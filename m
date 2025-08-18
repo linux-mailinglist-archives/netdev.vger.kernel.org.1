@@ -1,162 +1,124 @@
-Return-Path: <netdev+bounces-214504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AF85B29EE1
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 12:13:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4F2AB29F00
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 12:24:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AA174E5ACE
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 10:13:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAEC51646A1
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 10:21:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FB543112B4;
-	Mon, 18 Aug 2025 10:13:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A9FC315796;
+	Mon, 18 Aug 2025 10:20:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps001.vanheusden.com (fatelectron.soleus.nu [94.142.246.159])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85DCE273D65;
-	Mon, 18 Aug 2025 10:13:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.142.246.159
+Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6500315770;
+	Mon, 18 Aug 2025 10:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755511990; cv=none; b=LzdUnSvwUCPH20R1mzAGNj624hUxtQnFVm8HqpY31Qj+gPORNrxZhUksqAinOgqRTEvLultTPiIJ2yUDmsAwV+lio8BJKiXVmvSf/jgC7LbCP+wOq12K0WUXvD9lXD9txpzuCrw6n+qBs73CbiqjX2yWKAbk8xNp10a99ng6xYg=
+	t=1755512446; cv=none; b=bo6zwtWhETLxzkuydDrPtx+xAEPl0N5W8XSACGt8nkaRACt1dDOjRQplxIYnhC/Jfo+jrEY+sstp7ZjEV/wDmh6Y7g1ga2IY/kWl1WaxHp4yu8Je2mWPuQKfwUy50uMrHKKMiCH5MN3zKKI5Jdf3vJoAoI5z6Bh99vZ6i617bCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755511990; c=relaxed/simple;
-	bh=ZlxYiXZYWSzDfPDTW01mRTD49zmTG73+TBn2R9YARug=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=lhVOlX+85/0mx555i6j7vtWbbGgCfKXzWLdYsPmerhyIO+IxCwvEIeKpp/wDC/trOvosy+rT4Vk8a5mkeY5/8NfDrHXszg1Bt4avMYNJJlyG+PtQEMPWwu2OrTtpTpRkxELlNUe675HGcruBZCefDfQE7f1LZJr+krmWtanBD8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vanheusden.com; spf=pass smtp.mailfrom=vanheusden.com; arc=none smtp.client-ip=94.142.246.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vanheusden.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vanheusden.com
-Received: from webmail.vanheusden.com (unknown [172.29.0.1])
-	by vps001.vanheusden.com (Postfix) with ESMTPA id 26F245008F8;
-	Mon, 18 Aug 2025 12:04:17 +0200 (CEST)
+	s=arc-20240116; t=1755512446; c=relaxed/simple;
+	bh=vVfzZiL3SHLn9VOiHd94n8EbMb/amrFrBX1QpYNDS0Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LII+/4STT3YZP2O3Wvze4WoVcxRWxW8Q0mX1lKYOhhN5LERjGpVmVNXkEMqZ9nF6+6nk0DdxVsPNAyqZq9akYsGXFx64Rcx9asA5DOTPbVJC4pPFhaDqAG8kRqeAXHuUAGhnkuyf9UFOa3aYDHFKzTih6Z3kwJSeofddwcTdEaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
+	by localhost (Postfix) with ESMTP id 4c57gB3XdZz9sSh;
+	Mon, 18 Aug 2025 12:07:18 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id UW5otXcsL1ne; Mon, 18 Aug 2025 12:07:18 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4c57gB2nMFz9sSf;
+	Mon, 18 Aug 2025 12:07:18 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 4B9058B764;
+	Mon, 18 Aug 2025 12:07:18 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id ZTl45ucC9PUM; Mon, 18 Aug 2025 12:07:18 +0200 (CEST)
+Received: from [10.25.207.160] (unknown [10.25.207.160])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 269648B763;
+	Mon, 18 Aug 2025 12:07:18 +0200 (CEST)
+Message-ID: <edfed2af-8b4d-4afb-b999-5c46b7d46fba@csgroup.eu>
+Date: Mon, 18 Aug 2025 12:07:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Mon, 18 Aug 2025 12:04:17 +0200
-From: Folkert van Heusden <folkert@vanheusden.com>
-To: Bernard Pidoux <bernard.pidoux@free.fr>
-Cc: David Ranch <dranch@trinnet.net>, linux-hams@vger.kernel.org, netdev
- <netdev@vger.kernel.org>
-Subject: Re: [ROSE] [AX25] 6.15.10 long term stable kernel oops
-In-Reply-To: <acd04154-25a5-4721-a62b-36827a6e4e47@free.fr>
-References: <11c5701d-4bf9-4661-ad8a-06690bbe1c1c@free.fr>
- <fff0b3eb-ea42-4475-970d-30622dc25dca@free.fr>
- <e92e23a7-1503-454f-a7a2-cedab6e55fe2@free.fr>
- <acd04154-25a5-4721-a62b-36827a6e4e47@free.fr>
-Message-ID: <af3344165cd51561f92449a27841f41d@vanheusden.com>
-X-Sender: folkert@vanheusden.com
-Organization: www.vanheusden.com
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: modprobe returns 0 upon -EEXIST from insmod
+To: Phil Sutter <phil@nwl.cc>, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org
+Cc: linux-modules@vger.kernel.org, Yi Chen <yiche@redhat.com>,
+ netdev@vger.kernel.org
+References: <aKEVQhJpRdiZSliu@orbyte.nwl.cc>
+ <8a87656d-577a-4d0a-85b1-5fd17d0346fe@csgroup.eu>
+ <aKLzsAX14ybEjHfJ@orbyte.nwl.cc>
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+Content-Language: fr-FR
+In-Reply-To: <aKLzsAX14ybEjHfJ@orbyte.nwl.cc>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Looks like the issue I reported a few weeks ago.
-In my case not related to rose, only new connections.
+[+ Netfilter lists]
 
-On 2025-08-18 12:00, Bernard Pidoux wrote:
-> Hi,
-> 
-> I captured a screen picture of kernel panic in linux-6.16.0 that 
-> displays [mkiss]. See included picture.
-> 
-> Bernard
-> 
-> 
-> Le 16/08/2025 à 20:45, Bernard Pidoux a écrit :
->> David,
->> 
->> For some reason my messages are not accepted by vger.kernel.org 
->> despite I configured thunderbird not to send html.
->> 
->> I just compiled and loaded kernel 6.15.1.
->> 
->> Up to now FPAC 4.1.4 is running fine and performing connexions with 
->> neighbour ROSE nodes.
->> 
->> I will let it run a while before starting to apply progressively the 
->> AX25 and ROSE patches committed in kernels 15.2 to 15.10
->> 
->> I will start with ax25 ones and see what happens.
->> 
->> 73 de Bernard f6bvp / ai7bg
->> 
->> 
->> 
->> Le 16/08/2025 à 19:49, Bernard Pidoux a écrit :
->>> Hi David,
->>> 
->>> Actually Ubuntu stops responding without any message. No more 
->>> response from keyboard or mouse. Only switch power !
->>> 
->>> I am working on activating kernel messages on oops.
->>> 
->>> The bug is already present in 6.15.10 so there is no reason to look 
->>> at a more recent version.
->>> 
->>> I will report any progress if I find something interesting.
->>> 
->>> This is quite a challenge for me as I did not perform this kind of 
->>> kernel investigations since nearly a decade...and I am not getting 
->>> younger !
->>> 
->>> 73 de Bernard, f6bvp / ai7bg
->>> 
->>> 
->>> Le 16/08/2025 à 19:32, David Ranch a écrit :
->>>> 
->>>> Hey Bernard,
->>>> 
->>>> Thanks for posting this issue.  Can you copy/paste in the Oops 
->>>> you're seeing?  I did see a recent ROSE issue on 
->>>> 6.16.0-rc6-next-20250718- syzkaller and I wonder if that could have 
->>>> created this issue:
->>>> 
->>>> https://groups.google.com/g/syzkaller-bugs/c/0TmBbcJ2PKE
->>>> 
->>>> Btw, I would say that posting this to netdev@vger.kernel.org would 
->>>> probably be more important than this Debian list since this is most 
->>>> likely a kernel issue and not a distro issue per se.
->>>> 
->>>> --David
->>>> KI6ZHD
->>>> 
->>>> 
->>>> On 08/16/2025 10:02 AM, Bernard Pidoux wrote:
->>>>> Hi,
->>>>> 
->>>>> I am continuously working on AX25 ROSE/FPAC node since decades, 
->>>>> running a number of RaspBerry Pi (Raspi OS 64bit) plus Ubuntu LTS 
->>>>> on a mini PC.
->>>>> 
->>>>> Stable FPAC version 4.1.4 is performing packet switch quite well 
->>>>> although some improvements are underway.
->>>>> 
->>>>> FPAC runs flawlessly with kernel 6.14.11.
->>>>> 
->>>>> However, trying FPAC under stable kernel 6.15.10 experienced a 
->>>>> frozen system when issuing some commands like connect request.
->>>>> 
->>>>> Investigations seem to show that ax25 connect is fine and that the 
->>>>> bug is probably in ROSE module .
->>>>> 
->>>>> I am presently trying to find the faulty bug that triggers the 
->>>>> kernel oops by compiling and installing previous kernel versions 
->>>>> starting with 6.15.1.
->>>>> 
->>>>> 73s de Bernard, f6bvp / ai7bg
->>>>> 
->>>>> http://f6bvp.org
->>>>> 
->>>> 
->> 
+Hi Phil
 
+Le 18/08/2025 à 11:34, Phil Sutter a écrit :
+> [Vous ne recevez pas souvent de courriers de phil@nwl.cc. Découvrez pourquoi ceci est important à https://aka.ms/LearnAboutSenderIdentification ]
+> 
+> Hi Christophe,
+> 
+> On Sun, Aug 17, 2025 at 05:54:27PM +0200, Christophe Leroy wrote:
+>> Le 17/08/2025 à 01:33, Phil Sutter a écrit :
+>>> [Vous ne recevez pas souvent de courriers de phil@nwl.cc. D?couvrez pourquoi ceci est important ? https://aka.ms/LearnAboutSenderIdentification ]
+>>>
+>>> Hi,
+>>>
+>>> I admittedly didn't fully analyze the cause, but on my system a call to:
+>>>
+>>> # insmod /lib/module/$(uname -r)/kernel/net/netfilter/nf_conntrack_ftp.ko
+>>>
+>>> fails with -EEXIST (due to a previous call to 'nfct add helper ftp inet
+>>> tcp'). A call to:
+>>>
+>>> # modprobe nf_conntrack_ftp
+>>>
+>>> though returns 0 even though module loading fails. Is there a bug in
+>>> modprobe error status handling?
+>>>
+>>
+>> Read the man page : https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flinux.die.net%2Fman%2F8%2Fmodprobe&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7C34b49eb3d0544fc683e608ddde3a75b2%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638911064858807750%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=%2F70LV37Zb%2FNeiBV59y9rvkLGh0xsqga08Nl3c5%2BVU5I%3D&reserved=0
+>>
+>> In the man page I see:
+>>
+>>              Normally, modprobe will succeed (and do nothing) if told to
+>> insert a module which is already present or to remove a module which
+>> isn't present.
+> 
+> This is not a case of already inserted module, it is not loaded before
+> the call to modprobe. It is the module_init callback
+> nf_conntrack_ftp_init() which returns -EEXIST it received from
+> nf_conntrack_helpers_register().
+> 
+> Can't user space distinguish the two causes of -EEXIST? Or in other
+> words, is use of -EEXIST in module_init callbacks problematic?
 
--- 
-www.vanheusden.com
+So if I understand correctly the load fails because it is in conflict 
+with another module ?
+
+Then I think the error returned by nf_conntrack_helpers_register() 
+shouldn't be EEXIST but probably EBUSY.
+
+Christophe
 
