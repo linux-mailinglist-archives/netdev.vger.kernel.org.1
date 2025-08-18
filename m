@@ -1,137 +1,164 @@
-Return-Path: <netdev+bounces-214785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E12C3B2B38D
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 23:41:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9AEEB2B3E3
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 00:02:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8EADB7A735B
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 21:39:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91FB952679C
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 22:02:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B270421883E;
-	Mon, 18 Aug 2025 21:41:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C30027A468;
+	Mon, 18 Aug 2025 22:02:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="ViMJTKmi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mOWeY0Y6"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic312-26.consmr.mail.ir2.yahoo.com (sonic312-26.consmr.mail.ir2.yahoo.com [77.238.178.97])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC63217F23
-	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 21:41:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.238.178.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7116A1CAA85;
+	Mon, 18 Aug 2025 22:02:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755553286; cv=none; b=JvyxvW7pHKSi5Q7/OOx7x9EQWlGunqDAjJprXS5hQgU/4UIR093bX1s7x/7TKBDdpxrJFxc+63J7WvRbWrFeYJS7dh71aq6J5NFCdPgH6ti+NCR0yYBqw0EThnjrBQg1nvZJOI1FGLeWI6hb9TN+vfGFZBhqy+cAykf/nX7u1Wo=
+	t=1755554549; cv=none; b=UIxUUeQFwxe8L/ML/AtcP5nxN3jJO5wPepx7JkFsXHdRq7xB/7BsDG2pc2g68VjWeTZebghpg2YvU2KD3JdKGFPgqzBB13ukHWhXih1nfbFg9IE01cLiKXfkL0iusTJe4za9N13OZkvX0DQY7+ABHgD8ASYt0HAn34YhxS2AV9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755553286; c=relaxed/simple;
-	bh=botz0FT0NiuU9WqIXD42BZw5R29ehrUR/78Y1xEbVRc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=h72OVOcoKemRTGJweiEBuBXzr5yMw+LC/p0vXtpMB0Ky0yV6+sNZ6jIUtBbURKti2C3cHIzHGk/xZGpChMXA/Y0uoz1jiYSMaq+u/tWQ9eKRtG1D8rX7caKjZBQ1bWBw2hcX9MEed7iG90snOpFmT2veIhz7W87e8asG1YAbBi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gagniere.dev; spf=fail smtp.mailfrom=gagniere.dev; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=ViMJTKmi; arc=none smtp.client-ip=77.238.178.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gagniere.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=gagniere.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1755553277; bh=K5JfjdXTe5Sps1PIuwcFEPVRm7PfXvCzrb9okxWQosg=; h=From:To:Cc:Subject:Date:In-Reply-To:References:From:Subject:Reply-To; b=ViMJTKmiNlkhGT0Q2lGJp1+CewLxambdPNRmvTo+rO3eeqUe75oWhPsNrtJsNtbdtVj2xQdFISJUi69DEBq/MN4r1EE2jZot83UHsQQIVKU8UazTilMeS+MUj4Nl3DVV1C1VkJKMfyce2Q4IzOE5bOzq3lb706GKnmAkmsuGiMywp3GQa2apRveWCKTbWyM2N+MuNGBaY6Fp7fpi9sRHaCqMyS1HanyHMnTbegNnsytBf7gmuic6SPyPxl080KaVuP8sCO+zWaUwd6Q+48Z2sVx3xvp81tvNeBX4Dx9PnZdvCX8P88rW42fO3L/W/7ZdI53Ty87JZpfjEunlPQGIVA==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1755553277; bh=x+sgIpGZWPJFY6wYxcoXKm0cy3v/kT8pGhyX9HfYusk=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=G3CcaGlrEtZYLsxL/AwkbQkQuDy3AfQiBGeWYLykIp5cfj0k/LJYPiCfUUiBN6F/JhjM3XUD4ranrdYYO78bYeKMO9NT4qVZGybNS8Js/q2C8u7zj72A8s2IBrvGWZayY636YHlffJoaYmuOj+jwvkNmJoTbXv/YMkPheFQI9nvB/6jI0qEt8a0TRUOfP5+IFS4XkXgBWC9dZP2PDWa1VN4bPZ0JfKd/OvehYOZ36TcMHYFfxaVCMG6JKrJFw1bAyvDWGrMdcNh607PYkgWhn8HnYsGfObkFJRY2yjTnNa9I2jN/rgQxuwHP+2NqmvnS4JB/b6n3fPyx7TonFHCbwQ==
-X-YMail-OSG: _rDGOfQVM1mjFL2kYhzXkC0cNEvnjPxO9rH8Zgk6TJQpowSe8lOO_nzuAnd1RLz
- y0dotewveT6P2eWOjQf_v5XPJ0voT6HHlo4Kb8eEiJff89RfNZ5k.TcWHp33joB49Gyhj.lKOpbF
- 5.9APPhyIq1tFgylujo53qGutSIvbMnVjt0obJvBofRZXOBMAbfnqVN3xuhT5JWpB4F3TZd28DeL
- o18A3y80XCbktMwngGvBHEHOLgrVJIKdglS_3Bqox95zkJgbNNtHCfg8QN5bf4z5yv2D7S26iobD
- R0ozQHBegsNseO94nCZME.aYNB7JVbkprRfN.qKc7nkiIUL_ANHafZvFO6.XJXC4a3kPQLsY8V_2
- cHWDUd1S1IrZiGdLj6Z3UP8G01S9bD3c735OpaOOZw5Hi8SJ5YBtpVg2hSYNtiCkawHopQkv1Pky
- Ysr2kzwZkTM0P347up8BbcZ57HbNcV0SxtNX1e_tykNKjpKTv7NkduPaP2Zz9jFdJMOmPiiNaU8p
- M1uhA7A6O7CISyO2JNmVu_NyJj4bqsQe3MSu6AA2HQxfySN1KRXaH7NB77a2MrwTIQV0fh61gDyY
- CbkAdtciG2JWRd.8hbM9N5rpr7jdokygqGDjT__F9e3QLBr77dFtmeXaLrhD.RpVHgt.Wa1GUCKm
- lzzY3mHj5e2pmYd5.fViAk3JLeWFR1Fu71QTFzGK3N9ohkBkvg0HH3pK5l6zIShGUAnE_FgRqFfO
- wnokhVzfZ4ArBCA.G5AATJIS.kWqjVijZz2t_0wjQlGj3ghxk3UGi3S1bTM9IsB1qjiS0WLiSiKA
- l7Mn4woulQcIPZkM8rFPgA2no7GuOT4TZSwbjeAT4z3bjKxqiVBN5Sxgt0C8s8xrjKXc6JdN1PzC
- sYTX9AEMqRTZMV65s5oRm0mB3L62STBDJyOl8D5PyPUAEh8hk66n.5nlWA9UoHXllpwxCP3Q5.MZ
- IKJ_XhYgGBNP4oITjb8QsI78HUC0V7hBoBCo.YLU..TgCAthLWR4K8D0hnOHZsSad5.uobxiN.M7
- jQdfoRCr4X_nN89DWwXYUTweo10V0lxsSqqcu4HEaYR.y.385Ivd.qude2ebs5TtZn_bsUCPXuuZ
- BFWMUJEHVOo2bToURyksbRR8qeVudxMvoFmSpSX99KunFE6iAoD.Uc.UvYSLtVUR31dJ87GVrjQB
- 2c8F1zka0Ia9_jPj9nLLHPUGwXT3PLZP5KODhjlgdpGCnpYpyQ9Qmsi6yIkxHLjubq21O.wVtCjf
- R4mskQHzIxu6ZGab8c3hIUVIl42pYvcEIG6mkBOXBd5Dd2FS_qbil_PRUuZU3Ud0EuG5qQUCRJ1A
- Yrkqo_X3x3T5bKCA_glN0SPVqfaA.WOyhnvonufI8kF12TdZJVdVliEKZr3srzxy7sUBS6iXqYwq
- fMmWiFxEtC6teRfCmL5_O9FNoc5GR79JTibyMDgvKGJNv9X_JeEwnCo16aHVrJUpwucxRulCvhwU
- Vje_X6c8W4EJpGTlkevL.nPynu4GZJnE4ggC.vQ6WUSJgwVhyT0gbmF.zGfQp_pgUPKG8bmso1F8
- NDCSZHXu3kP3.qLoHZNKRwImNoxJ6Ajn7Qo71XPIkRwbwl_EEpjRv3qvB9bD_mUzQ3RFQDrHVYky
- P9WeAS8VcQEzYZ.LciHj..I57bGjxtrxRGCCNkYcqlMeJsWC5ij.eoEZ7.WVMIncRkNRBM1k9Wra
- 7qsUcxNECmsYWPrRZUu49Ym2L66rLr8lPCspuT.YMYr01AijpKMwwz_hqzwBQHFJRWliyvTO9W99
- ZiRLcCqcOaslBbtJV5149KQghUNbkVtLWf.5TbqzpXBT8NueaPo9rozi2.YxLdx4Id9JHD3os_fz
- 7uIcYJOZQ5xKZlmfMPDFgZjb1h8v6x3DST4zX2RJwKnIQensCLpXjhf.gPMtYIM4Qnt67Xxd9fMb
- qkiD6EoesAjsLLZONJDv2mQBnWx3agojXY56gg95xQMJpLLqQSzl1c_xhnDdErDxU0NBatstcbaT
- TLfpA804fYbaINYCpWJjh.IasXthgMeguhVnTXqSy5RdVtZ1wkXM0Ur1_U0N6eOOgyrfBC2sCP62
- oeB_1T2kJpmo5xvvDIfKB3ZuSqOnx2t8uz3RUizmh3OETnFrIlo979ibYwhTUWtuGMpnTtkagAE_
- m4WgO2e0tc9Nenlw7LPs.xDNV4EsB0T.S0DZc28SKNdvezF7VH0rsSHZhLSXvuzn_T5VkcZHwvkK
- _HAISpQjIvFjsAdkwX5zy3U761cyr0p5oK5NmjhB1CqdTdKD03qAaw2sca85aKQ--
-X-Sonic-MF: <antoine@gagniere.dev>
-X-Sonic-ID: 5066edb9-4f7b-4393-85f5-d0598e766b99
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic312.consmr.mail.ir2.yahoo.com with HTTP; Mon, 18 Aug 2025 21:41:17 +0000
-Received: by hermes--production-ir2-858bd4ff7b-mp79t (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 5508fcfd494b94e06b4a8396594c10b4;
-          Mon, 18 Aug 2025 21:31:05 +0000 (UTC)
-From: Antoine Gagniere <antoine@gagniere.dev>
-To: vadim.fedorenko@linux.dev
-Cc: antoine@gagniere.dev,
-	jonathan.lemon@gmail.com,
+	s=arc-20240116; t=1755554549; c=relaxed/simple;
+	bh=BbKQhsSie71PplRUIqtXnKtQMB2oshV1SJWnLXLpjls=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=mGZmXrTE4lsssJ5LWMWjOhPCWIBILeSpqlg/K/71TirU5vCHCILz4k15EGFaDp+rc11V1B2CxHdF118XfHGiXWw1ekixEdWe0W//TKbYqDRim1JIYVTsEDYHmYAeRReANjJfTDjibrL2QEnQu7f6skZFLyU0w7TVget73aYe840=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mOWeY0Y6; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3bb81a0c36aso177700f8f.3;
+        Mon, 18 Aug 2025 15:02:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755554544; x=1756159344; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MMT+x+jbaJC9oySW558qkFj8oOION97HvJImMbStZp8=;
+        b=mOWeY0Y6emOZIVbjQCM5Da6/PYrNyxDg58LESEPnRiT4YABhA/qEQI0XrFQNBvz3Jv
+         SitjazQW9jhcTn8tnSFWeusjmwkmyBEdvWgIR3P957Om3dGu0c3tHzb5+BAButMSGbvQ
+         z3upXnzT9f4mH9P7Cgy+V3jLFtHVTr7tCV9nlytKukQKXsrYrFLoandNKT7+sfJXd4Om
+         QMDlMv+8ydteBABEfqkTSq5SraPAkwQr0gV7FWQgIjZQkfVUZHEa8S5RbfVtXpvuVKyd
+         GHiN9V7fKx7quxECY9+BSGgWoLKOkwlUOadxZcc9lZJTJNVEBuebjyqQnOXWiWZQW1ZK
+         2trQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755554544; x=1756159344;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MMT+x+jbaJC9oySW558qkFj8oOION97HvJImMbStZp8=;
+        b=VFZh2n3vrGg9zVgD36Ahu+bOZztMlv63eLjJCEfxUUCY70h8S+nFUfhYOA1Sc3Rgv1
+         NeN8nJEkP1mCM/D4aypCzkCQKOMvosBRxQ76SSlzt/JNpDlTmU3GLuheQQrPH9WMk1G4
+         Nv8cnK31ji4o+9fe4XC3H0Z5Q8V3nCZSHHyh+6Bk9KyJS+FME82Z9gWoZhuk3RouY5RK
+         ucR0TMwfIrlAojVsyph+Cbr44tLqS4KSmep03LqPw0hcMIDRuXVP+d0wSDtQwyHdd4Y8
+         UbJ0CVL2XVZ0fi2ib9BZ9WOsON1mU7D0JbVX//0fpLlu/CsN6nuP1oraMtJj71tBCKEj
+         PiHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUY1woNxaK16Gxm/2J/JZZBq+UH4RQYw1Rqtm3ydw8rK40x9jsOxrOhAxboLzCgitJfKWzjd5Q2tJlV3EI=@vger.kernel.org, AJvYcCX9sPSjtkFBosAY8lVHMdln016Nw+xs5wSuiXHQfhrQbuKItjphMqCyyAI6eSTs1LhoKMFQ5082@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywed7XiPcFEK94pTXHjah69CttUG1hPHvIMG5yXpfoSb1HxTy46
+	k5mynomNXMKUsstEkNdXJGeUfVIfUdnlu76Sz08FpwJLnTyZxRRP/4Zh
+X-Gm-Gg: ASbGncsl2inzHDu03B92V4eAOOzFAGJo/bG6i4PrUIRNGom1Lf27fAXsfDB05NraFO3
+	sRx7wNejA+FMQL5Tm7I6oD5VfP+bOjl07+EKRNcJQowdRwO6uFtCkYQLLKXdPRp54w9l/udKFk/
+	B7dxurlO28nUIRTb+6uM45QlSNYu5DKvRCZa6bKcvqjxARc1CKp9kEWSu7DDl5dT7rQ5M64F/n3
+	5/dBCiRGutloZbKdKjBJSx5tBsgtSqWqQGh+NvhjDS9uonaNikWVnSCautt+gmq3JLCLDz4qPqJ
+	HKUH6lAAd3Rli6Tnhzeqd25Ov5uQRO3SMshjgd07nNZE1SmGM9F3CMkC2FwO4UgBgrPqUU5VUym
+	95B0rF5yPPofKz5Znx7eGZpLuRlHMFg5+xRJZl/n5YlZ42PA0a9okRU7ruddv7pFRejfezmwztw
+	==
+X-Google-Smtp-Source: AGHT+IGqTqLQGaZ68f4i/kMGo2uN5+oqDEU0Zd691fQqoW6XRw2OaSXzy4vlDNXALNeaT0rKZcREXw==
+X-Received: by 2002:a05:6000:290d:b0:3b9:13a4:731 with SMTP id ffacd0b85a97d-3c0ed7b8f3dmr67727f8f.10.1755554543409;
+        Mon, 18 Aug 2025 15:02:23 -0700 (PDT)
+Received: from pop-os.localdomain (208.77.11.37.dynamic.jazztel.es. [37.11.77.208])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3c0748797acsm967410f8f.10.2025.08.18.15.02.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Aug 2025 15:02:22 -0700 (PDT)
+From: =?UTF-8?q?Miguel=20Garc=C3=ADa?= <miguelgarciaroman8@gmail.com>
+To: davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
 	kuba@kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] ptp: ocp: Fix PCI delay estimation
-Date: Mon, 18 Aug 2025 23:31:04 +0200
-Message-ID: <20250818213104.34351-1-antoine@gagniere.dev>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <6848f9cc-a713-4eee-abf2-e4159fea50c2@linux.dev>
-References: <6848f9cc-a713-4eee-abf2-e4159fea50c2@linux.dev>
+	pabeni@redhat.com
+Cc: horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org,
+	=?UTF-8?q?Miguel=20Garc=C3=ADa?= <miguelgarciaroman8@gmail.com>
+Subject: [PATCH net-next] ipv6: ip6_gre: replace strcpy with strscpy for tunnel name
+Date: Tue, 19 Aug 2025 00:02:03 +0200
+Message-Id: <20250818220203.899338-1-miguelgarciaroman8@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
->>   static void
->>   ptp_ocp_estimate_pci_timing(struct ptp_ocp *bp)
->>   {
->> -	ktime_t start, end, delay = U64_MAX;
->> +	ktime_t start, end;
->> +	s64 delay_ns = U32_MAX; /* 4.29 seconds is high enough */
->>   	u32 ctrl;
->>   	int i;
->>
->> @@ -1568,15 +1569,16 @@ ptp_ocp_estimate_pci_timing(struct ptp_ocp *bp)
->>
->>   		iowrite32(ctrl, &bp->reg->ctrl);
->>
->> -		start = ktime_get_raw_ns();
->> +		start = ktime_get_raw();
->>
->>   		ctrl = ioread32(&bp->reg->ctrl);
->>
->> -		end = ktime_get_raw_ns();
->> +		end = ktime_get_raw();
->>
->> -		delay = min(delay, end - start);
->> +		delay_ns = min(delay_ns, ktime_to_ns(end - start));
->>   	}
->> -	bp->ts_window_adjust = (delay >> 5) * 3;
->> +	delay_ns = max(0, delay_ns);0
->
-> I don't believe we can get a negative value from
-> ktime_to_ns(end - start), and that means that delay_ns will always be
-> positive and there is no need for the last max().
+Replace the strcpy() call that copies the device name into
+tunnel->parms.name with strscpy(), to avoid potential overflow
+and guarantee NULL termination. This uses the two-argument
+form of strscpy(), where the destination size is inferred
+from the array type.
 
-You are correct, ktime is monotonic, this was an excess of zeal
-on my part.
+Destination is tunnel->parms.name (size IFNAMSIZ).
 
+Tested in QEMU (Alpine rootfs):
+ - Created IPv6 GRE tunnels over loopback
+ - Assigned overlay IPv6 addresses
+ - Verified bidirectional ping through the tunnel
+ - Changed tunnel parameters at runtime (`ip -6 tunnel change`)
 
-> JFYI, for the next version could you please organize the commit message
-> to fit into 80 chars per line and specify net tree as well as patch
-> which you believe introduced the problem using Fixes tag.
->
-> More details on formatting can be found at
-> https://docs.kernel.org/process/submitting-patches.html#submittingpatches
+Signed-off-by: Miguel García <miguelgarciaroman8@gmail.com>
+---
+ net/ipv6/ip6_gre.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-Thanks for the link, I was looking for such documentation but somehow missed this page
+diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
+index 74d49dd6124d..c82a75510c0e 100644
+--- a/net/ipv6/ip6_gre.c
++++ b/net/ipv6/ip6_gre.c
+@@ -329,9 +329,9 @@ static struct ip6_tnl *ip6gre_tunnel_locate(struct net *net,
+ 	if (parms->name[0]) {
+ 		if (!dev_valid_name(parms->name))
+ 			return NULL;
+-		strscpy(name, parms->name, IFNAMSIZ);
++		strscpy(name, parms->name);
+ 	} else {
+-		strcpy(name, "ip6gre%d");
++		strscpy(name, "ip6gre%d");
+ 	}
+ 	dev = alloc_netdev(sizeof(*t), name, NET_NAME_UNKNOWN,
+ 			   ip6gre_tunnel_setup);
+@@ -1469,7 +1469,7 @@ static int ip6gre_tunnel_init_common(struct net_device *dev)
+ 	tunnel = netdev_priv(dev);
+ 
+ 	tunnel->dev = dev;
+-	strcpy(tunnel->parms.name, dev->name);
++	strscpy(tunnel->parms.name, dev->name);
+ 
+ 	ret = dst_cache_init(&tunnel->dst_cache, GFP_KERNEL);
+ 	if (ret)
+@@ -1529,7 +1529,7 @@ static void ip6gre_fb_tunnel_init(struct net_device *dev)
+ 
+ 	tunnel->dev = dev;
+ 	tunnel->net = dev_net(dev);
+-	strcpy(tunnel->parms.name, dev->name);
++	strscpy(tunnel->parms.name, dev->name);
+ 
+ 	tunnel->hlen		= sizeof(struct ipv6hdr) + 4;
+ }
+@@ -1842,7 +1842,7 @@ static int ip6erspan_tap_init(struct net_device *dev)
+ 	tunnel = netdev_priv(dev);
+ 
+ 	tunnel->dev = dev;
+-	strcpy(tunnel->parms.name, dev->name);
++	strscpy(tunnel->parms.name, dev->name);
+ 
+ 	ret = dst_cache_init(&tunnel->dst_cache, GFP_KERNEL);
+ 	if (ret)
+-- 
+2.34.1
 
-Will attempt a v2 later this week
 
