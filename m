@@ -1,295 +1,132 @@
-Return-Path: <netdev+bounces-214471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8732B29BD5
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 10:16:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32711B29BEB
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 10:23:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 92E384E240B
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 08:16:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31EAF189BB57
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 08:22:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1404E2FDC3A;
-	Mon, 18 Aug 2025 08:16:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4799C2FF67D;
+	Mon, 18 Aug 2025 08:22:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="UizifVZ6"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="zvVmPLrR"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62FBD2FB98D;
-	Mon, 18 Aug 2025 08:16:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E02B21D9346;
+	Mon, 18 Aug 2025 08:22:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755504996; cv=none; b=cQfdKHdS7zOZ5q369Lk+dt2jDqVX7aW1ZCpa2nxtuYPIVl3PkUR0jzYAh9F+rj1A2+hshiZGeysbwnZy7BDZEAD0hi8K4eLeKgYl9c+GaihpLm+r+oFTDd9UdwQpSIpVIo5L6Vuc1sq5tJlVDc641rhsi3jUpEIjdsvYg2ktTGk=
+	t=1755505341; cv=none; b=OfarMtMXXXuytF9J3QipS6FUDFeODNiPQuPwRy4qiHqdaFPJHl0AVaRDHAAZQNpJc44wKgxxk9+nBf3RcDv5vklxTRIXfj++gSWePhHxN4Zb7wQF+TcW3Ye4JhVy0HKQ/Mrx2Ng1JRoSKLebWTzlGSqZLc/mVvnNFaJTbZh/a4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755504996; c=relaxed/simple;
-	bh=G+aHlvQ+CweaIXV2IXq48IipOx5UUo5t880wy4OPl1k=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uus9OpI91w0kymSMcjzShacJhPc3POn2zqu/ryt6bSwIqORtxvmMagpE5ZtT9STuEMb5hcPGvqg/Tep/gQw+Fr/V7mQ4ZGxo5WV5ttxMu31s+ctBiCrMemsDLNaTO4Lb1hzZ67eCV+Bp7UO4gileECsNNPIL0i2ak1hkSuvb6Ow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=UizifVZ6; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1755504995; x=1787040995;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=G+aHlvQ+CweaIXV2IXq48IipOx5UUo5t880wy4OPl1k=;
-  b=UizifVZ6OOTI93X5pS/Vsz7ttD9upmS1b6EpPTq565sE1t5CEo/bcQWT
-   ZgV0C9kV/U2XB+7BiGDJO9xY4KLrrHQ0NfcdZtKthzthw/H9k1x5/QODB
-   pyU1ndRvKEH09kt3gJWrwsISRzfGEAULgZWA17ra+ytNJm9fpqN6XtIJ7
-   9YOvm+SG76mZcn1MgQ2uCst5tC52muvByYhceGLeaZt56KUvLGNDwIuTh
-   7obv5wTEAZeSfoJfUfaiI23P0EFrUskjMIe5TaatkaYyT6Bp9m5J4wxd0
-   MfT4rTdrtKhHOuEsffM40SPJ8sn2T7rzDidD+I5w29ute2MZu1hW6Bzre
-   Q==;
-X-CSE-ConnectionGUID: DwC6mKDGSdioEGdvpUJHIA==
-X-CSE-MsgGUID: bN7t/wOcQFGpXpVdOUpFVA==
-X-IronPort-AV: E=Sophos;i="6.17,293,1747724400"; 
-   d="scan'208";a="45303678"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Aug 2025 01:16:34 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Mon, 18 Aug 2025 01:16:20 -0700
-Received: from DEN-DL-M31836.microchip.com (10.10.85.11) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.44 via Frontend Transport; Mon, 18 Aug 2025 01:16:17 -0700
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <richardcochran@gmail.com>,
-	<rmk+kernel@armlinux.org.uk>, <vladimir.oltean@nxp.com>, <rosenp@gmail.com>,
-	<christophe.jaillet@wanadoo.fr>, <viro@zeniv.linux.org.uk>,
-	<quentin.schulz@bootlin.com>, <atenart@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>
-Subject: [PATCH net v4] phy: mscc: Fix timestamping for vsc8584
-Date: Mon, 18 Aug 2025 10:10:29 +0200
-Message-ID: <20250818081029.1300780-1-horatiu.vultur@microchip.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1755505341; c=relaxed/simple;
+	bh=tQz09CQnpg2v7hXSM+rrQMxQLWtYNk13pbjlIvre16E=;
+	h=From:In-Reply-To:Content-Type:References:Date:Cc:To:MIME-Version:
+	 Message-ID:Subject; b=V6KjxdRE9YS724+exKXPoM06s6WoujOK4Db9OlQK9lprDGLRDne5hDMYQjRNpQEZwOS9I/gcpMNIWhqWRyBdyTs/W0nzZ0gJNHGAAFd6Y9at+GR5D08FpOBk9A87E2vQivZYHx/Pfa2alU8SitpHacxAVZf74HS0IBX3G8pMy6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=zvVmPLrR; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id D928D1A0D74;
+	Mon, 18 Aug 2025 08:16:29 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id A577E606A6;
+	Mon, 18 Aug 2025 08:16:29 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPA id EE6F21C22DA38;
+	Mon, 18 Aug 2025 10:15:57 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1755504988; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=+9Qk2NYCjGmfOUHqDVJHq6gqBPxiEeC5lSxafUieh6E=;
+	b=zvVmPLrR3DlHxwdDO+5udyfppBCbTiVOErcQUikGwVc2r7fpVow4GrUqinlVopdb8ctYOd
+	im04COl7V2zFSJTQWAqeqEnC6roiK+MGn7oTyI2xtVdbUIYU/nQidoytH2k7mH9120zAZf
+	e2fEEEZYKBu+O+e0+dDhej56qlFxqvEJfjJQ7z1eedeWKi0A0lc0lSwvSLSQ6daXwC5Odd
+	bvM8AjxsHhnjz+vDqp4qqx3uI34WTgVrlO9ewWH/WD3mQ58TsBk24HsO6uM0qRR86jIaL7
+	r1JSwb9Yu1PEetB/HQV+TOK/66F+T5reJUGCGgDhpXGgSBIQAZyTdp7vN2oMhQ==
+From: "Maxime Chevallier" <maxime.chevallier@bootlin.com>
+In-Reply-To: <20250815063509.743796-6-o.rempel@pengutronix.de>
+Content-Type: text/plain; charset="utf-8"
+References: <20250815063509.743796-1-o.rempel@pengutronix.de> <20250815063509.743796-6-o.rempel@pengutronix.de>
+Date: Mon, 18 Aug 2025 10:15:56 +0200
+Cc: "Andrew Lunn" <andrew@lunn.ch>, "Jakub Kicinski" <kuba@kernel.org>, =?utf-8?q?David_S=2E_Miller?= <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>, "Donald Hunter" <donald.hunter@gmail.com>, "Jonathan Corbet" <corbet@lwn.net>, "Heiner Kallweit" <hkallweit1@gmail.com>, "Russell King" <linux@armlinux.org.uk>, "Kory Maincent" <kory.maincent@bootlin.com>, "Nishanth Menon" <nm@ti.com>, kernel@pengutronix.de, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, UNGLinuxDriver@microchip.com, linux-doc@vger.kernel.org, "Michal Kubecek" <mkubecek@suse.cz>, "Roan van Dijk" <roan@protonic.nl>
+To: "Oleksij Rempel" <o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Message-ID: <1df-68a2e100-1-20bf1840@149731379>
+Subject: =?utf-8?q?Re=3A?= [PATCH net-next v2 5/5] =?utf-8?q?net=3A?=
+ =?utf-8?q?_phy=3A?==?utf-8?q?_dp83td510=3A?= add MSE interface support for 
+ 10BASE-T1L
+User-Agent: SOGoMail 5.10.0
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: None
 
-There was a problem when we received frames and the frames were
-timestamped. The driver is configured to store the nanosecond part of
-the timestmap in the ptp reserved bits and it would take the second part
-by reading the LTC. The problem is that when reading the LTC we are in
-atomic context and to read the second part will go over mdio bus which
-might sleep, so we get an error.
-The fix consists in actually put all the frames in a queue and start the
-aux work and in that work to read the LTC and then calculate the full
-received time.
+Hi Oleksij,
 
-Fixes: 7d272e63e0979d ("net: phy: mscc: timestamping and PHC support")
-Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+On Friday, August 15, 2025 08:35 CEST, Oleksij Rempel <o.rempel@pengutr=
+onix.de> wrote:
 
----
-v3->v4:
-- remove empty line
+> Implement get=5Fmse=5Fconfig() and get=5Fmse=5Fsnapshot() for the DP8=
+3TD510E
+> to expose its Mean Square Error (MSE) register via the new PHY MSE
+> UAPI.
+>=20
+> The DP83TD510E does not document any peak MSE values; it only exposes
+> a single average MSE register used internally to derive SQI. This
+> implementation therefore advertises only PHY=5FMSE=5FCAP=5FAVG, along=
+ with
+> LINK and channel-A selectors. Scaling is fixed to 0xFFFF, and the
+> refresh interval/number of symbols are estimated from 10BASE-T1L
+> symbol rate (7.5 MBd) and typical diagnostic intervals (~1 ms).
+>=20
+> For 10BASE-T1L deployments, SQI is a reliable indicator of link
+> modulation quality once the link is established, but it does not
+> indicate whether autonegotiation pulses will be correctly received
+> in marginal conditions. MSE provides a direct measurement of slicer
+> error rate that can be used to evaluate if autonegotiation is likely
+> to succeed under a given cable length and condition. In practice,
+> testing such scenarios often requires forcing a fixed-link setup to
+> isolate MSE behaviour from the autonegotiation process.
+>=20
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
-v2->v3:
-- make sure to flush the rx_skbs_list when the driver is removed
+[...]
 
-v1->v2:
-- use sk_buff_head instead of a list_head and spinlock_t
-- stop allocating vsc8431_skb but put the timestamp in skb->cb
----
- drivers/net/phy/mscc/mscc.h      | 12 ++++++++
- drivers/net/phy/mscc/mscc_main.c | 12 ++++++++
- drivers/net/phy/mscc/mscc_ptp.c  | 49 ++++++++++++++++++++++++--------
- 3 files changed, 61 insertions(+), 12 deletions(-)
+> +static int dp83td510=5Fget=5Fmse=5Fsnapshot(struct phy=5Fdevice *phy=
+dev, u32 channel,
+> +				      struct phy=5Fmse=5Fsnapshot *snapshot)
+> +{
+> +	int ret;
+> +
+> +	if (channel !=3D PHY=5FMSE=5FCHANNEL=5FLINK &&
+> +	    channel !=3D PHY=5FMSE=5FCHANNEL=5FA)
+> +		return -EOPNOTSUPP;
 
-diff --git a/drivers/net/phy/mscc/mscc.h b/drivers/net/phy/mscc/mscc.h
-index 138355f1ab0bc..b8c6ba7c7834e 100644
---- a/drivers/net/phy/mscc/mscc.h
-+++ b/drivers/net/phy/mscc/mscc.h
-@@ -365,6 +365,13 @@ struct vsc85xx_hw_stat {
- 	u16 mask;
- };
- 
-+struct vsc8531_skb_cb {
-+	u32 ns;
-+};
-+
-+#define VSC8531_SKB_CB(skb) \
-+	((struct vsc8531_skb_cb *)((skb)->cb))
-+
- struct vsc8531_private {
- 	int rate_magic;
- 	u16 supp_led_modes;
-@@ -413,6 +420,11 @@ struct vsc8531_private {
- 	 */
- 	struct mutex ts_lock;
- 	struct mutex phc_lock;
-+
-+	/* list of skbs that were received and need timestamp information but it
-+	 * didn't received it yet
-+	 */
-+	struct sk_buff_head rx_skbs_list;
- };
- 
- /* Shared structure between the PHYs of the same package.
-diff --git a/drivers/net/phy/mscc/mscc_main.c b/drivers/net/phy/mscc/mscc_main.c
-index 37e3e931a8e53..800da302ae632 100644
---- a/drivers/net/phy/mscc/mscc_main.c
-+++ b/drivers/net/phy/mscc/mscc_main.c
-@@ -2368,6 +2368,13 @@ static int vsc85xx_probe(struct phy_device *phydev)
- 	return vsc85xx_dt_led_modes_get(phydev, default_mode);
- }
- 
-+static void vsc85xx_remove(struct phy_device *phydev)
-+{
-+	struct vsc8531_private *priv = phydev->priv;
-+
-+	skb_queue_purge(&priv->rx_skbs_list);
-+}
-+
- /* Microsemi VSC85xx PHYs */
- static struct phy_driver vsc85xx_driver[] = {
- {
-@@ -2630,6 +2637,7 @@ static struct phy_driver vsc85xx_driver[] = {
- 	.config_intr    = &vsc85xx_config_intr,
- 	.suspend	= &genphy_suspend,
- 	.resume		= &genphy_resume,
-+	.remove		= &vsc85xx_remove,
- 	.probe		= &vsc8574_probe,
- 	.set_wol	= &vsc85xx_wol_set,
- 	.get_wol	= &vsc85xx_wol_get,
-@@ -2657,6 +2665,7 @@ static struct phy_driver vsc85xx_driver[] = {
- 	.config_intr    = &vsc85xx_config_intr,
- 	.suspend	= &genphy_suspend,
- 	.resume		= &genphy_resume,
-+	.remove		= &vsc85xx_remove,
- 	.probe		= &vsc8574_probe,
- 	.set_wol	= &vsc85xx_wol_set,
- 	.get_wol	= &vsc85xx_wol_get,
-@@ -2684,6 +2693,7 @@ static struct phy_driver vsc85xx_driver[] = {
- 	.config_intr    = &vsc85xx_config_intr,
- 	.suspend	= &genphy_suspend,
- 	.resume		= &genphy_resume,
-+	.remove		= &vsc85xx_remove,
- 	.probe		= &vsc8584_probe,
- 	.get_tunable	= &vsc85xx_get_tunable,
- 	.set_tunable	= &vsc85xx_set_tunable,
-@@ -2709,6 +2719,7 @@ static struct phy_driver vsc85xx_driver[] = {
- 	.config_intr    = &vsc85xx_config_intr,
- 	.suspend	= &genphy_suspend,
- 	.resume		= &genphy_resume,
-+	.remove		= &vsc85xx_remove,
- 	.probe		= &vsc8584_probe,
- 	.get_tunable	= &vsc85xx_get_tunable,
- 	.set_tunable	= &vsc85xx_set_tunable,
-@@ -2734,6 +2745,7 @@ static struct phy_driver vsc85xx_driver[] = {
- 	.config_intr    = &vsc85xx_config_intr,
- 	.suspend	= &genphy_suspend,
- 	.resume		= &genphy_resume,
-+	.remove		= &vsc85xx_remove,
- 	.probe		= &vsc8584_probe,
- 	.get_tunable	= &vsc85xx_get_tunable,
- 	.set_tunable	= &vsc85xx_set_tunable,
-diff --git a/drivers/net/phy/mscc/mscc_ptp.c b/drivers/net/phy/mscc/mscc_ptp.c
-index 275706de5847c..de6c7312e8f29 100644
---- a/drivers/net/phy/mscc/mscc_ptp.c
-+++ b/drivers/net/phy/mscc/mscc_ptp.c
-@@ -1194,9 +1194,7 @@ static bool vsc85xx_rxtstamp(struct mii_timestamper *mii_ts,
- {
- 	struct vsc8531_private *vsc8531 =
- 		container_of(mii_ts, struct vsc8531_private, mii_ts);
--	struct skb_shared_hwtstamps *shhwtstamps = NULL;
- 	struct vsc85xx_ptphdr *ptphdr;
--	struct timespec64 ts;
- 	unsigned long ns;
- 
- 	if (!vsc8531->ptp->configured)
-@@ -1206,27 +1204,52 @@ static bool vsc85xx_rxtstamp(struct mii_timestamper *mii_ts,
- 	    type == PTP_CLASS_NONE)
- 		return false;
- 
--	vsc85xx_gettime(&vsc8531->ptp->caps, &ts);
--
- 	ptphdr = get_ptp_header_rx(skb, vsc8531->ptp->rx_filter);
- 	if (!ptphdr)
- 		return false;
- 
--	shhwtstamps = skb_hwtstamps(skb);
--	memset(shhwtstamps, 0, sizeof(struct skb_shared_hwtstamps));
--
- 	ns = ntohl(ptphdr->rsrvd2);
- 
--	/* nsec is in reserved field */
--	if (ts.tv_nsec < ns)
--		ts.tv_sec--;
-+	VSC8531_SKB_CB(skb)->ns = ns;
-+	skb_queue_tail(&vsc8531->rx_skbs_list, skb);
- 
--	shhwtstamps->hwtstamp = ktime_set(ts.tv_sec, ns);
--	netif_rx(skb);
-+	ptp_schedule_worker(vsc8531->ptp->ptp_clock, 0);
- 
- 	return true;
- }
- 
-+static long vsc85xx_do_aux_work(struct ptp_clock_info *info)
-+{
-+	struct vsc85xx_ptp *ptp = container_of(info, struct vsc85xx_ptp, caps);
-+	struct skb_shared_hwtstamps *shhwtstamps = NULL;
-+	struct phy_device *phydev = ptp->phydev;
-+	struct vsc8531_private *priv = phydev->priv;
-+	struct sk_buff_head received;
-+	struct sk_buff *rx_skb;
-+	struct timespec64 ts;
-+	unsigned long flags;
-+
-+	__skb_queue_head_init(&received);
-+	spin_lock_irqsave(&priv->rx_skbs_list.lock, flags);
-+	skb_queue_splice_tail_init(&priv->rx_skbs_list, &received);
-+	spin_unlock_irqrestore(&priv->rx_skbs_list.lock, flags);
-+
-+	vsc85xx_gettime(info, &ts);
-+	while ((rx_skb = __skb_dequeue(&received)) != NULL) {
-+		shhwtstamps = skb_hwtstamps(rx_skb);
-+		memset(shhwtstamps, 0, sizeof(struct skb_shared_hwtstamps));
-+
-+		if (ts.tv_nsec < VSC8531_SKB_CB(rx_skb)->ns)
-+			ts.tv_sec--;
-+
-+		shhwtstamps->hwtstamp = ktime_set(ts.tv_sec,
-+						  VSC8531_SKB_CB(rx_skb)->ns);
-+		netif_rx(rx_skb);
-+	}
-+
-+	return -1;
-+}
-+
- static const struct ptp_clock_info vsc85xx_clk_caps = {
- 	.owner		= THIS_MODULE,
- 	.name		= "VSC85xx timer",
-@@ -1240,6 +1263,7 @@ static const struct ptp_clock_info vsc85xx_clk_caps = {
- 	.adjfine	= &vsc85xx_adjfine,
- 	.gettime64	= &vsc85xx_gettime,
- 	.settime64	= &vsc85xx_settime,
-+	.do_aux_work	= &vsc85xx_do_aux_work,
- };
- 
- static struct vsc8531_private *vsc8584_base_priv(struct phy_device *phydev)
-@@ -1567,6 +1591,7 @@ int vsc8584_ptp_probe(struct phy_device *phydev)
- 
- 	mutex_init(&vsc8531->phc_lock);
- 	mutex_init(&vsc8531->ts_lock);
-+	skb_queue_head_init(&vsc8531->rx_skbs_list);
- 
- 	/* Retrieve the shared load/save GPIO. Request it as non exclusive as
- 	 * the same GPIO can be requested by all the PHYs of the same package.
--- 
-2.34.1
+The doc in patch 1 says :
+
+  > + * Link-wide mode:
+  > + *  - Some PHYs only expose a link-wide aggregate MSE, or cannot m=
+ap their
+  > + *    measurement to a specific channel/pair (e.g. 100BASE-TX when=
+ MDI/MDI-X
+  > + *    resolution is unknown). In that case, callers must use the L=
+INK selector.
+
+The way I understand that is that PHYs will report either channel-speci=
+fic values or
+link-wide values. Is that correct or are both valid ? In BaseT1 this is=
+ the same thing,
+but maybe for consistency, we should report either channel values or li=
+nk-wide values ?
+
+Maxime
 
 
