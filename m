@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-214783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0AACB2B32D
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 23:05:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0A38B2B341
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 23:14:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 057483BF7D3
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 21:05:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59CCD4E3C9E
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 21:13:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A8323505E;
-	Mon, 18 Aug 2025 21:05:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0577B21FF3F;
+	Mon, 18 Aug 2025 21:13:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i2yqPDn7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ROMvMPeP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1825D20B7F4
-	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 21:05:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A22B146585
+	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 21:13:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755551114; cv=none; b=R9cHBEPlTb7qsTdy4WCnDrRAjUvknIRnPWx6oRl02Rns4njZdHahC+0pBuI9gDAZ11hoaT05bqG3epM6Llq37O3S7koTmmKcRN+LnTuod+IYLC0iYu0WZj8h1F/ZsMepaeLhEDSOMuBmaam+UYxIh7k4zYLm1+d/leO6woSMrEg=
+	t=1755551583; cv=none; b=rv/ERD7fEDNQp4LDkn5j6aUv5mGmubOQFb4U0xXYXiInpFaTnyyVEOBU1PqZ6beD9OJhpQA346vN8mysnJaD4oJvKpYZwP4IZExqyhvoDSIV7t/lEhWJ2rRKplNmOnkfpxuSiTICSXY7OxFlaWT88jQOv3acKes43EAvXDIYOXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755551114; c=relaxed/simple;
-	bh=vs33q/xMLjGp5f/8wOcGTqry10cy1yx1Vec5ZubeWiE=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=EdadQ1ck3e5V5mdAkbb54Ft4XGrOY+ztjxcucVRu99ICUvotACR4hLxk84zLCXaCB8KOXBxViquXsrtfwNYoI0ew5hp/RRuR1w2YqrJfRgrBtDi3vVAsKFoTTkaMF3ZR3rUBv+h3jEaOPSzi4FLaTYnWllVzNob/Jaq1L8QQFVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i2yqPDn7; arc=none smtp.client-ip=209.85.210.201
+	s=arc-20240116; t=1755551583; c=relaxed/simple;
+	bh=/nLLEfT3tyChrFQRlc03qPTRviAr/bcwwzJUDrBrorw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=QyDsyY/c63LlOmx++rmvR6E++xFkFPvnUXxh0bauwT9jpksbmCXlPGrLGMBypVdpEM/AR2XY0JKYpQ/lB4ngQ8XcKKhlw9FFCmgFVwaEv87Xfx3awSyT24dwL18tbQQwZsm2t3vL5wzFfTYSoLBIFrjAsNbSMf0+8JKzm60THM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jeroendb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ROMvMPeP; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-76e2eb6d2baso10407842b3a.3
-        for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 14:05:12 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jeroendb.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-323267c0292so4210910a91.1
+        for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 14:13:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755551112; x=1756155912; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1755551582; x=1756156382; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=Cqttlk/hbJyxL50WlgnQ4IHuWmhf7bPxr6NxrThxPlI=;
-        b=i2yqPDn7ucS2GuKvnXOt9MOEpKbo1DF7Ey074p4QmI+j2eRsq8GkaQCdoH0yKJq88R
-         Vvy3FBvlRRldiGltY/dRrn0m4MDuOLueVEayl/tj9XhClTJXWDNrBQuQCryvhgZn9kPJ
-         htGYmaJGM5d1p0S1nKH1Ks7cat/PFKxc0vK69tBj/fFsUdQQWWvVeoGftootDzFRc5a2
-         E6XwBhAOAbUHw4RdQPJcSq/wMKQAdl7NX16N+D/TYa8yrrGmOQ8/X3Eh/BNYtjqovrOK
-         X5H3djINkUhklY8SP9h/AxiSa2V1IuvdGjqmymm3oGMnnQGVunVyJQrZgLjzkw6Be8wX
-         2IPg==
+        bh=pe3bb3+hhZ0qSMkMqidp1VPBqJ/V/v1tvwOji8BfcIo=;
+        b=ROMvMPePSv9d0FKCqkU8vheMZITLBjP2ZDjgfCE8wN6P7+dzXowLJDB8zhpZvZGIdj
+         veB8eSGLdzPpinWzVigxvdo2q2HWmaxDLeI5F3OzC4agITAYMVnfEwYAKHC66qJUepyz
+         pXiZPu5p7r6xhflxgcC+1z2xnHfrqFRDIIjKi4dGqvmFE0cURqYNrpEG/IbYfIqXXKcQ
+         QN0ToJt19fBXyxX8+irPARMWwCG7X6B2ZDBIWk+jgj6EeEv7zS0ErLjoeL+mUoTAKZzC
+         FiLPX44+rHFLe0ov8rXXIJWLm4LXnOpcpog4ycP1TEiAARzzfwzaI+cDGaQdJcONxOIL
+         ttOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755551112; x=1756155912;
+        d=1e100.net; s=20230601; t=1755551582; x=1756156382;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Cqttlk/hbJyxL50WlgnQ4IHuWmhf7bPxr6NxrThxPlI=;
-        b=tHWavsBqz+OD0vXUx5ZJcWGQNW5vODjo+nDDBUMrIQuMeey/4oYmnMbI/+YNgebp9C
-         OlrpBA4lm1aEw+XeQXQQ4j+hfB6CnyJbe+eKeo0k1QSpNb1NKD3ckpz0fN0hYwRONPOc
-         3l3jDboOnugkUoIv7Az82yMcgycQTF7LtBHKVNFxlMrGetZVNmfoDlDY0MT6bLM62jS8
-         py69gAOkhVf6twaWYNVbZl9saUDvQC8eIpULa247dz3H5WQCzBqA8Na/J1s7FAML4P+H
-         2fVi6bjW8HDG1aYZBSikgRKXCr3T2s4cpiIHVMkygCej7JqPxasScUXpAFEV1ZGgcVWJ
-         /ITA==
-X-Gm-Message-State: AOJu0Yxj9ZtWmK1Qej3nNM174lTffY4Tb27Os2sjK+z+ctW7Vw6xwsGO
-	cPjSMMK+SdVzhZFGDYaHSgXl8wlIrnBfKcaulDMFtogaOPrEoZYtBn8xcDjqUHm4Zqvdt16wkq3
-	LEGgVWDahOoNKvm/4ZcGvq1PLpgCkoeJO7vR/7PfTZUcRgtZOVhoeumWuOpy8eKDP38Wc4zeIeL
-	h1NT5YwaMqlLu5GF5XfxA8MwPpyk1Lz7MRwcydx7S6T2DGd/pHwu39+JPfnjPSHfM=
-X-Google-Smtp-Source: AGHT+IHj+SISdeINEA8J4Jb4DADUwlz+KRawELTru597TLDhi2fzxgvYCQ9Kylo2E41s3lu1cj3YXOvo9fh/pZ8HHw==
-X-Received: from pfod1.prod.google.com ([2002:aa7:8681:0:b0:76b:da8d:7393])
- (user=hramamurthy job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a20:4320:b0:238:351a:6437 with SMTP id adf61e73a8af0-2430d4d3d9emr7675637.43.1755551112265;
- Mon, 18 Aug 2025 14:05:12 -0700 (PDT)
-Date: Mon, 18 Aug 2025 21:05:07 +0000
+        bh=pe3bb3+hhZ0qSMkMqidp1VPBqJ/V/v1tvwOji8BfcIo=;
+        b=j9LXV4HNj1zi9Zy01MWjU5jwFcu5WTibiYR7y3HN6walmAKme+5IsWKWzpBUW4xsaz
+         AZq8ol6cD2KdzV53AZ3I19XyhpRC/5tNxzlj8vMJbsXTimkJAAdkGazTYzMgDveolmx0
+         hBC3twCPF1/srZ0dnF1spfBEs1d3eudhviqVE1sk2UcnUUeHxFz0adBPebroHPKysxk+
+         TSbyol3upC5RHBaiRsSj2/7p3hZAEreI1+DRW7MVdouY8ziz3zYpLq0uMYR8OtBVDIp0
+         Kq9gImUMWxZuEHhaAfXDXCprN9/zUzCa6ibCzz0seEg1lmkQzEZLU/0Z0HTXBLkCrF09
+         VQwg==
+X-Gm-Message-State: AOJu0YzW+Er650zbBmR61FF8ASzYsC6RFD1asus2fEG+coPH9sDKdDq7
+	2JcEUZIwKmnrBR/eM/5qb9Mzh0vqV2vGOBBNxLJ8wFn+6I56Jxe/tpvCX8i+twgikvxIey3Swi4
+	qOZEem6ebSIM+bHu3UUv5DsXahtJx79OrAO8Nc4ixCBYB3QnU13TnZgSeNSEQdnG9Zs//FNMOQY
+	GyoHVZzHA88cm+9DHUJy2YAAGXcrBzC0j2EyPsRofVSj7wwkQ=
+X-Google-Smtp-Source: AGHT+IHkbraGzSqtrSSFL6J4QJNzq23hLmxsFJDCgRsrsaB7kHdW24jWyILQimhKFM/L4GVl9zPiWLvioSVGaQ==
+X-Received: from pjf14.prod.google.com ([2002:a17:90b:3f0e:b0:31c:38fb:2958])
+ (user=jeroendb job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:17cc:b0:31f:253e:d34f with SMTP id 98e67ed59e1d1-32476b02016mr419311a91.19.1755551581701;
+ Mon, 18 Aug 2025 14:13:01 -0700 (PDT)
+Date: Mon, 18 Aug 2025 14:12:45 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,125 +71,57 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.51.0.rc1.167.g924127e9c0-goog
-Message-ID: <20250818210507.3781705-1-hramamurthy@google.com>
-Subject: [PATCH net-next v2] gve: support unreadable netmem
-From: Harshitha Ramamurthy <hramamurthy@google.com>
+Message-ID: <20250818211245.1156919-1-jeroendb@google.com>
+Subject: [PATCH net] gve: prevent ethtool ops after shutdown
+From: Jeroen de Borst <jeroendb@google.com>
 To: netdev@vger.kernel.org
-Cc: jeroendb@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	willemb@google.com, pkaligineedi@google.com, joshwash@google.com, 
-	horms@kernel.org, linux-kernel@vger.kernel.org, 
-	Mina Almasry <almasrymina@google.com>, Ziwei Xiao <ziweixiao@google.com>
+Cc: hramamurthy@google.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, willemb@google.com, pabeni@redhat.com, 
+	Jordan Rhee <jordanrhee@google.com>, Jeroen de Borst <jeroendb@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Mina Almasry <almasrymina@google.com>
+From: Jordan Rhee <jordanrhee@google.com>
 
-Declare PP_FLAG_ALLOW_UNREADABLE_NETMEM to turn on unreadable netmem
-support in GVE.
+A crash can occur if an ethtool operation is invoked
+after shutdown() is called.
 
-We also drop any net_iov packets where header split is not enabled.
-We're unable to process packets where the header landed in unreadable
-netmem.
+shutdown() is invoked during system shutdown to stop DMA operations
+without performing expensive deallocations. It is discouraged to
+unregister the netdev in this path, so the device may still be visible
+to userspace and kernel helpers.
 
-Use page_pool_dma_sync_netmem_for_cpu in lieu of
-dma_sync_single_range_for_cpu to correctly handle unreadable netmem
-that should not be dma-sync'd.
+In gve, shutdown() tears down most internal data structures. If an
+ethtool operation is dispatched after shutdown(), it will dereference
+freed or NULL pointers, leading to a kernel panic. While graceful
+shutdown normally quiesces userspace before invoking the reboot
+syscall, forced shutdowns (as observed on GCP VMs) can still trigger
+this path.
 
-Disable rx_copybreak optimization if payload is unreadable netmem as
-that needs access to the payload.
+Fix by calling netif_device_detach() in shutdown().
+This marks the device as detached so the ethtool ioctl handler
+will skip dispatching operations to the driver.
 
-Signed-off-by: Mina Almasry <almasrymina@google.com>
-Signed-off-by: Ziwei Xiao <ziweixiao@google.com>
-Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
+Fixes: 974365e51861 ("gve: Implement suspend/resume/shutdown")
+Signed-off-by: Jordan Rhee <jordanrhee@google.com>
+Signed-off-by: Jeroen de Borst <jeroendb@google.com>
 ---
- Changes in v2:
- * Change to handle error paths using existing 'goto error' in gve_rx_dqo
-   (Simon Horman)
----
- .../ethernet/google/gve/gve_buffer_mgmt_dqo.c |  5 +++
- drivers/net/ethernet/google/gve/gve_rx_dqo.c  | 35 ++++++++++++++++---
- 2 files changed, 35 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/google/gve/gve_main.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c b/drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c
-index 8f5021e59e0a..0e2b703c673a 100644
---- a/drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c
-+++ b/drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c
-@@ -260,6 +260,11 @@ struct page_pool *gve_rx_create_page_pool(struct gve_priv *priv,
- 		.offset = xdp ? XDP_PACKET_HEADROOM : 0,
- 	};
+diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
+index 1f411d7..1be1b1e 100644
+--- a/drivers/net/ethernet/google/gve/gve_main.c
++++ b/drivers/net/ethernet/google/gve/gve_main.c
+@@ -2870,6 +2870,8 @@ static void gve_shutdown(struct pci_dev *pdev)
+ 	struct gve_priv *priv = netdev_priv(netdev);
+ 	bool was_up = netif_running(priv->dev);
  
-+	if (priv->header_split_enabled) {
-+		pp.flags |= PP_FLAG_ALLOW_UNREADABLE_NETMEM;
-+		pp.queue_idx = rx->q_num;
-+	}
++	netif_device_detach(netdev);
 +
- 	return page_pool_create(&pp);
- }
- 
-diff --git a/drivers/net/ethernet/google/gve/gve_rx_dqo.c b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
-index 7380c2b7a2d8..55393b784317 100644
---- a/drivers/net/ethernet/google/gve/gve_rx_dqo.c
-+++ b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
-@@ -718,6 +718,24 @@ static int gve_rx_xsk_dqo(struct napi_struct *napi, struct gve_rx_ring *rx,
- 	return 0;
- }
- 
-+static void gve_dma_sync(struct gve_priv *priv, struct gve_rx_ring *rx,
-+			 struct gve_rx_buf_state_dqo *buf_state, u16 buf_len)
-+{
-+	struct gve_rx_slot_page_info *page_info = &buf_state->page_info;
-+
-+	if (rx->dqo.page_pool) {
-+		page_pool_dma_sync_netmem_for_cpu(rx->dqo.page_pool,
-+						  page_info->netmem,
-+						  page_info->page_offset,
-+						  buf_len);
-+	} else {
-+		dma_sync_single_range_for_cpu(&priv->pdev->dev, buf_state->addr,
-+					      page_info->page_offset +
-+					      page_info->pad,
-+					      buf_len, DMA_FROM_DEVICE);
-+	}
-+}
-+
- /* Returns 0 if descriptor is completed successfully.
-  * Returns -EINVAL if descriptor is invalid.
-  * Returns -ENOMEM if data cannot be copied to skb.
-@@ -793,13 +811,18 @@ static int gve_rx_dqo(struct napi_struct *napi, struct gve_rx_ring *rx,
- 		rx->rx_hsplit_unsplit_pkt += unsplit;
- 		rx->rx_hsplit_bytes += hdr_len;
- 		u64_stats_update_end(&rx->statss);
-+	} else if (!rx->ctx.skb_head && rx->dqo.page_pool &&
-+		   netmem_is_net_iov(buf_state->page_info.netmem)) {
-+		/* when header split is disabled, the header went to the packet
-+		 * buffer. If the packet buffer is a net_iov, those can't be
-+		 * easily mapped into the kernel space to access the header
-+		 * required to process the packet.
-+		 */
-+		goto error;
- 	}
- 
- 	/* Sync the portion of dma buffer for CPU to read. */
--	dma_sync_single_range_for_cpu(&priv->pdev->dev, buf_state->addr,
--				      buf_state->page_info.page_offset +
--				      buf_state->page_info.pad,
--				      buf_len, DMA_FROM_DEVICE);
-+	gve_dma_sync(priv, rx, buf_state, buf_len);
- 
- 	/* Append to current skb if one exists. */
- 	if (rx->ctx.skb_head) {
-@@ -837,7 +860,9 @@ static int gve_rx_dqo(struct napi_struct *napi, struct gve_rx_ring *rx,
- 		u64_stats_update_end(&rx->statss);
- 	}
- 
--	if (eop && buf_len <= priv->rx_copybreak) {
-+	if (eop && buf_len <= priv->rx_copybreak &&
-+	    !(rx->dqo.page_pool &&
-+	      netmem_is_net_iov(buf_state->page_info.netmem))) {
- 		rx->ctx.skb_head = gve_rx_copy(priv->dev, napi,
- 					       &buf_state->page_info, buf_len);
- 		if (unlikely(!rx->ctx.skb_head))
+ 	rtnl_lock();
+ 	netdev_lock(netdev);
+ 	if (was_up && gve_close(priv->dev)) {
 -- 
-2.51.0.rc0.155.g4a0f42376b-goog
+2.51.0.rc1.167.g924127e9c0-goog
 
 
