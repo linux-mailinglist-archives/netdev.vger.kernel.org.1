@@ -1,99 +1,110 @@
-Return-Path: <netdev+bounces-214444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBE16B298F3
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 07:39:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CB881B298F5
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 07:39:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C0514E6280
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 05:39:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 754614E6392
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 05:39:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B21C26D4E2;
-	Mon, 18 Aug 2025 05:38:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43FE626F462;
+	Mon, 18 Aug 2025 05:39:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="BzWKWW/p"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="GxqwK5Wz"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12294232369;
-	Mon, 18 Aug 2025 05:38:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EEEB26D4E2;
+	Mon, 18 Aug 2025 05:39:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755495536; cv=none; b=Vw30iVIXF2VjqMgDK1jDT4/OSBEhQz9zn7foGEBQWMWkYdoriZVjCYzU08jtM+tDDKxcrrDQdi6uvsm6vNsyD+/ebVwCy0ofthEu+mYiikLo84Z35FpPfA3cukffysBoJhuj3oB2HMrHJBcHAUYYCCnJywYEJftPskK0VVn933s=
+	t=1755495591; cv=none; b=lwMKVFpp39qfT+/HLn5ki13CZXQRqCTfZgb59Xl6bqvh3+XGi1VA6h/7L1VvfNNBFXHsbmoQpyfWBu2FL/8AS1JMshpXUs6DzsVHVD3rVzzw8bKtxlZyhqlGRHn9yoWCmSav2z+yTfN724J+4pxLGCBblhtngUgQZpxky0qf4ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755495536; c=relaxed/simple;
-	bh=WXkskIoUMTcih3XN5uZjpg3i50lBSE5iYL5oWoSArRk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hZzPWOpl3WAB0V2Ee/XtBAytynhkA/xuuq5846IxwLHz1V6tzgosRqj5j3yNK5B9NuSMI5Rr7hsKa5tcsHo6iqLVV7Q+bAC34v+mmhGXp9Ot3qXcol5bZYmsa3XBQjzhfiAjXp8OLmlHyIV7zIFBBvQNRcGNPHkOWvHNxdnE7J0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=BzWKWW/p; arc=none smtp.client-ip=117.135.210.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=6x
-	QBO8BmLfIhv1bH3fnhD/r9YrTwsHkZZb2dWVwWJaU=; b=BzWKWW/p4PyrxpKAQL
-	0JA2D4mj6A1lv0B/qNNmz1ffIo7sL+2hVqb/VNPPW+lrlxJRBbw2+sqlE331jwbV
-	jVB4JD6wUZIw/AeZ5dJzxJ/RRfQgAg2St/EoJQvie22S9xrL/EIxVLPoKKTFBg16
-	OnQL3Ij6fn/1W2PAXExvreNkw=
-Received: from zhaoxin-MS-7E12.. (unknown [])
-	by gzga-smtp-mtada-g0-4 (Coremail) with SMTP id _____wCXlVBDvKJoSGHACA--.42003S2;
-	Mon, 18 Aug 2025 13:38:13 +0800 (CST)
-From: Xin Zhao <jackzxcui1989@163.com>
-To: willemdebruijn.kernel@gmail.com,
-	edumazet@google.com,
-	ferenc@fejes.dev
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3] net: af_packet: Use hrtimer to do the retire operation
-Date: Mon, 18 Aug 2025 13:38:11 +0800
-Message-Id: <20250818053811.181754-1-jackzxcui1989@163.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1755495591; c=relaxed/simple;
+	bh=o3uNSVAiO3egJNj37SYbpwN8ZS+890QUO9bcSpSLBAM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SqissgrSBwnVrjzcBIb48fX8I1aroIOO+TdQt+CaTUNm7MDt7eBY3+Ot+/3FwFm88MLkvE1xGYopiXp9nBw3zQROTAf11lWgcTpHVQWOyNHfVZ66ocZnYGrvoruGVAB39FxAtBH1lEIqX0OZxXr/aXPvtL/42knWBcZ/xL1Sa5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=GxqwK5Wz; arc=none smtp.client-ip=115.124.30.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1755495578; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=dihRxXmk6cpasMYFcjt6iSrWf1Q1lC5HSGvLlVUkcis=;
+	b=GxqwK5WzuXqvw3Q5xmjX1V98cg0ogRLgw6L3Cx/XC/knZvUyeoR9vGkg4uWJSs6vnx5d0ILTUfj6kAvPbp2P47XWDZ16aiKQ6H+npIB2AQzHjkFF0ZU7kvP9GDNdKmpgt/OwSTpN9Z6uH417R0PG+KmgX+6NyNYq9q/uwH6+GQ8=
+Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WlveepU_1755495576 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 18 Aug 2025 13:39:36 +0800
+Date: Mon, 18 Aug 2025 13:39:36 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com    >
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Alexandra Winter <wintera@linux.ibm.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>, ast@kernel.org,
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
+	pabeni@redhat.com, song@kernel.org, sdf@google.com,
+	haoluo@google.com, yhs@fb.com, edumazet@google.com,
+	john.fastabend@gmail.com, kpsingh@kernel.org, jolsa@kernel.org,
+	Mahanta.Jambigi@ibm.com, Sidraya.Jayagond@ibm.com,
+	wenjia@linux.ibm.com, dust.li@linux.alibaba.com,
+	tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
+	bpf@vger.kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+	jaka@linux.ibm.com
+Subject: Re: [PATCH bpf-next 2/5] net/smc: fix UAF on smcsk after
+ smc_listen_out()
+Message-ID: <20250818053936.GA28521@j66a10360.sqa.eu95>
+References: <20250731084240.86550-1-alibuda@linux.alibaba.com>
+ <20250731084240.86550-3-alibuda@linux.alibaba.com>
+ <174ccf57-6e7c-4dab-8743-33989829de01@linux.ibm.com>
+ <20250811015452.GB19346@j66a10360.sqa.eu95>
+ <14ec76a2-e80e-44a8-a775-ebd4668959c4@linux.ibm.com>
+ <20250811083356.7911039b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wCXlVBDvKJoSGHACA--.42003S2
-X-Coremail-Antispam: 1Uf129KBjvdXoW7XF17Ww1xKFyUXr1fAw1UWrg_yoWkZwbE9r
-	yDZF1DWws0ganxGF43Gw47XrWfta1UJw1UJ3yUCwn2g34DuFWDCFs5WryF9Fn5JanFkFnI
-	kr4fJr42yw13WjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUbBc_3UUUUU==
-X-CM-SenderInfo: pmdfy650fxxiqzyzqiywtou0bp/1tbiRwStCmiitxl+TwAAsx
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250811083356.7911039b@kernel.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Sun, 2025-08-17 at 21:28 +0800, Willem wrote:
-
-> Here we cannot use hrtimer_add_expires for the same reason you gave in
-> the second version of the patch:
+On Mon, Aug 11, 2025 at 08:33:56AM -0700, Jakub Kicinski wrote:
+> On Mon, 11 Aug 2025 11:24:50 +0200 Alexandra Winter wrote:
+> > > Yes, it should be sent to net. But the problem is that if I don't carry
+> > > this patch, the BPF CI test will always crash. Maybe I should send a
+> > > copy to both net and bpf-next? Do you have any suggestions?
+> > 
+> > I do not have any experience with bpf-next. But typically patches
+> > to 'net' are taken after one or two days, if there are no issues.
+> > I'd assume they are then picked to net-next and bpf-next(?) almost instantly.
+> > Then you would not need it in your bpf series anymore.
 > 
-> > Additionally, I think we cannot avoid using ktime_get, as the retire
-> > timeout for each block is not fixed. When there are a lot of network packets,
-> > a block can retire quickly, and if we do not re-fetch the time, the timeout
-> > duration may be set incorrectly.
+> AFAIU the patches which land in net will make it to -next trees after
+> respective PR with fixes. So
 > 
-> Is that right?
 > 
-> Otherwise patch LGTM.
+>  patch -> 
+>           net ->
+>                  [next Thu] Linus ->
+>                                       [same day] net-next
+>                                       [at some point] bpf PR ->
+>                                                                  Linux
+>                                                                         -> bpf-next
+> 
+> What gets applied to net should be in net-next in a week,
+> and most -next trees within 2 weeks.
 
+That's very helpful.
 
-Dear Willem,
+Based on those infomations, I will send this prerequisite patch to the net
+tree first. I'll then wait for about two weeks for it to propagate to
+bpf-next before submitting the rest of my BPF series.
 
-I have adjusted the logic in the recently sent v4 version by adding a boolean variable start
-to distinguish whether it is the case of prb_open_block. If it is prb_open_block, I use
-hrtimer_start to (re)start the timer; otherwise, I use hrtimer_set_expires to update the
-expiration time. Additionally, I have added comments explaining this branch selection before
-the _prb_refresh_rx_retire_blk_timer function.
-
-I apologize for sending three PATCH v4 emails in a row. In the first email, I forgot to include
-the link to v3. In the second email, there were no blank lines between v4 and v3.
-Therefore, you can just refer to the latest v4 version in the third PATCH v4 email.
-
-
-Thanks
-Xin Zhao
-
+Best regards,
+D. Wythe
 
