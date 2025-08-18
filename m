@@ -1,360 +1,127 @@
-Return-Path: <netdev+bounces-214549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47C69B2A1AF
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 14:36:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAC04B2A1CA
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 14:39:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A7672A7D99
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 12:25:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDAF84E28B4
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 12:39:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77464320385;
-	Mon, 18 Aug 2025 12:24:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E276927A465;
+	Mon, 18 Aug 2025 12:39:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UKW7LsV5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BBAR51Em"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44DCC26F2B4
-	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 12:24:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9BEE3218A9
+	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 12:39:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755519882; cv=none; b=jrC0Mtm9r5aWW1nZjCKnc7O/r9HOIPApJQDYPlw5G5q0AALTl9AZ0mxjfoK7HTe3b/ZU9qSFuhHcsVLXjVQqNkM9q3iAOX3A73CPAmBgx0aWS8jFO0cmZZCAcJZyFC4nu6+iUXH4kWsGhM+LcIYB521DN8x+0a1bMLhYanfDTXY=
+	t=1755520767; cv=none; b=DXjMiKdWXP/EJ4784yVwxnPqtHdmsC1wsh2DVlIdQPi6SosaICaUy8kU5dODh/t2dMuQ1GcNejeNdpXdAAdxQB28XsQW3ocN4fL11GE/97XtasR8Bt/idiSO8rqHv5cUf3BioiZ98hiKzxMBliMDMxgbWXtE0UKoGtI9Hp/1Z6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755519882; c=relaxed/simple;
-	bh=NeJYtS1ZoqmOW9N/JfyUTR/Un6XM/CM983LzN4D3cyE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IoDnbUQz2zTCfHzUUOmIeuQvHAsh1M3E5NB5/aFtjojaO9r2sGyl4aidkNvkkXjfrgcPswxd5c5wbYUmVxNY7a4tsw2tQ1/PQbVX8qmJ2W7uVaqsVpoqQ2nUKuKqiOWQwj5mwifw477E08M5O+d14ReO1WS/oPt679geuZZywQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UKW7LsV5; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755519879;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yD9a9s2aETuFSLgQGqZPxu5HZCmmaR8KXKsmVuvi5Zw=;
-	b=UKW7LsV5Vs9PuD2kLkl/IAFBRRF8TAxjrGbyyTjABs9jHKEi28JyNcUfbviB8sFS/uuTLo
-	ZYyhU6QLNJlSxKppLJDSyKzdMDqAt0LDdZYJRUxJdZh3FO6So0bfrJfKdeRfXjXTJ4GUgq
-	kHwaGYHlUKqpfwFFaxrQwtyzkpxFNLA=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-118-GAWdPVoxPUC2Tc_yKhszkQ-1; Mon,
- 18 Aug 2025 08:24:35 -0400
-X-MC-Unique: GAWdPVoxPUC2Tc_yKhszkQ-1
-X-Mimecast-MFC-AGG-ID: GAWdPVoxPUC2Tc_yKhszkQ_1755519873
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 122091800446;
-	Mon, 18 Aug 2025 12:24:33 +0000 (UTC)
-Received: from localhost (unknown [10.43.135.229])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3340C30001A5;
-	Mon, 18 Aug 2025 12:24:28 +0000 (UTC)
-Date: Mon, 18 Aug 2025 14:24:26 +0200
-From: Miroslav Lichvar <mlichvar@redhat.com>
-To: Kurt Kanzenbach <kurt@linutronix.de>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next] igb: Retrieve Tx timestamp
- directly from interrupt
-Message-ID: <aKMbekefL4mJ23kW@localhost>
-References: <20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de>
+	s=arc-20240116; t=1755520767; c=relaxed/simple;
+	bh=rhBvuqypf5LHhK3Z0/md04qrIWQLJc20kETHaLtkhz8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S9lr/YVsvE1x++KVSjnULRF+VVSujkB7DKdjPBfYPaMpUGbZfiuCZku26ZCKRJs62HKMTDFZGaKUsQ9KXC/ZNFz+5Vf5hxfgkk1s+zINWFLVu/vU869wUoNIiA++Z3Rgj8m5LrPHcteCGZdv6LVyEE4w5nkFbAwRFwgNV7Iy1Eo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BBAR51Em; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755520766; x=1787056766;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=rhBvuqypf5LHhK3Z0/md04qrIWQLJc20kETHaLtkhz8=;
+  b=BBAR51EmTHE0JUGRMMdV61Zv+eo0nywgQZweEyI7ZCl+TQsO3RsR7R8K
+   a379+753HpdUwNcjdnZHEXER5nPen7z+IAm3wivI2Jz9G1noyu/cmy8/1
+   uf1771aJ5bkEkEhgiLAauvR1AZ51oFS1w8A+mxO4NKFB+57CyxZFEaaco
+   k0NHY1U+6eUkvzK7D5ljzciFQPimt5OI2fec9RiTreMco2Bfqt0IeQxQR
+   M8BVVHK2tlhFQITdrYzKjEPldhstHxMk+JWpNgz80TuQC0SCJqIQL0BNA
+   xr/ebGkWdQ6OoMtMyvduj+YkGU1Nzf936MCRTuejjLcAtD/1YhRIpzdyy
+   Q==;
+X-CSE-ConnectionGUID: 1YmMHjHUQJ622dgs44Dicg==
+X-CSE-MsgGUID: a3iFRjmGSbCuhE+t/1uKdQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11526"; a="75309118"
+X-IronPort-AV: E=Sophos;i="6.17,293,1747724400"; 
+   d="scan'208";a="75309118"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2025 05:39:25 -0700
+X-CSE-ConnectionGUID: pvPjU/daSye+9qRi2vocuQ==
+X-CSE-MsgGUID: sr99iaffTTK7C9J8GI07RA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,293,1747724400"; 
+   d="scan'208";a="172906306"
+Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
+  by orviesa005.jf.intel.com with ESMTP; 18 Aug 2025 05:39:20 -0700
+From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	anthony.l.nguyen@intel.com,
+	aleksandr.loktionov@intel.com
+Cc: netdev@vger.kernel.org,
+	mschmidt@redhat.com
+Subject: [PATCH iwl-next v2 0/5] iavf and ice: GTP RSS support and flow enhancements
+Date: Mon, 18 Aug 2025 12:39:12 +0000
+Message-ID: <20250818123918.238640-1-aleksandr.loktionov@intel.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Transfer-Encoding: 8bit
 
-On Fri, Aug 15, 2025 at 08:50:23AM +0200, Kurt Kanzenbach wrote:
-> Retrieve Tx timestamp directly from interrupt handler.
-> 
-> The current implementation uses schedule_work() which is executed by the
-> system work queue to retrieve Tx timestamps. This increases latency and can
-> lead to timeouts in case of heavy system load.
-> 
-> Therefore, fetch the timestamp directly from the interrupt handler.
-> 
-> The work queue code stays for the Intel 82576. Tested on Intel i210.
+This patch series introduces support for Receive Side Scaling (RSS)
+configuration of GTP (GPRS Tunneling Protocol) flows via the ethtool
+interface on virtual function (VF) interfaces in the iavf driver.
 
-I tested this patch on 6.17-rc1 with an Intel I350 card on a NTP
-server (chrony 4.4), measuring packet rates and TX timestamp accuracy
-with ntpperf. While the HW TX timestamping seems more reliable at some
-lower request rates, there seems to be about 40% drop in the overall
-performance of the server in how much requests it can handle (falling
-back to SW timestamps when HW timestamp is missed). Is this expected
-or something to be considered? 
+The implementation enables fine-grained traffic distribution for
+GTP-based mobile workloads, including GTPC and GTPU encapsulations, by
+extending the advanced RSS infrastructure. This is particularly beneficial
+for virtualized network functions (VNFs) and user plane functions (UPFs)
+in 5G and LTE deployments.
 
-Before:
-               |          responses            |     TX timestamp offset (ns)
-rate   clients |  lost invalid   basic  xleave |    min    mean     max stddev
-1000       100   0.00%   0.00%   0.00% 100.00%      -77     -42      +1     14
-1050       105   0.00%   0.00%   0.00% 100.00%      -68     -35      +2     13
-1102       110   0.00%   0.00%   0.00% 100.00%      -60     -14     +27     15
-1157       115   0.00%   0.00%   0.00% 100.00%      -28     +12     +53     14
-1214       121   0.00%   0.00%   0.00% 100.00%       -3     +34     +68     13
-1274       127   0.00%   0.00%   0.00% 100.00%       -5     +35     +70     14
-1337       133   0.00%   0.00%   0.00% 100.00%       -2     +30     +64     13
-1403       140   0.00%   0.00%   0.00% 100.00%      -27     +11     +57     14
-1473       147   0.00%   0.00%   0.00% 100.00%      -15     +27     +65     15
-1546       154   0.00%   0.00%   0.00% 100.00%      -56      -8     +41     18
-1623       162   0.00%   0.00%   0.00% 100.00%      -69     -27     +28     17
-1704       170   0.00%   0.00%   0.00% 100.00%      -39      -5     +30     13
-1789       178   0.00%   0.00%   0.00% 100.00%      -32      +3     +37     13
-1878       187   0.00%   0.00%   0.00% 100.00%      -22     +20     +75     18
-1971       197   0.00%   0.00%   0.00% 100.00%      -27      +6     +40     12
-2069       206   0.00%   0.00%   0.00% 100.00%      -22     +19     +62     15
-2172       217   0.00%   0.00%   0.00% 100.00%      +16     +53     +92     13
-2280       228   0.00%   0.00%   0.00% 100.00%      -30     +55     +92     18
-2394       239   0.00%   0.00%   0.00% 100.00%      -61      -5     +33     18
-2513       251   0.00%   0.00%   0.00% 100.00%      -66     -23     +20     14
-2638       263   0.00%   0.00%   0.00% 100.00%      -34      -1     +32     12
-2769       276   0.00%   0.00%   0.00% 100.00%      -20     +20     +60     14
-2907       290   0.00%   0.00%   0.00% 100.00%      -35      +6     +68     20
-3052       305   0.00%   0.00%   0.00% 100.00%      -29      +5     +40     12
-3204       320   0.00%   0.00%   0.00% 100.00%      -25      +8     +42     12
-3364       336   0.00%   0.00%   0.00% 100.00%      -12     +31     +70     14
-3532       353   0.00%   0.00%   0.00% 100.00%      -12     +31     +88     17
-3708       370   0.00%   0.00%   0.00% 100.00%       +4     +40     +80     13
-3893       389   0.00%   0.00%   0.00% 100.00%      -47     +42     +93     28
-4087       408   0.00%   0.00%   0.00% 100.00%      -63     -25     +33     18
-4291       429   0.00%   0.00%   0.00% 100.00%      -57      -8     +37     15
-4505       450   0.00%   0.00%   0.00% 100.00%       -8     +27     +64     13
-4730       473   0.00%   0.00%   0.00% 100.00%       +5     +44     +81     13
-4966       496   0.00%   0.00%   0.00% 100.00%      -30     +14  +11670    119
-5214       521   0.00%   0.00%   0.00% 100.00%      -36      +2  +18077    251
-5474       547   0.00%   0.00%   0.00% 100.00%      -30     +14  +16652    160
-5747       574   0.00%   0.00%   0.00% 100.00%      -15     +37  +18081    292
-6034       603   0.00%   0.00%   0.00% 100.00%       +8     +51  +16561    151
-6335       633   0.00%   0.00%   0.00% 100.00%      -10     +28  +18073    161
-6651       665   0.00%   0.00%   0.00% 100.00%      -23     +23  +16349    158
-6983       698   0.00%   0.00%   0.00% 100.00%      -26     +26     +78     19
-7332       733   0.00%   0.00%   0.00% 100.00%      -50     -10     +30     13
-7698       769   0.00%   0.00%   0.00% 100.00%       +5     +45  +16397    148
-8082       808   0.00%   0.00%   0.00% 100.00%      +17     +60  +18089    284
-8486       848   0.00%   0.00%   0.00% 100.00%      -46     +30  +18197    195
-8910       891   0.00%   0.00%   0.00% 100.00%      -48     -13  +16493    127
-9355       935   0.00%   0.00%   0.00% 100.00%      -34     +15  +18049    225
-9822       982   0.00%   0.00%   0.00% 100.00%       -4     +33  +16663    148
-10313     1031   0.00%   0.00%   0.00% 100.00%      -31     +22  +15046    110
-10828     1082   0.00%   0.00%   0.00% 100.00%      -14     +30  +18201    214
-11369     1136   0.00%   0.00%   0.00% 100.00%       +0     +44  +16464    171
-11937     1193   0.00%   0.00%   0.00% 100.00%       -7     +55  +18101    346
-12533     1253   0.00%   0.00%   0.00% 100.00%      -21     +22  +18113    372
-13159     1315   0.00%   0.00%   0.00% 100.00%      -18     +22  +18068    263
-13816     1381   0.00%   0.00%   0.00% 100.00%      -33     +17  +18032    171
-14506     1450   0.00%   0.00%   0.00% 100.00%      -49      -4  +18040    218
-15231     1523   0.00%   0.00%   0.00% 100.00%      -40      -1  +18171    224
-15992     1599   0.00%   0.00%   0.00% 100.00%      -24     +17  +18106    210
-16791     1679   0.00%   0.00%   0.00% 100.00%       +2     +45  +17998    219
-17630     1763   0.00%   0.00%   0.00% 100.00%      -78     -26  +16597    214
-18511     1851   0.00%   0.00%   0.00% 100.00%      -40      +5  +18087    238
-19436     1943   0.00%   0.00%   0.00% 100.00%      -33     +27  +18110    316
-20407     2040   0.00%   0.00%   0.00% 100.00%       -4     +57  +18132    359
-21427     2142   0.00%   0.00%   0.00% 100.00%      -21     +39  +18131    402
-22498     2249   0.00%   0.00%   0.00% 100.00%      -53     +50  +18109    478
-23622     2362   0.00%   0.00%   0.00% 100.00%      -23    +109  +18153    718
-24803     2480   0.00%   0.00%   0.00% 100.00%      -13    +680  +18113   2227
-26043     2604   0.00%   0.00%   0.00% 100.00%     -248   +4060  +18732   6280
-27345     2734   0.00%   0.00%   0.00% 100.00%      -35   +1139  +18072   2774
-28712     2871   0.00%   0.00%   0.00% 100.00%       +9   +1338  +18153   2828
-30147     3014   0.00%   0.00%   0.00% 100.00%      +29   +1481  +17354   3083
-31654     3165   0.00%   0.00%   0.00% 100.00%      -37   +1609  +18032   3405
-33236     3323   0.00%   0.00%   0.00% 100.00%      -97   +2092  +18050   4248
-34897     3489   0.00%   0.00%   0.00% 100.00%     -122   +2537  +18113   4933
-36641     3664   0.00%   0.00%   0.00% 100.00%     -117   +3943  +18433   5985
-38473     3847   0.00%   0.00%   0.00% 100.00%     -178   +4307  +18708   6488
-40396     4039   0.00%   0.00%   0.00% 100.00%      +61   +3570  +18272   5927
-42415     4241   0.00%   0.00%   0.00% 100.00%     -171   +5080  +18745   6633
-44535     4453   0.00%   0.00%   0.00% 100.00%     -620   +3489  +18162   5717
-46761     4676   0.00%   0.00%   0.00% 100.00%     -667   +2999  +18110   5335
-49099     4909   0.00%   0.00%   0.00% 100.00%      +28   +2867  +18219   5023
-51553     5155   0.00%   0.00%   0.00% 100.00%      +64   +2241  +18035   4339
-54130     5413   0.00%   0.00%   0.00% 100.00%      +11   +1873  +18097   3915
-56836     5683   0.00%   0.00%   0.00% 100.00%      -17   +1748  +17564   3828
-59677     5967   0.00%   0.00%   0.00% 100.00%      -13   +1786  +17458   3800
-62660     6266   0.00%   0.00%   0.00% 100.00%       -7   +1932  +18122   3905
-65793     6579   0.00%   0.00%   0.00% 100.00%      -29   +1831  +17546   3731
-69082     6908   0.00%   0.00%   0.06%  99.94%     -152   +2825  +18696   4125
-72536     7253   0.00%   0.00%   0.00% 100.00%     +233   +2128  +18188   3404
-76162     7616   0.00%   0.00%   0.00% 100.00%      +61   +2279  +18109   3774
-79970     7997   0.00%   0.00%   0.00% 100.00%      -26   +2256  +18108   3819
-83968     8396   0.00%   0.00%   0.00% 100.00%      -74   +1886  +17372   3276
-88166     8816   0.00%   0.00%   0.05%  99.95%      -77   +1570  +17911   2158
-92574     9257   0.00%   0.00%   0.02%  99.98%     -151   +1368  +18671   1848
-97202     9720   0.00%   0.00%   0.00% 100.00%      +40   +1418  +17280   2003
-102062   10206   0.00%   0.00%   0.00% 100.00%      +70   +1738  +17183   2442
-107165   10716   0.00%   0.00%   0.00% 100.00%       +3   +1784  +17451   2487
-112523   11252   0.00%   0.00%   0.00% 100.00%      -29   +1459  +16843   1623
-118149   11814   0.00%   0.00%   0.00% 100.00%      -14   +1438  +16975   1516
-124056   12405   0.00%   0.00%   0.00% 100.00%       -8   +1639  +17178   2050
-130258   13025   0.00%   0.00%   0.00% 100.00%      -39   +1607  +17312   1735
-136770   13677   0.00%   0.00%   0.00% 100.00%      -49   +1546  +18063   1553
-143608   14360   0.00%   0.00%   0.00% 100.00%      -28   +1602  +17486   1510
-150788   15078   0.00%   0.00%   0.00% 100.00%       -3   +1540  +16739   1364
-158327   15832   0.05%   0.00%   0.16%  99.79%     -108   +2111  +18784   1405
-166243   16384   0.17%   0.00%   0.00%  99.83%      +67   +1766  +18211   1235
-174555   16384   0.00%   0.00%   0.00% 100.00%      +50   +1702  +16643   1165
-183282   16384   0.00%   0.00%   0.00% 100.00%      -12   +1672  +16543   1196
-192446   16384   0.00%   0.00%   0.00% 100.00%      -28   +1697  +16716   1197
-202068   16384   0.00%   0.00%   0.00% 100.00%      -59   +1692  +16631   1179
-212171   16384   0.00%   0.00%   0.00% 100.00%      -49   +1767  +16621   1179
-222779   16384   0.16%   0.00%   0.07%  99.77%      -44   +1820  +16643   1147
-233917   16384   3.60%   0.00%   0.20%  96.20%     -131   +1680  +31346   1089
-245612   16384   7.58%   0.00%   0.32%  92.10%     -149   +2102  +86219   1316
-257892   16384  11.15%   0.00%   0.40%  88.45%      +14   +2265  +21315   1351
-270786   16384  15.75%   0.00%   0.50%  83.75%       +1   +2338  +18161   1394
-284325   16384  19.72%   0.00%   0.60%  79.68%      -52   +2387  +40370   1437
-298541   16384  22.83%   0.00%   0.66%  76.51%      -61   +2461  +21356   1467
-313468   16384  26.26%   0.00%   0.70%  73.04%      -38   +2495  +24987   1466
-329141   16384  29.02%   0.00%   0.75%  70.24%      -24   +2598  +25469   1484
-345598   16384  32.21%   0.00%   0.78%  67.02%       -1   +2636  +24568   1489
-362877   16384  35.26%   0.00%   0.80%  63.94%      -38   +2654  +21299   1495
-381020   16384  38.66%   0.00%   0.96%  60.38%      -85   +2392  +20972   1415
-400071   16384  41.41%   0.00%   1.02%  57.57%     -524   +2323  +20943   1508
-420074   16384  43.53%   0.00%   1.09%  55.38%     -656   +2464  +68387   1564
+Key features:
+ - Adds new RSS flow segment headers and hash field definitions for GTP
+   protocols.
+ - Enhances ethtool parsing logic to support GTP-specific flow types.
+ - Updates the virtchnl interface to propagate GTP RSS configuration to PF.
+ - Extends the ICE driver to support GTP RSS configuration for VFs.
 
-After:
-               |          responses            |     TX timestamp offset (ns)
-rate   clients |  lost invalid   basic  xleave |    min    mean     max stddev
-1000       100   0.00%   0.00%   0.00% 100.00%      -50      -1     +60     25
-1050       105   0.00%   0.00%   0.00% 100.00%      -59     -25     +14     13
-1102       110   0.00%   0.00%   0.00% 100.00%      -36      +4     +36     13
-1157       115   0.00%   0.00%   0.00% 100.00%      -26     +20     +67     16
-1214       121   0.00%   0.00%   0.00% 100.00%      +11     +49     +85     14
-1274       127   0.00%   0.00%   0.00% 100.00%      -40     +36     +93     33
-1337       133   0.00%   0.00%   0.00% 100.00%      -37      +4     +49     17
-1403       140   0.00%   0.00%   0.00% 100.00%      -37      +9     +49     14
-1473       147   0.00%   0.00%   0.00% 100.00%      -54     -14     +25     14
-1546       154   0.00%   0.00%   0.00% 100.00%      -52      +9     +48     16
-1623       162   0.00%   0.00%   0.00% 100.00%      -35      +7     +50     15
-1704       170   0.00%   0.00%   0.00% 100.00%      -34      +1     +36     13
-1789       178   0.00%   0.00%   0.00% 100.00%      -44      -8     +31     13
-1878       187   0.00%   0.00%   0.00% 100.00%      -73     -33     +10     14
-1971       197   0.00%   0.00%   0.00% 100.00%      -76     -40      +0     14
-2069       206   0.00%   0.00%   0.00% 100.00%      -62      -4     +38     17
-2172       217   0.00%   0.00%   0.00% 100.00%      -11     +28     +68     15
-2280       228   0.00%   0.00%   0.00% 100.00%       +3     +47     +92     15
-2394       239   0.00%   0.00%   0.00% 100.00%      -19     +47     +95     22
-2513       251   0.00%   0.00%   0.00% 100.00%      -11     +22     +58     13
-2638       263   0.00%   0.00%   0.00% 100.00%      -45      -5     +56     15
-2769       276   0.00%   0.00%   0.00% 100.00%      -47     -10     +29     13
-2907       290   0.00%   0.00%   0.00% 100.00%      -26     +13     +57     14
-3052       305   0.00%   0.00%   0.00% 100.00%       -7     +34     +69     13
-3204       320   0.00%   0.00%   0.00% 100.00%      -91     -16     +25     17
-3364       336   0.00%   0.00%   0.00% 100.00%      -96     -45     +34     26
-3532       353   0.00%   0.00%   0.00% 100.00%      -36     +13     +60     18
-3708       370   0.00%   0.00%   0.00% 100.00%      -41      +2     +49     18
-3893       389   0.00%   0.00%   0.00% 100.00%       +1     +43     +87     14
-4087       408   0.00%   0.00%   0.00% 100.00%      +24     +69    +117     16
-4291       429   0.00%   0.00%   0.00% 100.00%      +43     +88    +137     15
-4505       450   0.00%   0.00%   0.00% 100.00%      -37     +19     +79     27
-4730       473   0.00%   0.00%   0.00% 100.00%      -20     +34  +11484    119
-4966       496   0.00%   0.00%   0.00% 100.00%      -47     +11     +57     21
-5214       521   0.00%   0.00%   0.00% 100.00%      -83     -29   +4438     49
-5474       547   0.00%   0.00%   0.00% 100.00%      -80      +5  +10236    105
-5747       574   0.00%   0.00%   0.00% 100.00%      -22     +27     +95     22
-6034       603   0.00%   0.00%   0.00% 100.00%      -11     +35  +16445    212
-6335       633   0.00%   0.00%   0.00% 100.00%      -44      -9     +29     13
-6651       665   0.00%   0.00%   0.00% 100.00%      -30     +19  +16177    141
-6983       698   0.00%   0.00%   0.00% 100.00%      +20     +64   +2875     28
-7332       733   0.00%   0.00%   0.00% 100.00%      +19     +78  +16312    136
-7698       769   0.00%   0.00%   0.00% 100.00%      -48     +33  +16456    137
-8082       808   0.00%   0.00%   0.00% 100.00%      -48      -4     +32     14
-8486       848   0.00%   0.00%   0.00% 100.00%      -23     +15     +52     13
-8910       891   0.00%   0.00%   0.00% 100.00%       -7     +32   +2514     23
-9355       935   0.00%   0.00%   0.00% 100.00%      -33     +24   +9744     74
-9822       982   0.00%   0.00%   0.00% 100.00%      -23     +18  +16182    227
-10313     1031   0.00%   0.00%   0.00% 100.00%      -36      +4  +16439    135
-10828     1082   0.00%   0.00%   0.00% 100.00%      -14     +30  +16198    177
-11369     1136   0.00%   0.00%   0.00% 100.00%       +4     +53  +16298    144
-11937     1193   0.00%   0.00%   0.00% 100.00%       +5     +45  +16296    164
-12533     1253   0.00%   0.00%   0.00% 100.00%      -27     +23  +16488    173
-13159     1315   0.00%   0.00%   0.00% 100.00%      -18     +24  +16318    135
-13816     1381   0.00%   0.00%   0.00% 100.00%       -9     +40  +16615    143
-14506     1450   0.00%   0.00%   0.00% 100.00%      -35     +18  +16327    155
-15231     1523   0.00%   0.00%   0.00% 100.00%      -36      +3  +16232    153
-15992     1599   0.00%   0.00%   0.00% 100.00%      -31     +12  +16371    148
-16791     1679   0.00%   0.00%   0.00% 100.00%      -29     +15  +16443    195
-17630     1763   0.00%   0.00%   0.00% 100.00%       -9     +30  +16399    188
-18511     1851   0.00%   0.00%   0.00% 100.00%       +3   +2039  +18611   5296
-19436     1943   0.00%   0.00%   0.00% 100.00%     -101   +1658  +18800   4692
-20407     2040   0.00%   0.00%   0.00% 100.00%      +23    +120  +16389    217
-21427     2142   0.00%   0.00%   0.00% 100.00%      -28    +126  +16177    331
-22498     2249   0.00%   0.00%   0.00% 100.00%      -21    +150  +16525    738
-23622     2362   0.00%   0.00%   0.00% 100.00%       +9    +293  +16218   1254
-24803     2480   0.00%   0.00%   0.00% 100.00%      -40    +322  +16404   1423
-26043     2604   0.00%   0.00%   0.00% 100.00%      -49    +389  +16426   1676
-27345     2734   0.00%   0.00%   0.00% 100.00%      -51    +691  +16498   2505
-28712     2871   0.00%   0.00%   0.00% 100.00%      -51    +963  +16607   3015
-30147     3014   0.00%   0.00%   0.00% 100.00%      -19   +1199  +16634   3397
-31654     3165   0.00%   0.00%   0.00% 100.00%      +10   +1592  +16675   3920
-33236     3323   0.00%   0.00%   0.00% 100.00%      -37   +1437  +16766   3881
-34897     3489   0.00%   0.00%   0.00% 100.00%      -34   +1031  +16765   3421
-36641     3664   0.00%   0.00%   0.00% 100.00%      -31    +308  +16668   1906
-38473     3847   0.00%   0.00%   0.00% 100.00%      -28    +327  +16841   1985
-40396     4039   0.00%   0.00%   0.00% 100.00%      -11    +570  +16775   2738
-42415     4241   0.00%   0.00%   0.00% 100.00%      -24    +392  +16872   2225
-44535     4453   0.00%   0.00%   0.00% 100.00%      -12    +396  +17011   2146
-46761     4676   0.00%   0.00%   0.00% 100.00%      -28    +406  +17292   2061
-49099     4909   0.00%   0.00%   0.00% 100.00%      -43    +425  +17224   2025
-51553     5155   0.00%   0.00%   0.00% 100.00%      -26    +578  +17207   2192
-54130     5413   0.00%   0.00%   0.00% 100.00%      -22    +703  +17214   2254
-56836     5683   0.00%   0.00%   0.00% 100.00%       -9    +780  +17239   2192
-59677     5967   0.00%   0.00%   0.00% 100.00%      -41   +1194  +17258   2931
-62660     6266   0.00%   0.00%   0.00% 100.00%      -51   +1245  +17285   3066
-65793     6579   0.00%   0.00%   0.00% 100.00%      -64   +1247  +17246   3103
-69082     6908   0.00%   0.00%   0.00% 100.00%     -784   +2074  +18422   3355
-72536     7253   0.00%   0.00%   0.00% 100.00%     -982    +660  +16681   1700
-76162     7616   0.00%   0.00%   0.00% 100.00%       +0   +1462  +17309   2513
-79970     7997   0.00%   0.00%   0.00% 100.00%     +280   +3833  +17455   5181
-83968     8396   0.00%   0.00%   0.00% 100.00%      -26   +1047  +17189   1689
-88166     8816   0.00%   0.00%   0.00% 100.00%      -85    +835  +16783   1307
-92574     9257   0.00%   0.00%   0.00% 100.00%     -122    +803  +16628   1311
-97202     9720   0.00%   0.00%   0.00% 100.00%      -44    +947  +16791   1345
-102062   10206   0.00%   0.00%   0.00% 100.00%       +7   +1033  +16637   1349
-107165   10716   0.01%   0.00%   0.00%  99.99%       +7   +1002  +24510   1311
-112523   11252   0.00%   0.00%   0.00% 100.00%      +14   +1054  +16479   1281
-118149   11814   0.00%   0.00%   0.11%  99.89%     -170   +1560  +17766   1122
-124056   12405   0.00%   0.00%   0.00% 100.00%      +24   +1255  +16566   1230
-130258   13025   0.00%   0.00%   0.00% 100.00%      +28   +1218  +16479   1331
-136770   13677   0.12%   0.00%   0.05%  99.82%      -13   +1336  +16770   1586
-143608   14360   3.35%   0.00%   0.23%  96.41%      -31   +1547  +21513   1924
-150788   15078   7.22%   0.00%   0.41%  92.37%      -37   +1617  +25333   1989
-158327   15832  11.59%   0.00%   0.62%  87.78%      -44   +1757  +24397   2110
-166243   16384  15.07%   0.00%   0.77%  84.16%      -36   +2074  +21110   2345
-174555   16384  19.09%   0.00%   0.92%  80.00%      -45   +2109  +26063   2294
-183282   16384  23.00%   0.00%   1.02%  75.98%      -35   +2222 +153077   2407
-192446   16384  26.77%   0.00%   1.14%  72.09%      -41   +2267  +18813   2397
-202068   16384  30.04%   0.00%   1.21%  68.74%      -45   +2374  +23266   2413
-212171   16384  32.80%   0.00%   1.34%  65.86%      -49   +2563  +23285   2307
-222779   16384  36.43%   0.00%   1.31%  62.26%     -158   +2693  +26937   2346
-233917   16384  39.76%   0.00%   1.38%  58.86%      +85   +2848  +25018   2349
-245612   16384  42.52%   0.00%   1.41%  56.07%      +89   +2846 +153305   2409
-257892   16384  44.83%   0.00%   1.41%  53.76%      +14   +2789  +24800   2323
-270786   16384  47.64%   0.00%   1.43%  50.94%      -19   +2766  +25002   2382
-284325   16384  49.02%   0.00%   1.51%  49.47%     -886   +2687  +23521   2006
-298541   16384  52.04%   0.00%   1.51%  46.44%     -917   +3332 +118317   2057
+changelog:
+v2:
+   - reduce much repetition with ice_hash_{remove,moveout}() calls
+     (Przemek, leftover from internal review)
+   - now applies on Tony's tree
 
--- 
-Miroslav Lichvar
+v1/RFC: https://lore.kernel.org/intel-wired-lan/20250811111213.2964512-1-aleksandr.loktionov@intel.com
 
+Aleksandr Loktionov (4):
+  ice: add flow parsing for GTP and new protocol field support
+  ice: add virtchnl and VF context support for GTP RSS
+  ice: improve TCAM priority handling for RSS profiles
+  iavf: add RSS support for GTP protocol via ethtool
+
+Przemek Kitszel (1):
+  ice: extend PTYPE bitmap coverage for GTP encapsulated flows
+
+ .../net/ethernet/intel/iavf/iavf_adv_rss.c    |  119 +-
+ .../net/ethernet/intel/iavf/iavf_adv_rss.h    |   31 +
+ .../net/ethernet/intel/iavf/iavf_ethtool.c    |   89 ++
+ .../net/ethernet/intel/ice/ice_flex_pipe.c    |   91 +-
+ .../net/ethernet/intel/ice/ice_flex_type.h    |    1 +
+ drivers/net/ethernet/intel/ice/ice_flow.c     |  251 ++-
+ drivers/net/ethernet/intel/ice/ice_flow.h     |   94 +-
+ .../ethernet/intel/ice/ice_protocol_type.h    |   20 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.h   |   48 +
+ .../net/ethernet/intel/ice/ice_virtchnl_rss.c | 1404 ++++++++++++++++-
+ include/linux/avf/virtchnl.h                  |   50 +
+ 11 files changed, 2070 insertions(+), 128 deletions(-)
+
+--
+2.47.1
 
