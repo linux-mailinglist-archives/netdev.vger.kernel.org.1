@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-214430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38803B295EA
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 02:51:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76E08B295EB
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 02:51:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D9B017CC1F
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 00:51:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C6014E5778
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 00:51:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88C9A2222A0;
-	Mon, 18 Aug 2025 00:50:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38684221DAE;
+	Mon, 18 Aug 2025 00:50:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Ez8HcdF6"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="SOtVz59O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00249221DAE
-	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 00:50:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5868222564
+	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 00:50:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755478241; cv=none; b=D6sgxGUgkOHvGyanSujzOaWPROah1i9mqpXFajO5C3nNbS+xg8gpb+UPNgcDyjiEZSJWqHFFO5D9iizqU5OlkR8i5/cqR7MNt0oIJPLc0Jz1lA8hxZu5uEdEnHw/bGyxu4RFoH9Y+EV0YdshpUQcV2wiydbrutseDMf/ZJCGxoY=
+	t=1755478243; cv=none; b=Gvio4z2hXH8CNixfJPP+s3DK49Yg9tI5Wi8/04I0a6Idt1A1cArAa+v3IHyfc3MkJfAdtV5I+W9EwNPSy6NV7iY7B70S0EzLiB/Yies6D4iQzyyIhcJsYLh7prHl/2MbECiz4Fw2jCLuPEYq+BnsuCfQBdvcwFSib12exls9IoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755478241; c=relaxed/simple;
-	bh=yO3YC+S/HSL+5FbXS/9QdjNaIiNMqqs/+ffpA5bR1fQ=;
+	s=arc-20240116; t=1755478243; c=relaxed/simple;
+	bh=NefKA9kuHAYmsnJPtIi2C8g1Fa//dlT9XNbcTbAlln4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FqTpVoMpBBqSuBCZLjUeV/jEw+tAkt/pSllQZXHcVYPzfctKvgnqickU48qxoDqQfR7tXgiGkO57vP4i74laN8TkVEC3R0B5TJtiUpJvhRL9IOvz7LJXU25POUQQFp0795bwkrganralFRUrRDg0Cq2xg5WROnaKRIvTTl07/BA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Ez8HcdF6; arc=none smtp.client-ip=209.85.219.51
+	 MIME-Version; b=KcLbEOKPfJZNM24DLMPvH+pm0jm5i89kzf3rDvTzNOhHXfuyHmPykw7+y9vUqGmggfoKcSR3w24Kv+xUUZTR60rVMYxPBQLnQFxLxw2AXit8tEnwRTZXFIalbpUpztfzOrGPtLJ4xXY68B5lyCuRZB+2D9TTY7RwV1Laqn/lAcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=SOtVz59O; arc=none smtp.client-ip=209.85.160.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-70a927f38deso18728986d6.1
-        for <netdev@vger.kernel.org>; Sun, 17 Aug 2025 17:50:39 -0700 (PDT)
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4b109912545so40419321cf.0
+        for <netdev@vger.kernel.org>; Sun, 17 Aug 2025 17:50:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1755478239; x=1756083039; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1755478240; x=1756083040; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DmjVnP7qpPSN2hUz0/Cxl4LBV3THbWeDOm+1Q3QyjaE=;
-        b=Ez8HcdF6HG1XqyPaMK5+2+2CXm9kqs5KTY7ymzDXJf/J8p9uf1KGwhi+3xQEG9IXjg
-         obj5ERvpXuZhvuvzNg7NFrh2nW5fweg2MVZKMPWG+06jqk4lGRyYMOIT67KucrLyGKQo
-         BGET0AB00A1SZRqMafwXTNYK8D6srm+aWqEis=
+        bh=DAFUgCNfzef7QGzW8mqYazNE6E0me8b/k0QPgzoStao=;
+        b=SOtVz59OLU+7YakWnjaaBvJjs/AAHxv4UZHXYfW1hX0ElIZBVRpfd/9tYgKsPuEyec
+         UB14nzKiM20bVd863DzdOth0urvc9NaMza6kocMS8Kp0OBc6/7+AVuVz7LU/+qM32x2n
+         6nVXtdUOCQYF6fDUxgAKl3UBnKzpYScagSsEo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755478239; x=1756083039;
+        d=1e100.net; s=20230601; t=1755478240; x=1756083040;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DmjVnP7qpPSN2hUz0/Cxl4LBV3THbWeDOm+1Q3QyjaE=;
-        b=HgAhvCOeZS5p2kxpy4yc05L5AhQ1GM7WEA0ged7dfqphb8KHMm1fxL8z5dXyT9s8bH
-         NrYlYf6lwerEwhQ+ZVY2hh1SzKZzAo8mmGrS8uHlWGpOsEtoVvS4ucw84J3KG0J0pCLf
-         8L8yLK7HH9qYfvBK7dRdqP/nnl+6sRs+NUSnoCSJmRtFQqkB/jDmecpurm9JYR/5IjCA
-         yuLcglumO5HR06BafakMqyuY8O7jIFalEmsLbSUQVTjLWXXStq+sv9TPZxoIUT1zVKk4
-         cUPLgEr0TAuu75zeBdXiKneHGFG6uJjIWhPQr+uM0cOEcq1vxhL5C4OPk3z1jxVj6z5c
-         zyzg==
-X-Gm-Message-State: AOJu0YxfA2GeIDkO6xCa1GcM2hMZDaHvhjX6dz9hYWHsUr9R/B2ggYmT
-	S3UsjHyqIWXvanIv1ITG3NUKYydHFOzi2ha+KRXdiBFRoMdKXt4NIi8Dl4gc7yEpoQ==
-X-Gm-Gg: ASbGncs/+3sCqBnEvujhSbUxmdqNTjzh/Si7Gy3AuctImI8bgL6VUcOIf5Ig38ht/EU
-	W5Y29Q/2tiX9/fg/s0QL/kfzaslEq6dyV54gIT5lxelm3XKpizzd3jayFf0aBZpt07JzawWaKMJ
-	C6788/1csL6LT/wGHVT/Z1TKxjP1TZsbnwbazZfNAl/hJv0wxmSmXHj+Gw1hl6oDyTlLjWqZqRA
-	/qOPzy9tDq9qD5uEI0HnIhDWwgsewP2CP5HzHzeUDUIje1BvJCH24lilew96Bto9AmKdKERPdrk
-	fUirVs7liyvR/78A+ZS2/hr8UIeFac0KWHimW5yiFRohyVpzM8uP+u9DaM4COpAT3dWDwO9mVmE
-	fUuM6yjULizTT7gt40is+xnufwIRXo42vkHbPjHmatGS0lfDin48d05j9ix8GQ47Vpg4roxOGcA
+        bh=DAFUgCNfzef7QGzW8mqYazNE6E0me8b/k0QPgzoStao=;
+        b=SOfC8o+aYDTi7+C44h1757kasQj9VvUrja8RTpk7rMRDUljzYKGzARWVScWMItMOVW
+         icuTT88FginWTg1HvsJXZTS/92i8/0hLA505Ivo83ynyzZ1gwNsxHAIhLLzi0aKxVK28
+         7X4z22y2IegQmjncuYXJWrq89LBXzQbFvliZIjD98+rfWu5kRLfHmNkKKUgtLe2OaSGm
+         dgb6G2tfal6/0R4i8XmkKqXmskzgbWn27HIF7SRtMd5akIVV49/YYTaWXQ4iFQxVBjxO
+         q1J2GnZJ2FIDYAI228qsg5whPQYPNIfL6mzkX+DiioBML6dYmBXQSfZxDfuX61RN2MiV
+         PDhg==
+X-Gm-Message-State: AOJu0YwpAiz9v6wWocKo6o/SWVAEP+yjuiY1fJ9bVKJLY13ROEGzTppo
+	fvrUjX6v5LZq1K3Vk46bUxTBHDMJB6QN++BekWlk0sawf5EuFDPgkk5so0Ag7Yqb0A==
+X-Gm-Gg: ASbGncsTrYZqnQjxBHpNEWPO7rV8PwOyh0i9+n+Acxp1ZY/egrRGyuCj7bFwilPRMEs
+	GCUDWOrnncXpSRpKWzw4stuw0abUVBdRySQ8oZ37g8QZ1DKvuhwqDIZ3cf80/v5CLZWBWiD/lyI
+	W37re05JnpotwutCbqq25Idg87TwNm6TY9bIZaQoNWQeCRIOw59yKSopyXSXC3q0GSB8KaXv0hs
+	3QkCyo+0OH3gYMpRpQGIB6fwfm1f/aCuuRBI45/1vz5SFYx3ztgTdRyeH0K0WMZFOta/mNqw4I0
+	Q4Q11JBegQlPQngImVav5ZCpCe0UHMkHLFv1D313l9zi6bhjhl2y+sN/+myzEj/X7TPymAd1dGP
+	cmlAs5aJy4x5SKVgT/wlC6VRoiDL0mCCcYMO3PskQDnEXn1rxDdINwKSmlMB6KC/YjEEMbqLibg
 	==
-X-Google-Smtp-Source: AGHT+IGg9FXPKCpMdY/TdPLKWNW3B91uvNZYmUI5K0Wa4TpuYTgSDukB10Om7B7UO6y6SmLXDrhtsQ==
-X-Received: by 2002:a05:6214:62c:b0:709:65c1:f17d with SMTP id 6a1803df08f44-70ba7c016e7mr119823206d6.25.1755478238818;
-        Sun, 17 Aug 2025 17:50:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEYDhQ5sJQoawFHZC3GoUk2gY+txl2Z+PTeefqHoVKCXncvTiarPKqe1xBgPihemCcAzlJmVA==
+X-Received: by 2002:a05:6214:406:b0:709:65c0:ae8d with SMTP id 6a1803df08f44-70ba7d0d10bmr145882936d6.50.1755478240573;
+        Sun, 17 Aug 2025 17:50:40 -0700 (PDT)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70ba9301703sm44987526d6.49.2025.08.17.17.50.37
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70ba9301703sm44987526d6.49.2025.08.17.17.50.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 Aug 2025 17:50:38 -0700 (PDT)
+        Sun, 17 Aug 2025 17:50:40 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -79,11 +79,11 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com,
-	Shruti Parab <shruti.parab@broadcom.com>,
+	Somnath Kotur <somnath.kotur@broadcom.com>,
 	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Subject: [PATCH net-next 4/5] bnxt_en: Add pcie_ctx_v2 support for ethtool -d
-Date: Sun, 17 Aug 2025 17:49:39 -0700
-Message-ID: <20250818004940.5663-5-michael.chan@broadcom.com>
+Subject: [PATCH net-next 5/5] bnxt_en: Add Hyper-V VF ID
+Date: Sun, 17 Aug 2025 17:49:40 -0700
+Message-ID: <20250818004940.5663-6-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20250818004940.5663-1-michael.chan@broadcom.com>
 References: <20250818004940.5663-1-michael.chan@broadcom.com>
@@ -95,57 +95,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Shruti Parab <shruti.parab@broadcom.com>
+From: Pavan Chebbi <pavan.chebbi@broadcom.com>
 
-Add support to dump the expanded v2 struct that contains PCIE read/write
-latency and credit histogram data.
+VFs of the P7 chip family created by Hyper-V will have the device ID of
+0x181b.
 
+Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
 Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Signed-off-by: Shruti Parab <shruti.parab@broadcom.com>
+Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 5 ++++-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h | 1 +
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index abb895fb1a9c..2830a2b17a27 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -2088,14 +2088,16 @@ __bnxt_hwrm_pcie_qstats(struct bnxt *bp, struct hwrm_pcie_qstats_input *req)
- }
- 
- #define BNXT_PCIE_32B_ENTRY(start, end)			\
--	 { offsetof(struct pcie_ctx_hw_stats, start),	\
--	   offsetof(struct pcie_ctx_hw_stats, end) }
-+	 { offsetof(struct pcie_ctx_hw_stats_v2, start),\
-+	   offsetof(struct pcie_ctx_hw_stats_v2, end) }
- 
- static const struct {
- 	u16 start;
- 	u16 end;
- } bnxt_pcie_32b_entries[] = {
- 	BNXT_PCIE_32B_ENTRY(pcie_ltssm_histogram[0], pcie_ltssm_histogram[3]),
-+	BNXT_PCIE_32B_ENTRY(pcie_tl_credit_nph_histogram[0], unused_1),
-+	BNXT_PCIE_32B_ENTRY(pcie_rd_latency_histogram[0], unused_2),
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 2d4fdf5a0dc5..ba99de403138 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -142,6 +142,7 @@ static const struct {
+ 	[NETXTREME_E_P5_VF] = { "Broadcom BCM5750X NetXtreme-E Ethernet Virtual Function" },
+ 	[NETXTREME_E_P5_VF_HV] = { "Broadcom BCM5750X NetXtreme-E Virtual Function for Hyper-V" },
+ 	[NETXTREME_E_P7_VF] = { "Broadcom BCM5760X Virtual Function" },
++	[NETXTREME_E_P7_VF_HV] = { "Broadcom BCM5760X Virtual Function for Hyper-V" },
  };
  
- static void bnxt_get_regs(struct net_device *dev, struct ethtool_regs *regs,
-@@ -2123,7 +2125,13 @@ static void bnxt_get_regs(struct net_device *dev, struct ethtool_regs *regs,
- 		int i, j, len;
+ static const struct pci_device_id bnxt_pci_tbl[] = {
+@@ -217,6 +218,7 @@ static const struct pci_device_id bnxt_pci_tbl[] = {
+ 	{ PCI_VDEVICE(BROADCOM, 0x1808), .driver_data = NETXTREME_E_P5_VF_HV },
+ 	{ PCI_VDEVICE(BROADCOM, 0x1809), .driver_data = NETXTREME_E_P5_VF_HV },
+ 	{ PCI_VDEVICE(BROADCOM, 0x1819), .driver_data = NETXTREME_E_P7_VF },
++	{ PCI_VDEVICE(BROADCOM, 0x181b), .driver_data = NETXTREME_E_P7_VF_HV },
+ 	{ PCI_VDEVICE(BROADCOM, 0xd800), .driver_data = NETXTREME_S_VF },
+ #endif
+ 	{ 0 }
+@@ -315,7 +317,8 @@ static bool bnxt_vf_pciid(enum board_idx idx)
+ 	return (idx == NETXTREME_C_VF || idx == NETXTREME_E_VF ||
+ 		idx == NETXTREME_S_VF || idx == NETXTREME_C_VF_HV ||
+ 		idx == NETXTREME_E_VF_HV || idx == NETXTREME_E_P5_VF ||
+-		idx == NETXTREME_E_P5_VF_HV || idx == NETXTREME_E_P7_VF);
++		idx == NETXTREME_E_P5_VF_HV || idx == NETXTREME_E_P7_VF ||
++		idx == NETXTREME_E_P7_VF_HV);
+ }
  
- 		len = min(bp->pcie_stat_len, le16_to_cpu(resp->pcie_stat_size));
--		regs->version = 1;
-+		if (len <= sizeof(struct pcie_ctx_hw_stats))
-+			regs->version = 1;
-+		else if (len < sizeof(struct pcie_ctx_hw_stats_v2))
-+			regs->version = 2;
-+		else
-+			regs->version = 3;
-+
- 		for (i = 0, j = 0; i < len; ) {
- 			if (i >= bnxt_pcie_32b_entries[j].start &&
- 			    i <= bnxt_pcie_32b_entries[j].end) {
+ #define DB_CP_REARM_FLAGS	(DB_KEY_CP | DB_IDX_VALID)
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index 25ca002fc382..1bb2a5de88cd 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -2130,6 +2130,7 @@ enum board_idx {
+ 	NETXTREME_E_P5_VF,
+ 	NETXTREME_E_P5_VF_HV,
+ 	NETXTREME_E_P7_VF,
++	NETXTREME_E_P7_VF_HV,
+ };
+ 
+ #define BNXT_TRACE_BUF_MAGIC_BYTE ((u8)0xbc)
 -- 
 2.30.1
 
