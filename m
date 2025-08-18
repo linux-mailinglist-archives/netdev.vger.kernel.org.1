@@ -1,119 +1,110 @@
-Return-Path: <netdev+bounces-214738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30516B2B219
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 22:10:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0D29B2B260
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 22:29:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23C3817E4EB
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 20:10:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2F933BC807
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 20:28:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9271E225416;
-	Mon, 18 Aug 2025 20:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E4542264B7;
+	Mon, 18 Aug 2025 20:28:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JIpOS1xk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ha6rnbEc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AA103451A6;
-	Mon, 18 Aug 2025 20:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D77CE225A29;
+	Mon, 18 Aug 2025 20:28:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755547838; cv=none; b=BVYYF9HLzMD4FLwrELuqKoMe3DS39oROjdbJ5R5zAD8olSRcpFYX+e67yzLQ2Cb5E6IDjuhVLeBR5pCr4UWb83ooFbTZciMUShHvHb6HzwcWENu2OBn62cW3YKd77iapKqJzfHUaAeXLhHr1g5cqtnwaFr3hxVAVjL22/Sk9teQ=
+	t=1755548927; cv=none; b=adKpB+UHR3kMCacnyWP/RGPUsXj5b8UFykAlQQdE6GYs94mCvz/kE0kGMQNjeIJr9eeVrVpoerrMHuUBPCVI1MEouIidusDPjDTqrWXpF+iQ6slY03yWLGBFiorXZkI5zyOWApy/ozcuqb5S7gpZyNZBcZAW/HDdU2IL13kSBbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755547838; c=relaxed/simple;
-	bh=qg6GZTp8IOOZdRgNGIXFARftWitXEVGq3DzHCuGmImo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TkNI30+Gn03PDMHPz8A9fTRWNojyn3AvDDhJZ93Qp8zUXn7NtNfmTSvZUuw+hETz8IIuZIDJp+5biERvfVLKeDgc5BHHjRis4PYOyCtahCvBv245Lp7iUiHj3+CXbkjUyvOi9SamNnHV/iFZjHlMVV9Nyz6KLyqbJvn7DxcVQLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JIpOS1xk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB7B7C4CEEB;
-	Mon, 18 Aug 2025 20:10:37 +0000 (UTC)
+	s=arc-20240116; t=1755548927; c=relaxed/simple;
+	bh=KiWZ/EiIDY+ilEC4IXfdyN/LdSTVyd3z4Jo9QiKYDtA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Fuum3r7iGZviRZtkrCJ+JFIlvBVLYPVjj7d3Zrfl5TK9t1s6Kl4fTwF3/KtqLJDijalPfXGKApfVTDmKbbNvOJXMaBFcb7JQrFpWGFua0QDF5p0HboBFe19c2X3fU2Jc8XrYJtQV0Gl3qin2kjD86TNIfHdLUc1iU2EPjw+Thn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ha6rnbEc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21579C4CEF1;
+	Mon, 18 Aug 2025 20:28:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755547838;
-	bh=qg6GZTp8IOOZdRgNGIXFARftWitXEVGq3DzHCuGmImo=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=JIpOS1xk7YahMhN5Ye/QxfvM1KFZzF+ZJKLD1lPbylumH+5cNqfFXMwBkxuvWL60v
-	 qi4ZUeXgTw+TLW1+3cnLUthS8RU/rplcG2CDUkqpiPPW5RqF3PHaiPwyJulrJuDI4N
-	 xQISNqlI4R6NnYQXtV7jw0ApGiVSjH6JLT5rYnjmzThfKjzuu67dyZnWdWYpXXcy0x
-	 Y9B7SkxmxNElXdnU8JtDZfUQMFGt/K1e6TgmtamsG6LunbtISoRzbTA3gkeFvrU7Pl
-	 jUDODGTn5iRWh6am2TOOeB+pWZdb+TF7c+v7Ej012BUzj8hGZvqiqXubas7FFeT0bM
-	 rHR/aKgHbW/hA==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 9A80ACE122F; Mon, 18 Aug 2025 13:10:37 -0700 (PDT)
-Date: Mon, 18 Aug 2025 13:10:37 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: linux-kernel@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH RFC] net: stmmac: Make DWMAC_ROCKCHIP and DWMAC_STM32
- depend on PM_SLEEP
-Message-ID: <4c3b0193-4fa7-47ef-9d61-f060c10d3ed4@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <7ee6a142-1ed9-4874-83b7-128031e41874@paulmck-laptop>
- <aKN-Tdfvc3_hD2p7@shell.armlinux.org.uk>
+	s=k20201202; t=1755548927;
+	bh=KiWZ/EiIDY+ilEC4IXfdyN/LdSTVyd3z4Jo9QiKYDtA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Ha6rnbEcOVvvtzAFK09Tdm0Qn6g6Yz45E3AsPi1F+28h3vY6yT1+pxzyqUjD7n8iG
+	 O2QEcjqOxXJHbTl2gtLRT+/6Y0OXygyXNzm45ixBoUkj4wU1rH2lf0EKQrUXc3+nb8
+	 uyqpQlD2cWQLUk2mGP1yZjciTuk9NOFN8RS1YB32+yyV6YFuAkTOY0qjerVsBZSoMN
+	 82HdRq8NPlFw1sQtVUH1R6QFipQmIHnPs3yu26dhSW/SzYTOucHTcPpnFfrlZ/XAY8
+	 5SDYeq1Fea6+9JO/gTJH5pF+IWXdZQM7I0P7YdLT0ceUq9rVqaw5ZMmy+y3s7I9oOt
+	 KUWMgvtasce5A==
+From: Eric Biggers <ebiggers@kernel.org>
+To: netdev@vger.kernel.org,
+	Andrea Mayer <andrea.mayer@uniroma2.it>
+Cc: linux-crypto@vger.kernel.org,
+	David Lebrun <dlebrun@google.com>,
+	Minhong He <heminhong@kylinos.cn>,
+	Eric Biggers <ebiggers@kernel.org>,
+	stable@vger.kernel.org
+Subject: [PATCH net v2] ipv6: sr: Fix MAC comparison to be constant-time
+Date: Mon, 18 Aug 2025 13:27:24 -0700
+Message-ID: <20250818202724.15713-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aKN-Tdfvc3_hD2p7@shell.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Aug 18, 2025 at 08:26:05PM +0100, Russell King (Oracle) wrote:
-> On Mon, Aug 18, 2025 at 12:11:09PM -0700, Paul E. McKenney wrote:
-> > Hello!
-> > 
-> > This might be more of a bug report than a patch, but here goes...
-> > 
-> > Running rcuscale or refscale performance tests on datacenter ARM systems
-> > gives the following build errors with CONFIG_HIBERNATION=n:
-> > 
-> > ERROR: modpost: "stmmac_simple_pm_ops" [drivers/net/ethernet/stmicro/stmmac/dwmac-rk.ko] undefined!
-> > ERROR: modpost: "stmmac_simple_pm_ops" [drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.ko] undefined!
-> 
-> The kernel build bot caught this, and I asked questions of Rafael last
-> week and have been waiting for a response that still hasn't come.
-> 
-> However, there was some discussion over the weekend (argh) on IRC from
-> rdd and arnd, but I didn't have time over a weekend (shocking, I know,
-> we're supposed to work 24x7 on the kernel, rather than preparing to
-> travel to a different location for medical stuff) to really participate
-> in that discussion.
-> 
-> Nevertheless, I do have a patch with my preferred solution - but whether
-> that solution is what other people prefer seems to be a subject of
-> disagreement according to that which happened on IRC. This affects every
-> driver that I converted to use stmmac_simple_pm_ops, which is more than
-> you're patching.
-> 
-> I've been missing around with medical stuff today, which means I also
-> haven't had time today to do anything further.
-> 
-> It's a known problem, but (1) there's been no participation from the
-> kernel community to help address it and (2) over the last few days I've
-> been busy myself doing stuff related to medical stuff.
-> 
-> Yea, it's shocking, but it's also real life outside of the realms of
-> kernel hacking.
+To prevent timing attacks, MACs need to be compared in constant time.
+Use the appropriate helper function for this.
 
-;-) ;-) ;-)
+Fixes: bf355b8d2c30 ("ipv6: sr: add core files for SR HMAC support")
+Cc: stable@vger.kernel.org
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
 
-I am happy with whatever solves the problem.  In the meantime, I will
-be using my patch in testing to get this failure out of the way of
-other bugs.
+v2: sent as standalone patch targeting net instead of net-next.
 
-							Thanx, Paul
+ net/ipv6/seg6_hmac.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/net/ipv6/seg6_hmac.c b/net/ipv6/seg6_hmac.c
+index f78ecb6ad8383..5dae892bbc73b 100644
+--- a/net/ipv6/seg6_hmac.c
++++ b/net/ipv6/seg6_hmac.c
+@@ -33,10 +33,11 @@
+ #include <net/ip6_route.h>
+ #include <net/addrconf.h>
+ #include <net/xfrm.h>
+ 
+ #include <crypto/hash.h>
++#include <crypto/utils.h>
+ #include <net/seg6.h>
+ #include <net/genetlink.h>
+ #include <net/seg6_hmac.h>
+ #include <linux/random.h>
+ 
+@@ -278,11 +279,11 @@ bool seg6_hmac_validate_skb(struct sk_buff *skb)
+ 		return false;
+ 
+ 	if (seg6_hmac_compute(hinfo, srh, &ipv6_hdr(skb)->saddr, hmac_output))
+ 		return false;
+ 
+-	if (memcmp(hmac_output, tlv->hmac, SEG6_HMAC_FIELD_LEN) != 0)
++	if (crypto_memneq(hmac_output, tlv->hmac, SEG6_HMAC_FIELD_LEN))
+ 		return false;
+ 
+ 	return true;
+ }
+ EXPORT_SYMBOL(seg6_hmac_validate_skb);
+
+base-commit: 715c7a36d59f54162a26fac1d1ed8dc087a24cf1
+-- 
+2.50.1
+
 
