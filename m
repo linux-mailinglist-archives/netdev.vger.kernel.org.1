@@ -1,123 +1,131 @@
-Return-Path: <netdev+bounces-214793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E506B2B515
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 01:50:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E835AB2B520
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 01:58:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BB385231EC
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 23:50:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97AEE526ADF
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 23:58:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97A412765C0;
-	Mon, 18 Aug 2025 23:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A32F27BF99;
+	Mon, 18 Aug 2025 23:58:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kEjs35mY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j6OfeSxP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE2CC2417C3
-	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 23:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BC481EB5B;
+	Mon, 18 Aug 2025 23:58:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755561030; cv=none; b=qIfWcfmplL3aXEk+8TLqn5TVZ89nLzqJRNXYW97FGdsDxxxdRflt4gHlH+nTbX0QJTWSjSDdHxc2vs2VzybBAnj067CQSD7sPmOa7/GYjyJPy6dxuK2yAHAJ3/mqIER5PlhQ2rkRttSTkJyZDNouwsA0OioBFfe3Uqgpj/Igv7U=
+	t=1755561499; cv=none; b=UM1I1n4XXUCcG9CLZgV8+rhlbYWvA9v2Og8IuxSgAihEXpBm/IhR2dCUAT+VU65wA1P6bTtgTn/eyXd+W++CyXomynI5C2lA+rGwHaUdko/RDf3KJPrgpbXAU3DA0msgUxPf0fucGZ8QugnGCCM8di+3J37euw7cjfZvO+n413k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755561030; c=relaxed/simple;
-	bh=LcsNuZAmmSgBbn7Rx/F0jKuldnOTvv9gOB0r7oIHRPo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Fiw/b614HeKVxeYBpNphzKFQFN1E/SK6DQdUqp5ZmH3/hJu6Go1iK1klzwmeKKveOBm33G3qVlKtEYa6TjXI8FX+6HQ/CadcCpkbjwWS+czSn9Z6/OoUudT2nsxe1SCI7TAF88O8sI6F/UeqZfMJKSG6aJ505ZA/C0e/lvVx5Lw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kEjs35mY; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-55df3796649so4187e87.0
-        for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 16:50:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755561027; x=1756165827; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LcsNuZAmmSgBbn7Rx/F0jKuldnOTvv9gOB0r7oIHRPo=;
-        b=kEjs35mY/abuBvRXcO10QPH8S6ZRk31NPSrdR0MCCAQkyIIOAv/SfHtJ4N/US1LPef
-         i/I8jM0Mhxy1gBQ0AzsabvyDg8xjtqck/Nfh9Yx1IZv20xHuokHS7WLRbTNmYN9BUDil
-         xwh1f8zGh7cEjQhwq8p8n1PGZ+HMFyvCqzZXCYhunBemhUojKo0yfHyFOvzj2McBqINc
-         pPrxjwXNu381/fHTr6R50CLBIJfn7UBbKeDdUxmyAMpMH38GONFiZwgjtAgwDkj5PeA1
-         Vz4vhz19VZ2UESv8chQbJ0WP9FyBv1m5C8qBhVDMHHABH9RQd8c46T/ZJ/8Guhbqvf5m
-         Y7wQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755561027; x=1756165827;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LcsNuZAmmSgBbn7Rx/F0jKuldnOTvv9gOB0r7oIHRPo=;
-        b=Smpx+dziaHPhuuke2uUIZ1nZRM75al8RNhA0k1E5FrnZPeFvIN6/4xEs0KU+cVHP1y
-         ONImZ0yx8Ipq8vO04WXpuMK9M4beOcy96vvtxg9wdvAORbwiAt2Xu2CPjFn7KhZK/eNQ
-         AAKGkJ9aR7+FynNRD1hthF+o1C54+Ny/pdK3/yYATf2AwLYJhHtdppRMWAbQqZibfqnd
-         603tuAH05ch5hEf9MovqCYzxrDZ84E/qvxBgw6qWCfxfRh5w3PXuLkdkBBXEXkW+Bgl2
-         q6j8dOujM44DgwRZFLz682nTx326ugx0s8RQzbW69kkYmZP21Ww6fxRpvlpi+Swlhy2p
-         FaeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUakO3T9+F06j/48sz1V2kJSAU8jKYpFyk5CpiJXA01x+33/PNJK5TNs8BFs33DQKnxF1pxEqM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxma508Hk/jiur2jq4/gmT/Yb4+12JdyNcNUe2B6kreJoz6YJ/O
-	uSwNIlD0jAAuPtyR+erwF1PkwF8F1AgUgN1LQjO+/H1XBm3FdgbQy0y/N72QnyAaKltAUy2oaNL
-	7fi+jn5eNOHqO2l37Qg4123eY3h9B4hoYY4c1hy2i
-X-Gm-Gg: ASbGncux4C+L92DGUs/uW1Kak8rFOzA7E8ZPy13/W56BuFPE+6b1LUU9Q6uLgYaTETM
-	ZvXXhz52uE8WnDZvelMvcd5V0PzfpiJjjUqm3Gsedtmd5OPJM7zjdxeeO24oWSnIs2ryRf6Z5Rc
-	GdvcJuIZtB6U1k+PUzhc7om8imw52Y06KrSFCrRWqDHGQDuY2i0QHeTYqdOtkdG6/s/PA+KBflv
-	azv9+A2AsEMJihjruw7YSJx0jC150GBz1EXDbQlVXYS
-X-Google-Smtp-Source: AGHT+IEz9461t1FLeYjqAPV9IC+YLeWd69snIPkzWT8jdh/N0oHfH1jree3Vr3yZo117hlh5lONNshD+tvF4WSbIHxw=
-X-Received: by 2002:a05:6512:250d:b0:55b:7c73:c5f0 with SMTP id
- 2adb3069b0e04-55e0095dfb9mr92067e87.2.1755561026720; Mon, 18 Aug 2025
- 16:50:26 -0700 (PDT)
+	s=arc-20240116; t=1755561499; c=relaxed/simple;
+	bh=c76ffSU+z29EdjuvcwEaZdMVo1BGLglOk32LHUKT+8Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PWVNcC2A5OvwvM6ofALCH72OjvoaxNYUse704p+/0y4zagT1YIGSyg8cslLuBo+VQrmgpsK+sW4uxLxULm40uVnUj7M0krvHgVzvF7HgYlao5frcWGgLAj0O+wGNbhmA11UjY3eBCp7/393JuMZjynVaroLpL8eTyemDcC9fQ54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=j6OfeSxP; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755561497; x=1787097497;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=c76ffSU+z29EdjuvcwEaZdMVo1BGLglOk32LHUKT+8Q=;
+  b=j6OfeSxPJOHKQ5w/Ed+E50s85srBEwYXuVuS4+MJbntjg83wZmlVneF9
+   yfDzla13WUwc7rYvExHbK3SOZspgtgEIFDZbzvR0Dgu3iEMFJF1gAcqga
+   /qb8OBmoajE3kDRec3qce0BOaGU/jsDFI+KPjdnK1w9gawnrKByJNKmDF
+   Zvxxxy+uanqrICSOherroNxiZt7tM/b4TIn710GRk6qo1bs5tETnSm00c
+   FQNgwjkGo9DNkL8oqYcj+eteS9utNpwYMGhdXFOGQU4P/9VtcuRyNVMs7
+   PambGfFGkC9oRYW9KUOlah4jA214S3nHuFkmY4vzam/KvcHyX4kxeEZIK
+   g==;
+X-CSE-ConnectionGUID: F9dKRY8SRLmAY8rMGbhFxQ==
+X-CSE-MsgGUID: gSbLp10KRemeNMbB2o4Qow==
+X-IronPort-AV: E=McAfee;i="6800,10657,11526"; a="61609894"
+X-IronPort-AV: E=Sophos;i="6.17,300,1747724400"; 
+   d="scan'208";a="61609894"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2025 16:58:16 -0700
+X-CSE-ConnectionGUID: 8bXpQ/8MRnerAdHif+U/Bw==
+X-CSE-MsgGUID: /qIoloXhS5W34Jon6neR7Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,300,1747724400"; 
+   d="scan'208";a="167934762"
+Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
+  by orviesa008.jf.intel.com with ESMTP; 18 Aug 2025 16:58:10 -0700
+Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uo9js-000GJr-0M;
+	Mon, 18 Aug 2025 23:58:08 +0000
+Date: Tue, 19 Aug 2025 07:57:37 +0800
+From: kernel test robot <lkp@intel.com>
+To: "irving.ch.lin" <irving-ch.lin@mediatek.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Richard Cochran <richardcochran@gmail.com>
+Cc: oe-kbuild-all@lists.linux.dev, Qiqi Wang <qiqi.wang@mediatek.com>,
+	linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-pm@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Project_Global_Chrome_Upstream_Group@mediatek.com,
+	sirius.wang@mediatek.com, vince-wl.liu@mediatek.com,
+	jh.hsu@mediatek.com, irving-ch.lin@mediatek.com
+Subject: Re: [PATCH 6/6] pmdomain: mediatek: Add power domain driver for
+ MT8189 SoC
+Message-ID: <202508190709.36QIqpVt-lkp@intel.com>
+References: <20250818115754.1067154-7-irving-ch.lin@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1755499375.git.asml.silence@gmail.com> <353e0195a0f44800c0b5aa4a6d751d3655d9842b.1755499376.git.asml.silence@gmail.com>
-In-Reply-To: <353e0195a0f44800c0b5aa4a6d751d3655d9842b.1755499376.git.asml.silence@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 18 Aug 2025 16:50:14 -0700
-X-Gm-Features: Ac12FXym-AdI0-6m9FtombEI_KXbKYd4WM0Qi3aWvTpPx0DSoGpMt0F2tRTsGrw
-Message-ID: <CAHS8izNEVecwoh+f1nUBmTOGHKS+A6Up8R-0KTFMSwPn4+VzdA@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 02/23] docs: ethtool: document that rx_buf_len
- must control payload lengths
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, andrew+netdev@lunn.ch, horms@kernel.org, 
-	davem@davemloft.net, sdf@fomichev.me, dw@davidwei.uk, 
-	michael.chan@broadcom.com, dtatulea@nvidia.com, ap420073@gmail.com, 
-	linux-kernel@vger.kernel.org, io-uring@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250818115754.1067154-7-irving-ch.lin@mediatek.com>
 
-On Mon, Aug 18, 2025 at 6:56=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.=
-com> wrote:
->
-> From: Jakub Kicinski <kuba@kernel.org>
->
-> Document the semantics of the rx_buf_len ethtool ring param.
-> Clarify its meaning in case of HDS, where driver may have
-> two separate buffer pools.
->
-> The various zero-copy TCP Rx schemes we have suffer from memory
+Hi irving.ch.lin,
 
-nit: 'we have suffer' sounds weird, probably meant just 'suffer'.
+kernel test robot noticed the following build warnings:
 
-> management overhead. Specifically applications aren't too impressed
-> with the number of 4kB buffers they have to juggle. Zero-copy
-> TCP makes most sense with larger memory transfers so using
-> 16kB or 32kB buffers (with the help of HW-GRO) feels more
-> natural.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+[auto build test WARNING on clk/clk-next]
+[also build test WARNING on robh/for-next linus/master v6.17-rc2 next-20250818]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
+url:    https://github.com/intel-lab-lkp/linux/commits/irving-ch-lin/dt-bindings-clock-mediatek-Add-new-MT8189-clock/20250818-200449
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/clk/linux.git clk-next
+patch link:    https://lore.kernel.org/r/20250818115754.1067154-7-irving-ch.lin%40mediatek.com
+patch subject: [PATCH 6/6] pmdomain: mediatek: Add power domain driver for MT8189 SoC
+config: arm-randconfig-001-20250819 (https://download.01.org/0day-ci/archive/20250819/202508190709.36QIqpVt-lkp@intel.com/config)
+compiler: arm-linux-gnueabi-gcc (GCC) 12.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250819/202508190709.36QIqpVt-lkp@intel.com/reproduce)
 
---=20
-Thanks,
-Mina
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202508190709.36QIqpVt-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> Warning: drivers/pmdomain/mediatek/mtk-scpsys.c:219 struct member 'sram_slp_bits' not described in 'scp_domain_data'
+>> Warning: drivers/pmdomain/mediatek/mtk-scpsys.c:219 struct member 'sram_slp_ack_bits' not described in 'scp_domain_data'
+>> Warning: drivers/pmdomain/mediatek/mtk-scpsys.c:219 struct member 'subsys_clk_prefix' not described in 'scp_domain_data'
+>> Warning: drivers/pmdomain/mediatek/mtk-scpsys.c:219 struct member 'bp_table' not described in 'scp_domain_data'
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
