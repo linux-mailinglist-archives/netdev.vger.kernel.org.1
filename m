@@ -1,132 +1,146 @@
-Return-Path: <netdev+bounces-214434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DFE8B2960E
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 03:20:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B07BB2960F
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 03:21:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D0141893EF8
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 01:20:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2F6F7AAC79
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 01:20:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE4DF1E9B2D;
-	Mon, 18 Aug 2025 01:19:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="r5bieQaQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD2A71487E9;
+	Mon, 18 Aug 2025 01:21:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6305C3176EE
-	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 01:19:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C76B1A26B
+	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 01:21:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.19.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755479994; cv=none; b=Mn7MhACx43t09o5SUomdtwZa4uFb3g3N0kHerERH7ijN8ZbHAEgZ9KNTWxKX/gjpDiHK+vDII+Jb8V7EJbklA2qS2WGpauec6mCxUahxkMILRlSg41pj8kXMujzsrwpzLrjw57137q6ecPVMynHrjqhgK6VuYmxjGaHsyIBhGKo=
+	t=1755480094; cv=none; b=MntsGUScl/Ecfn8fKo8q7vJpm2a/m2UPZdjj7OSZesOp/19S4QEvJekD7kLZEtxggCeHwd8ZoBDr3vX4/0ubtuPQ9FEB1hqXExM2GdivDTn2qm1ZqnAIWjJaHrnX3P2OL5A/Yl45VErVZpSZ/g+m5f83EhqhNXV1FJAt57c4W5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755479994; c=relaxed/simple;
-	bh=iMJ1oHRbauEj3lcgwQet8BFInJoPoG6llDJNmYuo08M=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=rIn5rlF11GGqtmvoL3XhYer314NKc5Cbn9GMEBXE7OcvJpNSnqOTJ0uXRY0Xqaf0caQxgu/z3I7CC5sVYAQ65KpFGv/gNgIsvD4gmDNwbVoZGw0mxpTdXRX7y8Prft58/7LreD0NZHiGjSrKeSRvslV9EQVe19Qh2K5sQpBKJus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=r5bieQaQ; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20250818011943epoutp03ac7140103b8e9ba18d67568418477142~ct756ri3F0859708597epoutp03H
-	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 01:19:43 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20250818011943epoutp03ac7140103b8e9ba18d67568418477142~ct756ri3F0859708597epoutp03H
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1755479983;
-	bh=oNTFgx0f6ht5S3wLJmJIF+ULm2VzvhkkVhPoqV1VuFU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=r5bieQaQDK+udQuQ/GAQ5N52e5rs0LXmxAZRW3grU3xxgxroejR7nBhMq5bp/FOrj
-	 91R/485IL4Owz8xUHaVPhvN4g7tBjbtDuKpcIXwQKmy1poKuoZ6rmO5LWbnYiLUfzT
-	 WvwHanvYLOYWlpf70NMDpbvYko7DCy6deLZS3XgA=
-Received: from epsnrtp03.localdomain (unknown [182.195.42.155]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPS id
-	20250818011942epcas5p2aaaec9298cbcd1112fd218a1ae73ec32~ct75Ip0qr0869608696epcas5p2p;
-	Mon, 18 Aug 2025 01:19:42 +0000 (GMT)
-Received: from epcas5p1.samsung.com (unknown [182.195.38.87]) by
-	epsnrtp03.localdomain (Postfix) with ESMTP id 4c4vyP46yvz3hhT3; Mon, 18 Aug
-	2025 01:19:41 +0000 (GMT)
-Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-	20250818011515epcas5p21295745d0e831fd988706877d598f913~ct3--8YNT1315413154epcas5p2j;
-	Mon, 18 Aug 2025 01:15:15 +0000 (GMT)
-Received: from asg29.. (unknown [109.105.129.29]) by epsmtip1.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20250818011513epsmtip12d2ab6910a9fefba463c4b8f998f0853~ct3_D_ADu1149011490epsmtip1x;
-	Mon, 18 Aug 2025 01:15:12 +0000 (GMT)
-From: Junnan Wu <junnan01.wu@samsung.com>
-To: kuba@kernel.org
+	s=arc-20240116; t=1755480094; c=relaxed/simple;
+	bh=fOQpiaXSWhdRBx87IMV+h6Ad7W+80WZ4ofnOSc8GllQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aSrmmEFmm32NKPCQMKTXKGtHTDnUcXYLb5hUBIhEREsENuCDUfGwZLxOTUPHHfXnT0OGjZoIBmtIjTfEDMnnhk7QEnUy8kSB6v0g+fLrIhMfDyXKqwL8hfQx3yYZJsSjdhVTLDq2jIWP95hhQe88TcRr9aNIsqcokf5wh0xNRXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.207.19.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: esmtpgz16t1755480073tfa152b0d
+X-QQ-Originating-IP: J4zOZYfdEVPwo6f9K36pp7u0T/5DQRVYSlsV84VpeYA=
+Received: from localhost ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 18 Aug 2025 09:21:11 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 11348850142159916151
+Date: Mon, 18 Aug 2025 09:21:11 +0800
+From: Yibo Dong <dong100@mucse.com>
+To: Andrew Lunn <andrew@lunn.ch>
 Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	eperezma@redhat.com, jasowang@redhat.com, junnan01.wu@samsung.com,
-	lei19.wang@samsung.com, linux-kernel@vger.kernel.org, mst@redhat.com,
-	netdev@vger.kernel.org, pabeni@redhat.com, q1.huang@samsung.com,
-	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com,
-	ying123.xu@samsung.com
-Subject: Re: [PATCH net] virtio_net: adjust the execution order of function
- `virtnet_close` during freeze
-Date: Mon, 18 Aug 2025 09:15:22 +0800
-Message-Id: <20250818011522.1334212-1-junnan01.wu@samsung.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250815085503.3034e391@kernel.org>
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
+	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
+	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, richardcochran@gmail.com,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 5/5] net: rnpgbe: Add register_netdev
+Message-ID: <BE62E79A10943B82+20250818012111.GB1370135@nic-Precision-5820-Tower>
+References: <20250814073855.1060601-1-dong100@mucse.com>
+ <20250814073855.1060601-6-dong100@mucse.com>
+ <099a6006-02e4-44f0-ae47-7de14cc58a12@lunn.ch>
+ <CFAA902406A8215F+20250815064441.GB1148411@nic-Precision-5820-Tower>
+ <b669db06-83f8-447c-8081-7ef6ae9d2aba@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20250818011515epcas5p21295745d0e831fd988706877d598f913
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-505,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250818011515epcas5p21295745d0e831fd988706877d598f913
-References: <20250815085503.3034e391@kernel.org>
-	<CGME20250818011515epcas5p21295745d0e831fd988706877d598f913@epcas5p2.samsung.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b669db06-83f8-447c-8081-7ef6ae9d2aba@lunn.ch>
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: OXA0paR4HBoFIuQMgGFlBcC2H23vlDZf6JJoOQw43iR7ShpdppyY9EwJ
+	4w/ZonPMEvwuePHqqteqDhKtPOE5jVCYCyTa+u0CQOLp6LPJi408GnNy5NG/kX3aC0Okodc
+	910VOQyTizuUALONiiE2WHKmVdiX8qpLsaqk8r0jiDYQPV17LreTh2jutIBoq/AetUWJ7wD
+	bbZR64V4m3b9l4OjeFRVDce6HUQBXbdZPo5u/deZE+lfFhE3Cwt5jyLAQM7pTogl4FhURb5
+	sjn1We4Lu6q3DmvvxFB7+F6a6EpaWtdCg8A2ClbLzJFkN0K2lGa2WZ1q5kZ2qq0jMFy1kYy
+	ZaLTnwMnTC/1bHyJBuV6Ba3ifIpGI33/G9E4Hw9qmjP5CO+jIHLssRBE1IhDKXcgTF2kQkV
+	3GGFpziJjwMrRt7HxKWZo+Tvvve8gdPf9+pVCNg2gPVDmRrMjC42pmr8dkGMZFo+RYx8VGq
+	IlyFTI5K5paIkdvOv0Buvd/yCqKjhv3Sdz7UtgMPTF7ftdZKEy0SDXXa+mmjbbDFjJ9oaia
+	J7IyiAyiygT0sUqnn/kODzJiUJ1p8BHMbjPyTt4cjCmn+eyz+4LRfSbAhvABZe+tdCOCsP3
+	TYJkF3zw8A9n2VyItDEJqQ1lvp4jmDEv2f7GiyVur4rqw/7D6R5lqcVo6mMsuYO347spwDF
+	F3qnjwHfmRiyNoPvSWiZBVkwPPDKpcc0QlgfdyN/qgBdbI+VDaGUIhShiXZnb5O7jwH/Ral
+	l5yowHuuE7YlPkVCLhSALekH4LT+ctfY31MaVL8H8VIZLMKye5xP8Kx+5/pGcpcQ3vnNFGh
+	5UCEPJ1sz//U5br+XvIjLTBUxjXC7VBsQ9Nx9f3DoYEOGNKyDOjqfvmd7OR8dHVuIh6lmBY
+	j0qKmiiTa+6AVs0AKJRbDqGfSosrq/SLcwnEBpLHvPvuj36sDfcGshFT5xs28PEqk+QBitr
+	2Y94Pk22CbAjMld+E3R8RpP7E0qPx7lBr2EO2dkPDS1eyufbDSg7fOL89FjNydsXlKnAY2O
+	CwPpGq/g==
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+X-QQ-RECHKSPAM: 0
 
-On Fri, 15 Aug 2025 08:55:03 -0700 Jakub Kicinski wrote
-> On Fri, 15 Aug 2025 14:06:15 +0800 Junnan Wu wrote:
-> > On Fri, 15 Aug 2025 13:38:21 +0800 Jason Wang <jasowang@redhat.com> wrote
-> > > On Fri, Aug 15, 2025 at 10:24 AM Junnan Wu <junnan01.wu@samsung.com> wrote:  
-> > > > Sorry, I basically mean that the tx napi which caused by
-> > > > userspace will not be scheduled during suspend, others can not be
-> > > > guaranteed, such as unfinished packets already in tx vq etc.
-> > > >
-> > > > But after this patch, once `virtnet_close` completes,
-> > > > both tx and rq napi will be disabled which guarantee their napi
-> > > > will not be scheduled in future. And the tx state will be set to
-> > > > "__QUEUE_STATE_DRV_XOFF" correctly in `netif_device_detach`.  
+On Fri, Aug 15, 2025 at 08:06:35PM +0200, Andrew Lunn wrote:
+> > > > +static int rnpgbe_reset_hw_ops(struct mucse_hw *hw)
+> > > > +{
+> > > > +	struct mucse_dma_info *dma = &hw->dma;
+> > > > +	int err;
+> > > > +
+> > > > +	dma_wr32(dma, RNPGBE_DMA_AXI_EN, 0);
+> > > > +	err = mucse_mbx_fw_reset_phy(hw);
+> > > > +	if (err)
+> > > > +		return err;
+> > > > +	/* Store the permanent mac address */
+> > > > +	if (!(hw->flags & M_FLAGS_INIT_MAC_ADDRESS))
 > > > 
-> > > Ok, so the commit mentioned by fix tag is incorrect.  
+> > > What do this hw->flags add to the driver? Why is it here?
+> > > 
 > > 
-> > Yes, you are right. The commit of this fix tag is the first commit I
-> > found which add function `virtnet_poll_cleantx`. Actually, we are not
-> > sure whether this issue appears after this commit.
-> > 
-> > In our side, this issue is found by chance in version 5.15.
-> > 
-> > It's hard to find the key commit which cause this issue
-> > for reason that the reproduction of this scenario is too complex.
+> > It is used to init 'permanent addr' only once.
+> > rnpgbe_reset_hw_ops maybe called when netdev down or hw hang, no need
+> > try to get 'permanent addr' more times.
 > 
-> I think the problem needs to be more clearly understood, and then it
-> will be easier to find the fixes tag. At the face of it the patch
-> makes it look like close() doesn't reliably stop the device, which
-> is highly odd.
+> It normally costs ~0 to ask the firmware something. So it is generally
+> simpler to just ask it. If the firmware is dead, you should not really
+> care, the RPC should timeout, ETIMEDOUT will get returned to user
+> space, and likely everything else will fail anyway.
+>  
 
-Yes, you are right. It is really strange that `close()` acts like that, because current order has worked for long time.
-But panic call stack in our env shows that the function `virtnet_close` and `netif_device_detach`
-should have a correct execution order.
-And it needs more time to find the fixes tag. I wonder that is it must have fixes tag to merge?
+Ok, I will remove 'M_FLAGS_INIT_MAC_ADDRESS', and ask the firmware when
+the function is called.
 
-By the way, you mentioned that "the problem need to be more clearly understood",
-did you mean the descriptions and sequences in commit message are not easy to understand?
-Do you have some suggestions about this?
+> > > >  static void rnpgbe_rm_adapter(struct pci_dev *pdev)
+> > > >  {
+> > > >  	struct mucse *mucse = pci_get_drvdata(pdev);
+> > > > +	struct mucse_hw *hw = &mucse->hw;
+> > > >  	struct net_device *netdev;
+> > > >  
+> > > >  	if (!mucse)
+> > > >  		return;
+> > > >  	netdev = mucse->netdev;
+> > > > +	if (netdev->reg_state == NETREG_REGISTERED)
+> > > > +		unregister_netdev(netdev);
+> > > 
+> > > Is that possible?
+> > > 
+> > 
+> > Maybe probe failed before register_netdev? Then rmmod the driver.
+> 
+> Functions like this come in pairs. There is some sort of setup
+> function, and a corresponding teardown function. probe/remove,
+> open/close. In Linux, if the first fails, the second is never called.
+> 
+> 	Andrew
+> 
 
-Thanks!
+Got it, 'if (netdev->reg_state == NETREG_REGISTERED)' will be removed.
+
+Thansk for you feedback.
 
 
