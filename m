@@ -1,84 +1,70 @@
-Return-Path: <netdev+bounces-214526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5C5BB2A072
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 13:33:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC433B2A077
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 13:34:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 682D52A4769
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 11:27:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 172856207DA
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 11:31:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B898319875;
-	Mon, 18 Aug 2025 11:25:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="rumCJebl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84EDA3002DD;
+	Mon, 18 Aug 2025 11:30:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
+Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9F1D31A077;
-	Mon, 18 Aug 2025 11:25:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0227266A7;
+	Mon, 18 Aug 2025 11:30:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755516345; cv=none; b=m0PHXNDvvbjys/hITSVxOf6VeWlHo6U2KhQltOK6EwiEyBfd+3gGC0gv7QB7gbOWzutr5jSIftgEKd+L5jVYxTqwPyJjufTKbdlvv90yfzOtdcHlmRzpQ7/FucoEdnPj55uEkEuhk4qFIyJh9cDjyBofwbeBj/k0STj2mGgwchE=
+	t=1755516619; cv=none; b=h5YaIkIR85JtSbYl/ZnP9j54QFEH8VV3n3FZmX0PZKIqKHYz7V2eOUtnjofr4eqytMO3T7x1TKwvIOc7ewvKskmXBPY7d7FcZlMeF7sFocBCoTdeQ78dxRgzAxGRAliFKnsEYZsUhZQmELcPNsv6w2ZkWj++9JKMWyUExC5wMQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755516345; c=relaxed/simple;
-	bh=9JeBBIAj9StZw7MNyVADMvGztIhwJK3T5QdJKS7xiCw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YRl4PtvG3qMkEMZdWfoExQZxgNW5Tjx2DmnepHEMawLzjArSjvIkUSROvhiN/bJQOr9cuq1XG0Qe8Jxu5HxEtCfarIe4l8xs0XP/S2n9GZauNw2HQo2hCVeFdqP1AX8sQ3EI9gt81X2bLmUML8S0PUBZfOqXsUiGIQZ6Zz46uP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=rumCJebl; arc=none smtp.client-ip=198.47.19.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllvem-sh03.itg.ti.com ([10.64.41.86])
-	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTP id 57IBOkPX3068951;
-	Mon, 18 Aug 2025 06:24:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1755516286;
-	bh=2Gnl+t8xqA3VBiXnOVNnAPd8aYqELmiP16+xtu6161I=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=rumCJeblKnjHBsmNtkm5cskPXw+8BAnUhDXkUIxsEkll7dpBwqcW4yY0G0K1GghKU
-	 YHfskl5qFYs+4YOrtmmPi3+jMKUf97CICzzlKRLxfmhqyHvm8fJG/J9qFqbmAak7mn
-	 CzvGpmd00/qNkmB6XmftFErZd1y/neWPU1sVjfyE=
-Received: from DFLE104.ent.ti.com (dfle104.ent.ti.com [10.64.6.25])
-	by fllvem-sh03.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 57IBOkxF3978048
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Mon, 18 Aug 2025 06:24:46 -0500
-Received: from DFLE101.ent.ti.com (10.64.6.22) by DFLE104.ent.ti.com
- (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Mon, 18
- Aug 2025 06:24:45 -0500
-Received: from fllvem-mr08.itg.ti.com (10.64.41.88) by DFLE101.ent.ti.com
- (10.64.6.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
- Frontend Transport; Mon, 18 Aug 2025 06:24:45 -0500
-Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
-	by fllvem-mr08.itg.ti.com (8.18.1/8.18.1) with ESMTP id 57IBOjIt3651384;
-	Mon, 18 Aug 2025 06:24:45 -0500
-Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
-	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 57IBOi0W028770;
-	Mon, 18 Aug 2025 06:24:44 -0500
-From: Meghana Malladi <m-malladi@ti.com>
-To: <namcao@linutronix.de>, <jacob.e.keller@intel.com>, <m-malladi@ti.com>,
-        <christian.koenig@amd.com>, <sumit.semwal@linaro.org>,
-        <sdf@fomichev.me>, <john.fastabend@gmail.com>, <hawk@kernel.org>,
-        <daniel@iogearbox.net>, <ast@kernel.org>, <pabeni@redhat.com>,
-        <kuba@kernel.org>, <edumazet@google.com>, <davem@davemloft.net>,
-        <andrew+netdev@lunn.ch>
-CC: <linaro-mm-sig@lists.linaro.org>, <dri-devel@lists.freedesktop.org>,
-        <linux-media@vger.kernel.org>, <bpf@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
-Subject: [PATCH net-next 6/6] net: ti: icssg-prueth: Enable zero copy in XDP features
-Date: Mon, 18 Aug 2025 16:54:24 +0530
-Message-ID: <20250818112424.3068643-7-m-malladi@ti.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250818112424.3068643-1-m-malladi@ti.com>
-References: <20250818112424.3068643-1-m-malladi@ti.com>
+	s=arc-20240116; t=1755516619; c=relaxed/simple;
+	bh=+LPdqwhCnAO60h1rRJ4mU9PRwuJG4gT9+SyzZF6MgGM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PYNJMsMu2RFX4+BDfEklUWTnTQM5NPeqOodK6ZMCX2KKn8Tp7MRCcZbJpUPgOZCHTxJyphXGelawW2fEHyUgBjnVhFaAxeaghViEel21q3cL6h/rMEZyXZWosw26IwNLThFnNB1NXNmj+yS/FXPyxxPGVO6sxJej2fmfRrYG/hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.254.200.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: zesmtpsz2t1755516554tb16007fa
+X-QQ-Originating-IP: iAa0o7aZGeg/JJqbr9ti+RkKGqaM92/kXXZgOgCBDtE=
+Received: from localhost.localdomain ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 18 Aug 2025 19:29:11 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 13453606116894291205
+EX-QQ-RecipientCnt: 23
+From: Dong Yibo <dong100@mucse.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	corbet@lwn.net,
+	gur.stavi@huawei.com,
+	maddy@linux.ibm.com,
+	mpe@ellerman.id.au,
+	danishanwar@ti.com,
+	lee@trager.us,
+	gongfan1@huawei.com,
+	lorenzo@kernel.org,
+	geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com,
+	lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com,
+	richardcochran@gmail.com
+Cc: netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	dong100@mucse.com
+Subject: [PATCH v5 0/5] Add driver for 1Gbe network chips from MUCSE
+Date: Mon, 18 Aug 2025 19:28:51 +0800
+Message-Id: <20250818112856.1446278-1-dong100@mucse.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,33 +72,111 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: Ob1RgLjHLyZvLqdkENgsxeYivp9Ri6KHEjeeDH6eL9dvaIFuePPlDltH
+	28+HrBKwQf+88FuMgp6fOfHXxqnFTMKIXWgnKCwjJD7gvCFmBdq2j876n33QsM79x19o3TP
+	Ldh5rewjZ1eHEZ4nhHU4O44dKiogpJWmIJUFer38fj/Dr1LqgE76iUPPsj4onjH3bbLJf4G
+	TW2Vxav9FXLlEj2Agp2fBUpdxDAulyt8YL6QmIGRVfx5h24JZ6WnU3Z/qq7yn6gzFcw6XEV
+	F5N+5ldIrjQS1EeLpoMw12+dyPk4FWwpBb53phOTZYJwA7sv3RXh9t+jDSS+Jtc3kACqbre
+	vzH7qtW07gQ7YT2+nWF8FaML9xV134PQcfzLsnx+QzH+4P8a1eTJxkTC17RzO+k+eJNHkDZ
+	WLr2r4IsBYVBuAX9gf0nYOpYUhWxU9K7ARWDddiOBNjVvwLY0SYgjgnNPBH/3DYTJRhkE9j
+	QWVEIkbVj3q/+oXI0KvV+Yuap3E6xLsF4F34jXd15qqQRnqezfI3JoGYslzMLbujLl9Qox4
+	kmgdkDu0ufdAltCEyNKaqujZYjqaxmFG0V79oslXotkxX5ywb4UchVqbsZNRN7LjM8u8Mg3
+	HRBxj6yFicIceySz7ly/rjjtsdb42G6OBPieIbjB/jR3KQslTrei1RmfQVboR/SFF2QsIrA
+	Od0A0845F/mE0yE/0zSAxqQyDKXOSbGlIvXT5YlAoEGmCQLu1Z8D40tgnObMe54VH176n07
+	FBTOD1oLJEFrvHqA/Md1ZJrl546kzPFar+sBTsdUPIFazrZrjYh++hR9nApo4O3ighTcYgF
+	PWhZ+rOcseKCteCOiuTHN6d0yBU4GifHvwyBoRo/vduHQPxM1Uo8UY5pZaDvG4dzktneWYW
+	68o3vaj5bUwkYgGeLdZ3jyCIOZD1GcVY75HPI4Cdvg3IovZN4hukOVwbQtVYhX4XO7Ts+h3
+	X+yt3cU78Ly7LVyepwmw3wbeV3xN/F4FIrzppHHx80kYFlAq0uP4fMPdSs5qcv14gWn3y1Y
+	pNBGp7tMgijZXzYCpNkK+1IC29R2g6sVAviIyrvCblxI1AdBrroLbLuYa9Pvo=
+X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
+X-QQ-RECHKSPAM: 0
 
-Enable the zero copy feature flag in xdp_set_features_flag()
-for a given ndev to get the AF-XDP zero copy support running
-for both Tx and Rx.
+Hi maintainers,
 
-Signed-off-by: Meghana Malladi <m-malladi@ti.com>
----
- drivers/net/ethernet/ti/icssg/icssg_prueth.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+This patch series is v5 to introduce support for MUCSE N500/N210 1Gbps
+Ethernet controllers. I divide codes into multiple series, this is the
+first one which only register netdev without true tx/rx functions.
 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index 7b5de71056ee..64cb21bb9291 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -1511,7 +1511,8 @@ static int prueth_netdev_init(struct prueth *prueth,
- 	xdp_set_features_flag(ndev,
- 			      NETDEV_XDP_ACT_BASIC |
- 			      NETDEV_XDP_ACT_REDIRECT |
--			      NETDEV_XDP_ACT_NDO_XMIT);
-+			      NETDEV_XDP_ACT_NDO_XMIT |
-+			      NETDEV_XDP_ACT_XSK_ZEROCOPY);
- 
- 	netif_napi_add(ndev, &emac->napi_rx, icssg_napi_rx_poll);
- 	hrtimer_setup(&emac->rx_hrtimer, &emac_rx_timer_callback, CLOCK_MONOTONIC,
+The driver has been tested on the following platform:
+   - Kernel version: 6.16.0
+   - Intel Xeon Processor
+
+Changelog:
+v4 -> v5:
+  [patch 1/5]:
+  1. Remove system state and Wol code.
+  [patch 2/5]:
+  1. Use define for mbx offset registers.
+  2. Remove 'switch (hw->hw_type)' in rnpgbe_add_adapter. 
+  3. Remove 'hw->driver_version' in hw structure.
+  [patch 3/5]:
+  1. Return -EINVAL if 'size > mbx->size' in mucse_read_mbx.
+  2. Remove mbx->ops, call the functions directly.
+  3. Rewrite mbx_wr32, mbx_rd32.
+  [patch 4/5]:
+  1. Change laber 'quit' to 'out' in mucse_fw_send_cmd_wait.
+  2. Fix 'mucse_mbx_fw_post_req' to follow 'one lock statement and
+  3. Use "timeout_jiffies" instead of "timeout_jiffes".
+  4. Fix 'pfvfnum' in define structure to improve padding problem.
+  5. Fix 'build_phy_abilities_req' pass the same parameter twice.
+  6. Use wait_event_timeout, not wait_event_interruptible_timeout.
+  7. Move 'build**' functions to .c.
+  8. Remove L_WD, do it in the lowest layer.
+  9. Add MBX_REQ_HDR_LEN in build**.
+  [patch 5/5]:
+  1. Remove no-use define dma_wr32.
+  2. Rename dma_rd32 to rnpgbe_dma_rd32.
+  3. Fix extra indentation in 'rnpgbe_xmit_frame'.
+  4. Return -EINVAL if get perm_addr failed in 'rnpgbe_get_permanent_mac'.
+  5. Remove flags 'M_FLAGS_INIT_MAC_ADDRESS'.
+  6. Remove 'netdev->reg_state' in rnpgbe_rm_adapter.
+
+links:
+v4: https://lore.kernel.org/netdev/20250814073855.1060601-1-dong100@mucse.com/
+v3: https://lore.kernel.org/netdev/20250812093937.882045-1-dong100@mucse.com/
+v2: https://lore.kernel.org/netdev/20250721113238.18615-1-dong100@mucse.com/
+v1: https://lore.kernel.org/netdev/20250703014859.210110-1-dong100@mucse.com/
+
+Dong Yibo (5):
+  net: rnpgbe: Add build support for rnpgbe
+  net: rnpgbe: Add n500/n210 chip support
+  net: rnpgbe: Add basic mbx ops support
+  net: rnpgbe: Add basic mbx_fw support
+  net: rnpgbe: Add register_netdev
+
+ .../device_drivers/ethernet/index.rst         |   1 +
+ .../device_drivers/ethernet/mucse/rnpgbe.rst  |  21 +
+ MAINTAINERS                                   |   8 +
+ drivers/net/ethernet/Kconfig                  |   1 +
+ drivers/net/ethernet/Makefile                 |   1 +
+ drivers/net/ethernet/mucse/Kconfig            |  34 ++
+ drivers/net/ethernet/mucse/Makefile           |   7 +
+ drivers/net/ethernet/mucse/rnpgbe/Makefile    |  11 +
+ drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    | 117 +++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   | 160 ++++++
+ drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |  26 +
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   | 310 +++++++++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c    | 481 ++++++++++++++++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h    |  31 ++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c | 333 ++++++++++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h | 155 ++++++
+ 16 files changed, 1697 insertions(+)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/mucse/rnpgbe.rst
+ create mode 100644 drivers/net/ethernet/mucse/Kconfig
+ create mode 100644 drivers/net/ethernet/mucse/Makefile
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/Makefile
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
+
 -- 
-2.43.0
+2.25.1
 
 
