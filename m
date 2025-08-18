@@ -1,584 +1,286 @@
-Return-Path: <netdev+bounces-214639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60126B2AAF3
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 16:39:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84A48B2B1E0
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 21:49:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6B191B6752D
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 14:31:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 091AB1B65525
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 19:49:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F020033A010;
-	Mon, 18 Aug 2025 14:21:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C38C26FD8F;
+	Mon, 18 Aug 2025 19:49:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RSLu+HrA"
+	dkim=pass (2048-bit key) header.d=cisco.com header.i=@cisco.com header.b="dy9uU0sK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from rcdn-iport-6.cisco.com (rcdn-iport-6.cisco.com [173.37.86.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 004623376BF
-	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 14:21:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755526883; cv=none; b=bj/VYWbUHMzJdiXRiTUlmjt8IrW8Sfc1iLANm2msJoLnKWqUDLU6/miNqOaVFtlFYj1jIRWCgWTA89WKkFnxLIZn8RPJg6pqPjRkcrqVkqxhVrc1qK75S3XxpUpkF6KoimfXe+jSc4xz8vwKfbFvJawoIhRzn1AOSHLeqI9t2xk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755526883; c=relaxed/simple;
-	bh=aLlAp9bjckI+LiIP/7BuWizhzxmrJ/IfHd446Cdd0A8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Qu6d5oawCqp0vMxuIDsy4kkiYIdOX1pKbOA7Bvy+H6vOwreQC0VBHb1g/i0HhEIQ8TFiFpZEBrH+6qlHwfYwjDtYXOMQhaCtBqVeiiQCjxfx/TylDmZVICQWXtlCkFDtzrMJl95Q0yVwnReD6aT3pT/n+NyCdTAQotU34NDBNbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=RSLu+HrA; arc=none smtp.client-ip=209.85.215.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-b472fd93ad1so1813253a12.0
-        for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 07:21:21 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618A71F37D3
+	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 19:49:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=173.37.86.77
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755546545; cv=fail; b=pAlnytAZL7XQ2QWJMBtwzskKnTDVTeSn2PIZsf9iTrki9Og4ILO1NlC+CiaxVZnykOxzjOKZyqZzA2PmLL+148q/OwJy0Dc28PkYlG1dt3PTjXJf6iULJxflNXGmMBDG7Y1w/u1eXNNMjy4wdRyD3NChOEhHO5s85LfFX1lNmT0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755546545; c=relaxed/simple;
+	bh=oTh3e5RuKsuSnV+T+xC/1r9Ipufhl6tL1vusDQcPQ/I=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=CXhKKHCv8sppysh9qZNg0Cnd/AbdgpW/CvTx0H5hbwGMT+DPUu3R4271KOoCturbvmxE87qkMIlwEe00SNn6v/BeV9xqw30GZLaYzTmrkwMBJt6YkfsqfcMHq3lVeUgpcHDr7SHPtj2VzKbfujpBPMePWhd7utzSCTD8tBywbEQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (2048-bit key) header.d=cisco.com header.i=@cisco.com header.b=dy9uU0sK; arc=fail smtp.client-ip=173.37.86.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1755526881; x=1756131681; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YO3e1o4BU80YLkrVIInNDSXqQSR6arEthgflDAPINIw=;
-        b=RSLu+HrAcMV/NxROIy1B3+io8Zy0McdfkC5PpdLyDxGL2Q+7QbDN3kcctmZjhw1Lul
-         MbSBH6brhEAspLKisJqIcnmU6KRNXzAToMc2PIQtzxpDAr8oacNXewKgoT6XR2WZ3ifd
-         IoTTtB9WuJ0+D2ETL3Fus1LZHWVHDjhCVg0DQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755526881; x=1756131681;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YO3e1o4BU80YLkrVIInNDSXqQSR6arEthgflDAPINIw=;
-        b=M+PabMp2TEEidm5uW3duH8/zj1PUMMlRUN5nKWOm/pQ7dBx/37c0PwbAIvT03yAg3p
-         GdNPKfePdgEEZDjBny21KorZMgRJZeGapp5c4gQrxUwfpJ+u5v37MNSk+SotQyt8Cx11
-         5p+4NSmtJ5oX9NbWgrFgwo5AxiIxjlLNZk2geIz0S9P3lPmOntdA5cktSRnw3BNmq/Ew
-         Gl/RA/mn1DmMuYLBRr6B7mHyhKftV36GLvFwFPZeD5l6HCXPJ0AnOtb2NW4PnBjlk5Dr
-         o7wNUcOn4okAwAlyexEl8rTd6x4lVf7XibbSQJiZCwTUOnWyr31FnmxnUWXXmPPYGQaZ
-         aafQ==
-X-Gm-Message-State: AOJu0YyDC1SDbAR4Kpii+7ZdSORmOKmbRDypFYjjCt6zNp/szKoFsRjM
-	wMYDQ8Ydwijh8h9oto3KsntET7qucMFRaUxAbQ3FPf8fa8Jh0YUHpr7j3cTVwgrQZq4j9a8j2s7
-	eTpdsdA==
-X-Gm-Gg: ASbGnctZqosnDVCE01VnOnY+bZxHqOa7LD2EmtTe9JdllED/d8VALsi05fqX4xgP8xy
-	6ur+H1UgGZK0Zg+NmkyHDQL01iDuAlIZy6Rd3Z+0TZe46LRWFJRnDtVefaMwV8LapafQQVvp8od
-	B0+JbW1X4sb79HRxVXsbvA/rx5k9ofWD+COlH2WGQl3s50iUrrnUzV9pzvauUYZns76SLjhFBJ8
-	KWu12z9SvjSsCTQZ/SWPBSbT2ZYnV9iQe+RhCbiMeqZqWYUNuLKPEx6eBBJO6e0b1riCyiaLnx9
-	kouSQ/2sWQmyZ7qKFLKddLXxBIKPKQ9ctAeNlRMaHG2Qpgv3JY6wBAIblT3HyJ5h38axU8HsoJD
-	buaBdW/pilaj/i8yEXZMmsQ+qKRY3KM3ouZWNJzW9c+Pd1HaffRJUKgcO3z3h8pXdxFs1+HipbL
-	LcUesAr75bxrjF+nJta83GyxyX6x699Gd6ZkzM
-X-Google-Smtp-Source: AGHT+IFU7WAkBvFT1Uro41CaQ62vT7i16b8vBNb2Sg5mlAQEJEHjgXMHbPHPQIGrd19UqmdngWIiVg==
-X-Received: by 2002:a17:902:d4c8:b0:243:3fe:4294 with SMTP id d9443c01a7336-24478ed53e5mr137513915ad.12.1755526881189;
-        Mon, 18 Aug 2025 07:21:21 -0700 (PDT)
-Received: from hyd-csg-thor2-h1-server2.dhcp.broadcom.net ([192.19.203.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2446d578aa4sm81947835ad.153.2025.08.18.07.21.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Aug 2025 07:21:20 -0700 (PDT)
-From: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com,
-	vsrama-krishna.nemani@broadcom.com,
-	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
-	Vikas Gupta <vikas.gupta@broadcom.com>,
-	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-Subject: [v2, net-next 9/9] bng_en: Configure default VNIC
-Date: Mon, 18 Aug 2025 19:47:16 +0000
-Message-ID: <20250818194716.15229-10-bhargava.marreddy@broadcom.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20250818194716.15229-1-bhargava.marreddy@broadcom.com>
-References: <20250818194716.15229-1-bhargava.marreddy@broadcom.com>
+  d=cisco.com; i=@cisco.com; l=1890; q=dns/txt;
+  s=iport01; t=1755546543; x=1756756143;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=PwEJoTnBTCTIBvcgq0gvyTShCWAfuJ/8YjrEZGMULsA=;
+  b=dy9uU0sK1udaizzB6T0FF1gVkc7Y4hJuN2o3r73GUKKIUmqICUYL1JvY
+   YeBONy4Bm5aXx9bX1BkUxg9HlpjCsqIjpmB4H+EWSpyVqt6DP3lLkt2Fg
+   ephYsY2sGjAejweDLVqzkCx62qcMdQSR32m5IfmcHXy63UXIcej31HGKc
+   391/wg6Q91tjHXIrWZY+bKXLFzhYJqIASHLBHDQLq8f/+DZwsUMHFiQCM
+   zdT2NpgexfDr8SrnWJG35Xh6A/eY1jGrfZ7PfK7w0VNTzj6PTbNQAXEO+
+   UXwC11kZTrxzx18qp4KZLbHnskBYTlGcT2rXruelB5qfKm7HMJxSlNUOc
+   A==;
+X-CSE-ConnectionGUID: wQ+lOLl/QXKa66Uo3CCXiQ==
+X-CSE-MsgGUID: 2XHsBVByTBiXn+vXG3wvAQ==
+X-IPAS-Result: =?us-ascii?q?A0BGAAChgqNo/5IQJK1aGQEBAQEBAQEBAQEBAQEBAQEBA?=
+ =?us-ascii?q?RIBAQEBAQEBAQEBAQFAJYEugW5SB3qBHEkEiBwDhSyIeYJ+iGaUNQ8BAQENA?=
+ =?us-ascii?q?i4WDQQBAYUHAowkAiY4EwECBAEBAQEDAgMBAQEBAQEBAQEBAQsBAQUBAQECA?=
+ =?us-ascii?q?QcFgQ4Thk8NhloBAQEBAgEBESg/BQcEAgEIEQQBAR8QJwodCAIEDgUIGoJhg?=
+ =?us-ascii?q?joDDyYDARCmFQGBQAKKK3iBNIEB4B8GgUkBiE8BhWwbhFwnG4FJRIFXeYFvP?=
+ =?us-ascii?q?oIfQgSBYIQTgi8Egg0VRFKINoJohUGCaYZ+UngcA1ksAVUTFwsHBYEgQwOBD?=
+ =?us-ascii?q?yNLBS0dgSd9hBmEJytPgiJ1gXdaP4NUEgwGaw8GgRUZHS4CAgIFAkM+gVwXB?=
+ =?us-ascii?q?h4GHxICAwECAoEkQAMLbT03FBsFBIE1BZNEhGWBGHvFejBxCoQcjB6NPYIBh?=
+ =?us-ascii?q?jEXqmuZBo4IhAmRd4UOAgQCBAUCEAEBBoF/JYFZcBWDIhM/GQ+XNK1AeAIBO?=
+ =?us-ascii?q?QIHCwEBAwmTZwEB?=
+IronPort-PHdr: A9a23:6+7Npxe3zP23gyavuZSzb7AJlGM/gIqcDmcuAtIPkblCdOGk55v9e
+ RCZ7vR2h1iPVoLeuLpIiOvT5rjpQndIoY2Av3YLbIFWWlcbhN8XkQ0tDI/NCUDyIPPwKS1vN
+ M9DT1RiuXq8NCBo
+IronPort-Data: A9a23:gfNCJKniIOINBRBzl+Ao91fo5gzOJ0RdPkR7XQ2eYbSJt1+Wr1Gzt
+ xIZXWuFOf2MYTPyL4h3b9++8ksG6JfTzd9iQAA/qyw9RVtH+JHPbTi7wugcHM8zwunrFh8PA
+ xA2M4GYRCwMZiaC4E/raP649CMUOZigHtLUEPTDNj16WThqQSIgjQMLs+Mii+aEu/Dha++2k
+ Y20+pK31GONgWYubzpEsvLb8XuDgdyr0N8mlg1mDRx0lAe2e0k9VPo3Oay3Jn3kdYhYdsbSb
+ /rD1ryw4lTC9B4rDN6/+p6jGqHdauePVeQmoiM+t5mK2nCulARrukoIHKZ0hXNsttm8t4sZJ
+ OOhGnCHYVxB0qXkwIzxWvTDes10FfUuFLTveRBTvSEPpqHLWyOE/hlgMK05FZIhueJQJWUJz
+ Mw7IW5TUxfYrMmGwYvuH4GAhux7RCXqFIobvnclyXTSCuwrBMiSBa7L/tRfmjw3g6iiH96HO
+ JFfMmQpNUqGOkERUrsUIMpWcOOAg2PwczpDqHqepLE85C7YywkZPL3FbIKEIoXTH5UK9qqej
+ jj233/TPDsLCPae+TzG7EKD3fDRtBquDer+E5X9rJaGmma7wGEPBBAIfUW0rOP/iUOkXd9bb
+ UsO9UITQbMa/UivSJz5Gha/unPB5k9aUNtLGOp84waIokbJ3zuk6qE/ZmcpQPQttdQ9Qnoh0
+ Vrhoj8jLWUHXGG9IZ5FyoqpkA==
+IronPort-HdrOrdr: A9a23:0+7L4aNqOctHksBcT47255DYdb4zR+YMi2TDiHoBKiC9I/b5qy
+ nxppUmPEfP+UgssREb9expOMG7MBXhHO1OkPgs1NCZLUbbUQqTXc1fBOTZskfd8kHFh4pgPO
+ JbAtdD4b7LfBZHZKTBkXSF+r8bqbHtntHL9ILjJjVWPH1Xgspbnn5E43OgYzZLrX59dOIE/f
+ Snl616jgvlU046Ku68AX4IVfXCodrkqLLKCCRtOzcXrCO1oXeN8rDVLzi0ty1yb9pI+9gf2F
+ mAtza8yrSosvm9xBOZ/XTU9Y5qlNzozcYGLNCQi+AOQw+cyjqAVcBEYfmvrTo1qOag5BIBi9
+ /XuSotOMx19jf4Yny1mx3wwAPtuQxeqEMKiGXow0cLk/aJAA7SOPAxwr6xtSGprXbIiesMlZ
+ 6jGVjp7qa/QymwxBgVrOK4Jy2C3nDE0kbK19RjzkC2leAlGeVsRUt1xjIPLL4QWC3984wpC+
+ 9oEYXV4+tXa0qTazTDsnBo28HEZAV5Iv6qeDlKhiWu6UkfoFlpi08DgMAPlHYJ85wwD5FC+u
+ TfK6xt0LVDVNUfY65xDPoIBZLfMB2BfTvcdGaJZVj3HqAOPHzA75bx/bUu/emvPJgF1oE7lp
+ jNWE5R8WQyZ0XtA8uT24AjyGGGfEytGTD2js1O7ZlwvbPxALLtLC2YUVgr19Ctpv0Oa/erLc
+ pb+KgmdMMLAVGebbqhhTeOKaW6AUNuJfEohg==
+X-Talos-CUID: 9a23:JHDSP22dLq139QFkTPalpbxfBflmdlr5yDDpE2yxVzhUT+a+Ym+RwfYx
+X-Talos-MUID: 9a23:sUimkQS0U/4mi4zlRXS2tBF5HvlC8piECXAL0os2lJKbKwVJbmI=
+X-IronPort-Anti-Spam-Filtered: true
+Received: from alln-l-core-09.cisco.com ([173.36.16.146])
+  by rcdn-iport-6.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 18 Aug 2025 19:47:54 +0000
+Received: from rcdn-opgw-4.cisco.com (rcdn-opgw-4.cisco.com [72.163.7.165])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by alln-l-core-09.cisco.com (Postfix) with ESMTPS id 59CCE1800021E
+	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 19:47:54 +0000 (GMT)
+X-CSE-ConnectionGUID: oW2CHkTTQi+96HYc63nrbw==
+X-CSE-MsgGUID: 7kP5+SNOTyi5ogLOH7lW3w==
+Authentication-Results: rcdn-opgw-4.cisco.com; dkim=pass (signature verified) header.i=@cisco.com
+X-IronPort-AV: E=Sophos;i="6.17,300,1747699200"; 
+   d="scan'208";a="57538444"
+Received: from mail-dm6nam11lp2175.outbound.protection.outlook.com (HELO NAM11-DM6-obe.outbound.protection.outlook.com) ([104.47.57.175])
+  by rcdn-opgw-4.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 18 Aug 2025 19:47:53 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=YI4vX1H1vUjqQH5PpCZJ7Yuw9Ccn1goB9QJlHa8ewFo3XaLWKdr8Spuw27MIpIzDK3uTU++koMsJXR7I5aEFACb/vPCGx5WUl5w7DzlLNPucxGl2f+dxa4D+mG9yeGFhESc2G2EbJnPCTKCcDBQNalMslzkNE5/l200h1MTHRG6iBcBD/UjCWh3xHf5rWdS3eTb5aPMa04QbHWClVCBRiOfnE2CNVTyMnIwuNmqNoiFIsyZaSLceAVf3NXz33GWOQlNf9SYXKsJd0qbysk2Yb7q+Kzw2+52JUoQnJBl07FMIl4jB8NzWarMmQKOkB2xKNoVNH8LkS5Mwe+tJcN5LMg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PwEJoTnBTCTIBvcgq0gvyTShCWAfuJ/8YjrEZGMULsA=;
+ b=l9UvppfUNiMkaSJNEJKTWCT5ly4TFdtLsNtEevpvT/GUAns0ZzgGY00+NHp8HDc5R/ZSjfIo7G/cU3aCNdAoGoseHV2PO/tQIYFDQh0pnxTDB0xRW4QNpRqWOuRYkwYmLW8L5Va2DTdjS+t6MrSLcm7+o6TsvyLTJLC185BgreirR0l7KcrQH2K0mlveLwSbS5ucg6eEevXLMoeyOmP9yD5CLPg4mlc4Oo8efHiwJ6QOX/yxFt6ph5xmVkEGAo4sLCpmG0SeYWRUeuiQ8HwawETN0EaRy6B+6KSPmzTFN92h/ho4LGVSKUA/Wr1j9KIVACnpLg1X0kQYjvjAisGj4g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=cisco.com; dmarc=pass action=none header.from=cisco.com;
+ dkim=pass header.d=cisco.com; arc=none
+Received: from SN7PR11MB7491.namprd11.prod.outlook.com (2603:10b6:806:349::8)
+ by SJ0PR11MB5200.namprd11.prod.outlook.com (2603:10b6:a03:2df::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.24; Mon, 18 Aug
+ 2025 19:47:51 +0000
+Received: from SN7PR11MB7491.namprd11.prod.outlook.com
+ ([fe80::4b22:100c:8231:120]) by SN7PR11MB7491.namprd11.prod.outlook.com
+ ([fe80::4b22:100c:8231:120%3]) with mapi id 15.20.9031.019; Mon, 18 Aug 2025
+ 19:47:51 +0000
+From: "Mrinmoy Ghosh (mrghosh)" <mrghosh@cisco.com>
+To: Stephen Hemminger <stephen@networkplumber.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"bridge@lists.linux-foundation.org" <bridge@lists.linux-foundation.org>,
+	"mrinmoy_g@hotmail.com" <mrinmoy_g@hotmail.com>, "Patrice Brissette
+ (pbrisset)" <pbrisset@cisco.com>
+Subject: RE: [PATCH iproute2] bridge:fdb: Protocol field in bridge fdb
+Thread-Topic: [PATCH iproute2] bridge:fdb: Protocol field in bridge fdb
+Thread-Index: AQHcDmfg/HByRIHOeUmtdsgj6F/OWbRldqeAgANcO3A=
+Date: Mon, 18 Aug 2025 19:47:51 +0000
+Message-ID:
+ <SN7PR11MB7491F1A40BB259F4EF7603C4A431A@SN7PR11MB7491.namprd11.prod.outlook.com>
+References: <20250816031145.1153429-1-mrghosh@cisco.com>
+ <20250816092051.1a8e4ed3@hermes.local>
+In-Reply-To: <20250816092051.1a8e4ed3@hermes.local>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN7PR11MB7491:EE_|SJ0PR11MB5200:EE_
+x-ms-office365-filtering-correlation-id: e0ae95a5-731c-49c2-5bbf-08ddde901de6
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|1800799024|376014|13003099007|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?dAxrMmTT2gP8L2vuV4pCqKhtT4bmjvRxa+JcX0u3APuFy5jViuSuxkncTzBs?=
+ =?us-ascii?Q?GqgIFekNQQSCa9+1q6+ttfUUdsJXfWCcvNVJjwJhwyehqqWMGcjIChg6/ikp?=
+ =?us-ascii?Q?A9nggwG4jJchgEfwLPRwuUfEWK5KKlJWJAQfomsE/jCMFqj2GOqPyhh5mkeg?=
+ =?us-ascii?Q?W//UxccvqO75TdQ90vkAJje6d+uEc6j5+aJgpW5nt5SP6ItAwe2d36epZdUa?=
+ =?us-ascii?Q?8rF/r4IJPkkiAGqXzctrAaDMlTHvsEbGHgNW2yRPkNNIlSZ4+3McADE/QLHG?=
+ =?us-ascii?Q?pkelYeGPPk0GeZ5n8kvXfrVg9Nht+/MqerBLyT5+7OSEsNhQSTgRTkbpDyjH?=
+ =?us-ascii?Q?V3+r3pB9XHEWhECewSx5+NPHZVDznWqiBCO4TBSt1ADvVwCOMAtQm3kTTRoI?=
+ =?us-ascii?Q?9VqXCuon34oYvBP1qRa3Q3C9OokvHo7nFx2o12rGM4iZmyCsYytEoR+FpVYO?=
+ =?us-ascii?Q?ru2st5Wj+g3G6ufoQ+P2i7onDm0rPIlDhGO78qEOtRWaCA+ofQdjmty/sgQb?=
+ =?us-ascii?Q?7ZapRfO2J4PQOUdvJhXh7wqi9Wr35jG/oaZ95TaZqesWfNh0nheOj3XLkxgC?=
+ =?us-ascii?Q?6pWToa6g2TDZLlxaVtqrRUilJXfnyA0nx70pcp6RG3DVJxpCansgJ9SCc7+j?=
+ =?us-ascii?Q?KsbjDUk0B3lp50X+Z28psrPUK8lE0N17gBY96bCqarNyI+b1YiaGSkGNmAKW?=
+ =?us-ascii?Q?LjPcPAsgT5u3te2gHQuv4XKuisM4R3omqjoYpM3agqMOphLDoejZVC4vRANg?=
+ =?us-ascii?Q?dYffGV4E+/jT3pAZKqGIk79M/dnta+rGuuq8y64mK4MEZ0eg/P4VVSVrMNcZ?=
+ =?us-ascii?Q?LM6Ix/a1kqXzUTLdHm1Oh9h9lgA+OnoCqq8SQHtmur+PnTZvVfsJce6KOwVG?=
+ =?us-ascii?Q?nGYFvlN30DTuPnlkcGKsexPmxJgcmLyteIR4yDhLtueHsypMpEqnnG/PPuJ6?=
+ =?us-ascii?Q?gVsUNDmksoDY846u43hzIBmG4vhIcFd3iYutrDdX2FbOR8PRrD149WORZVtk?=
+ =?us-ascii?Q?dtZ1kPPvyFmQG0/CPvu60VIkFEnE24llWjUjlGGKvymYNri44pkTsKmmsa/u?=
+ =?us-ascii?Q?qMfpCojTb+/jpF+wBXYWKmtZkdSIPSqiEQ6edSMBlJGbpt2VSz+fcKNzYPog?=
+ =?us-ascii?Q?ikXT5W1+8Amex5UD+EGNdLXAr3bYtgRX+bWufuYzYQ4kugxksFRL+QpzbOMa?=
+ =?us-ascii?Q?7PDVYkWd+nW2AWTdzpoXngTgmQmNjAVITf2kN9pn4KT29+u5R+qbrxWTc1BN?=
+ =?us-ascii?Q?3bwVkot/sBSCJkms3LOLLaCapG3tX7GDviNleTt8KaLG7hWWtq/ZlLz3GCl9?=
+ =?us-ascii?Q?/zSmWrs2y/OiD3PL1rhjaTFpfOP8GlVnsHrZhtIoz0VzXHO4Nnk1YCBfGdEe?=
+ =?us-ascii?Q?ow5HDmPBGwni9o1gHQ/0ECLg0HWazY9/vezWNk0KklDz4SPVmUjdqe3YrUar?=
+ =?us-ascii?Q?FWtwhFzD+vBgJYmX+s1HYnfCzzQhqc6O?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7491.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(13003099007)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?blXw4Frl8i+2oA4WfFYsoO4EA4KJnHaVyoDyo7643ge0f5tiPl38zFT12n0U?=
+ =?us-ascii?Q?e0BmMCglx8TNkIOrTgLrV+nPwtRaK50O9pVsUzWkEz9nT9aJqXFbGb3fm6pX?=
+ =?us-ascii?Q?cjV1UvqJgSdvRR5a+oubpOgVLFN1Nr/4qsqVqctqgo3dG/vUtWBEde10Bcy+?=
+ =?us-ascii?Q?nkz14Fsg4uczpVtzkFB5kEeVEH44s+o+QQKSQhJvtrBNt3MIv8YWEX6ybGVD?=
+ =?us-ascii?Q?nAp4ydyCh/ihouyw6IbX9QRgFxrN6nZVRagwbZYHSmDehuJBcPY8z17dpdfI?=
+ =?us-ascii?Q?MtGxauMZjXzTe08mN8PFszAzdXMxndIqMa4Lt2RZR6KLFuIMEizSkL1jR3tS?=
+ =?us-ascii?Q?oqPl3wNtgeOB+Sagi7DnQzNiJBcFWtv5BQpbyGVqNl/5rqbXveqvBDAdSPSM?=
+ =?us-ascii?Q?cdgb3QOHvAwIx0VUawa5zr1bDDt6sf3lrV5Np4reyqRywk3YgUf7IVmBYR5l?=
+ =?us-ascii?Q?SoD6kMZKcGr/sDs7zmlvC3WeLOkjg7/J/gtB02dUPUV6y7dMVYXi/xII0UCT?=
+ =?us-ascii?Q?fy4JJ7tQ9tmOYnz2yQn66bOiu3gAC21kmWM+tGakDSDQp/u1sZYvYD+cfFNY?=
+ =?us-ascii?Q?uubOCr52QvSnvHQ+eOzF3AyiHWvaXMYXaR4S7g8LBeDLCvxHai9CpArUUqHV?=
+ =?us-ascii?Q?sl4HhPzAXZQpNWIdfPkixW4unhYQNSCFzUstxHepYo+DgKMuZVAZQMWr//LV?=
+ =?us-ascii?Q?csLPTyaiiMJFPYxT86vXTCpSXapzYJP5kYkgEmEksMsCGX8+L06wJiLu42li?=
+ =?us-ascii?Q?BWH83m7w1xVjXs7rSU5CV55QX63L7csoyCuS1g8uqcimlWXTaH3WpiGc/Jny?=
+ =?us-ascii?Q?r4fNK7dt+clswEeW7wkuut4CAYsI6GegiFx0v1vV3A7Gj1dfSmuvfrhX/YFj?=
+ =?us-ascii?Q?LgUDo0hFRYL3/zvFIyQLQAwBJ7qvu+K/qoAaAL0lcogSZIFtDVtD0+Tdb52G?=
+ =?us-ascii?Q?HQsH6K0NKnU7Hg55nFPy6hG8PJ9ZhV3VsN+12G7A1isZoosVzWxSGiaZnb95?=
+ =?us-ascii?Q?+8Bza4z8xJFoiLhBYav458ZBdKh2m25rhaoS7mBiSa9x3KERgsW6UVHEZ9cK?=
+ =?us-ascii?Q?zvPks6mUQUg5XZC1BILvibB1q1SVozr85dgJd1u+y9yLjT7V5wuI17MxbJSx?=
+ =?us-ascii?Q?sPU4Tdp+SjNEKQXia+r8UVh6xKGWjtsHDF+9IL2VYueRQIFcqbg5A+n0MMUu?=
+ =?us-ascii?Q?7qkl6dU6zRuqsWp9q6vcB2RlsZZvB+ayxmI6wS0jHwrkqDpMzScO6UhMcoOE?=
+ =?us-ascii?Q?wsOzZfXF2EkQFg5drU02q9xHz5+IVBGgmjoCp6YMR2DA4lxUvhlJ929QG6w4?=
+ =?us-ascii?Q?Ihjs++cMAg1gcTFxNAjBx/kb2xl+RKD3KsYCudPWvZDOeVNUKo7Z9IdT8qnK?=
+ =?us-ascii?Q?iKmek6hIurzx2tJCxViHz1isdOAt/WJKsS/MBYzTAOLI5dlstht5Fz1L1+yU?=
+ =?us-ascii?Q?rcys6Sl1ekvN06JLxshxf1hxbbKo8Rhd5KwpXNGU3+RvKs7qG29eWy1HFap6?=
+ =?us-ascii?Q?qoT0Oer2A0r1aDtkBuj4v7jFArR53sTIUKMLQTD+QEotE7MpWqsGq9S+g6TT?=
+ =?us-ascii?Q?9FoUF8ad4rj4Fj6y28w=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: cisco.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7491.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e0ae95a5-731c-49c2-5bbf-08ddde901de6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Aug 2025 19:47:51.4370
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 5ae1af62-9505-4097-a69a-c1553ef7840e
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: VSTBG7VI403FNUVdphpgEkS+mD/tAyCze+gQwnWJuHzrlBhgKURbb948spj9slaXHe9vIphkFv0wm+2FbEt2IA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5200
+X-Outbound-SMTP-Client: 72.163.7.165, rcdn-opgw-4.cisco.com
+X-Outbound-Node: alln-l-core-09.cisco.com
 
-Add functions to add a filter to the VNIC to configure unicast
-addresses. Also, add multicast, broadcast, and promiscuous settings
-to the default VNIC.
+Hi Stephen,
 
-Signed-off-by: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
-Reviewed-by: Vikas Gupta <vikas.gupta@broadcom.com>
-Reviewed-by: Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
----
- .../ethernet/broadcom/bnge/bnge_hwrm_lib.c    |  72 +++++
- .../ethernet/broadcom/bnge/bnge_hwrm_lib.h    |   4 +
- .../net/ethernet/broadcom/bnge/bnge_netdev.c  | 271 ++++++++++++++++++
- .../net/ethernet/broadcom/bnge/bnge_netdev.h  |  40 +++
- 4 files changed, 387 insertions(+)
+Thanks for the review.
+The kernel patch is in:
+https://lore.kernel.org/netdev/20250818175258.275997-1-mrghosh@cisco.com/T/=
+#u
 
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
-index 4d3cf73cdf5..a7eb5c5e5c9 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
-@@ -854,6 +854,78 @@ void bnge_hwrm_update_rss_hash_cfg(struct bnge_net *bn)
- 	bnge_hwrm_req_drop(bd, req);
- }
- 
-+int bnge_hwrm_l2_filter_free(struct bnge_dev *bd, struct bnge_l2_filter *fltr)
-+{
-+	struct hwrm_cfa_l2_filter_free_input *req;
-+	int rc;
-+
-+	rc = bnge_hwrm_req_init(bd, req, HWRM_CFA_L2_FILTER_FREE);
-+	if (rc)
-+		return rc;
-+
-+	req->l2_filter_id = fltr->base.filter_id;
-+	return bnge_hwrm_req_send(bd, req);
-+}
-+
-+int bnge_hwrm_l2_filter_alloc(struct bnge_dev *bd, struct bnge_l2_filter *fltr)
-+{
-+	struct hwrm_cfa_l2_filter_alloc_output *resp;
-+	struct hwrm_cfa_l2_filter_alloc_input *req;
-+	int rc;
-+
-+	rc = bnge_hwrm_req_init(bd, req, HWRM_CFA_L2_FILTER_ALLOC);
-+	if (rc)
-+		return rc;
-+
-+	req->flags = cpu_to_le32(CFA_L2_FILTER_ALLOC_REQ_FLAGS_PATH_RX);
-+
-+	req->flags |= cpu_to_le32(CFA_L2_FILTER_ALLOC_REQ_FLAGS_OUTERMOST);
-+	req->dst_id = cpu_to_le16(fltr->base.fw_vnic_id);
-+	req->enables =
-+		cpu_to_le32(CFA_L2_FILTER_ALLOC_REQ_ENABLES_L2_ADDR |
-+			    CFA_L2_FILTER_ALLOC_REQ_ENABLES_DST_ID |
-+			    CFA_L2_FILTER_ALLOC_REQ_ENABLES_L2_ADDR_MASK);
-+	ether_addr_copy(req->l2_addr, fltr->l2_key.dst_mac_addr);
-+	eth_broadcast_addr(req->l2_addr_mask);
-+
-+	if (fltr->l2_key.vlan) {
-+		req->enables |=
-+			cpu_to_le32(CFA_L2_FILTER_ALLOC_REQ_ENABLES_L2_IVLAN |
-+				CFA_L2_FILTER_ALLOC_REQ_ENABLES_L2_IVLAN_MASK |
-+				CFA_L2_FILTER_ALLOC_REQ_ENABLES_NUM_VLANS);
-+		req->num_vlans = 1;
-+		req->l2_ivlan = cpu_to_le16(fltr->l2_key.vlan);
-+		req->l2_ivlan_mask = cpu_to_le16(0xfff);
-+	}
-+
-+	resp = bnge_hwrm_req_hold(bd, req);
-+	rc = bnge_hwrm_req_send(bd, req);
-+	if (!rc)
-+		fltr->base.filter_id = resp->l2_filter_id;
-+
-+	bnge_hwrm_req_drop(bd, req);
-+	return rc;
-+}
-+
-+int bnge_hwrm_cfa_l2_set_rx_mask(struct bnge_dev *bd,
-+				 struct bnge_vnic_info *vnic)
-+{
-+	struct hwrm_cfa_l2_set_rx_mask_input *req;
-+	int rc;
-+
-+	rc = bnge_hwrm_req_init(bd, req, HWRM_CFA_L2_SET_RX_MASK);
-+	if (rc)
-+		return rc;
-+
-+	req->vnic_id = cpu_to_le32(vnic->fw_vnic_id);
-+	if (vnic->rx_mask & CFA_L2_SET_RX_MASK_REQ_MASK_MCAST) {
-+		req->num_mc_entries = cpu_to_le32(vnic->mc_list_count);
-+		req->mc_tbl_addr = cpu_to_le64(vnic->mc_list_mapping);
-+	}
-+	req->mask = cpu_to_le32(vnic->rx_mask);
-+	return bnge_hwrm_req_send_silent(bd, req);
-+}
-+
- int bnge_hwrm_vnic_alloc(struct bnge_dev *bd, struct bnge_vnic_info *vnic,
- 			 unsigned int nr_rings)
- {
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.h b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.h
-index 09517ffb1a2..042f28e84a0 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.h
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.h
-@@ -43,6 +43,10 @@ int bnge_hwrm_vnic_alloc(struct bnge_dev *bd, struct bnge_vnic_info *vnic,
- void bnge_hwrm_vnic_free_one(struct bnge_dev *bd, struct bnge_vnic_info *vnic);
- void bnge_hwrm_vnic_ctx_free_one(struct bnge_dev *bd,
- 				 struct bnge_vnic_info *vnic, u16 ctx_idx);
-+int bnge_hwrm_l2_filter_free(struct bnge_dev *bd, struct bnge_l2_filter *fltr);
-+int bnge_hwrm_l2_filter_alloc(struct bnge_dev *bd, struct bnge_l2_filter *fltr);
-+int bnge_hwrm_cfa_l2_set_rx_mask(struct bnge_dev *bd,
-+				 struct bnge_vnic_info *vnic);
- void bnge_hwrm_stat_ctx_free(struct bnge_net *bn);
- int bnge_hwrm_stat_ctx_alloc(struct bnge_net *bn);
- int hwrm_ring_free_send_msg(struct bnge_net *bn, struct bnge_ring_struct *ring,
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-index 10d845b091c..ce802dd2e9f 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-@@ -1496,6 +1496,231 @@ static int bnge_setup_vnic(struct bnge_net *bn, struct bnge_vnic_info *vnic)
- 	return rc;
- }
- 
-+static void bnge_del_l2_filter(struct bnge_net *bn, struct bnge_l2_filter *fltr)
-+{
-+	if (!atomic_dec_and_test(&fltr->refcnt))
-+		return;
-+	hlist_del_rcu(&fltr->base.hash);
-+	kfree_rcu(fltr, base.rcu);
-+}
-+
-+static int bnge_init_l2_filter(struct bnge_net *bn, struct bnge_l2_filter *fltr,
-+			       struct bnge_l2_key *key, u32 idx)
-+{
-+	struct hlist_head *head;
-+
-+	ether_addr_copy(fltr->l2_key.dst_mac_addr, key->dst_mac_addr);
-+	fltr->l2_key.vlan = key->vlan;
-+	fltr->base.type = BNGE_FLTR_TYPE_L2;
-+
-+	head = &bn->l2_fltr_hash_tbl[idx];
-+	hlist_add_head_rcu(&fltr->base.hash, head);
-+	atomic_set(&fltr->refcnt, 1);
-+	return 0;
-+}
-+
-+static struct bnge_l2_filter *__bnge_lookup_l2_filter(struct bnge_net *bn,
-+						      struct bnge_l2_key *key,
-+						      u32 idx)
-+{
-+	struct bnge_l2_filter *fltr;
-+	struct hlist_head *head;
-+
-+	head = &bn->l2_fltr_hash_tbl[idx];
-+	hlist_for_each_entry_rcu(fltr, head, base.hash) {
-+		struct bnge_l2_key *l2_key = &fltr->l2_key;
-+
-+		if (ether_addr_equal(l2_key->dst_mac_addr, key->dst_mac_addr) &&
-+		    l2_key->vlan == key->vlan)
-+			return fltr;
-+	}
-+	return NULL;
-+}
-+
-+static struct bnge_l2_filter *bnge_lookup_l2_filter(struct bnge_net *bn,
-+						    struct bnge_l2_key *key,
-+						    u32 idx)
-+{
-+	struct bnge_l2_filter *fltr;
-+
-+	rcu_read_lock();
-+	fltr = __bnge_lookup_l2_filter(bn, key, idx);
-+	if (fltr)
-+		atomic_inc(&fltr->refcnt);
-+	rcu_read_unlock();
-+	return fltr;
-+}
-+
-+static struct bnge_l2_filter *bnge_alloc_l2_filter(struct bnge_net *bn,
-+						   struct bnge_l2_key *key,
-+						   gfp_t gfp)
-+{
-+	struct bnge_l2_filter *fltr;
-+	u32 idx;
-+	int rc;
-+
-+	idx = jhash2(&key->filter_key, BNGE_L2_KEY_SIZE, bn->hash_seed) &
-+	      BNGE_L2_FLTR_HASH_MASK;
-+	fltr = bnge_lookup_l2_filter(bn, key, idx);
-+	if (fltr)
-+		return fltr;
-+
-+	fltr = kzalloc(sizeof(*fltr), gfp);
-+	if (!fltr)
-+		return ERR_PTR(-ENOMEM);
-+	rc = bnge_init_l2_filter(bn, fltr, key, idx);
-+	if (rc) {
-+		bnge_del_l2_filter(bn, fltr);
-+		fltr = ERR_PTR(rc);
-+	}
-+	return fltr;
-+}
-+
-+static int bnge_hwrm_set_vnic_filter(struct bnge_net *bn, u16 vnic_id, u16 idx,
-+				     const u8 *mac_addr)
-+{
-+	struct bnge_l2_filter *fltr;
-+	struct bnge_l2_key key;
-+	int rc;
-+
-+	ether_addr_copy(key.dst_mac_addr, mac_addr);
-+	key.vlan = 0;
-+	fltr = bnge_alloc_l2_filter(bn, &key, GFP_KERNEL);
-+	if (IS_ERR(fltr))
-+		return PTR_ERR(fltr);
-+
-+	fltr->base.fw_vnic_id = bn->vnic_info[vnic_id].fw_vnic_id;
-+	rc = bnge_hwrm_l2_filter_alloc(bn->bd, fltr);
-+	if (rc)
-+		bnge_del_l2_filter(bn, fltr);
-+	else
-+		bn->vnic_info[vnic_id].l2_filters[idx] = fltr;
-+	return rc;
-+}
-+
-+static bool bnge_mc_list_updated(struct bnge_net *bn, u32 *rx_mask)
-+{
-+	struct bnge_vnic_info *vnic = &bn->vnic_info[BNGE_VNIC_DEFAULT];
-+	struct net_device *dev = bn->netdev;
-+	struct netdev_hw_addr *ha;
-+	int mc_count = 0, off = 0;
-+	bool update = false;
-+	u8 *haddr;
-+
-+	netdev_for_each_mc_addr(ha, dev) {
-+		if (mc_count >= BNGE_MAX_MC_ADDRS) {
-+			*rx_mask |= CFA_L2_SET_RX_MASK_REQ_MASK_ALL_MCAST;
-+			vnic->mc_list_count = 0;
-+			return false;
-+		}
-+		haddr = ha->addr;
-+		if (!ether_addr_equal(haddr, vnic->mc_list + off)) {
-+			memcpy(vnic->mc_list + off, haddr, ETH_ALEN);
-+			update = true;
-+		}
-+		off += ETH_ALEN;
-+		mc_count++;
-+	}
-+	if (mc_count)
-+		*rx_mask |= CFA_L2_SET_RX_MASK_REQ_MASK_MCAST;
-+
-+	if (mc_count != vnic->mc_list_count) {
-+		vnic->mc_list_count = mc_count;
-+		update = true;
-+	}
-+	return update;
-+}
-+
-+static bool bnge_uc_list_updated(struct bnge_net *bn)
-+{
-+	struct bnge_vnic_info *vnic = &bn->vnic_info[BNGE_VNIC_DEFAULT];
-+	struct net_device *dev = bn->netdev;
-+	struct netdev_hw_addr *ha;
-+	int off = 0;
-+
-+	if (netdev_uc_count(dev) != (vnic->uc_filter_count - 1))
-+		return true;
-+
-+	netdev_for_each_uc_addr(ha, dev) {
-+		if (!ether_addr_equal(ha->addr, vnic->uc_list + off))
-+			return true;
-+
-+		off += ETH_ALEN;
-+	}
-+	return false;
-+}
-+
-+static bool bnge_promisc_ok(struct bnge_net *bn)
-+{
-+	return true;
-+}
-+
-+static int bnge_cfg_def_vnic(struct bnge_net *bn)
-+{
-+	struct bnge_vnic_info *vnic = &bn->vnic_info[BNGE_VNIC_DEFAULT];
-+	struct net_device *dev = bn->netdev;
-+	struct bnge_dev *bd = bn->bd;
-+	struct netdev_hw_addr *ha;
-+	int i, off = 0, rc;
-+	bool uc_update;
-+
-+	netif_addr_lock_bh(dev);
-+	uc_update = bnge_uc_list_updated(bn);
-+	netif_addr_unlock_bh(dev);
-+
-+	if (!uc_update)
-+		goto skip_uc;
-+
-+	for (i = 1; i < vnic->uc_filter_count; i++) {
-+		struct bnge_l2_filter *fltr = vnic->l2_filters[i];
-+
-+		bnge_hwrm_l2_filter_free(bd, fltr);
-+		bnge_del_l2_filter(bn, fltr);
-+	}
-+
-+	vnic->uc_filter_count = 1;
-+
-+	netif_addr_lock_bh(dev);
-+	if (netdev_uc_count(dev) > (BNGE_MAX_UC_ADDRS - 1)) {
-+		vnic->rx_mask |= CFA_L2_SET_RX_MASK_REQ_MASK_PROMISCUOUS;
-+	} else {
-+		netdev_for_each_uc_addr(ha, dev) {
-+			memcpy(vnic->uc_list + off, ha->addr, ETH_ALEN);
-+			off += ETH_ALEN;
-+			vnic->uc_filter_count++;
-+		}
-+	}
-+	netif_addr_unlock_bh(dev);
-+
-+	for (i = 1, off = 0; i < vnic->uc_filter_count; i++, off += ETH_ALEN) {
-+		rc = bnge_hwrm_set_vnic_filter(bn, 0, i, vnic->uc_list + off);
-+		if (rc) {
-+			netdev_err(dev, "HWRM vnic filter failure rc: %d\n", rc);
-+			vnic->uc_filter_count = i;
-+			return rc;
-+		}
-+	}
-+
-+skip_uc:
-+	if ((vnic->rx_mask & CFA_L2_SET_RX_MASK_REQ_MASK_PROMISCUOUS) &&
-+	    !bnge_promisc_ok(bn))
-+		vnic->rx_mask &= ~CFA_L2_SET_RX_MASK_REQ_MASK_PROMISCUOUS;
-+	rc = bnge_hwrm_cfa_l2_set_rx_mask(bd, vnic);
-+	if (rc && (vnic->rx_mask & CFA_L2_SET_RX_MASK_REQ_MASK_MCAST)) {
-+		netdev_info(dev, "Failed setting MC filters rc: %d, turning on ALL_MCAST mode\n",
-+			    rc);
-+		vnic->rx_mask &= ~CFA_L2_SET_RX_MASK_REQ_MASK_MCAST;
-+		vnic->rx_mask |= CFA_L2_SET_RX_MASK_REQ_MASK_ALL_MCAST;
-+		vnic->mc_list_count = 0;
-+		rc = bnge_hwrm_cfa_l2_set_rx_mask(bd, vnic);
-+	}
-+	if (rc)
-+		netdev_err(dev, "HWRM cfa l2 rx mask failure rc: %d\n",
-+			   rc);
-+
-+	return rc;
-+}
-+
- static void bnge_hwrm_vnic_free(struct bnge_net *bn)
- {
- 	int i;
-@@ -1519,11 +1744,27 @@ static void bnge_hwrm_vnic_ctx_free(struct bnge_net *bn)
- 	bn->rsscos_nr_ctxs = 0;
- }
- 
-+static void bnge_hwrm_clear_vnic_filter(struct bnge_net *bn)
-+{
-+	struct bnge_vnic_info *vnic = &bn->vnic_info[BNGE_VNIC_DEFAULT];
-+	int i;
-+
-+	for (i = 0; i < vnic->uc_filter_count; i++) {
-+		struct bnge_l2_filter *fltr = vnic->l2_filters[i];
-+
-+		bnge_hwrm_l2_filter_free(bn->bd, fltr);
-+		bnge_del_l2_filter(bn, fltr);
-+	}
-+
-+	vnic->uc_filter_count = 0;
-+}
-+
- static void bnge_clear_vnic(struct bnge_net *bn)
- {
- 	if (!bn->vnic_info)
- 		return;
- 
-+	bnge_hwrm_clear_vnic_filter(bn);
- 	bnge_hwrm_vnic_free(bn);
- 	bnge_hwrm_vnic_ctx_free(bn);
- }
-@@ -1768,6 +2009,36 @@ static int bnge_init_chip(struct bnge_net *bn)
- 	if (bd->rss_cap & BNGE_RSS_CAP_RSS_HASH_TYPE_DELTA)
- 		bnge_hwrm_update_rss_hash_cfg(bn);
- 
-+	/* Filter for default vnic 0 */
-+	rc = bnge_hwrm_set_vnic_filter(bn, 0, 0, bn->netdev->dev_addr);
-+	if (rc) {
-+		netdev_err(bn->netdev, "HWRM vnic filter failure rc: %d\n", rc);
-+		goto err_out;
-+	}
-+	vnic->uc_filter_count = 1;
-+
-+	vnic->rx_mask = 0;
-+
-+	if (bn->netdev->flags & IFF_BROADCAST)
-+		vnic->rx_mask |= CFA_L2_SET_RX_MASK_REQ_MASK_BCAST;
-+
-+	if (bn->netdev->flags & IFF_PROMISC)
-+		vnic->rx_mask |= CFA_L2_SET_RX_MASK_REQ_MASK_PROMISCUOUS;
-+
-+	if (bn->netdev->flags & IFF_ALLMULTI) {
-+		vnic->rx_mask |= CFA_L2_SET_RX_MASK_REQ_MASK_ALL_MCAST;
-+		vnic->mc_list_count = 0;
-+	} else if (bn->netdev->flags & IFF_MULTICAST) {
-+		u32 mask = 0;
-+
-+		bnge_mc_list_updated(bn, &mask);
-+		vnic->rx_mask |= mask;
-+	}
-+
-+	rc = bnge_cfg_def_vnic(bn);
-+	if (rc)
-+		goto err_out;
-+
- 	return 0;
- err_out:
- 	bnge_hwrm_resource_free(bn, 0);
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
-index 43c64633ed5..565a10b4dab 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
-@@ -382,6 +382,10 @@ struct bnge_vnic_info {
- #define BNGE_MAX_CTX_PER_VNIC	8
- 	u16		fw_rss_cos_lb_ctx[BNGE_MAX_CTX_PER_VNIC];
- 	u16		mru;
-+#define BNGE_MAX_UC_ADDRS	4
-+	/* index 0 always dev_addr */
-+	struct bnge_l2_filter *l2_filters[BNGE_MAX_UC_ADDRS];
-+	u16		uc_filter_count;
- 	u8		*uc_list;
- 	dma_addr_t	rss_table_dma_addr;
- 	__le16		*rss_table;
-@@ -393,6 +397,7 @@ struct bnge_vnic_info {
- #define BNGE_RSS_TABLE_MAX_TBL		8
- #define BNGE_MAX_RSS_TABLE_SIZE			\
- 	(BNGE_RSS_TABLE_SIZE * BNGE_RSS_TABLE_MAX_TBL)
-+	u32		rx_mask;
- 
- 	u8		*mc_list;
- 	int		mc_list_size;
-@@ -407,6 +412,41 @@ struct bnge_vnic_info {
- 	u32		vnic_id;
- };
- 
-+struct bnge_filter_base {
-+	struct hlist_node	hash;
-+	struct list_head	list;
-+	__le64			filter_id;
-+	u8			type;
-+#define BNGE_FLTR_TYPE_L2	2
-+	u8			flags;
-+	u16			rxq;
-+	u16			fw_vnic_id;
-+	u16			vf_idx;
-+	unsigned long		state;
-+#define BNGE_FLTR_VALID		0
-+#define BNGE_FLTR_FW_DELETED	2
-+
-+	struct rcu_head         rcu;
-+};
-+
-+struct bnge_l2_key {
-+	union {
-+		struct {
-+			u8	dst_mac_addr[ETH_ALEN];
-+			u16	vlan;
-+		};
-+		u32	filter_key;
-+	};
-+};
-+
-+#define BNGE_L2_KEY_SIZE	(sizeof(struct bnge_l2_key) / 4)
-+struct bnge_l2_filter {
-+	/* base filter must be the first member */
-+	struct bnge_filter_base	base;
-+	struct bnge_l2_key	l2_key;
-+	atomic_t		refcnt;
-+};
-+
- u16 bnge_cp_ring_for_rx(struct bnge_rx_ring_info *rxr);
- u16 bnge_cp_ring_for_tx(struct bnge_tx_ring_info *txr);
- int bnge_get_nr_rss_ctxs(int rx_rings);
--- 
-2.47.3
+I have created a new patch review request for iproute2-next. Updated, the e=
+tc/iproute2/rt_protos based on your review comments:
+https://lore.kernel.org/netdev/20250818193756.277327-1-mrghosh@cisco.com/T/=
+#u
+
+Thanks,
+Mrinmoy
+
+-----Original Message-----
+From: Stephen Hemminger <stephen@networkplumber.org>=20
+Sent: Saturday, August 16, 2025 12:21 PM
+To: Mrinmoy Ghosh (mrghosh) <mrghosh@cisco.com>
+Cc: netdev@vger.kernel.org; bridge@lists.linux-foundation.org; mrinmoy_g@ho=
+tmail.com; Mike Mallin (mmallin) <mmallin@cisco.com>; Patrice Brissette (pb=
+risset) <pbrisset@cisco.com>
+Subject: Re: [PATCH iproute2] bridge:fdb: Protocol field in bridge fdb
+
+On Sat, 16 Aug 2025 03:11:45 +0000
+Mrinmoy Ghosh <mrghosh@cisco.com> wrote:
+
+> diff --git a/include/uapi/linux/rtnetlink.h=20
+> b/include/uapi/linux/rtnetlink.h index 085bb139..1ff9dbee 100644
+> --- a/include/uapi/linux/rtnetlink.h
+> +++ b/include/uapi/linux/rtnetlink.h
+> @@ -314,6 +314,7 @@ enum {
+>  #define RTPROT_OSPF		188	/* OSPF Routes */
+>  #define RTPROT_RIP		189	/* RIP Routes */
+>  #define RTPROT_EIGRP		192	/* EIGRP Routes */
+> +#define RTPROT_HW		193	/* HW Generated Routes */
+> =20
+>  /* rtm_scope
+> =20
+> diff --git a/lib/rt_names.c b/lib/rt_names.c index 7dc194b1..b9bc1b50=20
+> 100644
+> --- a/lib/rt_names.c
+> +++ b/lib/rt_names.c
+> @@ -148,6 +148,7 @@ static char *rtnl_rtprot_tab[256] =3D {
+>  	[RTPROT_OSPF]	    =3D "ospf",
+>  	[RTPROT_RIP]	    =3D "rip",
+>  	[RTPROT_EIGRP]	    =3D "eigrp",
+> +	[RTPROT_HW]	    =3D "hw",
+>  };
+> =20
+>  struct tabhash {
+
+This is iproute2-next material.
+
+Where is the kernel patch for this?
+Iproute headers are synced from kernel headers.
+
+If you add new RTPROT entry also need new line into etc/iproute2/rt_protos
+
 
 
