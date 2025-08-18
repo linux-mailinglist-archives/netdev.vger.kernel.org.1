@@ -1,166 +1,139 @@
-Return-Path: <netdev+bounces-214511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BEA5B29FAD
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 12:54:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BDB1B29FCE
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 12:58:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AECCB18A7D02
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 10:54:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 523961964BE2
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 10:58:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1D5530FF1C;
-	Mon, 18 Aug 2025 10:53:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF2F03101A1;
+	Mon, 18 Aug 2025 10:57:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Tj/Bm0j2"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b="M9dAqPvr"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+Received: from orbyte.nwl.cc (orbyte.nwl.cc [151.80.46.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6FE430100E;
-	Mon, 18 Aug 2025 10:53:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD6A2275B1D;
+	Mon, 18 Aug 2025 10:56:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=151.80.46.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755514436; cv=none; b=u0Ag04Zl8H+WGqN1EznOb1/YZFtf3Q7i17cbeswqwMbOQI1DfsEqDTd7OYHFBSGkS/aTASSIk3ICzQDrydRF7b7nR+vsH+mOwWwBf8bU5xs0CwPMzxuLqlzubraDgFwF830gplFAIUuAj/+pjC66kOIYLJ97bYBnC1Oo3M2hcNM=
+	t=1755514622; cv=none; b=n+xCBsewRiDIRqT06iaaioF962iiKyQWIHEUnVWxcAsY7Bg01706NN/ZsoAMWB2q6Ngpf2GpJ4wVhyLVTzLVANWiKFjFnMa/SyPxKF2FMjQU1a9bR8ZH/XS4b2sWF6p8ROsqEYvRH4A3gB1cUqjcZb+KKHr+WFXA1kaAN4OCL+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755514436; c=relaxed/simple;
-	bh=bdkGFGntJn6b9/DexCBKcDKT9nz79mQibMj1XFOZbAI=;
+	s=arc-20240116; t=1755514622; c=relaxed/simple;
+	bh=2w+EuXC/u8IFg9jA7o7kqWSy53CjQy5oq5noneEIrJ8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VGnSIcWusYB7agiqeRG1GmcUeE3GYtv7Cg4IlQ923yP28LTwvEij7+XvLCykNs+6OV4nrt346b7V9JGZ2vtY70QNWEXtye5npxbbg+WMTRBVUmcezqFyaSE8rCnfnNnffCKSzRw2RY6mnD+ZaoTPXhLw1jCCJfxJzhw5DOlB00g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Tj/Bm0j2; arc=none smtp.client-ip=115.124.30.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1755514424; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=UC+BNZzpQ+2R/7vUVL670jKwVT1hX1AhqBX1uis4yPM=;
-	b=Tj/Bm0j27okO4rsi+mbgGvlrgwicdRTNTF/uIGXmKv0ArGiJOkb0XWoGVxfywZrPPtZlac6pQHsC6h8FwElRGkkBtVU39vhQTSwlZGF7o42CEFjVgT+jm9wGkMgZNChGARmk8uwCKrbLnCLPnV7q4PtAGeszYVNY/eQrY57BIkc=
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0Wm-j9fQ_1755514423 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 18 Aug 2025 18:53:43 +0800
-Date: Mon, 18 Aug 2025 18:53:43 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: "D. Wythe" <alibuda@linux.alibaba.com>, Mahanta.Jambigi@ibm.com,
-	Sidraya.Jayagond@ibm.com, wenjia@linux.ibm.com,
-	wintera@linux.ibm.com, tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
-	pabeni@redhat.com, edumazet@google.com, jaka@linux.ibm.com
-Subject: Re: [PATCH net] net/smc: fix UAF on smcsk after smc_listen_out()
-Message-ID: <aKMGNyMUUwq7ufT7@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20250818054618.41615-1-alibuda@linux.alibaba.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=bJ2RMXKKhtHvIkyaF5pmPkYKyOIYsxguuJDwu3iqgHUJnQTvHSDYXmKpkCSM/Ts87fE+tAyOO1cxeZThIX4XkN0C7JIQrIKHF8K+M3hPHdN0lPKHuCFwVKYnqggzdCu5E5uARoHuI3ylfFDNe3F8tPHrqEFsn//JvxgrQPH4BvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc; spf=pass smtp.mailfrom=nwl.cc; dkim=pass (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b=M9dAqPvr; arc=none smtp.client-ip=151.80.46.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nwl.cc
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nwl.cc;
+	s=mail2022; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=h9WHAFB/RGgGKVIByINwvuyekvUFaG5ctKYRf81tJDo=; b=M9dAqPvr3u2gj5uo/AYom+dfop
+	FhVtQVRbBUJ2D7+d3fuvtZV1aAhSH3rcuYx+pkF8Fs5uVxKg/C+iIwRnla/lATfqtYJg/s0N2lVud
+	S9IBWtok30UYLJ53v6rHb0ZDSDUf0/as7ja/+2ueNzmDSNz+9gfqFOegPfz+0Cxz4MLfh7oxHi+7c
+	wX77fA8hQEZKr3o4J/K7J9OsGwpD9W89l/3KshUwZOiGPnZTt+42wYm7YxIG975rhky18FJkMj8Ol
+	7X1c5rYWNMWG5M38x03qgeUmezhVZInaTujPobu5Hb8xeegsvl9Pyx2H0IoXaZWekvqAYIqzoeUsz
+	gMKuII5w==;
+Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.97.1)
+	(envelope-from <phil@nwl.cc>)
+	id 1unxXs-000000003R7-1iFi;
+	Mon, 18 Aug 2025 12:56:56 +0200
+Date: Mon, 18 Aug 2025 12:56:56 +0200
+From: Phil Sutter <phil@nwl.cc>
+To: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	linux-modules@vger.kernel.org, Yi Chen <yiche@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: modprobe returns 0 upon -EEXIST from insmod
+Message-ID: <aKMG-LqLs3yaBDiJ@orbyte.nwl.cc>
+Mail-Followup-To: Phil Sutter <phil@nwl.cc>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	linux-modules@vger.kernel.org, Yi Chen <yiche@redhat.com>,
+	netdev@vger.kernel.org
+References: <aKEVQhJpRdiZSliu@orbyte.nwl.cc>
+ <8a87656d-577a-4d0a-85b1-5fd17d0346fe@csgroup.eu>
+ <aKLzsAX14ybEjHfJ@orbyte.nwl.cc>
+ <edfed2af-8b4d-4afb-b999-5c46b7d46fba@csgroup.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250818054618.41615-1-alibuda@linux.alibaba.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <edfed2af-8b4d-4afb-b999-5c46b7d46fba@csgroup.eu>
 
-On 2025-08-18 13:46:18, D. Wythe wrote:
->BPF CI testing report a UAF issue:
->
->  [   16.446633] BUG: kernel NULL pointer dereference, address: 000000000000003  0
->  [   16.447134] #PF: supervisor read access in kernel mod  e
->  [   16.447516] #PF: error_code(0x0000) - not-present pag  e
->  [   16.447878] PGD 0 P4D   0
->  [   16.448063] Oops: Oops: 0000 [#1] PREEMPT SMP NOPT  I
->  [   16.448409] CPU: 0 UID: 0 PID: 9 Comm: kworker/0:1 Tainted: G           OE      6.13.0-rc3-g89e8a75fda73-dirty #4  2
->  [   16.449124] Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODUL  E
->  [   16.449502] Hardware name: QEMU Ubuntu 24.04 PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/201  4
->  [   16.450201] Workqueue: smc_hs_wq smc_listen_wor  k
->  [   16.450531] RIP: 0010:smc_listen_work+0xc02/0x159  0
->  [   16.452158] RSP: 0018:ffffb5ab40053d98 EFLAGS: 0001024  6
->  [   16.452526] RAX: 0000000000000001 RBX: 0000000000000002 RCX: 000000000000030  0
->  [   16.452994] RDX: 0000000000000280 RSI: 00003513840053f0 RDI: 000000000000000  0
->  [   16.453492] RBP: ffffa097808e3800 R08: ffffa09782dba1e0 R09: 000000000000000  5
->  [   16.453987] R10: 0000000000000000 R11: 0000000000000000 R12: ffffa0978274640  0
->  [   16.454497] R13: 0000000000000000 R14: 0000000000000000 R15: ffffa09782d4092  0
->  [   16.454996] FS:  0000000000000000(0000) GS:ffffa097bbc00000(0000) knlGS:000000000000000  0
->  [   16.455557] CS:  0010 DS: 0000 ES: 0000 CR0: 000000008005003  3
->  [   16.455961] CR2: 0000000000000030 CR3: 0000000102788004 CR4: 0000000000770ef  0
->  [   16.456459] PKRU: 5555555  4
->  [   16.456654] Call Trace  :
->  [   16.456832]  <TASK  >
->  [   16.456989]  ? __die+0x23/0x7  0
->  [   16.457215]  ? page_fault_oops+0x180/0x4c  0
->  [   16.457508]  ? __lock_acquire+0x3e6/0x249  0
->  [   16.457801]  ? exc_page_fault+0x68/0x20  0
->  [   16.458080]  ? asm_exc_page_fault+0x26/0x3  0
->  [   16.458389]  ? smc_listen_work+0xc02/0x159  0
->  [   16.458689]  ? smc_listen_work+0xc02/0x159  0
->  [   16.458987]  ? lock_is_held_type+0x8f/0x10  0
->  [   16.459284]  process_one_work+0x1ea/0x6d  0
->  [   16.459570]  worker_thread+0x1c3/0x38  0
->  [   16.459839]  ? __pfx_worker_thread+0x10/0x1  0
->  [   16.460144]  kthread+0xe0/0x11  0
->  [   16.460372]  ? __pfx_kthread+0x10/0x1  0
->  [   16.460640]  ret_from_fork+0x31/0x5  0
->  [   16.460896]  ? __pfx_kthread+0x10/0x1  0
->  [   16.461166]  ret_from_fork_asm+0x1a/0x3  0
->  [   16.461453]  </TASK  >
->  [   16.461616] Modules linked in: bpf_testmod(OE) [last unloaded: bpf_testmod(OE)  ]
->  [   16.462134] CR2: 000000000000003  0
->  [   16.462380] ---[ end trace 0000000000000000 ]---
->  [   16.462710] RIP: 0010:smc_listen_work+0xc02/0x1590
->
->The direct cause of this issue is that after smc_listen_out_connected(),
->newclcsock->sk may be NULL since it will releases the smcsk. Therefore,
->if the application closes the socket immediately after accept,
->newclcsock->sk can be NULL. A possible execution order could be as
->follows:
->
->smc_listen_work                                 | userspace
->-----------------------------------------------------------------
->lock_sock(sk)                                   |
->smc_listen_out_connected()                      |
->| \- smc_listen_out                             |
->|    | \- release_sock                          |
->     | |- sk->sk_data_ready()                   |
->                                                | fd = accept();
->                                                | close(fd);
->                                                |  \- socket->sk = NULL;
->/* newclcsock->sk is NULL now */
->SMC_STAT_SERV_SUCC_INC(sock_net(newclcsock->sk))
->
->Since smc_listen_out_connected() will not fail, simply swapping the order
->of the code can easily fix this issue.
->
->Fixes: 3b2dec2603d5 ("net/smc: restructure client and server code in af_smc")
->Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->Reviewed-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
->Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
-
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
-
-Best regards,
-Dust
-
->---
-> net/smc/af_smc.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
->
->diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->index 9311c38f7abe..e0e48f24cd61 100644
->--- a/net/smc/af_smc.c
->+++ b/net/smc/af_smc.c
->@@ -2568,8 +2568,9 @@ static void smc_listen_work(struct work_struct *work)
-> 			goto out_decl;
-> 	}
+On Mon, Aug 18, 2025 at 12:07:18PM +0200, Christophe Leroy wrote:
+> [+ Netfilter lists]
 > 
->-	smc_listen_out_connected(new_smc);
-> 	SMC_STAT_SERV_SUCC_INC(sock_net(newclcsock->sk), ini);
->+	/* smc_listen_out() will release smcsk */
->+	smc_listen_out_connected(new_smc);
-> 	goto out_free;
+> Hi Phil
 > 
-> out_unlock:
->-- 
->2.45.0
->
+> Le 18/08/2025 à 11:34, Phil Sutter a écrit :
+> > [Vous ne recevez pas souvent de courriers de phil@nwl.cc. Découvrez pourquoi ceci est important à https://aka.ms/LearnAboutSenderIdentification ]
+> > 
+> > Hi Christophe,
+> > 
+> > On Sun, Aug 17, 2025 at 05:54:27PM +0200, Christophe Leroy wrote:
+> >> Le 17/08/2025 à 01:33, Phil Sutter a écrit :
+> >>> [Vous ne recevez pas souvent de courriers de phil@nwl.cc. D?couvrez pourquoi ceci est important ? https://aka.ms/LearnAboutSenderIdentification ]
+> >>>
+> >>> Hi,
+> >>>
+> >>> I admittedly didn't fully analyze the cause, but on my system a call to:
+> >>>
+> >>> # insmod /lib/module/$(uname -r)/kernel/net/netfilter/nf_conntrack_ftp.ko
+> >>>
+> >>> fails with -EEXIST (due to a previous call to 'nfct add helper ftp inet
+> >>> tcp'). A call to:
+> >>>
+> >>> # modprobe nf_conntrack_ftp
+> >>>
+> >>> though returns 0 even though module loading fails. Is there a bug in
+> >>> modprobe error status handling?
+> >>>
+> >>
+> >> Read the man page : https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flinux.die.net%2Fman%2F8%2Fmodprobe&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7C34b49eb3d0544fc683e608ddde3a75b2%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638911064858807750%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=%2F70LV37Zb%2FNeiBV59y9rvkLGh0xsqga08Nl3c5%2BVU5I%3D&reserved=0
+> >>
+> >> In the man page I see:
+> >>
+> >>              Normally, modprobe will succeed (and do nothing) if told to
+> >> insert a module which is already present or to remove a module which
+> >> isn't present.
+> > 
+> > This is not a case of already inserted module, it is not loaded before
+> > the call to modprobe. It is the module_init callback
+> > nf_conntrack_ftp_init() which returns -EEXIST it received from
+> > nf_conntrack_helpers_register().
+> > 
+> > Can't user space distinguish the two causes of -EEXIST? Or in other
+> > words, is use of -EEXIST in module_init callbacks problematic?
+> 
+> So if I understand correctly the load fails because it is in conflict 
+> with another module ?
+
+Yes, it tries to signal that there is already a conntrack helper for
+FTP. It is a stub redirecting to an implementation in user space, but
+that's just details.
+
+> Then I think the error returned by nf_conntrack_helpers_register() 
+> shouldn't be EEXIST but probably EBUSY.
+
+Sounds good! We could at least adjust the module_init callback return
+code from EEXIST to EBUSY so the change has minimal impact.
+
+Thanks for your help, Christophe!
+
+Cheers, Phil
 
