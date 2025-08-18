@@ -1,149 +1,114 @@
-Return-Path: <netdev+bounces-214499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9043FB29E98
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 11:58:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42250B29E9A
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 11:58:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 953421897652
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 09:58:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31FA21896215
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 09:59:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F98730F81B;
-	Mon, 18 Aug 2025 09:58:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CD8930FF1A;
+	Mon, 18 Aug 2025 09:58:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RbYFcOhj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nb29xwR4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5CC31E008B;
-	Mon, 18 Aug 2025 09:58:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBFBF30F55A
+	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 09:58:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755511093; cv=none; b=cXkA/MCbC4r0xBFfqOKieHDYz/sEYcwaRyJX7yq63ghyxQ1Tc+5Gqm3XyAltx0qg8llXqyiW2+qaHyNEQC5GPq2Bt7FMnDm/cc5nqZ4qhz6DdxWt1dC1/rlgff9yAsX/HoUxVj0yfi4PLG5Ku2JECqvovERJ2blCqK05tXmGzzM=
+	t=1755511119; cv=none; b=O8a3Bw4eDu3JWUafQa/52nAzKzfeThTY596Ilmfv/UY1zodChz7Q387H4z0QDQxvtBqmOYv0uiOeKPqQPpdeArp8jGsrPHCF07tn+S4n/5/RIsyyzRUU7iuDw4+Ch4zVP3EdbprndCyqFMB1YrVg8Bdneu/h3zRTAY+n17meh7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755511093; c=relaxed/simple;
-	bh=mQ63q3SrLsiGYe3hS2uVLaCBUISPOc7zkn8OeC14lGc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gs/Z2U9Qx3MtJVwOHl2AXliVwY15ssAKUiblMkynmp0w76cXvumNY2AnTbcBJfd1YFXCfpP1XV8nkatQZHi1qwfIi+c90uhnRGRM/san9Ugp54Ds/4zcXlCs9p12NMwkFJ9i85gPyw4B6NJJ7BJdLh3BmNsRScIc5AhLms+FFH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RbYFcOhj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB269C4CEED;
-	Mon, 18 Aug 2025 09:58:08 +0000 (UTC)
+	s=arc-20240116; t=1755511119; c=relaxed/simple;
+	bh=IVmYnonridwoQ6jxBvPZC4yerBdgroDgBZFPopy1r4g=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=nMupzkZ/ZZhGKNt5+lAI17XtDkbHbPdpWEXiHRyuUHod76bEd73smuQrw6BgbZNrr+GzBQ4tAU4NBgVyLXIEvTyKCPofisAoCfEw9O/nw4gxm90G8YxqX2hzIrneIvtIlC5anpNrOa6itwattbsf+QLYXgUa0dxZNswBpMmu+rw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nb29xwR4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 446B2C4CEEB;
+	Mon, 18 Aug 2025 09:58:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755511092;
-	bh=mQ63q3SrLsiGYe3hS2uVLaCBUISPOc7zkn8OeC14lGc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=RbYFcOhj84BoYqiCplFH3y2QUNnrUU2IDGUlhlWHQZK0FBWFNKIr68JJyb1Gzbul5
-	 8UDO/DLLHEkI+Fhz+TkzP2eNowzXpwSNCebR3zp9PLKDm322O9NOEU2SqvwR/0wNWh
-	 mlnk0IGoOWgcsWWp+CP88G/PkL9Vt/NpHxul9S5pC1hO/hPACmjTiGQ/AJCr1wz23u
-	 2QOP4SCpp8fXz+6wiJktUHqrGcSv8jrWA/oe66puxOHEuklyMJOP64xudNPEYWhE3k
-	 adci0Qz3WmycdRWg3SrWZLhW/ORNZ/5Sx4rE169dk/TvHL/BMfyDDGShPXZvMUcaA4
-	 AaUbua4taDljA==
-Message-ID: <bc96aab8-fbb4-4869-a40a-d655e01bb5c7@kernel.org>
-Date: Mon, 18 Aug 2025 11:58:07 +0200
+	s=k20201202; t=1755511119;
+	bh=IVmYnonridwoQ6jxBvPZC4yerBdgroDgBZFPopy1r4g=;
+	h=From:Date:Subject:To:Cc:From;
+	b=Nb29xwR4T10F6R7bKovgIT+ZChFem4oFqrrSeKarqu8BltJfcqsKclZEQmv7Hih1X
+	 JWpstzx1AnSCQ1wur/mxxVwjheTkLnXd+DDywd4XnNzbUPqAemGb+/PQKe9Ez3SuwQ
+	 +2fsH2idrkM2Ssw9zcAS7ft6fl5x4P+UiXcgbM2xBXH1kkRkWJEPFKyn4T6cDczVvL
+	 mOP5pnQ4m2HBG4jtSv/15lT4lT07wjOT7LcHQIpGQANBwaEsyY5fOMU4o/jp00TMut
+	 7Bkn07TCGqvEKxhLHASHCWBDre+/ev2Dpcm3weav2nLhXG5WMusdSBTvhilIyqxqaf
+	 aYYMv4h5bKBjw==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Mon, 18 Aug 2025 11:58:25 +0200
+Subject: [PATCH net] net: airoha: ppe: Do not invalid PPE entries in case
+ of SW hash collision
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] dt-bindings: net: Add support for J-Core EMAC
-To: "D. Jeff Dionne" <jeff@coresemi.io>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
- Artur Rojek <contact@artur-rojek.eu>, Rob Landley <rob@landley.net>,
- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250815194806.1202589-1-contact@artur-rojek.eu>
- <20250815194806.1202589-3-contact@artur-rojek.eu>
- <aa6bdc05-81b0-49a2-9d0d-8302fa66bf35@kernel.org>
- <cab483ef08e15d999f83e0fbabdc4fdf@artur-rojek.eu>
- <CAMuHMdVGv4UHoD0vbe3xrx8Q9thwrtEaKd6X+WaJgJHF_HXSaQ@mail.gmail.com>
- <26699eb1-26e8-4676-a7bc-623a1f770149@kernel.org>
- <295AB115-C189-430E-B361-4A892D7528C9@coresemi.io>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
- cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
- JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
- gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
- J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
- NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
- BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
- vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
- Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
- TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
- S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
- FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJoF1BKBQkWlnSaAAoJEBuTQ307
- QWKbHukP/3t4tRp/bvDnxJfmNdNVn0gv9ep3L39IntPalBFwRKytqeQkzAju0whYWg+R/rwp
- +r2I1Fzwt7+PTjsnMFlh1AZxGDmP5MFkzVsMnfX1lGiXhYSOMP97XL6R1QSXxaWOpGNCDaUl
- ajorB0lJDcC0q3xAdwzRConxYVhlgmTrRiD8oLlSCD5baEAt5Zw17UTNDnDGmZQKR0fqLpWy
- 786Lm5OScb7DjEgcA2PRm17st4UQ1kF0rQHokVaotxRM74PPDB8bCsunlghJl1DRK9s1aSuN
- hL1Pv9VD8b4dFNvCo7b4hfAANPU67W40AaaGZ3UAfmw+1MYyo4QuAZGKzaP2ukbdCD/DYnqi
- tJy88XqWtyb4UQWKNoQqGKzlYXdKsldYqrLHGoMvj1UN9XcRtXHST/IaLn72o7j7/h/Ac5EL
- 8lSUVIG4TYn59NyxxAXa07Wi6zjVL1U11fTnFmE29ALYQEXKBI3KUO1A3p4sQWzU7uRmbuxn
- naUmm8RbpMcOfa9JjlXCLmQ5IP7Rr5tYZUCkZz08LIfF8UMXwH7OOEX87Y++EkAB+pzKZNNd
- hwoXulTAgjSy+OiaLtuCys9VdXLZ3Zy314azaCU3BoWgaMV0eAW/+gprWMXQM1lrlzvwlD/k
- whyy9wGf0AEPpLssLVt9VVxNjo6BIkt6d1pMg6mHsUEVzsFNBFVDXDQBEADNkrQYSREUL4D3
- Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
- MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
- OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
- GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
- 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
- YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
- 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
- BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
- JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
- 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
- YpsFAmgXUF8FCRaWWyoACgkQG5NDfTtBYptO0w//dlXJs5/42hAXKsk+PDg3wyEFb4NpyA1v
- qmx7SfAzk9Hf6lWwU1O6AbqNMbh6PjEwadKUk1m04S7EjdQLsj/MBSgoQtCT3MDmWUUtHZd5
- RYIPnPq3WVB47GtuO6/u375tsxhtf7vt95QSYJwCB+ZUgo4T+FV4hquZ4AsRkbgavtIzQisg
- Dgv76tnEv3YHV8Jn9mi/Bu0FURF+5kpdMfgo1sq6RXNQ//TVf8yFgRtTUdXxW/qHjlYURrm2
- H4kutobVEIxiyu6m05q3e9eZB/TaMMNVORx+1kM3j7f0rwtEYUFzY1ygQfpcMDPl7pRYoJjB
- dSsm0ZuzDaCwaxg2t8hqQJBzJCezTOIkjHUsWAK+tEbU4Z4SnNpCyM3fBqsgYdJxjyC/tWVT
- AQ18NRLtPw7tK1rdcwCl0GFQHwSwk5pDpz1NH40e6lU+NcXSeiqkDDRkHlftKPV/dV+lQXiu
- jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
- zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
- XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <295AB115-C189-430E-B361-4A892D7528C9@coresemi.io>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250818-airoha-en7581-hash-collision-fix-v1-1-d190c4b53d1c@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAED5omgC/x2NUQqAIBAFrxL73YJKpnSV6MNqzQXRUIggunvS5
+ zyYNw9UKkwVpu6BQhdXzqmB7DvYgksHIe+NQQmlhZUWHZccHFIy2koMrgbccoy/iJ5v9F4N62j
+ MLoyCdnMWavOfmJf3/QAi4fK4cgAAAA==
+X-Change-ID: 20250818-airoha-en7581-hash-collision-fix-ff24b677d072
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Michal Kubiak <michal.kubiak@intel.com>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.2
 
-On 18/08/2025 10:21, D. Jeff Dionne wrote:
-> On Aug 18, 2025, at 17:07, Krzysztof Kozlowski <krzk@kernel.org> wrote:
-> 
->> git grep jcore,emac
->>
->> Gives me zero?
-> 
-> Um, right.  It’s not upstream yet.  Thanks for your work to get that done, Artur.
-> 
->>> If an incompatible version comes up, it should use a different
->>> (versioned?) compatible value.
->>
->> Versions are allowed if they follow some documented and known vendor SoC versioning scheme. Is this the case here?
->>
->> This is some sort of SoC, right? So it should have actual SoC name?
-> 
-> No.  It’s a generic IP core for multiple SoCs, which do have names.
+SW hash computed by airoha_ppe_foe_get_entry_hash routine (used for
+foe_flow hlist) can theoretically produce collisions between two
+different HW PPE entries.
+In airoha_ppe_foe_insert_entry() if the collision occurs we will mark
+the second PPE entry in the list as stale (setting the hw hash to 0xffff).
+Stale entries are no more updated in airoha_ppe_foe_flow_entry_update
+routine and so they are removed by Netfilter.
+Fix the problem not marking the second entry as stale in
+airoha_ppe_foe_insert_entry routine if we have already inserted the
+brand new entry in the PPE table and let Netfilter remove real stale
+entries according to their timestamp.
+Please note this is just a theoretical issue spotted reviewing the code
+and not faced running the system.
 
-Then you need other SoCs compatibles, because we do not allow generic
-items. See writing bindings.
+Fixes: cd53f622611f9 ("net: airoha: Add L2 hw acceleration support")
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ drivers/net/ethernet/airoha/airoha_ppe.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-> 
-> This is the correct naming scheme.  All compatible devices and SoCs match properly.
+diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
+index 47411d2cbd2803c0a448243fb3e92b32d9179bd8..88694b08afa1ce232b34c64f605a151aed137b6d 100644
+--- a/drivers/net/ethernet/airoha/airoha_ppe.c
++++ b/drivers/net/ethernet/airoha/airoha_ppe.c
+@@ -736,10 +736,8 @@ static void airoha_ppe_foe_insert_entry(struct airoha_ppe *ppe,
+ 			continue;
+ 		}
+ 
+-		if (commit_done || !airoha_ppe_foe_compare_entry(e, hwe)) {
+-			e->hash = 0xffff;
++		if (!airoha_ppe_foe_compare_entry(e, hwe))
+ 			continue;
+-		}
+ 
+ 		airoha_ppe_foe_commit_entry(ppe, &e->data, hash);
+ 		commit_done = true;
 
-No, it is not a correct naming scheme. Please read writing bindings.
-
+---
+base-commit: 715c7a36d59f54162a26fac1d1ed8dc087a24cf1
+change-id: 20250818-airoha-en7581-hash-collision-fix-ff24b677d072
 
 Best regards,
-Krzysztof
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
+
 
