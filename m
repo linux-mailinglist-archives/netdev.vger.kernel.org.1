@@ -1,168 +1,354 @@
-Return-Path: <netdev+bounces-214450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E591B29992
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 08:20:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA647B299BB
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 08:32:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68E0C7A6A00
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 06:19:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92D6C189F219
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 06:32:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C51442741A6;
-	Mon, 18 Aug 2025 06:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A913B2750ED;
+	Mon, 18 Aug 2025 06:31:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o79djgtn"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="TBo+RssG";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="hkq8SzjE";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="TBo+RssG";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="hkq8SzjE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6E1A2727FA
-	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 06:20:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FDC71DD877
+	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 06:31:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755498027; cv=none; b=Yhndq2syWZgdyfFD5cV0eeKVsLregATKTxzWb9fgPgCw2NQ3tygPMiwhWj9DgQLLZsZix/bFoifJPfQtwe5lFqnpd16RFgC+MQ6YBnaHvHT4dKsH8/gl9pvhtFmQ/0NbJaiO1dsPeEpA1FbREqmuWS9XFgzBZg2mJ2IKuE4UEuA=
+	t=1755498710; cv=none; b=jt7nofVEUTAlXjyXgB62IAJ8kDsiHZxaECzc9MQgavpe/OKOCgsqOVj/y5XtPekflJ2VOsBm+RVPXKEaij36dYJhg976fZJPT9Xvn/MnSmj5IhA6jDMqzw2xbL9d5z0tTLTKAFkT17zBBdKGmZ1ybHlG3dM71RL85o1nHMcSdag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755498027; c=relaxed/simple;
-	bh=T3q+O+jof6fhFKBiJ6CVFzCkkLe74GTWxIh8QQz46AQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=RqT4SM1M60AKHibyL1fdER5kCM66Jdd8uV53jmop+uh/0lNS37efInujuQORURTPHe8RVtFDRIX6a/cxP0AuAtiBNgg58ElLUxygGIcWgUK0ZdMZxjlyoKtO16+mxcG0mNirl0rfnHJ8fW7sAApHJG3H0S3lXOYxsTa+TsaEHiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=o79djgtn; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3b9d41d2a5cso2795066f8f.0
-        for <netdev@vger.kernel.org>; Sun, 17 Aug 2025 23:20:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1755498024; x=1756102824; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=vv+EedLDos6KkXvRZMzob7Rp+3yduDfdutqU9xZjFI0=;
-        b=o79djgtn7QvSzLGuvQ1CvLorExmkzRRNtw/+8zFCgEavVWGu9cxJ256R90reNkgMgz
-         6kNgpOtHoX2IR5jH/EdTGTUBuoPYC7eIRxOquUcqUUQphtyIU+W+8YUFJPqIxSOy/Prh
-         5DCF8a+dl5VpHUJAZkpc12BdNDjXgcfT+vBUq5efvFMb+EcBTl5X1aLrfiu8OJp4gHfi
-         bbbhbo5HF8scisKP9IQ4BwIRByr0+ZL6Na86WUs/GAjx1jAhZ1OebG1wltEK0+EwzgdJ
-         XgG4Wtxn2pOh/KKEXIGNL6m/Qd/y1teahUk3OziForYcZ5cqGoj3xKcbEYU/c4JZy63+
-         QG9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755498024; x=1756102824;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vv+EedLDos6KkXvRZMzob7Rp+3yduDfdutqU9xZjFI0=;
-        b=PMbztGx8gqujoY1noPk/zjCxC5Ypjj34rY3bNmX3H0PGVitxmtkPcYrsVLPc9zrKYt
-         7gWQEXw/iamh3shZrGXB8wX5sFsYKF8ZsIU6SdxJ9YSoF0+0Vt6dprzAp8lzJHRN5+0/
-         p56dcpFOCqdp4M343HL5/UTig68vCwDa88mQIPJOIj1JKuKM/z9kRPnn5QB6lzzJTBep
-         N1p+7N6Krj9QW4wJT6F9lGPZX1U9pgpK/iy2s1zqnfMNtM4wOvgPGOypJmByrYL2SG6E
-         i2azNhR+Fbsm2thT/aXwtvZkufoqyi/XmQB9oDowX4D5ZIC4RY2zhR7gUN4p4zUND0QJ
-         Rcaw==
-X-Forwarded-Encrypted: i=1; AJvYcCUJHS/lMsaewbUZ/dT2gyCA9LEhuf1j0BWrnFbQphrVScScMyHr7oWjpSbOPbqxtZlQnlEUZ7o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxuoKcN8R2Rg100Kj23EP7Cx6LwJrbT27TZnzvWRe/CMefUs+Ve
-	LGSs1UArmoz2Jgx9QzBxU0EmwxgtqpnDTrZe+jsNVBszpgkHcEb8ELgaYtpLv2q4Eqc=
-X-Gm-Gg: ASbGnctO/735Q13fFA09XY5lAPzm/ZibEu/sLpjKUj1ej6N06edtEfjbpKDCgipLQJJ
-	HYu2vrJqONuxrERBCPono5N3gkNiWEufxTIjtZbGL7cwJxiYsQNbjo7BV6d6aAvjpout7os/CII
-	8bJJ7+peKS+62lgXCg/qTGqWpYvPC2pOJzrue1s8oW9/synz67VX5mfXYAKrcqN9xQj48k2gHKO
-	+PsMi7uIAhcdIPGF7Cln1M9RfsZHDvGGFcqywAoldKvmwNnR0er4LMbpz5MBGitawG1NvpthACv
-	FEmApZXV4RJzFoPT2WNAy2WV2oESglUpKkTcia+rnnrYYWCPcw7EOJh1W6W4nlI4hL3BXa5sHKG
-	mf8e/CCIeLbJNkHDLV0/JeJjRRoU=
-X-Google-Smtp-Source: AGHT+IG+5SFi/GAbP4l+i/xmyijRNIVvSEjZ/3P/W3aR8A+Chf11iBLXkTTgzrgOP4ZfTjF9okFrnw==
-X-Received: by 2002:a05:6000:2284:b0:3b9:1635:c13 with SMTP id ffacd0b85a97d-3bc684d7af0mr5411496f8f.16.1755498024235;
-        Sun, 17 Aug 2025 23:20:24 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-3bb676caf79sm11538282f8f.42.2025.08.17.23.20.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 Aug 2025 23:20:23 -0700 (PDT)
-Date: Mon, 18 Aug 2025 09:20:20 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev, Jason Xing <kerneljasonxing@gmail.com>,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com,
-	sdf@fomichev.me, ast@kernel.org, daniel@iogearbox.net,
-	hawk@kernel.org, john.fastabend@gmail.com, horms@kernel.org,
-	andrew+netdev@lunn.ch
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next 1/2] xsk: introduce XDP_GENERIC_XMIT_BATCH
- setsockopt
-Message-ID: <202508171049.SGYNFbP3-lkp@intel.com>
+	s=arc-20240116; t=1755498710; c=relaxed/simple;
+	bh=CE5qQ851TpBnQeg0Q5ojnAghTuzyEee3eJY4tSKcJnE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oqLIZhj4t2taCArMWi0skGTwUMG4AZBL9qCIY4ydOw4ABGDox/U40VLiTrW03WjgPg/37c4JOOh+W9F+/1MwxEpZrbtsD0/m4D64P7ikA7D2+67eh1ObItV/bZdT2RhwmDw8nX8+Exx24Mn5nseWMgB63cvuTy8vCRASGUwknPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=TBo+RssG; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=hkq8SzjE; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=TBo+RssG; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=hkq8SzjE; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 2F027211E6;
+	Mon, 18 Aug 2025 06:31:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1755498705; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OKNYr7Sr1Rv8RUdhjv8p0XIb/kkQer4wA6muKTtrKVo=;
+	b=TBo+RssGZrAiSXlAKNYgmq/qsRNusV1X0Kxs1D76VfxPt23twt41rpGreA31MJytupNgPw
+	CNgPdxnsmEEtLuKNgc0SZTbKMZBBR7y9ZyPQYtINVXymVzBbcNGTMCmkv4eGtCe3Vwrd0l
+	wkO77Mad+/7JqdjMQ0DcDxRvmJGRc3g=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1755498705;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OKNYr7Sr1Rv8RUdhjv8p0XIb/kkQer4wA6muKTtrKVo=;
+	b=hkq8SzjE9MDdV98SBoYUFjno9CxF6K/O7qbDcPGEheiajZGZiXZINwkZ0Lm8yOGr2WCN+F
+	iHZ6kQ9MJmiYk4DQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1755498705; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OKNYr7Sr1Rv8RUdhjv8p0XIb/kkQer4wA6muKTtrKVo=;
+	b=TBo+RssGZrAiSXlAKNYgmq/qsRNusV1X0Kxs1D76VfxPt23twt41rpGreA31MJytupNgPw
+	CNgPdxnsmEEtLuKNgc0SZTbKMZBBR7y9ZyPQYtINVXymVzBbcNGTMCmkv4eGtCe3Vwrd0l
+	wkO77Mad+/7JqdjMQ0DcDxRvmJGRc3g=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1755498705;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OKNYr7Sr1Rv8RUdhjv8p0XIb/kkQer4wA6muKTtrKVo=;
+	b=hkq8SzjE9MDdV98SBoYUFjno9CxF6K/O7qbDcPGEheiajZGZiXZINwkZ0Lm8yOGr2WCN+F
+	iHZ6kQ9MJmiYk4DQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 792F813686;
+	Mon, 18 Aug 2025 06:31:44 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id /DV1GdDIomhdAgAAD6G6ig
+	(envelope-from <hare@suse.de>); Mon, 18 Aug 2025 06:31:44 +0000
+Message-ID: <a9ea0abf-1f11-4760-80b8-6a688e020093@suse.de>
+Date: Mon, 18 Aug 2025 08:31:43 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC v2 1/1] net/tls: allow limiting maximum record size
+To: Wilfred Mallawa <wilfred.opensource@gmail.com>, chuck.lever@oracle.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, donald.hunter@gmail.com, borisp@nvidia.com,
+ john.fastabend@gmail.com
+Cc: alistair.francis@wdc.com, dlemoal@kernel.org,
+ kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Wilfred Mallawa <wilfred.mallawa@wdc.com>
+References: <20250808072358.254478-3-wilfred.opensource@gmail.com>
+ <20250808072358.254478-5-wilfred.opensource@gmail.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20250808072358.254478-5-wilfred.opensource@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250811131236.56206-2-kerneljasonxing@gmail.com>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	TAGGED_RCPT(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,oracle.com,davemloft.net,google.com,kernel.org,redhat.com,nvidia.com];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:mid]
+X-Spam-Flag: NO
+X-Spam-Score: -2.80
 
-Hi Jason,
+On 8/8/25 09:24, Wilfred Mallawa wrote:
+> From: Wilfred Mallawa <wilfred.mallawa@wdc.com>
+> 
+> During a handshake, an endpoint may specify a maximum record size limit.
+> Currently, the kernel defaults to TLS_MAX_PAYLOAD_SIZE (16KB) for the
+> maximum record size. Meaning that, the outgoing records from the kernel
+> can exceed a lower size negotiated during the handshake. In such a case,
+> the TLS endpoint must send a fatal "record_overflow" alert [1], and
+> thus the record is discarded.
+> 
+> This patch adds support for retrieving the negotiated record size limit
+> during a handshake, and enforcing it at the TLS layer such that outgoing
+> records are no larger than the size negotiated. This patch depends on
+> the respective userspace support in tlshd [2] and GnuTLS [3].
+> 
+> [1] https://www.rfc-editor.org/rfc/rfc8449
+> [2] https://github.com/oracle/ktls-utils/pull/112
+> [3] https://gitlab.com/gnutls/gnutls/-/merge_requests/2005
+> 
+> Signed-off-by: Wilfred Mallawa <wilfred.mallawa@wdc.com>
+> ---
+>   Documentation/netlink/specs/handshake.yaml |  3 +++
+>   include/net/tls.h                          |  2 ++
+>   include/uapi/linux/handshake.h             |  1 +
+>   net/handshake/genl.c                       |  5 ++--
+>   net/handshake/tlshd.c                      | 29 +++++++++++++++++++++-
+>   net/tls/tls_sw.c                           |  6 ++++-
+>   6 files changed, 42 insertions(+), 4 deletions(-)
+> 
+> diff --git a/Documentation/netlink/specs/handshake.yaml b/Documentation/netlink/specs/handshake.yaml
+> index b934cc513e3d..4e6bc348f1fd 100644
+> --- a/Documentation/netlink/specs/handshake.yaml
+> +++ b/Documentation/netlink/specs/handshake.yaml
+> @@ -84,6 +84,9 @@ attribute-sets:
+>           name: remote-auth
+>           type: u32
+>           multi-attr: true
+> +      -
+> +          name: record-size-limit
+> +          type: u32
+>   
+>   operations:
+>     list:
+> diff --git a/include/net/tls.h b/include/net/tls.h
+> index 857340338b69..02e7b59fcc30 100644
+> --- a/include/net/tls.h
+> +++ b/include/net/tls.h
+> @@ -250,6 +250,8 @@ struct tls_context {
+>   			       */
+>   	unsigned long flags;
+>   
+> +	u32 tls_record_size_limit;
+> +
+>   	/* cache cold stuff */
+>   	struct proto *sk_proto;
+>   	struct sock *sk;
+> diff --git a/include/uapi/linux/handshake.h b/include/uapi/linux/handshake.h
+> index 3d7ea58778c9..0768eb8eb415 100644
+> --- a/include/uapi/linux/handshake.h
+> +++ b/include/uapi/linux/handshake.h
+> @@ -54,6 +54,7 @@ enum {
+>   	HANDSHAKE_A_DONE_STATUS = 1,
+>   	HANDSHAKE_A_DONE_SOCKFD,
+>   	HANDSHAKE_A_DONE_REMOTE_AUTH,
+> +	HANDSHAKE_A_DONE_RECORD_SIZE_LIMIT,
+>   
+>   	__HANDSHAKE_A_DONE_MAX,
+>   	HANDSHAKE_A_DONE_MAX = (__HANDSHAKE_A_DONE_MAX - 1)
+> diff --git a/net/handshake/genl.c b/net/handshake/genl.c
+> index f55d14d7b726..44c43ce18361 100644
+> --- a/net/handshake/genl.c
+> +++ b/net/handshake/genl.c
+> @@ -16,10 +16,11 @@ static const struct nla_policy handshake_accept_nl_policy[HANDSHAKE_A_ACCEPT_HAN
+>   };
+>   
+>   /* HANDSHAKE_CMD_DONE - do */
+> -static const struct nla_policy handshake_done_nl_policy[HANDSHAKE_A_DONE_REMOTE_AUTH + 1] = {
+> +static const struct nla_policy handshake_done_nl_policy[HANDSHAKE_A_DONE_RECORD_SIZE_LIMIT + 1] = {
 
-kernel test robot noticed the following build warnings:
+Shouldn't that be 'HANDSHAKE_A_DONE_MAX'?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jason-Xing/xsk-introduce-XDP_GENERIC_XMIT_BATCH-setsockopt/20250811-211509
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250811131236.56206-2-kerneljasonxing%40gmail.com
-patch subject: [PATCH net-next 1/2] xsk: introduce XDP_GENERIC_XMIT_BATCH setsockopt
-config: s390-randconfig-r073-20250817 (https://download.01.org/0day-ci/archive/20250817/202508171049.SGYNFbP3-lkp@intel.com/config)
-compiler: s390-linux-gcc (GCC) 8.5.0
+>   	[HANDSHAKE_A_DONE_STATUS] = { .type = NLA_U32, },
+>   	[HANDSHAKE_A_DONE_SOCKFD] = { .type = NLA_S32, },
+>   	[HANDSHAKE_A_DONE_REMOTE_AUTH] = { .type = NLA_U32, },
+> +	[HANDSHAKE_A_DONE_RECORD_SIZE_LIMIT] = { .type = NLA_U32, },
+>   };
+>   
+>   /* Ops table for handshake */
+> @@ -35,7 +36,7 @@ static const struct genl_split_ops handshake_nl_ops[] = {
+>   		.cmd		= HANDSHAKE_CMD_DONE,
+>   		.doit		= handshake_nl_done_doit,
+>   		.policy		= handshake_done_nl_policy,
+> -		.maxattr	= HANDSHAKE_A_DONE_REMOTE_AUTH,
+> +		.maxattr	= HANDSHAKE_A_DONE_RECORD_SIZE_LIMIT,
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202508171049.SGYNFbP3-lkp@intel.com/
+HANDSHAKE_A_DONE_MAX - 1?
 
-smatch warnings:
-net/xdp/xsk.c:1495 xsk_setsockopt() warn: inconsistent returns '&xs->mutex'.
+>   		.flags		= GENL_CMD_CAP_DO,
+>   	},
+>   };
+> diff --git a/net/handshake/tlshd.c b/net/handshake/tlshd.c
+> index d6f52839827e..f4e793f6288d 100644
+> --- a/net/handshake/tlshd.c
+> +++ b/net/handshake/tlshd.c
+> @@ -19,6 +19,7 @@
+>   #include <net/handshake.h>
+>   #include <net/genetlink.h>
+>   #include <net/tls_prot.h>
+> +#include <net/tls.h>
+>   
+>   #include <uapi/linux/keyctl.h>
+>   #include <uapi/linux/handshake.h>
+> @@ -37,6 +38,8 @@ struct tls_handshake_req {
+>   	key_serial_t		th_certificate;
+>   	key_serial_t		th_privkey;
+>   
+> +	struct socket		*th_sock;
+> +
+>   	unsigned int		th_num_peerids;
+>   	key_serial_t		th_peerid[5];
+>   };
+> @@ -52,6 +55,7 @@ tls_handshake_req_init(struct handshake_req *req,
+>   	treq->th_consumer_data = args->ta_data;
+>   	treq->th_peername = args->ta_peername;
+>   	treq->th_keyring = args->ta_keyring;
+> +	treq->th_sock = args->ta_sock;
+>   	treq->th_num_peerids = 0;
+>   	treq->th_certificate = TLS_NO_CERT;
+>   	treq->th_privkey = TLS_NO_PRIVKEY;
+> @@ -85,6 +89,27 @@ static void tls_handshake_remote_peerids(struct tls_handshake_req *treq,
+>   	}
+>   }
+>   
+> +static void tls_handshake_record_size(struct tls_handshake_req *treq,
+> +				      struct genl_info *info)
+> +{
+> +	struct tls_context *tls_ctx;
+> +	struct nlattr *head = nlmsg_attrdata(info->nlhdr, GENL_HDRLEN);
+> +	struct nlattr *nla;
+> +	u32 record_size_limit;
+> +	int rem, len = nlmsg_attrlen(info->nlhdr, GENL_HDRLEN);
+> +
+> +	nla_for_each_attr(nla, head, len, rem) {
+> +		if (nla_type(nla) == HANDSHAKE_A_DONE_RECORD_SIZE_LIMIT) {
+> +			record_size_limit = nla_get_u32(nla);
+> +			if (treq->th_sock) {
+> +				tls_ctx = tls_get_ctx(treq->th_sock->sk);
+> +				tls_ctx->tls_record_size_limit = record_size_limit;
+> +			}
+> +			break;
+> +		}
+> +	}
+> +}
+> +
+>   /**
+>    * tls_handshake_done - callback to handle a CMD_DONE request
+>    * @req: socket on which the handshake was performed
+> @@ -98,8 +123,10 @@ static void tls_handshake_done(struct handshake_req *req,
+>   	struct tls_handshake_req *treq = handshake_req_private(req);
+>   
+>   	treq->th_peerid[0] = TLS_NO_PEERID;
+> -	if (info)
+> +	if (info) {
+>   		tls_handshake_remote_peerids(treq, info);
+> +		tls_handshake_record_size(treq, info);
+> +	}
+>   
+>   	if (!status)
+>   		set_bit(HANDSHAKE_F_REQ_SESSION, &req->hr_flags);
+> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+> index fc88e34b7f33..70ffc4f5e382 100644
+> --- a/net/tls/tls_sw.c
+> +++ b/net/tls/tls_sw.c
+> @@ -1024,6 +1024,7 @@ static int tls_sw_sendmsg_locked(struct sock *sk, struct msghdr *msg,
+>   	ssize_t copied = 0;
+>   	struct sk_msg *msg_pl, *msg_en;
+>   	struct tls_rec *rec;
+> +	u32 tls_record_size_limit;
+>   	int required_size;
+>   	int num_async = 0;
+>   	bool full_record;
+> @@ -1045,6 +1046,9 @@ static int tls_sw_sendmsg_locked(struct sock *sk, struct msghdr *msg,
+>   		}
+>   	}
+>   
+> +	tls_record_size_limit = min_not_zero(tls_ctx->tls_record_size_limit,
+> +					     TLS_MAX_PAYLOAD_SIZE);
+> +
+>   	while (msg_data_left(msg)) {
+>   		if (sk->sk_err) {
+>   			ret = -sk->sk_err;
+> @@ -1066,7 +1070,7 @@ static int tls_sw_sendmsg_locked(struct sock *sk, struct msghdr *msg,
+>   		orig_size = msg_pl->sg.size;
+>   		full_record = false;
+>   		try_to_copy = msg_data_left(msg);
+> -		record_room = TLS_MAX_PAYLOAD_SIZE - msg_pl->sg.size;
+> +		record_room = tls_record_size_limit - msg_pl->sg.size;
+>   		if (try_to_copy >= record_room) {
+>   			try_to_copy = record_room;
+>   			full_record = true;
 
-vim +1495 net/xdp/xsk.c
+Otherwise:
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-48248366d9de2a Jason Xing         2025-08-11  1460  	case XDP_GENERIC_XMIT_BATCH:
-48248366d9de2a Jason Xing         2025-08-11  1461  	{
-48248366d9de2a Jason Xing         2025-08-11  1462  		unsigned int batch, batch_alloc_len;
-48248366d9de2a Jason Xing         2025-08-11  1463  		struct sk_buff **new;
-48248366d9de2a Jason Xing         2025-08-11  1464  
-48248366d9de2a Jason Xing         2025-08-11  1465  		if (optlen != sizeof(batch))
-48248366d9de2a Jason Xing         2025-08-11  1466  			return -EINVAL;
-48248366d9de2a Jason Xing         2025-08-11  1467  		if (copy_from_sockptr(&batch, optval, sizeof(batch)))
-48248366d9de2a Jason Xing         2025-08-11  1468  			return -EFAULT;
-48248366d9de2a Jason Xing         2025-08-11  1469  		if (batch > xs->max_tx_budget)
-48248366d9de2a Jason Xing         2025-08-11  1470  			return -EACCES;
-48248366d9de2a Jason Xing         2025-08-11  1471  
-48248366d9de2a Jason Xing         2025-08-11  1472  		mutex_lock(&xs->mutex);
-48248366d9de2a Jason Xing         2025-08-11  1473  		if (!batch) {
-48248366d9de2a Jason Xing         2025-08-11  1474  			kfree(xs->skb_batch);
-48248366d9de2a Jason Xing         2025-08-11  1475  			xs->generic_xmit_batch = 0;
-48248366d9de2a Jason Xing         2025-08-11  1476  			goto out;
-48248366d9de2a Jason Xing         2025-08-11  1477  		}
-48248366d9de2a Jason Xing         2025-08-11  1478  		batch_alloc_len = sizeof(struct sk_buff *) * batch;
-48248366d9de2a Jason Xing         2025-08-11  1479  		new = kmalloc(batch_alloc_len, GFP_KERNEL);
-48248366d9de2a Jason Xing         2025-08-11  1480  		if (!new)
-48248366d9de2a Jason Xing         2025-08-11  1481  			return -ENOMEM;
+Cheers,
 
-mutex_unlock(&xs->mutex); before returning
-
-48248366d9de2a Jason Xing         2025-08-11  1482  		if (xs->skb_batch)
-48248366d9de2a Jason Xing         2025-08-11  1483  			kfree(xs->skb_batch);
-48248366d9de2a Jason Xing         2025-08-11  1484  
-48248366d9de2a Jason Xing         2025-08-11  1485  		xs->skb_batch = new;
-48248366d9de2a Jason Xing         2025-08-11  1486  		xs->generic_xmit_batch = batch;
-48248366d9de2a Jason Xing         2025-08-11  1487  out:
-48248366d9de2a Jason Xing         2025-08-11  1488  		mutex_unlock(&xs->mutex);
-48248366d9de2a Jason Xing         2025-08-11  1489  		return 0;
-48248366d9de2a Jason Xing         2025-08-11  1490  	}
-c0c77d8fb787cf Björn Töpel        2018-05-02  1491  	default:
-c0c77d8fb787cf Björn Töpel        2018-05-02  1492  		break;
-c0c77d8fb787cf Björn Töpel        2018-05-02  1493  	}
-c0c77d8fb787cf Björn Töpel        2018-05-02  1494  
-c0c77d8fb787cf Björn Töpel        2018-05-02 @1495  	return -ENOPROTOOPT;
-c0c77d8fb787cf Björn Töpel        2018-05-02  1496  }
-
+Hannes
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
-
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 NÃ¼rnberg
+HRB 36809 (AG NÃ¼rnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
