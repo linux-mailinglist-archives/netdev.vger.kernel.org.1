@@ -1,140 +1,160 @@
-Return-Path: <netdev+bounces-214484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61375B29D3E
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 11:09:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19ECAB29D99
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 11:24:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78EE64E53AC
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 09:09:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 351DC2A316D
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 09:21:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7226230DECA;
-	Mon, 18 Aug 2025 09:08:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sO7VKKYX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C33730DEB0;
+	Mon, 18 Aug 2025 09:21:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488BE30DD13;
-	Mon, 18 Aug 2025 09:08:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8926C2C3246
+	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 09:21:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755508107; cv=none; b=TJoRfn4n7x/1jesCvVVFVAqAjexLZDd/MgTy8qAIekWd+/qXZebhMYnshB4hXuNJrOx1wJPIk17NityRW4SG0aEbF2KpwFGMTbpfDmAXePE2FCP+5WEI7gDKlya2PgQcGNV7IumHLrinb7vyMe+mo+Us0uoXz2TaW5zdoqrzodw=
+	t=1755508881; cv=none; b=loOVHCLEGfIq7XrVJxFDCDxbOJ6Nb5ANsN60DZL3uYcVHf+j5rJF14xT2j4bM4GcekDx4CruoN5UG1YZ9lQW9n1enhYwRtpamVnkhTtlbZ/J6ipmaUqGcGbZcRI8rucZdEdo8/7ENPbN5reGImAepCmitHLnSH6YiynAk8f9BBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755508107; c=relaxed/simple;
-	bh=sEjviTPRhYqGP5Y8/0bVLkQrZaSsat98TC4r3HprGO4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=uDLnAQtj6WRvI5hEx40z/1KjkNrP9nQ8Pr+jdOfLslBuOHaWXa1fhX489hTgJA3DAM5xZcxH+9WGta57RwStb3fsh32fsFZn3/5kqYDYhEOnB5MHTlr2mIkWNfx+vnF6w3jyKE2P4dluceBpPH1CkPyrRIfTI3mRuUpRavZ5FR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sO7VKKYX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66478C4CEEB;
-	Mon, 18 Aug 2025 09:08:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755508106;
-	bh=sEjviTPRhYqGP5Y8/0bVLkQrZaSsat98TC4r3HprGO4=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=sO7VKKYXEgCCrKA7UhDgHUhEK+pY+o0QLKoSaakjTSE47or7nlZ7vkHmIOyD1z5MK
-	 Ifiq1B2JEmdk6nz6W3JKevN+2elv+/dvaE5yKlDU5P/b/8TB63oteFyb94ofoU/ATJ
-	 R0ieqJOCS1Mh21BGGthR7gHX0UBoSSXyH113XdZ2pi8NpQseTvk/FyeZZ2Z+CO7x/h
-	 1XEzczjYhvn/uEYP/sZ61EMI+mKOVCrYhQr2GdUhgl5N51mrRdFTDgbktg8ZjgPeex
-	 Fkd7MtxKLibza9w7qxAxcLVk7neoj7sbV/Xiw3IPyyNGPFhady0B3PCmeYjmGsKPMk
-	 5mn4SpEDW1xpg==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Mon, 18 Aug 2025 11:07:34 +0200
-Subject: [PATCH nf-next v6 2/2] selftests: netfilter: nft_flowtable.sh: Add
- IPIP flowtable selftest
+	s=arc-20240116; t=1755508881; c=relaxed/simple;
+	bh=02EAHmb0JV+wP0FR+YB9py05X+SwMTPsln/83688kh8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PYjG40nmHf5BwESJRfTE78ic1OkSkgicVB0jnDLtitg0SwjLDqDVh/uBlXWhpFVgPdTYO9XRGcyw6wfEOKQ8TKfHpNtpLMQTkIP6U6Iawjj7vuXISGhvlaoM9FEktTTJySRRpve1FizJ6eUjQnFIB2XN4h2xE81RvGnzL32hxrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1unw2x-0005q1-Sd; Mon, 18 Aug 2025 11:20:55 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1unw2w-000sUD-13;
+	Mon, 18 Aug 2025 11:20:54 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1unw2w-001hUG-0d;
+	Mon, 18 Aug 2025 11:20:54 +0200
+Date: Mon, 18 Aug 2025 11:20:54 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Nishanth Menon <nm@ti.com>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com, linux-doc@vger.kernel.org,
+	Michal Kubecek <mkubecek@suse.cz>, Roan van Dijk <roan@protonic.nl>
+Subject: Re: [PATCH net-next v2 5/5] net: phy: dp83td510: add MSE interface
+ support for 10BASE-T1L
+Message-ID: <aKLwdrqn-_9KqMaA@pengutronix.de>
+References: <20250815063509.743796-1-o.rempel@pengutronix.de>
+ <20250815063509.743796-6-o.rempel@pengutronix.de>
+ <1df-68a2e100-1-20bf1840@149731379>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250818-nf-flowtable-ipip-v6-2-eda90442739c@kernel.org>
-References: <20250818-nf-flowtable-ipip-v6-0-eda90442739c@kernel.org>
-In-Reply-To: <20250818-nf-flowtable-ipip-v6-0-eda90442739c@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>, 
- David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Pablo Neira Ayuso <pablo@netfilter.org>, 
- Jozsef Kadlecsik <kadlec@netfilter.org>, Shuah Khan <shuah@kernel.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org, 
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
- linux-kselftest@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1df-68a2e100-1-20bf1840@149731379>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Introduce specific selftest for IPIP flowtable SW acceleration in
-nft_flowtable.sh
+Hi Maxime,
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- .../selftests/net/netfilter/nft_flowtable.sh       | 40 ++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
+On Mon, Aug 18, 2025 at 10:15:56AM +0200, Maxime Chevallier wrote:
+> Hi Oleksij,
+> 
+> On Friday, August 15, 2025 08:35 CEST, Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+> 
+> > Implement get_mse_config() and get_mse_snapshot() for the DP83TD510E
+> > to expose its Mean Square Error (MSE) register via the new PHY MSE
+> > UAPI.
+> > 
+> > The DP83TD510E does not document any peak MSE values; it only exposes
+> > a single average MSE register used internally to derive SQI. This
+> > implementation therefore advertises only PHY_MSE_CAP_AVG, along with
+> > LINK and channel-A selectors. Scaling is fixed to 0xFFFF, and the
+> > refresh interval/number of symbols are estimated from 10BASE-T1L
+> > symbol rate (7.5 MBd) and typical diagnostic intervals (~1 ms).
+> > 
+> > For 10BASE-T1L deployments, SQI is a reliable indicator of link
+> > modulation quality once the link is established, but it does not
+> > indicate whether autonegotiation pulses will be correctly received
+> > in marginal conditions. MSE provides a direct measurement of slicer
+> > error rate that can be used to evaluate if autonegotiation is likely
+> > to succeed under a given cable length and condition. In practice,
+> > testing such scenarios often requires forcing a fixed-link setup to
+> > isolate MSE behaviour from the autonegotiation process.
+> > 
+> > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> 
+> [...]
+> 
+> > +static int dp83td510_get_mse_snapshot(struct phy_device *phydev, u32 channel,
+> > +				      struct phy_mse_snapshot *snapshot)
+> > +{
+> > +	int ret;
+> > +
+> > +	if (channel != PHY_MSE_CHANNEL_LINK &&
+> > +	    channel != PHY_MSE_CHANNEL_A)
+> > +		return -EOPNOTSUPP;
+> 
+> The doc in patch 1 says :
+> 
+>   > + * Link-wide mode:
+>   > + *  - Some PHYs only expose a link-wide aggregate MSE, or cannot map their
+>   > + *    measurement to a specific channel/pair (e.g. 100BASE-TX when MDI/MDI-X
+>   > + *    resolution is unknown). In that case, callers must use the LINK selector.
+> 
+> The way I understand that is that PHYs will report either channel-specific values or
+> link-wide values. Is that correct or are both valid ? In BaseT1 this is the same thing,
+> but maybe for consistency, we should report either channel values or link-wide values ?
 
-diff --git a/tools/testing/selftests/net/netfilter/nft_flowtable.sh b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
-index a4ee5496f2a17cedf1ee71214397012c7906650f..d1c9d3eeda2c9874008f9d6de6cabaabea79b9fb 100755
---- a/tools/testing/selftests/net/netfilter/nft_flowtable.sh
-+++ b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
-@@ -519,6 +519,44 @@ if ! test_tcp_forwarding_nat "$ns1" "$ns2" 1 ""; then
- 	ip netns exec "$nsr1" nft list ruleset
- fi
- 
-+# IPIP tunnel test:
-+# Add IPIP tunnel interfaces and check flowtable acceleration.
-+test_ipip() {
-+if ! ip -net "$nsr1" link add name tun0 type ipip \
-+     local 192.168.10.1 remote 192.168.10.2 >/dev/null;then
-+	echo "SKIP: could not add ipip tunnel"
-+	[ "$ret" -eq 0 ] && ret=$ksft_skip
-+	return
-+fi
-+ip -net "$nsr1" link set tun0 up
-+ip -net "$nsr1" addr add 192.168.100.1/24 dev tun0
-+ip netns exec "$nsr1" sysctl net.ipv4.conf.tun0.forwarding=1 > /dev/null
-+
-+ip -net "$nsr2" link add name tun0 type ipip local 192.168.10.2 remote 192.168.10.1
-+ip -net "$nsr2" link set tun0 up
-+ip -net "$nsr2" addr add 192.168.100.2/24 dev tun0
-+ip netns exec "$nsr2" sysctl net.ipv4.conf.tun0.forwarding=1 > /dev/null
-+
-+ip -net "$nsr1" route change default via 192.168.100.2
-+ip -net "$nsr2" route change default via 192.168.100.1
-+ip -net "$ns2" route add default via 10.0.2.1
-+
-+ip netns exec "$nsr1" nft -a insert rule inet filter forward 'meta oif tun0 accept'
-+ip netns exec "$nsr1" nft -a insert rule inet filter forward \
-+	'meta oif "veth0" tcp sport 12345 ct mark set 1 flow add @f1 counter name routed_repl accept'
-+
-+if ! test_tcp_forwarding_nat "$ns1" "$ns2" 1 "IPIP tunnel"; then
-+	echo "FAIL: flow offload for ns1/ns2 with IPIP tunnel" 1>&2
-+	ip netns exec "$nsr1" nft list ruleset
-+	ret=1
-+fi
-+
-+# Restore the previous configuration
-+ip -net "$nsr1" route change default via 192.168.10.2
-+ip -net "$nsr2" route change default via 192.168.10.1
-+ip -net "$ns2" route del default via 10.0.2.1
-+}
-+
- # Another test:
- # Add bridge interface br0 to Router1, with NAT enabled.
- test_bridge() {
-@@ -604,6 +642,8 @@ ip -net "$nsr1" addr add dead:1::1/64 dev veth0 nodad
- ip -net "$nsr1" link set up dev veth0
- }
- 
-+test_ipip
-+
- test_bridge
- 
- KEY_SHA="0x"$(ps -af | sha1sum | cut -d " " -f 1)
+for 100Base-T1 the LINK and channel-A selectors are effectively the
+same, since the PHY only has a single channel. In this case both are
+valid, and the driver will return the same answer for either request.
 
+I decided to expose both for consistency:
+- on one side, the driver already reports pair_A information for the
+  cable test, so it makes sense to allow channel-A here as well;
+- on the other side, if a caller such as a generic link-status/health
+  request asks for LINK, we can also provide that without special
+  casing.
+
+So the driver just answers what it can. For this PHY, LINK and
+channel-A map to the same hardware register, and all other selectors
+return -EOPNOTSUPP.
+
+Best regards,
+Oleksij
 -- 
-2.50.1
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
