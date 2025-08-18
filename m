@@ -1,130 +1,112 @@
-Return-Path: <netdev+bounces-214722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3843FB2B062
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 20:29:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90462B2B094
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 20:36:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD4031B60A5C
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 18:29:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7017A6841E4
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 18:36:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E90A3314C4;
-	Mon, 18 Aug 2025 18:29:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F398724503F;
+	Mon, 18 Aug 2025 18:36:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=free.fr header.i=@free.fr header.b="J+c4rNOs"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gEO4tuua"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp4-g21.free.fr (smtp4-g21.free.fr [212.27.42.4])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70C8125484D;
-	Mon, 18 Aug 2025 18:29:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.27.42.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0279223DEE
+	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 18:36:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755541751; cv=none; b=Kx6Ck3f7I4Y1lgIKVIsCFQTch6Sk3ZuOiGN2Nq2o6qMf0/2JZu/u1HVauvkTmOA3WOY1QTqQ/a3iv5K1VGZUS0finjWLxKrFzp3+DeKRsF3uDy8940Nqzke0+N8KdbvdYySQUZqQtQCuAvDIwXaXBcWmAOJQaSrwdK2tNQAflX4=
+	t=1755542208; cv=none; b=by0YKtckrNtFPpEzbaPNv18tcEgr/K2rmxvx7QHmLHSSBiQBKqIAnVntzZnRMFvQEmumSnQfuh24awfjdYh90VB3qdnIA3CQBfZBTu71Xz1X3FiHDHTKT6EjZi7XZMiubbls5wXxAlf2RDZyoZVXwLYRMyM2/M3amxOArB5+Rtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755541751; c=relaxed/simple;
-	bh=ED8kNp1rWnbnKy7zRbhLyJo7VD7cKdhxeAEQmHCZhKQ=;
+	s=arc-20240116; t=1755542208; c=relaxed/simple;
+	bh=VFTAGHUcOhCsVCHbgqwMOmNRPxnfj8LmI2zeZpIYYZU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LD22FzuIHFIH5ZQ7DSOi2jAIrr02a+wNYBHBmWaS3KqZVhwCb1Djbxs78Yrd2TxP8fctVyVH7Jg5zu9eSTeNxYqxCWOWIbvQx/0JGqBrBMUlp34b39K3ydR42Fht44x5x2m53VAnqXGD6Dym8tui3yOlgG9NV5x24TUzfMM+5H8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=free.fr; spf=pass smtp.mailfrom=free.fr; dkim=pass (2048-bit key) header.d=free.fr header.i=@free.fr header.b=J+c4rNOs; arc=none smtp.client-ip=212.27.42.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=free.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=free.fr
-Received: from [44.168.19.11] (unknown [86.195.82.193])
-	(Authenticated sender: f6bvp@free.fr)
-	by smtp4-g21.free.fr (Postfix) with ESMTPSA id 3B07119F5C2;
-	Mon, 18 Aug 2025 20:29:01 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=free.fr;
-	s=smtp-20201208; t=1755541746;
-	bh=ED8kNp1rWnbnKy7zRbhLyJo7VD7cKdhxeAEQmHCZhKQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=J+c4rNOs7PBuqxajWhTiyTCWKJg2ePL02OYEw5IHBFL0pHBuG5F6KF7HppqL2HQ0o
-	 oQYSGrDXKIRDS9cGLnOmDiC3LpSuqydIykNQ61KJ1OyvBQP0upeO4VQ72UsRhfTiIZ
-	 ulz8r6xTlIJQ19VIvJ4csO/7Z3CQeiS/i7OfZxDSvp8Of3M/nUZIB/Y10AEnagMr5K
-	 QN/fWilkYbkjRsLST9HNU7hj04BLsvej5XCerq532DDtWMuRGp8vA68UiO+Q+Zby4O
-	 CsrDRr50VOT08muQxvRJhjH3HJpYoTVtQaEBuynh/F8QvvY31G8bgyUh3umO5NyBM+
-	 ob1cHpZ/NIW2w==
-Message-ID: <11212ddf-bf32-4b11-afee-e234cdee5938@free.fr>
-Date: Mon, 18 Aug 2025 20:28:59 +0200
+	 In-Reply-To:Content-Type; b=gZn84IgIRPE4B12N8Q1aRBAki+wkIbOZ2bl+kiKsrbA3o4pGQOk0GUqev8cUWzu8jeCA8p/zozM13ITH6wTIInqgqEAj4uLWHAS9dBrlii74EDNLNFK+i13fIBBRnlzabGlarYFVBRAhm4xkR1aR39Muv6dO+VYsPpegJN5Ncxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gEO4tuua; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <cab8df87-46fc-49f4-be1d-a55585587e61@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1755542204;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YEleciuqCzDP1u7gctFkcDKDnO/+TN1KeFYy+R1jcs0=;
+	b=gEO4tuua+R3qWKY7ae9B34t7MxPPMhZhAhTH88tS8smrXk0vsQoY18b7cdkNGb7wp5ywpu
+	2ijpvi/fRAFYTVHfQWmNV8+5fo9gDY8h8EYE5KqqCf0X/fzenRAdz5YSYOOr50s1qSh449
+	18YHT00stMsUcbE8itf5NUgvjm1SD68=
+Date: Mon, 18 Aug 2025 19:35:57 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [ROSE] [AX25] 6.15.10 long term stable kernel oops
-To: Dan Cross <crossd@gmail.com>, Bernard Pidoux <bernard.pidoux@free.fr>
-Cc: David Ranch <dranch@trinnet.net>, linux-hams@vger.kernel.org,
- netdev <netdev@vger.kernel.org>
-References: <11c5701d-4bf9-4661-ad8a-06690bbe1c1c@free.fr>
- <fff0b3eb-ea42-4475-970d-30622dc25dca@free.fr>
- <e92e23a7-1503-454f-a7a2-cedab6e55fe2@free.fr>
- <acd04154-25a5-4721-a62b-36827a6e4e47@free.fr>
- <CAEoi9W6kb0jZXY_Tu27CU7jkyx5O1ne5FOgvYqCk_GFBvnseiw@mail.gmail.com>
+Subject: Re: [RFC PATCH v5] ethtool: add FEC bins histogramm report
+To: Carolina Jubran <cjubran@nvidia.com>, Andrew Lunn <andrew@lunn.ch>,
+ Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Gal Pressman <gal@nvidia.com>, intel-wired-lan@lists.osuosl.org,
+ Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org
+References: <20250815132729.2251597-1-vadfed@meta.com>
+ <5b8da3d8-f24c-43d8-9d82-0bcc257e1dac@nvidia.com>
 Content-Language: en-US
-From: F6BVP <f6bvp@free.fr>
-In-Reply-To: <CAEoi9W6kb0jZXY_Tu27CU7jkyx5O1ne5FOgvYqCk_GFBvnseiw@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <5b8da3d8-f24c-43d8-9d82-0bcc257e1dac@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi Dan,
-
-I agree that it must be the same bug and mkiss module is involved in 
-both cases although the environment is quite different.
-I am using ROSE/FPAC nodes on different machines for AX25 messages 
-routing with LinFBB BBS.
-Nowadays I do not have radio anymore and all are interconnected via 
-Internet using IP over AX25 encapsulation with ax25ipd (UDP ports).
-
-I am running two RaspBerry Pi 3B+ with RaspiOS 64Bit and kernel 6.12.14.
-AX25 configuration is performed via kissattach to create ax0 device.
-ROSE / FPAC suite of applications manage ROSE, NetRom and AX25 protocols 
-for communications. FBB BBS forwards via rose0 port and TCP port 23 
-(telnet).
-
-I do not observe any issue on those RasPiOS systems.
-
-Another mini PC with Ubuntu 24-04 LTS and kernel 6-14.0-27-generic is 
-configured identiquely with FPAC/ROSE node and have absolutely no issues 
-with mkiss, ROSE or NetRom.
-
-A few years ago I had been quite active on debugging ROSE module. As I 
-wanted to restart AX25 debugging I installed Linux-6.15.10 stable 
-kernel. This was the beginning of my kernel panic hunting...
-
-My strategy is to find the most recent kernel that do not have any issue 
-with mkiss and progressively add AX25 patches in order to find the 
-guilty instruction. I will use a buch of printk in order to localize the 
-wrong code. We will see if it works.
-
-Bernard
-f6bvp / ai7bg
-
-
-Le 18/08/2025 à 18:30, Dan Cross a écrit :
-> On Mon, Aug 18, 2025 at 6:02 AM Bernard Pidoux <bernard.pidoux@free.fr> wrote:
->> Hi,
->>
->> I captured a screen picture of kernel panic in linux-6.16.0 that
->> displays [mkiss]. See included picture.
+On 18/08/2025 19:17, Carolina Jubran wrote:
 > 
-> Hi Bernard,
 > 
->      This is the same issue that I and a few other folks have run into.
-> Please see the analysis in
-> https://lore.kernel.org/linux-hams/CAEoi9W4FGoEv+2FUKs7zc=XoLuwhhLY8f8t_xQ6MgTJyzQPxXA@mail.gmail.com/#R
+> On 15/08/2025 16:27, Vadim Fedorenko wrote:
+>> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+>> index de5bd76a400ca..6c0dc6ae080a8 100644
+>> --- a/include/linux/ethtool.h
+>> +++ b/include/linux/ethtool.h
+>> @@ -492,7 +492,25 @@ struct ethtool_pause_stats {
+>>   };
+>>   #define ETHTOOL_MAX_LANES    8
+>> +#define ETHTOOL_FEC_HIST_MAX    18
 > 
->      There, I traced the issue far enough to see that it comes from
-> `sbk->dev` being NULL on these connections. I haven't had time to look
-> further into why that is, or what changed that made that the case. I
-> now think that this occurs on the _first_ of the two loops I
-> mentioned, not the second, however.
-> 
->          - Dan C.
-> 
-> (Aside: I'm pretty sure that `linux-hams@vger.kernel.org` is not a
-> Debian-specific list.)
+> Could you clarify why it is set to 18?
+> AFAIU IEEE 802.3ck/df define 16 bins.
 
+Yeah, the standard defines 16 bins, but this value came out of the
+discussion with Gal and Yael because the hardware supports more bins,
+I believe, in RDMA mode
+
+>> diff --git a/net/ethtool/fec.c b/net/ethtool/fec.c
+>> index e7d3f2c352a34..9313bd17544fd 100644
+>> --- a/net/ethtool/fec.c
+>> +++ b/net/ethtool/fec.c
+>> @@ -17,6 +17,7 @@ struct fec_reply_data {
+>>           u64 stats[1 + ETHTOOL_MAX_LANES];
+>>           u8 cnt;
+>>       } corr, uncorr, corr_bits;
+>> +    struct ethtool_fec_hist fec_stat_hist;
+>>   };
+>>   #define FEC_REPDATA(__reply_base) \
+>> @@ -113,7 +114,11 @@ static int fec_prepare_data(const struct 
+>> ethnl_req_info *req_base,
+>>           struct ethtool_fec_stats stats;
+>>           ethtool_stats_init((u64 *)&stats, sizeof(stats) / 8);
+>> -        dev->ethtool_ops->get_fec_stats(dev, &stats);
+>> +        ethtool_stats_init((u64 *)data->fec_stat_hist.values,
+>> +                   ETHTOOL_MAX_LANES *
+> this should be ETHTOOL_FEC_HIST_MAX since we’re initializing the 
+> histogram bins array.
+
+Yes, you're right, I'll change it in the next version
 
