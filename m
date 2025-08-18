@@ -1,140 +1,138 @@
-Return-Path: <netdev+bounces-214437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B8F3B29734
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 05:05:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F989B297A6
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 06:07:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D4BF179FED
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 03:05:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2DCD5196175A
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 04:07:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7583825C83A;
-	Mon, 18 Aug 2025 03:05:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9D46253358;
+	Mon, 18 Aug 2025 04:07:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ugfqU9y4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DeElftOw"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 886338632B;
-	Mon, 18 Aug 2025 03:04:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D05D2066DE;
+	Mon, 18 Aug 2025 04:07:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755486301; cv=none; b=JTJwSmNiU2BV5gg5I1aSQ9Il44rd0d3r7mIYVtYqDoaIMDCsjppIhEiWtlBJeXkqMdrwUR1Yg7GUIJ6yuvTupIGZxr3SU2YmXjRPrKwKG5+4C9wuFM9lglOYKdg0KGxDoT+t0Nxu1PlxjI2MoqCVuoyayHNxVYAGRzxQq6yLfCc=
+	t=1755490038; cv=none; b=LFFMZcJvv9/DlfD+nxNNIcIld1TqyNMoyp84Ls8D9R989UtOxGCiUlkj/yW0cjoi1MIw6jDeD3ZBDUrTUa4BHIzUfeReu/hgusRvYWDTZ81ydIevpFj81lyd/orQDhkGSJAAjlOa4JW2boAlADMxf4twwifTdCPk4mEjE/0nIFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755486301; c=relaxed/simple;
-	bh=xdRMAMoq82aAoif+H8/uL/q+IfDYG2rUsVWlxkx6Nc8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Mqg609WEkuP0xhGguXxd08FKVUuSqbcLUN/dXBlHdSPnpL3XzfhRebXoWy/seWTBIcHfz3VtWJJVZopbkG2WJh1hZ9PMTTkMnM/+94el0nXrBjPBBvruDgG+NLv570q+2KfTrihf+v4yX6NdLl5Ynl7JbJS189fE/eTPo/wzOFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ugfqU9y4; arc=none smtp.client-ip=115.124.30.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1755486288; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=Mr+DysRN3u5GqzLBeBZ3tOHHcVWUSvBBgIRpmmSePag=;
-	b=ugfqU9y4O4sp4ZGkR6du+XU+koRcdVXHkwZQOpSL7D+qQVRamE/QdV/L1kxSShy4z3GJofH00sbRp2uL4IfpyEEjGHbz2Lg0fHALIEp5awfPod1le5xXXGddJOIgwXZ3lM75oXwKOIvJV4DKk4dQFFk+8HZLWS64zzwfyKMhjaY=
-Received: from 30.221.128.156(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0Wlv1kXR_1755486287 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 18 Aug 2025 11:04:47 +0800
-Message-ID: <c00a30af-89b2-400c-8026-8a987be3e3dd@linux.alibaba.com>
-Date: Mon, 18 Aug 2025 11:04:46 +0800
+	s=arc-20240116; t=1755490038; c=relaxed/simple;
+	bh=LOjGr0k6lPWAispc913v37U+CI3AYwRBBOjnvBxj2bY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b0IdwGEulvrGhUwkQZQgTw6tseicIZsAtASuIB9/6Fi2iQNDJhZGitFEULxOBOjQK8ZGQOixCuc1wDMDOpUkPUb37/NNJOlfxuXe8DRg5C3F9KtO5P8+YlyJGN8stY4TkAMBXlpj5DntwSL6T7jZkUpppbR5PVePZ6hvvoczEJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DeElftOw; arc=none smtp.client-ip=209.85.215.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-b4716f46a2eso2586498a12.0;
+        Sun, 17 Aug 2025 21:07:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755490035; x=1756094835; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ucfQ81oUXPxEN6AJzwDksw5cG3XZNnlJdQFbAGkVa/4=;
+        b=DeElftOwvBZFqfM9+Ef1U6MwKOnzi3Xwf4CJVUuras8XcTDwn1nEp6WSCwOO035irK
+         efYQDElHXWJ7fPeMFf7/fpBCYZkjlwrLcR5IgA54p+rUxYZfuKXL9fPR/YLwnYmxh8rw
+         fmnHIIKEONbfD10HxJLhZOu566nip9/o+MImq/iI5Ca5turN86w07VwzguQGM2oYj0UP
+         KzNViY9umDO0+auCDVvhu8cwo2isFgneUsTLjXMr9/QJPHebXbkeSIWxYHIq/JlSt1JB
+         RIvOAl1XZ5lmPW+AyrC5yZsTvqN96Y5Ok22XfnLfkVGdkZXo696bvM1LY7MnHVGeBFux
+         g+Zw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755490035; x=1756094835;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ucfQ81oUXPxEN6AJzwDksw5cG3XZNnlJdQFbAGkVa/4=;
+        b=hKIWOFnVzMbLbmIJZw8aAo0j2iXlOiwm8cz6/PqGlmXC9+WkO3N7bmV+ejp3kOp0xe
+         PDAKd8JIir3xCp6LkCtpqHGwdosJve6hKhhvh0RUT5G0FYAi1IZZwb2HUDwHfe48WYND
+         QUzE7t7yeXlthx/3KxVGYnOxzvt5WQB9/6jmmzK0l3lXW/zZYvk3gz7TjvIzHhzQeGXn
+         GCXCCMCymrXTGS8ByJs6+Huleb1g6tNWWUN/I7WaIdbGBpehiuCz4qdIed98mSS3LP1Q
+         dL8Q/I2DDCU2Kqwh3aQ0wIDVDh6cCX/b41XhrivxqFNCzCykZ2SOuprt7MrP1gwyfVS9
+         /Udw==
+X-Forwarded-Encrypted: i=1; AJvYcCW4KFFjkfdykxtnjjC9OXuPf2pRVmNehOKlMxBV9CHpiLlhVi/cKzAOK9aTv6fBrVM+xqEMYOsGxj5mnhAb9h8S@vger.kernel.org, AJvYcCWZkxRhxf9kopsunLfz17f+HSVcJBDUxdn3jGXhflceDa2RqxX6RoBYvDLFlx2AibgbLfS4UpxZmXo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9OxYuuNV+epfHvonqXpPq8n5mGe1AsI+3hPpXiCTzk1T8XysU
+	jvuoNtTGpRQ8o7MxZZMCZJhIBi1pTRJBJ/dLIfjmcfMdiiPeaWlz0nDc
+X-Gm-Gg: ASbGncsN2ziUiZiKBj827HPXPsDTxlltOFwCXHRUM18crUsAXVUmxWqK+icvKEMzYQb
+	j3Qo+4x4Pfan1a9cX4qyzAvTTErUVQNSh7r8uwsTz3ByRQ4NHwA8b9U9GTl7AuKRMTFTCo77NFv
+	2NgKNJegdrdiil6PUCu5liaSOnEwz2xaDUrK1C3QCiTdaoADp9grOhYF/Th8V2kUjjcA3g+SicD
+	ohmliCJ0CtoaMAlIlJvR8F9r1/wEbLSmLK/2s8amDwv0mxzn3iyCAny/LbLN34Xgi/Jj7uIQUCy
+	cB8aQTZur5OnJYepnxfJOgy/TrrUbdbXr7vh4jK8FQVftEUT0AYBI6wrodFBaxfeEhEtCLgUrdr
+	owCtEoUn69fa6FL9HVfZfW8vFX6Q=
+X-Google-Smtp-Source: AGHT+IEKls5ZdCIHhgHQ3RswM5+V7giYpMPlNAwmSuqeK09rDBQ2PncT5vbWcyW970yU0rKxTWKt6w==
+X-Received: by 2002:a17:903:3d06:b0:243:e324:a36d with SMTP id d9443c01a7336-2446d749c0bmr127503975ad.23.1755490035252;
+        Sun, 17 Aug 2025 21:07:15 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-32330fc3684sm9864596a91.11.2025.08.17.21.07.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 Aug 2025 21:07:14 -0700 (PDT)
+Date: Mon, 18 Aug 2025 04:07:06 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jay Vosburgh <jv@jvosburgh.net>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>, Petr Machata <petrm@nvidia.com>,
+	Amit Cohen <amcohen@nvidia.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	David Ahern <dsahern@gmail.com>, linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCHv2 net-next 2/3] bonding: support aggregator selection
+ based on port priority
+Message-ID: <aKKm6mgrmmFzoVlU@fedora>
+References: <20250814104256.18372-1-liuhangbin@gmail.com>
+ <20250814104256.18372-3-liuhangbin@gmail.com>
+ <1109153.1755380673@famine>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4] ptp: add Alibaba CIPU PTP clock driver
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>, richardcochran@gmail.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, xuanzhuo@linux.alibaba.com, dust.li@linux.alibaba.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Thomas Gleixner <tglx@linutronix.de>, David Woodhouse <dwmw2@infradead.org>
-References: <20250812115321.9179-1-guwen@linux.alibaba.com>
- <20250815113814.5e135318@kernel.org>
- <2a98165b-a353-405d-83e0-ffbca1d41340@linux.alibaba.com>
- <729dee1e-3c8c-40c5-b705-01691e3d85d7@lunn.ch>
- <6a467d85-b524-4962-a3f4-bb2dab157ed7@linux.alibaba.com>
- <616e3d48-b449-401c-8c8b-501fce66c59d@lunn.ch>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <616e3d48-b449-401c-8c8b-501fce66c59d@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1109153.1755380673@famine>
 
-
-
-On 2025/8/17 23:56, Andrew Lunn wrote:
-> On Sun, Aug 17, 2025 at 11:01:23AM +0800, Wen Gu wrote:
->>
->>
->> On 2025/8/16 23:37, Andrew Lunn wrote:
->>>> These sysfs are intended to provide diagnostics and informations.
->>>
->>> Maybe they should be in debugfs if they are just diagnostics? You then
->>> don't need to document them, because they are not ABI.
->>>
->>> 	Andrew
->>
->> Hi Andrew,
->>
->> Thank you for the suggestion.
->>
->> But these sysfs aren't only for developer debugging, some cloud components
->> rely on the statistics to assess the health of PTP clocks or to perform
->> corresponding actions based on the reg values. So I prefer to use the stable
->> sysfs.
+On Sat, Aug 16, 2025 at 02:44:33PM -0700, Jay Vosburgh wrote:
+> >diff --git a/Documentation/networking/bonding.rst b/Documentation/networking/bonding.rst
+> >index 874d8a4681ec..151c964562db 100644
+> >--- a/Documentation/networking/bonding.rst
+> >+++ b/Documentation/networking/bonding.rst
+> >@@ -250,7 +250,14 @@ ad_select
+> > 		ports (slaves).  Reselection occurs as described under the
+> > 		"bandwidth" setting, above.
+> > 
+> >-	The bandwidth and count selection policies permit failover of
+> >+	prio or 3
+> >+
+> >+		The active aggregator is chosen by the highest total sum of
+> >+		actor port priorities across its active ports. Note this
+> >+		priority is ad_actor_port_prio, not per port prio, which is
+> >+		used for primary reselect.
+> >+
+> >+	The bandwidth, count and prio selection policies permit failover of
 > 
-> Doesn't this somewhat contradict what you said earlier:
+> 	Needing to have a caveat here makes me think we should instead
+> change the nomenclature.  Perhaps "lacp_port_prio"?  The standard hasn't
+> had "ad" in its name for 20-ish years, so I don't think we should use
+> "ad" in user facing options, and common usage these days is to just call
+> it "lacp."
 > 
->     These sysfs are intended to provide diagnostics and informations.
->     For users, interacting with this PTP clock works the same way as with other
->     PTP clock, through the exposed chardev.
-> 
-> So users don't use just the standard chardev, they additionally need
-> sysfs.
+> 	Simiarly, I don't think we need "ad" in the option name, either;
+> the standard just calls it "actor_port_priority", is there a good reason
 
-No, they are not contradictory.
+Sure, no problem on my side. I will update the option name.
 
-For cloud users, they only need to use standard ptp chardev exposed to do time
-operations. This is no different from using any other PTP clock.
-
-The sysfs are used by Alibaba cloud's components that monitor the health and behavior
-of the underlay device to ensure SLAs.
-
-> 
-> Maybe take a step back. Do what Jakub suggested:
-> 
->     Maybe it's just me, but in general I really wish someone stepped up
->     and created a separate subsystem for all these cloud / vm clocks.
->     They have nothing to do with PTP. In my mind PTP clocks are simple
->     HW tickers on which we build all the time related stuff. While this
->     driver reports the base year for the epoch and leap second status
->     via sysfs.
-> 
-> Talk with the other cloud vendors and define a common set of
-> properties, rather than each vendor having their own incompatible set.
-> 
-> OS 101: the OS is supposed to abstract over the hardware to make
-> different hardware all look the same.
-
-IMHO, the abstraction has been done by PTP layer, e.g. struct ptp_clock_info,
-struct ptp_clock and ptp_clock_{un}register(). For users, the PTP clock provide by
-any vendors should be same in terms of usage, Alibaba Cloud is no exception.
-
-But the specific implementation of underlay varies from ventor to ventor. Some depends
-on ptp4l and NIC with IEEE 1588, some offload 1588 work to underlay infra and get
-timestamps directly. I think it is difficult to require all vendors to provide the same
-underlying attributes. Besides, Even the underlying implementation and properties are
-different, it does not affect the user's use of them and the abstraction as PTP clocks.
-
-Thanks!
-
-> 
-> 	Andrew
-
+Regards
+Hangbin
 
