@@ -1,99 +1,143 @@
-Return-Path: <netdev+bounces-214424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 950C5B295DB
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 02:34:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A3E11B295E0
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 02:41:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40DC11966340
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 00:34:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B61CA1899EE8
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 00:41:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D45508632B;
-	Mon, 18 Aug 2025 00:34:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAFED200113;
+	Mon, 18 Aug 2025 00:41:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="KMVqDQpo"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="lP7VPkca"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80E6F26AE4;
-	Mon, 18 Aug 2025 00:33:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 341E519007D;
+	Mon, 18 Aug 2025 00:41:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755477240; cv=none; b=CHXeku06Z9m1+2yZnu56pssihIK2CPZd28k6dUyDUpNKOKI38tUHbAxQOykXGuo3bf286hOFXjjexdH5rwTfEzfvlYZguD/BhtTPu12h8qQvv2jBwe9X2VLsb2fkHBeVkwF4jYgYiLFSklKU3ARUok9yy+BRHOBccDqTsWkjQIE=
+	t=1755477684; cv=none; b=Q0jFuJpXzbncfbncKYI0qJ3R78w1IleLqqRs1qQAT4G2coXDyEzVzyZHDwQ47+pjRzXKptOcgtblZ2DcGRkC9JlHy0BtLrKtZ2SQlIdYNRC9ijLWwe+BI8bZceb3OLiCwCGDdqQsqRYj1rfoELOS88rMzlYLN8pFl7Qgo/1Pj3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755477240; c=relaxed/simple;
-	bh=i7v+jmozaxU/yN8mCTMzUUNms7yFfLWNhtUZ5EWwTHA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=LITkXB05NS3uF3sKib7x3knPVxd/osHTc7dw//qoggaIYhEQa+7ofWOnJt769shOz3r0U5PFrjZX88BQNTs47/MTgCXgNFf3AReWFY0zqcBodwuS/0RXvOSVYNswrpEQjz6OvC8yz/C81bKNLMag2kh7M+rUrCwKdaRCNa+cEFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=KMVqDQpo; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1755477229;
-	bh=i7v+jmozaxU/yN8mCTMzUUNms7yFfLWNhtUZ5EWwTHA=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=KMVqDQpoCODoqrUuUj0+iVX3ndJEWIG7ImLxce1cAfbEA+K2YAaf3yNeSI8nA98U1
-	 UWLXcbtXn3KRnW2psD6o48g8Ox3VodOmQJ5YcH7kOjiVezF4P382KAjqXGJvjaH0XE
-	 7T3XWXxBKU6UX9+YO9fw99RcpZaqMEwut1HuOE+OidjxMgHwh/uQ4v8yPMTT7BXnSh
-	 qmZOndUXEXmFc1liVy779c3OH2y+7LG4BI3rks7O4yPCFK1ZzMcfPLw+/HfMzfTDLn
-	 aS1kmGQQOz7UBx7Qua4minFBs55T9l+a516vMcKKDiPCfxYR2kljunuGnVuvLGRSYR
-	 vqqGZ5mcSkolw==
-Received: from pecola.lan (unknown [159.196.93.152])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 4E12E69374;
-	Mon, 18 Aug 2025 08:33:48 +0800 (AWST)
-Message-ID: <d6b7d0c82806ef41bc7ee7173595d334acbf3b17.camel@codeconstruct.com.au>
-Subject: Re: [PATCH v24 1/1] mctp pcc: Implement MCTP over PCC Transport
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: Adam Young <admiyo@amperemail.onmicrosoft.com>, 
- admiyo@os.amperecomputing.com, Matt Johnston <matt@codeconstruct.com.au>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Sudeep Holla
-	 <sudeep.holla@arm.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
-	Huisong Li <lihuisong@huawei.com>
-Date: Mon, 18 Aug 2025 08:33:48 +0800
-In-Reply-To: <5a061bbd-637b-41c1-a6a7-5a14e479e572@amperemail.onmicrosoft.com>
-References: <20250811153804.96850-1-admiyo@os.amperecomputing.com>
-	 <20250811153804.96850-2-admiyo@os.amperecomputing.com>
-	 <42643918b686206c97076cf9fd2f02718e85b108.camel@codeconstruct.com.au>
-	 <5a061bbd-637b-41c1-a6a7-5a14e479e572@amperemail.onmicrosoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+	s=arc-20240116; t=1755477684; c=relaxed/simple;
+	bh=c8+vX9iptbgSJl7LtoJBbh9yXc7ukDN487S4T12tm2U=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=L0p574Y1CQaLGgG6LZ+B/nFxou20kPkai3HdfMhWVa19z7zG3XoyAfCMzmds2MIh5RruI8PGR+dTFOsO4XcScvo4cCCRNkXxNRm4IwLUEeI5HRIj2/CzgyqHYppylBT2JWh5vlonTKAEiFzySui1YeiNpR8UEK26AKN9YtvkgMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=lP7VPkca; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1755477679;
+	bh=IA0+eMTpU8+MmsbQPkf+dVYaIYFwn7RtdftIMQD/0Zk=;
+	h=Date:From:To:Cc:Subject:From;
+	b=lP7VPkcamm68bG/GLPKkzee1IBPj9yfg+th+5A2T9uUgGpIwqTvSF1y7YH8ZzqYpn
+	 J4eC/KJR2NTGra1BRpHAREzp15Bl4tUFlEvELhcUCImPUeYJr13Jl6LeZ05gsM6tma
+	 gN5ahP7DTBfXAXGhflGGQzT2XxzDsfPIR5mpbnPRDxlV82Cf4kxE8T6WyxZ7yjF33g
+	 XvnPAp5/Cywc3qe3GgT76A7+86jp1Mhie1HUAbEZutcOCxwGdofPFPLxHCmmAfo24P
+	 Ka2UV+zH0hNl3RBMIXml5bPv/GfH1IcCU4f0bdT+UUGr35zELD9u//3+CesZXg1WtP
+	 i/cZJ1LV2EfkQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4c4v663lJLz4wbn;
+	Mon, 18 Aug 2025 10:41:18 +1000 (AEST)
+Date: Mon, 18 Aug 2025 10:41:17 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Leon Romanovsky <leon@kernel.org>, David Miller <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Adithya Jayachandran <ajayachandra@nvidia.com>, Daniel Jurgens
+ <danielj@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan
+ <tariqt@nvidia.com>, Networking <netdev@vger.kernel.org>, Linux Kernel
+ Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the mlx5-next tree with the net-next
+ tree
+Message-ID: <20250818104117.33a7c49b@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/ZSM+/ks.IKA3la=fJlge/7T";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-Hi Adam,
+--Sig_/ZSM+/ks.IKA3la=fJlge/7T
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> > And just confirming: the pcc header format is now all host-endian - or
-> > is that a firmware-specified endianness? (what happens if the OS may
-> > boot in either BE or LE? is that at all possible for any PCC-capable
-> > hardware, or are we otherwise guaranteed that we're the same endianness
-> > as the consumer?)
->=20
-> The specification does not specify endianess.=C2=A0 It is not addressed i=
-n
-> the ACPI=C2=A0 PCC spec nor the MCTP over PCC spec. There does not seem=
-=C2=A0 to=20
-> be any endianess modifiers in any of the ACPI code base.
+Hi all,
 
-There are a few cases of endian conversion, they appear to be cases
-where a pre-defined data format is used, and only where that data is BE.
+Today's linux-next merge of the mlx5-next tree got a conflict in:
 
-That's a pretty strong indication that we don't need to worry about host
-endian !=3D firmware endian (I'm assuming that firmware is the entity
-that parses the PCC headers you're constructing). All sounds good then.
+  drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
 
+between commit:
+
+  520369ef43a8 ("net/mlx5: Support disabling host PFs")
+
+from the net-next tree and commit:
+
+  1baf30426553 ("net/mlx5: E-Switch, Set/Query hca cap via vhca id")
+
+from the mlx5-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
 Cheers,
+Stephen Rothwell
 
+diff --cc drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+index 6c72080ac2a1,f47389629c62..000000000000
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+@@@ -968,11 -975,12 +977,18 @@@ static inline bool mlx5_eswitch_block_i
+ =20
+  static inline void mlx5_eswitch_unblock_ipsec(struct mlx5_core_dev *dev) =
+{}
+ =20
+ +static inline bool
+ +mlx5_esw_host_functions_enabled(const struct mlx5_core_dev *dev)
+ +{
+ +	return true;
+ +}
+++
++ static inline bool
++ mlx5_esw_vport_vhca_id(struct mlx5_eswitch *esw, u16 vportn, u16 *vhca_id)
++ {
++ 	return -EOPNOTSUPP;
++ }
++=20
+  #endif /* CONFIG_MLX5_ESWITCH */
+ =20
+  #endif /* __MLX5_ESWITCH_H__ */
 
-Jeremy
+--Sig_/ZSM+/ks.IKA3la=fJlge/7T
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmiidq0ACgkQAVBC80lX
+0GwHEwf7BgGKRg6zBzLWrP4sXqXZOR7BHUe3rHI4Dp09C3r6THxEJ0/sFOrXaasN
+Ek3e7uEcQ1OnMzGm/KQF9Zuvyhdmv7e1o8bnQW59J/GK/YJjN81dhinlITKXjX8o
+jKU0uD5QhAHbnv1FbO6X4o2Cr5z7yA3iH/hHtpYLEgXAwHIr6eUp0yauXGeTs2so
+wceZSlSnF3VqNee0DzMpbpaMJE1MnsQnAEZjmTg4T39AOPNZ080H/eelld0Qnezp
+x9ykrD54FL1nqD4A/B6vboRbJOEYItSYQkq+Wifniux2XhKmYyeKL+teC/vnzdse
+eVLbCjeP0csNvRE/blTEAi1idNPeMA==
+=00cH
+-----END PGP SIGNATURE-----
+
+--Sig_/ZSM+/ks.IKA3la=fJlge/7T--
 
