@@ -1,184 +1,123 @@
-Return-Path: <netdev+bounces-214703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2528B2AF67
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 19:28:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CB18B2AF72
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 19:32:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB2173A7328
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 17:28:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F1683B4A84
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 17:32:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 712EC320395;
-	Mon, 18 Aug 2025 17:28:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C47A43570AC;
+	Mon, 18 Aug 2025 17:32:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LN3ud8bK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CwETPAFY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D782D79CF;
-	Mon, 18 Aug 2025 17:28:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 925EF32C33A;
+	Mon, 18 Aug 2025 17:32:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755538092; cv=none; b=O80JRQoM9lpr49y0X+MZU4GbI/wvriVfIECyENkvLTa2bzf0nCRwHXvE8hmYp+S9lrAyq7rmwbE77WavBVJbCsl33AuqU1/P0dkS8qb0Cm7/MB3CO1G5KBeCcWEBzEOy9O9fGWCXsAZrtBo4L/sAQdAi05t2Hi/OhK3O9Ca0YTY=
+	t=1755538321; cv=none; b=S35L8KKwUMJjOnVRy0AAJuCXSsR5cGOPWc+nTRcxRQEJUfW2pLTlvs6XqVOsgBIolF7n5sJ5pMK0Ad5s+iJDBecsey783OjW0WTWNsyJssLsxoo9ymltvYiSWSeBB/ki3GhBkAUgQjTh8a2fDZCTaX9UUfx1LFqS7SNw3wq2MTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755538092; c=relaxed/simple;
-	bh=kbs4iXyt9FHLQBgq57xTwRMFpLnJCXnI7eRZP9hyCm4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ljZl3BOncrQcg56uYFU+9LFNbbVw3ORvvA2Pins0M3vGT7i+8/u6L359j8eDc0ofCD7ZZeGCYjbt8mfV4imzeehtG/zQrrR72g0T5l5YBzBcoqtUwnJ1fUQKE87Pwfx6iajwIwbz549xDu3sBb+Vrh4NeThx6j2datqvuVGA104=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LN3ud8bK; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-76e2e6038cfso5290406b3a.0;
-        Mon, 18 Aug 2025 10:28:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755538090; x=1756142890; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=acWiq/Eu4b97jl66iamb5rGB9A+KleSKxHt2g6OTFPc=;
-        b=LN3ud8bKcTBtsQaPqotSR2MLEaIaJsdyWCgR00VPCZd9/CR54l6lAuLvl94JuXIzhe
-         +LXs9pXhbHNGhJfZpkIRLXLrP8sbn0phnq2psERSaFuRzAxdvXQrBX8oz1SJonD53Ph4
-         qrjXNchZrFkdmYJzy2Sv21EYAaQmQFHTAQtL0t4O3XQgSus4WJUqMsU4iJ9rAVVSf41Q
-         cJxt1rqqpiz53LYu6L/+K8wXukvf7nCWZ9oH3+czklrYseVvSpzZn6th+EMODT5pzDKX
-         L7Shc/m7Ypfn7vbADGwGdlvvGAjA/UpnMsRCGUpG0efRA5p6jDcqgFV5S8tsLfu9CEGi
-         vUUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755538090; x=1756142890;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=acWiq/Eu4b97jl66iamb5rGB9A+KleSKxHt2g6OTFPc=;
-        b=NjgNy4JwQoemnf98NpJ+Uihojcyz3RToCJHrX2hr6vuXvx9QQJlDfAhPqf21BPi1xp
-         nVH2NGZxHiXDxlBAzlxTK5cnuprfSJ6egghPQA+iHDKZCBLUQO7MHt91c2N7qVHxIt0d
-         jeP4w3TYwXmYrz8n28hGpPCObxlLht7x7/UdQ9zEATZsK78dUi7SR5ycieB1PAp6KVCB
-         0Y1+a66ReKKd9yXU9toatzRe4xGre7qMZGInYyvC59iV7wUIUMkvHlT5MG4nVLWRGB21
-         U7aHVDjUGlPkTi5czt35N2ckMq9F2qCKVYD5CQDY4bYBPOcLuzcWTKXi192S2C35EQlZ
-         8q0w==
-X-Forwarded-Encrypted: i=1; AJvYcCV8dB0F6s8bTtLoRk29mbpU42EWdJAOm2lFnECXl+B3pS2LD8VMZWwRX7hgiQRjaHBw3GONLG8OkP6z6EM=@vger.kernel.org, AJvYcCWdHmEq9eS/L/w8jIEeOpVbXeW8JK666heikz8BKzIOtFaSkWI6lixKtKOMAIvZshKCybxyPViC@vger.kernel.org
-X-Gm-Message-State: AOJu0YwevLVFqCuJTBXvy19u/P+C6i0fOsnZVAm5zqWI3atazAuU+YP+
-	+67Uos37tVPEs4ySlsChLT00WAia1CdKINgdJTxGvat+wnt/vTUioHoD1c97Fw==
-X-Gm-Gg: ASbGncuJN4WerFd1CwrEuPixg5+dEc4CPtDZR6ocALE5YQBqakFVPonxUg2UahFHsei
-	H96IJwjgDI2vcaBWxdafy9hGqqHN+y5hGv3q27qVSQebRDbxieU1Omz0RIUvrH/y9Q2cC5W7uf4
-	mWxDyexeR/mbLbhgsulgLeGFN1jUX48QGuS2jnVe1CtdvPLU5sxVwWFI0Okeqw7Hrss+3/R67qZ
-	6MFr17mU67MT6KDW9spy+FqemC8uumEL9tvBIra0yX9Xlmhh2UnVtU7cj0YRr3Pt3xEP1nIArRm
-	k4bFyTdXD5e+v5lj7hM6Y65diSStTVXTlXLKFccgNd5ZrJ1TmGt8LvpENaLzJTORySc3uq9bfTc
-	LY9LdFHqg/+XwuALbW25ThQ==
-X-Google-Smtp-Source: AGHT+IFmRSySa45xD9fCEzcHsqRlZjFBWp1yVfJrKh54MmrWxQXTyfMCfcK8RaNkWNIs2+SqbAlNzg==
-X-Received: by 2002:a17:902:d482:b0:242:c66f:9f80 with SMTP id d9443c01a7336-2446da0196cmr177872225ad.53.1755538089876;
-        Mon, 18 Aug 2025 10:28:09 -0700 (PDT)
-Received: from localhost ([216.228.127.130])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2446d54e2a3sm85679165ad.125.2025.08.18.10.28.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Aug 2025 10:28:09 -0700 (PDT)
-From: Yury Norov <yury.norov@gmail.com>
-To: Aaron Conole <aconole@redhat.com>,
-	Eelco Chaudron <echaudro@redhat.com>,
-	Ilya Maximets <i.maximets@ovn.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	dev@openvswitch.org,
-	linux-kernel@vger.kernel.org
-Cc: "Yury Norov (NVIDIA)" <yury.norov@gmail.com>
-Subject: [PATCH] net: openvswitch: Use for_each_cpu() where appropriate
-Date: Mon, 18 Aug 2025 13:28:05 -0400
-Message-ID: <20250818172806.189325-1-yury.norov@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1755538321; c=relaxed/simple;
+	bh=H3XJRgaBuWjUxBvcJhn7lYFSzPn8j+APk5Bp+Ftotjw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gMfRJfai7kHvF05OLMAoJU2Fyeeclka0dz9SZKYtchrlR5wd8YV0hwTXe6sfAh/Vt/38D7GliwnWRwt85ZQ2o8buEdw25wq0p486kNWD6aabC79RNfgLm8M9hKmVIB31ygunVXldXfwF05ICSxNv1Lmnpp4WpJLIQ/FTpY9nzxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CwETPAFY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF044C4CEEB;
+	Mon, 18 Aug 2025 17:32:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755538321;
+	bh=H3XJRgaBuWjUxBvcJhn7lYFSzPn8j+APk5Bp+Ftotjw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CwETPAFYPhRvHA187/GoNvTABpUAnbRv6KXL/RxddDuXvX3tdYzQnyw3MzAHcxAgQ
+	 nUhw6LPTAS51HN7/RSmlSJY/PDGZzbs88EBbTlTUYrmUYUB6fhe9cS4ywWwYKLlNar
+	 2uGDsa2+F9HucMyRKPeUSe5BSFldO2m++v4xTm+lbsEFFivyYj9YhcHxfPyqKFI7Jn
+	 SQflTGv2e+oUYUDhi2GKMBCferFPHZwtvCxEQNOi/kzY+eJ0x9gwQW43FMdQC2Yc70
+	 uKZRxPesTxEz26HYl9RE6vPfFETnGuquTpiwSZBN5uCS9rnva61UwLBcyUxbHPgiSg
+	 /Fy2VCj4cypGw==
+Date: Mon, 18 Aug 2025 17:31:58 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Xin Long <lucien.xin@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-sctp@vger.kernel.org, netdev@vger.kernel.org,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH net-next v2 3/3] sctp: Convert cookie authentication to
+ use HMAC-SHA256
+Message-ID: <20250818173158.GA12939@google.com>
+References: <20250813040121.90609-1-ebiggers@kernel.org>
+ <20250813040121.90609-4-ebiggers@kernel.org>
+ <20250815120910.1b65fbd6@kernel.org>
+ <CADvbK_csEoZhA9vnGnYbfV90omFqZ6dX+V3eVmWP7qCOqWDAKw@mail.gmail.com>
+ <20250815215009.GA2041@quark>
+ <20250815180617.0bc1b974@kernel.org>
+ <CADvbK_fmCRARc8VznH8cQa-QKaCOQZ6yFbF=1-VDK=zRqv_cXw@mail.gmail.com>
+ <20250818084345.708ac796@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250818084345.708ac796@kernel.org>
 
-From: "Yury Norov (NVIDIA)" <yury.norov@gmail.com>
+On Mon, Aug 18, 2025 at 08:43:45AM -0700, Jakub Kicinski wrote:
+> On Sat, 16 Aug 2025 13:15:12 -0400 Xin Long wrote:
+> > > > Ideally we'd just fail the write and remove the last mentions of md5 and
+> > > > sha1 from the code.  But I'm concerned there could be a case where
+> > > > userspace is enabling cookie authentication by setting
+> > > > cookie_hmac_alg=md5 or cookie_hmac_alg=sha1, and by just failing the
+> > > > write the system would end up with cookie authentication not enabled.
+> > > >
+> > > > It would have been nice if this sysctl had just been a boolean toggle.
+> > > >
+> > > > A deprecation warning might be a good idea.  How about the following on
+> > > > top of this patch:  
+> > >
+> > > No strong opinion but I find the deprecation warnings futile.
+> > > Chances are we'll be printing this until the end of time.
+> > > Either someone hard-cares and we'll need to revert, or nobody
+> > > does and we can deprecate today.  
+> > Reviewing past network sysctl changes, several commits have simply
+> > removed or renamed parameters:
+> > 
+> > 4a7f60094411 ("tcp: remove thin_dupack feature")
+> > 4396e46187ca ("tcp: remove tcp_tw_recycle")
+> > d8b81175e412 ("tcp: remove sk_{tr}x_skb_cache")
+> > 3e0b8f529c10 ("net/ipv6: Expand and rename accept_unsolicited_na to
+> > accept_untracked_na")
+> > 5027d54a9c30 ("net: change accept_ra_min_rtr_lft to affect all RA lifetimes")
+> > 
+> > It seems to me that if we deprecate something, it's okay to change the
+> > sysctls, so I would prefer rejecting writes with md5 or sha1, or even
+> > better following Eric’s suggestion and turn this into a simple boolean
+> > toggle.
+> 
+> Slight preference towards reject. bool is worse in case we need to
+> revert (if it takes a few releases for the regression report to appear
+> we may have to maintain backward compat with both string and bool
+> formats going forward).
 
-Due to legacy reasons, openswitch code opencodes for_each_cpu() to make
-sure that CPU0 is always considered.
+To be clear, by "It would have been nice if this sysctl had just been a
+boolean toggle", I meant it would have been nice if it had been that way
+*originally*.  I wasn't suggesting making that change now.
 
-Since commit c4b2bf6b4a35 ("openvswitch: Optimize operations for OvS
-flow_stats."), the corresponding  flow->cpu_used_mask is initialized
-such that CPU0 is explicitly set.
+It would be safest to continue to honor existing attempts to enable
+cookie authentication (by writing md5 or sha1), as this patch does.
 
-So, switch the code to using plain for_each_cpu().
+If you'd prefer that those attempts be rejected instead, I can do that,
+but how about I do it as a separate patch on top of this one?  That way
+if there's a problem with it, we can just revert that patch, instead of
+the entire upgrade to the cookie auth.
 
-Suggested-by: Ilya Maximets <i.maximets@ovn.org>
-Signed-off-by: Yury Norov (NVIDIA) <yury.norov@gmail.com>
----
- net/openvswitch/flow.c       | 12 ++++--------
- net/openvswitch/flow_table.c |  7 +++----
- 2 files changed, 7 insertions(+), 12 deletions(-)
-
-v1: https://lore.kernel.org/all/20250814195838.388693-1-yury.norov@gmail.com/
-v2:
- - always include CPU0 (Ilya);
-
-diff --git a/net/openvswitch/flow.c b/net/openvswitch/flow.c
-index b80bd3a90773..66366982f604 100644
---- a/net/openvswitch/flow.c
-+++ b/net/openvswitch/flow.c
-@@ -129,15 +129,13 @@ void ovs_flow_stats_get(const struct sw_flow *flow,
- 			struct ovs_flow_stats *ovs_stats,
- 			unsigned long *used, __be16 *tcp_flags)
- {
--	int cpu;
-+	unsigned int cpu;
- 
- 	*used = 0;
- 	*tcp_flags = 0;
- 	memset(ovs_stats, 0, sizeof(*ovs_stats));
- 
--	/* We open code this to make sure cpu 0 is always considered */
--	for (cpu = 0; cpu < nr_cpu_ids;
--	     cpu = cpumask_next(cpu, flow->cpu_used_mask)) {
-+	for_each_cpu(cpu, flow->cpu_used_mask) {
- 		struct sw_flow_stats *stats = rcu_dereference_ovsl(flow->stats[cpu]);
- 
- 		if (stats) {
-@@ -158,11 +156,9 @@ void ovs_flow_stats_get(const struct sw_flow *flow,
- /* Called with ovs_mutex. */
- void ovs_flow_stats_clear(struct sw_flow *flow)
- {
--	int cpu;
-+	unsigned int cpu;
- 
--	/* We open code this to make sure cpu 0 is always considered */
--	for (cpu = 0; cpu < nr_cpu_ids;
--	     cpu = cpumask_next(cpu, flow->cpu_used_mask)) {
-+	for_each_cpu(cpu, flow->cpu_used_mask) {
- 		struct sw_flow_stats *stats = ovsl_dereference(flow->stats[cpu]);
- 
- 		if (stats) {
-diff --git a/net/openvswitch/flow_table.c b/net/openvswitch/flow_table.c
-index d108ae0bd0ee..ffc72a741a50 100644
---- a/net/openvswitch/flow_table.c
-+++ b/net/openvswitch/flow_table.c
-@@ -107,16 +107,15 @@ int ovs_flow_tbl_count(const struct flow_table *table)
- 
- static void flow_free(struct sw_flow *flow)
- {
--	int cpu;
-+	unsigned int cpu;
- 
- 	if (ovs_identifier_is_key(&flow->id))
- 		kfree(flow->id.unmasked_key);
- 	if (flow->sf_acts)
- 		ovs_nla_free_flow_actions((struct sw_flow_actions __force *)
- 					  flow->sf_acts);
--	/* We open code this to make sure cpu 0 is always considered */
--	for (cpu = 0; cpu < nr_cpu_ids;
--	     cpu = cpumask_next(cpu, flow->cpu_used_mask)) {
-+
-+	for_each_cpu(cpu, flow->cpu_used_mask) {
- 		if (flow->stats[cpu])
- 			kmem_cache_free(flow_stats_cache,
- 					(struct sw_flow_stats __force *)flow->stats[cpu]);
--- 
-2.43.0
-
+- Eric
 
