@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-214714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDE40B2AFEE
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 20:04:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE281B2AFF2
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 20:04:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0FCF2A8742
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 18:04:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C91167AF615
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 18:03:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22F8932C31F;
-	Mon, 18 Aug 2025 18:04:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 732EE32BF26;
+	Mon, 18 Aug 2025 18:04:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gkn5ybC9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dvAnLqoL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC972E22BF;
-	Mon, 18 Aug 2025 18:04:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48E8932BF22;
+	Mon, 18 Aug 2025 18:04:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755540248; cv=none; b=mRduGjHhUYYegWIalUFsha7jb28beZixipxB0OqogZvdiSE0U++KpiTo/IBdxVBxJfwHyrGzsMyjEpoDUNOMy8164Amj3hywuHRZAPxnc0tbtAzq7GSuK51sVqhvNfDVwchXj38i4Fe0RoXJvn8fFyJ+VGghG0LkahZQ1T3LlQc=
+	t=1755540251; cv=none; b=UObtBHwvZ3t2KY8j7H4DACvanexGinVGluLWoN6WWMtMzJN+/XRyIP4qifnZkuOyOX1f4IshdrA+qOghV6BAP8DTEsu6bFPzpQvN1Y8i5+atfF4w6ChmaFW8LwNq905yeujTNmCsphYzT4NiMKq0Ec2A3quO2MPpnGGdac3dZBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755540248; c=relaxed/simple;
-	bh=Xp4CQi1oRWwYMH5i+mF7dz/szvq22cKIqd3crJYwonU=;
+	s=arc-20240116; t=1755540251; c=relaxed/simple;
+	bh=/AOGjfiZYjmG5cI+NtFHNOOC86oa3AeQx6qXCDPv+Ys=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EIrzdxew7Ccq7BZx6HqPnzkg/VwubZuSWUExGHZrCDHPJRUZbKpcHa4IrpJ8eE4snKULj/FFwE56xaIuoWttH3iS6eN4N6iv1SIgMDlaQyqvSMSLSPDUGuQYoMTkM9+9cxmaLXdBDHrUypHF7lICEHsg4Lv0wQM+7CLYQWEpn6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gkn5ybC9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CED2DC4CEF1;
-	Mon, 18 Aug 2025 18:04:04 +0000 (UTC)
+	 MIME-Version; b=Vfodvg72Nkf81eAytF/KIVkZO28JIvbpwrZq+Q0N2nv5yxTbxmBGfN6DrnxdlMXEGNenpl//+vKNMf4dBMPIWsptaPGeM37Sjy490PxR8l0pUBSFZyuX9VUvyrkqcOw7tNuJGBmfABRZLYJqbowObcp8wRiZDXE8KUSrhritktI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dvAnLqoL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A189C4CEEB;
+	Mon, 18 Aug 2025 18:04:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755540247;
-	bh=Xp4CQi1oRWwYMH5i+mF7dz/szvq22cKIqd3crJYwonU=;
+	s=k20201202; t=1755540251;
+	bh=/AOGjfiZYjmG5cI+NtFHNOOC86oa3AeQx6qXCDPv+Ys=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gkn5ybC9UDbyACYdSpNvRWXbAtBXwutWhD79E1Z65QmOZ5awuywoYvBwKq8kDUM3w
-	 YbMZaNWtSEpTAuvt1LeEVPE4BFTOAdIwAujdeitiREUZiAiW2920rECdWJd/K6J9Rs
-	 ZdjuKW3+N8K3EhPGF5dk/KcGPA7LwgmYKrBOCnNsZj1cVTrrrCBupIGL2qPCO8rAsk
-	 7KE9MuDnDNkm93NniXMJhHv45tGcDx92G9Pnr8UAxbbYSLSoRd7eLQCYKIbNkLN5dI
-	 1kXwI4M63cHOF0syO3s6ahR13HtH5te+H/1yVZGynoOGjLTd5CKDDvaty3n0Sen8Tj
-	 0OkqXOXg+UYmQ==
+	b=dvAnLqoLBaZIyR9jPqZgLJekypsulnNJk/W3ktJ4lo7UlZlVJ9Dc6/zvuurcyE8eA
+	 T60VBmqaXU2jDgeFb9IKOpX2Wku+6l9VKdERle2ZsmA6S93paD3sb3y4fHxwuwT672
+	 r70loXcRqS65X3U5UDw3ddhoifR9w/t4RFN8vLEz265jTLB1xZnKjsuRvNNcWGAGcO
+	 fhaxcrCzI9i2QH18zjVcfQzmSI+xHhGJ4Qxf4G6Yu/BcU3ncTg4GtqDQ9+BfT7MTSk
+	 1q+BFSIK0CFzTI3WUBtKbJ697Megw590c/e2fM0Q7/AnC0WxZRY304RSoDbGJsQF1l
+	 2HYia467SZg0Q==
 From: Will Deacon <will@kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: virtualization@lists.linux.dev,
@@ -56,10 +56,11 @@ Cc: virtualization@lists.linux.dev,
 	"Michael S. Tsirkin" <mst@redhat.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Stefan Hajnoczi <stefanha@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>
-Subject: [PATCH 1/2] net: Introduce skb_copy_datagram_from_iter_full()
-Date: Mon, 18 Aug 2025 19:03:54 +0100
-Message-Id: <20250818180355.29275-2-will@kernel.org>
+	Stefano Garzarella <sgarzare@redhat.com>,
+	syzbot+b4d960daf7a3c7c2b7b1@syzkaller.appspotmail.com
+Subject: [PATCH 2/2] vsock/virtio: Fix message iterator handling on transmit path
+Date: Mon, 18 Aug 2025 19:03:55 +0100
+Message-Id: <20250818180355.29275-3-will@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250818180355.29275-1-will@kernel.org>
 References: <20250818180355.29275-1-will@kernel.org>
@@ -71,63 +72,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In a similar manner to copy_from_iter()/copy_from_iter_full(), introduce
-skb_copy_datagram_from_iter_full() which reverts the iterator to its
-initial state when returning an error.
+Commit 6693731487a8 ("vsock/virtio: Allocate nonlinear SKBs for handling
+large transmit buffers") converted the virtio vsock transmit path to
+utilise nonlinear SKBs when handling large buffers. As part of this
+change, virtio_transport_fill_skb() was updated to call
+skb_copy_datagram_from_iter() instead of memcpy_from_msg() as the latter
+expects a single destination buffer and cannot handle nonlinear SKBs
+correctly.
 
-A subsequent fix for a vsock regression will make use of this new
-function.
+Unfortunately, during this conversion, I overlooked the error case when
+the copying function returns -EFAULT due to a fault on the input buffer
+in userspace. In this case, memcpy_from_msg() reverts the iterator to
+its initial state thanks to copy_from_iter_full() whereas
+skb_copy_datagram_from_iter() leaves the iterator partially advanced.
+This results in a WARN_ONCE() from the vsock code, which expects the
+iterator to stay in sync with the number of bytes transmitted so that
+virtio_transport_send_pkt_info() can return -EFAULT when it is called
+again:
 
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Christian Brauner <brauner@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+  ------------[ cut here ]------------
+  'send_pkt()' returns 0, but 65536 expected
+  WARNING: CPU: 0 PID: 5503 at net/vmw_vsock/virtio_transport_common.c:428 virtio_transport_send_pkt_info+0xd11/0xf00 net/vmw_vsock/virtio_transport_common.c:426
+  Modules linked in:
+  CPU: 0 UID: 0 PID: 5503 Comm: syz.0.17 Not tainted 6.16.0-syzkaller-12063-g37816488247d #0 PREEMPT(full)
+  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+
+Call virtio_transport_fill_skb_full() to restore the previous iterator
+behaviour.
+
+Cc: Hillf Danton <hdanton@sina.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Reported-by: syzbot+b4d960daf7a3c7c2b7b1@syzkaller.appspotmail.com
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- include/linux/skbuff.h |  2 ++
- net/core/datagram.c    | 14 ++++++++++++++
- 2 files changed, 16 insertions(+)
+ net/vmw_vsock/virtio_transport_common.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 14b923ddb6df..fa633657e4c0 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -4172,6 +4172,8 @@ int skb_copy_and_crc32c_datagram_iter(const struct sk_buff *skb, int offset,
- 				      struct iov_iter *to, int len, u32 *crcp);
- int skb_copy_datagram_from_iter(struct sk_buff *skb, int offset,
- 				 struct iov_iter *from, int len);
-+int skb_copy_datagram_from_iter_full(struct sk_buff *skb, int offset,
-+				     struct iov_iter *from, int len);
- int zerocopy_sg_from_iter(struct sk_buff *skb, struct iov_iter *frm);
- void skb_free_datagram(struct sock *sk, struct sk_buff *skb);
- int skb_kill_datagram(struct sock *sk, struct sk_buff *skb, unsigned int flags);
-diff --git a/net/core/datagram.c b/net/core/datagram.c
-index 94cc4705e91d..f474b9b120f9 100644
---- a/net/core/datagram.c
-+++ b/net/core/datagram.c
-@@ -618,6 +618,20 @@ int skb_copy_datagram_from_iter(struct sk_buff *skb, int offset,
- }
- EXPORT_SYMBOL(skb_copy_datagram_from_iter);
- 
-+int skb_copy_datagram_from_iter_full(struct sk_buff *skb, int offset,
-+				     struct iov_iter *from, int len)
-+{
-+	struct iov_iter_state state;
-+	int ret;
-+
-+	iov_iter_save_state(from, &state);
-+	ret = skb_copy_datagram_from_iter(skb, offset, from, len);
-+	if (ret)
-+		iov_iter_restore(from, &state);
-+	return ret;
-+}
-+EXPORT_SYMBOL(skb_copy_datagram_from_iter_full);
-+
- int zerocopy_fill_skb_from_iter(struct sk_buff *skb,
- 				struct iov_iter *from, size_t length)
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index fe92e5fa95b4..dcc8a1d5851e 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -105,12 +105,14 @@ static int virtio_transport_fill_skb(struct sk_buff *skb,
+ 				     size_t len,
+ 				     bool zcopy)
  {
++	struct msghdr *msg = info->msg;
++
+ 	if (zcopy)
+-		return __zerocopy_sg_from_iter(info->msg, NULL, skb,
+-					       &info->msg->msg_iter, len, NULL);
++		return __zerocopy_sg_from_iter(msg, NULL, skb,
++					       &msg->msg_iter, len, NULL);
+ 
+ 	virtio_vsock_skb_put(skb, len);
+-	return skb_copy_datagram_from_iter(skb, 0, &info->msg->msg_iter, len);
++	return skb_copy_datagram_from_iter_full(skb, 0, &msg->msg_iter, len);
+ }
+ 
+ static void virtio_transport_init_hdr(struct sk_buff *skb,
 -- 
 2.51.0.rc1.167.g924127e9c0-goog
 
