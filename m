@@ -1,89 +1,87 @@
-Return-Path: <netdev+bounces-215033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0ABDB2CCF6
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 21:27:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1468CB2CCFF
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 21:33:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79CF31C24340
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 19:28:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEA5E587E40
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 19:33:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 159BA322A06;
-	Tue, 19 Aug 2025 19:27:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8736326D65;
+	Tue, 19 Aug 2025 19:33:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2yvPoS8H"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dSJaK/XL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D775D326D66
-	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 19:27:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21B3E254AE4
+	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 19:33:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755631668; cv=none; b=ULdFKCkyrTCgCC5+9NIjNEyTE1/ramexmQsXqEGr55iYnzK5WLqGfQjcbxD1tRbc2ETXBsaIKYTGfD0MT3Usdw7SYw3ZWu5L7bw3PyW17Oc8OsajGyNRrafdDtHxpOQO/AMgF0grwNRVEkw3loAcfrTca84whnVCsAgVA9LFGJI=
+	t=1755631986; cv=none; b=dPmUeXa8L/EJFeIV5QM8XoFbnlMCCjN6R5sAgfbSp2vK2Kf/sPAedINiz9kQeh4IMsmmXgBAYJHkPZLnNJxlPRd7aWJqRj/4u7+ej+Q0Xuo4LGr+NWEx+0LnEoqJRoDNXLiHC0UG9zVnhrYrouERLZF5Ypbd6jdXu5psmACvhe4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755631668; c=relaxed/simple;
-	bh=BlVzj2EUR10ubBzzoCWGCgBRnjT2tSR4AsN+B/Tx+uE=;
+	s=arc-20240116; t=1755631986; c=relaxed/simple;
+	bh=Dlc+gv/phCrMNJTD7pA0SvuOLHUdk1RTYlblxps6Ixw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dF8gcFPxdqTaimpX19xebNAdcQplJqdBMnGwQ8tCPEPvvdT2T4m0essamijA7/qsSigvd1deQ38mB6C1bl38NtrmXVnXmEwpTtH5MZy5kBjoINJa4VewScwPkcaGsQ1dcboUgc4KcciNyoCzyrxWDQwPst8BIjGq/NJxzULouGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2yvPoS8H; arc=none smtp.client-ip=209.85.160.181
+	 To:Cc:Content-Type; b=W3zeKS3tsoJclw8bKDEEkpupfSp3nLkIy2J37crioIM9B4JmhNYTOHI17GERVHa+2Zb5a6gstCV8TNU36CIJc6SwITNciwdqIlsvIBDgDRNeudJ52RG6j9XwI00KxefAhZO4wmI+YztNTOxOrIgi0wUGlJOJ5l+cHsYhNpHJZZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dSJaK/XL; arc=none smtp.client-ip=209.85.160.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4b0bf08551cso97391cf.1
-        for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 12:27:45 -0700 (PDT)
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4b0bf04716aso90251cf.1
+        for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 12:33:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755631665; x=1756236465; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1755631984; x=1756236784; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BlVzj2EUR10ubBzzoCWGCgBRnjT2tSR4AsN+B/Tx+uE=;
-        b=2yvPoS8HQWczeJaM7fx8jeCdrDaBiQmi4SbIn0siSypuiFDVh16Rl2L6b7paZZzsWu
-         aQhddtinIru6QmgeVDzpB/rjT+OeRBQHG3pnwufmOcWe3Gmn78Qa5RnxvgUd6h9LR9nO
-         srUzWuwWD20Ex6NB8g9qm47h8ybzzzwhRI3/MXMS5BgOSurLoWLhXjf2PXP2abvdtnVS
-         qupbU5P7iamPH/DDFRWRlGvOi9wczfTDkJWX/Gf13CPTqK91oCmVFXXkrvrfzig1uo70
-         Qaw04YlvGNy3ZluJ2AUhPNmCPmZdujB7/dg9gZoJF1DeLcKRQopTP7CulTrCrcBPQZYC
-         lv3w==
+        bh=Dlc+gv/phCrMNJTD7pA0SvuOLHUdk1RTYlblxps6Ixw=;
+        b=dSJaK/XLjjdkIlg8JnQYSU9gcXJdZATsA4dCEIJI3vfWY3BEVYPbTkQ90ZISFuEcGd
+         TFgmrIYvuRRxusOa/Lh8s71TXhh65PXjFplPRipgty51jJW9zpN+Be+ze1RyixXxmOwl
+         XKYbNfdySb1fP9vkrpKXdQpzZTUdULgGoR2ujho/yeKflkiOFcse7K6md9jryOc3iWCr
+         ZeYFETYhXbq02CtDiwDFLRdbsXsztQsnp1WhNZplvp5tis3szI7yTBrRhp1IzsOfYfBA
+         EzrD1xP/zvZ5KQWlxqyi6uHr6K2jNd0/dkgEBmQRl8K0DxZu3s8G2BSSpCv3DWTbth+g
+         b3Rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755631665; x=1756236465;
+        d=1e100.net; s=20230601; t=1755631984; x=1756236784;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=BlVzj2EUR10ubBzzoCWGCgBRnjT2tSR4AsN+B/Tx+uE=;
-        b=kzLKtC3zKy7m3W7pzb2rwrywlsOYG6/kH2/vdE8/PVOUdf3L3wIQ72XlNt/WkS4jLs
-         8/Jh0pngULM9NrxuS+HXDjyrlvGOCPfjJmNXNc4abXAUkeXvV5UhMbNjZGHv8pjUwLz+
-         ioqHeaqudJbyoF09gtSsu/900tKNJDltv0PN+x1zaLKYZ9LitRWxNV27hOE1AY6NNKq/
-         qHhUKqzaAV6gAFiNbwZH3S1vq7Sv7Kwqfu5NnvFU8mnVt/sCF65vV9kNw1OFISAvTQ1+
-         WTyo7lOocijKXgXrd1d2FAV8Rb4CpUq8UN+S5ySPgSm2BMMQdn99iaLUByxhhhIbwRsE
-         lRAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVRPUGERgMrm9iZMEuetBidRb92YmDw881yVtUbPyJxJTxFDzgvQCKa30HaAU3bBQ1EvZKnYG8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBvx/ByJyEyizoe+GElZ8laUtAOlaexYKekmH3LubhQ3OZvfWW
-	tbfY9zKpNVUezvGG5B6UIWWs6EppZq3d9seG1uCGr01e8uYJWoBCB9j1gTg3RTBmQ7Jj19E2hAP
-	e62vlpZPINMdY9pgd9agYpG/wfLSjX43YXuvHq4w1
-X-Gm-Gg: ASbGncv8sRHlpp9qALkRBhSrE7DCOXlTQGIuYBn3L/UNW59foz6Y6zDiJYT6bM+lCYO
-	z+jDu251fQRm4LrCCp0YUYZ1XzLuSRcCfBLIyYINMgskMeLYtdQKv6XVNcFAdHa6A/IowWlLqOt
-	n91z0jVV/gchhFWombsueL5PJ7QcgaM/WOKQuwrHk8WBnb5bUQw0y0ACQxoDWCYYYtkj78saTA2
-	3LY0s9aat77W7zn+AIfef2wypHDJ20DMf8k+UcrHzrInrcvGviYlIQ=
-X-Google-Smtp-Source: AGHT+IEDWpSWU5ZzY/KJckLXK1MXb3iQFKIaTTR+UKAO1//noOtBrDSrcuDwJaJI6GftEm+TVmZKste1iti0T0BhbeY=
-X-Received: by 2002:a05:622a:156:b0:4b0:8576:e036 with SMTP id
- d75a77b69052e-4b2916cdeffmr923341cf.0.1755631664504; Tue, 19 Aug 2025
- 12:27:44 -0700 (PDT)
+        bh=Dlc+gv/phCrMNJTD7pA0SvuOLHUdk1RTYlblxps6Ixw=;
+        b=eqAe2kcj3f1o9p4G9Io2I6Y1g5XTYBscMKiODpcJZi1byCssbwXUVknog5jwiB3NOs
+         NpHuIVjZSXZ+9NsC0Rc/nb7T3ME/ejidsWnsI9D3eJ8NV0KYqMqHcTQknB96bFlWnI4u
+         KpclkED090TIdpuxvqzF18kemtReqptLi/cELLcdD+o7rsuy+dfDLpuaWMhlK8eiKL1Q
+         VPj9azT6GfCmXfglMba6ANuFI3GDJ7xK+hxhIdM7OaS1voFWni8Hdn7+6Z2D+yT3eZpS
+         sfztRSpw3MXwGsr0CQpCc8JC4lCr6UOEyQ3KZAowH82R9vZf6MWmEPKGoHFBvV1cgRD6
+         lpkg==
+X-Forwarded-Encrypted: i=1; AJvYcCX193awhc04eRAEDhEwVt/yZkYhyHd/SqhCQwxsigbrRszluq+jkVXonII527c3ubB5ig42TxY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFMB9AWdUZr6JCNgcivhdG/VWBrXhGnHF5k7cf4bIZJ+EyJ0dx
+	LSXwhdIpUQMWQJ7d19nqw3KSJdNpdls67b+DBdGNBToCFsIBB7tAvDtck6eEvZbLF86XmZF8M2p
+	brMRYNuBD8IrXZYuZDMv8AzOHp4Z6elora5jBbFKT
+X-Gm-Gg: ASbGncsMcbfWU5mNpi60lbQ9XyyubWddr8u0Lt2ta/OW6zyI73rr53vxq1XBVtcgHi7
+	K0MQWaP7dZxBrV1JbXRfnsoTCVvo54ixe+YY49O+/pBphghGmToy5s5kOyjgp/EhuGg+oKYGKxc
+	/+wjmoyr9jzGTJDyH9DDROThywm+g82FUBAs9ZwPxRDVvqXeWPq6RdPtkU3Xd0XfWdvjQSPP9gT
+	Di0VEzhq3GTSDGKof31YhZDuXmcWiUfNgTXAKnwims10psxUgR4SZA=
+X-Google-Smtp-Source: AGHT+IFZOUs4HvSAXDicI6HRK+xenYcqiZRbzTDhlDFCbIHyzB/2YxgCL8t0otnlqVer1xfFluhajR27sxVEpthm9Bo=
+X-Received: by 2002:ac8:5949:0:b0:4a7:e3b:50be with SMTP id
+ d75a77b69052e-4b29190f742mr958271cf.16.1755631983445; Tue, 19 Aug 2025
+ 12:33:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1755499375.git.asml.silence@gmail.com> <d36305d654e82045aff0547cb94521211245ed2c.1755499376.git.asml.silence@gmail.com>
- <CAHS8izO_ivHDO_i9oxKZh672i6GSWeDOjB=wzGGa00HjA7Zt7Q@mail.gmail.com> <ab60ab17-c398-492b-beb7-0635de4be8e6@gmail.com>
-In-Reply-To: <ab60ab17-c398-492b-beb7-0635de4be8e6@gmail.com>
+References: <cover.1755499375.git.asml.silence@gmail.com> <fab9f52289a416f823d2eac6544e01cb7040eee9.1755499376.git.asml.silence@gmail.com>
+In-Reply-To: <fab9f52289a416f823d2eac6544e01cb7040eee9.1755499376.git.asml.silence@gmail.com>
 From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 19 Aug 2025 12:27:27 -0700
-X-Gm-Features: Ac12FXzollJPprpvLpQ4-IC38LVTaqJboHUEkHUZ0bfbl4-1_1fZtat3-UCqxVo
-Message-ID: <CAHS8izPuZRsrBXaQoTNBPyisEo3w7J2aF0qyyOOnUAV=2-8o+w@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 04/23] net: use zero value to restore
- rx_buf_len to default
+Date: Tue, 19 Aug 2025 12:32:46 -0700
+X-Gm-Features: Ac12FXyzzAHQkZQwTmfShgjuBIC83fo8ZLZc42_ORo6YGwvB1xgCyklsv26SR98
+Message-ID: <CAHS8izMPCOp8QeC9zZddBYaGSNd-9+CtV7XbKOn43pHb03vi0w@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 06/23] net: add rx_buf_len to netdev config
 To: Pavel Begunkov <asml.silence@gmail.com>
 Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
 	Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>, 
@@ -94,44 +92,18 @@ Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 19, 2025 at 8:51=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.=
+On Mon, Aug 18, 2025 at 6:56=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.=
 com> wrote:
 >
-> On 8/19/25 01:07, Mina Almasry wrote:
-> > On Mon, Aug 18, 2025 at 6:56=E2=80=AFAM Pavel Begunkov <asml.silence@gm=
-ail.com> wrote:
-> >>
-> >> From: Jakub Kicinski <kuba@kernel.org>
-> >>
-> >> Distinguish between rx_buf_len being driver default vs user config.
-> >> Use 0 as a special value meaning "unset" or "restore driver default".
-> >> This will be necessary later on to configure it per-queue, but
-> >> the ability to restore defaults may be useful in itself.
-> >>
-> >> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> >> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> >
-> > I wonder if it should be extended to the other driver using
-> > rx_buf_len, hns3. For that, I think the default buf size would be
-> > HNS3_DEFAULT_RX_BUF_LEN.
+> From: Jakub Kicinski <kuba@kernel.org>
 >
-> I'd rather avoid growing the series even more, let's follow up on
-> that in a separate patch on top, that should be just fine. And
-> thanks for the review
+> Add rx_buf_len to configuration maintained by the core.
+> Use "three-state" semantics where 0 means "driver default".
 >
-> > Other than that, seems fine to me,
-> >
-> > Reviewed-by: Mina Almasry <almasrymina@google.com>
->
-> With the said above, do you want me to retain the review tag?
->
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 
-I initially thought adding my reviewed-by would be fine, but on closer
-look, doesn't this series break rx_buf_len setting for hns3? AFAICT so
-far, in patch 3 you're adding a check to ethnl_set_rings where it'll
-be an error if rx_buf_len > rx_buf_len_max, and i'm guessing if the
-driver never sets rx_buf_len_max it'll be 0 initialized and that check
-would always fail? Or did I miss something?
+Reviewed-by: Mina Almasry <almasrymina@google.com>
 
 --=20
 Thanks,
