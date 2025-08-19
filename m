@@ -1,92 +1,126 @@
-Return-Path: <netdev+bounces-214853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A875B2B713
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 04:35:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78BCBB2B73D
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 04:46:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B3A87AB2B3
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 02:34:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B830F1965CBF
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 02:46:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72EA6218ABD;
-	Tue, 19 Aug 2025 02:35:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1BDB287507;
+	Tue, 19 Aug 2025 02:45:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JWLnKbPu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VbqWabv3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47815157E6B;
-	Tue, 19 Aug 2025 02:35:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC3B219313;
+	Tue, 19 Aug 2025 02:45:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755570931; cv=none; b=LKkBPjHOnFY1cIOSiI8vnzgeKYKXGNB+7P+P6U//2Q2/VV+X5l9lszWpAppivQHlL3sMFbSEaVV/Mf1FbVeKdvlaoZi49seVe0YBbjDhtMXD3s/8o0tkSiWezEEwKT2Xvp2KqCnPU8qd1Lln/zlny4aQYfwJSaNnKc/Hi6V1ZJM=
+	t=1755571558; cv=none; b=oxjiuQT9ouKbSy5G+ekxwL3Yx4ANqidv0UTlVAda2oUfIDlE+DHfwjZNfFQ+ESr7WLvNcUFlbRlhlURbQ3aU/YZ8nUklSrz7U7eWpYnF0JdkqrOQ9CuQ335gW4vOLpU7OZp9WVojkV0r/BMWt9G+1SMQ8Y+IMoDOAgl6sUGRnfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755570931; c=relaxed/simple;
-	bh=JZIl/RDVfGiBvF896NQ1rSVbvjvYhCYvsXQ35Z7vriU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NJEAphwI8Huawp4Mmp2/ulnrDcv041tJUSNMaLmyia03VQkpNn6oe5VW1XHTUgiRe1kqeI9vcvrv9QneZeybdy5ZDQqXFYa93jdg8FP7voLyuKCl5+cPdnqLHUo+PJmXf79grswtxR4GDB9H7UYxchb2AmghCLGk7bAQjH4FqSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JWLnKbPu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30615C4CEEB;
-	Tue, 19 Aug 2025 02:35:30 +0000 (UTC)
+	s=arc-20240116; t=1755571558; c=relaxed/simple;
+	bh=opA+9G7a6pm7Ukx4ygWDa+18cnwyybIAZesL/1UB1yA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=F6tvyqDOuKmiD5cXJr2vBpX2tX1urwiZE2Ssac+GjLjOH8THxbRh9LeKTRpBcgab6PmvJVJZDWq44GsWtQl1vN/1frNGoA+0lQyGtPsC+wOCPPFLLZxrUeFUosNeeuz8JbIBH5QvjvFIdMCZ13KhBrUPVzxXny2QPDEtuAWdv5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VbqWabv3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 70FCCC4CEEB;
+	Tue, 19 Aug 2025 02:45:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755570930;
-	bh=JZIl/RDVfGiBvF896NQ1rSVbvjvYhCYvsXQ35Z7vriU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=JWLnKbPu2IhWQL8ZQiPiPTFn5zqATCw1/Ou1YiJcn3NbkMTluLKGVkrMq8SoQLwNK
-	 4mzac93Ql5i3ZsRdv84//B2z4iqpwaVzhku+MI2TYn2tb03SAbMUj54egM2b53p/yW
-	 97sYAZf61sVztG4VxDyTI9dx06imXtLE2sNUlioj5BUymSStgT+TjQtNhn9xPXlsx3
-	 Qu6BwsB3xJQl5Knih4XRPuEtHPl7K8uNbHUshw1bAaVvwXXbdcE8bvM3yk+VtMkQo9
-	 YwvpgVfJZK48f+eNViycGIRiM+GbAnuI+GWkQhz2/8ukwkjS8Va13d+QgrE5KdF2Z4
-	 DdGw1M6SNnvzQ==
-Date: Mon, 18 Aug 2025 19:35:29 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
- Jonathan Corbet <corbet@lwn.net>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Kory Maincent
- <kory.maincent@bootlin.com>, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Nishanth Menon <nm@ti.com>,
- kernel@pengutronix.de, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
- linux-doc@vger.kernel.org, Michal Kubecek <mkubecek@suse.cz>, Roan van Dijk
- <roan@protonic.nl>
-Subject: Re: [PATCH net-next v2 3/5] ethtool: netlink: add lightweight MSE
- reporting to LINKSTATE_GET
-Message-ID: <20250818193529.365d49fe@kernel.org>
-In-Reply-To: <20250815063509.743796-4-o.rempel@pengutronix.de>
-References: <20250815063509.743796-1-o.rempel@pengutronix.de>
-	<20250815063509.743796-4-o.rempel@pengutronix.de>
+	s=k20201202; t=1755571558;
+	bh=opA+9G7a6pm7Ukx4ygWDa+18cnwyybIAZesL/1UB1yA=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=VbqWabv3EnHqF6C64W0HU6OlJFpJKAoDL9j1c6O0hJaBzgCP3LjF8+cy5TfCD9yh7
+	 bZhtZggS7qkT09fHTyyr27gvIbCErX/3Ymt/fRN8Up6MCPg78H8CCcFwg5OB/ZZSPA
+	 kdrB2Gqtd/nJ/CRv+YzZweE6CnXN8ebPc/8W5hmx1YDPjmWyjbC2fBpPW2/uH+MlRG
+	 m9qdI9bnz5rfltronUyu+TrWgHoz6ejLS/OY+B3Mp4gJCceBiBsupBN8A3DwJvhSdA
+	 5OYea43MIjUfN5f4BEMJ44ZME3KzXrJUVAJbPrSJ46m/IYKI7AgY2acUAfnpPEh01o
+	 LStQloIjN7Ckg==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E5BACA0EEB;
+	Tue, 19 Aug 2025 02:45:58 +0000 (UTC)
+From: Cryolitia PukNgae via B4 Relay <devnull+cryolitia.uniontech.com@kernel.org>
+Date: Tue, 19 Aug 2025 10:45:57 +0800
+Subject: [PATCH] selftests: net: fix memory leak in tls.c
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20250819-memoryleak-v1-1-d4c70a861e62@uniontech.com>
+X-B4-Tracking: v=1; b=H4sIAGTlo2gC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI1MDC0NL3dzU3PyiypzUxGxdy5Sk1GTLxDSzZANzJaCGgqLUtMwKsGHRsbW
+ 1APHd1ZpcAAAA
+X-Change-ID: 20250819-memoryleak-9dbec9af6c07
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, zhanjun@uniontech.com, 
+ niecheng1@uniontech.com, guanwentao@uniontech.com, 
+ Cryolitia PukNgae <cryolitia@uniontech.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1755571557; l=1183;
+ i=cryolitia@uniontech.com; s=20250730; h=from:subject:message-id;
+ bh=bJ2O1uJkJydfjBXKxT0NanxgQaONGN6lDC7g+1imYiw=;
+ b=xzQfIUFyWMrFvujCffyv+PN8PbAoSZ2gVir4MYYu1oaGPhjxkT884zXmNyYRWxQMZ4Rumu7Ms
+ XYBWpUhR09bAYeg8F5B+p2tk283oVjxbzbsV8eaet43ZEfxXqNBY/Sy
+X-Developer-Key: i=cryolitia@uniontech.com; a=ed25519;
+ pk=tZ+U+kQkT45GRGewbMSB4VPmvpD+KkHC/Wv3rMOn/PU=
+X-Endpoint-Received: by B4 Relay for cryolitia@uniontech.com/20250730 with
+ auth_id=474
+X-Original-From: Cryolitia PukNgae <cryolitia@uniontech.com>
+Reply-To: cryolitia@uniontech.com
 
-On Fri, 15 Aug 2025 08:35:07 +0200 Oleksij Rempel wrote:
-> diff --git a/include/uapi/linux/ethtool_netlink_generated.h b/include/uapi/linux/ethtool_netlink_generated.h
-> index 9c37a96a320b..6ef03a7de4ab 100644
-> --- a/include/uapi/linux/ethtool_netlink_generated.h
-> +++ b/include/uapi/linux/ethtool_netlink_generated.h
-> @@ -322,6 +322,9 @@ enum {
->  	ETHTOOL_A_LINKSTATE_EXT_STATE,
->  	ETHTOOL_A_LINKSTATE_EXT_SUBSTATE,
->  	ETHTOOL_A_LINKSTATE_EXT_DOWN_CNT,
-> +	ETHTOOL_A_LINKSTATE_MSE_VALUE,
-> +	ETHTOOL_A_LINKSTATE_MSE_MAX,
-> +	ETHTOOL_A_LINKSTATE_MSE_CHANNEL,
->  
->  	__ETHTOOL_A_LINKSTATE_CNT,
->  	ETHTOOL_A_LINKSTATE_MAX = (__ETHTOOL_A_LINKSTATE_CNT - 1)
+From: Cryolitia PukNgae <cryolitia@uniontech.com>
 
-This changes is not reflected in the YAML spec.
+To free memory and close fd after use
+
+Suggested-by: Jun Zhan <zhanjun@uniontech.com>
+Signed-off-by: Cryolitia PukNgae <cryolitia@uniontech.com>
+---
+ tools/testing/selftests/net/tls.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/tools/testing/selftests/net/tls.c b/tools/testing/selftests/net/tls.c
+index d8cfcf9bb82594ca078c998ce5849131bf46ade8..23cf6ff5fa49378bd7906334ff402aa61a205f29 100644
+--- a/tools/testing/selftests/net/tls.c
++++ b/tools/testing/selftests/net/tls.c
+@@ -427,6 +427,8 @@ TEST_F(tls, sendfile)
+ 	EXPECT_GE(filefd, 0);
+ 	fstat(filefd, &st);
+ 	EXPECT_GE(sendfile(self->fd, filefd, 0, st.st_size), 0);
++
++	close(filefd);
+ }
+ 
+ TEST_F(tls, send_then_sendfile)
+@@ -448,6 +450,9 @@ TEST_F(tls, send_then_sendfile)
+ 
+ 	EXPECT_GE(sendfile(self->fd, filefd, 0, st.st_size), 0);
+ 	EXPECT_EQ(recv(self->cfd, buf, st.st_size, MSG_WAITALL), st.st_size);
++
++	free(buf);
++	close(filefd);
+ }
+ 
+ static void chunked_sendfile(struct __test_metadata *_metadata,
+
+---
+base-commit: be48bcf004f9d0c9207ff21d0edb3b42f253829e
+change-id: 20250819-memoryleak-9dbec9af6c07
+
+Best regards,
 -- 
-pw-bot: cr
+Cryolitia PukNgae <cryolitia@uniontech.com>
+
+
 
