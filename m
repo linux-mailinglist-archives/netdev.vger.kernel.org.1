@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-214811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA9CDB2B5A3
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 03:00:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5D38B2B5A4
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 03:00:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABEBF522857
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 01:00:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 86C4C7B3A91
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 00:58:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F85E188734;
-	Tue, 19 Aug 2025 00:59:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D7651A2C25;
+	Tue, 19 Aug 2025 01:00:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tRk7QPZt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QrQTh/9F"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B5E8EEDE
-	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 00:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76AD319CC39;
+	Tue, 19 Aug 2025 00:59:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755565198; cv=none; b=laPV3a2NPUUYwK8TiMMlOcBqFUXlQDsyNsVqgEJO9d1m85rEs3qrYbj+nOt0TtjY4TINVriXryNZYC73qjSFM4Qb5t0FXFPqjZf57bbxYr260PTVzuz+er5TeAaFfpyNHftJLQ2o4cDvjvgAr8C243odVNt0ITMRbDpJfBxboMc=
+	t=1755565200; cv=none; b=NB2yW4NGML6rthPFzeGB3iHzLzVeIq5W153ziZP+LVY0OCVR221ISdc+a0IlK71HjD9l+3zEGqX69JEqcAJGasVKCzp8nfHPTJMmaGjUcrJ4lgUXcdaRJhWUqw33+NfrkkEacaCEF45a5KD5Hq2w04Dq/4gTO01EF2l42dckTfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755565198; c=relaxed/simple;
-	bh=qpMpuH8wP3ETkDPK3u5o6Uw+Mo9ZSqmkmrjRDgwdE1Y=;
+	s=arc-20240116; t=1755565200; c=relaxed/simple;
+	bh=+sfa6t83e14yl9Xt2JNYP1qflvGr43FTmDcm5kBC2fc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=aq+ZobaeIFrQHU5NQ0PmMPyZ8qasF3HkEetrpA7Dsx2NQw4hTiLVW8FgDkrvwvR52HKsL/AGECu7YmDDgDqKzyCAEB9d5VNaIn4AeIcNUZTtn8A14B6vourNBTwe8DwBFw444EIVHVOpHER5zopCsiIyzTqhVYwM+r8gyiO3dQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tRk7QPZt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEE1DC4CEEB;
-	Tue, 19 Aug 2025 00:59:57 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=hm0ue9wwiK6sE+H2WZefloOD1/PmeTTRz02Kiy3A4BKwyRW96jlW8uazZJasHk6D/ohC5ZW9mniplQ27Gcng+ijUiJNndh3BaPIzjREuScqRZWZwfDloOLf7APofBq//VADMD0HNlRL/RSsMjGFSmRotaKBXBWifNcYsfzh3s4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QrQTh/9F; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9FDBC113D0;
+	Tue, 19 Aug 2025 00:59:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755565197;
-	bh=qpMpuH8wP3ETkDPK3u5o6Uw+Mo9ZSqmkmrjRDgwdE1Y=;
+	s=k20201202; t=1755565199;
+	bh=+sfa6t83e14yl9Xt2JNYP1qflvGr43FTmDcm5kBC2fc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tRk7QPZtcCffzWYEw1fUN6bwfcQqYpPmUv1TS3sXUJUD/A+Sr9Hs3W2Pvyx/GEoF7
-	 hrGSxl7E3WWcBTdh3EGixEwWVlK0iT/+MpW9ojKfIk4oseg6W1GX/MPD0Mm49c/50t
-	 QMMmpfX0yHC6y2K/+PJF2d3l80SNDpnw0ruKYEgKUqSn6NR0J2T1FtbFG683iqewTQ
-	 nEl/hEhqsImuClTVk1wpkILyMjZCHVWK0tB2SHfbVgx6GvaDEsO2bUNqZVR4Kgz0y5
-	 Rp+WVYpL73eoAW3dlnWVLcYXYlew57VTnvbxV0EMYWqT5tfVtpy6KJ4RHFChnw/mqI
-	 x72ArIX1dwmOw==
+	b=QrQTh/9FnWoa0R76UqgIaE1thDJoI++FVd/YrR0RUFEkbFzBaldnqh6SCdBvmfymM
+	 X7Cyw4Px9hxlcsPXg/USd4XcRK5j+u/iqkBe9hmzxxy2uehC7sVlwBD/Nc4ze4YQgz
+	 +35LyjB7nvp8Xfa4TWWUApRBgCquXAxwVzvatWP6MMzxag9fnuyJILJholqgQtYwwC
+	 wiI8c5+cihXwS9w0V27GgQ+dsPSxY+irQJBmYmEcaYzx9rQYOTbkuLGp1pjzOX0oej
+	 6/wHCjfjRmItCrGHvlZ9M3ZhMfL8QSx28rheB0DuZlyqECXZVveuUz+Y54sQG11TSt
+	 hPpHu57MITrzQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD41383BF4E;
-	Tue, 19 Aug 2025 01:00:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C97383BF4E;
+	Tue, 19 Aug 2025 01:00:10 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,36 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] bnxt_en: Fix lockdep warning during rmmod
+Subject: Re: [PATCH net] net: dsa: b53: fix reserved register access in
+ b53_fdb_dump()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175556520776.2966773.2798007329883348467.git-patchwork-notify@kernel.org>
-Date: Tue, 19 Aug 2025 01:00:07 +0000
-References: <20250816183850.4125033-1-michael.chan@broadcom.com>
-In-Reply-To: <20250816183850.4125033-1-michael.chan@broadcom.com>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
- pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com, sdf@fomichev.me
+ <175556520899.2966773.10487281916372982476.git-patchwork-notify@kernel.org>
+Date: Tue, 19 Aug 2025 01:00:08 +0000
+References: <20250815201809.549195-1-jonas.gorski@gmail.com>
+In-Reply-To: <20250815201809.549195-1-jonas.gorski@gmail.com>
+To: Jonas Gorski <jonas.gorski@gmail.com>
+Cc: florian.fainelli@broadcom.com, andrew@lunn.ch, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ noltari@gmail.com, f.fainelli@gmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat, 16 Aug 2025 11:38:50 -0700 you wrote:
-> The commit under the Fixes tag added a netdev_assert_locked() in
-> bnxt_free_ntp_fltrs().  The lock should be held during normal run-time
-> but the assert will be triggered (see below) during bnxt_remove_one()
-> which should not need the lock.  The netdev is already unregistered by
-> then.  Fix it by calling netdev_assert_locked_or_invisible() which will
-> not assert if the netdev is unregistered.
+On Fri, 15 Aug 2025 22:18:09 +0200 you wrote:
+> When BCM5325 support was added in c45655386e53 ("net: dsa: b53: add
+> support for FDB operations on 5325/5365"), the register used for ARL access
+> was made conditional on the chip.
+> 
+> But in b53_fdb_dump(), instead of the register argument the page
+> argument was replaced, causing it to write to a reserved page 0x50 on
+> !BCM5325*. Writing to this page seems to completely lock the switch up:
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] bnxt_en: Fix lockdep warning during rmmod
-    https://git.kernel.org/netdev/net/c/4611d88a37cf
+  - [net] net: dsa: b53: fix reserved register access in b53_fdb_dump()
+    https://git.kernel.org/netdev/net/c/89eb9a62aed7
 
 You are awesome, thank you!
 -- 
