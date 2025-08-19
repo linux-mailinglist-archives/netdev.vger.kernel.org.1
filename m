@@ -1,95 +1,87 @@
-Return-Path: <netdev+bounces-214928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76FDAB2BF16
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 12:37:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 631EFB2BF46
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 12:47:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27D861B641CA
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 10:37:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B033562725A
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 10:47:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 786354690;
-	Tue, 19 Aug 2025 10:36:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18B5B322C9C;
+	Tue, 19 Aug 2025 10:46:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="TezlJBbT";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="/jwHUwE/";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="TezlJBbT";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="/jwHUwE/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i/+fc3IO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6321322A2E
-	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 10:36:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6190B32274B
+	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 10:46:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755599795; cv=none; b=qM4eVlfHLwRqShQ3Vrwa5W7GhgLnGFlEjjgvsDEEnhjDRLCfMlLvGB9Ak4E38nUKijuC8W+36FI0eLkZZe8gRl2/KstUMKCTfePtfpFx4u3s/dIP08KCWufydj+9vHskLwjL9p/pTTfT2r7pqcl3sm1ZkV8RIiKdsuW7peDTCd8=
+	t=1755600410; cv=none; b=JzvSdNEIamG9LyE+kfXlgSEQnnmBbobK9QR9q1a41K9eytIqNmtGJ+4iXuo2C+ilh1qrIPVKPmlFFytc9yQo9+9OLj9tcH7Tq678QHX1aqvx6wrPqN0Xvq42KJpeCJkYrsFrEGSwLLfvTrK8s5I5hCtr2uTBEGbBh3V6F/WUAdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755599795; c=relaxed/simple;
-	bh=37aey4AK3mJUZeNmjMHYQZ6v9A4NtdxD2XjaKTFYXno=;
+	s=arc-20240116; t=1755600410; c=relaxed/simple;
+	bh=elzb019ruRrmP1i7xp2LaZA5rb6ro318sxT9KCWpKGA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K3F0gemuEw8/QCiGrF+p2WSv/6SFK5PZfSX3FDWd0vXyjcw1NLB/kTicjiTWgGRixkaIyzGD9gmkAuXjsS73K6lvV6Gxjw4/oVKjq58FfwzZGowNEQ7YIwhMZAjgsG6yD8LqEEw2frJPtzbr2qIwWHToRmrV2g9Omb6m+QEfSXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=TezlJBbT; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=/jwHUwE/; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=TezlJBbT; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=/jwHUwE/; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id C0BB31F785;
-	Tue, 19 Aug 2025 10:36:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1755599791; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	 In-Reply-To:Content-Type; b=GJI8s8XBgQ1T528d7QKQ3+28PNr+Rby33YPtJeQ7iGN2CfVVHGwVR2eUkXbwjSbFnLkKcFV26ybmXKoVJ2/gdDyahY7an0DsHvUN2A7VYu2r4me3k2cFBZeaoO3aJF4Uh2OKOw6oCLB1Y0nkkw9p+AAz7iMaSNwHZycLzVU5Jrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i/+fc3IO; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755600407;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=wCP2sXh2gwfCkPbU6Wb/CWK6RQlUL1v1Xohq8MIEbiY=;
-	b=TezlJBbTjtioKcepFdP4s5z7tTYZPn/Bt16uIdS+IRohLyiD0pdEFo44EnYqhEkY4Kl45p
-	+MV5ArsmtY3a8cMD0JsUKBcHduBJXeE/cTuVXDR1d8FOlbcJ3zNUEG9tnB4Jgut4IG76JY
-	TZFidaoiG5mtq+uH5e48WIz8d7XnhqM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1755599791;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wCP2sXh2gwfCkPbU6Wb/CWK6RQlUL1v1Xohq8MIEbiY=;
-	b=/jwHUwE/R4yDKWdeW7jVCqMk9g+olXYtz4c0NA9J4bRs5ABxBInaUESpbCJAJ1ECVdZw5O
-	DPfFpH32Tp19lVAg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1755599791; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wCP2sXh2gwfCkPbU6Wb/CWK6RQlUL1v1Xohq8MIEbiY=;
-	b=TezlJBbTjtioKcepFdP4s5z7tTYZPn/Bt16uIdS+IRohLyiD0pdEFo44EnYqhEkY4Kl45p
-	+MV5ArsmtY3a8cMD0JsUKBcHduBJXeE/cTuVXDR1d8FOlbcJ3zNUEG9tnB4Jgut4IG76JY
-	TZFidaoiG5mtq+uH5e48WIz8d7XnhqM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1755599791;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wCP2sXh2gwfCkPbU6Wb/CWK6RQlUL1v1Xohq8MIEbiY=;
-	b=/jwHUwE/R4yDKWdeW7jVCqMk9g+olXYtz4c0NA9J4bRs5ABxBInaUESpbCJAJ1ECVdZw5O
-	DPfFpH32Tp19lVAg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CBFCD139B3;
-	Tue, 19 Aug 2025 10:36:30 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id vVAZL65TpGjVWgAAD6G6ig
-	(envelope-from <svarbanov@suse.de>); Tue, 19 Aug 2025 10:36:30 +0000
-Message-ID: <437a8d6d-8d59-4ae3-beda-d9eab1300109@suse.de>
-Date: Tue, 19 Aug 2025 13:36:25 +0300
+	bh=Th1VUQFqFIwlrfXv9YrDsFKWFzJEQXeRnE2P8wNg8gc=;
+	b=i/+fc3IOvJvOGxnyoWAN6QAkek3Th9WX//sm4b1FCwwRCXvRbeaG8F80GBYUVjO/JP3uXQ
+	MvqwreU7WrW972gN1/rD2Zuz4BkGLhp7oRDVJ8s+4trdE5k6C3bwWHSKJAP9INKiM7A0GM
+	wphJxi55BWd/LrfGTcCtN+MU4Zix6xc=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-270-FdISCCCbOWW_AJNkfzm-XA-1; Tue, 19 Aug 2025 06:46:46 -0400
+X-MC-Unique: FdISCCCbOWW_AJNkfzm-XA-1
+X-Mimecast-MFC-AGG-ID: FdISCCCbOWW_AJNkfzm-XA_1755600405
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4b109919a51so241772461cf.0
+        for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 03:46:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755600405; x=1756205205;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Th1VUQFqFIwlrfXv9YrDsFKWFzJEQXeRnE2P8wNg8gc=;
+        b=aRNIEh+I+UpFMQXjbakP3cHbKgBCI8tH5G/Hv/SlPqFNxwHkKCi6fvmluP7WihUkTa
+         9iaSnMeTZD4LRsfld8UZBwUU1SqY/bD0Wp120mKQfCYZPuEtbwxqhZMn9KdxnqgaWMoe
+         +YkWpjNqpCmq2kK7x+WYZKxbVNt6ItBHJSrhuWOYeiB7lx2wT3Arls/UZbWhV34kLx/E
+         wQmWc8/wVKHtb10Zyz7y7UTn8n1Kj3rxTwrfl78On4MGA5qeqZ70gpyiAYNkdRfmgUK9
+         zuZhSbS0Vg0C7Fd99xJRsBHyFRLjUK6LUhiqh8jA9pX8bGVM8+6nxu0QjdP3n5+zUhnR
+         lHDA==
+X-Forwarded-Encrypted: i=1; AJvYcCVMVlLJWYl+K+R61sYlGXiO/VJksbo02KbMjJlGLBPlsh77pBJorzLZLbltx2rbhwVUB2KpQus=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6JI9v7KZZ47uuA7TyItu4Y8xzatIIMmwNrEyYeJZ+KSchyt6x
+	Y6rGj2X2BeRzT74lOaFhkEzcE2sC5PBDCBRIUAItcR5u81MmtJ+66eNG9Jba9sYCwQpf5Nbr30V
+	JWUU5VzM4u/lkndm8dGTphoNnaomzINsir9oVi/UpTDyQZsPbyrLCR+o+6g==
+X-Gm-Gg: ASbGnctiL5s2QNOLc2LuNkDfoHYWsLIZej06qLvZ2okogIL1r0QtQBzTg9xCw0eE7E3
+	kyTgO4CX4JJEvQ2syqP49El8Lykn6RwWojejQhYuDg4mTsf4v+95GruM51g4fAYqytfy7Z0B19c
+	Y7+8MV9xJJrkrN7O+AUjXcm5tjq79sVM7NkcYcxkoCq6kv1NwxS7iKKXGKvfYL4UpXF1otss5xP
+	pHQIrPcnQGeAeDZ6osLZ1tmaH0QhOGVQRLA/nu7/b+ENi/EOesOifOZNrtPLU2Q/GzsFh3bdbrk
+	5QDZ/yrTsEbZ0OMqrtj0T2AI2ZnYVL8AQR5H2//ERM5lbjogVZQGAbnkJq2jfjbMBYVIcIYFvxs
+	RbAxqEExVz7I=
+X-Received: by 2002:a05:622a:58c5:b0:4b2:8ac5:27c1 with SMTP id d75a77b69052e-4b28ac52b62mr9951701cf.76.1755600405462;
+        Tue, 19 Aug 2025 03:46:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFBGEnlxs91a9yyAnL3D89TaSlDVI6ydBPLWp7ZWZ3NjDDIfFDapFaGpqUR7/kmISiVmBGcFA==
+X-Received: by 2002:a05:622a:58c5:b0:4b2:8ac5:27c1 with SMTP id d75a77b69052e-4b28ac52b62mr9951421cf.76.1755600405090;
+        Tue, 19 Aug 2025 03:46:45 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b11dc5c353sm66603271cf.15.2025.08.19.03.46.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Aug 2025 03:46:44 -0700 (PDT)
+Message-ID: <3bb31f61-08cd-4680-a16d-20c248e3e1c9@redhat.com>
+Date: Tue, 19 Aug 2025 12:46:42 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,114 +89,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/5] net: cadence: macb: Set upper 32bits of DMA ring
- buffer
-To: Nicolas Ferre <nicolas.ferre@microchip.com>,
- Stanimir Varbanov <svarbanov@suse.de>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-rpi-kernel@lists.infradead.org,
- Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Florian Fainelli <florian.fainelli@broadcom.com>,
- Andrea della Porta <andrea.porta@suse.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, Phil Elwell
- <phil@raspberrypi.com>, Jonathan Bell <jonathan@raspberrypi.com>,
- Dave Stevenson <dave.stevenson@raspberrypi.com>
-References: <20250815135911.1383385-1-svarbanov@suse.de>
- <20250815135911.1383385-2-svarbanov@suse.de>
- <37427c1a-68af-4c50-ac6d-da5ee135c260@microchip.com>
+Subject: Re: [PATCH net-next v2 1/2] net: ipv4: allow directed broadcast
+ routes to use dst hint
+To: Oscar Maes <oscmaes92@gmail.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, horms@kernel.org, shuah@kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250814140309.3742-1-oscmaes92@gmail.com>
+ <20250814140309.3742-2-oscmaes92@gmail.com>
 Content-Language: en-US
-From: Stanimir Varbanov <svarbanov@suse.de>
-In-Reply-To: <37427c1a-68af-4c50-ac6d-da5ee135c260@microchip.com>
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250814140309.3742-2-oscmaes92@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-6.80 / 50.00];
-	REPLY(-4.00)[];
-	BAYES_HAM(-3.00)[99.99%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[text/plain];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	TAGGED_RCPT(0.00)[dt,netdev];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	URIBL_BLOCKED(0.00)[suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo];
-	RCVD_COUNT_TWO(0.00)[2];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Spam-Score: -6.80
+Content-Transfer-Encoding: 7bit
 
-Hi Nicolas,
+On 8/14/25 4:03 PM, Oscar Maes wrote:
+> diff --git a/net/ipv4/ip_input.c b/net/ipv4/ip_input.c
+> index fc323994b1fa..57bf6e23b342 100644
+> --- a/net/ipv4/ip_input.c
+> +++ b/net/ipv4/ip_input.c
+> @@ -587,9 +587,13 @@ static void ip_sublist_rcv_finish(struct list_head *head)
+>  }
+>  
+>  static struct sk_buff *ip_extract_route_hint(const struct net *net,
+> -					     struct sk_buff *skb, int rt_type)
+> +					     struct sk_buff *skb)
+>  {
+> -	if (fib4_has_custom_rules(net) || rt_type == RTN_BROADCAST ||
+> +	const struct iphdr *iph = ip_hdr(skb);
+> +
+> +	if (fib4_has_custom_rules(net) ||
+> +	    ipv4_is_lbcast(iph->daddr) ||
+> +	    (iph->daddr == 0 && iph->saddr == 0) ||
 
-Thank you for the review!
+ipv4_is_zeronet(iph->daddr) is preferred for the daddr check, and it's
+not clear why the new check for the saddr is needed here.
 
-On 8/19/25 11:29 AM, Nicolas Ferre wrote:
-> On 15/08/2025 at 15:59, Stanimir Varbanov wrote:
->> In case of rx queue reset and 64bit capable hardware, set the upper
->> 32bits of DMA ring buffer address.
-> 
-> Very nice finding! Thanks.
+/P
 
-Hmm, that reminds me that I have to update the patch body because the
-credits should go to Jonathan Bell and Phil Elwell if I decipher
-properly the description in raspberrypi downstream kernel :)
-
-> 
->> Signed-off-by: Stanimir Varbanov <svarbanov@suse.de>
-> 
-> A "Fixes" tag might be interesting here.
-
-Sure, I'll do that.
-
-> 
->> ---
->>   drivers/net/ethernet/cadence/macb_main.c | 5 +++++
->>   1 file changed, 5 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/
->> ethernet/cadence/macb_main.c
->> index ce95fad8cedd..41c0cbb5262e 100644
->> --- a/drivers/net/ethernet/cadence/macb_main.c
->> +++ b/drivers/net/ethernet/cadence/macb_main.c
->> @@ -1635,6 +1635,11 @@ static int macb_rx(struct macb_queue *queue,
->> struct napi_struct *napi,
->>
->>                  macb_init_rx_ring(queue);
->>                  queue_writel(queue, RBQP, queue->rx_ring_dma);
-> 
-> For the sake of consistency, I would add lower_32_bits() to this call,
-> as I see it for each use of RBQP or TBQP.
-
-Ack.
-
-> 
->> +#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
->> +               if (bp->hw_dma_cap & HW_DMA_CAP_64B)
->> +                       macb_writel(bp, RBQPH,
->> +                                   upper_32_bits(queue->rx_ring_dma));
->> +#endif
->>
->>                  macb_writel(bp, NCR, ctrl | MACB_BIT(RE));
-> 
-> Best regards,
->   Nicolas
-> 
-
-regards,
-~Stan
 
