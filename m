@@ -1,252 +1,228 @@
-Return-Path: <netdev+bounces-214986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5E87B2C773
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 16:48:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EAD2B2C780
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 16:51:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3343517350C
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 14:46:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AB41682A99
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 14:50:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F22327B33A;
-	Tue, 19 Aug 2025 14:46:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58290279351;
+	Tue, 19 Aug 2025 14:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dS+1Tugx"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="UUwRw0ht";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="zbqVqTyt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 916171FF7D7;
-	Tue, 19 Aug 2025 14:46:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A410827B4EB
+	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 14:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755614765; cv=none; b=P+rjtf9CUk3wnF/9wI8uBCisQrZWm7nvwjSfBbgPXjpf555Y1DrfSuEBnLTHgJzSN8eRYigMWJ8ffU4NzR4UwNYWbDWzIZDAG4zhwymgcKIhuerj4UnJarFVKwbTNYRM+QJKV2Y/+UVdzt7II5BJft2tfjIzqicCUfVr577EPls=
+	t=1755615029; cv=none; b=qRMp1wHiSPBLVJYUxdsNFRN3C4nXjtOQeVhLMnmhHPz8xo9dCS7RC3pN20gHRxn318ghOvpKez03U9Pi0K8L8UlmKwHzGqU0u9VIHJhdbG+fUP2MbT2cxffhl7OwfBMgPaqGdIw8T4aSba41JLBBdF9WhvsqYYbR2b+kttT0Xoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755614765; c=relaxed/simple;
-	bh=DCZiF8kq04YIUMZs8I7NejSG0j963jBDxvlnKIltYV8=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Kcmpa3W14XqAR8k9d0/TEZOmvqi6Ks9j5jet9jkRCNTFW3TKxhp7aAb5yAUp0Qq4+wauvolagrdGny1pbQ9jQM5HjXk6/tB4919Al/zs51cJ4TZ1xq0OWsMxl0jSM8jg7hYUdd4wXnSOax+lhGfeLPvPo6+6ws9vLkbIwjox8pM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dS+1Tugx; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4b121dc259cso27553901cf.1;
-        Tue, 19 Aug 2025 07:46:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755614762; x=1756219562; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jBJBj4QZForHlCQsBm5N3P/Zz1khxIZow/yhMUT1I9Q=;
-        b=dS+1Tugx96WyNetZ6zVmAhYFCy4Oj0jh4KIi1zsyzd9I6NR1ErokH/+lApSlxNPECW
-         yWdHEJQSUMtyOexcvLbm8qcn5vadM/4vFZ4oUB9BrMmpkYjmc7W3lki2Dg0Jz5/shabT
-         xlV539s1WsyfnC3ivpcFYpOA1q8iZUhqNkFjKD4KF0ftOQtSjbT735IermK43LeKvorz
-         QcGygQNtfGaxsTIWEm+rAk9V5q16Yni8619p6leQx4P4QM19RTnGKDCQ988MbgNA/px9
-         jTCTztqlgOz7ot6PBiHghMjx4aDBSWwwSyoa1v5ou6aBRP0aTRGwPdV092ZF5w5oEwsl
-         5UAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755614762; x=1756219562;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=jBJBj4QZForHlCQsBm5N3P/Zz1khxIZow/yhMUT1I9Q=;
-        b=kbx/++2G071ABdXnv/vF5xecS85D5kr65yesjmIR6pfq2uQzw+Hjy51m66xPqixAxN
-         OlhZMPHHi+priiJU+GeedWxsDiyfOwb6494WUAdgsnRbFEL52SlbhK0Z/a1erCIZeLrs
-         6Vhhg9c23ogpUB3D5Obxcz2fWU1J9f9RB8PNxTOhO7spS9/ls+KHZH+cYWvHr3MQE/0t
-         VZLODZWq5AWHKQasrdOy+5XAkv2+1tOLFKJSKQ+yvnnnHy1JPZy3ceqQX2e9Jto8YHTX
-         xNVqGbDxbdUuABWCxMXHtgHWtE5qU6mMTf65opDq5Kx+9cFeAVMPv4+BZvThlPOzb6uD
-         AXTw==
-X-Forwarded-Encrypted: i=1; AJvYcCVFq1YJpvstujWL4xGuAwuPgX5W/Awv66kSKPbyyeJE5zsE9cGyvyXoesBl7IKPSNjl9F6LzylU@vger.kernel.org, AJvYcCX87wF2E7P01RTtBkEDbbd90zn8MooL7zoHWlUdhXynwYtNdc4K4w+EtE3P377iFDlUDLE0CoxFn2TZNto=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9XeBQexrTBo9d+k/BJ3nDFd0axNbh1BzPh2qw9VrewQAwb16N
-	NcbM35pC+jRZFET/nQ1AtSIU9n/VHlCmZSPzrgYkyJqcsBUaxnsWj/0A
-X-Gm-Gg: ASbGncvDWyhHc5BrCopTuOiIm198wZFtBBUsYxzMw1ia2RBEfPpeXnBNynvY7BDw3qY
-	BwSVblcq5b+yFS8bugB9FQqaliHq2hSuQkxdpsf/EINbI0PnfqjZUAnXbzwZLj+/+M6Ab4eIvxM
-	9zINGCP7k2ONybt9ovqqx9umUjPz8/8owvPUq4LA02g0kRrHH/M52hKI5fATAtFoBX6cUrjmcph
-	c8/GZcH0Fpx4d7ZlXR53jc3PaJuaqFr6RiXBSgYX32ipPSXodEaCJNnbSE87Aq9emSJCwCvzHaN
-	l6XZL5o6Y3iPEFe/ccVu+FGw7YDAngGpxOA5MnrJIEo73ZgQO6GTYXVBTAULsX0P+kfeBqoZYTL
-	mIpM8M/QDR15teNXhRg+2gTAlBOqp2n+9Aq68FAwfSIhk8LdWDzCl4M9zFgeADCdCokldAg==
-X-Google-Smtp-Source: AGHT+IGc81qdxCSR+PaPZepmyKxyryjgwFGzxpyj5AsgK7mQfH+yLPXu4BapDT/RrPKygy62G8x3Jg==
-X-Received: by 2002:a05:622a:1493:b0:4b0:8ac3:a388 with SMTP id d75a77b69052e-4b286c6cb24mr29976311cf.19.1755614762234;
-        Tue, 19 Aug 2025 07:46:02 -0700 (PDT)
-Received: from gmail.com (128.5.86.34.bc.googleusercontent.com. [34.86.5.128])
-        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7e87dee34f8sm792390485a.0.2025.08.19.07.46.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Aug 2025 07:46:01 -0700 (PDT)
-Date: Tue, 19 Aug 2025 10:46:01 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Richard Gobert <richardbgobert@gmail.com>, 
+	s=arc-20240116; t=1755615029; c=relaxed/simple;
+	bh=toXMenPmzF79QCt8zsMmYakv7wmuIYNt0yxcSa/CGfI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=WWoP8V/9T4t/sqJD2pWFgeyfcUw6QmP+Jff4bvi1sjIhzWbRRXdGPFZbzox0pg7NlgCMYKFlN9sGDllnDRcPhYBzfv3feSJ0tNmfAvapggxFkYE4HSahroHLNxb9a5u0uG09e0D1hp8xUp3HowWW7wKfge6B3G29ogpO6b9Xm84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=UUwRw0ht; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=zbqVqTyt; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1755615025;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ptWEFgp23Tx0lKdgnYP80JrRtGCoawk5mA53LdcsBFI=;
+	b=UUwRw0htleduy3eavpr9F+maRy6RvzIa/Z2WCu4VxB4qKl0s+sjepf13XYPcqHVq3TUbhW
+	2E3QnG3mOnmwaOIf4LfOM/Z3wHm9P8sSA5GWW2bd8XAM+7UfILNcthbFRBFsRN2gXPOAf3
+	Lp+3akpO56tjwnVqIJZ+v0l9hIi13RKOBmIab425f0nEsYhcaRWyGUXaHGkpEzCBZxR5Qu
+	m/t/AfoN0dO9SU9QHPC71e5IfSF5Un9olH17x/yoeu7KlZJcvFRN5oxevBAxDpCnZid2QI
+	j631LQrbhqaUy//tRjRYmGCac321ey4awSvMcUmDK5ZS9bf8J9cYEeL3D2vHBw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1755615025;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ptWEFgp23Tx0lKdgnYP80JrRtGCoawk5mA53LdcsBFI=;
+	b=zbqVqTytKZdhDD8K+8+ooUPaO8p6XV9/yGnGKgsepXyVt9z4I0yDjJi8Meze1KDzgwV09N
+	+aWpbyM9SnANu1CQ==
+To: Miroslav Lichvar <mlichvar@redhat.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Vinicius
+ Costa Gomes <vinicius.gomes@intel.com>, Sebastian Andrzej Siewior
+ <bigeasy@linutronix.de>, intel-wired-lan@lists.osuosl.org,
  netdev@vger.kernel.org
-Cc: davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- horms@kernel.org, 
- corbet@lwn.net, 
- shenjian15@huawei.com, 
- salil.mehta@huawei.com, 
- shaojijie@huawei.com, 
- andrew+netdev@lunn.ch, 
- saeedm@nvidia.com, 
- tariqt@nvidia.com, 
- mbloch@nvidia.com, 
- leon@kernel.org, 
- ecree.xilinx@gmail.com, 
- dsahern@kernel.org, 
- ncardwell@google.com, 
- kuniyu@google.com, 
- shuah@kernel.org, 
- sdf@fomichev.me, 
- ahmed.zaki@intel.com, 
- aleksander.lobakin@intel.com, 
- florian.fainelli@broadcom.com, 
- willemdebruijn.kernel@gmail.com, 
- linux-kernel@vger.kernel.org, 
- linux-net-drivers@amd.com, 
- Richard Gobert <richardbgobert@gmail.com>
-Message-ID: <willemdebruijn.kernel.a8507becb441@gmail.com>
-In-Reply-To: <20250819063223.5239-3-richardbgobert@gmail.com>
-References: <20250819063223.5239-1-richardbgobert@gmail.com>
- <20250819063223.5239-3-richardbgobert@gmail.com>
-Subject: Re: [PATCH net-next v2 2/5] net: gro: only merge packets with
- incrementing or fixed outer ids
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next] igb: Retrieve Tx timestamp
+ directly from interrupt
+In-Reply-To: <aKMbekefL4mJ23kW@localhost>
+References: <20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de>
+ <aKMbekefL4mJ23kW@localhost>
+Date: Tue, 19 Aug 2025 16:50:23 +0200
+Message-ID: <87ms7vs6vk.fsf@jax.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-Richard Gobert wrote:
-> Only merge encapsulated packets if their outer IDs are either
-> incrementing or fixed, just like for inner IDs and IDs of non-encapsulated
-> packets.
-> 
-> Add another ip_fixedid bit for a total of two bits: one for outer IDs and
-> one for inner IDs.
-> 
-> This commit preserves the current behavior of GSO where only the IDs of the
-> inner-most headers are restored correctly.
-> 
-> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
-> ---
->  include/net/gro.h      | 26 +++++++++++---------------
->  net/ipv4/tcp_offload.c |  4 +++-
->  2 files changed, 14 insertions(+), 16 deletions(-)
-> 
-> diff --git a/include/net/gro.h b/include/net/gro.h
-> index 87c68007f949..e7997a9fb30b 100644
-> --- a/include/net/gro.h
-> +++ b/include/net/gro.h
-> @@ -75,7 +75,7 @@ struct napi_gro_cb {
->  		u8	is_fou:1;
->  
->  		/* Used to determine if ipid_offset can be ignored */
-> -		u8	ip_fixedid:1;
-> +		u8	ip_fixedid:2;
->  
->  		/* Number of gro_receive callbacks this packet already went through */
->  		u8 recursion_counter:4;
-> @@ -442,29 +442,26 @@ static inline __wsum ip6_gro_compute_pseudo(const struct sk_buff *skb,
->  }
->  
->  static inline int inet_gro_flush(const struct iphdr *iph, const struct iphdr *iph2,
-> -				 struct sk_buff *p, bool outer)
-> +				 struct sk_buff *p, bool inner)
->  {
->  	const u32 id = ntohl(*(__be32 *)&iph->id);
->  	const u32 id2 = ntohl(*(__be32 *)&iph2->id);
->  	const u16 ipid_offset = (id >> 16) - (id2 >> 16);
->  	const u16 count = NAPI_GRO_CB(p)->count;
->  	const u32 df = id & IP_DF;
-> -	int flush;
->  
->  	/* All fields must match except length and checksum. */
-> -	flush = (iph->ttl ^ iph2->ttl) | (iph->tos ^ iph2->tos) | (df ^ (id2 & IP_DF));
-> -
-> -	if (flush | (outer && df))
-> -		return flush;
-> +	if ((iph->ttl ^ iph2->ttl) | (iph->tos ^ iph2->tos) | (df ^ (id2 & IP_DF)))
-> +		return true;
->  
->  	/* When we receive our second frame we can make a decision on if we
->  	 * continue this flow as an atomic flow with a fixed ID or if we use
->  	 * an incrementing ID.
->  	 */
->  	if (count == 1 && df && !ipid_offset)
-> -		NAPI_GRO_CB(p)->ip_fixedid = true;
-> +		NAPI_GRO_CB(p)->ip_fixedid |= 1 << inner;
->  
-> -	return ipid_offset ^ (count * !NAPI_GRO_CB(p)->ip_fixedid);
-> +	return ipid_offset ^ (count * !(NAPI_GRO_CB(p)->ip_fixedid & (1 << inner)));
->  }
->  
->  static inline int ipv6_gro_flush(const struct ipv6hdr *iph, const struct ipv6hdr *iph2)
-> @@ -479,7 +476,7 @@ static inline int ipv6_gro_flush(const struct ipv6hdr *iph, const struct ipv6hdr
->  
->  static inline int __gro_receive_network_flush(const void *th, const void *th2,
->  					      struct sk_buff *p, const u16 diff,
-> -					      bool outer)
-> +					      bool inner)
->  {
->  	const void *nh = th - diff;
->  	const void *nh2 = th2 - diff;
-> @@ -487,19 +484,18 @@ static inline int __gro_receive_network_flush(const void *th, const void *th2,
->  	if (((struct iphdr *)nh)->version == 6)
->  		return ipv6_gro_flush(nh, nh2);
->  	else
-> -		return inet_gro_flush(nh, nh2, p, outer);
-> +		return inet_gro_flush(nh, nh2, p, inner);
->  }
->  
->  static inline int gro_receive_network_flush(const void *th, const void *th2,
->  					    struct sk_buff *p)
->  {
-> -	const bool encap_mark = NAPI_GRO_CB(p)->encap_mark;
->  	int off = skb_transport_offset(p);
->  	int flush;
->  
-> -	flush = __gro_receive_network_flush(th, th2, p, off - NAPI_GRO_CB(p)->network_offset, encap_mark);
-> -	if (encap_mark)
-> -		flush |= __gro_receive_network_flush(th, th2, p, off - NAPI_GRO_CB(p)->inner_network_offset, false);
-> +	flush = __gro_receive_network_flush(th, th2, p, off - NAPI_GRO_CB(p)->network_offset, false);
-> +	if (NAPI_GRO_CB(p)->encap_mark)
-> +		flush |= __gro_receive_network_flush(th, th2, p, off - NAPI_GRO_CB(p)->inner_network_offset, true);
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-It's a bit unclear what the meaning of inner and outer are in the
-unencapsulated (i.e., normal) case. In my intuition outer only exists
-if encapsulated, but it seems you reason the other way around: inner
-is absent unless encapsulated. I guess they're equivalent, but please
-explicitly comment this choice somewhere.
+On Mon Aug 18 2025, Miroslav Lichvar wrote:
+> On Fri, Aug 15, 2025 at 08:50:23AM +0200, Kurt Kanzenbach wrote:
+>> Retrieve Tx timestamp directly from interrupt handler.
+>>=20
+>> The current implementation uses schedule_work() which is executed by the
+>> system work queue to retrieve Tx timestamps. This increases latency and =
+can
+>> lead to timeouts in case of heavy system load.
+>>=20
+>> Therefore, fetch the timestamp directly from the interrupt handler.
+>>=20
+>> The work queue code stays for the Intel 82576. Tested on Intel i210.
+>
+> I tested this patch on 6.17-rc1 with an Intel I350 card on a NTP
+> server (chrony 4.4), measuring packet rates and TX timestamp accuracy
+> with ntpperf. While the HW TX timestamping seems more reliable at some
+> lower request rates, there seems to be about 40% drop in the overall
+> performance of the server in how much requests it can handle (falling
+> back to SW timestamps when HW timestamp is missed). Is this expected
+> or something to be considered?=20
 
->  
->  	return flush;
->  }
-> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
-> index be5c2294610e..74f46663eeae 100644
-> --- a/net/ipv4/tcp_offload.c
-> +++ b/net/ipv4/tcp_offload.c
-> @@ -485,8 +485,10 @@ INDIRECT_CALLABLE_SCOPE int tcp4_gro_complete(struct sk_buff *skb, int thoff)
->  	th->check = ~tcp_v4_check(skb->len - thoff, iph->saddr,
->  				  iph->daddr, 0);
->  
-> +	bool is_fixedid = (NAPI_GRO_CB(skb)->ip_fixedid >> skb->encapsulation) & 1;
-> +
+I have never ever used ntpperf before, so please bear with me. I've
+setup two x86 machines with Debian Trixie, v6.17.0-rc1+ and Intel i210.
 
-Variable definition at top of function (or basic block)
+Installed ntpperf on one machine and chrony (v4.6) on the second. In the
+chrony config there is 'hwtimestamp enp1s0'. I did run the first example
+in ntpperf's README with the following results. 'rate' seems to be
+higher with my patch applied. Anyway, your ntpperf output looks
+completely different. What parameters are you using? I just want to
+reproduce your results first.
 
->  	skb_shinfo(skb)->gso_type |= SKB_GSO_TCPV4 |
-> -			(NAPI_GRO_CB(skb)->ip_fixedid * SKB_GSO_TCP_FIXEDID);
-> +			(is_fixedid * SKB_GSO_TCP_FIXEDID);
->  
->  	tcp_gro_complete(skb);
->  	return 0;
-> -- 
-> 2.36.1
-> 
+* ntpperf with igb patch applied
+Linux cml1 6.17.0-rc1+ #1 SMP PREEMPT_RT Tue Aug 19 12:56:41 CEST 2025 x86_=
+64 GNU/Linux
+Linux cml2 6.17.0-rc1+ #1 SMP PREEMPT_RT Tue Aug 19 12:56:41 CEST 2025 x86_=
+64 GNU/Linux
+root@cml1:~/ntpperf# ./ntpperf -i enp1s0 -m 6c:b3:11:52:39:15 -d 192.168.12=
+3.1 -s 172.18.0.0/16 -B -H
+               |          responses            |        response time (ns)
+rate   clients |  lost invalid   basic  xleave |    min    mean     max std=
+dev
+1000       100   0.00%   0.00% 100.00%   0.00%   +15124  +16491 +166838   4=
+773
+1500       150   0.00%   0.00% 100.00%   0.00%   +14589  +16163 +170222   4=
+028
+2250       225   0.00%   0.00% 100.00%   0.00%   +14337  +15825 +172604   3=
+356
+3375       337   0.00%   0.00% 100.00%   0.00%   +14267  +15549 +171365   2=
+727
+5062       506   0.00%   0.00% 100.00%   0.00%   +14033  +15389 +177490   2=
+384
+7593       759   0.00%   0.00% 100.00%   0.00%   +14307  +15418 +174652   1=
+983
+11389     1138   0.00%   0.00% 100.00%   0.00%   +14100  +16551 +169245   6=
+036
+17083     1708   0.00%   0.00% 100.00%   0.00%   +10077  +20077 +194647   9=
+182
+25624     2562   0.00%   0.00% 100.00%   0.00%   +10007  +25572 +181577  14=
+952
+38436     3843   0.00%   0.00% 100.00%   0.00%    +6851  +27466 +184041  14=
+900
+57654     5765   0.00%   0.00% 100.00%   0.00%    +5164  +29218 +246544  16=
+169
+86481     8648   0.00%   0.00% 100.00%   0.00%    +5346  +36063 +179512  14=
+388
+129721   12972   0.00%   0.00% 100.00%   0.00%    +7934  +49386 +229427  17=
+600
+194581   16384   0.00%   0.00% 100.00%   0.00%   +10760  +54961 +248325  18=
+860
+291871   16384   0.00%   0.00% 100.00%   0.00%   +13207  +57193 +248870  16=
+908
+437806   16384  25.42%   0.00%  74.58%   0.00%  +211479 +275061 +703480  20=
+529
+656709   16384  50.32%   0.00%  49.68%   0.00%  +230344 +292741 +485387  19=
+119
 
+* ntpperf without igb patch applied
+Linux cml1 6.17.0-rc1+ #3 SMP PREEMPT_RT Tue Aug 19 15:31:35 CEST 2025 x86_=
+64 GNU/Linux
+Linux cml2 6.17.0-rc1+ #3 SMP PREEMPT_RT Tue Aug 19 15:31:35 CEST 2025 x86_=
+64 GNU/Linux
+root@cml1:~/ntpperf# ./ntpperf -i enp1s0 -m 6c:b3:11:52:39:15 -d 192.168.12=
+3.1 -s 172.18.0.0/16 -B -H
+               |          responses            |        response time (ns)
+rate   clients |  lost invalid   basic  xleave |    min    mean     max std=
+dev
+1000       100   0.00%   0.00% 100.00%   0.00%   +18246  +19931 +174292   4=
+947
+1500       150   0.00%   0.00% 100.00%   0.00%   +17934  +19494 +194876   4=
+368
+2250       225   0.00%   0.00% 100.00%   0.00%   +17969  +19254 +177394   3=
+449
+3375       337   0.00%   0.00% 100.00%   0.00%   +17687  +19090 +179947   2=
+807
+5062       506   0.00%   0.00% 100.00%   0.00%   +17798  +18999 +175463   2=
+403
+7593       759   0.00%   0.00% 100.00%   0.00%   +17901  +19039 +176656   1=
+984
+11389     1138   0.00%   0.00% 100.00%   0.00%   +17192  +20318 +184805   6=
+802
+17083     1708   0.00%   0.00% 100.00%   0.00%   +14241  +24428 +185137  10=
+118
+25624     2562   0.00%   0.00% 100.00%   0.00%    +4819  +22667 +201990   7=
+962
+38436     3843   0.00%   0.00% 100.00%   0.00%    +3869  +17957 +192566   8=
+171
+57654     5765   0.00%   0.00% 100.00%   0.00%    +2529  +14036 +173719   6=
+240
+86481     8648   0.00%   0.00% 100.00%   0.00%    +2774  +13642 +201026   5=
+284
+129721   12972   0.00%   0.00% 100.00%   0.00%    +2670  +14699 +242395   6=
+692
+194581   16384   0.00%   0.00% 100.00%   0.00%    +2520  +19712 +329254   9=
+571
+291871   16384   1.37%   0.00%  98.63%   0.00%    +2818  +77396 +15480693 1=
+82286
+437806   16384  24.69%   0.00%  75.31%   0.00%  +108662 +246855 +2306431  3=
+8520
+Could not send requests at rate 656709
 
+Thanks,
+Kurt
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmikjy8THGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgmSUD/4suSlfa4c60Tk9+FTIRAt6SVMVnoYB
+LO9MnIc02bF4rW3pI8HAAszyIiYIBAgeC+Xei3lkxNPkXG1zWBDEPn6M/WMXvF7b
+Xd6GhH6fimth9ja3kBKW6GQFSh7V0pNdTV9WsczmC6L5bPIz76Qhrek5nTA0xFHp
+UzxE5uLPzAK1iiLiZuLBpBYoD1INmvZn2oKXv3xynCKE6HQHXAIozwwTM2DDseAs
+xzyhnC2RXCH6GHqP0pGYLMbrwiLd8ufDK+G6C6ATNWQ4sGiK7NuKC0+zrwDxRTFH
+3u/3W/tUn4/w5oYefcm/wtmfgYIZhAzucaJ+A+aGOH7Gdi2W78+KncJK65W3v8bu
+H9/HXhHbv79l4AFr7671IZsLkl9Zuwtc6la8s5H/ez6qboHfOBgiCZI1JWOELg/f
+VeBE4j9XHyQQKB8WSSk24VwTS7ldMN0Jjk+EOOkwHGVZFSYo2mYspvstv1OL+T/b
+wgkJ/UiUPZzVWLw16WWiURVMNdf//fFOHLcNm0GAxaXKsV99USHUtj5QcvpnYExH
+bvhFNUgaEbX6jlp3jn0mJWlxNiXfw5yI1AMZNVCUBzNJx+WwdZZ/Xd4V3CuLwyJI
+w1VgWV6CfEfDECpHt2S96Ft+BDNrmyxNdeTH9QUgawTAyBQC9REibtmLC8xr3ThH
+ls2i3MVCqkrydg==
+=NvBi
+-----END PGP SIGNATURE-----
+--=-=-=--
 
