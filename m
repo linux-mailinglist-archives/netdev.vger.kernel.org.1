@@ -1,118 +1,166 @@
-Return-Path: <netdev+bounces-214871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4700EB2B972
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 08:32:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F214B2B979
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 08:34:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B330B1BA5730
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 06:31:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0DE31734D4
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 06:32:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDCC2267B01;
-	Tue, 19 Aug 2025 06:30:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA35F2690D5;
+	Tue, 19 Aug 2025 06:32:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xbk92i5A"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jBCHn/ny"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06B6A2673AF
-	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 06:30:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F37601AF0C8;
+	Tue, 19 Aug 2025 06:32:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755585055; cv=none; b=CHlG+wE02KPHGhMAcSBHh12Ny+P4vnfVN81iwqNPmynxdcHEiKqUIf8fT/3XFZ9mGS3ZVVm+2zpEWtxQcyHoIJZu04xeOLB1pCD8c3zC5VssXJYTc8qVOajjcCz+gJ7S3iG+6ZEyaXs0HIgSQXsky/nlCZ1OKWPUvT5mFEAXf5w=
+	t=1755585166; cv=none; b=azw5Ml/ZjadZ7CTT+6wpvTvSugL3zU9XxXITzEAheyox/mjx4qHowtsK4ehzFZdWaHR5urDkSgjDvOi/jgkYafjq9ReKox5X0YSQ9lGkyPpFQkJNuI3l7gQbppohU7lhp5r1tRUixZxiCt8y8ECvKwwOyuOa8FGzpcxt6sZhUHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755585055; c=relaxed/simple;
-	bh=8BGkXAg/cYyaOt9ZXSqAWIYIeP5RwAQroBA7qi3xxK8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Qn8RVY6i6iJchINOE4ZYarIiDooZVJtm8urxWbuv5kyu3kwU7xbanhYNxdPynbmRT34uerM0FgT55SbByQsuaeDf6XitgWzmbfRFLwmB21ULFF8wvXlXFaY3R2dbDkjXapsBz9oubs5RdslZ4wR8HSU7O27ns05tNZ5KOL1eGNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xbk92i5A; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755585053;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8BGkXAg/cYyaOt9ZXSqAWIYIeP5RwAQroBA7qi3xxK8=;
-	b=Xbk92i5ASqaCpl1SBGlt6WVhcnpJWwRRGd4fcW1mn5HRJ2Owhc9825gWhgQxIQay6588i2
-	1YO3SeUIi97NkGJYvFZpPmA8HNXW9RYBM18Xbk4OaOeqMciqPSSVOnaeXSKs9JxFwejrWC
-	KpSOIfFYCi0tnJ5n9BSmQtPQIXcAoY0=
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
- [209.85.161.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-655-ssLusTOYOn-at78OzbKbOw-1; Tue, 19 Aug 2025 02:30:51 -0400
-X-MC-Unique: ssLusTOYOn-at78OzbKbOw-1
-X-Mimecast-MFC-AGG-ID: ssLusTOYOn-at78OzbKbOw_1755585051
-Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-61bd4dcbadeso253790eaf.2
-        for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 23:30:51 -0700 (PDT)
+	s=arc-20240116; t=1755585166; c=relaxed/simple;
+	bh=Jof04T+/mttylZx7yuLntizGnCO0cY9QCIhmVBxRIYQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CDJFIQbS9765i6g1DqgOQlYFj9EZ0Hl8IBBHBGTSWz7j4bqRNFh7niAdDjfUMHek7UzGEqE8ZQ+aPyn0dNismSjQ0Y6jAJ9jRTWqWeM+pmQRe02aBA6qvxVLlx+4dldTCermejdPaOZw0Ygnos+faLvMKOkF3m/u6L9N/fUgJEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jBCHn/ny; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3b9d41baedeso2590849f8f.0;
+        Mon, 18 Aug 2025 23:32:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755585163; x=1756189963; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=uSAzqVQc6JyL5nIPW5HIQmKZFDjkdHuqGlO57odkRuk=;
+        b=jBCHn/ny7Y9OBMt1hw8c4aJI0a/Z1dN/vGPU2FusUea0rzi0epLHuwEJiVprYQc1xA
+         6jC4gpjgzHjYCEDJr2QgEUNdKbXPxLEYgxOX86prNM6Q3U+XMzFPYzYgOCUjQrPioom1
+         w2dVTNEfV8W2r8fSRnzKjENRepygi5Rb7D9lMbpCV174LFSLgBxh9fdJeubzoVh/vUe4
+         l6lh46rR1JUOVue9CeovyALcNti76ogg19U/of1O/aui+K/GEXJhTfJ8G1gBCrFuqWp7
+         qe28DmDN5Jsi1H5/W7N/3TMigXasmvxCd3rYRzhe7NUQJQbZCx8a/5qPboIcwsrly4dz
+         sFLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755585051; x=1756189851;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8BGkXAg/cYyaOt9ZXSqAWIYIeP5RwAQroBA7qi3xxK8=;
-        b=A6q3XHqvm1iRFXO58iBSx0lROCs5iL4QCd1nTmtUjQOnhThH1R7//zu1uUs45dHRPK
-         br814kUKV2jh4GGO5ESKsknETe2AT5x++sCqp4eKamOTrelDW3dOEVX2hDq2KNxMd0mC
-         TJ4usHEGKGUDPOX4/Ghd3o11iwIrSelgvG7CTyjMZxiAhlbB5ZSND3nBaXulYt8eyGk/
-         O5oY4c1FDuXcxtf2w6uwQAyDISuo1EYbAuGS/fSlVF0VyDcqCkPoHBg62OjYdT7O6dRi
-         WK7as27yPkuwsdLfyTXXm1Q0Lkn8TUXOr7DYyuBvJ2WBJs6voh2KvSfJQlMNxnBKMrFr
-         eQrw==
-X-Forwarded-Encrypted: i=1; AJvYcCV81RwYdiwodvKqv0QSN2ce4RVNx+2c3QpnABng5lxaOeP7pamULyd0ipO/nKVWMTgFxP4bMHw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4IL75FFogu+UbpNopncA+3z4zwW/uh9BPU4BIMtVELiV/QXty
-	aWIO6QCyIAx40UDYhysl7GQkeXDk9wJG0iXjPAftgRalj95SwbgDGjsQh+9nKeActHZarpJZy/P
-	qGvehw5yZmE12NQCfF9t+0z9lm2+mJFlDpqer8U5dWg+F05LAd9DAyocWk1hMDg/55/3GjeH8wf
-	eNX/yUuOrUU43I5r99hOyvC9f7icCREF0S
-X-Gm-Gg: ASbGncu/SfRMJEwldOFOK6iTPnOUuj7SY/+NViX+BsZho16L8P7YeOPM5rr3GdAty2g
-	RSchor3/f1Ieqi5vEyzFsINotuqrABLr9J2VuTHvzgAGLXuxoy7/zwiQk2CibiBPv9spiyfcKP2
-	uM2vvJ/Gsmk9M7jg/OhaGI
-X-Received: by 2002:a05:6820:1e8b:b0:619:b57d:6673 with SMTP id 006d021491bc7-61d919e9f83mr444124eaf.2.1755585050888;
-        Mon, 18 Aug 2025 23:30:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE2NruEB0PpTboIZlO1R+deeNOAfR6szAOH8EjGkxNqMd5bxJ1wqDFHy3nGmYHV3yaIaLn+9Z6/t+ostF1mqZI=
-X-Received: by 2002:a05:6820:1e8b:b0:619:b57d:6673 with SMTP id
- 006d021491bc7-61d919e9f83mr444109eaf.2.1755585050578; Mon, 18 Aug 2025
- 23:30:50 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1755585163; x=1756189963;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uSAzqVQc6JyL5nIPW5HIQmKZFDjkdHuqGlO57odkRuk=;
+        b=gvwJrUNKGGnRxDHfpkie16XdL6QjqYUEsIvz9w01cuyHuBN7ahUOpO2TAKlWQHDrDK
+         YWMDsXwAc0Ho7qLkS8sLVyJzereBAIH31+fcK+3ciOfqeywnfGhchyNttgOZP8IrhREk
+         HeRpXKxH4E592S7sxd9JRaFl5wGiYu01zoIFCfnPfOwrWmvkAL3TwH9tBL8hfh7jpuqB
+         XuT8BAbCD/K7dwK3v5AGhjxD7rvhlrQG/7QfSJQmPgyIMo2735j+34PXpGrOIapc4Ebk
+         +d78rrSAdmIO5I5FhNTdROJmuzyujQAVtJkCquXiydsqEf04qnOXi7f5MHn8grcqWMC8
+         y7+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWOjxz3EqKaCt6gQ3PQPjRmF+NhIASkLMuBhKiXYQTEFZlT4S99ZMjNzmzOtg+BWb7QdOEX9PwZUM+VhRA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVOjHLrNF/wD4eBzfBR1nqPfQywgYsLR2ggo5g6xaEDx3jwTCp
+	6EMM8X+Ujx+Ju2R3ynQkCBP1CLsMG6inPyge/+DiCblVCb5qVMvPqCPpWblDccSD4JY=
+X-Gm-Gg: ASbGncs8z57VzB7C0zFfZhTPWLvAbuxLzULUZ+07L4JIQ2Sjpr3m/Gx8V7ulvYiMw9C
+	R0F9OiRd9uucqRQpY1x1KXjyNVLViF4cSF8Ewy3w0Mu4H5qIU/VrDncRqUvm3wWW7buSu/FE6NO
+	tUdaGmq9wBzgfyi6Kdy/EWF5XEujzgwm2Gh2juIM8bw6gMgIS5ychzTBbfR3zcHdal6tRCA+rTe
+	v68GBaIrOWrf5Tqss6aHBtusTTJ5u/8+m2NpIVlrzaoQ0j2ko04TUwZRaK5Ub+RJmRUUHPsneYJ
+	yNSi4K1YGwaRGQg9ZyXlJFHVMpsuXIuzSoNKCwvaRAaUNgVmMitPlYNv/Bdj1dg0Xk+rtWT1GcS
+	NUNEZmGVLQR6hWGX3lowPIrKXOMdMRloSTw==
+X-Google-Smtp-Source: AGHT+IHKu9+zp/0eKGFvQYqn0r4wTzn/xrd4ePUW9hhXKVKntaJJ+jo7UpZf7MfT/Eq3RXC78RgNoQ==
+X-Received: by 2002:a5d:5d0c:0:b0:3b8:d15d:933e with SMTP id ffacd0b85a97d-3c0ed6c32e8mr883634f8f.56.1755585163039;
+        Mon, 18 Aug 2025 23:32:43 -0700 (PDT)
+Received: from localhost ([45.10.155.18])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b42a0e8dcsm27206895e9.0.2025.08.18.23.32.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Aug 2025 23:32:42 -0700 (PDT)
+From: Richard Gobert <richardbgobert@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	corbet@lwn.net,
+	shenjian15@huawei.com,
+	salil.mehta@huawei.com,
+	shaojijie@huawei.com,
+	andrew+netdev@lunn.ch,
+	saeedm@nvidia.com,
+	tariqt@nvidia.com,
+	mbloch@nvidia.com,
+	leon@kernel.org,
+	ecree.xilinx@gmail.com,
+	dsahern@kernel.org,
+	ncardwell@google.com,
+	kuniyu@google.com,
+	shuah@kernel.org,
+	sdf@fomichev.me,
+	ahmed.zaki@intel.com,
+	aleksander.lobakin@intel.com,
+	florian.fainelli@broadcom.com,
+	willemdebruijn.kernel@gmail.com,
+	linux-kernel@vger.kernel.org,
+	linux-net-drivers@amd.com,
+	Richard Gobert <richardbgobert@gmail.com>
+Subject: [PATCH net-next v2 0/5] net: gso: restore outer ip ids correctly
+Date: Tue, 19 Aug 2025 08:32:18 +0200
+Message-Id: <20250819063223.5239-1-richardbgobert@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250818153903.189079-1-mschmidt@redhat.com> <aKNU1YnfNbXYhUyj@opensource>
-In-Reply-To: <aKNU1YnfNbXYhUyj@opensource>
-From: Michal Schmidt <mschmidt@redhat.com>
-Date: Tue, 19 Aug 2025 08:30:38 +0200
-X-Gm-Features: Ac12FXzQ5_CEpGP7NZNYa6OiUyYr-nwrNxzE9x55g1guU5BoPDYablJy0CT5lZc
-Message-ID: <CADEbmW1ayx8dKUmE=ueYTVwBme=m1E9WGOmpcv1MCquZ1yBgHQ@mail.gmail.com>
-Subject: Re: [PATCH net] i40e: fix IRQ freeing in i40e_vsi_request_irq_msix
- error path
-To: Subbaraya Sundeep <sbhatta@marvell.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jesse Brandeburg <jesse.brandeburg@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, 
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Aug 19, 2025 at 8:05=E2=80=AFAM Subbaraya Sundeep <sbhatta@marvell.=
-com> wrote:
-> Hi Michal,
-> On 2025-08-18 at 15:39:03, Michal Schmidt (mschmidt@redhat.com) wrote:
-> > Use the same dev_id for free_irq() as for request_irq().
-> >
-> > I tested this with inserting code to fail intentionally.
-> >
-> Nice. Looks like changing this in i40e_vsi_request_irq_msix was missed
-> during 493fb30011b3. Just a question isn't this not throwing any
-> compilation warning all these days?
+GRO currently ignores outer IPv4 header IDs for encapsulated packets
+that have their don't-fragment flag set. GSO, however, always assumes
+that outer IP IDs are incrementing. This results in GSO mangling the
+outer IDs when they aren't incrementing. For example, GSO mangles the
+outer IDs of IPv6 packets that were converted to IPv4, which must
+have an ID of 0 according to RFC 6145, sect. 5.1.
 
-No warnings, because the type of the dev_id parameter is a void pointer.
-Michal
+GRO+GSO is supposed to be entirely transparent by default. GSO already
+correctly restores inner IDs and IDs of non-encapsulated packets. The
+tx-tcp-mangleid-segmentation feature can be enabled to allow the
+mangling of such IDs so that TSO can be used.
+
+This series fixes outer ID restoration for encapsulated packets when
+tx-tcp-mangleid-segmentation is disabled. It also allows GRO to merge
+packets with fixed IDs that don't have their don't-fragment flag set.
+
+v1 -> v2:
+ - Add fou_gro_ops helper
+ - Clarify why sk_family check works
+ - Fix ipip packet generation in selftest
+
+Links:
+ - v1: https://lore.kernel.org/netdev/20250814114030.7683-1-richardbgobert@gmail.com/
+
+Richard Gobert (5):
+  net: gro: remove is_ipv6 from napi_gro_cb
+  net: gro: only merge packets with incrementing or fixed outer ids
+  net: gso: restore ids of outer ip headers correctly
+  net: gro: remove unnecessary df checks
+  selftests/net: test ipip packets in gro.sh
+
+ .../networking/segmentation-offloads.rst      |  4 +-
+ .../net/ethernet/hisilicon/hns3/hns3_enet.c   |  2 +-
+ .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  8 ++-
+ drivers/net/ethernet/sfc/ef100_tx.c           | 14 +++--
+ include/linux/netdevice.h                     |  9 ++-
+ include/linux/skbuff.h                        |  6 +-
+ include/net/gro.h                             | 32 ++++------
+ net/core/dev.c                                |  7 +--
+ net/ipv4/af_inet.c                            | 10 +---
+ net/ipv4/fou_core.c                           | 31 +++++-----
+ net/ipv4/tcp_offload.c                        |  2 +-
+ net/ipv4/udp_offload.c                        |  2 -
+ net/ipv6/udp_offload.c                        |  2 -
+ tools/testing/selftests/net/gro.c             | 58 ++++++++++++++-----
+ tools/testing/selftests/net/gro.sh            |  5 +-
+ 15 files changed, 107 insertions(+), 85 deletions(-)
+
+-- 
+2.36.1
 
 
