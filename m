@@ -1,124 +1,147 @@
-Return-Path: <netdev+bounces-214900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E36E1B2BB07
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 09:48:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 164B5B2BB6A
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 10:11:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E50218931B9
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 07:48:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 032EA5267AA
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 08:11:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79DFF2773EB;
-	Tue, 19 Aug 2025 07:48:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEB913101BB;
+	Tue, 19 Aug 2025 08:10:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lj4AlTff"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="paEjngKm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1872F217F23;
-	Tue, 19 Aug 2025 07:47:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4886286884;
+	Tue, 19 Aug 2025 08:10:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755589680; cv=none; b=sfNqViU23STcxgpT7AwhFpcV91lAe9vw4y4q0c7AtOg2uSb8EQpD3b7ngezcw7GU/qKWk9G0PFyOBCbTmdnQzVohqVr2f45qU/XLtlZ0/ER0Wa46gisxCrmlkzE6xmMQe8hPM610g2H6DusQ6UGvAqcPmAoPQa659aulkIi9HtY=
+	t=1755591054; cv=none; b=WA2UFgHQh6M196dGDGRDzaWGZbRwLWWUAAT6o8cgdyDpiySzHwrdigk7rHY/x2+IckJXJUcNetzDtkIHBB9eyT5bB1/sCw2MHN9gxhiV+4NyiWD6k4qtt8VFjGYx3M5/ZXI07syHDUDaXA2FUOicX9zR3O5SKNinAW7Hi7B0jUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755589680; c=relaxed/simple;
-	bh=L5AiGiUokq6cpctKpE8FbgTcHMur4UUls8lnXii3GTU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X4c0lfyuLpms3mT4XoA4RajcJBBUFXeAPdfXglC+PYKI6o2QgTswUf87/g30rY0OIFDYTujVrcF3IzSQtqlEXkzoo86GhQ+U/2B+QvLK0scakr7u0Xh4GlvVuYAK82/xPXugFOvZtIXIE6ON0VrRiJlS16uNoRGjJzlca2p7DJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lj4AlTff; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-76e2ea94c7dso5534968b3a.2;
-        Tue, 19 Aug 2025 00:47:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755589678; x=1756194478; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=n9whsM9Ixm8GRw4RUDKQhq+aVtmxmfD/5P//fgE8tJo=;
-        b=Lj4AlTffAIyL3s0AwsaihP3LeNANynPa86wKX8QGkMvJf4BXj7QnG5Qdf4ZYt4bF2g
-         AUpUqlgDxbKZ2G24ymBHEAvxVEGoJP6pTgwxhsowdXNjPPgDRnPcPFJbU2Qkmyn4psWs
-         3IzzKLZY8wf2x8NrO4Xx4aguqQcPjlngUuJ2uuuiZU/iI1icf/21G5k4Tupc0nuFCnwM
-         qf6PBCp2/3lM9STafCzNCUhVZ8HuKN40CzxzTcMw5/xKxz6qcizFiP9xU4huybYDSDj6
-         +NeeXdVuqOQeGJDCcHxnoHJA8K7bgVugMpmIKGkyq4SXNC2emsjdzrS20cn3HUCSRAAp
-         +acQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755589678; x=1756194478;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=n9whsM9Ixm8GRw4RUDKQhq+aVtmxmfD/5P//fgE8tJo=;
-        b=CSW27t2CUu9XgZtAS/EaXErXEBmezlfktHEYqaA3G5ONibxBByRI44vKA5dOcLWXok
-         +xdbp5KWhDR4jfIjhkrJd05oCD6vC49M9ExWzwAX3v/DszXB7X/q0HHDho2cHEgstHBq
-         WVV0u/rlT8jWuvhwXwgJEsIm6J1/JVhiEu44/wflxxqwQEZbcq3uAbgiDNE0KPb/ghBY
-         GaYansFWe7orkVbMmoSjPZtNwlrr4rDOJAQn9vbN3MjVskxNzBNT73XH9Skr3JUQw/bm
-         yQbnuwShmdOBdPq5WRWpa96kgPMLAyOFSTX54thF2UJJP4L2ouBzSPQyMlyna6JFNyNd
-         ySyw==
-X-Forwarded-Encrypted: i=1; AJvYcCUEuIXvMU5xhDitURmMdMc3izvJb3YVA5+aEjMjGP6ghfPJCiJEh0z3tNW+Qq0tpdw/7lAyVsd1i/34Q3ksezc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZ3PKicjkJC8jsL73jSQ+JDDINsH7GiGIAX0gNyc0c1eQLLS+Z
-	mw2n0CgCAUdRgKJ5/PPaXLUOEhbdNx9jA13fviuSIO0e1n+vtjDb/GeKi4akr20Q
-X-Gm-Gg: ASbGncvPYuStUIkN1d+fBq+6pjujirwgyz9mZNEYr44525Lu+GRuGt20svfQm23+UI3
-	6oCtGB/gFgKoTxT33TWfDGkIWw7rwzsv5rGQmwrtYY/RGymAg2YWvjOEpqwZFm8TO64LjO/FDsu
-	wcswFovGxpYcdBoY2UEJhoBw/G13ViONBiWdS06W2NP+ccE+aVuENnCHM0tzLowWF4h5XGcnJCG
-	viwKWrcd1DAhgAr+1GwrWwGC48QBu2UC9X1RVW5UIdjC9vSSUBQZWvbVGisZt5GfocFQ5j4CI34
-	2c/xUV+La46KtwTHf5pmIYwJ03YkpjdIHlnXjuRWBRtso0ONF0VSH+4tOzvWJ7I7Ovd1ZAfANO9
-	4gVGsgJK9KUAhLo6kPDwZ5zPNcHc8JTGYG224NkXW0GNhfArexVrY
-X-Google-Smtp-Source: AGHT+IEPQtenb5aBKyXu4mehY07P0EuLt91eDtvweR0TcTIgXsooaj56afb3QxQjezSXDVAUxwuvyQ==
-X-Received: by 2002:a05:6a00:17a0:b0:76c:1c69:111c with SMTP id d2e1a72fcca58-76e80ec781cmr1896224b3a.9.1755589678070;
-        Tue, 19 Aug 2025 00:47:58 -0700 (PDT)
-Received: from fedora.redhat.com ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76e7d4fa868sm1658994b3a.64.2025.08.19.00.47.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Aug 2025 00:47:57 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Florian Westphal <fw@strlen.de>,
-	linux-kselftest@vger.kernel.org,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCH net-next] selftests: rtnetlink: print device info on preferred_lft test failure
-Date: Tue, 19 Aug 2025 07:47:49 +0000
-Message-ID: <20250819074749.388064-1-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1755591054; c=relaxed/simple;
+	bh=Mem68XA4CBvVrxnZFm9GLUSQPJOaH1jSUqJBHty3Mn0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fd62V2N2mWcWlEh0fLcD/Esetqlnjs8dVcbVS0QbcOQKldt16xIfmIcJGEGZY+FUtfRGbif5RLhWa51H0wrrg8f4TUht3BGH/RZh+JtPNdAf2m/rZF52LQuMWw/vpKogHMtuYzd4BbsFZmfkc2n98W74kJMMS3QQ4H3jDHqGMdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=paEjngKm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 680B0C116B1;
+	Tue, 19 Aug 2025 08:10:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755591054;
+	bh=Mem68XA4CBvVrxnZFm9GLUSQPJOaH1jSUqJBHty3Mn0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=paEjngKmnO+QwgqvaZr2brJHyXDS2VnA0YxVuRGCj7LPiO1i4TSii33GeECXpsTui
+	 EzdiJ1ZooPBhluk6oLNUZ875Vpbd+jOzFsMGgPErlO8xvHn0zXuvC4wlhOoELs7MsQ
+	 IdC5b81q0XbT3hD//gyua/9FkG2FckzfXHjcQQT0l0+e+2WMiqZpb+srOzHsV1zko0
+	 KSagEqG6Q5X/ZxUfHajffiZ2mGq7ESMomiEH2T3xS1SrDzxAXcmgaqxhVqXT9hZ892
+	 XDIxkyAmko3pULWCFNG8iXouomUyggSs68S2hyo0yK+lWkqgOUJlYhCDW8hGcru0m1
+	 7/pCPyUI3d5Vw==
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-6188945f471so8314920a12.0;
+        Tue, 19 Aug 2025 01:10:54 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUA1hojWf4dPCB2sax1vnm+lLlGLN6hhFMxkXMYLG4kFt2lVGWSXKRPVahyXJOhUDSEkJEr2Dz28SYa@vger.kernel.org, AJvYcCV/xEw64FGlwQqNqeQ4BvvT2QCfSsF63aJc7PPrkOTMElag3lf3suEAJc+y0+fFlJUYViwaFlw9@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsS2VV4zZ6sJIGRHjl6PHQ2kXoMuubnZhICwfLfKZrsFOTG2Ln
+	f0ygNQWrBGg6t2aVUW3PpmIIbIPi/F2S0JoJGmJIOFJIufnWJzVXuKcow4r8sAvmkv+tkrVUm0E
+	Kp610BvkVHI150I2fNP4DpHl4OrL3ODI=
+X-Google-Smtp-Source: AGHT+IEcZyfGsiOFie2luy3fEI8Nb2QlkZUgkU7UA/Gw2GUbUPFLs5+mV5Il1Iqad4pMkJpKq63kvsNonnx+HvDMfvA=
+X-Received: by 2002:a05:6402:270b:b0:618:3502:80c9 with SMTP id
+ 4fb4d7f45d1cf-61a7fa6c1f5mr1422965a12.10.1755591052956; Tue, 19 Aug 2025
+ 01:10:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1755525878.git.lucien.xin@gmail.com> <50eb7a8c7f567f0a87b6e11d2ad835cdbb9546b4.1755525878.git.lucien.xin@gmail.com>
+ <5d5ac074-1790-410e-acf9-0e559cb7eacb@samba.org>
+In-Reply-To: <5d5ac074-1790-410e-acf9-0e559cb7eacb@samba.org>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Tue, 19 Aug 2025 17:10:40 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-L12tTQyMtTG9+8=XjWY0NDKbYybGXUjPrGin5yYtx3A@mail.gmail.com>
+X-Gm-Features: Ac12FXyiQuPEOg9fCPvN1r6JfTMy5hj0Blb3dqMBqsD73rGciFUNEEgDAVfLZ14
+Message-ID: <CAKYAXd-L12tTQyMtTG9+8=XjWY0NDKbYybGXUjPrGin5yYtx3A@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 01/15] net: define IPPROTO_QUIC and SOL_QUIC constants
+To: Stefan Metzmacher <metze@samba.org>
+Cc: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>, davem@davemloft.net, 
+	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Moritz Buhl <mbuhl@openbsd.org>, 
+	Tyler Fanelli <tfanelli@redhat.com>, Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, 
+	kernel-tls-handshake@lists.linux.dev, Chuck Lever <chuck.lever@oracle.com>, 
+	Jeff Layton <jlayton@kernel.org>, Benjamin Coddington <bcodding@redhat.com>, 
+	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
+	David Howells <dhowells@redhat.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
+	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Even with slowwait used to avoid system sleep in the preferred_lft test,
-failures can still occur after long runtimes.
+On Mon, Aug 18, 2025 at 11:31=E2=80=AFPM Stefan Metzmacher <metze@samba.org=
+> wrote:
+>
+> Hi,
+>
+> > diff --git a/include/linux/socket.h b/include/linux/socket.h
+> > index 3b262487ec06..a7c05b064583 100644
+> > --- a/include/linux/socket.h
+> > +++ b/include/linux/socket.h
+> > @@ -386,6 +386,7 @@ struct ucred {
+> >   #define SOL_MCTP    285
+> >   #define SOL_SMC             286
+> >   #define SOL_VSOCK   287
+> > +#define SOL_QUIC     288
+> >
+> >   /* IPX options */
+> >   #define IPX_TYPE    1
+> > diff --git a/include/uapi/linux/in.h b/include/uapi/linux/in.h
+> > index ced0fc3c3aa5..34becd90d3a6 100644
+> > --- a/include/uapi/linux/in.h
+> > +++ b/include/uapi/linux/in.h
+> > @@ -85,6 +85,8 @@ enum {
+> >   #define IPPROTO_RAW         IPPROTO_RAW
+> >     IPPROTO_SMC =3D 256,                /* Shared Memory Communications=
+         */
+> >   #define IPPROTO_SMC         IPPROTO_SMC
+> > +  IPPROTO_QUIC =3D 261,                /* A UDP-Based Multiplexed and =
+Secure Transport */
+> > +#define IPPROTO_QUIC         IPPROTO_QUIC
+> >     IPPROTO_MPTCP =3D 262,              /* Multipath TCP connection    =
+         */
+> >   #define IPPROTO_MPTCP               IPPROTO_MPTCP
+> >     IPPROTO_MAX
+>
+> Can these constants be accepted, soon?
+>
+> Samba 4.23.0 to be released early September will ship userspace code to
+> use them. It would be good to have them correct when kernel's start to
+> support this...
+I'd like to test ksmbd with smbclient of samba, which includes quic support=
+.
+Which Samba branch should I use? How do I enable quic in Samba?
+Do I need to update smb.conf?
 
-Print the device address info when the test fails to provide better
-troubleshooting data.
-
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
- tools/testing/selftests/net/rtnetlink.sh | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
-index d6c00efeb664..91b0f6cae04d 100755
---- a/tools/testing/selftests/net/rtnetlink.sh
-+++ b/tools/testing/selftests/net/rtnetlink.sh
-@@ -313,6 +313,8 @@ kci_test_addrlft()
- 
- 	slowwait 5 check_addr_not_exist "$devdummy" "10.23.11."
- 	if [ $? -eq 1 ]; then
-+		# troubleshoot the reason for our failure
-+		run_cmd ip addr show dev "$devdummy"
- 		check_err 1
- 		end_test "FAIL: preferred_lft addresses remaining"
- 		return
--- 
-2.50.1
-
+Thanks.
+>
+> It would also mean less risk for conflicting projects with the need for s=
+uch numbers.
+>
+> I think it's useful to use a value lower than IPPROTO_MAX, because it mea=
+ns
+> the kernel module can also be build against older kernels as out of tree =
+module
+> and still it would be transparent for userspace consumers like samba.
+> There are hardcoded checks for IPPROTO_MAX in inet_create, inet6_create, =
+inet_diag_register
+> and the value of IPPROTO_MAX is 263 starting with commit
+> d25a92ccae6bed02327b63d138e12e7806830f78 in 6.11.
+>
+> Thanks!
+> metze
 
