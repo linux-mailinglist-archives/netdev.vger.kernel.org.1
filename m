@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-214930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BF0FB2BF5B
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 12:51:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31B89B2BF6A
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 12:53:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07E923A701D
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 10:51:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 066DE1703FC
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 10:53:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6950F322C87;
-	Tue, 19 Aug 2025 10:51:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6561731AF01;
+	Tue, 19 Aug 2025 10:53:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ipz/jLoE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bivRkAID"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B570525F98E;
-	Tue, 19 Aug 2025 10:51:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A461F8722;
+	Tue, 19 Aug 2025 10:53:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755600663; cv=none; b=UM9SyD1gBqcLSO6Wtyn2BP3hkun3mjK4TiqHD1cRFggdWBckBhlvCT1uhNGFwzW5yB2woHwBHzKzFE2qjyk0upt8OxLg7edvqf9MHIVSbiH4kPBiPdltxY/3hyJ15uHRGLpAjkj4jdtvYx6zcQ864Fnlpr9xT1eXbJqR7YvBJrI=
+	t=1755600812; cv=none; b=CYAbx9O0lf//aibLCp6L9PuYqLSjj5uHWxd0mPhtwGRalfrAODIrvgN5fkEfQxiBGukYNgDG5pDsfZDQpjbBpdgs/b2wDfastugFuVfqx5AcSQ/uumvXXFSIIU1HZf5XsFmcy9GNLgBQ/XtnnFQz9kq7n7LsjPkHJuUVlzgHj0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755600663; c=relaxed/simple;
-	bh=8KEVwwRsMjn8LNeo7Swyhi+N5womecG4rF5cMId69UA=;
+	s=arc-20240116; t=1755600812; c=relaxed/simple;
+	bh=Lu8+FLgRBE2mWiUP/dZpUYRLl6TgRKYLZSvIGCaaHcU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ckBEVlTOi/dvidngvtJGKO8hNP55nc72OPZvLeHASynxkrPqsgXTYhJrBvdQICj+SkJyDHU9IGKShN5HMtJ2h8Vo09KoH1bgtxzWD6FunE2Kr7V+YmDyasYGxNMJ6PbQNGYRzoHTnRs8l3b+EBsKO5NxsXtlYrTEFI3XrvFu7mU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ipz/jLoE; arc=none smtp.client-ip=209.85.218.41
+	 Content-Type:Content-Disposition:In-Reply-To; b=uCY55ei6E33NUiknUM+l/Gly5p3p/rdaa70NXzXlhmGjO0C+gFYSx02/h2Jgq6CJnjixo5YZnXAAm+lRa6qpAP+KFhLCBAsFMkncf1bqfmq7waCobMEGFuArS908Zw958pc8LIN+1BSkWIzPl5mVNbhVdHrla/OykP7STavQCUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bivRkAID; arc=none smtp.client-ip=209.85.218.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-afcb7ab87ffso81339666b.3;
-        Tue, 19 Aug 2025 03:51:01 -0700 (PDT)
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-afcb7a5cff3so95608466b.3;
+        Tue, 19 Aug 2025 03:53:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755600660; x=1756205460; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1755600809; x=1756205609; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=om1w44JMuLFe2q43lus4Kq7PZlXJuu4rWOapDSJq7cQ=;
-        b=ipz/jLoENUSMr5Zw0ONXbo6A+MTYolUxkB9KLUi9evbdjqpEL8fJSLt2gk/PX5SVqW
-         4UmHtBX38G9XX3PQVr3VnI5PqFbP2+KQEgPM2MjAcuiNjA816Z8FCiIzfCyCOlfn6DHK
-         iwupeGjoUUeji/Z67X/1vCo/RGk61ELNbNUBWbUFnBfjmog8e2J4KZfNS/Wb5rhPnYtj
-         5fiUzUnbjTsF3v7o/gAhj/LA021qtINmOBDb7cF0AzbDfVxJ74UWjmM8jvW8BNCVQpg/
-         Ay84ilS9kXIP6iuJwGzMjRKN/Y1PfA9ZuL6QuVCJUYBPleOE0u4oBvFeiObuqMQzOLkN
-         I7Bg==
+        bh=LQ3WWCvJpdSlBjQe+gLB+6Rijmqm2XbNhbFSLgz2eKU=;
+        b=bivRkAIDeU4y3QAHSNonD4xmlPqAqhgFHYzUiSi8bGsWXJiXcB8HXhWw2jpNcJIlNP
+         kXlSQK88exDdDvWMtRCxZ6Iq0LPk1deQdyZE+/oUdg1v4rt2C9LYZITjTIlSmvSxhCQ3
+         SoxSF3Ac3yUzj4WXgi9bS7TJ9tcRpcU8M+L8GWicEdfx4489u+Xky25iD4++QpvDuHBA
+         /geaOuumzfKmTuhcD78B8JPTM+Jaooy0b5H4Tw6fs9FvCojOs90ephQ9oFaHffMkuGMG
+         g7VxT2NwOgyfhzqJPNspjnenCjew0dP0G/0LiGCFkhpDft01PnrectiYfwraSDfrs3uE
+         DHjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755600660; x=1756205460;
+        d=1e100.net; s=20230601; t=1755600809; x=1756205609;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=om1w44JMuLFe2q43lus4Kq7PZlXJuu4rWOapDSJq7cQ=;
-        b=xJeuocXCzo4eSib51992ojPyTdP/KyziY3c1gaqy9+vAzK7aaR+ElJj7jXlre8iMJF
-         h2jN6tULUeM+6fC89AIA02gUmoJbtawVapUyR+lO3+RVv/87X5hV13ALCnm0w1/0I/zw
-         13D9VIlfHZBjK8c6YKr2AW+rl0WIN9D7HYRxCYxIKt2My50EuzVFv+9iYq/+SrAiKdGU
-         1dT+3Oln1isuk5DsAq5aw6DZCQezpj1C3RQoLbAEHiHfx1kj1XOaNP5gcTIzgADkD9CB
-         VdEUfTDa7752Izy/SbQC0uxOvCPdTdZKdPTvcbB7I1Jjmrfo1d36tpknakN6S4GF3tNX
-         75hA==
-X-Forwarded-Encrypted: i=1; AJvYcCVe/VYsbTX0Dh2SvcaZPJozClGqj3u4sALWDbZv5Cjj30hdgxecggTJYsGdC6QIWtf7LB1fh2Cc@vger.kernel.org, AJvYcCW61pwwh2sWFsZAFBWBcRj1RZDVgbF6sLFrXlAKcW3LYQvFp1hStJZxZoGnWdIZU+VQyGycHPEfC/xPYZU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWsixtG9bAT+k9nefloRs3IfYgLvYRa7C0+5RwZ6uqbJWrJAC1
-	z1CKP18kLcGW4Lz1MFmzj4j40zaoKwU/+x11Yu8vLkaY5zfv9mBiAWok
-X-Gm-Gg: ASbGncuQEgYe0BcMyanxtb11mshkVz/XsgyVwebtH0VW/QZA4aHUPFvpa8G+HMigoas
-	8dCBoxKewPuhB6OoYMfmDzA6UsadHMk8ZuMyM9VIbmyKGppsvteQLSsjYZZx0qVzMfDhZcgzv9+
-	gXjNXIfgbuae99zJ8uKEoQqy+hLWADUnJg/mNyHAyGPzeiqraNHsJpJW9IpyKvv0gCo0ZCNgjf7
-	E/DCKz1Z5twmRIkRX14O3gKovt2ctqhhRVXG0AP2j2MQBCnd8op6zyVwpIJOgfks6eMxhE+LQ1w
-	SCya6iCA9rDS61H9GDjJ9vONzEDoNgaCsVPLgTR31b0HUzrFg/f9SJEUjt3Jac0idHOLTd5gole
-	07dVSOUpg7YgDQ0g=
-X-Google-Smtp-Source: AGHT+IEL2vxh7dpWujXHcBIp7VEe4dRbjpE9sbfahe//i2YudEjHNEvyvA24gblBb6k9jt9EpvYnoQ==
-X-Received: by 2002:a17:907:969e:b0:af8:fc60:5008 with SMTP id a640c23a62f3a-afddcd113eemr98473466b.4.1755600659743;
-        Tue, 19 Aug 2025 03:50:59 -0700 (PDT)
+        bh=LQ3WWCvJpdSlBjQe+gLB+6Rijmqm2XbNhbFSLgz2eKU=;
+        b=mA3LgZoV9mdmnS7+Pp0sKYPbQbIT7ztjTP6tZ1lnPXbOIOSaUFQqaO9mCXESZM8iUT
+         ck9+leJsGna887JcqYDDvOU845MZnEubwvxGmkwSQeEp1WbgIxyihBqe+x183SfP6Fg7
+         4yYrXUxZgR7CNbiVRhHvAPN5DQuFim+QDy4yFuOpKUvEi/rmgzP7BECAlJKiDwfou8iT
+         pv9wwTf2Sj2Tcaoges0dHeCvDzXrtgbdaPuU2ikPR9jbYU1J3tFe2+9iFFDYVFYb72x+
+         yTXRS3sUQXukIhI+fE4A8smf94aTpZiYydya1uuRGfCXnfaltMwONg1nq8H3u3pqHUfD
+         YTTA==
+X-Forwarded-Encrypted: i=1; AJvYcCUH1d0/2ZQOkUzL0r8E0r9fB3s/d8VXUv0NyYARAN4tZrI6LR+nCakrKIfwyaTUeEX/FNRRmCT2@vger.kernel.org, AJvYcCUUgvoCx+7FemCITa156L9x4IYlpJMzoIFi84FUuONmsBDcQ46QXzh3qnDGJqVsqbjjx7RNKTjsVRti824=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzzUMiMmZhPbtBc3e4kp+dbhPges4K9L+av7DH0ohjP177GLz+O
+	x3PVG4qsPYKOLwLkpGODA6x/kPUmYEbVXofXZW9TlCNmoGygHAYArher8YUCWg==
+X-Gm-Gg: ASbGnct9Ko3eKM4qE1wAmQMKErhZFnMgVURyODIjsn0az38ykZaBgXv/9Rx2aYgqgVI
+	uOXmFTI/qbMirmz8aLqZx2tR/b+y41OJKzMrJdRgXlfCkSka9lWOyiWXO6ixKQcgZ9uEKNvaY7b
+	r6Q1n/xAbTeXJxAhESKEz8lAv9ZRad+6szU2CkMSLBXvGkriNx/U54e3YLbxSsofbgeVvW5i29w
+	WVj8r8i2cfYi3ImM24Sb2ElAlB1vNlFZ0EGCwzilr1vEug8LSxG+PHSNhUFgJJQhs7CbHx6LB+r
+	vWa4+Jjc/fGaJkDdx5xPv7TsP0kXiHVOk263wPVfmsDFm4m0DUQY4JDR9GwcssMVXKOrS6ZLtY9
+	jok/1kLwfKeIndRQ=
+X-Google-Smtp-Source: AGHT+IHYHSHOrGl15203O0R9iDrM2r0QMVlszncbwITNXUNTXHG022X2whTrHOYFUN9Hmzo4j7v+YA==
+X-Received: by 2002:a17:907:3f1c:b0:ae0:ba0e:ae59 with SMTP id a640c23a62f3a-afddd1e4384mr104347866b.7.1755600808611;
+        Tue, 19 Aug 2025 03:53:28 -0700 (PDT)
 Received: from skbuf ([2a02:2f04:d005:3b00:5508:97d1:7a8e:6531])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-afcdd010d4csm967064066b.85.2025.08.19.03.50.57
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-afcdd04e0c5sm981587266b.117.2025.08.19.03.53.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Aug 2025 03:50:58 -0700 (PDT)
-Date: Tue, 19 Aug 2025 13:50:55 +0300
+        Tue, 19 Aug 2025 03:53:27 -0700 (PDT)
+Date: Tue, 19 Aug 2025 13:53:25 +0300
 From: Vladimir Oltean <olteanv@gmail.com>
 To: Daniel Golle <daniel@makrotopia.org>
 Cc: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
@@ -92,13 +92,10 @@ Cc: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net-next v2 3/8] net: dsa: lantiq_gswip: move definitions
- to header
-Message-ID: <20250819105055.tuig57u66sit2mlu@skbuf>
+Subject: Re: [PATCH net-next v2 0/8] net: dsa: lantiq_gswip: prepare for
+ supporting new features
+Message-ID: <20250819105325.2rvgom5gpnfmuozo@skbuf>
 References: <cover.1755564606.git.daniel@makrotopia.org>
- <cover.1755564606.git.daniel@makrotopia.org>
- <a6dd825d9e3eefa175a578a43e302b6eaae2b9dd.1755564606.git.daniel@makrotopia.org>
- <a6dd825d9e3eefa175a578a43e302b6eaae2b9dd.1755564606.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -107,22 +104,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a6dd825d9e3eefa175a578a43e302b6eaae2b9dd.1755564606.git.daniel@makrotopia.org>
- <a6dd825d9e3eefa175a578a43e302b6eaae2b9dd.1755564606.git.daniel@makrotopia.org>
+In-Reply-To: <cover.1755564606.git.daniel@makrotopia.org>
 
-On Tue, Aug 19, 2025 at 02:33:02AM +0100, Daniel Golle wrote:
-> +#define GSWIP_TABLE_ACTIVE_VLAN		0x01
-> +#define GSWIP_TABLE_VLAN_MAPPING	0x02
-> +#define GSWIP_TABLE_MAC_BRIDGE		0x0b
-> +#define  GSWIP_TABLE_MAC_BRIDGE_KEY3_FID	GENMASK(5, 0)	/* Filtering identifier */
-> +#define  GSWIP_TABLE_MAC_BRIDGE_VAL0_PORT	GENMASK(7, 4)	/* Port on learned entries */
-> +#define  GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC	BIT(0)		/* Static, non-aging entry */
-> +#define  GSWIP_TABLE_MAC_BRIDGE_VAL1_VALID	BIT(1)		/* Valid bit */
+On Tue, Aug 19, 2025 at 02:31:17AM +0100, Daniel Golle wrote:
+> Prepare for supporting the newer standalone MaxLinear GSW1xx switch
+> family by refactoring the existing lantiq_gswip driver.
+> This is the first of a total of 3 series and doesn't yet introduce
+> any functional changes, but rather just makes the driver more
+> flexible, so new hardware and features can be supported in future.
+> 
+> This series has been preceded by an RFC series which covers everything
+> needed to support the MaxLinear GSW1xx family of switches. Andrew Lunn
+> had suggested to start with the 8 patches now submitted as they prepare
+> but don't yet introduce any functional changes.
+> 
+> Everything has been compile and runtime tested on AVM Fritz!Box 7490
+> (GSWIP version 2.1, VR9 v1.2)
+> 
+> Link: https://lore.kernel.org/netdev/aKDhFCNwjDDwRKsI@pidgin.makrotopia.org/
+> 
+> Daniel Golle (8):
+>   net: dsa: lantiq_gswip: deduplicate dsa_switch_ops
+>   net: dsa: lantiq_gswip: prepare for more CPU port options
+>   net: dsa: lantiq_gswip: move definitions to header
+>   net: dsa: lantiq_gswip: introduce bitmaps for port types
+>   net: dsa: lantiq_gswip: load model-specific microcode
+>   net: dsa: lantiq_gswip: make DSA tag protocol model-specific
+>   net: dsa: lantiq_gswip: store switch API version in priv
+>   net: dsa: lantiq_gswip: add support for SWAPI version 2.3
+> 
+>  drivers/net/dsa/lantiq_gswip.c | 404 ++++++++-------------------------
+>  drivers/net/dsa/lantiq_gswip.h | 268 ++++++++++++++++++++++
+>  drivers/net/dsa/lantiq_pce.h   |   9 +-
+>  3 files changed, 363 insertions(+), 318 deletions(-)
+>  create mode 100644 drivers/net/dsa/lantiq_gswip.h
+> 
+> -- 
+> 2.50.1
 
-The VAL1_VALID bit definition sneaked in, there was no such thing in the
-code being moved.
-
-I'm willing to let this pass (I don't think I have other review comments
-that would justify a resend), but it's not a good practice to introduce
-changes in large quantities of code as you're moving them around.
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
