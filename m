@@ -1,165 +1,288 @@
-Return-Path: <netdev+bounces-215065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E655DB2CFC5
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 01:20:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9C19B2CFE1
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 01:26:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A15B41C46119
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 23:17:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E263A3B141A
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 23:24:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD6E927381E;
-	Tue, 19 Aug 2025 23:15:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 439982288E3;
+	Tue, 19 Aug 2025 23:24:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F9gbemjR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="c8UyEfCb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61FD34C9D
-	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 23:15:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755645338; cv=none; b=GUEYXIGR0lwFXhqIFNlTXHwOCGDkl4nKGMzHWaherqybwPb1WEOmcazxo2ux9SnHyzxa1hII4Exeab47IeFcNvr690Hkbla/+8HQ1RlsAAMf3uASU5yKXMAnRD1/ddtNxeAwmwq71FyG/uZAN0ayFT/sg6V6sdTi/1fntbSHN+M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755645338; c=relaxed/simple;
-	bh=sohXUCFQM1ep0RPRBEGHKkF2hRO8RMxXBzkJBASZSyM=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=seQDaaj8AQcMi7TcO4HhWRkYL6FH5MWzXrACeO4vEBtq+KtgUMFG6/HNJlctrrjGz/wDqd+ekqL8AR1S4mREWBB8vVC5BDk5uh2cot8kz3RCedJFzgnfYOvoU6teR183CHgrHILM6YasVdKlOWHp8pFzZv4GK+ic3JHbQ8+n8ek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=F9gbemjR; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b47174bdce2so4622971a12.2
-        for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 16:15:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755645336; x=1756250136; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Mjhf0MX/qFWykSy6d4h/JnOiudhoPbgld0ljmqsw4SI=;
-        b=F9gbemjRMnj16I4K0LtACn73LmzFSlR3Z+BbEOA2Am8Qw8Wl8ploNzC535cNSxPgI+
-         OYBJa+ytSGCdOPC1q60EZs+zVlxnlszCEgaw4tar5ejJEsHmQUTrCf1p1enVUYjnzhxI
-         fZsxfXb12DmrgloafaVz1+aV/O6E7LDQ7biMgf7/OWJGGMXEc+5KCnlOxX6agodKBUJf
-         GMGRb4PIFzIrqSjdACaMG+kUMd1FAOJ+F6LFPDx2SZaHDevQel+FuxwLo5ZObnZQXIOQ
-         zhTifCOiRtG02lNvm78wae2yZaXUZXR+SD2t7s2lmT4BGXED3O94E7OWEoVOxSSmL6ZH
-         8FMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755645336; x=1756250136;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Mjhf0MX/qFWykSy6d4h/JnOiudhoPbgld0ljmqsw4SI=;
-        b=wwZgm491rGih2eCakPKSY55cnt5zKW6BCEOgKWPJIAvP7BpPdvLotned4y0l4NYdHi
-         3OmRdMLAXjf9xE/Yc+MfA3Gqt+1OWjNrq8Wl5Gi/B4JAl5B5faImPq/y139DKotk5fzv
-         TRKpxTOb2ZcZ1dV9ztuLj1X4zNZRybuXrzaKfv45g19jNXrUW6QazALszRS/DDhe+x1A
-         Ssh3R5439ZMFMArHtRD8SEz9xQCdlALxvjdnXV2MlpsNVltjKRSJPG8S79yqb1J4ebCN
-         IS9qwbPFVbWFJTVzYzby9wxorP0iqIzhEp+zM3xz8TmdW27TwfYrGIdaLrHv+UJIkVj6
-         sZOg==
-X-Forwarded-Encrypted: i=1; AJvYcCUgm0t75ygAB0xICb+3j11mHt+X0XyT35VQOOD8UbQCBro2G797u3EOjmN6cSx5NV5CtTReQHM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrQpuwuGe+Puhl+fADjOyYK2HZ8o+kfuQnXEZNj9yS8qEwX1Al
-	ajnsx6jwVPfig7Y9xnD/iggWF/3XuA2gQtSisMOoCeBVMsKMBVaZWj8PrWTfeLmiQVl0Fv4lO4s
-	n93Vl7g==
-X-Google-Smtp-Source: AGHT+IGC73+nCYKcjA1K7BPCnr4BmsLmZNvusDaz/b0pIl1OqdXVTD/JubiTgqIC7KB0jm7kXT+GMtpATXE=
-X-Received: from pjbqi3.prod.google.com ([2002:a17:90b:2743:b0:324:e309:fc22])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3a47:b0:311:df4b:4b7a
- with SMTP id 98e67ed59e1d1-324e1448086mr1328690a91.29.1755645336659; Tue, 19
- Aug 2025 16:15:36 -0700 (PDT)
-Date: Tue, 19 Aug 2025 23:14:57 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90E735336A
+	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 23:24:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755645860; cv=fail; b=uhsu33yxPsKpnDK7GQXYTZvdsJsuDtXyfvgJOPMYHb+v9JU2fPHbfV1uGteu4N3AQz11S7kTIDrOCABSv5O6N2SDkfG1ifhfaBNQRhKWvgjO6uCiBnBFkWb9v8mU229vRdnSjfTw1lXuEQKDSvRqrhkrSGL2svIIG745RU506i4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755645860; c=relaxed/simple;
+	bh=TYFWVpATi5gLA8VtURzhBIvdWscOy2mpBW9qzbCoPzA=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=BpPHvU/0zShD5UEDVJFDMl7M7kCgP5bE0RgmZwUUsiltnbGi1XGzsMcHVXqD+1dvWnsqvRKMq3Gbxk1eTyqD2iZ/oEfb2epAYza53KBfQQ3CeoOvrqo2iDssKFwvOl8PJ9IkTmlynFABwFjRsa42jfw9bmTRcN0eGU/za1/6Aso=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=c8UyEfCb; arc=fail smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755645858; x=1787181858;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:mime-version;
+  bh=TYFWVpATi5gLA8VtURzhBIvdWscOy2mpBW9qzbCoPzA=;
+  b=c8UyEfCbb6J7j/MQ4pSI0wcVR01OBZPjslDQhkpZntkv+kcL/PSX1NkB
+   znZR5nyNKuf1Lh9OyazicWTsOO2GKkuxVbGDFhOlyLq5v23LfAN9Ga/Hy
+   PSYvc1yCfzqAmeSgn193MaZs3NWFCUdz957pVNemLLR2nCpizuREidk0M
+   Ls4VOI+sB4vdP9HLnCTbcVGfL8xl/POPOxznNrqetx8I+/J5i0ciQU3eC
+   uUFa2lRAV/4I3J4Vps38BNnHytEfGAazF1UEUXsw+Ntji1kOayBD+cYx/
+   HM9f2PZaHgxyBPE5fkFgPEPdQ9UWs2D2Hs+km7+pEHATcdWodxve0uve8
+   w==;
+X-CSE-ConnectionGUID: rsCcDcuvS7uF+wSHnPP96g==
+X-CSE-MsgGUID: 8eoKBFizSQmbBtzkbBH0HQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11527"; a="56931817"
+X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
+   d="asc'?scan'208";a="56931817"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2025 16:24:17 -0700
+X-CSE-ConnectionGUID: oa2J41cvQd62ds1DDAO+AQ==
+X-CSE-MsgGUID: 51dcb2spQamHQjYonbTGFw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
+   d="asc'?scan'208";a="172220276"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2025 16:24:17 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Tue, 19 Aug 2025 16:24:16 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Tue, 19 Aug 2025 16:24:16 -0700
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (40.107.101.55)
+ by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Tue, 19 Aug 2025 16:24:15 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=CNAm4ICcRSNqUVlLSr/3zHBu/LJYZut+rYj7wkVbg6c43AH1dSxx7dFWJHmxbc6OYm0tzYsWncsmIZVsY+1zmmfye3tQcK439+oi0Gh8EIJsCYIEJivbWAhE8gQJ5UcRNcj4m6GEpgkqk7BjDxtwzlxHEvn/SusZY610zTyyeVFA89Ud1B0jDciIogvwTPTyAO19zZ04YT2NxWMcgZeyrrdXbMsdHWshEShLibhoTLikUFzoSHKT39CmiRwYFWkgBaLE6Ggq1SUWA69r8HL2JiRTiBA2U5Wf0NadoNGf8E+OiLSJXajks5xTgZenDe/xiHaNxmpEJSXfbETVT7Gczg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TYFWVpATi5gLA8VtURzhBIvdWscOy2mpBW9qzbCoPzA=;
+ b=fvc+iAUEXQtw8T+RTinzfL9QkAHYujgRrlact6QLX+eHmL/7xS7mHV2fq/Gb48liy7trBD2BDMB7vsTwrzZR5/guha+TcSPzW4u1mUb9Jj3D/JpJLWhy58evSKp30FmBXdVbyiwzEHSkfxk6L0JrvatMR0JRZ2pwL4JnDD2wvWbKy2krgJxmJhDsOaz82KX+QnmC6yXY2zY3NLDn8V91IYKCL37ibVF6bXFp7vb+VbpPyBLUMSTYJczIENzdNoHspx0h3F8cLM188ect/bqKvihfguXid+OfCScGsmV9U1C66qNWgoj7St3c5PR5vnzd1b1CK63YX/8SdIN87GnXxg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by SA1PR11MB8349.namprd11.prod.outlook.com (2603:10b6:806:383::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.25; Tue, 19 Aug
+ 2025 23:24:08 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3%5]) with mapi id 15.20.9031.023; Tue, 19 Aug 2025
+ 23:24:08 +0000
+Message-ID: <cc538c62-87cd-472f-bcfa-7b92dbd90a25@intel.com>
+Date: Tue, 19 Aug 2025 16:24:05 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next] igb: Retrieve Tx timestamp directly from
+ interrupt
+To: Kurt Kanzenbach <kurt@linutronix.de>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Richard Cochran
+	<richardcochran@gmail.com>, Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
+References: <20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+Autocrypt: addr=jacob.e.keller@intel.com; keydata=
+ xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
+ J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
+ qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
+ CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
+ UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
+ MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
+ apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
+ cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
+In-Reply-To: <20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="------------rU6CTv5U5bMLK5RxpQVvRe1Y"
+X-ClientProxiedBy: MW4PR03CA0335.namprd03.prod.outlook.com
+ (2603:10b6:303:dc::10) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0.rc1.167.g924127e9c0-goog
-Message-ID: <20250819231527.1427361-1-kuniyu@google.com>
-Subject: [PATCH v1 net-next] selftests/net: packetdrill: Support single
- protocol test.
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|SA1PR11MB8349:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3ccc7682-8410-4336-d3a1-08dddf777ed0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?dlZIVUR3ZTJUbGRYM2h1TEJqTWZGSFp2cWtNS0h3YTN6L3EwR3BqS2JNSjRS?=
+ =?utf-8?B?eXFqeU9NR3dXN3ZCMWpiaXJ1L2J2ekM4czlDRExOeWROcVA4VFVUOHVaZWJY?=
+ =?utf-8?B?N2VhVTVFMEVUVmt4Ty9Makk3Z0k2UkYrbkE1R1RxaGUvOXVPcjNjQlkvZkFl?=
+ =?utf-8?B?WVBrcjNKTGVIMi9waURuQkNRSXRyT05mSWJtZll3Z1cwRjY0Y1FkTHVpSzF0?=
+ =?utf-8?B?cERyeXRCRDE3THB1M2NsTEVhZVZiQ29jMnpWUlJHWmkvR0NBd1I1cDYyL1RG?=
+ =?utf-8?B?bWU4UncwMnJmRW5wSzZPRnRSd0J1UXlwSmFWRkhSK3FQU0ZCYjZJaGF4cTg3?=
+ =?utf-8?B?NVFnNGQwTVNHdlYzU3NCZXc5VzZJb3NOWkc5NTNtSG1hQmF4ZTVnVjYrVTRW?=
+ =?utf-8?B?SXhhTS9WdmcyVHJ0NHQrTnRqUk51VnlTelhabVl2d3l0clVGMi9EYlhaL0lh?=
+ =?utf-8?B?S1MyZnBzYm43elhoNzNZOGxkaUxoRHJKQlVrVG02K1NyRnhsTDdNL2pMTHVr?=
+ =?utf-8?B?WlMyN0dYRnVHRmZiVVdTZUppZ2ljbHYzaVUxa1hJYzkzSVR5MzIyZnNKTEJZ?=
+ =?utf-8?B?dWoyZFlpR0FNUzJCRkU4NERSb0JkSWlsLzJoQ1NsYWEvSUlzUFFlc2NPQis1?=
+ =?utf-8?B?TTFJRllUb0tMcmZ0NjJtRk5MQmtZZXV1Sk11VXlRNmdCTlYxbDVqQ2ZJR201?=
+ =?utf-8?B?OVlQc3dka3dSb004Z1hzVnlvaWdPUUlxNVFkcEtTdHRrUVF4RmxJM2QxZFd2?=
+ =?utf-8?B?QjhZZ0RualJCcXNGeWZiYkxIZTFxLzU0MlpLM3lha1hNRjkwd1RMbnhmWTNF?=
+ =?utf-8?B?a3JQdjFQSWhZcStMUHBVQ3l6eUQxdVBMVTA1dTN4ZERxN2E3Q3VseldPZDZW?=
+ =?utf-8?B?SVJmZFFHQStXU1lyYy9sR0oyWGNnMkM0RXZXZGJVc3orQ3ZJZTlodlBiUjNp?=
+ =?utf-8?B?R2d4emMxbkNMVUJUQitWeWpleDhUS04vNDRzRmdHSDEzaUFIK0NnRjlXeG9j?=
+ =?utf-8?B?WnMyVmZXcllyR2JnRmx6M3lzMjNMV3Z1Yjd6eDY5QW9hYUlka2s5WUdYdGVW?=
+ =?utf-8?B?VTRYci9ZeVNDOWdhcjVaZy8zR1QrTkk1ZXl6WWNJNDJBY1M1T2xLeEREVDVU?=
+ =?utf-8?B?LzBxV29iRE5aRmlFRXhOVGZBcHpPL2lUWjd0ZHhDZVhFbW0rcHJzOTZ5Z2hX?=
+ =?utf-8?B?WWpJMVJWNFlKSy9iRFJiKzVRT2dhMnN5S1ZCOEJSSDF5dEp0T3EzL0RjSnNR?=
+ =?utf-8?B?d0I0MUF2b2wrRzdmMDNSbWV4STNCS2JzblgrQkdWRlk4bWI3V09HNkZEd1o4?=
+ =?utf-8?B?blJyaFp0UTlJOWFYUG82RmFMQjQvbnlJbUdwc2Y3b0lCeTZ4eXUwbFk0YUZI?=
+ =?utf-8?B?UHByVjdqZnQxcWc2VmpheGVIcEJ4NDB0ajBLZUpHclB6Sm5VdXZkZmg1RmJX?=
+ =?utf-8?B?eE9LYk9SSWRmUUV3bUZvdytLcXVManltY2ZYL0FTaXR3Sk5sYWlqTEgyYm9v?=
+ =?utf-8?B?c3l3U2xMSTl5MldOWjNnK0hraTY4QzJuVXdIYlMwKzN2WkJka2NiemxVbHVm?=
+ =?utf-8?B?ZmhidEhqcDlPcUtRaFgxSzhsaW4rYVJEdDl5QitwYVBUQmhRWldYSEEveHNx?=
+ =?utf-8?B?b213VGFaWGJiaTI4TXJsUVdIQzUzam1VVjVLRTc2UitTaWxYSUw4UnFrWTZ5?=
+ =?utf-8?B?Tm1MUVYrSUN4clUzK05SM0FkdTJBRS82SlpuTTZWZUwzWU5NRjN1ei9xdmN2?=
+ =?utf-8?B?UU1JSXRQZElYRW1NU28ySHBBVzlXLzVxOVNWbmRLbExQL1JCRDZvVCt6SEFy?=
+ =?utf-8?B?Q2VoWnhacWZnTktyQ3FtTUJLTjZrWDRlWDBiemZsNGlJZkJkL09zOE01UG5v?=
+ =?utf-8?B?NTlobkdHQnlad2RzZ0tGVnZyY0h5dFc1cVVXZjZTSU5HdmQxWDkvZXozUFBW?=
+ =?utf-8?Q?cpD7/Dby8sY=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NlFTamV0R25QL1JNZzlONmc0c1FzYjJUWGpLQ2RXTU5BQlZ4bU1LTWJnSHpZ?=
+ =?utf-8?B?OFNNd21CM21mQ0NyaEFmNDB5K0cva3JaazJTbFJEdjdKTzlUM1gzeWU0dEgz?=
+ =?utf-8?B?cmlpalV1dnVML0pNNi9XZ1hKdWRCRnU0T3RnaUhlRUVlTjhXdGk4VUtQSlVw?=
+ =?utf-8?B?K3daZ0QwVzR5cm5BWG9tc2lCWDMvR3ZrVTE1VUxhZURQbWpFZmRoQVpoUGEy?=
+ =?utf-8?B?c1ZIaHdoNnE2QXh1ZjBmYzI5NGFPV0I5WTNSQUhaOTkyZjNxKzRRcFhRVWR2?=
+ =?utf-8?B?bmJPUEJtVlhTb2taZlVHT1NlM2hEaDlhWkY1clRic1VKM1YybzVaR3ZyaTRW?=
+ =?utf-8?B?blVZbnNrMi9lMWRGdGNPYzIyQnBZa2RCTWpYbGZrM1k0dVV0NHdPaXovc21l?=
+ =?utf-8?B?eGUvNStsUmlMdTFmTGFudmJ0eDRVUXljMUQ2RnJTWFYrR3cwWDQ5VnFvMTFr?=
+ =?utf-8?B?bmFyUjc4UER5VExVMkVzTmlnNFlUNFhNV3RxcnVRd0dYdkVCK2szNGZibUxK?=
+ =?utf-8?B?U2NBcWdScm9raFZHZEtoNnh1b2VwMXk2RDk0bTRKMG9SMDlWQlU5WmljNVNp?=
+ =?utf-8?B?ZW8zeEwvQzh4Rkx2d3RZWWttelFhS0pYYTRRZFZMaTNBeHJwNWtZa2tMbDJm?=
+ =?utf-8?B?dDBrZkJKMFN0cmRrL2MzTnNlcnZHVVR4ZnhqVUYyOStoWVR4M21vdDdycGFz?=
+ =?utf-8?B?czBKY1h3Nmo1d3dLVHorV3dtbEI3MDc3R1l1WGpZME1pdHBLYVpJY0k5b0VU?=
+ =?utf-8?B?eGxQMDlkaGM5K2pTYkg3UEZvam1VeVl1OVNWZk8vMFBTSjdEd0V1WHBkT3Fn?=
+ =?utf-8?B?OUcxNlozdStuUTdNMTZPM1B4N043aWxDU2JoQmdPQ1ZBSStPY045QUE2M2Yv?=
+ =?utf-8?B?eTZsemc1Nm42NTZRdXgwZklidWdjMzVacmdBaWZuY3FjMWtzRkR3K3BGT0xX?=
+ =?utf-8?B?eXMzN01YR25xZEtjcVd0TjZVTFp6S2FVSmt2alY4YzAzNUVoSENUcVFsTEJp?=
+ =?utf-8?B?TjZlT1RabDNHelhGUEFsSkpTeFpxM1RZdWRzR3dqWGRweHJma0Q0NHJOQ3c1?=
+ =?utf-8?B?ZGlNMmdzeTRObkwzZXJkTkpXYmc0MlRvSGdmUzI5R0lhaXJtbVh3N0tMdWJ6?=
+ =?utf-8?B?emFMVzFJN2h2YUd0eThLekNZaXBsUlVRZjJkVkY3MC9PbUFNdWx4aTE5V0Nz?=
+ =?utf-8?B?RHVoT25ZRkllSzFYeEkzMVBETWF4bEdvSnJnTGs3aVFyTm8wRFhQYnB2MjVR?=
+ =?utf-8?B?ZzJrZ2RUZzFuaG9iaWVFZ3dDVnFUbXRtUjlEVE1jdk1yczZkNlduN05Bemx2?=
+ =?utf-8?B?SDJCbW9KdEpSOWg1L3NJY1hXSWdiUXpPMnc0a2lUeWJ1SkdDYzZCNlVCeVc3?=
+ =?utf-8?B?SVNPNVpxRUl3SHhtdGduWTdHQVpDNFU0bkI5R1RKQ2ZJUFlydnlZN1E1ajBD?=
+ =?utf-8?B?dCtUWXZKcXorUkJ3L3Vra29PdWFvNGpLbDMxM2lFdVZyd3RaSjBFbWhKTUVQ?=
+ =?utf-8?B?RDVQZDlyblJDb1g1SjdSZ2I1bTZwc2dBNVJYOHlKaWNVMHBnRmpITThNNlo2?=
+ =?utf-8?B?eGxpek1xVEZwN2ZlektwVkQwRUtRN2dtaUpmcVJyNVlrR0E1YmIxaklnVU5G?=
+ =?utf-8?B?TUdKVEd5VGk0UU1ZajVKay9UdHpMRS9LbTY1TkFRTWpkYlFqS0tIVVBlRzhy?=
+ =?utf-8?B?eGFmaU9LNXI3eXpSZ1dwZktqWXdrRi9tWDE3WDg0WjVIa3lTOFRJbzZrdWMx?=
+ =?utf-8?B?UnFpQ0l6WDVHK01yTUl6K2hZNkJnWW15Qmh0ZHFXV0tZOUMreDB3OUpjQUMy?=
+ =?utf-8?B?aVdiNzh2RlFvLzhmbVh2c1RqcUVDUllySFNOQUdwc1JCUUNGYXgzMXJscURr?=
+ =?utf-8?B?VzcrUDNHTTZMeGF3cEhQU2lZcVJqbmtRRFJKd3gzRkhRRUhDalM5MDFRVjVD?=
+ =?utf-8?B?K3p6djEwQ3VtcGwxaCsxL25MdnIvL0pROW42NUFOK29oS21LazJZZXZ4OUFM?=
+ =?utf-8?B?NUtVNlB1NjJaMEgrUXpxZ3IvdVdlVnQvU0pFaVczeTZPRjRHVy9ZTUJ0UUxW?=
+ =?utf-8?B?eUNNbitiYWlSYnpYallndW4wT1Zmc3BJTVIvb1FBOVhYQ21GdDZka1JsSlJj?=
+ =?utf-8?B?RDNFYkFaUUJSRXMzc1lzbmxpSEltcXVwcjI1L2h1RzBwYkNRdCtlNFdXejBa?=
+ =?utf-8?B?NHc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3ccc7682-8410-4336-d3a1-08dddf777ed0
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Aug 2025 23:24:07.9918
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vMkQHNyF2GmZ24GsNGAzUtlEn3BVt3wTGo0kOG2w4pA+VkDvjDXTtbQ0PLneTDP208lIKUfW3MYa/vG2LBmPw06D18usweNzU7VP66ok2J0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8349
+X-OriginatorOrg: intel.com
 
-Currently, we cannot write IPv4 or IPv6 specific packetdrill tests
-as ksft_runner.sh runs each .pkt file for both protocols.
+--------------rU6CTv5U5bMLK5RxpQVvRe1Y
+Content-Type: multipart/mixed; boundary="------------DIuw9BX53rC0UdHfRBvwt2yA";
+ protected-headers="v1"
+From: Jacob Keller <jacob.e.keller@intel.com>
+To: Kurt Kanzenbach <kurt@linutronix.de>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Message-ID: <cc538c62-87cd-472f-bcfa-7b92dbd90a25@intel.com>
+Subject: Re: [PATCH iwl-next] igb: Retrieve Tx timestamp directly from
+ interrupt
+References: <20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de>
+In-Reply-To: <20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de>
 
-Let's support single protocol test by checking --ip_version in the
-.pkt file.
+--------------DIuw9BX53rC0UdHfRBvwt2yA
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- .../selftests/net/packetdrill/ksft_runner.sh  | 47 +++++++++++--------
- 1 file changed, 28 insertions(+), 19 deletions(-)
 
-diff --git a/tools/testing/selftests/net/packetdrill/ksft_runner.sh b/tools/testing/selftests/net/packetdrill/ksft_runner.sh
-index a7e790af38ff..0ae6eeeb1a8e 100755
---- a/tools/testing/selftests/net/packetdrill/ksft_runner.sh
-+++ b/tools/testing/selftests/net/packetdrill/ksft_runner.sh
-@@ -3,21 +3,22 @@
- 
- source "$(dirname $(realpath $0))/../../kselftest/ktap_helpers.sh"
- 
--readonly ipv4_args=('--ip_version=ipv4 '
--		    '--local_ip=192.168.0.1 '
--		    '--gateway_ip=192.168.0.1 '
--		    '--netmask_ip=255.255.0.0 '
--		    '--remote_ip=192.0.2.1 '
--		    '-D CMSG_LEVEL_IP=SOL_IP '
--		    '-D CMSG_TYPE_RECVERR=IP_RECVERR ')
--
--readonly ipv6_args=('--ip_version=ipv6 '
--		    '--mtu=1520 '
--		    '--local_ip=fd3d:0a0b:17d6::1 '
--		    '--gateway_ip=fd3d:0a0b:17d6:8888::1 '
--		    '--remote_ip=fd3d:fa7b:d17d::1 '
--		    '-D CMSG_LEVEL_IP=SOL_IPV6 '
--		    '-D CMSG_TYPE_RECVERR=IPV6_RECVERR ')
-+declare -A ip_args=(
-+	[ipv4]="--ip_version=ipv4
-+		--local_ip=192.168.0.1
-+		--gateway_ip=192.168.0.1
-+		--netmask_ip=255.255.0.0
-+		--remote_ip=192.0.2.1
-+		-D CMSG_LEVEL_IP=SOL_IP
-+		-D CMSG_TYPE_RECVERR=IP_RECVERR"
-+	[ipv6]="--ip_version=ipv6
-+		--mtu=1520
-+		--local_ip=fd3d:0a0b:17d6::1
-+		--gateway_ip=fd3d:0a0b:17d6:8888::1
-+		--remote_ip=fd3d:fa7b:d17d::1
-+		-D CMSG_LEVEL_IP=SOL_IPV6
-+		-D CMSG_TYPE_RECVERR=IPV6_RECVERR"
-+)
- 
- if [ $# -ne 1 ]; then
- 	ktap_exit_fail_msg "usage: $0 <script>"
-@@ -38,12 +39,20 @@ if [[ -n "${KSFT_MACHINE_SLOW}" ]]; then
- 	failfunc=ktap_test_xfail
- fi
- 
-+ip_versions=$(grep -E '^--ip_version=' $script | cut -d '=' -f 2)
-+if [[ -z $ip_versions ]]; then
-+	ip_versions="ipv4 ipv6"
-+elif [[ ! "$ip_versions" =~ ^ipv[46]$ ]]; then
-+	ktap_exit_fail_msg "Too many or unsupported --ip_version: $ip_versions"
-+	exit "$KSFT_FAIL"
-+fi
-+
- ktap_print_header
- ktap_set_plan 2
- 
--unshare -n packetdrill ${ipv4_args[@]} ${optargs[@]} $script > /dev/null \
--	&& ktap_test_pass "ipv4" || $failfunc "ipv4"
--unshare -n packetdrill ${ipv6_args[@]} ${optargs[@]} $script > /dev/null \
--	&& ktap_test_pass "ipv6" || $failfunc "ipv6"
-+for ip_version in $ip_versions; do
-+	unshare -n packetdrill ${ip_args[$ip_version]} ${optargs[@]} $script > /dev/null \
-+	    && ktap_test_pass $ip_version || $failfunc $ip_version
-+done
- 
- ktap_finished
--- 
-2.51.0.rc1.167.g924127e9c0-goog
 
+On 8/14/2025 11:50 PM, Kurt Kanzenbach wrote:
+> Retrieve Tx timestamp directly from interrupt handler.
+>=20
+> The current implementation uses schedule_work() which is executed by th=
+e
+> system work queue to retrieve Tx timestamps. This increases latency and=
+ can
+> lead to timeouts in case of heavy system load.
+>=20
+> Therefore, fetch the timestamp directly from the interrupt handler.
+>=20
+> The work queue code stays for the Intel 82576. Tested on Intel i210.
+>=20
+
+The change makes sense to me. All we really have to do in the interrupt
+is read the timestamp register, and then report it to stack. Its much
+better to do that work immediately if we don't need any locking or other
+CPU intensive tasks here.
+
+I can confirm that 82576 does not have the interrupt, it was introduced
+in later hardware.
+
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+
+--------------DIuw9BX53rC0UdHfRBvwt2yA--
+
+--------------rU6CTv5U5bMLK5RxpQVvRe1Y
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wnsEABYIACMWIQQgQFSp1zOQVirsQx5qll0+bw8o6AUCaKUHlgUDAAAAAAAKCRBqll0+bw8o6Dfq
+APoCGRlDlXEX0y4G48u5qzuK/pZzi/1Kok/l0Y6W/IPNygD7BKTVkrGj2WRiO3BqNUixH4tzCVuL
+4wNPY9vQUttArAk=
+=jlpR
+-----END PGP SIGNATURE-----
+
+--------------rU6CTv5U5bMLK5RxpQVvRe1Y--
 
