@@ -1,87 +1,89 @@
-Return-Path: <netdev+bounces-214878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57889B2B9A0
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 08:39:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 666B1B2B996
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 08:37:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65AB1162EB8
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 06:36:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F050B3A2745
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 06:37:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 292A826A0D0;
-	Tue, 19 Aug 2025 06:36:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C205126D4CF;
+	Tue, 19 Aug 2025 06:36:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="EyEyXonY"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ZW++GaR6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E71125FA1D
-	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 06:36:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E97026CE22
+	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 06:36:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755585401; cv=none; b=EmBm0sibOOjIYnzipHj74Jy8HwYPR860YKrIbpauZSRQr4JLYfskAu51QST7fuqgpNvYuh1enSqcAIRa1tng6T8il46N5OvYK/CV/7Nn7GrjK6mCb6q73qbv5VArsLQ3NaMBrLOMPu3eJZ2wYzWQnUM5PdyFVtrV2QZZWWaFhCk=
+	t=1755585405; cv=none; b=FXTGTNQ69SXTZhk/XT7Qjdaov0qHryECOxgd8pOodXnNRcJhqx/HDy9TxZe9Fqtyj69qfb5O3lqL/pFGSRay+f3xkhiWpxVcpWmC4dnyyd/YHdtuyPq7pU1ppglpd3LgvAboDg2lIR4r6ZuWSXV9Q+xQsOZNcLZLiRb/ufy6tvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755585401; c=relaxed/simple;
-	bh=8rX82cXmDkiy7mxoulbCd1tP0xA4NYjLb7c/ZyHx9wE=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=lCCbhiA9s3W5Dj/+Yj+wmVLWqptjbo4mS84kTJRq+nrbA+vA6PzavTTlH2YoxUDeCWDO1Vox01TDuDbE21iv6Ih//Iz9h7RhRB3hVF/Wz92fXatYF+xeCu8XWAC35Kh19ncDhWZbX4cN/5GfQvsBWWR7ZuK8QTPNxOrhotnDWmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=EyEyXonY; arc=none smtp.client-ip=205.220.180.131
+	s=arc-20240116; t=1755585405; c=relaxed/simple;
+	bh=rgkE1DP1easYS6YslKYK9Bbq9OWK3nty3gdcQhkYooc=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=Intl1VaKdot90Jsy7BXW6PCRzIoROZ2Tp+mcXCl/Xvnn7hzwT7wbXrRjXab3zVNR0uwqAKWJS2fCxOn+qbkCKxtpI9FsA5Z+tqVQxlRl4uge6V+CZSo3N308ESecMrLKVbpkKRYwYt92l9uY7WbpfhwNAO/Jcrumd+iYNg4Gm6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ZW++GaR6; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57INx2Hc001955
-	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 06:36:38 GMT
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57ILfb1c025278
+	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 06:36:43 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=BNDtdStOIIki9xxSs9/BB+
-	Gr6oUDaLjPxhFCW+eeQCc=; b=EyEyXonYYSs6oBIqd3Ln5w1LpBUuXayPhDojXS
-	NG3ErmNfjJRADyOdJxZpec0t5sgSYnVXjcmQgssv+XIKCSo6Ktz4xCY4FYYpWLpu
-	dfHqSkicd/mXXWD+b+RotNQ3fkTpa0caLH/YBCZg4RPJ9VFIJJJi3EzNjn1l4wWr
-	e+s4Z4jn3jHVDXotpBwc9YkwHda1nXxTyBzzWdsYK6g64gt54bhYSR9kA9ALF3EO
-	wkwoGgh+/aV32Zxy6rY3iP2jFQHqOQMaqULtUc1AnYiFQtK8rDg3ZTFYkwu59T6A
-	ADSgjhXywDifKfwj50jTFX9sg3FlAJQye+dlNtvgJ39sA2LQ==
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48m62vje4h-1
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	jWZPw+Dpps6jokruu2kK5mo0seIUmSLFHBR/QVxbsPI=; b=ZW++GaR6r2FuhTkw
+	9b5wRt5o8NYv2lIEhyRloLp1OufW5ndt4sDKqW6IbiUGfuJghLP/y8yObQhdQ8BV
+	JLidfzkhERA4FNb3mqGOzKEwnG2JacuY9azj6mMDlZrfyHn+5LXWcecpvhZw3CYf
+	6Kejwh9NwHSRnLAcxlnFY2vedyVkCdvC4ZFkd2w+cX++mpSqJok9c0pZKqr8RKxy
+	Jn6VM2NoDbkvOuHKM8hH7CAGA+QEF2AT7MKelyp8dRkZ0VYmlLcVYcKqxJgCsJVL
+	ksmBWCgKDWd+uRZr75vwdgdbHX+B7i7M5oqIdALqfEZANG6g9ao/66Bal86onM5O
+	DsGPYw==
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48mca5h58v-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 06:36:38 +0000 (GMT)
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-b4716fa1e59so4189320a12.0
-        for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 23:36:38 -0700 (PDT)
+	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 06:36:43 +0000 (GMT)
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-24458121274so59939195ad.2
+        for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 23:36:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755585396; x=1756190196;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BNDtdStOIIki9xxSs9/BB+Gr6oUDaLjPxhFCW+eeQCc=;
-        b=FCk0Rt5k3Qnav4ZHBqwNwHxeZKBaiqIScHqegIcmbiIW4HfPqf+mnU9182fZRXq03e
-         8MXGO3BszZ4Zn+7Ha4mNYR7D1wfe3kGX91P1jQZP3M49NZLnAwIuFOhquta7+1vAAir1
-         Of2pKl++YyIj9gCoXie5WkMD1igd9+dXxRX9eHKD9jgnf8gQe3jffOXwF4LrXoElXC3T
-         FOO5gcUE4r1oZJvjYEUtyesNpxC5wfivFttGxp25k/Vy0OZqm4vYdkvLCTys6KFGs/Ed
-         HuLE17ptxSMzD1APNLxL9HInFSthFcuBrzV6yW4qDZS0nI4VLvUIcHW/FOPgd6eRsVPx
-         wg4A==
-X-Gm-Message-State: AOJu0YxDMn/HQdn68fEHF/SQCl0x3D0m72oX+vSAhG72mRK4fdMdPK9S
-	MyLRXGU171nzSqqTyYYROCfefRSh2x79khuD80EML3iuICvWT5+BIlnQ/sh2HSnwg6PEl+nLbKq
-	lv8seOhwlbb7HgL+XD8beH67kcjt80rkpIfTu7GShMwmYkdpfj45wE6LWcsc=
-X-Gm-Gg: ASbGncvy/YqzzfUO8W5P/goXA7FdQrk/MVCU0N8g9zMQtghpwoZIMjV4kg8O3BTOBbP
-	9mZBpQf4n458db2XvqjXPww4pwXfUPS8Bbz2Cse/Gt7W7EDVmc+ZZJjDReJmyZlCe53yKCfMAx7
-	MCTHorBrEYuvcWK/8Azyn9sVZAcTIYCV+UizU804687OPJ8iU7Eg7Ipnua4u24SgthzjRLfmcDc
-	656HZWc/ueBl/mC4ZIRcvgwQFXnr6dRqF8WKKpQXJzLy9Kdqj3XrdtBXoBYYCGzJ+yRtfxXZQis
-	CcyslIso0f2dOKU0F7oHqzVLsrUbFC0SkPJLtlT61NZYF5C2IrNWlJYMvHy1UOguVrFMDLqafKi
-	Yxf78p8Q3q/0l8d9q7gQTZI2EQ+teZExxng==
-X-Received: by 2002:a17:903:1a0f:b0:23f:d8e4:ded2 with SMTP id d9443c01a7336-245e04fa7ecmr18015895ad.53.1755585396142;
-        Mon, 18 Aug 2025 23:36:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH7x2rlLjLEjoY6XNFKv6eIKH4qPemYI90LbCuQyKWX6k4A4fAbmZ2rJWHEIcg7kMoDk+m1Xg==
-X-Received: by 2002:a17:903:1a0f:b0:23f:d8e4:ded2 with SMTP id d9443c01a7336-245e04fa7ecmr18015545ad.53.1755585395617;
-        Mon, 18 Aug 2025 23:36:35 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1755585402; x=1756190202;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jWZPw+Dpps6jokruu2kK5mo0seIUmSLFHBR/QVxbsPI=;
+        b=mG55trw/S5cnE3NWZgVwPnOjrh8UasnlU9C/dA+FAyQIpT1JN1Nqx4iIBwSJo3Nv7v
+         KX1XD4w8LUqMU/7uOmVMvrpMxxOuwztMD+tUEm6BF18yCPCjSqir1YgTinB6WyygGtUG
+         izHRFE4Hpg08dk8fiLQDzlWMVCT13kLqsyfB+JJWSqhFMFhnBZTipwfXQeBRKGPaoInF
+         VoBmetsQ9wZ23/EawaHOlSAN4GnODta5B1Av8ph1QVPJEjZcaHr/bYXNTjRa7jWE0ETK
+         LSfilSo5SImu25WGi5qrGEzbSnUFoRgapMz2SfYv8kd8YAtpvuvvEdtsRAtUEGaBxf7M
+         27FA==
+X-Gm-Message-State: AOJu0Yx944ApuFuWciDUZB8Y5khonH2vJi2riDnKNmcnX5NYCG6zLYp+
+	WRTqnxuT24ZVPr9ypB04pDIBG2M/Ewb/h/5HZstRa1cRonFeUuzLkJwuTJ8bmtnTUUK0CbJMura
+	ixun9UAU/4LyOoKtubwUN5Yn2UmFjfE98fdjD5fxmUM9o+k7KHEH8zNyEjnU=
+X-Gm-Gg: ASbGncuAdDSFQ1yPM9sP3AV2uZcFpW+G2ATO99389AsoBTqBs6bb6SyzGVUp5E/ClRp
+	FLWoXi31p67bLcVqTQ4XtlOeBdh24bVC2qB3qcJsXBV0ZML69BODO3FSn6qT6ajvnbHWtlWnO3j
+	MCzZj2O5qG7GBz4FLyNGP9oue/i4lkFINdB5zzbs43w+ugOJ6YGxNEbiMgCQlHyR7CrnuDGv440
+	99SXXEhcm3+yMLxbkmdMb2gSmO5w8o2NixT37LJOv35ESZAfYsf0v7Mus7Q/l7dUf8yMhEAxdxX
+	IuOR+o95AiFwNcAMZ/ghfLScjvxZo+pzVkqhXthDguDQoEkbc1EFZ3LDgIt0O/et4+8YOLbGPG5
+	UpvciV95Zxzt1OjbEDaVUNNGkhDANruO7og==
+X-Received: by 2002:a17:903:234c:b0:234:cf24:3be8 with SMTP id d9443c01a7336-245e0541d6dmr14369095ad.28.1755585402152;
+        Mon, 18 Aug 2025 23:36:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHl/lNABQK/kpg0X2OhEKp4HNBmGeNVvVA1WkA/paFD5ccWwopJ2tFxVPde1x3VdbYJUHJCYg==
+X-Received: by 2002:a17:903:234c:b0:234:cf24:3be8 with SMTP id d9443c01a7336-245e0541d6dmr14368825ad.28.1755585401656;
+        Mon, 18 Aug 2025 23:36:41 -0700 (PDT)
 Received: from yijiyang-gv.ap.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com. [103.229.16.4])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2446d54fe38sm98120455ad.135.2025.08.18.23.36.29
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2446d54fe38sm98120455ad.135.2025.08.18.23.36.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Aug 2025 23:36:35 -0700 (PDT)
+        Mon, 18 Aug 2025 23:36:41 -0700 (PDT)
 From: Yijie Yang <yijie.yang@oss.qualcomm.com>
-Subject: [PATCH v4 0/6] Enable ethernet on qcs615
-Date: Tue, 19 Aug 2025 14:35:55 +0800
-Message-Id: <20250819-qcs615_eth-v4-0-5050ed3402cb@oss.qualcomm.com>
+Date: Tue, 19 Aug 2025 14:35:56 +0800
+Subject: [PATCH v4 1/6] net: stmmac: Add support for 10 Mbps and 100 Mbps
+ Ethernet speeds
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,12 +91,10 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-B4-Tracking: v=1; b=H4sIAEwbpGgC/y2OzQ6DIBCEX8Vw7jaCP5Ge+h6NMYhr5SBWoMbG+
- O5d0eNkZr6ZjXl0Bj17JBtzuBhvJksivyVMD8q+EUxHmolUFGnFM5i1L3nRYBhAopC5KMpe8ox
- R4eOwN2uEvWrSrfIIrVNWDweCKk0X/JV0OH9pLZzxM6uncTThkVhcA1yLgh2owfgwuV+8ufDYi
- D4XHIjZnK9gySCFXuW5LGWRdpV60og2Vt8Jzep93/9hUL5Z8QAAAA==
-X-Change-ID: 20250813-qcs615_eth-9e294256f913
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250819-qcs615_eth-v4-1-5050ed3402cb@oss.qualcomm.com>
+References: <20250819-qcs615_eth-v4-0-5050ed3402cb@oss.qualcomm.com>
+In-Reply-To: <20250819-qcs615_eth-v4-0-5050ed3402cb@oss.qualcomm.com>
 To: Vinod Koul <vkoul@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
@@ -110,82 +110,82 @@ Cc: netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
         linux-stm32@st-md-mailman.stormreply.com,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
         devicetree@vger.kernel.org, stable+noautosel@kernel.org,
-        Yijie Yang <yijie.yang@oss.qualcomm.com>,
-        Yijie Yang <quic_yijiyang@quicinc.com>,
-        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+        Yijie Yang <yijie.yang@oss.qualcomm.com>
 X-Mailer: b4 0.15-dev-5bbf5
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1755585387; l=1876;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1755585388; l=1721;
  i=yijie.yang@oss.qualcomm.com; s=20240408; h=from:subject:message-id;
- bh=8rX82cXmDkiy7mxoulbCd1tP0xA4NYjLb7c/ZyHx9wE=;
- b=aePfqudwbcAPoG0PPnBbU0FLS0s8F7btntlHW3vUPmGfocAQIUpjWpRbyjMfijPe2uqxhVKJY
- McDY75ufw3tBmlF2fvkzXQ/MPEjYHaStCQJMuO2NDkjLw3U+Y3RiqW5
+ bh=rgkE1DP1easYS6YslKYK9Bbq9OWK3nty3gdcQhkYooc=;
+ b=lAzLbqBZgwScoYObFRiDqWfMrCAW8S5NgGjq7r08AjwHO1jUwef1A+841LP3ckCJ1R1EY5YEH
+ 4cuvivCRLNeDSw954otmMxHK0W9KcjsGR/NaRz4uxt+wTDkP5NVaIVl
 X-Developer-Key: i=yijie.yang@oss.qualcomm.com; a=ed25519;
  pk=XvMv0rxjrXLYFdBXoFjTdOdAwDT5SPbQ5uAKGESDihk=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODE4MDEzOSBTYWx0ZWRfX/SER1prQ/1Kh
- Jd9TiLn4BdCsP9ZzfrqnE4lZm6liMVFyhXBJmP3sQpiph8nBx6g0g3S2jx86BfOW79TS34bjCJf
- XUEPu/fgiYF/FPaEHAjtOltgxYlye2ZrRKRwn55UayTWD05a5BYvuWMiNYZghsFjyEVoAo9UgNg
- huwkDvcKmCUGqJbqc5i62bz9PGdcvw5j3aVXF8KQ6Wzu39LXRcrKQA9ZpdJYWumZZHhJ7JK9i2r
- d2m4FKVhS+DjpnedSiGt9gw+ptCNW82Eah8Lc4OovQLKfzEy60tdqKrbA8vPyjOFaRJYRuu+R9E
- 96myFnz90Rkt9wLbz0I0aH6/s/bL7veTPhHE0bwxJB6aTq49qDSRMlnOd9H9srA+dcmdCbuF7Oa
- HP2ejZFz
-X-Proofpoint-GUID: fPHisq6Jp-33jSyeDqVYxpyZ_M0J3enK
-X-Authority-Analysis: v=2.4 cv=A4tsP7WG c=1 sm=1 tr=0 ts=68a41b76 cx=c_pps
- a=oF/VQ+ItUULfLr/lQ2/icg==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=COk6AnOGAAAA:8
- a=EUspDBNiAAAA:8 a=wApU7nzg8TAj0S4BVTIA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=3WC7DwWrALyhR5TkjVHa:22 a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-ORIG-GUID: fPHisq6Jp-33jSyeDqVYxpyZ_M0J3enK
+X-Authority-Analysis: v=2.4 cv=FdU3xI+6 c=1 sm=1 tr=0 ts=68a41b7b cx=c_pps
+ a=JL+w9abYAAE89/QcEU+0QA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=EUspDBNiAAAA:8 a=VHUZ9mhHZOqmV8q2ncwA:9
+ a=QEXdDO2ut3YA:10 a=324X-CrmTo6CU4MGRt3R:22
+X-Proofpoint-ORIG-GUID: T4mvnuYHvGQiHdxE-zeU57GNdpIqCABo
+X-Proofpoint-GUID: T4mvnuYHvGQiHdxE-zeU57GNdpIqCABo
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODE4MDIwMiBTYWx0ZWRfX9Ms6JLPIGAMz
+ Gtod6VapibPKLqJcaVfraiqrHjtWRr6dkPdrjsUGIstr5J777WdPZt+HNVlZKC69udYyuP7gMb/
+ wXsCcAZ63NICfH469qJrGy5evT3iX2aW8QZ2Rj9GioURAWF9dFve64NLWehZdKtjXAadQKqdSJY
+ SLjiOXnkmU4rIddiHZLlu78S3rlcykUm0A4nfQI49eHacQIQrz4ys09PM0rvS+eqL5OYM1D0JEF
+ s1izywIdvgzhWh/OtFyTeRXFn+dutML2BNyF8XKTtSBobkYD2TJyYYFafmFxDxIRNAN+EEGbjZ2
+ f/ooOPWVJbOK+TaWWismxCTDbPk2OFaOhmEKLuT558DJqpbzpiPmNdv/xLNAd4W60rMugs7E24r
+ gSXAhkGZ
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-08-19_01,2025-08-14_01,2025-03-28_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 phishscore=0 adultscore=0 malwarescore=0 bulkscore=0
- spamscore=0 impostorscore=0 priorityscore=1501 clxscore=1015
+ suspectscore=0 clxscore=1015 phishscore=0 spamscore=0 malwarescore=0
+ priorityscore=1501 adultscore=0 impostorscore=0 bulkscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508180139
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508180202
 
-Adds device tree nodes and EMAC driver data to enable Ethernet
-functionality on the QCS615-RIDE platform, supporting all three
-standard speeds.
+The DLL is a Qualcomm-specific hardware component integrated within the
+MAC and should be configured in bypass mode for 10 Mbps and 100 Mbps
+speeds. If not bypassed, the timing delay will be incorrectly applied,
+which will disrupt signal sampling.
 
-Switches the semantic interpretation of 'rgmii' and 'rgmii-id' in the
-driver code to match upstream Linux kernel definitions. Updates the
-device tree files for affected boards—QCS404-EVB-400 and SA8155-ADP—
-accordingly to ensure consistent behavior across platforms.
-
+Fixes: a7c30e62d4b8 ("net: stmmac: Add driver for Qualcomm ethqos")
 Signed-off-by: Yijie Yang <yijie.yang@oss.qualcomm.com>
 ---
-Integrates the thread:
-https://lore.kernel.org/all/20241225-support_10m100m-v1-0-4b52ef48b488@quicinc.com/
+ drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-Changes in v4:
-- Change the phy-mode of QCS404-EVB-4000 and SA8155-ADP to rgmii-id.
-- Remove the DT binding change related to the phy-mode definition.
-- Update base commit.
-- Drop ABI compatibility and update the driver code accordingly.
-- Link to v3: https://lore.kernel.org/all/20250121-dts_qcs615-v3-0-fa4496950d8a@quicinc.com/
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+index d8fd4d8f6ced..a4ea72f86ca8 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+@@ -64,6 +64,9 @@
+ #define SDCC_DLL_CONFIG2_DDR_TRAFFIC_INIT_SW	BIT(1)
+ #define SDCC_DLL_CONFIG2_DDR_CAL_EN		BIT(0)
+ 
++/* SDCC_USR_CTL fields */
++#define SDCC_USR_CTL_DLL_BYPASS			BIT(30)
++
+ /* SDC4_STATUS bits */
+ #define SDC4_STATUS_DLL_LOCK			BIT(7)
+ 
+@@ -609,6 +612,17 @@ static int ethqos_configure_rgmii(struct qcom_ethqos *ethqos, int speed)
+ 	if (speed == SPEED_1000)
+ 		ethqos_dll_configure(ethqos);
+ 
++	/* The DLL (Delay Locked Loop) aligns the clock and samples data
++	 * in RGMII interfaces. It should be bypassed for 10 Mbps and
++	 * 100 Mbps speeds.
++	 */
++	if (speed == SPEED_10 || speed == SPEED_100) {
++		rgmii_updatel(ethqos, SDCC_DLL_CONFIG_PDN, SDCC_DLL_CONFIG_PDN,
++			      SDCC_HC_REG_DLL_CONFIG);
++		rgmii_updatel(ethqos, SDCC_USR_CTL_DLL_BYPASS,
++			      SDCC_USR_CTL_DLL_BYPASS, SDCC_USR_CTL);
++	}
++
+ 	ethqos_rgmii_macro_init(ethqos, speed);
+ 
+ 	return 0;
 
----
-Yijie Yang (6):
-      net: stmmac: Add support for 10 Mbps and 100 Mbps Ethernet speeds
-      net: stmmac: Inverse the phy-mode definition
-      arm64: dts: qcom: qcs615: add ethernet node
-      arm64: dts: qcom: qcs615-ride: Enable ethernet node
-      arm64: dts: qcom: qcs404: Inverse phy-mode for EVB-4000
-      arm64: dts: qcom: sa8155p-adp: Inverse phy-mode
-
- arch/arm64/boot/dts/qcom/qcs404-evb-4000.dts       |   2 +-
- arch/arm64/boot/dts/qcom/qcs615-ride.dts           | 104 +++++++++++++++++++++
- arch/arm64/boot/dts/qcom/sa8155p-adp.dts           |   2 +-
- arch/arm64/boot/dts/qcom/sm6150.dtsi               |  33 +++++++
- .../ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    |  28 +++++-
- 5 files changed, 162 insertions(+), 7 deletions(-)
----
-base-commit: eb91b04da2c3ac17e4e67079e455fba4bfd1b4f0
-change-id: 20250813-qcs615_eth-9e294256f913
-
-Best regards,
---  
-Yijie Yang <yijie.yang@oss.qualcomm.com>
+-- 
+2.34.1
 
 
