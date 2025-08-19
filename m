@@ -1,105 +1,90 @@
-Return-Path: <netdev+bounces-214899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BEFFB2BADB
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 09:34:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E36E1B2BB07
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 09:48:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 952385861A6
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 07:34:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E50218931B9
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 07:48:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C11DB304BC6;
-	Tue, 19 Aug 2025 07:34:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79DFF2773EB;
+	Tue, 19 Aug 2025 07:48:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HsLBl/k9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lj4AlTff"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B2C9304962;
-	Tue, 19 Aug 2025 07:34:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1872F217F23;
+	Tue, 19 Aug 2025 07:47:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755588845; cv=none; b=OJPDATdueEk2/1wTGR2DQIynQ9lsES2HRWXxzzgTxcPIFsI2vq4Z3gzNEXLV/4HRHbg1+JlGQPkVZha7Z9j+jpYJSvDlej1X1wudADUqpCCVdw4fgukEdbsJF6ObS3zOClXju2BCxh3WfEHrDbp0SPP+uB44w+0DtbAWkT3jkf0=
+	t=1755589680; cv=none; b=sfNqViU23STcxgpT7AwhFpcV91lAe9vw4y4q0c7AtOg2uSb8EQpD3b7ngezcw7GU/qKWk9G0PFyOBCbTmdnQzVohqVr2f45qU/XLtlZ0/ER0Wa46gisxCrmlkzE6xmMQe8hPM610g2H6DusQ6UGvAqcPmAoPQa659aulkIi9HtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755588845; c=relaxed/simple;
-	bh=mvDAEEjcSvS2J/xJnibH61hnns2SV+N5KFudF0ycESY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iHqgMjFPJtLiqTp/o7s5TfQbleJgPOs889wFBefDCs6/VABJ9CJ401ZebN3ayMmaiYUPD7oPQ6Sf6O5Uu+1Nwu9jNZBfJJQAEN+QsxfEyjX0s+/YRWKYiCByrbYT331OGcebdxXk6jSvRqWmBgro+6vuHjOR/sNVK4vz26I7cL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HsLBl/k9; arc=none smtp.client-ip=209.85.210.170
+	s=arc-20240116; t=1755589680; c=relaxed/simple;
+	bh=L5AiGiUokq6cpctKpE8FbgTcHMur4UUls8lnXii3GTU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X4c0lfyuLpms3mT4XoA4RajcJBBUFXeAPdfXglC+PYKI6o2QgTswUf87/g30rY0OIFDYTujVrcF3IzSQtqlEXkzoo86GhQ+U/2B+QvLK0scakr7u0Xh4GlvVuYAK82/xPXugFOvZtIXIE6ON0VrRiJlS16uNoRGjJzlca2p7DJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lj4AlTff; arc=none smtp.client-ip=209.85.210.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-76e2e8aff06so3898493b3a.1;
-        Tue, 19 Aug 2025 00:34:03 -0700 (PDT)
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-76e2ea94c7dso5534968b3a.2;
+        Tue, 19 Aug 2025 00:47:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755588843; x=1756193643; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1755589678; x=1756194478; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WRFb3rdAexBW6O6UzAWea93nghFYugX6Crj6XcdDSIU=;
-        b=HsLBl/k9mVghgubriLcDbDWHCR2BZzsbB0xTKgh89xTZlNg15lDYOdDSa5YdDVxACG
-         4KBgyJGzjsJEMGM3588To+2/JTgw6j4apptmpKzZnWyFy6vVaLdh2fZpSaoxHb0u2LsV
-         RgRgFgzPwsjPKo29TXkv4HMPn6rnAUvXZZrK6ujbH9nGN9jZ1G1V4/tlYxVuRkHn5B1w
-         Weo1f0P8hDWuAnohLTgOyHXhf4HVGYM9henz93AH5DtRaasbisLG6oPZIcb3/+q/gqEX
-         FlO8ZY0F79afAguQceQ84vR0a/FKgzlJr/Cs+z8d66bxgkzzA/xz9DudyO7x8ery46Vo
-         /Kew==
+        bh=n9whsM9Ixm8GRw4RUDKQhq+aVtmxmfD/5P//fgE8tJo=;
+        b=Lj4AlTffAIyL3s0AwsaihP3LeNANynPa86wKX8QGkMvJf4BXj7QnG5Qdf4ZYt4bF2g
+         AUpUqlgDxbKZ2G24ymBHEAvxVEGoJP6pTgwxhsowdXNjPPgDRnPcPFJbU2Qkmyn4psWs
+         3IzzKLZY8wf2x8NrO4Xx4aguqQcPjlngUuJ2uuuiZU/iI1icf/21G5k4Tupc0nuFCnwM
+         qf6PBCp2/3lM9STafCzNCUhVZ8HuKN40CzxzTcMw5/xKxz6qcizFiP9xU4huybYDSDj6
+         +NeeXdVuqOQeGJDCcHxnoHJA8K7bgVugMpmIKGkyq4SXNC2emsjdzrS20cn3HUCSRAAp
+         +acQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755588843; x=1756193643;
+        d=1e100.net; s=20230601; t=1755589678; x=1756194478;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=WRFb3rdAexBW6O6UzAWea93nghFYugX6Crj6XcdDSIU=;
-        b=eLvxnSE/S/VBR9SC3bV82LUdITtorn7h3Q5TP+g3Ab1DGCWoker5O621NLr1hJfEV0
-         6ePBtRpc+eOULWYoysMzeoOebe/y6d3AM8K0vv6AfH7IS50KpJc1wtKrpFoyojf5ktzY
-         8f0GULAOv9n6g8wiJAS/Dg1I5IW+DqaODGzAxrnUk+l+RQL6lqY1OhM4k1FgK4LDPHoF
-         US/726bAVXwY5NqqZYvkHTtDdo7HvKY9Kmypyx0CCXG4epvxyCpOfqSpit3itOsmtcY5
-         qPFxT0V8+C7uQS6yNmzbxttd0CcFogAGXQb7egU7BMkZxjqVI9WBi57fT5xWirQQ1oF2
-         A5Vg==
-X-Forwarded-Encrypted: i=1; AJvYcCUJjR7KBqPx3RQBlT6dbsOhtcHBJq9V33mMhtub0UnPYjBqu8THCGNpNlirTUpkg7wz+O2vswjkoh63Bs1J@vger.kernel.org, AJvYcCVyHo2SO/a19zjI0upGUmKG2HcD8ytl7ZibZMiM6tIdHsm4Q1AzvgNzLdjC5doooOxSMQo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1nfgZFYv14liKYOUv6fbvW9usv8eExSE6OutDobaK80JCMTNy
-	izUhUSIFXLWXGRqlDrVSqKvoeNAliiDDSwgmyyjwS8TvYVOpkOGvqWD4y9uzvh8c
-X-Gm-Gg: ASbGnctCqUsl+7A4I/W3afm4YkkIf2KeyzRMBMAQoJPMsNysKFQi/hNh2nERSZ+Nuyx
-	CbeQwW1+GOdO1nndt/SKteF0Isb3Oq/7fAXL6iS0U0Wsb2fM8AAcvqZmf6BzS8piCjNTVmfJTWz
-	CPZDrhK2yo0kGdhrR9adExKO1urzWbPVq0Z631EJZdqzlLegX3i9dNLLP73slPamOq64lfV4/xy
-	EgzOrtFlZCPn/ujQ1l6uzzgzH2e8aPEqoq2lgILsXvcu53k4ZmNi+9sPrYxiLEKpz9mjE+2D2eu
-	S15N8WSNvRXtwLPqGpN8DUOL5P6ruoURpQHCL3LkI6gO62xkwrt8qahh7vN6AjZdxhCFX62Psnj
-	lHV7t+BBTs9fVUCP7y+REIyRUSe/AO0s8Rx5KSJ55Gg==
-X-Google-Smtp-Source: AGHT+IHcmc5grlTNGzTr7aqz/F4U91EfGnFVj4SxTvYD/NNIEV06PV+BHBlDGl+wvKyqtQFcUQAxOQ==
-X-Received: by 2002:a17:903:2446:b0:240:8f4:b35c with SMTP id d9443c01a7336-245e02baa97mr18549795ad.10.1755588843009;
-        Tue, 19 Aug 2025 00:34:03 -0700 (PDT)
+        bh=n9whsM9Ixm8GRw4RUDKQhq+aVtmxmfD/5P//fgE8tJo=;
+        b=CSW27t2CUu9XgZtAS/EaXErXEBmezlfktHEYqaA3G5ONibxBByRI44vKA5dOcLWXok
+         +xdbp5KWhDR4jfIjhkrJd05oCD6vC49M9ExWzwAX3v/DszXB7X/q0HHDho2cHEgstHBq
+         WVV0u/rlT8jWuvhwXwgJEsIm6J1/JVhiEu44/wflxxqwQEZbcq3uAbgiDNE0KPb/ghBY
+         GaYansFWe7orkVbMmoSjPZtNwlrr4rDOJAQn9vbN3MjVskxNzBNT73XH9Skr3JUQw/bm
+         yQbnuwShmdOBdPq5WRWpa96kgPMLAyOFSTX54thF2UJJP4L2ouBzSPQyMlyna6JFNyNd
+         ySyw==
+X-Forwarded-Encrypted: i=1; AJvYcCUEuIXvMU5xhDitURmMdMc3izvJb3YVA5+aEjMjGP6ghfPJCiJEh0z3tNW+Qq0tpdw/7lAyVsd1i/34Q3ksezc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZ3PKicjkJC8jsL73jSQ+JDDINsH7GiGIAX0gNyc0c1eQLLS+Z
+	mw2n0CgCAUdRgKJ5/PPaXLUOEhbdNx9jA13fviuSIO0e1n+vtjDb/GeKi4akr20Q
+X-Gm-Gg: ASbGncvPYuStUIkN1d+fBq+6pjujirwgyz9mZNEYr44525Lu+GRuGt20svfQm23+UI3
+	6oCtGB/gFgKoTxT33TWfDGkIWw7rwzsv5rGQmwrtYY/RGymAg2YWvjOEpqwZFm8TO64LjO/FDsu
+	wcswFovGxpYcdBoY2UEJhoBw/G13ViONBiWdS06W2NP+ccE+aVuENnCHM0tzLowWF4h5XGcnJCG
+	viwKWrcd1DAhgAr+1GwrWwGC48QBu2UC9X1RVW5UIdjC9vSSUBQZWvbVGisZt5GfocFQ5j4CI34
+	2c/xUV+La46KtwTHf5pmIYwJ03YkpjdIHlnXjuRWBRtso0ONF0VSH+4tOzvWJ7I7Ovd1ZAfANO9
+	4gVGsgJK9KUAhLo6kPDwZ5zPNcHc8JTGYG224NkXW0GNhfArexVrY
+X-Google-Smtp-Source: AGHT+IEPQtenb5aBKyXu4mehY07P0EuLt91eDtvweR0TcTIgXsooaj56afb3QxQjezSXDVAUxwuvyQ==
+X-Received: by 2002:a05:6a00:17a0:b0:76c:1c69:111c with SMTP id d2e1a72fcca58-76e80ec781cmr1896224b3a.9.1755589678070;
+        Tue, 19 Aug 2025 00:47:58 -0700 (PDT)
 Received: from fedora.redhat.com ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2446d547c0esm99742715ad.123.2025.08.19.00.33.54
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76e7d4fa868sm1658994b3a.64.2025.08.19.00.47.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Aug 2025 00:34:02 -0700 (PDT)
+        Tue, 19 Aug 2025 00:47:57 -0700 (PDT)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Andrii Nakryiko <andriin@fb.com>,
-	Jussi Maki <joamaki@gmail.com>,
-	Jay Vosburgh <jv@jvosburgh.net>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	Felix Maurer <fmaurer@redhat.com>,
-	Viktor Malik <vmalik@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
+	Shuah Khan <shuah@kernel.org>,
+	Florian Westphal <fw@strlen.de>,
+	linux-kselftest@vger.kernel.org,
 	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCH net-next] selftests: net: bpf_offload: print loaded programs on mismatch
-Date: Tue, 19 Aug 2025 07:33:48 +0000
-Message-ID: <20250819073348.387972-1-liuhangbin@gmail.com>
+Subject: [PATCH net-next] selftests: rtnetlink: print device info on preferred_lft test failure
+Date: Tue, 19 Aug 2025 07:47:49 +0000
+Message-ID: <20250819074749.388064-1-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -109,43 +94,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The test sometimes fails due to an unexpected number of loaded programs. e.g
+Even with slowwait used to avoid system sleep in the preferred_lft test,
+failures can still occur after long runtimes.
 
-  FAIL: 2 BPF programs loaded, expected 1
-    File "/usr/libexec/kselftests/net/./bpf_offload.py", line 940, in <module>
-      progs = bpftool_prog_list(expected=1)
-    File "/usr/libexec/kselftests/net/./bpf_offload.py", line 187, in bpftool_prog_list
-      fail(True, "%d BPF programs loaded, expected %d" %
-    File "/usr/libexec/kselftests/net/./bpf_offload.py", line 89, in fail
-      tb = "".join(traceback.extract_stack().format())
-
-However, the logs do not show which programs were actually loaded, making it
-difficult to debug the failure.
-
-Add printing of the loaded programs when a mismatch is detected to help
-troubleshoot such errors. The list is printed on a new line to avoid breaking
-the current log format.
+Print the device address info when the test fails to provide better
+troubleshooting data.
 
 Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
- tools/testing/selftests/net/bpf_offload.py | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tools/testing/selftests/net/rtnetlink.sh | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/tools/testing/selftests/net/bpf_offload.py b/tools/testing/selftests/net/bpf_offload.py
-index b2c271b79240..c856d266c8f3 100755
---- a/tools/testing/selftests/net/bpf_offload.py
-+++ b/tools/testing/selftests/net/bpf_offload.py
-@@ -184,8 +184,8 @@ def bpftool_prog_list(expected=None, ns="", exclude_orphaned=True):
-         progs = [ p for p in progs if not p['orphaned'] ]
-     if expected is not None:
-         if len(progs) != expected:
--            fail(True, "%d BPF programs loaded, expected %d" %
--                 (len(progs), expected))
-+            fail(True, "%d BPF programs loaded, expected %d\nLoaded Progs:\n%s" %
-+                 (len(progs), expected, pp.pformat(progs)))
-     return progs
+diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
+index d6c00efeb664..91b0f6cae04d 100755
+--- a/tools/testing/selftests/net/rtnetlink.sh
++++ b/tools/testing/selftests/net/rtnetlink.sh
+@@ -313,6 +313,8 @@ kci_test_addrlft()
  
- def bpftool_map_list(expected=None, ns=""):
+ 	slowwait 5 check_addr_not_exist "$devdummy" "10.23.11."
+ 	if [ $? -eq 1 ]; then
++		# troubleshoot the reason for our failure
++		run_cmd ip addr show dev "$devdummy"
+ 		check_err 1
+ 		end_test "FAIL: preferred_lft addresses remaining"
+ 		return
 -- 
 2.50.1
 
