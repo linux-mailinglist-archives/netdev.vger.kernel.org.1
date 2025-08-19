@@ -1,187 +1,135 @@
-Return-Path: <netdev+bounces-214909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC788B2BBE9
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 10:31:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93447B2BC1D
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 10:44:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 817B71884AF7
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 08:32:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F267358700B
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 08:43:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AFC7264F99;
-	Tue, 19 Aug 2025 08:31:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50ED2311961;
+	Tue, 19 Aug 2025 08:43:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="l5pun4+U"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yt4PjlWN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCDDF21E0AF;
-	Tue, 19 Aug 2025 08:31:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36CE52773F6
+	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 08:43:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755592297; cv=none; b=sFeoJDDvGAZVjkwO16vrsS+MIfhyW4+L+q+wDoRhD0e+hn5Qg/6RPtpT0IF1kekSsYR+W7oV/wIX6Sx2SIgsHJIsbVtAAh9Qw3WMTmmXDQJNeVYqNFROjaeE9ZoqHrfGYHrrtxBWi7F3wBg1d+Bw7PiHwk2UARpQn12V/PGDOoY=
+	t=1755592990; cv=none; b=gOAtcdPO7y/VFuYx+J6nHX7b7rWXeriVh1X3D6mBc/VAqJGFbyTM6nnyuu917SqAl0hZyD/YSD+FVroAXVHUnqwFU2OqjqBxw+LRdXRJ4GvSIm9qn5uzFSjomPlo0kU+AQMOHUcuRVwJgD6zSlzf+GuKUtwn2VoLUVsYLwm3MJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755592297; c=relaxed/simple;
-	bh=0KHW0nAfuKis2B/TGxUWL9WSLHdvlO8+Zstbze7mhQ4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=S6jdrnHWZuhfHz5+h1Y45kqRBK6+UjJl/CtkGrEfALc1hAFJjLH5laJg8zv8srW92+WYjjqwFEFbec1ddVoxh+dBJspMfnASl8flkZhJVg3ZIp1ZVtkonfUTF3Qq1mD7U6EBhEfwFFd7UjuJsu4qPtpMMPcAefIuwhJRtnep3aw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=l5pun4+U; arc=none smtp.client-ip=80.241.56.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4c5jV61chLz9srJ;
-	Tue, 19 Aug 2025 10:31:26 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1755592286;
+	s=arc-20240116; t=1755592990; c=relaxed/simple;
+	bh=uiXQE0NRvooKnb00ZyDFhzitwmlzgW0GBH3yhlrAOPM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=COVAEO6zdBq3adN+n4BaRrHIWHCMN98+ZCmRJsl1UW9xua3PRV4EXUyLHUTgKkxqSbAYKgroFkz151HFTvYwELU49zyLzHCIeFm2E84/fes/pNaPX0+l1QTCCD0p58LbSLQnpBPo2zz/zJvnVAZ1rlnN+QqGQGg9itfFdiO2sAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Yt4PjlWN; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755592987;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=tl7aulnRN5FhYPpTxG+SmjpKIE2lFG8vUraDbN6PIzY=;
-	b=l5pun4+Ua5NTJZAV1YIp2FsOds2mcCjcYgWrr/LZJeZQyl4xg959qSmyYoi7MATbnEpo6c
-	mNtPXA0fM0nrBPZKJUaaPGLLrDfkbAeCiMpkGaeFo172xDHnhmjgBMoBD3RQ7JMaY/FA3c
-	gT1XTUqwccImYjWLqaNp6u908YO28OYaj9bybt8PcjBH0YxBIZT173Kmg2w8uxZmyjdlG7
-	BD2KqFFzwBYiq4RaqS3XWft5IU4F8sC94PVKUEcdf61hG+FH/KEQWfjQjoO43md7vMWNso
-	Ha1KbIfexEfXoVOv9aYtRF/IKYPp9JCEGoqTaGoU+D1qvTPWVMyF3WTihKHeWw==
-Date: Tue, 19 Aug 2025 10:31:19 +0200
-From: =?UTF-8?B?xYF1a2Fzeg==?= Majewski <lukasz.majewski@mailbox.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
- <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, Richard Cochran
- <richardcochran@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
- <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>
-Subject: Re: [net-next v18 5/7] net: mtip: Add mtip_switch_{rx|tx} functions
- to the L2 switch driver
-Message-ID: <20250819103119.42a64541@wsk>
-In-Reply-To: <20250815183359.352a0ecb@kernel.org>
-References: <20250813070755.1523898-1-lukasz.majewski@mailbox.org>
-	<20250813070755.1523898-6-lukasz.majewski@mailbox.org>
-	<20250815183359.352a0ecb@kernel.org>
-Organization: mailbox.org
+	bh=nj9EkvlpuR2O71TRrkQ6effPG9eafUyoJmenDbBRkkc=;
+	b=Yt4PjlWNTR33A17qSKrH/TVis3t3b//Nqh9rUTDOS1iF0b/a1nydLY1SPlMtv/z6eSECqw
+	y+4KJ+KwFeWAO5a345R1WutrYy+LdLgu75ohWXhpPTSl3lTySfG+dFfc+XR6hF3nmshw9r
+	iZflmXyzZTkOvfQA2c0Qm4oySpFRU2k=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-582-zuw2onxnOkmBLGaIWbV7EA-1; Tue, 19 Aug 2025 04:43:05 -0400
+X-MC-Unique: zuw2onxnOkmBLGaIWbV7EA-1
+X-Mimecast-MFC-AGG-ID: zuw2onxnOkmBLGaIWbV7EA_1755592985
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4b109c7ad98so186919161cf.3
+        for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 01:43:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755592985; x=1756197785;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nj9EkvlpuR2O71TRrkQ6effPG9eafUyoJmenDbBRkkc=;
+        b=JKTS1fD58aY/Oo97fGmgnAhOMxHmiGG98+q9ngzth/NdCFihdDkiHvoB4tiVV7G962
+         lwigkmSCJ/iOq7QjgUba9fX2SV8vpafnufAR+/fQQWKw56FIA6JPccJS2bwK29V81bds
+         0GGwQg0j8MIkPgeuy/zHCbLW7HBl1YpiTsOtZBMjwCqa4eHBGL9ejSgdH64JmrSUN2FY
+         CRs3/uiKvMlSpfcUH+r86JoZJWakJW8iG6lDC4ZLQWNBrh7x4Xu4AEKBfGMsHZYeTOKt
+         zgScodbel86fDvoI2B0r1dNWV93lU9CIjiZ37MHVqRUTm1+EPLopE/bXYr+WTtejOI6w
+         9x0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV5zyiV1XbxL0bwQN0EYqpN3WVndV25yzeZT0gCxKsT3lsSBzENvB1c/9yATpWzAZ30zSwVP7A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyyZbFLjec+A8hDY+uksDW6RO0SUapTeBxf1csmkaBRNlMcrG1t
+	3eOLs8QOwQ0karZWO01lV2CDg9fPivm6aQ6RCQ+fdY7ChjlcjSqecOtx41A3F77T4C0ke6cT1Mm
+	MMYPT6BkgJUN5dmO1BaMLEtytKrh4w2TTojiVHrVQaATdoOTvMZif+5qwsQ==
+X-Gm-Gg: ASbGncvZXq40kgfNtZ9PmTTx/VGAksHXIcpA1D1AwsCScfqYwUUgyWIMTbjJKxQVIkt
+	D4ojU1tIl+zB3Rf9NE7y5w6596J5B4wSnqsjaEyIgxkjPbfuQ8RtgXSgqDc6OxdtqQyogylNfjp
+	UBXIJrvpdmwlpWhR6sljeGXy+a3mGPBEwjwZndeTeWvKVKk/dNEbPBe0OoOMkCZZar/cUvws5DB
+	+a8ZQh5KHB9WnLl1XFKXVHJsbUid28rxU7NH1+4RljJVhQfHFKcGCAI1CzYLdE69fIY0vUIXzXz
+	z93bsOeUCxxouS7XAiW4kAZViCyUXotMxm9SIrXjngoArBwPOQrw7WpfDiiVLjQqv5jLridVULi
+	qNVNRgBffObc=
+X-Received: by 2002:a05:622a:4d03:b0:4af:1837:778e with SMTP id d75a77b69052e-4b286d9f7ebmr18161771cf.31.1755592985087;
+        Tue, 19 Aug 2025 01:43:05 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGw7UB9FBrpGjQ2XSRXKjMIthoW12C3rhlMGUbObj2mrt2S/t/HnOA8M/IRXI4lKNYc+qncPA==
+X-Received: by 2002:a05:622a:4d03:b0:4af:1837:778e with SMTP id d75a77b69052e-4b286d9f7ebmr18161561cf.31.1755592984715;
+        Tue, 19 Aug 2025 01:43:04 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b11dc19631sm63346241cf.12.2025.08.19.01.43.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Aug 2025 01:43:04 -0700 (PDT)
+Message-ID: <ca8b550b-a284-4afc-9a50-09e42b86c774@redhat.com>
+Date: Tue, 19 Aug 2025 10:43:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next V2 1/3] ptp: Add ioctl commands to expose raw
+ cycle counter values
+To: Richard Cochran <richardcochran@gmail.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Mark Bloch <mbloch@nvidia.com>, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Gal Pressman <gal@nvidia.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Carolina Jubran <cjubran@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Dragos Tatulea <dtatulea@nvidia.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>
+References: <1755008228-88881-1-git-send-email-tariqt@nvidia.com>
+ <1755008228-88881-2-git-send-email-tariqt@nvidia.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <1755008228-88881-2-git-send-email-tariqt@nvidia.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-MBO-RS-ID: b305455ec3b5e15fab4
-X-MBO-RS-META: komf8jsgranox9twdw3rim746cyyc699
+Content-Transfer-Encoding: 7bit
 
-Hi Jakub,
+On 8/12/25 4:17 PM, Tariq Toukan wrote:
+> From: Carolina Jubran <cjubran@nvidia.com>
+> 
+> Introduce two new ioctl commands, PTP_SYS_OFFSET_PRECISE_CYCLES and
+> PTP_SYS_OFFSET_EXTENDED_CYCLES, to allow user space to access the
+> raw free-running cycle counter from PTP devices.
+> 
+> These ioctls are variants of the existing PRECISE and EXTENDED
+> offset queries, but instead of returning device time in realtime,
+> they return the raw cycle counter value.
+> 
+> Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
+> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
-> On Wed, 13 Aug 2025 09:07:53 +0200 Lukasz Majewski wrote:
-> > +		page =3D fep->page[bdp - fep->rx_bd_base];
-> > +		/* Process the incoming frame */
-> > +		pkt_len =3D bdp->cbd_datlen;
-> > +
-> > +		dma_sync_single_for_cpu(&fep->pdev->dev,
-> > bdp->cbd_bufaddr,
-> > +					pkt_len, DMA_FROM_DEVICE);
-> > +		net_prefetch(page_address(page));
-> > +		data =3D page_address(page);
-> > +
-> > +		if (fep->quirks & FEC_QUIRK_SWAP_FRAME)
-> > +			swap_buffer(data, pkt_len);
-> > +
-> > +		eth_hdr =3D (struct ethhdr *)data;
-> > +		mtip_atable_get_entry_port_number(fep,
-> > eth_hdr->h_source,
-> > +						  &rx_port);
-> > +		if (rx_port =3D=3D MTIP_PORT_FORWARDING_INIT)
-> > +			mtip_atable_dynamicms_learn_migration(fep,
-> > +
-> > mtip_get_time(),
-> > +
-> > eth_hdr->h_source,
-> > +
-> > &rx_port); +
-> > +		if ((rx_port =3D=3D 1 || rx_port =3D=3D 2) &&
-> > fep->ndev[rx_port - 1])
-> > +			pndev =3D fep->ndev[rx_port - 1];
-> > +		else
-> > +			pndev =3D dev;
-> > +
-> > +		*port =3D rx_port;
-> > +
-> > +		/* This does 16 byte alignment, exactly what we
-> > need.
-> > +		 * The packet length includes FCS, but we don't
-> > want to
-> > +		 * include that when passing upstream as it messes
-> > up
-> > +		 * bridging applications.
-> > +		 */
-> > +		skb =3D netdev_alloc_skb(pndev, pkt_len +
-> > NET_IP_ALIGN);
-> > +		if (unlikely(!skb)) {
-> > +			dev_dbg(&fep->pdev->dev,
-> > +				"%s: Memory squeeze, dropping
-> > packet.\n",
-> > +				pndev->name);
-> > +			page_pool_recycle_direct(fep->page_pool,
-> > page);
-> > +			pndev->stats.rx_dropped++;
-> > +			return -ENOMEM;
-> > +		}
-> > +
-> > +		skb_reserve(skb, NET_IP_ALIGN);
-> > +		skb_put(skb, pkt_len);      /* Make room */
-> > +		skb_copy_to_linear_data(skb, data, pkt_len);
-> > +		skb->protocol =3D eth_type_trans(skb, pndev);
-> > +		skb->offload_fwd_mark =3D fep->br_offload;
-> > +		napi_gro_receive(&fep->napi, skb); =20
->=20
-> The rx buffer circulation is very odd.
+Hi Richard,
 
-The fec_main.c uses page_pool_alloc_pages() to allocate RX page from
-the pool.
+can we have a formal ack here?
 
-At the RX function the __build_skb(data, ...) is called to create skb.
+Thanks,
 
-Last step with the RX function is to call skb_mark_for_recycle(skb),
-which sets skb->pp_recycle =3D 1.
+Paolo
 
-And yes, in the MTIP I do copy the data to the newly created skb in RX
-function (anyway, I need to swap bytes in the buffer).=20
-
-It seems like extra copy is performed in the RX function.
-
-> You seem to pre-allocate
-> buffers for the full ring from a page_pool. And then copy the data
-> out of those pages.
-
-Yes, correct.
-
-> The normal process is that after packet is
-> received a new page is allocated to give to HW, and old is attached
-> to an skb, and sent up the stack.
-
-Ok.
-
->=20
-> Also you are releasing the page to be recycled without clearing it
-> from the ring. I think you'd free it again on shutdown, so it's a
-> double-free.
-
-No, the page is persistent. It will be removed when the driver is
-closed and memory for pages and descriptors is released.
-
---=20
-Best regards,
-
-=C5=81ukasz Majewski
 
