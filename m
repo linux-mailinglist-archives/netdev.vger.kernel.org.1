@@ -1,137 +1,137 @@
-Return-Path: <netdev+bounces-214886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 399FCB2B9C5
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 08:44:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 816C9B2B9BF
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 08:44:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 509955E1AEB
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 06:44:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41E7D5E0EFF
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 06:44:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97B6B26E165;
-	Tue, 19 Aug 2025 06:44:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32D9726C3A0;
+	Tue, 19 Aug 2025 06:44:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="KnIxvl/g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YRlLEoT3"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE22126B09F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02E1626B764;
 	Tue, 19 Aug 2025 06:44:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755585861; cv=none; b=ofZiY/ZDZ9/fM4GQe0alqSAaIB4dHZWPiq8R6lwjoTmmlf2EKQkPT5U+yV80EpUGcZP7lI/MEi+ah7DfYXpgzGqnXEhC7qKFThCJQNqjy7zskumJmLoD0PdvZWsj5IRxKtRxlj/eEG8cJ6eWjHV/hs0pZNMS+2ja4K9QOYMYAYY=
+	t=1755585860; cv=none; b=NmMogy3lScQPYiRUYicj1aywLztFM3wXDuK37A8LsacSpNOkkaE2hLf2V143zIZfNu9Km/GGAPTrIvogw8oZcNOIbxDjkP/pf2efYcg38ZCyKVwO+ZsfKoq9IZvM40DUX5nP2gFJKWihdNbGHDo9XKuAcuidb45cr7tvOL2SazU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755585861; c=relaxed/simple;
-	bh=cP8PEXAXqfpf3w0B8Uk32xdrJvRk5JyP2bU5Je7lfgw=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dvof6EtxGYnAv7UgZXaPHyHmdI78FGyUpWNlbp2SBXmQ5wfq9NRTVbPy5f0m1FmYNztA3Bn8h2GuS8JRSawOqvB0nyESYQ8wOpnRTiPg86HXB+O3TR6SS05PTuXFpg+BMrAKJiXdHsDotqOdjlzD7dRtPM1h6I4GtwGuMRfwTos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=KnIxvl/g; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1755585859; x=1787121859;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=cP8PEXAXqfpf3w0B8Uk32xdrJvRk5JyP2bU5Je7lfgw=;
-  b=KnIxvl/g1vvaETx+pHrF5rb2dtXiCibb5hsBFA1k8CwWAU8AUgXuAd8z
-   +uWI6TI/p7Eh4bsr8CA/CTzosJilwQzLosGOIsIXi87rs7kjqcoT0J9DS
-   23J+C3E+0/egM6jDURX1S4IpDYyXTrK7vIMBRADYZB066QL5T1wk1t8Os
-   LHxwQVJ3NGwbd6q/MNi+4jmgbH6B5GqvvRZcNMD2x+rIZocYD06IfakQ+
-   gpPMLUfek3B3lWTqQeuX8rOebssu8QFRlxkr/au4PIQf3hZcBepkaNEGh
-   kEdC36/AiSwTmMoRBEK1+eoaMAGdVd2KnCUzYn16naGntkiY7eUkcLoM/
-   w==;
-X-CSE-ConnectionGUID: rZgPSQg4TSeIFZSdw/pssg==
-X-CSE-MsgGUID: 83i4szVxTfWacn9WsKvBBg==
-X-IronPort-AV: E=Sophos;i="6.17,300,1747724400"; 
-   d="scan'208";a="212782844"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Aug 2025 23:44:12 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Mon, 18 Aug 2025 23:43:34 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
- Transport; Mon, 18 Aug 2025 23:43:34 -0700
-Date: Tue, 19 Aug 2025 08:40:11 +0200
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-CC: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <richardcochran@gmail.com>,
-	<rmk+kernel@armlinux.org.uk>, <rosenp@gmail.com>,
-	<christophe.jaillet@wanadoo.fr>, <viro@zeniv.linux.org.uk>,
-	<quentin.schulz@bootlin.com>, <atenart@kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net v4] phy: mscc: Fix timestamping for vsc8584
-Message-ID: <20250819064011.zv3ybgvjx6cqkyhc@DEN-DL-M31836.microchip.com>
-References: <20250818081029.1300780-1-horatiu.vultur@microchip.com>
- <20250818132141.ezxmflzzg6kj5t7k@skbuf>
- <20250818135658.exs5mrtuio7rm3bf@DEN-DL-M31836.microchip.com>
- <20250818141306.qlytyq3cjryhqkas@skbuf>
- <20250818141925.l7rvjns26gda3bp7@DEN-DL-M31836.microchip.com>
- <20250818143732.q5eymo65iywz44ci@skbuf>
+	s=arc-20240116; t=1755585860; c=relaxed/simple;
+	bh=A13ju+SQPSKzvs65vieUN2MHL6rBeN0oSeyPsi52s28=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nEmsYyIkeanvHqV5Ilw3AzOJK4o8LseBjXlAcjOAdhVPcIkBvHc5ZCF5sIp9F5pFusZRvEi3y+ORanaq0+vRv1xgBPJCgYJ5bMgkmTUvLOUBI1yYT0Zlr7etPqqy7DVt6sW2sgz1sKqf6aBLNTRgh8mB7rhEE95EitJkCwsWefs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YRlLEoT3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37F12C4CEF4;
+	Tue, 19 Aug 2025 06:44:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755585859;
+	bh=A13ju+SQPSKzvs65vieUN2MHL6rBeN0oSeyPsi52s28=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=YRlLEoT3Dx7O768aBcKUkf6iLGreBAG9DwtdZMWPmZtPERjRIWzvqkUOrWj9PKr7/
+	 6gU3z8NyG+CqJdZWF4d2FlUkYbAVFL200aXfW2jofSZyvrlNEW1kfxgwOklaLOsGEX
+	 Ba6rjF6mNw2EARCWJiyjdDaP9rhqvTiiZJ0zTGl5bST3X7SVCPb479AClyKUvI5bhR
+	 Db0tKmEftlyfw3iGAmcHq0ANSDFcFjKFnmqaa1XZNXf3QJVAjuB8y8LSq89loXOMHk
+	 f8pCIaoUIKSEk4ji6HfDHPolb5ym8IM50abSd2UR9dbHUmcFnSNtFJ70rOuMYe8Xy9
+	 ZWVpxciOCNBPg==
+Message-ID: <c4cbd50e-82e3-410b-bec6-72b9db1bafca@kernel.org>
+Date: Tue, 19 Aug 2025 08:44:12 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <20250818143732.q5eymo65iywz44ci@skbuf>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 3/6] arm64: dts: qcom: qcs615: add ethernet node
+To: YijieYang <yijie.yang@oss.qualcomm.com>, Vinod Koul <vkoul@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Richard Cochran <richardcochran@gmail.com>
+Cc: netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org, stable+noautosel@kernel.org,
+ Yijie Yang <quic_yijiyang@quicinc.com>,
+ Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+References: <20250819-qcs615_eth-v4-0-5050ed3402cb@oss.qualcomm.com>
+ <20250819-qcs615_eth-v4-3-5050ed3402cb@oss.qualcomm.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20250819-qcs615_eth-v4-3-5050ed3402cb@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The 08/18/2025 17:37, Vladimir Oltean wrote:
+On 19/08/2025 08:35, YijieYang wrote:
+> From: Yijie Yang <quic_yijiyang@quicinc.com>
 > 
-> On Mon, Aug 18, 2025 at 04:19:25PM +0200, Horatiu Vultur wrote:
-> > Nothing prevents me for looking at this issue. I just need to alocate
-> > some time for this.
-> >
-> > > The two problems are introduced by the same commit, and fixes will be
-> > > backported to all the same stable kernels. I don't exactly understand
-> > > why you'd add some code to the PHY's remove() method, but not enough in
-> > > order for it to work.
-> >
-> > Yes, I understand that but the fix for ptp_clock_unregister will fix a
-> > different issue that this patch is trying to fix. That is the reason why
-> > I prefer not to add that fix now, just to make things more clear.
+> Add an ethernet controller node for QCS615 SoC to enable ethernet
+> functionality.
 > 
-> Not sure "clear" for whom. One of the rules from Documentation/process/stable-kernel-rules.rst
-> is "It must be obviously correct and tested.", which to me makes it confusing
-> why you wouldn't fix that issue first (within the same patch set), and then
-> test this patch during unbind/bind to confirm that it achieves what it intends.
+> Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+> Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
+> ---
 
-I have tested the patch by inserting and removing the kernel module. And
-I have check that remove function was called and see that it tries to
-flush the queue.
 
-> 
-> I think the current state of the art is that unbinding a PHY that the
-> MAC hasn't connected to will work, whereas unbinding a connected PHY,
-> where the state machine is running, will crash the kernel. To be
-> perfectly clear, the request is just for the case that is supposed to
-> work given current phylib implementation, aka with the MAC unconnected
-> (put administratively down or also unbound, depending on whether it
-> connects to the PHY at probe time or ndo_open() time).
-> 
-> I don't see where the reluctance comes from - is it that there are going
-> to be 2 patches instead of 1? My reluctance as a reviewer comes from the
-> fact that I'm analyzing the change in the larger context and not seeing
-> how the remove() method you introduced makes any practical difference.
-> Not sure what I'm supposed to say.
+Why do you mix up DTS and net-next patches? This only makes difficult to
+apply it, for no benefits.
 
-I don't have anything against it, like I said before I thought those are
-2 different issues. But if you think otherwise I can add a new patch in
-this series, no problem.
-
-Why do you say that the function remove() doesn't make any practical
-difference?
-
--- 
-/Horatiu
+Best regards,
+Krzysztof
 
