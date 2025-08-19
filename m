@@ -1,136 +1,144 @@
-Return-Path: <netdev+bounces-214858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE7C0B2B7AD
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 05:36:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A46FB2B7B0
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 05:36:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA96E6266F4
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 03:35:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84A1A561642
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 03:36:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C66892F9C53;
-	Tue, 19 Aug 2025 03:34:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 328C62376E1;
+	Tue, 19 Aug 2025 03:36:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="XAv7CCLM"
+	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="ZbFA3URZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+Received: from mail-4323.protonmail.ch (mail-4323.protonmail.ch [185.70.43.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D42C2EAB6E
-	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 03:34:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A663AC3B
+	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 03:36:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755574471; cv=none; b=szHUu5Lhd/ug3J64Uy8mJ/hOIdVwjIARdq+5PQdTUaFOFsyvxzwjV/Kd9vi2t8Vo2xXTu/s4yZ6vQPo4MOs9YZGWmsOSX7BBm2sbAAQOg2a8tKLzaaqG7zkKxzTzCMjIeq0DkYTNBHwraR7n9H92FE+AJcDGnFHd7Uepe8rRwow=
+	t=1755574606; cv=none; b=iPhreJ21OXBc+2lpS5wMPpeFwCSKAjAg9aSnzw/puJxoo8G7Ss+fGGDhxlDvJccphrmQpbEG5Il9WZ4aFo27WjABRp2Bi7Gu21/k9LF8pDyDyzsTc3urP26v5ZDF8WLUB+gFiTFM/8BBMcwGGt7NqlsBOAp8JQT51p7xiDVYS20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755574471; c=relaxed/simple;
-	bh=JKNZX2bbEIrC8xCWZSb+vHXAfSZLVZNxXfIdG7LwcsI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=taUu94qaUAJN2Vs16UG1izn81XJeamap1uEPpTNSAJOKagNWOUCCrkvK+VYFz2zQm5YBZ7aeLfCyzYCfYUN5qfOUtppaD4XDtGUcWBmzS/YjqVEz+RWFC+HqyUudKYzLAatimoKDqPnVnO4gPCDNf2w37yYUx3skISfAzRJk1xU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=XAv7CCLM; arc=none smtp.client-ip=203.254.224.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20250819033421epoutp0186d34ddee9031b0ae3c1d3c7335ec3ae~dDavtCL-K0184601846epoutp01h
-	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 03:34:21 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20250819033421epoutp0186d34ddee9031b0ae3c1d3c7335ec3ae~dDavtCL-K0184601846epoutp01h
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1755574461;
-	bh=Hsc9puMhPwaXFA5i4kUspsGUpcSO7N7D73eS4uhdn3Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XAv7CCLM6SQreTulkQMq4em7c1xdncPU0BbOGn72h1yGzDf2reKDAFT53/LGf7Rvi
-	 uVWulezwXSgwqdt4SVA//YSk6KUE7ECtdMi5HiLNq+BDzRDiH64XpAs3u87Pjjnr1x
-	 8YzLaIRFMpRw4J1uRoJ1jWfNSPxKvar/br7kHh+Q=
-Received: from epsnrtp01.localdomain (unknown [182.195.42.153]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPS id
-	20250819033421epcas5p386142418c9dce35e45e0a8ed238f7a60~dDavLPnx-1213112131epcas5p3t;
-	Tue, 19 Aug 2025 03:34:21 +0000 (GMT)
-Received: from epcas5p2.samsung.com (unknown [182.195.38.88]) by
-	epsnrtp01.localdomain (Postfix) with ESMTP id 4c5ZvJ1tHGz6B9mD; Tue, 19 Aug
-	2025 03:34:20 +0000 (GMT)
-Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20250819033318epcas5p3325d9c2481db3e40d776197d13f09d5a~dDZ034sxy1308013080epcas5p3B;
-	Tue, 19 Aug 2025 03:33:18 +0000 (GMT)
-Received: from asg29.. (unknown [109.105.129.29]) by epsmtip2.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20250819033316epsmtip2600ea94da3ad14d0a16bd9af8a307fec~dDZzQbId-1926619266epsmtip2D;
-	Tue, 19 Aug 2025 03:33:16 +0000 (GMT)
-From: Junnan Wu <junnan01.wu@samsung.com>
-To: jasowang@redhat.com
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	eperezma@redhat.com, junnan01.wu@samsung.com, kuba@kernel.org,
-	lei19.wang@samsung.com, linux-kernel@vger.kernel.org, mst@redhat.com,
-	netdev@vger.kernel.org, pabeni@redhat.com, q1.huang@samsung.com,
-	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com,
-	ying123.xu@samsung.com
-Subject: Re: [PATCH net] virtio_net: adjust the execution order of function
- `virtnet_close` during freeze
-Date: Tue, 19 Aug 2025 11:33:26 +0800
-Message-Id: <20250819033326.3602994-1-junnan01.wu@samsung.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <CACGkMEsVJcb2YYvfXYA0soE++cPEmQatkC0tB+shNKB=OTteWg@mail.gmail.com>
+	s=arc-20240116; t=1755574606; c=relaxed/simple;
+	bh=IKVbwK8HJsyXoHh4mEYTOFg2GoY0C9/J5TgFP+Ra88s=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=rFYjYWkhFYSfJ//aQoiz65imWU0LnKnSSchDookr6jxMIx7O2VVdAAZxHG2rIXeibfpyOo2SlmJuPvcRW0zhWGSMp2rz4aILOfoJ4KutnLCOk8TD/eJeN3aN0DJxBZsJnQrhaYfrqNcp72FDK3Mnw2XZFYluZwDxhMvZ0H/+qe4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=ZbFA3URZ; arc=none smtp.client-ip=185.70.43.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
+	s=protonmail2; t=1755574594; x=1755833794;
+	bh=Uxmcfz2NMUsFKTidylCWbt8qNHcu7Y07A5YauOztNk8=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=ZbFA3URZqoU0+XCs8G86zh4d9fxt7j3aJw7hLPS9l+c848gECKFH7zv7URzUSo14Y
+	 1RW04Yyjp0EhADQpNhoSHHqHAKk3hZoRat1si9zl+ftq2u1ZsNAgU9VKclkgVLWHoe
+	 toEkkCGEmgpipIe/BF8d5+qR7XJvwrB+PSa2KpFzxnOu1lU91M9DN+UeDjTBqVLjnp
+	 V8ehH9Iw5ZFzVXQbKpH18f+DVmgVm7cSWbsdY2C57sK7tDio0BzEuv5B9pIyPNXVxQ
+	 Qqvr3X34oy3QwmA1r8R0KR6XsTuWsgVVrXTigvV5Nis6pM26tqlgI8IuYh1wIC5BiV
+	 1T9iMYvzRWtgQ==
+Date: Tue, 19 Aug 2025 03:36:28 +0000
+To: netdev@vger.kernel.org
+From: William Liu <will@willsroot.io>
+Cc: toke@toke.dk, dave.taht@gmail.com, jhs@mojatatu.com, xiyou.wangcong@gmail.com, pabeni@redhat.com, kuba@kernel.org, savy@syst3mfailure.io, jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, horms@kernel.org, cake@lists.bufferbloat.net, William Liu <will@willsroot.io>
+Subject: [PATCH net v2 1/2] net/sched: Make cake_enqueue return NET_XMIT_CN when past buffer_limit
+Message-ID: <20250819033601.579821-1-will@willsroot.io>
+Feedback-ID: 42723359:user:proton
+X-Pm-Message-ID: 2da39582976788ca4a1010f0531682d492225aac
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20250819033318epcas5p3325d9c2481db3e40d776197d13f09d5a
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-505,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250819033318epcas5p3325d9c2481db3e40d776197d13f09d5a
-References: <CACGkMEsVJcb2YYvfXYA0soE++cPEmQatkC0tB+shNKB=OTteWg@mail.gmail.com>
-	<CGME20250819033318epcas5p3325d9c2481db3e40d776197d13f09d5a@epcas5p3.samsung.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 19 Aug 2025 10:48:37 +0800 Jason Wang wrote:
-> On Mon, Aug 18, 2025 at 11:39 PM Jakub Kicinski <kuba@kernel.org> wrote:
-> >
-> > On Mon, 18 Aug 2025 09:15:22 +0800 Junnan Wu wrote:
-> > > > > Yes, you are right. The commit of this fix tag is the first commit I
-> > > > > found which add function `virtnet_poll_cleantx`. Actually, we are not
-> > > > > sure whether this issue appears after this commit.
-> > > > >
-> > > > > In our side, this issue is found by chance in version 5.15.
-> > > > >
-> > > > > It's hard to find the key commit which cause this issue
-> > > > > for reason that the reproduction of this scenario is too complex.
-> > > >
-> > > > I think the problem needs to be more clearly understood, and then it
-> > > > will be easier to find the fixes tag. At the face of it the patch
-> > > > makes it look like close() doesn't reliably stop the device, which
-> > > > is highly odd.
-> > >
-> > > Yes, you are right. It is really strange that `close()` acts like
-> > > that, because current order has worked for long time. But panic call
-> > > stack in our env shows that the function `virtnet_close` and
-> > > `netif_device_detach` should have a correct execution order. And it
-> > > needs more time to find the fixes tag. I wonder that is it must have
-> > > fixes tag to merge?
-> > >
-> > > By the way, you mentioned that "the problem need to be more clearly
-> > > understood", did you mean the descriptions and sequences in commit
-> > > message are not easy to understand? Do you have some suggestions
-> > > about this?
-> >
-> > Perhaps Jason gets your explanation and will correct me, but to me it
-> > seems like the fix is based on trial and error rather than clear
-> > understanding of the problem. If you understood the problem clearly
-> > you should be able to find the Fixes tag without a problem..
-> >
-> 
-> +1
-> 
-> The code looks fine but the fixes tag needs to be correct.
-> 
-> Thanks
+The following setup can trigger a WARNING in htb_activate due to
+the condition: !cl->leaf.q->q.qlen
 
-Well, I will do some works to find out the fixes tag.
-Once there's progress, I will let you know.
+tc qdisc del dev lo root
+tc qdisc add dev lo root handle 1: htb default 1
+tc class add dev lo parent 1: classid 1:1 \
+       htb rate 64bit
+tc qdisc add dev lo parent 1:1 handle f: \
+       cake memlimit 1b
+ping -I lo -f -c1 -s64 -W0.001 127.0.0.1
+
+This is because the low memlimit leads to a low buffer_limit, which
+causes packet dropping. However, cake_enqueue still returns
+NET_XMIT_SUCCESS, causing htb_enqueue to call htb_activate with an
+empty child qdisc. We should return NET_XMIT_CN when packets are
+dropped from the same tin and flow.
+
+I do not believe return value of NET_XMIT_CN is necessary for packet
+drops in the case of ack filtering, as that is meant to optimize
+performance, not to signal congestion.
+
+Fixes: 046f6fd5daef ("sched: Add Common Applications Kept Enhanced (cake) q=
+disc")
+Signed-off-by: William Liu <will@willsroot.io>
+Reviewed-by: Savino Dicanosa <savy@syst3mfailure.io>
+---
+v1 -> v2: only return NET_XMIT_CN when dropping from the same tin and flow
+---
+ net/sched/sch_cake.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
+index dbcfb948c867..32bacfc314c2 100644
+--- a/net/sched/sch_cake.c
++++ b/net/sched/sch_cake.c
+@@ -1750,7 +1750,7 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Q=
+disc *sch,
+ =09ktime_t now =3D ktime_get();
+ =09struct cake_tin_data *b;
+ =09struct cake_flow *flow;
+-=09u32 idx;
++=09u32 idx, tin;
+=20
+ =09/* choose flow to insert into */
+ =09idx =3D cake_classify(sch, &b, skb, q->flow_mode, &ret);
+@@ -1760,6 +1760,7 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Q=
+disc *sch,
+ =09=09__qdisc_drop(skb, to_free);
+ =09=09return ret;
+ =09}
++=09tin =3D (u32)(b - q->tins);
+ =09idx--;
+ =09flow =3D &b->flows[idx];
+=20
+@@ -1927,13 +1928,22 @@ static s32 cake_enqueue(struct sk_buff *skb, struct=
+ Qdisc *sch,
+ =09=09q->buffer_max_used =3D q->buffer_used;
+=20
+ =09if (q->buffer_used > q->buffer_limit) {
++=09=09bool same_flow =3D false;
+ =09=09u32 dropped =3D 0;
++=09=09u32 drop_id;
+=20
+ =09=09while (q->buffer_used > q->buffer_limit) {
+ =09=09=09dropped++;
+-=09=09=09cake_drop(sch, to_free);
++=09=09=09drop_id =3D cake_drop(sch, to_free);
++
++=09=09=09if ((drop_id >> 16) =3D=3D tin &&
++=09=09=09    (drop_id & 0xFFFF) =3D=3D idx)
++=09=09=09=09same_flow =3D true;
+ =09=09}
+ =09=09b->drop_overlimit +=3D dropped;
++
++=09=09if (same_flow)
++=09=09=09return NET_XMIT_CN;
+ =09}
+ =09return NET_XMIT_SUCCESS;
+ }
+--=20
+2.43.0
+
+
 
