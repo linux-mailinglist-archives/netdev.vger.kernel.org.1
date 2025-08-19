@@ -1,145 +1,357 @@
-Return-Path: <netdev+bounces-215020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AF40B2C9E7
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 18:42:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 135C9B2C9EF
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 18:45:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78ACE1BC619A
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 16:42:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83C14188BA0E
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 16:45:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72F3E283FF4;
-	Tue, 19 Aug 2025 16:42:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45F2B27AC32;
+	Tue, 19 Aug 2025 16:45:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B/XB9JiT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ChfL6moV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B398825228F;
-	Tue, 19 Aug 2025 16:41:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CC4A2EB87C;
+	Tue, 19 Aug 2025 16:45:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755621720; cv=none; b=CnEw/2Y9UEGWEsvbI2ZDfF7JXq7pDEpcGTdDxkUaDLprqVqzhoJH+R7MKdPDnwvprXhv7/z4qyEEqCVZSjNjb9pIPrOJ0mq9GoQWHPFUoNXKd/MmeMSRPbNFm/5dSqiNk4rLEa6AWDUFSqRzB0WXfJqKAHCw4b2dE4TjfYKMJjA=
+	t=1755621905; cv=none; b=Xl6iTh0mjz2+JhmhhJlt+sNTd2O8i1ThrieRZqoSW0SqQW3SZ4IcLuOgtMTGt230sgYRUWM23HrjJXhC7gUUfCJkai1y6MwDKgVlvq5EfaFtqwt2YSNK3dZOVG9NTGSVgPnn8vT6iBfOiFOeVnvE75BfLDaBlbIvtH78zy55mrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755621720; c=relaxed/simple;
-	bh=4NY2yeWwO1/lySCuscD0X6YTArnddn4170u6EFF+HfY=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=C/WZlcgu3BVcGF4DFXA5eKSqsiMA2vfH9JRDuMJxaApyxRddcwxJ7/8G7Pmr+mEeTW0k4sURSbhd82h2UYKy2gvR/tqHldcA+x89OjUjRrUPd7UZsUX4pavOttiF6Gcp5XjsXxas7kWSHN432KKLmtOxqhSnDyaFFrVdqnYluKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B/XB9JiT; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-45a1b0990b2so30499385e9.2;
-        Tue, 19 Aug 2025 09:41:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755621717; x=1756226517; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WxX71PXS3MJnJ5r/8RA04vZAE4FRLUH21Dt1zod0mbQ=;
-        b=B/XB9JiTEdwWrhVnO3sBsGA2L3qUi14JEiyRDiYESUeG+VKhUabxR20J7hkFpApqam
-         DQOp49PcPBAdpqfMGvJAg0N+yODD9ZtbJM5wLPzVJqpm8e4QxwFfQOcoNgWXRnmV2sHB
-         hrJ+j7MC1Z1vvRT5kAUu/ao/+KHBXBRnGWwY8j5ddYxxFjNKcQp4Z2qMwVbIEOZoBU54
-         7i4wVQb43Z4Xvzmf5WAv0m+ijeJn0xV25j8ToZtfhTzwQ9cKw1sNZ+zC4et8WT8bBDW4
-         lS7xc1rYK8IORiyIJNB7bZyZbqoAxWhCE398E2BgkiUNkns7ia58HY9lDi9FHCprPgBh
-         Vu1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755621717; x=1756226517;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WxX71PXS3MJnJ5r/8RA04vZAE4FRLUH21Dt1zod0mbQ=;
-        b=P70j2qWqNKbIFCu+SidPFAkvw6E/LDYANBzDZONt6GPAH5AMe/MJ/kNDFf4GWnakRK
-         lYDDXaP/0l0XqQ9e3fCIKYhzePZBHTuwU4gtI1RYFCWbaf7BnVcKa089IowTYYcaIU73
-         6J357+xcZjI36QtAR0XPgwthXuCsHyp1hI0GMmYfEq6meck+y4cSdnX0E9qvXZo7KnjD
-         5AhU+mPDxLUh25O67GhCVdv7gysxJRVI7voGUPaJfnhu9WJnIJWzC72juz6bMZCZ0DGq
-         /wV64/t0lT8+ocmgpj5LqEW8O42LcVn/nRBqmdNHQp98hUHnOGpL4If9KPi89bwmoEBO
-         0seQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUzJSN9jUAdEsXvXr8DkVlZrNAvWqdwFtEMxRwlHBi3u8u8kjijj1bMWiBGJHQSA6CKCjIM1euM@vger.kernel.org, AJvYcCVW/3wU5hwRVB750iTujRLoHrpMLQcwRZnzqsrrFDaoKEc1WK0OyNOCp3wmIKjUpqbZ8NadE4Tsit8Mp4c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZ83LFprFVHvbJaeabvuLug6OuqQ92EyaR2ZAW6hcQOCud5eJn
-	qK4YpCo51mW0R6bXRlnXFZOabVap1igBto8X8XEjGOBiVcHpMR2HDq+v
-X-Gm-Gg: ASbGncsLCJN4wppr9OoXKTJm0hDcTaMcEIWQcykAweoe5u1Bluxs3FpEpj9g2O3ueKu
-	c77ruXyEkAC5s/T4yjjckL8FF2pqaB1Q+JenbeJFM56VW0vN4VyKHSugFgmJzLUxK8wmih4LyQJ
-	TqOiICX0Kx8+Ropz7oB4DXjeI2WSICPdvHncf2E1QZi3KD8Pwdq4TwObWjRKAVYI2AJ7PWKKhOD
-	TAcaQhFUwr9LZV8iUeqH5XXPp5tENLEhkqxj6eUg+5t9LEyNDI8d564iFnvpfs5a/frXKXDOga8
-	YQmh6dIXmikOq0971SG8iS/9p2tVl7qmC3pOqAQBedRat7XyDeQDkEC7eUvBFDx1jI2nGa1Q9yL
-	G6h0FTxDT2RZDeBMVukvSr5DipbORQGC9BqTg5EchCG0wPjfQEMcggsK8/0XUharprIB/N40o8A
-	ZReJTd93bPuTY=
-X-Google-Smtp-Source: AGHT+IFDIfAL1PMrBbwe09+/9imnqhNdJLZgmQly4SWiKUqwJ+XF2dETMxPxVQYyM9rrcs8MD+Eokw==
-X-Received: by 2002:a05:600c:4f8c:b0:456:1204:e7e6 with SMTP id 5b1f17b1804b1-45b43dc0522mr31048255e9.11.1755621716705;
-        Tue, 19 Aug 2025 09:41:56 -0700 (PDT)
-Received: from Ansuel-XPS24.lan (host-95-251-209-58.retail.telecomitalia.it. [95.251.209.58])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-45b42a8f972sm51494015e9.20.2025.08.19.09.41.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Aug 2025 09:41:56 -0700 (PDT)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Christian Marangi <ansuelsmth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [net-next PATCH 2/2] net: phy: as21xxx: better handle PHY HW reset on soft-reboot
-Date: Tue, 19 Aug 2025 18:41:41 +0200
-Message-ID: <20250819164146.1675395-2-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <20250819164146.1675395-1-ansuelsmth@gmail.com>
-References: <20250819164146.1675395-1-ansuelsmth@gmail.com>
+	s=arc-20240116; t=1755621905; c=relaxed/simple;
+	bh=MGk7Z3gUQ11nfLslZDfTaWLuhSDABjAjmiYBP4r9+Pg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=X/40i7S8nKHb/hc9JRBXsbJVOz4OIfbKOnouwM5cq4rhzPIzbs0RLvNGcJXYt37whg8/cH+iMrU+XAvZk3ESVn8aK/E04/TxIf7o+ct15M5gvcqsX2g0ukAYJ0WjYZ3WIg3RDAPuvl3mdPiMwzBUnI/tLUn1vYnV5cF/uqYtE3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ChfL6moV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFEC4C4CEF1;
+	Tue, 19 Aug 2025 16:44:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755621904;
+	bh=MGk7Z3gUQ11nfLslZDfTaWLuhSDABjAjmiYBP4r9+Pg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ChfL6moVngWiTJ4Hf0ClbIczUIFKjROD3Lg3UTlTWVgmWae1nERjIifJqu/fvL8V9
+	 8YzEInbG9N8CsR/G9OEi2Y+eIHUz6jAK+9zWr0DBLc2FgFWCOQRf0VosG8tOzG+Ah0
+	 o9blvLZpZ0DG+Du1SXxQWEcrByehbnLbvCfNRNOl+kodgRdxKoV4aNnS63I1tYY1hw
+	 /ezBfmVPtNGLylbfJqOzSGHtbGCbNxpRUJljlEe3DW0yML27fygAZJX0iLDjyfyLGN
+	 PSL9OHqKSg40L/pNNKQow81B+SY1+tC47RsIFJ0+e41uu7AcmNVTTEkriObn1spgGa
+	 gys7peQrrLo/A==
+Message-ID: <6e2cbea1-8c70-4bfa-9ce4-1d07b545a705@kernel.org>
+Date: Tue, 19 Aug 2025 18:44:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 3/6] ice: fix Rx page leak on multi-buffer frames
+To: Jacob Keller <jacob.e.keller@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>, ast@kernel.org,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org
+Cc: maciej.fijalkowski@intel.com, magnus.karlsson@intel.com,
+ andrew+netdev@lunn.ch, daniel@iogearbox.net, john.fastabend@gmail.com,
+ sdf@fomichev.me, bpf@vger.kernel.org, horms@kernel.org,
+ przemyslaw.kitszel@intel.com, aleksander.lobakin@intel.com,
+ jaroslav.pulchart@gooddata.com, jdamato@fastly.com,
+ christoph.petrausch@deepl.com, Rinitha S <sx.rinitha@intel.com>,
+ Priya Singh <priyax.singh@intel.com>, Eelco Chaudron <echaudro@redhat.com>,
+ edumazet@google.com
+References: <20250815204205.1407768-1-anthony.l.nguyen@intel.com>
+ <20250815204205.1407768-4-anthony.l.nguyen@intel.com>
+ <3887332b-a892-42f6-9fde-782638ebc5f6@kernel.org>
+ <dd8703a5-7597-493c-a5c7-73eac7ed67d5@intel.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <dd8703a5-7597-493c-a5c7-73eac7ed67d5@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On soft-reboot, with a reset GPIO defined for an Aeonsemi PHY, the
-special match_phy_device fails to correctly identify that the PHY
-needs to load the firmware again.
 
-This is caused by the fact that PHY ID is read BEFORE the PHY reset
-GPIO (if present) is asserted, so we can be in the scenario where the
-phydev have the previous PHY ID (with the PHY firmware loaded) but
-after reset the generic AS21xxx PHY is present in the PHY ID registers.
 
-To better handle this, skip reading the PHY ID register only for the PHY
-that are not AS21xxx (by matching for the Aeonsemi Vendor) and always
-read the PHY ID for the other case to handle both firmware already
-loaded or an HW reset.
+On 19/08/2025 02.38, Jacob Keller wrote:
+> 
+> 
+> On 8/18/2025 4:05 AM, Jesper Dangaard Brouer wrote:
+>> On 15/08/2025 22.41, Tony Nguyen wrote:
+>>> This has the advantage that we also no longer need to track or cache the
+>>> number of fragments in the rx_ring, which saves a few bytes in the ring.
+>>>
+>>
+>> Have anyone tested the performance impact for XDP_DROP ?
+>> (with standard non-multi-buffer frames)
+>>
+>> Below code change will always touch cache-lines in shared_info area.
+>> Before it was guarded with a xdp_buff_has_frags() check.
+>>
+> 
+> I did some basic testing with XDP_DROP previously using the xdp-bench
+> tool, and do not recall notice an issue. I don't recall the actual
+> numbers now though, so I did some quick tests again.
+> 
+> without patch...
+> 
+> Client:
+> $ iperf3 -u -c 192.168.93.1 -t86400 -l1200 -P20 -b5G
+> ...
+> [SUM]  10.00-10.33  sec   626 MBytes  16.0 Gbits/sec  546909
+> 
+> $ iperf3 -s -B 192.168.93.1%ens260f0
+> [SUM]   0.00-10.00  sec  17.7 GBytes  15.2 Gbits/sec  0.011 ms
+> 9712/15888183 (0.061%)  receiver
+> 
+> $ xdp-bench drop ens260f0
+> Summary                 1,778,935 rx/s                  0 err/s
+> Summary                 2,041,087 rx/s                  0 err/s
+> Summary                 2,005,052 rx/s                  0 err/s
+> Summary                 1,918,967 rx/s                  0 err/s
+> 
+> with patch...
+> 
+> Client:
+> $ iperf3 -u -c 192.168.93.1 -t86400 -l1200 -P20 -b5G
+> ...
+> [SUM]  78.00-78.90  sec  2.01 GBytes  19.1 Gbits/sec  1801284
+> 
+> Server:
+> $ iperf3 -s -B 192.168.93.1%ens260f0
+> [SUM]  77.00-78.00  sec  2.14 GBytes  18.4 Gbits/sec  0.012 ms
+> 9373/1921186 (0.49%)
+> 
+> xdp-bench:
+> $ xdp-bench drop ens260f0
+> Dropping packets on ens260f0 (ifindex 8; driver ice)
+> Summary                 1,910,918 rx/s                  0 err/s
+> Summary                 1,866,562 rx/s                  0 err/s
+> Summary                 1,901,233 rx/s                  0 err/s
+> Summary                 1,859,854 rx/s                  0 err/s
+> Summary                 1,593,493 rx/s                  0 err/s
+> Summary                 1,891,426 rx/s                  0 err/s
+> Summary                 1,880,673 rx/s                  0 err/s
+> Summary                 1,866,043 rx/s                  0 err/s
+> Summary                 1,872,845 rx/s                  0 err/s
+> 
+> 
+> I ran a few times and it seemed to waffle a bit around 15Gbit/sec to
+> 20Gbit/sec, with throughput varying regardless of which patch applied. I
+> actually tended to see slightly higher numbers with this fix applied,
+> but it was not consistent and hard to measure.
+> 
 
-Fixes: 830877d89edc ("net: phy: Add support for Aeonsemi AS21xxx PHYs")
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
- drivers/net/phy/as21xxx.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+Above testing is not a valid XDP_DROP test.
 
-diff --git a/drivers/net/phy/as21xxx.c b/drivers/net/phy/as21xxx.c
-index 92697f43087d..005277360656 100644
---- a/drivers/net/phy/as21xxx.c
-+++ b/drivers/net/phy/as21xxx.c
-@@ -884,11 +884,12 @@ static int as21xxx_match_phy_device(struct phy_device *phydev,
- 	u32 phy_id;
- 	int ret;
- 
--	/* Skip PHY that are not AS21xxx or already have firmware loaded */
--	if (phydev->c45_ids.device_ids[MDIO_MMD_PCS] != PHY_ID_AS21XXX)
-+	/* Skip PHY that are not AS21xxx */
-+	if (!phy_id_compare_vendor(phydev->c45_ids.device_ids[MDIO_MMD_PCS],
-+				   PHY_VENDOR_AEONSEMI))
- 		return genphy_match_phy_device(phydev, phydrv);
- 
--	/* Read PHY ID to handle firmware just loaded */
-+	/* Read PHY ID to handle firmware loaded or HW reset */
- 	ret = phy_read_mmd(phydev, MDIO_MMD_PCS, MII_PHYSID1);
- 	if (ret < 0)
- 		return ret;
--- 
-2.50.0
+The packet generator need to be much much faster, as XDP_DROP is for
+DDoS protection use-cases (one of Cloudflare's main products).
+
+I recommend using the script for pktgen in kernel tree:
+  samples/pktgen/pktgen_sample03_burst_single_flow.sh
+
+Example:
+  ./pktgen_sample03_burst_single_flow.sh -vi mlx5p2 -d 198.18.100.1 -m 
+b4:96:91:ad:0b:09 -t $(nproc)
+
+
+> without the patch:
+
+On my testlab with CPU: AMD EPYC 9684X (SRSO=IBPB) running:
+  - sudo ./xdp-bench drop ice4  # (defaults to no-touch)
+
+XDP_DROP (with no-touch)
+  Without patch :  54,052,300 rx/s = 18.50 nanosec/packet
+  With the patch:  33,420,619 rx/s = 29.92 nanosec/packet
+  Diff: 11.42 nanosec
+
+Using perf stat I can see an increase in cache-misses.
+
+The difference is less, if we read-packet data, running:
+  - sudo ./xdp-bench drop ice4 --packet-operation read-data
+
+XDP_DROP (with read-data)
+  Without patch :  27,200,683 rx/s = 36.76 nanosec/packet
+  With the patch:  24,348,751 rx/s = 41.07 nanosec/packet
+  Diff: 4.31 nanosec
+
+On this CPU we don't have DDIO/DCA, so we take a big hit reading the
+packet data in XDP.  This will be needed by our DDoS bpf_prog.
+The nanosec diff isn't the same, so it seem this change can hide a
+little behind the cache-miss in the XDP bpf_prog.
+
+
+> Without xdp-bench running the XDP program, top showed a CPU usage of
+> 740% and an ~86 idle score.
+> 
+
+We don't want a scaling test for this. For this XDP_DROP/DDoS test we
+want to target a single CPU. This is easiest done by generating a single
+flow (hint pktgen script is called _single_flow). We want to see a
+single CPU running ksoftirqd 100% of the time.
+
+> With xdp-bench running, the iperf cpu drops off the top listing and the
+> CPU idle score goes up to 99.9
+> 
+
+With the single flow generator DoS "attacking" a single CPU, we want to
+see a single CPU running ksoftirqd 100% of the time, for XDP_DROP case.
+
+> 
+> with the patch:
+> 
+> The iperf3 CPU use seems to go up, but so does the throughput. It is
+> hard to get an isolated measure. I don't have an immediate setup for
+> fine tuned performance testing available to do anything more rigorous.
+> 
+> Personally, I think its overall in the noise, as I saw the same peak
+> performance and CPU usages with and without the patch.
+> 
+> I also tried testing TCP and also didn't see a significant difference
+> with or without the patch. Though, testing xdp-bench with TCP is not
+> that useful since the client stops transmitting once the packets are
+> dropped instead of handled.
+> 
+> $ iperf3 -c 192.168.93.1 -t86400 -l8000 -P5
+> 
+> Without patch:
+> [SUM]  24.00-25.00  sec  7.80 GBytes  67.0 Gbits/sec
+> 
+> With patch:
+> [SUM]  28.00-29.00  sec  7.85 GBytes  67.4 Gbits/sec
+> 
+> Again, it ranges from 60 to 68 Gbit/sec in both cases, though I think
+> the peak is slightly higher with the fix applied, sometimes I saw it
+> spike up to 70Gbit/sec but it mostly hovers around 67 Gbit/sec.
+> 
+> I'm sure theres a lot of factors impacting the performance here, but I
+> think there's not much evidence that its significantly different.
+>>> Cc: Christoph Petrausch <christoph.petrausch@deepl.com>
+>>> Reported-by: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+>>> Closes: https://lore.kernel.org/netdev/CAK8fFZ4hY6GUJNENz3wY9jaYLZXGfpr7dnZxzGMYoE44caRbgw@mail.gmail.com/
+>>> Fixes: 743bbd93cf29 ("ice: put Rx buffers after being done with current frame")
+>>> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+>>> Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
+>>> Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+>>> Tested-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+>>> Tested-by: Priya Singh <priyax.singh@intel.com>
+>>> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+>>> ---
+>>>    drivers/net/ethernet/intel/ice/ice_txrx.c | 81 +++++++++--------------
+>>>    drivers/net/ethernet/intel/ice/ice_txrx.h |  1 -
+>>>    2 files changed, 33 insertions(+), 49 deletions(-)
+>>>
+>>> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+>>> index 29e0088ab6b2..93907ab2eac7 100644
+>>> --- a/drivers/net/ethernet/intel/ice/ice_txrx.c
+>>> +++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
+>>> @@ -894,10 +894,6 @@ ice_add_xdp_frag(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
+>>>    	__skb_fill_page_desc_noacc(sinfo, sinfo->nr_frags++, rx_buf->page,
+>>>    				   rx_buf->page_offset, size);
+>>>    	sinfo->xdp_frags_size += size;
+>>> -	/* remember frag count before XDP prog execution; bpf_xdp_adjust_tail()
+>>> -	 * can pop off frags but driver has to handle it on its own
+>>> -	 */
+>>> -	rx_ring->nr_frags = sinfo->nr_frags;
+>>>    
+>>>    	if (page_is_pfmemalloc(rx_buf->page))
+>>>    		xdp_buff_set_frag_pfmemalloc(xdp);
+>>> @@ -968,20 +964,20 @@ ice_get_rx_buf(struct ice_rx_ring *rx_ring, const unsigned int size,
+>>>    /**
+>>>     * ice_get_pgcnts - grab page_count() for gathered fragments
+>>>     * @rx_ring: Rx descriptor ring to store the page counts on
+>>> + * @ntc: the next to clean element (not included in this frame!)
+>>>     *
+>>>     * This function is intended to be called right before running XDP
+>>>     * program so that the page recycling mechanism will be able to take
+>>>     * a correct decision regarding underlying pages; this is done in such
+>>>     * way as XDP program can change the refcount of page
+>>>     */
+>>> -static void ice_get_pgcnts(struct ice_rx_ring *rx_ring)
+>>> +static void ice_get_pgcnts(struct ice_rx_ring *rx_ring, unsigned int ntc)
+>>>    {
+>>> -	u32 nr_frags = rx_ring->nr_frags + 1;
+>>>    	u32 idx = rx_ring->first_desc;
+>>>    	struct ice_rx_buf *rx_buf;
+>>>    	u32 cnt = rx_ring->count;
+>>>    
+>>> -	for (int i = 0; i < nr_frags; i++) {
+>>> +	while (idx != ntc) {
+>>>    		rx_buf = &rx_ring->rx_buf[idx];
+>>>    		rx_buf->pgcnt = page_count(rx_buf->page);
+>>>    
+>>> @@ -1154,62 +1150,48 @@ ice_put_rx_buf(struct ice_rx_ring *rx_ring, struct ice_rx_buf *rx_buf)
+>>>    }
+>>>    
+>>>    /**
+>>> - * ice_put_rx_mbuf - ice_put_rx_buf() caller, for all frame frags
+>>> + * ice_put_rx_mbuf - ice_put_rx_buf() caller, for all buffers in frame
+>>>     * @rx_ring: Rx ring with all the auxiliary data
+>>>     * @xdp: XDP buffer carrying linear + frags part
+>>> - * @xdp_xmit: XDP_TX/XDP_REDIRECT verdict storage
+>>> - * @ntc: a current next_to_clean value to be stored at rx_ring
+>>> + * @ntc: the next to clean element (not included in this frame!)
+>>>     * @verdict: return code from XDP program execution
+>>>     *
+>>> - * Walk through gathered fragments and satisfy internal page
+>>> - * recycle mechanism; we take here an action related to verdict
+>>> - * returned by XDP program;
+>>> + * Called after XDP program is completed, or on error with verdict set to
+>>> + * ICE_XDP_CONSUMED.
+>>> + *
+>>> + * Walk through buffers from first_desc to the end of the frame, releasing
+>>> + * buffers and satisfying internal page recycle mechanism. The action depends
+>>> + * on verdict from XDP program.
+>>>     */
+>>>    static void ice_put_rx_mbuf(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
+>>> -			    u32 *xdp_xmit, u32 ntc, u32 verdict)
+>>> +			    u32 ntc, u32 verdict)
+>>>    {
+>>> -	u32 nr_frags = rx_ring->nr_frags + 1;
+>>> +	u32 nr_frags = xdp_get_shared_info_from_buff(xdp)->nr_frags;
+>>
+>> Here we unconditionally access the skb_shared_info area.
+>>
+>>>    	u32 idx = rx_ring->first_desc;
+>>>    	u32 cnt = rx_ring->count;
+>>> -	u32 post_xdp_frags = 1;
+>>>    	struct ice_rx_buf *buf;
+>>> -	int i;
+>>> -
+>>> -	if (unlikely(xdp_buff_has_frags(xdp)))
+>>
+>> Previously we only touch shared_info area if this is a multi-buff frame.
+>>
+> 
+> I'm not certain, but reading the helpers it might be correct to do
+> something like this:
+> 
+> if (unlikely(xdp_buff_has_frags(xdp)))
+>    nr_frags = xdp_get_shared_info_from_buff(xdp)->nr_frags;
+> else
+>    nr_frags = 1
+
+Yes, that looks like a correct pattern.
+
+> either in the driver code or by adding a new xdp helper function.
+> 
+> I'm not sure its worth it though. We have pending work from our
+> development team to refactor ice to use page pool and switch to libeth
+> XDP helpers which eliminates all of this driver-specific logic.
+
+Please do proper testing of XDP_DROP case when doing this change.
+
+> I don't personally think its worth holding up this series and this
+> important memory leak fix for a minor potential code change that I can't
+> measure an obvious improvement on.
+
+IMHO you included an optimization (that wasn't a gain) in a fix patch.
+I think you can fix the memory leak without the "optimization" part.
+
+pw-bot: cr
+
+--Jesper
 
 
