@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-214940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB740B2C36F
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 14:24:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B39D1B2C384
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 14:29:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B6F57A7347
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 12:23:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 765BC188CF5B
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 12:25:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 316F5343D61;
-	Tue, 19 Aug 2025 12:21:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACC9A343D73;
+	Tue, 19 Aug 2025 12:21:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lyCR6xx6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pr3HgkPe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D8CB34321E
-	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 12:21:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8836B34320E
+	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 12:21:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755606089; cv=none; b=acs7KvaVFM2iX8GmyG2h73Egr0BksnOzmgJTdNZHqbPyNAaQ9g50uwaZMPkQrLkkmZv86W3U80P4U3df+iVd+Cs6LFB+eDKOBBKg0BSfuYz+cn9EPCvaS8CMG3wvF5Gr6aGPa92TijXSLtrL9+lk1rg4X7OKy6Beeg7LZKmvJvo=
+	t=1755606091; cv=none; b=QTZnZXDZzjp2sZoOLnhzHdsT9fPC/MkZ68ZvdPQGyEbWiaD8dzOrVDW6D5edEKKU+vZVy/4kgw3t6A5wBp8AX7Ei/CYlpzTah7YRxogZtfZXt08uM2qDxib9p4RlSr8JRoIwE8IV3kaPepFscMRwoiF7JiPP70aPw/WMWIVu5r4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755606089; c=relaxed/simple;
-	bh=yIZC/YPrJ4rvcIHRrzw0y4RwLvWupKfvOlIXCXQTD5M=;
+	s=arc-20240116; t=1755606091; c=relaxed/simple;
+	bh=ZgAeLqBCCGeArPANi6zUOMhnXQnhm50yrseYUAeXpLA=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=GCtEEDTrARKRqHnfzMLn3KMZmjIsYHcyyDU7fiXrfPeRJPf9wuPTfh4uukQPbovzxvlfZSqlGOKfPJPZ5tJ0rKK1TCvpZoLCX2rNgARz1uXr/kf7wiZK1vmAII4OlYsh8hco9Y8UzsowO23UUCLfGQTwHYrQGqd+hhaEd8cL0dU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lyCR6xx6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13C7EC4CEF1;
-	Tue, 19 Aug 2025 12:21:27 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=IL7S+xRqRbv0CIt9jp52NI9/Ie5BIV5Cb++6iZvSzYeHum6nzP6bIZhqQmPWA4yUbYhgL6ll/bzFaqn40bWZ4sel+wTrvLe8muBlZXtCe02b8ZrRW8A3+4vpxPo5ACIbchhhirvruBI1HgGaf6ghjcK7wxXlOknyvfVLxzp5Nh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pr3HgkPe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1F9EC4CEF1;
+	Tue, 19 Aug 2025 12:21:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755606088;
-	bh=yIZC/YPrJ4rvcIHRrzw0y4RwLvWupKfvOlIXCXQTD5M=;
+	s=k20201202; t=1755606091;
+	bh=ZgAeLqBCCGeArPANi6zUOMhnXQnhm50yrseYUAeXpLA=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=lyCR6xx6A4MSRXeDkaCopFfxYD4GHgj7N8r2FxXaJe878BzuWNfvnUcOZaQ6gnnWz
-	 qDpFZHav4sHYRclxULOWPjHwqiBwPceSJfYD+jVEqUZHN2we36VIiCEOkKXzFvIwAp
-	 JGocN74zHlwXUXe/i0RZa4Am/ja92kcqXjd6rDbfJkPdmBj46UEZeFPaDyf7AYAlHI
-	 rFTvlqikR9F+399sMyz9Ai7roF+yXHj9B2Mfodca010tZZpsBJad/VFfJQgKuZs/6S
-	 osboNHjB10++zYn94qraxecqHA+JGrkbq0ogUtYgXxQR4u6NFunOQFvXpV2Pjfv+gv
-	 IFAbOdawiN3kA==
+	b=Pr3HgkPeU7GI0BXmHpGPavkiQtTYVbLpiTh+0cqT+e3I4r6M5lvCCmNIblDjVysZP
+	 f8ZIIG2AoW5DqcpuXFfn5+gHHFyWhuAZ+maZRSmR3XAa4L3itSWam5mIjzhVC1/8xM
+	 ww+Q+iGqeoGW7BkizRWGdZ+6lPXdkWWGq8VIemOX1yySDV/KBW/Ecl2Y6JBGDrzM6X
+	 WUe/xvfwjNJ/aWY/pQuagZx3sc8FSAUSPrYWhv8049LJWuSX4E5xAACX0hq/2AFMig
+	 rQbXbI5YBP+igkhq7GJ7NteNL2aFHq1Q6Tg2zlIiTIDXWCWSXqbhxcXjryn/jYLH6n
+	 kLMY8tblcjmVA==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Tue, 19 Aug 2025 14:21:07 +0200
-Subject: [PATCH net-next 2/3] net: airoha: Add airoha_ppe_dev struct
- definition
+Date: Tue, 19 Aug 2025 14:21:08 +0200
+Subject: [PATCH net-next 3/3] net: airoha: Introduce check_skb callback in
+ ppe_dev ops
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,7 +53,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250819-airoha-en7581-wlan-rx-offload-v1-2-71a097e0e2a1@kernel.org>
+Message-Id: <20250819-airoha-en7581-wlan-rx-offload-v1-3-71a097e0e2a1@kernel.org>
 References: <20250819-airoha-en7581-wlan-rx-offload-v1-0-71a097e0e2a1@kernel.org>
 In-Reply-To: <20250819-airoha-en7581-wlan-rx-offload-v1-0-71a097e0e2a1@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -64,233 +64,214 @@ Cc: linux-arm-kernel@lists.infradead.org,
  Lorenzo Bianconi <lorenzo@kernel.org>
 X-Mailer: b4 0.14.2
 
-Introduce airoha_ppe_dev struct as container for PPE offload callbacks
-consumed by the MT76 driver during flowtable offload for traffic
-received by the wlan NIC and forwarded to the wired one.
-Add airoha_ppe_setup_tc_block_cb routine to PPE offload ops for MT76
-driver.
-Rely on airoha_ppe_dev pointer in airoha_ppe_setup_tc_block_cb
-signature.
+Export airoha_ppe_check_skb routine in ppe_dev ops. check_skb callback
+will be used by the MT76 driver in order to offload the traffic received
+by the wlan NIC and forwarded to the ethernet one.
+Add rx_wlan parameter to airoha_ppe_check_skb routine signature.
 
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- drivers/net/ethernet/airoha/airoha_eth.c  |  4 +-
- drivers/net/ethernet/airoha/airoha_eth.h  |  4 +-
- drivers/net/ethernet/airoha/airoha_npu.c  |  1 -
- drivers/net/ethernet/airoha/airoha_ppe.c  | 68 +++++++++++++++++++++++++++++--
- include/linux/soc/airoha/airoha_offload.h | 35 ++++++++++++++++
- 5 files changed, 105 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/airoha/airoha_eth.c  |  3 ++-
+ drivers/net/ethernet/airoha/airoha_eth.h  |  8 ++------
+ drivers/net/ethernet/airoha/airoha_ppe.c  | 25 ++++++++++++++-----------
+ include/linux/soc/airoha/airoha_offload.h | 20 ++++++++++++++++++++
+ 4 files changed, 38 insertions(+), 18 deletions(-)
 
 diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index e6b802e3d84493508d2dbd248fb1cbfa9ace468f..5a04f90dd3de47ae0ee8e90bfe221618076297e6 100644
+index 5a04f90dd3de47ae0ee8e90bfe221618076297e6..81ea01a652b9c545c348ad6390af8be873a4997f 100644
 --- a/drivers/net/ethernet/airoha/airoha_eth.c
 +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -2599,13 +2599,15 @@ static int airoha_dev_setup_tc_block_cb(enum tc_setup_type type,
- 					void *type_data, void *cb_priv)
- {
- 	struct net_device *dev = cb_priv;
-+	struct airoha_gdm_port *port = netdev_priv(dev);
-+	struct airoha_eth *eth = port->qdma->eth;
+@@ -698,7 +698,8 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
  
- 	if (!tc_can_offload(dev))
- 		return -EOPNOTSUPP;
+ 		reason = FIELD_GET(AIROHA_RXD4_PPE_CPU_REASON, msg1);
+ 		if (reason == PPE_CPU_REASON_HIT_UNBIND_RATE_REACHED)
+-			airoha_ppe_check_skb(eth->ppe, q->skb, hash);
++			airoha_ppe_check_skb(&eth->ppe->dev, q->skb, hash,
++					     false);
  
- 	switch (type) {
- 	case TC_SETUP_CLSFLOWER:
--		return airoha_ppe_setup_tc_block_cb(dev, type_data);
-+		return airoha_ppe_setup_tc_block_cb(&eth->ppe->dev, type_data);
- 	case TC_SETUP_CLSMATCHALL:
- 		return airoha_dev_tc_matchall(dev, type_data);
- 	default:
+ 		done++;
+ 		napi_gro_receive(&q->napi, q->skb);
 diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
-index 9f721e2b972f0e547978419701caf532df664910..9060b1d2814e0e4023d42a05ecb5265212df588f 100644
+index 9060b1d2814e0e4023d42a05ecb5265212df588f..77fd13d466dcd235a3ab39a488aa26d8f793cf77 100644
 --- a/drivers/net/ethernet/airoha/airoha_eth.h
 +++ b/drivers/net/ethernet/airoha/airoha_eth.h
-@@ -13,6 +13,7 @@
- #include <linux/kernel.h>
- #include <linux/netdevice.h>
- #include <linux/reset.h>
-+#include <linux/soc/airoha/airoha_offload.h>
- #include <net/dsa.h>
+@@ -229,10 +229,6 @@ struct airoha_hw_stats {
+ 	u64 rx_len[7];
+ };
  
- #define AIROHA_MAX_NUM_GDM_PORTS	4
-@@ -546,6 +547,7 @@ struct airoha_gdm_port {
- #define AIROHA_RXD4_FOE_ENTRY		GENMASK(15, 0)
+-enum {
+-	PPE_CPU_REASON_HIT_UNBIND_RATE_REACHED = 0x0f,
+-};
+-
+ enum {
+ 	AIROHA_FOE_STATE_INVALID,
+ 	AIROHA_FOE_STATE_UNBIND,
+@@ -622,8 +618,8 @@ static inline bool airhoa_is_lan_gdm_port(struct airoha_gdm_port *port)
+ bool airoha_is_valid_gdm_port(struct airoha_eth *eth,
+ 			      struct airoha_gdm_port *port);
  
- struct airoha_ppe {
-+	struct airoha_ppe_dev dev;
- 	struct airoha_eth *eth;
- 
- 	void *foe;
-@@ -622,7 +624,7 @@ bool airoha_is_valid_gdm_port(struct airoha_eth *eth,
- 
- void airoha_ppe_check_skb(struct airoha_ppe *ppe, struct sk_buff *skb,
- 			  u16 hash);
--int airoha_ppe_setup_tc_block_cb(struct net_device *dev, void *type_data);
-+int airoha_ppe_setup_tc_block_cb(struct airoha_ppe_dev *dev, void *type_data);
+-void airoha_ppe_check_skb(struct airoha_ppe *ppe, struct sk_buff *skb,
+-			  u16 hash);
++void airoha_ppe_check_skb(struct airoha_ppe_dev *dev, struct sk_buff *skb,
++			  u16 hash, bool rx_wlan);
+ int airoha_ppe_setup_tc_block_cb(struct airoha_ppe_dev *dev, void *type_data);
  int airoha_ppe_init(struct airoha_eth *eth);
  void airoha_ppe_deinit(struct airoha_eth *eth);
- void airoha_ppe_init_upd_mem(struct airoha_gdm_port *port);
-diff --git a/drivers/net/ethernet/airoha/airoha_npu.c b/drivers/net/ethernet/airoha/airoha_npu.c
-index 1a6b191ae0b0bba2dc0a011b9da4eb5f4686783e..e1d131d6115c10b40a56b63427eec59ea587d22a 100644
---- a/drivers/net/ethernet/airoha/airoha_npu.c
-+++ b/drivers/net/ethernet/airoha/airoha_npu.c
-@@ -11,7 +11,6 @@
- #include <linux/of_platform.h>
- #include <linux/of_reserved_mem.h>
- #include <linux/regmap.h>
--#include <linux/soc/airoha/airoha_offload.h>
- 
- #include "airoha_eth.h"
- 
 diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
-index 2fabf33a5034d98c46efcaf3934e4ff21bd60e4a..fe050a54cdcc818e18cd781a5c6a0b5cf1b496d6 100644
+index fe050a54cdcc818e18cd781a5c6a0b5cf1b496d6..9ffcff8c3ddfa0651058d0f48dffe027231a55aa 100644
 --- a/drivers/net/ethernet/airoha/airoha_ppe.c
 +++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-@@ -6,8 +6,9 @@
+@@ -616,7 +616,7 @@ static bool airoha_ppe_foe_compare_entry(struct airoha_flow_table_entry *e,
  
- #include <linux/ip.h>
- #include <linux/ipv6.h>
-+#include <linux/of_platform.h>
-+#include <linux/platform_device.h>
- #include <linux/rhashtable.h>
--#include <linux/soc/airoha/airoha_offload.h>
- #include <net/ipv6.h>
- #include <net/pkt_cls.h>
+ static int airoha_ppe_foe_commit_entry(struct airoha_ppe *ppe,
+ 				       struct airoha_foe_entry *e,
+-				       u32 hash)
++				       u32 hash, bool rx_wlan)
+ {
+ 	struct airoha_foe_entry *hwe = ppe->foe + hash * sizeof(*hwe);
+ 	u32 ts = airoha_ppe_get_timestamp(ppe);
+@@ -639,7 +639,8 @@ static int airoha_ppe_foe_commit_entry(struct airoha_ppe *ppe,
+ 		goto unlock;
+ 	}
  
-@@ -1284,10 +1285,10 @@ static int airoha_ppe_offload_setup(struct airoha_eth *eth)
+-	airoha_ppe_foe_flow_stats_update(ppe, npu, hwe, hash);
++	if (!rx_wlan)
++		airoha_ppe_foe_flow_stats_update(ppe, npu, hwe, hash);
+ 
+ 	if (hash < PPE_SRAM_NUM_ENTRIES) {
+ 		dma_addr_t addr = ppe->foe_dma + hash * sizeof(*hwe);
+@@ -665,7 +666,7 @@ static void airoha_ppe_foe_remove_flow(struct airoha_ppe *ppe,
+ 		e->data.ib1 &= ~AIROHA_FOE_IB1_BIND_STATE;
+ 		e->data.ib1 |= FIELD_PREP(AIROHA_FOE_IB1_BIND_STATE,
+ 					  AIROHA_FOE_STATE_INVALID);
+-		airoha_ppe_foe_commit_entry(ppe, &e->data, e->hash);
++		airoha_ppe_foe_commit_entry(ppe, &e->data, e->hash, false);
+ 		e->hash = 0xffff;
+ 	}
+ 	if (e->type == FLOW_TYPE_L2_SUBFLOW) {
+@@ -704,7 +705,7 @@ static void airoha_ppe_foe_flow_remove_entry(struct airoha_ppe *ppe,
+ static int
+ airoha_ppe_foe_commit_subflow_entry(struct airoha_ppe *ppe,
+ 				    struct airoha_flow_table_entry *e,
+-				    u32 hash)
++				    u32 hash, bool rx_wlan)
+ {
+ 	u32 mask = AIROHA_FOE_IB1_BIND_PACKET_TYPE | AIROHA_FOE_IB1_BIND_UDP;
+ 	struct airoha_foe_entry *hwe_p, hwe;
+@@ -745,14 +746,14 @@ airoha_ppe_foe_commit_subflow_entry(struct airoha_ppe *ppe,
+ 	}
+ 
+ 	hwe.bridge.data = e->data.bridge.data;
+-	airoha_ppe_foe_commit_entry(ppe, &hwe, hash);
++	airoha_ppe_foe_commit_entry(ppe, &hwe, hash, rx_wlan);
+ 
+ 	return 0;
+ }
+ 
+ static void airoha_ppe_foe_insert_entry(struct airoha_ppe *ppe,
+ 					struct sk_buff *skb,
+-					u32 hash)
++					u32 hash, bool rx_wlan)
+ {
+ 	struct airoha_flow_table_entry *e;
+ 	struct airoha_foe_bridge br = {};
+@@ -787,7 +788,7 @@ static void airoha_ppe_foe_insert_entry(struct airoha_ppe *ppe,
+ 			continue;
+ 		}
+ 
+-		airoha_ppe_foe_commit_entry(ppe, &e->data, hash);
++		airoha_ppe_foe_commit_entry(ppe, &e->data, hash, rx_wlan);
+ 		commit_done = true;
+ 		e->hash = hash;
+ 	}
+@@ -799,7 +800,7 @@ static void airoha_ppe_foe_insert_entry(struct airoha_ppe *ppe,
+ 	e = rhashtable_lookup_fast(&ppe->l2_flows, &br,
+ 				   airoha_l2_flow_table_params);
+ 	if (e)
+-		airoha_ppe_foe_commit_subflow_entry(ppe, e, hash);
++		airoha_ppe_foe_commit_subflow_entry(ppe, e, hash, rx_wlan);
+ unlock:
+ 	spin_unlock_bh(&ppe_lock);
+ }
+@@ -1303,9 +1304,10 @@ int airoha_ppe_setup_tc_block_cb(struct airoha_ppe_dev *dev, void *type_data)
  	return err;
  }
  
--int airoha_ppe_setup_tc_block_cb(struct net_device *dev, void *type_data)
-+int airoha_ppe_setup_tc_block_cb(struct airoha_ppe_dev *dev, void *type_data)
+-void airoha_ppe_check_skb(struct airoha_ppe *ppe, struct sk_buff *skb,
+-			  u16 hash)
++void airoha_ppe_check_skb(struct airoha_ppe_dev *dev, struct sk_buff *skb,
++			  u16 hash, bool rx_wlan)
  {
--	struct airoha_gdm_port *port = netdev_priv(dev);
--	struct airoha_eth *eth = port->qdma->eth;
 +	struct airoha_ppe *ppe = dev->priv;
-+	struct airoha_eth *eth = ppe->eth;
- 	int err = 0;
+ 	u16 now, diff;
  
- 	mutex_lock(&flow_offload_mutex);
-@@ -1340,6 +1341,62 @@ void airoha_ppe_init_upd_mem(struct airoha_gdm_port *port)
- 		     PPE_UPDMEM_WR_MASK | PPE_UPDMEM_REQ_MASK);
+ 	if (hash > PPE_HASH_MASK)
+@@ -1317,7 +1319,7 @@ void airoha_ppe_check_skb(struct airoha_ppe *ppe, struct sk_buff *skb,
+ 		return;
+ 
+ 	ppe->foe_check_time[hash] = now;
+-	airoha_ppe_foe_insert_entry(ppe, skb, hash);
++	airoha_ppe_foe_insert_entry(ppe, skb, hash, rx_wlan);
  }
  
-+struct airoha_ppe_dev *airoha_ppe_get_dev(struct device *dev)
-+{
-+	struct platform_device *pdev;
-+	struct device_node *np;
-+	struct airoha_eth *eth;
-+
-+	np = of_parse_phandle(dev->of_node, "airoha,eth", 0);
-+	if (!np)
-+		return ERR_PTR(-ENODEV);
-+
-+	pdev = of_find_device_by_node(np);
-+
-+	if (!pdev) {
-+		dev_err(dev, "cannot find device node %s\n", np->name);
-+		of_node_put(np);
-+		return ERR_PTR(-ENODEV);
-+	}
-+	of_node_put(np);
-+
-+	if (!try_module_get(THIS_MODULE)) {
-+		dev_err(dev, "failed to get the device driver module\n");
-+		goto error_pdev_put;
-+	}
-+
-+	eth = platform_get_drvdata(pdev);
-+	if (!eth)
-+		goto error_module_put;
-+
-+	if (!device_link_add(dev, &pdev->dev, DL_FLAG_AUTOREMOVE_SUPPLIER)) {
-+		dev_err(&pdev->dev,
-+			"failed to create device link to consumer %s\n",
-+			dev_name(dev));
-+		goto error_module_put;
-+	}
-+
-+	return &eth->ppe->dev;
-+
-+error_module_put:
-+	module_put(THIS_MODULE);
-+error_pdev_put:
-+	platform_device_put(pdev);
-+
-+	return ERR_PTR(-ENODEV);
-+}
-+EXPORT_SYMBOL_GPL(airoha_ppe_get_dev);
-+
-+void airoha_ppe_put_dev(struct airoha_ppe_dev *dev)
-+{
-+	struct airoha_ppe *ppe = dev->priv;
-+	struct airoha_eth *eth = ppe->eth;
-+
-+	module_put(THIS_MODULE);
-+	put_device(eth->dev);
-+}
-+EXPORT_SYMBOL_GPL(airoha_ppe_put_dev);
-+
- int airoha_ppe_init(struct airoha_eth *eth)
- {
- 	struct airoha_ppe *ppe;
-@@ -1349,6 +1406,9 @@ int airoha_ppe_init(struct airoha_eth *eth)
- 	if (!ppe)
+ void airoha_ppe_init_upd_mem(struct airoha_gdm_port *port)
+@@ -1407,6 +1409,7 @@ int airoha_ppe_init(struct airoha_eth *eth)
  		return -ENOMEM;
  
-+	ppe->dev.ops.setup_tc_block_cb = airoha_ppe_setup_tc_block_cb;
-+	ppe->dev.priv = ppe;
-+
+ 	ppe->dev.ops.setup_tc_block_cb = airoha_ppe_setup_tc_block_cb;
++	ppe->dev.ops.check_skb = airoha_ppe_check_skb;
+ 	ppe->dev.priv = ppe;
+ 
  	foe_size = PPE_NUM_ENTRIES * sizeof(struct airoha_foe_entry);
- 	ppe->foe = dmam_alloc_coherent(eth->dev, foe_size, &ppe->foe_dma,
- 				       GFP_KERNEL);
 diff --git a/include/linux/soc/airoha/airoha_offload.h b/include/linux/soc/airoha/airoha_offload.h
-index 117c63c2448d2bd2a5c108c5baa56a39f6974d91..e05ded67c9e6fb89940e5b152f14c6ea0d7c6c49 100644
+index e05ded67c9e6fb89940e5b152f14c6ea0d7c6c49..4da562d0e4db6899d53f95b90a2a4ef2c63c974c 100644
 --- a/include/linux/soc/airoha/airoha_offload.h
 +++ b/include/linux/soc/airoha/airoha_offload.h
-@@ -9,6 +9,41 @@
+@@ -9,10 +9,17 @@
  #include <linux/spinlock.h>
  #include <linux/workqueue.h>
  
-+struct airoha_ppe_dev {
-+	struct {
-+		int (*setup_tc_block_cb)(struct airoha_ppe_dev *dev,
-+					 void *type_data);
-+	} ops;
-+
-+	void *priv;
++enum {
++	PPE_CPU_REASON_HIT_UNBIND_RATE_REACHED = 0x0f,
 +};
 +
-+#if (IS_BUILTIN(CONFIG_NET_AIROHA) || IS_MODULE(CONFIG_NET_AIROHA))
-+struct airoha_ppe_dev *airoha_ppe_get_dev(struct device *dev);
-+void airoha_ppe_put_dev(struct airoha_ppe_dev *dev);
+ struct airoha_ppe_dev {
+ 	struct {
+ 		int (*setup_tc_block_cb)(struct airoha_ppe_dev *dev,
+ 					 void *type_data);
++		void (*check_skb)(struct airoha_ppe_dev *dev,
++				  struct sk_buff *skb, u16 hash,
++				  bool rx_wlan);
+ 	} ops;
+ 
+ 	void *priv;
+@@ -27,6 +34,13 @@ static inline int airoha_ppe_dev_setup_tc_block_cb(struct airoha_ppe_dev *dev,
+ {
+ 	return dev->ops.setup_tc_block_cb(dev, type_data);
+ }
 +
-+static inline int airoha_ppe_dev_setup_tc_block_cb(struct airoha_ppe_dev *dev,
-+						   void *type_data)
++static inline void airoha_ppe_dev_check_skb(struct airoha_ppe_dev *dev,
++					    struct sk_buff *skb,
++					    u16 hash, bool rx_wlan)
 +{
-+	return dev->ops.setup_tc_block_cb(dev, type_data);
++	dev->ops.check_skb(dev, skb, hash, rx_wlan);
 +}
-+#else
-+static inline airoha_ppe_dev *airoha_ppe_get_dev(struct device *dev)
-+{
-+	return NULL;
-+}
+ #else
+ static inline airoha_ppe_dev *airoha_ppe_get_dev(struct device *dev)
+ {
+@@ -42,6 +56,12 @@ static inline int airoha_ppe_setup_tc_block_cb(struct airoha_ppe_dev *dev,
+ {
+ 	return -EOPNOTSUPP;
+ }
 +
-+static inline void airoha_ppe_put_dev(struct airoha_ppe_dev *dev)
++static inline void airoha_ppe_dev_check_skb(struct airoha_ppe_dev *dev,
++					    struct sk_buff *skb, u16 hash,
++					    bool rx_wlan)
 +{
 +}
-+
-+static inline int airoha_ppe_setup_tc_block_cb(struct airoha_ppe_dev *dev,
-+					       void *type_data)
-+{
-+	return -EOPNOTSUPP;
-+}
-+#endif
-+
+ #endif
+ 
  #define NPU_NUM_CORES		8
- #define NPU_NUM_IRQ		6
- #define NPU_RX0_DESC_NUM	512
 
 -- 
 2.50.1
