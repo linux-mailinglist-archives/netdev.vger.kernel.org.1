@@ -1,145 +1,129 @@
-Return-Path: <netdev+bounces-214827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1568CB2B670
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 03:46:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93355B2B67A
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 03:51:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C95A23BAA4B
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 01:46:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 100AC188B26C
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 01:51:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57EA328504B;
-	Tue, 19 Aug 2025 01:46:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF9D28640E;
+	Tue, 19 Aug 2025 01:50:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IokYRN4M"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Psp07Gcg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F30285079
-	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 01:46:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56E1527B500;
+	Tue, 19 Aug 2025 01:50:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755568002; cv=none; b=X7YYMgV1wPGmR1XgAz4j0QVbnh4XR1T7WMlwLJOyDaXTYqYDm4FGaIJLgQqUOqPjywFaWLC0i0igqFB8/e8T6Luy3RcFsaCYlDJMjstBoYgeaQXa9JuRt7qHYXsfe11kZ4gKvsEtiV0cG/TmyrdH/clmYJatZZKeTZhDAOC4elo=
+	t=1755568259; cv=none; b=KZzRvCWkE8WY1ndKEJ7aiWgtF2OZyHEgldYZ1DmEmM0Fv782FTYkhvkE1RhbfBpru0u9R/MHtt/hsJuq+QEMuybrOTbcClKBJiexOrMSv0zDChYl8JEfH9e9pdzv1KLHLZzMJjM0SmkWwLhpLwFZf/0Tt2y6vI5viuyryFAyysU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755568002; c=relaxed/simple;
-	bh=tEGknVAKb+PN/lYStQKRG0VhNOO+rKcQSO2jl7NQgp8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cZeJce6/DWN8cmA1ODVHO2/xWELmYp5CWAHcyJcb05I3Fz+Ju//A1Mo2WPEhPAECf8bgDWL/qg6Hqqmc7BPil0B++tiaBVBnI44+dash3txJbiLVP0ygABvVG+O8LqG/KZHr/+8tYyg0fncOzfNvo7xoK5MP1/H331tSUO/dppI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IokYRN4M; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-55cef2f624fso2456e87.1
-        for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 18:46:38 -0700 (PDT)
+	s=arc-20240116; t=1755568259; c=relaxed/simple;
+	bh=8YI/vhRAyY1BACNcDfxid6+yLfuGnYNNUvXA//GkKow=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Uf/718TK1oAQhSyoQ0mQe1n/sZCdRYbwbainanqo+2TRiLcHk2/f0WKbSxgtWsQbv5d/Cmrqt6ZOhekpVg3uc6AbWz9DrBISs81Q552GE7aQhcHU56fod3ps26FEmVVtDAwXyBT0DQR/CEfs5E6LDzXaOiaNk+t0GSBfRAYV3+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Psp07Gcg; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-76e2e614b84so4511140b3a.0;
+        Mon, 18 Aug 2025 18:50:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755567997; x=1756172797; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tEGknVAKb+PN/lYStQKRG0VhNOO+rKcQSO2jl7NQgp8=;
-        b=IokYRN4M43p2bMRqsHErNjuCfRonPyDYs0/z/4/QCe2o/E73wCHKqUlM5yxowQJUnc
-         ik5DDsyjaF1790X/dzdS1Ap4t0BgN009H2yg4YjW682QyQOskarPQ149oKa4YVHWdEzc
-         FosV+35D4DOoEMINeXE1pWUaqXZxZjOabuLBRjJYU098lhpBQBHnmH8E1GPAoGcyPEAI
-         CVSf5AI9V6kUlRWOcllnbS3uMt6+OyiSbrD8jIwQtiBsUzqmr2HB28ixuQc0OMSV/YBt
-         FrSr8l5jDqVwAv1HJucWyy1esItrmXIAn9n9ILCtb911EJjBLoLoOOF4QNRA9tqa7MAL
-         0gHg==
+        d=gmail.com; s=20230601; t=1755568257; x=1756173057; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0kGdHVKoHsgwhDb4EIcQAt0pL/4Uny3lwxFy9guJbrs=;
+        b=Psp07Gcg2QsSew3vMSJRh1Tvk5pAyWUKIYB+3EEfvlOrU1wo1rZ3gixNeFdZg85D7q
+         c6/RJKkylzcvMkKZrlqeZ+czJegOh+yBdH51N1Qj+wb+CASNA0IGi1dJ37cS4FAg+KlJ
+         3IaZl/i5NgbzOuzL9CF/tnRzoxZ+U0qyBAmv2WwlFgrR+su22L7SO0P1vA9+bJ3JZE3W
+         ZV0WO4syDEZVouUTNVlELcEv++lki/rzqFbB1V42Uv6TSft/UUpozsZ8/JZKT3cpi2Ir
+         VtIH2/bLRRLmVDMnIakEzrByGMSIDmt4Nym7EShhAmDsmxaqHgoEW+GZrxrRuvG5GTN5
+         b+Tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755567997; x=1756172797;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tEGknVAKb+PN/lYStQKRG0VhNOO+rKcQSO2jl7NQgp8=;
-        b=r/eeDW7BqE4qWAxENKzk86hbtiodGKu2t1sd16apnG1pGmAcVb20kgpLciX8ZTFBab
-         zCCrdLgPsCqkpdFujrhT1eqcBvREVRsh2aJ/K1j+HOZ1drFH4L9DZHY12GHKw/vlpQSj
-         WFeylB4SCqNJgE/t7CkWsZaBHgi6CYnMEB+ZMLxcQYcoakrG6kBGmO8to/WFQACXviig
-         hjU3ELnn3dlg6kDpfmyLJA9xEd7pmTnNP1bfGZhfpsH3qJxJ4xaxjXEWayfpCTvKQF9M
-         AAYRzWfBwkJ14Yh5LAtv8IXZgYXjhmCEeqCpILeQdhIOCfBpQ/eG7RilJl6bbt9FepHW
-         KxvA==
-X-Forwarded-Encrypted: i=1; AJvYcCVSRWs00+atwBKntb50+C3McBWOSL3BD4tx9gameKR4QqMI0lMDcK+T7gpjqTSCMeRSjtu8Asw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxV5e0Lm6JqEPzrBpTe/ZOKK0xaHUMXkIcnhMXhWG6aIuXADy4x
-	jjw/ta7vTrS/0tVUDafJwUfj6xLBBC6n4B3wiq1rsmzTwjm27CRsmCz6oct0jdmpqDEUWlp6ajR
-	Hg53Pzq5UHa+QK5sFS9ykqhdmXmvPHEcKhffIETPM
-X-Gm-Gg: ASbGnctNRgJoF4ruRvhDSnnZiWl279zDBl5SnsIB2YL/2iVah1T6Uuoo7Oo9F/zrH/p
-	qzQf15CycF0j3Qc5ej50TIf1liUPwzWYMT7zV4vdgFdTGPsXnwHfmPzIYQR0tLPkre7fU6tzsU6
-	vAvdaTTKEzcXYYPLSHm5kcEVlyMeIDi9mKbHsKh4pi1SHGt2uqXALT+ZdYXUFKXnS7ixYcPupvu
-	F1RHXlb0AYeJS4=
-X-Google-Smtp-Source: AGHT+IFMUp3WY4nxgsRLh9qsELNl/XFP9KJPv82ZlJwh8Of7VRvx5KMBcmdg5ew6Blf3tzjdDHHPFM335ASvYbURfxM=
-X-Received: by 2002:a05:6512:e86:b0:55d:9f5:8846 with SMTP id
- 2adb3069b0e04-55e008bca39mr113505e87.0.1755567997069; Mon, 18 Aug 2025
- 18:46:37 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1755568257; x=1756173057;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0kGdHVKoHsgwhDb4EIcQAt0pL/4Uny3lwxFy9guJbrs=;
+        b=Qd4IMB9T1wt4K7PLpiQh/T5nynrgNeoFUo0VeO8Tk6AGlo4jMNEU2Q1vyGc2kBh2OT
+         2b0ZVWmyLwCv7n2Y+MEGDya10fCaPkBpXO70+TrYELE7jbAY/dMqmVwscGviUvFdgT2k
+         81K0b6MMJcWEb5dvpuef1oQBT/F2vqJGRaPxva66Djo19QRW0KrbKI0zA0s06ZGgH5Dw
+         P5wOkJ1CbhEPU+mBzqzdGW/M2Fv9ycH5+CxDHm/00U7MEnq4sPYUtwIaaKt4zMHK4qR4
+         7vaABmHjMfVQFar8gqTI2RYw2hIDTw4nE0o30NuNi4qNTuCT2RaketSlHLiEMiDX4kd4
+         QL4w==
+X-Forwarded-Encrypted: i=1; AJvYcCXMg27CEJcmRjx8I1RHHiviPTLHsmUraOkuF3whmvoRJsn0A611wxzm8tR6xrTUjkqf8vI0OFdOKIl7E/Po1Kw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywv+opCDIz9b+lGmkjAEeSYS/j1TyisKwnTmxAwYAUG/oj2qTj0
+	ClASRP4sHm43lYHZrDEmG8PYVFc1dHbHeLFCOEss8KEU8CnlZTWomjro
+X-Gm-Gg: ASbGncv9dqk1S/t8S1KS3KSluBW83XEzRKv+ZHOU/fyC4p22rsMDFRMMc331f4pVTF6
+	RFvMQ7BDqahJadYHsvvGLgOPdf3TnWBy7BFpar2WfZtmn6E8+o5sfuuCkxsFSLdzZzq+Tl9O/jq
+	tDk3ubK2xR9U8rtHPSdfx2FoVg5ageeLLY0MDlENg83eABBBnp/FqcvgTLqCCqo5UjIW9vp7QyF
+	0FGrl3Za1vJoh2R8AWrbK9753vDE3bEKZVIkO5WdAO/DYS5+vQKwGboJyG/zGc/KK0qrjqIWW7W
+	+lZtZmIeAIuw21LEnQJdZ4+gEm1KwT0HHZGPNp6TJbJNG/Oruq7YJVoOxhq/ayNjg13OkbPloRD
+	OIVx3RzNqEfYpKWanZHl0979kwGY=
+X-Google-Smtp-Source: AGHT+IE2ghkvBT/YA8iBPGrHEog2EF5t7Zz1GJV2BZ5XDsMCeN7HPfCbatTE7JS9OmJRpnBsg5rxYw==
+X-Received: by 2002:a05:6a00:3d0b:b0:748:fb7c:bbe0 with SMTP id d2e1a72fcca58-76e81148983mr1112139b3a.24.1755568257394;
+        Mon, 18 Aug 2025 18:50:57 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76e7d52a700sm865255b3a.83.2025.08.18.18.50.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Aug 2025 18:50:56 -0700 (PDT)
+Date: Tue, 19 Aug 2025 01:50:51 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net] selftests: rtnetlink: fix addrlft test flakiness on
+ power-saving systems
+Message-ID: <aKPYe8t7kR_u7DZ7@fedora>
+References: <20250715043459.110523-1-liuhangbin@gmail.com>
+ <20250818183012.35f47956@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1755499375.git.asml.silence@gmail.com> <8669b80579316a12d5b1eb652edb475db2f535e7.1755499376.git.asml.silence@gmail.com>
-In-Reply-To: <8669b80579316a12d5b1eb652edb475db2f535e7.1755499376.git.asml.silence@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 18 Aug 2025 18:46:24 -0700
-X-Gm-Features: Ac12FXz-VQtX5NnWQl1oIQj3f2utu39W7Ga73n3qvm15FFIanSkTTYHkB_pEaFw
-Message-ID: <CAHS8izMO=6oHN4w9XiL0yw7x86LF8iw-LhMA4qZe2rXOu0Cmbg@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 05/23] net: clarify the meaning of
- netdev_config members
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, andrew+netdev@lunn.ch, horms@kernel.org, 
-	davem@davemloft.net, sdf@fomichev.me, dw@davidwei.uk, 
-	michael.chan@broadcom.com, dtatulea@nvidia.com, ap420073@gmail.com, 
-	linux-kernel@vger.kernel.org, io-uring@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250818183012.35f47956@kernel.org>
 
-On Mon, Aug 18, 2025 at 6:56=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.=
-com> wrote:
->
-> From: Jakub Kicinski <kuba@kernel.org>
->
-> hds_thresh and hds_config are both inside struct netdev_config
-> but have quite different semantics. hds_config is the user config
-> with ternary semantics (on/off/unset). hds_thresh is a straight
-> up value, populated by the driver at init and only modified by
-> user space. We don't expect the drivers to have to pick a special
-> hds_thresh value based on other configuration.
->
-> The two approaches have different advantages and downsides.
-> hds_thresh ("direct value") gives core easy access to current
-> device settings, but there's no way to express whether the value
-> comes from the user. It also requires the initialization by
-> the driver.
->
-> hds_config ("user config values") tells us what user wanted, but
-> doesn't give us the current value in the core.
->
-> Try to explain this a bit in the comments, so at we make a conscious
-> choice for new values which semantics we expect.
->
-> Move the init inside ethtool_ringparam_get_cfg() to reflect the semantics=
-.
-> Commit 216a61d33c07 ("net: ethtool: fix ethtool_ringparam_get_cfg()
-> returns a hds_thresh value always as 0.") added the setting for the
-> benefit of netdevsim which doesn't touch the value at all on get.
-> Again, this is just to clarify the intention, shouldn't cause any
-> functional change.
->
+On Mon, Aug 18, 2025 at 06:30:12PM -0700, Jakub Kicinski wrote:
+> On Tue, 15 Jul 2025 04:34:59 +0000 Hangbin Liu wrote:
+> > Jakub reported that the rtnetlink test for the preferred lifetime of an
+> > address has become quite flaky. The issue started appearing around the 6.16
+> > merge window in May, and the test fails with:
+> > 
+> >     FAIL: preferred_lft addresses remaining
+> > 
+> > The flakiness might be related to power-saving behavior, as address
+> > expiration is handled by a "power-efficient" workqueue.
+> > 
+> > To address this, use slowwait to check more frequently whether the address
+> > still exists. This reduces the likelihood of the system entering a low-power
+> > state during the test, improving reliability.
+> 
+> It flaked again, after long time of being fine..
+> 
+> https://netdev-3.bots.linux.dev/vmksft-net/results/259361/15-rtnetlink-sh/stdout
 
-TBH I can't say that moving the init to before
-dev->ethtool_ops->get_ringparam(dev, param, kparam, extack) made me
-understand semantics better. If you do a respin, maybe a comment above
-the kparam->hds_thresh to say what you mean would help the next reader
-understand.
+Hmm, I think we need to know what's the current preferred_lft and valid_lft
+on failed test. Would you please add a debug line so we can get the info
+after failed?
 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> [pavel: applied clarification on relationship b/w HDS thresh and config]
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+        slowwait 5 check_addr_not_exist "$devdummy" "10.23.11."
+        if [ $? -eq 1 ]; then
++               ip addr show dev "$devdummy"
+                check_err 1
+                end_test "FAIL: preferred_lft addresses remaining"
+                return
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
-
-
---=20
-Thanks,
-Mina
+Thanks
+Hangbin
 
