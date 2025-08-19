@@ -1,125 +1,113 @@
-Return-Path: <netdev+bounces-214807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E95E0B2B584
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 02:44:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7434CB2B591
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 02:51:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 758FA3ADCE7
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 00:44:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2DE8918A0F4A
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 00:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD1F417A2E8;
-	Tue, 19 Aug 2025 00:44:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9B9718EFD1;
+	Tue, 19 Aug 2025 00:50:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CjP8roxh"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B0C63451CC;
-	Tue, 19 Aug 2025 00:44:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A710B13D51E;
+	Tue, 19 Aug 2025 00:50:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755564291; cv=none; b=Sq7HboSMiw5AEPqVNFMSztQq+jbrw/st6LotbnZ8C+SLBJO1J05vvu8GQdsMS+xBYxfGnUKoZJx6aLHwk7r+ID3PyO07wESq7dPsaQWHYB/Bympj13b3L7+lBXoLWZYHYWB9JUtDFIL2VBhpxGwutGDTcsapcWJd2biYPlFmcx0=
+	t=1755564605; cv=none; b=BO42qCoAoHBiYkQSNc6ENvPmsIjz6K9R/QvbkXWcAGg8useyJKc9Rym374cHQY9rdd8d8yb0KdzrfGfb56zjwpOfS1lgZa9bSEw6PnftHVZ3/sCXk6MSW6bBNzgy71mdzfyEpsxtVRjLn/valQ2XmD4olPEVaQhGT/a0MFBQCyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755564291; c=relaxed/simple;
-	bh=G+3x4iO7YudQi/d9E2cAzuUHCVJPYOopGklJPRoumNk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I4FPTYqCD4G/s5Mc/1qFJdpVzXAZns87IZGE9Yqo++HexDPYw//hglMlHN/nocbe9cGkHfyKgTtuW0J3K2eBdkNonvDrXJnI6N6k8RjegMU20CluAJ/yyZuYLusr4tOiuV27UQSX8rEfePqpErB5AJN73qmPrH9UyHTNeIgJjMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1uoASl-000000008Qq-2F6B;
-	Tue, 19 Aug 2025 00:44:31 +0000
-Date: Tue, 19 Aug 2025 01:44:27 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Hauke Mehrtens <hauke@hauke-m.de>, Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Arkadi Sharshevsky <arkadis@mellanox.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Andreas Schirm <andreas.schirm@siemens.com>,
-	Lukas Stockmann <lukas.stockmann@siemens.com>,
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Peter Christen <peter.christen@siemens.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH RFC net-next 06/23] net: dsa: lantiq_gswip: load
- model-specific microcode
-Message-ID: <aKPI6xMIgIeBzqy7@pidgin.makrotopia.org>
-References: <aKDhZ9LQi63Qadvh@pidgin.makrotopia.org>
- <c8128783-6eac-4362-ae31-f2ae28122803@lunn.ch>
- <aKI_t6F0zzLq2AMw@pidgin.makrotopia.org>
+	s=arc-20240116; t=1755564605; c=relaxed/simple;
+	bh=tTKzEG7zl836WnweAKXGMrMXHoRDuAgoB+5V9lt1V5s=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=LvmT++V+yJbscXfPddR5iCNl+ZcB59cdy1f8oO+2rdfaXvqcSv340Dq0dHxG1sxNh1woglr30LIbk2eRSYsiNUTkVjLcFpAKDz2JEEmbeHOFtp6MR3vk4oD95Q1+3v6mFHuXCwwsfP5ClxA4NKM0lmE7oSg4S+y3ikCwYbtAS9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CjP8roxh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33CFEC4CEEB;
+	Tue, 19 Aug 2025 00:50:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755564605;
+	bh=tTKzEG7zl836WnweAKXGMrMXHoRDuAgoB+5V9lt1V5s=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=CjP8roxhSRFFleZTXw0+0Rz4hU5ly8A8OmNCRxXUSKihGqVXpCbmbEopnF2vLXd9E
+	 9p9LFtYYkhBd2E+74Gb4yVLiZrfd4OJy/Ih4uM08zsokdGBsqGefyYYceNxdFZmkm5
+	 /leufJ/utKPYV+XNqJFzYj6TbEHF25ad4IgPcyDGE6IesI56AkZgv1LtkVpXp76MKt
+	 PKCO6aVv+/roD+njL3BTUvxOebaz9INeC3G5prE5LtxKBUokLg4LP/6Pg1WhfGd4h+
+	 vgWWFsaoq0InRPiHChBAqhsEZg64BKU9fCxPH/S6xvUXLJ/V7Ah45OxJOTltdr9p5D
+	 XqX2EX01VxIgw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E25383BF4E;
+	Tue, 19 Aug 2025 00:50:16 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aKI_t6F0zzLq2AMw@pidgin.makrotopia.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/8] mptcp: misc fixes for v6.17-rc
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175556461525.2964462.14246574540734347809.git-patchwork-notify@kernel.org>
+Date: Tue, 19 Aug 2025 00:50:15 +0000
+References: 
+ <20250815-net-mptcp-misc-fixes-6-17-rc2-v1-0-521fe9957892@kernel.org>
+In-Reply-To: 
+ <20250815-net-mptcp-misc-fixes-6-17-rc2-v1-0-521fe9957892@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, wujianguo@chinatelecom.cn, shuah@kernel.org,
+ corbet@lwn.net, pizhenwei@bytedance.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-doc@vger.kernel.org, cpaasch@openai.com, stable@vger.kernel.org,
+ dreibh@simula.no
 
-On Sun, Aug 17, 2025 at 09:46:51PM +0100, Daniel Golle wrote:
-> On Sun, Aug 17, 2025 at 05:29:16PM +0200, Andrew Lunn wrote:
-> > >  
-> > > +struct gswip_pce_microcode {
-> > > +	u16 val_3;
-> > > +	u16 val_2;
-> > > +	u16 val_1;
-> > > +	u16 val_0;
-> > > +};
-> > > +
-> > 
-> > I would leave this where it is, and just have
-> > 
-> > struct gswip_pce_microcode;
-> > 
-> > Since only a pointer is needed, the compiler does not need the full
-> > type info, at this point.
-> > 
-> > The structure itself is rather opaque, and only makes some sort of
-> > sense when next to the MAC_ENTRY macro.
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri, 15 Aug 2025 19:28:18 +0200 you wrote:
+> Here are various fixes:
 > 
-> The structure is also used in the function gswip_pce_load_microcode().
-> Now, if we keep defining the struct fields along with the microcode this
-> will become a problem once there is more than one such set of microcode
-> instructions and additional header files for them. Each of them would
-> need to define struct gswip_pce_microcode with its fields.
-> The lantiq_pce.h header then becomes private to the driver for the
-> in-SoC switches, while gswip_pce_load_microcode() would be part of the
-> shared/common module use by both, in-SoC/MMIO switches as well as
-> (newer) MDIO-connected ones, and I would not want to include any of the
-> *_pce.h headers in the shared/common module.
+> - Patch 1: Better handling SKB extension allocation failures. A fix for
+>   v5.7.
 > 
-> Obviously I can just move the struct definition in the later commit
-> which actually separates the MMIO-specific parts of the driver and the
-> common/shared parts into different modules. Is it that what you had in
-> mind?
+> - Patches 2, 3: Avoid resetting MPTCP limits when flushing MPTCP
+>   endpoints. With a validation in the selftests. Fixes for v5.7.
+> 
+> [...]
 
-I didn't consider that the size of the array elements needs to be known
-when defining struct gswip_hw_info in lantiq_gswip.h.
-So the only reasonable solution is to make also the definition of
-struct gswip_pce_microcode into lantiq_gswip.h, so lantiq_pce.h won't
-have to be included before or by lantiq_gswip.h itself.
+Here is the summary with links:
+  - [net,1/8] mptcp: drop skb if MPTCP skb extension allocation fails
+    https://git.kernel.org/netdev/net/c/ccab04469798
+  - [net,2/8] mptcp: pm: kernel: flush: do not reset ADD_ADDR limit
+    https://git.kernel.org/netdev/net/c/68fc0f4b0d25
+  - [net,3/8] selftests: mptcp: pm: check flush doesn't reset limits
+    https://git.kernel.org/netdev/net/c/452690be7de2
+  - [net,4/8] mptcp: remove duplicate sk_reset_timer call
+    https://git.kernel.org/netdev/net/c/5d13349472ac
+  - [net,5/8] mptcp: disable add_addr retransmission when timeout is 0
+    https://git.kernel.org/netdev/net/c/f5ce0714623c
+  - [net,6/8] selftests: mptcp: disable add_addr retrans in endpoint_tests
+    https://git.kernel.org/netdev/net/c/f92199f551e6
+  - [net,7/8] selftests: mptcp: connect: fix C23 extension warning
+    https://git.kernel.org/netdev/net/c/2eefbed30d46
+  - [net,8/8] selftests: mptcp: sockopt: fix C23 extension warning
+    https://git.kernel.org/netdev/net/c/3259889fd3c0
 
-In file included from drivers/net/dsa/lantiq_gswip.c:28:
-drivers/net/dsa/lantiq_gswip.h:226:44: error: array type has incomplete element type 'struct gswip_pce_microcode'
-  226 |         const struct gswip_pce_microcode (*pce_microcode)[];
-      |                                            ^~~~~~~~~~~~~
- 
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
