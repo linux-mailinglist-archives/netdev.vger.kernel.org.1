@@ -1,132 +1,147 @@
-Return-Path: <netdev+bounces-214868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C3E9B2B924
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 08:09:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC315B2B959
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 08:27:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEDFA62767B
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 06:09:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A4CB1BA3C11
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 06:27:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBAC72690D5;
-	Tue, 19 Aug 2025 06:09:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B45726A0AD;
+	Tue, 19 Aug 2025 06:26:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ZGCq7qCf";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="SdkPN5lA"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="hj52rV+/"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA1871863E
-	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 06:09:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7E4E2652B7;
+	Tue, 19 Aug 2025 06:26:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755583770; cv=none; b=OsxdMuIjxNCr/phm+5T8xSEnYhsXN8D+Jij1EntAci2lqP6s5rhoIeBKbNRiO1trrwFgLhC059kfo7n2tiTz/2lbqs+3/v2NjAhYaE1D7hl5whtbU7WHxzc5Uxv2ZjAwLDWj5KGIqb9kS3A3mgegUONFV8UX2ysquVzmdIw1wuI=
+	t=1755584786; cv=none; b=o7y9zH7OLq/e5H7QrcGwTdnOjgwS0nlD6jNl8FPjzydugCxy1SFxnryuKfRpcDIctmlLjjealfWqL21t8UTE94iDKYBf75UEweb8tM0imlkCI5l1mg4+A2zMO5t88yotuSoJ4f12WKt0wj6RPiKs2QfpeAMe+8FdtO2WViJggXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755583770; c=relaxed/simple;
-	bh=rL+TrUW6tiyvddHWQRgJrjB30uAutfdbI4yIw0BN8hQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=J2h2MVzmVuaygC3NnHD0Dpt9AQ3EoNSSHcaDKmkssGnz3snZGo0fyUcJkiISnfktnm8RFYdAQVSYFyeukt26fgoZzV1l6le0LYtVm8RUGVpAY/QFNGU8H82WzGLcrRXnLMi5/QTm+grjql0LNyIStX6J3QXXMyC0qDzysWqwy6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ZGCq7qCf; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=SdkPN5lA; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1755583766;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rL+TrUW6tiyvddHWQRgJrjB30uAutfdbI4yIw0BN8hQ=;
-	b=ZGCq7qCfzC5H3GygyPZRbiTCwyFLWcjdY2GuCVTSeKzsFHLFi7TnN2rA4bRkAEQYHEWwx2
-	Sfa9Xe29n0OaffTVuC9J6MUc67waFR1yW/pkPD6SAYohfACHVFENHKtoFJUj3Tw1jwJWC0
-	8AYmBdbwddYzJ0w6lzjwNX07k/tMJrnsyulDzM8WbTMqCmUXTihkn+dQK6hLAb8sZ9V3Ax
-	lVnVn14sqyaxE+72Iw7hO6am1JCWDyRrJdihxn8jcTxYsCZm0sf5bWue+IFqtBvic41CgV
-	ChDG7IP/Ijw6260Hi/ammf/N/MVPo9J3DnLZTDrsaosc892S5+FbG5nupgmt9g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1755583766;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rL+TrUW6tiyvddHWQRgJrjB30uAutfdbI4yIw0BN8hQ=;
-	b=SdkPN5lASqNdoU8R88W/4y657SDrKUFPVaiX6qrGSBu6g8zZKUVSj7+sEnbKFPZte733Tl
-	zP6HS2zQ2xQOF9Ag==
-To: Miroslav Lichvar <mlichvar@redhat.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Vinicius
- Costa Gomes <vinicius.gomes@intel.com>, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next] igb: Retrieve Tx timestamp
- directly from interrupt
-In-Reply-To: <aKMbekefL4mJ23kW@localhost>
-References: <20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de>
- <aKMbekefL4mJ23kW@localhost>
-Date: Tue, 19 Aug 2025 08:09:25 +0200
-Message-ID: <87y0rf4zca.fsf@jax.kurt.home>
+	s=arc-20240116; t=1755584786; c=relaxed/simple;
+	bh=jqN7N0XM2l7RQwhd+QZ6BjPYyr1iA/Jzm1WRBpfTrJE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=awnqCGjfCigyEayeqvA+NOpSyRCxtqj/jgTThBlTfBzpJ0s+1tXzQP6JiyvxtqugoNH9tRFK18k/yeEC4w5q6ySUUMK3O9NcdqD0jk9WJbKJehZmV1WbLBIl7DKKkdUtS8zbZnvB4TxINZrGvzHzXqKgQI17EUZymdB1gQULjJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=hj52rV+/; arc=none smtp.client-ip=117.135.210.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Sb
+	bv5QhPGynHMeq0UXb8e4p39yIC/4/NvEUYT0rkH8E=; b=hj52rV+/7o+bEUxs0C
+	o6XIzcwLKBnDdTBayVG4CIwXMjC7wfO972WyS+tiLCfxQTNX0Ayc3UKkODNfeNls
+	4FBDrZgged9HNb1fyli596syk6Ol0q9kWRlVJr38iCG6lkA/hvHcuxtHZlkBntz8
+	QPrtfiUTTs7tFLu/h/h0S/9ow=
+Received: from zhaoxin-MS-7E12.. (unknown [])
+	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wAH6YqzGKRoYzv4Cw--.51505S2;
+	Tue, 19 Aug 2025 14:24:52 +0800 (CST)
+From: Xin Zhao <jackzxcui1989@163.com>
+To: willemdebruijn.kernel@gmail.com,
+	edumazet@google.com,
+	ferenc@fejes.dev
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4] net: af_packet: Use hrtimer to do the retire operation
+Date: Tue, 19 Aug 2025 14:24:51 +0800
+Message-Id: <20250819062451.1089842-1-jackzxcui1989@163.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wAH6YqzGKRoYzv4Cw--.51505S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxXw47ur4fJF4UCr4rJr4ruFg_yoW5Cw1UpF
+	W5ZFy7GwsrXw429a1xXr4kZFWSyws3Jrn8Grs5W34Iywn8Gry5tFZF9FWYvFWUKas29F17
+	ZF4FvryDAwn8ArDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UdUUUUUUUU=
+X-CM-SenderInfo: pmdfy650fxxiqzyzqiywtou0bp/1tbibg2uCmikEt2QHgAAsK
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+On Mon, 2025-08-18 at 17:29 +0800, Willem wrote:
 
-On Mon Aug 18 2025, Miroslav Lichvar wrote:
-> On Fri, Aug 15, 2025 at 08:50:23AM +0200, Kurt Kanzenbach wrote:
->> Retrieve Tx timestamp directly from interrupt handler.
->>=20
->> The current implementation uses schedule_work() which is executed by the
->> system work queue to retrieve Tx timestamps. This increases latency and =
-can
->> lead to timeouts in case of heavy system load.
->>=20
->> Therefore, fetch the timestamp directly from the interrupt handler.
->>=20
->> The work queue code stays for the Intel 82576. Tested on Intel i210.
->
-> I tested this patch on 6.17-rc1 with an Intel I350 card on a NTP
-> server (chrony 4.4), measuring packet rates and TX timestamp accuracy
-> with ntpperf. While the HW TX timestamping seems more reliable at some
-> lower request rates, there seems to be about 40% drop in the overall
-> performance of the server in how much requests it can handle (falling
-> back to SW timestamps when HW timestamp is missed). Is this expected
-> or something to be considered?=20
+> "We" don't do anything in the middle of a computation. Anyway, branch is
+> self explanatory enough, can drop comment.
+> 
+> >   */
+> > -static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core *pkc)
+> > +static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core *pkc,
+> > +		bool start)
+> 
+> Indentation, align with first argument on previous line
 
-Thanks for testing! Nope, this is not really expected. Let me see if I
-can reproduce your results and see where that comes from.
 
-Thanks,
-Kurt
+> > +	else
+> > +		/* We cannot use hrtimer_forward_now here because the function
+> > +		 * _prb_refresh_rx_retire_blk_timer can be called not only when
+> > +		 * the retire timer expires, but also when the kernel logic for
+> > +		 * receiving network packets detects that a network packet has
+> > +		 * filled up a block and calls prb_open_block to use the next
+> > +		 * block. This can lead to a WARN_ON being triggered in
+> > +		 * hrtimer_forward_now when it checks if the timer has already
+> > +		 * been enqueued.
+> > +		 */
+> 
+> As discussed, this will be changed in v5.
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+I will change them in v5. And I will ensure that there is a 24-hour send gap between
+each patch.
 
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmikFRUTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgl5/D/4ys9G0jrCyeLj8q6rsiY9vFRfVcq5L
-pLBED0b1dmwg5Wu0sxbioJFb5I/e/qZAWH9p1z5FfWXPKQjtt8zGijaklIOtDt5/
-MI1DwU/F/jfQMOa8DnPsrEEHKoYgultJ74ZTnGHjtQW2GqKbHUl48NGjA+8dk6Eu
-fHzZKWFmQ9/2RdeIK0DjQDgqiBkZ8N7b0Tvm+eD0DWHltlK8AE7qNvaY5ydSbzEc
-Jl9gLVp1Zu4OBn4wM0dYfBYsxWqZak5Xdd2MCnoLaZX1yeJFEfHiof1Jgl8Svdlu
-wZ8AOS20/Xi0XvKbdd5T80fK9EAlMrJpRPSQJoLSourKoRwKodZQIKxHv0403oCj
-Xt1MVry9zq6IRA4mKUdcD2j/xWwIdBrkE9swZ5py1m5W4EmiGYojgE2DwCcJd4Z1
-yxXPp/HzFZ3NmOfEhdjcljDUcBEZNim+qlgtFK0Diiz8TndLfFeaUE/zyEyQcMrQ
-ctI7dj/dlxt+V52fFcgYMh1ZEasa7bbmC1LNpys61MC1Vnp8z9NDL8S7dRUlTgM5
-q+qxor9pOg7SEc5h5HqEWvQn/SZ82lnGX/GZ0M0Tgasm7c0jyX73Qe/63/P5EP62
-n2yK2Timo8yN4lGt7B+vWxyBiAvgUeBYq3baklTVPYPlP1+Vw8HI2BQf089pTPXY
-1a91IQJQaNwNuQ==
-=Lz+0
------END PGP SIGNATURE-----
---=-=-=--
+
+> >  {
+> > -	mod_timer(&pkc->retire_blk_timer,
+> > -			jiffies + pkc->tov_in_jiffies);
+> > +	if (start)
+> > +		hrtimer_start(&pkc->retire_blk_timer, pkc->interval_ktime,
+> > +			      HRTIMER_MODE_REL_SOFT);
+> 
+> It's okay to call this from inside a timer callback itself and return
+> HRTIMER_RESTART? I don't know off the top of my head.
+
+Although I have been using hrtimer_start to restart the timer within the callback in
+our project and seem to work weill, I found that it seems no one does this in the
+current mainline kernel code. Therefore, I will add a boolean parameter to the
+callback in version 5 to indicate whether it is within the callback function. If it is
+in the callback function, I will use hrtimer_forward_now instead of hrtimer_start.
+Additionally, while looking at the historical Git logs of hrtimer, I noticed that it is
+possible to call hrtimer_start to start the hrtimer outside of the hrtimer callback, but
+it requires the protection of raw_spin_lock_irqsave. When entering the
+_prb_refresh_rx_retire_blk_timer function, as noted in the comments, there is already
+protection with the sk_buff_head lock, so I only need to add a set of irq save and restore
+operations. The reason for this is based on the reference from link
+https://lore.kernel.org/all/20150415113105.GT5029@twins.programming.kicks-ass.net/T/#u and
+the implementation of the perf_mux_hrtimer_restart function.
+
+The implementation of the _prb_refresh_rx_retire_blk_timer function in PATCH v5:
+
+/*  Do NOT update the last_blk_num first.
+ *  Assumes sk_buff_head lock is held.
+ */
+static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core *pkc,
+					     bool start, bool callback)
+{
+	unsigned long flags;
+
+	local_irq_save(flags);
+	if (start && !callback)
+		hrtimer_start(&pkc->retire_blk_timer, pkc->interval_ktime,
+			      HRTIMER_MODE_REL_SOFT);
+	else
+		hrtimer_forward_now(&pkc->retire_blk_timer, pkc->interval_ktime);
+	local_irq_restore(flags);
+	pkc->last_kactive_blk_num = pkc->kactive_blk_num;
+}
+
+
+Thanks
+Xin Zhao
+
 
