@@ -1,288 +1,207 @@
-Return-Path: <netdev+bounces-215066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9C19B2CFE1
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 01:26:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46E13B2CFDC
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 01:24:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E263A3B141A
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 23:24:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26C615680FC
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 23:24:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 439982288E3;
-	Tue, 19 Aug 2025 23:24:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4DA625A324;
+	Tue, 19 Aug 2025 23:24:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="c8UyEfCb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lqXYLQYh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90E735336A
-	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 23:24:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755645860; cv=fail; b=uhsu33yxPsKpnDK7GQXYTZvdsJsuDtXyfvgJOPMYHb+v9JU2fPHbfV1uGteu4N3AQz11S7kTIDrOCABSv5O6N2SDkfG1ifhfaBNQRhKWvgjO6uCiBnBFkWb9v8mU229vRdnSjfTw1lXuEQKDSvRqrhkrSGL2svIIG745RU506i4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755645860; c=relaxed/simple;
-	bh=TYFWVpATi5gLA8VtURzhBIvdWscOy2mpBW9qzbCoPzA=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=BpPHvU/0zShD5UEDVJFDMl7M7kCgP5bE0RgmZwUUsiltnbGi1XGzsMcHVXqD+1dvWnsqvRKMq3Gbxk1eTyqD2iZ/oEfb2epAYza53KBfQQ3CeoOvrqo2iDssKFwvOl8PJ9IkTmlynFABwFjRsa42jfw9bmTRcN0eGU/za1/6Aso=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=c8UyEfCb; arc=fail smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755645858; x=1787181858;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:mime-version;
-  bh=TYFWVpATi5gLA8VtURzhBIvdWscOy2mpBW9qzbCoPzA=;
-  b=c8UyEfCbb6J7j/MQ4pSI0wcVR01OBZPjslDQhkpZntkv+kcL/PSX1NkB
-   znZR5nyNKuf1Lh9OyazicWTsOO2GKkuxVbGDFhOlyLq5v23LfAN9Ga/Hy
-   PSYvc1yCfzqAmeSgn193MaZs3NWFCUdz957pVNemLLR2nCpizuREidk0M
-   Ls4VOI+sB4vdP9HLnCTbcVGfL8xl/POPOxznNrqetx8I+/J5i0ciQU3eC
-   uUFa2lRAV/4I3J4Vps38BNnHytEfGAazF1UEUXsw+Ntji1kOayBD+cYx/
-   HM9f2PZaHgxyBPE5fkFgPEPdQ9UWs2D2Hs+km7+pEHATcdWodxve0uve8
-   w==;
-X-CSE-ConnectionGUID: rsCcDcuvS7uF+wSHnPP96g==
-X-CSE-MsgGUID: 8eoKBFizSQmbBtzkbBH0HQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11527"; a="56931817"
-X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
-   d="asc'?scan'208";a="56931817"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2025 16:24:17 -0700
-X-CSE-ConnectionGUID: oa2J41cvQd62ds1DDAO+AQ==
-X-CSE-MsgGUID: 51dcb2spQamHQjYonbTGFw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
-   d="asc'?scan'208";a="172220276"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2025 16:24:17 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Tue, 19 Aug 2025 16:24:16 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Tue, 19 Aug 2025 16:24:16 -0700
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (40.107.101.55)
- by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Tue, 19 Aug 2025 16:24:15 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=CNAm4ICcRSNqUVlLSr/3zHBu/LJYZut+rYj7wkVbg6c43AH1dSxx7dFWJHmxbc6OYm0tzYsWncsmIZVsY+1zmmfye3tQcK439+oi0Gh8EIJsCYIEJivbWAhE8gQJ5UcRNcj4m6GEpgkqk7BjDxtwzlxHEvn/SusZY610zTyyeVFA89Ud1B0jDciIogvwTPTyAO19zZ04YT2NxWMcgZeyrrdXbMsdHWshEShLibhoTLikUFzoSHKT39CmiRwYFWkgBaLE6Ggq1SUWA69r8HL2JiRTiBA2U5Wf0NadoNGf8E+OiLSJXajks5xTgZenDe/xiHaNxmpEJSXfbETVT7Gczg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TYFWVpATi5gLA8VtURzhBIvdWscOy2mpBW9qzbCoPzA=;
- b=fvc+iAUEXQtw8T+RTinzfL9QkAHYujgRrlact6QLX+eHmL/7xS7mHV2fq/Gb48liy7trBD2BDMB7vsTwrzZR5/guha+TcSPzW4u1mUb9Jj3D/JpJLWhy58evSKp30FmBXdVbyiwzEHSkfxk6L0JrvatMR0JRZ2pwL4JnDD2wvWbKy2krgJxmJhDsOaz82KX+QnmC6yXY2zY3NLDn8V91IYKCL37ibVF6bXFp7vb+VbpPyBLUMSTYJczIENzdNoHspx0h3F8cLM188ect/bqKvihfguXid+OfCScGsmV9U1C66qNWgoj7St3c5PR5vnzd1b1CK63YX/8SdIN87GnXxg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by SA1PR11MB8349.namprd11.prod.outlook.com (2603:10b6:806:383::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.25; Tue, 19 Aug
- 2025 23:24:08 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::81f7:c6c0:ca43:11c3%5]) with mapi id 15.20.9031.023; Tue, 19 Aug 2025
- 23:24:08 +0000
-Message-ID: <cc538c62-87cd-472f-bcfa-7b92dbd90a25@intel.com>
-Date: Tue, 19 Aug 2025 16:24:05 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next] igb: Retrieve Tx timestamp directly from
- interrupt
-To: Kurt Kanzenbach <kurt@linutronix.de>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Richard Cochran
-	<richardcochran@gmail.com>, Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
-References: <20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-Autocrypt: addr=jacob.e.keller@intel.com; keydata=
- xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
- J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
- qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
- CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
- UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
- MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
- apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
- cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
-In-Reply-To: <20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="------------rU6CTv5U5bMLK5RxpQVvRe1Y"
-X-ClientProxiedBy: MW4PR03CA0335.namprd03.prod.outlook.com
- (2603:10b6:303:dc::10) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0C521B9DA;
+	Tue, 19 Aug 2025 23:24:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755645861; cv=none; b=JC73nh/uMy5ycTQKJ44H5iE5z56j9vN0p5WnzEuj4ZhmcOl+CkQ+v938IklFp1X2tKB5pn4USOprbszSyHOWO4671vzS2tvOts7tq1P/5CeFJ5p6aISXjiQlvba2SRm9TNIydr1uLzMa1CnEy1vtd5Vq+AGEd3n/N6R470TjzKg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755645861; c=relaxed/simple;
+	bh=/TKN4m04UU/ZQ0owKaypwRO48rADmn+PXF3RFHUOhi4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UotQxm0WXPzrhdn6yeCm/902pzBVuBv7a9PnML8cxq4O0KcQdGIeXcAp2jr5vp1bQ8NRHB4YyGI877AqP5W7UJYctq+jPfOo96BYFOfG2momcLeGnh2JINAm/0eaLdyyb37RASz2h6XAQs2rO5TPff7BnmXGajQK6mSmO1+T3I0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lqXYLQYh; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-76e4fc419a9so3527952b3a.0;
+        Tue, 19 Aug 2025 16:24:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755645859; x=1756250659; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dXsZkymfZg5n/r8Mb5dnukqbEfjwpxtF4j7Sbq0WEC8=;
+        b=lqXYLQYhsaGfZ8t0gl87cEVy5+Yf/iTTcPwSVGwXhHkthntMWa+fYQ0K8DLbguj4u4
+         hrubZCSy3kA4I6a3SPOh4Sk1674e94Nz0N7QIYqSVLPEBKN4JZ3xlF7QPsi5sLCeOX9k
+         g2egghJ4wyAOrmbBt8GMmP+Sg1esdN51zM0hD8JV48EyHHJ9gNP+jNDrachPXJqwqXhi
+         wzZuq9KqLRTNdwHnTFsirNTpTH7ncP4LwwxQi1YMMjAkaJW5c573+yiB5SJZZLYMZX9x
+         2x1GEDpK2W1ccoXFJhCwCHXNwkBexNmVT3xuqp7aHm6XFtRLeoGAOvFna9QkDFS6zfSF
+         lFqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755645859; x=1756250659;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dXsZkymfZg5n/r8Mb5dnukqbEfjwpxtF4j7Sbq0WEC8=;
+        b=LUXUN7icdf2iYCAjDC4bzL2I+lgltx0D/voBGvBODi4ZHGkWQNFjg/LsSa2msRqIC3
+         U/bYf1kLC7C1V2p86ur12APZBFTk+pxu01Ew6mw7oc74ZB4/GwBMkXw0phwe6p2M7ElN
+         mTZ+X9VKzeBEZ7QSapH1sg3hYkbXw/SeL/Gv6qiPvt9LhYkujP0rlnEQ0LFRtG6MXQLL
+         pMBt0E85ixP7ByDLmIXNxLlTg4gMnthGOnoBqJtG43OPexrcOYf0JfouUZ/iatwtDTcp
+         OBrMkeKmnYrwo7dghHQgmJoNW3Vt2E1AmL1IXBiY6QcHJpDfgBkxLe1iX1jmJD39Xckk
+         WTYg==
+X-Forwarded-Encrypted: i=1; AJvYcCU07Q4TeLHK63tKfttmzBQ0Aiz9tWRyQ9/e46TJnbsO6HXASlphsZK+uw1Fn508E8LFa9pUm20=@vger.kernel.org, AJvYcCUWQcPd5E2hPHnclB/Wx0Ta6N7X3DGPfaxsFonvLBjyTUY+V2NFMd56jn9sAmT6i8wGdIScZNf2QIflS/Ejrps0@vger.kernel.org
+X-Gm-Message-State: AOJu0YyG52L6hdATgUH6hbCGeKoD/qZcYaVb4+U9XrvnFAxe4ebKw9xY
+	zARJJjmNRJO/eyP91oGH+//adhFVHqk2fjiFBsDlsC8RbdvoM17l3qQN
+X-Gm-Gg: ASbGncvPedc5CTmQQPgh0rUVw1b1eej2g1SEIqJe82CrqjaOGcwD/EfQTNCrMfYRv/H
+	OXKZr4EUEjPMGQJJ4e1HSD439ZYEVlhXEhNjumFEmdrBZiOF+n8yIgUl0SZWw7/1EcQqbytfi3x
+	d2//b9He/1Nn+FZiSLmHoejrv3h1ZnbUOW3x4UnqEDFjIZJ3ZTjRzF8WL6lvg24WCLzwhuVgLCK
+	S56rezma+LB9LAbEaH0kW6LAYau57X79XZb4HMV7XNqHwXmTJ0e99NoW9CozvunqlLElH9lL96A
+	tWX+b3AFzDHpWXMTZ5aQUQIHvQ4mfxCE0lX9mh0rnESHrRYVawjeqR16fkMsQvJz5ht5ThR9krO
+	aOmkpq9u29LHzoViVrIMZgzhYD2hwz8pX/OIkqLUVauag
+X-Google-Smtp-Source: AGHT+IFjJLDqlm0W3bq1YAgCjGHK+vqinZzLZigJLHtUDJ+t23i1m589jTiENTtqss+LbbqbRIRb7A==
+X-Received: by 2002:a05:6a00:856:b0:76e:885a:c337 with SMTP id d2e1a72fcca58-76e8de39979mr1103746b3a.29.1755645859196;
+        Tue, 19 Aug 2025 16:24:19 -0700 (PDT)
+Received: from VAN-928222-PC2.fortinet-us.com ([173.214.130.2])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76e894bc4d2sm1467500b3a.67.2025.08.19.16.24.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Aug 2025 16:24:18 -0700 (PDT)
+From: Qingjie Xing <xqjcool@gmail.com>
+To: fw@strlen.de
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	xqjcool@gmail.com
+Subject: Re: [PATCH] netfilter: conntrack: drop expectations before freeing templates
+Date: Tue, 19 Aug 2025 16:24:17 -0700
+Message-Id: <20250819232417.2337655-1-xqjcool@gmail.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <aKTCFTQy1dVo-Ucy@strlen.de>
+References: <aKTCFTQy1dVo-Ucy@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|SA1PR11MB8349:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3ccc7682-8410-4336-d3a1-08dddf777ed0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?dlZIVUR3ZTJUbGRYM2h1TEJqTWZGSFp2cWtNS0h3YTN6L3EwR3BqS2JNSjRS?=
- =?utf-8?B?eXFqeU9NR3dXN3ZCMWpiaXJ1L2J2ekM4czlDRExOeWROcVA4VFVUOHVaZWJY?=
- =?utf-8?B?N2VhVTVFMEVUVmt4Ty9Makk3Z0k2UkYrbkE1R1RxaGUvOXVPcjNjQlkvZkFl?=
- =?utf-8?B?WVBrcjNKTGVIMi9waURuQkNRSXRyT05mSWJtZll3Z1cwRjY0Y1FkTHVpSzF0?=
- =?utf-8?B?cERyeXRCRDE3THB1M2NsTEVhZVZiQ29jMnpWUlJHWmkvR0NBd1I1cDYyL1RG?=
- =?utf-8?B?bWU4UncwMnJmRW5wSzZPRnRSd0J1UXlwSmFWRkhSK3FQU0ZCYjZJaGF4cTg3?=
- =?utf-8?B?NVFnNGQwTVNHdlYzU3NCZXc5VzZJb3NOWkc5NTNtSG1hQmF4ZTVnVjYrVTRW?=
- =?utf-8?B?SXhhTS9WdmcyVHJ0NHQrTnRqUk51VnlTelhabVl2d3l0clVGMi9EYlhaL0lh?=
- =?utf-8?B?S1MyZnBzYm43elhoNzNZOGxkaUxoRHJKQlVrVG02K1NyRnhsTDdNL2pMTHVr?=
- =?utf-8?B?WlMyN0dYRnVHRmZiVVdTZUppZ2ljbHYzaVUxa1hJYzkzSVR5MzIyZnNKTEJZ?=
- =?utf-8?B?dWoyZFlpR0FNUzJCRkU4NERSb0JkSWlsLzJoQ1NsYWEvSUlzUFFlc2NPQis1?=
- =?utf-8?B?TTFJRllUb0tMcmZ0NjJtRk5MQmtZZXV1Sk11VXlRNmdCTlYxbDVqQ2ZJR201?=
- =?utf-8?B?OVlQc3dka3dSb004Z1hzVnlvaWdPUUlxNVFkcEtTdHRrUVF4RmxJM2QxZFd2?=
- =?utf-8?B?QjhZZ0RualJCcXNGeWZiYkxIZTFxLzU0MlpLM3lha1hNRjkwd1RMbnhmWTNF?=
- =?utf-8?B?a3JQdjFQSWhZcStMUHBVQ3l6eUQxdVBMVTA1dTN4ZERxN2E3Q3VseldPZDZW?=
- =?utf-8?B?SVJmZFFHQStXU1lyYy9sR0oyWGNnMkM0RXZXZGJVc3orQ3ZJZTlodlBiUjNp?=
- =?utf-8?B?R2d4emMxbkNMVUJUQitWeWpleDhUS04vNDRzRmdHSDEzaUFIK0NnRjlXeG9j?=
- =?utf-8?B?WnMyVmZXcllyR2JnRmx6M3lzMjNMV3Z1Yjd6eDY5QW9hYUlka2s5WUdYdGVW?=
- =?utf-8?B?VTRYci9ZeVNDOWdhcjVaZy8zR1QrTkk1ZXl6WWNJNDJBY1M1T2xLeEREVDVU?=
- =?utf-8?B?LzBxV29iRE5aRmlFRXhOVGZBcHpPL2lUWjd0ZHhDZVhFbW0rcHJzOTZ5Z2hX?=
- =?utf-8?B?WWpJMVJWNFlKSy9iRFJiKzVRT2dhMnN5S1ZCOEJSSDF5dEp0T3EzL0RjSnNR?=
- =?utf-8?B?d0I0MUF2b2wrRzdmMDNSbWV4STNCS2JzblgrQkdWRlk4bWI3V09HNkZEd1o4?=
- =?utf-8?B?blJyaFp0UTlJOWFYUG82RmFMQjQvbnlJbUdwc2Y3b0lCeTZ4eXUwbFk0YUZI?=
- =?utf-8?B?UHByVjdqZnQxcWc2VmpheGVIcEJ4NDB0ajBLZUpHclB6Sm5VdXZkZmg1RmJX?=
- =?utf-8?B?eE9LYk9SSWRmUUV3bUZvdytLcXVManltY2ZYL0FTaXR3Sk5sYWlqTEgyYm9v?=
- =?utf-8?B?c3l3U2xMSTl5MldOWjNnK0hraTY4QzJuVXdIYlMwKzN2WkJka2NiemxVbHVm?=
- =?utf-8?B?ZmhidEhqcDlPcUtRaFgxSzhsaW4rYVJEdDl5QitwYVBUQmhRWldYSEEveHNx?=
- =?utf-8?B?b213VGFaWGJiaTI4TXJsUVdIQzUzam1VVjVLRTc2UitTaWxYSUw4UnFrWTZ5?=
- =?utf-8?B?Tm1MUVYrSUN4clUzK05SM0FkdTJBRS82SlpuTTZWZUwzWU5NRjN1ei9xdmN2?=
- =?utf-8?B?UU1JSXRQZElYRW1NU28ySHBBVzlXLzVxOVNWbmRLbExQL1JCRDZvVCt6SEFy?=
- =?utf-8?B?Q2VoWnhacWZnTktyQ3FtTUJLTjZrWDRlWDBiemZsNGlJZkJkL09zOE01UG5v?=
- =?utf-8?B?NTlobkdHQnlad2RzZ0tGVnZyY0h5dFc1cVVXZjZTSU5HdmQxWDkvZXozUFBW?=
- =?utf-8?Q?cpD7/Dby8sY=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NlFTamV0R25QL1JNZzlONmc0c1FzYjJUWGpLQ2RXTU5BQlZ4bU1LTWJnSHpZ?=
- =?utf-8?B?OFNNd21CM21mQ0NyaEFmNDB5K0cva3JaazJTbFJEdjdKTzlUM1gzeWU0dEgz?=
- =?utf-8?B?cmlpalV1dnVML0pNNi9XZ1hKdWRCRnU0T3RnaUhlRUVlTjhXdGk4VUtQSlVw?=
- =?utf-8?B?K3daZ0QwVzR5cm5BWG9tc2lCWDMvR3ZrVTE1VUxhZURQbWpFZmRoQVpoUGEy?=
- =?utf-8?B?c1ZIaHdoNnE2QXh1ZjBmYzI5NGFPV0I5WTNSQUhaOTkyZjNxKzRRcFhRVWR2?=
- =?utf-8?B?bmJPUEJtVlhTb2taZlVHT1NlM2hEaDlhWkY1clRic1VKM1YybzVaR3ZyaTRW?=
- =?utf-8?B?blVZbnNrMi9lMWRGdGNPYzIyQnBZa2RCTWpYbGZrM1k0dVV0NHdPaXovc21l?=
- =?utf-8?B?eGUvNStsUmlMdTFmTGFudmJ0eDRVUXljMUQ2RnJTWFYrR3cwWDQ5VnFvMTFr?=
- =?utf-8?B?bmFyUjc4UER5VExVMkVzTmlnNFlUNFhNV3RxcnVRd0dYdkVCK2szNGZibUxK?=
- =?utf-8?B?U2NBcWdScm9raFZHZEtoNnh1b2VwMXk2RDk0bTRKMG9SMDlWQlU5WmljNVNp?=
- =?utf-8?B?ZW8zeEwvQzh4Rkx2d3RZWWttelFhS0pYYTRRZFZMaTNBeHJwNWtZa2tMbDJm?=
- =?utf-8?B?dDBrZkJKMFN0cmRrL2MzTnNlcnZHVVR4ZnhqVUYyOStoWVR4M21vdDdycGFz?=
- =?utf-8?B?czBKY1h3Nmo1d3dLVHorV3dtbEI3MDc3R1l1WGpZME1pdHBLYVpJY0k5b0VU?=
- =?utf-8?B?eGxQMDlkaGM5K2pTYkg3UEZvam1VeVl1OVNWZk8vMFBTSjdEd0V1WHBkT3Fn?=
- =?utf-8?B?OUcxNlozdStuUTdNMTZPM1B4N043aWxDU2JoQmdPQ1ZBSStPY045QUE2M2Yv?=
- =?utf-8?B?eTZsemc1Nm42NTZRdXgwZklidWdjMzVacmdBaWZuY3FjMWtzRkR3K3BGT0xX?=
- =?utf-8?B?eXMzN01YR25xZEtjcVd0TjZVTFp6S2FVSmt2alY4YzAzNUVoSENUcVFsTEJp?=
- =?utf-8?B?TjZlT1RabDNHelhGUEFsSkpTeFpxM1RZdWRzR3dqWGRweHJma0Q0NHJOQ3c1?=
- =?utf-8?B?ZGlNMmdzeTRObkwzZXJkTkpXYmc0MlRvSGdmUzI5R0lhaXJtbVh3N0tMdWJ6?=
- =?utf-8?B?emFMVzFJN2h2YUd0eThLekNZaXBsUlVRZjJkVkY3MC9PbUFNdWx4aTE5V0Nz?=
- =?utf-8?B?RHVoT25ZRkllSzFYeEkzMVBETWF4bEdvSnJnTGs3aVFyTm8wRFhQYnB2MjVR?=
- =?utf-8?B?ZzJrZ2RUZzFuaG9iaWVFZ3dDVnFUbXRtUjlEVE1jdk1yczZkNlduN05Bemx2?=
- =?utf-8?B?SDJCbW9KdEpSOWg1L3NJY1hXSWdiUXpPMnc0a2lUeWJ1SkdDYzZCNlVCeVc3?=
- =?utf-8?B?SVNPNVpxRUl3SHhtdGduWTdHQVpDNFU0bkI5R1RKQ2ZJUFlydnlZN1E1ajBD?=
- =?utf-8?B?dCtUWXZKcXorUkJ3L3Vra29PdWFvNGpLbDMxM2lFdVZyd3RaSjBFbWhKTUVQ?=
- =?utf-8?B?RDVQZDlyblJDb1g1SjdSZ2I1bTZwc2dBNVJYOHlKaWNVMHBnRmpITThNNlo2?=
- =?utf-8?B?eGxpek1xVEZwN2ZlektwVkQwRUtRN2dtaUpmcVJyNVlrR0E1YmIxaklnVU5G?=
- =?utf-8?B?TUdKVEd5VGk0UU1ZajVKay9UdHpMRS9LbTY1TkFRTWpkYlFqS0tIVVBlRzhy?=
- =?utf-8?B?eGFmaU9LNXI3eXpSZ1dwZktqWXdrRi9tWDE3WDg0WjVIa3lTOFRJbzZrdWMx?=
- =?utf-8?B?UnFpQ0l6WDVHK01yTUl6K2hZNkJnWW15Qmh0ZHFXV0tZOUMreDB3OUpjQUMy?=
- =?utf-8?B?aVdiNzh2RlFvLzhmbVh2c1RqcUVDUllySFNOQUdwc1JCUUNGYXgzMXJscURr?=
- =?utf-8?B?VzcrUDNHTTZMeGF3cEhQU2lZcVJqbmtRRFJKd3gzRkhRRUhDalM5MDFRVjVD?=
- =?utf-8?B?K3p6djEwQ3VtcGwxaCsxL25MdnIvL0pROW42NUFOK29oS21LazJZZXZ4OUFM?=
- =?utf-8?B?NUtVNlB1NjJaMEgrUXpxZ3IvdVdlVnQvU0pFaVczeTZPRjRHVy9ZTUJ0UUxW?=
- =?utf-8?B?eUNNbitiYWlSYnpYallndW4wT1Zmc3BJTVIvb1FBOVhYQ21GdDZka1JsSlJj?=
- =?utf-8?B?RDNFYkFaUUJSRXMzc1lzbmxpSEltcXVwcjI1L2h1RzBwYkNRdCtlNFdXejBa?=
- =?utf-8?B?NHc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3ccc7682-8410-4336-d3a1-08dddf777ed0
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Aug 2025 23:24:07.9918
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vMkQHNyF2GmZ24GsNGAzUtlEn3BVt3wTGo0kOG2w4pA+VkDvjDXTtbQ0PLneTDP208lIKUfW3MYa/vG2LBmPw06D18usweNzU7VP66ok2J0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8349
-X-OriginatorOrg: intel.com
-
---------------rU6CTv5U5bMLK5RxpQVvRe1Y
-Content-Type: multipart/mixed; boundary="------------DIuw9BX53rC0UdHfRBvwt2yA";
- protected-headers="v1"
-From: Jacob Keller <jacob.e.keller@intel.com>
-To: Kurt Kanzenbach <kurt@linutronix.de>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Vinicius Costa Gomes <vinicius.gomes@intel.com>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Message-ID: <cc538c62-87cd-472f-bcfa-7b92dbd90a25@intel.com>
-Subject: Re: [PATCH iwl-next] igb: Retrieve Tx timestamp directly from
- interrupt
-References: <20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de>
-In-Reply-To: <20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de>
-
---------------DIuw9BX53rC0UdHfRBvwt2yA
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+
+With an iptables-configured TFTP helper in place, a UDP packet 
+(10.65.41.36:1069 → 10.65.36.2:69, TFTP RRQ) triggered creation of an expectation.
+Later, iptables changes removed the rule’s per-rule template nf_conn. 
+When the expectation’s timer expired, nf_ct_unlink_expect_report() 
+ran and dereferenced the freed master, causing a crash.
+
+The detailed system logs are as follows:
+--------------------------------------------------------------------------------
+//create
+[ 1978.316487] nf_conntrack: [nf_ct_tmpl_alloc:580] nf_conn:ffff8881391e3800 ext:0
+
+//insert
+[ 2131.989389] [nf_ct_expect_insert:417] exp:ffff88823aac8008 master:ffff8881391e3800 ext:ffff888286a3c500 jiffies:4296796140 timeout:300 expires:4297096140
+[ 2140.352649] nf_conntrack: [nf_ct_tmpl_alloc:580] nf_conn:ffff88813ae58e00 ext:0
+[ 2140.352657] nf_conntrack: [nf_ct_tmpl_alloc:580] nf_conn:ffff88813ae59a00 ext:0
+[ 2140.352661] nf_conntrack: [nf_ct_tmpl_alloc:580] nf_conn:ffff88813ae5d600 ext:0
+[ 2140.352664] nf_conntrack: [nf_ct_tmpl_alloc:580] nf_conn:ffff88813ae58800 ext:0
+[ 2140.352735] nf_conntrack: [nf_ct_tmpl_free:594] nf_conn:ffff8881391e3200 ext:6b6b6b6b6b6b6b6b
+[ 2140.352738] CPU: 0 PID: 4691 Comm: netd Kdump: loaded Tainted: G        W  O       6.1 #16
+[ 2140.352740] Hardware name: Supermicro SYS-2049P-TN8R-FI005/X11QPL, BIOS 3.3 02/19/2020
+[ 2140.352741] Call Trace:
+[ 2140.352742]  <TASK>
+[ 2140.352743]  nf_ct_tmpl_free+0x4f/0x60
+[ 2140.352749]  nf_ct_destroy+0xce/0x290
+[ 2140.352752]  xt_ct_tg_destroy+0x78/0xc0
+[ 2140.352756]  xt_ct_tg_destroy_v1+0x12/0x20
+[ 2140.352758]  cleanup_entry+0x115/0x1b0
+[ 2140.352761]  __do_replace+0x3ab/0x530
+[ 2140.352763]  ? do_ipt_set_ctl+0x5ef/0x6c0
+[ 2140.352765]  do_ipt_set_ctl+0x5ef/0x6c0
+[ 2140.352767]  nf_setsockopt+0x1a8/0x2e0
+[ 2140.352769]  raw_setsockopt+0x7b/0x120
+[ 2140.352771]  sock_common_setsockopt+0x18/0x30
+[ 2140.352773]  __sys_setsockopt+0xb9/0x130
+[ 2140.352775]  __x64_sys_setsockopt+0x21/0x30
+[ 2140.352777]  do_syscall_64+0x49/0xa0
+[ 2140.352780]  ? irqentry_exit+0x12/0x40
+[ 2140.352782]  entry_SYSCALL_64_after_hwframe+0x64/0xce
+[ 2140.352785] RIP: 0033:0x7f621d3f49aa
+[ 2140.352787] Code: ff ff ff c3 0f 1f 40 00 48 8b 15 69 b4 0c 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 49 89 ca b8 36 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 06 c3 0f 1f 44 00 00 48 8b 15 39 b4 0c 00 f7
+
+//free
+[ 2140.352889] nf_conntrack: [nf_ct_tmpl_free:594] nf_conn:ffff8881391e3800 ext:6b6b6b6b6b6b6b6b
+[ 2140.352891] CPU: 0 PID: 4691 Comm: netd Kdump: loaded Tainted: G        W  O       6.1 #16
+[ 2140.352892] Hardware name: Supermicro SYS-2049P-TN8R-FI005/X11QPL, BIOS 3.3 02/19/2020
+[ 2140.352893] Call Trace:
+[ 2140.352893]  <TASK>
+[ 2140.352894]  nf_ct_tmpl_free+0x4f/0x60
+[ 2140.352896]  nf_ct_destroy+0xce/0x290
+[ 2140.352898]  xt_ct_tg_destroy+0x78/0xc0
+[ 2140.352900]  xt_ct_tg_destroy_v1+0x12/0x20
+[ 2140.352902]  cleanup_entry+0x115/0x1b0
+[ 2140.352904]  __do_replace+0x3ab/0x530
+[ 2140.352906]  ? do_ipt_set_ctl+0x5ef/0x6c0
+[ 2140.352907]  do_ipt_set_ctl+0x5ef/0x6c0
+[ 2140.352909]  nf_setsockopt+0x1a8/0x2e0
+[ 2140.352911]  raw_setsockopt+0x7b/0x120
+[ 2140.352912]  sock_common_setsockopt+0x18/0x30
+[ 2140.352913]  __sys_setsockopt+0xb9/0x130
+[ 2140.352915]  __x64_sys_setsockopt+0x21/0x30
+[ 2140.352917]  do_syscall_64+0x49/0xa0
+[ 2140.352919]  ? irqentry_exit+0x12/0x40
+[ 2140.352920]  entry_SYSCALL_64_after_hwframe+0x64/0xce
+[ 2140.352923] RIP: 0033:0x7f621d3f49aa
+[ 2140.352924] Code: ff ff ff c3 0f 1f 40 00 48 8b 15 69 b4 0c 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 49 89 ca b8 36 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 06 c3 0f 1f 44 00 00 48 8b 15 39 b4 0c 00 f7
 
 
+//expectation timeout
+[ 2433.066066] general protection fault, probably for non-canonical address 0x6b6b6b6b6b6b6b6b: 0000 [#1] SMP NOPTI
+[ 2433.187797] CPU: 10 PID: 66 Comm: ksoftirqd/10 Kdump: loaded Tainted: G        W  O       6.1 #16
+[ 2433.293977] Hardware name: Supermicro SYS-2049P-TN8R-FI005/X11QPL, BIOS 3.3 02/19/2020
+[ 2433.306651] nf_conntrack: [__nf_conntrack_alloc:1729] nf_conn:ffff8882a9268440 jiffies:4297097457
+[ 2433.388722] RIP: 0010:nf_ct_unlink_expect_report+0x2d/0x1f0
+[ 2433.388730] Code: 00 00 55 48 89 e5 41 56 53 48 83 ec 18 65 48 8b 04 25 28 00 00 00 48 89 45 e8 48 8b 4f 70 4c 8b 81 e8 00 00 00 4d 85 c0 74 39 <41> 0f b7 00 48 85 c0 74 30 41 83 78 1c 00 75 11 4c 01 c0 48 8b 99
+[ 2433.388732] RSP: 0018:ffffc9000ce0fce0 EFLAGS: 00010202
+[ 2433.848812] RAX: a79bfdc906a58200 RBX: ffff88823aac8088 RCX: ffff8881391e3800
+[ 2433.934200] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff88823aac8008
+[ 2434.019584] RBP: ffffc9000ce0fd08 R08: 6b6b6b6b6b6b6b6b R09: 0000000000000000
+[ 2434.104964] R10: ffff8897e0f1cc00 R11: ffffffff80ee7e00 R12: ffffffff80ee7e00
+[ 2434.190349] R13: 0000000000000000 R14: ffff88823aac8008 R15: ffff88823aac8088
+[ 2434.275728] FS:  0000000000000000(0000) GS:ffff8897e0f00000(0000) knlGS:0000000000000000
+[ 2434.372555] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 2434.441296] CR2: 00007f980bc97000 CR3: 0000000107734003 CR4: 00000000007706e0
+[ 2434.526684] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[ 2434.612066] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[ 2434.697449] PKRU: 55555554
+[ 2434.729791] Call Trace:
+[ 2434.759017]  <TASK>
+[ 2434.784079]  ? __die_body+0x82/0x130
+[ 2434.826826]  ? die_addr+0xaa/0xe0
+[ 2434.866446]  ? exc_general_protection+0x13a/0x1e0
+[ 2434.922711]  ? asm_exc_general_protection+0x27/0x30
+[ 2434.981054]  ? nf_ct_expect_dst_hash+0x120/0x120
+[ 2435.036276]  ? nf_ct_expect_dst_hash+0x120/0x120
+[ 2435.091503]  ? nf_ct_unlink_expect_report+0x2d/0x1f0
+[ 2435.150885]  nf_ct_expectation_timed_out+0x2b/0x90
+[ 2435.208189]  ? nf_ct_expect_dst_hash+0x120/0x120
+[ 2435.263415]  call_timer_fn+0x2f/0x110
+[ 2435.307195]  run_timer_softirq+0x616/0x700
+[ 2435.356179]  ? newidle_balance+0x299/0x320
+[ 2435.405166]  __do_softirq+0xdc/0x2ab
+[ 2435.447904]  run_ksoftirqd+0x1c/0x30
+[ 2435.490649]  smpboot_thread_fn+0xe8/0x1b0
+[ 2435.538595]  kthread+0x269/0x2a0
+[ 2435.577179]  ? __smpboot_create_thread+0x220/0x220
+[ 2435.634479]  ? kthreadd+0x380/0x380
+[ 2435.676187]  ret_from_fork+0x1f/0x30
+[ 2435.718930]  </TASK>
+-------------------------------------------------------------------------------
 
-On 8/14/2025 11:50 PM, Kurt Kanzenbach wrote:
-> Retrieve Tx timestamp directly from interrupt handler.
->=20
-> The current implementation uses schedule_work() which is executed by th=
-e
-> system work queue to retrieve Tx timestamps. This increases latency and=
- can
-> lead to timeouts in case of heavy system load.
->=20
-> Therefore, fetch the timestamp directly from the interrupt handler.
->=20
-> The work queue code stays for the Intel 82576. Tested on Intel i210.
->=20
-
-The change makes sense to me. All we really have to do in the interrupt
-is read the timestamp register, and then report it to stack. Its much
-better to do that work immediately if we don't need any locking or other
-CPU intensive tasks here.
-
-I can confirm that 82576 does not have the interrupt, it was introduced
-in later hardware.
-
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-
---------------DIuw9BX53rC0UdHfRBvwt2yA--
-
---------------rU6CTv5U5bMLK5RxpQVvRe1Y
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wnsEABYIACMWIQQgQFSp1zOQVirsQx5qll0+bw8o6AUCaKUHlgUDAAAAAAAKCRBqll0+bw8o6Dfq
-APoCGRlDlXEX0y4G48u5qzuK/pZzi/1Kok/l0Y6W/IPNygD7BKTVkrGj2WRiO3BqNUixH4tzCVuL
-4wNPY9vQUttArAk=
-=jlpR
------END PGP SIGNATURE-----
-
---------------rU6CTv5U5bMLK5RxpQVvRe1Y--
 
