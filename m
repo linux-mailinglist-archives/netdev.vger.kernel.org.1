@@ -1,231 +1,152 @@
-Return-Path: <netdev+bounces-214898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BFFDB2BAD3
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 09:33:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BEFFB2BADB
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 09:34:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C60BD169315
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 07:31:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 952385861A6
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 07:34:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D9762848A2;
-	Tue, 19 Aug 2025 07:31:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C11DB304BC6;
+	Tue, 19 Aug 2025 07:34:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="lal99ikc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HsLBl/k9"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2062.outbound.protection.outlook.com [40.107.92.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C417026E165
-	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 07:31:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.62
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755588677; cv=fail; b=k9ylAJ1fuTXe6Te5EKs9H1X6rPoux5kREhKiaWKaFFsMDmCqrVuP5olKmUt2kH2/BvJ1KerCqPyceQXAJVujD1GSoKbe0kL1204HDl2QdglQhHDUiyIY9CT8EhjKd3wlP7+bG0f34LjBiJcXp7n5finExpUxpkbkrnf2kLgXFEQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755588677; c=relaxed/simple;
-	bh=rUA0RZuX51/SpV9E+lAVLoMKN+aHMv3oQvxxCOjaaO0=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=NjNwiNkWlZlF0tGB9CE+j/n3tjFLnZgJyS5m4NYb/v6atixuCWntipWcWAqfwgUXVB44uiS/PtzCYngNkR3je/Qik6ByVfT7eWNgUQf6OvwUz3gUBO/qc2c8LYz7jB/sjrBwYRaovncLl/0DyY6ElyvYF4YBiBUKwer1taCTI8c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=lal99ikc; arc=fail smtp.client-ip=40.107.92.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=HGHUC8lpFkWbQKmucQPWaFHjYAMB/QmcbFgoFqyhKDEFlul4mfNsCf99x7eSWKD6aRwxLCpG5gLBjNn0o7zBZJQTj6jQFOymFJKX7WwkXzd142uPtzL671mnrNFXFWbndbZaHPQ9JI7fhUb1sI0t+n/pTUOi6NRYeZv2sjTpt0b8N5FeDZlVcnYLL3QzO1tFq/60B8L6shtcP5xeS0Q4jyTONDd75VefRz+A6wlRzxhIjc/UMT52buwldKbUTgoB9EdVcGEkC9jJhOHVTlQbzn/5BB56EpHUbXXhSVgpQ7vgFr4N9EN/CyrVJz+a6Ko/t4bNATYyyfHZy0pfmyQf0Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6T2fHL5BrvOM9b2f6pZyWitBy9HxaMmHOffRtbOIH2Q=;
- b=cMzAtFktIxlOqxAmISIoiM6XqCVLrzM1ETh0oY8it+n+G3qauGXJl9+ks6oOyVIHtVJO7JQkyerCbvuNySdqh7EaU2b6/yhaewh5qd+obULcP25+wYqS1Jt2Gmse6JzmFjxBHF63xjFpcXh7Y6S0S9FAss1gLDXW3UdUqZ7Ii6u2ePMOVQimkuhb9BxZ9FpjqbHenZeeErIpyrn5jgZdJyTQzaYIlNAoUy7S0Du3g8KIHhSfnvmoE5cRjivrd/6j+/XEy2LRqAaBwF1zqu1lEUslqSaMr3KWv9UkUFzdpo5ZjyUuvS2zQs/HbV/WtTtuVghWwGUst0we8zLtmGN+Ug==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6T2fHL5BrvOM9b2f6pZyWitBy9HxaMmHOffRtbOIH2Q=;
- b=lal99ikc4zl1dtEK6tolWqbBkF7jj3A4AYS0fHblEVQANosrLTYmDEH+vzPiSDo4HvXjLg6qgaicl7vxPcy1oIQqVUkBvheJU2ntmDkUuy57iGKVJIsqg7wsRK5fiof/oC3zBkJMulv1nA/0TdzYMr53vn3xJ7ussayETfHzj0KdhrRO3tj4leLgciLP6BLTUIJ6HILNrOFOdPGmsYqzhCNGyNmqWKbviniz2sCjgzHxzBi+I7jJeFzFRfYAyfF3yLFgenR6bn/Dz+MwJ/8wMjGWRAC/hwoBf7KpgilxbiN9um2bJFKBIbUSvfWJU5c36l3OJOOABUo7dHHJ65nSkQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MW4PR12MB7141.namprd12.prod.outlook.com (2603:10b6:303:213::20)
- by MW4PR12MB7382.namprd12.prod.outlook.com (2603:10b6:303:222::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.18; Tue, 19 Aug
- 2025 07:31:09 +0000
-Received: from MW4PR12MB7141.namprd12.prod.outlook.com
- ([fe80::932c:7607:9eaa:b1f2]) by MW4PR12MB7141.namprd12.prod.outlook.com
- ([fe80::932c:7607:9eaa:b1f2%5]) with mapi id 15.20.9031.014; Tue, 19 Aug 2025
- 07:31:09 +0000
-Message-ID: <203ae8b4-9b45-43c2-a1e2-a3d0d80b81ea@nvidia.com>
-Date: Tue, 19 Aug 2025 10:31:02 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v5] ethtool: add FEC bins histogramm report
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Andrew Lunn
- <andrew@lunn.ch>, Michael Chan <michael.chan@broadcom.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>, Tariq Toukan <tariqt@nvidia.com>,
- Gal Pressman <gal@nvidia.com>, intel-wired-lan@lists.osuosl.org,
- Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org
-References: <20250815132729.2251597-1-vadfed@meta.com>
- <5b8da3d8-f24c-43d8-9d82-0bcc257e1dac@nvidia.com>
- <cab8df87-46fc-49f4-be1d-a55585587e61@linux.dev>
-Content-Language: en-US
-From: Carolina Jubran <cjubran@nvidia.com>
-In-Reply-To: <cab8df87-46fc-49f4-be1d-a55585587e61@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR4P281CA0018.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:c9::10) To MW4PR12MB7141.namprd12.prod.outlook.com
- (2603:10b6:303:213::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B2C9304962;
+	Tue, 19 Aug 2025 07:34:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755588845; cv=none; b=OJPDATdueEk2/1wTGR2DQIynQ9lsES2HRWXxzzgTxcPIFsI2vq4Z3gzNEXLV/4HRHbg1+JlGQPkVZha7Z9j+jpYJSvDlej1X1wudADUqpCCVdw4fgukEdbsJF6ObS3zOClXju2BCxh3WfEHrDbp0SPP+uB44w+0DtbAWkT3jkf0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755588845; c=relaxed/simple;
+	bh=mvDAEEjcSvS2J/xJnibH61hnns2SV+N5KFudF0ycESY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iHqgMjFPJtLiqTp/o7s5TfQbleJgPOs889wFBefDCs6/VABJ9CJ401ZebN3ayMmaiYUPD7oPQ6Sf6O5Uu+1Nwu9jNZBfJJQAEN+QsxfEyjX0s+/YRWKYiCByrbYT331OGcebdxXk6jSvRqWmBgro+6vuHjOR/sNVK4vz26I7cL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HsLBl/k9; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-76e2e8aff06so3898493b3a.1;
+        Tue, 19 Aug 2025 00:34:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755588843; x=1756193643; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WRFb3rdAexBW6O6UzAWea93nghFYugX6Crj6XcdDSIU=;
+        b=HsLBl/k9mVghgubriLcDbDWHCR2BZzsbB0xTKgh89xTZlNg15lDYOdDSa5YdDVxACG
+         4KBgyJGzjsJEMGM3588To+2/JTgw6j4apptmpKzZnWyFy6vVaLdh2fZpSaoxHb0u2LsV
+         RgRgFgzPwsjPKo29TXkv4HMPn6rnAUvXZZrK6ujbH9nGN9jZ1G1V4/tlYxVuRkHn5B1w
+         Weo1f0P8hDWuAnohLTgOyHXhf4HVGYM9henz93AH5DtRaasbisLG6oPZIcb3/+q/gqEX
+         FlO8ZY0F79afAguQceQ84vR0a/FKgzlJr/Cs+z8d66bxgkzzA/xz9DudyO7x8ery46Vo
+         /Kew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755588843; x=1756193643;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WRFb3rdAexBW6O6UzAWea93nghFYugX6Crj6XcdDSIU=;
+        b=eLvxnSE/S/VBR9SC3bV82LUdITtorn7h3Q5TP+g3Ab1DGCWoker5O621NLr1hJfEV0
+         6ePBtRpc+eOULWYoysMzeoOebe/y6d3AM8K0vv6AfH7IS50KpJc1wtKrpFoyojf5ktzY
+         8f0GULAOv9n6g8wiJAS/Dg1I5IW+DqaODGzAxrnUk+l+RQL6lqY1OhM4k1FgK4LDPHoF
+         US/726bAVXwY5NqqZYvkHTtDdo7HvKY9Kmypyx0CCXG4epvxyCpOfqSpit3itOsmtcY5
+         qPFxT0V8+C7uQS6yNmzbxttd0CcFogAGXQb7egU7BMkZxjqVI9WBi57fT5xWirQQ1oF2
+         A5Vg==
+X-Forwarded-Encrypted: i=1; AJvYcCUJjR7KBqPx3RQBlT6dbsOhtcHBJq9V33mMhtub0UnPYjBqu8THCGNpNlirTUpkg7wz+O2vswjkoh63Bs1J@vger.kernel.org, AJvYcCVyHo2SO/a19zjI0upGUmKG2HcD8ytl7ZibZMiM6tIdHsm4Q1AzvgNzLdjC5doooOxSMQo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1nfgZFYv14liKYOUv6fbvW9usv8eExSE6OutDobaK80JCMTNy
+	izUhUSIFXLWXGRqlDrVSqKvoeNAliiDDSwgmyyjwS8TvYVOpkOGvqWD4y9uzvh8c
+X-Gm-Gg: ASbGnctCqUsl+7A4I/W3afm4YkkIf2KeyzRMBMAQoJPMsNysKFQi/hNh2nERSZ+Nuyx
+	CbeQwW1+GOdO1nndt/SKteF0Isb3Oq/7fAXL6iS0U0Wsb2fM8AAcvqZmf6BzS8piCjNTVmfJTWz
+	CPZDrhK2yo0kGdhrR9adExKO1urzWbPVq0Z631EJZdqzlLegX3i9dNLLP73slPamOq64lfV4/xy
+	EgzOrtFlZCPn/ujQ1l6uzzgzH2e8aPEqoq2lgILsXvcu53k4ZmNi+9sPrYxiLEKpz9mjE+2D2eu
+	S15N8WSNvRXtwLPqGpN8DUOL5P6ruoURpQHCL3LkI6gO62xkwrt8qahh7vN6AjZdxhCFX62Psnj
+	lHV7t+BBTs9fVUCP7y+REIyRUSe/AO0s8Rx5KSJ55Gg==
+X-Google-Smtp-Source: AGHT+IHcmc5grlTNGzTr7aqz/F4U91EfGnFVj4SxTvYD/NNIEV06PV+BHBlDGl+wvKyqtQFcUQAxOQ==
+X-Received: by 2002:a17:903:2446:b0:240:8f4:b35c with SMTP id d9443c01a7336-245e02baa97mr18549795ad.10.1755588843009;
+        Tue, 19 Aug 2025 00:34:03 -0700 (PDT)
+Received: from fedora.redhat.com ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2446d547c0esm99742715ad.123.2025.08.19.00.33.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Aug 2025 00:34:02 -0700 (PDT)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrii Nakryiko <andriin@fb.com>,
+	Jussi Maki <joamaki@gmail.com>,
+	Jay Vosburgh <jv@jvosburgh.net>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Felix Maurer <fmaurer@redhat.com>,
+	Viktor Malik <vmalik@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCH net-next] selftests: net: bpf_offload: print loaded programs on mismatch
+Date: Tue, 19 Aug 2025 07:33:48 +0000
+Message-ID: <20250819073348.387972-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR12MB7141:EE_|MW4PR12MB7382:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1522faf9-3b2a-4d09-5a1e-08dddef25d7c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?RzFuck05bWJ0aWNwWGRJQVpSRlpTelNuM1lTSFhTNnVJallvYzU5UEgzL21I?=
- =?utf-8?B?ZWZXZXVXZldac3hRYy9nV0Y3SldhY2RsMFZ3NGJSd3VNWEJNVkk2SWUvUDhE?=
- =?utf-8?B?emJyM1RjWk1KbU0yZHozWXNOV3F2UGVrWlpDQVlsbDdib0hXZXhjQ2pCUTR4?=
- =?utf-8?B?N0FBc25Jb0xmU3pNck5IcitWQjZsVzVTSHdjYjBjY3hML0Z2Z05ESjhES1Jr?=
- =?utf-8?B?T3E0M200K1lRdHc5SkxCUkZKRmxUcXpZUXdVWGxxVzBYZklOMUFvS3ZsS25E?=
- =?utf-8?B?MVBLa3lwaVJBazZjQWNmSmEyQjNvQ3E4NlZOUGNvUnlHK0RwRytVS2lzTkRQ?=
- =?utf-8?B?RVM2R1Y4NlVKOU5Db3JlN1BFazJhb2ZkeGV1WGV0ZXpsVXlTeUNBZnM2cWwr?=
- =?utf-8?B?QVA3VHRCM0NUcnRJQmRYbWhSRlRNMk1FQXpuR3FQS1Z2SmhHK1lqS1g2YjJv?=
- =?utf-8?B?cHEyem41L2hFZnhtM0FJQSsxNHVrQW1pQURReFpLWmxxTGwyNlV4QkkvUFFH?=
- =?utf-8?B?QXR3d1oySThNRHh6VG5WYm5WRWlBclNWdHhyV1BWU0ErSW02V2FsbzdUMkor?=
- =?utf-8?B?a3ZUT1RlaUoxeEcyL3gwZG44SjcrY3cxbklYTU1aSG55L3ptNXVHbDg4WHBu?=
- =?utf-8?B?ZURGWUV2NU1sOWlYSldMVWtqRWphRDZ2a2M0T3FoajJEZTdncXNUYVRNRHpk?=
- =?utf-8?B?dFFncVdzUFIwVVkwNWVyZWNlVWV5NncrMGEwT3JOdFZXM0hwZUxhcGZudFd2?=
- =?utf-8?B?QWMxQ2w3WVdUWGdNSkVORDlwWlI4MVE2cEVSQ0RtWU4rVVNuQnlwSGVrYitK?=
- =?utf-8?B?VkdXaVVGUThEcHVUN1M2bmMycy83eUdmdmVPSU9QYi9TYVVuRW1yK1JaR2VQ?=
- =?utf-8?B?ZXJwVytrejYyQ0EyU2FKZG5RTDdiNmxSSFk3L0VlWCtGUUtZN0diU2RvZGU4?=
- =?utf-8?B?S3ZNYytxQzh4TWNNQmk4SG9qam1DZFFsaThEMk9pTGRKRU5NS3A2bUNHUmZa?=
- =?utf-8?B?VEFmbVB4dUxOWFVMakJGN2E0Y1J3bDZyRHJURlE3YWxnTmI3YlErd0NHdkZO?=
- =?utf-8?B?NkQ1WVdBbjBZUTgwNTRkaWNpQ296Tzg2Sm11VllRK2VKTTNBRVpMaGl4aVc2?=
- =?utf-8?B?TTQyUXlFcm5FU281SDJhWHZvQVJWOWxqeWQxVmVkcEFTS2ZwNEltWE9Dczlm?=
- =?utf-8?B?Y1ZJcWI1UzYvNWdUYjZPS1BMSmplWis3RmtPZFYzelFWVmZQNHN1cGVOM1VJ?=
- =?utf-8?B?K25XTXBPSUQwSXYxQVBDY1ZNZlhyZlAycXR5OGR0Nk9yb01lbUlKZHdWY2dm?=
- =?utf-8?B?T0VQYk41NXJoMHBXUHA2dXgzbXlOQ0VwOGVRdFVyZEFPcTFvNTFuTEtRMXBu?=
- =?utf-8?B?YW9DUlVvN09pUXkwS1F0MjE3MGRoWk5RMC9uc2U0b3hnWXNqN1ZpQmpaWVU3?=
- =?utf-8?B?MEJZRWNSSzFsUDBHTDY2TTRINVNPQzJVRG91dlNZa21zeTA0VEQvRHNUM3hR?=
- =?utf-8?B?emhSM1Y3MFNtc29PdGtpTmkwK2ZFUjY3OE1sdkxsNm9MNlhuTmo4RDZnQjJW?=
- =?utf-8?B?VEpicmx1QTM0VkVUZmpTSytyU28yaFh1alpHTGxZYlN5L25aU1dKMWJYZ1Vi?=
- =?utf-8?B?Ymtsbm96U2xLOHRZZTNiTVd5TkgzZEQySzN0b1RIejMwRW9DS2hCaVVyTG8w?=
- =?utf-8?B?TWR6M1BsbGx6TnAzWE9RY0VvNEQyR0dnT0hPK1NnbzFOWmZKeXpqYmNndmph?=
- =?utf-8?B?bTQwaEtCb2xGalFibENUTE1mOWFLNCtTY29CMS8rRDJXVmFiSUNYSEgwMk9P?=
- =?utf-8?B?ZGJQYjFXamRvYWtxS010SFdVOTF3MkxQQ3dXaUc1MDlZRlNIWFVYb3BqZlBG?=
- =?utf-8?B?aEhjYmkrZVdDd2tDZzVGMVE3QWpJNnAwTkhXTW1OdlQ1NmF5WWhqa2todUJq?=
- =?utf-8?Q?4nyDOTNG42U=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR12MB7141.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?SzVrbmR6OFBoa2ViSnhRSE82Q2l6SUQ1VkhXL3hrRzJxYjd2ZzlsbXJFM3RH?=
- =?utf-8?B?eElQVVBOWGVrcnlTdE5NVWpvY2N6bjFWcFRmWmZuL24zc2RXMTZDQWkvZ1ds?=
- =?utf-8?B?Mll4ZU15SlV1RGVyM0RlM1BvSXpzdTY5WlNncFNUWm5JcVdabUFhMCtEcGo5?=
- =?utf-8?B?SjVEVXA4OUdEd3lsTVVQa01FYkc5dlZ3dGs1bWNma251c0hCa1VSaSs0Tk9T?=
- =?utf-8?B?YVhDSHMwUEwzcnc4NzlsZGpkUy8wR1RmbDBFdk1xY01KdXRyeDRpK1dYSld2?=
- =?utf-8?B?UGlOT05BaVl5c0lHeVplaFc4M3FxUnlYNGg5TWpPRUhNY0R1bHZQTGIwUExS?=
- =?utf-8?B?bHE0aitFUU1OV0ZjWURwRnF6cWRkTXZ5WjcwRHBSMnhFUXJKQmFiT1djTDl4?=
- =?utf-8?B?Q25qNHBzbHpFTEJ3bklyZ0t0ZzZHVGtLbGNzN1lpMDBYUk9GRG9BaUczaUNn?=
- =?utf-8?B?QU94QStMTjRPUzcySEt3S3NiYjhrMmVuUTA0bElFcklFcks0R1E5RUFYYWdG?=
- =?utf-8?B?RHFEd2ZqWVdCYm1JSVFJOGlQbVY0U3NqcFBObkNTKzZvZE5Vc1pvSzUzMmwr?=
- =?utf-8?B?aWFRM29OVFhMY2ZVTEhFcXRGR05FWTFQSzE4WkpYbENLOGhhb1pyU2tvSHAz?=
- =?utf-8?B?NFIzYUJWdzBxQUFUMEpxdzFXbDNPQkVsb3pubURoenB3czNkTnZIa0N2ZHpy?=
- =?utf-8?B?bmVXUWdKSjhrOFlnVThFMFplQTcyamd6L21jMlJNVThqUzFuUHRNVnFvSTVP?=
- =?utf-8?B?OWJ5dWFPTE4vbTltdUtqcGE5QnJ4SlUzelJYVUpMMm00a2xoYy85QmdBT3di?=
- =?utf-8?B?ejFmTVN2S3B4eTA3MlJIMTlIL3d5cENjNS9sR3kwRDI2QXhpNG5HTFBtOFEy?=
- =?utf-8?B?a05heTErMzRKUXlmU2tkbElTaHh4TVpSbGphR3dEaGZxUElRN1NlcmV3R21r?=
- =?utf-8?B?cThOeVp1Z0RIMmdBMXZabThMQXZoU0JLMkUxdGpZbFR1SUx5YnJsaTJGRXJ4?=
- =?utf-8?B?TXpwNlluMjdGSTFFbDhzREx3L1Z1VjVZR2xubGtXd2Z1MWhESXpidG1Hb3Mr?=
- =?utf-8?B?NUZpRXQwN1pueWtRanU1eS96THdsR052T1NLVDZNSlM5QlA4RmtYdTVRRlh4?=
- =?utf-8?B?ak9USDVnWXdTQkw5bHFUaFdBNEI3NXQ2R3Rpc0srNzlhNDlXUlhibmxKSWll?=
- =?utf-8?B?dlpYT1hLdDFDZDNDci9haEEzZFZSZmtJOStwSFNTQkt4K0lQMUlDZjcxTjlG?=
- =?utf-8?B?NzNmM3lUcTdFZlFPQUZlT05mclhiUmZaL0dyczBScmorcHhGdGl2QTIxc1p5?=
- =?utf-8?B?UFR0dmorVVgwa1BKT2IzWmtmVFI3RVRMOVZ4SmxoSjdkV0xKZWFnbHJtSURt?=
- =?utf-8?B?ck53SEN5S1VLK0w2VmtQay9BYnVXc3B0YmdydHFxeUlhbmRuQ2kwa09MWitw?=
- =?utf-8?B?NFNSQ2JOWFV0MStnMS9xMVZvVnR0bS9jNkpYb25uUGZXbWRQV09WQ2N4UGRQ?=
- =?utf-8?B?OTFaUE5kTXdmNXFqY2h4TkJzRGd6VktBNE5QOEs4a1VjV3RxaXZkbEZqQUtv?=
- =?utf-8?B?WjdlOVpKU0tTRDFwQzJDOGhJR2h3QU5QbTB4ZDhYM0l5ZXlMaWsrMFJUVlNE?=
- =?utf-8?B?Z3JuUjI4aGpqZHM2bFJBL0pIUU9SMHBIdlUwcTlOdnNmS2Y0TXVVM2lxNVND?=
- =?utf-8?B?ZXhPcTlTa1owZ2dSdkZxTzZCVUNlVDhyWjdtQUdaTHZyRi9XVm1teXhqOTdl?=
- =?utf-8?B?ZlZZanZya25QY1JZL1E4Z1dIdGpPYy8zVVpNTzBvUVNzdGFpU1ZFZjhHTjBk?=
- =?utf-8?B?WjVLZVV5bXBoTi9zY0R5bnRyVllYTTJNTmxpelVkaHNDWXE1WjR3U1YvWnJ1?=
- =?utf-8?B?RU1YN1dCc0VSYnBud0g1ZnBMakIwOUxKTFFVb3hsNjFsclorRzMvVWtOeFd0?=
- =?utf-8?B?YmE3cXRDekFDblBBRUlPaFMrM2tOdTB3Qk9wTFhGa2ViejF6YWE0WnNCNmVS?=
- =?utf-8?B?bTVZWEhaeU1FbHZBK05zWjVWd3lwaVp3WmtRVUJBdE9BSVVMb2Rxc3QwZ0xU?=
- =?utf-8?B?WVpMT29WTlhwbW5NRStONUU0NkxSMzVJSWt5MFJsY2RqUGRSaVdOWlRGUitC?=
- =?utf-8?Q?ddWQZIT+0cPEMgUBZqkvuZR3l?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1522faf9-3b2a-4d09-5a1e-08dddef25d7c
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR12MB7141.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Aug 2025 07:31:09.2489
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: h9HoVZ/K94vCpD9+UUBmKyF+DvJqFmlgJe1KajIYAywnqpiqqa9vAUmYJb18ybvv1QM/ZxqA170ZsnR0bWo/cA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7382
+Content-Transfer-Encoding: 8bit
 
+The test sometimes fails due to an unexpected number of loaded programs. e.g
 
+  FAIL: 2 BPF programs loaded, expected 1
+    File "/usr/libexec/kselftests/net/./bpf_offload.py", line 940, in <module>
+      progs = bpftool_prog_list(expected=1)
+    File "/usr/libexec/kselftests/net/./bpf_offload.py", line 187, in bpftool_prog_list
+      fail(True, "%d BPF programs loaded, expected %d" %
+    File "/usr/libexec/kselftests/net/./bpf_offload.py", line 89, in fail
+      tb = "".join(traceback.extract_stack().format())
 
-On 18/08/2025 21:35, Vadim Fedorenko wrote:
-> On 18/08/2025 19:17, Carolina Jubran wrote:
->>
->>
->> On 15/08/2025 16:27, Vadim Fedorenko wrote:
->>> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
->>> index de5bd76a400ca..6c0dc6ae080a8 100644
->>> --- a/include/linux/ethtool.h
->>> +++ b/include/linux/ethtool.h
->>> @@ -492,7 +492,25 @@ struct ethtool_pause_stats {
->>>   };
->>>   #define ETHTOOL_MAX_LANES    8
->>> +#define ETHTOOL_FEC_HIST_MAX    18
->>
->> Could you clarify why it is set to 18?
->> AFAIU IEEE 802.3ck/df define 16 bins.
-> 
-> Yeah, the standard defines 16 bins, but this value came out of the
-> discussion with Gal and Yael because the hardware supports more bins,
-> I believe, in RDMA mode
-> 
+However, the logs do not show which programs were actually loaded, making it
+difficult to debug the failure.
 
-currently I believe those are internal modes that expose 19 on our 
-hardware. Therefore, I think 16 is sufficient and we can easily extend 
-in the future.
+Add printing of the loaded programs when a mismatch is detected to help
+troubleshoot such errors. The list is printed on a new line to avoid breaking
+the current log format.
 
->>> diff --git a/net/ethtool/fec.c b/net/ethtool/fec.c
->>> index e7d3f2c352a34..9313bd17544fd 100644
->>> --- a/net/ethtool/fec.c
->>> +++ b/net/ethtool/fec.c
->>> @@ -17,6 +17,7 @@ struct fec_reply_data {
->>>           u64 stats[1 + ETHTOOL_MAX_LANES];
->>>           u8 cnt;
->>>       } corr, uncorr, corr_bits;
->>> +    struct ethtool_fec_hist fec_stat_hist;
->>>   };
->>>   #define FEC_REPDATA(__reply_base) \
->>> @@ -113,7 +114,11 @@ static int fec_prepare_data(const struct 
->>> ethnl_req_info *req_base,
->>>           struct ethtool_fec_stats stats;
->>>           ethtool_stats_init((u64 *)&stats, sizeof(stats) / 8);
->>> -        dev->ethtool_ops->get_fec_stats(dev, &stats);
->>> +        ethtool_stats_init((u64 *)data->fec_stat_hist.values,
->>> +                   ETHTOOL_MAX_LANES *
->> this should be ETHTOOL_FEC_HIST_MAX since we’re initializing the 
->> histogram bins array.
-> 
-> Yes, you're right, I'll change it in the next version
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+---
+ tools/testing/selftests/net/bpf_offload.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/net/bpf_offload.py b/tools/testing/selftests/net/bpf_offload.py
+index b2c271b79240..c856d266c8f3 100755
+--- a/tools/testing/selftests/net/bpf_offload.py
++++ b/tools/testing/selftests/net/bpf_offload.py
+@@ -184,8 +184,8 @@ def bpftool_prog_list(expected=None, ns="", exclude_orphaned=True):
+         progs = [ p for p in progs if not p['orphaned'] ]
+     if expected is not None:
+         if len(progs) != expected:
+-            fail(True, "%d BPF programs loaded, expected %d" %
+-                 (len(progs), expected))
++            fail(True, "%d BPF programs loaded, expected %d\nLoaded Progs:\n%s" %
++                 (len(progs), expected, pp.pformat(progs)))
+     return progs
+ 
+ def bpftool_map_list(expected=None, ns=""):
+-- 
+2.50.1
 
 
