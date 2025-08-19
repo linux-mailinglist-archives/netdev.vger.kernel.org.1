@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-215061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85FF2B2CF46
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 00:21:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1248DB2CF4D
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 00:22:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C7E4687DF5
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 22:21:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9927521B89
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 22:21:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 811BA31DDBB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C72A5322A2D;
 	Tue, 19 Aug 2025 22:20:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GmiE+m9j"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jcW8Myuf"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C95F31DD9F;
-	Tue, 19 Aug 2025 22:20:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0FB31DD9C
+	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 22:20:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755642010; cv=none; b=I62h+O+MoTrDHilFuIkHU4ReBC0A+JxslRL0YxYtIYvsAtmI1iLhQz6UNvsUQ2HBMJISJYu49wB50yjiLsuFCH3JjzCxNzfJQIJhQAfs7Bwl3T8cjhlKTh/UCBVbTMGUm88nuQeeSvMWpSuVb6ch7DzaBxNotwSlYQWUmhtf3PY=
+	t=1755642010; cv=none; b=XQpbMWIOKJaeHOc7jPF7bH6hIUYtX+2rcO2PkKmREJ6ZaLxVZyRuhWS6r2QHaemb1ec8JuVICRkaiItiBxZ0II5OpvAuYqbEV2YEXsGryN8AzZxGqk7a2/yh6msIhWfiySA+rUM8+cE91FPLsaByIyN1Q6Lz8sEsIgNShkNo+5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1755642010; c=relaxed/simple;
-	bh=qTwScyjioHSsDj0BnqZZRgvKP7UwEeCQX5ykxBAfJvc=;
+	bh=XrCiYaEJPP6fVnU4aWJs+xfl+SJ7HjJ/AQb4oHnU9Zs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ikrL70YweivpwCyokWirdKFn5R99r2ZRx4oEJn5a5+4acwPKXgDGKTBhqQVEy8DGOm0iLUao+XYP6IJosfDB+uhdoPCY1yLLm+oFpwXFjL5cRFf9Y0V+FIp5ZuRQN703tCWkl9BxAXsW7TOE1UH3eW6JVeF4WEXuNvT8oTm1nco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GmiE+m9j; arc=none smtp.client-ip=192.198.163.17
+	 MIME-Version; b=IVKO53t0tLFcivvdWXTnn/TMVsMRNOWRWKEPhRW++vbjmZQCY0tpgmW2X+Am2Y9E9ovv7shr2F+2gG3byHTzStjkmZ1YZbXtmo5bOOuXybRqjZVzTQknDSsFcQW1yo0ssGnc57vmGxsPD1tKKKHrofL8/rpEOiO5ngzGZap3UHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jcW8Myuf; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755642009; x=1787178009;
+  t=1755642008; x=1787178008;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=qTwScyjioHSsDj0BnqZZRgvKP7UwEeCQX5ykxBAfJvc=;
-  b=GmiE+m9j46DE2Xy2aWEeGJ2cGUyANNRplLo3HquSIoyXb0eCMhtphXly
-   r5nHqAr2yTSBmR+u/rWQMTbrFYha6IJMpuALrlibceQGGo0seW/HAK+Ty
-   JwO34mUOvjhxlOHVW/FJ+7MBcm46TrCZcC4f9uN9g+OABpFg2CpSdtKor
-   flQHjObIJ53mRm5rZejuWmr8U9RZZVPtS4oK2iEEMbOYQgVQf9ittkURo
-   sA+e7E3Y1g2hgv2aa9vshmgGoSCtlawwExK+p9QNW5hoSmyd3kvdjavgs
-   TgX9EqlEzMhfinA+NeBb6WecvJcz93RnuevBXCUR4om3CmiYaZXZm/CzI
+  bh=XrCiYaEJPP6fVnU4aWJs+xfl+SJ7HjJ/AQb4oHnU9Zs=;
+  b=jcW8MyufYDJySb2TbKA+GkJNitQ/iig/XK8OoKzm7U3GJc/hDlUiQfS1
+   WSBNvzPdYEM7EdPJyFu2d3bfaZtN0znUQRJ1vdweWzUVSeklC6FcKAwrN
+   GmjEp+vUezzt2iM1qfb5xdBBY1VydmYDShMrKHxVQvTQE2P+iexhCLxCL
+   fGljV53UzQZ9uQyicROZTa8ySbtpcUEmvZI/lxh5WDcrMuawYvjtWiVU7
+   L0vMUu6d1G6X72jIxGPoJW+Q1xMrJPY3B7FZqJx9QMVNpbVBsH9ahDzTc
+   eQdU9KZe6gdqDsspoe4OMhgJiFODkDnTiIe8iLQyebhFOfSekP+guNL/a
    Q==;
-X-CSE-ConnectionGUID: iQRu11NlQtaitbRjG2CGdQ==
-X-CSE-MsgGUID: zQQUd8XlRQyEpU48Rpjmtg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11527"; a="57829575"
+X-CSE-ConnectionGUID: kvxvXyARSrasJYNDxGsTHg==
+X-CSE-MsgGUID: cWKfnIOrQBG2OyS3PTFLOQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11527"; a="57829585"
 X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
-   d="scan'208";a="57829575"
+   d="scan'208";a="57829585"
 Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2025 15:20:06 -0700
-X-CSE-ConnectionGUID: lbhkdObjTza57zziIMBvKw==
-X-CSE-MsgGUID: xMlBvJMRTEmL8w+FImd/iw==
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2025 15:20:07 -0700
+X-CSE-ConnectionGUID: rG55T+yIQQ+CYieyugONMA==
+X-CSE-MsgGUID: XkLmX9KlSfuQorpZL74o7w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
-   d="scan'208";a="173202849"
+   d="scan'208";a="173202853"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by fmviesa004.fm.intel.com with ESMTP; 19 Aug 2025 15:20:06 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -65,21 +65,14 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+Cc: ValdikSS <iam@valdikss.org.ru>,
 	anthony.l.nguyen@intel.com,
-	magnus.karlsson@intel.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	sdf@fomichev.me,
-	bpf@vger.kernel.org,
-	=?UTF-8?q?Tobias=20B=C3=B6hm?= <tobias.boehm@hetzner-cloud.de>,
-	Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [PATCH net v2 4/5] ixgbe: fix ndo_xdp_xmit() workloads
-Date: Tue, 19 Aug 2025 15:19:58 -0700
-Message-ID: <20250819222000.3504873-5-anthony.l.nguyen@intel.com>
+	vitaly.lifshits@intel.com,
+	dima.ruinskiy@intel.com,
+	Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: [PATCH net v2 5/5] igc: fix disabling L1.2 PCI-E link substate on I226 on init
+Date: Tue, 19 Aug 2025 15:19:59 -0700
+Message-ID: <20250819222000.3504873-6-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250819222000.3504873-1-anthony.l.nguyen@intel.com>
 References: <20250819222000.3504873-1-anthony.l.nguyen@intel.com>
@@ -89,145 +82,74 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+From: ValdikSS <iam@valdikss.org.ru>
 
-Currently ixgbe driver checks periodically in its watchdog subtask if
-there is anything to be transmitted (considering both Tx and XDP rings)
-under state of carrier not being 'ok'. Such event is interpreted as Tx
-hang and therefore results in interface reset.
+Device ID comparison in igc_is_device_id_i226 is performed before
+the ID is set, resulting in always failing check on init.
 
-This is currently problematic for ndo_xdp_xmit() as it is allowed to
-produce descriptors when interface is going through reset or its carrier
-is turned off.
+Before the patch:
+* L1.2 is not disabled on init
+* L1.2 is properly disabled after suspend-resume cycle
 
-Furthermore, XDP rings should not really be objects of Tx hang
-detection. This mechanism is rather a matter of ndo_tx_timeout() being
-called from dev_watchdog against Tx rings exposed to networking stack.
+With the patch:
+* L1.2 is properly disabled both on init and after suspend-resume
 
-Taking into account issues described above, let us have a two fold fix -
-do not respect XDP rings in local ixgbe watchdog and do not produce Tx
-descriptors in ndo_xdp_xmit callback when there is some problem with
-carrier currently. For now, keep the Tx hang checks in clean Tx irq
-routine, but adjust it to not execute for XDP rings.
+How to test:
+Connect to the 1G link with 300+ mbit/s Internet speed, and run
+the download speed test, such as:
 
-Cc: Tobias Böhm <tobias.boehm@hetzner-cloud.de>
-Reported-by: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
-Closes: https://lore.kernel.org/netdev/eca1880f-253a-4955-afe6-732d7c6926ee@hetzner-cloud.de/
-Fixes: 6453073987ba ("ixgbe: add initial support for xdp redirect")
-Fixes: 33fdc82f0883 ("ixgbe: add support for XDP_TX action")
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Tested-by: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
-Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+    curl -o /dev/null http://speedtest.selectel.ru/1GB
+
+Without L1.2 disabled, the speed would be no more than ~200 mbit/s.
+With L1.2 disabled, the speed would reach 1 gbit/s.
+Note: it's required that the latency between your host and the remote
+be around 3-5 ms, the test inside LAN (<1 ms latency) won't trigger the
+issue.
+
+Link: https://lore.kernel.org/intel-wired-lan/15248b4f-3271-42dd-8e35-02bfc92b25e1@intel.com
+Fixes: 0325143b59c6 ("igc: disable L1.2 PCI-E link substate to avoid performance issue")
+Signed-off-by: ValdikSS <iam@valdikss.org.ru>
+Reviewed-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 34 ++++++-------------
- 1 file changed, 11 insertions(+), 23 deletions(-)
+ drivers/net/ethernet/intel/igc/igc_main.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 6122a0abb41f..80e6a2ef1350 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -968,10 +968,6 @@ static void ixgbe_update_xoff_rx_lfc(struct ixgbe_adapter *adapter)
- 	for (i = 0; i < adapter->num_tx_queues; i++)
- 		clear_bit(__IXGBE_HANG_CHECK_ARMED,
- 			  &adapter->tx_ring[i]->state);
--
--	for (i = 0; i < adapter->num_xdp_queues; i++)
--		clear_bit(__IXGBE_HANG_CHECK_ARMED,
--			  &adapter->xdp_ring[i]->state);
- }
+diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+index 458e5eaa92e5..e79b14d50b24 100644
+--- a/drivers/net/ethernet/intel/igc/igc_main.c
++++ b/drivers/net/ethernet/intel/igc/igc_main.c
+@@ -7149,6 +7149,13 @@ static int igc_probe(struct pci_dev *pdev,
+ 	adapter->port_num = hw->bus.func;
+ 	adapter->msg_enable = netif_msg_init(debug, DEFAULT_MSG_ENABLE);
  
- static void ixgbe_update_xoff_received(struct ixgbe_adapter *adapter)
-@@ -1214,7 +1210,7 @@ static void ixgbe_pf_handle_tx_hang(struct ixgbe_ring *tx_ring,
- 	struct ixgbe_adapter *adapter = netdev_priv(tx_ring->netdev);
- 	struct ixgbe_hw *hw = &adapter->hw;
- 
--	e_err(drv, "Detected Tx Unit Hang%s\n"
-+	e_err(drv, "Detected Tx Unit Hang\n"
- 		   "  Tx Queue             <%d>\n"
- 		   "  TDH, TDT             <%x>, <%x>\n"
- 		   "  next_to_use          <%x>\n"
-@@ -1222,16 +1218,14 @@ static void ixgbe_pf_handle_tx_hang(struct ixgbe_ring *tx_ring,
- 		   "tx_buffer_info[next_to_clean]\n"
- 		   "  time_stamp           <%lx>\n"
- 		   "  jiffies              <%lx>\n",
--	      ring_is_xdp(tx_ring) ? " (XDP)" : "",
- 	      tx_ring->queue_index,
- 	      IXGBE_READ_REG(hw, IXGBE_TDH(tx_ring->reg_idx)),
- 	      IXGBE_READ_REG(hw, IXGBE_TDT(tx_ring->reg_idx)),
- 	      tx_ring->next_to_use, next,
- 	      tx_ring->tx_buffer_info[next].time_stamp, jiffies);
- 
--	if (!ring_is_xdp(tx_ring))
--		netif_stop_subqueue(tx_ring->netdev,
--				    tx_ring->queue_index);
-+	netif_stop_subqueue(tx_ring->netdev,
-+			    tx_ring->queue_index);
- }
- 
- /**
-@@ -1451,6 +1445,9 @@ static bool ixgbe_clean_tx_irq(struct ixgbe_q_vector *q_vector,
- 				   total_bytes);
- 	adapter->tx_ipsec += total_ipsec;
- 
-+	if (ring_is_xdp(tx_ring))
-+		return !!budget;
++	/* PCI config space info */
++	hw->vendor_id = pdev->vendor;
++	hw->device_id = pdev->device;
++	hw->revision_id = pdev->revision;
++	hw->subsystem_vendor_id = pdev->subsystem_vendor;
++	hw->subsystem_device_id = pdev->subsystem_device;
 +
- 	if (check_for_tx_hang(tx_ring) && ixgbe_check_tx_hang(tx_ring)) {
- 		if (adapter->hw.mac.type == ixgbe_mac_e610)
- 			ixgbe_handle_mdd_event(adapter, tx_ring);
-@@ -1468,9 +1465,6 @@ static bool ixgbe_clean_tx_irq(struct ixgbe_q_vector *q_vector,
- 		return true;
- 	}
+ 	/* Disable ASPM L1.2 on I226 devices to avoid packet loss */
+ 	if (igc_is_device_id_i226(hw))
+ 		pci_disable_link_state(pdev, PCIE_LINK_STATE_L1_2);
+@@ -7175,13 +7182,6 @@ static int igc_probe(struct pci_dev *pdev,
+ 	netdev->mem_start = pci_resource_start(pdev, 0);
+ 	netdev->mem_end = pci_resource_end(pdev, 0);
  
--	if (ring_is_xdp(tx_ring))
--		return !!budget;
+-	/* PCI config space info */
+-	hw->vendor_id = pdev->vendor;
+-	hw->device_id = pdev->device;
+-	hw->revision_id = pdev->revision;
+-	hw->subsystem_vendor_id = pdev->subsystem_vendor;
+-	hw->subsystem_device_id = pdev->subsystem_device;
 -
- #define TX_WAKE_THRESHOLD (DESC_NEEDED * 2)
- 	txq = netdev_get_tx_queue(tx_ring->netdev, tx_ring->queue_index);
- 	if (!__netif_txq_completed_wake(txq, total_packets, total_bytes,
-@@ -7974,12 +7968,9 @@ static void ixgbe_check_hang_subtask(struct ixgbe_adapter *adapter)
- 		return;
- 
- 	/* Force detection of hung controller */
--	if (netif_carrier_ok(adapter->netdev)) {
-+	if (netif_carrier_ok(adapter->netdev))
- 		for (i = 0; i < adapter->num_tx_queues; i++)
- 			set_check_for_tx_hang(adapter->tx_ring[i]);
--		for (i = 0; i < adapter->num_xdp_queues; i++)
--			set_check_for_tx_hang(adapter->xdp_ring[i]);
--	}
- 
- 	if (!(adapter->flags & IXGBE_FLAG_MSIX_ENABLED)) {
- 		/*
-@@ -8199,13 +8190,6 @@ static bool ixgbe_ring_tx_pending(struct ixgbe_adapter *adapter)
- 			return true;
- 	}
- 
--	for (i = 0; i < adapter->num_xdp_queues; i++) {
--		struct ixgbe_ring *ring = adapter->xdp_ring[i];
--
--		if (ring->next_to_use != ring->next_to_clean)
--			return true;
--	}
--
- 	return false;
- }
- 
-@@ -11005,6 +10989,10 @@ static int ixgbe_xdp_xmit(struct net_device *dev, int n,
- 	if (unlikely(test_bit(__IXGBE_DOWN, &adapter->state)))
- 		return -ENETDOWN;
- 
-+	if (!netif_carrier_ok(adapter->netdev) ||
-+	    !netif_running(adapter->netdev))
-+		return -ENETDOWN;
-+
- 	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
- 		return -EINVAL;
- 
+ 	/* Copy the default MAC and PHY function pointers */
+ 	memcpy(&hw->mac.ops, ei->mac_ops, sizeof(hw->mac.ops));
+ 	memcpy(&hw->phy.ops, ei->phy_ops, sizeof(hw->phy.ops));
 -- 
 2.47.1
 
