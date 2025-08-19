@@ -1,231 +1,169 @@
-Return-Path: <netdev+bounces-215041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 949D3B2CDAD
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 22:18:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55D27B2CDBA
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 22:21:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 174801C40F11
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 20:17:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 100783AFEBB
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 20:21:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08013341AA0;
-	Tue, 19 Aug 2025 20:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3489F310635;
+	Tue, 19 Aug 2025 20:21:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I/9mfs/P"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kXym7sMQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED0AF340DBD
-	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 20:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88878273D6D;
+	Tue, 19 Aug 2025 20:21:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755634555; cv=none; b=bvPA00/ILumudEVFM5cHi/5nfDFOCzaAVwS77Z/1/l4JV/5g01jzIXWxQyDGl8pAKgXPX0slfM875x165kZJ2vX6o17X1YlUVVzvi2t0WgPcYJGSC2WOZZ2acZV6+VUsBZ00+xfO0bhfWyJFTb2DEYP8hUPpGNtc1/Aw/0g8uNY=
+	t=1755634907; cv=none; b=akrT0hFIHY5Hu2D5nFCo1cM86L2SJRnd5nKNpYpD78PcnzSbYmnKZaiCoVRBhExlCEDh3lfqJLHxPYZXIC/d0pZPjZjl2jfbENOONz/+jpovsNiA683mnT+hHn9nxSG/RhqNOPXbzxpdKb4NY1NyLIyeXIaA7Kn2GYEwBgFfKqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755634555; c=relaxed/simple;
-	bh=haNt1ynrBslWuNN9po1WS/VqpVcCCWlCBE37zYZJkZY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JTPuUCBMBsWziW0m+hz9WQIK1/AhhPYRTMsCJwicgqQ2vAMYzjhTwgok8IdogqGn49PA+gbm1IsI8+iGRW6jyyV9BRsVIpnkjZLMgWVzz8Z7zpEivuED2tDdD8Jz+1HOehgD4Ltora0ddhPs/omSCyUgT1LnUm5ukjl/d5KPfys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I/9mfs/P; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-55cef2f624fso1727e87.1
-        for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 13:15:53 -0700 (PDT)
+	s=arc-20240116; t=1755634907; c=relaxed/simple;
+	bh=JmwDj0yM2hIxDCp945snAW1tIJFxf+MqSewCaUoodss=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=p1SEXsCM1JCs4/aiugOT8P0ZGi24Y1+0qGN1wopIeIwLaWnEDAMvS6YoaUhgBkHRQR5Gqbg3HIP/HSW3D4Bg/DYuoi8jzIb1xbq+lhCZRBD9De27tG5KPlVRrLVfN9uRHwh0oLkCfWo5XlTYHkAv14k6zJlLNEt4cgPP0hCquAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kXym7sMQ; arc=none smtp.client-ip=209.85.217.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-50f8ac28305so1634685137.2;
+        Tue, 19 Aug 2025 13:21:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755634552; x=1756239352; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1755634904; x=1756239704; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5ZMXm24uetgG6qUHWYUnf6IXKxtAndMosq8RvrZUKXE=;
-        b=I/9mfs/PHAGZt8YkAqfLpi4PE+blLDReBlDuEI3RqONOhVw1dGX4jG0muHA+IeXKCZ
-         qhk+S4LRxSX1K6b/8dZXlQ3vd7BTce8yNO7pkLwMwfginHA4pM7A5V14N0KagKwIdBA+
-         nrGxp8jwOybRPa6nbHPAwPJ41VB1TtRK1BRiMSjdwnqJ0K1B3wRZ5+bcYyMrBFUeix+O
-         7ymGb9fjpuYBoOAtqUdPzIb7iRLyUrakp2Ifld16hzr87UgfLrJhUsLeFO03HGsPL7FZ
-         IuL+wZdzB2NanxW6xPs5/L10dP4pBLMCyeQsyHeFlwtvTiBCGLE4B1N4AymvzTxJVHQF
-         OjTA==
+        bh=ErXHqYgIOywZbhEmGRe/ErbrEiUlQahOfnrKJ/dVBS8=;
+        b=kXym7sMQWH8RB444zFBgw+QATLySe6glH/b5qxhUK0pzAKhL1/plvjVqNE2j97sRl5
+         6QwMygP+aXbpThTsD7vNWQe//e4IcJViCMSyADCbcxaNCsF0b0dSA+dTabQawrOcE97t
+         Be2F3C4HHMpqcXGM5O8Pf3WudDDW2M6Kd2tjJvU+A0iX6bO/XrVAMccjPJHWqBhE3cmi
+         Nak/2PAxwUNL70GyiK4nkDVs3GWGEKUFZMUZHRIeqDhJt1OLzFkutbR45puyEKbCvKn4
+         jqHuYPEd49m3tQs/7uv7pxfalmXDlT81TgD9A0/mCWxv14bqWwTiOZ29a+nJ3bLbxKIk
+         QB+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755634552; x=1756239352;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5ZMXm24uetgG6qUHWYUnf6IXKxtAndMosq8RvrZUKXE=;
-        b=vk+G66cSrfAIpQb64D6dFyz+oxZUTNdc5lj/duhVYPecZiW5+dM5zUXMiC1wtMyD6U
-         Nr7KIlY1pMPWdGcyhijl2PzreyLkqoCZRyQHuxFvFo8LjRCG7rwIpTo+WeG+pKba3DhR
-         7pNVgjmd3LpHc3pKDCUZLOigPmAkMYnUsVhMMuzscu0rZvHdM9BytvE7xuwMOTwWD9Gi
-         /V4pq3/5WvXJtJZViCIuXmv1C39agXYXRbzaZPSjX6PGSRPwWxjin52dygu8bmwdR1/P
-         tkR6b2GMAd0PUle/Yh5pJTdzJZuudoNKLNwnXfpuqCDCyqva0YPXfFYPJMv43Hqw3wLT
-         B0rg==
-X-Forwarded-Encrypted: i=1; AJvYcCW+vpvPdjMdAuL+bbXfkh4ijv7kBkD6f/ULqRvpdt3N/szZggfT5jXk0EJrcjGBmlOLPTzIaYY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVZy7ribyTrtp5DdLDo9G4F4+ydnpPlXFctUfk9Yk77BfEgVk7
-	yR8H7RbYnIYO2kDAhBZkVStAEY5cIAgNWyCils7zGDkEI7/HTRNSN4fVMy1oj9vyjAd//uWHGzP
-	2uEQnhEelQy5bYog9P//joix/wUsYf4Ii0BtMMHX0
-X-Gm-Gg: ASbGncsDHUrAsgqnsIQ9PH4+Sjqd5X+gayOwlxMH8Oqh7OVGql696TZqGL00V4bf455
-	inKZQ5ZhdQLH9opQCI2iBwnzdzmMXyKrgCuSm072w2SETGf7c8VVH3i0y1mB79svr0B6A8+0X/K
-	i71aaamTd3E7WOvJILEanBP2uyRrW2b5OIXAIf7+AJFgd6Ft2mex1UDoObUbFkEVj8Gj+cBPsuB
-	g+I8X4CwJM2H/P+eu/A6wGGS8eFPJFA5gq2bhMtJsD0yO3VN+zTT0U=
-X-Google-Smtp-Source: AGHT+IGOTSfoGmYaePWoFD5+meo3XBb2vpfJQKqJ4JTBJP5htoWmfFQaOrBPMHZxzbYyZtrHwdJp4c1LpY5fBwKAiAM=
-X-Received: by 2002:a05:6512:609b:b0:55d:9f5:8846 with SMTP id
- 2adb3069b0e04-55e066ac51cmr50748e87.0.1755634551686; Tue, 19 Aug 2025
- 13:15:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1755634904; x=1756239704;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ErXHqYgIOywZbhEmGRe/ErbrEiUlQahOfnrKJ/dVBS8=;
+        b=f9MycN94hZ253CUYyXA+DRmwdbddJ+RCVCPdNuGOkv37sDnRn2CSmnFLextR1B2o0o
+         RajSJVPGSDvFaBPpYf2q8iboiskB98B+GwNm5Gbjc02LQlXh4iF68D4BovG7T16lGaIq
+         R9D2vzMLP9f+WbMCyIR9XFhmMS2iVDp5eqjHFPmpC7PHHvqk4sbCcW1pugvnMQVvoFYQ
+         QHNdwlxf87dVF1LeMaUWTXzRoL0K2CEqLRxU0nyRyXMiguI7QT1sNT4wwa6ge0MVv0U8
+         UCsr9/BBSh1pWuDqXcDtYDzRdOBietnvnpFiWi355tXJIrAN1c2vtrkowf5NPR620b6h
+         Mf7g==
+X-Forwarded-Encrypted: i=1; AJvYcCVdOTXAI+XtkWabZJeU1smwJfyienfH4jUI94Gugngkqc2k3JkCO5TaVufaGryaK3/yoi2YuszKZHHgq8M=@vger.kernel.org, AJvYcCWM39exxLFueXZaeg6Q5YunqiSsed8sUOe4B375polTa9Y4GKjdvVGRWU254upiMfnTwlIMNHBc@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSd1lpgLkZ50Ovn50oZ/4IPlAzM69QIXJFrBSEKrj2TE/9xKMG
+	w0qYLrA29ULoOQmooWeKeLf4dVbmo1WOtSxCZYCUwljLoh+BroTpOFL9
+X-Gm-Gg: ASbGncsiIoIwSJipUPey4YlSa9/lZDDlL7gSl737AlKoFJ3lSANiLRWXc9jj/QgsL7z
+	tDCqQAWDEMmtS88e99OIKCWZtgS9o3UkHp3J4dk4U1DJEPvLWKbcy+12G+x3q0Z2PSAHtVekHS4
+	l6muw3+e4izLgw1xKfBMoG8Vpswnm5xRXdurEyUR1E+1hGwyf7lOKCMiwJbi4BL+EZJ+X/55zc5
+	D6ehmdbjFbqTYYG+q1tmA0PeWxxTbPb1URsRXDtVdIdzEAhhehVrFA7WEe7+ucX/uCSEXGX5J0W
+	qDly+BqDcxd/sT1evSHsj0rWygY/ATgxTlIlW4xj7qu+oKn9SOlISbYMQ00yFWhGkCpWbK63anG
+	33DnxNbt9FUKoRO1MmKlEXggrGScdKvzSQuHYmE7uNjQR0rURizGWjUxw9jKG8puy+wzMvA==
+X-Google-Smtp-Source: AGHT+IFq5Fb+q6BwoXTONR8NfLqJRLAaqNnVbQWhZLboOUU4G8eeT+JswvN12+19Oc8bDG+85E18Yw==
+X-Received: by 2002:a05:6102:5128:b0:4fb:f2ff:dd16 with SMTP id ada2fe7eead31-51a51ebe471mr181179137.17.1755634904269;
+        Tue, 19 Aug 2025 13:21:44 -0700 (PDT)
+Received: from gmail.com (128.5.86.34.bc.googleusercontent.com. [34.86.5.128])
+        by smtp.gmail.com with UTF8SMTPSA id ada2fe7eead31-5127f80546fsm3109808137.14.2025.08.19.13.21.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Aug 2025 13:21:43 -0700 (PDT)
+Date: Tue, 19 Aug 2025 16:21:43 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Xin Zhao <jackzxcui1989@163.com>, 
+ willemdebruijn.kernel@gmail.com, 
+ edumazet@google.com, 
+ ferenc@fejes.dev
+Cc: davem@davemloft.net, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ horms@kernel.org, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Xin Zhao <jackzxcui1989@163.com>
+Message-ID: <willemdebruijn.kernel.85f8d3f87b8b@gmail.com>
+In-Reply-To: <willemdebruijn.kernel.1a86f7d92a05a@gmail.com>
+References: <20250819091447.1199980-1-jackzxcui1989@163.com>
+ <willemdebruijn.kernel.1a86f7d92a05a@gmail.com>
+Subject: Re: [PATCH net-next v5] net: af_packet: Use hrtimer to do the retire
+ operation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <cover.1755499375.git.asml.silence@gmail.com> <536e37960e3d75c633bdcdcfec37a89636581f2c.1755499376.git.asml.silence@gmail.com>
-In-Reply-To: <536e37960e3d75c633bdcdcfec37a89636581f2c.1755499376.git.asml.silence@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 19 Aug 2025 13:15:37 -0700
-X-Gm-Features: Ac12FXyFNa4-6VDkMH60R1X9jCiq4Lpoo0jyzvsCmWd87zW1qTO99gzjyPNMFJA
-Message-ID: <CAHS8izPWODE0sdVe0KTT69Wm8-LJLnXGjNFi+j77PrVGzK1FgQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 10/23] net: move netdev_config manipulation to
- dedicated helpers
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, andrew+netdev@lunn.ch, horms@kernel.org, 
-	davem@davemloft.net, sdf@fomichev.me, dw@davidwei.uk, 
-	michael.chan@broadcom.com, dtatulea@nvidia.com, ap420073@gmail.com, 
-	linux-kernel@vger.kernel.org, io-uring@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Aug 18, 2025 at 6:56=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.=
-com> wrote:
->
-> From: Jakub Kicinski <kuba@kernel.org>
->
-> netdev_config manipulation will become slightly more complicated
-> soon and we will need to call if from ethtool as well as queue API.
-> Encapsulate the logic into helper functions.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> ---
->  net/core/Makefile        |  2 +-
->  net/core/dev.c           |  7 ++-----
->  net/core/dev.h           |  5 +++++
->  net/core/netdev_config.c | 43 ++++++++++++++++++++++++++++++++++++++++
->  net/ethtool/netlink.c    | 14 ++++++-------
->  5 files changed, 57 insertions(+), 14 deletions(-)
->  create mode 100644 net/core/netdev_config.c
->
-> diff --git a/net/core/Makefile b/net/core/Makefile
-> index b2a76ce33932..4db487396094 100644
-> --- a/net/core/Makefile
-> +++ b/net/core/Makefile
-> @@ -19,7 +19,7 @@ obj-$(CONFIG_NETDEV_ADDR_LIST_TEST) +=3D dev_addr_lists=
-_test.o
->
->  obj-y +=3D net-sysfs.o
->  obj-y +=3D hotdata.o
-> -obj-y +=3D netdev_rx_queue.o
-> +obj-y +=3D netdev_config.o netdev_rx_queue.o
->  obj-$(CONFIG_PAGE_POOL) +=3D page_pool.o page_pool_user.o
->  obj-$(CONFIG_PROC_FS) +=3D net-procfs.o
->  obj-$(CONFIG_NET_PKTGEN) +=3D pktgen.o
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 5a3c0f40a93f..7cd4e5eab441 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -11873,10 +11873,8 @@ struct net_device *alloc_netdev_mqs(int sizeof_p=
-riv, const char *name,
->         if (!dev->ethtool)
->                 goto free_all;
->
-> -       dev->cfg =3D kzalloc(sizeof(*dev->cfg), GFP_KERNEL_ACCOUNT);
-> -       if (!dev->cfg)
-> +       if (netdev_alloc_config(dev))
->                 goto free_all;
-> -       dev->cfg_pending =3D dev->cfg;
->
->         dev->num_napi_configs =3D maxqs;
->         napi_config_sz =3D array_size(maxqs, sizeof(*dev->napi_config));
-> @@ -11947,8 +11945,7 @@ void free_netdev(struct net_device *dev)
->                 return;
->         }
->
-> -       WARN_ON(dev->cfg !=3D dev->cfg_pending);
-> -       kfree(dev->cfg);
-> +       netdev_free_config(dev);
->         kfree(dev->ethtool);
->         netif_free_tx_queues(dev);
->         netif_free_rx_queues(dev);
-> diff --git a/net/core/dev.h b/net/core/dev.h
-> index d6b08d435479..7041c8bd2a0f 100644
-> --- a/net/core/dev.h
-> +++ b/net/core/dev.h
-> @@ -92,6 +92,11 @@ extern struct rw_semaphore dev_addr_sem;
->  extern struct list_head net_todo_list;
->  void netdev_run_todo(void);
->
-> +int netdev_alloc_config(struct net_device *dev);
-> +void __netdev_free_config(struct netdev_config *cfg);
-> +void netdev_free_config(struct net_device *dev);
-> +int netdev_reconfig_start(struct net_device *dev);
-> +
->  /* netdev management, shared between various uAPI entry points */
->  struct netdev_name_node {
->         struct hlist_node hlist;
-> diff --git a/net/core/netdev_config.c b/net/core/netdev_config.c
-> new file mode 100644
-> index 000000000000..270b7f10a192
-> --- /dev/null
-> +++ b/net/core/netdev_config.c
-> @@ -0,0 +1,43 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +
-> +#include <linux/netdevice.h>
-> +#include <net/netdev_queues.h>
-> +
-> +#include "dev.h"
-> +
-> +int netdev_alloc_config(struct net_device *dev)
-> +{
-> +       struct netdev_config *cfg;
-> +
-> +       cfg =3D kzalloc(sizeof(*dev->cfg), GFP_KERNEL_ACCOUNT);
-> +       if (!cfg)
-> +               return -ENOMEM;
-> +
-> +       dev->cfg =3D cfg;
-> +       dev->cfg_pending =3D cfg;
-> +       return 0;
-> +}
-> +
-> +void __netdev_free_config(struct netdev_config *cfg)
-> +{
-> +       kfree(cfg);
-> +}
-> +
-> +void netdev_free_config(struct net_device *dev)
-> +{
-> +       WARN_ON(dev->cfg !=3D dev->cfg_pending);
-> +       __netdev_free_config(dev->cfg);
-> +}
-> +
-> +int netdev_reconfig_start(struct net_device *dev)
-> +{
-> +       struct netdev_config *cfg;
-> +
-> +       WARN_ON(dev->cfg !=3D dev->cfg_pending);
-> +       cfg =3D kmemdup(dev->cfg, sizeof(*dev->cfg), GFP_KERNEL_ACCOUNT);
-> +       if (!cfg)
-> +               return -ENOMEM;
-> +
-> +       dev->cfg_pending =3D cfg;
-> +       return 0;
+Willem de Bruijn wrote:
+> Xin Zhao wrote:
+> > In a system with high real-time requirements, the timeout mechanism of
+> > ordinary timers with jiffies granularity is insufficient to meet the
+> > demands for real-time performance. Meanwhile, the optimization of CPU
+> > usage with af_packet is quite significant. Use hrtimer instead of timer
+> > to help compensate for the shortcomings in real-time performance.
+> > In HZ=100 or HZ=250 system, the update of TP_STATUS_USER is not real-time
+> > enough, with fluctuations reaching over 8ms (on a system with HZ=250).
+> > This is unacceptable in some high real-time systems that require timely
+> > processing of network packets. By replacing it with hrtimer, if a timeout
+> > of 2ms is set, the update of TP_STATUS_USER can be stabilized to within
+> > 3 ms.
+> > 
+> > Signed-off-by: Xin Zhao <jackzxcui1989@163.com>
+> 
+> > -static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core *pkc)
+> > +static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core *pkc,
+> > +					     bool start, bool callback)
+> >  {
+> > -	mod_timer(&pkc->retire_blk_timer,
+> > -			jiffies + pkc->tov_in_jiffies);
+> > +	unsigned long flags;
+> > +
+> > +	local_irq_save(flags);
+> 
+> The two environments that can race are the timer callback running in
+> softirq context or the open_block from tpacket_rcv in process context.
 
-There are a couple of small behavior changes in this code. (a) the
-WARN_ON is new, and (b) this helper retains dev->cfg_pending on error
-while the old code would clear it. But both seem fine to me, so,
+I meant prb_open_block
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
+tpacket_rcv runs in softirq context (from __netif_receive_skb_core)
+or with bottom halves disabled (from __dev_queue_xmit, or if rx uses
+napi_threaded).
 
---
-Thanks,
-Mina
+That is likely why the spin_lock_bh variant is not explicitly needed.
+
+> So worst case the process context path needs to disable bh?
+> 
+> As you pointed out, the accesses to the hrtimer fields are already
+> protected, by the caller holding sk.sk_receive_queue.lock.
+> 
+> So it should be sufficient to just test hrtimer_is_queued inside that
+> critical section before calling hrtimer_start?
+> 
+> Side-note: tpacket_rcv calls spin_lock, not spin_lock_bh. But if the
+> same lock can also be taken in softirq context, the process context
+> caller should use the _bh variant. This is not new with your patch.
+> Classical timers also run in softirq context. I may be overlooking
+> something, will need to take a closer look at that.
+> 
+> In any case, I don't think local_irq_save is needed. 
+> 
+> > +	if (start && !callback)
+> > +		hrtimer_start(&pkc->retire_blk_timer, pkc->interval_ktime,
+> > +			      HRTIMER_MODE_REL_SOFT);
+> > +	else
+> > +		hrtimer_forward_now(&pkc->retire_blk_timer, pkc->interval_ktime);
+> > +	local_irq_restore(flags);
+> >  	pkc->last_kactive_blk_num = pkc->kactive_blk_num;
+> >  }
+
+
 
