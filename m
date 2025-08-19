@@ -1,178 +1,144 @@
-Return-Path: <netdev+bounces-214998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12987B2C8A3
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 17:41:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B866FB2C8B6
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 17:49:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF86C1C20685
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 15:42:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C17635286B3
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 15:49:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 247C0220F38;
-	Tue, 19 Aug 2025 15:41:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22DCF2820CE;
+	Tue, 19 Aug 2025 15:48:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KPCQK9EN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE9D24676D
-	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 15:41:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6CF5207A18
+	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 15:48:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755618099; cv=none; b=Mt3uS58G5yHSbeac8eKf65TxNBAYKSnlnAy6qp6UWNgJ9CoRO1a2sYGeGiI5NRa+n2sQpnmSsegsij84VH8dnTSvkzBpUsKPZGck5qvBEH0lslIiUGo9J7xwd0lIinViv9NNZWTclaH55o+vyjRuQUKc1RZU89dD26e7sxZoBRY=
+	t=1755618539; cv=none; b=DR+TW7L7ysKG+aiDayUCDAtHYFkja2gcpby7i6Kdxtn9Z1iuWQG96G5zA0dPdhUYm9wDLLREO2Nv6iccVko8u7H+gHRw8soHp9+FRuDxnmML0iVkcowP7nHJV8FLxbreAMuCnpLo5wBME7SQye71ks5hFc8P+MsTDi9it8rowDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755618099; c=relaxed/simple;
-	bh=6ny1+oLcix0Cm5LRZzNnGgVardq6Yu2NbGyuh2E9un0=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=XvQMs/3Yv/f44t+Mv7K+6+5dcCeZdo80DLaoUixPHRiA5KearBKiQr3jXxMTSIeIlPdo/KPJ5ZRfdEipJGjtFZDlt9niSdqIw3kAGXJKWy4lgBSmiYjtvfnTzbLtJQ3fnQ6wngwiMBDu1/Fd5ozziCxy8iWyD5SzC6sku+OO7e4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3e5758168ffso52801505ab.2
-        for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 08:41:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755618096; x=1756222896;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zGjRr1cYGEj54QjHL1/VNSj13OPwrMZdB0ipo2v3hKA=;
-        b=fa932uJKiAr9GPp2+FkCAEVuGzkbymzwdN9CLiXe4fsucuAbO3Z2XiEEKNpfPYqVNG
-         Z8ek9hQQo9cPgTQip7A/Uw6IW9P6AFYWHgtlVzejiYQry2NS6K43JYlD4QKad4wzO9/D
-         AbgPbe/rBzxKCcSxgQ9fiZeKOkc113gF1qbEKrPMCpbzQWWZ3vhQbJwntqzinoqxut+a
-         hS/LKOJMnNZusBgqbSTjUS3Bu5Sh5WPxpIs2sApc8MVznmFTQQkwKGIvshAp890ivlB4
-         TpHrvSTMHlbme9BRMwbYLkbRf3CLBwg2sgRUs9NsqlCNh8K9J9WskS/xgvVu78rPygV+
-         CzeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWDbxYucgFboi/3X26dS4981PCiafz338U/4xDVzJQanFh5mC8OlTgKJv0QgFvftMHiGfS7hFo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9HrULrgRdlkKTjNd/wKRWzk5+dWH+vSJqFnVNGaX8+dNsX3nh
-	Woo8G6KteurpQWFRuDsJQGAlgbYHGUU4rs6de6DZNhn/UhR6iYt2gVjokWHyf0+IcHEvDE3sHmq
-	VXAEsZQ9e4Df1NZ38mJpv54njA8KXzltsP64x/HLfSs8LW5uz3QiUdNLQTIc=
-X-Google-Smtp-Source: AGHT+IHX9l3izd1NoI9wLCzZARGcN2wtOytN4Ai4R7nzgvLtL+HnR4xPZxIdSZiyC7eK7BYeAJE0oC3ZipCi3JK8uoiSQ5lu2Xik
+	s=arc-20240116; t=1755618539; c=relaxed/simple;
+	bh=j6wM/SgJMkvJoI+6V8/dUD1+fFpnKMaohYKn6PzgK6w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=erquXTU0TwZHBfPrsq3e5veOxCCygin6HNWbzDQDuHj6rEkA7AIxNCbem52sO/uKjkoJoSCKu5wHLcCu16OV96/e76cDvnJF2M6hrNZ5PMZzAmK/TTNYSdgoxFu9ftomxFhB7+In5sS4K2wb/FMXwww0Vs3V7B3Q5fLd8Rk6vOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KPCQK9EN; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <41651550-4e63-4699-b10f-ba2e8cfbc0a3@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1755618524;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fANgjc2IIsKedMP7E9vOPJjvlcpxmZDjKWRIxAOqvVk=;
+	b=KPCQK9ENPL9cG2flPirxiQNDaxft4AQQvBTzXcyr52IqlFf5aeoriOBG7IPgARAiSzbg/I
+	FmG2xUQ3IkiyPO8FgDM1WdrGvZ/T4lKn04ynKxRPcfiu+01kMKAoyYdIOwe3F9fm26YGw4
+	wcXO3l+JIK3BpMVK2RBc7Uc7NKQhGvg=
+Date: Tue, 19 Aug 2025 16:48:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1947:b0:3e5:83c5:fe10 with SMTP id
- e9e14a558f8ab-3e6764f2d64mr41844415ab.0.1755618096385; Tue, 19 Aug 2025
- 08:41:36 -0700 (PDT)
-Date: Tue, 19 Aug 2025 08:41:36 -0700
-In-Reply-To: <20250818154032.3173645-1-sdf@fomichev.me>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68a49b30.050a0220.e29e5.00c8.GAE@google.com>
-Subject: [syzbot ci] Re: net: Convert to skb_dstref_steal and skb_dstref_restore
-From: syzbot ci <syzbot+ci77a5caa9fce14315@syzkaller.appspotmail.com>
-To: abhishektamboli9@gmail.com, andrew@lunn.ch, ayush.sawal@chelsio.com, 
-	coreteam@netfilter.org, davem@davemloft.net, dsahern@kernel.org, 
-	edumazet@google.com, fw@strlen.de, gregkh@linuxfoundation.org, 
-	herbert@gondor.apana.org.au, horms@kernel.org, kadlec@netfilter.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-staging@lists.linux.dev, 
-	mhal@rbox.co, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	pabeni@redhat.com, pablo@netfilter.org, sdf@fomichev.me, 
-	steffen.klassert@secunet.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v4 net-next 04/15] ptp: netc: add NETC V4 Timer PTP driver
+ support
+To: Wei Fang <wei.fang@nxp.com>, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, richardcochran@gmail.com, claudiu.manoil@nxp.com,
+ vladimir.oltean@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, Frank.Li@nxp.com, shawnguo@kernel.org,
+ s.hauer@pengutronix.de, festevam@gmail.com
+Cc: fushi.peng@nxp.com, devicetree@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, imx@lists.linux.dev, kernel@pengutronix.de
+References: <20250819123620.916637-1-wei.fang@nxp.com>
+ <20250819123620.916637-5-wei.fang@nxp.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20250819123620.916637-5-wei.fang@nxp.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-syzbot ci has tested the following series
+On 19/08/2025 13:36, Wei Fang wrote:
+> NETC V4 Timer provides current time with nanosecond resolution, precise
+> periodic pulse, pulse on timeout (alarm), and time capture on external
+> pulse support. And it supports time synchronization as required for
+> IEEE 1588 and IEEE 802.1AS-2020.
+> 
+> Inside NETC, ENETC can capture the timestamp of the sent/received packet
+> through the PHC provided by the Timer and record it on the Tx/Rx BD. And
+> through the relevant PHC interfaces provided by the driver, the enetc V4
+> driver can support PTP time synchronization.
+> 
+> In addition, NETC V4 Timer is similar to the QorIQ 1588 timer, but it is
+> not exactly the same. The current ptp-qoriq driver is not compatible with
+> NETC V4 Timer, most of the code cannot be reused, see below reasons.
+> 
+> 1. The architecture of ptp-qoriq driver makes the register offset fixed,
+> however, the offsets of all the high registers and low registers of V4
+> are swapped, and V4 also adds some new registers. so extending ptp-qoriq
+> to make it compatible with V4 Timer is tantamount to completely rewriting
+> ptp-qoriq driver.
+> 
+> 2. The usage of some functions is somewhat different from QorIQ timer,
+> such as the setting of TCLK_PERIOD and TMR_ADD, the logic of configuring
+> PPS, etc., so making the driver compatible with V4 Timer will undoubtedly
+> increase the complexity of the code and reduce readability.
+> 
+> 3. QorIQ is an expired brand. It is difficult for us to verify whether
+> it works stably on the QorIQ platforms if we refactor the driver, and
+> this will make maintenance difficult, so refactoring the driver obviously
+> does not bring any benefits.
+> 
+> Therefore, add this new driver for NETC V4 Timer. Note that the missing
+> features like PEROUT, PPS and EXTTS will be added in subsequent patches.
+> 
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> 
+[...]
 
-[v2] net: Convert to skb_dstref_steal and skb_dstref_restore
-https://lore.kernel.org/all/20250818154032.3173645-1-sdf@fomichev.me
-* [PATCH net-next v2 1/7] net: Add skb_dstref_steal and skb_dstref_restore
-* [PATCH net-next v2 2/7] xfrm: Switch to skb_dstref_steal to clear dst_entry
-* [PATCH net-next v2 3/7] netfilter: Switch to skb_dstref_steal to clear dst_entry
-* [PATCH net-next v2 4/7] net: Switch to skb_dstref_steal/skb_dstref_restore for ip_route_input callers
-* [PATCH net-next v2 5/7] staging: octeon: Convert to skb_dst_drop
-* [PATCH net-next v2 6/7] chtls: Convert to skb_dst_reset
-* [PATCH net-next v2 7/7] net: Add skb_dst_check_unset
+>   drivers/ptp/Kconfig             |  11 +
+>   drivers/ptp/Makefile            |   1 +
+>   drivers/ptp/ptp_netc.c          | 416 ++++++++++++++++++++++++++++++++
+>   include/linux/fsl/netc_global.h |   3 +-
+>   4 files changed, 430 insertions(+), 1 deletion(-)
+>   create mode 100644 drivers/ptp/ptp_netc.c
 
-and found the following issue:
-WARNING in nf_reject_fill_skb_dst
+[...]
 
-Full report is available here:
-https://ci.syzbot.org/series/74fec874-bca1-42a5-bb58-f3f49b95e348
+> diff --git a/include/linux/fsl/netc_global.h b/include/linux/fsl/netc_global.h
+> index fdecca8c90f0..763b38e05d7d 100644
+> --- a/include/linux/fsl/netc_global.h
+> +++ b/include/linux/fsl/netc_global.h
+> @@ -1,10 +1,11 @@
+>   /* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
+> -/* Copyright 2024 NXP
+> +/* Copyright 2024-2025 NXP
+>    */
+>   #ifndef __NETC_GLOBAL_H
+>   #define __NETC_GLOBAL_H
+>   
+>   #include <linux/io.h>
+> +#include <linux/pci.h>
 
-***
+What is the reason to include it header file? You need PCI functions
+only in ptp_netc.c, but this header is also included in a couple of
+other files (netc_blk_ctrl.c, ntmp.c).
 
-WARNING in nf_reject_fill_skb_dst
-
-tree:      net-next
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
-base:      8159572936392b514e404bab2d60e47cebd5acfe
-arch:      amd64
-compiler:  Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-config:    https://ci.syzbot.org/builds/10161afb-c9c1-4272-851c-1ded15995879/config
-C repro:   https://ci.syzbot.org/findings/7f681f6a-9952-49a0-8533-0bc185291f81/c_repro
-syz repro: https://ci.syzbot.org/findings/7f681f6a-9952-49a0-8533-0bc185291f81/syz_repro
-
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 5862 at ./include/linux/skbuff.h:1165 skb_dst_check_unset include/linux/skbuff.h:1164 [inline]
-WARNING: CPU: 1 PID: 5862 at ./include/linux/skbuff.h:1165 skb_dst_set include/linux/skbuff.h:1211 [inline]
-WARNING: CPU: 1 PID: 5862 at ./include/linux/skbuff.h:1165 nf_reject_fill_skb_dst+0x2a4/0x330 net/ipv4/netfilter/nf_reject_ipv4.c:234
-Modules linked in:
-CPU: 1 UID: 0 PID: 5862 Comm: kworker/u8:2 Not tainted 6.17.0-rc1-syzkaller-00207-g815957293639-dirty #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Workqueue: ipv6_addrconf addrconf_dad_work
-RIP: 0010:skb_dst_check_unset include/linux/skbuff.h:1164 [inline]
-RIP: 0010:skb_dst_set include/linux/skbuff.h:1211 [inline]
-RIP: 0010:nf_reject_fill_skb_dst+0x2a4/0x330 net/ipv4/netfilter/nf_reject_ipv4.c:234
-Code: 8b 0d 60 75 8b 08 48 3b 8c 24 e0 00 00 00 75 5d 48 8d 65 d8 5b 41 5c 41 5d 41 5e 41 5f 5d e9 03 91 67 01 cc e8 ad d0 aa f7 90 <0f> 0b 90 e9 38 ff ff ff 44 89 f9 80 e1 07 fe c1 38 c1 0f 8c 2b fe
-RSP: 0018:ffffc900001e0360 EFLAGS: 00010246
-RAX: ffffffff8a14dae3 RBX: ffff88810f943b00 RCX: ffff888109618000
-RDX: 0000000000000100 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: ffffc900001e0490 R08: ffffffff8fa37e37 R09: 1ffffffff1f46fc6
-R10: dffffc0000000000 R11: fffffbfff1f46fc7 R12: ffff88810ec56101
-R13: dffffc0000000001 R14: 1ffff9200003c070 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8881a3c1b000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000002f6a520 CR3: 0000000027716000 CR4: 00000000000006f0
-Call Trace:
- <IRQ>
- nf_send_unreach+0x17b/0x6e0 net/ipv4/netfilter/nf_reject_ipv4.c:325
- nft_reject_inet_eval+0x4bc/0x690 net/netfilter/nft_reject_inet.c:27
- expr_call_ops_eval net/netfilter/nf_tables_core.c:237 [inline]
- nft_do_chain+0x40c/0x1920 net/netfilter/nf_tables_core.c:285
- nft_do_chain_inet+0x25d/0x340 net/netfilter/nft_chain_filter.c:161
- nf_hook_entry_hookfn include/linux/netfilter.h:158 [inline]
- nf_hook_slow+0xc5/0x220 net/netfilter/core.c:623
- nf_hook include/linux/netfilter.h:273 [inline]
- NF_HOOK+0x206/0x3a0 include/linux/netfilter.h:316
- __netif_receive_skb_one_core net/core/dev.c:5979 [inline]
- __netif_receive_skb+0x143/0x380 net/core/dev.c:6092
- process_backlog+0x60e/0x14f0 net/core/dev.c:6444
- __napi_poll+0xc7/0x360 net/core/dev.c:7494
- napi_poll net/core/dev.c:7557 [inline]
- net_rx_action+0x707/0xe30 net/core/dev.c:7684
- handle_softirqs+0x286/0x870 kernel/softirq.c:579
- do_softirq+0xec/0x180 kernel/softirq.c:480
- </IRQ>
- <TASK>
- __local_bh_enable_ip+0x17d/0x1c0 kernel/softirq.c:407
- local_bh_enable include/linux/bottom_half.h:33 [inline]
- rcu_read_unlock_bh include/linux/rcupdate.h:910 [inline]
- __dev_queue_xmit+0x1d79/0x3b50 net/core/dev.c:4740
- neigh_output include/net/neighbour.h:547 [inline]
- ip6_finish_output2+0x11fe/0x16a0 net/ipv6/ip6_output.c:141
- NF_HOOK include/linux/netfilter.h:318 [inline]
- ndisc_send_skb+0xb96/0x1470 net/ipv6/ndisc.c:512
- ndisc_send_ns+0xcb/0x150 net/ipv6/ndisc.c:670
- addrconf_dad_work+0xaae/0x14b0 net/ipv6/addrconf.c:4282
- process_one_work kernel/workqueue.c:3236 [inline]
- process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3319
- worker_thread+0x8a0/0xda0 kernel/workqueue.c:3400
- kthread+0x711/0x8a0 kernel/kthread.c:463
- ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
+>   
+>   static inline u32 netc_read(void __iomem *reg)
+>   {
 
 
-***
 
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
