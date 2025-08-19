@@ -1,357 +1,339 @@
-Return-Path: <netdev+bounces-215021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 135C9B2C9EF
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 18:45:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F0CACB2CA8B
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 19:28:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83C14188BA0E
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 16:45:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76F7C1C20197
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 17:28:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45F2B27AC32;
-	Tue, 19 Aug 2025 16:45:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ChfL6moV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24B55304BBF;
+	Tue, 19 Aug 2025 17:27:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CC4A2EB87C;
-	Tue, 19 Aug 2025 16:45:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 134F82522B1;
+	Tue, 19 Aug 2025 17:27:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755621905; cv=none; b=Xl6iTh0mjz2+JhmhhJlt+sNTd2O8i1ThrieRZqoSW0SqQW3SZ4IcLuOgtMTGt230sgYRUWM23HrjJXhC7gUUfCJkai1y6MwDKgVlvq5EfaFtqwt2YSNK3dZOVG9NTGSVgPnn8vT6iBfOiFOeVnvE75BfLDaBlbIvtH78zy55mrg=
+	t=1755624475; cv=none; b=h3UOlhIqlfmYXsEN6QJwLETK8KGVxqI3YsTjdR9FXRQvwJ1lpK46wMWGKC4UXdJE9vG5UdyNepM6/+Jc3VjTlC5rXONUQEnYuJIyHE/E1r2kwgn+iptLvg//A2Utx1odWPPgCudNT9zAOBS4ovoED+3kAKQ0n/1IDmYVGhVeBhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755621905; c=relaxed/simple;
-	bh=MGk7Z3gUQ11nfLslZDfTaWLuhSDABjAjmiYBP4r9+Pg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X/40i7S8nKHb/hc9JRBXsbJVOz4OIfbKOnouwM5cq4rhzPIzbs0RLvNGcJXYt37whg8/cH+iMrU+XAvZk3ESVn8aK/E04/TxIf7o+ct15M5gvcqsX2g0ukAYJ0WjYZ3WIg3RDAPuvl3mdPiMwzBUnI/tLUn1vYnV5cF/uqYtE3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ChfL6moV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFEC4C4CEF1;
-	Tue, 19 Aug 2025 16:44:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755621904;
-	bh=MGk7Z3gUQ11nfLslZDfTaWLuhSDABjAjmiYBP4r9+Pg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ChfL6moVngWiTJ4Hf0ClbIczUIFKjROD3Lg3UTlTWVgmWae1nERjIifJqu/fvL8V9
-	 8YzEInbG9N8CsR/G9OEi2Y+eIHUz6jAK+9zWr0DBLc2FgFWCOQRf0VosG8tOzG+Ah0
-	 o9blvLZpZ0DG+Du1SXxQWEcrByehbnLbvCfNRNOl+kodgRdxKoV4aNnS63I1tYY1hw
-	 /ezBfmVPtNGLylbfJqOzSGHtbGCbNxpRUJljlEe3DW0yML27fygAZJX0iLDjyfyLGN
-	 PSL9OHqKSg40L/pNNKQow81B+SY1+tC47RsIFJ0+e41uu7AcmNVTTEkriObn1spgGa
-	 gys7peQrrLo/A==
-Message-ID: <6e2cbea1-8c70-4bfa-9ce4-1d07b545a705@kernel.org>
-Date: Tue, 19 Aug 2025 18:44:56 +0200
+	s=arc-20240116; t=1755624475; c=relaxed/simple;
+	bh=oumJVs5qzf00BH721SBK0mNWtZ+y5sCbArybiPDICsM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VB+iPyOcIQ0ZFYhdr/oZwaYbYj6vrE2FG2EVheFvgh4bHOY5lKyiJbWdM3r4EtxKDs0X8iWi/Hs0njFpWpLbBwZm/I5SOLt16/KyedkpJa6DLbBXFaHw7SjeVQ5iLdHWVReJKQIDpsbEQ4RcdNfPwcVJoXE2dxt1OZZwl2iAiPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-61a94bd82a5so444414a12.1;
+        Tue, 19 Aug 2025 10:27:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755624471; x=1756229271;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EytGZlIufGU0jmFPyiHa4qyR0eDz07YuVh2T1VLlp1Y=;
+        b=Ll0azUC64ebnXScfOIhnQ/nWF/BHbxMPhh7HfKHFL9KLkZLhX9VrFRFXTclKoLpXo/
+         BbbjK6e5BCN0M8R7Ze69Ag2d8aMVK6kz5S7wxqOjNbI0oTsGASpjtINDeroXpj4eEKvw
+         t0GLtyh8z6K59/pTUrj9dV2QHFjQvOdTidvya5c4j+AO+XVCAKLOjxWIjFM+iHmQ3Sq/
+         Z0LP4hsMwVmgZmD0kfOz2RQuIUFO1fhlz7byXsK6yeozOrJSXirenRpP+P0r1mvisGC5
+         P+7wTXLlZ7+hfzCHNhddEbKjrbwCMIDwKnBrkg+qcjNT7mU9+gAS0fOesD/fIQHnaxxo
+         kbHA==
+X-Forwarded-Encrypted: i=1; AJvYcCXHWVD5WRyuQZwOzYgoR5nUqqUUExTEzvKaimjcJExupNx4Wu9bQR8vO54dOlw67awtuItZLdrg@vger.kernel.org, AJvYcCXbUhIqKxFtwO5XG/Ed3OypQqd2GcZFdVquHZdMa/HT5134psHXbj6etSk+J4mkQtgHSclu8bNtCgxOVWw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGg8XN4+VxbzqY3Dbvq4tvUR7C1IPf/Jt+HNI2EpB8x7PYcfXL
+	52Yk360+7dZ3WDXuyq4+78hG/itGYioDyNMpEqOecBdAHfn7cuQPHvYnNglcVQ==
+X-Gm-Gg: ASbGncvzcZoVHAH69V2aEt07VwsTZcfotWiriTjGt6CXfzCp6+5RG4CDgoRx+QbVgha
+	tGIpemUmbv6jBpHcPzjZjVKIfIXj91a3+u42NJq9CmT4ElMhF1mdU92AF6tcuIXGZWFXqDqAp2G
+	DDvSd/9Fhym95UjWTJt4lm0qqIZG48wYUKVOXtuVaqvCmHGvDwbs4Ia0lM7/HemawS0rQxcVq5W
+	xWaAbU5VV34m18VamkR1OGqZWJQbVFLmhLqMSwy1ATBhmuRtPME5fuNptnJYLDOATPpgBoje6iI
+	pxM6gC8lPca76BywueZw9BsVVp2gISXXeCQPev8wTSdPjsHFYMK1RjvhNZS8M6wxqCTPLwVtwqS
+	WPfBw92QEA7qM84pBPI/dzBwpYchyZgwT2Q==
+X-Google-Smtp-Source: AGHT+IHxe2KQjChc6Bo/8cBcvjeISTZBWrwmf/r3NhA6p9RMlhQhwEgjv9OUKz1PmKlkaAXpadi1vw==
+X-Received: by 2002:a05:6402:5247:b0:615:6482:7498 with SMTP id 4fb4d7f45d1cf-61a9786a5cbmr119194a12.31.1755624471074;
+        Tue, 19 Aug 2025 10:27:51 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:4::])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-61a75794d0bsm2091155a12.46.2025.08.19.10.27.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Aug 2025 10:27:50 -0700 (PDT)
+Date: Tue, 19 Aug 2025 10:27:47 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, 
+	Johannes Berg <johannes@sipsolutions.net>, Mike Galbraith <efault@gmx.de>, paulmck@kernel.org, 
+	LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, boqun.feng@gmail.com
+Subject: Re: netconsole: HARDIRQ-safe -> HARDIRQ-unsafe lock order warning
+Message-ID: <b2qps3uywhmjaym4mht2wpxul4yqtuuayeoq4iv4k3zf5wdgh3@tocu6c7mj4lt>
+References: <fb38cfe5153fd67f540e6e8aff814c60b7129480.camel@gmx.de>
+ <oth5t27z6acp7qxut7u45ekyil7djirg2ny3bnsvnzeqasavxb@nhwdxahvcosh>
+ <20250814172326.18cf2d72@kernel.org>
+ <3d20ce1b-7a9b-4545-a4a9-23822b675e0c@gmail.com>
+ <20250815094217.1cce7116@kernel.org>
+ <isnqkmh36mnzm5ic5ipymltzljkxx3oxapez5asp24tivwtar2@4mx56cvxtrnh>
+ <3dd73125-7f9b-405c-b5cd-0ab172014d00@gmail.com>
+ <hyc64wbklq2mv77ydzfxcqdigsl33leyvebvf264n42m2f3iq5@qgn5lljc4m5y>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 3/6] ice: fix Rx page leak on multi-buffer frames
-To: Jacob Keller <jacob.e.keller@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>, ast@kernel.org,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org
-Cc: maciej.fijalkowski@intel.com, magnus.karlsson@intel.com,
- andrew+netdev@lunn.ch, daniel@iogearbox.net, john.fastabend@gmail.com,
- sdf@fomichev.me, bpf@vger.kernel.org, horms@kernel.org,
- przemyslaw.kitszel@intel.com, aleksander.lobakin@intel.com,
- jaroslav.pulchart@gooddata.com, jdamato@fastly.com,
- christoph.petrausch@deepl.com, Rinitha S <sx.rinitha@intel.com>,
- Priya Singh <priyax.singh@intel.com>, Eelco Chaudron <echaudro@redhat.com>,
- edumazet@google.com
-References: <20250815204205.1407768-1-anthony.l.nguyen@intel.com>
- <20250815204205.1407768-4-anthony.l.nguyen@intel.com>
- <3887332b-a892-42f6-9fde-782638ebc5f6@kernel.org>
- <dd8703a5-7597-493c-a5c7-73eac7ed67d5@intel.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <dd8703a5-7597-493c-a5c7-73eac7ed67d5@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <hyc64wbklq2mv77ydzfxcqdigsl33leyvebvf264n42m2f3iq5@qgn5lljc4m5y>
 
-
-
-On 19/08/2025 02.38, Jacob Keller wrote:
+On Mon, Aug 18, 2025 at 05:10:24AM -0700, Breno Leitao wrote:
+> On Fri, Aug 15, 2025 at 09:02:27PM +0100, Pavel Begunkov wrote:
+> > On 8/15/25 18:29, Breno Leitao wrote:
+> > > On Fri, Aug 15, 2025 at 09:42:17AM -0700, Jakub Kicinski wrote:
+> > > > On Fri, 15 Aug 2025 11:44:45 +0100 Pavel Begunkov wrote:
+> > > > > On 8/15/25 01:23, Jakub Kicinski wrote:
+> > > > 
+> > > > I suspect disabling netconsole over WiFi may be the most sensible way out.
+> > > 
+> > > I believe we might be facing a similar issue with virtio-net.
+> > > Specifically, any network adapter where TX is not safe to use in IRQ
+> > > context encounters this problem.
+> > > 
+> > > If we want to keep netconsole enabled on all TX paths, a possible
+> > > solution is to defer the transmission work when netconsole is called
+> > > inside an IRQ.
+> > > 
+> > > The idea is that netconsole first checks if it is running in an IRQ
+> > > context using in_irq(). If so, it queues the skb without transmitting it
+> > > immediately and schedules deferred work to handle the transmission
+> > > later.
+> > > 
+> > > A rough implementation could be:
+> > > 
+> > > static void send_udp(struct netconsole_target *nt, const char *msg, int len) {
+> > > 
+> > > 	/* get the SKB that is already populated, with all the headers
+> > > 	 * and ready to be sent
+> > > 	 */
+> > > 	struct sk_buff = netpoll_get_skb(&nt->np, msg, len);
+> > > 
+> > > 	if (in_irq()) {
+> > 
+> > It's not just irq handlers but any context that has irqs disabled, and
+> > since it's nested under irq-safe console_owner it'd need to always be
+> > deferred or somehow moved out of the console_owner critical section.
 > 
-> 
-> On 8/18/2025 4:05 AM, Jesper Dangaard Brouer wrote:
->> On 15/08/2025 22.41, Tony Nguyen wrote:
->>> This has the advantage that we also no longer need to track or cache the
->>> number of fragments in the rx_ring, which saves a few bytes in the ring.
->>>
->>
->> Have anyone tested the performance impact for XDP_DROP ?
->> (with standard non-multi-buffer frames)
->>
->> Below code change will always touch cache-lines in shared_info area.
->> Before it was guarded with a xdp_buff_has_frags() check.
->>
-> 
-> I did some basic testing with XDP_DROP previously using the xdp-bench
-> tool, and do not recall notice an issue. I don't recall the actual
-> numbers now though, so I did some quick tests again.
-> 
-> without patch...
-> 
-> Client:
-> $ iperf3 -u -c 192.168.93.1 -t86400 -l1200 -P20 -b5G
-> ...
-> [SUM]  10.00-10.33  sec   626 MBytes  16.0 Gbits/sec  546909
-> 
-> $ iperf3 -s -B 192.168.93.1%ens260f0
-> [SUM]   0.00-10.00  sec  17.7 GBytes  15.2 Gbits/sec  0.011 ms
-> 9712/15888183 (0.061%)  receiver
-> 
-> $ xdp-bench drop ens260f0
-> Summary                 1,778,935 rx/s                  0 err/s
-> Summary                 2,041,087 rx/s                  0 err/s
-> Summary                 2,005,052 rx/s                  0 err/s
-> Summary                 1,918,967 rx/s                  0 err/s
-> 
-> with patch...
-> 
-> Client:
-> $ iperf3 -u -c 192.168.93.1 -t86400 -l1200 -P20 -b5G
-> ...
-> [SUM]  78.00-78.90  sec  2.01 GBytes  19.1 Gbits/sec  1801284
-> 
-> Server:
-> $ iperf3 -s -B 192.168.93.1%ens260f0
-> [SUM]  77.00-78.00  sec  2.14 GBytes  18.4 Gbits/sec  0.012 ms
-> 9373/1921186 (0.49%)
-> 
-> xdp-bench:
-> $ xdp-bench drop ens260f0
-> Dropping packets on ens260f0 (ifindex 8; driver ice)
-> Summary                 1,910,918 rx/s                  0 err/s
-> Summary                 1,866,562 rx/s                  0 err/s
-> Summary                 1,901,233 rx/s                  0 err/s
-> Summary                 1,859,854 rx/s                  0 err/s
-> Summary                 1,593,493 rx/s                  0 err/s
-> Summary                 1,891,426 rx/s                  0 err/s
-> Summary                 1,880,673 rx/s                  0 err/s
-> Summary                 1,866,043 rx/s                  0 err/s
-> Summary                 1,872,845 rx/s                  0 err/s
-> 
-> 
-> I ran a few times and it seemed to waffle a bit around 15Gbit/sec to
-> 20Gbit/sec, with throughput varying regardless of which patch applied. I
-> actually tended to see slightly higher numbers with this fix applied,
-> but it was not consistent and hard to measure.
-> 
+> Agree. An IRQ-unsafe lock (fq lock) should not be reachable from an IRQ
+> disabled code path. So, one solution might be to always send TX packets
+> from a workqueue (unless it is on panic, as suggested by Calvin).
 
-Above testing is not a valid XDP_DROP test.
+I’ve continued investigating possible solutions, and it looks like
+moving netconsole over to the non‑blocking console (nbcon) framework
+might be the right approach. Unlike the classic console path, nbcon
+doesn’t rely on the global console lock, which was one of the main
+concerns regarding the possible deadlock.
 
-The packet generator need to be much much faster, as XDP_DROP is for
-DDoS protection use-cases (one of Cloudflare's main products).
+Migrating netconsole to nbcon was already on my TODO list, since nbcon
+is the modern infrastructure, but this issue accelerated that
+transition. I’ve put together a PoC, and so far I haven’t seen any
+lockdep warnings — even when explicitly triggering printk() from
+different contexts.
 
-I recommend using the script for pktgen in kernel tree:
-  samples/pktgen/pktgen_sample03_burst_single_flow.sh
-
-Example:
-  ./pktgen_sample03_burst_single_flow.sh -vi mlx5p2 -d 198.18.100.1 -m 
-b4:96:91:ad:0b:09 -t $(nproc)
+The new path is protected by NETCONSOLE_NBCON, which is disabled by
+default. This allows us to experiment and test both approaches.
 
 
-> without the patch:
+commit 9180c12086954d30b23ec2b4bbb7859aa1192aca
+Author: Breno Leitao <leitao@debian.org>
+Date:   Tue Aug 19 04:14:58 2025 -0700
 
-On my testlab with CPU: AMD EPYC 9684X (SRSO=IBPB) running:
-  - sudo ./xdp-bench drop ice4  # (defaults to no-touch)
+    netconsole: Add support for nbcon
+    
+    Add support for running netconsole using the new non‑blocking console
+    (nbcon) infrastructure.
+    
+    The nbcon framework improves console handling by avoiding the global
+    console lock and enabling asynchronous, non‑blocking writes from
+    multiple contexts.
+    
+    Key changes:
+       * Introduce CONFIG_NETCONSOLE_NBCON (EXPERIMENTAL, depends on
+         NETCONSOLE_EXTENDED_LOG && EXPERT) to enable nbcon mode.
+       * Split out do_write_msg() for chunked send logic, re‑used in both
+         sync and nbcon paths.
+       * Add .write_thread callbacks for normal and extended netconsole when
+         nbcon is enabled.
+       * Provide device_lock/unlock helpers wrapping target_list_lock for
+         safe nbcon integration.
+       * Keep existing synchronous .write paths as the default when nbcon
+         support is disabled, preserving backward compatibility.
+    
+    With this option enabled, netconsole can operate as a fully
+    asynchronous, lockless nbcon backend, not depending on console lock
+    anymore.
+    
+    This support is marked experimental for now until it receives wider
+    testing.
+    
+    This patch doesn't implement optional .write_atomic callbacks,
+    I initially implemented it to deferred the skbs, but, later I found that
+    even printks() from inside IRQs are sent using the .write_thread()
+    callback. Reading the code, I got the impression that .write_atomic
+    callback is only called from an atomic context and there is a write in
+    opertion, which might get interrupted (?). More on this soon.
+    
+    Signed-off-by: Breno Leitao <leitao@debian.org>
 
-XDP_DROP (with no-touch)
-  Without patch :  54,052,300 rx/s = 18.50 nanosec/packet
-  With the patch:  33,420,619 rx/s = 29.92 nanosec/packet
-  Diff: 11.42 nanosec
-
-Using perf stat I can see an increase in cache-misses.
-
-The difference is less, if we read-packet data, running:
-  - sudo ./xdp-bench drop ice4 --packet-operation read-data
-
-XDP_DROP (with read-data)
-  Without patch :  27,200,683 rx/s = 36.76 nanosec/packet
-  With the patch:  24,348,751 rx/s = 41.07 nanosec/packet
-  Diff: 4.31 nanosec
-
-On this CPU we don't have DDIO/DCA, so we take a big hit reading the
-packet data in XDP.  This will be needed by our DDoS bpf_prog.
-The nanosec diff isn't the same, so it seem this change can hide a
-little behind the cache-miss in the XDP bpf_prog.
-
-
-> Without xdp-bench running the XDP program, top showed a CPU usage of
-> 740% and an ~86 idle score.
-> 
-
-We don't want a scaling test for this. For this XDP_DROP/DDoS test we
-want to target a single CPU. This is easiest done by generating a single
-flow (hint pktgen script is called _single_flow). We want to see a
-single CPU running ksoftirqd 100% of the time.
-
-> With xdp-bench running, the iperf cpu drops off the top listing and the
-> CPU idle score goes up to 99.9
-> 
-
-With the single flow generator DoS "attacking" a single CPU, we want to
-see a single CPU running ksoftirqd 100% of the time, for XDP_DROP case.
-
-> 
-> with the patch:
-> 
-> The iperf3 CPU use seems to go up, but so does the throughput. It is
-> hard to get an isolated measure. I don't have an immediate setup for
-> fine tuned performance testing available to do anything more rigorous.
-> 
-> Personally, I think its overall in the noise, as I saw the same peak
-> performance and CPU usages with and without the patch.
-> 
-> I also tried testing TCP and also didn't see a significant difference
-> with or without the patch. Though, testing xdp-bench with TCP is not
-> that useful since the client stops transmitting once the packets are
-> dropped instead of handled.
-> 
-> $ iperf3 -c 192.168.93.1 -t86400 -l8000 -P5
-> 
-> Without patch:
-> [SUM]  24.00-25.00  sec  7.80 GBytes  67.0 Gbits/sec
-> 
-> With patch:
-> [SUM]  28.00-29.00  sec  7.85 GBytes  67.4 Gbits/sec
-> 
-> Again, it ranges from 60 to 68 Gbit/sec in both cases, though I think
-> the peak is slightly higher with the fix applied, sometimes I saw it
-> spike up to 70Gbit/sec but it mostly hovers around 67 Gbit/sec.
-> 
-> I'm sure theres a lot of factors impacting the performance here, but I
-> think there's not much evidence that its significantly different.
->>> Cc: Christoph Petrausch <christoph.petrausch@deepl.com>
->>> Reported-by: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
->>> Closes: https://lore.kernel.org/netdev/CAK8fFZ4hY6GUJNENz3wY9jaYLZXGfpr7dnZxzGMYoE44caRbgw@mail.gmail.com/
->>> Fixes: 743bbd93cf29 ("ice: put Rx buffers after being done with current frame")
->>> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
->>> Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
->>> Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
->>> Tested-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
->>> Tested-by: Priya Singh <priyax.singh@intel.com>
->>> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
->>> ---
->>>    drivers/net/ethernet/intel/ice/ice_txrx.c | 81 +++++++++--------------
->>>    drivers/net/ethernet/intel/ice/ice_txrx.h |  1 -
->>>    2 files changed, 33 insertions(+), 49 deletions(-)
->>>
->>> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
->>> index 29e0088ab6b2..93907ab2eac7 100644
->>> --- a/drivers/net/ethernet/intel/ice/ice_txrx.c
->>> +++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
->>> @@ -894,10 +894,6 @@ ice_add_xdp_frag(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
->>>    	__skb_fill_page_desc_noacc(sinfo, sinfo->nr_frags++, rx_buf->page,
->>>    				   rx_buf->page_offset, size);
->>>    	sinfo->xdp_frags_size += size;
->>> -	/* remember frag count before XDP prog execution; bpf_xdp_adjust_tail()
->>> -	 * can pop off frags but driver has to handle it on its own
->>> -	 */
->>> -	rx_ring->nr_frags = sinfo->nr_frags;
->>>    
->>>    	if (page_is_pfmemalloc(rx_buf->page))
->>>    		xdp_buff_set_frag_pfmemalloc(xdp);
->>> @@ -968,20 +964,20 @@ ice_get_rx_buf(struct ice_rx_ring *rx_ring, const unsigned int size,
->>>    /**
->>>     * ice_get_pgcnts - grab page_count() for gathered fragments
->>>     * @rx_ring: Rx descriptor ring to store the page counts on
->>> + * @ntc: the next to clean element (not included in this frame!)
->>>     *
->>>     * This function is intended to be called right before running XDP
->>>     * program so that the page recycling mechanism will be able to take
->>>     * a correct decision regarding underlying pages; this is done in such
->>>     * way as XDP program can change the refcount of page
->>>     */
->>> -static void ice_get_pgcnts(struct ice_rx_ring *rx_ring)
->>> +static void ice_get_pgcnts(struct ice_rx_ring *rx_ring, unsigned int ntc)
->>>    {
->>> -	u32 nr_frags = rx_ring->nr_frags + 1;
->>>    	u32 idx = rx_ring->first_desc;
->>>    	struct ice_rx_buf *rx_buf;
->>>    	u32 cnt = rx_ring->count;
->>>    
->>> -	for (int i = 0; i < nr_frags; i++) {
->>> +	while (idx != ntc) {
->>>    		rx_buf = &rx_ring->rx_buf[idx];
->>>    		rx_buf->pgcnt = page_count(rx_buf->page);
->>>    
->>> @@ -1154,62 +1150,48 @@ ice_put_rx_buf(struct ice_rx_ring *rx_ring, struct ice_rx_buf *rx_buf)
->>>    }
->>>    
->>>    /**
->>> - * ice_put_rx_mbuf - ice_put_rx_buf() caller, for all frame frags
->>> + * ice_put_rx_mbuf - ice_put_rx_buf() caller, for all buffers in frame
->>>     * @rx_ring: Rx ring with all the auxiliary data
->>>     * @xdp: XDP buffer carrying linear + frags part
->>> - * @xdp_xmit: XDP_TX/XDP_REDIRECT verdict storage
->>> - * @ntc: a current next_to_clean value to be stored at rx_ring
->>> + * @ntc: the next to clean element (not included in this frame!)
->>>     * @verdict: return code from XDP program execution
->>>     *
->>> - * Walk through gathered fragments and satisfy internal page
->>> - * recycle mechanism; we take here an action related to verdict
->>> - * returned by XDP program;
->>> + * Called after XDP program is completed, or on error with verdict set to
->>> + * ICE_XDP_CONSUMED.
->>> + *
->>> + * Walk through buffers from first_desc to the end of the frame, releasing
->>> + * buffers and satisfying internal page recycle mechanism. The action depends
->>> + * on verdict from XDP program.
->>>     */
->>>    static void ice_put_rx_mbuf(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
->>> -			    u32 *xdp_xmit, u32 ntc, u32 verdict)
->>> +			    u32 ntc, u32 verdict)
->>>    {
->>> -	u32 nr_frags = rx_ring->nr_frags + 1;
->>> +	u32 nr_frags = xdp_get_shared_info_from_buff(xdp)->nr_frags;
->>
->> Here we unconditionally access the skb_shared_info area.
->>
->>>    	u32 idx = rx_ring->first_desc;
->>>    	u32 cnt = rx_ring->count;
->>> -	u32 post_xdp_frags = 1;
->>>    	struct ice_rx_buf *buf;
->>> -	int i;
->>> -
->>> -	if (unlikely(xdp_buff_has_frags(xdp)))
->>
->> Previously we only touch shared_info area if this is a multi-buff frame.
->>
-> 
-> I'm not certain, but reading the helpers it might be correct to do
-> something like this:
-> 
-> if (unlikely(xdp_buff_has_frags(xdp)))
->    nr_frags = xdp_get_shared_info_from_buff(xdp)->nr_frags;
-> else
->    nr_frags = 1
-
-Yes, that looks like a correct pattern.
-
-> either in the driver code or by adding a new xdp helper function.
-> 
-> I'm not sure its worth it though. We have pending work from our
-> development team to refactor ice to use page pool and switch to libeth
-> XDP helpers which eliminates all of this driver-specific logic.
-
-Please do proper testing of XDP_DROP case when doing this change.
-
-> I don't personally think its worth holding up this series and this
-> important memory leak fix for a minor potential code change that I can't
-> measure an obvious improvement on.
-
-IMHO you included an optimization (that wasn't a gain) in a fix patch.
-I think you can fix the memory leak without the "optimization" part.
-
-pw-bot: cr
-
---Jesper
-
+diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+index b29628d46be9b..ec9a430aa160e 100644
+--- a/drivers/net/Kconfig
++++ b/drivers/net/Kconfig
+@@ -382,6 +382,16 @@ config NETCONSOLE_PREPEND_RELEASE
+ 	  message.  See <file:Documentation/networking/netconsole.rst> for
+ 	  details.
+ 
++config NETCONSOLE_NBCON
++	bool "Enable non blocking netconsole (EXPERIMENTAL)"
++	depends on NETCONSOLE
++	default n
++	help
++	  Move netconsole to use non-blocking console (nbcons).  Non-blocking
++	  console (nbcon) is a new console infrastructure introduced to improve
++	  console handling by avoiding the global console lock (Big Kernel
++	  Lock) and enabling non-blocking, asynchronous writes to the console.
++
+ config NETPOLL
+ 	def_bool NETCONSOLE
+ 
+diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+index e3722de08ea9f..5cd279e09fc8b 100644
+--- a/drivers/net/netconsole.c
++++ b/drivers/net/netconsole.c
+@@ -1708,12 +1708,30 @@ static void write_ext_msg(struct console *con, const char *msg,
+ 	spin_unlock_irqrestore(&target_list_lock, flags);
+ }
+ 
+-static void write_msg(struct console *con, const char *msg, unsigned int len)
++static void do_write_msg(struct netconsole_target *nt, const char *msg, unsigned int len)
+ {
++	const char *tmp;
+ 	int frag, left;
++
++	/*
++	 * We nest this inside the for-each-target loop above
++	 * so that we're able to get as much logging out to
++	 * at least one target if we die inside here, instead
++	 * of unnecessarily keeping all targets in lock-step.
++	 */
++	tmp = msg;
++	for (left = len; left;) {
++		frag = min(left, MAX_PRINT_CHUNK);
++		send_udp(nt, tmp, frag);
++		tmp += frag;
++		left -= frag;
++	}
++}
++
++static void write_msg(struct console *con, const char *msg, unsigned int len)
++{
+ 	unsigned long flags;
+ 	struct netconsole_target *nt;
+-	const char *tmp;
+ 
+ 	if (oops_only && !oops_in_progress)
+ 		return;
+@@ -1723,21 +1741,8 @@ static void write_msg(struct console *con, const char *msg, unsigned int len)
+ 
+ 	spin_lock_irqsave(&target_list_lock, flags);
+ 	list_for_each_entry(nt, &target_list, list) {
+-		if (!nt->extended && nt->enabled && netif_running(nt->np.dev)) {
+-			/*
+-			 * We nest this inside the for-each-target loop above
+-			 * so that we're able to get as much logging out to
+-			 * at least one target if we die inside here, instead
+-			 * of unnecessarily keeping all targets in lock-step.
+-			 */
+-			tmp = msg;
+-			for (left = len; left;) {
+-				frag = min(left, MAX_PRINT_CHUNK);
+-				send_udp(nt, tmp, frag);
+-				tmp += frag;
+-				left -= frag;
+-			}
+-		}
++		if (!nt->extended && nt->enabled && netif_running(nt->np.dev))
++			do_write_msg(nt, msg, len);
+ 	}
+ 	spin_unlock_irqrestore(&target_list_lock, flags);
+ }
+@@ -1917,16 +1922,69 @@ static void free_param_target(struct netconsole_target *nt)
+ 	kfree(nt);
+ }
+ 
++#ifdef CONFIG_NETCONSOLE_NBCON
++static void netcon_write_ext_thread(struct console *con, struct nbcon_write_context *wctxt)
++{
++	struct netconsole_target *nt;
++
++	list_for_each_entry(nt, &target_list, list)
++		if (nt->extended && nt->enabled && netif_running(nt->np.dev)) {
++			if (!nbcon_enter_unsafe(wctxt))
++				continue;
++			send_ext_msg_udp(nt, wctxt->outbuf, wctxt->len);
++			nbcon_exit_unsafe(wctxt);
++		}
++}
++
++static void netcon_write_thread(struct console *con, struct nbcon_write_context *wctxt)
++{
++	struct netconsole_target *nt;
++
++	list_for_each_entry(nt, &target_list, list)
++		if (!nt->extended && nt->enabled && netif_running(nt->np.dev)) {
++			if (!nbcon_enter_unsafe(wctxt))
++				continue;
++			do_write_msg(nt, wctxt->outbuf, wctxt->len);
++			nbcon_exit_unsafe(wctxt);
++		}
++}
++
++static void netconsole_device_lock(struct console *con, unsigned long *flags)
++{
++	/* protects all the targets at the same time */
++	spin_lock_irqsave(&target_list_lock, *flags);
++}
++
++static void netconsole_device_unlock(struct console *con, unsigned long flags)
++{
++	spin_unlock_irqrestore(&target_list_lock, flags);
++}
++#endif
++
+ static struct console netconsole_ext = {
+ 	.name	= "netcon_ext",
++#ifdef CONFIG_NETCONSOLE_NBCON
++	.flags	= CON_ENABLED | CON_EXTENDED | CON_NBCON,
++	.write_thread = netcon_write_ext_thread,
++	.device_lock = netconsole_device_lock,
++	.device_unlock = netconsole_device_unlock,
++#else
+ 	.flags	= CON_ENABLED | CON_EXTENDED,
+ 	.write	= write_ext_msg,
++#endif
+ };
+ 
+ static struct console netconsole = {
+ 	.name	= "netcon",
++#ifdef CONFIG_NETCONSOLE_NBCON
++	.flags	= CON_ENABLED | CON_NBCON,
++	.write_thread = netcon_write_thread,
++	.device_lock = netconsole_device_lock,
++	.device_unlock = netconsole_device_unlock,
++#else
+ 	.flags	= CON_ENABLED,
+ 	.write	= write_msg,
++#endif
+ };
+ 
+ static int __init init_netconsole(void)
 
