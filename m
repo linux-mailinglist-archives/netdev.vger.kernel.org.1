@@ -1,177 +1,92 @@
-Return-Path: <netdev+bounces-215049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56252B2CE61
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 23:10:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 043FEB2CEB2
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 23:48:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46D5D5C08C6
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 21:10:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DEBA82A4C6D
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 21:48:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3470A311974;
-	Tue, 19 Aug 2025 21:10:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kV6AT49z"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33C4825D209;
+	Tue, 19 Aug 2025 21:48:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 715483101AA;
-	Tue, 19 Aug 2025 21:10:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+Received: from newsmtp.uns.ac.rs (smtp.uns.ac.rs [147.91.173.6])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F6D725A2DA;
+	Tue, 19 Aug 2025 21:48:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=147.91.173.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755637810; cv=none; b=c6wdSXdcLfZloqk58jQX/JWkz1NYkVfSMOgazQ20qjNr2yg1kq3+LRd08gzSDUzKKS423ysi1ijORrYwLBq2ho45ilVulq95kkrv1a0ngiteGB3jy8SOGo8Ewh57L0G1kdRqn5f/gv4jOu9JHo4xRanlHCRKSne8msVMBTMI++g=
+	t=1755640115; cv=none; b=JiS0ICIFVeRo/3R4sZyvQ3QuR4Tgthjuq0ITH/ogR8ZFT4Sr+KhZEXJSeNVmVbKBlw1Sht4h+8RbXWjYWG5Uz+NBUy2dZRAl11IV1DOEa5MVqKUP81QuPhq3dr49CiBX0exDWY5szW7PBS0zm34MllCyn6RaJglfl7FQvjDoRDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755637810; c=relaxed/simple;
-	bh=lAs7kHreBtRFM5BmhN+uVj7cvYVrE9W4cw3bVA+6RCw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HbjDhQjlYikbh3kCyr4YgRbw2mvU7HudbXkk616tBLLgN1+mLWFle8YHSupe4lIk937fH9D1Mjb7TrgMFy9jfN3fheR+paFzRWNpJIMDEtjbYHTMUNnufprD7c7E8nZkwYcChtycbLmAhcPMo26uiEJolMjen6+JksLMdVBT5l0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kV6AT49z; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755637809; x=1787173809;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=lAs7kHreBtRFM5BmhN+uVj7cvYVrE9W4cw3bVA+6RCw=;
-  b=kV6AT49zh8Ga4td68vmfVc6MLXTSojIvyD1YeCthtqCze69n0Tl/5w74
-   vIqMV/H2Yg36Et/7dTglt5WxXmKPqicWvEFOFvRzfHw9A5lTNJpWESyMX
-   qLsLzMN8GRbFTfS9uQY5dnDrY3jAh69S4B63Z8U1qqmVGGT/zP6CDzpQK
-   yFaUSbLrO2bkrqw2SXAo6Aj9hyuCSIcYEJ9nVixTWcVv0o+O6f/8DGD4X
-   nP44Q79GWGHYFCBs9I+ogs1fUiHQST4nRMEshPlF9+MwasaERFFanwlX5
-   E18kHexkliWPg489v4NJgYzvsZA2/1ghCWsVC82EZn5wo4adhKtvRY/PL
-   A==;
-X-CSE-ConnectionGUID: bUXcFjrWSuGFPqwD9rzM+Q==
-X-CSE-MsgGUID: sDQHuh75THGSNfn+ASX2Tg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11527"; a="61728038"
-X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
-   d="scan'208";a="61728038"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2025 14:10:08 -0700
-X-CSE-ConnectionGUID: OjuMbXC3RGq+9bUgCgDQ/g==
-X-CSE-MsgGUID: q7vuU89HTWytl+PGKm8Z7g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
-   d="scan'208";a="173315511"
-Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
-  by orviesa005.jf.intel.com with ESMTP; 19 Aug 2025 14:10:04 -0700
-Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uoTai-000HVT-2v;
-	Tue, 19 Aug 2025 21:10:00 +0000
-Date: Wed, 20 Aug 2025 05:09:30 +0800
-From: kernel test robot <lkp@intel.com>
-To: Artur Rojek <contact@artur-rojek.eu>, Rob Landley <rob@landley.net>,
-	Jeff Dionne <jeff@coresemi.io>,
-	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Artur Rojek <contact@artur-rojek.eu>
-Subject: Re: [PATCH 3/3] net: j2: Introduce J-Core EMAC
-Message-ID: <202508200456.GIhKD5qv-lkp@intel.com>
-References: <20250815194806.1202589-4-contact@artur-rojek.eu>
+	s=arc-20240116; t=1755640115; c=relaxed/simple;
+	bh=F46LWby5n9zQSfOV6XgHq7tjvhMPB2oEX5bCs3mw8E4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UngtTqx5WkM5LZjbVYVoBAuRVvtU8JKi2Y7lJoRb470LRfCqh0X/RT0SEvrgjTVGLfd+stayI3zhWPynRnONRIUsoXeqDtXH+rTG4PUWk549QGCDOyz8O4mwqGWi8UbPGqpfcvXUaMEzFTdBIhepPqXQKrwdU0rfnugNd7gdeJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uns.ac.rs; spf=pass smtp.mailfrom=uns.ac.rs; arc=none smtp.client-ip=147.91.173.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uns.ac.rs
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uns.ac.rs
+Received: from newsmtp.uns.ac.rs (localhost.localdomain [127.0.0.1])
+	by localhost (Postfix) with ESMTP id ED46A259CD2;
+	Tue, 19 Aug 2025 23:25:51 +0200 (CEST)
+Received: from [147.91.175.7] (unknown [147.91.175.7])
+	by smtp.uns.ac.rs (Postfix) with ESMTP id DD0E3259CD0;
+	Tue, 19 Aug 2025 23:25:49 +0200 (CEST)
+Message-ID: <8cacd186-c95c-c5a3-a341-c67b9e55a13c@uns.ac.rs>
+Date: Tue, 19 Aug 2025 23:17:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250815194806.1202589-4-contact@artur-rojek.eu>
+User-Agent: Mozilla/5.0 (X11; Linux i686; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: [OT] Re: [ROSE] [AX25] 6.15.10 long term stable kernel oops
+Content-Language: en-GB
+To: F6BVP <f6bvp@free.fr>, Dan Cross <crossd@gmail.com>,
+ Bernard Pidoux <bernard.pidoux@free.fr>
+Cc: David Ranch <dranch@trinnet.net>, linux-hams@vger.kernel.org,
+ netdev <netdev@vger.kernel.org>
+References: <11c5701d-4bf9-4661-ad8a-06690bbe1c1c@free.fr>
+ <fff0b3eb-ea42-4475-970d-30622dc25dca@free.fr>
+ <e92e23a7-1503-454f-a7a2-cedab6e55fe2@free.fr>
+ <acd04154-25a5-4721-a62b-36827a6e4e47@free.fr>
+ <CAEoi9W6kb0jZXY_Tu27CU7jkyx5O1ne5FOgvYqCk_GFBvnseiw@mail.gmail.com>
+ <11212ddf-bf32-4b11-afee-e234cdee5938@free.fr>
+From: Miroslav Skoric <skoric@uns.ac.rs>
+In-Reply-To: <11212ddf-bf32-4b11-afee-e234cdee5938@free.fr>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: ClamAV using ClamSMTP
 
-Hi Artur,
+On 8/18/25 8:28 PM, F6BVP wrote:
+> Hi Dan,
+> 
+> I agree that it must be the same bug and mkiss module is involved in 
+> both cases although the environment is quite different.
+> I am using ROSE/FPAC nodes on different machines for AX25 messages 
+> routing with LinFBB BBS.
+> Nowadays I do not have radio anymore and all are interconnected via 
+> Internet using IP over AX25 encapsulation with ax25ipd (UDP ports).
+> 
 
-kernel test robot noticed the following build errors:
+Hi Bernard, et al.
 
-[auto build test ERROR on robh/for-next]
-[also build test ERROR on linus/master v6.17-rc2 next-20250819]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Sorry for hijacking the thread. I have a question: As an experimental 
+station based on Ubuntu 18.04 LTS (not connected to the Internet for 
+several years, using kernel Linux ubuntu 4.15.0-212-generic #223-Ubuntu 
+SMP Tue May 23 13:08:22 UTC 2023 i686 i686 i686 GNU/Linux), I run a 
+rather old FPAC-Node v 4.0.3 (built Jan  3 2016), and on top of it an 
+FBB bbs V7.0.10 (Feb 28 2021).
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Artur-Rojek/dt-bindings-vendor-prefixes-Document-J-Core/20250816-042354
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git for-next
-patch link:    https://lore.kernel.org/r/20250815194806.1202589-4-contact%40artur-rojek.eu
-patch subject: [PATCH 3/3] net: j2: Introduce J-Core EMAC
-config: m68k-randconfig-r113-20250819 (https://download.01.org/0day-ci/archive/20250820/202508200456.GIhKD5qv-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 8.5.0
-reproduce: (https://download.01.org/0day-ci/archive/20250820/202508200456.GIhKD5qv-lkp@intel.com/reproduce)
+All works well for my basic packet needs. However it makes me wonder 
+whether it would be of any use to try upgrading FPAC and FBB, having in 
+mind that upgrading the distro is not possible.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202508200456.GIhKD5qv-lkp@intel.com/
+Best regards, 73
 
-All errors (new ones prefixed by >>):
+Misko YT7MPB
 
-   drivers/net/ethernet/jcore_emac.c: In function 'jcore_emac_set_rx_mode':
->> drivers/net/ethernet/jcore_emac.c:230:1: error: label at end of compound statement
-    next_ha:
-    ^~~~~~~
-
-
-vim +230 drivers/net/ethernet/jcore_emac.c
-
-   192	
-   193	static void jcore_emac_set_rx_mode(struct net_device *ndev)
-   194	{
-   195		struct jcore_emac *priv = netdev_priv(ndev);
-   196		struct netdev_hw_addr *ha;
-   197		unsigned int reg, i, idx = 0, set_mask = 0, clear_mask = 0, addr = 0;
-   198	
-   199		if (ndev->flags & IFF_PROMISC)
-   200			set_mask |= JCORE_EMAC_PROMISC;
-   201		else
-   202			clear_mask |= JCORE_EMAC_PROMISC;
-   203	
-   204		if (ndev->flags & IFF_ALLMULTI)
-   205			set_mask |= JCORE_EMAC_MCAST;
-   206		else
-   207			clear_mask |= JCORE_EMAC_MCAST;
-   208	
-   209		regmap_update_bits(priv->map, JCORE_EMAC_CONTROL, set_mask | clear_mask,
-   210				   set_mask);
-   211	
-   212		if (!(ndev->flags & IFF_MULTICAST))
-   213			return;
-   214	
-   215		netdev_for_each_mc_addr(ha, ndev) {
-   216			/* Only the first 3 octets are used in a hardware mcast mask. */
-   217			memcpy(&addr, ha->addr, 3);
-   218	
-   219			for (i = 0; i < idx; i++) {
-   220				regmap_read(priv->map, JCORE_EMAC_MCAST_MASK(i), &reg);
-   221				if (reg == addr)
-   222					goto next_ha;
-   223			}
-   224	
-   225			regmap_write(priv->map, JCORE_EMAC_MCAST_MASK(idx), addr);
-   226			if (++idx >= JCORE_EMAC_MCAST_ADDRS) {
-   227				netdev_warn(ndev, "Multicast list limit reached\n");
-   228				break;
-   229			}
- > 230	next_ha:
-   231		}
-   232	
-   233		/* Clear the remaining mask entries. */
-   234		for (i = idx; i < JCORE_EMAC_MCAST_ADDRS; i++)
-   235			regmap_write(priv->map, JCORE_EMAC_MCAST_MASK(i), 0);
-   236	}
-   237	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
