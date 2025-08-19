@@ -1,110 +1,267 @@
-Return-Path: <netdev+bounces-215010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 844DBB2C9D5
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 18:38:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 17195B2C9D7
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 18:38:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25216168B7E
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 16:32:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9E9C163612
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 16:33:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3B542580F3;
-	Tue, 19 Aug 2025 16:32:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Ug74YUG8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70B022580F3;
+	Tue, 19 Aug 2025 16:33:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 458D2246332;
-	Tue, 19 Aug 2025 16:32:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9870D25A2A7
+	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 16:33:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755621152; cv=none; b=X+fSunMt0qBnM3Iv2UcppaBwA6jDzK6YjSZvvYtUyuYZCJUk48QBSBz/3gVInJ15YNcr4WPwiGJQgWGrmRu2M+OVs5OYFD83UODnv7yYGfZGI8lKh74EIalFhzgHcb4wrI8Qk1zW4tPZLLgg/hdlkTLh7JCnB35h13MKEBEkRtE=
+	t=1755621224; cv=none; b=Gq7RSW14YGC4Vm+Gtc80gKkv0RFKcPeOMEzNkgT09YXqdr5RqZ8R2WW4zn9jDmX5eUb8+WGY1dM2ysBjaHtIcqk6IcNrkYg8VxfzmkGF6MkDjjaRhAZaNgvRiIh9hyGfjLMbCHZk+j6Vj9idWIybtch7o7Nix2LGvXMwvMW9qSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755621152; c=relaxed/simple;
-	bh=MQnDmrXiyua8kPUq8gr/FxtUPRZGgcWnr5iZgi75NiY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Fow3gPcVbIbiuTVujK8IeL+WANABDVPDfOljIeBxWzm9OuAK2R4mejuYyQHOqpdWLhyK+5Fze0LFfO5vcGxK5/rUrvvbsaF+JW3hzUyzVTTLsXFoAgRUfySfF9phH6muoNx6ddwgO70IyI0Nnnq1Yy91cbJX72nQh5BBdRMBt0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Ug74YUG8; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1755621151; x=1787157151;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=MQnDmrXiyua8kPUq8gr/FxtUPRZGgcWnr5iZgi75NiY=;
-  b=Ug74YUG8V8oti3wzlnlggiAV7vCCRcKlDhMMsQxp2y4+4xc6s9+wFwwe
-   FLV9lnwXs67Gfi39YotIQoL/Fb0pFGgHSLrbOtN2MD88X9cohSPrzwLys
-   t0+pDBI1dwBTA7w0ZT/aZbbxdIESjlnm4HbTX+dYb0jueXgFFpd3b8dx4
-   f3EMmH4XuRtXO8ErwiBdBbbs/JTo/OLJ/RlWXCHDs6hOiZjEFonyTeRLe
-   isksDy7FKUHjXyJg9ifUvJnC8IOzJ6ZGMF/NJ2uVtazoFerR9RctIseFO
-   dKHgahdLIJKlX3j41TJCdUg/n+XawsV088PG7KLmxj5eOMFO9qV68suuN
-   g==;
-X-CSE-ConnectionGUID: NyzeezATTkm1HJH7itjXdw==
-X-CSE-MsgGUID: 2oKNj41hQOepDe6zqWRjqA==
-X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
-   d="scan'208";a="45382213"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Aug 2025 09:32:30 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Tue, 19 Aug 2025 09:31:49 -0700
-Received: from ryan-Precision-3630-Tower.microchip.com (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.44 via Frontend Transport; Tue, 19 Aug 2025 09:31:49 -0700
-From: <Ryan.Wanner@microchip.com>
-To: <nicolas.ferre@microchip.com>, <claudiu.beznea@tuxon.dev>,
-	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Ryan Wanner
-	<Ryan.Wanner@microchip.com>
-Subject: [PATCH] Revert "net: cadence: macb: sama7g5_emac: Remove USARIO CLKEN flag"
-Date: Tue, 19 Aug 2025 09:32:30 -0700
-Message-ID: <20250819163236.100680-1-Ryan.Wanner@microchip.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1755621224; c=relaxed/simple;
+	bh=z0NhIPV+00el/zFhMzAPGPfM27dFvoV+jQKcfTYHULM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nYd7JMNJHgzH+ZMvENaIZy+OLU8rZuAO/tdZjZDFTPv8bU4GbeUE6e1vxRVUozt+M7H+q1LThBcQ14xA7s5oeC1m3qyc8ATh0mfxoITE2KnqoH7ncUQULbJG9lwNkgG8KGZfitfX4nfWEbLak2NT2BisSEae4JyHxa588R97YWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 9062B60288273;
+	Tue, 19 Aug 2025 18:33:17 +0200 (CEST)
+Message-ID: <0acc47bb-58b9-40d7-9b4d-899de605879d@molgen.mpg.de>
+Date: Tue, 19 Aug 2025 18:33:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2] idpf: add HW timestamping
+ statistics
+To: Anton Nadezhdin <anton.nadezhdin@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ anthony.l.nguyen@intel.com, richardcochran@gmail.com,
+ Milena Olech <milena.olech@intel.com>, Joshua Hay <joshua.a.hay@intel.com>,
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+References: <20250819182640.43761-1-anton.nadezhdin@intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250819182640.43761-1-anton.nadezhdin@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 
-From: Ryan Wanner <Ryan.Wanner@microchip.com>
+Dear Anton,
 
-This reverts commit db400061b5e7cc55f9b4dd15443e9838964119ea.
 
-This commit can cause a Devicetree ABI break for older DTS files that rely this
-flag for RMII configuration. Adding this back in ensures that the older
-DTBs will not break.
+Thank you for the improved version.
 
-Fixes: db400061b5e7 ("net: cadence: macb: sama7g5_emac: Remove USARIO CLKEN flag")
-Signed-off-by: Ryan Wanner <Ryan.Wanner@microchip.com>
----
- drivers/net/ethernet/cadence/macb_main.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Am 19.08.25 um 20:26 schrieb Anton Nadezhdin:
+> From: Milena Olech <milena.olech@intel.com>
+> 
+> Add HW timestamping statistics support - through implementing get_ts_stats.
+> Timestamp statistics include correctly timestamped packets, discarded,
+> skipped and flushed during PTP release.
+> 
+> Most of the stats are collected per vport, only requests skipped due to
+> lack of free latch index are collected per Tx queue.
+> 
+> Statistics can be obtained using kernel ethtool since version 6.10
+> with:
+> ethtool -I -T <interface>
+> 
+> The output will include:
+> Statistics:
+>    tx_pkts: 15
+>    tx_lost: 0
+>    tx_err: 0
+> 
+> Signed-off-by: Milena Olech <milena.olech@intel.com>
+> Co-developed-by: Anton Nadezhdin <anton.nadezhdin@intel.com>
+> Signed-off-by: Anton Nadezhdin <anton.nadezhdin@intel.com>
+> Reviewed-by: Joshua Hay <joshua.a.hay@intel.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> ---
 
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index ce95fad8cedd..9693f0289435 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -5113,7 +5113,8 @@ static const struct macb_config sama7g5_gem_config = {
- 
- static const struct macb_config sama7g5_emac_config = {
- 	.caps = MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII |
--		MACB_CAPS_MIIONRGMII | MACB_CAPS_GEM_HAS_PTP,
-+		MACB_CAPS_USRIO_HAS_CLKEN | MACB_CAPS_MIIONRGMII |
-+		MACB_CAPS_GEM_HAS_PTP,
- 	.dma_burst_length = 16,
- 	.clk_init = macb_clk_init,
- 	.init = macb_init,
--- 
-2.43.0
+It’s common to add a change-log between the patch iterations here.
 
+>   drivers/net/ethernet/intel/idpf/idpf.h        | 17 +++++++
+>   .../net/ethernet/intel/idpf/idpf_ethtool.c    | 51 +++++++++++++++++++
+>   drivers/net/ethernet/intel/idpf/idpf_ptp.c    | 11 +++-
+>   .../ethernet/intel/idpf/idpf_virtchnl_ptp.c   |  4 ++
+>   4 files changed, 82 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
+> index f4c0eaf9bde3..5951ede8c7ea 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf.h
+> +++ b/drivers/net/ethernet/intel/idpf/idpf.h
+> @@ -256,6 +256,21 @@ enum idpf_vport_flags {
+>   	IDPF_VPORT_FLAGS_NBITS,
+>   };
+>   
+> +/**
+> + * struct idpf_tstamp_stats - Tx timestamp statistics
+> + * @stats_sync: See struct u64_stats_sync
+> + * @packets: Number of packets successfully timestamped by the hardware
+> + * @discarded: Number of Tx skbs discarded due to cached PHC
+> + *	       being too old to correctly extend timestamp
+> + * @flushed: Number of Tx skbs flushed due to interface closed
+> + */
+> +struct idpf_tstamp_stats {
+> +	struct u64_stats_sync stats_sync;
+> +	u64_stats_t packets;
+> +	u64_stats_t discarded;
+> +	u64_stats_t flushed;
+> +};
+> +
+>   struct idpf_port_stats {
+>   	struct u64_stats_sync stats_sync;
+>   	u64_stats_t rx_hw_csum_err;
+> @@ -322,6 +337,7 @@ struct idpf_fsteer_fltr {
+>    * @tx_tstamp_caps: Capabilities negotiated for Tx timestamping
+>    * @tstamp_config: The Tx tstamp config
+>    * @tstamp_task: Tx timestamping task
+> + * @tstamp_stats: Tx timestamping statistics
+>    */
+>   struct idpf_vport {
+>   	u16 num_txq;
+> @@ -372,6 +388,7 @@ struct idpf_vport {
+>   	struct idpf_ptp_vport_tx_tstamp_caps *tx_tstamp_caps;
+>   	struct kernel_hwtstamp_config tstamp_config;
+>   	struct work_struct tstamp_task;
+> +	struct idpf_tstamp_stats tstamp_stats;
+>   };
+>   
+>   /**
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
+> index 0eb812ac19c2..d56a4157ad5f 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
+> @@ -1685,6 +1685,56 @@ static int idpf_get_ts_info(struct net_device *netdev,
+>   	return err;
+>   }
+>   
+> +/**
+> + * idpf_get_ts_stats - Collect HW tstamping statistics
+> + * @netdev: network interface device structure
+> + * @ts_stats: HW timestamping stats structure
+> + *
+> + * Collect HW timestamping statistics including successfully timestamped
+> + * packets, discarded due to illegal values, flushed during releasing PTP and
+> + * skipped due to lack of the free index.
+> + */
+> +static void idpf_get_ts_stats(struct net_device *netdev,
+> +			      struct ethtool_ts_stats *ts_stats)
+> +{
+> +	struct idpf_vport *vport;
+> +	unsigned int start;
+> +
+> +	idpf_vport_ctrl_lock(netdev);
+> +	vport = idpf_netdev_to_vport(netdev);
+> +	do {
+> +		start = u64_stats_fetch_begin(&vport->tstamp_stats.stats_sync);
+> +		ts_stats->pkts = u64_stats_read(&vport->tstamp_stats.packets);
+> +		ts_stats->lost = u64_stats_read(&vport->tstamp_stats.flushed);
+> +		ts_stats->err = u64_stats_read(&vport->tstamp_stats.discarded);
+> +	} while (u64_stats_fetch_retry(&vport->tstamp_stats.stats_sync, start));
+> +
+> +	for (u16 i = 0; i < vport->num_txq_grp; i++) {
+> +		struct idpf_txq_group *txq_grp = &vport->txq_grps[i];
+> +
+> +		for (u16 j = 0; j < txq_grp->num_txq; j++) {
+> +			struct idpf_tx_queue *txq = txq_grp->txqs[j];
+> +			struct idpf_tx_queue_stats *stats;
+> +			u64 ts;
+> +
+> +			if (!txq)
+> +				continue;
+> +
+> +			stats = &txq->q_stats;
+> +			do {
+> +				start = u64_stats_fetch_begin(&txq->stats_sync);
+> +
+> +				ts = u64_stats_read(&stats->tstamp_skipped);
+> +			} while (u64_stats_fetch_retry(&txq->stats_sync,
+> +						       start));
+> +
+> +			ts_stats->lost += ts;
+> +		}
+> +	}
+> +
+> +	idpf_vport_ctrl_unlock(netdev);
+> +}
+> +
+>   static const struct ethtool_ops idpf_ethtool_ops = {
+>   	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
+>   				     ETHTOOL_COALESCE_USE_ADAPTIVE,
+> @@ -1711,6 +1761,7 @@ static const struct ethtool_ops idpf_ethtool_ops = {
+>   	.set_ringparam		= idpf_set_ringparam,
+>   	.get_link_ksettings	= idpf_get_link_ksettings,
+>   	.get_ts_info		= idpf_get_ts_info,
+> +	.get_ts_stats		= idpf_get_ts_stats,
+>   };
+>   
+>   /**
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_ptp.c b/drivers/net/ethernet/intel/idpf/idpf_ptp.c
+> index ee21f2ff0cad..142823af1f9e 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_ptp.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_ptp.c
+> @@ -618,8 +618,13 @@ u64 idpf_ptp_extend_ts(struct idpf_vport *vport, u64 in_tstamp)
+>   
+>   	discard_time = ptp->cached_phc_jiffies + 2 * HZ;
+>   
+> -	if (time_is_before_jiffies(discard_time))
+> +	if (time_is_before_jiffies(discard_time)) {
+> +		u64_stats_update_begin(&vport->tstamp_stats.stats_sync);
+> +		u64_stats_inc(&vport->tstamp_stats.discarded);
+> +		u64_stats_update_end(&vport->tstamp_stats.stats_sync);
+> +
+>   		return 0;
+> +	}
+>   
+>   	return idpf_ptp_tstamp_extend_32b_to_64b(ptp->cached_phc_time,
+>   						 lower_32_bits(in_tstamp));
+> @@ -853,10 +858,14 @@ static void idpf_ptp_release_vport_tstamp(struct idpf_vport *vport)
+>   
+>   	/* Remove list with latches in use */
+>   	head = &vport->tx_tstamp_caps->latches_in_use;
+> +	u64_stats_update_begin(&vport->tstamp_stats.stats_sync);
+>   	list_for_each_entry_safe(ptp_tx_tstamp, tmp, head, list_member) {
+> +		u64_stats_inc(&vport->tstamp_stats.flushed);
+> +
+>   		list_del(&ptp_tx_tstamp->list_member);
+>   		kfree(ptp_tx_tstamp);
+>   	}
+> +	u64_stats_update_end(&vport->tstamp_stats.stats_sync);
+>   
+>   	spin_unlock_bh(&vport->tx_tstamp_caps->latches_lock);
+>   
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl_ptp.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl_ptp.c
+> index 4f1fb0cefe51..8a2e0f8c5e36 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl_ptp.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl_ptp.c
+> @@ -521,6 +521,10 @@ idpf_ptp_get_tstamp_value(struct idpf_vport *vport,
+>   	list_add(&ptp_tx_tstamp->list_member,
+>   		 &tx_tstamp_caps->latches_free);
+>   
+> +	u64_stats_update_begin(&vport->tstamp_stats.stats_sync);
+> +	u64_stats_inc(&vport->tstamp_stats.packets);
+> +	u64_stats_update_end(&vport->tstamp_stats.stats_sync);
+> +
+>   	return 0;
+>   }
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+
+Kind regards,
+
+Paul
 
