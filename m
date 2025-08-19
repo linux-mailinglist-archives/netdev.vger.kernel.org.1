@@ -1,279 +1,162 @@
-Return-Path: <netdev+bounces-214941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B39D1B2C384
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 14:29:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01DA0B2C395
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 14:31:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 765BC188CF5B
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 12:25:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 438081885585
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 12:27:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACC9A343D73;
-	Tue, 19 Aug 2025 12:21:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2EC2305042;
+	Tue, 19 Aug 2025 12:27:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pr3HgkPe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UBY6yyiU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8836B34320E
-	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 12:21:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A85730504B;
+	Tue, 19 Aug 2025 12:27:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755606091; cv=none; b=QTZnZXDZzjp2sZoOLnhzHdsT9fPC/MkZ68ZvdPQGyEbWiaD8dzOrVDW6D5edEKKU+vZVy/4kgw3t6A5wBp8AX7Ei/CYlpzTah7YRxogZtfZXt08uM2qDxib9p4RlSr8JRoIwE8IV3kaPepFscMRwoiF7JiPP70aPw/WMWIVu5r4=
+	t=1755606430; cv=none; b=iGLiemTawOq+zxgehQnh+pxHZwylrI86j2EOsGpOl0/GvPtbh7LXkyIcOK+lPvhD0RQnJokKNg3KiUNNg6yfE3U/XEzU8zOpUN3Ozp2AlWVZ96lomgv5RK7JVq0zN1eBmpz6GlHJcV37qJJoxsGmvcBwDgBXPmx2mBHql0/hssU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755606091; c=relaxed/simple;
-	bh=ZgAeLqBCCGeArPANi6zUOMhnXQnhm50yrseYUAeXpLA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=IL7S+xRqRbv0CIt9jp52NI9/Ie5BIV5Cb++6iZvSzYeHum6nzP6bIZhqQmPWA4yUbYhgL6ll/bzFaqn40bWZ4sel+wTrvLe8muBlZXtCe02b8ZrRW8A3+4vpxPo5ACIbchhhirvruBI1HgGaf6ghjcK7wxXlOknyvfVLxzp5Nh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pr3HgkPe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1F9EC4CEF1;
-	Tue, 19 Aug 2025 12:21:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755606091;
-	bh=ZgAeLqBCCGeArPANi6zUOMhnXQnhm50yrseYUAeXpLA=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=Pr3HgkPeU7GI0BXmHpGPavkiQtTYVbLpiTh+0cqT+e3I4r6M5lvCCmNIblDjVysZP
-	 f8ZIIG2AoW5DqcpuXFfn5+gHHFyWhuAZ+maZRSmR3XAa4L3itSWam5mIjzhVC1/8xM
-	 ww+Q+iGqeoGW7BkizRWGdZ+6lPXdkWWGq8VIemOX1yySDV/KBW/Ecl2Y6JBGDrzM6X
-	 WUe/xvfwjNJ/aWY/pQuagZx3sc8FSAUSPrYWhv8049LJWuSX4E5xAACX0hq/2AFMig
-	 rQbXbI5YBP+igkhq7GJ7NteNL2aFHq1Q6Tg2zlIiTIDXWCWSXqbhxcXjryn/jYLH6n
-	 kLMY8tblcjmVA==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Tue, 19 Aug 2025 14:21:08 +0200
-Subject: [PATCH net-next 3/3] net: airoha: Introduce check_skb callback in
- ppe_dev ops
+	s=arc-20240116; t=1755606430; c=relaxed/simple;
+	bh=sVy+VJbFD3YF1p4lFrRtr69nxZbQWOec0xOFwgGmD0s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MyDR8miErcvkfmBTOMXkhgGm0PJRpmXSXmWlBIrzIdY4tL6TTqeu6y9VUn+XWnwDPCg4onJ4gPh/X6F7bv3GK8GPp2vngvqnkaf7i3UgaILoEFe3GLtMQQPIdXaYjfCMFdxJZE/e5X+JRLbIGd9KuyI58iMjUifwSbFNZNA/jb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UBY6yyiU; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-7e87061d120so512337785a.2;
+        Tue, 19 Aug 2025 05:27:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755606428; x=1756211228; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jLo6P75Te8N885LOfTcwvSUBepuV8X4lYUZFLoZoR8Q=;
+        b=UBY6yyiUEFFX7LBAuWaCFqhG2/Q0NScX5V7WqcmQQXs9PseJYJuofEblY7tSgIJwhw
+         1av3ppDE9z/ag5Tss9XUUPWSpbXpiFtrtCjPgbDTO//P8Qzlhgiyuon14EJCzjuenuGD
+         35LbbYmnqQJPD/08oZZdrQ8CxsdBKnZU8O2KU9RYExM2e0+hX6uy3XN09mZsxikQSGPm
+         p9XpXXHUif0jAzPEZhAE0jKnBfO+BA2YjOeSZ/cZBGl+9qdjcCbSDlFcN8JMFfctn9p3
+         dpYMpBet0dsy4zKLtuO1OGRin/gtxditX88oOrLyBa/UDqTVzF/0gf9Zs9XpjSQG0lQc
+         XUrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755606428; x=1756211228;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=jLo6P75Te8N885LOfTcwvSUBepuV8X4lYUZFLoZoR8Q=;
+        b=axffrR0UM95Kj6XOG2uRhGdi5nBs2Qj0nbKc654TJ9BXYv5ACMiJw66z6jB9A3/GOp
+         3DJiJ5PmRLu8YnmRnJZ+6i8zo+0oZVjcXlMDGBpJv9mMpIrUM6OnQWTQKfTeQ2TksGES
+         VgicFk1BF8mAXXi/F7Kq4DBR6S8eQxKwopDkylsKEhgRNSaFx5kWrYg1C/HkJYicWoUO
+         B9fOpvRPinoTQ+zBzf6aaQKdu7GzOkxWDA2rKAd+koKJO7aao835WkI9OHwCg3C8VlGH
+         Zjv2hMCYZwuJvH4eN78cAvuVqLlq/3Ph8xdLL2hbmPwneDeX/Xy34XgG8dwpt8D+hQBK
+         qUXA==
+X-Forwarded-Encrypted: i=1; AJvYcCV0eRuCbA6xAMBbFExf1iXkQnopPRYj0wFcUHFBrUDZ+d0R/Nvgb+Oqd+x3OprgkhX3jF+KRSuD2araO+M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxjfD07BLvHr4xspV0B0LlF+J0gl9DROe31UvXgKCME90Lg+Mi7
+	xCPczL3dUrKqg7FRAsHDHADQiOJT3/XvAK1RSjp6lNHq5vGVN96koF77
+X-Gm-Gg: ASbGncsncJL9HF8kjethQTPjDTCBdslUOwe8lB3PUDK/P5RsJHijHaZaKgfsl0wUdEs
+	h1n/2Ia5Fg/kxxCGqKNhhS7HtzO71LvdL0CtR+XIUkkFWZ6l4KSJX9KyfeMBSVD9cJaEH4NWwN5
+	rWphDugrRDZHP9lknu5H9UrenyU9Hr5Nz9299LUSC5WKiQ87Gd5DWQNPerqj/N2XI37FAGXWNGc
+	GjSGZY08YQDXflK/KoMqw2IIER3Rfwmvn660w3GE2DrV6s8BL5GWu1YmcFf/nfuek+rMDmLCBpe
+	9rMwa2GKOVsyFXkufPHhycazHfHgWvm6xSRbGRsLQp8T7tHWVZsMeXBj9MRsd8KIxegI67ra//d
+	PPnSyZfC8FXwcK/pYXASTv7w/Sii//ad2T9DJBc2XVVRK
+X-Google-Smtp-Source: AGHT+IEsNIv+tEsilZmDq6HbF1TCnVCUZ/jSH0J4vWVFSQl2ouFNJOZtUnByHd3uAduNdJd9Cox6hA==
+X-Received: by 2002:a05:620a:31a9:b0:7e7:f84c:9d6a with SMTP id af79cd13be357-7e9f341f76dmr216699385a.32.1755606427892;
+        Tue, 19 Aug 2025 05:27:07 -0700 (PDT)
+Received: from localhost ([45.10.155.18])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e87e1bd862sm751574085a.61.2025.08.19.05.26.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Aug 2025 05:27:07 -0700 (PDT)
+Message-ID: <6533e1fa-2528-4bee-92fa-6f2d1a44d906@gmail.com>
+Date: Tue, 19 Aug 2025 14:26:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250819-airoha-en7581-wlan-rx-offload-v1-3-71a097e0e2a1@kernel.org>
-References: <20250819-airoha-en7581-wlan-rx-offload-v1-0-71a097e0e2a1@kernel.org>
-In-Reply-To: <20250819-airoha-en7581-wlan-rx-offload-v1-0-71a097e0e2a1@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.2
+Subject: Re: [PATCH net-next v2 1/5] net: gro: remove is_ipv6 from napi_gro_cb
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, corbet@lwn.net, shenjian15@huawei.com,
+ salil.mehta@huawei.com, shaojijie@huawei.com, andrew+netdev@lunn.ch,
+ saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com, leon@kernel.org,
+ ecree.xilinx@gmail.com, dsahern@kernel.org, ncardwell@google.com,
+ kuniyu@google.com, shuah@kernel.org, sdf@fomichev.me, ahmed.zaki@intel.com,
+ aleksander.lobakin@intel.com, florian.fainelli@broadcom.com,
+ willemdebruijn.kernel@gmail.com, linux-kernel@vger.kernel.org,
+ linux-net-drivers@amd.com
+References: <20250819063223.5239-1-richardbgobert@gmail.com>
+ <20250819063223.5239-2-richardbgobert@gmail.com>
+ <CANn89iL8XHOeBbq_73SiCEEhYrudeDVagtr=K6wpEkh9JuZV6A@mail.gmail.com>
+From: Richard Gobert <richardbgobert@gmail.com>
+In-Reply-To: <CANn89iL8XHOeBbq_73SiCEEhYrudeDVagtr=K6wpEkh9JuZV6A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Export airoha_ppe_check_skb routine in ppe_dev ops. check_skb callback
-will be used by the MT76 driver in order to offload the traffic received
-by the wlan NIC and forwarded to the ethernet one.
-Add rx_wlan parameter to airoha_ppe_check_skb routine signature.
+Eric Dumazet wrote:
+> On Mon, Aug 18, 2025 at 11:32 PM Richard Gobert
+> <richardbgobert@gmail.com> wrote:
+>>
+>> Remove is_ipv6 from napi_gro_cb and use sk->sk_family instead.
+>> This frees up space for another ip_fixedid bit that will be added
+>> in the next commit.
+>>
+>> Using sk->sk_family is reliable since udp_sock_create always
+>> creates either a AF_INET or a AF_INET6 socket, and IPv6-FOU
+>> doesn't support receiving IPv4 packets.
+>>
+>> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
+>> ---
+>>  include/net/gro.h      |  3 ---
+>>  net/ipv4/fou_core.c    | 31 +++++++++++++------------------
+>>  net/ipv4/udp_offload.c |  2 --
+>>  net/ipv6/udp_offload.c |  2 --
+>>  4 files changed, 13 insertions(+), 25 deletions(-)
+>>
+>> diff --git a/include/net/gro.h b/include/net/gro.h
+>> index a0fca7ac6e7e..87c68007f949 100644
+>> --- a/include/net/gro.h
+>> +++ b/include/net/gro.h
+>> @@ -71,9 +71,6 @@ struct napi_gro_cb {
+>>                 /* Free the skb? */
+>>                 u8      free:2;
+>>
+>> -               /* Used in foo-over-udp, set in udp[46]_gro_receive */
+>> -               u8      is_ipv6:1;
+>> -
+>>                 /* Used in GRE, set in fou/gue_gro_receive */
+>>                 u8      is_fou:1;
+>>
+>> diff --git a/net/ipv4/fou_core.c b/net/ipv4/fou_core.c
+>> index 3e30745e2c09..261ea2cf460f 100644
+>> --- a/net/ipv4/fou_core.c
+>> +++ b/net/ipv4/fou_core.c
+>> @@ -228,21 +228,26 @@ static int gue_udp_recv(struct sock *sk, struct sk_buff *skb)
+>>         return 0;
+>>  }
+>>
+>> +static inline const struct net_offload *fou_gro_ops(struct sock *sk, int proto)
+> 
+> const struct sock *sk
+> 
+>> +{
+>> +       const struct net_offload __rcu **offloads;
+>> +
+>> +       /* FOU doesn't allow IPv4 on IPv6 sockets. */
+>> +       offloads = sk->sk_family == AF_INET6 ? inet6_offloads : inet_offloads;
+> 
+> 
+> Do we have a guarantee sk->sk_family can not change under us ?
+> 
+> IPV6_ADDRFORM is available to UDP sockets after all.
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/airoha/airoha_eth.c  |  3 ++-
- drivers/net/ethernet/airoha/airoha_eth.h  |  8 ++------
- drivers/net/ethernet/airoha/airoha_ppe.c  | 25 ++++++++++++++-----------
- include/linux/soc/airoha/airoha_offload.h | 20 ++++++++++++++++++++
- 4 files changed, 38 insertions(+), 18 deletions(-)
-
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 5a04f90dd3de47ae0ee8e90bfe221618076297e6..81ea01a652b9c545c348ad6390af8be873a4997f 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -698,7 +698,8 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
- 
- 		reason = FIELD_GET(AIROHA_RXD4_PPE_CPU_REASON, msg1);
- 		if (reason == PPE_CPU_REASON_HIT_UNBIND_RATE_REACHED)
--			airoha_ppe_check_skb(eth->ppe, q->skb, hash);
-+			airoha_ppe_check_skb(&eth->ppe->dev, q->skb, hash,
-+					     false);
- 
- 		done++;
- 		napi_gro_receive(&q->napi, q->skb);
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
-index 9060b1d2814e0e4023d42a05ecb5265212df588f..77fd13d466dcd235a3ab39a488aa26d8f793cf77 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.h
-+++ b/drivers/net/ethernet/airoha/airoha_eth.h
-@@ -229,10 +229,6 @@ struct airoha_hw_stats {
- 	u64 rx_len[7];
- };
- 
--enum {
--	PPE_CPU_REASON_HIT_UNBIND_RATE_REACHED = 0x0f,
--};
--
- enum {
- 	AIROHA_FOE_STATE_INVALID,
- 	AIROHA_FOE_STATE_UNBIND,
-@@ -622,8 +618,8 @@ static inline bool airhoa_is_lan_gdm_port(struct airoha_gdm_port *port)
- bool airoha_is_valid_gdm_port(struct airoha_eth *eth,
- 			      struct airoha_gdm_port *port);
- 
--void airoha_ppe_check_skb(struct airoha_ppe *ppe, struct sk_buff *skb,
--			  u16 hash);
-+void airoha_ppe_check_skb(struct airoha_ppe_dev *dev, struct sk_buff *skb,
-+			  u16 hash, bool rx_wlan);
- int airoha_ppe_setup_tc_block_cb(struct airoha_ppe_dev *dev, void *type_data);
- int airoha_ppe_init(struct airoha_eth *eth);
- void airoha_ppe_deinit(struct airoha_eth *eth);
-diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
-index fe050a54cdcc818e18cd781a5c6a0b5cf1b496d6..9ffcff8c3ddfa0651058d0f48dffe027231a55aa 100644
---- a/drivers/net/ethernet/airoha/airoha_ppe.c
-+++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-@@ -616,7 +616,7 @@ static bool airoha_ppe_foe_compare_entry(struct airoha_flow_table_entry *e,
- 
- static int airoha_ppe_foe_commit_entry(struct airoha_ppe *ppe,
- 				       struct airoha_foe_entry *e,
--				       u32 hash)
-+				       u32 hash, bool rx_wlan)
- {
- 	struct airoha_foe_entry *hwe = ppe->foe + hash * sizeof(*hwe);
- 	u32 ts = airoha_ppe_get_timestamp(ppe);
-@@ -639,7 +639,8 @@ static int airoha_ppe_foe_commit_entry(struct airoha_ppe *ppe,
- 		goto unlock;
- 	}
- 
--	airoha_ppe_foe_flow_stats_update(ppe, npu, hwe, hash);
-+	if (!rx_wlan)
-+		airoha_ppe_foe_flow_stats_update(ppe, npu, hwe, hash);
- 
- 	if (hash < PPE_SRAM_NUM_ENTRIES) {
- 		dma_addr_t addr = ppe->foe_dma + hash * sizeof(*hwe);
-@@ -665,7 +666,7 @@ static void airoha_ppe_foe_remove_flow(struct airoha_ppe *ppe,
- 		e->data.ib1 &= ~AIROHA_FOE_IB1_BIND_STATE;
- 		e->data.ib1 |= FIELD_PREP(AIROHA_FOE_IB1_BIND_STATE,
- 					  AIROHA_FOE_STATE_INVALID);
--		airoha_ppe_foe_commit_entry(ppe, &e->data, e->hash);
-+		airoha_ppe_foe_commit_entry(ppe, &e->data, e->hash, false);
- 		e->hash = 0xffff;
- 	}
- 	if (e->type == FLOW_TYPE_L2_SUBFLOW) {
-@@ -704,7 +705,7 @@ static void airoha_ppe_foe_flow_remove_entry(struct airoha_ppe *ppe,
- static int
- airoha_ppe_foe_commit_subflow_entry(struct airoha_ppe *ppe,
- 				    struct airoha_flow_table_entry *e,
--				    u32 hash)
-+				    u32 hash, bool rx_wlan)
- {
- 	u32 mask = AIROHA_FOE_IB1_BIND_PACKET_TYPE | AIROHA_FOE_IB1_BIND_UDP;
- 	struct airoha_foe_entry *hwe_p, hwe;
-@@ -745,14 +746,14 @@ airoha_ppe_foe_commit_subflow_entry(struct airoha_ppe *ppe,
- 	}
- 
- 	hwe.bridge.data = e->data.bridge.data;
--	airoha_ppe_foe_commit_entry(ppe, &hwe, hash);
-+	airoha_ppe_foe_commit_entry(ppe, &hwe, hash, rx_wlan);
- 
- 	return 0;
- }
- 
- static void airoha_ppe_foe_insert_entry(struct airoha_ppe *ppe,
- 					struct sk_buff *skb,
--					u32 hash)
-+					u32 hash, bool rx_wlan)
- {
- 	struct airoha_flow_table_entry *e;
- 	struct airoha_foe_bridge br = {};
-@@ -787,7 +788,7 @@ static void airoha_ppe_foe_insert_entry(struct airoha_ppe *ppe,
- 			continue;
- 		}
- 
--		airoha_ppe_foe_commit_entry(ppe, &e->data, hash);
-+		airoha_ppe_foe_commit_entry(ppe, &e->data, hash, rx_wlan);
- 		commit_done = true;
- 		e->hash = hash;
- 	}
-@@ -799,7 +800,7 @@ static void airoha_ppe_foe_insert_entry(struct airoha_ppe *ppe,
- 	e = rhashtable_lookup_fast(&ppe->l2_flows, &br,
- 				   airoha_l2_flow_table_params);
- 	if (e)
--		airoha_ppe_foe_commit_subflow_entry(ppe, e, hash);
-+		airoha_ppe_foe_commit_subflow_entry(ppe, e, hash, rx_wlan);
- unlock:
- 	spin_unlock_bh(&ppe_lock);
- }
-@@ -1303,9 +1304,10 @@ int airoha_ppe_setup_tc_block_cb(struct airoha_ppe_dev *dev, void *type_data)
- 	return err;
- }
- 
--void airoha_ppe_check_skb(struct airoha_ppe *ppe, struct sk_buff *skb,
--			  u16 hash)
-+void airoha_ppe_check_skb(struct airoha_ppe_dev *dev, struct sk_buff *skb,
-+			  u16 hash, bool rx_wlan)
- {
-+	struct airoha_ppe *ppe = dev->priv;
- 	u16 now, diff;
- 
- 	if (hash > PPE_HASH_MASK)
-@@ -1317,7 +1319,7 @@ void airoha_ppe_check_skb(struct airoha_ppe *ppe, struct sk_buff *skb,
- 		return;
- 
- 	ppe->foe_check_time[hash] = now;
--	airoha_ppe_foe_insert_entry(ppe, skb, hash);
-+	airoha_ppe_foe_insert_entry(ppe, skb, hash, rx_wlan);
- }
- 
- void airoha_ppe_init_upd_mem(struct airoha_gdm_port *port)
-@@ -1407,6 +1409,7 @@ int airoha_ppe_init(struct airoha_eth *eth)
- 		return -ENOMEM;
- 
- 	ppe->dev.ops.setup_tc_block_cb = airoha_ppe_setup_tc_block_cb;
-+	ppe->dev.ops.check_skb = airoha_ppe_check_skb;
- 	ppe->dev.priv = ppe;
- 
- 	foe_size = PPE_NUM_ENTRIES * sizeof(struct airoha_foe_entry);
-diff --git a/include/linux/soc/airoha/airoha_offload.h b/include/linux/soc/airoha/airoha_offload.h
-index e05ded67c9e6fb89940e5b152f14c6ea0d7c6c49..4da562d0e4db6899d53f95b90a2a4ef2c63c974c 100644
---- a/include/linux/soc/airoha/airoha_offload.h
-+++ b/include/linux/soc/airoha/airoha_offload.h
-@@ -9,10 +9,17 @@
- #include <linux/spinlock.h>
- #include <linux/workqueue.h>
- 
-+enum {
-+	PPE_CPU_REASON_HIT_UNBIND_RATE_REACHED = 0x0f,
-+};
-+
- struct airoha_ppe_dev {
- 	struct {
- 		int (*setup_tc_block_cb)(struct airoha_ppe_dev *dev,
- 					 void *type_data);
-+		void (*check_skb)(struct airoha_ppe_dev *dev,
-+				  struct sk_buff *skb, u16 hash,
-+				  bool rx_wlan);
- 	} ops;
- 
- 	void *priv;
-@@ -27,6 +34,13 @@ static inline int airoha_ppe_dev_setup_tc_block_cb(struct airoha_ppe_dev *dev,
- {
- 	return dev->ops.setup_tc_block_cb(dev, type_data);
- }
-+
-+static inline void airoha_ppe_dev_check_skb(struct airoha_ppe_dev *dev,
-+					    struct sk_buff *skb,
-+					    u16 hash, bool rx_wlan)
-+{
-+	dev->ops.check_skb(dev, skb, hash, rx_wlan);
-+}
- #else
- static inline airoha_ppe_dev *airoha_ppe_get_dev(struct device *dev)
- {
-@@ -42,6 +56,12 @@ static inline int airoha_ppe_setup_tc_block_cb(struct airoha_ppe_dev *dev,
- {
- 	return -EOPNOTSUPP;
- }
-+
-+static inline void airoha_ppe_dev_check_skb(struct airoha_ppe_dev *dev,
-+					    struct sk_buff *skb, u16 hash,
-+					    bool rx_wlan)
-+{
-+}
- #endif
- 
- #define NPU_NUM_CORES		8
-
--- 
-2.50.1
+This is a kernel socket, and FOU doesn't use IPV6_ADDRFORM.
 
 
