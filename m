@@ -1,90 +1,130 @@
-Return-Path: <netdev+bounces-215056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40493B2CF25
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 00:15:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 240FDB2CF40
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 00:20:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D02303BE2FB
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 22:13:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4BDFD7B5436
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 22:19:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAF5F353371;
-	Tue, 19 Aug 2025 22:13:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAC6231CA53;
+	Tue, 19 Aug 2025 22:20:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Vb7YpClR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CnAt9t+V"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C54353347
-	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 22:13:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F0B83054D8
+	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 22:20:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755641620; cv=none; b=UpQDjkRZ6tHaXTHwlInQ7R3wKOTV6KsVeV8ZwEatI7pH/zjdvzcO81d8Rg4l/q2ZSAvocK7kvL03hj+YtNaHHFqSopOBaP/KtynizcgtrfZimwTMUPerP1WtWDzmPk0VIOpK+4j8aKZLmY2KLBAhwl9k2EvXB7Yl88qA1ejMS38=
+	t=1755642006; cv=none; b=AYyenM2kl9fv5P5SR1Uwu2LGtpnwG5SwULg0NAL8s4y1YuJ3BcqHWJrZROkI4/HJ5B+oeIwXjuXj2LLzj3/rqXgqq2EhtaHkEXeWnHAoc/tDqBuNVWXpzAjt2B0AhovAGLZ8vVSGZ0Cgs+lIMdggkFvmFN6GBL+zneIbUkn5Lyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755641620; c=relaxed/simple;
-	bh=JdTQTHXLY7Buj9M2df1e+v13uj8j4VNFOuiTELHRd6Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GScl07cmzVGofPbqDYQZuLh+HGJlu2zhKl003SsvYGS0D2L3eXjCf/z3+O/9GPgysoI9PKBUQTF+4MMPdUnHMfDkTYjrYWBF0YYpQngOb8ZVUC+nwFrODi/UPxuT7Pu/z3htBYo71B8YiWcL6Ob/u02NS+W8qKejOCaxvJ50s60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Vb7YpClR; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=5ArRDWxijJwEfa54JxIkP6oK2yGMB5YGAPJxOKIT670=; b=Vb7YpClRcthH4qP6gYHMb50PXT
-	fdcJprc6O6HJDm/goAwJ3sInSbRn1wLXU7brZbioPNmFQcF6CHG5n18Og3taR3CKrlRkHmhFE/HLu
-	oKmmFTBHWAIIsBQeRNCWA4Na7SxfgPYEclS/ZqcD0a06W1/a6KHny0x/5P3O+2q4equg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uoUaG-005EzV-A2; Wed, 20 Aug 2025 00:13:36 +0200
-Date: Wed, 20 Aug 2025 00:13:36 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Ilya A. Evenbach" <ievenbach@aurora.tech>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH] [88q2xxx] Add support for handling master/slave in
- forced mode
-Message-ID: <57412198-d385-43ef-85ed-4f4edd7b318a@lunn.ch>
-References: <20250819212901.1559962-1-ievenbach@aurora.tech>
+	s=arc-20240116; t=1755642006; c=relaxed/simple;
+	bh=VaJyUYK3KtW+4VUKSErobAZddKClmLFBa4AA+AX57HM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=n213F8U/Svyyb2plo4AriLqolN4k+ESPUBZKks2h4Ylfs6BsLrx2Va/KTM7+DKf7drdzWaYu680Ut9TJrzqVEBezJGB9k47zsyyesQuFYxPNjR2kD+c3nmtnUhbiXXWvyUOUCB61Wiw3Q4vMQFgdonzp158QZ3Ei1jKw+tofGiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CnAt9t+V; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755642005; x=1787178005;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=VaJyUYK3KtW+4VUKSErobAZddKClmLFBa4AA+AX57HM=;
+  b=CnAt9t+V1s9WEp3JlHWeBVsaT7+CqbtSRhcG+PY7RwN7kv0w27LfC9wM
+   Dd+iYbyXZo50ZY4k/7W4lzHWn8SN/xAU9kiEyT53K3pAdMMgPtqRdYuh9
+   YllzccwFSEKkacE3or93Q85Clqq3fqlCS+JAkeiTDcbilKwY3NTjbCD2K
+   vtCve2N+/7GgmMr49flegeO66pvH8+wVpjL0Ih22vLzltz8hWN4+OO+xK
+   zHgqChbtnj4xR3mksgabjnPNejwBw3kSnnKM+/SxGJg2OQY7CPg5y3EJr
+   tZb/bONdiIq5+vuWGTSzzpH9Kn4qZAl+ywZjrq+QlngRC9A+q3eQgFjLv
+   w==;
+X-CSE-ConnectionGUID: sJgZ1VHcT3GWbdqv0CK6zg==
+X-CSE-MsgGUID: /cfDIL/NSOGfJVlOPy8moQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11527"; a="57829548"
+X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
+   d="scan'208";a="57829548"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2025 15:20:04 -0700
+X-CSE-ConnectionGUID: jwWTXTjHRyGUSXi4EzE0VA==
+X-CSE-MsgGUID: TuDSxFR7Siu2/r3k92elMw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
+   d="scan'208";a="173202828"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmviesa004.fm.intel.com with ESMTP; 19 Aug 2025 15:20:04 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net v2 0/5][pull request] Intel Wired LAN Driver Updates 2025-08-15 (ice, ixgbe, igc)
+Date: Tue, 19 Aug 2025 15:19:54 -0700
+Message-ID: <20250819222000.3504873-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250819212901.1559962-1-ievenbach@aurora.tech>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Aug 19, 2025 at 02:29:01PM -0700, Ilya A. Evenbach wrote:
-> 88q2xxx PHYs have non-standard way of setting master/slave in
-> forced mode.
-> This change adds support for changing and reporting this setting
-> correctly through ethtool.
+For ice:
+Emil adds a check to ensure auxiliary device was created before
+tear down to prevent NULL a pointer dereference and adds an unroll error
+path on auxiliary device creation to stop a possible memory leak.
 
-Please could you Cc: Dimitri Fedrau <dima.fedrau@gmail.com>. He has
-done most of the work on this driver.
+For ixgbe:
+Jason Xing corrects a condition in which improper decrement can cause
+improper budget value.
 
-> Signed-off-by: Ilya A. Evenbach <ievenbach@aurora.tech>
-> ---
->  drivers/net/phy/marvell-88q2xxx.c | 107 ++++++++++++++++++++++++++++--
->  1 file changed, 102 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/phy/marvell-88q2xxx.c b/drivers/net/phy/marvell-88q2xxx.c
-> index f3d83b04c953..1ab450056e86 100644
-> --- a/drivers/net/phy/marvell-88q2xxx.c
-> +++ b/drivers/net/phy/marvell-88q2xxx.c
-> @@ -9,6 +9,7 @@
->  #include <linux/ethtool_netlink.h>
->  #include <linux/hwmon.h>
->  #include <linux/marvell_phy.h>
-> +#include <linux/mdio.h>
+Maciej extends down states in which XDP cannot transmit and excludes XDP
+rings from Tx hang checks.
 
-I'm curious. What is needed from this?
+For igc:
+VladikSS moves setting of hardware device information to allow for proper
+check of device ID.
+---
+v2:
+- Drop patch 'ice: fix Rx page leak on multi-buffer frames'
 
-	Andrew
+v1: https://lore.kernel.org/netdev/20250815204205.1407768-1-anthony.l.nguyen@intel.com/
+
+The following are changes since commit 01792bc3e5bdafa171dd83c7073f00e7de93a653:
+  net: ti: icssg-prueth: Fix HSR and switch offload Enablement during firwmare reload.
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 100GbE
+
+Emil Tantilov (2):
+  ice: fix NULL pointer dereference in ice_unplug_aux_dev() on reset
+  ice: fix possible leak in ice_plug_aux_dev() error path
+
+Jason Xing (1):
+  ixgbe: xsk: resolve the negative overflow of budget in ixgbe_xmit_zc
+
+Maciej Fijalkowski (1):
+  ixgbe: fix ndo_xdp_xmit() workloads
+
+ValdikSS (1):
+  igc: fix disabling L1.2 PCI-E link substate on I226 on init
+
+ drivers/net/ethernet/intel/ice/ice.h          |  1 +
+ drivers/net/ethernet/intel/ice/ice_idc.c      | 29 +++++++++-------
+ drivers/net/ethernet/intel/igc/igc_main.c     | 14 ++++----
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 34 ++++++-------------
+ drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c  |  4 ++-
+ 5 files changed, 39 insertions(+), 43 deletions(-)
+
+-- 
+2.47.1
+
 
