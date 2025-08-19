@@ -1,147 +1,169 @@
-Return-Path: <netdev+bounces-214869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC315B2B959
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 08:27:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9663CB2B965
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 08:29:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A4CB1BA3C11
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 06:27:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C274C584C46
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 06:27:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B45726A0AD;
-	Tue, 19 Aug 2025 06:26:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 391EB265CA7;
+	Tue, 19 Aug 2025 06:27:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="hj52rV+/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d2DnRS/g"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7E4E2652B7;
-	Tue, 19 Aug 2025 06:26:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B9702652A4;
+	Tue, 19 Aug 2025 06:27:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755584786; cv=none; b=o7y9zH7OLq/e5H7QrcGwTdnOjgwS0nlD6jNl8FPjzydugCxy1SFxnryuKfRpcDIctmlLjjealfWqL21t8UTE94iDKYBf75UEweb8tM0imlkCI5l1mg4+A2zMO5t88yotuSoJ4f12WKt0wj6RPiKs2QfpeAMe+8FdtO2WViJggXQ=
+	t=1755584834; cv=none; b=GGFGcCaLfiWGOa+hK+imMvuFtkE+VJNhgfTYUMNVDyGImFitlLdYVTB9lTW8Yi2v5b8sLWpaAGDrf0v/qL0y5egZagMICZQPJuXqqj87UWPCnLvSCBhYrlKi9d/0s2tFytetux8vP46YtfunS7JMGtRv/REN7a3nhGIiM/VqgCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755584786; c=relaxed/simple;
-	bh=jqN7N0XM2l7RQwhd+QZ6BjPYyr1iA/Jzm1WRBpfTrJE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=awnqCGjfCigyEayeqvA+NOpSyRCxtqj/jgTThBlTfBzpJ0s+1tXzQP6JiyvxtqugoNH9tRFK18k/yeEC4w5q6ySUUMK3O9NcdqD0jk9WJbKJehZmV1WbLBIl7DKKkdUtS8zbZnvB4TxINZrGvzHzXqKgQI17EUZymdB1gQULjJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=hj52rV+/; arc=none smtp.client-ip=117.135.210.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Sb
-	bv5QhPGynHMeq0UXb8e4p39yIC/4/NvEUYT0rkH8E=; b=hj52rV+/7o+bEUxs0C
-	o6XIzcwLKBnDdTBayVG4CIwXMjC7wfO972WyS+tiLCfxQTNX0Ayc3UKkODNfeNls
-	4FBDrZgged9HNb1fyli596syk6Ol0q9kWRlVJr38iCG6lkA/hvHcuxtHZlkBntz8
-	QPrtfiUTTs7tFLu/h/h0S/9ow=
-Received: from zhaoxin-MS-7E12.. (unknown [])
-	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wAH6YqzGKRoYzv4Cw--.51505S2;
-	Tue, 19 Aug 2025 14:24:52 +0800 (CST)
-From: Xin Zhao <jackzxcui1989@163.com>
-To: willemdebruijn.kernel@gmail.com,
-	edumazet@google.com,
-	ferenc@fejes.dev
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v4] net: af_packet: Use hrtimer to do the retire operation
-Date: Tue, 19 Aug 2025 14:24:51 +0800
-Message-Id: <20250819062451.1089842-1-jackzxcui1989@163.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1755584834; c=relaxed/simple;
+	bh=d3dK6EscB52LS7V8xDRjKX4a4k7soWePrbItDSWszAo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PU5eqp7l04D/xpo0VZwbFyMB++2HfplWNqP0Bao5EBRWnUCBBCrJZqy8a5i3o4RsNj/GepcQedCciubUhUOiUs5GfWeIon7Hk+oyL5EzjwtqahO0/O8o7cKgH5LYIwrO8Z6HN/sQR8U57qllvhd8vW6a20DeCIrSf5RRvOlhQ4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d2DnRS/g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32E89C4CEF4;
+	Tue, 19 Aug 2025 06:27:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755584833;
+	bh=d3dK6EscB52LS7V8xDRjKX4a4k7soWePrbItDSWszAo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=d2DnRS/gW0BBK4MJWi5yuIVIxpjuBmVTMus9okE2GvQdM1ePDvQ7jb0tyueAEC5yd
+	 6kKpNFAo/076+l0TzPjH56963vZwG68Hp1Fgs6vWGCozNrYgO3bBSPxBsFgFQYjUL5
+	 yubE+Qb0zd86AcprMabyz2vb3g4COPEaS7Y/RW+grpi8FyPHp6hCu+1nl+YK3fDZ8x
+	 KIs3fTex/fzbXvDSoIIaQ92lcYvT9syHw90yxPYVTb3MsI7DwGIARNEQjn7ajCBZ7C
+	 Krql+eLy2YMdtfWAHVWjprcGT9knNupZIAemJzXzoE1prt41wY1RmQop5Sevo7xA2F
+	 ix55RtsrVQ53A==
+Message-ID: <a7fc4e8d-453b-49c2-8177-20568431bf81@kernel.org>
+Date: Tue, 19 Aug 2025 08:27:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wAH6YqzGKRoYzv4Cw--.51505S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxXw47ur4fJF4UCr4rJr4ruFg_yoW5Cw1UpF
-	W5ZFy7GwsrXw429a1xXr4kZFWSyws3Jrn8Grs5W34Iywn8Gry5tFZF9FWYvFWUKas29F17
-	ZF4FvryDAwn8ArDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UdUUUUUUUU=
-X-CM-SenderInfo: pmdfy650fxxiqzyzqiywtou0bp/1tbibg2uCmikEt2QHgAAsK
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next v4 1/3] dt-bindings: net: dsa: yt921x: Add Motorcomm
+ YT921x switch support
+To: Andrew Lunn <andrew@lunn.ch>, David Yang <mmyangfl@gmail.com>
+Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+ Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250818162445.1317670-1-mmyangfl@gmail.com>
+ <20250818162445.1317670-2-mmyangfl@gmail.com>
+ <7c4bc4cc-61d5-40ce-b0d5-c47072ee2f16@lunn.ch>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <7c4bc4cc-61d5-40ce-b0d5-c47072ee2f16@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, 2025-08-18 at 17:29 +0800, Willem wrote:
-
-> "We" don't do anything in the middle of a computation. Anyway, branch is
-> self explanatory enough, can drop comment.
+On 18/08/2025 18:55, Andrew Lunn wrote:
+>> +  motorcomm,switch-id:
+>> +    $ref: /schemas/types.yaml#/definitions/uint32
+>> +    description: |
+>> +      Value selected by Pin SWITCH_ID_1 / SWITCH_ID_0.
+>> +
+>> +      Up to 4 chips can share the same MII port ('reg' in DT) by giving
+>> +      different SWITCH_ID values. The default value should work if only one chip
+>> +      is present.
+>> +    enum: [0, 1, 2, 3]
+>> +    default: 0
 > 
-> >   */
-> > -static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core *pkc)
-> > +static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core *pkc,
-> > +		bool start)
+> It is like getting blood from a stone.
 > 
-> Indentation, align with first argument on previous line
-
-
-> > +	else
-> > +		/* We cannot use hrtimer_forward_now here because the function
-> > +		 * _prb_refresh_rx_retire_blk_timer can be called not only when
-> > +		 * the retire timer expires, but also when the kernel logic for
-> > +		 * receiving network packets detects that a network packet has
-> > +		 * filled up a block and calls prb_open_block to use the next
-> > +		 * block. This can lead to a WARN_ON being triggered in
-> > +		 * hrtimer_forward_now when it checks if the timer has already
-> > +		 * been enqueued.
-> > +		 */
+> So what you are saying is that you have:
 > 
-> As discussed, this will be changed in v5.
-
-
-I will change them in v5. And I will ensure that there is a 24-hour send gap between
-each patch.
-
-
-> >  {
-> > -	mod_timer(&pkc->retire_blk_timer,
-> > -			jiffies + pkc->tov_in_jiffies);
-> > +	if (start)
-> > +		hrtimer_start(&pkc->retire_blk_timer, pkc->interval_ktime,
-> > +			      HRTIMER_MODE_REL_SOFT);
+>     mdio {
+>         #address-cells = <1>;
+>         #size-cells = <0>;
 > 
-> It's okay to call this from inside a timer callback itself and return
-> HRTIMER_RESTART? I don't know off the top of my head.
+>         switch@1d {
+>             compatible = "motorcomm,yt9215";
+>             /* default 0x1d, alternate 0x0 */
+>             reg = <0x1d>;
+>             motorcomm,switch-id = <0>;
+>             reset-gpios = <&tlmm 39 GPIO_ACTIVE_LOW>;
+> ...
+> 	}
+> 
+>         switch@1d {
+>             compatible = "motorcomm,yt9215";
+>             reg = <0x1d>;
+>             motorcomm,switch-id = <1>;
+>             reset-gpios = <&tlmm 39 GPIO_ACTIVE_LOW>;
+> ...
+> 	}
+> 
+>         switch@1d {
+>             compatible = "motorcomm,yt9215";
+>             reg = <0x1d>;
+>             motorcomm,switch-id = <2>;
+>             reset-gpios = <&tlmm 39 GPIO_ACTIVE_LOW>;
+> ...
+> 	}
+>     }
+> 
+> Have you tested this? My _guess_ is, it does not work.
 
-Although I have been using hrtimer_start to restart the timer within the callback in
-our project and seem to work weill, I found that it seems no one does this in the
-current mainline kernel code. Therefore, I will add a boolean parameter to the
-callback in version 5 to indicate whether it is within the callback function. If it is
-in the callback function, I will use hrtimer_forward_now instead of hrtimer_start.
-Additionally, while looking at the historical Git logs of hrtimer, I noticed that it is
-possible to call hrtimer_start to start the hrtimer outside of the hrtimer callback, but
-it requires the protection of raw_spin_lock_irqsave. When entering the
-_prb_refresh_rx_retire_blk_timer function, as noted in the comments, there is already
-protection with the sk_buff_head lock, so I only need to add a set of irq save and restore
-operations. The reason for this is based on the reference from link
-https://lore.kernel.org/all/20150415113105.GT5029@twins.programming.kicks-ass.net/T/#u and
-the implementation of the perf_mux_hrtimer_restart function.
+Regardless if kernel actually works with this, but duplicating unit
+address is not supported, so this obviously would be wrong. I guess
+that's the answer for switch-id.
 
-The implementation of the _prb_refresh_rx_retire_blk_timer function in PATCH v5:
-
-/*  Do NOT update the last_blk_num first.
- *  Assumes sk_buff_head lock is held.
- */
-static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core *pkc,
-					     bool start, bool callback)
-{
-	unsigned long flags;
-
-	local_irq_save(flags);
-	if (start && !callback)
-		hrtimer_start(&pkc->retire_blk_timer, pkc->interval_ktime,
-			      HRTIMER_MODE_REL_SOFT);
-	else
-		hrtimer_forward_now(&pkc->retire_blk_timer, pkc->interval_ktime);
-	local_irq_restore(flags);
-	pkc->last_kactive_blk_num = pkc->kactive_blk_num;
-}
-
-
-Thanks
-Xin Zhao
-
+Best regards,
+Krzysztof
 
