@@ -1,107 +1,300 @@
-Return-Path: <netdev+bounces-214865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9C68B2B83F
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 06:06:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03C2DB2B899
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 07:27:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85FF34E8337
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 04:06:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E55D1893AF0
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 05:25:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63629200BBC;
-	Tue, 19 Aug 2025 04:06:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC2530FF2A;
+	Tue, 19 Aug 2025 05:25:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A73/TsHF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="czyEl5EQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3625CEAD7
-	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 04:06:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755576372; cv=none; b=IuQeew3SkXi+1XvGvYcsXx0LvyTcXZ92Tvz0iXzryTA2xW1Tl4I6XlS0N8JxDJVlDuYmXzBqNo7NbcQUM0zQjE6A5M8n8AOfRDL/mf0ULYpzoDos7fWKpLWgxIN1HniX5M/i8tqJMcq8xLmpYd/axH8n8nIdhzeRPbHS1ZxBuc0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755576372; c=relaxed/simple;
-	bh=05e3a3SurCkprk+daDNgdLibJMNr+3FeQ+hQgMXXfvs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fJFl1+PfD6dxIvxZL8xaaW5VyB9GeTdK0u8bBW01ajrYix6kwO9jhmNW1aFmTX5kCScnayaYNplvc9JBpRcK34X+myzDS14TmVPCnNp6day0Wp4MgG3Y9jhNFX5RMBubL1Ugfu/TYClz/52A4rAC6ATZLWbCMqLLKnbwq7Pcfb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A73/TsHF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A18AC4CEF4;
-	Tue, 19 Aug 2025 04:06:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755576371;
-	bh=05e3a3SurCkprk+daDNgdLibJMNr+3FeQ+hQgMXXfvs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=A73/TsHFXpYM3lo/fVY3rZJJL0XI6ovlo8rUOIJfYBGF3FxBd6vkdWnx+r5e6TBAx
-	 ASHhQCkF/ezz1ZXP2tdIkSkTgG/7Dmt0oOzvYy8K/LS9KxQ9b06sl0XQBmxgLLPa5h
-	 Nc3FcQbgy9/GCwh3W0YRoCwEiV8cZnxoURt+seFTHp/ZmUsZZiUfPJkF87ZA6odtKT
-	 K3lbCtRLP4Vx8StF0FqiHWox1yrq82jZ5GhJvrmDMSnYQdKvdbZNB5ybR6TQ32KTwg
-	 8zCXv7vzNU7QIIOHgdZbScls5F5FbDam0BB1sLd2U/HbDjbvY2CrPZoZvtUJr0Kqnj
-	 N4TPliuBh12Vg==
-Date: Mon, 18 Aug 2025 21:06:10 -0700
-From: Kees Cook <kees@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	dhowells@redhat.com, gustavoars@kernel.org,
-	aleksander.lobakin@intel.com, tstruk@gigaio.com
-Subject: Re: [PATCH net-next] stddef: don't include compiler_types.h in the
- uAPI header
-Message-ID: <202508182056.0D808624D8@keescook>
-References: <20250818181848.799566-1-kuba@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2C8030F81A
+	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 05:25:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755581115; cv=fail; b=iLhrc7X5pOayezVWEBMJ2PW04mNLlWQ65ioxaCyt8hWqS+MuZuAFsK86jSHAypyG4p9Ucybq3Aa1QouMHQKLhIUVXe5dX92RqxJWa6RfbSx80ZwJgiy7RWKx2eMi5r/3YWheuHqcd7/YOPVehFotigXZFT8Tv3u037nv+v4u+ss=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755581115; c=relaxed/simple;
+	bh=dGH/jU2R0LKMbtpV3w8NKmp9bSW7D+l/jOztm9MbNk8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=gQ8YxsTpdnB62PslYp0oQ0sBhy5Nt4KxFuFYh/zq3SpVBYysjQIHhYnKoNJkxF6a711jMaPYjhzE2j5y5oReBosIWitpfxVkdnqIZ1Pw3A2Grn7yNsaBOgZdRE0S/FxKbxTxbL3m7tDjxGLdUBVVEPUaDbsIZIdbZcy6L5jBFxE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=czyEl5EQ; arc=fail smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755581114; x=1787117114;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=dGH/jU2R0LKMbtpV3w8NKmp9bSW7D+l/jOztm9MbNk8=;
+  b=czyEl5EQSTZust7nVYL62AYZs410gxjbz85NirOIbug0I12YibXmtOnc
+   vqLoWsYl/YK4vEZhx1KzSm9I8hP1/e0l4hVomWVuf/BnsVRhQHILMNDL5
+   w/17bs04mFjslu+7TZwEaT+KDoNyuPwqRfD6JntdfCtGZ4uTLh2GIMC2x
+   JhdrJVUdB7S9yYQUgyl+Jpkxw48iIJmMgpla0vTs5390mn1njiBYnRIDu
+   6n8lITSTa3GtSU+R9xsbd303HbAdFLx6uYU++WMj8Jf8PSbGU2unO6W9S
+   TXexe0+4WgHYWlEw6qKTTZNw4Y5Ic1UYNQot4c+yk9dNmYNtYG9XFnR7R
+   A==;
+X-CSE-ConnectionGUID: 9TfktlEbSq6+NcaX4Grceg==
+X-CSE-MsgGUID: iEUJnzEUR5WM95hW5VD7hw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11526"; a="57527304"
+X-IronPort-AV: E=Sophos;i="6.17,300,1747724400"; 
+   d="scan'208";a="57527304"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2025 22:25:13 -0700
+X-CSE-ConnectionGUID: LbMfXS0uTSOzPThLXkovng==
+X-CSE-MsgGUID: pEwdeqCmTtOSz3FSlk715w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,300,1747724400"; 
+   d="scan'208";a="166988527"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2025 22:25:13 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 18 Aug 2025 22:25:12 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Mon, 18 Aug 2025 22:25:12 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (40.107.223.82)
+ by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 18 Aug 2025 22:25:12 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=TsZsNgYffiuK3JIjjKKrFuVcYhuFIG9PWk36Pvww2pGQYazUPGVttYV31NpC1g4Bfao/9v8ururDMU2YOXCaA6jVgO3BE2U10rpb+EE+Gf7df4OMrs9/8dNnwwc4kHEZkFi0rWdmwItOwBQpW3pw6F9rsq6bAaSi0taAweEwBU929R97BmIwhBISFL8b8dDA9HCg+gFtDE4nxkuJj7aZduF86B8i8S9nb4bnm82cwwyAfsFKg/cg3FQCvLfgaA821jTIHRCTe7fFtaUpwdPrAWEg2YYBPHE+Urbl7Uy2vVW+F6a3OkU9DKY9WVpqP8jXi1qTuqOh8Hv4XuzjO71o9A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DLPPjlZVQSP+HXKOxFckxBnB+b/mIyM4aKlFuliaTnA=;
+ b=SQNiikwOgFHmFMJ+GtC7qfExaKy41Up557jDwpzbaPF1yS1twsqllnC/iUV39eX/y+OTYMMEgsXeJTf8M9J2B4IhZphyEWQ8cLkJc1PqpTDCq1ByxwygcULUhO06dAIKrmAGGpjB4NhMR6g0g/tOyZhYcvxLCmAKeNndRiGKgH3JrbUTHrlHNNbMVg6D6vFPu3stng+LwHdedb1YcYfb1skEADVwrBAkLJRrPw47etZVUO45Zfv60XEugpcTUA/xW6U+NCPP37M9KIK3XDlew5raVVUF4KeoGGpgMkEXZ6jpzPSoOk29/jbsM+UtKCNsLz0X4PYq4kDfTIy9BorUyw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH3PPF67C992ECC.namprd11.prod.outlook.com
+ (2603:10b6:518:1::d28) by LV4PR11MB9467.namprd11.prod.outlook.com
+ (2603:10b6:408:2d8::5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.25; Tue, 19 Aug
+ 2025 05:25:10 +0000
+Received: from PH3PPF67C992ECC.namprd11.prod.outlook.com
+ ([fe80::8435:3b39:7eee:480]) by PH3PPF67C992ECC.namprd11.prod.outlook.com
+ ([fe80::8435:3b39:7eee:480%4]) with mapi id 15.20.9031.023; Tue, 19 Aug 2025
+ 05:25:09 +0000
+From: "Singh, PriyaX" <priyax.singh@intel.com>
+To: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "Zaremba, Larysa" <larysa.zaremba@intel.com>,
+	"Zaremba, Larysa" <larysa.zaremba@intel.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"bjorn@kernel.org" <bjorn@kernel.org>, "Fijalkowski, Maciej"
+	<maciej.fijalkowski@intel.com>, "Fijalkowski, Maciej"
+	<maciej.fijalkowski@intel.com>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Jason Infantolino
+	<jason.infantolino@cymer.com>, "kernelxing@tencent.com"
+	<kernelxing@tencent.com>
+Subject: RE: [Intel-wired-lan] [PATCH v2 iwl-net] ixgbe: xsk: resolve the
+ negative overflow of budget in ixgbe_xmit_zc
+Thread-Topic: [Intel-wired-lan] [PATCH v2 iwl-net] ixgbe: xsk: resolve the
+ negative overflow of budget in ixgbe_xmit_zc
+Thread-Index: AQHb/fuJjlyB9GtbZ02vmR10YRv5xbRgf3lAgAkV+/A=
+Date: Tue, 19 Aug 2025 05:25:09 +0000
+Message-ID: <PH3PPF67C992ECCC9C89104E935C33EB1709130A@PH3PPF67C992ECC.namprd11.prod.outlook.com>
+References: <20250726070356.58183-1-kerneljasonxing@gmail.com>
+ <PH0PR11MB50135E015152E30636D2AC37962AA@PH0PR11MB5013.namprd11.prod.outlook.com>
+In-Reply-To: <PH0PR11MB50135E015152E30636D2AC37962AA@PH0PR11MB5013.namprd11.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH3PPF67C992ECC:EE_|LV4PR11MB9467:EE_
+x-ms-office365-filtering-correlation-id: 2e8b9a47-6ad1-48dc-2010-08dddee0c3c5
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700018|921020|7053199007;
+x-microsoft-antispam-message-info: =?us-ascii?Q?DmP9LFPGWd8TMBfone9aMrhKHDcezgi8gvKF0u8AVVv//oFW008tnweog6Gh?=
+ =?us-ascii?Q?Qb8p/kzufwXNYCIqpVHu5VytdkEHK8Gjjk0VvdrXiuY9ve6iR0c7kvGGQS3n?=
+ =?us-ascii?Q?KWnGT7D7wh863mioxShmHb12fWCkcXUzYY0IsE5gwyPZLw1SK+aPKRbh5/4+?=
+ =?us-ascii?Q?wCYZJxxap//a5TJEpfHqG639kQI04qNavLlPK3W3v9WBvQ21odCJdbm5jp9x?=
+ =?us-ascii?Q?fY8B1oQoseQdPE17xfx3mvF6tqPIybq37sU2RMsecFIZ8I63VCh/WR6Qh8jI?=
+ =?us-ascii?Q?Z1WOAo13H2ZWnDxTkErkqzovzQa0TRbi6tHez5039ls8shKWgo3SNQHbWuGB?=
+ =?us-ascii?Q?2wlUfFhEMTbfvn3tVEg3xoa2PAEnPEOtNhqNWBLcAmbv9AOXdlPMxgiFAB+r?=
+ =?us-ascii?Q?cFuFnvSCAUFPLrNo0i/l9n/Un8Q8jAVohEaFQZLoy8uAcxnophmTExVmIZ6r?=
+ =?us-ascii?Q?bkfq/ggcW3eioxpnrXApgSR5VWrbf669jqXICyDRwx7zuJ5oCOmZCF5Xnr1b?=
+ =?us-ascii?Q?T47eHa+9mNDC/yThFfkuAC2f0FoayqPuiN/OBXziWgyF/sg8ppEwGksZxulr?=
+ =?us-ascii?Q?E6PLNLaEOhIBB97ohGrvzEythwqpbNxlfIQOyVIUGEA8usKFAskb+tBUWiRu?=
+ =?us-ascii?Q?QsAaVlIRiG68wBSQryhSbn/ZM70ea6mV5k2Ud9FhqFr9l9+H+wFY7oQWxEt8?=
+ =?us-ascii?Q?pA/NbrgHhvS5TyGQMW27hrNP3egDEfdS0lKujYkIVzbHJmAYIVYjUJOdM5Fj?=
+ =?us-ascii?Q?jSYP8BLDBP3qBi3NKMfQCDQEM8X/SgYjoDUuAG1pxMr9B58OnxsBxqdmGLcP?=
+ =?us-ascii?Q?myMqvvft6dk8BuJj6oRUtJaL6YfiEj8sCPvh3s8BZ1LBKF4llxCNHnzS33RO?=
+ =?us-ascii?Q?jQ9k/QeO3V5kEI+xnrqxhfVWbiIRM9G+RJj9ID9SxxeQU4LrbxvcwlyH5JRH?=
+ =?us-ascii?Q?ab2gIA1r48ID69y+1zT6TiyFtEsPcgG40RLQ0hnsLJdY9sTmJ6RxRRt2XpKY?=
+ =?us-ascii?Q?/bCT6ZNhGtZNbNtsUiEXyegUOZdjBWZDhc7KbaoqXeRz4IM4kihQyGKjoV4r?=
+ =?us-ascii?Q?9G7RfHOrrTMifOjz+rXfxGQ31gp0+7TeDWu4GB5UyA05ia/6/5CKkaNRYe8b?=
+ =?us-ascii?Q?f6OUCljkB9aTyMPrahHfCkkp8ADAYOD030HL/t+PcAxs1nV8/DWamD1I5Ees?=
+ =?us-ascii?Q?yseY1q6wd8f6Tfgd5qZ7mW45/vevi+xxcP/NyqS5Bo2U2ajFTh1HmvR477/Q?=
+ =?us-ascii?Q?G+Wq65e+vznsBlgUDt2k2tpNEk9TBUiBpwHi7AYJhTuUP3KnJjx0snGjFB/P?=
+ =?us-ascii?Q?WyIVlfyFGmgy7N88OhltfdK1IdJ/dw2qs1+4/vGBWdZiThngeRXUsZTBNB1+?=
+ =?us-ascii?Q?N3hSr9h7IR6hZLz7/xnRY3Uzfimu5Y4qtO2atqEWBuPM+/iaGRTwdIdBM3OY?=
+ =?us-ascii?Q?Bi/TflpM2VkhDPnnKnL91fnxXhpjgWKC?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH3PPF67C992ECC.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700018)(921020)(7053199007);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?LipnbjJOHxkFgU9W6mYErX4PFUEpAoayQb9+Cfj95qhtLmF9uPjr3QdY1kPP?=
+ =?us-ascii?Q?GpOXBykxba5HnoPopH3X97umijrlbanGP4sjvbpTZ6kpoMAaGMhL7FsMCdti?=
+ =?us-ascii?Q?tCCGJsKwYRrj0JFhBDKc1TwLX9gcC+63Gn99Nb2au58O2mMiRWXLj0vGf5bM?=
+ =?us-ascii?Q?/JjBu3h7q0vPh1v26JmGRp3OH23iAf4FS8xnQ5pnkvksMCkxrN+SrlVsXFah?=
+ =?us-ascii?Q?cNAmZIwGNJologIIbT6ZTKt2JUSdhFlHcKtw9ueiQb1AaRYwt+LudX4ln5W+?=
+ =?us-ascii?Q?hX0YL6nr0mCdX/BWf32/A2kV+uEVXi4DGyDp5AHgklQs9p0vleP8r9d86CMA?=
+ =?us-ascii?Q?DpQyM/9fu1cnrCRcsbnsqo//ZnGtG8NHzieeFfczh66OWbG1k5gz28RWTpo8?=
+ =?us-ascii?Q?2tO5I94+3S2A+5MaPo4QAenw/2aBzJgrAk+6d0+YEbvCOj9uN1CWZVz6l7Ce?=
+ =?us-ascii?Q?4QcESnqIGKmcLDH+/xkLqf6Pj1U6jS2zK6b7y/aPya5ePfp9m4rnZN/J3239?=
+ =?us-ascii?Q?dWZ7SN93meGZe8knCXN9rwDkEaBIb0iqrQS7/cc60aYAdRNi8Td2wQF/DMCm?=
+ =?us-ascii?Q?p4uil/FBRHxYSiGQKIIxZTs/MmuLFcXrlw1AR7kKP/HiQVOQQygjF5e2pNcZ?=
+ =?us-ascii?Q?4eVfpyyObCKtx0y++6RCWAhF1SqoEKIAmz6FV8hUW+4JBLZ1GqWHmLDscOMX?=
+ =?us-ascii?Q?YCwP/GgXoexT0Hz/rSlgjVDCR0sR6iwcIO0IFnPjEbiycOYkNecFuA1Jw4Zf?=
+ =?us-ascii?Q?6HWci6wIHam9meJuf5OXXn6R2fAoAG4cVdNn/9BhB+rvE2ewd3Si/Jz1Ik5J?=
+ =?us-ascii?Q?vJzkJe7FhNLdIvahBHQOug+2htNdafSFGoQ74ajhhibrlJ8ynUF1QJFQ2UAW?=
+ =?us-ascii?Q?HNwfUwKYUkeKmtOdUCltHy8OjS7wQ8giEg8TcsePqPkSGjkpGXiaS8l6WqW6?=
+ =?us-ascii?Q?giDKNrGgQf2YoHjm2+7xA9eNU1olv3bh+/ZnlWRhSAEHbgghl1dWKHJwiIhP?=
+ =?us-ascii?Q?o3q5PAHD2tdtxbYfav2v0Ly0c84ivEN9+wUMBZhVnC/pRTj+B8qfN0OEWGq5?=
+ =?us-ascii?Q?aFDsFAzm2z2lkftZj/TZEIeSqly+NtcQu5PhvfhpGk6sTOF4AoOZj/8QVqhQ?=
+ =?us-ascii?Q?IonZ8fCqDCSqX67/DOinT8i/hWcQiUVc1U9kR+e4HV8xPPjDuPJ6wbljY1oA?=
+ =?us-ascii?Q?JIBEjsl7qpIwZkrglVDbSl6A0Of7JwOzW4PsqdgPfqovVXTD8zIIoYV9Wlqr?=
+ =?us-ascii?Q?U3ALhxoMegW8dPZOJjDOf9+or/jD0IYj5t5tKF0oImDbhTC6SfbidcJrjNcD?=
+ =?us-ascii?Q?YW5c3d4VLTTMYEqC/3CviN5pqlzy8W/Dlh/XxaQts9jWRtC9yU7l2DTRQ8RQ?=
+ =?us-ascii?Q?TuYq9lGVE1OpGmOs+uozexiqrjSBATY1ebmNIBAMJYF9mHwjfn6w1ljmLOlC?=
+ =?us-ascii?Q?V/F1spRLn4rOUP6Yw21tS7JiXqs24sX3TOAHf/DkaLy69upV/5utRYdpFtCz?=
+ =?us-ascii?Q?3UqqcZ3Ztkr4hkVRlK+X8NaeRlYk4HMss/rdYxeKzhXnQBM22AzDVJHbCciT?=
+ =?us-ascii?Q?wDNVP2iKCYpqE7Itd4yCQTqhYcJsFLhrktf1iK3c?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250818181848.799566-1-kuba@kernel.org>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH3PPF67C992ECC.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2e8b9a47-6ad1-48dc-2010-08dddee0c3c5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Aug 2025 05:25:09.4471
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 60cwT85Saxoq/wx7WmlT+Cpzbl77xjWIKDEJrkSzsx/A979YVIfJC4J2Kodk2kzkuPslzdUMJkSPzVFoOAipsw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV4PR11MB9467
+X-OriginatorOrg: intel.com
 
-On Mon, Aug 18, 2025 at 11:18:48AM -0700, Jakub Kicinski wrote:
-> [...]
-> header. There is a hack in scripts/headers_install.sh which
-> strips includes of compiler.h and compiler_types.h.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Jason Xing
+> Sent: Saturday, July 26, 2025 12:34 PM
+> To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>; Zaremba, Larysa
+> <larysa.zaremba@intel.com>; andrew+netdev@lunn.ch;
+> davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
+> pabeni@redhat.com; bjorn@kernel.org; Fijalkowski, Maciej
+> <maciej.fijalkowski@intel.com>
+> Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Jason Xing
+> <kernelxing@tencent.com>
+> Subject: [Intel-wired-lan] [PATCH v2 iwl-net] ixgbe: xsk: resolve the neg=
+ative
+> overflow of budget in ixgbe_xmit_zc
+>=20
+> From: Jason Xing <kernelxing@tencent.com>
+>=20
+> Resolve the budget negative overflow which leads to returning true in
+> ixgbe_xmit_zc even when the budget of descs are thoroughly consumed.
+>=20
+> Before this patch, when the budget is decreased to zero and finishes
+> sending the last allowed desc in ixgbe_xmit_zc, it will always turn back =
+and
+> enter into the while() statement to see if it should keep processing pack=
+ets,
+> but in the meantime it unexpectedly decreases the value again to 'unsigne=
+d
+> int (0--)', namely, UINT_MAX. Finally, the ixgbe_xmit_zc returns true,
+> showing 'we complete cleaning the budget'. That also means
+> 'clean_complete =3D true' in ixgbe_poll.
+>=20
+> The true theory behind this is if that budget number of descs are
+> consumed, it implies that we might have more descs to be done. So we
+> should return false in ixgbe_xmit_zc to tell napi poll to find another ch=
+ance
+> to start polling to handle the rest of descs. On the contrary, returning =
+true
+> here means job done and we know we finish all the possible descs this tim=
+e
+> and we don't intend to start a new napi poll.
+>=20
+> It is apparently against our expectations. Please also see how
+> ixgbe_clean_tx_irq() handles the problem: it uses do..while() statement t=
+o
+> make sure the budget can be decreased to zero at most and the negative
+> overflow never happens.
+>=20
+> The patch adds 'likely' because we rarely would not hit the loop codition
+> since the standard budget is 256.
+>=20
+> Fixes: 8221c5eba8c1 ("ixgbe: add AF_XDP zero-copy Tx support")
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> Reviewed-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> ---
+> Link: https://lore.kernel.org/all/20250720091123.474-3-
+> kerneljasonxing@gmail.com/
+> 1. use 'negative overflow' instead of 'underflow' (Willem) 2. add reviewe=
+d-by
+> tag (Larysa) 3. target iwl-net branch (Larysa) 4. add the reason why the =
+patch
+> adds likely() (Larysa)
+> ---
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
+> b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
+> index ac58964b2f08..7b941505a9d0 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
+> @@ -398,7 +398,7 @@ static bool ixgbe_xmit_zc(struct ixgbe_ring
+> *xdp_ring, unsigned int budget)
+>  	dma_addr_t dma;
+>  	u32 cmd_type;
+>=20
+> -	while (budget-- > 0) {
+> +	while (likely(budget)) {
+>  		if (unlikely(!ixgbe_desc_unused(xdp_ring))) {
+>  			work_done =3D false;
+>  			break;
+> @@ -433,6 +433,8 @@ static bool ixgbe_xmit_zc(struct ixgbe_ring
+> *xdp_ring, unsigned int budget)
+>  		xdp_ring->next_to_use++;
+>  		if (xdp_ring->next_to_use =3D=3D xdp_ring->count)
+>  			xdp_ring->next_to_use =3D 0;
+> +
+> +		budget--;
+>  	}
+>=20
+>  	if (tx_desc) {
+> --
+> 2.41.3
 
-This looks like the last user of compiler_types.h in include/uapi, so
-it'd probably be best to also remove portion of the hack from
-scripts/headers_install.sh while you're at it.
-
-> [...]
-> understanding knows what that chain would be, given
-> kernel doesn't include uAPI stddef.h, and user space
-> has the compiler headers stripped.
-
-Uh, yes it does:
-
-$ git grep uapi/linux/stddef.h
-include/linux/stddef.h:#include <uapi/linux/stddef.h>
-
-> [...]
-> Since nothing needs this include, let's remove it.
-
-But yes, nothing uses compiler_types.h via uapi/linux/stddef.h. That
-does seem to be true.
-
-I find the change of subject between stddef.h ("nothing includes the
-uapi header") and compiler_types.h ("nothing needs this include") to be
-confusing in the commit log. :)
-
-> [...]
-> Builds pass on x86, arm64, csky, m68k, riscv32.
-> The direct motivation for the change is that the includes
-> of compiler.h and co. make it hard to include uAPI headers
-> from tools/.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-
-If you can clear that up and everything is building, then this change
-would be fine my me.
-
--- 
-Kees Cook
+Tested-by: Priya Singh <priyax.singh@intel.com>
 
