@@ -1,300 +1,177 @@
-Return-Path: <netdev+bounces-214866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03C2DB2B899
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 07:27:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC80CB2B912
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 08:05:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E55D1893AF0
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 05:25:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1C195821E6
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 06:05:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC2530FF2A;
-	Tue, 19 Aug 2025 05:25:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 248F224887E;
+	Tue, 19 Aug 2025 06:05:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="czyEl5EQ"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="cXhhhMiF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2C8030F81A
-	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 05:25:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755581115; cv=fail; b=iLhrc7X5pOayezVWEBMJ2PW04mNLlWQ65ioxaCyt8hWqS+MuZuAFsK86jSHAypyG4p9Ucybq3Aa1QouMHQKLhIUVXe5dX92RqxJWa6RfbSx80ZwJgiy7RWKx2eMi5r/3YWheuHqcd7/YOPVehFotigXZFT8Tv3u037nv+v4u+ss=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755581115; c=relaxed/simple;
-	bh=dGH/jU2R0LKMbtpV3w8NKmp9bSW7D+l/jOztm9MbNk8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=gQ8YxsTpdnB62PslYp0oQ0sBhy5Nt4KxFuFYh/zq3SpVBYysjQIHhYnKoNJkxF6a711jMaPYjhzE2j5y5oReBosIWitpfxVkdnqIZ1Pw3A2Grn7yNsaBOgZdRE0S/FxKbxTxbL3m7tDjxGLdUBVVEPUaDbsIZIdbZcy6L5jBFxE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=czyEl5EQ; arc=fail smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755581114; x=1787117114;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=dGH/jU2R0LKMbtpV3w8NKmp9bSW7D+l/jOztm9MbNk8=;
-  b=czyEl5EQSTZust7nVYL62AYZs410gxjbz85NirOIbug0I12YibXmtOnc
-   vqLoWsYl/YK4vEZhx1KzSm9I8hP1/e0l4hVomWVuf/BnsVRhQHILMNDL5
-   w/17bs04mFjslu+7TZwEaT+KDoNyuPwqRfD6JntdfCtGZ4uTLh2GIMC2x
-   JhdrJVUdB7S9yYQUgyl+Jpkxw48iIJmMgpla0vTs5390mn1njiBYnRIDu
-   6n8lITSTa3GtSU+R9xsbd303HbAdFLx6uYU++WMj8Jf8PSbGU2unO6W9S
-   TXexe0+4WgHYWlEw6qKTTZNw4Y5Ic1UYNQot4c+yk9dNmYNtYG9XFnR7R
-   A==;
-X-CSE-ConnectionGUID: 9TfktlEbSq6+NcaX4Grceg==
-X-CSE-MsgGUID: iEUJnzEUR5WM95hW5VD7hw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11526"; a="57527304"
-X-IronPort-AV: E=Sophos;i="6.17,300,1747724400"; 
-   d="scan'208";a="57527304"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2025 22:25:13 -0700
-X-CSE-ConnectionGUID: LbMfXS0uTSOzPThLXkovng==
-X-CSE-MsgGUID: pEwdeqCmTtOSz3FSlk715w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,300,1747724400"; 
-   d="scan'208";a="166988527"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2025 22:25:13 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87BD71863E;
+	Tue, 19 Aug 2025 06:05:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755583537; cv=none; b=c609J+k8zX4Fny/5bXC/Wu3SUXLXH+lsp9U6MuXuGffuRpl4nVYrVMWasIMr7GgoHdQuNwtL9aY24o+CUwkWRILsNPsnVDYUNp0TBgiYdqFavvYFv5Mw3OR5sv6qH847ZUw4zJmDD3hUSw+Lg3CPT0UAcN4St3wnLL3TgtLt5s4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755583537; c=relaxed/simple;
+	bh=N3LS7WI2X5NWesZ4A5L63sw8/+kTcuheRn9ATmG66jM=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XTytOkmTSJcaS3tcmwebAF5qEon5l+rQPTeRCTCv9smfACHKY0CpJg+riO0ME3/KkB9OqHLyLSCuPSDoFq3eIszb3G7uq+xeE9u6mlHoZt1P5xk9DxDAFkb0fBZDw1zHF1OyhzWXSHT4EWaZyDHRIPjzO7WeYCtaI1PpA9UWyCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=cXhhhMiF; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57INWaPb004812;
+	Mon, 18 Aug 2025 23:05:18 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=TB0qNR0SEwJRdxY8s9wEQYgP9
+	m0pbeXDRFVyU84GPyM=; b=cXhhhMiFKQhwLTHhBhY9XXs6hHV7aEDm/cDK0l0Qw
+	pLnMritCxNJRxaTjAdUSJxSRHJeTY4+OC5Lm7rheAuQSPxIAMDUe8bFcKXl92WRJ
+	8GJmbNpPnnFeMp+rtnCGbuPWB8QoMXUmv5Kg6xDK/Q4fyXN/WcLsNwD1Q9Sg6Rw+
+	iRs0z5WTEtjjWUTw7/EbbmAL0KcLIedYgvm0nnKbT61sH1s3la9ukEY0/S5G2/If
+	PaYHOSm5C0IVs9DLUnYSo06SroG0RWyjWQcW6f1wXeaLkh8UIwV2qPABNwS4w4Bh
+	hXIkLoaFu1HvQmHyagXdkEzQ+eVvCbqmcsNpN3k1oyWTQ==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 48mdx0gm08-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 18 Aug 2025 23:05:18 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Mon, 18 Aug 2025 22:25:12 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Mon, 18 Aug 2025 22:25:12 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (40.107.223.82)
- by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Mon, 18 Aug 2025 22:25:12 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=TsZsNgYffiuK3JIjjKKrFuVcYhuFIG9PWk36Pvww2pGQYazUPGVttYV31NpC1g4Bfao/9v8ururDMU2YOXCaA6jVgO3BE2U10rpb+EE+Gf7df4OMrs9/8dNnwwc4kHEZkFi0rWdmwItOwBQpW3pw6F9rsq6bAaSi0taAweEwBU929R97BmIwhBISFL8b8dDA9HCg+gFtDE4nxkuJj7aZduF86B8i8S9nb4bnm82cwwyAfsFKg/cg3FQCvLfgaA821jTIHRCTe7fFtaUpwdPrAWEg2YYBPHE+Urbl7Uy2vVW+F6a3OkU9DKY9WVpqP8jXi1qTuqOh8Hv4XuzjO71o9A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DLPPjlZVQSP+HXKOxFckxBnB+b/mIyM4aKlFuliaTnA=;
- b=SQNiikwOgFHmFMJ+GtC7qfExaKy41Up557jDwpzbaPF1yS1twsqllnC/iUV39eX/y+OTYMMEgsXeJTf8M9J2B4IhZphyEWQ8cLkJc1PqpTDCq1ByxwygcULUhO06dAIKrmAGGpjB4NhMR6g0g/tOyZhYcvxLCmAKeNndRiGKgH3JrbUTHrlHNNbMVg6D6vFPu3stng+LwHdedb1YcYfb1skEADVwrBAkLJRrPw47etZVUO45Zfv60XEugpcTUA/xW6U+NCPP37M9KIK3XDlew5raVVUF4KeoGGpgMkEXZ6jpzPSoOk29/jbsM+UtKCNsLz0X4PYq4kDfTIy9BorUyw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH3PPF67C992ECC.namprd11.prod.outlook.com
- (2603:10b6:518:1::d28) by LV4PR11MB9467.namprd11.prod.outlook.com
- (2603:10b6:408:2d8::5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.25; Tue, 19 Aug
- 2025 05:25:10 +0000
-Received: from PH3PPF67C992ECC.namprd11.prod.outlook.com
- ([fe80::8435:3b39:7eee:480]) by PH3PPF67C992ECC.namprd11.prod.outlook.com
- ([fe80::8435:3b39:7eee:480%4]) with mapi id 15.20.9031.023; Tue, 19 Aug 2025
- 05:25:09 +0000
-From: "Singh, PriyaX" <priyax.singh@intel.com>
-To: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "Zaremba, Larysa" <larysa.zaremba@intel.com>,
-	"Zaremba, Larysa" <larysa.zaremba@intel.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"bjorn@kernel.org" <bjorn@kernel.org>, "Fijalkowski, Maciej"
-	<maciej.fijalkowski@intel.com>, "Fijalkowski, Maciej"
-	<maciej.fijalkowski@intel.com>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Jason Infantolino
-	<jason.infantolino@cymer.com>, "kernelxing@tencent.com"
-	<kernelxing@tencent.com>
-Subject: RE: [Intel-wired-lan] [PATCH v2 iwl-net] ixgbe: xsk: resolve the
- negative overflow of budget in ixgbe_xmit_zc
-Thread-Topic: [Intel-wired-lan] [PATCH v2 iwl-net] ixgbe: xsk: resolve the
- negative overflow of budget in ixgbe_xmit_zc
-Thread-Index: AQHb/fuJjlyB9GtbZ02vmR10YRv5xbRgf3lAgAkV+/A=
-Date: Tue, 19 Aug 2025 05:25:09 +0000
-Message-ID: <PH3PPF67C992ECCC9C89104E935C33EB1709130A@PH3PPF67C992ECC.namprd11.prod.outlook.com>
-References: <20250726070356.58183-1-kerneljasonxing@gmail.com>
- <PH0PR11MB50135E015152E30636D2AC37962AA@PH0PR11MB5013.namprd11.prod.outlook.com>
-In-Reply-To: <PH0PR11MB50135E015152E30636D2AC37962AA@PH0PR11MB5013.namprd11.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH3PPF67C992ECC:EE_|LV4PR11MB9467:EE_
-x-ms-office365-filtering-correlation-id: 2e8b9a47-6ad1-48dc-2010-08dddee0c3c5
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700018|921020|7053199007;
-x-microsoft-antispam-message-info: =?us-ascii?Q?DmP9LFPGWd8TMBfone9aMrhKHDcezgi8gvKF0u8AVVv//oFW008tnweog6Gh?=
- =?us-ascii?Q?Qb8p/kzufwXNYCIqpVHu5VytdkEHK8Gjjk0VvdrXiuY9ve6iR0c7kvGGQS3n?=
- =?us-ascii?Q?KWnGT7D7wh863mioxShmHb12fWCkcXUzYY0IsE5gwyPZLw1SK+aPKRbh5/4+?=
- =?us-ascii?Q?wCYZJxxap//a5TJEpfHqG639kQI04qNavLlPK3W3v9WBvQ21odCJdbm5jp9x?=
- =?us-ascii?Q?fY8B1oQoseQdPE17xfx3mvF6tqPIybq37sU2RMsecFIZ8I63VCh/WR6Qh8jI?=
- =?us-ascii?Q?Z1WOAo13H2ZWnDxTkErkqzovzQa0TRbi6tHez5039ls8shKWgo3SNQHbWuGB?=
- =?us-ascii?Q?2wlUfFhEMTbfvn3tVEg3xoa2PAEnPEOtNhqNWBLcAmbv9AOXdlPMxgiFAB+r?=
- =?us-ascii?Q?cFuFnvSCAUFPLrNo0i/l9n/Un8Q8jAVohEaFQZLoy8uAcxnophmTExVmIZ6r?=
- =?us-ascii?Q?bkfq/ggcW3eioxpnrXApgSR5VWrbf669jqXICyDRwx7zuJ5oCOmZCF5Xnr1b?=
- =?us-ascii?Q?T47eHa+9mNDC/yThFfkuAC2f0FoayqPuiN/OBXziWgyF/sg8ppEwGksZxulr?=
- =?us-ascii?Q?E6PLNLaEOhIBB97ohGrvzEythwqpbNxlfIQOyVIUGEA8usKFAskb+tBUWiRu?=
- =?us-ascii?Q?QsAaVlIRiG68wBSQryhSbn/ZM70ea6mV5k2Ud9FhqFr9l9+H+wFY7oQWxEt8?=
- =?us-ascii?Q?pA/NbrgHhvS5TyGQMW27hrNP3egDEfdS0lKujYkIVzbHJmAYIVYjUJOdM5Fj?=
- =?us-ascii?Q?jSYP8BLDBP3qBi3NKMfQCDQEM8X/SgYjoDUuAG1pxMr9B58OnxsBxqdmGLcP?=
- =?us-ascii?Q?myMqvvft6dk8BuJj6oRUtJaL6YfiEj8sCPvh3s8BZ1LBKF4llxCNHnzS33RO?=
- =?us-ascii?Q?jQ9k/QeO3V5kEI+xnrqxhfVWbiIRM9G+RJj9ID9SxxeQU4LrbxvcwlyH5JRH?=
- =?us-ascii?Q?ab2gIA1r48ID69y+1zT6TiyFtEsPcgG40RLQ0hnsLJdY9sTmJ6RxRRt2XpKY?=
- =?us-ascii?Q?/bCT6ZNhGtZNbNtsUiEXyegUOZdjBWZDhc7KbaoqXeRz4IM4kihQyGKjoV4r?=
- =?us-ascii?Q?9G7RfHOrrTMifOjz+rXfxGQ31gp0+7TeDWu4GB5UyA05ia/6/5CKkaNRYe8b?=
- =?us-ascii?Q?f6OUCljkB9aTyMPrahHfCkkp8ADAYOD030HL/t+PcAxs1nV8/DWamD1I5Ees?=
- =?us-ascii?Q?yseY1q6wd8f6Tfgd5qZ7mW45/vevi+xxcP/NyqS5Bo2U2ajFTh1HmvR477/Q?=
- =?us-ascii?Q?G+Wq65e+vznsBlgUDt2k2tpNEk9TBUiBpwHi7AYJhTuUP3KnJjx0snGjFB/P?=
- =?us-ascii?Q?WyIVlfyFGmgy7N88OhltfdK1IdJ/dw2qs1+4/vGBWdZiThngeRXUsZTBNB1+?=
- =?us-ascii?Q?N3hSr9h7IR6hZLz7/xnRY3Uzfimu5Y4qtO2atqEWBuPM+/iaGRTwdIdBM3OY?=
- =?us-ascii?Q?Bi/TflpM2VkhDPnnKnL91fnxXhpjgWKC?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH3PPF67C992ECC.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700018)(921020)(7053199007);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?LipnbjJOHxkFgU9W6mYErX4PFUEpAoayQb9+Cfj95qhtLmF9uPjr3QdY1kPP?=
- =?us-ascii?Q?GpOXBykxba5HnoPopH3X97umijrlbanGP4sjvbpTZ6kpoMAaGMhL7FsMCdti?=
- =?us-ascii?Q?tCCGJsKwYRrj0JFhBDKc1TwLX9gcC+63Gn99Nb2au58O2mMiRWXLj0vGf5bM?=
- =?us-ascii?Q?/JjBu3h7q0vPh1v26JmGRp3OH23iAf4FS8xnQ5pnkvksMCkxrN+SrlVsXFah?=
- =?us-ascii?Q?cNAmZIwGNJologIIbT6ZTKt2JUSdhFlHcKtw9ueiQb1AaRYwt+LudX4ln5W+?=
- =?us-ascii?Q?hX0YL6nr0mCdX/BWf32/A2kV+uEVXi4DGyDp5AHgklQs9p0vleP8r9d86CMA?=
- =?us-ascii?Q?DpQyM/9fu1cnrCRcsbnsqo//ZnGtG8NHzieeFfczh66OWbG1k5gz28RWTpo8?=
- =?us-ascii?Q?2tO5I94+3S2A+5MaPo4QAenw/2aBzJgrAk+6d0+YEbvCOj9uN1CWZVz6l7Ce?=
- =?us-ascii?Q?4QcESnqIGKmcLDH+/xkLqf6Pj1U6jS2zK6b7y/aPya5ePfp9m4rnZN/J3239?=
- =?us-ascii?Q?dWZ7SN93meGZe8knCXN9rwDkEaBIb0iqrQS7/cc60aYAdRNi8Td2wQF/DMCm?=
- =?us-ascii?Q?p4uil/FBRHxYSiGQKIIxZTs/MmuLFcXrlw1AR7kKP/HiQVOQQygjF5e2pNcZ?=
- =?us-ascii?Q?4eVfpyyObCKtx0y++6RCWAhF1SqoEKIAmz6FV8hUW+4JBLZ1GqWHmLDscOMX?=
- =?us-ascii?Q?YCwP/GgXoexT0Hz/rSlgjVDCR0sR6iwcIO0IFnPjEbiycOYkNecFuA1Jw4Zf?=
- =?us-ascii?Q?6HWci6wIHam9meJuf5OXXn6R2fAoAG4cVdNn/9BhB+rvE2ewd3Si/Jz1Ik5J?=
- =?us-ascii?Q?vJzkJe7FhNLdIvahBHQOug+2htNdafSFGoQ74ajhhibrlJ8ynUF1QJFQ2UAW?=
- =?us-ascii?Q?HNwfUwKYUkeKmtOdUCltHy8OjS7wQ8giEg8TcsePqPkSGjkpGXiaS8l6WqW6?=
- =?us-ascii?Q?giDKNrGgQf2YoHjm2+7xA9eNU1olv3bh+/ZnlWRhSAEHbgghl1dWKHJwiIhP?=
- =?us-ascii?Q?o3q5PAHD2tdtxbYfav2v0Ly0c84ivEN9+wUMBZhVnC/pRTj+B8qfN0OEWGq5?=
- =?us-ascii?Q?aFDsFAzm2z2lkftZj/TZEIeSqly+NtcQu5PhvfhpGk6sTOF4AoOZj/8QVqhQ?=
- =?us-ascii?Q?IonZ8fCqDCSqX67/DOinT8i/hWcQiUVc1U9kR+e4HV8xPPjDuPJ6wbljY1oA?=
- =?us-ascii?Q?JIBEjsl7qpIwZkrglVDbSl6A0Of7JwOzW4PsqdgPfqovVXTD8zIIoYV9Wlqr?=
- =?us-ascii?Q?U3ALhxoMegW8dPZOJjDOf9+or/jD0IYj5t5tKF0oImDbhTC6SfbidcJrjNcD?=
- =?us-ascii?Q?YW5c3d4VLTTMYEqC/3CviN5pqlzy8W/Dlh/XxaQts9jWRtC9yU7l2DTRQ8RQ?=
- =?us-ascii?Q?TuYq9lGVE1OpGmOs+uozexiqrjSBATY1ebmNIBAMJYF9mHwjfn6w1ljmLOlC?=
- =?us-ascii?Q?V/F1spRLn4rOUP6Yw21tS7JiXqs24sX3TOAHf/DkaLy69upV/5utRYdpFtCz?=
- =?us-ascii?Q?3UqqcZ3Ztkr4hkVRlK+X8NaeRlYk4HMss/rdYxeKzhXnQBM22AzDVJHbCciT?=
- =?us-ascii?Q?wDNVP2iKCYpqE7Itd4yCQTqhYcJsFLhrktf1iK3c?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ 15.2.1544.25; Mon, 18 Aug 2025 23:05:22 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Mon, 18 Aug 2025 23:05:22 -0700
+Received: from opensource (unknown [10.29.8.22])
+	by maili.marvell.com (Postfix) with SMTP id 4FB253F704F;
+	Mon, 18 Aug 2025 23:05:13 -0700 (PDT)
+Date: Tue, 19 Aug 2025 06:05:12 +0000
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: Michal Schmidt <mschmidt@redhat.com>
+CC: Tony Nguyen <anthony.l.nguyen@intel.com>,
+        Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David
+ S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Jesse Brandeburg
+	<jesse.brandeburg@intel.com>,
+        Alexander Duyck <alexander.h.duyck@intel.com>,
+        <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] i40e: fix IRQ freeing in i40e_vsi_request_irq_msix
+ error path
+Message-ID: <aKNU1YnfNbXYhUyj@opensource>
+References: <20250818153903.189079-1-mschmidt@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH3PPF67C992ECC.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2e8b9a47-6ad1-48dc-2010-08dddee0c3c5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Aug 2025 05:25:09.4471
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 60cwT85Saxoq/wx7WmlT+Cpzbl77xjWIKDEJrkSzsx/A979YVIfJC4J2Kodk2kzkuPslzdUMJkSPzVFoOAipsw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV4PR11MB9467
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250818153903.189079-1-mschmidt@redhat.com>
+X-Proofpoint-GUID: l9xTP6HBH2e_0mEtNWTxDdxGK_zSUXWR
+X-Proofpoint-ORIG-GUID: l9xTP6HBH2e_0mEtNWTxDdxGK_zSUXWR
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODE5MDA1NiBTYWx0ZWRfX3oVAofVUB1Wx jqiAW+/Me2Bdho8ExZdWk6o4s+QKkHdowTu7AlRtIsqDi4h/63XkGp+N1kK/faVlwTh/TZC3jHd duv2mEviLAOz2uh//3SolXuC1rgKhAJn+fak6c8HRbtI/y7k2TTPzimMv1DkcWKe409m/4VH4Bu
+ XFqZ1MLNinyQJ5wqT0cW5PeHNe2R9agU9jphxzEL9f0iYDDvRe09aG3F5MYg7fZlnqqZ9oPJlPa T5iJNTGXUFdjTSXXpc02jGSdhsLvFI++F1geDi4/1Nh+ADLmknwU/JDTU07db5wkxiAkjIURfCW gc7+52NZ1gpDZmD+PkfyZfJJDjKZjPY/QhFdzyzs0urPPMmAs06NvtDFyHqIVi0tsUaU7/Z95ao
+ cXz2bNrDB/CeLqG/O9+G+JgooinIK5L4eepe2uutBt8e1uU+09L7EWtMrfd8+QhT79F4wIsb
+X-Authority-Analysis: v=2.4 cv=D4hHKuRj c=1 sm=1 tr=0 ts=68a4141e cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=kj9zAlcOel0A:10 a=2OwXVqhp2XgA:10 a=20KFwNOVAAAA:8 a=M5GUcnROAAAA:8 a=I6fm6gUqSGKCge1PFHkA:9 a=CjuIK1q_8ugA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-19_01,2025-08-14_01,2025-03-28_01
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Jason Xing
-> Sent: Saturday, July 26, 2025 12:34 PM
-> To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>; Zaremba, Larysa
-> <larysa.zaremba@intel.com>; andrew+netdev@lunn.ch;
-> davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
-> pabeni@redhat.com; bjorn@kernel.org; Fijalkowski, Maciej
-> <maciej.fijalkowski@intel.com>
-> Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Jason Xing
-> <kernelxing@tencent.com>
-> Subject: [Intel-wired-lan] [PATCH v2 iwl-net] ixgbe: xsk: resolve the neg=
-ative
-> overflow of budget in ixgbe_xmit_zc
->=20
-> From: Jason Xing <kernelxing@tencent.com>
->=20
-> Resolve the budget negative overflow which leads to returning true in
-> ixgbe_xmit_zc even when the budget of descs are thoroughly consumed.
->=20
-> Before this patch, when the budget is decreased to zero and finishes
-> sending the last allowed desc in ixgbe_xmit_zc, it will always turn back =
-and
-> enter into the while() statement to see if it should keep processing pack=
-ets,
-> but in the meantime it unexpectedly decreases the value again to 'unsigne=
-d
-> int (0--)', namely, UINT_MAX. Finally, the ixgbe_xmit_zc returns true,
-> showing 'we complete cleaning the budget'. That also means
-> 'clean_complete =3D true' in ixgbe_poll.
->=20
-> The true theory behind this is if that budget number of descs are
-> consumed, it implies that we might have more descs to be done. So we
-> should return false in ixgbe_xmit_zc to tell napi poll to find another ch=
-ance
-> to start polling to handle the rest of descs. On the contrary, returning =
-true
-> here means job done and we know we finish all the possible descs this tim=
-e
-> and we don't intend to start a new napi poll.
->=20
-> It is apparently against our expectations. Please also see how
-> ixgbe_clean_tx_irq() handles the problem: it uses do..while() statement t=
-o
-> make sure the budget can be decreased to zero at most and the negative
-> overflow never happens.
->=20
-> The patch adds 'likely' because we rarely would not hit the loop codition
-> since the standard budget is 256.
->=20
-> Fixes: 8221c5eba8c1 ("ixgbe: add AF_XDP zero-copy Tx support")
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> Reviewed-by: Larysa Zaremba <larysa.zaremba@intel.com>
+Hi Michal,
+
+On 2025-08-18 at 15:39:03, Michal Schmidt (mschmidt@redhat.com) wrote:
+> If request_irq() in i40e_vsi_request_irq_msix() fails in an iteration
+> later than the first, the error path wants to free the IRQs requested
+> so far. However, it uses the wrong dev_id argument for free_irq(), so
+> it does not free the IRQs correctly and instead triggers the warning:
+> 
+>  Trying to free already-free IRQ 173
+>  WARNING: CPU: 25 PID: 1091 at kernel/irq/manage.c:1829 __free_irq+0x192/0x2c0
+>  Modules linked in: i40e(+) [...]
+>  CPU: 25 UID: 0 PID: 1091 Comm: NetworkManager Not tainted 6.17.0-rc1+ #1 PREEMPT(lazy)
+>  Hardware name: [...]
+>  RIP: 0010:__free_irq+0x192/0x2c0
+>  [...]
+>  Call Trace:
+>   <TASK>
+>   free_irq+0x32/0x70
+>   i40e_vsi_request_irq_msix.cold+0x63/0x8b [i40e]
+>   i40e_vsi_request_irq+0x79/0x80 [i40e]
+>   i40e_vsi_open+0x21f/0x2f0 [i40e]
+>   i40e_open+0x63/0x130 [i40e]
+>   __dev_open+0xfc/0x210
+>   __dev_change_flags+0x1fc/0x240
+>   netif_change_flags+0x27/0x70
+>   do_setlink.isra.0+0x341/0xc70
+>   rtnl_newlink+0x468/0x860
+>   rtnetlink_rcv_msg+0x375/0x450
+>   netlink_rcv_skb+0x5c/0x110
+>   netlink_unicast+0x288/0x3c0
+>   netlink_sendmsg+0x20d/0x430
+>   ____sys_sendmsg+0x3a2/0x3d0
+>   ___sys_sendmsg+0x99/0xe0
+>   __sys_sendmsg+0x8a/0xf0
+>   do_syscall_64+0x82/0x2c0
+>   entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>   [...]
+>   </TASK>
+>  ---[ end trace 0000000000000000 ]---
+> 
+> Use the same dev_id for free_irq() as for request_irq().
+> 
+> I tested this with inserting code to fail intentionally.
+> 
+Nice. Looks like changing this in i40e_vsi_request_irq_msix was missed
+during 493fb30011b3. Just a question isn't this not throwing any
+compilation warning all these days?
+Anyway LGTM.
+
+Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
+
+Thanks,
+Sundeep
+
+> Fixes: 493fb30011b3 ("i40e: Move q_vectors from pointer to array to array of pointers")
+> Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
 > ---
-> Link: https://lore.kernel.org/all/20250720091123.474-3-
-> kerneljasonxing@gmail.com/
-> 1. use 'negative overflow' instead of 'underflow' (Willem) 2. add reviewe=
-d-by
-> tag (Larysa) 3. target iwl-net branch (Larysa) 4. add the reason why the =
-patch
-> adds likely() (Larysa)
-> ---
->  drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-> b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-> index ac58964b2f08..7b941505a9d0 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-> @@ -398,7 +398,7 @@ static bool ixgbe_xmit_zc(struct ixgbe_ring
-> *xdp_ring, unsigned int budget)
->  	dma_addr_t dma;
->  	u32 cmd_type;
->=20
-> -	while (budget-- > 0) {
-> +	while (likely(budget)) {
->  		if (unlikely(!ixgbe_desc_unused(xdp_ring))) {
->  			work_done =3D false;
->  			break;
-> @@ -433,6 +433,8 @@ static bool ixgbe_xmit_zc(struct ixgbe_ring
-> *xdp_ring, unsigned int budget)
->  		xdp_ring->next_to_use++;
->  		if (xdp_ring->next_to_use =3D=3D xdp_ring->count)
->  			xdp_ring->next_to_use =3D 0;
-> +
-> +		budget--;
+>  drivers/net/ethernet/intel/i40e/i40e_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> index b83f823e4917..dd21d93d39dd 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> @@ -4156,7 +4156,7 @@ static int i40e_vsi_request_irq_msix(struct i40e_vsi *vsi, char *basename)
+>  		irq_num = pf->msix_entries[base + vector].vector;
+>  		irq_set_affinity_notifier(irq_num, NULL);
+>  		irq_update_affinity_hint(irq_num, NULL);
+> -		free_irq(irq_num, &vsi->q_vectors[vector]);
+> +		free_irq(irq_num, vsi->q_vectors[vector]);
 >  	}
->=20
->  	if (tx_desc) {
-> --
-> 2.41.3
-
-Tested-by: Priya Singh <priyax.singh@intel.com>
+>  	return err;
+>  }
+> -- 
+> 2.50.1
+> 
 
