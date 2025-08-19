@@ -1,218 +1,181 @@
-Return-Path: <netdev+bounces-215027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B17FB2CB5E
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 19:49:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D10E4B2CB81
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 19:54:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 764BC5C2DE8
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 17:48:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30BD417B0D2
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 17:52:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E51D430C36E;
-	Tue, 19 Aug 2025 17:47:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FD5F30DD0F;
+	Tue, 19 Aug 2025 17:52:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mvjgj9z0"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="dH7P+UVp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7AB30E83E;
-	Tue, 19 Aug 2025 17:47:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3731742065;
+	Tue, 19 Aug 2025 17:52:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755625668; cv=none; b=c36KBtklJpej/78hGG0olA+zX6foVlQMd/LMkwDmqZlL9N9Eug5uP/d8/5j0xseO/0lRQ/Pc9tob8k6MY38oSn7d3/QoT/OVGOoiU87xMX5+Obfx37oiFqB1I5Fh23FOLuI6noUU6dlawBqrJUZm7nyffT7XxYKEIVaIRwnUy+4=
+	t=1755625943; cv=none; b=aMsHDdJ/IYH+XMdgRcUdf9nJZNSdZUq4D9/7droPEfU0XPCMxed6IcO/uK+lSbm5fDiifaewBFZyY9zZgw5TJuxUCBXxWVAi3Vqg643/KXP+5z7dFEECsez2kxXzJ0LwbIlnxt3tSZSTzbWS6wi8WIUMzqwga2nB9bmhiPekyTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755625668; c=relaxed/simple;
-	bh=zxOsO0U7uICU9UyC/BtygGo50pT3VEuJ8Qus3wpcaDY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JqhlWnehkBWqBmcPvQ6IKuvkeVw8RvsDPGHeA40IKIs0QgSm7IVWrrqNdSyPSNfVdmzaV+6fYWNLNaEF7N+C5wQ6UKi1xpH33b+l5sh3cjSpvHQB3EoS1T4/Nnw9DMpfSfPeHRfGFxfeg5NtcrApjcAFKzLl9pgZmVz34V+mc9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mvjgj9z0; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-45a1b066b5eso29424635e9.1;
-        Tue, 19 Aug 2025 10:47:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755625665; x=1756230465; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jV8T1/e9vmT2yocc8WGsZXIRU5vCVTMY+wuZVgREffs=;
-        b=Mvjgj9z0Yi8C4hlDRS4KUaO+gfvZoFvYnDGrJXkSHWp58v1WQZDlWNxkXynn5rQ6DE
-         85gZArk5Q+rpNkJL47fnpAAOmtBID9LVfsr7NGDUdvjXYTnmlKcJknPArtjEGzdMPs9t
-         LFCGTEmNGGL6VK9yQl3L9ejt8eT9v4Kf3b+JCbO49c716t0U3umrZtIq9h/GoCrpPCqy
-         UvZhSlhJRt1vGMe5zAgkNh95g04tVknWtqQ4bh3mkHdVzJ27YgoTfKc72hktcjmH3cug
-         6xsqLjtFUeW4CtQTXiThFzLCycZDduQm/lKUrFjIbZri2EXHKx198cRQnd0CzDE68278
-         58sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755625665; x=1756230465;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jV8T1/e9vmT2yocc8WGsZXIRU5vCVTMY+wuZVgREffs=;
-        b=IaMq8TR6gVpZTWm3tWNZiyo170n3RgskeckrxTvIIPoJ2tbnrmjcIZeRYs+zWtsM78
-         58D4wnO2CMSFqpxwI8BCrUKCscA3rHeg20FE8Kk0skTZh2UCJl9NgrRBjgdOkElSQim/
-         wGRPQSKWIXbBBWuE/Robe3YdjTEGNu4+ayRahldChli0ukpOsvOhENhtECG/gjxPbtJm
-         pWuU3BzViy29FywWiIEceLcBcz5jwlEovEjKLS28Z59BfJqHKo1cCKrv2CSjhhvf4rXv
-         jiuwo5HyOUpwxJ1GHdcxm3pH4h6JNqbB1llLhjBVzaUWi1Ym4L57sV4IXAzGfKHXbfeL
-         w0Zg==
-X-Forwarded-Encrypted: i=1; AJvYcCUunVwin6XRa0NoFZcM0HoAKdRl4sP2aqDKLfQEswKuTJzI5Tk35RCPoNx9NgnnkBIETrgwv44OEPc8a0U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzB8greBWwXbzfCvCc4wxm6aQPHsCt1wv5AuwNT22EU4PiIaUK0
-	QsD7I1ulfULsmf9hKAVdz1ILv7BVeaLlUpmT9JLCyq1zKiE94mooBM74OtiFmEsR
-X-Gm-Gg: ASbGnctrYH8Wla5XbsDfeHukpzd9+j2RR6h9VQUP3IAYVo071WTi6zvV6lMQHGop+Ss
-	KjCi9VXzl7DIVNisHHiZb3yphmcsAcyuMmIsmNEA+3rp957XjNwtdfBPFaxF3SNwQYCQ2gDgW3L
-	oaqk/Hbqg0PU+LPH30/zdhLsx2n49CE3NstoR8KSBdMzucGXeNw7klrB2shSpjQ3pYarEeikarC
-	fGArEE0eOnahaxePMF2+Yg+IkuWSUvFfSq4TOFKCv1Tj4+9awS4RDg9lVNPHDBFVixrY/Zod41h
-	qWk/4KeBbiGZVWGsmDUCqSzZ6jh9KGRlQOXWpyT5DyD74e5FJXZ4JPMp2EbwRZD5S7DTFA3m96+
-	JSPBJvfyJIfQJs2wD3TTKsfNGa5x+GS+PQjc=
-X-Google-Smtp-Source: AGHT+IHMqwdHLa809CtLhJdzk/Jh+JBj770G0jJA+aVXN+7wj7JZNMuXNeRiwwNxT2lMT5fTnTKzJA==
-X-Received: by 2002:a05:600c:470f:b0:458:bf7c:f744 with SMTP id 5b1f17b1804b1-45b43e0d57emr30448365e9.32.1755625665028;
-        Tue, 19 Aug 2025 10:47:45 -0700 (PDT)
-Received: from localhost.localdomain ([45.128.133.229])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45a1c78b410sm232181565e9.24.2025.08.19.10.47.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Aug 2025 10:47:44 -0700 (PDT)
-From: Oscar Maes <oscmaes92@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	shuah@kernel.org,
-	linux-kernel@vger.kernel.org,
-	Oscar Maes <oscmaes92@gmail.com>
-Subject: [PATCH net-next v3 2/2] selftests: net: add test for dst hint mechanism with directed broadcast addresses
-Date: Tue, 19 Aug 2025 19:46:42 +0200
-Message-Id: <20250819174642.5148-3-oscmaes92@gmail.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250819174642.5148-1-oscmaes92@gmail.com>
-References: <20250819174642.5148-1-oscmaes92@gmail.com>
+	s=arc-20240116; t=1755625943; c=relaxed/simple;
+	bh=FHQbCGsWAX0wCQwbh53ZoVSGGXHOlu7JbCC79vMNKm8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JVrJeJjca3+wQJzx/zJMCnvZRn6AREWVyIXqAQtdMVGCKaTVuw2JY6A5wEztpYSiLLD2kZ5MDG9SnMO7Yg/G152r5GAwNDMs6tNXmfxjUaC56nWICKjwYJSfG6FHYXU1JrCIEUQZbSFLUPMJjZEZYbbVYhXSoZVQzvn9LtGlURE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=dH7P+UVp; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=eVJwE8LXHuTcSQYuU8Nun8a0+Ezt+MXVF3/+UllM6iU=; b=dH7P+UVp1FgY2nyGq2AW7A4Yu5
+	UwY99gPv1p5Juy0cdftW/JALX/V7spocEqB20YAOgdvzYHJf9sXn6yk2d6/sYqWfpR2QOh8vSDWFy
+	LGGMF2lc4a+Wz/bj0kkFInACBiYwf9RCS3GmkxslMeJ0Ohx8Km/bQOvz9YWTQ6E+cVqemWm8vGGqX
+	khv8kKsI/zQ2CqOFRuuBvoa9NPCss+hmNA9rIIUIJti81mIYRXLp8xTAAFnDEyp3lJo0W57cUFZMb
+	9kxd6/6I8Q+iRCWk/KZYT4k9C56GUFRmH1TMkM6Wzb2iIcnrqQ1lS+52wEZ32blExGwV5BPma0co6
+	BqMJ59dA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56586)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uoQUo-0003RU-1Q;
+	Tue, 19 Aug 2025 18:51:43 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uoQUi-0003gJ-0o;
+	Tue, 19 Aug 2025 18:51:36 +0100
+Date: Tue, 19 Aug 2025 18:51:36 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Lukasz Majewski <lukma@denx.de>, Jonathan Corbet <corbet@lwn.net>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Divya.Koppera@microchip.com
+Subject: Re: [PATCH net-next v2 1/1] Documentation: networking: add detailed
+ guide on Ethernet flow control configuration
+Message-ID: <aKS5p8ALKEl5PISD@shell.armlinux.org.uk>
+References: <20250814075342.212732-1-o.rempel@pengutronix.de>
+ <36bdd275-25bb-4b53-a14d-39677da468cc@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <36bdd275-25bb-4b53-a14d-39677da468cc@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Add a test for ensuring that the dst hint mechanism is used for
-directed broadcast addresses.
+On Tue, Aug 19, 2025 at 02:48:22PM +0200, Andrew Lunn wrote:
+> > +2. Half-Duplex: Collision-Based Flow Control
+> > +--------------------------------------------
+> > +On half-duplex links, a device cannot send and receive simultaneously, so PAUSE
+> > +frames are not used. Flow control is achieved by leveraging the CSMA/CD
+> > +(Carrier Sense Multiple Access with Collision Detection) protocol itself.
+> > +
+> > +* **How it works**: To inhibit incoming data, a receiving device can force a
+> > +    collision on the line. When the sending station detects this collision, it
+> > +    terminates its transmission, sends a "jam" signal, and then executes the
+> > +    "Collision backoff and retransmission" procedure as defined in IEEE 802.3,
+> > +    Section 4.2.3.2.5. This algorithm makes the sender wait for a random
+> > +    period before attempting to retransmit. By repeatedly forcing collisions,
+> > +    the receiver can effectively throttle the sender's transmission rate.
+> > +
+> > +.. note::
+> > +    While this mechanism is part of the IEEE standard, there is currently no
+> > +    generic kernel API to configure or control it. Drivers should not enable
+> > +    this feature until a standardized interface is available.
+> 
+> Interesting. I did not know about this.
+> 
+> I wounder if we want phylib and phylink to return -EOPNOTSUPP in the
+> general code, if the current link is 1/2 duplex?
+> 
+> It might be considered an ABI change. I guess the generic code
+> currently stores the settings and only puts them into effect when the
+> link changes to full duplex?
 
-This test relies on mausezahn for sending directed broadcast packets.
-Additionally, a high GRO flush timeout is set to ensure that packets
-will be received as lists.
+The pause API is exactly that, it's an API for controlling the pause
+frame stuff which isn't the HD version of flow control. We haven't had
+an API for it, but it does exist.
 
-The test determines if the hint mechanism was used by checking
-the in_brd statistic using lnstat.
+In networks which are HD in nature, enabling HD "flow control" would
+be disasterous. (Think 10base2 or a twisted-pair network that uses a
+hub rather than a switch.) When the station decides to inhibit the
+reception of packets, it will cause a collision on the network, which
+will be network-wide rather than just the segment between a switch
+and host. Whether that's something we care, whether it's something
+that should be mentioned is an open question.
 
-Signed-off-by: Oscar Maes <oscmaes92@gmail.com>
----
- tools/testing/selftests/net/Makefile      |  1 +
- tools/testing/selftests/net/route_hint.sh | 79 +++++++++++++++++++++++
- 2 files changed, 80 insertions(+)
- create mode 100755 tools/testing/selftests/net/route_hint.sh
+> > +
+> > +Configuring Flow Control with `ethtool`
+> > +=======================================
+> > +
+> > +The standard tool for managing flow control is `ethtool`.
+> > +
+> > +Viewing the Current Settings
+> > +----------------------------
+> > +Use `ethtool -a <interface>` to see the current configuration.
+> > +
+> > +.. code-block:: text
+> > +
+> > +  $ ethtool -a eth0
+> > +  Pause parameters for eth0:
+> > +  Autonegotiate:  on
+> > +  RX:             on
+> > +  TX:             on
+> > +
+> > +* **Autonegotiate**: Shows if flow control settings are being negotiated with
+> > +    the link partner.
+> > +
+> > +* **RX**: Shows if we will *obey* PAUSE frames (pause our sending).
+> > +
+> > +* **TX**: Shows if we will *send* PAUSE frames (ask the peer to pause).
+> > +
+> > +If autonegotiation is on, `ethtool` will also show the active, negotiated result.
+> > +This result is calculated by `ethtool` itself based on the advertisement masks
+> > +from both link partners. It represents the expected outcome according to IEEE
+> > +802.3 rules, but the final decision on what is programmed into the MAC hardware
+> > +is made by the kernel driver.
+> > +
+> > +.. code-block:: text
+> > +
+> > +  RX negotiated: on
+> > +  TX negotiated: on
+> 
+> Maybe add a description of what happens if Pause Auto negotiation is
+> off?
+> 
+> Also, one of the common errors is mixing up Pause Autoneg and Autoneg
+> in general. Pause Autoneg can be off while generic Autoneg is on.
+> 
+> And if i remember correctly, with phylink, if generic Autoneg is off,
+> but pause Autoneg is on, the settings are saved until generic Autoneg
+> is enabled.
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index b31a71f2b372..eef0b8f8a7b0 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -117,6 +117,7 @@ TEST_GEN_FILES += tfo
- TEST_PROGS += tfo_passive.sh
- TEST_PROGS += broadcast_pmtu.sh
- TEST_PROGS += ipv6_force_forwarding.sh
-+TEST_PROGS += route_hint.sh
- 
- # YNL files, must be before "include ..lib.mk"
- YNL_GEN_FILES := busy_poller netlink-dumps
-diff --git a/tools/testing/selftests/net/route_hint.sh b/tools/testing/selftests/net/route_hint.sh
-new file mode 100755
-index 000000000000..2db01ece0cc1
---- /dev/null
-+++ b/tools/testing/selftests/net/route_hint.sh
-@@ -0,0 +1,79 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# This test ensures directed broadcast routes use dst hint mechanism
-+
-+source lib.sh
-+
-+CLIENT_IP4="192.168.0.1"
-+SERVER_IP4="192.168.0.2"
-+BROADCAST_ADDRESS="192.168.0.255"
-+
-+setup() {
-+	setup_ns CLIENT_NS SERVER_NS
-+
-+	ip -net "${SERVER_NS}" link add link1 type veth peer name link0 netns "${CLIENT_NS}"
-+
-+	ip -net "${CLIENT_NS}" link set link0 up
-+	ip -net "${CLIENT_NS}" addr add "${CLIENT_IP4}/24" dev link0
-+
-+	ip -net "${SERVER_NS}" link set link1 up
-+	ip -net "${SERVER_NS}" addr add "${SERVER_IP4}/24" dev link1
-+
-+	ip netns exec "${CLIENT_NS}" ethtool -K link0 tcp-segmentation-offload off
-+	ip netns exec "${SERVER_NS}" sh -c "echo 500000000 > /sys/class/net/link1/gro_flush_timeout"
-+	ip netns exec "${SERVER_NS}" sh -c "echo 1 > /sys/class/net/link1/napi_defer_hard_irqs"
-+	ip netns exec "${SERVER_NS}" ethtool -K link1 generic-receive-offload on
-+}
-+
-+cleanup() {
-+	ip -net "${SERVER_NS}" link del link1
-+	cleanup_ns "${CLIENT_NS}" "${SERVER_NS}"
-+}
-+
-+directed_bcast_hint_test()
-+{
-+	local rc=0
-+
-+	echo "Testing for directed broadcast route hint"
-+
-+	orig_in_brd=$(ip netns exec "${SERVER_NS}" lnstat -j -i1 -c1 | jq '.in_brd')
-+	ip netns exec "${CLIENT_NS}" mausezahn link0 -a own -b bcast -A "${CLIENT_IP4}" \
-+		-B "${BROADCAST_ADDRESS}" -c1 -t tcp "sp=1-100,dp=1234,s=1,a=0" -p 5 -q
-+	sleep 1
-+	new_in_brd=$(ip netns exec "${SERVER_NS}" lnstat -j -i1 -c1 | jq '.in_brd')
-+
-+	res=$(echo "${new_in_brd} - ${orig_in_brd}" | bc)
-+
-+	if [ "${res}" -lt 100 ]; then
-+		echo "[ OK ]"
-+		rc="${ksft_pass}"
-+	else
-+		echo "[FAIL] expected in_brd to be under 100, got ${res}"
-+		rc="${ksft_fail}"
-+	fi
-+
-+	return "${rc}"
-+}
-+
-+if [ ! -x "$(command -v mausezahn)" ]; then
-+	echo "SKIP: Could not run test without mausezahn tool"
-+	exit "${ksft_skip}"
-+fi
-+
-+if [ ! -x "$(command -v jq)" ]; then
-+	echo "SKIP: Could not run test without jq tool"
-+	exit "${ksft_skip}"
-+fi
-+
-+if [ ! -x "$(command -v bc)" ]; then
-+	echo "SKIP: Could not run test without bc tool"
-+	exit "${ksft_skip}"
-+fi
-+
-+trap cleanup EXIT
-+
-+setup
-+
-+directed_bcast_hint_test
-+exit $?
+Yes, phylink remembers the settings for the ethtool command in
+pl->link_config.pause.
+
 -- 
-2.39.5
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
