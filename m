@@ -1,77 +1,100 @@
-Return-Path: <netdev+bounces-214966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214968-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 905E1B2C4C2
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 15:10:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D1E2B2C56B
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 15:25:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF0C6242655
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 13:05:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45184244FAF
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 13:20:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CA1C2C11FE;
-	Tue, 19 Aug 2025 13:03:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3BF3431EE;
+	Tue, 19 Aug 2025 13:17:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bBE1vgAE"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SM5ikWLv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55113224AF9;
-	Tue, 19 Aug 2025 13:03:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3226E340D90;
+	Tue, 19 Aug 2025 13:17:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755608622; cv=none; b=StUzwHOEutivBVL5oXpfmfOOS9iDP9onBD/zeFf9+Y3Arr0KPthtXzMQLn1rfx0cKd16ZcAMf82PneCyV4zYH4RxTIaK8KNhKQrWICousXSjfTBl+aDEwP8sM1tzDB2z1eaX1hi5GS4zUifURCap9LboFGqiaRcqv+ix927F5yw=
+	t=1755609474; cv=none; b=ed4ADLNypW7/Dh1LW2G93FFBrZMGDsPOrSzpUxX0IUdKeabAN5zbRy4jtKqQ662LUImvoEcMpiqpu0uugf0MFVoxXS5c3b+PKRRYaowxoxBw260ekbIikmb+l8kPdtSZvjcXNdr4PURMN4yhr6xdu4Q1QAhm+ptZhsGBGUayGyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755608622; c=relaxed/simple;
-	bh=hplkDh1/2FSuApngWSdqjeR/23Vt5OkOSLfobeSPdFw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DfJv+kjdTdyNkbrdCFrqvW17brlFSyvETi48n8Xn3oLLvBgdyR2vnoQi/Hqh3ky3h2JpfZSjSzz/XGtnQTsvQeYMqH7wbdmeRKGSDU/HcgTRzgw/xb2Qo5lRJN/N4mVxQ2PVFZbBkoc0H1Hef1xeM4OhrMkeRJsbLF0hc70xzEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bBE1vgAE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 061E9C113CF;
-	Tue, 19 Aug 2025 13:03:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755608621;
-	bh=hplkDh1/2FSuApngWSdqjeR/23Vt5OkOSLfobeSPdFw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bBE1vgAEo4bbHJ7SIvzzOzhgWKHLFVlLWkSeakMoHYneWqwf/uNi1k+Ul9NbC+or8
-	 yQWoPs7oGsU4gn8rZQUbQuu8A8W5g3TMe0Gkm/SJBo36lPPD/qXH16eCWfYIhC66Ok
-	 BPzH0fwEtOVfDNHEfLk7MGBllFhYERHKc7cSX/wpWZHRLwrQrHNTIWIG4pVfXRVWXL
-	 IqfszaZ/F3IZNT4TdSEVNYOLs9kOowZ3vp+6fSR3LginfDarVrmRC1ecQKxd2O06oe
-	 Ak88WZKTrUfKPns6LH7nFHPK1mFyznjFabu3OIu60TvazW4YKEQaa0EjwvDDpHZUiZ
-	 s1DXoUdsRDrpQ==
-Date: Tue, 19 Aug 2025 06:03:39 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, michael.chan@broadcom.com,
- pavan.chebbi@broadcom.com, vsrama-krishna.nemani@broadcom.com, Vikas Gupta
- <vikas.gupta@broadcom.com>, Rajashekar Hudumula
- <rajashekar.hudumula@broadcom.com>
-Subject: Re: [v2, net-next 9/9] bng_en: Configure default VNIC
-Message-ID: <20250819060339.7b38ae1d@kernel.org>
-In-Reply-To: <20250818194716.15229-10-bhargava.marreddy@broadcom.com>
-References: <20250818194716.15229-1-bhargava.marreddy@broadcom.com>
-	<20250818194716.15229-10-bhargava.marreddy@broadcom.com>
+	s=arc-20240116; t=1755609474; c=relaxed/simple;
+	bh=QGTfgyFbnf204gc7MV6xdgfCByjtZ0IjT1uVmSv4jxs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cSgfDdJRWxrUxchIsqGcgHWSkDdCYeBkkrdJvvg5Jp9Pko4TdzLd6qldjgGoNyg60CzhC8VTQ1PRNvfhap4iZ+zpuZZhobxi91dE5SKtlRax6P7aTGyoTXcvgNI1q38yFZKBrqxIChLsJvCWUk9x1mR2wfGcud4GVeUqKBNgfh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=SM5ikWLv; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=vxJf67II3FxlJSmZdeE18uzEgiaeHoKYvt1KyyAKTTw=; b=SM5ikWLvxOBLS10jN6/VZwETho
+	/wr8IsNEZhDh/wtKbOx18GpiZdjq8kpwYnazbEbS0uK7ny0rWPH9WD6hrB8c45UeksBEydGJqqKoz
+	6c6CZoeJl4cNWPC6agxkU/tlBFljHL7Mqzf3WZmPAl0UN9YSo03iIHmbubGnk2lL2MRQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uoMDT-005C1y-BX; Tue, 19 Aug 2025 15:17:31 +0200
+Date: Tue, 19 Aug 2025 15:17:31 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Hauke Mehrtens <hauke@hauke-m.de>, Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Arkadi Sharshevsky <arkadis@mellanox.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Andreas Schirm <andreas.schirm@siemens.com>,
+	Lukas Stockmann <lukas.stockmann@siemens.com>,
+	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Peter Christen <peter.christen@siemens.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
+	Juraj Povazanec <jpovazanec@maxlinear.com>,
+	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	"Livia M. Rosu" <lrosu@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH RFC net-next 06/23] net: dsa: lantiq_gswip: load
+ model-specific microcode
+Message-ID: <5cabea37-2a10-4664-b02b-c803641aff1f@lunn.ch>
+References: <aKDhZ9LQi63Qadvh@pidgin.makrotopia.org>
+ <c8128783-6eac-4362-ae31-f2ae28122803@lunn.ch>
+ <aKI_t6F0zzLq2AMw@pidgin.makrotopia.org>
+ <aKPI6xMIgIeBzqy7@pidgin.makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aKPI6xMIgIeBzqy7@pidgin.makrotopia.org>
 
-On Mon, 18 Aug 2025 19:47:16 +0000 Bhargava Marreddy wrote:
-> +struct bnge_l2_filter {
-> +	/* base filter must be the first member */
-> +	struct bnge_filter_base	base;
-> +	struct bnge_l2_key	l2_key;
-> +	atomic_t		refcnt;
+> I didn't consider that the size of the array elements needs to be known
+> when defining struct gswip_hw_info in lantiq_gswip.h.
+> So the only reasonable solution is to make also the definition of
+> struct gswip_pce_microcode into lantiq_gswip.h, so lantiq_pce.h won't
+> have to be included before or by lantiq_gswip.h itself.
 
-please use refcount_t for refcounts.
--- 
-pw-bot: cr
+What i've done in the past is define a structure which describes the
+firmware. Two members, a pointer to the list of values, and a length
+of the list of values. You can construct this structure using
+ARRAY_SIZE(), and export it. You should then be able to put the odd
+val4, val3, val2, val1 structure, and the macro together in one header
+file, and use it in two places to define the firmware blobs for the
+different devices.
+
+	  Andrew
 
