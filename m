@@ -1,323 +1,252 @@
-Return-Path: <netdev+bounces-214985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5785FB2C763
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 16:45:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5E87B2C773
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 16:48:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BAF95E6A09
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 14:45:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3343517350C
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 14:46:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBDB327B4EB;
-	Tue, 19 Aug 2025 14:45:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F22327B33A;
+	Tue, 19 Aug 2025 14:46:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="A0rCJxQq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dS+1Tugx"
 X-Original-To: netdev@vger.kernel.org
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013029.outbound.protection.outlook.com [40.107.159.29])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C04DC1FF7D7;
-	Tue, 19 Aug 2025 14:45:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.29
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755614744; cv=fail; b=R9CxzkXTY+mmq/nPzex6BBNEXl3kZoc+0a031tK8UAaasNgilBE6Pby1oB8beWMV+HjUf1mQFa0LMk3/xnyTRx7+gsFGFam9D+Yylt+8C+BbM+fafSyPGM8tz41HeTah7BYad4/FMf+UbokdRapj43r15opARoYnsCG0BDmbHk8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755614744; c=relaxed/simple;
-	bh=6hgBJQ1O/l9aH6iu4x+aMRx8uf2Pmx50IdHp2upALl0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=UsKZCLLS/ZSKf5UPdiUa+vJBjRp1qJKsEtS61yXhLsRYR+RpZoaqaInoi5jSW1mejvp0ghCAS1R65YHfjLf+fmF3ODzqkoUIvkR7D3UR48fl9rcPVOw9AC5qnUqgmgFJi4SRAsdNpmXKi7KOD2wrrfa6QmVfdh1rjsmAad52Ie4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=A0rCJxQq; arc=fail smtp.client-ip=40.107.159.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rHD5mV7rvE2nuaqs0hZoFaPvC4/1q/FiF1MGeix9ikb9DmC4RJ2iblVcQQOLhGbF8MHxdwQK8l283PDq55g84IlD5OUjbjVVunsyRD+cpPr6cHmLUdiE7hlp+AApvD+4xS88DbkwK++IRBlszhkdOJVWy67rUQCO6V9afRPXANYIVvfJ958LJnp8/J/9EaTfwq6qd5quMA58sGBOoamZ/P5L6JU+EFGj+4Ux3jaoNSGK91tNtNi37MImfy/V4K9OAou2CHddWut+VJ7DupPuVpV87EMLrJ/n1pqUkACVj0CqLjxOHydvkYDtVDObW7QWfBVoIGCaZ+ElRzE5C5r/3g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ErG5qomNHRmXr0XCtdbWeCf7IhIbpSmClDtG8hSPH4Y=;
- b=wWjQHCWMKy87ZV8YNrGE4j7lzzOV3WbO1/Y5pEXmD7xUMtsQt0GY4byAJhE+SKpgWoLXu0/hkw3TCPpQv+XekAwPyM8PJ5emorUCnhWALL30sHJH5jnvSNniqtxvDIz1IYIaeF4WsMAGP5LcRKRQwsehuF/JJTSKkchYdgdqgIYoozHbUpiKJ+qL4z0fSAYp+rGUjwRMd/9cgvz44nRLILSvwEirLaQcbhAkL1N2+o1mISKZ4rGu/E5N89O5L1TJdzuRIGYiW9uauy9fp3dMr3Z0XKVJyVeO0TR+ZyQlanw7C6qRtZjSpuBvQh4gWIJOybzQMa65CKDbgZbH9pebTQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ErG5qomNHRmXr0XCtdbWeCf7IhIbpSmClDtG8hSPH4Y=;
- b=A0rCJxQqxUjTYaJziuO8lzxsrwpgKAn5uNDYigHuqd7OkMJ3r7KCXuAAi1BDE3nzU3zqQsMv8pFlERoZtNPl7qhl2/nx31/JYyrtTZr12MnoW3UdHsa04+9CRWNYNFGhiisH+Yhdp7mwp8v7YvFhaZvqt7w3aZIOEC846sgwHuG8yknmNu4SvnAPvju4WGwGEG4eEHXngXqXbxWm7tWdMPKWikZU7satuKPLURWPeZLZBTO8OY4JHOfdDw6qVD2WTZKtRpV/LtSIYdY73TUJaXhCkhaQitqLRDZO7OfTMC7wXM1BTeJfFBfbGmISeHUWpHODb1BUXlYLlrOcXPeINQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB9642.eurprd04.prod.outlook.com (2603:10a6:102:240::14)
- by VI1PR04MB6896.eurprd04.prod.outlook.com (2603:10a6:803:12e::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.12; Tue, 19 Aug
- 2025 14:45:39 +0000
-Received: from PAXPR04MB9642.eurprd04.prod.outlook.com
- ([fe80::9126:a61e:341d:4b06]) by PAXPR04MB9642.eurprd04.prod.outlook.com
- ([fe80::9126:a61e:341d:4b06%5]) with mapi id 15.20.9052.011; Tue, 19 Aug 2025
- 14:45:39 +0000
-Date: Tue, 19 Aug 2025 10:45:29 -0400
-From: Frank Li <Frank.li@nxp.com>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	richardcochran@gmail.com, claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, vadim.fedorenko@linux.dev,
-	shawnguo@kernel.org, s.hauer@pengutronix.de, festevam@gmail.com,
-	fushi.peng@nxp.com, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev, kernel@pengutronix.de
-Subject: Re: [PATCH v4 net-next 03/15] ptp: add helpers to get the phc_index
- by of_node or dev
-Message-ID: <aKSOCbuKcwRkBe82@lizhi-Precision-Tower-5810>
-References: <20250819123620.916637-1-wei.fang@nxp.com>
- <20250819123620.916637-4-wei.fang@nxp.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250819123620.916637-4-wei.fang@nxp.com>
-X-ClientProxiedBy: SJ0PR03CA0042.namprd03.prod.outlook.com
- (2603:10b6:a03:33e::17) To PAXPR04MB9642.eurprd04.prod.outlook.com
- (2603:10a6:102:240::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 916171FF7D7;
+	Tue, 19 Aug 2025 14:46:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755614765; cv=none; b=P+rjtf9CUk3wnF/9wI8uBCisQrZWm7nvwjSfBbgPXjpf555Y1DrfSuEBnLTHgJzSN8eRYigMWJ8ffU4NzR4UwNYWbDWzIZDAG4zhwymgcKIhuerj4UnJarFVKwbTNYRM+QJKV2Y/+UVdzt7II5BJft2tfjIzqicCUfVr577EPls=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755614765; c=relaxed/simple;
+	bh=DCZiF8kq04YIUMZs8I7NejSG0j963jBDxvlnKIltYV8=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Kcmpa3W14XqAR8k9d0/TEZOmvqi6Ks9j5jet9jkRCNTFW3TKxhp7aAb5yAUp0Qq4+wauvolagrdGny1pbQ9jQM5HjXk6/tB4919Al/zs51cJ4TZ1xq0OWsMxl0jSM8jg7hYUdd4wXnSOax+lhGfeLPvPo6+6ws9vLkbIwjox8pM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dS+1Tugx; arc=none smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4b121dc259cso27553901cf.1;
+        Tue, 19 Aug 2025 07:46:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755614762; x=1756219562; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jBJBj4QZForHlCQsBm5N3P/Zz1khxIZow/yhMUT1I9Q=;
+        b=dS+1Tugx96WyNetZ6zVmAhYFCy4Oj0jh4KIi1zsyzd9I6NR1ErokH/+lApSlxNPECW
+         yWdHEJQSUMtyOexcvLbm8qcn5vadM/4vFZ4oUB9BrMmpkYjmc7W3lki2Dg0Jz5/shabT
+         xlV539s1WsyfnC3ivpcFYpOA1q8iZUhqNkFjKD4KF0ftOQtSjbT735IermK43LeKvorz
+         QcGygQNtfGaxsTIWEm+rAk9V5q16Yni8619p6leQx4P4QM19RTnGKDCQ988MbgNA/px9
+         jTCTztqlgOz7ot6PBiHghMjx4aDBSWwwSyoa1v5ou6aBRP0aTRGwPdV092ZF5w5oEwsl
+         5UAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755614762; x=1756219562;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=jBJBj4QZForHlCQsBm5N3P/Zz1khxIZow/yhMUT1I9Q=;
+        b=kbx/++2G071ABdXnv/vF5xecS85D5kr65yesjmIR6pfq2uQzw+Hjy51m66xPqixAxN
+         OlhZMPHHi+priiJU+GeedWxsDiyfOwb6494WUAdgsnRbFEL52SlbhK0Z/a1erCIZeLrs
+         6Vhhg9c23ogpUB3D5Obxcz2fWU1J9f9RB8PNxTOhO7spS9/ls+KHZH+cYWvHr3MQE/0t
+         VZLODZWq5AWHKQasrdOy+5XAkv2+1tOLFKJSKQ+yvnnnHy1JPZy3ceqQX2e9Jto8YHTX
+         xNVqGbDxbdUuABWCxMXHtgHWtE5qU6mMTf65opDq5Kx+9cFeAVMPv4+BZvThlPOzb6uD
+         AXTw==
+X-Forwarded-Encrypted: i=1; AJvYcCVFq1YJpvstujWL4xGuAwuPgX5W/Awv66kSKPbyyeJE5zsE9cGyvyXoesBl7IKPSNjl9F6LzylU@vger.kernel.org, AJvYcCX87wF2E7P01RTtBkEDbbd90zn8MooL7zoHWlUdhXynwYtNdc4K4w+EtE3P377iFDlUDLE0CoxFn2TZNto=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9XeBQexrTBo9d+k/BJ3nDFd0axNbh1BzPh2qw9VrewQAwb16N
+	NcbM35pC+jRZFET/nQ1AtSIU9n/VHlCmZSPzrgYkyJqcsBUaxnsWj/0A
+X-Gm-Gg: ASbGncvDWyhHc5BrCopTuOiIm198wZFtBBUsYxzMw1ia2RBEfPpeXnBNynvY7BDw3qY
+	BwSVblcq5b+yFS8bugB9FQqaliHq2hSuQkxdpsf/EINbI0PnfqjZUAnXbzwZLj+/+M6Ab4eIvxM
+	9zINGCP7k2ONybt9ovqqx9umUjPz8/8owvPUq4LA02g0kRrHH/M52hKI5fATAtFoBX6cUrjmcph
+	c8/GZcH0Fpx4d7ZlXR53jc3PaJuaqFr6RiXBSgYX32ipPSXodEaCJNnbSE87Aq9emSJCwCvzHaN
+	l6XZL5o6Y3iPEFe/ccVu+FGw7YDAngGpxOA5MnrJIEo73ZgQO6GTYXVBTAULsX0P+kfeBqoZYTL
+	mIpM8M/QDR15teNXhRg+2gTAlBOqp2n+9Aq68FAwfSIhk8LdWDzCl4M9zFgeADCdCokldAg==
+X-Google-Smtp-Source: AGHT+IGc81qdxCSR+PaPZepmyKxyryjgwFGzxpyj5AsgK7mQfH+yLPXu4BapDT/RrPKygy62G8x3Jg==
+X-Received: by 2002:a05:622a:1493:b0:4b0:8ac3:a388 with SMTP id d75a77b69052e-4b286c6cb24mr29976311cf.19.1755614762234;
+        Tue, 19 Aug 2025 07:46:02 -0700 (PDT)
+Received: from gmail.com (128.5.86.34.bc.googleusercontent.com. [34.86.5.128])
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7e87dee34f8sm792390485a.0.2025.08.19.07.46.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Aug 2025 07:46:01 -0700 (PDT)
+Date: Tue, 19 Aug 2025 10:46:01 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Richard Gobert <richardbgobert@gmail.com>, 
+ netdev@vger.kernel.org
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ horms@kernel.org, 
+ corbet@lwn.net, 
+ shenjian15@huawei.com, 
+ salil.mehta@huawei.com, 
+ shaojijie@huawei.com, 
+ andrew+netdev@lunn.ch, 
+ saeedm@nvidia.com, 
+ tariqt@nvidia.com, 
+ mbloch@nvidia.com, 
+ leon@kernel.org, 
+ ecree.xilinx@gmail.com, 
+ dsahern@kernel.org, 
+ ncardwell@google.com, 
+ kuniyu@google.com, 
+ shuah@kernel.org, 
+ sdf@fomichev.me, 
+ ahmed.zaki@intel.com, 
+ aleksander.lobakin@intel.com, 
+ florian.fainelli@broadcom.com, 
+ willemdebruijn.kernel@gmail.com, 
+ linux-kernel@vger.kernel.org, 
+ linux-net-drivers@amd.com, 
+ Richard Gobert <richardbgobert@gmail.com>
+Message-ID: <willemdebruijn.kernel.a8507becb441@gmail.com>
+In-Reply-To: <20250819063223.5239-3-richardbgobert@gmail.com>
+References: <20250819063223.5239-1-richardbgobert@gmail.com>
+ <20250819063223.5239-3-richardbgobert@gmail.com>
+Subject: Re: [PATCH net-next v2 2/5] net: gro: only merge packets with
+ incrementing or fixed outer ids
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB9642:EE_|VI1PR04MB6896:EE_
-X-MS-Office365-Filtering-Correlation-Id: e8d9ee84-7264-4778-23cf-08dddf2f10de
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|19092799006|7416014|52116014|376014|1800799024|366016|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Uu9D1hwOIlGlE0FywX316JcUY6+rW9xEjOqaG1T8IQsq2cH6Wke6joxjbAp1?=
- =?us-ascii?Q?1s6MQ94X7z+wabX89UDvKpciKOvdIWoKM0NNe8kRhrqaHNgxVJ6UfUqFjhOn?=
- =?us-ascii?Q?j+gZ16OCRvD9f1IgUDie1pCgW/B1GXbQywI7dqe3xQGA5RNWq+29lcUae+Lr?=
- =?us-ascii?Q?/9JNPNSnwBrAo1qY10K9T6s7JfZcUPkyihzRkv++PFH3MJPhxNFOYSCZGbDq?=
- =?us-ascii?Q?b1XnaKoiRNTLOk2GG7ImFzhLTILepNte7k8OJFYgRH/h7it8wY05WeXEXjDn?=
- =?us-ascii?Q?tUX9s0xBO/6bwjgl9mwdRo6jZD+owhyjBzEp7YyV5rk1f+WfvFUlXbkjO5h8?=
- =?us-ascii?Q?gqSVjgTOY0zXra6rMTrBcQPIEfYdN7L2+F91z0QyuLY3+s7VHs3hXMqkWkxb?=
- =?us-ascii?Q?ifeBvU3oUyAub9hYVn9leMmubG9RPHGGSkmJW2lztFfv9xAjqH3JKP7W++OG?=
- =?us-ascii?Q?2ql/Is+lDfE8RdbJMe+j9ugJTHi0EdiURy7pmMKIKtuscNOVkDc0XPagCMsA?=
- =?us-ascii?Q?rywI0b3hjqkJUMopudGst6zme+SNXMK+iX1K2ZH+B2xBLyrv8/hXukL30d7+?=
- =?us-ascii?Q?5jLT3SB8phYMELX9ioEdyR0XJCRcyOGH5dgP02kQmg5muGGqoSmDiNQ5iKm9?=
- =?us-ascii?Q?egM7Ivb1uU49Ool4RFjNbHDbkKrCSBM9Z/fxzO6JwnY21cthqc3N1foCZVR/?=
- =?us-ascii?Q?DC1rpnZS1qGN7BH0ybj4TdaC8wymZFZfK9M9cA/v9+axoNncePNJacliQBeX?=
- =?us-ascii?Q?Kpf4T/tIdLnUAzqMwFFz+jTUPuuVTY4pdAH4k5PvrL/lxstXv5hOAVR/igCx?=
- =?us-ascii?Q?8sJJYJK9Z+Ifa7Jn1pLvpqJjhD7VtIqbwUOhBED9vNgUgu2/IJiESq5lTA9f?=
- =?us-ascii?Q?Wlkk5uQ7G4yrBHNYkjxp+lz8x8ezzW9lQGr3/QovABNfgOIPWh7Ry3EUpcYR?=
- =?us-ascii?Q?dmYMn0wzfK7bNIcRC4DpbV+S7QiPYxkDgHTSott5gfpa/GCv+CU2l4vEgMQ0?=
- =?us-ascii?Q?K/TSw2ptCQJ3ztDClfDva2k8iE9ujYv1HCzephxcVswFo/z4V6HMTNP8RrjT?=
- =?us-ascii?Q?G/efwU7+JGI2h6b4CoaJ+i/zd1dDx+uCLHOq+z6yQRM+SwkarR/qIkO9uoNJ?=
- =?us-ascii?Q?powQtYKj5kKeFKoazD7YYykIzBJRRDPaipbwKpmhNcYBQowp45Ie+WhqpM24?=
- =?us-ascii?Q?zzO7BPoK1hEZXlgcZ6ddPa/AQrOoBFbrATu+d+g+bnXqavbGtKArWxZVhl+Q?=
- =?us-ascii?Q?KB6M1NZkA9uzR6/H7725fSph0kVlFbjfhSvztq2BsgD8SM7CrXM+5la+2idv?=
- =?us-ascii?Q?H8M2+CUqh44B+qP+PXliD/34i2iCrlF5VCTa5dt1o9z5g1KuvsDfX0WYI+7W?=
- =?us-ascii?Q?xJ2L1F0AB9EhhR52ANAfT1Ht/M5979l0tfkwTu67UmfY63E4Jgk52gcnaSl9?=
- =?us-ascii?Q?4tuljK5vtPGUPR/ksmQ6/HkiB+VaGpRQHlWtotoJ/XDC4uXlK6yrRg=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9642.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(7416014)(52116014)(376014)(1800799024)(366016)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?7T5dpFE6QbCFoJVgUwfRXSP2QlkBBYIuRZGSpTxYadjm0xHwBar+4A7bKzbV?=
- =?us-ascii?Q?qkXF9pfPA9fnsfM5gpToereCvNXfVsawgwTDvn0DvCvm1HTsjouASY7yjRXa?=
- =?us-ascii?Q?5+IbWR7UuPIgUJN9T+n0cFyTE70weJDyB3xe+iP3PARiwUc7LLvtEJ4hm9lK?=
- =?us-ascii?Q?xreQ63v4yz3toWwwY3T9EC9+f9U0t2vjwMxJ2drzeHGeqoMHhX7kdffmJLwU?=
- =?us-ascii?Q?Ufav28PaymymcI9l4opJ5k3Ekk/eZRsd5aMY7Dh9mscGORTLMJ6+ZFr6bMKX?=
- =?us-ascii?Q?tmYX293EU0uiIIXnRx7N9xvZnEL3ZrZNaZ3xDUPD4+KAL3mSRaFvCYBP0gHg?=
- =?us-ascii?Q?BB3z8g1jdXrLzXy6Z+/8MKXQYjdRBR0KUDLFutE/a5l/5IPZ2O4XboQrMfRd?=
- =?us-ascii?Q?EtXt2W8q2NcHAU0s7TGFTN+KCbSpb4k9ggXMS9/OucohWM4wyfXBaatSWbH6?=
- =?us-ascii?Q?uuyiAXorTfvXfJVXmrAZtjVG6kxv9Rrti6kutXAMdO8erZvagOT8IRZwc4mF?=
- =?us-ascii?Q?IBKJ/74RNL9ojqacODw65BHreR7ql4lTCsWXt0/7AxuFQ/+rEYMJzlNPQ5M5?=
- =?us-ascii?Q?bWUwZwLFd0QVSFHE+54o3HSF0mr6QPF1RhBlP4f6FCCSk/WM+DseqC5u6ZX8?=
- =?us-ascii?Q?51q/FCvXinaG6Gk5h46GWOeUlYzmsJgr/kwFMGb3LiCYhL1HJgh+N9q7cWy5?=
- =?us-ascii?Q?0xHIxNK0WNyjju0QKBO0325cznpvA/aLkYCe8KF9I1NtCqKzPsSmCeq6dFkK?=
- =?us-ascii?Q?yW6DPQJJ+YFvqrTrKxS+zDh5ceMbf9slkQRnARI1Z+k922uyzO9MS99WO77T?=
- =?us-ascii?Q?AL2sTXkzdobgJmvV1uCjKIa2SM9AY5+MZs5KfQROrg1QfslXuOpJT+TDDX2h?=
- =?us-ascii?Q?etXaalFK12Tqd64+Yjrek3XHJqnh0QZViFNPElwyY4N/EoSk/auQ2w4Lwn1R?=
- =?us-ascii?Q?uMRkJzgY8STKiPlxExiqqjUzlQ59mfsrMZxXLOq2MmD+vpZxu7pNqeyQ2Jnv?=
- =?us-ascii?Q?p4YZfE8n1ktSCSwqiwPyUW2+MuGmN0xkgHn1rp9OjmBur6eUtyW/A6I2eNq7?=
- =?us-ascii?Q?gZopP/9KzE8diTVghDaTigW0glhrkvhP9/k20Z/PyBYH2bwxSoasGKFDd6pF?=
- =?us-ascii?Q?j7CkwLBQ8sYripyRctmY0yniQuFAKcdVEnsylRuK5JE8yPoLOZUPdLBKrTv1?=
- =?us-ascii?Q?3f9NbnSF1tXhCVAx7RIGdty+At7vnqiggZnnL1JGtIkztoKxi0pAYW1TLbSz?=
- =?us-ascii?Q?jFRRwY5RpUpAMZL1UozHEJwUoHtFbw8IfBpCAaMPyISKdQKWYIhtI2GNao1u?=
- =?us-ascii?Q?zG0Y28GedWfQ7IT1HeeigwFfSGuPMFPQ3R3XCVteeJyDHO9RkYwtWSfEszqI?=
- =?us-ascii?Q?zsYgT2EM+gIZsQPSQVx3DMvXceyEv7jZt4ELbCg+sK+YjHadmNr8pq+toBPb?=
- =?us-ascii?Q?wTa2I+1pfLRLC6bWEsptuX1lvTYx8y3sOMBkY8K1/iggx/n7+MLB1OUthhk3?=
- =?us-ascii?Q?EFQ+2gySxhihD1opo1aIcMzlzQBalhEgMH09C1ub83lBUur34qGhsA3mrevo?=
- =?us-ascii?Q?E1zppfrAdRZtJiArM1gBE2XYDPjMPCNCM44G9gbl?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e8d9ee84-7264-4778-23cf-08dddf2f10de
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9642.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Aug 2025 14:45:39.7214
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SeKoURgesONv0LP5naynDczA3hWjYbkX0uSZYi7X+DJne6L6/eRAa5/8UhqKiY5H98OhaQyHXNayrJsWCWODuw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB6896
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 19, 2025 at 08:36:08PM +0800, Wei Fang wrote:
-> Some Ethernet controllers do not have an integrated PTP timer function.
-> Instead, the PTP timer is a separated device and provides PTP hardware
-> clock to the Ethernet controller to use. Therefore, the Ethernet
-> controller driver needs to obtain the PTP clock's phc_index in its
-> ethtool_ops::get_ts_info(). Currently, most drivers implement this in
-> the following ways.
->
-> 1. The PTP device driver adds a custom API and exports it to the Ethernet
-> controller driver.
-> 2. The PTP device driver adds private data to its device structure. So
-> the private data structure needs to be exposed to the Ethernet controller
-> driver.
->
-> When registering the ptp clock, ptp_clock_register() always saves the
-> ptp_clock pointer to the private data of ptp_clock::dev. Therefore, as
-> long as ptp_clock::dev is obtained, the phc_index can be obtained. So
-> the following generic APIs can be added to the ptp driver to obtain the
-> phc_index.
->
-> 1. ptp_clock_index_by_dev(): Obtain the phc_index by the device pointer
-> of the PTP device.
-> 2.ptp_clock_index_by_of_node(): Obtain the phc_index by the of_node
-> pointer of the PTP device.
->
-> Also, we can add another API like ptp_clock_index_by_fwnode() to get the
-> phc_index by fwnode of PTP device. However, this API is not used in this
-> patch set, so it is better to add it when needed.
-
-Needn't this paragraph.
-
-Reviewed-by: Frank Li <Frank.Li@nxp.com>
-
->
-> Suggested-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
->
+Richard Gobert wrote:
+> Only merge encapsulated packets if their outer IDs are either
+> incrementing or fixed, just like for inner IDs and IDs of non-encapsulated
+> packets.
+> 
+> Add another ip_fixedid bit for a total of two bits: one for outer IDs and
+> one for inner IDs.
+> 
+> This commit preserves the current behavior of GSO where only the IDs of the
+> inner-most headers are restored correctly.
+> 
+> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
 > ---
-> v4 changes:
-> New patch
-> ---
->  drivers/ptp/ptp_clock.c          | 53 ++++++++++++++++++++++++++++++++
->  include/linux/ptp_clock_kernel.h | 22 +++++++++++++
->  2 files changed, 75 insertions(+)
->
-> diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-> index 1cc06b7cb17e..2b0fd62a17ef 100644
-> --- a/drivers/ptp/ptp_clock.c
-> +++ b/drivers/ptp/ptp_clock.c
-> @@ -11,6 +11,7 @@
->  #include <linux/module.h>
->  #include <linux/posix-clock.h>
->  #include <linux/pps_kernel.h>
-> +#include <linux/property.h>
->  #include <linux/slab.h>
->  #include <linux/syscalls.h>
->  #include <linux/uaccess.h>
-> @@ -477,6 +478,58 @@ int ptp_clock_index(struct ptp_clock *ptp)
+>  include/net/gro.h      | 26 +++++++++++---------------
+>  net/ipv4/tcp_offload.c |  4 +++-
+>  2 files changed, 14 insertions(+), 16 deletions(-)
+> 
+> diff --git a/include/net/gro.h b/include/net/gro.h
+> index 87c68007f949..e7997a9fb30b 100644
+> --- a/include/net/gro.h
+> +++ b/include/net/gro.h
+> @@ -75,7 +75,7 @@ struct napi_gro_cb {
+>  		u8	is_fou:1;
+>  
+>  		/* Used to determine if ipid_offset can be ignored */
+> -		u8	ip_fixedid:1;
+> +		u8	ip_fixedid:2;
+>  
+>  		/* Number of gro_receive callbacks this packet already went through */
+>  		u8 recursion_counter:4;
+> @@ -442,29 +442,26 @@ static inline __wsum ip6_gro_compute_pseudo(const struct sk_buff *skb,
 >  }
->  EXPORT_SYMBOL(ptp_clock_index);
->
-> +static int ptp_clock_of_node_match(struct device *dev, const void *data)
-> +{
-> +	const struct device_node *parent_np = data;
-> +
-> +	return (dev->parent && dev_of_node(dev->parent) == parent_np);
-> +}
-> +
-> +int ptp_clock_index_by_of_node(struct device_node *np)
-> +{
-> +	struct ptp_clock *ptp;
-> +	struct device *dev;
-> +	int phc_index;
-> +
-> +	dev = class_find_device(&ptp_class, NULL, np,
-> +				ptp_clock_of_node_match);
-> +	if (!dev)
-> +		return -1;
-> +
-> +	ptp = dev_get_drvdata(dev);
-> +	phc_index = ptp_clock_index(ptp);
-> +	put_device(dev);
-> +
-> +	return phc_index;
-> +}
-> +EXPORT_SYMBOL_GPL(ptp_clock_index_by_of_node);
-> +
-> +static int ptp_clock_dev_match(struct device *dev, const void *data)
-> +{
-> +	const struct device *parent = data;
-> +
-> +	return dev->parent == parent;
-> +}
-> +
-> +int ptp_clock_index_by_dev(struct device *parent)
-> +{
-> +	struct ptp_clock *ptp;
-> +	struct device *dev;
-> +	int phc_index;
-> +
-> +	dev = class_find_device(&ptp_class, NULL, parent,
-> +				ptp_clock_dev_match);
-> +	if (!dev)
-> +		return -1;
-> +
-> +	ptp = dev_get_drvdata(dev);
-> +	phc_index = ptp_clock_index(ptp);
-> +	put_device(dev);
-> +
-> +	return phc_index;
-> +}
-> +EXPORT_SYMBOL_GPL(ptp_clock_index_by_dev);
-> +
->  int ptp_find_pin(struct ptp_clock *ptp,
->  		 enum ptp_pin_function func, unsigned int chan)
+>  
+>  static inline int inet_gro_flush(const struct iphdr *iph, const struct iphdr *iph2,
+> -				 struct sk_buff *p, bool outer)
+> +				 struct sk_buff *p, bool inner)
 >  {
-> diff --git a/include/linux/ptp_clock_kernel.h b/include/linux/ptp_clock_kernel.h
-> index 3d089bd4d5e9..7dd7951b23d5 100644
-> --- a/include/linux/ptp_clock_kernel.h
-> +++ b/include/linux/ptp_clock_kernel.h
-> @@ -360,6 +360,24 @@ extern void ptp_clock_event(struct ptp_clock *ptp,
->
->  extern int ptp_clock_index(struct ptp_clock *ptp);
->
-> +/**
-> + * ptp_clock_index_by_of_node() - obtain the device index of
-> + * a PTP clock based on the PTP device of_node
-> + *
-> + * @np:    The device of_node pointer of the PTP device.
-> + * Return: The PHC index on success or -1 on failure.
-> + */
-> +int ptp_clock_index_by_of_node(struct device_node *np);
+>  	const u32 id = ntohl(*(__be32 *)&iph->id);
+>  	const u32 id2 = ntohl(*(__be32 *)&iph2->id);
+>  	const u16 ipid_offset = (id >> 16) - (id2 >> 16);
+>  	const u16 count = NAPI_GRO_CB(p)->count;
+>  	const u32 df = id & IP_DF;
+> -	int flush;
+>  
+>  	/* All fields must match except length and checksum. */
+> -	flush = (iph->ttl ^ iph2->ttl) | (iph->tos ^ iph2->tos) | (df ^ (id2 & IP_DF));
+> -
+> -	if (flush | (outer && df))
+> -		return flush;
+> +	if ((iph->ttl ^ iph2->ttl) | (iph->tos ^ iph2->tos) | (df ^ (id2 & IP_DF)))
+> +		return true;
+>  
+>  	/* When we receive our second frame we can make a decision on if we
+>  	 * continue this flow as an atomic flow with a fixed ID or if we use
+>  	 * an incrementing ID.
+>  	 */
+>  	if (count == 1 && df && !ipid_offset)
+> -		NAPI_GRO_CB(p)->ip_fixedid = true;
+> +		NAPI_GRO_CB(p)->ip_fixedid |= 1 << inner;
+>  
+> -	return ipid_offset ^ (count * !NAPI_GRO_CB(p)->ip_fixedid);
+> +	return ipid_offset ^ (count * !(NAPI_GRO_CB(p)->ip_fixedid & (1 << inner)));
+>  }
+>  
+>  static inline int ipv6_gro_flush(const struct ipv6hdr *iph, const struct ipv6hdr *iph2)
+> @@ -479,7 +476,7 @@ static inline int ipv6_gro_flush(const struct ipv6hdr *iph, const struct ipv6hdr
+>  
+>  static inline int __gro_receive_network_flush(const void *th, const void *th2,
+>  					      struct sk_buff *p, const u16 diff,
+> -					      bool outer)
+> +					      bool inner)
+>  {
+>  	const void *nh = th - diff;
+>  	const void *nh2 = th2 - diff;
+> @@ -487,19 +484,18 @@ static inline int __gro_receive_network_flush(const void *th, const void *th2,
+>  	if (((struct iphdr *)nh)->version == 6)
+>  		return ipv6_gro_flush(nh, nh2);
+>  	else
+> -		return inet_gro_flush(nh, nh2, p, outer);
+> +		return inet_gro_flush(nh, nh2, p, inner);
+>  }
+>  
+>  static inline int gro_receive_network_flush(const void *th, const void *th2,
+>  					    struct sk_buff *p)
+>  {
+> -	const bool encap_mark = NAPI_GRO_CB(p)->encap_mark;
+>  	int off = skb_transport_offset(p);
+>  	int flush;
+>  
+> -	flush = __gro_receive_network_flush(th, th2, p, off - NAPI_GRO_CB(p)->network_offset, encap_mark);
+> -	if (encap_mark)
+> -		flush |= __gro_receive_network_flush(th, th2, p, off - NAPI_GRO_CB(p)->inner_network_offset, false);
+> +	flush = __gro_receive_network_flush(th, th2, p, off - NAPI_GRO_CB(p)->network_offset, false);
+> +	if (NAPI_GRO_CB(p)->encap_mark)
+> +		flush |= __gro_receive_network_flush(th, th2, p, off - NAPI_GRO_CB(p)->inner_network_offset, true);
+
+It's a bit unclear what the meaning of inner and outer are in the
+unencapsulated (i.e., normal) case. In my intuition outer only exists
+if encapsulated, but it seems you reason the other way around: inner
+is absent unless encapsulated. I guess they're equivalent, but please
+explicitly comment this choice somewhere.
+
+>  
+>  	return flush;
+>  }
+> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+> index be5c2294610e..74f46663eeae 100644
+> --- a/net/ipv4/tcp_offload.c
+> +++ b/net/ipv4/tcp_offload.c
+> @@ -485,8 +485,10 @@ INDIRECT_CALLABLE_SCOPE int tcp4_gro_complete(struct sk_buff *skb, int thoff)
+>  	th->check = ~tcp_v4_check(skb->len - thoff, iph->saddr,
+>  				  iph->daddr, 0);
+>  
+> +	bool is_fixedid = (NAPI_GRO_CB(skb)->ip_fixedid >> skb->encapsulation) & 1;
 > +
-> +/**
-> + * ptp_clock_index_by_dev() - obtain the device index of
-> + * a PTP clock based on the PTP device.
-> + *
-> + * @parent:    The parent device (PTP device) pointer of the PTP clock.
-> + * Return: The PHC index on success or -1 on failure.
-> + */
-> +int ptp_clock_index_by_dev(struct device *parent);
-> +
->  /**
->   * ptp_find_pin() - obtain the pin index of a given auxiliary function
->   *
-> @@ -425,6 +443,10 @@ static inline void ptp_clock_event(struct ptp_clock *ptp,
->  { }
->  static inline int ptp_clock_index(struct ptp_clock *ptp)
->  { return -1; }
-> +static inline int ptp_clock_index_by_of_node(struct device_node *np)
-> +{ return -1; }
-> +static inline int ptp_clock_index_by_dev(struct device *parent)
-> +{ return -1; }
->  static inline int ptp_find_pin(struct ptp_clock *ptp,
->  			       enum ptp_pin_function func, unsigned int chan)
->  { return -1; }
-> --
-> 2.34.1
->
+
+Variable definition at top of function (or basic block)
+
+>  	skb_shinfo(skb)->gso_type |= SKB_GSO_TCPV4 |
+> -			(NAPI_GRO_CB(skb)->ip_fixedid * SKB_GSO_TCP_FIXEDID);
+> +			(is_fixedid * SKB_GSO_TCP_FIXEDID);
+>  
+>  	tcp_gro_complete(skb);
+>  	return 0;
+> -- 
+> 2.36.1
+> 
+
+
 
