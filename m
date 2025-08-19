@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-214804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0769B2B57F
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 02:42:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42D72B2B57C
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 02:42:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A927B1B6000C
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 00:41:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 622D96802C6
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 00:41:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 385A619AD48;
-	Tue, 19 Aug 2025 00:40:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78FE91B21BF;
+	Tue, 19 Aug 2025 00:40:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ds7lAItm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lIw34vct"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D3B51607AC;
-	Tue, 19 Aug 2025 00:40:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DDEE1AC44D;
+	Tue, 19 Aug 2025 00:40:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755564009; cv=none; b=D8bpdXZqcLDkLARZkulB8GzoJqUufiAKUSW2aBubq6SLQ6vicye2s4eb6cD7BdOAxhqs7M9UnJ5AZDfq2YPl/agt6/fp0e7t+rx/AyKCY8ViF++xF+wJyFYMIO5iS+GKEDdUsl5A1AaZOqjxpa4XpteFy/0V5cUc9accQbbmA1U=
+	t=1755564010; cv=none; b=hADWorBf1nRknDKvjOe858I563UBWQ2xupH8aWXRQQksLbBublpIcOdNky4K/d7z8zVIkpcNKD71ACfVbNBan5PFJMDEY3imIvNLHungBql6tIyvSYpwwt7/kulZmwlb2zRcDD90DXTOkwEx7BwidLqHZtnGgGw2mvdpM+5zVV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755564009; c=relaxed/simple;
-	bh=qjqR7/wG4s/fGkSkjeV1jCvFNJYxK73OG7vqqwSJzsg=;
+	s=arc-20240116; t=1755564010; c=relaxed/simple;
+	bh=1UOC/S8NX0q/Tbwv3Ar8qP5cEhOOtnHMjinZiBj5+BI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MjLMzG72T4dj462+ONmR0Z9plMR6dEG6MqRZVFsN+wvH6ZbwP9x32d6d4AZwQmk5qBbM/B0fiMki6ozo1J5097+GGSkSMU5CGS8cpXJIvEavVBoEKBUvAfs7ZWRjnfWoqmPY5zWHmdZEx+/R2uIDBqK74ICYpNLrMW5sYn8OEtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ds7lAItm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E309AC4CEEB;
-	Tue, 19 Aug 2025 00:40:08 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=b0qkbsW8hHQ1Jkk5ra+q3XmncOWEwpyfQDCAyCepU1dIr/EG/q8aModb1DsC75/3tv8iY6kc6MLJ9q9REZcXfd7Bw0Jv8o2BY61j7BewlzDVHvKPzxdyO3dVQUxW/et+lCDVe+3ejWPbI76LLqk+2UwJhZxpO7oDersr35lBR34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lIw34vct; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E120C116B1;
+	Tue, 19 Aug 2025 00:40:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755564008;
-	bh=qjqR7/wG4s/fGkSkjeV1jCvFNJYxK73OG7vqqwSJzsg=;
+	s=k20201202; t=1755564010;
+	bh=1UOC/S8NX0q/Tbwv3Ar8qP5cEhOOtnHMjinZiBj5+BI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ds7lAItmTS723iNavJtidA9TkhejkAxn1+Q+oDAYWs2eSTRqb7c6acYAIppAqU9BM
-	 Cnte6Tqwl8rHtRnfDOIgCENnAYQM6hWAMge6Y0LqQczW7XUgNujoIJ0l+h+ezuTzPZ
-	 UOnHeJqJ7pgjgxwEsZp6Nr3LvJOATO7KcazJ+tkS5NWq50bD5QLIQrDYO+Oq2lQ22J
-	 k+QKxQotQI1S13aPRyf+wfyoWuNUK6JJtGXHIlrnyHp63FRGyB0bG7gFQb6a8lRcYS
-	 3DghprKOpaO+O7ZQ/Nk8Wb1DXi9GhCIfs0A+6YuMF7i9zRRigS8FsdbM573OchyDRq
-	 Y5LVACwaScOUw==
+	b=lIw34vct1wdbKwSUk8FQeerC20lGSTKKZmFvH7uktMIECJhG8RPtdtpDqAoXIIJ4L
+	 BJMnqJ9HTza9FnAxris8mZk5zD9OXsuIwRYbG56CXf5tP6rKJw0WNEdGJg0fh5kEpx
+	 +a4owt6gxadVxCxaWhGMrsdbOh55Hw7oo8tTaG7HreF4CrfkXMI57RMbmX7k1tnKe1
+	 crAO4UshugYaR+WwtpA3HCX3upC0vC2ZvMzR3G+PDdya+JAdBJvBCO9bpHtQBQrPqP
+	 JuA2oPcGTMhJ/IbUwTeZNtlEnhpQuUHmRI2mMN+2yZ5tbkvZ9a2677WpG046wyHHWX
+	 YTpUVO4bUh6Ng==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33EC9383BF4E;
-	Tue, 19 Aug 2025 00:40:20 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70BF2383BF4E;
+	Tue, 19 Aug 2025 00:40:21 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] nfc: s3fwrn5: Use SHA-1 library instead of
+Subject: Re: [PATCH net-next] ppp: mppe: Use SHA-1 library instead of
  crypto_shash
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175556401899.2961995.16051530585251950559.git-patchwork-notify@kernel.org>
-Date: Tue, 19 Aug 2025 00:40:18 +0000
-References: <20250815022329.28672-1-ebiggers@kernel.org>
-In-Reply-To: <20250815022329.28672-1-ebiggers@kernel.org>
+ <175556402024.2961995.8220856469203813950.git-patchwork-notify@kernel.org>
+Date: Tue, 19 Aug 2025 00:40:20 +0000
+References: <20250815020705.23055-1-ebiggers@kernel.org>
+In-Reply-To: <20250815020705.23055-1-ebiggers@kernel.org>
 To: Eric Biggers <ebiggers@kernel.org>
-Cc: krzk@kernel.org, netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Cc: linux-ppp@vger.kernel.org, netdev@vger.kernel.org,
+ linux-crypto@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 14 Aug 2025 19:23:29 -0700 you wrote:
+On Thu, 14 Aug 2025 19:07:05 -0700 you wrote:
 > Now that a SHA-1 library API is available, use it instead of
 > crypto_shash.  This is simpler and faster.
 > 
 > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 > ---
->  drivers/nfc/s3fwrn5/Kconfig    |  3 +--
->  drivers/nfc/s3fwrn5/firmware.c | 17 +----------------
->  2 files changed, 2 insertions(+), 18 deletions(-)
+>  drivers/net/ppp/Kconfig    |   3 +-
+>  drivers/net/ppp/ppp_mppe.c | 108 +++++++------------------------------
+>  2 files changed, 19 insertions(+), 92 deletions(-)
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] nfc: s3fwrn5: Use SHA-1 library instead of crypto_shash
-    https://git.kernel.org/netdev/net-next/c/661bfb4699f8
+  - [net-next] ppp: mppe: Use SHA-1 library instead of crypto_shash
+    https://git.kernel.org/netdev/net-next/c/b55f7295d600
 
 You are awesome, thank you!
 -- 
