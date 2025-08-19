@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-215059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D08E4B2CF44
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 00:20:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B1F1B2CF45
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 00:21:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD8DD687D2E
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 22:20:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 086BD6868BD
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 22:21:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CE2C31DDA0;
-	Tue, 19 Aug 2025 22:20:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F36031DDB3;
+	Tue, 19 Aug 2025 22:20:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ns9TnZXC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J19HPxIm"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA07F31DD81
-	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 22:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4DB308F16;
+	Tue, 19 Aug 2025 22:20:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755642008; cv=none; b=Wkdhre2uxtMg7PHfioN2Suh8/S5XRlcAYV6nwhV6seCvioiePxkDTp8Av5KjDDFPbp6tNGoFyxPl/WNFNelMRe+T4T2+gG1H5jobCzBOmacyW4AAV7d0YfSJpGlPf5wvbjgi3812zAy4dMpMdjgY7HBQeAGZOeqvgbkLNcXsThE=
+	t=1755642009; cv=none; b=fttHCtH9X8nCsYp9fu2hi/aihoy6szz05tU/743iy7has1PprDejgYrpp3+16NXRkLQnMvkeGb19doUHkn70AzEySkmHiQ/BBAmfThkiWOKCLRPl+qj/40YXc+16uuGSwy1ME++lrhJ0T/7LjoC33Wedff6qBYMkgyjODwMT4gU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755642008; c=relaxed/simple;
-	bh=6F9TlIeMjNBAgf3BO3eCjOcPgLbSWc016FuZZUFGoI0=;
+	s=arc-20240116; t=1755642009; c=relaxed/simple;
+	bh=Y1gJcmKzAjtJHlZtBlefjGpXGCoJCpipKjcg2/uVoSE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mAwXQvmZsZkOgWqZPt6DW8qAu7AQtDFoj6NdlooHtYhGukZVUJ7veuAV2nd15rH4w5BaaXmV0tMSqpb1zwVt1lKobva/qMuluFsXMn4n3SKNUJXLA5vYJAKfym81+2sGFBjBZhD6opb630o8De14qcqeVXQUmMs467AO58tOGXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ns9TnZXC; arc=none smtp.client-ip=192.198.163.17
+	 MIME-Version; b=H2bYOYUx/C38rJWYjjlwbZszvIq3yw1o/knwR+hxiFRncCRgsFRVsYaILe24q9Wkcuyypu+BFZi29v8dx18VGlfk6YDKghk0cE3djcGzESqMvoMS2gWeT3Bg5SUW0jOZYFvEq0IDQVhxkvkgPqJBsxs/PPp2SMVtSWNkO8502Wk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J19HPxIm; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755642007; x=1787178007;
+  t=1755642008; x=1787178008;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=6F9TlIeMjNBAgf3BO3eCjOcPgLbSWc016FuZZUFGoI0=;
-  b=ns9TnZXCbxiL9uEwr/ii/+k/aSCiJB9tEfHdxulcLUq/oY0eDm4UHM+1
-   fIDy4a3tSmt0p3eQ07WcZ3jm9jCDO0EKlOEuln/N3IEj2Hb9knw6NooPK
-   txY/q7ps+OKUguwwd2Dt87do6cdHt3BTVIdbcHUwiOiXnA4O3yOwfdy9y
-   SvgFIwmgfy381Z4M0/KWDMOcpM6hPfbpoNaBHUfpqXUcuACVnAES+vdap
-   IRHDQUp85GA+qpiQvoAXkV95PmP7l+sJvffcW4lxigniPhtZ/9Z4h/jVU
-   zctXfbcZ4JpLsUYCMvTL+B6M6Eio+DXkYAlPslqVFuh+MKF+SLazsofyl
-   g==;
-X-CSE-ConnectionGUID: fxKOfoaJSo6QkH9LBr7R0A==
-X-CSE-MsgGUID: ovfCQJ06TL249slLWttY6Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11527"; a="57829558"
+  bh=Y1gJcmKzAjtJHlZtBlefjGpXGCoJCpipKjcg2/uVoSE=;
+  b=J19HPxImtQCT6dLsI/hMtciiTiGTejZ5ghslSyB87ZvPRPShXaZu4SvG
+   Yta6XfK2zHVZXkw0jesgXboF9WJdyTTugVN0SiTz1Ria5KeHL8d9f501s
+   NBId3pgts0RuWnGk1b/P+Hmw3yOEzRZj02Lo24sJUHs8cNuzx3VkSni3r
+   UZ+cRWW1/sTog9SPk/x49SPEzhIadMYBMcCrJO79y75gTYlGMDUJefy9L
+   hl9ikx3pNqejiwFBxSuZEIE51nfYQLC2S7uaAt8wFpUiugzoqdAZmAekp
+   2v+J0hsjkXltT+yRtKoo5uEywx/dNnJiB6+OCS4jVPsLS+YEBjOGeqDEg
+   Q==;
+X-CSE-ConnectionGUID: 5TOLoNnBTWuZIg7P4UqgNw==
+X-CSE-MsgGUID: iBU/RNLwRzuNYQTSIUY3nQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11527"; a="57829564"
 X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
-   d="scan'208";a="57829558"
+   d="scan'208";a="57829564"
 Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2025 15:20:05 -0700
-X-CSE-ConnectionGUID: 1aqH4lxcQzWk1F2mDG8b3A==
-X-CSE-MsgGUID: 59ZKRaizSl+9bcwkeCCosw==
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2025 15:20:06 -0700
+X-CSE-ConnectionGUID: PmUl2fZBQ6eDjAoVq+SFYA==
+X-CSE-MsgGUID: fOeTSmGYTx6jpR/CinDBVA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
-   d="scan'208";a="173202842"
+   d="scan'208";a="173202845"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by fmviesa004.fm.intel.com with ESMTP; 19 Aug 2025 15:20:05 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -65,15 +65,25 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Emil Tantilov <emil.s.tantilov@intel.com>,
+Cc: Jason Xing <kernelxing@tencent.com>,
 	anthony.l.nguyen@intel.com,
-	david.m.ertman@intel.com,
-	tatyana.e.nikolova@intel.com,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [PATCH net v2 2/5] ice: fix possible leak in ice_plug_aux_dev() error path
-Date: Tue, 19 Aug 2025 15:19:56 -0700
-Message-ID: <20250819222000.3504873-3-anthony.l.nguyen@intel.com>
+	maciej.fijalkowski@intel.com,
+	magnus.karlsson@intel.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	sdf@fomichev.me,
+	bpf@vger.kernel.org,
+	bjorn@kernel.org,
+	przemyslaw.kitszel@intel.com,
+	larysa.zaremba@intel.com,
+	Paul Menzel <pmenzel@molgen.mpg.de>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Priya Singh <priyax.singh@intel.com>
+Subject: [PATCH net v2 3/5] ixgbe: xsk: resolve the negative overflow of budget in ixgbe_xmit_zc
+Date: Tue, 19 Aug 2025 15:19:57 -0700
+Message-ID: <20250819222000.3504873-4-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250819222000.3504873-1-anthony.l.nguyen@intel.com>
 References: <20250819222000.3504873-1-anthony.l.nguyen@intel.com>
@@ -85,59 +95,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Emil Tantilov <emil.s.tantilov@intel.com>
+From: Jason Xing <kernelxing@tencent.com>
 
-Fix a memory leak in the error path where kfree(iadev) was not called
-following an error in auxiliary_device_add().
+Resolve the budget negative overflow which leads to returning true in
+ixgbe_xmit_zc even when the budget of descs are thoroughly consumed.
 
-Fixes: f9f5301e7e2d ("ice: Register auxiliary device to provide RDMA")
-Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Before this patch, when the budget is decreased to zero and finishes
+sending the last allowed desc in ixgbe_xmit_zc, it will always turn back
+and enter into the while() statement to see if it should keep processing
+packets, but in the meantime it unexpectedly decreases the value again to
+'unsigned int (0--)', namely, UINT_MAX. Finally, the ixgbe_xmit_zc returns
+true, showing 'we complete cleaning the budget'. That also means
+'clean_complete = true' in ixgbe_poll.
+
+The true theory behind this is if that budget number of descs are consumed,
+it implies that we might have more descs to be done. So we should return
+false in ixgbe_xmit_zc to tell napi poll to find another chance to start
+polling to handle the rest of descs. On the contrary, returning true here
+means job done and we know we finish all the possible descs this time and
+we don't intend to start a new napi poll.
+
+It is apparently against our expectations. Please also see how
+ixgbe_clean_tx_irq() handles the problem: it uses do..while() statement
+to make sure the budget can be decreased to zero at most and the negative
+overflow never happens.
+
+The patch adds 'likely' because we rarely would not hit the loop condition
+since the standard budget is 256.
+
+Fixes: 8221c5eba8c1 ("ixgbe: add AF_XDP zero-copy Tx support")
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
+Reviewed-by: Larysa Zaremba <larysa.zaremba@intel.com>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Tested-by: Priya Singh <priyax.singh@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_idc.c | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
+ drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_idc.c b/drivers/net/ethernet/intel/ice/ice_idc.c
-index 420d45c2558b..8c4a3dc22a7c 100644
---- a/drivers/net/ethernet/intel/ice/ice_idc.c
-+++ b/drivers/net/ethernet/intel/ice/ice_idc.c
-@@ -322,16 +322,12 @@ int ice_plug_aux_dev(struct ice_pf *pf)
- 		"roce" : "iwarp";
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
+index ac58964b2f08..7b941505a9d0 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
+@@ -398,7 +398,7 @@ static bool ixgbe_xmit_zc(struct ixgbe_ring *xdp_ring, unsigned int budget)
+ 	dma_addr_t dma;
+ 	u32 cmd_type;
  
- 	ret = auxiliary_device_init(adev);
--	if (ret) {
--		kfree(iadev);
--		return ret;
--	}
-+	if (ret)
-+		goto free_iadev;
- 
- 	ret = auxiliary_device_add(adev);
--	if (ret) {
--		auxiliary_device_uninit(adev);
--		return ret;
--	}
-+	if (ret)
-+		goto aux_dev_uninit;
- 
- 	mutex_lock(&pf->adev_mutex);
- 	cdev->adev = adev;
-@@ -339,6 +335,13 @@ int ice_plug_aux_dev(struct ice_pf *pf)
- 	set_bit(ICE_FLAG_AUX_DEV_CREATED, pf->flags);
- 
- 	return 0;
+-	while (budget-- > 0) {
++	while (likely(budget)) {
+ 		if (unlikely(!ixgbe_desc_unused(xdp_ring))) {
+ 			work_done = false;
+ 			break;
+@@ -433,6 +433,8 @@ static bool ixgbe_xmit_zc(struct ixgbe_ring *xdp_ring, unsigned int budget)
+ 		xdp_ring->next_to_use++;
+ 		if (xdp_ring->next_to_use == xdp_ring->count)
+ 			xdp_ring->next_to_use = 0;
 +
-+aux_dev_uninit:
-+	auxiliary_device_uninit(adev);
-+free_iadev:
-+	kfree(iadev);
-+
-+	return ret;
- }
++		budget--;
+ 	}
  
- /* ice_unplug_aux_dev - unregister and free AUX device
+ 	if (tx_desc) {
 -- 
 2.47.1
 
