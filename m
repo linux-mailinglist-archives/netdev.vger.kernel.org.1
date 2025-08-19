@@ -1,237 +1,139 @@
-Return-Path: <netdev+bounces-215032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D13BB2CC7F
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 20:55:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0ABDB2CCF6
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 21:27:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01A507B37EA
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 18:53:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79CF31C24340
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 19:28:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 303C431E11F;
-	Tue, 19 Aug 2025 18:55:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 159BA322A06;
+	Tue, 19 Aug 2025 19:27:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NZnOXbnL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2yvPoS8H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 911DC30BF70;
-	Tue, 19 Aug 2025 18:55:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D775D326D66
+	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 19:27:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755629711; cv=none; b=S0PDZysuD0f36wJp4Dlz2OJYYPBgM2lgZqhGoQisXWw61gOsKs8YLimc3Jc1ZgfZ4BmfrJgD/rik4B/VDVDmnL6C1r9tsx5bYipMtofXW9PZACjRR3ooFu0Hp6SKlkupTpWYh4QsO+vloirhI4HIdIAF+bEwJ1a7VlcMNcDrZEE=
+	t=1755631668; cv=none; b=ULdFKCkyrTCgCC5+9NIjNEyTE1/ramexmQsXqEGr55iYnzK5WLqGfQjcbxD1tRbc2ETXBsaIKYTGfD0MT3Usdw7SYw3ZWu5L7bw3PyW17Oc8OsajGyNRrafdDtHxpOQO/AMgF0grwNRVEkw3loAcfrTca84whnVCsAgVA9LFGJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755629711; c=relaxed/simple;
-	bh=RQEfMF96SEP4R1XfTk+9ZcDy1ylx28Z2qlKwpt6Xlw8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e0r6ez+dU+xPqOhwIBmlXmrw/kHqZTJhkOIua3RyNdCMEvU2g3Yg/NoDrAf1rqUMofCG+kJRoZ4sXL+vRHzKVbcUzvKeJ/G3VQjJ9z+TaQVKlHKx7GIfG2eBnOcD1XXWJwQXnBqBPD/mzwzWyXLpG3LAcspaMOT6AEZKO8BfVmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NZnOXbnL; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755629709; x=1787165709;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=RQEfMF96SEP4R1XfTk+9ZcDy1ylx28Z2qlKwpt6Xlw8=;
-  b=NZnOXbnLhs4Gt0qFP+PfmJ87djG7yK/tZvgEUYvylb0YeVlSBFlxMCnv
-   wGuPL7X5llfmX6R5tWcts6+4X/G523IZMOCO6sHgSAmQ6Vf9rHzBdkqvJ
-   2i1q4MONjZ8LvytHqJUQY6VWh/sBrqCHpkwb+6hGf/VjLz/EZC0y3du7z
-   TP8kkDuF/0arwTB+00qlNKTqQnpblR2J9VaOYWCf+bXBi6SMpAXP8ZBG3
-   v208PubJYoQwytXywkNk+ZxOyhRrPDSzv6+XxNGqYVKnXlsw42IP61CZX
-   ctxgkniSNOZdVkNOLfELIjerNb2IOjC3KuNqzhhiYRLpiH2KrqscNSXKX
-   g==;
-X-CSE-ConnectionGUID: 0dx242REQ7OLgvG+oJ2OVA==
-X-CSE-MsgGUID: YMHTYpsFQ16xSIO9ub3M9g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11527"; a="83313090"
-X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
-   d="scan'208";a="83313090"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2025 11:55:09 -0700
-X-CSE-ConnectionGUID: F5C9Nmb8Qq2s9IW34qM2Mg==
-X-CSE-MsgGUID: irN8Rn32TdqNENgBbPS4xw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
-   d="scan'208";a="198785907"
-Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
-  by fmviesa001.fm.intel.com with ESMTP; 19 Aug 2025 11:55:04 -0700
-Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uoRU5-000HIR-03;
-	Tue, 19 Aug 2025 18:55:01 +0000
-Date: Wed, 20 Aug 2025 02:54:39 +0800
-From: kernel test robot <lkp@intel.com>
-To: Daniel Golle <daniel@makrotopia.org>, Hauke Mehrtens <hauke@hauke-m.de>,
-	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Andreas Schirm <andreas.schirm@siemens.com>,
-	Lukas Stockmann <lukas.stockmann@siemens.com>,
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Peter Christen <peter.christen@siemens.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net-next v2 7/8] net: dsa: lantiq_gswip: store switch API
- version in priv
-Message-ID: <202508200254.WPms5O1T-lkp@intel.com>
-References: <56f6b06e22b3b6dbfb45ef04a43bac13a8cb02e5.1755564606.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1755631668; c=relaxed/simple;
+	bh=BlVzj2EUR10ubBzzoCWGCgBRnjT2tSR4AsN+B/Tx+uE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dF8gcFPxdqTaimpX19xebNAdcQplJqdBMnGwQ8tCPEPvvdT2T4m0essamijA7/qsSigvd1deQ38mB6C1bl38NtrmXVnXmEwpTtH5MZy5kBjoINJa4VewScwPkcaGsQ1dcboUgc4KcciNyoCzyrxWDQwPst8BIjGq/NJxzULouGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2yvPoS8H; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4b0bf08551cso97391cf.1
+        for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 12:27:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755631665; x=1756236465; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BlVzj2EUR10ubBzzoCWGCgBRnjT2tSR4AsN+B/Tx+uE=;
+        b=2yvPoS8HQWczeJaM7fx8jeCdrDaBiQmi4SbIn0siSypuiFDVh16Rl2L6b7paZZzsWu
+         aQhddtinIru6QmgeVDzpB/rjT+OeRBQHG3pnwufmOcWe3Gmn78Qa5RnxvgUd6h9LR9nO
+         srUzWuwWD20Ex6NB8g9qm47h8ybzzzwhRI3/MXMS5BgOSurLoWLhXjf2PXP2abvdtnVS
+         qupbU5P7iamPH/DDFRWRlGvOi9wczfTDkJWX/Gf13CPTqK91oCmVFXXkrvrfzig1uo70
+         Qaw04YlvGNy3ZluJ2AUhPNmCPmZdujB7/dg9gZoJF1DeLcKRQopTP7CulTrCrcBPQZYC
+         lv3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755631665; x=1756236465;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BlVzj2EUR10ubBzzoCWGCgBRnjT2tSR4AsN+B/Tx+uE=;
+        b=kzLKtC3zKy7m3W7pzb2rwrywlsOYG6/kH2/vdE8/PVOUdf3L3wIQ72XlNt/WkS4jLs
+         8/Jh0pngULM9NrxuS+HXDjyrlvGOCPfjJmNXNc4abXAUkeXvV5UhMbNjZGHv8pjUwLz+
+         ioqHeaqudJbyoF09gtSsu/900tKNJDltv0PN+x1zaLKYZ9LitRWxNV27hOE1AY6NNKq/
+         qHhUKqzaAV6gAFiNbwZH3S1vq7Sv7Kwqfu5NnvFU8mnVt/sCF65vV9kNw1OFISAvTQ1+
+         WTyo7lOocijKXgXrd1d2FAV8Rb4CpUq8UN+S5ySPgSm2BMMQdn99iaLUByxhhhIbwRsE
+         lRAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVRPUGERgMrm9iZMEuetBidRb92YmDw881yVtUbPyJxJTxFDzgvQCKa30HaAU3bBQ1EvZKnYG8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBvx/ByJyEyizoe+GElZ8laUtAOlaexYKekmH3LubhQ3OZvfWW
+	tbfY9zKpNVUezvGG5B6UIWWs6EppZq3d9seG1uCGr01e8uYJWoBCB9j1gTg3RTBmQ7Jj19E2hAP
+	e62vlpZPINMdY9pgd9agYpG/wfLSjX43YXuvHq4w1
+X-Gm-Gg: ASbGncv8sRHlpp9qALkRBhSrE7DCOXlTQGIuYBn3L/UNW59foz6Y6zDiJYT6bM+lCYO
+	z+jDu251fQRm4LrCCp0YUYZ1XzLuSRcCfBLIyYINMgskMeLYtdQKv6XVNcFAdHa6A/IowWlLqOt
+	n91z0jVV/gchhFWombsueL5PJ7QcgaM/WOKQuwrHk8WBnb5bUQw0y0ACQxoDWCYYYtkj78saTA2
+	3LY0s9aat77W7zn+AIfef2wypHDJ20DMf8k+UcrHzrInrcvGviYlIQ=
+X-Google-Smtp-Source: AGHT+IEDWpSWU5ZzY/KJckLXK1MXb3iQFKIaTTR+UKAO1//noOtBrDSrcuDwJaJI6GftEm+TVmZKste1iti0T0BhbeY=
+X-Received: by 2002:a05:622a:156:b0:4b0:8576:e036 with SMTP id
+ d75a77b69052e-4b2916cdeffmr923341cf.0.1755631664504; Tue, 19 Aug 2025
+ 12:27:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <56f6b06e22b3b6dbfb45ef04a43bac13a8cb02e5.1755564606.git.daniel@makrotopia.org>
+References: <cover.1755499375.git.asml.silence@gmail.com> <d36305d654e82045aff0547cb94521211245ed2c.1755499376.git.asml.silence@gmail.com>
+ <CAHS8izO_ivHDO_i9oxKZh672i6GSWeDOjB=wzGGa00HjA7Zt7Q@mail.gmail.com> <ab60ab17-c398-492b-beb7-0635de4be8e6@gmail.com>
+In-Reply-To: <ab60ab17-c398-492b-beb7-0635de4be8e6@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 19 Aug 2025 12:27:27 -0700
+X-Gm-Features: Ac12FXzollJPprpvLpQ4-IC38LVTaqJboHUEkHUZ0bfbl4-1_1fZtat3-UCqxVo
+Message-ID: <CAHS8izPuZRsrBXaQoTNBPyisEo3w7J2aF0qyyOOnUAV=2-8o+w@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 04/23] net: use zero value to restore
+ rx_buf_len to default
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, andrew+netdev@lunn.ch, horms@kernel.org, 
+	davem@davemloft.net, sdf@fomichev.me, dw@davidwei.uk, 
+	michael.chan@broadcom.com, dtatulea@nvidia.com, ap420073@gmail.com, 
+	linux-kernel@vger.kernel.org, io-uring@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Daniel,
+On Tue, Aug 19, 2025 at 8:51=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.=
+com> wrote:
+>
+> On 8/19/25 01:07, Mina Almasry wrote:
+> > On Mon, Aug 18, 2025 at 6:56=E2=80=AFAM Pavel Begunkov <asml.silence@gm=
+ail.com> wrote:
+> >>
+> >> From: Jakub Kicinski <kuba@kernel.org>
+> >>
+> >> Distinguish between rx_buf_len being driver default vs user config.
+> >> Use 0 as a special value meaning "unset" or "restore driver default".
+> >> This will be necessary later on to configure it per-queue, but
+> >> the ability to restore defaults may be useful in itself.
+> >>
+> >> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> >> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> >
+> > I wonder if it should be extended to the other driver using
+> > rx_buf_len, hns3. For that, I think the default buf size would be
+> > HNS3_DEFAULT_RX_BUF_LEN.
+>
+> I'd rather avoid growing the series even more, let's follow up on
+> that in a separate patch on top, that should be just fine. And
+> thanks for the review
+>
+> > Other than that, seems fine to me,
+> >
+> > Reviewed-by: Mina Almasry <almasrymina@google.com>
+>
+> With the said above, do you want me to retain the review tag?
+>
 
-kernel test robot noticed the following build warnings:
+I initially thought adding my reviewed-by would be fine, but on closer
+look, doesn't this series break rx_buf_len setting for hns3? AFAICT so
+far, in patch 3 you're adding a check to ethnl_set_rings where it'll
+be an error if rx_buf_len > rx_buf_len_max, and i'm guessing if the
+driver never sets rx_buf_len_max it'll be 0 initialized and that check
+would always fail? Or did I miss something?
 
-[auto build test WARNING on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Golle/net-dsa-lantiq_gswip-deduplicate-dsa_switch_ops/20250819-094007
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/56f6b06e22b3b6dbfb45ef04a43bac13a8cb02e5.1755564606.git.daniel%40makrotopia.org
-patch subject: [PATCH net-next v2 7/8] net: dsa: lantiq_gswip: store switch API version in priv
-config: m68k-randconfig-r113-20250819 (https://download.01.org/0day-ci/archive/20250820/202508200254.WPms5O1T-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 8.5.0
-reproduce: (https://download.01.org/0day-ci/archive/20250820/202508200254.WPms5O1T-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202508200254.WPms5O1T-lkp@intel.com/
-
-sparse warnings: (new ones prefixed by >>)
->> drivers/net/dsa/lantiq_gswip.c:1940:25: sparse: sparse: cast to restricted __le16
->> drivers/net/dsa/lantiq_gswip.c:1940:25: sparse: sparse: cast to restricted __le16
->> drivers/net/dsa/lantiq_gswip.c:1940:25: sparse: sparse: cast to restricted __le16
->> drivers/net/dsa/lantiq_gswip.c:1940:25: sparse: sparse: cast to restricted __le16
-
-vim +1940 drivers/net/dsa/lantiq_gswip.c
-
-  1869	
-  1870	static int gswip_probe(struct platform_device *pdev)
-  1871	{
-  1872		struct device_node *np, *gphy_fw_np;
-  1873		struct device *dev = &pdev->dev;
-  1874		struct gswip_priv *priv;
-  1875		int err;
-  1876		int i;
-  1877		u32 version;
-  1878	
-  1879		priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
-  1880		if (!priv)
-  1881			return -ENOMEM;
-  1882	
-  1883		priv->gswip = devm_platform_ioremap_resource(pdev, 0);
-  1884		if (IS_ERR(priv->gswip))
-  1885			return PTR_ERR(priv->gswip);
-  1886	
-  1887		priv->mdio = devm_platform_ioremap_resource(pdev, 1);
-  1888		if (IS_ERR(priv->mdio))
-  1889			return PTR_ERR(priv->mdio);
-  1890	
-  1891		priv->mii = devm_platform_ioremap_resource(pdev, 2);
-  1892		if (IS_ERR(priv->mii))
-  1893			return PTR_ERR(priv->mii);
-  1894	
-  1895		priv->hw_info = of_device_get_match_data(dev);
-  1896		if (!priv->hw_info)
-  1897			return -EINVAL;
-  1898	
-  1899		priv->ds = devm_kzalloc(dev, sizeof(*priv->ds), GFP_KERNEL);
-  1900		if (!priv->ds)
-  1901			return -ENOMEM;
-  1902	
-  1903		priv->ds->dev = dev;
-  1904		priv->ds->num_ports = priv->hw_info->max_ports;
-  1905		priv->ds->priv = priv;
-  1906		priv->ds->ops = &gswip_switch_ops;
-  1907		priv->ds->phylink_mac_ops = &gswip_phylink_mac_ops;
-  1908		priv->dev = dev;
-  1909		mutex_init(&priv->pce_table_lock);
-  1910		version = gswip_switch_r(priv, GSWIP_VERSION);
-  1911	
-  1912		np = dev->of_node;
-  1913		switch (version) {
-  1914		case GSWIP_VERSION_2_0:
-  1915		case GSWIP_VERSION_2_1:
-  1916			if (!of_device_is_compatible(np, "lantiq,xrx200-gswip"))
-  1917				return -EINVAL;
-  1918			break;
-  1919		case GSWIP_VERSION_2_2:
-  1920		case GSWIP_VERSION_2_2_ETC:
-  1921			if (!of_device_is_compatible(np, "lantiq,xrx300-gswip") &&
-  1922			    !of_device_is_compatible(np, "lantiq,xrx330-gswip"))
-  1923				return -EINVAL;
-  1924			break;
-  1925		default:
-  1926			return dev_err_probe(dev, -ENOENT,
-  1927					     "unknown GSWIP version: 0x%x\n", version);
-  1928		}
-  1929	
-  1930		/* bring up the mdio bus */
-  1931		gphy_fw_np = of_get_compatible_child(dev->of_node, "lantiq,gphy-fw");
-  1932		if (gphy_fw_np) {
-  1933			err = gswip_gphy_fw_list(priv, gphy_fw_np, version);
-  1934			of_node_put(gphy_fw_np);
-  1935			if (err)
-  1936				return dev_err_probe(dev, err,
-  1937						     "gphy fw probe failed\n");
-  1938		}
-  1939	
-> 1940		priv->version = le16_to_cpu(version);
-  1941	
-  1942		/* bring up the mdio bus */
-  1943		err = gswip_mdio(priv);
-  1944		if (err) {
-  1945			dev_err_probe(dev, err, "mdio probe failed\n");
-  1946			goto gphy_fw_remove;
-  1947		}
-  1948	
-  1949		err = dsa_register_switch(priv->ds);
-  1950		if (err) {
-  1951			dev_err_probe(dev, err, "dsa switch registration failed\n");
-  1952			goto gphy_fw_remove;
-  1953		}
-  1954	
-  1955		err = gswip_validate_cpu_port(priv->ds);
-  1956		if (err)
-  1957			goto disable_switch;
-  1958	
-  1959		platform_set_drvdata(pdev, priv);
-  1960	
-  1961		dev_info(dev, "probed GSWIP version %lx mod %lx\n",
-  1962			 (version & GSWIP_VERSION_REV_MASK) >> GSWIP_VERSION_REV_SHIFT,
-  1963			 (version & GSWIP_VERSION_MOD_MASK) >> GSWIP_VERSION_MOD_SHIFT);
-  1964		return 0;
-  1965	
-  1966	disable_switch:
-  1967		gswip_mdio_mask(priv, GSWIP_MDIO_GLOB_ENABLE, 0, GSWIP_MDIO_GLOB);
-  1968		dsa_unregister_switch(priv->ds);
-  1969	gphy_fw_remove:
-  1970		for (i = 0; i < priv->num_gphy_fw; i++)
-  1971			gswip_gphy_fw_remove(priv, &priv->gphy_fw[i]);
-  1972		return err;
-  1973	}
-  1974	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+--=20
+Thanks,
+Mina
 
