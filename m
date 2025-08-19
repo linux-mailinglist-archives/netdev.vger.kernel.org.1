@@ -1,156 +1,500 @@
-Return-Path: <netdev+bounces-215062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1248DB2CF4D
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 00:22:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DE69B2CF6C
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 00:36:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9927521B89
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 22:21:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 338513B3E82
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 22:36:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C72A5322A2D;
-	Tue, 19 Aug 2025 22:20:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 504C0221FDC;
+	Tue, 19 Aug 2025 22:36:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jcW8Myuf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lm/XcDib"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0FB31DD9C
-	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 22:20:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BF9235336A
+	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 22:36:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755642010; cv=none; b=XQpbMWIOKJaeHOc7jPF7bH6hIUYtX+2rcO2PkKmREJ6ZaLxVZyRuhWS6r2QHaemb1ec8JuVICRkaiItiBxZ0II5OpvAuYqbEV2YEXsGryN8AzZxGqk7a2/yh6msIhWfiySA+rUM8+cE91FPLsaByIyN1Q6Lz8sEsIgNShkNo+5s=
+	t=1755642982; cv=none; b=lTnbiywma+oaSXj6agKSjmlTEymFpTbBhmW9Gr8KK5zeUHCT9gOji0N6V9YcBzO/iB25FdrQa8vXs3F6TMXpFGxdBVBGX6/g/vyQyiUAqXhVwt9cr4mX5Y15E0kNmNM53Co2RkUv14xTwKT6ug2xhoi4OHEV/BTWJ059ieSEcAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755642010; c=relaxed/simple;
-	bh=XrCiYaEJPP6fVnU4aWJs+xfl+SJ7HjJ/AQb4oHnU9Zs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IVKO53t0tLFcivvdWXTnn/TMVsMRNOWRWKEPhRW++vbjmZQCY0tpgmW2X+Am2Y9E9ovv7shr2F+2gG3byHTzStjkmZ1YZbXtmo5bOOuXybRqjZVzTQknDSsFcQW1yo0ssGnc57vmGxsPD1tKKKHrofL8/rpEOiO5ngzGZap3UHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jcW8Myuf; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755642008; x=1787178008;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=XrCiYaEJPP6fVnU4aWJs+xfl+SJ7HjJ/AQb4oHnU9Zs=;
-  b=jcW8MyufYDJySb2TbKA+GkJNitQ/iig/XK8OoKzm7U3GJc/hDlUiQfS1
-   WSBNvzPdYEM7EdPJyFu2d3bfaZtN0znUQRJ1vdweWzUVSeklC6FcKAwrN
-   GmjEp+vUezzt2iM1qfb5xdBBY1VydmYDShMrKHxVQvTQE2P+iexhCLxCL
-   fGljV53UzQZ9uQyicROZTa8ySbtpcUEmvZI/lxh5WDcrMuawYvjtWiVU7
-   L0vMUu6d1G6X72jIxGPoJW+Q1xMrJPY3B7FZqJx9QMVNpbVBsH9ahDzTc
-   eQdU9KZe6gdqDsspoe4OMhgJiFODkDnTiIe8iLQyebhFOfSekP+guNL/a
-   Q==;
-X-CSE-ConnectionGUID: kvxvXyARSrasJYNDxGsTHg==
-X-CSE-MsgGUID: cWKfnIOrQBG2OyS3PTFLOQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11527"; a="57829585"
-X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
-   d="scan'208";a="57829585"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2025 15:20:07 -0700
-X-CSE-ConnectionGUID: rG55T+yIQQ+CYieyugONMA==
-X-CSE-MsgGUID: XkLmX9KlSfuQorpZL74o7w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
-   d="scan'208";a="173202853"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa004.fm.intel.com with ESMTP; 19 Aug 2025 15:20:06 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: ValdikSS <iam@valdikss.org.ru>,
-	anthony.l.nguyen@intel.com,
-	vitaly.lifshits@intel.com,
-	dima.ruinskiy@intel.com,
-	Paul Menzel <pmenzel@molgen.mpg.de>
-Subject: [PATCH net v2 5/5] igc: fix disabling L1.2 PCI-E link substate on I226 on init
-Date: Tue, 19 Aug 2025 15:19:59 -0700
-Message-ID: <20250819222000.3504873-6-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250819222000.3504873-1-anthony.l.nguyen@intel.com>
-References: <20250819222000.3504873-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1755642982; c=relaxed/simple;
+	bh=dRzOSEjJNnWSsSayXPVOy15UVRxM0CmzVUqVNpoZXPo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UYtwSvxU0ZZJZGEi/z52NAhhf/HiwciXQNx1mOj2Pak0r2oRvyXPjiAd9Oo4bg6kUTv2+7bzip+ni8ycw4cJred+cu+zl1gitG6QFO/4YUHKNQ3/k/rBtIysHy0mHodICGanqd3YWoe+YhBc6eyt/s6jsKB++WS9abb/G9n6k3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Lm/XcDib; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-55df3796649so3158e87.0
+        for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 15:36:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755642977; x=1756247777; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8gy2AN2/SkyT3RSY5JewoNosnXqqdYkXuYDooCYhRao=;
+        b=Lm/XcDibtKL6C793b1bToiF42deS+87jmEOUi73MQamsxAFOiEdququT4no3cSR/LU
+         bxKUNyDQqUitZRdm3ZNqL04uxhjrIxrDtD7vzlBbHvUHBznH61ZSKTA/pK8dVWht474a
+         5Pjkyft+INaN9N0EEZp35f5B/jRi35x/pkbBAPOix91GIkHkr0EybU4kmY6QkFKrrBGD
+         Z9QZQ0Xl8t4HuVVqj6PAitT7zDsR9qtmqxBE/bu6wg46hbvmb4RgPeF0CVft5PoD1xQm
+         gHg+IITI2zOj2NMz91pyoNrvKIvBQnszXREGeDYt5vh97/Jvqj68d91uow9Dj9KQPLAs
+         S1tA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755642977; x=1756247777;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8gy2AN2/SkyT3RSY5JewoNosnXqqdYkXuYDooCYhRao=;
+        b=QKpvD9837VIrK9ZziJ4lCiXTMgGc7CAqxC/iNb0QUlUFJJkddchbe4p1LAPaWTYDPs
+         wN4AUQFKxbLyzolQCUlLb8sjLYEz2XzORYCevDzac8Oc7ynme9WUtkA1jdWKcYQ54P0G
+         nhyfYtZLxjnxLAV8blmw7fz+7rCiET7korUEwm2vr8FpW2NOSH1O6ZAvnBKeqaehCAoJ
+         WjqrE2i60FXoVyLD77h46ZpjvLD8IUosloZg4v86v+YcqBdKcTCEiMzsKH75OpImml1p
+         bZnIcVARa0Zg78+aR6r+BjINGSuPoSYhMOXbrQGfoyUzXllA5fWEzPqR+gMfQoi7KKhf
+         Mmlg==
+X-Forwarded-Encrypted: i=1; AJvYcCUeptXtzv2dTRXE/5ZWKOU56N9OgJpRHeHU+clOwsrMByiRpZIcxaKsawJ3Db5PpkysMo+2+p0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6WWsaYwDscvioxbbHXPd64RXXJeguiihrDlpwFXMulvTc/6KJ
+	utcbSEj+jxwFKVxIQA9+JO2S3rBGzQJia9o/Yt4CCu8/kErJMWJbdLjHRUFB6ew7uunHb/gFqwQ
+	lxcCoSdHszP4OIroAzeDi1Apce3wdaYgspW55da89
+X-Gm-Gg: ASbGncs9Y3B8erZ8c87BZzcyuoUt5YQpsI8D57whuwoHaXPF1nT7KKQTa9lwWLhdyKW
+	g44lnG3Dv2j3WYnwC7wBONG8QdxO9Z6tuCoKVzcIl9rcWxydIe1Eb3YEw/hAOwa3nnpftMPGoPE
+	EzHW+plk9In8kzkDxZYibCH5jWwcXphMeptwDN9mKSYSCqeQux5TdDGfnJalhrLFRbbFz/Dbj2E
+	uef9NzX/3rbLMhJR0dGiQpQKiqSGrAjILdIDrC8+YpXKOlNk4XFvxA=
+X-Google-Smtp-Source: AGHT+IFcfgUO5wNolp6fFZvfOutvnpWwDp4dgvVZwk+86PQtZHdROgAzzyI23tJg8r+BWXatK9+8tHaza3rQxzNK+58=
+X-Received: by 2002:ac2:5e36:0:b0:55b:7c73:c5f0 with SMTP id
+ 2adb3069b0e04-55e06752de0mr81825e87.2.1755642976845; Tue, 19 Aug 2025
+ 15:36:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1755499375.git.asml.silence@gmail.com> <5273e2bf83c1f22a6448363b5a51ec85854f03d6.1755499376.git.asml.silence@gmail.com>
+In-Reply-To: <5273e2bf83c1f22a6448363b5a51ec85854f03d6.1755499376.git.asml.silence@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 19 Aug 2025 15:36:04 -0700
+X-Gm-Features: Ac12FXwatsWO-HP9hZX1u9ho5Xx8_97189DUAz2yzlhIMmP7QDO9LFBhuYeUVNs
+Message-ID: <CAHS8izNjZEZLqpXFNjFKQy8ngB8qOdSYVe_pG_vggS8iPGJvVg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 18/23] netdev: add support for setting
+ rx-buf-len per queue
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, andrew+netdev@lunn.ch, horms@kernel.org, 
+	davem@davemloft.net, sdf@fomichev.me, dw@davidwei.uk, 
+	michael.chan@broadcom.com, dtatulea@nvidia.com, ap420073@gmail.com, 
+	linux-kernel@vger.kernel.org, io-uring@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: ValdikSS <iam@valdikss.org.ru>
+On Mon, Aug 18, 2025 at 6:57=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.=
+com> wrote:
+>
+> From: Jakub Kicinski <kuba@kernel.org>
+>
+> Zero-copy APIs increase the cost of buffer management. They also extend
+> this cost to user space applications which may be used to dealing with
+> much larger buffers. Allow setting rx-buf-len per queue, devices with
+> HW-GRO support can commonly fill buffers up to 32k (or rather 64k - 1
+> but that's not a power of 2..)
+>
+> The implementation adds a new option to the netdev netlink, rather
+> than ethtool. The NIC-wide setting lives in ethtool ringparams so
+> one could argue that we should be extending the ethtool API.
+> OTOH netdev API is where we already have queue-get, and it's how
+> zero-copy applications bind memory providers.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> ---
+>  Documentation/netlink/specs/netdev.yaml | 15 ++++
+>  include/net/netdev_queues.h             |  5 ++
+>  include/net/netlink.h                   | 19 +++++
+>  include/uapi/linux/netdev.h             |  2 +
+>  net/core/netdev-genl-gen.c              | 15 ++++
+>  net/core/netdev-genl-gen.h              |  1 +
+>  net/core/netdev-genl.c                  | 92 +++++++++++++++++++++++++
+>  net/core/netdev_config.c                | 16 +++++
+>  tools/include/uapi/linux/netdev.h       |  2 +
+>  9 files changed, 167 insertions(+)
+>
+> diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netl=
+ink/specs/netdev.yaml
+> index c035dc0f64fd..498c4bcafdbd 100644
+> --- a/Documentation/netlink/specs/netdev.yaml
+> +++ b/Documentation/netlink/specs/netdev.yaml
+> @@ -338,6 +338,10 @@ attribute-sets:
+>          doc: XSK information for this queue, if any.
+>          type: nest
+>          nested-attributes: xsk-info
+> +      -
+> +        name: rx-buf-len
+> +        doc: Per-queue configuration of ETHTOOL_A_RINGS_RX_BUF_LEN.
+> +        type: u32
+>    -
+>      name: qstats
+>      doc: |
+> @@ -771,6 +775,17 @@ operations:
+>          reply:
+>            attributes:
+>              - id
+> +    -
+> +      name: queue-set
+> +      doc: Set per-queue configurable options.
+> +      attribute-set: queue
+> +      do:
+> +        request:
+> +          attributes:
+> +            - ifindex
+> +            - type
+> +            - id
+> +            - rx-buf-len
+>
+>  kernel-family:
+>    headers: ["net/netdev_netlink.h"]
+> diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
+> index d0cc475ec51e..b69b1d519dcb 100644
+> --- a/include/net/netdev_queues.h
+> +++ b/include/net/netdev_queues.h
+> @@ -39,6 +39,7 @@ struct netdev_config {
+>
+>  /* Same semantics as fields in struct netdev_config */
+>  struct netdev_queue_config {
+> +       u32     rx_buf_len;
+>  };
+>
+>  /* See the netdev.yaml spec for definition of each statistic */
+> @@ -141,6 +142,8 @@ void netdev_stat_queue_sum(struct net_device *netdev,
+>  /**
+>   * struct netdev_queue_mgmt_ops - netdev ops for queue management
+>   *
+> + * @supported_ring_params: ring params supported per queue (ETHTOOL_RING=
+_USE_*).
+> + *
 
-Device ID comparison in igc_is_device_id_i226 is performed before
-the ID is set, resulting in always failing check on init.
+Not necessarily a problem, but note that if you depend on
+ETHTOOL_RING_USE_*, then queue configs need to also be ethtool
+configs, which means they need to also be NIC wide configs. Maybe
+that's a plus in your eyes. I wonder if ever we're going to be in a
+situation where some config makes sense per queue, but not per NIC.
+mem providers are already that sorta.
 
-Before the patch:
-* L1.2 is not disabled on init
-* L1.2 is properly disabled after suspend-resume cycle
+>   * @ndo_queue_mem_size: Size of the struct that describes a queue's memo=
+ry.
+>   *
+>   * @ndo_queue_cfg_defaults: (Optional) Populate queue config struct with
+> @@ -171,6 +174,8 @@ void netdev_stat_queue_sum(struct net_device *netdev,
+>   * be called for an interface which is open.
+>   */
+>  struct netdev_queue_mgmt_ops {
+> +       u32     supported_ring_params;
+> +
+>         size_t  ndo_queue_mem_size;
+>         void    (*ndo_queue_cfg_defaults)(struct net_device *dev,
+>                                           int idx,
+> diff --git a/include/net/netlink.h b/include/net/netlink.h
+> index 1a8356ca4b78..29989ad81ddd 100644
+> --- a/include/net/netlink.h
+> +++ b/include/net/netlink.h
+> @@ -2200,6 +2200,25 @@ static inline struct nla_bitfield32 nla_get_bitfie=
+ld32(const struct nlattr *nla)
+>         return tmp;
+>  }
+>
+> +/**
+> + * nla_update_u32() - update u32 value from NLA_U32 attribute
+> + * @dst:  value to update
+> + * @attr: netlink attribute with new value or null
+> + *
+> + * Copy the u32 value from NLA_U32 netlink attribute @attr into variable
+> + * pointed to by @dst; do nothing if @attr is null.
+> + *
+> + * Return: true if this function changed the value of @dst, otherwise fa=
+lse.
+> + */
+> +static inline bool nla_update_u32(u32 *dst, const struct nlattr *attr)
+> +{
+> +       u32 old_val =3D *dst;
+> +
+> +       if (attr)
+> +               *dst =3D nla_get_u32(attr);
+> +       return *dst !=3D old_val;
+> +}
+> +
+>  /**
+>   * nla_memdup - duplicate attribute memory (kmemdup)
+>   * @src: netlink attribute to duplicate from
+> diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
+> index 48eb49aa03d4..820f89b67a72 100644
+> --- a/include/uapi/linux/netdev.h
+> +++ b/include/uapi/linux/netdev.h
+> @@ -158,6 +158,7 @@ enum {
+>         NETDEV_A_QUEUE_DMABUF,
+>         NETDEV_A_QUEUE_IO_URING,
+>         NETDEV_A_QUEUE_XSK,
+> +       NETDEV_A_QUEUE_RX_BUF_LEN,
+>
+>         __NETDEV_A_QUEUE_MAX,
+>         NETDEV_A_QUEUE_MAX =3D (__NETDEV_A_QUEUE_MAX - 1)
+> @@ -226,6 +227,7 @@ enum {
+>         NETDEV_CMD_BIND_RX,
+>         NETDEV_CMD_NAPI_SET,
+>         NETDEV_CMD_BIND_TX,
+> +       NETDEV_CMD_QUEUE_SET,
+>
+>         __NETDEV_CMD_MAX,
+>         NETDEV_CMD_MAX =3D (__NETDEV_CMD_MAX - 1)
+> diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
+> index e9a2a6f26cb7..d053306a3af8 100644
+> --- a/net/core/netdev-genl-gen.c
+> +++ b/net/core/netdev-genl-gen.c
+> @@ -106,6 +106,14 @@ static const struct nla_policy netdev_bind_tx_nl_pol=
+icy[NETDEV_A_DMABUF_FD + 1]
+>         [NETDEV_A_DMABUF_FD] =3D { .type =3D NLA_U32, },
+>  };
+>
+> +/* NETDEV_CMD_QUEUE_SET - do */
+> +static const struct nla_policy netdev_queue_set_nl_policy[NETDEV_A_QUEUE=
+_RX_BUF_LEN + 1] =3D {
+> +       [NETDEV_A_QUEUE_IFINDEX] =3D NLA_POLICY_MIN(NLA_U32, 1),
+> +       [NETDEV_A_QUEUE_TYPE] =3D NLA_POLICY_MAX(NLA_U32, 1),
+> +       [NETDEV_A_QUEUE_ID] =3D { .type =3D NLA_U32, },
+> +       [NETDEV_A_QUEUE_RX_BUF_LEN] =3D { .type =3D NLA_U32, },
+> +};
+> +
+>  /* Ops table for netdev */
+>  static const struct genl_split_ops netdev_nl_ops[] =3D {
+>         {
+> @@ -204,6 +212,13 @@ static const struct genl_split_ops netdev_nl_ops[] =
+=3D {
+>                 .maxattr        =3D NETDEV_A_DMABUF_FD,
+>                 .flags          =3D GENL_CMD_CAP_DO,
+>         },
+> +       {
+> +               .cmd            =3D NETDEV_CMD_QUEUE_SET,
+> +               .doit           =3D netdev_nl_queue_set_doit,
+> +               .policy         =3D netdev_queue_set_nl_policy,
+> +               .maxattr        =3D NETDEV_A_QUEUE_RX_BUF_LEN,
+> +               .flags          =3D GENL_CMD_CAP_DO,
+> +       },
+>  };
+>
+>  static const struct genl_multicast_group netdev_nl_mcgrps[] =3D {
+> diff --git a/net/core/netdev-genl-gen.h b/net/core/netdev-genl-gen.h
+> index cf3fad74511f..b7f5e5d9fca9 100644
+> --- a/net/core/netdev-genl-gen.h
+> +++ b/net/core/netdev-genl-gen.h
+> @@ -35,6 +35,7 @@ int netdev_nl_qstats_get_dumpit(struct sk_buff *skb,
+>  int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info);
+>  int netdev_nl_napi_set_doit(struct sk_buff *skb, struct genl_info *info)=
+;
+>  int netdev_nl_bind_tx_doit(struct sk_buff *skb, struct genl_info *info);
+> +int netdev_nl_queue_set_doit(struct sk_buff *skb, struct genl_info *info=
+);
+>
+>  enum {
+>         NETDEV_NLGRP_MGMT,
+> diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+> index 6314eb7bdf69..abb128e45fcf 100644
+> --- a/net/core/netdev-genl.c
+> +++ b/net/core/netdev-genl.c
+> @@ -386,6 +386,30 @@ static int nla_put_napi_id(struct sk_buff *skb, cons=
+t struct napi_struct *napi)
+>         return 0;
+>  }
+>
+> +static int
+> +netdev_nl_queue_fill_cfg(struct sk_buff *rsp, struct net_device *netdev,
+> +                        u32 q_idx, u32 q_type)
+> +{
+> +       struct netdev_queue_config *qcfg;
+> +
+> +       if (!netdev_need_ops_lock(netdev))
+> +               return 0;
+> +
 
-With the patch:
-* L1.2 is properly disabled both on init and after suspend-resume
+Why are we checking this? I don't see this function doing any locking.
 
-How to test:
-Connect to the 1G link with 300+ mbit/s Internet speed, and run
-the download speed test, such as:
+> +       qcfg =3D &netdev->cfg->qcfg[q_idx];
+> +       switch (q_type) {
+> +       case NETDEV_QUEUE_TYPE_RX:
+> +               if (qcfg->rx_buf_len &&
+> +                   nla_put_u32(rsp, NETDEV_A_QUEUE_RX_BUF_LEN,
+> +                               qcfg->rx_buf_len))
+> +                       return -EMSGSIZE;
+> +               break;
+> +       default:
+> +               break;
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+>  static int
+>  netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
+>                          u32 q_idx, u32 q_type, const struct genl_info *i=
+nfo)
+> @@ -433,6 +457,9 @@ netdev_nl_queue_fill_one(struct sk_buff *rsp, struct =
+net_device *netdev,
+>                 break;
+>         }
+>
+> +       if (netdev_nl_queue_fill_cfg(rsp, netdev, q_idx, q_type))
+> +               goto nla_put_failure;
+> +
+>         genlmsg_end(rsp, hdr);
+>
+>         return 0;
+> @@ -572,6 +599,71 @@ int netdev_nl_queue_get_dumpit(struct sk_buff *skb, =
+struct netlink_callback *cb)
+>         return err;
+>  }
+>
+> +int netdev_nl_queue_set_doit(struct sk_buff *skb, struct genl_info *info=
+)
+> +{
+> +       struct nlattr * const *tb =3D info->attrs;
+> +       struct netdev_queue_config *qcfg;
+> +       u32 q_id, q_type, ifindex;
+> +       struct net_device *netdev;
+> +       bool mod;
+> +       int ret;
+> +
+> +       if (GENL_REQ_ATTR_CHECK(info, NETDEV_A_QUEUE_ID) ||
+> +           GENL_REQ_ATTR_CHECK(info, NETDEV_A_QUEUE_TYPE) ||
+> +           GENL_REQ_ATTR_CHECK(info, NETDEV_A_QUEUE_IFINDEX))
+> +               return -EINVAL;
+> +
+> +       q_id =3D nla_get_u32(tb[NETDEV_A_QUEUE_ID]);
+> +       q_type =3D nla_get_u32(tb[NETDEV_A_QUEUE_TYPE]);
+> +       ifindex =3D nla_get_u32(tb[NETDEV_A_QUEUE_IFINDEX]);
+> +
+> +       if (q_type !=3D NETDEV_QUEUE_TYPE_RX) {
+> +               /* Only Rx params exist right now */
+> +               NL_SET_BAD_ATTR(info->extack, tb[NETDEV_A_QUEUE_TYPE]);
+> +               return -EINVAL;
+> +       }
+> +
+> +       ret =3D 0;
+> +       netdev =3D netdev_get_by_index_lock(genl_info_net(info), ifindex)=
+;
+> +       if (!netdev || !netif_device_present(netdev))
+> +               ret =3D -ENODEV;
+> +       else if (!netdev->queue_mgmt_ops)
+> +               ret =3D -EOPNOTSUPP;
+> +       if (ret) {
+> +               NL_SET_BAD_ATTR(info->extack, tb[NETDEV_A_QUEUE_IFINDEX])=
+;
+> +               goto exit_unlock;
+> +       }
+> +
+> +       ret =3D netdev_nl_queue_validate(netdev, q_id, q_type);
+> +       if (ret) {
+> +               NL_SET_BAD_ATTR(info->extack, tb[NETDEV_A_QUEUE_ID]);
+> +               goto exit_unlock;
+> +       }
+> +
+> +       ret =3D netdev_reconfig_start(netdev);
+> +       if (ret)
+> +               goto exit_unlock;
+> +
+> +       qcfg =3D &netdev->cfg_pending->qcfg[q_id];
+> +       mod =3D nla_update_u32(&qcfg->rx_buf_len, tb[NETDEV_A_QUEUE_RX_BU=
+F_LEN]);
 
-    curl -o /dev/null http://speedtest.selectel.ru/1GB
+Don't you need to check the queue_mgmt_ops->supported_thingy first to
+know that this driver actually supports modifying rx_buf_len?
 
-Without L1.2 disabled, the speed would be no more than ~200 mbit/s.
-With L1.2 disabled, the speed would reach 1 gbit/s.
-Note: it's required that the latency between your host and the remote
-be around 3-5 ms, the test inside LAN (<1 ms latency) won't trigger the
-issue.
+> +       if (!mod)
+> +               goto exit_free_cfg;
+> +
+> +       ret =3D netdev_rx_queue_restart(netdev, q_id, info->extack);
+> +       if (ret)
+> +               goto exit_free_cfg;
+> +
+> +       swap(netdev->cfg, netdev->cfg_pending);
+> +
+> +exit_free_cfg:
+> +       __netdev_free_config(netdev->cfg_pending);
+> +       netdev->cfg_pending =3D netdev->cfg;
+> +exit_unlock:
+> +       if (netdev)
+> +               netdev_unlock(netdev);
+> +       return ret;
+> +}
+> +
+>  #define NETDEV_STAT_NOT_SET            (~0ULL)
+>
+>  static void netdev_nl_stats_add(void *_sum, const void *_add, size_t siz=
+e)
+> diff --git a/net/core/netdev_config.c b/net/core/netdev_config.c
+> index fc700b77e4eb..ede02b77470e 100644
+> --- a/net/core/netdev_config.c
+> +++ b/net/core/netdev_config.c
+> @@ -67,11 +67,27 @@ int netdev_reconfig_start(struct net_device *dev)
+>  void __netdev_queue_config(struct net_device *dev, int rxq,
+>                            struct netdev_queue_config *qcfg, bool pending=
+)
+>  {
+> +       const struct netdev_config *cfg;
+> +
+> +       cfg =3D pending ? dev->cfg_pending : dev->cfg;
+> +
+>         memset(qcfg, 0, sizeof(*qcfg));
+>
+>         /* Get defaults from the driver, in case user config not set */
+>         if (dev->queue_mgmt_ops->ndo_queue_cfg_defaults)
+>                 dev->queue_mgmt_ops->ndo_queue_cfg_defaults(dev, rxq, qcf=
+g);
+> +
+> +       /* Set config based on device-level settings */
+> +       if (cfg->rx_buf_len)
+> +               qcfg->rx_buf_len =3D cfg->rx_buf_len;
+> +
+> +       /* Set config dedicated to this queue */
+> +       if (rxq >=3D 0) {
+> +               const struct netdev_queue_config *user_cfg =3D &cfg->qcfg=
+[rxq];
+> +
+> +               if (user_cfg->rx_buf_len)
+> +                       qcfg->rx_buf_len =3D user_cfg->rx_buf_len;
+> +       }
+>  }
+>
+>  /**
+> diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux=
+/netdev.h
+> index 48eb49aa03d4..820f89b67a72 100644
+> --- a/tools/include/uapi/linux/netdev.h
+> +++ b/tools/include/uapi/linux/netdev.h
+> @@ -158,6 +158,7 @@ enum {
+>         NETDEV_A_QUEUE_DMABUF,
+>         NETDEV_A_QUEUE_IO_URING,
+>         NETDEV_A_QUEUE_XSK,
+> +       NETDEV_A_QUEUE_RX_BUF_LEN,
+>
+>         __NETDEV_A_QUEUE_MAX,
+>         NETDEV_A_QUEUE_MAX =3D (__NETDEV_A_QUEUE_MAX - 1)
+> @@ -226,6 +227,7 @@ enum {
+>         NETDEV_CMD_BIND_RX,
+>         NETDEV_CMD_NAPI_SET,
+>         NETDEV_CMD_BIND_TX,
+> +       NETDEV_CMD_QUEUE_SET,
+>
+>         __NETDEV_CMD_MAX,
+>         NETDEV_CMD_MAX =3D (__NETDEV_CMD_MAX - 1)
+> --
+> 2.49.0
+>
 
-Link: https://lore.kernel.org/intel-wired-lan/15248b4f-3271-42dd-8e35-02bfc92b25e1@intel.com
-Fixes: 0325143b59c6 ("igc: disable L1.2 PCI-E link substate to avoid performance issue")
-Signed-off-by: ValdikSS <iam@valdikss.org.ru>
-Reviewed-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/igc/igc_main.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 458e5eaa92e5..e79b14d50b24 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -7149,6 +7149,13 @@ static int igc_probe(struct pci_dev *pdev,
- 	adapter->port_num = hw->bus.func;
- 	adapter->msg_enable = netif_msg_init(debug, DEFAULT_MSG_ENABLE);
- 
-+	/* PCI config space info */
-+	hw->vendor_id = pdev->vendor;
-+	hw->device_id = pdev->device;
-+	hw->revision_id = pdev->revision;
-+	hw->subsystem_vendor_id = pdev->subsystem_vendor;
-+	hw->subsystem_device_id = pdev->subsystem_device;
-+
- 	/* Disable ASPM L1.2 on I226 devices to avoid packet loss */
- 	if (igc_is_device_id_i226(hw))
- 		pci_disable_link_state(pdev, PCIE_LINK_STATE_L1_2);
-@@ -7175,13 +7182,6 @@ static int igc_probe(struct pci_dev *pdev,
- 	netdev->mem_start = pci_resource_start(pdev, 0);
- 	netdev->mem_end = pci_resource_end(pdev, 0);
- 
--	/* PCI config space info */
--	hw->vendor_id = pdev->vendor;
--	hw->device_id = pdev->device;
--	hw->revision_id = pdev->revision;
--	hw->subsystem_vendor_id = pdev->subsystem_vendor;
--	hw->subsystem_device_id = pdev->subsystem_device;
--
- 	/* Copy the default MAC and PHY function pointers */
- 	memcpy(&hw->mac.ops, ei->mac_ops, sizeof(hw->mac.ops));
- 	memcpy(&hw->phy.ops, ei->phy_ops, sizeof(hw->phy.ops));
--- 
-2.47.1
-
+--=20
+Thanks,
+Mina
 
