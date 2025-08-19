@@ -1,144 +1,133 @@
-Return-Path: <netdev+bounces-214999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B866FB2C8B6
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 17:49:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49129B2C8BF
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 17:51:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C17635286B3
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 15:49:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1389E189EB30
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 15:51:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22DCF2820CE;
-	Tue, 19 Aug 2025 15:48:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3EA1286D50;
+	Tue, 19 Aug 2025 15:51:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KPCQK9EN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FFxeBDue"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6CF5207A18
-	for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 15:48:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 377DD26E707;
+	Tue, 19 Aug 2025 15:51:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755618539; cv=none; b=DR+TW7L7ysKG+aiDayUCDAtHYFkja2gcpby7i6Kdxtn9Z1iuWQG96G5zA0dPdhUYm9wDLLREO2Nv6iccVko8u7H+gHRw8soHp9+FRuDxnmML0iVkcowP7nHJV8FLxbreAMuCnpLo5wBME7SQye71ks5hFc8P+MsTDi9it8rowDc=
+	t=1755618668; cv=none; b=Fh9MsmIq6gGCECBGcQ/3eaQdjwU9FwNBZD/9XbZ+MixB5vmwdLVKZQTFW+4BHyE0hJzeY/pG6sdff3YrE/nBWk5vLnHIID8kftC9EONrWovH5BH4mlm6afUBldAHn0URFWFzYzIU82vSY/8kZ/kLa9TFDoNkhDO18v7IwtXcmQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755618539; c=relaxed/simple;
-	bh=j6wM/SgJMkvJoI+6V8/dUD1+fFpnKMaohYKn6PzgK6w=;
+	s=arc-20240116; t=1755618668; c=relaxed/simple;
+	bh=a6ZGqGqQriw5wtcTQnJQ+E8H9T2G8nhUgo1qAhPQw6U=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=erquXTU0TwZHBfPrsq3e5veOxCCygin6HNWbzDQDuHj6rEkA7AIxNCbem52sO/uKjkoJoSCKu5wHLcCu16OV96/e76cDvnJF2M6hrNZ5PMZzAmK/TTNYSdgoxFu9ftomxFhB7+In5sS4K2wb/FMXwww0Vs3V7B3Q5fLd8Rk6vOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KPCQK9EN; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <41651550-4e63-4699-b10f-ba2e8cfbc0a3@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1755618524;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fANgjc2IIsKedMP7E9vOPJjvlcpxmZDjKWRIxAOqvVk=;
-	b=KPCQK9ENPL9cG2flPirxiQNDaxft4AQQvBTzXcyr52IqlFf5aeoriOBG7IPgARAiSzbg/I
-	FmG2xUQ3IkiyPO8FgDM1WdrGvZ/T4lKn04ynKxRPcfiu+01kMKAoyYdIOwe3F9fm26YGw4
-	wcXO3l+JIK3BpMVK2RBc7Uc7NKQhGvg=
-Date: Tue, 19 Aug 2025 16:48:19 +0100
+	 In-Reply-To:Content-Type; b=LCpjpxuoBuNN+XazdxsMCrQvMR7RdUDWd83CIurHo7cee9VkMwXr2a4E1+ym3zQVZZe9NywPEdzHLGpMqSn9gvY8X3gDSF4JsPEcPK0gipTl4lWZUzRDUaFT0YdaHc3VZfkbGQom/Rjm10cWl9N5BI7c3b1oqb2sir5mPqEVa5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FFxeBDue; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3b9edf0e4efso3692994f8f.2;
+        Tue, 19 Aug 2025 08:51:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755618666; x=1756223466; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=As+W4X5MBTwXfXiBGJpiHyliRWQospCn+A6ubJW8Mxo=;
+        b=FFxeBDueSuMEs4mytFc9DXiSgvyTu0KGuJnsRgLhHZlI2IYpLRnoiMJx8IQ1yznnji
+         Wr1swvjj5A0vMylcoL53GQXFQ1HAHI3nWocr58L/IluYHWkSXfHxRoZ3OAbQ1tDO7otL
+         p2WZeS1o7alpNK/3ornZCQW01GEThLdUj4ZBNb7PrSBCaRsBiV0FenLcfjdeX+/dGU4I
+         Oq7dQKD1ficuPjde2Frc0QG7Cxlc5grwXy0YOT4Ay7elRELutR2A8sv923IfQSvXtybl
+         +5zl8+Zkxhn6ERJEc3Cv6HrfcJNB+Dw77GPowq5+XxNFpNwer6R90smYY5EzvVC3uWcg
+         2Cxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755618666; x=1756223466;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=As+W4X5MBTwXfXiBGJpiHyliRWQospCn+A6ubJW8Mxo=;
+        b=n0qUhHKPHNF79v0Ijzi4+eYTRbmE+lDaroeTCOlKHrRG88h6yOWwgctg0kM/dN3Iwi
+         UaB5Kj9mPoboZ2Kp2EsH1eAE78W98dOir47W90fFfqo8lF/0JNxU7/3Or1ZwW1U1u+9+
+         +NCPyxPOzbX1yMr09syirSShYkQb7ctga0SM4HW4jOquM7RcJAGs8k8vQfMBPgYWTNrE
+         ciRVJ/RsFo6MOsk/t084Hg29OVYI4CabMdS46WXbdQdCdaWBgBNdlBeuA+nqbDD9NdYI
+         sp2SkDZjXdp19FnyHLyJfCldcmQbtO838ArhW+axv8KsY66fjlWoSf5AgNiXOdXlkE2Z
+         l5tQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVoXdQEjV+yN+oByangEJx8gF9qrI0vnvr8nEJuM+KBFqQLrwjSlrF+R+01KQTZes8JQKHF+Iuf@vger.kernel.org, AJvYcCX577BlDHnN/gUbSaWC3mJunIBV5Ugm9sX8Kd8SvUZ912nyTOTkhAi+zNm6q971Et0LbAFSpTwcnA==@vger.kernel.org, AJvYcCXzy6/SMFAZIMe0Dk1Qkn0ti1g6OMxULUVFRdFvZvhGT0nwUYfDQY9i8tKAUGZaSyMOMpK00M3rte+fbkxf@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+hP+oangx+1svzCfdO3lzODz25Np7vq0GdbGUQHDYbhz681Y0
+	+Qee5XbRXVL2S9vZPRYID5geBAXxjgNCZ1JYfwbp9LwDg5iXd1lpsk09
+X-Gm-Gg: ASbGnctiToQVtJ2jKyzwkwGUSkINSynJx7maqFCT4wB+HkwArvTPKhocUm6VxePrOdI
+	yxuwgLpgGsu+tT0nmqPGrQU7uOVPOu0kwk4e+bYZzyMdj7QN6eqTVsgpZ5cGjFdnttgvls5sL28
+	Y3L3kudXTUeA4nzjCkujwRtKSa4KIeKoJycepqVxIlO1itvcVDnX69+zth/7GytKDrhhyZx2Hzy
+	qd9LMblzYTIfMVkMgUKEbHRegP0FD8sTBlaWm6Z2DpVXMdvCABuuZHp5AM2exRLhyN/SNc7zklO
+	PpN8OgeoV/TupwTjPfabp7lTjhuO71QU7vK3wZ6WU88ZwE7n/OBCGbryKQkcf/BmC5beygTZ5di
+	zajN6OveFn9u39PS8e5zPlpzZqubAbA==
+X-Google-Smtp-Source: AGHT+IFa2tWwTkP68HwXkeiF+gbI3rKcWiSfezlHfbTT5pMSW84KwuEvkwpHueKL3GIcKmlRBv5Gew==
+X-Received: by 2002:a5d:64ef:0:b0:3b7:9c28:f846 with SMTP id ffacd0b85a97d-3c0ed1f3372mr2637658f8f.44.1755618665366;
+        Tue, 19 Aug 2025 08:51:05 -0700 (PDT)
+Received: from [192.168.8.100] ([185.69.144.43])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3c077c5776fsm4132783f8f.61.2025.08.19.08.51.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Aug 2025 08:51:04 -0700 (PDT)
+Message-ID: <ab60ab17-c398-492b-beb7-0635de4be8e6@gmail.com>
+Date: Tue, 19 Aug 2025 16:52:16 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v4 net-next 04/15] ptp: netc: add NETC V4 Timer PTP driver
- support
-To: Wei Fang <wei.fang@nxp.com>, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, richardcochran@gmail.com, claudiu.manoil@nxp.com,
- vladimir.oltean@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, Frank.Li@nxp.com, shawnguo@kernel.org,
- s.hauer@pengutronix.de, festevam@gmail.com
-Cc: fushi.peng@nxp.com, devicetree@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, imx@lists.linux.dev, kernel@pengutronix.de
-References: <20250819123620.916637-1-wei.fang@nxp.com>
- <20250819123620.916637-5-wei.fang@nxp.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 04/23] net: use zero value to restore
+ rx_buf_len to default
+To: Mina Almasry <almasrymina@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+ Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, andrew+netdev@lunn.ch, horms@kernel.org,
+ davem@davemloft.net, sdf@fomichev.me, dw@davidwei.uk,
+ michael.chan@broadcom.com, dtatulea@nvidia.com, ap420073@gmail.com,
+ linux-kernel@vger.kernel.org, io-uring@vger.kernel.org
+References: <cover.1755499375.git.asml.silence@gmail.com>
+ <d36305d654e82045aff0547cb94521211245ed2c.1755499376.git.asml.silence@gmail.com>
+ <CAHS8izO_ivHDO_i9oxKZh672i6GSWeDOjB=wzGGa00HjA7Zt7Q@mail.gmail.com>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250819123620.916637-5-wei.fang@nxp.com>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CAHS8izO_ivHDO_i9oxKZh672i6GSWeDOjB=wzGGa00HjA7Zt7Q@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On 19/08/2025 13:36, Wei Fang wrote:
-> NETC V4 Timer provides current time with nanosecond resolution, precise
-> periodic pulse, pulse on timeout (alarm), and time capture on external
-> pulse support. And it supports time synchronization as required for
-> IEEE 1588 and IEEE 802.1AS-2020.
+On 8/19/25 01:07, Mina Almasry wrote:
+> On Mon, Aug 18, 2025 at 6:56 AM Pavel Begunkov <asml.silence@gmail.com> wrote:
+>>
+>> From: Jakub Kicinski <kuba@kernel.org>
+>>
+>> Distinguish between rx_buf_len being driver default vs user config.
+>> Use 0 as a special value meaning "unset" or "restore driver default".
+>> This will be necessary later on to configure it per-queue, but
+>> the ability to restore defaults may be useful in itself.
+>>
+>> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+>> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 > 
-> Inside NETC, ENETC can capture the timestamp of the sent/received packet
-> through the PHC provided by the Timer and record it on the Tx/Rx BD. And
-> through the relevant PHC interfaces provided by the driver, the enetc V4
-> driver can support PTP time synchronization.
-> 
-> In addition, NETC V4 Timer is similar to the QorIQ 1588 timer, but it is
-> not exactly the same. The current ptp-qoriq driver is not compatible with
-> NETC V4 Timer, most of the code cannot be reused, see below reasons.
-> 
-> 1. The architecture of ptp-qoriq driver makes the register offset fixed,
-> however, the offsets of all the high registers and low registers of V4
-> are swapped, and V4 also adds some new registers. so extending ptp-qoriq
-> to make it compatible with V4 Timer is tantamount to completely rewriting
-> ptp-qoriq driver.
-> 
-> 2. The usage of some functions is somewhat different from QorIQ timer,
-> such as the setting of TCLK_PERIOD and TMR_ADD, the logic of configuring
-> PPS, etc., so making the driver compatible with V4 Timer will undoubtedly
-> increase the complexity of the code and reduce readability.
-> 
-> 3. QorIQ is an expired brand. It is difficult for us to verify whether
-> it works stably on the QorIQ platforms if we refactor the driver, and
-> this will make maintenance difficult, so refactoring the driver obviously
-> does not bring any benefits.
-> 
-> Therefore, add this new driver for NETC V4 Timer. Note that the missing
-> features like PEROUT, PPS and EXTTS will be added in subsequent patches.
-> 
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
-> 
-[...]
+> I wonder if it should be extended to the other driver using
+> rx_buf_len, hns3. For that, I think the default buf size would be
+> HNS3_DEFAULT_RX_BUF_LEN.
 
->   drivers/ptp/Kconfig             |  11 +
->   drivers/ptp/Makefile            |   1 +
->   drivers/ptp/ptp_netc.c          | 416 ++++++++++++++++++++++++++++++++
->   include/linux/fsl/netc_global.h |   3 +-
->   4 files changed, 430 insertions(+), 1 deletion(-)
->   create mode 100644 drivers/ptp/ptp_netc.c
+I'd rather avoid growing the series even more, let's follow up on
+that in a separate patch on top, that should be just fine. And
+thanks for the review
 
-[...]
+> Other than that, seems fine to me,
+> 
+> Reviewed-by: Mina Almasry <almasrymina@google.com>
 
-> diff --git a/include/linux/fsl/netc_global.h b/include/linux/fsl/netc_global.h
-> index fdecca8c90f0..763b38e05d7d 100644
-> --- a/include/linux/fsl/netc_global.h
-> +++ b/include/linux/fsl/netc_global.h
-> @@ -1,10 +1,11 @@
->   /* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
-> -/* Copyright 2024 NXP
-> +/* Copyright 2024-2025 NXP
->    */
->   #ifndef __NETC_GLOBAL_H
->   #define __NETC_GLOBAL_H
->   
->   #include <linux/io.h>
-> +#include <linux/pci.h>
+With the said above, do you want me to retain the review tag?
 
-What is the reason to include it header file? You need PCI functions
-only in ptp_netc.c, but this header is also included in a couple of
-other files (netc_blk_ctrl.c, ntmp.c).
-
->   
->   static inline u32 netc_read(void __iomem *reg)
->   {
-
-
+-- 
+Pavel Begunkov
 
 
