@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-215099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31A24B2D1AB
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 03:56:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0399DB2D1AF
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 03:57:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93D151C433B1
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 01:56:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B58F816AB50
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 01:56:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7C6D27814A;
-	Wed, 20 Aug 2025 01:55:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 097F92773F0;
+	Wed, 20 Aug 2025 01:55:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 190252773DA;
-	Wed, 20 Aug 2025 01:55:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EAA12773D0;
+	Wed, 20 Aug 2025 01:55:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755654921; cv=none; b=ZexKl6kDsiVHt52TPDat5Ou7qEHNJFcnms2WhzY6xnPnRpgep4HSPKuVV8fuA+orD7HvW4SaPv3lPb5sfcNM4fhyRu57eGBDKoauvvuxLfYYxMCK8adt+XZjdr91Rm4T4G0PzLuoyDzKM9PDSO9UfLSrDoymChGhYhN1xLyHAyA=
+	t=1755654936; cv=none; b=E2gTZ0IDc1QuEjzIY2+ERRhR4r2U8ZCwcQd9uN3frPAKtSot8994VZhe+42j8CSGQVqbbM2jeV4XvyYimEz8/Tvo3rGrSjy9seoXcCfZYixSR6REWS3Mg7efP7r5WOlgURwVTaPTTlm9LIZJjfBZO2IJqhVLqLQEYKNk4ztYNtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755654921; c=relaxed/simple;
-	bh=Np36qSbseptDY8V/rK4lecc9wSpvDDn8rjPyo22r/XM=;
+	s=arc-20240116; t=1755654936; c=relaxed/simple;
+	bh=Z5e406gAp4jZgmxAv49+4a5DsR0SX6/O3rUOlDZVJ3w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bHe3NPWu1pd2/ftU9dHM0aIUhhxRNO2tKyYty5fz0B22amegHodVXA3rCYyXZfferj2vni8ZcWpaR/zWW9YKYZvYhx2XKLfwIZ8rZlVtvcelA4lZpe1n5hy3XP0UpO1QsPRIuVwowxQiFcYK0vrw91o5cq8mvVYbyRqU+WDiM5A=
+	 Content-Type:Content-Disposition:In-Reply-To; b=KjNLTbMkUO7qPQzCYxIwF+neLfDgRXefAfUXlyQoNQJzgHx17Fl+94c3jS0Hv4kErdmVLc7g91xzgPddQP0gL9Cr9C2w6xnwM4dhqG0GrBVY/N9NinaSh3RIwyxkwEKIy7hmje88oZSG194tC8Iy6S6iGUdmPZPIHRU6aGT/tw4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,9 +33,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1uoY2l-000000006Dh-0tiV;
-	Wed, 20 Aug 2025 01:55:15 +0000
-Date: Wed, 20 Aug 2025 02:55:11 +0100
+	id 1uoY30-000000006E8-2RDJ;
+	Wed, 20 Aug 2025 01:55:30 +0000
+Date: Wed, 20 Aug 2025 02:55:27 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -56,9 +56,9 @@ Cc: Andreas Schirm <andreas.schirm@siemens.com>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next v3 5/8] net: dsa: lantiq_gswip: load model-specific
- microcode
-Message-ID: <caa49221c6241ab286cfd71eb141103603b06717.1755654392.git.daniel@makrotopia.org>
+Subject: [PATCH net-next v3 6/8] net: dsa: lantiq_gswip: make DSA tag
+ protocol model-specific
+Message-ID: <cc6a679ccf0e6dabf6c6ff51d4369b564db72fea.1755654392.git.daniel@makrotopia.org>
 References: <cover.1755654392.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -70,115 +70,66 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1755654392.git.daniel@makrotopia.org>
 
-Load microcode as specified in struct hw_info instead of relying on
-a single array of instructions. This is done in preparation to allow
-loading different microcode for the MaxLinear GSW1xx family.
+While the older Lantiq / Intel which are currently supported all use
+the DSA_TAG_GSWIP tagging protocol, newer MaxLinear GSW1xx modules use
+another 8-byte tagging protocol. Move the tag protocol information to
+struct gswip_hw_info to make it possible for new models to specify
+a different tagging protocol.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 ---
 v3: no changes
 v2: no changes
 
- drivers/net/dsa/lantiq_gswip.c | 14 +++++++++-----
- drivers/net/dsa/lantiq_gswip.h |  9 +++++++++
- drivers/net/dsa/lantiq_pce.h   |  9 ++-------
- 3 files changed, 20 insertions(+), 12 deletions(-)
+ drivers/net/dsa/lantiq_gswip.c | 6 +++++-
+ drivers/net/dsa/lantiq_gswip.h | 1 +
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/dsa/lantiq_gswip.c b/drivers/net/dsa/lantiq_gswip.c
-index d988839dce2f..1ce9ef425082 100644
+index 1ce9ef425082..f8a43c351649 100644
 --- a/drivers/net/dsa/lantiq_gswip.c
 +++ b/drivers/net/dsa/lantiq_gswip.c
-@@ -500,15 +500,15 @@ static int gswip_pce_load_microcode(struct gswip_priv *priv)
- 			  GSWIP_PCE_TBL_CTRL_OPMOD_ADWR, GSWIP_PCE_TBL_CTRL);
- 	gswip_switch_w(priv, 0, GSWIP_PCE_TBL_MASK);
+@@ -659,7 +659,9 @@ static enum dsa_tag_protocol gswip_get_tag_protocol(struct dsa_switch *ds,
+ 						    int port,
+ 						    enum dsa_tag_protocol mp)
+ {
+-	return DSA_TAG_PROTO_GSWIP;
++	struct gswip_priv *priv = ds->priv;
++
++	return priv->hw_info->tag_protocol;
+ }
  
--	for (i = 0; i < ARRAY_SIZE(gswip_pce_microcode); i++) {
-+	for (i = 0; i < priv->hw_info->pce_microcode_size; i++) {
- 		gswip_switch_w(priv, i, GSWIP_PCE_TBL_ADDR);
--		gswip_switch_w(priv, gswip_pce_microcode[i].val_0,
-+		gswip_switch_w(priv, (*priv->hw_info->pce_microcode)[i].val_0,
- 			       GSWIP_PCE_TBL_VAL(0));
--		gswip_switch_w(priv, gswip_pce_microcode[i].val_1,
-+		gswip_switch_w(priv, (*priv->hw_info->pce_microcode)[i].val_1,
- 			       GSWIP_PCE_TBL_VAL(1));
--		gswip_switch_w(priv, gswip_pce_microcode[i].val_2,
-+		gswip_switch_w(priv, (*priv->hw_info->pce_microcode)[i].val_2,
- 			       GSWIP_PCE_TBL_VAL(2));
--		gswip_switch_w(priv, gswip_pce_microcode[i].val_3,
-+		gswip_switch_w(priv, (*priv->hw_info->pce_microcode)[i].val_3,
- 			       GSWIP_PCE_TBL_VAL(3));
- 
- 		/* start the table access: */
-@@ -2001,6 +2001,8 @@ static const struct gswip_hw_info gswip_xrx200 = {
- 	.allowed_cpu_ports = BIT(6),
- 	.mii_ports = BIT(0) | BIT(1) | BIT(5),
+ static int gswip_vlan_active_create(struct gswip_priv *priv,
+@@ -2003,6 +2005,7 @@ static const struct gswip_hw_info gswip_xrx200 = {
  	.phylink_get_caps = gswip_xrx200_phylink_get_caps,
-+	.pce_microcode = &gswip_pce_microcode,
-+	.pce_microcode_size = ARRAY_SIZE(gswip_pce_microcode),
+ 	.pce_microcode = &gswip_pce_microcode,
+ 	.pce_microcode_size = ARRAY_SIZE(gswip_pce_microcode),
++	.tag_protocol = DSA_TAG_PROTO_GSWIP,
  };
  
  static const struct gswip_hw_info gswip_xrx300 = {
-@@ -2008,6 +2010,8 @@ static const struct gswip_hw_info gswip_xrx300 = {
- 	.allowed_cpu_ports = BIT(6),
- 	.mii_ports = BIT(0) | BIT(5),
+@@ -2012,6 +2015,7 @@ static const struct gswip_hw_info gswip_xrx300 = {
  	.phylink_get_caps = gswip_xrx300_phylink_get_caps,
-+	.pce_microcode = &gswip_pce_microcode,
-+	.pce_microcode_size = ARRAY_SIZE(gswip_pce_microcode),
+ 	.pce_microcode = &gswip_pce_microcode,
+ 	.pce_microcode_size = ARRAY_SIZE(gswip_pce_microcode),
++	.tag_protocol = DSA_TAG_PROTO_GSWIP,
  };
  
  static const struct of_device_id gswip_of_match[] = {
 diff --git a/drivers/net/dsa/lantiq_gswip.h b/drivers/net/dsa/lantiq_gswip.h
-index 1bd05348f1e1..3c60f14673a7 100644
+index 3c60f14673a7..0b7b6db4eab9 100644
 --- a/drivers/net/dsa/lantiq_gswip.h
 +++ b/drivers/net/dsa/lantiq_gswip.h
-@@ -213,10 +213,19 @@
-  */
- #define GSWIP_MAX_PACKET_LENGTH	2400
- 
-+struct gswip_pce_microcode {
-+	u16 val_3;
-+	u16 val_2;
-+	u16 val_1;
-+	u16 val_0;
-+};
-+
- struct gswip_hw_info {
- 	int max_ports;
- 	unsigned int allowed_cpu_ports;
+@@ -226,6 +226,7 @@ struct gswip_hw_info {
  	unsigned int mii_ports;
-+	const struct gswip_pce_microcode (*pce_microcode)[];
-+	size_t pce_microcode_size;
+ 	const struct gswip_pce_microcode (*pce_microcode)[];
+ 	size_t pce_microcode_size;
++	enum dsa_tag_protocol tag_protocol;
  	void (*phylink_get_caps)(struct dsa_switch *ds, int port,
  				 struct phylink_config *config);
  };
-diff --git a/drivers/net/dsa/lantiq_pce.h b/drivers/net/dsa/lantiq_pce.h
-index e2be31f3672a..659f9a0638d9 100644
---- a/drivers/net/dsa/lantiq_pce.h
-+++ b/drivers/net/dsa/lantiq_pce.h
-@@ -7,6 +7,8 @@
-  * Copyright (C) 2017 - 2018 Hauke Mehrtens <hauke@hauke-m.de>
-  */
- 
-+#include "lantiq_gswip.h"
-+
- enum {
- 	OUT_MAC0 = 0,
- 	OUT_MAC1,
-@@ -74,13 +76,6 @@ enum {
- 	FLAG_NO,	/*13*/
- };
- 
--struct gswip_pce_microcode {
--	u16 val_3;
--	u16 val_2;
--	u16 val_1;
--	u16 val_0;
--};
--
- #define MC_ENTRY(val, msk, ns, out, len, type, flags, ipv4_len) \
- 	{ val, msk, ((ns) << 10 | (out) << 4 | (len) >> 1),\
- 		((len) & 1) << 15 | (type) << 13 | (flags) << 9 | (ipv4_len) << 8 }
 -- 
 2.50.1
 
