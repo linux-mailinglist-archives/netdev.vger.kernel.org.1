@@ -1,155 +1,134 @@
-Return-Path: <netdev+bounces-215153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38F24B2D43D
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 08:48:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B74DBB2D456
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 08:54:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AAB617A01D
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 06:48:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 726D83B1139
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 06:54:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFD9225B1FC;
-	Wed, 20 Aug 2025 06:48:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A2D72D0C8A;
+	Wed, 20 Aug 2025 06:54:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OVZX+l1y"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0E351F30A9;
-	Wed, 20 Aug 2025 06:48:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 055DC2C11C4
+	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 06:54:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755672522; cv=none; b=mxi4UIKmoNj1TX1SpYF+u8c9Dpo0Fo5FBmouNSAqjIAO9Kw42eNzCnTRL8avJtfGGqhyi0+bsm7jVZve4PFCwOiTBi6ctgLMSOFB72wUnwJ2Pe/SoaM2Ki6xTuNvT0EaZVqvSX3+wjcoV4eioG5rzqWWRTw5IpmLURmbYlpShb0=
+	t=1755672863; cv=none; b=O4OgmD8wKOXLZmy0MUqaEmX9A4Hz5dpLcGZtwH9ZzO7p5HE1WdxqmQy5rxw9w5kFPhIU+9BECq2Q+NK+qt1+tBZim6yT5Oesu5UItFVMkwWg559sQ/yGBIBvRQMd8LAriP24uqFvcP+g+07n4yDjXrLY9IC59GOJHRnr7fyRa5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755672522; c=relaxed/simple;
-	bh=49DBKkptDFzzA2ZrfYvNanOnxBOu5JYgjj8zU6d4Jvg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=RvhI7qsKUTI5N4gbA0yg+m7UXiDb7eGE/TiaVSj+ZLRXWpsgQ8duMqyVjO4Iyst/5ouHRVipEMEf5oeKykDdbWoOKXvAgO/IQiL4PzrqWSnYf2bLqdqPis/XzPtL3nQsSUKBpPFam8g9gm6yuN1/Yrw0J8wl0Nk5XjgH5zW9heU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from [127.0.0.2] (unknown [114.241.87.235])
-	by APP-03 (Coremail) with SMTP id rQCowABHoYKbb6Vozu+wDQ--.65205S7;
-	Wed, 20 Aug 2025 14:47:58 +0800 (CST)
-From: Vivian Wang <wangruikang@iscas.ac.cn>
-Date: Wed, 20 Aug 2025 14:47:54 +0800
-Subject: [PATCH net-next v6 5/5] riscv: dts: spacemit: Add Ethernet support
- for Jupiter
+	s=arc-20240116; t=1755672863; c=relaxed/simple;
+	bh=C7FGJEn9utV4DVIxMBnuhS0fIHB/EBeIFop+TFsP6/s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LoCrK2EbM9jEzjIdMGzPz0ECgr9kx8sPtAb/bxChjE7sTKIUcXIIk395ROAZyac49fSEx0cRVwGoCprG/t5bnsZ+JaigmZBnB6krAqBgnZ2RrHUWd54MDG2jl9K31xo3Vyufx6x5IBhleR31+Al5LfJH9k43efYxtHgklf3d2e8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OVZX+l1y; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755672860;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yovFcx2lS/jztUpVbcF86Ft2OX16ePIPJO/lfVq9oj8=;
+	b=OVZX+l1y4Yn+5W5zRhdVvDfjoyr2RHv8R7gG1xfI3VtBmhnVUZ7Zclcb4cpXZhhdGyT4tW
+	FgftEk7UsD9GjHmEUc5Q4GE199L6ARwjBUV/LLACxv4hTE/TkcyPYjCdBKj6rlqzXJIwNH
+	bL2wuoxrpPZQuLElitMQBl3bFTj/u3Q=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-672-UBGOA6hBNt6Wf8X1tSnt6w-1; Wed,
+ 20 Aug 2025 02:54:15 -0400
+X-MC-Unique: UBGOA6hBNt6Wf8X1tSnt6w-1
+X-Mimecast-MFC-AGG-ID: UBGOA6hBNt6Wf8X1tSnt6w_1755672853
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EFDCF1955D69;
+	Wed, 20 Aug 2025 06:54:12 +0000 (UTC)
+Received: from localhost (unknown [10.43.135.229])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 04DE1180028B;
+	Wed, 20 Aug 2025 06:54:08 +0000 (UTC)
+Date: Wed, 20 Aug 2025 08:54:06 +0200
+From: Miroslav Lichvar <mlichvar@redhat.com>
+To: Kurt Kanzenbach <kurt@linutronix.de>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next] igb: Retrieve Tx timestamp
+ directly from interrupt
+Message-ID: <aKVxDjocY3uQr342@localhost>
+References: <20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de>
+ <aKMbekefL4mJ23kW@localhost>
+ <87ms7vs6vk.fsf@jax.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250820-net-k1-emac-v6-5-c1e28f2b8be5@iscas.ac.cn>
-References: <20250820-net-k1-emac-v6-0-c1e28f2b8be5@iscas.ac.cn>
-In-Reply-To: <20250820-net-k1-emac-v6-0-c1e28f2b8be5@iscas.ac.cn>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>, 
- Vivian Wang <wangruikang@iscas.ac.cn>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
- Paul Walmsley <paul.walmsley@sifive.com>, 
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
- Alexandre Ghiti <alex@ghiti.fr>
-Cc: Vivian Wang <uwu@dram.page>, 
- Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
- Junhui Liu <junhui.liu@pigmoral.tech>, Simon Horman <horms@kernel.org>, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-riscv@lists.infradead.org, 
- spacemit@lists.linux.dev, linux-kernel@vger.kernel.org
-X-Mailer: b4 0.14.2
-X-CM-TRANSID:rQCowABHoYKbb6Vozu+wDQ--.65205S7
-X-Coremail-Antispam: 1UD129KBjvJXoW7Kw43Gw1ftrWfAF43Cr45Jrb_yoW8WrW7pa
-	y3CFsaqFZrCr1fKw43Zr9F9r13Ga95GrWkC3y3uF1rJ3yIvFZ0vw1rtw17tr1DGrW5X34Y
-	vr10yFyxurnFkw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUmS14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
-	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
-	z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
-	4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
-	3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
-	IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
-	M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
-	kIc2xKxwCY1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
-	bVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67
-	AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI
-	42IY6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF
-	4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBI
-	daVFxhVjvjDU0xZFpf9x0pRQJ5wUUUUU=
-X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87ms7vs6vk.fsf@jax.kurt.home>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Milk-V Jupiter uses an RGMII PHY for each port and uses GPIO for PHY
-reset.
+On Tue, Aug 19, 2025 at 04:50:23PM +0200, Kurt Kanzenbach wrote:
+> Installed ntpperf on one machine and chrony (v4.6) on the second. In the
+> chrony config there is 'hwtimestamp enp1s0'. I did run the first example
+> in ntpperf's README with the following results. 'rate' seems to be
+> higher with my patch applied. Anyway, your ntpperf output looks
+> completely different. What parameters are you using? I just want to
+> reproduce your results first.
+> 
+> root@cml1:~/ntpperf# ./ntpperf -i enp1s0 -m 6c:b3:11:52:39:15 -d 192.168.123.1 -s 172.18.0.0/16 -B -H
 
-Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
----
- arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts | 46 +++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+Interleaved mode needs to be selected by the -I option (instead of -B)
+in order for the server to enable SW+HW TX timestamps for the
+responses it sends back to the client.
 
-diff --git a/arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts b/arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts
-index 4483192141049caa201c093fb206b6134a064f42..c5933555c06b66f40e61fe2b9c159ba0770c2fa1 100644
---- a/arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts
-+++ b/arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts
-@@ -20,6 +20,52 @@ chosen {
- 	};
- };
- 
-+&eth0 {
-+	phy-handle = <&rgmii0>;
-+	phy-mode = "rgmii-id";
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&gmac0_cfg>;
-+	rx-internal-delay-ps = <0>;
-+	tx-internal-delay-ps = <0>;
-+	status = "okay";
-+
-+	mdio-bus {
-+		#address-cells = <0x1>;
-+		#size-cells = <0x0>;
-+
-+		reset-gpios = <&gpio K1_GPIO(110) GPIO_ACTIVE_LOW>;
-+		reset-delay-us = <10000>;
-+		reset-post-delay-us = <100000>;
-+
-+		rgmii0: phy@1 {
-+			reg = <0x1>;
-+		};
-+	};
-+};
-+
-+&eth1 {
-+	phy-handle = <&rgmii1>;
-+	phy-mode = "rgmii-id";
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&gmac1_cfg>;
-+	rx-internal-delay-ps = <0>;
-+	tx-internal-delay-ps = <250>;
-+	status = "okay";
-+
-+	mdio-bus {
-+		#address-cells = <0x1>;
-+		#size-cells = <0x0>;
-+
-+		reset-gpios = <&gpio K1_GPIO(115) GPIO_ACTIVE_LOW>;
-+		reset-delay-us = <10000>;
-+		reset-post-delay-us = <100000>;
-+
-+		rgmii1: phy@1 {
-+			reg = <0x1>;
-+		};
-+	};
-+};
-+
- &uart0 {
- 	pinctrl-names = "default";
- 	pinctrl-0 = <&uart0_2_cfg>;
+My ntpperf command line also had "-x 1.05" to increase the rate in
+smaller steps and "-o 0.000000500" to print the offset between the
+server TX and client RX timestamp instead of the offset between
+server's TX and RX timestamp (response time), but that requires the
+NIC PHCs to be synchronized to each other over a different network
+link and the -o value to be calibrated for the delays in timestamping
+and cable. It's not important for this issue, no need to bother with
+that.
+
+> * ntpperf with igb patch applied
+
+> 129721   12972   0.00%   0.00% 100.00%   0.00%    +7934  +49386 +229427  17600
+> 194581   16384   0.00%   0.00% 100.00%   0.00%   +10760  +54961 +248325  18860
+> 291871   16384   0.00%   0.00% 100.00%   0.00%   +13207  +57193 +248870  16908
+> 437806   16384  25.42%   0.00%  74.58%   0.00%  +211479 +275061 +703480  20529
+> 
+> * ntpperf without igb patch applied
+
+> 129721   12972   0.00%   0.00% 100.00%   0.00%    +2670  +14699 +242395   6692
+> 194581   16384   0.00%   0.00% 100.00%   0.00%    +2520  +19712 +329254   9571
+> 291871   16384   1.37%   0.00%  98.63%   0.00%    +2818  +77396 +15480693 182286
+> 437806   16384  24.69%   0.00%  75.31%   0.00%  +108662 +246855 +2306431  38520
+
+Those results look the same within few percent, as I'd expect with
+the basic NTP mode (-B option), which doesn't enable server's TX
+timestamping. Normally, I see larger differences in subsequent runs in
+the same configuration.
 
 -- 
-2.50.1
+Miroslav Lichvar
 
 
