@@ -1,96 +1,97 @@
-Return-Path: <netdev+bounces-215377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91DE5B2E48D
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 19:59:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C47CB2E49D
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 20:05:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B81B5E348B
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 17:58:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15A8EA25DC1
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 18:04:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7D9C27A131;
-	Wed, 20 Aug 2025 17:56:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ECD2276045;
+	Wed, 20 Aug 2025 18:04:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S7xEiV2q"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pe4Tx/Mv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24CEE261B70;
-	Wed, 20 Aug 2025 17:56:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B80273D67
+	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 18:04:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755712616; cv=none; b=KgBBeQyUkfRm9mqA6ex2ppgcgtDiOQAI3UqPpmrOL++lv5euoZpsrOCj+oJRN9jJBnv5Hs5kFTWm/VZNWGoHAT/H5ubq7PZNm+k6tpdDwWWqHg9gbWhvQJuGL4vmjiiHzjmaC6EVw2MFcuasyR6jC/+A+jfyI76st+HKbSRU7gE=
+	t=1755713055; cv=none; b=s5xQr1tRxnycX7Ace5kLayLCfeesI4KNv6Cr3hcb/QX9p3/uDvv4P/guBLpYfVRkYcttfMpHHSrmTiYXygpBZVMWGFT6r/HvCD3P9Dcg1QTr5EJ9tNNaZTB5a7utKTy4UCmu5asrH+OU1UnGdn8bW7PcGJzISS4AC1M6A7h4gRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755712616; c=relaxed/simple;
-	bh=aTVe6zIx9eeEkQY2Ki1hCOn4/af5y00QBLtcbdjCizk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pf49sOZnoacJ++q5aiYgJT0FsJ1thhE7fG0kJ5GoXVRp0OobuaAEFiDYGIegMv8RABLfK8zzWSX3wd0tMwrpB7Ctsmr84fgE7TnisaWVWeaNqbl1sc+E6DjsCLtvE9CD7xWu7ILGASAGNvlphTLHmZ5ACNszjlQ/PaVPlCYahTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S7xEiV2q; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b471738daabso78190a12.1;
-        Wed, 20 Aug 2025 10:56:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755712614; x=1756317414; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h15eIxqdIwCof1MRCBcz3fgygqELtVuk+XlaIGTeo3U=;
-        b=S7xEiV2qBMEc2bcKEAmB6MBjhZjhIrvT0ByINR3cU0dpUsDb787PTi99lt2M0ATSA/
-         8ak7Cuiby7847hWr+sy9t+9RZf6XRfFpAU7PguAXki6EV0PzihaJ1pMTANfye4b17d6m
-         0XjmVgqi6R/GoGTJrAohdEXxlOWw+5InDK+BkMZZPcg96Xjq4ucEwshCwhoZpTYadwYn
-         ch02zgPUWPWMafzZGtCkCfa2uNTsGhMHN9S3d1KYGY1OXuFHTg6x/zlV+L5W9+JphR2k
-         jVRikL9LhVLDETmvjVlDuUrzlG0PEyCm/Pgt2xhtxFVPEYVaE3FzaN8rGd1m+t6OqNgi
-         oRAA==
+	s=arc-20240116; t=1755713055; c=relaxed/simple;
+	bh=mlAmTZB4J4eFaTmxwa9T60gRLD2R2gtwas8Lu1fiFbk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WKDKfoCyjiq8SX45X391xA5uqxu3bmJXOwZPDy4SpWC0sSF5hBJV1DjcRTv5fA7+Gqdwtn0E19RmVSLffnm0JybmpG+rinbINCAiXCBkTUbGSUFUQCogWd0i8SDB3Z/bR7bCjvCmq/j5B6nIlbM4W5DVl0bYr4i32k9SgYfCjAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pe4Tx/Mv; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755713052;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=oeLiiBFCMgKQsLacMLVBhE65F6ijEZfsV3QkmwGfTs0=;
+	b=Pe4Tx/MvA/5XJrXT95UGvt6uD7MXDZyeC9nuBvzylCZd1DcSH0JVV21lvNofCuOS9+0/TY
+	Dh84VW2ax+6UNG58M9cf3HNHJ6oVv800Zgq6B80ysKOR3MSKcwazp+VlUboWvE6HcNCWnJ
+	CgTPPx8noV/m4UO8ICRdR7qBo41WF/c=
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-146-uzfOi_ClMduQ1aUbGEoDWw-1; Wed, 20 Aug 2025 14:04:09 -0400
+X-MC-Unique: uzfOi_ClMduQ1aUbGEoDWw-1
+X-Mimecast-MFC-AGG-ID: uzfOi_ClMduQ1aUbGEoDWw_1755713048
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-244582bc5e4so1171325ad.2
+        for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 11:04:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755712614; x=1756317414;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=h15eIxqdIwCof1MRCBcz3fgygqELtVuk+XlaIGTeo3U=;
-        b=Xi6jQipHQKYaAkzBqEIrX8b7ndYVEOYMSfdeQ67KUd/5OfrijF3MgbZsUCNb0e6F7d
-         Mkr3H8ooZuMtkUZKJP709P6H5MavwgFAueyBb+WGGs0EWX7RF2x7xqGOXCXzdv/RERQF
-         0CzkI64frcy12NzXnFvurJBc/odm2N5aPSftGclVUbYeDQBRM5xR10rW7VH0+c7bHVzP
-         WdT+SnPllSyKsrCpEfPnKXh7g2m3FbahWaxvK3rBxZvOJ8BWirdzpS/EPQQG+dL3BCgJ
-         QuARRoFccjUb0BP7rcZRH5qtRLp3YzqzXA6KEphZaQmmUfw5X7JMHKpqbMHJf1kkJp+Y
-         Altw==
-X-Forwarded-Encrypted: i=1; AJvYcCUrkDUNZgPmz/Q07L2qesycpdkNymCpGFWtiCwvR3oqnpHfQnIlYk+YWuLuDtrOVh6acYRnc3z7Y6KQsDM=@vger.kernel.org, AJvYcCVQX6odNSShV2CzON8N4H7JkF2wsz7sPDJJCVyj3IeouY8EpHy+afzHs25L+HKhmggj9YF9Ojs2RzCx3g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTPRY6o9k58wa/MQ0J8ZQ93lsKQIgZ81x2Eda+oDyE1oSeFdAL
-	mjeyp8tU/BsI4TvRI814UTVjDn9i0dud14XGqgaGuUMhRMLYHNov32g=
-X-Gm-Gg: ASbGncvWr6suprcwvy0kbcPxyTGMN+Wc/LkJYrt09+ogrDeG3SbqkodJdic2CkZefSf
-	Jkc0S4bGr+cMBKrWt+SRpdQLJmZvORu0Ok90+PgsBB5vhxI9p/8w6dL+8hSs/VFqQwt5rwItu6J
-	/9Y0EqOkd+40ObqHO02FHaaymXh7NTKS7t42gxTjHnYCnul8hmnzmpIHSZEVxtw+Rc3pZ96pbe5
-	NNaQhKLkzSJtelqhY+ORZU/w3lmaRW47+8qH3GPJsFBWGWHLDt214nqklkH21BKbAnCnCDAtGjr
-	MmKwUxVdbX3OV0f9YOBOFj94a/R+a6EqhkWD3yxTTdsnA+ADQ9sfu6C40O6bEwgRZijGDH0msfk
-	MsmZVkyfYNmf5/mb9bc8ffkGtUHPgrZZe
-X-Google-Smtp-Source: AGHT+IGgy/Kot7C/NrIwHPLLQwSrbwouelo5AZzvdNv+3H683amHQAwYeqAU87DjfEX2ZQIbjOCjtQ==
-X-Received: by 2002:a17:902:ce01:b0:235:f078:4746 with SMTP id d9443c01a7336-245ef25bb33mr44825635ad.42.1755712614298;
-        Wed, 20 Aug 2025 10:56:54 -0700 (PDT)
-Received: from debian.ujwal.com ([223.185.130.96])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-245ed4ccaa9sm32553815ad.86.2025.08.20.10.56.50
+        d=1e100.net; s=20230601; t=1755713048; x=1756317848;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oeLiiBFCMgKQsLacMLVBhE65F6ijEZfsV3QkmwGfTs0=;
+        b=BfyiVy3LmqvmOphbRrNybIXfaE6roD81gKt9twdgK/WkxaqUe8EaIrA2FFzMgw89Z/
+         H5HW0qMW7pJvNSwEjy6LYs/791F+Vgb0CCsIuFS6RQr795zbajSGCYB5N9/MdNcpx0NB
+         3gWB5/v987RTAP/yW30V7ykoRroBhGsdTckhK39qj0i6xiYZoU50SnQ0t4NpAemtzuYd
+         wvHJ0JINrO4CGxG1NjoitT1n0bbVt+sutlGrIp7eq8t4m3NALPXwOvV3pLhfgKpND25i
+         vPbKi7hIX/8VM608Mp5LxyhskQsfkuhf9AyZTzu812JbasBlRZh1PjpW2OE6KAQYnuy7
+         Q84Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUpHqiyNKBCq7TmXBxGTLx/33sv2HTVY9O1vTylG9uVGMU/fS+APdTbvOwVj850oXFBSTZb+vc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxeh1WvLXpNDqI5sLX2aq3q7wG1gAZMqU9vTUK68nNYwuvKNrfK
+	x4c6M7u8f6KDZi2YauCy6vtM9ssUa9PtpX7+vEvBQ2OdZ1wTUm4XpXMH3K/ibTNQpTcvzZMMXti
+	swVtIV7wV1Zrr+Rtz6MEV90hBQRrmZf1U//Q7FBkEYq/NsZiIDrOPd2j3+g==
+X-Gm-Gg: ASbGnctAt+mfZo11qMnt3jnn8wXn/rits4YUYmJVXScQLwjYBJ0LoKy3abhUL3vT6hx
+	ynsJa6U2cFTULyQ+YJ5BbvepM+wLaVce+8h6abk3sjkbN+y0w19ghbKCRWTlPmH+VliPEVs3jM3
+	k6DAuqIfTurq846YsMweZ83OqKxF8/RBesyyr/vVGkr5zYYL5LqPCfrGx9x4tRBtHsed/ECllJw
+	CurKRS7PL6l2+xLO7Epj6Gm4E9re3JABsD16y5Wn1BeP7oHsYeAfTt8KcYjlFCt6nsxVo79EsWf
+	U+kdlFcevigeuHD8ZJ9RIftGRrHc7NvUV6BomY0o
+X-Received: by 2002:a17:902:cec3:b0:240:70d4:85d9 with SMTP id d9443c01a7336-245eee3fd84mr42237995ad.0.1755713047782;
+        Wed, 20 Aug 2025 11:04:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGeww1NAvh4/NyhufoiKDyWk9lGBXliPK3456q7VVImqohgGb8IuZFpaqWk/h+JjPKAhXNAIw==
+X-Received: by 2002:a17:902:cec3:b0:240:70d4:85d9 with SMTP id d9443c01a7336-245eee3fd84mr42237675ad.0.1755713047393;
+        Wed, 20 Aug 2025 11:04:07 -0700 (PDT)
+Received: from kernel-devel ([240d:1a:c0d:9f00:be24:11ff:fe35:71b3])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-245ed379dcfsm32729565ad.68.2025.08.20.11.04.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Aug 2025 10:56:53 -0700 (PDT)
-From: Ujwal Kundur <ujwal.kundur@gmail.com>
-To: allison.henderson@oracle.com,
-	davem@davemloft.net,
+        Wed, 20 Aug 2025 11:04:06 -0700 (PDT)
+From: Shigeru Yoshida <syoshida@redhat.com>
+To: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	rds-devel@oss.oracle.com,
+Cc: george.mccollister@gmail.com,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Ujwal Kundur <ujwal.kundur@gmail.com>
-Subject: [PATCH net-next v2 4/4] rds: Fix endianness annotations for RDS extension headers
-Date: Wed, 20 Aug 2025 23:25:50 +0530
-Message-Id: <20250820175550.498-5-ujwal.kundur@gmail.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20250820175550.498-1-ujwal.kundur@gmail.com>
-References: <20250820175550.498-1-ujwal.kundur@gmail.com>
+	Shigeru Yoshida <syoshida@redhat.com>,
+	syzbot+a81f2759d022496b40ab@syzkaller.appspotmail.com
+Subject: [PATCH net] hsr: add length check before setting network header
+Date: Thu, 21 Aug 2025 03:03:25 +0900
+Message-ID: <20250820180325.580882-1-syoshida@redhat.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,68 +100,90 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Per the RDS 3.1 spec [1], RDS extension headers EXTHDR_NPATHS and
-EXTHDR_GEN_NUM are be16 and be32 values respectively, exchanged during
-normal operations over-the-wire (RDS Ping/Pong). This contrasts their
-declarations as host endian unsigned ints.
+syzbot reported an uninitialized value issue in hsr_get_node() [1].
+If the packet length is insufficient, it can lead to the issue when
+accessing HSR header.
 
-Fix the annotations across occurrences. Flagged by Sparse.
+Add validation to ensure sufficient packet length before setting
+network header in HSR frame handling to prevent the issue.
 
-[1] https://oss.oracle.com/projects/rds/dist/documentation/rds-3.1-spec.html
+[1]
+BUG: KMSAN: uninit-value in hsr_get_node+0xab0/0xad0 net/hsr/hsr_framereg.c:250
+ hsr_get_node+0xab0/0xad0 net/hsr/hsr_framereg.c:250
+ fill_frame_info net/hsr/hsr_forward.c:577 [inline]
+ hsr_forward_skb+0x330/0x30e0 net/hsr/hsr_forward.c:615
+ hsr_handle_frame+0xa20/0xb50 net/hsr/hsr_slave.c:69
+ __netif_receive_skb_core+0x1cff/0x6190 net/core/dev.c:5432
+ __netif_receive_skb_one_core net/core/dev.c:5536 [inline]
+ __netif_receive_skb+0xca/0xa00 net/core/dev.c:5652
+ netif_receive_skb_internal net/core/dev.c:5738 [inline]
+ netif_receive_skb+0x58/0x660 net/core/dev.c:5798
+ tun_rx_batched+0x3ee/0x980 drivers/net/tun.c:1549
+ tun_get_user+0x5566/0x69e0 drivers/net/tun.c:2002
+ tun_chr_write_iter+0x3af/0x5d0 drivers/net/tun.c:2048
+ call_write_iter include/linux/fs.h:2110 [inline]
+ new_sync_write fs/read_write.c:497 [inline]
+ vfs_write+0xb63/0x1520 fs/read_write.c:590
+ ksys_write+0x20f/0x4c0 fs/read_write.c:643
+ __do_sys_write fs/read_write.c:655 [inline]
+ __se_sys_write fs/read_write.c:652 [inline]
+ __x64_sys_write+0x93/0xe0 fs/read_write.c:652
+ x64_sys_call+0x3062/0x3b50 arch/x86/include/generated/asm/syscalls_64.h:2
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Signed-off-by: Ujwal Kundur <ujwal.kundur@gmail.com>
+Uninit was created at:
+ __alloc_pages+0x9d6/0xe70 mm/page_alloc.c:4598
+ alloc_pages_mpol+0x299/0x990 mm/mempolicy.c:2264
+ alloc_pages+0x1bf/0x1e0 mm/mempolicy.c:2335
+ skb_page_frag_refill+0x2bf/0x7c0 net/core/sock.c:2921
+ tun_build_skb drivers/net/tun.c:1679 [inline]
+ tun_get_user+0x1258/0x69e0 drivers/net/tun.c:1819
+ tun_chr_write_iter+0x3af/0x5d0 drivers/net/tun.c:2048
+ call_write_iter include/linux/fs.h:2110 [inline]
+ new_sync_write fs/read_write.c:497 [inline]
+ vfs_write+0xb63/0x1520 fs/read_write.c:590
+ ksys_write+0x20f/0x4c0 fs/read_write.c:643
+ __do_sys_write fs/read_write.c:655 [inline]
+ __se_sys_write fs/read_write.c:652 [inline]
+ __x64_sys_write+0x93/0xe0 fs/read_write.c:652
+ x64_sys_call+0x3062/0x3b50 arch/x86/include/generated/asm/syscalls_64.h:2
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+CPU: 1 PID: 5050 Comm: syz-executor387 Not tainted 6.9.0-rc4-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+
+Fixes: 48b491a5cc74 ("net: hsr: fix mac_len checks")
+Reported-by: syzbot+a81f2759d022496b40ab@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=a81f2759d022496b40ab
+Tested-by: syzbot+a81f2759d022496b40ab@syzkaller.appspotmail.com
+Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
 ---
- net/rds/message.c | 4 ++--
- net/rds/recv.c    | 4 ++--
- net/rds/send.c    | 4 ++--
- 3 files changed, 6 insertions(+), 6 deletions(-)
+ net/hsr/hsr_slave.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/net/rds/message.c b/net/rds/message.c
-index 7af59d2443e5..199a899a43e9 100644
---- a/net/rds/message.c
-+++ b/net/rds/message.c
-@@ -44,8 +44,8 @@ static unsigned int	rds_exthdr_size[__RDS_EXTHDR_MAX] = {
- [RDS_EXTHDR_VERSION]	= sizeof(struct rds_ext_header_version),
- [RDS_EXTHDR_RDMA]	= sizeof(struct rds_ext_header_rdma),
- [RDS_EXTHDR_RDMA_DEST]	= sizeof(struct rds_ext_header_rdma_dest),
--[RDS_EXTHDR_NPATHS]	= sizeof(u16),
--[RDS_EXTHDR_GEN_NUM]	= sizeof(u32),
-+[RDS_EXTHDR_NPATHS]	= sizeof(__be16),
-+[RDS_EXTHDR_GEN_NUM]	= sizeof(__be32),
- };
+diff --git a/net/hsr/hsr_slave.c b/net/hsr/hsr_slave.c
+index b87b6a6fe070..979fe4084f86 100644
+--- a/net/hsr/hsr_slave.c
++++ b/net/hsr/hsr_slave.c
+@@ -63,8 +63,12 @@ static rx_handler_result_t hsr_handle_frame(struct sk_buff **pskb)
+ 	skb_push(skb, ETH_HLEN);
+ 	skb_reset_mac_header(skb);
+ 	if ((!hsr->prot_version && protocol == htons(ETH_P_PRP)) ||
+-	    protocol == htons(ETH_P_HSR))
++	    protocol == htons(ETH_P_HSR)) {
++		if (skb->len < ETH_HLEN + HSR_HLEN)
++			goto finish_pass;
++
+ 		skb_set_network_header(skb, ETH_HLEN + HSR_HLEN);
++	}
+ 	skb_reset_mac_len(skb);
  
- void rds_message_addref(struct rds_message *rm)
-diff --git a/net/rds/recv.c b/net/rds/recv.c
-index 5627f80013f8..66205d6924bf 100644
---- a/net/rds/recv.c
-+++ b/net/rds/recv.c
-@@ -202,8 +202,8 @@ static void rds_recv_hs_exthdrs(struct rds_header *hdr,
- 	unsigned int pos = 0, type, len;
- 	union {
- 		struct rds_ext_header_version version;
--		u16 rds_npaths;
--		u32 rds_gen_num;
-+		__be16 rds_npaths;
-+		__be32 rds_gen_num;
- 	} buffer;
- 	u32 new_peer_gen_num = 0;
- 
-diff --git a/net/rds/send.c b/net/rds/send.c
-index 42d991bc8543..0b3d0ef2f008 100644
---- a/net/rds/send.c
-+++ b/net/rds/send.c
-@@ -1454,8 +1454,8 @@ rds_send_probe(struct rds_conn_path *cp, __be16 sport,
- 
- 	if (RDS_HS_PROBE(be16_to_cpu(sport), be16_to_cpu(dport)) &&
- 	    cp->cp_conn->c_trans->t_mp_capable) {
--		u16 npaths = cpu_to_be16(RDS_MPATH_WORKERS);
--		u32 my_gen_num = cpu_to_be32(cp->cp_conn->c_my_gen_num);
-+		__be16 npaths = cpu_to_be16(RDS_MPATH_WORKERS);
-+		__be32 my_gen_num = cpu_to_be32(cp->cp_conn->c_my_gen_num);
- 
- 		rds_message_add_extension(&rm->m_inc.i_hdr,
- 					  RDS_EXTHDR_NPATHS, &npaths,
+ 	/* Only the frames received over the interlink port will assign a
 -- 
-2.30.2
+2.50.1
 
 
