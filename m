@@ -1,136 +1,130 @@
-Return-Path: <netdev+bounces-215261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E1BCB2DD61
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 15:10:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B6B70B2DD64
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 15:11:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB04B5631D0
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 13:09:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF8EB17BFA9
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 13:11:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66D2931A057;
-	Wed, 20 Aug 2025 13:09:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ifr0tf1O"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE00531B125;
+	Wed, 20 Aug 2025 13:10:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB6C23093CB
-	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 13:09:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5363131AF21
+	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 13:10:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755695370; cv=none; b=EqDay8ejxyaIWv+6aQCUC3iuMULPZHXcWbUJ1jFN2xcmpdJK+UTrliwYDDpbheTrHJLLxqOf4T9L+M2zWZ8FDDO7+cFyerCBgnxPRMA5VGUdct0oAzUdyf5jy6MWXvoA4TzKKsC7zzYAnE3fkLZ5I1z2XgggJYw8lEvAfXU8wDo=
+	t=1755695453; cv=none; b=tMe3lAiOo1v372HQunA+SCTRiicPprjRezedEl9D/Sx4gHAsvjCMhGz0O8kGfcndZY9Q/MnDJT/eCPuyCs+Ok1Ol3MKUH53tLBRQqW5h230GwVoWvVHAAKhvdJZxSXgiMH03HCQtg2k3LNJnVRyURL7jXVGjH04Nj/Huc5I89ZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755695370; c=relaxed/simple;
-	bh=FEXjWKZ7j9gKW41TVi5lhas4ByO+JorZFuH4ehN8pSE=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ljOLAJLDd+u2zFKM00bjtGQtKGUmX8R98K7CF1+BknACEV63x2i1lWLUSkjoM8oI54uGCCZQzLvdFMa+tn4btSrMgP1Nt7rdQKQOy0gH7uJkg0ADhgHkuGdG9Yi/60XRqUSTh4XWH+V1d/UzPZwSyPVfzeJCkxfPijsiR0htteE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ifr0tf1O; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755695367;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kPMmZ6zRKIfrFWDZNXgVdvv8UMxp7S0BOvyouv50hn4=;
-	b=Ifr0tf1OxDUGe9hbOeSBuoR1mDPML0dN4rvoirAuAX1dAIVa5Puqfot+u9GpwHrMun3wMm
-	GIQDig9jcZ7t6b+pSwwpRLTvE6/WMCqkUr1RZdRZ6XVxRWS2hapfdcmbsrhviuSYxsWGoZ
-	QfTuk+3VS5N7NYjwLtp+Yf640w4ql3g=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-282-z8V46R3eOl2CVyp7G3wm2g-1; Wed, 20 Aug 2025 09:09:26 -0400
-X-MC-Unique: z8V46R3eOl2CVyp7G3wm2g-1
-X-Mimecast-MFC-AGG-ID: z8V46R3eOl2CVyp7G3wm2g_1755695366
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-70bc9937844so43781556d6.2
-        for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 06:09:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755695366; x=1756300166;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kPMmZ6zRKIfrFWDZNXgVdvv8UMxp7S0BOvyouv50hn4=;
-        b=j8qOfvlliig6KoVfUHdEAUGHPYmslPOI0XliI674OI/LnZxJW52WRFIloF5gKHHLGe
-         /+ZFbzBhnZu45kFFrBVp9E7JxcOe7vELpdfU2QCWAuvXbbHJh4boO2+nUAePgdw3BoFR
-         I2mZN9ETbMyimMgA7P2VjeaYIY2kxrvrwkt1AUW5mGwEVlAPyq4Oav1GnH9kdXqru3V0
-         Jq8BVVi651gY2Yy4L+AjFXKZ5Ggi/A5khUpzy4f9chdQlzeelbPfmmFrQvbtzoYGjZGO
-         DQsJp+dA3dE2kc4srBAkP0+x4ffdUWsKlJIshXyMoRcIdWeVJktmijkK4vnJZCVzexv8
-         oClg==
-X-Forwarded-Encrypted: i=1; AJvYcCWW9m9UIzvD0W4XgNHEYk3QWKDWmpEnZ3i2mQxknzmgWdmmjhBti7xFPSXL/BSJbjw5wIbxQe4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy3OD3saaROOVS0LF2JSoTPDf6lWm0ag9gGcrPTlAIUVIOgE1Hc
-	cVlCrSEIfGMUsy4Dv6Gyc0NMEns91NZz1jQfQ5j+D3wc7/G5kxPyH+4WByDLIu84K7N1SuI5lrW
-	9axNK8Wmy8iKRyqfNvP53TaIVSUt5QUW42TP6PNCPnr9PeXLrRQdIdPNslg==
-X-Gm-Gg: ASbGncu2uL8YKBuyCMIujMnqGIwviVodYI+XJVuPYliNF8JV+XTTqGv0z261+gOaLeq
-	9Pa22243UN8Jf+ewQYYFDNjIblT4cckk2lC4TbV83lhbMT3evm6Rv68A6pxg/3zThkk8xeC5dxW
-	W6egAxRdv9xJkRFQoS6Z04dN3qzFgfYo7ixBKd6vAJqDgD5+06kzNgMfbwbTBLBI1ptcCz01WZY
-	Fk54BdQsd/3hCLVLz2kIzVfkk9HLCn+pFrTwkn5kk1CWe09WBB8rBYfEhcuBTP30LaBvR15ts4a
-	HzbMh5Sp2sP409QpRCbIVssWL6m97D5U5F5XveAQ/iI=
-X-Received: by 2002:a05:622a:a06:b0:4ae:6b72:2ae2 with SMTP id d75a77b69052e-4b291bad303mr27150881cf.40.1755695364418;
-        Wed, 20 Aug 2025 06:09:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE6CDVMR8ZcLipXu4rcH+OG7XRzN7NLSTlOlrwN/6LFzDR4qGHtyPyzVaZz3BytkA8vDU51Cg==
-X-Received: by 2002:a05:622a:a06:b0:4ae:6b72:2ae2 with SMTP id d75a77b69052e-4b291bad303mr27150361cf.40.1755695363884;
-        Wed, 20 Aug 2025 06:09:23 -0700 (PDT)
-Received: from [192.168.68.125] ([147.235.216.242])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b11ddd6947sm85787501cf.36.2025.08.20.06.09.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Aug 2025 06:09:23 -0700 (PDT)
-Message-ID: <f5c3b451-0a8d-4146-8e47-be2c7e2d6284@redhat.com>
-Date: Wed, 20 Aug 2025 16:09:20 +0300
+	s=arc-20240116; t=1755695453; c=relaxed/simple;
+	bh=yKVG4JgXuOy0kLK2+1t9JbSUAY/kx7t7yYGBQ5c+L7E=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=P5vcIC9a5RgofM3x+KE2lnDthOsUflmGDwfAhltXdY8waM57LEEn0TXmer/Kl7WJzwwsiGJ7zWuax5fT1E1xsc9Vrt5KZxnmRTCt25e02h2tjw8BW5ZdcK5ap38Ty78oXVnpwoUC69GY2oOS4OJq32TKRgLMRvd/owYJmLBGZuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uoiaA-0007YF-9i; Wed, 20 Aug 2025 15:10:26 +0200
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uoia8-001Fnc-2C;
+	Wed, 20 Aug 2025 15:10:24 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uoia8-003atA-1s;
+	Wed, 20 Aug 2025 15:10:24 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Lukasz Majewski <lukma@denx.de>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Russell King <linux@armlinux.org.uk>,
+	Divya.Koppera@microchip.com,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Stanislav Fomichev <sdf@fomichev.me>
+Subject: [PATCH net-next v3 0/3] Documentation and ynl: add flow control
+Date: Wed, 20 Aug 2025 15:10:20 +0200
+Message-Id: <20250820131023.855661-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] PATCH: i40e Add module option to disable max VF limit
-From: mohammad heib <mheib@redhat.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Jacob Keller <jacob.e.keller@intel.com>, David Hill <dhill@redhat.com>,
- netdev@vger.kernel.org, anthony.l.nguyen@intel.com,
- przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-References: <20250805134042.2604897-1-dhill@redhat.com>
- <20250805134042.2604897-2-dhill@redhat.com>
- <20250805195249.GB61519@horms.kernel.org>
- <6133c0c5-8a1a-48c3-9083-8cd307293120@intel.com>
- <20250808130115.GA1705@horms.kernel.org>
- <CANQtZ2wffk6jUTTMYFgTYxWQBc=hmw7nAkbYB2kxt-1ihUP9Rw@mail.gmail.com>
-Content-Language: en-US
-In-Reply-To: <CANQtZ2wffk6jUTTMYFgTYxWQBc=hmw7nAkbYB2kxt-1ihUP9Rw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hi Simon, Jacob,
+This series improves kernel documentation around Ethernet flow control
+and enhances the ynl tooling to generate kernel-doc comments for
+attribute enums.
 
-I’ve also been examining this issue, as it’s affecting us.
-I agree that handling the number of allowed filters per VF as a devlink 
-resource is the best long-term approach.
-However, currently in i40e, we only create a devlink port per PF and no 
-devlink ports per VF.
-Implementing the resource-per-VF approach would therefore require some 
-extra work.
-For now, could we adopt Simon’s devlink parameter suggestion as a 
-temporary solution and consider adding the resource-based approach in 
-the future?
+Patch 1 extends the ynl generator to emit kdoc for enums based on YAML
+attribute documentation.
+Patch 2 regenerates all affected UAPI headers (dpll, ethtool, team,
+net_shaper, netdev, ovpn) so that attribute enums now carry kernel-doc.
+Patch 3 adds a new flow_control.rst document and annotates the ethtool
+pause/pause-stat YAML definitions, relying on the kdoc generation
+support from the earlier patches.
 
-On 8/20/25 2:33 PM, Mohammad Heib wrote:
-> Hi Simon, Jacob,
->
-> I’ve also been examining this issue, as it’s affecting us.
-> I agree that handling the number of allowed filters per VF as a 
-> devlink resource is the best long-term approach.
-> However, currently in i40e, we only create a devlink port per PF and 
-> no devlink ports per VF.
-> Implementing the resource-per-VF approach would therefore require some 
-> extra work.
-> For now, could we adopt Simon’s devlink parameter suggestion as a 
-> temporary solution and consider adding the resource-based approach in 
-> the future?
+Oleksij Rempel (3):
+  tools: ynl-gen: generate kdoc for attribute enums
+  net: ynl: add generated kdoc to UAPI headers
+  Documentation: net: add flow control guide and document ethtool API
+
+ Documentation/netlink/specs/ethtool.yaml      |  27 ++
+ Documentation/networking/flow_control.rst     | 379 ++++++++++++++++++
+ Documentation/networking/index.rst            |   1 +
+ Documentation/networking/phy.rst              |  12 +-
+ include/linux/ethtool.h                       |  45 ++-
+ include/uapi/linux/dpll.h                     |  30 ++
+ .../uapi/linux/ethtool_netlink_generated.h    |  57 ++-
+ include/uapi/linux/if_team.h                  |  11 +
+ include/uapi/linux/net_shaper.h               |  50 +++
+ include/uapi/linux/netdev.h                   | 165 ++++++++
+ include/uapi/linux/ovpn.h                     |  62 +++
+ net/dcb/dcbnl.c                               |   2 +
+ net/ethtool/pause.c                           |   4 +
+ tools/include/uapi/linux/netdev.h             | 165 ++++++++
+ tools/net/ynl/pyynl/ynl_gen_c.py              |  23 ++
+ 15 files changed, 1018 insertions(+), 15 deletions(-)
+ create mode 100644 Documentation/networking/flow_control.rst
+
+--
+2.39.5
 
 
