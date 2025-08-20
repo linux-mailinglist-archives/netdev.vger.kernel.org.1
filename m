@@ -1,30 +1,31 @@
-Return-Path: <netdev+bounces-215262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6B70B2DD64
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 15:11:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B246B2DD6C
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 15:12:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF8EB17BFA9
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 13:11:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BE986270CA
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 13:11:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE00531B125;
-	Wed, 20 Aug 2025 13:10:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D442331CA57;
+	Wed, 20 Aug 2025 13:10:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5363131AF21
-	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 13:10:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3827B31DD81
+	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 13:10:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755695453; cv=none; b=tMe3lAiOo1v372HQunA+SCTRiicPprjRezedEl9D/Sx4gHAsvjCMhGz0O8kGfcndZY9Q/MnDJT/eCPuyCs+Ok1Ol3MKUH53tLBRQqW5h230GwVoWvVHAAKhvdJZxSXgiMH03HCQtg2k3LNJnVRyURL7jXVGjH04Nj/Huc5I89ZI=
+	t=1755695457; cv=none; b=XupuqBqGC/Cz/2oNPw6CIri+zEp/Fkee5FZt5R8hVIbvfsS3Q7IGzArdkNAmeOdfRWjiES4TWKGmX0u8h/2Pp+8P8eW/G/2Sit59azK0dRLkGF7eimeJ6eIgRdcxp8SpUquq6p//nCbnWFZlXazIWkVjeAXu5HLaOZyFU7iMJh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755695453; c=relaxed/simple;
-	bh=yKVG4JgXuOy0kLK2+1t9JbSUAY/kx7t7yYGBQ5c+L7E=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=P5vcIC9a5RgofM3x+KE2lnDthOsUflmGDwfAhltXdY8waM57LEEn0TXmer/Kl7WJzwwsiGJ7zWuax5fT1E1xsc9Vrt5KZxnmRTCt25e02h2tjw8BW5ZdcK5ap38Ty78oXVnpwoUC69GY2oOS4OJq32TKRgLMRvd/owYJmLBGZuQ=
+	s=arc-20240116; t=1755695457; c=relaxed/simple;
+	bh=fhBwj0/qXS75pS91i/DiEjnO64GV2qzUt87N+q2z4SI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=JhaA7dod14nAdpsb02mV/2KmazK4uCj9Yto1c5amcY+KtHwoAhQGpW0uXqFgK8UaNQ1ZJtvUYyULd33/rarQDJD6M5Nh/APyenOMxTnH4Y6+moHxAchw6HElzKeBCV06cJG86X1kOb2pkyxrVynj3PZphPZgK0Fa7DpjFGIhaTw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -32,16 +33,16 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1uoiaA-0007YF-9i; Wed, 20 Aug 2025 15:10:26 +0200
+	id 1uoiaA-0007YG-9h; Wed, 20 Aug 2025 15:10:26 +0200
 Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1uoia8-001Fnc-2C;
+	id 1uoia8-001Fnd-2G;
 	Wed, 20 Aug 2025 15:10:24 +0200
 Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1uoia8-003atA-1s;
+	id 1uoia8-003atK-1x;
 	Wed, 20 Aug 2025 15:10:24 +0200
 From: Oleksij Rempel <o.rempel@pengutronix.de>
 To: Andrew Lunn <andrew@lunn.ch>,
@@ -73,10 +74,12 @@ Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
 	Divya.Koppera@microchip.com,
 	Sabrina Dubroca <sd@queasysnail.net>,
 	Stanislav Fomichev <sdf@fomichev.me>
-Subject: [PATCH net-next v3 0/3] Documentation and ynl: add flow control
-Date: Wed, 20 Aug 2025 15:10:20 +0200
-Message-Id: <20250820131023.855661-1-o.rempel@pengutronix.de>
+Subject: [PATCH net-next v3 1/3] tools: ynl-gen: generate kdoc for attribute enums
+Date: Wed, 20 Aug 2025 15:10:21 +0200
+Message-Id: <20250820131023.855661-2-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250820131023.855661-1-o.rempel@pengutronix.de>
+References: <20250820131023.855661-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,42 +92,56 @@ X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-This series improves kernel documentation around Ethernet flow control
-and enhances the ynl tooling to generate kernel-doc comments for
-attribute enums.
+Parse 'doc' strings from the YAML spec to generate kernel-doc comments
+for the corresponding enums in the C UAPI header, making the headers
+self-documenting.
 
-Patch 1 extends the ynl generator to emit kdoc for enums based on YAML
-attribute documentation.
-Patch 2 regenerates all affected UAPI headers (dpll, ethtool, team,
-net_shaper, netdev, ovpn) so that attribute enums now carry kernel-doc.
-Patch 3 adds a new flow_control.rst document and annotates the ethtool
-pause/pause-stat YAML definitions, relying on the kdoc generation
-support from the earlier patches.
+The generated comment format depends on the documentation available:
+ - a full kdoc block ('/**') with @member tags is used if attributes are
+   documented
+ - a simple block comment ('/*') is used if only the set itself has a doc
+   string
 
-Oleksij Rempel (3):
-  tools: ynl-gen: generate kdoc for attribute enums
-  net: ynl: add generated kdoc to UAPI headers
-  Documentation: net: add flow control guide and document ethtool API
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+---
+ tools/net/ynl/pyynl/ynl_gen_c.py | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
- Documentation/netlink/specs/ethtool.yaml      |  27 ++
- Documentation/networking/flow_control.rst     | 379 ++++++++++++++++++
- Documentation/networking/index.rst            |   1 +
- Documentation/networking/phy.rst              |  12 +-
- include/linux/ethtool.h                       |  45 ++-
- include/uapi/linux/dpll.h                     |  30 ++
- .../uapi/linux/ethtool_netlink_generated.h    |  57 ++-
- include/uapi/linux/if_team.h                  |  11 +
- include/uapi/linux/net_shaper.h               |  50 +++
- include/uapi/linux/netdev.h                   | 165 ++++++++
- include/uapi/linux/ovpn.h                     |  62 +++
- net/dcb/dcbnl.c                               |   2 +
- net/ethtool/pause.c                           |   4 +
- tools/include/uapi/linux/netdev.h             | 165 ++++++++
- tools/net/ynl/pyynl/ynl_gen_c.py              |  23 ++
- 15 files changed, 1018 insertions(+), 15 deletions(-)
- create mode 100644 Documentation/networking/flow_control.rst
-
---
+diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
+index ef032e17fec4..d7634560c461 100755
+--- a/tools/net/ynl/pyynl/ynl_gen_c.py
++++ b/tools/net/ynl/pyynl/ynl_gen_c.py
+@@ -3225,6 +3225,29 @@ def render_uapi(family, cw):
+         if attr_set.subset_of:
+             continue
+ 
++        # Write kdoc for attribute-set enums
++        has_main_doc = 'doc' in attr_set.yaml and attr_set.yaml['doc']
++        has_attr_doc = any('doc' in attr for _, attr in attr_set.items())
++
++        if has_main_doc or has_attr_doc:
++            if has_attr_doc:
++                cw.p('/**')
++                # Construct the main description line for the enum
++                doc_line = f"enum {c_lower(family.ident_name + '_' + attr_set.name)}"
++                if has_main_doc:
++                    doc_line += f" - {attr_set.yaml['doc']}"
++                cw.write_doc_line(doc_line)
++
++                # Write documentation for each attribute (enum member)
++                for _, attr in attr_set.items():
++                    if 'doc' in attr and attr['doc']:
++                        doc = f"@{attr.enum_name}: {attr['doc']}"
++                        cw.write_doc_line(doc)
++            else:  # Only has main doc, use a simpler comment block
++                cw.p('/*')
++                cw.write_doc_line(attr_set.yaml['doc'], indent=False)
++            cw.p(' */')
++
+         max_value = f"({attr_set.cnt_name} - 1)"
+ 
+         val = 0
+-- 
 2.39.5
 
 
