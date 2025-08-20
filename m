@@ -1,76 +1,86 @@
-Return-Path: <netdev+bounces-215208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A539BB2D9FA
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 12:26:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 30325B2DA26
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 12:35:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F9E33B8117
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 10:26:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5872687C9F
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 10:35:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5573C2DEA9D;
-	Wed, 20 Aug 2025 10:25:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC9622DFA2B;
+	Wed, 20 Aug 2025 10:35:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rcm4PIzE"
 X-Original-To: netdev@vger.kernel.org
-Received: from elvis.franken.de (elvis.franken.de [193.175.24.41])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6F5F19D8A8;
-	Wed, 20 Aug 2025 10:25:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.175.24.41
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B89CA2D94A5
+	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 10:35:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755685559; cv=none; b=oh4bOZLchlfVtReCTFa+pv1efVyHOauvuGUXVSRKubteyBmtNDi7XublzLwB6kpK8eNPR3n7A6J7RZoatXceVTSigAcMwd3b0CKi0g/LA0pwnc+LAujZXOzbakviPtJ5k8Him6EUpTXXYAC20RRU0T2kLF2hZVutB5DPYw8H94U=
+	t=1755686138; cv=none; b=pHUtAAGnMtqnodFtct0ecQFGPdPx4GS5BVLJqNAbwPCGP/fq5oSkxNtgo+fL3RRn5WSi9adyA0L0+QNZhG9wPrxlDf94QDICsMhaPhdU7U8s/g9flFK/HNDFF6AmPRiHurg3yC8MXE50qrdeA6WV4mB281dbrF2gVQnafIJEqm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755685559; c=relaxed/simple;
-	bh=e24nH6hB1zqybFzLAcWiXaeMPH2em6ptEvBmNhj1Ay4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t7i14QplJezVLRk0Bna+FzeIQhxAXh6q1cB6gDj8xIfKwiXXcZJ9LtYIRBT9rapQB3UcLLC46goCvO1+O9zl26kOQ/S2JioGBeW4IFGUFxwkFwd1xpLkE/k8woSUUnvXzzboNQpaK8Wyrdi5FOXHJ2ccuM2DKJnEQg8hoxaFCY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alpha.franken.de; spf=pass smtp.mailfrom=alpha.franken.de; arc=none smtp.client-ip=193.175.24.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alpha.franken.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alpha.franken.de
-Received: from uucp by elvis.franken.de with local-rmail (Exim 3.36 #1)
-	id 1uog0s-0006tc-00; Wed, 20 Aug 2025 12:25:50 +0200
-Received: by alpha.franken.de (Postfix, from userid 1000)
-	id 79453C075D; Wed, 20 Aug 2025 12:24:25 +0200 (CEST)
-Date: Wed, 20 Aug 2025 12:24:25 +0200
-From: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Aleksander Jan Bajkowski <olek2@wp.pl>, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	john@phrozen.org, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2 0/2] mips: lantiq: fix ethernet support
-Message-ID: <aKWiWX50F6kQNc13@alpha.franken.de>
-References: <20250817131022.3796476-1-olek2@wp.pl>
- <20250819182641.1b7ff210@kernel.org>
+	s=arc-20240116; t=1755686138; c=relaxed/simple;
+	bh=5LVI1KmzUCzUxqGkfJb6tjeX2FuOB0wXbJzcvKDhOvk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=U2Niuo38xDF9NMojZcUL3cMpxljWopzvw0hGrB8ux3dZ9N4yM3y2zwE0mFYh5dSYYJXRdlXCJx04Ha5Ec5nzHhZa6LAQokquoKyhbYW/fYFelBXJuiffaeFoQ8ElJCXi7ZBFIP9LApLFGNLpyvFSoa2j4nb2De9/DWRhJcdTVAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rcm4PIzE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 267E0C4CEEB;
+	Wed, 20 Aug 2025 10:35:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755686138;
+	bh=5LVI1KmzUCzUxqGkfJb6tjeX2FuOB0wXbJzcvKDhOvk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=rcm4PIzEswEuJxPIAMekBfQT3I+DcD4byxky+Tx5Ha6jUxaUVzvs3YjUKGIWJR11D
+	 nw+GTMer8BFNHFnFWvIVBATbxC0RErXZIxUDsVmVTn2Psfwt4S7KT2puiD7ZizBMRE
+	 lPCm+UuPye9NDinxAgfYzi/pPfryFLbOzM/Ua5zWTH/YP2BhkrAZW3YOebbKgGVnqr
+	 1mOANTRH21eJwCopUtEwCqqDxsUohgglPEkI4SbKSxJ4M1qQiDdmj6ZzC1sU6+9EpE
+	 wd8RWzBLFpXre0H5IMeNLLaHym1wZqdBraSi9FX72EX1blgFdlFAv7CE+bijVjO5gi
+	 rzgytonvYDIPQ==
+Message-ID: <bafcd787-fed4-4133-a27a-97114a744c62@kernel.org>
+Date: Wed, 20 Aug 2025 12:35:31 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250819182641.1b7ff210@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 01/15] net: page_pool: add page_pool_get()
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, almasrymina@google.com,
+ michael.chan@broadcom.com, tariqt@nvidia.com, dtatulea@nvidia.com,
+ ilias.apalodimas@linaro.org, alexanderduyck@fb.com, sdf@fomichev.me
+References: <20250820025704.166248-1-kuba@kernel.org>
+ <20250820025704.166248-2-kuba@kernel.org>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20250820025704.166248-2-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 19, 2025 at 06:26:41PM -0700, Jakub Kicinski wrote:
-> On Sun, 17 Aug 2025 14:49:05 +0200 Aleksander Jan Bajkowski wrote:
-> > This series fixes broken Ethernet in the upstream danube dts. The
-> > driver doesn't attach due to missing burst length property. OpenWRT
-> > has its own dts, which is correct, so the problem has only been
-> > spotted now. Other dts inconsistencies with bindings have been
-> > fixed as well.
+
+
+On 20/08/2025 04.56, Jakub Kicinski wrote:
+> There is a page_pool_put() function but no get equivalent.
+> Having multiple references to a page pool is quite useful.
+> It avoids branching in create / destroy paths in drivers
+> which support memory providers.
 > 
-> Hi Thomas, Aleksander tagged these for net, are you okay with us taking
-> them via the networking tree? Looks like these are half DTS changes.
+> Use the new helper in bnxt.
+> 
+> Signed-off-by: Jakub Kicinski<kuba@kernel.org>
+> ---
+>   include/net/page_pool/helpers.h           |  5 +++++
+>   drivers/net/ethernet/broadcom/bnxt/bnxt.c | 11 +++++------
+>   2 files changed, 10 insertions(+), 6 deletions(-)
 
-Aleksander is further changing the Lantiq DTs, so I'd prefer to take
-this patches through the MIPS tree.
+LGTM
 
-Thomas.
-
--- 
-Crap can work. Given enough thrust pigs will fly, but it's not necessarily a
-good idea.                                                [ RFC1925, 2.3 ]
+Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
 
