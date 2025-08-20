@@ -1,197 +1,136 @@
-Return-Path: <netdev+bounces-215268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B171B2DD8D
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 15:17:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79576B2DD9A
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 15:19:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 057071C80A21
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 13:17:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48C7F5C5452
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 13:18:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82BA32E11B8;
-	Wed, 20 Aug 2025 13:17:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CA2F31CA72;
+	Wed, 20 Aug 2025 13:18:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kloWcBFc"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ENwthEb+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a7-smtp.messagingengine.com (fhigh-a7-smtp.messagingengine.com [103.168.172.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7CCD27BF99
-	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 13:17:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E47F17BEBF;
+	Wed, 20 Aug 2025 13:18:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755695828; cv=none; b=Y6aeuBabgs2EpIMYzyNpMpUXIPH2/R8l8aiOFKOSamrljUW3ZhNA7B+i/h39FZjRl9R/F1OaNMjUb8nWFaCJyqlytzOfRyArG/3aJrvkEmhv+a06FEETDjH2+mMC3Gyc9gb3NfmG4Kt+TpkMvTFiKFJUrxz5yh4H0OVl4YeNKak=
+	t=1755695896; cv=none; b=omWgzDg6218xhtbvSqK+3RRIAdHo3rkxYgD1vbmJyNlSn7JvY5C5eNC80WbtlqGeq2aH29ci6uYyAgOSD8fNeuzfQKg2Q6+psU5ejwHEMmZXBk1nEAu7YD6xPCN57KU4cIXQj932oMn3ryh9vJlDJHmv4j4FMVdqIAV3DtKSAtI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755695828; c=relaxed/simple;
-	bh=VBz1KWhFCpG8jWrLgoBKbwZBD5H16rQ3iUyc84d5BWY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PdqEYx9AWXYS+SOa1bEviILLTH7zYC87xkZrVD7OpbxiTUsT4uYTYO727gYPs1hV4n15ZuhniVvXJmFY32cEPpgSerYRFt2w/5U94kE8mBOSG8X3sY7b7HfqJVudd366+nFIisuH1Pd0koXkv5KuGOm7skU6cJ3UuAiB7d9E7JE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kloWcBFc; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4b109c6532fso65243581cf.3
-        for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 06:17:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755695826; x=1756300626; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gLhF8h1sqXy3sl3VwtKNT/mJ1yJVmt1iTz/LotLfR2E=;
-        b=kloWcBFcLmSJbsiHuyV02wDhLaA9xLszeK6Ov6c/N5O2gEVGHFELyRKutOk1EKEdQe
-         cjWr+85Dv01/9lYcFS6UFH/EJGybpoDsD94g9JVg9TySS8Svj8EUXQwfxiWe5ul5PCc/
-         eRrWha8vHvR+Al22vqXcPN/WOmzWwJE+NEN7mOytVbC5BF9Ldcn3VwOJSalRbzLcrLmX
-         9+fEBALRJSyaOnIjHAAfjxTBb6oZn7ZXicOh6x0ntXB03PeS+dpvzCG8G2MQdXe3SpAH
-         zKklsFdDqT1j+KnhUj6cAD6vSO2Vfz7V5Oo3CzqfG2y4OlJ/ReNd46WkHScNRy0Ozhzb
-         kn/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755695826; x=1756300626;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gLhF8h1sqXy3sl3VwtKNT/mJ1yJVmt1iTz/LotLfR2E=;
-        b=Xlg3aB6iIXNyV9ujUrN8LjHQZWEjTDLBvn6/X5X1GExFPWa5iJ/7S1kD4bQQ/fQtL9
-         QGiTeliGaqlbVjZTf3sieuYC9SAJH7aeYVSCRPeULChPBDvCeJsQB2VhszbbKXRvaCoc
-         WZHL7q3zgyUuNv6i7hTcEhmVJ69EJh39j9LEIhC4cJ6E+6U6L8PLOlQvz7nCSAKZDKQk
-         DRRTfQiS2QUNqc54H0Cw9sMkR9EpIpXSTd985F3xzPwH4aiQt0HOZHYLoK4lOqJtg8hD
-         mSiqxMXLPN1e7+3Me3jhv9YWzdLP/lODf9F+bXOHrpzxmQuR1jBVdiHG7FayXPgS7ege
-         k2QA==
-X-Gm-Message-State: AOJu0Ywqmh3dbQtd3OrKtxX32QdyMDtnSlpp07WlVyzd4FctLsWcgm7c
-	GmE4JJuVgsO4PiIjsuVVNyyqaPZcuVW7l7l0NM4meo47DrJ5G1pmOpbUN7GLd86voTOwoTIUaTc
-	nL+yX4KXELCt4/MEAm9mxlsJr2vYEH5epHvoZ1mQRLHqu1sF0d7++QjLPCV8=
-X-Gm-Gg: ASbGncuzSEWM/4f2p09n1rjcq9Y1DY2hNsgbx04As1n8KdBTqEztrLMokny5/7Udiwd
-	hj/P81hX7f5HIoGO6qFpRuaM9TPjJmfJp7XnjWJRuqJK7ChzjVFxLt+Q/TPK6SwZnPRyLX/NOVW
-	L+sGZU3gt/lniX8NkPCkjyQekLVHpOQjRraOxV41HX1T8YORFI9WauN9A+QvyQS7soRWG8vazN7
-	piozg615x7lHOwiTvWaUoSWfGuUbnR5m3E=
-X-Google-Smtp-Source: AGHT+IFa83VqXeT0ie2ajR21WbocvR/2Bz8rM4LhXwoCUHU2FVbpTmSPqfLAprLGPUGGUdW6Pck4HNxdhSq6MmcIu8Y=
-X-Received: by 2002:a05:622a:4c0d:b0:4b0:78fb:39da with SMTP id
- d75a77b69052e-4b291a970acmr40724321cf.21.1755695824952; Wed, 20 Aug 2025
- 06:17:04 -0700 (PDT)
+	s=arc-20240116; t=1755695896; c=relaxed/simple;
+	bh=DOeocE2TSMK2zhBIMAISf0bA1p+4iSO7xk5SPu2tIfc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Doj94pHRqjC/H+u/+WvnzhYhYnRJZzTWNcvxh5XTCFjhKN9GnT57E8J0BAw4tYUmI5I3M8tcb6sFcYZRbovi46/vrDSYCAuarUwwGQ166r6h2+IU433DvPr+hAndKQQ04iJh2SppphJ/8pOS47F8ex/KCKJjRt7alfiXmf3ihM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ENwthEb+; arc=none smtp.client-ip=103.168.172.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 8EE3714003B9;
+	Wed, 20 Aug 2025 09:18:13 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-12.internal (MEProxy); Wed, 20 Aug 2025 09:18:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1755695893; x=1755782293; bh=dzEYBhueTWc89/MISWU3UFuCYVd1T4k9Kq6
+	zJAOupw0=; b=ENwthEb+Ky21vZLrX+qnv+f6AyHsIx3sG86siSeLtTHUVMBax0t
+	F8LjXTrl6bDCwwkpazNZ1JKKI8SUZfUdNRJQTYAB6zwsMzCxcsyjC2rfilufvjJm
+	fHeFGSgxSoLbr4Hv4hvFxdxN9my4gqkHxG8mHZLLoiXw+Yo7Lg0dyOTqSIXZ/apW
+	5lOzUhGnEstpFRCgGnhwNFkxOEQ7f4wue0v29runO6+kn2HMc6y8BUxk/rqwgkXJ
+	616kKKbNb+2n8TMJ7Cl52mtSsn1K2cWoPbv971dmy+sHg6cv3Wq9+ezIROl1ukYW
+	150wojWK9rXge+VNLyR5fzzopoHYCqV7npg==
+X-ME-Sender: <xms:FculaCYGrrWPF0axijoXPinf3zDEc23SrYUvRpMwO2-YuvP5dgLb4w>
+    <xme:FculaNAdgcf33lpjBApqpzPojukmSZwNBvB8-ClHh9iWZgawiGXRqjlknLbOU6PhI
+    2eZLay7Xo5c95g>
+X-ME-Received: <xmr:FculaKmM61xFbleSxj4UZnpMkvqtc-1v_Vd-iHYpfmWnjhGXUPLIvTr6zhBR>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdduheekgeejucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcuufgt
+    hhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrthhtvg
+    hrnhephefhtdejvdeiffefudduvdffgeetieeigeeugfduffdvffdtfeehieejtdfhjeek
+    necuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtne
+    curfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhn
+    sggprhgtphhtthhopeejpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehmrhhghh
+    hoshhhsegtihhstghordgtohhmpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehv
+    ghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkh
+    gvrhhnvghlrdhorhhgpdhrtghpthhtohepsghrihgughgvsehlihhsthhsrdhlihhnuhig
+    qdhfohhunhgurghtihhonhdrohhrghdprhgtphhtthhopehmrhhinhhmohihpghgsehhoh
+    htmhgrihhlrdgtohhmpdhrtghpthhtohepphgsrhhishhsvghtsegtihhstghordgtohhm
+    pdhrtghpthhtoheprhgriihorhessghlrggtkhifrghllhdrohhrgh
+X-ME-Proxy: <xmx:FculaOx3A_6SA5pGhBWbRiMK4Rv60ltL88f9wjl8fyvvfTSvU-KhVw>
+    <xmx:FculaEQ1se9V8cAT_kw_d2MzpUhDW8u0-7FP4MopGEVwFX1JJczLRQ>
+    <xmx:FculaG9UPX8vb_kM0Zr0onUtfO7JIAFIGY4uZPGw6PHKxS2dNiAjPw>
+    <xmx:FculaCurBEBKqQ2g7j75PTVVDoj8tlOEatuaO6tpPTfNfJRH0kBslA>
+    <xmx:FculaMqjobtMGghfqMasYWhjjWBzFWAVbdBa_9J9KjRWlAEW__FgvqKB>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 20 Aug 2025 09:18:12 -0400 (EDT)
+Date: Wed, 20 Aug 2025 16:18:10 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Mrinmoy Ghosh <mrghosh@cisco.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	bridge@lists.linux-foundation.org,
+	Mrinmoy Ghosh <mrinmoy_g@hotmail.com>,
+	Patrice Brissette <pbrisset@cisco.com>, razor@blackwall.org
+Subject: Re: [PATCH] net: bridge: vxlan: Protocol field in bridge fdb
+Message-ID: <aKXLEiY8gd0sNGrW@shredder>
+References: <20250818175258.275997-1-mrghosh@cisco.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250820123707.10671-1-fw@strlen.de>
-In-Reply-To: <20250820123707.10671-1-fw@strlen.de>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 20 Aug 2025 06:16:54 -0700
-X-Gm-Features: Ac12FXzQjiSGePtH8Nfvv5F1MFLdawJfQS_iax-aouAf9UNAQdyMF4GaKRbuoiE
-Message-ID: <CANn89i+EQTt8eaBT0=1U=1JjOb5K5_hH=OhESo9_1hnU5XZU1g@mail.gmail.com>
-Subject: Re: [PATCH net] netfilter: nf_reject: don't leak dst refcount for
- loopback packets
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, netfilter-devel@vger.kernel.org, 
-	pablo@netfilter.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250818175258.275997-1-mrghosh@cisco.com>
 
-On Wed, Aug 20, 2025 at 5:37=E2=80=AFAM Florian Westphal <fw@strlen.de> wro=
-te:
->
-> recent patches to add a WARN() when replacing skb dst entry found an
-> old bug:
->
-> WARNING: include/linux/skbuff.h:1165 skb_dst_check_unset include/linux/sk=
-buff.h:1164 [inline]
-> WARNING: include/linux/skbuff.h:1165 skb_dst_set include/linux/skbuff.h:1=
-210 [inline]
-> WARNING: include/linux/skbuff.h:1165 nf_reject_fill_skb_dst+0x2a4/0x330 n=
-et/ipv4/netfilter/nf_reject_ipv4.c:234
-> [..]
-> Call Trace:
->  nf_send_unreach+0x17b/0x6e0 net/ipv4/netfilter/nf_reject_ipv4.c:325
->  nft_reject_inet_eval+0x4bc/0x690 net/netfilter/nft_reject_inet.c:27
->  expr_call_ops_eval net/netfilter/nf_tables_core.c:237 [inline]
->  ..
->
-> This is because blamed commit forgot about loopback packets.
-> Such packets already have a dst_entry attached, even at PRE_ROUTING stage=
-.
->
-> Instead of checking hook just check if the skb already has a route
-> attached to it.
->
-> Fixes: f53b9b0bdc59 ("netfilter: introduce support for reject at prerouti=
-ng stage")
-> Signed-off-by: Florian Westphal <fw@strlen.de>
++ Nik
+
+Please use scripts/get_maintainer.pl when submitting a patch.
+
+On Mon, Aug 18, 2025 at 05:52:58PM +0000, Mrinmoy Ghosh wrote:
+> This is to add optional "protocol" field for bridge fdb entries.
+> The introduction of the 'protocol' field in the bridge FDB for EVPN Multihome, addresses the need to distinguish between MAC addresses learned via the control plane and those learned via the data plane with data plane aging. Specifically:
+> * A MAC address in an EVPN Multihome environment can be learned either through the control plane (static MAC) or the data plane (dynamic MAC with aging).
+> * The 'protocol' field uses values such as 'HW' for data plane dynamic MACs and 'ZEBRA' for control plane static MACs.
+> * This distinction allows the application to manage the MAC address state machine effectively during transitions, which can occur due to traffic hashing between EVPN Multihome peers or mobility of MAC addresses across EVPN peers.
+> * By identifying the source of the MAC learning (control plane vs. data plane), the system can handle MAC aging and mobility more accurately, ensuring synchronization between control and data planes and improving stability and reliability in MAC route handling.
+> 
+> This mechanism supports the complex state transitions and synchronization required in EVPN Multihome scenarios, where MAC addresses may move or be learned differently depending on network events and traffic patterns.
+
+[...]
+
+> Signed-off-by: Mrinmoy Ghosh <mrghosh@cisco.com>
+> Co-authored-by: Mrinmoy Ghosh <mrinmoy_g@hotmail.com>
+> Co-authored-by: Patrice Brissette <pbrisset@cisco.com>
 > ---
->  Sending this instead of a pull request. the only other two
->  candidates for -net are still under review.
->
->  Let me know if you prefer a normal pull request even in this case.
->  Thanks!
->
+>  drivers/net/vxlan/vxlan_core.c      | 132 ++++++++++++++--------------
+>  drivers/net/vxlan/vxlan_private.h   |  21 +++--
+>  drivers/net/vxlan/vxlan_vnifilter.c |  11 +--
+>  net/bridge/br.c                     |   4 +-
+>  net/bridge/br_fdb.c                 |  52 ++++++++---
+>  net/bridge/br_private.h             |   5 +-
+>  6 files changed, 127 insertions(+), 98 deletions(-)
 
-Great, I was looking at an internal syzbot report with this exact issue.
+Please read these two documents and make changes accordingly before
+submitting a new version:
 
+https://docs.kernel.org/process/submitting-patches.html
+https://docs.kernel.org/process/maintainer-netdev.html
 
+At the very least the patch should be split to a bridge patch and a
+VXLAN patch. I will provide more comments later this week.
 
-WARNING: CPU: 1 PID: 5922 at ./include/linux/skbuff.h:1165
-skb_dst_check_unset include/linux/skbuff.h:1164 [inline]
-WARNING: CPU: 1 PID: 5922 at ./include/linux/skbuff.h:1165 skb_dst_set
-include/linux/skbuff.h:1211 [inline]
-WARNING: CPU: 1 PID: 5922 at ./include/linux/skbuff.h:1165
-nf_reject6_fill_skb_dst net/ipv6/netfilter/nf_reject_ipv6.c:264
-[inline]
-WARNING: CPU: 1 PID: 5922 at ./include/linux/skbuff.h:1165
-nf_send_unreach6+0x828/0xa20 net/ipv6/netfilter/nf_reject_ipv6.c:401
-Modules linked in:
-CPU: 1 UID: 0 PID: 5922 Comm: kworker/1:3 Not tainted syzkaller #0 PREEMPT(=
-full)
-Hardware name: Google Google Compute Engine/Google Compute Engine,
-BIOS Google 07/12/2025
-Workqueue: wg-crypt-wg0 wg_packet_tx_worker
-RIP: 0010:skb_dst_check_unset include/linux/skbuff.h:1164 [inline]
-RIP: 0010:skb_dst_set include/linux/skbuff.h:1211 [inline]
-RIP: 0010:nf_reject6_fill_skb_dst
-net/ipv6/netfilter/nf_reject_ipv6.c:264 [inline]
-RIP: 0010:nf_send_unreach6+0x828/0xa20 net/ipv6/netfilter/nf_reject_ipv6.c:=
-401
-Code: 85 f6 74 0a e8 a9 6c 7a f7 e9 c8 fc ff ff e8 9f 6c 7a f7 4c 8b
-7c 24 18 e9 34 fa ff ff e8 90 6c 7a f7 eb 9b e8 89 6c 7a f7 90 <0f> 0b
-90 e9 c7 fb ff ff 48 85 db 0f 84 81 00 00 00 4c 8d a4 24 20
-RSP: 0018:ffffc90000a083c0 EFLAGS: 00010246
-RAX: ffffffff8a453fa7 RBX: ffff88802e6888c0 RCX: ffff88802fc3da00
-RDX: 0000000000000100 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: ffffc90000a08568 R08: ffff888078550b83 R09: 1ffff1100f0aa170
-R10: dffffc0000000000 R11: ffffed100f0aa171 R12: ffff888079bb4101
-R13: dffffc0000000001 R14: 1ffff11005cd1123 R15: 0000000000000000
-FS: 0000000000000000(0000) GS:ffff888125d1b000(0000) knlGS:0000000000000000
-CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fd4758e56c0 CR3: 00000000776ca000 CR4: 00000000003526f0
-Call Trace:
-<IRQ>
-nft_reject_inet_eval+0x441/0x690 net/netfilter/nft_reject_inet.c:44
-expr_call_ops_eval net/netfilter/nf_tables_core.c:237 [inline]
-nft_do_chain+0x40c/0x1920 net/netfilter/nf_tables_core.c:285
-nft_do_chain_inet+0x25d/0x340 net/netfilter/nft_chain_filter.c:161
-nf_hook_entry_hookfn include/linux/netfilter.h:158 [inline]
-nf_hook_slow+0xc5/0x220 net/netfilter/core.c:623
-nf_hook include/linux/netfilter.h:273 [inline]
-NF_HOOK+0x206/0x3a0 include/linux/netfilter.h:316
-__netif_receive_skb_one_core net/core/dev.c:5979 [inline]
-__netif_receive_skb+0xd3/0x380 net/core/dev.c:6092
-process_backlog+0x60e/0x14f0 net/core/dev.c:6444
-__napi_poll+0xc7/0x360 net/core/dev.c:7494
-napi_poll net/core/dev.c:7557 [inline]
-net_rx_action+0x707/0xe30 net/core/dev.c:7684
-handle_softirqs+0x283/0x870 kernel/softirq.c:579
-do_softirq+0xec/0x180 kernel/softirq.c:480
-</IRQ>
-<TASK>
-__local_bh_enable_ip+0x17d/0x1c0 kernel/softirq.c:407
-wg_socket_send_skb_to_peer+0x16b/0x1d0 drivers/net/wireguard/socket.c:184
-wg_packet_create_data_done drivers/net/wireguard/send.c:251 [inline]
-wg_packet_tx_worker+0x1c8/0x7c0 drivers/net/wireguard/send.c:276
-process_one_work kernel/workqueue.c:3236 [inline]
-process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3319
-worker_thread+0x8a0/0xda0 kernel/workqueue.c:3400
-kthread+0x711/0x8a0 kernel/kthread.c:463
-ret_from_fork+0x3f9/0x770 arch/x86/kernel/process.c:148
-ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-</TASK>
+Thanks
 
