@@ -1,152 +1,118 @@
-Return-Path: <netdev+bounces-215408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65B2DB2E852
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 00:49:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 500C3B2E854
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 00:50:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5BCA3BB270
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 22:47:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48A1BAA42AE
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 22:49:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 772412D661D;
-	Wed, 20 Aug 2025 22:47:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD6182D661D;
+	Wed, 20 Aug 2025 22:49:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E2Pcsw1B"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RjWsvsE7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B33E92D0C8A;
-	Wed, 20 Aug 2025 22:47:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BEF1222584
+	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 22:49:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755730066; cv=none; b=DjM4d4T733XwtNtck39T55CH/N9SAFiu7O8ay3vW9c5bp4yODOuiQ8rIoNwmAUVp8DtaO7cO8K2B5oav1TGlGUuEo9nuPAzxpqz2fhs7K7lBKyyF8rOQrb0sCIG/AmJkp02PwBYUpJ39qFCx8RtmsGECiwW7uAg9pT0sJ27qHR8=
+	t=1755730151; cv=none; b=WC0WSmagkUMzcs9FNf9ThDPf2S/7WxdIzBKZ8L0HvTtOZxJlEICd9A1u6plwv6S053VIoQdIS9uM6Z7iwURRS1rMP2/cxjzZbb5J0hWuyOpo8V4I7j0UBl9KZQ/n/9dE7UHyjbn1N6YUrFQGkXOn3ciR2Grw2Y1m0res0BZbZI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755730066; c=relaxed/simple;
-	bh=aKHlxeIJj0NhWL5rFj8SAJiHfOeC64OVey16cOjjDKI=;
+	s=arc-20240116; t=1755730151; c=relaxed/simple;
+	bh=D5XMdSUaoflvoWDHrYNuRLgXNYvL1UIYdqWuCZ7I1zU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fpyhxQVc5q+FDGpaZq6h5x3SjJk7NHO1ghmNdjHK5B61NfNdZbZSLsdxBiaW4S/X5Yvvnn7PiWyBO9RVBWCX2rXbcpBfPsJxlJffpcCWr1qgXBaANBGLlR6z34XxvOe4LGld70Mjm7qOGd2Us6Z5CR8I0fhPg6VtI675prpvjaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E2Pcsw1B; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-24458242b33so3674965ad.3;
-        Wed, 20 Aug 2025 15:47:44 -0700 (PDT)
+	 To:Cc:Content-Type; b=UNGPJCETwtCJFzb14dF3iDuj7yNFQyRxrGKGbS8fybWEJON7PELiRucaN7j0huHV/jgZcnnYlJvYclBpxkWXygeRkBm+hEN2UnMXjTbqNZshEceA27C9sWFrmG7s5nbFkB0lzMyUV0VTwVb5lLxm8gpM1MFUGsFEkr/Pg4qU5uw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RjWsvsE7; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4b0bd88ab8fso93531cf.0
+        for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 15:49:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755730064; x=1756334864; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1755730149; x=1756334949; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CxmSUEH8XUSKiQrWMIiadQU2ELcXoRKtyFDMxUyNAvc=;
-        b=E2Pcsw1BqHvWTEXpS7whBjZ/U9SZLDI6RCDM2qdC2D8zQFHsawh0I6FTheJakR+9PC
-         bs+2JA5CkjLH92YVnKFCQlVjUVQnPpMrr5UcGjpblH9TOGLHRQyxKjTNrrdLawHAr3Nu
-         q9gD/hwnYq3/bI8oolo7QyJW4bh7Ltc6w3Qwczq2yO4oGq6XFyxz09pcuF6gPh2QzfmZ
-         YjH/LICDUabWkb+giyuM5l3q/esLIzFrW6iAe416YjjgoS8HjUktCz+ais5tcTvYn+J9
-         ztOOVg9481vZyQwR8lgF6Uablo1Kh52gg5Bs7CZrwRwqQbFMgLjR7qTtA4/ixRE54lQn
-         jXYA==
+        bh=D5XMdSUaoflvoWDHrYNuRLgXNYvL1UIYdqWuCZ7I1zU=;
+        b=RjWsvsE7yb7wZZOS/zb5AFBNhs+5wwj8zWWE2NKlv2O7E/0i7v7mhpVn57H5Go734U
+         hqdTSnEUH/GOjEac7hFqWp8BACQEoal9V+BChJdjq87iUcHEAIP7giE/n8+4o6gzsxfd
+         dY5OQXF5W8vmsDbpcIhwBMWnpw9298jIZIAwVTLwG28u9JPn0+Yf/S1WRPrhUTxa24tB
+         EwTt7Ki06qK0wz2Sgejhg3ncPD5GzgmpXhvvjVA38b2/i7EV7RtbXBzyVzXQXoyZhIsC
+         6fC0K6zP4YNAFrBi6mM5QP7xaxCGcsPtSi873/1N0karPz5cNcTvWIcOaRp+VCQvhXha
+         ULRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755730064; x=1756334864;
+        d=1e100.net; s=20230601; t=1755730149; x=1756334949;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CxmSUEH8XUSKiQrWMIiadQU2ELcXoRKtyFDMxUyNAvc=;
-        b=jnEINlJg2ii4+roTtTRpdEnE/Q6d7vA8LTyoBe81teLatS8dVVCWwWlIvwsu4hHYXI
-         FF2w2KZfEhxto2CPshEBZg45w3eCUG21LUy/qNW512aQT8sbFS5XEMdAtoSle7yxf7Ps
-         J4Q+FP5O3YfBkHjuH/fg1wyAYH0qTaITi2/lC8+//s2/d6unBJh/sGSdCnV0VU7M92aG
-         YJgU97FyaQ5oe9CLAhm8oPj030sNErQLk291MJ+Iv/G1vB8Uq6TurjITcnLzcpyxsIuW
-         HLQNJ3C8rSgljrwzpwdPPLpjUkNC3wAJnr57czqrRpmXjHeBJS0OPb6MgdUGDBb8zIE0
-         KCqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUJ7xjjhizhfp6lIvotk0Dx2vC96T9QeQTa8oz+oaB3PDaGL+m/Grs2acbJbgj9UXViN7eygvfb1UhS7BXvku2l@vger.kernel.org, AJvYcCWiYrBs5RrL+i6HMhsrw2VjbWrKURdy+BSzN7OGXUB8tBi5MTWmt/nepiz5i5XIbkE0d8I=@vger.kernel.org, AJvYcCXMVeeK0dTdgr4KkhPdEICnbYnYzidEDOPDFMQRxzT82LkybeRDpHkCbsA+6x2mKSU/f3EHtgydmlci1g38@vger.kernel.org, AJvYcCXbSfyi+9HbkIa+KbMxGrcllKPt8OgSsFuNzPpsXwHawXkkRBPoLe0eJ5f7fzzB9UVeXlgcr/P4@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrAAcnn4+YOjzOeX4H0nnxmbTV8BLqUO1z5I6IStiET3L3rr5p
-	ergEyhoxuEmz5Rs78ifm1EDJiB0kNCTnov9wh4srtEwH0J/yfAM/4gvyKDUuqsB8zKRFwTgo9az
-	wX5Qlba4xt+wUEJCU5N0wGdPd0QAcp3Y=
-X-Gm-Gg: ASbGncsg9x7k8yWRpq0nGBkGlm2CatnZQWpBt3vFOX0eGS4CaamMQ97XcV9xUxgZLJ9
-	QP/5HdG16rKVuJrjwfnn1Ktf2nPoZW3MdmMNNgQQh9foMIrfUbKK8g38u/yzooNyXX/86+NiW0X
-	lSXGgmIPDC2cVZXK0vD+oqskieaGgioaOVNfV2OCOMh78ia7oZf2QL9+fnHbp95a51V2MDQfQOl
-	WE8PID7rEARuR5fIXlo05WKxcV8PbYyJePPU3+rZEnN
-X-Google-Smtp-Source: AGHT+IGfXE/LPyy5OpwjdvIBYFagxDqu+JLxgJsnoM4MRvNr7cBY/jRWzrvpmvFodOiN1fufMP+/m2v1odbFJOTclS0=
-X-Received: by 2002:a17:902:e884:b0:23f:f707:f97e with SMTP id
- d9443c01a7336-245fec04067mr6138445ad.17.1755730063826; Wed, 20 Aug 2025
- 15:47:43 -0700 (PDT)
+        bh=D5XMdSUaoflvoWDHrYNuRLgXNYvL1UIYdqWuCZ7I1zU=;
+        b=sx9fK73/KPArhyHR6joqcMxabNm/0zh/6RDubWVrSnUahIiDA5U844oawKe3j7X6q6
+         5BMiowsRf80LI4ybYfB8wgCkuedBA+MkUpfjjNF2pinx2/AbVVUGL7eTyLcEuXC+ZCwl
+         APoUGJ4z0jxT5fU+V+BNauCzJs3ikUdcAdpvI5iaP2Hg7GeinLDFNlDACjcQ/oB4K7l2
+         c6cOU5pEWkcgJr+4u6zpUEA9+XC/z740ryeq4ru6Me8nFiRTf4unDtQ65m57MhLWjN/z
+         buEGCjoMZv/8DP7kT9dM0CawWneGV2HkDlGLSNCG4CSIEGXWW+hOTwNKitYNXkGfRqzl
+         pOjA==
+X-Forwarded-Encrypted: i=1; AJvYcCU+VUQqXHzPfzfHxh38ZHZf6kSfGJMJOXcjUPGq2Yw4IMMQ914Gkok+TJVenWxOtLXlLi21M4s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUNt6pwjPWLVo9vgnqGNuuFFtxEF3OPuVN9uU5/n9wfk3jMDX8
+	Voa2JbT7iae6DWc2NUuhJ5gjcWmafDFEEajOwn+MIgeI2n4BIHaFf3L3y5Fgwr6IDJohCKHnwVY
+	PfhtQO7/S/K+oJa4z7K46fHcqLtyR6+K8VLI623Up
+X-Gm-Gg: ASbGncugSbaqeUfeDiZjrRMNKh3PuPGPi6l/X2a1gbDGiLd5ceQSKq4EtGZRZIgf1Sr
+	9A+2QL8Umae0gHFb7ExBTw0ol2TSxxast8KZTlM2vmHpJTE9CYvY1+v149gUn0BtBOit6g5wTbq
+	kBbAZQ/1pw2ie1HQQY5hAZKdcVfojlUt7EfXzCQyM8JUSu6uPCypnFL9tfs6JPlS5LrwQSiWpgL
+	aNx2hETpGA8+L/dPDpncoTfp7E++poQ9yFAyQIXnnHI
+X-Google-Smtp-Source: AGHT+IESA+eP6kM9nwktT60dNHPMQb0J22hBZaWkw6tfpY+brU5rfimYiJQUSNMYeIZIN8n5YRzXVvto0cY6pqWxHH8=
+X-Received: by 2002:a05:622a:c2:b0:4a5:9b0f:a150 with SMTP id
+ d75a77b69052e-4b29f790b96mr833291cf.16.1755730148497; Wed, 20 Aug 2025
+ 15:49:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250819033956.59164-1-dongml2@chinatelecom.cn> <20250819033956.59164-3-dongml2@chinatelecom.cn>
-In-Reply-To: <20250819033956.59164-3-dongml2@chinatelecom.cn>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Wed, 20 Aug 2025 15:47:29 -0700
-X-Gm-Features: Ac12FXxwNFYx3X1C5Pu9tp-WySpazWQxJmdHRR6C2ikj-hLBBFxY7DT7gZK46Co
-Message-ID: <CAEf4BzZBztC69GFDuA4YJHPmWOXuq3+tSNMspPNA3tksGaEi=A@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 2/3] selftests/bpf: skip recursive functions for kprobe_multi
-To: Menglong Dong <menglong8.dong@gmail.com>
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org, 
-	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
-	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, mykolal@fb.com, 
-	shuah@kernel.org, davem@davemloft.net, kuba@kernel.org, hawk@kernel.org, 
-	nathan@kernel.org, nick.desaulniers+lkml@gmail.com, morbo@google.com, 
-	justinstitt@google.com, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, llvm@lists.linux.dev
+References: <20250820171214.3597901-1-dtatulea@nvidia.com> <20250820171214.3597901-3-dtatulea@nvidia.com>
+In-Reply-To: <20250820171214.3597901-3-dtatulea@nvidia.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 20 Aug 2025 15:48:32 -0700
+X-Gm-Features: Ac12FXxVnl6sM0_WZDKM6qKI7HAYHIkAelNoq7Ld4ak_A5zT0VD-rswwR056X4M
+Message-ID: <CAHS8izNto5Na=jAyXhvm0ocL4mA0pUXmXMcn4bwnNvQbA81hzg@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 1/7] queue_api: add support for fetching per
+ queue DMA dev
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: asml.silence@gmail.com, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, cratiu@nvidia.com, parav@nvidia.com, 
+	netdev@vger.kernel.org, sdf@meta.com, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 18, 2025 at 8:40=E2=80=AFPM Menglong Dong <menglong8.dong@gmail=
-.com> wrote:
+On Wed, Aug 20, 2025 at 10:13=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia.co=
+m> wrote:
 >
-> Some functions is recursive for the kprobe_multi and impact the benchmark
-> results. So just skip them.
+> For zerocopy (io_uring, devmem), there is an assumption that the
+> parent device can do DMA. However that is not always the case:
+> - Scalable Function netdevs [1] have the DMA device in the grandparent.
+> - For Multi-PF netdevs [2] queues can be associated to different DMA
+> devices.
 >
-> Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
-> ---
->  tools/testing/selftests/bpf/trace_helpers.c | 16 ++++++++++++++++
->  1 file changed, 16 insertions(+)
+> This patch introduces the a queue based interface for allowing drivers
+> to expose a different DMA device for zerocopy.
 >
-> diff --git a/tools/testing/selftests/bpf/trace_helpers.c b/tools/testing/=
-selftests/bpf/trace_helpers.c
-> index d24baf244d1f..9da9da51b132 100644
-> --- a/tools/testing/selftests/bpf/trace_helpers.c
-> +++ b/tools/testing/selftests/bpf/trace_helpers.c
-> @@ -559,6 +559,22 @@ static bool skip_entry(char *name)
->         if (!strncmp(name, "__ftrace_invalid_address__",
->                      sizeof("__ftrace_invalid_address__") - 1))
->                 return true;
-> +
-> +       if (!strcmp(name, "migrate_disable"))
-> +               return true;
-> +       if (!strcmp(name, "migrate_enable"))
-> +               return true;
-> +       if (!strcmp(name, "rcu_read_unlock_strict"))
-> +               return true;
-> +       if (!strcmp(name, "preempt_count_add"))
-> +               return true;
-> +       if (!strcmp(name, "preempt_count_sub"))
-> +               return true;
-> +       if (!strcmp(name, "__rcu_read_lock"))
-> +               return true;
-> +       if (!strcmp(name, "__rcu_read_unlock"))
-> +               return true;
-> +
-
-static const char *trace_blacklist[] =3D {
-    "migrate_disable",
-    "migrate_enable",
-    ...
-};
-
-it's not like it's one or two functions where copy-pasting strcmp might be =
-fine
-
-pw-bot: cr
-
-
->         return false;
->  }
+> [1] Documentation/networking/device_drivers/ethernet/mellanox/mlx5/switch=
+dev.rst
+> [2] Documentation/networking/multi-pf-netdev.rst
 >
-> --
-> 2.50.1
->
+> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
+
+Reviewed-by: Mina Almasry <almasrymina@google.com>
+
+--=20
+Thanks,
+Mina
 
