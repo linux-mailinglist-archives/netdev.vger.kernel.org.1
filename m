@@ -1,67 +1,66 @@
-Return-Path: <netdev+bounces-215313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53357B2E114
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 17:30:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06549B2E11C
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 17:31:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB2D1A2467D
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 15:15:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA938684190
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 15:17:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59B0E33473A;
-	Wed, 20 Aug 2025 15:04:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8725D327780;
+	Wed, 20 Aug 2025 15:08:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l3+1C9It"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hSKpfRXP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31FDF33472E;
-	Wed, 20 Aug 2025 15:04:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B83B322C98;
+	Wed, 20 Aug 2025 15:08:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755702278; cv=none; b=B5UX8CjcVGIAROUsyrsNyRlZWaMUSwB4ybnExRLdTisuUztb0meuNwICKr6/K7uSKKb21KVWuGQCFLHDfFzFVMfel5O+mNQdRxLLggz0P9H56lWB/kSxnv/3OL0tQWpm6BVhXdBn+us90Xab4xmq8c/VskqMmsVTEk+kxuNYm8E=
+	t=1755702487; cv=none; b=LoFNO72E7bZeViQUwclLYoE4sSZdifmYEz5TzRjRLwY6ECGZhwaWmNMamEYvlygdDxtviUgdvHwxqQOphcwKeIdy859rI42xkup0gRBz+gtPJIMRSvyEd06aHPKfvbjsErQ36K/t7Zw+sU6AxWqa03nnyporbCsmi1AfG6bwJ9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755702278; c=relaxed/simple;
-	bh=8swLeMoDrj6X1zOeo0D/bAz3d4lgOnxpRrdZBtyJerU=;
+	s=arc-20240116; t=1755702487; c=relaxed/simple;
+	bh=GE5St3AH2vAEE6STTTMAkSYjbxbjNa8r7LP67c+65Rs=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EsyzVmUH71yuYCw6pChXjwYIDv9kfTHNvXl4P8S59h9KaVVNJKiBpT7aDZpDHrzCxx/itqGniQiTyco7brjBGdcDUrWQeHzv0AZQ08kCuPcVCJgwpc9SEYu/vDKDmnNKy3QNLMekXgMZr3lTnd8wHTHzX/Z3WuyEsxMt46QWp/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l3+1C9It; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAE02C4CEE7;
-	Wed, 20 Aug 2025 15:04:36 +0000 (UTC)
+	 MIME-Version:Content-Type; b=rkJ06ifUk4cWDKB6x6Z5Mvdu7h3deBIGeYzBHaF7ObBf8Tro9RPnV5jDE/9pfCPKr8U3SJcRtY+C6iaEJ2X3SfJGH0AmQEmySeRnTE6LWJuJzl7SumrPWb27+CUtdfmAlop9tIdlOlhwo76Wj8Zqu4ZaeBmu+1oTIWBpEJKYgP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hSKpfRXP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3371C4CEE7;
+	Wed, 20 Aug 2025 15:08:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755702277;
-	bh=8swLeMoDrj6X1zOeo0D/bAz3d4lgOnxpRrdZBtyJerU=;
+	s=k20201202; t=1755702485;
+	bh=GE5St3AH2vAEE6STTTMAkSYjbxbjNa8r7LP67c+65Rs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=l3+1C9ItykQgKVLcWvupyDfY6ahYfzf05P7risXn+Y8CaRC+sceSR/wqSxkhT/Iyw
-	 F1TqA/ILHIYW/L1/LO1PW7HkbL7sbh11uE3oaT7ZlJLaCHG3TXTnQQhXZy0YXwPGYo
-	 fP+qc/beFG/UXW/jLJFIiBsckH4n+4kwgOh+fkyy6F+y7eXHNwja+kCa5mkNaazcUr
-	 a12GWdWoQn375HIDmTV4fCtpI0Q6EIje3ol4296SKs5iX7szxcoLxU1VRiaablICvW
-	 wG2OpY8qNWksPSIrBA5Z31chvql8gtc33ME+YYqHTcYIuqFZN98JSikujH7u/dzafe
-	 Tk/eAz/pYH3qg==
-Date: Wed, 20 Aug 2025 08:04:36 -0700
+	b=hSKpfRXPUGlpTZrlVQrjnXJH8PWAP6t4O5O7bDR4HtpdRypy2rRnLy1c+APIKnZLw
+	 K+TZ+RwmgaEQZ2Jmy7gwLlwt8kfQtSffTFtNvTHK+mM+H/BRDJxh3iUG+8OogWbbOA
+	 0hxsetcw8z1kbPQ96nnhfnQn4w6zQKKoA34hh/R8DafmcUcjxmVa+eI2ZB6+r9GIdN
+	 CuyLtb/rf0V8LD/fWq+5bfh3bJThlOtPjuSsZvBabZY+aVufFYNb5ajSrX/uMlLrV2
+	 w5fH2XBVYiXs6zTlenyqd5PXyhuifLKMmACT5Z7P+JGuxRJuiGdLCSilS7esnGGfon
+	 unWFVW2CI6wRg==
+Date: Wed, 20 Aug 2025 08:08:04 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Richard Gobert <richardbgobert@gmail.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, horms@kernel.org, corbet@lwn.net, shenjian15@huawei.com,
- salil.mehta@huawei.com, shaojijie@huawei.com, andrew+netdev@lunn.ch,
- saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com, leon@kernel.org,
- ecree.xilinx@gmail.com, dsahern@kernel.org, ncardwell@google.com,
- kuniyu@google.com, shuah@kernel.org, sdf@fomichev.me, ahmed.zaki@intel.com,
- aleksander.lobakin@intel.com, florian.fainelli@broadcom.com,
- linux-kernel@vger.kernel.org, linux-net-drivers@amd.com
-Subject: Re: [PATCH net-next v2 2/5] net: gro: only merge packets with
- incrementing or fixed outer ids
-Message-ID: <20250820080436.36bed70a@kernel.org>
-In-Reply-To: <bb28ffa4-d91d-479a-9293-fa3aa52c57e5@gmail.com>
-References: <20250819063223.5239-1-richardbgobert@gmail.com>
-	<20250819063223.5239-3-richardbgobert@gmail.com>
-	<willemdebruijn.kernel.a8507becb441@gmail.com>
-	<20250819173005.6b560779@kernel.org>
-	<bb28ffa4-d91d-479a-9293-fa3aa52c57e5@gmail.com>
+To: Aleksandr Nogikh <nogikh@google.com>
+Cc: syzbot ci <syzbot+ci77a5caa9fce14315@syzkaller.appspotmail.com>,
+ abhishektamboli9@gmail.com, andrew@lunn.ch, ayush.sawal@chelsio.com,
+ coreteam@netfilter.org, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, fw@strlen.de, gregkh@linuxfoundation.org,
+ herbert@gondor.apana.org.au, horms@kernel.org, kadlec@netfilter.org,
+ linux-kernel@vger.kernel.org, linux-staging@lists.linux.dev, mhal@rbox.co,
+ netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pabeni@redhat.com,
+ pablo@netfilter.org, sdf@fomichev.me, steffen.klassert@secunet.com,
+ syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot ci] Re: net: Convert to skb_dstref_steal and
+ skb_dstref_restore
+Message-ID: <20250820080804.30910230@kernel.org>
+In-Reply-To: <CANp29Y4g6kzpsjis4=rUjhfg=BPMiR9Jk68z=NT0MeDyJS7CaQ@mail.gmail.com>
+References: <20250818154032.3173645-1-sdf@fomichev.me>
+	<68a49b30.050a0220.e29e5.00c8.GAE@google.com>
+	<20250819175842.7edaf8a5@kernel.org>
+	<CANp29Y4g6kzpsjis4=rUjhfg=BPMiR9Jk68z=NT0MeDyJS7CaQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,25 +70,28 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 20 Aug 2025 14:27:12 +0200 Richard Gobert wrote:
-> Jakub Kicinski wrote:
-> > On Tue, 19 Aug 2025 10:46:01 -0400 Willem de Bruijn wrote:  
-> >> It's a bit unclear what the meaning of inner and outer are in the
-> >> unencapsulated (i.e., normal) case. In my intuition outer only exists
-> >> if encapsulated, but it seems you reason the other way around: inner
-> >> is absent unless encapsulated.   
-> > 
-> > +1, whether the header in unencapsulted packet is inner or outer
-> > is always a source of unnecessary confusion. I would have also
-> > preferred your suggestion on v1 to use _ENCAP in the name.  
+On Wed, 20 Aug 2025 12:45:52 +0200 Aleksandr Nogikh wrote:
+> > Could we do something about this Tested-by: tag?
+> > Since the syzbot CI reports are sent in reply to a series patchwork and
+> > other tooling will think that syzbot is sending it's Tested-by tag for
+> > this series.
+> >
+> > In some cases we know that the issues found are unrelated, or rather
+> > expect them to be fixed separately.  
 > 
-> Yeah, I guess that was the source of confusion. IMO, it makes more sense that
-> INNER is absent unless encapsulated since that seems to be the convention in
-> the rest of the network stack. (e.g. inner_network_header for both skb and
-> napi_gro_cb is only relevant for encapsulation)
+> FWIW if you notice the reported issues that are completely unrelated,
+> please let me know.
 > 
-> I could rename the OUTER variant to simply SKB_GSO_TCP_FIXEDID so that it's
-> clearer that it's the default (resembling network_header). WDYT?
+> > Could we perhaps indent the tag with a couple of spaces? Not 100% sure
+> > but I _think_ most tools will match the tags only from start of line.  
+> 
+> Sure, that sounds like a very simple solution.
+> I've adjusted the email template - now there are several leading
+> whitespaces on the tag line. I hope it will help (otherwise we'll see
+> what else can be done).
 
-Yup! That'd match the skb fields so SGTM!
+Looks like we have received a report with your adjustment in place for:
+https://lore.kernel.org/all/20250820092925.2115372-1-jackzxcui1989@163.com/
+I can confirm that it fixes the tag propagation for our tooling. 
+Thank you!
 
