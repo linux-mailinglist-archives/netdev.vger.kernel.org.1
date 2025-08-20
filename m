@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-215080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 415F3B2D0DE
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 03:00:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FE99B2D0DF
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 03:00:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C65B47A601C
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 00:58:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83315584097
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 01:00:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62BA019F40B;
-	Wed, 20 Aug 2025 01:00:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC0A71A3A80;
+	Wed, 20 Aug 2025 01:00:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pX4025v1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MCh3g2DR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 334A619539F
-	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 01:00:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2FD71922D3;
+	Wed, 20 Aug 2025 01:00:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755651607; cv=none; b=VxoJ24Fa5q02qTlj2W/fDe+yo8paeRe0cV68dHrK/pRof0t3Ub5BTwi8Mg6x+YIfEBmHOi+BSUqgIceJCiraGRpgJTL6X9rbTZqsF5ynNbChJdjLDiVOdSrdnWUWlk/yo0qV/62TN6CsaDawF+nLls1+s8fOxfojtw1LGPG/mT0=
+	t=1755651608; cv=none; b=Mwet6RnBB7SpU2XB1esMZZtG+9TYaHh8lMxR33RwZdgby51R6ZOmCaKPi2PyBQkpepP0ZlQoCUD6p+Co97+E7HgQnyJ1lZ7EoWDrpKdypSkg0GITp6BmFqUU0tdzCin31RDQuzihRWMNtT3MIsdc8J1J1MqRhMnKqL+46GIRrpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755651607; c=relaxed/simple;
-	bh=nptlQY32NCSIccxs32DfxP1iyB+g/4iBCr8esVANs2I=;
+	s=arc-20240116; t=1755651608; c=relaxed/simple;
+	bh=TSQ7wgGxH8wjkIC7287Maz3A/+sq9Ck5XiaO2CCdP7k=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=u0ubqK7RpF7Dpcxfg8ETTveyRsp7aR078w9fDnCHXjMc0dtQ93jfQ8pZYrtOpVGieegjQ4geQKyHbnptxA2k6RU0zCxCxsKO7DQZlIJ7uBqlt6w94vby8ngas5lU0jKytYkXbDlLLQM6DVKzYsxUHqnEYHlEvgjF7t1TAFykm9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pX4025v1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2D30C4CEF1;
-	Wed, 20 Aug 2025 01:00:06 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=PawzAHSdSEiZsAnmWwiW+OLIcAoDIQmyzTGJVnPQqe8hQ2jMA0Q+OCn8MMIUIgC5avHJARoidHaLh9zGOEVMgKJDvcwK1iTP/NZHc7kFMCQvYahnIpFvjEy/t66kQZlrsOU4tBl6fIHKlP8gvkEzNOoi8728ALO9g1xV+XPbRK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MCh3g2DR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49994C4CEF1;
+	Wed, 20 Aug 2025 01:00:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755651606;
-	bh=nptlQY32NCSIccxs32DfxP1iyB+g/4iBCr8esVANs2I=;
+	s=k20201202; t=1755651608;
+	bh=TSQ7wgGxH8wjkIC7287Maz3A/+sq9Ck5XiaO2CCdP7k=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pX4025v1iqihby8I0CFC2Ctj3iAH4EChE/imVfsMK9TqZxQEi2Pnn4GPs+fNJqD8U
-	 wYn2pytCYcKWpE1W060XJ4R/Ntswa7JHhodrN08XMb+Ho3GXOajTYYAFEsRS7Kccbo
-	 ZOHERm0xjvmxsdOF8WrIisf+h0sKSg8qMRINma8UsKT5XYMYyqAtqlkL1SHOA19Tzq
-	 GKyDnFTx2rGq7NazluWCSUFdNyefEfoIXGtCIZdKZxoaO17PE1OJycYCvhIZuo9f/O
-	 jc9Y1XDWKmKuRlTQ1+1NSA+L9CgrdetGdFGaIpe665h2jE8rp0nGentOTxs/t+Tylg
-	 lTh1/As/8R9YQ==
+	b=MCh3g2DRB6b2+o3kW1J3+9FUWvsRb5LJX00BJBdV3prABHh0oxgWI1/MqK1QoCNEE
+	 FOgM4U+JoZkXkZIi7g6gfa3z+49zsRnvIWCSb5I97k6tcACs1ocpu3TZSrXIsYu0Op
+	 3wTLAtthUm2nPHiECkmjet1CnzO+mouUnL6qKn3OM/GdwuWD7EDF+SYY96q7CJ9SoJ
+	 UlsM03X8KoeoEw+skhHAo0BR4/03W8syvQ9ST6yhq8uB5UDfla2ccwKNQjc11+YvD9
+	 hE5Tb9qr/pvh1meJtmvUI+JeCEuskj6IIps8lSWEvLf70INM5lMPNMCfHRMypTl7WN
+	 SCs4fs0ig9PMQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCD0383BF58;
-	Wed, 20 Aug 2025 01:00:17 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33ABF383BF58;
+	Wed, 20 Aug 2025 01:00:19 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/2] net: Speedup some nexthop handling when
- having A LOT of nexthops
+Subject: Re: [PATCH net-next] selftests: drv-net: tso: increase the retransmit
+ threshold
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175565161623.3748899.17139444532353047943.git-patchwork-notify@kernel.org>
-Date: Wed, 20 Aug 2025 01:00:16 +0000
-References: <20250816-nexthop_dump-v2-0-491da3462118@openai.com>
-In-Reply-To: <20250816-nexthop_dump-v2-0-491da3462118@openai.com>
-To: Christoph Paasch <cpaasch@openai.com>
-Cc: dsahern@kernel.org, razor@blackwall.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- idosch@idosch.org, netdev@vger.kernel.org
+ <175565161774.3748899.1626697623111633858.git-patchwork-notify@kernel.org>
+Date: Wed, 20 Aug 2025 01:00:17 +0000
+References: <20250815224100.363438-1-kuba@kernel.org>
+In-Reply-To: <20250815224100.363438-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
+ willemb@google.com, daniel.zahka@gmail.com, linux-kselftest@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat, 16 Aug 2025 16:12:47 -0700 you wrote:
-> Configuring a very large number of nexthops is fairly possible within a
-> reasonable time-frame. But, certain netlink commands can become
-> extremely slow.
+On Fri, 15 Aug 2025 15:41:00 -0700 you wrote:
+> We see quite a few flakes during the TSO test against virtualized
+> devices in NIPA. There's often 10-30 retransmissions during the
+> test. Sometimes as many as 100. Set the retransmission threshold
+> at 1/4th of the wire frame target.
 > 
-> This series addresses some of these, namely dumping and removing
-> nexthops.
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,1/2] net: Make nexthop-dumps scale linearly with the number of nexthops
-    https://git.kernel.org/netdev/net-next/c/5236f57e7c03
-  - [net-next,v2,2/2] net: When removing nexthops, don't call synchronize_net if it is not necessary
-    https://git.kernel.org/netdev/net-next/c/b0ac6d3b56a2
+  - [net-next] selftests: drv-net: tso: increase the retransmit threshold
+    https://git.kernel.org/netdev/net-next/c/eddc821f98af
 
 You are awesome, thank you!
 -- 
