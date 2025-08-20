@@ -1,80 +1,135 @@
-Return-Path: <netdev+bounces-215255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AB4FB2DCC5
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 14:42:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A266B2DCC3
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 14:41:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44B213BA638
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 12:37:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C1D75826DA
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 12:38:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E828311C16;
-	Wed, 20 Aug 2025 12:36:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="szvdnviO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE23931A063;
+	Wed, 20 Aug 2025 12:37:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E14B311C03;
-	Wed, 20 Aug 2025 12:36:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 081CA319864;
+	Wed, 20 Aug 2025 12:37:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755693412; cv=none; b=Xe+6VLGj+lJrPltlbIIQXcJdI/I2ly/sCY/TcgnkilT3G4y3KWg6+tV7MI7gbj8NQsYFAyUAUmgF/JOsOMGpviOLcn8i9Yrbtc3G8STusGygYKX2MzXamCq1dR7wkejWXpTKvXtjNhn+kXtFw5Hxx9pj+GTOD4GLw3mY7QuoGDk=
+	t=1755693435; cv=none; b=B/lKPfmBXTok1rdlBVTEESALcd78LR2nrf7vWZr0qm9MjNkXKlHL8o+QgXazrUQwVBhk1QMI0EfAf8Z8yO1CkSooRin6z6n13VV5m/u49vnLI8Q5eklYGGWAlyV5c6DS6fl1oFJRi7p2LEv0N4cr8ncMSv/th4UyHKUz39+g87c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755693412; c=relaxed/simple;
-	bh=VIDrPunw/2JzpejDhUs7NcEYeN98ymFfehpbQmS0wJA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y6bd58ElMy+bwckqrYemrFiI8sb3M+C6DPpIBrsvby/qkcuD0ybxPUV7+sFdu7MxYrZ1hv3c1sdj0alRsvXcJQ+ktiXHhQNzz6NP1PG5XEVWkHofS4N7zXa5IvGxp+8po8hg+XmAF9nObuepLNhOk4NYomhdw/avyrxgysdh70s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=szvdnviO; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=EF3c1LrjzPOtgfZvnP8yaAbWzaLVMBt0Ay/Kfnqyg60=; b=szvdnviOgP+OyVjbNiLur+NpVz
-	HBtwYFQpM7RH0fio06QrQqdIfwg0nh9RL9JWiAwX3prD3g/7ZvxM4m7+jWO+7iiaqB1WCHoEeTqHZ
-	csIe1Y+DbGMmsX1BG4HdDvNojKxBgoAJNjacyDP86fXDZiwxQKDZ0UE3wgKNOdnGh4GE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uoi3T-005JvJ-S4; Wed, 20 Aug 2025 14:36:39 +0200
-Date: Wed, 20 Aug 2025 14:36:39 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Xu Liang <lxu@maxlinear.com>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+	s=arc-20240116; t=1755693435; c=relaxed/simple;
+	bh=BQXL5683E7bHCga7iUfNODHd3QdDCfTRoPZFY2CewAw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Rqq4enzxY0+AI+W10oGrTuHqb4scmxBZtEMhvSkVmDhMsPZcYyJoq3dK+ZtKbdraps3RZsjofMdR5UjdHeDcDIvr20xR21GLYTiaznD0TkfzChbQixK/tIILsPJRfQLpAeZKz0f/V+wrEE37dRcbVoE9RpYiphm09/gx1vkq5EA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id C5522601EB; Wed, 20 Aug 2025 14:37:11 +0200 (CEST)
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 2/3] net: phy: mxl-86110: fix indentation in
- struct phy_driver
-Message-ID: <0df53861-7c7d-4514-9b4b-495a1e2f52bd@lunn.ch>
-References: <a63f1487c3d36fc150fa3a920cd3ab19feb9b9f9.1755691622.git.daniel@makrotopia.org>
- <5591a3b638c4d42950375781a76e7e7116bf4219.1755691622.git.daniel@makrotopia.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	<netfilter-devel@vger.kernel.org>,
+	pablo@netfilter.org
+Subject: [PATCH net] netfilter: nf_reject: don't leak dst refcount for loopback packets
+Date: Wed, 20 Aug 2025 14:37:07 +0200
+Message-ID: <20250820123707.10671-1-fw@strlen.de>
+X-Mailer: git-send-email 2.49.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5591a3b638c4d42950375781a76e7e7116bf4219.1755691622.git.daniel@makrotopia.org>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Aug 20, 2025 at 01:11:29PM +0100, Daniel Golle wrote:
-61;8003;1c> The .led_hw_control_get and .led_hw_control_set ops are indented with
-> spaces instead of tabs, unlike the rest of the values of the PHY's
-> struct phy_driver instance.
-> Use tabs instead of spaces resulting in a uniform indentation style.
-> 
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+recent patches to add a WARN() when replacing skb dst entry found an
+old bug:
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+WARNING: include/linux/skbuff.h:1165 skb_dst_check_unset include/linux/skbuff.h:1164 [inline]
+WARNING: include/linux/skbuff.h:1165 skb_dst_set include/linux/skbuff.h:1210 [inline]
+WARNING: include/linux/skbuff.h:1165 nf_reject_fill_skb_dst+0x2a4/0x330 net/ipv4/netfilter/nf_reject_ipv4.c:234
+[..]
+Call Trace:
+ nf_send_unreach+0x17b/0x6e0 net/ipv4/netfilter/nf_reject_ipv4.c:325
+ nft_reject_inet_eval+0x4bc/0x690 net/netfilter/nft_reject_inet.c:27
+ expr_call_ops_eval net/netfilter/nf_tables_core.c:237 [inline]
+ ..
 
-    Andrew
+This is because blamed commit forgot about loopback packets.
+Such packets already have a dst_entry attached, even at PRE_ROUTING stage.
+
+Instead of checking hook just check if the skb already has a route
+attached to it.
+
+Fixes: f53b9b0bdc59 ("netfilter: introduce support for reject at prerouting stage")
+Signed-off-by: Florian Westphal <fw@strlen.de>
+---
+ Sending this instead of a pull request. the only other two
+ candidates for -net are still under review.
+
+ Let me know if you prefer a normal pull request even in this case.
+ Thanks!
+
+ net/ipv4/netfilter/nf_reject_ipv4.c | 6 ++----
+ net/ipv6/netfilter/nf_reject_ipv6.c | 5 ++---
+ 2 files changed, 4 insertions(+), 7 deletions(-)
+
+diff --git a/net/ipv4/netfilter/nf_reject_ipv4.c b/net/ipv4/netfilter/nf_reject_ipv4.c
+index 87fd945a0d27..0d3cb2ba6fc8 100644
+--- a/net/ipv4/netfilter/nf_reject_ipv4.c
++++ b/net/ipv4/netfilter/nf_reject_ipv4.c
+@@ -247,8 +247,7 @@ void nf_send_reset(struct net *net, struct sock *sk, struct sk_buff *oldskb,
+ 	if (!oth)
+ 		return;
+ 
+-	if ((hook == NF_INET_PRE_ROUTING || hook == NF_INET_INGRESS) &&
+-	    nf_reject_fill_skb_dst(oldskb) < 0)
++	if (!skb_dst(oldskb) && nf_reject_fill_skb_dst(oldskb) < 0)
+ 		return;
+ 
+ 	if (skb_rtable(oldskb)->rt_flags & (RTCF_BROADCAST | RTCF_MULTICAST))
+@@ -321,8 +320,7 @@ void nf_send_unreach(struct sk_buff *skb_in, int code, int hook)
+ 	if (iph->frag_off & htons(IP_OFFSET))
+ 		return;
+ 
+-	if ((hook == NF_INET_PRE_ROUTING || hook == NF_INET_INGRESS) &&
+-	    nf_reject_fill_skb_dst(skb_in) < 0)
++	if (!skb_dst(skb_in) && nf_reject_fill_skb_dst(skb_in) < 0)
+ 		return;
+ 
+ 	if (skb_csum_unnecessary(skb_in) ||
+diff --git a/net/ipv6/netfilter/nf_reject_ipv6.c b/net/ipv6/netfilter/nf_reject_ipv6.c
+index 838295fa32e3..cb2d38e80de9 100644
+--- a/net/ipv6/netfilter/nf_reject_ipv6.c
++++ b/net/ipv6/netfilter/nf_reject_ipv6.c
+@@ -293,7 +293,7 @@ void nf_send_reset6(struct net *net, struct sock *sk, struct sk_buff *oldskb,
+ 	fl6.fl6_sport = otcph->dest;
+ 	fl6.fl6_dport = otcph->source;
+ 
+-	if (hook == NF_INET_PRE_ROUTING || hook == NF_INET_INGRESS) {
++	if (!skb_dst(oldskb)) {
+ 		nf_ip6_route(net, &dst, flowi6_to_flowi(&fl6), false);
+ 		if (!dst)
+ 			return;
+@@ -397,8 +397,7 @@ void nf_send_unreach6(struct net *net, struct sk_buff *skb_in,
+ 	if (hooknum == NF_INET_LOCAL_OUT && skb_in->dev == NULL)
+ 		skb_in->dev = net->loopback_dev;
+ 
+-	if ((hooknum == NF_INET_PRE_ROUTING || hooknum == NF_INET_INGRESS) &&
+-	    nf_reject6_fill_skb_dst(skb_in) < 0)
++	if (!skb_dst(skb_in) && nf_reject6_fill_skb_dst(skb_in) < 0)
+ 		return;
+ 
+ 	icmpv6_send(skb_in, ICMPV6_DEST_UNREACH, code, 0);
+-- 
+2.49.1
+
 
