@@ -1,100 +1,98 @@
-Return-Path: <netdev+bounces-215337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2CCFB2E301
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 19:10:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CBE9B2E314
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 19:13:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1995CA21717
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 17:09:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9B7EA21E3A
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 17:13:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74C803314DC;
-	Wed, 20 Aug 2025 17:09:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E50F6335BA5;
+	Wed, 20 Aug 2025 17:12:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V8JHUcri"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CXeS7/eP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2049.outbound.protection.outlook.com [40.107.244.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F82B33438D;
-	Wed, 20 Aug 2025 17:09:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755709763; cv=none; b=sTwRbvOPTgfvbkN00302h9dOKYR4iXlh08qOIzhbITWJnc6OPRagVTGjSPfXCDMc4gOBBjk9qMUkMPNmPzX4pZL48XWKcHjdPehZtYQ9wN849Ulk6c/vQVLn/0ZHJ8ri/xLNeS7QPSw9/SBpHM5YJ64aEOGI/DebQLVz6LyVnTs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755709763; c=relaxed/simple;
-	bh=onCZhWEZv0sN7Coawqrn23/OzfNd3gropWTNiiami5c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gcBeMT9Stl3qVE/EmYn6AiZk9WNuC4ONUNNuKny5UTO2Qc5H3R/B371SEiWb1FycXWJ8SoPCBSPY3HKhVu3A+fMYKi3EIh/7XWMlaWmf4s5Zaug2O417R9xqCLAc8zBPN9VGxf8cD1stK3OfQThdrEd79To5C2hC49rGDDCcxcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V8JHUcri; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-45a15fd04d9so8213295e9.1;
-        Wed, 20 Aug 2025 10:09:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755709760; x=1756314560; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=MPScU1ItNsuVBAeO87+rFDAEOXNN+q4yVoKKRyKs/Y8=;
-        b=V8JHUcriW90da/vU6KZXDlJ9GE0hjG6J4p1pjE37Co1JvPN3pEHQAE0fviNjZeCeyk
-         bk59hEEBdm1fHvYT46T6H0tuYZEe12hUKat2AxUzi+SinCDQg8akEylCo0k5FfGl7+C5
-         Y9UhF+NKImQiWxinDopKSj+fe29babNSf9R5iOJY20vLs3qHEeB7u3C8DcdatAhflCfj
-         eJu3tvwG8eNX5Kf9tgvqJ7U6JlzCtF1f2k7gH4MEa1jSHE/yz16Zx+PvLP1PMbVzT2XL
-         Tos345Q73M8Na50BwLAlMt/ONEpFimK2Y+d5I45izw9HgutLeyg43d2C+hPPDsCAvABG
-         JXHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755709760; x=1756314560;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MPScU1ItNsuVBAeO87+rFDAEOXNN+q4yVoKKRyKs/Y8=;
-        b=mRHbkj3vSeObU5lzlSrxG48DcUryg+cEGTd7CN3CMuzJEKOO3/0Jb6hE+4o9gFwYn3
-         V3Uww6CsRcZl5ltT0yVxYnEAhKjDqEs0FG0mG0pjaGnpQ3gaEaE1/IVqxYJB2721Unpq
-         Ng+AgRRJF8UlxHUrOeWNlk2Sk7T2CEQf3LDExd6dUWZFi2+aq28+H0pCEqbQyASqaidG
-         hrJP2NClDrWZWdjP3wsmvJJNe9N6pz8yzvptZI6SoWVm472PNidu7/WUSq18eETRNru0
-         JkAJYq/ciDbpnTo3yhUG71FvsVRYAdnxm7EKqGXa4KAHuuO6orvPVNKWu+0IjrHGduut
-         liCA==
-X-Forwarded-Encrypted: i=1; AJvYcCU/YKyzLx3/eva2UVJMb/ZpPvmY1bWI49l9orb3w+2Gzc7WgR02e3idXiSxJab8eTPARhPR4Ms6FOQozRY=@vger.kernel.org, AJvYcCWKA5v0PSlhRG7OXhNmD63K3Z83vGv3+3kwUhYnIeMQEZim//LIIVFICdgxwW+EfHcEYAc1Pzl9@vger.kernel.org
-X-Gm-Message-State: AOJu0YzuVpXdznGYQHP4RzsVriLr38I6dgAsrRBmhhQThtd5Lco2zzW6
-	GiNs5FIEHh6e8nukksFB9OYquUesmGfAhCsfQnldZvePcD4mKOXtUFLp
-X-Gm-Gg: ASbGncu90X3Y/Zs3W3s2t7RJQphBDK/AmnHm7vuhUlc5HcvT0fdR6/DmtUh/Q9vbB6C
-	2aC3JR8RVWXwEWnD/leLEquXSJFPYnsisD7jK53zAjmiO8MwrtgLSIYhfJEdOaQ2CRZUab+f2Zl
-	oWMV9aEaqc7emrMEfWb/2Q6/QsUnSn3qVQyR++OXmSZ9Bn7wklD2xb/s7zL+XlfQLNEbPlNNj8A
-	Ut/XDyYpp9f21ZPTkGqFu/j63Spf8rIlUWrrlAbiCwu+PSNRA6iegLsX/R40Lp2/nyq34FvSecs
-	Nb08iB+ZIVqjI0vhoOCQIP4r1JT65EPQa37OjaEzQuGplnaUY65RNp252MDjqhxDb5MrnEEkLHf
-	XIgcnxmE98jBCO0tsuLRcPkxff7G11hotS+Q7IlZ0RE+IFWIFg4oqL260
-X-Google-Smtp-Source: AGHT+IGMp/og93GJnnQsP8vZ8w4JEv8g3mF3aEsNkXrBBZYqPOCbIxmFaI1dS0QKUMPOwONj0CxqSQ==
-X-Received: by 2002:a05:600c:64c8:b0:45b:47e1:f603 with SMTP id 5b1f17b1804b1-45b4c6449dfmr2721875e9.18.1755709759349;
-        Wed, 20 Aug 2025 10:09:19 -0700 (PDT)
-Received: from iku.Home ([2a06:5906:61b:2d00:9b1:f84b:89f6:b00e])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b47c605e8sm38532445e9.20.2025.08.20.10.09.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Aug 2025 10:09:18 -0700 (PDT)
-From: Prabhakar <prabhakar.csengg@gmail.com>
-X-Google-Original-From: Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-To: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <clement.leger@bootlin.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Wolfram Sang <wsa+renesas@sang-engineering.com>
-Cc: linux-renesas-soc@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Prabhakar <prabhakar.csengg@gmail.com>,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	stable@kernel.org
-Subject: [PATCH net-next v2] net: pcs: rzn1-miic: Correct MODCTRL register offset
-Date: Wed, 20 Aug 2025 18:09:13 +0100
-Message-ID: <20250820170913.2037049-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-X-Mailer: git-send-email 2.51.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 349943314DC;
+	Wed, 20 Aug 2025 17:12:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755709975; cv=fail; b=X4aYMitIgmK15ONQaiZkwqDyX1uNG+FFDRdcpLaTG4pJrbH8XD64PX2SMtGiqzeqn1JXk2FvFTwYcYfZ/IbvVSMuxMOHAdkmdkEWW7n3iMpPWiGhKsICd01aoa18xOAf9pGpbnMlHDTlR/Xzc85XEl3jL2n6z/eny6V7QIhL0Lg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755709975; c=relaxed/simple;
+	bh=cUuX8ujmedt/EeuG13BYq2JXLddUYJ2LiqE4121618g=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BeI5dwv7xub7HfQ5r/gGzSOhQCwAtEcb6/9DECttjcoYCRxQkHHeEyZ+1fMHhxP9KcmCHIvczPKng/HnDJ0UOp5DZMKR7uPXs08r2aHz7qk4A0/FEF2cwieaZ1D7o+KnlIvsrb5SdlUTk8CcccScsz1gQGAG/l9mRBxnLt9iHXw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=CXeS7/eP; arc=fail smtp.client-ip=40.107.244.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=sxFQrFKOJLq/0IeEph4s22jAz7GQ9nmrbR5qYFnQzf+NtWyvEOl5R/dggJf4kMJN1sD7tW+/mJ4ej7rAifqImZ/EaN9b1ihVxs/BaPEDzOWKCdCa8BmMYfOKDOxKWDJQR1K3yn8SIgmBE0hfsOR1eaA1D06a0ajJQl7s8u6a9GTpOCh+56fkBazDVm1etSmLswxaQj9c/+gDMiANR1lKIYxBKkFrvRsj+6AvBgH2U5bVBnrHej502D8kxk4dLcgeojKnU+K+ZGvFTSHO6a/RCA07Pato40keUXZ8W0LLP51Ua4jGIP/4aym/rYOXChMfEWtA30S/A9vWASZjr6foig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=K57w/4XjGEhIh7fhk39AfV+lRlzGSf3PZDEo7ZjIU+Q=;
+ b=C+r1sCqmoIoNDEceKqNvV6AVpLgp0j4u6Zh+Y0YU5U7rLOZjeF7Z0KE7rUqrfC469Wsmn2Y4EDTU4gP+zVXHbf/VMABHlPWeWcnvIgYd2uAkxrBRZh+DJ4cAThFrYgvoAL/n5sr/+QBqXA86dPV2zRYBVsGTw5hfQBBR5K8Nds1TLzvHUjgTW5NQcSdrKR0O/tGzm0r0zks+FpkZ5WZhsrGSMT+SyzjkXZhzzumqfXF9St9bj3P0vAELiJJVvHfTZsVSRA7A0TDYOH2pA5wEEw9mo4OdOpEpC6YkeA74hodfdNrwRg8Ld7smgkAdRwPWGn1RgopwpRXw1XxTlgxqww==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=K57w/4XjGEhIh7fhk39AfV+lRlzGSf3PZDEo7ZjIU+Q=;
+ b=CXeS7/eP6rstBaMhoKJDnaRp7f227PoBKWD4JkKGOeGKJV5l8cPOQsEpjOwflJJ7lKheEt1pJhsRw+yfCpgHWhcJReF5cvp6xgAEwfr4vNoVS6tP8rh3Unx4BOCayk5L5YV3fzzk35P4eacWMUslCHwhLrms07uVCf/M333DfQ/LNzjk5uXs1kAI5hOaXqTnN/IenpTUj5TVmurKqn03ZOksjJ/xw4C2fb9OFCXJakNmCSBSsPGQtq3/59yzMX7eS7hgxvApTavxAYFVFG6Seaxuw5S82aCmmO2GoMG/9dn/sddwqbA5PuY7slp5DQAgkEZKQAodvOjuujsPCATGLg==
+Received: from BN9PR03CA0156.namprd03.prod.outlook.com (2603:10b6:408:f4::11)
+ by SN7PR12MB7227.namprd12.prod.outlook.com (2603:10b6:806:2aa::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.24; Wed, 20 Aug
+ 2025 17:12:49 +0000
+Received: from BN1PEPF00004682.namprd03.prod.outlook.com
+ (2603:10b6:408:f4:cafe::51) by BN9PR03CA0156.outlook.office365.com
+ (2603:10b6:408:f4::11) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9052.14 via Frontend Transport; Wed,
+ 20 Aug 2025 17:12:48 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BN1PEPF00004682.mail.protection.outlook.com (10.167.243.88) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9052.8 via Frontend Transport; Wed, 20 Aug 2025 17:12:48 +0000
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 20 Aug
+ 2025 10:12:24 -0700
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail202.nvidia.com
+ (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 20 Aug
+ 2025 10:12:23 -0700
+Received: from f42.dev-l-178 (10.127.8.9) by mail.nvidia.com (10.129.68.10)
+ with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Wed, 20
+ Aug 2025 10:12:18 -0700
+From: Dragos Tatulea <dtatulea@nvidia.com>
+To: <almasrymina@google.com>, <asml.silence@gmail.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Jens Axboe <axboe@kernel.dk>, Saeed Mahameed
+	<saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch
+	<mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Andrew Lunn
+	<andrew+netdev@lunn.ch>
+CC: Dragos Tatulea <dtatulea@nvidia.com>, <cratiu@nvidia.com>,
+	<parav@nvidia.com>, <netdev@vger.kernel.org>, <sdf@meta.com>,
+	<linux-kernel@vger.kernel.org>, <io-uring@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>
+Subject: [PATCH net-next v4 0/7] devmem/io_uring: allow more flexibility for ZC DMA devices
+Date: Wed, 20 Aug 2025 20:11:50 +0300
+Message-ID: <20250820171214.3597901-1-dtatulea@nvidia.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,58 +100,140 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN1PEPF00004682:EE_|SN7PR12MB7227:EE_
+X-MS-Office365-Filtering-Correlation-Id: f80f701a-3421-44d5-f1b0-08dde00cc9f8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|7416014|376014|1800799024|82310400026|13003099007|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?4PunLWig/winxx8MJrcduDWHS/HZR5KnHPjvtw2RAZjyIyRai0mVoIpmhgVt?=
+ =?us-ascii?Q?Ge5jD9lEiQU0JnZekjFfGG1D7Y78oF/AX7Teh98NI6pec72X19xQiwN4tBCP?=
+ =?us-ascii?Q?eH3j3k4Gs1L+3oPUAat7cC3LQGLK3WekWK32Cwq7atqVMcq0rWvnLl0Ur6QW?=
+ =?us-ascii?Q?zYjJJ28CrrZ0ajhjyhmCm5/HU5GS7dyMWjQzKj6/Dqt1X3j31TJ4bkmUYIAq?=
+ =?us-ascii?Q?CPX7u4mpWUqo0jeWuqYby6UL4ei8GH3JqkL8ztzwHUses5AOPV90Z4rqcVW0?=
+ =?us-ascii?Q?8CCk4nY5OyXzJyIeBB413DiH/7Yzw1HKd39HzsvO9JrKGWLS/x1jkvkUwFvw?=
+ =?us-ascii?Q?etqgwT5kvyMltBM3jGShQnyrByU7wgUxzKIduuPTogrocacXwzv/xqlvLXyG?=
+ =?us-ascii?Q?+xolrGhcS/JC6qHVLfK/yS46iRXSxWQM/mLygW6vfkzlTR52Ty/pewjYeG18?=
+ =?us-ascii?Q?hdOXeRhGQR1/XMAYyehmSGFsb9HjIt8G6ddEp0Sfm85oUx0XxZCxboJKJvE/?=
+ =?us-ascii?Q?SBG38+quKO2QXw/FQUd+4qTi7ot2Ao9CkgXazWnxkJaXQtUJY8ESd4ihVn5g?=
+ =?us-ascii?Q?b+PZQd2AKolCSdAW3QamcLCEROcqT8w2YSPxz5DmZ8aiEHhY6Y4ccvlRLvtV?=
+ =?us-ascii?Q?tRwJH3ZotAI/LoEs+AyoIarXD6EgxRvV0u2arnqzos25GPnaggWNFdGMRes3?=
+ =?us-ascii?Q?u+gyPN1Uv1mzr9uo1vbg1ra5PKMAcjRGu+U+SZm187G+7+HSLHmcFOFIXog7?=
+ =?us-ascii?Q?tltfSty3NJnJa9RB2HNELJr8N2lh+E0bQE72BNdKPzXBL3TSzhqIztS88FkV?=
+ =?us-ascii?Q?ehSXK0jyd0Z/vB7x9dHWU5lExB0IZT8te33Opn48AfRba3InbHMN6QWlonQd?=
+ =?us-ascii?Q?uuXbHyqCFR+/37HAM2TSm0X/4PO4ow1SqBMKSzQ9eyu5WokOTrZVRQ6nZ8JP?=
+ =?us-ascii?Q?6T9yso2zSz6l5LSnNI0Ydbf7pD+KCtmNPNbsPA/0xGBQc7XWw0im5GC13UdW?=
+ =?us-ascii?Q?B2oFkLyc7xaZDNTwPE5LHPEVZ+GDylhS87oTd9a312DrhI04JJJG5BLLSH7u?=
+ =?us-ascii?Q?3CZba8uwkM2GWZhwIX0/h/3K9OFM20ZVIdhWjTk9iPuKavXv7cgRKpG3GyxA?=
+ =?us-ascii?Q?8a8T//tho6Ukt47+2kcL6AUMnAUOMvPEE4jyBeOWIodV4/3epYt1EulZjcaq?=
+ =?us-ascii?Q?pf30g7kPk8E2jehaPnLnuOIz95lm5t0Okx2jvEhGf8RNbxF6n3ntBfg6cQH+?=
+ =?us-ascii?Q?5hCyzIcwxAWWAI62bgaE02GWv2untsZlngWlv/fgrMhITBk4MNdBhtgARCpy?=
+ =?us-ascii?Q?+gtOBkcJObhwdcsCKhbfy/XuxHrBKc14afszfvZMNbku00AlHcLUi7TKt+Gb?=
+ =?us-ascii?Q?CQC57vcVpV+dyHT1WzxxUFvHjflbVR/LzDStdFJvv6VFwdjNO4WVNAtF/ui8?=
+ =?us-ascii?Q?Cy3cJEu4HDRR0CTKxfjjFYyqree8JbjdI/5pxRBclrRSUTabieNTBa1r8u/y?=
+ =?us-ascii?Q?X0YzHb/6947YkLFwijncEKF+5VdUBftO2KlDnp6wpxlqbSKAM3PmKw3T6JwA?=
+ =?us-ascii?Q?MiUOcWdTaFxHB11bymA=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(7416014)(376014)(1800799024)(82310400026)(13003099007)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2025 17:12:48.7273
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f80f701a-3421-44d5-f1b0-08dde00cc9f8
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN1PEPF00004682.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7227
 
-From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+For TCP zerocopy rx (io_uring, devmem), there is an assumption that the
+parent device can do DMA. However that is not always the case:
+- Scalable Function netdevs [1] have the DMA device in the grandparent.
+- For Multi-PF netdevs [2] queues can be associated to different DMA
+  devices.
 
-Correct the Mode Control Register (MODCTRL) offset for RZ/N MIIC.
-According to the R-IN Engine and Ethernet Peripherals Manual (Rev.1.30)
-[0], Table 10.1 "Ethernet Accessory Register List", MODCTRL is at offset
-0x8, not 0x20 as previously defined.
+The series adds an API for getting the DMA device for a netdev queue.
+Drivers that have special requirements can implement the newly added
+queue management op. Otherwise the parent will still be used as before.
 
-Offset 0x20 actually maps to the Port Trigger Control Register (PTCTRL),
-which controls PTP_MODE[3:0] and RGMII_CLKSEL[4]. Using this incorrect
-definition prevented the driver from configuring the SW_MODE[4:0] bits
-in MODCTRL, which control the internal connection of Ethernet ports. As
-a result, the MIIC could not be switched into the correct mode, leading
-to link setup failures and non-functional Ethernet ports on affected
-systems.
+This series continues with switching to this API for io_uring zcrx and
+devmem and adds a ndo_queue_dma_dev op for mlx5.
 
-[0] https://www.renesas.com/en/document/mah/rzn1d-group-rzn1s-group-rzn1l-group-users-manual-r-engine-and-ethernet-peripherals?r=1054571
+The last part of the series changes devmem rx bind to get the DMA device
+per queue and blocks the case when multiple queues use different DMA
+devices. The tx bind is left as is.
 
-Fixes: 7dc54d3b8d91 ("net: pcs: add Renesas MII converter driver")
-Cc: stable@kernel.org
-Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Reviewed-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
+[1] Documentation/networking/device_drivers/ethernet/mellanox/mlx5/switchdev.rst
+[2] Documentation/networking/multi-pf-netdev.rst
+
+Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+
+----
+Changes sice v3 [4]:
+- Moved ndo_queue_get_dma_dev() from header to own file (patch 1).
+- Used real_num_rx_queues for queue bitmap (patch 6).
+- Allocate zeroed bitmap (patch 6).
+- Validate queue index (patch 6).
+- Forward errors from netdev_nl_read_rxq_bitmap() (patch 6).
+- Dropped rxq_dma_dev check (patch 7).
+- Fixed incorrect handling of extack message on bad dma dev (patch 7).
+- Added conflicting queues in error message (patch 7).
+- Dropped RFC status as feedback was mostly positive.
+
+Changes sice v2 [3]:
+- Downgraded to RFC status until consensus is reached.
+- Implemented more generic approach as discussed during
+  v2 review.
+- Refactor devmem to get DMA device for multiple rx queues for
+  multi PF netdev support.
+- Renamed series with a more generic name.
+
+Changes since v1 [2]:
+- Dropped the Fixes tag.
+- Added more documentation as requeseted.
+- Renamed the patch title to better reflect its purpose.
+
+Changes since RFC [1]:
+- Upgraded from RFC status.
+- Dropped driver specific bits for generic solution.
+- Implemented single patch as a fix as requested in RFC.
+- Handling of multi-PF netdevs will be handled in a subsequent patch
+  series.
+
+[1] RFC: https://lore.kernel.org/all/20250702172433.1738947-2-dtatulea@nvidia.com/
+[2]  v1: https://lore.kernel.org/all/20250709124059.516095-2-dtatulea@nvidia.com/
+[3]  v2: https://lore.kernel.org/all/20250711092634.2733340-2-dtatulea@nvidia.com/
+[4]  v3: https://lore.kernel.org/all/20250815110401.2254214-2-dtatulea@nvidia.com/#t
+
 ---
-v1->v2:
-- Used correct subject prefix
-- Updated commit message to clarify the issue.
 
-Hi All,
+Dragos Tatulea (7):
+  queue_api: add support for fetching per queue DMA dev
+  io_uring/zcrx: add support for custom DMA devices
+  net: devmem: get netdev DMA device via new API
+  net/mlx5e: add op for getting netdev DMA device
+  net: devmem: pull out dma_dev out of net_devmem_bind_dmabuf
+  net: devmem: pre-read requested rx queues during bind
+  net: devmem: allow binding on rx queues with same DMA devices
 
-I've just build-tested this patch and found this issue while working
-on a similar IP on the Renesas RZ/T2H SoC where the MODCTRL register
-offset is also at offset 0x8.
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |  24 ++++
+ include/net/netdev_queues.h                   |   8 ++
+ io_uring/zcrx.c                               |   3 +-
+ net/core/Makefile                             |   1 +
+ net/core/devmem.c                             |   8 +-
+ net/core/devmem.h                             |   2 +
+ net/core/netdev-genl.c                        | 123 +++++++++++++-----
+ net/core/netdev_queues.c                      |  25 ++++
+ 8 files changed, 163 insertions(+), 31 deletions(-)
+ create mode 100644 net/core/netdev_queues.c
 
-Cheers, Prabhakar
----
- drivers/net/pcs/pcs-rzn1-miic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/pcs/pcs-rzn1-miic.c b/drivers/net/pcs/pcs-rzn1-miic.c
-index d79bb9b06cd2..ce73d9474d5b 100644
---- a/drivers/net/pcs/pcs-rzn1-miic.c
-+++ b/drivers/net/pcs/pcs-rzn1-miic.c
-@@ -19,7 +19,7 @@
- #define MIIC_PRCMD			0x0
- #define MIIC_ESID_CODE			0x4
- 
--#define MIIC_MODCTRL			0x20
-+#define MIIC_MODCTRL			0x8
- #define MIIC_MODCTRL_SW_MODE		GENMASK(4, 0)
- 
- #define MIIC_CONVCTRL(port)		(0x100 + (port) * 4)
 -- 
-2.51.0
+2.50.1
 
 
