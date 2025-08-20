@@ -1,114 +1,121 @@
-Return-Path: <netdev+bounces-215373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D863B2E482
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 19:58:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07738B2E477
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 19:57:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76A4F586409
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 17:57:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9524C581BBE
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 17:56:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2CC9275AEB;
-	Wed, 20 Aug 2025 17:56:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C32A2765C0;
+	Wed, 20 Aug 2025 17:56:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cDhYH/b3"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F4E9273803;
-	Wed, 20 Aug 2025 17:56:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B8F27057B;
+	Wed, 20 Aug 2025 17:56:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755712596; cv=none; b=tKxZaO/YSwxYoblUbAU0IV1cQysaMwtRt+4DPQonI0A8Y1/NaTRvA0fWseRXrqj4bg6/ifJI00RuJ+82A95cF8nJnxQ2Iu9NvQU+cxCzpf59rifx0cv5/X1oSJQ+FPijfmrOOFd7EyTL4p2MZ5WrWLo3x33XxJQ/A/fBssZzlkA=
+	t=1755712581; cv=none; b=b64//OiptBI8zewwX5SI9cU+qaO/NRfQpMSEP+osz1btSneExkgp+NuEHa5RFD+fL1bSTLemPp7t7K8GvUA0t+tNvquXtljDkGMp9vLVAA+zRKr2l34dwyBVTaiTnJGrJyKOuTPq6o2uk7h3L/KJv4dw6YzJjT5vJvVLP3Z1+R0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755712596; c=relaxed/simple;
-	bh=PAk45Dqw/IAb5hhcZzBL27LdnwY8NSIC8b5E9cb1V/4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VkKUX5EHl+gYdw0/C0wY/KaUrexej9Y81DvIpL+hOIuoOD/KbolLMBGth8R95LFR0rJfIrUujJcE3oAj5iOdR0F7y917jGMz2ahXg+CuXVmfl97NVcgbr1g2y9nUMVpmPaJYaIymIK636FTSTmovOYpc3hHJr4Slk2+1BbtrRK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from [192.168.0.110] (unknown [114.241.87.235])
-	by APP-01 (Coremail) with SMTP id qwCowAB3Z6sLDKZou3TODQ--.64161S2;
-	Thu, 21 Aug 2025 01:55:23 +0800 (CST)
-Message-ID: <2601e3bd-b3d4-4eb1-bcb5-e4fbd9fe9c96@iscas.ac.cn>
-Date: Thu, 21 Aug 2025 01:55:23 +0800
+	s=arc-20240116; t=1755712581; c=relaxed/simple;
+	bh=jGdY+XlkdSM3yt6Aoazxzypn69809S2YpVHdfUFsk7w=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FGunouGDKD2dJc+conQRk38URem8+OISf6R2TzjHZ2oH6UPtqyWqiqJZ4vXJdhAXK868Odn09r9M3dTomdxCUrzn1mDHdRyrcuSqhr4ZeGroqKU+j/tAM070Wcz0OlbCTAXjNqk5M33p3z/iRss6qhrvbtJvjKsmlPxRkoGuBFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cDhYH/b3; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-76e4fc419a9so247195b3a.0;
+        Wed, 20 Aug 2025 10:56:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755712579; x=1756317379; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JNB2CrqWtsjiP7tsNyF0vHX9zkfr5BLz9zt8kKx4s2A=;
+        b=cDhYH/b3O1KqjbYaxxR5uGu7GT2iuc88ZomGsr+5YNg1ztvWfGobNF4MRx3YFudNNr
+         9YT6efjLWYvaPXolKGRz444HL2jceOvnYvGoR7HfwG3C8f1du2BumtwWDW8G1xJoxd68
+         5LhdwpSI/rSXXUddBNxD8ReAt/UklV0/4OPFuluqPF6n4yi2PJNdRrIU1x/eWREvaYSY
+         UQwVMmvxB+ExpeXxkkJMWJ9Q1SuMoCN69lN4T0z0LTiFxd9JVxP+ZwP+JBxJkcEYi1L4
+         ioA3Zq79LgnxF/QnA6Y1Si/VsKrmGjnA/sKj7re9Hipv6RbkGp+Pa+l45u8BQ0/uQkIP
+         X1tg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755712579; x=1756317379;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JNB2CrqWtsjiP7tsNyF0vHX9zkfr5BLz9zt8kKx4s2A=;
+        b=XLXX+okAx7qgGafYRvwBa7fz8P7Qkt/E3Gitp/Eg6WWSmfRD8S3bV8s+yHyuGydMQF
+         TxCyFaEd3MUdkih+ySSsVK7N6nS7sGzZu2gFWF/IcLNJi0JAFbPi+IrVjjJOfthd66HH
+         bJ+vH7Lsb3JpD8dbT0YGiAHjuz8srYY0XF1rkZuHMbPfUCjt+tTD0LVrXEKNiRsJOA/w
+         2oAjwtG8a7wK1S0XL8yWtPkaKWQf78suSrI8equG0/qpv2OchZ+eAs6BQM0/D6v+uMR+
+         IncQ68PL5zyU+YzP4FBOrchaV2ptxWjncPohgEqvq3M2vTT6SvINOOpfgfhQK9X3VpFe
+         Damg==
+X-Forwarded-Encrypted: i=1; AJvYcCU4TpaB0GHupNus7VPgGPCVWJ267ypNABZNUj/SwQyX8Z6Uf8VmqsWo1ppupI1wlG+PBGC5rB1YvPPP0IA=@vger.kernel.org, AJvYcCW2jqKynQL5SFy8UvH7tHIH/9RdB7Q831IKHhtwJ03lXhKtkakg27qKKz7yiBvfL59R1TEu6VtpvrkJJA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7/R+99iVh0afQ4rfoH0ft0WaAusC8dANHK4xwQUM62oCSsQX7
+	9VZGKDJIW8tyAPPxrfQYNYJw7XlfeKg5fiX+b7TThmaZlpRSQCAgvnA=
+X-Gm-Gg: ASbGncvn1Rb4ZbEM1bCwkXTudS9XmcuxqCVKysDrglXhd2Rh047Nbbmc0xU/rjabt86
+	wWoTlkjo/yJWYNNzueuZ5mKveUdWv82tQ+WcdNsCiRKit77w7fyx5z1ZCDqJFsq7oWDMBa9Kqom
+	/sPfy3Ulj1cOlTvo6Uv/UwC3GUuQwTdK+i0ioF2hBTzvI7aUyfVFUd0M+xwg1vvu2Fbxfs/V0QU
+	N124oWUVaRn8IHeNQYGf6jLYudyK+Cp/LdHfhYvzvlTunf1eD9DdZASeDDRLbuTlLpEDCVyxRJq
+	UwqO5YeCE0iRkIZ7olh8Zm5j9J2+YJofwMCUyjQc0UF6dw6Z/5dLxuhvwfovX7VhDpO6CqIY/bb
+	5utFCedw7o8JBNJ7pGL/j2jwzIlSN/kEB
+X-Google-Smtp-Source: AGHT+IGF8ILzjEPGlCmGVMO/tO+HPfoKuFdeOEBPrhGoP67CgwFRsjqvn6uJxe22BQIKRc2gDn5bvg==
+X-Received: by 2002:a17:902:cf0f:b0:240:770f:72d1 with SMTP id d9443c01a7336-245ef165ec6mr56142485ad.24.1755712578979;
+        Wed, 20 Aug 2025 10:56:18 -0700 (PDT)
+Received: from debian.ujwal.com ([223.185.130.96])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-245ed4ccaa9sm32553815ad.86.2025.08.20.10.56.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Aug 2025 10:56:18 -0700 (PDT)
+From: Ujwal Kundur <ujwal.kundur@gmail.com>
+To: allison.henderson@oracle.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	rds-devel@oss.oracle.com,
+	linux-kernel@vger.kernel.org,
+	Ujwal Kundur <ujwal.kundur@gmail.com>
+Subject: [PATCH net-next v2 0/4] rds: Fix semantic annotations
+Date: Wed, 20 Aug 2025 23:25:46 +0530
+Message-Id: <20250820175550.498-1-ujwal.kundur@gmail.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 4/5] riscv: dts: spacemit: Add Ethernet
- support for BPI-F3
-To: Hendrik Hamerlinck <hendrik.hamerlinck@hammernet.be>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexandre Ghiti <alex@ghiti.fr>
-Cc: Vivian Wang <uwu@dram.page>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Junhui Liu <junhui.liu@pigmoral.tech>, Simon Horman <horms@kernel.org>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-riscv@lists.infradead.org,
- spacemit@lists.linux.dev, linux-kernel@vger.kernel.org,
- Shuah Khan <skhan@linuxfoundation.org>
-References: <20250812-net-k1-emac-v5-0-dd17c4905f49@iscas.ac.cn>
- <20250812-net-k1-emac-v5-4-dd17c4905f49@iscas.ac.cn>
- <463dcfa3-152e-4a48-9821-debdc29c89b2@hammernet.be>
-Content-Language: en-US
-From: Vivian Wang <wangruikang@iscas.ac.cn>
-In-Reply-To: <463dcfa3-152e-4a48-9821-debdc29c89b2@hammernet.be>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowAB3Z6sLDKZou3TODQ--.64161S2
-X-Coremail-Antispam: 1UD129KBjvdXoWrurWrJr43Kw45AFy8Gr45Wrg_yoWfArbE9F
-	WSqFnxu34ku3W0gr1UtanxAr1FqrZxWryaqas8twn5J34Ivw4UGw1rJas5JwnxGFy2qrnr
-	ZFyagF4jyr12vjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbVxYjsxI4VWkKwAYFVCjjxCrM7AC8VAFwI0_Xr0_Wr1l1xkIjI8I
-	6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM2
-	8CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0
-	cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwV
-	C2z280aVCY1x0267AKxVW8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVAC
-	Y4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJV
-	W8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkI
-	wI1lc7CjxVAaw2AFwI0_GFv_Wryl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr
-	0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY
-	17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcV
-	C0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY
-	6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa
-	73UjIFyTuYvjxUkX_TUUUUU
-X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 
+This patchset addresses all semantic warnings flagged by Sparse for
+net/rds.
 
-On 8/13/25 21:34, Hendrik Hamerlinck wrote:
->
-> On 8/12/25 04:02, Vivian Wang wrote:
->> Banana Pi BPI-F3 uses an RGMII PHY for each port and uses GPIO for PHY
->> reset.
->>
->> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
->>
-> Tested on Banana Pi BPI-F3 and Orange Pi RV2. Verified SSH shell over eth0
-> and eth1 interfaces, and basic UDP connectivity using iperf3. Thank you!
->
-> Tested-by: Hendrik Hamerlinck <hendrik.hamerlinck@hammernet.be>
+v1:
+ - https://lore.kernel.org/all/20250810171155.3263-1-ujwal.kundur@gmail.com/
 
-Thank you for the testing! I've already put this trailer on v6, but
-forgot to reply here.
+Ujwal Kundur (4):
+  rds: Replace POLLERR with EPOLLERR
+  rds: Fix endianness annotation of jhash wrappers
+  rds: Fix endianness annotation for RDS_MPATH_HASH
+  rds: Fix endianness annotations for RDS extension headers
 
-I haven't included the DTS patch for Orange Pi RV2 in v6, because the
-board DTS is not in v6.17-rc1. However, it is in Yixun's spacemit tree,
-AFAICT, so if we get the driver in for v6.18 I'll send the DTS
-separately to spacemit mailing list. If we don't, I'll include it
-alongside the driver when rebasing to v6.18-rc1.
+ net/rds/af_rds.c     | 2 +-
+ net/rds/connection.c | 9 +++++----
+ net/rds/message.c    | 4 ++--
+ net/rds/rds.h        | 2 +-
+ net/rds/recv.c       | 4 ++--
+ net/rds/send.c       | 4 ++--
+ 6 files changed, 13 insertions(+), 12 deletions(-)
 
-Vivian "dramforever" Wang
-
+-- 
+2.30.2
 
 
