@@ -1,156 +1,159 @@
-Return-Path: <netdev+bounces-215336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 133AAB2E2F0
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 19:06:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2CCFB2E301
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 19:10:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E757189BF32
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 17:07:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1995CA21717
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 17:09:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0C992E8B72;
-	Wed, 20 Aug 2025 17:06:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74C803314DC;
+	Wed, 20 Aug 2025 17:09:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AVZdys1b"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V8JHUcri"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F4536CE0D;
-	Wed, 20 Aug 2025 17:06:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F82B33438D;
+	Wed, 20 Aug 2025 17:09:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755709607; cv=none; b=FuXofJr2WF93xXdK5kmFS/jumgsR7VvW7pz62vYuU7LzDYi/zXKymo6pfC9DvyZLvur6pCUPoWGv2QbNam8cy4p41xZULKcOcFb6OCA+q0C/ZcUueYyUvSvdj6Qi0VAyLE8VSHcrLgrDkhxFYLWd6VxV+XJhYLtZSgXkBEYP5DY=
+	t=1755709763; cv=none; b=sTwRbvOPTgfvbkN00302h9dOKYR4iXlh08qOIzhbITWJnc6OPRagVTGjSPfXCDMc4gOBBjk9qMUkMPNmPzX4pZL48XWKcHjdPehZtYQ9wN849Ulk6c/vQVLn/0ZHJ8ri/xLNeS7QPSw9/SBpHM5YJ64aEOGI/DebQLVz6LyVnTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755709607; c=relaxed/simple;
-	bh=IQUsg5cvVqy3HqgYcOB3CxMyauJ9YJlgKAd8e1YvGDs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NNGNQbx1xvBEopVqTEMU9Sc2oIOUR3n8QxOG43s7Aaqm5Y17xFjwheFXO2FlYZU3KcY/haC+MRfZmlAE2gSIRosBvA8jJney/UEz/QWE+BQbwWkuohva6+BsMszw5wRzLUavoBK79ZsZxrtAxWO87sEQuuz8YcZNuWkc79Xq0Zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AVZdys1b; arc=none smtp.client-ip=209.85.215.182
+	s=arc-20240116; t=1755709763; c=relaxed/simple;
+	bh=onCZhWEZv0sN7Coawqrn23/OzfNd3gropWTNiiami5c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gcBeMT9Stl3qVE/EmYn6AiZk9WNuC4ONUNNuKny5UTO2Qc5H3R/B371SEiWb1FycXWJ8SoPCBSPY3HKhVu3A+fMYKi3EIh/7XWMlaWmf4s5Zaug2O417R9xqCLAc8zBPN9VGxf8cD1stK3OfQThdrEd79To5C2hC49rGDDCcxcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V8JHUcri; arc=none smtp.client-ip=209.85.128.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b472fd93ad1so32405a12.0;
-        Wed, 20 Aug 2025 10:06:44 -0700 (PDT)
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-45a15fd04d9so8213295e9.1;
+        Wed, 20 Aug 2025 10:09:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755709604; x=1756314404; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8W8/wWuM+A08MdToSUhnUGmguQ8smfR5MJmNoOHi5O4=;
-        b=AVZdys1basU8tJKaazvOh1WKdTRxo0YnCSUCzfY1TiGiwrHqG8Krl+72nO8hdqKKkI
-         L8bUEu6Vp73rMdSxIidEmPGSjiQNrZ7pDOgAyuF7a8rbNszN3b8AqgXVLxo6n4axHr4F
-         w7SK4SbNg0WS5Ll/7VOh1k/3h9TzivIrHzUKJMLIiRgxiGYoplQbX/RWXfwUrMpI2awW
-         CwHja3WJTI/S4W1WEovoYTpIV+l4nN8AegbAsJ4c+Y4OmMZRCkcYaNfsEy/QWLDxjZIj
-         SViZptmQXcGkqwMZzzkMa2eQVvmMXaS4Dx1l4CDbTJs2qEl58SCRWjGtRkF/jfIpX2l1
-         AMnA==
+        d=gmail.com; s=20230601; t=1755709760; x=1756314560; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MPScU1ItNsuVBAeO87+rFDAEOXNN+q4yVoKKRyKs/Y8=;
+        b=V8JHUcriW90da/vU6KZXDlJ9GE0hjG6J4p1pjE37Co1JvPN3pEHQAE0fviNjZeCeyk
+         bk59hEEBdm1fHvYT46T6H0tuYZEe12hUKat2AxUzi+SinCDQg8akEylCo0k5FfGl7+C5
+         Y9UhF+NKImQiWxinDopKSj+fe29babNSf9R5iOJY20vLs3qHEeB7u3C8DcdatAhflCfj
+         eJu3tvwG8eNX5Kf9tgvqJ7U6JlzCtF1f2k7gH4MEa1jSHE/yz16Zx+PvLP1PMbVzT2XL
+         Tos345Q73M8Na50BwLAlMt/ONEpFimK2Y+d5I45izw9HgutLeyg43d2C+hPPDsCAvABG
+         JXHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755709604; x=1756314404;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8W8/wWuM+A08MdToSUhnUGmguQ8smfR5MJmNoOHi5O4=;
-        b=Fr8dQoXChvHT3bw1A/V5V+0oJ/y3a/GvZtycLedWa3u0Km77eSGYTpcB+RVL8qboOd
-         KBAgCGEseu0Zrco/CoKLVyMxYxZyyPQz/zLmf8IydEPwviZV/HbHweVfg7DdvKVkzA44
-         GfUSBD8Kzi5Yg1bWVD0o2a1uxzs5NTDcsn/grVcTOdKaLZHR9MWH3sOxEXw8WV0o7aqG
-         AocaMO/VEjCljw+BIz70wHGJQQCFKiSrd+l6m65MESf9on5jOcpyPBr5KC9LBkU9UpNa
-         FINfeZKSnsTo50T6SqjDbvPwkveF4tWczXIF3XE2bs8wGAESeOFdpFzhrCp/ai5ZhglC
-         wLwA==
-X-Forwarded-Encrypted: i=1; AJvYcCVkiW0/RELBf7jbmye7ILnq8S8Kat13rHDUUgKTqrvjj5LbH88OCJxIRQYlX3lfYu0xPBhRRog=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOJ/HMRmNTRYrO/GtendymimesuI4t0FEcRMospbF3BPhA2pl4
-	QCTk53Jtz8exqUuJwKw9FZSapUnYTW/0yyGIRO2MjVhlwTORY5caawc=
-X-Gm-Gg: ASbGnct0gv9PVTYq+617Ph+3iYqOYKwhODb7Et/8reebnURRPgmsgE114+nrX5M5D06
-	9bXXNSUNZon23y8EeMsXpssVQ7RzH3OzJyHHI7Q0NpLgiW9505VdbZ1le+HSEyPolQIBddKvX03
-	y2JNRhDhn/9UcjafEUDBGyW4B4nzqcvnhwVmjTST8D2HPNHO7EDEVkURrqfaJUNgqa3Gq7Vzlh8
-	UuIBJFCT4YwrrysE025JWXQ7fTW+1SfkCSfqMOT7VaiJjpk2U5D10jMmm1z9agVN/tcaXvQh+Ae
-	bkczVYllDq6jQuFsshekxf2ivBz4QLtXxe+iVAIKOFTBTQTa74NfoWEbhfwkKrjEguT4rGpZ922
-	+rzoXu6gj4nPpfQqYmJdUK5zeARnvf2kmiVT7YM7dkAGaXM3eJEHYwMHilvk=
-X-Google-Smtp-Source: AGHT+IHhrnS4bO5cF6D66gvRd6lpOM+6Asj4u4plG7wTD1l3FOElbOmm14MXfP3s7mtRa9SLL1vJ7A==
-X-Received: by 2002:a17:903:b0e:b0:240:6ae4:3695 with SMTP id d9443c01a7336-245ef113d53mr43278745ad.4.1755709604160;
-        Wed, 20 Aug 2025 10:06:44 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-245ed4fa5c8sm31466475ad.122.2025.08.20.10.06.43
+        d=1e100.net; s=20230601; t=1755709760; x=1756314560;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MPScU1ItNsuVBAeO87+rFDAEOXNN+q4yVoKKRyKs/Y8=;
+        b=mRHbkj3vSeObU5lzlSrxG48DcUryg+cEGTd7CN3CMuzJEKOO3/0Jb6hE+4o9gFwYn3
+         V3Uww6CsRcZl5ltT0yVxYnEAhKjDqEs0FG0mG0pjaGnpQ3gaEaE1/IVqxYJB2721Unpq
+         Ng+AgRRJF8UlxHUrOeWNlk2Sk7T2CEQf3LDExd6dUWZFi2+aq28+H0pCEqbQyASqaidG
+         hrJP2NClDrWZWdjP3wsmvJJNe9N6pz8yzvptZI6SoWVm472PNidu7/WUSq18eETRNru0
+         JkAJYq/ciDbpnTo3yhUG71FvsVRYAdnxm7EKqGXa4KAHuuO6orvPVNKWu+0IjrHGduut
+         liCA==
+X-Forwarded-Encrypted: i=1; AJvYcCU/YKyzLx3/eva2UVJMb/ZpPvmY1bWI49l9orb3w+2Gzc7WgR02e3idXiSxJab8eTPARhPR4Ms6FOQozRY=@vger.kernel.org, AJvYcCWKA5v0PSlhRG7OXhNmD63K3Z83vGv3+3kwUhYnIeMQEZim//LIIVFICdgxwW+EfHcEYAc1Pzl9@vger.kernel.org
+X-Gm-Message-State: AOJu0YzuVpXdznGYQHP4RzsVriLr38I6dgAsrRBmhhQThtd5Lco2zzW6
+	GiNs5FIEHh6e8nukksFB9OYquUesmGfAhCsfQnldZvePcD4mKOXtUFLp
+X-Gm-Gg: ASbGncu90X3Y/Zs3W3s2t7RJQphBDK/AmnHm7vuhUlc5HcvT0fdR6/DmtUh/Q9vbB6C
+	2aC3JR8RVWXwEWnD/leLEquXSJFPYnsisD7jK53zAjmiO8MwrtgLSIYhfJEdOaQ2CRZUab+f2Zl
+	oWMV9aEaqc7emrMEfWb/2Q6/QsUnSn3qVQyR++OXmSZ9Bn7wklD2xb/s7zL+XlfQLNEbPlNNj8A
+	Ut/XDyYpp9f21ZPTkGqFu/j63Spf8rIlUWrrlAbiCwu+PSNRA6iegLsX/R40Lp2/nyq34FvSecs
+	Nb08iB+ZIVqjI0vhoOCQIP4r1JT65EPQa37OjaEzQuGplnaUY65RNp252MDjqhxDb5MrnEEkLHf
+	XIgcnxmE98jBCO0tsuLRcPkxff7G11hotS+Q7IlZ0RE+IFWIFg4oqL260
+X-Google-Smtp-Source: AGHT+IGMp/og93GJnnQsP8vZ8w4JEv8g3mF3aEsNkXrBBZYqPOCbIxmFaI1dS0QKUMPOwONj0CxqSQ==
+X-Received: by 2002:a05:600c:64c8:b0:45b:47e1:f603 with SMTP id 5b1f17b1804b1-45b4c6449dfmr2721875e9.18.1755709759349;
+        Wed, 20 Aug 2025 10:09:19 -0700 (PDT)
+Received: from iku.Home ([2a06:5906:61b:2d00:9b1:f84b:89f6:b00e])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b47c605e8sm38532445e9.20.2025.08.20.10.09.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Aug 2025 10:06:43 -0700 (PDT)
-Date: Wed, 20 Aug 2025 10:06:43 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
-	andrii@kernel.org, netdev@vger.kernel.org,
-	magnus.karlsson@intel.com, aleksander.lobakin@intel.com,
-	Eryk Kubanski <e.kubanski@partner.samsung.com>
-Subject: Re: [PATCH v6 bpf] xsk: fix immature cq descriptor production
-Message-ID: <aKYAo2pNMp3Ahvog@mini-arch>
-References: <20250820154416.2248012-1-maciej.fijalkowski@intel.com>
+        Wed, 20 Aug 2025 10:09:18 -0700 (PDT)
+From: Prabhakar <prabhakar.csengg@gmail.com>
+X-Google-Original-From: Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+To: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <clement.leger@bootlin.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Wolfram Sang <wsa+renesas@sang-engineering.com>
+Cc: linux-renesas-soc@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Prabhakar <prabhakar.csengg@gmail.com>,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	stable@kernel.org
+Subject: [PATCH net-next v2] net: pcs: rzn1-miic: Correct MODCTRL register offset
+Date: Wed, 20 Aug 2025 18:09:13 +0100
+Message-ID: <20250820170913.2037049-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250820154416.2248012-1-maciej.fijalkowski@intel.com>
+Content-Transfer-Encoding: 8bit
 
-On 08/20, Maciej Fijalkowski wrote:
-> Eryk reported an issue that I have put under Closes: tag, related to
-> umem addrs being prematurely produced onto pool's completion queue.
-> Let us make the skb's destructor responsible for producing all addrs
-> that given skb used.
-> 
-> Introduce struct xsk_addrs which will carry descriptor count with array
-> of addresses taken from processed descriptors that will be carried via
-> skb_shared_info::destructor_arg. This way we can refer to it within
-> xsk_destruct_skb(). In order to mitigate the overhead that will be
-> coming from memory allocations, let us introduce kmem_cache of
-> xsk_addrs. There will be a single kmem_cache for xsk generic xmit on the
-> system.
-> 
-> Commit from fixes tag introduced the buggy behavior, it was not broken
-> from day 1, but rather when xsk multi-buffer got introduced.
-> 
-> Fixes: b7f72a30e9ac ("xsk: introduce wrappers and helpers for supporting multi-buffer in Tx path")
-> Reported-by: Eryk Kubanski <e.kubanski@partner.samsung.com>
-> Closes: https://lore.kernel.org/netdev/20250530103456.53564-1-e.kubanski@partner.samsung.com/
-> Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
-> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> ---
-> 
-> v1:
-> https://lore.kernel.org/bpf/20250702101648.1942562-1-maciej.fijalkowski@intel.com/
-> v2:
-> https://lore.kernel.org/bpf/20250705135512.1963216-1-maciej.fijalkowski@intel.com/
-> v3:
-> https://lore.kernel.org/bpf/20250806154127.2161434-1-maciej.fijalkowski@intel.com/
-> v4:
-> https://lore.kernel.org/bpf/20250813171210.2205259-1-maciej.fijalkowski@intel.com/
-> v5:
-> https://lore.kernel.org/bpf/aKXBHGPxjpBDKOHq@boxer/T/
-> 
-> v1->v2:
-> * store addrs in array carried via destructor_arg instead having them
->   stored in skb headroom; cleaner and less hacky approach;
-> v2->v3:
-> * use kmem_cache for xsk_addrs allocation (Stan/Olek)
-> * set err when xsk_addrs allocation fails (Dan)
-> * change xsk_addrs layout to avoid holes
-> * free xsk_addrs on error path
-> * rebase
-> v3->v4:
-> * have kmem_cache as percpu vars
-> * don't drop unnecessary braces (unrelated) (Stan)
-> * use idx + i in xskq_prod_write_addr (Stan)
-> * alloc kmem_cache on bind (Stan)
-> * keep num_descs as first member in xsk_addrs (Magnus)
-> * add ack from Magnus
-> v4->v5:
-> * have a single kmem_cache per xsk subsystem (Stan)
-> v5->v6:
-> * free skb in xsk_build_skb_zerocopy() when xsk_addrs allocation fails
->   (Stan)
-> * unregister netdev notifier if creating kmem_cache fails (Stan)
+From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+Correct the Mode Control Register (MODCTRL) offset for RZ/N MIIC.
+According to the R-IN Engine and Ethernet Peripherals Manual (Rev.1.30)
+[0], Table 10.1 "Ethernet Accessory Register List", MODCTRL is at offset
+0x8, not 0x20 as previously defined.
 
-Thanks!
+Offset 0x20 actually maps to the Port Trigger Control Register (PTCTRL),
+which controls PTP_MODE[3:0] and RGMII_CLKSEL[4]. Using this incorrect
+definition prevented the driver from configuring the SW_MODE[4:0] bits
+in MODCTRL, which control the internal connection of Ethernet ports. As
+a result, the MIIC could not be switched into the correct mode, leading
+to link setup failures and non-functional Ethernet ports on affected
+systems.
+
+[0] https://www.renesas.com/en/document/mah/rzn1d-group-rzn1s-group-rzn1l-group-users-manual-r-engine-and-ethernet-peripherals?r=1054571
+
+Fixes: 7dc54d3b8d91 ("net: pcs: add Renesas MII converter driver")
+Cc: stable@kernel.org
+Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Reviewed-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
+---
+v1->v2:
+- Used correct subject prefix
+- Updated commit message to clarify the issue.
+
+Hi All,
+
+I've just build-tested this patch and found this issue while working
+on a similar IP on the Renesas RZ/T2H SoC where the MODCTRL register
+offset is also at offset 0x8.
+
+Cheers, Prabhakar
+---
+ drivers/net/pcs/pcs-rzn1-miic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/pcs/pcs-rzn1-miic.c b/drivers/net/pcs/pcs-rzn1-miic.c
+index d79bb9b06cd2..ce73d9474d5b 100644
+--- a/drivers/net/pcs/pcs-rzn1-miic.c
++++ b/drivers/net/pcs/pcs-rzn1-miic.c
+@@ -19,7 +19,7 @@
+ #define MIIC_PRCMD			0x0
+ #define MIIC_ESID_CODE			0x4
+ 
+-#define MIIC_MODCTRL			0x20
++#define MIIC_MODCTRL			0x8
+ #define MIIC_MODCTRL_SW_MODE		GENMASK(4, 0)
+ 
+ #define MIIC_CONVCTRL(port)		(0x100 + (port) * 4)
+-- 
+2.51.0
+
 
