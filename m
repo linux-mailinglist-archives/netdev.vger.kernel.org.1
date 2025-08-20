@@ -1,69 +1,72 @@
-Return-Path: <netdev+bounces-215404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C49AB2E78D
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 23:35:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45C16B2E7A1
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 23:41:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 005607B74C8
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 21:33:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB1413A5C64
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 21:40:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C37DC258ECB;
-	Wed, 20 Aug 2025 21:34:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 761A9334377;
+	Wed, 20 Aug 2025 21:40:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NNQ05Mdu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B+TQUYr0"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 643FF1DB154
-	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 21:34:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4700732A3D1;
+	Wed, 20 Aug 2025 21:40:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755725683; cv=none; b=aPD5xPC46uIsjBZRPC/0vB9vsBNKes4mjW/HRecGEhxCwCZ6lD2UPoKPmnpXNd/0LX512o1tBLiIvAvRQO0941jbHQgD9sAxBQyWS9cZ5kN1dt21FfF0so4g6ldMhslVXL7CYHN03S2hGy7vj3EVtpIP2Iacdl5uXALFEDUVJKY=
+	t=1755726001; cv=none; b=HQ/5DjFu27CcxOCv/6lX0+WNqoY7WSIKqRfaCB9R9Rk7klInd9rqHVpcBgtAbt9u+gno6KGUSxdudsuYMim4mr9m/U6dCogiHfy1iL9NgbN73pQfZHHvepIsxbsxzSUHcXXthogx+LFxV5KHjjjFIpw1eUT31ZexNywxUx1xt2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755725683; c=relaxed/simple;
-	bh=X/KkpmLbn4F5MP7wCou9O6AcaiHjVgcH3CgN8fhMs1c=;
+	s=arc-20240116; t=1755726001; c=relaxed/simple;
+	bh=Vu1I+HuHxDoxxbdFB6j/GEmkfst7XlomsGsZmlP9iJQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rWBhTWhFUp9hspVZWbvmaouMYD7o3e+K4xjIusif6O25458EsuEeeYanS/W1F/p8PZmSlOOc16qM4Oxa3n3v+Jo5MUm1UYpagyqSyP+LgJSsx2ayn2cYKNNGudRPKPNKHdP8TJiDfcv9hnIsRTvtJuiIgK/AfemL5Ngn6r7etL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NNQ05Mdu; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 20 Aug 2025 14:34:29 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1755725679;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PM4zc6JuUjs9DXSdg1cZOgc0LHF7QtVILQ3VPU4Ih/8=;
-	b=NNQ05MduTzCaRYI9uiMb7owIrlzEL1YD/MvexojLbiozG6JxgMI58P+bKk4ZGymiCm0Cp0
-	UcJ3Lmrcrf7o5ltnSE+CU1DdPSXFMbdsWQ1/9NtCpn1//ftaB4Gc3fByz0lVo+9Dgs0Fp8
-	a2Lf4TnQry6HsMT23aHSrgSHvx+V3oM=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Matyas Hurtik <matyas.hurtik@cdn77.com>
-Cc: Tejun Heo <tj@kernel.org>, 
-	Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, Daniel Sedlak <daniel.sedlak@cdn77.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, David Ahern <dsahern@kernel.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Yosry Ahmed <yosry.ahmed@linux.dev>, linux-mm@kvack.org, 
-	netdev@vger.kernel.org, Johannes Weiner <hannes@cmpxchg.org>, 
-	Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
-	Muchun Song <muchun.song@linux.dev>, cgroups@vger.kernel.org
-Subject: Re: [PATCH v4] memcg: expose socket memory pressure in a cgroup
-Message-ID: <kyy6mxg4g6aer2mht3xawiq56ytveg7vllg7o6f7dgivkoh52z@ccinqivomtyl>
-References: <20250805064429.77876-1-daniel.sedlak@cdn77.com>
- <aJeUNqwzRuc8N08y@slm.duckdns.org>
- <gqeq3trayjsylgylrl5wdcrrp7r5yorvfxc6puzuplzfvrqwjg@j4rr5vl5dnak>
- <aJzTeyRTu_sfm-9R@slm.duckdns.org>
- <e65222c1-83f9-4d23-b9af-16db7e6e8a42@cdn77.com>
- <aKYb7_xshbtFbXjb@slm.duckdns.org>
- <fa039702-3d60-4dc0-803a-b094b41fd2b9@cdn77.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=W3eSuetFWHyr3TOvneEpMux52c6u7AX3aorTat8KKu+YGcUEBJsqcUA2r/VB6l6m0WM2K32+55d0kpQsGR+kIekkwwJVDLlI3+HOax5bKU4VDIj/t2QFI7sRQ7p1g2Pm2smhdlAO29VC6oeRnf4AL81Gi5aViRX3mlY9BOezKF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B+TQUYr0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A08D9C4CEE7;
+	Wed, 20 Aug 2025 21:40:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755726000;
+	bh=Vu1I+HuHxDoxxbdFB6j/GEmkfst7XlomsGsZmlP9iJQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=B+TQUYr0THucNKh8oKFkwFeJXzEbfGCHJyoliV+IcvcvgGdLfCzeR0EbkUp+qrvn2
+	 LvSN948xgKu4YQ1nblQ3HF95WmUJUY12AoElpmJipXd6634ZWgggLhWhySVolrY98G
+	 KhAiwZwwNsd2pXm1syl27NxVCPbkjHIe6IHYWXS/vw7FPFVgIVNZ2QHE7v3z5YngHK
+	 E+uXlLTvIyGR1J/K2wa/sxc63Phh37yxqJnpvv1wqzZtWX9QdwOwbVH7cVV0aTK+lV
+	 wTs2VLXpzP1Qk0N5I+TPcOGrtXag/d45bQozG90GXCexdjXYsGLZPihNClOxgkN5yV
+	 +XPS05GgV0DLw==
+Date: Wed, 20 Aug 2025 16:39:59 -0500
+From: Rob Herring <robh@kernel.org>
+To: "D. Jeff Dionne" <jeff@coresemi.io>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Artur Rojek <contact@artur-rojek.eu>, Rob Landley <rob@landley.net>,
+	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/3] dt-bindings: net: Add support for J-Core EMAC
+Message-ID: <20250820213959.GA1242641-robh@kernel.org>
+References: <20250815194806.1202589-3-contact@artur-rojek.eu>
+ <aa6bdc05-81b0-49a2-9d0d-8302fa66bf35@kernel.org>
+ <cab483ef08e15d999f83e0fbabdc4fdf@artur-rojek.eu>
+ <CAMuHMdVGv4UHoD0vbe3xrx8Q9thwrtEaKd6X+WaJgJHF_HXSaQ@mail.gmail.com>
+ <26699eb1-26e8-4676-a7bc-623a1f770149@kernel.org>
+ <295AB115-C189-430E-B361-4A892D7528C9@coresemi.io>
+ <bc96aab8-fbb4-4869-a40a-d655e01bb5c7@kernel.org>
+ <CAMuHMdW0NZHCX1V01N4oay-yKuOf+RR5YV3kjNFiM6X6aVAvdw@mail.gmail.com>
+ <0784109c-bb3e-4c4e-a516-d9e11685f9fb@kernel.org>
+ <CB2BF943-8629-4D01-8E52-EEC578A371B5@coresemi.io>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,35 +76,61 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <fa039702-3d60-4dc0-803a-b094b41fd2b9@cdn77.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <CB2BF943-8629-4D01-8E52-EEC578A371B5@coresemi.io>
 
-On Wed, Aug 20, 2025 at 10:37:49PM +0200, Matyas Hurtik wrote:
-> Hello,
-> 
-> On 8/20/25 9:03 PM, Tejun Heo wrote:
-> > On Wed, Aug 20, 2025 at 06:51:07PM +0200, Matyas Hurtik wrote:
-> > > And the read side:   total_duration = 0;   for (;
-> > > !mem_cgroup_is_root(memcg); memcg = parent_mem_cgroup(memcg))    
-> > > total_duration +=
-> > > atomic_long_read(&memcg->socket_pressure_duration); Would that work?
-> > This doesn't make sense to me. Why would a child report the numbers from
-> > its ancestors?
-> 
-> Result of mem_cgroup_under_socket_pressure() depends on
-> whether self or any ancestors have had socket_pressure set.
-> 
-> So any duration of an ancestor being throttled would also
-> mean the child was being throttled.
-> 
-> By summing our and our ancestors socket_pressure_duration
-> we should get our total time being throttled
-> (possibly more because of overlaps).
+On Mon, Aug 18, 2025 at 10:55:51PM +0900, D. Jeff Dionne wrote:
+> Something like:
 
-This is not how memcg stats (and their semantics) work and maybe that is
-not what you want. In the memcg stats semactics for a given memcg the
-socket_pressure_duration metric is not the stall duration faced by
-sockets in memcg but instead it will be stall duration caused by the
-memcg and its descendants. If that is not what we want, we need to do
-something different and orthogonal to memcg stats.
+Please don't top post to maillists.
+
+> J-Core SoCs are assembled with an SoC generator tool from standard 
+> components.  An SoC has a ROM from soc_gen with a Device Tree binary 
+> included.  Therefore, J-Core SoC devices are designed to ‘just work’ 
+> with linux, but this means the DT entires are generic, slightly 
+> different than standard device tree practice.
+
+Yes. Though doesn't the SoC generator evolve/change? New features in the 
+IP blocks, bug fixes, etc. Soft IP for FPGAs is similar I think. There 
+we typically just require the versioning schema be documented and 
+correlate to the IP versions (vs. made up v1, v2, v3).
+
+This is all pretty niche I think, so I'm not too concerned about what 
+you do here.
+
+Rob
+
+> 
+> J
+> 
+> > On Aug 18, 2025, at 22:41, Krzysztof Kozlowski <krzk@kernel.org> wrote:
+> > 
+> > On 18/08/2025 12:57, Geert Uytterhoeven wrote:
+> >>>> 
+> >>>> No.  It’s a generic IP core for multiple SoCs, which do have names.
+> >>> 
+> >>> Then you need other SoCs compatibles, because we do not allow generic
+> >>> items. See writing bindings.
+> >>> 
+> >>>> This is the correct naming scheme.  All compatible devices and SoCs match properly.
+> >>> 
+> >>> No, it is not a correct naming scheme. Please read writing bindings.
+> >> 
+> >> Can we please relax this for this specific compatible value?
+> > 
+> > We can...
+> > 
+> >> All other devices in this specific hardware implementation were
+> >> accepted without SoC-specific compatible values ca. 9 years ago. AFAIK
+> >> the Ethernet MAC was the sole missing piece, because its Linux driver
+> >> was never attempted to be upstreamed before.
+> > 
+> > ...just provide some context and rationale in the commit msg.
+> > 
+> > Some (different) people pick up some irrelevant commits and use them as
+> > argument in different discussions in style: it was allowed there, so I
+> > can do the same.
+> > 
+> > Best regards,
+> > Krzysztof
+> 
 
