@@ -1,175 +1,107 @@
-Return-Path: <netdev+bounces-215403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A798B2E740
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 23:14:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C49AB2E78D
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 23:35:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8194C7B09C0
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 21:12:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 005607B74C8
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 21:33:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56298304BD5;
-	Wed, 20 Aug 2025 21:13:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C37DC258ECB;
+	Wed, 20 Aug 2025 21:34:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XAuqXO8G"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NNQ05Mdu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B7CB1C3306;
-	Wed, 20 Aug 2025 21:13:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 643FF1DB154
+	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 21:34:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755724432; cv=none; b=iH2VtaOlCc/T5IrKwq6KOmOE21J5Xqvh61ded2U1B9/N0JYmG+NvbgzfXIpQchz11TLj+rQxzPsocmFM9goduti9mtD9wjliSp/0Wrz8jgzi4wkDJQWQbuCVGG7+6KPdS27UgP0UWbsb/t10+pMh/OR83npFbT7OALFT6MJR2k8=
+	t=1755725683; cv=none; b=aPD5xPC46uIsjBZRPC/0vB9vsBNKes4mjW/HRecGEhxCwCZ6lD2UPoKPmnpXNd/0LX512o1tBLiIvAvRQO0941jbHQgD9sAxBQyWS9cZ5kN1dt21FfF0so4g6ldMhslVXL7CYHN03S2hGy7vj3EVtpIP2Iacdl5uXALFEDUVJKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755724432; c=relaxed/simple;
-	bh=WV7VhBpXVnPGHMwCHb6sbkmgr2ObSQPssfODRH4+LN0=;
+	s=arc-20240116; t=1755725683; c=relaxed/simple;
+	bh=X/KkpmLbn4F5MP7wCou9O6AcaiHjVgcH3CgN8fhMs1c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nm/DG/uNeRn1v4rZkS8YaUsn1uYoHdsJMEcnvSbRI4pnFW3MJRb4XJo9kuDOJ7iF4IIJe9JUA8tPaN5msW2UWEgDA6lhXmSRk2wV6FPfc7mLRHSe0bvrU0bmuYYpp6fCjiHTkATFjREdugd1q9S+h4FmrEM65BYkHjtXkBoivX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XAuqXO8G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 939A7C4CEE7;
-	Wed, 20 Aug 2025 21:13:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755724431;
-	bh=WV7VhBpXVnPGHMwCHb6sbkmgr2ObSQPssfODRH4+LN0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XAuqXO8GXBeANo9jz7yeTT6uuCkttWIlDQgua/WZD4ycp2oEW97roCewQJYSQyBno
-	 DVlq2xisIwlRpo9bSLZtg9RMGtsuqlXesSl5tgB626tXaC3KEuUn/TtFxU19Uuvwaf
-	 eHaTi2bAJqa0Hq+sToJxdSpsIjrGyT1717GguUtgSI8Fkm55Gq0gKIV8QfxB4k+FON
-	 QcERc0ZkcxC229nyWXERKW9XcG7HUsYCtp9c4L+L9PTyNBYoxZOfV932eke6hs3tKr
-	 pyLCH3BPG0fbegsubnKrL4I8TeHKlW7cWaf53KZi29HGw+DbcgTZGDb7oEhkjhZ+Na
-	 pq7s66A7OQAIQ==
-Date: Wed, 20 Aug 2025 16:13:50 -0500
-From: Rob Herring <robh@kernel.org>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, mschmidt@redhat.com, poros@redhat.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
-	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH net-next] dt-bindings: dpll: Add per-channel Ethernet
- reference property
-Message-ID: <20250820211350.GA1072343-robh@kernel.org>
-References: <20250815144736.1438060-1-ivecera@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=rWBhTWhFUp9hspVZWbvmaouMYD7o3e+K4xjIusif6O25458EsuEeeYanS/W1F/p8PZmSlOOc16qM4Oxa3n3v+Jo5MUm1UYpagyqSyP+LgJSsx2ayn2cYKNNGudRPKPNKHdP8TJiDfcv9hnIsRTvtJuiIgK/AfemL5Ngn6r7etL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NNQ05Mdu; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 20 Aug 2025 14:34:29 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1755725679;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PM4zc6JuUjs9DXSdg1cZOgc0LHF7QtVILQ3VPU4Ih/8=;
+	b=NNQ05MduTzCaRYI9uiMb7owIrlzEL1YD/MvexojLbiozG6JxgMI58P+bKk4ZGymiCm0Cp0
+	UcJ3Lmrcrf7o5ltnSE+CU1DdPSXFMbdsWQ1/9NtCpn1//ftaB4Gc3fByz0lVo+9Dgs0Fp8
+	a2Lf4TnQry6HsMT23aHSrgSHvx+V3oM=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Matyas Hurtik <matyas.hurtik@cdn77.com>
+Cc: Tejun Heo <tj@kernel.org>, 
+	Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, Daniel Sedlak <daniel.sedlak@cdn77.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, David Ahern <dsahern@kernel.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Yosry Ahmed <yosry.ahmed@linux.dev>, linux-mm@kvack.org, 
+	netdev@vger.kernel.org, Johannes Weiner <hannes@cmpxchg.org>, 
+	Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
+	Muchun Song <muchun.song@linux.dev>, cgroups@vger.kernel.org
+Subject: Re: [PATCH v4] memcg: expose socket memory pressure in a cgroup
+Message-ID: <kyy6mxg4g6aer2mht3xawiq56ytveg7vllg7o6f7dgivkoh52z@ccinqivomtyl>
+References: <20250805064429.77876-1-daniel.sedlak@cdn77.com>
+ <aJeUNqwzRuc8N08y@slm.duckdns.org>
+ <gqeq3trayjsylgylrl5wdcrrp7r5yorvfxc6puzuplzfvrqwjg@j4rr5vl5dnak>
+ <aJzTeyRTu_sfm-9R@slm.duckdns.org>
+ <e65222c1-83f9-4d23-b9af-16db7e6e8a42@cdn77.com>
+ <aKYb7_xshbtFbXjb@slm.duckdns.org>
+ <fa039702-3d60-4dc0-803a-b094b41fd2b9@cdn77.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250815144736.1438060-1-ivecera@redhat.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <fa039702-3d60-4dc0-803a-b094b41fd2b9@cdn77.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Aug 15, 2025 at 04:47:35PM +0200, Ivan Vecera wrote:
-> In case of SyncE scenario a DPLL channels generates a clean frequency
-> synchronous Ethernet clock (SyncE) and feeds it into the NIC transmit
-> path. The DPLL channel can be locked either to the recovered clock
-> from the NIC's PHY (Loop timing scenario) or to some external signal
-> source (e.g. GNSS) (Externally timed scenario).
+On Wed, Aug 20, 2025 at 10:37:49PM +0200, Matyas Hurtik wrote:
+> Hello,
 > 
-> The example shows both situations. NIC1 recovers the input SyncE signal
-> that is used as an input reference for DPLL channel 1. The channel locks
-> to this signal, filters jitter/wander and provides holdover. On output
-> the channel feeds a stable, phase-aligned clock back into the NIC1.
-> In the 2nd case the DPLL channel 2 locks to a master clock from GNSS and
-> feeds a clean SyncE signal into the NIC2.
+> On 8/20/25 9:03 PM, Tejun Heo wrote:
+> > On Wed, Aug 20, 2025 at 06:51:07PM +0200, Matyas Hurtik wrote:
+> > > And the read side:   total_duration = 0;   for (;
+> > > !mem_cgroup_is_root(memcg); memcg = parent_mem_cgroup(memcg))    
+> > > total_duration +=
+> > > atomic_long_read(&memcg->socket_pressure_duration); Would that work?
+> > This doesn't make sense to me. Why would a child report the numbers from
+> > its ancestors?
 > 
-> 		   +-----------+
-> 		+--|   NIC 1   |<-+
-> 		|  +-----------+  |
-> 		|                 |
-> 		| RxCLK     TxCLK |
-> 		|                 |
-> 		|  +-----------+  |
-> 		+->| channel 1 |--+
-> +------+	   |-- DPLL ---|
-> | GNSS |---------->| channel 2 |--+
-> +------+  RefCLK   +-----------+  |
-> 				  |
-> 			    TxCLK |
-> 				  |
-> 		   +-----------+  |
-> 		   |   NIC 2   |<-+
-> 		   +-----------+
+> Result of mem_cgroup_under_socket_pressure() depends on
+> whether self or any ancestors have had socket_pressure set.
 > 
-> In the situations above the DPLL channels should be registered into
-> the DPLL sub-system with the same Clock Identity as PHCs present
-> in the NICs (for the example above DPLL channel 1 uses the same
-> Clock ID as NIC1's PHC and the channel 2 as NIC2's PHC).
+> So any duration of an ancestor being throttled would also
+> mean the child was being throttled.
 > 
-> Because a NIC PHC's Clock ID is derived from the NIC's MAC address,
-> add a per-channel property 'ethernet-handle' that specifies a reference
-> to a node representing an Ethernet device that uses this channel
-> to synchronize its hardware clock. Additionally convert existing
-> 'dpll-types' list property to 'dpll-type' per-channel property.
-> 
-> Suggested-by: Andrew Lunn <andrew@lunn.ch>
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
-> ---
->  .../devicetree/bindings/dpll/dpll-device.yaml | 40 ++++++++++++++++---
->  .../bindings/dpll/microchip,zl30731.yaml      | 29 +++++++++++++-
->  2 files changed, 62 insertions(+), 7 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/dpll/dpll-device.yaml b/Documentation/devicetree/bindings/dpll/dpll-device.yaml
-> index fb8d7a9a3693f..798c5484657cf 100644
-> --- a/Documentation/devicetree/bindings/dpll/dpll-device.yaml
-> +++ b/Documentation/devicetree/bindings/dpll/dpll-device.yaml
-> @@ -27,11 +27,41 @@ properties:
->    "#size-cells":
->      const: 0
->  
-> -  dpll-types:
-> -    description: List of DPLL channel types, one per DPLL instance.
-> -    $ref: /schemas/types.yaml#/definitions/non-unique-string-array
-> -    items:
-> -      enum: [pps, eec]
+> By summing our and our ancestors socket_pressure_duration
+> we should get our total time being throttled
+> (possibly more because of overlaps).
 
-Dropping this is an ABI change. You can't do that unless you are 
-confident there are no users both in existing DTs and OSs.
-
-> +  channels:
-> +    type: object
-> +    description: DPLL channels
-> +    unevaluatedProperties: false
-> +
-> +    properties:
-> +      "#address-cells":
-> +        const: 1
-> +      "#size-cells":
-> +        const: 0
-> +
-> +    patternProperties:
-> +      "^channel@[0-9a-f]+$":
-> +        type: object
-> +        description: DPLL channel
-> +        unevaluatedProperties: false
-> +
-> +        properties:
-> +          reg:
-> +            description: Hardware index of the DPLL channel
-> +            maxItems: 1
-> +
-> +          dpll-type:
-> +            description: DPLL channel type
-> +            $ref: /schemas/types.yaml#/definitions/string
-> +            enum: [pps, eec]
-> +
-> +          ethernet-handle:
-> +            description:
-> +              Specifies a reference to a node representing an Ethernet device
-> +              that uses this channel to synchronize its hardware clock.
-> +            $ref: /schemas/types.yaml#/definitions/phandle
-
-Seems a bit odd to me that the ethernet controller doesn't have a link 
-to this node instead. 
-
-Rob
+This is not how memcg stats (and their semantics) work and maybe that is
+not what you want. In the memcg stats semactics for a given memcg the
+socket_pressure_duration metric is not the stall duration faced by
+sockets in memcg but instead it will be stall duration caused by the
+memcg and its descendants. If that is not what we want, we need to do
+something different and orthogonal to memcg stats.
 
