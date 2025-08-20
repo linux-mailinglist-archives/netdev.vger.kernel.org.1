@@ -1,152 +1,124 @@
-Return-Path: <netdev+bounces-215317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B386B2E140
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 17:35:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DC94B2E14B
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 17:37:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E58B18992BD
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 15:28:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8994D1894B49
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 15:32:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C35EC221F15;
-	Wed, 20 Aug 2025 15:26:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D91182222CB;
+	Wed, 20 Aug 2025 15:31:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="hT4tLLCo"
+	dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b="C8LDnFfK"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5B1936CE0A;
-	Wed, 20 Aug 2025 15:26:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE8036CDF2
+	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 15:31:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755703573; cv=none; b=ZaXt7LE9OCg65lHLSOr4sJBCZgrjDY/+l/sSROQ9W2B5IvXugW4Vn/P9igmIcTrmZOsAp2E7rZy4eWAo6DiEsNkadI4osn+n7WnY1KN4dkyiuRowIHCI4UwcjaofSyMsOZNVhZc1lJwJbIXV79cVn37x4Bj6YYnACM498YHBmPA=
+	t=1755703899; cv=none; b=skuUdOQjs1Ag8x3SedntkLqvW7VeqVxNTHb5ZJCu9O/gD1Lm2LBMI2bMTC1XNVUZwmEHIAN+C6efwFEqmds0D6q5vzYMkoP/xtr/YJEQilq7ajFBXgJFH3J7YaS/Okn/0VUz/M4eRPneAArDKDRjIDs9U45VG2pDRHvFkQA4OBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755703573; c=relaxed/simple;
-	bh=UKsT/uOiNEwUjDVanX/gjmwf4DfudF9I6p37X5ia2ck=;
+	s=arc-20240116; t=1755703899; c=relaxed/simple;
+	bh=10I89XL/l2GRS76lOXYnSC+MjwZsTherQYswe/RkQt4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C3F5Nzn2hhOUkiRAXn9CcY7hJiC+MLkk2MC0t5izvhDVRslul2yCHtMfy2pSrRVeslYIvsozlfIiW4Y2pxKcQ0WmON1tqEzZHboMil6tQBadIdBvZULg0UK5OVoONfFJ28v6g4zigqY8HUrlIbc1AjDoPHjVHky8LjTgXdyAZlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=hT4tLLCo; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=D12hxmFmFM9loDOUzOMSaKyZa2Ga8k1rsHytR3xCixo=; b=hT4tLLCoi7gMkYSW7jpvz1IJbw
-	A9jPca9W97CkEqJCKT7KabsZW7vVFEzVo40lZCJ7NDrAwsVCVBh98vfK9dFFRpyPbVwsGo+ftW+YD
-	xBC/pi0FkrJDUq+hvyUFTFcvgtUCjCuJ8n9egfyBx8cFPbAPYAUjSCoZzMMfdOa/IcZFycs0pAbBj
-	HyGCFhCE10JRWZMlb2SfTpPOeQurFOxJikgHwYs3FeP02DBSGjjSomiYjMd8k5UgN2KPiz/xM3Kcn
-	bguurHeA58FCBciMSyzlDxk0cQgYOhRplTCNhZX5Kt+HEsQdABnzGT95yFWAcZCith89MOeQk8VZh
-	3OrVbkwg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54360)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uokhG-0004yn-0R;
-	Wed, 20 Aug 2025 16:25:55 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uokhC-000000000Kq-0kCG;
-	Wed, 20 Aug 2025 16:25:50 +0100
-Date: Wed, 20 Aug 2025 16:25:50 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: =?iso-8859-1?Q?Th=E9o?= Lebrun <theo.lebrun@bootlin.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=SGOes+RlIOwfqOVpbxiE9bbVuiuzW93VhVFd7rrAuSZQ7giWzXr9wf1NA5xgKxq2sF2NCjMYTubgtf3hYfXEFDV6bpM/GqN4FnX3Vcm+38ElZqDwanuZZuuUxLNC8URafPSxO2MVm0yp9OVXRqz+PBarz1KWlesrwXm8UftH4U8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org; spf=pass smtp.mailfrom=wbinvd.org; dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b=C8LDnFfK; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wbinvd.org
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-76e2ea79219so53410b3a.2
+        for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 08:31:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=wbinvd.org; s=wbinvd; t=1755703897; x=1756308697; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=CFiBinjOkqTeTTRLQMbijMZjq/eImrXz0BMlfgI32uI=;
+        b=C8LDnFfK2ynDUobMq839AryvR6wprfGJkp70IrRuj+JByrV4SLDBm/74KO2ROiqTR0
+         UHgsHYsEC5Bk14T1uiSSCNI3yDbfEYC7olgZwgL0/gI4258I4vK0qt3ZbZskdDpaDz0F
+         l4aAqDUk9sUHUAOQ0eyqDlWU/ckSRe/SpgprgXl+vClQtmyAOvnY1y8Px+IgXK6y2rTg
+         vmi3R7qZLdVFS6SVRwCUAq+OtO0Vj5gIIz1E3HWWpKJU6WsyF7/NaDmoHcosbQRaxatn
+         dy7aPhYoev1oQU6JrUk01PgaqKYoF3OK0mRIVCV+/6BKS6tC0llS5DP++eZcuGrCEZOE
+         U3zg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755703897; x=1756308697;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CFiBinjOkqTeTTRLQMbijMZjq/eImrXz0BMlfgI32uI=;
+        b=Vg8fZUwTyduu9+uVHAqCU+ahvVls30MzhDGZXBXVFyDtYsrbw5gA864vngNNQnUp9E
+         Vzb/IWAM+dM2KTuOObMGHS50EDa2nI7u9eEq09d6cJtlB6U98IYZYZ6MjYncz3aA3j60
+         +JBif8hXBiC+pT/rwuKkCqFhqZyWLwcTIBAvfn/WDExnVMlqsG4CcJHaVIf6V2AdX0jT
+         AJl9yy3aDj3QtLtiUTtvkap5cM0g4nUtZUVX7PUw6yUiTAd2RNazpL7hyvxumI2Brrre
+         eVqR0y7mByLPtAjRVSbW/1VIJxxabOLKvwqesidzYNxLMcm7KbpIsq7ABGID9r7AnIAe
+         CfaA==
+X-Gm-Message-State: AOJu0YyzOodRiJDkMwL4T379FNTILlt4ON856ljpiz4qEnNWwpy5RS45
+	vswzK15rnGhImMFnvP9MBQkQXXr9ztkts6m+uDL5i95SMBD1aOsnGej6I9nbU4zJJOM=
+X-Gm-Gg: ASbGncviZb6ZTRqj/wnyC1RWjKSteJ+77jXCl4/ysK/riSUtpmyRpaAL/mPhhNnloaY
+	Tcfb9NBocgbghfeMmi4sJBOdcsCAuUmkAC5/DVI7UMpLCGOUxr21Ip8z00TJMZISZe/6iAZzn9F
+	xOGqCDRdVVmTneRZSTLD5I0WF7JuGgb4AV+FLZFPSy2goxjKt8+VXdzG0gCXtXvrxK2Fc5k8chE
+	WoiUCfZ8HgMIZPVSGr1Fo94l63KiovPq2zTiAVycgDyrVaEtDNhWB8bHzWMN+kPG8HLYisLiwQK
+	eBmtwpjYc3hlG87LPjTUUKWZjyxz/IDR5sIbXoL56zhzxkfgy8q8GgWiQrMNiTeZlJVfYZj3q48
+	bWNHpZ90r7SK7ti8bGh9NvTNy
+X-Google-Smtp-Source: AGHT+IFa+65EiF5gOLmsUqiKDfGi/hjEovv5LFIEhAxpf/e3lDkv/Vl67MHoAyiAjrypV/nXob9hNw==
+X-Received: by 2002:a17:902:f98d:b0:240:1953:f9a with SMTP id d9443c01a7336-245ef0bd96cmr33559625ad.2.1755703896739;
+        Wed, 20 Aug 2025 08:31:36 -0700 (PDT)
+Received: from mozart.vkv.me ([192.184.167.117])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-245ed517beesm29774255ad.134.2025.08.20.08.31.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Aug 2025 08:31:36 -0700 (PDT)
+Date: Wed, 20 Aug 2025 08:31:34 -0700
+From: Calvin Owens <calvin@wbinvd.org>
+To: Michal Schmidt <mschmidt@redhat.com>
+Cc: netdev@vger.kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Harini Katakam <harini.katakam@xilinx.com>,
-	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Tawfik Bayouk <tawfik.bayouk@mobileye.com>,
-	Sean Anderson <sean.anderson@linux.dev>
-Subject: Re: [PATCH net v4 5/5] net: macb: avoid double endianness swap in
- macb_set_hwaddr()
-Message-ID: <aKXo_jihNKyJmxVQ@shell.armlinux.org.uk>
-References: <20250820-macb-fixes-v4-0-23c399429164@bootlin.com>
- <20250820-macb-fixes-v4-5-23c399429164@bootlin.com>
+	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+	Ivan Vecera <ivecera@redhat.com>, intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] i40e: Prevent unwanted interface name changes
+Message-ID: <aKXqVqj_bUefe1Nj@mozart.vkv.me>
+References: <94d7d5c0bb4fc171154ccff36e85261a9f186923.1755661118.git.calvin@wbinvd.org>
+ <CADEbmW100menFu3KACm4p72yPSjbnQwnYumDCGRw+GxpgXeMJA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250820-macb-fixes-v4-5-23c399429164@bootlin.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <CADEbmW100menFu3KACm4p72yPSjbnQwnYumDCGRw+GxpgXeMJA@mail.gmail.com>
 
-On Wed, Aug 20, 2025 at 04:55:09PM +0200, Théo Lebrun wrote:
-> writel() does a CPU->LE conversion. Drop manual cpu_to_le*() calls.
+On Wednesday 08/20 at 08:42 +0200, Michal Schmidt wrote:
+> On Wed, Aug 20, 2025 at 6:30â€¯AM Calvin Owens <calvin@wbinvd.org> wrote:
+> > The same naming regression which was reported in ixgbe and fixed in
+> > commit e67a0bc3ed4f ("ixgbe: prevent from unwanted interface name
+> > changes") still exists in i40e.
+> >
+> > Fix i40e by setting the same flag, added in commit c5ec7f49b480
+> > ("devlink: let driver opt out of automatic phys_port_name generation").
+> >
+> > Fixes: 9e479d64dc58 ("i40e: Add initial devlink support")
 > 
-> On little-endian system:
->  - cpu_to_le32() is a no-op (LE->LE),
->  - writel() is a no-op (LE->LE),
->  - dev_addr will therefore not be swapped and written as-is.
-> 
-> On big-endian system:
->  - cpu_to_le32() is a swap (BE->LE),
->  - writel() is a swap (BE->LE),
->  - dev_addr will therefore be swapped twice and written as a BE value.
+> But this one's almost two years old. By now, there may be more users
+> relying on the new name than on the old one.
+> Michal
 
-I'm not convinced by this, I think you're missing something.
+Well, I was relying on the new ixgbe names, and I had to revert them
+all in a bunch of configs yesterday after e67a0bc3ed4f :)
 
-writel() on a BE or LE system will give you bits 7:0 of the CPU value
-written to LE bit 7:0 of the register. It has to be this way, otherwise
-we would need to do endian conversions everwhere where we write simple
-numbers to device registers.
+Should e67a0bc3ed4f be reverted instead? Why is ixgbe special?
 
-Why?
-
-Remember that on a LE system with a 32-bit bus, a hex value of
-0x76543210 at the CPU when written without conversion will appear
-as:
-	0 on bus bits 0:3
-	1 on bus bits 4:7
-	...
-	6 on bus bits 24:27
-	7 on bus bits 28:31
-
-whereas on a BE system, this is reversed:
-	6 on bus bits 0:3
-	7 on bus bits 4:7
-	...
-	0 on bus bits 24:27
-	1 on bus bits 28:31
-
-The specification is that writel() will write in LE format even on
-BE systems, so there is a need to do an endian conversion for BE
-systems.
-
-So, if a device expects bits 0:7 on the bus to be the first byte of
-the MAC address (high byte of the OUI) then this must be in CPU
-bits 0:7 as well.
-
-
-Now, assuming that a MAC address of AA:BB:CC:DD:EE:FF gets read as
-0xDDCCBBAA by the first read on a LE machine, it will get read as
-0xAABBCCDD on a BE machine.
-
-We can now see that combining these two, getting rid of the
-cpu_to_le32() is likely wrong.
-
-
-Therefore, I am not convinced this patch is actually correct.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks,
+Calvin
 
