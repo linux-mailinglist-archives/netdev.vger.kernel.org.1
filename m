@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-215134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09A23B2D26F
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 05:14:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EDC8B2D268
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 05:13:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F629585E7B
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 03:12:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B22F87B8BDB
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 03:11:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7D23257ACF;
-	Wed, 20 Aug 2025 03:11:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2168B26F2B2;
+	Wed, 20 Aug 2025 03:11:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RmU7TOoM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hU+5giPO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B182C78F34;
-	Wed, 20 Aug 2025 03:11:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5B2A26D4FB;
+	Wed, 20 Aug 2025 03:11:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755659501; cv=none; b=R3VUC21GNi/9+N1VT1GqryB/YsMQDWDcLLZp7EMgz6phY+oEETvjH7EGvO83dGFxBsBwuUTfQtMQVS4rx3N/FkPKPKJx9g+x+aFCX4bGZ+M+VZsiC1HrMVBLB25+6zO5St7x4To7SxbqXd4ZaJmXc/+OtdGciuU6TRqoRG30t3w=
+	t=1755659503; cv=none; b=t0D0sG5VXlYe2btJJL0BmiKunQCaGjQXv6YIe1tXcAaIcHkKZNOJvcP6cPmHf0Z24GQiU4IP/Fb1vjulR20F7Xebt6gMeJeemPAdmREdJtFwCz2XRmXfeqelgYfUGgMN86A5vS/QKgXynAts0u5WrNVEkJkm5MQZeJpgRDU+lDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755659501; c=relaxed/simple;
-	bh=2+QVvojJyGANiWkj4yXxbKlCR2iG+8Ht5YmkAd6DrMs=;
+	s=arc-20240116; t=1755659503; c=relaxed/simple;
+	bh=9s/5VxVNdQxhkf/qAlrxc4K30roBXgIz6GG233jUOfM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=teHcmSmJtITZ5+dCJ4fCguEcd5Fm0pvUfTP79nAoD4YQnQFBfpqeXxuNGuRxZb835AeUFv4SSVNFNUfzTE/bYIZu05JwEmK9y/GIIJpLsNijLd5azDFc/3eGTxdCLqisMUJAGl3rwmsjK1PCFVfXLSLQqObgoEf3bK1ZGj7POJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RmU7TOoM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E957C4CEF1;
-	Wed, 20 Aug 2025 03:11:41 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=d+vZxDakOLUXABIpejPW+fuvAkBd3aCCfEc+lEkd4HrkUzYk9LhJnXOf4uJX4ToOLwMoXGDR2Wg0n//K5vJaWdDrHQSbK5Ni4hD9DFvTNzzdPLfsiD8QWQZFIzHCLX8L1qKJmqg/SuOfTovm9+xiR1ah0yXCZJVcYMhDlQDGzzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hU+5giPO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 791F1C16AAE;
+	Wed, 20 Aug 2025 03:11:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755659501;
-	bh=2+QVvojJyGANiWkj4yXxbKlCR2iG+8Ht5YmkAd6DrMs=;
+	s=k20201202; t=1755659502;
+	bh=9s/5VxVNdQxhkf/qAlrxc4K30roBXgIz6GG233jUOfM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RmU7TOoMDzLG+AnMEOC3FULW2bhVYFGXrwyohX2nv46dOoCt86QKraffHBNQitM0J
-	 /mv6rDzLLf8ks76XtxrVAh+df670m0jn6ncKYZBJvhZ/h0dGwvg2DEfA/EcTUDqikJ
-	 pTWsTPHWmfvCnrDoTcaBTqJ4VzFeFGu0DD7lYcyFws/8nSzDmRUyyCh8Agp2Sn2zC7
-	 m6S9buiVPcNgudzK/MujP2prz/xY2btvgWZ4kwsbwkbmPvjO/+cghY5BGLL8Ac1wkJ
-	 /hABOBYH4xhDnjEUsOWghvNq3JPIhfoiu5vfepTyNVaZVMH9ZmPPaC7o/WGxmiw+MP
-	 BXTjsEPyrPpZw==
+	b=hU+5giPOHyRNrJ2yyY8g7D/72PTQZXTjInkrdHqY7AJlQJ0qxrfxxdEmG+emAfm3a
+	 qRHkXMCFfMuJ3xLXtwJTxAxexzWYRRfxr7PqWOOJVda0FfyO4BV0iUvBC4kBb+BRIe
+	 BHzxlrkOyXoJhTaigxiZyVINCJD9Qzce99z3j8A9nzGq0LrQ6b7VnjwLZBP+MGqWAz
+	 cFMCOIX0xdBapFlj8OeFEeG0nZQWMtBQYt/I4JIQnXLr1Zry6V2dC3ifNyhwOgTxiK
+	 Ed7l91MTtAY1A5okA4kfVC9TOXrI5yXD9GIly7bTSkxwN8uuXpKUXgBnEGUPOESR+P
+	 Re+peDXhUQTgA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C5D383BF58;
-	Wed, 20 Aug 2025 03:11:52 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D74383BF58;
+	Wed, 20 Aug 2025 03:11:53 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/2] There are a cleancode and a parameter check
- for
- hns3 driver
+Subject: Re: [PATCH net-next v2 0/7] net: Convert to skb_dstref_steal and
+ skb_dstref_restore
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175565951073.3753798.100437251034921390.git-patchwork-notify@kernel.org>
-Date: Wed, 20 Aug 2025 03:11:50 +0000
-References: <20250815100414.949752-1-shaojijie@huawei.com>
-In-Reply-To: <20250815100414.949752-1-shaojijie@huawei.com>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- shenjian15@huawei.com, liuyonglong@huawei.com, chenhao418@huawei.com,
- jonathan.cameron@huawei.com, salil.mehta@huawei.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ <175565951224.3753798.14794372578854364006.git-patchwork-notify@kernel.org>
+Date: Wed, 20 Aug 2025 03:11:52 +0000
+References: <20250818154032.3173645-1-sdf@fomichev.me>
+In-Reply-To: <20250818154032.3173645-1-sdf@fomichev.me>
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, ayush.sawal@chelsio.com,
+ andrew+netdev@lunn.ch, gregkh@linuxfoundation.org, horms@kernel.org,
+ dsahern@kernel.org, pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de,
+ steffen.klassert@secunet.com, mhal@rbox.co, abhishektamboli9@gmail.com,
+ linux-kernel@vger.kernel.org, linux-staging@lists.linux.dev,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ herbert@gondor.apana.org.au
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 15 Aug 2025 18:04:12 +0800 you wrote:
-> This patchset includes:
->  1. a parameter check omitted from fix code in net branch
->    https://lore.kernel.org/all/20250723072900.GV2459@horms.kernel.org/
->  2. a small clean code
-> 
-> Jijie Shao (2):
->   net: hns3: add parameter check for tx_copybreak and tx_spare_buf_size
->   net: hns3: change the function return type from int to bool
+On Mon, 18 Aug 2025 08:40:25 -0700 you wrote:
+> To diagnose and prevent issues similar to [0], emit warning
+> (CONFIG_DEBUG_NET) from skb_dst_set and skb_dst_set_noref when
+> overwriting non-null reference-counted entry. Two new helpers
+> are added to handle special cases where the entry needs to be
+> reset and restored: skb_dstref_steal/skb_dstref_restore. The bulk of
+> the patches in the series converts manual _skb_refst manipulations
+> to these new helpers.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/2] net: hns3: add parameter check for tx_copybreak and tx_spare_buf_size
-    https://git.kernel.org/netdev/net-next/c/e16e973c576f
-  - [net-next,2/2] net: hns3: change the function return type from int to bool
-    https://git.kernel.org/netdev/net-next/c/021f989c863b
+  - [net-next,v2,1/7] net: Add skb_dstref_steal and skb_dstref_restore
+    https://git.kernel.org/netdev/net-next/c/c3f0c02997c7
+  - [net-next,v2,2/7] xfrm: Switch to skb_dstref_steal to clear dst_entry
+    https://git.kernel.org/netdev/net-next/c/c829aab21ed5
+  - [net-next,v2,3/7] netfilter: Switch to skb_dstref_steal to clear dst_entry
+    https://git.kernel.org/netdev/net-next/c/15488d4d8dc1
+  - [net-next,v2,4/7] net: Switch to skb_dstref_steal/skb_dstref_restore for ip_route_input callers
+    https://git.kernel.org/netdev/net-next/c/e97e6a1830dd
+  - [net-next,v2,5/7] staging: octeon: Convert to skb_dst_drop
+    https://git.kernel.org/netdev/net-next/c/da3b9d493ba2
+  - [net-next,v2,6/7] chtls: Convert to skb_dst_reset
+    https://git.kernel.org/netdev/net-next/c/3e31075a1194
+  - [net-next,v2,7/7] net: Add skb_dst_check_unset
+    https://git.kernel.org/netdev/net-next/c/a890348adcc9
 
 You are awesome, thank you!
 -- 
