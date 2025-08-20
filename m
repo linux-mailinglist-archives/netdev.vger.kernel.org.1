@@ -1,103 +1,78 @@
-Return-Path: <netdev+bounces-215239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 847FCB2DB33
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 13:38:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 233BAB2DBAD
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 13:50:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55FAC176EB8
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 11:36:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BB2C17DBC9
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 11:50:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A256F2EB87C;
-	Wed, 20 Aug 2025 11:35:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E630D2DAFA6;
+	Wed, 20 Aug 2025 11:50:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Lsu1LkDT"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gVO6e4XX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49BFF2E7179;
-	Wed, 20 Aug 2025 11:35:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49DA0219E8D;
+	Wed, 20 Aug 2025 11:50:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755689707; cv=none; b=ULKxk8AUV/oeMM8vsgoJNOjw/agUTg++8EcnFTAY+2to3VxQ2IgmouFDt4UMyD8clI6418FtL8XgTKOamtVN5xOYPu5cEXwEZDsyyW7ufQt6Na9BfFbeJ2T72o2c4JYi2S7k9359DHJfFq/qat4eR2RjU8Kf4vTutorulnbzmvg=
+	t=1755690646; cv=none; b=J8gsEKspEpfGtfpTV7vaHJJj2COl+N50okel4NEdbcb+dpDwNKF+doWxiHi7nl1AnGMb1JtmZW6MDGaLVME2ki6iRQ5RdgLlVdLPZv9xzuFnFe1YcaYPT1yPkcOcidRP4njGO8a+IO3KE9yS1a/kOg2JNRGoLlJ+RbEqOJq3AS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755689707; c=relaxed/simple;
-	bh=QOHtLk5QqbgZtnm43GlNAZR0h56vCGCpRCGU58YU9R8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=agki5rTEzEsuNOH1eBFK6SBQh+fDHTfu1Bd4pLrNOOcwa/oSm8AQGNW18G0I15IrN6Fcgm8qTFip/lADn8Z5ngRncvAOyMGoZWiBdgWJki+op0vE9gCoIK+ZHoNyBpQ7o22l33bhzPriT4mafJWI+llv8387439A0evdzDsklLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Lsu1LkDT; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 8EA974E40C47;
-	Wed, 20 Aug 2025 11:35:03 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 58B9D606A0;
-	Wed, 20 Aug 2025 11:35:03 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 658B71C22D8F8;
-	Wed, 20 Aug 2025 13:34:08 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1755689701; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=QOHtLk5QqbgZtnm43GlNAZR0h56vCGCpRCGU58YU9R8=;
-	b=Lsu1LkDTMPB1LU5muwhWVRn23FMJLNqKfUMsR9IDJHWjE45qmCxx5AP6d9b55ZECZsgZpb
-	q9hc/A+lIm20Lru3taO2asF6l6H/8VyMy+Jum/cCxT2ReEVhkFLPRayceA0Qdix1PO4W5m
-	gr5lQUmpUdJOlRtGpmwloQSI0I9fO65qPP7lXklBAtQVw0p08f1bi1F++WujW+Rs5+xTGV
-	NqypZSpQHsuLa2kCClB4Ihvb2bTrT0sGGeYb881pGLbvQofXGZUT24IIxf2eLwmT/h0yRD
-	4XXsx7oq8udgN9HrcROhny4ywakOpELNa1sr97A5W7qm6hufK1fy9+/QcwrSnA==
-Message-ID: <3c8d191c-efd6-4756-9c71-109236d4c54c@bootlin.com>
-Date: Wed, 20 Aug 2025 13:34:04 +0200
+	s=arc-20240116; t=1755690646; c=relaxed/simple;
+	bh=UFromHrRsf0eFQ0r2IUAwdJR52qB1xTJ/5THf8+c8wE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Bq9mDHg7VFYZrmo5NcMWWMbYyfi2gQaymxuewYwteJR0a7n6cno16rCz+FN1S7qFPUlQeNsyTM+u7yMkWFR7YeuT7aCwZng88B5fA+F25/zJ9+0CjbidjvCELas0oO7Eh8lGgbuVKAAYnduqvBphCnkxWkDJOC3Qr8jwORDiMDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gVO6e4XX; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=2ufkVTHxVBuyxmr8RYXYQrx87GoJRgwyDH3U7ezovC8=; b=gVO6e4XXVUFWIuH5QSdV3rib7k
+	P8CIY4WUkN2oreYgfP3kH+21ekt0P7yb9Nb2HyoWY8wetZQW3zIvsbTJlCEw9S0RC3j5UWgFBee+t
+	6XpiiWvtH1sfaIIMlDX26WNgaN+yLi8Xp4fHRxH/u1z7BiscC6K6IKDuPTXjf2XBzdGs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uohKl-005Je3-Kc; Wed, 20 Aug 2025 13:50:27 +0200
+Date: Wed, 20 Aug 2025 13:50:27 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Xichao Zhao <zhao.xichao@vivo.com>
+Cc: Hauke Mehrtens <hauke@hauke-m.de>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"open list:LANTIQ / INTEL Ethernet drivers" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 2/2] net: dsa: Remove the use of dev_err_probe()
+Message-ID: <6cfac11c-1489-4423-815d-07f0417cc7d7@lunn.ch>
+References: <20250820085749.397586-1-zhao.xichao@vivo.com>
+ <20250820085749.397586-3-zhao.xichao@vivo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 2/5] net: spacemit: Add K1 Ethernet MAC
-To: Vivian Wang <wangruikang@iscas.ac.cn>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexandre Ghiti <alex@ghiti.fr>
-Cc: Vivian Wang <uwu@dram.page>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Junhui Liu <junhui.liu@pigmoral.tech>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
- linux-kernel@vger.kernel.org
-References: <20250820-net-k1-emac-v6-0-c1e28f2b8be5@iscas.ac.cn>
- <20250820-net-k1-emac-v6-2-c1e28f2b8be5@iscas.ac.cn>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20250820-net-k1-emac-v6-2-c1e28f2b8be5@iscas.ac.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250820085749.397586-3-zhao.xichao@vivo.com>
 
-Hi Vivian,
+On Wed, Aug 20, 2025 at 04:57:49PM +0800, Xichao Zhao wrote:
+> The dev_err_probe() doesn't do anything when error is '-ENOMEM'.
+> Therefore, remove the useless call to dev_err_probe(), and just
+> return the value instead.
+> 
+> Signed-off-by: Xichao Zhao <zhao.xichao@vivo.com>
 
-On 20/08/2025 08:47, Vivian Wang wrote:
-> The Ethernet MACs found on SpacemiT K1 appears to be a custom design
-> that only superficially resembles some other embedded MACs. SpacemiT
-> refers to them as "EMAC", so let's just call the driver "k1_emac".
->
-> Supports RGMII and RMII interfaces. Includes support for MAC hardware
-> statistics counters. PTP support is not implemented.
->
-> Tested-by: Junhui Liu <junhui.liu@pigmoral.tech>
-> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-I've read through the driver and it's looking good to me
-
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-
-Maxime
-
+    Andrew
 
