@@ -1,57 +1,76 @@
-Return-Path: <netdev+bounces-215384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD783B2E528
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 20:43:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10766B2E531
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 20:55:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0D7757A4272
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 18:41:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20C781BA2194
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 18:55:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2BEC27AC43;
-	Wed, 20 Aug 2025 18:43:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6628D27F727;
+	Wed, 20 Aug 2025 18:55:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dvGvHeX2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CozULjtI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE892566E2
-	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 18:43:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 208672522A7;
+	Wed, 20 Aug 2025 18:55:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755715399; cv=none; b=Boot9upNwvRlVOXX5Wx5A4mAHZOEfucOcrURW6O1aZM0jOziBtBvW29yqbrIRdowQ2Ya8f33/YcTnGXsvx6lo4yjI6vluieHtZuH0embu+Oc5yurTcz215/xHKCwAZeb070o5RcrONmcdI+KSc+jxebblfbY/9/AK0k99TKXgnI=
+	t=1755716110; cv=none; b=q+xHpZ4WM4cW8Y3L05qoSMsUF7sFfL4Fim7ZsHBtOk7yzzw8pzAB34zE+wcAdyvs2SW0VpARmLwHHRaBCU+goDMrPhYuB7e9/Fck471sS7gxY1Wlh7x7RidXsgsMCH32VZ6b1Pkk5TMJPUgXg4unUfAKxBVvzWsfSq8ML4auO78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755715399; c=relaxed/simple;
-	bh=cOpbY3wt9qAPgLlHoEgGI3YhBqCs2c6VUZ0/FKbKeZY=;
+	s=arc-20240116; t=1755716110; c=relaxed/simple;
+	bh=KrxBI4bw6u84H4zKkUEDYwKmV2iNFMyZmZhqsrfdtV8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KDHsXm2H9doFKBaQXA6v8+nrhBOGyzOWYHQKKyD4SuRBYnoOqQSLTHdYV8SIZjLytjq8zg8hIYKGUrVOO8KmRokh6qmO+IXcqWc4q3se+41kwYijUhq7+d2QNuttch2yBGiP3Ftz5Xc1upmxyRi1KG+Ms5XnH/CpbPE0pUhssA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dvGvHeX2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FCA9C4CEE7;
-	Wed, 20 Aug 2025 18:43:19 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=R7IYANhACssORhLKzP6jQq3x17roE97+5pN+L699rcZMDrzXa7lxE43m16CTuT74DTPuPlTRn+DfDjTPiYsxsXSbESyPveoJmfv+lQh4rOslTHx6i834mGZUz96ua78O9d9U3nLbflzqKjgdJPXdx9RXXyHSlTdeyflKhypqmKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CozULjtI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CD47C4CEE7;
+	Wed, 20 Aug 2025 18:55:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755715399;
-	bh=cOpbY3wt9qAPgLlHoEgGI3YhBqCs2c6VUZ0/FKbKeZY=;
+	s=k20201202; t=1755716109;
+	bh=KrxBI4bw6u84H4zKkUEDYwKmV2iNFMyZmZhqsrfdtV8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dvGvHeX2zdRnxreRZs2FqPt6tHHEGHgxyMNb5Uy3As/T7KCHg87V8d0h941YT2ep9
-	 /fc5ZCGDscOz6giV/8BQXJPFzuHMqJUqM4XKj9aNBp5dQzhrZ9rJ1Nl1IXs8R1qES9
-	 7ex+uH/Yq5NZvLpQSzuO9MAZ/bcerCGTvptUuoWkYUO7omYLyRqhkRjnOR9fTmd5cM
-	 pShKSFL3Vd/DeqXqVjZf2t/H8aOYfyL6FTDncz/cSse5VgZXMnlUweO7m8eYNs1Bw5
-	 RTPMdKVKINuaALdQ50qc2uG5sIcGkZ5W8Q0n/luKvPlqOc6cPpoGgAXQx5I7OBuHMt
-	 42OjaVhkTjnpQ==
-Date: Wed, 20 Aug 2025 11:43:17 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org, David Ahern <dsahern@gmail.com>,
-	Andrea Mayer <andrea.mayer@uniroma2.it>,
-	David Lebrun <dlebrun@google.com>
-Subject: Re: [PATCH iproute2-next v2] man8: ip-sr: Document that passphrase
- must be high-entropy
-Message-ID: <20250820184317.GA1838@quark>
-References: <20250816031846.483658-1-ebiggers@kernel.org>
- <20250820092535.415ee6e0@hermes.local>
+	b=CozULjtI87ezxw30qO0tiBXmd/B+a0DtFD8O0r1Ijt8QQQx8BThbtwW8QWNFZ8zwn
+	 GDhVSyvd/eTXNDvmuoKLP8gZbzIqwAavVeNAJTL9AD4T+oq9JD211sXJ3A9jIHdBe9
+	 oby2P2YVBQ3I8r9mQM/Lwt2RVdfRe2sGJcP/c1x3u1vg+xkh+l09/RNCiQufnL+vjh
+	 GyhWNZepnUHlVO7AOBcuUpAEM08nIs4SZGmNIG29XplZsZ5MYKbpImtIHpbPRBy/n6
+	 J3D2v1i3GLEYxCZCXE+oRmNdlWlQrHy63msQ03IsVrcWk7mI62sGbw7/ZkfMSJmtPd
+	 X3jYiXs/0WZXQ==
+Date: Wed, 20 Aug 2025 13:55:08 -0500
+From: Rob Herring <robh@kernel.org>
+To: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+Cc: airlied@gmail.com, amergnat@baylibre.com, andrew+netdev@lunn.ch,
+	andrew-ct.chen@mediatek.com,
+	angelogioacchino.delregno@collabora.com, broonie@kernel.org,
+	chunkuang.hu@kernel.org, ck.hu@mediatek.com, conor+dt@kernel.org,
+	davem@davemloft.net, dmitry.torokhov@gmail.com, edumazet@google.com,
+	flora.fu@mediatek.com, houlong.wei@mediatek.com, jeesw@melfas.com,
+	jmassot@collabora.com, kernel@collabora.com, krzk+dt@kernel.org,
+	kuba@kernel.org, kyrie.wu@mediatek.corp-partner.google.com,
+	lgirdwood@gmail.com, linus.walleij@linaro.org,
+	louisalexis.eyraud@collabora.com, maarten.lankhorst@linux.intel.com,
+	matthias.bgg@gmail.com, mchehab@kernel.org,
+	minghsiu.tsai@mediatek.com, mripard@kernel.org,
+	p.zabel@pengutronix.de, pabeni@redhat.com, sean.wang@kernel.org,
+	simona@ffwll.ch, support.opensource@diasemi.com,
+	tiffany.lin@mediatek.com, tzimmermann@suse.de,
+	yunfei.dong@mediatek.com, devicetree@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
+	linux-gpio@vger.kernel.org, linux-input@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+	linux-mediatek@lists.infradead.org, linux-sound@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v1 14/14] dt-bindings: media: mediatek,jpeg: Fix jpeg
+ encoder/decoder ranges
+Message-ID: <20250820185508.GA273751-robh@kernel.org>
+References: <20250820171302.324142-1-ariel.dalessandro@collabora.com>
+ <20250820171302.324142-15-ariel.dalessandro@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,70 +79,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250820092535.415ee6e0@hermes.local>
+In-Reply-To: <20250820171302.324142-15-ariel.dalessandro@collabora.com>
 
-On Wed, Aug 20, 2025 at 09:25:35AM -0700, Stephen Hemminger wrote:
-> On Fri, 15 Aug 2025 20:18:46 -0700
-> Eric Biggers <ebiggers@kernel.org> wrote:
+On Wed, Aug 20, 2025 at 02:13:02PM -0300, Ariel D'Alessandro wrote:
+> Commit 14176e94bb35d ("arm64: dts: mediatek: mt8195: Fix ranges for jpeg
+
+That commit is not in any upstream tree.
+
+> enc/decoder nodes") redefined jpeg encoder/decoder children node ranges.
+> Update the related device tree binding yaml definition to match
+> mediatek/mt8195.dtsi, as this is currently the only one using it.
 > 
-> > diff --git a/man/man8/ip-sr.8 b/man/man8/ip-sr.8
-> > index 6be1cc54..cd8c5d18 100644
-> > --- a/man/man8/ip-sr.8
-> > +++ b/man/man8/ip-sr.8
-> > @@ -1,6 +1,6 @@
-> > -.TH IP\-SR 8 "14 Apr 2017" "iproute2" "Linux"
-> > +.TH IP\-SR 8 "15 Aug 2025" "iproute2" "Linux"
+> Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+> ---
+>  .../media/mediatek,mt8195-jpegdec.yaml        | 31 ++++++++++---------
+>  .../media/mediatek,mt8195-jpegenc.yaml        | 15 ++++-----
+>  2 files changed, 24 insertions(+), 22 deletions(-)
 > 
-> NAK - do not change man page date for each change.
+> diff --git a/Documentation/devicetree/bindings/media/mediatek,mt8195-jpegdec.yaml b/Documentation/devicetree/bindings/media/mediatek,mt8195-jpegdec.yaml
+> index e5448c60e3eb5..b1f3df258dc87 100644
+> --- a/Documentation/devicetree/bindings/media/mediatek,mt8195-jpegdec.yaml
+> +++ b/Documentation/devicetree/bindings/media/mediatek,mt8195-jpegdec.yaml
+> @@ -36,7 +36,7 @@ properties:
+>  
+>  # Required child node:
+>  patternProperties:
+> -  "^jpgdec@[0-9a-f]+$":
+> +  "^jpgdec@[0-9],[0-9a-f]+$":
 
-Sure, if that's the convention for this project.  Note that this differs
-from the convention used by most projects with dated man pages.  The
-purpose of the date is normally to indicate how fresh the man page is.
+This is wrong unless 0-9 is a separate, distinct address (like a chip 
+select #).
 
-> >  .SH "NAME"
-> >  ip-sr \- IPv6 Segment Routing management
-> >  .SH SYNOPSIS
-> >  .sp
-> >  .ad l
-> > @@ -32,13 +32,21 @@ internal parameters.
-> >  .PP
-> >  Those parameters include the mapping between an HMAC key ID and its associated
-> >  hashing algorithm and secret, and the IPv6 address to use as source for encapsulated
-> >  packets.
-> >  .PP
-> > -The \fBip sr hmac set\fR command prompts for a passphrase that will be used as the
-> > -HMAC secret for the corresponding key ID. A blank passphrase removes the mapping.
-> > -The currently supported algorithms for \fIALGO\fR are \fBsha1\fR and \fBsha256\fR.
-> > +The \fBip sr hmac set\fR command prompts for a newline-terminated "passphrase"
-> 
-> That implies that newline is part of the pass phrase.
+Rob
 
-Not really.  "NUL-terminated" strings don't include the NUL in the
-string content.  If you prefer, it could be made explicit as follows:
-
-    The \fBip sr hmac set\fR command prompts for a "passphrase" that
-    will be used as the HMAC secret for the corresponding key ID. The
-    passphrase is terminated by a newline, but the terminating newline
-    is not included in the resulting passphrase.
-
-But I don't think it's very useful, as it's not needed to know how to
-use the command correctly.
-
-> The code to read password is using getpass() which is marked as obsolete
-> in glibc. readpassphrase is preferred.
-
-Is that relevant to this documentation patch?
-
-> > +that will be used as the HMAC secret for the corresponding key ID. This
-> > +"passphrase" is \fInot\fR stretched, and it is used directly as the HMAC key.
-> > +Therefore it \fImust\fR have enough entropy to be used as a key. For example, a
-> > +correct use would be to use a passphrase that was generated using
-> > +\fBhead\~-c\~32\~/dev/urandom\~|\~base64\~-w\~0\fR.
-> 
-> Shouldn't /dev/random be used instead of /dev/urandom for keys.
-
-If you prefer that as the maintainer of this code, sure.  There are
-reasons to use either one, and it's been an endless debate for years.
-
-- Eric
 
