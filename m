@@ -1,134 +1,162 @@
-Return-Path: <netdev+bounces-215285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B820B2DE26
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 15:44:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF0E0B2DE68
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 15:53:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C2843AF92A
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 13:42:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5833817A6C2
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 13:50:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F0F531DDB5;
-	Wed, 20 Aug 2025 13:42:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zd0xfn8+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 401F71A9F81;
+	Wed, 20 Aug 2025 13:50:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D424279354;
-	Wed, 20 Aug 2025 13:42:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7021A1DE8B2
+	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 13:50:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755697338; cv=none; b=h1dJOlqUJ0Rs8bxcx/2t1A8DZ6D94spRpjuRIgpZ+TI/xjvt3jcF5Qf8ioEDpme+HA3xDMvgWofeh7ISzt5v2FKQWypMD+klwJjMkdUcLC+rcuBlEkXbnU9MqZFALzZz6uDX42JxcU7IKMTIoCxAytiDgFw4EJ+MECPyb1mP7k4=
+	t=1755697819; cv=none; b=Oi/2VhVfRDjhu7UYg0mQmm75O1/QUClGuyYKDDEmxfUb9l38MFDUPisLyb/42IhFuoTihHShWoYSnDhfZeWGujJy8IzLHIXa57lnILm3Hm6Y9llT4htbkBG3dVgBs8B9IitkuzFdibEpklgTBvBDfxwuBj4BY96n8aNYsYFCSH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755697338; c=relaxed/simple;
-	bh=GwzwwgyfcwqqHuSy6ePWprhgFwNZ7jn3wGiJU2BpbWc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mtrVJAZpjylLzrb9xrWIdTj8Tw0FAsbuIV/jKDOoao7O87e1T+4/wevlmW8sgLiYa/eCNH+14MRcBk6eeWUFVzr7+Y1pde+3O1hPLs4figXMAcuWoAaUzPojL5ZdpAZHNEb1CoyuokycZr7VR+40m7GakPB3rkU1IVYcX8FZOYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zd0xfn8+; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-45a1b004a31so45025515e9.0;
-        Wed, 20 Aug 2025 06:42:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755697335; x=1756302135; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=D//IkqSgYiDNhWtOIHFgRl44HO3wESqHykekTe6D+/U=;
-        b=Zd0xfn8+9QqQlABfg85uqQ2DpDP1wCo4aQzHoPCa/lFiSbSGJU0Kg01iXqimJ3yaiJ
-         sAGDXdJjCplmTtGsI+K3HU2TWf7XWrn1BYLqLwh4eljHOiBETgDDtfof4oNoKGEOvqn5
-         AdIblZJhp8x/ii//9+lwKa7FYkCZgZ3oBzEdo0d4q66Va84hS8tBpENRIlL9YHNN1qDJ
-         VxDFZNEPc53/l7DfCAne1ioyFbu7YySFsJo7+9+Mortz0t/Ia9VhVcYshqTaaJ0emHYG
-         oTPYa+yNluMgzTvJ6Z6xecmqBHGrVMykvPvrbWpWi91v88qs0Su007nIlqB3Xe1dHQMI
-         MsWg==
+	s=arc-20240116; t=1755697819; c=relaxed/simple;
+	bh=IY1hCmh/ms+pl4eZUlo7JOL5fRJk9SupjR3P8rg4KAA=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=fospKJmFnjb+fa/NM+2FBDk7FWD8rjwYhqOuc91AYr6Tb7rsyk5l8vN9KTOY5fCTy21lYXNCItZAlfrqTLJxQtgH0zyJ4U8NxNW1kBNeWSpPwa6IV3PoraFpwtm2XKv1ORei7eVuygF0dSdwQiLt8mJ/KqPKpIAkqRTFN1C1dto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3e5700a3d43so183457335ab.3
+        for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 06:50:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755697335; x=1756302135;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1755697816; x=1756302616;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=D//IkqSgYiDNhWtOIHFgRl44HO3wESqHykekTe6D+/U=;
-        b=ML1Dr8YfKUgox2PuGyO59tujG/K74r0QKQY3swcHjl2ANA5YBycbBNQkGdXwuPU8Zk
-         neJjHBcrG8lyzDbGmCY/ihOQpJbmAxZrusU7qcJBXsK9hbzarNRLv87uyOtcj0vFmx8Z
-         2WtDHZX0s3sQjQ0WSavg7fP5GiEllJmt0Yxuk23A7fooU3GYccB01mEaHub94QlF4ZZ7
-         5Y/OrY2uyTwSZ/nw6ArwJqcTMAnrXokVjiqN6/n4FIXfVtl5yQ4jDoTcnyUDZaxIDZsj
-         6Sjmz2pqpMOU4cdYnpT+WPj6l0Duy7qJSZa5DllOOcQc6PidhG20eX54zyQJwH2h/IcO
-         31sQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUrSu0ySLFC50MBGgj0/DYB7yQ4BdJCHgBCq7IUHGKQldZsTacFJzPdP4Yl53FCeBUbFFf0m16L@vger.kernel.org, AJvYcCVAZruHy0n73tiFBGNFe0D8kokzgseR1M5qIBXUYHkcxXgA9GO24r0x1pnQQHrq2GXl2p5SQriNw+RjEaFZ@vger.kernel.org, AJvYcCWptn4x4iiF145FM4oP+FhB2WyF4s4zl5fDzRfuRuP8iWLW2fE1bbukqKx+JVmlTcNuGd4lAZGCWg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyMcv2eV+Z3JNH+FsnCD10JgVV7CkZTo9CLJEjIZazm2wQal7PF
-	HPzkT+xbGbLOiUXx6xYGl23OuKpxpS7A2NUeiky3qWBKp21J1BTSDo8a
-X-Gm-Gg: ASbGncvfVjOBqrMtLuJWUFrV3pPVPSHWtueqkq8yDugepVSIYOv4dLCaQfoZb7S5/ho
-	W4M3kwEe8IK0MB2RdzmaJvdS77e5Y9PTUjWU3jWCqQRzZeY/ZwZYdgLNEIaXz1xDWmOotr4tZnj
-	orckjcAh7rGQRsvlfxAI41IRrPrltvX/q339hkriwhb1xxLmI+padqtBKdCaMnkynqQWp/fzXW2
-	mGth3zB7fhGg4ul/hjMl1LStXcDSYSnF8q9o+1Bj8hoTuHKDyXkErSRpLFrSFpIpigWXekGtHBm
-	b2rbT+ib/qMXCZioxQrosiqlnnuQYjzVgtDTVHg0+OKEch9JkqtG0Re3O1gNrscpFkd19/IFpdS
-	pneCKX4+xCCViPqnyrI88si0Mtad3EUsPmCejn6pEZH8g6w+w1fa1R7KFHkodBjac8w==
-X-Google-Smtp-Source: AGHT+IEPrLhd+G8QilOq2hZbXfX8bnPCYF3Vhwwz/ytgqwVqzAjC4BEqxfxFhrefUqHnTGOBgbr9OA==
-X-Received: by 2002:a05:600c:4744:b0:45a:236a:23ba with SMTP id 5b1f17b1804b1-45b479e4b91mr18847345e9.22.1755697334538;
-        Wed, 20 Aug 2025 06:42:14 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:5f7e])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3c3c85efc57sm1815616f8f.40.2025.08.20.06.42.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Aug 2025 06:42:13 -0700 (PDT)
-Message-ID: <55e8116d-7bff-4116-a5cf-d96cf95e02d8@gmail.com>
-Date: Wed, 20 Aug 2025 14:43:25 +0100
+        bh=FCft0OtSYmLcVWsWIK6iy7gIzs3jV3RaunmmsDo3CIY=;
+        b=UNZAF+hKHqFokDJA72fWfp2xYOdpuVTVOv7m3PyQXpPEICmDPsGjRuiRu74jcFhiXY
+         Rawe6sHjRolzIK7yzmIlEKjke4wOgKyhHGanPtreNmZ7DQSQenpXA3QW9nICyBxZrga1
+         o5+oTtDgw5PzKtOMsjvGVvphc05hOXMpt6NVSj0QZnJqdahPmC8BTtPQC6K1nPVh+DnA
+         SPBpdxdu1oB7OVuuoSipUC0m5Tdmq9DuDgFahydktAWqQAuJI1HgQZDSeUNhwyi7p+Xv
+         91pdeVcBmrQPNcLyPKRRC+mtfa1LKEoydUwOCZOD/J9FOBk1fcUf5lD/oXmJwTy4wxl0
+         Mq2g==
+X-Forwarded-Encrypted: i=1; AJvYcCX4+corWY7lk5/HSTMn35/hjnNAn/2tOrDdOlzOR0keUJLFNAfx3TvNNoWJptR4AV85CvCD8/A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4XIVjWvbPK23c8GI7nCgEglo059TR9erbvj5JgTvQIw03FLnW
+	fAJy2w1AbrrMarQhsRKVV426NygWO9cw7SGzeT69Yx+H2UXYEIgA5sdveDOzyM5dehfU8hGqnLh
+	EhUv3qqPt0paXZ25Rj38b9MBecpbPOurTpXRQH8zTaadpPxSM4EWxZ7YQLPg=
+X-Google-Smtp-Source: AGHT+IGhn4ZYmJP7sBYy4J89eY3N54uRGsYJzXgBSJdGM3I2L/PUzn7oQGaPAbDMu9Q/TuHoUNnRPiV0D3jaz8zlEydn+YcEPKCy
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 07/23] eth: bnxt: read the page size from the
- adapter struct
-To: Mina Almasry <almasrymina@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
- Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>,
- Paolo Abeni <pabeni@redhat.com>, andrew+netdev@lunn.ch, horms@kernel.org,
- davem@davemloft.net, sdf@fomichev.me, dw@davidwei.uk,
- michael.chan@broadcom.com, dtatulea@nvidia.com, ap420073@gmail.com,
- linux-kernel@vger.kernel.org, io-uring@vger.kernel.org
-References: <cover.1755499375.git.asml.silence@gmail.com>
- <43a256bdc70e9a0201f25e60305516aed6b1e97c.1755499376.git.asml.silence@gmail.com>
- <CAHS8izNq8wKXwiZs8SeuYhsknR=wAwWPEnBOxUgcMhCoObQ=xA@mail.gmail.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <CAHS8izNq8wKXwiZs8SeuYhsknR=wAwWPEnBOxUgcMhCoObQ=xA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:156e:b0:3e5:3ef0:b0e5 with SMTP id
+ e9e14a558f8ab-3e67c9b66b1mr46030995ab.7.1755697816711; Wed, 20 Aug 2025
+ 06:50:16 -0700 (PDT)
+Date: Wed, 20 Aug 2025 06:50:16 -0700
+In-Reply-To: <20250820092925.2115372-1-jackzxcui1989@163.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68a5d298.050a0220.3d78fd.0003.GAE@google.com>
+Subject: [syzbot ci] Re: net: af_packet: Use hrtimer to do the retire operation
+From: syzbot ci <syzbot+ci8b7a13618981d53b@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, ferenc@fejes.dev, 
+	horms@kernel.org, jackzxcui1989@163.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	willemdebruijn.kernel@gmail.com
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 8/19/25 20:37, Mina Almasry wrote:
-> On Mon, Aug 18, 2025 at 6:56 AM Pavel Begunkov <asml.silence@gmail.com> wrote:
->>
->> From: Jakub Kicinski <kuba@kernel.org>
->>
->> Switch from using a constant to storing the BNXT_RX_PAGE_SIZE
->> inside struct bnxt. This will allow configuring the page size
->> at runtime in subsequent patches.
->>
->> The MSS size calculation for older chip continues to use the constant.
->> I'm intending to support the configuration only on more recent HW,
->> looks like on older chips setting this per queue won't work,
->> and that's the ultimate goal.
->>
->> This patch should not change the current behavior as value
->> read from the struct will always be BNXT_RX_PAGE_SIZE at this stage.
->>
->> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
->> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> 
-> Reviewed-by: Mina Almasry <almasrymina@google.com>
-> 
-> nit: AFAIU BNXT_RX_PAGE_SIZE should be unused after this? You could
-> delete the definition in bnxt.h if so.
+syzbot ci has tested the following series
 
-Still used in a couple of places, notably as the minimum and/or
-default size
+[v6] net: af_packet: Use hrtimer to do the retire operation
+https://lore.kernel.org/all/20250820092925.2115372-1-jackzxcui1989@163.com
+* [PATCH net-next v6] net: af_packet: Use hrtimer to do the retire operation
 
--- 
-Pavel Begunkov
+and found the following issue:
+WARNING in hrtimer_forward
 
+Full report is available here:
+https://ci.syzbot.org/series/81b08fd6-a740-4520-9c88-b7dcdc7953a1
+
+***
+
+WARNING in hrtimer_forward
+
+tree:      net-next
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
+base:      da114122b83149d1f1db0586b1d67947b651aa20
+arch:      amd64
+compiler:  Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+config:    https://ci.syzbot.org/builds/0ebac6ed-b7ae-4c3d-9edc-db3a521ad7a0/config
+C repro:   https://ci.syzbot.org/findings/c3421800-7bbc-4097-a1cf-36e97a4dea98/c_repro
+syz repro: https://ci.syzbot.org/findings/c3421800-7bbc-4097-a1cf-36e97a4dea98/syz_repro
+
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 6012 at kernel/time/hrtimer.c:1052 hrtimer_forward+0x1d6/0x2b0 kernel/time/hrtimer.c:1052
+Modules linked in:
+CPU: 1 UID: 0 PID: 6012 Comm: syz.0.20 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:hrtimer_forward+0x1d6/0x2b0 kernel/time/hrtimer.c:1052
+Code: 4c 89 33 48 8b 04 24 eb 07 e8 66 30 12 00 31 c0 48 83 c4 18 5b 41 5c 41 5d 41 5e 41 5f 5d e9 01 b0 ce 09 cc e8 4b 30 12 00 90 <0f> 0b 90 eb df 48 89 e8 4c 09 f8 48 c1 e8 20 74 0a 48 89 e8 31 d2
+RSP: 0018:ffffc900029def90 EFLAGS: 00010293
+RAX: ffffffff81ad7be5 RBX: ffff888028782648 RCX: ffff88810e88d640
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
+RBP: 000000000000116b R08: ffffffff8fa37e37 R09: 1ffffffff1f46fc6
+R10: dffffc0000000000 R11: ffffffff81724e10 R12: ffff888028782660
+R13: 00000000007a1200 R14: 1ffff110050f04cc R15: 0000000000000001
+FS:  000055555f6cd500(0000) GS:ffff8881a3c1c000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007ffcf1be3d88 CR3: 0000000023c86000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ hrtimer_forward_now include/linux/hrtimer.h:366 [inline]
+ _prb_refresh_rx_retire_blk_timer net/packet/af_packet.c:697 [inline]
+ prb_open_block+0x3a7/0x5e0 net/packet/af_packet.c:930
+ prb_dispatch_next_block net/packet/af_packet.c:994 [inline]
+ __packet_lookup_frame_in_block net/packet/af_packet.c:1152 [inline]
+ packet_current_rx_frame net/packet/af_packet.c:1178 [inline]
+ tpacket_rcv+0x1229/0x2f40 net/packet/af_packet.c:2409
+ deliver_skb net/core/dev.c:2472 [inline]
+ deliver_ptype_list_skb net/core/dev.c:2487 [inline]
+ __netif_receive_skb_core+0x3107/0x4020 net/core/dev.c:5923
+ __netif_receive_skb_list_core+0x23f/0x800 net/core/dev.c:6054
+ __netif_receive_skb_list net/core/dev.c:6121 [inline]
+ netif_receive_skb_list_internal+0x975/0xcc0 net/core/dev.c:6212
+ netif_receive_skb_list+0x54/0x450 net/core/dev.c:6264
+ xdp_recv_frames net/bpf/test_run.c:280 [inline]
+ xdp_test_run_batch net/bpf/test_run.c:361 [inline]
+ bpf_test_run_xdp_live+0x1786/0x1b10 net/bpf/test_run.c:390
+ bpf_prog_test_run_xdp+0x713/0x1000 net/bpf/test_run.c:1322
+ bpf_prog_test_run+0x2c7/0x340 kernel/bpf/syscall.c:4590
+ __sys_bpf+0x581/0x870 kernel/bpf/syscall.c:6047
+ __do_sys_bpf kernel/bpf/syscall.c:6139 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:6137 [inline]
+ __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6137
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f31da38ebe9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffcf1be5358 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 00007f31da5b5fa0 RCX: 00007f31da38ebe9
+RDX: 0000000000000050 RSI: 0000200000000600 RDI: 000000000000000a
+RBP: 00007f31da411e19 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f31da5b5fa0 R14: 00007f31da5b5fa0 R15: 0000000000000003
+ </TASK>
+
+
+***
+
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
+
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
