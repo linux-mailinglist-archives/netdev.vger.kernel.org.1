@@ -1,180 +1,171 @@
-Return-Path: <netdev+bounces-215411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D81DB2E85F
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 00:54:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8746CB2E863
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 00:58:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB7F33B09DB
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 22:54:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EACB4686686
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 22:57:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5382D979A;
-	Wed, 20 Aug 2025 22:54:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F6762D8DB9;
+	Wed, 20 Aug 2025 22:57:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gl4lgZFL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C2Jfy/w8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EAF12BE7B4;
-	Wed, 20 Aug 2025 22:54:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7320A27E7EB
+	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 22:57:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755730454; cv=none; b=GGGvQrvuw28SOWYkv3kssEii58/61csq+NctZNDpDretb6HtgkN1+638eg3Tp98yl9mlFTUSqq8QusJm8l3MSj7ZgF1Xl26vVQtB6ISTVYRZjcprm+6Rj7nyc8obXXFgKgXwwKHZO7D0GVhI6WZ1c/4FV7ueawejpsGeP2Df0fA=
+	t=1755730668; cv=none; b=m0/j/6ihY4zWs24s/A+mEKlXttnrhsrbvEM1gM1G/kEbA+ei1i/1/kBIEK1hiM44kE1QukTQcyWMLqJ+A4DMVsJTuHtYJMX2bq1gHK/IFlHsSYypaqaa6MOFx8HlqGLUdXpKxdhcsEVE2mhHbDCLLW+0p8Rdcb+1cSt76z/ptqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755730454; c=relaxed/simple;
-	bh=nxwUi+vma0gxF8jaxzpDP96ejlHXfqlhgoCKUq98E+A=;
+	s=arc-20240116; t=1755730668; c=relaxed/simple;
+	bh=n9Bd8IEkV/IRTwOdU9uX1p5y4MveMsGf5jHJ/dTc0ss=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cefHX90kP48RIkfLOofVXu8f3C9yWI37PLNwEmkbXTeoxTMc0/tAoWb5ks8qRAifLIQQAA1vA5cCbDpjzCkOch+BYIDrNVHYnBC1w7FTOwjHFkVHnTw5tXaGVHp8PBPKVSMJVgmgXSEcIiygUwFvi1qBb63pLDdR9ZUAIJ6Nb7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gl4lgZFL; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-24458195495so2347255ad.2;
-        Wed, 20 Aug 2025 15:54:13 -0700 (PDT)
+	 To:Cc:Content-Type; b=nMw1leAzjEZy+hcgjihpDqJHmqhVsnWIfyql6NuIoGcNTJaqHbqG0c+dBcWERmuzCm6M5vahmRqV5jMUmFlQhrtNVZrBp5AUG7MVa/EcBhA6KrJll66U39kX8SKdJ9y/f6FFQtuFpIj51eqC0h/yaWXy6LYuadfzcmpBuADLP7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C2Jfy/w8; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-55cdfd57585so1632e87.1
+        for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 15:57:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755730452; x=1756335252; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1755730664; x=1756335464; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+v+ZtPegRwXYIddqayc8WLX+z8QS5ISVjLMRUJjSTvY=;
-        b=Gl4lgZFLd8UZJLLzdgsc7Lm9oSD9cB2Nq1TMfGgf0VYsDli+ioPZ9GePdnkzgxpYN+
-         KQpPsTM24kviqo2lWZnnvw6djFl6914vsnZ6ibNjHJBv4K5+3JdF2bT9ebwBpuYvJ8DL
-         luCJ7tM+otHos3/ZIYzOljeex3CCHEX7ta/ypp+cTQeDc81LF8br6x3jw9GqjUTPsdbW
-         UarDWnCxU+XWoNq+9/UO/1pcq2UzJPSTJyt2K8OQzeLZ+zqDoIPq1iixoDf/kWjD42Hm
-         q4n3c0uV0JmcYaSf4A3lO19QriqqGjc3HN8APeaXq6gijOHkdLlk47xRYUeTyF7so2Vt
-         VEWA==
+        bh=Kv92BsJeoSyMQyBVXvEV2fBjtlWdhSVa/KfUUa75TSc=;
+        b=C2Jfy/w8cFKiE9LoKa4yqhOz96P1D4UW5CEY+d6XbJ/2S2MTUFsLH+y2wfNZUO+FDY
+         yjTTJsDyuCk0xRvDaRiSdfEe5uwT9ezU7sV0YhEFVr5mOqIubmckYyL/PndwlIT+oISw
+         XWyS/JNzSjCbg7zDsdVTS8r9bnzq+YeHRYTwsXXNcYkPEqiovIqsAQcFF/CSROmCpN5g
+         FrES3gSPWBLeIA8MQoVtvTFmVZ1rJR53AldBuisk28cbDJxGdn6El6ccwbJBINqb1h/O
+         dXwIk1AptXG/L8tqfHGfV2Hpkns0exqhRzDGFH10uIwM16OzudKBbFqftRRTuycrp0mL
+         Dg+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755730452; x=1756335252;
+        d=1e100.net; s=20230601; t=1755730664; x=1756335464;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+v+ZtPegRwXYIddqayc8WLX+z8QS5ISVjLMRUJjSTvY=;
-        b=dJ8Z5rmLeq9ggBLEcslqPB2uRCdlMpp5ElgVE/XmzkWryyUuvWCTjTn4MFzM1MsY2N
-         bcwvttNzcWLjw8rCmSBQnH5XQ+a0utu2a49FyKsuFYecWBEzXHaYzszisj0ItVG+JwTE
-         OlJ7VYQYcIPhcUeRVTeZ9lzwnB1vahXN04GKflCUGgmNENyJFtIq6wIARMHuNCvnd+ck
-         afasYG/oAZu9d/RN7mt80XnwBeLWjNUpdvYrqiiOjJOc4HG3+C6yAw8FBQAF6QLQcv47
-         KlPaGfIIYyn/TNeOywicQx4CMcUJh6rBAyM4xBS6+pE1/kQ/hNajDovsFHtv+x2rRkLK
-         01Dw==
-X-Forwarded-Encrypted: i=1; AJvYcCUdO2mwOfxkfgOmOoAafvQeQRk6sq2BC3pzaXsuf1/8BkSty5x/TUzgzMZ/7w69GgwMmBlcoQLmGcEelyOCpNVi@vger.kernel.org, AJvYcCUyFEWEHFs5mFaQHFlKgcrIrnYFUrkkHwCcwOKJW0krhvOBCPl/TWE4TVENUFKB0iNTKie9Bz3a@vger.kernel.org, AJvYcCWU1VBGOd42PwdN97lA1ZCiZAi+bCTj1x6T0MIAedFDfP6J7WqntDnCsg5dJR/c0CRDu4PgU1J/M2NmBHG2@vger.kernel.org, AJvYcCX++T3zdAyDA8fI0oqldnw+eyLsZcNE2nviMY8WXChY+iApo9WNkTIi2tIRW3E2ExBGvok=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbBmo9drmYq2F3dNnJxXEypGSQf7HQOjFbDELuHU1SDerAX853
-	Xsv2d35qBYF1Qpkx6mtolb0E03eIkVaOIbTT3OCVgWG6HtXxZ0s8OhiFImTph0LvlVsplsaykgJ
-	WwvO3OJp4VsSiWqC3e30uNq2oBdN9Pq4=
-X-Gm-Gg: ASbGnctenCypYglXvIBLM9TjVQ/QyGKnCAEN2dHHw8LeWxn0lTqHAVke9h51LN2q2Fg
-	GdR2ZnvAz6uxq5dRPi/xMC9ZyKysEWn8an2e8BkLMylW48yx+JkVGUhXE9NcQHWMV3kPhB+f4cG
-	PWCsbEc57zMuPZGh/sjsZ/m4ak0zu1zrZllQ6dBNXDtAiWT6fE2dGNWqVfPGIOiG6rLrevl8slG
-	asU/bgA7rOtUYpnxHwDUK9kdRpT1m1/80cCQowSKfDc
-X-Google-Smtp-Source: AGHT+IHsYq1/G3bkWo2LTB+Wjq6BjQc3MS0ahLPsXURmjYsCiKDmAvwNrGYkktwC5RFWrRVV25fqel2mh6B7rbrx6mk=
-X-Received: by 2002:a17:902:f68b:b0:240:2145:e51f with SMTP id
- d9443c01a7336-245febe11dcmr6286575ad.3.1755730452431; Wed, 20 Aug 2025
- 15:54:12 -0700 (PDT)
+        bh=Kv92BsJeoSyMQyBVXvEV2fBjtlWdhSVa/KfUUa75TSc=;
+        b=vxdbDdjVK0ctG6DPM24FexgEl6f+SFXFWlqxPj53K8D1INwALGZ/qshXljKoCVkfPI
+         34yrogtjzKDH0BOs8CaVExV046SBCOqvVpRaTCzpbr6x72zcx3th3xTAksgORAwDlybw
+         PdXQ2Z4QtidWHmF7gzEh3sEce8tXlUOtBYjRVsOxIkJ42TIGBmQxv5VDh5vpYcwAmEdv
+         sxjSEbTs1WakPf1gpLvHOUzdwOj4SXyT0uSmg145L6d81aULpSFzhDgzrajHZjpQIo7U
+         C1+LawikC04U9o8SudfsKlNoRINsjNTNamrkXgqNPmeNyGjzmv8GCuj8WgsX7rt7FEYS
+         skcw==
+X-Forwarded-Encrypted: i=1; AJvYcCUf1QM9UV9Ps0adtdsvk/BgzXvMdmE4KUbncjYpdXwbOOq3vzjKtf+VrwFb4h+ET1+8Llmm7Cs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/kUMjyz8KrQwrHcWhtVP1tFha+7UMwWK+EhalcXNxABt3ag/W
+	QEZbLzZlD/eV/5pmFZeysfoRLvtTctwIbNosHDieodjSdCa9FPWC86JcPzSQiafj/7RC6JAToga
+	CtPcsaXCBSMKuz6LiwhiCLHmT0nuQSTZY67uNfGU+
+X-Gm-Gg: ASbGncvhYN1ewPqXMTnMbXIc/Fqi7bzxrbS7xqxGS1ZWe8s2JQBFgB6taypdkZXdeqv
+	Bk069/GKUr3pAf+cU4kAK+aHaVus5UXMDl5soVSs88+6JFdf2BiU5iYs59ckAVZr2NrBWx8za+p
+	7lirC1t0dkT6Fr1UvZu/6VCd9ar0GpipfppJtYHqxVRi05/kMB4XcSr/DhPFSa97gO/Gjl78VN1
+	a8z8OAZjMNQAmvvXImMN9O68JHaN4Cl7fckCsby229aye0ZM/G6Mzw=
+X-Google-Smtp-Source: AGHT+IGH9vQ8FVEVTOoInISa4rr0NshjyvtshuJzy0f+Z07svAYwLNshA6CLiESpfx8faYlT1rP3eTaZ3ND++HOOQMw=
+X-Received: by 2002:a05:6512:4381:b0:55c:df56:f936 with SMTP id
+ 2adb3069b0e04-55e0d7fffa8mr48358e87.6.1755730664222; Wed, 20 Aug 2025
+ 15:57:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250819033956.59164-1-dongml2@chinatelecom.cn> <20250819033956.59164-4-dongml2@chinatelecom.cn>
-In-Reply-To: <20250819033956.59164-4-dongml2@chinatelecom.cn>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Wed, 20 Aug 2025 15:53:56 -0700
-X-Gm-Features: Ac12FXx-fO5PKvBgzD_sLr5b2q6BW5ewlWVsvn9PgVglGjlHt1qy_PlT4iHOnWc
-Message-ID: <CAEf4BzZOC6Zyo9sikPJH+0Xz=aCbx=dBM_RksYZMaZM4ndR+OA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 3/3] selftests/bpf: add benchmark testing for kprobe-multi-all
-To: Menglong Dong <menglong8.dong@gmail.com>
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org, 
-	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
-	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, mykolal@fb.com, 
-	shuah@kernel.org, davem@davemloft.net, kuba@kernel.org, hawk@kernel.org, 
-	nathan@kernel.org, nick.desaulniers+lkml@gmail.com, morbo@google.com, 
-	justinstitt@google.com, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, llvm@lists.linux.dev
+References: <20250820171214.3597901-1-dtatulea@nvidia.com> <20250820171214.3597901-9-dtatulea@nvidia.com>
+In-Reply-To: <20250820171214.3597901-9-dtatulea@nvidia.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 20 Aug 2025 15:57:32 -0700
+X-Gm-Features: Ac12FXzWXtwzFd2q8Bx4gRa1je-LCa7G70ijBzEW_fCEnHL5Wi-KdxefJhnUL0Q
+Message-ID: <CAHS8izOQ=G-wVo5UXPyof+U=sxB-27Rv8UBfnVkvgtoOTW7Cdw@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 7/7] net: devmem: allow binding on rx queues
+ with same DMA devices
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: asml.silence@gmail.com, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, cratiu@nvidia.com, parav@nvidia.com, 
+	netdev@vger.kernel.org, sdf@meta.com, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 18, 2025 at 8:40=E2=80=AFPM Menglong Dong <menglong8.dong@gmail=
-.com> wrote:
+On Wed, Aug 20, 2025 at 10:14=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia.co=
+m> wrote:
 >
-> For now, the benchmark for kprobe-multi is single, which means there is
-> only 1 function is hooked during testing. Add the testing
-> "kprobe-multi-all", which will hook all the kernel functions during
-> the benchmark. And the "kretprobe-multi-all" is added too.
+> Multi-PF netdevs have queues belonging to different PFs which also means
+> different DMA devices. This means that the binding on the DMA buffer can
+> be done to the incorrect device.
 >
-> Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+> This change allows devmem binding to multiple queues only when the
+> queues have the same DMA device. Otherwise an error is returned.
+>
+> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
 > ---
->  tools/testing/selftests/bpf/bench.c           |  4 ++
->  .../selftests/bpf/benchs/bench_trigger.c      | 54 +++++++++++++++++++
->  .../selftests/bpf/benchs/run_bench_trigger.sh |  4 +-
->  .../selftests/bpf/progs/trigger_bench.c       | 12 +++++
->  tools/testing/selftests/bpf/trace_helpers.c   |  3 ++
->  5 files changed, 75 insertions(+), 2 deletions(-)
+>  net/core/netdev-genl.c | 34 +++++++++++++++++++++++++++++++++-
+>  1 file changed, 33 insertions(+), 1 deletion(-)
 >
-> diff --git a/tools/testing/selftests/bpf/bench.c b/tools/testing/selftest=
-s/bpf/bench.c
-> index ddd73d06a1eb..29dbf937818a 100644
-> --- a/tools/testing/selftests/bpf/bench.c
-> +++ b/tools/testing/selftests/bpf/bench.c
-> @@ -510,6 +510,8 @@ extern const struct bench bench_trig_kretprobe;
->  extern const struct bench bench_trig_kprobe_multi;
->  extern const struct bench bench_trig_kretprobe_multi;
->  extern const struct bench bench_trig_fentry;
-> +extern const struct bench bench_trig_kprobe_multi_all;
-> +extern const struct bench bench_trig_kretprobe_multi_all;
->  extern const struct bench bench_trig_fexit;
->  extern const struct bench bench_trig_fmodret;
->  extern const struct bench bench_trig_tp;
-> @@ -578,6 +580,8 @@ static const struct bench *benchs[] =3D {
->         &bench_trig_kprobe_multi,
->         &bench_trig_kretprobe_multi,
->         &bench_trig_fentry,
-> +       &bench_trig_kprobe_multi_all,
-> +       &bench_trig_kretprobe_multi_all,
->         &bench_trig_fexit,
->         &bench_trig_fmodret,
->         &bench_trig_tp,
-> diff --git a/tools/testing/selftests/bpf/benchs/bench_trigger.c b/tools/t=
-esting/selftests/bpf/benchs/bench_trigger.c
-> index 82327657846e..c6634a64a7c0 100644
-> --- a/tools/testing/selftests/bpf/benchs/bench_trigger.c
-> +++ b/tools/testing/selftests/bpf/benchs/bench_trigger.c
-> @@ -226,6 +226,58 @@ static void trigger_fentry_setup(void)
->         attach_bpf(ctx.skel->progs.bench_trigger_fentry);
+> diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+> index 0df9c159e515..a8c27f636453 100644
+> --- a/net/core/netdev-genl.c
+> +++ b/net/core/netdev-genl.c
+> @@ -906,6 +906,33 @@ static int netdev_nl_read_rxq_bitmap(struct genl_inf=
+o *info,
+>         return 0;
 >  }
 >
-> +static void attach_ksyms_all(struct bpf_program *empty, bool kretprobe)
+> +static struct device *netdev_nl_get_dma_dev(struct net_device *netdev,
+> +                                           unsigned long *rxq_bitmap,
+> +                                           struct netlink_ext_ack *extac=
+k)
 > +{
-> +       LIBBPF_OPTS(bpf_kprobe_multi_opts, opts);
-> +       char **syms =3D NULL;
-> +       size_t cnt =3D 0;
+> +       struct device *dma_dev =3D NULL;
+> +       u32 rxq_idx, prev_rxq_idx;
 > +
-> +       if (bpf_get_ksyms(&syms, &cnt, true)) {
-> +               printf("failed to get ksyms\n");
-
-we seem to be using fprintf(stderr, "...") for emitting errors like
-this (at least in some benchmarks, and it makes sense to me). Do the
-same?
-
-> +               exit(1);
+> +       for_each_set_bit(rxq_idx, rxq_bitmap, netdev->real_num_rx_queues)=
+ {
+> +               struct device *rxq_dma_dev;
+> +
+> +               rxq_dma_dev =3D netdev_queue_get_dma_dev(netdev, rxq_idx)=
+;
+> +               /* Multi-PF netdev queues can belong to different DMA dev=
+oces.
+> +                * Block this case.
+> +                */
+> +               if (dma_dev && rxq_dma_dev !=3D dma_dev) {
+> +                       NL_SET_ERR_MSG_FMT(extack, "Queue %u has a differ=
+ent dma device than queue %u",
+> +                                          rxq_idx, prev_rxq_idx);
+> +                       return ERR_PTR(-EOPNOTSUPP);
+> +               }
+> +
+> +               dma_dev =3D rxq_dma_dev;
+> +               prev_rxq_idx =3D rxq_idx;
 > +       }
 > +
-> +       printf("found %zu ksyms\n", cnt);
-
-stray debug output?
-
-> +       opts.syms =3D (const char **) syms;
-> +       opts.cnt =3D cnt;
-> +       opts.retprobe =3D kretprobe;
-> +       /* attach empty to all the kernel functions except bpf_get_numa_n=
-ode_id. */
-> +       if (!bpf_program__attach_kprobe_multi_opts(empty, NULL, &opts)) {
-> +               printf("failed to attach bpf_program__attach_kprobe_multi=
-_opts to all\n");
-> +               exit(1);
-> +       }
+> +       return dma_dev;
 > +}
 > +
+>  int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
+>  {
+>         struct net_devmem_dmabuf_binding *binding;
+> @@ -969,7 +996,12 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, stru=
+ct genl_info *info)
+>         if (err)
+>                 goto err_rxq_bitmap;
+>
+> -       dma_dev =3D netdev_queue_get_dma_dev(netdev, 0);
+> +       dma_dev =3D netdev_nl_get_dma_dev(netdev, rxq_bitmap, info->extac=
+k);
+> +       if (IS_ERR(dma_dev)) {
 
-[...]
+Does this need to be IS_ERR_OR_NULL? AFAICT if all the ndos return
+NULL, then dma_dev will also be NULL, and NULL is not a valid value to
+pass to bind_dmabuf below.
+
+
+--=20
+Thanks,
+Mina
 
