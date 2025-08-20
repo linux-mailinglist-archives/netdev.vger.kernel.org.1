@@ -1,97 +1,109 @@
-Return-Path: <netdev+bounces-215345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95381B2E33C
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 19:17:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9A31B2E336
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 19:17:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 092FC1C83F11
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 17:15:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74D68A2222B
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 17:15:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D108B33A02E;
-	Wed, 20 Aug 2025 17:14:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DA2D335BB1;
+	Wed, 20 Aug 2025 17:14:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="rrAxMNiP"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=ariel.dalessandro@collabora.com header.b="iXdiIBjc"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2050.outbound.protection.outlook.com [40.107.95.50])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49BA433A022;
-	Wed, 20 Aug 2025 17:14:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D59CC321447;
+	Wed, 20 Aug 2025 17:14:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755710048; cv=fail; b=UJE/HiImHbtWTPTAPnuz6vqphFPIRP94Jb3kqmjNe0PbjnrCAP0fUeWFLMNXefoS1cpgKFpfQ0dL9A7pr6udhKC7nUgEBD7iZXK7y6aNVl7hIEgrBOdqwPrCx+llhKRAn9IqnOmo1DjCuNnmajKCsbrq+OwSPaLOoco+htjO0gk=
+	t=1755710099; cv=pass; b=o1rfIMjzfadph5ExeuHI9ZPdidbD53FDeKG7v9P8DXGXl7d35oe1A0Y0Zt2Ieh1vBCWyrXt7h+Cnhen2rPqBKW25i6GRW8x0l6rX4aKnzq5gRwI3NIhuSOWDlF9yf3GL+GtFyioO98F41XNpkOlsoovdMYAnQMbe0lopUvQ08mg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755710048; c=relaxed/simple;
-	bh=3JPVcHSGHpIfGU659L8QMB7TVhcSDIwBfwKXitN25eA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=u9uoEXb9CB0O7GiyjoEoH0sXZHndtP3aDaRhtUV9BDY0LSN+QBDSSm03m3s9hO3a/vHzPKmpbrlANoZ8Lu86RPB9nZ90VAtnEUNIbzLTH9arEocFY4p8ok8j8DulA54+Y1oPy+b/gOSjzE+SkiWmsADoISVHcxRS/cxVmLFEAMI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=rrAxMNiP; arc=fail smtp.client-ip=40.107.95.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qUQpaiZhM2IMhLC2uUxlaic6kjkafrMHoV303P0HZ/N4lVyRROiOEil9kPvQxmLynsQz4KPtWB2L7xrDaAoOPtvXdGtO1lyryCW65/VBApuUsHPbEFTt9weqgMwEZbyzOWgwCniCOYBEPlO87BGdla5D4b0dI2LCBrh/6BjybGdpxHlbFacy61poYTv7hNh2oatMKjUXV3jwgZA0DchTjTfg0YUETnwcxzBnoTcfiS9O5e5Lcw4Sg/UigEvuJWLxuid50nsPpt8BIATr23IOuE/5ESxVBtQ1AaDPgHEn2zFqwFzU7FPaoh9t+W5XV/TEt7mFz3/rt0Mrj2WUliL13Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YAj74CKHPBe1yyfYxuQ+vt8nQ/Gex9y+oyUhvHDA/uk=;
- b=qw2upkofGX8Bl4Ql37mWyPa16qokJmjuvXXClGAO2qCJbKCSdhAUYW2N/PgdFgIkpsBD/oTo19eOT5UWGzHA02JosHOwJNHrKU5xZBukiiuy5tH3WTBfnC59NWGY3o+btAScwZYHgLFLgLYXNuui9XHmfo6N06Psxb7Nf3ECAC5OdbhXw7ElgaBwcmNbNm9BYcfF6pEudBpZX8CKYAp/qzW4+SS++yEuSiY/NpvqEYkqlLomwx+o3gTwIA5kG1EeK4SWqQOdclvCyPo2eOER2kdTX+PKwml1iodMHrFC3nQ0IDLSjieeJL3gCp1tJgJxJL3xhzbRZFT75L81h1CIZw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YAj74CKHPBe1yyfYxuQ+vt8nQ/Gex9y+oyUhvHDA/uk=;
- b=rrAxMNiP/MZm4zUC7am59rerF0g2M05EWrkoRg4rwBA4Gn86Ke3hIY6Y035HsL/Tgu/+5WTIE8thSrab3ogKGNepfmqyGwdFH87CPchkTt66iQirD2XBkyzbvzU1HjZzCRhVcGKsNP6lVDU9m/jdSVOv+6tMKCROL4a5qa5HZGdfBHPynnO1lCkhyArUtFNKkZUWWaNF8oAD714M8xnz15eE3fDD1x7jimh2ijlIQqeWJgdHGzes1VTFT7D+lhEVyE3eupL1elxoTuD4ZE3w9F6EeuoP5UqLlA0Ap+JfUg5wq2XjvFLwsaChijUQJYT4etrukb0HJcLnhQ6mcctiRg==
-Received: from BN9PR03CA0154.namprd03.prod.outlook.com (2603:10b6:408:f4::9)
- by DM3PR12MB9433.namprd12.prod.outlook.com (2603:10b6:0:47::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.14; Wed, 20 Aug
- 2025 17:14:03 +0000
-Received: from BN1PEPF00004682.namprd03.prod.outlook.com
- (2603:10b6:408:f4:cafe::cd) by BN9PR03CA0154.outlook.office365.com
- (2603:10b6:408:f4::9) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9031.25 via Frontend Transport; Wed,
- 20 Aug 2025 17:14:03 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BN1PEPF00004682.mail.protection.outlook.com (10.167.243.88) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9052.8 via Frontend Transport; Wed, 20 Aug 2025 17:14:03 +0000
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 20 Aug
- 2025 10:13:36 -0700
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail204.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 20 Aug
- 2025 10:13:35 -0700
-Received: from f42.dev-l-178 (10.127.8.9) by mail.nvidia.com (10.129.68.10)
- with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Wed, 20
- Aug 2025 10:13:32 -0700
-From: Dragos Tatulea <dtatulea@nvidia.com>
-To: <almasrymina@google.com>, <asml.silence@gmail.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>
-CC: Dragos Tatulea <dtatulea@nvidia.com>, <cratiu@nvidia.com>,
-	<parav@nvidia.com>, <netdev@vger.kernel.org>, <sdf@meta.com>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next v4 7/7] net: devmem: allow binding on rx queues with same DMA devices
-Date: Wed, 20 Aug 2025 20:11:58 +0300
-Message-ID: <20250820171214.3597901-9-dtatulea@nvidia.com>
+	s=arc-20240116; t=1755710099; c=relaxed/simple;
+	bh=sV4kV/mfpkuY2wa8iKDdxtO5llhW9IcZK2g3plBieoY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gZR5TxkYcQgjUGvd43QUMtqcDgNWQc4RYVFsrJFwsflk7sde8eqSlsEv4NFA3RNjKsmA0ri1SEcP8o5BhsYCS2WBcpjoNbncWT8AaDKQN+bdUEHNDdlWgG1nh0eWcRHZnVkTEXSIlnIwmqQT7NKj+fXxJbRIgkcbvuqJnz6jlCs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=ariel.dalessandro@collabora.com header.b=iXdiIBjc; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1755710040; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=Tim5F0HvYU373WHcbS+AW8itdXClm69OGGAsV1A46kh652ncp3eSt6GC0leBhqQH405N+NPRTuGFjKQEUvPvcrXmcjPYge5C/9fszUGPrpZ5XGJoWwPlyg6Izx+fS2Si8WlHPNLOTPyqgUchpe4WQwKCX0+b+lLw//3TM164iRw=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1755710040; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=DaMNOnKm2AnfZhbaigAUu68c7YdBR4a87CV7XaTyqjQ=; 
+	b=NO+n+dEsIpuIEW/n/h9GYA9kEKtT860Sym3jjxLtnbWPN+LQVmltK9yAjn4BT/NP9BeIqZ29j6cMMWzQ8cVuRxHQsn+gkG6m06E2i3FvJET1GwFmdYbpD/1QAJ/EvgPsXeR8DaWuwm6GggX8aaDWOJ1UsDCWYze9LFtBPVar8h4=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=ariel.dalessandro@collabora.com;
+	dmarc=pass header.from=<ariel.dalessandro@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1755710040;
+	s=zohomail; d=collabora.com; i=ariel.dalessandro@collabora.com;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=DaMNOnKm2AnfZhbaigAUu68c7YdBR4a87CV7XaTyqjQ=;
+	b=iXdiIBjcdK3P7kvXuElLIVC112o9r1eEOb6UZAwC74zp+49vHMbc2ihpozoDyC7T
+	X+KKEt/amBhjUN4d6/KrsnmQM8X6JXL/Fxoc1teeoq21qpT+5zcDfZ1qpXkTHyX+0Oa
+	tsnKB3Yni2Qt7wENZUUvI7IQ/xdgh6kf7HnAjcUQ=
+Received: by mx.zohomail.com with SMTPS id 1755710039628806.7841478498982;
+	Wed, 20 Aug 2025 10:13:59 -0700 (PDT)
+From: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+To: airlied@gmail.com,
+	amergnat@baylibre.com,
+	andrew+netdev@lunn.ch,
+	andrew-ct.chen@mediatek.com,
+	angelogioacchino.delregno@collabora.com,
+	ariel.dalessandro@collabora.com,
+	broonie@kernel.org,
+	chunkuang.hu@kernel.org,
+	ck.hu@mediatek.com,
+	conor+dt@kernel.org,
+	davem@davemloft.net,
+	dmitry.torokhov@gmail.com,
+	edumazet@google.com,
+	flora.fu@mediatek.com,
+	houlong.wei@mediatek.com,
+	jeesw@melfas.com,
+	jmassot@collabora.com,
+	kernel@collabora.com,
+	krzk+dt@kernel.org,
+	kuba@kernel.org,
+	kyrie.wu@mediatek.corp-partner.google.com,
+	lgirdwood@gmail.com,
+	linus.walleij@linaro.org,
+	louisalexis.eyraud@collabora.com,
+	maarten.lankhorst@linux.intel.com,
+	matthias.bgg@gmail.com,
+	mchehab@kernel.org,
+	minghsiu.tsai@mediatek.com,
+	mripard@kernel.org,
+	p.zabel@pengutronix.de,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	sean.wang@kernel.org,
+	simona@ffwll.ch,
+	support.opensource@diasemi.com,
+	tiffany.lin@mediatek.com,
+	tzimmermann@suse.de,
+	yunfei.dong@mediatek.com
+Cc: devicetree@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-clk@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	linux-input@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	linux-sound@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v1 00/14] MediaTek dt-bindings sanitization (MT8173)
+Date: Wed, 20 Aug 2025 14:12:48 -0300
+Message-ID: <20250820171302.324142-1-ariel.dalessandro@collabora.com>
 X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250820171214.3597901-1-dtatulea@nvidia.com>
-References: <20250820171214.3597901-1-dtatulea@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,121 +111,77 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN1PEPF00004682:EE_|DM3PR12MB9433:EE_
-X-MS-Office365-Filtering-Correlation-Id: dab94ad8-4b93-4903-8b10-08dde00cf653
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|7416014|376014|1800799024|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Rq27fsiW+Dm7mIQiUpQ+r40G4jTWSVayq/MgazZ5jhiQ3iMa5ZFfcHtWZ6pH?=
- =?us-ascii?Q?v5Z56yqorl6Hh/vWymjKisPgwYbE93GMqfVPjZiV19xXKLEPoHF5sdkjsTAu?=
- =?us-ascii?Q?kXKzzbxmQXFIWilT86wuCuKuNqeU3xK0Zd/1Yctcni+CCylAY2gjIgnNGirW?=
- =?us-ascii?Q?F1pm9VpL3sWqOwqB9lS1usdF88weYJKxxP6n0td+3QQ+TnRphmYOye3/H6/K?=
- =?us-ascii?Q?/Mn83pEwYG2ylRmRp1CNpaiHsg5c942cs/OFWa7g6KbGq7cJK9jSyaWbw2hN?=
- =?us-ascii?Q?k3VOLZKq+oTElWEhZeDWbsHucwWX0pEqbu+pEy7cOCVRZMTOiDRq2EUItas8?=
- =?us-ascii?Q?TrtVIRD7rKrBeAmAqhAO3C1eFmLcXkMJmrjMTI/c2VFhfFKH2mrZYy8XYVg4?=
- =?us-ascii?Q?ltXsb3HqGD0jThrxtzXFJVmUWjKbomuqwVj0x08xuUZl+oplgBjzE9nIENPP?=
- =?us-ascii?Q?vqEVF/QwkNNeCQyPPFcoYtAnHwnli5oUWrgOqF+A8R4ATxjRTQQ+fYIn1sBU?=
- =?us-ascii?Q?ytH9Wa/FXxz1b3A2vb2L7ixMcy7sNqndsV8NenunnOc8nrgftcbteeJNdx9Z?=
- =?us-ascii?Q?hmu5NYCG5Bc6TudOXVCou7Fc9dsAA7w0M4x29DKpiIblFWDXOoz5Imii6Nj1?=
- =?us-ascii?Q?80RQU/ZBQrBmKI+wh0Qi6usQxfAZVHo7kMk+AitOQIT3NfQ211rQe1FCMWTE?=
- =?us-ascii?Q?zHl/bTLNjFRp4haq8eEItlWzkkG1MmQqBEOtSodkI+zgaeKpYxEm3bSVrNZz?=
- =?us-ascii?Q?A+0wcUZCzA9zWrUyevatThsMF28ONxxDq2k+O170eLdO9lkbbjd8CQjH+YLV?=
- =?us-ascii?Q?ETcw62W+XfhgJuJqQvAHwj0GjpsUFqRcHciNHM2aXXkE6Mji01/UEprhLuck?=
- =?us-ascii?Q?lc2dMjiRzUrkrMtsh5Ev9/IHWERXF+l15E7TOU2zX0L9hSTFxuB0zspHigGL?=
- =?us-ascii?Q?OY/aJT0tgMjPnwGuCKJyQEr8jmZL1sIBHsItxubysFTj1qb0Dt/UXq/zVGGv?=
- =?us-ascii?Q?7W1Os8fLgekubOD7QvxwlZ+pJaQHTogMuuUHJxaJsfJNJ39QQGDFFPEP7Q3T?=
- =?us-ascii?Q?939Tu4+xkW4FlubG3fhxWQrCJdrC89W972nxOl5+D5QStpQfKfZTyI3wbZVL?=
- =?us-ascii?Q?YsVDXGFv1qDj8jnWbxBpQJmh5qySUQQjFfi94T0q2/W2nZ7NWK/LXUknztkc?=
- =?us-ascii?Q?khLFnAe/9bMbLnMBhMIuwuKspi/1LXMIVEEhe3rMXFc9fLrftABkj8gepXeF?=
- =?us-ascii?Q?mrUsl6VjurDusNiWDclpp5s/CVV0CANG62+Dh/FGBEsjdZumCq6rPrm5LsSt?=
- =?us-ascii?Q?wO3YXNcWtCTkeP866ktraQVBeV9yJIZZf8oO54vluFwgXLLZfgHA5J3ns3J+?=
- =?us-ascii?Q?JKHj4w+AKtptq7ROcF0eQ5dBnrQ+hwuhKhE8M3oPJ66w+6/0pdq51a01bCe+?=
- =?us-ascii?Q?p/Cy+NlbuaKWBH5q4X4p3LR6PEDXyAETYoP3WsW8wUyGPw2SWP9UirBgB27n?=
- =?us-ascii?Q?yMI2ayS2rLPRwegYhsx5ipUVRfmapZ8N6ixu?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(7416014)(376014)(1800799024)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2025 17:14:03.1938
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: dab94ad8-4b93-4903-8b10-08dde00cf653
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN1PEPF00004682.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR12MB9433
+X-ZohoMailClient: External
 
-Multi-PF netdevs have queues belonging to different PFs which also means
-different DMA devices. This means that the binding on the DMA buffer can
-be done to the incorrect device.
+This patch series continues the effort to address Device Tree validation
+warnings for MediaTek platforms, with a focus on MT8173. It follows the initial
+cleanup series by Angelo (https://www.spinics.net/lists/kernel/msg5780177.html)
 
-This change allows devmem binding to multiple queues only when the
-queues have the same DMA device. Otherwise an error is returned.
+Similarly to the ongoing MT8183 work done by Julien Massot, this patchset
+eliminates several of the remaining warnings by improving or converting DT
+bindings to YAML, adding missing properties, and updating device tree files
+accordingly.
 
-Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
----
- net/core/netdev-genl.c | 34 +++++++++++++++++++++++++++++++++-
- 1 file changed, 33 insertions(+), 1 deletion(-)
+Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
 
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index 0df9c159e515..a8c27f636453 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -906,6 +906,33 @@ static int netdev_nl_read_rxq_bitmap(struct genl_info *info,
- 	return 0;
- }
- 
-+static struct device *netdev_nl_get_dma_dev(struct net_device *netdev,
-+					    unsigned long *rxq_bitmap,
-+					    struct netlink_ext_ack *extack)
-+{
-+	struct device *dma_dev = NULL;
-+	u32 rxq_idx, prev_rxq_idx;
-+
-+	for_each_set_bit(rxq_idx, rxq_bitmap, netdev->real_num_rx_queues) {
-+		struct device *rxq_dma_dev;
-+
-+		rxq_dma_dev = netdev_queue_get_dma_dev(netdev, rxq_idx);
-+		/* Multi-PF netdev queues can belong to different DMA devoces.
-+		 * Block this case.
-+		 */
-+		if (dma_dev && rxq_dma_dev != dma_dev) {
-+			NL_SET_ERR_MSG_FMT(extack, "Queue %u has a different dma device than queue %u",
-+					   rxq_idx, prev_rxq_idx);
-+			return ERR_PTR(-EOPNOTSUPP);
-+		}
-+
-+		dma_dev = rxq_dma_dev;
-+		prev_rxq_idx = rxq_idx;
-+	}
-+
-+	return dma_dev;
-+}
-+
- int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
- {
- 	struct net_devmem_dmabuf_binding *binding;
-@@ -969,7 +996,12 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
- 	if (err)
- 		goto err_rxq_bitmap;
- 
--	dma_dev = netdev_queue_get_dma_dev(netdev, 0);
-+	dma_dev = netdev_nl_get_dma_dev(netdev, rxq_bitmap, info->extack);
-+	if (IS_ERR(dma_dev)) {
-+		err = PTR_ERR(dma_dev);
-+		goto err_rxq_bitmap;
-+	}
-+
- 	binding = net_devmem_bind_dmabuf(netdev, dma_dev, DMA_FROM_DEVICE,
- 					 dmabuf_fd, priv, info->extack);
- 	if (IS_ERR(binding)) {
+Ariel D'Alessandro (14):
+  media: dt-bindings: Convert MediaTek mt8173-mdp bindings to YAML
+  media: dt-bindings: Convert MediaTek mt8173-vpu bindings to YAML
+  dt-bindings: arm: mediatek: mmsys: Add assigned-clocks/rates
+    properties
+  net: dt-bindings: Convert Marvell 8897/8997 bindings to YAML
+  sound: dt-bindings: Convert MediaTek RT5650 codecs bindings to YAML
+  dt-bindings: display: mediatek,od: Add mediatek,gce-client-reg
+    property
+  dt-bindings: display: mediatek,ufoe: Add mediatek,gce-client-reg
+    property
+  arm64: dts: mediatek: mt8173: Fix mt8173-pinctrl node names
+  dt-bindings: pinctrl: mediatek,mt65xx-pinctrl: Allow gpio-line-names
+  regulator: dt-bindings: Convert Dialog Semiconductor DA9211 Regulators
+    to YAML
+  arm64: dts: mediatek: mt8173-elm: Drop unused bank supply
+  dt-bindings: soc: mediatek: pwrap: Add power-domains property
+  dt-bindings: input/touchscreen: Convert MELFAS MIP4 Touchscreen to
+    YAML
+  dt-bindings: media: mediatek,jpeg: Fix jpeg encoder/decoder ranges
+
+ .../bindings/arm/mediatek/mediatek,mmsys.yaml |   9 +
+ .../display/mediatek/mediatek,od.yaml         |  10 +
+ .../display/mediatek/mediatek,ufoe.yaml       |  11 +
+ .../input/touchscreen/melfas,mip4_ts.yaml     |  55 +++++
+ .../input/touchscreen/melfas_mip4.txt         |  20 --
+ .../bindings/media/mediatek,mt8173-mdp.yaml   | 174 +++++++++++++++
+ .../bindings/media/mediatek,mt8173-vpu.yaml   |  76 +++++++
+ .../media/mediatek,mt8195-jpegdec.yaml        |  31 +--
+ .../media/mediatek,mt8195-jpegenc.yaml        |  15 +-
+ .../bindings/media/mediatek-mdp.txt           |  95 --------
+ .../bindings/media/mediatek-vpu.txt           |  31 ---
+ .../bindings/net/marvell,sd8897-bt.yaml       |  91 ++++++++
+ .../bindings/net/marvell-bt-8xxx.txt          |  83 -------
+ .../pinctrl/mediatek,mt65xx-pinctrl.yaml      |   2 +
+ .../devicetree/bindings/regulator/da9211.txt  | 205 ------------------
+ .../bindings/regulator/dlg,da9211.yaml        | 104 +++++++++
+ .../bindings/soc/mediatek/mediatek,pwrap.yaml |  15 ++
+ .../sound/mediatek,mt8173-rt5650.yaml         |  73 +++++++
+ .../bindings/sound/mt8173-rt5650.txt          |  31 ---
+ .../boot/dts/mediatek/mt8173-elm-hana.dtsi    |   2 +-
+ arch/arm64/boot/dts/mediatek/mt8173-elm.dtsi  |  31 ++-
+ arch/arm64/boot/dts/mediatek/mt8173-evb.dts   |  14 +-
+ arch/arm64/boot/dts/mediatek/mt8173.dtsi      |  14 +-
+ 23 files changed, 672 insertions(+), 520 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/input/touchscreen/melfas,mip4_ts.yaml
+ delete mode 100644 Documentation/devicetree/bindings/input/touchscreen/melfas_mip4.txt
+ create mode 100644 Documentation/devicetree/bindings/media/mediatek,mt8173-mdp.yaml
+ create mode 100644 Documentation/devicetree/bindings/media/mediatek,mt8173-vpu.yaml
+ delete mode 100644 Documentation/devicetree/bindings/media/mediatek-mdp.txt
+ delete mode 100644 Documentation/devicetree/bindings/media/mediatek-vpu.txt
+ create mode 100644 Documentation/devicetree/bindings/net/marvell,sd8897-bt.yaml
+ delete mode 100644 Documentation/devicetree/bindings/net/marvell-bt-8xxx.txt
+ delete mode 100644 Documentation/devicetree/bindings/regulator/da9211.txt
+ create mode 100644 Documentation/devicetree/bindings/regulator/dlg,da9211.yaml
+ create mode 100644 Documentation/devicetree/bindings/sound/mediatek,mt8173-rt5650.yaml
+ delete mode 100644 Documentation/devicetree/bindings/sound/mt8173-rt5650.txt
+
 -- 
 2.50.1
 
