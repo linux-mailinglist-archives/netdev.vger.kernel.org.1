@@ -1,124 +1,146 @@
-Return-Path: <netdev+bounces-215318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DC94B2E14B
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 17:37:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 642BBB2E14C
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 17:38:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8994D1894B49
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 15:32:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91DFE7A46FB
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 15:36:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D91182222CB;
-	Wed, 20 Aug 2025 15:31:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F29222CBC0;
+	Wed, 20 Aug 2025 15:37:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b="C8LDnFfK"
+	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="bhFP+2Gp";
+	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="HLDDTQaD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE8036CDF2
-	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 15:31:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9073213E6D;
+	Wed, 20 Aug 2025 15:37:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755703899; cv=none; b=skuUdOQjs1Ag8x3SedntkLqvW7VeqVxNTHb5ZJCu9O/gD1Lm2LBMI2bMTC1XNVUZwmEHIAN+C6efwFEqmds0D6q5vzYMkoP/xtr/YJEQilq7ajFBXgJFH3J7YaS/Okn/0VUz/M4eRPneAArDKDRjIDs9U45VG2pDRHvFkQA4OBs=
+	t=1755704275; cv=none; b=anYLCun9AcWZfjxE/z2qYzyFTSLyu1RquzWUxn+ALAK+WCsT9lk2Z99so8bOVSuDTTi4cp0bZOea9qVqqf8I4OpBaU8jNMZjD+rbkC5+rYYsfkAiQQMZd5vjuSrbUh3y2nNlZB0SgmL0tlQHt9KEKvlZDSV9a7X7/zSFOTp03Qc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755703899; c=relaxed/simple;
-	bh=10I89XL/l2GRS76lOXYnSC+MjwZsTherQYswe/RkQt4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SGOes+RlIOwfqOVpbxiE9bbVuiuzW93VhVFd7rrAuSZQ7giWzXr9wf1NA5xgKxq2sF2NCjMYTubgtf3hYfXEFDV6bpM/GqN4FnX3Vcm+38ElZqDwanuZZuuUxLNC8URafPSxO2MVm0yp9OVXRqz+PBarz1KWlesrwXm8UftH4U8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org; spf=pass smtp.mailfrom=wbinvd.org; dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b=C8LDnFfK; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wbinvd.org
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-76e2ea79219so53410b3a.2
-        for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 08:31:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=wbinvd.org; s=wbinvd; t=1755703897; x=1756308697; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=CFiBinjOkqTeTTRLQMbijMZjq/eImrXz0BMlfgI32uI=;
-        b=C8LDnFfK2ynDUobMq839AryvR6wprfGJkp70IrRuj+JByrV4SLDBm/74KO2ROiqTR0
-         UHgsHYsEC5Bk14T1uiSSCNI3yDbfEYC7olgZwgL0/gI4258I4vK0qt3ZbZskdDpaDz0F
-         l4aAqDUk9sUHUAOQ0eyqDlWU/ckSRe/SpgprgXl+vClQtmyAOvnY1y8Px+IgXK6y2rTg
-         vmi3R7qZLdVFS6SVRwCUAq+OtO0Vj5gIIz1E3HWWpKJU6WsyF7/NaDmoHcosbQRaxatn
-         dy7aPhYoev1oQU6JrUk01PgaqKYoF3OK0mRIVCV+/6BKS6tC0llS5DP++eZcuGrCEZOE
-         U3zg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755703897; x=1756308697;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CFiBinjOkqTeTTRLQMbijMZjq/eImrXz0BMlfgI32uI=;
-        b=Vg8fZUwTyduu9+uVHAqCU+ahvVls30MzhDGZXBXVFyDtYsrbw5gA864vngNNQnUp9E
-         Vzb/IWAM+dM2KTuOObMGHS50EDa2nI7u9eEq09d6cJtlB6U98IYZYZ6MjYncz3aA3j60
-         +JBif8hXBiC+pT/rwuKkCqFhqZyWLwcTIBAvfn/WDExnVMlqsG4CcJHaVIf6V2AdX0jT
-         AJl9yy3aDj3QtLtiUTtvkap5cM0g4nUtZUVX7PUw6yUiTAd2RNazpL7hyvxumI2Brrre
-         eVqR0y7mByLPtAjRVSbW/1VIJxxabOLKvwqesidzYNxLMcm7KbpIsq7ABGID9r7AnIAe
-         CfaA==
-X-Gm-Message-State: AOJu0YyzOodRiJDkMwL4T379FNTILlt4ON856ljpiz4qEnNWwpy5RS45
-	vswzK15rnGhImMFnvP9MBQkQXXr9ztkts6m+uDL5i95SMBD1aOsnGej6I9nbU4zJJOM=
-X-Gm-Gg: ASbGncviZb6ZTRqj/wnyC1RWjKSteJ+77jXCl4/ysK/riSUtpmyRpaAL/mPhhNnloaY
-	Tcfb9NBocgbghfeMmi4sJBOdcsCAuUmkAC5/DVI7UMpLCGOUxr21Ip8z00TJMZISZe/6iAZzn9F
-	xOGqCDRdVVmTneRZSTLD5I0WF7JuGgb4AV+FLZFPSy2goxjKt8+VXdzG0gCXtXvrxK2Fc5k8chE
-	WoiUCfZ8HgMIZPVSGr1Fo94l63KiovPq2zTiAVycgDyrVaEtDNhWB8bHzWMN+kPG8HLYisLiwQK
-	eBmtwpjYc3hlG87LPjTUUKWZjyxz/IDR5sIbXoL56zhzxkfgy8q8GgWiQrMNiTeZlJVfYZj3q48
-	bWNHpZ90r7SK7ti8bGh9NvTNy
-X-Google-Smtp-Source: AGHT+IFa+65EiF5gOLmsUqiKDfGi/hjEovv5LFIEhAxpf/e3lDkv/Vl67MHoAyiAjrypV/nXob9hNw==
-X-Received: by 2002:a17:902:f98d:b0:240:1953:f9a with SMTP id d9443c01a7336-245ef0bd96cmr33559625ad.2.1755703896739;
-        Wed, 20 Aug 2025 08:31:36 -0700 (PDT)
-Received: from mozart.vkv.me ([192.184.167.117])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-245ed517beesm29774255ad.134.2025.08.20.08.31.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Aug 2025 08:31:36 -0700 (PDT)
-Date: Wed, 20 Aug 2025 08:31:34 -0700
-From: Calvin Owens <calvin@wbinvd.org>
-To: Michal Schmidt <mschmidt@redhat.com>
-Cc: netdev@vger.kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Ivan Vecera <ivecera@redhat.com>, intel-wired-lan@lists.osuosl.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] i40e: Prevent unwanted interface name changes
-Message-ID: <aKXqVqj_bUefe1Nj@mozart.vkv.me>
-References: <94d7d5c0bb4fc171154ccff36e85261a9f186923.1755661118.git.calvin@wbinvd.org>
- <CADEbmW100menFu3KACm4p72yPSjbnQwnYumDCGRw+GxpgXeMJA@mail.gmail.com>
+	s=arc-20240116; t=1755704275; c=relaxed/simple;
+	bh=tYvTZy0bYiaZpkHh2cl/jkMfUGMcOXG2vzebLIEmYEk=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=bWa4bVeRk8C00xcZHGzHs4A3U3UOuzsuUqHm1ZVzw3wbetxoIF8mhR2Cp8gfdypcAN1QCfvwj/16k5xzccigh6O5Gtx6vorQ09xxzJaBkPRwF+zt6l7qFZDK7yC+zppbfryQjhARVLQupYxdvU+C7MwROrJmcxaeFD57FeW9iuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=bhFP+2Gp; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=HLDDTQaD; arc=none smtp.client-ip=160.80.4.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
+Received: from smtpauth-2019-1.uniroma2.it (smtpauth.uniroma2.it [160.80.5.46])
+	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 57KFbCF1024314;
+	Wed, 20 Aug 2025 17:37:17 +0200
+Received: from lubuntu-18.04 (unknown [160.80.103.126])
+	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id 53C5F120497;
+	Wed, 20 Aug 2025 17:37:07 +0200 (CEST)
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
+	s=ed201904; t=1755704227; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=x9/s2xzb/me85lzEEWaqZKaMJPHuvgxbFuxCDRpRqQ0=;
+	b=bhFP+2Gpw2WVhtOXolH9Z4eVBubYUg0ZPefGmJz8m5S12qnFaWuJYwkiPCUT0GA+3zo7Z+
+	vQ7urGEYpNwI+/AQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
+	t=1755704227; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=x9/s2xzb/me85lzEEWaqZKaMJPHuvgxbFuxCDRpRqQ0=;
+	b=HLDDTQaDyFPoFWZNYx5qgFjKhcdAyQJu3X9ET095NOmah6ZZgIAN67XAb8Oqrz2Ld+VYoG
+	AU1AiQu7n5ILE1Ha5a5M9ViVl1q4Jv9Y7wWX4LeOI4ptLaw6z0bRQrheZqsDLk/uj1ISLd
+	i74njCpmujShx1oXfUXa3OVxsxTTdSHsXg2HriOKJ4xH68oPkF8B4W53HCtZRbG/CVMhZd
+	mCSmvii8/yM9XJ8lde8vWb2XiNGZacuws2/2Hrnt2py1+DDy4Gg/1s3IsyYBF3sf9Xn6rf
+	mcSYczmN/cmKYjSyROLJVFUyEUEQd5+IsrGYfGBMlrjRKgiRHFUK/nDrWwHTJw==
+Date: Wed, 20 Aug 2025 17:37:06 +0200
+From: Andrea Mayer <andrea.mayer@uniroma2.it>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+        David Lebrun
+ <dlebrun@google.com>, Minhong He <heminhong@kylinos.cn>,
+        stable@vger.kernel.org, stefano.salsano@uniroma2.it,
+        Paolo Lungaroni
+ <paolo.lungaroni@uniroma2.it>,
+        Andrea Mayer <andrea.mayer@uniroma2.it>
+Subject: Re: [PATCH net v2] ipv6: sr: Fix MAC comparison to be constant-time
+Message-Id: <20250820173706.6cd7d8848513e3082112fa06@uniroma2.it>
+In-Reply-To: <20250818202724.15713-1-ebiggers@kernel.org>
+References: <20250818202724.15713-1-ebiggers@kernel.org>
+X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADEbmW100menFu3KACm4p72yPSjbnQwnYumDCGRw+GxpgXeMJA@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
+X-Virus-Status: Clean
 
-On Wednesday 08/20 at 08:42 +0200, Michal Schmidt wrote:
-> On Wed, Aug 20, 2025 at 6:30 AM Calvin Owens <calvin@wbinvd.org> wrote:
-> > The same naming regression which was reported in ixgbe and fixed in
-> > commit e67a0bc3ed4f ("ixgbe: prevent from unwanted interface name
-> > changes") still exists in i40e.
-> >
-> > Fix i40e by setting the same flag, added in commit c5ec7f49b480
-> > ("devlink: let driver opt out of automatic phys_port_name generation").
-> >
-> > Fixes: 9e479d64dc58 ("i40e: Add initial devlink support")
+On Mon, 18 Aug 2025 13:27:24 -0700
+Eric Biggers <ebiggers@kernel.org> wrote:
+
+> To prevent timing attacks, MACs need to be compared in constant time.
+> Use the appropriate helper function for this.
 > 
-> But this one's almost two years old. By now, there may be more users
-> relying on the new name than on the old one.
-> Michal
+> Fixes: bf355b8d2c30 ("ipv6: sr: add core files for SR HMAC support")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+> 
+> v2: sent as standalone patch targeting net instead of net-next.
+> 
+>  net/ipv6/seg6_hmac.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
 
-Well, I was relying on the new ixgbe names, and I had to revert them
-all in a bunch of configs yesterday after e67a0bc3ed4f :)
+The fix looks good to me. Thanks!
 
-Should e67a0bc3ed4f be reverted instead? Why is ixgbe special?
+Ciao,
+Andrea
 
-Thanks,
-Calvin
+Reviewed-by: Andrea Mayer <andrea.mayer@uniroma2.it>
+
+> diff --git a/net/ipv6/seg6_hmac.c b/net/ipv6/seg6_hmac.c
+> index f78ecb6ad8383..5dae892bbc73b 100644
+> --- a/net/ipv6/seg6_hmac.c
+> +++ b/net/ipv6/seg6_hmac.c
+> @@ -33,10 +33,11 @@
+>  #include <net/ip6_route.h>
+>  #include <net/addrconf.h>
+>  #include <net/xfrm.h>
+>  
+>  #include <crypto/hash.h>
+> +#include <crypto/utils.h>
+>  #include <net/seg6.h>
+>  #include <net/genetlink.h>
+>  #include <net/seg6_hmac.h>
+>  #include <linux/random.h>
+>  
+> @@ -278,11 +279,11 @@ bool seg6_hmac_validate_skb(struct sk_buff *skb)
+>  		return false;
+>  
+>  	if (seg6_hmac_compute(hinfo, srh, &ipv6_hdr(skb)->saddr, hmac_output))
+>  		return false;
+>  
+> -	if (memcmp(hmac_output, tlv->hmac, SEG6_HMAC_FIELD_LEN) != 0)
+> +	if (crypto_memneq(hmac_output, tlv->hmac, SEG6_HMAC_FIELD_LEN))
+>  		return false;
+>  
+>  	return true;
+>  }
+>  EXPORT_SYMBOL(seg6_hmac_validate_skb);
+> 
+> base-commit: 715c7a36d59f54162a26fac1d1ed8dc087a24cf1
+> -- 
+> 2.50.1
+>
 
