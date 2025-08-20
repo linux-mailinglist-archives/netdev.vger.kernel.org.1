@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-215235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37FB4B2DB19
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 13:35:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C690B2DB3B
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 13:39:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5057F5C7606
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 11:34:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF66E1C45278
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 11:35:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A0CA3054ED;
-	Wed, 20 Aug 2025 11:31:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 701C73054F7;
+	Wed, 20 Aug 2025 11:31:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZDf5NKlj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IPlC6xAa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAFF23054CC
-	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 11:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 899A22749D5
+	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 11:31:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755689504; cv=none; b=VlW//KoCkzdT1z3QVpTWnASImtgT8a4uQD+KGoQ/B2zRXVyb1Sn1pHdBD61rcN/AabaTALl+r0BfKKXFL9tIGeppj3z7By9WerNvdlUkhqQ/QDQ/Px+/QrVPmm6z/7Cqa6iIciF6FPKPAkSLb8ZOrJwmRaYZuxppSyBgmXVT9QY=
+	t=1755689505; cv=none; b=jaXE4u759CjhsOTmxoisN4Pb3F+kai/I2/u5fTX1niDLBYGMdFxxYe9G6RMpyljtm1ay50UDlyp+61sqZpMN6aa4oWu8xQULUe66CGM8LiFlYbW2bnsMNqqRG8v2aFn93mWWC9qaP/ek2Px+tM16hsnQDwH5y5RsozLU0Eqmrjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755689504; c=relaxed/simple;
-	bh=QJXQlXMQtc7697yuRontgX6xpHqEo/+owih5wyGE7Cc=;
+	s=arc-20240116; t=1755689505; c=relaxed/simple;
+	bh=IdxgJZCrGw6r3AbOSvergTiRAFtwh1SAGbMKM/tjFDg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=S4Xigu6tBoj6/AmdE49SpbFjjWtb85NV+4CJnblIMuWdooSm06BSZUhyuC+Hp9cA1tK2Tbm7Y2fVesWK6y1dLqeVriJ5i1X3OMZwH3iooF+5g2G3+QwsUrJZcXX+zTdvLg+TEldSRUmAwhejTTZz3H4yMocEwoYjqkVCmpYYs64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZDf5NKlj; arc=none smtp.client-ip=209.85.219.172
+	 MIME-Version; b=aNYsjURY35qMSkYmsWXgzQvV9e9SEAgmDmJqdK9RbKzse56bmWYHFTEMzrLd8n4DdGytXHo0EB+Ie+xPgU23eWgXrfk+/3j1FXzHvr4BRM0m0ACkFuePEdy7KQbaVJMql0eXnYx2PQeapglq1PwQV6A1x1WJ51eCgadjnQrJhgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IPlC6xAa; arc=none smtp.client-ip=209.85.128.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-e94fe8c509aso304472276.1
-        for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 04:31:42 -0700 (PDT)
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-71d6059f490so54492757b3.3
+        for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 04:31:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20230601; t=1755689502; x=1756294302; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2PRig1kLxU/AtNaCmh+qK3P9/4BBv4caazgCMc7Z2tI=;
-        b=ZDf5NKljbHWGGWQVjVNrErEyRZCpAm3A9LV0PR0JjNZWpQvG7JczPCI4vOlJXka4xZ
-         vn78ygxLKBGmWrhLJv2EdqjMrM4cWFHQThSz0HgA++Pcp+puEOm9EJcpElypcewbWDlN
-         aQSItxvN92PbIxeHAPD7qqw0IQwroYEh0IreerC8h1shTCuT4KDixOoyhFa2zXlKI0u/
-         QcFLWO0wVpD+HNCeZ9IIY4alpP0Rue0oitEueVGZ26rkmWJWbUnntybPGfn1GGvZ67s2
-         cptRp8m04nmy/PoLJq3NNKjXttzjfeOagOlOeAYKhrQuAEygW5tQQChN8gmde+89kf+i
-         ph1w==
+        bh=SXzeSxEhO+TL4hVEiijBY1pcbn8eYrbaSU1+DUXJzdU=;
+        b=IPlC6xAam2D20iFbf3VWzOaUrU/3oHNkWijai535XsLi64sx73lTo75CjhGKpBx/7M
+         19fNJwXGJxOq2kyO0Fz8GKtACoCu7nGSJBsCW2GACjIVFwuUkfX3UhyACzz2/1lTdmbo
+         ur/zcX985yF9OXJ44ChRJ0beVNk9eMDFUG7yTReEwmLYwHhOHx4CqqDVtY7TR7ZFNj+V
+         0Aa5q97NkqafHfweGib+veW8YaO/wuV5uOSmIfeZlwRcW0HSlOYXSAidYUHeRrlRH/yt
+         qVxn292ykERMz8lZ5OKGRUv7pLB0NbNuVo90jD495XgS/YDJfIV78fayWS2qtFJ+gFdi
+         IQbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1755689502; x=1756294302;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2PRig1kLxU/AtNaCmh+qK3P9/4BBv4caazgCMc7Z2tI=;
-        b=CI3OwwrGdsStq0R3KIxawWM8y08RArS3WWfvadI3iIsd6hzjeIO0IZqWnmM/9wqPJj
-         0XetL4mo1ZjNq/wkkARoq8wGL8F1clc6sP5OSBCyiw1S/fyrFUBiUIssIAVXu0r6nSkB
-         UpgILVZYaBcengoFNwlqzuYDBuFAnaoNpAqANg+EcsAS2O276G5rUKYAAF0ktJaIi7ix
-         KNkdt2dnnIbGREWe+BOGaH9Ou/cPCKjEnNil4V/OthBuu0jyS2K90woVSmFcPU7pibC2
-         Nq7L+zxQCkp9s14xfJCiXpC+5G2TOwGm4EIS6eSvA5TOFWmWJiIvoGDl7jn0l787aAi8
-         9vBw==
-X-Forwarded-Encrypted: i=1; AJvYcCVgdUuaCWMG/9me34DjBRTYIMbvp5hi9r4Zic/ikS37jNihV3bORuA8+zpd883j4fUWMZNQQIw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyghp0KOUCu/Cp76m3BwPBKTeoRyNFJnAmmpIAvHq7UAzcSw4rY
-	Hh0iabtUYHzsA1lj4egn8O6iwsZkk7hDVU1ma1CZSNNO4B77w6F3mEO3
-X-Gm-Gg: ASbGnctqhHNeAxbvS6lY9iMF94s7KXFyvymr7qEyRQ7vzfzrY5wZoMXQQGAOwizprho
-	KKodTLnIx9bdgc5nL9zjcrn/aNzR5Sj/V1rMYFFLetHSdk7LAlb1kfKcsRaZVaxvIiSygQwlgd7
-	1eiKKR/sTB5/k0pRA+mC2pK++3kirkfGt/OHtY8YEC90B0oe0lKe0vF0V+scWknmP71U4TWvtHz
-	pOvlJ1/a483Dqz49EepPOcd4eF0/SLYxoFpCs1nJ+jk5aB2U5OzQPOHyXE2emOUZteef9CX4NRA
-	h66DUstfqXytPe/ZWuD3LKf/8b9cj+E/1eFx6Shxm75ZJ8mfWwMWX0GvRp5oWCh/y7trACWFszZ
-	K7FTZOHiws8aGxzlF2cGp
-X-Google-Smtp-Source: AGHT+IG+iNAvYKff0cSxZyyVbYiIJ5cSYXyT4m3BPYHKoMwZMnVfVWSsFRJOM1st3KUT7DZ2ryBuKg==
-X-Received: by 2002:a05:6902:1143:b0:e91:75b6:9439 with SMTP id 3f1490d57ef6-e94e7750017mr5612400276.16.1755689501327;
-        Wed, 20 Aug 2025 04:31:41 -0700 (PDT)
-Received: from localhost ([2a03:2880:25ff:5a::])
-        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e93456fa756sm3843768276.30.2025.08.20.04.31.40
+        bh=SXzeSxEhO+TL4hVEiijBY1pcbn8eYrbaSU1+DUXJzdU=;
+        b=Q9AXl0tT/4LxAD5kuAsxkKl/FXlC7kYHumXKIbw351iR4PE7n27AzgDC2QtGtJpb+v
+         /Q+dH9MdKwofHxDRELiOv3EVmZzcygQwdt4xh/CzAbC7RMoBlcFb6OO7MODnPRvYVUZV
+         0msKKqEl0iOJH3yqho2trbH2Twiu1HFxufs/AnNqOkxREMHpo5GvBI6k2b7/60DGci2t
+         TPs9oYcjoBX/LgQJgD56fUV4Dp7fgHAW9C1molx1WT8lyeI1bgo4GpuSNOWhHaNsDkNu
+         jGiIaxAVvoA1aRZTvkJF4DTQM07ZaEkbSBjmLFMRfzAJ5/TeZHBLZ5jqnKPIhhbQJdVb
+         xEVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWGB1P7Kd4ClXCZtVAZaKLWe6x4tn94Im4gXwizssuRIu607gStl/4i89Nnm8pJIxJfRx3mSxE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRnSLmTY+kqn4rWd3axGepnWI7/hagdLYbCwvxrPQXm7xd9P9n
+	3L3+Ka5t/yeJVAMEUyIu94iz5/LmjU9iy7X+a12BDnoS/ilBETWCQuud
+X-Gm-Gg: ASbGncvP/rwGuWhffdGeVXjVtNfenWF9wXfenpKpz+17gGixg3SMh3JXGuTg8qs2uNx
+	aPSN3iaKLI60qOwRfhbqSGtPaen850NExTu0cBA9SbZNII2iG6TVZtpCEDoksRKaoD3BiEAh0td
+	BuNgVrtOmCBchaaY3QoiD1oWEWOdaHdvmaJACGShBLxGjoNwf1ozxhm/wLxJTJMQzDgwwapjNe1
+	0fC0P6edDvbASlKyyvyA6zPwFYYreK88vRJTcutwyZDHV8E5pkikW4UEeCyGdhxdpHfg1n+jR1p
+	gRm8SE1cK3lQjrylaDUQ469awXt8bT5JJL34TpE9RCp8xz/OluVnzJfSxzTsvPkETIsiMXs3a/i
+	TQg0cD00LqJzl+uQr5EeLt3yRWQpGeA==
+X-Google-Smtp-Source: AGHT+IGuYsDFo9AenS4j+JpUbJ6joiUaRDdmXasHTJt6C1IehlECyMPRqmPpQj7J1p2D4IXQBr70Fg==
+X-Received: by 2002:a05:690c:9a03:b0:71e:759c:f7bc with SMTP id 00721157ae682-71fb32616cdmr29830277b3.36.1755689502270;
+        Wed, 20 Aug 2025 04:31:42 -0700 (PDT)
+Received: from localhost ([2a03:2880:25ff:b::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-71f96ec62cfsm14107867b3.22.2025.08.20.04.31.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Aug 2025 04:31:40 -0700 (PDT)
+        Wed, 20 Aug 2025 04:31:41 -0700 (PDT)
 From: Daniel Zahka <daniel.zahka@gmail.com>
 To: Donald Hunter <donald.hunter@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -101,9 +101,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Kiran Kella <kiran.kella@broadcom.com>,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next v7 17/19] psp: provide decapsulation and receive helper for drivers
-Date: Wed, 20 Aug 2025 04:31:15 -0700
-Message-ID: <20250820113120.992829-18-daniel.zahka@gmail.com>
+Subject: [PATCH net-next v7 18/19] net/mlx5e: Add Rx data path offload
+Date: Wed, 20 Aug 2025 04:31:16 -0700
+Message-ID: <20250820113120.992829-19-daniel.zahka@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20250820113120.992829-1-daniel.zahka@gmail.com>
 References: <20250820113120.992829-1-daniel.zahka@gmail.com>
@@ -117,15 +117,10 @@ Content-Transfer-Encoding: 8bit
 
 From: Raed Salem <raeds@nvidia.com>
 
-Create psp_rcv(), which drivers can call to psp decapsulate and attach
-a psp_skb_ext to an skb.
+On receive flow inspect received packets for PSP offload indication using
+the cqe, for PSP offloaded packets set SKB PSP metadata i.e spi, header
+length and key generation number to stack for further processing.
 
-psp_rcv() only supports what the PSP architecture specification refers
-to as "transport mode" packets, where the L3 header is IPv6. psp_rcv()
-also assumes that a psp trailer is present and should be pulled from
-the skb.
-
-Reviewed-by: Willem de Bruijn <willemb@google.com>
 Signed-off-by: Raed Salem <raeds@nvidia.com>
 Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
@@ -134,91 +129,285 @@ Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
 
 Notes:
     v4:
-    - rename psp_rcv() to psp_dev_rcv()
-    - add strip_icv param psp_dev_rcv() to make trailer stripping optional
+    - remove mlx5e_psp_csum_complete() because stripping psp_icv can be
+      done in psp_dev_rcv() now
+    - fix MLX5_PSP_METADATA_SYNDROME typo
     v3:
-    - patch introduced
+    - move psp_rcv() into psp_main.c in a separate commit
+    v2:
+    - fill out new pse::dev_id field in psp_rcv()
+    v1:
+    - https://lore.kernel.org/netdev/20240510030435.120935-15-kuba@kernel.org/
 
- include/net/psp/functions.h |  1 +
- net/psp/psp_main.c          | 53 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 54 insertions(+)
+ .../mellanox/mlx5/core/en_accel/ipsec_rxtx.h  |  2 +-
+ .../mellanox/mlx5/core/en_accel/psp_rxtx.c    | 30 ++++++++++++
+ .../mellanox/mlx5/core/en_accel/psp_rxtx.h    | 25 ++++++++++
+ .../net/ethernet/mellanox/mlx5/core/en_rx.c   | 49 ++++++++++++++-----
+ 4 files changed, 93 insertions(+), 13 deletions(-)
 
-diff --git a/include/net/psp/functions.h b/include/net/psp/functions.h
-index e8c2201814d5..1075e236dcc1 100644
---- a/include/net/psp/functions.h
-+++ b/include/net/psp/functions.h
-@@ -19,6 +19,7 @@ psp_dev_create(struct net_device *netdev, struct psp_dev_ops *psd_ops,
- void psp_dev_unregister(struct psp_dev *psd);
- bool psp_dev_encapsulate(struct net *net, struct sk_buff *skb,
- 			 __be32 spi, u8 ver, __be16 sport);
-+int psp_dev_rcv(struct sk_buff *skb, u16 dev_id, u8 generation, bool strip_icv);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.h b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.h
+index 3cc640669247..45b0d19e735c 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.h
+@@ -40,7 +40,7 @@
+ #include "en/txrx.h"
  
- /* Kernel-facing API */
- void psp_assoc_put(struct psp_assoc *pas);
-diff --git a/net/psp/psp_main.c b/net/psp/psp_main.c
-index 40eb0b396b0e..a2e79a245571 100644
---- a/net/psp/psp_main.c
-+++ b/net/psp/psp_main.c
-@@ -215,6 +215,59 @@ bool psp_dev_encapsulate(struct net *net, struct sk_buff *skb,
+ /* Bit31: IPsec marker, Bit30: reserved, Bit29-24: IPsec syndrome, Bit23-0: IPsec obj id */
+-#define MLX5_IPSEC_METADATA_MARKER(metadata)  (((metadata) >> 31) & 0x1)
++#define MLX5_IPSEC_METADATA_MARKER(metadata)  ((((metadata) >> 30) & 0x3) == 0x2)
+ #define MLX5_IPSEC_METADATA_SYNDROM(metadata) (((metadata) >> 24) & GENMASK(5, 0))
+ #define MLX5_IPSEC_METADATA_HANDLE(metadata)  ((metadata) & GENMASK(23, 0))
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_rxtx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_rxtx.c
+index 2ae5dafcc43f..828bff1137af 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_rxtx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_rxtx.c
+@@ -14,6 +14,12 @@
+ #include "en_accel/psp_rxtx.h"
+ #include "en_accel/psp.h"
+ 
++enum {
++	MLX5E_PSP_OFFLOAD_RX_SYNDROME_DECRYPTED,
++	MLX5E_PSP_OFFLOAD_RX_SYNDROME_AUTH_FAILED,
++	MLX5E_PSP_OFFLOAD_RX_SYNDROME_BAD_TRAILER,
++};
++
+ static void mlx5e_psp_set_swp(struct sk_buff *skb,
+ 			      struct mlx5e_accel_tx_psp_state *psp_st,
+ 			      struct mlx5_wqe_eth_seg *eseg)
+@@ -113,6 +119,30 @@ static bool mlx5e_psp_set_state(struct mlx5e_priv *priv,
+ 	return ret;
  }
- EXPORT_SYMBOL(psp_dev_encapsulate);
  
-+/* Receive handler for PSP packets.
-+ *
-+ * Presently it accepts only already-authenticated packets and does not
-+ * support optional fields, such as virtualization cookies.
-+ */
-+int psp_dev_rcv(struct sk_buff *skb, u16 dev_id, u8 generation, bool strip_icv)
++bool mlx5e_psp_offload_handle_rx_skb(struct net_device *netdev, struct sk_buff *skb,
++				     struct mlx5_cqe64 *cqe)
 +{
-+	const struct psphdr *psph;
-+	int depth = 0, end_depth;
-+	struct psp_skb_ext *pse;
-+	struct ipv6hdr *ipv6h;
-+	struct ethhdr *eth;
-+	int encap_bytes;
-+	__be16 proto;
++	u32 psp_meta_data = be32_to_cpu(cqe->ft_metadata);
++	struct mlx5e_priv *priv = netdev_priv(netdev);
++	u16 dev_id = priv->psp->psp->id;
++	bool strip_icv = true;
++	u8 generation = 0;
 +
-+	eth = (struct ethhdr *)(skb->data);
-+	proto = __vlan_get_protocol(skb, eth->h_proto, &depth);
-+	if (proto != htons(ETH_P_IPV6))
-+		return -EINVAL;
++	/* TBD: report errors as SW counters to ethtool, any further handling ? */
++	if (MLX5_PSP_METADATA_SYNDROME(psp_meta_data) != MLX5E_PSP_OFFLOAD_RX_SYNDROME_DECRYPTED)
++		goto drop;
 +
-+	ipv6h = (struct ipv6hdr *)(skb->data + depth);
-+	depth += sizeof(*ipv6h);
-+	end_depth = depth + sizeof(struct udphdr) + sizeof(struct psphdr);
++	if (psp_dev_rcv(skb, dev_id, generation, strip_icv))
++		goto drop;
 +
-+	if (unlikely(end_depth > skb_headlen(skb)))
-+		return -EINVAL;
++	skb->decrypted = 1;
++	return false;
 +
-+	pse = skb_ext_add(skb, SKB_EXT_PSP);
-+	if (!pse)
-+		return -EINVAL;
-+
-+	psph = (const struct psphdr *)(skb->data + depth + sizeof(struct udphdr));
-+	pse->spi = psph->spi;
-+	pse->dev_id = dev_id;
-+	pse->generation = generation;
-+	pse->version = FIELD_GET(PSPHDR_VERFL_VERSION, psph->verfl);
-+
-+	ipv6h->nexthdr = psph->nexthdr;
-+
-+	encap_bytes = PSP_ENCAP_HLEN;
-+	encap_bytes += strip_icv ? PSP_TRL_SIZE : 0;
-+	ipv6h->payload_len = htons(ntohs(ipv6h->payload_len) - encap_bytes);
-+
-+	memmove(skb->data + PSP_ENCAP_HLEN, skb->data, depth);
-+	skb_pull(skb, PSP_ENCAP_HLEN);
-+
-+	if (strip_icv)
-+		pskb_trim(skb, skb->len - PSP_TRL_SIZE);
-+
-+	return 0;
++drop:
++	kfree_skb(skb);
++	return true;
 +}
-+EXPORT_SYMBOL(psp_dev_rcv);
 +
- static int __init psp_init(void)
+ void mlx5e_psp_tx_build_eseg(struct mlx5e_priv *priv, struct sk_buff *skb,
+ 			     struct mlx5e_accel_tx_psp_state *psp_st,
+ 			     struct mlx5_wqe_eth_seg *eseg)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_rxtx.h b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_rxtx.h
+index 521b2c3620e6..70289c921bd6 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_rxtx.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_rxtx.h
+@@ -10,6 +10,11 @@
+ #include "en.h"
+ #include "en/txrx.h"
+ 
++/* Bit30: PSP marker, Bit29-23: PSP syndrome, Bit22-0: PSP obj id */
++#define MLX5_PSP_METADATA_MARKER(metadata)  ((((metadata) >> 30) & 0x3) == 0x3)
++#define MLX5_PSP_METADATA_SYNDROME(metadata) (((metadata) >> 23) & GENMASK(6, 0))
++#define MLX5_PSP_METADATA_HANDLE(metadata)  ((metadata) & GENMASK(22, 0))
++
+ struct mlx5e_accel_tx_psp_state {
+ 	u32 tailen;
+ 	u32 keyid;
+@@ -75,6 +80,14 @@ static inline unsigned int mlx5e_psp_tx_ids_len(struct mlx5e_accel_tx_psp_state
  {
- 	mutex_init(&psp_devs_lock);
+ 	return psp_st->tailen;
+ }
++
++static inline bool mlx5e_psp_is_rx_flow(struct mlx5_cqe64 *cqe)
++{
++	return MLX5_PSP_METADATA_MARKER(be32_to_cpu(cqe->ft_metadata));
++}
++
++bool mlx5e_psp_offload_handle_rx_skb(struct net_device *netdev, struct sk_buff *skb,
++				     struct mlx5_cqe64 *cqe);
+ #else
+ static inline bool mlx5e_psp_is_offload_state(struct mlx5e_accel_tx_psp_state *psp_state)
+ {
+@@ -92,5 +105,17 @@ static inline bool mlx5e_psp_txwqe_build_eseg_csum(struct mlx5e_txqsq *sq, struc
+ {
+ 	return false;
+ }
++
++static inline bool mlx5e_psp_is_rx_flow(struct mlx5_cqe64 *cqe)
++{
++	return false;
++}
++
++static inline bool mlx5e_psp_offload_handle_rx_skb(struct net_device *netdev,
++						   struct sk_buff *skb,
++						   struct mlx5_cqe64 *cqe)
++{
++	return false;
++}
+ #endif /* CONFIG_MLX5_EN_PSP */
+ #endif /* __MLX5E_PSP_RXTX_H__ */
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+index b8c609d91d11..f4dbdeb27821 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+@@ -51,6 +51,7 @@
+ #include "ipoib/ipoib.h"
+ #include "en_accel/ipsec.h"
+ #include "en_accel/macsec.h"
++#include "en_accel/psp_rxtx.h"
+ #include "en_accel/ipsec_rxtx.h"
+ #include "en_accel/ktls_txrx.h"
+ #include "en/xdp.h"
+@@ -1521,6 +1522,11 @@ static inline void mlx5e_handle_csum(struct net_device *netdev,
+ 		skb->ip_summed = CHECKSUM_COMPLETE;
+ 		skb->csum = csum_unfold((__force __sum16)cqe->check_sum);
+ 
++		if (unlikely(mlx5e_psp_is_rx_flow(cqe))) {
++			/* TBD: PSP csum complete corrections for now chose csum_unnecessary path */
++			goto csum_unnecessary;
++		}
++
+ 		if (test_bit(MLX5E_RQ_STATE_CSUM_FULL, &rq->state))
+ 			return; /* CQE csum covers all received bytes */
+ 
+@@ -1549,7 +1555,7 @@ static inline void mlx5e_handle_csum(struct net_device *netdev,
+ 
+ #define MLX5E_CE_BIT_MASK 0x80
+ 
+-static inline void mlx5e_build_rx_skb(struct mlx5_cqe64 *cqe,
++static inline bool mlx5e_build_rx_skb(struct mlx5_cqe64 *cqe,
+ 				      u32 cqe_bcnt,
+ 				      struct mlx5e_rq *rq,
+ 				      struct sk_buff *skb)
+@@ -1563,6 +1569,11 @@ static inline void mlx5e_build_rx_skb(struct mlx5_cqe64 *cqe,
+ 	if (unlikely(get_cqe_tls_offload(cqe)))
+ 		mlx5e_ktls_handle_rx_skb(rq, skb, cqe, &cqe_bcnt);
+ 
++	if (unlikely(mlx5e_psp_is_rx_flow(cqe))) {
++		if (mlx5e_psp_offload_handle_rx_skb(netdev, skb, cqe))
++			return true;
++	}
++
+ 	if (unlikely(mlx5_ipsec_is_rx_flow(cqe)))
+ 		mlx5e_ipsec_offload_handle_rx_skb(netdev, skb,
+ 						  be32_to_cpu(cqe->ft_metadata));
+@@ -1608,9 +1619,11 @@ static inline void mlx5e_build_rx_skb(struct mlx5_cqe64 *cqe,
+ 
+ 	if (unlikely(mlx5e_skb_is_multicast(skb)))
+ 		stats->mcast_packets++;
++
++	return false;
+ }
+ 
+-static void mlx5e_shampo_complete_rx_cqe(struct mlx5e_rq *rq,
++static bool mlx5e_shampo_complete_rx_cqe(struct mlx5e_rq *rq,
+ 					 struct mlx5_cqe64 *cqe,
+ 					 u32 cqe_bcnt,
+ 					 struct sk_buff *skb)
+@@ -1620,16 +1633,20 @@ static void mlx5e_shampo_complete_rx_cqe(struct mlx5e_rq *rq,
+ 	stats->packets++;
+ 	stats->bytes += cqe_bcnt;
+ 	if (NAPI_GRO_CB(skb)->count != 1)
+-		return;
+-	mlx5e_build_rx_skb(cqe, cqe_bcnt, rq, skb);
++		return false;
++
++	if (mlx5e_build_rx_skb(cqe, cqe_bcnt, rq, skb))
++		return true;
++
+ 	skb_reset_network_header(skb);
+ 	if (!skb_flow_dissect_flow_keys(skb, &rq->hw_gro_data->fk, 0)) {
+ 		napi_gro_receive(rq->cq.napi, skb);
+ 		rq->hw_gro_data->skb = NULL;
+ 	}
++	return false;
+ }
+ 
+-static inline void mlx5e_complete_rx_cqe(struct mlx5e_rq *rq,
++static inline bool mlx5e_complete_rx_cqe(struct mlx5e_rq *rq,
+ 					 struct mlx5_cqe64 *cqe,
+ 					 u32 cqe_bcnt,
+ 					 struct sk_buff *skb)
+@@ -1638,7 +1655,7 @@ static inline void mlx5e_complete_rx_cqe(struct mlx5e_rq *rq,
+ 
+ 	stats->packets++;
+ 	stats->bytes += cqe_bcnt;
+-	mlx5e_build_rx_skb(cqe, cqe_bcnt, rq, skb);
++	return mlx5e_build_rx_skb(cqe, cqe_bcnt, rq, skb);
+ }
+ 
+ static inline
+@@ -1855,7 +1872,8 @@ static void mlx5e_handle_rx_cqe(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe)
+ 		goto wq_cyc_pop;
+ 	}
+ 
+-	mlx5e_complete_rx_cqe(rq, cqe, cqe_bcnt, skb);
++	if (mlx5e_complete_rx_cqe(rq, cqe, cqe_bcnt, skb))
++		goto wq_cyc_pop;
+ 
+ 	if (mlx5e_cqe_regb_chain(cqe))
+ 		if (!mlx5e_tc_update_skb_nic(cqe, skb)) {
+@@ -1902,7 +1920,8 @@ static void mlx5e_handle_rx_cqe_rep(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe)
+ 		goto wq_cyc_pop;
+ 	}
+ 
+-	mlx5e_complete_rx_cqe(rq, cqe, cqe_bcnt, skb);
++	if (mlx5e_complete_rx_cqe(rq, cqe, cqe_bcnt, skb))
++		goto wq_cyc_pop;
+ 
+ 	if (rep->vlan && skb_vlan_tag_present(skb))
+ 		skb_vlan_pop(skb);
+@@ -1951,7 +1970,8 @@ static void mlx5e_handle_rx_cqe_mpwrq_rep(struct mlx5e_rq *rq, struct mlx5_cqe64
+ 	if (!skb)
+ 		goto mpwrq_cqe_out;
+ 
+-	mlx5e_complete_rx_cqe(rq, cqe, cqe_bcnt, skb);
++	if (mlx5e_complete_rx_cqe(rq, cqe, cqe_bcnt, skb))
++		goto mpwrq_cqe_out;
+ 
+ 	mlx5e_rep_tc_receive(cqe, rq, skb);
+ 
+@@ -2388,7 +2408,10 @@ static void mlx5e_handle_rx_cqe_mpwrq_shampo(struct mlx5e_rq *rq, struct mlx5_cq
+ 		stats->hds_nosplit_bytes += data_bcnt;
+ 	}
+ 
+-	mlx5e_shampo_complete_rx_cqe(rq, cqe, cqe_bcnt, *skb);
++	if (mlx5e_shampo_complete_rx_cqe(rq, cqe, cqe_bcnt, *skb)) {
++		*skb = NULL;
++		goto free_hd_entry;
++	}
+ 	if (flush && rq->hw_gro_data->skb)
+ 		mlx5e_shampo_flush_skb(rq, cqe, match);
+ free_hd_entry:
+@@ -2446,7 +2469,8 @@ static void mlx5e_handle_rx_cqe_mpwrq(struct mlx5e_rq *rq, struct mlx5_cqe64 *cq
+ 	if (!skb)
+ 		goto mpwrq_cqe_out;
+ 
+-	mlx5e_complete_rx_cqe(rq, cqe, cqe_bcnt, skb);
++	if (mlx5e_complete_rx_cqe(rq, cqe, cqe_bcnt, skb))
++		goto mpwrq_cqe_out;
+ 
+ 	if (mlx5e_cqe_regb_chain(cqe))
+ 		if (!mlx5e_tc_update_skb_nic(cqe, skb)) {
+@@ -2779,7 +2803,8 @@ static void mlx5e_trap_handle_rx_cqe(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe
+ 	if (!skb)
+ 		goto wq_cyc_pop;
+ 
+-	mlx5e_complete_rx_cqe(rq, cqe, cqe_bcnt, skb);
++	if (mlx5e_complete_rx_cqe(rq, cqe, cqe_bcnt, skb))
++		goto wq_cyc_pop;
+ 	skb_push(skb, ETH_HLEN);
+ 
+ 	mlx5_devlink_trap_report(rq->mdev, trap_id, skb,
 -- 
 2.47.3
 
