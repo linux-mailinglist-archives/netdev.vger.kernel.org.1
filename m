@@ -1,136 +1,109 @@
-Return-Path: <netdev+bounces-215269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79576B2DD9A
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 15:19:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95197B2DDA9
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 15:22:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48C7F5C5452
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 13:18:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CB843BCD86
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 13:21:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CA2F31CA72;
-	Wed, 20 Aug 2025 13:18:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D157C31DD8B;
+	Wed, 20 Aug 2025 13:20:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ENwthEb+"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="QFIDn2CE";
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="lMhzo0/L"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a7-smtp.messagingengine.com (fhigh-a7-smtp.messagingengine.com [103.168.172.158])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E47F17BEBF;
-	Wed, 20 Aug 2025 13:18:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119512D8762;
+	Wed, 20 Aug 2025 13:20:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755695896; cv=none; b=omWgzDg6218xhtbvSqK+3RRIAdHo3rkxYgD1vbmJyNlSn7JvY5C5eNC80WbtlqGeq2aH29ci6uYyAgOSD8fNeuzfQKg2Q6+psU5ejwHEMmZXBk1nEAu7YD6xPCN57KU4cIXQj932oMn3ryh9vJlDJHmv4j4FMVdqIAV3DtKSAtI=
+	t=1755696058; cv=none; b=j/gJos0yIyazJda/twfXZnMfIdCVkzEvBm4caQbUXfEA9piH+LEGpEmq02ntTCdJvbWgE+nnjKzWHVlw9UeZsAC4kpLSO2Q0eO3rpdEST8tvQcJ+pspgFxouakm6Cpaf8u/s/aVEqFczMfJLBFRVZGPRydKNMH5+snrNu+wQxgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755695896; c=relaxed/simple;
-	bh=DOeocE2TSMK2zhBIMAISf0bA1p+4iSO7xk5SPu2tIfc=;
+	s=arc-20240116; t=1755696058; c=relaxed/simple;
+	bh=m/jigQWe5Z4LT6UdB5nbt+38Dcm3Yors/+leD70tsu8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Doj94pHRqjC/H+u/+WvnzhYhYnRJZzTWNcvxh5XTCFjhKN9GnT57E8J0BAw4tYUmI5I3M8tcb6sFcYZRbovi46/vrDSYCAuarUwwGQ166r6h2+IU433DvPr+hAndKQQ04iJh2SppphJ/8pOS47F8ex/KCKJjRt7alfiXmf3ihM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ENwthEb+; arc=none smtp.client-ip=103.168.172.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 8EE3714003B9;
-	Wed, 20 Aug 2025 09:18:13 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-12.internal (MEProxy); Wed, 20 Aug 2025 09:18:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1755695893; x=1755782293; bh=dzEYBhueTWc89/MISWU3UFuCYVd1T4k9Kq6
-	zJAOupw0=; b=ENwthEb+Ky21vZLrX+qnv+f6AyHsIx3sG86siSeLtTHUVMBax0t
-	F8LjXTrl6bDCwwkpazNZ1JKKI8SUZfUdNRJQTYAB6zwsMzCxcsyjC2rfilufvjJm
-	fHeFGSgxSoLbr4Hv4hvFxdxN9my4gqkHxG8mHZLLoiXw+Yo7Lg0dyOTqSIXZ/apW
-	5lOzUhGnEstpFRCgGnhwNFkxOEQ7f4wue0v29runO6+kn2HMc6y8BUxk/rqwgkXJ
-	616kKKbNb+2n8TMJ7Cl52mtSsn1K2cWoPbv971dmy+sHg6cv3Wq9+ezIROl1ukYW
-	150wojWK9rXge+VNLyR5fzzopoHYCqV7npg==
-X-ME-Sender: <xms:FculaCYGrrWPF0axijoXPinf3zDEc23SrYUvRpMwO2-YuvP5dgLb4w>
-    <xme:FculaNAdgcf33lpjBApqpzPojukmSZwNBvB8-ClHh9iWZgawiGXRqjlknLbOU6PhI
-    2eZLay7Xo5c95g>
-X-ME-Received: <xmr:FculaKmM61xFbleSxj4UZnpMkvqtc-1v_Vd-iHYpfmWnjhGXUPLIvTr6zhBR>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdduheekgeejucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcuufgt
-    hhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrthhtvg
-    hrnhephefhtdejvdeiffefudduvdffgeetieeigeeugfduffdvffdtfeehieejtdfhjeek
-    necuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtne
-    curfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhn
-    sggprhgtphhtthhopeejpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehmrhhghh
-    hoshhhsegtihhstghordgtohhmpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehv
-    ghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkh
-    gvrhhnvghlrdhorhhgpdhrtghpthhtohepsghrihgughgvsehlihhsthhsrdhlihhnuhig
-    qdhfohhunhgurghtihhonhdrohhrghdprhgtphhtthhopehmrhhinhhmohihpghgsehhoh
-    htmhgrihhlrdgtohhmpdhrtghpthhtohepphgsrhhishhsvghtsegtihhstghordgtohhm
-    pdhrtghpthhtoheprhgriihorhessghlrggtkhifrghllhdrohhrgh
-X-ME-Proxy: <xmx:FculaOx3A_6SA5pGhBWbRiMK4Rv60ltL88f9wjl8fyvvfTSvU-KhVw>
-    <xmx:FculaEQ1se9V8cAT_kw_d2MzpUhDW8u0-7FP4MopGEVwFX1JJczLRQ>
-    <xmx:FculaG9UPX8vb_kM0Zr0onUtfO7JIAFIGY4uZPGw6PHKxS2dNiAjPw>
-    <xmx:FculaCurBEBKqQ2g7j75PTVVDoj8tlOEatuaO6tpPTfNfJRH0kBslA>
-    <xmx:FculaMqjobtMGghfqMasYWhjjWBzFWAVbdBa_9J9KjRWlAEW__FgvqKB>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 20 Aug 2025 09:18:12 -0400 (EDT)
-Date: Wed, 20 Aug 2025 16:18:10 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Mrinmoy Ghosh <mrghosh@cisco.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	bridge@lists.linux-foundation.org,
-	Mrinmoy Ghosh <mrinmoy_g@hotmail.com>,
-	Patrice Brissette <pbrisset@cisco.com>, razor@blackwall.org
-Subject: Re: [PATCH] net: bridge: vxlan: Protocol field in bridge fdb
-Message-ID: <aKXLEiY8gd0sNGrW@shredder>
-References: <20250818175258.275997-1-mrghosh@cisco.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FtOFFNeiRCEh1lisDSuOk1jNSj0oRfoObmIcIdLAc1HobUDzLoVr1GMYOjGMUymhnBCFr4ssIQYeMaVRdMM1XxP9/w/Py4GNYSe+yCtFkXZDN4Y+zbQrzrBY903GN91jY0M5UtdgJ7ZKRxRTuQIemihM/ILhECls9EpAxPbv6AM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=QFIDn2CE; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=lMhzo0/L; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: by mail.netfilter.org (Postfix, from userid 109)
+	id 89E0160278; Wed, 20 Aug 2025 15:20:55 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1755696055;
+	bh=+WqaoKixAdq/Jh8XhAQbtY9xC8+8J5W3jP9ZSbjOcvQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QFIDn2CE6WrLXTp3YYfrC5C0pf0MYZWHrHMTNH0GooGggHkJddvNl91gz/uSMD4ky
+	 pU/5WaB0NgD4r5r0PaCLSGG/thSg3lqKesJkNhq16SRIRCKB1XU2kZPWycUa7Rjq6U
+	 a2ZS7Y7ytWM3i17+aB+cwEFSXTfiMqe00q6MP4pDBhHVzxLNZTMCBU32OI2qOKtCO8
+	 gps/BrX04d2heGg6d0O1e7Hl1A5tq8eHuHTtwrSz+R6bRrIGDzaAzfRGNE7nDN92pT
+	 4IcwW0sypk496c+UN0gity/Z04OYpnhAoIDfMK56NeetaiMgqmPqzDyVRsu1x8Cyrv
+	 PHI6CPAiNxKxg==
+X-Spam-Level: 
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id E6F116026C;
+	Wed, 20 Aug 2025 15:20:53 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1755696054;
+	bh=+WqaoKixAdq/Jh8XhAQbtY9xC8+8J5W3jP9ZSbjOcvQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lMhzo0/LED0i5kFschS2uZeiWMKY3pfs9gwVAl0zHAKdbmrITjd8mTa7jWmIuOuZ5
+	 jcXiQZUHRxcpKtNw0IfSB7kNbuhOnjxhsIGaM4BLDu4Uot5mswLRDm6xBrJUkGD62d
+	 FdhHzu3Y699GZ9PNxdFtbI/2jECJ/k8K2DfaEHZ0Ro9YfeKKdjPHNWF5DyNrrf74yF
+	 bg7l1qVYLxuv9bXP/r8EIA0ga95eTKHIxqqi1BWsEbM5dKCxV4e5KDKhBNZyQkWOQg
+	 XdFrYNsjMqnfcWmbJGrUg0nG1eh7Ek5GzXM3MPuMNPI789iusXJLjiuw7v01jZ2Otw
+	 4E6PXW9TUqzxw==
+Date: Wed, 20 Aug 2025 15:20:50 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, netfilter-devel@vger.kernel.org
+Subject: Re: [PATCH net] netfilter: nf_reject: don't leak dst refcount for
+ loopback packets
+Message-ID: <aKXLsoLkSdnEU_at@calendula>
+References: <20250820123707.10671-1-fw@strlen.de>
+ <aKXKpE35H7KBzdBa@calendula>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250818175258.275997-1-mrghosh@cisco.com>
+In-Reply-To: <aKXKpE35H7KBzdBa@calendula>
 
-+ Nik
-
-Please use scripts/get_maintainer.pl when submitting a patch.
-
-On Mon, Aug 18, 2025 at 05:52:58PM +0000, Mrinmoy Ghosh wrote:
-> This is to add optional "protocol" field for bridge fdb entries.
-> The introduction of the 'protocol' field in the bridge FDB for EVPN Multihome, addresses the need to distinguish between MAC addresses learned via the control plane and those learned via the data plane with data plane aging. Specifically:
-> * A MAC address in an EVPN Multihome environment can be learned either through the control plane (static MAC) or the data plane (dynamic MAC with aging).
-> * The 'protocol' field uses values such as 'HW' for data plane dynamic MACs and 'ZEBRA' for control plane static MACs.
-> * This distinction allows the application to manage the MAC address state machine effectively during transitions, which can occur due to traffic hashing between EVPN Multihome peers or mobility of MAC addresses across EVPN peers.
-> * By identifying the source of the MAC learning (control plane vs. data plane), the system can handle MAC aging and mobility more accurately, ensuring synchronization between control and data planes and improving stability and reliability in MAC route handling.
+On Wed, Aug 20, 2025 at 03:16:23PM +0200, Pablo Neira Ayuso wrote:
+> Hi Florian,
 > 
-> This mechanism supports the complex state transitions and synchronization required in EVPN Multihome scenarios, where MAC addresses may move or be learned differently depending on network events and traffic patterns.
+> On Wed, Aug 20, 2025 at 02:37:07PM +0200, Florian Westphal wrote:
+> > recent patches to add a WARN() when replacing skb dst entry found an
+> > old bug:
+> > 
+> > WARNING: include/linux/skbuff.h:1165 skb_dst_check_unset include/linux/skbuff.h:1164 [inline]
+> > WARNING: include/linux/skbuff.h:1165 skb_dst_set include/linux/skbuff.h:1210 [inline]
+> > WARNING: include/linux/skbuff.h:1165 nf_reject_fill_skb_dst+0x2a4/0x330 net/ipv4/netfilter/nf_reject_ipv4.c:234
+> > [..]
+> > Call Trace:
+> >  nf_send_unreach+0x17b/0x6e0 net/ipv4/netfilter/nf_reject_ipv4.c:325
+> >  nft_reject_inet_eval+0x4bc/0x690 net/netfilter/nft_reject_inet.c:27
+> >  expr_call_ops_eval net/netfilter/nf_tables_core.c:237 [inline]
+> >  ..
+> > 
+> > This is because blamed commit forgot about loopback packets.
+> > Such packets already have a dst_entry attached, even at PRE_ROUTING stage.
+> > 
+> > Instead of checking hook just check if the skb already has a route
+> > attached to it.
+> 
+> Quick question: does inconditional route lookup work for br_netfilter?
 
-[...]
-
-> Signed-off-by: Mrinmoy Ghosh <mrghosh@cisco.com>
-> Co-authored-by: Mrinmoy Ghosh <mrinmoy_g@hotmail.com>
-> Co-authored-by: Patrice Brissette <pbrisset@cisco.com>
-> ---
->  drivers/net/vxlan/vxlan_core.c      | 132 ++++++++++++++--------------
->  drivers/net/vxlan/vxlan_private.h   |  21 +++--
->  drivers/net/vxlan/vxlan_vnifilter.c |  11 +--
->  net/bridge/br.c                     |   4 +-
->  net/bridge/br_fdb.c                 |  52 ++++++++---
->  net/bridge/br_private.h             |   5 +-
->  6 files changed, 127 insertions(+), 98 deletions(-)
-
-Please read these two documents and make changes accordingly before
-submitting a new version:
-
-https://docs.kernel.org/process/submitting-patches.html
-https://docs.kernel.org/process/maintainer-netdev.html
-
-At the very least the patch should be split to a bridge patch and a
-VXLAN patch. I will provide more comments later this week.
-
-Thanks
+Never mind, it should be fine, the fake dst get attached to the skb.
 
