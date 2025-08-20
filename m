@@ -1,331 +1,229 @@
-Return-Path: <netdev+bounces-215204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D22DB2D8CF
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 11:44:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D22D0B2D931
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 11:52:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52BB2188D113
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 09:35:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4F8616F14E
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 09:47:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68B332E1755;
-	Wed, 20 Aug 2025 09:32:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 042772E0930;
+	Wed, 20 Aug 2025 09:41:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PRywEq1B"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 283DB1B4233;
-	Wed, 20 Aug 2025 09:32:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755682345; cv=none; b=nI29urZDjNzLtXAMxJ+BDsG/QBB90oV6xmMwWQbFkNf/hcs5ZIvgGolXEW5Logp0dWVvvLoxa44qkj4E6EYS+/+2MCIQHmGaaDt2fLDkwDwvPPv5v6SSEpb9B+8O2r3ebk+u4QLutQDxmvnIQnQz9cLTUFcyHPobLnqz5MMgM54=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755682345; c=relaxed/simple;
-	bh=hNULJ87ZxtX6Iu4BqQ00wfoBZmqcZio6prsPuynj+08=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I30QzF0RXpljeNtn/h5CLyYa+5YGjgBiYGPW1jehqj7m1FDhvZiX6GEP363SjCPyjvh9xIwZprxd/ZoomRWgUJa5RTU8U54/UI6P1Vv7JLOuwkuhbfn1dTMG0ugOucA3f8tBj8k9iwM02U1+G8Zxj/5bNSYrcOzvvcQWfQwnH9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4c6Lhr69lGzdcVZ;
-	Wed, 20 Aug 2025 17:27:56 +0800 (CST)
-Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
-	by mail.maildlp.com (Postfix) with ESMTPS id D3622180080;
-	Wed, 20 Aug 2025 17:32:19 +0800 (CST)
-Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.189.55) by
- kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA5C828935A;
+	Wed, 20 Aug 2025 09:41:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755682915; cv=fail; b=JuS26sN6sulC1PH5FJT+P1RX3b20B8ZKljpW2P5HVBikzLUexXaZp4+8T4WtJPpCXoPSfVCIvMF193huI1p4JftS5YS+Ume98G8UiUJH0c/boWDo8kJLFD8zM9RD4At7RRmftw/qvwf5H0AAsBCk/fcF7GIoD9F0qjcEwE9TS0M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755682915; c=relaxed/simple;
+	bh=17Bz3VwWZMHHTFWO2vRlLp+Jhuma3ING4zS/FTfOaog=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=YfqsJ0iWNhF1BtTBhw8eQw7/6CcBRUGf2pivjnmCC4PMcslx6zwHQdOtKxLIKx1EVBeFx+8vVK6Xoq2aneXU4GYLaOHwlanu5o6PD3A/qJkQ64YYx/uP2zgZ1gMLNegQO5nkNr2TkJ9BrtIHxB5hBXjF+DyDR8lPeN/oSRIAAks=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PRywEq1B; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755682914; x=1787218914;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=17Bz3VwWZMHHTFWO2vRlLp+Jhuma3ING4zS/FTfOaog=;
+  b=PRywEq1BJmbz3xvNhUVIpeqM3HEV/8AqtRWmEM1FXMugzYKkqA/1cOFw
+   Nt49tjWLzmxH+Gw1YSlZHqVFn2u0JnzzrzXOmK13P0Hwrw3zqR4VrTPcO
+   Z6G7wO1418o/+9s4uzAbgW1uEoy9432b1VUBYyV783WcnXrQMxCQ3fLFI
+   0e8lYlwp12lzXP4CJINgrWHdscql23e23hPNXECJLO8iCq/oMiBVR9cvc
+   q1G7ypja/+OumJ20n+jQuQLacxhZXkmxympGtR/Re9t6eAxOln4JiY2cO
+   b9l+20sdxQQF6lsf43mWbYEgXkmKTNtxf/rqAIBm6phPe3S0vp/zOsJGS
+   A==;
+X-CSE-ConnectionGUID: goYsikAxQgSspIewNLupvw==
+X-CSE-MsgGUID: 3rmVzA4VRH6g07R6VCCOOg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11527"; a="68214612"
+X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
+   d="scan'208";a="68214612"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2025 02:41:53 -0700
+X-CSE-ConnectionGUID: NaTAHaTbS0GCmY6A7EjJsA==
+X-CSE-MsgGUID: yLDBd+9bSjCzCs01JTPJeQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,302,1747724400"; 
+   d="scan'208";a="168887989"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2025 02:41:52 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 20 Aug 2025 17:32:18 +0800
-From: Fan Gong <gongfan1@huawei.com>
-To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	<linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Bjorn Helgaas
-	<helgaas@kernel.org>, luosifu <luosifu@huawei.com>, Xin Guo
-	<guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>, Zhou
- Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
-	<shijing34@huawei.com>, Fu Guiming <fuguiming@h-partners.com>, Meny Yossefi
-	<meny.yossefi@huawei.com>, Gur Stavi <gur.stavi@huawei.com>, Lee Trager
-	<lee@trager.us>, Michael Ellerman <mpe@ellerman.id.au>, Vadim Fedorenko
-	<vadim.fedorenko@linux.dev>, Suman Ghosh <sumang@marvell.com>, Przemek
- Kitszel <przemyslaw.kitszel@intel.com>, Joe Damato <jdamato@fastly.com>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: [PATCH net-next v14 8/8] hinic3: Interrupt request configuration
-Date: Wed, 20 Aug 2025 17:31:25 +0800
-Message-ID: <37615d5d87ced741e522cd966948d11ec87e4ad6.1755673097.git.zhuyikai1@h-partners.com>
-X-Mailer: git-send-email 2.51.0.windows.1
-In-Reply-To: <cover.1755673097.git.zhuyikai1@h-partners.com>
-References: <cover.1755673097.git.zhuyikai1@h-partners.com>
+ 15.2.2562.17; Wed, 20 Aug 2025 02:41:51 -0700
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Wed, 20 Aug 2025 02:41:50 -0700
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (40.107.95.41) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Wed, 20 Aug 2025 02:41:50 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=aI4q3crIyGJ/gvhIRB6mIbeVlO1+iowjj8OfX8jMSCv8xc3dL7iZ07KmTnxc5GQLF9JNMcw/mAt/vOpBU1Nn6IJ0tHcuY7iRa16t7CQIFSeAkC1lSqlImG+2WZmM5Z2fyzo7CxF71H/zn+F+9TJKmSNAJaJVqlRw1r6nP3l/Qde4jA4s5GS0wcfVx0AbbtlRvCc/QrC4m6ZrMXXMrmxkWS6DHfKPmGQmgL+rxE09Vt0YjwsHQ4N+A8o2ni9ENS96ng7GmQ4attSPsc9LnKdHyY6YQa5eV0/dKBU4THmvHHsCx96k2AvB3jT9ByXL+im6tvtCl/939xpfUEeFS4TnEw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=v41ZYg9TfiMD+Zl2xOKNM5ZxVgP4258LycqdT8MEipI=;
+ b=muDeXl3jdnLzrAfI5Vz84CPiboz43397cXZI7y2PTIxScPKWoAVwNsgM7GRUlqULxjjibML31eoTMneQVIx5s7lh+ivgBDrtSmxoD2bL+LnQdEKenK/pSBZGxPgbfSyOkU5NWco9+FboyMIhvpoapdd+yRln0mHWwIW/UzsENTydMWTHWlmfDQJlBhKI9dsph/ZhVZX6os2eM0sduaR+TmwZLdWT+ez1xm4hI2hHmmCdsMHrvkL5apo/4XtgVF2VGB2REdHMTuTWoek3cpfs+w8bIuZ1XO/FoalY57d9RtQGHZjaLC4pBNtnxWAIF5wU7ChgHv7f8+wCTLx7QfYZoQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by CY5PR11MB6318.namprd11.prod.outlook.com (2603:10b6:930:3e::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.25; Wed, 20 Aug
+ 2025 09:41:48 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.9031.023; Wed, 20 Aug 2025
+ 09:41:48 +0000
+Message-ID: <089ba88e-e19d-40eb-844d-541d39e648e8@intel.com>
+Date: Wed, 20 Aug 2025 11:41:42 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] i40e: Prevent unwanted interface name changes
+To: Michal Schmidt <mschmidt@redhat.com>, Calvin Owens <calvin@wbinvd.org>
+CC: <netdev@vger.kernel.org>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jedrzej Jagielski
+	<jedrzej.jagielski@intel.com>, "Ivan Vecera" <ivecera@redhat.com>,
+	<intel-wired-lan@lists.osuosl.org>, <linux-kernel@vger.kernel.org>
+References: <94d7d5c0bb4fc171154ccff36e85261a9f186923.1755661118.git.calvin@wbinvd.org>
+ <CADEbmW100menFu3KACm4p72yPSjbnQwnYumDCGRw+GxpgXeMJA@mail.gmail.com>
+Content-Language: en-US
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+In-Reply-To: <CADEbmW100menFu3KACm4p72yPSjbnQwnYumDCGRw+GxpgXeMJA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: DUZPR01CA0195.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:4b6::26) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- kwepemf100013.china.huawei.com (7.202.181.12)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|CY5PR11MB6318:EE_
+X-MS-Office365-Filtering-Correlation-Id: a8d55a2f-dd02-45fc-7b6e-08dddfcdc845
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?V1ZEMHUreFBqQWpsblpIcnVLamlKOE12ZTFWMDBjbHRWNUVGd3laWnM3TkZx?=
+ =?utf-8?B?d2NYWGU4ZDBIditDQVc0OVZzNnU4bHFTOFNMelpIbVdqQW5vNmkrTFAxVEsw?=
+ =?utf-8?B?WDhZa0trdlF5WnFkTkZhRHdjengyakZJbzVKa3JXVGFNaFlSVjBvaWtPN2JE?=
+ =?utf-8?B?MWlpcFM0WUZqV2tLVUtrTU5wd3dzNklmYWIrQzBRRXJSZFQ4Z1BwdDFEbDRY?=
+ =?utf-8?B?L3pqdCtxV3hlSGRJQnoydVVZcTc0NDlMUTJuUnNYUUduNG94QzBVTGptTnhF?=
+ =?utf-8?B?KzdEZll6WkxYSlNXMDNFbDVNN2JJMWgwMXZCdWFoVnY0b3o0SnhVTmdsZ3Bl?=
+ =?utf-8?B?UUwzYk9pcGxnT0NkKzUxS2NMdVE1UnpwQkpGY0xzSlUrMTJIb1ZpMEwyLzJk?=
+ =?utf-8?B?eFMvY25pU0dLcWNCZTB5TXErTTRTNkg0WEZJTlk0WlRpNFFjbTZjRmkvSDl5?=
+ =?utf-8?B?TDNuQ2NHb0QrMlhHbzJoYnBDaEtNZm5MUitDV0pqOWxRaENickxGc2FsbFdC?=
+ =?utf-8?B?ZzFGNS8rcHorN1FTVVVrbjJwdG1NYTM4Z0RjemFIVkJpRzRpMUQvVFNkSUJN?=
+ =?utf-8?B?bTJpS3dzazBMVVdGeFpwS3Y4emlsYTVsdHdXazltYTRjcFg0bWJOTVZVS1Ay?=
+ =?utf-8?B?b0R0NW10MGsxb0hQcTBHL3lvVUY0N0I4WndLK252aklnYVlqN2lIUEg1dVV4?=
+ =?utf-8?B?c1NiNnRnVWEvRUhBNncvMml1M0tPR3JwOWQxVk5sQTVlcU0wKzFVNExxYTl2?=
+ =?utf-8?B?VW9Db0h3SGVvVUZ6am5rVmZ1c1BPNlIwcHlUeDR2WEZaeVBxU205VDdka3RZ?=
+ =?utf-8?B?c1RlU1A3U2tlNVRzaFRsdnBsVFdYUGRDK2JxV25Idk4yVC9Ud3pkSElORWZ0?=
+ =?utf-8?B?YWsrK1lJWlpIRkt4VjZ4d0kyTUVhckFNT0Z4aVB4UEQ5emhmQ090SWs0cUVz?=
+ =?utf-8?B?S1NUWDdNRFFKZGlqejdqekF5OFF5Tk9FMkR4MVAyZUE5MjVCend2UnE0RVh0?=
+ =?utf-8?B?UlZqNjhCa3JJQ0dsMEZFemRCMnJSMU9kZnNjWnBBQUZLcTZvYmJNQVZDMTdl?=
+ =?utf-8?B?UkYwN0JJOS9LVlJjMGl2WGFMNFNQWlZ4TkE4Z0xIcjdxTWFvS0s3c0o2N0VW?=
+ =?utf-8?B?R0pEZG1rVmRNVTZ6Q1lZeTBXejJROCttWUJxQzFIZGp6YllzV0kvTmtqL1JF?=
+ =?utf-8?B?TEYyZWNabi90YXZUMHoyWkd2bWVBVW1SQUttSC9CcGtvcmpiQlRnWno2Slkx?=
+ =?utf-8?B?Q0pDWjAvSFNZNWZoWEZ1c3R0NmhHUy9zMnc1YnIyU0VNMjlvN3o1VjQxTm1F?=
+ =?utf-8?B?a0F2QVZVQlhpT3FFUTR5bm9TOXpnU0g3YVcrWk5rck16QnZmVVdLLzBUNzVR?=
+ =?utf-8?B?cWlDUWR0NHlDanFFQlNQMUduSlNRNWFOT3VZb0RsWEhZbTQwTS8vTmtPYXUv?=
+ =?utf-8?B?WjZucmQ5SjVpN1NrNHp4bjk4dy9TeEJpTnVWR0VVMGl4WVZxZDYxSElQM2dK?=
+ =?utf-8?B?cjVWWTRNcGRHS1J2cllTWmRhNlkyMndESTAvRTY0aG1WNUV0OC9oa2d4YlNN?=
+ =?utf-8?B?aHM5QUdoZWtTNU1YSDdLVENDajJZbERpeFBIMGF5RStCODJmakoxVUR1dGh3?=
+ =?utf-8?B?eGIrdktUSWl0YnlqZExoMlJyLzNjOEVia0hLbllSUG9KVWYwdnFzMUozcEJW?=
+ =?utf-8?B?dU5QVm1FcVMyQnpNYkpCdmFnRGovQk9vZTB1N3pQUTVpN2ZFRkVxemdiSDdB?=
+ =?utf-8?B?V05xcmhCaCtjOThzWHF1R01lWHRqSVEzcFpVREhNNmIvMnVKNFUzcXRWUk83?=
+ =?utf-8?B?TENDSTlDUVNuY04xWDNFK2g0bW8yWkRMRWNTcHFobEJSOGdCNXZGM1pYcFVU?=
+ =?utf-8?B?UFM2U2VtYVlhaWxaaU9ZZklhOW92d2xwTjhKdFJpNWdqWm43QWxVTm1VK2J1?=
+ =?utf-8?Q?VkOA5YNnkIg=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?b1JTOEFlczREc3hiKzVHemRISnoxZ1M1TWRDUC9ZaXBoMzFLbmVjMlVBOVlU?=
+ =?utf-8?B?b1V5T3lXWklkUHJBNU1UWjlXMm1zczFla2x6SDVBSi9SWkY2dXVlR3EzNFNw?=
+ =?utf-8?B?SCsxeU1Md3VmK3FHbE4zVU5DMzZBT0pSRjVyWXZVTmRtVFNkT1RJRDVTOWVT?=
+ =?utf-8?B?L3NKdHVMVTdpbmVJZCtGZER4T09WbVJPYzBvL0swU1E2YUFFaWxjZ25ONnJI?=
+ =?utf-8?B?aHhLUXhESUZjZlNMK2tpd25mSm40Sk9UVjluL2xSU0xkOVNHWEVxUTI2QmYr?=
+ =?utf-8?B?M29heEpydlFIOFFrNHN2eFFYL1N6RlA5VHpSK2twRWF0ZjduUFFUNm5lRVli?=
+ =?utf-8?B?MUNlUDRQL2RTekNlT2h5dlVNcjJXOXFrV05KcFR3RzZONjhUYUlKTE1uai9Q?=
+ =?utf-8?B?ZDNOcGJkM01JVzVySG9mcVJKbUlkV3pjcGFXa3RjSWhpL214V1N1SG42b0Va?=
+ =?utf-8?B?MkxWSFRONmJ6OVRZcitqeGdVOUU4QTFvVDgrSFRFNUZ6U3ZxWlVONDc3VEx1?=
+ =?utf-8?B?TnY1RkVqck9yUFNYaXJ2aitnQmNHcnBFUzVtZktkK3BzbUEwV3hrZStlQ05U?=
+ =?utf-8?B?OG53MXFDaE9ldC9EQ2t1SFZoOWRYMFJvYi9vbGVUeWR3UklxeFAyV0kzakdV?=
+ =?utf-8?B?VG1qUTNWbFRTWCthd25sd3RUNmtMemoxUkgzR05qYlBldklPNW9IMGU3cnVw?=
+ =?utf-8?B?OGJMWWpUclgzTnhVK1ZqeXFZS2NJN3EvKzVUaExpRW9CbHU0Q2xGdWlxckxG?=
+ =?utf-8?B?Vk4wazVqVWVydTJIQWV2b29TVXEzMzd3OThhUVNldFVMRDZMbWYyWTMvT214?=
+ =?utf-8?B?aXZkSzEzYnIyNmFBN2szRWdDMUZzOHhGeXdHQTFjN2tiV0daTVNhelRGdG1J?=
+ =?utf-8?B?Q2JpVS9yRW5hVFZQdHkzSkY1Q3BkNG5CVkxFVFdjY0VQSkQ3TDhudW1hZ2hn?=
+ =?utf-8?B?QUx6T2h1alpCb2Q1eGVtRHJDN0FoZGdRL2hpRVFCbHlHek5JUXkrY0lyVnZq?=
+ =?utf-8?B?SEJoaHBFcEtHUzl1QU9idEhRT1FORTNtNzJvRDZpREQrZ3JXNUNQN0hQNFln?=
+ =?utf-8?B?MGorQnYra28zL2tyQ1FNSExpbDYrTHVnRVdDTU5JdVlvUXRCVHY2STN3VlVQ?=
+ =?utf-8?B?OU1Pb0c2ajFaSmZWeWw5YkYvOExlRDQrbjRRN0g0MFlibW82cVdDSWVpYTFW?=
+ =?utf-8?B?eUN5bUNxbW9lL0hlTGhOb1ljWlAvYnlJeWRsWmtnM2VSZzNJUVpQWDN2WURL?=
+ =?utf-8?B?QkZBOUprSVdYckFnRTg1em9BRFRHQy9YR3JHSDR4QWFMS0g2OGxNQndLVlI3?=
+ =?utf-8?B?clNSMlFMdHFrdzBXVmttcDNOWTVZWU9pUTNtbW84WWhWdmcyTFQzWW1aM29n?=
+ =?utf-8?B?MDlrMVZQN2NSTnJka1ROKzZvZVJjVC9CR240Tm5TYjFSZHJBOUQreGNERGc1?=
+ =?utf-8?B?YWlCYnpuY1krSGRPMUR1NXNFRUt4RXRjQmJUS2k3Q1pvL1JUd1hzbUgxWU1B?=
+ =?utf-8?B?bGtvcDVTMzE5a1Ftd2xwNEF2aFRrUHVERUpSL3FrMkM3ck1mZVNpcng2R1N3?=
+ =?utf-8?B?YkdFNG53U1RTa0RlWlRlYzIvRGpGZE1LSUZvMzFlbWhYTExlRThpQ2pBdUwz?=
+ =?utf-8?B?aFVPUjVSckdVTmxWZ2EreUZRbWlwL2dYWTNsWnc2VkgrQXA3bFNiTjlCYjkz?=
+ =?utf-8?B?Y1VSdE03Q0J2L3ZMd1FwMG9DRGRlT0twRkJUN3dFN1oxRU5DSS9Fb1A3T0FR?=
+ =?utf-8?B?dTgxUGtEd0RwVG9rN0FkYmxtakFwcTlDMzR5bXdnd1N5WmlzSThLMnl5a1d6?=
+ =?utf-8?B?Sll3bit3WWF3M2ZGekRqd2IrdHVOU2FXNEgyVnJLSSt5b0k3ZHJDTlZVVmZq?=
+ =?utf-8?B?SDhrcUNsTkJmTjRsaTFuYUV6c2ZQekhYVUkvTUJOVGZrdUVVUFo4aGlleHNG?=
+ =?utf-8?B?SDlDd0ZMRWZ2OGUzQlNJR1UwRU1LeEpNelAvMEQxNmhQcVBGQ0dJaERrQkdF?=
+ =?utf-8?B?TTJUaXk0dkI1dTQ3Wk1uUXBMUG9XM1ZFVDd5VHMySUtTQVNHU1BOc0kzcm9G?=
+ =?utf-8?B?WFF3ZDhtb1IxSlQwbStXcSs1cTNIZHBNNXo1R3JDTEY3aHFOUWs4TERma3c0?=
+ =?utf-8?B?ek1CNGFwRkhxNzBCU2lvamttN01tUG1vSmZOMVJXcEpYeGhxeUN2RUR5OWZy?=
+ =?utf-8?B?OGc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: a8d55a2f-dd02-45fc-7b6e-08dddfcdc845
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2025 09:41:47.9769
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: cuLe1vDzK/yiDgo+I2RQcZ+ABrp1D80WlNv8tw2uZ55MGnXWSJg5TcoLwjJ2UKaOg0BkecI5lgRYQKwDCvbWiFuByO4tBcPOWJBD9njvOuA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6318
+X-OriginatorOrg: intel.com
 
-Configure interrupt request initialization.
-It allows driver to receive packets and management information
-from HW.
+On 8/20/25 08:42, Michal Schmidt wrote:
+> On Wed, Aug 20, 2025 at 6:30 AM Calvin Owens <calvin@wbinvd.org> wrote:
+>> The same naming regression which was reported in ixgbe and fixed in
+>> commit e67a0bc3ed4f ("ixgbe: prevent from unwanted interface name
+>> changes") still exists in i40e.
+>>
+>> Fix i40e by setting the same flag, added in commit c5ec7f49b480
+>> ("devlink: let driver opt out of automatic phys_port_name generation").
+>>
+>> Fixes: 9e479d64dc58 ("i40e: Add initial devlink support")
+> 
+> But this one's almost two years old. By now, there may be more users
+> relying on the new name than on the old one.
+> Michal
+> 
 
-Co-developed-by: Xin Guo <guoxin09@huawei.com>
-Signed-off-by: Xin Guo <guoxin09@huawei.com>
-Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
-Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
-Signed-off-by: Fan Gong <gongfan1@huawei.com>
----
- .../ethernet/huawei/hinic3/hinic3_hw_comm.c   |  31 ++++
- .../ethernet/huawei/hinic3/hinic3_hw_comm.h   |  13 ++
- .../net/ethernet/huawei/hinic3/hinic3_irq.c   | 136 +++++++++++++++++-
- .../ethernet/huawei/hinic3/hinic3_nic_dev.h   |   4 -
- 4 files changed, 178 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
-index 434696ce7dc2..7adcdd569c7b 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
-@@ -8,6 +8,37 @@
- #include "hinic3_hwif.h"
- #include "hinic3_mbox.h"
- 
-+int hinic3_set_interrupt_cfg_direct(struct hinic3_hwdev *hwdev,
-+				    const struct hinic3_interrupt_info *info)
-+{
-+	struct comm_cmd_cfg_msix_ctrl_reg msix_cfg = {};
-+	struct mgmt_msg_params msg_params = {};
-+	int err;
-+
-+	msix_cfg.func_id = hinic3_global_func_id(hwdev);
-+	msix_cfg.msix_index = info->msix_index;
-+	msix_cfg.opcode = MGMT_MSG_CMD_OP_SET;
-+
-+	msix_cfg.lli_credit_cnt = info->lli_credit_limit;
-+	msix_cfg.lli_timer_cnt = info->lli_timer_cfg;
-+	msix_cfg.pending_cnt = info->pending_limit;
-+	msix_cfg.coalesce_timer_cnt = info->coalesc_timer_cfg;
-+	msix_cfg.resend_timer_cnt = info->resend_timer_cfg;
-+
-+	mgmt_msg_params_init_default(&msg_params, &msix_cfg, sizeof(msix_cfg));
-+
-+	err = hinic3_send_mbox_to_mgmt(hwdev, MGMT_MOD_COMM,
-+				       COMM_CMD_CFG_MSIX_CTRL_REG, &msg_params);
-+	if (err || msix_cfg.head.status) {
-+		dev_err(hwdev->dev,
-+			"Failed to set interrupt config, err: %d, status: 0x%x\n",
-+			err, msix_cfg.head.status);
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
- int hinic3_func_reset(struct hinic3_hwdev *hwdev, u16 func_id, u64 reset_flag)
- {
- 	struct comm_cmd_func_reset func_reset = {};
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h
-index c33a1c77da9c..2270987b126f 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h
-@@ -8,6 +8,19 @@
- 
- struct hinic3_hwdev;
- 
-+struct hinic3_interrupt_info {
-+	u32 lli_set;
-+	u32 interrupt_coalesc_set;
-+	u16 msix_index;
-+	u8  lli_credit_limit;
-+	u8  lli_timer_cfg;
-+	u8  pending_limit;
-+	u8  coalesc_timer_cfg;
-+	u8  resend_timer_cfg;
-+};
-+
-+int hinic3_set_interrupt_cfg_direct(struct hinic3_hwdev *hwdev,
-+				    const struct hinic3_interrupt_info *info);
- int hinic3_func_reset(struct hinic3_hwdev *hwdev, u16 func_id, u64 reset_flag);
- 
- #endif
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_irq.c b/drivers/net/ethernet/huawei/hinic3/hinic3_irq.c
-index 8b92eed25edf..33eb9080739d 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_irq.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_irq.c
-@@ -38,7 +38,7 @@ static int hinic3_poll(struct napi_struct *napi, int budget)
- 	return work_done;
- }
- 
--void qp_add_napi(struct hinic3_irq_cfg *irq_cfg)
-+static void qp_add_napi(struct hinic3_irq_cfg *irq_cfg)
- {
- 	struct hinic3_nic_dev *nic_dev = netdev_priv(irq_cfg->netdev);
- 
-@@ -50,7 +50,7 @@ void qp_add_napi(struct hinic3_irq_cfg *irq_cfg)
- 	napi_enable(&irq_cfg->napi);
- }
- 
--void qp_del_napi(struct hinic3_irq_cfg *irq_cfg)
-+static void qp_del_napi(struct hinic3_irq_cfg *irq_cfg)
- {
- 	napi_disable(&irq_cfg->napi);
- 	netif_queue_set_napi(irq_cfg->netdev, irq_cfg->irq_id,
-@@ -60,3 +60,135 @@ void qp_del_napi(struct hinic3_irq_cfg *irq_cfg)
- 	netif_stop_subqueue(irq_cfg->netdev, irq_cfg->irq_id);
- 	netif_napi_del(&irq_cfg->napi);
- }
-+
-+static irqreturn_t qp_irq(int irq, void *data)
-+{
-+	struct hinic3_irq_cfg *irq_cfg = data;
-+	struct hinic3_nic_dev *nic_dev;
-+
-+	nic_dev = netdev_priv(irq_cfg->netdev);
-+	hinic3_msix_intr_clear_resend_bit(nic_dev->hwdev,
-+					  irq_cfg->msix_entry_idx, 1);
-+
-+	napi_schedule(&irq_cfg->napi);
-+
-+	return IRQ_HANDLED;
-+}
-+
-+static int hinic3_request_irq(struct hinic3_irq_cfg *irq_cfg, u16 q_id)
-+{
-+	struct hinic3_interrupt_info info = {};
-+	struct hinic3_nic_dev *nic_dev;
-+	struct net_device *netdev;
-+	int err;
-+
-+	netdev = irq_cfg->netdev;
-+	nic_dev = netdev_priv(netdev);
-+	qp_add_napi(irq_cfg);
-+
-+	info.msix_index = irq_cfg->msix_entry_idx;
-+	info.interrupt_coalesc_set = 1;
-+	info.pending_limit = nic_dev->intr_coalesce[q_id].pending_limit;
-+	info.coalesc_timer_cfg =
-+		nic_dev->intr_coalesce[q_id].coalesce_timer_cfg;
-+	info.resend_timer_cfg = nic_dev->intr_coalesce[q_id].resend_timer_cfg;
-+	err = hinic3_set_interrupt_cfg_direct(nic_dev->hwdev, &info);
-+	if (err) {
-+		netdev_err(netdev, "Failed to set RX interrupt coalescing attribute.\n");
-+		qp_del_napi(irq_cfg);
-+		return err;
-+	}
-+
-+	err = request_irq(irq_cfg->irq_id, qp_irq, 0, irq_cfg->irq_name,
-+			  irq_cfg);
-+	if (err) {
-+		qp_del_napi(irq_cfg);
-+		return err;
-+	}
-+
-+	irq_set_affinity_hint(irq_cfg->irq_id, &irq_cfg->affinity_mask);
-+
-+	return 0;
-+}
-+
-+static void hinic3_release_irq(struct hinic3_irq_cfg *irq_cfg)
-+{
-+	irq_set_affinity_hint(irq_cfg->irq_id, NULL);
-+	free_irq(irq_cfg->irq_id, irq_cfg);
-+}
-+
-+int hinic3_qps_irq_init(struct net_device *netdev)
-+{
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	struct pci_dev *pdev = nic_dev->pdev;
-+	struct hinic3_irq_cfg *irq_cfg;
-+	struct msix_entry *msix_entry;
-+	u32 local_cpu;
-+	u16 q_id;
-+	int err;
-+
-+	for (q_id = 0; q_id < nic_dev->q_params.num_qps; q_id++) {
-+		msix_entry = &nic_dev->qps_msix_entries[q_id];
-+		irq_cfg = &nic_dev->q_params.irq_cfg[q_id];
-+
-+		irq_cfg->irq_id = msix_entry->vector;
-+		irq_cfg->msix_entry_idx = msix_entry->entry;
-+		irq_cfg->netdev = netdev;
-+		irq_cfg->txq = &nic_dev->txqs[q_id];
-+		irq_cfg->rxq = &nic_dev->rxqs[q_id];
-+		nic_dev->rxqs[q_id].irq_cfg = irq_cfg;
-+
-+		local_cpu = cpumask_local_spread(q_id, dev_to_node(&pdev->dev));
-+		cpumask_set_cpu(local_cpu, &irq_cfg->affinity_mask);
-+
-+		snprintf(irq_cfg->irq_name, sizeof(irq_cfg->irq_name),
-+			 "%s_qp%u", netdev->name, q_id);
-+
-+		err = hinic3_request_irq(irq_cfg, q_id);
-+		if (err) {
-+			netdev_err(netdev, "Failed to request Rx irq\n");
-+			goto err_release_irqs;
-+		}
-+
-+		hinic3_set_msix_auto_mask_state(nic_dev->hwdev,
-+						irq_cfg->msix_entry_idx,
-+						HINIC3_SET_MSIX_AUTO_MASK);
-+		hinic3_set_msix_state(nic_dev->hwdev, irq_cfg->msix_entry_idx,
-+				      HINIC3_MSIX_ENABLE);
-+	}
-+
-+	return 0;
-+
-+err_release_irqs:
-+	while (q_id > 0) {
-+		q_id--;
-+		irq_cfg = &nic_dev->q_params.irq_cfg[q_id];
-+		qp_del_napi(irq_cfg);
-+		hinic3_set_msix_state(nic_dev->hwdev, irq_cfg->msix_entry_idx,
-+				      HINIC3_MSIX_DISABLE);
-+		hinic3_set_msix_auto_mask_state(nic_dev->hwdev,
-+						irq_cfg->msix_entry_idx,
-+						HINIC3_CLR_MSIX_AUTO_MASK);
-+		hinic3_release_irq(irq_cfg);
-+	}
-+
-+	return err;
-+}
-+
-+void hinic3_qps_irq_uninit(struct net_device *netdev)
-+{
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	struct hinic3_irq_cfg *irq_cfg;
-+	u16 q_id;
-+
-+	for (q_id = 0; q_id < nic_dev->q_params.num_qps; q_id++) {
-+		irq_cfg = &nic_dev->q_params.irq_cfg[q_id];
-+		qp_del_napi(irq_cfg);
-+		hinic3_set_msix_state(nic_dev->hwdev, irq_cfg->msix_entry_idx,
-+				      HINIC3_MSIX_DISABLE);
-+		hinic3_set_msix_auto_mask_state(nic_dev->hwdev,
-+						irq_cfg->msix_entry_idx,
-+						HINIC3_CLR_MSIX_AUTO_MASK);
-+		hinic3_release_irq(irq_cfg);
-+	}
-+}
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h
-index 9577cc673257..9fad834f9e92 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h
-@@ -85,8 +85,4 @@ void hinic3_set_netdev_ops(struct net_device *netdev);
- int hinic3_qps_irq_init(struct net_device *netdev);
- void hinic3_qps_irq_uninit(struct net_device *netdev);
- 
--/* Temporary prototypes. Functions become static in later submission. */
--void qp_add_napi(struct hinic3_irq_cfg *irq_cfg);
--void qp_del_napi(struct hinic3_irq_cfg *irq_cfg);
--
- #endif
--- 
-2.43.0
-
+And, more importantly, noone was complaining on the new name ;)
 
