@@ -1,92 +1,68 @@
-Return-Path: <netdev+bounces-215069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDAB2B2D099
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 02:15:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68FC3B2D09F
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 02:18:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48122723626
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 00:15:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF9523AF4E9
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 00:17:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4299C46447;
-	Wed, 20 Aug 2025 00:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FZt4sIJY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EB891C28E;
+	Wed, 20 Aug 2025 00:17:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 197142C859;
-	Wed, 20 Aug 2025 00:15:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 940CD35337B;
+	Wed, 20 Aug 2025 00:17:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755648907; cv=none; b=C3Kr1eRcH/WHpQOHHmDSvy77Ns9ER6xuhJVaUhxOlhXRODYhifO/qeb0x2RxIhclYQ/MutI+zeFSQpqomOsJ3BHPTHJLYaYX4sSNatgIng6zTugn0L0erywXYJuWzD+l1E3TDNUn6DQbUZrYVOzFv0iMFoO5PxptiUCWW9qhxrU=
+	t=1755649036; cv=none; b=l+nNh1dRR+KhPXsiGjlsGuEj7WysyFhIQ4nHBxAuMieIYbefnp/7HWfdpqB8o+XYdiG7Jldbq+hakqShM1rfGt3G3oqyZP7lz4+0MV0aYkfNdh9ME16WAgCCRy/sr1DIu/+xQWGLAuwhtr6SJNR18gFmqK3fc/2qhwyrEwWAobY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755648907; c=relaxed/simple;
-	bh=kzPn/YJEz3P/5bJQfIbsGMlkw33F/6kXcp2B3/hVnxg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XFkr2EeksjbbIXpn2CauwP1BMAVj/O9pkuRjGHHvJOTI6Ua3jrZ7kZ/HQWf1b34NUAXW2xMSVDPFLH5uCHNzJ8ip8rRzCuCwoZ3OZIJu//3Rci/N5aUDUWO2ZRCaVjvFePtvQkY/epFxos7EHQD1HmBj2tmJwNHk7vP2uI2hZZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FZt4sIJY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2721CC4CEF1;
-	Wed, 20 Aug 2025 00:15:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755648906;
-	bh=kzPn/YJEz3P/5bJQfIbsGMlkw33F/6kXcp2B3/hVnxg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FZt4sIJYj+5SDWKOoTklabwUDzLP1zxuCPLwdqAItQIVr9vTqB7nG4lHsUK2kYQD5
-	 podavnBbhOdpiGcL6iTpICCB4OmKH7fKR/OZuvogq6KLE4CpWKzo9r5R2VVh/3CHCx
-	 d9JSnjY8Xu6KSDaItD3iqyDxRPo1juL+PqhRCLP9sgGNEMoFpDzTK6BQhJ+Vz2i3Vn
-	 Dd8xWHOVr5zRmV9ZLcHifGrtmf613TqDCjpc5XKDYaew6jNjWJAv2nu/c9Uh6v2MGe
-	 9zGRT/jNgTsCc7BzdHjU5PXX1Y5rjs1z6vyP5gnfIKcTP5Qj5RIPxWJvN9ISI+NSSw
-	 rXn3KDoDpsqkw==
-Date: Tue, 19 Aug 2025 17:15:05 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: cpaasch@openai.com, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
- <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch
- <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Alexander Lobakin <aleksander.lobakin@intel.com>, Gal
- Pressman <gal@nvidia.com>, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/2] net/mlx5: Avoid copying payload to the
- skb's linear part
-Message-ID: <20250819171505.4ebbac36@kernel.org>
-In-Reply-To: <6dguqontvbisoypbfxw5xyscyqhvskk5avf7gwqgwajc4ic75a@id3pume2f4hw>
-References: <20250816-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v2-0-b11b30bc2d10@openai.com>
-	<20250816-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v2-2-b11b30bc2d10@openai.com>
-	<6dguqontvbisoypbfxw5xyscyqhvskk5avf7gwqgwajc4ic75a@id3pume2f4hw>
+	s=arc-20240116; t=1755649036; c=relaxed/simple;
+	bh=EKtl4HHMjUn0kAzyuD5H7t8s6ps1qQ+IphQ25Wg7NV4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=s62gknUjv2NNApweV2GdP8464/M6+2LGwHocnJK3Nhty0SVqy+E01TKziao6i6U+Xw3hHrtb5G72OIQJoSZBLKFkwlGN59B1W6gbi/gqakEuEZB5jczEWM/T/j9ULbrZIzv0l5gPvsk9pU2kevTawL1JdauXCaYlNcxSZJzWKZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 1CC9F601EB; Wed, 20 Aug 2025 02:17:11 +0200 (CEST)
+Date: Wed, 20 Aug 2025 02:17:10 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Qingjie Xing <xqjcool@gmail.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org
+Subject: Re: [PATCH] netfilter: conntrack: drop expectations before freeing
+ templates
+Message-ID: <aKUUBsFYBYOu2xu-@strlen.de>
+References: <aKTCFTQy1dVo-Ucy@strlen.de>
+ <20250819232417.2337655-1-xqjcool@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250819232417.2337655-1-xqjcool@gmail.com>
 
-On Tue, 19 Aug 2025 09:58:54 +0000 Dragos Tatulea wrote:
-> > @@ -2009,10 +2040,14 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_rq *rq, struct mlx5e_mpw_info *w
-> >  	u32 linear_frame_sz;
-> >  	u16 linear_data_len;
-> >  	u16 linear_hr;
-> > +	u16 headlen;
-> >  	void *va;
-> >  
-> >  	prog = rcu_dereference(rq->xdp_prog);
-> >  
-> > +	headlen = min3(mlx5e_cqe_estimate_hdr_len(cqe), cqe_bcnt,
-> > +		       (u16)MLX5E_RX_MAX_HEAD);
-> > +  
-> How about keeping the old calculation for XDP and do this one for
-> non-xdp in the following if/else block?
-> 
-> This way XDP perf will not be impacted by the extra call to 
-> mlx5e_cqe_estimate_hdr_len().
+Qingjie Xing <xqjcool@gmail.com> wrote:
+> With an iptables-configured TFTP helper in place, a UDP packet 
+> (10.65.41.36:1069 → 10.65.36.2:69, TFTP RRQ) triggered creation of an expectation.
+> Later, iptables changes removed the rule’s per-rule template nf_conn. 
+> When the expectation’s timer expired, nf_ct_unlink_expect_report() 
+> ran and dereferenced the freed master, causing a crash.
 
-Perhaps move it further down for XDP?
-Ideally attaching a program which returns XDP_PASS shouldn't impact
-normal TCP perf.
+Sorry, I do not see the problem.
+A template should never be listed as exp->master.
+
+Can you make a reproducer/selftest for this bug?
+
+I worry we paper over a different bug.
 
