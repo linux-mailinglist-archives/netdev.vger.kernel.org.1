@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-215137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9951FB2D26B
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 05:14:00 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1F65B2D267
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 05:13:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 09D117B916E
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 03:11:44 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B86AA4E38E0
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 03:13:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 825AA2D3755;
-	Wed, 20 Aug 2025 03:11:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 572C22D3ED2;
+	Wed, 20 Aug 2025 03:11:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dMMPNhDs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wv4XQRqH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E1912D374E
-	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 03:11:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FE322D3ED1;
+	Wed, 20 Aug 2025 03:11:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755659505; cv=none; b=L9NRCkOGSvD+1UbWgA99TLkeJ0anpQrs2rmlqiYDifyCKX67qXjJA6IBQ96IBSb61qRCupKG/aLJxEtG+cpIcGQ7V8zt4Ndk+0O7VjMDp2L8vJgKQ1Fd4N1Ffn7IM4hRrGkWB4J1TtnvRgC4jHDNnFRFw1LFpPUX2G9AhlDBGqo=
+	t=1755659507; cv=none; b=IYJjPITiVOJTeEBNJvbFLo4S7nTT3/Tu3Sc0F72sOrA9aA1omTJdshDQjm0ImhwQKZSL5bHL4EjMI3jiRbwySVPOHzZSslDFH9ncuLRGy4f3/UHBhTK2AmShhsKsOND9xRWY+DVGbLbVq4T2zWXeBZGkIDxKgzT8UAcWMtfpN5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755659505; c=relaxed/simple;
-	bh=5KcFUIpg+3Cb0ffpuwt/56y4Y9pyDGpEZJ7Gw7vlSRE=;
+	s=arc-20240116; t=1755659507; c=relaxed/simple;
+	bh=Wpuq8PHBzi6ztnD4h/ECXT0EObBnUmUFOmFgs6RT+sA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=olsXDt9614JUZuFKePPhIoZSeD6O7ezpnSkOA1Lgh0zjpF1pGVeHV/xkpUUQSwZNw0WNwp9cMgDBHbTWitk3v9V8aXdubMPjSfRc48E5/7WSN9/dh/kqn1R64XFZwNUZr5pGApQyRHFUucBF5TQxXNbX6ecmbN8qHdj+Rk7hCYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dMMPNhDs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E3C2C4CEF4;
-	Wed, 20 Aug 2025 03:11:45 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=PINbrJ/rYgRRQnvVL/jrdGuxNerilURjcgB6Cg3UFYfkAe3PGjjjeALJAfMwXSicQwQOvuaecxmh3vJDj8O/cAKiUhGgOgfBMcILegTVUroWwoap42Hp8BK2QzE7JrnzQqktjoNqnLqjvUH6q7N9CPvSKSYEUuoSi9C3iCgeCc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wv4XQRqH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8B4AC4CEF1;
+	Wed, 20 Aug 2025 03:11:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755659505;
-	bh=5KcFUIpg+3Cb0ffpuwt/56y4Y9pyDGpEZJ7Gw7vlSRE=;
+	s=k20201202; t=1755659506;
+	bh=Wpuq8PHBzi6ztnD4h/ECXT0EObBnUmUFOmFgs6RT+sA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dMMPNhDszphRKw10tkjuzt5a3d7IkTl/VCi7mdTXmJ2pKRlutcuPGJkdqpv2Uz1PP
-	 KA7kF/DvmWf9O7skH2N8n/TuXDz3akxSZ1DS2560oLSPfRoI/8mHwgYiQRo1GCPXqB
-	 cNqvjrpVlKKCKdLHP7JIZ011I+x9BTyt+02PaRAUzOuCd+HCMT3ie3vY4rX98J4X5B
-	 uPGJSszhRV+Cf732TumYTsvxlQSuMZOBIkHoPVEXw3mh8PgHrGhGQtyDUrp4vuTQ2R
-	 Rsi+Wc97laSY1f7g0wwrSLpqlfd4OFly1WxUVTCv8lWkHZDxE0l3QMiRjJB+v1Jbq4
-	 hrTmUYvu03y0A==
+	b=Wv4XQRqHdkL+E1B9HhzQaljS8aZjmWuCj/NwvCKD4VN/EU+AeDydeQFjSNMRS62bu
+	 FlW4ucfbzdblCwqE76plgLjb5cIgKIV8feLgnUKAhFi5vdtTNMQ0Mi2NTMHBTILjbl
+	 ZSJrkHgUhaykcO2VOQoE+zVfeQ3D2pir2n3dE9vDZ8J5Vf2PWKpnS5A2+3DZqibDKw
+	 r/G0mnKWkHoeral5qf6bKsqMBAdnOTh0XI8lO7UehJLHSp+T9PpMsSz/XS7TSgmnq/
+	 5m3/r/p18aeAHK5/nSYLRM7RJaPoTW25cXbg8GwlS/wt4bkey8Vuz2rJEGFUJBwuhg
+	 1M3mwYoTBrkJg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E3E383BF58;
-	Wed, 20 Aug 2025 03:11:56 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE541383BF58;
+	Wed, 20 Aug 2025 03:11:57 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: phy: realtek: enable serdes option mode for
- RTL8226-CG
+Subject: Re: [PATCH net-next v1 0/3] stmmac: stop silently dropping bad
+ checksum
+ packets
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175565951474.3753798.14843663767219796679.git-patchwork-notify@kernel.org>
-Date: Wed, 20 Aug 2025 03:11:54 +0000
-References: <20250815082009.3678865-1-markus.stockhausen@gmx.de>
-In-Reply-To: <20250815082009.3678865-1-markus.stockhausen@gmx.de>
-To: Markus Stockhausen <markus.stockhausen@gmx.de>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ <175565951624.3753798.940710091571028774.git-patchwork-notify@kernel.org>
+Date: Wed, 20 Aug 2025 03:11:56 +0000
+References: <20250818090217.2789521-1-o.rempel@pengutronix.de>
+In-Reply-To: <20250818090217.2789521-1-o.rempel@pengutronix.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: andrew+netdev@lunn.ch, alexandre.torgue@foss.st.com, joabreu@synopsys.com,
  davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- michael@fossekall.de, daniel@makrotopia.org, netdev@vger.kernel.org,
- jan@3e8.eu
+ mcoquelin.stm32@gmail.com, kernel@pengutronix.de,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, horms@kernel.org,
+ rmk+kernel@armlinux.org.uk, san@skov.dk
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 15 Aug 2025 04:20:09 -0400 you wrote:
-> The RTL8226-CG can make use of the serdes option mode feature to
-> dynamically switch between SGMII and 2500base-X. From what is
-> known the setup sequence is much simpler with no magic values.
+On Mon, 18 Aug 2025 11:02:14 +0200 you wrote:
+> Hi all,
 > 
-> Convert the exiting config_init() into a helper that configures
-> the PHY depending on generation 1 or 2. Call the helper from two
-> separated new config_init() functions.
+> this series reworks how stmmac handles receive checksum offload
+> (CoE) errors on dwmac4.
+> 
+> At present, when CoE is enabled, the hardware silently discards any
+> frame that fails checksum validation. These packets never reach the
+> driver and are not accounted in the generic drop statistics. They are
+> only visible in the stmmac-specific counters as "payload error" or
+> "header error" packets, which makes it harder to debug or monitor
+> network issues.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: phy: realtek: enable serdes option mode for RTL8226-CG
-    https://git.kernel.org/netdev/net-next/c/3a752e678001
+  - [net-next,v1,1/3] net: stmmac: Correctly handle Rx checksum offload errors
+    https://git.kernel.org/netdev/net-next/c/ee0aace5f844
+  - [net-next,v1,2/3] net: stmmac: dwmac4: report Rx checksum errors in status
+    https://git.kernel.org/netdev/net-next/c/644b8437ccef
+  - [net-next,v1,3/3] net: stmmac: dwmac4: stop hardware from dropping checksum-error packets
+    https://git.kernel.org/netdev/net-next/c/fe4042797651
 
 You are awesome, thank you!
 -- 
