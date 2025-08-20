@@ -1,153 +1,182 @@
-Return-Path: <netdev+bounces-215259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C040CB2DD62
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 15:10:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1A9BB2DD5D
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 15:10:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 626E15E804A
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 13:08:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB59C17D22A
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 13:08:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E24C3093CB;
-	Wed, 20 Aug 2025 13:08:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 081ED311C14;
+	Wed, 20 Aug 2025 13:08:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="CU2fgwUW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CpVkkvsC"
 X-Original-To: netdev@vger.kernel.org
-Received: from server.couthit.com (server.couthit.com [162.240.164.96])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5097242D9E;
-	Wed, 20 Aug 2025 13:08:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F04242D9E;
+	Wed, 20 Aug 2025 13:08:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755695320; cv=none; b=bxWWKQZIHf6DiLwpi7l2bW59tNOxSBIcd0Knmcsf5A5lDk209gw8SXGxPj09tKlrS54TGIOiosvPv8ifxtow+3FvpSiHnKHbAqyp2qmg2MevFxOcrWdedEZKlseCkHqnhTvAKITKyOKEXDMNf5qANBgFWk8nLg+dROldAkzzQeA=
+	t=1755695328; cv=none; b=U9Gp5Sq4U86SICJYUSy33kkQubHwSgg7BW90BYJo9ukRN7JKp2fA8xjUu69NhsBmduH3WbsKe4X7TclhEG1p76WLa/7XMcUF7zsepOwjTmsMP2EbFpfj7o47x7KqNMOcCshJHiYqXgoCF5b7zVARMxDfMp5EQIRra9EBh7Y4DLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755695320; c=relaxed/simple;
-	bh=tYLXLwBiTvj3SVfvw7xo/j++DN4t6QK+4GQmepz/7aw=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=QuCG6kPdmnU6rMdlxOGVYoRgJr3y9V2VQ8UpI7y8IBCdJbHZkKrs5GJ/9g4704fqxHrbaoK/U5Y4zhX9PHHiu8QCTU2A1V8kaErctOifCiEHzJo6CaBA2eZ7IUFnaDrGBTkeEuRuFwPa9dKpWSdXlrn2ZBgp1cNWhab+gLru19I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=CU2fgwUW; arc=none smtp.client-ip=162.240.164.96
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
-	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
-	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=Kjyyibg+wnsB9xvjdEV1H8HvE9Jnw2qmWLH9c5mLoEg=; b=CU2fgwUW+jWZmeRnhjwoWTpuFM
-	ABZ7xClo+oMu9gFyv3so9YBfaiwHpECY8HzfCgyBGmWYNrdnTiJwgkOs9DQ8G2KC/fUMKMoYIOGhj
-	RE187O8Y4wl0BRCg6uu8SWDRJOo/ZLk+GUFImIfQuVJuJm8DX22f9G7XRsl5XRhtm1UeEpOa0hYNE
-	8k+ZSCX4fk/rnyD0goX1zuBsLgT/raxu/nDlaqqXmN/gwP0MGkb6TSQ5B2F6DrlRJJF8N8gvpRqdg
-	rUUHOc17XgFUG9//riERJikPBR/qwT8OrwEbhj2x9XkgiJLpWphsPYtGnzvXff/sFaWh6iw6vlyy+
-	nfyhragw==;
-Received: from [122.175.9.182] (port=64641 helo=zimbra.couthit.local)
-	by server.couthit.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.1)
-	(envelope-from <parvathi@couthit.com>)
-	id 1uoiYC-0000000GE8f-2wAe;
-	Wed, 20 Aug 2025 09:08:24 -0400
-Received: from zimbra.couthit.local (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTPS id 5878E1781A82;
-	Wed, 20 Aug 2025 18:38:18 +0530 (IST)
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTP id 32FE417823F4;
-	Wed, 20 Aug 2025 18:38:18 +0530 (IST)
-Received: from zimbra.couthit.local ([127.0.0.1])
-	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id ygfb58BmiwQo; Wed, 20 Aug 2025 18:38:18 +0530 (IST)
-Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
-	by zimbra.couthit.local (Postfix) with ESMTP id D5D421781A82;
-	Wed, 20 Aug 2025 18:38:17 +0530 (IST)
-Date: Wed, 20 Aug 2025 18:38:17 +0530 (IST)
-From: Parvathi Pudi <parvathi@couthit.com>
-To: kuba <kuba@kernel.org>
-Cc: parvathi <parvathi@couthit.com>, danishanwar <danishanwar@ti.com>, 
-	rogerq <rogerq@kernel.org>, andrew+netdev <andrew+netdev@lunn.ch>, 
-	davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
-	pabeni <pabeni@redhat.com>, robh <robh@kernel.org>, 
-	krzk+dt <krzk+dt@kernel.org>, conor+dt <conor+dt@kernel.org>, 
-	ssantosh <ssantosh@kernel.org>, 
-	richardcochran <richardcochran@gmail.com>, 
-	m-malladi <m-malladi@ti.com>, s hauer <s.hauer@pengutronix.de>, 
-	afd <afd@ti.com>, jacob e keller <jacob.e.keller@intel.com>, 
-	horms <horms@kernel.org>, johan <johan@kernel.org>, 
-	m-karicheri2 <m-karicheri2@ti.com>, s-anna <s-anna@ti.com>, 
-	glaroque <glaroque@baylibre.com>, 
-	saikrishnag <saikrishnag@marvell.com>, 
-	kory maincent <kory.maincent@bootlin.com>, 
-	diogo ivo <diogo.ivo@siemens.com>, 
-	javier carrasco cruz <javier.carrasco.cruz@gmail.com>, 
-	basharath <basharath@couthit.com>, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
-	netdev <netdev@vger.kernel.org>, 
-	devicetree <devicetree@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	ALOK TIWARI <alok.a.tiwari@oracle.com>, 
-	Bastien Curutchet <bastien.curutchet@bootlin.com>, 
-	pratheesh <pratheesh@ti.com>, Prajith Jayarajan <prajith@ti.com>, 
-	Vignesh Raghavendra <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
-	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
-	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>, 
-	mohan <mohan@couthit.com>
-Message-ID: <1714979234.207867.1755695297667.JavaMail.zimbra@couthit.local>
-In-Reply-To: <20250818084020.378678a7@kernel.org>
-References: <20250812110723.4116929-1-parvathi@couthit.com> <20250812133534.4119053-5-parvathi@couthit.com> <20250815115956.0f36ae06@kernel.org> <1969814282.190581.1755522577590.JavaMail.zimbra@couthit.local> <20250818084020.378678a7@kernel.org>
-Subject: Re: [PATCH net-next v13 4/5] net: ti: prueth: Adds link detection,
- RX and TX support.
+	s=arc-20240116; t=1755695328; c=relaxed/simple;
+	bh=ZMa6c5IXXc7FTpDi4XwZl4jGC7UySzLS0/LL8shetd8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uQmUW/aSQzwrWI8OVPWmrC0KFOJrEKHUO1yb7X99erHL7yNWU/TnKtMfnSe8rqLE/RMkIxdsgd7PPrl2NGu1EqXsNHEyPoBDat8bpXF2c+H8gyhc9y6+69aifFBu9GzOZaK9VumZW6uXzsCN+R4O//r/7GkySEjzhS7+G4n+eRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CpVkkvsC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 694ADC4CEED;
+	Wed, 20 Aug 2025 13:08:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755695328;
+	bh=ZMa6c5IXXc7FTpDi4XwZl4jGC7UySzLS0/LL8shetd8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=CpVkkvsC4Vdv5Os71gtsmYfUWJ/rB6peVMstYHp5nr3ZjHT69/1UcRQkYkQivO91T
+	 KUhGyRC/fEzdupijaiv00W2E9JW+8j4yidXGgkxBv4kTCAHnzeNGn3PPfSwEZN8CME
+	 eplaQVTvPWKk8Y4qoCgUuT3u/UoBx+I2yBQrvFx19SqJtfIwJY8GrxtWEBpV1j9SFM
+	 tFJXq8X1TUEGQNSo6cGUEhyoiWUBt+NhAvMIN5CTmZrcEDGGRRGMOFD/bLTfz0MWMW
+	 f6XWwNgGzj5RWmo7/Ulc8XR/ARkOSfSD39yIiFL5ubzLt6YY0D5OzdOyHPFp8XUsaK
+	 kYUpvn33knZ5Q==
+Message-ID: <9fe9d86e-0d24-4877-aefc-438248d7024e@kernel.org>
+Date: Wed, 20 Aug 2025 15:08:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 3/6] arm64: dts: qcom: qcs615: add ethernet node
+To: Yijie Yang <yijie.yang@oss.qualcomm.com>, Vinod Koul <vkoul@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Richard Cochran <richardcochran@gmail.com>
+Cc: netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org, stable+noautosel@kernel.org,
+ Yijie Yang <quic_yijiyang@quicinc.com>,
+ Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+References: <20250819-qcs615_eth-v4-0-5050ed3402cb@oss.qualcomm.com>
+ <20250819-qcs615_eth-v4-3-5050ed3402cb@oss.qualcomm.com>
+ <c4cbd50e-82e3-410b-bec6-72b9db1bafca@kernel.org>
+ <157c048d-0efd-458c-8a3f-dfc30d07edf8@oss.qualcomm.com>
+ <0b53dc0b-a96f-49e1-a81e-3748fa908144@kernel.org>
+ <1394aa43-3edc-4ed5-9662-43d98bf8d85f@oss.qualcomm.com>
+ <7c072b63-f4ff-4d7f-b71e-01f239f6b465@kernel.org>
+ <b1eb2ed6-9743-465e-9b2e-75d5a06c1497@oss.qualcomm.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <b1eb2ed6-9743-465e-9b2e-75d5a06c1497@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - GC138 (Linux)/8.8.15_GA_3968)
-Thread-Topic: prueth: Adds link detection, RX and TX support.
-Thread-Index: rWG3COPtPBb60rDF6O1ULILOZDFtmA==
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server.couthit.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - couthit.com
-X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: smtp@couthit.com
-X-Authenticated-Sender: server.couthit.com: smtp@couthit.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
 
-Hi,
-
-> On Mon, 18 Aug 2025 18:39:37 +0530 (IST) Parvathi Pudi wrote:
->> +       if (num_rx_packets < budget && napi_complete_done(napi, num_rx_packets))
->>                 enable_irq(emac->rx_irq);
->> -       }
->>  
->>         return num_rx_packets;
->>  }
->> 
->> We will address this in the next version.
+On 20/08/2025 10:57, Yijie Yang wrote:
 > 
-> Ideally:
 > 
->	if (num_rx < budget && napi_complete_done()) {
->		enable_irq();
->		return num_rx;
->	}
+> On 2025-08-19 17:08, Krzysztof Kozlowski wrote:
+>> On 19/08/2025 11:04, Yijie Yang wrote:
+>>>
+>>>
+>>> On 2025-08-19 15:15, Krzysztof Kozlowski wrote:
+>>>> On 19/08/2025 08:51, Yijie Yang wrote:
+>>>>>
+>>>>>
+>>>>> On 2025-08-19 14:44, Krzysztof Kozlowski wrote:
+>>>>>> On 19/08/2025 08:35, YijieYang wrote:
+>>>>>>> From: Yijie Yang <quic_yijiyang@quicinc.com>
+>>>>>>>
+>>>>>>> Add an ethernet controller node for QCS615 SoC to enable ethernet
+>>>>>>> functionality.
+>>>>>>>
+>>>>>>> Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+>>>>>>> Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
+>>>>>>> ---
+>>>>>>
+>>>>>>
+>>>>>> Why do you mix up DTS and net-next patches? This only makes difficult to
+>>>>>> apply it, for no benefits.
+>>>>>
+>>>>> The DTS changes and driver code modifications work together to achieve a
+>>>>> single purpose, so I included them in one patch series. Should I
+>>>>> consider splitting them into two separate series?
+>>>> Of course yes. You are just making difficult to apply this. Patches are
+>>>> completely independent and even your internal guideline asks to NOT
+>>>> combine independent patches.
+>>>
+>>> The challenge with splitting this series lies in the fact that it
+>>> attempts to reverse the incorrect semantics of phy-mode in both the
+>>> driver code and the device tree. Selecting only part of the series would
+>>> break Ethernet functionality on both boards.
+>>
+>> And where did you explain that? Anyway, you did not achieve your goal,
+>> because you broke the boards still.
+>>
+>> Your patchset is not bisectable and does not follow standard submission
+>> guidelines. DTS is always independent, please read carefully the docs.
 > 
-> 	return budget;
+> The approach I'm taking will inevitably make the series non-bisectable, 
 
-However, if num_rx < budget and if napi_complete_done() is false, then
-instead of returning the num_rx the above code will return budget.
+The series are non-bisectable now!
 
-So, unless I am missing something, the previous logic seems correct to me.
-Please let me know otherwise.
+Do you understand the concept of commit and how patch is applied? How
+splitting this patchset per two changes ANYTHING in bisectability?
 
+And you keep arguing on this...
 
-Thanks and Regards,
-Parvathi.
+Best regards,
+Krzysztof
 
