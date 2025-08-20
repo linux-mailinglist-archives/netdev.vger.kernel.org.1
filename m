@@ -1,132 +1,178 @@
-Return-Path: <netdev+bounces-215151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71F2FB2D436
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 08:45:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF63BB2D438
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 08:46:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FB151C22C65
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 06:46:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AD5E622CBB
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 06:46:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84C5D2C21C3;
-	Wed, 20 Aug 2025 06:45:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8588E188906;
+	Wed, 20 Aug 2025 06:46:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="X3nLlQvF"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="kATAWw3H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A25A4253355
-	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 06:45:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 007CB256D;
+	Wed, 20 Aug 2025 06:46:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755672342; cv=none; b=C/EN/nk8tMWlz291MYLUhKswGCH6L1Sy7Pl7PWPsHSe0T/Muc+XexdfZ6YRx6qa+Honcc4tQCIPmD4ItUmz9ZZgQIrJgfu4kyBxA4OReCo9Ks7hrLJGj4fZRN9k/JNb6qjfci6YTA9T3US4E3wKDw3RqgAu6T6n8B3Ps7RVYKUY=
+	t=1755672410; cv=none; b=jXijLIwTQw+NtQL6c9qO34zMHL7aNeS0TthAS7lNTKcD1I0RPqDGIUvCDMK6ht+43vOt2h4zz01LjA5EjAZ39zeAAC51c3YgDz3gX3zzWMlkTZm4ZQdwR2a3Z2c+PkWQTsZXCAAjTg7gRSAWdC5EtlJyybra0R7zDnVplS6MXmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755672342; c=relaxed/simple;
-	bh=LTulMa5DzzgXFRwCbA8eqiueWXac+4TukenysHIxSeE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SW53Q07eOVK/z0duNGj/jrxg5ZNsANRHoM7MuB6HND3tkES//XA1+P+ofNiiqGjYSwn4m9dzmlqKTrx2pVN6bx+Kq5Y/y0++nE7moP+0uwkCZgyy3IeQ6qxjDoRhZQYgGDMAcrQR5JMFbGcHuGAVaQRR6UQGAfZGPAEfQkjuvqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=X3nLlQvF; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-32326e66dbaso4285185a91.3
-        for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 23:45:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1755672340; x=1756277140; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/GIOgGi2jTMp7v09lKAxmABqYcMeuVEyv+PG69CHHZo=;
-        b=X3nLlQvFWqrnE3n5IvhTiNch4vbSPK45EYfXjZnDM30QJ+DQcRRufeZCoy8K7qfo88
-         gTXW4JOjQxk8S6avbdqjG3m4MNn06dnRMR50/jWBqpBlvTHgk2jkjoAS3nlE9RIL+tCa
-         UMEc/VEqsrs5Uw/P66ehvBFk8y26RkzCJkpcIJKNXNOBBPfzYIFVXFtbKdGAztcEGttU
-         HrUydWykY7kIfVgVfcdAZbMNrpvFc8Qaq14k9xWlNqxrVW0TVCkLc5p/UKvScLrGg7SD
-         m05IaCgz42QrVN9TxbOhMsI8Ka3eLAUHUP214QBX2fxasz6EtnyMPjKYhvENknFwMeXb
-         1tkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755672340; x=1756277140;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/GIOgGi2jTMp7v09lKAxmABqYcMeuVEyv+PG69CHHZo=;
-        b=B8LzMswcGpv+imtbNRSX7h034OUbUZOX7aoEgM5yTSkDHNNVKXxv92C16NHirqRRUz
-         HJXnmk7qG0ATueBkBtm7SZzSeq0bGwfAw2SlWr9CFzjz0wnuwpSO2TEatajgj4GuQRuq
-         tEgJRQlG0TCgycGKvQUrrSJCTrB4j+ZPftZoiXwgbZ9F1RIJBhn7YcQJcJcvYLA0z723
-         +zjX7HppmwNcQv+qRq+/xyJQ4PXUkiqhw/936BVw9eqOoY5uY3twaTho1E7+RlVnxvUo
-         ck8EzYII1dltKfZIvIp8mtyHDp2jvBgYKSDONpvYej8OdXV7NV1frF+OtNFwBGq2IWg8
-         g8aw==
-X-Forwarded-Encrypted: i=1; AJvYcCUWVHyqSj6xn1ROW1GzGcyvrpevmAtxSAQeBexdyNym7exeaO0eIJPI+yVXnTshy/QcgOc6lZk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhTmwEUiNMskOi+GhFBmKTZ+OmZ2fWTqcRg8Ajo/aIp0vY+Jod
-	j/611oufMZgINgetke6BzHOE6zhHH9DqwdLOQZV2r7JbLY8AVdjbvDZz1cSGW5qtmLMke+p8wlt
-	QvYOJ14K4IPvvhbt0YuaSSjex1rpZXv2p+Gd7ejp8
-X-Gm-Gg: ASbGnctRq0/5yCCFyLkjLUdYBUKooSQXyBcMxmlr4/kqkdOctcrE00F49f8NN1lj4zf
-	EOlsnkD7W9sdbpAi2Z4NI9bs9wDHBmHV70ka7wJ5ENxofBIE9P1dyMArd+ObMbYz/2fdogbLLxx
-	eYuXJMKVeo0GbSWIBCb48twsPtO0DAoC8MZPqRkJyJHQWM8KH71HasDbdBkGh875Y0ozE3WGerS
-	/M9/x/0gQEEbnKM
-X-Google-Smtp-Source: AGHT+IEDERn0WICGs2a8Kah+93iHICYYCy1ydZIzCJ9Yr3/+Mq9XL1oBmswjXnt5iJUMbq0tBuuTmgt9TYnYSV9cy6k=
-X-Received: by 2002:a17:90a:e70c:b0:312:e731:5a6b with SMTP id
- 98e67ed59e1d1-324e147375bmr2009084a91.32.1755672339752; Tue, 19 Aug 2025
- 23:45:39 -0700 (PDT)
+	s=arc-20240116; t=1755672410; c=relaxed/simple;
+	bh=ldNndaQoO/UHByOrYRw96gyaFlCZhoYjJ+xlgbyY9tk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AIXcmL0toSbtSZ7DNPGGVmjMioIRxEunBl/JszfA8WpHm9vHTPDDxzfP1S9SF2JBByvnzV3rJNZ1jkQ7Bo1g88t+yaujTo1IGcVf04YjBa06bQmqF8yF9sB9OxpBy4aOtgp1ZFFi/9S1WPIGl4rXf5Vs73A4xtNb4hOReOikrok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=kATAWw3H; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57K1oBoM012409;
+	Tue, 19 Aug 2025 23:46:39 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=mgvPjbKHPHmqG3f6LOUqpIF
+	jvu1YeBJXr3u8s7i319M=; b=kATAWw3HyB+bJ5cs3f+c0VPwJ1SMHcZWsfInWVp
+	Z6+PxT/hwA7cwyKD4rtBMD4+g3p86fAEqG43BVWG9N7aO/fDhzJ2J5cBBLQhGwUJ
+	PIAfAGTeL+d1+bcunAMti1KVMuAC7YWlrA7/Eo9cZ83U0Gqt4JVKGwRXAsupSIk9
+	bsQPRvu2+rQkGV6US7S5lcJ6KVscUftWSnotJ4HDCx3eFFCqaHSpLgNKe8V2Kguf
+	WvHvVRYoDF410Bl11HEDvSND4QrINrW6+5J7OYvTYFrV9YcQt36WmIqIWyyZS+m8
+	Ao5dK8EfnOwsWB7hyBGzrqepUiT1cBc2wX67Izsdc/ArZKg==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 48n51urgbk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Aug 2025 23:46:39 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Tue, 19 Aug 2025 23:46:43 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Tue, 19 Aug 2025 23:46:42 -0700
+Received: from test-OptiPlex-Tower-Plus-7010.marvell.com (unknown [10.29.37.157])
+	by maili.marvell.com (Postfix) with ESMTP id 1DE183F70B5;
+	Tue, 19 Aug 2025 23:46:33 -0700 (PDT)
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Hariprasad Kelam <hkelam@marvell.com>,
+        Sunil Goutham
+	<sgoutham@marvell.com>,
+        Linu Cherian <lcherian@marvell.com>,
+        Geetha sowjanya
+	<gakula@marvell.com>,
+        Jerin Jacob <jerinj@marvell.com>,
+        Subbaraya Sundeep
+	<sbhatta@marvell.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>
+Subject: [net-next Patch] Octeontx2-af: Broadcast XON on all channels
+Date: Wed, 20 Aug 2025 12:16:25 +0530
+Message-ID: <20250820064625.1464361-1-hkelam@marvell.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250819033601.579821-1-will@willsroot.io> <871pp7k82y.fsf@toke.dk>
-In-Reply-To: <871pp7k82y.fsf@toke.dk>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 20 Aug 2025 02:45:28 -0400
-X-Gm-Features: Ac12FXxVXwHmUJSemVja_qARLGER9n0WQ12wwfJspc-KE09huXzM7bzq_H15PCA
-Message-ID: <CAM0EoMk60U8VV_dqiuXsE+AWQHAoiFKSc4FfBgVSJs1sWp+B5w@mail.gmail.com>
-Subject: Re: [PATCH net v2 1/2] net/sched: Make cake_enqueue return
- NET_XMIT_CN when past buffer_limit
-To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@toke.dk>
-Cc: William Liu <will@willsroot.io>, netdev@vger.kernel.org, dave.taht@gmail.com, 
-	xiyou.wangcong@gmail.com, pabeni@redhat.com, kuba@kernel.org, 
-	savy@syst3mfailure.io, jiri@resnulli.us, davem@davemloft.net, 
-	edumazet@google.com, horms@kernel.org, cake@lists.bufferbloat.net
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: aIF4cOFPENb5x4stqJ4qKuTj_Bu-EPtX
+X-Proofpoint-GUID: aIF4cOFPENb5x4stqJ4qKuTj_Bu-EPtX
+X-Authority-Analysis: v=2.4 cv=I9E8hNgg c=1 sm=1 tr=0 ts=68a56f4f cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=2OwXVqhp2XgA:10 a=M5GUcnROAAAA:8 a=Zm5e-TsFn6k_I1Zn3SQA:9 a=OBjm3rFKGHvpk9ecZwUJ:22 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODIwMDA1NyBTYWx0ZWRfX5xFSkjaHru68 v9UdCAn5UB2zn66qoUbsImFwYVB2SrsQXPfwWudzQsdznhOL7hFuBBEAikjsYNQRpdOVqRWj+XO 8QZZ9Etffv5+Fax3QCl0eS/0GVCEIcgOuiXn7/VIgEW9hdYeNiHUKv9qifvu/XP5zVp03q0R+AI
+ 8D4Gy4yH73wmBCf7GQL8odJyqwa2K8gqcZoXlibzbpeUqEX6EZCRK3fphvm00yU86QmgTaDQIWI UWE0w1gtXHO6Rguqtc2GA24aifLnCMI9z/FhO5oAs9nj188vEGTC+rquudzjlP98Br7AonSm2Mf C9B2qrUgxQ7fR/9zi885f4uosHHSHPa8r9+4grTtpDU7+ekCFBfRynxoHQ0cwL2v+9XoCvikS4o
+ Um6GLql0EjKGqVGBQe2YNiVqDvZykq34Sn68+TpXpG+3l+46KZiNq2lqtYnootPrmAY84WJR
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-20_03,2025-08-14_01,2025-03-28_01
 
-On Tue, Aug 19, 2025 at 4:51=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen <t=
-oke@toke.dk> wrote:
->
-> William Liu <will@willsroot.io> writes:
->
-> > The following setup can trigger a WARNING in htb_activate due to
-> > the condition: !cl->leaf.q->q.qlen
-> >
-> > tc qdisc del dev lo root
-> > tc qdisc add dev lo root handle 1: htb default 1
-> > tc class add dev lo parent 1: classid 1:1 \
-> >        htb rate 64bit
-> > tc qdisc add dev lo parent 1:1 handle f: \
-> >        cake memlimit 1b
-> > ping -I lo -f -c1 -s64 -W0.001 127.0.0.1
-> >
-> > This is because the low memlimit leads to a low buffer_limit, which
-> > causes packet dropping. However, cake_enqueue still returns
-> > NET_XMIT_SUCCESS, causing htb_enqueue to call htb_activate with an
-> > empty child qdisc. We should return NET_XMIT_CN when packets are
-> > dropped from the same tin and flow.
-> >
-> > I do not believe return value of NET_XMIT_CN is necessary for packet
-> > drops in the case of ack filtering, as that is meant to optimize
-> > performance, not to signal congestion.
-> >
-> > Fixes: 046f6fd5daef ("sched: Add Common Applications Kept Enhanced (cak=
-e) qdisc")
-> > Signed-off-by: William Liu <will@willsroot.io>
-> > Reviewed-by: Savino Dicanosa <savy@syst3mfailure.io>
->
-> Acked-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@toke.dk>
+The NIX block receives traffic from multiple channels, including:
 
-Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+MAC block (RPM)
+Loopback module (LBK)
+CPT block
 
-cheers,
-jamal
->
+                     RPM
+                      |
+                -----------------
+       LBK   --|     NIX         |
+                -----------------
+                     |
+                    CPT
+
+Due to a hardware errata,  CN10k and earlier Octeon silicon series,
+the hardware may incorrectly assert XOFF on certain channels during
+reset. As a workaround, a write operation to the NIX_AF_RX_CHANX_CFG
+register can be performed to broadcast XON signals on the affected
+channels
+
+Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.c  |  3 +++
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.h  |  1 +
+ .../net/ethernet/marvell/octeontx2/af/rvu_nix.c  | 16 ++++++++++++++++
+ 3 files changed, 20 insertions(+)
+
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+index c6bb3aaa8e0d..2d78e08f985f 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+@@ -1164,6 +1164,9 @@ static int rvu_setup_hw_resources(struct rvu *rvu)
+ 	rvu_program_channels(rvu);
+ 	cgx_start_linkup(rvu);
+ 
++	rvu_block_bcast_xon(rvu, BLKADDR_NIX0);
++	rvu_block_bcast_xon(rvu, BLKADDR_NIX1);
++
+ 	err = rvu_mcs_init(rvu);
+ 	if (err) {
+ 		dev_err(rvu->dev, "%s: Failed to initialize mcs\n", __func__);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+index 7ee1fdeb5295..1692033b46b0 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+@@ -1017,6 +1017,7 @@ int rvu_nix_mcast_update_mcam_entry(struct rvu *rvu, u16 pcifunc,
+ void rvu_nix_flr_free_bpids(struct rvu *rvu, u16 pcifunc);
+ int rvu_alloc_cint_qint_mem(struct rvu *rvu, struct rvu_pfvf *pfvf,
+ 			    int blkaddr, int nixlf);
++void rvu_block_bcast_xon(struct rvu *rvu, int blkaddr);
+ /* NPC APIs */
+ void rvu_npc_freemem(struct rvu *rvu);
+ int rvu_npc_get_pkind(struct rvu *rvu, u16 pf);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+index 60db1f616cc8..828316211b24 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+@@ -6616,3 +6616,19 @@ int rvu_mbox_handler_nix_mcast_grp_update(struct rvu *rvu,
+ 
+ 	return ret;
+ }
++
++/* On CN10k and older series of silicons, hardware may incorrectly
++ * assert XOFF on certain channels. Issue a write on NIX_AF_RX_CHANX_CFG
++ * to broadcacst XON on the same.
++ */
++void rvu_block_bcast_xon(struct rvu *rvu, int blkaddr)
++{
++	struct rvu_block *block = &rvu->hw->block[blkaddr];
++	u64 cfg;
++
++	if (!block->implemented || is_cn20k(rvu->pdev))
++		return;
++
++	cfg = rvu_read64(rvu, blkaddr, NIX_AF_RX_CHANX_CFG(0));
++	rvu_write64(rvu, blkaddr, NIX_AF_RX_CHANX_CFG(0), cfg);
++}
+-- 
+2.34.1
+
 
