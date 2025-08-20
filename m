@@ -1,150 +1,81 @@
-Return-Path: <netdev+bounces-215288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45BC0B2DE9D
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 16:03:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51C80B2DEBF
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 16:11:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5D7516629C
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 14:00:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D96FD1C829D7
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 14:06:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2A51226CF9;
-	Wed, 20 Aug 2025 14:00:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hxp9UyiO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F378525EF97;
+	Wed, 20 Aug 2025 14:04:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA49D19C558
-	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 14:00:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE9221C174;
+	Wed, 20 Aug 2025 14:04:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755698410; cv=none; b=hOePdvWDg2Vxl0iNDqcJDXx/PoyT/Gad/BsHcPIUvfTLGVl/urLcpSHKXeiyAC3BaGKzwOpvruRbOA7c1eB8yUEHKiBQRaD5mCiITzam3IqYVCe1P0gZp6m+c4ROZLPcVr5iGxAT1BB1WGExC6Dioh39ZBSF+UBXMLI8mG7/2qo=
+	t=1755698691; cv=none; b=JszeB6pJVgZrdJWqC6g8kn0g/5gV/NQkUcI/wVlCW2oncRRYcoy+705hHbHR6MC4GenDAk9U0BV9CGj3cyEq+eEQkOlPJKFflLl5T0QvVwKnVzR2t6satl/oW2q9lATWJgtAFsQpFGdLOEJgW1/bsLUvAmCedM6n4A5+KETFFKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755698410; c=relaxed/simple;
-	bh=WTD3/ArXFBvcXWRDIaLDjP6fA0+AfFc2iGlvvPf8jQA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kZbFxoXxb017HBo0MdN4wN36lIGqdcVRccWNSSPQtDt/1Xxtwr0ecns14H9pl5GbPDwEYYrLSa/bpvKD3EdmpUon3hqycsosVdsAqQV2DE41F/sc8loRqF3hJfbF7WsJiSr5Aik7qAX6Ekp/I71iz53YUWlVXs4xlr6iiMDEzQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hxp9UyiO; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-55cdfd57585so6655e87.1
-        for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 07:00:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755698407; x=1756303207; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WTD3/ArXFBvcXWRDIaLDjP6fA0+AfFc2iGlvvPf8jQA=;
-        b=hxp9UyiORUwzO3jg5zMSmwkvUk2XC+RuwZQZY6RH3kOfP74k9piTU2SDfy5SMonw54
-         xi0Sg9lyFGWv8ZXHz0LTVgCEJBfT9QsovoCdxUuuKml15ApGEYqpjnnwW+teki3OPWEQ
-         SaiqegaHkCMRDL3TgQHr6SNakXvPJ+iH5942/I6ADMhC60x62d7znnu8JCloA2vByYoF
-         uT0oCy2j3uNjZPCZ0T/+nQE604Z9amPZ6GBpmx2Slz7fPVdv//48uRQaT0m0FS10AwIC
-         54BwnofxXJzqc1fkjDi2hiZgGNCxdEjKfum9BqNWqwi+/G732MNHrUjDYCh0CVFzqzA7
-         u4+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755698407; x=1756303207;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WTD3/ArXFBvcXWRDIaLDjP6fA0+AfFc2iGlvvPf8jQA=;
-        b=E0wDL/iKh8yHxneN+2sBlzwi7D9lsiSawklPfbNndKoV/deJX480otdNIQ78OMWCDc
-         1WioSptZlEqcSjQkNxxwCsqSHI6oXaOiAZA8KD44blBidiw5WaJmEP3jR00korUrAj9z
-         e0owXvTxUt9IBsUZSmQuifo/GZhIgtczWSMXD1qE9rSIYKz2Y1JjjxxiWAtvm0G29uYN
-         OPEbjvvp2thM9wIUx4Vz8fvrMIvKjiRjFdJReToz/1S3c8fLCxv7F9NO7EMO0cRMy1Zf
-         PKLcvrEw89U9RoKYvbRp+5omynk+otuqWiCDkKW4FYyyo+zQgXELIpnrqtcaOW4rrMIe
-         vOBw==
-X-Forwarded-Encrypted: i=1; AJvYcCVv/QiACsrzH2lo6i3h2zpD/qsZU1hCnD+ux9svFCAa9QTMKsDB/0liDz9Qi88SKGjdoPppmQk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyqU2Exj4LAe/c5xQ/5PE9se1DU1l3qOsfsKg4quZHxNs4UmVzz
-	IkbEOS0NfPPozG4hxaG+VXlPB0Z/7j4Wq3DKFlRsatfw8HxsGOBXZQCfu5Tpqbq+/rZAp06xmmU
-	OzpXinSV1LjcLtB7/KQkAdv4ag8YGzH20ZeNuHLmn
-X-Gm-Gg: ASbGncu7kcV79DeaarhMPqG+3kvKlqjgdMGQHAbovePejZrq8rYGiuhhgLRD9YZvWEm
-	GudgqabOtKDJ7xAdBEyP8ilAAVMKbw0OC7qH5oHZQR+AqvR69P4tfoqYjrgkVeroQtxhXdrs/ub
-	ZIdyqzrVjxyGJXyeEwaN1YQHIRkMtz99dcLsDfH9pojGzSY7l7
-X-Google-Smtp-Source: AGHT+IGlXQFrW/JI848HnlpaOFMG5uQo1vUXrwNovg/X/oPwBt3lyo06OZeyIWxfa7ULckeb9isVS2e26W/w+7wcCKk=
-X-Received: by 2002:a05:6512:4388:b0:55c:df56:f936 with SMTP id
- 2adb3069b0e04-55e06818947mr351070e87.6.1755698404574; Wed, 20 Aug 2025
- 07:00:04 -0700 (PDT)
+	s=arc-20240116; t=1755698691; c=relaxed/simple;
+	bh=SPJ+BBwAbAmnGlLEH9Y5m02OS4ByPeGPck4jVufiez8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Oinev7hbcabUPwYh6B4bPpk0WV1ciWA8n1Xw/EHh4FQYjQRmpcxGLC99c8K8ETzAa8F6U0A32ONpe21NX+0anwxm3M1Fj02fEZTtwl1VqxowEpCcxoxgsVz4+rq+XOXTf7JI5fMPhPzl0T62fP8c8TxDBpTBn96Ic6D4x9FG7P8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id A641D602F8; Wed, 20 Aug 2025 16:04:47 +0200 (CEST)
+Date: Wed, 20 Aug 2025 16:04:47 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, netfilter-devel@vger.kernel.org
+Subject: Re: [PATCH net] netfilter: nf_reject: don't leak dst refcount for
+ loopback packets
+Message-ID: <aKXV_3J4iDkhQ06R@strlen.de>
+References: <20250820123707.10671-1-fw@strlen.de>
+ <aKXKpE35H7KBzdBa@calendula>
+ <aKXLsoLkSdnEU_at@calendula>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1755499375.git.asml.silence@gmail.com> <20250819193126.2a4af62b@kernel.org>
- <fb85866c-3890-41d2-9d5c-27549c4b7aa3@gmail.com>
-In-Reply-To: <fb85866c-3890-41d2-9d5c-27549c4b7aa3@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 20 Aug 2025 06:59:51 -0700
-X-Gm-Features: Ac12FXyn3WeKsZNiJ_eN0Aeg_Ps8KKgTYMmuYPbod81uJ5k4iGCaZzxEQKmNVk8
-Message-ID: <CAHS8izP2odYCfEfB_JMdT26nUzniXRdp5MaZgqozYd7wV9Z-gg@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 00/23][pull request] Queue configs and large
- buffer providers
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, andrew+netdev@lunn.ch, horms@kernel.org, 
-	davem@davemloft.net, sdf@fomichev.me, dw@davidwei.uk, 
-	michael.chan@broadcom.com, dtatulea@nvidia.com, ap420073@gmail.com, 
-	linux-kernel@vger.kernel.org, io-uring@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aKXLsoLkSdnEU_at@calendula>
 
-On Wed, Aug 20, 2025 at 6:38=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.=
-com> wrote:
->
-> On 8/20/25 03:31, Jakub Kicinski wrote:
-> > On Mon, 18 Aug 2025 14:57:16 +0100 Pavel Begunkov wrote:
-> >> Jakub Kicinski (20):
-> >
-> > I think we need to revisit how we operate.
-> > When we started the ZC work w/ io-uring I suggested a permanent shared
-> > branch. That's perhaps an overkill. What I did not expect is that you
-> > will not even CC netdev@ on changes to io_uring/zcrx.*
-> >
-> > I don't mean to assert any sort of ownership of that code, but you're
-> > not meeting basic collaboration standards for the kernel. This needs
-> > to change first.
->
-> You're throwing quite allegations. Basic collaboration standards don't
-> include spamming people with unrelated changes via an already busy list.
-> I cc'ed netdev on patches that meaningfully change how it interacts
-> (incl indirectly) with netdev and/or might be of interest, which is
-> beyond of the usual standard expected of a project using infrastructure
-> provided by a subsystem. There are pieces that don't touch netdev, like
-> how io_uring pins pages, accounts memory, sets up rings, etc. In the
-> very same way generic io_uring patches are not normally posted to
-> netdev, and netdev patches are not redirected to mm because there
-> are kmalloc calls, even though, it's not even the standard used here.
->
-> If you have some way you want to work, I'd appreciate a clear
-> indication of that, because that message you mentioned was answered
-> and I've never heard any objection, or anything else really.
->
+Pablo Neira Ayuso <pablo@netfilter.org> wrote:
+> > > Instead of checking hook just check if the skb already has a route
+> > > attached to it.
+> > 
+> > Quick question: does inconditional route lookup work for br_netfilter?
+> 
+> Never mind, it should be fine, the fake dst get attached to the skb.
 
-We could use tags in the MAINTAINERS file similar to these:
+Good point, this changes behaviour for br_netfilter case, we no
+longer call nf_reject_fill_skb_dst() then due to the fake dst.
 
-F: include/linux/*fence.h
-F: include/linux/dma-buf.h
-F: include/linux/dma-resv.h
-K: \bdma_(?:buf|fence|resv)\b
+I don't think br_netfilter is supposed to do anything (iptables
+-j REJECT doesn't work in PRE_ROUTING), and we should not encourage
+use of br_netfilter with nftables.
 
-We could make sure anything touching io_uring/zcrx. and anything using
-netmem_ref/net_iov goes to netdev. I think roughly adding something
-like this to general networking entry?
+What about adding a followup patch, targetting nf, that adds:
 
-F: io_uring/zcrx.*
-K: \bnet(mem_ref|_iov)\b
+if (hook == NF_INET_PRE_ROUTING && nf_bridge_info_exists(oldskb))
+	return;
 
-I had suggested this before but never had time to suggest the actual
-changes, and in the back of my mind was a bit weary of spamming the
-maintainers, but it seems this is not as much a concern as the patches
-not getting to netdev.
+?
 
---=20
-Thanks,
-Mina
+After all, there is no guarantee that we have the needed routing
+info on a bridge in the first place.
 
