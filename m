@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-215200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7552FB2D895
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 11:39:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18017B2D8AB
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 11:41:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3AB63AB69F
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 09:33:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5FC91C816F0
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 09:34:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 860C52DEA79;
-	Wed, 20 Aug 2025 09:32:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DA9C2E03FB;
+	Wed, 20 Aug 2025 09:32:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D09E2DE6F2;
-	Wed, 20 Aug 2025 09:32:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80E092DEA76;
+	Wed, 20 Aug 2025 09:32:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755682337; cv=none; b=F83Xqf+rqMIDZgJpc6lqTZdrsD5tWQ3ewtWKm/OuWV5nGwLhNgbMYi/gsk452LrkV1VyjMT7m1NaCd48dY94S9UIP/F2sAbsqxULcCZ8EX2f+PBWkXp8F33YHW9zSbJ87+yHqHzthTM2ufqSSm5kSnzY9X2LQI+MWc5afjKY2fk=
+	t=1755682340; cv=none; b=S0NBs5ISCM6+lPu6/8COgNgAIz72l40b1nawj1v2ZexB5SHQJNbmHwds5TX5hH2107ZhS2aGE0aCINFFTs6oqwfpJuzoajlbMGWmK1oc/zfcCq9vH/4vN+yB5FmHNvIQFBpyGCkk7tdIlpxQjE4FJuSWDwG5jX2uPigjUaO5SoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755682337; c=relaxed/simple;
-	bh=BRdyHpOg12Na5pCEvdBSmOWwrjxyLXfUWtiZuoH6MHE=;
+	s=arc-20240116; t=1755682340; c=relaxed/simple;
+	bh=BTHXNj2yjWnwxy2ybp4HEPQXbODXyzSQikFU1+9xU8Y=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QYdKGpvbJ3KLzdTDkE7m9yo1pyVMIE6jIo2yh4rZdLHdsPpLZI7oCNyKTC7OphNNn+QFRVws2nuTBdI1i2l0yWv7cbowL5ZsX8/UezSVeNFyePxE3Ut/STcR3kukeCnpjRDHswDu1yONINgY74jwYua7MAuKKUvNwFGQrBFhpi8=
+	 MIME-Version:Content-Type; b=IOk7YoR7/Icr19+dnvsNLB7pA/PKreCvbLJxB+x1lRRaveERiMPQqynRZolGeZD5O7Y2kAcekyXGoFzAPgpipNqNgjSG+yTdBFsXAreOdNS3GReS6Q38pWE6WDwHY+TW8hxB23n9zt8bWZ+iWscXRapnAUD7OsvNFpqIxcjP43c=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4c6Ljg6Yc3z13MT3;
-	Wed, 20 Aug 2025 17:28:39 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4c6Lnl51Hpz14MZB;
+	Wed, 20 Aug 2025 17:32:11 +0800 (CST)
 Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2C41314011A;
-	Wed, 20 Aug 2025 17:32:13 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 77B5A180080;
+	Wed, 20 Aug 2025 17:32:15 +0800 (CST)
 Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.189.55) by
  kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 20 Aug 2025 17:32:11 +0800
+ 15.2.1544.11; Wed, 20 Aug 2025 17:32:13 +0800
 From: Fan Gong <gongfan1@huawei.com>
 To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
@@ -55,9 +55,9 @@ CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
 	<vadim.fedorenko@linux.dev>, Suman Ghosh <sumang@marvell.com>, Przemek
  Kitszel <przemyslaw.kitszel@intel.com>, Joe Damato <jdamato@fastly.com>,
 	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: [PATCH net-next v14 5/8] hinic3: TX & RX Queue coalesce interfaces
-Date: Wed, 20 Aug 2025 17:31:22 +0800
-Message-ID: <20bdb94d91e5dcbb3257b7486830ea4109922169.1755673097.git.zhuyikai1@h-partners.com>
+Subject: [PATCH net-next v14 6/8] hinic3: Mailbox framework
+Date: Wed, 20 Aug 2025 17:31:23 +0800
+Message-ID: <084f22f0155aaa713fa583205d540cb2bf3c3c2d.1755673097.git.zhuyikai1@h-partners.com>
 X-Mailer: git-send-email 2.51.0.windows.1
 In-Reply-To: <cover.1755673097.git.zhuyikai1@h-partners.com>
 References: <cover.1755673097.git.zhuyikai1@h-partners.com>
@@ -72,141 +72,618 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
  kwepemf100013.china.huawei.com (7.202.181.12)
 
-Add TX RX queue coalesce interfaces initialization.
-It configures the parameters of tx & tx msix coalesce.
+Add mailbox framework initialization.
+It allows driver to send commands to HW.
 
 Co-developed-by: Xin Guo <guoxin09@huawei.com>
 Signed-off-by: Xin Guo <guoxin09@huawei.com>
 Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
 Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
 Signed-off-by: Fan Gong <gongfan1@huawei.com>
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 ---
- .../net/ethernet/huawei/hinic3/hinic3_main.c  | 61 +++++++++++++++++--
- .../ethernet/huawei/hinic3/hinic3_nic_dev.h   | 10 +++
- 2 files changed, 66 insertions(+), 5 deletions(-)
+ .../ethernet/huawei/hinic3/hinic3_common.c    |  14 +
+ .../ethernet/huawei/hinic3/hinic3_common.h    |   9 +
+ .../net/ethernet/huawei/hinic3/hinic3_mbox.c  | 409 ++++++++++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_mbox.h  | 103 +++++
+ 4 files changed, 535 insertions(+)
 
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_main.c b/drivers/net/ethernet/huawei/hinic3/hinic3_main.c
-index 497f2a36f35d..a0b04fb07c76 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_main.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_main.c
-@@ -17,12 +17,53 @@
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_common.c b/drivers/net/ethernet/huawei/hinic3/hinic3_common.c
+index b8d29e26e2da..fe4778d152cf 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_common.c
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_common.c
+@@ -3,6 +3,7 @@
  
- #define HINIC3_NIC_DRV_DESC  "Intelligent Network Interface Card Driver"
+ #include <linux/delay.h>
+ #include <linux/dma-mapping.h>
++#include <linux/iopoll.h>
  
--#define HINIC3_RX_BUF_LEN            2048
--#define HINIC3_LRO_REPLENISH_THLD    256
--#define HINIC3_NIC_DEV_WQ_NAME       "hinic3_nic_dev_wq"
-+#define HINIC3_RX_BUF_LEN          2048
-+#define HINIC3_LRO_REPLENISH_THLD  256
-+#define HINIC3_NIC_DEV_WQ_NAME     "hinic3_nic_dev_wq"
+ #include "hinic3_common.h"
  
--#define HINIC3_SQ_DEPTH              1024
--#define HINIC3_RQ_DEPTH              1024
-+#define HINIC3_SQ_DEPTH            1024
-+#define HINIC3_RQ_DEPTH            1024
-+
-+#define HINIC3_DEFAULT_TXRX_MSIX_PENDING_LIMIT      2
-+#define HINIC3_DEFAULT_TXRX_MSIX_COALESC_TIMER_CFG  25
-+#define HINIC3_DEFAULT_TXRX_MSIX_RESEND_TIMER_CFG   7
-+
-+static void init_intr_coal_param(struct net_device *netdev)
+@@ -52,6 +53,19 @@ void hinic3_dma_free_coherent_align(struct device *dev,
+ 			  mem_align->ori_vaddr, mem_align->ori_paddr);
+ }
+ 
++int hinic3_wait_for_timeout(void *priv_data, wait_cpl_handler handler,
++			    u32 wait_total_ms, u32 wait_once_us)
 +{
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	struct hinic3_intr_coal_info *info;
-+	u16 i;
++	enum hinic3_wait_return ret;
++	int err;
 +
-+	for (i = 0; i < nic_dev->max_qps; i++) {
-+		info = &nic_dev->intr_coalesce[i];
-+		info->pending_limit = HINIC3_DEFAULT_TXRX_MSIX_PENDING_LIMIT;
-+		info->coalesce_timer_cfg = HINIC3_DEFAULT_TXRX_MSIX_COALESC_TIMER_CFG;
-+		info->resend_timer_cfg = HINIC3_DEFAULT_TXRX_MSIX_RESEND_TIMER_CFG;
-+	}
++	err = read_poll_timeout(handler, ret, ret == HINIC3_WAIT_PROCESS_CPL,
++				wait_once_us, wait_total_ms * USEC_PER_MSEC,
++				false, priv_data);
++
++	return err;
 +}
 +
-+static int hinic3_init_intr_coalesce(struct net_device *netdev)
+ /* Data provided to/by cmdq is arranged in structs with little endian fields but
+  * every dword (32bits) should be swapped since HW swaps it again when it
+  * copies it from/to host memory.
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_common.h b/drivers/net/ethernet/huawei/hinic3/hinic3_common.h
+index dfa5bd882379..a8fabfae90fb 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_common.h
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_common.h
+@@ -18,6 +18,11 @@ struct hinic3_dma_addr_align {
+ 	dma_addr_t align_paddr;
+ };
+ 
++enum hinic3_wait_return {
++	HINIC3_WAIT_PROCESS_CPL     = 0,
++	HINIC3_WAIT_PROCESS_WAITING = 1,
++};
++
+ struct hinic3_sge {
+ 	__le32 hi_addr;
+ 	__le32 lo_addr;
+@@ -40,6 +45,10 @@ int hinic3_dma_zalloc_coherent_align(struct device *dev, u32 size, u32 align,
+ void hinic3_dma_free_coherent_align(struct device *dev,
+ 				    struct hinic3_dma_addr_align *mem_align);
+ 
++typedef enum hinic3_wait_return (*wait_cpl_handler)(void *priv_data);
++int hinic3_wait_for_timeout(void *priv_data, wait_cpl_handler handler,
++			    u32 wait_total_ms, u32 wait_once_us);
++
+ void hinic3_cmdq_buf_swab32(void *data, int len);
+ 
+ #endif
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.c b/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.c
+index e74d1eb09730..eaa8b8cda7fa 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.c
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.c
+@@ -4,10 +4,419 @@
+ #include <linux/dma-mapping.h>
+ 
+ #include "hinic3_common.h"
++#include "hinic3_csr.h"
+ #include "hinic3_hwdev.h"
+ #include "hinic3_hwif.h"
+ #include "hinic3_mbox.h"
+ 
++#define MBOX_MSG_POLLING_TIMEOUT_MS  8000 // send msg seg timeout
++#define MBOX_COMP_POLLING_TIMEOUT_MS 40000 // response
++
++#define MBOX_MAX_BUF_SZ           2048
++#define MBOX_HEADER_SZ            8
++
++/* MBOX size is 64B, 8B for mbox_header, 8B reserved */
++#define MBOX_SEG_LEN              48
++#define MBOX_SEG_LEN_ALIGN        4
++#define MBOX_WB_STATUS_LEN        16
++
++#define MBOX_SEQ_ID_START_VAL     0
++#define MBOX_SEQ_ID_MAX_VAL       42
++#define MBOX_LAST_SEG_MAX_LEN  \
++	(MBOX_MAX_BUF_SZ - MBOX_SEQ_ID_MAX_VAL * MBOX_SEG_LEN)
++
++#define MBOX_DMA_MSG_QUEUE_DEPTH    32
++#define MBOX_AREA(hwif)  \
++	((hwif)->cfg_regs_base + HINIC3_FUNC_CSR_MAILBOX_DATA_OFF)
++
++#define MBOX_MQ_CI_OFFSET  \
++	(HINIC3_CFG_REGS_FLAG + HINIC3_FUNC_CSR_MAILBOX_DATA_OFF + \
++	 MBOX_HEADER_SZ + MBOX_SEG_LEN)
++
++#define MBOX_MQ_SYNC_CI_MASK   GENMASK(7, 0)
++#define MBOX_MQ_ASYNC_CI_MASK  GENMASK(15, 8)
++#define MBOX_MQ_CI_GET(val, field)  \
++	FIELD_GET(MBOX_MQ_##field##_CI_MASK, val)
++
++#define MBOX_MGMT_FUNC_ID         0x1FFF
++#define MBOX_COMM_F_MBOX_SEGMENT  BIT(3)
++
++static u8 *get_mobx_body_from_hdr(u8 *header)
 +{
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
++	return header + MBOX_HEADER_SZ;
++}
 +
-+	nic_dev->intr_coalesce = kcalloc(nic_dev->max_qps,
-+					 sizeof(*nic_dev->intr_coalesce),
-+					 GFP_KERNEL);
++static struct hinic3_msg_desc *get_mbox_msg_desc(struct hinic3_mbox *mbox,
++						 enum mbox_msg_direction_type dir,
++						 u16 src_func_id)
++{
++	struct hinic3_msg_channel *msg_ch;
 +
-+	if (!nic_dev->intr_coalesce)
++	msg_ch = (src_func_id == MBOX_MGMT_FUNC_ID) ?
++		&mbox->mgmt_msg : mbox->func_msg;
++
++	return (dir == MBOX_MSG_SEND) ?
++		&msg_ch->recv_msg : &msg_ch->resp_msg;
++}
++
++static void resp_mbox_handler(struct hinic3_mbox *mbox,
++			      const struct hinic3_msg_desc *msg_desc)
++{
++	spin_lock(&mbox->mbox_lock);
++	if (msg_desc->msg_info.msg_id == mbox->send_msg_id &&
++	    mbox->event_flag == MBOX_EVENT_START)
++		mbox->event_flag = MBOX_EVENT_SUCCESS;
++	spin_unlock(&mbox->mbox_lock);
++}
++
++static bool mbox_segment_valid(struct hinic3_mbox *mbox,
++			       struct hinic3_msg_desc *msg_desc,
++			       __le64 mbox_header)
++{
++	u8 seq_id, seg_len, msg_id, mod;
++	__le16 src_func_idx, cmd;
++
++	seq_id = MBOX_MSG_HEADER_GET(mbox_header, SEQID);
++	seg_len = MBOX_MSG_HEADER_GET(mbox_header, SEG_LEN);
++	msg_id = MBOX_MSG_HEADER_GET(mbox_header, MSG_ID);
++	mod = MBOX_MSG_HEADER_GET(mbox_header, MODULE);
++	cmd = cpu_to_le16(MBOX_MSG_HEADER_GET(mbox_header, CMD));
++	src_func_idx = cpu_to_le16(MBOX_MSG_HEADER_GET(mbox_header,
++						       SRC_GLB_FUNC_IDX));
++
++	if (seq_id > MBOX_SEQ_ID_MAX_VAL || seg_len > MBOX_SEG_LEN ||
++	    (seq_id == MBOX_SEQ_ID_MAX_VAL && seg_len > MBOX_LAST_SEG_MAX_LEN))
++		goto err_seg;
++
++	if (seq_id == 0) {
++		msg_desc->seq_id = seq_id;
++		msg_desc->msg_info.msg_id = msg_id;
++		msg_desc->mod = mod;
++		msg_desc->cmd = cmd;
++	} else {
++		if (seq_id != msg_desc->seq_id + 1 ||
++		    msg_id != msg_desc->msg_info.msg_id ||
++		    mod != msg_desc->mod || cmd != msg_desc->cmd)
++			goto err_seg;
++
++		msg_desc->seq_id = seq_id;
++	}
++
++	return true;
++
++err_seg:
++	dev_err(mbox->hwdev->dev,
++		"Mailbox segment check failed, src func id: 0x%x, front seg info: seq id: 0x%x, msg id: 0x%x, mod: 0x%x, cmd: 0x%x\n",
++		src_func_idx, msg_desc->seq_id, msg_desc->msg_info.msg_id,
++		msg_desc->mod, msg_desc->cmd);
++	dev_err(mbox->hwdev->dev,
++		"Current seg info: seg len: 0x%x, seq id: 0x%x, msg id: 0x%x, mod: 0x%x, cmd: 0x%x\n",
++		seg_len, seq_id, msg_id, mod, cmd);
++
++	return false;
++}
++
++static void recv_mbox_handler(struct hinic3_mbox *mbox,
++			      u8 *header, struct hinic3_msg_desc *msg_desc)
++{
++	__le64 mbox_header = *((__force __le64 *)header);
++	u8 *mbox_body = get_mobx_body_from_hdr(header);
++	u8 seq_id, seg_len;
++	int pos;
++
++	if (!mbox_segment_valid(mbox, msg_desc, mbox_header)) {
++		msg_desc->seq_id = MBOX_SEQ_ID_MAX_VAL;
++		return;
++	}
++
++	seq_id = MBOX_MSG_HEADER_GET(mbox_header, SEQID);
++	seg_len = MBOX_MSG_HEADER_GET(mbox_header, SEG_LEN);
++
++	pos = seq_id * MBOX_SEG_LEN;
++	memcpy(msg_desc->msg + pos, mbox_body, seg_len);
++
++	if (!MBOX_MSG_HEADER_GET(mbox_header, LAST))
++		return;
++
++	msg_desc->msg_len = cpu_to_le16(MBOX_MSG_HEADER_GET(mbox_header,
++							    MSG_LEN));
++	msg_desc->msg_info.status = MBOX_MSG_HEADER_GET(mbox_header, STATUS);
++
++	if (MBOX_MSG_HEADER_GET(mbox_header, DIRECTION) == MBOX_MSG_RESP)
++		resp_mbox_handler(mbox, msg_desc);
++}
++
++void hinic3_mbox_func_aeqe_handler(struct hinic3_hwdev *hwdev, u8 *header,
++				   u8 size)
++{
++	__le64 mbox_header = *((__force __le64 *)header);
++	enum mbox_msg_direction_type dir;
++	struct hinic3_msg_desc *msg_desc;
++	struct hinic3_mbox *mbox;
++	u16 src_func_id;
++
++	mbox = hwdev->mbox;
++	dir = MBOX_MSG_HEADER_GET(mbox_header, DIRECTION);
++	src_func_id = MBOX_MSG_HEADER_GET(mbox_header, SRC_GLB_FUNC_IDX);
++	msg_desc = get_mbox_msg_desc(mbox, dir, src_func_id);
++	recv_mbox_handler(mbox, header, msg_desc);
++}
++
++static int init_mbox_dma_queue(struct hinic3_hwdev *hwdev,
++			       struct mbox_dma_queue *mq)
++{
++	u32 size;
++
++	mq->depth = MBOX_DMA_MSG_QUEUE_DEPTH;
++	mq->prod_idx = 0;
++	mq->cons_idx = 0;
++
++	size = mq->depth * MBOX_MAX_BUF_SZ;
++	mq->dma_buf_vaddr = dma_alloc_coherent(hwdev->dev, size,
++					       &mq->dma_buf_paddr,
++					       GFP_KERNEL);
++	if (!mq->dma_buf_vaddr)
 +		return -ENOMEM;
-+
-+	init_intr_coal_param(netdev);
 +
 +	return 0;
 +}
 +
-+static void hinic3_free_intr_coalesce(struct net_device *netdev)
++static void uninit_mbox_dma_queue(struct hinic3_hwdev *hwdev,
++				  struct mbox_dma_queue *mq)
 +{
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+
-+	kfree(nic_dev->intr_coalesce);
++	dma_free_coherent(hwdev->dev, mq->depth * MBOX_MAX_BUF_SZ,
++			  mq->dma_buf_vaddr, mq->dma_buf_paddr);
 +}
- 
- static int hinic3_alloc_txrxqs(struct net_device *netdev)
- {
-@@ -42,8 +83,17 @@ static int hinic3_alloc_txrxqs(struct net_device *netdev)
- 		goto err_free_txqs;
- 	}
- 
-+	err = hinic3_init_intr_coalesce(netdev);
++
++static int hinic3_init_mbox_dma_queue(struct hinic3_mbox *mbox)
++{
++	u32 val;
++	int err;
++
++	err = init_mbox_dma_queue(mbox->hwdev, &mbox->sync_msg_queue);
++	if (err)
++		return err;
++
++	err = init_mbox_dma_queue(mbox->hwdev, &mbox->async_msg_queue);
 +	if (err) {
-+		dev_err(hwdev->dev, "Failed to init_intr_coalesce\n");
-+		goto err_free_rxqs;
++		uninit_mbox_dma_queue(mbox->hwdev, &mbox->sync_msg_queue);
++		return err;
 +	}
 +
- 	return 0;
- 
-+err_free_rxqs:
-+	hinic3_free_rxqs(netdev);
++	val = hinic3_hwif_read_reg(mbox->hwdev->hwif, MBOX_MQ_CI_OFFSET);
++	val &= ~MBOX_MQ_SYNC_CI_MASK;
++	val &= ~MBOX_MQ_ASYNC_CI_MASK;
++	hinic3_hwif_write_reg(mbox->hwdev->hwif, MBOX_MQ_CI_OFFSET, val);
 +
- err_free_txqs:
- 	hinic3_free_txqs(netdev);
- 
-@@ -52,6 +102,7 @@ static int hinic3_alloc_txrxqs(struct net_device *netdev)
- 
- static void hinic3_free_txrxqs(struct net_device *netdev)
++	return 0;
++}
++
++static void hinic3_uninit_mbox_dma_queue(struct hinic3_mbox *mbox)
++{
++	uninit_mbox_dma_queue(mbox->hwdev, &mbox->sync_msg_queue);
++	uninit_mbox_dma_queue(mbox->hwdev, &mbox->async_msg_queue);
++}
++
++static int alloc_mbox_msg_channel(struct hinic3_msg_channel *msg_ch)
++{
++	msg_ch->resp_msg.msg = kzalloc(MBOX_MAX_BUF_SZ, GFP_KERNEL);
++	if (!msg_ch->resp_msg.msg)
++		return -ENOMEM;
++
++	msg_ch->recv_msg.msg = kzalloc(MBOX_MAX_BUF_SZ, GFP_KERNEL);
++	if (!msg_ch->recv_msg.msg) {
++		kfree(msg_ch->resp_msg.msg);
++		return -ENOMEM;
++	}
++
++	msg_ch->resp_msg.seq_id = MBOX_SEQ_ID_MAX_VAL;
++	msg_ch->recv_msg.seq_id = MBOX_SEQ_ID_MAX_VAL;
++
++	return 0;
++}
++
++static void free_mbox_msg_channel(struct hinic3_msg_channel *msg_ch)
++{
++	kfree(msg_ch->recv_msg.msg);
++	kfree(msg_ch->resp_msg.msg);
++}
++
++static int init_mgmt_msg_channel(struct hinic3_mbox *mbox)
++{
++	int err;
++
++	err = alloc_mbox_msg_channel(&mbox->mgmt_msg);
++	if (err) {
++		dev_err(mbox->hwdev->dev, "Failed to alloc mgmt message channel\n");
++		return err;
++	}
++
++	err = hinic3_init_mbox_dma_queue(mbox);
++	if (err) {
++		dev_err(mbox->hwdev->dev, "Failed to init mbox dma queue\n");
++		free_mbox_msg_channel(&mbox->mgmt_msg);
++		return err;
++	}
++
++	return 0;
++}
++
++static void uninit_mgmt_msg_channel(struct hinic3_mbox *mbox)
++{
++	hinic3_uninit_mbox_dma_queue(mbox);
++	free_mbox_msg_channel(&mbox->mgmt_msg);
++}
++
++static int hinic3_init_func_mbox_msg_channel(struct hinic3_hwdev *hwdev)
++{
++	struct hinic3_mbox *mbox;
++	int err;
++
++	mbox = hwdev->mbox;
++	mbox->func_msg = kzalloc(sizeof(*mbox->func_msg), GFP_KERNEL);
++	if (!mbox->func_msg)
++		return -ENOMEM;
++
++	err = alloc_mbox_msg_channel(mbox->func_msg);
++	if (err)
++		goto err_free_func_msg;
++
++	return 0;
++
++err_free_func_msg:
++	kfree(mbox->func_msg);
++	mbox->func_msg = NULL;
++
++	return err;
++}
++
++static void hinic3_uninit_func_mbox_msg_channel(struct hinic3_hwdev *hwdev)
++{
++	struct hinic3_mbox *mbox = hwdev->mbox;
++
++	free_mbox_msg_channel(mbox->func_msg);
++	kfree(mbox->func_msg);
++	mbox->func_msg = NULL;
++}
++
++static void prepare_send_mbox(struct hinic3_mbox *mbox)
++{
++	struct hinic3_send_mbox *send_mbox = &mbox->send_mbox;
++
++	send_mbox->data = MBOX_AREA(mbox->hwdev->hwif);
++}
++
++static int alloc_mbox_wb_status(struct hinic3_mbox *mbox)
++{
++	struct hinic3_send_mbox *send_mbox = &mbox->send_mbox;
++	struct hinic3_hwdev *hwdev = mbox->hwdev;
++	u32 addr_h, addr_l;
++
++	send_mbox->wb_vaddr = dma_alloc_coherent(hwdev->dev,
++						 MBOX_WB_STATUS_LEN,
++						 &send_mbox->wb_paddr,
++						 GFP_KERNEL);
++	if (!send_mbox->wb_vaddr)
++		return -ENOMEM;
++
++	addr_h = upper_32_bits(send_mbox->wb_paddr);
++	addr_l = lower_32_bits(send_mbox->wb_paddr);
++	hinic3_hwif_write_reg(hwdev->hwif, HINIC3_FUNC_CSR_MAILBOX_RESULT_H_OFF,
++			      addr_h);
++	hinic3_hwif_write_reg(hwdev->hwif, HINIC3_FUNC_CSR_MAILBOX_RESULT_L_OFF,
++			      addr_l);
++
++	return 0;
++}
++
++static void free_mbox_wb_status(struct hinic3_mbox *mbox)
++{
++	struct hinic3_send_mbox *send_mbox = &mbox->send_mbox;
++	struct hinic3_hwdev *hwdev = mbox->hwdev;
++
++	hinic3_hwif_write_reg(hwdev->hwif, HINIC3_FUNC_CSR_MAILBOX_RESULT_H_OFF,
++			      0);
++	hinic3_hwif_write_reg(hwdev->hwif, HINIC3_FUNC_CSR_MAILBOX_RESULT_L_OFF,
++			      0);
++
++	dma_free_coherent(hwdev->dev, MBOX_WB_STATUS_LEN,
++			  send_mbox->wb_vaddr, send_mbox->wb_paddr);
++}
++
++static int hinic3_mbox_pre_init(struct hinic3_hwdev *hwdev,
++				struct hinic3_mbox *mbox)
++{
++	mbox->hwdev = hwdev;
++	mutex_init(&mbox->mbox_send_lock);
++	spin_lock_init(&mbox->mbox_lock);
++
++	mbox->workq = create_singlethread_workqueue(HINIC3_MBOX_WQ_NAME);
++	if (!mbox->workq) {
++		dev_err(hwdev->dev, "Failed to initialize MBOX workqueue\n");
++		return -ENOMEM;
++	}
++	hwdev->mbox = mbox;
++
++	return 0;
++}
++
++int hinic3_init_mbox(struct hinic3_hwdev *hwdev)
++{
++	struct hinic3_mbox *mbox;
++	int err;
++
++	mbox = kzalloc(sizeof(*mbox), GFP_KERNEL);
++	if (!mbox)
++		return -ENOMEM;
++
++	err = hinic3_mbox_pre_init(hwdev, mbox);
++	if (err)
++		goto err_free_mbox;
++
++	err = init_mgmt_msg_channel(mbox);
++	if (err)
++		goto err_destroy_workqueue;
++
++	err = hinic3_init_func_mbox_msg_channel(hwdev);
++	if (err)
++		goto err_uninit_mgmt_msg_ch;
++
++	err = alloc_mbox_wb_status(mbox);
++	if (err) {
++		dev_err(hwdev->dev, "Failed to alloc mbox write back status\n");
++		goto err_uninit_func_mbox_msg_ch;
++	}
++
++	prepare_send_mbox(mbox);
++
++	return 0;
++
++err_uninit_func_mbox_msg_ch:
++	hinic3_uninit_func_mbox_msg_channel(hwdev);
++
++err_uninit_mgmt_msg_ch:
++	uninit_mgmt_msg_channel(mbox);
++
++err_destroy_workqueue:
++	destroy_workqueue(mbox->workq);
++
++err_free_mbox:
++	kfree(mbox);
++
++	return err;
++}
++
++void hinic3_free_mbox(struct hinic3_hwdev *hwdev)
++{
++	struct hinic3_mbox *mbox = hwdev->mbox;
++
++	destroy_workqueue(mbox->workq);
++	free_mbox_wb_status(mbox);
++	hinic3_uninit_func_mbox_msg_channel(hwdev);
++	uninit_mgmt_msg_channel(mbox);
++	kfree(mbox);
++}
++
+ int hinic3_send_mbox_to_mgmt(struct hinic3_hwdev *hwdev, u8 mod, u16 cmd,
+ 			     const struct mgmt_msg_params *msg_params)
  {
-+	hinic3_free_intr_coalesce(netdev);
- 	hinic3_free_rxqs(netdev);
- 	hinic3_free_txqs(netdev);
- }
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h
-index c994fc9b6ee0..9577cc673257 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h
-@@ -51,6 +51,12 @@ struct hinic3_dyna_txrxq_params {
- 	struct hinic3_irq_cfg      *irq_cfg;
- };
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.h b/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.h
+index d7a6c37b7eff..410254ab69f3 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.h
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.h
+@@ -9,6 +9,109 @@
  
-+struct hinic3_intr_coal_info {
-+	u8 pending_limit;
-+	u8 coalesce_timer_cfg;
-+	u8 resend_timer_cfg;
+ struct hinic3_hwdev;
+ 
++#define MBOX_MSG_HEADER_SRC_GLB_FUNC_IDX_MASK  GENMASK_ULL(12, 0)
++#define MBOX_MSG_HEADER_STATUS_MASK            BIT_ULL(13)
++#define MBOX_MSG_HEADER_SOURCE_MASK            BIT_ULL(15)
++#define MBOX_MSG_HEADER_AEQ_ID_MASK            GENMASK_ULL(17, 16)
++#define MBOX_MSG_HEADER_MSG_ID_MASK            GENMASK_ULL(21, 18)
++#define MBOX_MSG_HEADER_CMD_MASK               GENMASK_ULL(31, 22)
++#define MBOX_MSG_HEADER_MSG_LEN_MASK           GENMASK_ULL(42, 32)
++#define MBOX_MSG_HEADER_MODULE_MASK            GENMASK_ULL(47, 43)
++#define MBOX_MSG_HEADER_SEG_LEN_MASK           GENMASK_ULL(53, 48)
++#define MBOX_MSG_HEADER_NO_ACK_MASK            BIT_ULL(54)
++#define MBOX_MSG_HEADER_DATA_TYPE_MASK         BIT_ULL(55)
++#define MBOX_MSG_HEADER_SEQID_MASK             GENMASK_ULL(61, 56)
++#define MBOX_MSG_HEADER_LAST_MASK              BIT_ULL(62)
++#define MBOX_MSG_HEADER_DIRECTION_MASK         BIT_ULL(63)
++
++#define MBOX_MSG_HEADER_SET(val, member) \
++	FIELD_PREP(MBOX_MSG_HEADER_##member##_MASK, val)
++#define MBOX_MSG_HEADER_GET(val, member) \
++	FIELD_GET(MBOX_MSG_HEADER_##member##_MASK, le64_to_cpu(val))
++
++/* identifies if a segment belongs to a message or to a response. A VF is only
++ * expected to send messages and receive responses. PF driver could receive
++ * messages and send responses.
++ */
++enum mbox_msg_direction_type {
++	MBOX_MSG_SEND = 0,
++	MBOX_MSG_RESP = 1,
 +};
 +
- struct hinic3_nic_dev {
- 	struct pci_dev                  *pdev;
- 	struct net_device               *netdev;
-@@ -70,10 +76,14 @@ struct hinic3_nic_dev {
- 	u16                             num_qp_irq;
- 	struct msix_entry               *qps_msix_entries;
- 
-+	struct hinic3_intr_coal_info    *intr_coalesce;
++#define HINIC3_MBOX_WQ_NAME  "hinic3_mbox"
 +
- 	bool                            link_status_up;
- };
++struct mbox_msg_info {
++	u8 msg_id;
++	u8 status;
++};
++
++struct hinic3_msg_desc {
++	u8                   *msg;
++	__le16               msg_len;
++	u8                   seq_id;
++	u8                   mod;
++	__le16               cmd;
++	struct mbox_msg_info msg_info;
++};
++
++struct hinic3_msg_channel {
++	struct   hinic3_msg_desc resp_msg;
++	struct   hinic3_msg_desc recv_msg;
++};
++
++struct hinic3_send_mbox {
++	u8 __iomem *data;
++	void       *wb_vaddr;
++	dma_addr_t wb_paddr;
++};
++
++enum mbox_event_state {
++	MBOX_EVENT_START   = 0,
++	MBOX_EVENT_FAIL    = 1,
++	MBOX_EVENT_SUCCESS = 2,
++	MBOX_EVENT_TIMEOUT = 3,
++	MBOX_EVENT_END     = 4,
++};
++
++struct mbox_dma_msg {
++	__le32 xor;
++	__le32 dma_addr_high;
++	__le32 dma_addr_low;
++	__le32 msg_len;
++	__le64 rsvd;
++};
++
++struct mbox_dma_queue {
++	void       *dma_buf_vaddr;
++	dma_addr_t dma_buf_paddr;
++	u16        depth;
++	u16        prod_idx;
++	u16        cons_idx;
++};
++
++struct hinic3_mbox {
++	struct hinic3_hwdev       *hwdev;
++	/* lock for send mbox message and ack message */
++	struct mutex              mbox_send_lock;
++	struct hinic3_send_mbox   send_mbox;
++	struct mbox_dma_queue     sync_msg_queue;
++	struct mbox_dma_queue     async_msg_queue;
++	struct workqueue_struct   *workq;
++	/* driver and MGMT CPU */
++	struct hinic3_msg_channel mgmt_msg;
++	/* VF to PF */
++	struct hinic3_msg_channel *func_msg;
++	u8                        send_msg_id;
++	enum mbox_event_state     event_flag;
++	/* lock for mbox event flag */
++	spinlock_t                mbox_lock;
++};
++
++void hinic3_mbox_func_aeqe_handler(struct hinic3_hwdev *hwdev, u8 *header,
++				   u8 size);
++int hinic3_init_mbox(struct hinic3_hwdev *hwdev);
++void hinic3_free_mbox(struct hinic3_hwdev *hwdev);
++
+ int hinic3_send_mbox_to_mgmt(struct hinic3_hwdev *hwdev, u8 mod, u16 cmd,
+ 			     const struct mgmt_msg_params *msg_params);
  
- void hinic3_set_netdev_ops(struct net_device *netdev);
-+int hinic3_qps_irq_init(struct net_device *netdev);
-+void hinic3_qps_irq_uninit(struct net_device *netdev);
- 
- /* Temporary prototypes. Functions become static in later submission. */
- void qp_add_napi(struct hinic3_irq_cfg *irq_cfg);
 -- 
 2.43.0
 
