@@ -1,66 +1,67 @@
-Return-Path: <netdev+bounces-215084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84942B2D158
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 03:22:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9655B2D15C
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 03:24:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29F112A475F
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 01:22:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67A6D1C42A26
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 01:24:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E06B11C1F05;
-	Wed, 20 Aug 2025 01:22:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A51C21171B;
+	Wed, 20 Aug 2025 01:23:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H/AKtw8R"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WZaPJdoc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA4A71BFE00;
-	Wed, 20 Aug 2025 01:22:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CD5920B7F9;
+	Wed, 20 Aug 2025 01:23:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755652929; cv=none; b=Ow3Lptj4lUujscvDfWYMF11S1ofj/zgBU3PDqMLRHsOXRZ4KLKBcQNXwj/+pS3Q9nHBsZGmJEL7a9ToeV1DNBdgWkw2hytKX/CX0vK7hxykSThdLDuLk/nh3vX0rhrx1QQ6GgStjev4g8rNWd45gWg5sCQ3MLFuE7rbTdAf5DCg=
+	t=1755653038; cv=none; b=WlQcvxXmiSCCw5oJkBsjRVzzfrdXPBfuAY2tPYCZZrUukd7tpWeRcezOtuSAfdQ44iwLD0U0JNCIdBqG4DcK+YiTEBlKQ2U4hG6x4c7ssEpvlI5HCZ0AxrDsa2FrNSKs20ldxpHivaFZnRlJ69qt5yWdOOxChyY31SAhNY7/FkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755652929; c=relaxed/simple;
-	bh=giJrwNr4gTNI+BHt14QArf7z8KvI8kFYYAqwhT6nAzc=;
+	s=arc-20240116; t=1755653038; c=relaxed/simple;
+	bh=C+2GTR0YI18RQg7u25sMTQABBcMAstNJVqtMhULRkOc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hFaQvIoHewMK84SD5UUuMkGY7lbiBAe2gsB1ro3Fr3IiXCZAURQ13yveHZQ5jjy4k0LsIsC+YGc3fDTgW5qsvH+827az/iTQ9eCwEloRTl7GCWTCn6gverR3PalLg5F8oVzhOuN7st9vVo/3trHa0ftYTWWpYeaA+mCIbN0bGFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H/AKtw8R; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB17FC113CF;
-	Wed, 20 Aug 2025 01:22:08 +0000 (UTC)
+	 MIME-Version:Content-Type; b=kmxlFIrP5cUp90bchQTgkcebpAlz+I9tzxcXFY6qMnHhOGX9G4y+SfRWvwm7IQmueEWDL2uRHmkN9cP31T2wTsyO3ggCJaOGtV65LRKyPpBcCE06VmGf62E64+xsFW3ooSxDLzggFL/e2WOyIULem0ag+qkatV70p0yNXpXIhuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WZaPJdoc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBFDAC4CEF1;
+	Wed, 20 Aug 2025 01:23:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755652929;
-	bh=giJrwNr4gTNI+BHt14QArf7z8KvI8kFYYAqwhT6nAzc=;
+	s=k20201202; t=1755653037;
+	bh=C+2GTR0YI18RQg7u25sMTQABBcMAstNJVqtMhULRkOc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=H/AKtw8RMqpy1JosLZEooNgULsO4wBZsWKirV3sTpu1SUB2bXcRfWL680obJWgZL2
-	 AyX7yUuQmp9vkp8MoF7VGXbza+fcDlaEm5p3EZovW9zmudPrjyGHouiATXHPu+gzu0
-	 e0fpta8hr+QKHjiGrwIuvKMFZVktAABjw1hXwGIXXaG1hQSTdfUfTTHd0EXKD1hvB/
-	 q/DbOERoiBF3qlZMa/h3Cg11HLD7szlcYO8lHJ+bihAfzFQWVVjlIIfxMmJqMknj0e
-	 BiuD7Ffl90P1nV82+pNwmGSinDFwuMfrPbwchulcA9nyCKIFPiUQMdVKrqYeWQyN8s
-	 1ZEURTQMJupow==
-Date: Tue, 19 Aug 2025 18:22:07 -0700
+	b=WZaPJdocCn479Xgj8B3WHfL6XEbteMRp4spYbJHrKRBsvPTNdt82w7J0ckf1sbZ3K
+	 v9NLjjrNm03pfouKO9pYrOz5WmbXxn0zgnY7eQhSHLKFALzAzd7gGxDXbAXO7ggY6S
+	 ZP6KuZGPuipzXROF92MMdH1DF++mTr9xnzIbQoqfGyqa/LtMo511gtA0Z8HjzXSyf8
+	 pykXVleVygK3hxM9bwoYGzDKOB33L3M0EUgvmgNfV3iFTsKEryFnjpp7f+S77kWBbj
+	 1i7g6Qf9xMxQ2SjhotyTIT4+ebodrg5TiFSBQ/AiC1u7MxNG8D99SIZ6KKZSBUxKmP
+	 009BVg9fIAqzg==
+Date: Tue, 19 Aug 2025 18:23:56 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Rohan G Thomas via B4 Relay
- <devnull+rohan.g.thomas.altera.com@kernel.org>
-Cc: rohan.g.thomas@altera.com, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>, Serge Semin
- <fancer.lancer@gmail.com>, Romain Gantois <romain.gantois@bootlin.com>,
- Jose Abreu <Jose.Abreu@synopsys.com>, Ong Boon Leong
- <boon.leong.ong@intel.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Matthew
- Gerlach <matthew.gerlach@altera.com>
-Subject: Re: [PATCH net-next v2 3/3] net: stmmac: Set CIC bit only for TX
- queues with COE
-Message-ID: <20250819182207.5d7b2faa@kernel.org>
-In-Reply-To: <20250816-xgmac-minor-fixes-v2-3-699552cf8a7f@altera.com>
-References: <20250816-xgmac-minor-fixes-v2-0-699552cf8a7f@altera.com>
-	<20250816-xgmac-minor-fixes-v2-3-699552cf8a7f@altera.com>
+To: Shakeel Butt <shakeel.butt@linux.dev>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Neal Cardwell
+ <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn
+ <willemb@google.com>, Matthieu Baerts <matttbe@kernel.org>, Mat Martineau
+ <martineau@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko
+ <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, Andrew
+ Morton <akpm@linux-foundation.org>, "Michal =?UTF-8?B?S291dG7DvQ==?="
+ <mkoutny@suse.com>, Tejun Heo <tj@kernel.org>, Simon Horman
+ <horms@kernel.org>, Geliang Tang <geliang@kernel.org>, Muchun Song
+ <muchun.song@linux.dev>, Mina Almasry <almasrymina@google.com>, Kuniyuki
+ Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
+ mptcp@lists.linux.dev, cgroups@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH v5 net-next 09/10] net-memcg: Pass struct sock to
+ mem_cgroup_sk_under_memory_pressure().
+Message-ID: <20250819182356.75aa4996@kernel.org>
+In-Reply-To: <20250815201712.1745332-10-kuniyu@google.com>
+References: <20250815201712.1745332-1-kuniyu@google.com>
+	<20250815201712.1745332-10-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,10 +71,20 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sat, 16 Aug 2025 00:55:25 +0800 Rohan G Thomas via B4 Relay wrote:
-> +	bool csum = !priv->plat->tx_queues_cfg[queue].coe_unsupported;
+On Fri, 15 Aug 2025 20:16:17 +0000 Kuniyuki Iwashima wrote:
+> We will store a flag in the lowest bit of sk->sk_memcg.
+> 
+> Then, we cannot pass the raw pointer to mem_cgroup_under_socket_pressure().
+> 
+> Let's pass struct sock to it and rename the function to match other
+> functions starting with mem_cgroup_sk_.
+> 
+> Note that the helper is moved to sock.h to use mem_cgroup_from_sk().
+> 
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
+> Acked-by: Roman Gushchin <roman.gushchin@linux.dev>
 
-Hopefully the slight pointer chasing here doesn't impact performance?
-XDP itself doesn't support checksum so perhaps we could always pass
-false?
+Hi Shakeel, looks like you acked every single patch here but this one.
+Is this intentional? :)
 
