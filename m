@@ -1,146 +1,159 @@
-Return-Path: <netdev+bounces-215170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01CE0B2D547
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 09:57:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6BEFB2D5A4
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 10:08:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB18B1BC7128
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 07:57:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5487517CC69
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 08:06:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 620892D6E6D;
-	Wed, 20 Aug 2025 07:56:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LHyTXFDi"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A0B52D7818;
+	Wed, 20 Aug 2025 08:06:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C7A2D838E
-	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 07:56:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45882D8DC3
+	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 08:06:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755676606; cv=none; b=ReEcg2ZUZzgS6FqzlKPU1AlsVeXCL7ZgHI2AgWq3AhgaVkAGlnz0MWBTMXrbqm+VaF79LINrASZfkyp6o9qPW/LfIYgfu+jWEcDvCuxzx57lFJEF4wrDTs3WiAvfuHDlyTkLTdcaqqOyjuL5vZvbFEU/SxhHhlOlwVawnqHo3E8=
+	t=1755677194; cv=none; b=XWk6YgVwsI5/JIiYHyAb0jZzPkseZ7nX23flcaAmJBxPjsZUiJKM4ZvnDA59ATPwAAWelMocgmtOwQA0BLgDIq2LyHRprfaVbzi3pi6wqDQnVJyXjgPPfyaLIVCGk9GuA+wSikQHOJoCguVOaeh6DAhuSANGeoGoAkoLoqbdb50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755676606; c=relaxed/simple;
-	bh=GQMNAmNy/zVgHmi+zLjcxRm9t9x4LA0akP4L99OAMNI=;
+	s=arc-20240116; t=1755677194; c=relaxed/simple;
+	bh=TSEWfehoPdM3gmaj9QZJ0UPUmwRx/M938OT2evtPpS0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AiOnsEjHKylC35e2+9g2Qa6novJFEtxrLAfri+NdiRHmTllnC9ChqcaEO8ZWuBZfFfzo2rFY9FOgIY52VGCRNJqWKenxvNndrOB+c524OCgGO4NsFVeeu3T3nWx0h9KP6Y+2e14a6Azt+p1NrE9saDdfTNf2lIpNtVJHtJ4kI7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LHyTXFDi; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755676603;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JL4/RTCr1wG7n9TqI8dawujOVLp09ZQA/NyuJYZQpDE=;
-	b=LHyTXFDi+jCwZTVTnyE9jGhYw2fpsC3WNI+bcdfmvTtqAT0d71/27bISlTFRXtlqpV9hZO
-	eZw3/qVoX/gKflUvJj3kBEqa01x2Bs5+C+ztc9ajrgJ4NmzkCmpOTidxViC82pMLNAyZDe
-	OBNcNLpYDGMGz06evPtZdEOtsOuRvV0=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-458-K1saE8n2OFWAFNbzeLg5UA-1; Wed,
- 20 Aug 2025 03:56:37 -0400
-X-MC-Unique: K1saE8n2OFWAFNbzeLg5UA-1
-X-Mimecast-MFC-AGG-ID: K1saE8n2OFWAFNbzeLg5UA_1755676595
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2018319775A6;
-	Wed, 20 Aug 2025 07:56:35 +0000 (UTC)
-Received: from localhost (unknown [10.43.135.229])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1A64519560B0;
-	Wed, 20 Aug 2025 07:56:30 +0000 (UTC)
-Date: Wed, 20 Aug 2025 09:56:28 +0200
-From: Miroslav Lichvar <mlichvar@redhat.com>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Kurt Kanzenbach <kurt@linutronix.de>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=C78JuR4eOgE8PQNbwTc6AA1/4RBS4FQY+8MKV4a5O/hvmOZuVFvfZ6NZtNmSfgI4wOlqZfl5gklyTt9UeGxY48q4axIygfTQ2kZyj20nYS+sBYRR2mueNUngy2X5P2GXwNkA9ce64JD25KFLClCVeVTvC08mekWeVPKa2U5dAxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uodpj-0007v7-DH; Wed, 20 Aug 2025 10:06:11 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uodpi-001DLk-0F;
+	Wed, 20 Aug 2025 10:06:10 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uodph-005rZz-36;
+	Wed, 20 Aug 2025 10:06:09 +0200
+Date: Wed, 20 Aug 2025 10:06:09 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next] igb: Retrieve Tx timestamp
- directly from interrupt
-Message-ID: <aKV_rEjYD_BDgG1A@localhost>
-References: <20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de>
- <aKMbekefL4mJ23kW@localhost>
- <c3250413-873f-4517-a55d-80c36d3602ee@intel.com>
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Lukasz Majewski <lukma@denx.de>, Jonathan Corbet <corbet@lwn.net>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+	Divya.Koppera@microchip.com
+Subject: Re: [PATCH net-next v2 1/1] Documentation: networking: add detailed
+ guide on Ethernet flow control configuration
+Message-ID: <aKWB8QA8fTwrZhFb@pengutronix.de>
+References: <20250814075342.212732-1-o.rempel@pengutronix.de>
+ <36bdd275-25bb-4b53-a14d-39677da468cc@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <c3250413-873f-4517-a55d-80c36d3602ee@intel.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <36bdd275-25bb-4b53-a14d-39677da468cc@lunn.ch>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, Aug 19, 2025 at 04:31:49PM -0700, Jacob Keller wrote:
-> I'm having trouble interpreting what exactly this data shows, as its
-> quite a lot of data and numbers. I guess that it is showing when it
-> switches over to software timestamps.. It would be nice if ntpperf
-> showed number of events which were software vs hardware timestamping, as
-> thats likely the culprit. igb hardare only has a single outstanding Tx
-> timestamp at a time.
+On Tue, Aug 19, 2025 at 02:48:22PM +0200, Andrew Lunn wrote:
+> > +2. Half-Duplex: Collision-Based Flow Control
+> > +--------------------------------------------
+> > +On half-duplex links, a device cannot send and receive simultaneously, so PAUSE
+> > +frames are not used. Flow control is achieved by leveraging the CSMA/CD
+> > +(Carrier Sense Multiple Access with Collision Detection) protocol itself.
+> > +
+> > +* **How it works**: To inhibit incoming data, a receiving device can force a
+> > +    collision on the line. When the sending station detects this collision, it
+> > +    terminates its transmission, sends a "jam" signal, and then executes the
+> > +    "Collision backoff and retransmission" procedure as defined in IEEE 802.3,
+> > +    Section 4.2.3.2.5. This algorithm makes the sender wait for a random
+> > +    period before attempting to retransmit. By repeatedly forcing collisions,
+> > +    the receiver can effectively throttle the sender's transmission rate.
+> > +
+> > +.. note::
+> > +    While this mechanism is part of the IEEE standard, there is currently no
+> > +    generic kernel API to configure or control it. Drivers should not enable
+> > +    this feature until a standardized interface is available.
+> 
+> Interesting. I did not know about this.
+> 
+> I wounder if we want phylib and phylink to return -EOPNOTSUPP in the
+> general code, if the current link is 1/2 duplex?
 
-The server doesn't have a way to tell the client (ntpperf) which
-timestamps are HW or SW, we can only guess from the measured offset as
-HW timestamps should be more accurate, but on the server side the
-number of SW and HW TX timestamps provided to the client can be
-monitored with the "chronyc serverstats" command. The server requests
-both SW and HW TX timestamps and uses the better one it gets from the
-kernel, if it can actually get one before it receives the next
-request from the same client (ntpperf simulates up to 16384 concurrent
-clients).
+Rejecting ethtool -A calls in half-duplex mode would cause problems. At
+request time we often don’t know what the final link will be (autoneg,
+fixed link, link flapping, etc.). On top of that, PAUSE conflicts not
+only with half-duplex, but also with PFC.
 
-When I run ntpperf at a fixed rate of 140000 requests per second
-for 10 seconds (-r 140000 -t 10), I get the following numbers.
+A cleaner model is to treat ethtool pause config as a wish specifically
+for 802.3x PAUSE. Phylib/phylink store this wish and apply it
+automatically when the negotiated link is compatible (full-duplex
+without PFC). If the link is not compatible (half-duplex, PFC), the wish
+is ignored.
 
-Without the patch:
-NTP daemon TX timestamps   : 28056
-NTP kernel TX timestamps   : 1012864
-NTP hardware TX timestamps : 387239
+So the user always sets their preference once, the kernel enforces it
+when possible, and status queries (ethtool -a) show the actual active
+state. This avoids races and keeps semantics simple and predictable.
 
-With the patch:
-NTP daemon TX timestamps   : 28047
-NTP kernel TX timestamps   : 707674
-NTP hardware TX timestamps : 692326
+> > +Additionally, some MACs provide a way to configure the `pause_time` value
+> > +(quanta) sent in PAUSE frames. This value's duration depends on the link
+> > +speed. As there is currently no generic kernel interface to configure this,
+> > +drivers often set it to a default or maximum value, which may not be optimal
+> > +for all use cases.
+> 
+> The Mellanox driver has something in this space. It is a long time ago
+> that i reviewed the patches. I don't remember if it is a pause_time
+> you can configure, or the maximum number of pause frames you can send
+> before giving up and just letting the buffers overflow. I also don't
+> remember what API is used, if it is something custom, or generic. It
+> is a bit of a niche thing, so maybe it is not worth researching and
+> mentioning.
 
-The number of HW timestamps is significantly higher with the patch, so
-that looks good.
+I did some digging. A number of drivers simply hard-code the pause
+quanta to the maximum value for all link modes:
 
-But when I increase the rate to 200000, I get this:
+stmmac: #define PAUSE_TIME 0xffff
+lan78xx: pause_time_quanta = 65535
+smsc95xx / smsc75xx: flow = 0xFFFF0002
+FEC: FEC_ENET_OPD_V  = 0xFFF0
 
-Without the patch:
-NTP daemon TX timestamps   : 35835
-NTP kernel TX timestamps   : 1410956
-NTP hardware TX timestamps : 581575            
-
-With the patch:
-NTP daemon TX timestamps   : 476908
-NTP kernel TX timestamps   : 646146
-NTP hardware TX timestamps : 412095
-
-With the patch, the server is now dropping requests and can provide
-a smaller number of HW timestamps and also a smaller number of SW
-timestamps, i.e. less work is done overall.
-
-Could the explanation be that a single CPU core now needs to do more
-work, while it was better distributed before?
+If we translate quanta into real time:
+1 Gbps -> 1 quanta = 512 ns -> max val ~ 33.6 ms
+100 Mbps -> 1 quanta = 5.12 µs -> max val ~ 335 ms
+10 Mbps -> 1 quanta = 51.2 µs -> max val ~ 3.3 s
 
 -- 
-Miroslav Lichvar
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
