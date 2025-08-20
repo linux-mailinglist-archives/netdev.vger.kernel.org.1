@@ -1,117 +1,95 @@
-Return-Path: <netdev+bounces-215312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79749B2E0AB
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 17:20:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53357B2E114
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 17:30:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15B9CB6340C
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 15:13:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB2D1A2467D
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 15:15:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E899B334382;
-	Wed, 20 Aug 2025 15:03:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59B0E33473A;
+	Wed, 20 Aug 2025 15:04:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="RGKgbBUF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l3+1C9It"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 013D333437A;
-	Wed, 20 Aug 2025 15:03:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31FDF33472E;
+	Wed, 20 Aug 2025 15:04:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755702221; cv=none; b=b8tNdJpqGDhLeqfnEgM2hvUTboQzCxyqoZrK6RM5O8T07OaluooP8OMxnSAn4XeSFUx9Mv0GrZeCKDWUOOt1PHxBKsjstQ3o81/T+U86+k4fr4bRoU8Jr6E0HwiR8oGogWoYcRoycv9c43JqtDITH4AA0by1ADV3KXfg90I+cus=
+	t=1755702278; cv=none; b=B5UX8CjcVGIAROUsyrsNyRlZWaMUSwB4ybnExRLdTisuUztb0meuNwICKr6/K7uSKKb21KVWuGQCFLHDfFzFVMfel5O+mNQdRxLLggz0P9H56lWB/kSxnv/3OL0tQWpm6BVhXdBn+us90Xab4xmq8c/VskqMmsVTEk+kxuNYm8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755702221; c=relaxed/simple;
-	bh=0EFoaUWPAzWwpgzU3pvmrQ4MhPQdfhcCrBQ3+gdLRWA=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=pXg9+NZKJ0tzTPf/5nLN6um1Wr4kpcLwfiS1tFOEsso8GuQRFACX1uouBDZd2On1bn+x1ZgKvdzSZhDsknJ/8BIrHKWfTZJloQDF1iW/UUA7//4zUSAd3QMSARhcn+hN5zqtFRG5Q/UNBC2wxqKDsZmgQb5omxJmrX/nqU8g3gI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=RGKgbBUF; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 6A93CC6B3AF;
-	Wed, 20 Aug 2025 15:03:24 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 04915606A0;
-	Wed, 20 Aug 2025 15:03:38 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id EBFDD1C2288F8;
-	Wed, 20 Aug 2025 17:03:26 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1755702216; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=lqjA40HWWIjcIx3M1y+rukbJMA+JHTWzf+bzksm45x8=;
-	b=RGKgbBUF3A7HzCwL7Vmn+Og6nEsHaElJB60UDwiydlP7AsssrNxAwSck4WVkvj7Vc8Lo9Z
-	mdQKFd0f+B7EurmhQXSSBf5KHzL4Hqosy0hYUJEIFfOy6bXTHhM/l4+oaFwId94qJ7e8MZ
-	JaFrY4mkbhjJT2ZxrqcZEXMTpYz5wgM17tFGqzAd3/bEk9FDK+JQ3gCOKLyZ9wnlwbNgQ1
-	hEITtDfZ+DwwciihveWhmsJLKj2UdLUc22V7uAMUUIvTVRgUwI/Zw5waffq4r5c5zAUhoz
-	t9LVv82xJ3UwA4k9KCgvcjkzxUonDBV/P2jkuzjWzENI7Gy40BGmZ2HV3Sk/sg==
+	s=arc-20240116; t=1755702278; c=relaxed/simple;
+	bh=8swLeMoDrj6X1zOeo0D/bAz3d4lgOnxpRrdZBtyJerU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EsyzVmUH71yuYCw6pChXjwYIDv9kfTHNvXl4P8S59h9KaVVNJKiBpT7aDZpDHrzCxx/itqGniQiTyco7brjBGdcDUrWQeHzv0AZQ08kCuPcVCJgwpc9SEYu/vDKDmnNKy3QNLMekXgMZr3lTnd8wHTHzX/Z3WuyEsxMt46QWp/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l3+1C9It; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAE02C4CEE7;
+	Wed, 20 Aug 2025 15:04:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755702277;
+	bh=8swLeMoDrj6X1zOeo0D/bAz3d4lgOnxpRrdZBtyJerU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=l3+1C9ItykQgKVLcWvupyDfY6ahYfzf05P7risXn+Y8CaRC+sceSR/wqSxkhT/Iyw
+	 F1TqA/ILHIYW/L1/LO1PW7HkbL7sbh11uE3oaT7ZlJLaCHG3TXTnQQhXZy0YXwPGYo
+	 fP+qc/beFG/UXW/jLJFIiBsckH4n+4kwgOh+fkyy6F+y7eXHNwja+kCa5mkNaazcUr
+	 a12GWdWoQn375HIDmTV4fCtpI0Q6EIje3ol4296SKs5iX7szxcoLxU1VRiaablICvW
+	 wG2OpY8qNWksPSIrBA5Z31chvql8gtc33ME+YYqHTcYIuqFZN98JSikujH7u/dzafe
+	 Tk/eAz/pYH3qg==
+Date: Wed, 20 Aug 2025 08:04:36 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Richard Gobert <richardbgobert@gmail.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, corbet@lwn.net, shenjian15@huawei.com,
+ salil.mehta@huawei.com, shaojijie@huawei.com, andrew+netdev@lunn.ch,
+ saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com, leon@kernel.org,
+ ecree.xilinx@gmail.com, dsahern@kernel.org, ncardwell@google.com,
+ kuniyu@google.com, shuah@kernel.org, sdf@fomichev.me, ahmed.zaki@intel.com,
+ aleksander.lobakin@intel.com, florian.fainelli@broadcom.com,
+ linux-kernel@vger.kernel.org, linux-net-drivers@amd.com
+Subject: Re: [PATCH net-next v2 2/5] net: gro: only merge packets with
+ incrementing or fixed outer ids
+Message-ID: <20250820080436.36bed70a@kernel.org>
+In-Reply-To: <bb28ffa4-d91d-479a-9293-fa3aa52c57e5@gmail.com>
+References: <20250819063223.5239-1-richardbgobert@gmail.com>
+	<20250819063223.5239-3-richardbgobert@gmail.com>
+	<willemdebruijn.kernel.a8507becb441@gmail.com>
+	<20250819173005.6b560779@kernel.org>
+	<bb28ffa4-d91d-479a-9293-fa3aa52c57e5@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 20 Aug 2025 17:03:26 +0200
-Message-Id: <DC7CHN0HU2SJ.EUZIRAIIO3EC@bootlin.com>
-Subject: Re: [PATCH net v4 0/5] net: macb: various fixes
-Cc: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, "Thomas Petazzoni"
- <thomas.petazzoni@bootlin.com>, "Tawfik Bayouk"
- <tawfik.bayouk@mobileye.com>, "Krzysztof Kozlowski"
- <krzysztof.kozlowski@linaro.org>, "Sean Anderson" <sean.anderson@linux.dev>
-To: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>, "Andrew Lunn"
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, "Rob Herring" <robh@kernel.org>, "Krzysztof
- Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>,
- "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
- <claudiu.beznea@tuxon.dev>, "Geert Uytterhoeven" <geert@linux-m68k.org>,
- "Harini Katakam" <harini.katakam@xilinx.com>, "Richard Cochran"
- <richardcochran@gmail.com>, "Russell King" <linux@armlinux.org.uk>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-X-Mailer: aerc 0.20.1-0-g2ecb8770224a-dirty
-References: <20250820-macb-fixes-v4-0-23c399429164@bootlin.com>
-In-Reply-To: <20250820-macb-fixes-v4-0-23c399429164@bootlin.com>
-X-Last-TLS-Session-Version: TLSv1.3
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed Aug 20, 2025 at 4:55 PM CEST, Th=C3=A9o Lebrun wrote:
-> Changes in v4:
-> - Drop 11 patches that are only cleanups. That includes the
->   RBOF/skb_reserve() patch that, after discussion with Sean [1], has
->   had its Fixes trailer dropped. "move ring size computation to
->   functions" is the only non-fix patch that is kept, as it is depended
->   upon by further patches. Dropped patches:
->     dt-bindings: net: cdns,macb: sort compatibles
->     net: macb: match skb_reserve(skb, NET_IP_ALIGN) with HW alignment
->     net: macb: use BIT() macro for capability definitions
->     net: macb: remove gap in MACB_CAPS_* flags
->     net: macb: Remove local variables clk_init and init in macb_probe()
->     net: macb: drop macb_config NULL checking
->     net: macb: simplify macb_dma_desc_get_size()
->     net: macb: simplify macb_adj_dma_desc_idx()
->     net: macb: move bp->hw_dma_cap flags to bp->caps
->     net: macb: introduce DMA descriptor helpers (is 64bit? is PTP?)
->     net: macb: sort #includes
->   [1]: https://lore.kernel.org/lkml/d4bead1c-697a-46d8-ba9c-64292fccb19f@=
-linux.dev/
-> - Link to v3: https://lore.kernel.org/r/20250808-macb-fixes-v3-0-08f1fcb5=
-179f@bootlin.com
+On Wed, 20 Aug 2025 14:27:12 +0200 Richard Gobert wrote:
+> Jakub Kicinski wrote:
+> > On Tue, 19 Aug 2025 10:46:01 -0400 Willem de Bruijn wrote:  
+> >> It's a bit unclear what the meaning of inner and outer are in the
+> >> unencapsulated (i.e., normal) case. In my intuition outer only exists
+> >> if encapsulated, but it seems you reason the other way around: inner
+> >> is absent unless encapsulated.   
+> > 
+> > +1, whether the header in unencapsulted packet is inner or outer
+> > is always a source of unnecessary confusion. I would have also
+> > preferred your suggestion on v1 to use _ENCAP in the name.  
+> 
+> Yeah, I guess that was the source of confusion. IMO, it makes more sense that
+> INNER is absent unless encapsulated since that seems to be the convention in
+> the rest of the network stack. (e.g. inner_network_header for both skb and
+> napi_gro_cb is only relevant for encapsulation)
+> 
+> I could rename the OUTER variant to simply SKB_GSO_TCP_FIXEDID so that it's
+> clearer that it's the default (resembling network_header). WDYT?
 
-And I forgot mentioning that Jakub's comment [0] about wrapping to 80
-characters got taken into account. Sorry about that omission!
-
-[0]: https://lore.kernel.org/lkml/20250808160615.695beafe@kernel.org/
-
-Thanks,
-
---
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+Yup! That'd match the skb fields so SGTM!
 
