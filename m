@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-215110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FA5EB2D21B
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 04:57:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77E1FB2D21C
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 04:57:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D09301C225C6
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 02:57:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 329471C22690
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 02:57:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 949A72517B9;
-	Wed, 20 Aug 2025 02:57:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E1D32566DF;
+	Wed, 20 Aug 2025 02:57:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cpWMnHil"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OTNwT3Jd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F8B1248F62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1992824A05B
 	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 02:57:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755658631; cv=none; b=R6Q99h+hL+20nCdTy6/PhMfk8Nhp4pw06A/WGQGTM1uNHnQpM7i5k1IeHyodyYYPKHT5wW4uJMODkyAcKxwubxkOWrGzhbllkiiqh/KipyvgyVIdpMwWvp7LPk0U+2hSeYl1m+EsQ5HJJfleN2xkWA9v8jQb3ZvSNlpYLdWGMF0=
+	t=1755658632; cv=none; b=JSkYl3RztZCxb84AJV88VqpZySs6BMtcf92Z9skjG4Vw874AXHgpkaBfSAmNwU1XFpvuo7zZVUqgJu9Ii2z3QljkqYCKVtZKD6OV7Hy/ruCvDpeYo5Z+psogUgiSmduviRg4XxRdA5yiidv4+Kk1lDrp8e8OcsJUNc43EcQBgjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755658631; c=relaxed/simple;
-	bh=ZQvV25vn2LEbmLMIDZT3GgNFeS3u1oa4fylFBBl7Amk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MEhu33Cmw2tcHdj4kF7+zujrw6jLPJxRYZ/icfXeCFVodJ4wxjUf4AXwxPiMAQVGUfzPcmA7Q//RdWEEXFHb4qQ3FEVS3YQ8Li7jbnWeeRJMhFcNacYBrwcB992SDjS0LE1FLxsAT+SGDJxk8h+qLxzg3JHC+7uFWNdMj00wN4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cpWMnHil; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75ADAC4CEF1;
-	Wed, 20 Aug 2025 02:57:10 +0000 (UTC)
+	s=arc-20240116; t=1755658632; c=relaxed/simple;
+	bh=zuhaasXURnKo/anDuZ/xcPhAxz4Pzf/zHMfqGa4zp24=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=GoWlUPazwH1iZ7bw/27Jj+1hhdb53NYh/y0uBNe1AkBEKFBhHQ0pSVlIa/KS73bhTZ9WxEQ1YAPtd6qYNWfEy6cvRgCM+qBDbNXcrZk+iWNeCntAigInKWZ1gMO8WiUcL/236rAojoaUvjnovfPsr2F6vUgoEba5CDidVCFa8yM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OTNwT3Jd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23351C16AAE;
+	Wed, 20 Aug 2025 02:57:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1755658631;
-	bh=ZQvV25vn2LEbmLMIDZT3GgNFeS3u1oa4fylFBBl7Amk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=cpWMnHilOI78JvVX9E5gcpV0wX0pNRVQb+jrO7j8f6+G43epAjBeCeDvEEuyFoQrx
-	 THaV4O9x8TfPeszlxlFv9Qlay1tdPQmj5GnEpQUR9UWl0zD2AVKzOWgo8y4GU3jROg
-	 uhacxZA/HSCYYTvVa9cP57af9Ii3HcrsTzu9VItdG2XOCFBegU8YIRXrD6plIxugDG
-	 uM8xFAo+K6gSZW+nbPkBxI7y5cFuY2tKvXtiFuvJ8w57sNocLRIxub8NGDcmLbvVuk
-	 iKDDBEh3yAMgPaDmuRiGsmTW+8/tARojTwTky90KH6zCaQGJvj4Uaanr7mYs8QVQt7
-	 R++OyAqnG4VMQ==
+	bh=zuhaasXURnKo/anDuZ/xcPhAxz4Pzf/zHMfqGa4zp24=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=OTNwT3JdSrHdRJhF7ubdUeaypISRkgyQva0mFkENfhUV8Hfuq0MrdU9SFDZCjVx4G
+	 gGzWJVWFQPN13uipuLycqULj6FnQoTLiPm86XWWiCNof/MNrBEpxTnYHWMiHhg0Ryk
+	 4p1GXl4BuMXl3di0OY95Gsu8fwBNUI8NqMkLotyYW5rwskNM/GIrrSv3aMbe5SymRM
+	 FkPF/XItPoZ2z8TbkXSh34GizaeJ6c3IlvAbtkbz1+4uySHyEmBGzcgp/nr7h5VFwY
+	 BFdnqdKUH/T0o+ZcoOboUM7cPGj+sW2ktg9pn7FRdLTQd/eVXf4HRQ+rL6pEodzsJp
+	 gSQzLITYMho1A==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -56,10 +57,12 @@ Cc: netdev@vger.kernel.org,
 	alexanderduyck@fb.com,
 	sdf@fomichev.me,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 00/15] eth: fbnic: support queue API and zero-copy Rx
-Date: Tue, 19 Aug 2025 19:56:49 -0700
-Message-ID: <20250820025704.166248-1-kuba@kernel.org>
+Subject: [PATCH net-next 01/15] net: page_pool: add page_pool_get()
+Date: Tue, 19 Aug 2025 19:56:50 -0700
+Message-ID: <20250820025704.166248-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20250820025704.166248-1-kuba@kernel.org>
+References: <20250820025704.166248-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,67 +71,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add support for queue API to fbnic, enable zero-copy Rx.
+There is a page_pool_put() function but no get equivalent.
+Having multiple references to a page pool is quite useful.
+It avoids branching in create / destroy paths in drivers
+which support memory providers.
 
-The first patch adds page_pool_get(), I alluded to this
-new helper when dicussing commit 64fdaa94bfe0 ("net: page_pool:
-allow enabling recycling late, fix false positive warning").
-For page pool-oriented reviewers another patch of interest
-is patch 11, which adds a helper to test whether rxq wants
-to create a unreadable page pool. mlx5 already has this
-sort of a check, we said we will add a helper when more
-drivers need it (IIRC), so I guess now is the time.
+Use the new helper in bnxt.
 
-Patches 2-4 reshuffle the Rx init/allocation path to better
-align structures and functions which operate on them. Notably
-patch 2 moves the page pool pointer to the queue struct (from
-NAPI).
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ include/net/page_pool/helpers.h           |  5 +++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 11 +++++------
+ 2 files changed, 10 insertions(+), 6 deletions(-)
 
-Patch 5 converts the driver to use netmem_ref. The driver has
-separate and explicit buffer queue for scatter / payloads,
-so only references to those are converted.
-
-Next 5 patches are more boring code shifts.
-
-Patch 12 adds unreadable memory support to page pool allocation.
-
-Patch 15 finally adds the support for queue API.
-
-  $ ./tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-  TAP version 13
-  1..3
-  ok 1 iou-zcrx.test_zcrx
-  ok 2 iou-zcrx.test_zcrx_oneshot
-  ok 3 iou-zcrx.test_zcrx_rss
-  # Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
-
-Jakub Kicinski (15):
-  net: page_pool: add page_pool_get()
-  eth: fbnic: move page pool pointer from NAPI to the ring struct
-  eth: fbnic: move xdp_rxq_info_reg() to resource alloc
-  eth: fbnic: move page pool alloc to fbnic_alloc_rx_qt_resources()
-  eth: fbnic: use netmem_ref where applicable
-  eth: fbnic: request ops lock
-  eth: fbnic: split fbnic_disable()
-  eth: fbnic: split fbnic_flush()
-  eth: fbnic: split fbnic_enable()
-  eth: fbnic: split fbnic_fill()
-  net: page_pool: add helper to pre-check if PP will be unreadable
-  eth: fbnic: allocate unreadable page pool for the payloads
-  eth: fbnic: defer page pool recycling activation to queue start
-  eth: fbnic: don't pass NAPI into pp alloc
-  eth: fbnic: support queue ops / zero-copy Rx
-
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.h  |  20 +-
- include/net/page_pool/helpers.h               |  14 +
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  11 +-
- .../net/ethernet/mellanox/mlx5/core/en_main.c |  10 +-
- .../net/ethernet/meta/fbnic/fbnic_netdev.c    |   1 +
- drivers/net/ethernet/meta/fbnic/fbnic_pci.c   |   9 +-
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.c  | 621 ++++++++++++------
- net/core/page_pool.c                          |   8 +
- 8 files changed, 459 insertions(+), 235 deletions(-)
-
+diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
+index db180626be06..aa3719f28216 100644
+--- a/include/net/page_pool/helpers.h
++++ b/include/net/page_pool/helpers.h
+@@ -489,6 +489,11 @@ page_pool_dma_sync_netmem_for_cpu(const struct page_pool *pool,
+ 				     offset, dma_sync_size);
+ }
+ 
++static inline void page_pool_get(struct page_pool *pool)
++{
++	refcount_inc(&pool->user_cnt);
++}
++
+ static inline bool page_pool_put(struct page_pool *pool)
+ {
+ 	return refcount_dec_and_test(&pool->user_cnt);
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 2d4fdf5a0dc5..1a571a90e6be 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -3797,8 +3797,7 @@ static void bnxt_free_rx_rings(struct bnxt *bp)
+ 			xdp_rxq_info_unreg(&rxr->xdp_rxq);
+ 
+ 		page_pool_destroy(rxr->page_pool);
+-		if (bnxt_separate_head_pool(rxr))
+-			page_pool_destroy(rxr->head_pool);
++		page_pool_destroy(rxr->head_pool);
+ 		rxr->page_pool = rxr->head_pool = NULL;
+ 
+ 		kfree(rxr->rx_agg_bmap);
+@@ -3845,6 +3844,8 @@ static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
+ 		pool = page_pool_create(&pp);
+ 		if (IS_ERR(pool))
+ 			goto err_destroy_pp;
++	} else {
++		page_pool_get(pool);
+ 	}
+ 	rxr->head_pool = pool;
+ 
+@@ -15900,8 +15901,7 @@ static int bnxt_queue_mem_alloc(struct net_device *dev, void *qmem, int idx)
+ 	xdp_rxq_info_unreg(&clone->xdp_rxq);
+ err_page_pool_destroy:
+ 	page_pool_destroy(clone->page_pool);
+-	if (bnxt_separate_head_pool(clone))
+-		page_pool_destroy(clone->head_pool);
++	page_pool_destroy(clone->head_pool);
+ 	clone->page_pool = NULL;
+ 	clone->head_pool = NULL;
+ 	return rc;
+@@ -15919,8 +15919,7 @@ static void bnxt_queue_mem_free(struct net_device *dev, void *qmem)
+ 	xdp_rxq_info_unreg(&rxr->xdp_rxq);
+ 
+ 	page_pool_destroy(rxr->page_pool);
+-	if (bnxt_separate_head_pool(rxr))
+-		page_pool_destroy(rxr->head_pool);
++	page_pool_destroy(rxr->head_pool);
+ 	rxr->page_pool = NULL;
+ 	rxr->head_pool = NULL;
+ 
 -- 
 2.50.1
 
