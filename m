@@ -1,100 +1,122 @@
-Return-Path: <netdev+bounces-215172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 707D9B2D5CF
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 10:13:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D63F3B2D70E
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 10:50:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67DB53BCD4F
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 08:12:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E2965A6971
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 08:50:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 479B32D9EC2;
-	Wed, 20 Aug 2025 08:11:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69AE62D24AD;
+	Wed, 20 Aug 2025 08:50:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=free.fr header.i=@free.fr header.b="dbS5rnzJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp4-g21.free.fr (smtp4-g21.free.fr [212.27.42.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BC5A2D94BF
-	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 08:11:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3DC2D979F;
+	Wed, 20 Aug 2025 08:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.27.42.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755677499; cv=none; b=rhTcq7uzaxouQkFDK+8ZkEsggSNkoWgtCTTlsfEPfJF4toPBT50lX/f+eHEwK0y4qEeaOeMS1IsCEyaYqEUt1L643/qh90LWHRrvjUh2d1KIJ3NQDT4iVt6FpUgDofFfrEsbvyI8b6fPzyzJG9DIPn8d/hLckArz5l1vDaHIwRc=
+	t=1755679832; cv=none; b=tu89OhxCa5Sb5PSulwBpH6wQLx2tX/jHMfdcoE8xDo77sss4M5zeHrkd3LPWLArHPd3+gLyvts47YhCtXlAILx8mbdf2IoOuZnNcm0bcRRzp4Kb9FIko9nlcnhXTmZ0dhDPTNMorb3/qOw38D2ErC3Awj5vpoSaeCm2htrpKVGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755677499; c=relaxed/simple;
-	bh=V2ORPdLKdyIF6IEfPL3tmlEaAeXzXJCqBpmsLyhacgY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=osw4Ulm74dnG1PnHayIGNQJ0ZDv1xWdWbWkGRCJW4bqQIBIYWyHkKahqkE2ABAiHN/2oi1q/LYi7pzwGOBeli82/6OESHrkIGPl0a+i5nLgM5EwJyMT+c64OPR/vdoOF1dnFNJPYwJ+Lp7yxkuFSPDfpFuSMK37BkVubfRTO43E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-88432e1eaa5so1586629439f.2
-        for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 01:11:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755677495; x=1756282295;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yfbB1FSHiw6P4C31LBsKWDW7GmtJlZq19wObesXeHDo=;
-        b=NzX0GPntZIQOWM0I5a0eIwoHaQxhQiHJbIgguuA0SVvQENoHIugA3k66LUYN/mdZPq
-         K144GZEYUAz7WhIAOWPVKQFGgZ/KPYym+/q8Cp+UlschGx87gfDyGKwJzkoA/5KEDNdN
-         WtmqB+uOQUx5nn2nm+uSxsVeyhOELntPBepa7TbBvBA9d3yCBf1bgJ/TEbXYfgc6fFJH
-         PWhtkgeQS53s3vG+cejt0/A2zlFZvHZMXmGZ/zbf1R4D4NbqLAingNaGTsLXwC7htm3R
-         sfWIJIYlFthBljsfXdblLIVeml0lq/kt1zW+7S4UMhuLM+CdC08i8Qj7iC+8pDpGs3PL
-         /ryw==
-X-Forwarded-Encrypted: i=1; AJvYcCVkP1ZqC2sx2ZuMwab6f5CgW6P1IYVvNgckf0TbJwIQXe/TqZgvvKhI0j1IXla80mEgb4UBliY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLxiJ/V4UgSXgJCXbUesWj5+tf5CbNq9/ysKGoo4nTuY6XmhmI
-	yJtjVDr0AFXhxsR8W8Dp799yTG57clJ99vQKkhSvaUV2auKKlQeYsLznkp0rDb4YhFW4xitVXGc
-	4N4ibI23n310y8nbfnATlkrQGVwvgHhUgWCOXbCBuYDiHskz9ob9iN2wtbig=
-X-Google-Smtp-Source: AGHT+IHnRF+BVNV37CIIil93Du05nxMCfrOSZyzGWdOXk9nJ995NrsrdEI3T3s9GiJy67Kvuu4cXP2vILSqqRV705ZzYbnkNZ5za
+	s=arc-20240116; t=1755679832; c=relaxed/simple;
+	bh=bsBTzh7CFA6FK/Obva841yhuCSQBcVsRUbVv9X82xQU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dyPf6GE27/Mj5iOZBJWuxq9areX74iewySFmk1IJGgH2Qh5A6Qxpp710eItMopmfnJP3hU1dqsSosT25oSvZDZ+53GQjN2QkFibUyCwc3O/INFYHdn8FWWmSUArQQFIytEXewHF5AzA0wcWUi4ruyE0KCNwmq86tbQfye1hImck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=free.fr; spf=pass smtp.mailfrom=free.fr; dkim=pass (2048-bit key) header.d=free.fr header.i=@free.fr header.b=dbS5rnzJ; arc=none smtp.client-ip=212.27.42.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=free.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=free.fr
+Received: from [44.168.19.11] (unknown [86.195.82.193])
+	(Authenticated sender: f6bvp@free.fr)
+	by smtp4-g21.free.fr (Postfix) with ESMTPSA id 614C819F734;
+	Wed, 20 Aug 2025 10:50:17 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=free.fr;
+	s=smtp-20201208; t=1755679821;
+	bh=bsBTzh7CFA6FK/Obva841yhuCSQBcVsRUbVv9X82xQU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=dbS5rnzJKUthY6oWY7hGIH1eWTwtEyDxfbuGWATTnHlohPhyDsFyESI8hOQHVY1CN
+	 DGrQEbwOHcqZ04YPoNrDjibX0b+YXWNTCVXRLHAijg7MfPD/LlSIH4tvyp+uVvv0qL
+	 7Rh4YnehFRLhxZZH87UWm0AuPyhBIVf/Vguf1yfWf7lF7iqeAmycuaFs2zm0MUzGHJ
+	 EQIVzGmU1i99qOprFEtXdMYd4iyiPKgc8plyEazc036RWaUS/vhACBf3Ht+rSdFHio
+	 LuZ2DVoDkiUOmbXIFhYVobrzBz8Y6oHBQXLI7kM5/xYnY/9pXm905ZK7pZ5hOH1vFT
+	 /VDlQK859k97g==
+Message-ID: <847a7cd7-c17c-4aa7-824d-22768ff9775d@free.fr>
+Date: Wed, 20 Aug 2025 10:50:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2511:b0:3e5:50a5:a7ef with SMTP id
- e9e14a558f8ab-3e67ca7243amr37639535ab.15.1755677495685; Wed, 20 Aug 2025
- 01:11:35 -0700 (PDT)
-Date: Wed, 20 Aug 2025 01:11:35 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68a58337.050a0220.1b2f6c.000b.GAE@google.com>
-Subject: [syzbot] Monthly netfilter report (Aug 2025)
-From: syzbot <syzbot+list9abda43ae935f9073c3e@syzkaller.appspotmail.com>
-To: kadlec@netfilter.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, pablo@netfilter.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [ROSE] [AX25] 6.15.10 long term stable kernel oops
+To: Dan Cross <crossd@gmail.com>, Bernard Pidoux <bernard.pidoux@free.fr>
+Cc: David Ranch <dranch@trinnet.net>, linux-hams@vger.kernel.org,
+ netdev <netdev@vger.kernel.org>
+References: <11c5701d-4bf9-4661-ad8a-06690bbe1c1c@free.fr>
+ <fff0b3eb-ea42-4475-970d-30622dc25dca@free.fr>
+ <e92e23a7-1503-454f-a7a2-cedab6e55fe2@free.fr>
+ <acd04154-25a5-4721-a62b-36827a6e4e47@free.fr>
+ <CAEoi9W6kb0jZXY_Tu27CU7jkyx5O1ne5FOgvYqCk_GFBvnseiw@mail.gmail.com>
+ <11212ddf-bf32-4b11-afee-e234cdee5938@free.fr>
+ <4e4c9952-e445-41af-8942-e2f1c24a0586@free.fr>
+Content-Language: en-US
+From: F6BVP <f6bvp@free.fr>
+In-Reply-To: <4e4c9952-e445-41af-8942-e2f1c24a0586@free.fr>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello netfilter maintainers/developers,
+Hi All,
 
-This is a 31-day syzbot report for the netfilter subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/netfilter
+As linux-6.15.1 came with the same Oops kernel panic I jummped into 6.14 
+branch resulting in no issue up to 6.14.4
 
-During the period, 1 new issues were detected and 2 were fixed.
-In total, 10 issues are still open and 191 have already been fixed.
+I observed that kworker/u16 was always cited in the panic report.
 
-Some of the still happening issues:
+Grep -r kworker/u16 found the following report in
 
-Ref Crashes Repro Title
-<1> 552     No    KMSAN: uninit-value in __schedule (5)
-                  https://syzkaller.appspot.com/bug?extid=28bdcfc1dab2ffa279a5
-<2> 203     Yes   INFO: rcu detected stall in gc_worker (3)
-                  https://syzkaller.appspot.com/bug?extid=eec403943a2a2455adaa
-<3> 104     Yes   INFO: rcu detected stall in NF_HOOK (2)
-                  https://syzkaller.appspot.com/bug?extid=34c2df040c6cfa15fdfe
+~.drivers/gpu/drm/ci/xfails/msm-apq8096-skips.txt
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+I am not sure if it is relevant to our present problem.
+.....................
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+# Whole machine hangs
+kms_cursor_legacy@all-pipes-torture-move
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+# Skip driver specific tests
+^amdgpu.*
+nouveau_.*
+^panfrost.*
+^v3d.*
+^vc4.*
+^vmwgfx*
 
-You may send multiple commands in a single email message.
+# Skip intel specific tests
+gem_.*
+i915_.*
+tools_test.*
+
+# Currently fails and causes coverage loss for other tests
+# since core_getversion also fails.
+core_hotunplug.*
+
+# gpu fault
+# [IGT] msm_mapping: executing
+# [IGT] msm_mapping: starting subtest shadow
+# *** gpu fault: ttbr0=00000001030ea000 iova=0000000001074000 dir=WRITE 
+type=PERMISSION source=1f030000 (0,0,0,0)
+# msm_mdp 901000.display-controller: RBBM | ME master split | 
+status=0x701000B0
+# watchdog: BUG: soft lockup - CPU#0 stuck for 26s! [kworker/u16:3:46]
+msm/msm_mapping@shadow
+.........................
+
+
+Bernard
+
 
