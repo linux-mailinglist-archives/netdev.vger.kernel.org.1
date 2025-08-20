@@ -1,146 +1,128 @@
-Return-Path: <netdev+bounces-215319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 642BBB2E14C
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 17:38:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78D7BB2E174
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 17:48:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91DFE7A46FB
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 15:36:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 666511C2262D
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 15:44:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F29222CBC0;
-	Wed, 20 Aug 2025 15:37:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 085172E8B9F;
+	Wed, 20 Aug 2025 15:44:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="bhFP+2Gp";
-	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="HLDDTQaD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DEaJhjFy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.42])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9073213E6D;
-	Wed, 20 Aug 2025 15:37:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 602882E8B94
+	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 15:44:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755704275; cv=none; b=anYLCun9AcWZfjxE/z2qYzyFTSLyu1RquzWUxn+ALAK+WCsT9lk2Z99so8bOVSuDTTi4cp0bZOea9qVqqf8I4OpBaU8jNMZjD+rbkC5+rYYsfkAiQQMZd5vjuSrbUh3y2nNlZB0SgmL0tlQHt9KEKvlZDSV9a7X7/zSFOTp03Qc=
+	t=1755704648; cv=none; b=RUFrW1FggfuES8unL4DYNsInnu1YP1WHdlyuiUmgTmL7wDa54QAlY+fUnJzrMsg/y+mRLAA+61SlykOqsh3Uwopv1uYOq63sZyCFPd2mqbDQqUSQpdRphPAjZDkx0/fa64dgeBEPSd/5NaD7gMbISfDXirQ/ooisLDQzxcRdzWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755704275; c=relaxed/simple;
-	bh=tYvTZy0bYiaZpkHh2cl/jkMfUGMcOXG2vzebLIEmYEk=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=bWa4bVeRk8C00xcZHGzHs4A3U3UOuzsuUqHm1ZVzw3wbetxoIF8mhR2Cp8gfdypcAN1QCfvwj/16k5xzccigh6O5Gtx6vorQ09xxzJaBkPRwF+zt6l7qFZDK7yC+zppbfryQjhARVLQupYxdvU+C7MwROrJmcxaeFD57FeW9iuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=bhFP+2Gp; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=HLDDTQaD; arc=none smtp.client-ip=160.80.4.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
-Received: from smtpauth-2019-1.uniroma2.it (smtpauth.uniroma2.it [160.80.5.46])
-	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 57KFbCF1024314;
-	Wed, 20 Aug 2025 17:37:17 +0200
-Received: from lubuntu-18.04 (unknown [160.80.103.126])
-	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id 53C5F120497;
-	Wed, 20 Aug 2025 17:37:07 +0200 (CEST)
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
-	s=ed201904; t=1755704227; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
+	s=arc-20240116; t=1755704648; c=relaxed/simple;
+	bh=95yC15JbWppqU8jyo2fHbeAS3d+H0Gix7rRJptRWZtM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=f0a5GP9I7vgQZX88vV1w4UkIP4+hCimfjA3ngP3UDjj1kSUO7FdEY1lsirPaLDFd2UEyChZu7fwWiSmiV13qGqAtLN9b8gEZ8XRjfGHQUzn9Uv4N6DnSGRYw4RIqrjFUp7nsRwnDEJwEW1nmcmQQp7TkmsO79orGoPcMBLdHhFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DEaJhjFy; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755704646;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=x9/s2xzb/me85lzEEWaqZKaMJPHuvgxbFuxCDRpRqQ0=;
-	b=bhFP+2Gpw2WVhtOXolH9Z4eVBubYUg0ZPefGmJz8m5S12qnFaWuJYwkiPCUT0GA+3zo7Z+
-	vQ7urGEYpNwI+/AQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
-	t=1755704227; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x9/s2xzb/me85lzEEWaqZKaMJPHuvgxbFuxCDRpRqQ0=;
-	b=HLDDTQaDyFPoFWZNYx5qgFjKhcdAyQJu3X9ET095NOmah6ZZgIAN67XAb8Oqrz2Ld+VYoG
-	AU1AiQu7n5ILE1Ha5a5M9ViVl1q4Jv9Y7wWX4LeOI4ptLaw6z0bRQrheZqsDLk/uj1ISLd
-	i74njCpmujShx1oXfUXa3OVxsxTTdSHsXg2HriOKJ4xH68oPkF8B4W53HCtZRbG/CVMhZd
-	mCSmvii8/yM9XJ8lde8vWb2XiNGZacuws2/2Hrnt2py1+DDy4Gg/1s3IsyYBF3sf9Xn6rf
-	mcSYczmN/cmKYjSyROLJVFUyEUEQd5+IsrGYfGBMlrjRKgiRHFUK/nDrWwHTJw==
-Date: Wed, 20 Aug 2025 17:37:06 +0200
-From: Andrea Mayer <andrea.mayer@uniroma2.it>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-        David Lebrun
- <dlebrun@google.com>, Minhong He <heminhong@kylinos.cn>,
-        stable@vger.kernel.org, stefano.salsano@uniroma2.it,
-        Paolo Lungaroni
- <paolo.lungaroni@uniroma2.it>,
-        Andrea Mayer <andrea.mayer@uniroma2.it>
-Subject: Re: [PATCH net v2] ipv6: sr: Fix MAC comparison to be constant-time
-Message-Id: <20250820173706.6cd7d8848513e3082112fa06@uniroma2.it>
-In-Reply-To: <20250818202724.15713-1-ebiggers@kernel.org>
-References: <20250818202724.15713-1-ebiggers@kernel.org>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	bh=CZTdOUMLElInOZa8jWVy+Dw5UJB8zui244DoqjKy0s0=;
+	b=DEaJhjFytRLTt5SlAU2XsbnBX5zHHg3RWiA8lN5jqEyu+TWN21C/1TjiAvTYxRWz+HClqT
+	jFbTISA1OtF4e5MEifQCOf7zmnQtFaazNidliPcnxidPIVL3n8SKrkjeh8AqKp9Vt3Sfwz
+	3bpTyyyOzG8uWfwONnaSJJbf7AJAmDE=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-378-RtDSB4LxPWqJXcDiD97_Rg-1; Wed, 20 Aug 2025 11:44:05 -0400
+X-MC-Unique: RtDSB4LxPWqJXcDiD97_Rg-1
+X-Mimecast-MFC-AGG-ID: RtDSB4LxPWqJXcDiD97_Rg_1755704644
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45a1b0c5377so30095345e9.3
+        for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 08:44:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755704644; x=1756309444;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CZTdOUMLElInOZa8jWVy+Dw5UJB8zui244DoqjKy0s0=;
+        b=KHrHi3iLOtep9dqV3vPgNOYruzZ93tk/RoCiwoU81MqoXnp8MhbKT0qo7coIZR/usj
+         1U5R/tpltSKGU2IcnjMZ2e7CtpK6u6w8/L0Kh/KqSHvPczcbQpbnxtopvJ5tUax4mJ/1
+         EGw2l8jDKnOndEIyVzZTbiGKxFr/3kImE4CuyaKZk59ejNsQIbkvbjb3WwWQz9bqUuHa
+         4zyrdcHUDDUGyw0raTQnHJATIApAFMIoHywF4HcEeR0T2FePTNwtd13ixEuF6gihdXcD
+         B9WgsUOD3okceauOzflnkm8KoSTEIEbKSfbgolsXk16Z5aUBtN7eaBHibt1Exrcn1s2g
+         bDkw==
+X-Gm-Message-State: AOJu0YzQUB+GfDllL0Z50kBZSslNywuMsXDvqU1h5UuZLdoci7Y7zBIr
+	Da0C/bey0N/9B5Y86GxSKwlR+eEZvM81tmjv3ZoVtH3D/a6FknG0Q712jcICwzHj/Av/9dS4hj2
+	czSdmQQYK7ka0AkZbuiHISBDQOmodNLVrZMVZLXPL92gwb3X7vSle7fGosA==
+X-Gm-Gg: ASbGnctpT5NXzJITe01D6f1Mgz3guA1sDfryVWe1dRKgnJcfyfjIggGlDyEIq+jGnEV
+	9P0dkzcYqL45//RdXRqM3IWN6VVLfHnq4zhv4nB+TPGHhmMdqDub3K0ZqK2npHvcloZtACr50YL
+	9LW/AG+e93a9pLeCfaiz4WvtN7KBQDp4ZTfFMATSwYRkvqFlvnS1SXY6wBaVZjI8poVJoD9rjku
+	tF+OvemMfBazH98osMSBtkBQgnsBdsVHJutqWRqzXMF2Qqr+uVLNzzzqf0ZSTTtA2K4D6kEiKqA
+	V0udKDeHxmylcGc9lD1CqYI5ssaYMOkzjb4SPZd4rJU+VN3Ak3WLIJjHExJ5+gHUn3hO
+X-Received: by 2002:a05:600c:8b4b:b0:456:24aa:9586 with SMTP id 5b1f17b1804b1-45b479f7d79mr29730335e9.21.1755704643877;
+        Wed, 20 Aug 2025 08:44:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHQEQmzCV1NTmYWg14hpuYZBLWhYM2bdzJEG/AeqxOARbHWDkqg2ZXpbF4adP2mEM4l9ToKqA==
+X-Received: by 2002:a05:600c:8b4b:b0:456:24aa:9586 with SMTP id 5b1f17b1804b1-45b479f7d79mr29730055e9.21.1755704643410;
+        Wed, 20 Aug 2025 08:44:03 -0700 (PDT)
+Received: from maya.myfinge.rs (ifcgrfdd.trafficplex.cloud. [176.103.220.4])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b47c90cc4sm41236355e9.16.2025.08.20.08.44.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Aug 2025 08:44:02 -0700 (PDT)
+Date: Wed, 20 Aug 2025 17:44:01 +0200
+From: Stefano Brivio <sbrivio@redhat.com>
+To: Florian Westphal <fw@strlen.de>, Sebastian Andrzej Siewior
+ <bigeasy@linutronix.de>
+Cc: <netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, <netfilter-devel@vger.kernel.org>,
+ pablo@netfilter.org
+Subject: Re: [PATCH net-next 5/6] netfilter: nft_set_pipapo: Store real
+ pointer, adjust later.
+Message-ID: <20250820174401.5addbfc1@elisabeth>
+In-Reply-To: <20250820144738.24250-6-fw@strlen.de>
+References: <20250820144738.24250-1-fw@strlen.de>
+	<20250820144738.24250-6-fw@strlen.de>
+Organization: Red Hat
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.49; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
-X-Virus-Status: Clean
 
-On Mon, 18 Aug 2025 13:27:24 -0700
-Eric Biggers <ebiggers@kernel.org> wrote:
+On Wed, 20 Aug 2025 16:47:37 +0200
+Florian Westphal <fw@strlen.de> wrote:
 
-> To prevent timing attacks, MACs need to be compared in constant time.
-> Use the appropriate helper function for this.
+> From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 > 
-> Fixes: bf355b8d2c30 ("ipv6: sr: add core files for SR HMAC support")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
+> The struct nft_pipapo_scratch is allocated, then aligned to the required
+> alignment and difference (in bytes) is then saved in align_off. The
+> aligned pointer is used later.
+> While this works, it gets complicated with all the extra checks if
+> all member before map are larger than the required alignment.
 > 
-> v2: sent as standalone patch targeting net instead of net-next.
-> 
->  net/ipv6/seg6_hmac.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
+> Instead of saving the aligned pointer, just save the returned pointer
+> and align the map pointer in nft_pipapo_lookup() before using it. The
+> alignment later on shouldn't be that expensive.
 
-The fix looks good to me. Thanks!
+The cost of doing the alignment later was the very reason why I added
+this whole dance in the first place though. Did you check packet
+matching rates before and after this?
 
-Ciao,
-Andrea
+-- 
+Stefano
 
-Reviewed-by: Andrea Mayer <andrea.mayer@uniroma2.it>
-
-> diff --git a/net/ipv6/seg6_hmac.c b/net/ipv6/seg6_hmac.c
-> index f78ecb6ad8383..5dae892bbc73b 100644
-> --- a/net/ipv6/seg6_hmac.c
-> +++ b/net/ipv6/seg6_hmac.c
-> @@ -33,10 +33,11 @@
->  #include <net/ip6_route.h>
->  #include <net/addrconf.h>
->  #include <net/xfrm.h>
->  
->  #include <crypto/hash.h>
-> +#include <crypto/utils.h>
->  #include <net/seg6.h>
->  #include <net/genetlink.h>
->  #include <net/seg6_hmac.h>
->  #include <linux/random.h>
->  
-> @@ -278,11 +279,11 @@ bool seg6_hmac_validate_skb(struct sk_buff *skb)
->  		return false;
->  
->  	if (seg6_hmac_compute(hinfo, srh, &ipv6_hdr(skb)->saddr, hmac_output))
->  		return false;
->  
-> -	if (memcmp(hmac_output, tlv->hmac, SEG6_HMAC_FIELD_LEN) != 0)
-> +	if (crypto_memneq(hmac_output, tlv->hmac, SEG6_HMAC_FIELD_LEN))
->  		return false;
->  
->  	return true;
->  }
->  EXPORT_SYMBOL(seg6_hmac_validate_skb);
-> 
-> base-commit: 715c7a36d59f54162a26fac1d1ed8dc087a24cf1
-> -- 
-> 2.50.1
->
 
