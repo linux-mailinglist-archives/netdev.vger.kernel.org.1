@@ -1,162 +1,150 @@
-Return-Path: <netdev+bounces-215287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF0E0B2DE68
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 15:53:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B460DB2DE51
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 15:50:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5833817A6C2
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 13:50:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 778197BAE71
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 13:48:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 401F71A9F81;
-	Wed, 20 Aug 2025 13:50:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 908CF1A9FB2;
+	Wed, 20 Aug 2025 13:50:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ViR3ztcX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7021A1DE8B2
-	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 13:50:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD07417A309;
+	Wed, 20 Aug 2025 13:50:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755697819; cv=none; b=Oi/2VhVfRDjhu7UYg0mQmm75O1/QUClGuyYKDDEmxfUb9l38MFDUPisLyb/42IhFuoTihHShWoYSnDhfZeWGujJy8IzLHIXa57lnILm3Hm6Y9llT4htbkBG3dVgBs8B9IitkuzFdibEpklgTBvBDfxwuBj4BY96n8aNYsYFCSH4=
+	t=1755697814; cv=none; b=qCjIXxDUX6LzoAccO/N2pSU/dFx9tx9mMxPckWab2/5Eo1wCLssx82WqJz6u++f6dGeLrpSrIPASu4qvQqKfdyukAc42CU3ea+ntkCt4nhXbsd2diCSVhtt+5bzSxuS3tmgOBwB/y+Zhl2+t8Lp4kdY11tsVu0tMeNxPP2+bKic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755697819; c=relaxed/simple;
-	bh=IY1hCmh/ms+pl4eZUlo7JOL5fRJk9SupjR3P8rg4KAA=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=fospKJmFnjb+fa/NM+2FBDk7FWD8rjwYhqOuc91AYr6Tb7rsyk5l8vN9KTOY5fCTy21lYXNCItZAlfrqTLJxQtgH0zyJ4U8NxNW1kBNeWSpPwa6IV3PoraFpwtm2XKv1ORei7eVuygF0dSdwQiLt8mJ/KqPKpIAkqRTFN1C1dto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3e5700a3d43so183457335ab.3
-        for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 06:50:17 -0700 (PDT)
+	s=arc-20240116; t=1755697814; c=relaxed/simple;
+	bh=dMvgYaXjumQ1VdyVAztFC4jmSWiILQ0PT5qCK7OBCIw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oK2nTmDk00ejRFz25KH88DvCfohfwOVlZJjmar/NGek32bUjRye8T2JR3JMP7mDZlVvfQdxv6+44aQZaW5Q1NcV7g3kVHpG9uma7BdWPJGY71c/FMClelvJ+T96EVNRuVD0nbpcC87jpn9rX5BnbR6VjEXyYuQw4bvablzU6PV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ViR3ztcX; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-45a20c51c40so39884165e9.3;
+        Wed, 20 Aug 2025 06:50:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755697811; x=1756302611; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eBy4+jOy550+2s+ORoaxR2PvHEe/JGkfvCohbhnR2vA=;
+        b=ViR3ztcXusjtJnGAVKnu2oIr6HrazFnn6fxzaKJAkZCwQAKUSLo8blirAdSWY5CWsv
+         OSvtoZaoI6yQAYakZH1cSx5ixXYGDSw8y/+EEE7iH0AmW2GWAVx7JoShNIwx9P7+b0rF
+         5mezcXAy9ATdmLUWXeFTghU6KPf3AskzsygxlLBSLkr1uJIGc8l/DRnDeZN/II6IqUTp
+         ruLAIdxlcktYcEPdNEBUWHZlfX8ZpQSIa/RwfPQeM0hb4nVb6OAV41MBk4+OE1gweXwE
+         yPUvGUj0ByCIT6YWFL97F2/pZG8AIRnuFyO7TGHVIKiewFocVMrrPRmypNLzhKFCXFm8
+         wtJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755697816; x=1756302616;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+        d=1e100.net; s=20230601; t=1755697811; x=1756302611;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FCft0OtSYmLcVWsWIK6iy7gIzs3jV3RaunmmsDo3CIY=;
-        b=UNZAF+hKHqFokDJA72fWfp2xYOdpuVTVOv7m3PyQXpPEICmDPsGjRuiRu74jcFhiXY
-         Rawe6sHjRolzIK7yzmIlEKjke4wOgKyhHGanPtreNmZ7DQSQenpXA3QW9nICyBxZrga1
-         o5+oTtDgw5PzKtOMsjvGVvphc05hOXMpt6NVSj0QZnJqdahPmC8BTtPQC6K1nPVh+DnA
-         SPBpdxdu1oB7OVuuoSipUC0m5Tdmq9DuDgFahydktAWqQAuJI1HgQZDSeUNhwyi7p+Xv
-         91pdeVcBmrQPNcLyPKRRC+mtfa1LKEoydUwOCZOD/J9FOBk1fcUf5lD/oXmJwTy4wxl0
-         Mq2g==
-X-Forwarded-Encrypted: i=1; AJvYcCX4+corWY7lk5/HSTMn35/hjnNAn/2tOrDdOlzOR0keUJLFNAfx3TvNNoWJptR4AV85CvCD8/A=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4XIVjWvbPK23c8GI7nCgEglo059TR9erbvj5JgTvQIw03FLnW
-	fAJy2w1AbrrMarQhsRKVV426NygWO9cw7SGzeT69Yx+H2UXYEIgA5sdveDOzyM5dehfU8hGqnLh
-	EhUv3qqPt0paXZ25Rj38b9MBecpbPOurTpXRQH8zTaadpPxSM4EWxZ7YQLPg=
-X-Google-Smtp-Source: AGHT+IGhn4ZYmJP7sBYy4J89eY3N54uRGsYJzXgBSJdGM3I2L/PUzn7oQGaPAbDMu9Q/TuHoUNnRPiV0D3jaz8zlEydn+YcEPKCy
+        bh=eBy4+jOy550+2s+ORoaxR2PvHEe/JGkfvCohbhnR2vA=;
+        b=caYoYllpTSgYkOaQzfYVDScy17znsKqtY0ThNa5wgDpl+TRU0D2DLmUQV+G1zF5NjS
+         vRW60Tu1MHiEbQCnpK9CeWIdv/+DzQ6KVQYVsSzBER3m4EGgVXzhPkPIskOlD2dKithl
+         IF8i4D1HON2qQbk8zfDG10dlqNaO6k8CjB6jC5lsS6s0xgsj1ZJmm3Ri3zE6cXtIsMp9
+         SI/GO6IuKYJPmtvfl3H+cBGxYTHQ4Y2BucpgN6+BsSig8J5wrEgjKNHrXSgxOAH1oGwG
+         EkEx0GA77Kju+WUHm+esWwa9IvxHeMxCt26n1BoEucxZlkDi30D/o/OiP+/6769+PRjK
+         M3Vw==
+X-Forwarded-Encrypted: i=1; AJvYcCUD+S40CPBD9ToWBP6fWd/WJHNR77j0igIvkwNDiaghRaBScAXYHOL7wd2Hvw4qPZ2H8Z9RWMV+XpG56aXk@vger.kernel.org, AJvYcCWWVeO7/w8GZQKejIqVKwq2Cb1kVr71ddUjchwEDAHCEG3QiB3nk6yr7y90XYa4XZEcZxGIM3lz@vger.kernel.org, AJvYcCXinSeqwTjxIgd0kmBlcJe7mRZ2aRVPASaY9fqsqd8E57JB1pq4ho7YFrw+RwsNMwz3sdFFy6zxmw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEjHEQyPwwc3+ZW4KCc0h9YWmeijm9Yc3nOSPoZmxdvRkVaAai
+	xQ3jbRNuSHuDlFKZ3xgyE4FSrwD2iiPDG3j4s/WR/A0AugQTv5A1Htrv
+X-Gm-Gg: ASbGncuQ74zgPMuo8G6RuvbmUzkVBMoZKwWVqWE+J7WNVrne+bwI9knrgRVCkcEAmuw
+	RNwiNBJAv0qwcHCytpT3opdag/d5Vka+9nLGkH/x/ME6pgQMn6vRHPhGTM2VM0SxphphG3tLcuv
+	sCNCUIM3/MlUtGT/8khO6guLtz9uXgue6vnyfbxKJherv4MCqp7S562llS5xsjMhAurQmGZihVE
+	4HJwClKOwnKoueJKahm4go6aid8LyTlCh6feIjdNJ0yeLlAyseb0kXETPe5hWcXJ5mTwzbpgDJT
+	TzgKwagTughbesdEMRz/5iyKZUSb556XLm+9eXwaFvw1gu2AOLxdP/9vcUzEG8RKXhnLhV/RLVS
+	7+VUkQMQdtP9EMcuLGNvlqZx5jq4rluK/vo9E2AcOdLBuxOzxbvwXoaU=
+X-Google-Smtp-Source: AGHT+IFdQ3wLI4MGcZ93YlSdYTeoAmiyN+/gD0DLVcCnFemnvTq4l1fLPv7+rWpJrqyIX0UXaACR6g==
+X-Received: by 2002:a05:600c:b86:b0:459:d9a2:e927 with SMTP id 5b1f17b1804b1-45b4acff99cmr16103705e9.5.1755697810679;
+        Wed, 20 Aug 2025 06:50:10 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:5f7e])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b47c90cc4sm36949085e9.16.2025.08.20.06.50.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Aug 2025 06:50:10 -0700 (PDT)
+Message-ID: <cbbb4ce9-146d-4491-afd5-7ba54e13a724@gmail.com>
+Date: Wed, 20 Aug 2025 14:51:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:156e:b0:3e5:3ef0:b0e5 with SMTP id
- e9e14a558f8ab-3e67c9b66b1mr46030995ab.7.1755697816711; Wed, 20 Aug 2025
- 06:50:16 -0700 (PDT)
-Date: Wed, 20 Aug 2025 06:50:16 -0700
-In-Reply-To: <20250820092925.2115372-1-jackzxcui1989@163.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68a5d298.050a0220.3d78fd.0003.GAE@google.com>
-Subject: [syzbot ci] Re: net: af_packet: Use hrtimer to do the retire operation
-From: syzbot ci <syzbot+ci8b7a13618981d53b@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, ferenc@fejes.dev, 
-	horms@kernel.org, jackzxcui1989@163.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	willemdebruijn.kernel@gmail.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 08/23] eth: bnxt: set page pool page order
+ based on rx_page_size
+To: Mina Almasry <almasrymina@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+ Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, andrew+netdev@lunn.ch, horms@kernel.org,
+ davem@davemloft.net, sdf@fomichev.me, dw@davidwei.uk,
+ michael.chan@broadcom.com, dtatulea@nvidia.com, ap420073@gmail.com,
+ linux-kernel@vger.kernel.org, io-uring@vger.kernel.org
+References: <cover.1755499375.git.asml.silence@gmail.com>
+ <51c3dd0a3a8aab6175e2915d94f7f7aece8e74d3.1755499376.git.asml.silence@gmail.com>
+ <CAHS8izOs_m9nzeqC5yXiW9c1etDug4NUoGowPzzPRbB4UFL_bQ@mail.gmail.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CAHS8izOs_m9nzeqC5yXiW9c1etDug4NUoGowPzzPRbB4UFL_bQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-syzbot ci has tested the following series
+On 8/19/25 20:43, Mina Almasry wrote:
+> On Mon, Aug 18, 2025 at 6:56 AM Pavel Begunkov <asml.silence@gmail.com> wrote:
+>>
+>> From: Jakub Kicinski <kuba@kernel.org>
+>>
+>> If user decides to increase the buffer size for agg ring
+>> we need to ask the page pool for higher order pages.
+>> There is no need to use larger pages for header frags,
+>> if user increase the size of agg ring buffers switch
+>> to separate header page automatically.
+>>
+>> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+>> [pavel: calculate adjust max_len]
+>> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+>> ---
+>>   drivers/net/ethernet/broadcom/bnxt/bnxt.c | 7 ++++++-
+>>   1 file changed, 6 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+>> index 5307b33ea1c7..d3d9b72ef313 100644
+>> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+>> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+>> @@ -3824,11 +3824,13 @@ static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
+>>          pp.pool_size = bp->rx_agg_ring_size / agg_size_fac;
+>>          if (BNXT_RX_PAGE_MODE(bp))
+>>                  pp.pool_size += bp->rx_ring_size / rx_size_fac;
+>> +
+>> +       pp.order = get_order(bp->rx_page_size);
+>>          pp.nid = numa_node;
+>>          pp.netdev = bp->dev;
+>>          pp.dev = &bp->pdev->dev;
+>>          pp.dma_dir = bp->rx_dir;
+>> -       pp.max_len = PAGE_SIZE;
+>> +       pp.max_len = PAGE_SIZE << pp.order;
+> 
+> nit: I assume this could be `pp.max_len = bp->rx_ring_size;` if you
+> wanted, since bnxt is not actually using the full compound page in the
+> case that bp->rx_ring_size is not a power of 2. Though doesn't matter
+> much, either way:
 
-[v6] net: af_packet: Use hrtimer to do the retire operation
-https://lore.kernel.org/all/20250820092925.2115372-1-jackzxcui1989@163.com
-* [PATCH net-next v6] net: af_packet: Use hrtimer to do the retire operation
+Yeah, thought it's cleaner to derive it from order in case
+sth about rx_page_size changes again and it was already
+overlooked once, and it's pow2 anyway
 
-and found the following issue:
-WARNING in hrtimer_forward
+-- 
+Pavel Begunkov
 
-Full report is available here:
-https://ci.syzbot.org/series/81b08fd6-a740-4520-9c88-b7dcdc7953a1
-
-***
-
-WARNING in hrtimer_forward
-
-tree:      net-next
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
-base:      da114122b83149d1f1db0586b1d67947b651aa20
-arch:      amd64
-compiler:  Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-config:    https://ci.syzbot.org/builds/0ebac6ed-b7ae-4c3d-9edc-db3a521ad7a0/config
-C repro:   https://ci.syzbot.org/findings/c3421800-7bbc-4097-a1cf-36e97a4dea98/c_repro
-syz repro: https://ci.syzbot.org/findings/c3421800-7bbc-4097-a1cf-36e97a4dea98/syz_repro
-
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 6012 at kernel/time/hrtimer.c:1052 hrtimer_forward+0x1d6/0x2b0 kernel/time/hrtimer.c:1052
-Modules linked in:
-CPU: 1 UID: 0 PID: 6012 Comm: syz.0.20 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:hrtimer_forward+0x1d6/0x2b0 kernel/time/hrtimer.c:1052
-Code: 4c 89 33 48 8b 04 24 eb 07 e8 66 30 12 00 31 c0 48 83 c4 18 5b 41 5c 41 5d 41 5e 41 5f 5d e9 01 b0 ce 09 cc e8 4b 30 12 00 90 <0f> 0b 90 eb df 48 89 e8 4c 09 f8 48 c1 e8 20 74 0a 48 89 e8 31 d2
-RSP: 0018:ffffc900029def90 EFLAGS: 00010293
-RAX: ffffffff81ad7be5 RBX: ffff888028782648 RCX: ffff88810e88d640
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: 000000000000116b R08: ffffffff8fa37e37 R09: 1ffffffff1f46fc6
-R10: dffffc0000000000 R11: ffffffff81724e10 R12: ffff888028782660
-R13: 00000000007a1200 R14: 1ffff110050f04cc R15: 0000000000000001
-FS:  000055555f6cd500(0000) GS:ffff8881a3c1c000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffcf1be3d88 CR3: 0000000023c86000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- hrtimer_forward_now include/linux/hrtimer.h:366 [inline]
- _prb_refresh_rx_retire_blk_timer net/packet/af_packet.c:697 [inline]
- prb_open_block+0x3a7/0x5e0 net/packet/af_packet.c:930
- prb_dispatch_next_block net/packet/af_packet.c:994 [inline]
- __packet_lookup_frame_in_block net/packet/af_packet.c:1152 [inline]
- packet_current_rx_frame net/packet/af_packet.c:1178 [inline]
- tpacket_rcv+0x1229/0x2f40 net/packet/af_packet.c:2409
- deliver_skb net/core/dev.c:2472 [inline]
- deliver_ptype_list_skb net/core/dev.c:2487 [inline]
- __netif_receive_skb_core+0x3107/0x4020 net/core/dev.c:5923
- __netif_receive_skb_list_core+0x23f/0x800 net/core/dev.c:6054
- __netif_receive_skb_list net/core/dev.c:6121 [inline]
- netif_receive_skb_list_internal+0x975/0xcc0 net/core/dev.c:6212
- netif_receive_skb_list+0x54/0x450 net/core/dev.c:6264
- xdp_recv_frames net/bpf/test_run.c:280 [inline]
- xdp_test_run_batch net/bpf/test_run.c:361 [inline]
- bpf_test_run_xdp_live+0x1786/0x1b10 net/bpf/test_run.c:390
- bpf_prog_test_run_xdp+0x713/0x1000 net/bpf/test_run.c:1322
- bpf_prog_test_run+0x2c7/0x340 kernel/bpf/syscall.c:4590
- __sys_bpf+0x581/0x870 kernel/bpf/syscall.c:6047
- __do_sys_bpf kernel/bpf/syscall.c:6139 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:6137 [inline]
- __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6137
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f31da38ebe9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffcf1be5358 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 00007f31da5b5fa0 RCX: 00007f31da38ebe9
-RDX: 0000000000000050 RSI: 0000200000000600 RDI: 000000000000000a
-RBP: 00007f31da411e19 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f31da5b5fa0 R14: 00007f31da5b5fa0 R15: 0000000000000003
- </TASK>
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
