@@ -1,121 +1,156 @@
-Return-Path: <netdev+bounces-215335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7720B2E2A8
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 18:51:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 133AAB2E2F0
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 19:06:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E1187B2840
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 16:49:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E757189BF32
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 17:07:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A562532A3D5;
-	Wed, 20 Aug 2025 16:51:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0C992E8B72;
+	Wed, 20 Aug 2025 17:06:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b="fg/O2ocZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AVZdys1b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-internal.sh.cz (mail-internal.sh.cz [95.168.196.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 111B872634;
-	Wed, 20 Aug 2025 16:51:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.168.196.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F4536CE0D;
+	Wed, 20 Aug 2025 17:06:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755708680; cv=none; b=YH7EtU/Ble0tj8JavXu+cG0X9QrnK9UNMP4YKL0vtfeTlRfW17BoSnQAu6mz7JC/fqm4YMPPu7FaqFJ0zZ2n+k9UgJ5fni4pq43ItloZVVai6fIf/dzetb/dkQrsPCaM8o0fIG0xWam9J5GPrSf58UH0iM0SL9vRRvjM1wgm1R8=
+	t=1755709607; cv=none; b=FuXofJr2WF93xXdK5kmFS/jumgsR7VvW7pz62vYuU7LzDYi/zXKymo6pfC9DvyZLvur6pCUPoWGv2QbNam8cy4p41xZULKcOcFb6OCA+q0C/ZcUueYyUvSvdj6Qi0VAyLE8VSHcrLgrDkhxFYLWd6VxV+XJhYLtZSgXkBEYP5DY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755708680; c=relaxed/simple;
-	bh=ba719obtLPXDjN/hMxv84tLxoFOQDoplgjt+Dh1FquE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p38ySEPJXeNWxbpDgGyzPvJZW42kgDNEhqX/T9U0mNTb4aybyT4HpxLlm7hzEGiBZTpaMgvfn0LpAR02k10n2XVI4MHt5dYekdH9a5Og2GDTuZtCu4I7dNo/wCSxvt6XNMunwm2V5f3TWezAEYAN5p58FDWmaU3e0CX61Qym4w0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com; spf=pass smtp.mailfrom=cdn77.com; dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b=fg/O2ocZ; arc=none smtp.client-ip=95.168.196.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cdn77.com
-DKIM-Signature: a=rsa-sha256; t=1755708669; x=1756313469; s=dkim2019; d=cdn77.com; c=relaxed/relaxed; v=1; bh=aEvEGZgaiQng64jbfPgPU723vPCPqVeUVZPTA1jHr5w=; h=From:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:In-Reply-To:References;
-   b=fg/O2ocZjuJb1khY1d9W6L5zjRL5KJ/K0LsmwHwa0y9DFWT285xTXAWuf4fbnzx+YklJOUB6jWFwMHodGpTOQGabBHo2NK9M7roc2jjsW/1PXXCJ9O1TxiqmoCgrYggOUkxlmfT/U8FO3TdiIy/04hwdCWacLsh3U0Z7ogZkeVY=
-Received: from [10.26.2.104] ([80.250.18.198])
-        by mail.sh.cz (14.1.0 build 16 ) with ASMTP (SSL) id 202508201851072124;
-        Wed, 20 Aug 2025 18:51:07 +0200
-Message-ID: <e65222c1-83f9-4d23-b9af-16db7e6e8a42@cdn77.com>
-Date: Wed, 20 Aug 2025 18:51:07 +0200
+	s=arc-20240116; t=1755709607; c=relaxed/simple;
+	bh=IQUsg5cvVqy3HqgYcOB3CxMyauJ9YJlgKAd8e1YvGDs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NNGNQbx1xvBEopVqTEMU9Sc2oIOUR3n8QxOG43s7Aaqm5Y17xFjwheFXO2FlYZU3KcY/haC+MRfZmlAE2gSIRosBvA8jJney/UEz/QWE+BQbwWkuohva6+BsMszw5wRzLUavoBK79ZsZxrtAxWO87sEQuuz8YcZNuWkc79Xq0Zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AVZdys1b; arc=none smtp.client-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b472fd93ad1so32405a12.0;
+        Wed, 20 Aug 2025 10:06:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755709604; x=1756314404; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8W8/wWuM+A08MdToSUhnUGmguQ8smfR5MJmNoOHi5O4=;
+        b=AVZdys1basU8tJKaazvOh1WKdTRxo0YnCSUCzfY1TiGiwrHqG8Krl+72nO8hdqKKkI
+         L8bUEu6Vp73rMdSxIidEmPGSjiQNrZ7pDOgAyuF7a8rbNszN3b8AqgXVLxo6n4axHr4F
+         w7SK4SbNg0WS5Ll/7VOh1k/3h9TzivIrHzUKJMLIiRgxiGYoplQbX/RWXfwUrMpI2awW
+         CwHja3WJTI/S4W1WEovoYTpIV+l4nN8AegbAsJ4c+Y4OmMZRCkcYaNfsEy/QWLDxjZIj
+         SViZptmQXcGkqwMZzzkMa2eQVvmMXaS4Dx1l4CDbTJs2qEl58SCRWjGtRkF/jfIpX2l1
+         AMnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755709604; x=1756314404;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8W8/wWuM+A08MdToSUhnUGmguQ8smfR5MJmNoOHi5O4=;
+        b=Fr8dQoXChvHT3bw1A/V5V+0oJ/y3a/GvZtycLedWa3u0Km77eSGYTpcB+RVL8qboOd
+         KBAgCGEseu0Zrco/CoKLVyMxYxZyyPQz/zLmf8IydEPwviZV/HbHweVfg7DdvKVkzA44
+         GfUSBD8Kzi5Yg1bWVD0o2a1uxzs5NTDcsn/grVcTOdKaLZHR9MWH3sOxEXw8WV0o7aqG
+         AocaMO/VEjCljw+BIz70wHGJQQCFKiSrd+l6m65MESf9on5jOcpyPBr5KC9LBkU9UpNa
+         FINfeZKSnsTo50T6SqjDbvPwkveF4tWczXIF3XE2bs8wGAESeOFdpFzhrCp/ai5ZhglC
+         wLwA==
+X-Forwarded-Encrypted: i=1; AJvYcCVkiW0/RELBf7jbmye7ILnq8S8Kat13rHDUUgKTqrvjj5LbH88OCJxIRQYlX3lfYu0xPBhRRog=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOJ/HMRmNTRYrO/GtendymimesuI4t0FEcRMospbF3BPhA2pl4
+	QCTk53Jtz8exqUuJwKw9FZSapUnYTW/0yyGIRO2MjVhlwTORY5caawc=
+X-Gm-Gg: ASbGnct0gv9PVTYq+617Ph+3iYqOYKwhODb7Et/8reebnURRPgmsgE114+nrX5M5D06
+	9bXXNSUNZon23y8EeMsXpssVQ7RzH3OzJyHHI7Q0NpLgiW9505VdbZ1le+HSEyPolQIBddKvX03
+	y2JNRhDhn/9UcjafEUDBGyW4B4nzqcvnhwVmjTST8D2HPNHO7EDEVkURrqfaJUNgqa3Gq7Vzlh8
+	UuIBJFCT4YwrrysE025JWXQ7fTW+1SfkCSfqMOT7VaiJjpk2U5D10jMmm1z9agVN/tcaXvQh+Ae
+	bkczVYllDq6jQuFsshekxf2ivBz4QLtXxe+iVAIKOFTBTQTa74NfoWEbhfwkKrjEguT4rGpZ922
+	+rzoXu6gj4nPpfQqYmJdUK5zeARnvf2kmiVT7YM7dkAGaXM3eJEHYwMHilvk=
+X-Google-Smtp-Source: AGHT+IHhrnS4bO5cF6D66gvRd6lpOM+6Asj4u4plG7wTD1l3FOElbOmm14MXfP3s7mtRa9SLL1vJ7A==
+X-Received: by 2002:a17:903:b0e:b0:240:6ae4:3695 with SMTP id d9443c01a7336-245ef113d53mr43278745ad.4.1755709604160;
+        Wed, 20 Aug 2025 10:06:44 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-245ed4fa5c8sm31466475ad.122.2025.08.20.10.06.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Aug 2025 10:06:43 -0700 (PDT)
+Date: Wed, 20 Aug 2025 10:06:43 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+	andrii@kernel.org, netdev@vger.kernel.org,
+	magnus.karlsson@intel.com, aleksander.lobakin@intel.com,
+	Eryk Kubanski <e.kubanski@partner.samsung.com>
+Subject: Re: [PATCH v6 bpf] xsk: fix immature cq descriptor production
+Message-ID: <aKYAo2pNMp3Ahvog@mini-arch>
+References: <20250820154416.2248012-1-maciej.fijalkowski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4] memcg: expose socket memory pressure in a cgroup
-To: Tejun Heo <tj@kernel.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
- <mkoutny@suse.com>
-Cc: Daniel Sedlak <daniel.sedlak@cdn77.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
- David Ahern <dsahern@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
- Shakeel Butt <shakeel.butt@linux.dev>, Yosry Ahmed <yosry.ahmed@linux.dev>,
- linux-mm@kvack.org, netdev@vger.kernel.org,
- Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- Muchun Song <muchun.song@linux.dev>, cgroups@vger.kernel.org
-References: <20250805064429.77876-1-daniel.sedlak@cdn77.com>
- <aJeUNqwzRuc8N08y@slm.duckdns.org>
- <gqeq3trayjsylgylrl5wdcrrp7r5yorvfxc6puzuplzfvrqwjg@j4rr5vl5dnak>
- <aJzTeyRTu_sfm-9R@slm.duckdns.org>
-Content-Language: en-US, cs
-From: Matyas Hurtik <matyas.hurtik@cdn77.com>
-In-Reply-To: <aJzTeyRTu_sfm-9R@slm.duckdns.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CTCH: RefID="str=0001.0A002116.68A5FD2E.0047,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0"; Spam="Unknown"; VOD="Unknown"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250820154416.2248012-1-maciej.fijalkowski@intel.com>
 
-Hello,
+On 08/20, Maciej Fijalkowski wrote:
+> Eryk reported an issue that I have put under Closes: tag, related to
+> umem addrs being prematurely produced onto pool's completion queue.
+> Let us make the skb's destructor responsible for producing all addrs
+> that given skb used.
+> 
+> Introduce struct xsk_addrs which will carry descriptor count with array
+> of addresses taken from processed descriptors that will be carried via
+> skb_shared_info::destructor_arg. This way we can refer to it within
+> xsk_destruct_skb(). In order to mitigate the overhead that will be
+> coming from memory allocations, let us introduce kmem_cache of
+> xsk_addrs. There will be a single kmem_cache for xsk generic xmit on the
+> system.
+> 
+> Commit from fixes tag introduced the buggy behavior, it was not broken
+> from day 1, but rather when xsk multi-buffer got introduced.
+> 
+> Fixes: b7f72a30e9ac ("xsk: introduce wrappers and helpers for supporting multi-buffer in Tx path")
+> Reported-by: Eryk Kubanski <e.kubanski@partner.samsung.com>
+> Closes: https://lore.kernel.org/netdev/20250530103456.53564-1-e.kubanski@partner.samsung.com/
+> Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
+> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> ---
+> 
+> v1:
+> https://lore.kernel.org/bpf/20250702101648.1942562-1-maciej.fijalkowski@intel.com/
+> v2:
+> https://lore.kernel.org/bpf/20250705135512.1963216-1-maciej.fijalkowski@intel.com/
+> v3:
+> https://lore.kernel.org/bpf/20250806154127.2161434-1-maciej.fijalkowski@intel.com/
+> v4:
+> https://lore.kernel.org/bpf/20250813171210.2205259-1-maciej.fijalkowski@intel.com/
+> v5:
+> https://lore.kernel.org/bpf/aKXBHGPxjpBDKOHq@boxer/T/
+> 
+> v1->v2:
+> * store addrs in array carried via destructor_arg instead having them
+>   stored in skb headroom; cleaner and less hacky approach;
+> v2->v3:
+> * use kmem_cache for xsk_addrs allocation (Stan/Olek)
+> * set err when xsk_addrs allocation fails (Dan)
+> * change xsk_addrs layout to avoid holes
+> * free xsk_addrs on error path
+> * rebase
+> v3->v4:
+> * have kmem_cache as percpu vars
+> * don't drop unnecessary braces (unrelated) (Stan)
+> * use idx + i in xskq_prod_write_addr (Stan)
+> * alloc kmem_cache on bind (Stan)
+> * keep num_descs as first member in xsk_addrs (Magnus)
+> * add ack from Magnus
+> v4->v5:
+> * have a single kmem_cache per xsk subsystem (Stan)
+> v5->v6:
+> * free skb in xsk_build_skb_zerocopy() when xsk_addrs allocation fails
+>   (Stan)
+> * unregister netdev notifier if creating kmem_cache fails (Stan)
 
-On 8/13/25 8:03 PM, Tejun Heo wrote:
-> On Wed, Aug 13, 2025 at 02:03:28PM +0200, Michal Koutný wrote:
-> ...
->> One more point to clarify -- should the value include throttling from
->> ancestors or not. (I think both are fine but) this semantic should also
->> be described in the docs. I.e. current proposal is
->> 	value = sum_children + self
->> and if you're see that C's value is 0, it doesn't mean its sockets
->> weren't subject of throttling. It just means you need to check also
->> values in C ancestors. Does that work?
-> I was more thinking that it would account for all throttled durations, but
-> it's true that we only count locally originating events for e.g.
-> memory.events::low or pids.events::max. Hmm... I'm unsure. So, for events, I
-> think local sources make sense as it's tracking what limits are triggering
-> where. However, I'm not sure that translates well to throttle duration which
-> is closer to pressure metrics than event counters. We don't distinguish the
-> sources of contention when presenting pressure metrics after all.
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
-I think calculating the value using self and ancestors would better match
-the logic in mem_cgroup_under_socket_pressure() and it would avoid the
-issue Michal outlined without relying on an explanation in the docs -
-checking a single value per cgroup to confirm whether sockets belonging
-to that cgroup were being throttled looks more intuitive to me.
-
-If we were to have the write side of the stat in vmpressure() look 
-something like:
-   new_socket_pressure = jiffies + HZ;
-   old_socket_pressure = atomic_long_xchg(
-     &memcg->socket_pressure, new_socket_pressure);
-
-   duration_to_add = jiffies_to_usecs(
-     min(new_socket_pressure - old_socket_pressure, HZ));
-   atomic_long_add(duration_to_add, &memcg->socket_pressure_duration);
-
-And the read side:
-   total_duration = 0;
-   for (; !mem_cgroup_is_root(memcg); memcg = parent_mem_cgroup(memcg))
-     total_duration += atomic_long_read(&memcg->socket_pressure_duration);
-Would that work?
-
-There would be an issue with the reported value possibly being larger
-than the real duration of the throttling, due to overlapping
-intervals of socket_pressure with some ancestor. Is that a problem?
-
-Thanks,
-Matyas
+Thanks!
 
