@@ -1,93 +1,56 @@
-Return-Path: <netdev+bounces-215143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 350F0B2D2FA
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 06:30:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 689A7B2D2FD
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 06:33:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AACB116B0A7
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 04:30:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1754B1BC3F04
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 04:33:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 714FB78F26;
-	Wed, 20 Aug 2025 04:30:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b="TouYaUaR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9EB8223324;
+	Wed, 20 Aug 2025 04:33:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC958245014
-	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 04:30:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9C9D1D5146;
+	Wed, 20 Aug 2025 04:33:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755664204; cv=none; b=gg8xxseq577PASCTmPsdxsTuwdxxYtqcUzkBuJ/V4wDoGNFFr2iLHvQELpHj8xLfTyN+zxs1W2FH/0EqrV86SgCJEbDQZwCdAsZZguxYHhoIGAypI3MegQTRpI7gzkknnyehUgWu3J89Mln4a/na/+9TocmHfy8pXmtv7sKfbb8=
+	t=1755664390; cv=none; b=pJ/+Kukuoy9NYaoK9D2l0XVCOgxV9mP9WYVixfnCErlkvuJu3GincR5TaP42yhIzM08HCoQYphEOh4B5oGWbGZ8+VSz+AeO4wGB9qMDTe1EL2gUueQhoQlA7OPnGRZkFzPrJFCspl39CvhzzFCpaAhnCixKvSO1jkpdQuV238JM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755664204; c=relaxed/simple;
-	bh=j7GdqpbRQnKiL+YA5c1CqZDhaW9qk+RTqb/XOZKLv+o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kXGJKN83BXimG8IOnYNtz9ecwXLHpP2Yew5PnUTW743S2TjmMSgkfzc1aafuG4taTciGt7PfTiikHUa4okNa1pxLmD9aIV7oRDtYKbEd2RSUj7k825i/PMvcoJn8GHnQfgK7f1NqMskeAdzX4QmkeIJzbMzOQT9fuAKZ8ZiOH0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org; spf=pass smtp.mailfrom=wbinvd.org; dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b=TouYaUaR; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wbinvd.org
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-76e2eb6ce24so5268838b3a.3
-        for <netdev@vger.kernel.org>; Tue, 19 Aug 2025 21:30:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=wbinvd.org; s=wbinvd; t=1755664201; x=1756269001; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=O/XhOpQfSquhT6qAiE/Hm7UDJfbQoL+JBQv5VOGD3m8=;
-        b=TouYaUaRQw2+IQv4ajv2cwG1X+qf6fNruB0BJ0QmQlxONp5/E6oEqE8GmxdKxetHWC
-         TtFZcaqEPWZ6kNKw6lKS7w73Qm6XslRnbpkWNRUVsab3p46ViCI1BIhiSDUd8IYbfrDc
-         NDyBDvJyFaef7S3W0FfPEIxDnURmG9iqCgnrtPI6TbJ889rlnUM6+KRRfaRW2Yj6Dt3A
-         SSzqhyDTEK4L+HCGEicI0epA0QJD4RBJmq6jAF22VWI01DB3kQyWM1C+vr4nWIlFVsQR
-         xdiJ0tX08L/DdigYhwGBVgvfi8Gbuy2x7tA9KVve3MyuY4DRMO3rxaRBTN8WNC5bj8Vk
-         RK3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755664201; x=1756269001;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=O/XhOpQfSquhT6qAiE/Hm7UDJfbQoL+JBQv5VOGD3m8=;
-        b=lm1sEcZhU6J+dtqRarVLP//Rlks6JIj14IHTPfv+bJ8Vvx4JQFvcp3eqYcBvDl1RtY
-         2AUhxXVG/ol9msfvmZd6Df7lHR1tNunNr4bmkgPxWxCNSf8+okuB6wQrXnEZ+xgYqJWr
-         AfVOJ9aimVuSuH756XfoYlTHBtqKQDt1yDW4VVZgKInBpBiicYgWqZ8qsvQnV5dQqjjA
-         IO6o9MJqWdG+iv9SnoxCOlfypSqqXE7R3KaerCT3hpgD0iU9V/KFwH0QzrXB66nixL1J
-         qNOzor+wSORU5iKDRZ/zjpe/DYmQl1GJOPAa+hu3UBbXFe7qbXWTM3cB6A93eMXfImf7
-         PKDA==
-X-Gm-Message-State: AOJu0YzQnra72XsA/OokA1gBO227g8qIFSLK6/DAqMSDNQyQSVwLAB/V
-	/nRoQaPoXq5ePqk6VkMlZ0QRN8DDxt9kh6UCXni24RX2mapLqnbCWlFOEhHXmjv+W9W2W76Q83y
-	RrjxWWXo=
-X-Gm-Gg: ASbGncvnonYI1Lten20HP14TAMu8gNNHGR6GaaB5wma33moY+3r8zWrcsaqYw0Ft7bc
-	CagCAEKl3DK1waAh2N31Xh623lEM/mIQPmwJbsLwxl5VFf0WoYAXa/36gq5TypLcXMavMgJY+lg
-	FzJh8I/7xZ8L2L5G4VJlNdAIG7Rn/1oHGUNZciffojy1ZP108qrtMamLYJ9cZ9hQMnnoTxDrtSG
-	DTcvlAjuemWw1xA/y41f+fp683+vFhgdQZgrfS7b+3JM5T17Pc+9g0mW6oGMgMGvkzLtZ967bmu
-	V5sXiprxu4JNIrxdoP3yqoi+kEEiLSNLc0Mi0L/gtF0vEF03ycipODhruZvv9PGoerpZ5/r6Z7H
-	rEWw7Kqlz0vd5t7UARSf4dvBF
-X-Google-Smtp-Source: AGHT+IGZr4nlgpLI+auV0iC4Ha3LGY7jX80Pp8ALkEHgYHjKKLQHDtDDxmFwBV4EzhFfQNMUpADqwA==
-X-Received: by 2002:a05:6a20:9144:b0:243:78a:82b8 with SMTP id adf61e73a8af0-2431b941d4dmr2365720637.50.1755664201106;
-        Tue, 19 Aug 2025 21:30:01 -0700 (PDT)
-Received: from mozart.vkv.me ([192.184.167.117])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b4763fe8aaesm1133488a12.19.2025.08.19.21.29.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Aug 2025 21:30:00 -0700 (PDT)
-From: Calvin Owens <calvin@wbinvd.org>
-To: netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Ivan Vecera <ivecera@redhat.com>,
-	intel-wired-lan@lists.osuosl.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] i40e: Prevent unwanted interface name changes
-Date: Tue, 19 Aug 2025 21:29:01 -0700
-Message-ID: <94d7d5c0bb4fc171154ccff36e85261a9f186923.1755661118.git.calvin@wbinvd.org>
-X-Mailer: git-send-email 2.47.2
+	s=arc-20240116; t=1755664390; c=relaxed/simple;
+	bh=+sZR4pVtM4D1/iCNqe2AY2fiLorrX6QjbH8YFnC4x6M=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=u1Vt6Up7/iS7ConEURuAo0tur+j/vNeB/YkpZQnD8nEBL2r9o1dxB3TkPEOLg82Ef09b8Mf9S6TAJz/rDgCw1Ihz4B2mobZXAPHsv3SDcWpw+J5ZfrpBaiKBoPDAHCgc9g0ffYyP9PaomMtQD1v5R9v1OiavGZSJ5081UCxkLnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4c6D7N27WvztT3D;
+	Wed, 20 Aug 2025 12:32:00 +0800 (CST)
+Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
+	by mail.maildlp.com (Postfix) with ESMTPS id 463181402C4;
+	Wed, 20 Aug 2025 12:32:59 +0800 (CST)
+Received: from huawei.com (10.175.104.170) by dggpemf500016.china.huawei.com
+ (7.185.36.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 20 Aug
+ 2025 12:32:57 +0800
+From: Wang Liang <wangliang74@huawei.com>
+To: <pablo@netfilter.org>, <kadlec@netfilter.org>, <fw@strlen.de>,
+	<razor@blackwall.org>, <idosch@nvidia.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<horms@kernel.org>
+CC: <yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
+	<wangliang74@huawei.com>, <netfilter-devel@vger.kernel.org>,
+	<coreteam@netfilter.org>, <bridge@lists.linux.dev>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH net] netfilter: br_netfilter: reread nf_conn from skb after confirm()
+Date: Wed, 20 Aug 2025 12:33:29 +0800
+Message-ID: <20250820043329.2902014-1-wangliang74@huawei.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,33 +58,69 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ dggpemf500016.china.huawei.com (7.185.36.197)
 
-The same naming regression which was reported in ixgbe and fixed in
-commit e67a0bc3ed4f ("ixgbe: prevent from unwanted interface name
-changes") still exists in i40e.
+Previous commit 2d72afb34065 ("netfilter: nf_conntrack: fix crash due to
+removal of uninitialised entry") move the IPS_CONFIRMED assignment after
+the hash table insertion.
 
-Fix i40e by setting the same flag, added in commit c5ec7f49b480
-("devlink: let driver opt out of automatic phys_port_name generation").
+When send a broadcast packet to a tap device, which was added to a bridge,
+br_nf_local_in() is called to confirm the conntrack. If another conntrack
+with the same hash value is added to the hash table, which can be
+triggered by a normal packet to a non-bridge device, the below warning
+may happen.
 
-Fixes: 9e479d64dc58 ("i40e: Add initial devlink support")
-Signed-off-by: Calvin Owens <calvin@wbinvd.org>
+  ------------[ cut here ]------------
+  WARNING: CPU: 1 PID: 96 at net/bridge/br_netfilter_hooks.c:632 br_nf_local_in+0x168/0x200
+  CPU: 1 UID: 0 PID: 96 Comm: tap_send Not tainted 6.17.0-rc2-dirty #44 PREEMPT(voluntary)
+  RIP: 0010:br_nf_local_in+0x168/0x200
+  Call Trace:
+   <TASK>
+   nf_hook_slow+0x3e/0xf0
+   br_pass_frame_up+0x103/0x180
+   br_handle_frame_finish+0x2de/0x5b0
+   br_nf_hook_thresh+0xc0/0x120
+   br_nf_pre_routing_finish+0x168/0x3a0
+   br_nf_pre_routing+0x237/0x5e0
+   br_handle_frame+0x1ec/0x3c0
+   __netif_receive_skb_core+0x225/0x1210
+   __netif_receive_skb_one_core+0x37/0xa0
+   netif_receive_skb+0x36/0x160
+   tun_get_user+0xa54/0x10c0
+   tun_chr_write_iter+0x65/0xb0
+   vfs_write+0x305/0x410
+   ksys_write+0x60/0xd0
+   do_syscall_64+0xa4/0x260
+   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+   </TASK>
+  ---[ end trace 0000000000000000 ]---
+
+To solve the hash conflict, nf_ct_resolve_clash() try to merge the
+conntracks, and update skb->_nfct. However, br_nf_local_in() still use the
+old ct from local variable 'nfct' after confirm(), which leads to this
+issue. Fix it by rereading nfct from skb.
+
+Fixes: 62e7151ae3eb ("netfilter: bridge: confirm multicast packets before passing them up the stack")
+Signed-off-by: Wang Liang <wangliang74@huawei.com>
 ---
- drivers/net/ethernet/intel/i40e/i40e_devlink.c | 1 +
+ net/bridge/br_netfilter_hooks.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_devlink.c b/drivers/net/ethernet/intel/i40e/i40e_devlink.c
-index cc4e9e2addb7..40f81e798151 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_devlink.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_devlink.c
-@@ -212,6 +212,7 @@ int i40e_devlink_create_port(struct i40e_pf *pf)
+diff --git a/net/bridge/br_netfilter_hooks.c b/net/bridge/br_netfilter_hooks.c
+index 94cbe967d1c1..55b1b7dcb609 100644
+--- a/net/bridge/br_netfilter_hooks.c
++++ b/net/bridge/br_netfilter_hooks.c
+@@ -626,6 +626,7 @@ static unsigned int br_nf_local_in(void *priv,
+ 		break;
+ 	}
  
- 	attrs.flavour = DEVLINK_PORT_FLAVOUR_PHYSICAL;
- 	attrs.phys.port_number = pf->hw.pf_id;
-+	attrs.no_phys_port_name = 1;
- 	i40e_devlink_set_switch_id(pf, &attrs.switch_id);
- 	devlink_port_attrs_set(&pf->devlink_port, &attrs);
- 	err = devlink_port_register(devlink, &pf->devlink_port, pf->hw.pf_id);
++	nfct = skb_nfct(skb);
+ 	ct = container_of(nfct, struct nf_conn, ct_general);
+ 	WARN_ON_ONCE(!nf_ct_is_confirmed(ct));
+ 
 -- 
-2.47.2
+2.33.0
 
 
