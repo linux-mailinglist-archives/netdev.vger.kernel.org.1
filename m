@@ -1,113 +1,128 @@
-Return-Path: <netdev+bounces-215103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFD66B2D1B8
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 03:59:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2E77B2D1D4
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 04:20:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BB2E74E1D54
-	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 01:59:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 66C207AC252
+	for <lists+netdev@lfdr.de>; Wed, 20 Aug 2025 02:18:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 828502798FE;
-	Wed, 20 Aug 2025 01:59:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65E3322068F;
+	Wed, 20 Aug 2025 02:20:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LAVdh0jw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 239B9279331
-	for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 01:59:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 400E320C47C;
+	Wed, 20 Aug 2025 02:19:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755655159; cv=none; b=Janbl68Eepu/eKQ28nLJJoz18mPw4A2LjafABbv41mldIYzgW4uyMJuYREbWjkrUGZzRYXZe1UkTmLce0RNKPdgVEcS5tlIXHkb8If+g4oNnOlIZLAt3uPXg6qqb2vN7RYiyucXDySGR4++2UwxPkbSqjvwBFdwW3lPqmoGrzTs=
+	t=1755656400; cv=none; b=n+88vZ6KbU+Om2XXPfbqlIB0+6NXbeM1Ztsuly4aVUnFviIIwfbyRUSO6nzDAia/UAMTwtN6xKbyZIdfrLDkyjMCTM7fmKIdRHRcqeueCmGiUHlIa1MHjH5Hb+1dfWHgZOYTLUTXBfdyK0SKcHwCHTvcmZdWXn+us75gTmC//Po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755655159; c=relaxed/simple;
-	bh=BsRix858UdVobGHEoSnCDXw3NfG+R5prmBKLtiz1aKE=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=OFTphbBMiUN/ns5hed43RomTcJx3LMKT5X8bYA2kH5diCCSokPrQBlxWHbfqDFR9zXhEOmnBDnlTaHNK61PYJT9t2OcH/OFbasB14Wgl37OZacMgV0mv9i6soS4+Rkbr3IHvGtnOPxdZCQyOMn1U7si1Z/hAbPt11f8aRfqG8Kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.207.22.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid:Yeas10t1755655065t197t06608
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [122.233.175.250])
-X-QQ-SSF:0000000000000000000000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 3044220916234619391
-To: "'Jakub Kicinski'" <kuba@kernel.org>
-Cc: <netdev@vger.kernel.org>,
-	"'Andrew Lunn'" <andrew+netdev@lunn.ch>,
-	"'David S. Miller'" <davem@davemloft.net>,
-	"'Eric Dumazet'" <edumazet@google.com>,
-	"'Paolo Abeni'" <pabeni@redhat.com>,
-	"'Simon Horman'" <horms@kernel.org>,
-	"'Jacob Keller'" <jacob.e.keller@intel.com>,
-	"'Mengyuan Lou'" <mengyuanlou@net-swift.com>
-References: <20250812015023.12876-1-jiawenwu@trustnetic.com>	<20250812015023.12876-5-jiawenwu@trustnetic.com> <20250815111854.170fea68@kernel.org>
-In-Reply-To: <20250815111854.170fea68@kernel.org>
-Subject: RE: [PATCH net-next v4 4/4] net: wangxun: support to use adaptive RX/TX coalescing
-Date: Wed, 20 Aug 2025 09:57:43 +0800
-Message-ID: <0bea01dc1175$d1394730$73abd590$@trustnetic.com>
+	s=arc-20240116; t=1755656400; c=relaxed/simple;
+	bh=rnOOVfhATF2sXlf6TA43TUWmhbaHQJOoNukOPhP2/VM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=saSrVqWgtMolbEjN559dkADmLoBzFWeaqeeJr025EFTn60VumTKIrAb/6R9T6pjqhcpy1XJIvueC4qt1FAVc+qZJKlP2uw1a1s8A+KJrAlwqyFRcE5l6n5/2kej7DrwuyaA1k08O44D2O55En2WmaHyok4jLSjMYy6Z3aOGoRvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LAVdh0jw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53A2CC4CEF1;
+	Wed, 20 Aug 2025 02:19:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755656399;
+	bh=rnOOVfhATF2sXlf6TA43TUWmhbaHQJOoNukOPhP2/VM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=LAVdh0jwJUrH2mjNL6Kkknr+NZGgyy/LP7J7jkI3B7KIScfZREBWQP+ZlZso4wKI8
+	 DxcmUGJA//BU7QeT3Lp5Cw+CbPUqxuwIKddftn29ckJO/Xt3x9pbD0W/Qnbczykp4X
+	 7MC/X9gBiFI/f6RMarkG8qCpFPCf9LBzWBVaKzIk5U5/1DDsTu02Vxk2jfVx0hVNCu
+	 Rc2gdNfO6enwngBsxSCjzTjhrokg4ZeIuGKWHmLfTfLNv2hyp5+kKCggfY2hQtvf9q
+	 sVDj1LKcZdbcPOQSKErgUoy3qYllU85yWwpKttmO+7+DbFIFHarvtTNlrBn+im6fwA
+	 EaXa/vhknZfhQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	sd@queasysnail.net,
+	borisp@nvidia.com,
+	john.fastabend@gmail.com,
+	linux-kselftest@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Muhammad Alifa Ramdhan <ramdhan@starlabs.sg>,
+	Billy Jheng Bing-Jhong <billy@starlabs.sg>
+Subject: [PATCH net 1/2] tls: fix handling of zero-length records on the rx_list
+Date: Tue, 19 Aug 2025 19:19:51 -0700
+Message-ID: <20250820021952.143068-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: zh-cn
-Thread-Index: AQJSp6GMsSi4kqJepxUFy3vdl3vtHAGdM6CxAmQrRkyzXF/coA==
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: NDxI9psdf3YV4d/pU8DInthao9uehgNMtTZoO6wjFBtZ/+72TKJqZh5e
-	qXDIyHd07T4LqA/wV8m2hiMrapnK0yDkNd8ZNibPbTrdvSRju26X3QTjKgA8Tnir/6r1Biy
-	BXQN9YmAtztn5QUjeiSvItMgDSeNm7E2bRRMqoRDLowyZXjBXQ5utCmk4kiV/HbruCP7No2
-	puPur9ZE4R+UvhG8S95eQkt0u+ggDvILjNvjKKzb/yOBKrZ7BySuoqag0BQJkPn1JQwi1nV
-	5EoUojhabkop2JClxc8mq2RFNlH3hg91FJ6cvz0fmS53rMkpgBCgvRoUPOmA1o1sniLVKJK
-	KUc3LmvxXY9B5oK82Ap4hwRt8JwllR4eDGBGeSj4nDhSbZWjaTwOXAKzMjfdOGX49LovTyC
-	WUyW/M4xzH2QDybaSGpQaoD3vki8PUQwPGDpni7FtYKTZf0lVtzNPzWI8ez4mAsty9s8tXS
-	bNdYlYYFubpqX3MRu2S++4KRvpluzozQkCo2ygRZZoue63UTthMNRrYoPkX8gmw7zRBtm21
-	0fS4kzCKZxtQDx/U/IrYqUTEJTSCm+SimTyUsP+/3jBSxoqCS7L8pk3cwLxbu0YmZ63HUse
-	tGiyQaBwPvVwF3HnUOitsrJL9RZw9gSLg7Y60E+OJ0TimMsVBw1AdqRJtgFhBfBZK8QWn7Y
-	89smQxbLTUD2sBftO0jGaHdTPb+8IM9S7DUtqfrSFx9tBnFLN8rFPYqobZg9+flE1scKxUi
-	/tGMWGdqeVW2/oWm3jPT+WJBmKhokiny1t8hQ59C6lSiq69nmpTXjVeZ0Aj3X3OtKT6MVK+
-	TYU5hcYhzRe7w7yCkMy30zqGDr/SfHfnt1txDEJr/hjA9z8Nb5KjpBBGa/kc+U50qyqfvKy
-	XtEZH0pvX/PLqPIeE1bBMmIiusBgXFGQ/X+zOf1KlFxu5hPvJj0vkmBxVPiTP8zOqDIzsHh
-	7dK5G4ukWsUoP6I54FZy2BA1a72P/de305uzv40GUYC6xweMePBF0OaIGJXyWgh3ZhWta6+
-	SaOSiAlKrABzzCBvIRsLwhTHGeH0RaNdzwuuuuvA==
-X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
-X-QQ-RECHKSPAM: 0
+Content-Transfer-Encoding: 8bit
 
-On Sat, Aug 16, 2025 2:19 AM, Jakub Kicinski wrote:
-> On Tue, 12 Aug 2025 09:50:23 +0800 Jiawen Wu wrote:
-> > @@ -878,6 +909,8 @@ static int wx_poll(struct napi_struct *napi, int budget)
-> >
-> >  	/* all work done, exit the polling mode */
-> >  	if (likely(napi_complete_done(napi, work_done))) {
-> > +		if (wx->adaptive_itr)
-> > +			wx_update_dim_sample(q_vector);
-> 
-> this is racy, napi is considered released after napi_complete_done()
-> returns. So napi_disable() can succeed right after that point...
-> 
-> > @@ -1611,6 +1708,8 @@ void wx_napi_disable_all(struct wx *wx)
-> >  	for (q_idx = 0; q_idx < wx->num_q_vectors; q_idx++) {
-> >  		q_vector = wx->q_vector[q_idx];
-> >  		napi_disable(&q_vector->napi);
-> > +		cancel_work_sync(&q_vector->rx.dim.work);
-> > +		cancel_work_sync(&q_vector->tx.dim.work);
-> 
-> so you may end up with the DIM work scheduled after the device is
-> stopped.
+Each recvmsg() call must process either
+ - only contiguous DATA records (any number of them)
+ - one non-DATA record
 
-But the DIM work doesn't seem to be concerned about the status of napi.
-And even if the device is stopped, setting itr would not cause any errors.
+If the next record has different type than what has already been
+processed we break out of the main processing loop. If the record
+has already been decrypted (which may be the case for TLS 1.3 where
+we don't know type until decryption) we queue the pending record
+to the rx_list. Next recvmsg() will pick it up from there.
 
-I can't fully grasp this point...
-Should I move cancel_work_sync() in front of napi_disable()?
+Queuing the skb to rx_list after zero-copy decrypt is not possible,
+since in that case we decrypted directly to the user space buffer,
+and we don't have an skb to queue (darg.skb points to the ciphertext
+skb for access to metadata like length).
 
+Only data records are allowed zero-copy, and we break the processing
+loop after each non-data record. So we should never zero-copy and
+then find out that the record type has changed. The corner case
+we missed is when the initial record comes from rx_list, and it's
+zero length.
+
+Reported-by: Muhammad Alifa Ramdhan <ramdhan@starlabs.sg>
+Reported-by: Billy Jheng Bing-Jhong <billy@starlabs.sg>
+Fixes: 84c61fe1a75b ("tls: rx: do not use the standard strparser")
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ net/tls/tls_sw.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index 51c98a007dda..bac65d0d4e3e 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -1808,6 +1808,9 @@ int decrypt_skb(struct sock *sk, struct scatterlist *sgout)
+ 	return tls_decrypt_sg(sk, NULL, sgout, &darg);
+ }
+ 
++/* All records returned from a recvmsg() call must have the same type.
++ * 0 is not a valid content type. Use it as "no type reported, yet".
++ */
+ static int tls_record_content_type(struct msghdr *msg, struct tls_msg *tlm,
+ 				   u8 *control)
+ {
+@@ -2051,8 +2054,10 @@ int tls_sw_recvmsg(struct sock *sk,
+ 	if (err < 0)
+ 		goto end;
+ 
++	/* process_rx_list() will set @control if it processed any records */
+ 	copied = err;
+-	if (len <= copied || (copied && control != TLS_RECORD_TYPE_DATA) || rx_more)
++	if (len <= copied || rx_more ||
++	    (control && control != TLS_RECORD_TYPE_DATA))
+ 		goto end;
+ 
+ 	target = sock_rcvlowat(sk, flags & MSG_WAITALL, len);
+-- 
+2.50.1
 
 
