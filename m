@@ -1,108 +1,151 @@
-Return-Path: <netdev+bounces-215563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BE55B2F3BC
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 11:23:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28089B2F387
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 11:15:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF504A033ED
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 09:20:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0481E188231D
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 09:15:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A28652EF664;
-	Thu, 21 Aug 2025 09:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C24232DCF79;
+	Thu, 21 Aug 2025 09:14:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=onurozkan.dev header.i=@onurozkan.dev header.b="NoE+lS2p"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TPmTz98N"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward204d.mail.yandex.net (forward204d.mail.yandex.net [178.154.239.217])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B9672EE604;
-	Thu, 21 Aug 2025 09:20:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AACD2E11B6
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 09:14:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755768026; cv=none; b=R8fVIBaq52tUAyjhGOl6k2siyk+pbamfsBGMzFL9b+Gpp0vk0v8/8ehuVwHphCQxH9uDPN3NEEF/o9fVg4MoHit9ysfsPM93ZV/yt95Su0+qDJMMud4Cxfu9VYwuCn9ijiXMEgJ568gwQP53O6Nmu/8oUhLcKiELnmJRZt6HKCc=
+	t=1755767685; cv=none; b=QgAQWnWieXKREEOPKwB5u8zpsnNNoZGdmbciPJx+xVx6PCV7mZyq+l4qeAjB71vechbxON3CijoPgsEz+aCqrQacgcVTEnXh7S8ymhhq6k0+LoeAJCAbnALX19kEA9E8Q9+qsTj9WiOxmtyKbzQ3WMVQpCcuOOrINDBMXrLnUzg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755768026; c=relaxed/simple;
-	bh=3tVdFuHj4uHnjdjqWf3PNJx6ecexjwUyT+qOONlFsek=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=L6jL1KjVGuogu950kPpsdMCKyzbyeN78zgTvHfh0h7XKKXLuSrTqlQngUWR6O1T8sXVflJUB/0yLBtLW1PgVNQkRDU5QyAnIZtwBpbzp9mgaAoR4qtCumPKs/aExovo9yeStS+n8FzE1Yq2fcd6AgGLDK23XknvYY96VxaGyDPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=onurozkan.dev; spf=pass smtp.mailfrom=onurozkan.dev; dkim=pass (1024-bit key) header.d=onurozkan.dev header.i=@onurozkan.dev header.b=NoE+lS2p; arc=none smtp.client-ip=178.154.239.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=onurozkan.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=onurozkan.dev
-Received: from forward102d.mail.yandex.net (forward102d.mail.yandex.net [IPv6:2a02:6b8:c41:1300:1:45:d181:d102])
-	by forward204d.mail.yandex.net (Yandex) with ESMTPS id F054C832B2;
-	Thu, 21 Aug 2025 12:12:53 +0300 (MSK)
-Received: from mail-nwsmtp-smtp-production-main-69.iva.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-69.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:160e:0:640:2589:0])
-	by forward102d.mail.yandex.net (Yandex) with ESMTPS id 74116C00C6;
-	Thu, 21 Aug 2025 12:12:44 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-69.iva.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id aCPrMXHMhOs0-xS4o7xgm;
-	Thu, 21 Aug 2025 12:12:43 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=onurozkan.dev;
-	s=mail; t=1755767563;
-	bh=Eerujrdfh/b9a+GIG0kU2uvLlnxYMyTOGbw/ntnEXBY=;
-	h=Message-ID:Date:Cc:Subject:To:From;
-	b=NoE+lS2puUcbUChbid6y6ZJ1jsjCQTfo0XPelej12dnYiLgO+F9HzQDiKUsbLitFr
-	 ULOKk6hOJCNm6EJomEU1euLxD3+Bsd+L/yCDA6LZFrtWisl3ZC0z9932tBuWWCWbTH
-	 UpFEBJ3G7YIsiACSfnl1sG3PgHcDLizDo6M6wGh8=
-Authentication-Results: mail-nwsmtp-smtp-production-main-69.iva.yp-c.yandex.net; dkim=pass header.i=@onurozkan.dev
-From: =?UTF-8?q?Onur=20=C3=96zkan?= <work@onurozkan.dev>
-To: rust-for-linux@vger.kernel.org
-Cc: fujita.tomonori@gmail.com,
-	tmgross@umich.edu,
-	ojeda@kernel.org,
-	alex.gaynor@gmail.com,
-	boqun.feng@gmail.com,
-	gary@garyguo.net,
-	bjorn3_gh@protonmail.com,
-	lossin@kernel.org,
-	a.hindborg@kernel.org,
-	aliceryhl@google.com,
-	dakr@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	=?UTF-8?q?Onur=20=C3=96zkan?= <work@onurozkan.dev>
-Subject: [PATCH] rust: phy: use to_result for error handling
-Date: Thu, 21 Aug 2025 12:12:35 +0300
-Message-ID: <20250821091235.800-1-work@onurozkan.dev>
-X-Mailer: git-send-email 2.50.0
+	s=arc-20240116; t=1755767685; c=relaxed/simple;
+	bh=1ewMSBBg9cmq1Asjak1aE7nAcBgixBHay9BTXHvKZ8g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OtFmdb/XTFuqCR1m6sBM/RaIDWNXEEL1nZ7ChcpuyQfkZLrhRFNgBwTDAAOjn0qJGvdKJET+2ppAyhgz5jaMauziWEHgvJEplswehmwEv83bs/JUgP+N+geLLtXYaflfTXFgVMbmFuh1+zmhGLtqoHfoJvVe6z+ueYisnY3innI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TPmTz98N; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755767682;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=d/cls12ySWE3NAa48m4sMHEPJFNdbq2Fp43VAzgYuEY=;
+	b=TPmTz98NyWIBT4cp0ZJBrTe/4chifDMw8jb1Sa4djuLZ5/waJb+/Kf8Q29VojSkQsazdn6
+	wTJNpCE21iZFNxAbx4C5ZxoIMCACSFfe14QQ/CQ07pi7kNr+GFNOvz70I8wtDzhHU7flqj
+	h4TrisJlEr4BMNMFZQ7cSjXjtmMtmdo=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-44-mwiMw37WPYSD5Tpbn_Qh7A-1; Thu, 21 Aug 2025 05:14:40 -0400
+X-MC-Unique: mwiMw37WPYSD5Tpbn_Qh7A-1
+X-Mimecast-MFC-AGG-ID: mwiMw37WPYSD5Tpbn_Qh7A_1755767680
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7e870316b85so163652985a.0
+        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 02:14:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755767680; x=1756372480;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=d/cls12ySWE3NAa48m4sMHEPJFNdbq2Fp43VAzgYuEY=;
+        b=pwPjPxXhJ7/S28si8PQxOybIg+dFtzH0W5B8PtC8rhDGzoX3FcOiA3Kgs82oSbcoVe
+         k+a8/sJr6D++KjGM0N8685McuwaKKcY1rRFNAUWsPsQyU5WjFiM9b74Fp6ZxHn8Z2TT3
+         Pywh9GQv5bo19aU/ZY1PdILteFWNvBslwxi121nCXTHXqlg864x/iW9qa8EXk1AXekws
+         iquPAC9bdn2UYjE1UOGH57W/bfMucAy/ylRHNhUEJZAg2GWShUNQINfshLFyCrVqg8s5
+         iuukGhGpSrqn6UQUtlkQxxAcvPrHsKKkan8R1Qo17l8wczWUU+XoIRxS5WXocK29jH1A
+         MtSg==
+X-Forwarded-Encrypted: i=1; AJvYcCX6VIL9kuQNFBk4D9p0WlMuvz6qO79/O+k6a6r+CD7WX3gk2a5hskUjw9uqo6L/Ksq3AveFJK0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzqv34L8Kr+grS3FjM6KSL+Ny6lMOqvPQJq36QJ3/XgIGTT9wxM
+	tGPInsPOqPNBDYRAumftNZQLCKlrw0ipFKlLBYi9yAdYTTq19axtHqPbch6yZ8Dod6/O2MAPCjg
+	YuIl/cTkwACcktNhYnxmJm/dzba+b2Dtz5goQD6Lvr5nZ30ZXozpIXm+dCn0DEFxyHw==
+X-Gm-Gg: ASbGncscarJ+1U/pU53F9//fksXomvsH4k6P7bqGfADkqU1dqww4nePf6OUVxtKG4EN
+	GjNXe9rwNHh+X+6mjEFKu5s3QsYAOklGDIHpcgnCC0+eix7f0rBdM6bYNSu+t+/aHJzuqC87Xvt
+	c8RhZgL9/7PpuFnv6oGV8OZ4O2IM/339f1HOmkI71KKlRMrLiNk1InBzSMxAlHaIerRkfHGKC4l
+	Jh7I5pdbjDXL8DS21cs1bh1G4GRBQjpnkStaXER/f8Z93mRzGyIWr6s32v2Uli15D9EKL9Km94y
+	BObBCVKhpV5ueWb6yjWIKzffviYb/ZKIY6z8bpgFkmPMdLrfzFUh6S/X89oj1sFHwRN6ixiT9/M
+	vDjDoNXl3SGA=
+X-Received: by 2002:a05:620a:31a9:b0:7e8:7eee:7d66 with SMTP id af79cd13be357-7ea08e3ecedmr181780385a.40.1755767679868;
+        Thu, 21 Aug 2025 02:14:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFZ0c/CeAt2mU1zijFZ8Xtf8yg68lytCTDkdCZS7E9eYRtoLIMsMFMlh4Pv2bSyDJHFqzlT3w==
+X-Received: by 2002:a05:620a:31a9:b0:7e8:7eee:7d66 with SMTP id af79cd13be357-7ea08e3ecedmr181778085a.40.1755767679305;
+        Thu, 21 Aug 2025 02:14:39 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e87e04abd8sm1085524985a.18.2025.08.21.02.14.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Aug 2025 02:14:38 -0700 (PDT)
+Message-ID: <ea44c100-34fc-4dec-a749-454d224fa84e@redhat.com>
+Date: Thu, 21 Aug 2025 11:14:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv3 net-next 3/3] selftests: bonding: add test for LACP
+ actor port priority
+To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Nikolay Aleksandrov <razor@blackwall.org>,
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Petr Machata <petrm@nvidia.com>,
+ Amit Cohen <amcohen@nvidia.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Stephen Hemminger <stephen@networkplumber.org>,
+ David Ahern <dsahern@gmail.com>, Jonas Gorski <jonas.gorski@gmail.com>,
+ linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20250818092311.383181-1-liuhangbin@gmail.com>
+ <20250818092311.383181-4-liuhangbin@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250818092311.383181-4-liuhangbin@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Simplifies error handling by replacing the manual check
-of the return value with the `to_result` helper.
+On 8/18/25 11:23 AM, Hangbin Liu wrote:
+> +# Trigger link state change to reselect the aggregator
+> +ip -n "${c_ns}" link set eth1 down
+> +sleep 1
+> +ip -n "${c_ns}" link set eth1 up
+> +# the active agg should be connect to switch
+> +bond_agg_id=$(cmd_jq "ip -n ${c_ns} -d -j link show bond0" ".[].linkinfo.info_data.ad_info.aggregator")
+> +eth0_agg_id=$(cmd_jq "ip -n ${c_ns} -d -j link show eth0" ".[].linkinfo.info_slave_data.ad_aggregator_id")
+> +[ "${bond_agg_id}" -ne "${eth0_agg_id}" ] && RET=1
 
-Signed-off-by: Onur Özkan <work@onurozkan.dev>
----
- rust/kernel/net/phy.rs | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+A few lines above exceed 100 chars, it would be better to wrap them
 
-diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
-index 7de5cc7a0eee..c895582cd624 100644
---- a/rust/kernel/net/phy.rs
-+++ b/rust/kernel/net/phy.rs
-@@ -196,11 +196,8 @@ pub fn read_paged(&mut self, page: u16, regnum: u16) -> Result<u16> {
-         // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
-         // So it's just an FFI call.
-         let ret = unsafe { bindings::phy_read_paged(phydev, page.into(), regnum.into()) };
--        if ret < 0 {
--            Err(Error::from_errno(ret))
--        } else {
--            Ok(ret as u16)
--        }
-+
-+        to_result(ret).map(|()| ret as u16)
-     }
+> +log_test "bond 802.3ad" "actor_port_prio select"
+> +
+> +# Change the actor port prio and re-test
+> +ip -n "${c_ns}" link set eth0 type bond_slave actor_port_prio 10
+> +ip -n "${c_ns}" link set eth2 type bond_slave actor_port_prio 1000
+> +# Trigger link state change to reselect the aggregator
+> +ip -n "${c_ns}" link set eth1 down
+> +sleep 1
+> +ip -n "${c_ns}" link set eth1 up
+> +# now the active agg should be connect to backup switch
+> +bond_agg_id=$(cmd_jq "ip -n ${c_ns} -d -j link show bond0" ".[].linkinfo.info_data.ad_info.aggregator")
+> +eth2_agg_id=$(cmd_jq "ip -n ${c_ns} -d -j link show eth2" ".[].linkinfo.info_slave_data.ad_aggregator_id")
+> +# shellcheck disable=SC2034
+> +if [ "${bond_agg_id}" -ne "${eth2_agg_id}" ]; then
+> +	RET=1
+> +fi
+> +log_test "bond 802.3ad" "actor_port_prio switch"
 
-     /// Resolves the advertisements into PHY settings.
---
-2.50.0
+The test above is basically the same of the previous one, with a
+slightly different style, it would be better to factor the whole
+status cycling, data fetching and comparison in an helper to avoid code
+duplication and the mentioned confusing difference.
+
+Thanks,
+
+Paolo
 
 
