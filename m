@@ -1,220 +1,174 @@
-Return-Path: <netdev+bounces-215637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60586B2FBA3
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDB4FB2FBA4
 	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 16:02:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 305DE189D30B
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 13:57:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2462A6234D5
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 13:56:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 363C5230BE3;
-	Thu, 21 Aug 2025 13:55:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87ACE23BCE7;
+	Thu, 21 Aug 2025 13:55:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J8S5g0+f"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gjm8FrmB"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86671230981
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 13:55:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16922235BEE
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 13:55:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755784514; cv=none; b=M6DvOFe96/DhBgCXm/UJ5dm3O+3l//E8PYLZCHwkfTO17H+A6lFVK/gin7ukINVIqburQIHYOHxJdLIqi1glEnyrdiZtSoOO1XaZIf79rbt0S8Z+MM+vyjkVEeUMK0+FC7rJoHtOwPxtitWNuHxj6JrxiJlMyOb8U0VNU3Ddy2s=
+	t=1755784529; cv=none; b=EOxjWukaTIieU6ji4YeGU4KQi0K29jQB2idP0BqRu7HQAke4uCXUvlWBXMfw8y5KgJ39+Mn4UC+I6IiTKi/lAd+/8Q5OeAQ2zaXmEj5HCwWXzZxGOCBFSmePjmv/gZUzkC7ZRWlZ6tqCyoEfPcnDcXscIokw23uvJn8Zh9lqIDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755784514; c=relaxed/simple;
-	bh=ZviIfSbh0VhjgD45Fn9oFgsDkrDTP6rt7QaE5xDyGGU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TIKIQXVz5hjVfF22sAwfpgSmRC1Lb05T/2sUfTWOj8EOBEdcIeK09/ZFjZix51aFbokim/0tGN1s7KcKaREiFw3bpJi2ZHASMnsowBKzCHr7X566E2hWun8d9JjQYh4ychiyCw8G675zah0NOciNLCsUSpxooVsdQQtN33SyMCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J8S5g0+f; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755784511;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vqpCFdTzBLh9g0B1TnAyisbVI0QorOaFpispw1JN7Gc=;
-	b=J8S5g0+f2PiAybLCt6WOQpicHF54hvBMyA5eXKVYsNIVGO/CDB9NIwxfaDRenSRmp7eNuB
-	U1rwyw2EFr/9ziPegDzYjSm6jT6n8qTez5D/erNa9guXOQT3GAMEA+fSyZ2y3cTrumnpPZ
-	SFg2PbXP6YGeevD+B9T217GQFXJrpLA=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-44-KD7LRsHWNHeCGm-TbsEULw-1; Thu, 21 Aug 2025 09:55:09 -0400
-X-MC-Unique: KD7LRsHWNHeCGm-TbsEULw-1
-X-Mimecast-MFC-AGG-ID: KD7LRsHWNHeCGm-TbsEULw_1755784509
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3b9e4117542so511185f8f.2
-        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 06:55:09 -0700 (PDT)
+	s=arc-20240116; t=1755784529; c=relaxed/simple;
+	bh=wHspB9lP9ytZ5qoP/apoEbwEudQSgCr+8Ne7IMCn/0k=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ommOzFEVs5Ygwt4nHfTHM2aHEAelQ85Db7A1VIRtHGJo7ryQ66MMtQHZDatjBitHk3DM6jcSbunlxVr5L72q8Yp82n8aAnnECWNkXzlUzCv5Xtt6e5Hh84jLmrqc+lzY+LEpC4JApGRgD/dVhAcV/uprC+3kWiGqmKFHfmJKh74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--cmllamas.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gjm8FrmB; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--cmllamas.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2445806b2beso30332455ad.1
+        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 06:55:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755784527; x=1756389327; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=lKdnyTkgvffM7mkS2a96ehAiqGPtNgTkiNVc3WNtEtY=;
+        b=gjm8FrmBbQp7asF8cKHCZUMTFFwFuB9vQb/JAj3PN17eht+yeIorCau16Il27U+U1I
+         JJ5dsZ+vYoFJIMM14w3HOaCqGWIWPhgvSU5gjPL1KADWM7Av6UU1BpuwFlU5CSw5YuYg
+         TOCXPp13NYpJyRxKzxff8A9kHDxttawP0AyxDm97h23VZKHk2UxpmYxllJrKJqZhDGWX
+         NpM9UgaAOXi157/QiJP14kSTVhYxT4kKzGlKa9RFyo3U4QSYDdlNCP3PqbETuPONjZpV
+         b0G3hdifBWN+RYY1Zlj8C6/k0v+dxtmYqD7tzs9rw/2B1dA/I60ysOZU5uJ/lXDLD5+Q
+         kw+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755784508; x=1756389308;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vqpCFdTzBLh9g0B1TnAyisbVI0QorOaFpispw1JN7Gc=;
-        b=FiPtWO7JpTLkDqDll/EE90nfp8423e0o8N1SR1lCb22VUaODq309QpXZmD16oFEejZ
-         bFaFC16RXGpNquHNCcu4L7sTeciT8XuOuNNLEJ1iSuMZ1ciaJU9NiG3eMFINNOxJghdm
-         0gkkJMVzFcrxcBIaBgIzO01t3tdIeXpRhirhPbmMY14P8a/Xpk0ilbtHG99u+e4IGcWD
-         X6QoYZRvJ7zuVrF+dYTEw+AVoNf89xt6qYiWh7LNNVuPXt9y/o9+MtwHpDv6oGB2Sm/w
-         3777CpeqXLFvEvuebEtObCHI5irCco3EijBTf/UlYcv/B5Bf49TFiwGtB6z/fhauvbhw
-         bo8g==
-X-Forwarded-Encrypted: i=1; AJvYcCXuyFcwOTHQgJ8FxOS5Mk9IM54Lk6cEB1lYoqjkYrZiSECMJQauGRyf9q07jR4mQ8SloF2SPO4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhpLB92jP1CpUJkXOZkMXCNFufNURGbJ/69hC+jWDQphgNLeMz
-	8/FOuXbNwBD5McRhieHmydvazH9K7ilFvqhdVr6qBS+KFyaA2U0QdjbxFWz+AcZ051QNoO2dHWH
-	VV9BWO6dgC5pa2A20eXP0uj8tySHtF0/CNLC11/iEVE95D1fDj7o3bAKx8w==
-X-Gm-Gg: ASbGncvJvNcOFqUJUsGGa1AeDpw8FYt0Zhe8ILAxZiNmszkEp8BLIu8MLteoVa3L11z
-	C/Gw71+OnyEYVQCnY7necr/0Y0cHw42ZKtY7TxC+G09xabOhQ4Su4hUQLw0EHhs4vqRiFNImdJ6
-	XCZKra1FkzReCe+wufYfumyW1k7qZn4+yHbqhFYecZqWDbK+GPAUUVVuMjxetgvIx4oYMAlCzeB
-	3E+2nOleDPyazq2NUc8F9wuppoeiYlmfKCu/byZBxQXyE/gRvt3MgWaMNLyK2tPdNFkZQs/4No+
-	khOsF/XwIEPXxEEbd2ovAzDG+fvK7l16pLYPswSHYXlU8rlM607dSK7nTzjor6rsfN8W//doJbS
-	pzpGDgHF1kA4=
-X-Received: by 2002:a05:6000:2f82:b0:3b7:926f:894c with SMTP id ffacd0b85a97d-3c49549d32emr2167570f8f.23.1755784508529;
-        Thu, 21 Aug 2025 06:55:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEIy5n1DLX30C0ab+YmzKYVMr4r0vuN7yISHYHRZ6gAfhK+7oL5iHJc2LHbMR17R330Ik8K6w==
-X-Received: by 2002:a05:6000:2f82:b0:3b7:926f:894c with SMTP id ffacd0b85a97d-3c49549d32emr2167519f8f.23.1755784507860;
-        Thu, 21 Aug 2025 06:55:07 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3c3da114eabsm5262534f8f.8.2025.08.21.06.55.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Aug 2025 06:55:07 -0700 (PDT)
-Message-ID: <1cf31726-bfb9-4909-a077-6c2c45e0720a@redhat.com>
-Date: Thu, 21 Aug 2025 15:55:04 +0200
+        d=1e100.net; s=20230601; t=1755784527; x=1756389327;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lKdnyTkgvffM7mkS2a96ehAiqGPtNgTkiNVc3WNtEtY=;
+        b=eevCljTkL5fal8tppAT1s8CqUEqd+gXZtLYUJAMU8wZz6Wv+yhyZrCpZfBeGdMnzDu
+         nSeeCjS/8zW/wlMOUMW6PNWS+FrYifeZGkWOugyIMNUOzT0FbNVESE3TUghS1LZ/w9CS
+         feUbnYOp8GXUZyAYD31PI4JzB/IG1Ba1JUqfZOngSw6/y3AzxWr8Lizx6iOX4hcqrJOL
+         aHnxuuxs24cJwkxt0jbK+lchW1Ha9z2hNcZ640mysQbbUl+tEXoxvXxBavmZQqemjjws
+         cCLQNU0imZhtQuSZ8QBkwgifTWocuNwZD9cd+jEOXajXw821yovCyzAn6lig4DNN2AvG
+         hkqw==
+X-Forwarded-Encrypted: i=1; AJvYcCUC81rvxKRa1DOTXOxrM4OVPBqC071+LFsNn/sE1t0xp7/C63KpkjSI5YS7ydD9Law/Zypcx9w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9DqOLCJRRWBQ2+Kc9fCoR/7FNALcOsZKULpbIfuppgXw6/GkR
+	40WhPNTF5MFNMaLUzAGltMP/uaolbBIlqNl3qiWPvLdc55KF2H7QKdkTQjEyvSLMVDIceg4lrbW
+	fLwLCOIbu8BUvLg==
+X-Google-Smtp-Source: AGHT+IHsMqhR+FC1Vaoc1hCDg2gMTNywVUl9RwkU/LLcAQVairjJf0TCsVawP0vFsJexqsUgLxEVKVJAb9sjRQ==
+X-Received: from pljc15.prod.google.com ([2002:a17:903:3b8f:b0:243:31a:f8e2])
+ (user=cmllamas job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:903:2f85:b0:242:cf0b:66cd with SMTP id d9443c01a7336-245fed69268mr38021605ad.34.1755784527309;
+ Thu, 21 Aug 2025 06:55:27 -0700 (PDT)
+Date: Thu, 21 Aug 2025 13:55:21 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 07/15] quic: add connection id management
-To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>
-Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>,
- Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
- Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org,
- Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>,
- Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
- kernel-tls-handshake@lists.linux.dev, Chuck Lever <chuck.lever@oracle.com>,
- Jeff Layton <jlayton@kernel.org>, Benjamin Coddington <bcodding@redhat.com>,
- Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
- Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
- Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
- <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
- illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Daniel Stenberg <daniel@haxx.se>,
- Andy Gospodarek <andrew.gospodarek@broadcom.com>
-References: <cover.1755525878.git.lucien.xin@gmail.com>
- <e7d5e3954c0d779e999dc50a9b03d9f7ed94dbd2.1755525878.git.lucien.xin@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <e7d5e3954c0d779e999dc50a9b03d9f7ed94dbd2.1755525878.git.lucien.xin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.rc1.193.gad69d77794-goog
+Message-ID: <20250821135522.2878772-1-cmllamas@google.com>
+Subject: [PATCH] netlink: specs: binder: replace underscores with dashes in names
+From: Carlos Llamas <cmllamas@google.com>
+To: Alice Ryhl <aliceryhl@google.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"=?UTF-8?q?Arve=20Hj=C3=B8nnev=C3=A5g?=" <arve@android.com>, Todd Kjos <tkjos@android.com>, Martijn Coenen <maco@android.com>, 
+	Joel Fernandes <joelagnelf@nvidia.com>, Christian Brauner <brauner@kernel.org>, 
+	Carlos Llamas <cmllamas@google.com>, Suren Baghdasaryan <surenb@google.com>, 
+	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Li Li <dualli@google.com>
+Cc: Tiffany Yang <ynaffit@google.com>, John Stultz <jstultz@google.com>, kernel-team@android.com, 
+	linux-kernel@vger.kernel.org, Thorsten Leemhuis <linux@leemhuis.info>, 
+	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On 8/18/25 4:04 PM, Xin Long wrote:
-> This patch introduces 'struct quic_conn_id_set' for managing Connection
-> IDs (CIDs), which are represented by 'struct quic_source_conn_id'
-> and 'struct quic_dest_conn_id'.
-> 
-> It provides helpers to add and remove CIDs from the set, and handles
-> insertion of source CIDs into the global connection ID hash table
-> when necessary.
-> 
-> - quic_conn_id_add(): Add a new Connection ID to the set, and inserts
->   it to conn_id hash table if it is a source conn_id.
-> 
-> - quic_conn_id_remove(): Remove connection IDs the set with sequence
->   numbers less than or equal to a number.
+The usage of underscores is no longer allowed for the 'name' format in
+the yaml spec. Instead, dashes should be used. This fixes the build
+issue reported by Thorsten that showed up on linux-next.
 
-It's unclear how many connections are expected to be contained in each
-set. If more than an handful you should consider using RB-tree instead
-of lists.
+Note this change has no impact on C code.
 
-[...]
-> +static void quic_source_conn_id_free(struct quic_source_conn_id *s_conn_id)
-> +{
-> +	u8 *data = s_conn_id->common.id.data;
-> +	struct quic_hash_head *head;
-> +
-> +	if (!hlist_unhashed(&s_conn_id->node)) {
-> +		head = quic_source_conn_id_head(sock_net(s_conn_id->sk), data);
-> +		spin_lock_bh(&head->s_lock);
-> +		hlist_del_init(&s_conn_id->node);
-> +		spin_unlock_bh(&head->s_lock);
-> +	}
-> +
-> +	/* Freeing is deferred via RCU to avoid use-after-free during concurrent lookups. */
-> +	call_rcu(&s_conn_id->rcu, quic_source_conn_id_free_rcu);
-> +}
-> +
-> +static void quic_conn_id_del(struct quic_common_conn_id *common)
-> +{
-> +	list_del(&common->list);
-> +	if (!common->hashed) {
-> +		kfree(common);
-> +		return;
-> +	}
-> +	quic_source_conn_id_free((struct quic_source_conn_id *)common);
+Cc: Jakub Kicinski <kuba@kernel.org>
+Reported-by: Thorsten Leemhuis <linux@leemhuis.info>
+Closes: https://lore.kernel.org/all/e21744a4-0155-40ec-b8c1-d81b14107c9f@leemhuis.info/
+Fixes: 63740349eba7 ("binder: introduce transaction reports via netlink")
+Signed-off-by: Carlos Llamas <cmllamas@google.com>
+---
+ Documentation/netlink/specs/binder.yaml | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-It looks like the above cast is not needed.
-
-> +}
-> +
-> +/* Add a connection ID with sequence number and associated private data to the connection ID set. */
-> +int quic_conn_id_add(struct quic_conn_id_set *id_set,
-> +		     struct quic_conn_id *conn_id, u32 number, void *data)
-> +{
-> +	struct quic_source_conn_id *s_conn_id;
-> +	struct quic_dest_conn_id *d_conn_id;
-> +	struct quic_common_conn_id *common;
-> +	struct quic_hash_head *head;
-> +	struct list_head *list;
-> +
-> +	/* Locate insertion point to keep list ordered by number. */
-> +	list = &id_set->head;
-> +	list_for_each_entry(common, list, list) {
-> +		if (number == common->number)
-> +			return 0; /* Ignore if it is already exists on the list. */
-> +		if (number < common->number) {
-> +			list = &common->list;
-> +			break;
-> +		}
-> +	}
-> +
-> +	if (conn_id->len > QUIC_CONN_ID_MAX_LEN)
-> +		return -EINVAL;
-> +	common = kzalloc(id_set->entry_size, GFP_ATOMIC);
-> +	if (!common)
-> +		return -ENOMEM;
-> +	common->id = *conn_id;
-> +	common->number = number;
-> +	if (id_set->entry_size == sizeof(struct quic_dest_conn_id)) {
-> +		/* For destination connection IDs, copy the stateless reset token if available. */
-> +		if (data) {
-> +			d_conn_id = (struct quic_dest_conn_id *)common;
-> +			memcpy(d_conn_id->token, data, QUIC_CONN_ID_TOKEN_LEN);
-> +		}
-> +	} else {
-> +		/* For source connection IDs, mark as hashed and insert into the global source
-> +		 * connection ID hashtable.
-> +		 */
-> +		common->hashed = 1;
-> +		s_conn_id = (struct quic_source_conn_id *)common;
-> +		s_conn_id->sk = data;
-> +
-> +		head = quic_source_conn_id_head(sock_net(s_conn_id->sk), common->id.data);
-> +		spin_lock_bh(&head->s_lock);
-> +		hlist_add_head(&s_conn_id->node, &head->head);
-> +		spin_unlock_bh(&head->s_lock);
-> +	}
-> +	list_add_tail(&common->list, list);
-
-It's unclear if/how id_set->list is protected vs concurrent accesses.
-
-/P
+diff --git a/Documentation/netlink/specs/binder.yaml b/Documentation/netlink/specs/binder.yaml
+index 140b77a6afee..0f0575ad1265 100644
+--- a/Documentation/netlink/specs/binder.yaml
++++ b/Documentation/netlink/specs/binder.yaml
+@@ -26,27 +26,27 @@ attribute-sets:
+         type: string
+         doc: The binder context where the transaction occurred.
+       -
+-        name: from_pid
++        name: from-pid
+         type: u32
+         doc: The PID of the sender process.
+       -
+-        name: from_tid
++        name: from-tid
+         type: u32
+         doc: The TID of the sender thread.
+       -
+-        name: to_pid
++        name: to-pid
+         type: u32
+         doc: |
+           The PID of the recipient process. This attribute may not be present
+           if the target could not be determined.
+       -
+-        name: to_tid
++        name: to-tid
+         type: u32
+         doc: |
+           The TID of the recipient thread. This attribute may not be present
+           if the target could not be determined.
+       -
+-        name: is_reply
++        name: is-reply
+         type: flag
+         doc: When present, indicates the failed transaction is a reply.
+       -
+@@ -58,7 +58,7 @@ attribute-sets:
+         type: u32
+         doc: The application-defined code from the transaction.
+       -
+-        name: data_size
++        name: data-size
+         type: u32
+         doc: The transaction payload size in bytes.
+ 
+@@ -78,14 +78,14 @@ operations:
+         attributes:
+           - error
+           - context
+-          - from_pid
+-          - from_tid
+-          - to_pid
+-          - to_tid
+-          - is_reply
++          - from-pid
++          - from-tid
++          - to-pid
++          - to-tid
++          - is-reply
+           - flags
+           - code
+-          - data_size
++          - data-size
+ 
+ mcast-groups:
+   list:
+-- 
+2.51.0.rc1.193.gad69d77794-goog
 
 
