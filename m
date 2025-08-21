@@ -1,114 +1,126 @@
-Return-Path: <netdev+bounces-215531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F9D4B2F00A
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 09:47:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BA435B2F016
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 09:50:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B08E0188B0CC
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 07:46:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 54268189654F
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 07:50:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F93D272E46;
-	Thu, 21 Aug 2025 07:46:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C32612741C9;
+	Thu, 21 Aug 2025 07:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=0x65c.net header.i=@0x65c.net header.b="T1LJ4G67"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D7gAUN48"
 X-Original-To: netdev@vger.kernel.org
-Received: from m204-227.eu.mailgun.net (m204-227.eu.mailgun.net [161.38.204.227])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBAF913A265
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 07:46:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=161.38.204.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBB1121FF28
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 07:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755762369; cv=none; b=KjChifdP9lVPyNKsF4arYA0FIX+PiCTZAWxsaRSYwMIcuXGEmJW0dFfKJ1fRLjX9MBBpvBDiDNMx7QXx1aAoJ6Qws4ytRTojIedy4NadV6tn9jSzFME0LX1j0NA+3EivhL4MXr6bYiEQHjvXZ+35Uw0N9zwrcU3mfRsguq+xYQ8=
+	t=1755762629; cv=none; b=Zr8J+4NG/hMvSpXyNQMS+yF8mqGJ5VY31/4OMNir7MV4rh8+XQcrBYV5j3nNOYKwZiy5KyxWJdSb/00vJ9Njh2xkN8XCJ5fBKmCAuw7Tq1ZjuZrsdIDgr2VdoEmvGUFolxgYq5rLhlmMw0iULdTAGnn9hfxQHEm0wpsYLGm9NvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755762369; c=relaxed/simple;
-	bh=kTa6aPcLW7/bGWNd0ucEtWPY4hfPYvEDmPOMrh3xP64=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZTi7YJLmxTSIckzUQupgoYkstEFyYTha6cbsZWh8Y7CFukYymFHrsESc0pvoVBqoZJCL+9jdJAdCWuZsNLww544fgfvCq9j/WZB2jUnwNikhhu+C8AD0tKQYXxwAnVTrKPPQ+kKxPim+kaOW5f14wihNkfVmyalIqXZaAWaktAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x65c.net; spf=pass smtp.mailfrom=0x65c.net; dkim=pass (2048-bit key) header.d=0x65c.net header.i=@0x65c.net header.b=T1LJ4G67; arc=none smtp.client-ip=161.38.204.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x65c.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0x65c.net
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=0x65c.net; q=dns/txt; s=email; t=1755762362; x=1755769562;
- h=Content-Transfer-Encoding: MIME-Version: References: In-Reply-To: Message-ID: Date: Subject: Subject: Cc: To: To: From: From: Sender: Sender;
- bh=juB/gAYnTUiUjs6DHxjr6nOjFleWPqyUEmK9XSraXBY=;
- b=T1LJ4G67usJ8ut6dtMZQDaXooyGTAKqPVCLxU2NTn1rSpXn08/IJgMNm18IJwyhGwB4w3TAzh690y4vBpJC/O/AniW9hwCyPghj42PGZmg3ed8z8Z8lXeJkR7/8kkv6yk52n0L7s54zwrGBjpvhoFjk3yPPZLOsFgS342N5udmiuLagDxexAUm4xcjRbF2YGJOVqL6vbw8A9P/gP4CCqvEXEBse6mlGts3FYKfsyx3EAeBmL0vKDuwZXp4G7dQsRKA4BYyVuqBtMv9qqhRwNYKx2A4GL1/xRItBAgnB4gnWG+JjcACLHUThgKcUjsgT79DhZbFmFMr4KWrBpKARm5Q==
-X-Mailgun-Sid: WyI2ZTA5MCIsIm5ldGRldkB2Z2VyLmtlcm5lbC5vcmciLCI1NGVmNCJd
-Received: from fedora (pub082136115007.dh-hfc.datazug.ch [82.136.115.7]) by
- 0915ebfd771c1cc991a8a786c634850dbf8b05025dfa8b8697bc1d69e9166444 with SMTP id
- 68a6ceb9ec4fa32e700a628e; Thu, 21 Aug 2025 07:46:01 GMT
-X-Mailgun-Sending-Ip: 161.38.204.227
-Sender: alessandro@0x65c.net
-From: Alessandro Ratti <alessandro@0x65c.net>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	skhan@linuxfoundation.org
-Cc: netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	alessandro.ratti@gmail.com,
-	Alessandro Ratti <alessandro@0x65c.net>
-Subject: [PATCH] selftests: rtnetlink: add checks for ifconfig and iproute2
-Date: Thu, 21 Aug 2025 09:43:11 +0200
-Message-ID: <20250821074552.682731-2-alessandro@0x65c.net>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250821074552.682731-1-alessandro@0x65c.net>
-References: <20250821074552.682731-1-alessandro@0x65c.net>
+	s=arc-20240116; t=1755762629; c=relaxed/simple;
+	bh=XqtPuuJFQ5CejlQ3nTuKysAVB4WXspXTDT03mguXjW4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=crBRMPGKggcbSu1cLO8I6jfftNa008WeY46sy2arsDhevnpqkvDqZAVF/t5yAqmrk6I0XDtILbrQVgP/t484nUrLC0LHM1hzeAhVcoT0uhn2F3llY9fp0lftfPTgIQPBQUQjcG4YyPtRHDgN03U3rIDM8HkXxImnBZohx/yy2JQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D7gAUN48; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755762626;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dKiVVI7dxTB2KqSBmt6ytWWdgaP4+YJtf5CAboYFUAg=;
+	b=D7gAUN48vpynWhYDLDTUeuw4CswWXjTWlQUERtvGZlP820bBb+jCcv7Fx2ROZzhqRYDEiV
+	vbgRfvd1SBWt2nJH6242kkJrT0SyirEj2yKIfl/QIpNtZ12cmWl5hYSwPo1ZJeIv4hXTTK
+	S2B+bs0lfIqIUCf7q8e2JwA5dtm+E/Q=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-344-NUtxdQwOPbCdUA9eDb1Jpg-1; Thu,
+ 21 Aug 2025 03:50:23 -0400
+X-MC-Unique: NUtxdQwOPbCdUA9eDb1Jpg-1
+X-Mimecast-MFC-AGG-ID: NUtxdQwOPbCdUA9eDb1Jpg_1755762621
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C8CFC19560B6;
+	Thu, 21 Aug 2025 07:50:20 +0000 (UTC)
+Received: from localhost (unknown [10.43.135.229])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B029719560B2;
+	Thu, 21 Aug 2025 07:50:16 +0000 (UTC)
+Date: Thu, 21 Aug 2025 09:50:14 +0200
+From: Miroslav Lichvar <mlichvar@redhat.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Kurt Kanzenbach <kurt@linutronix.de>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next] igb: Retrieve Tx timestamp
+ directly from interrupt
+Message-ID: <aKbPtoZqfWqSOzLN@localhost>
+References: <20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de>
+ <aKMbekefL4mJ23kW@localhost>
+ <c3250413-873f-4517-a55d-80c36d3602ee@intel.com>
+ <aKV_rEjYD_BDgG1A@localhost>
+ <81c1a391-3193-41c6-8ab7-c50c58684a22@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <81c1a391-3193-41c6-8ab7-c50c58684a22@intel.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On systems where `ifconfig` is not available (e.g., modern Debian), the
-`kci_test_promote_secondaries` test fails. Wrap the call in a check.
+On Wed, Aug 20, 2025 at 01:29:31PM -0700, Jacob Keller wrote:
+> On 8/20/2025 12:56 AM, Miroslav Lichvar wrote:
+> > Without the patch:
+> > NTP daemon TX timestamps   : 35835
+> > NTP kernel TX timestamps   : 1410956
+> > NTP hardware TX timestamps : 581575            
+> > 
+> > With the patch:
+> > NTP daemon TX timestamps   : 476908
+> > NTP kernel TX timestamps   : 646146
+> > NTP hardware TX timestamps : 412095
+> > 
+> 
+> When does the NTP daemon decide to go with timestamping within the
+> daemon vs timestamping in the kernel? It seems odd that we don't achieve
+> 100% kernel timestamps...
 
-Additionally, `do_test_address_proto` fails on iproute2 versions that
-lack support for `proto` in `ip address` commands. Add a minimal feature
-check and skip the test with a proper message if unsupported.
+Yes, it is odd. The daemon uses the best timestamp it has when the
+new request comes from the client asking for the TX timestamp of the
+previous response. With 16384 clients and 200000 requests per second,
+that's 12 milliseconds between two requests of a client. I tried
+increasing the receive buffer size of the server UDP socket and also
+increase the number of clients to make the server wait longer for the
+SW TX timestamps, but that didn't help. It looks like they are lost.
 
-These changes allow the tests to run and report SKIP instead of FAIL on
-platforms with older tools.
+Due to the way the server implements the interleaved mode, it's the
+first two exchanges with a client always have the TX daemon timestamp,
+so the "without the patch" result above has only 35835 - 2 * 16384 =
+3067 missing SW or HW timestamps (1.5% of all responses), but "with
+the patch" it is 476908 - 2 * 16384 = 444140 (28.9% of all responses). 
 
-Signed-off-by: Alessandro Ratti <alessandro@0x65c.net>
----
- tools/testing/selftests/net/rtnetlink.sh | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
-index d6c00efeb664..9bff620ef595 100755
---- a/tools/testing/selftests/net/rtnetlink.sh
-+++ b/tools/testing/selftests/net/rtnetlink.sh
-@@ -330,7 +330,9 @@ kci_test_promote_secondaries()
- 	for i in $(seq 2 254);do
- 		IP="10.23.11.$i"
- 		ip -f inet addr add $IP/16 brd + dev "$devdummy"
--		ifconfig "$devdummy" $IP netmask 255.255.0.0
-+		if command -v ifconfig >/dev/null 2>&1; then
-+			ifconfig "$devdummy" $IP netmask 255.255.0.0
-+		fi
- 	done
- 
- 	ip addr flush dev "$devdummy"
-@@ -1201,6 +1203,12 @@ do_test_address_proto()
- 	local ret=0
- 	local err
- 
-+	run_cmd_grep 'proto' ip address help
-+	if [ $? -ne 0 ];then
-+		end_test "SKIP: addr proto ${what}: iproute2 too old"
-+		return $ksft_skip
-+	fi
-+
- 	ip address add dev "$devdummy" "$addr3"
- 	check_err $?
- 	proto=$(address_get_proto "$addr3")
 -- 
-2.39.5
+Miroslav Lichvar
 
 
