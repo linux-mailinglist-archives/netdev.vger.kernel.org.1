@@ -1,94 +1,79 @@
-Return-Path: <netdev+bounces-215750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E847B301DD
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 20:20:08 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C55BB301E3
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 20:20:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90448AE0406
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 18:20:06 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F17FA4E570A
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 18:20:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24053343D62;
-	Thu, 21 Aug 2025 18:19:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AAA92FB62F;
+	Thu, 21 Aug 2025 18:20:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ftd5BTZk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="atC7rdDP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA02019EED3;
-	Thu, 21 Aug 2025 18:19:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E77012E62B3;
+	Thu, 21 Aug 2025 18:20:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755800398; cv=none; b=c3o0Q2qKKDn/gJfBeOSRPqpw0970Ko5XybLx2AUh15tFB1l+fMexTw8AIp11hsAEt75hxSjQdcgchqH9x3BZVSiCipWyR4lU1F7SKjXvduik0ZB+2zZ0OeiAI2jvJ1DEsH8nz6xq7bEMrYXaurN55zE3r9yaIVZZM0SK7TmUoUQ=
+	t=1755800434; cv=none; b=VaNbCZUg1CGoKVSvaO9lXX5hul7jX2Wypg/Whelplt7RHw8YiTxZu3at5G2cWq66LPKReRkqFYDi05sWqX26tvdpiNgTDdiuo6vsi2pLgYO1d4hcFhZVGl9uPreTelz7BY8A2VIlknTYYTPo1dNmEBKQHNkjt21HROjaRKlZhoc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755800398; c=relaxed/simple;
-	bh=Ml4hUrMmhtCtc9egKvXHdw6ST7xy3d80Zu7REsvebCA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Cp5ddv+stU4b00+J2I5XgXj9/Y/1ZCLaG7dLLBrdD/AyIWptMHoFuWpsw1bAD00MVfR4EhsJMZjS9wbrSuG4k6d6OYDGyHZ1eYW3nPlLRbdy3phkrRXrS7JhjOH97T8KcXtTWQtWFne2iQAoNC6K8+tDZXckX3UmgT+diLZ6flI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ftd5BTZk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2222C4CEEB;
-	Thu, 21 Aug 2025 18:19:57 +0000 (UTC)
+	s=arc-20240116; t=1755800434; c=relaxed/simple;
+	bh=4hrLo4L+G1zUcmSSW/67SSpyLfiydKVmvlj+/64Owh4=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=WFKDPM5vE4Glh0LtrFiN0EFkSUTEWw75A+TIEZBZkhzEyTFbW+/B3/TTpBhP6/7Ir4sTapiDKkUQuc4CTkutL56loMx7y+h5XSdyA3EHFRj1yCTk4DdhJNXJEPjzVrgWuL92czCWf7NdHA/Qju/zvXToCoCQTpCBEAhmFVojkHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=atC7rdDP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C351FC4CEEB;
+	Thu, 21 Aug 2025 18:20:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755800397;
-	bh=Ml4hUrMmhtCtc9egKvXHdw6ST7xy3d80Zu7REsvebCA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Ftd5BTZknHK64rWSsrS62LHqDwjoadMleUzUOx6gIhUhGa7klbrphYPRTBX+xDqi4
-	 FxNVZTaLoi7aGQPpWNSZmXrOZt649aCF1FNk/28dcVRA0oTn50fHjxWFes5fdE5T2H
-	 1mD4A4Z8lB2pgTDe0gWkc971N0eEUZ5zhMYX9dtIjH5zn5KhstFrH2c0LkGuUtpidv
-	 VeKNVZgiThYMZARV9VEhAiyluMB3kRSTLvuWqWETT4LOcZ6sia5AJWsxNYS+uB4vwv
-	 gcfzqT/Q9JQyXvmyk5PSEi9qFRUocaH58g88dKGFAuVyFqTjNtAj3punXqkj+gzKij
-	 oryVJH1TqOyQQ==
+	s=k20201202; t=1755800433;
+	bh=4hrLo4L+G1zUcmSSW/67SSpyLfiydKVmvlj+/64Owh4=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=atC7rdDP5tN+XGRGhesealtEJXcd6suasB+wttw0wuUaZPkkf+r/OZQCPhSAG1daa
+	 YG6YZGbDHyA9LhSiUkAYtN+l5tuRmYmY4JE6OpVErlNIroPZIpHOpB1lon3Ni10DKD
+	 DznyP+q083OCHmCDzT+J1wsEt5XdUQ5K3gai5y8g8CUfNl05+dJSrOLsM8kt1x5xxH
+	 EY1nod4JbwytuybapeUXSlJYv2cJG41fxVpwG83EOX0oNGsqiDS7XwdOdr59G2aPjz
+	 zbbqwZpTwnTfYhfgifgJQQY3XYVTM7fwGpGVkaxN0hgtoNS1XELUF5dBSfkpG3ZZNA
+	 mDy+n7uVJsi6Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33F93383BF5B;
-	Thu, 21 Aug 2025 18:20:08 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3405F383BF5B;
+	Thu, 21 Aug 2025 18:20:44 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.17-rc3
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20250821171641.2435897-1-kuba@kernel.org>
+References: <20250821171641.2435897-1-kuba@kernel.org>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20250821171641.2435897-1-kuba@kernel.org>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.17-rc3
+X-PR-Tracked-Commit-Id: 91a79b792204313153e1bdbbe5acbfc28903b3a5
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 6439a0e64c355d2e375bd094f365d56ce81faba3
+Message-Id: <175580044275.1140263.17914941560586894452.pr-tracker-bot@kernel.org>
+Date: Thu, 21 Aug 2025 18:20:42 +0000
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] selftests: net: fix memory leak in tls.c
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175580040701.1138531.10293512687033473272.git-patchwork-notify@kernel.org>
-Date: Thu, 21 Aug 2025 18:20:07 +0000
-References: <20250819-memoryleak-v1-1-d4c70a861e62@uniontech.com>
-In-Reply-To: <20250819-memoryleak-v1-1-d4c70a861e62@uniontech.com>
-To: Cryolitia PukNgae <cryolitia@uniontech.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, zhanjun@uniontech.com, niecheng1@uniontech.com,
- guanwentao@uniontech.com
 
-Hello:
+The pull request you sent on Thu, 21 Aug 2025 10:16:41 -0700:
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.17-rc3
 
-On Tue, 19 Aug 2025 10:45:57 +0800 you wrote:
-> From: Cryolitia PukNgae <cryolitia@uniontech.com>
-> 
-> To free memory and close fd after use
-> 
-> Suggested-by: Jun Zhan <zhanjun@uniontech.com>
-> Signed-off-by: Cryolitia PukNgae <cryolitia@uniontech.com>
-> 
-> [...]
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/6439a0e64c355d2e375bd094f365d56ce81faba3
 
-Here is the summary with links:
-  - selftests: net: fix memory leak in tls.c
-    https://git.kernel.org/netdev/net-next/c/e5b71dd3ad0e
+Thank you!
 
-You are awesome, thank you!
 -- 
 Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+https://korg.docs.kernel.org/prtracker.html
 
