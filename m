@@ -1,186 +1,129 @@
-Return-Path: <netdev+bounces-215439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F2F9B2EAEF
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 03:44:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A9C6B2EAF5
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 03:46:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 308C25E494F
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 01:44:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44C7F724183
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 01:46:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B940324BCF5;
-	Thu, 21 Aug 2025 01:44:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05E9B1F4CA1;
+	Thu, 21 Aug 2025 01:46:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
+Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6891E1D54FE
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 01:44:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3D3C5FEE6
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 01:46:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755740668; cv=none; b=j0o8tj1CYD0A5cCvjc3BAK+tj0kGkpkk4DhShMXaXSjZ4KUySdWg4kEZ0rMm+AvLX+2S3+ZFNrS9MjdihZvm2SV74ZNCim3xnXR6gSqL6opqvh2CHbhK9eM5h7/EPCRLi9M72zrKz4QVKrKYFFppJIB7HHjNclc4r1/IvkscDRE=
+	t=1755740811; cv=none; b=PMi7dJ7PedwQawpcE4XQ6qLZT9HoHhL2o7gOFEQxUi+JToBT41Ru98aGrxl9H6lusGcHGnP7FDQJ9FXQGkpHakzCbvSKVk4tIo7wBS0BCtdrhWaKW3k0GEiQbmxS8guiyUdHmINH0xZXqUJZlaPNbkGt1UI/U98L7zIKuruR/QU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755740668; c=relaxed/simple;
-	bh=/spv7jWo69UbbuIZnbqkbS+7Kk/f7i+A+U1mM8kITus=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MFp1dZIGyS2c4qLW3FD+RZIFfAv+R+ICKf3TSg0OS5b33trKGrMqym77enH4khKlKNzuQsVfjTUVBgnoVxCopjq8/nuLUth4pXDRIuQLAtq3urZ2H6H4Q/wR4jR1/FqyGfi1dTWaRNDvNBT8a5xsRYVU36V0xrYN6pmLwhQpuO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=18.132.163.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: esmtpgz16t1755740653t744f92ac
-X-QQ-Originating-IP: sSkp9uld1sPBcAjgjwrJDFdHIEDs46stzol3q4J49GU=
-Received: from localhost ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 21 Aug 2025 09:44:11 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 11662485468357027338
-Date: Thu, 21 Aug 2025 09:44:11 +0800
-From: Yibo Dong <dong100@mucse.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
-	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 3/5] net: rnpgbe: Add basic mbx ops support
-Message-ID: <6981CF6C1312658E+20250821014411.GB1742451@nic-Precision-5820-Tower>
-References: <20250818112856.1446278-1-dong100@mucse.com>
- <20250818112856.1446278-4-dong100@mucse.com>
- <5cced097-52db-41c9-93e4-927aab5ffb2e@lunn.ch>
+	s=arc-20240116; t=1755740811; c=relaxed/simple;
+	bh=ySONGNdsPmg86SSrrcztNvt0AGXVE7A53Onq5Bg+ekI=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=GkTObfhRwhrcGKQK9LmcJ4RN7RLUctGFEGBw2OyNy39TVlrWvYJZN11gzTv3jCtNuuMI6PJosrdaqnp9PoPn1t3jGtTiuPlaPtX9IeArAowoxnTBUedeovZZD7MGLJH+QBVEs2vo5ePoKTLnqIQf6HDAdD0XN+guVI87djCViqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.207.22.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas3t1755740706t582t41196
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [122.233.175.250])
+X-QQ-SSF:0000000000000000000000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 10310331411603570299
+To: "'Jakub Kicinski'" <kuba@kernel.org>
+Cc: <netdev@vger.kernel.org>,
+	"'Andrew Lunn'" <andrew+netdev@lunn.ch>,
+	"'David S. Miller'" <davem@davemloft.net>,
+	"'Eric Dumazet'" <edumazet@google.com>,
+	"'Paolo Abeni'" <pabeni@redhat.com>,
+	"'Simon Horman'" <horms@kernel.org>,
+	"'Jacob Keller'" <jacob.e.keller@intel.com>,
+	"'Mengyuan Lou'" <mengyuanlou@net-swift.com>
+References: <20250812015023.12876-1-jiawenwu@trustnetic.com>	<20250812015023.12876-5-jiawenwu@trustnetic.com>	<20250815111854.170fea68@kernel.org>	<0bea01dc1175$d1394730$73abd590$@trustnetic.com> <20250820084513.587f560b@kernel.org>
+In-Reply-To: <20250820084513.587f560b@kernel.org>
+Subject: RE: [PATCH net-next v4 4/4] net: wangxun: support to use adaptive RX/TX coalescing
+Date: Thu, 21 Aug 2025 09:45:05 +0800
+Message-ID: <0c2101dc123d$38242470$a86c6d50$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5cced097-52db-41c9-93e4-927aab5ffb2e@lunn.ch>
+Content-Type: text/plain;
+	charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQJSp6GMsSi4kqJepxUFy3vdl3vtHAGdM6CxAmQrRkwBFLaOdgFi17CDs0tjf7A=
 X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: M75I2DDAzREFMtYwJAvfGXNR2mhOFgUILJCSe2syUJRDSAIUP8hCWTjf
-	fpxrGmLZkZ+CvANSbvspFTUJLVdEHAJsC1TUrlag4oRYllFIX4z9/1KMo2gYFHXcXSsBIVA
-	2r7CtvYI63BouGYZUWfjRoZS86vNuj/HikXBx++bKFOcsnUAZC2Bxk61gZ2n4UKRRsz1QYo
-	ddQblflY3UMsxjgaiDrsEBe3bTJry+rbz4IdgJaHjrXY8R2vTFJojcd7vU9XBFPDZYjc7G2
-	TmH0LM3bPpqUgdbt16HBzccOhg4R6j9n4NNGngb7JJ+r4XpP8iAh6D+BrhcHEzuv2bq8q7q
-	EFxMH5JiDkAU72ArpFoj66IQWx/swhwUC5V0wnDGqd4cQXwRBPIMthUvKrItzhGmQDz7vzj
-	1yRsF0eG+JMpKSx/ZEZuPaz9CKsDQQrU4GtCSnSNNfefFgAW4ZMaPgXSOaWyVDPZGMSZZjF
-	nN4HXUIQcyNzx9UJHZuKLDyGDX7AC7Q5PJUgn1gwh/2kOJGHJQHB+2aOFucg8z5jpmWeg1c
-	txxti822MTkKfpX24aTfhFAm4UDIc9M5KWOsHvUosBHKGewReDYeX/aRmyd1Zmj7gbCATn2
-	vsGXoV87SsiDHRU1ozQWidAP63wq60kJbjw+ZB0eZTighm9xmMkJ2RZBn2ojjV7WnRIYZwi
-	AZaXBuSOhXPNKWn2LKbZraoVc8gxIPn0SJ/LsoC8Yaf3DK1PMz9DXccvbp1+qaWMjI7JPas
-	QPrRFWpo77x2m6g8+23Jx19YfO+xAhhGWhzJQVEK8MvDaMJMDKnHSg0dprvNcpfZ/i5fLdS
-	Mp1LU1FN+q7cxQ3/Vw5wOt4DipOe3nfQow5aj8bKCml9AEImQyaCPvc65vI2bn/CufJSM+T
-	ZY4i9wqBtapwUX6ke9xahTdN8NgdY+dMd1dy02FGlpYauXLoKzgF27KB5Hc3Bsxr3egjKwl
-	zf9n5k64MEptq52AJV63nnZjsatQJy+asCGU/dobqxTelFKSQDsSjG3bBC0PHJxgCVXUrIe
-	q1N7yWuwiaEnD1bVoxnKU6dwr4vp0=
-X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: N/EN6P+BmEafMucSaU+EidtO8KWDCUV+kDrBDtGciYrQ/rnYHpN2Nmpy
+	lpnO3modbI81oMmekgKMJQfYItFbPbDaQeog3NbavYRq6QKtqKmsGCljsRQ9Khcx+5ennce
+	tCtYPR2wCAr2eLbRCr2d+e7d7cX1/vCwIWG7ArWC9nLAFc7GsElNOq76ogAq5kMpClGqNOk
+	5F6gKbxgw/E+NWjFFN7a1x9qXb9DkhzkCl+I5GCIcJO/ZUPG9EcUMj0hvIPAS1nNc4qQn8g
+	G6h/nbCOs3LACILPg76Vq8R6IGHb7SR7EiggDy3NkrlPVJIxNTwhnTgmkN37+BfA6d5sVaI
+	cFqvh2VSxCIjYGpwhEaZbh8EKE9r8PsCWyJJIpa8b4jblQ2/ItUkVqYI3qBMPfy2dR4W39i
+	ylUF7wDn5S9tSAHh/tuPgqRWuceedj/tkhmLwHFG5HeRGaGfqty3IEShUdRaYnr0pPOTcB1
+	jhk3UICxSifkQKKC1xiVGRZm6ef8AEl8phHtSG1krjK5XHwanBrPhdPpL3R5waHswKVvONJ
+	YE6esr+XBYcvutoiXNL0nkuVMrxcVyoe7NQ7iDWzIx/a1RjJWlrKp27UT+cTxfK7FWfmNdl
+	52SFnavkntSwwRG24Ktd7aKziiGigGHyAkx9DotMgaNGjyQwbjTxXB89x4/WckUQpBS8aMu
+	khk0I5cp+qlfXcmg0z4PLbU5ClzzkOR1K7B2rMOMTrPxgpAxff/mRPMJekJExK7sc8n3wh/
+	sS0mXw18eRVeM8eeuUadNvsYikSuJfwQEV0qwY0xhXRDO5XxAVvWyo3pHpO8myS78zW1Sla
+	egApXnZb4cgkHgCDR0gArKrBlKK0FxFa74PYxYa2Lp6c9Z7AmpBy3mJyykiy2y/39PTECCn
+	hgm5W+UDxj+LcvnNZ1T7Xeba9/fCGmSsM4Z2hyEGEKsMgyYdsalIuft0t/13NUTEKRfLC26
+	ylfjrIrcwH7AO4wfZ4gZFOifYxTE0TDL89Opq+diPOZPfygPf4/Apmjrl2WffQxj0T6a7Fu
+	gTF533P9cvdrqPRqy1P0lNrdh8G2W1HGuEEc/FUaRCWvWEcWQt
+X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
 X-QQ-RECHKSPAM: 0
 
-On Wed, Aug 20, 2025 at 10:23:44PM +0200, Andrew Lunn wrote:
-> > +/**
-> > + * mucse_mbx_get_ack - Read ack from reg
-> > + * @mbx: pointer to the MBX structure
-> > + * @reg: register to read
-> > + *
-> > + * @return: the ack value
-> > + **/
-> > +static u16 mucse_mbx_get_ack(struct mucse_mbx_info *mbx, int reg)
-> > +{
-> > +	return (mbx_data_rd32(mbx, reg) >> 16);
-> > +}
+On Wed, Aug 20, 2025 11:45 PM, Jakub Kicinski wrote:
+> On Wed, 20 Aug 2025 09:57:43 +0800 Jiawen Wu wrote:
+> > On Sat, Aug 16, 2025 2:19 AM, Jakub Kicinski wrote:
+> > > On Tue, 12 Aug 2025 09:50:23 +0800 Jiawen Wu wrote:
+> > > > @@ -878,6 +909,8 @@ static int wx_poll(struct napi_struct *napi, int budget)
+> > > >
+> > > >  	/* all work done, exit the polling mode */
+> > > >  	if (likely(napi_complete_done(napi, work_done))) {
+> > > > +		if (wx->adaptive_itr)
+> > > > +			wx_update_dim_sample(q_vector);
+> > >
+> > > this is racy, napi is considered released after napi_complete_done()
+> > > returns. So napi_disable() can succeed right after that point...
+> > >
+> > > > @@ -1611,6 +1708,8 @@ void wx_napi_disable_all(struct wx *wx)
+> > > >  	for (q_idx = 0; q_idx < wx->num_q_vectors; q_idx++) {
+> > > >  		q_vector = wx->q_vector[q_idx];
+> > > >  		napi_disable(&q_vector->napi);
+> > > > +		cancel_work_sync(&q_vector->rx.dim.work);
+> > > > +		cancel_work_sync(&q_vector->tx.dim.work);
+> > >
+> > > so you may end up with the DIM work scheduled after the device is
+> > > stopped.
+> >
+> > But the DIM work doesn't seem to be concerned about the status of napi.
+> > And even if the device is stopped, setting itr would not cause any errors.
+> >
+> > I can't fully grasp this point...
+> > Should I move cancel_work_sync() in front of napi_disable()?
 > 
-> > +static int mucse_check_for_ack_pf(struct mucse_hw *hw)
-> > +{
-> > +	struct mucse_mbx_info *mbx = &hw->mbx;
-> > +	u16 hw_fw_ack;
-> > +
-> > +	hw_fw_ack = mucse_mbx_get_ack(mbx, MBX_FW2PF_COUNTER);
+> My point is that this is possible today:
 > 
-> > +int mucse_write_mbx_pf(struct mucse_hw *hw, u32 *msg, u16 size)
-> > +{
-> > +	struct mucse_mbx_info *mbx = &hw->mbx;
-> > +	int size_inwords = size / 4;
-> > +	u32 ctrl_reg;
-> > +	int ret;
-> > +	int i;
-> > +
-> > +	ctrl_reg = PF2FW_MBOX_CTRL(mbx);
-> > +	ret = mucse_obtain_mbx_lock_pf(hw);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	for (i = 0; i < size_inwords; i++)
-> > +		mbx_data_wr32(mbx, MBX_FW_PF_SHM_DATA + i * 4, msg[i]);
-> > +
-> > +	/* flush msg and acks as we are overwriting the message buffer */
-> > +	hw->mbx.fw_ack = mucse_mbx_get_ack(mbx, MBX_FW2PF_COUNTER);
+>      CPU 0                     CPU 1
 > 
-> It seems like the ACK is always at MBX_FW2PF_COUNTER. So why pass it
-> to mucse_mbx_get_ack()? Please look at your other getters and setters.
+>   napi_complete_done()
+>                             napi_disable()
+>                             cancel_work()
+>   wx_update_dim_sample()
+>     schedule_work()
 > 
+> You can probably use disable_work_sync() and enable_work..
+> to fix it.
 
-'mucse_mbx_get_ack' is always at MBX_FW2PF_COUNTER now, just for pf-fw mbx. 
-But, in the future, there will be pf-vf mbx with different input.
-Should I move 'MBX_FW2PF_COUNTER' to function 'mucse_mbx_get_ack', and
-update the function when I add vf relative code in the future?
-
-> > +/**
-> > + * mucse_write_mbx - Write a message to the mailbox
-> > + * @hw: pointer to the HW structure
-> > + * @msg: the message buffer
-> > + * @size: length of buffer
-> > + *
-> > + * @return: 0 on success, negative on failure
-> > + **/
-> > +int mucse_write_mbx(struct mucse_hw *hw, u32 *msg, u16 size)
-> > +{
-> > +	return mucse_write_mbx_pf(hw, msg, size);
-> > +}
-> 
-> This function does not do anything useful. Why not call
-> mucse_write_mbx_pf() directly?
-> 
-
-Yes, I should call it directly. 
-
-> > +/**
-> > + * mucse_check_for_msg - Check to see if fw sent us mail
-> > + * @hw: pointer to the HW structure
-> > + *
-> > + * @return: 0 on success, negative on failure
-> > + **/
-> > +int mucse_check_for_msg(struct mucse_hw *hw)
-> > +{
-> > +	return mucse_check_for_msg_pf(hw);
-> > +}
-> > +
-> > +/**
-> > + * mucse_check_for_ack - Check to see if fw sent us ACK
-> > + * @hw: pointer to the HW structure
-> > + *
-> > + * @return: 0 on success, negative on failure
-> > + **/
-> > +int mucse_check_for_ack(struct mucse_hw *hw)
-> > +{
-> > +	return mucse_check_for_ack_pf(hw);
-> > +}
-> 
-> These as well.
-
-Got it, I will update it.
-
-> 
-> 	Andrew
-> 
-
-Thanks for your feedback.
+Get it. Thanks!
 
 
