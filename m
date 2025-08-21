@@ -1,194 +1,107 @@
-Return-Path: <netdev+bounces-215630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C12B5B2FA9E
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 15:37:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 483E0B2FB3F
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 15:52:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AA68AA5D4D
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 13:29:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29ABFAE80DE
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 13:46:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E738B335BA4;
-	Thu, 21 Aug 2025 13:29:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WjckZDPu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A59AC2EDD50;
+	Thu, 21 Aug 2025 13:39:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42A38334378
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 13:29:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E48B82EDD41;
+	Thu, 21 Aug 2025 13:39:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755782977; cv=none; b=XeqU/aVCtP+ww7KLWYowpX4H5OpsHsjhJD+9r/t5PHYTjj99j7yoH1wV907NTZ12u7MCYjGErh/UR0QPZGQCxizW2ImzRqufVF7a7gWJAP88jvP9eDxtofvrnMBsbuPFqFd+VYFwvWN1L+L0mC1aG3O245bNc3GJkajr9QEIxqY=
+	t=1755783556; cv=none; b=Orx4Ao7mJxsIcNsTLUzSgFDre+ryuKgZivO14W6HCZLeG3M6/Dnf2NvpVcs250xB9gKmIc6g20HeRXFrVHO9uou5y/AoUYhsybuwQvIJW+27zpN2cqk+OFFMLyH28cJCq2wJ2zvq5eltmNCLtJ9ARzq/4jw1mMThmrwewc2CRH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755782977; c=relaxed/simple;
-	bh=wc5v9uTTIL728+hB7UJTKaDvwgtQwqhmi3Vl/hFU5ak=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JZdbFSrBANc4gu8VZrmWt5ByjSR0ZXhj5JDmNNW8qgI2Hh/b9Mvoz3W1B5DPkSxS5Cdjambs6rXxd5LO3IEW8WwZRRENCXJqWGr+ZIDVlxw7VQeG+POsk+ESF5vm8X6O0wssd/RupY3REHQJ6NECcObUwexKVLYf1+h0WZdVTlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WjckZDPu; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-246013de800so135655ad.0
-        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 06:29:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755782975; x=1756387775; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=J13Esd7nTONrArlNpUKcH+9/JHXUHsKEy/Ib89aPaCQ=;
-        b=WjckZDPuo7y3Xh8jJTXxR+MBh9aWmoKvkLNd0tcrZtigIT2fPZ2vi94ZoJMZl9dgv/
-         VtoNsQPws+ioJBCOI9Y/Kmqbfd+YXVnue2vpoZH4Fv0XW5JqqdwEnoR0poRFBbLeEKn6
-         ljtT5o4Q05byKB714hFG2EoUVQEx04JRW+ESAGCTmkqY/DKcloSPi9bFlsy9fSkAPnTK
-         2ocCKCzcWsRXpBD5wjKi2vyO1VrVMclcC0nPaOw/p16X70FE9z3QlPhl/SjeyEDdaapJ
-         aFhzYxIVeJ/TWNgk4rwWMl06bF+RDyeMS3vOMCUXZzOLkoJD1BMxoQ4fV1jAE4QuTm/N
-         qm1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755782975; x=1756387775;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J13Esd7nTONrArlNpUKcH+9/JHXUHsKEy/Ib89aPaCQ=;
-        b=EhbRsJdd3O78C7gWY3RvA1gVYcqnCTAJuiamFYTqNZhQGrGV8yweZvAEmx8TdcPi/t
-         hjWZ6tBcJmU4jbVPGd/+eyAHqcbHb34viKh4d1guQFqTvN/V+yngSuXjRFExFD69Whfq
-         3IJT4KqS2pJ1QLhm8WLv0m6hs0+Eu8vyzC7UJgdj6bDNnkD++y4KF9QhCfhWH8mhxILM
-         waQkyy7UHEzlRx0RbFk25GU7IyQw6FWsVav1I2L5m1FvZyx7nuJHJhbG7LAy7LYO2TZm
-         CSFymB8k0eKHvM/hSAUWQBVcftgbfetXPcewG8p7KvNHF9U7DKONtRWQ5Foa0dx/RMFS
-         SvXg==
-X-Forwarded-Encrypted: i=1; AJvYcCXu8UVWaYP7jFQ5GqRuKGNOzxN0iJefb1XIQryXV2XInXZ73M74Nq9v4+BkPANa15aVlUotQQQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/kmqs/LxPIRW9nMs1ZMgx1c/dRz+iqQpwz7IBFI3NDopcUfGF
-	rWBsrPxHWNjsIHMtKZONeRFqub+uZNa1HJDxgsNEAfOYjhM8tri3ofGw24wDf6OCyQ==
-X-Gm-Gg: ASbGncsuLGb95eQU4AqXwzG0difMR8zvvnPGagchTPURSiiwSu131w11Hq24SbCUC2i
-	boxp7V4QG00759chjCjdZhrA93kBIEB9Ljqc0DZA920+s/OfmgnajZEuEexMxsg8QeMgO1McjAX
-	UVMHN2JFbvUtEi6BTwwxmE42Rj44oKIMLfEh8IuosCda4H1vRqtcMJtp4OK5S2eieBHeP0EBc7/
-	XplUsX2rMRi3EUQsuPdAWYmJls7pHb+e/GBgchzvWON5mlBr5prxLwq3tuhB4Au4fXpchqdFplr
-	7sxNwn69gZ6o6skxekNqF+AjgCQVBsj6Ua6OmUs6ZE9e4RyG01sGYBSAlI/Bf3FSvVPNbeUrKlA
-	uGhocvShs+x0ltK/nkgDlf6sKugzsTki5iKKOLTAkeVxKwTEkcb3/K2NnEwxHSA==
-X-Google-Smtp-Source: AGHT+IEJ89+AicE1lZQ3XnhpL5tHd/m1IsnyOgUW94AR1BOA58fjSEzDksF9jqNKQwq8P3RC6Erj0g==
-X-Received: by 2002:a17:903:166e:b0:234:b441:4d4c with SMTP id d9443c01a7336-24602317afcmr3273645ad.5.1755782975217;
-        Thu, 21 Aug 2025 06:29:35 -0700 (PDT)
-Received: from google.com (3.32.125.34.bc.googleusercontent.com. [34.125.32.3])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76e7d4fd2f5sm8344077b3a.74.2025.08.21.06.29.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Aug 2025 06:29:34 -0700 (PDT)
-Date: Thu, 21 Aug 2025 13:29:29 +0000
-From: Carlos Llamas <cmllamas@google.com>
-To: Thorsten Leemhuis <linux@leemhuis.info>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Li Li <dualli@google.com>, Tiffany Yang <ynaffit@google.com>,
-	John Stultz <jstultz@google.com>, Shai Barack <shayba@google.com>,
-	=?iso-8859-1?Q?Thi=E9baud?= Weksteen <tweek@google.com>,
-	kernel-team@android.com, linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Joel Fernandes <joelagnelf@nvidia.com>,
-	Todd Kjos <tkjos@android.com>,
-	Arve =?iso-8859-1?B?SGr4bm5lduVn?= <arve@android.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-	Martijn Coenen <maco@android.com>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Linux kernel regressions list <regressions@lists.linux.dev>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH v20 3/5] binder: introduce transaction reports via netlink
-Message-ID: <aKcfOXcutUwoivDD@google.com>
-References: <20250727182932.2499194-1-cmllamas@google.com>
- <20250727182932.2499194-4-cmllamas@google.com>
- <e21744a4-0155-40ec-b8c1-d81b14107c9f@leemhuis.info>
- <2025082145-crabmeat-ounce-e71f@gregkh>
- <ddbf8e90-3fbb-4747-8e45-c931a0f02935@leemhuis.info>
+	s=arc-20240116; t=1755783556; c=relaxed/simple;
+	bh=nB2t3WQDGZmyqwOWHUe4oKJKmrBX6EMje7BAzEJRWNg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZJeg2bYPLRtgZm/32y3B7b/aK7A0JIXqnbKFBItIWw2f2RKqxeFjYoUUXx1zetDAadLMa3ViE65fFqC9h5gv5GdP6ssNMtNBPFdvQMKbcFYxWn7EAQqmRsn7f4tLIvo7ckzAU0EZzJfVaLekbjmNFeH8/ASEYfXIsXh1jwV9Mgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from [192.168.0.106] (unknown [114.241.87.235])
+	by APP-01 (Coremail) with SMTP id qwCowABXR6tfIadoNV0QDg--.59898S2;
+	Thu, 21 Aug 2025 21:38:40 +0800 (CST)
+Message-ID: <e0d4e114-9523-4b12-bf32-22d13c7f914f@iscas.ac.cn>
+Date: Thu, 21 Aug 2025 21:38:39 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ddbf8e90-3fbb-4747-8e45-c931a0f02935@leemhuis.info>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 2/5] net: spacemit: Add K1 Ethernet MAC
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexandre Ghiti <alex@ghiti.fr>
+Cc: Vivian Wang <uwu@dram.page>, Junhui Liu <junhui.liu@pigmoral.tech>,
+ Simon Horman <horms@kernel.org>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-riscv@lists.infradead.org,
+ spacemit@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20250820-net-k1-emac-v6-0-c1e28f2b8be5@iscas.ac.cn>
+ <20250820-net-k1-emac-v6-2-c1e28f2b8be5@iscas.ac.cn>
+ <cf0431cf-523e-488e-87ec-6b5a68699809@linux.dev>
+Content-Language: en-US
+From: Vivian Wang <wangruikang@iscas.ac.cn>
+In-Reply-To: <cf0431cf-523e-488e-87ec-6b5a68699809@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qwCowABXR6tfIadoNV0QDg--.59898S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7GryfZFWfAr48ZFy8AFWUurg_yoWxtrXEkF
+	W0vwnF9w1DGw10g3WfG3ZF9w4DKr1kXr1xWrZrZws5Jw17AF98XF17Kwnaqr43WFZ2qrn7
+	Gr1jyrWYv343ujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbsxYjsxI4VW3JwAYFVCjjxCrM7AC8VAFwI0_Xr0_Wr1l1xkIjI8I
+	6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM2
+	8CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWUCVW8JwA2z4x0Y4vE2Ix0
+	cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z2
+	80aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAK
+	zVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx
+	8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF
+	7I0En4kS14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI
+	8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AK
+	xVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI
+	8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280
+	aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0x
+	ZFpf9x07jgPEfUUUUU=
+X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 
-On Thu, Aug 21, 2025 at 03:00:50PM +0200, Thorsten Leemhuis wrote:
-> On 21.08.25 14:19, Greg Kroah-Hartman wrote:
-> > On Thu, Aug 21, 2025 at 10:49:09AM +0200, Thorsten Leemhuis wrote:
-> >> On 27.07.25 20:29, Carlos Llamas wrote:
-> >>> From: Li Li <dualli@google.com>
-> >>>
-> >>> Introduce a generic netlink multicast event to report binder transaction
-> >>> failures to userspace. This allows subscribers to monitor these events
-> >>> and take appropriate actions, such as stopping a misbehaving application
-> >>> that is spamming a service with huge amount of transactions.
-> >>>
-> >>> The multicast event contains full details of the failed transactions,
-> >>> including the sender/target PIDs, payload size and specific error code.
-> >>> This interface is defined using a YAML spec, from which the UAPI and
-> >>> kernel headers and source are auto-generated.
-> >>
-> >> It seems to me like this patch (which showed up in -next today after
-> >> Greg merged it) caused a build error for me in my daily -next builds
-> >> for Fedora when building tools/net/ynl:
-> >>
-> >> """
-> >> make[1]: Entering directory '/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/lib'
-> >> gcc -std=gnu11 -O2 -W -Wall -Wextra -Wno-unused-parameter -Wshadow   -c -MMD -c -o ynl.o ynl.c
-> >>         AR ynl.a
-> >> make[1]: Leaving directory '/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/lib'
-> >> make[1]: Entering directory '/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/generated'
-> >>         GEN binder-user.c
-> >> Traceback (most recent call last):
-> >>   File "/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/generated/../pyynl/ynl_gen_c.py", line 3673, in <module>
-> >>     main()
-> >>     ~~~~^^
-> >>   File "/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/generated/../pyynl/ynl_gen_c.py", line 3382, in main
-> >>     parsed = Family(args.spec, exclude_ops)
-> >>   File "/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/generated/../pyynl/ynl_gen_c.py", line 1205, in __init__
-> >>     super().__init__(file_name, exclude_ops=exclude_ops)
-> >>     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> >>   File "/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/pyynl/lib/nlspec.py", line 462, in __init__
-> >>     jsonschema.validate(self.yaml, schema)
-> >>     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
-> >>   File "/usr/lib/python3.13/site-packages/jsonschema/validators.py", line 1307, in validate
-> >>     raise error
-> >> jsonschema.exceptions.ValidationError: 'from_pid' does not match '^[0-9a-z-]+$'
-> >>
-> >> Failed validating 'pattern' in schema['properties']['attribute-sets']['items']['properties']['attributes']['items']['properties']['name']:
-> >>     {'pattern': '^[0-9a-z-]+$', 'type': 'string'}
-> >>
-> >> On instance['attribute-sets'][0]['attributes'][2]['name']:
-> >>     'from_pid'
-> >> make[1]: *** [Makefile:48: binder-user.c] Error 1
-> >> make[1]: Leaving directory '/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/generated'
-> >> make: *** [Makefile:25: generated] Error 2
-> >> """
-> > 
-> > Odd, this works for me.
-> 
-> Hmmm, happened on various Fedora releases and archs in Fedora's coprs
-> buildsys for me today. And with a local Fedora 41 x86_64 install, too;
-> in the latter case (just verified) both when checking out next-20250821
-> and 63740349eba78f ("binder: introduce transaction reports via netlink")
-> from -next.
-> 
-> > How exactly are you building this?
-> 
-> Just "cd tools/net/ynl; make".
-> 
-> Ciao, Thorsten
+Hi Vadim,
 
-Judging by the regex in the error log it seems there is a new
-restriction to not using underscores in the yml files. This restriction
-probably raced with my patch in next. It should be very easy to fix. Can
-you please try replacing the underscores?
+On 8/21/25 20:59, Vadim Fedorenko wrote:
 
- $ sed -i 's/_/-/' Documentation/netlink/specs/binder.yaml
+> On 20/08/2025 07:47, Vivian Wang wrote:
+>> The Ethernet MACs found on SpacemiT K1 appears to be a custom design
+>> that only superficially resembles some other embedded MACs. SpacemiT
+>> refers to them as "EMAC", so let's just call the driver "k1_emac".
+>>
+>> Supports RGMII and RMII interfaces. Includes support for MAC hardware
+>> statistics counters. PTP support is not implemented.
+>>
+>> Tested-by: Junhui Liu <junhui.liu@pigmoral.tech>
+>> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
+>
+> Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev> 
 
-I think that should fix your build. I'll try to reproduce.
+Thank you for your review. I appreciate it.
 
---
-Carlos Llamas
+Vivian "dramforever" Wang
+
 
