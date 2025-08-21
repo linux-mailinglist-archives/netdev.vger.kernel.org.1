@@ -1,50 +1,56 @@
-Return-Path: <netdev+bounces-215550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34577B2F2C6
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 10:50:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 383ACB2F302
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 10:56:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6D5C7BEF32
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 08:48:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F094189363D
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 08:54:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A06702EB863;
-	Thu, 21 Aug 2025 08:50:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ADB22ECEBF;
+	Thu, 21 Aug 2025 08:54:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ab32gm+y"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="StSKpPO1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7902D2641FC;
-	Thu, 21 Aug 2025 08:50:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D935021FF28;
+	Thu, 21 Aug 2025 08:54:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755766203; cv=none; b=GaedEey3I+x5Dvz2u2/erylHhaAa+njPIgaOkIPr4I16pRagxghVwmAnnzXGER0XPAZ1pkqc5/MpTTyXY1LW35y8TlzSkO0f9O64YMVDiinhGui4napI8CfGOojlSESA5KS7hPOW7ok1a+fU4wazHPYQ+8HOwk21p3azb1Y9HyQ=
+	t=1755766448; cv=none; b=ljGmuTFr4hdc4nwkbnQ+6E+ma03y5TuMYrj0HQ5CdbvG4HV3Qe90IiUOlJ+TM9urPK5sdX4N9QKBEtRAJ600mVt1JmTjGUzKs3mTNW2wRE2lYlzMRgSsXVUCAGkiXBfDPcYtKx8+WpS5mHPIfdKVbI+uQgiP/3SjOMFC0gH+pMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755766203; c=relaxed/simple;
-	bh=uorD+s6RTCZK6xWgBvrtaRd33UyFWBIPNmlokBD8v60=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=D2IwDrhLs+w5HzFrBxe57Jbo50LyPDAGLmtrdlL7WcUmYsMy+JgWPPebJv8Hchhm3q1KFFMe/DDtsrKUYkcpG7Q67AOqUQH67bNKFrPtFMRcF5ZWdyPZ6AUBRsq0VsB84MyFpirYL8SqfVDDbL80KbVhRCPYUD6XhCD8Uq9UHkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ab32gm+y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6026C4CEEB;
-	Thu, 21 Aug 2025 08:50:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755766203;
-	bh=uorD+s6RTCZK6xWgBvrtaRd33UyFWBIPNmlokBD8v60=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ab32gm+yDbtJM/o4sXTqtD48EqvCP5OfEKo54d4wSLRdZuRmbYdQ7nZZT40dGDGRG
-	 SFLFRek3Nh2nL0am9ic0Z2EC6WfogipbZWoBf46sIU1usG/q0kx1Egls+P71sNxEav
-	 JcrvsfCs3XOy49HP2sn2CTWmjX39YhnmbDcopoiPrMVn/snsYK+Uv0eeLDvz82pP+2
-	 8xBmVJckFKQVExJ0IlzAVxHvxhIHY4+JEeJiG+IwCSkcF27EW8KHx5a+EjaLYZWWyA
-	 Z2SRTXw3T6A/C6nZ0VGmG/H5/2oarwYAwjooEhPuOolD2N4gWV4Hy3iGpJoCwyK9dX
-	 lO40SSaFFTh0Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C1B383BF5B;
-	Thu, 21 Aug 2025 08:50:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1755766448; c=relaxed/simple;
+	bh=E7wlCF/qd5NHjG6mOLnD7yWZl9+qK0uQRNNENYmY0Qk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=B2hZwffA6KqNLSt/Ms6jR14YiMS8zYGYsUIyWUCggbEmbAILne9b1vH9HVFwRDI1yFH8g6If54BBoG7TS6fgoyau8w3Jg6VG+4LziygwSbfzT9SXE75Tit+tj9VDFH1crtYeOa2maJZ5ON6vMmXIfDblKkvmde6KoPxJFaSCQfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=StSKpPO1; arc=none smtp.client-ip=117.135.210.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=0f
+	VX8rrkuXOhydTNOOC17PpoylVUri3YXUcQETlaG2U=; b=StSKpPO1BqXZ1EbCzE
+	4SjM1j9IeoMJSa/CGV9gx/kmN7HFO+qXonw51vOwwae5hzSV3fbuy6Bu3JdNxx8X
+	UJqD6VsD+uf9CGWC8ddps/IPEW/u+BEwTYjRdBa3VjAUyEiPqKjd5LTKMwTXLgWx
+	/hyApvVDz+WJwGxNAaJWjYLWg=
+Received: from zhaoxin-MS-7E12.. (unknown [])
+	by gzsmtp3 (Coremail) with SMTP id PigvCgC3MPF+3qZocU0tAA--.6833S2;
+	Thu, 21 Aug 2025 16:53:19 +0800 (CST)
+From: Xin Zhao <jackzxcui1989@163.com>
+To: willemdebruijn.kernel@gmail.com,
+	edumazet@google.com,
+	ferenc@fejes.dev
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v6] net: af_packet: Use hrtimer to do the retire operation
+Date: Thu, 21 Aug 2025 16:53:18 +0800
+Message-Id: <20250821085318.3022527-1-jackzxcui1989@163.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,50 +58,132 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 0/4] net: phy: micrel: Add support for lan8842
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175576621125.946325.3157798502826280312.git-patchwork-notify@kernel.org>
-Date: Thu, 21 Aug 2025 08:50:11 +0000
-References: <20250818075121.1298170-1-horatiu.vultur@microchip.com>
-In-Reply-To: <20250818075121.1298170-1-horatiu.vultur@microchip.com>
-To: Horatiu Vultur <horatiu.vultur@microchip.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- richardcochran@gmail.com, o.rempel@pengutronix.de, alok.a.tiwari@oracle.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+X-CM-TRANSID:PigvCgC3MPF+3qZocU0tAA--.6833S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW3AF17ZF4xZr4kZFyfGr4UArb_yoWxuF1UpF
+	Wjg347twn7JFsF9FyxXa1kXFyUJw43Ar45Grn3Jryjy3sxGFy2qFW2gFWFqFWIkr4ktwn2
+	vr18trZ8Aw1DCrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07Ul1v-UUUUU=
+X-CM-SenderInfo: pmdfy650fxxiqzyzqiywtou0bp/1tbiowiwCmim1fPhmAAAsA
 
-Hello:
+On Wed, 2025-08-20 at 19:15 +0800, Willem wrote:
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Mon, 18 Aug 2025 09:51:17 +0200 you wrote:
-> Add support for LAN8842 which supports industry-standard SGMII.
-> While add this the first 3 patches in the series cleans more the
-> driver, they should not introduce any functional changes.
+> > -static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core *pkc)
+> > +static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core *pkc,
+> > +					     bool start)
+> >  {
+> > -	mod_timer(&pkc->retire_blk_timer,
+> > -			jiffies + pkc->tov_in_jiffies);
+> > +	if (start && !hrtimer_is_queued(&pkc->retire_blk_timer))
+> > +		hrtimer_start(&pkc->retire_blk_timer, pkc->interval_ktime,
+> > +			      HRTIMER_MODE_REL_SOFT);
+> > +	else
+> > +		hrtimer_forward_now(&pkc->retire_blk_timer, pkc->interval_ktime);
 > 
-> v4->v5:
-> - implement inband_caps and config_inband ops
-> - remove unused defines
-> - use reverse x-mas tree in lan8842_get_stat function
+> Is the hrtimer still queued when prb_retire_rx_blk_timer_expired
+> fires? Based on the existence of hrtimer_forward_now, I assume so. But
+> have not checked yet. If so, hrtimer_is_queued alone suffices to
+> detect the other callstack from tpacket_rcv where hrtimer_start is
+> needed. No need for bool start?
 > 
-> [...]
+> >  	pkc->last_kactive_blk_num = pkc->kactive_blk_num;
+> >  }
 
-Here is the summary with links:
-  - [net-next,v5,1/4] net: phy: micrel: Start using PHY_ID_MATCH_MODEL
-    https://git.kernel.org/netdev/net-next/c/54e974c71524
-  - [net-next,v5,2/4] net: phy: micrel: Introduce lanphy_modify_page_reg
-    https://git.kernel.org/netdev/net-next/c/a0de636ed7a2
-  - [net-next,v5,3/4] net: phy: micrel: Replace hardcoded pages with defines
-    https://git.kernel.org/netdev/net-next/c/d471793a9b67
-  - [net-next,v5,4/4] net: phy: micrel: Add support for lan8842
-    https://git.kernel.org/netdev/net-next/c/5a774b64cd6a
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Since the CI tests have reported the previously mentioned WARN_ON situation within
+hrtimer_forward_now, I believe we should reevaluate the implementation of the
+_prb_refresh_rx_retire_blk_timer function, which is responsible for setting the
+hrtimer timeout, and establish the principles it should adhere to. After careful
+consideration and a detailed review of the hrtimer implementation, I have identified
+the following two principles:
 
+1. It is essential to ensure that calls to hrtimer_forward_now or hrtimer_set_expires
+occur strictly within the hrtimer's callback.
+2. It is critical to ensure that no calls to hrtimer_forward_now or hrtimer_set_expires
+are made while the hrtimer is enqueued.
+
+
+Regarding these two principles, I would like to add three points:
+1. In principle 1, if hrtimer_forward_now or hrtimer_set_expires is called outside of
+the hrtimer's callback without triggering the timer's enqueue, it will lead to the
+hrtimer timeout not being triggered as expected (this issue is obvious and can be
+reproduced by writing a kernel object and setting a short timeout, such as 2ms).
+2. Both principles above are aimed at preventing scenarios where hrtimer_forward_now
+or hrtimer_set_expires modify the timeout while the hrtimer is already enqueued, which
+could lead to disarray in the hrtimer's red-black tree (after all, the WARN_ON check
+for enqueue in the non-inlined hrtimer_forward_now interface exists to prevent such
+situations). It is also important to note that apart from executing the hrtimer_start
+series of functions outside the hrtimer callback, the __run_hrtimer function, upon
+returning HRTIMER_RESTART after executing the hrtimer callback, will also enqueue the
+hrtimer.
+3. The reason for principle 2, in addition to principle 1, is that when setting the
+timeout using hrtimer_forward_now in the hrtimer's callback, there is no protection
+provided by the lock for hrtimer_cpu_base, meaning that if an hrtimer_start action is
+performed outside the hrtimer's callback while simultaneously updating the timeout
+within the callback, it could cause disarray in the hrtimer's red-black tree.
+
+The occurrence of the WARN_ON enqueue error in the CI test indicates that
+hrtimer_forward_now was executed in a scenario outside the hrtimer's callback while
+the hrtimer was in a queued state. A possible sequence that could cause this issue is
+as follows:
+cpu0 (softirq context, hrtimer timeout)                             cpu1 (process context, need prb_open_block)
+hrtimer_run_softirq
+  __hrtimer_run_queues
+    __run_hrtimer
+      _prb_refresh_rx_retire_blk_timer
+        spin_lock(&po->sk.sk_receive_queue.lock);
+        hrtimer_is_queued(&pkc->retire_blk_timer) == false
+        hrtimer_forward_now
+        spin_unlock(&po->sk.sk_receive_queue.lock)                 tpacket_rcv
+      enqueue_hrtimer                                                spin_lock(&sk->sk_receive_queue.lock);
+                                                                     packet_current_rx_frame
+                                                                       __packet_lookup_frame_in_block
+                                                                         prb_open_block
+                                                                           _prb_refresh_rx_retire_blk_timer
+                                                                             hrtimer_is_queued(&pkc->retire_blk_timer) == true
+                                                                             hrtimer_forward_now
+                                                                             WARN_ON
+
+In summary, the key issue now is to find a mechanism to ensure that the hrtimer's start
+or enqueue, as well as the timeout settings for the hrtimer, cannot be executed
+concurrently. I have thought of two methods to address this issue (method 1 will make the
+code appear much simpler, while method 2 will make the code more complex):
+
+Method 1:
+Do not call hrtimer_forward_now to set the timeout within the hrtimer's callback; instead,
+only call the hrtimer_start function to perform the hrtimer's enqueue. This approach is
+viable because, in the current version, inside __run_hrtimer, the state of the timer is
+checked under the protection of cpu_base->lock. If the timer is already enqueued, it will
+not be enqueued again. By doing this, all hrtimer enqueues will be protected under both
+sk_receive_queue.lock and cpu_base->lock, eliminating concerns about the timeout being
+concurrently modified during enqueueing, which could lead to chaos in the hrtimer's
+red-black tree.
+
+Method 2:
+This method primarily aims to strictly ensure that hrtimer_start is not called within the
+hrtimer's callback. However, doing so would require a lot of additional logic:
+We would need to add a callback parameter to strictly ensure that hrtimer_forward_now is
+executed within the callback and hrtimer_start is executed outside the callback. The
+occurrence of the WARN_ON in the CI test indicates that the method of using
+"hrtimer_is_queued to make the judgment" does not cover all scenarios. The fundamental
+reason for this is that the hrtimer_is_queued check must be precise, which requires
+protection from cpu_base->lock. Similarly, using hrtimer_callback_running check would not
+achieve precise judgment either. It is necessary to know on which CPU the hrtimer is running
+and send an IPI to execute hrtimer_forward_now using local_irq_save on that CPU to satisfy
+the aforementioned principle 2), as it is inappropriate to acquire the cpu_base->lock within
+the af_packet logic; the only way to ensure that the hrtimer_forward_now operation is
+executed without enqueueing the hrtimer is by disabling IRQs.
+
+Since strictly ensuring that hrtimer_start is not called within the hrtimer's callback leads
+to a lot of extra logic, and logically, I have also demonstrated that it is permissible to
+call hrtimer_start within the hrtimer's callback (for the hrtimer module, the lock is
+cpu_base->lock, which is associated with the clock base where the hrtimer resides, and does
+not follow smp_processor_id()), it does not matter whether hrtimer_start is executed by the
+CPU executing the hrtimer callback or by another CPU; both scenarios are the same for the
+hrtimer module. TTherefore, I prefer to use the aforementioned method 1) to resolve this
+issue. If there are no concerns, I will reflect this in PATCH v7.
+
+
+Thanks
+Xin Zhao
 
 
