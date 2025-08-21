@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-215464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10734B2EB58
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 04:41:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1182B2EB61
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 04:42:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45EBE7B1C6D
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 02:39:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4E761C88637
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 02:41:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F0D7257829;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D454525A320;
 	Thu, 21 Aug 2025 02:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jgKP9woY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LsfbA1m/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E715F252910;
-	Thu, 21 Aug 2025 02:40:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB215258EE6
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 02:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755744026; cv=none; b=mHvvS1lS24PDyHMOaeuecZFLOlfgoixpdGnr+OA5IWWwX1G++Jca0wlpcVm6CygGZeZyTtB5ENzbsWtgOKATZUrjBWoffdwGJerPeDEhBeHL65dsNw7mTvH2m3xyltR9kIA7vpVLUssg5QANEtceBsZDZoBi0RdyKDAxLbyc9h4=
+	t=1755744026; cv=none; b=W/AxSCKRRerXOg10f0qxvWfM4v96Sg3dBOcpUEuHhda4Nz+zJf+mv7Jg5kh3lzE+7JUJXMvkpzt1k7oLQy+EbjUSN8XzFEpgJy6LdrZTjDYJYiC7NnfSsF+k+GrENa8WyIEkzMs3Hw+1e6LHL3gRILuc9eyTq4ql5YV8TB5EQFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1755744026; c=relaxed/simple;
-	bh=9o/c4Ykf1FXVHZSL8h2+vsayOJyjbxiOwpDKgqJnfWc=;
+	bh=c29pNNL5cBof2QgXaD1NRmip5Ia3hE7syRPzKhyq5zs=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RunyoHjhjPLyAvtMZcUovISjqWHcLO44jLgTrwVtX8tOtKafyn3TuaSzBTwS48W54jyF+KP0P+xNXDbaRPGoamPYozefNUwol8MhqeR49VyTpXj0dtmiUE1YKqz1UxuNxb8q1q/xAkMVZ8BMeGpmlII4UWBFozJ/pC0iqBQ0Nng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jgKP9woY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54266C4CEE7;
-	Thu, 21 Aug 2025 02:40:25 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=nlblD2W48s7sKMEadz0g+hkvQhIu1ErQZMreQ6iDHUQyqWsQvQm9gTcPj0m9izomkJzGR7yJAtxUgOeNiWrXm8rferVuCXrOVgj5XWWBBYLa7O2EeCI/FKikdZccbNhGC1IRRuAv/IIV9zBzQ5JXowLrEvO7sGrSkC2nvmhreUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LsfbA1m/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83D77C4CEE7;
+	Thu, 21 Aug 2025 02:40:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755744025;
-	bh=9o/c4Ykf1FXVHZSL8h2+vsayOJyjbxiOwpDKgqJnfWc=;
+	s=k20201202; t=1755744026;
+	bh=c29pNNL5cBof2QgXaD1NRmip5Ia3hE7syRPzKhyq5zs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jgKP9woYL27+rNaY9DgTwkEX+Wg9JZgEHo0dpF3zjC8QOhUVeRRaZBldyuS9n064O
-	 Z5/mNN0z55Q5N7A0+CCDWPLQal70NwmGl3+ArepfWasZcPBHfFFn06lWo7ymRJvvwh
-	 YJ8D+K5vagggWfJRO3ftI+D8dwoSZQvd73Sc3hMPb1djFg+4o9AcO2GG3Sbz/Z1Gtm
-	 l5HnlrzMb6Jia9WSAPE2Yvthh3wv89f7ACs7/jrbA21piAuX0uMu2nNJXlp+doeeep
-	 /bmQyh/tck6D3F3vWRCsYF0rJOgzqd2Ltmh6noF/+getuyly1qHZYfpguoxtAq4Pu5
-	 vtLbEhvkw9G7g==
+	b=LsfbA1m/JdAt+NdUhoGAy+e/2NVStrXd/KWRaWO3/87of7v2CCIaNMUBYyvctA1hK
+	 uZZTlHG/fFfl16Y+omaj1c5IyMnLV62CwUVwz/Hy2iAHeMR3/ZCJzyPvs23yKKwBYZ
+	 EXw54MMQHhvGKTg24YRU1Mv+VG7wMGK6VLZ47Lb+m8nvcXiwM9s3CeQq+m8IyDffqZ
+	 +pgQIedt/A3FO/mfP48lr4bc2BKW4R4xXi4E/oLKxt+DRNyBfaYR2VHkHkQP5AUDCZ
+	 dV4TOj2mHCglwlosAUUA9VfPTOeWR4+DYCZa3jbcsHZe+H7fclg7DXRM45v+eVqJTq
+	 3K7R6warvTBig==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB03D383BF4E;
-	Thu, 21 Aug 2025 02:40:35 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33A77383BF4E;
+	Thu, 21 Aug 2025 02:40:37 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,45 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] selftests: net: bpf_offload: print loaded
- programs
- on mismatch
+Subject: Re: [PATCH net-next] net: set net.core.rmem_max and net.core.wmem_max
+ to
+ 4 MB
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175574403449.482952.12532476837961479515.git-patchwork-notify@kernel.org>
-Date: Thu, 21 Aug 2025 02:40:34 +0000
-References: <20250819073348.387972-1-liuhangbin@gmail.com>
-In-Reply-To: <20250819073348.387972-1-liuhangbin@gmail.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, john.fastabend@gmail.com, bigeasy@linutronix.de,
- lorenzo@kernel.org, andriin@fb.com, joamaki@gmail.com, jv@jvosburgh.net,
- andy@greyhouse.net, corbet@lwn.net, andrew+netdev@lunn.ch,
- razor@blackwall.org, toke@redhat.com, horms@kernel.org, fmaurer@redhat.com,
- vmalik@redhat.com, linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+ <175574403599.482952.17071662130404818536.git-patchwork-notify@kernel.org>
+Date: Thu, 21 Aug 2025 02:40:35 +0000
+References: <20250819174030.1986278-1-edumazet@google.com>
+In-Reply-To: <20250819174030.1986278-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 19 Aug 2025 07:33:48 +0000 you wrote:
-> The test sometimes fails due to an unexpected number of loaded programs. e.g
+On Tue, 19 Aug 2025 17:40:30 +0000 you wrote:
+> SO_RCVBUF and SO_SNDBUF have limited range today, unless
+> distros or system admins change rmem_max and wmem_max.
 > 
->   FAIL: 2 BPF programs loaded, expected 1
->     File "/usr/libexec/kselftests/net/./bpf_offload.py", line 940, in <module>
->       progs = bpftool_prog_list(expected=1)
->     File "/usr/libexec/kselftests/net/./bpf_offload.py", line 187, in bpftool_prog_list
->       fail(True, "%d BPF programs loaded, expected %d" %
->     File "/usr/libexec/kselftests/net/./bpf_offload.py", line 89, in fail
->       tb = "".join(traceback.extract_stack().format())
+> Even iproute2 uses 1 MB SO_RCVBUF which is capped by
+> the kernel.
+> 
+> Decouple [rw]mem_max and [rw]mem_default and increase
+> [rw]mem_max to 4 MB.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] selftests: net: bpf_offload: print loaded programs on mismatch
-    https://git.kernel.org/netdev/net-next/c/eacb6e408dc8
+  - [net-next] net: set net.core.rmem_max and net.core.wmem_max to 4 MB
+    https://git.kernel.org/netdev/net-next/c/a6d4f25888b8
 
 You are awesome, thank you!
 -- 
