@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-215688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215690-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A33E9B2FE3B
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 17:24:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA847B2FE5E
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 17:30:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A87C77BAF5A
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 15:21:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F271DAC553C
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 15:23:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53A35296BC2;
-	Thu, 21 Aug 2025 15:21:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B79322C326B;
+	Thu, 21 Aug 2025 15:21:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="jdh+K39d"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="E682BXa4"
 X-Original-To: netdev@vger.kernel.org
 Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011002.outbound.protection.outlook.com [52.101.70.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 369EB287276;
-	Thu, 21 Aug 2025 15:21:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9158B288C22;
+	Thu, 21 Aug 2025 15:21:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.2
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755789689; cv=fail; b=UQDwoYsdGyxlaroDzolDQyWgweB0m+P4SkykZ2a1VYVl3erjFVw3bbW/HGhckKXNrUawbxGKI0e+V8+9Am9s26LQ/6NRaufqod7LDE0u9QpXfr2a31MItiFSeE6JRG0u7CUVhNAGTkgEI0vBaubPNMB+n66atmaap/k8sueWwRo=
+	t=1755789691; cv=fail; b=EDb2etYmMzM6oklRcwBfQckpNyrQGFYG0uuw20ra5srRbdULipCHB2qKpflLDt9+yd/Tk8T+J7uopMA9IXS9LYoY9LlDdnD9L45T1ERLZM+PhrLNY6sKkeZ+UeM2x7kPrBf0CJkzaFjpNewuvnqria071ke2MqGW+KKAf+b/6qU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755789689; c=relaxed/simple;
-	bh=Yq6utMtqD2I7IoS25Kq6OcQhwqXwqVkdMSANFc9F8t4=;
+	s=arc-20240116; t=1755789691; c=relaxed/simple;
+	bh=SCqmxOKDIm2qWTcNHAh1iK9IURczPHwI+RIxp57SFdo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=qEOy4gpq1phHBd8YF7PxyXnErtPkBm6sZFA3iwl2IGV7vaz9wVEu3g2Ve7iWlINu/O2Iuv2spIN5DIo5vFewGX+ONHCPgBzlWeBIWYs+zqItoVepIrkFG7lFM3weNWBI3h7gVv0xd24IL+kRKv+FJYTNwP4WvSwQq8oYYAZ8qGU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=jdh+K39d; arc=fail smtp.client-ip=52.101.70.2
+	 Content-Type:MIME-Version; b=QhDWyqAcAlQRNcydTP/WYGk4knlkj/VeSCx3o5LVl2xV6zN7QTYUUT1yXSYM+7FqA3zMekvIffjLhCsRwTnOGQF2xYrwQn5ckHtliUtBKgy22UQD8j98PoJ9bzRTzIgUiPcXVnev7oamdHauB/xud1AOMsjmGcjzlVLE6ro0wU4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=E682BXa4; arc=fail smtp.client-ip=52.101.70.2
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=vl7PiR1guB+U3KlMslnTwInaVMjAkWzyLWiKCQriuPpcjn6VDwSq/IhosAI2aXK3VMF91+EFehg9ItusGO7fssZqJuzfP79J7E3Xx/ba19WhhrQU+QrdYsH9mId7Zgk065nKpx4KJdep122JcwaxcqRzE8IYxEFrxq+JxKmxriKn/OXYre5wC2TXa+mmdDbz9rucDrshyE/lslLtRE/xnPvTZTUhlarv71vo5fVnbECEtWw1EyhALP4jjsNSFXAppAl7pT4bMQ82p8k3KfwBhjQosFkM6a4mAtHPtFvsrF4iUbR5XxTCEwMBD5f70aQGBCgVwOLRK5X9s3Wr9kdJtA==
+ b=DPL2kazwUDdhDR5lRTzAMT+9XVmGWYphMKmpoh68pXi0Z84L/XxSj8FUgLNPnbMPrzp+fVYkwPhWPRc1OV4IJFAbRYbqaTTLFMBhHEXrPh2H5LYj3fMGKCvZwF8+MlRyR1kI2KzwZZ+25D+pk3J2lHAzxkSEeAE8Y0rT+7sOmGXVyklRbVkGNdHFxZ2lFHLtZvkPeFZR3XYd5qVQafw6Z5QznnIBsaCii6xpeahDQXRAIc8wkglskAwmTet27a7l+ocj0wU33d3DTW5HWx2PA8Cdva3m2l2Z84tx2ipSdSgbsROld20BwgwMdjtkTfM/IaErqwDZnDR1DclvPwrTEQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=S2iw7SVy6qReQ25eTwZv4nA5LhDvLopKvfQ6FFYsdTU=;
- b=pIjtEbpx5TD5HTMf8AdvMipqp0PvcitMAelrkNrQ/fvk0N2uNYGlOsxGFYFyLXY5Q87oxBVbGYWX89tsLHAaLtpv9VStcSFdEmidnz6BxIRPi45txSEQnMqqd1cLcz/RVPy1ig1qsMWgJZmeUL0zFnqB24LYqmcZxSP33QXCEkoe36KleNhyOKXIOuAm4E1WqGZHOnbeUfvGNhw0ujaDESwu4GOqw7prNL3zmfKUOgUSQeLnogcmy2h+/IfSIrzhKyICXOS+G9vjowQwkhQxUeySBERc1/zQoJYhvbbbkQSfo2CJ2g8cJyPSVOA+KbRFcnCDhyoJT4Nl0M517wWqag==
+ bh=Tj7SlPVkCBGuSSnls28sZTXSY8KlmW5lLd6Kjegf8TY=;
+ b=XgyJBJtfi7Hebqe1oqc+T9AmamjzsVKYJrnYWI8KNC/Ax4l+1KcPfMtZoT8KGtlzzSihY2x1/bVxUqzMJdZ8CDdhDv+of0yZNJwVVnJ+GRcSfo86eDUU0O7+cIQLnTvFEcPDpQrljVcsTYNXJ1g+VxqGKxf+mByAfSGUJMM2N7FfkuNOTlYetPCKkJzjMwF+B/YB+ZSBTgHpRzNLhD68Z7eOHcUlZXY2CXVve5PqJprUmYLKmKTmzys6cQ5sp15kO5mXRuBuPN+1/EzlN3rwd4gLzb8LXY1cS6GMAzdIefZHRu48zoT9WSzaoy7pPJCvlY1+HyeLfPohO4G2o8VXng==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=S2iw7SVy6qReQ25eTwZv4nA5LhDvLopKvfQ6FFYsdTU=;
- b=jdh+K39dx2O2TcHK0Q0CD+sbbNnxGE5pN/KMtGf/RKSpIbQ1kKNQwlXZzS4kdwmwOuhcOuVqZvWPPWbIKX2f240rG0Vcvs/SQk4GTznAOZ0Yftrc/MSSBrPY2YhUtyRirGFqxnNAWfeDfRJPF679oxATODrWUGqUyZsupc2QHzRDwL6kYeZ02RhrhEw8BHSlmp9qNoydcF3J1L0Skk3fM1BckghJOLXTjLmo3A7wCdd4hvWfAEBkKwu6+KQ3tvvZoxIsyJB/22rgvIbR/ELldkEtJ2B2gfTQ65ScmGvO1yEWm4T/OId3qLsGJ3YxmGaOotIyN8qoJmqKqJO44k6fVA==
+ bh=Tj7SlPVkCBGuSSnls28sZTXSY8KlmW5lLd6Kjegf8TY=;
+ b=E682BXa47OUEl0d9iJq3my34zTZoA0rxk5PQdH+a2HJXwlt4oyghet0im0As0nx3YSnR4QrszwRcYbOiK8L6Py2BBEvRrvaAIALrKEowEFKsgS2uvOeSjAbveK7rV15beOsnzhlWF+W9n52nDSXbJyv+oKmKr31mllCXHd1P0lDUsyK1ssGx7MLITTrq5jx3wjRci5OefmWUhza0PeU4FMPVkUUgLlSPnKMtD22YH7IXMrSIlOLZpDbhtcDfh5uoRqtcA3fWnAPk1QDPjkvRZfCVN2dsSKrl77Sa/x90HNW7JPGuCTLBjwe2fEmsK3puxnDNZiTAMMtiUvstDcdfug==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
  by VI2PR04MB10809.eurprd04.prod.outlook.com (2603:10a6:800:27b::12) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.11; Thu, 21 Aug
- 2025 15:21:19 +0000
+ 2025 15:21:21 +0000
 Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
  ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
  ([fe80::7417:d17f:8d97:44d2%7]) with mapi id 15.20.9052.013; Thu, 21 Aug 2025
- 15:21:19 +0000
+ 15:21:21 +0000
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew@lunn.ch>,
@@ -73,9 +73,9 @@ Cc: Andrew Lunn <andrew@lunn.ch>,
 	=?UTF-8?q?Pawe=C5=82=20Owoc?= <frut3k7@gmail.com>,
 	Sean Anderson <sean.anderson@seco.com>,
 	Jon Hunter <jonathanh@nvidia.com>
-Subject: [PATCH net-next 05/15] net: phy: aquantia: fill supported_interfaces for all aqr_gen2_config_init() callers
-Date: Thu, 21 Aug 2025 18:20:12 +0300
-Message-Id: <20250821152022.1065237-6-vladimir.oltean@nxp.com>
+Subject: [PATCH net-next 06/15] net: phy: aquantia: save a local shadow of GLOBAL_CFG register values
+Date: Thu, 21 Aug 2025 18:20:13 +0300
+Message-Id: <20250821152022.1065237-7-vladimir.oltean@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250821152022.1065237-1-vladimir.oltean@nxp.com>
 References: <20250821152022.1065237-1-vladimir.oltean@nxp.com>
@@ -92,127 +92,234 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|VI2PR04MB10809:EE_
-X-MS-Office365-Filtering-Correlation-Id: 940e52e3-c65f-4572-8921-08dde0c6614e
+X-MS-Office365-Filtering-Correlation-Id: 99443d4b-17d3-4ff0-069b-08dde0c661fc
 X-LD-Processed: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
  BCL:0;ARA:13230040|1800799024|366016|52116014|376014|19092799006|7416014|38350700014;
 X-Microsoft-Antispam-Message-Info:
- =?us-ascii?Q?qr1MV68v0gy7rJjVXmB1qz2Y4ECH6ojzbAiL59ZmMXgUqrPX6JHKXw5tqn37?=
- =?us-ascii?Q?dQ8k7fhUkBwcCMPcJFA9eBfe4AT5JBZXj5Y6Gf+0u74nLxjv0x+7GbTv9cQu?=
- =?us-ascii?Q?bTCNaBZnaTqzl+OEo37CynfNbVbcA9F50zjN+Vid0jXjkbX0vwF+QTcEe1l5?=
- =?us-ascii?Q?VDzlZRJ2rlky4KMqjJ8hLmCkYqCG/U88a0NHU7DZaNd5RDQtu3mcJot57JDL?=
- =?us-ascii?Q?r6TUFoLdxt5fhTgNB3ESHnLnNzqQElcfbAw+zHgMb8Wq0RFtQma2I0U3oz2+?=
- =?us-ascii?Q?wM/A9YQ97Anka9gljWmii3Ehlya7+sQ5PTMZZkvJvXXCyz2GbvJZZk9thoxS?=
- =?us-ascii?Q?c9AO7geI+4wbZ4T7BaXsYhgRIXg9MIyLBlx0F3I+32L5GlIYRHNVQINg/iic?=
- =?us-ascii?Q?G0PUb5Oce9nzkO/TrWnEW9ZGh8Aln/xpDYXQF+LzdqUrbfu73/aHXjyZcpxM?=
- =?us-ascii?Q?jOC31uGKdKdMSdFv26nFLnr0yEY/rKBRA2Im3B5FJkMe/6SxIqyEJpzNlI5c?=
- =?us-ascii?Q?DIcBY8rF9KaonzkDOAEunh+1ABQaSMSpFlEKYz5e/kZz7wELJKx3VdHMRz9Y?=
- =?us-ascii?Q?ICZb25wtvMNF87SyAyjnC/hMa6iMKfCPz/Zt1y5PQQJPU7vqofDqKoI0qepI?=
- =?us-ascii?Q?bY1ZZyasPJNaJGyybwzFW4hOPkxhF+pj/qCxfQ4HmFl8saBrNv079IMJ1kpV?=
- =?us-ascii?Q?Gy+AG5lrwkVQCDzWk3ryS7bKXUkLRRtI54eBXPnq11Y/01DmUqr3L7G1yeEe?=
- =?us-ascii?Q?MXEfay/My5dxmmSMDnaeOI2jyJvtzE/9zp0oJvwAjl1Y37ZSGKyHA1iEMQmD?=
- =?us-ascii?Q?stKhaDZZGfe0keOGvbye1sNyBg0+Xwy0twqoUBif31HGy/icE2lN24DoB54T?=
- =?us-ascii?Q?t/U39wNUEvDWzK6os5xvwnq6GHWhm4jtFxPy2C/FW3+F9H4UJV1G9EMq/OwD?=
- =?us-ascii?Q?9Qa/yIcwFYurHwUY8gwAvXyw5TwS7IUAf5cwHqNFImOJyCQ61u0YI3d76dJH?=
- =?us-ascii?Q?42q0FeGPidSFT69pwabDerkZLfsSkURZKWuwe7K2pUqI9Ao2hpf3LGp2Pakp?=
- =?us-ascii?Q?MOBX0yaf/HGO0w1eGWAKpgn1cjtthw5sUSkdJC0mWkyE8hIEFQJpVtmGjhR7?=
- =?us-ascii?Q?6Ab2ccumDZMEquBc9BgCol5o94gIyga/7dDlNH5m+W5UOlSwF9LrPNo5gr2q?=
- =?us-ascii?Q?5gwjpVQyjxsuka580hwNfrxzEtltb4MhT27ansCKO1ef9txgR9j/nNYKGIaJ?=
- =?us-ascii?Q?P/Lle5kHC3BGADcjjSFUn2oXDZngqpPsHzkSGwrS+r2silyMeqjBxv5WjrPA?=
- =?us-ascii?Q?s4L5oySxq4JG1tyz1f1nSUz5h+ldsHcokpD/rHDgTtIXvEK2MAmh+pGs+9N/?=
- =?us-ascii?Q?860ziGjU/auc/IUtEJ5A2pYn/bcguZXfgvF9Tq27/yzokREFSNbWqFjwannb?=
- =?us-ascii?Q?5Ana5/VTW5a2BAkuFb/sGacWj1GiPJq6QO6IxJm5SGHm8BhxrL7GPg=3D=3D?=
+ =?us-ascii?Q?Cu5yVaCohHdByU0LJeC9iFkFRE4ITSJy+c9yr213xDFEmRYRvDdUL2jQ5oFi?=
+ =?us-ascii?Q?bPN9J6WYTPJxfrtV7gHxPFZAwZPu3jm3ZrSRWzOTuviMxWBNG0STr1Fgqqa7?=
+ =?us-ascii?Q?FFuf5rzq6vzyVSizNJvNOtrwq6grNyYFLS43vCUs7NSkjkdSzqBj5j7X1kar?=
+ =?us-ascii?Q?umUF/u0TtpN06oxTUZF4NRpo6D/6RtbfuRdF22WPM+2ehPKZ9imDhkj7KIAL?=
+ =?us-ascii?Q?zVKVh5ZtiG64S0toraxxtlHNBj+qcDARFZ2Cq3+ad86dCvJZB/e1PUF8RHOB?=
+ =?us-ascii?Q?vVDMDKUZZu0ndFoqkvmu2Ii4cfOaruYMjNp7OC0/HcfqsPBAWMCdFmd6sV4h?=
+ =?us-ascii?Q?T6MeBqqJ2kUIvrr+vEeQGMFNuR4P++Eh5oD6q/ABnsObL9mjsrielmVTY/vR?=
+ =?us-ascii?Q?42IgkoFPXU2nRXsDRyxEXrRCtKoA4HQrIzQt8scvEn3U/G3uPwT+XwJCUa9i?=
+ =?us-ascii?Q?329QSLbHFCZMTA23JtUMX4adIXPs8JOBKqewW4ZTwEDRx6jSPznhsbsklrec?=
+ =?us-ascii?Q?87aFZUtsRZEVPm3FbWz46SH2j22R9Yv8rz2ewYzYm+S1dq79He2gF8NvoAiE?=
+ =?us-ascii?Q?lGBbJPIxNKvGogboeiN3pSyPu6pcbd1D/e47CpNJHuBa8d2kcoL/HSlZ9JXn?=
+ =?us-ascii?Q?nSNA0A1CXnhGJXY/10W5HuyZ/cab7XLUCIaGD3VlVx6wOTKvSj+4B7M1SAg/?=
+ =?us-ascii?Q?gLsUV8xPjE44wS1HC909sFEXFmFMuWEDbM7IbGpouu/QmC1sYu1pazAle0ZL?=
+ =?us-ascii?Q?Ik/ETDs9rSy6GfsgzL0h+JEpS60yTd1RzSU79IDtbaDceNDkFCvAEACLFVJ2?=
+ =?us-ascii?Q?eBcLYnow9obOS8YCYJHHy80Mkh6BiMxiBomORENtbcRfm2+q5boTD93RZYkk?=
+ =?us-ascii?Q?yIQizs5cIDAVVzMPN9YVUq1ro9We/583X4m8gApLAP/bIHXQeYg4S6WvmsWh?=
+ =?us-ascii?Q?ihjsS0W+pRa0uqdUFzeZScWKg3vVK8UfG9CUWBBRgV2VeZPi/vacnDLcCxag?=
+ =?us-ascii?Q?eWMw71wxi8eLKVNOwr0Jm4ITajARCsl+cK/aFyiH/E3g8CU8KGIUqQNsJvAM?=
+ =?us-ascii?Q?0TLuDeeziKfTKjC3tJx6rvl+Wutn7Yb56w9CtcCPeuNvTIOUXvx1oW5/HE0Y?=
+ =?us-ascii?Q?cTyCOD1np1u1ks1Q+C/ePndrh8WOX/Ul5B5CbYNBNiRtGvKyJo+VE0heqwrL?=
+ =?us-ascii?Q?2OOiHu4mLpMN9FmiipYPNVSr3DBpnwt+65pJnsFAE7XLfqN+EAJ1AXZjf6ED?=
+ =?us-ascii?Q?sr6FXrGoe24x/xpI++EUdI/PaYbbQpDORnzZ9puWj5tmb/S30d397Ls+b6FD?=
+ =?us-ascii?Q?QjQamjTYeFFg+t18LdwLJOCCN0cfhy1PEm3NQr7O9TecDlAt+xBQI4ctAWoF?=
+ =?us-ascii?Q?a5CpvxlEaZcQeDQRjzethTgFn0QiqdomcirSgLVvPE4bKu/tZHFb0sFRPm5f?=
+ =?us-ascii?Q?vdQojP+NY5qUG2bTCpPVQ49q7zoJHzAT1km+f7iUk3OwoffkayFnPA=3D=3D?=
 X-Forefront-Antispam-Report:
  CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(52116014)(376014)(19092799006)(7416014)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
- =?us-ascii?Q?Q5PKnzHXDdDx7SNn1ApGip2ttQcwNUENo9AWjkNwN4972vzpOUy+byKW1rXR?=
- =?us-ascii?Q?vHwlaSonR3oWRlutvb4t0yAFpV9EU9+5viJLior+8o5GCsBu0pkTWmxLu11x?=
- =?us-ascii?Q?ROnrDWWNReYFzrU6k+3jfM/V6u6biA9/e+AN1lq/N+JGW5MNTO/FDbSqwEiZ?=
- =?us-ascii?Q?zxIdGNAeCIgZOEuyRdeEnZHZPdv85RsPPPKoIlEPOeb9q9M0C1eYsHL9TmUy?=
- =?us-ascii?Q?ClM85eIjHzPKr7rMC3vnLqxLIdMQ8mCJGBARSWAM3j5Ez/XU8zRxMZNr8rKH?=
- =?us-ascii?Q?Ybk1ZqSGcVs31BIQg2+7Pw7AaZq5Qnb19hYnLTzJxfzx9HmODFnDR/NHzBuA?=
- =?us-ascii?Q?3WdezXo+tcUhy4WZsP+iWj1dSyjv9yanAkwjZtLVs1G1+FMxBIUqE+g87+rl?=
- =?us-ascii?Q?OWu0krKXzICfKHfcFHazdhTa6k3fCg2DaIvw1w4Rn1i7k8ry6f/hyVFa6wEp?=
- =?us-ascii?Q?zWy+56TKhHAfO3RUzHs2+fnCjmbu2BmwdpPxP/otTDWiB+dLfhc9RCH0oHV+?=
- =?us-ascii?Q?UhzhsbeVVUtDkyl+ePPj627FsMG8cXaW3774KiFxigZATS+NOlno+kse+lcy?=
- =?us-ascii?Q?z2lQmmIvWRlwogIya/CKuAc7NrlTZzQ2rApLPqwRrOmsB8cLfh9KRQSls9wl?=
- =?us-ascii?Q?PuQ6gQWWJmkmkwlPe1np//ssJ0keRv8w1dApDdHWT1OBwaJpl3QYMk/G4MWw?=
- =?us-ascii?Q?BZYwm/xQgUG2GimalU3mz/1p7cl3jn8Se1IRnNIRabdK0gXUqU6AtnNPg1b9?=
- =?us-ascii?Q?7HxleRbGAatVYAPgRW9FH+PsYC1wFLjTxuwpqShe2/6C8ZjfqONIuC1V8SNE?=
- =?us-ascii?Q?iBy6dL9MMf2I/5AxSoatPOTGariQo8D6mWsthz/s69gQoSbxCtBsEsKaOPyW?=
- =?us-ascii?Q?2Ia5k8gJ3M9Sz0Jb4bSmDKghOQJPQYPeX2SOz1S5QaYnhWR1JTv7XRh5LL/O?=
- =?us-ascii?Q?bkNTltWRWCUu/q3wCQpIbbsG0W5tTnobU+X+7Hr6XR7yOXvmChsFt5+47SfS?=
- =?us-ascii?Q?RtZv/MsmP9SSBRzRXr+h3o3g/yXh7owsNyPlv0VrdSKUEkMjVdxeKrEI0ooS?=
- =?us-ascii?Q?Qfip/pCE0xvksC3JxwXn45lb9UHazcSCU9rjwE/bAs12yMGrVwfyBSddaDM/?=
- =?us-ascii?Q?Ka0ULjjqo6V88C40Rdv2HpFS0RlMsnrOb/6k1Ex7syZ92SpjP0CTM1MKHRNR?=
- =?us-ascii?Q?UHF35PkqQ1ec72N1oRZSrlSf2N1izzDLCwXclNd+f9oMxfmnfzl2vAqaaKOo?=
- =?us-ascii?Q?DpNVL1FCcwaHjgFP2qnuqUwfNaModFqyawfRzCUdLg00gP2ssAZdYwDUioSw?=
- =?us-ascii?Q?yD9oYp7ZPXuYknmHHo5UvXvWpFKQMSR9CkbZYRCO0rT8uSeTY/zfrZiefH3D?=
- =?us-ascii?Q?5LNbzGQMbGROP9jS3OByaiInrki+oZ5IdanXOhZFAEKCmNaq3HiMw9bDjxof?=
- =?us-ascii?Q?iXZ7379Nqq8W7xtgwHasT8Q2w1iGAUR0F28/zGHA0A1VpF6DIeqkUQNaHUF4?=
- =?us-ascii?Q?QAj/US+ymu69Fh1cp2MX0oslJFH0mUuhE5qJLcqTUcUjZWMOBe0Z6/6yT6E2?=
- =?us-ascii?Q?EMsm0D0UkfT++u/WqLbaca8rOwFv/b1AjzA+oyYj?=
+ =?us-ascii?Q?wxsq4Qg24qJkUWIYTGPob/1vqaGo8O0jPFkEMRxBd6gky/U60RtiNKnR1cPP?=
+ =?us-ascii?Q?EKGr36HVkeUazAruF63icRHIL4MhWCwpAU9cz166CytKilODjEAAgtOk7Ro8?=
+ =?us-ascii?Q?UX6xXTSFizHmsHrDkmnzVW3RBEAVEi6nnygwBHOcqIv8WRNgRVIJCLYzll/m?=
+ =?us-ascii?Q?HjgAmWiW5+PgtnvA1DSoUD8IuLSq37yz/LtaQpnPcRppSkOv2OJ3iukTJfAd?=
+ =?us-ascii?Q?bi8v+nahHEcFeEHNmTKC5u6n/WksQGmBh9ibm/2zCdN392YfBZLQPA99Lk9m?=
+ =?us-ascii?Q?ISEv0Y9sHPva4NVd2vjUbZRPM8nybwHCTfz00bHXPcryd2Qucf3FusvH4x/+?=
+ =?us-ascii?Q?I7jpDzaMIsOMdKpD+0FkQk0ITDfzcSs5r/TsvMsAs7IpNIJ3yL9oCFbtkDse?=
+ =?us-ascii?Q?/QIPlg4qtNg1DUBHDmO7tf0boh9YQ3ylU70AeO08amEJvbAlx5gfK0FFMd7H?=
+ =?us-ascii?Q?+y4bBzSKnp7+bximi+QTcnQ/p29Q5A1hVprwCyuXA4hkWx0GWyfWjrq2dMRM?=
+ =?us-ascii?Q?i/tR4ucG1+tta6ESW0F6O+KxViPBhrlwrh/kI1Z6ldELPhE5HJq9cBW5wlU0?=
+ =?us-ascii?Q?VjYU5PwnBEkU5Pv4dX9zdck3T8Yx1zoZ9qcX6elR/9Lu3S7bi1r4azAM4DqA?=
+ =?us-ascii?Q?oC1E84nQYUJeECDoX0nA07Dgpp4Icot/N/YS8ay778eeTfe+7OQN7NHE/gU9?=
+ =?us-ascii?Q?IVku41twjMAH1rG4aMV8dU8kl4XnP8QJGEukEm6LcZ/1gkqG9m/WwD0EzBcg?=
+ =?us-ascii?Q?Skqwzkz0VWVOECWLadcwqOKRn4z3429ryHkOzrmk7a1oPiPgUEMHSdyCJlFs?=
+ =?us-ascii?Q?y7mWZ9YcRZxNU6q/r1CTUIvjB6xM1eCxivWXia9HE4P9g3HJOdiOoxMuQwe1?=
+ =?us-ascii?Q?hB43nW4emP64f0BZ2/5owPqXfMnYutGcge6BjTPoa2XPP9upV8hWPx69N6ql?=
+ =?us-ascii?Q?N/bGthBqo4irZ7ozMdgBWxIUXhag+KlZuVVEUWquZS3c+pKutxcZ+fMisyfa?=
+ =?us-ascii?Q?J8MvmmWNqOGSmduYlBrCvDdZtjnQS0Kq4ZRf8R9ZBfo/2tF4PvvsXDfVImJc?=
+ =?us-ascii?Q?W3q2KCStb4w2jgepliuN/WFfUjtQfD4DZ2XqZWOesVMhBqkzfI+S9yd94L9u?=
+ =?us-ascii?Q?qeuAjrkjqQ8x2KdlJlwKaSEWnc9LLMZQVRKnUaYek1eA6d0uLKYd0favS17w?=
+ =?us-ascii?Q?gYBzANxslmhmduHB7ESHCenXGbddc84k5/mjHz8q+lXyus3OYx9hfUuaXp2n?=
+ =?us-ascii?Q?3m4VXN7KgE6fsNFbBdd0FWvVjddA2FhrVrPr4btk5thzSuG66oZkVQBr9i1A?=
+ =?us-ascii?Q?tY2ErSn1dztKc5nKWxqeGA8ji1MMiNcgPI5AxVNqVWuOrVzYsQ7TSGf9CNO3?=
+ =?us-ascii?Q?FffoJ3Bqcgz5N2rs2fgeW5aMUDGnWOtlZNP6PF4Y02d/r80+wB2XSYa/gSvD?=
+ =?us-ascii?Q?bVB7whSPblQCd0SpQfoW0PQtaglQVU4O7zFQUU5w0OfYSTBV9eo1MfW46o1D?=
+ =?us-ascii?Q?ZauihOS3iq+yN6dzaNBqwFBFJeFme72HQB41IXsfMMgCfhJBkiiwJT/5EJ6P?=
+ =?us-ascii?Q?wJ0lgBgjl3sMblM4CxhRpIHloHIhYgNSLHP2J05Y?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 940e52e3-c65f-4572-8921-08dde0c6614e
+X-MS-Exchange-CrossTenant-Network-Message-Id: 99443d4b-17d3-4ff0-069b-08dde0c661fc
 X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2025 15:21:19.8573
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2025 15:21:20.9877
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8zmcOJ8H6Dg4PVNsLW9HUgXu/upEwGLOiK1I7L4pUSy6EPrufoADGdrHKk/a4GxJ/uPM08JciuFdf6QxFCpoAw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: M/QTcU26HeI/GK0G0w52096jv5xrSKzUaP6tYCTchSqDb9mW9WFK0hgl5XyOMsZ9UzVLbIkzpox2RWB7YpF1xw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI2PR04MB10809
 
-Since aqr_gen2_config_init() and aqr_gen2_fill_interface_modes() refer to
-the feature set common to the same generation, it means all callers of
-aqr_gen2_config_init() also support the Global System Configuration
-registers at addresses 1E.31B -> 1E.31F, and these should be read by the
-driver to figure out the list of supported interfaces for phylink.
+Currently, aqr_gen2_fill_interface_modes() reads VEND1_GLOBAL_CFG_*
+registers to populate phydev->supported_interfaces. But this is not
+the only place which needs to read these registers. There is also
+aqr107_read_rate().
 
-This affects the following PHYs supported by this driver:
-- Gen2: AQR107
-- Gen3: AQR111, AQR111B0
-- Gen4: AQR114C, AQR813.
+Based on the premise that these values are statically set by firmware
+and the driver only needs to read them, the proposal is to read them
+only once, at config_init() time, and use the cached values also in
+aqr107_read_rate().
 
-AQR113C, a Gen4 PHY, has unmodified logic after this change, because
-currently, the aqr_gen2_fill_interface_modes() call is chained after
-aqr_gen2_config_init(), and after this patch, it is tail-called from the
-latter function, leading to the same code flow.
-
-At the same time, move aqr_gen2_fill_interface_modes() upwards of its
-new caller, aqr_gen2_config_init(), to avoid a forward declaration.
+This patch only refactors the aqr_gen2_fill_interface_modes() code to
+save the registers to driver memory, and to populate supported_interfaces
+based on that.
 
 Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 ---
- drivers/net/phy/aquantia/aquantia_main.c | 168 ++++++++++++-----------
- 1 file changed, 85 insertions(+), 83 deletions(-)
+ drivers/net/phy/aquantia/aquantia.h      | 27 +++++++
+ drivers/net/phy/aquantia/aquantia_main.c | 91 ++++++++++++++++--------
+ 2 files changed, 87 insertions(+), 31 deletions(-)
 
+diff --git a/drivers/net/phy/aquantia/aquantia.h b/drivers/net/phy/aquantia/aquantia.h
+index 67ec6f7484af..492052cf1e6e 100644
+--- a/drivers/net/phy/aquantia/aquantia.h
++++ b/drivers/net/phy/aquantia/aquantia.h
+@@ -174,11 +174,38 @@ static const struct aqr107_hw_stat aqr107_hw_stats[] = {
+ 
+ #define AQR107_SGMII_STAT_SZ ARRAY_SIZE(aqr107_hw_stats)
+ 
++static const struct {
++	int speed;
++	u16 reg;
++} aqr_global_cfg_regs[] = {
++	{ SPEED_10,	VEND1_GLOBAL_CFG_10M, },
++	{ SPEED_100,	VEND1_GLOBAL_CFG_100M, },
++	{ SPEED_1000,	VEND1_GLOBAL_CFG_1G, },
++	{ SPEED_2500,	VEND1_GLOBAL_CFG_2_5G, },
++	{ SPEED_5000,	VEND1_GLOBAL_CFG_5G, },
++	{ SPEED_10000,	VEND1_GLOBAL_CFG_10G, },
++};
++
++#define AQR_NUM_GLOBAL_CFG ARRAY_SIZE(aqr_global_cfg_regs)
++
++enum aqr_rate_adaptation {
++	AQR_RATE_ADAPT_NONE,
++	AQR_RATE_ADAPT_USX,
++	AQR_RATE_ADAPT_PAUSE,
++};
++
++struct aqr_global_syscfg {
++	int speed;
++	phy_interface_t interface;
++	enum aqr_rate_adaptation rate_adapt;
++};
++
+ struct aqr107_priv {
+ 	u64 sgmii_stats[AQR107_SGMII_STAT_SZ];
+ 	unsigned long leds_active_low;
+ 	unsigned long leds_active_high;
+ 	bool wait_on_global_cfg;
++	struct aqr_global_syscfg global_cfg[AQR_NUM_GLOBAL_CFG];
+ };
+ 
+ #if IS_REACHABLE(CONFIG_HWMON)
 diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
-index 8136f7843a37..21fdbda2a0e0 100644
+index 21fdbda2a0e0..9d704b7e3dc8 100644
 --- a/drivers/net/phy/aquantia/aquantia_main.c
 +++ b/drivers/net/phy/aquantia/aquantia_main.c
-@@ -860,9 +860,93 @@ static int aqr_gen1_config_init(struct phy_device *phydev)
+@@ -860,44 +860,24 @@ static int aqr_gen1_config_init(struct phy_device *phydev)
  	return 0;
  }
  
-+static const u16 aqr_global_cfg_regs[] = {
-+	VEND1_GLOBAL_CFG_10M,
-+	VEND1_GLOBAL_CFG_100M,
-+	VEND1_GLOBAL_CFG_1G,
-+	VEND1_GLOBAL_CFG_2_5G,
-+	VEND1_GLOBAL_CFG_5G,
-+	VEND1_GLOBAL_CFG_10G,
-+};
+-static const u16 aqr_global_cfg_regs[] = {
+-	VEND1_GLOBAL_CFG_10M,
+-	VEND1_GLOBAL_CFG_100M,
+-	VEND1_GLOBAL_CFG_1G,
+-	VEND1_GLOBAL_CFG_2_5G,
+-	VEND1_GLOBAL_CFG_5G,
+-	VEND1_GLOBAL_CFG_10G,
+-};
+-
+-static int aqr_gen2_fill_interface_modes(struct phy_device *phydev)
++/* Walk the media-speed configuration registers to determine which
++ * host-side serdes modes may be used by the PHY depending on the
++ * negotiated media speed.
++ */
++static int aqr_gen2_read_global_syscfg(struct phy_device *phydev)
+ {
+-	unsigned long *possible = phydev->possible_interfaces;
+ 	struct aqr107_priv *priv = phydev->priv;
+ 	unsigned int serdes_mode, rate_adapt;
+ 	phy_interface_t interface;
+-	int i, val, ret;
++	int i, val;
+ 
+-	/* It's been observed on some models that - when coming out of suspend
+-	 * - the FW signals that the PHY is ready but the GLOBAL_CFG registers
+-	 * continue on returning zeroes for some time. Let's poll the 100M
+-	 * register until it returns a real value as both 113c and 115c support
+-	 * this mode.
+-	 */
+-	if (priv->wait_on_global_cfg) {
+-		ret = phy_read_mmd_poll_timeout(phydev, MDIO_MMD_VEND1,
+-						VEND1_GLOBAL_CFG_100M, val,
+-						val != 0, 1000, 100000, false);
+-		if (ret)
+-			return ret;
+-	}
++	for (i = 0; i < AQR_NUM_GLOBAL_CFG; i++) {
++		struct aqr_global_syscfg *syscfg = &priv->global_cfg[i];
++
++		syscfg->speed = aqr_global_cfg_regs[i].speed;
+ 
+-	/* Walk the media-speed configuration registers to determine which
+-	 * host-side serdes modes may be used by the PHY depending on the
+-	 * negotiated media speed.
+-	 */
+-	for (i = 0; i < ARRAY_SIZE(aqr_global_cfg_regs); i++) {
+ 		val = phy_read_mmd(phydev, MDIO_MMD_VEND1,
+-				   aqr_global_cfg_regs[i]);
++				   aqr_global_cfg_regs[i].reg);
+ 		if (val < 0)
+ 			return val;
+ 
+@@ -931,6 +911,55 @@ static int aqr_gen2_fill_interface_modes(struct phy_device *phydev)
+ 			break;
+ 		}
+ 
++		syscfg->interface = interface;
++
++		switch (rate_adapt) {
++		case VEND1_GLOBAL_CFG_RATE_ADAPT_NONE:
++			syscfg->rate_adapt = AQR_RATE_ADAPT_NONE;
++			break;
++		case VEND1_GLOBAL_CFG_RATE_ADAPT_USX:
++			syscfg->rate_adapt = AQR_RATE_ADAPT_USX;
++			break;
++		case VEND1_GLOBAL_CFG_RATE_ADAPT_PAUSE:
++			syscfg->rate_adapt = AQR_RATE_ADAPT_PAUSE;
++			break;
++		default:
++			phydev_warn(phydev, "unrecognized rate adapt mode %u\n",
++				    rate_adapt);
++			break;
++		}
++	}
++
++	return 0;
++}
 +
 +static int aqr_gen2_fill_interface_modes(struct phy_device *phydev)
 +{
 +	unsigned long *possible = phydev->possible_interfaces;
 +	struct aqr107_priv *priv = phydev->priv;
-+	unsigned int serdes_mode, rate_adapt;
 +	phy_interface_t interface;
 +	int i, val, ret;
 +
@@ -230,162 +337,15 @@ index 8136f7843a37..21fdbda2a0e0 100644
 +			return ret;
 +	}
 +
-+	/* Walk the media-speed configuration registers to determine which
-+	 * host-side serdes modes may be used by the PHY depending on the
-+	 * negotiated media speed.
-+	 */
-+	for (i = 0; i < ARRAY_SIZE(aqr_global_cfg_regs); i++) {
-+		val = phy_read_mmd(phydev, MDIO_MMD_VEND1,
-+				   aqr_global_cfg_regs[i]);
-+		if (val < 0)
-+			return val;
-+
-+		serdes_mode = FIELD_GET(VEND1_GLOBAL_CFG_SERDES_MODE, val);
-+		rate_adapt = FIELD_GET(VEND1_GLOBAL_CFG_RATE_ADAPT, val);
-+
-+		switch (serdes_mode) {
-+		case VEND1_GLOBAL_CFG_SERDES_MODE_XFI:
-+			if (rate_adapt == VEND1_GLOBAL_CFG_RATE_ADAPT_USX)
-+				interface = PHY_INTERFACE_MODE_USXGMII;
-+			else
-+				interface = PHY_INTERFACE_MODE_10GBASER;
-+			break;
-+
-+		case VEND1_GLOBAL_CFG_SERDES_MODE_XFI5G:
-+			interface = PHY_INTERFACE_MODE_5GBASER;
-+			break;
-+
-+		case VEND1_GLOBAL_CFG_SERDES_MODE_OCSGMII:
-+			interface = PHY_INTERFACE_MODE_2500BASEX;
-+			break;
-+
-+		case VEND1_GLOBAL_CFG_SERDES_MODE_SGMII:
-+			interface = PHY_INTERFACE_MODE_SGMII;
-+			break;
-+
-+		default:
-+			phydev_warn(phydev, "unrecognised serdes mode %u\n",
-+				    serdes_mode);
-+			interface = PHY_INTERFACE_MODE_NA;
-+			break;
-+		}
-+
-+		if (interface != PHY_INTERFACE_MODE_NA)
-+			__set_bit(interface, possible);
-+	}
-+
-+	return 0;
-+}
-+
- static int aqr_gen2_config_init(struct phy_device *phydev)
- {
--	return aqr_gen1_config_init(phydev);
-+	int ret;
-+
-+	ret = aqr_gen1_config_init(phydev);
++	ret = aqr_gen2_read_global_syscfg(phydev);
 +	if (ret)
 +		return ret;
 +
-+	return aqr_gen2_fill_interface_modes(phydev);
- }
- 
- static int aqcs109_config_init(struct phy_device *phydev)
-@@ -984,84 +1068,6 @@ static int aqr_gen1_resume(struct phy_device *phydev)
- 	return aqr_gen1_wait_processor_intensive_op(phydev);
- }
- 
--static const u16 aqr_global_cfg_regs[] = {
--	VEND1_GLOBAL_CFG_10M,
--	VEND1_GLOBAL_CFG_100M,
--	VEND1_GLOBAL_CFG_1G,
--	VEND1_GLOBAL_CFG_2_5G,
--	VEND1_GLOBAL_CFG_5G,
--	VEND1_GLOBAL_CFG_10G
--};
--
--static int aqr_gen2_fill_interface_modes(struct phy_device *phydev)
--{
--	unsigned long *possible = phydev->possible_interfaces;
--	struct aqr107_priv *priv = phydev->priv;
--	unsigned int serdes_mode, rate_adapt;
--	phy_interface_t interface;
--	int i, val, ret;
--
--	/* It's been observed on some models that - when coming out of suspend
--	 * - the FW signals that the PHY is ready but the GLOBAL_CFG registers
--	 * continue on returning zeroes for some time. Let's poll the 100M
--	 * register until it returns a real value as both 113c and 115c support
--	 * this mode.
--	 */
--	if (priv->wait_on_global_cfg) {
--		ret = phy_read_mmd_poll_timeout(phydev, MDIO_MMD_VEND1,
--						VEND1_GLOBAL_CFG_100M, val,
--						val != 0, 1000, 100000, false);
--		if (ret)
--			return ret;
--	}
--
--	/* Walk the media-speed configuration registers to determine which
--	 * host-side serdes modes may be used by the PHY depending on the
--	 * negotiated media speed.
--	 */
--	for (i = 0; i < ARRAY_SIZE(aqr_global_cfg_regs); i++) {
--		val = phy_read_mmd(phydev, MDIO_MMD_VEND1,
--				   aqr_global_cfg_regs[i]);
--		if (val < 0)
--			return val;
--
--		serdes_mode = FIELD_GET(VEND1_GLOBAL_CFG_SERDES_MODE, val);
--		rate_adapt = FIELD_GET(VEND1_GLOBAL_CFG_RATE_ADAPT, val);
--
--		switch (serdes_mode) {
--		case VEND1_GLOBAL_CFG_SERDES_MODE_XFI:
--			if (rate_adapt == VEND1_GLOBAL_CFG_RATE_ADAPT_USX)
--				interface = PHY_INTERFACE_MODE_USXGMII;
--			else
--				interface = PHY_INTERFACE_MODE_10GBASER;
--			break;
--
--		case VEND1_GLOBAL_CFG_SERDES_MODE_XFI5G:
--			interface = PHY_INTERFACE_MODE_5GBASER;
--			break;
--
--		case VEND1_GLOBAL_CFG_SERDES_MODE_OCSGMII:
--			interface = PHY_INTERFACE_MODE_2500BASEX;
--			break;
--
--		case VEND1_GLOBAL_CFG_SERDES_MODE_SGMII:
--			interface = PHY_INTERFACE_MODE_SGMII;
--			break;
--
--		default:
--			phydev_warn(phydev, "unrecognised serdes mode %u\n",
--				    serdes_mode);
--			interface = PHY_INTERFACE_MODE_NA;
--			break;
--		}
--
--		if (interface != PHY_INTERFACE_MODE_NA)
--			__set_bit(interface, possible);
--	}
--
--	return 0;
--}
--
- static int aqr115c_get_features(struct phy_device *phydev)
- {
- 	unsigned long *supported = phydev->supported;
-@@ -1098,10 +1104,6 @@ static int aqr113c_config_init(struct phy_device *phydev)
- 	if (ret < 0)
- 		return ret;
- 
--	ret = aqr_gen2_fill_interface_modes(phydev);
--	if (ret)
--		return ret;
--
- 	ret = phy_clear_bits_mmd(phydev, MDIO_MMD_PMAPMD, MDIO_PMA_TXDIS,
- 				 MDIO_PMD_TXDIS_GLOBAL);
- 	if (ret)
++	for (i = 0; i < AQR_NUM_GLOBAL_CFG; i++) {
++		interface = priv->global_cfg[i].interface;
+ 		if (interface != PHY_INTERFACE_MODE_NA)
+ 			__set_bit(interface, possible);
+ 	}
 -- 
 2.34.1
 
