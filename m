@@ -1,133 +1,112 @@
-Return-Path: <netdev+bounces-215431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17905B2EAB0
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 03:30:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 53848B2EAC1
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 03:37:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9465417DF7A
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 01:30:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 304DA5C75F5
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 01:37:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56FC61C3C14;
-	Thu, 21 Aug 2025 01:30:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A703E242D9E;
+	Thu, 21 Aug 2025 01:37:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S112F9kW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A0D621B9C5
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 01:29:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 772B924167A;
+	Thu, 21 Aug 2025 01:37:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755739805; cv=none; b=ZBNnB05RE4Hpaj6THwER7pR0H2l8J3VqfDhO7TekOGvE+aesAq0S26iUOhzftqtBOy37/NVOvpueyT5k1htK1qqTrM0GlZlWK3sjVVYFwi9cTsw0yx8Af4FOiS2dy5TAQGTfPM9QK40WZJBm+VNroxwTv8CgJrHaQc9qMUUiMOk=
+	t=1755740233; cv=none; b=G3qXyZf1d5q10/PAhwzwpey7yX9vFZEOeqbPyYiuPS6kPFpXygFfGWXaI8IHjcMZU1ZL6IZsC03EiNA11szsIsp5evV46dX0KDz8HhJNTqR2R4b9Rw6vlqroUI0pqz8xazZyLSLptUgJixRXnAdngHogQ6WwNAcQWQ3U5/hY4p8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755739805; c=relaxed/simple;
-	bh=vSYcJ0aHEHWUirTFp5oX8P5I3M5GKhP0AGzOqF/u6Wo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YtdkF1RmB5MReFYcTIOz9+H7MwWigY1PlRryq7ec0pfGyr71oFuR8HFeMBaYQ3wDSENhVS81UnHRXqYU4+jIXroVd80+jyNTLrMs5dQyYiVv4hQWCItrLXPopoIBIs6lHgxbbMvJL920DB7v5G7iO6Fb1LKpIyI2AL7cGhsHmnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.254.200.128
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: esmtpsz18t1755739791t57bdd104
-X-QQ-Originating-IP: AHknXJ7UDHE8zUvEpK7b2spqug7488n8a6smgTHyaQw=
-Received: from localhost ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 21 Aug 2025 09:29:49 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 3096026230268940680
-Date: Thu, 21 Aug 2025 09:29:49 +0800
-From: Yibo Dong <dong100@mucse.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
-	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 1/5] net: rnpgbe: Add build support for rnpgbe
-Message-ID: <8DE9B7420E7CCA57+20250821012949.GA1742451@nic-Precision-5820-Tower>
-References: <20250818112856.1446278-1-dong100@mucse.com>
- <20250818112856.1446278-2-dong100@mucse.com>
- <7696f764-7046-4967-813e-5a14557b9711@lunn.ch>
+	s=arc-20240116; t=1755740233; c=relaxed/simple;
+	bh=N0XCA6eoElM2GHMVUFBlv8c3qmMMno3R+pQmAkikF+w=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Aeq7Af4F68eZjUfgvquLsksbd7rwguuMwjJ30WRx3zqIojPqt+jvmQ76Js0eTWMR4GWdy5rngeEaDbiiTtJ8c3hVX1ZkS/hjIacGfInnubX6IzoYlU/P4r7HNrVZlSVBBG5+ohX6DN1IdYAnNCfiet2JfJYTpUFevG2so4tziSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S112F9kW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83FC5C4CEE7;
+	Thu, 21 Aug 2025 01:37:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755740233;
+	bh=N0XCA6eoElM2GHMVUFBlv8c3qmMMno3R+pQmAkikF+w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=S112F9kWmHQjxzdAGtwDE/fZztkPFSeFLm1rc7m/vWoyfx0BeZRY8iFX/f3k5AA4r
+	 kDtWmqtoVZs7yyvBi+qvmaKcqqgXBCiRJespZJwQexiU+Tllp7NTUB6D1s8Xahp4Gt
+	 J4vM6TG6xeQMCKXWgHq+DFP1CpmeQ36+e3HCdXMUsEHI3ovALMFWZ2LiN360TtDZxs
+	 LIrBfycDQLW7OGoMhWBkePdPNcSDudGDIrylahQuFqxU5KMM3is2mvA1niFJMwVyR1
+	 2HRUvhkiOjz88HUFDrqtScrUWmF4DC4JOSeXdlARpe01kbV6gfInZcPIcvoI7MoHtD
+	 uleXau7kG14OQ==
+Date: Wed, 20 Aug 2025 18:37:11 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, Willem de
+ Bruijn <willemb@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ andrew+netdev@lunn.ch, horms@kernel.org, davem@davemloft.net,
+ sdf@fomichev.me, almasrymina@google.com, dw@davidwei.uk,
+ michael.chan@broadcom.com, dtatulea@nvidia.com, ap420073@gmail.com,
+ linux-kernel@vger.kernel.org, io-uring@vger.kernel.org
+Subject: Re: [PATCH net-next v3 00/23][pull request] Queue configs and large
+ buffer providers
+Message-ID: <20250820183711.6586c1c6@kernel.org>
+In-Reply-To: <fb85866c-3890-41d2-9d5c-27549c4b7aa3@gmail.com>
+References: <cover.1755499375.git.asml.silence@gmail.com>
+	<20250819193126.2a4af62b@kernel.org>
+	<fb85866c-3890-41d2-9d5c-27549c4b7aa3@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7696f764-7046-4967-813e-5a14557b9711@lunn.ch>
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: MC2LmCE9YcPx8m4m2xUMBhfqWynfml5xxmbpjMWh1MGhEilwEES/Sp7R
-	yJuCLKOaLzeQW/0mvUJKyYH0WuUlIMB22whrn0+CD7zpr8tSZMtKqH4qs/q4Glue1KO+q36
-	ysYo0fkJejoJBo1AgJoTlmAojAZ35qIdQn+4BWkrlQm+ilypXRQBY404Zh0v6bqXWp6wFth
-	bhMwsTfNbuK2sz4G/tQMBUSX6/Cac+9hem/Ba5OyJTGYP7Bwr3wi83NijA0/LTHWIjgo+LX
-	sgWBNMGjnt6FvzcYQAC7mfkzX7NN6MWQu2ejIOJ8NSfM7wZbQxh8erxUnE88p8s/qSucnKY
-	kUcePPPRy7zLaZRrEMBQXJ9ZGa53opZMYarQxbgH1Hw1pxHB5kFqMbVSzs2RA1KrudUDWR/
-	uqZgHSOEzkNCB/hbMmW5j9XCz6x42SQ26XQNzoMzEYuHCcdW8KzsD4n7ZogocI+OTnOEzWO
-	9jRbLDOKcRc1rzsywm5Z8nqlYezsNC/wzzIHS4WjjupKPMNcHfzlog8TcjbCT6Uf7Von03m
-	g+UPEfYnYYeL61GJaS8dohRXlFOcb+9DWqF/Q6lkWYOQGn7c7ev41APhJiOY4M853B2rPfY
-	ZFm4euVTtRaz24snpos7A32ovFUYR1rdwKUyRsG2x3k4hBBfN7DJyLU7y0pyxYsesgsUESE
-	4f2Rz4wWxclywgqvZauCltzNg5k8AgpHy/H0UX7VdxWFAsiu3yt0MvlJx7dvhKYlu9B4EGw
-	KKiOquYHZWTEVz0RAdSuB9BnV2ANiL9HP8n6dCZPJPflhiGIJ8vuvyVsg0gePJ7Hj+dcxOA
-	acr8/rjy6MsvwF1f6Xtl6jdmB4q4NtyfoFimDBnn+kEPVWoMPrVHenUlNRRnhYVSoRpcO2H
-	FRpe83IUJcY4CydOnRIb3QDg3jwvQwKUS1exUnT2md/MIFpHFjp0ZkYeVvERb++COuYPzu0
-	WnMTQ6/aURgakgavo/2oFOerPvOtCAkDrhnAecdIvn9NdI5V9llgAET0xa6ildmiQBtg=
-X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Aug 20, 2025 at 10:06:00PM +0200, Andrew Lunn wrote:
-> > +/**
-> > + * rnpgbe_init_module - Driver init routine
-> > + *
-> > + * rnpgbe_init_module is called when driver insmod
-> > + *
-> > + * @return: 0 on success, negative on failure
-> > + **/
-> > +static int __init rnpgbe_init_module(void)
-> > +{
-> > +	return pci_register_driver(&rnpgbe_driver);
-> > +}
-> > +
-> > +module_init(rnpgbe_init_module);
-> > +
-> > +/**
-> > + * rnpgbe_exit_module - Driver remove routine
-> > + *
-> > + * rnpgbe_exit_module is called when driver is removed
-> > + **/
-> > +static void __exit rnpgbe_exit_module(void)
-> > +{
-> > +	pci_unregister_driver(&rnpgbe_driver);
-> > +}
-> > +
-> > +module_exit(rnpgbe_exit_module);
+On Wed, 20 Aug 2025 14:39:51 +0100 Pavel Begunkov wrote:
+> On 8/20/25 03:31, Jakub Kicinski wrote:
+> > On Mon, 18 Aug 2025 14:57:16 +0100 Pavel Begunkov wrote:  
+> >> Jakub Kicinski (20):  
+> > 
+> > I think we need to revisit how we operate.
+> > When we started the ZC work w/ io-uring I suggested a permanent shared
+> > branch. That's perhaps an overkill. What I did not expect is that you
+> > will not even CC netdev@ on changes to io_uring/zcrx.*
+> > 
+> > I don't mean to assert any sort of ownership of that code, but you're
+> > not meeting basic collaboration standards for the kernel. This needs
+> > to change first.  
 > 
-> This can be replaced by module_pci_driver()
-> 
+> You're throwing quite allegations. Basic collaboration standards don't
+> include spamming people with unrelated changes via an already busy list.
+> I cc'ed netdev on patches that meaningfully change how it interacts
+> (incl indirectly) with netdev and/or might be of interest, which is
+> beyond of the usual standard expected of a project using infrastructure
+> provided by a subsystem.
 
-Ok, I will improve it.
-By the way, if I want to add some functions(maybe workqueue to handle
-link status, or debugfs for the driver) in the future. The function is
-only one for driver, not each for every pci device, should I turn back to
-'module_exit' and 'module_init'?
-Maybe workqueue can use 'system_power_efficient_wq' just like libwx
-does? 
+To me iouring is a fancy syscall layer. It's good at its job, sure,
+but saying that netdev provides infrastructure to a syscall layer is
+laughable.
 
-> 
->     Andrew
-> 
-> ---
-> pw-bot: cr
-> 
+> There are pieces that don't touch netdev, like
+> how io_uring pins pages, accounts memory, sets up rings, etc. In the
+> very same way generic io_uring patches are not normally posted to
+> netdev, and netdev patches are not redirected to mm because there
+> are kmalloc calls, even though, it's not even the standard used here.
 
-Thanks for your feedback.
+I'm asking you to CC netdev, and people who work on ZC like Mina.
+Normal reaction to someone asking to be CCed on patches is "Sure."
+I don't understand what you're afraid of.
 
+> If you have some way you want to work, I'd appreciate a clear
+> indication of that, because that message you mentioned was answered
+> and I've never heard any objection, or anything else really.
+
+It honestly didn't cross my mind that you'd only CC netdev on patches
+which touch code under net/. I'd have let you know sooner but it's hard
+to reply to messages one doesn't see. I found out that there's whole
+bunch of ZC work that landed in iouring from talking to David Wei.
 
