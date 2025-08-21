@@ -1,78 +1,71 @@
-Return-Path: <netdev+bounces-215575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B662BB2F4F6
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 12:16:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F918B2F4FE
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 12:17:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63CEF686D4A
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 10:14:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C49A3B66B9
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 10:16:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 870882F0C5B;
-	Thu, 21 Aug 2025 10:14:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Sa1Tb74T"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 526F62F1FEB;
+	Thu, 21 Aug 2025 10:16:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78EF2264F99;
-	Thu, 21 Aug 2025 10:14:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59FB72459C9
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 10:16:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755771259; cv=none; b=OPK5PfD3DJnJ0UVVcqwSfQibBQ5mnHu5Xj9/nlbNE4OtcEedIKoVmwPIPT/0ED7FdinhK7MRjIhnIlRI/9j++5JH/lcbXFsLM2cvE4uW6Us2gkDJvjI7aPtge1JfSsjTHWEdNZSwUblkWfuZdgHtYVOU0PK7usESjgRnJoHHplU=
+	t=1755771368; cv=none; b=uaBmd/ZjXB1clVptAI9yim0bngRyljtTNlI2Kw10p30//gNOvuwTayzB/HLZr73O/yNerRgfwrY7yboE83lKTv2vhUlR5B/F9CA0xAsUux21bWzN/Xwck0OsEgzP6I0RMIlJeZVitEAx1TKhpx6zQh5sT7upjR6Iz/gf6KbJvXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755771259; c=relaxed/simple;
-	bh=cM1YyM6yYa+RXccBpuLDpkZ6GribivREOwjxc1lSsYs=;
+	s=arc-20240116; t=1755771368; c=relaxed/simple;
+	bh=GBwCNdsSPTgkl6+MZ/58UzFmAiMnptb1wekxJ049+9E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HaR9FqQEW9Ol+20V9rNAye7EG4Ow+bkYHrg9QDbc1vP/ptRa3lH3wQPc88Ty2Nkl6pPJI7Z273sHMfIBzv0EQiqPmBVy3GiSuC/cLrx4H1JEzT1xDvaYASCRplu9vkX4ICGEJba4MAHtUX5orfLcJROPVM6XY6F7rSwgFJdL8+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Sa1Tb74T; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=xwbnmilUfefNilKkhDbCSq1WdkxVj2w6J1wxm3ypUeo=; b=Sa1Tb74TcVeI48mk0D7etjkPmT
-	/XwwnzzlPnizwBDMQZuztD9nAVDIBux9SKp1iehpl1mfi7sFRCP7mgxcbnrxGlVctgQiLG0WPcpkf
-	1zzOkLC6i9LWVvKphMqv2pPPdoDz6iy9q6NBNpGlvnHBJCp6S80YG7CuMkibhoDs0ELIUptnpWbud
-	QeTdCNwimGza4HPEmvSNaSWw6kDjxT28eS8RWDztdy9OsP9kKFIm2Uk/1RwIZ2XwbUItSUEj0Dh/B
-	jpnyNtgkcPyRGfKsL96mhPfDo3SiNMN22XmjXkffk3L/f93y56FRFxNfxlmItW8yMQKrtyw8naSqE
-	v6IWCS5Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33696)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1up2JD-000000000zI-0BCu;
-	Thu, 21 Aug 2025 11:14:15 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1up2JB-0000000010g-2pb6;
-	Thu, 21 Aug 2025 11:14:13 +0100
-Date: Thu, 21 Aug 2025 11:14:13 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Yangfl <mmyangfl@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=aI/8JAxW3A4YS0R8HwJLvnfKMbIYTxYgRp2qNuNjyPv7YTCPGYsyBDfqTSgPjpqvPpqcBLo+1MjxnXShaD0B0eQSjLxM86X3uzIF3iZUhLwYJNMYfu+wTtGZ1zGW4MZ1Wo+Vdh6RvoJ27bIKNftw0tn1rjlFDNNSE4tV66LfLCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1up2Kk-0001Yg-Jm; Thu, 21 Aug 2025 12:15:50 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1up2Ki-001OYX-0t;
+	Thu, 21 Aug 2025 12:15:48 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1up2Ki-00805O-0T;
+	Thu, 21 Aug 2025 12:15:48 +0200
+Date: Thu, 21 Aug 2025 12:15:48 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next v5 3/3] net: dsa: yt921x: Add support for Motorcomm
- YT921x
-Message-ID: <aKbxdaDFMe2Fqnxu@shell.armlinux.org.uk>
-References: <20250820075420.1601068-1-mmyangfl@gmail.com>
- <20250820075420.1601068-4-mmyangfl@gmail.com>
- <aKbZM6oYhIN6cBQb@shell.armlinux.org.uk>
- <CAAXyoMMGCRZTuhYG0zxTgKdDdgB1brU7BAUiCVR_MheFK-n5Yw@mail.gmail.com>
- <aKbuQ7MCbq1JL9sw@shell.armlinux.org.uk>
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Nishanth Menon <nm@ti.com>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com, linux-doc@vger.kernel.org,
+	Michal Kubecek <mkubecek@suse.cz>, Roan van Dijk <roan@protonic.nl>
+Subject: Re: [PATCH net-next v4 2/5] ethtool: netlink: add
+ ETHTOOL_MSG_MSE_GET and wire up PHY MSE access
+Message-ID: <aKbx1EoO0iWe2bMU@pengutronix.de>
+References: <20250821091101.1979201-1-o.rempel@pengutronix.de>
+ <20250821091101.1979201-3-o.rempel@pengutronix.de>
+ <20250821115830.3a231885@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,72 +75,103 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <aKbuQ7MCbq1JL9sw@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250821115830.3a231885@kmaincent-XPS-13-7390>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Thu, Aug 21, 2025 at 11:00:35AM +0100, Russell King (Oracle) wrote:
-> On Thu, Aug 21, 2025 at 05:25:46PM +0800, Yangfl wrote:
-> > On Thu, Aug 21, 2025 at 4:30 PM Russell King (Oracle)
-> > <linux@armlinux.org.uk> wrote:
-> > > Someone clearly doesn't believe in reading the documentation before
-> > > writing code. This also hasn't been tested in any way. Sorry, but
-> > > I'm going to put as much effort into this review as you have into
-> > > understanding the phylink API, and thus my review ends here.
-> > >
-> > > NAK.
-> > 
-> > Sorry I'm quite new here. I don't understand very clearly why a
-> > different set of calls is involved in dsa_switch_ops, so I referred to
-> > other dsa drivers and made a working driver (at least tested on my
-> > device), but I would appreciate it much if you could point it out in
-> > an earlier version of series.
+Hello Kory,
+
+On Thu, Aug 21, 2025 at 11:59:14AM +0200, Kory Maincent wrote:
+> Hello Oleksij,
 > 
-> This isn't dsa_switch_ops, but phylink_mac_ops, which are well
-> documented in include/linux/phylink.h. Please read the documentation
-> found in that header file detailing the phylink_mac_ops methods.
-> You'll find a brief overview before the struct, and then in the #if 0
-> section, detailed per-method documentation.
+> Le Thu, 21 Aug 2025 11:10:58 +0200,
+> Oleksij Rempel <o.rempel@pengutronix.de> a écrit :
+> 
+> > Introduce the userspace entry point for PHY MSE diagnostics via
+> > ethtool netlink. This exposes the core API added previously and
+> > returns both configuration and one or more snapshots.
+> > 
+> > Userspace sends ETHTOOL_MSG_MSE_GET with an optional channel
+> > selector. The reply carries:
+> >   - ETHTOOL_A_MSE_CONFIG: scale limits, timing, and supported
+> >     capability bitmask
+> >   - ETHTOOL_A_MSE_SNAPSHOT+: one or more snapshots, each tagged
+> >     with the selected channel
+> > 
+> > If no channel is requested, the kernel returns snapshots for all
+> > supported selectors (per‑channel if available, otherwise WORST,
+> > otherwise LINK). Requests for unsupported selectors fail with
+> > -EOPNOTSUPP; link down returns -ENOLINK.
+> > 
+> > Changes:
+> >   - YAML: add attribute sets (mse, mse-config, mse-snapshot) and
+> >     the mse-get operation
+> >   - UAPI (generated): add ETHTOOL_A_MSE_* enums and message IDs,
+> >     ETHTOOL_MSG_MSE_GET/REPLY
+> >   - ethtool core: add net/ethtool/mse.c implementing the request,
+> >     register genl op, and hook into ethnl dispatch
+> >   - docs: document MSE_GET in ethtool-netlink.rst
+> > 
+> > The include/uapi/linux/ethtool_netlink_generated.h is generated
+> > from Documentation/netlink/specs/ethtool.yaml.
+> > 
+> > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> 
+> ...
+> 
+> > +MSE Configuration
+> > +-----------------
+> > +
+> > +This nested attribute contains the full configuration properties for the MSE
+> > +measurements
+> > +
+> > +  ===============================================  ======
+> > ====================
+> > +  ETHTOOL_A_MSE_CONFIG_MAX_AVERAGE_MSE             u32     max avg_mse scale
+> > +  ETHTOOL_A_MSE_CONFIG_MAX_PEAK_MSE                u32     max peak_mse scale
+> > +  ETHTOOL_A_MSE_CONFIG_REFRESH_RATE_PS             u64     sample rate (ps)
+> > +  ETHTOOL_A_MSE_CONFIG_NUM_SYMBOLS                 u64     symbols per sample
+> > +  ETHTOOL_A_MSE_CONFIG_SUPPORTED_CAPS              bitset  capability bitmask
+> > +  ===============================================  ======
+> > ==================== +
+> 
+> Why did you remove the kernel doc identifiers to phy_mse_config?
+> It was useful for the documentation.
+> 
+> > +MSE Snapshot
+> > +------------
+> > +
+> > +This nested attribute contains an atomic snapshot of MSE values for a
+> > specific +channel or for the link as a whole.
+> > +
+> > +  ===============================================  ======
+> > ======================
+> > +  ETHTOOL_A_MSE_SNAPSHOT_CHANNEL                   u32     channel enum value
+> > +  ETHTOOL_A_MSE_SNAPSHOT_AVERAGE_MSE               u32     average MSE value
+> > +  ETHTOOL_A_MSE_SNAPSHOT_PEAK_MSE                  u32     current peak MSE
+> > +  ETHTOOL_A_MSE_SNAPSHOT_WORST_PEAK_MSE            u32     worst-case peak
+> > MSE
+> > +  ===============================================  ======
+> 
+> Same question here for phy_mse_snapshot.
 
-Also, the reason I state that it hasn't been tested is because when
-your mac_config method is invoked, and print debug information which
-includes state->speed and state->duplex, and then go on to use these.
-Phylink's sole call path to mac_config() does this:
+I had following warnings:
+Documentation/networking/ethtool-netlink:2499: ./include/linux/phy.h:3: WARNING: Duplicate C declaration, also defined at kapi:892. 
+Declaration is '.. c:struct:: phy_mse_config'. 
+Documentation/networking/ethtool-netlink:2515: ./include/linux/phy.h:3: WARNING: Duplicate C declaration, also defined at kapi:915.
+Declaration is '.. c:struct:: phy_mse_snapshot'
 
-        /* Stop drivers incorrectly using these */
-        linkmode_zero(st.lp_advertising);
-        st.speed = SPEED_UNKNOWN;
-        st.duplex = DUPLEX_UNKNOWN;
-        st.an_complete = false;
-        st.link = false;
-
-        phylink_dbg(pl,
-                    "%s: mode=%s/%s/%s adv=%*pb pause=%02x\n",
-                    __func__, phylink_an_mode_str(pl->act_link_an_mode),
-                    phy_modes(st.interface),
-                    phy_rate_matching_to_str(st.rate_matching),
-                    __ETHTOOL_LINK_MODE_MASK_NBITS, st.advertising,
-                    st.pause);
-
-        pl->mac_ops->mac_config(pl->config, pl->act_link_an_mode, &st);
-
-and you would've noticed in your debug print that e.g. state->speed and
-state->duplex are both always -1, and thus are not useful. Note also the
-debugging that phylink includes.
-
-Note that no other mac_config() implementations refer to state->speed
-and state->duplex. The only time drivers _write_ to these is in the
-pcs_get_state() method if they support a PCS.
-
-Therefore, I think your code is completely untested.
-
-I'm also concerned about the SMI locking, which looks to me like you
-haven't realised that the MDIO bus layer has locking which guarantees
-that all invocations of the MDIO bus read* and write* methods are
-serialised.
-
-Thanks.
+I didn't found proper was to solve it, so I removed them.
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
