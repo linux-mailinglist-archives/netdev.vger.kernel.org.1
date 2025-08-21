@@ -1,123 +1,264 @@
-Return-Path: <netdev+bounces-215446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEF73B2EB0E
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 04:04:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6ECA8B2EB24
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 04:19:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69564A231DA
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 02:04:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFA8B685B3A
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 02:19:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CEEA214204;
-	Thu, 21 Aug 2025 02:04:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9DA721D3F2;
+	Thu, 21 Aug 2025 02:19:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w7RTYCrN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD78119E7E2
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 02:04:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4077421B9F6
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 02:19:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755741864; cv=none; b=Tm9b0gdyRwGweL9JADCOvQdYOlRJNpnOIQoMo9p7qQG1BnwnI9z/wXC5jAoMlSD02lBCPKgNTGUVtsmAt7mLYRGLqNCFcag+Ws7VCyPMX2faELaps0UJu1umMj4NmedR5pYuGUhHu/ll7Jl/ypu8uuEH2miCgYb47iBaoeCuJHE=
+	t=1755742746; cv=none; b=byNA3NMIdo84a74b3y6Zr9CYxaUPwsskNYPX1wVtZ1svA/9+qZjWfQUo4Ibs0HVULCvnweoHhLb73rctl318EvjeS4pkNcAs3r0/0NV8Qq99lz8KaZsLupKI3yR3z8XTK0ILOv8Om3JXRvtWTbjyawKyvsEaTdaWBvWeXEm7bqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755741864; c=relaxed/simple;
-	bh=FNLBdWhtXd2m9yHwmeI8KFlYBcHkijGv9Sr7nDG2Uyc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eMdBIZpkd/qkDme/ZnwPgHyQVPu/8uO7cpApmIIyST6wIAut1ztK9U2CCSyR82U6HCvYxW/w/kD1XZuU4qG29wG/JPjGGawbRDUWZdEqu7n6mmPwOCe4V/4gJ+BMaeYY03WjfJO4j4kjIHbePG9pG1c5f78IJ7YhsvAFIz0VJNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.204.34.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: esmtpgz12t1755741849tfda9277f
-X-QQ-Originating-IP: CBo+yViVKO1fMalkEw0THj+HBznWJv82D9hIYlQUVFM=
-Received: from localhost ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 21 Aug 2025 10:04:07 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 4256339024035975856
-Date: Thu, 21 Aug 2025 10:04:08 +0800
-From: Yibo Dong <dong100@mucse.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
-	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 4/5] net: rnpgbe: Add basic mbx_fw support
-Message-ID: <9BFA6532A427F621+20250821020408.GE1742451@nic-Precision-5820-Tower>
-References: <20250818112856.1446278-1-dong100@mucse.com>
- <20250818112856.1446278-5-dong100@mucse.com>
- <399be32e-5e11-479d-bd2a-bd75de0c2ff5@lunn.ch>
+	s=arc-20240116; t=1755742746; c=relaxed/simple;
+	bh=3HpRPiSfRjHzj2X0sMabWYMxCKGEPjEzdBoODQYACnI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=PXju4XWWD32YD8Udg6SNbSU5FgiA7BtUnYlkXggvfibRe3kxyZ4HcU8X84lvqvWp63RRBbWvm5h0pW4f7QC6iny+vj/Ix5ZOs0CVZBGu8cW5jgj2Rm1kvs4Qy7QftAvkkeh88fKGV5OFcmISsFIauGzxEu4QV8ntTWL8XwsPHV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=w7RTYCrN; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-323267bf596so621420a91.1
+        for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 19:19:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755742744; x=1756347544; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/7299vGbfREqbBOOITxtyERwG8vWDgbkrDhLTrAttFg=;
+        b=w7RTYCrNo2c/Nhnqvhj8QWJsqZ7yFfaMJAkHFL7mpKUeWwd/uiTw9y+RO7jNY3NlaJ
+         rHyFTIVl2M5t2c7uyi0/4BEbiybefwKUbOwe1R69hKpNFYs6xPZCPqGO0aKXHS7JCwdW
+         CSxk+Imk2I0YfGNWfxqZnQBByBhjaWPUV8/M87VbKWPzPVxeU/tCAjddzsD/51Vgo9g/
+         Lni6v2qBqpEZCbHW+y6JJ77MQfv5VPtBN/eg5Fb3lRxROrnC+M6GP5Sc2J4Jlrc7R82x
+         jqcIS5MT7yaGyjtc/EfXQAIzXcwwZyJ4B6Ka/8WVR4ApRBSVH+hEmIMADu1fWLceZCsY
+         69Ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755742744; x=1756347544;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/7299vGbfREqbBOOITxtyERwG8vWDgbkrDhLTrAttFg=;
+        b=hZ6gHo21WAys9qVr4OOIS1t34BxeT94LOuJSQm4HnZRMnj7eQWI2tX5srCK9hezqpI
+         uBtGQFACiO5NLvB4ka4rWxAZPDGEZUILUG01j9VIKwaGs8f6a3rLYs4/xi6pDTznn+kJ
+         UM6T+TKnOqrWKRyLdNZbNUFSKMdIIZZTyatPKlNwpx+3iHbL66QcktVLj0hbvfrNA2zC
+         RCsjU7LKi/KxEAwzyQUXonGiP0+/DASUaioKx+k06z57PCCBp4kDjH/85vD0spH2aiEP
+         1OAt5Ijtz4RiDoXMtiVEPJNBJZNAJUMqyR8qPh5iOv+fcyyCYOckLUN8yJk8KilmGBtI
+         06XQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWV/ZGOE2NulpM0AeYKrtyWXi8dt5kJzMUKB+slOVFi9CSS8eAcISM+/TFbmdJ8aMeEKCu8wec=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnnLVC6r/XcG6pJuwdvpK78eJyAb6fHzwoDjd7eeWPHJbgm1Ys
+	gTk8r+zNLZIN2MHNw6GOJv3NLzV84FqTtDBJny7sJon5jnlIr8i6FzhzB7RJMTH3Y/5PXP2wz1H
+	+F+EU4w==
+X-Google-Smtp-Source: AGHT+IHZgFgo3j+TWuAGubLJvOC7aEA7AKjuNoMy3ppxAbLJ/bftLtCfLYumdxQ/sylmxw4QPO2HQ2WxNFM=
+X-Received: from pjff7.prod.google.com ([2002:a17:90b:5627:b0:321:c300:9aac])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:52d0:b0:31f:6d95:8f76
+ with SMTP id 98e67ed59e1d1-324ed12dd87mr1171604a91.29.1755742744546; Wed, 20
+ Aug 2025 19:19:04 -0700 (PDT)
+Date: Thu, 21 Aug 2025 02:18:24 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <399be32e-5e11-479d-bd2a-bd75de0c2ff5@lunn.ch>
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: OZsapEVPoiO6ZsKYGvtf16iwyFS0uKN/pV9xTYOGIMoVrP5JcYIBOYVp
-	EEtkTAClI9A72m8tDx7Osm1xPl2nzPfRKTfkzwJIZqqYXg1erB7hiW0lcOFAutMHx/TDcMW
-	Gn7R6j0cGOUTfhc+BcEDjpJsLP6RWfbb5Aeo2gbZiWPGWKLMlaFvlyqSnsrnih1fjTsNeXe
-	8rujtuBJ2BnF2BMea+07lD3tMxpi8pcMNmJk8e1oc/Q+Jbr1Ovbf1Dy7flDqdpqisEd5bBG
-	K/hY9U2KxXPssrOIBJWq+y5X9ftg80BER7oinv5AvML9L8XYVllN69iZkUsSESVBp08M4wr
-	oyS2L5xoXGujPY42kOX05UHu0pXoGrFhUxNhuh3gMxmk9gsJ0Zrez/6cpxzBU/mwizzEIsj
-	6xdygnncfYFJVGHEdO8b00v4Y00jKoj874JEf9Sb8lKiiFj5pXfqzGQRd1SF/j0WIj8ZguJ
-	Ti2vL1CbHptNBVsANS2kKVbMCX+jAYvEixm0wdnDjbbFSTpMhxOrf6gLHC39QD0xVpoNprn
-	Vsp9ExegWwerbh953+UNg/4j3BJyKDwKMly7lxeZH3ckeCmc5z9g627OxgtICXR/eaBSRWe
-	9vgvObXFbFLCTEdZgyoZza2nBeNOb2Zy2bw5yMx7Ju9be3LlRsezJzyCh9HIoczk6+p047L
-	uFWv9vLxBH8tqmPOlohfOWbM5TirBb9fg41HIocfZ16W5Rk42SSUDMLBXIZ8YA7F7tbYRul
-	wGbcC3y+v9+CmvFrPwr8BwJQ8e1sYZktYScYYWjn2o/2DU+P9YDPFvy76MHFUFpFuulxMty
-	cmRucQBeTBJa+Y3OrR87huZQp4PdswsWf8s7MNYm0x1HyY1tgpA3Nmn8ouEQq19lCfWidVZ
-	2J3/mdSasekGYfxmNcHlrWNr9UosskFNNeI8EsvJnrlKo0CAmxDB+od8Dw8Kc/OH7xEp+bH
-	OlTMX9No9fR0YjyQywKeIIOvWkESJbXuJPC9YOO/6skRXeZyvRCFDXOH+XBF27+tVizl6O/
-	y127IA2GxjI04byuXSx/7WPjBNm/3IK1+KOS1ZT8jlTL/W4bEb
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-X-QQ-RECHKSPAM: 0
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.rc1.193.gad69d77794-goog
+Message-ID: <20250821021901.2814721-1-kuniyu@google.com>
+Subject: [PATCH v1 net] atm: atmtcp: Prevent arbitrary write in atmtcp_recv_control().
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: Chas Williams <3chas3@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, linux-atm-general@lists.sourceforge.net, 
+	netdev@vger.kernel.org, syzbot+1741b56d54536f4ec349@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Aug 20, 2025 at 10:30:17PM +0200, Andrew Lunn wrote:
-> > +int mucse_mbx_get_capability(struct mucse_hw *hw)
-> > +{
-> > +	struct hw_abilities ability = {};
-> > +	int try_cnt = 3;
-> > +	int err = -EIO;
-> > +
-> > +	while (try_cnt--) {
-> > +		err = mucse_fw_get_capability(hw, &ability);
-> > +		if (err)
-> > +			continue;
-> > +		hw->pfvfnum = le16_to_cpu(ability.pfnum);
-> > +		hw->fw_version = le32_to_cpu(ability.fw_version);
-> > +		hw->usecstocount = le32_to_cpu(ability.axi_mhz);
-> 
-> If you can get it from the hardware, why do you need to initialise it
-> in the earlier patch?
-> 
-> I guess you have a bootstrap problem, you need it to get it. But
-> cannot you just initialise it to a single pessimistic value which will
-> work well enough for all hardware variants until you can actually ask
-> the hardware?
-> 
->     Andrew
-> 
+syzbot reported the splat below. [0]
 
-It is a problem related with fw version. Older fw may return with axi_mhz
-0, So I init a no-zero default value first. Also, I missed to check the axi_mhz
-here. The 'usecstocount' is removed in v6, I will update here like this in
-the patch which truely use 'usecstocount':
+When atmtcp_v_open() or atmtcp_v_close() is called via connect()
+or close(), atmtcp_send_control() is called to send an in-kernel
+special message.
 
-if (le32_to_cpu(ability.axi_mhz))
-	hw->usecstocount = le32_to_cpu(ability.axi_mhz);
-/* else keep use the default value */
+The message has ATMTCP_HDR_MAGIC in atmtcp_control.hdr.length.
+Also, a pointer of struct atm_vcc is set to atmtcp_control.vcc.
 
-Thanks for your feedback.
+The notable thing is struct atmtcp_control is uAPI but has a
+space for an in-kernel pointer.
+
+  struct atmtcp_control {
+  	struct atmtcp_hdr hdr;	/* must be first */
+  ...
+  	atm_kptr_t vcc;		/* both directions */
+  ...
+  } __ATM_API_ALIGN;
+
+  typedef struct { unsigned char _[8]; } __ATM_API_ALIGN atm_kptr_t;
+
+The special message is processed in atmtcp_recv_control() called
+from atmtcp_c_send().
+
+atmtcp_c_send() is vcc->dev->ops->send() and called from 2 paths:
+
+  1. .ndo_start_xmit() (vcc->send() == atm_send_aal0())
+  2. vcc_sendmsg()
+
+The problem is sendmsg() does not validate the message length and
+userspace can abuse atmtcp_recv_control() to overwrite any kptr
+by atmtcp_control.
+
+Let's add a new ->pre_send() hook to validate messages from sendmsg().
+
+[0]:
+Oops: general protection fault, probably for non-canonical address 0xdffffc00200000ab: 0000 [#1] SMP KASAN PTI
+KASAN: probably user-memory-access in range [0x0000000100000558-0x000000010000055f]
+CPU: 0 UID: 0 PID: 5865 Comm: syz-executor331 Not tainted 6.17.0-rc1-syzkaller-00215-gbab3ce404553 #0 PREEMPT(full)
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+RIP: 0010:atmtcp_recv_control drivers/atm/atmtcp.c:93 [inline]
+RIP: 0010:atmtcp_c_send+0x1da/0x950 drivers/atm/atmtcp.c:297
+Code: 4d 8d 75 1a 4c 89 f0 48 c1 e8 03 42 0f b6 04 20 84 c0 0f 85 15 06 00 00 41 0f b7 1e 4d 8d b7 60 05 00 00 4c 89 f0 48 c1 e8 03 <42> 0f b6 04 20 84 c0 0f 85 13 06 00 00 66 41 89 1e 4d 8d 75 1c 4c
+RSP: 0018:ffffc90003f5f810 EFLAGS: 00010203
+RAX: 00000000200000ab RBX: 0000000000000000 RCX: 0000000000000000
+RDX: ffff88802a510000 RSI: 00000000ffffffff RDI: ffff888030a6068c
+RBP: ffff88802699fb40 R08: ffff888030a606eb R09: 1ffff1100614c0dd
+R10: dffffc0000000000 R11: ffffffff8718fc40 R12: dffffc0000000000
+R13: ffff888030a60680 R14: 000000010000055f R15: 00000000ffffffff
+FS:  00007f8d7e9236c0(0000) GS:ffff888125c1c000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000000045ad50 CR3: 0000000075bde000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ vcc_sendmsg+0xa10/0xc60 net/atm/common.c:645
+ sock_sendmsg_nosec net/socket.c:714 [inline]
+ __sock_sendmsg+0x219/0x270 net/socket.c:729
+ ____sys_sendmsg+0x505/0x830 net/socket.c:2614
+ ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
+ __sys_sendmsg net/socket.c:2700 [inline]
+ __do_sys_sendmsg net/socket.c:2705 [inline]
+ __se_sys_sendmsg net/socket.c:2703 [inline]
+ __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2703
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f8d7e96a4a9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 51 18 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f8d7e923198 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f8d7e9f4308 RCX: 00007f8d7e96a4a9
+RDX: 0000000000000000 RSI: 0000200000000240 RDI: 0000000000000005
+RBP: 00007f8d7e9f4300 R08: 65732f636f72702f R09: 65732f636f72702f
+R10: 65732f636f72702f R11: 0000000000000246 R12: 00007f8d7e9c10ac
+R13: 00007f8d7e9231a0 R14: 0000200000000200 R15: 0000200000000250
+ </TASK>
+Modules linked in:
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: syzbot+1741b56d54536f4ec349@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/68a6767c.050a0220.3d78fd.0011.GAE@google.com/
+Tested-by: syzbot+1741b56d54536f4ec349@syzkaller.appspotmail.com
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+---
+ drivers/atm/atmtcp.c   | 17 ++++++++++++++---
+ include/linux/atmdev.h |  1 +
+ net/atm/common.c       | 15 ++++++++++++---
+ 3 files changed, 27 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/atm/atmtcp.c b/drivers/atm/atmtcp.c
+index eeae160c898d..fa3c76a2b49d 100644
+--- a/drivers/atm/atmtcp.c
++++ b/drivers/atm/atmtcp.c
+@@ -279,6 +279,19 @@ static struct atm_vcc *find_vcc(struct atm_dev *dev, short vpi, int vci)
+         return NULL;
+ }
+ 
++static int atmtcp_c_pre_send(struct atm_vcc *vcc, struct sk_buff *skb)
++{
++	struct atmtcp_hdr *hdr;
++
++	if (skb->len < sizeof(struct atmtcp_hdr))
++		return -EINVAL;
++
++	hdr = (struct atmtcp_hdr *)skb->data;
++	if (hdr->length == ATMTCP_HDR_MAGIC)
++		return -EINVAL;
++
++	return 0;
++}
+ 
+ static int atmtcp_c_send(struct atm_vcc *vcc,struct sk_buff *skb)
+ {
+@@ -288,9 +301,6 @@ static int atmtcp_c_send(struct atm_vcc *vcc,struct sk_buff *skb)
+ 	struct sk_buff *new_skb;
+ 	int result = 0;
+ 
+-	if (skb->len < sizeof(struct atmtcp_hdr))
+-		goto done;
+-
+ 	dev = vcc->dev_data;
+ 	hdr = (struct atmtcp_hdr *) skb->data;
+ 	if (hdr->length == ATMTCP_HDR_MAGIC) {
+@@ -347,6 +357,7 @@ static const struct atmdev_ops atmtcp_v_dev_ops = {
+ 
+ static const struct atmdev_ops atmtcp_c_dev_ops = {
+ 	.close		= atmtcp_c_close,
++	.pre_send	= atmtcp_c_pre_send,
+ 	.send		= atmtcp_c_send
+ };
+ 
+diff --git a/include/linux/atmdev.h b/include/linux/atmdev.h
+index 45f2f278b50a..70807c679f1a 100644
+--- a/include/linux/atmdev.h
++++ b/include/linux/atmdev.h
+@@ -185,6 +185,7 @@ struct atmdev_ops { /* only send is required */
+ 	int (*compat_ioctl)(struct atm_dev *dev,unsigned int cmd,
+ 			    void __user *arg);
+ #endif
++	int (*pre_send)(struct atm_vcc *vcc, struct sk_buff *skb);
+ 	int (*send)(struct atm_vcc *vcc,struct sk_buff *skb);
+ 	int (*send_bh)(struct atm_vcc *vcc, struct sk_buff *skb);
+ 	int (*send_oam)(struct atm_vcc *vcc,void *cell,int flags);
+diff --git a/net/atm/common.c b/net/atm/common.c
+index d7f7976ea13a..881c7f259dbd 100644
+--- a/net/atm/common.c
++++ b/net/atm/common.c
+@@ -635,18 +635,27 @@ int vcc_sendmsg(struct socket *sock, struct msghdr *m, size_t size)
+ 
+ 	skb->dev = NULL; /* for paths shared with net_device interfaces */
+ 	if (!copy_from_iter_full(skb_put(skb, size), size, &m->msg_iter)) {
+-		atm_return_tx(vcc, skb);
+-		kfree_skb(skb);
+ 		error = -EFAULT;
+-		goto out;
++		goto free_skb;
+ 	}
+ 	if (eff != size)
+ 		memset(skb->data + size, 0, eff-size);
++
++	if (vcc->dev->ops->pre_send) {
++		error = vcc->dev->ops->pre_send(vcc, skb);
++		if (error)
++			goto free_skb;
++	}
++
+ 	error = vcc->dev->ops->send(vcc, skb);
+ 	error = error ? error : size;
+ out:
+ 	release_sock(sk);
+ 	return error;
++free_skb:
++	atm_return_tx(vcc, skb);
++	kfree_skb(skb);
++	goto out;
+ }
+ 
+ __poll_t vcc_poll(struct file *file, struct socket *sock, poll_table *wait)
+-- 
+2.51.0.rc1.193.gad69d77794-goog
+
 
