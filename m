@@ -1,75 +1,99 @@
-Return-Path: <netdev+bounces-215730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B7FAB300E3
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 19:20:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F00C1B300EC
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 19:22:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15EB5A01D50
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 17:18:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6251F1BA0CF0
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 17:20:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CE542E7F36;
-	Thu, 21 Aug 2025 17:18:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35D3B3054EE;
+	Thu, 21 Aug 2025 17:19:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FtNs/1Se"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k2XyAQtJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F642DCF58;
-	Thu, 21 Aug 2025 17:18:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C0BF1DFCE;
+	Thu, 21 Aug 2025 17:19:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755796683; cv=none; b=QSahJHTmejpuG5821Qe3R1M0uvJ74Wn4SznOp+DaeOIry80FbGk77m9Tp9tHbIE9IpHnDNmJb17LG77wW6O9BfkTZHHkJ3307+o2Sh7QD48+KqlY8tFtAPrkOAMVQkyLg/HXuK0rGnVlp9ekCeC9Hj/qA3uB1BVsqlDBVq+wly4=
+	t=1755796798; cv=none; b=eBYHdbscJcz8bAoLDq8rtd1LQgcwXakMbupnT1VkdwaHCLS804XcOM5Xkk8Y15OQiUL2wluEHKr/IfcaLkFrkBwBUhVfkZotJ6PrN/LBO1qW2O374XZhUM58GSco002Zycsu43G25sPqsNo7gdkK26AWlgDmAduoe8vF0RGgrI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755796683; c=relaxed/simple;
-	bh=LrbyNf39tSzJ81B5o+I7bZf5pg3uLPwS6g58MGHjZiM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aBiOHpTzz7aoZ5ZlX1vEmmfTGaFj1p314Teuga3eCBWlOVFCnFsr5FpzBfanVsbE0LEH1h7NQHmHOg/TdJzeQsIYtuzuznBTsXY/d8h1m5i5lDtEo8PeNZ+76g6V2E5rgGUolvcWNxVhrYYI4m2Sz/xRFTu3+WU1PwgzDom8DDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FtNs/1Se; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 021D1C4CEEB;
-	Thu, 21 Aug 2025 17:18:01 +0000 (UTC)
+	s=arc-20240116; t=1755796798; c=relaxed/simple;
+	bh=srJorbUHKfSOi1LHnSkKnV8R63yQ/pJFq1r03NxyH20=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=cjXsQUa29X0NlyT2xLrKj7Q6pMyU6fKI0xLiF7etTUoq44qddAr26vMm2LE1eXuQPMrMUQ+MZFsyAPgDcr+apOwfspi02EyuCWYvvugGPS6YuIDzxzBz1EcwqPuAocf8YVB+MPyLTi4b7p4EIK+WjAvWW6HuoEEP+Dq9hdVUXJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k2XyAQtJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B43B2C4CEEB;
+	Thu, 21 Aug 2025 17:19:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755796682;
-	bh=LrbyNf39tSzJ81B5o+I7bZf5pg3uLPwS6g58MGHjZiM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FtNs/1Sesz/JZXOdYDKeDRpzpU9nzgvbE55KiJMeICzCpxd0Jd53B2UYTQl19+3m9
-	 00vgGbcWcI29+QAI16d/oidRF787wKXwjAMmiIfGraLvMciZ3U+fsbKEZAYSs+WT/1
-	 +7Px5y9K/Rpf/ii3bN6u+NXf9nge1e7UpBnIq2cIPF1MHBMdmAOL0fjn96scaHIz/O
-	 7uOWtgHWSSJADfxXMOAR4oEyZLKuv8/1VdO5lD18GURK32a3bol4aI7qSzLdjh7hJ1
-	 YZA6227v8EI8eBps+L/yfiSF+PH61BKhBZ2EDGaP2CeXZ7RuRdcRLpZRqwCIfb2Zcf
-	 elWlwpjccdMXQ==
-Date: Thu, 21 Aug 2025 10:18:01 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, michael.chan@broadcom.com,
- pavan.chebbi@broadcom.com, vsrama-krishna.nemani@broadcom.com
-Subject: Re: [v3, net-next 0/9] Add more functionality to BNGE
-Message-ID: <20250821101801.2d0820d6@kernel.org>
-In-Reply-To: <20250821211517.16578-1-bhargava.marreddy@broadcom.com>
-References: <20250821211517.16578-1-bhargava.marreddy@broadcom.com>
+	s=k20201202; t=1755796796;
+	bh=srJorbUHKfSOi1LHnSkKnV8R63yQ/pJFq1r03NxyH20=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=k2XyAQtJoRyhI7mW4or3koFKnvUNj8bARuVPU3XZHa53GQ9Z6xXHdo31KgVfHnWdp
+	 nAMdWHhmNeS/dG0f2QKTHfl4n79R6GIWjDLt3b4Ht80H8sOxA73gJ4Wrjf0vIKxZ3L
+	 Lhmoc5g/YuZ9IN3Sf9Tc7KbXxwDKYV4Je9CTqqkobQRuUSJ+tPWCjeaIz4r+4Tm4Sv
+	 NDcHGzt+MLW6DaX+yTMD2gYVwxupr6ehm+1rGnkS35Rg93Z7LQx/QRZzgp60QAbB8O
+	 4JzO4ZeAwHIKX8aDdd01EA45ruRnxDxTHls42NdGQ3UGTrsTnl5xwgg51pa7xQfS8i
+	 YfTljyD/Uyjew==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C15383BF5B;
+	Thu, 21 Aug 2025 17:20:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] netfilter: nf_reject: don't leak dst refcount for
+ loopback packets
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175579680600.1120781.8221767043922846856.git-patchwork-notify@kernel.org>
+Date: Thu, 21 Aug 2025 17:20:06 +0000
+References: <20250820123707.10671-1-fw@strlen.de>
+In-Reply-To: <20250820123707.10671-1-fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
+ pablo@netfilter.org
 
-On Thu, 21 Aug 2025 21:15:08 +0000 Bhargava Marreddy wrote:
-> This patch series adds the infrastructure to make the netdevice
-> functional. It allocates data structures for core resources,
-> followed by their initialisation and registration with the firmware.
-> The core resources include the RX, TX, AGG, CMPL, and NQ rings,
-> as well as the VNIC. RX/TX functionality will be introduced in the
-> next patch series to keep this one at a reviewable size.
+Hello:
 
-Please make sure the timezone on your system is correct.
-You sent these 8 hours in the future..
-No need to repost (I think, we'll see if CI is okay).
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 20 Aug 2025 14:37:07 +0200 you wrote:
+> recent patches to add a WARN() when replacing skb dst entry found an
+> old bug:
+> 
+> WARNING: include/linux/skbuff.h:1165 skb_dst_check_unset include/linux/skbuff.h:1164 [inline]
+> WARNING: include/linux/skbuff.h:1165 skb_dst_set include/linux/skbuff.h:1210 [inline]
+> WARNING: include/linux/skbuff.h:1165 nf_reject_fill_skb_dst+0x2a4/0x330 net/ipv4/netfilter/nf_reject_ipv4.c:234
+> [..]
+> Call Trace:
+>  nf_send_unreach+0x17b/0x6e0 net/ipv4/netfilter/nf_reject_ipv4.c:325
+>  nft_reject_inet_eval+0x4bc/0x690 net/netfilter/nft_reject_inet.c:27
+>  expr_call_ops_eval net/netfilter/nf_tables_core.c:237 [inline]
+>  ..
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] netfilter: nf_reject: don't leak dst refcount for loopback packets
+    https://git.kernel.org/netdev/net/c/91a79b792204
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
