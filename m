@@ -1,197 +1,343 @@
-Return-Path: <netdev+bounces-215622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57991B2F97D
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 15:08:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FE67B2F98C
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 15:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 855A41C26C89
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 13:01:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DB703BEFC1
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 13:02:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 067B9322548;
-	Thu, 21 Aug 2025 13:00:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 633A82F658B;
+	Thu, 21 Aug 2025 13:02:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="lvbHXQzS"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ZzjRLAxM"
 X-Original-To: netdev@vger.kernel.org
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71CED31B125;
-	Thu, 21 Aug 2025 13:00:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B0AE1F4CAC
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 13:02:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755781258; cv=none; b=LKHWie91visRyPu93830dquDoBuYOUbf10RM1DenSLh5CBYYbma7QIffOpdIDrJ5vz44RldXMhEuNKt70QsYBXj1HqYzV/jj4xTULvfAV4evAKI3M6m+g6nKi2ChQBYk2NVJ7DDA2/y46Kvma8yYwQ6tF0xkzfE7Albk84UXBBI=
+	t=1755781363; cv=none; b=bIzyItR+9FsmVBqDmgwyj49iHrfOYL7cFb6a5cdKZQ2Ph3aSjsko34dmB8PgyQKCKHknB1JVNBY9I/h0jECdmTTQh7VBNfTlVmh3XedDvLPfYMM9KEULVrN8kAwigTeEVoH8r4ZLSPzWGB1efSxIZiNpK/hTupnZ3mZemAJ/Kv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755781258; c=relaxed/simple;
-	bh=9ba2oWdy2gFANZnPfwMrc2CW+QoDwkc3CcxG+upH78c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IL86YCO8fe1dKAzwou/peOGW5UYvuvXB1jF9An6nBvWnKHcnlOioNLL9TEwKmQloi8x0qHrAQA0hEHo+uHAmG3va3gQh80WUvJ+WqdicnVuIjF2ziQ+CNnSBIfPTr77hgRDuNLvMKnVMihc9/6ZcKTV31ytWHrkGykroQSyPwPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=lvbHXQzS; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:In-Reply-To:
-	References; bh=7avwWKz/EvLYc1vieGzvYJzHL8jXYfFoIMoY/fbsTGs=; t=1755781256;
-	x=1756213256; b=lvbHXQzSFthjwJ1cPKeLQxfYSWhS+n2PArM+gnLsEmjkNkQnRK7qSH1NGIeSe
-	9S6WP1ce5tHYxbqz9K2jUEOSKgZCzXHe6fyJOMweH3/VV8gVa1mzwTpp0jqo5g2dT7/mIDP7Sig0N
-	U3YX/2npr2S1b4I8tSPbNKIrEMgq+J/meA0HtWr0EhL26w2xbfmByOs+MI25YEMRXZRj3m8ECyPrF
-	cCsH7U2/+rVTxA+SPMb1uwPrXOclWHNLIu/xQ5qL38i15Jmq8FUwgk6jkPQwhLFDdOJX3VpIkKKeJ
-	p33Vg0X2lR9LfPeZQkFpJ0H1OpHjWYE7mWl/+wb57Y1JWoloJA==;
-Received: from [2a02:8108:8984:1d00:a0cf:1912:4be:477f]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128)
-	id 1up4uR-009Md5-1Z;
-	Thu, 21 Aug 2025 15:00:51 +0200
-Message-ID: <ddbf8e90-3fbb-4747-8e45-c931a0f02935@leemhuis.info>
-Date: Thu, 21 Aug 2025 15:00:50 +0200
+	s=arc-20240116; t=1755781363; c=relaxed/simple;
+	bh=o9GIdngTZG6TIypmL0koGguV8hYImyIZv2DbnZLc3TY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=acL4kbajt3Zkc+uxLbGhxjiW/CIe/kRiW+5kL6NknJyplVFFNlwp4aq313cbC7b0rR4rUMtBaukIo2qJEjgoHsps/Jv2GWF+qHvPwzvBHrjNKd3dAvtdmlEvZ/RiriDyXRbzTBDmArRUCopNVmh6vJcp+joc2L9UhZ8EerIWhlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ZzjRLAxM; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57LA0OBG007842;
+	Thu, 21 Aug 2025 13:02:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pp1; bh=zB5TEyFM+OyejbgaLfoSEmEPK4yT
+	tbaBr+wHS0/rkho=; b=ZzjRLAxMQG3U3dNb2rlMy/N0AodccNQ4WZKyuA3sMqMu
+	nTzug2KuoT+02MVEFeSRXpNTYl8h7+77oQyXaxOX/mnHxwt8NxUzGvrspueVUx6d
+	fzDcI/75gt/siM0A4hWyFiv2QT7lj3giVgPKdlIhZxiaU/i2HgR7uQ+hLKbKoGrI
+	Qzna32yvMhpV12FNevcWbBfdbUIiZqzP6emKrsiPKfqTWubP06+9vpgOqD1gUnDF
+	eGPgy60F77MnrzXwAlmtwNrmC4HKsDwNOwIQvC7pwQdaZl+FQf0lEcw/3tBV3zCn
+	4W22rtWRpfjKjqpAmOwLGEUQbmUY0Tk4khx1ogu0ng==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48n38w0mr1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 Aug 2025 13:02:24 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 57LCvI0P009192;
+	Thu, 21 Aug 2025 13:02:23 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48n38w0mqu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 Aug 2025 13:02:23 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57LB15jI016038;
+	Thu, 21 Aug 2025 13:02:23 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 48my428c64-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 Aug 2025 13:02:23 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57LD2Cub7340656
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 21 Aug 2025 13:02:13 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 06C0258063;
+	Thu, 21 Aug 2025 13:02:21 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2126658059;
+	Thu, 21 Aug 2025 13:02:20 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.61.242.172])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 21 Aug 2025 13:02:20 +0000 (GMT)
+From: Mingming Cao <mmc@linux.ibm.com>
+To: netdev@vger.kernel.org
+Cc: horms@kernel.org, bjking1@linux.ibm.com, haren@linux.ibm.com,
+        ricklind@linux.ibm.com, mmc@linux.ibm.com, kuba@kernel.org,
+        edumazet@google.com, pabeni@redhat.com, linuxppc-dev@lists.ozlabs.org,
+        maddy@linux.ibm.com, mpe@ellerman.id.au
+Subject: [PATCH net-next RESEND v4] ibmvnic: Increase max subcrq indirect entries with fallback
+Date: Thu, 21 Aug 2025 06:02:15 -0700
+Message-Id: <20250821130215.97960-1-mmc@linux.ibm.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v20 3/5] binder: introduce transaction reports via netlink
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Carlos Llamas <cmllamas@google.com>
-Cc: Li Li <dualli@google.com>, Tiffany Yang <ynaffit@google.com>,
- John Stultz <jstultz@google.com>, Shai Barack <shayba@google.com>,
- =?UTF-8?Q?Thi=C3=A9baud_Weksteen?= <tweek@google.com>,
- kernel-team@android.com, linux-kernel@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>,
- Joel Fernandes <joelagnelf@nvidia.com>, Todd Kjos <tkjos@android.com>,
- =?UTF-8?Q?Arve_Hj=C3=B8nnev=C3=A5g?= <arve@android.com>,
- Donald Hunter <donald.hunter@gmail.com>,
- Christian Brauner <brauner@kernel.org>, Eric Dumazet <edumazet@google.com>,
- "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
- Martijn Coenen <maco@android.com>, Stephen Rothwell <sfr@canb.auug.org.au>,
- Linux Next Mailing List <linux-next@vger.kernel.org>,
- Jakub Kicinski <kuba@kernel.org>,
- Linux kernel regressions list <regressions@lists.linux.dev>,
- Alice Ryhl <aliceryhl@google.com>, Suren Baghdasaryan <surenb@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-References: <20250727182932.2499194-1-cmllamas@google.com>
- <20250727182932.2499194-4-cmllamas@google.com>
- <e21744a4-0155-40ec-b8c1-d81b14107c9f@leemhuis.info>
- <2025082145-crabmeat-ounce-e71f@gregkh>
-From: Thorsten Leemhuis <linux@leemhuis.info>
-Content-Language: de-DE, en-US
-Autocrypt: addr=linux@leemhuis.info; keydata=
- xsFNBFJ4AQ0BEADCz16x4kl/YGBegAsYXJMjFRi3QOr2YMmcNuu1fdsi3XnM+xMRaukWby47
- JcsZYLDKRHTQ/Lalw9L1HI3NRwK+9ayjg31wFdekgsuPbu4x5RGDIfyNpd378Upa8SUmvHik
- apCnzsxPTEE4Z2KUxBIwTvg+snEjgZ03EIQEi5cKmnlaUynNqv3xaGstx5jMCEnR2X54rH8j
- QPvo2l5/79Po58f6DhxV2RrOrOjQIQcPZ6kUqwLi6EQOi92NS9Uy6jbZcrMqPIRqJZ/tTKIR
- OLWsEjNrc3PMcve+NmORiEgLFclN8kHbPl1tLo4M5jN9xmsa0OZv3M0katqW8kC1hzR7mhz+
- Rv4MgnbkPDDO086HjQBlS6Zzo49fQB2JErs5nZ0mwkqlETu6emhxneAMcc67+ZtTeUj54K2y
- Iu8kk6ghaUAfgMqkdIzeSfhO8eURMhvwzSpsqhUs7pIj4u0TPN8OFAvxE/3adoUwMaB+/plk
- sNe9RsHHPV+7LGADZ6OzOWWftk34QLTVTcz02bGyxLNIkhY+vIJpZWX9UrfGdHSiyYThHCIy
- /dLz95b9EG+1tbCIyNynr9TjIOmtLOk7ssB3kL3XQGgmdQ+rJ3zckJUQapLKP2YfBi+8P1iP
- rKkYtbWk0u/FmCbxcBA31KqXQZoR4cd1PJ1PDCe7/DxeoYMVuwARAQABzSdUaG9yc3RlbiBM
- ZWVtaHVpcyA8bGludXhAbGVlbWh1aXMuaW5mbz7CwZQEEwEKAD4CGwMFCwkIBwMFFQoJCAsF
- FgIDAQACHgECF4AWIQSoq8a+lZZX4oPULXVytubvTFg9LQUCX31PIwUJFmtPkwAKCRBytubv
- TFg9LWsyD/4t3g4i2YVp8RoKAcOut0AZ7/uLSqlm8Jcbb+LeeuzjY9T3mQ4ZX8cybc1jRlsL
- JMYL8GD3a53/+bXCDdk2HhQKUwBJ9PUDbfWa2E/pnqeJeX6naLn1LtMJ78G9gPeG81dX5Yq+
- g/2bLXyWefpejlaefaM0GviCt00kG4R/mJJpHPKIPxPbOPY2REzWPoHXJpi7vTOA2R8HrFg/
- QJbnA25W55DzoxlRb/nGZYG4iQ+2Eplkweq3s3tN88MxzNpsxZp475RmzgcmQpUtKND7Pw+8
- zTDPmEzkHcUChMEmrhgWc2OCuAu3/ezsw7RnWV0k9Pl5AGROaDqvARUtopQ3yEDAdV6eil2z
- TvbrokZQca2808v2rYO3TtvtRMtmW/M/yyR233G/JSNos4lODkCwd16GKjERYj+sJsW4/hoZ
- RQiJQBxjnYr+p26JEvghLE1BMnTK24i88Oo8v+AngR6JBxwH7wFuEIIuLCB9Aagb+TKsf+0c
- HbQaHZj+wSY5FwgKi6psJxvMxpRpLqPsgl+awFPHARktdPtMzSa+kWMhXC4rJahBC5eEjNmP
- i23DaFWm8BE9LNjdG8Yl5hl7Zx0mwtnQas7+z6XymGuhNXCOevXVEqm1E42fptYMNiANmrpA
- OKRF+BHOreakveezlpOz8OtUhsew9b/BsAHXBCEEOuuUg87BTQRSeAENARAAzu/3satWzly6
- +Lqi5dTFS9+hKvFMtdRb/vW4o9CQsMqL2BJGoE4uXvy3cancvcyodzTXCUxbesNP779JqeHy
- s7WkF2mtLVX2lnyXSUBm/ONwasuK7KLz8qusseUssvjJPDdw8mRLAWvjcsYsZ0qgIU6kBbvY
- ckUWkbJj/0kuQCmmulRMcaQRrRYrk7ZdUOjaYmjKR+UJHljxLgeregyiXulRJxCphP5migoy
- ioa1eset8iF9fhb+YWY16X1I3TnucVCiXixzxwn3uwiVGg28n+vdfZ5lackCOj6iK4+lfzld
- z4NfIXK+8/R1wD9yOj1rr3OsjDqOaugoMxgEFOiwhQDiJlRKVaDbfmC1G5N1YfQIn90znEYc
- M7+Sp8Rc5RUgN5yfuwyicifIJQCtiWgjF8ttcIEuKg0TmGb6HQHAtGaBXKyXGQulD1CmBHIW
- zg7bGge5R66hdbq1BiMX5Qdk/o3Sr2OLCrxWhqMdreJFLzboEc0S13BCxVglnPqdv5sd7veb
- 0az5LGS6zyVTdTbuPUu4C1ZbstPbuCBwSwe3ERpvpmdIzHtIK4G9iGIR3Seo0oWOzQvkFn8m
- 2k6H2/Delz9IcHEefSe5u0GjIA18bZEt7R2k8CMZ84vpyWOchgwXK2DNXAOzq4zwV8W4TiYi
- FiIVXfSj185vCpuE7j0ugp0AEQEAAcLBfAQYAQoAJgIbDBYhBKirxr6Vllfig9QtdXK25u9M
- WD0tBQJffU8wBQkWa0+jAAoJEHK25u9MWD0tv+0P/A47x8r+hekpuF2KvPpGi3M6rFpdPfeO
- RpIGkjQWk5M+oF0YH3vtb0+92J7LKfJwv7GIy2PZO2svVnIeCOvXzEM/7G1n5zmNMYGZkSyf
- x9dnNCjNl10CmuTYud7zsd3cXDku0T+Ow5Dhnk6l4bbJSYzFEbz3B8zMZGrs9EhqNzTLTZ8S
- Mznmtkxcbb3f/o5SW9NhH60mQ23bB3bBbX1wUQAmMjaDQ/Nt5oHWHN0/6wLyF4lStBGCKN9a
- TLp6E3100BuTCUCrQf9F3kB7BC92VHvobqYmvLTCTcbxFS4JNuT+ZyV+xR5JiV+2g2HwhxWW
- uC88BtriqL4atyvtuybQT+56IiiU2gszQ+oxR/1Aq+VZHdUeC6lijFiQblqV6EjenJu+pR9A
- 7EElGPPmYdO1WQbBrmuOrFuO6wQrbo0TbUiaxYWyoM9cA7v7eFyaxgwXBSWKbo/bcAAViqLW
- ysaCIZqWxrlhHWWmJMvowVMkB92uPVkxs5IMhSxHS4c2PfZ6D5kvrs3URvIc6zyOrgIaHNzR
- 8AF4PXWPAuZu1oaG/XKwzMqN/Y/AoxWrCFZNHE27E1RrMhDgmyzIzWQTffJsVPDMQqDfLBhV
- ic3b8Yec+Kn+ExIF5IuLfHkUgIUs83kDGGbV+wM8NtlGmCXmatyavUwNCXMsuI24HPl7gV2h n7RI
-In-Reply-To: <2025082145-crabmeat-ounce-e71f@gregkh>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;linux@leemhuis.info;1755781256;d8b16d85;
-X-HE-SMSGID: 1up4uR-009Md5-1Z
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: SCxp0sXttnbnYNYDHIZrAd-i1s84TnVH
+X-Proofpoint-GUID: H5gKCtC4hs_0EIDyxszbSKVpYQqDL15Z
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODE5MDIyMiBTYWx0ZWRfXwVKzehM2lcZK
+ DvEUwc2vMSk1mAeuX/JTKh89M2NaeqORKHiknzIdo0y/XQck8v3ZxemVry7MjWJ1NLVDVrQ/csk
+ UiYuRk+uHvo/6inlyPFmESWh5NYesvzfPhUdp0HmvvvGv+bh4d1ffTAFJm7g8ztythjMPTxfXjW
+ Lnp3hAUjUUDd5QxuqhLrQPYrqW24qxD9ssNvMFF8fTtImNdselCsyrJs4CZ865g5T1BoDkm3M/f
+ KCArOHr5LqppddaNwwse/5o9wDJ9ajsbHoS7uUZivH/MElEC8jhrmvXE0eV4C7BEs+c9IEW5TGv
+ GtefLe4SrG0X2283iTXryuwVCr1OSiC2ri46X2kZ3Ic47WZJs4nG8/kU+5gs9jinFhQ6dAP0Dwp
+ 7ASBBTIsj9QVjQO4EWrmkJ/GR7T2+A==
+X-Authority-Analysis: v=2.4 cv=a9dpNUSF c=1 sm=1 tr=0 ts=68a718e0 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=OLL_FvSJAAAA:8 a=VnNF1IyMAAAA:8
+ a=VwQbUJbxAAAA:8 a=w0uWSLrWK22mGSI73woA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=sBcVD6HgrJwA:10 a=S0tEaOFY4U4A:10 a=om6-3txeEIcA:10 a=0HqUTnTcdJQA:10
+ a=oIrB72frpwYPwTMnlWqB:22 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-21_03,2025-08-20_03,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 spamscore=0 suspectscore=0 adultscore=0 impostorscore=0
+ malwarescore=0 bulkscore=0 priorityscore=1501 clxscore=1015 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2508110000 definitions=main-2508190222
 
-On 21.08.25 14:19, Greg Kroah-Hartman wrote:
-> On Thu, Aug 21, 2025 at 10:49:09AM +0200, Thorsten Leemhuis wrote:
->> On 27.07.25 20:29, Carlos Llamas wrote:
->>> From: Li Li <dualli@google.com>
->>>
->>> Introduce a generic netlink multicast event to report binder transaction
->>> failures to userspace. This allows subscribers to monitor these events
->>> and take appropriate actions, such as stopping a misbehaving application
->>> that is spamming a service with huge amount of transactions.
->>>
->>> The multicast event contains full details of the failed transactions,
->>> including the sender/target PIDs, payload size and specific error code.
->>> This interface is defined using a YAML spec, from which the UAPI and
->>> kernel headers and source are auto-generated.
->>
->> It seems to me like this patch (which showed up in -next today after
->> Greg merged it) caused a build error for me in my daily -next builds
->> for Fedora when building tools/net/ynl:
->>
->> """
->> make[1]: Entering directory '/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/lib'
->> gcc -std=gnu11 -O2 -W -Wall -Wextra -Wno-unused-parameter -Wshadow   -c -MMD -c -o ynl.o ynl.c
->>         AR ynl.a
->> make[1]: Leaving directory '/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/lib'
->> make[1]: Entering directory '/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/generated'
->>         GEN binder-user.c
->> Traceback (most recent call last):
->>   File "/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/generated/../pyynl/ynl_gen_c.py", line 3673, in <module>
->>     main()
->>     ~~~~^^
->>   File "/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/generated/../pyynl/ynl_gen_c.py", line 3382, in main
->>     parsed = Family(args.spec, exclude_ops)
->>   File "/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/generated/../pyynl/ynl_gen_c.py", line 1205, in __init__
->>     super().__init__(file_name, exclude_ops=exclude_ops)
->>     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->>   File "/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/pyynl/lib/nlspec.py", line 462, in __init__
->>     jsonschema.validate(self.yaml, schema)
->>     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
->>   File "/usr/lib/python3.13/site-packages/jsonschema/validators.py", line 1307, in validate
->>     raise error
->> jsonschema.exceptions.ValidationError: 'from_pid' does not match '^[0-9a-z-]+$'
->>
->> Failed validating 'pattern' in schema['properties']['attribute-sets']['items']['properties']['attributes']['items']['properties']['name']:
->>     {'pattern': '^[0-9a-z-]+$', 'type': 'string'}
->>
->> On instance['attribute-sets'][0]['attributes'][2]['name']:
->>     'from_pid'
->> make[1]: *** [Makefile:48: binder-user.c] Error 1
->> make[1]: Leaving directory '/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/generated'
->> make: *** [Makefile:25: generated] Error 2
->> """
-> 
-> Odd, this works for me.
+POWER8 support a maximum of 16 subcrq indirect descriptor entries per
+ H_SEND_SUB_CRQ_INDIRECT call, while POWER9 and newer hypervisors
+ support up to 128 entries. Increasing the max number of indirect
+descriptor entries improves batching efficiency and reduces
+hcall overhead, which enhances throughput under large workload on POWER9+.
 
-Hmmm, happened on various Fedora releases and archs in Fedora's coprs
-buildsys for me today. And with a local Fedora 41 x86_64 install, too;
-in the latter case (just verified) both when checking out next-20250821
-and 63740349eba78f ("binder: introduce transaction reports via netlink")
-from -next.
+Currently, ibmvnic driver always uses a fixed number of max indirect
+descriptor entries (16). send_subcrq_indirect() treats all hypervisor
+errors the same:
+ - Cleanup and Drop the entire batch of descriptors.
+ - Return an error to the caller.
+ - Rely on TCP/IP retransmissions to recover.
+ - If the hypervisor returns H_PARAMETER (e.g., because 128
+   entries are not supported on POWER8), the driver will continue
+   to drop batches, resulting in unnecessary packet loss.
 
-> How exactly are you building this?
+In this patch:
+Raise the default maximum indirect entries to 128 to improve ibmvnic
+batching on morden platform. But also gracefully fall back to
+16 entries for Power 8 systems.
 
-Just "cd tools/net/ynl; make".
+Since there is no VIO interface to query the hypervisor’s supported
+limit, vnic handles send_subcrq_indirect() H_PARAMETER errors:
+ - On first H_PARAMETER failure, log the failure context
+ - Reduce max_indirect_entries to 16 and allow the single batch to drop.
+ - Subsequent calls automatically use the correct lower limit,
+    avoiding repeated drops.
 
-Ciao, Thorsten
+The goal is to  optimizes performance on modern systems while handles
+falling back for older POWER8 hypervisors.
+
+Performance shows 40% improvements with MTU (1500) on largework load.
+
+Signed-off-by: Mingming Cao <mmc@linux.ibm.com>
+Reviewed-by: Brian King <bjking1@linux.ibm.com>
+Reviewed-by: Haren Myneni <haren@linux.ibm.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+--------------------------------------
+Changes since v3:
+Link to v3: https://www.spinics.net/lists/netdev/msg1112828.html
+- consolidate H_PARAMTER handling & subcrq ind desc limit reset for RX/TX
+  into a helper function
+- Cleanup and clarify comments in post migration case
+- Renamed the limits to be a clear and simple name
+
+Changes since v2:
+link to v2: https://www.spinics.net/lists/netdev/msg1104669.html
+
+-- was Patch 4 from a patch series v2. v2 introduced a module parameter
+for backward compatibility. Based on review feedback, This patch handles
+older systems fall back case without adding a module parameter.
+---
+ drivers/net/ethernet/ibm/ibmvnic.c | 59 ++++++++++++++++++++++++++----
+ drivers/net/ethernet/ibm/ibmvnic.h |  6 ++-
+ 2 files changed, 56 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
+index eec971567aac..3808148c1fc7 100644
+--- a/drivers/net/ethernet/ibm/ibmvnic.c
++++ b/drivers/net/ethernet/ibm/ibmvnic.c
+@@ -756,6 +756,17 @@ static void deactivate_rx_pools(struct ibmvnic_adapter *adapter)
+ 		adapter->rx_pool[i].active = 0;
+ }
+ 
++static void ibmvnic_set_safe_max_ind_descs(struct ibmvnic_adapter *adapter)
++{
++	if (adapter->cur_max_ind_descs > IBMVNIC_SAFE_IND_DESC) {
++		netdev_info(adapter->netdev,
++			    "set max ind descs from %u to safe limit %u\n",
++			    adapter->cur_max_ind_descs,
++			    IBMVNIC_SAFE_IND_DESC);
++		adapter->cur_max_ind_descs = IBMVNIC_SAFE_IND_DESC;
++	}
++}
++
+ static void replenish_rx_pool(struct ibmvnic_adapter *adapter,
+ 			      struct ibmvnic_rx_pool *pool)
+ {
+@@ -843,7 +854,7 @@ static void replenish_rx_pool(struct ibmvnic_adapter *adapter,
+ 		sub_crq->rx_add.len = cpu_to_be32(pool->buff_size << shift);
+ 
+ 		/* if send_subcrq_indirect queue is full, flush to VIOS */
+-		if (ind_bufp->index == IBMVNIC_MAX_IND_DESCS ||
++		if (ind_bufp->index == adapter->cur_max_ind_descs ||
+ 		    i == count - 1) {
+ 			lpar_rc =
+ 				send_subcrq_indirect(adapter, handle,
+@@ -862,6 +873,14 @@ static void replenish_rx_pool(struct ibmvnic_adapter *adapter,
+ failure:
+ 	if (lpar_rc != H_PARAMETER && lpar_rc != H_CLOSED)
+ 		dev_err_ratelimited(dev, "rx: replenish packet buffer failed\n");
++
++	/* Detect platform limit H_PARAMETER */
++	if (lpar_rc == H_PARAMETER)
++		ibmvnic_set_safe_max_ind_descs(adapter);
++
++	/* For all error case, temporarily drop only this batch
++	 * Rely on TCP/IP retransmissions to retry and recover
++	 */
+ 	for (i = ind_bufp->index - 1; i >= 0; --i) {
+ 		struct ibmvnic_rx_buff *rx_buff;
+ 
+@@ -2381,16 +2400,28 @@ static int ibmvnic_tx_scrq_flush(struct ibmvnic_adapter *adapter,
+ 		rc = send_subcrq_direct(adapter, handle,
+ 					(u64 *)ind_bufp->indir_arr);
+ 
+-	if (rc)
++	if (rc) {
++		dev_err_ratelimited(&adapter->vdev->dev,
++				    "tx_flush failed, rc=%u (%llu entries dma=%pad handle=%llx)\n",
++				    rc, entries, &dma_addr, handle);
++		/* Detect platform limit H_PARAMETER */
++		if (rc == H_PARAMETER)
++			ibmvnic_set_safe_max_ind_descs(adapter);
++
++		/* For all error case, temporarily drop only this batch
++		 * Rely on TCP/IP retransmissions to retry and recover
++		 */
+ 		ibmvnic_tx_scrq_clean_buffer(adapter, tx_scrq);
+-	else
++	} else {
+ 		ind_bufp->index = 0;
++	}
+ 	return rc;
+ }
+ 
+ static netdev_tx_t ibmvnic_xmit(struct sk_buff *skb, struct net_device *netdev)
+ {
+ 	struct ibmvnic_adapter *adapter = netdev_priv(netdev);
++	u32 cur_max_ind_descs = adapter->cur_max_ind_descs;
+ 	int queue_num = skb_get_queue_mapping(skb);
+ 	u8 *hdrs = (u8 *)&adapter->tx_rx_desc_req;
+ 	struct device *dev = &adapter->vdev->dev;
+@@ -2590,7 +2621,7 @@ static netdev_tx_t ibmvnic_xmit(struct sk_buff *skb, struct net_device *netdev)
+ 	tx_crq.v1.n_crq_elem = num_entries;
+ 	tx_buff->num_entries = num_entries;
+ 	/* flush buffer if current entry can not fit */
+-	if (num_entries + ind_bufp->index > IBMVNIC_MAX_IND_DESCS) {
++	if (num_entries + ind_bufp->index > cur_max_ind_descs) {
+ 		lpar_rc = ibmvnic_tx_scrq_flush(adapter, tx_scrq, true);
+ 		if (lpar_rc != H_SUCCESS)
+ 			goto tx_flush_err;
+@@ -2603,7 +2634,7 @@ static netdev_tx_t ibmvnic_xmit(struct sk_buff *skb, struct net_device *netdev)
+ 	ind_bufp->index += num_entries;
+ 	if (__netdev_tx_sent_queue(txq, skb->len,
+ 				   netdev_xmit_more() &&
+-				   ind_bufp->index < IBMVNIC_MAX_IND_DESCS)) {
++				   ind_bufp->index < cur_max_ind_descs)) {
+ 		lpar_rc = ibmvnic_tx_scrq_flush(adapter, tx_scrq, true);
+ 		if (lpar_rc != H_SUCCESS)
+ 			goto tx_err;
+@@ -4006,7 +4037,7 @@ static void release_sub_crq_queue(struct ibmvnic_adapter *adapter,
+ 	}
+ 
+ 	dma_free_coherent(dev,
+-			  IBMVNIC_IND_ARR_SZ,
++			  IBMVNIC_IND_MAX_ARR_SZ,
+ 			  scrq->ind_buf.indir_arr,
+ 			  scrq->ind_buf.indir_dma);
+ 
+@@ -4063,7 +4094,7 @@ static struct ibmvnic_sub_crq_queue *init_sub_crq_queue(struct ibmvnic_adapter
+ 
+ 	scrq->ind_buf.indir_arr =
+ 		dma_alloc_coherent(dev,
+-				   IBMVNIC_IND_ARR_SZ,
++				   IBMVNIC_IND_MAX_ARR_SZ,
+ 				   &scrq->ind_buf.indir_dma,
+ 				   GFP_KERNEL);
+ 
+@@ -6369,6 +6400,19 @@ static int ibmvnic_reset_init(struct ibmvnic_adapter *adapter, bool reset)
+ 			rc = reset_sub_crq_queues(adapter);
+ 		}
+ 	} else {
++		if (adapter->reset_reason == VNIC_RESET_MOBILITY) {
++			/* After an LPM, reset the max number of indirect
++			 * subcrq descriptors per H_SEND_SUB_CRQ_INDIRECT
++			 * hcall to the default max (e.g POWER8 -> POWER10)
++			 *
++			 * If the new destination platform does not support
++			 * the higher limit max (e.g. POWER10-> POWER8 LPM)
++			 * H_PARAMETER will trigger automatic fallback to the
++			 * safe minimum limit.
++			 */
++			adapter->cur_max_ind_descs = IBMVNIC_MAX_IND_DESCS;
++		}
++
+ 		rc = init_sub_crqs(adapter);
+ 	}
+ 
+@@ -6520,6 +6564,7 @@ static int ibmvnic_probe(struct vio_dev *dev, const struct vio_device_id *id)
+ 
+ 	adapter->wait_for_reset = false;
+ 	adapter->last_reset_time = jiffies;
++	adapter->cur_max_ind_descs = IBMVNIC_MAX_IND_DESCS;
+ 
+ 	rc = register_netdev(netdev);
+ 	if (rc) {
+diff --git a/drivers/net/ethernet/ibm/ibmvnic.h b/drivers/net/ethernet/ibm/ibmvnic.h
+index 246ddce753f9..480dc587078f 100644
+--- a/drivers/net/ethernet/ibm/ibmvnic.h
++++ b/drivers/net/ethernet/ibm/ibmvnic.h
+@@ -29,8 +29,9 @@
+ #define IBMVNIC_BUFFS_PER_POOL	100
+ #define IBMVNIC_MAX_QUEUES	16
+ #define IBMVNIC_MAX_QUEUE_SZ   4096
+-#define IBMVNIC_MAX_IND_DESCS  16
+-#define IBMVNIC_IND_ARR_SZ	(IBMVNIC_MAX_IND_DESCS * 32)
++#define IBMVNIC_MAX_IND_DESCS 128
++#define IBMVNIC_SAFE_IND_DESC 16
++#define IBMVNIC_IND_MAX_ARR_SZ (IBMVNIC_MAX_IND_DESCS * 32)
+ 
+ #define IBMVNIC_TSO_BUF_SZ	65536
+ #define IBMVNIC_TSO_BUFS	64
+@@ -930,6 +931,7 @@ struct ibmvnic_adapter {
+ 	struct ibmvnic_control_ip_offload_buffer ip_offload_ctrl;
+ 	dma_addr_t ip_offload_ctrl_tok;
+ 	u32 msg_enable;
++	u32 cur_max_ind_descs;
+ 
+ 	/* Vital Product Data (VPD) */
+ 	struct ibmvnic_vpd *vpd;
+-- 
+2.39.3 (Apple Git-146)
+
 
