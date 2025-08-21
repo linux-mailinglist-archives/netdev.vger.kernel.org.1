@@ -1,112 +1,160 @@
-Return-Path: <netdev+bounces-215432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53848B2EAC1
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 03:37:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E9CBB2EAD2
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 03:39:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 304DA5C75F5
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 01:37:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E6FB07B00F9
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 01:38:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A703E242D9E;
-	Thu, 21 Aug 2025 01:37:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 027D1245008;
+	Thu, 21 Aug 2025 01:39:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S112F9kW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BCZUR5HI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f193.google.com (mail-yw1-f193.google.com [209.85.128.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 772B924167A;
-	Thu, 21 Aug 2025 01:37:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0313243951;
+	Thu, 21 Aug 2025 01:39:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755740233; cv=none; b=G3qXyZf1d5q10/PAhwzwpey7yX9vFZEOeqbPyYiuPS6kPFpXygFfGWXaI8IHjcMZU1ZL6IZsC03EiNA11szsIsp5evV46dX0KDz8HhJNTqR2R4b9Rw6vlqroUI0pqz8xazZyLSLptUgJixRXnAdngHogQ6WwNAcQWQ3U5/hY4p8=
+	t=1755740385; cv=none; b=j7UqI39MYdQU6yjNIINhYp3XsMjln8a1KgCj5Gj0I7tMIFIGe0dkjXv9IuHBrBbloms9J7uGB3aN9kSzP5pnydvZGlE5RThmqbtDH0BumZUxgbx22/pA0EY8jRKO5O6fXSvvXzghKmyk9qcMWQ+bUBoasFZQS3YrrdKX+4rBt9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755740233; c=relaxed/simple;
-	bh=N0XCA6eoElM2GHMVUFBlv8c3qmMMno3R+pQmAkikF+w=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Aeq7Af4F68eZjUfgvquLsksbd7rwguuMwjJ30WRx3zqIojPqt+jvmQ76Js0eTWMR4GWdy5rngeEaDbiiTtJ8c3hVX1ZkS/hjIacGfInnubX6IzoYlU/P4r7HNrVZlSVBBG5+ohX6DN1IdYAnNCfiet2JfJYTpUFevG2so4tziSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S112F9kW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83FC5C4CEE7;
-	Thu, 21 Aug 2025 01:37:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755740233;
-	bh=N0XCA6eoElM2GHMVUFBlv8c3qmMMno3R+pQmAkikF+w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=S112F9kWmHQjxzdAGtwDE/fZztkPFSeFLm1rc7m/vWoyfx0BeZRY8iFX/f3k5AA4r
-	 kDtWmqtoVZs7yyvBi+qvmaKcqqgXBCiRJespZJwQexiU+Tllp7NTUB6D1s8Xahp4Gt
-	 J4vM6TG6xeQMCKXWgHq+DFP1CpmeQ36+e3HCdXMUsEHI3ovALMFWZ2LiN360TtDZxs
-	 LIrBfycDQLW7OGoMhWBkePdPNcSDudGDIrylahQuFqxU5KMM3is2mvA1niFJMwVyR1
-	 2HRUvhkiOjz88HUFDrqtScrUWmF4DC4JOSeXdlARpe01kbV6gfInZcPIcvoI7MoHtD
-	 uleXau7kG14OQ==
-Date: Wed, 20 Aug 2025 18:37:11 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, Willem de
- Bruijn <willemb@google.com>, Paolo Abeni <pabeni@redhat.com>,
- andrew+netdev@lunn.ch, horms@kernel.org, davem@davemloft.net,
- sdf@fomichev.me, almasrymina@google.com, dw@davidwei.uk,
- michael.chan@broadcom.com, dtatulea@nvidia.com, ap420073@gmail.com,
- linux-kernel@vger.kernel.org, io-uring@vger.kernel.org
-Subject: Re: [PATCH net-next v3 00/23][pull request] Queue configs and large
- buffer providers
-Message-ID: <20250820183711.6586c1c6@kernel.org>
-In-Reply-To: <fb85866c-3890-41d2-9d5c-27549c4b7aa3@gmail.com>
-References: <cover.1755499375.git.asml.silence@gmail.com>
-	<20250819193126.2a4af62b@kernel.org>
-	<fb85866c-3890-41d2-9d5c-27549c4b7aa3@gmail.com>
+	s=arc-20240116; t=1755740385; c=relaxed/simple;
+	bh=kSDSfek91jsHl7FrJyM0gLyKBh6BqcNAxcjQLYi4lr0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZA/AC+x6guEFid1D11m1qv1HmxW0kEmxIRg4QJ42bhkQNjeYXzOM+Lz2pJena1a4ZP8JxYMWgQrPoa4MfMDqy32jdbn6IXSkDkrELNKrQ91bvpq611Q1yAUzavq8ZlS2KvvQoXmCkkHiGsHLKwVvZOaqKXO690fCnXwcrzhK8O8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BCZUR5HI; arc=none smtp.client-ip=209.85.128.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f193.google.com with SMTP id 00721157ae682-71d6083cc69so3920597b3.2;
+        Wed, 20 Aug 2025 18:39:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755740382; x=1756345182; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ebI6Za89uQY5Wc3NtaCHo2kvrIsvdUGpm5geS336IaY=;
+        b=BCZUR5HIRYVCwWBt+JlNeUoB4hkWonQUkO5ptgiQg5bhCAOg1naSBQdKj1JY7IbgZD
+         Er1oOBvai9Fcw0GUXHQIgkIzBUR9ZxIc1UmII8HmR2Was2vqgZm5CoPPIlPYac4VM8h5
+         0e//StOonDEIXR6Pt02ByixOOyuDWcf702XZYAkcdaJK/7FIXhhzhFDzMUL/o5Gbcdc4
+         dysTU6cxWxzi14Njkv2nQISo6x8VRFwMhfHGpxxh9k+vkEC+j0F/e2wd10UHBUBlhGKJ
+         m+PQplZe+t3XnSQOtQhUF6XY1f+3CeGoF9luPH13Sp2mnPg24lUEsbYP/KHbYDyqu56Z
+         W9Tg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755740382; x=1756345182;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ebI6Za89uQY5Wc3NtaCHo2kvrIsvdUGpm5geS336IaY=;
+        b=jswEQrZtfIyyYMZ9Pw+OWLJkspvzi0wIAdFJe/+2uFuP57QK+b2rZFyvMW+ENPqaki
+         9cYkAfuCMBH30z5un31/cspOjmOpy2QkpUjza6CsSk8C5sCGl3jf7vWY8Nf8XmMvrzLO
+         6cf10Joc0xSq2aN5j70rexr+2s+sf3XXm59UH4PXc98NOYDxWZYuM5Bf79YJH34Xq6IB
+         UosZu5L/61rnI/VluUy4Rt4ADw32f09Wf4JDiTqbdZw+CEd7WgT7e7g6x+1HblKsVrJ4
+         T8Kdf0gxrlQS+Z5d8awtZ7Q2N71fxE5dK8BAMnXpl4luHfDc9rOr6S7c53U1fG5Zf4Gy
+         tcKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVDRnl6HXAQ/98oWJKLp2ZIriKnGHr5TpKC/hvThyzVkI3WtjIjM/JVVSQnahTSgr/NCa+s2A3USLnd2i99AID5@vger.kernel.org, AJvYcCVUS6Cc3RCukXs5QkOEvpv2+PFW55tHFJosxbj1AJIFVo6LpHij+vMevITBpz1OrqnCvms=@vger.kernel.org, AJvYcCWgxi2CnkfdJIaXQaWVw0e1XO8sne9k5y2iCfmyGJWB7UV8nMewmLvqTgWXE52+d0yJ+v7GMqE1@vger.kernel.org, AJvYcCXkDODRKhK5C/ux2alzmC0Ai4TfTGM8uHy8q81Pl83+fG6E/SqqIIq6di1IZfQJyvrUQiEAUTmiU3S0WWOg@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHznvrgoA4Z+bA4YIUDDzmG+fppU+NE2vHexGAzVQHHuVNY+/r
+	3rkRxVsZ1aB+4ovyFwPSvDWIKI4tHAw8QK/T7MS2D0A7X79qtjIdUXy+od1hdiOQdxAX6RI4nN0
+	bJAr04NGJbyuwXzL+L1DGuedbzHBS7pQ=
+X-Gm-Gg: ASbGncuAgfoiPwosmez67whP3jRMq4OfsP2QTw0isQJq0E7V2jeKYHgyd18KY9pmpkv
+	maGtpiY3PZTth8X7ZvETUTtwkNFTevy5OeKxMSG/1OxQ48nK72LKRnQEYU8zeUd5BpmRWVXrR8A
+	JZeHEXw9tjGDD8xO817yovIR1lcnzRGA0T5TQAFQ2RZ3wsM7XKpf4QaNPJT75LFDlRNGz+uzeOk
+	JKl41DHQNU=
+X-Google-Smtp-Source: AGHT+IGfNVSG+YcsbP05U+7tIuANEtQ3x/KgCgdmjsd6mkdSCWkbsC/b2aHy2e+JJzoZ3OamVVaeaFd9iZgnbQ6z6cY=
+X-Received: by 2002:a05:690c:30d:b0:71b:9213:a75d with SMTP id
+ 00721157ae682-71fc8899224mr12037257b3.18.1755740382464; Wed, 20 Aug 2025
+ 18:39:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250819033956.59164-1-dongml2@chinatelecom.cn>
+ <20250819033956.59164-3-dongml2@chinatelecom.cn> <CAEf4BzZBztC69GFDuA4YJHPmWOXuq3+tSNMspPNA3tksGaEi=A@mail.gmail.com>
+In-Reply-To: <CAEf4BzZBztC69GFDuA4YJHPmWOXuq3+tSNMspPNA3tksGaEi=A@mail.gmail.com>
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Thu, 21 Aug 2025 09:39:31 +0800
+X-Gm-Features: Ac12FXzswgjQ95dJXpbKnIm6pNkHCGVkejzRiQftM1aigpT1SzLiC1ZO-IiEQUM
+Message-ID: <CADxym3bjmC3d1d3_CKd2DqFB4P_LYK_FwXUXFcKsYcJ6=smfAg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 2/3] selftests/bpf: skip recursive functions for kprobe_multi
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org, 
+	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, mykolal@fb.com, 
+	shuah@kernel.org, davem@davemloft.net, kuba@kernel.org, hawk@kernel.org, 
+	nathan@kernel.org, nick.desaulniers+lkml@gmail.com, morbo@google.com, 
+	justinstitt@google.com, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 20 Aug 2025 14:39:51 +0100 Pavel Begunkov wrote:
-> On 8/20/25 03:31, Jakub Kicinski wrote:
-> > On Mon, 18 Aug 2025 14:57:16 +0100 Pavel Begunkov wrote:  
-> >> Jakub Kicinski (20):  
-> > 
-> > I think we need to revisit how we operate.
-> > When we started the ZC work w/ io-uring I suggested a permanent shared
-> > branch. That's perhaps an overkill. What I did not expect is that you
-> > will not even CC netdev@ on changes to io_uring/zcrx.*
-> > 
-> > I don't mean to assert any sort of ownership of that code, but you're
-> > not meeting basic collaboration standards for the kernel. This needs
-> > to change first.  
-> 
-> You're throwing quite allegations. Basic collaboration standards don't
-> include spamming people with unrelated changes via an already busy list.
-> I cc'ed netdev on patches that meaningfully change how it interacts
-> (incl indirectly) with netdev and/or might be of interest, which is
-> beyond of the usual standard expected of a project using infrastructure
-> provided by a subsystem.
+On Thu, Aug 21, 2025 at 6:47=E2=80=AFAM Andrii Nakryiko
+<andrii.nakryiko@gmail.com> wrote:
+>
+> On Mon, Aug 18, 2025 at 8:40=E2=80=AFPM Menglong Dong <menglong8.dong@gma=
+il.com> wrote:
+> >
+> > Some functions is recursive for the kprobe_multi and impact the benchma=
+rk
+> > results. So just skip them.
+> >
+> > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+> > ---
+> >  tools/testing/selftests/bpf/trace_helpers.c | 16 ++++++++++++++++
+> >  1 file changed, 16 insertions(+)
+> >
+> > diff --git a/tools/testing/selftests/bpf/trace_helpers.c b/tools/testin=
+g/selftests/bpf/trace_helpers.c
+> > index d24baf244d1f..9da9da51b132 100644
+> > --- a/tools/testing/selftests/bpf/trace_helpers.c
+> > +++ b/tools/testing/selftests/bpf/trace_helpers.c
+> > @@ -559,6 +559,22 @@ static bool skip_entry(char *name)
+> >         if (!strncmp(name, "__ftrace_invalid_address__",
+> >                      sizeof("__ftrace_invalid_address__") - 1))
+> >                 return true;
+> > +
+> > +       if (!strcmp(name, "migrate_disable"))
+> > +               return true;
+> > +       if (!strcmp(name, "migrate_enable"))
+> > +               return true;
+> > +       if (!strcmp(name, "rcu_read_unlock_strict"))
+> > +               return true;
+> > +       if (!strcmp(name, "preempt_count_add"))
+> > +               return true;
+> > +       if (!strcmp(name, "preempt_count_sub"))
+> > +               return true;
+> > +       if (!strcmp(name, "__rcu_read_lock"))
+> > +               return true;
+> > +       if (!strcmp(name, "__rcu_read_unlock"))
+> > +               return true;
+> > +
+>
+> static const char *trace_blacklist[] =3D {
+>     "migrate_disable",
+>     "migrate_enable",
+>     ...
+> };
+>
+> it's not like it's one or two functions where copy-pasting strcmp might b=
+e fine
 
-To me iouring is a fancy syscall layer. It's good at its job, sure,
-but saying that netdev provides infrastructure to a syscall layer is
-laughable.
+OK!
 
-> There are pieces that don't touch netdev, like
-> how io_uring pins pages, accounts memory, sets up rings, etc. In the
-> very same way generic io_uring patches are not normally posted to
-> netdev, and netdev patches are not redirected to mm because there
-> are kmalloc calls, even though, it's not even the standard used here.
-
-I'm asking you to CC netdev, and people who work on ZC like Mina.
-Normal reaction to someone asking to be CCed on patches is "Sure."
-I don't understand what you're afraid of.
-
-> If you have some way you want to work, I'd appreciate a clear
-> indication of that, because that message you mentioned was answered
-> and I've never heard any objection, or anything else really.
-
-It honestly didn't cross my mind that you'd only CC netdev on patches
-which touch code under net/. I'd have let you know sooner but it's hard
-to reply to messages one doesn't see. I found out that there's whole
-bunch of ZC work that landed in iouring from talking to David Wei.
+>
+> pw-bot: cr
+>
+>
+> >         return false;
+> >  }
+> >
+> > --
+> > 2.50.1
+> >
 
