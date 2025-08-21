@@ -1,153 +1,103 @@
-Return-Path: <netdev+bounces-215471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF651B2EB83
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 04:57:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D314B2EB8B
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 04:59:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 784DE1715C0
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 02:56:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EFE55A62EF
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 02:58:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C14542D3EE6;
-	Thu, 21 Aug 2025 02:56:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66F4D2D3EEB;
+	Thu, 21 Aug 2025 02:58:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LYXHujI8"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="w4X7xw2L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4061B2D3A9B
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 02:56:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 733B32D3ED7;
+	Thu, 21 Aug 2025 02:58:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755744996; cv=none; b=BekdFrPaA8vkDvcEDuXcqGbvw6G31lKCr79jNFzFIZrY/fyW3I2x1U0s3mFIdJVdSBXdThX1xnhWcU3UpUYL3c2R7HW8H28ha/6R+nuwMuM0wrQnwcpkiOkRnCL6HLdR0lsBm+hzEMmbo5Qf7qX0V/UeVi5wGjPAQLXxIosjrX4=
+	t=1755745126; cv=none; b=IxIpD5sB8qXbXG555I8u6EPD3QkGAqEdlrbX86OlN4descerlC0AnF4YMWqB0PbgNGpRZOv/Wpa00JRFJNG1DTibjKkMF4gmgXMnK4YxK65qf7ej8eKUrcq20J0L1j+r6l4kxH53WkaCp/MYK53j4//nGC/MuvNzImf4doSwpig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755744996; c=relaxed/simple;
-	bh=balfMEORisG0GrrKqsodEt+jiqQAngx3v2OR69BFcPY=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=gcT8VRywGrQLXqWejtcvcjXV85HH+G/SN5TEbVYuYsGpBOPQ1bdjx4Je/dcHi0/UAXbbzXDO19o4icvTWxMt932qK2te86TZL9xqPhtR1GygRGh8pEVUKx/hMGbgUm9b5/4z1NW2dXUWPrdSn4s0BD1OLYunSlr7jULjOhuGajE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LYXHujI8; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-245fd2b644eso9816135ad.3
-        for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 19:56:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755744994; x=1756349794; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=XBaK+uDkb1FKWMnsKSy6ZhbJaoQabX0cbuYGiNdtzlM=;
-        b=LYXHujI87+IlJ7ShNwMEIaWA0S5GM6sbWmOZVMdNLwdd69wHTCNTDYaUfcZoYfG/+I
-         4NuAdvw1U7ajbcrTPlFmLJP++Vr5RSbJAxc1jE7sYLhEjy0ZrJW5eqysbKXCmmFbBFku
-         T3Xw6ZSgoyZeWIMONesdFamrUimkHv//Xy0agQSaEQWw5Dsr/BdV0C6DxJp/SABnQx7y
-         LMOJBS4Sppav0lP+BVhWsBXy6a2QX04B6DvN1Rp6r86Z322MCqbs2VynjtxFHaN2fdW5
-         BLAXDBzQmm8GHhx3GozwGQH7Mbzu4Ss3HidfYi2MM9RvFHcdsiYisTSt+W3kFSdN5hip
-         YYZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755744994; x=1756349794;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XBaK+uDkb1FKWMnsKSy6ZhbJaoQabX0cbuYGiNdtzlM=;
-        b=b+ONpVgX4Uw1ZNww9+WWyWJlPGthY8LDWk+Wi0NwE4Wgf+4bVur2wZU+R1hgF0AIjA
-         TB3d//jY1D+T1OOhmN2y2fQTR8MM+3wotu5TKmIRRsOdicyKZgyY+ephBG9IvZx+FA7w
-         qqqvTtR5jZZCaZrVKM3sTWX00bNac/mD56nfN1E+1+5GHWZuT0uiI/83t8WlnOccKsBT
-         tWm+8V8ks/xU75s1NS9NKPVo2BLOsEOXg8cwVOfJY5f0OeHCaXW4g1rLB5tVQhKoT/0C
-         a1NQzAtUquLvvqOmJNqnGhm9YqvGwCB5bU+h7UYahENuwsEXpQN7HH/FayJHqWpja4vl
-         ae6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCV7CsamQP6yYqrAsX9tq0lHugnl+uChslOJdh1Fyb4qsxq2bYdIFAJH9jLSSkAiGSbr3mJt57o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxogSlGlH17F68vVJimMeu/qdmrYyy0R7JulPLFtvU5LO1zYCA+
-	l/WPEFj3Cf4u3WOB0wcNHDoYyNi9MZN2HUcJob91tJ3YkOtilFjeOyNwlbcNdBbotvKs8TZOHzQ
-	7xsRXicft7tIXq3TfT0cbbXHPBA==
-X-Google-Smtp-Source: AGHT+IHOUOftlFA6gwO5touzHJxQk7/q1lypr8Q4vbHBqJ26hjGPhbxSN2SE73bXv0muunHuQFwlQukp1KrVN5ncmw==
-X-Received: from plbkx11.prod.google.com ([2002:a17:902:f94b:b0:240:3ec9:aa82])
- (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:2f85:b0:242:cf0b:66cd with SMTP id d9443c01a7336-245fed69268mr14788835ad.34.1755744994361;
- Wed, 20 Aug 2025 19:56:34 -0700 (PDT)
-Date: Thu, 21 Aug 2025 02:56:16 +0000
+	s=arc-20240116; t=1755745126; c=relaxed/simple;
+	bh=ipnT4qyQdgKYvzDTgVarpM3gJWUVAc083y4UR3xajUU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V8SAyEECOShXEFYqFvMgQi7WVNH9XY+fmRmTurhOZ3NiXzNCtQXIkYm5W1+sDq0V5N/LYIX74gHaCeX3Q4cKD9DrvTiV2qrVzzXeHLUTYBMl/UvzRnceorX40Sn9XFIDOTSSjpJOlN3QjSuT51E3JhQ8jQ+QNmlz19dwVWxIyW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=w4X7xw2L; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=L95uriYwgXcsKp7IEjNA2NGmB2cdqeLOLMS6FJXClwI=; b=w4X7xw2LaPr+dk2WvxqBTc6Q03
+	pu4QSk23JtL9o5A/IfmhNAfuIB92SZHp0Axa+9nhLgQZZwCWcOoR95925q95ZOyX7RGlvyHMRyCgM
+	6peUojZrhuH4pu4R2FlltqYcr6pja2lyJnO8mU+AiK2C8WEkcAnoJ3pnkRnIPh4xXyD8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uovVP-005Oz4-9f; Thu, 21 Aug 2025 04:58:23 +0200
+Date: Thu, 21 Aug 2025 04:58:23 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Hauke Mehrtens <hauke@hauke-m.de>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Andreas Schirm <andreas.schirm@siemens.com>,
+	Lukas Stockmann <lukas.stockmann@siemens.com>,
+	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Peter Christen <peter.christen@siemens.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
+	Juraj Povazanec <jpovazanec@maxlinear.com>,
+	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	"Livia M. Rosu" <lrosu@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net-next v3 7/8] net: dsa: lantiq_gswip: store switch API
+ version in priv
+Message-ID: <58d31b56-8145-419e-b7be-1fd48cfeda88@lunn.ch>
+References: <cover.1755654392.git.daniel@makrotopia.org>
+ <88e9ca073e31cdd54ef093053731b32947e8bc67.1755654392.git.daniel@makrotopia.org>
+ <aKZg3TviLUDgKgLz@pidgin.makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0.rc1.193.gad69d77794-goog
-Message-ID: <20250821025620.552728-1-almasrymina@google.com>
-Subject: [PATCH RFC net-next v1] net: Add maintainer entry for netmem & friends
-From: Mina Almasry <almasrymina@google.com>
-To: linux-kernel@vger.kernel.org
-Cc: Mina Almasry <almasrymina@google.com>, kuba@kernel.org, asml.silence@gmail.com, 
-	sdf@fomichev.me, byungchul@sk.com, io-uring@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aKZg3TviLUDgKgLz@pidgin.makrotopia.org>
 
-There is some needless friction with regards to whether netmem_ref,
-net_iov, and memory provider patches being CC'd to netdev or not. Add
-clear policy and put it in the MAINTAINERS file so get_maintainer.pl
-does the right thing by default.
+> > +	priv->version = le16_to_cpu((__le16 __force)version);
+> 
+> I've researched this a bit more and came to the conclusion that while the
+> above works fine because all Lantiq SoCs with built-in switch are
+> big-endian machines it is still wrong.
+> I base this conclusion on the fact that when dealing with more recent
+> MDIO-connected switches (MaxLinear GSW1xx series) the host endian doesn't
+> play a role in the driver -- when dealing with 16-bit values on the MDIO
+> bus, the bus abstraction takes care of converting from/to host endianess.
 
-All changes to current and future memory providers should be CC'd to
-netdev. The devmem memory provider happens to be under net so is
-covered by 'NETWORKING [GENERAL]' as-is. The io_uring memory provider
-happens to be outside of net/ though, so add an explicit file entry
-for that.
+I agree that all MDIO bus registers are host endian, 16 bit. The shift
+register in the hardware is responsible for putting the bits on the
+wire in the correct order for MDIO.
 
-Note that the memory provider changes need _not_ be merged through net
-or net-next, but the changes should be CC'd to netdev. Target the
-appropriate tree using the [PATCH ...] prefix.
+> Hence I believe this should simply be a swab16() which will always result
+> in the version being in the right byte order to use comparative operators
+> in a meaningful way.
 
-All changes using or modifying netmem_ref or struct net_iov should also
-be sent to netdev, so add a content regex for that. Patches modifying
-the netmem_ref or net_iov infra should also target net or net-next
-([PATCH net] or [PATCH net-next]). This is already the convention.
+How is this described in the datasheet? And is version special, or do
+all registers need swapping?
 
-Note that no maintainers or reviewers are dedicated to this entry.
-We don't presume to overburden existing maintainers or add new ones; let
-the maintainers nominate folks whenever they feel appropriate. But make
-sure changes are sent to the correct lists.
-
-Tested by creating a couple of trivial changes in io_uring/zcrx.[h|c]
-and adding netmem_ref and net_iov in other subsystems, and looking at
-the get_maintainer.pl results.
-
-Signed-off-by: Mina Almasry <almasrymina@google.com>
-
----
-
-Cc: kuba@kernel.org
-Cc: asml.silence@gmail.com
-Cc: sdf@fomichev.me
-Cc: byungchul@sk.com
-Cc: io-uring@vger.kernel.org
-Cc: netdev@vger.kernel.org
----
- MAINTAINERS | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 4dcce7a5894b..22c50aeefaa5 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -17853,6 +17853,17 @@ F:	include/uapi/linux/unix_diag.h
- F:	net/unix/
- F:	tools/testing/selftests/net/af_unix/
- 
-+NETWORKING [NETMEM, NET_IOV & MEMORY PROVIDERS]
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+Q:	https://patchwork.kernel.org/project/netdevbpf/list/
-+B:	mailto:netdev@vger.kernel.org
-+P:	Documentation/process/maintainer-netdev.rst
-+T:	git git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git
-+T:	git git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git
-+F:	io_uring/zcrx.*
-+K:	\bnet(mem_ref|_iov)\b
-+
- NETXEN (1/10) GbE SUPPORT
- M:	Manish Chopra <manishc@marvell.com>
- M:	Rahul Verma <rahulv@marvell.com>
-
-base-commit: 62a2b3502573091dc5de3f9acd9e47f4b5aac9a1
--- 
-2.51.0.rc1.193.gad69d77794-goog
-
+	Andrew
 
