@@ -1,112 +1,129 @@
-Return-Path: <netdev+bounces-215519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7B90B2EEFB
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 09:02:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAA92B2EF24
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 09:12:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE6A71BA0153
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 07:00:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9C2C7AD2B6
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 07:11:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66A2F13B58B;
-	Thu, 21 Aug 2025 07:00:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zJ3OzwZL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6BED27C17F;
+	Thu, 21 Aug 2025 07:12:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E130D36CE1B
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 07:00:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E11561EA7D2;
+	Thu, 21 Aug 2025 07:12:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755759634; cv=none; b=KOXK9mYP9VrfcJLt//dSgg+wLQ261zCE9RCwgcGb9xE0fgYDDmcCywPBLKjfZXBwpyGZ6pIC/9Oe2oyHNPrZThih/lLwUFBslAXZc09qjqpzN7lwafo0kbEFjqYyateLQ8tqqKXyzu4QvMm5ZM/yi6qZGKZGP8XGf5DL+XURB00=
+	t=1755760365; cv=none; b=FzuuAXR7LSNK69l1BQpJ6l057OJGwqi075THuLtn6VZ039S1y343yw2wPA7KBo2aqHPXgSC1mXH0s3+u6XAIxrYJeWwyMVsHFTeeZB6YtRMHM7KuVgEPno7ikucUQI08s1HxBLQokRdxAB29zVV75PFEjjy1hyBfgSJgtLDWf2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755759634; c=relaxed/simple;
-	bh=eT8lYjwPuDwqFIiR/6cWKANlHuTQL2UJO7UTGEwDiL0=;
+	s=arc-20240116; t=1755760365; c=relaxed/simple;
+	bh=I0BZ/WEff0RkimR1T0MhwO0o6umktB6ZMOOp9QGaa7s=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r5xVD54pQDZxIIZSrhLVnYM2RGFaO9/jg01Quh4JMQoYaPTonAHpGROHApTpGlm2PzV7W2zcNbiw2HgAZUihEGvgvZj1cBQ9PBSBDl3M73NREWLXIf4Ad4LcvGe34reT4OiDLCLzIPCeLNzxzm0ZFsxAS+a5fnp00spW3VB6El8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zJ3OzwZL; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4b134a96ea9so6108281cf.1
-        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 00:00:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755759632; x=1756364432; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eT8lYjwPuDwqFIiR/6cWKANlHuTQL2UJO7UTGEwDiL0=;
-        b=zJ3OzwZL4XeZjjM8RWlZNBBj7oTOp2Ri0VZ4kgRE+dNxVC7hcXCqdEatyddgUHPDUB
-         HfIGKacIk5KnLtwIeK7MZyWeXhe8eSc95kg1/5C0zN5BMDxGnFQQLKkAV+ybJBJWMsd3
-         /bJdyWzUdKaiCrpxQCA5/eeNqcATHu6dVVVGO2IX+EvEo1tPRlO/7ca/wdMPeUoFcDHI
-         iV3aGCNzo8iJuX3oyiwsz1/mCUv+wY1sanKWaEHNWyxo4BLnAr2ZSn7pQRMq+rUQyj5r
-         6C6eMPQDbMXL5P8HwubRlkVbYRikzzItDnwociKuKkaH5vqQZgdhzbdq74VmU104niYs
-         /Tbw==
+	 To:Cc:Content-Type; b=HaOkjI2EWhycWwBiWIpPgJy5Y+cIWWUh+yVu2sNY8ciAQTRdLCZ9PD8Sc7SPKX7QWlqbZKnQqx0zmujSPGNrY9iHDhfywmz/3QriCGUDpRQ0j5lip2bNd6lR+4ikQAgQcKjfgHoR6v2ZjUpmTbkt83wkYkjkf8SnDZTyyZ8mQp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-89021b256d1so160841241.1;
+        Thu, 21 Aug 2025 00:12:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755759632; x=1756364432;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eT8lYjwPuDwqFIiR/6cWKANlHuTQL2UJO7UTGEwDiL0=;
-        b=NwzkU/a4vmbwKSWkWNhExJ2qX0xG0Ac1XXXOt2OqND+WAMMfRbzY60s6u+Cb91yCQn
-         glBvlJ99K/6+Ys/ON5MdoqWyJvYvFilzQ/rzctI9BOpnPfeczxDtzChhCZjd9FqSxJ1i
-         7RBQB1b8GIUMvezFuQPIYH0p30eE2nt9DFpJc764jDpoLSPaSHBT62eDL/56iX+fxKyc
-         XCx4nxJlglg8gAp5P8DfIfDwMksumVpi3JYhf/2QdAApyupEpt1/Me+qlX+tL1PRZ/na
-         1EOr0437iV3xlxxL5g/xs1BFPDPEATfPm9evuLx4tXE5r0f96HjG26RzYLMyCMgpARis
-         D2zg==
-X-Forwarded-Encrypted: i=1; AJvYcCW+nrNefYfGEr2hMvGFcxAGfewDRJzixFuJXQzOqw24c+v7ofIDezOdwPq3fb+U3XE4NXCyN1I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIyub4M9lBZnXn22ESSiiDoi83Ctwj2MlLfe1KNj4hbXgVfsOL
-	LCW8+XoCCm3NOTq7M+1vBNY4ov+4RAY7kYMdqJeL47vb03qCbhoZW0tuhjHCYlBs21hPQpSPLne
-	1fnquTMDCLlgzpxHrEgznhte2a0S9vNpJJ1BxukMc
-X-Gm-Gg: ASbGnctHnjGtdjAPkK/fhTUqQqR1uk3o6SSIrFmjHevLaWFMC6eH9uTFpoarxdBLisq
-	QbcEwrrRfZlZjGq0tT18H9lrC2Ck5EQhVNaM4trjycuYy84x1FpKoHj9tkwUR36flsx9zIEzZ2x
-	QhRzYL2RWN4DT1mBkEWvvr964H1JE46zY1fftze6tjCdRDHVObxRuQDJEwQzm5eR0VIrox/ktec
-	cG7aF3hTmc4kkIIpYZ8IiE28Q==
-X-Google-Smtp-Source: AGHT+IGpLHZ8FPFiWNWZiXL7nkZkRqIOhY79ocUAENhsR48qZlX9MIpbLzCYNDZd3+HeYJgPQ3Fv0rCGlykHFTdF64k=
-X-Received: by 2002:ac8:5d4f:0:b0:4b0:eb79:931d with SMTP id
- d75a77b69052e-4b29fa0992dmr13871061cf.2.1755759631227; Thu, 21 Aug 2025
- 00:00:31 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1755760363; x=1756365163;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=R+XyJvS29M9jObsU5Dm5+mqIU3v/ZCQA9ib8OZRdEvw=;
+        b=cRcPhi7tY/sCl58rZ7c42DeUF1PjnAJl5ejur83oKiX11DCmNMrgne5ZAR6XT2y3nX
+         Rqa8OzTQYr8/ey8D0RFLdobKusMxJJe3nPW5IurUxlc6CT9ynHmCAdm90lsEho7QOk02
+         drNSPvJJpyF6ANAjBVV4dggIaWt5cEZN+oVYF+hUJzO7IKFDworf03JCinnUM7aHHZmp
+         SGkEwZRF19E/DceoYgzQfinyaJR+HfXk2M2sHG3EiVjsn9j1bW6HhrCCDDnymhIFk8xs
+         i3DIjPlCWZMe3P93TFzfWoIKup0Hl+rdtZRjvqhebFJ4y6lJ6baJt6tfji+9H8i9+Yt1
+         GeoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUfEbO9qwBoudTtWqG3e9KugHChYp+V7NqTQsi7Si0nUc9lQnkhfQ5ZdBoeFmxDWrnIE/u5Nkt0FIo+HH8=@vger.kernel.org, AJvYcCVjKU8dRveVNzTayWZu9h4lHibyLx9/8WATpESapVHbn4tYJ7g87L6pFTG/bzj85cX/OMRC/t2yKndGcKUHTAC6duY=@vger.kernel.org, AJvYcCW1sCnRdZqryQjWtvdPHVnEV1VzeROdrXa7YBZsAswenMCAPdmLylHPcMlVD7XakGdgdGxxg0V+@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVZP4iFjv/5Fwrjp9C4eHc+1k9gb/dfQcei7ka/77pRTDGF3tm
+	AXUxwwCVUaE9CyNz4lHdClJ/dpL+d49NOquzUip5lv5/shiDV0/1ZgbNRO7N94Lu
+X-Gm-Gg: ASbGncuIdF5YzCxAZkYK+Id+/1KOD7nSlDO4JdHNtxSk4BZR0oo8xNuwwVZFhr3P3NN
+	WCOxpQdUTYy0ZRnpe5Ao40z0OgIvqRJfApkxRKI/JBuZwe1B6mxEBq8urbrq2jVdkyNjYZF2qUv
+	mEIWtK89f++ASe/8JKBu1YNooqX4hzLekpNcE0Ws1x6sKITwvYSeU7jbt8o9UB6C9ykLlD+RF1/
+	MBL4j2fjzyZJS96QwYLmu3HNKgiOA/X/3X/Hkb+MYoNFHlwC83c9jHc0d4xb8YW3DYmuk3aZ89r
+	TDNO83wep9GVZwz4OJucHXR0MvA50AuBWwkD5a02DelMCW5vWW+t+OJoK7Nd94FuujOGKK6LQnc
+	R0Q/Gwb/pDuMWmaLBNVQCT/GNepymPaZO3GDjscIdHYI0FZ4aBNUTAtRebJfX
+X-Google-Smtp-Source: AGHT+IEu1x/ojD8RY/mYRSSla9DhE56VoxavjH5IPOni1i/DXYnWiggK7FCMZEliHu4PKiLT5H+S5g==
+X-Received: by 2002:a05:6102:5111:b0:4eb:53ca:3cfb with SMTP id ada2fe7eead31-51be13b5e02mr348729137.25.1755760362683;
+        Thu, 21 Aug 2025 00:12:42 -0700 (PDT)
+Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com. [209.85.222.52])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-51c55f1b913sm45765137.5.2025.08.21.00.12.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Aug 2025 00:12:42 -0700 (PDT)
+Received: by mail-ua1-f52.google.com with SMTP id a1e0cc1a2514c-89021b256d1so160837241.1;
+        Thu, 21 Aug 2025 00:12:42 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU0BDZKCNAsWlhC/Xvdr//HTyT1CMdxq+q2f58YU6S4VsPSjffWZU3W0IxYwptxX/f37pt0KYsFsSEQgcQa77De4MA=@vger.kernel.org, AJvYcCVk5n9idouaOI3d7tQrVP2N2KRdnxThVg20BQix+qosL0AfdnEubCYLlQYjE6f68PUD6LV2EZyrYwE4vGY=@vger.kernel.org, AJvYcCWWlnUXFF2q0gGAd0IGzFDk7JXN7ZUwmfWnHjMlishLSVqrWftbp0hvN7aqKpLXfJ3ypGEvoM/J@vger.kernel.org
+X-Received: by 2002:a05:6102:5346:b0:4f6:25fd:7ed3 with SMTP id
+ ada2fe7eead31-51be0c3cb22mr330848137.22.1755760361875; Thu, 21 Aug 2025
+ 00:12:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250821061540.2876953-1-kuniyu@google.com> <20250821061540.2876953-5-kuniyu@google.com>
-In-Reply-To: <20250821061540.2876953-5-kuniyu@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 21 Aug 2025 00:00:20 -0700
-X-Gm-Features: Ac12FXwR6Hp86NUpQ6o6-CfriqNR0_HZgzz-s6exJUmjchmrTO4a30Vwgcc5PWw
-Message-ID: <CANn89i+Wq+XiAK_HfgjO=gOesaXJvxT_FgAjstSCfAqzjwGrug@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 4/7] tcp: Remove hashinfo test for inet6?_lookup_run_sk_lookup().
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, 
-	David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+References: <20250820170913.2037049-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+In-Reply-To: <20250820170913.2037049-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 21 Aug 2025 09:12:30 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdXRw4HU+eoO=ttj3YDEbi9UdHKtZqC1UT2E251UMh0WyA@mail.gmail.com>
+X-Gm-Features: Ac12FXwXG_8NGNoZINWQzhw9Gs7sTvVLOc6_H3t9avyHMg8cxxSqyey1mBXkMvc
+Message-ID: <CAMuHMdXRw4HU+eoO=ttj3YDEbi9UdHKtZqC1UT2E251UMh0WyA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] net: pcs: rzn1-miic: Correct MODCTRL register offset
+To: Prabhakar <prabhakar.csengg@gmail.com>
+Cc: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
+	Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Wolfram Sang <wsa+renesas@sang-engineering.com>, linux-renesas-soc@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Biju Das <biju.das.jz@bp.renesas.com>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, stable@kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 20, 2025 at 11:16=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.c=
-om> wrote:
+On Wed, 20 Aug 2025 at 19:09, Prabhakar <prabhakar.csengg@gmail.com> wrote:
+> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+>
+> Correct the Mode Control Register (MODCTRL) offset for RZ/N MIIC.
+> According to the R-IN Engine and Ethernet Peripherals Manual (Rev.1.30)
+> [0], Table 10.1 "Ethernet Accessory Register List", MODCTRL is at offset
+> 0x8, not 0x20 as previously defined.
+>
+> Offset 0x20 actually maps to the Port Trigger Control Register (PTCTRL),
+> which controls PTP_MODE[3:0] and RGMII_CLKSEL[4]. Using this incorrect
+> definition prevented the driver from configuring the SW_MODE[4:0] bits
+> in MODCTRL, which control the internal connection of Ethernet ports. As
+> a result, the MIIC could not be switched into the correct mode, leading
+> to link setup failures and non-functional Ethernet ports on affected
+> systems.
+>
+> [0] https://www.renesas.com/en/document/mah/rzn1d-group-rzn1s-group-rzn1l-group-users-manual-r-engine-and-ethernet-peripherals?r=1054571
+>
+> Fixes: 7dc54d3b8d91 ("net: pcs: add Renesas MII converter driver")
+> Cc: stable@kernel.org
+> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> Reviewed-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
 
-Please fix, and add
+Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Gr{oetje,eeting}s,
 
->
-> Commit 6c886db2e78c ("net: remove duplicate sk_lookup helpers")
-> started to check if hashinfo =3D=3D net->ipv4.tcp_death_row.hashinfo
-> in __inet_lookup_listener() and inet6_lookup_listener() and
-> stopped invoking BPF sk_lookup prog for DCCP.
->
-> DCCP has gone and the condition is always true.
->
-> Let's remove the hashinfo test.
->
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-> ---
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
