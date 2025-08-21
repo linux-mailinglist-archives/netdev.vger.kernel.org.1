@@ -1,389 +1,211 @@
-Return-Path: <netdev+bounces-215579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AABB6B2F592
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 12:45:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B99E1B2F5A9
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 12:51:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F92917683E
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 10:45:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4FE337AE0C4
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 10:50:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 634821AA1F4;
-	Thu, 21 Aug 2025 10:45:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BE353093DB;
+	Thu, 21 Aug 2025 10:51:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="ICkMPg+f"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="iUzuca7u"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C96C307AEA
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 10:45:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA576308F35;
+	Thu, 21 Aug 2025 10:51:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755773120; cv=none; b=qwf+LihyB3nBlozxUyCWeL1EA0sx2faQwwfpjJpLnBdmF+v2vGC2hM4QthlFTB+r1B21IoEA3+7Zyh2/zsEkuPwh2yxeHUi77tbu+q/cFzrqvFJE/fgj67YxNnSejQYslJQPRddDs78kZ/2EEHVDzYT6xWII0zZQGohxxOrP0yo=
+	t=1755773494; cv=none; b=laNydgR40UO/yFp+LOCBSuJDiWqDHtjKAg6zolzqKo779+u8fhN+/TwNT5A4Hvb6MjjREO/iyknNY3lk0tvd6tPSXmmZBWZio7mKb9IRhvtKzsglPotEhb0Q8oDUfcu6E2pNhxgWkYhZ/XEXJWdyFZy654p5N7kUzONpPRm6SBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755773120; c=relaxed/simple;
-	bh=PBBCROPXqCqMiyfxSy2ogwx9x/fVh4Mdn3jHv7YOdlA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B2mS4oFbvOUtS1MFsMf4RnezI/vcozsMpuf7jfM4F+8ZoR/p8LZBLgSdlykYnIPMo2Oux2d69XdJ91Vzi13WuzaYTQABx3HPuWxzQAyNWibp24ceAuUuMaTZhWP+lKQKahD1lEQfnRmYOXBHYo5bVxsuR5NlsBzFUgKcbkGKK7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=ICkMPg+f; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1173)
-	id D2C6A2015BAB; Thu, 21 Aug 2025 03:45:17 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D2C6A2015BAB
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1755773117;
-	bh=e7SjHFKqk2A6sr3D14xMVQkuBQSQH+8UWQBRCGzve8o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ICkMPg+fV0DgsxvFc5FYYdchtB7cGgt2Pl6woolhq19ppCRW8CR4UdI8DTZjaTf0z
-	 TK5QsA6pyBX/OXiEJsyVFALpytbSVGcrgElEximZ/yA/CT2j+uMlF2jjLRercB1cx0
-	 VPmZ8uVomG2rX+NMyOP1mI+PxqMFKoqAamKWCNKo=
-Date: Thu, 21 Aug 2025 03:45:17 -0700
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: dsahern@gmail.com, netdev@vger.kernel.org, haiyangz@microsoft.com,
-	shradhagupta@linux.microsoft.com, ssengar@microsoft.com,
-	dipayanroy@microsoft.com, ernis@microsoft.com
-Subject: Re: [PATCH iproute2-next v3] iproute2: Add 'netshaper' command to
- 'ip link' for netdev shaping
-Message-ID: <20250821104517.GA7364@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1754895902-8790-1-git-send-email-ernis@linux.microsoft.com>
- <20250816110507.3063a733@hermes.local>
+	s=arc-20240116; t=1755773494; c=relaxed/simple;
+	bh=KHvuHVpT8XLrB8kkvREiSYcjY5lHv8A1nlW+gWH/5H8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=m5NTxZB+CYir41SvY35gj4se9u91A/kGSAiRWFU6JR8YvtMs1iMHx5r+nrVXawl7e+wlhPHlT/IuZIlUu8ba4UnBGzR1t0v286D3krDh3JvbjSauVpIgF4Fs5q8r/h8YIxzGElQUgF6PUX0xhuVcnJGGpGcg3cb5WfO5IoUmonM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=iUzuca7u; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1755773492; x=1787309492;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=KHvuHVpT8XLrB8kkvREiSYcjY5lHv8A1nlW+gWH/5H8=;
+  b=iUzuca7uruZLMUAiio2XuCgKMu+6lV9GtR+sZRBHuQp6D/y9x82N/ge2
+   s3A+gIqQmf4hGeBZad6hGW6x4FilynMXGPZjWYI2tNvdd3PWTz0lZdfBR
+   9Pk/rX2e0bYnbM+WYn92JOHwGtB+7Zh8nX91Owex4CBBB73+/I0FbKz64
+   3hlyvONMO//DemUhJ+KYF7EeGqXjX7tJYJaIsDrpAlxFosauYko2VO83Q
+   6pEtLVp3Gjg4CLIQDMLcmaw/eO/WqLG9Vt9Vjjr2rjs4ksIRALZgKUuM6
+   Obnt7qlqlz4KXHvvFLvPBABwgd/pfnIIWVcHr5vc+WqaZ9KCnP/u9UBWE
+   w==;
+X-CSE-ConnectionGUID: +qjVfyXuTYuMLQY71/8fbw==
+X-CSE-MsgGUID: aNC6yLbjRH6jginZxGGdSg==
+X-IronPort-AV: E=Sophos;i="6.17,306,1747724400"; 
+   d="scan'208";a="212904275"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Aug 2025 03:51:25 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Thu, 21 Aug 2025 03:50:44 -0700
+Received: from DEN-DL-M31836.microchip.com (10.10.85.11) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
+ 15.1.2507.44 via Frontend Transport; Thu, 21 Aug 2025 03:50:41 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <richardcochran@gmail.com>, <vadim.fedorenko@linux.dev>,
+	<vladimir.oltean@nxp.com>, <rmk+kernel@armlinux.org.uk>, <rosenp@gmail.com>,
+	<christophe.jaillet@wanadoo.fr>, <viro@zeniv.linux.org.uk>,
+	<atenart@kernel.org>, <quentin.schulz@bootlin.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>
+Subject: [PATCH net] phy: mscc: Fix when PTP clock is register and unregister
+Date: Thu, 21 Aug 2025 12:46:28 +0200
+Message-ID: <20250821104628.2329569-1-horatiu.vultur@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250816110507.3063a733@hermes.local>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Sat, Aug 16, 2025 at 11:05:07AM -0700, Stephen Hemminger wrote:
-> On Mon, 11 Aug 2025 00:05:02 -0700
-> Erni Sri Satya Vennela <ernis@linux.microsoft.com> wrote:
-> 
-> > Add support for the netshaper Generic Netlink
-> > family to iproute2. Introduce a new subcommand to `ip link` for
-> > configuring netshaper parameters directly from userspace.
-> > 
-> > This interface allows users to set shaping attributes (such as speed)
-> > which are passed to the kernel to perform the corresponding netshaper
-> > operation.
-> > 
-> > Example usage:
-> > $ip link netshaper { set | get | delete } dev DEVNAME \
-> >                    handle scope SCOPE id ID \
-> >                    [ speed SPEED ]
-> > 
-> > Internally, this triggers a kernel call to apply the shaping
-> > configuration to the specified network device.
-> > 
-> > Currently, the tool supports the following functionalities:
-> > - Setting speed in Mbps, enabling bandwidth clamping for
-> >   a network device that support netshaper operations.
-> > - Deleting the current configuration.
-> > - Querying the existing configuration.
-> > 
-> > Additional netshaper operations will be integrated into the tool
-> > as per requirement.
-> > 
-> > This change enables easy and scriptable configuration of bandwidth
-> > shaping for  devices that use the netshaper Netlink family.
-> > 
-> > Corresponding net-next patches:
-> > 1) https://lore.kernel.org/all/cover.1728460186.git.pabeni@redhat.com/
-> > 2) https://lore.kernel.org/lkml/1750144656-2021-1-git-send-email-ernis@linux.microsoft.com/
-> > 
-> > Install pkg-config and libmnl* packages to print kernel extack
-> > errors to stdout.
-> > 
-> > Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-> > ---
-> > Please add include/uapi/linux/net_shaper.h from kernel source tree
-> > for this patch.
-> > ---
-> > Changes in v3:
-> > * Use strcmp instead of matches.
-> > * Use get_rate64 instead get_unsigned for speed parameter.
-> > * Remove speed_mbps in do_cmd() to reduce redundancy.
-> > * Update the usage of speed parameter in the command.
-> > Changes in v2:
-> > * Use color coding for printing device name in stdout.
-> > * Use clang-format to format the code inline.
-> > * Use __u64 for speed_bps.
-> > * Remove include/uapi/linux/netshaper.h file. 
-> > ---
-> >  ip/Makefile           |   2 +-
-> >  ip/iplink.c           |  12 +++
-> >  ip/iplink_netshaper.c | 189 ++++++++++++++++++++++++++++++++++++++++++
-> >  3 files changed, 202 insertions(+), 1 deletion(-)
-> >  create mode 100644 ip/iplink_netshaper.c
-> 
-> No documentation.
-> No tests?
-I will share the documentation on netshapers, specifically covering
-how to use the ip command for this use case.
-> 
-> > 
-> > diff --git a/ip/Makefile b/ip/Makefile
-> > index 3535ba78..18218c3b 100644
-> > --- a/ip/Makefile
-> > +++ b/ip/Makefile
-> > @@ -4,7 +4,7 @@ IPOBJ=ip.o ipaddress.o ipaddrlabel.o iproute.o iprule.o ipnetns.o \
-> >      ipmaddr.o ipmonitor.o ipmroute.o ipprefix.o iptuntap.o iptoken.o \
-> >      ipxfrm.o xfrm_state.o xfrm_policy.o xfrm_monitor.o iplink_dummy.o \
-> >      iplink_ifb.o iplink_nlmon.o iplink_team.o iplink_vcan.o iplink_vxcan.o \
-> > -    iplink_vlan.o link_veth.o link_gre.o iplink_can.o iplink_xdp.o \
-> > +    iplink_vlan.o iplink_netshaper.o link_veth.o link_gre.o iplink_can.o iplink_xdp.o \
-> >      iplink_macvlan.o ipl2tp.o link_vti.o link_vti6.o link_xfrm.o \
-> >      iplink_vxlan.o tcp_metrics.o iplink_ipoib.o ipnetconf.o link_ip6tnl.o \
-> >      link_iptnl.o link_gre6.o iplink_bond.o iplink_bond_slave.o iplink_hsr.o \
-> > diff --git a/ip/iplink.c b/ip/iplink.c
-> > index 59e8caf4..daa4603d 100644
-> > --- a/ip/iplink.c
-> > +++ b/ip/iplink.c
-> > @@ -1509,6 +1509,15 @@ static void do_help(int argc, char **argv)
-> >  		usage();
-> >  }
-> >  
-> > +static int iplink_netshaper(int argc, char **argv)
-> > +{
-> > +	struct link_util *lu;
-> > +
-> > +	lu = get_link_kind("netshaper");
-> > +
-> > +	return lu->parse_opt(lu, argc, argv, NULL);
-> > +}
-> > +
-> >  int do_iplink(int argc, char **argv)
-> >  {
-> >  	if (argc < 1)
-> > @@ -1545,6 +1554,9 @@ int do_iplink(int argc, char **argv)
-> >  	if (matches(*argv, "property") == 0)
-> >  		return iplink_prop(argc-1, argv+1);
-> >  
-> > +	if (strcmp(*argv, "netshaper") == 0)
-> > +		return iplink_netshaper(argc-1, argv+1);
-> > +
-> >  	if (matches(*argv, "help") == 0) {
-> >  		do_help(argc-1, argv+1);
-> >  		return 0;
-> > diff --git a/ip/iplink_netshaper.c b/ip/iplink_netshaper.c
-> > new file mode 100644
-> > index 00000000..30ee6c3e
-> > --- /dev/null
-> > +++ b/ip/iplink_netshaper.c
-> > @@ -0,0 +1,189 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +/*
-> > + * iplink_netshaper.c netshaper H/W shaping support
-> > + *
-> > + * Authors:        Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-> > + */
-> > +#include <stdio.h>
-> > +#include <string.h>
-> > +#include <linux/genetlink.h>
-> > +#include <linux/netlink.h>
-> > +#include <linux/rtnetlink.h>
-> > +#include <uapi/linux/netshaper.h>
-> > +#include "utils.h"
-> > +#include "ip_common.h"
-> > +#include "libgenl.h"
-> > +
-> > +/* netlink socket */
-> > +static struct rtnl_handle gen_rth = { .fd = -1 };
-> > +static int genl_family = -1;
-> > +
-> > +static void usage(void)
-> > +{
-> > +	fprintf(stderr,
-> > +		"Usage:	ip link netshaper set dev DEVNAME handle scope HANDLE_SCOPE id HANDLE_ID speed SPEED\n"
-> > +		"	ip link netshaper delete dev DEVNAME handle scope HANDLE_SCOPE id HANDLE_ID\n"
-> > +		"	ip link netshaper get dev DEVNAME handle scope HANDLE_SCOPE id HANDLE_ID\n"
-> 
-> Seems like netshaper is property of the device not a top level object, the syntax
-> here is awkward. Open to better suggestions. Looks to me that netshaper should be property of
-> device not top level object.
-> 
-> Or netshaper is like neighbour and route and really wants to be not part of link command.
-> 
-> Also no other ip commands use show not get.
-> The verb "get" is only used for things like getting a route or neighbor with a particular address.
+It looks like that every time when the interface was set down and up the
+driver was creating a new ptp clock. On top of this the function
+ptp_clock_unregister was never called.
+Therefore fix this by calling ptp_clock_register and initialize the
+mii_ts struct inside the probe function and call ptp_clock_unregister when
+driver is removed.
 
-Okay. I will change the code accordingly.
-> 
-> 
-> > +		"Where:	DEVNAME		:= STRING\n"
-> > +		"	HANDLE_SCOPE	:= { netdev | queue | node }\n"
-> > +		"	HANDLE_ID	:= UINT\n"
-> > +		"	SPEED		:= UINT{ kbit | mbit | gbit }\n");
-> > +
-> > +	exit(-1);
-> > +}
-> > +
-> > +static void print_netshaper_attrs(struct nlmsghdr *answer)
-> > +{
-> > +	struct genlmsghdr *ghdr = NLMSG_DATA(answer);
-> > +	int len = answer->nlmsg_len - NLMSG_LENGTH(GENL_HDRLEN);
-> > +	struct rtattr *tb[NET_SHAPER_A_MAX + 1] = {};
-> > +	__u32 speed_mbps;
-> > +	__u64 speed_bps;
-> > +	int ifindex;
-> > +
-> > +	parse_rtattr(tb, NET_SHAPER_A_MAX,
-> > +		     (struct rtattr *)((char *)ghdr + GENL_HDRLEN), len);
-> > +
-> > +	for (int i = 1; i <= NET_SHAPER_A_MAX; ++i) {
-> > +		if (!tb[i])
-> > +			continue;
-> > +		switch (i) {
-> > +		case NET_SHAPER_A_BW_MAX:
-> > +			speed_bps = rta_getattr_u64(tb[i]);
-> > +			speed_mbps = (speed_bps / 1000000);
-> > +			print_uint(PRINT_ANY, "speed", "speed: %u mbps\n",
-> > +				   speed_mbps);
-> > +			break;
-> > +		case NET_SHAPER_A_IFINDEX:
-> > +			ifindex = rta_getattr_u32(tb[i]);
-> > +			print_color_string(PRINT_ANY, COLOR_IFNAME, "dev",
-> > +					   "dev: %s\n",
-> > +					   ll_index_to_name(ifindex));
-> > +			break;
-> > +		default:
-> > +			break;
-> > +		}
-> > +	}
-> > +}
-> > +
-> > +static int do_cmd(int argc, char **argv, struct nlmsghdr *n, int cmd)
-> > +{
-> > +	GENL_REQUEST(req, 1024, genl_family, 0, NET_SHAPER_FAMILY_VERSION, cmd,
-> > +		     NLM_F_REQUEST | NLM_F_ACK);
-> > +
-> > +	struct nlmsghdr *answer;
-> > +	__u64 speed_bps = 0;
-> > +	int ifindex = -1;
-> > +	int handle_scope = NET_SHAPER_SCOPE_UNSPEC;
-> > +	__u32 handle_id = 0;
-> > +	bool handle_present = false;
-> > +	int err;
-> > +
-> > +	while (argc > 0) {
-> > +		if (strcmp(*argv, "dev") == 0) {
-> > +			NEXT_ARG();
-> > +			ifindex = ll_name_to_index(*argv);
-> > +		} else if (strcmp(*argv, "speed") == 0) {
-> > +			NEXT_ARG();
-> > +			if(get_rate64(&speed_bps, *argv)) {
-> > +				fprintf(stderr, "Invalid speed value\n");
-> > +				return -1;
-> > +			}
-> > +			/*Convert Bps to bps*/
-> > +			speed_bps *= 8;
-> > +		} else if (strcmp(*argv, "handle") == 0) {
-> > +			handle_present = true;
-> > +			NEXT_ARG();
-> > +			if (strcmp(*argv, "scope") == 0) {
-> > +				NEXT_ARG();
-> > +				if (strcmp(*argv, "netdev") == 0) {
-> > +					handle_scope = NET_SHAPER_SCOPE_NETDEV;
-> > +				} else if (strcmp(*argv, "queue") == 0) {
-> > +					handle_scope = NET_SHAPER_SCOPE_QUEUE;
-> > +				} else if (strcmp(*argv, "node") == 0) {
-> > +					handle_scope = NET_SHAPER_SCOPE_NODE;
-> > +				} else {
-> > +					fprintf(stderr, "Invalid scope\n");
-> > +					return -1;
-> > +				}
-> > +
-> > +				NEXT_ARG();
-> > +				if (strcmp(*argv, "id") == 0) {
-> > +					NEXT_ARG();
-> > +					if (get_unsigned(&handle_id, *argv, 10)) {
-> > +						fprintf(stderr,
-> > +							"Invalid handle id\n");
-> > +						return -1;
-> > +					}
-> > +				}
-> > +			}
-> > +		} else {
-> > +			fprintf(stderr, "What is \"%s\"\n", *argv);
-> > +			usage();
-> > +		}
-> > +		argc--;
-> > +		argv++;
-> > +	}
-> > +
-> > +	if (ifindex == -1)
-> > +		missarg("dev");
-> > +
-> > +	if (!handle_present)
-> > +		missarg("handle");
-> > +
-> > +	if (cmd == NET_SHAPER_CMD_SET && speed_bps == 0)
-> > +		missarg("speed");
-> > +
-> > +	addattr32(&req.n, sizeof(req), NET_SHAPER_A_IFINDEX, ifindex);
-> > +
-> > +	struct rtattr *handle = addattr_nest(&req.n, sizeof(req),
-> > +					     NET_SHAPER_A_HANDLE | NLA_F_NESTED);
-> > +	addattr32(&req.n, sizeof(req), NET_SHAPER_A_HANDLE_SCOPE, handle_scope);
-> > +	addattr32(&req.n, sizeof(req), NET_SHAPER_A_HANDLE_ID, handle_id);
-> > +	addattr_nest_end(&req.n, handle);
-> > +
-> > +	if (cmd == NET_SHAPER_CMD_SET)
-> > +		addattr64(&req.n, sizeof(req), NET_SHAPER_A_BW_MAX, speed_bps);
-> > +
-> > +	err = rtnl_talk(&gen_rth, &req.n, &answer);
-> > +	if (err < 0) {
-> > +		printf("Kernel command failed: %d\n", err);
-> > +		return err;
-> > +	}
-> > +
-> > +	if (cmd == NET_SHAPER_CMD_GET)
-> > +		print_netshaper_attrs(answer);
-> > +
-> > +	return err;
-> > +}
-> > +
-> > +static int netshaper_parse_opt(struct link_util *lu, int argc, char **argv,
-> > +			       struct nlmsghdr *n)
-> > +{
-> > +	if (argc < 1)
-> > +		usage();
-> > +	if (strcmp(*argv, "help") == 0)
-> > +		usage();
-> > +
-> > +	if (genl_init_handle(&gen_rth, NET_SHAPER_FAMILY_NAME, &genl_family))
-> > +		exit(1);
-> > +
-> > +	if (strcmp(*argv, "set") == 0)
-> > +		return do_cmd(argc - 1, argv + 1, n, NET_SHAPER_CMD_SET);
-> > +
-> > +	if (strcmp(*argv, "delete") == 0)
-> > +		return do_cmd(argc - 1, argv + 1, n, NET_SHAPER_CMD_DELETE);
-> > +
-> > +	if (strcmp(*argv, "get") == 0)
-> > +		return do_cmd(argc - 1, argv + 1, n, NET_SHAPER_CMD_GET);
-> > +
-> > +	fprintf(stderr,
-> > +		"Command \"%s\" is unknown, try \"ip link netshaper help\".\n",
-> > +		*argv);
-> > +	exit(-1);
-> > +}
-> > +
-> > +struct link_util netshaper_link_util = {
-> > +	.id = "netshaper",
-> > +	.parse_opt = netshaper_parse_opt,
-> > +};
-> 
-> 
-> Please add a print_opt functionality.
-> Very useful to see what kernel thinks state is. 
+Fixes: 7d272e63e0979d ("net: phy: mscc: timestamping and PHC support")
+Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+---
+ drivers/net/phy/mscc/mscc.h      |  4 ++++
+ drivers/net/phy/mscc/mscc_main.c |  4 +---
+ drivers/net/phy/mscc/mscc_ptp.c  | 40 +++++++++++++++++++++++---------
+ 3 files changed, 34 insertions(+), 14 deletions(-)
 
-Thankyou for the clarification. I'll make sure to integrate these
-changes in the next version.
+diff --git a/drivers/net/phy/mscc/mscc.h b/drivers/net/phy/mscc/mscc.h
+index b8c6ba7c7834e..2d8eca54c40a2 100644
+--- a/drivers/net/phy/mscc/mscc.h
++++ b/drivers/net/phy/mscc/mscc.h
+@@ -484,6 +484,7 @@ static inline void vsc8584_config_macsec_intr(struct phy_device *phydev)
+ void vsc85xx_link_change_notify(struct phy_device *phydev);
+ void vsc8584_config_ts_intr(struct phy_device *phydev);
+ int vsc8584_ptp_init(struct phy_device *phydev);
++void vsc8584_ptp_deinit(struct phy_device *phydev);
+ int vsc8584_ptp_probe_once(struct phy_device *phydev);
+ int vsc8584_ptp_probe(struct phy_device *phydev);
+ irqreturn_t vsc8584_handle_ts_interrupt(struct phy_device *phydev);
+@@ -498,6 +499,9 @@ static inline int vsc8584_ptp_init(struct phy_device *phydev)
+ {
+ 	return 0;
+ }
++static inline void vsc8584_ptp_deinit(struct phy_device *phydev)
++{
++}
+ static inline int vsc8584_ptp_probe_once(struct phy_device *phydev)
+ {
+ 	return 0;
+diff --git a/drivers/net/phy/mscc/mscc_main.c b/drivers/net/phy/mscc/mscc_main.c
+index 800da302ae632..a034a8a8dde51 100644
+--- a/drivers/net/phy/mscc/mscc_main.c
++++ b/drivers/net/phy/mscc/mscc_main.c
+@@ -2370,9 +2370,7 @@ static int vsc85xx_probe(struct phy_device *phydev)
+ 
+ static void vsc85xx_remove(struct phy_device *phydev)
+ {
+-	struct vsc8531_private *priv = phydev->priv;
+-
+-	skb_queue_purge(&priv->rx_skbs_list);
++	vsc8584_ptp_deinit(phydev);
+ }
+ 
+ /* Microsemi VSC85xx PHYs */
+diff --git a/drivers/net/phy/mscc/mscc_ptp.c b/drivers/net/phy/mscc/mscc_ptp.c
+index de6c7312e8f29..827c399d9d30f 100644
+--- a/drivers/net/phy/mscc/mscc_ptp.c
++++ b/drivers/net/phy/mscc/mscc_ptp.c
+@@ -1298,7 +1298,6 @@ static void vsc8584_set_input_clk_configured(struct phy_device *phydev)
+ 
+ static int __vsc8584_init_ptp(struct phy_device *phydev)
+ {
+-	struct vsc8531_private *vsc8531 = phydev->priv;
+ 	static const u32 ltc_seq_e[] = { 0, 400000, 0, 0, 0 };
+ 	static const u8  ltc_seq_a[] = { 8, 6, 5, 4, 2 };
+ 	u32 val;
+@@ -1515,17 +1514,15 @@ static int __vsc8584_init_ptp(struct phy_device *phydev)
+ 
+ 	vsc85xx_ts_eth_cmp1_sig(phydev);
+ 
+-	vsc8531->mii_ts.rxtstamp = vsc85xx_rxtstamp;
+-	vsc8531->mii_ts.txtstamp = vsc85xx_txtstamp;
+-	vsc8531->mii_ts.hwtstamp = vsc85xx_hwtstamp;
+-	vsc8531->mii_ts.ts_info  = vsc85xx_ts_info;
+-	phydev->mii_ts = &vsc8531->mii_ts;
++	return 0;
++}
+ 
+-	memcpy(&vsc8531->ptp->caps, &vsc85xx_clk_caps, sizeof(vsc85xx_clk_caps));
++static void __vsc8584_deinit_ptp(struct phy_device *phydev)
++{
++	struct vsc8531_private *vsc8531 = phydev->priv;
+ 
+-	vsc8531->ptp->ptp_clock = ptp_clock_register(&vsc8531->ptp->caps,
+-						     &phydev->mdio.dev);
+-	return PTR_ERR_OR_ZERO(vsc8531->ptp->ptp_clock);
++	ptp_clock_unregister(vsc8531->ptp->ptp_clock);
++	skb_queue_purge(&vsc8531->rx_skbs_list);
+ }
+ 
+ void vsc8584_config_ts_intr(struct phy_device *phydev)
+@@ -1552,6 +1549,18 @@ int vsc8584_ptp_init(struct phy_device *phydev)
+ 	return 0;
+ }
+ 
++void vsc8584_ptp_deinit(struct phy_device *phydev)
++{
++	switch (phydev->phy_id & phydev->drv->phy_id_mask) {
++	case PHY_ID_VSC8572:
++	case PHY_ID_VSC8574:
++	case PHY_ID_VSC8575:
++	case PHY_ID_VSC8582:
++	case PHY_ID_VSC8584:
++		return __vsc8584_deinit_ptp(phydev);
++	}
++}
++
+ irqreturn_t vsc8584_handle_ts_interrupt(struct phy_device *phydev)
+ {
+ 	struct vsc8531_private *priv = phydev->priv;
+@@ -1612,7 +1621,16 @@ int vsc8584_ptp_probe(struct phy_device *phydev)
+ 
+ 	vsc8531->ptp->phydev = phydev;
+ 
+-	return 0;
++	vsc8531->mii_ts.rxtstamp = vsc85xx_rxtstamp;
++	vsc8531->mii_ts.txtstamp = vsc85xx_txtstamp;
++	vsc8531->mii_ts.hwtstamp = vsc85xx_hwtstamp;
++	vsc8531->mii_ts.ts_info  = vsc85xx_ts_info;
++	phydev->mii_ts = &vsc8531->mii_ts;
++
++	memcpy(&vsc8531->ptp->caps, &vsc85xx_clk_caps, sizeof(vsc85xx_clk_caps));
++	vsc8531->ptp->ptp_clock = ptp_clock_register(&vsc8531->ptp->caps,
++						     &phydev->mdio.dev);
++	return PTR_ERR_OR_ZERO(vsc8531->ptp->ptp_clock);
+ }
+ 
+ int vsc8584_ptp_probe_once(struct phy_device *phydev)
+-- 
+2.34.1
+
 
