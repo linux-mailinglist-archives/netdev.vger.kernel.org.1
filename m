@@ -1,94 +1,84 @@
-Return-Path: <netdev+bounces-215466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC632B2EB5C
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 04:41:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F5B9B2EB64
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 04:44:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8EDFA086A0
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 02:41:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16A56722A10
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 02:44:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA0082D97BA;
-	Thu, 21 Aug 2025 02:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD652241136;
+	Thu, 21 Aug 2025 02:44:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NZq5Recj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DNE33v+U"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 824802D97AC;
-	Thu, 21 Aug 2025 02:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8467228C9D
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 02:44:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755744028; cv=none; b=uJFmpzCLGgNAWaHBoCoZVOmX4CxfQYpL4qbUkZWR+a0/qqBH1ob/axZzGWu2WO25KdvOY6h4gsAjvspIGEo7qTWKIDoh8Lccyzv06x2PEs6mIVA6alu+iA1JrEPREBAdUEPc8MDlHgb+hqbLnA78TsA/WrVeS8cp8cjyjaMMLzQ=
+	t=1755744244; cv=none; b=C/g2BX7MUscBz3DG4Tb67KMZf/iH9tpVtI2rF+maGetvb/D7y8W9dVpUfQ+Ygkx3Fwtff/Esw62GXJZ3jtJlS0MlvLbWWCisPib1yM767MZeo7MfcCIrH4ypL2hAz+gVzBXEpEIU9lycktA7LgC2WLSo70qckp++ZSmZiJLJr9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755744028; c=relaxed/simple;
-	bh=p6J28krG4f7lZM8W41t/qhSp1UEt0ZpO3YDjqLJIHIY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ub9JotqpC+b2XBJRdz8yXOTWDKw6MNoD+Empq1KPMHd1VHcYWwsTM5cXq5ADEPWW+r09RWf46HiA2E3+PkTO/0g5YNdML6wIgHfe8yN2deG/dvDs31Pomdn4YKgyMzfsMs8lBY3XV2ZTLD/GXfRqR8Avr/CY8sQNnM/J8aQRK+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NZq5Recj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D50AC4AF09;
-	Thu, 21 Aug 2025 02:40:28 +0000 (UTC)
+	s=arc-20240116; t=1755744244; c=relaxed/simple;
+	bh=cb1NVHJH0g9Efs9aDyZXSxOKMrioCoMVrli4BNonX8s=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CCe37l+OOJocLMUxSHQhIVLdaLFXla+ACcfO/Rmwv/zkfyBKKWnT/gUAYJTOzH7ezSBdG4patjlo7NBNVdn3rqvUbkv3EGQ4pYgcrL4bAje4Lvw8NZeDqcSbPh+VvL/66kF/8Oo7YCgpuhCbMFoq28GG6HlTSdRpNXPP5QCh6FY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DNE33v+U; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1E18C4CEE7;
+	Thu, 21 Aug 2025 02:44:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755744028;
-	bh=p6J28krG4f7lZM8W41t/qhSp1UEt0ZpO3YDjqLJIHIY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=NZq5Recj1xXDnzhH/Q+pgrSwHDMSd8yJ3wP4oM4fE9keiAj5f4IXq7tBE2m/SlPNK
-	 iq7pZVeh86g/8510wllgeqIuiWNwSAqgI1ZA6jSHw6mB4CbR0puoMQFA2OfMDr1Vvu
-	 yyLRcXLyMlDQqc/JumR/UDBG5hpsNHp9S+nHL7ri7XvrRxUxQT6Qj5j3jNM4Kh+fiQ
-	 yvw8vBvvjScpJEWPrEVJlaPR0TRGUr83mV2NZwnyrLaAR+xLBh8e1m/5hk/KlgWYjY
-	 4k6ZzrgcOhOCse8ha58e2OdpB9woNR8kSRjtNTMeU4n0wjT9pA2LxWWXcc+4vxI83l
-	 uZBYUVwHQ2iQg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC8B383BF4E;
-	Thu, 21 Aug 2025 02:40:38 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1755744244;
+	bh=cb1NVHJH0g9Efs9aDyZXSxOKMrioCoMVrli4BNonX8s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DNE33v+U+6ZlO1x5JnhH8cf33g2MAzIKP2XdLi1/ZQVMOp0VfFee6A7xW+eFXHaBK
+	 rUArSMR21sXsWwSSGbmiowPcCtXcUh+Ugt7wqY0Yh8xLzad/VtekoI+il/GjowH6Dr
+	 CNTB5Bj64X89mLQAxZNS4634DIR3+mW4DLIWHIh6arufo+S54gOhI/zdm5qBNjjgba
+	 4qPFaDY5QKQX4l2HZmqKRos4i0v9FhFZgtzD/lYBOcq7IYNt332CmNHwUjHYZTJ4Pa
+	 7StWWKbNOtdTv//ojLcuBccVIQQVzJ045ep3zV2cYipShJrGboCIXxUGfiA9OG4gS7
+	 Y+vSBLg52gmrA==
+Date: Wed, 20 Aug 2025 19:44:03 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: David Wei <dw@davidwei.uk>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v1] iou-zcrx: update documentation
+Message-ID: <20250820194403.259c48b6@kernel.org>
+In-Reply-To: <20250819205632.1368993-1-dw@davidwei.uk>
+References: <20250819205632.1368993-1-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] selftests: rtnetlink: print device info on
- preferred_lft test failure
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175574403724.482952.16387694626145075781.git-patchwork-notify@kernel.org>
-Date: Thu, 21 Aug 2025 02:40:37 +0000
-References: <20250819074749.388064-1-liuhangbin@gmail.com>
-In-Reply-To: <20250819074749.388064-1-liuhangbin@gmail.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
- fw@strlen.de, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Tue, 19 Aug 2025 13:56:32 -0700 David Wei wrote:
+> +Zero copy Rx currently support two NIC families:
+> +
+> +* Broadcom Thor (BCM95750x) family
+> +  * Minimum FW is 232
+> +* Mellanox ConnectX-7 (MT2910) family
+> +  * Minimum FW is 28.42
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+The sub-bullets don't get rendered correctly it seems. HTML output
+looks like this:
 
-On Tue, 19 Aug 2025 07:47:49 +0000 you wrote:
-> Even with slowwait used to avoid system sleep in the preferred_lft test,
-> failures can still occur after long runtimes.
-> 
-> Print the device address info when the test fails to provide better
-> troubleshooting data.
-> 
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> 
-> [...]
+ * Broadcom Thor (BCM95750x) family * Minimum FW is 232
+ ^                                  ^
+  real bullet point                  just a * character
 
-Here is the summary with links:
-  - [net-next] selftests: rtnetlink: print device info on preferred_lft test failure
-    https://git.kernel.org/netdev/net-next/c/781bf2cc0616
-
-You are awesome, thank you!
+In general looks useful, I think we have a similar list of XDP features
+somewhere. When you repost - could you CC the respective driver
+maintainers? I suspect Micheal may tell us that Thor2 is also covered..
+Also I think we should say "nVidia" now?
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
