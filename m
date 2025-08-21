@@ -1,204 +1,203 @@
-Return-Path: <netdev+bounces-215592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id B71E7B2F5F6
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 13:11:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAA3BB2F65C
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 13:21:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9E1C04E5C76
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 11:11:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F0EB5A0949
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 11:17:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C643430E822;
-	Thu, 21 Aug 2025 11:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0141A30C344;
+	Thu, 21 Aug 2025 11:17:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ggQ2xEPn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cKPwSyWm"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2049.outbound.protection.outlook.com [40.107.92.49])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3740B30C357;
-	Thu, 21 Aug 2025 11:11:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755774668; cv=fail; b=Akl2fve4OLYwZHoTeYhpocZPtv8yUNihX8rHrky6vkGVqAA9QJV6IZLQMecTOYyHul8CQI2jTwqRFSfx9XjYzwRB/rkCKT1ffQxHZfRvNXUV7J3xC0DC2aPrgnoDRgyR8ef9ShL0GO/6lgNV3ZDymYW/AQF6cFY6CbpDt43u64w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755774668; c=relaxed/simple;
-	bh=LL//yGw4xjCS8RPXuDo2OPGj9FYDb2nfQB0wAIdK8sw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Wzmdvr0Mwhm2WdhSUnCRfdib5cQ1hpvFtYh/j82PRWUbkFqaoD8C+Au/OfpA5cjsdhZacRrh9ajRE6cggciGlM9zlbsqq6NHAM4/jYQOxYgxy73cVQIL+aV1FptfFRkAJqOba9WkZpM1VPMX084lYMCRJcUpZDzNE0wKjNKlyj0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ggQ2xEPn; arc=fail smtp.client-ip=40.107.92.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=jp6ydBeohgIJVUsV5PRrcPemmlnxbQB+SffFXNfkSGVlof6FDPwySBQ/96FxuV8gZVa4NUQ9zuHJkfbGahOeoufOFYXcUPhUlLzJblpRLOp2Heodqk4APiaSfWLUQqmEiSRJnWXvNeJrVfvwW8BV4ITcLO2gZWGWh61WYCuVLkUQ4syEtlhbfIDF2O532ZKT+NK3vc/Abp1lMg35TK3Of4NQ2mKej2RNP3CgZumFgY6HME6XIMMdJz10dE4hF2tOtZxQqIxauN9Pcagu7vys2iFRF4MZRlgEUSAXPPewUtJ9fh1wwLXAg/ETll66yXORlJRTHM4JDLB819/l2sTxNw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zF5ck0NvmNTpDFOigBikcYPn5FnAfMeAhpKzPWaDs6s=;
- b=CDfaL9NtGZjK9159PQXCVgyPhRqm6npneTi5reKoZgYpoFx4k7V7XdoaMcTPNz2yA0W2mc4TZ+akZtR7pzHT9RTStLP2mVFsBdUSvQyQpqATN5q7tmrD8O0NvrUVZj9oCZ7xNgddA2jqLQQfOAv+S0NbuxwreMpusqyYnYsRNSc0z/oTWthHDwS5gxO1ADywre+PgFKBUDvWvc6lmk0MJRIk0hygTaNBPM2N8aUUkTB2M0B5gzSGwVwU8JgSZMwe5oB36NhSmoEKZm/gsE8cUvwbxX3KlhnCtyZ2dAC2fUnPJv+ACSToilc/h64CcXFotbcUKEFa6BgkkQrnj6vjwg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zF5ck0NvmNTpDFOigBikcYPn5FnAfMeAhpKzPWaDs6s=;
- b=ggQ2xEPnyPfhDQDnu7NCyty9fxbkOGun6az9Xnx7EuVH2gaS6NtkvsyQGFmB9n7HZ/3uciOSAuna1BUa31BQ08470SpPDzbcee46EHxMmRUgqkur5J2hbLa9eeHZcCkMD6BRJVwm+Hkhx2ycXhiyEfrh+hGfb6fIO6vFCdpQ6B5Sc6N45q61t65T0zBd6jWPWLX33ZMTBdIkhNT5VSMhrobIdQVbLZTnJu/FDss0qU+Awzr8igDsc4SP+NpTYicoz01D98su7cMMNyM9Wscga12NPOT2qHzwEsr3j4OOsfUeZgSugCM9Fiwnj2HjI/IHeHLDvbu5Fow9NOWjdw4XSw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from IA1PR12MB9031.namprd12.prod.outlook.com (2603:10b6:208:3f9::19)
- by SJ2PR12MB7941.namprd12.prod.outlook.com (2603:10b6:a03:4d3::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.15; Thu, 21 Aug
- 2025 11:11:02 +0000
-Received: from IA1PR12MB9031.namprd12.prod.outlook.com
- ([fe80::1fb7:5076:77b5:559c]) by IA1PR12MB9031.namprd12.prod.outlook.com
- ([fe80::1fb7:5076:77b5:559c%6]) with mapi id 15.20.9052.014; Thu, 21 Aug 2025
- 11:11:02 +0000
-Date: Thu, 21 Aug 2025 11:10:57 +0000
-From: Dragos Tatulea <dtatulea@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: almasrymina@google.com, asml.silence@gmail.com, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, cratiu@nvidia.com, 
-	parav@nvidia.com, netdev@vger.kernel.org, sdf@meta.com, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v4 7/7] net: devmem: allow binding on rx queues
- with same DMA devices
-Message-ID: <73yte2bgpw4e6vdycrbgiyhujtl4z6h33e743vvo2rg3bioajb@u3ebcsmuench>
-References: <20250820171214.3597901-1-dtatulea@nvidia.com>
- <20250820171214.3597901-9-dtatulea@nvidia.com>
- <20250820181609.616976d2@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250820181609.616976d2@kernel.org>
-X-ClientProxiedBy: TL2P290CA0016.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:3::18) To IA1PR12MB9031.namprd12.prod.outlook.com
- (2603:10b6:208:3f9::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF7E277C9F
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 11:17:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755775074; cv=none; b=nTJIikXDvzmMA7Y7IcTvrIbd7SAQ6Z8df+E5XfyAN4cXc1FqIL7ScY40ednL7WwVGD3mbqWyeytHmycX1w4saqqK+4vHKjt71iBv5sW+Hwl60DYZxEwaf4mUqzScr2em9QLjEwSvNITFV7+FNAEaxH9CS8o1aGCNILXmyTufqgY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755775074; c=relaxed/simple;
+	bh=0eZh22ExobVFn9QdpDSpMbExsBJy4p5TIuWrfygp2ng=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NGmRv8KiFbjwLMeh0wekEj6Qn/4GxQ26nnNvyYgshO34GH1zdFkMenEp09u10PBea8z1habbPTLhCaCHku1F4W+f1uczXHTvmTV5x0vYFJj5gcTOgjKBZGls9kE+rgXHD3MloIQx4nJgX5GaYCQxXV0bawRUbjIUocXMZyH/+ZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cKPwSyWm; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755775072;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vTF7fdaBAf09RlYCJCvUZk3IkcMydLaKtpCtjA+Wsos=;
+	b=cKPwSyWm0RVSYuUBxUqPmDYtMtrwwAZG8EAlPWbdtYnAE7SoZRcyygfzuBA15VwfzP7hTv
+	B2GcZ5yY/MIOx/waJbakXOiOgbHFUQ93DZ7OL/Au+DaL7wI1E3D2XOjp/APT4mh05m1vQH
+	3Hw7cQ+BBCDPJBMSqYb2ze+iEoZG0xw=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-262-7SY3Rl7XNee-_qFQg1xH3g-1; Thu, 21 Aug 2025 07:17:51 -0400
+X-MC-Unique: 7SY3Rl7XNee-_qFQg1xH3g-1
+X-Mimecast-MFC-AGG-ID: 7SY3Rl7XNee-_qFQg1xH3g_1755775071
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7e870324a51so217996885a.0
+        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 04:17:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755775071; x=1756379871;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vTF7fdaBAf09RlYCJCvUZk3IkcMydLaKtpCtjA+Wsos=;
+        b=Bbs2OLnuLbFuWSykMTG+qrlQ1l5PhdwCpFcvy4IBEm/iY46bqNICtZnz3YCteQrz/l
+         1dAjUPWuOrLMk5kxC8iUPbH1xBwpaLx131dQ9RcE3yuenSlnpu8gbjjmbpoqi8pAAFba
+         1T3RfYo0h5XFffFz75YnGNCyTlIet3puhBuZQ6SzeA+V9Kc/ctQPwSJzucMpunxfL1qm
+         +NhN1xqzMQLukSTH7vy78K34zwtA35wc9JTXyeY8+BY2KqzOMKMGKUuPvCNJQDodxXgx
+         SU2gt3O5/hZhI1fZGuR7MRfMOweu0aq8KGmnY1BJEd91CLar3c+g+VA3aeaivbhEEVFG
+         Zatw==
+X-Forwarded-Encrypted: i=1; AJvYcCUUqd7Px22l7C+oVlFKvFY8Yss/l/H7Cj1Jlg1U5NnnDi5BzeMuKdbDVEpxqMGzLkfFTq290LA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7o580e1GLtPqW/gLRnIKx51rH7+lmzOkFS5c6aQ0UMMsGGgFV
+	sG1QSD9M4g4ZheDjsZDM839ZE08zvpJ/oHoj5da8YOr+FzZAiuBFq1JIbBLLiK7kW0vZFVQ3U/M
+	G/lHrF2DA0vABQsk0ekqjkJ/qLjgqb70kNCPbVKmOE8+oi5ktZxJfQxuKaQ==
+X-Gm-Gg: ASbGnctF3hnJu+Ab8vUgxyw+jC//vFuGci8f160y9Ev8UC2nN8FAv5kSjzzw5rhOIqx
+	qWJSKvFYNBEXEtCljDk8/c56AkbT8PelTKY/loHHAofj4NlHYB74lWHyxlSBHqf5mvaF/eIqOt6
+	+M8d/fxhhr758zdr9wHgyyl2KJrVk899arw/nmgkT/M2RKDgW+9ydCIu/iV17tWI8ck5fnM9azT
+	V5VhP9HIP99FwpD6NygHKOiVMXlfgRY3r/Bg3pyHXqLKt8q6+pks+0dO/kkuh7owWWmlkBKcEYT
+	5p9zYbBnNbfwXlRBPXg7rbPHHbEbsvfUOqL6djHUNnztqbZdRn4gxooAsdBlzjJbQnYsm58+cYN
+	djMHBvIVM3fY=
+X-Received: by 2002:a05:620a:4153:b0:7e9:f820:2b87 with SMTP id af79cd13be357-7ea08ea6badmr221665385a.72.1755775070661;
+        Thu, 21 Aug 2025 04:17:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGKExl4TKOYXLwhVSd7hxOBflNKJUSf9wwh0aonmAI1AB6dLc57LZaBS4sxU5LAnOMYXuVEEQ==
+X-Received: by 2002:a05:620a:4153:b0:7e9:f820:2b87 with SMTP id af79cd13be357-7ea08ea6badmr221660085a.72.1755775070157;
+        Thu, 21 Aug 2025 04:17:50 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e87f16f9ecsm1080143785a.24.2025.08.21.04.17.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Aug 2025 04:17:49 -0700 (PDT)
+Message-ID: <ec99ef48-c805-4ce8-99d5-dcf254f6e189@redhat.com>
+Date: Thu, 21 Aug 2025 13:17:44 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA1PR12MB9031:EE_|SJ2PR12MB7941:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1336546e-b1e8-4ef6-ca3f-08dde0a36a18
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Zlb6DuZ0kd7nIrZXehylsCEt1jbo/E8d2UTL9enweSSux5wJktZ6DV212ol3?=
- =?us-ascii?Q?4cMnDkpshbt8y4alMRl8zB+AoIxw/VsHfb09dQEpPFufoy32w6XvjUoKdxOl?=
- =?us-ascii?Q?vuZzJMa0N7H3Db5pk0+D16C7uI0XgQXJPq50iwpSmrpovqkqY37F4i1RxOq+?=
- =?us-ascii?Q?5AmtW4egO8TbYQ5MlG1Pc/dQ6szDwsHVgt4Y+8eFjNNUEk+Zw95ksVucf5pT?=
- =?us-ascii?Q?Ce3dVn/y9LMNthqNIIvghKg9J6WD/j2Cz0G8W3PD4PEVANstJ9hlcd3dCXds?=
- =?us-ascii?Q?HlHEJIcInO5nwm+FqBuVy0GvFeyObgKC0IHxrmV4MfNcqaUiRKjyAgfSoLb8?=
- =?us-ascii?Q?WrZ/lgVV7lchqDWrRtHxMDa/s9CoWkZLOtTnlgKrx6SV9WvzoTeSKGRohlhj?=
- =?us-ascii?Q?FhqAesmKfo0w2qviSvwj7I7iwx88cPqNZODTHr1Oq+Bz7X5+j4Z3J6oOeq45?=
- =?us-ascii?Q?5fdaos+92KIASOZ81uWGv0thU0LA6rclRZwavXwz8f4Wse5X1HNEdAHzZ5E+?=
- =?us-ascii?Q?OwJ17FZHVUwDd98rALtUQTTOUXAedaR/AJslbgzdAgxjsrlYdKMGHXeiod6Z?=
- =?us-ascii?Q?i6F1ewHxolwXKynEbuJF4ly523toB2E3fH88/HIVneigqSr9iNniRBdjohvl?=
- =?us-ascii?Q?FXomeA5O0nZbZb5CTV11mb4wC0wiC0GcYX7ynavk3BETRNm89H3KgJHDnYPI?=
- =?us-ascii?Q?51lEO4Zc1zjxE+VO2pELehBJGqsgi06z5nCSXYyJHJGCwzOBYj1QrYVRfrnB?=
- =?us-ascii?Q?u6uQU4MgQk637FSEgGvCZc/twS81JQbl1jwwKaojd2us8D8uX+4n0B9afVrV?=
- =?us-ascii?Q?/hYBIpZQZC1dkjqoj1Xf1DX7kcZ2H/BOqcrd5DyNl5M472NXyPEmb3++Y+Jd?=
- =?us-ascii?Q?+JW37VOS1uvyUMum+qNYs7RsMNqq9eYZOVfkVFGJxMdVwnVZSshwIC4jdnZL?=
- =?us-ascii?Q?BwABdXIMN0iNfcvKZnDXmD07o5+YXkZCX/7xlnHDVVfIFAkc3O+XxYweE1pd?=
- =?us-ascii?Q?YoiOQUtq7sLUpd1O2D7fvs/Hi50piI9cwkcGhT/LvyGGvQoCxye5LAk10j7T?=
- =?us-ascii?Q?/cxJWNV2D/Uf1RZRv/Dj+vRbW32kzbG5vwvsr4ZN9U2qgdNESlheVKIVTZOi?=
- =?us-ascii?Q?dyfucaTOeB6/lOAzmS67kPsbYS4kHx3rLw+Spc6ko4mMUI/RP0QaA2hlvTji?=
- =?us-ascii?Q?3/SKH0XJuM3ntgCW3+YdCrfV390t5rT/7ihO+jwZ5odxbVLoIknLyg2wJTlf?=
- =?us-ascii?Q?WsLTmrzlO99InscESHRjSBqfdzcdUCsfNcNqBg9+yRWz/DvypKMObXOry0gM?=
- =?us-ascii?Q?9mWMnAO0i8TvEDsE8ayzpQ8rgE4C+jKjGde9gYoevNojkURFnpAHod9VDa96?=
- =?us-ascii?Q?tEtJ5mv4oq9lfe/4KH5lenpYCRIhntcedNrCs1OxJEQKYM1WrLuKQWKUDuA3?=
- =?us-ascii?Q?4eApPoT0Tjs=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB9031.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?9NXyWqUKPYiqsi1Wk8RARdtYQbWHtywFLWBUczGybowHITxyqIMDSl+6HCHV?=
- =?us-ascii?Q?SvrFDvzkgEVgy0RIQlMn2ak5tG3cANISmuZtzU2zp1jqrZLxqhzDeG3t3XEH?=
- =?us-ascii?Q?mN/QKyYukxmOiLK8cRzB6ihEtIDFI1hnydfLaqKK5j68iwRz1iP3b/d4lLro?=
- =?us-ascii?Q?QpRRcrDovjPwJPui1z+4z6wF4cpnTkC4mIZNNbb7xeOUJweXF/Mg2IN0pKpQ?=
- =?us-ascii?Q?K7nxINw41H+u0dnAFNoDpS6Awj9qMBD1GcCLv7oRVVR5x+pcAPN4IdhGSeCc?=
- =?us-ascii?Q?2PM1IUZ8H7kYvcAOc2UwgciSyW4+U7qypd+Sm/+2NNqUcYTGrZO1HLfHcS21?=
- =?us-ascii?Q?/8+FAIChro2IM6X/i2SKOGpqFkRNZMwNiPp4Nqc/eDGpOsZoUQUL8sPoetQk?=
- =?us-ascii?Q?pfj6gfqzBgx5MfcKeRaJjMHI+jUu9Cp/1L5yXT9gz+ag1mJEPcrZYe4fHNMO?=
- =?us-ascii?Q?pEBpKQEKzFcwHlwH0t+8dqjiQxGC6Uev7Cx/tUkmwsx6y0+UVwZMNWtyJgdU?=
- =?us-ascii?Q?pmyKgE0B84WROTLow/Q0tEMJzve5LshdxZg88D+D+DI5HwBAdrDYj3Bfc/FV?=
- =?us-ascii?Q?K7bJ3w9YwaQ3aqONt019c+W1x7mTRbX9Zegqhi3rmby7W1g8GtjuzrDXsecZ?=
- =?us-ascii?Q?ysqHdpQwZz6zBDneXReYnxSCw3kPZcE2lmYV+ZK2oHD7FkNAg/M32ivJFczl?=
- =?us-ascii?Q?kNbr+UDs9ZUK5KdlIBqD5FyPrGA3jA7snIZsprOQ1m4n6gxSbquORsAl/3Jg?=
- =?us-ascii?Q?iKCiwVCOQy8DC8fI9xHP7jbZWya+YYAP5LSu9Zx5S3tSIZUqHBaEuQxXMiTk?=
- =?us-ascii?Q?yJO8tHTYms9jLYvhVQ7KoDLZuoG7G0XbtGy1yU4l3fixEDCWRkoLtr9SboAL?=
- =?us-ascii?Q?2Wua6GojqhRLNSqQWLUdH2DEPwGIBAX4tTt8OaCBfHnWsykDgLVFWQIMX3NH?=
- =?us-ascii?Q?+FAHbqdvFTVFtA493CQImRJFS1Row8tsl5Hb8H0PRHOnxN3pdPrOHNIBGHWC?=
- =?us-ascii?Q?kvkSFSE0lWZHIGC+VLyZG8YUXb/cQQGu84j72WgU6VweufkZ+/Voh3ohnmk/?=
- =?us-ascii?Q?ar6QXw6djb0fTADZQ8lw/OVQrF8kzVjUrbnerva5m5fD0E4GMn4VL+DxgrxL?=
- =?us-ascii?Q?miQSjIoVKNesFmIN3s3Eie7vtFBlqGpq/Ck8zUoChALABgpWxJjurUdgqOHN?=
- =?us-ascii?Q?2f3Cf4kS/1lLmrD7uDIud2vA5aF9lfRhtXNELw+tZd3U3EHcV2a6vAUgq8sh?=
- =?us-ascii?Q?Ddc4RtydNPaq/LNFFDR1A/4XsTahrSMQ7WJjkTy6fl3z6d9MU6NfQbDu9Qjn?=
- =?us-ascii?Q?uKG4puWR2nhqCLEeVfOlzpxQ312X2aGXSVagvZuKYsOAVbZZ+lCIfhJqHPXf?=
- =?us-ascii?Q?yBOzYb72qMJaG4nj9mGOGglEKN7wkna4gYTqlGRj2SXwFXqY3z0O53Lhxa6b?=
- =?us-ascii?Q?lYc7Bcogkofh/+Zwyz0KchKN87vKmN9lzlQKqynUDruHzH+qyCtUsix22a1H?=
- =?us-ascii?Q?gksOndKSY0RPk2WYEY1zwnPtiVt1/C9VAdJlb5jWRXNJCcavsMcM2L6ooEs4?=
- =?us-ascii?Q?mru9gCTm6ECvndomrP93bzeO3FR7XK6wU98REPT9?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1336546e-b1e8-4ef6-ca3f-08dde0a36a18
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB9031.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2025 11:11:02.3044
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: m+xHkC0dLKXa3OH9lg2AdYKzdtLjcEj9oJcOXlq+QPL6oSAb0p1kT71O30ovCUCnY423c17iZsU4z9h42oPnkA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB7941
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 02/15] net: build socket infrastructure for
+ QUIC protocol
+To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>
+Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>,
+ Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
+ Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org,
+ Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>,
+ Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
+ kernel-tls-handshake@lists.linux.dev, Chuck Lever <chuck.lever@oracle.com>,
+ Jeff Layton <jlayton@kernel.org>, Benjamin Coddington <bcodding@redhat.com>,
+ Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
+ Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
+ Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
+ <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
+ illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+ Daniel Stenberg <daniel@haxx.se>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>
+References: <cover.1755525878.git.lucien.xin@gmail.com>
+ <0456736751c8beb50a089368d8adb71ecccb32b1.1755525878.git.lucien.xin@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <0456736751c8beb50a089368d8adb71ecccb32b1.1755525878.git.lucien.xin@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Aug 20, 2025 at 06:16:09PM -0700, Jakub Kicinski wrote:
-> On Wed, 20 Aug 2025 20:11:58 +0300 Dragos Tatulea wrote:
-> > +static struct device *netdev_nl_get_dma_dev(struct net_device *netdev,
-> > +					    unsigned long *rxq_bitmap,
-> > +					    struct netlink_ext_ack *extack)
-> 
-> break after type if it's long and multi line:
-> 
-> static struct device *
-> netdev_nl_get_dma_dev(struct net_device *netdev, unsigned long *rxq_bitmap,
-> 		      struct netlink_ext_ack *extack)
->
-Will fix. Hope to remember for next times as well.
+On 8/18/25 4:04 PM, Xin Long wrote:
+> diff --git a/net/Makefile b/net/Makefile
+> index aac960c41db6..7c6de28e9aa5 100644
+> --- a/net/Makefile
+> +++ b/net/Makefile
+> @@ -42,6 +42,7 @@ obj-$(CONFIG_PHONET)		+= phonet/
+>  ifneq ($(CONFIG_VLAN_8021Q),)
+>  obj-y				+= 8021q/
+>  endif
+> +obj-$(CONFIG_IP_QUIC)		+= quic/
+>  obj-$(CONFIG_IP_SCTP)		+= sctp/
+>  obj-$(CONFIG_RDS)		+= rds/
+>  obj-$(CONFIG_WIRELESS)		+= wireless/
+> diff --git a/net/quic/Kconfig b/net/quic/Kconfig
+> new file mode 100644
+> index 000000000000..b64fa398750e
+> --- /dev/null
+> +++ b/net/quic/Kconfig
+> @@ -0,0 +1,35 @@
+> +# SPDX-License-Identifier: GPL-2.0-or-later
+> +#
+> +# QUIC configuration
+> +#
+> +
+> +menuconfig IP_QUIC
+> +	tristate "QUIC: A UDP-Based Multiplexed and Secure Transport (Experimental)"
+> +	depends on INET
+> +	depends on IPV6
 
-> > +{
-> > +	struct device *dma_dev = NULL;
-> > +	u32 rxq_idx, prev_rxq_idx;
-> > +
-> > +	for_each_set_bit(rxq_idx, rxq_bitmap, netdev->real_num_rx_queues) {
-> > +		struct device *rxq_dma_dev;
-> > +
-> > +		rxq_dma_dev = netdev_queue_get_dma_dev(netdev, rxq_idx);
-> > +		/* Multi-PF netdev queues can belong to different DMA devoces.
-> 
-> typo: devoces
-> 
-Thanks!
+What if IPV6=m ?
 
-> > +		 * Block this case.
-> > +		 */
-> > +		if (dma_dev && rxq_dma_dev != dma_dev) {
-> > +			NL_SET_ERR_MSG_FMT(extack, "Queue %u has a different dma device than queue %u",
-> 
-> s/dma/DMA/
-> I think we may want to bubble up the Multi-PF thing from the comment to
-> the user. This could be quite confusing to people. How about:
-> 
-> 	"DMA device mismatch between queue %u and %u (multi-PF device?)"
-Sounds good. Do we still need the comment? A similar remark is done in
-the commit message as well.
+> +	select CRYPTO
+> +	select CRYPTO_HMAC
+> +	select CRYPTO_HKDF
+> +	select CRYPTO_AES
+> +	select CRYPTO_GCM
+> +	select CRYPTO_CCM
+> +	select CRYPTO_CHACHA20POLY1305
+> +	select NET_UDP_TUNNEL
 
-Thanks,
-Dragos
+Possibly:
+	default n
+
+?
+[...]
+> +static int quic_init_sock(struct sock *sk)
+> +{
+> +	sk->sk_destruct = inet_sock_destruct;
+> +	sk->sk_write_space = quic_write_space;
+> +	sock_set_flag(sk, SOCK_USE_WRITE_QUEUE);
+> +
+> +	WRITE_ONCE(sk->sk_sndbuf, READ_ONCE(sysctl_quic_wmem[1]));
+> +	WRITE_ONCE(sk->sk_rcvbuf, READ_ONCE(sysctl_quic_rmem[1]));
+> +
+> +	local_bh_disable();
+
+Why?
+
+> +	sk_sockets_allocated_inc(sk);
+> +	sock_prot_inuse_add(sock_net(sk), sk->sk_prot, 1);
+> +	local_bh_enable();
+> +
+> +	return 0;
+> +}
+> +
+> +static void quic_destroy_sock(struct sock *sk)
+> +{
+> +	local_bh_disable();
+
+Same question :)
+
+[...]
+> +static int quic_disconnect(struct sock *sk, int flags)
+> +{
+> +	quic_set_state(sk, QUIC_SS_CLOSED); /* for a listen socket only */
+> +	return 0;
+> +}
+
+disconnect() primary use-case is creating a lot of syzkaller reports.
+Since there should be no legacy/backward compatibility issue, I suggest
+considering a simple implementation always failing.
+
+/P
+
 
