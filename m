@@ -1,120 +1,186 @@
-Return-Path: <netdev+bounces-215586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E22CB2F5E2
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 13:07:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01428B2F5EE
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 13:09:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E974B1CC6FA6
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 11:06:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E92A86035E4
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 11:08:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A28930C34D;
-	Thu, 21 Aug 2025 11:06:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B554930EF8B;
+	Thu, 21 Aug 2025 11:07:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="okFQX9Ao"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ep5tfZVg"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07DEF30C36D
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 11:06:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755774369; cv=none; b=XHH1WVweNU6U97DiEK9T3z7oAkgT6midgfeCZNbhRa8K6adnkN87QhbbGQd63Mmq9YLwl1FRIPzwNpiXLfPlpFr4SJ0Orjssf/DTag2tPzgiRND2gtd3QMMv8Z74Gk3FKQj6w8rIUvTL7Efd+82W6IHwA/PWNbAFIieLOB1X9ZU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755774369; c=relaxed/simple;
-	bh=YsDIhuRNGE+4/wmy1jjagFktsQcJjYOPZR+VqA5NHPU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bXVww+4l4nHaj77N9/tdsTCwqK2AAHFEggUangOSoic/BiVYFG4HDZXbR4poNuZW4apEXzp+bacWsHYT6mctA6kW8fEOFyK4W3Dr7nvMVamaHyHcd3cCxKxIyPi3hQINwvJx36fCyZGDkcVMYPS2Hs5lvvsNx2CBG3F94iCkHpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=okFQX9Ao; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1173)
-	id 9A02B2115A5D; Thu, 21 Aug 2025 04:06:07 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 9A02B2115A5D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1755774367;
-	bh=9G4yc2KQOR2pELGVXWYSwi9XPpvTxGGAnY0JY469J6U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=okFQX9AoqB/n1CeDSDa8P3pmZn97PkPCV3BKM2chfFjyTMLrSX9emfXKcWPnsbVLo
-	 5L9UURLP+gWwQZznkt48r9kGMDcGNib91JN4wBMNWR6b5xw7Tpr0RbmoYu/qRUmgEK
-	 zPJdlPos261EJsXqVrzBQfg+dv1UfpRMEI2cMZgA=
-Date: Thu, 21 Aug 2025 04:06:07 -0700
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2089.outbound.protection.outlook.com [40.107.236.89])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CFB530DD3D;
+	Thu, 21 Aug 2025 11:07:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.89
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755774447; cv=fail; b=j2yg4H3ypzfulaIDMIBEKH7zEy+cuTcGJc7z+dw7lV14Osksce8g0sH+wsGvfkul/a2K8tdZZv9lX/qbrOqhznb4S87isdMXBZyAtoWwyaqnz2FagOzE2HWDkxHO5y6IcoBRMvmuLLYP1RHjqBdUfju+zMkATOSJqlNHRR2+aa8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755774447; c=relaxed/simple;
+	bh=K2uy4VvN7zTUcqZhY7dOPRuydbyz+EcWFRj/DWQbSOk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=eY8DfuyZiJVlqdYce/MSavM/BYoXnoFuVkxz5VxxEwEzSLGwe/LYnJSb13CRYn3UWerNKK9vsA9ol4m0qblQj9JuosnMmGN3MfpM5TR0rgM8J7FWKbbRhJSXQ9fZO0IfdBJVzM7zsxD09aZua33Us4/nDvuItcBZ1eEgIfnwq3Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ep5tfZVg; arc=fail smtp.client-ip=40.107.236.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=GjwjrFOgJ+KfVxKSdemSHttGkv/HLg0B8QzghThVRg5fAnu8xP6f3lXZXW/ph3nQCX0WgNVJ7U0qliPGLB69g+5Qla8Vbt5w/Y5xQUhHsF98HAWcN2bAXsA5ADYUGjnqBbCLKc0ykik2GhkEcD8S0b26P0ylvGW4VM35Q9xpvR990gIulUuGGuTJBmZyg6xejmzcPGhKRX7J4eQrdyG2CYQper/4oXWRr9lp+q3HYKK3p/++9MCb8ZBk3QxHJgLXd49Eh9tv0wAwAksf33ehq1GKNA0fFbUNGgwUO6JShs87+6dNU+cW8ftpHdDgx56vsshNdsJi/5+JZpGiOZlCFA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zgygFsCsJde5xjSdpM52NoWbRwxIAMIEAxlCYU+it1s=;
+ b=l/nmBOHRssRs0nIfvEcvFpzJwUSTmIkS0ZScuEDP4D019/ESx4pYEAMK3/mY18x08BvXHTJhueAwKbODoXtRWU0vxH2J0JfOrInjTA3c54AbltKofnQ6F2WBSdcz/HxjjhMsDPYgfl5yGCOmuVFoZpIMfbUjqLxfxYi8fa9W3d2CnwXO72eDZmcsI9SQXFKtx1j2t5PeYMGNKd2kLAvzdIw7+ou3iyZ88lGHeYygce89smgPxV8t3jE1UyW4hZSfZEHj4NhcV05dYf69i1YvJi9GhKePLrPyW90nqtPQyaf6g7u/TQX+Nm1dFayuGTkvEbLuuSWcYJ7m6pPFU00lLw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zgygFsCsJde5xjSdpM52NoWbRwxIAMIEAxlCYU+it1s=;
+ b=ep5tfZVgnBrVq8vCVyhVkY+1YsDRqGgU4hZRnotZ30vW3tXdTeyfSLRIC0qMiBE9n3MXLJS+OgfdGiQvhQu17shQzeBt7jOWgxdPYpyeqFzuIhym/8GuxBXzRLzMwMbAg7VveYxaYH22J7RiG1qRzKGNGM/LZniaawj6pocYKtA1wmdYwg54MVICunZZcD3QhKSTWhOQ8oxK+GFyG9jz4KmNdSN31KmVhkdm+jX3GPXFs4HlVnI3naVAnq3yGMb6nhDj2J/BQWMtEEmcMXH9+dMjvI18SohUAbjJ+CuWx1qmUKGw5iZPqaVQmDrfVFrQJqEy07J6F0za/xhFbBMNlw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from IA1PR12MB9031.namprd12.prod.outlook.com (2603:10b6:208:3f9::19)
+ by BY5PR12MB4225.namprd12.prod.outlook.com (2603:10b6:a03:211::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.21; Thu, 21 Aug
+ 2025 11:07:21 +0000
+Received: from IA1PR12MB9031.namprd12.prod.outlook.com
+ ([fe80::1fb7:5076:77b5:559c]) by IA1PR12MB9031.namprd12.prod.outlook.com
+ ([fe80::1fb7:5076:77b5:559c%6]) with mapi id 15.20.9052.014; Thu, 21 Aug 2025
+ 11:07:21 +0000
+Date: Thu, 21 Aug 2025 11:07:18 +0000
+From: Dragos Tatulea <dtatulea@nvidia.com>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: Stephen Hemminger <stephen@networkplumber.org>, dsahern@gmail.com,
-	netdev@vger.kernel.org, haiyangz@microsoft.com,
-	shradhagupta@linux.microsoft.com, ssengar@microsoft.com,
-	dipayanroy@microsoft.com, ernis@microsoft.com
-Subject: Re: [PATCH iproute2-next v3] iproute2: Add 'netshaper' command to
- 'ip link' for netdev shaping
-Message-ID: <20250821110607.GC7364@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1754895902-8790-1-git-send-email-ernis@linux.microsoft.com>
- <20250816155510.03a99223@hermes.local>
- <20250818083612.68a3c137@kernel.org>
+Cc: almasrymina@google.com, asml.silence@gmail.com, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, cratiu@nvidia.com, 
+	parav@nvidia.com, netdev@vger.kernel.org, sdf@meta.com, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4 6/7] net: devmem: pre-read requested rx
+ queues during bind
+Message-ID: <bcj2oerynyc537fekpmvd63ei4ewtajo4ase4y4rp2hghiz4i2@weyhqp4itgez>
+References: <20250820171214.3597901-1-dtatulea@nvidia.com>
+ <20250820171214.3597901-8-dtatulea@nvidia.com>
+ <20250820180904.698f1546@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250820180904.698f1546@kernel.org>
+X-ClientProxiedBy: TL2P290CA0001.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:2::19) To IA1PR12MB9031.namprd12.prod.outlook.com
+ (2603:10b6:208:3f9::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250818083612.68a3c137@kernel.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR12MB9031:EE_|BY5PR12MB4225:EE_
+X-MS-Office365-Filtering-Correlation-Id: 41aa3c5f-7189-4fe4-e2ef-08dde0a2e6a8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?jDnffFXlWzbGHMi3sxANMpfIfWclqHzIwwKzF1/SYsulReMs8BezDmxAHWy8?=
+ =?us-ascii?Q?yF0VII44YmiTzwdz0aJhm8OhSOWiE8boMQeyeMI8AHQCJD69dDAu5ERQfPaw?=
+ =?us-ascii?Q?r6a3IJQnNop/0+dPQMgylm+hrehH833Zsm8kOynhTm6wiZP+p0ZI1z/KyX9X?=
+ =?us-ascii?Q?EV6iYb1lxIYSscALwDfjH8HglFUYZQF6n9+aSVNhdrgNIe+O9uSbiqCLEUBW?=
+ =?us-ascii?Q?ask11pGzY7QpFWn/ZfUcpJPJ8VKQDyyfbAGuAg0spIfgkt12DZYPsD6QlmHr?=
+ =?us-ascii?Q?U/anWGxGzSdxY2joqiuFuijEDNu1N63PQfgW61GNHz2giGIS+2hxvNvSzlaG?=
+ =?us-ascii?Q?0mK2fwL222Ig6ScJloaJ6P451M/BIRqGTtdA00Q81WdolRLocgZYjLkCNWh6?=
+ =?us-ascii?Q?kStqJMkVnbTvvyhydNx+K1CTMtGczJpAinlwNdEWVrK5eHro9wydjEyVa5GU?=
+ =?us-ascii?Q?ZjlDBbqcgtxluKUjtf12OG2WiNtlp5zd4yfb3wcVoTXEeyv4FGt3amKiqY+A?=
+ =?us-ascii?Q?uaJW93dY1VWP17y/OQgRc+rHagZO+9+rhaw5UHWJshADCKasHR/q6JmzsJEE?=
+ =?us-ascii?Q?pUVVcqD3MfYN2F7Y6zgEQWyY/lM03cIb5dZDqeLOqHFhRjxEEYJPw0tm5q8N?=
+ =?us-ascii?Q?oaL7pQKuqG+PSI/PEco3MotodSxrZxyrQVmZH34I4RkIg81olp5xyJYQrX0v?=
+ =?us-ascii?Q?e8p+INrC8j3kTAgpOml/2egqLjCGf0cZ8Q6zF9ggDQ3fKupFxSvg78mbwNKj?=
+ =?us-ascii?Q?km/R5m7L15M/oBOnbDeUw7Le0CcopMsg+o7f3jH0dXZLvV4v0eSWZ1yNaDn6?=
+ =?us-ascii?Q?Cf4r+Ln6StT4gJKUNqWao63SIG0H+wEr3hPNl+TbQdIfQmCOTRKL0O0MIFED?=
+ =?us-ascii?Q?i5CO/vaQooK//1BvsvALEUz1710ZmwlhSvl19LA9IOU7C0xoYS1IsnnNOpF7?=
+ =?us-ascii?Q?iXdMwzQmb0aC+IXNAIoFztg7Rc5zE6PWd2o69VjtZaRlM4ZWmpKM5aTwVmhK?=
+ =?us-ascii?Q?Qp2+oL9M37eJe1ccGcy9AcSaIUOTxnwfaica1t/qHo3WGBLNi9KGoEMqAmH6?=
+ =?us-ascii?Q?CDdI6lnYZySNSN8xD4OI+YTtchQowK1epaVn8BEkblDiMO7f8XGNHl+3cBYG?=
+ =?us-ascii?Q?evAOEzJqTTeRh+UeEWcAHWxRQfEDsyjnbmn2MmzTGfqolqbk6PCIXyfjkify?=
+ =?us-ascii?Q?rLQP0/85mCKv4lr9DOCUKrJIbVB0P/i96ibEz44kuzYRE8fK2qyTys9cpKmg?=
+ =?us-ascii?Q?51sQFq4Io1UB45zj+avZp443IMHh9/9QWnM6LWsSVXt1ixb24fUhce3f78eN?=
+ =?us-ascii?Q?7MaZzWcicyu1o/nrxpLw1A7Nj/87HlDCrRqoxILVXh67SyY49F87Sp5KC7Nz?=
+ =?us-ascii?Q?S6zz7YoMJh1ReFvsRIGXpak/r+tGevx6xZ7qc0WoR+5XvoWWNXclNgzG2TDE?=
+ =?us-ascii?Q?cuyvmAQ0rGo=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB9031.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?wfv/CgQOPGzxpPmobiiGPaP0Zo8UO8n8t6E9ajgQodhA+hh7+qJic2bNlEZm?=
+ =?us-ascii?Q?+eMn+hJMWo0ow0axNxYauPJ0LBvFhmI7zT/OwxN9cvHnmI2XD1YNChwpsTFc?=
+ =?us-ascii?Q?w4o6l2f/YUcA6vaehU7yZDS/V/Y7ixcMfrlmAq0ZR4JNRLO0UVzbBUb1HwL3?=
+ =?us-ascii?Q?p8UtHxmgUNdvI4AL0xNFJ20Z7pWraUPhfNNU0MwdgUi7TXgO4fzrXj7fnI7s?=
+ =?us-ascii?Q?c5ZS8D4GYyLCpq9BWut80MGjPon0vnWnEvK9UTCRsWd3IZHKyuK339K3aK2k?=
+ =?us-ascii?Q?HMKsETtTbsT0agNNkTj+IjCZFwW57yVLi7nHOz8IHqj2TkXxcOh+Tn5cn26C?=
+ =?us-ascii?Q?MQ/tkpp+dbtYJImr0L71OPsh9Vlrj23EyrhK4FKmIh+wzvr04bp+SF+wsZiJ?=
+ =?us-ascii?Q?7up0Byb0xcIxGFVskGAiVlBxN3+UuI7hfDUbWHEE7AnTezOy+V1ne0HSVwrz?=
+ =?us-ascii?Q?hNRKWl9JlRNKUz9iHabiOzUOjUOSzR7k+W1L14wfXbRHLG3JryjekJ/IXRyX?=
+ =?us-ascii?Q?s/K9lxfaIio1+gfRp3HSO/294WbhwAbTBxOgf5odgVZLeRlypzB9lIaKaTQe?=
+ =?us-ascii?Q?V7afahl8EUGkIq36en2B2KRasb3cgDalNQaEE+a63u+ZKFYbVXKn3/hVjrX+?=
+ =?us-ascii?Q?rA8ee+C568kBFuSE/OxwxCrtQMsDJ33tiHnrgMnyoPH+GzA5FlXRe0A74gK6?=
+ =?us-ascii?Q?hSWzEbgSm2/vcLmIq7TAkQ4T+qic9w6vSW+wbci4qDiy9qIl3o5WyfQr/lhf?=
+ =?us-ascii?Q?K3ThG/z5Fu9KvIe8kywUXKqj21FiB/y7WNW6nIdajUxM+1B37rLeAuiYYGEy?=
+ =?us-ascii?Q?KK0BXqSsGBFQ5eNA9NvBBc3m2/lUlosOk/edc8FAvlvqairOPajcD53EqfLg?=
+ =?us-ascii?Q?iuGc/6jn88Xs/4/jk5tOC/G3MF1zB2Y3IDl8ytlvo3Nz+bkIS2ZZf2Q0hKmb?=
+ =?us-ascii?Q?R9PU5p/+JpZfWDiA/5KgQhtdKdFBusq8QE+QsgdkVp6WmllnipZNFj1wRNeo?=
+ =?us-ascii?Q?jZW0W6o9KvRt1c1m4P7VZK0mneE+KyYhCe0ZktufRB20mrsEAxtl+/Rtwrhg?=
+ =?us-ascii?Q?JM2eptMNNskz0Wh+HEJ827ewcKuOyf/JEXl5ZkLw/zytN5psedwv7L5mxF00?=
+ =?us-ascii?Q?lghrLLexx0xmrykqlJ66muCIRiqDSAnlusjObJb4k2s6OtF57vOqJyuUaI/9?=
+ =?us-ascii?Q?vJ2mdKKumOVELaAgYeWxgv421jAs0OlZR/YbzNJ9QxAcOEG1ND7BqMgr7crr?=
+ =?us-ascii?Q?ZUUJmb5t3CYZSm8Ye7WqARUHxMOtf2mAO8CjbGVBHqq4g11khGCaj+NBwIcT?=
+ =?us-ascii?Q?7keqxcY+OQzaXD1BtbNeCQiRxaL0zs3JMJ4iByEaTh9eg7myqDFI8asgajNA?=
+ =?us-ascii?Q?11QczZzfVox0/o6MVp+wiUGk+wb3MoRYnnWJqC4f192/LlseY7mYkNfQ+0xR?=
+ =?us-ascii?Q?MDlJ+qTfN7hVH/QM1ZkRHZUHyDVuWJOYL480IL+99VtyiMlzeEROUp8euYBY?=
+ =?us-ascii?Q?fi1Dwpzs/9bz2e3hCaf3NxYZ1F0PGqwERF54LcEUtgcsjEJ7iYVwfCwVmtCr?=
+ =?us-ascii?Q?Ty8EHtrT284vHtBVIo41lSwmlsKiHyA13SidhzcB?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 41aa3c5f-7189-4fe4-e2ef-08dde0a2e6a8
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB9031.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2025 11:07:21.7075
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: r4Yqw+x/yI1ZsewmDmoYnS8gtqLX10g8q4KZmeFPdoxx2GghYBoW1wuMxwKEKHeJs+gFAKUKVKpHNDkDGo6a9A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4225
 
-On Mon, Aug 18, 2025 at 08:36:12AM -0700, Jakub Kicinski wrote:
-> On Sat, 16 Aug 2025 15:55:10 -0700 Stephen Hemminger wrote:
-> > On Mon, 11 Aug 2025 00:05:02 -0700
-> > Erni Sri Satya Vennela <ernis@linux.microsoft.com> wrote:
-> > 
-> > > Add support for the netshaper Generic Netlink
-> > > family to iproute2. Introduce a new subcommand to `ip link` for
-> > > configuring netshaper parameters directly from userspace.
-> > > 
-> > > This interface allows users to set shaping attributes (such as speed)
-> > > which are passed to the kernel to perform the corresponding netshaper
-> > > operation.
-> > > 
-> > > Example usage:
-> > > $ip link netshaper { set | get | delete } dev DEVNAME \
-> > >                    handle scope SCOPE id ID \
-> > >                    [ speed SPEED ]  
-> > 
-> > The choice of ip link is awkward and doesn't match other options.
-> > I can think of some better other choices:
-> > 
-> >   1. netshaper could be a property of the device. But the choice of using genetlink
-> >      instead of regular ip netlink attributes makes this hard.
-> >   2. netshaper could be part of devlink. Since it is more targeted at hardware
-> >      device attributes.
-> >   3. netshaper could be a standalone command like bridge, dcb, devlink, rdma, tipc and vdpa.
-> > 
-> > What ever choice the command line options need to follow similar syntax to other iproute commands.
+On Wed, Aug 20, 2025 at 06:09:04PM -0700, Jakub Kicinski wrote:
+> On Wed, 20 Aug 2025 20:11:57 +0300 Dragos Tatulea wrote:
+> >  	struct nlattr *tb[ARRAY_SIZE(netdev_queue_id_nl_policy)];
+> > +	struct nlattr *attr;
+> > +	int rem, err = 0;
+> > +	u32 rxq_idx;
+> > +
+> > +	nla_for_each_attr_type(attr, NETDEV_A_DMABUF_QUEUES,
+> > +			       genlmsg_data(info->genlhdr),
+> > +			       genlmsg_len(info->genlhdr), rem) {
+> > +		err = nla_parse_nested(
+> > +			tb, ARRAY_SIZE(netdev_queue_id_nl_policy) - 1, attr,
 > 
-> I think historically we gravitated towards option 3 -- each family has
-> a command? But indeed we could fold it together with something like
-> the netdev family without much issue, they are both key'd on netdevs.
+> While you're touching this line, could you perhaps clean up the line
+> wrap? Save ARRAY_SIZE(netdev_queue_id_nl_policy) - 1 to a const and
+> then:
 > 
-> Somewhat related -- what's your take on integrating / vendoring in YNL?
-> mnl doesn't provide any extack support..
+> 		err = nla_parse_nested(tb, maxtype, attr, 
+> 				       netdev_queue_id_nl_policy, info->extack);
+> 
+> or some such.
+Will clean up.
 
-I have done some tests and found that if we install pkg-config and
-libmnl packages beforehand. The extack error messages from the kernel
-are being printed to the stdout.
-
-Example 1:
-$ sudo ip link netshaper set dev <interface> handle scope queue id 1
-speed 15gbit
-
-Error: mana: net shaper scope should be netdev.
-Kernel command failed: -1
-
-Example 2:
-$ sudo ip link netshaper set dev <interface> handle scope netdev id 2
-speed 15gbit
-
-Error: mana: Cannot create multiple shapers.
-Kernel command failed: -1
-
+Thanks,
+Dragos
 
