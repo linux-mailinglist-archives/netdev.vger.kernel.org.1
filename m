@@ -1,338 +1,127 @@
-Return-Path: <netdev+bounces-215598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FDB9B2F6F2
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 13:42:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85184B2F6F4
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 13:43:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15D5B3A02FA
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 11:39:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4181B1C2443F
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 11:44:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DE0130FF09;
-	Thu, 21 Aug 2025 11:38:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D058230E833;
+	Thu, 21 Aug 2025 11:43:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="LNgmCmob";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="QO8yfFEW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M3hbGI+b"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 571B330F551
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 11:38:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613D030F531;
+	Thu, 21 Aug 2025 11:43:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755776336; cv=none; b=smSV4h77yOU45YF6n6DVWrcAyeXa0J9IaB5SipsLa8zEfV0H7mCJTpTGNt3Uizim5pnISZFtPYxMB+RSPs528H3Uz/XqqdKAXPN5VnFTSqaQXERxuSp7OtSHErpp+b1vZhLlhp3NFQ3cOtAG3lym0BaAC1gKGTUYEXdFh60VRyY=
+	t=1755776628; cv=none; b=sLTqTyz+WhMUrXfmFe+/rrOACYgSfZxppsgh7JfFOO4Gvl++1cupoh+MIKQbw2ZKHho/PAYm3w6qrc5FKCyX/eG3aWkHUesIV6PToAZJJ3E5BDOitbzVPGwfZm9/q+6KrBkEM3UdGF2o4+kWtGlti3M4Op077Mthsc7nLmzFcaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755776336; c=relaxed/simple;
-	bh=iBnX6Oq23MmsRBC0WsqPxn5c/fkLA4yYmkVCPxb94Qc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=oKQWXl3FEppZnpa5BI5Y/nQa/kVlYuTuNmoj2MUcShMAMg06XcsAzmXw2QnFLp3vXld9e4Xbyp/3Rj9NNt10bs30Bcshhc9Fxn/WjSFmCtjO9wELb4Alp21SVLwxaTdoJGLFWiIHXo5RUQJgL0yo7/24NPKjkww3uDr+WnHtVKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=LNgmCmob; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=QO8yfFEW; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1755776326;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vot0hwlvDZbwBGJwdG2Otwy2FPYjUK+K6Sxb0As+xq4=;
-	b=LNgmCmob6Np/IswX5WiAYffsHN2MgxsJ5jo8und+HPxRw9Oav2fMAE5c45x28OGJBk4Hqq
-	lDwac4bOUHgirJjHbOY1aT08sv32OkUKXakhr13bnqo4BWe+clqGhijHRCtbG13RlcyTy/
-	3/dmBIbBTX1dzYpuxURJayynuSrvwhY918CjKceBAICR2w/ejzNEC3jdyT2hYHS59rXAJc
-	y70wE02y6iMgTH7B5dcNB/eG1obxDmwUTGSwBFFM9Jxei/u1iUpmdEiOMsHuCylqygOtrA
-	TYL7iM1kPVGkopYcTZuRWnxmj0oc/TuomsD74Svc3ijBsXNA7oGOMeholrLnzg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1755776326;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vot0hwlvDZbwBGJwdG2Otwy2FPYjUK+K6Sxb0As+xq4=;
-	b=QO8yfFEW0ezSCU42EFhc1WxmoSwf8AJBxEWMQY7J9iKBUGnAtiT6dk5TxT3UFZLxYSaXgQ
-	bnz9F/+uSqljyQAw==
-To: Jacob Keller <jacob.e.keller@intel.com>, Miroslav Lichvar
- <mlichvar@redhat.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
- Vinicius Costa Gomes <vinicius.gomes@intel.com>, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next] igb: Retrieve Tx timestamp
- directly from interrupt
-In-Reply-To: <81c1a391-3193-41c6-8ab7-c50c58684a22@intel.com>
-References: <20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de>
- <aKMbekefL4mJ23kW@localhost>
- <c3250413-873f-4517-a55d-80c36d3602ee@intel.com>
- <aKV_rEjYD_BDgG1A@localhost>
- <81c1a391-3193-41c6-8ab7-c50c58684a22@intel.com>
-Date: Thu, 21 Aug 2025 13:38:44 +0200
-Message-ID: <87ldncoqez.fsf@jax.kurt.home>
+	s=arc-20240116; t=1755776628; c=relaxed/simple;
+	bh=R3Scx1nCm7qXdEeR72YI5W2/n/X1yCm0pDtCDNCqSJg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CG/aJsHCK3Hzg6sZ1reX37Duz7xCtjedvwF992Nr2M0SrufraNndVcgOXyVZEgn5qEwktJNmI96J3UTfBI7A53ycnSFy2yQPatOcCjNqqV7MgHdIWjeCRGXTNT/Gz4f3iwADUP/Qaf6926/ooo90HUCbFGUaYeBP9V0IboTkASM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M3hbGI+b; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-76e2eb6ce24so777936b3a.3;
+        Thu, 21 Aug 2025 04:43:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755776625; x=1756381425; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=E8SdXJDP9EOWPMR/erbb4MQMr6TAUsa/gMSJnaqvBaM=;
+        b=M3hbGI+bZyo/3KqL7E4qr+BbOPl/m2sv+140ItqMmkkJbG3qw8Bm0hADgXvTO4Nzdv
+         hq8fKesE9Mx6cu7AviaIZ4so3YfDwM3O5tGO5C7VsSiWZhCXPB6sJtU91YCbqHnxasAS
+         BnodHSytcbkeAgp8fJxT7hXtGnYgF0/Y9EXHSsB92LzpY+iwUM96ppLze12aqLgV7Aqo
+         8x7kioN/89v5NcvMjf7g+EEY7FIcZm6TIUNz+qK3p6QW96gXSQVG4O3EyE87YPfiTtoW
+         Dq1eb+NxEYD6vfqXHV6kyxVPZKY/Ouct9ohgYHmdSwyIVwz2Zj+27jVygN+CSezneJIa
+         OBTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755776625; x=1756381425;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=E8SdXJDP9EOWPMR/erbb4MQMr6TAUsa/gMSJnaqvBaM=;
+        b=ERh/4GG9KQlu67aVHxQJA0FpvQL8kJ4yHs/mxCLBoGqIgILDAKpSjdGWIWxyT1Fi9r
+         vNabN49g7KDUxhlUepcLh48qtuoUqKK+i1HZAgR0cEB9SG/EAfQ/gnWqYE3tYngT+VGW
+         VGL76STbseW2rzbOfjqksYgPwPalYnP1QIUft5P1mzNhP9sQ4oshbadLAapp+/ngntGV
+         vOBNx6TVuzZArOqtEBgNTIXiv1I36Ns9qXjeELD0XfcevuoUi0KegyG4PeSFiIIJ407U
+         wXYEX/wqByqSmuF/v/6ADVVtDBoje2P5UTN31ZkgoLjKb6mTUS0fmKyCcT+Xp3lwKV8g
+         0WWw==
+X-Forwarded-Encrypted: i=1; AJvYcCU2pNpm/4SoSbYrI5uiSro/sCS4+5JllhHc+iiUp+FoHPyVvD8aDphwbhFIRnN/WF/wS4m5eha5IKWEF3E=@vger.kernel.org, AJvYcCWbAVGs5KW6OdO6hPjV/C8BNH7Jznp0CVRIwg8sGaM1Pvapsenk5+TwJLOF4mkx+7mDeOOZ6omZ@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHH0vtIB9pGuomvrP48gtLZ2dJvl1rYVYYn7TT/3ficA2/f/ZH
+	QGFJ5HWNG+V8o3WHYzhjH+2rqo7DGC0CChYn2FyupY8LAEnTHg7kICAq
+X-Gm-Gg: ASbGnctKQRXKlUp8SbCj74RuTmevgzljTFW/+McMeC5VTwtqFIbZF8QHs/nebNQu5FS
+	BP4E+EujWU9Eo+tZWo3/dMyqV4y11GkKQoShzviyvgnTPQkW2XA2jVFIDMGAsWvI+jJ9d40hzJz
+	l+JjdfnaCF+iNRCdUKHh7ncpaM7oirb/KefoqbWnpx/AQllPoHKoBUyeGg8w8jpoRuEzmirxak4
+	Wua8eRUwZs/5qRSQm7I3ojJdpzPHjTHCazaKihbSLSk8x8/u9d+fVc+LdOuY/xkRbmzlTVzj+zG
+	6wkZCBbHNDInoEJ22p0NJlujzM1txFevhFndGrhSj928kT3fp1d42tYkN0ZK7wOUc85BRt1FAxC
+	6Js7S7r18Y26ex9tHDdNr+ZQz
+X-Google-Smtp-Source: AGHT+IG0qPXrimBqxKsTPgNOg7cjXvEK1Tg1fEhT9QgLA9n/DxXnbIC5Aibc3t7h6VGnDQWi710POQ==
+X-Received: by 2002:a05:6a20:7f96:b0:23d:ab68:1b7c with SMTP id adf61e73a8af0-24330a98906mr2887985637.46.1755776625394;
+        Thu, 21 Aug 2025 04:43:45 -0700 (PDT)
+Received: from mythos-cloud ([121.159.229.173])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76e7ccfa8d1sm8072679b3a.0.2025.08.21.04.43.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Aug 2025 04:43:45 -0700 (PDT)
+From: Yeounsu Moon <yyyynoom@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Yeounsu Moon <yyyynoom@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: dlink: fix multicast stats being counted incorrectly
+Date: Thu, 21 Aug 2025 20:42:53 +0900
+Message-ID: <20250821114254.3384-1-yyyynoom@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Transfer-Encoding: 8bit
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+`McstFramesRcvdOk` counts the number of received multicast packets, and
+it reports the value correctly.
 
-On Wed Aug 20 2025, Jacob Keller wrote:
-> On 8/20/2025 12:56 AM, Miroslav Lichvar wrote:
->> On Tue, Aug 19, 2025 at 04:31:49PM -0700, Jacob Keller wrote:
->>> I'm having trouble interpreting what exactly this data shows, as its
->>> quite a lot of data and numbers. I guess that it is showing when it
->>> switches over to software timestamps.. It would be nice if ntpperf
->>> showed number of events which were software vs hardware timestamping, as
->>> thats likely the culprit. igb hardare only has a single outstanding Tx
->>> timestamp at a time.
->>=20
->> The server doesn't have a way to tell the client (ntpperf) which
->> timestamps are HW or SW, we can only guess from the measured offset as
->> HW timestamps should be more accurate, but on the server side the
->> number of SW and HW TX timestamps provided to the client can be
->> monitored with the "chronyc serverstats" command. The server requests
->> both SW and HW TX timestamps and uses the better one it gets from the
->> kernel, if it can actually get one before it receives the next
->> request from the same client (ntpperf simulates up to 16384 concurrent
->> clients).
->>=20
->> When I run ntpperf at a fixed rate of 140000 requests per second
->> for 10 seconds (-r 140000 -t 10), I get the following numbers.
->>=20
->> Without the patch:
->> NTP daemon TX timestamps   : 28056
->> NTP kernel TX timestamps   : 1012864
->> NTP hardware TX timestamps : 387239
->>=20
->> With the patch:
->> NTP daemon TX timestamps   : 28047
->> NTP kernel TX timestamps   : 707674
->> NTP hardware TX timestamps : 692326
->>=20
->> The number of HW timestamps is significantly higher with the patch, so
->> that looks good.
->>=20
->> But when I increase the rate to 200000, I get this:
->>=20
->> Without the patch:
->> NTP daemon TX timestamps   : 35835
->> NTP kernel TX timestamps   : 1410956
->> NTP hardware TX timestamps : 581575=20=20=20=20=20=20=20=20=20=20=20=20
->>=20
->> With the patch:
->> NTP daemon TX timestamps   : 476908
->> NTP kernel TX timestamps   : 646146
->> NTP hardware TX timestamps : 412095
->>=20
->
-> When does the NTP daemon decide to go with timestamping within the
-> daemon vs timestamping in the kernel? It seems odd that we don't achieve
-> 100% kernel timestamps...
->
->> With the patch, the server is now dropping requests and can provide
->> a smaller number of HW timestamps and also a smaller number of SW
->> timestamps, i.e. less work is done overall.
->>=20
->> Could the explanation be that a single CPU core now needs to do more
->> work, while it was better distributed before?
->>=20
->
-> Hm. The interrupt vector may be fired on the same CPU maybe? The work
-> items can go into the general pool which spreads to all CPUs, and I
-> guess the amount of work to submit the timestamp is high enough that we
-> do end up costing too much?
->
-> Hmm.
->
-> We could experiment with using a kthread via the ptp_aux_work setup and
-> tuning to ensure that thread has good prioritization? I don't know what
-> the best compromise is since its clear the interrupt is best if the
-> timestamp volume isn't too high.
+However, reading `McstFramesRcvdOk` clears the register to zero. As a
+result, the driver was reporting only the packets since the last read,
+instead of the accumulated total.
 
-Miroslav, can you test the following patch? Does this help?
+Fix this by updating the multicast statistics accumulatively instaed of
+instantaneously.
 
-From=200b795f37fecd235bf4c9965148afaf33e4a5139c Mon Sep 17 00:00:00 2001
-From: Kurt Kanzenbach <kurt@linutronix.de>
-Date: Wed, 20 Aug 2025 14:01:45 +0200
-Subject: [PATCH] igb: Convert Tx timestamping to PTP aux worker
+Tested-on: D-Link DGE-550T Rev-A3
+Signed-off-by: Yeounsu Moon <yyyynoom@gmail.com>
+---
+ drivers/net/ethernet/dlink/dl2k.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The current implementation uses schedule_work() which is executed by the
-system work queue to retrieve Tx timestamps. This increases latency and can
-lead to timeouts in case of heavy system load.
+diff --git a/drivers/net/ethernet/dlink/dl2k.c b/drivers/net/ethernet/dlink/dl2k.c
+index cc60ee454bf9..6bbf6e5584e5 100644
+--- a/drivers/net/ethernet/dlink/dl2k.c
++++ b/drivers/net/ethernet/dlink/dl2k.c
+@@ -1099,7 +1099,7 @@ get_stats (struct net_device *dev)
+ 	dev->stats.rx_bytes += dr32(OctetRcvOk);
+ 	dev->stats.tx_bytes += dr32(OctetXmtOk);
+ 
+-	dev->stats.multicast = dr32(McstFramesRcvdOk);
++	dev->stats.multicast += dr32(McstFramesRcvdOk);
+ 	dev->stats.collisions += dr32(SingleColFrames)
+ 			     +  dr32(MultiColFrames);
+ 
+-- 
+2.50.1
 
-Therefore, switch to the PTP aux worker which can be prioritized according
-to use case.
-
-Tested on Intel i210.
-
-Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
-=2D--
- drivers/net/ethernet/intel/igb/igb.h      |  1 -
- drivers/net/ethernet/intel/igb/igb_main.c |  6 +++---
- drivers/net/ethernet/intel/igb/igb_ptp.c  | 26 ++++++++++++-----------
- 3 files changed, 17 insertions(+), 16 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/igb/igb.h b/drivers/net/ethernet/in=
-tel/igb/igb.h
-index 43401c3c824f..0d2bdde47c32 100644
-=2D-- a/drivers/net/ethernet/intel/igb/igb.h
-+++ b/drivers/net/ethernet/intel/igb/igb.h
-@@ -624,7 +624,6 @@ struct igb_adapter {
- 	struct ptp_clock *ptp_clock;
- 	struct ptp_clock_info ptp_caps;
- 	struct delayed_work ptp_overflow_work;
-=2D	struct work_struct ptp_tx_work;
- 	struct sk_buff *ptp_tx_skb;
- 	struct kernel_hwtstamp_config tstamp_config;
- 	unsigned long ptp_tx_start;
-diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethern=
-et/intel/igb/igb_main.c
-index fe0c0a5caa85..5974180721b1 100644
-=2D-- a/drivers/net/ethernet/intel/igb/igb_main.c
-+++ b/drivers/net/ethernet/intel/igb/igb_main.c
-@@ -6665,7 +6665,7 @@ netdev_tx_t igb_xmit_frame_ring(struct sk_buff *skb,
- 			adapter->ptp_tx_skb =3D skb_get(skb);
- 			adapter->ptp_tx_start =3D jiffies;
- 			if (adapter->hw.mac.type =3D=3D e1000_82576)
-=2D				schedule_work(&adapter->ptp_tx_work);
-+				ptp_schedule_worker(adapter->ptp_clock, 0);
- 		} else {
- 			adapter->tx_hwtstamp_skipped++;
- 		}
-@@ -6701,7 +6701,7 @@ netdev_tx_t igb_xmit_frame_ring(struct sk_buff *skb,
- 		dev_kfree_skb_any(adapter->ptp_tx_skb);
- 		adapter->ptp_tx_skb =3D NULL;
- 		if (adapter->hw.mac.type =3D=3D e1000_82576)
-=2D			cancel_work_sync(&adapter->ptp_tx_work);
-+			ptp_cancel_worker_sync(adapter->ptp_clock);
- 		clear_bit_unlock(__IGB_PTP_TX_IN_PROGRESS, &adapter->state);
- 	}
-=20
-@@ -7169,7 +7169,7 @@ static void igb_tsync_interrupt(struct igb_adapter *a=
-dapter)
-=20
- 	if (tsicr & E1000_TSICR_TXTS) {
- 		/* retrieve hardware timestamp */
-=2D		schedule_work(&adapter->ptp_tx_work);
-+		ptp_schedule_worker(adapter->ptp_clock, 0);
- 	}
-=20
- 	if (tsicr & TSINTR_TT0)
-diff --git a/drivers/net/ethernet/intel/igb/igb_ptp.c b/drivers/net/etherne=
-t/intel/igb/igb_ptp.c
-index a7876882aeaf..f0b08809cf91 100644
-=2D-- a/drivers/net/ethernet/intel/igb/igb_ptp.c
-+++ b/drivers/net/ethernet/intel/igb/igb_ptp.c
-@@ -803,15 +803,15 @@ static int igb_ptp_verify_pin(struct ptp_clock_info *=
-ptp, unsigned int pin,
-  * This work function polls the TSYNCTXCTL valid bit to determine when a
-  * timestamp has been taken for the current stored skb.
-  **/
-=2Dstatic void igb_ptp_tx_work(struct work_struct *work)
-+static long igb_ptp_tx_work(struct ptp_clock_info *ptp)
- {
-=2D	struct igb_adapter *adapter =3D container_of(work, struct igb_adapter,
-=2D						   ptp_tx_work);
-+	struct igb_adapter *adapter =3D container_of(ptp, struct igb_adapter,
-+						   ptp_caps);
- 	struct e1000_hw *hw =3D &adapter->hw;
- 	u32 tsynctxctl;
-=20
- 	if (!adapter->ptp_tx_skb)
-=2D		return;
-+		return -1;
-=20
- 	if (time_is_before_jiffies(adapter->ptp_tx_start +
- 				   IGB_PTP_TX_TIMEOUT)) {
-@@ -824,15 +824,17 @@ static void igb_ptp_tx_work(struct work_struct *work)
- 		 */
- 		rd32(E1000_TXSTMPH);
- 		dev_warn(&adapter->pdev->dev, "clearing Tx timestamp hang\n");
-=2D		return;
-+		return -1;
- 	}
-=20
- 	tsynctxctl =3D rd32(E1000_TSYNCTXCTL);
-=2D	if (tsynctxctl & E1000_TSYNCTXCTL_VALID)
-+	if (tsynctxctl & E1000_TSYNCTXCTL_VALID) {
- 		igb_ptp_tx_hwtstamp(adapter);
-=2D	else
-=2D		/* reschedule to check later */
-=2D		schedule_work(&adapter->ptp_tx_work);
-+		return -1;
-+	}
-+
-+	/* reschedule to check later */
-+	return 1;
- }
-=20
- static void igb_ptp_overflow_check(struct work_struct *work)
-@@ -915,7 +917,7 @@ void igb_ptp_tx_hang(struct igb_adapter *adapter)
- 	 * timestamp bit when this occurs.
- 	 */
- 	if (timeout) {
-=2D		cancel_work_sync(&adapter->ptp_tx_work);
-+		ptp_cancel_worker_sync(adapter->ptp_clock);
- 		dev_kfree_skb_any(adapter->ptp_tx_skb);
- 		adapter->ptp_tx_skb =3D NULL;
- 		clear_bit_unlock(__IGB_PTP_TX_IN_PROGRESS, &adapter->state);
-@@ -1381,6 +1383,7 @@ void igb_ptp_init(struct igb_adapter *adapter)
- 		return;
- 	}
-=20
-+	adapter->ptp_caps.do_aux_work =3D igb_ptp_tx_work;
- 	adapter->ptp_clock =3D ptp_clock_register(&adapter->ptp_caps,
- 						&adapter->pdev->dev);
- 	if (IS_ERR(adapter->ptp_clock)) {
-@@ -1392,7 +1395,6 @@ void igb_ptp_init(struct igb_adapter *adapter)
- 		adapter->ptp_flags |=3D IGB_PTP_ENABLED;
-=20
- 		spin_lock_init(&adapter->tmreg_lock);
-=2D		INIT_WORK(&adapter->ptp_tx_work, igb_ptp_tx_work);
-=20
- 		if (adapter->ptp_flags & IGB_PTP_OVERFLOW_CHECK)
- 			INIT_DELAYED_WORK(&adapter->ptp_overflow_work,
-@@ -1437,7 +1439,7 @@ void igb_ptp_suspend(struct igb_adapter *adapter)
- 	if (adapter->ptp_flags & IGB_PTP_OVERFLOW_CHECK)
- 		cancel_delayed_work_sync(&adapter->ptp_overflow_work);
-=20
-=2D	cancel_work_sync(&adapter->ptp_tx_work);
-+	ptp_cancel_worker_sync(adapter->ptp_clock);
- 	if (adapter->ptp_tx_skb) {
- 		dev_kfree_skb_any(adapter->ptp_tx_skb);
- 		adapter->ptp_tx_skb =3D NULL;
-=2D-=20
-2.47.2
-
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAminBUQTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgpSdEAClAQ3VvRipEoxjNZt+bLiPpFmeHFfd
-RXRCeO8s9o0rBk3IQXr58ExcIb33Pp2ti4ghu+guaPrx9Q61tG5OwDvwC7CXUXd/
-A43k2XIF6PeDXAIRC5vOmSD1ip9Vq+Ztc9jaNCgT3FSNEI/MQ9MLhfcyM1IZxPz6
-MqQVjdiiBswyvs/KowcS5Orvpk4S6LY9kDC9yXM1S60yTj1pFvP23q3K4vJPlKZo
-y7wwUavZ7nnZWcOG11Xv4dJVZXDYGodt2YSHiCEQq92q81Wav6J20YxG8ScDinp2
-LG4xZkwjwmCfZLTN4QBbGJbQCknvf78b8Pk9N9OtJuPPwEkTx9o4yPEYOXYe+VZl
-jUAxNG2AGdTwwr7b7z0dVZoAlnlulcf26ALmBTqz3N9hwbTtiB4ZGwAejFze3D4K
-HKwOnm6vEoAulhhZyHHWL1se3fTlbqiAhlY+h3agRedLrfTXwdZnibs/teUdgWWd
-P080mSGGaab8Fww6LRKYU1/MRe6/QctXsfIhG2KZihjpjLwEVfiCOjuRnIit9FnJ
-t6FYgclxiIEemxdQJryZ6zvhjPcs+fEakxBwpNkcWCATjmyfQzjtREk8y2cGa3XP
-RmD0bQuP9DvSDCVT6mePN8InAIgH9ohbrHKOPGNrF9ZP9oIdDr3ImljnynUuCfX+
-ewhucve10POfxg==
-=XPwy
------END PGP SIGNATURE-----
---=-=-=--
 
