@@ -1,124 +1,128 @@
-Return-Path: <netdev+bounces-215546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215547-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29B86B2F28D
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 10:43:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF96FB2F2C0
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 10:49:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7F2B1888D15
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 08:37:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5BA0188125B
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 08:46:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FB7E2C11C5;
-	Thu, 21 Aug 2025 08:37:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 793652D9499;
+	Thu, 21 Aug 2025 08:45:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d21+CVNW"
+	dkim=pass (2048-bit key) header.d=0x65c.net header.i=@0x65c.net header.b="SN3Vly0B"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from m239-4.eu.mailgun.net (m239-4.eu.mailgun.net [185.250.239.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A94E32BE632
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 08:37:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2174F2D7809
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 08:45:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.250.239.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755765454; cv=none; b=a56FFh95/UwvRU8OqQQuGMAB7a6uL4jlqbhGEE0HrAfsnc5F0pdTUfIoiMVfuBJYhtglLRSsWUEoHay7AGyPk43GSj9uPe0zKOh7emswKngJHwX5tv8WtYpE9v0RXI2gAazQP1yn356QXRj/lvNp+hTqOIFee7Imsnp0eradvxg=
+	t=1755765935; cv=none; b=tdJC2twn6ycmyxmiZ2iEDY6EZAKqP0vATR0hkcbkAf2nSfygS88q+FoLWMbHLaMFAFbxCgfE0UNy0FMyy9i6dUHMzBz8L/zYh755Kgl5JTFL6JtFsb/+jWB4tvOFRfj81Rt2puP61B8isCAF8qM1xCf750LPGZw4hDTk++JzirA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755765454; c=relaxed/simple;
-	bh=JgRgDYpNHETv7narYbvqfLs6QlA4PD1MYCamiDt4VCU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KI8TNFBnpnXzo+GtwsNqEvlqmKVKf5VQ8wKwowCCpDkCTtYYpz98gDRKpuzTGN+/dmfiSVouDArFq27TWaWY23rRygsgaSgUID2khuNcoIvmLN43GZOuDLtcvxs6QH3eNRfmIzNjrQG99nN/a9yePMIOmQs5jRdcBf5/Agc/J+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d21+CVNW; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755765451;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6Z/jl4NhLbXD2Dij5yPc3+gGoxGWFr3ANr1k9GO/WQw=;
-	b=d21+CVNWgYj+5Zh738LSyp52Qq9nChRnI7ajhtq7TK+FYoeSL7QAvY5VcYklVTKzNTNNRG
-	zXziqiSz/ukHusg5uEYF/LoEZDgHPlEYiLdqoiZSh2ddTGOJBXQWpp1OhURtRdHglnzjun
-	6C6+D1zhyIH2HnGKBy6HBXlkpQEXArk=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-396-9-x732j0MmuCFIZwjKonSQ-1; Thu, 21 Aug 2025 04:37:29 -0400
-X-MC-Unique: 9-x732j0MmuCFIZwjKonSQ-1
-X-Mimecast-MFC-AGG-ID: 9-x732j0MmuCFIZwjKonSQ_1755765449
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4b109ab1e1dso33974961cf.1
-        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 01:37:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755765449; x=1756370249;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6Z/jl4NhLbXD2Dij5yPc3+gGoxGWFr3ANr1k9GO/WQw=;
-        b=Xb5RrMTSd6izSLZ67//2+WmTfDVqiMRQS1CJsEo8tuudLyDPbgjZY6XO6JS7qxUQ8Q
-         jH+6G4yZNYCTFIoMccJdWyi3eJHNw/UicnaLJICGUgwvzqbzG9NErLnJpHZSKbgica+Z
-         bpS1LwUcPP0NjMPky9WrcGpjCOblRjbADiuS9FYyg6LaONWc4TlhIUjeSnGdpJ9kLYmc
-         fgo2MiXs2W9UTocFCHJx3euRlvTRSE8qU/2AmMeLPuvI7GyUxa6x8nZZ87W83q36oTKt
-         kUubPsL7odnO3mrGCZ6vY58CNaAhEr4vkh8lwNmXPiI17724OWSvzFgzv+Gwy2GaVuuo
-         AgTA==
-X-Forwarded-Encrypted: i=1; AJvYcCUlZejy3q7Sog+4H2O4DNd9P/VFFNBOWBW4vCfETI9WWRe/i4OhXeokKxOA3Y/BImPyWwpXpVc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPdVuqu8zp7ws5C6WoWYRspeVn9BQJvCBnzTGzeBwbgPKt3L6W
-	MP9Icnbjft3bZ7HZzZOiZBTSioYFRAQH5ttDJ7iIP84kfLhr1ijydlnoJ5dAGKN1RHNDjc9Xn2I
-	vSKrqYcLQRWKiFOmLhfnyDYTM8+/WmyKoUO92p2TprRIXvGz2T/j7GIFU9Fn2NilkrA==
-X-Gm-Gg: ASbGnctgjmfqm5nRvXhQYFdwG29CP+vL6UYB5jJyEHr34Sos7BRnIqrMAPtaLKj7sih
-	uDB6SbQKgQO3br/aZCRoDTJSEubb7qM7eSjTAK1CTJPYKuIzVcVzSn5eZWr3Nwl0BYgajdhAITL
-	2xVMkjcX0njjlMREwQWA3RMrf7HhgRq44Vj1zFvUbaDgFpZFPfhJp/gaYK/6ORQsuOvnjr0k8XF
-	oPmOTfDwnnoTTQsX79Tq8qf+Uf9ma2pUNmLV5ErEF/aADLtBCUMx7WjZMNx46BcoaMRb6dw2GT5
-	i0V03hudRBJsDSNbfHPaGqnwxZK1NnZjZxcmaRT+J/YLLr4170ZOou7O+BWb9UFesHkJAyUf1qL
-	0IgoE9DMtNBU=
-X-Received: by 2002:ac8:5f84:0:b0:4b2:8ac4:f079 with SMTP id d75a77b69052e-4b29ffbf332mr15472861cf.75.1755765448952;
-        Thu, 21 Aug 2025 01:37:28 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHa7HLEniIEeVkau0Y7KiByuf3qR340mDfBeXhw9Feg3OiLXP4Ua8HjnDawfSR9+z1zBUadDQ==
-X-Received: by 2002:ac8:5f84:0:b0:4b2:8ac4:f079 with SMTP id d75a77b69052e-4b29ffbf332mr15472731cf.75.1755765448579;
-        Thu, 21 Aug 2025 01:37:28 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b11dc19033sm97984061cf.6.2025.08.21.01.37.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Aug 2025 01:37:28 -0700 (PDT)
-Message-ID: <c263ea0a-adb3-4c91-81b8-cb5b283c5806@redhat.com>
-Date: Thu, 21 Aug 2025 10:37:25 +0200
+	s=arc-20240116; t=1755765935; c=relaxed/simple;
+	bh=bYhu+EaqpGwbWGE7KwLH0uEIuOTOreJsPzJjXF/uUPk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GQiJdGCQkEQ8HnBEZLbheGSGjH4auEwI79M9zEEC03rwAgMgUWpiXhMi61Qf2TwZBQ9mAHCztj+pOWWUIlL3C2IXPBRmwFeTp5WbXaWV2/839YIb6Nv7O3oCjjafgAHVwuNiXk56umBnkUd7FapnmoM8pOIeXcYeOAiQM9X42ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x65c.net; spf=pass smtp.mailfrom=0x65c.net; dkim=pass (2048-bit key) header.d=0x65c.net header.i=@0x65c.net header.b=SN3Vly0B; arc=none smtp.client-ip=185.250.239.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x65c.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0x65c.net
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=0x65c.net; q=dns/txt; s=email; t=1755765931; x=1755773131;
+ h=Content-Type: Cc: To: To: Subject: Subject: Message-ID: Date: From: From: In-Reply-To: References: MIME-Version: Sender: Sender;
+ bh=msCpBQuhCsYe0DLREgBEhe037zGE4EqylmEpUhtFCws=;
+ b=SN3Vly0BED1eMOXt2/9rqYliW6fgyVy3Q2thHSqy5yBmV5OOzdycKQAVgZukkzBa66jMOkPX9C7bC4bLCJB8e4m+ai+S6H7SEyYFqM5qdWcAgu65YhE62pf0nxbD2PISqROiwwc6+LFsvpeXUDKC5PNxgGk2rlyADJIcMsh9oMuxv66wTXRgqmYZWQF407A5lvNHR7SLVnt2xcC4Q0Fnrl9sss0+PTwtNvLn09WFNX/7S5PmwRm0yn/gD4giYqvi9P/hpUWEYzkjZMB66MLfrKooXKI/5UKA7OeT108h3DIcRCcEYZ0J3+HsQccGfhAaoNYELmD63q3IfQXB6qF3Ug==
+X-Mailgun-Sid: WyI2ZTA5MCIsIm5ldGRldkB2Z2VyLmtlcm5lbC5vcmciLCI1NGVmNCJd
+Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170]) by
+ 6daba92ea63ccfff060124925e5e264487e90b9321cf65b2c1448e79f35e349c with SMTP id
+ 68a6dcab03c0e2ff1b55fc2a (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
+ Thu, 21 Aug 2025 08:45:31 GMT
+X-Mailgun-Sending-Ip: 185.250.239.4
+Sender: alessandro@0x65c.net
+Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-e94e3c3621fso705778276.0;
+        Thu, 21 Aug 2025 01:45:31 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU4K2uos5dPyRlVDDurmESZTxVNll96z2hWCdjMC2X7ZOPm7kgRXf9jl76NDq6vOMRrLfhfFKHr@vger.kernel.org, AJvYcCVJYsSNteAjwy0mzQuzcj2ApvLvBGnvfsnz9o1b/sNV/jjxzQmWns4vQpFWFqqDZ7dr12nBMGpWpevvG4aames=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzS5yfS+Mg0xWqUSlIyjyh6UoXdHH+vjts8dvAmyVkedWKNjpHw
+	s+hGqCjW8cDkku2ZJGFUVrg//ynIMr26Z0JUdHwfP/ZJA9H08FjS8INVxyXz04TUMVyCB6GQfmt
+	P6v+dlbZj9TX9IswxxqZJVneoYelBfe4=
+X-Google-Smtp-Source: AGHT+IGsJcqMRG4yd4cvOtt5skBISj3uXRZWX0nol9HqMOYR6esa1KPfaIztVwhO0z6oj8rOkDyMltT6s5I/XOlZZeM=
+X-Received: by 2002:a05:6902:c11:b0:e93:1d56:df4b with SMTP id
+ 3f1490d57ef6-e9508917cb1mr1834622276.18.1755765930435; Thu, 21 Aug 2025
+ 01:45:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL][mlx5-next 0/4] Cached vhca id and adjacent function
- vports
-To: Saeed Mahameed <saeed@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>,
- Leon Romanovsky <leonro@nvidia.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
- Parav Pandit <parav@nvidia.com>
-References: <20250815194901.298689-1-saeed@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250815194901.298689-1-saeed@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250821074552.682731-1-alessandro@0x65c.net> <20250821074552.682731-2-alessandro@0x65c.net>
+ <aKbX_CzxSi7T9Bcp@fedora>
+In-Reply-To: <aKbX_CzxSi7T9Bcp@fedora>
+From: Alessandro <alessandro@0x65c.net>
+Date: Thu, 21 Aug 2025 10:45:19 +0200
+X-Gmail-Original-Message-ID: <CAKiXHKcLsEWbEz1EkzE942PbsMEpfj=wO7uYDb+Nxy8nGCEx1Q@mail.gmail.com>
+X-Gm-Features: Ac12FXygZEeAbzB1YfK8tFEi6oY-JpXBvuzzKU8MqJf9IYpjcrpTliTW74aQ1Lw
+Message-ID: <CAKiXHKcLsEWbEz1EkzE942PbsMEpfj=wO7uYDb+Nxy8nGCEx1Q@mail.gmail.com>
+Subject: Re: [PATCH] selftests: rtnetlink: add checks for ifconfig and iproute2
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: Alessandro Ratti <alessandro@0x65c.net>, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, skhan@linuxfoundation.org, 
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 8/15/25 9:48 PM, Saeed Mahameed wrote:
-> From: Saeed Mahameed <saeedm@nvidia.com>
-> 
-> Hi Jakub, Jason,
-> 
-> This pull request introduces a preparation patchset for caching vhca_id 
-> and needed HW bits for the upcoming netdev/eswitch series to support
-> adjacent function vports.
-> 
-> For more information please see tag log below.
+On Thu, 21 Aug 2025 at 10:25, Hangbin Liu <liuhangbin@gmail.com> wrote:
+>
+> On Thu, Aug 21, 2025 at 09:43:11AM +0200, Alessandro Ratti wrote:
+> > On systems where `ifconfig` is not available (e.g., modern Debian), the
+> > `kci_test_promote_secondaries` test fails. Wrap the call in a check.
+> >
+> > Additionally, `do_test_address_proto` fails on iproute2 versions that
+> > lack support for `proto` in `ip address` commands. Add a minimal feature
+> > check and skip the test with a proper message if unsupported.
+> >
+> > These changes allow the tests to run and report SKIP instead of FAIL on
+> > platforms with older tools.
+> >
+> > Signed-off-by: Alessandro Ratti <alessandro@0x65c.net>
+> > ---
+> >  tools/testing/selftests/net/rtnetlink.sh | 10 +++++++++-
+> >  1 file changed, 9 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
+> > index d6c00efeb664..9bff620ef595 100755
+> > --- a/tools/testing/selftests/net/rtnetlink.sh
+> > +++ b/tools/testing/selftests/net/rtnetlink.sh
+> > @@ -330,7 +330,9 @@ kci_test_promote_secondaries()
+> >       for i in $(seq 2 254);do
+> >               IP="10.23.11.$i"
+> >               ip -f inet addr add $IP/16 brd + dev "$devdummy"
+> > -             ifconfig "$devdummy" $IP netmask 255.255.0.0
+> > +             if command -v ifconfig >/dev/null 2>&1; then
+> > +                     ifconfig "$devdummy" $IP netmask 255.255.0.0
+> > +             fi
+>
+> Maybe just skip the promote_secondaries test if ifconfig is not available?
+>
 
-This has a conflict vs net-next, could you please double check the
-conflict resolution?
+Thank you for your review and comment.
 
-Thanks,
+My takeaway here is that the test works because the IP addresses are set on the
+$devdummy by the previous ip(8) command, and ifconfig seems a bit redundant.
 
-Paolo
+Also, considering we are testing netlink, I was baffled to see ifconfig there
+that, if I'm not mistaken, uses ioctl(); but I might be missing
+something obvious
+here, considering I'm looking at these tests for the first time, so bear with
+me :)
 
+If it's better to skip the test altogether when ifconfig is missing, I'll
+submit another patch to do so.
+
+Thank you
+
+Best regards,
+Alessandro
 
