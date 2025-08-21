@@ -1,129 +1,111 @@
-Return-Path: <netdev+bounces-215520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAA92B2EF24
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 09:12:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D76FB2EF49
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 09:18:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9C2C7AD2B6
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 07:11:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A13F3B3872
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 07:18:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6BED27C17F;
-	Thu, 21 Aug 2025 07:12:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3205B2E7F2A;
+	Thu, 21 Aug 2025 07:18:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E11561EA7D2;
-	Thu, 21 Aug 2025 07:12:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 850942C17B6;
+	Thu, 21 Aug 2025 07:18:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755760365; cv=none; b=FzuuAXR7LSNK69l1BQpJ6l057OJGwqi075THuLtn6VZ039S1y343yw2wPA7KBo2aqHPXgSC1mXH0s3+u6XAIxrYJeWwyMVsHFTeeZB6YtRMHM7KuVgEPno7ikucUQI08s1HxBLQokRdxAB29zVV75PFEjjy1hyBfgSJgtLDWf2I=
+	t=1755760727; cv=none; b=Iz/mQujY/Vdo7ktpjGS4NBV3omCHwdKErAelFHx/nwfA0uwZEfPBE09U1GhohUBTcs11vLCrjqaD9Wy8trYJ+oZ8TkuLBXUYTboKF7F5x0Qk4JUA+dygPZnms7HA4RIL6vKPNZ8ZzbSFKSHA93E11kGzsfThnRyfFeOtcNCKQDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755760365; c=relaxed/simple;
-	bh=I0BZ/WEff0RkimR1T0MhwO0o6umktB6ZMOOp9QGaa7s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HaOkjI2EWhycWwBiWIpPgJy5Y+cIWWUh+yVu2sNY8ciAQTRdLCZ9PD8Sc7SPKX7QWlqbZKnQqx0zmujSPGNrY9iHDhfywmz/3QriCGUDpRQ0j5lip2bNd6lR+4ikQAgQcKjfgHoR6v2ZjUpmTbkt83wkYkjkf8SnDZTyyZ8mQp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-89021b256d1so160841241.1;
-        Thu, 21 Aug 2025 00:12:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755760363; x=1756365163;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=R+XyJvS29M9jObsU5Dm5+mqIU3v/ZCQA9ib8OZRdEvw=;
-        b=cRcPhi7tY/sCl58rZ7c42DeUF1PjnAJl5ejur83oKiX11DCmNMrgne5ZAR6XT2y3nX
-         Rqa8OzTQYr8/ey8D0RFLdobKusMxJJe3nPW5IurUxlc6CT9ynHmCAdm90lsEho7QOk02
-         drNSPvJJpyF6ANAjBVV4dggIaWt5cEZN+oVYF+hUJzO7IKFDworf03JCinnUM7aHHZmp
-         SGkEwZRF19E/DceoYgzQfinyaJR+HfXk2M2sHG3EiVjsn9j1bW6HhrCCDDnymhIFk8xs
-         i3DIjPlCWZMe3P93TFzfWoIKup0Hl+rdtZRjvqhebFJ4y6lJ6baJt6tfji+9H8i9+Yt1
-         GeoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUfEbO9qwBoudTtWqG3e9KugHChYp+V7NqTQsi7Si0nUc9lQnkhfQ5ZdBoeFmxDWrnIE/u5Nkt0FIo+HH8=@vger.kernel.org, AJvYcCVjKU8dRveVNzTayWZu9h4lHibyLx9/8WATpESapVHbn4tYJ7g87L6pFTG/bzj85cX/OMRC/t2yKndGcKUHTAC6duY=@vger.kernel.org, AJvYcCW1sCnRdZqryQjWtvdPHVnEV1VzeROdrXa7YBZsAswenMCAPdmLylHPcMlVD7XakGdgdGxxg0V+@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVZP4iFjv/5Fwrjp9C4eHc+1k9gb/dfQcei7ka/77pRTDGF3tm
-	AXUxwwCVUaE9CyNz4lHdClJ/dpL+d49NOquzUip5lv5/shiDV0/1ZgbNRO7N94Lu
-X-Gm-Gg: ASbGncuIdF5YzCxAZkYK+Id+/1KOD7nSlDO4JdHNtxSk4BZR0oo8xNuwwVZFhr3P3NN
-	WCOxpQdUTYy0ZRnpe5Ao40z0OgIvqRJfApkxRKI/JBuZwe1B6mxEBq8urbrq2jVdkyNjYZF2qUv
-	mEIWtK89f++ASe/8JKBu1YNooqX4hzLekpNcE0Ws1x6sKITwvYSeU7jbt8o9UB6C9ykLlD+RF1/
-	MBL4j2fjzyZJS96QwYLmu3HNKgiOA/X/3X/Hkb+MYoNFHlwC83c9jHc0d4xb8YW3DYmuk3aZ89r
-	TDNO83wep9GVZwz4OJucHXR0MvA50AuBWwkD5a02DelMCW5vWW+t+OJoK7Nd94FuujOGKK6LQnc
-	R0Q/Gwb/pDuMWmaLBNVQCT/GNepymPaZO3GDjscIdHYI0FZ4aBNUTAtRebJfX
-X-Google-Smtp-Source: AGHT+IEu1x/ojD8RY/mYRSSla9DhE56VoxavjH5IPOni1i/DXYnWiggK7FCMZEliHu4PKiLT5H+S5g==
-X-Received: by 2002:a05:6102:5111:b0:4eb:53ca:3cfb with SMTP id ada2fe7eead31-51be13b5e02mr348729137.25.1755760362683;
-        Thu, 21 Aug 2025 00:12:42 -0700 (PDT)
-Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com. [209.85.222.52])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-51c55f1b913sm45765137.5.2025.08.21.00.12.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Aug 2025 00:12:42 -0700 (PDT)
-Received: by mail-ua1-f52.google.com with SMTP id a1e0cc1a2514c-89021b256d1so160837241.1;
-        Thu, 21 Aug 2025 00:12:42 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCU0BDZKCNAsWlhC/Xvdr//HTyT1CMdxq+q2f58YU6S4VsPSjffWZU3W0IxYwptxX/f37pt0KYsFsSEQgcQa77De4MA=@vger.kernel.org, AJvYcCVk5n9idouaOI3d7tQrVP2N2KRdnxThVg20BQix+qosL0AfdnEubCYLlQYjE6f68PUD6LV2EZyrYwE4vGY=@vger.kernel.org, AJvYcCWWlnUXFF2q0gGAd0IGzFDk7JXN7ZUwmfWnHjMlishLSVqrWftbp0hvN7aqKpLXfJ3ypGEvoM/J@vger.kernel.org
-X-Received: by 2002:a05:6102:5346:b0:4f6:25fd:7ed3 with SMTP id
- ada2fe7eead31-51be0c3cb22mr330848137.22.1755760361875; Thu, 21 Aug 2025
- 00:12:41 -0700 (PDT)
+	s=arc-20240116; t=1755760727; c=relaxed/simple;
+	bh=p3SlXTPlVxpUkr4CCkDqkcy0tjuyoyDPOvAhzDuyVrw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o8O2Yl+vnTZgrV87bAn5xF2Sek9qR7rguWvddt10niMFdGIwmTkaZEVtpJtQTyKkTLBoF56TBgL9OC0LFl6ZkKw2kLbS8QfHWvBlbTtGnDZHiTPLn+RGn2Oy3F+Rmeq1XYDuDirD5ZJtgccqFa+Z28rYEqw6XiTlGh8ws5wNqHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id CC9E660242; Thu, 21 Aug 2025 09:18:41 +0200 (CEST)
+Date: Thu, 21 Aug 2025 09:18:41 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Qingjie Xing <xqjcool@gmail.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org
+Subject: Re: [PATCH] netfilter: conntrack: drop expectations before freeing
+ templates
+Message-ID: <aKbIUQ3a3jqijZi0@strlen.de>
+References: <aKUVqxJVrGgRJZA4@strlen.de>
+ <20250820183225.2707430-1-xqjcool@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250820170913.2037049-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-In-Reply-To: <20250820170913.2037049-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Thu, 21 Aug 2025 09:12:30 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdXRw4HU+eoO=ttj3YDEbi9UdHKtZqC1UT2E251UMh0WyA@mail.gmail.com>
-X-Gm-Features: Ac12FXwXG_8NGNoZINWQzhw9Gs7sTvVLOc6_H3t9avyHMg8cxxSqyey1mBXkMvc
-Message-ID: <CAMuHMdXRw4HU+eoO=ttj3YDEbi9UdHKtZqC1UT2E251UMh0WyA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] net: pcs: rzn1-miic: Correct MODCTRL register offset
-To: Prabhakar <prabhakar.csengg@gmail.com>
-Cc: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
-	Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Wolfram Sang <wsa+renesas@sang-engineering.com>, linux-renesas-soc@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Biju Das <biju.das.jz@bp.renesas.com>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, stable@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250820183225.2707430-1-xqjcool@gmail.com>
 
-On Wed, 20 Aug 2025 at 19:09, Prabhakar <prabhakar.csengg@gmail.com> wrote:
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
->
-> Correct the Mode Control Register (MODCTRL) offset for RZ/N MIIC.
-> According to the R-IN Engine and Ethernet Peripherals Manual (Rev.1.30)
-> [0], Table 10.1 "Ethernet Accessory Register List", MODCTRL is at offset
-> 0x8, not 0x20 as previously defined.
->
-> Offset 0x20 actually maps to the Port Trigger Control Register (PTCTRL),
-> which controls PTP_MODE[3:0] and RGMII_CLKSEL[4]. Using this incorrect
-> definition prevented the driver from configuring the SW_MODE[4:0] bits
-> in MODCTRL, which control the internal connection of Ethernet ports. As
-> a result, the MIIC could not be switched into the correct mode, leading
-> to link setup failures and non-functional Ethernet ports on affected
-> systems.
->
-> [0] https://www.renesas.com/en/document/mah/rzn1d-group-rzn1s-group-rzn1l-group-users-manual-r-engine-and-ethernet-peripherals?r=1054571
->
-> Fixes: 7dc54d3b8d91 ("net: pcs: add Renesas MII converter driver")
-> Cc: stable@kernel.org
-> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> Reviewed-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
+Qingjie Xing <xqjcool@gmail.com> wrote:
+> I added a panic() in nf_ct_expect_insert(). After reproducing, the crash dump 
+> (via crash) shows the nf_conntrack involved is a template (used as the master), 
+> and the expectation insertion was triggered by a TFTP packet.
 
-Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
+The tftp packet should be associated with a conntrack entry, not a
+template.
 
-Gr{oetje,eeting}s,
+>  #3 [ffffc9001762b9c8] nf_ct_expect_related_report at ffffffff80ee7b27
+>  #4 [ffffc9001762ba40] tftp_help at ffffffff80f001ea
+>  #5 [ffffc9001762ba98] nf_confirm at ffffffff80eeaa77
+>  #6 [ffffc9001762bac8] ipv4_confirm at ffffffff80eeafa9
+>  #7 [ffffc9001762baf8] nf_hook_slow at ffffffff80ed24db
+>  #8 [ffffc9001762bb40] ip_output at ffffffff80fe85a5
+>  #9 [ffffc9001762bbc8] udp_send_skb at ffffffff81033372
+> #10 [ffffc9001762bc18] udp_sendmsg at ffffffff81032cb2
+> #11 [ffffc9001762bd90] inet_sendmsg at ffffffff810488a1
 
-                        Geert
+How can this happen?
 
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+1. -t raw assigns skb->_nfct to the template.
+2. at OUTPUT, nf_conntrack_in is called:
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+unsigned int
+nf_conntrack_in(struct sk_buff *skb, const struct nf_hook_state *state)
+{
+        enum ip_conntrack_info ctinfo;
+        struct nf_conn *ct, *tmpl;
+        u_int8_t protonum;
+        int dataoff, ret;
+
+        tmpl = nf_ct_get(skb, &ctinfo);
+        if (tmpl || ctinfo == IP_CT_UNTRACKED) {
+                /* Previously seen (loopback or untracked)?  Ignore. */
+                if ((tmpl && !nf_ct_is_template(tmpl)) ||
+                     ctinfo == IP_CT_UNTRACKED)
+                        return NF_ACCEPT;
+                skb->_nfct = 0; // HERE
+        }
+
+... and that will *clear* the template again.
+
+3. nf_conntrack_in assigns skb->_nfct to a newly allocated
+   connrack (not a template).
+
+The backtrace you quote should be impossible.
+
+You need to figure out why skb->_nfct was not cleared by
+nf_conntrack_in().
+
+You did not mention anything about timing, does this only
+happen at the start, i.e. do we have a race where nf_confirm
+was just registered with nf_hook_slow for the first time but
+ipv4_confirm wasn't set up yet?
+
+If so, please fix nf_confirm() to return early if the skb
+has a template attached.
 
