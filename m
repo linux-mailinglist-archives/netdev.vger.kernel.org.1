@@ -1,174 +1,192 @@
-Return-Path: <netdev+bounces-215638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDB4FB2FBA4
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 16:02:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 569F4B2FC03
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 16:12:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2462A6234D5
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 13:56:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0235F1BA19BB
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:07:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87ACE23BCE7;
-	Thu, 21 Aug 2025 13:55:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A7682356B9;
+	Thu, 21 Aug 2025 14:07:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gjm8FrmB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h/ASva8X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16922235BEE
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 13:55:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8171623D7C0
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 14:07:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755784529; cv=none; b=EOxjWukaTIieU6ji4YeGU4KQi0K29jQB2idP0BqRu7HQAke4uCXUvlWBXMfw8y5KgJ39+Mn4UC+I6IiTKi/lAd+/8Q5OeAQ2zaXmEj5HCwWXzZxGOCBFSmePjmv/gZUzkC7ZRWlZ6tqCyoEfPcnDcXscIokw23uvJn8Zh9lqIDI=
+	t=1755785232; cv=none; b=FjX+TYlxMt4kz7H05SXrV/uhF4rUW2Lpt5rfaPdnltpoiIRpeq0rbC4jQcriA5rYFsz4LuePQ/6QOFbAqzBktCpX+XFI11qiEB7ihZmErstzLbf/Blgdc5QXytx+0u0bxAS0PMufLXTa8wqmELAnPkp2pplQhbW66oDnsfSeCp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755784529; c=relaxed/simple;
-	bh=wHspB9lP9ytZ5qoP/apoEbwEudQSgCr+8Ne7IMCn/0k=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ommOzFEVs5Ygwt4nHfTHM2aHEAelQ85Db7A1VIRtHGJo7ryQ66MMtQHZDatjBitHk3DM6jcSbunlxVr5L72q8Yp82n8aAnnECWNkXzlUzCv5Xtt6e5Hh84jLmrqc+lzY+LEpC4JApGRgD/dVhAcV/uprC+3kWiGqmKFHfmJKh74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--cmllamas.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gjm8FrmB; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--cmllamas.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2445806b2beso30332455ad.1
-        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 06:55:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755784527; x=1756389327; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=lKdnyTkgvffM7mkS2a96ehAiqGPtNgTkiNVc3WNtEtY=;
-        b=gjm8FrmBbQp7asF8cKHCZUMTFFwFuB9vQb/JAj3PN17eht+yeIorCau16Il27U+U1I
-         JJ5dsZ+vYoFJIMM14w3HOaCqGWIWPhgvSU5gjPL1KADWM7Av6UU1BpuwFlU5CSw5YuYg
-         TOCXPp13NYpJyRxKzxff8A9kHDxttawP0AyxDm97h23VZKHk2UxpmYxllJrKJqZhDGWX
-         NpM9UgaAOXi157/QiJP14kSTVhYxT4kKzGlKa9RFyo3U4QSYDdlNCP3PqbETuPONjZpV
-         b0G3hdifBWN+RYY1Zlj8C6/k0v+dxtmYqD7tzs9rw/2B1dA/I60ysOZU5uJ/lXDLD5+Q
-         kw+w==
+	s=arc-20240116; t=1755785232; c=relaxed/simple;
+	bh=nVC4e7skfIJuT9Xx1y2TwqKkMvv2bnZ9KINS/xoKEjw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hvUyuQ4maregaQW0qTkNMOcjcnCVR/i0b0Is4N5eBbMpQjUqXCQYUUBpS3TBL9CKPtH2QuEmpOZE+p/1zVTDi+UKQmg+nK94oKgwA00tr/DAA8tN0vcBzo5UGUMsNCe/KTxpD4cZ/FSyZFfnyF2GBtX/dwf+4IJBbdip/gyuga4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h/ASva8X; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755785229;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pkI4mCYDrgguWBZNB4zbd1CX9VG2+lm5bnKjZZvuPqw=;
+	b=h/ASva8X3n9pZjfwi3Ba+jdhOz6bFYalRCXiY0zJHpPEMvk5au5Ga5ysZrSlUWoNFgBhb4
+	cjbmqsUHW4mXPFxGXxNSP9q76T4Urr6E/G5NRhtsSEvvpXdllHb0fIQpb7f2NPZZ/WP29n
+	PYfmDr0tiKmhgByMzcu0ZrsnwX7b+7E=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-153-ebuvXaoHNqSCdZh_W4_s0Q-1; Thu, 21 Aug 2025 10:07:07 -0400
+X-MC-Unique: ebuvXaoHNqSCdZh_W4_s0Q-1
+X-Mimecast-MFC-AGG-ID: ebuvXaoHNqSCdZh_W4_s0Q_1755785227
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4b109bd3fa0so10504411cf.2
+        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 07:07:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755784527; x=1756389327;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lKdnyTkgvffM7mkS2a96ehAiqGPtNgTkiNVc3WNtEtY=;
-        b=eevCljTkL5fal8tppAT1s8CqUEqd+gXZtLYUJAMU8wZz6Wv+yhyZrCpZfBeGdMnzDu
-         nSeeCjS/8zW/wlMOUMW6PNWS+FrYifeZGkWOugyIMNUOzT0FbNVESE3TUghS1LZ/w9CS
-         feUbnYOp8GXUZyAYD31PI4JzB/IG1Ba1JUqfZOngSw6/y3AzxWr8Lizx6iOX4hcqrJOL
-         aHnxuuxs24cJwkxt0jbK+lchW1Ha9z2hNcZ640mysQbbUl+tEXoxvXxBavmZQqemjjws
-         cCLQNU0imZhtQuSZ8QBkwgifTWocuNwZD9cd+jEOXajXw821yovCyzAn6lig4DNN2AvG
-         hkqw==
-X-Forwarded-Encrypted: i=1; AJvYcCUC81rvxKRa1DOTXOxrM4OVPBqC071+LFsNn/sE1t0xp7/C63KpkjSI5YS7ydD9Law/Zypcx9w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9DqOLCJRRWBQ2+Kc9fCoR/7FNALcOsZKULpbIfuppgXw6/GkR
-	40WhPNTF5MFNMaLUzAGltMP/uaolbBIlqNl3qiWPvLdc55KF2H7QKdkTQjEyvSLMVDIceg4lrbW
-	fLwLCOIbu8BUvLg==
-X-Google-Smtp-Source: AGHT+IHsMqhR+FC1Vaoc1hCDg2gMTNywVUl9RwkU/LLcAQVairjJf0TCsVawP0vFsJexqsUgLxEVKVJAb9sjRQ==
-X-Received: from pljc15.prod.google.com ([2002:a17:903:3b8f:b0:243:31a:f8e2])
- (user=cmllamas job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:2f85:b0:242:cf0b:66cd with SMTP id d9443c01a7336-245fed69268mr38021605ad.34.1755784527309;
- Thu, 21 Aug 2025 06:55:27 -0700 (PDT)
-Date: Thu, 21 Aug 2025 13:55:21 +0000
+        d=1e100.net; s=20230601; t=1755785227; x=1756390027;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pkI4mCYDrgguWBZNB4zbd1CX9VG2+lm5bnKjZZvuPqw=;
+        b=ul025Rv/zXkgi5wBb18WE6ySRiizl4eKvI2+OgSLz7BEhN9RMioLwt3Fmu67S6vEu7
+         IvChK6VjicFPNLVT2luCtI5Sy5kzIOwhgrVb+OgEIH4ubQrxeQaps9D+xZSfCjqyE5eS
+         nfIgBy5kKeytUOlRd85sNL9i4Jxldnv61BUgZwvtevWZhT9ysD4M5NeGEdCbKQ0A3IuA
+         81tWJ43tj6xEKgR85nYPB5p2iI64xjucc4756GAtN2WMwgehsthciOTs2Cq+d1DRWZUg
+         b2jCIgBCu/M2XMQqjTd9i0HKn9BDK4GIc/e1A0ZC6ZJHxDWHSN01PdmRHjgUKWbfw6Jo
+         4OOw==
+X-Forwarded-Encrypted: i=1; AJvYcCV7oXLTBFnM5V5T7UnRRjKyu+uVNiAnrZ0WWuOqHqwuv2HSkORoUsWlX5ksF2ahl7wCtjhwnFk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzwSgoGVLuE92vMgg4f84Acli3GuoNiv6a7sfhuQG/cF5RHMGoF
+	ufnKM383fC7gcblyDXiowfBaAvao5kV00nKfjgMibc0CtUMDBcQ5vDalrF3M3U1EPCuG+0Y4W+2
+	NCQ4UrmuI0418/jnKhbfTFIlIB3wcMnD8v58vBrl/1FRuib4iEazQco5KDQ==
+X-Gm-Gg: ASbGncuZq4ILK77lQEOlwaKTpD7qeVP5h4u4yEHAAiac0W9pYTjoM2xOuVavOkafh3F
+	1kHMez/ZKZm6FAVAKhbTxdCcrxxkVzk0xs6Mgbo88gRYKT4g2Qp4PWOEh2xP+fBEYTiEB8WFZTS
+	VRSFXaF0DBpPvY+PwET54gQhMCU1irFpc4OZAAPgv+bDFTc90pNv2zpfCa+KrOr45rJs4rRK8C5
+	mhoTVwPtpuFW/WzbMh4VFJ5qDtJdo/oacz/wo6EVbJhewoB3YngOSitSIYo3kv5R8zbvFZsjb9y
+	12AZtX2aVZ8A+We/n66MJe4fVWLgrovbK92aZwNFhJVakcWkQk1yK4nmv8dNnmKcsdJrQ1DXBlJ
+	ePwxc2QrLJMBkE80fLJk=
+X-Received: by 2002:a05:622a:4089:b0:4b0:86e5:ef94 with SMTP id d75a77b69052e-4b29ff95a5cmr28813131cf.55.1755785226668;
+        Thu, 21 Aug 2025 07:07:06 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEsCa1bqRsI4eZH/MPz64iUM+4n/41OhqcS9oKqt7zb6zdFMnfR53x2HdvE3gFBZ8B6W578TA==
+X-Received: by 2002:a05:622a:4089:b0:4b0:86e5:ef94 with SMTP id d75a77b69052e-4b29ff95a5cmr28812371cf.55.1755785225958;
+        Thu, 21 Aug 2025 07:07:05 -0700 (PDT)
+Received: from debian (2a01cb058d23d600dec560d2f476214c.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:dec5:60d2:f476:214c])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b11dc5a17csm101529211cf.13.2025.08.21.07.07.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Aug 2025 07:07:05 -0700 (PDT)
+Date: Thu, 21 Aug 2025 16:06:57 +0200
+From: Guillaume Nault <gnault@redhat.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+	Taehee Yoo <ap420073@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>,
+	Edward Cree <ecree.xilinx@gmail.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Harald Welte <laforge@gnumonks.org>,
+	David Ahern <dsahern@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>
+Subject: Re: [PATCH net-next] ipv4: Convert ->flowi4_tos to dscp_t.
+Message-ID: <aKcoAbPXff_IT7MN@debian>
+References: <5af3062dabed0fb45506a38114082b5090e61a52.1755715298.git.gnault@redhat.com>
+ <aKbDCJWjMpUEOtXe@shredder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0.rc1.193.gad69d77794-goog
-Message-ID: <20250821135522.2878772-1-cmllamas@google.com>
-Subject: [PATCH] netlink: specs: binder: replace underscores with dashes in names
-From: Carlos Llamas <cmllamas@google.com>
-To: Alice Ryhl <aliceryhl@google.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"=?UTF-8?q?Arve=20Hj=C3=B8nnev=C3=A5g?=" <arve@android.com>, Todd Kjos <tkjos@android.com>, Martijn Coenen <maco@android.com>, 
-	Joel Fernandes <joelagnelf@nvidia.com>, Christian Brauner <brauner@kernel.org>, 
-	Carlos Llamas <cmllamas@google.com>, Suren Baghdasaryan <surenb@google.com>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Li Li <dualli@google.com>
-Cc: Tiffany Yang <ynaffit@google.com>, John Stultz <jstultz@google.com>, kernel-team@android.com, 
-	linux-kernel@vger.kernel.org, Thorsten Leemhuis <linux@leemhuis.info>, 
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aKbDCJWjMpUEOtXe@shredder>
 
-The usage of underscores is no longer allowed for the 'name' format in
-the yaml spec. Instead, dashes should be used. This fixes the build
-issue reported by Thorsten that showed up on linux-next.
+On Thu, Aug 21, 2025 at 09:56:08AM +0300, Ido Schimmel wrote:
+> On Thu, Aug 21, 2025 at 01:32:03AM +0200, Guillaume Nault wrote:
+> > Convert the ->flowic_tos field of struct flowi_common from __u8 to
+> > dscp_t, rename it ->flowic_dscp and propagate these changes to struct
+> > flowi and struct flowi4.
+> > 
+> > We've had several bugs in the past where ECN bits could interfere with
+> > IPv4 routing, because these bits were not properly cleared when setting
+> > ->flowi4_tos. These bugs should be fixed now and the dscp_t type has
+> > been introduced to ensure that variables carrying DSCP values don't
+> > accidentally have any ECN bits set. Several variables and structure
+> > fields have been converted to dscp_t already, but the main IPv4 routing
+> > structure, struct flowi4, is still using a __u8. To avoid any future
+> > regression, this patch converts it to dscp_t.
+> > 
+> > There are many users to convert at once. Fortunately, around half of
+> > ->flowi4_tos users already have a dscp_t value at hand, which they
+> > currently convert to __u8 using inet_dscp_to_dsfield(). For all of
+> > these users, we just need to drop that conversion.
+> > 
+> > But, although we try to do the __u8 <-> dscp_t conversions at the
+> > boundaries of the network or of user space, some places still store
+> > TOS/DSCP variables as __u8 in core networking code. Some structure
+> > fields, like struct ip_tunnel_key::tos could be converted to dscp_t,
+> > but that would require a lot of work, so this is left for later. Other
+> > places can't be converted, for example because the data structure is
+> > part of UAPI or because the same variable or field is also used for
+> > handling ECN in other parts of the code. In all of these cases where we
+> > don't have a dscp_t variable at hand, we need to use
+> > inet_dsfield_to_dscp() when interacting with ->flowi4_dscp.
+> > 
+> > Signed-off-by: Guillaume Nault <gnault@redhat.com>
+> 
+> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+> 
+> Thanks! One nit below
+> 
+> [...]
+> 
+> > diff --git a/net/core/filter.c b/net/core/filter.c
+> > index da391e2b0788..c75f95c60af3 100644
+> > --- a/net/core/filter.c
+> > +++ b/net/core/filter.c
+> > @@ -2373,7 +2373,7 @@ static int __bpf_redirect_neigh_v4(struct sk_buff *skb, struct net_device *dev,
+> >  		struct flowi4 fl4 = {
+> >  			.flowi4_flags = FLOWI_FLAG_ANYSRC,
+> >  			.flowi4_mark  = skb->mark,
+> > -			.flowi4_tos   = inet_dscp_to_dsfield(ip4h_dscp(ip4h)),
+> > +			.flowi4_dscp   = ip4h_dscp(ip4h),
+> 
+> Nit: alignment is off
 
-Note this change has no impact on C code.
+Thanks. I thought I had carefully reviewed my patch before posting...
 
-Cc: Jakub Kicinski <kuba@kernel.org>
-Reported-by: Thorsten Leemhuis <linux@leemhuis.info>
-Closes: https://lore.kernel.org/all/e21744a4-0155-40ec-b8c1-d81b14107c9f@leemhuis.info/
-Fixes: 63740349eba7 ("binder: introduce transaction reports via netlink")
-Signed-off-by: Carlos Llamas <cmllamas@google.com>
----
- Documentation/netlink/specs/binder.yaml | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+By the way, do you have an opinion about converting struct
+ip_tunnel_key::tos? Do you think it'd be worth it, or just code churn?
 
-diff --git a/Documentation/netlink/specs/binder.yaml b/Documentation/netlink/specs/binder.yaml
-index 140b77a6afee..0f0575ad1265 100644
---- a/Documentation/netlink/specs/binder.yaml
-+++ b/Documentation/netlink/specs/binder.yaml
-@@ -26,27 +26,27 @@ attribute-sets:
-         type: string
-         doc: The binder context where the transaction occurred.
-       -
--        name: from_pid
-+        name: from-pid
-         type: u32
-         doc: The PID of the sender process.
-       -
--        name: from_tid
-+        name: from-tid
-         type: u32
-         doc: The TID of the sender thread.
-       -
--        name: to_pid
-+        name: to-pid
-         type: u32
-         doc: |
-           The PID of the recipient process. This attribute may not be present
-           if the target could not be determined.
-       -
--        name: to_tid
-+        name: to-tid
-         type: u32
-         doc: |
-           The TID of the recipient thread. This attribute may not be present
-           if the target could not be determined.
-       -
--        name: is_reply
-+        name: is-reply
-         type: flag
-         doc: When present, indicates the failed transaction is a reply.
-       -
-@@ -58,7 +58,7 @@ attribute-sets:
-         type: u32
-         doc: The application-defined code from the transaction.
-       -
--        name: data_size
-+        name: data-size
-         type: u32
-         doc: The transaction payload size in bytes.
- 
-@@ -78,14 +78,14 @@ operations:
-         attributes:
-           - error
-           - context
--          - from_pid
--          - from_tid
--          - to_pid
--          - to_tid
--          - is_reply
-+          - from-pid
-+          - from-tid
-+          - to-pid
-+          - to-tid
-+          - is-reply
-           - flags
-           - code
--          - data_size
-+          - data-size
- 
- mcast-groups:
-   list:
--- 
-2.51.0.rc1.193.gad69d77794-goog
+> >  			.flowi4_oif   = dev->ifindex,
+> >  			.flowi4_proto = ip4h->protocol,
+> >  			.daddr	      = ip4h->daddr,
+> 
 
 
