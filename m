@@ -1,91 +1,90 @@
-Return-Path: <netdev+bounces-215594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0895B2F655
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 13:19:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01C7EB2F658
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 13:20:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 987621CC7BA7
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 11:17:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE71A562E1F
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 11:17:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB5E530E831;
-	Thu, 21 Aug 2025 11:16:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 635CE3074A1;
+	Thu, 21 Aug 2025 11:17:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Xpmqm9gX"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="DjsVb16g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f98.google.com (mail-qv1-f98.google.com [209.85.219.98])
+Received: from mail-vk1-f227.google.com (mail-vk1-f227.google.com [209.85.221.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4198830E0FE
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 11:16:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C86EB1DF271
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 11:17:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755775011; cv=none; b=p3JLAyvRjf2kmTDxGaSnC/zqAr5imMz461LTSRowwUULw79wux7HbEc/IooxHbUaJmTzTvBLfqAdM2j64r5+SmF7p5xxTeWdZLgRQvQWia6IP18KqdvplRw5ro2M97e7dWfcMqKUA9CRof93yQ6KugHHo2D+q3vYeNK2oCRD8iQ=
+	t=1755775022; cv=none; b=oLLeOaMsFCMOLSy9JlDBe7DrajzTuWEYOJVoiaPnXY1L2PaFnkus3QVmisk2p4UMQ+8cv7+QX8xrLtoI4KCiG98vXzDfxiy0CqY1bgOGwybad9ie/CDZPgFuVoZjhpxowE2vQUe6MVFg/pPtdHhti5+K8gAygYFPBhjYmQ8rsnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755775011; c=relaxed/simple;
-	bh=cHuqB43g+O16/Z3CpSQ3oQ/XdPfNvLQgDSdfExkjhI4=;
+	s=arc-20240116; t=1755775022; c=relaxed/simple;
+	bh=Mh0jYCcl2AsQYiir7/eSo4Eodqp1ipzQ+9QF7J/Shn8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZAKCO9VX9johYWiYMR+lh2xEp/tME2fKi0O9CElvTAuvoXi4cODd/Vmsr8/4flcgwKopJ8fNG7QlarWXdUSB+Z11PRrDlDNjXmGj8rH9MkMhp2df1lruzEWTWVNQUPnRchi4ThWjMqBffkLET+f5KPz21HdTibcpljANfTVIDeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Xpmqm9gX; arc=none smtp.client-ip=209.85.219.98
+	 MIME-Version; b=jj73PEX4bs2oIbVrSrjxu210tHYZNVJtqa0mYsk0PlGuJmvKXhl++kyrFOyYN+mdmGOETLhdyueAvvzrcdQfM9+1AszhrViHzq0oBNJtqq5OfDlX84+9tN08yI7Uz4v8Ub386/h5j+m4i0QwSW7bSkniS5rYB7V1GPtEDmF1oUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=DjsVb16g; arc=none smtp.client-ip=209.85.221.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qv1-f98.google.com with SMTP id 6a1803df08f44-70d814d107bso10523816d6.3
-        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 04:16:49 -0700 (PDT)
+Received: by mail-vk1-f227.google.com with SMTP id 71dfb90a1353d-53b1740154dso646244e0c.1
+        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 04:17:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755775009; x=1756379809;
+        d=1e100.net; s=20230601; t=1755775020; x=1756379820;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:dkim-signature
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wTOBCmTJeaSpol9K63NxFX5d4RT5ariDJfta1AzP468=;
-        b=P8XPlg5Vx4X3Is/ByrLt94ePcX3nxfkY4EHhHU01dqqVvh+SW86M5UbO1fEAoCy0tZ
-         l+Uzs6Gsqd/hHc/tlkgPcgKAb/daOh0wanBY3Kk9y3Az7rQu5D4E6onHh8j8nNWLV2B3
-         uVwVesKWvkcMpYrS0kOSKYtzAXqtpyGAeIMr3VWds3zN0JfOizojGZC0eeNYHNWpRL2o
-         vyqBODpdI2ltSO5fiifnvlHeFrpN16f8iVarXQ3agXXo8/4V9lQou13Syz5tMNrAVOFc
-         e3F42PRIljT5TFNYq0J9vHYitkDf7yLRh03it2cPK99o9Na6tZ8kVVUV6/YLUc7nCTcb
-         RF3g==
-X-Gm-Message-State: AOJu0YweBtpPkhUeUjlgUa/Ewji1Z4WNcd8buB0RYIf1o9X37evfjihs
-	uSuSIpOy49veJd9KDimB/utsmqezGE92dOoqOqEtPZmOeJUaz2m8k3asgQJY1EHxAQLM0tIx55p
-	0tmRyC/GRrYzifdeVSG0vVv673B/JFhdXzmiCzZk9KmyBUb+VsMqJAXQgzmBVQeobEM4WcjFBoB
-	9ZUdB14T4yMsMH8TIXOrGHLRVdH6XH2i5PCwH9ViyWY/RD92wu6MmfU2+hftSuJnn6cts7qeL+Y
-	NM2Ol75ObA=
-X-Gm-Gg: ASbGncvaznNQ1jKh7wHcmip7LAmBX+cqUFpCTsZWt7WucjOjtzy8ilz61TxTRkyUpXV
-	dQvFLSOpPYnzMtDSWGHXaoOwh2c8QFbTmnEBlhsFHYUM7TP/x5lAHlqhYL6rtBcquJKqcURVWYu
-	eKgTSMbuUSW9nJkxtdAnm0MZrIZbk4x9rsgIpJy/ffMdqQLF4Glpi1hYoILJV4b9xSX46EMINwg
-	2RsGPcHLYmmJC99JjgRBSAAVIq5T51KGn00jbmKBGy/uib+vbhET57ljtw2au8FtirLG9q1BKTa
-	L8hRrpGDIgYXRiKrNoao6EvfqUOpWvGLcYnDL1qhjqfI21X8aIsRvKBpIMPuJZTZTBzRVkeUf0a
-	GC3gH7nwCrTjK/mWx79T5WePFZWq3SSy9tZMHvFYKcLGHSDdkdpZeESP6SQS69IvBSTcxguC3dg
-	g=
-X-Google-Smtp-Source: AGHT+IHXYPF7AaStZZxNq2vqrHbbz41eBuJPiwru/cDvrVBq6N8PzibojMl7LV39MQGyoLLmhhsI9RSIxPQe
-X-Received: by 2002:a05:6214:4019:b0:707:5dea:3331 with SMTP id 6a1803df08f44-70d88e37640mr17491076d6.14.1755775009048;
-        Thu, 21 Aug 2025 04:16:49 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-121.dlp.protect.broadcom.com. [144.49.247.121])
-        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-70d84c8296dsm1536246d6.29.2025.08.21.04.16.48
+        bh=QdQolOKpYG6UAB2piGu+oICeMfmzrvTtBrOxQYX6H6w=;
+        b=mWg3k5sNN3AiO2aya4htALcHIuimpJ03GLHrTRAJm39St8jMRlcLoBO/SHl5EJa2yK
+         RiTqb+mfwmCngm89dKW90hURMhdxyERp0eAjplH4UITKh6QNYIVGYrPBtCN4NLzmbjRp
+         maTA3BPOsmyYnP2i2tQ22SSHsuiTWJbtVkv1fU0A1xZb5IxxFesS4uGazdBevNWYftg/
+         XNe7YPf17bt2zB/lYz8Gl+lhcnofPSUCfoOSs/R4oDayfCScbX0AykzD6OYD8+LNbyk9
+         /KhpK6WK1vbqUdAlECsv4DCVbdj+ZwcG3Jfy5V8BbCrFoeKSU3Bzo45BTAyHoi67FuMp
+         IxUw==
+X-Gm-Message-State: AOJu0Yyig6frdjjKGYQZSfvPKM5GqXCzAFCtLyCBb6t1h9KzxFthdwKt
+	ZZM6B3ZNykpEhZB7ohY/Xa5fUXcJoekldELlpicbsdv4jQoa9AhR6XNa9bHPFNc7np06/ddw+tF
+	+k7w3dENlcd0idpshmZudW0gLybwBGL7lC3u/Z8wT1IdFnO13zSJQpetLK+emq9XcU7wO0i7Tj6
+	mUYeLdJ/QMNLlyJ3u+xc+uP+tfW46K8V0aFLbeFIr9EPBR68tKv6kNj8rmky04mG5EgmYHNYeFw
+	06lmQcRIL0=
+X-Gm-Gg: ASbGncsTYHlfw7VasO/hWNXAXi1DAPMHV4aLZh+pQ++5WnmfjhBbqO8voe514F2M9Tv
+	5WpFoEnjKVbxsahj0lKlf19Dw0XZfBPTcfiiWnaFqKw165vQ2JB4tWsvBKaElaO86FB/+si+CW+
+	N8AfjZAAmDDsrXhjPXKWfP3W4TjsKw2Ah4YQxZ/5OVH0loD4o1i7PKfEqI9TFLsClQxueMSSp5m
+	MCzS5ODibPSHe5RgntPLzmF6xmktEkWBT23WoeFJWbf4REqYRYhl82eJa4hsTWFkQHbnOTv9s/R
+	rYaJzNeybtLKKCfI3NaoUh5foubDq8AsTKZ7V8l0kY9Clv5UvWSokd/L1afMnV0m3plVpDFaaod
+	Wc0995m75kv+n0FWewHRxQ600gkiOrUifinsP/IsWEVMbjktDbiOLEQ7M2sKHLE715ozdgaKZ
+X-Google-Smtp-Source: AGHT+IECL0B16Ui1pTQgJBW+cWBXrhgUT54t4MXbT6dmF9MfG70xD6LcZRC4RLVlLZy7Y/vUEcV28dy9XAvI
+X-Received: by 2002:a05:6122:2092:b0:53a:dcb4:79be with SMTP id 71dfb90a1353d-53c7d6835e2mr555113e0c.4.1755775019653;
+        Thu, 21 Aug 2025 04:16:59 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-15.dlp.protect.broadcom.com. [144.49.247.15])
+        by smtp-relay.gmail.com with ESMTPS id 71dfb90a1353d-53b2bd22379sm1391588e0c.2.2025.08.21.04.16.59
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 21 Aug 2025 04:16:49 -0700 (PDT)
+        Thu, 21 Aug 2025 04:16:59 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-b471a0e5a33so1587654a12.3
-        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 04:16:48 -0700 (PDT)
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-245f2a91d02so13805215ad.0
+        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 04:16:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1755775008; x=1756379808; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1755775018; x=1756379818; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wTOBCmTJeaSpol9K63NxFX5d4RT5ariDJfta1AzP468=;
-        b=Xpmqm9gX+6+efijMHItIEUdD9wOrNjLHt0E95+lEzcr994KX+MaR1X751iu6YAnTK+
-         1jkzmmmQMOC4RNJ8QiutVgUJtl8WEyq5Y6K/1cL1ujAD8rEeyGYi6ZxH+Kyp17/fcvX6
-         HhL5+b1ORA3/LiP74CL3eCYT2/cU/C6OZbDUI=
-X-Received: by 2002:a17:903:1250:b0:240:1831:eeeb with SMTP id d9443c01a7336-245fedd06c6mr32499925ad.40.1755775007730;
-        Thu, 21 Aug 2025 04:16:47 -0700 (PDT)
-X-Received: by 2002:a17:903:1250:b0:240:1831:eeeb with SMTP id d9443c01a7336-245fedd06c6mr32499515ad.40.1755775007278;
-        Thu, 21 Aug 2025 04:16:47 -0700 (PDT)
+        bh=QdQolOKpYG6UAB2piGu+oICeMfmzrvTtBrOxQYX6H6w=;
+        b=DjsVb16gVl68O2SQ+zjZM40PwF2m9J1VScXtEQ2Ha4k1qsF68Jb5/apgu13+5bALAG
+         mnD6OO6d3mpGK2pINcFhKghFNMGDbeCfbSwAE49HORH67/on+DUGZ0QUbBNdKfQC4Stj
+         hMZNDJWqLvwZxRr+/9jj+1d0Q9/imQBiXLkeA=
+X-Received: by 2002:a17:903:2448:b0:246:571:4b51 with SMTP id d9443c01a7336-246066025a9mr26676565ad.29.1755775018486;
+        Thu, 21 Aug 2025 04:16:58 -0700 (PDT)
+X-Received: by 2002:a17:903:2448:b0:246:571:4b51 with SMTP id d9443c01a7336-246066025a9mr26676165ad.29.1755775017689;
+        Thu, 21 Aug 2025 04:16:57 -0700 (PDT)
 Received: from photon-dev-haas.. ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-245fd335ea1sm21363285ad.110.2025.08.21.04.16.39
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-245fd335ea1sm21363285ad.110.2025.08.21.04.16.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Aug 2025 04:16:47 -0700 (PDT)
+        Thu, 21 Aug 2025 04:16:57 -0700 (PDT)
 From: Ajay Kaher <ajay.kaher@broadcom.com>
 To: nick.shi@broadcom.com,
 	alexey.makhalov@broadcom.com,
@@ -105,9 +104,9 @@ Cc: netdev@vger.kernel.org,
 	karen.wang@broadcom.com,
 	hari-krishna.ginka@broadcom.com,
 	ajay.kaher@broadcom.com
-Subject: [PATCH 1/2] ptp/ptp_vmw: Implement PTP clock adjustments ops
-Date: Thu, 21 Aug 2025 11:03:22 +0000
-Message-Id: <20250821110323.974367-2-ajay.kaher@broadcom.com>
+Subject: [PATCH 2/2] ptp/ptp_vmw: load ptp_vmw driver by directly probing the device
+Date: Thu, 21 Aug 2025 11:03:23 +0000
+Message-Id: <20250821110323.974367-3-ajay.kaher@broadcom.com>
 X-Mailer: git-send-email 2.40.4
 In-Reply-To: <20250821110323.974367-1-ajay.kaher@broadcom.com>
 References: <20250821110323.974367-1-ajay.kaher@broadcom.com>
@@ -120,13 +119,16 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-Implement PTP clock ops that set time and frequency of the underlying
-clock. On supported versions of VMware precision clock virtual device,
-new commands can adjust its time and frequency, allowing time transfer
-from a virtual machine to the underlying hypervisor.
+For scenerios when ACPI is disabled, allow ptp_vmw driver to be
+loaded by directly probing for the device using VMware hypercalls.
 
-In case of error, vmware_hypercall doesn't return Linux defined errno,
-converting it to -EIO.
+VMware precision clock virtual device is exposed as a platform ACPI
+device in its virtual chipset hardware. Its driver - ptp_vmw - is
+registered with the ACPI bus for discovery and binding. On systems
+where ACPI is disabled, such as virtual machines optimized for fast
+boot times, this means that the device is not discoverable and cannot
+be loaded. Since the device operations are performed via VMware
+hypercalls, the ACPI sub-system can be by-passed and manually loaded.
 
 Cc: Shubham Gupta <shubham-sg.gupta@broadcom.com>
 Cc: Nick Shi <nick.shi@broadcom.com>
@@ -134,106 +136,115 @@ Tested-by: Karen Wang <karen.wang@broadcom.com>
 Tested-by: Hari Krishna Ginka <hari-krishna.ginka@broadcom.com>
 Signed-off-by: Ajay Kaher <ajay.kaher@broadcom.com>
 ---
- drivers/ptp/ptp_vmw.c | 39 +++++++++++++++++++++++++++++----------
- 1 file changed, 29 insertions(+), 10 deletions(-)
+ drivers/ptp/ptp_vmw.c | 71 +++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 59 insertions(+), 12 deletions(-)
 
 diff --git a/drivers/ptp/ptp_vmw.c b/drivers/ptp/ptp_vmw.c
-index 20ab05c4d..a18ba729e 100644
+index a18ba729e..ce44b12ce 100644
 --- a/drivers/ptp/ptp_vmw.c
 +++ b/drivers/ptp/ptp_vmw.c
-@@ -1,6 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
- /*
-- * Copyright (C) 2020 VMware, Inc., Palo Alto, CA., USA
-+ * Copyright (C) 2020-2023 VMware, Inc., Palo Alto, CA., USA
-+ * Copyright (C) 2024-2025 Broadcom Ltd.
-  *
-  * PTP clock driver for VMware precision clock virtual device.
-  */
-@@ -16,20 +17,36 @@
+@@ -98,25 +98,41 @@ static struct ptp_clock_info ptp_vmw_clock_info = {
+ 	.enable		= ptp_vmw_enable,
+ };
  
- #define VMWARE_CMD_PCLK(nr) ((nr << 16) | 97)
- #define VMWARE_CMD_PCLK_GETTIME VMWARE_CMD_PCLK(0)
-+#define VMWARE_CMD_PCLK_SETTIME VMWARE_CMD_PCLK(1)
-+#define VMWARE_CMD_PCLK_ADJTIME VMWARE_CMD_PCLK(2)
-+#define VMWARE_CMD_PCLK_ADJFREQ VMWARE_CMD_PCLK(3)
- 
- static struct acpi_device *ptp_vmw_acpi_device;
- static struct ptp_clock *ptp_vmw_clock;
- 
-+/*
-+ * Helpers for reading and writing to precision clock device.
-+ */
- 
--static int ptp_vmw_pclk_read(u64 *ns)
-+static int ptp_vmw_pclk_read(int cmd, u64 *ns)
- {
- 	u32 ret, nsec_hi, nsec_lo;
- 
--	ret = vmware_hypercall3(VMWARE_CMD_PCLK_GETTIME, 0,
--				&nsec_hi, &nsec_lo);
-+	ret = vmware_hypercall3(cmd, 0, &nsec_hi, &nsec_lo);
- 	if (ret == 0)
- 		*ns = ((u64)nsec_hi << 32) | nsec_lo;
--	return ret;
-+
-+	return ret != 0 ? -EIO : 0;
++static int ptp_vmw_clock_register(void)
++{
++	ptp_vmw_clock = ptp_clock_register(&ptp_vmw_clock_info, NULL);
++	if (IS_ERR(ptp_vmw_clock)) {
++		pr_err("ptp_vmw: Failed to register ptp clock\n");
++		return PTR_ERR(ptp_vmw_clock);
++	}
++	pr_debug("ptp_vmw: ptp clock registered\n");
++	return 0;
 +}
 +
-+static int ptp_vmw_pclk_write(int cmd, u64 in)
++static void ptp_vmw_clock_unregister(void)
 +{
-+	u32 ret, unused;
++	ptp_clock_unregister(ptp_vmw_clock);
++	ptp_vmw_clock = NULL;
++	pr_debug("ptp_vmw: ptp clock unregistered\n");
++}
 +
-+	ret = vmware_hypercall5(cmd, 0, 0, in >> 32, in & 0xffffffff,
-+				&unused);
-+
-+	return ret != 0 ? -EIO : 0;
- }
- 
  /*
-@@ -38,19 +55,19 @@ static int ptp_vmw_pclk_read(u64 *ns)
+  * ACPI driver ops for VMware "precision clock" virtual device.
+  */
  
- static int ptp_vmw_adjtime(struct ptp_clock_info *info, s64 delta)
+ static int ptp_vmw_acpi_add(struct acpi_device *device)
  {
--	return -EOPNOTSUPP;
-+	return ptp_vmw_pclk_write(VMWARE_CMD_PCLK_ADJTIME, (u64)delta);
+-	ptp_vmw_clock = ptp_clock_register(&ptp_vmw_clock_info, NULL);
+-	if (IS_ERR(ptp_vmw_clock)) {
+-		pr_err("failed to register ptp clock\n");
+-		return PTR_ERR(ptp_vmw_clock);
+-	}
++	int ret = ptp_vmw_clock_register();
+ 
+-	ptp_vmw_acpi_device = device;
+-	return 0;
++	if (ret == 0)
++		ptp_vmw_acpi_device = device;
++	return ret;
  }
  
- static int ptp_vmw_adjfine(struct ptp_clock_info *info, long delta)
+ static void ptp_vmw_acpi_remove(struct acpi_device *device)
  {
--	return -EOPNOTSUPP;
-+	return ptp_vmw_pclk_write(VMWARE_CMD_PCLK_ADJFREQ, (u64)delta);
+-	ptp_clock_unregister(ptp_vmw_clock);
++	ptp_vmw_clock_unregister();
++	ptp_vmw_acpi_device = NULL;
  }
  
- static int ptp_vmw_gettime(struct ptp_clock_info *info, struct timespec64 *ts)
- {
- 	u64 ns;
+ static const struct acpi_device_id ptp_vmw_acpi_device_ids[] = {
+@@ -135,16 +151,47 @@ static struct acpi_driver ptp_vmw_acpi_driver = {
+ 	},
+ };
  
--	if (ptp_vmw_pclk_read(&ns) != 0)
-+	if (ptp_vmw_pclk_read(VMWARE_CMD_PCLK_GETTIME, &ns) != 0)
- 		return -EIO;
- 	*ts = ns_to_timespec64(ns);
- 	return 0;
-@@ -59,7 +76,9 @@ static int ptp_vmw_gettime(struct ptp_clock_info *info, struct timespec64 *ts)
- static int ptp_vmw_settime(struct ptp_clock_info *info,
- 			  const struct timespec64 *ts)
- {
--	return -EOPNOTSUPP;
-+	u64 ns = timespec64_to_ns(ts);
++/*
++ * Probe existence of device by poking at a command. If successful,
++ * register as a PTP clock. This is a fallback option for when ACPI
++ * is not available.
++ */
++static int ptp_vmw_probe(void)
++{
++	u64 ns;
 +
-+	return ptp_vmw_pclk_write(VMWARE_CMD_PCLK_SETTIME, ns);
++	return ptp_vmw_pclk_read(VMWARE_CMD_PCLK_GETTIME, &ns);
++}
++
+ static int __init ptp_vmw_init(void)
+ {
+-	if (x86_hyper_type != X86_HYPER_VMWARE)
+-		return -1;
+-	return acpi_bus_register_driver(&ptp_vmw_acpi_driver);
++
++	int error = -ENODEV;
++
++	if (x86_hyper_type != X86_HYPER_VMWARE) {
++		error = -EINVAL;
++		goto out;
++	}
++
++	if (!acpi_disabled) {
++		error = acpi_bus_register_driver(&ptp_vmw_acpi_driver);
++		if (!error)
++			goto out;
++	}
++
++	if (!ptp_vmw_probe())
++		error = ptp_vmw_clock_register();
++
++out:
++	return error;
  }
  
- static int ptp_vmw_enable(struct ptp_clock_info *info,
-@@ -71,7 +90,7 @@ static int ptp_vmw_enable(struct ptp_clock_info *info,
- static struct ptp_clock_info ptp_vmw_clock_info = {
- 	.owner		= THIS_MODULE,
- 	.name		= "ptp_vmw",
--	.max_adj	= 0,
-+	.max_adj	= 999999999,
- 	.adjtime	= ptp_vmw_adjtime,
- 	.adjfine	= ptp_vmw_adjfine,
- 	.gettime64	= ptp_vmw_gettime,
+ static void __exit ptp_vmw_exit(void)
+ {
+-	acpi_bus_unregister_driver(&ptp_vmw_acpi_driver);
++	if (!acpi_disabled && ptp_vmw_acpi_device)
++		acpi_bus_unregister_driver(&ptp_vmw_acpi_driver);
++	else if (ptp_vmw_clock)
++		ptp_vmw_clock_unregister();
+ }
+ 
+ module_init(ptp_vmw_init);
 -- 
 2.40.4
 
