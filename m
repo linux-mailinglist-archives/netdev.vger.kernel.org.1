@@ -1,60 +1,63 @@
-Return-Path: <netdev+bounces-215428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F625B2EA54
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 03:16:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E397B2EAA8
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 03:27:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A9623B98EB
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 01:16:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D44C81C825EC
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 01:26:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C1B71E98E6;
-	Thu, 21 Aug 2025 01:16:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A03E21578D;
+	Thu, 21 Aug 2025 01:26:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nmcfr7e8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pv2bELXf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4449A36CE02;
-	Thu, 21 Aug 2025 01:16:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B4A918991E;
+	Thu, 21 Aug 2025 01:26:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755738971; cv=none; b=QjalFCCCqINwU8nTKnjb4nXhBjkbFTof1U+cutLZA0VT6D29hMGs+tPW/hrIfn9uUz0KfYxlkax1cdFqV6FribdOv6UR13PWZkVUjCOvE0cDRSUui8+2i+zFVG+7hJJU7OvTQXZPFKy7YNyeFN9N5Tfk0hpgczCHiapuTuc6BcA=
+	t=1755739594; cv=none; b=O0uLPbtiLmXXfWlU74HsPMCEBnkfm/SEzGs/nATbqAGyQcChKrpUYwTTONUQf0CQStJRoRD1ESzW0Ox07Qjf2kCrJhqK0kB7con+0g5djZJlF0ZCqIxqbxlucoGa5WMjvPVioo3uUpKy2iQgeJemjR7J3yODaf41W78T8u92kSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755738971; c=relaxed/simple;
-	bh=PkeRqvBIRGhspvX/sKPFj1tXO8ucfCKO6Wmq7H5bPh0=;
+	s=arc-20240116; t=1755739594; c=relaxed/simple;
+	bh=nt1wmkMzdycDN1HariQos43upByKwX/rxUM0DpMe4/0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X+CAC3jTdVvkdB7ExTNcVYpIcEhMxjcZgAiUT6xRl7KEsrPMYezIbU9chRpHrf8dmNGVPbsOo3iAizfQW6fBNBYBRfug5QC7itfZEawbffGp/0U5YOeqU6CpTz+mm8xIhvJfhGk4H2zh2otbOmnAaM903XNVVy9DdC/Ls/Qy62s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nmcfr7e8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77D79C4CEE7;
-	Thu, 21 Aug 2025 01:16:10 +0000 (UTC)
+	 MIME-Version:Content-Type; b=SuxTio3SEx6dFFUqWYKO1pWGCToANszhfZtH77T+6UUxpTG5ZnXqyfUxVVA216r17uU5nF+5cSGpsFNLiiCuYlPny1QT/IBM1ob4M+Jez8zn2Zze82S8xJnclaK5+R+g6bMEDuOv/004THn0RHMZxqPLG6HOM+uwDbLWgJeQje0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pv2bELXf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6247C4CEE7;
+	Thu, 21 Aug 2025 01:26:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755738970;
-	bh=PkeRqvBIRGhspvX/sKPFj1tXO8ucfCKO6Wmq7H5bPh0=;
+	s=k20201202; t=1755739594;
+	bh=nt1wmkMzdycDN1HariQos43upByKwX/rxUM0DpMe4/0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Nmcfr7e8X94BeorS+PzjFVtzAk4dzIyD17E/Qv+R8sSC/1yD+csRH3Gp/LslhEVru
-	 +1DUNhByODJR0TY0JV6L6PM0TjlPCGXT732+v8UsMCvsAQfaW2l6SuDTUCcI9JDpxC
-	 ghRP4TcmNBnXaNwS4shi1GeSQMbKBiYR18YpYlPzKbZyLa/tLNCOd2tMJxMFZ/UlU/
-	 +op5CUXaQ9vDFGJ7OYk/n32qbYlWw/axg65ThxXDH0EnL1X8jkEsBMX3RFqLiWmjPw
-	 l/9tmz5aO3PsECQfmQv5j4+xBhO+FKSiMcZE3m/SyYkqAheKqKF2Lx8xuDBEzL1YeB
-	 bsy2CrwgDt0YA==
-Date: Wed, 20 Aug 2025 18:16:09 -0700
+	b=Pv2bELXfWtTeYycHKkro4DewMzQ4mvDaEtTv7yJLs2P9xCZt1Sv8asex3zLsxMiK5
+	 zoCsNk/MHlRPWOllAjCWahRoL0I6W06AvNn0PSF1MZjI9LpNmTvNWnvo/JTBL48mo+
+	 BIrki7sBA7bhCflLXuJxmD/ylw3a6QeGG5ln3R+VpsPxRzTQ4uxp6DInswsu+V6bLV
+	 M2Pa3zUGK3LcsNO5BAYoWfwT8WRNZMQKbL8ue0XUPYbqnmT/KAHa4tCJpmI+GTcfMY
+	 hGqXCfwSG1q/FUFluvmKYHXE84I2hgkQ8KR3H1RXM5vtBQJvHtiZYW9dDpu0vOO3cB
+	 iBE3t/Rs9/5JQ==
+Date: Wed, 20 Aug 2025 18:26:33 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: <almasrymina@google.com>, <asml.silence@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, <cratiu@nvidia.com>,
- <parav@nvidia.com>, <netdev@vger.kernel.org>, <sdf@meta.com>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v4 7/7] net: devmem: allow binding on rx queues
- with same DMA devices
-Message-ID: <20250820181609.616976d2@kernel.org>
-In-Reply-To: <20250820171214.3597901-9-dtatulea@nvidia.com>
-References: <20250820171214.3597901-1-dtatulea@nvidia.com>
-	<20250820171214.3597901-9-dtatulea@nvidia.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Pavel Begunkov <asml.silence@gmail.com>, netdev@vger.kernel.org, Eric
+ Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, andrew+netdev@lunn.ch, horms@kernel.org,
+ davem@davemloft.net, sdf@fomichev.me, dw@davidwei.uk,
+ michael.chan@broadcom.com, dtatulea@nvidia.com, ap420073@gmail.com,
+ linux-kernel@vger.kernel.org, io-uring@vger.kernel.org
+Subject: Re: [PATCH net-next v3 00/23][pull request] Queue configs and large
+ buffer providers
+Message-ID: <20250820182633.71e991a5@kernel.org>
+In-Reply-To: <CAHS8izP2odYCfEfB_JMdT26nUzniXRdp5MaZgqozYd7wV9Z-gg@mail.gmail.com>
+References: <cover.1755499375.git.asml.silence@gmail.com>
+	<20250819193126.2a4af62b@kernel.org>
+	<fb85866c-3890-41d2-9d5c-27549c4b7aa3@gmail.com>
+	<CAHS8izP2odYCfEfB_JMdT26nUzniXRdp5MaZgqozYd7wV9Z-gg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,37 +67,22 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 20 Aug 2025 20:11:58 +0300 Dragos Tatulea wrote:
-> +static struct device *netdev_nl_get_dma_dev(struct net_device *netdev,
-> +					    unsigned long *rxq_bitmap,
-> +					    struct netlink_ext_ack *extack)
+On Wed, 20 Aug 2025 06:59:51 -0700 Mina Almasry wrote:
+> We could make sure anything touching io_uring/zcrx. and anything using
+> netmem_ref/net_iov goes to netdev. I think roughly adding something
+> like this to general networking entry?
+> 
+> F: io_uring/zcrx.*
+> K: \bnet(mem_ref|_iov)\b
 
-break after type if it's long and multi line:
+Right, I think clearest would be to add a new entry for this, and copy
+the real metadata (Jens as the maintainer, his tree etc.). If we just
+add the match to netdev it will look like the patches will flow via
+net-next. No strong preference, tho. As long as get_maintainer suggests
+CCing netdev I'll be happy.
 
-static struct device *
-netdev_nl_get_dma_dev(struct net_device *netdev, unsigned long *rxq_bitmap,
-		      struct netlink_ext_ack *extack)
-
-> +{
-> +	struct device *dma_dev = NULL;
-> +	u32 rxq_idx, prev_rxq_idx;
-> +
-> +	for_each_set_bit(rxq_idx, rxq_bitmap, netdev->real_num_rx_queues) {
-> +		struct device *rxq_dma_dev;
-> +
-> +		rxq_dma_dev = netdev_queue_get_dma_dev(netdev, rxq_idx);
-> +		/* Multi-PF netdev queues can belong to different DMA devoces.
-
-typo: devoces
-
-> +		 * Block this case.
-> +		 */
-> +		if (dma_dev && rxq_dma_dev != dma_dev) {
-> +			NL_SET_ERR_MSG_FMT(extack, "Queue %u has a different dma device than queue %u",
-
-s/dma/DMA/
-I think we may want to bubble up the Multi-PF thing from the comment to
-the user. This could be quite confusing to people. How about:
-
-	"DMA device mismatch between queue %u and %u (multi-PF device?)"
+> I had suggested this before but never had time to suggest the actual
+> changes, and in the back of my mind was a bit weary of spamming the
+> maintainers, but it seems this is not as much a concern as the patches
+> not getting to netdev.
 
