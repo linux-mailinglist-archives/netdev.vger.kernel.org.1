@@ -1,118 +1,79 @@
-Return-Path: <netdev+bounces-215644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE5EEB2FC3B
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 16:20:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20F4AB2FC93
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 16:29:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EA81A006D1
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:16:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 82E897BF201
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:26:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E85C2BD5B3;
-	Thu, 21 Aug 2025 14:15:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79DE7321433;
+	Thu, 21 Aug 2025 14:21:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="U2+oXM9f"
+	dkim=pass (2048-bit key) header.d=0x65c.net header.i=@0x65c.net header.b="f1Wb8+GG"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from m204-227.eu.mailgun.net (m204-227.eu.mailgun.net [161.38.204.227])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52E523D7ED;
-	Thu, 21 Aug 2025 14:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52F963101A5
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 14:21:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=161.38.204.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755785755; cv=none; b=d62DQBim+BrrG/XqCZczPgKEJyuIl8YcvGYdP2RIyoG1pIpzf7s7S8jiInjkzw4qSMh4zBa73OUNJ9HRAG+6i+BRecfzRyIwLOBIRLuiSWZMao0WYpcM77hX1q4saW8ak6pPmePjZ4Z17XD90IZpbLKkRQOGt75eSou1bgUbrR4=
+	t=1755786115; cv=none; b=rq6lSBD3ZRFFJilQ5F0swfexf+PSR6l6H+x18MBO0LLMVtoKOVYNrzPX88QiXVLwIJPc7kiVw3dm/hlZ66+mCXC9LeEoyhekGb7UbpNmbFXomnwuu6uNpuWKP6ZFaXOrPv05nt76Hmr4KK+iJSaC/tR6tKFKK7Zelj3ZEJSK2Ek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755785755; c=relaxed/simple;
-	bh=aGTiUaE6wgWfeBsp7D9zWiVk9Ot/eVVN9KU/GJLEIwc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HR6DlwJKMw67owQeYAd6yy3tlvRs/QGY7qxTaXINRHSAZCxeGxTDBjm3jigFqFvkypZpgQDenp56Svt3XepnvDXCpZKyfxDNCLezWKWq1BnZaQI9xaxnsee3tsR8XESlK0PzPoDeJpd4zcktDJyRlSK8KQo93t5UXtHD90qT+50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=U2+oXM9f; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=xU+9vDUiNjllQZALNS0DJDtz8AB80KXzT3XORAL0N2g=; b=U2+oXM9f0IyReIgrGiTjSkyrGy
-	HODDwMdacAre75sfqY4NhMzFpvBKzTOctCAnAze1Q+z8ExOJRZM9TJWeb0puDNEd2kfs21RRsvLp+
-	6eLoCMTQ12VeXJYNWW56EdEBecqyGYGW9ZLzwe4gsLt3UmVr5fDTN8VRtP+zYblb0QbA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1up64i-005SZd-CQ; Thu, 21 Aug 2025 16:15:32 +0200
-Date: Thu, 21 Aug 2025 16:15:32 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Hauke Mehrtens <hauke@hauke-m.de>, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Andreas Schirm <andreas.schirm@siemens.com>,
-	Lukas Stockmann <lukas.stockmann@siemens.com>,
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Peter Christen <peter.christen@siemens.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net-next v3 7/8] net: dsa: lantiq_gswip: store switch API
- version in priv
-Message-ID: <8eb20dee-162f-47ea-8596-be71a3aa653b@lunn.ch>
-References: <cover.1755654392.git.daniel@makrotopia.org>
- <88e9ca073e31cdd54ef093053731b32947e8bc67.1755654392.git.daniel@makrotopia.org>
- <aKZg3TviLUDgKgLz@pidgin.makrotopia.org>
- <58d31b56-8145-419e-b7be-1fd48cfeda88@lunn.ch>
- <aKb59jMfDIJIK0KP@pidgin.makrotopia.org>
+	s=arc-20240116; t=1755786115; c=relaxed/simple;
+	bh=fI/vBmYoPbL2e7jrvLhjIJBCGy37cdY01TiUpHVOgfw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=WzUcf4NnvoTmuPgbjYSEifkV8aSbYpY/NONNm8U1b9vj7xuGlIvYLLTlISwTFU7qOtKbo6jqld0vmCluRJZz+Ug5iDzF57eGRUga/mEtylsbMTdgWUDLUuG3677ZtAEbLEWs4ABKUXyOGkRDsOb0FT0b3JFvJ7FKD7UJ6Kfq68o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x65c.net; spf=pass smtp.mailfrom=0x65c.net; dkim=pass (2048-bit key) header.d=0x65c.net header.i=@0x65c.net header.b=f1Wb8+GG; arc=none smtp.client-ip=161.38.204.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x65c.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0x65c.net
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=0x65c.net; q=dns/txt; s=email; t=1755786111; x=1755793311;
+ h=Content-Transfer-Encoding: MIME-Version: References: In-Reply-To: Message-ID: Date: Subject: Subject: Cc: To: To: From: From: Sender: Sender;
+ bh=fI/vBmYoPbL2e7jrvLhjIJBCGy37cdY01TiUpHVOgfw=;
+ b=f1Wb8+GG2Fz7HxXWqLS74Do9sYPq9zZW8YT46Y/f8L2EAXJDK14GZus3LyUsJp4+RH/CKPnyoBBgdRk1xtcVOpGOb3VTN8PWzEUeQ2yzQo3u8LcgohyXQQ3eOUFv+ZtAfY5K+NR0lubuVVKjtjN5WxPn9677eCCLmBmP+N1NptYr0UK8F0iqPpfWVGKWPFPQf5VNMHhQER+bcbQECQprLvJsiG+NSGZh4BkWlFLhY27Mvk3ytXybksXeqt66kQKPUmPDiJ46z6rhzgRKYldZcazO1JKyiBHWs9hr2gF7My4dX+bMOBn8z121SPorvsLs9+bkD3WLgQ+PBZbuC2+t/Q==
+X-Mailgun-Sid: WyI2ZTA5MCIsIm5ldGRldkB2Z2VyLmtlcm5lbC5vcmciLCI1NGVmNCJd
+Received: from fedora (pub082136115007.dh-hfc.datazug.ch [82.136.115.7]) by
+ 7b15455cfe8dbafdef49f89608815e4823a50a73c49b1f725c695bfcd1e1c385 with SMTP id
+ 68a72b7e03c0e2ff1b44b971; Thu, 21 Aug 2025 14:21:50 GMT
+X-Mailgun-Sending-Ip: 161.38.204.227
+Sender: alessandro@0x65c.net
+From: Alessandro Ratti <alessandro@0x65c.net>
+To: alessandro@0x65c.net,
+	linux-kselftest@vger.kernel.org,
+	liuhangbin@gmail.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	skhan@linuxfoundation.org
+Subject: [PATCH v2] selftests: rtnetlink: skip tests if tools or feats are missing
+Date: Thu, 21 Aug 2025 16:16:50 +0200
+Message-ID: <20250821142141.735075-1-alessandro@0x65c.net>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <CAKiXHKejzOAiieTxZpq8+v-vnzSEyuOuD0tYbzHL5R78iS+BMQ@mail.gmail.com>
+References: <CAKiXHKejzOAiieTxZpq8+v-vnzSEyuOuD0tYbzHL5R78iS+BMQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aKb59jMfDIJIK0KP@pidgin.makrotopia.org>
+Content-Transfer-Encoding: 8bit
 
-> The (anyway public) datasheets I have access to don't describe the VERSION
-> register at all. In the existing precompiler macros, however, you can see
-> that most-significant and least-significant byte are swapped. REV is
-> more significant than MOD:
-> 
-> #define GSWIP_VERSION                   0x013
-> #define  GSWIP_VERSION_REV_SHIFT        0
-> #define  GSWIP_VERSION_REV_MASK         GENMASK(7, 0)
-> #define  GSWIP_VERSION_MOD_SHIFT        8
-> #define  GSWIP_VERSION_MOD_MASK         GENMASK(15, 8)
-> #define   GSWIP_VERSION_2_0             0x100
-> #define   GSWIP_VERSION_2_1             0x021
-> #define   GSWIP_VERSION_2_2             0x122
-> #define   GSWIP_VERSION_2_2_ETC         0x022
-> 
-> Now I'd like to add
-> #define   GSWIP_VERSION_2_3             0x023
-> 
-> and then have a simple way to make features available starting from a
-> GSWIP_VERSION. Now in order for GSWIP_VERSION_2_3 to be greater than
-> GSWIP_VERSION_2_2, and GSWIP_VERSION_2_1 to be greater than
-> GSWIP_VERSION_2_0, the bytes need to be swapped.
-> 
-> I don't think the vendor even considered any specific order of the two
-> bytes but just defines them as separate 8-bit fields, considering it a
-> 16-bit unsigned integer is my interpretation which came from the need for
-> comparability.
 
-It would be good to put some of this into the commit message and
-comments in the code. That the hardware has the 'major/minor' version
-bytes in the wrong order preventing numerical comparisons. To make it
-obvious, rather than use swap16(), maybe actually extract the major
-and minor, and then construct the version in the form you want?
+Hi,
 
-    Andrew
+Following up on Hangbin's comment, here is the updated patch with
+adjustments to skip tests gracefully when missing tools and iproute2
+capabilities.
+
+Thanks for your time and consideration.
+
+Best regards,
+Alessandro Ratti
 
