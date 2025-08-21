@@ -1,151 +1,148 @@
-Return-Path: <netdev+bounces-215539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE1B4B2F251
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 10:36:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5B98B2F20A
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 10:34:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB2F51887291
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 08:30:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0ACFD3B5B60
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 08:29:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F35092E8DFA;
-	Thu, 21 Aug 2025 08:24:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 850BB261B82;
+	Thu, 21 Aug 2025 08:25:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="JaLclXCl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L5iw6FwJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A0832EA496;
-	Thu, 21 Aug 2025 08:24:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 052E21F4C8E;
+	Thu, 21 Aug 2025 08:25:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755764681; cv=none; b=Q4RkyjLWqQixRdTaMfi3NMlQn1+eaVBVKGELP0634g9Yqxt9F5o/X2Vz+3Tlh6cqV7fwi+/y2gtOoNpF53bqZ2nFHyE6JzjqeO/CaSIysDWDs1m729rii0w3zs6xJW0IA+2VCF428ktvKbeigzB40Na7Zh+FYp1yjL9hB75O1/I=
+	t=1755764741; cv=none; b=Ai5QTlv4x2xgxKBJ3ZHYs3EdMUW8jX566nIY3MXJJKMuBACjWPHR3WgxyCBUGGkR26LNe5onODMyUjBQKvoV4+Tm9UwOYS+LVY2MfQuptnVnpFMHk97nIWYuG+kJfHHjC/v+LYgoh1u8xCbgZcJJt/Cu39ZaWVPb2at6PXStzIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755764681; c=relaxed/simple;
-	bh=scHGrOC8eE1WmWFXS9WzmAtynz/lWXfDXS5O62Lq58U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LX5J2NGX6Boyv9/DONyubAbrQWuGj8TV5RIpoR42SKaF6zj3YQvEB8fbIbv2phhK+w4aj2bB2x+faIcVwGiFxGS6Bxb1LEqlDQEURBaaSVE2NkdLi1Sg7gNYzR8kYWqjfZ7HJaAwb0rWYGrVtpwfcygB/+IRvbscBGmjhdyw/Hc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=JaLclXCl; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=a9NwOEZ9E0uWkOujSpLzh89ug+qWlu/+wzfesTRczEI=; b=JaLclXCl25bBTMGj/D8BHmqVtH
-	VH0qmicgBBqjFi8uUH3YApkvWnvx1EEJOSz31ttFGERSKZl2R7PqyoXgtAi9nBmMgPkUrmqvJtdr7
-	5oBPPD9WXzQBI93K6P1YiSL8NylQ73gyZ4KWMnHj3c/thSApsAWpUnfShWD1riCpnm1qHR6aw0xw2
-	e8sQ2D6B97nZEXNT2OIsQC0Ph15HIHJHDPSvX0dZVnJ9xuCLOAtd02Lwurp/CnjXSAq7ExsCtUUrg
-	LYSMyDOPgNYrAdxHJKWYbHQAXrGmgEv6G+nSc0UuUUBB564k86BJWETjupNlTpDTp6feQHC7Hi6UO
-	xtdO5GcGuUTu+o1iRLCwGmSWc0AHkrOalq0lWAJm+Ux0y9STp90kWmGBbCAFhdVBlignScX5XzzFS
-	dG6JSK6XGlMd3Vz3xMLmihfV61fsiblTMCq2atNfqSiQV9lzbs/pGAiIZ3ggNTuG1VTUSj1X+z/5v
-	zQR3NcZtxgc9vkuUkKs3EXqI;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1up0b1-0002Ee-2a;
-	Thu, 21 Aug 2025 08:24:31 +0000
-Message-ID: <c604d959-61f6-4d6e-97fb-2c74ef07334a@samba.org>
-Date: Thu, 21 Aug 2025 10:24:31 +0200
+	s=arc-20240116; t=1755764741; c=relaxed/simple;
+	bh=vqjVSAC39DLzfmRq6oEZZ4wUyUSsoaxOHIsxethJGaI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NqeulOD/7exhZYyIwTDEzqV8nLPDCVXaLQnCksZTB1DFIw1fQiVopMTo7NDXUnxIOMuP5kSa74zI2VVqnYXrFi906uncpSDkJqSSibIQ99qFAIYil1JkAwELqxyR2MLzBHa+dPRWHggGlv4VdnvGS8HAnT1LPlwcDJgVoLbW58Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L5iw6FwJ; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-32326e2f0b3so591003a91.2;
+        Thu, 21 Aug 2025 01:25:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755764739; x=1756369539; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FhSKPDIlNSYqB854DlTsEXLBDzoRep9gv44E1FLx6cA=;
+        b=L5iw6FwJwWj3mOqWyD2IYFZJdD55rnh46O3lJQhUdJxpDVLC/eVYXiF7dfoe19MsaJ
+         8mMmAkYDtDuWkdQNgN2EgsKCPH5klxb3Dnh+jKNxv++HenKkeEEyAQPq50E8vm35A3pW
+         3SwUjgUEqNf6T2Tss4AcbOxN+4zYc7ENFsKSyoOgzdJYlPs0W/7v9dSPiHyeLhY6lqEG
+         xkF7Xvm3l3XhHymrNd3OiX68ep69WQFZzteUE00A33ObY9Jil8O8Mm9V5AI5J2pzo6hi
+         S/o2t/+eO2X6tUNA90PgXrQVuqcwd3Jw5ST1PgiPDbYIp2lkPKbHj2LVDIuJdma62c/I
+         r/oA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755764739; x=1756369539;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FhSKPDIlNSYqB854DlTsEXLBDzoRep9gv44E1FLx6cA=;
+        b=Lds0lOE0UMGwqmZpzewnR+rfb5OXEbVNt4v3ATw8X9ur3/Wti9gQHQI8sxQ2qg5VkP
+         xX7Ze5XJVYleWw7ZQjz/WIT6XEoRIhKdy9CFK07kV7oWNtwVScvmHjUl2EfJfwvIp0r5
+         eobt23bcM3d0ZbwCw6bi6VGhSnHi4j5ro4AYgfvtxqBZIXclSjMDJhYjDlqvSog7wylU
+         9ps3xvgaDQpVwDW60F2cuIhF8onjR2xteoKIoYjrmgdja1SOK+oitZCXTUTWVBl1/8e4
+         5pT06NG87yxL/bUujLlmLjfIHNDDkVA8ws8G2kwZtdI1JjFol+Cy7+w/g9qPZwnTnsNn
+         +gKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUW26gBeINy0X1EMiS8aQXJAaCcHRdtonBIBoY6dBUwono8XGehEn4TiCpyf0eA2m5QQrLdSHxIVXbPoRB070Y=@vger.kernel.org, AJvYcCW/kAsE4npefHvmPY7Gh29QDhoLmbTxbN1UJ/4lXATxsp/G5NwwsJnjssOmBozTHcHGlX5GvVEC@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlPGNA4nG3bIHGhkMd6mAqNrukhafm0NjjXykiOQS+Qrrs2IFJ
+	CpAURK6ZA+baVhyzJp/q89XAmtLyxT3jFqCEdK/gNhpWmumqtgm1whLGs/Z1qa8X
+X-Gm-Gg: ASbGnctTV0wRBLhsSLrhQxqeFmj7fV+5B5uMKm9kTIzkA62WtHiS0+BbmuwTS+ek2nC
+	nl4A+zMRHd8HHOUInmLcg+28ALgHjy7tZiFRdJlC1az0YbHcxgqdvWBr5/z6gCXxSSsWh3iaf5Q
+	mvJHb7oAG/5qtE1XrBIQKua06uEscGZQxj1Yc8w0USywVOXRFqC3hNM9acgquIQvpKXgcO/w8s/
+	oLB3gnKjiH/KZoV3Wai8li7zFFwqBkR0bE1EFAQgQKXsRXQfVqxpA+BsEOzmbQLro3IlT8iklvO
+	N7NcoQ7kZfTBydAte8Oka6Tei9X2fDl1QpFY7MBZ4kUeh/JZif+y4C4GSP/iq878m780Xl9q2qr
+	Q1TcHGhL0xiDNfcLDzPdgQERhxJINldUoJ2tFpA==
+X-Google-Smtp-Source: AGHT+IGDx0HzUgM7euXlpNBzSXjRDzWhTDt9pKPGYUt4vhHfLjOysfxGJgRHIebr+TfnmjUIWlqapg==
+X-Received: by 2002:a17:90b:5443:b0:321:937a:6d79 with SMTP id 98e67ed59e1d1-324ed1bff14mr2036303a91.30.1755764739147;
+        Thu, 21 Aug 2025 01:25:39 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76e7d52cbfdsm7466463b3a.84.2025.08.21.01.25.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Aug 2025 01:25:38 -0700 (PDT)
+Date: Thu, 21 Aug 2025 08:25:32 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Alessandro Ratti <alessandro@0x65c.net>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, skhan@linuxfoundation.org,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	alessandro.ratti@gmail.com
+Subject: Re: [PATCH] selftests: rtnetlink: add checks for ifconfig and
+ iproute2
+Message-ID: <aKbX_CzxSi7T9Bcp@fedora>
+References: <20250821074552.682731-1-alessandro@0x65c.net>
+ <20250821074552.682731-2-alessandro@0x65c.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 01/15] net: define IPPROTO_QUIC and SOL_QUIC
- constants
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
- davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
- Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org,
- Steve French <smfrench@gmail.com>, Paulo Alcantara <pc@manguebit.com>,
- Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev,
- Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
- Benjamin Coddington <bcodding@redhat.com>, Steve Dickson
- <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
- Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
- Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
- <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
- illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Daniel Stenberg <daniel@haxx.se>,
- Andy Gospodarek <andrew.gospodarek@broadcom.com>
-References: <cover.1755525878.git.lucien.xin@gmail.com>
- <50eb7a8c7f567f0a87b6e11d2ad835cdbb9546b4.1755525878.git.lucien.xin@gmail.com>
- <5d5ac074-1790-410e-acf9-0e559cb7eacb@samba.org>
- <CAKYAXd-L12tTQyMtTG9+8=XjWY0NDKbYybGXUjPrGin5yYtx3A@mail.gmail.com>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <CAKYAXd-L12tTQyMtTG9+8=XjWY0NDKbYybGXUjPrGin5yYtx3A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250821074552.682731-2-alessandro@0x65c.net>
 
-Hi Namjae,
+On Thu, Aug 21, 2025 at 09:43:11AM +0200, Alessandro Ratti wrote:
+> On systems where `ifconfig` is not available (e.g., modern Debian), the
+> `kci_test_promote_secondaries` test fails. Wrap the call in a check.
+> 
+> Additionally, `do_test_address_proto` fails on iproute2 versions that
+> lack support for `proto` in `ip address` commands. Add a minimal feature
+> check and skip the test with a proper message if unsupported.
+> 
+> These changes allow the tests to run and report SKIP instead of FAIL on
+> platforms with older tools.
+> 
+> Signed-off-by: Alessandro Ratti <alessandro@0x65c.net>
+> ---
+>  tools/testing/selftests/net/rtnetlink.sh | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
+> index d6c00efeb664..9bff620ef595 100755
+> --- a/tools/testing/selftests/net/rtnetlink.sh
+> +++ b/tools/testing/selftests/net/rtnetlink.sh
+> @@ -330,7 +330,9 @@ kci_test_promote_secondaries()
+>  	for i in $(seq 2 254);do
+>  		IP="10.23.11.$i"
+>  		ip -f inet addr add $IP/16 brd + dev "$devdummy"
+> -		ifconfig "$devdummy" $IP netmask 255.255.0.0
+> +		if command -v ifconfig >/dev/null 2>&1; then
+> +			ifconfig "$devdummy" $IP netmask 255.255.0.0
+> +		fi
 
->>> diff --git a/include/linux/socket.h b/include/linux/socket.h
->>> index 3b262487ec06..a7c05b064583 100644
->>> --- a/include/linux/socket.h
->>> +++ b/include/linux/socket.h
->>> @@ -386,6 +386,7 @@ struct ucred {
->>>    #define SOL_MCTP    285
->>>    #define SOL_SMC             286
->>>    #define SOL_VSOCK   287
->>> +#define SOL_QUIC     288
->>>
->>>    /* IPX options */
->>>    #define IPX_TYPE    1
->>> diff --git a/include/uapi/linux/in.h b/include/uapi/linux/in.h
->>> index ced0fc3c3aa5..34becd90d3a6 100644
->>> --- a/include/uapi/linux/in.h
->>> +++ b/include/uapi/linux/in.h
->>> @@ -85,6 +85,8 @@ enum {
->>>    #define IPPROTO_RAW         IPPROTO_RAW
->>>      IPPROTO_SMC = 256,                /* Shared Memory Communications         */
->>>    #define IPPROTO_SMC         IPPROTO_SMC
->>> +  IPPROTO_QUIC = 261,                /* A UDP-Based Multiplexed and Secure Transport */
->>> +#define IPPROTO_QUIC         IPPROTO_QUIC
->>>      IPPROTO_MPTCP = 262,              /* Multipath TCP connection             */
->>>    #define IPPROTO_MPTCP               IPPROTO_MPTCP
->>>      IPPROTO_MAX
->>
->> Can these constants be accepted, soon?
->>
->> Samba 4.23.0 to be released early September will ship userspace code to
->> use them. It would be good to have them correct when kernel's start to
->> support this...
-> I'd like to test ksmbd with smbclient of samba, which includes quic support.
-> Which Samba branch should I use? How do I enable quic in Samba?
-> Do I need to update smb.conf?
+Maybe just skip the promote_secondaries test if ifconfig is not available?
 
-With master or 4.23 the simplest way would be
-
-smbclient //ksmbd-server/share \
-    -Uuser%Passw0rd \
-    --option='client smb transports = quic' \
-    --option='tls verify peer = no_check' \
-    -I 10.0.0.1
-
-Note it only works with a name in the unc otherwise
-quic can't work.
-
-For development you may want to use
-SSLKEYLOGFILE=/dev/shm/sslkeylogfile.txt smbclient ...
-
-And point wireshark to /dev/shm/sslkeylogfile.txt with
-
-wireshark -o tls.keylog_file:/dev/shm/sslkeylogfile.txt
-
-Or you merge it into a pcapng file like this:
-
-editcap --inject-secrets tls,/dev/shm/sslkeylogfile.txt capture.pcap.gz capture.pcapng.gz
-
-Then 'wireshark capture.pcapng.gz' will have everything to decrypt.
-
-metze
-
+Hangbin
+>  	done
+>  
+>  	ip addr flush dev "$devdummy"
+> @@ -1201,6 +1203,12 @@ do_test_address_proto()
+>  	local ret=0
+>  	local err
+>  
+> +	run_cmd_grep 'proto' ip address help
+> +	if [ $? -ne 0 ];then
+> +		end_test "SKIP: addr proto ${what}: iproute2 too old"
+> +		return $ksft_skip
+> +	fi
+> +
+>  	ip address add dev "$devdummy" "$addr3"
+>  	check_err $?
+>  	proto=$(address_get_proto "$addr3")
+> -- 
+> 2.39.5
+> 
 
