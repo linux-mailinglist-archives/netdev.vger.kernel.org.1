@@ -1,251 +1,297 @@
-Return-Path: <netdev+bounces-215534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72871B2F059
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 10:01:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2E54B2F076
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 10:04:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DD333A5015
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 08:01:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D89B8179656
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 08:02:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A4E2E9EC8;
-	Thu, 21 Aug 2025 08:01:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF3A82EA16B;
+	Thu, 21 Aug 2025 08:02:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GdiU4QJM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZhS/9KHv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 184C81F4C8E;
-	Thu, 21 Aug 2025 08:01:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755763263; cv=fail; b=nkBlUBmYBqQ2LkH16mtqxTov/SeiyiJrScUUppxqcUOUAuoaRE/aqs3NpXvRU1Auis3m7aHyjYwyW1ifTLA/49iZ4T/Fv58J8EV+hWhgWP2JRbYcBawZOKrFr6XX8Be+kOzVNPdAVFiZgHL2DZua4Ma7ptyhXlSg8DBcztshxXo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755763263; c=relaxed/simple;
-	bh=ggs7S5OmSy/WWMv3gXDD4O52jzp0EfDkOVm2sGBGfng=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=EwA6/qm5AjaZmFkorQqpNC6p/VjBxKi1My/yRzlrK4n5d9yw31EBV7n/+TaBdOkJ8hv/1jNflxUqH4Fdso74M+UGXa5rSJR7l189GobGhnAbOmoFZ0WNnUlzpOuiluKpRwr6rklS6xLMmEQOc4yhY2kmsMJW1Ezoeh8nudcNQXI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GdiU4QJM; arc=fail smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755763262; x=1787299262;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ggs7S5OmSy/WWMv3gXDD4O52jzp0EfDkOVm2sGBGfng=;
-  b=GdiU4QJMxHXWuI0oyUlFSZA8aKxOyV6q21qqS86EiMjorbffEhNocCNP
-   L2AqOikbjL61MAhGc6xjDz44uFf9CPIG1/VNPOjQZGf3KIeNEczIxCfqx
-   W62SlnfBlJo98zop0y9KXX1gIbUuVzOPBAY+batYTxwi32MUTRl9BQGZB
-   XmbWbAuMszq+wdMPXtJntB1tLcuy2PuCnpALdZJS9fp60Rsgq4NHfzO9d
-   LZ9x8/yDZgydlgqf8J22vTr8uBSyVbt59Wb79if+esOiI9Ewn0ENeKDEI
-   KfaOUglYMeXWVYlXdflTajbRvyIhJEzpL9pExhJrMxjdoEf/4/yZ442Cm
-   g==;
-X-CSE-ConnectionGUID: xIvuX/KAQTuZED5Zks0Bfg==
-X-CSE-MsgGUID: RTNR25ddRJ+nhcEa4FhZ9Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11527"; a="58189123"
-X-IronPort-AV: E=Sophos;i="6.17,306,1747724400"; 
-   d="scan'208";a="58189123"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2025 01:01:00 -0700
-X-CSE-ConnectionGUID: DP3imm74STG1c28p0Lwi0Q==
-X-CSE-MsgGUID: UzhpzDU4Rl2wsVOoDi7W1g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,306,1747724400"; 
-   d="scan'208";a="167959888"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2025 01:01:00 -0700
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Thu, 21 Aug 2025 01:00:59 -0700
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Thu, 21 Aug 2025 01:00:59 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (40.107.236.41)
- by edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Thu, 21 Aug 2025 01:00:59 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=R8DpMr3Rc4ZTImWkMReDDub9u4YoGwWtkEt/g+ANtvi1mVjvIhwaa/F4zm7HosDqMfQGVtdxgr7LQK2EnKthS0FL9TodS/Btj6HMmTZEr5MfKJRwbnPYN80CpaeKa7uUp1OMb9emaIq+Fl3B1fmNLOclX5IPOy5+Rxexud/bZ86x1VaJj+CgKeDcgw7vVyUCS/iCylaTuz8XmKxiuySdpnrYKIzhuqsfQYgNSAoNK2MbXNFpcxfgHZkzw4Od5ACxM/V+utSpSQKA6nTYDT+cw/5ZfB10u+IFvKMuK9TVf8SldOkOmdbHvz2wn2/89BNnigwApliijVaM+yA0zDuCYw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=h9fLSClQ2/knB5oUZYiT9lKx0nxRiwxm0kaXnAyoETI=;
- b=g5HrsBcy6fQz6vmZ51DX3hlt6210ZaDLueNBqoaqRDt2ptpjOKKpOdmqHzTb/6w3edM/JJ3fidxe9tSVMpXj3Wyb1B7mJzDOPn45HgobYb9/LCyr2H/l38fI5m5HZvPX1jNCMEHn27e3R47K9EMdVearJtqjXfh1cXjU952me+x5aWQ6cGImNdNK/3atLL9LA6bcJ6zbqU1WVOnO0YS9TOT3Ts9PfyY3wQCeecDp2aPpT6BCUXNWdBmC0sPYqDQSa95Nmiyg4255afelFPG4uDY1yB5MxcqlqPJ5vcyHyxPqGAk7/eGAxdKAQcAIocjPY7ooVRw9niskhDQ/nDvpvQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by MW6PR11MB8437.namprd11.prod.outlook.com (2603:10b6:303:249::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.15; Thu, 21 Aug
- 2025 08:00:56 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.9031.023; Thu, 21 Aug 2025
- 08:00:56 +0000
-Message-ID: <e71fe3bf-ec97-431e-b60c-634c5263ad82@intel.com>
-Date: Thu, 21 Aug 2025 10:00:51 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] i40e: Prevent unwanted interface name changes
-To: Calvin Owens <calvin@wbinvd.org>, Michal Schmidt <mschmidt@redhat.com>
-CC: <netdev@vger.kernel.org>, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jedrzej Jagielski
-	<jedrzej.jagielski@intel.com>, "Ivan Vecera" <ivecera@redhat.com>,
-	<intel-wired-lan@lists.osuosl.org>, <linux-kernel@vger.kernel.org>
-References: <94d7d5c0bb4fc171154ccff36e85261a9f186923.1755661118.git.calvin@wbinvd.org>
- <CADEbmW100menFu3KACm4p72yPSjbnQwnYumDCGRw+GxpgXeMJA@mail.gmail.com>
- <aKXqVqj_bUefe1Nj@mozart.vkv.me> <aKYI5wXcEqSjunfk@mozart.vkv.me>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-In-Reply-To: <aKYI5wXcEqSjunfk@mozart.vkv.me>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: DU7P251CA0020.EURP251.PROD.OUTLOOK.COM
- (2603:10a6:10:551::22) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9A6D2E9EC8
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 08:02:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755763332; cv=none; b=nSmmlkfuPa48WwPODG1tYXox6AJvT/+W1NiaAQb3HN8eOsrflFEQNy6cOEAr1fhUw4/ptuGpJYL46AFoiGFL1L5UOL2sJL9nMJ4Y6lQcBEVXYU4N1n63HmwXQ7TuOEZ6YD/qfIsInYCYzcvQj9nBfN9NflVqRHaXRNCSmSug2mo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755763332; c=relaxed/simple;
+	bh=+bHo+mNfaReBmwCY6co3I1TOBfKp7u9tHdDMlSCb2P0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cKyjKBZb8ZaN2sHpsfb6Cab0+YbZIgb32tJg7ykr/y2oRTge5wAmngjd1DQ/ZxPerGmzpIqmQbN2OFWCjtU2kI9ZLC95DGvbUZYDobuvwf2oVl38KhYE3nFK7geqYS/0bMMzuUbNmVI/0sLEQezA/Xo5+/9tfbnCJJ+o1X1rwrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZhS/9KHv; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3c46686d1e6so371127f8f.3
+        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 01:02:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755763329; x=1756368129; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ajqgx7Amr++Oe3j8qLtWGfZkpa1mE11u/9OfI91qGpM=;
+        b=ZhS/9KHvxCNOU46t9paQdJTeT1kmKXHFFuxyDzQEGBrLl0hghkLUjqXEJH1XFMOiZs
+         bKhPWBVp19deHJ21b+iN02r2oMC3Ro+5mx36phMznWReRjVo646nJeysNUJ+wbaUFlMV
+         kTBBIdM+gWOt27/Ut3L+fqZmXXKNst4RMuZYmPuJ6JzeMUM4JxvtPNORTP7OlfEfX5aw
+         vVjWTlTWMYdpfTwBr7tLsFCVsGgjc6gxXGDXBq0aNdgxIJmncewJHjfSjKqbPTXS5Ayw
+         oEEuR+kG2JfvKZAAo0NJzglacKu8FgER5Fqk3JC9zO73xDRqd/ZBYJKa8GeCPEyIJTDU
+         16WA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755763329; x=1756368129;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ajqgx7Amr++Oe3j8qLtWGfZkpa1mE11u/9OfI91qGpM=;
+        b=GGOXiT9GjxFuhAaDx4Cz0koQtBEY1WzSHtWuOnXwQcZC5TFqfvEKGgWt2t7fiH+evb
+         UxOiznx65G59Lgphlz9kC8Qq9/ifJkdit3IDaQpdCg1uMVjM5yxaw51ft3EwT02pfBBV
+         QfawqgtVzRhP8pPPWOXOOX+K0sm/QkDWrXwTgI7OLfwXJWzXnTavad81KlYfCjXZuuD9
+         bKsx+9djUd6wJOONQevIYgYMwr8GxqKOWpGPYUfcUVK60KP0nr1DYTX8du5PJwdEPhAC
+         RlIImBAnpBdsceGlMJwuICuFto7pTFYx9Iz/67c5gBCyY5PKiSo9JU/DYXbr209If/8S
+         v1PQ==
+X-Gm-Message-State: AOJu0Yw+rZcKn2GojuxImOEivAURea4UGwNANyBNV4/l5IEyBe2htz3Q
+	k+wcb1fUe6cdm5rCp+ddRjvEryR4mDAgTg1Jhww3s/EK4siQt18nZSu3
+X-Gm-Gg: ASbGncshlU5SWPOgevfxme4Mr0VshHn/qy48GuHzkGliWHF1rGMC02vHZZBC6IpWI9h
+	BbRtoPaod83URGYKNqPuNcdDGoFfyjnjXCsMfDfQVB8ib+GuImp1bbWYYJbWOo/4o6xiE7h7tGC
+	AvuVUGxYN/krRMcsMg4CunF+gJ5xvrksDRvEUQw6Xegwy/r3t9nIin7tt+x6ORZPg52IDjwktS4
+	TH4CFDZDJkA2IhfhMMnhiLEEnr1h7QAP1eJhN2XF210wVntXMNrfU7bK340x96xUnr+zXEXrpK4
+	e1RUZmhVEpJwQ5RADjiHYn2NePgqfZqtwmR2y49OlDlIqUzxvyGKRlPlpKYmV+M4VIg2AH2jFVz
+	+WN1hSaz9anJYwQEEG6S1
+X-Google-Smtp-Source: AGHT+IHI2h54iB+SJWo/VzwAvDQstS21tn4zr81Pcy6qnReRSRp0BYJqu6O3eNwyD2r8HKMbZ+S9kw==
+X-Received: by 2002:a05:6000:2388:b0:3c4:39cc:34a with SMTP id ffacd0b85a97d-3c49549d819mr1255124f8f.21.1755763328476;
+        Thu, 21 Aug 2025 01:02:08 -0700 (PDT)
+Received: from legfed1 ([2a00:79c0:6b1:2e00:22ea:3d6a:5919:85f8])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3c077d4cd67sm10567637f8f.60.2025.08.21.01.02.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Aug 2025 01:02:07 -0700 (PDT)
+Date: Thu, 21 Aug 2025 10:02:05 +0200
+From: Dimitri Fedrau <dima.fedrau@gmail.com>
+To: "Ilya A. Evenbach" <ievenbach@aurora.tech>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH] [88q2xxx] Add support for handling master/slave in
+ forced mode
+Message-ID: <20250821080205.GA5542@legfed1>
+References: <57412198-d385-43ef-85ed-4f4edd7b318a@lunn.ch>
+ <20250820181143.2288755-1-ievenbach@aurora.tech>
+ <20250820181143.2288755-2-ievenbach@aurora.tech>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|MW6PR11MB8437:EE_
-X-MS-Office365-Filtering-Correlation-Id: 240b17ce-774e-49a3-7050-08dde088db97
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?MnpXY2lockVxZW5MOW4vM0p3NzZaVy9CNThjdEk5dC9pVnVYd3U5aHBjaG5j?=
- =?utf-8?B?RjhhVGNuM1FFYm5YWStiSWZvcW9kL2Z2WlNoakpZbU1uWTRlU0R6YlJiNEZv?=
- =?utf-8?B?cGhBNWRMenFjZm5hRXBzK0VGK3NRQlM0VmlFTkxBWm1aM0hwWUpISzd2UkVh?=
- =?utf-8?B?cnBTRnBkblgvbzl5dUV6LzQvcmxaTHJsQlRZRFR4UklxQlowMEM2OTAxUEVa?=
- =?utf-8?B?RnVVWVhncTl1bHpVUnNZN1d1UzR2bGtTUnljQmFYa0ozQzdxVVBLeHQ2WUl0?=
- =?utf-8?B?SW5FREhHZW9iZEd1Nk5ZYWVwNk0wd1FGQlg5QkM3UllhSVo0RUpyaU9RN0k0?=
- =?utf-8?B?bU1rWS92OGhybk42RDhBZC9WL3ZyVFQ3UjdwVGpNd0wxbGxpZWY4M21XZUVy?=
- =?utf-8?B?dEZjSE5TdmJ0aVQ5eGdsNzJLL3lXOWswZlF4dUVyeG5qa3NPdHRNaTNiMkhU?=
- =?utf-8?B?amZoMmFBSmxpdml5V2FPeVlqSjhHUzl4Slo4Z0h6K2VNb2xkelp5eEx4K3lj?=
- =?utf-8?B?MnBGTExUNHJKNzNtVkh6M1EwNEZaTmdqcE1BbjEvcDZwOVFyaXdsbjI2ek5R?=
- =?utf-8?B?Y1pIWEh5a01TZjIzNlJndWdmamFlMkJjbzlPSkRld1I4dWxsV3lNZFNYTDJL?=
- =?utf-8?B?NTA2ZlgxK1lYZ0luY2dMeitVSlRzd1l4aWE1UmhnZVRiUjhkU05MbXJjTnoz?=
- =?utf-8?B?Nkx0SFNQSjkwMUZxazZ0aTFuQ29Td0FGMUNjMFlzaUZJWTVIanhrR1Y3Z3JO?=
- =?utf-8?B?Ui96NExFTHhjVG10SlhIYk00aVBPWi9QL1AzMDlFNSt5Q2pyQlh4MWxFK3NY?=
- =?utf-8?B?WnQ1eHVFUWhkbVBRMzRSVU9zWmgyaklzNHVnb0xQbDZmbThHQjRlQU5zQ3lV?=
- =?utf-8?B?NU92TENMTGN0b0FMeHIyRUVXYzZvekZZZERVd3M0UUhkUUtoUVIvblc4QWd0?=
- =?utf-8?B?aDFWaVlkc0sxUUt5angrMG1DTmtjbHZFb1RaTmo4bTViOVgwYU5iZHRXOE12?=
- =?utf-8?B?clo5aFExdHdqT2tDZFg2OHh5UGk1M2JKem9SR2RlTGpLT082aDJBR0Jab2kx?=
- =?utf-8?B?L3RrWjZvdEU3MmlIUGRFNGFmOG9VVERxMWlSbFYwWGhGY2ZpR3ZZZUc4Y3dG?=
- =?utf-8?B?TkRMWmRxMm9SVWpLYmZVVnpzazZHMlVFUHVkT1dyOWF4N3JSL1h3NzVpZjdn?=
- =?utf-8?B?ekYzMmliVG5tQi9SRGVVUEZHNGVWSDNVODBMc2QxUDRPTkI3dTlyWDkwY1Fr?=
- =?utf-8?B?UTVXa3ZmMHVvUys3VG9obk9vcjhIQXh5VytEY1Rsdlc2VkRobWJqNlU0bDZk?=
- =?utf-8?B?T2YzcDVQT1cyeHBZNHVsaDlHM3lmRTVhOVhGS2hkMzVnYzVwc3UrbmdGQW5V?=
- =?utf-8?B?WGFHWUl6cElmd0hxdk9mLzFNS1Y1WHNmcDRoQkx2WUMwMzhUS21wb0htM2hX?=
- =?utf-8?B?ZWpIaU92TjNka1BFalFsOGZpbExZK2JyQSt4S3M2bWhKdnZNNXNWVVpEMzVN?=
- =?utf-8?B?TVNGUmpKL2ZJUStnbGJVUURLNGJLR3BpZ0ZHWTNVbzlLV1lSOU8xOVF3b1ZC?=
- =?utf-8?B?K09JQjdQWVRIVE1yRU5zZmFadnRwSlYyV3lRcnUwSThjb3JCOE1NUFNjVVFN?=
- =?utf-8?B?dWozZ1NVY3l1UlAvRzVjMXFZSE9VbGpnWW1jZ0s1bVltOEFLOVdrc015TzVE?=
- =?utf-8?B?eDRtNE9zbFVPVGpDU2xwcDVLUVlnb1d3cVgrYWdmRDJaSlU3NzFoaEVReWZ5?=
- =?utf-8?B?SDU4M2xGSmM1WjBscGFVeFdyNk0xQmVTTzFqeHR6N2ZWb3VZSXJiUDhZaXlH?=
- =?utf-8?B?dkpYV1hBckV6RGZ5dmc5VmFzZ1pRZkhkSGxQb1hGSlg5eWZ2MUVVRFN5Y0lo?=
- =?utf-8?B?aEhETy9jcUVnanlqVDJ0RFlMSHk0TXQzdGMzSkRqYk5wTWVVZHhVNy9JNy9l?=
- =?utf-8?Q?YBCwRnKYBFs=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NzFXYjY2Uzlzd2J2Tk9wYVBVT0w1dXc3ZkFhWS9OeW9EeWtBbGxJS0xmc2pY?=
- =?utf-8?B?aFE5ckl4UXZIeE5iOGUrUGZObk91QU90YUZNdEoyTlpmN1JZalRpOHE5QVM2?=
- =?utf-8?B?VC9qdnozWkJNKzJZQnc3bzZEV0Y3U0dhV3VpbE94cDcyV0xBYkdxeWFyYkRv?=
- =?utf-8?B?UVdjMGxlQzNNZXd1NG5sbjlvcDRoSmJpUktqbk1MRXliaUcyU2hSdEdTbWlM?=
- =?utf-8?B?bzdCaWNWNCtWWTM2SVluazM3OElPakhXRXpTdTNaOFVMN3NNZlNmVEpwYzZk?=
- =?utf-8?B?YS9yckxDRDc2UmtSMXBJTk9RM256Wm5ORE4wQXVIZzdzc2N4ZUVXUkh4U2xj?=
- =?utf-8?B?NW1wbFdQRHlvRWF5d3NiQllLZkdhUnYrT1BNLzJRWWRRRXFKQTdKTmt2a0J4?=
- =?utf-8?B?M0wxd0p3NTdXVFV6eWpoSlB6VnF3MDNjUmZsNjEvSXRtZ2JoSGlpeDFCNWQr?=
- =?utf-8?B?aERralpCZHJKQ1YxQ0I2S3I0N24yeE1CMWwzYklOSWFnbmNtTy9haHdHYmw2?=
- =?utf-8?B?YlFBTDdPYVhjUENsSlkwWDhwTndpOXVUNHJ4Mk14OHhrMG56UThOZ052ci9N?=
- =?utf-8?B?NTZGT28rMGpKMkZjYitsTHhHSURHbG9ZT2lZUFl5ajFhaUpaT1YrQ2N4N0U0?=
- =?utf-8?B?cTJQWG5uMXFNVjRUY0JRNWYrU1dkUjJVVkhhN21lcmVHR2dld1F0ZWUzZGJZ?=
- =?utf-8?B?QUZDSTh0bWVaelJwV3NyQjBYSTRNTGdXWEFMZHlpWUdGSHJCRnpYVWZSUHRF?=
- =?utf-8?B?azZpZHJuZFV2STVKdkFieFFmOUhXVXlhQTVzUno5N3FwdEZQOG44bE9mNG80?=
- =?utf-8?B?LzlhU3haOHlkYWtqYVZmaEYrTGRIRytGMWFIQlE2WXQrTkNpOThCYlNaSDcr?=
- =?utf-8?B?bVF4eFFKUVJBMkErVDNFMFFpYmdwcWlqVlZXM2FEc2JESVREdkhNTU1mTFFp?=
- =?utf-8?B?dWNBQzV0RjByUEpNcE4rcEpuWGdUNEtBZ1pXaURZR3ZEMzdsamk1d0Irdmti?=
- =?utf-8?B?NVNTRENiSmRJckRxTnd0dlNzWFdDUGQ1Zjkrazd5YlAxeStBZ0ppRUFTV3VO?=
- =?utf-8?B?aFNxckRmMG51M01RSlc5dlc1M2V2NHliQWpvL0NlamJ3WnZWblNCUUMxTWZX?=
- =?utf-8?B?QjNVUU45MUMydG9mbDAzN2NuSTU4YldkRzZDaUVOMDlCMmh6QXVQSzdNVWhq?=
- =?utf-8?B?UEkreFFFMDU3QjBmNVlKNlY5YU54bmlSdDZRZGVzYzA5bno2RFZYQlJ4Vnhr?=
- =?utf-8?B?aWMxYkVLWnJoVHFwZE9EVDZNUHZrRkxRKzc4cHQxY1hXWHJPK21KMWFjMjFX?=
- =?utf-8?B?QmtpVGd0V21CQUlTcFBSMGdvUGdrZUpqSXJlalkvMm83b0ZFV3AzTVdaREQ5?=
- =?utf-8?B?d0tCUEZNVS9QM2Z3QmRaMXkzTTVZQ3hZdlJqd2M2aU4wWXRvTkErZHZKTjlM?=
- =?utf-8?B?aDRSekZLeFdVS3VuWTlVeUNHeDNVRURDY3ordStGMlRwTHhrUkE0djd0R0w3?=
- =?utf-8?B?bnlyRFJIUmxPWkRRZXU1WjBqZlVjQXlUWlVLc0dscnJvQzladGtmZHlsNGhX?=
- =?utf-8?B?bVF5cTFiaTVncEdKZ01PUi9iOGRYKzlHUEV3R1dTZXF0N0JqbXhnOXhPUnBS?=
- =?utf-8?B?RXR0RXpESTNwYVdpeFA5MG9jdXMwUzlPdUJaR1daZ2VIM2QveHVjcmdRMnRm?=
- =?utf-8?B?aFNiQ3NnWThqbGFJcjc0SERHVExnUkYzRXRMMFV4Vnl4SElQdkcrRnFPbHJD?=
- =?utf-8?B?RmtaZkRsdTlGUnpTRVdzSlhjRnNkczMxYWdncVNsam9kNjlxNmhQTmMxQnV3?=
- =?utf-8?B?Q0lrNnl4dFd5WE9ldW5PdlN4RVEvWmFHeG5Ic3hmMGVoOHM4Yy9HQW9tZ3BQ?=
- =?utf-8?B?VHMweGJCT3J4L252SEg3TEd6eWFYZFc3aXp1RUZXT3BPbUJmWk5aY2RzbC9P?=
- =?utf-8?B?ME9UWGdtdjhidDNPUld1QTdxR1k3cXdVNE9YV3VjMFd2NTdYalpLNEN1Zngy?=
- =?utf-8?B?OTdod2VNNnVPSWlPZ0hJdU9FVG1HRGFBSnAyc1BIM2FHWXlWOU5zaFU2TW5D?=
- =?utf-8?B?V2dYZHhsYnBYdVUxdDdPVFNaRW1peTdGNWJkQWhJbFFkMWpTaGpUUm14U1BD?=
- =?utf-8?B?MG1nYWlLWm14aFplQ05Ic0JzZlhpclFwa1JZalVibVY4cm0vTElpb0ZqQ1ZP?=
- =?utf-8?Q?tIRcUMg90cOKpSisYPux53Y=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 240b17ce-774e-49a3-7050-08dde088db97
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2025 08:00:56.2264
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xnZ8gnk7NOnVZk8UOzX7n6XUHpgogbIZAPY6unRGkDNMbQs61MNgyHZnrA7rbZarGbxGvkfG42E79SJzj3xM5cPCs8rRo0sXeHs/tOo8UwU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR11MB8437
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250820181143.2288755-2-ievenbach@aurora.tech>
 
-On 8/20/25 19:41, Calvin Owens wrote:
-> On Wednesday 08/20 at 08:31 -0700, Calvin Owens wrote:
->> On Wednesday 08/20 at 08:42 +0200, Michal Schmidt wrote:
->>> On Wed, Aug 20, 2025 at 6:30 AM Calvin Owens <calvin@wbinvd.org> wrote:
->>>> The same naming regression which was reported in ixgbe and fixed in
->>>> commit e67a0bc3ed4f ("ixgbe: prevent from unwanted interface name
->>>> changes") still exists in i40e.
->>>>
->>>> Fix i40e by setting the same flag, added in commit c5ec7f49b480
->>>> ("devlink: let driver opt out of automatic phys_port_name generation").
->>>>
->>>> Fixes: 9e479d64dc58 ("i40e: Add initial devlink support")
->>>
->>> But this one's almost two years old. By now, there may be more users
->>> relying on the new name than on the old one.
->>> Michal
->>
->> Well, I was relying on the new ixgbe names, and I had to revert them
->> all in a bunch of configs yesterday after e67a0bc3ed4f :)
+Hi Ilya,
 
-we have fixed (changed to old naming scheme) ixgbe right after the
-kernel was used by real users (modulo usual delay needed to invent
-a good solution)
-
+Am Wed, Aug 20, 2025 at 11:11:43AM -0700 schrieb Ilya A. Evenbach:
+> 88q2xxx PHYs have non-standard way of setting master/slave in
+> forced mode.
+> This change adds support for changing and reporting this setting
+> correctly through ethtool.
 > 
-> And, even if it is e67a0bc3ed4f that introduced it, v6.7 was the first
-> release with it. I strongly suspect most servers with i40e NICs running
-> in the wild are running older kernels than that, and have not yet
-> encountered the naming regression. But you probably have much better
-> data about that than I do :)
+> Signed-off-by: Ilya A. Evenbach <ievenbach@aurora.tech>
+> ---
+>  drivers/net/phy/marvell-88q2xxx.c | 106 ++++++++++++++++++++++++++++--
+>  1 file changed, 101 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/phy/marvell-88q2xxx.c b/drivers/net/phy/marvell-88q2xxx.c
+> index f3d83b04c953..b94d574fd9b7 100644
+> --- a/drivers/net/phy/marvell-88q2xxx.c
+> +++ b/drivers/net/phy/marvell-88q2xxx.c
+> @@ -118,6 +118,11 @@
+>  #define MV88Q2XXX_LED_INDEX_TX_ENABLE			0
+>  #define MV88Q2XXX_LED_INDEX_GPIO			1
+>  
+> +/* Marvell vendor PMA/PMD control for forced master/slave when AN is disabled */
+> +#define PMAPMD_MVL_PMAPMD_CTL				0x0834
 
-RedHat patches their kernels with current code of the drivers that their
-customers use (including i40e and ixgbe)
-One could expect that changes made today to those will reach RHEL 10.3,
-even if it would be named "kernel 6.12".
+Already defined, see MDIO_PMA_PMD_BT1_CTRL.
 
-(*) the changes will likely be also in 10.2, but I don't want to make
-any promises from Intel or Redhat here
+> +#define MASTER_MODE					BIT(14)
+
+Already defines, see MDIO_PMA_PMD_BT1_CTRL_CFG_MST.
+
+> +#define MODE_MASK					BIT(14)
+> +
+>  struct mv88q2xxx_priv {
+>  	bool enable_led0;
+>  };
+> @@ -377,13 +382,57 @@ static int mv88q2xxx_read_link(struct phy_device *phydev)
+>  static int mv88q2xxx_read_master_slave_state(struct phy_device *phydev)
+>  {
+>  	int ret;
+> +	int adv_l, adv_m, stat, stat2;
+> +
+> +	/* In forced mode, state and config are controlled via PMAPMD 0x834 */
+> +	if (phydev->autoneg == AUTONEG_DISABLE) {
+> +		ret = phy_read_mmd(phydev, MDIO_MMD_PMAPMD, PMAPMD_MVL_PMAPMD_CTL);
+> +		if (ret < 0)
+> +			return ret;
+> +
+> +		if (ret & MASTER_MODE) {
+> +			phydev->master_slave_state = MASTER_SLAVE_STATE_MASTER;
+> +			phydev->master_slave_get = MASTER_SLAVE_CFG_MASTER_FORCE;
+> +		} else {
+> +			phydev->master_slave_state = MASTER_SLAVE_STATE_SLAVE;
+> +			phydev->master_slave_get = MASTER_SLAVE_CFG_SLAVE_FORCE;
+> +		}
+> +		return 0;
+> +	}
+>  
+> -	phydev->master_slave_state = MASTER_SLAVE_STATE_UNKNOWN;
+> -	ret = phy_read_mmd(phydev, MDIO_MMD_AN, MDIO_MMD_AN_MV_STAT);
+> -	if (ret < 0)
+> -		return ret;
+>  
+> -	if (ret & MDIO_MMD_AN_MV_STAT_LOCAL_MASTER)
+> +	adv_l = phy_read_mmd(phydev, MDIO_MMD_AN, MDIO_AN_T1_ADV_L);
+> +	if (adv_l < 0)
+> +		return adv_l;
+> +	adv_m = phy_read_mmd(phydev, MDIO_MMD_AN, MDIO_AN_T1_ADV_M);
+> +	if (adv_m < 0)
+> +		return adv_m;
+> +
+> +	if (adv_l & MDIO_AN_T1_ADV_L_FORCE_MS)
+> +		phydev->master_slave_get = MASTER_SLAVE_CFG_MASTER_FORCE;
+> +	else if (adv_m & MDIO_AN_T1_ADV_M_MST)
+> +		phydev->master_slave_get = MASTER_SLAVE_CFG_MASTER_PREFERRED;
+> +	else
+> +		phydev->master_slave_get = MASTER_SLAVE_CFG_SLAVE_PREFERRED;
+> +
+> +	stat = phy_read_mmd(phydev, MDIO_MMD_AN, MDIO_MMD_AN_MV_STAT);
+> +	if (stat < 0)
+> +		return stat;
+> +
+> +	if (stat & MDIO_MMD_AN_MV_STAT_MS_CONF_FAULT) {
+> +		phydev->master_slave_state = MASTER_SLAVE_STATE_ERR;
+> +		return 0;
+> +	}
+> +
+> +	stat2 = phy_read_mmd(phydev, MDIO_MMD_AN, MDIO_MMD_AN_MV_STAT2);
+> +	if (stat2 < 0)
+> +		return stat2;
+> +	if (!(stat2 & MDIO_MMD_AN_MV_STAT2_AN_RESOLVED)) {
+> +		phydev->master_slave_state = MASTER_SLAVE_STATE_UNKNOWN;
+> +		return 0;
+> +	}
+> +
+> +	if (stat & MDIO_MMD_AN_MV_STAT_LOCAL_MASTER)
+>  		phydev->master_slave_state = MASTER_SLAVE_STATE_MASTER;
+>  	else
+>  		phydev->master_slave_state = MASTER_SLAVE_STATE_SLAVE;
+> @@ -391,6 +440,34 @@ static int mv88q2xxx_read_master_slave_state(struct phy_device *phydev)
+>  	return 0;
+>  }
+>  
+
+Is there a issue with the function you are trying to fix ? Seems that
+you copied some generic functions into it.
+
+> +static int mv88q2xxx_setup_master_slave_forced(struct phy_device *phydev)
+> +{
+> +	int ret = 0;
+> +
+> +	switch (phydev->master_slave_set) {
+> +	case MASTER_SLAVE_CFG_MASTER_FORCE:
+> +	case MASTER_SLAVE_CFG_MASTER_PREFERRED:
+> +		ret = phy_modify_mmd_changed(phydev, MDIO_MMD_PMAPMD,
+> +					     PMAPMD_MVL_PMAPMD_CTL,
+> +					     MODE_MASK, MASTER_MODE);
+> +		break;
+> +	case MASTER_SLAVE_CFG_SLAVE_FORCE:
+> +	case MASTER_SLAVE_CFG_SLAVE_PREFERRED:
+> +		ret = phy_modify_mmd_changed(phydev, MDIO_MMD_PMAPMD,
+> +					     PMAPMD_MVL_PMAPMD_CTL,
+> +					     MODE_MASK, 0);
+> +		break;
+> +	case MASTER_SLAVE_CFG_UNKNOWN:
+> +	case MASTER_SLAVE_CFG_UNSUPPORTED:
+> +	default:
+> +		phydev_warn(phydev, "Unsupported Master/Slave mode\n");
+> +		ret = 0;
+> +		break;
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+
+This function does the same as genphy_c45_pma_baset1_setup_master_slave.
+Please use the generic function. Besides you are introducing register
+PMAPMD_MVL_PMAPMD_CTL which is MDIO_PMA_PMD_BT1_CTRL.
+
+>  static int mv88q2xxx_read_aneg_speed(struct phy_device *phydev)
+>  {
+>  	int ret;
+> @@ -448,6 +525,11 @@ static int mv88q2xxx_read_status(struct phy_device *phydev)
+>  	if (ret < 0)
+>  		return ret;
+>  
+> +	/* Populate master/slave status also for forced modes */
+> +	ret = mv88q2xxx_read_master_slave_state(phydev);
+> +	if (ret < 0 && ret != -EOPNOTSUPP)
+> +		return ret;
+> +
+>  	return genphy_c45_read_pma(phydev);
+>  }
+>  
+
+Why ? This function is only used in case AUTONEG_ENABLE.
+
+> @@ -478,6 +560,20 @@ static int mv88q2xxx_config_aneg(struct phy_device *phydev)
+>  	if (ret)
+>  		return ret;
+>  
+> +	/* Configure Base-T1 master/slave per phydev->master_slave_set.
+> +	 * For AN disabled, program PMAPMD role directly; otherwise rely on
+> +	 * the standard Base-T1 AN advertisement bits.
+> +	 */
+> +	if (phydev->autoneg == AUTONEG_DISABLE) {
+> +		ret = mv88q2xxx_setup_master_slave_forced(phydev);
+> +		if (ret)
+> +			return ret;
+> +	} else {
+> +		ret = genphy_c45_pma_baset1_setup_master_slave(phydev);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+>  	return phydev->drv->soft_reset(phydev);
+>  }
+>  
+
+I don't see any reason why genphy_c45_config_aneg isn't sufficient here.
+In case AUTONEG_DISABLE, genphy_c45_pma_setup_forced is called and calls
+genphy_c45_pma_baset1_setup_master_slave which is basically the same as
+mv88q2xxx_setup_master_slave_forced.
+In case AUTONEG_ENABLE, calling genphy_c45_pma_baset1_setup_master_slave is
+wrong, please look how genphy_c45_an_config_aneg is implemented.
+
+Please take other users of the driver into CC, they did a lot of
+reviewing and testing in the past. If there is some issue with the
+driver, they should know:
+
+"Niklas Söderlund" <niklas.soderlund+renesas@ragnatech.se>
+"Gregor Herburger" <gregor.herburger@ew.tq-group.com>
+"Stefan Eichenberger" <eichest@gmail.com>
+"Geert Uytterhoeven" <geert@linux-m68k.org>
+
+Which device are you using, and why did you need this patch ? Is there
+any issue you are trying to fix ? On my side I did a lot of testing with
+the different modes and never experienced any problems so far.
+
+Best regards,
+Dimitri Fedrau
 
