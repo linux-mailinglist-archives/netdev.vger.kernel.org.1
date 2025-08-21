@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-215462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A355FB2EB57
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 04:40:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 152E6B2EB60
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 04:42:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E9685E4F4F
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 02:40:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 841461C88F0D
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 02:41:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2683429BD81;
-	Thu, 21 Aug 2025 02:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82816253F03;
+	Thu, 21 Aug 2025 02:40:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SaGlS2+o"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MdmNoF3q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02E6C27990A
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 02:40:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A86A252910
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 02:40:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755744008; cv=none; b=Qbd7KRTl1pOmRPdXkZHSPcAEEKrlQAo8/AG/Dp5z1kB/DrjQrpKP9zlyPAz/xqAPDX0qjAZ3KXVJBpFLaTKg8UNPs1YuSyFXfn8h7jhYeJIgUVO9fB1wDN886a8QUpgg5bCSgSw84q9Yb65jx48l3KbKT/I1NRVeissLXFPIZx0=
+	t=1755744024; cv=none; b=I8z9ZrcfPsKARPzxF2toYpZ7NW+x80HylS9h0z1Yev6HpROTp8Ol6j94Btsef8B6zGij5/E/n1yDtBzr7xK9Rts6jVb6wjwuCd++EoPOBq9j9Ifa4XSOcWrpifm9d4B7h1M5Sy5dFrKW+r6BjPqo6GfS8S2k8Ke8EfEHvnVwD/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755744008; c=relaxed/simple;
-	bh=sht5IwXPXe9lLDUdVFEK7rEs8VmcLuMc6CFKQZuYHkQ=;
+	s=arc-20240116; t=1755744024; c=relaxed/simple;
+	bh=k6uBuR+BFsezZ+t3N5i7gC9dG1VhnDJnGYMxyVqrBbA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SHnx14dOTLIz6kt5QT0VZmeITltGqR+wuKGnyCRVRC0fkALotOdgLEu+Vk9B1qmCp608hjunwVKoihcj2Kz5usXw0h6Ry48ovzFPhssvrvDmijGNoUQDu1Uq2EjRD+m1t5qFJtJgcxJ1lyY1EUcihS3G9xniGm/TaNVI+j7mIGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SaGlS2+o; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC8D5C4CEE7;
-	Thu, 21 Aug 2025 02:40:07 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=pQPxpugVUuIR2HxmWL5xl1fH8hBQw634xr+ABCOp5/NHA/Lsyws0W/udNIxAZFuMJmiCuJkm1dg5Sek6rOvy8mE4CAAOSdjTW8Fu6pz4VUJo52MfDBdlGiOI77D+Kj94TvxAJYhVkuCXexSYppTGe3AC+T/PB26oflfYXv6JG6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MdmNoF3q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE1DAC4CEE7;
+	Thu, 21 Aug 2025 02:40:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755744007;
-	bh=sht5IwXPXe9lLDUdVFEK7rEs8VmcLuMc6CFKQZuYHkQ=;
+	s=k20201202; t=1755744023;
+	bh=k6uBuR+BFsezZ+t3N5i7gC9dG1VhnDJnGYMxyVqrBbA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=SaGlS2+of02Z8hKeOIfaEjzwts4hzP1HQ2zQZavtan7zXuabrd3oTlTzfU4hBFzdk
-	 6yZHfNwMdcEzhbOThbn1KABW+IxCmR6XCggqzjlulg5ZoDdm/H+8XpHeu5e6zqHL+q
-	 h1ERrL2DddfCp6OQiHJ239+NGVa32hxZq77TCHuDcTapveMN1/1T+dyB53d7xCyAMp
-	 7DFqkwMnmFjib7YizD/4tAJZs8R7olZOrbiAj0YgAtR8o+AHtmwMOdG7j4bViLsTJr
-	 tne+M+MnpBPHtkOwjOIfy4yI7eNp8tV9VRVOHx0M+fFqF47pSCw6hIo4XjdIOnqgKi
-	 Q9sv1xDqvUA9g==
+	b=MdmNoF3q3pvy//ktFo1CQn5qTfqx0xYB/nCNWbSJwUwdsHZRPBwXdRVto/rMmJhMt
+	 YXGoNnQ2eliv4187kgLkJVfg/ktXqHIN9pIprbQpToodPl2iOdlnGI7zKHKFkO0vSs
+	 iKS/N8/sOn123xDMkG9kphHqIaxZLLY9K0ZzJiYvc0rnKVGItG9KYe/r5uVesdxnWg
+	 SVOdYBJG9RF0AHSQWFdTAVmtTQKj+vaqmanlpzolCxdemhb0/Q9iG9ESUft3q1M3y8
+	 f1luJVta97bQoSugx5eKGSjlBspoj6p3VWwbDnBapToaDV3NIdOYxPi9e9bK9AA3tS
+	 QfwqLxYVOH84g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C86383BF4E;
-	Thu, 21 Aug 2025 02:40:18 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D96383BF4E;
+	Thu, 21 Aug 2025 02:40:34 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,46 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 1/2] net/sched: Make cake_enqueue return
- NET_XMIT_CN
- when past buffer_limit
+Subject: Re: [PATCH net-next v2 0/5] bnxt_en: Updates for net-next
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175574401699.482952.13902122380397656800.git-patchwork-notify@kernel.org>
-Date: Thu, 21 Aug 2025 02:40:16 +0000
-References: <20250819033601.579821-1-will@willsroot.io>
-In-Reply-To: <20250819033601.579821-1-will@willsroot.io>
-To: William Liu <will@willsroot.io>
-Cc: netdev@vger.kernel.org, toke@toke.dk, dave.taht@gmail.com,
- jhs@mojatatu.com, xiyou.wangcong@gmail.com, pabeni@redhat.com,
- kuba@kernel.org, savy@syst3mfailure.io, jiri@resnulli.us,
- davem@davemloft.net, edumazet@google.com, horms@kernel.org,
- cake@lists.bufferbloat.net
+ <175574403298.482952.17915026779929048641.git-patchwork-notify@kernel.org>
+Date: Thu, 21 Aug 2025 02:40:32 +0000
+References: <20250819163919.104075-1-michael.chan@broadcom.com>
+In-Reply-To: <20250819163919.104075-1-michael.chan@broadcom.com>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
+ pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 19 Aug 2025 03:36:28 +0000 you wrote:
-> The following setup can trigger a WARNING in htb_activate due to
-> the condition: !cl->leaf.q->q.qlen
+On Tue, 19 Aug 2025 09:39:14 -0700 you wrote:
+> The first patch is the FW interface update, followed by 3 patches to
+> support the expanded pcie v2 structure for ethtool -d.  The last patch
+> adds a Hyper-V PCI ID for the 5760X chips (Thor2).
 > 
-> tc qdisc del dev lo root
-> tc qdisc add dev lo root handle 1: htb default 1
-> tc class add dev lo parent 1: classid 1:1 \
->        htb rate 64bit
-> tc qdisc add dev lo parent 1:1 handle f: \
->        cake memlimit 1b
-> ping -I lo -f -c1 -s64 -W0.001 127.0.0.1
+> v2: Update Changelog for patch #2
+> 
+> v1: https://lore.kernel.org/netdev/20250818004940.5663-1-michael.chan@broadcom.com/
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2,1/2] net/sched: Make cake_enqueue return NET_XMIT_CN when past buffer_limit
-    https://git.kernel.org/netdev/net/c/15de71d06a40
-  - [net,v2,2/2] net/sched: Remove unnecessary WARNING condition for empty child qdisc in htb_activate
-    https://git.kernel.org/netdev/net/c/2c2192e5f9c7
+  - [net-next,v2,1/5] bnxt_en: hsi: Update FW interface to 1.10.3.133
+    https://git.kernel.org/netdev/net-next/c/5f8a4f34f6dc
+  - [net-next,v2,2/5] bnxt_en: Refactor bnxt_get_regs()
+    https://git.kernel.org/netdev/net-next/c/1cc174d33a1f
+  - [net-next,v2,3/5] bnxt_en: Add pcie_stat_len to struct bp
+    https://git.kernel.org/netdev/net-next/c/b530173d3c8a
+  - [net-next,v2,4/5] bnxt_en: Add pcie_ctx_v2 support for ethtool -d
+    https://git.kernel.org/netdev/net-next/c/5a4cf42322a0
+  - [net-next,v2,5/5] bnxt_en: Add Hyper-V VF ID
+    https://git.kernel.org/netdev/net-next/c/5be7cb805bd9
 
 You are awesome, thank you!
 -- 
