@@ -1,135 +1,195 @@
-Return-Path: <netdev+bounces-215434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9CF9B2EAD6
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 03:40:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDB18B2EADE
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 03:41:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E2005C7F75
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 01:40:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F4537263E1
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 01:40:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB89D244693;
-	Thu, 21 Aug 2025 01:40:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2419E258ED7;
+	Thu, 21 Aug 2025 01:40:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fj1qRvSn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qm7PcABH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+Received: from mail-yw1-f193.google.com (mail-yw1-f193.google.com [209.85.128.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28102243951;
-	Thu, 21 Aug 2025 01:40:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50A16257435;
+	Thu, 21 Aug 2025 01:40:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755740426; cv=none; b=AxRtAOR34LGdOsZzDAF4h0tUmEpBKFedzaE1NI5vRUqqdp6z+RENZGyAW/WkUFQIyMNeZ/ex1JKv4k6uLkG/bi+AHA8e9RAbFna5cJb2iPFoNW/pqGXVgLYEx5Ztc9ios+SMBvBO5ZvIlQLJdS2YHZ4qWGHMwLf9KDBBj5/0rRk=
+	t=1755740435; cv=none; b=CTq2hSfaFRj61H1XGbsTOLZtj1ZZRAqnIK0PU7TLA0q1nAl8oOJyY/z7xmvpqvUsGes9tpERb2gVsBFJr/bwT9PXz0gZvwyrjY4+1Y+nwglAy83kYQHT9OsJy3bS3I1dvcv7d/Gun9mxvAgkVIhwaL5ShIcbWzjOQ/uCXEEz1lA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755740426; c=relaxed/simple;
-	bh=dd+p+m8RCr1gu/K9XT7fineNz8vxsj2Aal37WOOGexQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qP62BbOjIvnwm1ZM5HaWtuf6lPxzv7BURa6MG7rrrAfAtW7XoiKhw5s1xt7FDBT8mWK4pLvXhaHjBoXIRFeMPPTok4kqkuCjyM8ISwLTIJvNDAYUu5Ioik+tv07H+/+RSSoqmVZgwa8ysoh2gUuZ+U4fhoHN0mFUsJTNOlQc/fE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fj1qRvSn; arc=none smtp.client-ip=209.85.210.53
+	s=arc-20240116; t=1755740435; c=relaxed/simple;
+	bh=7NzyyKQFr2eofSiUjDElzqtXmnS6djl6vapXpPdAlP8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tKmgR/eMr19tcQt0ke5ssFLNZ8Z7vCrWxjgtmzF0KUfuX/oECk8dj8bir+v6dhHCnvSKtlnVWpjOKvppf8usGUuxIrwHjGDTFw/KRflezxK0qNxI1+//AwY1LBZy5k3WHTyL8NCN5/ouGIJ/+7HrAgm967Pp1qpuJk2Hd+BwvpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qm7PcABH; arc=none smtp.client-ip=209.85.128.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-74381efd643so123964a34.1;
-        Wed, 20 Aug 2025 18:40:24 -0700 (PDT)
+Received: by mail-yw1-f193.google.com with SMTP id 00721157ae682-71d60501806so3988927b3.2;
+        Wed, 20 Aug 2025 18:40:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755740424; x=1756345224; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=0l2Fv6f/eOIwISC/GzHFraV5mmiSruIYibODwqgTDdo=;
-        b=Fj1qRvSnC7OfZ2eQtQwFc2OG6I4fArhbegC0YQ7TXkVF6IMaY0fYZNnfd7ryc+H/9J
-         xSWYoxsEmFXLMkPtM3JxKpsFFHQqaTZHS8gD9GQCQxwOl0zk+Gpb0mwv3tajuuTml2LI
-         95RXNgFz/VXQiIdCiQ5S2LHe0UPcCrJl5b2fTkd8faUMpNx8E054pEp1tHpWCiTx9Xns
-         JZZRopCxIg/9mwYJXe1xFrwehCn5TmPVj3g4v7ADY09pQuwc+TjeDpjRafdbzEU1prpg
-         Q+gGauzV/ynPoyWjXVhWBUXNCJiD5G7Xh13bPR66HnTDYGaFyK8roo2xDxa/lznTY5Qc
-         ZK5w==
+        d=gmail.com; s=20230601; t=1755740432; x=1756345232; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vItjwoBGwkZfqnVBm2Rd+0n8q7fmA/zGpzfuFKRm3Sw=;
+        b=Qm7PcABHRSLa9kdGRUeJiSV5gRET6lM/uTAxW4T4GbORQJWPpv/PCC6VmkEWyiaCru
+         CTkwslmpPmloc0C4yy3cB7w6GRT8O00gDnEqOU/twqh/AlXXZx7FElisiWZFewEVTsvb
+         /KNMwk9R2odsYE4JhlFtYo48Br3L9odePKy2f7IPxTSIWhcvPkRn4/ouhfBrH1bVCXgy
+         dZk50njNajSu6rSzZU5/4HV3wHpRMpF9iTIkk7DG/9W4RSTJmhacvtDOF7TFN17zhadX
+         z9KRR2hM/eTKoXBTSNBq/lpB80509605Ifp454uz+yZJeqv3IR879hesKR/xV+MKI1xN
+         LUjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755740424; x=1756345224;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0l2Fv6f/eOIwISC/GzHFraV5mmiSruIYibODwqgTDdo=;
-        b=TlyE11sBEhSWSxcr7u3jnxIHZ0AqVM713ll3I1ZjQHrkBzlhWDAguJODrZEIo+cteU
-         gv/pcNBSSxDfRe4V49f9DJ1IYMW8q+habpszkXfQNjBRruRdi0TfknzLeTyJz6GRASBG
-         hU/I68922qkesE7/8nvap0McEoosQ7mvtmAECH2J5I0bMJP6fADO0RcdWudnsSbmzmu2
-         QUaEZm8Q4+NQwVY865XMb8Utosg9nQ/N5IfSSq2HE4ahIW6qnM4mlybaLzZYwREruwlX
-         jPSaB5uWtSWmwiVg0X5xqKDuu9v1o2wXV9SC86bj5NwqEeyGtHrcae62sn+ZjHfB7DPq
-         5sKg==
-X-Forwarded-Encrypted: i=1; AJvYcCWG41ywvWzxT2fjIW++eGcMqytmZ6CI+dNcD0COj3aZ8xOQq0VmzrPnJcpeEdBilEAvknfaeNyG0EDP+D5WDso=@vger.kernel.org, AJvYcCXbz1ayFxf+dAoarzdjBjgflm/+4G1JIbnCbGeSRU2GBHJBzf8+HRzY1vQhbY7dxho7hZ6rA3iO@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGPKjIf5HTRYuwScUUg+6D2+uHiCvm6Wl7khgewS193r7tMAJ4
-	3zZGp7IlcpQt7ce2m8l5irHxW6D4JqLieeTS7KuHSgkUHbNCaVqq/E/s
-X-Gm-Gg: ASbGnctSfg3BLuo1BNxou5RlILELhhhDaYBH46RqpBdBczICBGNyHcaY+9gGcZA2eXv
-	0cKDQFkRvvPWjEF0XgUGmbh3TJ9810IDpYH0h8RcwYs1cOTkTWXjCN/b8hycoWEASeLBXOsj0Gs
-	oVXgEeWHm3yL8jmhO9pZ7xqhR8PqaOmoidZIHlSHWezVu26DJ75EfoTGIYsysKT2YJBsiNS7Hmw
-	QMYuOy2q+yg2S2tlMTIVjLsQoO6TgfumMFGM+0MdBnroXOOutN0Zua04JRTB7kp2oftz/QboSou
-	ggO8SyC96eY6FZ2FVlutD3zptaxnNKylGw7t4sEXXlX6TpXAqOcKuoMhOCmz78tPaXFbpKHLA9z
-	q8Jmawwc9g8p6ppEsU23qLHP300Pm6A==
-X-Google-Smtp-Source: AGHT+IHBp/V/ETNxCyJMTg1P2+9qy8XwY5wTbZan865pCwiR8ngJoZaR/VTFPNax6YFM/R9T9rvF0A==
-X-Received: by 2002:a05:6830:380e:b0:744:f112:e539 with SMTP id 46e09a7af769-744f6b41776mr373612a34.32.1755740424025;
-        Wed, 20 Aug 2025 18:40:24 -0700 (PDT)
-Received: from localhost ([2a03:2880:12ff:74::])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7439203b5c2sm3231251a34.28.2025.08.20.18.40.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Aug 2025 18:40:23 -0700 (PDT)
-From: Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>
-To: "David S . Miller" <davem@davemloft.net>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next 0/3] selftests: Test XDP_TX for single-buffer
-Date: Wed, 20 Aug 2025 18:40:20 -0700
-Message-ID: <20250821014023.1481662-1-dimitri.daskalakis1@gmail.com>
-X-Mailer: git-send-email 2.47.3
+        d=1e100.net; s=20230601; t=1755740432; x=1756345232;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vItjwoBGwkZfqnVBm2Rd+0n8q7fmA/zGpzfuFKRm3Sw=;
+        b=ME54X5Vn7A0Y8+Eb6HZMUtW2ZHvqtYm497+PhFE5/JLAiGmiCcy1ATeq8jmJXX1L/q
+         LbhkNvrWjndC4+sK3gsU1WjiVahKe2tXEVGR2DcwOXACuL6hJerFT5TTz5HCFXFjQebR
+         SkVzzipoN69xCpyaNJ4/oZLf0swzR4mHub/Wd30jN5DO1hGuLNZkcglgfi9KBt+mN5M2
+         eVbdgxfV8ZwNDZjjXYJWYVHGvjvNkkSRrRYjn9T7/b28C3XUy22PIvTJFemxyXNq8oxm
+         Bre/+V438lxacQ7ii2o8Ityy2gOM0gvTtusF6SuApeukKiEY0lE8weXCXlvptyzIDQyF
+         xkJA==
+X-Forwarded-Encrypted: i=1; AJvYcCUm2AHilC0pzlSfDFozvFr0urneH+AKjbmGWEsITfmvq7MRoccKNfw0PgIY6DFHqj5flF97X6UI@vger.kernel.org, AJvYcCW117sPvOuBvyWe2FliqjA32S5j8HbyzjFUedug3h3gsWewobdVoPS5DjhXWsG8M9gfRWFnaU4DGTAPvtsqu73f@vger.kernel.org, AJvYcCW72sfT8LtTkPL50+rYJm/E8hnun66OciHptjqtkt40ZC3rRZB2CeaGE5pPclNsBzAV8Dny7COCGuZNUwYt@vger.kernel.org, AJvYcCWw0QWyqp/6933TZloF1GrLmxOWW9ym5ZqLlPuF4VQcQqCW0ycR78YWPrvMEhfI72U0FjM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxv2Iog2QLoo5AaEcgU5MtjCNF5r/w6GHpvhm8httHsXgVMLvNL
+	vD0CPSAGdACUr2Hr3iH+QH+VNiHeXrSjtjExjeYUWGerdNGbAKPzJs49sp1YHcJ4rl58GpEHZYS
+	FqqTup7qMlfJAnLfUWuPIJu4GOHsFtHE=
+X-Gm-Gg: ASbGncs4Kwz1auuo4Tp0ia/vU3FrSmwArdcq9naXgWWUjd4BMisrsZ/fNKz4S9hQmIS
+	bBDrOM9YB3V2SN6Eixy7jXhpCB+R7p9hx4vyUQNz6AXsBzM/ip5/7lHnLZs/PVYVaAZzz3Zxi0N
+	91PXIjN6XJsi603/G2pGsDXqs2znu9IvRnOzr9qEKdkOyWtO3b8T7z/g9qE+3TZ2KtRuo5Sj818
+	zzHq+IfeS0=
+X-Google-Smtp-Source: AGHT+IFNgH4nfyrA8IG4t0dWjyf/2STD4SIQw2irwD7LYdlGT6ENNd6k1P3j/VAb9T9DkpftmcAFxSshvy3X+fIMUL4=
+X-Received: by 2002:a05:690c:4c09:b0:719:f37e:e69c with SMTP id
+ 00721157ae682-71fc89dd72emr10794537b3.36.1755740432267; Wed, 20 Aug 2025
+ 18:40:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250819033956.59164-1-dongml2@chinatelecom.cn>
+ <20250819033956.59164-4-dongml2@chinatelecom.cn> <CAEf4BzZOC6Zyo9sikPJH+0Xz=aCbx=dBM_RksYZMaZM4ndR+OA@mail.gmail.com>
+In-Reply-To: <CAEf4BzZOC6Zyo9sikPJH+0Xz=aCbx=dBM_RksYZMaZM4ndR+OA@mail.gmail.com>
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Thu, 21 Aug 2025 09:40:21 +0800
+X-Gm-Features: Ac12FXyC839nqzgjfLwuVWAeVwrtOk_JF8yPaPJInPdSwaHlsMvt96BJQKQzZnE
+Message-ID: <CADxym3ZgRE-AN0YC50izuO63ipA-bc_Y+JAOMfJq8T3i7mKTzQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 3/3] selftests/bpf: add benchmark testing for kprobe-multi-all
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org, 
+	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, mykolal@fb.com, 
+	shuah@kernel.org, davem@davemloft.net, kuba@kernel.org, hawk@kernel.org, 
+	nathan@kernel.org, nick.desaulniers+lkml@gmail.com, morbo@google.com, 
+	justinstitt@google.com, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Ensure single buffer XDP functions correctly by covering the following cases:
-1) Zero size payload
-2) Full MTU
-3) Single buffer packets through a multi-buffer XDP program
+On Thu, Aug 21, 2025 at 6:54=E2=80=AFAM Andrii Nakryiko
+<andrii.nakryiko@gmail.com> wrote:
+>
+> On Mon, Aug 18, 2025 at 8:40=E2=80=AFPM Menglong Dong <menglong8.dong@gma=
+il.com> wrote:
+> >
+> > For now, the benchmark for kprobe-multi is single, which means there is
+> > only 1 function is hooked during testing. Add the testing
+> > "kprobe-multi-all", which will hook all the kernel functions during
+> > the benchmark. And the "kretprobe-multi-all" is added too.
+> >
+> > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+> > ---
+> >  tools/testing/selftests/bpf/bench.c           |  4 ++
+> >  .../selftests/bpf/benchs/bench_trigger.c      | 54 +++++++++++++++++++
+> >  .../selftests/bpf/benchs/run_bench_trigger.sh |  4 +-
+> >  .../selftests/bpf/progs/trigger_bench.c       | 12 +++++
+> >  tools/testing/selftests/bpf/trace_helpers.c   |  3 ++
+> >  5 files changed, 75 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/bpf/bench.c b/tools/testing/selfte=
+sts/bpf/bench.c
+> > index ddd73d06a1eb..29dbf937818a 100644
+> > --- a/tools/testing/selftests/bpf/bench.c
+> > +++ b/tools/testing/selftests/bpf/bench.c
+> > @@ -510,6 +510,8 @@ extern const struct bench bench_trig_kretprobe;
+> >  extern const struct bench bench_trig_kprobe_multi;
+> >  extern const struct bench bench_trig_kretprobe_multi;
+> >  extern const struct bench bench_trig_fentry;
+> > +extern const struct bench bench_trig_kprobe_multi_all;
+> > +extern const struct bench bench_trig_kretprobe_multi_all;
+> >  extern const struct bench bench_trig_fexit;
+> >  extern const struct bench bench_trig_fmodret;
+> >  extern const struct bench bench_trig_tp;
+> > @@ -578,6 +580,8 @@ static const struct bench *benchs[] =3D {
+> >         &bench_trig_kprobe_multi,
+> >         &bench_trig_kretprobe_multi,
+> >         &bench_trig_fentry,
+> > +       &bench_trig_kprobe_multi_all,
+> > +       &bench_trig_kretprobe_multi_all,
+> >         &bench_trig_fexit,
+> >         &bench_trig_fmodret,
+> >         &bench_trig_tp,
+> > diff --git a/tools/testing/selftests/bpf/benchs/bench_trigger.c b/tools=
+/testing/selftests/bpf/benchs/bench_trigger.c
+> > index 82327657846e..c6634a64a7c0 100644
+> > --- a/tools/testing/selftests/bpf/benchs/bench_trigger.c
+> > +++ b/tools/testing/selftests/bpf/benchs/bench_trigger.c
+> > @@ -226,6 +226,58 @@ static void trigger_fentry_setup(void)
+> >         attach_bpf(ctx.skel->progs.bench_trigger_fentry);
+> >  }
+> >
+> > +static void attach_ksyms_all(struct bpf_program *empty, bool kretprobe=
+)
+> > +{
+> > +       LIBBPF_OPTS(bpf_kprobe_multi_opts, opts);
+> > +       char **syms =3D NULL;
+> > +       size_t cnt =3D 0;
+> > +
+> > +       if (bpf_get_ksyms(&syms, &cnt, true)) {
+> > +               printf("failed to get ksyms\n");
+>
+> we seem to be using fprintf(stderr, "...") for emitting errors like
+> this (at least in some benchmarks, and it makes sense to me). Do the
+> same?
 
-These changes were tested with netdevsim and fbnic.
+OK!
 
- # ./ksft-net-drv/drivers/net/xdp.py
- TAP version 13
- 1..10
- ok 1 xdp.test_xdp_native_pass_sb
- ok 2 xdp.test_xdp_native_pass_mb
- ok 3 xdp.test_xdp_native_drop_sb
- ok 4 xdp.test_xdp_native_drop_mb
- ok 5 xdp.test_xdp_native_tx_sb
- ok 6 xdp.test_xdp_native_tx_mb
- # Failed run: pkt_sz 2048, offset 1. Last successful run: pkt_sz 1024, offset 256. Reason: Adjustment failed
- ok 7 xdp.test_xdp_native_adjst_tail_grow_data
- ok 8 xdp.test_xdp_native_adjst_tail_shrnk_data
- # Failed run: pkt_sz 512, offset -256. Last successful run: pkt_sz 512, offset -128. Reason: Adjustment failed
- ok 9 xdp.test_xdp_native_adjst_head_grow_data
- # Failed run: pkt_sz (2048) > HDS threshold (1536) and offset 64 > 48
- ok 10 xdp.test_xdp_native_adjst_head_shrnk_data
- # Totals: pass:10 fail:0 xfail:0 xpass:0 skip:0 error:0
+>
+> > +               exit(1);
+> > +       }
+> > +
+> > +       printf("found %zu ksyms\n", cnt);
+>
+> stray debug output?
 
-Dimitri Daskalakis (3):
-  selftests: drv-net: xdp: Extract common XDP_TX setup/validation.
-  selftests: drv-net: xdp: Add a single-buffer XDP_TX test.
-  selftests: drv-net: xdp: Validate single-buff XDP_TX in multi-buff
-    mode
+OK!
 
- tools/testing/selftests/drivers/net/xdp.py | 71 ++++++++++++++++++----
- 1 file changed, 58 insertions(+), 13 deletions(-)
+Thanks!
+Menglong Dong
 
--- 
-2.47.3
-
+>
+> > +       opts.syms =3D (const char **) syms;
+> > +       opts.cnt =3D cnt;
+> > +       opts.retprobe =3D kretprobe;
+> > +       /* attach empty to all the kernel functions except bpf_get_numa=
+_node_id. */
+> > +       if (!bpf_program__attach_kprobe_multi_opts(empty, NULL, &opts))=
+ {
+> > +               printf("failed to attach bpf_program__attach_kprobe_mul=
+ti_opts to all\n");
+> > +               exit(1);
+> > +       }
+> > +}
+> > +
+>
+> [...]
 
