@@ -1,85 +1,124 @@
-Return-Path: <netdev+bounces-215668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39390B2FCE4
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 16:37:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07D09B2FD78
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 16:55:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 06FD14E162D
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:37:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3223E5C604D
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:46:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8D9C2A1B2;
-	Thu, 21 Aug 2025 14:37:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C10CE2DC358;
+	Thu, 21 Aug 2025 14:46:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bPdkO1ne"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AqVoQXge"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B19812EC549;
-	Thu, 21 Aug 2025 14:37:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 187992D7807;
+	Thu, 21 Aug 2025 14:46:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755787065; cv=none; b=dH4qR4Uip10pYcWO7AY92o6Je4LvVw2J/838Qf5xko0zhjMXUwXf4PLaCCkKR6HiQf9iGlkRw1rxB8QHOtf0nyy6VHmEqt9YtlYmfrXbpC7wrk1aGF1ACgq7d307oVopUq4VunXdsFaQ2Dkg2BUKW8Hs/V1Xozv6LNU37pd9Au8=
+	t=1755787576; cv=none; b=FWkz/SdTKKPFKF0JLmls1hWvVCZC8VcINB9TmYHdbhECx1HNYL3+18c6NspoJN2oCPoRDmz4tG1miZQVpLGM1n4gwmGH1CZ9MmzCCXFXO5w9cSKpNVG4k/nAT0Awxm6mqwjccgtwzS1M0Zx0VYRIOkAEgqGmasJl3WQcq7DBY+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755787065; c=relaxed/simple;
-	bh=1vrbY0X9co0KzB/I/9Y6/Ln/h3hmwgwFOPu33wQyVDE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p9G0Y+qSd+vRR1iw35VyRdYy9UfY8x91Y7gsd002J0uVSdG8aqDX1F/7cW1hu0ewucI8wi3nsQdAr0CoLxUVYXa8MrI2mAmynrPTVieRkAOl/Hblybg5SOTWUmN5RX7oi8nXrzInEwmASN+W9F46PBrJ3B6Jxia7gkcIqggkFvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bPdkO1ne; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BB0DC4CEEB;
-	Thu, 21 Aug 2025 14:37:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755787065;
-	bh=1vrbY0X9co0KzB/I/9Y6/Ln/h3hmwgwFOPu33wQyVDE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bPdkO1ne/HIdwP7RUp83SJ0wvTyncFfKz+pUd7CPkBkCsLujOE8HOWK2tepJK1p/G
-	 DwD5UpIZ8+RmxrgoBq8ztQQHjOcLvs/6WxqStnis3lbItMZphBQxY72CYs0iMNx2Dw
-	 UTg/gce2MsOH+ArU5bP8FzfZnmvxvwbqcGtBZfn3/RjzLFb5E4OhWwfv2/HoTHSaj1
-	 NMnElRg3pGkXxhYk8SdV7v/ZDypmjTN72liPoJSmRYGzhidVfzz3uuGDf5rtjhCJrZ
-	 tEHVES18gA3/Zy+hSig3vIgQeSsJ1HPUEbixuWfne3+Ep4liju9KBVqozUVgcR5eNP
-	 V3ImZFEQI8szA==
-Date: Thu, 21 Aug 2025 07:37:43 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Carlos Llamas <cmllamas@google.com>
-Cc: Alice Ryhl <aliceryhl@google.com>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, "Arve =?UTF-8?B?SGrDuG5uZXbDpWc=?="
- <arve@android.com>, Todd Kjos <tkjos@android.com>, Martijn Coenen
- <maco@android.com>, Joel Fernandes <joelagnelf@nvidia.com>, Christian
- Brauner <brauner@kernel.org>, Suren Baghdasaryan <surenb@google.com>,
- Donald Hunter <donald.hunter@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Li Li
- <dualli@google.com>, Tiffany Yang <ynaffit@google.com>, John Stultz
- <jstultz@google.com>, kernel-team@android.com,
- linux-kernel@vger.kernel.org, Thorsten Leemhuis <linux@leemhuis.info>,
- "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Subject: Re: [PATCH] netlink: specs: binder: replace underscores with dashes
- in names
-Message-ID: <20250821073743.7bf0e0db@kernel.org>
-In-Reply-To: <20250821135522.2878772-1-cmllamas@google.com>
-References: <20250821135522.2878772-1-cmllamas@google.com>
+	s=arc-20240116; t=1755787576; c=relaxed/simple;
+	bh=+4n4utJycwA3AgzQiJvu/ewM4+9QABDzfmE0ooAk+9c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=s6IHIsBz3vR8zPKZFWsV+SKaMpD+OkfPSIbKVLDGFzt1Ls6/3XlHbh2A+mDhEdssqqhRiTN/viTrqv16Bd40Ue6IVSlBFlKbLY5QT1pBznsbZR7DmyhD7b9jwNraxkL5iEpACbwmWiMhwUnQdmmQ2zuQ+ykWsa9QJY4mtt/mnsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AqVoQXge; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-afcb78fb04cso146794466b.1;
+        Thu, 21 Aug 2025 07:46:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755787573; x=1756392373; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JIG+w3J97fChnrmJiRIedihpzfaTzFXkYAGxoj1msbc=;
+        b=AqVoQXge4f8XKgAkV7MwOXYnIvKnTpJERlLRXE5o1I/cTt8eOjyTntq5EBFH6Yvwo5
+         sPbrtacyvY4b7b8rpYReQWypmCQ5+EaZyxg5fDuxx6aUjSQKXl97QR6Ow6g5IYuaR4xg
+         V9uS1eJJpzwtYNrba8surhmOUUAKh94/sf/s3hJfOZZMq8XiexriavLpUhowiUmNL7Hv
+         n/yGHT2YMdEj42gsWBPXYRwQEqSAfNVeIvrjaVXRSZKVqYJONit1adpyPY3DBnBkgCQK
+         QnPj463BBwJDls+NJ/yfj8ScJUU3iObiBmbpod22MQtqVTVPRbryeoelmWhEkjCwxD7I
+         Iy1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755787573; x=1756392373;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :reply-to:message-id:subject:cc:to:from:date:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=JIG+w3J97fChnrmJiRIedihpzfaTzFXkYAGxoj1msbc=;
+        b=eQBytU54YdhqbUOnB3+xe0nrujljX7GxtXpjB3W3SBv62tAHMYFhMUqDNH9Ru0YGBw
+         hdj0B/SWzy1X3d7Z3YtFEFHOg7qw9ffOCt7xMDIEhSoTw6P1g6F5aY2d6I2H0Om4qT1W
+         GjmX7tLGbIrVxhQ13dcoqtSmKwJfO+BigE6lvzkFyM8x5DvG8gvixyfs89f34KiJyXq9
+         OksAkgsFKNqT/4n1797MpEwGVUV5Ds8CILIJ6jKQR7H93g5EjkBsVQedEIfuayYzfjkL
+         IrtHgdC8mdKPlWW8eDjf160J68OmvnodgE70oEOSrlhy3/jqPNAkIl9WWDj93T+EN9St
+         MjcA==
+X-Forwarded-Encrypted: i=1; AJvYcCUlcz9w0asp0bUMmRqqVibDgpKYurMxu89yUXtgQEWRuENA8mEtzqqrBcMPwZQymZYSUUSe20CLdXSo/dOTyvY0@vger.kernel.org, AJvYcCUqETeRT0u+dqfxyJuGVvvnSHJ2PztdZvWJpdLLVnwujso4XFxE4O+l/EQktPPWiEJ2wQg5flpX@vger.kernel.org, AJvYcCVcPRatREGm3rqxXcP2VMQoz7Exy5hm4eZRU1W0pupFwS1Xq01N9hST4skFr0n6wTCkOSDMqYFa44IPx4UIAjjz+mE/1pJp@vger.kernel.org, AJvYcCW9x+AsI2JoiY/2ku2GrFh1Ztf37yCFlXGRjdEkg73q2BQPCQJd0VjuH7wWuY4LIcd19SAxTa7Tf/hVQg==@vger.kernel.org, AJvYcCWCikeRm3+KgSdeEays8WdhfZDEcp/sHxSn3sQV0MqOnuiXuHrP+yO/IpJS7g+ZMBq/h/uKp4CkMxXzagD+rw==@vger.kernel.org, AJvYcCWYngZVbeocT5AqRqDqScjJqnv/z9pYNv5bXXuxkC4lO67lMPs+eJshV58TRCB3+USOyrNfNQYJ4ADs7tvK@vger.kernel.org
+X-Gm-Message-State: AOJu0YztjZciqUPxzxhXB7dtr2fFtWoqjnPaw9JGJCYVfaYI2FgLMTUD
+	vcVQBTsOjO3prEo4hlVBXGq15/0M4ssAWvGrDLY1Tb/3KB57pc5JHwMs
+X-Gm-Gg: ASbGncu+PUyAvFa4XMGtvgyBq0tzZDMxnl5hwuOVzfgdxa/biYCejwxYf873nHYcOUI
+	RjvPD2fPtwYUq3sq7uf7H2hI+dqBTGW2Ph+QwFFzfp0GVYTVF82w7NPAyxetY350GGT8OYX4rdX
+	4TlxswhKE7u+M+kLE7FK53YeOT0S23e+J78arzlKl7PT2xW7FilDO6gsJhAGp9bms8TLt66xtPN
+	6CHTCDdwscDuykS5G4ek2xJEmdkzahTKioy975WUlKL0KbQx1JKYttqys4wt3ytkU7iqfnIow8B
+	EhY3eQK3aYlYZ4AEBlwClQm/w2bwJu4vxfA4Ebe8mKJ6OvVtptZP5Tr3xBTPHdmDfrplHUYe9qG
+	EDU9j++vCPVStG8H+hPdmOwtc5NFqMXE9
+X-Google-Smtp-Source: AGHT+IGLVuYVD4/5frXWAQs5H5qLefX8r3lwrN7PcOc+bxumtnjbgdiK8HV2S0+1muwsZBsiec73zw==
+X-Received: by 2002:a17:907:1c17:b0:ad8:9997:aa76 with SMTP id a640c23a62f3a-afe07b96fcemr266557066b.37.1755787573131;
+        Thu, 21 Aug 2025 07:46:13 -0700 (PDT)
+Received: from localhost ([185.92.221.13])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-afdfa887a90sm289060966b.11.2025.08.21.07.46.12
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 21 Aug 2025 07:46:12 -0700 (PDT)
+Date: Thu, 21 Aug 2025 14:46:12 +0000
+From: Wei Yang <richard.weiyang@gmail.com>
+To: Bala-Vignesh-Reddy <reddybalavignesh9979@gmail.com>
+Cc: akpm@linux-foundation.org, shuah@kernel.org, mic@digikod.net,
+	gnoack@google.com, david@redhat.com, lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
+	surenb@google.com, mhocko@suse.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, ming.lei@redhat.com, skhan@linuxfoundation.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, linux-mm@kvack.org,
+	netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH] selftests: centralise maybe-unused definition in
+ kselftest.h
+Message-ID: <20250821144612.a26otz2yriqb5gdq@master>
+Reply-To: Wei Yang <richard.weiyang@gmail.com>
+References: <20250821101159.2238-1-reddybalavignesh9979@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250821101159.2238-1-reddybalavignesh9979@gmail.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 
-On Thu, 21 Aug 2025 13:55:21 +0000 Carlos Llamas wrote:
-> The usage of underscores is no longer allowed for the 'name' format in
-> the yaml spec. Instead, dashes should be used. This fixes the build
-> issue reported by Thorsten that showed up on linux-next.
-> 
-> Note this change has no impact on C code.
+On Thu, Aug 21, 2025 at 03:41:59PM +0530, Bala-Vignesh-Reddy wrote:
+>Several selftests subdirectories duplicated the define __maybe_unused,
+>leading to redundant code. Moved to kselftest.h header and removed
+>other definition.
+>
+>This addresses the duplication noted in the proc-pid-vm warning fix
+>
+>Suggested-by: Andrew Morton <akpm@linux-foundation.org>
+>Link:https://lore.kernel.org/lkml/20250820143954.33d95635e504e94df01930d0@linux-foundation.org/
+>
+>Signed-off-by: Bala-Vignesh-Reddy <reddybalavignesh9979@gmail.com>
 
-I guess the tree where the patches landed doesn't have last merge window
-material? I thought the extra consistency checks went in for 6.17
-already.. In any case, change makes sense:
+Looks reasonable.
 
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Wei Yang <richard.weiyang@gmail.com>
+
+-- 
+Wei Yang
+Help you, Help me
 
