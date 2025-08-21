@@ -1,169 +1,107 @@
-Return-Path: <netdev+bounces-215654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96532B2FD1B
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 16:44:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 39672B2FD3E
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 16:48:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A01764143F
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:28:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D2D6164E3C
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:31:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F41942882B2;
-	Thu, 21 Aug 2025 14:23:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE9722E2DDE;
+	Thu, 21 Aug 2025 14:28:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b="PHuUhUtE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4PRjRlt5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 356C122E402
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 14:23:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F1471EE019
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 14:28:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755786224; cv=none; b=kZjGUIK9uH5LPQOVy/xzXPxH8T6a6ztBl/8saKtu4s8ScnxkV5h2maWAs1sHI8ys9QHuNAdWG8WAY9XkI/aw0QoCiSbRF/YA9yoz6ouEqoayjeLTkJVNb/sIg09+iKQblEyAk2FAjFecX7lGH50fs5B6gbdaGJKEMnYLmBsSzCU=
+	t=1755786502; cv=none; b=sHTO1SO0RAttCBQNftGbTmVR0WfIRixICDi7tZ1ZaM9/DkhAY2Bzh5+JUj3Q4iGX/rI2+oXetUNmINClhZQv79uWTSyeHrYndL8+Za/dwxdYwc2lucJ+L0bWs2mo5ejWMKMPBkZJ5OdPWkiVXMpKJpSVDOVGqJmaNV+D/aWUx3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755786224; c=relaxed/simple;
-	bh=/Q42VOBv5rtxb0pQz7EKEZooplEopOXO5j7KPdqQ/U4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CTAOoEIpCYyCPd/bU1iRFFdLS+IZZWIM+V7fEPBRB6IRm1Pcc8Qh41zmLYCQ/Mgby9VZFz5ZP3o/hiiOQ/8HQ3wF6a60msn9ECeV6IC3+tjSPzFekJ7yHKpnXfCC0BioVwlutMQ/jXejVTyjNPnjgwUP37EqVU5520BH0uowwbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org; spf=pass smtp.mailfrom=wbinvd.org; dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b=PHuUhUtE; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wbinvd.org
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-76e2eb49b83so790661b3a.3
-        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 07:23:42 -0700 (PDT)
+	s=arc-20240116; t=1755786502; c=relaxed/simple;
+	bh=Osw2o2AW9afeK12NE6hse5EtuH8xlV/L/bTy4tw9qAg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=U1IbOyNWpuVq096QpSZ5yXl5hySSJSBqxuAolctrDijB9SEN8xhbIysfdPknQ7PDujDqzCHfzkjv78HbTQcCbTprmX3qDZogIqDBt3Lf5qjQj4+CzPQMkOe+CmuqPx74MdOEFm9mulz/RfbHVu0yXoMGxe3P2gVViWXDJf69K3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4PRjRlt5; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4b12b123e48so351971cf.0
+        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 07:28:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=wbinvd.org; s=wbinvd; t=1755786222; x=1756391022; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=gltw2YB8idtK1To8X9NeA2NjVxqELvTwQkrDIQqvz6Q=;
-        b=PHuUhUtEoNZg6ZiytAWpNhYKglZiNMNurT3t9fPRCto/opRDgsWecwuUfpMG2sc6P1
-         AG4SZT6kWgSWfCKd4LRZ+c+keiNqG++GiV7+lVjA6+Dw1/UYGqDYvf2y8oeTbe/08XvK
-         Erhkw5rvRIQspIbSOLmWSvjXJuM+oKJ9ddnTiLUF7W19vAXXo7QLDYo7/VPqrVlljs6X
-         NANeskRIPBEsrWwT4VoeQRqeY0ejJZ0GstYYYMXgRrYqu3RqpqwpLV0MxZ1By/PSAOwE
-         lVp3YBbG7aYUUZdbJvI4XXEjcug0diYYO8W3FDDEAvI6yaNItgsuBKYPlkEqAkU68yeB
-         CEYQ==
+        d=google.com; s=20230601; t=1755786500; x=1756391300; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Osw2o2AW9afeK12NE6hse5EtuH8xlV/L/bTy4tw9qAg=;
+        b=4PRjRlt5NBhldeXFPh/aLionv9H8dwPioREqfWsEMui9jIynOsnAxgZZmZ2oLT1yd7
+         j1CMEwrjn1wCJyg81NnuqK08Exr8hLQD2dpSFqoP4skmUCs9out3c4NRtaR3vsk9NR1X
+         DKAWSXghhk0f8M9WbxbxjsMulT8JTG/Tn3QET6vjgCwLg/ZYBQu7bc0pXCOnFs6wqDWt
+         JLckGM7cHdwfRgQsdmJeia24QXza5ggMnrLmfL5DBQQMO5IYZybZ/q7/Bvg5c3+qMQbk
+         3SLCRbfzbflsRT+EIn0OcI4o3D8PtyniTpISft9aKJUb+rYmPDOOztrIFfEJs56DhxzO
+         TT6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755786222; x=1756391022;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gltw2YB8idtK1To8X9NeA2NjVxqELvTwQkrDIQqvz6Q=;
-        b=FmPp9rYFo9P0/9fEk08RY00+xzwK3/9cP0fV51K6AVuk5ZvGzl+KoRh12hBQp3emzr
-         nTCJ/FEsye6B9U9i48M26x/Y346isEo5SKN9FgQBO733xmIfA60SLI8+IKhDm7jq3fGJ
-         qRrP6l1PfrjqbSAC5/uQQUirZRdKxu684Llqd59/3WEloKxa0bhOruPIGU0ZQMtJLW/r
-         h9up2KpRYWoROWi/HVzbMB8w1lBAQYIMQ86bvLQLT2y6cICnMMc7u6JmPbvmFaqIs4kG
-         jwoObd3Ur08teB9Iz2Ty3SpI2QJUgsUvOdQNdMx6+0IjKsveCxpAHr+XYtaWMn3Xwe0n
-         jR7w==
-X-Forwarded-Encrypted: i=1; AJvYcCXgLgxub9W4yyvOe/TflTTMEIlNatoubrp0TiCjtaTLNt6hzgahbjhg9jS3vjrkonD6VL1u7CY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJh+ZiLONY208u/SNjaK0AcE4i0ucjCz/DnNPVAgY4Yn3s3P5K
-	DOh9rX23Kon1FpUiX2nkX0+IzG+S4Fbpf89YQmoFcwQ9ufX61/U5ZqlPaxz2MIs9TAI=
-X-Gm-Gg: ASbGncul99dlIpoMy77Qs0WxS1yvfyEOh4NclCZAg5yH/vtGOs9ZZRWjWHE+jz4AI3H
-	kIhUEegbKwhuCxxZhtacJNteqmYN53bKU9fABAJ4QZkLvitMMdNg3HHMvUcEzQPLz2jNQQ7K+0T
-	cRc3MhSPlLZou4/YcqDAhgCxPU+PWKHOJHo3nq1hLwb6lEl7qg6L0XPaxYGiQ59OQngGph1tsuP
-	vYBUlsUlGXh3v5Ull1nK9o3m8VpQgh+RDvF7zhjq7ITOPZJWBnRhADev32ZZiJVGffTT5bN+Uix
-	O2+15ewbDrb70cv2PlTEQmkcHD1RWUBkjhFePDEMcoTkFAKukqF0JYSfBJN97j/jqlfnbz4ZH43
-	ZwBaQ9mmimv53w21/RDDqdKNz
-X-Google-Smtp-Source: AGHT+IHC9kZMbllRdoU5B4ZJo00K1PDPDVqdvazp9vl34+r/qKCj0BP9ePp+tekV3D9iBLHdu8oAsA==
-X-Received: by 2002:a05:6a21:998d:b0:240:27be:bb99 with SMTP id adf61e73a8af0-2433074e72bmr3189057637.9.1755786222380;
-        Thu, 21 Aug 2025 07:23:42 -0700 (PDT)
-Received: from mozart.vkv.me ([192.184.167.117])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76e7d0d62f3sm8455613b3a.19.2025.08.21.07.23.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Aug 2025 07:23:41 -0700 (PDT)
-Date: Thu, 21 Aug 2025 07:23:40 -0700
-From: Calvin Owens <calvin@wbinvd.org>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Michal Schmidt <mschmidt@redhat.com>, netdev@vger.kernel.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Ivan Vecera <ivecera@redhat.com>, intel-wired-lan@lists.osuosl.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] i40e: Prevent unwanted interface name changes
-Message-ID: <aKcr7FCOHZycDrsC@mozart.vkv.me>
-References: <94d7d5c0bb4fc171154ccff36e85261a9f186923.1755661118.git.calvin@wbinvd.org>
- <CADEbmW100menFu3KACm4p72yPSjbnQwnYumDCGRw+GxpgXeMJA@mail.gmail.com>
- <aKXqVqj_bUefe1Nj@mozart.vkv.me>
- <aKYI5wXcEqSjunfk@mozart.vkv.me>
- <e71fe3bf-ec97-431e-b60c-634c5263ad82@intel.com>
+        d=1e100.net; s=20230601; t=1755786500; x=1756391300;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Osw2o2AW9afeK12NE6hse5EtuH8xlV/L/bTy4tw9qAg=;
+        b=heWEKYAklQkkepp6BmGPz05T6dS010Pp+gt6QID7NwFic9KN6BcqgGOWySeW16maw0
+         7k+CwmUyb3dadLn2xv0I8UoE6OyxGDpAQASSQlD1GJf2q0+kwFYbrF/aAXaFvWrL1UJ4
+         8mXf3BRs/ZPniX48hDOLGkXXhDDhRXiyLBOBcOxRkAbl2Tz9rdqYDBkRbZoXDHbGCMjX
+         FKjyeLl9aPgXnUtCRlPihb5ZoWNEZSWMr4b1pxqLbWHB1FgZSK4gSI8HAqmW+YsQyvoF
+         xczTlY9SrJXH9eKJmBW/9eIcHBdPo90R65YP7c223G/xOCxNNvkWcOcyp1rrMAJ0dd1H
+         Y3XA==
+X-Forwarded-Encrypted: i=1; AJvYcCViirukt+Q4Y8B1PmPQExv6sWoGFTt4M1dNY0qZb2c77NnyiFi81ym85BSs6kGXxeemsl09R80=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxuzqWHOq+oVlXw4REuf6tJ/c9T8UbuOODMqBD4SW4/H91eiurh
+	W89H9TcdHkD42xRGJossSKmyfPe+BqxuyBkJzyqph/DfK7iSiKP3RLq4KPn4y7nrvN604QwmYwh
+	XcMP0+8PVkmsHUoQZJrN1RTdZkt3MHXWiqufp0F/F
+X-Gm-Gg: ASbGncsklqu9HVRtZ2M4zTxUQUd7/5RleaJ0Zx2DOx54rnXn639YCbO8a33I1tHadIe
+	tIvyQKRLh0qc/mMFAdNovkDtELlQleABZgPgy8xYlQgMaorpH/a7D8d/OySp8gxiGxyU5H/Apyr
+	L7nqS66t5yN9ZY7PHx8Usb+46oOV77g8usAOHA8bYtvcfkHrCC9EkrbI+sm+mUuIg74Pv0kV1Ro
+	pQzIQYTxoL3kUV4eJcdWUOq
+X-Google-Smtp-Source: AGHT+IFYKJsKRQOIOdBKtADhkjitGwmqd+HTNnwPRHKvhcgV8AKneDd+pNCCon2r6IF5tdsfvL1Vbz9BIqqO31fE5X8=
+X-Received: by 2002:a05:622a:24e:b0:479:1958:d81a with SMTP id
+ d75a77b69052e-4b29f779b8dmr4065081cf.6.1755786499808; Thu, 21 Aug 2025
+ 07:28:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <e71fe3bf-ec97-431e-b60c-634c5263ad82@intel.com>
+References: <20250821141901.18839-1-edumazet@google.com> <20250821141901.18839-2-edumazet@google.com>
+In-Reply-To: <20250821141901.18839-2-edumazet@google.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Thu, 21 Aug 2025 10:28:03 -0400
+X-Gm-Features: Ac12FXwAbRCFiQmDwEzyZOa-J-YUIju9b7ngAD3FVuwS2ZIGhx6qdKVukWl68_k
+Message-ID: <CADVnQy=m_mXb8pgcnUX0_H2FCAp58HTmhnESzQg78wXx9swaAw@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] tcp: annotate data-races around tp->rx_opt.user_mss
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thursday 08/21 at 10:00 +0200, Przemek Kitszel wrote:
-> On 8/20/25 19:41, Calvin Owens wrote:
-> > On Wednesday 08/20 at 08:31 -0700, Calvin Owens wrote:
-> > > On Wednesday 08/20 at 08:42 +0200, Michal Schmidt wrote:
-> > > > On Wed, Aug 20, 2025 at 6:30 AM Calvin Owens <calvin@wbinvd.org> wrote:
-> > > > > The same naming regression which was reported in ixgbe and fixed in
-> > > > > commit e67a0bc3ed4f ("ixgbe: prevent from unwanted interface name
-> > > > > changes") still exists in i40e.
-> > > > > 
-> > > > > Fix i40e by setting the same flag, added in commit c5ec7f49b480
-> > > > > ("devlink: let driver opt out of automatic phys_port_name generation").
-> > > > > 
-> > > > > Fixes: 9e479d64dc58 ("i40e: Add initial devlink support")
-> > > > 
-> > > > But this one's almost two years old. By now, there may be more users
-> > > > relying on the new name than on the old one.
-> > > > Michal
-> > > 
-> > > Well, I was relying on the new ixgbe names, and I had to revert them
-> > > all in a bunch of configs yesterday after e67a0bc3ed4f :)
-> 
-> we have fixed (changed to old naming scheme) ixgbe right after the
-> kernel was used by real users (modulo usual delay needed to invent
-> a good solution)
+On Thu, Aug 21, 2025 at 10:19=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
+ wrote:
+>
+> This field is already read locklessly for listeners,
+> next patch will make setsockopt(TCP_MAXSEG) lockless.
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
 
-No, the "fix" actually broke me for a *second time*, because I'd
-already converted my infrastructure to use the *new* names, which match
-i40e and the rest of the world.
+Reviewed-by: Neal Cardwell <ncardwell@google.com>
 
-We've seen *two* user ABI regressions in the last several months in
-ixgbe now, both of which completely broke networking on the system.
+Thanks, Eric!
 
-I'm not here to whine about that: I just want to save as many people out
-there in the real world as I can the trouble of having to do the same
-work (which has absolutely no benefit) over the next five years in i40e.
-
-If it's acceptable to break me for a second time to "fix" this, because
-I'm the minority of users (a viewpoint I am in agreement with), it
-should also be acceptable to break the minority of i40e users who are
-running newer kernels to "fix" it there too.
-
-Why isn't it?
-
-> > 
-> > And, even if it is e67a0bc3ed4f that introduced it, v6.7 was the first
-> > release with it. I strongly suspect most servers with i40e NICs running
-> > in the wild are running older kernels than that, and have not yet
-> > encountered the naming regression. But you probably have much better
-> > data about that than I do :)
-> 
-> RedHat patches their kernels with current code of the drivers that their
-> customers use (including i40e and ixgbe)
-> One could expect that changes made today to those will reach RHEL 10.3,
-> even if it would be named "kernel 6.12".
-> 
-> (*) the changes will likely be also in 10.2, but I don't want to make
-> any promises from Intel or Redhat here
-
-But how many i40e users are actually on the most recent version of RHEL?
-Not very many, is my guess. RHEL9 is 5.14, and has the old behavior.
-
-If you actually have data on that, obviously that's different. But it
-sounds like you're guessing just like I am.
+neal
 
