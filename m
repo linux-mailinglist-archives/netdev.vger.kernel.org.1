@@ -1,124 +1,92 @@
-Return-Path: <netdev+bounces-215669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07D09B2FD78
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 16:55:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 346D5B2FD73
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 16:54:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3223E5C604D
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:46:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC1FC1BA6E9C
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:47:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C10CE2DC358;
-	Thu, 21 Aug 2025 14:46:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E821C2DF70D;
+	Thu, 21 Aug 2025 14:47:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AqVoQXge"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NVc1vezA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 187992D7807;
-	Thu, 21 Aug 2025 14:46:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1262253359;
+	Thu, 21 Aug 2025 14:47:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755787576; cv=none; b=FWkz/SdTKKPFKF0JLmls1hWvVCZC8VcINB9TmYHdbhECx1HNYL3+18c6NspoJN2oCPoRDmz4tG1miZQVpLGM1n4gwmGH1CZ9MmzCCXFXO5w9cSKpNVG4k/nAT0Awxm6mqwjccgtwzS1M0Zx0VYRIOkAEgqGmasJl3WQcq7DBY+M=
+	t=1755787647; cv=none; b=b1KWSE6naVroOrgO21Qw6Rd1/hQKYxSJV0sB30FtPt/62qNYEwTnNcHVrm14nVOOz71DqGvSZ5xQIVA1g/J7qE1cCOWyIWda62gMWQKKnC/je9JNa/HyXBdMeHPjrzZ53JwZadf+V99DYVZ0NXxKceWBhb8/SXYXsojCowlPfOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755787576; c=relaxed/simple;
-	bh=+4n4utJycwA3AgzQiJvu/ewM4+9QABDzfmE0ooAk+9c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s6IHIsBz3vR8zPKZFWsV+SKaMpD+OkfPSIbKVLDGFzt1Ls6/3XlHbh2A+mDhEdssqqhRiTN/viTrqv16Bd40Ue6IVSlBFlKbLY5QT1pBznsbZR7DmyhD7b9jwNraxkL5iEpACbwmWiMhwUnQdmmQ2zuQ+ykWsa9QJY4mtt/mnsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AqVoQXge; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-afcb78fb04cso146794466b.1;
-        Thu, 21 Aug 2025 07:46:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755787573; x=1756392373; darn=vger.kernel.org;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JIG+w3J97fChnrmJiRIedihpzfaTzFXkYAGxoj1msbc=;
-        b=AqVoQXge4f8XKgAkV7MwOXYnIvKnTpJERlLRXE5o1I/cTt8eOjyTntq5EBFH6Yvwo5
-         sPbrtacyvY4b7b8rpYReQWypmCQ5+EaZyxg5fDuxx6aUjSQKXl97QR6Ow6g5IYuaR4xg
-         V9uS1eJJpzwtYNrba8surhmOUUAKh94/sf/s3hJfOZZMq8XiexriavLpUhowiUmNL7Hv
-         n/yGHT2YMdEj42gsWBPXYRwQEqSAfNVeIvrjaVXRSZKVqYJONit1adpyPY3DBnBkgCQK
-         QnPj463BBwJDls+NJ/yfj8ScJUU3iObiBmbpod22MQtqVTVPRbryeoelmWhEkjCwxD7I
-         Iy1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755787573; x=1756392373;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :reply-to:message-id:subject:cc:to:from:date:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=JIG+w3J97fChnrmJiRIedihpzfaTzFXkYAGxoj1msbc=;
-        b=eQBytU54YdhqbUOnB3+xe0nrujljX7GxtXpjB3W3SBv62tAHMYFhMUqDNH9Ru0YGBw
-         hdj0B/SWzy1X3d7Z3YtFEFHOg7qw9ffOCt7xMDIEhSoTw6P1g6F5aY2d6I2H0Om4qT1W
-         GjmX7tLGbIrVxhQ13dcoqtSmKwJfO+BigE6lvzkFyM8x5DvG8gvixyfs89f34KiJyXq9
-         OksAkgsFKNqT/4n1797MpEwGVUV5Ds8CILIJ6jKQR7H93g5EjkBsVQedEIfuayYzfjkL
-         IrtHgdC8mdKPlWW8eDjf160J68OmvnodgE70oEOSrlhy3/jqPNAkIl9WWDj93T+EN9St
-         MjcA==
-X-Forwarded-Encrypted: i=1; AJvYcCUlcz9w0asp0bUMmRqqVibDgpKYurMxu89yUXtgQEWRuENA8mEtzqqrBcMPwZQymZYSUUSe20CLdXSo/dOTyvY0@vger.kernel.org, AJvYcCUqETeRT0u+dqfxyJuGVvvnSHJ2PztdZvWJpdLLVnwujso4XFxE4O+l/EQktPPWiEJ2wQg5flpX@vger.kernel.org, AJvYcCVcPRatREGm3rqxXcP2VMQoz7Exy5hm4eZRU1W0pupFwS1Xq01N9hST4skFr0n6wTCkOSDMqYFa44IPx4UIAjjz+mE/1pJp@vger.kernel.org, AJvYcCW9x+AsI2JoiY/2ku2GrFh1Ztf37yCFlXGRjdEkg73q2BQPCQJd0VjuH7wWuY4LIcd19SAxTa7Tf/hVQg==@vger.kernel.org, AJvYcCWCikeRm3+KgSdeEays8WdhfZDEcp/sHxSn3sQV0MqOnuiXuHrP+yO/IpJS7g+ZMBq/h/uKp4CkMxXzagD+rw==@vger.kernel.org, AJvYcCWYngZVbeocT5AqRqDqScjJqnv/z9pYNv5bXXuxkC4lO67lMPs+eJshV58TRCB3+USOyrNfNQYJ4ADs7tvK@vger.kernel.org
-X-Gm-Message-State: AOJu0YztjZciqUPxzxhXB7dtr2fFtWoqjnPaw9JGJCYVfaYI2FgLMTUD
-	vcVQBTsOjO3prEo4hlVBXGq15/0M4ssAWvGrDLY1Tb/3KB57pc5JHwMs
-X-Gm-Gg: ASbGncu+PUyAvFa4XMGtvgyBq0tzZDMxnl5hwuOVzfgdxa/biYCejwxYf873nHYcOUI
-	RjvPD2fPtwYUq3sq7uf7H2hI+dqBTGW2Ph+QwFFzfp0GVYTVF82w7NPAyxetY350GGT8OYX4rdX
-	4TlxswhKE7u+M+kLE7FK53YeOT0S23e+J78arzlKl7PT2xW7FilDO6gsJhAGp9bms8TLt66xtPN
-	6CHTCDdwscDuykS5G4ek2xJEmdkzahTKioy975WUlKL0KbQx1JKYttqys4wt3ytkU7iqfnIow8B
-	EhY3eQK3aYlYZ4AEBlwClQm/w2bwJu4vxfA4Ebe8mKJ6OvVtptZP5Tr3xBTPHdmDfrplHUYe9qG
-	EDU9j++vCPVStG8H+hPdmOwtc5NFqMXE9
-X-Google-Smtp-Source: AGHT+IGLVuYVD4/5frXWAQs5H5qLefX8r3lwrN7PcOc+bxumtnjbgdiK8HV2S0+1muwsZBsiec73zw==
-X-Received: by 2002:a17:907:1c17:b0:ad8:9997:aa76 with SMTP id a640c23a62f3a-afe07b96fcemr266557066b.37.1755787573131;
-        Thu, 21 Aug 2025 07:46:13 -0700 (PDT)
-Received: from localhost ([185.92.221.13])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-afdfa887a90sm289060966b.11.2025.08.21.07.46.12
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 21 Aug 2025 07:46:12 -0700 (PDT)
-Date: Thu, 21 Aug 2025 14:46:12 +0000
-From: Wei Yang <richard.weiyang@gmail.com>
-To: Bala-Vignesh-Reddy <reddybalavignesh9979@gmail.com>
-Cc: akpm@linux-foundation.org, shuah@kernel.org, mic@digikod.net,
-	gnoack@google.com, david@redhat.com, lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
-	surenb@google.com, mhocko@suse.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, ming.lei@redhat.com, skhan@linuxfoundation.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, linux-mm@kvack.org,
-	netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH] selftests: centralise maybe-unused definition in
- kselftest.h
-Message-ID: <20250821144612.a26otz2yriqb5gdq@master>
-Reply-To: Wei Yang <richard.weiyang@gmail.com>
-References: <20250821101159.2238-1-reddybalavignesh9979@gmail.com>
+	s=arc-20240116; t=1755787647; c=relaxed/simple;
+	bh=69Jw2Jxys8t4+vWvpxm0TD+lT6lPUWlfyE3Zxx1THZU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=e2DA9cw6Ilhghj5vQs5uDJa2FdE/XZ34E8Fqfk8TkEdoo0/m4JO7ppPko1wXWlgieE2WFxCQqIC4oXGwuqE1VJvKSuPwOcCbEoUw1wpqtID/cQVUfcRnrKnIQrOiAlmiwvDjzoNkEi7MBgThaw8RE2Olw5rxP7b31Dj9EgKfC1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NVc1vezA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06F4AC4CEEB;
+	Thu, 21 Aug 2025 14:47:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755787647;
+	bh=69Jw2Jxys8t4+vWvpxm0TD+lT6lPUWlfyE3Zxx1THZU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=NVc1vezArIbFmWA7MMJqwJdUrhYsIVgot/A1Ix0h6TbcXDxZokYCmbYcMZmAKn1mq
+	 ONz9+M1rkyXufz16BEasYGh7kHJ3l9hPQMzAKXdh5UYi1YHBzyUFJBh5SmCSr9EZcS
+	 pTbr+xGfviJ10Wh45M53HQt4E3U9dXuCXsd+3Obur8klpRbAaY3E3Qj/MqNaPBjpHz
+	 IZKZYkk4fs+LZNRYlLswiBjQPbmpL0mdofleyAsrJs5l09Ti292FxbA2cd0a+ae67V
+	 B3Xv7Npr2l72cdJkn/n490ZrIe9uLbyp7VrRp7c3dRXrzp4mhc/Yz775mo9dxwANLx
+	 ujzI/hbYR85Ag==
+Date: Thu, 21 Aug 2025 07:47:26 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org, Paolo Abeni
+ <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, netfilter-devel@vger.kernel.org
+Subject: Re: [PATCH net] netfilter: nf_reject: don't leak dst refcount for
+ loopback packets
+Message-ID: <20250821074726.7cc3f294@kernel.org>
+In-Reply-To: <aKXV_3J4iDkhQ06R@strlen.de>
+References: <20250820123707.10671-1-fw@strlen.de>
+	<aKXKpE35H7KBzdBa@calendula>
+	<aKXLsoLkSdnEU_at@calendula>
+	<aKXV_3J4iDkhQ06R@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250821101159.2238-1-reddybalavignesh9979@gmail.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 21, 2025 at 03:41:59PM +0530, Bala-Vignesh-Reddy wrote:
->Several selftests subdirectories duplicated the define __maybe_unused,
->leading to redundant code. Moved to kselftest.h header and removed
->other definition.
->
->This addresses the duplication noted in the proc-pid-vm warning fix
->
->Suggested-by: Andrew Morton <akpm@linux-foundation.org>
->Link:https://lore.kernel.org/lkml/20250820143954.33d95635e504e94df01930d0@linux-foundation.org/
->
->Signed-off-by: Bala-Vignesh-Reddy <reddybalavignesh9979@gmail.com>
+On Wed, 20 Aug 2025 16:04:47 +0200 Florian Westphal wrote:
+> > > Quick question: does inconditional route lookup work for br_netfilter?  
+> > 
+> > Never mind, it should be fine, the fake dst get attached to the skb.  
+> 
+> Good point, this changes behaviour for br_netfilter case, we no
+> longer call nf_reject_fill_skb_dst() then due to the fake dst.
+> 
+> I don't think br_netfilter is supposed to do anything (iptables
+> -j REJECT doesn't work in PRE_ROUTING), and we should not encourage
+> use of br_netfilter with nftables.
+> 
+> What about adding a followup patch, targetting nf, that adds:
+> 
+> if (hook == NF_INET_PRE_ROUTING && nf_bridge_info_exists(oldskb))
+> 	return;
+> 
+> ?
+> 
+> After all, there is no guarantee that we have the needed routing
+> info on a bridge in the first place.
 
-Looks reasonable.
-
-Reviewed-by: Wei Yang <richard.weiyang@gmail.com>
-
--- 
-Wei Yang
-Help you, Help me
+Pablo, are you okay with that plan? Would be great to ship this to
+Linus and therefore net-next today, given the checks recently added
+there..
 
