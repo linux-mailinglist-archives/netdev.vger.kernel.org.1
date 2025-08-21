@@ -1,72 +1,64 @@
-Return-Path: <netdev+bounces-215603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 692BCB2F7C1
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:21:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B718B2F7C3
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:21:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69529AA6E99
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 12:20:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FCB8602B31
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 12:20:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE16D3101B5;
-	Thu, 21 Aug 2025 12:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 636DA2E174C;
+	Thu, 21 Aug 2025 12:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="UQcg3t+6"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qcmDpjoA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E26C30FF09;
-	Thu, 21 Aug 2025 12:19:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C3F4258CDC;
+	Thu, 21 Aug 2025 12:20:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755778790; cv=none; b=Mi4TBBUAVu2UNi3NZEgroQ62GIMAmevFEysnYOkuP/jyfdBcYMoQMr7/oX1XN++KqtrYHH3N69K8ezzH5NQBtP2tZcMNso+qgKuXkbs8X2g4kLfPPbzbK9TouCDZ4LIMSC4tiD2Z0/mSz1KiDhiPUNpft+fOY2oo6nI4fusBm9Q=
+	t=1755778825; cv=none; b=NE8f9y+cDQfAOtt6A+GMWl5umIusIC8hGba6jGT85mzZEjSfTVh2ZaxBLT+yRE36nfXWpO1pmm6q4ng5ZSVs5CeRMIuy6ur9jMaNswVQ3AYDOIl4BgEQxbH1RYTfxb5EGbfbGxDlx2TAFBzzHQNUkSxRakSfZttUCxg2c56iOFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755778790; c=relaxed/simple;
-	bh=WogvDi0r85d7kj4DsfJxqY9POVZ7xh8jiErYhA/jon0=;
+	s=arc-20240116; t=1755778825; c=relaxed/simple;
+	bh=T0eepIogU/C4nGtklDI6AXFgkozWLR2Zv5SLQKKQmK8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=glA9fvRTalL6rp7129OqLK5BFFKaX70Ueh0icPVsArcIh6eH93hdEGWVAwiFwrGTGXWk1+li0HAsYrpzUx7sAMpY1JXpC65Oqxpper0/tonHLXzEhPySCXLWzv5VMqgw3M5UuA4JjvchFpX5GMDHtnBCNBoEKKxcLCsy9aE+Dvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=UQcg3t+6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D223C4CEEB;
-	Thu, 21 Aug 2025 12:19:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1755778790;
-	bh=WogvDi0r85d7kj4DsfJxqY9POVZ7xh8jiErYhA/jon0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UQcg3t+6Oq0Gnwjfg6zo5Qz9jY49O7XuYQskyEZxpMyh95MW8MQ0PeSHTzlw6pIAE
-	 rddukuDZg2Lar/PVmhOWRp0cvmA7yc3djlIQKfSUXA5EZgnCHbUGUAi7D+LMt9f5rR
-	 nrbcYp3Y45HLrG3NVXdOqMZugwSMXN5+Y1+zOT3g=
-Date: Thu, 21 Aug 2025 14:19:46 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Thorsten Leemhuis <linux@leemhuis.info>
-Cc: Li Li <dualli@google.com>, Tiffany Yang <ynaffit@google.com>,
-	John Stultz <jstultz@google.com>, Shai Barack <shayba@google.com>,
-	=?iso-8859-1?Q?Thi=E9baud?= Weksteen <tweek@google.com>,
-	kernel-team@android.com, linux-kernel@vger.kernel.org,
+	 Content-Type:Content-Disposition:In-Reply-To; b=OVjqZHUfpx7DFWjAUQa40fCkHx3ZA7GxwLj0Gj//XjixC8veEhR4M+XGpXf/CphG45QEOr5N0kFrPhzTz94taF6ekxSLAoompwmQQHknS51cK3hUb+0ZqEw9u5TE1gBVlphNtRHKekfTTZEETTZw5kCn/FPk4ZRUZUBIzH6ZEMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qcmDpjoA; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=XE7nezHRyctL24JiD/kzBAFcrxkUVmQDEQuFCl9Kvk0=; b=qcmDpjoAT7v7YzNJC3dMVxkjpE
+	YJ6BnVDNmWlqScrdrkstznmndvy7z84GJ57AgtifwBsrQbYWTIdjrUShFU0sgZQnUQx3lV4Owkixf
+	YUv2BW/3nkvUhidrh6omKtpqpTAJoqppsd2gbE6BDi/2M2Vqy35SiMH71ymAgLRvBgD4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1up4H3-005Rqc-9Z; Thu, 21 Aug 2025 14:20:09 +0200
+Date: Thu, 21 Aug 2025 14:20:09 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: David Yang <mmyangfl@gmail.com>
+Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Joel Fernandes <joelagnelf@nvidia.com>,
-	Todd Kjos <tkjos@android.com>,
-	Arve =?iso-8859-1?B?SGr4bm5lduVn?= <arve@android.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Christian Brauner <brauner@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-	Martijn Coenen <maco@android.com>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Linux kernel regressions list <regressions@lists.linux.dev>,
-	Carlos Llamas <cmllamas@google.com>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH v20 3/5] binder: introduce transaction reports via netlink
-Message-ID: <2025082145-crabmeat-ounce-e71f@gregkh>
-References: <20250727182932.2499194-1-cmllamas@google.com>
- <20250727182932.2499194-4-cmllamas@google.com>
- <e21744a4-0155-40ec-b8c1-d81b14107c9f@leemhuis.info>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next v5 1/3] dt-bindings: net: dsa: yt921x: Add Motorcomm
+ YT921x switch support
+Message-ID: <ce66b757-f17d-458c-83f4-e8f2785c271c@lunn.ch>
+References: <20250820075420.1601068-1-mmyangfl@gmail.com>
+ <20250820075420.1601068-2-mmyangfl@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,64 +67,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e21744a4-0155-40ec-b8c1-d81b14107c9f@leemhuis.info>
+In-Reply-To: <20250820075420.1601068-2-mmyangfl@gmail.com>
 
-On Thu, Aug 21, 2025 at 10:49:09AM +0200, Thorsten Leemhuis wrote:
-> On 27.07.25 20:29, Carlos Llamas wrote:
-> > From: Li Li <dualli@google.com>
-> > 
-> > Introduce a generic netlink multicast event to report binder transaction
-> > failures to userspace. This allows subscribers to monitor these events
-> > and take appropriate actions, such as stopping a misbehaving application
-> > that is spamming a service with huge amount of transactions.
-> > 
-> > The multicast event contains full details of the failed transactions,
-> > including the sender/target PIDs, payload size and specific error code.
-> > This interface is defined using a YAML spec, from which the UAPI and
-> > kernel headers and source are auto-generated.
-> 
-> It seems to me like this patch (which showed up in -next today after
-> Greg merged it) caused a build error for me in my daily -next builds
-> for Fedora when building tools/net/ynl:
-> 
-> """
-> make[1]: Entering directory '/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/lib'
-> gcc -std=gnu11 -O2 -W -Wall -Wextra -Wno-unused-parameter -Wshadow   -c -MMD -c -o ynl.o ynl.c
->         AR ynl.a
-> make[1]: Leaving directory '/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/lib'
-> make[1]: Entering directory '/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/generated'
->         GEN binder-user.c
-> Traceback (most recent call last):
->   File "/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/generated/../pyynl/ynl_gen_c.py", line 3673, in <module>
->     main()
->     ~~~~^^
->   File "/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/generated/../pyynl/ynl_gen_c.py", line 3382, in main
->     parsed = Family(args.spec, exclude_ops)
->   File "/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/generated/../pyynl/ynl_gen_c.py", line 1205, in __init__
->     super().__init__(file_name, exclude_ops=exclude_ops)
->     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->   File "/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/pyynl/lib/nlspec.py", line 462, in __init__
->     jsonschema.validate(self.yaml, schema)
->     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
->   File "/usr/lib/python3.13/site-packages/jsonschema/validators.py", line 1307, in validate
->     raise error
-> jsonschema.exceptions.ValidationError: 'from_pid' does not match '^[0-9a-z-]+$'
-> 
-> Failed validating 'pattern' in schema['properties']['attribute-sets']['items']['properties']['attributes']['items']['properties']['name']:
->     {'pattern': '^[0-9a-z-]+$', 'type': 'string'}
-> 
-> On instance['attribute-sets'][0]['attributes'][2]['name']:
->     'from_pid'
-> make[1]: *** [Makefile:48: binder-user.c] Error 1
-> make[1]: Leaving directory '/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/generated'
-> make: *** [Makefile:25: generated] Error 2
-> """
+> +        switch@1d {
+> +            compatible = "motorcomm,yt9215";
+> +            /* default 0x1d, alternate 0x0 */
+> +            reg = <0x1d>;
 
-Odd, this works for me.
+Just curious, what does alternative 0x0 mean? Does this switch have
+only one strapping pin for address, so it either uses address 0x1d or
+0x0?
 
-How exactly are you building this?
-
-thanks,
-
-greg k-h
+	Andrew
 
