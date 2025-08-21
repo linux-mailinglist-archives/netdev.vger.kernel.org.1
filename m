@@ -1,112 +1,200 @@
-Return-Path: <netdev+bounces-215514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0579BB2EEC3
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 08:54:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C404AB2EECB
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 08:55:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAE541BA3FEE
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 06:51:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF86A3B3CC7
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 06:53:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39CBD2E88B7;
-	Thu, 21 Aug 2025 06:51:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 366792E88AB;
+	Thu, 21 Aug 2025 06:53:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="Xi2HG+DU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qs7XcmMv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zeus03.de (zeus03.de [194.117.254.33])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA2902E7F01
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 06:51:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31732E62B1;
+	Thu, 21 Aug 2025 06:53:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755759085; cv=none; b=fjqA3YmKjT3XAbk4iUBvN8hphcSjgOgb3E6cQ23thc+kGDi+oQZE24/JFjzgoFXqsC8v31u7vBG4hv3OZH89vcMPJoiXqDdOY79VV33IQMlIMWSMRjDQoz6wjV5g1QYa10PwYlGnQKcHmj1W8TgeT/LL1PWYdvYiJFusvUGJzk4=
+	t=1755759190; cv=none; b=RVLHIKuHMmHPAWhZ8as+c4ONAX7MO2DLGcSqjuQKBXejK+amWSgxkiScQqQqOs3fAeGksvirw1QjBySJbvSFg3sEPOmBP4u8QHj/x8vksHK35Cw12Re/8W1dE30filN/UfkMWuAmYMndc2JwC90F2S35tYRsLYFvE1OloKEtVH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755759085; c=relaxed/simple;
-	bh=GfHgawS+yCqoXN1aSsOTJfn8eRUVQWMmUGj3iS9i514=;
+	s=arc-20240116; t=1755759190; c=relaxed/simple;
+	bh=Bq9tP1dBXwQ3sRC4YKUxmHUFPSXpyXHLlJKSZ1attcQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s2tzITb5W5YOY2L0B/FrhUfs2FoUi6HGbQgOT50hTICbdt4kzSr8ugBDVL5fq6p4GqlF3dvytEhy9vE8oXw+gr1zFmOPhURGinWGi60OmyVtXxiL9sbWVgRHOPnPyQNoyvPIlxo1zU/u4ELlBY2XHWjOXhv5WAVM/LKGG78ZD1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=Xi2HG+DU; arc=none smtp.client-ip=194.117.254.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	sang-engineering.com; h=date:from:to:cc:subject:message-id
-	:references:mime-version:content-type:in-reply-to; s=k1; bh=GfHg
-	awS+yCqoXN1aSsOTJfn8eRUVQWMmUGj3iS9i514=; b=Xi2HG+DUcgxjEZQUE/nY
-	JEAesoXELinHjS54J7AN9vorMOOYvvYmqzss4aTBkSJjTUxJW7cicujsb4xMCpzw
-	F3Lr/Kof1BtzhhxO41Wcvr33QroeTkJNXMiPQHQvB6IEzusess3EibyuVVwrG1Pt
-	AzqymEmC7GDt7foVW89joImI1bFqItKEy0gGA8zEGq0/KTvm+F9IUI/jZPoxNYES
-	rLaKBX3tWanxpBiq2PUoA2er6AINmZ8KUwOgWUGvkgOQSDcnQH8UZ4yCE2U/ODkK
-	mny2gUpNDMIjdifOjDVp2iHLatAIavksENgNCoB8IbLZhs6x7yjk/hubyrkCnClq
-	jw==
-Received: (qmail 3407497 invoked from network); 21 Aug 2025 08:51:07 +0200
-Received: by mail.zeus03.de with UTF8SMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 21 Aug 2025 08:51:07 +0200
-X-UD-Smtp-Session: l3s3148p1@nL2Fg9o8NubUtcd1
-Date: Thu, 21 Aug 2025 08:51:05 +0200
-From: Wolfram Sang <wsa+renesas@sang-engineering.com>
-To: Prabhakar <prabhakar.csengg@gmail.com>
-Cc: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	stable@kernel.org
-Subject: Re: [PATCH net-next v2] net: pcs: rzn1-miic: Correct MODCTRL
- register offset
-Message-ID: <aKbB2XZhLZ7T-y5P@shikoro>
-References: <20250820170913.2037049-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=n78rQaSabD/ScKUnpdTllO9ZlOg/hDxdCc+ldpAowt6f4umkVt5TxhZ8AArkxFRzJinaYlanbIJQWKe0+FhGCd+kGDQAQhPK9H/U8b72NoTMSW3CS4wOv092aogUcb+K2vG42wz4oKsRxYZrpbO/St1YuZzDs5k89jvumpkF2SI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qs7XcmMv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22860C4CEED;
+	Thu, 21 Aug 2025 06:53:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755759189;
+	bh=Bq9tP1dBXwQ3sRC4YKUxmHUFPSXpyXHLlJKSZ1attcQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Qs7XcmMvSsV7ZlsJpkSxU/mY6+27bCRXN2nW1JYMEkIZbbbxqeCb++SHayuZouPBe
+	 pXLdV6i4y+uV93jaiaeZXB1iriW3zE/bbKi69plgG3xa5OIs0Qi76qhRmK7VU1E6ss
+	 LtnBtwtwFnfX6J44cs071lPZ9x5vD+8uwLd7zPounkMciOpdxkDvBvqh8jlNUP8dii
+	 u2f72i1+0PrrVy50oULnOBet9AcjJiPjRXovxGrycQLyhLCkK3Ylvj06fa/HZTKOhm
+	 8BZFUH4yFIxuQlwwigXeCGWanttsE4WFa/g75aoSrNq3PTsRHEf2r+EsWQcMVJMPEe
+	 J0JNPZ+l1tSHA==
+Date: Thu, 21 Aug 2025 08:53:07 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+Cc: airlied@gmail.com, amergnat@baylibre.com, andrew+netdev@lunn.ch, 
+	andrew-ct.chen@mediatek.com, angelogioacchino.delregno@collabora.com, broonie@kernel.org, 
+	chunkuang.hu@kernel.org, ck.hu@mediatek.com, conor+dt@kernel.org, davem@davemloft.net, 
+	dmitry.torokhov@gmail.com, edumazet@google.com, flora.fu@mediatek.com, 
+	houlong.wei@mediatek.com, jeesw@melfas.com, jmassot@collabora.com, kernel@collabora.com, 
+	krzk+dt@kernel.org, kuba@kernel.org, kyrie.wu@mediatek.corp-partner.google.com, 
+	lgirdwood@gmail.com, linus.walleij@linaro.org, louisalexis.eyraud@collabora.com, 
+	maarten.lankhorst@linux.intel.com, matthias.bgg@gmail.com, mchehab@kernel.org, 
+	minghsiu.tsai@mediatek.com, mripard@kernel.org, p.zabel@pengutronix.de, pabeni@redhat.com, 
+	robh@kernel.org, sean.wang@kernel.org, simona@ffwll.ch, 
+	support.opensource@diasemi.com, tiffany.lin@mediatek.com, tzimmermann@suse.de, 
+	yunfei.dong@mediatek.com, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, 
+	linux-mediatek@lists.infradead.org, linux-sound@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v1 10/14] regulator: dt-bindings: Convert Dialog
+ Semiconductor DA9211 Regulators to YAML
+Message-ID: <20250821-practical-coyote-of-hail-d2fddb@kuoka>
+References: <20250820171302.324142-1-ariel.dalessandro@collabora.com>
+ <20250820171302.324142-11-ariel.dalessandro@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="TBeIdkOG2Lhrt6XW"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250820170913.2037049-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+In-Reply-To: <20250820171302.324142-11-ariel.dalessandro@collabora.com>
+
+On Wed, Aug 20, 2025 at 02:12:58PM -0300, Ariel D'Alessandro wrote:
+> Convert the existing text-based DT bindings for Dialog Semiconductor DA9211
+> Voltage Regulators family to a YAML schema. Examples are simplified, as
+> these are all equal.
+
+Also not wrapped... fix your editor to recognize how commits are
+written.
+
+> 
+> Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+> ---
+
+...
+
+> +---
+> +$id: http://devicetree.org/schemas/regulator/dlg,da9211.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: |
+
+Drop |
+
+> +  Dialog Semiconductor DA9211/DA9212/DA9213/DA9223/DA9214/DA9224/DA9215/DA9225
+> +  Voltage Regulator
+> +
+> +maintainers:
+> +  - Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - "dlg,da9211"
+> +      - "dlg,da9212"
+> +      - "dlg,da9213"
+> +      - "dlg,da9223"
+> +      - "dlg,da9214"
+> +      - "dlg,da9224"
+> +      - "dlg,da9215"
+> +      - "dlg,da9225"
+
+No quotes. I don't think this was ever tested.
+
+Also, keep it properly ordered
 
 
---TBeIdkOG2Lhrt6XW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  interrupts:
+> +    maxItems: 1
+> +
+> +  regulators:
+> +    type: object
+> +    additionalProperties: false
+> +    description: |
+
+Drop |
+
+> +      List of regulators provided by the device
+> +
+> +    patternProperties:
+> +      "^BUCK([A-B])$":
+
+[AB]
+
+> +        type: object
+> +        $ref: regulator.yaml#
+> +        description: |
+> +          Properties for a single BUCK regulator
+> +
+> +        properties:
+> +          regulator-initial-mode:
+> +            items:
+> +              enum: [ 1, 2, 3 ]
+> +            description: Defined in include/dt-bindings/regulator/dlg,da9211-regulator.h
+> +
+> +          regulator-allowed-modes:
+> +            items:
+> +              enum: [ 1, 2, 3 ]
+> +            description: Defined in include/dt-bindings/regulator/dlg,da9211-regulator.h
+> +
+> +          enable-gpios:
+> +            maxItems: 1
+> +            description: Specify a valid GPIO for platform control of the regulator
+
+Drop description, obvious.
+
+> +
+> +        unevaluatedProperties: false
+
+For nested blocks this goes after $ref: regulator.
+
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - interrupts
+> +  - regulators
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/regulator/dlg,da9211-regulator.h>
+> +
+> +    i2c1 {
+
+i2c
+
+> +        #address-cells = <1>;
+> +        #size-cells = <0>;
+> +
+> +        da9212: da9212@68 {
+
+Node names should be generic. See also an explanation and list of
+examples (not exhaustive) in DT specification:
+https://devicetree-specification.readthedocs.io/en/latest/chapter2-devicetree-basics.html#generic-names-recommendation
 
 
-> I've just build-tested this patch and found this issue while working
-> on a similar IP on the Renesas RZ/T2H SoC where the MODCTRL register
-> offset is also at offset 0x8.
+Best regards,
+Krzysztof
 
-I can test this on affected hardware next week.
-
-
---TBeIdkOG2Lhrt6XW
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmimwdUACgkQFA3kzBSg
-KbYYiA//aqr+N4gh4rBtIMI5BbvKJRMwXtKaUmKjVpfESdmbSS7MN8kYKCsW2hyE
-7z0WZjWq2ASOzhlP4JAlNlPeQrkBcLt1z06A0/sg17vcoJ8wn/U9S/ZbVFEvpCyX
-eM9XlwH2gr8aHbcQKVgV2VQsBNbcb5UTNZNEQTChESNh/I05NMrseGLfaulKihGl
-a42Gm8Vwu2UUG/oqKxZtxYeAnnFlnqwLIJG6Ot9ofG+IsO1pM3UazRoruZfxl5Bn
-CLurj04UyLCAkN7lHk2qTn9GJoAWQKHDbc9XUSPIYGvtbzXZTiC6Y4TkrwKKJO+n
-YZAI5qFxCfTZkPbKILbeGh7lqg4D4WERlWPYWJYoET5A9GaH5UVqg5Jmcg8eX1WE
-VU85h7UxOAVvkX2WrrMz9IGQn9XQZA0rkaXmknjV5WRiW2b7/R/T27+2jr50UmH6
-S/4leKbxwKb+4AE7rrFUwznqriqnqKgGZLBumuwknAWfQOMae0osqWZg+l7259tj
-l8B/TfEEBT3vbx3qdhlS27XwhICa+Vz7Nk41lV6agqXDoVQKknI3ikoD0nmNZK3o
-Wg8USc0KNXm5LL+F2mslAPN8NmXv/JYVXqToAyR5anvu9bUx1FkZJ5PYBqJtIKCK
-HkI8VmFc4WFBgWRMykJjYeAMOjn3TVfOgBOGxCMI2TTnuNNXNYQ=
-=eAE1
------END PGP SIGNATURE-----
-
---TBeIdkOG2Lhrt6XW--
 
