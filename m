@@ -1,124 +1,93 @@
-Return-Path: <netdev+bounces-215652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A2A7B2FCBF
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 16:33:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB770B2FC53
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 16:24:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD8BBAC0B59
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:28:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DD741794A9
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:18:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CAD532779E;
-	Thu, 21 Aug 2025 14:21:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D8026D4F1;
+	Thu, 21 Aug 2025 14:17:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=0x65c.net header.i=@0x65c.net header.b="FChdCC9T"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nT2dFNMT"
 X-Original-To: netdev@vger.kernel.org
-Received: from m239-4.eu.mailgun.net (m239-4.eu.mailgun.net [185.250.239.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C2631AF38
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 14:21:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.250.239.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DBF926B761;
+	Thu, 21 Aug 2025 14:17:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755786116; cv=none; b=qk9Mapa+uvK9t1wnQDtdvTqsEOGQtUNjxOhyGj/uBBAiHCS9cqFt9+H1P3Q21RgGm9oL4TGtxawrq0T1rOtxAariZSda5lpt4e+bTnjQOF+lPKxkWCbKmXFPBiSHAkmUF08UnZu5SPQMkiVmlluGV6nb+AOkTtT+DYqxph3mPWU=
+	t=1755785861; cv=none; b=TXu1jqbDKbuA3EILCizOHmAMwJPl6YJvMXgZWTHkrdUIIccjEMFK0z+2oozPrIcjZOcUMLOvbl6ldRgNMsMUwyQNcPeYuUh1g2ojldB9cLIeZE8LP9j0WHtObGoeGqo3LEVZXTQVyIVTCoC8AAvs27o84cYJOvpA+YOkVRpMkcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755786116; c=relaxed/simple;
-	bh=sc1LRY9wxfJhyEkCNT+gvnBzPwB1KzMkTYDX249gnLo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MB4V+sSXqqtBi9KGeBXGguHicqt0xPLVkOOBbly3LjbB3v2T4/o/C6m24fduUxcm67++HREvQ/HuGmMqj8LUGM3n/xVSRCWztn2uudwBmkafwfyUOPmErAgXU8ONazy0H+jCccD9cG1UBuiiT6eNo/t7NoXFxrY89Pjv5IbxkhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x65c.net; spf=pass smtp.mailfrom=0x65c.net; dkim=pass (2048-bit key) header.d=0x65c.net header.i=@0x65c.net header.b=FChdCC9T; arc=none smtp.client-ip=185.250.239.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x65c.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0x65c.net
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=0x65c.net; q=dns/txt; s=email; t=1755786112; x=1755793312;
- h=Content-Transfer-Encoding: MIME-Version: References: In-Reply-To: Message-ID: Date: Subject: Subject: Cc: To: To: From: From: Sender: Sender;
- bh=5rawqhjXiGbRr3VXLAx+apZbtahFA21OZMMwwvU91HE=;
- b=FChdCC9TAuUjQVEF97qmRavTfj04W9/Vsbb6M+3EdfhmK8ZiH0RZexbjIKnPDgFKN2FTth89HCgvv67t4aKbIHCyuYO26E3URSB8QZfMfJ4tDx04YPqkr7j0h/e6H925GekA98ZOg6u2CaEyli0/i+nuU+xab+89utJ3MyCfHZmLP56DcvlyANj9wS8/c4TquI5I9yStRoRCbDsSS774sQSERh8byrYhiHRxka6naI+K6Yzs1lGiZK828j6Q1CwinlhnLs7YwSzWPYxB/my3FfbcmeGScvOQC2MJBRpRubz+tpSNpZdbKi26eeVrH1eHHsOk7uIfmvG3k0EsREnw9g==
-X-Mailgun-Sid: WyI2ZTA5MCIsIm5ldGRldkB2Z2VyLmtlcm5lbC5vcmciLCI1NGVmNCJd
-Received: from fedora (pub082136115007.dh-hfc.datazug.ch [82.136.115.7]) by
- 7b15455cfe8dbafdef49f89608815e4823a50a73c49b1f725c695bfcd1e1c385 with SMTP id
- 68a72b80ca5807a38b2dd9bb; Thu, 21 Aug 2025 14:21:52 GMT
-X-Mailgun-Sending-Ip: 185.250.239.4
-Sender: alessandro@0x65c.net
-From: Alessandro Ratti <alessandro@0x65c.net>
-To: alessandro@0x65c.net,
-	linux-kselftest@vger.kernel.org,
-	liuhangbin@gmail.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	skhan@linuxfoundation.org
-Subject: [PATCH] selftests: rtnetlink: skip tests if tools or feats are missing
-Date: Thu, 21 Aug 2025 16:16:51 +0200
-Message-ID: <20250821142141.735075-2-alessandro@0x65c.net>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250821142141.735075-1-alessandro@0x65c.net>
-References: <CAKiXHKejzOAiieTxZpq8+v-vnzSEyuOuD0tYbzHL5R78iS+BMQ@mail.gmail.com>
- <20250821142141.735075-1-alessandro@0x65c.net>
+	s=arc-20240116; t=1755785861; c=relaxed/simple;
+	bh=gW7zqHt7cuAakYbLK9BQKAYcDbTeaMYBUi5199VFuWI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lr108co+fp5b1AkA15R8+Kfoe8NZTat2nyRpuoKTI1TbPWABwKuE8bBo7ABz9H9TWsEWu+OMv0I6uR0u1mu/KvwfHCHCrmuTcoVVMeTZ9fw3lCkUs9HqPb/bE4MImFTKmBaZPgqi+LFhk3cehuNfUwvCac71FBkuaXrqiooawuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nT2dFNMT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 186A6C4CEEB;
+	Thu, 21 Aug 2025 14:17:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755785860;
+	bh=gW7zqHt7cuAakYbLK9BQKAYcDbTeaMYBUi5199VFuWI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nT2dFNMTdJafnR8SCtfTZ4mri3Lbf6Uobpr9VzI6B7WWWTWueKS2GpZsfOM4W5Nul
+	 jI3GCEU11vPSdLCtvy/MjJMPT8dny8Rwe4zbyNeKnHr7WHKP5mK5SdOIcYajHvymgT
+	 tW3YMrkNocdSeWpD4xypEwihTB9ldMoEaAKjOtBBSXxoRYrr1lsfkzqut+JG3kNJ4D
+	 YLmM0mIA/lEam7fPLNtPjInCYoGmaIxE7K7Lgdf4UT4vwjb81vIbXKKc9u7722DLm5
+	 x80sH/px/HKkEYCDcx1FDetplKayERaM+BZoFgVpNE8rFtH8FqIst1UYrvSwV0d0Bo
+	 H/fk60AGBEorQ==
+Date: Thu, 21 Aug 2025 07:17:39 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "G Thomas, Rohan" <rohan.g.thomas@altera.com>
+Cc: Rohan G Thomas via B4 Relay
+ <devnull+rohan.g.thomas.altera.com@kernel.org>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Serge Semin <fancer.lancer@gmail.com>,
+ Romain Gantois <romain.gantois@bootlin.com>, Jose Abreu
+ <Jose.Abreu@synopsys.com>, Ong Boon Leong <boon.leong.ong@intel.com>,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Matthew
+ Gerlach <matthew.gerlach@altera.com>
+Subject: Re: [PATCH net-next v2 3/3] net: stmmac: Set CIC bit only for TX
+ queues with COE
+Message-ID: <20250821071739.2e05316a@kernel.org>
+In-Reply-To: <feb15456-2a16-4323-9d69-16aa842603f2@altera.com>
+References: <20250816-xgmac-minor-fixes-v2-0-699552cf8a7f@altera.com>
+	<20250816-xgmac-minor-fixes-v2-3-699552cf8a7f@altera.com>
+	<20250819182207.5d7b2faa@kernel.org>
+	<22947f6b-03f3-4ee5-974b-aa4912ea37a3@altera.com>
+	<20250820085446.61c50069@kernel.org>
+	<20250820085652.5e4aa8cf@kernel.org>
+	<feb15456-2a16-4323-9d69-16aa842603f2@altera.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Some rtnetlink selftests assume the presence of ifconfig and iproute2
-support for the `proto` keyword in `ip address` commands. These
-assumptions can cause test failures on modern systems (e.g. Debian
-Bookworm) where:
+On Thu, 21 Aug 2025 19:20:02 +0530 G Thomas, Rohan wrote:
+> > To be clear -- this is just for context. I don't understand the details
+> > of what the CIC bit controls, so the final decision is up to you.  
+> 
+> Currently, in the stmmac driver, even though tmo_request_checksum is not
+> implemented, checksum offloading is still effectively enabled for AF_XDP
+> frames, as CIC bit for tx desc are set, which implies checksum
+> calculation and insertion by hardware for IP packets. So, I'm thinking
+> it is better to keep it as false only for queues that do not support
+> COE.
 
- - ifconfig is not installed by default
- - The iproute2 version lacks support for address protocol
-
-This patch improves test robustness by:
-
- - Skipping kci_test_promote_secondaries if ifconfig is missing
- - Skipping do_test_address_proto if ip address help does not mention
-   proto
-
-These changes ensure the tests degrade gracefully by reporting SKIP
-instead of FAIL when prerequisites are not met, improving portability
-across systems.
-
-Signed-off-by: Alessandro Ratti <alessandro@0x65c.net>
----
- tools/testing/selftests/net/rtnetlink.sh | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
-index d6c00efeb664..c2a0e7f37391 100755
---- a/tools/testing/selftests/net/rtnetlink.sh
-+++ b/tools/testing/selftests/net/rtnetlink.sh
-@@ -323,6 +323,11 @@ kci_test_addrlft()
- 
- kci_test_promote_secondaries()
- {
-+	run_cmd ifconfig "$devdummy"
-+	if [ $ret -ne 0 ]; then
-+		end_test "SKIP: ifconfig not installed"
-+		return $ksft_skip
-+	fi
- 	promote=$(sysctl -n net.ipv4.conf.$devdummy.promote_secondaries)
- 
- 	sysctl -q net.ipv4.conf.$devdummy.promote_secondaries=1
-@@ -1201,6 +1206,12 @@ do_test_address_proto()
- 	local ret=0
- 	local err
- 
-+	run_cmd_grep 'proto' ip address help
-+	if [ $? -ne 0 ];then
-+		end_test "SKIP: addr proto ${what}: iproute2 too old"
-+		return $ksft_skip
-+	fi
-+
- 	ip address add dev "$devdummy" "$addr3"
- 	check_err $?
- 	proto=$(address_get_proto "$addr3")
--- 
-2.39.5
-
+Oh, so the device parses the packet and inserts the checksum whether
+user asked for it or not? Damn, I guess it may indeed be too late
+to fix, but that certainly _not_ how AF_XDP is supposed to work.
+The frame should not be modified without user asking for it..
 
