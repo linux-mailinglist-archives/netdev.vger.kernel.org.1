@@ -1,157 +1,169 @@
-Return-Path: <netdev+bounces-215554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9516B2F313
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 10:59:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51A48B2F38A
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 11:16:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB5535A5590
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 08:59:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 307AF580F24
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 09:12:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 248B12EE262;
-	Thu, 21 Aug 2025 08:59:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SnkRw+I5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36B962EF676;
+	Thu, 21 Aug 2025 09:11:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 969C62EE263;
-	Thu, 21 Aug 2025 08:59:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AA3B2ED84E
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 09:11:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755766742; cv=none; b=mXlzfalBlInDkmnkd6u+1PhHrTs4X/hlqCqI9yjHdJ5i9oahisVj6QDT0FI6XPEdRkZngjafDc+3FcNTi0dBd22nWj9adBwqaSpRwqDL5Hm1ustq8YQDUn4Kr3VAPDgCZR/km+9o2A5y/4RIsxM/3RK9cmLPybAzzWf+PnpbIJY=
+	t=1755767491; cv=none; b=afDVgCy+4PCxshgUtIZZ3jENl8BLxvBZZhtddbWLMZyO3DzPY2yCSO/NGSt/URLA7B4ySEvO5HnIh7dI6/1z7yWD6eh1JvRPK/4sceIU/X51sXDIjUVeDUin5Fqoz/ZWy56MwDgJKzVQ8eLoSKoaoV6SmRGUAE/7UYEd6nGs2W0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755766742; c=relaxed/simple;
-	bh=p62M6eX2iuYBqZDezqNWyP8v3/JrtHtVwp2a0puBwbk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MmqWb6gsovnmNU/rE4ecEYGHKVetXjHD3n1BhYkFks6U5TAuHWHh/z2H8kJaXcrPv61d4rO9Xi38z7GsSdljOYgQuT21sK1vCoq1ZTS8g6ejRhFvKcfIKC9YrI951rPVhRNofvpvFvZGev1yvj25hreSFaWxdxDX5+2kIawWrSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SnkRw+I5; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-244581caca6so6133275ad.2;
-        Thu, 21 Aug 2025 01:59:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755766740; x=1756371540; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cEm9mEjlF/ZAqt+0IE6+oZVFwgVkKRkNrtybX+6TA9M=;
-        b=SnkRw+I5Mc9CSziFzI2hAGJu1/JoFfYti9ZzODCMQg0EDFebYZ6U3YpEZDY+FixN4y
-         jhumdEOAcy56pfIP4Yb1pjdr80GvgJJD2a0Axpu6+8yu5r7rY5B7LJ2BS8lD55Btf1i6
-         t3zVb92kGyF3ffKAJxW92RIWRu+aGUz1MQsFhv2Lk0jKQ8AnJCZk8WfaYBQWNANkdFnT
-         YKHuRaSIOkvV8TDV0jOYQlmaZtnub2qpmb8gEKsQg5QX5eqBGLWahj4+33+kkHWECToz
-         kX1U5yV1ib1w3RMLU4GRkzotN+8N/WWsnLhVz2f9D2JwaqSLEYz7wavsQwN7U2EDLeuC
-         ZorQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755766740; x=1756371540;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cEm9mEjlF/ZAqt+0IE6+oZVFwgVkKRkNrtybX+6TA9M=;
-        b=pNRFiz1OlZtOdCAnHK2LIZE3fu8nrJVcT0HCl7K9rEZN/sTTukNoE2Vlp7SbPe7MXJ
-         UEfrXps745+h0sZI/Hp6gBiOO73cN3dhhlxbs9JlnipSvzwfSlhR716y8mRrRGuXYYR+
-         KB/hiJOZcQqTrpOEirvkGqIS0OYNKYpf3xxFeHhkzF9iP1vBDYS1h/6cDdW/0RQ5oKfl
-         +/BMRlFyRMRlkuTRUKuH1gsMTAHyJQt9bsO2rd/O0WyISeBSUQCNj3FE/vf3pF3OLLrW
-         OrIrICq+nOdHRJEYbhXlaRCwvOr8N7ogTok4Wqo6lLJG1mc+oyPC4BduaIdCLn/Eo/xH
-         CkMw==
-X-Forwarded-Encrypted: i=1; AJvYcCV3rOatphadRgy7Wl3edlIipCLCybVLmloQ3dqh5z9nR/GAtLAgqF6UDVFiMdkJTxkMvWgnSamy@vger.kernel.org, AJvYcCWwbbt+IbiRbaHzNJmiFHCc15frm3c5JRUfssdfriutyIqqSE26zf8V1Z+0/c0nM9LdQ43z6cwuGaUM8MuiJD0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbQ+pKzNI+0D1N55QnrPTYl+0Bore9kLrJwU6cd0z+mPM/0DSv
-	NKEDNas1D64UP+xyxtQ1FciKK/o4aC/Ik+zlw2V7uiINTfORWoqoLZn5
-X-Gm-Gg: ASbGncsSOA5w6/sgrG6XgdYpuiO831wmFAMhAo1MVnOuYo6A9RjaZjBGj58XZ3ob4SO
-	gAutnUAho6ZAeIJbWCqT+CgIdbjN9BBFcTZOlgi8z3QoHcLYk2rsenfh5raSyqDuSpzf1g0BJSe
-	Li0rVv6KxBpxl5SFdBRW8Jq5b3qEv4c4nkhUlb/g9wzHStL4Naxx6wxQWwzkcvL0tg4XbBzz/vp
-	AGzk8ygcVGWY+wyNP0AwrJ5b/tAa+318dhu7bJMivncbgZrngAyRiyob+MNL+D+JeTU2b74cGL1
-	mK138jDmwsU0q21DExpmyIsCAmPsXMiCNg28KKjQfaTi4Lob0ekC00X63tGwpt/mPDVJSelq4OK
-	+I2Y255a91WILxY+WqJnZHQfoPNmT1KlT9YVaGg==
-X-Google-Smtp-Source: AGHT+IEuRkmxaAmThc7HNmy8O8AUR11/28szLpXKHJnRoYviVNaEU4iTN+tgtGE/bL591pYe6jGzRg==
-X-Received: by 2002:a17:903:2406:b0:235:f078:4746 with SMTP id d9443c01a7336-245fedb0faemr20873415ad.42.1755766739755;
-        Thu, 21 Aug 2025 01:58:59 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-245ed50352esm48683365ad.128.2025.08.21.01.58.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Aug 2025 01:58:59 -0700 (PDT)
-Date: Thu, 21 Aug 2025 08:58:53 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Alessandro <alessandro@0x65c.net>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, skhan@linuxfoundation.org,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH] selftests: rtnetlink: add checks for ifconfig and
- iproute2
-Message-ID: <aKbfzeS1QrP0dE4N@fedora>
-References: <20250821074552.682731-1-alessandro@0x65c.net>
- <20250821074552.682731-2-alessandro@0x65c.net>
- <aKbX_CzxSi7T9Bcp@fedora>
- <CAKiXHKcLsEWbEz1EkzE942PbsMEpfj=wO7uYDb+Nxy8nGCEx1Q@mail.gmail.com>
+	s=arc-20240116; t=1755767491; c=relaxed/simple;
+	bh=JMLkpt8gghy+8Q85DSYe9pZz4nrrCgAxwVxnlfm0Hvo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=QfpluLw84HmpC2ac1LG+FOFMrc7x6t9gw8X1Fifl9bUi0sq+GFRAFwAn62fW8CDmHlGnnqerlEe3/5bltxJcnoY61VOFIehbIP026OG59vWnHfkPFZYF+x52aeAgDhl6fkbi3AsIExm7phLRh3UiRZ982OQ+rKCyAZgGMbFsOo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1up1K4-0001Pe-32; Thu, 21 Aug 2025 11:11:04 +0200
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1up1K2-001O87-1O;
+	Thu, 21 Aug 2025 11:11:02 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1up1K2-008It5-16;
+	Thu, 21 Aug 2025 11:11:02 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Nishanth Menon <nm@ti.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	linux-doc@vger.kernel.org,
+	Michal Kubecek <mkubecek@suse.cz>,
+	Roan van Dijk <roan@protonic.nl>
+Subject: [PATCH net-next v4 0/5] ethtool: introduce PHY MSE diagnostics UAPI and drivers
+Date: Thu, 21 Aug 2025 11:10:56 +0200
+Message-Id: <20250821091101.1979201-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKiXHKcLsEWbEz1EkzE942PbsMEpfj=wO7uYDb+Nxy8nGCEx1Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Thu, Aug 21, 2025 at 10:45:19AM +0200, Alessandro wrote:
-> On Thu, 21 Aug 2025 at 10:25, Hangbin Liu <liuhangbin@gmail.com> wrote:
-> >
-> > On Thu, Aug 21, 2025 at 09:43:11AM +0200, Alessandro Ratti wrote:
-> > > On systems where `ifconfig` is not available (e.g., modern Debian), the
-> > > `kci_test_promote_secondaries` test fails. Wrap the call in a check.
-> > >
-> > > Additionally, `do_test_address_proto` fails on iproute2 versions that
-> > > lack support for `proto` in `ip address` commands. Add a minimal feature
-> > > check and skip the test with a proper message if unsupported.
-> > >
-> > > These changes allow the tests to run and report SKIP instead of FAIL on
-> > > platforms with older tools.
-> > >
-> > > Signed-off-by: Alessandro Ratti <alessandro@0x65c.net>
-> > > ---
-> > >  tools/testing/selftests/net/rtnetlink.sh | 10 +++++++++-
-> > >  1 file changed, 9 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
-> > > index d6c00efeb664..9bff620ef595 100755
-> > > --- a/tools/testing/selftests/net/rtnetlink.sh
-> > > +++ b/tools/testing/selftests/net/rtnetlink.sh
-> > > @@ -330,7 +330,9 @@ kci_test_promote_secondaries()
-> > >       for i in $(seq 2 254);do
-> > >               IP="10.23.11.$i"
-> > >               ip -f inet addr add $IP/16 brd + dev "$devdummy"
-> > > -             ifconfig "$devdummy" $IP netmask 255.255.0.0
-> > > +             if command -v ifconfig >/dev/null 2>&1; then
-> > > +                     ifconfig "$devdummy" $IP netmask 255.255.0.0
-> > > +             fi
-> >
-> > Maybe just skip the promote_secondaries test if ifconfig is not available?
-> >
-> 
-> Thank you for your review and comment.
-> 
-> My takeaway here is that the test works because the IP addresses are set on the
-> $devdummy by the previous ip(8) command, and ifconfig seems a bit redundant.
+changes v4:
+- remove -ENETDOWN as expected error value for get_mse_config() and
+  get_mse_snapshot()
+- fix htmldocs builds
+- s/__ethtool-a-mse/--ethtool-a-mse
+changes v3:
+- add missing ETHTOOL_A_LINKSTATE_MSE_* yaml changes
+changes v2:
+- rebase on latest net-next
 
-No, please check the git log to see why we use ifconfig here.
+This series introduces a generic kernel-userspace API for retrieving PHY
+Mean Square Error (MSE) diagnostics, together with netlink integration,
+a fast-path reporting hook in LINKSTATE_GET, and initial driver
+implementations for the KSZ9477 and DP83TD510E PHYs.
 
-Thanks
-Hangbin
+MSE is defined by the OPEN Alliance "Advanced diagnostic features for
+100BASE-T1 automotive Ethernet PHYs" specification [1] as a measure of
+slicer error rate, typically used internally to derive the Signal
+Quality Indicator (SQI). While SQI is useful as a normalized quality
+index, it hides raw measurement data, varies in scaling and thresholds
+between vendors, and may not indicate certain failure modes - for
+example, cases where autonegotiation would fail even though SQI reports
+a good link. In practice, such scenarios can only be investigated in
+fixed-link mode; here, MSE can provide an empirically estimated value
+indicating conditions under which autonegotiation would not succeed.
 
-> 
-> Also, considering we are testing netlink, I was baffled to see ifconfig there
-> that, if I'm not mistaken, uses ioctl(); but I might be missing
-> something obvious
-> here, considering I'm looking at these tests for the first time, so bear with
-> me :)
-> 
-> If it's better to skip the test altogether when ifconfig is missing, I'll
-> submit another patch to do so.
-> 
-> Thank you
-> 
-> Best regards,
-> Alessandro
+Example output with current implementation:
+root@DistroKit:~ ethtool lan1
+Settings for lan1:
+...
+        Speed: 1000Mb/s
+        Duplex: Full
+...
+        Link detected: yes
+        SQI: 5/7
+        MSE: 3/127 (channel: worst)
+
+root@DistroKit:~ ethtool --show-mse lan1
+MSE diagnostics for lan1:
+MSE Configuration:
+        Max Average MSE: 127
+        Refresh Rate: 2000000 ps
+        Symbols per Sample: 250
+        Supported capabilities: average channel-a channel-b channel-c
+                                channel-d worst
+
+MSE Snapshot (Channel: a):
+        Average MSE: 4
+
+MSE Snapshot (Channel: b):
+        Average MSE: 3
+
+MSE Snapshot (Channel: c):
+        Average MSE: 2
+
+MSE Snapshot (Channel: d):
+        Average MSE: 3
+
+[1] https://opensig.org/wp-content/uploads/2024/01/Advanced_PHY_features_for_automotive_Ethernet_V1.0.pdf
+
+Oleksij Rempel (5):
+  ethtool: introduce core UAPI and driver API for PHY MSE diagnostics
+  ethtool: netlink: add ETHTOOL_MSG_MSE_GET and wire up PHY MSE access
+  ethtool: netlink: add lightweight MSE reporting to LINKSTATE_GET
+  net: phy: micrel: add MSE interface support for KSZ9477 family
+  net: phy: dp83td510: add MSE interface support for 10BASE-T1L
+
+ Documentation/netlink/specs/ethtool.yaml      | 175 +++++++++
+ Documentation/networking/ethtool-netlink.rst  |  65 ++++
+ drivers/net/phy/dp83td510.c                   |  44 +++
+ drivers/net/phy/micrel.c                      |  76 ++++
+ include/linux/phy.h                           | 115 ++++++
+ .../uapi/linux/ethtool_netlink_generated.h    |  94 +++++
+ net/ethtool/Makefile                          |   2 +-
+ net/ethtool/linkstate.c                       |  84 ++++
+ net/ethtool/mse.c                             | 362 ++++++++++++++++++
+ net/ethtool/netlink.c                         |  10 +
+ net/ethtool/netlink.h                         |   2 +
+ 11 files changed, 1028 insertions(+), 1 deletion(-)
+ create mode 100644 net/ethtool/mse.c
+
+--
+2.39.5
+
 
