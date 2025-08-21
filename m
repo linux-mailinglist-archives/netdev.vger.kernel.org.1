@@ -1,129 +1,104 @@
-Return-Path: <netdev+bounces-215442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A9C6B2EAF5
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 03:46:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA291B2EAF0
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 03:45:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44C7F724183
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 01:46:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B3AA727C72
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 01:45:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05E9B1F4CA1;
-	Thu, 21 Aug 2025 01:46:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34060253954;
+	Thu, 21 Aug 2025 01:45:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R1A6KqyQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3D3C5FEE6
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 01:46:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1053F1A9F84
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 01:45:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755740811; cv=none; b=PMi7dJ7PedwQawpcE4XQ6qLZT9HoHhL2o7gOFEQxUi+JToBT41Ru98aGrxl9H6lusGcHGnP7FDQJ9FXQGkpHakzCbvSKVk4tIo7wBS0BCtdrhWaKW3k0GEiQbmxS8guiyUdHmINH0xZXqUJZlaPNbkGt1UI/U98L7zIKuruR/QU=
+	t=1755740716; cv=none; b=jdl5AODa+0JDULAmLDfsjfdPG5vA7372kOvsRJzy2LdXtwNEl57/T+6As6mGHJa6zMRVcZa+As1oZN7s4bJ+cCbtLR50kSByx8X6zOl2NL9rR5DjGTxAJpojqyOvHyw7OQ2lK1H9z1GM4PHKTgJ4fLan0RiErcpf0gPafXF+hCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755740811; c=relaxed/simple;
-	bh=ySONGNdsPmg86SSrrcztNvt0AGXVE7A53Onq5Bg+ekI=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=GkTObfhRwhrcGKQK9LmcJ4RN7RLUctGFEGBw2OyNy39TVlrWvYJZN11gzTv3jCtNuuMI6PJosrdaqnp9PoPn1t3jGtTiuPlaPtX9IeArAowoxnTBUedeovZZD7MGLJH+QBVEs2vo5ePoKTLnqIQf6HDAdD0XN+guVI87djCViqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.207.22.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid:Yeas3t1755740706t582t41196
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [122.233.175.250])
-X-QQ-SSF:0000000000000000000000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 10310331411603570299
-To: "'Jakub Kicinski'" <kuba@kernel.org>
-Cc: <netdev@vger.kernel.org>,
-	"'Andrew Lunn'" <andrew+netdev@lunn.ch>,
-	"'David S. Miller'" <davem@davemloft.net>,
-	"'Eric Dumazet'" <edumazet@google.com>,
-	"'Paolo Abeni'" <pabeni@redhat.com>,
-	"'Simon Horman'" <horms@kernel.org>,
-	"'Jacob Keller'" <jacob.e.keller@intel.com>,
-	"'Mengyuan Lou'" <mengyuanlou@net-swift.com>
-References: <20250812015023.12876-1-jiawenwu@trustnetic.com>	<20250812015023.12876-5-jiawenwu@trustnetic.com>	<20250815111854.170fea68@kernel.org>	<0bea01dc1175$d1394730$73abd590$@trustnetic.com> <20250820084513.587f560b@kernel.org>
-In-Reply-To: <20250820084513.587f560b@kernel.org>
-Subject: RE: [PATCH net-next v4 4/4] net: wangxun: support to use adaptive RX/TX coalescing
-Date: Thu, 21 Aug 2025 09:45:05 +0800
-Message-ID: <0c2101dc123d$38242470$a86c6d50$@trustnetic.com>
+	s=arc-20240116; t=1755740716; c=relaxed/simple;
+	bh=IvtQuPhY6mGZLQxl/B6sb8xg07akbyBEwdx+i1tv1ko=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TEzpNnV8dfsaPp3QA0p4vJa1TBzXKEovtzcEgsh+uEXy8bSo3EifK5a+So6QP/SSWbAWB2gBpkJH/oTzlao/7V8YZGstqHrieRnO+JFIZDxIjYX5hFGpYHHzE0qkARiwgxnnC8TdctKJWbNPuOoJ3CS/IctOMEtO3b/1j0w7zVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R1A6KqyQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29A69C4CEE7;
+	Thu, 21 Aug 2025 01:45:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755740715;
+	bh=IvtQuPhY6mGZLQxl/B6sb8xg07akbyBEwdx+i1tv1ko=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=R1A6KqyQTxc5zG8lkpxGHm2qZQAECUiUot8D35shYcG5PDQ3zT9mVOZ7pa98dSJ6w
+	 kM4Om5U+/Qh0BCqqyyEs6kAtKMmeU85ngueRRQGDzx88TFfR/o/Pej39dP+3OgATNA
+	 fCi4sCEE/02SR/cU7dXWyDIX5d396E15xZ0ex7fO1ZzfjJakr9AqI6qdktHNjjWSna
+	 FfF/tWCCyhFyHXz7IjF13nwZD9KRXGGfPsW+/N0ymfcZ8nuj9pHp/at9HaVpkqZ9ka
+	 4CNSkkOu/J8YTmawOwKJKurS6KY5c4VRRQgB2fLni/Ohq+EhBzjmLOoRvERO5A1vA7
+	 xVK9Gl6+DszJA==
+Date: Wed, 20 Aug 2025 18:45:14 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ andrew+netdev@lunn.ch, netdev@vger.kernel.org, Emil Tantilov
+ <emil.s.tantilov@intel.com>, david.m.ertman@intel.com,
+ tatyana.e.nikolova@intel.com, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Aleksandr Loktionov
+ <aleksandr.loktionov@intel.com>
+Subject: Re: [PATCH net v2 2/5] ice: fix possible leak in ice_plug_aux_dev()
+ error path
+Message-ID: <20250820184514.0cf9cbb5@kernel.org>
+In-Reply-To: <20250819222000.3504873-3-anthony.l.nguyen@intel.com>
+References: <20250819222000.3504873-1-anthony.l.nguyen@intel.com>
+	<20250819222000.3504873-3-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="US-ASCII"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: zh-cn
-Thread-Index: AQJSp6GMsSi4kqJepxUFy3vdl3vtHAGdM6CxAmQrRkwBFLaOdgFi17CDs0tjf7A=
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: N/EN6P+BmEafMucSaU+EidtO8KWDCUV+kDrBDtGciYrQ/rnYHpN2Nmpy
-	lpnO3modbI81oMmekgKMJQfYItFbPbDaQeog3NbavYRq6QKtqKmsGCljsRQ9Khcx+5ennce
-	tCtYPR2wCAr2eLbRCr2d+e7d7cX1/vCwIWG7ArWC9nLAFc7GsElNOq76ogAq5kMpClGqNOk
-	5F6gKbxgw/E+NWjFFN7a1x9qXb9DkhzkCl+I5GCIcJO/ZUPG9EcUMj0hvIPAS1nNc4qQn8g
-	G6h/nbCOs3LACILPg76Vq8R6IGHb7SR7EiggDy3NkrlPVJIxNTwhnTgmkN37+BfA6d5sVaI
-	cFqvh2VSxCIjYGpwhEaZbh8EKE9r8PsCWyJJIpa8b4jblQ2/ItUkVqYI3qBMPfy2dR4W39i
-	ylUF7wDn5S9tSAHh/tuPgqRWuceedj/tkhmLwHFG5HeRGaGfqty3IEShUdRaYnr0pPOTcB1
-	jhk3UICxSifkQKKC1xiVGRZm6ef8AEl8phHtSG1krjK5XHwanBrPhdPpL3R5waHswKVvONJ
-	YE6esr+XBYcvutoiXNL0nkuVMrxcVyoe7NQ7iDWzIx/a1RjJWlrKp27UT+cTxfK7FWfmNdl
-	52SFnavkntSwwRG24Ktd7aKziiGigGHyAkx9DotMgaNGjyQwbjTxXB89x4/WckUQpBS8aMu
-	khk0I5cp+qlfXcmg0z4PLbU5ClzzkOR1K7B2rMOMTrPxgpAxff/mRPMJekJExK7sc8n3wh/
-	sS0mXw18eRVeM8eeuUadNvsYikSuJfwQEV0qwY0xhXRDO5XxAVvWyo3pHpO8myS78zW1Sla
-	egApXnZb4cgkHgCDR0gArKrBlKK0FxFa74PYxYa2Lp6c9Z7AmpBy3mJyykiy2y/39PTECCn
-	hgm5W+UDxj+LcvnNZ1T7Xeba9/fCGmSsM4Z2hyEGEKsMgyYdsalIuft0t/13NUTEKRfLC26
-	ylfjrIrcwH7AO4wfZ4gZFOifYxTE0TDL89Opq+diPOZPfygPf4/Apmjrl2WffQxj0T6a7Fu
-	gTF533P9cvdrqPRqy1P0lNrdh8G2W1HGuEEc/FUaRCWvWEcWQt
-X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
-X-QQ-RECHKSPAM: 0
 
-On Wed, Aug 20, 2025 11:45 PM, Jakub Kicinski wrote:
-> On Wed, 20 Aug 2025 09:57:43 +0800 Jiawen Wu wrote:
-> > On Sat, Aug 16, 2025 2:19 AM, Jakub Kicinski wrote:
-> > > On Tue, 12 Aug 2025 09:50:23 +0800 Jiawen Wu wrote:
-> > > > @@ -878,6 +909,8 @@ static int wx_poll(struct napi_struct *napi, int budget)
-> > > >
-> > > >  	/* all work done, exit the polling mode */
-> > > >  	if (likely(napi_complete_done(napi, work_done))) {
-> > > > +		if (wx->adaptive_itr)
-> > > > +			wx_update_dim_sample(q_vector);
-> > >
-> > > this is racy, napi is considered released after napi_complete_done()
-> > > returns. So napi_disable() can succeed right after that point...
-> > >
-> > > > @@ -1611,6 +1708,8 @@ void wx_napi_disable_all(struct wx *wx)
-> > > >  	for (q_idx = 0; q_idx < wx->num_q_vectors; q_idx++) {
-> > > >  		q_vector = wx->q_vector[q_idx];
-> > > >  		napi_disable(&q_vector->napi);
-> > > > +		cancel_work_sync(&q_vector->rx.dim.work);
-> > > > +		cancel_work_sync(&q_vector->tx.dim.work);
-> > >
-> > > so you may end up with the DIM work scheduled after the device is
-> > > stopped.
-> >
-> > But the DIM work doesn't seem to be concerned about the status of napi.
-> > And even if the device is stopped, setting itr would not cause any errors.
-> >
-> > I can't fully grasp this point...
-> > Should I move cancel_work_sync() in front of napi_disable()?
-> 
-> My point is that this is possible today:
-> 
->      CPU 0                     CPU 1
-> 
->   napi_complete_done()
->                             napi_disable()
->                             cancel_work()
->   wx_update_dim_sample()
->     schedule_work()
-> 
-> You can probably use disable_work_sync() and enable_work..
-> to fix it.
+On Tue, 19 Aug 2025 15:19:56 -0700 Tony Nguyen wrote:
+>  	ret = auxiliary_device_init(adev);
+> -	if (ret) {
+> -		kfree(iadev);
+> -		return ret;
+> -	}
+> +	if (ret)
+> +		goto free_iadev;
+>  
+>  	ret = auxiliary_device_add(adev);
+> -	if (ret) {
+> -		auxiliary_device_uninit(adev);
+> -		return ret;
 
-Get it. Thanks!
+I think the code is correct as is. Once auxiliary_device_init()
+returns the device is refcounted, auxiliary_device_uninit()
+will call release, which is ice_adev_release(), which in turn
+frees iadev.
 
+> -	}
+> +	if (ret)
+> +		goto aux_dev_uninit;
+>  
+>  	mutex_lock(&pf->adev_mutex);
+>  	cdev->adev = adev;
+> @@ -339,6 +335,13 @@ int ice_plug_aux_dev(struct ice_pf *pf)
+>  	set_bit(ICE_FLAG_AUX_DEV_CREATED, pf->flags);
+>  
+>  	return 0;
+> +
+> +aux_dev_uninit:
+> +	auxiliary_device_uninit(adev);
+> +free_iadev:
+> +	kfree(iadev);
+> +
+> +	return ret;
 
