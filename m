@@ -1,202 +1,163 @@
-Return-Path: <netdev+bounces-215824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D93FBB3084A
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 23:24:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DC7BB2FF2C
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 17:51:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBFE33ACC49
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 21:21:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3C06E7AE989
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 15:49:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 956912C026B;
-	Thu, 21 Aug 2025 21:21:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A1A62D0628;
+	Thu, 21 Aug 2025 15:48:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=landley.net header.i=@landley.net header.b="E7Ze60CN"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="BsKIjGVV"
 X-Original-To: netdev@vger.kernel.org
-Received: from bird.elm.relay.mailchannels.net (bird.elm.relay.mailchannels.net [23.83.212.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f225.google.com (mail-il1-f225.google.com [209.85.166.225])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BFE52BD001;
-	Thu, 21 Aug 2025 21:21:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.212.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755811316; cv=pass; b=aaORIOpLJVEA+8B8f+l1Eguax2mXDzlPiHWtbIqIX7uUr8BD0wIaolgJPN3EhfigLKe2vQU5NIBVaRzSHzXITieA1NG6a8y2A41NlBTn/tqo2tD54EW4KsErJLhxdMIauW85TWKf1GVfdohWw8W1YKONeLihrfgcynLQp8aIH0U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755811316; c=relaxed/simple;
-	bh=gHc9N+sPNmbFdoVvlcXaXBnEUwSsL2C2pPfbjITtm2c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T24ZERiKtkukb2gip27u04p3LUQ2LzdbRX0C7Q7gHbl6my40KWs8SMPfIl1Qe3ffqIclOMSQzuc2POlhxgQ5Zybfc171Mpr/qb0aUFeRICrvAFE5BlSU/y+k/ewng1EPNnhJXrQ48gD2LoLe0isoUAuS8XhPYYpoiFODy4IS5BA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=landley.net; spf=pass smtp.mailfrom=landley.net; dkim=pass (2048-bit key) header.d=landley.net header.i=@landley.net header.b=E7Ze60CN; arc=pass smtp.client-ip=23.83.212.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=landley.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=landley.net
-X-Sender-Id: dreamhost|x-authsender|rob@landley.net
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id 67DB02C60D5;
-	Thu, 21 Aug 2025 21:02:47 +0000 (UTC)
-Received: from pdx1-sub0-mail-a254.dreamhost.com (trex-blue-3.trex.outbound.svc.cluster.local [100.96.37.67])
-	(Authenticated sender: dreamhost)
-	by relay.mailchannels.net (Postfix) with ESMTPA id BB8372C6073;
-	Thu, 21 Aug 2025 21:02:44 +0000 (UTC)
-ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1755810165; a=rsa-sha256;
-	cv=none;
-	b=VA395R/iBN/iOB+2AT3Sx/h1V57sN4gvPNEF/dlZq+Ge5opPfCJ/TpPnVatyDp0CHNJxEv
-	tfDOgcPj/9I3SSVqRyD5TEldt/tqv/xweW+60BgBStohBbFv8e2ynhrglN2nyyxh25jZQA
-	YORnb92Kh16oV1zpUf9tESKgdmeBarvhIeE7vF0+64eZYgtrrOlVucRk0kDNPxv7OQ5qY/
-	E2N1+scnJbeXWvTnXGmf8uS0oFkgbmIM+zJq5T0ul1As2+W1OWWVvNCUD+YIrVnck8t/2A
-	ji//1hdJ9dZfNDYeeIgIAVsb/CjjUaJAfb6JHpd7XAcTnKIglfss8ZWkvQuNWg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-	s=arc-2022; t=1755810165;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:dkim-signature;
-	bh=PiRdnVkb3Mdck8rf90p7+DnOfB9A+JduUXfai72Z7+4=;
-	b=fvPcQG0GmaTFX0s1SvnPmsgzy7jrpdnnof5z+FJUBRcZNz6Yrb7EjpplCBztg5XKo8l85X
-	vHXX5ehr9qCvBYjGuVtmUvNX7211fZM0R9Xql2poMvPoFXHnoBmEFYsyNj4CC5rM9SmwHO
-	EAPh/w93JrVjFX3ybeA5SbFS+CvE6mYStAXAMcPUXA2p3YmsqIRTR+lWEtDtz6xxqipg7a
-	wI/lpLAQAIurkhZwCy7PSEzAmul2gk48lwVbObDJY/IKmMwgd9RSptaiYI45tUTfv3K7ml
-	HcRlx8kRl3opZw0WLx0xmQEJVlTb7vOavtegGw4yurw/8Zt+PJG4G0s6aM2eNg==
-ARC-Authentication-Results: i=1;
-	rspamd-b597879cf-ngsbq;
-	auth=pass smtp.auth=dreamhost smtp.mailfrom=rob@landley.net
-X-Sender-Id: dreamhost|x-authsender|rob@landley.net
-X-MC-Relay: Neutral
-X-MailChannels-SenderId: dreamhost|x-authsender|rob@landley.net
-X-MailChannels-Auth-Id: dreamhost
-X-Macabre-Bubble: 2f8dd21033f8e097_1755810167283_2720825162
-X-MC-Loop-Signature: 1755810167283:381200934
-X-MC-Ingress-Time: 1755810167283
-Received: from pdx1-sub0-mail-a254.dreamhost.com (pop.dreamhost.com
- [64.90.62.162])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-	by 100.96.37.67 (trex/7.1.3);
-	Thu, 21 Aug 2025 21:02:47 +0000
-Received: from [IPV6:2607:fb90:faae:51e1:d9d4:2e42:ae75:9827] (unknown [172.58.14.113])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: rob@landley.net)
-	by pdx1-sub0-mail-a254.dreamhost.com (Postfix) with ESMTPSA id 4c7G431Sm7zDF;
-	Thu, 21 Aug 2025 14:02:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=landley.net;
-	s=dreamhost; t=1755810164;
-	bh=PiRdnVkb3Mdck8rf90p7+DnOfB9A+JduUXfai72Z7+4=;
-	h=Date:Subject:To:Cc:From:Content-Type:Content-Transfer-Encoding;
-	b=E7Ze60CNKAiVA+WD8T4gncR5kdArdw1idFuny3yPyKtIHpxERaG5Sb3tizBAEbBL/
-	 1rZpQo1GhUTePym7uXRlMqKbqQScRPDFlva0DiRf+aR0LSjS/M+i/0OSjzvlYfTtCd
-	 IgsnjyNyyunyCtWVkBI/altwWbggCNtHJGZ7XJ3zZhXH203GZsTE7otLwmIRNL/uUV
-	 Fjdx1AxvsaHevwhNKe1sIfhj+tUt6JSudtond1NWpomo1JJ7C5lGodn70E5f4LSu22
-	 96C1BYubVxQ4CfoUOIKdH3ZsHxphuqfLytr7+LmMt956XvMF7DNvFXe8gaUzBPpzRP
-	 pM+ZgqBhRFNkw==
-Message-ID: <4df745a6-2997-4eee-87b1-0c77ff46cfdd@landley.net>
-Date: Thu, 21 Aug 2025 16:02:41 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92EA827702B
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 15:48:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.225
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755791319; cv=none; b=ChV2iSZHKVxRHI1Y8u5MV4GF0PLdcsY8q436X5/wa90HgOYfr4J0IXaAcHaJiKcYumvJ+kZomd3FaBkV5AiNtkPyfOd5uWzr6iU94NZbcWKmYou70mQeqSAqLAUXMbcX5vHBzP8h7kt7cHyhvl4Td5mN08BIp6WmDYeKm/KCdB4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755791319; c=relaxed/simple;
+	bh=QxMezdxGdBtB5eRD0pROjljUigKSdcuW8FalgQx9w8s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ucyCpnQ2MVdn46puKDGUNq8LH3RjC3jkLtvmVme8m/UXgnisOIgEQpxZPK21bCEpCP8yRQXLhDPteb04aoxRAuKxyxtd7kzaIBS9kHSWdn/3fWAakm6GlUU07L6l77eKmEPjQWSmwdhH+ifgIx08AMSLwH/aVWWdm3HiujH6qkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=BsKIjGVV; arc=none smtp.client-ip=209.85.166.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-il1-f225.google.com with SMTP id e9e14a558f8ab-3e57003ee3fso5024195ab.2
+        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 08:48:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755791315; x=1756396115;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:dkim-signature:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TnMi0sjBhZE4uuElmYuknC/E7+AMHFdyHEwqPSdU9NI=;
+        b=OeLYXtgkJAVC5Nj+MCkKV1A3+wtDVSTSBZQeInoyyH4oqJ0hGa1Fhclm6wr8s6UyzU
+         /40oL3nuvHGSqyf6KFhKdR7aYJ7KbGagHyRHFTxnrZqsY1W6RjN4gI3xnDWG+3acdrYM
+         239ysV8acFRTwlPzyfOJYp9JzONSsG1nH5zjdlWog6L5p4x4KoNaT0yM3+KF6QcGlmoD
+         /0cchH8omIEtqVrwQnw39kXa71Q7Tx7bGmPjyVv6Mk7kxE4z26Q1woM97rF7Eq0b62W8
+         IBBMKHZx3SWIYMlQklJou61+voqsc7rWrZJrDp8YlIGfOpGOqUYeNH9WIh7oIrqX3l2z
+         A5SQ==
+X-Gm-Message-State: AOJu0YzjR+JPm5iKZJ2pn48XittVyYn036oHMekN5ssDEFGaDSc5a/JG
+	o1G4QsMw6tneIbHnf+ZNuBDetjNi4stQ4XyzQftG6HjX5D3UOTWeYubwjYpK7WUYw6Vj2tQ252A
+	vUK5fvVpoguZZr2Voe6ExedVx1S2fkCqAyEeMQvSRlK2q7/7F74zicQmWNjwtuQyzOykScT1W+F
+	8fcXaIMZrwGc7C04Clj9zn++CF9E2f3CBCRmVIo9QivY5b/s4WNCPECd5hgPrkGp0whlgDvi5Zf
+	952lI1Ps7CY/y8IyYoZ
+X-Gm-Gg: ASbGncte5Pya5DvUvV+2igTYYGkLOYEzyx9Fb0/CWA+Zbk49EtOSU0oO34sg5r0WaV7
+	eNd+TDX0HLnbtsd0LYMtVQI4sviwIEzEAygpPZZkTmvUPTHQPbtIMbZtaIrl5AmMljFG/JgISe0
+	cpIjAYGIOogLI3rakLoKVBjza0st9b3HGMPeD4fgQOy3Q3f8mN79WtFl57l5xSOzxFgVXgaNTuW
+	1IiMp1WWSxajuZfPHtPrrbtiT1fdH92fvZWNGxeIAJ5ztnsThXo3aRMrFddkqzXByw312WdV8kY
+	O+yyQWjEKlpamH3E7O7rOHHDqpQGAsPOW/a9JEv1qhESmR16xi29Yy/V488sRWm9P6S8KGxioqm
+	o57ms4WyVOzHsmtkn9XJl7IsASabjhhLvVSIFpNzNGoKUFg2p433OjpIcMVXNCXE0uKrxngah5K
+	wT9fyVBQ==
+X-Google-Smtp-Source: AGHT+IG8pS56rq4KYwIUbQE4Zdh+YLEwBmRjVx8pS7ZgiUdnhJD8pCR/079fQNOXp6PtrlDl5MK8+cvIcvAb
+X-Received: by 2002:a05:6e02:1aa9:b0:3e5:5937:e54d with SMTP id e9e14a558f8ab-3e6d747d8ccmr49023155ab.15.1755791315494;
+        Thu, 21 Aug 2025 08:48:35 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-13.dlp.protect.broadcom.com. [144.49.247.13])
+        by smtp-relay.gmail.com with ESMTPS id e9e14a558f8ab-3e67efe3294sm3171505ab.22.2025.08.21.08.48.35
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 21 Aug 2025 08:48:35 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-323267915ebso2478053a91.1
+        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 08:48:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1755791314; x=1756396114; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=TnMi0sjBhZE4uuElmYuknC/E7+AMHFdyHEwqPSdU9NI=;
+        b=BsKIjGVVQ8VCgZgVIvQ4xVrtirKQTzllBPLn/+HpA8xkaCM0mgfJtYuq/TGyib5hpn
+         ir+SueLMXI6UQboU/EnC5Wle0merdyM+zV0KZBEw5kGKHMgX1biRVPzYriZoc2mOOAN0
+         KUEEVBIT7VZtxFVU4Qw1k/M3FNRGWpOXjGuEY=
+X-Received: by 2002:a17:90a:ec84:b0:31e:f3b7:49d2 with SMTP id 98e67ed59e1d1-32515d21177mr84868a91.0.1755791314050;
+        Thu, 21 Aug 2025 08:48:34 -0700 (PDT)
+X-Received: by 2002:a17:90a:ec84:b0:31e:f3b7:49d2 with SMTP id 98e67ed59e1d1-32515d21177mr84839a91.0.1755791313505;
+        Thu, 21 Aug 2025 08:48:33 -0700 (PDT)
+Received: from hyd-csg-thor2-h1-server2.dhcp.broadcom.net ([192.19.203.250])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b47640b2d37sm5046894a12.46.2025.08.21.08.48.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Aug 2025 08:48:32 -0700 (PDT)
+From: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	vsrama-krishna.nemani@broadcom.com,
+	Bhargava Marreddy <bhargava.marreddy@broadcom.com>
+Subject: [v3, net-next 0/9] Add more functionality to BNGE 
+Date: Thu, 21 Aug 2025 21:15:08 +0000
+Message-ID: <20250821211517.16578-1-bhargava.marreddy@broadcom.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] dt-bindings: net: Add support for J-Core EMAC
-To: Rob Herring <robh@kernel.org>, "D. Jeff Dionne" <jeff@coresemi.io>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>,
- Geert Uytterhoeven <geert@linux-m68k.org>,
- Artur Rojek <contact@artur-rojek.eu>,
- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250815194806.1202589-3-contact@artur-rojek.eu>
- <aa6bdc05-81b0-49a2-9d0d-8302fa66bf35@kernel.org>
- <cab483ef08e15d999f83e0fbabdc4fdf@artur-rojek.eu>
- <CAMuHMdVGv4UHoD0vbe3xrx8Q9thwrtEaKd6X+WaJgJHF_HXSaQ@mail.gmail.com>
- <26699eb1-26e8-4676-a7bc-623a1f770149@kernel.org>
- <295AB115-C189-430E-B361-4A892D7528C9@coresemi.io>
- <bc96aab8-fbb4-4869-a40a-d655e01bb5c7@kernel.org>
- <CAMuHMdW0NZHCX1V01N4oay-yKuOf+RR5YV3kjNFiM6X6aVAvdw@mail.gmail.com>
- <0784109c-bb3e-4c4e-a516-d9e11685f9fb@kernel.org>
- <CB2BF943-8629-4D01-8E52-EEC578A371B5@coresemi.io>
- <20250820213959.GA1242641-robh@kernel.org>
-Content-Language: en-US
-From: Rob Landley <rob@landley.net>
-In-Reply-To: <20250820213959.GA1242641-robh@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-On 8/20/25 16:39, Rob Herring wrote:
-> On Mon, Aug 18, 2025 at 10:55:51PM +0900, D. Jeff Dionne wrote:
->> J-Core SoCs are assembled with an SoC generator tool from standard
->> components.  An SoC has a ROM from soc_gen with a Device Tree binary
->> included.  Therefore, J-Core SoC devices are designed to ‘just work’
->> with linux, but this means the DT entires are generic, slightly
->> different than standard device tree practice.
-> 
-> Yes. Though doesn't the SoC generator evolve/change? New features in the
-> IP blocks, bug fixes, etc. Soft IP for FPGAs is similar I think.
+Hi,
 
-The j-core guys almost never change the hardware interface on a deployed 
-I/O device: when the existing interface is too limiting they do a new 
-design with a different interface. (You'll notice in the github soc_top, 
-components/ has ddr and ddr2, and components/misc has aic and aic2 from 
-when the interrupt controller changed, for example. Those aren't version 
-numbers, those are rewrites.)
+This patch series adds the infrastructure to make the netdevice
+functional. It allocates data structures for core resources,
+followed by their initialisation and registration with the firmware.
+The core resources include the RX, TX, AGG, CMPL, and NQ rings,
+as well as the VNIC. RX/TX functionality will be introduced in the
+next patch series to keep this one at a reviewable size.
 
-Outputting a different constellation of devices/busses from the SOC 
-generator is more akin to running "make menuconfig". There isn't an 
-ancestor/descendant relationship there, it's a generator working from a 
-configuration to instantiate and connect existing components.
+Changes from:
 
-> There
-> we typically just require the versioning schema be documented and
-> correlate to the IP versions (vs. made up v1, v2, v3).
+v2->v3
+Addressed a comment from Jakub Kicinski: 
+    - Changed uses of atomic_t to refcount_t
 
-There hasn't been a new version of the 100baseT specification recently.
+v1->v2
 
-The same chunk of bitstream is still driving the same PHY chips on the 
-boards (or compatible, long out of patent) via the same small parallel 
-bus at 50mhz. The engineers are no more interested in changing the 
-kernel side interface than they are in changing the PHY side interface.
+Addressed warnings and errors in the patch series.
 
-> This is all pretty niche I think, so I'm not too concerned about what 
-> you do here.
+Thanks,
 
-Eh, not that niche. Just hardware development culture rather than 
-software development culture. What's the model number on your microwave? 
-If you need to replace it, how many versions will you advance?
+Bhargava Marreddy (9):
+  bng_en: Add initial support for RX and TX rings
+  bng_en: Add initial support for CP and NQ rings
+  bng_en: Introduce VNIC
+  bng_en: Initialise core resources
+  bng_en: Allocate packet buffers
+  bng_en: Allocate stat contexts
+  bng_en: Register rings with the firmware
+  bng_en: Register default VNIC
+  bng_en: Configure default VNIC
 
-Chip model numbers tend to be assigned by marketing well after the fact, 
-and don't necessarily have a linear relationship even for the big boys 
-making central components other people build entire systems around:
+ drivers/net/ethernet/broadcom/Kconfig         |    1 +
+ drivers/net/ethernet/broadcom/bnge/bnge.h     |   27 +
+ .../net/ethernet/broadcom/bnge/bnge_core.c    |   16 +
+ drivers/net/ethernet/broadcom/bnge/bnge_db.h  |   34 +
+ .../ethernet/broadcom/bnge/bnge_hwrm_lib.c    |  485 ++++
+ .../ethernet/broadcom/bnge/bnge_hwrm_lib.h    |   31 +
+ .../net/ethernet/broadcom/bnge/bnge_netdev.c  | 2186 +++++++++++++++++
+ .../net/ethernet/broadcom/bnge/bnge_netdev.h  |  253 +-
+ .../net/ethernet/broadcom/bnge/bnge_resc.c    |    4 +-
+ .../net/ethernet/broadcom/bnge/bnge_resc.h    |    1 +
+ .../net/ethernet/broadcom/bnge/bnge_rmem.c    |   58 +
+ .../net/ethernet/broadcom/bnge/bnge_rmem.h    |   14 +
+ 12 files changed, 3106 insertions(+), 4 deletions(-)
+ create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_db.h
 
-https://en.wikipedia.org/wiki/List_of_Qualcomm_Snapdragon_systems_on_chips
+-- 
+2.47.3
 
-The Pentium II's development name was Kalmath, Pentium III was Katmai, 
-then Pentium 4 was a space heater and everybody backed up and switched 
-to "Pentium M" (which was MEANT to be a mobile chip but was instead a 
-"not stupid" chip) and then they did "Core"... And then "Core 2" and 
-"Core Duo" were different things and "Core 2 Duo" was both of those 
-things, and then they had i3 and i5 and i7 but they all came out at the 
-same time...
-
-Jeep produced a "Cherokee" for 50 years and expected the user to step 
-from a 1973 model to a 2023 model and be able to drive it the same 
-(modulo major flag day changes like stick shift or leaded gasoline) with 
-zero learning curve. Hardware developers of today go "here's an sd card, 
-it goes click-click into your device and it just works, the only numbers 
-you really need to know are price and capacity" (modulo microsd, but 
-they still provide adapter sleds).
-
-Software developers think that "DOS 2.0" and "DOS 3.0" or "Windows 3.0" 
-and "Windows 3.1" being profoundly different and largely incompatible is 
-just normal, and track that stuff minutely.
-
-Different culture.
-
-Rob
 
