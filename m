@@ -1,137 +1,118 @@
-Return-Path: <netdev+bounces-215643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83464B2FC19
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 16:15:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE5EEB2FC3B
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 16:20:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5EA057AC661
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:14:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EA81A006D1
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:16:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D19412DF716;
-	Thu, 21 Aug 2025 14:14:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E85C2BD5B3;
+	Thu, 21 Aug 2025 14:15:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g/VE7ZSJ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="U2+oXM9f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39D542F619D
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 14:14:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52E523D7ED;
+	Thu, 21 Aug 2025 14:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755785682; cv=none; b=Rz0Ot5yq0Axk7wN7mnQXbgFqZjWc1o/QdsT9xo4DaKl4fE8MZ0u6L2kUlYsiRKnTKxjh9ma+GfFLFRQ2s8HyobMCzLjOSJw/abop1slZ8ESqzP9yebMuYZPBjTM6hdWOcjumbYvse5iVgWuv+VoUntcTo6q6da47/7gI4O1jS4w=
+	t=1755785755; cv=none; b=d62DQBim+BrrG/XqCZczPgKEJyuIl8YcvGYdP2RIyoG1pIpzf7s7S8jiInjkzw4qSMh4zBa73OUNJ9HRAG+6i+BRecfzRyIwLOBIRLuiSWZMao0WYpcM77hX1q4saW8ak6pPmePjZ4Z17XD90IZpbLKkRQOGt75eSou1bgUbrR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755785682; c=relaxed/simple;
-	bh=wklH5RSkZi+lkKayoTSAl+6FUN6m8CIpX7+2bBp2jdQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rG8yigP93qeHT0AK2Nx959oaDqvbc0/csg99q1kUf8xiG51M9QfX5qkKvZ+gCwizSmHfdBoh93GKAGgCqoUUeLYp7XTF4Lp0OWDWd0EkNnECe/pBG1Yae7AiJ55rEPDww/zoVE3Fq+fo6qolvafcFb+j5scFlCz5HPUH98felSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g/VE7ZSJ; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7e87031323aso117745785a.0
-        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 07:14:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755785680; x=1756390480; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wklH5RSkZi+lkKayoTSAl+6FUN6m8CIpX7+2bBp2jdQ=;
-        b=g/VE7ZSJ3jyS8eUn2uu9Pjn5QO3OG3EE5MDqU4RecNyBHzHcp+6pB08ZLvPsDiVq5M
-         hRoI+C7/cwbMK6rJ17aZxP/47Rv0+HsQar5iYhU3JC0TMjvPdORe6O2Q03215tIzqsbv
-         N/+Za3VIw/743ndF7M8g/jHXX6vebQP97eiF0+8WaK6oaQKVp4tpWKi+wuYwf8Ju19t6
-         tgV8y85pWdpjgaVINDIVnNO1a5H18DITsf35Yiu8102FHWXDgZ2h1EA1z56t+KkT2Tu6
-         yBl/kZLG16XuwKp9eAEGJTTMYZyiIcVJJ8E5s18vurCVPwHzmqgtaHKhL9CscFjApt4v
-         IO1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755785680; x=1756390480;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wklH5RSkZi+lkKayoTSAl+6FUN6m8CIpX7+2bBp2jdQ=;
-        b=weF5jaIoKYRRAQKd7zLuEmHO2FkNNnALrcUMDq2k7NoK3NbktDOlKJ2tOsfPUbVdWz
-         fkt6zMeoIlEB6RnRp2Qmlr8oq8PduDPpnrL84SbOjanEr6z3KIAHT1XWrbzoVnHSWg43
-         kMSQrRJLKXk0UjN4UBkxDGr9o/JFDJeuqBw0t/JYFBETURPOGMzB8I6M1IZpU0RKwCna
-         oHp8q3kStXr7j9pvG2Vx3HIR/OhMnxxHenSDg58xXsejtrJC1hJFhyovFCSw2IdhtbbE
-         Kd7xTE3HsaIdvt/E6DOeNDAA9aBZPDRar4fvYEJtCMojXhzQqw4D3kiIfpKKDNOE71si
-         +9zA==
-X-Forwarded-Encrypted: i=1; AJvYcCXi2Wsol6NAGXtkBvTIjawBN9tgaWbMzvpuu/KtgDT1cQMXox1Sxa7jU0GhCUAti6UaJqHSzMw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbDPPARThJyMwqjPJ6rKvRJTlt2mO8R4wfApweXORNvp95ykeW
-	GAfKpKMprkQ91rWNFrKdeTz00Kayg+nB8JODOY7Z/+Gh7+x0h9wHfLAAlI7J9VSa5TFbH6TuxP3
-	PbsoXq0ggZ7uE7egSa4VIGS7SwRwEC82CMViTXl/g
-X-Gm-Gg: ASbGnctlOiJ3LnNWu1oNAO2QAFPWTGKs9kb2X8JZSr52Tpq93Qf6omNiI+pTnaB6jZX
-	CdYYY2pMDugYMj7nsluVH4byE0yzal3PjcyYoIjUGWLQkB2BGIW6bcWhb90xnm6Lr0mAECH1qrP
-	TKX6Ql0j5J9x8xEUcPnMPNF6UL0NHv+uaiWp8AvvbJiOKpFTvBwo3r6eWG4uTCy+EM2Or2mMHvz
-	F3fYKDSYbd7nzU=
-X-Google-Smtp-Source: AGHT+IFBQYEhzxEfUJuh7/Ufly+YtIuPzk9NaiFpHkLdtKRYJwwGcfimS1d9E4ez3jq7Lj0aNP6KUsVHvEkQMQ0vo4A=
-X-Received: by 2002:ad4:5c64:0:b0:707:4c0c:5316 with SMTP id
- 6a1803df08f44-70d89019cdfmr25864846d6.46.1755785679429; Thu, 21 Aug 2025
- 07:14:39 -0700 (PDT)
+	s=arc-20240116; t=1755785755; c=relaxed/simple;
+	bh=aGTiUaE6wgWfeBsp7D9zWiVk9Ot/eVVN9KU/GJLEIwc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HR6DlwJKMw67owQeYAd6yy3tlvRs/QGY7qxTaXINRHSAZCxeGxTDBjm3jigFqFvkypZpgQDenp56Svt3XepnvDXCpZKyfxDNCLezWKWq1BnZaQI9xaxnsee3tsR8XESlK0PzPoDeJpd4zcktDJyRlSK8KQo93t5UXtHD90qT+50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=U2+oXM9f; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=xU+9vDUiNjllQZALNS0DJDtz8AB80KXzT3XORAL0N2g=; b=U2+oXM9f0IyReIgrGiTjSkyrGy
+	HODDwMdacAre75sfqY4NhMzFpvBKzTOctCAnAze1Q+z8ExOJRZM9TJWeb0puDNEd2kfs21RRsvLp+
+	6eLoCMTQ12VeXJYNWW56EdEBecqyGYGW9ZLzwe4gsLt3UmVr5fDTN8VRtP+zYblb0QbA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1up64i-005SZd-CQ; Thu, 21 Aug 2025 16:15:32 +0200
+Date: Thu, 21 Aug 2025 16:15:32 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Hauke Mehrtens <hauke@hauke-m.de>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Andreas Schirm <andreas.schirm@siemens.com>,
+	Lukas Stockmann <lukas.stockmann@siemens.com>,
+	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Peter Christen <peter.christen@siemens.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
+	Juraj Povazanec <jpovazanec@maxlinear.com>,
+	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	"Livia M. Rosu" <lrosu@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net-next v3 7/8] net: dsa: lantiq_gswip: store switch API
+ version in priv
+Message-ID: <8eb20dee-162f-47ea-8596-be71a3aa653b@lunn.ch>
+References: <cover.1755654392.git.daniel@makrotopia.org>
+ <88e9ca073e31cdd54ef093053731b32947e8bc67.1755654392.git.daniel@makrotopia.org>
+ <aKZg3TviLUDgKgLz@pidgin.makrotopia.org>
+ <58d31b56-8145-419e-b7be-1fd48cfeda88@lunn.ch>
+ <aKb59jMfDIJIK0KP@pidgin.makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250818195934.757936-1-edumazet@google.com> <DM4PR11MB6502871B0C99047AC76827BCD433A@DM4PR11MB6502.namprd11.prod.outlook.com>
-In-Reply-To: <DM4PR11MB6502871B0C99047AC76827BCD433A@DM4PR11MB6502.namprd11.prod.outlook.com>
-From: Brian Vazquez <brianvv@google.com>
-Date: Thu, 21 Aug 2025 10:14:28 -0400
-X-Gm-Features: Ac12FXy-PPKz-nGP1IhFwqpoEnXZCUiiP1Bd58UDI3ZNaihCVGmplacFmLavGOg
-Message-ID: <CAMzD94SjV35aPV5tUxKNEfpAk36yjZMQJz63bSnMeshHc8BSBQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] idpf: do not linearize big TSO packets
-To: "Hay, Joshua A" <joshua.a.hay@intel.com>
-Cc: Eric Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "eric.dumazet@gmail.com" <eric.dumazet@gmail.com>, 
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, 
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "Keller, Jacob E" <jacob.e.keller@intel.com>, 
-	"Chittim, Madhu" <madhu.chittim@intel.com>, 
-	"Linga, Pavan Kumar" <pavan.kumar.linga@intel.com>, Willem de Bruijn <willemb@google.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aKb59jMfDIJIK0KP@pidgin.makrotopia.org>
 
-Tested-by: Brian Vazquez <brianvv@google.com>
+> The (anyway public) datasheets I have access to don't describe the VERSION
+> register at all. In the existing precompiler macros, however, you can see
+> that most-significant and least-significant byte are swapped. REV is
+> more significant than MOD:
+> 
+> #define GSWIP_VERSION                   0x013
+> #define  GSWIP_VERSION_REV_SHIFT        0
+> #define  GSWIP_VERSION_REV_MASK         GENMASK(7, 0)
+> #define  GSWIP_VERSION_MOD_SHIFT        8
+> #define  GSWIP_VERSION_MOD_MASK         GENMASK(15, 8)
+> #define   GSWIP_VERSION_2_0             0x100
+> #define   GSWIP_VERSION_2_1             0x021
+> #define   GSWIP_VERSION_2_2             0x122
+> #define   GSWIP_VERSION_2_2_ETC         0x022
+> 
+> Now I'd like to add
+> #define   GSWIP_VERSION_2_3             0x023
+> 
+> and then have a simple way to make features available starting from a
+> GSWIP_VERSION. Now in order for GSWIP_VERSION_2_3 to be greater than
+> GSWIP_VERSION_2_2, and GSWIP_VERSION_2_1 to be greater than
+> GSWIP_VERSION_2_0, the bytes need to be swapped.
+> 
+> I don't think the vendor even considered any specific order of the two
+> bytes but just defines them as separate 8-bit fields, considering it a
+> 16-bit unsigned integer is my interpretation which came from the need for
+> comparability.
 
+It would be good to put some of this into the commit message and
+comments in the code. That the hardware has the 'major/minor' version
+bytes in the wrong order preventing numerical comparisons. To make it
+obvious, rather than use swap16(), maybe actually extract the major
+and minor, and then construct the version in the form you want?
 
-On Wed, Aug 20, 2025 at 12:27=E2=80=AFAM Hay, Joshua A <joshua.a.hay@intel.=
-com> wrote:
->
-> > From: Eric Dumazet <edumazet@google.com>
-> >
-> > idpf has a limit on number of scatter-gather frags
-> > that can be used per segment.
-> >
-> > Currently, idpf_tx_start() checks if the limit is hit
-> > and forces a linearization of the whole packet.
-> >
-> > This requires high order allocations that can fail
-> > under memory pressure. A full size BIG-TCP packet
-> > would require order-7 alocation on x86_64 :/
-> >
-> > We can move the check earlier from idpf_features_check()
-> > for TSO packets, to force GSO in this case, removing the
-> > cost of a big copy.
-> >
-> > This means that a linearization will eventually happen
-> > with sizes smaller than one MSS.
-> >
-> > __idpf_chk_linearize() is renamed to idpf_chk_tso_segment()
-> > and moved to idpf_lib.c
-> >
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
-> > Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> > Cc: Jacob Keller <jacob.e.keller@intel.com>
-> > Cc: Madhu Chittim <madhu.chittim@intel.com>
-> > Cc: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-> > Cc: Joshua Hay <joshua.a.hay@intel.com>
-> > Cc: Brian Vazquez <brianvv@google.com>
-> > Cc: Willem de Bruijn <willemb@google.com>
-> > Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-> > ---
-> Reviewed-by: Joshua Hay <joshua.a.hay@intel.com>
+    Andrew
 
