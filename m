@@ -1,200 +1,188 @@
-Return-Path: <netdev+bounces-215826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F746B3089A
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 23:46:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44698B308A6
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 23:49:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E89777B375C
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 21:44:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1BED9624409
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 21:49:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C372EACEF;
-	Thu, 21 Aug 2025 21:45:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B1392E8DFF;
+	Thu, 21 Aug 2025 21:49:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DIlR16bx"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vOrqbFbp"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D14B2E9EAC
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 21:45:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FA182580CF
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 21:49:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755812729; cv=none; b=OrVwUsQzBfHF1uCj3v+EAuOOy1wGyinx2uekJISExHqeRU+cGnthCz317ZaQc9VAwsOObqSPevVzNzSIiTs6FS96RS737mZ1XE5hgSXc9W5uPCOXGRQT4EwvDVIj5Eot27BrO0LmvVzM3cq9CcaBMoOZfNnNitIJBUq0yuMOHUc=
+	t=1755812961; cv=none; b=ntauqHRquYhVzjy79r4m0+JoM/7U2IkXexrXqS8ssne/u6PWLVO1w26JV6q+zZI7SjIK0py7lLdmkbKxiZUfW2+Qj2qHMrSfLBuUxC9KVNoVGZXxOUfgSptepuWCTs5saFzI60j4ZPbMqp0CNFazhpyvJavcytJ4zB31yD3/ZlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755812729; c=relaxed/simple;
-	bh=fUaBHZHAJdUQk9eKwml7s0QHGPPoV73wuBZAYASLp2c=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Ku48+WPuR3z0QHMif2iPZQGzP7Buy7fU4fU3NLxC+Z0QZeGFAFK9obujnHVz0SomO8zOcbKyJ7k0bWzDbnlSCS8XzwGLd0wQfcdpzmSSHfdc4iU3jjcIoQq6grTEtwMgkv3N0xPdLPSVSNOISs9lnkbXbaORvH31yDVCTKDqxlY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DIlR16bx; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755812726;
+	s=arc-20240116; t=1755812961; c=relaxed/simple;
+	bh=HqM5XDu0iiew9jRxvCXQQtl9xZD9ZCsgol4tJ6pbScY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=K3d9NwxGs2yuG0y1ucfDDG0zMbUblqbBzRMmFcipe9NjSUxBxv3FU+mlqqn7rVfByXtkjPGHn9uQktF3OuYlkuAicsIx5KOR41X5gcKC2CrSkrxgBQ2lfikuVMWmiZEKWj4EJaji361rWiqncI1qqZuEEmgeGReghNVFNuHSyPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vOrqbFbp; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <a3d437ce-c91d-47c6-9590-88b716fb6690@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1755812947;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=xgU+Z5k4KPqEraeKDWCOzJcpc8HGVmW4oZxLQRmx6Ws=;
-	b=DIlR16bxGJfN5nSLXlliejd62VDQBzZhUVoge40kookE3FZTApi/N9MKn1PBNg+m2apa5I
-	5SW73TpcFvvBJYuBOlEmUhx2Se8Uo8fgFJTBaeD2qaxj+UozuC1sJSGVdpblz4uyvOBaaG
-	CEaKDCiYjzyouWe+ckHWMbpmmeK8QyA=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-55-G8UYAXWTN_mbZaKS09fZyw-1; Thu, 21 Aug 2025 17:45:23 -0400
-X-MC-Unique: G8UYAXWTN_mbZaKS09fZyw-1
-X-Mimecast-MFC-AGG-ID: G8UYAXWTN_mbZaKS09fZyw_1755812722
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3b9e743736dso814623f8f.3
-        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 14:45:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755812722; x=1756417522;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xgU+Z5k4KPqEraeKDWCOzJcpc8HGVmW4oZxLQRmx6Ws=;
-        b=qHH2c+4yq1xkYy4RwPO11qWZZSSnvjLx1Lxu12L9klknluX10+GoOSx9+PpgMUjw9u
-         /2SXNqjRpcpRl3PfkR6D6z0Ib3Iq7gNEHnaV/WO+1W/qwAmxE3VegaV+3sxbDFbpKlZe
-         BGCgHKLbl0Ge5Z3YgG6aP7P1BzX8tTG/W2WlNDyBie6p/d47oHU1pyea15w+d4sdCJdI
-         BKM6ZdqlAba7+zuPt7+HaJi69i0WTU4BbUzwLCl2mG1kPe1APTfVqRaHF8Flch21a/kM
-         326ix1NVpQUMSAyOEP6wkrqVOzwLbSiZv2b4ObXLomHz1ZF74Hsi1IFU8XCrRVwDJxcu
-         ePxA==
-X-Forwarded-Encrypted: i=1; AJvYcCViorHPDkL7Yh520Ae0kb8z7bBxsBm3v3mArUpKkCU3mv33sTqXrFTa90Cbwrtuzu3twxlu/AU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8h4gppsH/3qY05EEjVJuIZjidDkfjOdDFGaECfTGrqKtxdYJb
-	VegcL3TFNGcrmvmIIn6yske9OIvHz209W+HCsHs4+sKyVL+5ky7uvHMbH+ER11EDw+XDu3B42UT
-	D7PUrfhvziOjmHjlLeOTR1ekBB8AtznxUGDiX+hVyLA3AfFP4O0FAqHHg+Q==
-X-Gm-Gg: ASbGnctKHrqVGmLDHpDPRXzvmx8hiiDVjZVWZqnowcWNZdJcX8AXXb2VXNSkKm/7W5o
-	Tm0mjvRT3pQczgjOGo26pH4ZmnYiv4/dJ2KNhFugNE53K+38iv8zbboU1Coy14W8WLA0E25G+Iz
-	5BIHoYc8alconpXGcN368mPCDypu5CccRmGydjceS5zX/LmZH/MKz/FPsl09j5Iy3b/SP7kUi7y
-	nUHlFmEiuQA4gn1TpIGENjA4F4QSqtoxd8DIYsyaXMxEI4wkxLwFIvtEMt4Lfk751cvjQ6LtriT
-	M3XfxqVe+Kde+KTdVDVY6sVpQtU3CJjI6XOkP1Vbcz+7mf8+vS5mbiCuRig9Vyjg8AcCLCKq7cR
-	b3juU8xxGhrjj+UR0y0DbW1l8Sd/+ZdGxCWV81vV4zfIHUrlQn1YS/80aBkhsCw==
-X-Received: by 2002:a05:6000:2902:b0:3b8:f925:8d4 with SMTP id ffacd0b85a97d-3c5db2da00amr300067f8f.26.1755812721883;
-        Thu, 21 Aug 2025 14:45:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEfnhl0R8ZwVLuxUZYmGD7nMrbthuKRx51tD/iqNpCQL5sxy24UygUdE3xc6j7fC/B+t7+yTQ==
-X-Received: by 2002:a05:6000:2902:b0:3b8:f925:8d4 with SMTP id ffacd0b85a97d-3c5db2da00amr300045f8f.26.1755812721421;
-        Thu, 21 Aug 2025 14:45:21 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f26:ba00:803:6ec5:9918:6fd? (p200300d82f26ba0008036ec5991806fd.dip0.t-ipconnect.de. [2003:d8:2f26:ba00:803:6ec5:9918:6fd])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b4e25da97sm22067085e9.1.2025.08.21.14.45.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Aug 2025 14:45:20 -0700 (PDT)
-Message-ID: <b09b7ef4-5b06-4bb8-9be3-1194e3904c92@redhat.com>
-Date: Thu, 21 Aug 2025 23:45:18 +0200
+	 in-reply-to:in-reply-to:references:references;
+	bh=C4cFJbpQNFTwV50kiFAuGphrqAUZV8+ER0tPmM4e7u8=;
+	b=vOrqbFbp2U6+4Lv4vvKFyZzygPCihHn3FE9erEwiEeRRToOEonKYCJ/e83Rw09Ibl8Nhw9
+	DJ8rELk3KsoF5fGTP/vGcydpz7RVf1nwdgVHznCZWstwbIKbarpPkgHDTon5p33de40qFy
+	WfXiu+EHiM0ArhNbhO8cXn6+fwii+tM=
+Date: Thu, 21 Aug 2025 14:48:53 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 33/35] kfence: drop nth_page() usage
-From: David Hildenbrand <david@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Alexander Potapenko <glider@google.com>, Marco Elver <elver@google.com>,
- Dmitry Vyukov <dvyukov@google.com>, Andrew Morton
- <akpm@linux-foundation.org>, Brendan Jackman <jackmanb@google.com>,
- Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>,
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- iommu@lists.linux.dev, io-uring@vger.kernel.org,
- Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
- Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
- kasan-dev@googlegroups.com, kvm@vger.kernel.org,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>, Michal Hocko <mhocko@suse.com>,
- Mike Rapoport <rppt@kernel.org>, Muchun Song <muchun.song@linux.dev>,
- netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
- Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
- Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
- virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
- wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
-References: <20250821200701.1329277-1-david@redhat.com>
- <20250821200701.1329277-34-david@redhat.com>
- <1a13a5cb-4312-4c01-827b-fa8a029df0f1@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- qIws/H2t
-In-Reply-To: <1a13a5cb-4312-4c01-827b-fa8a029df0f1@redhat.com>
+Subject: Re: [PATCH bpf-next] bpf: hashtab - allow
+ BPF_MAP_LOOKUP{,_AND_DELETE}_BATCH with NULL keys/values.
+Content-Language: en-GB
+To: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Linux Network Development Mailing List <netdev@vger.kernel.org>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ BPF Mailing List <bpf@vger.kernel.org>, Stanislav Fomichev <sdf@fomichev.me>
+References: <20250813073955.1775315-1-maze@google.com>
+ <6df59861-8334-49ac-8dca-2b0bac82f2d7@linux.dev>
+ <CANP3RGcJ06uRUBF=RR6bjqNnxdaSdpBpynGzNTSms0jA-ZpW6w@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yonghong Song <yonghong.song@linux.dev>
+In-Reply-To: <CANP3RGcJ06uRUBF=RR6bjqNnxdaSdpBpynGzNTSms0jA-ZpW6w@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 21.08.25 22:32, David Hildenbrand wrote:
-> On 21.08.25 22:06, David Hildenbrand wrote:
->> We want to get rid of nth_page(), and kfence init code is the last user.
->>
->> Unfortunately, we might actually walk a PFN range where the pages are
->> not contiguous, because we might be allocating an area from memblock
->> that could span memory sections in problematic kernel configs (SPARSEMEM
->> without SPARSEMEM_VMEMMAP).
->>
->> We could check whether the page range is contiguous
->> using page_range_contiguous() and failing kfence init, or making kfence
->> incompatible these problemtic kernel configs.
->>
->> Let's keep it simple and simply use pfn_to_page() by iterating PFNs.
->>
-> 
-> Fortunately this series is RFC due to lack of detailed testing :P
-> 
-> Something gives me a NULL-pointer pointer here (maybe the virt_to_phys()).
-> 
-> Will look into that tomorrow.
 
-Okay, easy: relying on i but not updating it /me facepalm
 
--- 
-Cheers
+On 8/20/25 7:23 PM, Maciej Żenczykowski wrote:
+> On Mon, Aug 18, 2025 at 1:58 PM Yonghong Song 
+> <yonghong.song@linux.dev> wrote:
+> > On 8/13/25 12:39 AM, Maciej Żenczykowski wrote:
+> > > BPF_MAP_LOOKUP_AND_DELETE_BATCH keys & values == NULL
+> > > seems like a nice way to simply quickly clear a map.
+> >
+> > This will change existing API as users will expect
+> > some error (e.g., -EFAULT) return when keys or values is NULL.
+>
+> No reasonable user will call the current api with NULLs.
 
-David / dhildenb
+I do agree it is really unlikely users will have NULL keys or values.
+
+>
+> This is a similar API change to adding a new system call
+> (where previously it returned -ENOSYS) - which *is* also a UAPI 
+> change, but obviously allowed.
+>
+> Or adding support for a new address family / protocol (where 
+> previously it -EAFNOSUPPORT)
+> Or adding support for a new flag (where previously it returned -EINVAL)
+>
+> Consider why userspace would ever pass in NULL, two possibilities:
+> (a) explicit NULL - you'd never do this since it would (till now) 
+> always -EFAULT,
+>   so this would only possibly show up in a very thorough test suite
+> (b) you're using dynamically allocated memory and it failed allocation.
+>   that's already a program bug, you should catch that before you call 
+> bpf().
+
+Okay. What you describes make sense.
+Could you add a selftest for this?
+Could you add some comments in below uapi bpf.h header to new functionality?
+
+>
+> > We have a 'flags' field in uapi header in
+> >
+> >          struct { /* struct used by BPF_MAP_*_BATCH commands */
+> >                  __aligned_u64   in_batch;       /* start batch,
+> >                                                   * NULL to start 
+> from beginning
+> >                                                   */
+> >                  __aligned_u64   out_batch;      /* output: next 
+> start batch */
+> >                  __aligned_u64   keys;
+> >                  __aligned_u64   values;
+> >                  __u32           count;          /* input/output:
+> >                                                   * input: # of 
+> key/value
+> >                                                   * elements
+> >                                                   * output: # of 
+> filled elements
+> >                                                   */
+> >                  __u32           map_fd;
+> >                  __u64           elem_flags;
+> >                  __u64           flags;
+> >          } batch;
+> >
+> > we can add a flag in 'flags' like BPF_F_CLEAR_MAP_IF_KV_NULL with a 
+> comment
+> > that if keys or values is NULL, the batched elements will be cleared.
+>
+> I just don't see what value this provides.
+>
+> > > BPF_MAP_LOOKUP keys/values == NULL might be useful if we just want
+> > > the values/keys and don't want to bother copying the keys/values...
+> > >
+> > > BPF_MAP_LOOKUP keys & values == NULL might be useful to count
+> > > the number of populated entries.
+> >
+> > bpf_map_lookup_elem() does not have flags field, so we probably 
+> should not
+> > change existins semantics.
+>
+> This is unrelated to this patch, since this only touches 'batch' 
+> operation.
+> (unless I'm missing something)
+>
+> > > Cc: Alexei Starovoitov <ast@kernel.org>
+> > > Cc: Daniel Borkmann <daniel@iogearbox.net>
+> > > Cc: Stanislav Fomichev <sdf@fomichev.me>
+> > > Signed-off-by: Maciej Żenczykowski <maze@google.com>
+> > > ---
+> > >   kernel/bpf/hashtab.c | 4 ++--
+> > >   1 file changed, 2 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/kernel/bpf/hashtab.c b/kernel/bpf/hashtab.c
+> > > index 5001131598e5..8fbdd000d9e0 100644
+> > > --- a/kernel/bpf/hashtab.c
+> > > +++ b/kernel/bpf/hashtab.c
+> > > @@ -1873,9 +1873,9 @@ __htab_map_lookup_and_delete_batch(struct 
+> bpf_map *map,
+> > >
+> > >       rcu_read_unlock();
+> > >       bpf_enable_instrumentation();
+> > > -     if (bucket_cnt && (copy_to_user(ukeys + total * key_size, keys,
+> > > +     if (bucket_cnt && (ukeys && copy_to_user(ukeys + total * 
+> key_size, keys,
+> > >           key_size * bucket_cnt) ||
+> > > -         copy_to_user(uvalues + total * value_size, values,
+> > > +         uvalues && copy_to_user(uvalues + total * value_size, 
+> values,
+> > >           value_size * bucket_cnt))) {
+> > >               ret = -EFAULT;
+> > >               goto after_loop;
+> >
+>
+>
+> --
+> Maciej Żenczykowski, Kernel Networking Developer @ Google
 
 
