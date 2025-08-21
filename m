@@ -1,100 +1,93 @@
-Return-Path: <netdev+bounces-215615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36250B2F8FC
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:56:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACFEAB2F909
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:57:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8ED2D175B8F
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 12:51:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BB9C17F42D
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 12:52:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 894F3311C18;
-	Thu, 21 Aug 2025 12:50:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D0CA320CC7;
+	Thu, 21 Aug 2025 12:52:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mL/rqBGn"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZwxRVUqu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B7B315779;
-	Thu, 21 Aug 2025 12:50:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FD8431E0F8
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 12:52:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755780647; cv=none; b=IUwMhjf7FAchHgjxRKqRqsol4lDPeSHOaBAAeQfxHqTfKnE+HHqLtM/Ok/rM+v/6ZqOafmRQ+WO20cpYGtGbjyTnbLaLgcI5T6CSUKnIKf56MJy8rJEt1qkjfBP7lo3eLsE5SwpSsBNd2+Jur8TO5MLFnHzEd18v4S7hd06c+sM=
+	t=1755780740; cv=none; b=Ji/Zg2y6sSEP724HZ/eUw+lITdCrp1pn5gIjJRSwE9Gc+jBYdAFyREBLVfmz/MymoEax+ByDVo7qP91XImyX8vZjwL62RUtcps4jWOuKfJOug9dwpvSk3ioSIMLQ1DV2+SmAp/Z+nOUh2tueTIMR7kM9fKqkyXe3trqhO2dcx0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755780647; c=relaxed/simple;
-	bh=iM45yIansOQAMUNjn0bUabduD2UfVw8nzX3XVGOkjdU=;
+	s=arc-20240116; t=1755780740; c=relaxed/simple;
+	bh=LLujgo17aIxSBLq0GGYcaNSwdVWwDosgbd4HO6Yv0z0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j7DSTraoQUuVirI8smNP//BdJD11nDWgJjvDEnfVGXruSciiA8bu30rTvMK4L92onEt6MSfqZ5T+WeQEumQF3lenriixmW39JLgBQOS5kOCHd5a7F/lOhEK/HUpN9U7Vek87KX4GYVYQOSEmExVEb6Zak74LIKXSPC8bzZGRyNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mL/rqBGn; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-70d93f5799bso1277256d6.1;
-        Thu, 21 Aug 2025 05:50:45 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=NufoaDW8hIxk0EGY0JVLuIiHmMcc6MyxbWgsgNdnrYeQHIlHeqjz6VOyRf4sFoxC/bBpzsK4sKDhsk8PGjBbE1HAK7jnFm0oCPfkKUBY8EckDU37ZlCI7PH7DrE08LJCbPHIutVsqgYLTTVrQt+6X++NuNWqi2sVqJH3UYYuDsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ZwxRVUqu; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-45a1b065d59so5227655e9.1
+        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 05:52:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755780644; x=1756385444; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1755780736; x=1756385536; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fxU/c9QtdpeT6vjzYdNg7d6fasiYd8WLob216PwFuUw=;
-        b=mL/rqBGnzkdE0Ia05RypHfyf1L7lh7afPiYX4WcTIoBO4AQpAXrUwux/ixovPXREsW
-         hWmT2ZWgvGAm946wD8iV7/ZJod3dwoQIEepx7hpBybNc2yKy7znul7LoVTOqbpDqznUU
-         N1pJ/m7g2z4p3Wij4vD9KUzKrXmTfAQM1QJI8ZOZJwe5tf0muC7Giix7UpbbyWNChMY3
-         E6AxerAcGUQHOvTprwX9FhgrGLk++7EHGndZi93uWXGhCOQgndNF+N6bSwlEdyfPL3nn
-         fZtHI93pfK3PuIljWRJ85+fMO9y1+IJD4J3OorGAyAoAyYG2AnHQz2a47fGXRyNvrtmo
-         oLFQ==
+        bh=FUsL83zsecC7yRV/e3S2bWkQ9rwjTqlIbBsHbqavuDw=;
+        b=ZwxRVUquafbd/ELBupcDXlwK/jhzyMMDdHRxfaVjlIcK2qIU5Zbkzx+yuSgiJBG/0B
+         KDTy9/cS7fGvHKAqoESzIgpXSH4crgCnQYpoX0v+X0R0ZqaN/MagyRDFRdGsalr1HLZL
+         qZasoT8RS9FTnCC93f+/y5lWsp/ydL0tK7jDSb6C/gUBeIrEXlwqPBsmr0vs3F8rMkrZ
+         8JnxBwNCxs3S+We0dqIhw9hWwlUtVAFsSTv5/AVZz19w/j2SALVNQmIadsxsoGvri58H
+         k0MEDIqk9WrZJMU1WeW8UtfSS9rHDQpYTCrW5Tyzg0c0WouKpRLGixi59mMeHzoxwhdY
+         Ql+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755780644; x=1756385444;
+        d=1e100.net; s=20230601; t=1755780736; x=1756385536;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fxU/c9QtdpeT6vjzYdNg7d6fasiYd8WLob216PwFuUw=;
-        b=l2gvq9dr4Jh5XlpVaWd+gxrbR4SSpHrBifG2YQFAmMozfZrNKGH3JgCDNm/UVkXAeV
-         IVfdpQPR2kshhkq2zjWZdqqe6fYPJlq2AONtAo2rGr+Abn4dOOlWSyi7eA4asT+0f0WH
-         PkfqDfLL0esq831Ln/kD8KELJ2daQnQDx7aEtJzCDa1SqaRXuTreftx/jLx8JT3/49c6
-         G4YMgDrF+rz2G4eugtgGSzCFSVOxbHs9ZpyUhKuKbKYjwL1Dtv50ekTZBkdeV2QRmtMF
-         qf16tIsqRZTwW8NnfE53MRqg5kasT6PKyDNynBUcEdEkFqMmmg6pV0hpO1YfGH82Y/Ij
-         dGeg==
-X-Forwarded-Encrypted: i=1; AJvYcCU1jnCqTEZ1yxEL8OiqpEA317SDceuw1SU9F9mjNNSQjKPRx0E8bxboFgiqGdChl9QK+MN3QvtA@vger.kernel.org, AJvYcCVndG9akLohI1OQKO+PojnnAxUmwf9OzrofWs6eA3UFFYDzicihFxmWrPO80rP0zYlYC9MN911XVAXY@vger.kernel.org, AJvYcCWhdh4ER1O3BRmJSBPrrjX36DRnQRrGH1e2vXWtcs5No332Qt2V4iXSAuh73h0W02C1rC4dO7PwnEvJCgGX@vger.kernel.org
-X-Gm-Message-State: AOJu0YyA+waUTRaJvfvuNQkeBI6fZRW2am0RdJR4PDBCqQheDqshDFUk
-	7QaJ8+1aEBy1BgL3STG+fOYXLD4TzWIiM/+QpHCjWX/RNX//6CZueyiI
-X-Gm-Gg: ASbGncswlB61M73r0GQkE+a4yp7E3s0/fFzf2b8utF7PrWBL6z0sTjXDne4jocpm2xr
-	JIKILc7zj5dhd7JHmHskLBqP8PmynMAWj7gVRJs1msadS5TMMxWzgGlcBMUqVRvrf4mJjPpVRAG
-	r6N5yIqM5NJYn0cnhf5xLKEl7C+8ZLOSU0G4mWvH0AbY4mF+Lb6th69Jj8kwGB9iSkAwViJZoD6
-	jaIsc+BqOaUzAIqjWTswRLsJjlM4fkX1NUMDhdU15q/+rTPa4Rb+rUOS3qgaeU3etGArYVEX7jh
-	y3U+9oeZYRYaCVJ2Chva4L02YHhzNB1cv5lLo/AGFceZncPwNrri/fCJrJMBRi55gRQCpF58br/
-	vGkjAhGsuvg3YkjdndFk1AhbdL/Zto0AVXx6eRkULyQmhKxvNG5RSglNTCQ==
-X-Google-Smtp-Source: AGHT+IGbZanLkhWctvc/z0MtnIxZdEvoJJZIiEwfGt+Ut7mMdNAmEieP2/DGUu6J7Q5lwzwUveSegg==
-X-Received: by 2002:a05:6214:478e:b0:70d:9527:e45a with SMTP id 6a1803df08f44-70d9527e62emr1519806d6.16.1755780644519;
-        Thu, 21 Aug 2025 05:50:44 -0700 (PDT)
-Received: from glsmbp.wifi.local.cmu.edu (cmu-device2.nat.cmu.net. [128.2.149.252])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70d905e19a9sm5318436d6.19.2025.08.21.05.50.42
+        bh=FUsL83zsecC7yRV/e3S2bWkQ9rwjTqlIbBsHbqavuDw=;
+        b=nbVGbrN0p7/G9kB/gDk2OZyPkllLLkl33T6eGFSaLNmrW2iXYFPK0/2vgIxuOpV+w9
+         OPD67ASLgMQhhSHSxrjP11mVPVp7enKejAIp/GJA2WLLY0jNDEg1wloyAIS5OO8XNhaq
+         yGBCZrlZfREyK7zM+AaAur2+XETfa+81lreQhb8+XeCbnTMH/bjVBzyzNja1USTvjnPO
+         kcIGUN60qOzUrqcNPog0qnsvcLXX6pRRITF8CxHRq1JxnJFpoSsuAQTr+yzlJ56Rv3KH
+         SPhiSI/D43pRJhzizsst2lWtwST169a8fyt5qfs8bKbvC4UHKahSbSRMxvd/dw4PgNTN
+         jR+Q==
+X-Gm-Message-State: AOJu0Yz6IohNAo7hKy8E+z2zcDO/bfRko4DyVAPgJMMSYyxcWrlPaelu
+	xWCmIixvI5k5QogoQmqfpBd+ltCmXYoioLuHDYKpq+QBpGVcZU5n0PBdJebN+YxOCYDDvpHCM1t
+	j4iW9
+X-Gm-Gg: ASbGnctQ/h1MckPhQp3rnvozJqyExwaERrFn8ID6UVh4tvg/wEDi3gZHSSwPC0yPiHf
+	0YTwMfzOEddH0G4ZVGayxRfsldAd3l11MorKGV1gtCkdi6w33gRJTkzgSXuQv9yeCPqlsIIi8iD
+	efvFhHbhaZSukRM76A5JWtBDe4WcSXBM1GoGk9kASd5W0ZXu/0vzq3gSUj8VNi8MGqg9N3fUVGv
+	QX1ERAlH9c0zphBGv6S5a19qkwMI/crKlCRNjNmiUNG/i+gWuvb+W1eUEwiC8uMBcNZY6B2AfTB
+	YjFnfc83AfNXKU3js0a9XvAxsku4ClLXnaLmEhY9/I3cts25sU76WdUctqN7Tz09COTlQpYSPPK
+	7Y2XVBoAOyc5nDmyK7eT+a5KMrxCLgnAugWFaGQ==
+X-Google-Smtp-Source: AGHT+IFks1UjqoTs3zcB6As7czWYaenw+YDRjeJCaniM0ZwF9o4gJA0TsV6eIfS1nlqXA8r4whdavg==
+X-Received: by 2002:a05:600c:3b04:b0:459:dde3:1a3d with SMTP id 5b1f17b1804b1-45b4d86c120mr20248785e9.26.1755780736319;
+        Thu, 21 Aug 2025 05:52:16 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-45b4db2ab9esm27009175e9.9.2025.08.21.05.52.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Aug 2025 05:50:43 -0700 (PDT)
-Date: Thu, 21 Aug 2025 08:50:41 -0400
-From: "Gabriel L. Somlo" <gsomlo@gmail.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Karol Gugala <kgugala@antmicro.com>,
-	Mateusz Holenko <mholenko@antmicro.com>,
-	Joel Stanley <joel@jms.id.au>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Lars Povlsen <lars.povlsen@microchip.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 2/2] dt-bindings: net: Drop vim style annotation
-Message-ID: <aKcWIZ2zMKuOeW6M@glsmbp.wifi.local.cmu.edu>
-References: <20250821083038.46274-3-krzysztof.kozlowski@linaro.org>
- <20250821083038.46274-4-krzysztof.kozlowski@linaro.org>
+        Thu, 21 Aug 2025 05:52:15 -0700 (PDT)
+Date: Thu, 21 Aug 2025 15:52:11 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org, aleksander.lobakin@intel.com,
+	alexanderduyck@fb.com, andrew+netdev@lunn.ch, ast@kernel.org,
+	bpf@vger.kernel.org, corbet@lwn.net, daniel@iogearbox.net,
+	davem@davemloft.net, edumazet@google.com, hawk@kernel.org,
+	horms@kernel.org, john.fastabend@gmail.com, kernel-team@meta.com,
+	kuba@kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, pabeni@redhat.com, sdf@fomichev.me,
+	vadim.fedorenko@linux.dev
+Subject: Re: [PATCH net-next V4 5/9] eth: fbnic: Add XDP pass, drop, abort
+ support
+Message-ID: <aKcWe3bm3wQqlfdx@stanley.mountain>
+References: <20250813221319.3367670-1-mohsin.bashr@gmail.com>
+ <20250813221319.3367670-6-mohsin.bashr@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,45 +96,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250821083038.46274-4-krzysztof.kozlowski@linaro.org>
-X-Clacks-Overhead: GNU Terry Pratchett
+In-Reply-To: <20250813221319.3367670-6-mohsin.bashr@gmail.com>
 
-On Thu, Aug 21, 2025 at 10:30:40AM +0200, Krzysztof Kozlowski wrote:
-> Bindings files should not carry markings of editor setup, so drop vim
-> style annotation.  No functional impact.
-> 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-
-Acked-by: Gabriel Somlo <gsomlo@gmail.com>
-
-Thanks,
---Gabriel
-
-> ---
->  Documentation/devicetree/bindings/net/litex,liteeth.yaml        | 2 --
->  .../devicetree/bindings/net/microchip,sparx5-switch.yaml        | 1 -
->  2 files changed, 3 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/litex,liteeth.yaml b/Documentation/devicetree/bindings/net/litex,liteeth.yaml
-> index bbb71556ec9e..200b198b0d9b 100644
-> --- a/Documentation/devicetree/bindings/net/litex,liteeth.yaml
-> +++ b/Documentation/devicetree/bindings/net/litex,liteeth.yaml
-> @@ -95,5 +95,3 @@ examples:
->          };
->      };
->  ...
-> -
-> -#  vim: set ts=2 sw=2 sts=2 tw=80 et cc=80 ft=yaml :
-> diff --git a/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml b/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml
-> index a73fc5036905..082982c59a55 100644
-> --- a/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml
-> +++ b/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml
-> @@ -245,4 +245,3 @@ examples:
->      };
+On Wed, Aug 13, 2025 at 03:13:15PM -0700, Mohsin Bashir wrote:
+> @@ -1251,6 +1293,7 @@ static void fbnic_free_napi_vector(struct fbnic_net *fbn,
+>  	}
 >  
->  ...
-> -#  vim: set ts=2 sw=2 sts=2 tw=80 et cc=80 ft=yaml :
-> -- 
-> 2.48.1
-> 
+>  	for (j = 0; j < nv->rxt_count; j++, i++) {
+> +		xdp_rxq_info_unreg(&nv->qt[i].xdp_rxq);
+>  		fbnic_remove_rx_ring(fbn, &nv->qt[i].sub0);
+>  		fbnic_remove_rx_ring(fbn, &nv->qt[i].sub1);
+>  		fbnic_remove_rx_ring(fbn, &nv->qt[i].cmpl);
+> @@ -1423,6 +1466,11 @@ static int fbnic_alloc_napi_vector(struct fbnic_dev *fbd, struct fbnic_net *fbn,
+>  		fbnic_ring_init(&qt->cmpl, db, rxq_idx, FBNIC_RING_F_STATS);
+>  		fbn->rx[rxq_idx] = &qt->cmpl;
+>  
+> +		err = xdp_rxq_info_reg(&qt->xdp_rxq, fbn->netdev, rxq_idx,
+> +				       nv->napi.napi_id);
+> +		if (err)
+> +			goto free_ring_cur_qt;
+> +
+>  		/* Update Rx queue index */
+>  		rxt_count--;
+>  		rxq_idx += v_count;
+> @@ -1433,6 +1481,25 @@ static int fbnic_alloc_napi_vector(struct fbnic_dev *fbd, struct fbnic_net *fbn,
+>  
+>  	return 0;
+>  
+> +	while (rxt_count < nv->rxt_count) {
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+This should be <= otherwise it won't free enough.  Then qt will point to
+the wrong thing and the next loop will crash.
+
+The loops in this function are mind bendingly complicated.  It might be
+easiter to write them as:
+
+	for (i = 0; i < nv->txt_count; i++) {
+		qt = &nv->qt[i];
+		...
+	}
+
+	for (i = 0; i < nv->rxt_count; i++) {
+		qt = &nv->qt[txt_count + i];
+		...
+	}
+
+Generally, I would just unwind the partial loop before the goto instead
+of doing a jump to the middle of the goto.  It's more lines of code, but
+I'm stupid, so I prefer code which is easy even if it's longer.
+
+regards,
+dan carpenter
+
+> +		qt--;
+> +
+> +		xdp_rxq_info_unreg(&qt->xdp_rxq);
+> +free_ring_cur_qt:
+> +		fbnic_remove_rx_ring(fbn, &qt->sub0);
+> +		fbnic_remove_rx_ring(fbn, &qt->sub1);
+> +		fbnic_remove_rx_ring(fbn, &qt->cmpl);
+> +		rxt_count++;
+> +	}
+> +	while (txt_count < nv->txt_count) {
+> +		qt--;
+> +
+> +		fbnic_remove_tx_ring(fbn, &qt->sub0);
+> +		fbnic_remove_tx_ring(fbn, &qt->cmpl);
+> +
+> +		txt_count++;
+> +	}
+> +	fbnic_napi_free_irq(fbd, nv);
+>  pp_destroy:
+>  	page_pool_destroy(nv->page_pool);
+>  napi_del:
+
 
