@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-215718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EAD0B2FFF0
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 18:24:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90917B2FFFA
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 18:26:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C58101BC7E20
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 16:22:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7487EAC1AEF
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 16:22:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5526D2DCF64;
-	Thu, 21 Aug 2025 16:20:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA78E2DCBFB;
+	Thu, 21 Aug 2025 16:21:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GEdi2ijP"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="EEDvRMYs"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8FD51EB5FE;
-	Thu, 21 Aug 2025 16:20:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17DB5274FF5;
+	Thu, 21 Aug 2025 16:21:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755793257; cv=none; b=do2apqzz0x2hQSw+oHVVdPGCiOQlLytOCSJGBiId40w384gb57WJezkRz5fDErCBHIHbyYuxxoV0h2vZ2mOO9rsRw3E3uWNnYASZyBz4e9+bu9v7W4og5JWFiRlSO0ccFic8Xd4sdkvdzymzHsB6/fbqTm2hwyXYLXg94yhhXFg=
+	t=1755793308; cv=none; b=JM674fgOBSqkU4gTxKzpf+gkOATaAUoJAGDypLUviCnt28h0Nq7OQzE5FabyvBk55igA+gTjBfD/2e6awnbTaJpSo+SQ1WZznLvVafIej/vA+S+Pykk57jdy4Li5ntH6TlPUPBe1w/4xZD5nhJKQNUrN7MqlL/ml7RXAbyCAz24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755793257; c=relaxed/simple;
-	bh=SVYwBgrxF+fidYXx6MB+GC/1PI3+tc6tVk4REki5cYk=;
+	s=arc-20240116; t=1755793308; c=relaxed/simple;
+	bh=UlGrfSohYvmCsiBDTKP3ye8vAh0tUIfx4LHIKObHZ+4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y4bHkLoQU4WBjbvgDTanmUbpMyc7EHPpFOppV2rXbHKEuk8a+FEchPCuomKgE7gyHItE7NuvGRWhKf/nthoP5uasALab7cVR+6xKsCoDbExGUv9knLynyHlR5ChQjH9GIenHmm561b2bETHJPNIcGDtV8a1spQlyhx1N9hvqKKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GEdi2ijP; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=ck50RZ5eBUuNXWiMZkqOXN0Z26BKN42VgcoUe84p/+hWhLuB/sv+rurF7z6qYDSdobZTLPyx9SZZKgXsifDPTvTHricutUIwPsVAjP0vFG5ZNa1gcy4w8PF6IyhmVSGlRRnX9EvsYjhtJ40c7apQlVzDXIFU2Zg/ATzWiijAB94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=EEDvRMYs; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=m7VDrV4gseJewWjqTqtmSwKWWM5SD7kbK2phRQT7nvc=; b=GEdi2ijP61fiZSHA03/ojnalrN
-	pvheXNil2dDNacnh1emry1xQD/tcKAfwBagMhCPM9r7+fri1IRibjRhhXppH505BrRqMd2qU/m8JD
-	iyPn9+MJxyypgzI6Puvfxa2rtcvZgpHSYgQ+jusRjpKrklx/0j7xa8qndpGk2mMACmzg=;
+	bh=Cv1lV7YR8+jcAn23Ws2PaQq6LK7+5rl7Y8lkLzr7ZDw=; b=EEDvRMYsUhFBFv32t/XHXw0AJR
+	Bl5kzSahjSdA1UFO/MAo1lU+smosAb44vyJW+zor4f4GPRu3FerbRBITKB/tq0nvL/wjhSenxKauK
+	kntcp2V5VIK+2B4ZA3ljEsKW7jgjli9srjuf67RkC8Gv+wVrBS3Ua3sTfxqi2uVLYW0o=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1up81u-005TV9-1I; Thu, 21 Aug 2025 18:20:46 +0200
-Date: Thu, 21 Aug 2025 18:20:46 +0200
+	id 1up82l-005TVm-HI; Thu, 21 Aug 2025 18:21:39 +0200
+Date: Thu, 21 Aug 2025 18:21:39 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Vladimir Oltean <vladimir.oltean@nxp.com>
 Cc: netdev@vger.kernel.org, Heiner Kallweit <hkallweit1@gmail.com>,
@@ -57,11 +57,11 @@ Cc: netdev@vger.kernel.org, Heiner Kallweit <hkallweit1@gmail.com>,
 	=?utf-8?B?UGF3ZcWC?= Owoc <frut3k7@gmail.com>,
 	Sean Anderson <sean.anderson@seco.com>,
 	Jon Hunter <jonathanh@nvidia.com>
-Subject: Re: [PATCH net-next 02/15] net: phy: aquantia: merge
- aqr113c_fill_interface_modes() into aqr107_fill_interface_modes()
-Message-ID: <e0e40c1f-26e3-41aa-8db3-5757c69f0310@lunn.ch>
+Subject: Re: [PATCH net-next 03/15] net: phy: aquantia: reorder AQR113C PMD
+ Global Transmit Disable bit clearing with supported_interfaces
+Message-ID: <0087f090-4ef0-41d5-a3ab-10c1eb2756f4@lunn.ch>
 References: <20250821152022.1065237-1-vladimir.oltean@nxp.com>
- <20250821152022.1065237-3-vladimir.oltean@nxp.com>
+ <20250821152022.1065237-4-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,23 +70,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250821152022.1065237-3-vladimir.oltean@nxp.com>
+In-Reply-To: <20250821152022.1065237-4-vladimir.oltean@nxp.com>
 
-On Thu, Aug 21, 2025 at 06:20:09PM +0300, Vladimir Oltean wrote:
-> I'm unsure whether intentionate or not, but I think the (partially
-> observed) naming convention in this driver is that function prefixes
-> denote the earliest generation when a feature is available. In case of
-> aqr107_fill_interface_modes(), that means that the GLOBAL_CFG registers
-> are a Gen2 feature. Supporting evidence: the AQR105, a Gen1 PHY, does
-> not have these registers, thus the function is not named aqr105_*.
-
-That is reasonably common. The Marvell PHY and DSA driver use the
-same.
-
-The other option would be to use gen1_, gen2_, gen3_ prefixes.
-
-The Broadcom PHY uses an odd naming scheme, 28nm_, 16nm_, which i
-assume is the silicon gate size of the generation.
+On Thu, Aug 21, 2025 at 06:20:10PM +0300, Vladimir Oltean wrote:
+> Introduced in commit bed90b06b681 ("net: phy: aquantia: clear PMD Global
+> Transmit Disable bit during init"), the clearing of MDIO_PMA_TXDIS plus
+> the call to aqr107_wait_processor_intensive_op() are only by chance
+> placed between aqr107_config_init() and aqr107_fill_interface_modes().
+> In other words, aqr107_fill_interface_modes() does not depend in any way
+> on these 2 operations.
+> 
+> I am only 90% sure of that, and I intend to move aqr107_fill_interface_modes()
+> to be a part of aqr107_config_init() in the future. So to isolate the
+> issue for blame attribution purposes, make these 2 functions adjacent to
+> each other again.
+> 
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
