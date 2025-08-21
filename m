@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-215676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E388B2FDD9
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 17:11:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E340BB2FDBB
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 17:06:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1887064205D
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 15:00:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1396189D1F4
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 15:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3FFA2F6194;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3F2B2F6193;
 	Thu, 21 Aug 2025 15:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EhfYON2T"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dKwM0cHd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C4882E716A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C4FB2E719C;
 	Thu, 21 Aug 2025 15:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755788405; cv=none; b=lHPPGxgQfupxCuQ+PlYoP1UUSm079l56tJEmpEcWlg2p63ev6T52Hm4IEIn+R4TW0liBOtsd3bxwZ6mx/KNtqSmnrCYIuUj277b5vlgPM3h0CA38RrimL0YCPMgwtGVybUAN6AvxfznsfmqjuoIzTVjI2hkF6SsD4lcRGnUcidY=
+	t=1755788405; cv=none; b=km2E4wgvxRuJ4olEd7Z8MHP0Y/XJ+XIeKOLi0y15BYnC5Vy2mI5NADgDwh+8sdyop/4rXN8EUJQr9cT3fGGL2bh3Vjr0NeQH+ijgurtz8I9Qp5p4dDSW702o0tsbRNg4QfbzjCCKb0vhNpnEqLkSMPrtsKUcPaSKl0xlfvuQkHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1755788405; c=relaxed/simple;
-	bh=wmGjbKJzF1CskCjy/nqXr4k75IK4LsALd4FCJijvRUo=;
+	bh=VEtsEWyLke6pHvxuCSoaRicQZP8ik1aQraZxnD6VNOI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PXh6j547YVQQWATjsSn6gl2Tbyn/BtZVug6EZpWYloOXMlBD7mTw8roRbb8XqobHJKIZFR0BY2J4OayrbWb6pmcm/XxYCumvQngmOV/rJaHbuPZE9q0lGX25I6TAqTwZUTsnNOATKr4oty8FSzcPGxUIxAUi5C+FkWF5aDvic1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EhfYON2T; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7C8CC4CEF4;
+	 In-Reply-To:To:Cc; b=gHxGz0vBVTvHatyHhUezvR1b1+GGBm9y7Z6gq10z+zZXUPqX8i/yhG9ZAZ8m0i+VYQ1W7iysZzqZw9FB7y4vQlkAsnBobycFZTMcU39wwhZUDhM2hiCq3u+iM6X/Xdi2OPeGn0y9nRIfCyFOjp/ggy6mpPayEPaAO2PnKqBKgUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dKwM0cHd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7B48C4CEEB;
 	Thu, 21 Aug 2025 15:00:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1755788405;
-	bh=wmGjbKJzF1CskCjy/nqXr4k75IK4LsALd4FCJijvRUo=;
+	bh=VEtsEWyLke6pHvxuCSoaRicQZP8ik1aQraZxnD6VNOI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EhfYON2TvdZVmCjRiDQADenq81FCAA8v3JQZQw/0jC5slz2I2ZixC1VAkQDzi1u+D
-	 zSNB8EEDLDywIqvLWwq3uomhHsHyJkLrAyr3wHUbJJv19fr7D2cMtVuUKva3RxqHtJ
-	 VSnztmFFjzDxhlS1GmJGq4PqmAATL9OiLdIk0L1q+fEh3kuwt/q9En67HdsCbmZKtV
-	 n2Vdxhrqu9JO4dgNXobJlD+8E91eba/Aqv/uXHrlgfreq3XA28mYdzX24Mf0jShkfW
-	 V+wcM7uOEhd/ul57geqx3KdcrxAKoIRmLUVl4BZgjd8prwP4YZ111Ifbgdl3lmNemp
-	 rwHXXTC4dbkKw==
+	b=dKwM0cHdxy60EC5yxNY6NLZ/OwpaiUNOXu+J2AjIGQh0JbUj8N4N7r1L/8L6UgBjG
+	 dyOjMXvGEGMBQDmzr5uqGbQDLZTe3DRE3qkayuN2HhF+8IUGtcqJr1wFiunEaopKHr
+	 QVT3QdHxxPBDdlakRoTT4oFnlqFjw05OMQR+EQClNxgJhXpialCU0hEylRM7RVBCdI
+	 Uxj96v0U+e5f6UtsjShni51tqRJQkWOJNaOLUAmhunqc4Xb7kHhnFoCx4OLS+tZsXF
+	 9J7WSX8xHDM3uLlLaiVJv77dE0tw29xXwTKvbShg8/lnwa2tv1eb9SHsah4gd9W4Au
+	 anR5XsNsAudCg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E3C383BF5C;
-	Thu, 21 Aug 2025 15:00:12 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDF7383BF5D;
+	Thu, 21 Aug 2025 15:00:13 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [net PatchV2] Octeontx2-af: Skip overlap check for SPI field
+Subject: Re: [PATCH net 1/2] tls: fix handling of zero-length records on the
+ rx_list
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175578841101.1075387.4122901286206850392.git-patchwork-notify@kernel.org>
-Date: Thu, 21 Aug 2025 15:00:11 +0000
-References: <20250820063919.1463518-1-hkelam@marvell.com>
-In-Reply-To: <20250820063919.1463518-1-hkelam@marvell.com>
-To: Hariprasad Kelam <hkelam@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
- jerinj@marvell.com, sbhatta@marvell.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, rkannoth@marvell.com
+ <175578841229.1075387.17185721811161977550.git-patchwork-notify@kernel.org>
+Date: Thu, 21 Aug 2025 15:00:12 +0000
+References: <20250820021952.143068-1-kuba@kernel.org>
+In-Reply-To: <20250820021952.143068-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ sd@queasysnail.net, borisp@nvidia.com, john.fastabend@gmail.com,
+ linux-kselftest@vger.kernel.org, ramdhan@starlabs.sg, billy@starlabs.sg
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 20 Aug 2025 12:09:18 +0530 you wrote:
-> Octeontx2/CN10K silicon supports generating a 256-bit key per packet.
-> The specific fields to be extracted from a packet for key generation
-> are configurable via a Key Extraction (MKEX) Profile.
+On Tue, 19 Aug 2025 19:19:51 -0700 you wrote:
+> Each recvmsg() call must process either
+>  - only contiguous DATA records (any number of them)
+>  - one non-DATA record
 > 
-> The AF driver scans the configured extraction profile to ensure that
-> fields from upper layers do not overwrite fields from lower layers in
-> the key.
+> If the next record has different type than what has already been
+> processed we break out of the main processing loop. If the record
+> has already been decrypted (which may be the case for TLS 1.3 where
+> we don't know type until decryption) we queue the pending record
+> to the rx_list. Next recvmsg() will pick it up from there.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,PatchV2] Octeontx2-af: Skip overlap check for SPI field
-    https://git.kernel.org/netdev/net/c/8c5d95988c34
+  - [net,1/2] tls: fix handling of zero-length records on the rx_list
+    https://git.kernel.org/netdev/net/c/62708b9452f8
+  - [net,2/2] selftests: tls: add tests for zero-length records
+    https://git.kernel.org/netdev/net/c/a61a3e961baf
 
 You are awesome, thank you!
 -- 
