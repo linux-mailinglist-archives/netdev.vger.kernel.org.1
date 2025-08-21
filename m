@@ -1,121 +1,120 @@
-Return-Path: <netdev+bounces-215600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F85DB2F72F
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 13:54:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DDAEB2F749
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 13:57:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7526B7A3120
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 11:52:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EE9F727CB1
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 11:54:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4645C2E0929;
-	Thu, 21 Aug 2025 11:54:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EeTlcgdw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E302E03E3;
+	Thu, 21 Aug 2025 11:54:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6178A2DEA78
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 11:53:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2DC32DAFD9;
+	Thu, 21 Aug 2025 11:54:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755777240; cv=none; b=OiKOf1KNPHkE4CtuJEEIdoqZO7WzUv0NHAI6OQTC+dTnDJjcVDF3sMeM/b8v8//P6enpkYIOCyOxeMmnNd5zAZTDG+5pRoLCZxDmnXh79C9LT/v1RuJ6xGiSmzqqruqMSQIto9fabanICGAuQzhYQYm+VgdK5j5cii8zn6NYbCA=
+	t=1755777259; cv=none; b=Njgi/NtjiQphcWekUONTmVWSUIV67V9lj3UJfS8EnY+DCGqKZ0Dwmnybfh/l+KCYr/rdfHY/HTTX7dgKZ4Wsi8J/3CMIUPI/kRADFCPXkLSIq2iIZoSTNHm7porDmgMb0hJ6WkclXgPC3cGCqdY1OXilcGBKjowfw8Id2yDucvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755777240; c=relaxed/simple;
-	bh=L7PbAw7tFxkqZThPb3yJ9U2UGY2pHnuSaci2IGV7yfc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=H4eredic0DU8+YkhSC7fGGjrTv75d8Qm3hElZjPqxbBnZxGKMJWJeCy07P1EWYKX3S8VMixNoCVkQlQQuuTEhZEs6EzZlJGQG5g5IbPGUsPJbeKaeLZlMlOyJa197yiu5PdaqxJl0eFWb+eUvwSZreMUZOAv0ONgY2KQ/nQMyaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=EeTlcgdw; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-333e7517adcso18494771fa.1
-        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 04:53:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1755777236; x=1756382036; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L7PbAw7tFxkqZThPb3yJ9U2UGY2pHnuSaci2IGV7yfc=;
-        b=EeTlcgdwYygVPvWzZ81l5IByZT3GZgdfLnceLEVRtnLKn5kjZAK18d9RTZKllNN3R9
-         UXNJuNZYhZL2/q7EIlmuqT/RNnXonu0xTXfM7Mu1hvzHJXxGStRwQ8wUjUvu1nmWe5kJ
-         bOvHqJiyfkTBFnPalQCG/zkNmCKpV4C//WOnsggDAKiSq2dxxWaUdzQDpOv4icRLO6jy
-         FLT1i4qApSx7t3oDdCbKZI6Uo/XCgFeugJGvh4s4McwDReUaIaDZCi4GNX1+YPb88r4q
-         FyMPyu6OD1xEbix9HWqrFIy2K24Qt+lvmhMkS4VLBb67YbyhwsoovUIdJ3elz5ONpvok
-         A3oQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755777236; x=1756382036;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=L7PbAw7tFxkqZThPb3yJ9U2UGY2pHnuSaci2IGV7yfc=;
-        b=mafIJjATZqttfI2tFHqfq4PpUFscHfgaZqmZs1SVNHqGMSnviiEhQeqgndKEigvVDF
-         DaUJdTNIDKGZzNjhA5Hpwl07TQXIiYVV4EvxnomWZBtdXW3yNxBKXGQc5YZVCCyrKPj3
-         W1qghulTgzb0RJec3Gqj+ECytN32cLyg5J8+FucWL3l8miT8MSRadcQcfC5a1EpsJqrA
-         fLS8U5MrLDaCKhr+Psqiv7K5Xx5XtqkEXItBCpYbJ3W4mGmgF1JRoEPbkcwM9O4CgoI9
-         Nh7WALoFIJsd85yXLqXXGnrOTUfhpHQnfOw9sG3sJK0gddjIsl+I8Xhk5JZ/N4Y2axmf
-         InzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXYSxeB63CQkzOpjr3QzGEnIFbYoJkb239cJaFcpiXLJUbTdP3s2OWl6JVBMFRzAB/MEWKPGgE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLRz+ES8igMDZOSsuK4o2OB8bat0iFDGWoDPKGBwYR1P6zbWE1
-	sKjXSolj9HUfhcz+IINIkY7NEiZZDQJr4s/Y52FyWlqSt1Tce3olE36O6jJZNcyKVi92xksNx56
-	lf1zTa2Nu9BYgwcFRfbGN9b9A4ZhoS5Q4jvnWSepKXQ==
-X-Gm-Gg: ASbGncv+kLN49Mf/15Fjz++Ovx5L4vbTrLcGc2qjPBjlxtmmnzX85S8Wv5MyY8nNWB8
-	iyX0ABiy8Fy4465KSvbPS1qHGPJ5DrvSA0bCpBmDPvguxP7NifpvtOPGM/YO3HBbO6QWOhgR5B9
-	N7enarn5ZlTnVwtobvN4vwd7I1lJtHcuyaeaYDfOtTC6cN8f1cf/lNeXzpSrcas0pblLmgtNVmi
-	MvgZ74=
-X-Google-Smtp-Source: AGHT+IFoewdvNuLwpOMDi7tPmb9FEQKLI5JEdERuyolhueuXHZ2+5KnKdkT/j3cc2QMbmt8jG7ipw7ObSBOoHSZHVLc=
-X-Received: by 2002:a2e:a013:0:b0:332:2d5c:e171 with SMTP id
- 38308e7fff4ca-3354a275fd8mr4061531fa.11.1755777236482; Thu, 21 Aug 2025
- 04:53:56 -0700 (PDT)
+	s=arc-20240116; t=1755777259; c=relaxed/simple;
+	bh=PaAQHUyTGe+B93azQQXoaD5J7SC6s0Sk2ljBFxTqysk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=oh61Qsw0V4RzvJBYz+gfl6XlJtAHi3HchX+4n7BUDACepgKDFXibdOnyGE1OxNqSAUOr/BvwjZgIWWpF0OmVYrJqvZYnBVTskY7w/c1eb65SnrNKyt0RS5c6ZQNLj2ATkAXgC9VOpGkuWbU4X/1I0djMBcGwqCrlxpoeLVC4ONE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4c71qr6kZ0z2gL9S;
+	Thu, 21 Aug 2025 19:51:20 +0800 (CST)
+Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
+	by mail.maildlp.com (Postfix) with ESMTPS id 83C731A016C;
+	Thu, 21 Aug 2025 19:54:14 +0800 (CST)
+Received: from [10.174.179.113] (10.174.179.113) by
+ dggpemf500002.china.huawei.com (7.185.36.57) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 21 Aug 2025 19:54:13 +0800
+Message-ID: <1c4a6601-c484-4ffb-a0c1-ec02bd644a5e@huawei.com>
+Date: Thu, 21 Aug 2025 19:54:12 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250820171302.324142-1-ariel.dalessandro@collabora.com> <20250820171302.324142-10-ariel.dalessandro@collabora.com>
-In-Reply-To: <20250820171302.324142-10-ariel.dalessandro@collabora.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Thu, 21 Aug 2025 13:53:45 +0200
-X-Gm-Features: Ac12FXy1SuiUzS280qDRSJHcA_2jVr4y-FjGItB1ru8eWVK-JVnc9Ql5XGWxM9c
-Message-ID: <CACRpkdbVqNpz2HiAz+_vFUkDy1TE6ZDxp6X2g9rRWAt4s=jRgw@mail.gmail.com>
-Subject: Re: [PATCH v1 09/14] dt-bindings: pinctrl: mediatek,mt65xx-pinctrl:
- Allow gpio-line-names
-To: "Ariel D'Alessandro" <ariel.dalessandro@collabora.com>
-Cc: airlied@gmail.com, amergnat@baylibre.com, andrew+netdev@lunn.ch, 
-	andrew-ct.chen@mediatek.com, angelogioacchino.delregno@collabora.com, 
-	broonie@kernel.org, chunkuang.hu@kernel.org, ck.hu@mediatek.com, 
-	conor+dt@kernel.org, davem@davemloft.net, dmitry.torokhov@gmail.com, 
-	edumazet@google.com, flora.fu@mediatek.com, houlong.wei@mediatek.com, 
-	jeesw@melfas.com, jmassot@collabora.com, kernel@collabora.com, 
-	krzk+dt@kernel.org, kuba@kernel.org, 
-	kyrie.wu@mediatek.corp-partner.google.com, lgirdwood@gmail.com, 
-	louisalexis.eyraud@collabora.com, maarten.lankhorst@linux.intel.com, 
-	matthias.bgg@gmail.com, mchehab@kernel.org, minghsiu.tsai@mediatek.com, 
-	mripard@kernel.org, p.zabel@pengutronix.de, pabeni@redhat.com, 
-	robh@kernel.org, sean.wang@kernel.org, simona@ffwll.ch, 
-	support.opensource@diasemi.com, tiffany.lin@mediatek.com, tzimmermann@suse.de, 
-	yunfei.dong@mediatek.com, devicetree@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-arm-kernel@lists.infradead.org, 
-	linux-clk@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-media@vger.kernel.org, linux-mediatek@lists.infradead.org, 
-	linux-sound@vger.kernel.org, netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND net-next] ipv6: mcast: Add ip6_mc_find_idev()
+ helper
+To: Paolo Abeni <pabeni@redhat.com>, <davem@davemloft.net>,
+	<dsahern@kernel.org>, <edumazet@google.com>, <kuba@kernel.org>,
+	<horms@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20250818101051.892443-1-yuehaibing@huawei.com>
+ <4ff3b7df-cba0-4446-8411-7b99b5cdce69@redhat.com>
+Content-Language: en-US
+From: Yue Haibing <yuehaibing@huawei.com>
+In-Reply-To: <4ff3b7df-cba0-4446-8411-7b99b5cdce69@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ dggpemf500002.china.huawei.com (7.185.36.57)
 
-On Wed, Aug 20, 2025 at 7:16=E2=80=AFPM Ariel D'Alessandro
-<ariel.dalessandro@collabora.com> wrote:
+On 2025/8/21 17:42, Paolo Abeni wrote:
+> On 8/18/25 12:10 PM, Yue Haibing wrote:
+>> @@ -302,32 +310,18 @@ int ipv6_sock_mc_drop(struct sock *sk, int ifindex, const struct in6_addr *addr)
+>>  }
+>>  EXPORT_SYMBOL(ipv6_sock_mc_drop);
+>>  
+>> -static struct inet6_dev *ip6_mc_find_dev(struct net *net,
+>> -					 const struct in6_addr *group,
+>> -					 int ifindex)
+>> +static struct inet6_dev *ip6_mc_find_idev(struct net *net,
+>> +					  const struct in6_addr *group,
+>> +					  int ifindex)
+>>  {
+>> -	struct net_device *dev = NULL;
+>> -	struct inet6_dev *idev;
+>> -
+>> -	if (ifindex == 0) {
+>> -		struct rt6_info *rt;
+>> +	struct inet6_dev *idev = NULL;
+>> +	struct net_device *dev;
+>>  
+>> -		rcu_read_lock();
+>> -		rt = rt6_lookup(net, group, NULL, 0, NULL, 0);
+>> -		if (rt) {
+>> -			dev = dst_dev(&rt->dst);
+>> -			dev_hold(dev);
+>> -			ip6_rt_put(rt);
+>> -		}
+>> -		rcu_read_unlock();
+>> -	} else {
+>> -		dev = dev_get_by_index(net, ifindex);
+>> +	dev = ip6_mc_find_dev(net, group, ifindex);
+>> +	if (dev) {
+>> +		idev = in6_dev_get(dev);
+>> +		dev_put(dev);
+>>  	}
+>> -	if (!dev)
+>> -		return NULL;
+>> -
+>> -	idev = in6_dev_get(dev);
+>> -	dev_put(dev);
+> 
+> Not so minor nit: if you omit the last chunk (from 'if (dev) {' onwards,
+> unneeded), the patch will be much more obvious and smaller. Also you
+> could clarify a bit the commit message.
 
-> Current, the DT bindings for MediaTek's MT65xx Pin controller is missing
-> the gpio-line-names property, add it to the associated schema.
->
-> Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+Thanks, it is indeed more clear, will do this in v2
 
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-
-Yours,
-Linus Walleij
+> You can retain Dawid's ack when posting the next version
+> 
+> /P
+> 
+> 
 
