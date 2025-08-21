@@ -1,60 +1,64 @@
-Return-Path: <netdev+bounces-215610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215611-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA2D0B2F80D
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:31:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9029EB2F878
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:44:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC5933A990C
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 12:31:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6598A6048E7
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 12:43:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DEC130EF9C;
-	Thu, 21 Aug 2025 12:31:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C26531AF1F;
+	Thu, 21 Aug 2025 12:41:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="HI6mVSyM"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WY/wwDUW"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F24AF2F5E
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 12:31:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 681B131AF13;
+	Thu, 21 Aug 2025 12:41:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755779496; cv=none; b=ElCKh8xDC3OoUfVHzeMMHZ+rAUIOnu0k2gDI/9JPA76oDufT8nGdphAFyJ0IMyBHp7SENk+GYLPZsPkHujuRaNs+lzbtz5VvZabT5EpmtkO41bY1nRTLiFfPRZwfOFRRIrCzbVlMFhs5utKcllxDg2Y9drBk8g9nfEWX9TrAFUI=
+	t=1755780080; cv=none; b=ikKln9V7GkLkfgKnTG3PRKDGyLJaCIUxiDvseGyuqlb6WoGgwqtnjp7mLwReddUsJ5PI+TK4GmL7abuixS38fWbamQJvsM0GAU+wQZya+IpurCmtsbRm3rZ64UXRfzvjMjPGmQf3pdkNZpU98MLhvaPAalv8qGlpvskh9gU8NFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755779496; c=relaxed/simple;
-	bh=njKY15hGc+dMqrtzrwBA8umfUwTNYx/s9vdbKXNbyFA=;
+	s=arc-20240116; t=1755780080; c=relaxed/simple;
+	bh=5SntXcT3EX6iRj3qRaCgNZss4u35RUFrPDY1w3CY6gA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MXZKXgCsAfI3GyIPqixWaDsXEap9SM3aDiHSUwlppDax41YE0h9NZXS2Da2ylkbv5hg5RgWpa/ITPPHBuraXmvEgWYHL9bhUfUxvtDD+3M6j0lLeOCAU7sSAgIbaGt8OiAMqIUoS0NPRV5Fcuj7EzN9gWzDmBWOFnvtXHPNKo0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=HI6mVSyM; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1173)
-	id 982CE2115A5F; Thu, 21 Aug 2025 05:31:34 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 982CE2115A5F
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1755779494;
-	bh=4KvkEgGYEwO19yBArhSOsaxuLbp/FcuULsjMt/wUi54=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HI6mVSyMdim+X11ofXvJK7LNdphsXWrI6pbs/GWY2Yrt6U8gUluocmj1I+gWITy8b
-	 bynvCm2cESsJxiQCQUOMt5466osnMTINqGmdf9yQeA7mfE+b/2I8QNYxYwYmXOwsmd
-	 Q6w6Y1SpcXHuP+BnxulFTXrnumBEdQItFmaXuoHc=
-Date: Thu, 21 Aug 2025 05:31:34 -0700
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: David Ahern <dsahern@gmail.com>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	netdev@vger.kernel.org, haiyangz@microsoft.com,
-	shradhagupta@linux.microsoft.com, ssengar@microsoft.com,
-	dipayanroy@microsoft.com, ernis@microsoft.com
-Subject: Re: [PATCH iproute2-next v3] iproute2: Add 'netshaper' command to
- 'ip link' for netdev shaping
-Message-ID: <20250821123134.GD7364@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1754895902-8790-1-git-send-email-ernis@linux.microsoft.com>
- <20250816155510.03a99223@hermes.local>
- <20250818083612.68a3c137@kernel.org>
- <31e038a1-5a17-4c13-bf37-d07cbccd7056@gmail.com>
- <20250818090010.1201f52a@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=CE/L5aSsSMhC/4MzAHMn7onftJQNJT0NgVEsAAiuRiI4kaSLbrvLfkLtWuMEXPDonwnlEpYylvqrB255C/lMpGGvBbF7LjSymWTkk7//AzxY9OKfWsLx7jQkxFSvQoL7MZecPZJnhdFk0BAMb+TQdxkBRiJkDeYQbLjjq0Me7R8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WY/wwDUW; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=jYiM3Qw38rzuBVo6SaPYD/cuw6C9KtVM8CdKHhDfty0=; b=WY/wwDUWzp4h7zINiTrJz700Um
+	p3pkz2fXL/JslUBJLYn2wfRTAaSuJDF9/AKKecZDL8s40kz0MoyCJ5SoX/GdDFJBmgV8Q1ZiZtEQs
+	Li02meBLdBk8GxQGiRwkWJH80PVISjD2chohLLuRvxGLK3qAU5g4nYooZqIzGa17MT0Q=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1up4bN-005Ryv-TY; Thu, 21 Aug 2025 14:41:09 +0200
+Date: Thu, 21 Aug 2025 14:41:09 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: David Yang <mmyangfl@gmail.com>
+Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next v5 3/3] net: dsa: yt921x: Add support for Motorcomm
+ YT921x
+Message-ID: <02baf961-b82d-4819-8791-229f7735a1a7@lunn.ch>
+References: <20250820075420.1601068-1-mmyangfl@gmail.com>
+ <20250820075420.1601068-4-mmyangfl@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,41 +67,71 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250818090010.1201f52a@kernel.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20250820075420.1601068-4-mmyangfl@gmail.com>
 
-On Mon, Aug 18, 2025 at 09:00:10AM -0700, Jakub Kicinski wrote:
-> On Mon, 18 Aug 2025 09:41:29 -0600 David Ahern wrote:
-> > On 8/18/25 9:36 AM, Jakub Kicinski wrote:
-> > > Somewhat related -- what's your take on integrating / vendoring in YNL?  
-> > 
-> > I feel like this has been brought up a few times.
-> > 
-> > Is there a specific proposal or any patches to review?
-> 
-> Not AFAIK. Erni is being asked to rethink his approach here, and 
-> if we're going with a new command perhaps YNL should be on the table.
-> 
-Thank you for the feedback and for suggesting integration with the ynl
-tool.
+> +#define should_unreachable() \
+> +	pr_err("%s: !!unreachable %d, please report a bug!\n", \
+> +	       __func__, __LINE__)
+> +#define consume_retval(res) do { \
+> +	if (unlikely(res)) \
+> +		pr_err("%s: %i\n", __func__, (res)); \
+> +} while (0)
+> +
 
-For the current implementation, I have followed your earlier guidance
-( while implementing bandwidth clamping for MANA interface ) and used 
-netlink commands similar to those used by ynl to support netshaper
-operations from the kernel.
+> +static int
+> +yt921x_vid_del(struct yt921x_priv *priv, int port, u16 vid)
+> +{
+> +	struct yt921x_port *pp = &priv->ports[port];
+> +	u32 mask;
+> +	u32 ctrl;
+> +	u32 val;
+> +	int res;
 
-Ref: https://lore.kernel.org/all/20250421170349.003861f2@kernel.org/
+...
 
-> I'd be very interested to get a final ruling on YNL integration 
-> into iproute2 -- given its inability to work as a shared object /
-> library it's not unreasonable for the answer to be "no". 
+> +
+> +	if (pp->vids_cnt <= 0)
+> +		should_unreachable();
+> +	else
+> +		pp->vids_cnt--;
+> +	return 0;
 
-This approach, to use netshaper as separate command in iproute2, seemed
-like the most practical path forward to address shaping support without
-introducing additional complexity.
-> 
-> The page pool sample in the kernel sources is very useful, I find
-> myself copying to various systems during debug. If there's no clear
-> path to YNL integration with iproute2 it's time for that sample to
-> be come a real CLI tool.
+Have you seen other drivers do this? If you are doing something which
+other drivers don't do, it is probably wrong.
+
+What you are more likely to see is WARN_ON(pp->vids_cnt <= 0); You
+then get a stack trace, to help debug what happened. Kernel developers
+know what WARN_ON() does, so it is easy to
+understand. should_unreachable() is unique, it is unclear what it
+does, making it harder to understand and review.
+
+> +static void
+> +yt921x_dsa_port_bridge_leave(struct dsa_switch *ds, int port,
+> +			     struct dsa_bridge bridge)
+> +{
+> +	struct yt921x_priv *priv = to_yt921x_priv(ds);
+> +	struct device *dev = to_device(priv);
+> +	u16 ports_mask;
+> +	int res;
+> +
+> +	ports_mask = dsa_bridge_ports(ds, bridge.dev);
+> +
+> +	dev_dbg(dev, "%s: port %d, mask 0x%x\n", __func__, port, ports_mask);
+> +
+> +	ports_mask |= priv->cpu_ports_mask;
+> +
+> +	yt921x_smi_acquire(priv);
+> +	res = yt921x_bridge_force(priv, ports_mask);
+> +	yt921x_smi_release(priv);
+> +
+> +	consume_retval(res);
+> +}
+
+And this is the same. Every driver you look at would just have the if
+statement, not a macro.
+
+In order to make drivers easy to maintain, easier to review, easy to
+debug, they should all look similar.
+
+	Andrew
 
