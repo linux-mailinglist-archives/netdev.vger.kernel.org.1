@@ -1,76 +1,69 @@
-Return-Path: <netdev+bounces-215506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34A50B2EE4D
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 08:37:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 01CE6B2EE71
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 08:43:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0FB71C8302B
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 06:37:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE5561C83640
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 06:44:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD14E274FDB;
-	Thu, 21 Aug 2025 06:37:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B27692E7F3D;
+	Thu, 21 Aug 2025 06:43:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="oIEAKtvC";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="KN0OingQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RlbxLLph"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20CA6255248;
-	Thu, 21 Aug 2025 06:37:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 683342110;
+	Thu, 21 Aug 2025 06:43:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755758244; cv=none; b=IHESy3q9gCJ8cAgGTUBkAU/AVfjKk3rSEGm4k+RZEC3UR/eDrFxu7mSywDmhvHd2U47GAkEGyoaJzvDpgmOr1aaCsoCpr6FYZIKsIDEZAlnNKSXXfNneUCjWY4CyAO8htDjaDA4lgUkO/ut10JqEbb97FARiC743ftI6NlHqB4I=
+	t=1755758613; cv=none; b=oJ4EIHlPtdiW6tDA9F2xKRjWGWpU2zkcruZeK2pM5iRIwl7QHRMxXQDjFPKkJXyG4V9LiRvft90/womBB8yBIHaqpaW2rIGPeYWQYqOh5NXJ9ZqrtrwFxGBp6sbhP3aakkwg7/nK+8mKEmXRDryqC40r3gVGF4+nMPUsjFn+mNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755758244; c=relaxed/simple;
-	bh=fIPjFgU4kbJHAMX5NoqzdFE8Hxcq8vV4q6G70L/GAAc=;
+	s=arc-20240116; t=1755758613; c=relaxed/simple;
+	bh=zaVWerZTZLJ8YGpnqDKef0xiQVpqgGGNlE3XojBrVrQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cdG1X0e1dFEmFdzQM7ffM8F19f7nwwa7fQ5ts9mWeGj3B87Ksq4xfOUOFSetd60x3I9bp2sOcqMWfsw+ugFhVkcgYXEu8IG4XpXLQACo4t3Cp9SO5lns/9VTBuZcgqiJ52Lm7JR0MrtyFsIWX6jwdAkTGZcnzURyMetXr/rXZY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=oIEAKtvC; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=KN0OingQ; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Thu, 21 Aug 2025 08:37:19 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1755758240;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7nDs/D4cyXax7bq0/ER/nxMXVP+lSfgy8DQRWLUXCeQ=;
-	b=oIEAKtvC6pWqCLaN4se0+Tj60Vf0m/v8jMljcT64+LhITUTHBqppHia2ir5+Tn8D9lu0m7
-	USDAv+vBAcz8rXrDGXpI0ZhOGYox4hlHyMxmT4n0lsdOhyQt9KN+KR6v7z1FNsAMO2FSkW
-	S7suh4XiuABocgrO8me0AwKwFjSYoX2N6W0phpI1F60lJHJrfvjCDWXGTs26yconA9m4ak
-	ZFrtHeDMF41RuyH8pwLpa0wFtOfCv8nhm1nYXgd/fiHmiBaQj+8BN8bzO9XC9NbK0L/4+k
-	eTllLtoEwHQCM4zauKM8r1LBC3C3tVAE7iiIu1TsNob5+HqcqtNxo7aqaIQdaA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1755758240;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7nDs/D4cyXax7bq0/ER/nxMXVP+lSfgy8DQRWLUXCeQ=;
-	b=KN0OingQ10+N2C9Xyj48IGU+Ka1FkFnmk7xUrIrxZmANX9smIXWXbzZbU1P415sPGi0HCa
-	aUl8qSJMLhfojbAg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Stefano Brivio <sbrivio@redhat.com>
-Cc: Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netfilter-devel@vger.kernel.org,
-	pablo@netfilter.org
-Subject: Re: [PATCH net-next 5/6] netfilter: nft_set_pipapo: Store real
- pointer, adjust later.
-Message-ID: <20250821063719.SylAQzbe@linutronix.de>
-References: <20250820144738.24250-1-fw@strlen.de>
- <20250820144738.24250-6-fw@strlen.de>
- <20250820174401.5addbfc1@elisabeth>
- <20250820160114.LI90UJWx@linutronix.de>
- <20250820181536.02e50df6@elisabeth>
- <20250820162925.CWZJJo36@linutronix.de>
- <20250820183451.6b4749d6@elisabeth>
- <20250820230445.05f5029f@elisabeth>
+	 Content-Type:Content-Disposition:In-Reply-To; b=aIGASKiuxLd0LIsNq6/0QArWbZcerbbNxVD2jHL5UsBpQCdPRwumraQubyam7Hz6fyXElDQgModm3KZMLCYL45dK0O5h3OgnxwXIWSpYTvoS+oEpYWGnKJ6N5glX/P5BvzvRI2gP9ZsWLm8YSmm7IYrAcZcnGGcDcToxUF39fQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RlbxLLph; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5356EC4CEED;
+	Thu, 21 Aug 2025 06:43:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755758612;
+	bh=zaVWerZTZLJ8YGpnqDKef0xiQVpqgGGNlE3XojBrVrQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RlbxLLphD3s6EoJ5D3WCBJhkvpXfyxmkM+Qya8AKcXeBnVJLqM3Vsrc3PdaE1oGl/
+	 Qo+edh7KSJ0kTQEF7CnlEohahPoHRRs2dickP/uGTguIIdLZVFlS2b52/8ecx5Nk/m
+	 7T2LcSdChTzPHT3itMuL39yH6al0pQprxVmGFsBW9p+lMgWfXyVZWtte+oZjqxv2Uz
+	 sksMu6TvOONzSOEaSF9B1dAWw/J39W6ARtM4nHVYp3KwZbqb9VuE1HT0enMMEDhCZW
+	 i8kxRu1EZ2sYpSQHNpCitTBsBoN1OR7Lkjq536twpmdXapSiVtjLmM2GbVlIRiytW9
+	 +hYeRC8retWSA==
+Date: Thu, 21 Aug 2025 08:43:30 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+Cc: airlied@gmail.com, amergnat@baylibre.com, andrew+netdev@lunn.ch, 
+	andrew-ct.chen@mediatek.com, angelogioacchino.delregno@collabora.com, broonie@kernel.org, 
+	chunkuang.hu@kernel.org, ck.hu@mediatek.com, conor+dt@kernel.org, davem@davemloft.net, 
+	dmitry.torokhov@gmail.com, edumazet@google.com, flora.fu@mediatek.com, 
+	houlong.wei@mediatek.com, jeesw@melfas.com, jmassot@collabora.com, kernel@collabora.com, 
+	krzk+dt@kernel.org, kuba@kernel.org, kyrie.wu@mediatek.corp-partner.google.com, 
+	lgirdwood@gmail.com, linus.walleij@linaro.org, louisalexis.eyraud@collabora.com, 
+	maarten.lankhorst@linux.intel.com, matthias.bgg@gmail.com, mchehab@kernel.org, 
+	minghsiu.tsai@mediatek.com, mripard@kernel.org, p.zabel@pengutronix.de, pabeni@redhat.com, 
+	robh@kernel.org, sean.wang@kernel.org, simona@ffwll.ch, 
+	support.opensource@diasemi.com, tiffany.lin@mediatek.com, tzimmermann@suse.de, 
+	yunfei.dong@mediatek.com, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, 
+	linux-mediatek@lists.infradead.org, linux-sound@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v1 03/14] dt-bindings: arm: mediatek: mmsys: Add
+ assigned-clocks/rates properties
+Message-ID: <20250821-electric-kestrel-of-awe-cb89dc@kuoka>
+References: <20250820171302.324142-1-ariel.dalessandro@collabora.com>
+ <20250820171302.324142-4-ariel.dalessandro@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,21 +72,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250820230445.05f5029f@elisabeth>
+In-Reply-To: <20250820171302.324142-4-ariel.dalessandro@collabora.com>
 
-On 2025-08-20 23:04:45 [+0200], Stefano Brivio wrote:
-> On Wed, 20 Aug 2025 18:34:51 +0200
-> 
-> it's a single run and not exactly from the same baseline (you see that
-> the baseline actually improved), but I'd say it's enough to be
-> confident that the change doesn't affect matching rate significantly,
-> so:
-> 
-> Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
-> 
-> ...thanks for making this simpler!
+On Wed, Aug 20, 2025 at 02:12:51PM -0300, Ariel D'Alessandro wrote:
+> Current, the DT bindings for MediaTek mmsys controller is missing the
+> assigned-clocks and assigned-clocks-rates properties. Add these and
 
-Thank you for testing in the meantime!
+No, they do not miss them. I don't understand why you are adding these.
 
-Sebastian
+> update the example as well.
+> 
+> Signed-off-by: Ariel D'Alessandro <ariel.dalessandro@collabora.com>
+> ---
+>  .../devicetree/bindings/arm/mediatek/mediatek,mmsys.yaml | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/arm/mediatek/mediatek,mmsys.yaml b/Documentation/devicetree/bindings/arm/mediatek/mediatek,mmsys.yaml
+> index 3f4262e93c789..d045d366eb8e2 100644
+> --- a/Documentation/devicetree/bindings/arm/mediatek/mediatek,mmsys.yaml
+> +++ b/Documentation/devicetree/bindings/arm/mediatek/mediatek,mmsys.yaml
+> @@ -68,6 +68,12 @@ properties:
+>        of the power controller specified by phandle. See
+>        Documentation/devicetree/bindings/power/power-domain.yaml for details.
+>  
+> +  assigned-clocks:
+> +    maxItems: 1
+> +
+> +  assigned-clock-rates:
+> +    maxItems: 1
+> +
+
+Drop both, completely redundant and not actually in the scope of the binding.
+
+Best regards,
+Krzysztof
+
 
