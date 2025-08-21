@@ -1,130 +1,158 @@
-Return-Path: <netdev+bounces-215733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AC97B30115
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 19:30:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BD312B3011C
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 19:31:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBC7D620FD7
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 17:28:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B4855A3E72
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 17:29:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD31333A01B;
-	Thu, 21 Aug 2025 17:27:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC2733054E7;
+	Thu, 21 Aug 2025 17:29:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LF0ltisw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HjImgYFD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3FC6321F53;
-	Thu, 21 Aug 2025 17:27:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B462DFA21;
+	Thu, 21 Aug 2025 17:29:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755797242; cv=none; b=bop0j7/g/O4zq0+BPWoEJjgGAvQLgljysbzZddJbKKLrLAUIM+50vlRhdP5fAaAvN6ajVoh4gT0b/5COKy0K8XMm/Syy1MAAzrG/aq/o6hW56kFoe2UbLlHmQ41d5GSoOT8CZBuy1XxnwnYN4mABUMjEc98/5kj37K7B8Ydj9J0=
+	t=1755797390; cv=none; b=gq0bjd1vGWOHrTEfJrwyrfJY4kbp1bX/B06UqLvV+Zj7iJ8TU5DUOxwxT+9pMdeSjAhZuKi1VAktQrtydqeuyJmkNV3vfnDb2+C6aYlhvYJKUAdvRHJdGGSv66elXgvCidRaPGXkSVICXo503tLuqUMSoPJTtEA9CzdMxICZlj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755797242; c=relaxed/simple;
-	bh=cLCla9s2LojKSPoNV8EDyc+1W5sSoN3oOPeQCGlXy1k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fq/UOOCZOW1PrGjqnXv2cLvW/CzHu6S1qDetbXsh4PMSxLSIJ89xrASyF6FJ7zxwKiZXW1vvyiEetYx6h8H5UdRBdonSY5X3wJ4PSveVO8YojitCHGRF0PifGAt1WMGVtPe1xNItYFzHNhVTFuxFA0w2W/G/bBZG9uZzwQ8ASx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LF0ltisw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B94DC4CEEB;
-	Thu, 21 Aug 2025 17:27:22 +0000 (UTC)
+	s=arc-20240116; t=1755797390; c=relaxed/simple;
+	bh=3cJ6X2W2PFxDwEeEoAnsOEX0ZLzSK8hEG/0SWi7KlRM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kWJLncdCx/sP5MZ9LIOkmHxNstjGaJaG8ARmxb/41ijAYC3v0LGAdebsr6yB3FYfHGPPK9tpgk8tF3DTenBcPk8/tzarUuCxX8E/WVtFt8vZE1MpfPeB6IRLBfP95BbmHxr1ZmizFv0SEnqAsqSpWEINjQGGidvIs4yKrZUOq50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HjImgYFD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62FCFC4CEEB;
+	Thu, 21 Aug 2025 17:29:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755797242;
-	bh=cLCla9s2LojKSPoNV8EDyc+1W5sSoN3oOPeQCGlXy1k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LF0ltiswl3B4fUjQ5Ushzz0wN61Br6JJsS9GrFDzgweZRV9rlcTvqELkAwsP4qXsj
-	 IOkNuti9j5rV0UiXfuMXIdD21v81fbMpYXjdK4WVUZRgXJlB83xcdcwUz5/EjURnN6
-	 RPl+Bx+nwduKJxIYgkgtEK0wcD9cfZjJWYQeuAp0+akEIW8wb+8TiXKVtxBHC+dfDI
-	 ffsV8Yr7fmABabVs181XKC0XNf6JMgC7PAVOHqD7Erl06FzXiUT+rF8lQffi7DNapO
-	 sVG/6kTppAaM9+3QH0BdsLWLjo64sU64S5iq23OOvMQqkNTlZ1bXcOJb8whjlGCXr/
-	 M0r3Pvp13rw7w==
-Date: Thu, 21 Aug 2025 10:27:21 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: torvalds@linux-foundation.org
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, pabeni@redhat.com
-Subject: Re: [GIT PULL] Networking for v6.17-rc3
-Message-ID: <20250821102721.6deae493@kernel.org>
-In-Reply-To: <20250821171641.2435897-1-kuba@kernel.org>
-References: <20250821171641.2435897-1-kuba@kernel.org>
+	s=k20201202; t=1755797390;
+	bh=3cJ6X2W2PFxDwEeEoAnsOEX0ZLzSK8hEG/0SWi7KlRM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=HjImgYFD2oUolUoitOP6Q7i/tO34EXB4jpN0nh/Tpi2plOrATpra4qhc4R4pg3gkt
+	 WUdsD1N7hVBwTIFyo8BVSd7QOAp0RwSGioszcRhLBlPDV+8VlK8UBKR7oW0zB4+KXs
+	 KLuVS6D/bOhRmV2As7Vc8nksSVPFqEvhnO9jqlIx6FTJvAXnRL5zvQ3s/pjLT7xRi4
+	 VCK/6KUGBV5Jr9UP2rdlW3++4uQU9ad0h9j5ETue0GGhPNUe+mja7f8Dzz7Ag7CarP
+	 leKhe9wBB0cxXF0cmKRj6SrDsnunTgeyORE89l64u0yGjD070mvGAqa3XrvfEGm0Ti
+	 oEZtsgqBA/7/g==
+Message-ID: <599598da-5453-4cd9-b19d-ca7935985030@kernel.org>
+Date: Thu, 21 Aug 2025 19:29:43 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/2] xsk: support generic batch xmit in copy mode
+To: Jason Xing <kerneljasonxing@gmail.com>,
+ "Karlsson, Magnus" <magnus.karlsson@intel.com>,
+ =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com,
+ maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me,
+ ast@kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com,
+ horms@kernel.org, andrew+netdev@lunn.ch, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+References: <20250811131236.56206-1-kerneljasonxing@gmail.com>
+ <20250811131236.56206-3-kerneljasonxing@gmail.com>
+ <b07b8930-e644-45a2-bef8-06f4494e7a39@kernel.org>
+ <CAL+tcoBWOUCd8f1Q6BYh+xuKs5=Qgr2oOBb9CLU_6BrasD0vfg@mail.gmail.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <CAL+tcoBWOUCd8f1Q6BYh+xuKs5=Qgr2oOBb9CLU_6BrasD0vfg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, 21 Aug 2025 10:16:41 -0700 Jakub Kicinski wrote:
-> Hi Linus!
+I need some help from Cc Magnus or Björn, to explain why you changes
+fails in xsk_destruct_skb().
 
-FWIW I'm hitting the splat below from random code paths (futex, epoll,
-bpf) when running your tree within Meta. Takes some time to hit, IDK
-what exactly triggers it. Could be a driver tho I can hit it on two
-different generations of servers.
 
-[ 2121.610162] BUG: sleeping function called from invalid context at mm/vmalloc.c:3409
-[ 2121.625698] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 3382, name: x
-[ 2121.642639] preempt_count: 1, expected: 0
-[ 2121.651190] RCU nest depth: 0, expected: 0
-[ 2121.660177] INFO: lockdep is turned off.
-[ 2121.668619] Preemption disabled at:
-[ 2121.668625] [<ffffffff84565d0f>] schedule+0x15f/0x360
-[ 2121.686927] CPU: 9 UID: 34126 PID: 3382 Comm: x Kdump: loaded Tainted: G S               N  6.17.0-rc2-00079-g1c656b1efde6 #136 PREEMPT(none) 
-[ 2121.686938] Tainted: [S]=CPU_OUT_OF_SPEC, [N]=TEST
-[ 2121.686944] Call Trace:
-[ 2121.686947]  <TASK>
-[ 2121.686950]  dump_stack_lvl+0xe3/0x160
-[ 2121.686962]  ? show_regs_print_info+0x10/0x10
-[ 2121.686969]  ? thaw_kernel_threads+0x1c0/0x1c0
-[ 2121.686985]  ? schedule+0x15f/0x360
-[ 2121.686992]  __might_resched+0x474/0x5f0
-[ 2121.687001]  ? schedule+0x15f/0x360
-[ 2121.687006]  ? __might_sleep+0xe0/0xe0
-[ 2121.687012]  ? rcu_force_quiescent_state+0x250/0x250
-[ 2121.687020]  ? _raw_spin_unlock_irqrestore+0xa5/0x100
-[ 2121.687026]  ? _raw_spin_unlock+0x40/0x40
-[ 2121.687041]  vfree+0x41/0x2f0
-[ 2121.687052]  __mmdrop+0x25f/0x490
-[ 2121.687062]  finish_task_switch+0x31c/0x7a0
-[ 2121.687076]  __schedule+0x158a/0x26b0
-[ 2121.687098]  ? is_mmconf_reserved+0x390/0x390
-[ 2121.687109]  ? schedule+0x92/0x360
-[ 2121.687112]  ? rcu_is_watching+0x1b/0x90
-[ 2121.687122]  ? rcu_is_watching+0x1b/0x90
-[ 2121.687131]  ? _raw_spin_unlock+0x40/0x40
-[ 2121.687141]  schedule+0x166/0x360
-[ 2121.687148]  schedule_hrtimeout_range_clock+0x110/0x290
-[ 2121.687154]  ? ktime_get+0x2b/0x120
-[ 2121.687162]  ? schedule_timeout_idle+0xb0/0xb0
-[ 2121.687170]  ? hrtimer_dummy_timeout+0x10/0x10
-[ 2121.687184]  ? ktime_get+0x64/0x120
-[ 2121.687190]  ? do_epoll_wait+0x75e/0xcc0
-[ 2121.687197]  do_epoll_wait+0xabe/0xcc0
-[ 2121.687205]  ? do_epoll_wait+0x75e/0xcc0
-[ 2121.687227]  ? ep_destroy_wakeup_source+0xd0/0xd0
-[ 2121.687234]  ? do_epoll_wait+0xcc0/0xcc0
-[ 2121.687246]  ? nsecs_to_jiffies+0x20/0x20
-[ 2121.687251]  ? kmem_cache_free+0x18c/0x410
-[ 2121.687259]  ? entry_SYSCALL_64_after_hwframe+0x4b/0x53
-[ 2121.687268]  __x64_sys_epoll_wait+0x179/0x1c0
-[ 2121.687276]  ? ep_try_send_events+0xb50/0xb50
-[ 2121.687284]  ? rcu_is_watching+0x1b/0x90
-[ 2121.687294]  ? entry_SYSCALL_64_after_hwframe+0x4b/0x53
-[ 2121.687300]  ? entry_SYSCALL_64_after_hwframe+0x4b/0x53
-[ 2121.687305]  do_syscall_64+0x86/0x2d0
-[ 2121.687309]  ? trace_irq_enable+0x60/0x180
-[ 2121.687319]  entry_SYSCALL_64_after_hwframe+0x4b/0x53
-[ 2121.687324] RIP: 0033:0x7f46cc32c482
-[ 2121.687343] Code: 89 55 f8 48 89 75 f0 89 7d fc 89 4d ec e8 c6 a7 f6 ff 41 89 c0 44 8b 55 ec 8b 55 f8 48 8b 75 f0 8b 7d fc b8 e8 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 36 44 89 c7 89 45 fc e8 fb a7 f6 ff 8b 45 fc
-[ 2121.687347] RSP: 002b:00007f46507cc2a0 EFLAGS: 00000293 ORIG_RAX: 00000000000000e8
-[ 2121.687355] RAX: ffffffffffffffda RBX: 00007f467a5bb800 RCX: 00007f46cc32c482
-[ 2121.687359] RDX: 0000000000000020 RSI: 00007f467a5bb800 RDI: 000000000000017f
-[ 2121.687363] RBP: 00007f46507cc2c0 R08: 0000000000000000 R09: 7fffffffffffffff
-[ 2121.687366] R10: 0000000000001b47 R11: 0000000000000293 R12: 0000000000000000
-[ 2121.687369] R13: 00007f4668c30000 R14: 00007f4668c30000 R15: 00000000021d3a00
+On 15/08/2025 08.44, Jason Xing wrote:
+> On Tue, Aug 12, 2025 at 10:30 PM Jesper Dangaard Brouer <hawk@kernel.org> wrote:
+>>
+> ...
+>>
+>> But this also requires changing the SKB alloc function used by
+>> xsk_build_skb(). As a seperate patch, I recommend that you change the
+>> sock_alloc_send_skb() to instead use build_skb (or build_skb_around).
+>> I expect this will be a large performance improvement on it's own.
+>> Can I ask you to benchmark this change before the batch xmit change?
+>>
+>> Opinions needed from other maintainers please (I might be wrong!):
+>> I don't think the socket level accounting done in sock_alloc_send_skb()
+>> is correct/relevant for AF_XDP/XSK, because the "backpressure mechanism"
+>> code comment above.
+> 
+> Here I'm bringing back the last test you expected to know :)
+> 
+> I use alloc_skb() to replace sock_alloc_send_skb() and introduce other
+> minor changes, say, removing sock_wfree() from xsk_destruct_skb(). It
+> turns out to be a stable 5% performance improvement on i40e driver.
+> slight improvement on virtio_net. That's good news.
+> 
+> Bad news is that the above logic has bugs like freeing skb in the napi
+> poll causes accessing skb->sk in xsk_destruct_skb() which triggers a
+> NULL pointer issue. How did I spot this one? I removed the BQL flow
+> control and started two xdpsock on different queues, then I saw a
+> panic[1]... To solve the problem like that, I'm afraid that we still
+> need to charge a certain length value into sk_wmem_alloc so that
+> sock_wfree(skb) can be the last one to free the socket finally.
+> 
+> So this socket level accounting mechanism keeps its safety in the above case.
+> 
+> IMHO, we can get rid of the limitation of sk_sndbuf but still use
+> skb_set_owner_w() that charges the len of skb. If we stick to removing
+> the whole accounting function, probably we have to adjust the position
+> of xsk_cq_submit_locked(), but I reckon for now it's not practical...
+> 
+> Any thoughts on this?
+> 
+> [1]
+>   997 [  133.528449] RIP: 0010:xsk_destruct_skb+0x6a/0x90
+>   998 [  133.528920] Code: 8b 6c 02 28 48 8b 43 18 4c 8b a0 68 03 00 00
+> 49 8d 9c 24 e8 00 00 00 48 89 df e8 f1 eb 06 00 48 89 c6 49 8b 84 24
+> 88 00 00 00 <48> 8b 50 10 03 2a 48      8b 40 10 48 89 df 89 28 5b 5d
+> 41 5c e9 6e ec
+>   999 [  133.530526] RSP: 0018:ffffae71c06a0d08 EFLAGS: 00010046
+> 1000 [  133.531005] RAX: 0000000000000000 RBX: ffff9f42c81c49e8 RCX:
+> 00000000000002e7
+> 1001 [  133.531631] RDX: 0000000000000001 RSI: 0000000000000286 RDI:
+> ffff9f42c81c49e8
+> 1002 [  133.532249] RBP: 0000000000000001 R08: 0000000000000008 R09:
+> 00000000000000001003 [  133.532867] R10: ffffffff978080c0 R11:
+> ffffae71c06a0ff8 R12: ffff9f42c81c4900
+> 1004 [  133.533491] R13: ffffae71c06a0d88 R14: ffff9f42e0f1f900 R15:
+> ffff9f42ce850d801005 [  133.534123] FS:  0000000000000000(0000)
+> GS:ffff9f5227655000(0000) knlGS:00000000000000001006 [  133.534831]
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> 1007 [  133.535366] CR2: 0000000000000010 CR3: 000000011c820000 CR4:
+> 00000000003506f0
+> 1008 [  133.536014] Call Trace:
+> 1009 [  133.536313]  <IRQ>
+> 1010 [  133.536583]  skb_release_head_state+0x20/0x90
+> 1011 [  133.537021]  napi_consume_skb+0x42/0x120
+> 1012 [  133.537429]  __free_old_xmit+0x76/0x170 [virtio_net]
+> 1013 [  133.537923]  free_old_xmit+0x53/0xc0 [virtio_net]
+> 1014 [  133.538395]  virtnet_poll+0xed/0x5d0 [virtio_net]
+> 1015 [  133.538867]  ? blake2s_compress+0x52/0xa0
+> 1016 [  133.539286]  __napi_poll+0x28/0x200
+> 1017 [  133.539668]  net_rx_action+0x319/0x400
+> 1018 [  133.540068]  ? sched_clock_cpu+0xb/0x190
+> 1019 [  133.540482]  ? __run_timers+0x1d1/0x260
+> 1020 [  133.540906]  ? __pfx_dl_task_timer+0x10/0x10
+> 1021 [  133.541349]  ? lock_timer_base+0x72/0x90
+> 1022 [  133.541767]  handle_softirqs+0xce/0x2e0
+> 1023 [  133.542178]  __irq_exit_rcu+0xc6/0xf0
+> 1024 [  133.542575]  common_interrupt+0x81/0xa0
+> 
+> Thanks,
+> Jason
+
 
