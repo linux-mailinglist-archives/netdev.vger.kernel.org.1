@@ -1,155 +1,149 @@
-Return-Path: <netdev+bounces-215640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 403D8B2FC0C
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 16:13:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79DF4B2FC2F
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 16:19:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC00F3A94FC
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:08:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F8AA1889455
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:13:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA316239085;
-	Thu, 21 Aug 2025 14:08:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C72E2E0B45;
+	Thu, 21 Aug 2025 14:13:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="rOJN1s2I";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="gYn6KMMR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GxT+wf2H"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D0C222069A
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 14:08:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D05B2E0B59;
+	Thu, 21 Aug 2025 14:12:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755785287; cv=none; b=SXhXDqTy6d+oy8qUESX73HMf5B/qr7zKdajLQ/jdF9TMGFfuLD6YUY/Kgx7EP2XcM1Go/lkwX5lc0xZwtVNPlZnXi6tE5celXFS07QuWyoN+QYiogkNlHKXoy6igdtBwLDMx82b3y7ECTusnd8nvzii97vRWDkd2FvE5ViGpKSI=
+	t=1755785580; cv=none; b=tkPtppB9QnFbS8t/MwWbBRMn4oraf74ZeE6lRCdUrDkFSl6UmxyV/tCIoyzR3/cAu2qQYoJ5QbemD+Kw3cUqYwMT+Tm22/cKxu9fkfbVyt8KPhv7/42vqjok9S3rsjgynjxsavKRbWM9h8GbALSqoSHpmWe3yro58lnE2xQ2Vjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755785287; c=relaxed/simple;
-	bh=97Zu0Bv0fNeJWeob/9eos0/7B+DKVK6081D9saWOivM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ccE+8sdNvsrWdg+O7BSLQlZ/occJd7KSDfPZU1muOOC2e0IeusXoLaAHwVophfIeguUlSuDbesuceuRm0aNGjtKKNBo0ZJoWvdW31rkooVdr+QDuST2sO31uFhu3TOXliOTgD8uVo4GwBQsykKH1vZq1+9QnTo8EUdYJFtYoaPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=rOJN1s2I; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=gYn6KMMR; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1755785284;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+a0n6yg5YpwXfaAe6ujzgjNE4xpyhtOIVlYowEYwLrg=;
-	b=rOJN1s2I/sErJtAxlWiWnB/Zke8rfX5pHhgKnuJQhY0gujy7bJOZAFxINvVwtQCdRiDomg
-	q/59rcaMI2QUKsjAi08IHmxr2L27Brps4a5BOIsPlBfgFRFIgRrs5lQ7sTZkA49HAVO1fi
-	Z3CVQyXuUysK5nrl7JccVn87I5ey8sXv67nmtM2/GZ9nOLxkF/bBcImoOjmNOHQ8o5T47M
-	esx3djGv8IrRoaM3NqgUlrjCDxseIyO5MGTbC3dMeK5Qj+1rgD/rh06qfc5DgjECLiKePn
-	ZMnpeaG1XtDLOW7EOCEgh9GQiJ2YqBAwgDeIfs+ZnMwKwE0GEZ+zlMVOqS+2bw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1755785284;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+a0n6yg5YpwXfaAe6ujzgjNE4xpyhtOIVlYowEYwLrg=;
-	b=gYn6KMMRYMBjxIKsLf+ZQx0i51JXsE4/aG/YsHP5zjYn06GV/GyJXXWrBzkgSIwjNZDwS8
-	LoM2A7jzTKu6GKAg==
-To: Miroslav Lichvar <mlichvar@redhat.com>
-Cc: Jacob Keller <jacob.e.keller@intel.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Vinicius
- Costa Gomes <vinicius.gomes@intel.com>, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next] igb: Retrieve Tx timestamp
- directly from interrupt
-In-Reply-To: <aKcYFbzbbfPXlrlN@localhost>
-References: <20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de>
- <aKMbekefL4mJ23kW@localhost>
- <c3250413-873f-4517-a55d-80c36d3602ee@intel.com>
- <aKV_rEjYD_BDgG1A@localhost>
- <81c1a391-3193-41c6-8ab7-c50c58684a22@intel.com>
- <87ldncoqez.fsf@jax.kurt.home> <aKcYFbzbbfPXlrlN@localhost>
-Date: Thu, 21 Aug 2025 16:08:02 +0200
-Message-ID: <87cy8ooji5.fsf@jax.kurt.home>
+	s=arc-20240116; t=1755785580; c=relaxed/simple;
+	bh=JzFlbqvJbyfZExRim+IPsyzHAGmOhUuIklEqAtZssyU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YXgl7TfOu1HtrwgU1W2r6wa99OdOKek6pK0OFyFRHCRondUms0aobhsgOkzJDeZVf0HCNSzlQR1U1T0qsSZF6CDQK+bmwFGuYEKh0B6SHjHkPYhQc63hUrjXzk4aDKBJdxZuLjBvKhsSQjX6mrvfgCe2G6CP43e/hh4IBEqvKrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GxT+wf2H; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-b474e8d6d01so673434a12.0;
+        Thu, 21 Aug 2025 07:12:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755785578; x=1756390378; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wxDcxcJjJWIviKxX8rPKeJ39EKkqJnwDi/gabzi8NQ4=;
+        b=GxT+wf2HB/bQEhdRbQHEB1JKrwTxZ2C1O8GufPZP8gSZWhEwKFV+pBuJk5NKLcLNgD
+         e8VuwMtUqJlTHJBE8fUsTSjoJalPY2jFS/nj+lFIzjBfsDZ3ybTtgvnpzu7MqmTytYjn
+         97Z6EEdaRI8+DgdjXto6+dBKHc/6ft4AQ0Kzcr+WT8iDjJ1BEQvOByKHxIOuSosfhrIG
+         0fEFgN+GYmLYpS5dI/+m09ICC4b0y5tZ9mswyF3sdP3W23JFk7HgInbpwr1DqfFOK8fv
+         uddeBBRVKKCkA+zO351FYoPOTjNfVtg5X9ZYF42g/L7fu15pwFGcbIx2AU6cDLE6XSn9
+         3k3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755785578; x=1756390378;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wxDcxcJjJWIviKxX8rPKeJ39EKkqJnwDi/gabzi8NQ4=;
+        b=W5M8+e0j6SdlJDfXBs6QFd5hSApqx7gRYPZDLb6Kuszz48L7x6zjL+NY2m8Y3ku51o
+         Md4cxkCb1LLN0ezVzzcRQ5IooV3wLLPOI2Zr1ldn7s0InPlvbDA6PtslSZzJTsRwaAlJ
+         ZYGiOAd6Vf0ksYC9frTmvXUVJMXfsxtbkmMrQV58VksD/zfg0krmgwvrNdUd5BfCxLtv
+         4Yc10Kiugqv3Qm9M+FQrpl83DN2FQS6KNWdkNdcNj3qJ0qCh7vTS5cQasiVkjEGoTuza
+         OO5/+hbaCYxmqk2PA50JcceNd+KJEq4X0z2bFh2Z5azBKviCgsO1VdCk59nKsPxTbEyt
+         lr8g==
+X-Forwarded-Encrypted: i=1; AJvYcCUKMopCqT2p2Jw/1STlaXjiOglKA9cW2ra2MzpjqaBjsGhzVowoqoi4bDOy+fTRc3SsTbOhsvT1aMc=@vger.kernel.org, AJvYcCXq/s/eFPC54GCQeBfaAVoj8pC5uRxL8uzrGwHSYZUT2XVWim0KL8RHofpkfzl8/WA3hldFPjFjSjdhCulAS/p0@vger.kernel.org
+X-Gm-Message-State: AOJu0YwboXMexktu+FUxQp1edq8zSYQJ34gxc2TrhTn1dIc5RCIkZv7b
+	Gh6AhIkfQJKIGV1gabM/CBg0BQclk2rOYH7YdY/dvm5Aq8uxfy3J1OSl
+X-Gm-Gg: ASbGncu7sdSVaQMhIbs1AilfNsM6M4VE734AR3reaRyzSWH1VfCG3CJkVLlU0f47JvX
+	fWzhm7EPnnIc5Ni+ZY0dcnsjOm0WbBAUq7iQlKxhLaR93s+LQVmT7VpPjENqfJZu1II/4X7Almg
+	vFa7NLCmyUCgcYdzBvvJU+Juzb5+xZdY5KQ3nLu52eVO8YOP7mLpk+f2dz5A4IuGS348YUp2PoX
+	c0fOCb79hkOjSSDc/0k4B2id+u7+jvbaklcLzULGpji3U3bQV09nEFq/5wMozM+PKD/OdyXpkzn
+	BzJec4DdLX3OHRxCrp0og8gne8T5J63HM/rRQ37xGudTG4FCChmLMCcvB9KbEi7NTvPcb9+LpNL
+	/YFizKiCnNDPTWHq4HpF5nixc/BE=
+X-Google-Smtp-Source: AGHT+IFcxGoKYxR1wVUGnXRkF/cJwJukRGVJaUzuiohB725dFo1nuTk5EqCkivxP0bKRcCOFCd+mQg==
+X-Received: by 2002:a17:903:1786:b0:240:127:85f1 with SMTP id d9443c01a7336-245fec05b1dmr32395425ad.18.1755785577577;
+        Thu, 21 Aug 2025 07:12:57 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-245ed375db3sm57226395ad.59.2025.08.21.07.12.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Aug 2025 07:12:57 -0700 (PDT)
+Date: Thu, 21 Aug 2025 14:12:46 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>, Petr Machata <petrm@nvidia.com>,
+	Amit Cohen <amcohen@nvidia.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	David Ahern <dsahern@gmail.com>,
+	Jonas Gorski <jonas.gorski@gmail.com>, linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCHv3 net-next 3/3] selftests: bonding: add test for LACP
+ actor port priority
+Message-ID: <aKcpXt_OLrvf4XDN@fedora>
+References: <20250818092311.383181-1-liuhangbin@gmail.com>
+ <20250818092311.383181-4-liuhangbin@gmail.com>
+ <ea44c100-34fc-4dec-a749-454d224fa84e@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ea44c100-34fc-4dec-a749-454d224fa84e@redhat.com>
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+On Thu, Aug 21, 2025 at 11:14:34AM +0200, Paolo Abeni wrote:
+> On 8/18/25 11:23 AM, Hangbin Liu wrote:
+> > +# Trigger link state change to reselect the aggregator
+> > +ip -n "${c_ns}" link set eth1 down
+> > +sleep 1
+> > +ip -n "${c_ns}" link set eth1 up
+> > +# the active agg should be connect to switch
+> > +bond_agg_id=$(cmd_jq "ip -n ${c_ns} -d -j link show bond0" ".[].linkinfo.info_data.ad_info.aggregator")
+> > +eth0_agg_id=$(cmd_jq "ip -n ${c_ns} -d -j link show eth0" ".[].linkinfo.info_slave_data.ad_aggregator_id")
+> > +[ "${bond_agg_id}" -ne "${eth0_agg_id}" ] && RET=1
+> 
+> A few lines above exceed 100 chars, it would be better to wrap them
+> 
+> > +log_test "bond 802.3ad" "actor_port_prio select"
+> > +
+> > +# Change the actor port prio and re-test
+> > +ip -n "${c_ns}" link set eth0 type bond_slave actor_port_prio 10
+> > +ip -n "${c_ns}" link set eth2 type bond_slave actor_port_prio 1000
+> > +# Trigger link state change to reselect the aggregator
+> > +ip -n "${c_ns}" link set eth1 down
+> > +sleep 1
+> > +ip -n "${c_ns}" link set eth1 up
+> > +# now the active agg should be connect to backup switch
+> > +bond_agg_id=$(cmd_jq "ip -n ${c_ns} -d -j link show bond0" ".[].linkinfo.info_data.ad_info.aggregator")
+> > +eth2_agg_id=$(cmd_jq "ip -n ${c_ns} -d -j link show eth2" ".[].linkinfo.info_slave_data.ad_aggregator_id")
+> > +# shellcheck disable=SC2034
+> > +if [ "${bond_agg_id}" -ne "${eth2_agg_id}" ]; then
+> > +	RET=1
+> > +fi
+> > +log_test "bond 802.3ad" "actor_port_prio switch"
+> 
+> The test above is basically the same of the previous one, with a
+> slightly different style, it would be better to factor the whole
+> status cycling, data fetching and comparison in an helper to avoid code
+> duplication and the mentioned confusing difference.
+> 
 
-On Thu Aug 21 2025, Miroslav Lichvar wrote:
-> On Thu, Aug 21, 2025 at 01:38:44PM +0200, Kurt Kanzenbach wrote:
->> On Wed Aug 20 2025, Jacob Keller wrote:
->> > On 8/20/2025 12:56 AM, Miroslav Lichvar wrote:
->> >> But when I increase the rate to 200000, I get this:
->> >>=20
->> >> Without the patch:
->> >> NTP daemon TX timestamps   : 35835
->> >> NTP kernel TX timestamps   : 1410956
->> >> NTP hardware TX timestamps : 581575=20=20=20=20=20=20=20=20=20=20=20=
-=20
->> >>=20
->> >> With the patch:
->> >> NTP daemon TX timestamps   : 476908
->> >> NTP kernel TX timestamps   : 646146
->> >> NTP hardware TX timestamps : 412095
->
->> Miroslav, can you test the following patch? Does this help?
->
-> It seems better than with the original patch, but not as good as
-> before, at least in the tests I'm doing. The maximum packet rate the
-> server can handle is now only about 5% worse (instead of 40%), but the
-> the number of missing timestamps on the server still seems high.
->
-> With the new patch at 200000 requests per second:
-> NTP daemon TX timestamps   : 192404
-> NTP kernel TX timestamps   : 1318971
-> NTP hardware TX timestamps : 418805
->
-> I didn't try to adjust the aux worker priority.
+OK, I will fix it.
 
-Here's what I can see in the traces: In the current implementation, the
-kworker runs directly after the IRQ on the *same* CPU. With the AUX
-worker approach the kthread can be freely distributed to any other
-CPU. This in turn involves remote wakeups etc.
-
-You could try to pin the PTP AUX worker (e.g. called ptp0) with taskset
-to the same CPU where the TS IRQs are processed. That might help to get
-the old behavior back. Adjusting the priority is not necessary, both the
-kworker and AUX thread run with 120 (SCHED_OTHER, nice value 0) by
-default.
-
-Thanks,
-Kurt
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAminKEITHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgmnuEACsD6c/HGINjfd4LUKYXkIyGMzWu+/q
-YiRzYk51/ZKeYPDASuO4pgA7Zlv5kfoPz7lfs7J+b9Pqkn7xR+aUk63Yjw5c9qI+
-dYZ8hOXG1UR8SX9dtGITHhDc4J8cBQZdIQlyHLXBgMQ8Q1n1gdDud9lakTXTU5ld
-CYk2MmWpxqA7I0/uwx7FyUfIoeLVWt3QMThsVsUHXVuchCp6XN5ubptdKbdQJqrD
-na1/S+BnccF5GUc9KX5LCG14jzNVgVvV/O4C99RjeCAv7krMkJpl4Lee0oxrVZpV
-ofg2qY9uKoUZGh6SelPtk74sI7G/CbZvN8AQLpg47BpvNtUZtwmj4HK00DPiiPTu
-mzwrmhoTI/s5fcdwKsYNFlIaA73RN6xGE7RCOovGnMb6guyMYyPb6Uco3sQ/qtfY
-JePd8Jrvac4MV7OR1FH3mat7L5R70v/NWKqVanQlLn5ofI2zEaWAU/poeWYmob7g
-wwpBv3yDRrDOXvl04JCY3eFh6G5Kb8Yc+vHpgZ+VAQfOJjyME7UkySTS42PZwFPT
-tgWaXqJVSLClObVp/gptJueaRpzE6FUalJxkKrc6ICxgqsJBCrLuKBqe0NxR8zef
-9TCmer4t3Jwo9JwiHEVI2LRIrS5R6RzSInoc4tvODRNb15tEps003vuHHbkGBIgJ
-xFPd492TdGdDtg==
-=qiXK
------END PGP SIGNATURE-----
---=-=-=--
+Regards
+Hangbin
 
