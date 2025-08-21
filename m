@@ -1,128 +1,125 @@
-Return-Path: <netdev+bounces-215582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9813B2F5A1
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 12:50:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E201B2F5A4
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 12:51:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74918AA487B
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 10:50:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58E66AA47AA
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 10:51:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C58E6308F1A;
-	Thu, 21 Aug 2025 10:50:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mnkrqOXH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4DC6308F11;
+	Thu, 21 Aug 2025 10:50:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84DB3308F02;
-	Thu, 21 Aug 2025 10:50:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F86308F1D;
+	Thu, 21 Aug 2025 10:50:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755773414; cv=none; b=g+2W7wWTLH8GicqRyQEOeulhllSTxl2djV55e2b2y8piKkbjBj8SFBis4dkCKZ5WyMjx8zUaJ4qbTO09u2qZhoH3FUdZAt2lIXWsIILNYCmYDuevfWwS4nH3Vc/Sh3xgmgqjHI2Yku9lZa2wHqKOHCJaVRICYC3b9fXgZrFcbKI=
+	t=1755773459; cv=none; b=LjDp22E3lxCObEraaF5IskTlUFoKmAak6iH8fL8m0UxwvbadMuWqNTsZKFuKdSX9js3PTD8TyLDvUVbF/OMtfaZC5xUOJ/Q6Q5Dj2Oj6vId8hdyKfrjj47EOsi2hmLNWPsnCp5+cWaay13SDizNmrhW6r5BNh5/Roku4BqgPASw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755773414; c=relaxed/simple;
-	bh=3pWLHc7LmGxgUyl74J5LFWhSFK0KCYRgf/oJ2btTLDI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JNA90HiKf8ce6WalzuRukEfdlyVPe2oONvNREXJ5JzqE1MKXPS6VUxb2QXoyLT9aZCYUKa6iAXARrBpnHH0zHn5PshkvvSg/AMEd5t/hE7vIgM/lp+eoUOMe83Oq64Lnve0sMd/6gf1eVEoDKEiRx3f/9jGb3ybdO2hnB6DdDGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mnkrqOXH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDF9EC4CEEB;
-	Thu, 21 Aug 2025 10:50:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755773414;
-	bh=3pWLHc7LmGxgUyl74J5LFWhSFK0KCYRgf/oJ2btTLDI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=mnkrqOXHzIRqsY8fvy/vAHAEDK9+sT2XcxY9xn12xK8HxrmGkTImR/ebMLe6Xg81K
-	 9NQTFTqJSFPSMl1S6PaYn/sges8X/7fUeBexkwwPwHhijE5L4pVmhP32LC2miHSKKv
-	 o+nLUJVkitI9LhycxaVByhD0TBaA+/bYlJ5rmOgbjzMVrrRuj7hzj900DDSYfFA7eT
-	 F9UxuUaKuim+ajVoK30suue2H+MhKvSxNCJNYqnW9EAKC+lFh2QLnm4RDGRI1Y470n
-	 k2u/PlhV7243xai0eq/2QifGsf0oVFHbar0dCoNJwDLXufGu6cV0nNGGqblMvlI0MU
-	 VMsNbFt4ZU3Fw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F05383BF5B;
-	Thu, 21 Aug 2025 10:50:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1755773459; c=relaxed/simple;
+	bh=WblN97EhwZ90OMk+WFVY1KIpIdh+xdsyfDca1cFFfls=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CFn1ktpqbc1baPydKFDEKLq1xSKwxIdM7k8Kim+nANXoUkPRlWJmHyT+AEIs2HMKU9Taw5I46m+ko40BZ32KMEW66XGVV+zm9CKM+sB09Tt3KR/1WOCk8Tj7Dd1PIqG1ZhCmSmOSW3FxnTpDdYVtK/c3P2JG59kyJmeMKy6m72s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1up2sR-000000006IT-48NG;
+	Thu, 21 Aug 2025 10:50:40 +0000
+Date: Thu, 21 Aug 2025 11:50:30 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Hauke Mehrtens <hauke@hauke-m.de>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Andreas Schirm <andreas.schirm@siemens.com>,
+	Lukas Stockmann <lukas.stockmann@siemens.com>,
+	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Peter Christen <peter.christen@siemens.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
+	Juraj Povazanec <jpovazanec@maxlinear.com>,
+	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	"Livia M. Rosu" <lrosu@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net-next v3 7/8] net: dsa: lantiq_gswip: store switch API
+ version in priv
+Message-ID: <aKb59jMfDIJIK0KP@pidgin.makrotopia.org>
+References: <cover.1755654392.git.daniel@makrotopia.org>
+ <88e9ca073e31cdd54ef093053731b32947e8bc67.1755654392.git.daniel@makrotopia.org>
+ <aKZg3TviLUDgKgLz@pidgin.makrotopia.org>
+ <58d31b56-8145-419e-b7be-1fd48cfeda88@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v8 00/14] Add PPE driver for Qualcomm IPQ9574 SoC
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175577342325.986145.13841394351982921726.git-patchwork-notify@kernel.org>
-Date: Thu, 21 Aug 2025 10:50:23 +0000
-References: <20250818-qcom_ipq_ppe-v8-0-1d4ff641fce9@quicinc.com>
-In-Reply-To: <20250818-qcom_ipq_ppe-v8-0-1d4ff641fce9@quicinc.com>
-To: Luo Jie <quic_luoj@quicinc.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, quic_leiwei@quicinc.com, quic_suruchia@quicinc.com,
- quic_pavir@quicinc.com, horms@kernel.org, corbet@lwn.net, kees@kernel.org,
- gustavoars@kernel.org, p.zabel@pengutronix.de, linux-arm-msm@vger.kernel.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-hardening@vger.kernel.org, quic_kkumarcs@quicinc.com,
- quic_linchen@quicinc.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <58d31b56-8145-419e-b7be-1fd48cfeda88@lunn.ch>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Mon, 18 Aug 2025 21:14:24 +0800 you wrote:
-> The PPE (packet process engine) hardware block is available in Qualcomm
-> IPQ chipsets that support PPE architecture, such as IPQ9574 and IPQ5332.
-> The PPE in the IPQ9574 SoC includes six Ethernet ports (6 GMAC and 6
-> XGMAC), which are used to connect with external PHY devices by PCS. The
-> PPE also includes packet processing offload capabilities for various
-> networking functions such as route and bridge flows, VLANs, different
-> tunnel protocols and VPN. It also includes an L2 switch function for
-> bridging packets among the 6 Ethernet ports and the CPU port. The CPU
-> port enables packet transfer between the Ethernet ports and the ARM
-> cores in the SoC, using the Ethernet DMA.
+On Thu, Aug 21, 2025 at 04:58:23AM +0200, Andrew Lunn wrote:
+> > > +	priv->version = le16_to_cpu((__le16 __force)version);
+> > 
+> > I've researched this a bit more and came to the conclusion that while the
+> > above works fine because all Lantiq SoCs with built-in switch are
+> > big-endian machines it is still wrong.
+> > I base this conclusion on the fact that when dealing with more recent
+> > MDIO-connected switches (MaxLinear GSW1xx series) the host endian doesn't
+> > play a role in the driver -- when dealing with 16-bit values on the MDIO
+> > bus, the bus abstraction takes care of converting from/to host endianess.
 > 
-> [...]
+> I agree that all MDIO bus registers are host endian, 16 bit. The shift
+> register in the hardware is responsible for putting the bits on the
+> wire in the correct order for MDIO.
+> 
+> > Hence I believe this should simply be a swab16() which will always result
+> > in the version being in the right byte order to use comparative operators
+> > in a meaningful way.
+> 
+> How is this described in the datasheet? And is version special, or do
+> all registers need swapping?
 
-Here is the summary with links:
-  - [net-next,v8,01/14] dt-bindings: net: Add PPE for Qualcomm IPQ9574 SoC
-    https://git.kernel.org/netdev/net-next/c/1898fc572118
-  - [net-next,v8,02/14] docs: networking: Add PPE driver documentation for Qualcomm IPQ9574 SoC
-    https://git.kernel.org/netdev/net-next/c/6b9f301985a3
-  - [net-next,v8,03/14] net: ethernet: qualcomm: Add PPE driver for IPQ9574 SoC
-    https://git.kernel.org/netdev/net-next/c/353a0f1d5b27
-  - [net-next,v8,04/14] net: ethernet: qualcomm: Initialize PPE buffer management for IPQ9574
-    https://git.kernel.org/netdev/net-next/c/8a971df98c4e
-  - [net-next,v8,05/14] net: ethernet: qualcomm: Initialize PPE queue management for IPQ9574
-    https://git.kernel.org/netdev/net-next/c/806268dc7efd
-  - [net-next,v8,06/14] net: ethernet: qualcomm: Initialize the PPE scheduler settings
-    https://git.kernel.org/netdev/net-next/c/331227983814
-  - [net-next,v8,07/14] net: ethernet: qualcomm: Initialize PPE queue settings
-    https://git.kernel.org/netdev/net-next/c/7a23a8af179d
-  - [net-next,v8,08/14] net: ethernet: qualcomm: Initialize PPE service code settings
-    https://git.kernel.org/netdev/net-next/c/73d05bdaf01e
-  - [net-next,v8,09/14] net: ethernet: qualcomm: Initialize PPE port control settings
-    https://git.kernel.org/netdev/net-next/c/8821bb0f6262
-  - [net-next,v8,10/14] net: ethernet: qualcomm: Initialize PPE RSS hash settings
-    https://git.kernel.org/netdev/net-next/c/1c46c3c0075c
-  - [net-next,v8,11/14] net: ethernet: qualcomm: Initialize PPE queue to Ethernet DMA ring mapping
-    https://git.kernel.org/netdev/net-next/c/fa99608a9a9e
-  - [net-next,v8,12/14] net: ethernet: qualcomm: Initialize PPE L2 bridge settings
-    https://git.kernel.org/netdev/net-next/c/8cc72c6c9236
-  - [net-next,v8,13/14] net: ethernet: qualcomm: Add PPE debugfs support for PPE counters
-    https://git.kernel.org/netdev/net-next/c/a2a7221dbd2b
-  - [net-next,v8,14/14] MAINTAINERS: Add maintainer for Qualcomm PPE driver
-    https://git.kernel.org/netdev/net-next/c/ad5cef7ef01c
+The (anyway public) datasheets I have access to don't describe the VERSION
+register at all. In the existing precompiler macros, however, you can see
+that most-significant and least-significant byte are swapped. REV is
+more significant than MOD:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+#define GSWIP_VERSION                   0x013
+#define  GSWIP_VERSION_REV_SHIFT        0
+#define  GSWIP_VERSION_REV_MASK         GENMASK(7, 0)
+#define  GSWIP_VERSION_MOD_SHIFT        8
+#define  GSWIP_VERSION_MOD_MASK         GENMASK(15, 8)
+#define   GSWIP_VERSION_2_0             0x100
+#define   GSWIP_VERSION_2_1             0x021
+#define   GSWIP_VERSION_2_2             0x122
+#define   GSWIP_VERSION_2_2_ETC         0x022
 
+Now I'd like to add
+#define   GSWIP_VERSION_2_3             0x023
+
+and then have a simple way to make features available starting from a
+GSWIP_VERSION. Now in order for GSWIP_VERSION_2_3 to be greater than
+GSWIP_VERSION_2_2, and GSWIP_VERSION_2_1 to be greater than
+GSWIP_VERSION_2_0, the bytes need to be swapped.
+
+I don't think the vendor even considered any specific order of the two
+bytes but just defines them as separate 8-bit fields, considering it a
+16-bit unsigned integer is my interpretation which came from the need for
+comparability.
 
 
