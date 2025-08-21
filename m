@@ -1,149 +1,112 @@
-Return-Path: <netdev+bounces-215614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2E5EB2F8D1
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:51:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41CCCB2F905
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:57:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B264B6434E
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 12:49:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C756178675
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 12:52:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AEC5311C0B;
-	Thu, 21 Aug 2025 12:50:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E284321447;
+	Thu, 21 Aug 2025 12:50:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e79uk4uh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D5com0r5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DBA330DD3E;
-	Thu, 21 Aug 2025 12:50:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAAC7315779;
+	Thu, 21 Aug 2025 12:50:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755780615; cv=none; b=eA1BqaFhjHzy7JzPz3p1FHLbY7KCVnPgjivBMMNVldcqbp+YzDR/c4H+PAQKl/AIwpoYuXwtuSe3PIm6rtWscYxZ78UgcUQpUUmTdSboy6fdOGSjQyZ9U4IrWw9a1kXxmRNx4CJrBZ/WYIIRhUYg5e1OKQ9o/36sKrzkZfstHCo=
+	t=1755780657; cv=none; b=CbHG92oTHcBEF7QMsHPGNsEbmJ5KtWEgkZVDJjvhtFnLtyE5s0SaHArEj7f047KQJBWv1Wzj0nEWBR1oY2zwCEn1AuuH5jLOeOAKVL5sCr291utYm3PUZn6asfwSZFrBD3brov4NQJLBkt6g1z0OwojyjL+6VI4Rn2xiZ/iEU+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755780615; c=relaxed/simple;
-	bh=GnjsYseB3x82SxnBPiq9wVpuJ57d9eN+HPgAIsk934U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kLMoLABBV0JL//dzdxd1N5Q4z83bCAAWmEdUQlwfAZennJN6UaiwTE3odh8wlsnnYq1OWgx4xaNslS3A8hhE9dMgRfrrBiUH9lfv4INCDBMT74/AVetoCpkGVmHoVeinmpPADsG20B3B0Y1nwpMBVRb5HJmt5D4LcbLpV7Jkmw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e79uk4uh; arc=none smtp.client-ip=209.85.222.172
+	s=arc-20240116; t=1755780657; c=relaxed/simple;
+	bh=jGT8s5zSIKA+32oR2OuC9O7ATTgHr/3h4vyMVjynHOo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kYyYkILrqstP+ayRflD01Lfik/TWd7NFLlKbaFbWvmz94jfgamj4poMLGhn/fDpfsdGB2+sn+iiMUB4hPrdkJMKueJzxNcrnf5JuYJy2fliBvzC0BNWhbiqfBvAbSXpchrk/eJz/yBVUAFBMLpMvF1jWKWUhWNpLbKsEAWx0jcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D5com0r5; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7e8705415ceso110538085a.1;
-        Thu, 21 Aug 2025 05:50:13 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-245f2a8fa81so13760905ad.0;
+        Thu, 21 Aug 2025 05:50:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755780612; x=1756385412; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GPd7TEjWkozgvC/v5mJtOM5zRUUP6vJZ0SAdjA9o64g=;
-        b=e79uk4uhwK/lzYFLZO3juq26t8RDdGBqcFL6uRxd+Dx003nscSeYQmdFJooCWsDC7J
-         AVkDW5zSEU0BZVklNDbZZ11d6sOuRMmY2nI1ac8QoAqG1wxMDQIaG9SQYGJrCwAn3n1j
-         Lvs9+D30GuzL5kxAZ6fTOjVTlG4JJQwj2GmP34jm93znJhdQYaFijuomw14BXKCFxZY5
-         Gmea2ToU85z2rnIle3W3qzEQuFwcL13QhPd9qysSvK3MaEjCVoa4Y+Cd6tQ72/OirypU
-         Jb3TEIWJ/cqRyxgEqOyfbJulgoGjhUrbxXlIBRKKMlKGHnIGtIpKml2Te3qjaGvheiKF
-         LNqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755780612; x=1756385412;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1755780655; x=1756385455; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GPd7TEjWkozgvC/v5mJtOM5zRUUP6vJZ0SAdjA9o64g=;
-        b=oqMj2SluRZQzaL6abF8Soh2fFX0WSi6454Y+AE6KBxwEWBbIhQSqDM3O0Xs89JVQfR
-         VbebnNY5AMzODool0TRpsbLmhSoD7zY2U/kAvWKQcNtBdI4EK1ryDezMi8j71sW3lbwf
-         RKR4qwTjrmb6x6Ha6E9unA6AV6De4cVI3rT6NQk+sULMyMejzov9z0cgTfFJx2T6aCg5
-         CVWFoCCHolDIue5TaEpE7qROudQxcxizN+4vjc+OGoGsrIszIUXauE8rz1MMz8U5De0w
-         LGSohhqJ8E3lB1RqDx06nxR4xa/aFxhHhwkAOTjkg00R9bXzQ1lYQekea6BvK3t5OG+n
-         XV5A==
-X-Forwarded-Encrypted: i=1; AJvYcCUZwYNnEhtGVLcRFtYPP2xhmz58XkcAgPxsl/TJDuqU7RiO4QHr2ORcpfi2cOx/AZo53dap4kQ4@vger.kernel.org, AJvYcCUdzg9n1iHK8EOT9HaayLH7vtRwxQ7HWE0/BUrg99NZmkumz8W1RSExrSQgiYmxqe0y7jOqOOoxXr5F@vger.kernel.org, AJvYcCVNwS/uU9C/HXmU9b1ydcm1kQjwZLeIMjsFfY1FBG20Yu0CaKsHoYcu9muHUhKvUfNND1zBaXLEagyBpt/+@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWdsiWFzuMSXh51AfG5TeBTjVsuuFP8cswiWw2FfzLd+EwRPgw
-	ofiovTeX+TAbWUhcIrBRwZs1hB8/Cr5tJ6cOYKxUl/ogBK9+LMBZGLOm
-X-Gm-Gg: ASbGnct7WfYp4oUOgqpb9ZI9DZtJGGMgZg0QB8g53b9EHGiLon1NsH0E9VJ6CLhGuO1
-	qivE50+VSXZ6BTm16SrgQmBzOBzR14Fwn48SpxJYcXNW3VjNvAqCCEpDk35i3lLvGj6OkDwhgqw
-	xVwKx9aYkIRG3HvwCJtDnQccxpuvOU2AHnfgmligLtoeJARdRUV/H5NQ8tYulvnjY0y+OyzZF6Y
-	5AZ0p3jHXY76KhtY/3wWY6+mdtrXCFjd9A8pLOUIo64KJN0dwKEVXEtb9lqycB6ueujFJ3HWY0u
-	x5M/V2XUq2KuZI6DNLbaslIcgXSoj7ayYWW3L8tOZ4xAonirOQ+SGypdPzuLs49gACEhzWCVyhq
-	aDLCrndLzDCuzNUpwMgYxWPRJq6W8O5OZVFFU0DNnd/ozP3GBKrNEN9Gyzg==
-X-Google-Smtp-Source: AGHT+IHKlAINmciaKPdOD0ea73iO/5ZcLBWhJDwWa0ZbgscyKMHmIXQTkwQ9F922ubbV6Q5wAXzySg==
-X-Received: by 2002:a05:620a:17a8:b0:7e8:324e:c7e8 with SMTP id af79cd13be357-7ea08e8086bmr221288085a.44.1755780612282;
-        Thu, 21 Aug 2025 05:50:12 -0700 (PDT)
-Received: from glsmbp.wifi.local.cmu.edu (cmu-device2.nat.cmu.net. [128.2.149.252])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b11de44f76sm100197321cf.50.2025.08.21.05.50.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Aug 2025 05:50:11 -0700 (PDT)
-Date: Thu, 21 Aug 2025 08:50:09 -0400
-From: "Gabriel L. Somlo" <gsomlo@gmail.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Karol Gugala <kgugala@antmicro.com>,
-	Mateusz Holenko <mholenko@antmicro.com>,
-	Joel Stanley <joel@jms.id.au>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Lars Povlsen <lars.povlsen@microchip.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 1/2] dt-bindings: net: litex,liteeth: Correct example
- indentation
-Message-ID: <aKcWAant1Y4481q9@glsmbp.wifi.local.cmu.edu>
-References: <20250821083038.46274-3-krzysztof.kozlowski@linaro.org>
+        bh=9foK9Kd0CNIBHKg4DH+R7erYEYhgm3gn2u+8dPgiJQg=;
+        b=D5com0r5Azq0CSiX6beJHOkXcRcyQEFGPikyr6x0h/Yq8uRWNznk1JvEdXWzIAFDSo
+         YH3ld637J3MY8FRlfQNyb3v/WLLUqqhjTNX5VqiFSZpUs0WqCjuAWHwiEmLlZ28f5xQF
+         9MBX12GJspK63wNbzVl+UTcrPvoH+/yoe7SuWjlgnS2Obbm+QyxibE062HdfhmUCPC7f
+         FB8HGUTROSIyv4b/zL0JGhlwi6Ya4hlS3sUH2QiheQdWpcvsWyZlMfRVjWXOyY+5nRuO
+         BKc0rwYMm2grpgnCz8K7klhDQcSpeYoMmRNplpF6/6Ly1Zm7mUzgsQFodyzJewbVEuYX
+         CWLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755780655; x=1756385455;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9foK9Kd0CNIBHKg4DH+R7erYEYhgm3gn2u+8dPgiJQg=;
+        b=MkeA9YeTBVp4zmpqZqtVQCTzxEFL8VyKpGFyqHxq8A8doEhn73Wg21dicCkH5HJU8Y
+         lIgPTAShTsFMBSQGYQ2bXV3BFGSt5wfRJdzMA2uFQ62+Fm8/+6LF346gPu7dKuDuMq08
+         C3m9n4ITk7xzDmSuOewQwZk7cXHt2LPKBr5xouOgiutMUkJU0tzgZm6Jx0pcDRxe79Wv
+         K8zaZ+RirvfdFSiGyoUkwlEBOpdAuRSahjtB64K6Cp8e47lE3KQkLelRiziFlvg4wz3m
+         mfZAjdMoYzyp0wtdU3wybzzCRFfE7mhQ/cEsDtTJ1VAfWQ5OrWexPf0u62uVmi31HMM2
+         nIfA==
+X-Forwarded-Encrypted: i=1; AJvYcCVD2tZpn20bnQkovWJRgLmPaAzb30VWF3sQSJ+Zt2XbPwwn+rkX1v9TSphPfTCaeyQO9nWcZITFlEPj@vger.kernel.org, AJvYcCXEUBup9Jg1ScqrIzlbYCKR4e6/6N2gTSkQPABHo6VJYty4K95Q4zcl/D/+vyaUt2yQldrp3P5zIk7q6dCt@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzrFMvagaQk7sq1hYDKn5ox+d0uB2sNqe7KTnB/kRcDmlFnAGe
+	mtcUpuwovG4Ga/DjSwiAqzh9OeACTSv3SUF0AT8w4sOMbaSt1Ij6yEJh2fWL6m4Oj4hQ8Ub+k/2
+	m3dmSOUPv4UNfbbkQfCbvpUXlaDdwflg=
+X-Gm-Gg: ASbGncvRMdjBe6kkez0fVzrmldBD7r66I4wNPmsPdjdyNdk7kKwFQQYxPO2nyh32GzB
+	tKJx66hjafF6U2+tPet8JHs2++FQAbjXppjrHKrf51S00BWPL9WyYQRrurxeYqCqdrGZNY2/OqY
+	6Ybr5730Dza40pnkQ7Z8JlpSkcnlctesCJxIFUgEhZNgQEFq57iRMJl35t7VYv1P9OQAibmj/T6
+	fZF7pd+Ezgql9uf4KlqK1ky76Z3s/MchaFTw+t4
+X-Google-Smtp-Source: AGHT+IFqVqOPssPGblynM3TvvWkBT6OODcOeZZiexLuzjkVsZq4nfaUJACCBtZMiYlZawr/SC4jDqihfyCN+1+16EOM=
+X-Received: by 2002:a17:902:d4cd:b0:242:b138:8119 with SMTP id
+ d9443c01a7336-246024c22f2mr26833665ad.26.1755780655118; Thu, 21 Aug 2025
+ 05:50:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250821083038.46274-3-krzysztof.kozlowski@linaro.org>
-X-Clacks-Overhead: GNU Terry Pratchett
+References: <20250820075420.1601068-1-mmyangfl@gmail.com> <20250820075420.1601068-2-mmyangfl@gmail.com>
+ <ce66b757-f17d-458c-83f4-e8f2785c271c@lunn.ch>
+In-Reply-To: <ce66b757-f17d-458c-83f4-e8f2785c271c@lunn.ch>
+From: Yangfl <mmyangfl@gmail.com>
+Date: Thu, 21 Aug 2025 20:50:18 +0800
+X-Gm-Features: Ac12FXwwLwr2bCMna7pQhcpT1kCIgGZcsfwaI-LHJtYXN3OTqXnIVYFOWK6UbYw
+Message-ID: <CAAXyoMMpf9u7aZO204moF5DHd+QR4aAxxdtEdTx-iU77DKhBDg@mail.gmail.com>
+Subject: Re: [net-next v5 1/3] dt-bindings: net: dsa: yt921x: Add Motorcomm
+ YT921x switch support
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Simon Horman <horms@kernel.org>, Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 21, 2025 at 10:30:39AM +0200, Krzysztof Kozlowski wrote:
-> DTS example in the bindings should be indented with 2- or 4-spaces, so
-> correct a mixture of different styles to keep consistent 4-spaces.
-> 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+On Thu, Aug 21, 2025 at 8:41=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> > +        switch@1d {
+> > +            compatible =3D "motorcomm,yt9215";
+> > +            /* default 0x1d, alternate 0x0 */
+> > +            reg =3D <0x1d>;
+>
+> Just curious, what does alternative 0x0 mean? Does this switch have
+> only one strapping pin for address, so it either uses address 0x1d or
+> 0x0?
+>
+>         Andrew
 
-Acked-by: Gabriel Somlo <gsomlo@gmail.com>
-
-Thanks,
---Gabriel
-
-> ---
->  .../devicetree/bindings/net/litex,liteeth.yaml         | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/litex,liteeth.yaml b/Documentation/devicetree/bindings/net/litex,liteeth.yaml
-> index ebf4e360f8dd..bbb71556ec9e 100644
-> --- a/Documentation/devicetree/bindings/net/litex,liteeth.yaml
-> +++ b/Documentation/devicetree/bindings/net/litex,liteeth.yaml
-> @@ -86,12 +86,12 @@ examples:
->          phy-handle = <&eth_phy>;
->  
->          mdio {
-> -          #address-cells = <1>;
-> -          #size-cells = <0>;
-> +            #address-cells = <1>;
-> +            #size-cells = <0>;
->  
-> -          eth_phy: ethernet-phy@0 {
-> -            reg = <0>;
-> -          };
-> +            eth_phy: ethernet-phy@0 {
-> +                reg = <0>;
-> +            };
->          };
->      };
->  ...
-> -- 
-> 2.48.1
-> 
+Yes. I've seen this approach on other chips (offering two MDIO
+phyaddrs), so this should be a common practice.
 
