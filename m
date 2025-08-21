@@ -1,264 +1,173 @@
-Return-Path: <netdev+bounces-215447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6ECA8B2EB24
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 04:19:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D8C3B2EB28
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 04:23:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFA8B685B3A
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 02:19:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19343585258
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 02:22:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9DA721D3F2;
-	Thu, 21 Aug 2025 02:19:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C23B1225A38;
+	Thu, 21 Aug 2025 02:22:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w7RTYCrN"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="mx8Xv+UK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4077421B9F6
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 02:19:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38F6F21D5AE
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 02:22:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755742746; cv=none; b=byNA3NMIdo84a74b3y6Zr9CYxaUPwsskNYPX1wVtZ1svA/9+qZjWfQUo4Ibs0HVULCvnweoHhLb73rctl318EvjeS4pkNcAs3r0/0NV8Qq99lz8KaZsLupKI3yR3z8XTK0ILOv8Om3JXRvtWTbjyawKyvsEaTdaWBvWeXEm7bqY=
+	t=1755742939; cv=none; b=NCgxUgRp2WTQJ74u0Atg7LBVVLU+G5YiU9YNIaCzAn7mZDrxsXGg7NyECIf/Za+FX5riMVbJnu8jLuhzKH6Vef9uUCEQ++CbxYo4APt3x5hpkHoOax4u+Ird3hIrEyfStXeCsS5q1QyYA8BgcoPz7M7zouRu8usF9th4h3O5qc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755742746; c=relaxed/simple;
-	bh=3HpRPiSfRjHzj2X0sMabWYMxCKGEPjEzdBoODQYACnI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=PXju4XWWD32YD8Udg6SNbSU5FgiA7BtUnYlkXggvfibRe3kxyZ4HcU8X84lvqvWp63RRBbWvm5h0pW4f7QC6iny+vj/Ix5ZOs0CVZBGu8cW5jgj2Rm1kvs4Qy7QftAvkkeh88fKGV5OFcmISsFIauGzxEu4QV8ntTWL8XwsPHV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=w7RTYCrN; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-323267bf596so621420a91.1
-        for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 19:19:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755742744; x=1756347544; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=/7299vGbfREqbBOOITxtyERwG8vWDgbkrDhLTrAttFg=;
-        b=w7RTYCrNo2c/Nhnqvhj8QWJsqZ7yFfaMJAkHFL7mpKUeWwd/uiTw9y+RO7jNY3NlaJ
-         rHyFTIVl2M5t2c7uyi0/4BEbiybefwKUbOwe1R69hKpNFYs6xPZCPqGO0aKXHS7JCwdW
-         CSxk+Imk2I0YfGNWfxqZnQBByBhjaWPUV8/M87VbKWPzPVxeU/tCAjddzsD/51Vgo9g/
-         Lni6v2qBqpEZCbHW+y6JJ77MQfv5VPtBN/eg5Fb3lRxROrnC+M6GP5Sc2J4Jlrc7R82x
-         jqcIS5MT7yaGyjtc/EfXQAIzXcwwZyJ4B6Ka/8WVR4ApRBSVH+hEmIMADu1fWLceZCsY
-         69Ng==
+	s=arc-20240116; t=1755742939; c=relaxed/simple;
+	bh=M+Tt7lOyvwNBEVxje7vB5+qnUcdtvBNxt4rOINYoqf0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=d/d3jiISJdK5eJmezLdBYtLFZITu3iBtCNPCTk1lKj+QJIot+z91h3Hzy6C5PYYz95fHOHjLv7eHfP0DanTVgGOuQgLnY0HM80iS+gCnuOZrrLWnlGEYs0Q2duSmmlTPru+4oTJ1tiH8fYM6oXUFov2mv7G1Fto6kPUrY6Uh8xw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=mx8Xv+UK; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57KGmO1u025745
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 02:22:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	fhuQQAYtkFz1+EMzbo9h41xY8JijUtMlK2wIkAFemmg=; b=mx8Xv+UKFekjgIea
+	zpwoOjBGpC8vG24HybBj9dFPUt5QlmnxYQI1nLF8qREnKjpKlPZWWhwvbIQSm75g
+	AcfvH8kA10kv7f/86IZhqHh0uayUClUfBvRuLXE/AJBKZPrNY2mJlOufKoHv0fVy
+	c0OBFnzpDknd9ZbpLkJ98UFg9FM+oxyx+q7o3t19K0C754pSN2QwlwdVhOeGq05S
+	wyA/ACFZPVgH4tfzv/wZNXwBN7MwYWzXTMeO+citUmkwfWKIixxOuoUwhJzeacWI
+	NaBtSrWeTcKHyU4ig+xdplvCIu80jwleequB4k36qWtceMtk4klLI/tzwrWQemCl
+	SJD2FQ==
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com [209.85.216.72])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48n52aujvc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 02:22:16 +0000 (GMT)
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-32326bf571bso1226296a91.2
+        for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 19:22:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755742744; x=1756347544;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/7299vGbfREqbBOOITxtyERwG8vWDgbkrDhLTrAttFg=;
-        b=hZ6gHo21WAys9qVr4OOIS1t34BxeT94LOuJSQm4HnZRMnj7eQWI2tX5srCK9hezqpI
-         uBtGQFACiO5NLvB4ka4rWxAZPDGEZUILUG01j9VIKwaGs8f6a3rLYs4/xi6pDTznn+kJ
-         UM6T+TKnOqrWKRyLdNZbNUFSKMdIIZZTyatPKlNwpx+3iHbL66QcktVLj0hbvfrNA2zC
-         RCsjU7LKi/KxEAwzyQUXonGiP0+/DASUaioKx+k06z57PCCBp4kDjH/85vD0spH2aiEP
-         1OAt5Ijtz4RiDoXMtiVEPJNBJZNAJUMqyR8qPh5iOv+fcyyCYOckLUN8yJk8KilmGBtI
-         06XQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWV/ZGOE2NulpM0AeYKrtyWXi8dt5kJzMUKB+slOVFi9CSS8eAcISM+/TFbmdJ8aMeEKCu8wec=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnnLVC6r/XcG6pJuwdvpK78eJyAb6fHzwoDjd7eeWPHJbgm1Ys
-	gTk8r+zNLZIN2MHNw6GOJv3NLzV84FqTtDBJny7sJon5jnlIr8i6FzhzB7RJMTH3Y/5PXP2wz1H
-	+F+EU4w==
-X-Google-Smtp-Source: AGHT+IHZgFgo3j+TWuAGubLJvOC7aEA7AKjuNoMy3ppxAbLJ/bftLtCfLYumdxQ/sylmxw4QPO2HQ2WxNFM=
-X-Received: from pjff7.prod.google.com ([2002:a17:90b:5627:b0:321:c300:9aac])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:52d0:b0:31f:6d95:8f76
- with SMTP id 98e67ed59e1d1-324ed12dd87mr1171604a91.29.1755742744546; Wed, 20
- Aug 2025 19:19:04 -0700 (PDT)
-Date: Thu, 21 Aug 2025 02:18:24 +0000
+        d=1e100.net; s=20230601; t=1755742936; x=1756347736;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fhuQQAYtkFz1+EMzbo9h41xY8JijUtMlK2wIkAFemmg=;
+        b=RPdr7fcHsuu9Wo29EvekRvfyiVqpCf/50zSVtzf1rf9tCvxx4lfzO67pbNdqZfR9ml
+         2HZqHnOaa1KM/TehD1TML13HosbnV9G9GJ/Q6sZAAvQFUFmeyAKLZQC7LTumhuGf3oub
+         e36Ho2Xyp0i5mWeKVSPl/PRbxkqUZHoKYI1qrCJA9V5IwlP1o164zSDEZEUxfSYiS1OK
+         AkGwrktppy4tPesRW5qv4c7oarflETJiIRHzp4AwvMyBLdQeZFvE8D4omNsojaSPVGjw
+         +NBwoEjO7cUrMKAEo8TAEBov/6HjKAAoBZ2gTHFVqBlP86IPX5JFfXzA7ByTjTnuAHOP
+         lpjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV42yhJkO155f6WP1v99kk/OD79U8FixBTZ15nOehLyXwVrhuj4Lhc/l31qAPhD3/kulBY6Ofc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPXVKgMlXRRbYD6NWlhrxXXtgtYJWSCivtaRz3N2zBUN5Ivute
+	NnA2RT+W/fKB0vIOS4V7uHhM6C7TcnCV/XbyV6Sx23JoEotWwuyZgTFUaIMV+xH48Uh0RXR4XdH
+	plEEAi+/vT/QPPGitJS2i6Izi5zwJNjOsjOhlYcMluOZHXhBqyvYo+nZ/UmA=
+X-Gm-Gg: ASbGncvOhOnn2ODoafpyz0dHGMfwhvD6ybgI+QfPVu37tkxiV4BkET8ac4Lno93Cf8C
+	JpllO4ebyzMbFmDFqrOSRPx7FzRF8pC18065s3Eh8rnblEY29C+RYuJ7XbRA3g8LhDqYLAgZwpt
+	FbRVRuAPz6KMRLa52mu0uT9OEokAaaszHbVso2+HuBQmF7iCrUJWJaXH9yvIscNyLOcs7ElkegM
+	qC947kBKskToGe3j04Ai3S+8P6VN7rb3QEz8edq7l7tbmPOU2wB8m7wWU5f8xuO6n/cczDGrFJE
+	kcX9E2TiJpueliVrcUNiCYxXvJw4/qDYNvhbiSx6CxI8gN5l0IaBXY5z/2KjwS0pLSRqr6+uBBs
+	9gBGcCpA0XYiTuettvHLOSJEtZ0qgvUgd
+X-Received: by 2002:a17:90b:53c4:b0:324:e642:b5ca with SMTP id 98e67ed59e1d1-324ed13a72dmr1379011a91.29.1755742935710;
+        Wed, 20 Aug 2025 19:22:15 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEJRz4sysTqGhrRLL4dSQy2QlK07feYrDXxAVKB+n79aOM7MsuZWRLWFY/xgGqdwpBUmHYgnw==
+X-Received: by 2002:a17:90b:53c4:b0:324:e642:b5ca with SMTP id 98e67ed59e1d1-324ed13a72dmr1378979a91.29.1755742935196;
+        Wed, 20 Aug 2025 19:22:15 -0700 (PDT)
+Received: from [10.133.33.88] (tpe-colo-wan-fw-bordernet.qualcomm.com. [103.229.16.4])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-324f23d745csm356703a91.4.2025.08.20.19.22.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Aug 2025 19:22:14 -0700 (PDT)
+Message-ID: <f467aade-e604-448d-b23e-9b169c30ff2e@oss.qualcomm.com>
+Date: Thu, 21 Aug 2025 10:22:05 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0.rc1.193.gad69d77794-goog
-Message-ID: <20250821021901.2814721-1-kuniyu@google.com>
-Subject: [PATCH v1 net] atm: atmtcp: Prevent arbitrary write in atmtcp_recv_control().
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: Chas Williams <3chas3@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, linux-atm-general@lists.sourceforge.net, 
-	netdev@vger.kernel.org, syzbot+1741b56d54536f4ec349@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 2/6] net: stmmac: Inverse the phy-mode definition
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Vinod Koul <vkoul@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        devicetree@vger.kernel.org, stable+noautosel@kernel.org
+References: <20250819-qcs615_eth-v4-0-5050ed3402cb@oss.qualcomm.com>
+ <20250819-qcs615_eth-v4-2-5050ed3402cb@oss.qualcomm.com>
+ <80a60564-3174-4edd-a57c-706431f2ad91@lunn.ch>
+Content-Language: en-US
+From: Yijie Yang <yijie.yang@oss.qualcomm.com>
+In-Reply-To: <80a60564-3174-4edd-a57c-706431f2ad91@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODIwMDAxMyBTYWx0ZWRfXxHOTrkdEyfOm
+ nkmktHRFIyBlL4iQyQP/fiuLd0CiOUnrypltQC/BuYshPBv1A7hHsLh8NUrPzFERDi4ZCVgoYbQ
+ Uwr2aRwtMTyf++foi32OvnUHes/Uccu7N7/Mnp4RVTXYnlGFm5451CvEChjRjVBje3vZfGjXpmN
+ KMGUFz/qj3o5nQP9C4S0u36CCKO0OzRNnCW86u4iz9R+zTTlS/8O0FGaaEPNA4B8nu9C/2H2ROt
+ kh2flkVFCFX550amzD8t/22GCJlNG84eY49Qt37RdmtZ2ukxP6bihlw+yvTgmIwJGPDQaYIQb4H
+ 1ktXITtzvsmmqH5NYiVe6l4ge3TRFva/IjEBNKNX0Zj+zCEIlAJa9CACUrM3APMxvIIB7ga15Zo
+ qBBASPZ+bAF+0KZOSp6T4SVs91izDg==
+X-Authority-Analysis: v=2.4 cv=TIIci1la c=1 sm=1 tr=0 ts=68a682d9 cx=c_pps
+ a=RP+M6JBNLl+fLTcSJhASfg==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=uddfqdTxQVX4ueY0IN0A:9
+ a=QEXdDO2ut3YA:10 a=iS9zxrgQBfv6-_F4QbHw:22
+X-Proofpoint-ORIG-GUID: nPP0gVLmrD7e0GbvTkyHxHxQmGxWuDYW
+X-Proofpoint-GUID: nPP0gVLmrD7e0GbvTkyHxHxQmGxWuDYW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-20_06,2025-08-20_03,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 suspectscore=0 priorityscore=1501 clxscore=1015 phishscore=0
+ bulkscore=0 impostorscore=0 spamscore=0 malwarescore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2508110000 definitions=main-2508200013
 
-syzbot reported the splat below. [0]
 
-When atmtcp_v_open() or atmtcp_v_close() is called via connect()
-or close(), atmtcp_send_control() is called to send an in-kernel
-special message.
 
-The message has ATMTCP_HDR_MAGIC in atmtcp_control.hdr.length.
-Also, a pointer of struct atm_vcc is set to atmtcp_control.vcc.
+On 2025-08-20 00:20, Andrew Lunn wrote:
+>>   static int ethqos_rgmii_macro_init(struct qcom_ethqos *ethqos, int speed)
+>>   {
+>>   	struct device *dev = &ethqos->pdev->dev;
+>> -	int phase_shift;
+>> +	int phase_shift = 0;
+>>   	int loopback;
+>>   
+>>   	/* Determine if the PHY adds a 2 ns TX delay or the MAC handles it */
+>> -	if (ethqos->phy_mode == PHY_INTERFACE_MODE_RGMII_ID ||
+>> -	    ethqos->phy_mode == PHY_INTERFACE_MODE_RGMII_TXID)
+>> -		phase_shift = 0;
+>> -	else
+>> +	if (ethqos->phy_mode == PHY_INTERFACE_MODE_RGMII_ID)
+>>   		phase_shift = RGMII_CONFIG2_TX_CLK_PHASE_SHIFT_EN;
+> 
+> Does this one setting control both RX and TX delays? The hardware
+> cannot support 2ns delay on TX, but 0ns on RX? Or 2ns on RX but 0ns on
+> TX?
+> 
 
-The notable thing is struct atmtcp_control is uAPI but has a
-space for an in-kernel pointer.
+This setting is only for Tx delay. Rx delays are taken care separately 
+with DLL delays.
 
-  struct atmtcp_control {
-  	struct atmtcp_hdr hdr;	/* must be first */
-  ...
-  	atm_kptr_t vcc;		/* both directions */
-  ...
-  } __ATM_API_ALIGN;
+> 	Andrew
 
-  typedef struct { unsigned char _[8]; } __ATM_API_ALIGN atm_kptr_t;
-
-The special message is processed in atmtcp_recv_control() called
-from atmtcp_c_send().
-
-atmtcp_c_send() is vcc->dev->ops->send() and called from 2 paths:
-
-  1. .ndo_start_xmit() (vcc->send() == atm_send_aal0())
-  2. vcc_sendmsg()
-
-The problem is sendmsg() does not validate the message length and
-userspace can abuse atmtcp_recv_control() to overwrite any kptr
-by atmtcp_control.
-
-Let's add a new ->pre_send() hook to validate messages from sendmsg().
-
-[0]:
-Oops: general protection fault, probably for non-canonical address 0xdffffc00200000ab: 0000 [#1] SMP KASAN PTI
-KASAN: probably user-memory-access in range [0x0000000100000558-0x000000010000055f]
-CPU: 0 UID: 0 PID: 5865 Comm: syz-executor331 Not tainted 6.17.0-rc1-syzkaller-00215-gbab3ce404553 #0 PREEMPT(full)
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-RIP: 0010:atmtcp_recv_control drivers/atm/atmtcp.c:93 [inline]
-RIP: 0010:atmtcp_c_send+0x1da/0x950 drivers/atm/atmtcp.c:297
-Code: 4d 8d 75 1a 4c 89 f0 48 c1 e8 03 42 0f b6 04 20 84 c0 0f 85 15 06 00 00 41 0f b7 1e 4d 8d b7 60 05 00 00 4c 89 f0 48 c1 e8 03 <42> 0f b6 04 20 84 c0 0f 85 13 06 00 00 66 41 89 1e 4d 8d 75 1c 4c
-RSP: 0018:ffffc90003f5f810 EFLAGS: 00010203
-RAX: 00000000200000ab RBX: 0000000000000000 RCX: 0000000000000000
-RDX: ffff88802a510000 RSI: 00000000ffffffff RDI: ffff888030a6068c
-RBP: ffff88802699fb40 R08: ffff888030a606eb R09: 1ffff1100614c0dd
-R10: dffffc0000000000 R11: ffffffff8718fc40 R12: dffffc0000000000
-R13: ffff888030a60680 R14: 000000010000055f R15: 00000000ffffffff
-FS:  00007f8d7e9236c0(0000) GS:ffff888125c1c000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000000045ad50 CR3: 0000000075bde000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- vcc_sendmsg+0xa10/0xc60 net/atm/common.c:645
- sock_sendmsg_nosec net/socket.c:714 [inline]
- __sock_sendmsg+0x219/0x270 net/socket.c:729
- ____sys_sendmsg+0x505/0x830 net/socket.c:2614
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
- __sys_sendmsg net/socket.c:2700 [inline]
- __do_sys_sendmsg net/socket.c:2705 [inline]
- __se_sys_sendmsg net/socket.c:2703 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2703
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f8d7e96a4a9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 51 18 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f8d7e923198 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f8d7e9f4308 RCX: 00007f8d7e96a4a9
-RDX: 0000000000000000 RSI: 0000200000000240 RDI: 0000000000000005
-RBP: 00007f8d7e9f4300 R08: 65732f636f72702f R09: 65732f636f72702f
-R10: 65732f636f72702f R11: 0000000000000246 R12: 00007f8d7e9c10ac
-R13: 00007f8d7e9231a0 R14: 0000200000000200 R15: 0000200000000250
- </TASK>
-Modules linked in:
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: syzbot+1741b56d54536f4ec349@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/68a6767c.050a0220.3d78fd.0011.GAE@google.com/
-Tested-by: syzbot+1741b56d54536f4ec349@syzkaller.appspotmail.com
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- drivers/atm/atmtcp.c   | 17 ++++++++++++++---
- include/linux/atmdev.h |  1 +
- net/atm/common.c       | 15 ++++++++++++---
- 3 files changed, 27 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/atm/atmtcp.c b/drivers/atm/atmtcp.c
-index eeae160c898d..fa3c76a2b49d 100644
---- a/drivers/atm/atmtcp.c
-+++ b/drivers/atm/atmtcp.c
-@@ -279,6 +279,19 @@ static struct atm_vcc *find_vcc(struct atm_dev *dev, short vpi, int vci)
-         return NULL;
- }
- 
-+static int atmtcp_c_pre_send(struct atm_vcc *vcc, struct sk_buff *skb)
-+{
-+	struct atmtcp_hdr *hdr;
-+
-+	if (skb->len < sizeof(struct atmtcp_hdr))
-+		return -EINVAL;
-+
-+	hdr = (struct atmtcp_hdr *)skb->data;
-+	if (hdr->length == ATMTCP_HDR_MAGIC)
-+		return -EINVAL;
-+
-+	return 0;
-+}
- 
- static int atmtcp_c_send(struct atm_vcc *vcc,struct sk_buff *skb)
- {
-@@ -288,9 +301,6 @@ static int atmtcp_c_send(struct atm_vcc *vcc,struct sk_buff *skb)
- 	struct sk_buff *new_skb;
- 	int result = 0;
- 
--	if (skb->len < sizeof(struct atmtcp_hdr))
--		goto done;
--
- 	dev = vcc->dev_data;
- 	hdr = (struct atmtcp_hdr *) skb->data;
- 	if (hdr->length == ATMTCP_HDR_MAGIC) {
-@@ -347,6 +357,7 @@ static const struct atmdev_ops atmtcp_v_dev_ops = {
- 
- static const struct atmdev_ops atmtcp_c_dev_ops = {
- 	.close		= atmtcp_c_close,
-+	.pre_send	= atmtcp_c_pre_send,
- 	.send		= atmtcp_c_send
- };
- 
-diff --git a/include/linux/atmdev.h b/include/linux/atmdev.h
-index 45f2f278b50a..70807c679f1a 100644
---- a/include/linux/atmdev.h
-+++ b/include/linux/atmdev.h
-@@ -185,6 +185,7 @@ struct atmdev_ops { /* only send is required */
- 	int (*compat_ioctl)(struct atm_dev *dev,unsigned int cmd,
- 			    void __user *arg);
- #endif
-+	int (*pre_send)(struct atm_vcc *vcc, struct sk_buff *skb);
- 	int (*send)(struct atm_vcc *vcc,struct sk_buff *skb);
- 	int (*send_bh)(struct atm_vcc *vcc, struct sk_buff *skb);
- 	int (*send_oam)(struct atm_vcc *vcc,void *cell,int flags);
-diff --git a/net/atm/common.c b/net/atm/common.c
-index d7f7976ea13a..881c7f259dbd 100644
---- a/net/atm/common.c
-+++ b/net/atm/common.c
-@@ -635,18 +635,27 @@ int vcc_sendmsg(struct socket *sock, struct msghdr *m, size_t size)
- 
- 	skb->dev = NULL; /* for paths shared with net_device interfaces */
- 	if (!copy_from_iter_full(skb_put(skb, size), size, &m->msg_iter)) {
--		atm_return_tx(vcc, skb);
--		kfree_skb(skb);
- 		error = -EFAULT;
--		goto out;
-+		goto free_skb;
- 	}
- 	if (eff != size)
- 		memset(skb->data + size, 0, eff-size);
-+
-+	if (vcc->dev->ops->pre_send) {
-+		error = vcc->dev->ops->pre_send(vcc, skb);
-+		if (error)
-+			goto free_skb;
-+	}
-+
- 	error = vcc->dev->ops->send(vcc, skb);
- 	error = error ? error : size;
- out:
- 	release_sock(sk);
- 	return error;
-+free_skb:
-+	atm_return_tx(vcc, skb);
-+	kfree_skb(skb);
-+	goto out;
- }
- 
- __poll_t vcc_poll(struct file *file, struct socket *sock, poll_table *wait)
 -- 
-2.51.0.rc1.193.gad69d77794-goog
+Best Regards,
+Yijie
 
 
