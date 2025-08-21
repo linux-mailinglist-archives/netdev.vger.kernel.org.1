@@ -1,208 +1,389 @@
-Return-Path: <netdev+bounces-215578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B8BBB2F571
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 12:36:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AABB6B2F592
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 12:45:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 578833AAB6E
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 10:36:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F92917683E
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 10:45:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 783DD305E2D;
-	Thu, 21 Aug 2025 10:36:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 634821AA1F4;
+	Thu, 21 Aug 2025 10:45:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dIa/hYA7"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="ICkMPg+f"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7B3129CEB
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 10:36:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C96C307AEA
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 10:45:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755772568; cv=none; b=e/BnV5G6jE+PEymjZoWkx/XqtV47CvfN3BqbBFFWekZPQWI+qmX/PDUM2Ws+I5zAnCNl7nOxIv/DJr9YWdo7Vh8jtYaYiyDVmlvSgFaCqkFk5XrliAaWrAc185p5dFJNs4yQ/Rvou/DZ8ZynfzzsvYDrE8yu0euNVa0s71DkLEw=
+	t=1755773120; cv=none; b=qwf+LihyB3nBlozxUyCWeL1EA0sx2faQwwfpjJpLnBdmF+v2vGC2hM4QthlFTB+r1B21IoEA3+7Zyh2/zsEkuPwh2yxeHUi77tbu+q/cFzrqvFJE/fgj67YxNnSejQYslJQPRddDs78kZ/2EEHVDzYT6xWII0zZQGohxxOrP0yo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755772568; c=relaxed/simple;
-	bh=qKer6YT3Q76olAg17x+x08/F9ma42lVqHrtAeHU3o18=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Je+ah4udTi+oJuIZ5pPjJsHH2WN/9cRgZYWOxxQSVqjAc+k9tTwTlW9hzrVvdNWQL+DmFK11+ycnKtQoxaZve3rWVByu3fAGNsCs+kRX7hme1S4C4HOj8AztlmVO/emuNh6uwTLEKzK8LD0cMVTz9eIecWTFWZLwNXYMU3gHKUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dIa/hYA7; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755772561;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6semH6t3oIdm7MpbEFkvxssbKDEQ5+MwdBZngJ3rCfY=;
-	b=dIa/hYA71TU9IhwHhP3Cs97N4CukgzTjXevHAnqGm3EJxKYretcJZqgVOaoxHDtUeZddWk
-	F2w+gdt6JxM7AcAGN3CMQwgsNH4gUyY+bIBtbTgXRZ3DnZIRfqF1s/dcpVzmIzy8ZBkmlA
-	cAHQV3j6SFWLPjqQVi/CBCjoX0ufgeo=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-453-a6CCr_hHM7el8PKbCJJ5Zg-1; Thu, 21 Aug 2025 06:35:59 -0400
-X-MC-Unique: a6CCr_hHM7el8PKbCJJ5Zg-1
-X-Mimecast-MFC-AGG-ID: a6CCr_hHM7el8PKbCJJ5Zg_1755772558
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45a1b05a59cso5538315e9.1
-        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 03:35:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755772558; x=1756377358;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6semH6t3oIdm7MpbEFkvxssbKDEQ5+MwdBZngJ3rCfY=;
-        b=D0RigBZPM5JqYipPAWYUyjfbwq+rotc9VXvDc+o+bWMCrF3XSkBNNnfUhXqRWLfso/
-         R7+uoEVXR/Yj0Q3WpxIrIlTpDftnhzTHVHi924sZ26IztuO8cgz1bzSiDdc2hgmA6Lir
-         a8V2rdX3yyj1qSB9eVTDxHdR0RiC3pNvj/6hFwRb8+tRcjoIDP3n0Bg1WW+1GJJuquC5
-         kxJRX6r8SBZEY/rtwk4dQp969FO17rmHrdkeb4o7kjHFmWl548/6bWmVph/krecUvLlR
-         vuUS+nSxK1ChsPSaFtdDd37Q9mfeyVQCfN68LmLxDV0qjzctoP3ayvfbEIjXzpVVjFEP
-         GvIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXIv0y5ONFB5ABZFs60rfKXxZIDeYi3+ZWQT5U+jXjuT62bU4LaohrFtrcZ0vGRMZ7JJm96+fc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKPsvZLXD48tBOR7p342D9ddzLF6OCkPivuyxaoWFsOdogwwHx
-	rGjnBI95z34xmx7ORD38S+8dPHP+i/5sQlL1XsjgOqJyjhgAUbBFZC7a038rQMQLTZrm3tfuLQA
-	6G0uAqSflTP6rS9IOpnA7vyRAaJmBP9BYSlnxnHoDaVxI2/gC8JnLkDggtg==
-X-Gm-Gg: ASbGncujq7u5GdUvrTZ6hwFsI98O2M0T1VcapWlDtnz0RvG43OfQBMmiz99qTj/wUUQ
-	YB/0f/RzxXWF3crBbS7XWjKdm6d9QXC3Aq9Lu94spRHN4SeBPfXxDytzFS2os0/zg9+SL/pCVeB
-	l73E036NdBS2rseBT8unuVx0F6n2+zV1pzlSbBg2QOhAgpABCWijIX7vclpqr5RHpF3qw9T0Ilt
-	1Bw+Nxa9Kj43MhBGYSct1OHUFrUPnXOe79BVh0CQtNJssgSIWP42QxzhPy8EzEvzb/Rp80hWfim
-	hnyO1MgyE3NxXxCsdtyajDC1pAzh0QRJDo1AtNfZZV4BHBztdVk=
-X-Received: by 2002:a05:600c:46d1:b0:458:bfb1:1fb6 with SMTP id 5b1f17b1804b1-45b4d7d0f9cmr16418395e9.2.1755772558411;
-        Thu, 21 Aug 2025 03:35:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGvDu6Q5YQBHUvDCyaZLIpZafdy6VIAftUNzMrhEs/AM4N8Gk1HXbWN+HSKj1dGaR8OfHL5ig==
-X-Received: by 2002:a05:600c:46d1:b0:458:bfb1:1fb6 with SMTP id 5b1f17b1804b1-45b4d7d0f9cmr16418065e9.2.1755772557947;
-        Thu, 21 Aug 2025 03:35:57 -0700 (PDT)
-Received: from maya.myfinge.rs (ifcgrfdd.trafficplex.cloud. [2a10:fc81:a806:d6a9::1])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b4e88bbe0sm9102895e9.4.2025.08.21.03.35.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Aug 2025 03:35:57 -0700 (PDT)
-Date: Thu, 21 Aug 2025 12:35:55 +0200
-From: Stefano Brivio <sbrivio@redhat.com>
-To: Paul Wayper <pwayper@redhat.com>
-Cc: Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org,
- paulway@redhat.com, jbainbri@redhat.com
-Subject: Re: [PATCH iproute2] ss: Don't pad the last (enabled) column
-Message-ID: <20250821123555.67ed31d1@elisabeth>
-In-Reply-To: <20250821054547.473917-1-paulway@redhat.com>
-References: <20250821054547.473917-1-paulway@redhat.com>
-Organization: Red Hat
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.49; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1755773120; c=relaxed/simple;
+	bh=PBBCROPXqCqMiyfxSy2ogwx9x/fVh4Mdn3jHv7YOdlA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B2mS4oFbvOUtS1MFsMf4RnezI/vcozsMpuf7jfM4F+8ZoR/p8LZBLgSdlykYnIPMo2Oux2d69XdJ91Vzi13WuzaYTQABx3HPuWxzQAyNWibp24ceAuUuMaTZhWP+lKQKahD1lEQfnRmYOXBHYo5bVxsuR5NlsBzFUgKcbkGKK7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=ICkMPg+f; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1173)
+	id D2C6A2015BAB; Thu, 21 Aug 2025 03:45:17 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D2C6A2015BAB
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1755773117;
+	bh=e7SjHFKqk2A6sr3D14xMVQkuBQSQH+8UWQBRCGzve8o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ICkMPg+fV0DgsxvFc5FYYdchtB7cGgt2Pl6woolhq19ppCRW8CR4UdI8DTZjaTf0z
+	 TK5QsA6pyBX/OXiEJsyVFALpytbSVGcrgElEximZ/yA/CT2j+uMlF2jjLRercB1cx0
+	 VPmZ8uVomG2rX+NMyOP1mI+PxqMFKoqAamKWCNKo=
+Date: Thu, 21 Aug 2025 03:45:17 -0700
+From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: dsahern@gmail.com, netdev@vger.kernel.org, haiyangz@microsoft.com,
+	shradhagupta@linux.microsoft.com, ssengar@microsoft.com,
+	dipayanroy@microsoft.com, ernis@microsoft.com
+Subject: Re: [PATCH iproute2-next v3] iproute2: Add 'netshaper' command to
+ 'ip link' for netdev shaping
+Message-ID: <20250821104517.GA7364@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1754895902-8790-1-git-send-email-ernis@linux.microsoft.com>
+ <20250816110507.3063a733@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250816110507.3063a733@hermes.local>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-Hi Paul,
-
-On Thu, 21 Aug 2025 15:45:47 +1000
-Paul Wayper <pwayper@redhat.com> wrote:
-
-> ss will emit spaces on the right hand side of a left-justified, enabled
-> column even if it's the last column.  In situations where one or more
-> lines are very long - e.g. because of a large PROCESS field value - this
-> causes a lot of excess output.
-
-I guess I understand the issue, but having an example would help,
-because I'm not quite sure how to reproduce this.
-
-There's a problem with this change though, which I didn't really
-investigate. It turns something like this (105 columns):
-
-$ ss -tunl
-Netid   State    Recv-Q   Send-Q                           Local Address:Port        Peer Address:Port   
-udp     UNCONN   0        0                                 10.45.242.29:49047            0.0.0.0:*      
-udp     UNCONN   0        0                                192.168.122.1:53               0.0.0.0:*      
-udp     UNCONN   0        0                               0.0.0.0%virbr0:67               0.0.0.0:*      
-udp     UNCONN   0        0                                      0.0.0.0:111              0.0.0.0:*      
-udp     UNCONN   0        0                                      0.0.0.0:33335            0.0.0.0:*      
-udp     UNCONN   0        0                                192.168.1.185:60797            0.0.0.0:*      
-udp     UNCONN   0        0                                      0.0.0.0:5154             0.0.0.0:*      
-udp     UNCONN   0        0                                  224.0.0.251:5353             0.0.0.0:*      
-udp     UNCONN   0        0                                  224.0.0.251:5353             0.0.0.0:*      
-udp     UNCONN   0        0                                  224.0.0.251:5353             0.0.0.0:*      
-udp     UNCONN   0        0                                  224.0.0.251:5353             0.0.0.0:*      
-udp     UNCONN   0        0                                      0.0.0.0:5353             0.0.0.0:*      
-udp     UNCONN   0        0                                         [::]:111                 [::]:*      
-udp     UNCONN   0        0           [fe80::1839:8c7e:5e64:76a4]%wlp4s0:546                 [::]:*      
-udp     UNCONN   0        0                                         [::]:5353                [::]:*      
-udp     UNCONN   0        0                                         [::]:39164               [::]:*      
-tcp     LISTEN   0        128                                    0.0.0.0:22               0.0.0.0:*      
-tcp     LISTEN   0        4096                                   0.0.0.0:111              0.0.0.0:*      
-tcp     LISTEN   0        1024                                   0.0.0.0:80               0.0.0.0:*      
-tcp     LISTEN   0        5                                      0.0.0.0:5154             0.0.0.0:*      
-tcp     LISTEN   0        4096                                 127.0.0.1:631              0.0.0.0:*      
-tcp     LISTEN   0        4096                                 127.0.0.1:41001            0.0.0.0:*      
-tcp     LISTEN   0        20                                   127.0.0.1:25               0.0.0.0:*      
-tcp     LISTEN   0        32                               192.168.122.1:53               0.0.0.0:*      
-tcp     LISTEN   0        128                                       [::]:22                  [::]:*      
-tcp     LISTEN   0        4096                                      [::]:111                 [::]:*      
-tcp     LISTEN   0        1024                                      [::]:80                  [::]:*      
-tcp     LISTEN   0        4096                                     [::1]:631                 [::]:*      
-tcp     LISTEN   0        1024                                         *:12865                  *:*      
-tcp     LISTEN   0        20                                       [::1]:25                  [::]:*      
-
-into this:
-
-$ ./ss -tunl
-Netid   State    Recv-Q   Send-Q                           Local Address:Port        Peer Address:Port
-        udp      UNCONN   0                                        0     192.168.122.1:               530.0.0.0:
-*                udp      UNCONN                                   0     0         0.0.0.0%virbr0:67
-0.0.0.0: *                 udp                                      UNCONN0                  0     0.0.0.0:
-111     0.0.0.0: *                                                    udpUNCONN             0     0     
-0.0.0.0: 33335    0.0.0.0: *                                              udp                UNCONN0     
-0       0.0.0.0: 5154     0.0.0.0:                                      *                      udpUNCONN
-0       0        224.0.0.251: 5353                                   0.0.0.0:*                        udp
-UNCONN  0        0        224.0.0.251:                                   53530.0.0.0:                *
-udp     UNCONN   0        0                                  224.0.0.251:5353             0.0.0.0:*
-        udp      UNCONN   0                                        0     224.0.0.251:             53530.0.0.0:
-*                udp      UNCONN                                   0     0                0.0.0.0:5353
-0.0.0.0: *                 udp                                      UNCONN0                  0     [::]:
-111     [::]:    *                                                    udpUNCONN             0     0     
-[fe80::1839:8c7e:5e64:76a4]%wlp4s0: 546      [::]:    *                                              udp                UNCONN0     
-0       [::]:    5353     [::]:                                         *                      udpUNCONN
-0       0        [::]:    39164                                     [::]:*                        tcp
-LISTEN  0        128      0.0.0.0:                                     220.0.0.0:                *
-tcp     LISTEN   0        4096                                   0.0.0.0:111              0.0.0.0:*
-        tcp      LISTEN   0                                        1024  0.0.0.0:               800.0.0.0:
-*                tcp      LISTEN                                   0     5                0.0.0.0:5154
-0.0.0.0: *                 tcp                                      LISTEN0                  4096  127.0.0.1:
-631     0.0.0.0: *                                                    tcpLISTEN             0     4096  
-127.0.0.1: 41001    0.0.0.0: *                                              tcp                LISTEN0     
-20      127.0.0.1: 25       0.0.0.0:                                      *                      tcpLISTEN
-0       32       192.168.122.1: 53                                     0.0.0.0:*                        tcp
-LISTEN  0        128      [::]:                                        22[::]:                   *
-tcp     LISTEN   0        4096                                      [::]:111                 [::]:*
-        tcp      LISTEN   0                                        1024  [::]:                  80[::]:
-*                tcp      LISTEN                                   0     4096               [::1]:631
-[::]:   *                 tcp                                      LISTEN0                  1024  *:
-12865   *:       *                                                    tcpLISTEN             0     20    
-[::1]:  25       [::]:    *                                              
-
-> Firstly, calculate the last enabled column.  Then use this in the check
-> for whether to emit trailing spaces on the last column.
+On Sat, Aug 16, 2025 at 11:05:07AM -0700, Stephen Hemminger wrote:
+> On Mon, 11 Aug 2025 00:05:02 -0700
+> Erni Sri Satya Vennela <ernis@linux.microsoft.com> wrote:
 > 
-> Also remove the 'EXT' column which does not seem to be used.
+> > Add support for the netshaper Generic Netlink
+> > family to iproute2. Introduce a new subcommand to `ip link` for
+> > configuring netshaper parameters directly from userspace.
+> > 
+> > This interface allows users to set shaping attributes (such as speed)
+> > which are passed to the kernel to perform the corresponding netshaper
+> > operation.
+> > 
+> > Example usage:
+> > $ip link netshaper { set | get | delete } dev DEVNAME \
+> >                    handle scope SCOPE id ID \
+> >                    [ speed SPEED ]
+> > 
+> > Internally, this triggers a kernel call to apply the shaping
+> > configuration to the specified network device.
+> > 
+> > Currently, the tool supports the following functionalities:
+> > - Setting speed in Mbps, enabling bandwidth clamping for
+> >   a network device that support netshaper operations.
+> > - Deleting the current configuration.
+> > - Querying the existing configuration.
+> > 
+> > Additional netshaper operations will be integrated into the tool
+> > as per requirement.
+> > 
+> > This change enables easy and scriptable configuration of bandwidth
+> > shaping for  devices that use the netshaper Netlink family.
+> > 
+> > Corresponding net-next patches:
+> > 1) https://lore.kernel.org/all/cover.1728460186.git.pabeni@redhat.com/
+> > 2) https://lore.kernel.org/lkml/1750144656-2021-1-git-send-email-ernis@linux.microsoft.com/
+> > 
+> > Install pkg-config and libmnl* packages to print kernel extack
+> > errors to stdout.
+> > 
+> > Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+> > ---
+> > Please add include/uapi/linux/net_shaper.h from kernel source tree
+> > for this patch.
+> > ---
+> > Changes in v3:
+> > * Use strcmp instead of matches.
+> > * Use get_rate64 instead get_unsigned for speed parameter.
+> > * Remove speed_mbps in do_cmd() to reduce redundancy.
+> > * Update the usage of speed parameter in the command.
+> > Changes in v2:
+> > * Use color coding for printing device name in stdout.
+> > * Use clang-format to format the code inline.
+> > * Use __u64 for speed_bps.
+> > * Remove include/uapi/linux/netshaper.h file. 
+> > ---
+> >  ip/Makefile           |   2 +-
+> >  ip/iplink.c           |  12 +++
+> >  ip/iplink_netshaper.c | 189 ++++++++++++++++++++++++++++++++++++++++++
+> >  3 files changed, 202 insertions(+), 1 deletion(-)
+> >  create mode 100644 ip/iplink_netshaper.c
+> 
+> No documentation.
+> No tests?
+I will share the documentation on netshapers, specifically covering
+how to use the ip command for this use case.
+> 
+> > 
+> > diff --git a/ip/Makefile b/ip/Makefile
+> > index 3535ba78..18218c3b 100644
+> > --- a/ip/Makefile
+> > +++ b/ip/Makefile
+> > @@ -4,7 +4,7 @@ IPOBJ=ip.o ipaddress.o ipaddrlabel.o iproute.o iprule.o ipnetns.o \
+> >      ipmaddr.o ipmonitor.o ipmroute.o ipprefix.o iptuntap.o iptoken.o \
+> >      ipxfrm.o xfrm_state.o xfrm_policy.o xfrm_monitor.o iplink_dummy.o \
+> >      iplink_ifb.o iplink_nlmon.o iplink_team.o iplink_vcan.o iplink_vxcan.o \
+> > -    iplink_vlan.o link_veth.o link_gre.o iplink_can.o iplink_xdp.o \
+> > +    iplink_vlan.o iplink_netshaper.o link_veth.o link_gre.o iplink_can.o iplink_xdp.o \
+> >      iplink_macvlan.o ipl2tp.o link_vti.o link_vti6.o link_xfrm.o \
+> >      iplink_vxlan.o tcp_metrics.o iplink_ipoib.o ipnetconf.o link_ip6tnl.o \
+> >      link_iptnl.o link_gre6.o iplink_bond.o iplink_bond_slave.o iplink_hsr.o \
+> > diff --git a/ip/iplink.c b/ip/iplink.c
+> > index 59e8caf4..daa4603d 100644
+> > --- a/ip/iplink.c
+> > +++ b/ip/iplink.c
+> > @@ -1509,6 +1509,15 @@ static void do_help(int argc, char **argv)
+> >  		usage();
+> >  }
+> >  
+> > +static int iplink_netshaper(int argc, char **argv)
+> > +{
+> > +	struct link_util *lu;
+> > +
+> > +	lu = get_link_kind("netshaper");
+> > +
+> > +	return lu->parse_opt(lu, argc, argv, NULL);
+> > +}
+> > +
+> >  int do_iplink(int argc, char **argv)
+> >  {
+> >  	if (argc < 1)
+> > @@ -1545,6 +1554,9 @@ int do_iplink(int argc, char **argv)
+> >  	if (matches(*argv, "property") == 0)
+> >  		return iplink_prop(argc-1, argv+1);
+> >  
+> > +	if (strcmp(*argv, "netshaper") == 0)
+> > +		return iplink_netshaper(argc-1, argv+1);
+> > +
+> >  	if (matches(*argv, "help") == 0) {
+> >  		do_help(argc-1, argv+1);
+> >  		return 0;
+> > diff --git a/ip/iplink_netshaper.c b/ip/iplink_netshaper.c
+> > new file mode 100644
+> > index 00000000..30ee6c3e
+> > --- /dev/null
+> > +++ b/ip/iplink_netshaper.c
+> > @@ -0,0 +1,189 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +/*
+> > + * iplink_netshaper.c netshaper H/W shaping support
+> > + *
+> > + * Authors:        Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+> > + */
+> > +#include <stdio.h>
+> > +#include <string.h>
+> > +#include <linux/genetlink.h>
+> > +#include <linux/netlink.h>
+> > +#include <linux/rtnetlink.h>
+> > +#include <uapi/linux/netshaper.h>
+> > +#include "utils.h"
+> > +#include "ip_common.h"
+> > +#include "libgenl.h"
+> > +
+> > +/* netlink socket */
+> > +static struct rtnl_handle gen_rth = { .fd = -1 };
+> > +static int genl_family = -1;
+> > +
+> > +static void usage(void)
+> > +{
+> > +	fprintf(stderr,
+> > +		"Usage:	ip link netshaper set dev DEVNAME handle scope HANDLE_SCOPE id HANDLE_ID speed SPEED\n"
+> > +		"	ip link netshaper delete dev DEVNAME handle scope HANDLE_SCOPE id HANDLE_ID\n"
+> > +		"	ip link netshaper get dev DEVNAME handle scope HANDLE_SCOPE id HANDLE_ID\n"
+> 
+> Seems like netshaper is property of the device not a top level object, the syntax
+> here is awkward. Open to better suggestions. Looks to me that netshaper should be property of
+> device not top level object.
+> 
+> Or netshaper is like neighbour and route and really wants to be not part of link command.
+> 
+> Also no other ip commands use show not get.
+> The verb "get" is only used for things like getting a route or neighbor with a particular address.
 
-It's not referenced explicitly but it's definitely used, see also commits:
+Okay. I will change the code accordingly.
+> 
+> 
+> > +		"Where:	DEVNAME		:= STRING\n"
+> > +		"	HANDLE_SCOPE	:= { netdev | queue | node }\n"
+> > +		"	HANDLE_ID	:= UINT\n"
+> > +		"	SPEED		:= UINT{ kbit | mbit | gbit }\n");
+> > +
+> > +	exit(-1);
+> > +}
+> > +
+> > +static void print_netshaper_attrs(struct nlmsghdr *answer)
+> > +{
+> > +	struct genlmsghdr *ghdr = NLMSG_DATA(answer);
+> > +	int len = answer->nlmsg_len - NLMSG_LENGTH(GENL_HDRLEN);
+> > +	struct rtattr *tb[NET_SHAPER_A_MAX + 1] = {};
+> > +	__u32 speed_mbps;
+> > +	__u64 speed_bps;
+> > +	int ifindex;
+> > +
+> > +	parse_rtattr(tb, NET_SHAPER_A_MAX,
+> > +		     (struct rtattr *)((char *)ghdr + GENL_HDRLEN), len);
+> > +
+> > +	for (int i = 1; i <= NET_SHAPER_A_MAX; ++i) {
+> > +		if (!tb[i])
+> > +			continue;
+> > +		switch (i) {
+> > +		case NET_SHAPER_A_BW_MAX:
+> > +			speed_bps = rta_getattr_u64(tb[i]);
+> > +			speed_mbps = (speed_bps / 1000000);
+> > +			print_uint(PRINT_ANY, "speed", "speed: %u mbps\n",
+> > +				   speed_mbps);
+> > +			break;
+> > +		case NET_SHAPER_A_IFINDEX:
+> > +			ifindex = rta_getattr_u32(tb[i]);
+> > +			print_color_string(PRINT_ANY, COLOR_IFNAME, "dev",
+> > +					   "dev: %s\n",
+> > +					   ll_index_to_name(ifindex));
+> > +			break;
+> > +		default:
+> > +			break;
+> > +		}
+> > +	}
+> > +}
+> > +
+> > +static int do_cmd(int argc, char **argv, struct nlmsghdr *n, int cmd)
+> > +{
+> > +	GENL_REQUEST(req, 1024, genl_family, 0, NET_SHAPER_FAMILY_VERSION, cmd,
+> > +		     NLM_F_REQUEST | NLM_F_ACK);
+> > +
+> > +	struct nlmsghdr *answer;
+> > +	__u64 speed_bps = 0;
+> > +	int ifindex = -1;
+> > +	int handle_scope = NET_SHAPER_SCOPE_UNSPEC;
+> > +	__u32 handle_id = 0;
+> > +	bool handle_present = false;
+> > +	int err;
+> > +
+> > +	while (argc > 0) {
+> > +		if (strcmp(*argv, "dev") == 0) {
+> > +			NEXT_ARG();
+> > +			ifindex = ll_name_to_index(*argv);
+> > +		} else if (strcmp(*argv, "speed") == 0) {
+> > +			NEXT_ARG();
+> > +			if(get_rate64(&speed_bps, *argv)) {
+> > +				fprintf(stderr, "Invalid speed value\n");
+> > +				return -1;
+> > +			}
+> > +			/*Convert Bps to bps*/
+> > +			speed_bps *= 8;
+> > +		} else if (strcmp(*argv, "handle") == 0) {
+> > +			handle_present = true;
+> > +			NEXT_ARG();
+> > +			if (strcmp(*argv, "scope") == 0) {
+> > +				NEXT_ARG();
+> > +				if (strcmp(*argv, "netdev") == 0) {
+> > +					handle_scope = NET_SHAPER_SCOPE_NETDEV;
+> > +				} else if (strcmp(*argv, "queue") == 0) {
+> > +					handle_scope = NET_SHAPER_SCOPE_QUEUE;
+> > +				} else if (strcmp(*argv, "node") == 0) {
+> > +					handle_scope = NET_SHAPER_SCOPE_NODE;
+> > +				} else {
+> > +					fprintf(stderr, "Invalid scope\n");
+> > +					return -1;
+> > +				}
+> > +
+> > +				NEXT_ARG();
+> > +				if (strcmp(*argv, "id") == 0) {
+> > +					NEXT_ARG();
+> > +					if (get_unsigned(&handle_id, *argv, 10)) {
+> > +						fprintf(stderr,
+> > +							"Invalid handle id\n");
+> > +						return -1;
+> > +					}
+> > +				}
+> > +			}
+> > +		} else {
+> > +			fprintf(stderr, "What is \"%s\"\n", *argv);
+> > +			usage();
+> > +		}
+> > +		argc--;
+> > +		argv++;
+> > +	}
+> > +
+> > +	if (ifindex == -1)
+> > +		missarg("dev");
+> > +
+> > +	if (!handle_present)
+> > +		missarg("handle");
+> > +
+> > +	if (cmd == NET_SHAPER_CMD_SET && speed_bps == 0)
+> > +		missarg("speed");
+> > +
+> > +	addattr32(&req.n, sizeof(req), NET_SHAPER_A_IFINDEX, ifindex);
+> > +
+> > +	struct rtattr *handle = addattr_nest(&req.n, sizeof(req),
+> > +					     NET_SHAPER_A_HANDLE | NLA_F_NESTED);
+> > +	addattr32(&req.n, sizeof(req), NET_SHAPER_A_HANDLE_SCOPE, handle_scope);
+> > +	addattr32(&req.n, sizeof(req), NET_SHAPER_A_HANDLE_ID, handle_id);
+> > +	addattr_nest_end(&req.n, handle);
+> > +
+> > +	if (cmd == NET_SHAPER_CMD_SET)
+> > +		addattr64(&req.n, sizeof(req), NET_SHAPER_A_BW_MAX, speed_bps);
+> > +
+> > +	err = rtnl_talk(&gen_rth, &req.n, &answer);
+> > +	if (err < 0) {
+> > +		printf("Kernel command failed: %d\n", err);
+> > +		return err;
+> > +	}
+> > +
+> > +	if (cmd == NET_SHAPER_CMD_GET)
+> > +		print_netshaper_attrs(answer);
+> > +
+> > +	return err;
+> > +}
+> > +
+> > +static int netshaper_parse_opt(struct link_util *lu, int argc, char **argv,
+> > +			       struct nlmsghdr *n)
+> > +{
+> > +	if (argc < 1)
+> > +		usage();
+> > +	if (strcmp(*argv, "help") == 0)
+> > +		usage();
+> > +
+> > +	if (genl_init_handle(&gen_rth, NET_SHAPER_FAMILY_NAME, &genl_family))
+> > +		exit(1);
+> > +
+> > +	if (strcmp(*argv, "set") == 0)
+> > +		return do_cmd(argc - 1, argv + 1, n, NET_SHAPER_CMD_SET);
+> > +
+> > +	if (strcmp(*argv, "delete") == 0)
+> > +		return do_cmd(argc - 1, argv + 1, n, NET_SHAPER_CMD_DELETE);
+> > +
+> > +	if (strcmp(*argv, "get") == 0)
+> > +		return do_cmd(argc - 1, argv + 1, n, NET_SHAPER_CMD_GET);
+> > +
+> > +	fprintf(stderr,
+> > +		"Command \"%s\" is unknown, try \"ip link netshaper help\".\n",
+> > +		*argv);
+> > +	exit(-1);
+> > +}
+> > +
+> > +struct link_util netshaper_link_util = {
+> > +	.id = "netshaper",
+> > +	.parse_opt = netshaper_parse_opt,
+> > +};
+> 
+> 
+> Please add a print_opt functionality.
+> Very useful to see what kernel thinks state is. 
 
-8740ca9dcd3c ss: add support for BPF socket-local storage
-84c45b8acb30 Reapply "ss: prevent "Process" column from being printed unless requested"
-f22c49730c36 Revert "ss: prevent "Process" column from being printed unless requested"
-1607bf531fd2 ss: prevent "Process" column from being printed unless requested
-
-Now, while 5883c6eba517 ("ss: show header for --processes/-p") and consequently
-f22c49730c36 are obviously broken (sorry, I didn't review those, nobody Cc'ed
-me), they clearly show that COL_EXT is used. It's for stuff like TCP extensions
-(say, 'ss -tei') which have no own / specific column header.
-
--- 
-Stefano
-
+Thankyou for the clarification. I'll make sure to integrate these
+changes in the next version.
 
