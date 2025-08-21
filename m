@@ -1,106 +1,102 @@
-Return-Path: <netdev+bounces-215723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86B3DB3009B
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 18:59:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECBAAB300B5
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 19:04:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A39AC1CE1A82
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 16:56:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D54A1587E1C
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 17:04:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44AE82E6107;
-	Thu, 21 Aug 2025 16:56:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B9332FB624;
+	Thu, 21 Aug 2025 17:03:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X2pFq3sw"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qBdtO3cA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B4DB2E1F11;
-	Thu, 21 Aug 2025 16:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B16992FB62B;
+	Thu, 21 Aug 2025 17:03:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755795365; cv=none; b=ub+vuWw/3aKSPop+UwpnANDXZ01CFiovCHkrp1wFpLcWfY5cpDen/wYIYzkH4P+lF/IX6mIMrceAzecZeu+7ew3XmhTxRZEFvH3/UkqU2MEC7m2Z7jYHJ8t/T2Ob02yVO662WW+37CzG5BtOgxszibvaqnwjIoCSyuGGhkfHy+M=
+	t=1755795837; cv=none; b=BpZ5v7vUiIPikkyuqt2h2ZmjVJOljGWlyXs8IkcprcExX604CpHya1vI4FjQcNvfPzSicCIZvArHkZlUHqxF0SnkczJDO8EIEpPd0JKm/SJuWV6dxf4CEhDftrhDpsG1fVl7qs+RWkuYp0+MYYgRceCZtdqgUOdhiHd9oZhcbQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755795365; c=relaxed/simple;
-	bh=OTJfMD5H4cDT5DeZwBC9vrpTKC9XBlJdn8JVZTk0OfA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lQg+5fz9ZmyhuoAIx3AqpXk8nuxUTRMGJ6cndZSleR66wqFAHvrfRnXyDLwqdmS0pOrzUd8o1VENpMR2jSBSMO0+EEAKQTG3OdKGzFSWetb9abP7j/Oxtf/QF//i05DjxqOezjjxpv1hc9ng6INkf8OwEFKiR1ia+NVHBRcNlgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X2pFq3sw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66C4FC4CEF4;
-	Thu, 21 Aug 2025 16:56:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755795364;
-	bh=OTJfMD5H4cDT5DeZwBC9vrpTKC9XBlJdn8JVZTk0OfA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=X2pFq3swWLYIK/fEgSYiOtTYtShp4zuzf3sugfUz5NkK2zy+tphCNy/d/MvkUV5/l
-	 qFPdgdCYcUco0Hsy/E87K25hxzrJSQ31SToOjB/EDos+/4n0w6rK+chN1ioL48MHSe
-	 cOc5MJ6stgKBkcNayHxqqXcg8aqP6QVytAEXPOyhG5RaxxZ0QvEQbRMCvNLn88Jt8F
-	 1/zMcIHH7gpllTV7BrZG/PzZfyVGS6HQ3RO6p+MTrHHYJw3elBu54+axH4A+Wr4Ent
-	 XIxATolM0fhS3WrWQaGvf0yC85rJjWG5KjW/yH6esL8uKfzbkPthPD699lY0fSp/rN
-	 3mZePrUrR0Jsg==
-From: SeongJae Park <sj@kernel.org>
-To: Bala-Vignesh-Reddy <reddybalavignesh9979@gmail.com>
-Cc: SeongJae Park <sj@kernel.org>,
-	akpm@linux-foundation.org,
-	shuah@kernel.org,
-	mic@digikod.net,
-	gnoack@google.com,
-	david@redhat.com,
-	lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com,
-	vbabka@suse.cz,
-	rppt@kernel.org,
-	surenb@google.com,
-	mhocko@suse.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	ming.lei@redhat.com,
-	skhan@linuxfoundation.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-mm@kvack.org,
-	netdev@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH] selftests: centralise maybe-unused definition in kselftest.h
-Date: Thu, 21 Aug 2025 09:56:02 -0700
-Message-Id: <20250821165602.79023-1-sj@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250821101159.2238-1-reddybalavignesh9979@gmail.com>
-References: 
+	s=arc-20240116; t=1755795837; c=relaxed/simple;
+	bh=zST2lgy3sN3VlnQjMfYCnDBwSTsHCfLZY52u/GQApsU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VJnqKDHRB5jJ2LYIYzeSNHO4lVfe6NUBopy8kJfxJhgTh0hJYVrzIxHZ45Vm+wi4SZlv8xc5WqMAePqyzxScu/+j318ZWQUYDN+8cuShJ4gOOriTiLxQH6ypuRw/18n8T6H7EVEx1qL9sYtco611IZ2VHEOfZJ6JM0qMQU35vZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qBdtO3cA; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=FsQ6glM8E2Fm3GYBU8rO+vl9K7vuBOAnCV5mG0HmHPw=; b=qB
+	dtO3cAS63s1y0aKe7siuEHqulwQJlnXsrOJNHBp3D0tqG5u/qDXmAmY2Wu5KT/LN7XMo5euT+50lo
+	2JHExIpUIL/m3Pb/GQ2pIQF0HGJLd2+CXniQ/EQVK6Xu6r2mRQ0RuJWS5hAKryuoJiIBXwA+fHu3Q
+	GhdYH4Ju8aV537s=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1up8hL-005ThV-Lf; Thu, 21 Aug 2025 19:03:35 +0200
+Date: Thu, 21 Aug 2025 19:03:35 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Sverdlin, Alexander" <alexander.sverdlin@siemens.com>
+Cc: "hauke@hauke-m.de" <hauke@hauke-m.de>,
+	"olteanv@gmail.com" <olteanv@gmail.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"arkadis@mellanox.com" <arkadis@mellanox.com>,
+	"daniel@makrotopia.org" <daniel@makrotopia.org>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"f.fainelli@gmail.com" <f.fainelli@gmail.com>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"john@phrozen.org" <john@phrozen.org>,
+	"Stockmann, Lukas" <lukas.stockmann@siemens.com>,
+	"yweng@maxlinear.com" <yweng@maxlinear.com>,
+	"fchan@maxlinear.com" <fchan@maxlinear.com>,
+	"lxu@maxlinear.com" <lxu@maxlinear.com>,
+	"jpovazanec@maxlinear.com" <jpovazanec@maxlinear.com>,
+	"Schirm, Andreas" <andreas.schirm@siemens.com>,
+	"Christen, Peter" <peter.christen@siemens.com>,
+	"ajayaraman@maxlinear.com" <ajayaraman@maxlinear.com>,
+	"bxu@maxlinear.com" <bxu@maxlinear.com>,
+	"lrosu@maxlinear.com" <lrosu@maxlinear.com>
+Subject: Re: [PATCH RFC net-next 12/23] net: dsa: lantiq_gswip: support 4k
+ VLANs on API 2.2 or later
+Message-ID: <dfb11982-5a7f-495c-8b25-aa1365ab8fe9@lunn.ch>
+References: <aKDhwYPptuC94u-f@pidgin.makrotopia.org>
+ <88bdaad0bb744dc401e94d97aba002431ac0b03b.camel@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <88bdaad0bb744dc401e94d97aba002431ac0b03b.camel@siemens.com>
 
-On Thu, 21 Aug 2025 15:41:59 +0530 Bala-Vignesh-Reddy <reddybalavignesh9979@gmail.com> wrote:
-
-> Several selftests subdirectories duplicated the define __maybe_unused,
-> leading to redundant code. Moved to kselftest.h header and removed
-> other definition.
+> > @@ -269,7 +270,8 @@ struct gswip_priv {
+> >  	struct dsa_switch *ds;
+> >  	struct device *dev;
+> >  	struct regmap *rcu_regmap;
+> > -	struct gswip_vlan vlans[64];
+> > +	struct gswip_vlan (*vlans)[];
 > 
-> This addresses the duplication noted in the proc-pid-vm warning fix
-> 
-> Suggested-by: Andrew Morton <akpm@linux-foundation.org>
-> Link:https://lore.kernel.org/lkml/20250820143954.33d95635e504e94df01930d0@linux-foundation.org/
-> 
-> Signed-off-by: Bala-Vignesh-Reddy <reddybalavignesh9979@gmail.com>
+> ... if this would be just "struct gswip_vlan *vlans;"?
 
-Acked-by: SeongJae Park <sj@kernel.org>
+Could it be moved to the end of the structure and made into an
+flexible array?
 
-
-Thanks,
-SJ
-
-[...]
+	Andrew
 
