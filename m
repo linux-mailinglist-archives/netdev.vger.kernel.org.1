@@ -1,157 +1,119 @@
-Return-Path: <netdev+bounces-215543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 852F8B2F26A
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 10:39:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E25AB2F271
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 10:40:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82C30607223
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 08:32:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A8831BC33C2
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 08:32:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1F1F296BB7;
-	Thu, 21 Aug 2025 08:30:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 721F62D131A;
+	Thu, 21 Aug 2025 08:30:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ImV9UPN+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="xpHmr9OU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B39F5280A2C
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 08:30:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533982877CA;
+	Thu, 21 Aug 2025 08:30:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755765050; cv=none; b=junXMDzqikdoM7Nio9h5n4XKhEBqMTZ/UCGPTyc5Ka1zuo9MQVkBG42mA16gvBz49zhrXWh4NKIGi/9QlLhpgmHUxN8QBcY/tvPrn3ddhaPtT1SRS0zcWRYLjdZETqDyFRnA9jwH0HqYr3/PEXzNuHhfSj0smsFehaVUHxvWduE=
+	t=1755765053; cv=none; b=GO7vV+7Lmb8dAllHYoQ42Wg74IxvYVn+7jsPVllcOBsuhaq1doS6+Td+UzOCl7VK4IdC+AZTHFdWO4fbjqIdbGHtLf+jViIT2nrjrMG7pEV55KXS8saJZq7vYSBO+msXzmdx7LiB0blqKypFqpHvSGv4hgyNjClT/Ci6w/lA/eY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755765050; c=relaxed/simple;
-	bh=ND4zh8X94+77oWXwlUcgY2jHQfPRnpcNlAA0j3O1hvI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qrR1/tU9IhWMBnKXa0KKZKSJXZqXPZtAV6iwVll3aZsmxDYUHcHxEVks6EHAA+7xjlwNKguETCKA70zdtutQsz8aUeyvUgHN+AHedYErq/RNlv16TcZ5f1v95dRk0bOaUA02DYVetZimJ95VwjuPRaZT3M5FMp9gc83l2hhnx2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ImV9UPN+; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-afcb7a5cff3so11379066b.3
-        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 01:30:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1755765047; x=1756369847; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vEcS9kmFNroiJfhtAKIlLkk9PCfkgBUnsKq1fC1zPFg=;
-        b=ImV9UPN+PNo3Zq9O5vxLaeMO3Moc5p43WWpsYxc4yLvgYP4OwbbUGTEYihn/fYbZDO
-         Vx0Pd8IxG6YoKKZQc39zV8OKFZXFCMNp7vCJK75hjZxRHAr1IqUCplypE6a4F9p7zTaM
-         9ORwlFw6VZ89fw5eLQ5e9YZlseFKzDeXLtT+poFp9tQESNU0myJFPDaEvcxWdl/+jZwQ
-         oRWBMLhDOP8UYmjnsCNsnCNtPkb23qbr/elpZtXfYFE/dVJsjiHhKBxaLQWaM4y67M0f
-         cJbNHZFYxbclt231kS/dqJSH35C1lkqtyPc14+od62GgyNThCMKVWXkOdyyVeWAReTye
-         fwmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755765047; x=1756369847;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vEcS9kmFNroiJfhtAKIlLkk9PCfkgBUnsKq1fC1zPFg=;
-        b=F4quTsEThQ2pP7VGfp324wGvLTvceKPgoRcRVgelew1nXWsmTwbyiiCKR+m9xyplbo
-         JU+inBGlnlKYxQbHM2m/npeTFjy3lqAeJ6dyOAkZ1wfX7TTsbYFovGP3s1o4q2ihTtiG
-         ctKv1kPGNXR42qmYFj3Q+hjzBPfKx6lfYUwZhIajJHj7Ri8Xr5poLPhQne0ESbkA7wXT
-         azgLO33Y6+JrjbA7hgVLwmyD2dWHwp0aFf/UGEksaT1yITlVvt45xNxODdHslhG48Mbw
-         g216DEj0iCyVLjp0KGjKlp+5CDh0yvwBXz3PQbVuJ9z1UpwnDKGIr7kFuNa737i/IjfE
-         6GVg==
-X-Forwarded-Encrypted: i=1; AJvYcCVpIld67QM3doy3b9eYTzrDbkkWeQX+4BQ94OZxjNyKEqKoUDOJvPJrpfyYcDAllaNKSsiWiN0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzN10q23KIdnAH8pH0qE84m9x2hfDBZ/maWrHFAl05dkk8Vd+yG
-	Eg7JJ5LEWv9o6DIMmFYYYdCeRt4G1nKJQtUGDKhoaZtUDceTUcaf8tdYM7EWcxSVmHM=
-X-Gm-Gg: ASbGncvSI/8W8+dJ3s1EwFlY8NTmyD2VY7Y0Lu/7Wu1vWMtt6bMfGm18+xeapXtJ0tc
-	xpInkeEOjcEvMVZAZw5OQJvlH0LKvwY/7rtodCU8L79NtSgfShd0NdJ4hQShlUTtrye3w+XtOWX
-	gMNL3MxQerdMMMuJk4/A12Ze/98QK61cxgQMzhk3QpY1+8eTGqQb6iF8q7jjJkHHtiYAIzQlEwd
-	xjYUVT/V7fvHdrzAeWsmDZoOFkHCkoMfBKaS6LNbRyAZmuWzNWlS0frTXEoaAyOfhefbvki/PrB
-	+mYQtchlsWGjCS+sd+CFkQC3ktqQ6ml/ULcwT1JSTvw2XaBpIJLzBsCOvDYd/ilhoSRz1ailXmA
-	Yf4pYX868TE6xkjSzkrf6Mj6Y7KYKw3cRxw==
-X-Google-Smtp-Source: AGHT+IFfK7KR9dULQ+eb5pquxlByOYnBMZWeZhLR+dgCavIt1FucW6E6r00iBOgiXFI47XtRb0RHAA==
-X-Received: by 2002:a17:907:6e8a:b0:af9:3758:a85a with SMTP id a640c23a62f3a-afe07a1f85dmr80547366b.5.1755765046984;
-        Thu, 21 Aug 2025 01:30:46 -0700 (PDT)
-Received: from kuoka.. ([178.197.219.123])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-afded355489sm349014166b.51.2025.08.21.01.30.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Aug 2025 01:30:46 -0700 (PDT)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1755765053; c=relaxed/simple;
+	bh=nAHExjg2GB1moowRbRupjfbdewBjSHwZlbBdNpYDk/E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nSwbE2759TTNuzPAXDnV+Ed5yEzT50TBNJ7m1qgkIwKRs7sqkYDcFiQ+Yei4Fso0BLjJLsVsVJ1SB6mzC0pANmyrNsVmE2+S5Tjz789RIMUgar+ca3eUEUaJeJCpVw5C7pCjlG80tHJqtY9C0W9fCkoiD7UQJJd6OHpNh7EFXbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=xpHmr9OU; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=umqiuqpl92vLkFrBEOgMn4O1gLGgBbb+mOAsh/N+N04=; b=xpHmr9OUghCfQitUOyENjjAoOM
+	5UjxlDxiDJJHE9B2yyFZZHMUgEjvtSxfRXnfBkmSi+PWjzDd+EyTBpMgdRa/ecKk0n3oQErpsGb/w
+	Et2ZGaRSZuNMTcetfUmgqJA2ySVtvVaFTvuObomrbdy51NFAM/mQfOTUZJx5a6NZSdbuVcFmOFvWv
+	EKpp37EwoqlWeGi2uLgvmo5NyaPc5v2Xto0dbkZ/nTxGbBLjGIECKIqYrQ43n8JFnZZJr6kJRo+jM
+	Vn4TgxuwIaqy7o3dY6onVglOmjiMAkWsL9mEkk3lhhtJYz4qPNT0sRT9hh7n1bgbRpG5yF4ehZsgq
+	8HsgFnfw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48070)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1up0h4-000000000qk-1iZn;
+	Thu, 21 Aug 2025 09:30:46 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1up0h1-000000000w4-3HkS;
+	Thu, 21 Aug 2025 09:30:43 +0100
+Date: Thu, 21 Aug 2025 09:30:43 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: David Yang <mmyangfl@gmail.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Karol Gugala <kgugala@antmicro.com>,
-	Mateusz Holenko <mholenko@antmicro.com>,
-	Gabriel Somlo <gsomlo@gmail.com>,
-	Joel Stanley <joel@jms.id.au>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH 2/2] dt-bindings: net: Drop vim style annotation
-Date: Thu, 21 Aug 2025 10:30:40 +0200
-Message-ID: <20250821083038.46274-4-krzysztof.kozlowski@linaro.org>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250821083038.46274-3-krzysztof.kozlowski@linaro.org>
-References: <20250821083038.46274-3-krzysztof.kozlowski@linaro.org>
+	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next v5 3/3] net: dsa: yt921x: Add support for Motorcomm
+ YT921x
+Message-ID: <aKbZM6oYhIN6cBQb@shell.armlinux.org.uk>
+References: <20250820075420.1601068-1-mmyangfl@gmail.com>
+ <20250820075420.1601068-4-mmyangfl@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1240; i=krzysztof.kozlowski@linaro.org;
- h=from:subject; bh=ND4zh8X94+77oWXwlUcgY2jHQfPRnpcNlAA0j3O1hvI=;
- b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBoptkv9iG6FsH4MiISPx4GR5gayrwH/aJQg3dDl
- pA50kxO8HeJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCaKbZLwAKCRDBN2bmhouD
- 1wh3D/sFpXXif9I0uZB2iXFPLlCC5wlPui68Fk6vtcGP5KMEIZUYTBqI4tMqX5EOZSgZM8Cozri
- iflai5Ao/Nrgn4+KHzgGfbwgeStGH2ylgZ+6O3v/uTCz5rcGKlUhezIZ2gKGgXQlLEc+6DTDMlq
- yTyfzKEz52Y6uzynfvYL6ro13xevfQFRV9o96Cl8ELwuyBn9tuVGy9Odc/7lRgkS4A02rSNxS3G
- SXRo+MmopPrAI7Gh1K+yG0uEXebY6omw43uzjXeCDYQ+XaQ+r+jVWpI8nNfXC2U7+TDlKtRJ/5f
- khxZHQ8bAlMg1rfRnjvaQn6DQs2YoPZlnvEaWpk8r7l1POYieYwujIWqcKYOW4DjgAZBnXhVRe2
- /0zx2fI8HJ6hdJfXrnOGthZiNPgGJHz7kxxiU9UzrYxi4fmRbL1aYrZOo2MqusjMQjYCrTR+R9q
- plKS4NZDqimEFhhXvI1DpDw4kFn75sIalTS+TIrxY3rQl7YdP9OeKcoIahORG+YdxlzPRF/WD5P
- t0hE3+67pfSobjD5SUsGh0lo5vv6SK3H6IXwOGca2rBDh20yTUrG7BjLRFWfQchZln4wWERfo1w
- mPVO6dpj6VvRHmdqFFDle6yhcAuQKKQBN8vND/BCA9uqeYQv/yEeokzWi9svny74uDwOn1zHppB aZlrJs5rkosb93g==
-X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp; fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250820075420.1601068-4-mmyangfl@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Bindings files should not carry markings of editor setup, so drop vim
-style annotation.  No functional impact.
+On Wed, Aug 20, 2025 at 03:54:16PM +0800, David Yang wrote:
+> +static int
+> +yt921x_port_config(struct yt921x_priv *priv, int port, unsigned int mode,
+> +		   const struct phylink_link_state *state)
+> +{
+> +	const struct yt921x_info *info = priv->info;
+> +	struct device *dev = to_device(priv);
+> +	enum yt921x_fixed fixed;
+> +	bool duplex_full;
+> +	u32 mask;
+> +	u32 ctrl;
+> +	int res;
+> +
+> +	if (state->interface != PHY_INTERFACE_MODE_INTERNAL &&
+> +	    !yt921x_info_port_is_external(info, port)) {
+> +		dev_err(dev, "Wrong mode %d on port %d\n",
+> +			state->interface, port);
+> +		return -EINVAL;
+> +	}
+> +
+> +	fixed = YT921X_FIXED_NOTFIXED;
+> +	ctrl = YT921X_PORT_LINK;
+> +	if (mode == MLO_AN_FIXED)
+> +		switch (state->speed) {
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
----
- Documentation/devicetree/bindings/net/litex,liteeth.yaml        | 2 --
- .../devicetree/bindings/net/microchip,sparx5-switch.yaml        | 1 -
- 2 files changed, 3 deletions(-)
+Someone clearly doesn't believe in reading the documentation before
+writing code. This also hasn't been tested in any way. Sorry, but
+I'm going to put as much effort into this review as you have into
+understanding the phylink API, and thus my review ends here.
 
-diff --git a/Documentation/devicetree/bindings/net/litex,liteeth.yaml b/Documentation/devicetree/bindings/net/litex,liteeth.yaml
-index bbb71556ec9e..200b198b0d9b 100644
---- a/Documentation/devicetree/bindings/net/litex,liteeth.yaml
-+++ b/Documentation/devicetree/bindings/net/litex,liteeth.yaml
-@@ -95,5 +95,3 @@ examples:
-         };
-     };
- ...
--
--#  vim: set ts=2 sw=2 sts=2 tw=80 et cc=80 ft=yaml :
-diff --git a/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml b/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml
-index a73fc5036905..082982c59a55 100644
---- a/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml
-+++ b/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml
-@@ -245,4 +245,3 @@ examples:
-     };
- 
- ...
--#  vim: set ts=2 sw=2 sts=2 tw=80 et cc=80 ft=yaml :
+NAK.
+
 -- 
-2.48.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
