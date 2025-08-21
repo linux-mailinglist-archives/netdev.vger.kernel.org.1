@@ -1,753 +1,216 @@
-Return-Path: <netdev+bounces-215748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80BC5B301A9
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 20:03:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 575B5B301C0
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 20:11:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A78911CE3FB2
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 18:02:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 346586001B2
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 18:11:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9871B34575E;
-	Thu, 21 Aug 2025 18:01:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59410343206;
+	Thu, 21 Aug 2025 18:11:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P3IHboUY"
+	dkim=pass (2048-bit key) header.d=siemens.com header.i=@siemens.com header.b="UVghpF9W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010058.outbound.protection.outlook.com [52.101.84.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D3163451D1
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 18:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755799292; cv=none; b=cG2dR9/H4l6txim+LXYpLIo6Q376okA62OyLDDTHjrs482Q1EN+3MOhoIEqnxFL2VKJB1XLvbzM2/Yd5uK8QA+WitHyBpOaEYhzv4z0kA1gXFIVG5oRB+ZTpPdykzSfph0BYRhB3+QsR4eQvMHzT4UOMZAPLSmXYtGgcrblgwYA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755799292; c=relaxed/simple;
-	bh=6+cpCVbqfw5sVaYkHo58ycmCFO2IM3bGhUEX/f79iig=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YTgVPzv1AZp3ANot7nJ2+e1SkIgnpiF0nG22sDBhJQxsJmJGzVDFVEZ7ZU3UUQFbGBbz2V6hW/sBvRjbmSKl6IgEbvAcvb2RJZcLFI8x6ro5ugXwqAtsUZVKpYt6PufrNPSvHQbGJ6drndAasX3K952tSaTFfNTYu8Zqa3S6wrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=P3IHboUY; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755799290; x=1787335290;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=6+cpCVbqfw5sVaYkHo58ycmCFO2IM3bGhUEX/f79iig=;
-  b=P3IHboUYiMHnlfyytmooZbosLbeDHwi/WkW5H+/T6LtAcO0NIuZMb916
-   Ija0N435al6XMbyUCZhEPf47jTjFVZnmuzTspwbNtYjEPY7E0AKZxT+j8
-   pHZFai8KVarKZ1OTucVlrGS7XtWc8L3+6y4asOaxKSigMR4ofsU+48Jsu
-   DwiDqqY8DWyzh5pyJCDOxpCbU+9J/TL0vk8/2cJUZwFd7nPBY4vjwr50G
-   2FwPaBSV4kmg4+Tdk+aRJxJ/uNYmFfTJV7srzJUuwwGQPWSOJiKvbT0T7
-   3qvbl63jPstVTs2UkrRDXrRQKFk6DbG3WtkN1muHpo+SW0XGB7WdwjBGA
-   g==;
-X-CSE-ConnectionGUID: Vsd7+vN4QfOMlOgt158pkg==
-X-CSE-MsgGUID: /lKoWb0zTxquOpfaMSlh+A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11529"; a="60727127"
-X-IronPort-AV: E=Sophos;i="6.17,309,1747724400"; 
-   d="scan'208";a="60727127"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2025 11:01:14 -0700
-X-CSE-ConnectionGUID: HfrFwz0/SKSJ+SJ0ljfSNw==
-X-CSE-MsgGUID: J9dxwqzYQoa7InhyEpd44A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,309,1747724400"; 
-   d="scan'208";a="172738265"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa005.fm.intel.com with ESMTP; 21 Aug 2025 11:01:13 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Joshua Hay <joshua.a.hay@intel.com>,
-	anthony.l.nguyen@intel.com,
-	lrizzo@google.com,
-	brianvv@google.com,
-	aleksander.lobakin@intel.com,
-	horms@kernel.org,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Samuel Salin <Samuel.salin@intel.com>
-Subject: [PATCH net 6/6] idpf: remove obsolete stashing code
-Date: Thu, 21 Aug 2025 11:00:59 -0700
-Message-ID: <20250821180100.401955-7-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250821180100.401955-1-anthony.l.nguyen@intel.com>
-References: <20250821180100.401955-1-anthony.l.nguyen@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 256D74C6E;
+	Thu, 21 Aug 2025 18:11:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755799902; cv=fail; b=QrH52jpO1CaM0Sjwrww27Xjige6LVw7P0IZ4k1KnvzRxOChmMHu8juf3OTwcSTHEeCwME04grN1IaqywCMoz/6gSDKiglv3YF+o0E9EeANjmiInYzz/POna9fjcYw0rFNsRrzXYC8FjCTSrpaTpIWl4pcVbsbdnEVgzPL669CzY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755799902; c=relaxed/simple;
+	bh=iREuDxAoVdDaSsBW08nYGCQWCVARG3OTReBIeCiSJ4E=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=uGh73F3iQx0jM8aHE/WokxHmZDZNDKyNi+XA4pHCwJpDVFo9Fm000e6CtGbDt87uwTXagzaQhNrhrJ1UphfhJ26thgWmowg2cvzQgCwhk4UmmjN1u9jCesgFJL2vu+3sKcuUa4wpXlIxKugbAsTAGVK0OStXiEmrPe4rCJnGucY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=@siemens.com header.b=UVghpF9W; arc=fail smtp.client-ip=52.101.84.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=siemens.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=imYJcpjdq2mg66nvdLnAfb6pfERqTr5jST0/SEojYPd5R9KqORavngm5y9IsfCZEsVYIp7vbS544kZuFCGI8JksPkb4aeO77WLF6dnZoonXBz2OwhdRs+HQ2D79MBk7NDDBqMql/xWRpQTkVoQ0mr6NLSK+0upjYnPPHvfD9OQIIIt/UW61fi7RFUcDAiQXcAebIet8ziNApcb8PvbNZVi7VBHo+nCExrU2jJ7c/1hWJbDhCTc9yJpCjizYxpRLKabrq3oSMn5wq/7xJapynWsCYeZphXCgyvhmGJhbUuGvXs+mqTXqwglkYbHIsxVy8cBYSV5DnoG3bPNsxaeklSg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iREuDxAoVdDaSsBW08nYGCQWCVARG3OTReBIeCiSJ4E=;
+ b=dmAmiW2P+Aa8j8trVWRxzd462ZTBWFr7xBVxse1exIWAb7317C68Uihj56bBp5IEZ2DAHAfdAyzSxli++l3jHgCU+E51GcOlgEumG0f8KfBCiIxn5pNS0+wL0k8VwUSaX8zXwft8tdS+FHocYumrUi5t0jmXig6CYNQ2EHaI3PqotBhN7JZidRHFkUTgCM8O+RhjG3dDfoT2lo6Wbrg44RoJvv7ht3sDDXIxLZAAwavKt7joKcXOUv8/t/HbbP8Mz80conG9thHJZjKj6WmQJofxAp8CYq++6mw15/NiY4A3WFXRUyNmSIKtnwQLRQJApLgkErIjMv/KfVnqYdB1Cg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=siemens.com; dmarc=pass action=none header.from=siemens.com;
+ dkim=pass header.d=siemens.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=siemens.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iREuDxAoVdDaSsBW08nYGCQWCVARG3OTReBIeCiSJ4E=;
+ b=UVghpF9WsSygLvGi9B9Poa2rJqsSq0IrrMpTi1FFs4BleyvDDs0Qv6ZV072BcxQr630kHAqEmbhp8jkdl6ZL2HknRXX2HQbBcaU27ZOP/Xd25tybwFWQpWFcVJY71OkSEpYbjnVN2KV93Kr4zkpsc1koGdmINNKGO06oYvLdD6btAM1DykXGLrMLAGfW9dCtr1n2UWRxat54wThO8grjZ1M/nLgjXZh74MrklqCQqDaAYl0rW89gr9qjGYViq97fOJ2sncw6UeY/T+YtwA5jT6qYV7NL8SbngAB3CLZG3rE3mbuMMUv8Zc38yvxnKOz960q91MrpdVVWyC28i+q2aA==
+Received: from AS8PR10MB6867.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:5b6::22)
+ by DU4PR10MB8759.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:10:569::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.16; Thu, 21 Aug
+ 2025 18:11:36 +0000
+Received: from AS8PR10MB6867.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::baa6:3ada:fbe6:98f4]) by AS8PR10MB6867.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::baa6:3ada:fbe6:98f4%5]) with mapi id 15.20.9052.012; Thu, 21 Aug 2025
+ 18:11:36 +0000
+From: "Sverdlin, Alexander" <alexander.sverdlin@siemens.com>
+To: "hauke@hauke-m.de" <hauke@hauke-m.de>, "olteanv@gmail.com"
+	<olteanv@gmail.com>, "davem@davemloft.net" <davem@davemloft.net>,
+	"andrew@lunn.ch" <andrew@lunn.ch>, "linux@armlinux.org.uk"
+	<linux@armlinux.org.uk>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "arkadis@mellanox.com"
+	<arkadis@mellanox.com>, "daniel@makrotopia.org" <daniel@makrotopia.org>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"edumazet@google.com" <edumazet@google.com>, "f.fainelli@gmail.com"
+	<f.fainelli@gmail.com>, "horms@kernel.org" <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+CC: "john@phrozen.org" <john@phrozen.org>, "Stockmann, Lukas"
+	<lukas.stockmann@siemens.com>, "yweng@maxlinear.com" <yweng@maxlinear.com>,
+	"fchan@maxlinear.com" <fchan@maxlinear.com>, "lxu@maxlinear.com"
+	<lxu@maxlinear.com>, "jpovazanec@maxlinear.com" <jpovazanec@maxlinear.com>,
+	"Schirm, Andreas" <andreas.schirm@siemens.com>, "Christen, Peter"
+	<peter.christen@siemens.com>, "ajayaraman@maxlinear.com"
+	<ajayaraman@maxlinear.com>, "bxu@maxlinear.com" <bxu@maxlinear.com>,
+	"lrosu@maxlinear.com" <lrosu@maxlinear.com>
+Subject: Re: [PATCH RFC net-next 20/23] net: dsa: lantiq_gswip: add registers
+ specific for MaxLinear GSW1xx
+Thread-Topic: [PATCH RFC net-next 20/23] net: dsa: lantiq_gswip: add registers
+ specific for MaxLinear GSW1xx
+Thread-Index: AQHcDufpcMd3Gd2mckihtyBc0P2gPLRtcD+A
+Date: Thu, 21 Aug 2025 18:11:36 +0000
+Message-ID: <d867cfec3cc144f1404420ab868aefc0779cbcd9.camel@siemens.com>
+References: <aKDief99H-oV0Q7y@pidgin.makrotopia.org>
+In-Reply-To: <aKDief99H-oV0Q7y@pidgin.makrotopia.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.54.3 (3.54.3-1.fc41) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=siemens.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AS8PR10MB6867:EE_|DU4PR10MB8759:EE_
+x-ms-office365-filtering-correlation-id: 389ac26f-5f9b-4d66-d7d6-08dde0de2adb
+x-ms-exchange-atpmessageproperties: SA
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|7416014|376014|921020|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?elFFZDZ4VURzMk14Q1lRYWlWRTlUVUd1ZEp6VDRXRFUyMDExMEl5aFYvdWly?=
+ =?utf-8?B?d2VzbU85WnI4YzJET21DM0FmMk9ST0tJRlg2Q3k4eXZrRWlLK0Jxb3hURnRU?=
+ =?utf-8?B?K3ZGMFVFWnoybUhsL01UT1N2M21lcHZWbjJWSi9PNHg2ekpMaC9WU0tlZVhB?=
+ =?utf-8?B?RUNVZ2R5YnBOdndpUnBxeHN5OEJaS3k2RHA3UmJoRnA1a2UvVkE0NzNHSmV4?=
+ =?utf-8?B?eEJaRDlJWDFaV1JaUU9mNWdnVWovQXV0QjU1NExXSUlkaG4rMG8xbnVDcWhZ?=
+ =?utf-8?B?anlnOHBpYXRLaW4wc3ozR3pTYkJVNkhPNUI2dTZVQlEvOHNuNWFneDAvekR4?=
+ =?utf-8?B?R2daTUpMM2hLSURkSWtvczU0ckZtOEFzOFVpZHYvZ2E5M1RvZk9QMHY0Q0xX?=
+ =?utf-8?B?eitqbHphclJMVUp2RGJTbmliSHJzZ3V2NGxSdjVka1NTMytyd0VqMDY0cVVv?=
+ =?utf-8?B?UkFpekZWcDY0OGwrcjRFRXJkOC9DZzZuUnlUVG50amM0N29YSXhQRkN4U01h?=
+ =?utf-8?B?VmNMYjBUQWNOci8wZi9UQlFqMTB6Vy9pWkVtdDB0VVNhL1hWeGdIVHVMY2ll?=
+ =?utf-8?B?bWFTTEdScEdKKyt3c1F2UHVjdkd1bGdVSUZUL0pENUhLS05pNnQ2cHU3ZVNJ?=
+ =?utf-8?B?NVR4bUtHVU1CN0Z3Q2JDZE1jY0NqRWtqbWs3ekJJQUZCUGN6aTBId3VhL0pJ?=
+ =?utf-8?B?a211cXRZSWdiTk1ORnNSLzlTU2lZc3RPK002SitQbnRmaVhXMFdXUkVDZEJj?=
+ =?utf-8?B?UXQyNDdORFM5MlY2RXJwc2dPNnFabFp4azRLT1RSaWtmb2RSakgzY3lSdXlY?=
+ =?utf-8?B?QXc5L09BRUY1NWdnQ2EwYmd0OXR6bHRjSXdXZ0ppM3lkWjJQanJGUVJ5a3p1?=
+ =?utf-8?B?azNZQ0h2bDJoQ1BVSmptdmxtK21IVFdLa0hyVkpjZFh4OEh0clI0SCtVUkln?=
+ =?utf-8?B?Uks0ZVJDN01ocUVhMlZTTmNmcjF5UW9za2loVkI3cWJtZG5wenRJNVVPcXps?=
+ =?utf-8?B?c3BoWXlmV3FkRGxaWnMxcHc4MFF0dHpqamxjSzBHZXVpdGo4L0pLc0V3TmlK?=
+ =?utf-8?B?TkVTWGdXeWlMT1hKdTl2MnAxak8vejFjbVZCd2J2SjRZYVZwOHp3azFQVHdh?=
+ =?utf-8?B?b2o2Z28rV1pQTlorUlRRQ29QOFZQVExlYlBBQW1FVXJWOGlpeEpkMENNUkI4?=
+ =?utf-8?B?REsrOTRnNzJaNkhneUZVYVh3K3Z2cjBUTlFkdktkMC9HdnFKSFNJTHI3akpm?=
+ =?utf-8?B?eFd0SytmQ0RvZ3A3alI2ZTV6R2V6RkNPNWFmNkFFWGpVdkl3NmJLUUpMQmda?=
+ =?utf-8?B?UE45Q1B3eFNiU3ZHQnlFV1czeHV6b3lLVzNxR0Jhb2dMa3NCMmhxNTBoWUFQ?=
+ =?utf-8?B?VDg1eGEwWnlyTVdVcjdYdUdCajlKY0hJc29qWlI1UmRySzUxWWtPVUFqV1RM?=
+ =?utf-8?B?aDk4bGVEaVJsaHBEMVFXY1Baa1BIL3NKQkRRZDFrbUVaZHVDbEF4SUU2ZTNu?=
+ =?utf-8?B?U2RaSDJKalBCUFNUc3FXUG5lUWk4VE1WcTRSaGYxLytaYmQ4YzlPQ0hTU0s2?=
+ =?utf-8?B?dFlTb2c0RkNXa0crbThibHNvNTV3cWNJdm11cnRhWk15U2pnMHVSdXVMcmQ3?=
+ =?utf-8?B?SzFkZXhzZ0NpbzVXOGVrVFBUNGY1ZXpZMDdTQW1ZRFk2MytoYXI4ODdHZ2kz?=
+ =?utf-8?B?L3c4R3orZU5GYkVOdER6aU0rTlBLOWx2U2Y4U1I5SXdvVTVNK0VPZE5uZ0tD?=
+ =?utf-8?B?N0hYMVNXL01Yb0xtMmdzdmYxKzJPNWlJc3BHbXNpUDdOZjFQanQzejdnN1c4?=
+ =?utf-8?B?Yy9aTlRCaHFtNytnVER4RXJlK1c0RDFKMFJkOGFhbklmdkFYU29KQkp6Z3VH?=
+ =?utf-8?B?OTBhU241VysyZmVwVU5VWDhGdnpmS2JwdVBENUdKOTd5MjhVa21saVQvUTBj?=
+ =?utf-8?Q?PiXURUMA5uI6aQWuWIE9MRmR/V22jTTx?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR10MB6867.EURPRD10.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(921020)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?MldtNkJCOGVqWkhObVFRMTJMSjJidmFnc01Kcmt4MERIVDYzdkYycVZPcVI2?=
+ =?utf-8?B?TUJjMVpzRjY0L2tGMmJCNFd6VStzSzgzNEk5aVhqeGxNeFl4dmd6VU9VYzY3?=
+ =?utf-8?B?akZ1b1pTNXlZaFR1MVI0aVlXUDd3YW9SMVdVQWZNQ0dKUHkrWE8wSlpGQ0hQ?=
+ =?utf-8?B?QUhlbG9LZ1RVM3ZTbUpQbGh1TWFXRnBJZlY1dFFqTzByb2hOOEVBZWRYQnRy?=
+ =?utf-8?B?UWhNazdnSTV0R0pyOEFXZ2hiNTlUNmVUSzlmUFBUQmVCbjdKMmhYRHQ2U095?=
+ =?utf-8?B?NWs0RDZpYTlBTWh3S1h5SUYwS0ZnUVZoeHMzNnhVdkFYd3h4QkJzTDJ0Zi9I?=
+ =?utf-8?B?U3hhOGcrcjdXa0RjeEhKTGtYcFZqWFJzS29PU1ZDQmxKa2xXODNzcUlJVEhr?=
+ =?utf-8?B?TUcxK0U4SnNXeTVKc2JtakZUZUl4bVBHNzZwREZ6TE1wRWp0TEo3STVFcXR4?=
+ =?utf-8?B?TEs0bW1LdVh0ZW1JL2VSdUJLb3ZnaDRpekV4L3BaRlFuaHN4WklVVHgwUyt3?=
+ =?utf-8?B?bVZpNkxqN1JTTDBoSmV4VzZIQ0thVFAxZTdTbGdleHZBaUFHV3ZKcTh2NlVx?=
+ =?utf-8?B?T1JXamgya2NPN29LcStFZHZRcUlzZ1ZFWFNOLzdQSHppeGdTK1R2cVFDL0pl?=
+ =?utf-8?B?cThCZ016eUFPZkM2dTVENnVCajQwZjlkSmJxZmh3bnQ1V2NFVTIwdEdXbFRV?=
+ =?utf-8?B?ZjExNFhydVhTWWdGTmxCOFBBektjS0JvV3pRTmlQNmczOHlVeU5UTFMwUGZh?=
+ =?utf-8?B?MFZEd2dDNTB1djFZdm9sdWRnUVYvVzYwZ0s0VTgzaDU3d1FNY3lyWXZ5Q0Rv?=
+ =?utf-8?B?T2MxV2ZIKy92Y2lzUUx4VWNtVkpDeHZacUJ1TWthUHZlSkhEdnpsa0JaWTdX?=
+ =?utf-8?B?QjBieFdaL0dkYVduaExqUU5XaHFRMVR2UzE2SER6VEorUHY1OFc4MW9FK1BV?=
+ =?utf-8?B?OW1PTFVNZVJwaXAzbDEwb0lCbnVwMk1SYVh5Z1J2U3VSOEVsdHRpQytZQUFr?=
+ =?utf-8?B?MHhJdHljYVRWbnl1TVYrVEJDaEhSWStxQ3JmQ2F6UHFMZ3ZzQUpWYy9ONUto?=
+ =?utf-8?B?OUpndVVVWkpMbGhEVGJyZDF6bWxncEVtdVFET1VkbmFGalI4OG9iTnlDZE40?=
+ =?utf-8?B?ZlRPdFFGSFNzdldxd09YSDYwTVJUcW81Y05sUkFBL3RXYWdtUlAvZ1BWOHFH?=
+ =?utf-8?B?QVFtSW1LTDZlK3ExVkdMZWFDdXQ3Sk1ya0t0NHJ2Tm9KTnAxUzZHVXU2VTVQ?=
+ =?utf-8?B?VTlFZUlMd2hSQ1h5cWg0SnhXc0xuNGZ2dHRsdVhaTkRHV1YzZDQ4U2p1Y0lD?=
+ =?utf-8?B?YzhtL1I0VkZwNTl1YVRjM2VqaklaRWlJeldPeG1YakU2V2xOSVpqWjFDNjFT?=
+ =?utf-8?B?ajhXRzFFeUhnQlhWM1A2a3dyS3AvVUJ4YkkrUWh3MGVtK0VtV2RsdWhCNGhx?=
+ =?utf-8?B?dElnaURsNWxpdkV1anZtUU82eTZnVW9ES2Q1T2wwNnFRUXNHRVBIbm1ETlQv?=
+ =?utf-8?B?RmRRdmFqZnFVa0VxVmJhUGl5UmlLL1p6c1ZRNE44ZURkdHdiUU02b3grUjcv?=
+ =?utf-8?B?SFg2VGkxQS9IOTlmQ2YxdGxzMnV5ZEYzZEFzQmJMd21SKzkzT3M0Rm1LQVoy?=
+ =?utf-8?B?U09LREs2dDd4Z0g3b0VOcTV5NGhBMVVlZVJVODg2NEc3N09ZMWVGY2FrV2M5?=
+ =?utf-8?B?N1RRNzdJellJUmJiczc1ZSt4OXNwOFBKeUFnOWltRktaQWZBVEVueEJwRHpG?=
+ =?utf-8?B?aHlMZ0RpRmRCUXRsczl2MitNQk1JLzhrUkhkQ01oTW1TYnJhck5VKy9NQ1A0?=
+ =?utf-8?B?eVlSVHNTMHZvUEViQmZ3aU5kWVVxMVVyTjREVE02MCtlUnVEcGNPUVJXbTBV?=
+ =?utf-8?B?d21sempWcXc0K0UxdHJxUzJsa3VqU1N0V3MrSGJyenZpZEpmcnBEUHlORjNC?=
+ =?utf-8?B?M1NGdFRwbkl6dzYrVWw3MTh5ckxETm5saTBkU0pVSkVVZE1hWitGZmhMOGto?=
+ =?utf-8?B?RWZ4cnVCcjhieldzYldtaHZod01ZamwyckhqWWtuMjhBSXplWWNXVkJmcTR0?=
+ =?utf-8?B?T3hCVHZwVzcrcjZMYVpjd01lSGFLWEZieUhLeUFQNmJKeWFVRHUrUEgvcnk0?=
+ =?utf-8?B?OWJBVGNUN3dBVnF1S3ZUalcxM0VlZnNHYnpmVmMweVg0cnlMbDl5WE5STDRX?=
+ =?utf-8?Q?mXOqL7RByKLsfkkn4HwIOdM=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <5BABA5F36FD7344FAEB6020C179C5FA6@EURPRD10.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: siemens.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AS8PR10MB6867.EURPRD10.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 389ac26f-5f9b-4d66-d7d6-08dde0de2adb
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Aug 2025 18:11:36.2538
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 38ae3bcd-9579-4fd4-adda-b42e1495d55a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: VkmRnFQJf/eGgRdz3rdj59LSa0tC9WuWIaQqevA7rRyzQiGf/7FRK7nyr4LKSPhaiOU7BGnVHJqnob5yK0FSwxTcNZ8I32MoIjeMu/hlqkI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR10MB8759
 
-From: Joshua Hay <joshua.a.hay@intel.com>
-
-With the new Tx buffer management scheme, there is no need for all of
-the stashing mechanisms, the hash table, the reserve buffer stack, etc.
-Remove all of that.
-
-Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
-Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Tested-by: Samuel Salin <Samuel.salin@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 314 ++------------------
- drivers/net/ethernet/intel/idpf/idpf_txrx.h |  47 +--
- 2 files changed, 22 insertions(+), 339 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index fa5432a0566a..eaad52a83b04 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -8,48 +8,12 @@
- #include "idpf_ptp.h"
- #include "idpf_virtchnl.h"
- 
--struct idpf_tx_stash {
--	struct hlist_node hlist;
--	struct libeth_sqe buf;
--};
--
- #define idpf_tx_buf_next(buf)		(*(u32 *)&(buf)->priv)
--#define idpf_tx_buf_compl_tag(buf)	(*(u32 *)&(buf)->priv)
- LIBETH_SQE_CHECK_PRIV(u32);
- 
- static bool idpf_chk_linearize(struct sk_buff *skb, unsigned int max_bufs,
- 			       unsigned int count);
- 
--/**
-- * idpf_buf_lifo_push - push a buffer pointer onto stack
-- * @stack: pointer to stack struct
-- * @buf: pointer to buf to push
-- *
-- * Returns 0 on success, negative on failure
-- **/
--static int idpf_buf_lifo_push(struct idpf_buf_lifo *stack,
--			      struct idpf_tx_stash *buf)
--{
--	if (unlikely(stack->top == stack->size))
--		return -ENOSPC;
--
--	stack->bufs[stack->top++] = buf;
--
--	return 0;
--}
--
--/**
-- * idpf_buf_lifo_pop - pop a buffer pointer from stack
-- * @stack: pointer to stack struct
-- **/
--static struct idpf_tx_stash *idpf_buf_lifo_pop(struct idpf_buf_lifo *stack)
--{
--	if (unlikely(!stack->top))
--		return NULL;
--
--	return stack->bufs[--stack->top];
--}
--
- /**
-  * idpf_tx_timeout - Respond to a Tx Hang
-  * @netdev: network interface device structure
-@@ -78,14 +42,11 @@ void idpf_tx_timeout(struct net_device *netdev, unsigned int txqueue)
- static void idpf_tx_buf_rel_all(struct idpf_tx_queue *txq)
- {
- 	struct libeth_sq_napi_stats ss = { };
--	struct idpf_buf_lifo *buf_stack;
--	struct idpf_tx_stash *stash;
- 	struct libeth_cq_pp cp = {
- 		.dev	= txq->dev,
- 		.ss	= &ss,
- 	};
--	struct hlist_node *tmp;
--	u32 i, tag;
-+	u32 i;
- 
- 	/* Buffers already cleared, nothing to do */
- 	if (!txq->tx_buf)
-@@ -97,33 +58,6 @@ static void idpf_tx_buf_rel_all(struct idpf_tx_queue *txq)
- 
- 	kfree(txq->tx_buf);
- 	txq->tx_buf = NULL;
--
--	if (!idpf_queue_has(FLOW_SCH_EN, txq))
--		return;
--
--	buf_stack = &txq->stash->buf_stack;
--	if (!buf_stack->bufs)
--		return;
--
--	/*
--	 * If a Tx timeout occurred, there are potentially still bufs in the
--	 * hash table, free them here.
--	 */
--	hash_for_each_safe(txq->stash->sched_buf_hash, tag, tmp, stash,
--			   hlist) {
--		if (!stash)
--			continue;
--
--		libeth_tx_complete(&stash->buf, &cp);
--		hash_del(&stash->hlist);
--		idpf_buf_lifo_push(buf_stack, stash);
--	}
--
--	for (i = 0; i < buf_stack->size; i++)
--		kfree(buf_stack->bufs[i]);
--
--	kfree(buf_stack->bufs);
--	buf_stack->bufs = NULL;
- }
- 
- /**
-@@ -199,9 +133,6 @@ static void idpf_tx_desc_rel_all(struct idpf_vport *vport)
-  */
- static int idpf_tx_buf_alloc_all(struct idpf_tx_queue *tx_q)
- {
--	struct idpf_buf_lifo *buf_stack;
--	int i;
--
- 	/* Allocate book keeping buffers only. Buffers to be supplied to HW
- 	 * are allocated by kernel network stack and received as part of skb
- 	 */
-@@ -214,29 +145,6 @@ static int idpf_tx_buf_alloc_all(struct idpf_tx_queue *tx_q)
- 	if (!tx_q->tx_buf)
- 		return -ENOMEM;
- 
--	if (!idpf_queue_has(FLOW_SCH_EN, tx_q))
--		return 0;
--
--	buf_stack = &tx_q->stash->buf_stack;
--
--	/* Initialize tx buf stack for out-of-order completions if
--	 * flow scheduling offload is enabled
--	 */
--	buf_stack->bufs = kcalloc(tx_q->desc_count, sizeof(*buf_stack->bufs),
--				  GFP_KERNEL);
--	if (!buf_stack->bufs)
--		return -ENOMEM;
--
--	buf_stack->size = tx_q->desc_count;
--	buf_stack->top = tx_q->desc_count;
--
--	for (i = 0; i < tx_q->desc_count; i++) {
--		buf_stack->bufs[i] = kzalloc(sizeof(*buf_stack->bufs[i]),
--					     GFP_KERNEL);
--		if (!buf_stack->bufs[i])
--			return -ENOMEM;
--	}
--
- 	return 0;
- }
- 
-@@ -350,8 +258,6 @@ static int idpf_tx_desc_alloc_all(struct idpf_vport *vport)
- 	for (i = 0; i < vport->num_txq_grp; i++) {
- 		for (j = 0; j < vport->txq_grps[i].num_txq; j++) {
- 			struct idpf_tx_queue *txq = vport->txq_grps[i].txqs[j];
--			u8 gen_bits = 0;
--			u16 bufidx_mask;
- 
- 			err = idpf_tx_desc_alloc(vport, txq);
- 			if (err) {
-@@ -360,34 +266,6 @@ static int idpf_tx_desc_alloc_all(struct idpf_vport *vport)
- 					i);
- 				goto err_out;
- 			}
--
--			if (!idpf_is_queue_model_split(vport->txq_model))
--				continue;
--
--			txq->compl_tag_cur_gen = 0;
--
--			/* Determine the number of bits in the bufid
--			 * mask and add one to get the start of the
--			 * generation bits
--			 */
--			bufidx_mask = txq->desc_count - 1;
--			while (bufidx_mask >> 1) {
--				txq->compl_tag_gen_s++;
--				bufidx_mask = bufidx_mask >> 1;
--			}
--			txq->compl_tag_gen_s++;
--
--			gen_bits = IDPF_TX_SPLITQ_COMPL_TAG_WIDTH -
--							txq->compl_tag_gen_s;
--			txq->compl_tag_gen_max = GETMAXVAL(gen_bits);
--
--			/* Set bufid mask based on location of first
--			 * gen bit; it cannot simply be the descriptor
--			 * ring size-1 since we can have size values
--			 * where not all of those bits are set.
--			 */
--			txq->compl_tag_bufid_m =
--				GETMAXVAL(txq->compl_tag_gen_s);
- 		}
- 
- 		if (!idpf_is_queue_model_split(vport->txq_model))
-@@ -1042,9 +920,6 @@ static void idpf_txq_group_rel(struct idpf_vport *vport)
- 
- 		kfree(txq_grp->complq);
- 		txq_grp->complq = NULL;
--
--		if (flow_sch_en)
--			kfree(txq_grp->stashes);
- 	}
- 	kfree(vport->txq_grps);
- 	vport->txq_grps = NULL;
-@@ -1405,7 +1280,6 @@ static int idpf_txq_group_alloc(struct idpf_vport *vport, u16 num_txq)
- 	for (i = 0; i < vport->num_txq_grp; i++) {
- 		struct idpf_txq_group *tx_qgrp = &vport->txq_grps[i];
- 		struct idpf_adapter *adapter = vport->adapter;
--		struct idpf_txq_stash *stashes;
- 		int j;
- 
- 		tx_qgrp->vport = vport;
-@@ -1418,15 +1292,6 @@ static int idpf_txq_group_alloc(struct idpf_vport *vport, u16 num_txq)
- 				goto err_alloc;
- 		}
- 
--		if (split && flow_sch_en) {
--			stashes = kcalloc(num_txq, sizeof(*stashes),
--					  GFP_KERNEL);
--			if (!stashes)
--				goto err_alloc;
--
--			tx_qgrp->stashes = stashes;
--		}
--
- 		for (j = 0; j < tx_qgrp->num_txq; j++) {
- 			struct idpf_tx_queue *q = tx_qgrp->txqs[j];
- 
-@@ -1446,11 +1311,6 @@ static int idpf_txq_group_alloc(struct idpf_vport *vport, u16 num_txq)
- 			if (!flow_sch_en)
- 				continue;
- 
--			if (split) {
--				q->stash = &stashes[j];
--				hash_init(q->stash->sched_buf_hash);
--			}
--
- 			idpf_queue_set(FLOW_SCH_EN, q);
- 
- 			q->refillq = kzalloc(sizeof(*q->refillq), GFP_KERNEL);
-@@ -1742,87 +1602,6 @@ static void idpf_tx_read_tstamp(struct idpf_tx_queue *txq, struct sk_buff *skb)
- 	spin_unlock_bh(&tx_tstamp_caps->status_lock);
- }
- 
--/**
-- * idpf_tx_clean_stashed_bufs - clean bufs that were stored for
-- * out of order completions
-- * @txq: queue to clean
-- * @compl_tag: completion tag of packet to clean (from completion descriptor)
-- * @cleaned: pointer to stats struct to track cleaned packets/bytes
-- * @budget: Used to determine if we are in netpoll
-- */
--static void idpf_tx_clean_stashed_bufs(struct idpf_tx_queue *txq,
--				       u16 compl_tag,
--				       struct libeth_sq_napi_stats *cleaned,
--				       int budget)
--{
--	struct idpf_tx_stash *stash;
--	struct hlist_node *tmp_buf;
--	struct libeth_cq_pp cp = {
--		.dev	= txq->dev,
--		.ss	= cleaned,
--		.napi	= budget,
--	};
--
--	/* Buffer completion */
--	hash_for_each_possible_safe(txq->stash->sched_buf_hash, stash, tmp_buf,
--				    hlist, compl_tag) {
--		if (unlikely(idpf_tx_buf_compl_tag(&stash->buf) != compl_tag))
--			continue;
--
--		hash_del(&stash->hlist);
--
--		if (stash->buf.type == LIBETH_SQE_SKB &&
--		    (skb_shinfo(stash->buf.skb)->tx_flags & SKBTX_IN_PROGRESS))
--			idpf_tx_read_tstamp(txq, stash->buf.skb);
--
--		libeth_tx_complete(&stash->buf, &cp);
--
--		/* Push shadow buf back onto stack */
--		idpf_buf_lifo_push(&txq->stash->buf_stack, stash);
--	}
--}
--
--/**
-- * idpf_stash_flow_sch_buffers - store buffer parameters info to be freed at a
-- * later time (only relevant for flow scheduling mode)
-- * @txq: Tx queue to clean
-- * @tx_buf: buffer to store
-- */
--static int idpf_stash_flow_sch_buffers(struct idpf_tx_queue *txq,
--				       struct idpf_tx_buf *tx_buf)
--{
--	struct idpf_tx_stash *stash;
--
--	if (unlikely(tx_buf->type <= LIBETH_SQE_CTX))
--		return 0;
--
--	stash = idpf_buf_lifo_pop(&txq->stash->buf_stack);
--	if (unlikely(!stash)) {
--		net_err_ratelimited("%s: No out-of-order TX buffers left!\n",
--				    netdev_name(txq->netdev));
--
--		return -ENOMEM;
--	}
--
--	/* Store buffer params in shadow buffer */
--	stash->buf.skb = tx_buf->skb;
--	stash->buf.bytes = tx_buf->bytes;
--	stash->buf.packets = tx_buf->packets;
--	stash->buf.type = tx_buf->type;
--	stash->buf.nr_frags = tx_buf->nr_frags;
--	dma_unmap_addr_set(&stash->buf, dma, dma_unmap_addr(tx_buf, dma));
--	dma_unmap_len_set(&stash->buf, len, dma_unmap_len(tx_buf, len));
--	idpf_tx_buf_compl_tag(&stash->buf) = idpf_tx_buf_compl_tag(tx_buf);
--
--	/* Add buffer to buf_hash table to be freed later */
--	hash_add(txq->stash->sched_buf_hash, &stash->hlist,
--		 idpf_tx_buf_compl_tag(&stash->buf));
--
--	tx_buf->type = LIBETH_SQE_EMPTY;
--
--	return 0;
--}
--
- #define idpf_tx_splitq_clean_bump_ntc(txq, ntc, desc, buf)	\
- do {								\
- 	if (unlikely(++(ntc) == (txq)->desc_count)) {		\
-@@ -1850,14 +1629,8 @@ do {								\
-  * Separate packet completion events will be reported on the completion queue,
-  * and the buffers will be cleaned separately. The stats are not updated from
-  * this function when using flow-based scheduling.
-- *
-- * Furthermore, in flow scheduling mode, check to make sure there are enough
-- * reserve buffers to stash the packet. If there are not, return early, which
-- * will leave next_to_clean pointing to the packet that failed to be stashed.
-- *
-- * Return: false in the scenario above, true otherwise.
-  */
--static bool idpf_tx_splitq_clean(struct idpf_tx_queue *tx_q, u16 end,
-+static void idpf_tx_splitq_clean(struct idpf_tx_queue *tx_q, u16 end,
- 				 int napi_budget,
- 				 struct libeth_sq_napi_stats *cleaned,
- 				 bool descs_only)
-@@ -1871,12 +1644,11 @@ static bool idpf_tx_splitq_clean(struct idpf_tx_queue *tx_q, u16 end,
- 		.napi	= napi_budget,
- 	};
- 	struct idpf_tx_buf *tx_buf;
--	bool clean_complete = true;
- 
- 	if (descs_only) {
- 		/* Bump ring index to mark as cleaned. */
- 		tx_q->next_to_clean = end;
--		return true;
-+		return;
- 	}
- 
- 	tx_desc = &tx_q->flex_tx[ntc];
-@@ -1897,53 +1669,24 @@ static bool idpf_tx_splitq_clean(struct idpf_tx_queue *tx_q, u16 end,
- 			break;
- 
- 		eop_idx = tx_buf->rs_idx;
-+		libeth_tx_complete(tx_buf, &cp);
- 
--		if (descs_only) {
--			if (IDPF_TX_BUF_RSV_UNUSED(tx_q) < tx_buf->nr_frags) {
--				clean_complete = false;
--				goto tx_splitq_clean_out;
--			}
--
--			idpf_stash_flow_sch_buffers(tx_q, tx_buf);
-+		/* unmap remaining buffers */
-+		while (ntc != eop_idx) {
-+			idpf_tx_splitq_clean_bump_ntc(tx_q, ntc,
-+						      tx_desc, tx_buf);
- 
--			while (ntc != eop_idx) {
--				idpf_tx_splitq_clean_bump_ntc(tx_q, ntc,
--							      tx_desc, tx_buf);
--				idpf_stash_flow_sch_buffers(tx_q, tx_buf);
--			}
--		} else {
-+			/* unmap any remaining paged data */
- 			libeth_tx_complete(tx_buf, &cp);
--
--			/* unmap remaining buffers */
--			while (ntc != eop_idx) {
--				idpf_tx_splitq_clean_bump_ntc(tx_q, ntc,
--							      tx_desc, tx_buf);
--
--				/* unmap any remaining paged data */
--				libeth_tx_complete(tx_buf, &cp);
--			}
- 		}
- 
- fetch_next_txq_desc:
- 		idpf_tx_splitq_clean_bump_ntc(tx_q, ntc, tx_desc, tx_buf);
- 	}
- 
--tx_splitq_clean_out:
- 	tx_q->next_to_clean = ntc;
--
--	return clean_complete;
- }
- 
--#define idpf_tx_clean_buf_ring_bump_ntc(txq, ntc, buf)	\
--do {							\
--	(buf)++;					\
--	(ntc)++;					\
--	if (unlikely((ntc) == (txq)->desc_count)) {	\
--		buf = (txq)->tx_buf;			\
--		ntc = 0;				\
--	}						\
--} while (0)
--
- /**
-  * idpf_tx_clean_bufs - clean flow scheduling TX queue buffers
-  * @txq: queue to clean
-@@ -1954,7 +1697,7 @@ do {							\
-  * Clean all buffers associated with the packet starting at buf_id. Returns the
-  * byte/segment count for the cleaned packet.
-  */
--static bool idpf_tx_clean_bufs(struct idpf_tx_queue *txq, u32 buf_id,
-+static void idpf_tx_clean_bufs(struct idpf_tx_queue *txq, u32 buf_id,
- 			       struct libeth_sq_napi_stats *cleaned,
- 			       int budget)
- {
-@@ -1981,8 +1724,6 @@ static bool idpf_tx_clean_bufs(struct idpf_tx_queue *txq, u32 buf_id,
- 		libeth_tx_complete(tx_buf, &cp);
- 		idpf_post_buf_refill(txq->refillq, buf_id);
- 	}
--
--	return true;
- }
- 
- /**
-@@ -2001,22 +1742,17 @@ static void idpf_tx_handle_rs_completion(struct idpf_tx_queue *txq,
- 					 struct libeth_sq_napi_stats *cleaned,
- 					 int budget)
- {
--	u16 compl_tag;
-+	/* RS completion contains queue head for queue based scheduling or
-+	 * completion tag for flow based scheduling.
-+	 */
-+	u16 rs_compl_val = le16_to_cpu(desc->q_head_compl_tag.q_head);
- 
- 	if (!idpf_queue_has(FLOW_SCH_EN, txq)) {
--		u16 head = le16_to_cpu(desc->q_head_compl_tag.q_head);
--
--		idpf_tx_splitq_clean(txq, head, budget, cleaned, false);
-+		idpf_tx_splitq_clean(txq, rs_compl_val, budget, cleaned, false);
- 		return;
- 	}
- 
--	compl_tag = le16_to_cpu(desc->q_head_compl_tag.compl_tag);
--
--	/* If we didn't clean anything on the ring, this packet must be
--	 * in the hash table. Go clean it there.
--	 */
--	if (!idpf_tx_clean_bufs(txq, compl_tag, cleaned, budget))
--		idpf_tx_clean_stashed_bufs(txq, compl_tag, cleaned, budget);
-+	idpf_tx_clean_bufs(txq, rs_compl_val, cleaned, budget);
- }
- 
- /**
-@@ -2133,8 +1869,7 @@ static bool idpf_tx_clean_complq(struct idpf_compl_queue *complq, int budget,
- 		/* Update BQL */
- 		nq = netdev_get_tx_queue(tx_q->netdev, tx_q->idx);
- 
--		dont_wake = !complq_ok || IDPF_TX_BUF_RSV_LOW(tx_q) ||
--			    np->state != __IDPF_VPORT_UP ||
-+		dont_wake = !complq_ok || np->state != __IDPF_VPORT_UP ||
- 			    !netif_carrier_ok(tx_q->netdev);
- 		/* Check if the TXQ needs to and can be restarted */
- 		__netif_txq_completed_wake(nq, tx_q->cleaned_pkts, tx_q->cleaned_bytes,
-@@ -2205,7 +1940,6 @@ static int idpf_txq_has_room(struct idpf_tx_queue *tx_q, u32 descs_needed,
- 	if (IDPF_DESC_UNUSED(tx_q) < descs_needed ||
- 	    IDPF_TX_COMPLQ_PENDING(tx_q->txq_grp) >
- 		IDPF_TX_COMPLQ_OVERFLOW_THRESH(tx_q->txq_grp->complq) ||
--	    IDPF_TX_BUF_RSV_LOW(tx_q) ||
- 	    idpf_tx_splitq_get_free_bufs(tx_q->refillq) < bufs_needed)
- 		return 0;
- 	return 1;
-@@ -2329,10 +2063,8 @@ static unsigned int idpf_tx_splitq_bump_ntu(struct idpf_tx_queue *txq, u16 ntu)
- {
- 	ntu++;
- 
--	if (ntu == txq->desc_count) {
-+	if (ntu == txq->desc_count)
- 		ntu = 0;
--		txq->compl_tag_cur_gen = IDPF_TX_ADJ_COMPL_TAG_GEN(txq);
--	}
- 
- 	return ntu;
- }
-@@ -2514,8 +2246,6 @@ static void idpf_tx_splitq_map(struct idpf_tx_queue *tx_q,
- 			if (unlikely(++i == tx_q->desc_count)) {
- 				tx_desc = &tx_q->flex_tx[0];
- 				i = 0;
--				tx_q->compl_tag_cur_gen =
--					IDPF_TX_ADJ_COMPL_TAG_GEN(tx_q);
- 			} else {
- 				tx_desc++;
- 			}
-@@ -2546,7 +2276,6 @@ static void idpf_tx_splitq_map(struct idpf_tx_queue *tx_q,
- 		if (unlikely(++i == tx_q->desc_count)) {
- 			tx_desc = &tx_q->flex_tx[0];
- 			i = 0;
--			tx_q->compl_tag_cur_gen = IDPF_TX_ADJ_COMPL_TAG_GEN(tx_q);
- 		} else {
- 			tx_desc++;
- 		}
-@@ -2980,10 +2709,9 @@ static netdev_tx_t idpf_tx_splitq_frame(struct sk_buff *skb,
- 
- 		tx_params.dtype = IDPF_TX_DESC_DTYPE_FLEX_FLOW_SCHE;
- 		tx_params.eop_cmd = IDPF_TXD_FLEX_FLOW_CMD_EOP;
--		/* Set the RE bit to catch any packets that may have not been
--		 * stashed during RS completion cleaning. MIN_GAP is set to
--		 * MIN_RING size to ensure it will be set at least once each
--		 * time around the ring.
-+		/* Set the RE bit to periodically "clean" the descriptor ring.
-+		 * MIN_GAP is set to MIN_RING size to ensure it will be set at
-+		 * least once each time around the ring.
- 		 */
- 		if (idpf_tx_splitq_need_re(tx_q)) {
- 			tx_params.eop_cmd |= IDPF_TXD_FLEX_FLOW_CMD_RE;
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-index 9565e4dc3514..52753dff381c 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-@@ -118,10 +118,6 @@ do {								\
- 	((((txq)->next_to_clean > (txq)->next_to_use) ? 0 : (txq)->desc_count) + \
- 	(txq)->next_to_clean - (txq)->next_to_use - 1)
- 
--#define IDPF_TX_BUF_RSV_UNUSED(txq)	((txq)->stash->buf_stack.top)
--#define IDPF_TX_BUF_RSV_LOW(txq)	(IDPF_TX_BUF_RSV_UNUSED(txq) < \
--					 (txq)->desc_count >> 2)
--
- #define IDPF_TX_COMPLQ_OVERFLOW_THRESH(txcq)	((txcq)->desc_count >> 1)
- /* Determine the absolute number of completions pending, i.e. the number of
-  * completions that are expected to arrive on the TX completion queue.
-@@ -131,12 +127,6 @@ do {								\
- 	0 : U32_MAX) + \
- 	(txq)->num_completions_pending - (txq)->complq->num_completions)
- 
--#define IDPF_TX_SPLITQ_COMPL_TAG_WIDTH	16
--/* Adjust the generation for the completion tag and wrap if necessary */
--#define IDPF_TX_ADJ_COMPL_TAG_GEN(txq) \
--	((++(txq)->compl_tag_cur_gen) >= (txq)->compl_tag_gen_max ? \
--	0 : (txq)->compl_tag_cur_gen)
--
- #define IDPF_TXBUF_NULL			U32_MAX
- 
- #define IDPF_TXD_LAST_DESC_CMD (IDPF_TX_DESC_CMD_EOP | IDPF_TX_DESC_CMD_RS)
-@@ -154,18 +144,6 @@ union idpf_tx_flex_desc {
- 
- #define idpf_tx_buf libeth_sqe
- 
--/**
-- * struct idpf_buf_lifo - LIFO for managing OOO completions
-- * @top: Used to know how many buffers are left
-- * @size: Total size of LIFO
-- * @bufs: Backing array
-- */
--struct idpf_buf_lifo {
--	u16 top;
--	u16 size;
--	struct idpf_tx_stash **bufs;
--};
--
- /**
-  * struct idpf_tx_offload_params - Offload parameters for a given packet
-  * @tx_flags: Feature flags enabled for this packet
-@@ -476,17 +454,6 @@ struct idpf_tx_queue_stats {
- #define IDPF_ITR_IDX_SPACING(spacing, dflt)	(spacing ? spacing : dflt)
- #define IDPF_DIM_DEFAULT_PROFILE_IX		1
- 
--/**
-- * struct idpf_txq_stash - Tx buffer stash for Flow-based scheduling mode
-- * @buf_stack: Stack of empty buffers to store buffer info for out of order
-- *	       buffer completions. See struct idpf_buf_lifo
-- * @sched_buf_hash: Hash table to store buffers
-- */
--struct idpf_txq_stash {
--	struct idpf_buf_lifo buf_stack;
--	DECLARE_HASHTABLE(sched_buf_hash, 12);
--} ____cacheline_aligned;
--
- /**
-  * struct idpf_rx_queue - software structure representing a receive queue
-  * @rx: universal receive descriptor array
-@@ -631,11 +598,7 @@ libeth_cacheline_set_assert(struct idpf_rx_queue, 64,
-  *		   only once at the end of the cleaning routine.
-  * @clean_budget: singleq only, queue cleaning budget
-  * @cleaned_pkts: Number of packets cleaned for the above said case
-- * @stash: Tx buffer stash for Flow-based scheduling mode
-  * @refillq: Pointer to refill queue
-- * @compl_tag_bufid_m: Completion tag buffer id mask
-- * @compl_tag_cur_gen: Used to keep track of current completion tag generation
-- * @compl_tag_gen_max: To determine when compl_tag_cur_gen should be reset
-  * @cached_tstamp_caps: Tx timestamp capabilities negotiated with the CP
-  * @tstamp_task: Work that handles Tx timestamp read
-  * @stats_sync: See struct u64_stats_sync
-@@ -666,7 +629,6 @@ struct idpf_tx_queue {
- 	u16 desc_count;
- 
- 	u16 tx_min_pkt_len;
--	u16 compl_tag_gen_s;
- 
- 	struct net_device *netdev;
- 	__cacheline_group_end_aligned(read_mostly);
-@@ -683,13 +645,8 @@ struct idpf_tx_queue {
- 	};
- 	u16 cleaned_pkts;
- 
--	struct idpf_txq_stash *stash;
- 	struct idpf_sw_queue *refillq;
- 
--	u16 compl_tag_bufid_m;
--	u16 compl_tag_cur_gen;
--	u16 compl_tag_gen_max;
--
- 	struct idpf_ptp_vport_tx_tstamp_caps *cached_tstamp_caps;
- 	struct work_struct *tstamp_task;
- 
-@@ -707,7 +664,7 @@ struct idpf_tx_queue {
- 	__cacheline_group_end_aligned(cold);
- };
- libeth_cacheline_set_assert(struct idpf_tx_queue, 64,
--			    120 + sizeof(struct u64_stats_sync),
-+			    104 + sizeof(struct u64_stats_sync),
- 			    32);
- 
- /**
-@@ -918,7 +875,6 @@ struct idpf_rxq_group {
-  * @vport: Vport back pointer
-  * @num_txq: Number of TX queues associated
-  * @txqs: Array of TX queue pointers
-- * @stashes: array of OOO stashes for the queues
-  * @complq: Associated completion queue pointer, split queue only
-  * @num_completions_pending: Total number of completions pending for the
-  *			     completion queue, acculumated for all TX queues
-@@ -933,7 +889,6 @@ struct idpf_txq_group {
- 
- 	u16 num_txq;
- 	struct idpf_tx_queue *txqs[IDPF_LARGE_MAX_Q];
--	struct idpf_txq_stash *stashes;
- 
- 	struct idpf_compl_queue *complq;
- 
--- 
-2.47.1
-
+SGkgRGFuaWVsLA0KDQpPbiBTYXQsIDIwMjUtMDgtMTYgYXQgMjA6NTYgKzAxMDAsIERhbmllbCBH
+b2xsZSB3cm90ZToNCj4gQWRkIHJlZ2lzdGVycyBuZWVkZWQgZm9yIE1heExpbmVhciBHU1cxeHgg
+ZmFtaWx5IG9mIGRlZGljYXRlZCBzd2l0Y2gNCj4gSUNzIGNvbm5lY3RlZCB2aWEgTURJTyBvciBT
+UEkuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBEYW5pZWwgR29sbGUgPGRhbmllbEBtYWtyb3RvcGlh
+Lm9yZz4NCj4gLS0tDQo+IMKgZHJpdmVycy9uZXQvZHNhL2xhbnRpcV9nc3dpcC5oIHwgMTA5ICsr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KPiDCoDEgZmlsZSBjaGFuZ2VkLCAxMDkg
+aW5zZXJ0aW9ucygrKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvbmV0L2RzYS9sYW50aXFf
+Z3N3aXAuaCBiL2RyaXZlcnMvbmV0L2RzYS9sYW50aXFfZ3N3aXAuaA0KPiBpbmRleCBmZDg5ODk5
+MTE4MGQuLmU4OTE0NDgwZDU5ZSAxMDA2NDQNCj4gLS0tIGEvZHJpdmVycy9uZXQvZHNhL2xhbnRp
+cV9nc3dpcC5oDQo+ICsrKyBiL2RyaXZlcnMvbmV0L2RzYS9sYW50aXFfZ3N3aXAuaA0KPiBAQCAt
+MjI0LDYgKzIyNCwxMTQgQEANCj4gwqANCj4gwqAjZGVmaW5lIFhSWDIwMF9HUEhZX0ZXX0FMSUdO
+CSgxNiAqIDEwMjQpDQo+IMKgDQo+ICsjZGVmaW5lIEdTVzFYWF9QT1JUUwkJCQk2DQoNCmEgdHJp
+Y2t5IHF1ZXN0aW9ucyBmb3IgeW91IDstKQ0KDQpUaGVyZSBhcmUgc2NhcmNlIHJlZmVyZW5jZXMg
+dG8gUG9ydCA2IGFjcm9zcyBHU1cxNDUgZGF0YXNoZWV0LCB0aGUgN3RoIHBvcnQuDQpPbmUgY291
+bGQgYWxzbyBlbmFibGUvZGlzYWJsZSBpdCAoYml0IFA2KSBpbiBHU1dJUF9DRkcgKDB4RjQwMCku
+DQoNClllcywgaXQncyBzb2xkIGFzIDYtcG9ydCBzd2l0Y2gsIGJ1dCB0aGUgcXVlc3Rpb24gaXMs
+IHNoYWxsIHRoZSBwb3J0IDYgYmUNCmRpc2FibGVkIHRvIHNhdmUgcG93ZXIgYW5kIGF2b2lkIHVu
+bmVjZXNzYXJ5IEVNST8NCg0KLS0gDQpBbGV4YW5kZXIgU3ZlcmRsaW4NClNpZW1lbnMgQUcNCnd3
+dy5zaWVtZW5zLmNvbQ0K
 
