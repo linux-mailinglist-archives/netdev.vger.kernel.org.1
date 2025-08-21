@@ -1,165 +1,101 @@
-Return-Path: <netdev+bounces-215837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 583EEB30984
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 00:45:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 674DAB3098E
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 00:48:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A23718987EB
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 22:43:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0971AA38E8
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 22:44:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3B9D34DCC9;
-	Thu, 21 Aug 2025 22:38:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28A112EBBBA;
+	Thu, 21 Aug 2025 22:39:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=free.fr header.i=@free.fr header.b="q0Jz9M/s"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp4-g21.free.fr (smtp4-g21.free.fr [212.27.42.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B17E3128BB;
-	Thu, 21 Aug 2025 22:38:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3770B2EBDC4;
+	Thu, 21 Aug 2025 22:39:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.27.42.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755815888; cv=none; b=jaQDNHXjs8uPWr3MrS37NicpER6eKGxdaNKKJgUA2tYHE9HqpSWTam2VNWtccxcqKKV8pxdqNpAPMfqk3Hl2nqJeV0yi6gnlEbphLNEKtC9Y5/0Ffb0GdOPMWs0ru3BLRQqOwrCskWKhET3WUvz4SRNT/5E6SvEScHxWefYWvFo=
+	t=1755815978; cv=none; b=t+/5Mo8woZIM4N8Qg9hWyr47pJAMaB9fnU3tfzb6lDZrbzL2y9HPOlZQGTBt5miXYMP0NKlb3Asd90/aHMl1Yv3wRTZVlKivkntOJDVKOpCCwsNB26ZNz5rMIN8sccsxnok2e6pYIDJcM7072pExTDfIdaav1L+5SeZuMobseUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755815888; c=relaxed/simple;
-	bh=JAKV+m3cuPzOrPOamBpGHs3U2qVTmhaXqceomooRw/4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WD/zBfoXhay2nfDSFTTxg3iTcSJ2WpMI4TlvjJN6LVxu4Vnh+Lgd0ieu0/q1gRz1EuZNahmymUBjQPlcW2yGqouQLK1OWsCf1qRY5aeGe5UYMGqoKP6OMoIxbKN0hbI2eO0wmNuoUdwtmrtayIgfxYfyTA7QjBnZihk5nWDhHA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1upDuw-000000002Qe-2Vi3;
-	Thu, 21 Aug 2025 22:37:58 +0000
-Date: Thu, 21 Aug 2025 23:37:53 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: "Sverdlin, Alexander" <alexander.sverdlin@siemens.com>
-Cc: "olteanv@gmail.com" <olteanv@gmail.com>,
-	"andrew@lunn.ch" <andrew@lunn.ch>,
-	"Christen, Peter" <peter.christen@siemens.com>,
-	"lxu@maxlinear.com" <lxu@maxlinear.com>,
-	"john@phrozen.org" <john@phrozen.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"yweng@maxlinear.com" <yweng@maxlinear.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"bxu@maxlinear.com" <bxu@maxlinear.com>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"fchan@maxlinear.com" <fchan@maxlinear.com>,
-	"ajayaraman@maxlinear.com" <ajayaraman@maxlinear.com>,
-	"hauke@hauke-m.de" <hauke@hauke-m.de>,
-	"arkadis@mellanox.com" <arkadis@mellanox.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"jpovazanec@maxlinear.com" <jpovazanec@maxlinear.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"Stockmann, Lukas" <lukas.stockmann@siemens.com>,
-	"lrosu@maxlinear.com" <lrosu@maxlinear.com>,
-	"f.fainelli@gmail.com" <f.fainelli@gmail.com>,
-	"Schirm, Andreas" <andreas.schirm@siemens.com>
-Subject: Re: [PATCH RFC net-next 22/23] net: dsa: add driver for MaxLinear
- GSW1xx switch family
-Message-ID: <aKefwdv1DJeYz1WU@pidgin.makrotopia.org>
-References: <aKDikYiU-88zC6RF@pidgin.makrotopia.org>
- <59f32c924cd8ebd02483dfd19c2788cf09d9ab75.camel@siemens.com>
- <aKdxCpOEsX--ESpB@pidgin.makrotopia.org>
- <a4048989adc1724a8aff80f954b9dfeac2bfa9b4.camel@siemens.com>
+	s=arc-20240116; t=1755815978; c=relaxed/simple;
+	bh=VQDnQI7JXoVAaOTdgqbZmWufqmscrmlNXYg7GFGXTJg=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=qYWcHTh9LC5O9ok8G+zGRZNJPRYgzh/m/VlgeTJuMXRONEPFXKLnAhBcKXT/8df4HdsElJ08R16mBnncaJA6jUTqX12cZIzL2rfI/0UrBw5xAvvDwaqZaE5zwQeAbrCceIlvhSRvX5yR0fTURBJ3IMB1ZlbJ4ngWu1CEmls3Fbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=free.fr; spf=pass smtp.mailfrom=free.fr; dkim=pass (2048-bit key) header.d=free.fr header.i=@free.fr header.b=q0Jz9M/s; arc=none smtp.client-ip=212.27.42.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=free.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=free.fr
+Received: from [44.168.19.11] (unknown [86.195.82.193])
+	(Authenticated sender: f6bvp@free.fr)
+	by smtp4-g21.free.fr (Postfix) with ESMTPSA id D634A19F576;
+	Fri, 22 Aug 2025 00:39:28 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=free.fr;
+	s=smtp-20201208; t=1755815973;
+	bh=VQDnQI7JXoVAaOTdgqbZmWufqmscrmlNXYg7GFGXTJg=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=q0Jz9M/sO4aRmVrenhxinwabmHTZkabVYf3lxHm9BGC8wSibHRSJ1PtVI5UlexYJa
+	 ThkmSCdOOOhMs/6taMWbQMATUmWY9KeGV653mz822vQNbq9Yx6Uh8nxZrCmE3xLtYY
+	 VzBESPrdlLWmHv/BGuVwm5LRyXu12LHb6xUY4X4oULN6PEHSnvNJNcy5zA0ukbSLPa
+	 bV7/MpnSf2yJNpI5b/qHAOQRyyb/mAP/L3y5fc20ThWbVCD0Z9TqVFZ3xs/FEfepj8
+	 wI5kw1Np4q34VCu6BdpwQy7ikJcNRdZruO0XqzTgx0cNHCmvepBmEmklsT3Gz+vlEF
+	 WRlmsg+G3Hidw==
+Message-ID: <6c525868-3e72-4baf-8df4-a1e5982ef783@free.fr>
+Date: Fri, 22 Aug 2025 00:39:27 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <a4048989adc1724a8aff80f954b9dfeac2bfa9b4.camel@siemens.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [ROSE] [AX25] 6.15.10 long term stable kernel oops
+From: F6BVP <f6bvp@free.fr>
+To: linux-hams@vger.kernel.org, netdev <netdev@vger.kernel.org>
+Cc: Dan Cross <crossd@gmail.com>, Folkert van Heusden
+ <folkert@vanheusden.com>, David Ranch <dranch@trinnet.net>
+References: <11c5701d-4bf9-4661-ad8a-06690bbe1c1c@free.fr>
+ <fff0b3eb-ea42-4475-970d-30622dc25dca@free.fr>
+ <e92e23a7-1503-454f-a7a2-cedab6e55fe2@free.fr>
+ <acd04154-25a5-4721-a62b-36827a6e4e47@free.fr>
+ <CAEoi9W6kb0jZXY_Tu27CU7jkyx5O1ne5FOgvYqCk_GFBvnseiw@mail.gmail.com>
+ <11212ddf-bf32-4b11-afee-e234cdee5938@free.fr>
+ <4e4c9952-e445-41af-8942-e2f1c24a0586@free.fr>
+ <90efee88-b9dc-4f87-86f2-6ab60701c39f@free.fr>
+Content-Language: en-US
+In-Reply-To: <90efee88-b9dc-4f87-86f2-6ab60701c39f@free.fr>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 21, 2025 at 08:13:24PM +0000, Sverdlin, Alexander wrote:
-> Hello Daniel,
-> 
-> On Thu, 2025-08-21 at 20:18 +0100, Daniel Golle wrote:
-> > > > Add driver for the MaxLinear GSW1xx family of Ethernet switch ICs which
-> > > > are based on the same IP as the Lantiq/Intel GSWIP found in the Lantiq VR9
-> > > > and Intel GRX MIPS router SoCs. The main difference is that instead of
-> > > > using memory-mapped I/O to communicate with the host CPU these ICs are
-> > > > connected via MDIO (or SPI, which isn't supported by this driver).
-> > > > Implement the regmap API to access the switch registers over MDIO to allow
-> > > > reusing lantiq_gswip_common for all core functionality.
-> > > > 
-> > > > The GSW1xx also comes with a SerDes port capable of 1000Base-X, SGMII and
-> > > > 2500Base-X, which can either be used to connect an external PHY or SFP
-> > > > cage, or as the CPU port. Support for the SerDes interface is implemented
-> > > > in this driver using the phylink_pcs interface.
-> > > 
-> > > ...
-> > > 
-> > > > --- /dev/null
-> > > > +++ b/drivers/net/dsa/mxl-gsw1xx.c
-> > > 
-> > > ...
-> > > 
-> > > > static int gsw1xx_sgmii_pcs_config(struct phylink_pcs *pcs,
-> > > > +				   unsigned int neg_mode,
-> > > > +				   phy_interface_t interface,
-> > > > +				   const unsigned long *advertising,
-> > > > +				   bool permit_pause_to_mac)
-> > > > +{
-> > > > +	struct gsw1xx_priv *priv = sgmii_pcs_to_gsw1xx(pcs);
-> > > > +	bool sgmii_mac_mode = dsa_is_user_port(priv->gswip.ds, GSW1XX_SGMII_PORT);
-> > > > +	u16 txaneg, anegctl, val, nco_ctrl;
-> > > > +	int ret;
-> > > > +
-> > > > +	/* Assert and deassert SGMII shell reset */
-> > > > +	ret = regmap_set_bits(priv->shell, GSW1XX_SHELL_RST_REQ,
-> > > > +			      GSW1XX_RST_REQ_SGMII_SHELL);
-> > > 
-> > > Can this be moved into gsw1xx_probe() maybe?
-> > > 
-> > > The thing is, if the switch is bootstrapped in
-> > > "Self-start Mode: Managed Switch Sub-Mode", SGMII will be already
-> > > brought out of reset (by bootloader?) (GSWIP_CFG register), refer
-> > > to "Table 12 Registers Configuration for Self-start Mode: Managed Switch Sub-Mode"
-> > > in datasheet. And nobody would disable SGMII if it's unused otherwise.
-> > 
-> > What you say is true if the SGMII interface is used as the CPU port or
-> > to connect a (1000M/100M/10M) PHY. However, it can also be used to connect
-> > SFP modules, which can be hot-plugged. Or a 2500M/1000M/100M/10M PHY which
-> > requires switching to 2500Base-X mode in case of a 2500M link on the UTP
-> > interface comes up, but uses SGMII for all lower speeds.
-> 
-> I'm actually concerned about use-cases where SGMII is unused.
-> In "Self-start Mode" SGMII block is being brought up and driver will never disable it.
-> I'm not proposing to move the de-assertion of the reset, but either
-> the assertion can be done unconditionally somewhere around probe
-> or struct dsa_switch_ops::setup callback or the assertion can remain
-> here and be duplicated somewhere around init.
+As I already reported mkiss never triggered any Oops kernel panic up to 
+linux-6.14.11.
 
-Lets assert the SGMII in the probe() function and let .pcs_enable() and
-.pcs_disable() handle deassertion and assertion at runtime. That's easy
-and obvious, and makes sure the SGMII reset is always asserted if the
-SGMII unit isn't used. We can later optmize more and also stop clocks
-or do whatever MaxLinear folks are telling us would be good to further
-reduce power consumption and potentially also EM noise.
+In that version I put a number of printk inside of mkiss.c in order to 
+follow the normal behaviour and content outside and during FPAC 
+functionning especially when issuing a connect request.
 
-> 
-> > We can probably do this similar to drivers/net/pcs/pcs-mtk-lynxi.c and
-> > only do a full reconf including reset if there are major changes which
-> > actually require that, but as the impact is minimal and the vendor
-> > implementation also carries out a reset as the first thing when
-> > configuring the SGMII interface, I'd just keep it like that for now.
-> > Optimization can come later if actually required.
-> 
-> Sure, it goes a bit beyond basic support as it's a power consumption
-> optimization, but I thought I'll bring this up now as the re-spin will happen
-> anyway and if you agree on moving the reset assertion, then later patching
-> will not be required.
+On the opposite an FPAC connect request systematically triggers a kernel 
+panic with linux-6.15.2 and following kernels.
 
-Convinced me ;)
+In 6.14.11 I observe that when mkiss runs core/dev is never activated 
+i.e. neither __netif_receive_skb nor __netif_receive_skb_one_core.
 
+These functions appear in kernel 6.15.2 panics after mkiss_receive_buf.
+
+One can guess that mkiss_receive_buf() is triggering something wrong in 
+kernel 6.15.2 and all following kernels up to net-next.
+
+The challenge to locate the bug is quite difficult as I did not find the 
+way to find relevant code differences between both kernels in absence of 
+inc patch...
+
+I sincerely regret not knowing how to go further.
+
+Bernard,
+hamradio f6bvp /ai7bg
 
