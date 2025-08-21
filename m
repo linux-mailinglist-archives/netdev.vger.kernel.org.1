@@ -1,90 +1,93 @@
-Return-Path: <netdev+bounces-215771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46B71B303F6
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 22:10:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2289AB30402
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 22:11:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89B58AA1F35
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 20:08:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84488AC1C93
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 20:08:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94686350832;
-	Thu, 21 Aug 2025 20:07:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 683483570B3;
+	Thu, 21 Aug 2025 20:07:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZUBaY8aG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FvhgezoK"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D49BD34F474
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 20:07:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3163D35335B
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 20:07:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755806838; cv=none; b=HUGvWlkiy47JuZyIxv5XVujFvHQclZkiOGgi1fT8xgmRG/KLLkzjRzXmCEh2BOCHuZuC5bx4pYNPrANIFl0UfdeL+pldQwDCOtDwZxhVHJkEGkiuiTWrlzOuGnl9yrVMB29m/UdaRQJkm2TrZwvohw4dOZ0pQbFNQWASYQzUtZM=
+	t=1755806842; cv=none; b=qG+ol59ci5zOagULVuB720zghh6WKDLu/nuPgfki46EQ+q+++BBncxVMUMBY44h5k1llHI5it/mwXeM9lANJnsoDRh25JGezYAdnoADDbAMtnKOnACvMJOuDeZ+djEbzHIOdyUwKe21glhAaC9o1OipnfAc0Pq13+lqaSGBCQQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755806838; c=relaxed/simple;
-	bh=3FOM28sJXvbUF2Tn/5jLCVekviR1dLu1+OtM4m//AQ0=;
+	s=arc-20240116; t=1755806842; c=relaxed/simple;
+	bh=rCgYuDQcQ3nJcWNFmOxD+pxeBEJSNoep86nFob2zhE0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cFANAA+rvWDvJ9ve9O8VjWz0GFHVAmf4EEGqy44WJl6pPkHZCri5wXeLltywBaEUHij088kQnLYHtlo8XcGyWTKqB04Jy59e+nbcjV5+ZTHSfeAPJCUVTQzgJQdZMDlSHDhDzcsuCKbvjgNVZx+009Wh2T/M9/L/ZMFXsWtolNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZUBaY8aG; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=uUKykHUzsZKEglcHzhr/tDmccZmVJZmPCGwd9HwWOos4RJy2oOb6ddw4dBHFWvqpBRB6g4/lIfh5BmjmFZZei4apkyDymlCh7AG4xASm9qN7TOvZhZRYv7rV84ELX9+i8oel6uDMHti3Fvn1zSRLj2FA3C59+z0oWgOO1APZSLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FvhgezoK; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755806835;
+	s=mimecast20190719; t=1755806839;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7sWLap5u4LkaWlbSo2T/W3JLtp2tuveUv2Z9sucaeo0=;
-	b=ZUBaY8aGc6h8AaVVkeyTLZ3J+O1D+D/c8cVUbV19LJv6ZIKVbXabLCyTrOad47hDCgnktr
-	RRuDrA7m34WEiR6fwoRZHoEFArIqXrONt6ywnM+0+d5IkIZjr5pYP70a/XseYFqWNgLQc+
-	SAAkVUJHYT7W/shHWSZuLf7wwSq0iVE=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Zfh98TqNQqR9uCNr2hB5bEgIJ/15ql7Yv0zNbj5EC/8=;
+	b=FvhgezoKXHMUZ2BWrsd04lTIP8unxj540pU946NcJnJJuOAbNKVsaPENFIHuD6kkJBPSKP
+	p0LfaqPL9e5jofDyReCvBx3Ju+COG6jcSU+9UKHLRmnaECy4UXAUOU1zvMDtILyXgF/jdB
+	8mDdg99mU8xQvc0YJu02PswwzrZb9Vk=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-636-e4S0yunLOkGtcohhJQjz6Q-1; Thu, 21 Aug 2025 16:07:14 -0400
-X-MC-Unique: e4S0yunLOkGtcohhJQjz6Q-1
-X-Mimecast-MFC-AGG-ID: e4S0yunLOkGtcohhJQjz6Q_1755806833
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-45a1b05d251so7730705e9.1
-        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 13:07:14 -0700 (PDT)
+ us-mta-587-9llgHaH_PB-BX3x_RM1FSg-1; Thu, 21 Aug 2025 16:07:17 -0400
+X-MC-Unique: 9llgHaH_PB-BX3x_RM1FSg-1
+X-Mimecast-MFC-AGG-ID: 9llgHaH_PB-BX3x_RM1FSg_1755806836
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3b9dc566cb4so995972f8f.1
+        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 13:07:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755806833; x=1756411633;
+        d=1e100.net; s=20230601; t=1755806836; x=1756411636;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7sWLap5u4LkaWlbSo2T/W3JLtp2tuveUv2Z9sucaeo0=;
-        b=p88RZR0UqqSZ51cWf0xdGgAtDGd7gXet597kirOK1kY6su9swjJcRUwKPvqQIjk/Aw
-         FH8BDvchjwJ/L2TXMbH9e68PEUjzMbwFp8u+XY2NhdubJX7qv4doToNnDW6fPHMOo/e+
-         9dFozAX+qYHSOpp0O+Zv6u8VaPJojDilbKnTZlvaUtkOLqzXUQiDrV5liun/RtCSLTH7
-         HvBLwK+pKiHOWmhkucErNmvV/59IwHjQMmJu3gr4gbwYHD0E81IKYzHkf/pLUrvxKqNY
-         WXuytaflD7FLgvVLaeGks9oziu0gD7uFNeHFKgA8Ju48Wiq2ODR2n0wjHArjvZbGRHbI
-         q1sw==
-X-Forwarded-Encrypted: i=1; AJvYcCWCHz/huPpNfl3U0bvoGb3Ae8tNwTT5ekGdWFvxc5Q9fnkRzINq0rGT8jzPAMSySNofQ33y48k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzS36amSHI50vwi1fQ/CFj993g1v1/AuhJEcNRbjWGktE1Qkt4f
-	l2Jut1+8GPsu3NT7QUatVJGHjFF4YEsflRXbjCS0L0l2zmenDGiF26rj71e8Us9INHmTuJBXNa7
-	p8WsxJjyMF/0O8FdJw/ya2z7jIETvqW1FdM5IudmsiImdv/o6P3q9+paXWQ==
-X-Gm-Gg: ASbGncvkf0NN6xW5RzNm/Cj5T/ixJuP2CRyzqywrW60umlriLBkPLirOytR/DNIju1+
-	+WafHKhB+pnRXoipA/6uqAeXdxVe79YV26NYVTjCV+X2GoHQbmZW34IcWGZXfjbJMxEEYEtDcb3
-	LJ92C8g+MloxCrBGPG4khpbch5ajwCT+x95CTldKJNedatHU/B9Oy3sK7OoQpvp9kuHloEP1xT/
-	dwXUvXJwqLRZ7BXpNGpgTskXu/IDnPPbcz0fOO1cWMHeeu8hHL2nQ13BFGOUoZVyyJqLWI5CWcx
-	PSitsknOlJVWCLsNu+qpWP6MjewvPdktigT5k88FXjsn+XWFA+y7xYpTSANtlqVlDhIM2SiD/H0
-	kphsZZnN6z8rzx/A8HdRUBQ==
-X-Received: by 2002:a05:600c:1d06:b0:455:ed48:144f with SMTP id 5b1f17b1804b1-45b5179669dmr2598525e9.14.1755806833367;
-        Thu, 21 Aug 2025 13:07:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHSutx6qbatKffMJ28UfT2ZDXFlSv+vNq81oYks3KAGI73zxxTWKo8ClwQ/mmPq6W0wDfVQow==
-X-Received: by 2002:a05:600c:1d06:b0:455:ed48:144f with SMTP id 5b1f17b1804b1-45b5179669dmr2597955e9.14.1755806832889;
-        Thu, 21 Aug 2025 13:07:12 -0700 (PDT)
+        bh=Zfh98TqNQqR9uCNr2hB5bEgIJ/15ql7Yv0zNbj5EC/8=;
+        b=o76QzU+sP7DBsh8hvGzQMKxnbKkVzY3dphS/8RQUb4yMCsfp0u//OR1fMH3MHjgex0
+         w7l4VYobfGci2NFebWhmtqnujOYnXcC7Jb7OMgad3aCpua1W2FZbwqdu83sR5GTriwdi
+         3811yp4MC7TZtE1Mo0YtTuTHS+CUAAbMSAYbr3M1w8P/CJ2feW5PcOlRU+R5rS+vMBr3
+         PhPg9Y6wxihp4stFJibLme1NQmfvnth/MfBu1dJ9P5IrEbuTBW+kRz7XK6Z5ZPkNjyTt
+         GXxJvUuERZJ5ocqheb8cHu4xXhTpLbdYhlfUPoozFmivhHesK8A/WTsk8DOn6YafUioV
+         7iMg==
+X-Forwarded-Encrypted: i=1; AJvYcCXHwwd8xVF25Tpup5mrnlZTfBXc5lBZ8yEXjvojdlaeipbsYtyeGS5eFVij+GLKzkBykuo+7eg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLgemhnKsLJ0USmeOKdck2X0ci5mo4N5QY9JaPvQZtbOZIcfna
+	DnDN3BIVBi3Skq1sFm2nZ8bj5+PoE6/UMEdlL5KrfqEWcz/qBJwg0tGqkyJRv8h8RT4U+qIBMZF
+	q/5qo1b/gWtJPdCsAN9yfD+is04OIVsulxvYPpb4T5LpKf4O14YyredPWzg==
+X-Gm-Gg: ASbGncvUCxOOyOOt9chRrB4UMCL9D4u6pooqd8049K8IydJzu10nY7rswP5lKQcB8/c
+	amNcm9J8Sgrzw5t6EbxYmFNS0yzDm23Mwd0qBXQ7kMWz5kPOJbCfHbCY+5b3I7MSHOg89LYwSf2
+	t7RT6We0nQv6y3iTjG9OMVDlpMvBI9wl+8QadIuxCwRrOJc1KKArCTupeTmAfuNyCLZYcyeel0n
+	pvQgfkZ5JcQZw0DLTm+The4KN8IuTVEgpi32KMNwK0OZldysaig3ueBauwIGvKoRpySHS+BZGRH
+	YKBc/1vb8/oa10TQX2HJyZRiUkyptXiDwixt0TIjMfCTL0FcfOPbFVVoyyE3GH6JCItvaLBzvrb
+	c5UZHFIz5I7qjV88p/41z0g==
+X-Received: by 2002:a05:6000:1445:b0:3a5:27ba:47c7 with SMTP id ffacd0b85a97d-3c5dcc0da36mr163004f8f.48.1755806836152;
+        Thu, 21 Aug 2025 13:07:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFpC+bUbLbCjHqucY3RiMYJPd72Xl9UYU3JmJwOiC1ZPXsKWXLLEiwWSHifO8HwGgrBWSbiEw==
+X-Received: by 2002:a05:6000:1445:b0:3a5:27ba:47c7 with SMTP id ffacd0b85a97d-3c5dcc0da36mr162946f8f.48.1755806835650;
+        Thu, 21 Aug 2025 13:07:15 -0700 (PDT)
 Received: from localhost (p200300d82f26ba0008036ec5991806fd.dip0.t-ipconnect.de. [2003:d8:2f26:ba00:803:6ec5:9918:6fd])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-3c0771c166bsm12916801f8f.33.2025.08.21.13.07.09
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-45b50dc00a8sm10958175e9.1.2025.08.21.13.07.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Aug 2025 13:07:11 -0700 (PDT)
+        Thu, 21 Aug 2025 13:07:15 -0700 (PDT)
 From: David Hildenbrand <david@redhat.com>
 To: linux-kernel@vger.kernel.org
 Cc: David Hildenbrand <david@redhat.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
 	Alexander Potapenko <glider@google.com>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	Brendan Jackman <jackmanb@google.com>,
@@ -131,9 +134,9 @@ Cc: David Hildenbrand <david@redhat.com>,
 	wireguard@lists.zx2c4.com,
 	x86@kernel.org,
 	Zi Yan <ziy@nvidia.com>
-Subject: [PATCH RFC 02/35] arm64: Kconfig: drop superfluous "select SPARSEMEM_VMEMMAP"
-Date: Thu, 21 Aug 2025 22:06:28 +0200
-Message-ID: <20250821200701.1329277-3-david@redhat.com>
+Subject: [PATCH RFC 03/35] s390/Kconfig: drop superfluous "select SPARSEMEM_VMEMMAP"
+Date: Thu, 21 Aug 2025 22:06:29 +0200
+Message-ID: <20250821200701.1329277-4-david@redhat.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250821200701.1329277-1-david@redhat.com>
 References: <20250821200701.1329277-1-david@redhat.com>
@@ -148,24 +151,27 @@ Content-Transfer-Encoding: 8bit
 Now handled by the core automatically once SPARSEMEM_VMEMMAP_ENABLE
 is selected.
 
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>
+Cc: Heiko Carstens <hca@linux.ibm.com>
+Cc: Vasily Gorbik <gor@linux.ibm.com>
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: Sven Schnelle <svens@linux.ibm.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- arch/arm64/Kconfig | 1 -
+ arch/s390/Kconfig | 1 -
  1 file changed, 1 deletion(-)
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index e9bbfacc35a64..b1d1f2ff2493b 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -1570,7 +1570,6 @@ source "kernel/Kconfig.hz"
+diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
+index bf680c26a33cf..145ca23c2fff6 100644
+--- a/arch/s390/Kconfig
++++ b/arch/s390/Kconfig
+@@ -710,7 +710,6 @@ menu "Memory setup"
  config ARCH_SPARSEMEM_ENABLE
  	def_bool y
  	select SPARSEMEM_VMEMMAP_ENABLE
 -	select SPARSEMEM_VMEMMAP
  
- config HW_PERF_EVENTS
+ config ARCH_SPARSEMEM_DEFAULT
  	def_bool y
 -- 
 2.50.1
