@@ -1,117 +1,143 @@
-Return-Path: <netdev+bounces-215444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BB56B2EAFF
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 03:55:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33688B2EB04
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 03:56:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85F61A0408D
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 01:54:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 046735C71F9
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 01:56:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1372F25A2DA;
-	Thu, 21 Aug 2025 01:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E681E28A73A;
+	Thu, 21 Aug 2025 01:56:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 788FC1E5B70
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 01:54:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3292A288504;
+	Thu, 21 Aug 2025 01:56:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755741276; cv=none; b=WwfrsfKgayT3yYgXJDbXPo7Is6YudhD5wGrKbfIaP50J1oPo1e08t5y1sd+oIHa4VLWnpl/3o5Nqx6YBsWHvLI3jo33vE5QC4zO9L+Dm8XerdZZg7ek3+1HakVUsdQ3w+JMKnVKLQ7TpfV3Z1rfrtIvp85uSrdOSEMqB60D8mC0=
+	t=1755741396; cv=none; b=kYA7dTVBt8ygtvLbU93Pk0qzRDhIFXQBvXtv9r/e3IUkxDJChu60TqofloNRmXZr/bUtxYK842YAkD1BN0lZTgIaGB4Ue99ALhiMcdEl8SSurpLgAO7cibQTnVtdiB1Btx1PIrJ6FcFUQFm02Ox5jfiF4M+qhN3c0lF/OZM+G9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755741276; c=relaxed/simple;
-	bh=Hjt2XKIqo3+Dd1a74qTezfLIh4/05/HZfR0EMUnHXBg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=spQP92l6Qn4igCuiqT718f8xJPi4m8ggWNTYkNC7LBKwBZ/XdWkenFapR0TbOKtvMpzWh81N6PvFMuox+YaV5ZpKB1lO01h2x7oyiNyrMYC/e9v2lOKfDsAQhYHmpTsb/to1o/SUYH8Mz3/urRSXOSHxIJlBgxvpapeD2nuqsJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.206.34.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: esmtpsz10t1755741264t689e7382
-X-QQ-Originating-IP: U0fEyWnwHg6dZLkemjeK4dcZ8M2S6VxDy3X/6ajZ+TY=
-Received: from localhost ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 21 Aug 2025 09:54:22 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 3627118193617159813
-Date: Thu, 21 Aug 2025 09:54:23 +0800
-From: Yibo Dong <dong100@mucse.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
-	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 2/5] net: rnpgbe: Add n500/n210 chip support
-Message-ID: <B6794BB31A93D48F+20250821015423.GD1742451@nic-Precision-5820-Tower>
-References: <20250818112856.1446278-1-dong100@mucse.com>
- <20250818112856.1446278-3-dong100@mucse.com>
- <3e5e73f7-bbf5-490c-9cff-24f34d550d24@lunn.ch>
+	s=arc-20240116; t=1755741396; c=relaxed/simple;
+	bh=rB1BGf26IEIKquulbtzHM2s9bSe26Cv/iAmfPf+I+1c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=G4q2pYqLwNnT8lIFqrM5hTHgormSxZ1kl0/YxecLrrXYknudztNahiAjEs5qC4GP/TGJcjVEtL0zVQiz3INQT77BEivpSxUXI+7lTozVb7vmRHFN7MQh3IMcjFsE/P4Rz3F3hNTj5xrLyuJg9OEapJ6bIgPqpagHsAHpRMkQPI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4c6mXR14Snzdcfc;
+	Thu, 21 Aug 2025 09:52:07 +0800 (CST)
+Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
+	by mail.maildlp.com (Postfix) with ESMTPS id 750DC180B63;
+	Thu, 21 Aug 2025 09:56:30 +0800 (CST)
+Received: from [10.174.176.70] (10.174.176.70) by
+ dggpemf500016.china.huawei.com (7.185.36.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 21 Aug 2025 09:56:29 +0800
+Message-ID: <80706fff-ca22-45f5-ac0b-ff84e1ba6a8b@huawei.com>
+Date: Thu, 21 Aug 2025 09:56:27 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3e5e73f7-bbf5-490c-9cff-24f34d550d24@lunn.ch>
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: No4GWyI4cWt68cK1ENtfPIAGtcHLk4MUfQjDRJagCpBBXDI945mtranl
-	W6UrbIN0TAaIslu5eMpXm1AMzHZjFdVBctV8ebKONDAStzmQEqoiLczRdZFTkARr1VMoSzp
-	wy35TA1gBySiGYAmulVecp1YOJHs0RE+wL+7iyayvHYD5oR8tDLlZIgIxEYkdED3lObFW4C
-	LbAQwlMGgPj+WLCEmCAr4BNOTkjn3olbjHVdbUU5cWvEzHqEWdX8QfdI0xfUdru8xx8c7vg
-	CGCjsaWf6jaifP61C+IVpddDwCkYxhI0OnAqXR86LZ+b+hfm/uNAPrBr5Ltx2P7Np/LmCm6
-	0jR6xUbb7KdHRfrIttxlTSl4groaaXKQsgRs99gqrWDQQE+YCgJdNloCt8cMAvKSzNn8MH+
-	zs1CvIpR0OYnix0sYPHAuJ4U9c4ACVfuryc7evzPqplGOyVJh0gsS1+ZwdmXsAE9FbdHlan
-	jUN+8mjTIojqEQMbRfwAUV6FnUPrENjYalmUgTrkfgOI20xGWddYcWwE34VNvGehCAmsL9A
-	Quk9VyICJ+GRcu1nXLg4tjyCAAca9j4cRjOfxQ4QAUTFuypUHefRd20UfrkDL7athbwXjOy
-	8QC/46LpdxjMUGav3N3Gtets8XBIrd4WDaKtD+B6TDraXtQvshbBakB9BrHgMcwhOQVEHV3
-	h4C2ALMeyhsIDy+YWRuD1CE+6+rw6+GV19OBM8CaXaHedonokbbpRCOTGZq0NijzzzovpBa
-	AV3IP/o8SfRctstaTAuTDYFT9Alyc4cEbZ07FG0XyJQP6FvnWG8lObhAnyTLGmzKqA5ThDb
-	GlsTMDx7OyBnsBPthDAyF9N68oodIzf/vRQpuzycTLmG4zz7ctFVgmWEnv3dzo8Rs0hIRQD
-	78MnJM2B4fAUg5nib279v2fubvaBofW1IxInH/p4QxzIw+TsXF737lSSn8XoR6qba+KCRP6
-	z97VH4vMNoQ+b1sNyOIeFYLnbNgZV06yKYxc70vi0lc5gHUkqnX4rrMyJD1Sdw5RXZHmCqA
-	R5d6OzXfoB4N/bkfiMKUV+FwMXaHd0JVTyar7UTQ==
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-X-QQ-RECHKSPAM: 0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] netfilter: br_netfilter: reread nf_conn from skb
+ after confirm()
+To: Florian Westphal <fw@strlen.de>
+CC: <pablo@netfilter.org>, <kadlec@netfilter.org>, <razor@blackwall.org>,
+	<idosch@nvidia.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
+	<netfilter-devel@vger.kernel.org>, <coreteam@netfilter.org>,
+	<bridge@lists.linux.dev>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20250820043329.2902014-1-wangliang74@huawei.com>
+ <aKWyImI9qxi6GDIF@strlen.de>
+From: Wang Liang <wangliang74@huawei.com>
+In-Reply-To: <aKWyImI9qxi6GDIF@strlen.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ dggpemf500016.china.huawei.com (7.185.36.197)
 
-On Wed, Aug 20, 2025 at 10:16:00PM +0200, Andrew Lunn wrote:
-> > +const struct rnpgbe_info rnpgbe_n500_info = {
-> > +	.total_queue_pair_cnts = RNPGBE_MAX_QUEUES,
-> > +	.hw_type = rnpgbe_hw_n500,
-> > +	.init = &rnpgbe_init_n500,
-> > +};
-> > +
-> > +const struct rnpgbe_info rnpgbe_n210_info = {
-> > +	.total_queue_pair_cnts = RNPGBE_MAX_QUEUES,
-> > +	.hw_type = rnpgbe_hw_n210,
-> > +	.init = &rnpgbe_init_n210,
-> > +};
-> > +
-> > +const struct rnpgbe_info rnpgbe_n210L_info = {
-> > +	.total_queue_pair_cnts = RNPGBE_MAX_QUEUES,
-> > +	.hw_type = rnpgbe_hw_n210L,
-> > +	.init = &rnpgbe_init_n210,
-> > +};
-> 
-> total_queue_pair_cnts is the same for all three. So it probably does
-> not need to be in the structure. You can just use RNPGBE_MAX_QUEUES.
-> 
->     Andrew
-> 
 
-Got it, I will update it.
+在 2025/8/20 19:31, Florian Westphal 写道:
+> Wang Liang <wangliang74@huawei.com> wrote:
+>> Previous commit 2d72afb34065 ("netfilter: nf_conntrack: fix crash due to
+>> removal of uninitialised entry") move the IPS_CONFIRMED assignment after
+>> the hash table insertion.
+> How is that related to this change?
+> As you write below, the bug came in with 62e7151ae3eb.
 
-> ---
-> pw-bot: cr
-> 
+
+Before the commit 2d72afb34065, __nf_conntrack_confirm() set
+'ct->status |= IPS_CONFIRMED;' before check hash, the warning will not
+happen, so I put it here.
+
+As you say, the bug came in with 62e7151ae3eb. I will delete this paragraph
+in next patch.
+
+>> To solve the hash conflict, nf_ct_resolve_clash() try to merge the
+>> conntracks, and update skb->_nfct. However, br_nf_local_in() still use the
+>> old ct from local variable 'nfct' after confirm(), which leads to this
+>> issue. Fix it by rereading nfct from skb.
+>>
+>> Fixes: 62e7151ae3eb ("netfilter: bridge: confirm multicast packets before passing them up the stack")
+>> Signed-off-by: Wang Liang <wangliang74@huawei.com>
+>> ---
+>>   net/bridge/br_netfilter_hooks.c | 1 +
+>>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/net/bridge/br_netfilter_hooks.c b/net/bridge/br_netfilter_hooks.c
+>> index 94cbe967d1c1..55b1b7dcb609 100644
+>> --- a/net/bridge/br_netfilter_hooks.c
+>> +++ b/net/bridge/br_netfilter_hooks.c
+>> @@ -626,6 +626,7 @@ static unsigned int br_nf_local_in(void *priv,
+>>   		break;
+>>   	}
+>>   
+>> +	nfct = skb_nfct(skb);
+>>   	ct = container_of(nfct, struct nf_conn, ct_general);
+>>   	WARN_ON_ONCE(!nf_ct_is_confirmed(ct));
+> There is a second bug here, confirm can return NF_DROP and
+> nfct will be NULL.
+
+
+Thanks for your suggestion!
+
+Do you mean that ct may be deleted in confirm and return NF_DROP, so we can
+not visit it in br_nf_local_in() and need to add 'case NF_DROP:' here?
+
+I cannot find somewhere set skb->_nfct to NULL and return NF_DROP. Can you
+give some hints?
+
+------
+Best regards
+Wang Liang
+
+>
+> Can you make this change too? (or something similar)?
+>
+> diff --git a/net/bridge/br_netfilter_hooks.c b/net/bridge/br_netfilter_hooks.c
+> index 94cbe967d1c1..69b7b7c7565e 100644
+> --- a/net/bridge/br_netfilter_hooks.c
+> +++ b/net/bridge/br_netfilter_hooks.c
+> @@ -619,8 +619,9 @@ static unsigned int br_nf_local_in(void *priv,
+>          nf_bridge_pull_encap_header(skb);
+>          ret = ct_hook->confirm(skb);
+>          switch (ret & NF_VERDICT_MASK) {
+> +       case NF_DROP:
+>          case NF_STOLEN:
+> -               return NF_STOLEN;
+> +               return ret;
+>
+>
+> nfct reload seems correct, thanks for catching this.
 
