@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-215557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA5B4B2F369
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 11:12:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6707B2F36A
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 11:12:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECEF81CC573B
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 09:12:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC69E1CC4E44
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 09:12:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B21D12EFDA8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE98F2D77E8;
 	Thu, 21 Aug 2025 09:11:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A9C52ED848
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 09:11:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D01E2D47F5
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 09:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755767492; cv=none; b=r+MGWZFHPwIxRP016HCItI4YX9xuVrnZeQDtOJ56G0hWlPrrnK13jSl11AFLo81tTf7Ii3a86DeCSizkil718quK8CpsnKxg0rAY9FAmllWyzWCX8Lj7kcP1p8OayIELiyfd7vd6hlG9AiBiUkZcxQ9fW28gcFJZZ9SNuU+2KBA=
+	t=1755767492; cv=none; b=sXorDAmSYpBD4kBDsD48khFb1N7faWRsAJsYYcDQwJwJ9+VWR2QzkS9I1T0xd7YJ93ojmDmphL9MIU9FbnHaQiQzyzxSh3L0wcKPX8Xqz4YSqZ/L7k1ncDg3+AjRmIv/iX4sowcnPbVw+Tt+oTEKCIuwbc8bD7iqoVU3V+Dw81s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1755767492; c=relaxed/simple;
-	bh=Ti9yK+DxmGjIMVGfu7+APd3GtTKKV9VpkLTQVUaSaio=;
+	bh=llwU2Haob+VB2ivA8PzF5K2LGi4vmKnFoaGS4VTW+J4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X1Hzs6EHXEiqTCl90Y7DwIfrI5GQXJrkx5eWVWjuNON2RHsHdctzR4MwisvF9VotnkUNcSukv9p1Ljs/O2cO6Y8lgdwEZiN/1yqY3Gd3yCWo3AUIgF/kkTYDdf2L500Xb2xG0eaeNOpGhSq0kp4txnYIOFT55rvnejxBP1gImuw=
+	 MIME-Version:Content-Type; b=MuzyDcTaMedULSW4+cl2lNUvlusrYEMsO7kRoBRMl0/4MssdZfo/ppRn4BlXbztDDgHjw3Ygay6A/8v8FCy7vPB5rjQ8tUCvD3ZH1Kv6dWmU+Z172kO0YKgYl3BziOoDpN3kA0P4NBgh3TUXVARX0nURSKJR4KJgoImgFFJS1ws=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,16 +33,16 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1up1K4-0001Pv-32; Thu, 21 Aug 2025 11:11:04 +0200
+	id 1up1K4-0001Pw-32; Thu, 21 Aug 2025 11:11:04 +0200
 Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1up1K2-001O8A-1e;
+	id 1up1K2-001O8B-1p;
 	Thu, 21 Aug 2025 11:11:02 +0200
 Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1up1K2-008ItZ-1M;
+	id 1up1K2-008Itj-1Q;
 	Thu, 21 Aug 2025 11:11:02 +0200
 From: Oleksij Rempel <o.rempel@pengutronix.de>
 To: Andrew Lunn <andrew@lunn.ch>,
@@ -66,9 +66,9 @@ Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
 	linux-doc@vger.kernel.org,
 	Michal Kubecek <mkubecek@suse.cz>,
 	Roan van Dijk <roan@protonic.nl>
-Subject: [PATCH net-next v4 3/5] ethtool: netlink: add lightweight MSE reporting to LINKSTATE_GET
-Date: Thu, 21 Aug 2025 11:10:59 +0200
-Message-Id: <20250821091101.1979201-4-o.rempel@pengutronix.de>
+Subject: [PATCH net-next v4 4/5] net: phy: micrel: add MSE interface support for KSZ9477 family
+Date: Thu, 21 Aug 2025 11:11:00 +0200
+Message-Id: <20250821091101.1979201-5-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250821091101.1979201-1-o.rempel@pengutronix.de>
 References: <20250821091101.1979201-1-o.rempel@pengutronix.de>
@@ -85,226 +85,127 @@ X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Extend ETHTOOL_MSG_LINKSTATE_GET to optionally return a simplified
-Mean Square Error (MSE) reading alongside existing link status fields.
+Implement the get_mse_config() and get_mse_snapshot() PHY driver ops
+for KSZ9477-series integrated PHYs to demonstrate the new PHY MSE
+UAPI.
 
-The new attributes are:
-  - ETHTOOL_A_LINKSTATE_MSE_VALUE: current average MSE value
-  - ETHTOOL_A_LINKSTATE_MSE_MAX: scale limit for the reported value
-  - ETHTOOL_A_LINKSTATE_MSE_CHANNEL: source channel selector
+These PHYs do not expose a documented direct MSE register, but the
+Signal Quality Indicator (SQI) registers are derived from the
+internal MSE computation. This hook maps SQI readings into the MSE
+interface so that tooling can retrieve the raw value together with
+metadata for correct interpretation in userspace.
 
-This path reuses the PHY MSE core API, but only retrieves a single
-value intended for quick link-health checks:
-  * If the PHY supports a WORST channel selector, report its current
-    average MSE.
-  * Otherwise, if LINK-wide measurements are supported, report those.
-  * If neither is available, omit the attributes.
+Behaviour:
+  - For 1000BASE-T, report per-channel (A–D) values and support a
+    WORST channel selector.
+  - For 100BASE-TX, only LINK-wide measurements are available.
+  - Report average MSE only, with a max scale based on
+    KSZ9477_MMD_SQI_MASK and a fixed refresh rate of 2 µs.
 
-Unlike the full MSE_GET interface, LINKSTATE_GET does not expose
-per-channel or peak/worst-peak values and incurs minimal overhead.
-Drivers that implement get_mse_config() / get_mse_snapshot() will
-automatically populate this data.
-
-The intent is to provide tooling with a “fast path” health indicator
-without issuing a separate MSE_GET request, though the long-term
-overlap with the full interface may need reevaluation.
+This mapping differs from the OPEN Alliance SQI definition, which
+assigns thresholds such as pre-fail indices; the MSE interface
+instead provides the raw measurement, leaving interpretation to
+userspace.
 
 Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
-changes v3:
-- add missing yaml spec
----
- Documentation/netlink/specs/ethtool.yaml      |  9 ++
- Documentation/networking/ethtool-netlink.rst  |  9 ++
- .../uapi/linux/ethtool_netlink_generated.h    |  3 +
- net/ethtool/linkstate.c                       | 84 +++++++++++++++++++
- 4 files changed, 105 insertions(+)
+ drivers/net/phy/micrel.c | 76 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 76 insertions(+)
 
-diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-index d69dd3fb534b..3f1f19c9c18a 100644
---- a/Documentation/netlink/specs/ethtool.yaml
-+++ b/Documentation/netlink/specs/ethtool.yaml
-@@ -708,6 +708,15 @@ attribute-sets:
-       -
-         name: ext-down-cnt
-         type: u32
-+      -
-+        name: mse-value
-+        type: u32
-+      -
-+        name: mse-max
-+        type: u32
-+      -
-+        name: mse-channel
-+        type: u32
-   -
-     name: debug
-     attr-cnt-name: __ethtool-a-debug-cnt
-diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
-index 06d0563d311d..1271df21ea79 100644
---- a/Documentation/networking/ethtool-netlink.rst
-+++ b/Documentation/networking/ethtool-netlink.rst
-@@ -530,6 +530,9 @@ Kernel response contents:
-   ``ETHTOOL_A_LINKSTATE_EXT_STATE``     u8      link extended state
-   ``ETHTOOL_A_LINKSTATE_EXT_SUBSTATE``  u8      link extended substate
-   ``ETHTOOL_A_LINKSTATE_EXT_DOWN_CNT``  u32     count of link down events
-+  ``ETHTOOL_A_LINKSTATE_MSE_VALUE``     u32     Current average MSE value
-+  ``ETHTOOL_A_LINKSTATE_MSE_MAX``       u32     Max scale for average MSE
-+  ``ETHTOOL_A_LINKSTATE_MSE_CHANNEL``   u32     Source of MSE value
-   ====================================  ======  ============================
- 
- For most NIC drivers, the value of ``ETHTOOL_A_LINKSTATE_LINK`` returns
-@@ -541,6 +544,12 @@ optional values. ethtool core can provide either both
- ``ETHTOOL_A_LINKSTATE_EXT_STATE`` and ``ETHTOOL_A_LINKSTATE_EXT_SUBSTATE``,
- or only ``ETHTOOL_A_LINKSTATE_EXT_STATE``, or none of them.
- 
-+``ETHTOOL_A_LINKSTATE_MSE_VALUE`` and ``ETHTOOL_A_LINKSTATE_MSE_MAX`` are
-+optional values. The MSE value provided by this interface is a lightweight,
-+less detailed version for quick health checks. If only one channel is used, it
-+returns the current average MSE value. If multiple channels are supported, it
-+returns the current average MSE of the channel with the worst MSE.
-+
- ``LINKSTATE_GET`` allows dump requests (kernel returns reply messages for all
- devices supporting the request).
- 
-diff --git a/include/uapi/linux/ethtool_netlink_generated.h b/include/uapi/linux/ethtool_netlink_generated.h
-index 8317e4b230a5..a9ef0ec11695 100644
---- a/include/uapi/linux/ethtool_netlink_generated.h
-+++ b/include/uapi/linux/ethtool_netlink_generated.h
-@@ -331,6 +331,9 @@ enum {
- 	ETHTOOL_A_LINKSTATE_EXT_STATE,
- 	ETHTOOL_A_LINKSTATE_EXT_SUBSTATE,
- 	ETHTOOL_A_LINKSTATE_EXT_DOWN_CNT,
-+	ETHTOOL_A_LINKSTATE_MSE_VALUE,
-+	ETHTOOL_A_LINKSTATE_MSE_MAX,
-+	ETHTOOL_A_LINKSTATE_MSE_CHANNEL,
- 
- 	__ETHTOOL_A_LINKSTATE_CNT,
- 	ETHTOOL_A_LINKSTATE_MAX = (__ETHTOOL_A_LINKSTATE_CNT - 1)
-diff --git a/net/ethtool/linkstate.c b/net/ethtool/linkstate.c
-index 05a5f72c99fa..b27fb0ffc526 100644
---- a/net/ethtool/linkstate.c
-+++ b/net/ethtool/linkstate.c
-@@ -14,6 +14,9 @@ struct linkstate_reply_data {
- 	int					link;
- 	int					sqi;
- 	int					sqi_max;
-+	u32					mse_value;
-+	u32					mse_max;
-+	u32					mse_channel;
- 	struct ethtool_link_ext_stats		link_stats;
- 	bool					link_ext_state_provided;
- 	struct ethtool_link_ext_state_info	ethtool_link_ext_state_info;
-@@ -76,6 +79,65 @@ static bool linkstate_sqi_valid(struct linkstate_reply_data *data)
- 	       data->sqi <= data->sqi_max;
+diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+index 605b0315b4cb..6a49722890bb 100644
+--- a/drivers/net/phy/micrel.c
++++ b/drivers/net/phy/micrel.c
+@@ -2305,6 +2305,80 @@ static int kszphy_get_sqi_max(struct phy_device *phydev)
+ 	return KSZ9477_SQI_MAX;
  }
  
-+static int linkstate_get_mse(struct phy_device *phydev,
-+			     struct linkstate_reply_data *data)
++static int kszphy_get_mse_config(struct phy_device *phydev,
++				 struct phy_mse_config *config)
 +{
-+	struct phy_mse_snapshot snapshot = {};
-+	struct phy_mse_config config = {};
-+	int channel, ret;
-+
-+	if (!phydev)
++	if (phydev->speed == SPEED_1000)
++		config->supported_caps |= PHY_MSE_CAP_CHANNEL_A |
++					  PHY_MSE_CAP_CHANNEL_B |
++					  PHY_MSE_CAP_CHANNEL_C |
++					  PHY_MSE_CAP_CHANNEL_D |
++					  PHY_MSE_CAP_WORST_CHANNEL;
++	else if (phydev->speed == SPEED_100)
++		config->supported_caps |= PHY_MSE_CAP_LINK;
++	else
 +		return -EOPNOTSUPP;
 +
-+	mutex_lock(&phydev->lock);
++	config->max_average_mse = FIELD_MAX(KSZ9477_MMD_SQI_MASK);
++	config->refresh_rate_ps = 2000000; /* 2 us */
++	/* Estimated from link modulation (125 MBd per channel) and documented
++	 * refresh rate of 2 µs
++	 */
++	config->num_symbols = 250;
 +
-+	if (!phydev->drv || !phydev->drv->get_mse_config ||
-+	    !phydev->drv->get_mse_snapshot) {
-+		ret = -EOPNOTSUPP;
-+		goto unlock;
-+	}
++	config->supported_caps |= PHY_MSE_CAP_AVG;
 +
-+	if (!phydev->link) {
-+		ret = -ENETDOWN;
-+		goto unlock;
-+	}
++	return 0;
++}
 +
-+	ret = phydev->drv->get_mse_config(phydev, &config);
-+	if (ret)
-+		goto unlock;
++static int kszphy_get_mse_snapshot(struct phy_device *phydev, u32 channel,
++				   struct phy_mse_snapshot *snapshot)
++{
++	u8 num_channels;
++	int ret;
 +
-+	if (config.supported_caps & PHY_MSE_CAP_WORST_CHANNEL) {
-+		channel = PHY_MSE_CHANNEL_WORST;
-+	} else if (config.supported_caps & PHY_MSE_CAP_LINK) {
-+		channel = PHY_MSE_CHANNEL_LINK;
++	if (phydev->speed == SPEED_1000)
++		num_channels = 4;
++	else if (phydev->speed == SPEED_100)
++		num_channels = 1;
++	else
++		return -EOPNOTSUPP;
++
++	if (channel == PHY_MSE_CHANNEL_WORST) {
++		u32 worst_val = 0;
++		int i;
++
++		for (i = 0; i < num_channels; i++) {
++			ret = phy_read_mmd(phydev, MDIO_MMD_PMAPMD,
++					KSZ9477_MMD_SIGNAL_QUALITY_CHAN_A + i);
++			if (ret < 0)
++				return ret;
++
++			ret = FIELD_GET(KSZ9477_MMD_SQI_MASK, ret);
++			if (ret > worst_val)
++				worst_val = ret;
++		}
++		snapshot->average_mse = worst_val;
++	} else if (channel == PHY_MSE_CHANNEL_LINK && num_channels == 1) {
++		ret = phy_read_mmd(phydev, MDIO_MMD_PMAPMD,
++				   KSZ9477_MMD_SIGNAL_QUALITY_CHAN_A);
++		if (ret < 0)
++			return ret;
++		snapshot->average_mse = FIELD_GET(KSZ9477_MMD_SQI_MASK, ret);
++	} else if (channel >= PHY_MSE_CHANNEL_A &&
++		   channel <= PHY_MSE_CHANNEL_D) {
++		ret = phy_read_mmd(phydev, MDIO_MMD_PMAPMD,
++				   KSZ9477_MMD_SIGNAL_QUALITY_CHAN_A + channel);
++		if (ret < 0)
++			return ret;
++		snapshot->average_mse = FIELD_GET(KSZ9477_MMD_SQI_MASK, ret);
 +	} else {
-+		ret = -EOPNOTSUPP;
-+		goto unlock;
++		return -EINVAL;
 +	}
 +
-+	ret = phydev->drv->get_mse_snapshot(phydev, channel, &snapshot);
-+	if (ret)
-+		goto unlock;
-+
-+	data->mse_value = snapshot.average_mse;
-+	data->mse_max = config.max_average_mse;
-+	data->mse_channel = channel;
-+
-+unlock:
-+	mutex_unlock(&phydev->lock);
-+	return ret;
++	return 0;
 +}
 +
-+static bool linkstate_mse_critical_error(int err)
-+{
-+	return err < 0 && err != -EOPNOTSUPP && err != -ENETDOWN;
-+}
-+
-+static bool linkstate_mse_valid(struct linkstate_reply_data *data)
-+{
-+	return data->mse_max > 0 && data->mse_value <= data->mse_max;
-+}
-+
- static int linkstate_get_link_ext_state(struct net_device *dev,
- 					struct linkstate_reply_data *data)
+ static void kszphy_enable_clk(struct phy_device *phydev)
  {
-@@ -125,6 +187,10 @@ static int linkstate_prepare_data(const struct ethnl_req_info *req_base,
- 		goto out;
- 	data->sqi_max = ret;
+ 	struct kszphy_priv *priv = phydev->priv;
+@@ -5943,6 +6017,8 @@ static struct phy_driver ksphy_driver[] = {
+ 	.cable_test_get_status	= ksz9x31_cable_test_get_status,
+ 	.get_sqi	= kszphy_get_sqi,
+ 	.get_sqi_max	= kszphy_get_sqi_max,
++	.get_mse_config = kszphy_get_mse_config,
++	.get_mse_snapshot = kszphy_get_mse_snapshot,
+ } };
  
-+	ret = linkstate_get_mse(phydev, data);
-+	if (linkstate_mse_critical_error(ret))
-+		goto out;
-+
- 	if (dev->flags & IFF_UP) {
- 		ret = linkstate_get_link_ext_state(dev, data);
- 		if (ret < 0 && ret != -EOPNOTSUPP && ret != -ENODATA)
-@@ -164,6 +230,12 @@ static int linkstate_reply_size(const struct ethnl_req_info *req_base,
- 		len += nla_total_size(sizeof(u32)); /* LINKSTATE_SQI_MAX */
- 	}
- 
-+	if (linkstate_mse_valid(data)) {
-+		len += nla_total_size(sizeof(u32)); /* LINKSTATE_MSE_VALUE */
-+		len += nla_total_size(sizeof(u32)); /* LINKSTATE_MSE_MAX */
-+		len += nla_total_size(sizeof(u32)); /* LINKSTATE_MSE_CHANNEL */
-+	}
-+
- 	if (data->link_ext_state_provided)
- 		len += nla_total_size(sizeof(u8)); /* LINKSTATE_EXT_STATE */
- 
-@@ -195,6 +267,18 @@ static int linkstate_fill_reply(struct sk_buff *skb,
- 			return -EMSGSIZE;
- 	}
- 
-+	if (linkstate_mse_valid(data)) {
-+		if (nla_put_u32(skb, ETHTOOL_A_LINKSTATE_MSE_VALUE,
-+				data->mse_value))
-+			return -EMSGSIZE;
-+		if (nla_put_u32(skb, ETHTOOL_A_LINKSTATE_MSE_MAX,
-+				data->mse_max))
-+			return -EMSGSIZE;
-+		if (nla_put_u32(skb, ETHTOOL_A_LINKSTATE_MSE_CHANNEL,
-+				data->mse_channel))
-+			return -EMSGSIZE;
-+	}
-+
- 	if (data->link_ext_state_provided) {
- 		if (nla_put_u8(skb, ETHTOOL_A_LINKSTATE_EXT_STATE,
- 			       data->ethtool_link_ext_state_info.link_ext_state))
+ module_phy_driver(ksphy_driver);
 -- 
 2.39.5
 
