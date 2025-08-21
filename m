@@ -1,188 +1,126 @@
-Return-Path: <netdev+bounces-215827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44698B308A6
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 23:49:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97274B308B9
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 23:58:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1BED9624409
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 21:49:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54976A2221C
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 21:58:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B1392E8DFF;
-	Thu, 21 Aug 2025 21:49:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE8D62E9EAC;
+	Thu, 21 Aug 2025 21:58:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vOrqbFbp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NNnZrjyV"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FA182580CF
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 21:49:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99C5F393DDD
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 21:58:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755812961; cv=none; b=ntauqHRquYhVzjy79r4m0+JoM/7U2IkXexrXqS8ssne/u6PWLVO1w26JV6q+zZI7SjIK0py7lLdmkbKxiZUfW2+Qj2qHMrSfLBuUxC9KVNoVGZXxOUfgSptepuWCTs5saFzI60j4ZPbMqp0CNFazhpyvJavcytJ4zB31yD3/ZlA=
+	t=1755813532; cv=none; b=lnRdJqjYtKAqXp+oRpSh6mLSumGf4uGhQDQlTOV7fXCBRXbNwy+Gv8V9fgHMZ/2pdfT3eF8bvMuIWAbGsYr8s3DrhzXpMCMYt2c/IwHREz2ldjjMXugLtxmPOy3/7O+5ffrSooXa2jIiGxEF86wkEi703aNvyMAgkuzqMc23mJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755812961; c=relaxed/simple;
-	bh=HqM5XDu0iiew9jRxvCXQQtl9xZD9ZCsgol4tJ6pbScY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K3d9NwxGs2yuG0y1ucfDDG0zMbUblqbBzRMmFcipe9NjSUxBxv3FU+mlqqn7rVfByXtkjPGHn9uQktF3OuYlkuAicsIx5KOR41X5gcKC2CrSkrxgBQ2lfikuVMWmiZEKWj4EJaji361rWiqncI1qqZuEEmgeGReghNVFNuHSyPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vOrqbFbp; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <a3d437ce-c91d-47c6-9590-88b716fb6690@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1755812947;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=C4cFJbpQNFTwV50kiFAuGphrqAUZV8+ER0tPmM4e7u8=;
-	b=vOrqbFbp2U6+4Lv4vvKFyZzygPCihHn3FE9erEwiEeRRToOEonKYCJ/e83Rw09Ibl8Nhw9
-	DJ8rELk3KsoF5fGTP/vGcydpz7RVf1nwdgVHznCZWstwbIKbarpPkgHDTon5p33de40qFy
-	WfXiu+EHiM0ArhNbhO8cXn6+fwii+tM=
-Date: Thu, 21 Aug 2025 14:48:53 -0700
+	s=arc-20240116; t=1755813532; c=relaxed/simple;
+	bh=jgXPxJfFaSaBlgVXCqXFl9efZx6iDRQHCzEJKFwWYKc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t3kyaOYqjsmJjyRWDOXylyRELeBxAV4Z9ugtvbGQqMflctdj0lrRP1fZyUcm6WTHtDGWijM8x/0Y6ypjPWBfupDZpKX1bmW/iSotcgfNuhXa8LvF0ubLADrn9EQFZFXwFuuJvlbBoVj1ItT3S9+KY6/hAWLvCFI2C+RX796iusI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NNnZrjyV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23EA1C4CEEB;
+	Thu, 21 Aug 2025 21:58:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755813532;
+	bh=jgXPxJfFaSaBlgVXCqXFl9efZx6iDRQHCzEJKFwWYKc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=NNnZrjyVPLy2Ibkge+1BkiPj3z8LtWcGptxOnpjecAkrN+TPd/Lx4/dph/Nw8hEaD
+	 rx6yZlYwpgX9B6qMUM23XbmP+XQ2R7nbJ3Lw4B3PjF2YUcsCODkwwrwnrUbVhx2rzd
+	 kXjXoNYlYsWKR15dChwbKLyyMHmCx8VB2iUKd+dAeaJc/5/kMufp9U/QKZoQzhDpYt
+	 XfzuEipmLFWIXT/0Uy4rvP/yyRy0OwWIFBEy4stOBbVugihvLJky1S25ww8JfqmVec
+	 2LuIHdie/FCvIOD4NXh54XVYC3TXMNWQuWsDx6SMtV95T/1yJlZJyPKP071011VppA
+	 7dTRQntRW3q0g==
+From: Saeed Mahameed <saeed@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>,
+	netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Parav Pandit <parav@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>,
+	Adithya Jayachandran <ajayachandra@nvidia.com>
+Subject: [PATCH net-next 0/7] E-Switch vport sharing & delegation
+Date: Thu, 21 Aug 2025 14:58:32 -0700
+Message-ID: <20250821215839.280364-1-saeed@kernel.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next] bpf: hashtab - allow
- BPF_MAP_LOOKUP{,_AND_DELETE}_BATCH with NULL keys/values.
-Content-Language: en-GB
-To: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Linux Network Development Mailing List <netdev@vger.kernel.org>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- BPF Mailing List <bpf@vger.kernel.org>, Stanislav Fomichev <sdf@fomichev.me>
-References: <20250813073955.1775315-1-maze@google.com>
- <6df59861-8334-49ac-8dca-2b0bac82f2d7@linux.dev>
- <CANP3RGcJ06uRUBF=RR6bjqNnxdaSdpBpynGzNTSms0jA-ZpW6w@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <CANP3RGcJ06uRUBF=RR6bjqNnxdaSdpBpynGzNTSms0jA-ZpW6w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+
+From: Saeed Mahameed <saeedm@nvidia.com>
+
+An mlx5 E-Switch FDB table can manage vports belonging to other sibling
+physical functions, such as ECPF (ARM embedded cores) and Host PF (x86).
+This enables a single source of truth for SDN software to manage network
+pipelines from one host. While such functionality already exists in mlx5,
+it is currently limited by static vport allocation,
+meaning the number of vports shared between multi-host functions
+must be known pre-boot.
+
+This patchset enables delegated/external vports to be discovered
+dynamically when switchdev mode is enabled, leveraging new firmware
+capabilities for dynamic vport creation.
+
+Adjacent functions that delegate their SR-IOV VFs to sibling PFs, can be
+dynamically discovered on the sibling PF's switchdev mode enabling,
+after sriov was enabled on the originating PF, allowing for more
+flexible and scalable management in multi-host and ECPF-to-host
+scenarios.
+
+The patchset consists of the following changes:
+
+- Refactoring of ACL root namespace handling: The storage of vport ACL root
+  namespaces is converted from a linear array to an xarray, allowing dynamic
+  creation of ACLs per individual vport.
+- Improvements for vhca_id to vport mapping.
+- Dynamic querying and creation of delegated functions/vports.
 
 
+Adithya Jayachandran (2):
+  net/mlx5: E-Switch, Add support for adjacent functions vports
+    discovery
+  net/mlx5: E-switch, Set representor attributes for adjacent VFs
 
-On 8/20/25 7:23 PM, Maciej Żenczykowski wrote:
-> On Mon, Aug 18, 2025 at 1:58 PM Yonghong Song 
-> <yonghong.song@linux.dev> wrote:
-> > On 8/13/25 12:39 AM, Maciej Żenczykowski wrote:
-> > > BPF_MAP_LOOKUP_AND_DELETE_BATCH keys & values == NULL
-> > > seems like a nice way to simply quickly clear a map.
-> >
-> > This will change existing API as users will expect
-> > some error (e.g., -EFAULT) return when keys or values is NULL.
->
-> No reasonable user will call the current api with NULLs.
+Saeed Mahameed (5):
+  net/mlx5: FS, Convert vport acls root namespaces to xarray
+  net/mlx5: E-Switch, Move vport acls root namespaces creation to
+    eswitch
+  net/mlx5: E-Switch, Create acls root namespace for adjacent vports
+  net/mlx5: E-Switch, Register representors for adjacent vports
+  net/mlx5: {DR,HWS}, Use the cached vhca_id for this device
 
-I do agree it is really unlikely users will have NULL keys or values.
+ .../net/ethernet/mellanox/mlx5/core/Makefile  |   2 +-
+ .../mellanox/mlx5/core/esw/adj_vport.c        | 209 ++++++++++++++++++
+ .../mellanox/mlx5/core/esw/devlink_port.c     |  11 +-
+ .../net/ethernet/mellanox/mlx5/core/eswitch.c | 131 ++++++++++-
+ .../net/ethernet/mellanox/mlx5/core/eswitch.h |  17 ++
+ .../mellanox/mlx5/core/eswitch_offloads.c     |  37 +++-
+ .../net/ethernet/mellanox/mlx5/core/fs_core.c | 185 ++++++++--------
+ .../net/ethernet/mellanox/mlx5/core/fs_core.h |  18 +-
+ .../mellanox/mlx5/core/steering/hws/cmd.c     |  34 +--
+ .../mellanox/mlx5/core/steering/sws/dr_cmd.c  |  34 +--
+ 10 files changed, 501 insertions(+), 177 deletions(-)
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/esw/adj_vport.c
 
->
-> This is a similar API change to adding a new system call
-> (where previously it returned -ENOSYS) - which *is* also a UAPI 
-> change, but obviously allowed.
->
-> Or adding support for a new address family / protocol (where 
-> previously it -EAFNOSUPPORT)
-> Or adding support for a new flag (where previously it returned -EINVAL)
->
-> Consider why userspace would ever pass in NULL, two possibilities:
-> (a) explicit NULL - you'd never do this since it would (till now) 
-> always -EFAULT,
->   so this would only possibly show up in a very thorough test suite
-> (b) you're using dynamically allocated memory and it failed allocation.
->   that's already a program bug, you should catch that before you call 
-> bpf().
-
-Okay. What you describes make sense.
-Could you add a selftest for this?
-Could you add some comments in below uapi bpf.h header to new functionality?
-
->
-> > We have a 'flags' field in uapi header in
-> >
-> >          struct { /* struct used by BPF_MAP_*_BATCH commands */
-> >                  __aligned_u64   in_batch;       /* start batch,
-> >                                                   * NULL to start 
-> from beginning
-> >                                                   */
-> >                  __aligned_u64   out_batch;      /* output: next 
-> start batch */
-> >                  __aligned_u64   keys;
-> >                  __aligned_u64   values;
-> >                  __u32           count;          /* input/output:
-> >                                                   * input: # of 
-> key/value
-> >                                                   * elements
-> >                                                   * output: # of 
-> filled elements
-> >                                                   */
-> >                  __u32           map_fd;
-> >                  __u64           elem_flags;
-> >                  __u64           flags;
-> >          } batch;
-> >
-> > we can add a flag in 'flags' like BPF_F_CLEAR_MAP_IF_KV_NULL with a 
-> comment
-> > that if keys or values is NULL, the batched elements will be cleared.
->
-> I just don't see what value this provides.
->
-> > > BPF_MAP_LOOKUP keys/values == NULL might be useful if we just want
-> > > the values/keys and don't want to bother copying the keys/values...
-> > >
-> > > BPF_MAP_LOOKUP keys & values == NULL might be useful to count
-> > > the number of populated entries.
-> >
-> > bpf_map_lookup_elem() does not have flags field, so we probably 
-> should not
-> > change existins semantics.
->
-> This is unrelated to this patch, since this only touches 'batch' 
-> operation.
-> (unless I'm missing something)
->
-> > > Cc: Alexei Starovoitov <ast@kernel.org>
-> > > Cc: Daniel Borkmann <daniel@iogearbox.net>
-> > > Cc: Stanislav Fomichev <sdf@fomichev.me>
-> > > Signed-off-by: Maciej Żenczykowski <maze@google.com>
-> > > ---
-> > >   kernel/bpf/hashtab.c | 4 ++--
-> > >   1 file changed, 2 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/kernel/bpf/hashtab.c b/kernel/bpf/hashtab.c
-> > > index 5001131598e5..8fbdd000d9e0 100644
-> > > --- a/kernel/bpf/hashtab.c
-> > > +++ b/kernel/bpf/hashtab.c
-> > > @@ -1873,9 +1873,9 @@ __htab_map_lookup_and_delete_batch(struct 
-> bpf_map *map,
-> > >
-> > >       rcu_read_unlock();
-> > >       bpf_enable_instrumentation();
-> > > -     if (bucket_cnt && (copy_to_user(ukeys + total * key_size, keys,
-> > > +     if (bucket_cnt && (ukeys && copy_to_user(ukeys + total * 
-> key_size, keys,
-> > >           key_size * bucket_cnt) ||
-> > > -         copy_to_user(uvalues + total * value_size, values,
-> > > +         uvalues && copy_to_user(uvalues + total * value_size, 
-> values,
-> > >           value_size * bucket_cnt))) {
-> > >               ret = -EFAULT;
-> > >               goto after_loop;
-> >
->
->
-> --
-> Maciej Żenczykowski, Kernel Networking Developer @ Google
+-- 
+2.50.1
 
 
