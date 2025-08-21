@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-215449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A5A7B2EB31
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 04:30:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDE58B2EB32
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 04:30:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B84A25E5E9F
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 02:30:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D06895A85AD
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 02:30:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D342D245032;
-	Thu, 21 Aug 2025 02:30:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B48C2561B9;
+	Thu, 21 Aug 2025 02:30:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IGzV4jHL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SLG46SE2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5851242D96
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 02:30:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53162255F3C;
+	Thu, 21 Aug 2025 02:30:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755743401; cv=none; b=KXwyJsgFm4dsA+WKDFopsgLa0Zu3mE4C4Rcenzy2suRLzH4VJm6xQjtPiHuyBKjCPczQ7uD4KurqMAmnzs85Zg4woknRSLhV9krvluFazPeohxf1NazdZnK3HdtFAEUHF7jRt/hpWsZsxTaoqfNF3P++nRxjUM+Fq8m4xsGptKU=
+	t=1755743406; cv=none; b=AxEBzS0ucG7Qr5bm9gSODvHsCrO5RWmSV1Y8xkYPOcDEz5P2PPPedwRWxQKr6XnkZlvgAdMM7kQdHDzGwy/NYp7TJ8XVrf3Ubehc1ZSXfgTi3KtZAZu/BHK6JwjtdgJJ1X5ucq+rHOy57k9EpfrrfmXrjzhzM4jShrqQnlgkTe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755743401; c=relaxed/simple;
-	bh=dKEH2vQ/xfw2hBX8TdhMZliwxiH6CRsPZ8NbFjG/m0Y=;
+	s=arc-20240116; t=1755743406; c=relaxed/simple;
+	bh=vtxbRxJa9c4U1HtStAqXq2jJHGIiw9dYmM0a4sVQKy8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MiIfiWLIZEVp7DpZ78bf00msYHJWdL3g4qqix9kIt0I+WeUg3oi3iFeKVASDC8VgnBopBLWLc1d71TrFFr1VgW4clh2TEYEtp4nwXe1NiCUJzPDIu7k3cYlm9U8YSDA/JmuVjyPHT2Q9j7gHlztYL57NgDk4DZdkV2fwqQC5ZaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IGzV4jHL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB9E5C4CEE7;
-	Thu, 21 Aug 2025 02:30:00 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=pLQ1Za94VLaWLqnBSBQuKElH7f3qD6OaWriQleENL8MZCL92nK0vyA26hMzOg4ZnXwiqav6j7JcKG1US/gQTGNC2dd8qxB5UrKEVtiVC5Rj6ovu1Yq4R43Q00KpZSsKCKftuUBvbQsrdpIYzfGf0dLUoluFC4lMX3n7mFT3Gjpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SLG46SE2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF21CC19424;
+	Thu, 21 Aug 2025 02:30:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755743401;
-	bh=dKEH2vQ/xfw2hBX8TdhMZliwxiH6CRsPZ8NbFjG/m0Y=;
+	s=k20201202; t=1755743406;
+	bh=vtxbRxJa9c4U1HtStAqXq2jJHGIiw9dYmM0a4sVQKy8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=IGzV4jHLpY5yJRS9mNG9cybFACpeYVApgz86r92Ke+kYKG4xsux2UEDAQKKNk6/2C
-	 ZbSeahN0H8VUYkYN+L1KlgxB4PdJwfaXjeUHYmYfE9EBPz5pvkrn0kGW/pZZFH9cBZ
-	 u5y1uGbgOF7ha8ljKyBggvT61O563jJsXE5Dfr+XZ997lJE5Kch1I0bdL5eUDlb9Pe
-	 0nysd1CbaJysAu9lyuodv8Y8q+9TcGTakRS158goRQfxL6X140rKBZuvusSnw2EVCl
-	 5qa7odxCjNkbQhTldj9eEdt8VukqsE1dDfFw8tHO4WHfZAIvr0lQqf5H3poE4BgKLS
-	 6ALtPdiThIPJA==
+	b=SLG46SE2kZyN+Q2emboUI5XQCTIYTsF+PCltz5c1H912bo2uEFScD/qcgljOkc/ia
+	 k6EIifIwxSvW1L7a0FK3jcmF4nLcFtZc81pTJfBnbhUDXmvikoIaRAZ8TX0OnJEtfh
+	 7QbUzqzsa3YhlZNwSTxwEwQ5F3RRESr00xmJzhyo8AVnuZGdDQwoHBEPdoUQFlQjTT
+	 CHxTTLaIM+SkGi5ihMXOSLv830iWfge4cpOTW3bH/MnHUBUCFvAK40haTpaTEZWE1U
+	 3IRXV0n0blUQUyRiNNqo+FoTVAP8ndV6gX2yoY/GlezbKggG0DUjn3MGMLe/g1PwAq
+	 aO1epDzBleL2g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70BE2383BF4E;
-	Thu, 21 Aug 2025 02:30:11 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 94786383BF4E;
+	Thu, 21 Aug 2025 02:30:16 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,46 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 0/5][pull request] Intel Wired LAN Driver Updates
- 2025-08-15 (ice, ixgbe, igc)
+Subject: Re: [PATCH net-next v5] net: avoid one loop iteration in
+ __skb_splice_bits
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175574341026.480425.13944704403834523616.git-patchwork-notify@kernel.org>
-Date: Thu, 21 Aug 2025 02:30:10 +0000
-References: <20250819222000.3504873-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20250819222000.3504873-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org
+ <175574341524.480425.3327622284691937497.git-patchwork-notify@kernel.org>
+Date: Thu, 21 Aug 2025 02:30:15 +0000
+References: <20250819021551.8361-1-hept.hept.hept@gmail.com>
+In-Reply-To: <20250819021551.8361-1-hept.hept.hept@gmail.com>
+To: Pengtao He <hept.hept.hept@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, willemb@google.com,
+ almasrymina@google.com, kerneljasonxing@gmail.com, mhal@rbox.co,
+ ebiggers@google.com, aleksander.lobakin@intel.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 19 Aug 2025 15:19:54 -0700 you wrote:
-> For ice:
-> Emil adds a check to ensure auxiliary device was created before
-> tear down to prevent NULL a pointer dereference and adds an unroll error
-> path on auxiliary device creation to stop a possible memory leak.
+On Tue, 19 Aug 2025 10:15:51 +0800 you wrote:
+> If *len is equal to 0 at the beginning of __splice_segment
+> it returns true directly. But when decreasing *len from
+> a positive number to 0 in __splice_segment, it returns false.
+> The __skb_splice_bits needs to call __splice_segment again.
 > 
-> For ixgbe:
-> Jason Xing corrects a condition in which improper decrement can cause
-> improper budget value.
+> Recheck *len if it changes, return true in time.
+> Reduce unnecessary calls to __splice_segment.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2,1/5] ice: fix NULL pointer dereference in ice_unplug_aux_dev() on reset
-    (no matching commit)
-  - [net,v2,2/5] ice: fix possible leak in ice_plug_aux_dev() error path
-    (no matching commit)
-  - [net,v2,3/5] ixgbe: xsk: resolve the negative overflow of budget in ixgbe_xmit_zc
-    https://git.kernel.org/netdev/net/c/4d4d9ef9dfee
-  - [net,v2,4/5] ixgbe: fix ndo_xdp_xmit() workloads
-    https://git.kernel.org/netdev/net/c/f3d9f7fa7f5d
-  - [net,v2,5/5] igc: fix disabling L1.2 PCI-E link substate on I226 on init
-    https://git.kernel.org/netdev/net/c/1468c1f97cf3
+  - [net-next,v5] net: avoid one loop iteration in __skb_splice_bits
+    https://git.kernel.org/netdev/net-next/c/8f2c72f2252c
 
 You are awesome, thank you!
 -- 
