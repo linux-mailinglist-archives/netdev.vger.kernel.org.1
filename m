@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-215832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04E10B308BD
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 23:59:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4D35B308BE
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 23:59:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93C6B5C856C
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 21:59:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36034A28788
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 21:59:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 236FF2EACFF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B52712EB5C1;
 	Thu, 21 Aug 2025 21:58:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iLUV1xM9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G+VUnnNg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3D052EACF3
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 21:58:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DACE2EB5AB
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 21:58:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755813536; cv=none; b=DxFTu7aMo5gPvF0DA7Lfd47oF7Y155bnffjMhu1TezdBNCEXXI85Erv824AnDUeKxSBKM9Fj/Dn7Bryv0wOx6rnvqMvujV+1udi8PrNgAzla6kyH96XZ54aAZh1wwhqCYbVUoy8h6bpWkTRL9qPmy+EnEdONffOBzJq5Rfvl3Eg=
+	t=1755813536; cv=none; b=JefoUcZDEKuMw6sM3bPPChwi4SgwrYiPmrIf5wAzvhQHT+i4shdZnfxMw+n17CGzjBgA++EcILYFBZLBiX0n7b8K9JDrECTFtan5hek4prolIb45RBOu6MsunOjdQ41f7QxeNRwjTM0Kyh5bdgpbgFu64TUy0j0Q4coTM9cw0eY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1755813536; c=relaxed/simple;
-	bh=OLCW8HhikcCVBxtlZi4jGQmqzO79Z+OmHE83kbqrhAk=;
+	bh=rHT6baWng5Doep7tNskldJeg8sAI3DKafQW5NJRgTU4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JdexAm4i9G09sVk5XwbUgySxvI6o17fDVCcPaOcVNZIzt3yD+HCxfvld9fsRggs4cMmDMo89z8xu40+PLaNrAbNh6AmksyV/KDxNwiKbBy66uMhqpD8nJrz6mA+fOsjwHD7Q9R4BGCCEp5C/yuib94gzxOFD1OkhWCBhuEq+LWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iLUV1xM9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86CC9C4CEEB;
-	Thu, 21 Aug 2025 21:58:55 +0000 (UTC)
+	 MIME-Version; b=CQcxa6ZaQqVT8JXdLl+2bqS3FY+P9FcHpZd0v7ZeZuKkRZ9SWET2f/k0riqelqDsWOlsgIsL+VaoZQuSUm2yZC4vbKMCESnkb3UfDJaPVabf+4k6ftwcKqSJFHM+3QEEEuWXdgZnlCPlxwROJWwdashjLG++RPJleqJ3xKRVyIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G+VUnnNg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FC3BC4CEF4;
+	Thu, 21 Aug 2025 21:58:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755813535;
-	bh=OLCW8HhikcCVBxtlZi4jGQmqzO79Z+OmHE83kbqrhAk=;
+	s=k20201202; t=1755813536;
+	bh=rHT6baWng5Doep7tNskldJeg8sAI3DKafQW5NJRgTU4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iLUV1xM9eAvPPR2Nu5pYy08HhP/9cIp7blqYa3FqdFCbhY6s0KH8tTbXGydQIdF6L
-	 yUoU0Ik7dZYpFk/6f/o4vJuG10eUvxa6cN9CQMpr8JNjVOG40vbINe3sNXRRhB3BeN
-	 WSiZYCdcsoHfGKy/ZFKz9/YorCggEub2q/e37hCi63dLLIx5Qo2lIso1AlrJSNh5IJ
-	 XBt5IWYKtBjKvQ2iOSmeYQJFFH+I6kNTKzYBxJOfS1FkufjO9vb1VCcsiEq3GbT9Qp
-	 JzYHN1I3Bw57opkAKThtumTGLDWMAut/B6/uZY38QDfrqxd+N5Yx7QO7/rU/jCu4Xs
-	 t0MDdDyIg3sTA==
+	b=G+VUnnNguBwkbA6G3ComBtYVOmd0jH/kiIYYocTHvJCnaocYr/pXYKFVHv00l26KF
+	 DVkyh2idwNu9Bj9RgKhvZfKIVoKLsAC41QFIKlimCwY6zcUOUXV8ajl6I20hhW22kJ
+	 Bk6x+LVoI6tdY2ZFscFvBsxMojLLFHPbAyt0BDIjFtpSyLzX2s+bNCKzS6v8lSeEky
+	 3P0c8/sUFLBff45NKYar0tRjeztaq7xMn+sGBMAk9sF3wm545cq9LEVJ0LkrMxieS4
+	 ZhvjuPXzv2a6BDhQY5uuzawg5u20ukw+rm3X+NK/yGk+lgsoT2UPqP/pv7Puspa6zf
+	 vvB6IoGDosUeg==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -54,9 +54,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Parav Pandit <parav@nvidia.com>,
 	Mark Bloch <mbloch@nvidia.com>,
 	Adithya Jayachandran <ajayachandra@nvidia.com>
-Subject: [PATCH net-next 4/7] net/mlx5: E-Switch, Create acls root namespace for adjacent vports
-Date: Thu, 21 Aug 2025 14:58:36 -0700
-Message-ID: <20250821215839.280364-5-saeed@kernel.org>
+Subject: [PATCH net-next 5/7] net/mlx5: E-Switch, Register representors for adjacent vports
+Date: Thu, 21 Aug 2025 14:58:37 -0700
+Message-ID: <20250821215839.280364-6-saeed@kernel.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250821215839.280364-1-saeed@kernel.org>
 References: <20250821215839.280364-1-saeed@kernel.org>
@@ -70,47 +70,124 @@ Content-Transfer-Encoding: 8bit
 
 From: Saeed Mahameed <saeedm@nvidia.com>
 
-Use the new vport acl root namespace add/remove API to create the
-missing acl root name spaces per each new adjacent function vport.
+Register representors for adjacent vports dynamically when they are
+discovered. Dynamically added representors state will now be set to
+'REGISTERED' when the representor type was already registered,
+otherwise they won't be loaded.
 
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/esw/adj_vport.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ .../mellanox/mlx5/core/esw/adj_vport.c        | 10 ++++++
+ .../net/ethernet/mellanox/mlx5/core/eswitch.h |  5 +++
+ .../mellanox/mlx5/core/eswitch_offloads.c     | 33 ++++++++++++++++---
+ 3 files changed, 43 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/adj_vport.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/adj_vport.c
-index 0bb7f77cce1f..8e6edd4b6386 100644
+index 8e6edd4b6386..26f2ba6f665d 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/esw/adj_vport.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/adj_vport.c
-@@ -1,6 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
- // Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+@@ -85,10 +85,19 @@ static int mlx5_esw_adj_vport_create(struct mlx5_eswitch *esw, u16 vhca_id)
  
-+#include "fs_core.h"
- #include "eswitch.h"
+ 	mlx5_fs_vport_egress_acl_ns_add(esw->dev->priv.steering, vport->index);
+ 	mlx5_fs_vport_ingress_acl_ns_add(esw->dev->priv.steering, vport->index);
++	err = mlx5_esw_offloads_rep_add(esw, vport);
++	if (err)
++		goto err_free;
  
- enum {
-@@ -82,6 +83,9 @@ static int mlx5_esw_adj_vport_create(struct mlx5_eswitch *esw, u16 vhca_id)
- 	vport->adjacent = true;
- 	vport->vhca_id = vhca_id;
- 
-+	mlx5_fs_vport_egress_acl_ns_add(esw->dev->priv.steering, vport->index);
-+	mlx5_fs_vport_ingress_acl_ns_add(esw->dev->priv.steering, vport->index);
-+
  	mlx5_esw_adj_vport_modify(esw->dev, vport_num, MLX5_ADJ_VPORT_CONNECT);
  	return 0;
  
-@@ -99,6 +103,10 @@ static void mlx5_esw_adj_vport_destroy(struct mlx5_eswitch *esw,
++err_free:
++	mlx5_fs_vport_ingress_acl_ns_remove(esw->dev->priv.steering,
++					    vport->index);
++	mlx5_fs_vport_egress_acl_ns_remove(esw->dev->priv.steering,
++					   vport->index);
++	mlx5_esw_vport_free(esw, vport);
+ err_destroy:
+ 	mlx5_esw_destroy_esw_vport(esw->dev, vport_num);
+ 	return err;
+@@ -103,6 +112,7 @@ static void mlx5_esw_adj_vport_destroy(struct mlx5_eswitch *esw,
  		  vport_num, vport->vhca_id);
  	mlx5_esw_adj_vport_modify(esw->dev, vport_num,
  				  MLX5_ADJ_VPORT_DISCONNECT);
-+	mlx5_fs_vport_egress_acl_ns_remove(esw->dev->priv.steering,
-+					   vport->index);
-+	mlx5_fs_vport_ingress_acl_ns_remove(esw->dev->priv.steering,
-+					    vport->index);
- 	mlx5_esw_vport_free(esw, vport);
- 	/* Reset the vport index back so new adj vports can use this index.
- 	 * When vport count can incrementally change, this needs to be modified.
++	mlx5_esw_offloads_rep_remove(esw, vport);
+ 	mlx5_fs_vport_egress_acl_ns_remove(esw->dev->priv.steering,
+ 					   vport->index);
+ 	mlx5_fs_vport_ingress_acl_ns_remove(esw->dev->priv.steering,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+index 9f8bb397eae5..9fc020bc40cf 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+@@ -838,6 +838,11 @@ void mlx5_esw_vport_vhca_id_unmap(struct mlx5_eswitch *esw,
+ int mlx5_eswitch_vhca_id_to_vport(struct mlx5_eswitch *esw, u16 vhca_id, u16 *vport_num);
+ bool mlx5_esw_vport_vhca_id(struct mlx5_eswitch *esw, u16 vportn, u16 *vhca_id);
+ 
++void mlx5_esw_offloads_rep_remove(struct mlx5_eswitch *esw,
++				  const struct mlx5_vport *vport);
++int mlx5_esw_offloads_rep_add(struct mlx5_eswitch *esw,
++			      const struct mlx5_vport *vport);
++
+ /**
+  * struct mlx5_esw_event_info - Indicates eswitch mode changed/changing.
+  *
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+index fb03981d5036..d57f86d297ab 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+@@ -2378,7 +2378,20 @@ static int esw_offloads_start(struct mlx5_eswitch *esw,
+ 	return 0;
+ }
+ 
+-static int mlx5_esw_offloads_rep_init(struct mlx5_eswitch *esw, const struct mlx5_vport *vport)
++void mlx5_esw_offloads_rep_remove(struct mlx5_eswitch *esw,
++				  const struct mlx5_vport *vport)
++{
++	struct mlx5_eswitch_rep *rep = xa_load(&esw->offloads.vport_reps,
++					       vport->vport);
++
++	if (!rep)
++		return;
++	xa_erase(&esw->offloads.vport_reps, vport->vport);
++	kfree(rep);
++}
++
++int mlx5_esw_offloads_rep_add(struct mlx5_eswitch *esw,
++			      const struct mlx5_vport *vport)
+ {
+ 	struct mlx5_eswitch_rep *rep;
+ 	int rep_type;
+@@ -2390,9 +2403,19 @@ static int mlx5_esw_offloads_rep_init(struct mlx5_eswitch *esw, const struct mlx
+ 
+ 	rep->vport = vport->vport;
+ 	rep->vport_index = vport->index;
+-	for (rep_type = 0; rep_type < NUM_REP_TYPES; rep_type++)
+-		atomic_set(&rep->rep_data[rep_type].state, REP_UNREGISTERED);
+-
++	for (rep_type = 0; rep_type < NUM_REP_TYPES; rep_type++) {
++		if (!esw->offloads.rep_ops[rep_type]) {
++			atomic_set(&rep->rep_data[rep_type].state,
++				   REP_UNREGISTERED);
++			continue;
++		}
++		/* Dynamic/delegated vports add their representors after
++		 * mlx5_eswitch_register_vport_reps, so mark them as registered
++		 * for them to be loaded later with the others.
++		 */
++		rep->esw = esw;
++		atomic_set(&rep->rep_data[rep_type].state, REP_REGISTERED);
++	}
+ 	err = xa_insert(&esw->offloads.vport_reps, rep->vport, rep, GFP_KERNEL);
+ 	if (err)
+ 		goto insert_err;
+@@ -2430,7 +2453,7 @@ static int esw_offloads_init_reps(struct mlx5_eswitch *esw)
+ 	xa_init(&esw->offloads.vport_reps);
+ 
+ 	mlx5_esw_for_each_vport(esw, i, vport) {
+-		err = mlx5_esw_offloads_rep_init(esw, vport);
++		err = mlx5_esw_offloads_rep_add(esw, vport);
+ 		if (err)
+ 			goto err;
+ 	}
 -- 
 2.50.1
 
