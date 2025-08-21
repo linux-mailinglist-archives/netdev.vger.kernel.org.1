@@ -1,71 +1,103 @@
-Return-Path: <netdev+bounces-215576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F918B2F4FE
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 12:17:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3CDCB2F536
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 12:24:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C49A3B66B9
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 10:16:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04DA6600666
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 10:23:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 526F62F1FEB;
-	Thu, 21 Aug 2025 10:16:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E37922F8BEE;
+	Thu, 21 Aug 2025 10:22:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="qz2uZROb"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from server.couthit.com (server.couthit.com [162.240.164.96])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59FB72459C9
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 10:16:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F69C2F7477;
+	Thu, 21 Aug 2025 10:22:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755771368; cv=none; b=uaBmd/ZjXB1clVptAI9yim0bngRyljtTNlI2Kw10p30//gNOvuwTayzB/HLZr73O/yNerRgfwrY7yboE83lKTv2vhUlR5B/F9CA0xAsUux21bWzN/Xwck0OsEgzP6I0RMIlJeZVitEAx1TKhpx6zQh5sT7upjR6Iz/gf6KbJvXo=
+	t=1755771742; cv=none; b=C6bOmI7ZTEVVjimOgpZC28aJuRK+Iym5Nlof7tc7uX55PDa8GexWyNuPKGVqqrgWq3JQCzgBDlRxD/mClC2WDYCurMwZpz/FTdIQRfje4jJTbAd3KYKgD5V/x1ReQWEax7eGp4LVEdYTxwbpPaBMi5zrGH4moVBcSCgsVTwQ3+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755771368; c=relaxed/simple;
-	bh=GBwCNdsSPTgkl6+MZ/58UzFmAiMnptb1wekxJ049+9E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aI/8JAxW3A4YS0R8HwJLvnfKMbIYTxYgRp2qNuNjyPv7YTCPGYsyBDfqTSgPjpqvPpqcBLo+1MjxnXShaD0B0eQSjLxM86X3uzIF3iZUhLwYJNMYfu+wTtGZ1zGW4MZ1Wo+Vdh6RvoJ27bIKNftw0tn1rjlFDNNSE4tV66LfLCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1up2Kk-0001Yg-Jm; Thu, 21 Aug 2025 12:15:50 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1up2Ki-001OYX-0t;
-	Thu, 21 Aug 2025 12:15:48 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1up2Ki-00805O-0T;
-	Thu, 21 Aug 2025 12:15:48 +0200
-Date: Thu, 21 Aug 2025 12:15:48 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Nishanth Menon <nm@ti.com>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com, linux-doc@vger.kernel.org,
-	Michal Kubecek <mkubecek@suse.cz>, Roan van Dijk <roan@protonic.nl>
-Subject: Re: [PATCH net-next v4 2/5] ethtool: netlink: add
- ETHTOOL_MSG_MSE_GET and wire up PHY MSE access
-Message-ID: <aKbx1EoO0iWe2bMU@pengutronix.de>
-References: <20250821091101.1979201-1-o.rempel@pengutronix.de>
- <20250821091101.1979201-3-o.rempel@pengutronix.de>
- <20250821115830.3a231885@kmaincent-XPS-13-7390>
+	s=arc-20240116; t=1755771742; c=relaxed/simple;
+	bh=ke0Mxr0+ImBybm5HcDHtBUz1ItD/FtBXs42PEiftTSA=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=Le0cTAnlfnIHeznNRxgzxn1A41EKD4iy14PKSlWKcAfYy5xj+BuELLo0lt63vyJUT/492eYR7ezR571VT++8SV4uXzJa00OZ8+Av1SqplzimWSG1A71gZXpHIFPxQ7SABlpdtic8H9kRFRSrex9zBJ0uRBRBXGssTymAuMtrRF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=qz2uZROb; arc=none smtp.client-ip=162.240.164.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
+	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=MP8TZmTt1aO0rpPA1VlRUx+vlzVRWV5nJEBr4K4uwl0=; b=qz2uZRObXNze480DbNKjv5VPkW
+	YLo9HqggwTP8dZEICRHFewux8E07N0TBIU5w/8BTYnnffMxo8cFxSMQFe0SRy9oSEaxi33XTtOKtD
+	MXsL7ZvbvzkoMQYLm5d2nbOthDU6MHPR8kSuPTI3yQuzWT8GkpbXSWiUCvVqntGKF7aH2P4+q3DuV
+	adYAf3QzqqcjC1YUQOpxbnTpoKJ+Z+3WI1XiCM4BD0b4/U1AtS3fi294mb62emLGR83Ewao7/o8CF
+	df38ChQn9qVjHEm113uAnE4dV0i+WJSPVN53eKbVrxm3ofBKaJ/BUInqskoCT4DRcQBP/SPyl1qSX
+	Azz7/mmg==;
+Received: from [122.175.9.182] (port=17203 helo=zimbra.couthit.local)
+	by server.couthit.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.1)
+	(envelope-from <parvathi@couthit.com>)
+	id 1up2Qu-0000000H5N8-2MGl;
+	Thu, 21 Aug 2025 06:22:13 -0400
+Received: from zimbra.couthit.local (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTPS id 3ECC81781F9F;
+	Thu, 21 Aug 2025 15:52:06 +0530 (IST)
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id 159FC17823D4;
+	Thu, 21 Aug 2025 15:52:06 +0530 (IST)
+Received: from zimbra.couthit.local ([127.0.0.1])
+	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id vjuA_uO9NEBg; Thu, 21 Aug 2025 15:52:05 +0530 (IST)
+Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
+	by zimbra.couthit.local (Postfix) with ESMTP id B84611781F9F;
+	Thu, 21 Aug 2025 15:52:05 +0530 (IST)
+Date: Thu, 21 Aug 2025 15:52:05 +0530 (IST)
+From: Parvathi Pudi <parvathi@couthit.com>
+To: kuba <kuba@kernel.org>
+Cc: parvathi <parvathi@couthit.com>, danishanwar <danishanwar@ti.com>, 
+	rogerq <rogerq@kernel.org>, andrew+netdev <andrew+netdev@lunn.ch>, 
+	davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
+	pabeni <pabeni@redhat.com>, robh <robh@kernel.org>, 
+	krzk+dt <krzk+dt@kernel.org>, conor+dt <conor+dt@kernel.org>, 
+	ssantosh <ssantosh@kernel.org>, 
+	richardcochran <richardcochran@gmail.com>, 
+	m-malladi <m-malladi@ti.com>, s hauer <s.hauer@pengutronix.de>, 
+	afd <afd@ti.com>, jacob e keller <jacob.e.keller@intel.com>, 
+	horms <horms@kernel.org>, johan <johan@kernel.org>, 
+	m-karicheri2 <m-karicheri2@ti.com>, s-anna <s-anna@ti.com>, 
+	glaroque <glaroque@baylibre.com>, 
+	saikrishnag <saikrishnag@marvell.com>, 
+	kory maincent <kory.maincent@bootlin.com>, 
+	diogo ivo <diogo.ivo@siemens.com>, 
+	javier carrasco cruz <javier.carrasco.cruz@gmail.com>, 
+	basharath <basharath@couthit.com>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
+	netdev <netdev@vger.kernel.org>, 
+	devicetree <devicetree@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	ALOK TIWARI <alok.a.tiwari@oracle.com>, 
+	Bastien Curutchet <bastien.curutchet@bootlin.com>, 
+	pratheesh <pratheesh@ti.com>, Prajith Jayarajan <prajith@ti.com>, 
+	Vignesh Raghavendra <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
+	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
+	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>, 
+	mohan <mohan@couthit.com>
+Message-ID: <641170813.212171.1755771725482.JavaMail.zimbra@couthit.local>
+In-Reply-To: <20250820081713.2d243c55@kernel.org>
+References: <20250812110723.4116929-1-parvathi@couthit.com> <20250812133534.4119053-5-parvathi@couthit.com> <20250815115956.0f36ae06@kernel.org> <1969814282.190581.1755522577590.JavaMail.zimbra@couthit.local> <20250818084020.378678a7@kernel.org> <1714979234.207867.1755695297667.JavaMail.zimbra@couthit.local> <20250820081713.2d243c55@kernel.org>
+Subject: Re: [PATCH net-next v13 4/5] net: ti: prueth: Adds link detection,
+ RX and TX support.
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,105 +105,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250821115830.3a231885@kmaincent-XPS-13-7390>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - GC138 (Linux)/8.8.15_GA_3968)
+Thread-Topic: prueth: Adds link detection, RX and TX support.
+Thread-Index: 0Ddp1f2DlVt3suYoV83jhextCZCwAQ==
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.couthit.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: smtp@couthit.com
+X-Authenticated-Sender: server.couthit.com: smtp@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-Hello Kory,
+Hi,
 
-On Thu, Aug 21, 2025 at 11:59:14AM +0200, Kory Maincent wrote:
-> Hello Oleksij,
+> On Wed, 20 Aug 2025 18:38:17 +0530 (IST) Parvathi Pudi wrote:
+>> > On Mon, 18 Aug 2025 18:39:37 +0530 (IST) Parvathi Pudi wrote:
+>> >> +       if (num_rx_packets < budget && napi_complete_done(napi, num_rx_packets))
+>> >>                 enable_irq(emac->rx_irq);
+>> >> -       }
+>> >>  
+>> >>         return num_rx_packets;
+>> >>  }
+>> >> 
+>> >> We will address this in the next version.
+>> > 
+>> > Ideally:
+>> > 
+>> >	if (num_rx < budget && napi_complete_done()) {
+>> >		enable_irq();
+>> >		return num_rx;
+>> >	}
+>> > 
+>> > 	return budget;
+>> 
+>> However, if num_rx < budget and if napi_complete_done() is false, then
+>> instead of returning the num_rx the above code will return budget.
+>> 
+>> So, unless I am missing something, the previous logic seems correct to me.
+>> Please let me know otherwise.
 > 
-> Le Thu, 21 Aug 2025 11:10:58 +0200,
-> Oleksij Rempel <o.rempel@pengutronix.de> a écrit :
-> 
-> > Introduce the userspace entry point for PHY MSE diagnostics via
-> > ethtool netlink. This exposes the core API added previously and
-> > returns both configuration and one or more snapshots.
-> > 
-> > Userspace sends ETHTOOL_MSG_MSE_GET with an optional channel
-> > selector. The reply carries:
-> >   - ETHTOOL_A_MSE_CONFIG: scale limits, timing, and supported
-> >     capability bitmask
-> >   - ETHTOOL_A_MSE_SNAPSHOT+: one or more snapshots, each tagged
-> >     with the selected channel
-> > 
-> > If no channel is requested, the kernel returns snapshots for all
-> > supported selectors (per‑channel if available, otherwise WORST,
-> > otherwise LINK). Requests for unsupported selectors fail with
-> > -EOPNOTSUPP; link down returns -ENOLINK.
-> > 
-> > Changes:
-> >   - YAML: add attribute sets (mse, mse-config, mse-snapshot) and
-> >     the mse-get operation
-> >   - UAPI (generated): add ETHTOOL_A_MSE_* enums and message IDs,
-> >     ETHTOOL_MSG_MSE_GET/REPLY
-> >   - ethtool core: add net/ethtool/mse.c implementing the request,
-> >     register genl op, and hook into ethnl dispatch
-> >   - docs: document MSE_GET in ethtool-netlink.rst
-> > 
-> > The include/uapi/linux/ethtool_netlink_generated.h is generated
-> > from Documentation/netlink/specs/ethtool.yaml.
-> > 
-> > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> 
-> ...
-> 
-> > +MSE Configuration
-> > +-----------------
-> > +
-> > +This nested attribute contains the full configuration properties for the MSE
-> > +measurements
-> > +
-> > +  ===============================================  ======
-> > ====================
-> > +  ETHTOOL_A_MSE_CONFIG_MAX_AVERAGE_MSE             u32     max avg_mse scale
-> > +  ETHTOOL_A_MSE_CONFIG_MAX_PEAK_MSE                u32     max peak_mse scale
-> > +  ETHTOOL_A_MSE_CONFIG_REFRESH_RATE_PS             u64     sample rate (ps)
-> > +  ETHTOOL_A_MSE_CONFIG_NUM_SYMBOLS                 u64     symbols per sample
-> > +  ETHTOOL_A_MSE_CONFIG_SUPPORTED_CAPS              bitset  capability bitmask
-> > +  ===============================================  ======
-> > ==================== +
-> 
-> Why did you remove the kernel doc identifiers to phy_mse_config?
-> It was useful for the documentation.
-> 
-> > +MSE Snapshot
-> > +------------
-> > +
-> > +This nested attribute contains an atomic snapshot of MSE values for a
-> > specific +channel or for the link as a whole.
-> > +
-> > +  ===============================================  ======
-> > ======================
-> > +  ETHTOOL_A_MSE_SNAPSHOT_CHANNEL                   u32     channel enum value
-> > +  ETHTOOL_A_MSE_SNAPSHOT_AVERAGE_MSE               u32     average MSE value
-> > +  ETHTOOL_A_MSE_SNAPSHOT_PEAK_MSE                  u32     current peak MSE
-> > +  ETHTOOL_A_MSE_SNAPSHOT_WORST_PEAK_MSE            u32     worst-case peak
-> > MSE
-> > +  ===============================================  ======
-> 
-> Same question here for phy_mse_snapshot.
+> IIRC either way is fine, as long as num_rx doesn't go over budget.
 
-I had following warnings:
-Documentation/networking/ethtool-netlink:2499: ./include/linux/phy.h:3: WARNING: Duplicate C declaration, also defined at kapi:892. 
-Declaration is '.. c:struct:: phy_mse_config'. 
-Documentation/networking/ethtool-netlink:2515: ./include/linux/phy.h:3: WARNING: Duplicate C declaration, also defined at kapi:915.
-Declaration is '.. c:struct:: phy_mse_snapshot'
+Sure. We will address this in the next version.
 
-I didn't found proper was to solve it, so I removed them.
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Thanks and Regards,
+Parvathi.
 
