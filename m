@@ -1,138 +1,225 @@
-Return-Path: <netdev+bounces-215509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7AD4B2EE8C
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 08:47:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 192F4B2EE94
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 08:48:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 971007A75F0
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 06:45:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86D1D1C84A00
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 06:48:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B3A72E7193;
-	Thu, 21 Aug 2025 06:46:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1D982E8B94;
+	Thu, 21 Aug 2025 06:47:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Gv+Ew2Wg"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="JbydOtTb";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="3zNQ49Rl";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="JbydOtTb";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="3zNQ49Rl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99CBA2E266E
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 06:46:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8A292E88B2
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 06:47:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755758818; cv=none; b=FHSfT4FwYHTr0vBxRMYanGG3JP67xHRKF7+koEFPc2DfRBCPXMj6iIYQGlsWfvXAMtl5tmyIOXh+eLoTinSqW/xZ+NG4j+rV4c1nmRX0M418EBDknFMsWEyk6jxb/6FZ3xjmEBDIQpAedz2lOT53V9LJIMGQ7lwfplAUvWwepFo=
+	t=1755758836; cv=none; b=UR3rYqVK8B6T/8IFotn9sF6J92oqlXTjXpfKe/pou91FccnN/FCjU7Q4QxfwwFwkin3cq79EFV4sDA5budFG8JKFzOU5Ef/fx1CfI30KtoQq88PNmZJ3bpdR8WyKvLUuL6bUL/EjkFbXoFJD/eMnVp5JqxJQuHglN7oXbJsNrrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755758818; c=relaxed/simple;
-	bh=H7BBGLKirpU5HolAL8rEB2oiMX5QwfijH2Nuo9NDzn4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MbUGP6XvGH8tjOk6K1BNuOoG9yEKZMYteheRB7Z5/rB+aJM1lgmNgLWTOhY+oT6nh63arAbGL/VQLvnz/Vu2aXne5SKiO/nSvsL0qg+frtgtbn9m4K9TAgljf5pIY9OTVZE1TmTYFt/EZmY6yhIhtKAvw2PSn2Dte2YE81s1m24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Gv+Ew2Wg; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4b289cdc86aso6960831cf.1
-        for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 23:46:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755758815; x=1756363615; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gJAJ7T4OdE4Wo7UVTut/FgXgd+qXtwJZX26cmpP+9Zg=;
-        b=Gv+Ew2Wgw8p03DlUe3vULy/518oreBxDYxGf5vXvPGTO2HrHWNRZjPT3TcZJp54D4K
-         SiIH7+fewWb6NJT87JDPAnu/bc4GuPdwkXUr5CWflrM71bpMuvnqyxWhpxDNwv4NnDAw
-         FGfb55QLN86dtEWxr2i8gXRP6iCQ4IU+SXU8NOGYT1SOWgI52CFcbGu7lDIswgZzbPBI
-         RPfVjm9LeoDfC8N+VcVuC9nFjqdgIAJZ9CAa1TPJ0oKMSfvaEwIUeeutv56OeFUA8Ukq
-         7Sx6uolcsAL4txwPMQ4n1+Q3UxUjy6GumzbAR+aI6aZ/P+0xlvTOGQvOzNuWbCPk354s
-         EyhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755758815; x=1756363615;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gJAJ7T4OdE4Wo7UVTut/FgXgd+qXtwJZX26cmpP+9Zg=;
-        b=Gq+c7ANVjFzJzhftkxXbubIT+CI+5CznRQqJ32+fcso3vTm25D9SGgWIiPaQ2pPXAC
-         xQ+vfdi6WP9QAXw3vExZpm3D33Iehnq/08Usf4OzQ8YXetwTlZ/1yz0S4nwYSwnlKAEu
-         nHlSwFynfYhT9AFavjJtdOQ5y6Encatr6NaAg+OMLLKI5aDcygPer6Aff1hlMqKKYe5J
-         i7JGEY9vsbBpNRN8cHlFBHXFzRuVK+xHCOzLbPE3xRoacvw4DsO+pJX+BUWwRi7qRkNg
-         +QLTSx4Pt0ACSr3qNhIkh8Qy5g1XTa3nYTEcdXg+NWc2R3Fiu7LxDth04vv6cucUmm+p
-         pFZg==
-X-Forwarded-Encrypted: i=1; AJvYcCX3SSzlohrzpyyK6+GwCC+NpXPgv8AbHlIHk20szMc9AzYC+/oCLEFk+COM4ISbMsTcmyHelgo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJEsVNAjCEriG6U30RWZ6abrb3tjwnc/52SbVw3MRD8jxaEuUM
-	GxiA13NgDwehKUs6b20jxZ6oHuiUedN4KMtiL2BQISOtWWgw5Rb0mQ1WlIFL8lx7aiwt8Xg9dJI
-	UdWrOgUuUErXKQNiHyQTe0aADrGi7Dqb1LN5MOH4t
-X-Gm-Gg: ASbGncuP/3NACz1HVL1F9LltgTiwr75lsdKiaRj0QR55XVivId0TJOAlhY6qxq8iQso
-	enYXFagOaSVilMbfdP9WXtJqHN8EbhdhUYO8cHbQY3cWVP6CEui1XqAZnetIu3X51W7WhzPp5Dh
-	TiHK6gfK0hofEA5g8f7jVylaR10wYzad5AVEbl5XThlcmdD5eVSgBl0kt+dJtvIt9Nn7/SFNmba
-	wdW2HzA2IoaiPHg67+E+osnCQ==
-X-Google-Smtp-Source: AGHT+IG4hOMoxFdBkBFcM8/uYXHPW9MVJg9Cp5fjNdQq/+sN43vFnBcAQ8qygEh59gogJDlu+VP2kE2LcirAWSRc52k=
-X-Received: by 2002:a05:622a:38e:b0:4a9:c2e1:89c4 with SMTP id
- d75a77b69052e-4b29fe8f32dmr11780401cf.47.1755758815125; Wed, 20 Aug 2025
- 23:46:55 -0700 (PDT)
+	s=arc-20240116; t=1755758836; c=relaxed/simple;
+	bh=TjXWvJKB+2qBJCYpvpMyHm9kWT+TXRQtLMuQMwKQW/E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PpTnAE/Aq/yzKxZHD9mNRYhhmy1gIgc9wR0VUyPxNmTq7RHmdJauw4dVU+Kw3p0KS5fz3G4HsGQnAfAECCQjDJGzKIDffNImE/HwpxLRsDm5lhDPI8sBo18t2kNqF107zNakWSAuWIxbbvJpnum8ziOBUoV8/PD2esOU0iqrXA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=JbydOtTb; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=3zNQ49Rl; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=JbydOtTb; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=3zNQ49Rl; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 169561F7C7;
+	Thu, 21 Aug 2025 06:47:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1755758833; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fLRhyqFm8SiIehFhfynIEPF7Ujw9moFt7tZyPdJKd68=;
+	b=JbydOtTbDFmLuEqIpOQfYA/bUuMS4guyS0mz4Hsasw+nERRNzfwZbcbAVOXqkL7ChoqqUS
+	EQNp3OC42Ei2hyJ/uVSVwuMuEnxinulyvfn6Kf5/44gIEO8HcRSB8i+I9/4MGH2Jns0ek7
+	owYjlyDgZQdOoyR+XBffD5f2Zpey18s=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1755758833;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fLRhyqFm8SiIehFhfynIEPF7Ujw9moFt7tZyPdJKd68=;
+	b=3zNQ49Rlga5TKHqwFMLXoy11oYEGWjJI3FtYxtYdbHf6eAp6m1ZHy2Hf55baNfXDzJait/
+	2kKWkOR9TBXtDqCg==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=JbydOtTb;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=3zNQ49Rl
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1755758833; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fLRhyqFm8SiIehFhfynIEPF7Ujw9moFt7tZyPdJKd68=;
+	b=JbydOtTbDFmLuEqIpOQfYA/bUuMS4guyS0mz4Hsasw+nERRNzfwZbcbAVOXqkL7ChoqqUS
+	EQNp3OC42Ei2hyJ/uVSVwuMuEnxinulyvfn6Kf5/44gIEO8HcRSB8i+I9/4MGH2Jns0ek7
+	owYjlyDgZQdOoyR+XBffD5f2Zpey18s=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1755758833;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fLRhyqFm8SiIehFhfynIEPF7Ujw9moFt7tZyPdJKd68=;
+	b=3zNQ49Rlga5TKHqwFMLXoy11oYEGWjJI3FtYxtYdbHf6eAp6m1ZHy2Hf55baNfXDzJait/
+	2kKWkOR9TBXtDqCg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8841913867;
+	Thu, 21 Aug 2025 06:47:12 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id tiZDH/DApmg0dwAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 21 Aug 2025 06:47:12 +0000
+Message-ID: <1bc0eb81-3ccf-479e-924d-f0672daf5fab@suse.de>
+Date: Thu, 21 Aug 2025 08:47:12 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250821061540.2876953-1-kuniyu@google.com> <20250821061540.2876953-3-kuniyu@google.com>
-In-Reply-To: <20250821061540.2876953-3-kuniyu@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 20 Aug 2025 23:46:42 -0700
-X-Gm-Features: Ac12FXwr3sQPTIXNJ0msSi3yBxdEqzap9vM6lAieFTAG1zqfoiu-twXD2jpP0jk
-Message-ID: <CANn89iL+D-OcDgxWYVP4vufeuOESrz=jy-wknM=Bbb7qVZoJuw@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 2/7] tcp: Save __module_get() for TIME_WAIT sockets.
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, 
-	David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC v2 1/1] net/tls: allow limiting maximum record size
+To: Wilfred Mallawa <wilfred.opensource@gmail.com>, chuck.lever@oracle.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, donald.hunter@gmail.com, borisp@nvidia.com,
+ john.fastabend@gmail.com
+Cc: alistair.francis@wdc.com, dlemoal@kernel.org,
+ kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250808072358.254478-3-wilfred.opensource@gmail.com>
+ <20250808072358.254478-5-wilfred.opensource@gmail.com>
+ <a9ea0abf-1f11-4760-80b8-6a688e020093@suse.de>
+ <90cc9b71e356a94e593b66614bbb28a542ca204c.camel@gmail.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <90cc9b71e356a94e593b66614bbb28a542ca204c.camel@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: 169561F7C7
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FREEMAIL_TO(0.00)[gmail.com,oracle.com,davemloft.net,google.com,kernel.org,redhat.com,nvidia.com];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	MIME_TRACE(0.00)[0:+];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Score: -3.01
 
-On Wed, Aug 20, 2025 at 11:16=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.c=
-om> wrote:
->
-> From: Kuniyuki Iwashima <kuniyu@amazon.com>
->
-> __module_get() in inet_twsk_alloc() was necessary to prevent
-> unloading tw->tw_prot, which is used in inet_twsk_free().
->
-> DCCP has gone, and TCP is built-in, so the pair is no longer needed.
->
-> ULPs also do not need it because
->
->  * kTLS and XFRM_ESPINTCP restore sk_prot before close()
->  * MPTCP is built-in
->  * SMC uses TCP as is
->
-> , but using tw_prot without module_get() would be error prone to
-> future ULP addition.
->
-> Now we can use kfree() without the slab cache pointer thanks to SLUB.
+On 8/21/25 08:18, Wilfred Mallawa wrote:
+> On Mon, 2025-08-18 at 08:31 +0200, Hannes Reinecke wrote:
+>>
+> [snip]
+>>> --- a/include/uapi/linux/handshake.h
+>>> +++ b/include/uapi/linux/handshake.h
+>>> @@ -54,6 +54,7 @@ enum {
+>>>    	HANDSHAKE_A_DONE_STATUS = 1,
+>>>    	HANDSHAKE_A_DONE_SOCKFD,
+>>>    	HANDSHAKE_A_DONE_REMOTE_AUTH,
+>>> +	HANDSHAKE_A_DONE_RECORD_SIZE_LIMIT,
+>>>    
+>>>    	__HANDSHAKE_A_DONE_MAX,
+>>>    	HANDSHAKE_A_DONE_MAX = (__HANDSHAKE_A_DONE_MAX - 1)
+>>> diff --git a/net/handshake/genl.c b/net/handshake/genl.c
+>>> index f55d14d7b726..44c43ce18361 100644
+>>> --- a/net/handshake/genl.c
+>>> +++ b/net/handshake/genl.c
+>>> @@ -16,10 +16,11 @@ static const struct nla_policy
+>>> handshake_accept_nl_policy[HANDSHAKE_A_ACCEPT_HAN
+>>>    };
+>>>    
+>>>    /* HANDSHAKE_CMD_DONE - do */
+>>> -static const struct nla_policy
+>>> handshake_done_nl_policy[HANDSHAKE_A_DONE_REMOTE_AUTH + 1] = {
+>>> +static const struct nla_policy
+>>> handshake_done_nl_policy[HANDSHAKE_A_DONE_RECORD_SIZE_LIMIT + 1] =
+>>> {
+>>
+> Hey Hannes,
+> 
+> I did consider using HANDSHAKE_A_DONE_MAX, but wasn't sure if the
+> existing convention is there for some reason. But I can switch over if
+> you think that is best.
+> 
+I guess, no reason, just an oversight.
 
-Right, but kmem_cache_free() has extra debug checks (SLAB_CONSISTENCY_CHECK=
-S):
-we check the object was indeed allocated from a precise cache.
+>> Shouldn't that be 'HANDSHAKE_A_DONE_MAX'?
+>>
+>>>    	[HANDSHAKE_A_DONE_STATUS] = { .type = NLA_U32, },
+>>>    	[HANDSHAKE_A_DONE_SOCKFD] = { .type = NLA_S32, },
+>>>    	[HANDSHAKE_A_DONE_REMOTE_AUTH] = { .type = NLA_U32, },
+>>> +	[HANDSHAKE_A_DONE_RECORD_SIZE_LIMIT] = { .type = NLA_U32,
+>>> },
+>>>    };
+>>>    
+>>>    /* Ops table for handshake */
+>>> @@ -35,7 +36,7 @@ static const struct genl_split_ops
+>>> handshake_nl_ops[] = {
+>>>    		.cmd		= HANDSHAKE_CMD_DONE,
+>>>    		.doit		= handshake_nl_done_doit,
+>>>    		.policy		=
+>>> handshake_done_nl_policy,
+>>> -		.maxattr	= HANDSHAKE_A_DONE_REMOTE_AUTH,
+>>> +		.maxattr	=
+>>> HANDSHAKE_A_DONE_RECORD_SIZE_LIMIT,
+>>
+>> HANDSHAKE_A_DONE_MAX - 1?
+> 
+> Shouldn't it be `HANDSHAKE_A_DONE_MAX`? Unless the existing
+> `HANDSHAKE_A_DONE_REMOTE_AUTH` is incorrect?
+> 
+Yes, you are right.
 
-I would prefer leaving this in place.
-
-Such a conversion could be done globally if you think about it, no
-need for hundreds of patches.
-
-static inline void kmem_cache_free(struct kmem_cache *s, void *x)
-{
-      kfree(x);
-}
-
-
->
-> Let's use kfree() in inet_twsk_free() and remove 2 atomic ops
-> for each connection.
->
-
-Where are you seeing the atomic ops exactly ?
-
-TCP is builtin, so .owner is NULL.
+Cheers,
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
