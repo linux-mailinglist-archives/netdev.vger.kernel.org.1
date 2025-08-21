@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-215494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71DDAB2EE01
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 08:16:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC465B2EE02
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 08:16:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38C2B5E37D6
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 06:16:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BB271725D6
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 06:16:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 417B825BEFD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF1B8261B82;
 	Thu, 21 Aug 2025 06:16:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xWKCAy89"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="o1JmzJXl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B5D5202F65
-	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 06:16:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4001C35971
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 06:16:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755756964; cv=none; b=DsQLD39WPwlFIHhyxHYllOI8BGin/hP3yh9Bu2cagrd/IbAOIrLLmL/21zfCcnErku5T9zyChdiv8BD2j2/g0B3rB2SIfVq2RZ6PRFtRfQsLShGwWd+fKI+gYNV1PPW8r97ATe65IMcgawD5dNoBei45FE2AYTU/u3HTtYlNyTM=
+	t=1755756964; cv=none; b=nDTElTDTrtewUymg1gT7udv8+F/pvj5Ah3O6nQFABgd/0bI++3hdjBsVewH1ib+evlK3txye/2r1J6RCfDOfwSu4pvvqiYkrsWWm9ZTT1GbD0rIjmDE4oSapnog7QzkrYIUYZX4R8TpCn6ijJzwGMb91ORyTHAKPhzfd8Ie/PlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1755756964; c=relaxed/simple;
-	bh=jNt+BRSLiYaRYmlf5PTTkDSeypF9mO8p3JY29k73nKA=;
+	bh=8Qq+gIzConoqMsa75/6iSyrJeOg/gPNUXNIyYWk2Rd8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Yz4o7z2FjTaaIJPu6GyunH/IUklcwyfOCmgt/yV3FdHMTDn/LxAEU7AGBzYeAilT91km24cjeATkOZ+kdELtXQNyDBgD2OrCrNs756geKVbbAmJJmZLhF80qAcVYG4VwrWITFaO0XI877ruuetmxTqQrPcam4qhI5juOyzg5LcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xWKCAy89; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=HYg/V12RqBdOHhTNyiW/CKeX6mfXZg0XkBLuWoUyfPiw2y6MeoDFQlySrr+KJKPuFDYn5TDvoqAjcvZBTV/qhM7pj7tskxB2qEZQQ6ZdK5W+2Tc2wusLWXqFwHdQ0xggvbD7xaky9sfZ1GwO2+c02c/y1QswhQi/i8ZSDLZDY2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=o1JmzJXl; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-24457ef983fso14596855ad.0
-        for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 23:16:00 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3232677ad11so692161a91.1
+        for <netdev@vger.kernel.org>; Wed, 20 Aug 2025 23:16:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755756960; x=1756361760; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1755756962; x=1756361762; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+Kq12/VJgz0F1P8yx5kAentqBRItKKz7EMP7VUA5hH0=;
-        b=xWKCAy89VeV5aSIkAry0N6sJbWr1EuVvHLTiKkBz20m5ABQ9PYaRX2qjovKqrtMk/F
-         ePTeKrTwnHSN2qaZDogpx+JiB3gLWazP2jye2FgYpv6TiWnP8DYvZlMjM/0DPFkxvIag
-         Q0z6cIkMXbmO8IOtMkU69eH8/OCpbneE/fcUsoMkdAfi5oLb1MxuE9MKYMrwEDeBLOM2
-         eBOUDKXf1XTs6PsyX9EEHaXar/TEQOtmEvpgnDTGCTF6WZtly9oU8Muc/uNVd3uCU0U1
-         K3z7Uk3U5aJH/OYJ7s1wGP9gP+cl8KMnvIb7ULC/c0Ro0fq8NlObzSVa5LZyByA5cZEw
-         MbRQ==
+        bh=KOtXyIkvDrXeaTPTWhHuojgRCoBVdIX4dpR+xrdU4/A=;
+        b=o1JmzJXlwFYXvjubdTtRVgb6SDYxVIXnqMGAnbm9yyVThGT0/MawJyQ8R2NlMRp52f
+         QjDSJfLB445GtOQpyQ/gaZtgLbC1yrTmRVF61dGJPGw322+YdNzF22OghtGrjf+O9aYv
+         3skjyUi/9NkeJWgaRr2UnEPBD2mnx9N6/4ARBi6Y3pl3nSX48EgsrqOp1dssnbvIFCdL
+         tpB6R53qyRtebLsTrpLHwF0eyfQt+OUrdSOIRph0B9qfaa1A9Io9ncYepwG2XQZnKmD4
+         GA0Z/WmbMctU0NAFPttC39S6GtEM6N00y31R6KslaF9dyIb2yOzXrD1wuux23S0dx/tv
+         7ZiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755756960; x=1756361760;
+        d=1e100.net; s=20230601; t=1755756962; x=1756361762;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+Kq12/VJgz0F1P8yx5kAentqBRItKKz7EMP7VUA5hH0=;
-        b=mUyXS8KVdhtt3j/f2ZzbtTRQdrXciN7Sz3e54eDtP7df2ZfaWPB1Eqarbnrp9OmZ/I
-         9LYDfoCVy5J1OeZbmpXH608pvoDBIh0clGblouYVz3WpR5Oo4UnOqfM5uty+dzmWVV90
-         N4jFR9MwvAXEPDjbW8Vc8n/XeKHDPsQIARZl/yutTZLGbxJxi69OhuLM4pEwOYEyqf+R
-         cBCLE30ENQWc8smcZYNBxIIducikmUl+3IM01ZZQwbJ9silC7407eVzM6jTZvzFTQHHH
-         +THq3/zkXLn9bxfYTUTGi4byz0A3zgZMBMnWy6JSbBIHPMuFBooOpGHfWUnW7Wyi5Pgd
-         YFnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXiqLiOrDOTRIGGwcs+OCS4/E8LD+XshQIYDMveezVvfD7rfI3qyrl8PK71ENLebVLB2OYmgfg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YweOK5pQh0XlpG8wUmS3M5RVvfXLActJ32DFhTU7aldfyUoJbnN
-	SIOxKFK94Ylsx2Pjy6K45uZQ4SILqjpGe8/AWnFg7p8pvu6CUGEuXDqzOp4WO3Bhn6VZLsIM98f
-	2saK3/g==
-X-Google-Smtp-Source: AGHT+IEvHvyXOkXaap06fo0y429q5U9asUbr6I2uFfkRsNshJxJyHeTgfQ3wEbaOd7+HOP+PMwTy/+U/6As=
-X-Received: from plxe3.prod.google.com ([2002:a17:902:ef43:b0:23f:d929:167b])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:246:b0:235:eefe:68f4
- with SMTP id d9443c01a7336-245fedb418emr17842075ad.29.1755756960407; Wed, 20
- Aug 2025 23:16:00 -0700 (PDT)
-Date: Thu, 21 Aug 2025 06:15:12 +0000
+        bh=KOtXyIkvDrXeaTPTWhHuojgRCoBVdIX4dpR+xrdU4/A=;
+        b=HLKoGpl03xEVu1mZgUSIkP1KwOKH22cKy5Y8S5SggqwXX+JQ3JH4uZjCUH8C7gju8N
+         UrcjbR5OIDIB2rD2CbV3fXt7mB5GmhBlvfCUKLkIfGAls/Bqg2y1OH/XbYh4zkAI1kQD
+         ypUzJleUQ3Ypbit9Zb3GbK4bkPqiA2BUkT546qiS26nWbv6mGy0gkyproATB6U2atuCJ
+         Wv3EaLt8FwYf4BVYQmIyAsvlRfAaIrWF3Ru3v4e6pQV+SqqZSH8uQUitgVQzqA5fFRdt
+         M1+6QY3WeW4Px2ff6RE3qs+XMOsBKXBNF0sqiBjDYV5GQYGtQAW/oAjiah+j6DBWTEMu
+         2Uxw==
+X-Forwarded-Encrypted: i=1; AJvYcCW4nDQR952DQArwdAal/sNa9tJnzzX1hJf0nAMGtVSsSY3p2VN2GUh6R61qZMR/ULMD7frT4eY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUKIkIRs8cuOs7vPZ5zIL1++KsUJKq0gBGYqjpu7NFfRpg9WV+
+	hPMGGjYlzBMOwK/BpOTQ6skSfpPah0oTMc5wCCR5S+0A9Nk1ZT1YEdu7icgccnMPgqnlzHcdcJP
+	WnNzr+g==
+X-Google-Smtp-Source: AGHT+IEiB0Gx9T2peCI88U05qaHFshMqtj8EH1/DPg9utbSspBxePjIoGrQKBIlxhowQe+K02/KCfXuhkCI=
+X-Received: from pjbee11.prod.google.com ([2002:a17:90a:fc4b:b0:312:187d:382d])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:38c6:b0:31e:9cdb:32df
+ with SMTP id 98e67ed59e1d1-324ed09777dmr2106993a91.10.1755756962520; Wed, 20
+ Aug 2025 23:16:02 -0700 (PDT)
+Date: Thu, 21 Aug 2025 06:15:13 +0000
 In-Reply-To: <20250821061540.2876953-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250821061540.2876953-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.51.0.rc1.193.gad69d77794-goog
-Message-ID: <20250821061540.2876953-2-kuniyu@google.com>
-Subject: [PATCH v1 net-next 1/7] tcp: Remove sk_protocol test for tcp_twsk_unique().
+Message-ID: <20250821061540.2876953-3-kuniyu@google.com>
+Subject: [PATCH v1 net-next 2/7] tcp: Save __module_get() for TIME_WAIT sockets.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -87,49 +87,76 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-Commit 383eed2de529 ("tcp: get rid of twsk_unique()") added
-sk->sk_protocol test in  __inet_check_established() and
-__inet6_check_established() to remove twsk_unique() and call
-tcp_twsk_unique() directly.
+__module_get() in inet_twsk_alloc() was necessary to prevent
+unloading tw->tw_prot, which is used in inet_twsk_free().
 
-DCCP has gone, and the condition is always true.
+DCCP has gone, and TCP is built-in, so the pair is no longer needed.
 
-Let's remove the sk_protocol test.
+ULPs also do not need it because
+
+ * kTLS and XFRM_ESPINTCP restore sk_prot before close()
+ * MPTCP is built-in
+ * SMC uses TCP as is
+
+, but using tw_prot without module_get() would be error prone to
+future ULP addition.
+
+Now we can use kfree() without the slab cache pointer thanks to SLUB.
+
+Let's use kfree() in inet_twsk_free() and remove 2 atomic ops
+for each connection.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- net/ipv4/inet_hashtables.c  | 3 +--
- net/ipv6/inet6_hashtables.c | 3 +--
- 2 files changed, 2 insertions(+), 4 deletions(-)
+ include/net/inet_timewait_sock.h | 1 -
+ net/ipv4/inet_timewait_sock.c    | 7 +------
+ 2 files changed, 1 insertion(+), 7 deletions(-)
 
-diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-index ceeeec9b7290..fef71dd72521 100644
---- a/net/ipv4/inet_hashtables.c
-+++ b/net/ipv4/inet_hashtables.c
-@@ -579,8 +579,7 @@ static int __inet_check_established(struct inet_timewait_death_row *death_row,
- 		if (likely(inet_match(net, sk2, acookie, ports, dif, sdif))) {
- 			if (sk2->sk_state == TCP_TIME_WAIT) {
- 				tw = inet_twsk(sk2);
--				if (sk->sk_protocol == IPPROTO_TCP &&
--				    tcp_twsk_unique(sk, sk2, twp))
-+				if (tcp_twsk_unique(sk, sk2, twp))
- 					break;
- 			}
- 			goto not_unique;
-diff --git a/net/ipv6/inet6_hashtables.c b/net/ipv6/inet6_hashtables.c
-index 76ee521189eb..dbb10774764a 100644
---- a/net/ipv6/inet6_hashtables.c
-+++ b/net/ipv6/inet6_hashtables.c
-@@ -305,8 +305,7 @@ static int __inet6_check_established(struct inet_timewait_death_row *death_row,
- 				       dif, sdif))) {
- 			if (sk2->sk_state == TCP_TIME_WAIT) {
- 				tw = inet_twsk(sk2);
--				if (sk->sk_protocol == IPPROTO_TCP &&
--				    tcp_twsk_unique(sk, sk2, twp))
-+				if (tcp_twsk_unique(sk, sk2, twp))
- 					break;
- 			}
- 			goto not_unique;
+diff --git a/include/net/inet_timewait_sock.h b/include/net/inet_timewait_sock.h
+index 67a313575780..500a0478370f 100644
+--- a/include/net/inet_timewait_sock.h
++++ b/include/net/inet_timewait_sock.h
+@@ -48,7 +48,6 @@ struct inet_timewait_sock {
+ #define tw_tx_queue_mapping	__tw_common.skc_tx_queue_mapping
+ #define tw_rx_queue_mapping	__tw_common.skc_rx_queue_mapping
+ #define tw_hash			__tw_common.skc_hash
+-#define tw_prot			__tw_common.skc_prot
+ #define tw_net			__tw_common.skc_net
+ #define tw_daddr        	__tw_common.skc_daddr
+ #define tw_v6_daddr		__tw_common.skc_v6_daddr
+diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
+index 875ff923a8ed..024463a3e696 100644
+--- a/net/ipv4/inet_timewait_sock.c
++++ b/net/ipv4/inet_timewait_sock.c
+@@ -73,10 +73,8 @@ static void inet_twsk_kill(struct inet_timewait_sock *tw)
+ 
+ void inet_twsk_free(struct inet_timewait_sock *tw)
+ {
+-	struct module *owner = tw->tw_prot->owner;
+ 	twsk_destructor((struct sock *)tw);
+-	kmem_cache_free(tw->tw_prot->twsk_prot->twsk_slab, tw);
+-	module_put(owner);
++	kfree(tw);
+ }
+ 
+ void inet_twsk_put(struct inet_timewait_sock *tw)
+@@ -206,7 +204,6 @@ struct inet_timewait_sock *inet_twsk_alloc(const struct sock *sk,
+ 		tw->tw_hash	    = sk->sk_hash;
+ 		tw->tw_ipv6only	    = 0;
+ 		tw->tw_transparent  = inet_test_bit(TRANSPARENT, sk);
+-		tw->tw_prot	    = sk->sk_prot_creator;
+ 		atomic64_set(&tw->tw_cookie, atomic64_read(&sk->sk_cookie));
+ 		twsk_net_set(tw, sock_net(sk));
+ 		timer_setup(&tw->tw_timer, tw_timer_handler, 0);
+@@ -216,8 +213,6 @@ struct inet_timewait_sock *inet_twsk_alloc(const struct sock *sk,
+ 		 * timewait socket.
+ 		 */
+ 		refcount_set(&tw->tw_refcnt, 0);
+-
+-		__module_get(tw->tw_prot->owner);
+ 	}
+ 
+ 	return tw;
 -- 
 2.51.0.rc1.193.gad69d77794-goog
 
