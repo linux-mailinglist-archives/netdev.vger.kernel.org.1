@@ -1,101 +1,79 @@
-Return-Path: <netdev+bounces-215838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 674DAB3098E
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 00:48:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6C69B3099C
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 00:50:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0971AA38E8
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 22:44:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA405188EE0B
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 22:48:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28A112EBBBA;
-	Thu, 21 Aug 2025 22:39:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C33D2C234F;
+	Thu, 21 Aug 2025 22:48:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=free.fr header.i=@free.fr header.b="q0Jz9M/s"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jWyLF1qE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp4-g21.free.fr (smtp4-g21.free.fr [212.27.42.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3770B2EBDC4;
-	Thu, 21 Aug 2025 22:39:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.27.42.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F237262F;
+	Thu, 21 Aug 2025 22:48:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755815978; cv=none; b=t+/5Mo8woZIM4N8Qg9hWyr47pJAMaB9fnU3tfzb6lDZrbzL2y9HPOlZQGTBt5miXYMP0NKlb3Asd90/aHMl1Yv3wRTZVlKivkntOJDVKOpCCwsNB26ZNz5rMIN8sccsxnok2e6pYIDJcM7072pExTDfIdaav1L+5SeZuMobseUM=
+	t=1755816500; cv=none; b=K6HDBfd9FYQu7PJ4f0ovzlcCslc1sSZ0UgCSArL9zbs5d/XUYd60s7Hlc5+e/cG2ed3ar7B9WeEIV0Gr/1mBNPs8KXwyxiIiJG+mWdHqBfNmDmAZQpM1DK3Ki29h3EbAsskk5z8SfvfstSSOePUhvsW3yqYkSnQLJa/jlY7RVTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755815978; c=relaxed/simple;
-	bh=VQDnQI7JXoVAaOTdgqbZmWufqmscrmlNXYg7GFGXTJg=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=qYWcHTh9LC5O9ok8G+zGRZNJPRYgzh/m/VlgeTJuMXRONEPFXKLnAhBcKXT/8df4HdsElJ08R16mBnncaJA6jUTqX12cZIzL2rfI/0UrBw5xAvvDwaqZaE5zwQeAbrCceIlvhSRvX5yR0fTURBJ3IMB1ZlbJ4ngWu1CEmls3Fbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=free.fr; spf=pass smtp.mailfrom=free.fr; dkim=pass (2048-bit key) header.d=free.fr header.i=@free.fr header.b=q0Jz9M/s; arc=none smtp.client-ip=212.27.42.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=free.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=free.fr
-Received: from [44.168.19.11] (unknown [86.195.82.193])
-	(Authenticated sender: f6bvp@free.fr)
-	by smtp4-g21.free.fr (Postfix) with ESMTPSA id D634A19F576;
-	Fri, 22 Aug 2025 00:39:28 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=free.fr;
-	s=smtp-20201208; t=1755815973;
-	bh=VQDnQI7JXoVAaOTdgqbZmWufqmscrmlNXYg7GFGXTJg=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=q0Jz9M/sO4aRmVrenhxinwabmHTZkabVYf3lxHm9BGC8wSibHRSJ1PtVI5UlexYJa
-	 ThkmSCdOOOhMs/6taMWbQMATUmWY9KeGV653mz822vQNbq9Yx6Uh8nxZrCmE3xLtYY
-	 VzBESPrdlLWmHv/BGuVwm5LRyXu12LHb6xUY4X4oULN6PEHSnvNJNcy5zA0ukbSLPa
-	 bV7/MpnSf2yJNpI5b/qHAOQRyyb/mAP/L3y5fc20ThWbVCD0Z9TqVFZ3xs/FEfepj8
-	 wI5kw1Np4q34VCu6BdpwQy7ikJcNRdZruO0XqzTgx0cNHCmvepBmEmklsT3Gz+vlEF
-	 WRlmsg+G3Hidw==
-Message-ID: <6c525868-3e72-4baf-8df4-a1e5982ef783@free.fr>
-Date: Fri, 22 Aug 2025 00:39:27 +0200
+	s=arc-20240116; t=1755816500; c=relaxed/simple;
+	bh=GAoYZ6fe/lNuQbQEQ/DgRYtPaaokBTN5+U3oFlTLZYs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=u63Zl9iRSNUcWr4mM/Km/C+vgF/p9vtPP+JWzlhYA//genJaHVyKSOuhIVOQI18QaAdXlT3M0of/3gkoHREX1j+YVDzDqRgys4zY3R4+eHHWtOR7n/vG/cn7ujlqZjcJulFucNaWj51pDtnE+wYLKC7hk/pclaerLYslcDKcYik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jWyLF1qE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EDF0C4CEEB;
+	Thu, 21 Aug 2025 22:48:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755816500;
+	bh=GAoYZ6fe/lNuQbQEQ/DgRYtPaaokBTN5+U3oFlTLZYs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jWyLF1qEUslq/3OJPS0payjaWR9d0qbaDgoQ13CHhvNH5xTBcbR+7P0lu2ZFEXl47
+	 +RvRtRnzto1xhRZ3pGo0xkHC4BurQLuB8hymaJzi2W+YXTCiO28KOfreTNK6E58iAE
+	 HiBftcbymiyBZtAGV+6rsVIMJ2n8vM2jP0TPb6+04rSNHBuuKNUXvfGm8oMdiuqV2r
+	 xf/SNJljosIi7ctYLI3RuyE2PKMj49WkPwMn8xGorUxukTq810M4qWwAGBH8oARUn9
+	 k22HO1R5jFGVyI6Q+lDX4U9UExAT3QSeU51EfrYnDXY+gnBNuGZyQPMjTD/CaFUTQ4
+	 Ws3y3uatgfPqA==
+Date: Thu, 21 Aug 2025 15:48:19 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
+ Jason Gunthorpe <jgg@nvidia.com>, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org, Parav Pandit <parav@nvidia.com>
+Subject: Re: [GIT PULL][mlx5-next 0/4] Cached vhca id and adjacent function
+ vports
+Message-ID: <20250821154819.249d6140@kernel.org>
+In-Reply-To: <20250815194901.298689-1-saeed@kernel.org>
+References: <20250815194901.298689-1-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [ROSE] [AX25] 6.15.10 long term stable kernel oops
-From: F6BVP <f6bvp@free.fr>
-To: linux-hams@vger.kernel.org, netdev <netdev@vger.kernel.org>
-Cc: Dan Cross <crossd@gmail.com>, Folkert van Heusden
- <folkert@vanheusden.com>, David Ranch <dranch@trinnet.net>
-References: <11c5701d-4bf9-4661-ad8a-06690bbe1c1c@free.fr>
- <fff0b3eb-ea42-4475-970d-30622dc25dca@free.fr>
- <e92e23a7-1503-454f-a7a2-cedab6e55fe2@free.fr>
- <acd04154-25a5-4721-a62b-36827a6e4e47@free.fr>
- <CAEoi9W6kb0jZXY_Tu27CU7jkyx5O1ne5FOgvYqCk_GFBvnseiw@mail.gmail.com>
- <11212ddf-bf32-4b11-afee-e234cdee5938@free.fr>
- <4e4c9952-e445-41af-8942-e2f1c24a0586@free.fr>
- <90efee88-b9dc-4f87-86f2-6ab60701c39f@free.fr>
-Content-Language: en-US
-In-Reply-To: <90efee88-b9dc-4f87-86f2-6ab60701c39f@free.fr>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-As I already reported mkiss never triggered any Oops kernel panic up to 
-linux-6.14.11.
+On Fri, 15 Aug 2025 12:48:57 -0700 Saeed Mahameed wrote:
+> To: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>
 
-In that version I put a number of printk inside of mkiss.c in order to 
-follow the normal behaviour and content outside and during FPAC 
-functionning especially when issuing a connect request.
+> Subject: [GIT PULL][mlx5-next 0/4] Cached vhca id and adjacent function vports
 
-On the opposite an FPAC connect request systematically triggers a kernel 
-panic with linux-6.15.2 and following kernels.
+> Hi Jakub, Jason,
 
-In 6.14.11 I observe that when mkiss runs core/dev is never activated 
-i.e. neither __netif_receive_skb nor __netif_receive_skb_one_core.
+Sorry for not pulling this easier. FWIW, I completely missed your
+intent, IDK if Jason read your mind right. The series is tagged *for*
+mlx5-next, and To: yourself and Leon. It totally looked like you're
+planning to apply this to your mlx5-next tree and send it out as a PR
+later. I missed the "Hi Jakub, Jason" :$
 
-These functions appear in kernel 6.15.2 panics after mkiss_receive_buf.
-
-One can guess that mkiss_receive_buf() is triggering something wrong in 
-kernel 6.15.2 and all following kernels up to net-next.
-
-The challenge to locate the bug is quite difficult as I did not find the 
-way to find relevant code differences between both kernels in absence of 
-inc patch...
-
-I sincerely regret not knowing how to go further.
-
-Bernard,
-hamradio f6bvp /ai7bg
+If in doubt please don't put any tree designation in the subject
+prefix.
 
