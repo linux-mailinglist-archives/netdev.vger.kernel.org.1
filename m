@@ -1,65 +1,61 @@
-Return-Path: <netdev+bounces-215479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BB12B2EBED
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 05:29:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64C54B2EBF6
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 05:33:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 19BB81BA83B4
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 03:29:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3EC68683B21
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 03:33:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 033B12D877F;
-	Thu, 21 Aug 2025 03:29:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="n770zwqp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 071942E5B24;
+	Thu, 21 Aug 2025 03:33:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F710154423;
-	Thu, 21 Aug 2025 03:29:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 012454317D
+	for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 03:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755746962; cv=none; b=UzmTAn8aO3PKl/qPimXmfB5JqfGzFXIMRC743UVCyTrinUc8bGPNazQfVstlfiJv6Gxqhf3Zm5fDwo4+jGPKfo2NQ34HDYD5vP5Xtx13sNl/PdVOsusw2nkMC+FLGCnonspg7Tl8PDNTt8A6zU2rtD2Jm7BG5hVJ7rkoiJmIeDA=
+	t=1755747189; cv=none; b=qQAtyHxB7PMxW8R2rlPSU8OccUZ2ywrwJiDZaGXku/cqlqHSeimCPyyJ/dEZufwlVi0kO5MyD7NDLa4ZG/nXMMzF1TX3KQHUJMFr/V9t7Gd/lsZUEPpI4fMVPDY+uMm7mcvIcaQ0nuoCdmudndKYR/lycLsOYiZ/8+XeDBs0y/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755746962; c=relaxed/simple;
-	bh=o/6DwDIBIQ99ty/EvsXfHyYUXQzK7nE+7rAwt9N+GAc=;
+	s=arc-20240116; t=1755747189; c=relaxed/simple;
+	bh=4LFcMDfo/zbUYfGKlorYccLY9PwrEh1kqHEyrvJizI0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qTmyv+6vHYIrQwzl5gt85ICT/dFhSt7+m3HNgeAMijUaIzPN6yh8TluBxD/IGscnX4I6GsPjBjGnNg0KHgGJa+DmrgcHya+At4sYa3W/NuVaGqdR2LiOjc0oCNZ31Y37882on9EOrQmbyO123nsoSltYaEZbyKoZ2aczL5XgcDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=n770zwqp; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=JMKhB6kyFAD9gcjFCdXdpxoe38SI+rRjE5ZThTi319s=; b=n770zwqpcYGva4kIGC9MvrAH9x
-	+5ktFCSgT07R4ixJ3NKUvx9y/UevpOX+abIC6IRqYMnKms6kNJ0/n4YbGH0ZlUp3w/mo69W9ayb10
-	tGccdhSOuI9KS7j6KmdHzkW8zmUMsryCLkBj0dsXkvRucc0KS+MuEjORdemT9CFs/wLw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uovz8-005P7g-5F; Thu, 21 Aug 2025 05:29:06 +0200
-Date: Thu, 21 Aug 2025 05:29:06 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Shenwei Wang <shenwei.wang@nxp.com>
-Cc: Wei Fang <wei.fang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	Stanislav Fomichev <sdf@fomichev.me>, imx@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-imx@nxp.com
-Subject: Re: [PATCH net-next] net: fec: add the Jumbo frame support
-Message-ID: <2aecd34f-259f-4660-9df7-3d7a320b51d1@lunn.ch>
-References: <20250820222308.994949-1-shenwei.wang@nxp.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=jlNd0a10if+MbRab3m1SdbEwUme4rQREBdxyAb291WV0zvxOflRy5IRm+H6IFG6sopTuV6MQfsVkWfpuwy91ia8+m72PDtTWtp6Jw333+e1U9ss6IMcFwTUN1ZcxpCn26LXwPRTx4bllR2g7frD/IlMCH50qoWze/cIxofJ/hmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.204.34.129
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: zesmtpsz8t1755747174t1aeda2f3
+X-QQ-Originating-IP: B3BZVKqW3jX07jw0veN9lGFzHwGmjdz36KID2sMYiu0=
+Received: from localhost ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Thu, 21 Aug 2025 11:32:52 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 9983899224186391793
+Date: Thu, 21 Aug 2025 11:32:53 +0800
+From: Yibo Dong <dong100@mucse.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
+	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
+	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, richardcochran@gmail.com,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 4/5] net: rnpgbe: Add basic mbx_fw support
+Message-ID: <7FCBCC1F18AFE0F3+20250821033253.GA1754449@nic-Precision-5820-Tower>
+References: <20250818112856.1446278-1-dong100@mucse.com>
+ <20250818112856.1446278-5-dong100@mucse.com>
+ <39262c11-b14f-462f-b9c0-4e7bd1f32f0d@lunn.ch>
+ <458C8E59A94CE79B+20250821024916.GF1742451@nic-Precision-5820-Tower>
+ <47aa140e-552b-4650-9031-8931475f0719@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,89 +64,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250820222308.994949-1-shenwei.wang@nxp.com>
+In-Reply-To: <47aa140e-552b-4650-9031-8931475f0719@lunn.ch>
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: Nc4Sv39/e83WJDUNsElZp8L6cF3bf/DZtWDpbGsH/jb93GdE5axLPAJM
+	b5OomXvJB8eiNca08p5ljvk95tC4E0wplmtL4OF7L31gukDaNPY9apCtEanBgPXxnJF0rPu
+	TpBOt7KJ/ylHDH6s3ch2HqPIu9Sfe6HGMYiLKW2WhFMEIEaHMWHVOau4vFPhiEJda/ozTui
+	ycNNGykK7H6GfXoc0JLjPCTlkL0T/jqD+p5k13LP54YGnWZLxRq+RIdX8g4D10DmRyarN9e
+	wlToIT/bz66G/20rzZj+pDFdwYujy/vIkm7Xnl4zxx73K++31j6VQque8/MbPa/f3ipbjKD
+	PaxtM7R6xUY0isDVaPR49NsuRum0ZN7pen3VN16d/eYxVNU/oYh072qYIfjTOOK6NladTgc
+	v+G/612+yQ/yB5hjZZLs8amDFRh/fAihk09wmONEFzfhCVM4PmibkKL9TI0GtgOuMh2rCW+
+	lcaqc1XD5EIqdNaYhqhNQ3LuukZThXMx1W/SJDhXdpjL19lV9SP0IycjNdYqzDGLsZ9nlKH
+	Bj0sy2Tw9GGs6D2awtfWlFxrSKYG84uBrXrE6oYBoJjrFGjEqJzPxl6OiqNHoKkXXYAP151
+	s6w7UwXDrp1L/pol7PucOXacdB2mIEM2VbdhlIIpMqZli6dzvqGQ729Xc3IWzHoj4ITjCU5
+	6iNoCo5jPrg9JVVxxrGg+Z63arjJ+DKlw20MMRNU2Uf8DmtAy3EKzOA3H834XWcqHPbNQ92
+	pK5pr4BjX2VqBgWLrUyT/ki0XLNfuxTs05SlDYCDmJefuadJF7FDJeGG9FlItLpB6dwyLrg
+	6tWFrVQUWzFNP5sLw7/xUqE4Aervl49wSp46QRChIHrxpQX0MFiwp4+RIEtPv04Ku0y0GQj
+	lnrKmmqxg4SHKujulJbStJMlJ7u7QvTSOIAJvC4xJLnIExjDuKD0t4EB5n0flyzfEPv3QE7
+	o+9/C1xxd0CjFOiJgNIj9Q66Tt8n1eQ72U5UoTDVgB1yceOVeFyRb86GkOByCLKDu9pRM4X
+	QnFkQmIbPevK/GNugbajx9aqv7p8PKs6675IEfuQ==
+X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
+X-QQ-RECHKSPAM: 0
 
-On Wed, Aug 20, 2025 at 05:23:08PM -0500, Shenwei Wang wrote:
-> Certain i.MX SoCs, such as i.MX8QM and i.MX8QXP, feature enhanced
-> FEC hardware that supports Ethernet Jumbo frames with packet sizes
-> up to 16K bytes.
+On Thu, Aug 21, 2025 at 05:13:27AM +0200, Andrew Lunn wrote:
+> > 'mucse_mbx_fw_post_req' is designed can be called by 'cat /sys/xxx',
 > 
-> When Jumbo frames are enabled, the TX FIFO may not be large enough
-> to hold an entire frame. To accommodate this, the FIFO should be
-> configured to operate in cut-through mode, which allows transmission
-> to begin once the FIFO reaches a certain threshold.
+> It is pretty unusual for ethernet drivers to export data in /sys,
+> except via standard APIs, like statistics, carrier, address, opstate
+> etc.  I don't know how well the core will handle EINTR. It is not
+> something most drivers do. -ETIMEDOUT is more likely when the firmware
+> has crashed and does not respond in time.
+> 
+> Do you have any operations which take a long time when things are
+> working correctly?
+> 
+> 	Andrew
+> 
 
-Please could you break this patch up into smaller parts, doing
-refactoring before adding jumbo support.
+'Update firmware operation' will take long time, maybe more than
+10s. If user use 'ethtool -f' to update firmware, and ^C before done?
+If ^C before mucse_write_mbx, return as soon as possible. If after mucse_write_mbx,
+wait until fw true response.
 
->  fec_restart(struct net_device *ndev)
->  {
->  	struct fec_enet_private *fep = netdev_priv(ndev);
-> -	u32 rcntl = OPT_FRAME_SIZE | FEC_RCR_MII;
-> +	u32 rcntl = FEC_RCR_MII;
->  	u32 ecntl = FEC_ECR_ETHEREN;
->  
-> +	rcntl |= (fep->max_buf_size << 16);
->  	if (fep->bufdesc_ex)
->  		fec_ptp_save_state(fep);
->  
-> @@ -1191,7 +1199,7 @@ fec_restart(struct net_device *ndev)
->  		else
->  			val &= ~FEC_RACC_OPTIONS;
->  		writel(val, fep->hwp + FEC_RACC);
-> -		writel(PKT_MAXBUF_SIZE, fep->hwp + FEC_FTRL);
-> +		writel(fep->max_buf_size, fep->hwp + FEC_FTRL);
->  	}
->  #endif
->  
-> @@ -1278,8 +1286,16 @@ fec_restart(struct net_device *ndev)
->  	if (fep->quirks & FEC_QUIRK_ENET_MAC) {
->  		/* enable ENET endian swap */
->  		ecntl |= FEC_ECR_BYTESWP;
-> -		/* enable ENET store and forward mode */
-> -		writel(FEC_TXWMRK_STRFWD, fep->hwp + FEC_X_WMRK);
-> +
-> +		/* When Jumbo Frame is enabled, the FIFO may not be large enough
-> +		 * to hold an entire frame. In this case, configure the interface
-> +		 * to operate in cut-through mode, triggered by the FIFO threshold.
-> +		 * Otherwise, enable the ENET store-and-forward mode.
-> +		 */
-> +		if (fep->quirks & FEC_QUIRK_JUMBO_FRAME)
-> +			writel(0xF, fep->hwp + FEC_X_WMRK);
-> +		else
-> +			writel(FEC_TXWMRK_STRFWD, fep->hwp + FEC_X_WMRK);
->  	}
->  
->  	if (fep->bufdesc_ex)
-
-Part of why i ask for this to be broken up is that OPT_FRAME_SIZE has
-just disappeared. It has not moved into an if/else, just gone.
-
-#if defined(CONFIG_M523x) || defined(CONFIG_M527x) || defined(CONFIG_M528x) || \
-    defined(CONFIG_M520x) || defined(CONFIG_M532x) || defined(CONFIG_ARM) || \
-    defined(CONFIG_ARM64)
-#define	OPT_FRAME_SIZE	(PKT_MAXBUF_SIZE << 16)
-#else
-#define	OPT_FRAME_SIZE	0
-#endif
-
-and
-
- * 2048 byte skbufs are allocated. However, alignment requirements
- * varies between FEC variants. Worst case is 64, so round down by 64.
- */
-#define PKT_MAXBUF_SIZE		(round_down(2048 - 64, 64))
-
-It is unclear to me where all this alignment code has gone. And does
-jumbo have the same alignment issues?
-
-A smaller patch just refactoring this bit of code can have a good
-commit message explaining what is going on. Some for other parts of
-the code. You want lots if small, obviously correct, well described
-patches which are easy to review.
-
-    Andrew
-
----
-pw-bot: cr
 
