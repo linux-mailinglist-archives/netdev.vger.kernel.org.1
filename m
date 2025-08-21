@@ -1,125 +1,114 @@
-Return-Path: <netdev+bounces-215481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EDCFB2EBF8
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 05:33:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0779DB2EBF9
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 05:33:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03B07563684
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 03:33:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DABEC1BC7B6A
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 03:34:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E120255F31;
-	Thu, 21 Aug 2025 03:33:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA77E278150;
+	Thu, 21 Aug 2025 03:33:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.co.jp header.i=@amazon.co.jp header.b="ioDcxWm0"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Hmv4e2X6"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.162.73.231])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF6623B627;
-	Thu, 21 Aug 2025 03:33:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.162.73.231
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8CD62E7BC6;
+	Thu, 21 Aug 2025 03:33:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755747210; cv=none; b=qi0HNdX6OQMBRfmMavRzzfsZ8lI5G0UqdB+BNAomvYrLgIkAs3X2dz4IXZbe5v8hmjNQe3hDyI+at3PFbyKqPlgo+tLqfz8FrxrRBblFqJAsdfhQoknd0AE4qLiuEKyaq1pM26dsanMPmw6BE4u967qDIXnmQZnHy3hhgNZ1X3k=
+	t=1755747216; cv=none; b=qCxUWBGRCvXFwjarXQQxK9oa5AiHUKwM/BmtlgwgR0gVzle2I7L/7l3ksX14I8a3GuCHeXVyXecxwbsv40I92Fpxed0rzgfByxENLbUd+vE1vy2VPZB9MlQ84E4Q5BsgBULA8ZX+hqQmwgLGvy9oUgTllr7rQAlHHtOowmMMxqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755747210; c=relaxed/simple;
-	bh=WaD4SyykvecHRFYhHEWU1tycvPdcpJMpNhWcg88J00g=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ef31yqk5VdQmouggZdTbfnp9cEUIVS6W3pDB0TNHnh/QX2TYGtDHyZZ7Fm1zwhFzVz5QpOkS/ozop3CrRBvj3jFmCqd8CqnrKRQGzF83mnoGmc2SM6d2vHmHCoh4LGmxLWi04o0cqjxNYR0PbOC4CmWWu1HWto8meeM0J6qrZuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.jp; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.co.jp header.i=@amazon.co.jp header.b=ioDcxWm0; arc=none smtp.client-ip=35.162.73.231
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.jp; i=@amazon.co.jp; q=dns/txt;
-  s=amazoncorp2; t=1755747208; x=1787283208;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=WAr9KE4qh//VrC5EMHXIx5UXaXb+9qQ0MAe6NtPqRSg=;
-  b=ioDcxWm0YoPuEq8uoiX8p7dQv7o9H4yJrgzVcf4pJNsv0uOYMFQjotw8
-   THut5zidaFda8JHrR9fLvwA0JWNi90spiXjicgciKSnCkfuJZT+RkTAnt
-   2QQlIal7beaf+DVxY3h/vvFK2t5nNqasJmXlEBqcff9Jd9TTAapeQorog
-   /43roOv7/8pOdIhPDoPZ/XQsmP4PdD8ytbJRDbTTG7VA4vrfhrvN01hWG
-   GZyeqeNnVXYCpe8OqOvIaCnfemtLW1zDCKCQvFRowx2VzPRm7cpMYZ3XU
-   DfwHOfEx2QUyTWC1TOYG1m5G/Jn9kzOKVVEA9WW6tMUDjQmaOLc1SUhCC
-   g==;
-X-CSE-ConnectionGUID: NzXspl3sR6qZnM9QyAmwmg==
-X-CSE-MsgGUID: rjRNutl8SIGbpwPnzlym1Q==
-X-IronPort-AV: E=Sophos;i="6.17,306,1747699200"; 
-   d="scan'208";a="1395644"
-Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
-  by internal-pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2025 03:33:28 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:8110]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.45.64:2525] with esmtp (Farcaster)
- id aa9240ab-990b-4ff6-8ae6-bafa39a186b9; Thu, 21 Aug 2025 03:33:28 +0000 (UTC)
-X-Farcaster-Flow-ID: aa9240ab-990b-4ff6-8ae6-bafa39a186b9
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
- Thu, 21 Aug 2025 03:33:27 +0000
-Received: from 80a9974c3af6.amazon.com (10.37.245.11) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
- Thu, 21 Aug 2025 03:33:25 +0000
-From: Takamitsu Iwai <takamitz@amazon.co.jp>
-To: <kuniyu@google.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <enjuk@amazon.com>,
-	<horms@kernel.org>, <kuba@kernel.org>, <linux-hams@vger.kernel.org>,
-	<mingo@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<takamitz@amazon.co.jp>, <tglx@linutronix.de>
-Subject: Re: Re: [PATCH v1 net 2/3] net: rose: convert 'use' field to refcount_t
-Date: Thu, 21 Aug 2025 12:33:17 +0900
-Message-ID: <20250821033317.68056-1-takamitz@amazon.co.jp>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250821023822.2820797-1-kuniyu@google.com>
-References: <20250821023822.2820797-1-kuniyu@google.com>
+	s=arc-20240116; t=1755747216; c=relaxed/simple;
+	bh=24BH5Rkal4AnYqqQtj74V/4hPzsLJlrlUZGruS4Dg3g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sCRdU5qC96Ql6SmPK/tGMLPr1eYwwWWe6t1R/oX5C8gzbDYJnu7ZhtVFRl3oUJuXmSZOd6TQyUROLN6mHiUBTNL5SQ5eIcbkhAn70nuD/tpOlC2rTPBDAnJcu1k+wFmsv1A0bajgjMclspA98o8mdVgxSMIboBvQWHp97nUf47Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Hmv4e2X6; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=NhecIOpybuUkmVRn+RV36PWvwdJyuFnrfxzmzDFBna8=; b=Hmv4e2X61kfRt4AKpoofe646kq
+	+OlNDQvtDGPXi8oms7OYJ/6oEIjEzhjsJL7A5gesXFfDlcKge+jHv9dBJY7j3XTHjRIhzF4LDk1xe
+	gSVBZl88aCPwpRJU9bXmBTeLW2ajoPbGtz6VNWFLA7d3SqcqG1hM3eowksQ0wkAClWoE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uow3G-005P9K-PC; Thu, 21 Aug 2025 05:33:22 +0200
+Date: Thu, 21 Aug 2025 05:33:22 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Yijie Yang <yijie.yang@oss.qualcomm.com>
+Cc: Vinod Koul <vkoul@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, stable+noautosel@kernel.org
+Subject: Re: [PATCH v4 2/6] net: stmmac: Inverse the phy-mode definition
+Message-ID: <f93d325f-2c04-49ab-ae92-b87ae88ab49d@lunn.ch>
+References: <20250819-qcs615_eth-v4-0-5050ed3402cb@oss.qualcomm.com>
+ <20250819-qcs615_eth-v4-2-5050ed3402cb@oss.qualcomm.com>
+ <80a60564-3174-4edd-a57c-706431f2ad91@lunn.ch>
+ <f467aade-e604-448d-b23e-9b169c30ff2e@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D040UWB001.ant.amazon.com (10.13.138.82) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f467aade-e604-448d-b23e-9b169c30ff2e@oss.qualcomm.com>
 
-> On 2025/08/21, 11:38, "Kuniyuki Iwashima" <kuniyu@google.com <mailto:kuniyu@google.com>> wrote:
-> From: Takamitsu Iwai <takamitz@amazon.co.jp <mailto:takamitz@amazon.co.jp>>
-> Date: Thu, 21 Aug 2025 02:47:06 +0900
-> > @@ -874,8 +874,6 @@ static int rose_connect(struct socket *sock, struct sockaddr *uaddr, int addr_le
-> >
-> > rose->state = ROSE_STATE_1;
-> >
-> > - rose->neighbour->use++;
-> > -
+On Thu, Aug 21, 2025 at 10:22:05AM +0800, Yijie Yang wrote:
 > 
 > 
-> This is replaced by rose_neigh_hold() in rose_get_neigh(),
-> then rose_neigh_put() needs to be placed in error paths in
-> rose_connect() (and rose_route_frame()).
+> On 2025-08-20 00:20, Andrew Lunn wrote:
+> > >   static int ethqos_rgmii_macro_init(struct qcom_ethqos *ethqos, int speed)
+> > >   {
+> > >   	struct device *dev = &ethqos->pdev->dev;
+> > > -	int phase_shift;
+> > > +	int phase_shift = 0;
+> > >   	int loopback;
+> > >   	/* Determine if the PHY adds a 2 ns TX delay or the MAC handles it */
+> > > -	if (ethqos->phy_mode == PHY_INTERFACE_MODE_RGMII_ID ||
+> > > -	    ethqos->phy_mode == PHY_INTERFACE_MODE_RGMII_TXID)
+> > > -		phase_shift = 0;
+> > > -	else
+> > > +	if (ethqos->phy_mode == PHY_INTERFACE_MODE_RGMII_ID)
+> > >   		phase_shift = RGMII_CONFIG2_TX_CLK_PHASE_SHIFT_EN;
+> > 
+> > Does this one setting control both RX and TX delays? The hardware
+> > cannot support 2ns delay on TX, but 0ns on RX? Or 2ns on RX but 0ns on
+> > TX?
+> > 
+> 
+> This setting is only for Tx delay. Rx delays are taken care separately with
+> DLL delays.
 
-Thank you for reviewing my patch.
+If this is only for Tx delays, why is it also not used for
+PHY_INTERFACE_MODE_RGMII_TXID?
 
-You are right and I have also confirmed that we need to place
-rose_neigh_put in error paths to prevent reference count leaks.
-I will check error paths and resubmit the updated patch.
+It is simpler to just let the PHY add the delays, the PHY drivers get
+this right, are well tested, and just work. MAC drivers often get
+delays wrong.
 
-> > rose_write_internal(sk, ROSE_CALL_REQUEST);
-> > rose_start_heartbeat(sk);
-> > rose_start_t1timer(sk);
-> [...]
-> > @@ -680,6 +679,7 @@ struct rose_neigh *rose_get_neigh(rose_address *addr, unsigned char *cause,
-> > for (i = 0; i < node->count; i++) {
-> > if (node->neighbour[i]->restarted) {
-> > res = node->neighbour[i];
-> > + rose_neigh_hold(node->neighbour[i]);
-> > goto out;
-> > }
-> > }
-> >
-
-Sincerely
-Takamitsu.
+	Andrew
 
