@@ -1,170 +1,138 @@
-Return-Path: <netdev+bounces-215604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B1A7B2F7BD
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:20:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 692BCB2F7C1
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 14:21:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 522286023EC
-	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 12:20:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69529AA6E99
+	for <lists+netdev@lfdr.de>; Thu, 21 Aug 2025 12:20:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D00A52D3744;
-	Thu, 21 Aug 2025 12:19:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE16D3101B5;
+	Thu, 21 Aug 2025 12:19:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aLSUgr4O"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="UQcg3t+6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 466CD311958;
-	Thu, 21 Aug 2025 12:19:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E26C30FF09;
+	Thu, 21 Aug 2025 12:19:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755778794; cv=none; b=qubJwRV0gJ+jXvlfs2VY2RSIvUCB9FfB71VWUjxSGRoPH6ErJ3r9EeSIhibSzIo92OLMzZKOrmWHXS0RD6c1b+/bTPzEHGqdElgngSmSVm/9rMPbIAi+i6t/8DgbHDpAz60GoXl9Z67kfT9EHoVGDeD85hugCzHXK4rG00VkUvQ=
+	t=1755778790; cv=none; b=Mi4TBBUAVu2UNi3NZEgroQ62GIMAmevFEysnYOkuP/jyfdBcYMoQMr7/oX1XN++KqtrYHH3N69K8ezzH5NQBtP2tZcMNso+qgKuXkbs8X2g4kLfPPbzbK9TouCDZ4LIMSC4tiD2Z0/mSz1KiDhiPUNpft+fOY2oo6nI4fusBm9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755778794; c=relaxed/simple;
-	bh=f4ZXLQraKeUWdE6NkgCXifJOFIulzraXRRO58aCqkrc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HouUPkb/w0qz4Kz/nL93fVf3ZcIdn5xhUkikyyh9vcmKs5O0MPy1bPSwzKInoPtIR38/u5VmuI67rPUJu6o7bIoMfEKSmmi6KgffzjLbwChSCZydp/FOP/nsoLYFjjUhXN+rnK19Wj5a5wmSQyKsCVGQJP14PoBI6fl1zqWwCqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aLSUgr4O; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-323267b7dfcso890661a91.1;
-        Thu, 21 Aug 2025 05:19:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755778792; x=1756383592; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vaKgXrxF6SpHaQWaJmXdkgOltLQX8upg3py3VLODSZA=;
-        b=aLSUgr4OHrD1cwP0AkR5aE7hudMmYLad8zTFRr1Vm4DgM6Fe/yrKFPuVKDDYUbneGb
-         ILJDi6nL7fbvc+OJJdiEbSEGhFrDaT55tu4A8D2Ide9js/13sX3lE8bmx7C9iNZkekV2
-         b5iZjg1Wy1yMrjuEUcv+ritT12Vn4aU8Jk7BIOXo6UC2cL3sopGkks8plZBV43OdKVP5
-         9/1TnQ+IQjkjQ8aj9tIMf14OWpXS05KssRAROkmMTTVdQ4r/KdxPNAA8waiDVrDRnHRH
-         bKFC96ERm9MsIDsVWPNON+v4OV+pl4p/o9FNs8F8XKd5+yHBnkkUqMnw9jTbHEz0eFne
-         u06A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755778792; x=1756383592;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vaKgXrxF6SpHaQWaJmXdkgOltLQX8upg3py3VLODSZA=;
-        b=o4538js1SnWb2P24gC5f8ieDjXK7BodZRNAQkKFjkQjx4wfriA18WSI80ouM+kXtfw
-         z4qrYu/iD9hBoytCkgaP3jVDv20FXeKY7OqSXDo5h7cXQsUgTGYeXqZHdVGLK3sWZfC1
-         j4adrenvbtmVizOZ9/rfi6gjPvIvzdayCbRjjZTR7lFDGpbKGF018YaTXncwwtLqWmS6
-         2c3LBCUNv9KTLjsV+MJW5hj7gEMhUi32xhwdhiwcWCpB0IYSD70fMl3EPCXgBwgK5Cqt
-         NUoKaU6H2ze0zdFE1t+HqEHYm7YI1+9keg4Z3Eo4wJY8BYbIxiQreM2TtKjYaFnsmbYA
-         4w3g==
-X-Forwarded-Encrypted: i=1; AJvYcCVj80m3vQfTZPalBPsTzbzkaW1+0C4004vy1gACCUSICy49C9NvYtTS5L3moG+ykUQxoFphaFyPkBDY@vger.kernel.org, AJvYcCX7UIuyXhbdm4e9vRK8GN9JqsR84qj9NcpEQRijrCmBLyjZG4fGxPHov7sdYNwDcsjm8aaAzSaZt1TjHSeP@vger.kernel.org
-X-Gm-Message-State: AOJu0YyeLOkRiDhcY3ITR2aVcefSyxV0NvxCx8YUMWrMRW8jupd6/Ejh
-	jRsjCDM1K6jFuRNR+mPcnMq6/Wt8YqFgcaNDZcw09r5CoNXUfv9YkrRx04JcQRInRkkyP6UNXGT
-	cjGXD2FDhtmXLmM1U4alw5Lr/WsaaZKY=
-X-Gm-Gg: ASbGncshVKhY+ptyQNKLdh1Rkow9FvcGeqKNbwGf17r/dZalrf3aH8Y08zZCM5qor/k
-	DykK+iu0J5uN+LPfh/mRHIUq7oluVFGnB4NxUFGkm7qO4ccxQJgUnh7kkCsHvaEiQo/TfXJWaPb
-	VdYfHONcrB1rynheUr5H5mhQqpu1MzsXbj4NE66r1qO2LG1lZziOa1FCAHgMuTfe4vgaqj1jhCn
-	1TiK6Q0P+/SfZH3oKohrdTODdI+P/NVLSYU6922
-X-Google-Smtp-Source: AGHT+IGM50hDPsf/GYBccWoWK+jHNexFKXj+zQEktHP5NeW/ljtqy2Us7gDShggdepMqD20JwQfwNTE8miCEsUg8OiM=
-X-Received: by 2002:a17:90b:57c6:b0:321:9366:5865 with SMTP id
- 98e67ed59e1d1-324ed15bc0cmr3366389a91.33.1755778792359; Thu, 21 Aug 2025
- 05:19:52 -0700 (PDT)
+	s=arc-20240116; t=1755778790; c=relaxed/simple;
+	bh=WogvDi0r85d7kj4DsfJxqY9POVZ7xh8jiErYhA/jon0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=glA9fvRTalL6rp7129OqLK5BFFKaX70Ueh0icPVsArcIh6eH93hdEGWVAwiFwrGTGXWk1+li0HAsYrpzUx7sAMpY1JXpC65Oqxpper0/tonHLXzEhPySCXLWzv5VMqgw3M5UuA4JjvchFpX5GMDHtnBCNBoEKKxcLCsy9aE+Dvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=UQcg3t+6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D223C4CEEB;
+	Thu, 21 Aug 2025 12:19:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1755778790;
+	bh=WogvDi0r85d7kj4DsfJxqY9POVZ7xh8jiErYhA/jon0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UQcg3t+6Oq0Gnwjfg6zo5Qz9jY49O7XuYQskyEZxpMyh95MW8MQ0PeSHTzlw6pIAE
+	 rddukuDZg2Lar/PVmhOWRp0cvmA7yc3djlIQKfSUXA5EZgnCHbUGUAi7D+LMt9f5rR
+	 nrbcYp3Y45HLrG3NVXdOqMZugwSMXN5+Y1+zOT3g=
+Date: Thu, 21 Aug 2025 14:19:46 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Thorsten Leemhuis <linux@leemhuis.info>
+Cc: Li Li <dualli@google.com>, Tiffany Yang <ynaffit@google.com>,
+	John Stultz <jstultz@google.com>, Shai Barack <shayba@google.com>,
+	=?iso-8859-1?Q?Thi=E9baud?= Weksteen <tweek@google.com>,
+	kernel-team@android.com, linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Joel Fernandes <joelagnelf@nvidia.com>,
+	Todd Kjos <tkjos@android.com>,
+	Arve =?iso-8859-1?B?SGr4bm5lduVn?= <arve@android.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+	Martijn Coenen <maco@android.com>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Linux kernel regressions list <regressions@lists.linux.dev>,
+	Carlos Llamas <cmllamas@google.com>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH v20 3/5] binder: introduce transaction reports via netlink
+Message-ID: <2025082145-crabmeat-ounce-e71f@gregkh>
+References: <20250727182932.2499194-1-cmllamas@google.com>
+ <20250727182932.2499194-4-cmllamas@google.com>
+ <e21744a4-0155-40ec-b8c1-d81b14107c9f@leemhuis.info>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250820075420.1601068-1-mmyangfl@gmail.com> <20250820075420.1601068-4-mmyangfl@gmail.com>
- <aKbZM6oYhIN6cBQb@shell.armlinux.org.uk> <CAAXyoMMGCRZTuhYG0zxTgKdDdgB1brU7BAUiCVR_MheFK-n5Yw@mail.gmail.com>
- <aKbuQ7MCbq1JL9sw@shell.armlinux.org.uk> <aKbxdaDFMe2Fqnxu@shell.armlinux.org.uk>
-In-Reply-To: <aKbxdaDFMe2Fqnxu@shell.armlinux.org.uk>
-From: Yangfl <mmyangfl@gmail.com>
-Date: Thu, 21 Aug 2025 20:19:15 +0800
-X-Gm-Features: Ac12FXxbEV7Y8dawuc3P9ut229C1lMCt0Dlom-IYXt2_mPqORfrMZbGZQRXr148
-Message-ID: <CAAXyoMPjdL=KHyr6XCZv-ODV9=8r1_1iwRatAziYU2mPyREmuA@mail.gmail.com>
-Subject: Re: [net-next v5 3/3] net: dsa: yt921x: Add support for Motorcomm YT921x
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, 
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Simon Horman <horms@kernel.org>, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e21744a4-0155-40ec-b8c1-d81b14107c9f@leemhuis.info>
 
-On Thu, Aug 21, 2025 at 6:14=E2=80=AFPM Russell King (Oracle)
-<linux@armlinux.org.uk> wrote:
->
-> On Thu, Aug 21, 2025 at 11:00:35AM +0100, Russell King (Oracle) wrote:
-> > On Thu, Aug 21, 2025 at 05:25:46PM +0800, Yangfl wrote:
-> > > On Thu, Aug 21, 2025 at 4:30=E2=80=AFPM Russell King (Oracle)
-> > > <linux@armlinux.org.uk> wrote:
-> > > > Someone clearly doesn't believe in reading the documentation before
-> > > > writing code. This also hasn't been tested in any way. Sorry, but
-> > > > I'm going to put as much effort into this review as you have into
-> > > > understanding the phylink API, and thus my review ends here.
-> > > >
-> > > > NAK.
-> > >
-> > > Sorry I'm quite new here. I don't understand very clearly why a
-> > > different set of calls is involved in dsa_switch_ops, so I referred t=
-o
-> > > other dsa drivers and made a working driver (at least tested on my
-> > > device), but I would appreciate it much if you could point it out in
-> > > an earlier version of series.
-> >
-> > This isn't dsa_switch_ops, but phylink_mac_ops, which are well
-> > documented in include/linux/phylink.h. Please read the documentation
-> > found in that header file detailing the phylink_mac_ops methods.
-> > You'll find a brief overview before the struct, and then in the #if 0
-> > section, detailed per-method documentation.
->
-> Also, the reason I state that it hasn't been tested is because when
-> your mac_config method is invoked, and print debug information which
-> includes state->speed and state->duplex, and then go on to use these.
-> Phylink's sole call path to mac_config() does this:
->
->         /* Stop drivers incorrectly using these */
->         linkmode_zero(st.lp_advertising);
->         st.speed =3D SPEED_UNKNOWN;
->         st.duplex =3D DUPLEX_UNKNOWN;
->         st.an_complete =3D false;
->         st.link =3D false;
->
->         phylink_dbg(pl,
->                     "%s: mode=3D%s/%s/%s adv=3D%*pb pause=3D%02x\n",
->                     __func__, phylink_an_mode_str(pl->act_link_an_mode),
->                     phy_modes(st.interface),
->                     phy_rate_matching_to_str(st.rate_matching),
->                     __ETHTOOL_LINK_MODE_MASK_NBITS, st.advertising,
->                     st.pause);
->
->         pl->mac_ops->mac_config(pl->config, pl->act_link_an_mode, &st);
->
-> and you would've noticed in your debug print that e.g. state->speed and
-> state->duplex are both always -1, and thus are not useful. Note also the
-> debugging that phylink includes.
->
-> Note that no other mac_config() implementations refer to state->speed
-> and state->duplex. The only time drivers _write_ to these is in the
-> pcs_get_state() method if they support a PCS.
->
-> Therefore, I think your code is completely untested.
->
+On Thu, Aug 21, 2025 at 10:49:09AM +0200, Thorsten Leemhuis wrote:
+> On 27.07.25 20:29, Carlos Llamas wrote:
+> > From: Li Li <dualli@google.com>
+> > 
+> > Introduce a generic netlink multicast event to report binder transaction
+> > failures to userspace. This allows subscribers to monitor these events
+> > and take appropriate actions, such as stopping a misbehaving application
+> > that is spamming a service with huge amount of transactions.
+> > 
+> > The multicast event contains full details of the failed transactions,
+> > including the sender/target PIDs, payload size and specific error code.
+> > This interface is defined using a YAML spec, from which the UAPI and
+> > kernel headers and source are auto-generated.
+> 
+> It seems to me like this patch (which showed up in -next today after
+> Greg merged it) caused a build error for me in my daily -next builds
+> for Fedora when building tools/net/ynl:
+> 
+> """
+> make[1]: Entering directory '/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/lib'
+> gcc -std=gnu11 -O2 -W -Wall -Wextra -Wno-unused-parameter -Wshadow   -c -MMD -c -o ynl.o ynl.c
+>         AR ynl.a
+> make[1]: Leaving directory '/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/lib'
+> make[1]: Entering directory '/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/generated'
+>         GEN binder-user.c
+> Traceback (most recent call last):
+>   File "/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/generated/../pyynl/ynl_gen_c.py", line 3673, in <module>
+>     main()
+>     ~~~~^^
+>   File "/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/generated/../pyynl/ynl_gen_c.py", line 3382, in main
+>     parsed = Family(args.spec, exclude_ops)
+>   File "/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/generated/../pyynl/ynl_gen_c.py", line 1205, in __init__
+>     super().__init__(file_name, exclude_ops=exclude_ops)
+>     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>   File "/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/pyynl/lib/nlspec.py", line 462, in __init__
+>     jsonschema.validate(self.yaml, schema)
+>     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+>   File "/usr/lib/python3.13/site-packages/jsonschema/validators.py", line 1307, in validate
+>     raise error
+> jsonschema.exceptions.ValidationError: 'from_pid' does not match '^[0-9a-z-]+$'
+> 
+> Failed validating 'pattern' in schema['properties']['attribute-sets']['items']['properties']['attributes']['items']['properties']['name']:
+>     {'pattern': '^[0-9a-z-]+$', 'type': 'string'}
+> 
+> On instance['attribute-sets'][0]['attributes'][2]['name']:
+>     'from_pid'
+> make[1]: *** [Makefile:48: binder-user.c] Error 1
+> make[1]: Leaving directory '/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/generated'
+> make: *** [Makefile:25: generated] Error 2
+> """
 
-Thanks for your help. I didn't notice that since it accidentally
-configures autonegotiation for me. Anyway I'll take a closer look at
-relevant apis.
+Odd, this works for me.
 
-> I'm also concerned about the SMI locking, which looks to me like you
-> haven't realised that the MDIO bus layer has locking which guarantees
-> that all invocations of the MDIO bus read* and write* methods are
-> serialised.
+How exactly are you building this?
 
-The device takes two sequential u16 MDIO r/w into one op on its
-internal 32b regs, so we need to serialise SMI ops to avoid race
-conditions. Strictly speaking only locking the target phyaddr is
-needed, but I think it won't hurt to lock the MDIO bus as long as I
-don't perform busy wait while holding the bus lock.
+thanks,
+
+greg k-h
 
