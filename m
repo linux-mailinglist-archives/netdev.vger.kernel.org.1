@@ -1,93 +1,93 @@
-Return-Path: <netdev+bounces-215899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EE7CB30D23
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 06:03:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB529B30D24
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 06:03:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 402331CE45C0
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 04:03:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF1EB5E8A11
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 04:03:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DC3028B407;
-	Fri, 22 Aug 2025 04:02:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98EC3270553;
+	Fri, 22 Aug 2025 04:02:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="GyigsuoA"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="BHLrTuCB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f99.google.com (mail-io1-f99.google.com [209.85.166.99])
+Received: from mail-qk1-f226.google.com (mail-qk1-f226.google.com [209.85.222.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B78942773F6
-	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 04:02:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4D5128CF5F
+	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 04:02:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755835376; cv=none; b=fLN4agA6bJhC/1E/+PKBZLOtm7zBAtuXkkPDplBWncTr4XiAixYYbSUEsYu0WB7m4OV7716ydhpSewG2uflkvqQE8j4eemBnBMS0ZRQCIvoA6MNAu9NokOJh8hsCg0izf4xUe7PXARsxgSgSoYPu0p7Jo7odw993X9ZbUSBWRXE=
+	t=1755835379; cv=none; b=ni0MAs0ae9ylHrXUjd74U+bbpdLtxeuZJq8AhXLYzD/jJkLEQKU6+ohdKNLZRINDCjscdIX9ivDOleHgQVW91GfOYzdC+bDEzynbLQuCzREfYdxNT0lbHa3NyFAlDv/Hb6cxQo4vmB931hSE9i4iu4fR4smYfyCy+BF+fjHYdOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755835376; c=relaxed/simple;
-	bh=39+oe9SB85UaY1/dYjexAgsa7wUOhhfw9MgFsKM0+n8=;
+	s=arc-20240116; t=1755835379; c=relaxed/simple;
+	bh=OIhVAik299++T2NwIVstX/xxBqyf6VqBS7soWCI/pLc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gmbl91f2VDok1ghydmCkaRfIGgRxkwbDdd1t7qm7B5d9bT5n/2H8YR4iaoWKtkhRM0NBkIUnhC/JadT1f6njpQPG9uIzjtSmwvfOc8vU5uDze1Qzf6XwTOnHFBAS7fX2oHqSUhyzQ9LHPmQYCDo99/uaw+J0leOWOUtM5u1cMPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=GyigsuoA; arc=none smtp.client-ip=209.85.166.99
+	 MIME-Version; b=RTmW5kADVwrbB29j3FceEq6H4EgzBUTTCjnr8uCeuiT5npfcPOTDg6oeCQxfyIaq+I4rYOy4mSQinT35tbDxSzdU9q3kaSVd8XFFUyCvjSPM+wm72u79pZwbLrjCyqLOBJdqo5eCvU+rB8zCGvAokcmTKh3YaqMQvaoj2AwBzpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=BHLrTuCB; arc=none smtp.client-ip=209.85.222.226
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-io1-f99.google.com with SMTP id ca18e2360f4ac-88432e6700dso25867139f.3
-        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 21:02:54 -0700 (PDT)
+Received: by mail-qk1-f226.google.com with SMTP id af79cd13be357-7e87035a7c3so234292585a.0
+        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 21:02:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755835374; x=1756440174;
+        d=1e100.net; s=20230601; t=1755835377; x=1756440177;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:dkim-signature
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ttRgLIRqTP30+LhxgwiGR9e2bpOp/NOF9qofYEvXhuQ=;
-        b=g+z1VjNdnw5kkRTST/64/QoP2RT3UCx/DT+Z/7wB3+4tTXoHhNofGM7LNbQTgKlG9b
-         97QfgV9u5hTpz03DRWhjhoHB3ygfZYGWB59YCCEFMz0zoswsHQuzAtpAYm2TplmWHXuA
-         wKSj/Llq5PUCGAo92WmHTucIWkbbrHABCis6vh1kubRsM9HYiY66otGe+5WlcCI4u+08
-         jFAwxsSwIyBHG1cBLkP5ZsErrcE8vzlIHorTt0SD+0kh9U9ycETJY2UsitWNVZEZOL6N
-         LUAHGSDoB4jIzTlzWpE5Yxdz9elYigTCLvrGztro8m1cpmySjPcASiixvA25ijAPkiSU
-         CeMw==
-X-Forwarded-Encrypted: i=1; AJvYcCVMYlv0m5PALqjkkkXAs5Rp4zFMfxplmq6CLBv0t2LeAWfyNqeKiHlOB+vRNv/K611xNFpC+7U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHrkEZf20pgdSOBCgxW+/zHmmMfLSIZP6Ea4nNNb6hhyPqfXtE
-	lDVn0J13/FOahIYE8kg21MX/+WDvKeP7u9kBElZ82owvk5fff9wIKz4PRqeq0w7GU8gg2v2yZWs
-	t2Ayf16alqyuGZkXm+Qbft0//zR4eCI8gknBFZyn07UfPGjAZi8POXxlHXw230Z4dt7/f86UBEE
-	VQ+8hRxXgTW4qPBWrDimXA1IxMfg1quMfcLHMAY3Sm5cFpAT2KDjjjQRTS78xyjJWUsbM5ktUBT
-	E5DwdZxie34k/mC7lxgESej
-X-Gm-Gg: ASbGncusO3AhK8ZTY2Xl2V6gmfVqlmTYqChs9Kq7HP6e5WP3M4SBkkW+OlDhx1hFxpD
-	IpOs1cvmBI31nnmDAOUc1itVqy82/ZWuZKsYSThfkAnHRktCpWy+qUsvXCw5wn88MDPDGdSPaty
-	QfNnk5rTsQgYnrB1eIRVjklssnUnbpUaVbTzIEAowAawxX8b4ULY3RqcWIF6jU6VKyPjceWzNmB
-	kzAMPWUflSVc6B2BX1w8y7hQ2jea9wXZAX0K4qe5tBMDuq1V5aYP6drbWKcSpJoGKCrD9kH15aq
-	iev1OJ6aBabRMykrjQMIq/P6w61CAWeS24hBugyyu1/0k1pKKAFiLSY8rENEAhaI/UJ50laCMTF
-	jYiP+C8D9Br/FJUsWuQ+m/QM87tNNdW5mxbWLQde1RR/xNIVHszrSuzgJw7qko8rzK610JU954v
-	qKd522zHWyFDYA
-X-Google-Smtp-Source: AGHT+IHrP9vCC7bx05bGrsZB1JDamGUaUzmDz3PmBETb/6Giu7VWcxou5IrR2ewSKZ3yDGUfRWIiPUuwIx7B
-X-Received: by 2002:a05:6602:15d2:b0:87c:5a38:45e9 with SMTP id ca18e2360f4ac-886bd1016ebmr265652639f.3.1755835373747;
-        Thu, 21 Aug 2025 21:02:53 -0700 (PDT)
+        bh=QgehaGBydiTXhMzeHwQkiGCglFniU9L9yIWr2yVwOck=;
+        b=BUf8IPgYRrsmLtEJs9z6DmTkPZtvPwfua8tfRLCGfkL7jta4LkIdlUCmWv49cdqyqR
+         R76L+0UmPgfNGCCf+cJKr8sRg5M+uA+jztQN/Yspj32jN1xOtnOMhuXS1EYBJfPrEJD7
+         x3j1WDdvy12jzEOcsD3qbAnOW5ClpDpYh+KuzYPQPsax1Wd15rEUFEtJqPcexHrUajcn
+         /hhH9YwVF4oftyWWMtDW9nEkSfZ/yg/YsDCmUy9aQps85Z0OfV7URYyrMKfjklsq0TjZ
+         SyBwS/duHXSC2+n5jA3kieJMAWUhTb37SF+WrTRWra8UTlmTdkwtlPl6uwTIE/+BNOBu
+         83hw==
+X-Forwarded-Encrypted: i=1; AJvYcCUjIAzzKlAkKFSHLzgSqHI78ClUALYzwBMsODFvgDawvFpkZ3xbhSNdyM3KO1OmMCIpe2vOYiI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQDAV6t1QRle94PcfkcjmugkxELsN4q3wQXUsS2m5RzMAhkUHN
+	Tt6ZoDvvMiePrQLtoDW5FAqKHu/6x6G3g8YO4c8IwsgRBSbtCvXBzZ08xaf7v2Io0Yn4m8QVUhk
+	EbEm/hYYGyZAzLOGuqUGutwAHiRC9AIibB/7+8wvxV/JkI6DowDbmNjLLDCkjkvHJ3rpSsQxQfx
+	0yhLDRS3jM3ClfyESXMMOcA1iZ6XNxH5aINgApYHjgp52JpaIDREc7j8Rbzn6t2zlZXnGMgbtux
+	gAaXNO05Zs1HzKSZLV9/nn6
+X-Gm-Gg: ASbGncv4l+QhNhRA9MAATDu4yqV+IH+MFHKSevnn248PETt1rrziXhAWQNg91M1k9Sj
+	8/QckqTy04cVOpWfSBO9DrUJ89EEpnSdchaNir8SxXZOa2/dqfAuk1czdY2/GxMsXzKgZQ/lHRX
+	rM8YkyLOxZYVbadr9H6QvTZzJnBLvFOi/q1WmchGTqBCxB7zRf4RrqVibdmiNOpCRDPh9NyZ0MB
+	9ba6QHRWzxyMni3ni7R/jtw2GNjcJ/BQYaGxiL+pqVJPu1DCO6QbEy8HsYCWg7IzHVIfl6Ck/Hz
+	Cy/evQ18GoV/U3x7jK4MnyuAdHmMvarEFbUDpnUWPt+VQCQsk4vqiMiTXm/slKh1Km0h2II0tKo
+	QWns1KCvp/KBMga9vLVXgeR3LaBYCaMUxXGuFSFGrt16gloa+QyI/ZSD+yJw8F2tJ0zjqYL7wah
+	LR03OVzhBxQaVH
+X-Google-Smtp-Source: AGHT+IECh9ERW3FjsALq5YH5led8N+7F2Jp9r9taJFBiQM/thVhAwjj1K+iyV06+y9r2vRMlDWzBU06KEm1t
+X-Received: by 2002:a05:620a:1a1c:b0:7e6:20a9:1855 with SMTP id af79cd13be357-7ea11066ddfmr221554585a.44.1755835376539;
+        Thu, 21 Aug 2025 21:02:56 -0700 (PDT)
 Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-72.dlp.protect.broadcom.com. [144.49.247.72])
-        by smtp-relay.gmail.com with ESMTPS id ca18e2360f4ac-886b626aae0sm16922439f.11.2025.08.21.21.02.53
+        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-70d9669e27csm1118946d6.7.2025.08.21.21.02.56
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 21 Aug 2025 21:02:53 -0700 (PDT)
+        Thu, 21 Aug 2025 21:02:56 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-76e2e8afd68so1608514b3a.1
-        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 21:02:53 -0700 (PDT)
+Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-76e2e8afd68so1608534b3a.1
+        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 21:02:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1755835372; x=1756440172; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1755835375; x=1756440175; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ttRgLIRqTP30+LhxgwiGR9e2bpOp/NOF9qofYEvXhuQ=;
-        b=GyigsuoAgQuLuTQ3c1tRlmlLy/wRgKoSsnBDlP3lMisrd3NKAAn87X18ygX5T9bVqJ
-         UozXLxhqjQ/7/txQ9mRbF7XUFnkcWnPXxMOYlm47Cn/r5I/guzImpKu4WrKsiMeJEkiu
-         C7H00i8XdwdpIsyKP6iYjjgcSZGKGPHknr2EE=
-X-Forwarded-Encrypted: i=1; AJvYcCX21dNXcBnt1OtuiFu2+J96rQxBTMC70YTsUyvURP/l3DRTebWgdI3slcg12M461A5qHZr3OeM=@vger.kernel.org
-X-Received: by 2002:a05:6a00:9295:b0:76e:9f28:ad56 with SMTP id d2e1a72fcca58-7702fa664camr2400138b3a.14.1755835372180;
-        Thu, 21 Aug 2025 21:02:52 -0700 (PDT)
-X-Received: by 2002:a05:6a00:9295:b0:76e:9f28:ad56 with SMTP id d2e1a72fcca58-7702fa664camr2400106b3a.14.1755835371753;
-        Thu, 21 Aug 2025 21:02:51 -0700 (PDT)
+        bh=QgehaGBydiTXhMzeHwQkiGCglFniU9L9yIWr2yVwOck=;
+        b=BHLrTuCBgL4Ool9W138IH3rh+TPd9XUoIMAge/N4+EkfYVyZvjnelPQkQlghdQH/Gx
+         GE6WEgLgAH0H0izLFoLEhPYqfnm3XFpz1JcqPamXASzQor9cIjlrM7TdZN21TfpRN3WP
+         74N5mzRlxM4eC9kbjYwrPrMh5Xc6L+vA7xtR8=
+X-Forwarded-Encrypted: i=1; AJvYcCUoP7UJ5WioT1UqUous/yOVJUwxanQC3Roy+hCdeRxJp+jscGhBV0bxqMqD533K92VWn/q8d00=@vger.kernel.org
+X-Received: by 2002:a05:6a00:4f91:b0:76b:dcc6:8138 with SMTP id d2e1a72fcca58-7702fc46479mr1807579b3a.22.1755835375243;
+        Thu, 21 Aug 2025 21:02:55 -0700 (PDT)
+X-Received: by 2002:a05:6a00:4f91:b0:76b:dcc6:8138 with SMTP id d2e1a72fcca58-7702fc46479mr1807540b3a.22.1755835374668;
+        Thu, 21 Aug 2025 21:02:54 -0700 (PDT)
 Received: from dhcp-10-123-157-228.dhcp.broadcom.net ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76e7d0d3abdsm9659814b3a.11.2025.08.21.21.02.49
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76e7d0d3abdsm9659814b3a.11.2025.08.21.21.02.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Aug 2025 21:02:51 -0700 (PDT)
+        Thu, 21 Aug 2025 21:02:54 -0700 (PDT)
 From: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 To: leon@kernel.org,
 	jgg@ziepe.ca
@@ -97,9 +97,9 @@ Cc: linux-rdma@vger.kernel.org,
 	selvin.xavier@broadcom.com,
 	michael.chan@broadcom.com,
 	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Subject: [PATCH rdma-next 03/10] RDMA/bnxt_re: Refactor hw context memory allocation
-Date: Fri, 22 Aug 2025 09:37:54 +0530
-Message-ID: <20250822040801.776196-4-kalesh-anakkur.purayil@broadcom.com>
+Subject: [PATCH rdma-next 04/10] RDMA/bnxt_re: Refactor stats context memory allocation
+Date: Fri, 22 Aug 2025 09:37:55 +0530
+Message-ID: <20250822040801.776196-5-kalesh-anakkur.purayil@broadcom.com>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20250822040801.776196-1-kalesh-anakkur.purayil@broadcom.com>
 References: <20250822040801.776196-1-kalesh-anakkur.purayil@broadcom.com>
@@ -112,145 +112,194 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
+Moved the stats context allocation logic to a new function.
+The stats context memory allocation code has been moved from
+bnxt_qplib_alloc_hwctx() to the newly added bnxt_re_get_stats_ctx()
+function. Also, the code to send the firmware command has been moved.
+
 This patch is in preparation for other patches in this series.
 There is no functional changes intended.
 
-1. Rename bnxt_qplib_alloc_ctx() to bnxt_qplib_alloc_hwctx().
-2. Rename bnxt_qplib_free_ctx() to bnxt_qplib_free_hwctx().
-3. Reduce the number of arguments of bnxt_qplib_alloc_hwctx()
-   by moving a check outside of it.
-
 Signed-off-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 ---
- drivers/infiniband/hw/bnxt_re/main.c      | 18 ++++++++++--------
- drivers/infiniband/hw/bnxt_re/qplib_res.c | 17 ++++++-----------
- drivers/infiniband/hw/bnxt_re/qplib_res.h |  9 ++++-----
- 3 files changed, 20 insertions(+), 24 deletions(-)
+ drivers/infiniband/hw/bnxt_re/main.c      | 46 ++++++++++++++++++-----
+ drivers/infiniband/hw/bnxt_re/qplib_res.c | 21 +++--------
+ drivers/infiniband/hw/bnxt_re/qplib_res.h |  5 +++
+ 3 files changed, 47 insertions(+), 25 deletions(-)
 
 diff --git a/drivers/infiniband/hw/bnxt_re/main.c b/drivers/infiniband/hw/bnxt_re/main.c
-index 3ae5f0d08f3a..9f752cb0c135 100644
+index 9f752cb0c135..c25eb2525a8f 100644
 --- a/drivers/infiniband/hw/bnxt_re/main.c
 +++ b/drivers/infiniband/hw/bnxt_re/main.c
-@@ -2011,7 +2011,7 @@ static void bnxt_re_dev_uninit(struct bnxt_re_dev *rdev, u8 op_type)
- 			ibdev_warn(&rdev->ibdev,
- 				   "Failed to deinitialize RCFW: %#x", rc);
- 		bnxt_re_net_stats_ctx_free(rdev, rdev->qplib_ctx.stats.fw_id);
--		bnxt_qplib_free_ctx(&rdev->qplib_res, &rdev->qplib_ctx);
-+		bnxt_qplib_free_hwctx(&rdev->qplib_res, &rdev->qplib_ctx);
- 		bnxt_qplib_disable_rcfw_channel(&rdev->rcfw);
- 		type = bnxt_qplib_get_ring_type(rdev->chip_ctx);
- 		bnxt_re_net_ring_free(rdev, rdev->rcfw.creq.ring_id, type);
-@@ -2139,12 +2139,14 @@ static int bnxt_re_dev_init(struct bnxt_re_dev *rdev, u8 op_type)
- 	bnxt_qplib_query_version(&rdev->rcfw);
- 	bnxt_re_set_resource_limits(rdev);
- 
--	rc = bnxt_qplib_alloc_ctx(&rdev->qplib_res, &rdev->qplib_ctx, 0,
--				  bnxt_qplib_is_chip_gen_p5_p7(rdev->chip_ctx));
--	if (rc) {
--		ibdev_err(&rdev->ibdev,
--			  "Failed to allocate QPLIB context: %#x\n", rc);
--		goto disable_rcfw;
-+	if (!rdev->is_virtfn &&
-+	    !bnxt_qplib_is_chip_gen_p5_p7(rdev->chip_ctx)) {
-+		rc = bnxt_qplib_alloc_hwctx(&rdev->qplib_res, &rdev->qplib_ctx);
-+		if (rc) {
-+			ibdev_err(&rdev->ibdev,
-+				  "Failed to allocate hw context: %#x\n", rc);
-+			goto disable_rcfw;
-+		}
- 	}
- 	rc = bnxt_re_net_stats_ctx_alloc(rdev,
- 					 rdev->qplib_ctx.stats.dma_map,
-@@ -2206,7 +2208,7 @@ static int bnxt_re_dev_init(struct bnxt_re_dev *rdev, u8 op_type)
- free_sctx:
- 	bnxt_re_net_stats_ctx_free(rdev, rdev->qplib_ctx.stats.fw_id);
- free_ctx:
--	bnxt_qplib_free_ctx(&rdev->qplib_res, &rdev->qplib_ctx);
-+	bnxt_qplib_free_hwctx(&rdev->qplib_res, &rdev->qplib_ctx);
- disable_rcfw:
- 	bnxt_qplib_disable_rcfw_channel(&rdev->rcfw);
- free_ring:
-diff --git a/drivers/infiniband/hw/bnxt_re/qplib_res.c b/drivers/infiniband/hw/bnxt_re/qplib_res.c
-index 6cd05207ffed..db2ee7246861 100644
---- a/drivers/infiniband/hw/bnxt_re/qplib_res.c
-+++ b/drivers/infiniband/hw/bnxt_re/qplib_res.c
-@@ -350,8 +350,8 @@ int bnxt_qplib_alloc_init_hwq(struct bnxt_qplib_hwq *hwq,
+@@ -935,8 +935,7 @@ static int bnxt_re_net_stats_ctx_free(struct bnxt_re_dev *rdev,
  }
  
- /* Context Tables */
--void bnxt_qplib_free_ctx(struct bnxt_qplib_res *res,
--			 struct bnxt_qplib_ctx *ctx)
-+void bnxt_qplib_free_hwctx(struct bnxt_qplib_res *res,
-+			   struct bnxt_qplib_ctx *ctx)
+ static int bnxt_re_net_stats_ctx_alloc(struct bnxt_re_dev *rdev,
+-				       dma_addr_t dma_map,
+-				       u32 *fw_stats_ctx_id)
++				       struct bnxt_qplib_stats *stats)
  {
- 	int i;
+ 	struct bnxt_qplib_chip_ctx *chip_ctx = rdev->chip_ctx;
+ 	struct hwrm_stat_ctx_alloc_output resp = {};
+@@ -945,21 +944,21 @@ static int bnxt_re_net_stats_ctx_alloc(struct bnxt_re_dev *rdev,
+ 	struct bnxt_fw_msg fw_msg = {};
+ 	int rc = -EINVAL;
  
-@@ -464,7 +464,7 @@ static int bnxt_qplib_setup_tqm_rings(struct bnxt_qplib_res *res,
- }
+-	*fw_stats_ctx_id = INVALID_STATS_CTX_ID;
++	stats->fw_id = INVALID_STATS_CTX_ID;
  
- /*
-- * Routine: bnxt_qplib_alloc_ctx
-+ * Routine: bnxt_qplib_alloc_hwctx
-  * Description:
-  *     Context tables are memories which are used by the chip fw.
-  *     The 6 tables defined are:
-@@ -484,17 +484,13 @@ static int bnxt_qplib_setup_tqm_rings(struct bnxt_qplib_res *res,
-  * Returns:
-  *     0 if success, else -ERRORS
-  */
--int bnxt_qplib_alloc_ctx(struct bnxt_qplib_res *res,
--			 struct bnxt_qplib_ctx *ctx,
--			 bool virt_fn, bool is_p5)
-+int bnxt_qplib_alloc_hwctx(struct bnxt_qplib_res *res,
-+			   struct bnxt_qplib_ctx *ctx)
- {
- 	struct bnxt_qplib_hwq_attr hwq_attr = {};
- 	struct bnxt_qplib_sg_info sginfo = {};
- 	int rc;
+ 	if (!en_dev)
+ 		return rc;
  
--	if (virt_fn || is_p5)
--		goto stats_alloc;
--
- 	/* QPC Tables */
- 	sginfo.pgsize = PAGE_SIZE;
- 	sginfo.pgshft = PAGE_SHIFT;
-@@ -540,7 +536,6 @@ int bnxt_qplib_alloc_ctx(struct bnxt_qplib_res *res,
- 	rc = bnxt_qplib_alloc_init_hwq(&ctx->tim_tbl, &hwq_attr);
- 	if (rc)
- 		goto fail;
--stats_alloc:
- 	/* Stats */
- 	rc = bnxt_qplib_alloc_stats_ctx(res->pdev, res->cctx, &ctx->stats);
- 	if (rc)
-@@ -549,7 +544,7 @@ int bnxt_qplib_alloc_ctx(struct bnxt_qplib_res *res,
- 	return 0;
+ 	bnxt_re_init_hwrm_hdr((void *)&req, HWRM_STAT_CTX_ALLOC);
+ 	req.update_period_ms = cpu_to_le32(1000);
+-	req.stats_dma_addr = cpu_to_le64(dma_map);
++	req.stats_dma_addr = cpu_to_le64(stats->dma_map);
+ 	req.stats_dma_length = cpu_to_le16(chip_ctx->hw_stats_size);
+ 	req.stat_ctx_flags = STAT_CTX_ALLOC_REQ_STAT_CTX_FLAGS_ROCE;
+ 	bnxt_re_fill_fw_msg(&fw_msg, (void *)&req, sizeof(req), (void *)&resp,
+ 			    sizeof(resp), DFLT_HWRM_CMD_TIMEOUT);
+ 	rc = bnxt_send_msg(en_dev, &fw_msg);
+ 	if (!rc)
+-		*fw_stats_ctx_id = le32_to_cpu(resp.stat_ctx_id);
++		stats->fw_id = le32_to_cpu(resp.stat_ctx_id);
  
- fail:
--	bnxt_qplib_free_ctx(res, ctx);
-+	bnxt_qplib_free_hwctx(res, ctx);
  	return rc;
  }
+@@ -1986,6 +1985,36 @@ static void bnxt_re_free_nqr_mem(struct bnxt_re_dev *rdev)
+ 	rdev->nqr = NULL;
+ }
  
++static int bnxt_re_get_stats_ctx(struct bnxt_re_dev *rdev)
++{
++	struct bnxt_qplib_ctx *hctx = &rdev->qplib_ctx;
++	struct bnxt_qplib_res *res = &rdev->qplib_res;
++	int rc;
++
++	rc = bnxt_qplib_alloc_stats_ctx(res->pdev, res->cctx, &hctx->stats);
++	if (rc)
++		return rc;
++
++	rc = bnxt_re_net_stats_ctx_alloc(rdev, &hctx->stats);
++	if (rc)
++		goto free_stat_mem;
++
++	return 0;
++free_stat_mem:
++	bnxt_qplib_free_stats_ctx(res->pdev, &hctx->stats);
++
++	return rc;
++}
++
++static void bnxt_re_put_stats_ctx(struct bnxt_re_dev *rdev)
++{
++	struct bnxt_qplib_ctx *hctx = &rdev->qplib_ctx;
++	struct bnxt_qplib_res *res = &rdev->qplib_res;
++
++	bnxt_re_net_stats_ctx_free(rdev, hctx->stats.fw_id);
++	bnxt_qplib_free_stats_ctx(res->pdev, &hctx->stats);
++}
++
+ static void bnxt_re_dev_uninit(struct bnxt_re_dev *rdev, u8 op_type)
+ {
+ 	u8 type;
+@@ -2010,7 +2039,7 @@ static void bnxt_re_dev_uninit(struct bnxt_re_dev *rdev, u8 op_type)
+ 		if (rc)
+ 			ibdev_warn(&rdev->ibdev,
+ 				   "Failed to deinitialize RCFW: %#x", rc);
+-		bnxt_re_net_stats_ctx_free(rdev, rdev->qplib_ctx.stats.fw_id);
++		bnxt_re_put_stats_ctx(rdev);
+ 		bnxt_qplib_free_hwctx(&rdev->qplib_res, &rdev->qplib_ctx);
+ 		bnxt_qplib_disable_rcfw_channel(&rdev->rcfw);
+ 		type = bnxt_qplib_get_ring_type(rdev->chip_ctx);
+@@ -2148,9 +2177,8 @@ static int bnxt_re_dev_init(struct bnxt_re_dev *rdev, u8 op_type)
+ 			goto disable_rcfw;
+ 		}
+ 	}
+-	rc = bnxt_re_net_stats_ctx_alloc(rdev,
+-					 rdev->qplib_ctx.stats.dma_map,
+-					 &rdev->qplib_ctx.stats.fw_id);
++
++	rc = bnxt_re_get_stats_ctx(rdev);
+ 	if (rc) {
+ 		ibdev_err(&rdev->ibdev,
+ 			  "Failed to allocate stats context: %#x\n", rc);
+diff --git a/drivers/infiniband/hw/bnxt_re/qplib_res.c b/drivers/infiniband/hw/bnxt_re/qplib_res.c
+index db2ee7246861..8d04f98b2606 100644
+--- a/drivers/infiniband/hw/bnxt_re/qplib_res.c
++++ b/drivers/infiniband/hw/bnxt_re/qplib_res.c
+@@ -53,12 +53,6 @@
+ #include "qplib_sp.h"
+ #include "qplib_rcfw.h"
+ 
+-static void bnxt_qplib_free_stats_ctx(struct pci_dev *pdev,
+-				      struct bnxt_qplib_stats *stats);
+-static int bnxt_qplib_alloc_stats_ctx(struct pci_dev *pdev,
+-				      struct bnxt_qplib_chip_ctx *cctx,
+-				      struct bnxt_qplib_stats *stats);
+-
+ /* PBL */
+ static void __free_pbl(struct bnxt_qplib_res *res, struct bnxt_qplib_pbl *pbl,
+ 		       bool is_umem)
+@@ -365,7 +359,6 @@ void bnxt_qplib_free_hwctx(struct bnxt_qplib_res *res,
+ 	/* restore original pde level before destroy */
+ 	ctx->tqm_ctx.pde.level = ctx->tqm_ctx.pde_level;
+ 	bnxt_qplib_free_hwq(res, &ctx->tqm_ctx.pde);
+-	bnxt_qplib_free_stats_ctx(res->pdev, &ctx->stats);
+ }
+ 
+ static int bnxt_qplib_alloc_tqm_rings(struct bnxt_qplib_res *res,
+@@ -534,10 +527,6 @@ int bnxt_qplib_alloc_hwctx(struct bnxt_qplib_res *res,
+ 	hwq_attr.depth = ctx->qpc_count * 16;
+ 	hwq_attr.stride = 1;
+ 	rc = bnxt_qplib_alloc_init_hwq(&ctx->tim_tbl, &hwq_attr);
+-	if (rc)
+-		goto fail;
+-	/* Stats */
+-	rc = bnxt_qplib_alloc_stats_ctx(res->pdev, res->cctx, &ctx->stats);
+ 	if (rc)
+ 		goto fail;
+ 
+@@ -825,8 +814,8 @@ static int bnxt_qplib_alloc_dpi_tbl(struct bnxt_qplib_res *res,
+ }
+ 
+ /* Stats */
+-static void bnxt_qplib_free_stats_ctx(struct pci_dev *pdev,
+-				      struct bnxt_qplib_stats *stats)
++void bnxt_qplib_free_stats_ctx(struct pci_dev *pdev,
++			       struct bnxt_qplib_stats *stats)
+ {
+ 	if (stats->dma) {
+ 		dma_free_coherent(&pdev->dev, stats->size,
+@@ -836,9 +825,9 @@ static void bnxt_qplib_free_stats_ctx(struct pci_dev *pdev,
+ 	stats->fw_id = -1;
+ }
+ 
+-static int bnxt_qplib_alloc_stats_ctx(struct pci_dev *pdev,
+-				      struct bnxt_qplib_chip_ctx *cctx,
+-				      struct bnxt_qplib_stats *stats)
++int bnxt_qplib_alloc_stats_ctx(struct pci_dev *pdev,
++			       struct bnxt_qplib_chip_ctx *cctx,
++			       struct bnxt_qplib_stats *stats)
+ {
+ 	memset(stats, 0, sizeof(*stats));
+ 	stats->fw_id = -1;
 diff --git a/drivers/infiniband/hw/bnxt_re/qplib_res.h b/drivers/infiniband/hw/bnxt_re/qplib_res.h
-index 12e2fa23794a..9d866cfdebab 100644
+index 9d866cfdebab..ed1be06c2c60 100644
 --- a/drivers/infiniband/hw/bnxt_re/qplib_res.h
 +++ b/drivers/infiniband/hw/bnxt_re/qplib_res.h
-@@ -433,11 +433,10 @@ void bnxt_qplib_cleanup_res(struct bnxt_qplib_res *res);
- int bnxt_qplib_init_res(struct bnxt_qplib_res *res);
- void bnxt_qplib_free_res(struct bnxt_qplib_res *res);
- int bnxt_qplib_alloc_res(struct bnxt_qplib_res *res, struct net_device *netdev);
--void bnxt_qplib_free_ctx(struct bnxt_qplib_res *res,
--			 struct bnxt_qplib_ctx *ctx);
--int bnxt_qplib_alloc_ctx(struct bnxt_qplib_res *res,
--			 struct bnxt_qplib_ctx *ctx,
--			 bool virt_fn, bool is_p5);
-+void bnxt_qplib_free_hwctx(struct bnxt_qplib_res *res,
-+			   struct bnxt_qplib_ctx *ctx);
-+int bnxt_qplib_alloc_hwctx(struct bnxt_qplib_res *res,
-+			   struct bnxt_qplib_ctx *ctx);
- int bnxt_qplib_map_db_bar(struct bnxt_qplib_res *res);
+@@ -441,6 +441,11 @@ int bnxt_qplib_map_db_bar(struct bnxt_qplib_res *res);
  void bnxt_qplib_unmap_db_bar(struct bnxt_qplib_res *res);
  
+ int bnxt_qplib_determine_atomics(struct pci_dev *dev);
++int bnxt_qplib_alloc_stats_ctx(struct pci_dev *pdev,
++			       struct bnxt_qplib_chip_ctx *cctx,
++			       struct bnxt_qplib_stats *stats);
++void bnxt_qplib_free_stats_ctx(struct pci_dev *pdev,
++			       struct bnxt_qplib_stats *stats);
+ 
+ static inline void bnxt_qplib_hwq_incr_prod(struct bnxt_qplib_db_info *dbinfo,
+ 					    struct bnxt_qplib_hwq *hwq, u32 cnt)
 -- 
 2.43.5
 
