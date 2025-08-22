@@ -1,182 +1,234 @@
-Return-Path: <netdev+bounces-216124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADB04B32220
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 20:12:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC2C1B32287
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 21:01:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC92C1D284D4
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 18:12:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C5343AE6BB
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 19:01:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E2832BE033;
-	Fri, 22 Aug 2025 18:11:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADDB529B79A;
+	Fri, 22 Aug 2025 19:01:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VD0GlZI/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fHGCFvCM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986FD2BD5B3;
-	Fri, 22 Aug 2025 18:11:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3182C21D4;
+	Fri, 22 Aug 2025 19:00:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755886302; cv=none; b=uXjBMkjdZMw2PjJBDLEBOq+P4UY6UEddmij4WJy/ziEyHmtDA+2bAJ6EBrYBaD8Mas9b0T+J+v2MgvhhwkgntjV20+vDOaLxoVUj1knALc6DxEhgDybPvLclurBhWhcnwWEEY3s14ICD6Venfbdgvxma/yN2WMsJvpeDgE9AmtY=
+	t=1755889280; cv=none; b=bJEqL71dHZgw07HrSUeBwM/rE8odDBzs348PUSP2KBgah7LetkhRJMzdPkggg+VGb6fFu089XrqKGlU1UUrRpDRK5l+4PHrm239H3oIStjIMharyP7Ba711c/wTUgEHDItKJbuGCf/lAQQTfnbu+2zFJOWD2Cb5XNiWZthuhexA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755886302; c=relaxed/simple;
-	bh=IJtLE1Q4rJCO8zJhc+hEtTZK1+HnLN8Rtssuw8qX5aw=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ox44m+2+RcCiIE/jdNz5qwUOttnO1OMhk9Tp20nfdVkGd4rIvCa0M01G+6ArZjIyw2krA+ERu1EzqVUBAhUmVSt2jCXyG3NHPU3pa00K2JDWYhMed+OK+WNh9YUKsDpWMIN/pqm8v6w4E2nmXhBb/08GRw4dV4GZyr1RiKcTKT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VD0GlZI/; arc=none smtp.client-ip=209.85.128.52
+	s=arc-20240116; t=1755889280; c=relaxed/simple;
+	bh=MmmXQmiYtuiUZvLDCzhyQq0oQAsG8MaMCnLc2t8LIuA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nvMkk3qivvVJkaUByMKzlFE7cSuYuCTj+mEy55kH3qvAKlx0L66OIYf91U1rOjBAC2SkCJYvjF7zrTrvN9bsRM/XGQcimAbqstHDdVDU7IaDT1DsACuRIRPR4h/9pTRQzwdrlO4nE5T5tEZD9uXrlGYudQgMyw+yGxjquLiAr9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fHGCFvCM; arc=none smtp.client-ip=209.85.216.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-45a1b04f8b5so15396645e9.1;
-        Fri, 22 Aug 2025 11:11:40 -0700 (PDT)
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-32326e5f0bfso2025794a91.3;
+        Fri, 22 Aug 2025 12:00:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755886299; x=1756491099; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zhlyI1Vji6S4iPUyGLb7GjEFW+HU1Z0XCJTAoKiKDwk=;
-        b=VD0GlZI/Xje8VutMEnH4GJBeKebl2sEK8V8Ea8ttRDWHGibSKOoCLSTxA4YwVDFPxX
-         wePRIkfxp1vBD9gEW/ZfoPNCorWeJM3ey3H0kgsRt/JsR9EphasbfAojVW0uP2iyuJCS
-         1zeWprJnUu0Z5tb2Tq6fNSo/zraNPs875qZBx7ahOrB/NMNI5xU1ntckLSDv5JGlfXxu
-         ODjYiZT2X2wTlpeBOnh37y4t2nplofRAJRa8ydkpISkwvNl3WS4YAGh2SjxejyvV9AMN
-         iU2m8Ct2j7tJ42bWTRL/7p0IIuLrSAACkTSsOdUKNvy4rnEIhXDo1xGjX8aqYBZcwRkT
-         wABg==
+        d=gmail.com; s=20230601; t=1755889253; x=1756494053; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2G4uVOcBa/iivnMpGsqEmtusc+mONUzr/xNCqDruNEw=;
+        b=fHGCFvCMqISo+AyWNyNg9B/4Wo7Ml5UIt0KXLjgy2BB2subAYmvnWHcXX58UwAMyft
+         pV5KfEavIJJMdiF1iThezpkne0PxyOSwJqGaxdFnkc8pLHDpGFY6db9Ao4s+7HHV0mzO
+         LPFsXG31zP+VjS769+6fIVPTQ3/ZaAG39KNSfCy6zsAGCjyewk3tLw1ylkYXW94RlWZY
+         WSDQPxjkQqoJYDrGd6oCqdDYJajFU5wzBeZqoXeedaSEef6eHqkEN+3EaOhAVGgPK2zk
+         rvgjNZMbXngGO/cupjILQqeaYmFat72uMxChHUcP13tjXm2o2UQ+IScqE3famS9+KDYK
+         4Jlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755886299; x=1756491099;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zhlyI1Vji6S4iPUyGLb7GjEFW+HU1Z0XCJTAoKiKDwk=;
-        b=U7x5gZUwl12FfDmPaMG1cUo58nXJPYD/85dvl92fwAzT4Vo6B8+ugBhyM5lfrVHR9k
-         2267XPt5iMjKoc5426GpYY7/5iIRXgzwn2jpVKU7MvJH9iYCS0bH0adQScy/nSf6RFbu
-         EKqk7JBHQlsXol65wIKwQO2dTN1VH3wq2Yx8h0aWxZk3Qdy87w6hMn3aeCS/RNgvS8Jb
-         y278eISsJbjMdXONhoKVrLprqNxIHPsrb3NqcVB9pibxSLd9dSGJuOV280thbfK6q0Oz
-         r2W1QleBUJzHdCIbQ4ePmASJr4+5P51/g1k+dJOSUpV+5sODl79FHa8wuDkvhm6R36o3
-         5yrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX3AS1YfYlBT0WKjGeglVmVDf4lJdsPgeyAcTVlKZUCSgCUrX8P9cPWmBi2csV4DQl4WbGNKjuoG4IlHaI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKPuRYj5Xp3tVaMEKTAudaon2t4nPS7zZ7EOfcpni6Evg/JKel
-	KdCvfgQfCsWu3NefXtEyqOP7kaos4micc/bxvl65sVk1EVCDqyuObH5Ls+cmYv4=
-X-Gm-Gg: ASbGncultxQD1AF9CP8CPs1YJc/HrXHrJt7W2w/YGTpkJU8c2E69W0uAlfctzjkgyth
-	eQqj3DLOrzPxymu2VfPt3YqPqt+wVbdbbScStaGYL/5etR7W6P8HpGMKPtZkQj7JTzTXTx2syed
-	sfv3AYtsNTf1byzhwNb46vSFgxZKjPdATrvC1d4jmRnLLu7QaMKx+X6EU1c6/vHXvWmMtpMNrNW
-	35EelZFCm+XZ8CSZf3HafKvsaIT57ygt/XPxV62o/mU1VBmnqwuNo5YLL43yvpHPx6gnG3T3IhI
-	nsxRXLcZakvILG5PK1/+I7ag6feFKDFss6900vKbo+9prS0UqB5qw7OJqbaapxGJfveXxixc63S
-	ESf59J5MZu403gz7pLlaBa7a3
-X-Google-Smtp-Source: AGHT+IEcEXXL9E75Q0oSfCH1XgdzQeq368tH6A0PH5dLP2MAUtRhM2w8SNkWmRhoGzgwKx1EHVEoVw==
-X-Received: by 2002:a05:600c:4695:b0:456:26a1:a0c1 with SMTP id 5b1f17b1804b1-45b517cb8e5mr42484925e9.17.1755886298715;
-        Fri, 22 Aug 2025 11:11:38 -0700 (PDT)
-Received: from vova-pc ([37.122.165.138])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b57535439sm8574595e9.4.2025.08.22.11.11.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Aug 2025 11:11:38 -0700 (PDT)
-Date: Fri, 22 Aug 2025 20:11:36 +0200
-From: Vladimir Riabchun <ferr.lambarginio@gmail.com>
-To: isdn@linux-pingi.de
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	ferr.lambarginio@gmail.com
-Subject: [PATCH] mISDN: hfcpci: Fix warning when deleting uninitialized timer
-Message-ID: <aKiy2D_LiWpQ5kXq@vova-pc>
+        d=1e100.net; s=20230601; t=1755889253; x=1756494053;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2G4uVOcBa/iivnMpGsqEmtusc+mONUzr/xNCqDruNEw=;
+        b=lDC+CRYLlLmNV8U6YNHVq0vDH0689PdPy6OMLLo8Tza8Kg7md2rFrrAQfCv6aGcryh
+         kjDvu9qdjDJRdMuaJ+Xo/tGbs+6Iabb+5lVItCWB3mfszlrl8ZK6zuMprm770DwoKKt/
+         Ar3g6OyX1RDQ0hcn69SE69UwkAT0TURH3oONJOQyEaNgqPUUjC7cUj87/xgwLqVUgvt4
+         sHANRuaihP/p31Q0joz/m1unV7nTiKZGBnWapG/EQmEIn16jH8r2JOJCh+78OIu1j+qe
+         z0m5X8mxqSqdB4DLeSfPCpJw+0o9dGyoWMyPkWpk0Miut7J00ZGfOkO5Myx4SDTyeEzv
+         r9fw==
+X-Forwarded-Encrypted: i=1; AJvYcCVUu+5Mk5tIoophRpri4YLsvTtJ481jM0XJZz6wF0vqr60FdnIvopWzy5DHTc181cjWay7JmSS3ToNzoUsv@vger.kernel.org, AJvYcCX5yulaBmljrTYc4/F7d1TSKCidA22Qa4KscsPBqAiqOtscqNbEmY4XlWVk6y8j54BZTzg=@vger.kernel.org, AJvYcCXDW+MQRfGOaoc0pFABV+DKN3NsdC6S2VaQC6IjjpUZ94WD+o+hrZtQGTFKbjCFDHwiYUdvEJBj@vger.kernel.org
+X-Gm-Message-State: AOJu0YzzPh1z2pm980NDJP1IwvvGkLURHxpkw98VfDUjf1P14bGCt25a
+	8ozgWuDfAR/VzTZ900h/f30jv3BDXOcCw9rysPeqTYwYTXgAsGeuNJf0AgoJyGdANTcR8t+wQSL
+	pNL/yuBGjByyVnOMmyqMLsrMOSyPdZvE=
+X-Gm-Gg: ASbGncuVJ0vMGfeXy3qPj/RYeD1/ScN8KHCYdzvBm0AaS7mmdvIu0s29aQE2+kI+bj7
+	cX7eAZ92NS+s9rMCiD0JX3cFZmqblVTbIi78SDwyKQK/GNMww+yC0XCUZPz2ArkY+uol+C8OsIr
+	/1qlAszrwqTKosa/iFF9S3by8KT3HYrkPj9jrZa+uPaj6OF9CiYS/FwPGF/6FlvAmT8PXXpsSFI
+	bCgFA8yMybF6s6uZaxzf9wHlimdtiGmFg==
+X-Google-Smtp-Source: AGHT+IFqeDt4xyP9+GIOv8ChYUNwdA+7nFMivdwPnGvNMZIkoKl9VMhe4tBx9FuuBlBI10NSV6shvJM3cPBvU7ZmrYU=
+X-Received: by 2002:a17:90b:3c47:b0:324:fbbe:a457 with SMTP id
+ 98e67ed59e1d1-32517748ee5mr5102753a91.21.1755889252885; Fri, 22 Aug 2025
+ 12:00:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20250813073955.1775315-1-maze@google.com> <6df59861-8334-49ac-8dca-2b0bac82f2d7@linux.dev>
+ <CANP3RGcJ06uRUBF=RR6bjqNnxdaSdpBpynGzNTSms0jA-ZpW6w@mail.gmail.com> <a3d437ce-c91d-47c6-9590-88b716fb6690@linux.dev>
+In-Reply-To: <a3d437ce-c91d-47c6-9590-88b716fb6690@linux.dev>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Fri, 22 Aug 2025 12:00:36 -0700
+X-Gm-Features: Ac12FXxmgU6oECat9fB9U_9F3fWqtrlWLu_VfkCnOaPfi02VDFbJguKrIT9_vYY
+Message-ID: <CAEf4BzabChgVsFBJPp6oKENJK=WAKPQahH8HO3fSBz_xWDH54Q@mail.gmail.com>
+Subject: Re: [PATCH bpf-next] bpf: hashtab - allow BPF_MAP_LOOKUP{,_AND_DELETE}_BATCH
+ with NULL keys/values.
+To: Yonghong Song <yonghong.song@linux.dev>
+Cc: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Linux Network Development Mailing List <netdev@vger.kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, BPF Mailing List <bpf@vger.kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-With CONFIG_DEBUG_OBJECTS_TIMERS unloading hfcpci module leads
-to the following splat:
+On Thu, Aug 21, 2025 at 2:49=E2=80=AFPM Yonghong Song <yonghong.song@linux.=
+dev> wrote:
+>
+>
+>
+> On 8/20/25 7:23 PM, Maciej =C5=BBenczykowski wrote:
+> > On Mon, Aug 18, 2025 at 1:58=E2=80=AFPM Yonghong Song
+> > <yonghong.song@linux.dev> wrote:
+> > > On 8/13/25 12:39 AM, Maciej =C5=BBenczykowski wrote:
+> > > > BPF_MAP_LOOKUP_AND_DELETE_BATCH keys & values =3D=3D NULL
+> > > > seems like a nice way to simply quickly clear a map.
+> > >
+> > > This will change existing API as users will expect
+> > > some error (e.g., -EFAULT) return when keys or values is NULL.
+> >
+> > No reasonable user will call the current api with NULLs.
+>
+> I do agree it is really unlikely users will have NULL keys or values.
+>
+> >
+> > This is a similar API change to adding a new system call
+> > (where previously it returned -ENOSYS) - which *is* also a UAPI
+> > change, but obviously allowed.
+> >
+> > Or adding support for a new address family / protocol (where
+> > previously it -EAFNOSUPPORT)
+> > Or adding support for a new flag (where previously it returned -EINVAL)
+> >
+> > Consider why userspace would ever pass in NULL, two possibilities:
+> > (a) explicit NULL - you'd never do this since it would (till now)
+> > always -EFAULT,
+> >   so this would only possibly show up in a very thorough test suite
+> > (b) you're using dynamically allocated memory and it failed allocation.
+> >   that's already a program bug, you should catch that before you call
+> > bpf().
+>
+> Okay. What you describes make sense.
 
-[  250.215892] ODEBUG: assert_init not available (active state 0) object: ffffffffc01a3dc0 object type: timer_list hint: 0x0
-[  250.217520] WARNING: CPU: 0 PID: 233 at lib/debugobjects.c:612 debug_print_object+0x1b6/0x2c0
-[  250.218775] Modules linked in: hfcpci(-) mISDN_core
-[  250.219537] CPU: 0 UID: 0 PID: 233 Comm: rmmod Not tainted 6.17.0-rc2-g6f713187ac98 #2 PREEMPT(voluntary)
-[  250.220940] Hardware name: QEMU Ubuntu 24.04 PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-[  250.222377] RIP: 0010:debug_print_object+0x1b6/0x2c0
-[  250.223131] Code: fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 75 4f 41 56 48 8b 14 dd a0 4e 01 9f 48 89 ee 48 c7 c7 20 46 01 9f e8 cb 84d
-[  250.225805] RSP: 0018:ffff888015ea7c08 EFLAGS: 00010286
-[  250.226608] RAX: 0000000000000000 RBX: 0000000000000005 RCX: ffffffff9be93a95
-[  250.227708] RDX: 1ffff1100d945138 RSI: 0000000000000008 RDI: ffff88806ca289c0
-[  250.228993] RBP: ffffffff9f014a00 R08: 0000000000000001 R09: ffffed1002bd4f39
-[  250.230043] R10: ffff888015ea79cf R11: 0000000000000001 R12: 0000000000000001
-[  250.231185] R13: ffffffff9eea0520 R14: 0000000000000000 R15: ffff888015ea7cc8
-[  250.232454] FS:  00007f3208f01540(0000) GS:ffff8880caf5a000(0000) knlGS:0000000000000000
-[  250.233851] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  250.234856] CR2: 00007f32090a7421 CR3: 0000000004d63000 CR4: 00000000000006f0
-[  250.236117] Call Trace:
-[  250.236599]  <TASK>
-[  250.236967]  ? trace_irq_enable.constprop.0+0xd4/0x130
-[  250.237920]  debug_object_assert_init+0x1f6/0x310
-[  250.238762]  ? __pfx_debug_object_assert_init+0x10/0x10
-[  250.239658]  ? __lock_acquire+0xdea/0x1c70
-[  250.240369]  __try_to_del_timer_sync+0x69/0x140
-[  250.241172]  ? __pfx___try_to_del_timer_sync+0x10/0x10
-[  250.242058]  ? __timer_delete_sync+0xc6/0x120
-[  250.242842]  ? lock_acquire+0x30/0x80
-[  250.243474]  ? __timer_delete_sync+0xc6/0x120
-[  250.244262]  __timer_delete_sync+0x98/0x120
-[  250.245015]  HFC_cleanup+0x10/0x20 [hfcpci]
-[  250.245704]  __do_sys_delete_module+0x348/0x510
-[  250.246461]  ? __pfx___do_sys_delete_module+0x10/0x10
-[  250.247338]  do_syscall_64+0xc1/0x360
-[  250.247924]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
++1, I think there is no backwards compat concern with this extension.
 
-Fix this by initializing hfc_tl timer with DEFINE_TIMER macro.
-Also, use mod_timer instead of manual timeout update.
+> Could you add a selftest for this?
 
-Fixes: 87c5fa1bb426 ("mISDN: Add different different timer settings for hfc-pci")
-Fixes: 175302f6b79e ("mISDN: hfcpci: Fix use-after-free bug in hfcpci_softirq")
-Signed-off-by: Vladimir Riabchun <ferr.lambarginio@gmail.com>
----
- drivers/isdn/hardware/mISDN/hfcpci.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+yes, please
 
-diff --git a/drivers/isdn/hardware/mISDN/hfcpci.c b/drivers/isdn/hardware/mISDN/hfcpci.c
-index 2b05722d4dbe..ea8a0ab47afd 100644
---- a/drivers/isdn/hardware/mISDN/hfcpci.c
-+++ b/drivers/isdn/hardware/mISDN/hfcpci.c
-@@ -39,12 +39,13 @@
- 
- #include "hfc_pci.h"
- 
-+static void hfcpci_softirq(struct timer_list *unused);
- static const char *hfcpci_revision = "2.0";
- 
- static int HFC_cnt;
- static uint debug;
- static uint poll, tics;
--static struct timer_list hfc_tl;
-+static DEFINE_TIMER(hfc_tl, hfcpci_softirq);
- static unsigned long hfc_jiffies;
- 
- MODULE_AUTHOR("Karsten Keil");
-@@ -2305,8 +2306,7 @@ hfcpci_softirq(struct timer_list *unused)
- 		hfc_jiffies = jiffies + 1;
- 	else
- 		hfc_jiffies += tics;
--	hfc_tl.expires = hfc_jiffies;
--	add_timer(&hfc_tl);
-+	mod_timer(&hfc_tl, hfc_jiffies);
- }
- 
- static int __init
-@@ -2332,10 +2332,8 @@ HFC_init(void)
- 	if (poll != HFCPCI_BTRANS_THRESHOLD) {
- 		printk(KERN_INFO "%s: Using alternative poll value of %d\n",
- 		       __func__, poll);
--		timer_setup(&hfc_tl, hfcpci_softirq, 0);
--		hfc_tl.expires = jiffies + tics;
--		hfc_jiffies = hfc_tl.expires;
--		add_timer(&hfc_tl);
-+		hfc_jiffies = jiffies + tics;
-+		mod_timer(&hfc_tl, hfc_jiffies);
- 	} else
- 		tics = 0; /* indicate the use of controller's timer */
- 
--- 
-2.43.0
+> Could you add some comments in below uapi bpf.h header to new functionali=
+ty?
 
++1, I'd also appreciate if you can incorporate that into libbpf API
+doc comments in tools/lib/bpf/bpf.h, as we already have a decent
+description of this rather complicated API, so it would be nice to
+keep it up to date with this added semantics. Thanks!
+
+Also, please shorten the subject, it's way too long.
+
+pw-bot: cr
+
+>
+> >
+> > > We have a 'flags' field in uapi header in
+> > >
+> > >          struct { /* struct used by BPF_MAP_*_BATCH commands */
+> > >                  __aligned_u64   in_batch;       /* start batch,
+> > >                                                   * NULL to start
+> > from beginning
+> > >                                                   */
+> > >                  __aligned_u64   out_batch;      /* output: next
+> > start batch */
+> > >                  __aligned_u64   keys;
+> > >                  __aligned_u64   values;
+> > >                  __u32           count;          /* input/output:
+> > >                                                   * input: # of
+> > key/value
+> > >                                                   * elements
+> > >                                                   * output: # of
+> > filled elements
+> > >                                                   */
+> > >                  __u32           map_fd;
+> > >                  __u64           elem_flags;
+> > >                  __u64           flags;
+> > >          } batch;
+> > >
+> > > we can add a flag in 'flags' like BPF_F_CLEAR_MAP_IF_KV_NULL with a
+> > comment
+> > > that if keys or values is NULL, the batched elements will be cleared.
+> >
+> > I just don't see what value this provides.
+> >
+> > > > BPF_MAP_LOOKUP keys/values =3D=3D NULL might be useful if we just w=
+ant
+> > > > the values/keys and don't want to bother copying the keys/values...
+> > > >
+> > > > BPF_MAP_LOOKUP keys & values =3D=3D NULL might be useful to count
+> > > > the number of populated entries.
+> > >
+> > > bpf_map_lookup_elem() does not have flags field, so we probably
+> > should not
+> > > change existins semantics.
+> >
+> > This is unrelated to this patch, since this only touches 'batch'
+> > operation.
+> > (unless I'm missing something)
+> >
+> > > > Cc: Alexei Starovoitov <ast@kernel.org>
+> > > > Cc: Daniel Borkmann <daniel@iogearbox.net>
+> > > > Cc: Stanislav Fomichev <sdf@fomichev.me>
+> > > > Signed-off-by: Maciej =C5=BBenczykowski <maze@google.com>
+> > > > ---
+> > > >   kernel/bpf/hashtab.c | 4 ++--
+> > > >   1 file changed, 2 insertions(+), 2 deletions(-)
+> > > >
+> > > > diff --git a/kernel/bpf/hashtab.c b/kernel/bpf/hashtab.c
+> > > > index 5001131598e5..8fbdd000d9e0 100644
+> > > > --- a/kernel/bpf/hashtab.c
+> > > > +++ b/kernel/bpf/hashtab.c
+> > > > @@ -1873,9 +1873,9 @@ __htab_map_lookup_and_delete_batch(struct
+> > bpf_map *map,
+> > > >
+> > > >       rcu_read_unlock();
+> > > >       bpf_enable_instrumentation();
+> > > > -     if (bucket_cnt && (copy_to_user(ukeys + total * key_size, key=
+s,
+> > > > +     if (bucket_cnt && (ukeys && copy_to_user(ukeys + total *
+> > key_size, keys,
+> > > >           key_size * bucket_cnt) ||
+> > > > -         copy_to_user(uvalues + total * value_size, values,
+> > > > +         uvalues && copy_to_user(uvalues + total * value_size,
+> > values,
+> > > >           value_size * bucket_cnt))) {
+> > > >               ret =3D -EFAULT;
+> > > >               goto after_loop;
+> > >
+> >
+> >
+> > --
+> > Maciej =C5=BBenczykowski, Kernel Networking Developer @ Google
+>
+>
 
