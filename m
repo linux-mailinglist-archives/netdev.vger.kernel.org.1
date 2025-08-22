@@ -1,101 +1,98 @@
-Return-Path: <netdev+bounces-215934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B3A6B30FC7
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 09:02:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0E65B31010
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 09:16:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E814B5C6852
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 07:00:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5EAA18945A9
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 07:15:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B447A2E7166;
-	Fri, 22 Aug 2025 07:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63AC62E7646;
+	Fri, 22 Aug 2025 07:15:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eOFIAolK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oa/ZsUGG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9054C2E54AA
-	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 07:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ECE92E62BF
+	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 07:15:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755846032; cv=none; b=umaCqm1MVVNDsSzWEpUZ3Z1PbPSx50cdkI2bEpO4ogWQX2XeHJLPf6nb0jwlS9R0p8WqxHhUowua7hFSiUJr0+Kz9ypTqvVjE/vnOPIwaPEU7JBXA5RjuWFa1CLw+b/8XFMg73Yf00WnYXhRSqZvknvpkcZeYa5uiiuab+vSSFs=
+	t=1755846910; cv=none; b=g0liFTql65vNYaV7TRKPrjT0OIyDPtgWgIdFvvIikSvKL6VaPJ20AoNVgfMz/GdtFL8aU+Cp9KfdiG9muR1lyyIT6zffmb664+c+HoCyQ4/Sonp6QwHSzBHxTkNTrTs2+mzVi1RPxq03XBnx0uAZfoCekYtqHfHwdyV58zcSb1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755846032; c=relaxed/simple;
-	bh=QI4S+Cfn/P10Eg8qjEHO9hXbG9rIH/PlkrXcpQyh7Po=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jCLQm/6VuKTianjY2IhtLJ9Tqv4pAc9eCtjAM+UTi0uig+EjfVx27XIfQlbNS5mS+Z41Yo6acLw83nKjM8zcmNQnSb+lZMM3WCbgqQNvkTYabbyEXhdKouqCKPnV6sEcXNpYqlU2WYImkynAOzNg8/CUYLMgDbMLERBx2RoSElI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eOFIAolK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC610C4CEF4;
-	Fri, 22 Aug 2025 07:00:31 +0000 (UTC)
+	s=arc-20240116; t=1755846910; c=relaxed/simple;
+	bh=CVihnyQ1lbG3xmCXsosuDlSrApxiofSs6sf1IgE+ifA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=HN2ReUEQcO7SGjrOkKvGJiqa3nxdgNRD9OsFfnp0gNusm44tVJRFaQNnGAsbo8agduiEBsQBDRwS6W3AybDuP2+vLRS6p6iRYubCsiLyyfBIJHtz0jcf0DRc7LkgPcp71/WTiTaQPeV7wmQShTsrmuhyzAcvxqpyz8rSD88wBWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oa/ZsUGG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EB10C4CEF1;
+	Fri, 22 Aug 2025 07:15:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755846032;
-	bh=QI4S+Cfn/P10Eg8qjEHO9hXbG9rIH/PlkrXcpQyh7Po=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eOFIAolKI2qMkjFwPhLSWCq221EIYCu/mID8GiikO/HQtWo0w4r+24RBu5CBpL0YO
-	 X9ept7kI7u4AK2afWQIrHJOI3NUc3mlGfKiO2N1IuJp2zH+1Qp13caqO7qkbjKuOB7
-	 86Fkfv1ClEbT0OM+XEUg/Q1mdYApYzcqY5uAfqIcYMBSy6ujasYV1ZoIdoMPok/8pm
-	 qUZqwsKzGl8F3mA71LrLwg6T4Tuiu1FUEV+OL9nQkVFReqyyZ/i4HaAecovTors+LI
-	 J+ZkT+ZIYz/AHYGsTb71UyFSt5jm8j8hGxKmeEjlkTcDsfo2dbJ7Nz+D9WLMunvNo/
-	 1onFQnaa97Iwg==
-Date: Fri, 22 Aug 2025 09:00:25 +0200
+	s=k20201202; t=1755846909;
+	bh=CVihnyQ1lbG3xmCXsosuDlSrApxiofSs6sf1IgE+ifA=;
+	h=From:Subject:Date:To:Cc:From;
+	b=oa/ZsUGG7trUDAixHJsonNxYZNWCwSb8P+uTbXcAE8amhNjWbpWjMJg9ji3Txg6hd
+	 HmN3DxcKfqw5wcddTVeNZprn+1oDMWwIpNYHblE+Ioq6KUCeiH5i2CKLXYCNt6U/od
+	 +/yIcZpgGt/aKwXWfLtTgxGAoyZ3IZ/R3IQC6Sx6v8LpUW8UuUCQQCnvL46K/5hQ++
+	 v0NnVYhOhoZ2ZSjB5rpA9LuyxaqxdgfR71O2hgDKc3CwUtht2Jb4nQCaMLEzROYUWa
+	 aV2cQSbciDRugLbe5uLsz9jSapNHDygScekpo/7RLxAPNd+Igb1wkctIAk0GyPhCyl
+	 sfl7oSsqQzm5w==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 0/3] net: airoha: Add PPE support for RX wlan
+Subject: [PATCH net-next v2 0/3] net: airoha: Add PPE support for RX wlan
  offload
-Message-ID: <aKgViYI74bN1y--U@lore-rh-laptop>
-References: <20250819-airoha-en7581-wlan-rx-offload-v1-0-71a097e0e2a1@kernel.org>
- <20250821183420.45af8077@kernel.org>
+Date: Fri, 22 Aug 2025 09:14:47 +0200
+Message-Id: <20250822-airoha-en7581-wlan-rx-offload-v2-0-8a76e1d3fec2@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="onp8zdhmBvKzfJxz"
-Content-Disposition: inline
-In-Reply-To: <20250821183420.45af8077@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAOcYqGgC/43NTQ6CMBCG4auYWTumU+XPlfcwLCYwhUbSmqlBD
+ OHuVk7g8vkW77dCEvWS4HpYQWX2yceQYY8H6EYOg6Dvs8EaW5iaGmSvcWSUUBU14XvigLpgdG6
+ K3CNZca4sO2fPF8iNp4rzy96/t9mjT6+on/1upt/6b3kmNFgRm6YSI5bp9hANMp2iDtBu2/YFA
+ OL89MsAAAA=
+X-Change-ID: 20250819-airoha-en7581-wlan-rx-offload-12eff66cf234
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+X-Mailer: b4 0.14.2
 
+Introduce the missing bits to airoha ppe driver to offload traffic received
+by the MT76 driver (wireless NIC) and forwarded by the Packet Processor
+Engine (PPE) to the ethernet interface.
 
---onp8zdhmBvKzfJxz
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+---
+Changes in v2:
+- Rebase on top of net-next main branch
+- Link to v1: https://lore.kernel.org/r/20250819-airoha-en7581-wlan-rx-offload-v1-0-71a097e0e2a1@kernel.org
 
-> On Tue, 19 Aug 2025 14:21:05 +0200 Lorenzo Bianconi wrote:
-> > Introduce the missing bits to airoha ppe driver to offload traffic rece=
-ived
-> > by the MT76 driver (wireless NIC) and forwarded by the Packet Processor
-> > Engine (PPE) to the ethernet interface.
->=20
-> Doesn't apply :( please rebase
+---
+Lorenzo Bianconi (3):
+      net: airoha: Rely on airoha_eth struct in airoha_ppe_flow_offload_cmd signature
+      net: airoha: Add airoha_ppe_dev struct definition
+      net: airoha: Introduce check_skb callback in ppe_dev ops
 
-Uhm weird, it applies cleanly on top of net-next to me
-(git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git). I will
-repost.
+ drivers/net/ethernet/airoha/airoha_eth.c  |   7 +-
+ drivers/net/ethernet/airoha/airoha_eth.h  |  12 ++--
+ drivers/net/ethernet/airoha/airoha_npu.c  |   1 -
+ drivers/net/ethernet/airoha/airoha_ppe.c  | 113 +++++++++++++++++++++++-------
+ include/linux/soc/airoha/airoha_offload.h |  55 +++++++++++++++
+ 5 files changed, 151 insertions(+), 37 deletions(-)
+---
+base-commit: a7bd72158063740212344fad5d99dcef45bc70d6
+change-id: 20250819-airoha-en7581-wlan-rx-offload-12eff66cf234
 
-Regards,
-Lorenzo
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
 
---onp8zdhmBvKzfJxz
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaKgVhgAKCRA6cBh0uS2t
-rLaTAP0TqBnNLsXSZso8mTSrP9MFqN8++YyOP4qmvMkUNeHOwgD/eCGuV3E9W5fP
-vj5pEBPHqb7A4FhFLjoa2Tl2fauFlgY=
-=ig+N
------END PGP SIGNATURE-----
-
---onp8zdhmBvKzfJxz--
 
