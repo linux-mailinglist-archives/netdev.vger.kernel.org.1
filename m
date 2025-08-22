@@ -1,223 +1,201 @@
-Return-Path: <netdev+bounces-215953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1BA9B311AC
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 10:24:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A448B311DD
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 10:32:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95EC3A22813
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 08:22:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E98272235A
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 08:31:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 267842EAB8E;
-	Fri, 22 Aug 2025 08:21:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94EFD21256B;
+	Fri, 22 Aug 2025 08:31:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="a99m7rAZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WedoQPa7"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E91321256B;
-	Fri, 22 Aug 2025 08:21:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 997701428E7
+	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 08:31:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755850918; cv=none; b=nBG895tpe5V1VLDufWPXPUiEPUEpsjif4slC/3S8zxZTCJjPuehPFIvaDYqQrj4C7OmEHrj/lTFM6yhZRCmuM70OU4JfyHgBG3DIDDP4bleQo/u30Num48RbuOx8LpYo24CVQ9kDGmpNTSWzvG0qes0mqJiuSoQsz0C7jHF7tqE=
+	t=1755851484; cv=none; b=W5wjPDmCbdcWNKrFyocOf2qVM1Y64or6Z9COAsL3KvCeGxvggwtPCZGip26Wj8WMR+wHM2FCN2CI7ja5VKr0fnVAuPfgK1zVMX3Su0WjYI6UDtdkNx835yVuGGWaLctkLr+dEnfhYMkgkeywQ3TmQwKI6TFAaCV4Ov4fg3lV0lA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755850918; c=relaxed/simple;
-	bh=PWIeXmdBk8sOPfOzgIyBbD4F0B9qEfIuco2f+wBido8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=mKrhTxtje4eLqv92PSjD9P8RJKPsmwwMKS/HnCSAj3pzQsjnGf+nqL1XEPu7pGDwuUEGJ0IMnyMfwQusMjKu+H8b6pyoCjU1RFPE4+oJSYZdlX9MMbh3IYgUSFbA/kkRwfoTHQDzPRy73ITJkZhSI3SJ/lPPVV5trGsd112MVQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=a99m7rAZ; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1755850907;
-	bh=PWIeXmdBk8sOPfOzgIyBbD4F0B9qEfIuco2f+wBido8=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=a99m7rAZQWm+UjHvWrf1rGV1iRHSpZdyNGyE2Bcbhga0edcdvhVbM+Zsz5e9V/E40
-	 47NSPqyku26AycKn2jHXaEhLGRYig3tSJHwhYANZYVbyOexfrttBTa5/U1MqSI+6kI
-	 daGpOevkCSPbunng3Xb/9ITM/MFC2FUXTRlE4f02w/u/KuI2/T+75xJ/YixrOjyLGe
-	 mNoN8/dt10fYtFdJWw0KwBrwg+jhpNyD8xJ59jiqPWkrmdVL4Axy4A87ciKyA3mqR9
-	 2iog7IYgA8TxtN36KtLg+ZS5JyXlxggvCBsomWKXHD8V+PHYocJZPs61Hz08lTyeDO
-	 FWHRSqRxaD4zw==
-Received: from pecola.lan (unknown [159.196.93.152])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 429406CEE4;
-	Fri, 22 Aug 2025 16:21:46 +0800 (AWST)
-Message-ID: <88a67cc10907926204a478c58e361cb6706a939a.camel@codeconstruct.com.au>
-Subject: Re: [PATCH net-next v25 1/1] mctp pcc: Implement MCTP over PCC
- Transport
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: admiyo@os.amperecomputing.com, Matt Johnston
- <matt@codeconstruct.com.au>,  Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Sudeep Holla
-	 <sudeep.holla@arm.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
-	Huisong Li <lihuisong@huawei.com>
-Date: Fri, 22 Aug 2025 16:21:45 +0800
-In-Reply-To: <20250819205159.347561-2-admiyo@os.amperecomputing.com>
-References: <20250819205159.347561-1-admiyo@os.amperecomputing.com>
-	 <20250819205159.347561-2-admiyo@os.amperecomputing.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-User-Agent: Evolution 3.46.4-2 
+	s=arc-20240116; t=1755851484; c=relaxed/simple;
+	bh=Cu8xo//SuFYNe/yq/cf/lP09igfl1ZhrHUxrSpyAdQU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Z9WpORvFg8KFkZbGlOhVbkusOjyYiIxZPs8dMKXk7lzpFTI5Iaef+6+FlvzPXvNtmY1tXmEyMesOHkmspuowDL20600te49E8u8jihU8qd/NukI4+3UQrpRNi4eBWK5omL/pHKeIEhHD8P/NaFVyXX3qH1hPdt6ZD66LIw3r4Uk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WedoQPa7; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755851481;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lT0Vt6aiyXs+DEMRvuBBLV7w2IbA5/N0O5+Xoi7IwY4=;
+	b=WedoQPa7a3U0P6YgA2itaUUhhuL7cPdVnWAwj4myzZa7f6CJ52JEwXAKXsiQVdGOshx3ei
+	E6gXoLbTc/d9Ofo4ydtxwIe3/mECJBLyZfP4+UtZOISE/9HW9KJHJ751Fadmmq4io3fjJe
+	lRNYoSRpq1TuZNWp3v5WNNZ2W5OXT9c=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-554-QzjDBZhrPbizvabzwSfGow-1; Fri, 22 Aug 2025 04:26:49 -0400
+X-MC-Unique: QzjDBZhrPbizvabzwSfGow-1
+X-Mimecast-MFC-AGG-ID: QzjDBZhrPbizvabzwSfGow_1755851209
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-709e7485b3eso57873896d6.1
+        for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 01:26:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755851209; x=1756456009;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lT0Vt6aiyXs+DEMRvuBBLV7w2IbA5/N0O5+Xoi7IwY4=;
+        b=FW86g3dYkvg7DsCyt8mY0buw9xlEyqbBpRCYPfQBJu1yrXG9qMAIiW1HTAltdiQAIb
+         14+JnXNb1xQNDPKOAzBPM18imZ/bABMXHJsR5AJN7GvqYBgZ43kTTIQtEduh2Klt6RiJ
+         hOX4v+iXc4WGiiKq2SCmRfQmfFAKIYWvlFp2kVEzld00PmIRSvMPZWkS7KybLlOtsB37
+         BKykU8Sy/oIjQwis5Lu+Mwz6I1L3CZB2FsseayYyL2PiaP5/InJozCFC55ANzL9WNTCG
+         Zma+1VN4cvC7kb2jSOLwYS+oG7pD5mIKq3bwZhWvnicZx4Gc1lwN0tROIrHiKdkK24cG
+         VZIA==
+X-Forwarded-Encrypted: i=1; AJvYcCUxsCEaupwhR24X7+qRyRfa2rL97U47y7P8Vq1+plJRhfJ2Zj8E8g9+hoLAs8Fq3UExR7PAEsI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3JAu/a89jRbsuVYN4j/BGE7oJ4e9DfoFTYp2OAmaFhZDKtGqu
+	7MgEOVlWWzcWjb6htB5wS/Om+yU/tcsoT8Z4O+Fe8lhQ11bXw6raxd+ur5U91TkuxyBLQdK8J08
+	sE+sY1HNTkSw62TKXtS0CS+aCyaR3MdcPgKgd/sJab4Y8PqlmhhPi4JTTaw==
+X-Gm-Gg: ASbGncvTSN6Rmg3FL4hll2UeamsqOOUH/WwlH6GdKKKUHQAPi4jsPeIEhVDoT3y/j9Y
+	liW4ECKo+0/74l97aUZ0NtTt5+ToIp8NYZdH4bBiOrFOYTlb4P5U3kipjgNg07aHSYyFvRAWqYw
+	RVtbX3rV88J85cN4QsPeHenf+e9dBtfDZOqS2DeGX+/8yUMzWhl1ZGCguYgxHlALMJyu/8/JWAC
+	w7vqq6H6RMUgAtg2Cr3gAiT8BOk7kEu+Ei8CbClij43OwXuVzCkEUeUw7FhPExdhp6Q+aYfY8Wh
+	EBSeJfgBbBymzvm94efy5cH0TU4Il2FC2DRksC7XQNOLwj5PURg6qLTEcf0/RWr48kBnGpQ3YhR
+	zOnY317yEXk0=
+X-Received: by 2002:a05:6214:dcf:b0:704:a1c6:fff3 with SMTP id 6a1803df08f44-70d893b7e8cmr65023856d6.15.1755851209042;
+        Fri, 22 Aug 2025 01:26:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGbuSV5M3uUv5uKHoyxUj5Lwj/G/7tQhGlA5XRvn/4WeYWUt+BF1kAeN6hrGRVpk3imrKmvZg==
+X-Received: by 2002:a05:6214:dcf:b0:704:a1c6:fff3 with SMTP id 6a1803df08f44-70d893b7e8cmr65023666d6.15.1755851208545;
+        Fri, 22 Aug 2025 01:26:48 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70ba9086433sm121691916d6.24.2025.08.22.01.26.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 Aug 2025 01:26:48 -0700 (PDT)
+Message-ID: <d986135a-d0ee-4878-9fc2-958f35d569da@redhat.com>
+Date: Fri, 22 Aug 2025 10:26:44 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 2/5] net: gro: only merge packets with
+ incrementing or fixed outer ids
+To: Richard Gobert <richardbgobert@gmail.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ horms@kernel.org, corbet@lwn.net, saeedm@nvidia.com, tariqt@nvidia.com,
+ mbloch@nvidia.com, leon@kernel.org, ecree.xilinx@gmail.com,
+ dsahern@kernel.org, ncardwell@google.com, kuniyu@google.com,
+ shuah@kernel.org, sdf@fomichev.me, aleksander.lobakin@intel.com,
+ florian.fainelli@broadcom.com, willemdebruijn.kernel@gmail.com,
+ alexander.duyck@gmail.com, linux-kernel@vger.kernel.org,
+ linux-net-drivers@amd.com
+References: <20250821073047.2091-1-richardbgobert@gmail.com>
+ <20250821073047.2091-3-richardbgobert@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250821073047.2091-3-richardbgobert@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-SGkgQWRhbSwKCkEgZmV3IGNvbW1lbnRzIGlubGluZSwgbWFpbmx5IG9uIHRoZSBsb2NraW5nICYg
-bGlzdCB0cmF2ZXJzYWwuCgo+ICtzdHJ1Y3QgbWN0cF9wY2NfbWFpbGJveCB7Cj4gK8KgwqDCoMKg
-wqDCoMKgdTMyIGluZGV4Owo+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCBwY2NfbWJveF9jaGFuICpj
-aGFuOwo+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCBtYm94X2NsaWVudCBjbGllbnQ7Cj4gK8KgwqDC
-oMKgwqDCoMKgc3RydWN0IHNrX2J1ZmZfaGVhZCBwYWNrZXRzOwo+ICt9Owo+ICsKPiArLyogVGhl
-IG5ldGRldiBzdHJ1Y3R1cmUuIE9uZSBvZiB0aGVzZSBwZXIgUENDIGFkYXB0ZXIuICovCj4gK3N0
-cnVjdCBtY3RwX3BjY19uZGV2IHsKPiArwqDCoMKgwqDCoMKgwqAvKiBzcGlubG9jayB0byBzZXJp
-YWxpemUgYWNjZXNzIHRvIHF1ZXVlIHRoYXQgaG9sZHMgYSBjb3B5IG9mIHRoZQo+ICvCoMKgwqDC
-oMKgwqDCoCAqIHNrX2J1ZmZzIHRoYXQgYXJlIGFsc28gaW4gdGhlIHJpbmcgYnVmZmVycyBvZiB0
-aGUgbWFpbGJveC4KPiArwqDCoMKgwqDCoMKgwqAgKi8KPiArwqDCoMKgwqDCoMKgwqBzcGlubG9j
-a190IGxvY2s7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IG5ldF9kZXZpY2UgKm5kZXY7Cj4gK8Kg
-wqDCoMKgwqDCoMKgc3RydWN0IGFjcGlfZGV2aWNlICphY3BpX2RldmljZTsKPiArwqDCoMKgwqDC
-oMKgwqBzdHJ1Y3QgbWN0cF9wY2NfbWFpbGJveCBpbmJveDsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1
-Y3QgbWN0cF9wY2NfbWFpbGJveCBvdXRib3g7Cj4gK307Cj4gKwo+ICtzdGF0aWMgdm9pZCAqbWN0
-cF9wY2NfcnhfYWxsb2Moc3RydWN0IG1ib3hfY2xpZW50ICpjLCBpbnQgc2l6ZSkKPiArewo+ICvC
-oMKgwqDCoMKgwqDCoHN0cnVjdCBtY3RwX3BjY19uZGV2ICptY3RwX3BjY19uZGV2Owo+ICvCoMKg
-wqDCoMKgwqDCoHN0cnVjdCBtY3RwX3BjY19tYWlsYm94ICpib3g7Cj4gK8KgwqDCoMKgwqDCoMKg
-c3RydWN0IHNrX2J1ZmYgKnNrYjsKPiArCj4gK8KgwqDCoMKgwqDCoMKgbWN0cF9wY2NfbmRldiA9
-wqBjb250YWluZXJfb2YoYywgc3RydWN0IG1jdHBfcGNjX25kZXYsIGluYm94LmNsaWVudCk7Cj4g
-K8KgwqDCoMKgwqDCoMKgYm94ID0gJm1jdHBfcGNjX25kZXYtPmluYm94Owo+ICsKPiArwqDCoMKg
-wqDCoMKgwqBpZiAoc2l6ZSA+IG1jdHBfcGNjX25kZXYtPm5kZXYtPm10dSkKPiArwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgcmV0dXJuIE5VTEw7Cj4gK8KgwqDCoMKgwqDCoMKgc2tiID0g
-bmV0ZGV2X2FsbG9jX3NrYihtY3RwX3BjY19uZGV2LT5uZGV2LCBzaXplKTsKPiArwqDCoMKgwqDC
-oMKgwqBpZiAoIXNrYikKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmV0dXJuIE5V
-TEw7Cj4gK8KgwqDCoMKgwqDCoMKgc2tiX3B1dChza2IsIHNpemUpOwo+ICvCoMKgwqDCoMKgwqDC
-oHNrYi0+cHJvdG9jb2wgPSBodG9ucyhFVEhfUF9NQ1RQKTsKPiArCj4gK8KgwqDCoMKgwqDCoMKg
-c3Bpbl9sb2NrKCZtY3RwX3BjY19uZGV2LT5sb2NrKTsKPiArwqDCoMKgwqDCoMKgwqBza2JfcXVl
-dWVfaGVhZCgmYm94LT5wYWNrZXRzLCBza2IpOwo+ICvCoMKgwqDCoMKgwqDCoHNwaW5fdW5sb2Nr
-KCZtY3RwX3BjY19uZGV2LT5sb2NrKTsKCkdpdmVuIHlvdSdyZSB1c2luZyB5b3VyIG93biBsb2Nr
-aW5nIGhlcmUgKHdoaWNoIHNlZW1zIHNlbnNpYmxlLCBzaW5jZQp5b3UncmUgaXRlcmF0aW5nIGVs
-c2V3aGVyZSksIHlvdSdyZSBub3QgcmVseWluZyBvbiB0aGUgbGlzdCdzIGxvY2suIEluCndoaWNo
-IGNhc2UgeW91IGNhbiB1c2UgX19za2JfcXVldWVfaGVhZCgpIChhbmQgX19za2JfdW5saW5rIGJl
-bG93KSBhcwpsb2NrbGVzcyB2YXJpYW50cy4KCj4gKwo+ICvCoMKgwqDCoMKgwqDCoHJldHVybiBz
-a2ItPmRhdGE7Cj4gK30KPiArCj4gK3N0YXRpYyB2b2lkIG1jdHBfcGNjX2NsaWVudF9yeF9jYWxs
-YmFjayhzdHJ1Y3QgbWJveF9jbGllbnQgKmMsIHZvaWQgKmJ1ZmZlcikKPiArewo+ICvCoMKgwqDC
-oMKgwqDCoHN0cnVjdCBtY3RwX3BjY19uZGV2ICptY3RwX3BjY19uZGV2Owo+ICvCoMKgwqDCoMKg
-wqDCoHN0cnVjdCBwY2NfaGVhZGVyIHBjY19oZWFkZXI7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0
-IHNrX2J1ZmYgKnNrYiA9IE5VTEw7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IG1jdHBfc2tiX2Ni
-ICpjYjsKPiArCj4gK8KgwqDCoMKgwqDCoMKgbWN0cF9wY2NfbmRldiA9IGNvbnRhaW5lcl9vZihj
-LCBzdHJ1Y3QgbWN0cF9wY2NfbmRldiwgaW5ib3guY2xpZW50KTsKPiArwqDCoMKgwqDCoMKgwqBp
-ZiAoIWJ1ZmZlcikgewo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBkZXZfZHN0YXRz
-X3J4X2Ryb3BwZWQobWN0cF9wY2NfbmRldi0+bmRldik7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoHJldHVybjsKPiArwqDCoMKgwqDCoMKgwqB9Cj4gKwo+ICvCoMKgwqDCoMKgwqDC
-oHNwaW5fbG9jaygmbWN0cF9wY2NfbmRldi0+bG9jayk7Cj4gK8KgwqDCoMKgwqDCoMKgc2tiX3F1
-ZXVlX3dhbGsoJm1jdHBfcGNjX25kZXYtPmluYm94LnBhY2tldHMsIHNrYikgewo+ICvCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBpZiAoc2tiLT5kYXRhICE9IGJ1ZmZlcikKPiArwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGNvbnRpbnVlOwo+ICvCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBza2JfdW5saW5rKHNrYiwgJm1jdHBfcGNjX25kZXYt
-PmluYm94LnBhY2tldHMpOwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBicmVhazsK
-PiArwqDCoMKgwqDCoMKgwqB9Cj4gK8KgwqDCoMKgwqDCoMKgc3Bpbl91bmxvY2soJm1jdHBfcGNj
-X25kZXYtPmxvY2spOwo+ICsKPiArwqDCoMKgwqDCoMKgwqBpZiAoc2tiKSB7CgpUaGUgdGVybWlu
-YXRpb24gY2FzZSBvZiBza2JfcXVldWVfd2FsaygpIHdpbGwgbm90IGxlYXZlIHNrYiBhcyBudWxs
-LgoKSW5zdGVhZCwgeW91IHdpbGwgcHJvYmFibHkgd2FudCB0byB1c2UgYSB0ZW1wb3JhcnkgdmFy
-aWFibGUgZm9yIHRoZQppdGVyYXRvciwgYW5kIHNldCBza2Igd2hlbiB5b3UgZmluZCBhIG1hdGNo
-LgoKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgZGV2X2RzdGF0c19yeF9hZGQobWN0
-cF9wY2NfbmRldi0+bmRldiwgc2tiLT5sZW4pOwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqBza2JfcmVzZXRfbWFjX2hlYWRlcihza2IpOwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqBza2JfcHVsbChza2IsIHNpemVvZihwY2NfaGVhZGVyKSk7Cj4gK8KgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoHNrYl9yZXNldF9uZXR3b3JrX2hlYWRlcihza2IpOwo+ICvCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBjYiA9IF9fbWN0cF9jYihza2IpOwo+ICvCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBjYi0+aGFsZW4gPSAwOwo+ICvCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqBuZXRpZl9yeChza2IpOwo+ICvCoMKgwqDCoMKgwqDCoH0KPiArfQo+ICsK
-PiArc3RhdGljIHZvaWQgbWN0cF9wY2NfdHhfZG9uZShzdHJ1Y3QgbWJveF9jbGllbnQgKmMsIHZv
-aWQgKm1zc2csIGludCByKQo+ICt7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IG1jdHBfcGNjX25k
-ZXYgKm1jdHBfcGNjX25kZXY7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IG1jdHBfcGNjX21haWxi
-b3ggKmJveDsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3Qgc2tfYnVmZiAqc2tiID0gTlVMTDsKPiAr
-Cj4gK8KgwqDCoMKgwqDCoMKgbWN0cF9wY2NfbmRldiA9IGNvbnRhaW5lcl9vZihjLCBzdHJ1Y3Qg
-bWN0cF9wY2NfbmRldiwgb3V0Ym94LmNsaWVudCk7Cj4gK8KgwqDCoMKgwqDCoMKgYm94ID0gY29u
-dGFpbmVyX29mKGMsIHN0cnVjdCBtY3RwX3BjY19tYWlsYm94LCBjbGllbnQpOwo+ICvCoMKgwqDC
-oMKgwqDCoHNwaW5fbG9jaygmbWN0cF9wY2NfbmRldi0+bG9jayk7Cj4gK8KgwqDCoMKgwqDCoMKg
-c2tiX3F1ZXVlX3dhbGsoJmJveC0+cGFja2V0cywgc2tiKSB7Cj4gK8KgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoGlmIChza2ItPmRhdGEgPT0gbXNzZykgewo+ICvCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgc2tiX3VubGluayhza2IsICZib3gtPnBhY2tl
-dHMpOwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgYnJl
-YWs7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoH0KPiArwqDCoMKgwqDCoMKgwqB9
-Cj4gK8KgwqDCoMKgwqDCoMKgc3Bpbl91bmxvY2soJm1jdHBfcGNjX25kZXYtPmxvY2spOwo+ICsK
-PiArwqDCoMKgwqDCoMKgwqBpZiAoc2tiKQoKU2FtZSBhcyBhYm92ZTsgdGhpcyB3aWxsIG5vdCBi
-ZSBudWxsIGluIHRoZSBub3QtZm91bmQgY2FzZSwgYnV0IHdpbGwKcG9pbnQgdG8gdGhlIGxpc3Qg
-aGVhZC4KCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGRldl9jb25zdW1lX3NrYl9h
-bnkoc2tiKTsKCi4uLiBidXQgZXZlbiBpZiBzbywgeW91IGNvdWxkIHBhc3Mgc2tiIGFzIE5VTEwg
-aGVyZSBhbmQgYXZvaWQgdGhlIGlmLgoKPiArfQo+ICsKPiArc3RhdGljIG5ldGRldl90eF90IG1j
-dHBfcGNjX3R4KHN0cnVjdCBza19idWZmICpza2IsIHN0cnVjdCBuZXRfZGV2aWNlICpuZGV2KQo+
-ICt7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IG1jdHBfcGNjX25kZXYgKm1wbmQgPSBuZXRkZXZf
-cHJpdihuZGV2KTsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgcGNjX2hlYWRlciAqcGNjX2hlYWRl
-cjsKPiArwqDCoMKgwqDCoMKgwqBpbnQgbGVuID0gc2tiLT5sZW47Cj4gK8KgwqDCoMKgwqDCoMKg
-aW50IHJjOwo+ICsKPiArwqDCoMKgwqDCoMKgwqByYyA9IHNrYl9jb3dfaGVhZChza2IsIHNpemVv
-ZigqcGNjX2hlYWRlcikpOwo+ICvCoMKgwqDCoMKgwqDCoGlmIChyYykgewo+ICvCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqBkZXZfZHN0YXRzX3R4X2Ryb3BwZWQobmRldik7Cj4gK8KgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGtmcmVlX3NrYihza2IpOwo+ICvCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqByZXR1cm4gTkVUREVWX1RYX09LOwo+ICvCoMKgwqDCoMKgwqDCoH0K
-PiArCj4gK8KgwqDCoMKgwqDCoMKgcGNjX2hlYWRlciA9IHNrYl9wdXNoKHNrYiwgc2l6ZW9mKCpw
-Y2NfaGVhZGVyKSk7Cj4gK8KgwqDCoMKgwqDCoMKgcGNjX2hlYWRlci0+c2lnbmF0dXJlID0gUEND
-X1NJR05BVFVSRSB8IG1wbmQtPm91dGJveC5pbmRleDsKPiArwqDCoMKgwqDCoMKgwqBwY2NfaGVh
-ZGVyLT5mbGFncyA9IFBDQ19DTURfQ09NUExFVElPTl9OT1RJRlk7Cj4gK8KgwqDCoMKgwqDCoMKg
-bWVtY3B5KCZwY2NfaGVhZGVyLT5jb21tYW5kLCBNQ1RQX1NJR05BVFVSRSwgTUNUUF9TSUdOQVRV
-UkVfTEVOR1RIKTsKPiArwqDCoMKgwqDCoMKgwqBwY2NfaGVhZGVyLT5sZW5ndGggPSBsZW4gKyBN
-Q1RQX1NJR05BVFVSRV9MRU5HVEg7Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoHNwaW5fbG9jaygmbXBu
-ZC0+bG9jayk7Cj4gK8KgwqDCoMKgwqDCoMKgc2tiX3F1ZXVlX2hlYWQoJm1wbmQtPm91dGJveC5w
-YWNrZXRzLCBza2IpOwo+ICvCoMKgwqDCoMKgwqDCoHNwaW5fdW5sb2NrKCZtcG5kLT5sb2NrKTsK
-PiArCj4gK8KgwqDCoMKgwqDCoMKgcmMgPSBtYm94X3NlbmRfbWVzc2FnZShtcG5kLT5vdXRib3gu
-Y2hhbi0+bWNoYW4sIHNrYi0+ZGF0YSk7Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoGlmIChyYyA8IDAp
-IHsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgc2tiX3VubGluayhza2IsICZtcG5k
-LT5vdXRib3gucGFja2V0cyk7CgpUaGlzIGRvZXMgbm90IGhvbGQgdGhlIGxvY2sgeW91IGFyZSB1
-c2luZyBmb3IgdGhlIGxpc3QgdHJhdmVyc2FsLiBJZiB5b3UKd2FudCB0byByZWx5IG9uIHRoZSBs
-aXN0LWludGVybmFsIGxvY2tpbmcsIHRoYXQncyBmaW5lLCBidXQgeW91IG5lZWQgdG8KYmUgY29u
-c2lzdGVudCBpbiB5b3VyIGFwcHJvYWNoLgoKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgcmV0dXJuIE5FVERFVl9UWF9CVVNZOwo+ICvCoMKgwqDCoMKgwqDCoH0KPiArCj4gK8KgwqDC
-oMKgwqDCoMKgZGV2X2RzdGF0c190eF9hZGQobmRldiwgbGVuKTsKPiArwqDCoMKgwqDCoMKgwqBy
-ZXR1cm4gTkVUREVWX1RYX09LOwo+ICt9Cj4gKwo+ICtzdGF0aWMgdm9pZCBkcmFpbl9wYWNrZXRz
-KHN0cnVjdCBza19idWZmX2hlYWQgKmxpc3QpCj4gK3sKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3Qg
-c2tfYnVmZiAqc2tiOwo+ICsKPiArwqDCoMKgwqDCoMKgwqB3aGlsZSAoIXNrYl9xdWV1ZV9lbXB0
-eShsaXN0KSkgewo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBza2IgPSBza2JfZGVx
-dWV1ZShsaXN0KTsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgZGV2X2NvbnN1bWVf
-c2tiX2FueShza2IpOwo+ICvCoMKgwqDCoMKgwqDCoH0KPiArfQo+ICsKPiArc3RhdGljIGludCBt
-Y3RwX3BjY19uZG9fb3BlbihzdHJ1Y3QgbmV0X2RldmljZSAqbmRldikKPiArewo+ICvCoMKgwqDC
-oMKgwqDCoHN0cnVjdCBtY3RwX3BjY19uZGV2ICptY3RwX3BjY19uZGV2ID0KPiArwqDCoMKgwqDC
-oMKgwqDCoMKgwqAgbmV0ZGV2X3ByaXYobmRldik7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IG1j
-dHBfcGNjX21haWxib3ggKm91dGJveCA9Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgICZtY3RwX3Bj
-Y19uZGV2LT5vdXRib3g7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IG1jdHBfcGNjX21haWxib3gg
-KmluYm94ID0KPiArwqDCoMKgwqDCoMKgwqDCoMKgwqAgJm1jdHBfcGNjX25kZXYtPmluYm94OwoK
-TWlub3I6IEkgZG9uJ3QgdGhpbmsgdGhlc2UgbmVlZCB3cmFwcGluZz8KCj4gK8KgwqDCoMKgwqDC
-oMKgaW50IG1jdHBfcGNjX210dTsKPiArCj4gK8KgwqDCoMKgwqDCoMKgb3V0Ym94LT5jaGFuID0g
-cGNjX21ib3hfcmVxdWVzdF9jaGFubmVsKCZvdXRib3gtPmNsaWVudCwgb3V0Ym94LT5pbmRleCk7
-Cj4gK8KgwqDCoMKgwqDCoMKgaWYgKElTX0VSUihvdXRib3gtPmNoYW4pKQo+ICvCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1cm4gUFRSX0VSUihvdXRib3gtPmNoYW4pOwo+ICsKPiAr
-wqDCoMKgwqDCoMKgwqBpbmJveC0+Y2hhbiA9IHBjY19tYm94X3JlcXVlc3RfY2hhbm5lbCgmaW5i
-b3gtPmNsaWVudCwgaW5ib3gtPmluZGV4KTsKPiArwqDCoMKgwqDCoMKgwqBpZiAoSVNfRVJSKGlu
-Ym94LT5jaGFuKSkgewo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBwY2NfbWJveF9m
-cmVlX2NoYW5uZWwob3V0Ym94LT5jaGFuKTsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgcmV0dXJuIFBUUl9FUlIoaW5ib3gtPmNoYW4pOwo+ICvCoMKgwqDCoMKgwqDCoH0KPiArCj4g
-K8KgwqDCoMKgwqDCoMKgbWN0cF9wY2NfbmRldi0+aW5ib3guY2hhbi0+cnhfYWxsb2MgPSBtY3Rw
-X3BjY19yeF9hbGxvYzsKPiArwqDCoMKgwqDCoMKgwqBtY3RwX3BjY19uZGV2LT5vdXRib3guY2hh
-bi0+bWFuYWdlX3dyaXRlcyA9IHRydWU7Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoC8qIFRoZXJlIGlz
-IG5vIGNsZWFuIHdheSB0byBwYXNzIHRoZSBNVFUgdG8gdGhlIGNhbGxiYWNrIGZ1bmN0aW9uCj4g
-K8KgwqDCoMKgwqDCoMKgICogdXNlZCBmb3IgcmVnaXN0cmF0aW9uLCBzbyBzZXQgdGhlIHZhbHVl
-cyBhaGVhZCBvZiB0aW1lLgo+ICvCoMKgwqDCoMKgwqDCoCAqLwoKRm9yIG15IG93biBjbGFyaXR5
-LCB3aGF0J3MgInRoZSBjYWxsYmFjayBmdW5jdGlvbiB1c2VkIGZvcgpyZWdpc3RyYXRpb24iPwoK
-PiArwqDCoMKgwqDCoMKgwqBtY3RwX3BjY19tdHUgPSBtY3RwX3BjY19uZGV2LT5vdXRib3guY2hh
-bi0+c2htZW1fc2l6ZSAtCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHNpemVvZihz
-dHJ1Y3QgcGNjX2hlYWRlcik7Cj4gK8KgwqDCoMKgwqDCoMKgbmRldi0+bXR1ID0gTUNUUF9NSU5f
-TVRVOwo+ICvCoMKgwqDCoMKgwqDCoG5kZXYtPm1heF9tdHUgPSBtY3RwX3BjY19tdHU7Cj4gK8Kg
-wqDCoMKgwqDCoMKgbmRldi0+bWluX210dSA9IE1DVFBfTUlOX01UVTsKPiArCj4gK8KgwqDCoMKg
-wqDCoMKgcmV0dXJuIDA7Cj4gK30KPiArCj4gK3N0YXRpYyBpbnQgbWN0cF9wY2NfbmRvX3N0b3Ao
-c3RydWN0IG5ldF9kZXZpY2UgKm5kZXYpCj4gK3sKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgbWN0
-cF9wY2NfbmRldiAqbWN0cF9wY2NfbmRldiA9Cj4gKyAgICAgICAgICAgbmV0ZGV2X3ByaXYobmRl
-dik7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IG1jdHBfcGNjX21haWxib3ggKm91dGJveCA9Cj4g
-KyAgICAgICAgICAgJm1jdHBfcGNjX25kZXYtPm91dGJveDsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1
-Y3QgbWN0cF9wY2NfbWFpbGJveCAqaW5ib3ggPQo+ICsgICAgICAgICAgICZtY3RwX3BjY19uZGV2
-LT5pbmJveDsKCk5vIHdyYXBwaW5nIG5lZWRlZCBoZXJlIGVpdGhlci4KCkNoZWVycywKCgpKZXJl
-bXkK
+On 8/21/25 9:30 AM, Richard Gobert wrote:
+> @@ -442,29 +442,26 @@ static inline __wsum ip6_gro_compute_pseudo(const struct sk_buff *skb,
+>  }
+>  
+>  static inline int inet_gro_flush(const struct iphdr *iph, const struct iphdr *iph2,
+> -				 struct sk_buff *p, bool outer)
+> +				 struct sk_buff *p, bool inner)
+>  {
+>  	const u32 id = ntohl(*(__be32 *)&iph->id);
+>  	const u32 id2 = ntohl(*(__be32 *)&iph2->id);
+>  	const u16 ipid_offset = (id >> 16) - (id2 >> 16);
+>  	const u16 count = NAPI_GRO_CB(p)->count;
+>  	const u32 df = id & IP_DF;
+> -	int flush;
+>  
+>  	/* All fields must match except length and checksum. */
+> -	flush = (iph->ttl ^ iph2->ttl) | (iph->tos ^ iph2->tos) | (df ^ (id2 & IP_DF));
+> -
+> -	if (flush | (outer && df))
+> -		return flush;
+> +	if ((iph->ttl ^ iph2->ttl) | (iph->tos ^ iph2->tos) | (df ^ (id2 & IP_DF)))
+> +		return true;
+>  
+>  	/* When we receive our second frame we can make a decision on if we
+>  	 * continue this flow as an atomic flow with a fixed ID or if we use
+>  	 * an incrementing ID.
+>  	 */
+>  	if (count == 1 && df && !ipid_offset)
+> -		NAPI_GRO_CB(p)->ip_fixedid = true;
+> +		NAPI_GRO_CB(p)->ip_fixedid |= 1 << inner;
+>  
+> -	return ipid_offset ^ (count * !NAPI_GRO_CB(p)->ip_fixedid);
+> +	return ipid_offset ^ (count * !(NAPI_GRO_CB(p)->ip_fixedid & (1 << inner)));
+>  }
+>  
+>  static inline int ipv6_gro_flush(const struct ipv6hdr *iph, const struct ipv6hdr *iph2)
+> @@ -478,28 +475,30 @@ static inline int ipv6_gro_flush(const struct ipv6hdr *iph, const struct ipv6hdr
+>  }
+>  
+>  static inline int __gro_receive_network_flush(const void *th, const void *th2,
+> -					      struct sk_buff *p, const u16 diff,
+> -					      bool outer)
+> +					      struct sk_buff *p, bool inner)
+>  {
+> -	const void *nh = th - diff;
+> -	const void *nh2 = th2 - diff;
+> +	const void *nh, *nh2;
+> +	int off, diff;
+> +
+> +	off = skb_transport_offset(p);
+> +	diff = off - NAPI_GRO_CB(p)->network_offsets[inner];
+> +	nh = th - diff;
+> +	nh2 = th2 - diff;
+>  
+>  	if (((struct iphdr *)nh)->version == 6)
+>  		return ipv6_gro_flush(nh, nh2);
+>  	else
+> -		return inet_gro_flush(nh, nh2, p, outer);
+> +		return inet_gro_flush(nh, nh2, p, inner);
+>  }
+>  
+>  static inline int gro_receive_network_flush(const void *th, const void *th2,
+>  					    struct sk_buff *p)
+>  {
+> -	const bool encap_mark = NAPI_GRO_CB(p)->encap_mark;
+> -	int off = skb_transport_offset(p);
+>  	int flush;
+>  
+> -	flush = __gro_receive_network_flush(th, th2, p, off - NAPI_GRO_CB(p)->network_offset, encap_mark);
+> -	if (encap_mark)
+> -		flush |= __gro_receive_network_flush(th, th2, p, off - NAPI_GRO_CB(p)->inner_network_offset, false);
+> +	flush = __gro_receive_network_flush(th, th2, p, false);
+> +	if (NAPI_GRO_CB(p)->encap_mark)
+> +		flush |= __gro_receive_network_flush(th, th2, p, true);
+
+Minor nit: I'm under the (unverified) impression that the old syntax
+could help the compiler generating better code. What about storing the
+diff in a local variable:
+
+	int diff;
+
+	diff = skb_transport_offset(p) - NAPI_GRO_CB(p)->network_offset;
+	flush = __gro_receive_network_flush(th, th2, diff, false);
+	if (NAPI_GRO_CB(p)->encap_mark)
+		flush |= __gro_receive_network_flush(th, th2, diff, true);
+
+?
+
+/P
 
 
