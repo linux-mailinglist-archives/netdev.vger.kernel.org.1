@@ -1,81 +1,88 @@
-Return-Path: <netdev+bounces-215848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E63EFB30A3F
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 02:22:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25B31B30A42
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 02:23:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 221A62A4314
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 00:22:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF0D41CE77C2
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 00:23:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CA1C442C;
-	Fri, 22 Aug 2025 00:22:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CE7E4A3E;
+	Fri, 22 Aug 2025 00:23:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e5t1iCEU"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="b4rlDsE+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BB931BC58;
-	Fri, 22 Aug 2025 00:22:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74C8F393DE0;
+	Fri, 22 Aug 2025 00:23:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755822138; cv=none; b=H7su1vJcJy5MJiwmKmgl/j2bkhCNTGksPPYAhAVDHz3COa7JpjfOzUnen1GwKmUOKeSSn4Yi9q4rZqhUiqdbyZh3kOyWj8UyQIANbR8JJaUo1Xu9OC1rNM+uzD91tDx74AfQdSgpINCDZvWDZwwHVPCBnwAtOJ0WDiYR6Dp0xPw=
+	t=1755822212; cv=none; b=dKin0jJJv9R557p9m+SID9NxuclOE9XIfZt0ei3Q3G/kFzwBs9VFiUwn9D5zgZQ6PBM+ixiiE9Yh2fnJG7MOLk8ogr8/dN2e0+jSxWZNcKTG3A0ToKU8rVX6setRge52/PiHZ3XVBpaZVVC2OY2WRHYivi+zRvQdtAbPDrfGyPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755822138; c=relaxed/simple;
-	bh=UBh6eNBEIOcH2bnJnd8z8Mv/gUsHh6WuQjYoQhi75GU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DXOJ8m08q/gCKG8bCD8d8qUJEnFP68s6B4bgo+Eav5ZQbar0LPxpnejorvsNtYqT8w48mVDMOLMXWKh6PtfheGKAuU1oLipSGDxqgp9N24zSrtEDbRQeYeDCkCc0cDgdfSXW7PZ2OLT1EacRDkEBOUb0Bn6Ns1LgE/yEF9LQisM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e5t1iCEU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D825C4CEEB;
-	Fri, 22 Aug 2025 00:22:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755822136;
-	bh=UBh6eNBEIOcH2bnJnd8z8Mv/gUsHh6WuQjYoQhi75GU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=e5t1iCEUcIWft/gdheh6g+KVeqbXPEEdfrtTOx/WY+7j7LhJrsY2uUG2xOsOMGJvD
-	 aYAEpmAhwi9loI+sTwWz0lPR8/s1Wnf/9VwBo1ZV9UaTomE9sEHsVMF3EzkKFTHsPF
-	 mmwqTGi8k3SC/L5nS3RkUo10YhEjv0Pz1XjVTWIRzCj31zBudgoICoVZ4cVg64b21q
-	 d0jxUk9MQmCvMrTccuY3DIhGGKiWiN+nIHeP0uiczNePsj+fAU9OhT9eEH2lWFT9DH
-	 tYpi/DCkpn/qmYNoFUjFBOEVdLPUMsU+qh54JSPPbSDwJc1IE7UhhzJ3Tf0arDENb7
-	 fa70HPqceu22A==
-Date: Thu, 21 Aug 2025 17:22:15 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Prabhakar <prabhakar.csengg@gmail.com>
-Cc: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, Andrew
- Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Geert
- Uytterhoeven <geert+renesas@glider.be>, Wolfram Sang
- <wsa+renesas@sang-engineering.com>, linux-renesas-soc@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Biju Das
- <biju.das.jz@bp.renesas.com>, Fabrizio Castro
- <fabrizio.castro.jz@renesas.com>, Lad Prabhakar
- <prabhakar.mahadev-lad.rj@bp.renesas.com>, stable@kernel.org
-Subject: Re: [PATCH net-next v2] net: pcs: rzn1-miic: Correct MODCTRL
- register offset
-Message-ID: <20250821172215.7fb18f5f@kernel.org>
-In-Reply-To: <20250820170913.2037049-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-References: <20250820170913.2037049-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	s=arc-20240116; t=1755822212; c=relaxed/simple;
+	bh=d8uSlCdsb6IxON+UB2gioFYxQjDtQKGH8lLrzfJm/6o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F/0hN4fyLMzRNUryZNkHPGlU3FvoXSfpb8AXQ44e/k8g0qGQCDQ74edHtlvLG6E3KH5zbME9yl0llUnJ0AB3xMl8QKDilw9+qt93SdynuHjJxzMUbz2OeXCzVBZJCC+EXdTZVCUF6N4PfuuwxhTb/xcN3jt2MF5PdoPR3zkmGD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=b4rlDsE+; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=pdwFPjIY1pZ9q97xgTvS+donn5rx+Zx9UyAGAblGIoo=; b=b4rlDsE+x09keSlPfhZmsxsNcf
+	WLJHrpSr7MLO27TernWqiGoCe1RkjcVgcxcM+xKsVb1bkB3Pkf6ZXdAYJpV/KMundEGdEksxs83Ff
+	mbBBnJLPcUxVQmUVltH+HCOPvo/jGx9yjP5JpUsuYvyCMgWFvfPaToGHM3TctiCgCGZc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1upFYx-005W7H-AA; Fri, 22 Aug 2025 02:23:23 +0200
+Date: Fri, 22 Aug 2025 02:23:23 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Yeounsu Moon <yyyynoom@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: dlink: fix multicast stats being counted
+ incorrectly
+Message-ID: <f06befad-ebbc-441f-95e5-c206bcd512ce@lunn.ch>
+References: <20250821114254.3384-1-yyyynoom@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250821114254.3384-1-yyyynoom@gmail.com>
 
-On Wed, 20 Aug 2025 18:09:13 +0100 Prabhakar wrote:
-> Subject: [PATCH net-next v2] net: pcs: rzn1-miic: Correct MODCTRL register offset
+On Thu, Aug 21, 2025 at 08:42:53PM +0900, Yeounsu Moon wrote:
+> `McstFramesRcvdOk` counts the number of received multicast packets, and
+> it reports the value correctly.
+> 
+> However, reading `McstFramesRcvdOk` clears the register to zero. As a
+> result, the driver was reporting only the packets since the last read,
+> instead of the accumulated total.
+> 
+> Fix this by updating the multicast statistics accumulatively instaed of
+> instantaneously.
 
-Hi Prabhakar!
+This looks like a fix. Please could you add a Fixes: tag and submit to
+net.
 
-AFAIU we're waiting for Wolfram to test (hopefully early) next week.
-Could you repost in the meantime with [PATCH net v3] as the subject
-prefix? If it's a fix it's not -next material.
--- 
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+
+
+    Andrew
+
+---
 pw-bot: cr
 
