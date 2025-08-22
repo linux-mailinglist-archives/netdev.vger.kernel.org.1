@@ -1,135 +1,143 @@
-Return-Path: <netdev+bounces-216099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 948CEB3208F
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 18:32:26 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id E515BB32098
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 18:35:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3054D3B69AC
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 16:27:35 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BD8F24E13F9
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 16:35:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B152874F2;
-	Fri, 22 Aug 2025 16:27:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1332D3009C1;
+	Fri, 22 Aug 2025 16:35:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bFGa20Wf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KhliOF1J"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5360C279DD8
-	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 16:27:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 198462853F8;
+	Fri, 22 Aug 2025 16:35:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755880041; cv=none; b=dR63ZAw694zPRWuIG5PJww+pzcGwBVIqkYu9UEXJKiDcwgyUShwNrbIoEj2fCo/05Rl0sbgwhbQw2wdEMlr/AkBcA7GrjBztO/rLb3f2jTrFxHzYmvgfHwSFoWfGeDGfKmwvmxcnWJT1CTE5MMl7h44glezCTGzH6MKGWT4b0X0=
+	t=1755880541; cv=none; b=dS3WSvXJpPL0D++yn7pw2ZqFz3UstxlTz1fUOyPnh+usvJ2ByiP8cGBdmRh/vrPL1uEvpG8jNxUSTHTx0cZEMi88hAiTA8BXiPi1AumzxTQfC3xyMw31m6+aMp/X0N4Stutzmgv9Mr1kW9U4EOwDNG81TQmln3lQRI4Rc3B0IZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755880041; c=relaxed/simple;
-	bh=bLmUpZ+ZY1CaI4yXsUQZMAQ6DKkJ6xfcA78SgDLAJGg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pc/74CUZp8KQoyPc5P82CZn0DE3ylxMvlolBqmmpRvc3jGkaaz3fPVKwYZEA9csqN/7wefvFT/5OXHEBd/ErbEMuCX/JQqquEpkZBXLtWGRACZekWlbFcmcSY0KqIPukN2oXdILX/wCnONCJOFi6DQkL6uSDuOEpI4xihLOtyd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bFGa20Wf; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <27e8fb9f-0e9c-4a0b-b961-64ff9d2f5228@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1755880033;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=76stymdmYGxmCdV+zWc/JNXPWOmvJL9ShI/3xunZrbI=;
-	b=bFGa20Wf1ILzNwjk48Iy7jLaeJ07I53X9gl6W/KN8/FmrExc1kDdlmLIRqCCadGn9dXi6b
-	Xs2PYBwhru965WlLKiU1BcTbMpfNDp5dz16tjQBKhZ1gNihy3G/nUi0Ye7awFBzFQ5LMIc
-	W9KREGbWMWvvffZFSyoJVJeymfAc4Lw=
-Date: Fri, 22 Aug 2025 17:27:10 +0100
+	s=arc-20240116; t=1755880541; c=relaxed/simple;
+	bh=wmzL8WhEl7OoUCt6gCCzTFu2FcX/5HDAySlZEShwT4I=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=icbhpjfFLQL9I0hA2V6ta5y1RrG6yctoFEFpBC8ZA+XUgOT4aovWjLDtR8yVPka1qDD5Km8c4L7VArBWl3/HVXaTfhZfAhNTUOngsxWnKDjhMooscBVmh161i6jGVEhmAqClluRYdjep0rTB9En9vICAMf/1cqP3GqDBpsiEai0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KhliOF1J; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-770305d333aso948112b3a.0;
+        Fri, 22 Aug 2025 09:35:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755880534; x=1756485334; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=wmzL8WhEl7OoUCt6gCCzTFu2FcX/5HDAySlZEShwT4I=;
+        b=KhliOF1JmcrYP+aZ8uVltTnrvGwDEE/g4I3mlGrhSISOkyimL+Qccc9eibnrEZouVs
+         zdXVDSL+gv3b1CAIJWLqKbJt/qrxpOVnw0SpTdoAl96dc8OsmWnaSlBTp2SKksZZXn+P
+         r1ejrzsDEUZ7Ly5wuDfix4KzNHWiJ/Z1aPZmGQwVwqffzSRJEOnldLRuug1BrSLXXGEa
+         9TriaMV/ij/8d/nq3bkMGkLbFfh+bEKU8kS+0fOR1y4jY0EbTcvoabpLkve7jmRDheli
+         1z+HTi1ClCMRXKH3TA7S6/ZHvxmEd6LqBWh5u/42+iRJjifGbrNrG4QNHiLkokv3puaq
+         9mIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755880534; x=1756485334;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wmzL8WhEl7OoUCt6gCCzTFu2FcX/5HDAySlZEShwT4I=;
+        b=pzHM4ecuMlLrWfmBEYPcZ30cbKwdn9xZjoJoE0oyGMlMcSdN6997jq+ZipOIaoAHi0
+         ojRVXyFSl5Dgs9magYDoHB5yKfAnvuI21pfWHpi9rnizX6r+hkDu00JM4mzUFo2JJ5fm
+         rVnUZ2NGqwxgIGhnZis0HPYQdQy8KFAujXCfhOBz5KWWGaRpLytk0mt4wKA0E0b3ohBG
+         nsgWGtwVF/d0A0wsreKX4ei4OObZqqGAYtuvHsa9NCWplEoOpNAdRYlFt/fBJBrwa0Un
+         1gtmzt2n9YWxTn68oE3tgBUsuETMobmS0j+UG7pW/jkFk7d/mVN3GZiKMYwOWXI02Edo
+         z5zg==
+X-Forwarded-Encrypted: i=1; AJvYcCUclZ4QS1N92x7Px8h2EyjLC3w2uoHx0HQUGDOLOgpaXcs6TmGNHiRNGzYSdj6x5LDv1r7qjKAw@vger.kernel.org, AJvYcCVZ19Rc4ehJeW1l7KsL8pe3UBrB73e3bIyw+CpI5BIbPzE0MrUeaeNFuBj4jU87/sh7Bi3F07Gzgttj/GQ=@vger.kernel.org, AJvYcCXIhWbpP1h40GmSBDwzZ15DRLr+a0S9dIT18OZucEi0fvXCXR28iSlh17OKSX27NS2zruBWvCTm@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlBdA35SoTDETNiQ2Gbdh96P+JlUvwCf+HSVIsp0wx9LXQSY8n
+	OiOxQsU9b6kl7AF7+AE2Hem+8k4IO6f+42+NKzZgYhdzWR0Ht0MjPLxIASO+55G2ewYodnVjUlf
+	xMh2A9VTACoktnEt2syWbLGLJAVvYNw==
+X-Gm-Gg: ASbGncsv4iBOocShPXfN1USPK1kmHovMxysk2mh3RppNyAZyh4VXJQBxt60SF0DmVN3
+	GLdN2N2hf6F7LVvZDB8Nj8tauMcqXx/YryN3JjaWDaaFup/sM/ZfGMkKDf6mXdRty4FbYCRdAAC
+	NNKVKUByk9ZJDeCOX5J8Oe/pNcLCqDxyAW81rVZiyuNzQNd8GhhH1yZvyh39HfPFYZvoM0y3Wo2
+	AEPK+fC0aIR3z08h6cL8eFty/pmfPn/J0Jw721UZHs3cmIman34gdOQphcTAODKEUaRq6fnXLgA
+	zM1xCoJBYV/vTfHrcZt2
+X-Google-Smtp-Source: AGHT+IHTDq1oeNBYpM1bw8gGhdGoQ7e0NTteeJjpTzVATWPWK+u5h4kRpsn/uFF5bNXy7VxhaDie626knu1nQQws00E=
+X-Received: by 2002:a05:6a20:3d06:b0:240:1c36:79a2 with SMTP id
+ adf61e73a8af0-24340b01a3emr5979726637.10.1755880534264; Fri, 22 Aug 2025
+ 09:35:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH iwl-next v2] igb: Convert Tx timestamping to PTP aux
- worker
-To: Kurt Kanzenbach <kurt@linutronix.de>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Vinicius Costa Gomes <vinicius.gomes@intel.com>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Paul Menzel <pmenzel@molgen.mpg.de>, Miroslav Lichvar <mlichvar@redhat.com>,
- Jacob Keller <jacob.e.keller@intel.com>, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org
-References: <20250822-igb_irq_ts-v2-1-1ac37078a7a4@linutronix.de>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250822-igb_irq_ts-v2-1-1ac37078a7a4@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+From: Rui Salvaterra <rsalvaterra@gmail.com>
+Date: Fri, 22 Aug 2025 17:35:22 +0100
+X-Gm-Features: Ac12FXxOAJwfk6e6i3lw8xuT8N1nK7SDe6oUIjfCp20HUbSIh_3_NqPV8J5QaGY
+Message-ID: <CALjTZvZkDr8N18ocZ8jNND_4DwKqr-PV4BBXB60+=WXPF3vn=Q@mail.gmail.com>
+Subject: [REGRESSION, BISECTED] IPv6 RA is broken with Linux 6.12.42+
+To: wangzijie1@honor.com, gregkh@linuxfoundation.org
+Cc: adobriyan@gmail.com, viro@zeniv.linux.org.uk, akpm@linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+	openwrt-devel@lists.openwrt.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 22/08/2025 08:28, Kurt Kanzenbach wrote:
-> The current implementation uses schedule_work() which is executed by the
-> system work queue to retrieve Tx timestamps. This increases latency and can
-> lead to timeouts in case of heavy system load.
-> 
-> Therefore, switch to the PTP aux worker which can be prioritized and pinned
-> according to use case. Tested on Intel i210.
-> 
->    * igb_ptp_tx_work
-> - * @work: pointer to work struct
-> + * @ptp: pointer to ptp clock information
->    *
->    * This work function polls the TSYNCTXCTL valid bit to determine when a
->    * timestamp has been taken for the current stored skb.
->    **/
-> -static void igb_ptp_tx_work(struct work_struct *work)
-> +static long igb_ptp_tx_work(struct ptp_clock_info *ptp)
->   {
-> -	struct igb_adapter *adapter = container_of(work, struct igb_adapter,
-> -						   ptp_tx_work);
-> +	struct igb_adapter *adapter = container_of(ptp, struct igb_adapter,
-> +						   ptp_caps);
->   	struct e1000_hw *hw = &adapter->hw;
->   	u32 tsynctxctl;
->   
->   	if (!adapter->ptp_tx_skb)
-> -		return;
-> +		return -1;
->   
->   	if (time_is_before_jiffies(adapter->ptp_tx_start +
->   				   IGB_PTP_TX_TIMEOUT)) {
-> @@ -824,15 +824,17 @@ static void igb_ptp_tx_work(struct work_struct *work)
->   		 */
->   		rd32(E1000_TXSTMPH);
->   		dev_warn(&adapter->pdev->dev, "clearing Tx timestamp hang\n");
-> -		return;
-> +		return -1;
->   	}
->   
->   	tsynctxctl = rd32(E1000_TSYNCTXCTL);
-> -	if (tsynctxctl & E1000_TSYNCTXCTL_VALID)
-> +	if (tsynctxctl & E1000_TSYNCTXCTL_VALID) {
->   		igb_ptp_tx_hwtstamp(adapter);
-> -	else
-> -		/* reschedule to check later */
-> -		schedule_work(&adapter->ptp_tx_work);
-> +		return -1;
-> +	}
-> +
-> +	/* reschedule to check later */
-> +	return 1;
+Hi, everyone,
 
-do_aux_work is expected to return delay in jiffies to re-schedule the
-work. it would be cleaner to use msec_to_jiffies macros to tell how much
-time the driver has to wait before the next try of retrieving the
-timestamp. AFAIU, the timestamp may come ASAP in this case, so it's
-actually reasonable to request immediate re-schedule of the worker by
-returning 0.
 
->   }
+We noticed a regression in OpenWrt, with IPv6, which causes a router's
+client devices to stop receiving the IPv6 default route. I have
+bisected it down to (rather surprisingly)
+fc1072d934f687e1221d685cf1a49a5068318f34 ("proc: use the same
+treatment to check proc_lseek as ones for proc_read_iter et.al").
+Reverting the aforementioned commit fixes the issue, of course.
+
+Git bisect log follows:
+
+git bisect start
+# status: waiting for both good and bad commits
+# bad: [880e4ff5d6c8dc6b660f163a0e9b68b898cc6310] Linux 6.12.42
+git bisect bad 880e4ff5d6c8dc6b660f163a0e9b68b898cc6310
+# status: waiting for good commit(s), bad commit known
+# good: [8f5ff9784f3262e6e85c68d86f8b7931827f2983] Linux 6.12.41
+git bisect good 8f5ff9784f3262e6e85c68d86f8b7931827f2983
+# good: [dab173bae3303f074f063750a8dead2550d8c782] RDMA/hns: Fix
+double destruction of rsv_qp
+git bisect good dab173bae3303f074f063750a8dead2550d8c782
+# bad: [11fa01706a4f60e759fbee7c53095ff22eaf1595] PCI: pnv_php: Work
+around switches with broken presence detection
+git bisect bad 11fa01706a4f60e759fbee7c53095ff22eaf1595
+# bad: [966460bace9e1dd8609c9d44cf4509844daea8bb] perf record: Cache
+build-ID of hit DSOs only
+git bisect bad 966460bace9e1dd8609c9d44cf4509844daea8bb
+# bad: [f63bd615e58f43dbe4b2e4c3f3ffa0bfb7766007] hwrng: mtk - handle
+devm_pm_runtime_enable errors
+git bisect bad f63bd615e58f43dbe4b2e4c3f3ffa0bfb7766007
+# bad: [9ea3f6b9a67be3476e331ce51cac316c2614a564] pinmux: fix race
+causing mux_owner NULL with active mux_usecount
+git bisect bad 9ea3f6b9a67be3476e331ce51cac316c2614a564
+# good: [1209e33fe3afb6d9e543f963d41b30cfc04538ff] RDMA/hns: Get
+message length of ack_req from FW
+git bisect good 1209e33fe3afb6d9e543f963d41b30cfc04538ff
+# good: [5f3c0301540bc27e74abbfbe31571e017957251b] RDMA/hns: Fix
+-Wframe-larger-than issue
+git bisect good 5f3c0301540bc27e74abbfbe31571e017957251b
+# bad: [fc1072d934f687e1221d685cf1a49a5068318f34] proc: use the same
+treatment to check proc_lseek as ones for proc_read_iter et.al
+git bisect bad fc1072d934f687e1221d685cf1a49a5068318f34
+# good: [ec437d0159681bbdb1cf1f26759d12e9650bffca] kernel: trace:
+preemptirq_delay_test: use offstack cpu mask
+git bisect good ec437d0159681bbdb1cf1f26759d12e9650bffca
+# first bad commit: [fc1072d934f687e1221d685cf1a49a5068318f34] proc:
+use the same treatment to check proc_lseek as ones for proc_read_iter
+et.al
+
+Please let me know if you need any additional information.
+
+
+Kind regards,
+
+Rui Salvaterra
 
