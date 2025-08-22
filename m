@@ -1,106 +1,118 @@
-Return-Path: <netdev+bounces-216020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E801B3191C
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 15:18:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40C2DB31936
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 15:20:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C9CDA234A2
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 13:14:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A17447BF594
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 13:18:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49F422FC02E;
-	Fri, 22 Aug 2025 13:14:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 109E02FF147;
+	Fri, 22 Aug 2025 13:19:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="esmGT7gR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dzav66wS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22C912F99AE;
-	Fri, 22 Aug 2025 13:14:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C48E22FE592;
+	Fri, 22 Aug 2025 13:19:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755868496; cv=none; b=d9wMseXWkld5xZEdycd8JXLVh7Fp24rc3tFqsz0QUMaUAKXQnbUCPCF+pBE5/NHNnc2nAF5lq9YQnoINRgdi17D/alJoDNVEQFmWDlSJDDw5ANlE0pPNdn3jwvsZuGEOPzIFBc/5MUQxUGGTIuxmnHradf+4Sl6yGmO8re7V34s=
+	t=1755868786; cv=none; b=GHD+maRqsA+Qpq7sw0EQf6tjy+hJW5paXDeG/WsSZY5YXTDKiMBEymDUe0OQgYXwz1x8rcgivPSnPRIe07KzyRiY7JtNxO76f0HxeS7ujGBJD06EFCJlz3ycnzALl2DcNPhDqCFtcOXPphb+joG47f0bz/Uou3O1EoLf4z1X8gE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755868496; c=relaxed/simple;
-	bh=OSk0FlS7YPnOOnzpzVwZCD1eeI9gpLGRPubVS8YyYbA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SWpheVMeZjaQoerV+MWnMN6rX9j8KNVi3xyTjuVNO8C1rYO9DQd6HDsvOYvPdTZJ21igG3Mj/dtLHOeCX+FTJjJ5X/CVAasgLLaBByBFdOIUpQHRvkVO+BS2XKe0ucgngy0ZhIc4Nu3BeP9CXRVmsdFbmMhNLlqiixzKfbLNL+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=esmGT7gR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29184C4CEED;
-	Fri, 22 Aug 2025 13:14:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1755868495;
-	bh=OSk0FlS7YPnOOnzpzVwZCD1eeI9gpLGRPubVS8YyYbA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=esmGT7gRWZUly6hrk5d6hsCjDFJF8TWRjOdSLvm9qBsBfXvS8WH4R0m4zzr17vSzz
-	 S7SnXrKnIpQuQ2/0paSi3RqhxHQAFOK32KTTNYkhpoB3hpJeM4DIBfH7Odan+GoTC6
-	 +BQkDtMe5Nq2Wt7+sjophwWL0aPJDnM48jH8Y0Kc=
-Date: Fri, 22 Aug 2025 15:14:52 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Hauke Mehrtens <hauke@hauke-m.de>
-Cc: stable@vger.kernel.org, Lion Ackermann <nnamrec@gmail.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>, netdev@vger.kernel.org
-Subject: Re: stable 5.15 backport: sch_*: make *_qlen_notify() idempotent
-Message-ID: <2025082202-albatross-atlas-b4c2@gregkh>
-References: <87960e35-5b7b-4b7e-9bba-50db6292cd5b@hauke-m.de>
+	s=arc-20240116; t=1755868786; c=relaxed/simple;
+	bh=MyNgdMxnyEB/P7oXWoztxQMr+47U1RLFpT8c8a5OKoc=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=SSombk1bNWZ2DDrRJG9HIbDjXXzO7U3lwCrx2GNWDPLA6R0ERezATFY5n7aj224rOLO9MN0TFiRuas88Zh0MEXwehxgdoX+ZmKMp5goojNYJJeWdGISt01thA/Xq9i2mX8E9piC24jXRfG8qNZZR0ahbTNW1he9DduvQ+j2EHsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dzav66wS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B787C4CEED;
+	Fri, 22 Aug 2025 13:19:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755868786;
+	bh=MyNgdMxnyEB/P7oXWoztxQMr+47U1RLFpT8c8a5OKoc=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Dzav66wSYqOQh8PgImtIxM6Cwlr5krkZrJf+Uu5VPHyuhSq5Mw+zkORV28y1TFVnZ
+	 m+aPS5PjU1NFfMmbJDXcrIDDnu2cGNRbwfQubvtO81xavtkDRYx4NZrUVxBCx/NnfN
+	 ncZiOYpie5SitqOF6Eh/RvYnXXJIl/SHRaYvLld7FaYlm+uXgh1i1+4qtkIhSHweyW
+	 0YxTHB9TgUvzR6/Nubmqbzv/p/V7Ov7BY3yGpHJu1r2huyyjDxejrd49WLaZ901BkS
+	 5+vQNHMUcfmaD8nzHCkcNcwNzsc6FQQdKXSxk2Xnl9qXeu3kGv13mZXa2W4mR0mqAB
+	 8TvIttVQXfprg==
+From: Jeff Layton <jlayton@kernel.org>
+Subject: [PATCH v2 0/2] sunrpc: allow dprintk() to go to the trace buffer
+ instead of console
+Date: Fri, 22 Aug 2025 09:19:21 -0400
+Message-Id: <20250822-nfs-testing-v2-0-5f6034b16e46@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87960e35-5b7b-4b7e-9bba-50db6292cd5b@hauke-m.de>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAFluqGgC/23MQQ6CMBCF4auQWVszHQWtK+9hWKAdYKIppNM0G
+ sLdraxd/i953wLKUVjhUi0QOYvKFErQroLH2IWBjfjSQEg1nsma0KtJrEnCYOhOFk/oavJHKI8
+ 5ci/vTbu1pUfRNMXPhmf7W/872Ro0PTbonGsO7Lvrk2Pg136KA7Trun4BfKlknKcAAAA=
+X-Change-ID: 20250821-nfs-testing-2b21070952d4
+To: Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
+ Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>, 
+ Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
+ Tom Talpey <tom@talpey.com>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, Jeff Layton <jlayton@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1243; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=MyNgdMxnyEB/P7oXWoztxQMr+47U1RLFpT8c8a5OKoc=;
+ b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBoqG5nlo54B+e38yagzXYM8iUYdmSkDPT+QaAEj
+ K8b3fpOdQuJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaKhuZwAKCRAADmhBGVaC
+ FfWLEACyR9DwlivE1t0R3+hiKGnmcX8Dj+dyFumcDeLRq0r6F/qFqNOPJl1U+cxvCXdt91r2tO/
+ kI6bHTnCJwFdzwhj4oySHNoYqmeDFC4ZyxrO+pKreWR2Uw9BdudISWMywMcNntIQLko48dyelUR
+ CWni6JnHsVgqEnfkhfvAdmZ2Kv2pXeKuBsI0n7YhOHVs4emAlBRieNql30ELQpzQZZFr/Gg952d
+ wonnYN8rNJuyp/0FYM3brch0ucTao9P4jHTbjvJAyMhO2uDkQUnimH8JE/DxyeRkVePy3u6NiWL
+ sjTM1gnfbfBit5XiIOyiayUqMJGbgNkR39o7bk8q4NO74cd1dU4GEInMk6F4+0H/ZGBzsHD6xQa
+ MCPjjPq3cImkmL2WDtpvveSQ22ywLA5ZUpZ0KAYcIkrLMepXjU3EhkPq7CbfyHi+ZPn7qHyqPqt
+ /s4jB/qBcDpRXqUmSGmK0vCa9YhAukKM0iWZ9SFkCC42r14upoDLAKSuy7XPgqAti/6UJ7kDHqc
+ T8suQQgq3//JmGPxXxTDmi8BmNa1bdFmXBIXRUDCNTDMzPz8IA0zwcqyPLloXBcgmi9CjzSvGiF
+ CpMD4CtMfl91IhtTQtPzoScJQUY1NUZ+K9GJb9mGeBwR3U/VweSGw7zmTSPPjVCjE6EWSjiGvd0
+ wwCaQwo2/3whrbg==
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-On Thu, Aug 07, 2025 at 07:44:29PM +0200, Hauke Mehrtens wrote:
-> Hi,
-> 
-> Kernel 5.15.189 is showing a warning caused by:
-> commit e269f29e9395527bc00c213c6b15da04ebb35070
-> Author: Lion Ackermann <nnamrec@gmail.com>
-> Date:   Mon Jun 30 15:27:30 2025 +0200
->      net/sched: Always pass notifications when child class becomes empty
->      [ Upstream commit 103406b38c600fec1fe375a77b27d87e314aea09 ]
-> 
-> See here for details: https://www.spinics.net/lists/netdev/msg1113109.html
-> 
-> To fix this please backport the following 4 commits to 5.15 stable:
-> 
-> commit 5ba8b837b522d7051ef81bacf3d95383ff8edce5
-> Author: Cong Wang <xiyou.wangcong@gmail.com>
-> Date:   Thu Apr 3 14:10:23 2025 -0700
-> 
->     sch_htb: make htb_qlen_notify() idempotent
+While we have added a lot of static tracepoints in the last few years,
+we still have a load of dprintks in place at all levels of the
+NFS/NLM/RPC stack. At the same time, they're pretty useless under any
+significant load due to the console overhead.
 
-Now applied.
+This adds a new Kconfig switch to allow those to go to the trace buffer
+instead. In addition to being more efficient, that allows us to enable
+static tracepoints alongside dprintk() and get a unified log.
 
-> commit df008598b3a00be02a8051fde89ca0fbc416bd55
-> Author: Cong Wang <xiyou.wangcong@gmail.com>
-> Date:   Thu Apr 3 14:10:24 2025 -0700
-> 
->     sch_drr: make drr_qlen_notify() idempotent
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
+---
+Changes in v2:
+- pr_default() doesn't exist. Use printk(KERN_DEFAULT ...) instead.
+- Link to v1: https://lore.kernel.org/r/20250821-nfs-testing-v1-0-f06099963eda@kernel.org
 
-Does not apply, please provide a working backport.
+---
+Jeff Layton (2):
+      sunrpc: remove dfprintk_cont() and dfprintk_rcu_cont()
+      sunrpc: add a Kconfig option to redirect dfprintk() output to trace buffer
 
-> commit 51eb3b65544c9efd6a1026889ee5fb5aa62da3bb
-> Author: Cong Wang <xiyou.wangcong@gmail.com>
-> Date:   Thu Apr 3 14:10:25 2025 -0700
-> 
->     sch_hfsc: make hfsc_qlen_notify() idempotent
+ fs/nfs/write.c               |  6 +++---
+ include/linux/sunrpc/debug.h | 30 ++++++++----------------------
+ net/sunrpc/Kconfig           | 14 ++++++++++++++
+ 3 files changed, 25 insertions(+), 25 deletions(-)
+---
+base-commit: 80a1bea0cd81de70c56b37a8292c23d57419776f
+change-id: 20250821-nfs-testing-2b21070952d4
 
-Now applied
+Best regards,
+-- 
+Jeff Layton <jlayton@kernel.org>
 
-> commit 55f9eca4bfe30a15d8656f915922e8c98b7f0728
-> Author: Cong Wang <xiyou.wangcong@gmail.com>
-> Date:   Thu Apr 3 14:10:26 2025 -0700
-> 
->     sch_qfq: make qfq_qlen_notify() idempotent
-
-Now applied, thanks.
-
-greg k-h
 
