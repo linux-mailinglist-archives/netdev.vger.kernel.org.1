@@ -1,225 +1,208 @@
-Return-Path: <netdev+bounces-215908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADD56B30D87
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 06:24:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28B91B30D90
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 06:26:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24EAF6870F5
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 04:23:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10C5B189342A
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 04:25:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A92F127A935;
-	Fri, 22 Aug 2025 04:23:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31C6E28D830;
+	Fri, 22 Aug 2025 04:24:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b="Eov/N93I"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="FqAJJnIV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2056.outbound.protection.outlook.com [40.107.220.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C68652773FC
-	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 04:23:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755836605; cv=none; b=FPxQeGovmZ8yEBOn6CEghEhY2HPHvr6HhIwrvi0qF9poK6QyAnhhUPV5kh3wSY7ZheBokEGQLaLaj1Czo1Dtza4feKqXc2Gp4WyUbDJ/+VoFCuJrkpXHrIYJIg1xr+7q+1x0n5bcEdlRvg/LCZvvWiYYF6N5m9z1jOSo3Y9NHC0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755836605; c=relaxed/simple;
-	bh=rcfw7pKOmFxog5o6Pv8xbpuXN5/vYailwsWhsRDTQPs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SmLguNn6n44YL7DGY+WDwlNiG5Xmu9wJa5T7nvJYUA3+1UwP8MuCdXvOKHFApilBN3cxpI7NX5htmietaVwnmWPb/fZcAcDKeZy4uaWs7GhpYyun3IO4HNqXjwvLt9MPXBkHHR4dmkxUWCogAkZYEXiDhS5p6/ZaCLJl82KDF4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org; spf=pass smtp.mailfrom=wbinvd.org; dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b=Eov/N93I; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wbinvd.org
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-b47174c8e45so1558600a12.2
-        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 21:23:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=wbinvd.org; s=wbinvd; t=1755836603; x=1756441403; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=8OYbr6Zeb0In7ciWZAGGuuclyk12KWAFQqeCkPJi8ew=;
-        b=Eov/N93IZjIkQ+77ciJVgTSnW6Ujqs8bTmTJKNvSRscUCK5WqKE0DiO8iGETuhQbGj
-         SAGK/cbBtR6ER+t8/NgZyj9kKWNxsS+oJxcvVAodtpicveJQTkhQWVBme0i+jNk4u4ZQ
-         IiVBD5wmsQlYhALJWtkDjUjimTadpCmxO/kPkAsF0rGA6TRUBo4Mr/hwBdvjwINq0uXF
-         +5urKAS79vt5J/g6lqgJKB2USSWxToQYBgm5R3FQDxEplw83YWMf3CpKzTjzI/dvUhIo
-         vEQwfBqMz81chUP1fp3eWV7UASSD8JYxGy58g/tYh3L5tXMa2Pk7OEvXbJlha8Qawlla
-         bxHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755836603; x=1756441403;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8OYbr6Zeb0In7ciWZAGGuuclyk12KWAFQqeCkPJi8ew=;
-        b=V1NRfZSXCtx23MBGAs3Eh+WhZ7Yyfsrj2B9XlCjL8GycgZg3lMG39cAG2Qm+s/8puY
-         77RY55h87fYexjCBe9MoK8XOZRO7n8l2JJkgB0Jk3vV7nWim/UeE1ZqaSLWcyNqJ+jYR
-         XNeLCikOmo5aGQaTVhiVd4HVYYaK9hJcQRdj0E58njxwhiyR1KgNHD6DEIMWbiUkEWUd
-         6DWA89kXH4OeQjoAjdG4fOVeHKHP8AojOC6WIqze12WDDGLuKP7QItL4NhsxVjKlJFsp
-         GWDCjhTHV8NQpJ8C+YacJ3nkEvmOfQX02WoCrG/tQcnjLkoCUGnT/rqXHeOYQXKy3uKG
-         ZVxA==
-X-Forwarded-Encrypted: i=1; AJvYcCUzvMOFnarqod2bssrEGPnJ3VTpxN+PVcKgzoXndVF0sSTY3RfCBTp/g4seMwoOow12Viq4ZzY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxa1CEY32HTL6w1ZwI6aF+M8A4s3YAiO06ORIytEgEmc7FbfDzs
-	1gYj0Uresr/7QZEzNc66XH0MednlSB7EkJWmyOTlx3hACCJL2fJjdDg/WsEyv0GhoFc=
-X-Gm-Gg: ASbGnctVBdjUpY1HKLXNFQf86eb1TNyvTofNB1F3HKMd3ebT/tpOyw9BITia0Kv/Wy3
-	5KEuyrB4oDqNXdhjP7U9X+zRup9XVPkSruEl/FqpLIELhFvQ5znSTZK9K0WH6UltZLoyCLRjlaq
-	q4fL+cilOXmRF6QF5kBoHoYEJbNR7UD7NwmvZBde76bxlkLEPFAwVfQiJNesINAVWrLIV2bpYBW
-	QdjS7hQ7GR6mbrt3pjJQwC5zWIUtyAU2B7dV+cfYnrAEC35lkaLbS4D9XaQT4BTQRyUEkLQiEIf
-	TwuRocwDwFQuiQTFkmngSDgZAo0wlt7Q34UQUuH5DIWBgV+fG4/3uwr3x9mX8ONB/ncapg/d6Dl
-	eB/wgBlaYDKgC1WyC5aRd+/cI
-X-Google-Smtp-Source: AGHT+IGkr6KG1Nu9z0iOHepL9KnzdBIr5e1tJ3KsMa+xu1RZViZOdy4PjdjRbUW4MQjoOYoW45A27Q==
-X-Received: by 2002:a17:902:ce01:b0:245:fcc6:a9d8 with SMTP id d9443c01a7336-2462efbe05amr28662875ad.54.1755836603033;
-        Thu, 21 Aug 2025 21:23:23 -0700 (PDT)
-Received: from mozart.vkv.me ([192.184.167.117])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24636064715sm8694255ad.29.2025.08.21.21.23.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Aug 2025 21:23:22 -0700 (PDT)
-Date: Thu, 21 Aug 2025 21:23:20 -0700
-From: Calvin Owens <calvin@wbinvd.org>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Michal Schmidt <mschmidt@redhat.com>, netdev@vger.kernel.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Ivan Vecera <ivecera@redhat.com>, intel-wired-lan@lists.osuosl.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] i40e: Prevent unwanted interface name changes
-Message-ID: <aKfwuFXnvOzWx5De@mozart.vkv.me>
-References: <94d7d5c0bb4fc171154ccff36e85261a9f186923.1755661118.git.calvin@wbinvd.org>
- <CADEbmW100menFu3KACm4p72yPSjbnQwnYumDCGRw+GxpgXeMJA@mail.gmail.com>
- <aKXqVqj_bUefe1Nj@mozart.vkv.me>
- <aKYI5wXcEqSjunfk@mozart.vkv.me>
- <e71fe3bf-ec97-431e-b60c-634c5263ad82@intel.com>
- <aKcr7FCOHZycDrsC@mozart.vkv.me>
- <8f077022-e98a-4e30-901b-7e014fe5d5b2@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840EE28CF49;
+	Fri, 22 Aug 2025 04:24:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.56
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755836682; cv=fail; b=cHs9U4vMRqi6MdykKnWJgIIG/dgMdWScHY8lU6gryre/MfJ9aId84OBki8QAkakntvXGf/9NHiXwInyBaRTBFhev94hKuZ7fB2yBjoNKd3AK8153t7r07MchHGBa1s+EJcxfT62y2m77rtPHa4Leiq5gURQXA+LaPWGOf7dkkVo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755836682; c=relaxed/simple;
+	bh=d22V3BNBq95G9xuSaQkeTmuTMSUJ4w1Ee+Nd8eZWGZ8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=nx9e9HBWSxat+K47IaWgw7EgXwWYMGII+n2frbqSzvm4KQxnt2Reo127LdUD9xpNqMnYen3SYiXEJMXgdoR2T+llGjki+Conu0MuTs88UfyiqvTv4en09RdbycUt9zlA0cTzJrlyQGVOammwDsWRKrPbAT9mnkayq7eFulyXpTw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=FqAJJnIV; arc=fail smtp.client-ip=40.107.220.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=HhnN57PhII5xHSccrNrjyPtWkJJ8eMTiJcOWqXWk0AG4ntnSwRETCkote9NuU3i+7y8VRnHXyExICdRkVJc9d9D3HOjMbocIwlFjVl6KWUyDt/v4eU/8FjOHaV09AvVxBfMNM3nkmuqayCki13hOwBOdxcSXF3XvG2D/7XhNaoIO8Ao5NOLXXHbBemtV5AaFaQsuwB82FWM70+L9Rxnh8szsXhV3Exo3LBqORwDUywSRn+9R/HaieDu/J7Reh3J6hQy5HvIa0NXHZsk/UXBnUG5CH/eyiU32ew49vV9yXXua8BXW3t4HKI/Qj71rmh3kSzZFsF0lHK8zY9Q0K8b6SA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=d22V3BNBq95G9xuSaQkeTmuTMSUJ4w1Ee+Nd8eZWGZ8=;
+ b=YpDclRClaHiS3Ue9e4hVG44Calz8vVCKTOoMTfFwFWQYp56NwOXHRyjj2Nt/tV4jfqCeaQivfUgpRpDPahkj8j6t6r1JCTWqcKlxJwg4KzCYL4I5lOapGkeOr8Q/kRPnd6wcy5nk2RLKX3w3sLVATk3ugIpdxNTNprr15z8b3f50I6hJKfRyWaYhJJ96aRGwDWaXutc+Ag36e3KoeVX+833LAhWYNTPsR0Tj7it8nreTVOL4hekJkhMnXZiuqO0mpSOnpJd5mJGybrFpoC41TtIkHaHUXY9UM4Lrd2620jlsW6E97ozwiwt2ewWaxsyGKenxd4yYr8rNh3ccZ6vM3A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=d22V3BNBq95G9xuSaQkeTmuTMSUJ4w1Ee+Nd8eZWGZ8=;
+ b=FqAJJnIV3ohO833fLpx+HUdrrY//C6A/EwhG8Wrby4G9YgrahloSEeYbH1PR4ZAC3Z8bjZX9roeANabVT10sPgIupfgYb/7qgpnE6d1F1dXFr5eqXdD+OwOQqk/G/Pfdv4PsAwf5X9B1AlWx6rD4QzoWW01TEo4HhEM3sd1jynPdv8jJqyWPVKRJQD2K8UzssN+TGtPBoJPW8hoIcuibjA7UsCBDslPPYwN/m+REnccVRQanj0d85CHASV9EIxQ/2910OgwkZPm9+Q6xfa1GmXJzyaLRjuI4Z9N6FOSYlX4wDnYfiiahBoNJBPbQopV5OWVNswz3tQPV+NuKB5eUWA==
+Received: from SA1PR11MB8278.namprd11.prod.outlook.com (2603:10b6:806:25b::19)
+ by SJ2PR11MB7453.namprd11.prod.outlook.com (2603:10b6:a03:4cb::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.24; Fri, 22 Aug
+ 2025 04:24:36 +0000
+Received: from SA1PR11MB8278.namprd11.prod.outlook.com
+ ([fe80::84fa:e267:e389:fa9]) by SA1PR11MB8278.namprd11.prod.outlook.com
+ ([fe80::84fa:e267:e389:fa9%7]) with mapi id 15.20.8989.011; Fri, 22 Aug 2025
+ 04:24:36 +0000
+From: <Parthiban.Veerasooran@microchip.com>
+To: <andrew@lunn.ch>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] microchip: lan865x: fix missing ndo_eth_ioctl handler
+ to support PHY ioctl
+Thread-Topic: [PATCH net] microchip: lan865x: fix missing ndo_eth_ioctl
+ handler to support PHY ioctl
+Thread-Index: AQHcEnWbR+tCBESmtUqmTIms15S55LRtz2IAgABFB4A=
+Date: Fri, 22 Aug 2025 04:24:36 +0000
+Message-ID: <4a2e6ca1-7ae9-4959-a394-c84aab4b4c02@microchip.com>
+References: <20250821082832.62943-1-parthiban.veerasooran@microchip.com>
+ <204b8b3d-e981-41fa-b65c-46b012742bfe@lunn.ch>
+In-Reply-To: <204b8b3d-e981-41fa-b65c-46b012742bfe@lunn.ch>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR11MB8278:EE_|SJ2PR11MB7453:EE_
+x-ms-office365-filtering-correlation-id: baae5d5d-3b55-4057-5c1c-08dde133cd5e
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?WHpRSkk2N3JmdUJBRmpBdFp4cU15UUtsRnNlUXVud0FObVEwWVRiRENtYkRC?=
+ =?utf-8?B?ZVE2V09NV0pkVjR5R2ZVRU5GMk95NThOeUlod1lvSW9EVHdaM2ZTL1RYT2pO?=
+ =?utf-8?B?N1krd0xBTkVQTmY0YkRhd1dmMGI4NmVubXdVNE5YbEovNExMU2traUxaOUo5?=
+ =?utf-8?B?QWsrNUFtVUl0blNCSVhDbDM1TDBid1dpMDd0S09ic1Y1bmZTSXJSVXJRT2dC?=
+ =?utf-8?B?ZmNWWnlROXJRdjQ1Q21ZMkJWZUd3K2kxS2JibE5DOFZsUjFGb1pCTHZReTdV?=
+ =?utf-8?B?Y2JvTjN6cHJZSHRNOS9UNHo5Z0lwYk9UTFJkbHJabEJUUTVjQnN5b1VTTzVl?=
+ =?utf-8?B?Uk1WNytFQWFoSFkvL09yemF3a0NRRW9rMlNra21sMzZlYzI3OFNSeW1RYWdE?=
+ =?utf-8?B?WkJYUlY4cTFXL3FXS2hENDJoczVxbk5LcmU2a3JsSi92RFZuWHdia0xwN010?=
+ =?utf-8?B?NkFQU2VVbFFmaGlOVGtjWHRDaUVLbDhwaEg5dzlrN3F1MVpGek4rcjM3dGVx?=
+ =?utf-8?B?c0JGcnA3OUd6UldaWFc5ZmZ5VHl6Q0hsTTM0Qy91Q3BHZ2dOZFlCOGNmZDRU?=
+ =?utf-8?B?ZVMyK1JBZERBb1AzbEFhaG84ZGM3UzBVV1JJbmRHcW9zUzNOTnJNd1dtbkEw?=
+ =?utf-8?B?bEhDV1g2Ti9XaThnUE90ZUpEcFJuOVNBTWtZNkl5ZVVHTUhTQUovc2d6aVpP?=
+ =?utf-8?B?aGtOSVhIV080d2RkWmNCbkxxMlNOK0d3ZTI5Mi9yS0g4YjJpblE4SXRJd2I1?=
+ =?utf-8?B?Wm1GbCtnbnJuSUZBczk0REJGSWVaNk9QTW9kM0g3TS9Ea3lJUHNqeGs2eFpr?=
+ =?utf-8?B?Qnp0czMzNEdFYjl5Q1FLRzhCbE9EeUpqcUZnVUZNazQ5OGkxQ2lzcjlSeStv?=
+ =?utf-8?B?THRtYWFmREE3cDZ4UjUrREZIbzU2dDg4dkJBaGhvQXZsLzVkcHB1UU5sUzRu?=
+ =?utf-8?B?WW8xeStORVdRRFJhTi95RHYxYkJrY2o2bGo0SGVxbm9tUFNTV1BGc0JZSlJq?=
+ =?utf-8?B?dHAwWStsNGtqSVB1RE5KOTVxeUQ3UGpwT2FBTnhPTnpKQ0d3RWJYck9yV2tk?=
+ =?utf-8?B?R29WWGtxaHYrc0J2QzU3QVZZdXFDV0hwcGVXL1hkL3htV3U3aFRMaTBrMldB?=
+ =?utf-8?B?cG5wKytLWmdvaE5hOEk3bVB5NHZmdExlOUtZM1F4ZmhwZkRueHVaR2FvdUJU?=
+ =?utf-8?B?dGVrY1ZpM3NUTmpwQ1l6citySDZXTXFVRTVmdGpVU0Q0a1lrODlXTzNDejhT?=
+ =?utf-8?B?RTZJWHllYnFxUnBLWEJJMXN2N0NaNUF1enZURFljVWFiL3ZNQzdmSVErQUxS?=
+ =?utf-8?B?d3hjZUpzMDg2bW1OQnY0L0lVY1hsSjQ2b2dDTW1IQ21CeTE5WjhzU0l0cGRU?=
+ =?utf-8?B?amtpVkdSSW83VkxVSlJHcDlNbi8rL1FGWHl2UU1JOU5mSU1MUk1Ta1ZNUHBk?=
+ =?utf-8?B?N2FzanloeXNmSFJ3bzRLWFFmdHBscTBianU0Y21NdXVzUWlzbEJtV1E2WUVs?=
+ =?utf-8?B?OXFYWDRzaVB2cDBLenVUWnVZQ0wvRko2Q2RCZno3Z1YvS1paTDlMUWdHVy8y?=
+ =?utf-8?B?N09TRFdoUHlCVTBaVlhwR25ZNkdZcGFubDBOYnU1NVREb01FZGZnT2hpcDZJ?=
+ =?utf-8?B?ZFRRTHZwd0gyOVRkMy81ZXAvNGhsTmh2dk5USE13SHZTNE1YdUlCYWNFUTJW?=
+ =?utf-8?B?eUNWSjhTdmpmNCtqSnVmemxVVTk1SHpWZlNnbElLdk15V2I5dC9Ebk4wb2RH?=
+ =?utf-8?B?a1FQVEFkeGp4ejZ1eXVEb2g3YVBWc2EzQ3NYaWZ2QSthcHN0a2pqam9TQldQ?=
+ =?utf-8?B?OUhsQ2NZTFFTMkhKYXkrTFVEbjVXNTRNKzBpajV4aDdHYWtPZkQvSWF1RWwy?=
+ =?utf-8?B?bnpRRU05M1BSNnE5SnQ4TFVLTTZNMjRFTSsrcHhQMzczb3pYQ0U3dUppcjlC?=
+ =?utf-8?B?blpxVE81NXh2QUx2R0Q0QlJTc0lUcEpUSjhjVGtFT1FlZU1rS2dWTGhUcjBi?=
+ =?utf-8?B?bHVFYzFjMGdnPT0=?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB8278.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?ODZJdFJlbkhSZ2QyYkJhTVZyMXVtVkpzaFlsMlM2bWhZVEFTdGw2citZQUM4?=
+ =?utf-8?B?ZEh1d3ZuSEYvTWR4UEdqSE9nZnRyWDZBN3ZxTzB2T0hMLzkrUlVPVllxamo5?=
+ =?utf-8?B?aWtDeTYrYUlUNUpNMGdnVXU1Zkc4NFRURURTRFVsd3BQZ1RicUhhT1pleUtU?=
+ =?utf-8?B?dHRRUFhKdWp1ZTJlTEF1V09qODZCS21tSnZEWWhrNnAyQ2pYYTlwbmpvOW1B?=
+ =?utf-8?B?eUw2UzlKOThwdG1wSHpYSzlSZWs4KzVSY1RnazBidkd0c1FwaG0yck43bkNh?=
+ =?utf-8?B?dmZya0gxd0kzYkRnZ1J3TzkrV050aDhxNkkzZ3JlVi83Mk8zdTVRYWlVbnNi?=
+ =?utf-8?B?WjMvZ3EyeUdJWUNYUFR4bFpuNTVYaTRtUUJUbXBGaW5EZmh4cVpjejJraWta?=
+ =?utf-8?B?KzdPd0NURUJ6Vis4WEFPV3M1SWU4cXFqRERxeUtKTUZkR0lES2FGVW5JQytw?=
+ =?utf-8?B?K095aXRnb3RWTEZqWDdhTG5TYWdoSnZFUmovRnRPOXVXRDNlbGZ6ZnhxWml1?=
+ =?utf-8?B?UStTcTJnQkN6dmt2UWtUdVdsOUNJK3F6MmVmSmRCVzJTeW8rOHM1ZUJpS0FP?=
+ =?utf-8?B?R0FiQnFzUVZWR29pa2lTc3g1QjNrTFpPQnRyTlR4bThTUDNyK0RBY3NVRUVO?=
+ =?utf-8?B?N29kcGhHeUlSb0d2S0NkYTI0dGsxWDkwcnBSRG1IUHkxMlZyaSt4bHRlM3FB?=
+ =?utf-8?B?U3JEVDAzdmlyOHBJSWlaTDZ0YWFleVVldlRIeVVIRHFCM0plWDJ1YzZhRDlQ?=
+ =?utf-8?B?aW0wcG1YQnpFUHFhSmp5MTB6cTFqTm85bVR4cE9zM0w2OW5sNUlJNXM3UzRq?=
+ =?utf-8?B?dGc5SU9PN3U4MGlNcS90NjJSZzFuUEVwdUVpenBhVlI1Mlo0TzdLcWtVZ25C?=
+ =?utf-8?B?TERESi96eVdRTmRIa2czdFBBbXgwVkkwU2ZLK0NSc3hpbG55Q29NTTZiNU9j?=
+ =?utf-8?B?UXd1NmdaVEdYYVFXbEZBTDQzMlNVY3l1TzV4bUlqSWVMY0hwaTVtMDBpc2k4?=
+ =?utf-8?B?RzBzYnJ2N2crN1dsdkhCLzluNEhPUjBPZXJZYXpMWTlsYjcvTHNocVpEcVE2?=
+ =?utf-8?B?VVBES0JpN2NsQ1BqRXN3RHZyaTNSQUxqNStZUzFjZng0bUZuUHRobzFPYXpE?=
+ =?utf-8?B?enBWdE5CU21XTFV0NGtwQlI3Q1FKMnVqYkg0ODUrTWlZWndva2tjSnovY3Rm?=
+ =?utf-8?B?bGdLcG5uM05ESzFlSStqV29uZG82SExkTWU3enZiQjVuNFNZcWFKUm1INEkz?=
+ =?utf-8?B?aE5XZzZaSEhIRkhYN0VFb2hkbG9lclhvSUtLcFV0UWJlbndKdXVPVTJPdUdt?=
+ =?utf-8?B?YlhHYWZ4RzkrSTBYTVkrYjZXU0tBZ2lIUDZmc2ZmT2VXaGQ0MlNqTitvcHM2?=
+ =?utf-8?B?VXRlU0xuazdTQ0FwZUplYXdOalJiUXB3OVZaZ2xHSG1YSzFlNkUwUzIzMjd6?=
+ =?utf-8?B?NmRVcG9kVUM4a2h3VnhDMUZ1cytMYmVsamNPWkpUMlBsdWRDVG9OcnZhVEcz?=
+ =?utf-8?B?L0hlNkhHWXhsSXVKaFd2dVREQ1ZQamFtUlI4ektJOTkya1dWREVmUUlndzAw?=
+ =?utf-8?B?WVNxNGpRYUpYbmd2Z3RjMW14UEtsWXBEckVIWWpDakpxWDNpTzJDZk1IUkhy?=
+ =?utf-8?B?dWk5b0JNR2ljMUdCbmxYVjc4T0JVUU9PQysvTDdSL0ZDV1RGWmpqODVTQy9H?=
+ =?utf-8?B?U0laU01DN1R0UjZNeDM3LzlKaWFZOFF5T2Q2TW9HMzhiSHZQZGhWdUdVL0FR?=
+ =?utf-8?B?b2tVcDhKcTAvMFNXN1R2c0hZcmI4L0xEYjZnSFZQcDVlN3oyRml4VVYwUUw3?=
+ =?utf-8?B?SGlIYStGSFEwK1lmOHlOUUpJL0RqQTVQMmcrSHBhVklZYXJBUEhDZmhldnpu?=
+ =?utf-8?B?VWp0aTRTdEtzWmZPOUM2M1RnRzFvSlVkTWJPWnJJSzdEMDdlT2c3dG9EK3Ji?=
+ =?utf-8?B?REp1Mm43dUpsanN4d3p4NjUwbXpaaGZKQXJIVDR3M0E3Q2E4RC95ak91YktD?=
+ =?utf-8?B?VUxTUVFHVnVFZDBTSTcwSGZEblZnRGlqTk1wLzRZNFlmWGl6N3RwRHpmT0FZ?=
+ =?utf-8?B?K0J5RFVlUEVFQkE3MVFlVGFYdEgrU1FvYXZXYzhEQ3dsMTNlblV0dEZBMkJZ?=
+ =?utf-8?B?eC9RVGo4WnZhSlRrNHBZM1JYQmUyRm83dmZZSWhhUUU3cVhHdHVyNWFpUThD?=
+ =?utf-8?B?QVE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <C2C8E5E43C4DDE4EB4A255B1682F0CC0@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8f077022-e98a-4e30-901b-7e014fe5d5b2@intel.com>
+X-OriginatorOrg: microchip.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB8278.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: baae5d5d-3b55-4057-5c1c-08dde133cd5e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Aug 2025 04:24:36.1320
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vMO5RQTXKSSE/OjcjCsslMfGqidCnTOYIsIooAoBcUdeWD/8VqzNOl2cMBrIF7blNIqQyBA8S8SSUcyQJrAmLS51UtplWb1O2zWGovv9wHIxpOTWe1h8i+2jd8MyGUEU
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB7453
 
-On Thursday 08/21 at 22:39 +0200, Przemek Kitszel wrote:
-> On 8/21/25 16:23, Calvin Owens wrote:
-> > On Thursday 08/21 at 10:00 +0200, Przemek Kitszel wrote:
-> > > On 8/20/25 19:41, Calvin Owens wrote:
-> > > > On Wednesday 08/20 at 08:31 -0700, Calvin Owens wrote:
-> > > > > On Wednesday 08/20 at 08:42 +0200, Michal Schmidt wrote:
-> > > > > > On Wed, Aug 20, 2025 at 6:30 AM Calvin Owens <calvin@wbinvd.org> wrote:
-> > > > > > > The same naming regression which was reported in ixgbe and fixed in
-> > > > > > > commit e67a0bc3ed4f ("ixgbe: prevent from unwanted interface name
-> > > > > > > changes") still exists in i40e.
-> > > > > > > 
-> > > > > > > Fix i40e by setting the same flag, added in commit c5ec7f49b480
-> > > > > > > ("devlink: let driver opt out of automatic phys_port_name generation").
-> > > > > > > 
-> > > > > > > Fixes: 9e479d64dc58 ("i40e: Add initial devlink support")
-> > > > > > 
-> > > > > > But this one's almost two years old. By now, there may be more users
-> > > > > > relying on the new name than on the old one.
-> > > > > > Michal
-> > > > > 
-> > > > > Well, I was relying on the new ixgbe names, and I had to revert them
-> > > > > all in a bunch of configs yesterday after e67a0bc3ed4f :)
-> > > 
-> > > we have fixed (changed to old naming scheme) ixgbe right after the
-> > > kernel was used by real users (modulo usual delay needed to invent
-> > > a good solution)
-> > 
-> > No, the "fix" actually broke me for a *second time*, because I'd
-> > already converted my infrastructure to use the *new* names, which match
-> > i40e and the rest of the world.
-> > 
-> > We've seen *two* user ABI regressions in the last several months in
-> > ixgbe now, both of which completely broke networking on the system.
-> > 
-> > I'm not here to whine about that: I just want to save as many people out
-> > there in the real world as I can the trouble of having to do the same
-> > work (which has absolutely no benefit) over the next five years in i40e.
-> > 
-> > If it's acceptable to break me for a second time to "fix" this, because
-> > I'm the minority of users (a viewpoint I am in agreement with), it
-> > should also be acceptable to break the minority of i40e users who are
-> > running newer kernels to "fix" it there too.
-> > 
-> > Why isn't it?
-> 
-> I think we agree that it is ok-ish to sometime break setups for bleeding
-> edge users, then fix (aka undo). It's bad that this time it was with
-> effect equivalent to the first breakage (hope that it was easier to fix
-> locally when it occurred second time in a row).
-
-I just want to re-emphasize, it was *not* my intent to gripe at you
-about this. A big reason I test new kernels is in the hope I can hit
-things like this myself and get them fixed before they impact the wide
-userbase, I'm only frustrated I'm probably too late here to do that.
-
-> But we dispute over change from Oct 2023, for me it is carved in stone
-> at this point. Every user either adjusted or worked it around [1]
-
-IMHO the date of the release (Jan 2024) is more relevant than the
-commit date, but it's not really that different in this case.
-
-I think there's merit to the idea that the lack of complaining is a sign
-that most users have not had to adjust yet, because if they had, they'd
-have complained about it. But I don't have any real data either way.
-
-The objections raised over the new interface naming in ixgbe are in no
-way specific to ixgbe. You can s/ixgbe/i40e/ any mail about it and
-nothing really changes. They're generalized objections against the
-renaming of interfaces, so from a certain POV people *are* actively
-complaining.
-
-> > > > And, even if it is e67a0bc3ed4f that introduced it, v6.7 was the first
-> > > > release with it. I strongly suspect most servers with i40e NICs running
-> > > > in the wild are running older kernels than that, and have not yet
-> > > > encountered the naming regression. But you probably have much better
-> > > > data about that than I do :)
-> > > 
-> > > RedHat patches their kernels with current code of the drivers that their
-> > > customers use (including i40e and ixgbe)
-> > > One could expect that changes made today to those will reach RHEL 10.3,
-> > > even if it would be named "kernel 6.12".
-> > > 
-> > > (*) the changes will likely be also in 10.2, but I don't want to make
-> > > any promises from Intel or Redhat here
-> > 
-> > But how many i40e users are actually on the most recent version of RHEL?
-> > Not very many, is my guess. RHEL9 is 5.14, and has the old behavior.
-> 
-> RHEL 9 backported devlink for i40e in July 2024 [0], together with undo
-> of interface name change [1] (this likely tells why there were zero
-> complains from RH users).
-> 
-> [0]
-> https://gitlab.com/redhat/centos-stream/src/kernel/centos-stream-9/-/commit/bcbc349375ecd977aa429c3eff4d182b74dcdd8a
-> 
-> [1]
-> https://gitlab.com/redhat/centos-stream/src/kernel/centos-stream-9/-/commit/5ab8aa31dc2b44fbd6761bb19463f5427b9be245
-
-Heh. Thank you very much for checking that, and for the links.
-
-> > 
-> > If you actually have data on that, obviously that's different. But it
-> > sounds like you're guessing just like I am.
-> 
-> I could only guess about other OS Vendors, one could check it also
-> for Ubuntu in their public git, but I don't think we need more data, as
-> ultimate judge here are Stable Maintainers
-
-Maybe I'm barking up the wrong tree, it's udev after all that decides to
-read the thing in /sys and name the interfaces differently because it's
-there...
-
-In any case, Debian stable is on 6.12 and didn't patch it (just
-checked), so I concede, it is simply too late :/
-
-Thanks,
-Calvin
+SGkgQW5kcmV3LA0KDQpUaGFuayB5b3UgZm9yIHJldmlld2luZyB0aGlzIHBhdGNoLg0KDQpPbiAy
+Mi8wOC8yNSA1OjQ3IGFtLCBBbmRyZXcgTHVubiB3cm90ZToNCj4gRVhURVJOQUwgRU1BSUw6IERv
+IG5vdCBjbGljayBsaW5rcyBvciBvcGVuIGF0dGFjaG1lbnRzIHVubGVzcyB5b3Uga25vdyB0aGUg
+Y29udGVudCBpcyBzYWZlDQo+IA0KPiBPbiBUaHUsIEF1ZyAyMSwgMjAyNSBhdCAwMTo1ODozMlBN
+ICswNTMwLCBQYXJ0aGliYW4gVmVlcmFzb29yYW4gd3JvdGU6DQo+PiBUaGUgTEFOODY1eCBFdGhl
+cm5ldCBkcml2ZXIgaXMgbWlzc2luZyBhbiAubmRvX2V0aF9pb2N0bCBpbXBsZW1lbnRhdGlvbiwN
+Cj4+IHdoaWNoIGlzIHJlcXVpcmVkIHRvIGhhbmRsZSBzdGFuZGFyZCBNSUkgaW9jdGwgY29tbWFu
+ZHMgc3VjaCBhcw0KPj4gU0lPQ0dNSUlSRUcgYW5kIFNJT0NTTUlJUkVHLiBUaGVzZSBjb21tYW5k
+cyBhcmUgdXNlZCBieSB1c2Vyc3BhY2UgdG9vbHMNCj4+IChlLmcuLCBldGh0b29sLCBtaWktdG9v
+bCkgdG8gYWNjZXNzIGFuZCBjb25maWd1cmUgUEhZIHJlZ2lzdGVycy4NCj4+DQo+PiBUaGlzIHBh
+dGNoIGFkZHMgdGhlIGxhbjg2NXhfZXRoX2lvY3RsKCkgZnVuY3Rpb24gdG8gcGFzcyBpb2N0bCBj
+YWxscyB0bw0KPj4gdGhlIFBIWSBsYXllciB2aWEgcGh5X21paV9pb2N0bCgpIHdoZW4gdGhlIGlu
+dGVyZmFjZSBpcyB1cC4NCj4+DQo+PiBXaXRob3V0IHRoaXMgaGFuZGxlciwgTUlJIGlvY3RsIG9w
+ZXJhdGlvbnMgcmV0dXJuIC1FSU5WQUwsIGJyZWFraW5nIFBIWQ0KPj4gZGlhZ25vc3RpY3MgYW5k
+IGNvbmZpZ3VyYXRpb24gZnJvbSB1c2Vyc3BhY2UuDQo+IA0KPiBJJ20gbm90IHN1cmUgdGhpcyBj
+bGFzc2VzIGFzIGEgZml4LiBUaGlzIElPQ1RMIGlzIG9wdGlvbmFsLCBub3QNCj4gbWFuZGF0b3J5
+LiBSZXR1cm5pbmcgRUlOVkFMIGlzIHZhbGlkIGJlaGF2aW91ci4gU28gZm9yIG1lLCB0aGlzIGlz
+DQo+IGp1c3Qgb25nb2luZyBkZXZlbG9wbWVudCB3b3JrLCBhZGRpbmcgbW9yZSBmZWF0dXJlcyB0
+byB0aGUgZHJpdmVyLg0KPiANCj4gUGxlYXNlIHN1Ym1pdCB0byBuZXQtbmV4dC4NClN1cmUgSSB3
+aWxsIHN1Ym1pdCBpdCB0byBuZXQtbmV4dCBhcyBpdCBpcyBhIGZlYXR1cmUuDQoNCkJ5IHRoZSB3
+YXksIGlzIHRoZXJlIGEgcG9zc2liaWxpdHkgdG8gc3VibWl0IG9yIGFwcGx5IHRoaXMgcGF0Y2gg
+dG8gdGhlIA0Kb2xkZXIgc3RhYmxlIGtlcm5lbHMgYXMgd2VsbCwgc28gdGhhdCB1c2VycyBvbiB0
+aG9zZSB2ZXJzaW9ucyBjYW4gYWxzbyANCmJlbmVmaXQgZnJvbSB0aGlzIGZlYXR1cmU/DQoNCkJl
+c3QgcmVnYXJkcywNClBhcnRoaWJhbiBWDQo+IA0KPiAgICAgIEFuZHJldw0KPiANCj4gLS0tDQo+
+IHB3LWJvdDogY3INCg0K
 
