@@ -1,179 +1,204 @@
-Return-Path: <netdev+bounces-215906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 293B6B30D36
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 06:04:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8074FB30D60
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 06:09:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A30EB64528
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 04:02:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4259176069
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 04:09:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25E85287276;
-	Fri, 22 Aug 2025 04:03:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88C8828C878;
+	Fri, 22 Aug 2025 04:09:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Xl+iEgpU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ekVL8Jce"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f97.google.com (mail-pj1-f97.google.com [209.85.216.97])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8147263C90
-	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 04:03:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE26528AAEE
+	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 04:09:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755835401; cv=none; b=jkmFByDJ0QXLLwgERvSDf8TT8bPWKgOnlCxqo3hXCqdqJ2Nk28rKnZ6Gs0WeYInQLchCaqKoXTYqf4P02irDXQHJ0QdOxJFDirfa5N8XyiWk9c1XUrWPbS1NmK9/glKH/7hl6nNfPNTRE1vFbi9SM2618dvPGzh8pcTLv5agrDc=
+	t=1755835769; cv=none; b=YJlTJhAcr2lUgu40N+2bvdd1iVBJlN2wtv9ZLv/4TlY6QI6Yyrhvlgi6/qt1UCNi+RALDKURmkezwF17+uffUIdAf7vBJjE1mw5bJxpz5JbF4ND28oMSOZM9q9nlvLhGgTmIM4XYvQz1Rlbph7osYN8tgHCAKHC1xhubSM22SZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755835401; c=relaxed/simple;
-	bh=jvXFLpYVYHEIUc1iLOZbe4sL5yU9EXCDJbEwLbZOtJo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WWLSx6um8pYLaqfYvJSGtaTYZp2fEszewexE9CsNkDQbSP6ZzDhKEmB/ViBiU3IZK0diAIujuqZISn/OZOifdP45QLaGD1FFVHwUFbshSvWC/fTo6SYz8oDXa/zwDopHZSTM5GDDdTnrU1oS4j2pX2bz60SKWepG+thMPcDZD7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Xl+iEgpU; arc=none smtp.client-ip=209.85.216.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f97.google.com with SMTP id 98e67ed59e1d1-323267b7dfcso1606991a91.1
-        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 21:03:17 -0700 (PDT)
+	s=arc-20240116; t=1755835769; c=relaxed/simple;
+	bh=uvxGoPwpEkTnej/P9frRazHxG8UL+BClJE53WOAvyXQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=T5domw/lg41PY1ZlhFGKxsUD5ONMtC/61qJozdVgnQVG5ojGRisj1NQs9VFQXwRLGVZBDEh5ac00r3spSYPgboAlnw+H/Nsv2LhGBQoxoQNCdAjdkPYB2QUkqXZMuKyCq4fKPnRCVPsCpnHcmJ7jzcWRsZXaatwL6hjh9gQreos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ekVL8Jce; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755835765;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wD6Kie9NmTYlBWSYITqg8VmPWCkzgpHh3Jn6J+e3AEM=;
+	b=ekVL8Jcem6q4cF0HM2y6xOx21D/FJFLgh+Adi11GsoKh93+dTphRUEqvPEAbV1jsnGf0+j
+	76vWlhnV/nsaTW5nDgWVAmPnyWUl0TtjWGi7aVu71PRBgkpV7KBux/J7eN3g1ihAEe3TSt
+	6lo4Vg1aDMs7A8C7PTZdjARZhrto0Jk=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-561-MczQw6GEMbKTn0gWJ3FTYw-1; Fri, 22 Aug 2025 00:09:23 -0400
+X-MC-Unique: MczQw6GEMbKTn0gWJ3FTYw-1
+X-Mimecast-MFC-AGG-ID: MczQw6GEMbKTn0gWJ3FTYw_1755835762
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-333f8ddf072so6799761fa.0
+        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 21:09:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755835397; x=1756440197;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature
+        d=1e100.net; s=20230601; t=1755835762; x=1756440562;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=f53GRlIh8R+xAEhzUiUULZbbPM7pwilIyORgSUpiEzU=;
-        b=J9Ikyl0evyhjK7r+uQaxGHJbPbtx0z96eohAPaFmf2MzumHeHewXUT8eW5GfB5wBWH
-         q4dvOR8Mwd/Vae5w9NgmK3owedLvx95vIuHThKp5A8VMdAvwqIeOgY8wNgqMwD3f5OoM
-         ZMk9yT5KQwWyytD1nlgVHVFyCd7xvS4+Jdiw5Ukf2bMyBrguiAGlIohpzOT0a766V2Ub
-         IkOWlkitwd5wuJafttb8vmT8pHETDht0D5RrKxvG/jBZQF/INKJ64iBs/2CXViSWJ6R9
-         4Kz7ghETg4KT4rwBzuVydy5veifwqVgggOFZdZ42wA66fuILF/5w5ALa8bMovjHZzDVI
-         tpSw==
-X-Forwarded-Encrypted: i=1; AJvYcCX4gJ5xf4lA2HbEBQ+vDFQBDg5T3hL3r7KTnOOaVLmuSavXRPePnkzBQQxY1UF3Lh9MSVs5R0A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwAp8UHzqWZjgS749odWXb9kMusp7ho6VJNuKdoO84K9Oa6Lnfj
-	dTbOw10jH8NNI6TnYQeqXSwpjHnLEDKszXZGlGdG/7PPFya8m6GqbXYqq1Sn4ybWbLspVZI9Htx
-	fvjiua2UnU+L3m5zwDXTGjuI8AIY93n4TVP26IpF0A5pMKybcYorP00rmjUt2CxA6C30hfiNzKj
-	STNjGTsgHG9olykAbm3ckDffrwu5DNKJBO6icvt+05C5n/CXOYa3Tx5UtrPuGOxLWIOVzA9eHk6
-	MfoHV8v8s7eLMnPfxAgEm+2
-X-Gm-Gg: ASbGncuuJ+u15IZolypJU/w/RspfPqT63pJ2aW8SoWEV61Pu8Uiep6t8SNPZJEBd7UA
-	EeEbe4mwAhIerhnBepe+iNO/0ujNgzPlmtw7TN/BQLwd8+Ea/Nfrw3DZ6yV8lev/28hDMG/9E2r
-	8YrVNZDtGChKRR5YBv9u/8YiTXSOvQMQRGGbL5wmWMSoBiB/RC63waPmMQ5UACd2n7wVyHmkiOE
-	cqZslXpbrj4/vuFniamGbnIj+ANVrZ0kdOy9GLH1NlrmSiHikc97lxbFlNMGlQjZn6ZdDMM942H
-	58u2tY+8D2G/L0YW0o/groHlDYuWlX2czcG9kYx+eLQNGtFmFmpYUWGJT/3eJSrmbDyvGMkfKRa
-	vtkL+rWgpMWH9jhP56NCTFLZje2VzYVP2gB5d1tHV89Rz8eJdKJ8fzVKOVzBIlwZdE7nENKGcqf
-	mIhKceQ9rhPLxf
-X-Google-Smtp-Source: AGHT+IEHa+61MQ6g7+CL4yBmRQze0nVhF752qc6IumkURQtRMlYZoI/lpGzdPMvnObu3VtfItD6nFlfBF0K8
-X-Received: by 2002:a17:902:ebc5:b0:240:2953:4b6b with SMTP id d9443c01a7336-2462eded8f0mr23252035ad.2.1755835396881;
-        Thu, 21 Aug 2025 21:03:16 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-72.dlp.protect.broadcom.com. [144.49.247.72])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-245ed32ea84sm6888245ad.8.2025.08.21.21.03.16
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 21 Aug 2025 21:03:16 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-76e55665b05so1582882b3a.2
-        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 21:03:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1755835395; x=1756440195; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f53GRlIh8R+xAEhzUiUULZbbPM7pwilIyORgSUpiEzU=;
-        b=Xl+iEgpUKa/bzhcquYrK6c29hn8RN1c0MU19bDxxATuq9j+RIfN53+NtPXxzUDeAai
-         tI7eO4LDhD9EvFvvpoMhR6CouJ3ZEl/RSUKJRH1GhaDsz/BoW3XL9///d5XIS+UKhl6Y
-         IMdTsAxyJG+5LZVvTnxrz1zP+1tD2iYZ4mTCc=
-X-Forwarded-Encrypted: i=1; AJvYcCWS47UnS1aXtxYFFbqg9b/k4ZQ6QEiQVwSwjMYClE/TITEYtyXJpqsi7MW2dr94d6GEEIHIXDM=@vger.kernel.org
-X-Received: by 2002:a05:6a00:10c7:b0:76b:f24d:6d67 with SMTP id d2e1a72fcca58-7702fa62641mr2408570b3a.13.1755835395355;
-        Thu, 21 Aug 2025 21:03:15 -0700 (PDT)
-X-Received: by 2002:a05:6a00:10c7:b0:76b:f24d:6d67 with SMTP id d2e1a72fcca58-7702fa62641mr2408534b3a.13.1755835394864;
-        Thu, 21 Aug 2025 21:03:14 -0700 (PDT)
-Received: from dhcp-10-123-157-228.dhcp.broadcom.net ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76e7d0d3abdsm9659814b3a.11.2025.08.21.21.03.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Aug 2025 21:03:14 -0700 (PDT)
-From: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-To: leon@kernel.org,
-	jgg@ziepe.ca
-Cc: linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org,
-	andrew.gospodarek@broadcom.com,
-	selvin.xavier@broadcom.com,
-	michael.chan@broadcom.com,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
-	Saravanan Vajravel <saravanan.vajravel@broadcom.com>
-Subject: [PATCH rdma-next 10/10] RDMA/bnxt_re: Remove unnecessary condition checks
-Date: Fri, 22 Aug 2025 09:38:01 +0530
-Message-ID: <20250822040801.776196-11-kalesh-anakkur.purayil@broadcom.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20250822040801.776196-1-kalesh-anakkur.purayil@broadcom.com>
-References: <20250822040801.776196-1-kalesh-anakkur.purayil@broadcom.com>
+        bh=wD6Kie9NmTYlBWSYITqg8VmPWCkzgpHh3Jn6J+e3AEM=;
+        b=wMOBwLTytEXcblEUlusTEcZ5eRtJdAvHuGug7x9oKTjFXglRsvUxBIyECqC4iCRBdk
+         EjWHy4aCU5BtS3bLzdkYRA0XggSiShFFaikdkWWxqaqKIDgZKgP6eZVyiqCffoCt9eFE
+         jBSLYu7BLZxLvV29TC8/pKnhMc41U+qOzsMjDsBjJeA3MwsmliH3GJUPX6sp5k80DQmn
+         Is4ijA52oXN/v/DP6xlkZY6T90wWXK51u1jWp9nOjyFv0yTlN65S3ETH6O+FXtS1D51x
+         KWu1mURXB+ZMcwBWiMpoo4ZHuTJu77c2h3NFYzE3SOZUn2aZotAP2/NOA3bkLC4ecZxh
+         91Hg==
+X-Forwarded-Encrypted: i=1; AJvYcCVMGW9ZT5ERQ9ijzqB51DUgShdrLEM88B/nRhLgPYEZgoY5XK0AXaSztMTFKeKWbuhaeCOxXIQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsAKjdgWWbt2XcLgoLAMVuBjqvFHgkwpZtlf/Uz31I+6naPZz7
+	ZEdktd8s/UjmlXIp0TSsI6XC726uLXV1tQ6X5R2oRG35JaW+01FTv6Hnmw7Ra6AYOrBTfCRAGyL
+	aVHlcFYHDEOSsKmmLcCWtJ8OfxkEZJMUSlMLkESrg0gSbLeYHo7/uWrLq
+X-Gm-Gg: ASbGncstu5cS5bdwaQpMdbnbJUg05Q8LhliDi5bRvDarTeUGNKgR3n/DWlRFuCPwP/5
+	yQ+e7hip+LeLhkgqnbqRPFdFAprhSqbq9zKP4xTbIL2dwN9JnXZYLR4t6b1LDXaxKSDIZxLAvky
+	EhelqS+baK24wV3RTZUjeBP4fZu4yQF/DC/7OPDZLMDcbrsjCoV1bX+j5eWaXbUTq3vdABVuILC
+	tXPIgDcUqX1n33BWa89uNA8M/JbBxejtc0B28+8b9f9cy6VHUzi8+hpN6KqjUy6+4W3TUcYKBHP
+	cI54HrJDLQQdo1YK3l8AO5MOcs6Cy9sjqcMW4dCxAFee5p0JvNkbFBDEbZcuHXYt5g==
+X-Received: by 2002:a2e:be0c:0:b0:333:b6b0:e665 with SMTP id 38308e7fff4ca-33650fa8605mr4319281fa.30.1755835762098;
+        Thu, 21 Aug 2025 21:09:22 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHIfwy5viYQG7CiACnNo0XJ1QLrkAQo6vQi0t/AKYxGuojOFc+bxzH8Oeop0sL+wr/cDEqByA==
+X-Received: by 2002:a2e:be0c:0:b0:333:b6b0:e665 with SMTP id 38308e7fff4ca-33650fa8605mr4319091fa.30.1755835761548;
+        Thu, 21 Aug 2025 21:09:21 -0700 (PDT)
+Received: from [192.168.1.86] (85-23-48-6.bb.dnainternet.fi. [85.23.48.6])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-3340a41e3cfsm35236551fa.6.2025.08.21.21.09.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Aug 2025 21:09:19 -0700 (PDT)
+Message-ID: <9156d191-9ec4-4422-bae9-2e8ce66f9d5e@redhat.com>
+Date: Fri, 22 Aug 2025 07:09:17 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 10/35] mm/hugetlb: cleanup
+ hugetlb_folio_init_tail_vmemmap()
+To: David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org
+Cc: Alexander Potapenko <glider@google.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
+ Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+ iommu@lists.linux.dev, io-uring@vger.kernel.org,
+ Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
+ Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
+ kasan-dev@googlegroups.com, kvm@vger.kernel.org,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
+ linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Marco Elver <elver@google.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
+ Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
+ Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
+ Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
+ Robin Murphy <robin.murphy@arm.com>, Suren Baghdasaryan <surenb@google.com>,
+ Tejun Heo <tj@kernel.org>, virtualization@lists.linux.dev,
+ Vlastimil Babka <vbabka@suse.cz>, wireguard@lists.zx2c4.com, x86@kernel.org,
+ Zi Yan <ziy@nvidia.com>
+References: <20250821200701.1329277-1-david@redhat.com>
+ <20250821200701.1329277-11-david@redhat.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Mika_Penttil=C3=A4?= <mpenttil@redhat.com>
+In-Reply-To: <20250821200701.1329277-11-david@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The check for "rdev" and "en_dev" pointer validity always
-return false.
 
-Remove them.
+On 8/21/25 23:06, David Hildenbrand wrote:
 
-Reviewed-by: Saravanan Vajravel <saravanan.vajravel@broadcom.com>
-Signed-off-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
----
- drivers/infiniband/hw/bnxt_re/main.c | 17 -----------------
- 1 file changed, 17 deletions(-)
+> All pages were already initialized and set to PageReserved() with a
+> refcount of 1 by MM init code.
 
-diff --git a/drivers/infiniband/hw/bnxt_re/main.c b/drivers/infiniband/hw/bnxt_re/main.c
-index 3e1161721738..43af0dba0749 100644
---- a/drivers/infiniband/hw/bnxt_re/main.c
-+++ b/drivers/infiniband/hw/bnxt_re/main.c
-@@ -922,14 +922,6 @@ static int bnxt_re_net_ring_free(struct bnxt_re_dev *rdev,
- 	struct bnxt_fw_msg fw_msg = {};
- 	int rc = -EINVAL;
- 
--	if (!rdev)
--		return rc;
--
--	en_dev = rdev->en_dev;
--
--	if (!en_dev)
--		return rc;
--
- 	if (test_bit(BNXT_RE_FLAG_ERR_DEVICE_DETACHED, &rdev->flags))
- 		return 0;
- 
-@@ -955,9 +947,6 @@ static int bnxt_re_net_ring_alloc(struct bnxt_re_dev *rdev,
- 	struct bnxt_fw_msg fw_msg = {};
- 	int rc = -EINVAL;
- 
--	if (!en_dev)
--		return rc;
--
- 	bnxt_re_init_hwrm_hdr((void *)&req, HWRM_RING_ALLOC);
- 	req.enables = 0;
- 	req.page_tbl_addr =  cpu_to_le64(ring_attr->dma_arr[0]);
-@@ -990,9 +979,6 @@ static int bnxt_re_net_stats_ctx_free(struct bnxt_re_dev *rdev,
- 	struct bnxt_fw_msg fw_msg = {};
- 	int rc = -EINVAL;
- 
--	if (!en_dev)
--		return rc;
--
- 	if (test_bit(BNXT_RE_FLAG_ERR_DEVICE_DETACHED, &rdev->flags))
- 		return 0;
- 
-@@ -1020,9 +1006,6 @@ static int bnxt_re_net_stats_ctx_alloc(struct bnxt_re_dev *rdev,
- 
- 	stats->fw_id = INVALID_STATS_CTX_ID;
- 
--	if (!en_dev)
--		return rc;
--
- 	bnxt_re_init_hwrm_hdr((void *)&req, HWRM_STAT_CTX_ALLOC);
- 	req.update_period_ms = cpu_to_le32(1000);
- 	req.stats_dma_addr = cpu_to_le64(stats->dma_map);
--- 
-2.43.5
+Just to be sure, how is this working with MEMBLOCK_RSRV_NOINIT, where MM is supposed not to
+initialize struct pages?
+
+> In fact, by using __init_single_page(), we will be setting the refcount to
+> 1 just to freeze it again immediately afterwards.
+>
+> So drop the __init_single_page() and use __ClearPageReserved() instead.
+> Adjust the comments to highlight that we are dealing with an open-coded
+> prep_compound_page() variant.
+>
+> Further, as we can now safely iterate over all pages in a folio, let's
+> avoid the page-pfn dance and just iterate the pages directly.
+>
+> Note that the current code was likely problematic, but we never ran into
+> it: prep_compound_tail() would have been called with an offset that might
+> exceed a memory section, and prep_compound_tail() would have simply
+> added that offset to the page pointer -- which would not have done the
+> right thing on sparsemem without vmemmap.
+>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  mm/hugetlb.c | 21 ++++++++++-----------
+>  1 file changed, 10 insertions(+), 11 deletions(-)
+>
+> diff --git a/mm/hugetlb.c b/mm/hugetlb.c
+> index d12a9d5146af4..ae82a845b14ad 100644
+> --- a/mm/hugetlb.c
+> +++ b/mm/hugetlb.c
+> @@ -3235,17 +3235,14 @@ static void __init hugetlb_folio_init_tail_vmemmap(struct folio *folio,
+>  					unsigned long start_page_number,
+>  					unsigned long end_page_number)
+>  {
+> -	enum zone_type zone = zone_idx(folio_zone(folio));
+> -	int nid = folio_nid(folio);
+> -	unsigned long head_pfn = folio_pfn(folio);
+> -	unsigned long pfn, end_pfn = head_pfn + end_page_number;
+> +	struct page *head_page = folio_page(folio, 0);
+> +	struct page *page = folio_page(folio, start_page_number);
+> +	unsigned long i;
+>  	int ret;
+>  
+> -	for (pfn = head_pfn + start_page_number; pfn < end_pfn; pfn++) {
+> -		struct page *page = pfn_to_page(pfn);
+> -
+> -		__init_single_page(page, pfn, zone, nid);
+> -		prep_compound_tail((struct page *)folio, pfn - head_pfn);
+> +	for (i = start_page_number; i < end_page_number; i++, page++) {
+> +		__ClearPageReserved(page);
+> +		prep_compound_tail(head_page, i);
+>  		ret = page_ref_freeze(page, 1);
+>  		VM_BUG_ON(!ret);
+>  	}
+> @@ -3257,12 +3254,14 @@ static void __init hugetlb_folio_init_vmemmap(struct folio *folio,
+>  {
+>  	int ret;
+>  
+> -	/* Prepare folio head */
+> +	/*
+> +	 * This is an open-coded prep_compound_page() whereby we avoid
+> +	 * walking pages twice by preparing+freezing them in the same go.
+> +	 */
+>  	__folio_clear_reserved(folio);
+>  	__folio_set_head(folio);
+>  	ret = folio_ref_freeze(folio, 1);
+>  	VM_BUG_ON(!ret);
+> -	/* Initialize the necessary tail struct pages */
+>  	hugetlb_folio_init_tail_vmemmap(folio, 1, nr_pages);
+>  	prep_compound_head((struct page *)folio, huge_page_order(h));
+>  }
+
+--Mika
 
 
