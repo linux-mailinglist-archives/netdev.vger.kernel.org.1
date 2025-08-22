@@ -1,159 +1,153 @@
-Return-Path: <netdev+bounces-215987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22FC0B313F1
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 11:48:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EB1EBB3141D
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 11:50:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 964CE1D20B90
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 09:43:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 468E21D23B1F
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 09:45:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BB1D2FB639;
-	Fri, 22 Aug 2025 09:37:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D55522FCBF8;
+	Fri, 22 Aug 2025 09:39:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="z/YYL4dX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TK/4Fq8n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7702D2F0C7C
-	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 09:37:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AACF2FC033;
+	Fri, 22 Aug 2025 09:39:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755855463; cv=none; b=QzmA0Smz5vMLe4tAETQvEvU0vOG9zBOWYoygFlzt+JaQ2m1u2p54D+wc8ply8aNShZeqQzxzLCneWHFforD/hfXOlIEzpzt3zVyQEMVPe3Q2XFeVjluR7dp1OEJNikktFVR0JlNtsDfRfnSkN1WtXXAPz/JjlyNDUtSI8hW0CZc=
+	t=1755855580; cv=none; b=mAaGv785aRP3ZNef/G3HiToVZWhG5eySCfjHB+G0H19ha+pcrvnITEJsS7XRfrCVaBBRAX5VnuulMtilkMVc76A9KNhPU6EO98nu2kW3dH2Yfdn6FyF6OKmfMaNNNfNgwN8xZqtHP+2CuNk6HUWg6ac3FIH3cEKCMFEIbHStBQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755855463; c=relaxed/simple;
-	bh=KGxVlyktlvMg2J3Z7DFu9zukuowEvZnlKoc7wpeFJRc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Frth7PkTcbnuIgA+RhIgEnOmYkkSVrKxAuyZTVbSVVR+++1luYNNLms4XO5lxyzu+Vxwm2aeXD+9H91FM3sPUaujjByCpNUoA1vIpMfgsOIgZUmS8HUUVvumJFQ8ijkAUkEHjSXBA4DkHtmRP/rsB1RO9Tets1W522BHQ1HCo3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=z/YYL4dX; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4b109c6b9fcso20499861cf.3
-        for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 02:37:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755855460; x=1756460260; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G/wAkSeCI/p5BRy3MuUgX12/OtD3Iw4XHsnLLdUUoSk=;
-        b=z/YYL4dXbgcDD8ip5kDceSvuckS6z100K0HReJ5GmpXLGwnTx31/Y1HFEWU9p+6QAY
-         sQpkxHLCwHr1dMtlePe1gSnXrS9vqEyd1NYjNdFNVTggVhoyPAQEA8EorNNUomTzQU86
-         oxAQJMZI4jMNy9jtPy7d66J+Txmj2QWNBO86Ufvv65+gyOTPzYLJZJjiadXbc0rlY74R
-         4X4V2fsImkq5Cw2L/zBaQddDy4YLxSkHqOqzlVkvaxKVIj2NnXQ9V7gu/pOtzPb4thOr
-         bMzVfqUK217LNesPetxygHgHFunH3zu3BBy6Reu0PvSDzbVGYRnyPevKGZkmRk7n8T4W
-         TC/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755855460; x=1756460260;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=G/wAkSeCI/p5BRy3MuUgX12/OtD3Iw4XHsnLLdUUoSk=;
-        b=w1Qwz/Kk4vKTklzCBzn2m1S3e8VgiqhG6ycrHJDtNAF9hW08Ry/kFiyXNG2Ms28cvI
-         Koz4QMoQ8H8JsKJgdm34UGdcseSMBtiaAIxMuw8gxh9U8b5T7O7bau93cXcxD1PFFDMX
-         EnRoq4iQi9JJQY7mQzFK4k2kelgzXXvHbpgwyGhHOEVvt+fISR7SY0mhpIMPBPMfJ8Wt
-         e7JKJfnMAi2Lg+fnECliiOtUKxMtz5pPTv3qrZfK+dBkNa2S+GsZbkIT6WAbaU78UxwE
-         Sfon56C1HsjatiWD096gj5FY5oRAiWURkj8YVkzJpBBw2Sj273wQT9UWcg4sFqcr/W0M
-         TUBw==
-X-Gm-Message-State: AOJu0YyoQQJ6Cf1CClNhJxwqfdAYsHCeftRxbliGOyrOTIx74Mmx3lBc
-	9oPPIbZDwt4H1J2Kn3Jwrf4NkiW/tUVlXdI7P6UMdtlONgHxexQbCIPh+clq/eFS/DlWXzMt+fA
-	ZMQrojmbOfFbgDxE9JQhso9CrqEWhOItHvDB63Ogp
-X-Gm-Gg: ASbGnct9i8J+uilfGa1xGhSmeEEaCW5ZMSD1NnprRxNuKj6t2L3GEJlZP7qo2NNodU+
-	u34VcevVR7Hv7JU/VtJInv+vWHqU8LFCxVNyzOyRZ4JeKnSyS6g3+Q8p/ScWyl275HPFb3g/u6s
-	Qhesb9JlCY8wjNJkdHAZiwawXDgTgIeqvin+R595OiNy4q0QKPLaUMHwA+15h4rnSMLRFHWuaCB
-	Zz9n79U3DdcgU8=
-X-Google-Smtp-Source: AGHT+IGCJ82v4V9A6pgJMz352LL/ClfK8PaNlBmvVnfkOmiDocAdZv4anLPGxqxW4fN2Gqkb+zb4WTSiJIxlj91+3qA=
-X-Received: by 2002:ac8:5e0f:0:b0:4b2:9d9c:22d5 with SMTP id
- d75a77b69052e-4b2aaa1a280mr23744591cf.6.1755855459705; Fri, 22 Aug 2025
- 02:37:39 -0700 (PDT)
+	s=arc-20240116; t=1755855580; c=relaxed/simple;
+	bh=QtMj72CyuTQenS1iyhlCgbUv0X/aDO6qIDcV8gkotig=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qJys0A312WjUm4VFMIITnP7D3l3PgFnZLjybqcK8nVySiKbEdvYlwnmC0u7gdnzcjA3tgSaRrGzGmirroo3GX3fH4gU5tNr+JXmZC90K46WY8xyCKgtpiJTB4FgJKMy1gu9ewtB2oFTqfvT42oQFvUNPXNb1wRPRR1/fd36LCA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TK/4Fq8n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24582C2BCB1;
+	Fri, 22 Aug 2025 09:39:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755855579;
+	bh=QtMj72CyuTQenS1iyhlCgbUv0X/aDO6qIDcV8gkotig=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=TK/4Fq8nZEigVq6G8+RehpdeBHoBr8eJ9p47P1neKZ7VuY3D16ytxEJKxes0+ZTsE
+	 f/8T6d8J7JIei50A8htEVpkX5i5edb4/iJ5ALP28E55vSdmHm0FT5ofk2Z1bWTXfUq
+	 VO8gSwLBJ1Mja7oXG38nJvjTFByxLeFCUIEKPrVg+Th27NTa7Y6gR1Gx5OcBAiMnIc
+	 k6YAImm+OfUhwmfhs04iItZMmNGWVXwcqnj3W6pEqg2pXIdiULvctzcCrKCwWauSmn
+	 utiIQIeYGe7EzI9kOJMgEtOmax0mok5x39/HsNgDlJqIbYttn2HC8gxAvlfkW8xLv2
+	 FsyZVG3g42J0g==
+Message-ID: <c941b600-ec7d-4167-8f7b-7ea761017603@kernel.org>
+Date: Fri, 22 Aug 2025 11:39:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aKgnLcw6yzq78CIP@bzorp3> <CANn89iLy4znFBLK2bENWMfhPyjTc_gkLRswAf92uV7KY3bTdYg@mail.gmail.com>
- <aKg1Qgtw-QyE8bLx@bzorp3>
-In-Reply-To: <aKg1Qgtw-QyE8bLx@bzorp3>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 22 Aug 2025 02:37:28 -0700
-X-Gm-Features: Ac12FXzkoTpl_TV3jzySZ_fT8mz-36-tbCfSCwa_lYkImkPo_yzbxROcGrHuCsc
-Message-ID: <CANn89i+GMqF91FkjxfGp3KGJ-dC6-Snu3DoBdGuxZqrq=iOOcQ@mail.gmail.com>
-Subject: Re: [RFC, RESEND] UDP receive path batching improvement
-To: Balazs Scheidler <bazsi77@gmail.com>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/2] dt-bindings: net: mxl: Add MxL LGM Network
+ Processor SoC
+To: Jack Ping CHNG <jchng@maxlinear.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org
+Cc: davem@davemloft.net, andrew+netdev@lunn.ch, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, yzhu@maxlinear.com, sureshnagaraj@maxlinear.com
+References: <20250822090809.1464232-1-jchng@maxlinear.com>
+ <20250822090809.1464232-3-jchng@maxlinear.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20250822090809.1464232-3-jchng@maxlinear.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 22, 2025 at 2:15=E2=80=AFAM Balazs Scheidler <bazsi77@gmail.com=
-> wrote:
->
-> On Fri, Aug 22, 2025 at 01:18:36AM -0700, Eric Dumazet wrote:
-> > On Fri, Aug 22, 2025 at 1:15=E2=80=AFAM Balazs Scheidler <bazsi77@gmail=
-.com> wrote:
-> > > The condition above uses "sk->sk_rcvbuf >> 2" as a trigger when the u=
-pdate is
-> > > done to the counter.
-> > >
-> > > In our case (syslog receive path via udp), socket buffers are general=
-ly
-> > > tuned up (in the order of 32MB or even more, I have seen 256MB as wel=
-l), as
-> > > the senders can generate spikes in their traffic and a lot of senders=
- send
-> > > to the same port. Due to latencies, sometimes these buffers take MBs =
-of data
-> > > before the user-space process even has a chance to consume them.
-> > >
-> >
-> >
-> > This seems very high usage for a single UDP socket.
-> >
-> > Have you tried SO_REUSEPORT to spread incoming packets to more sockets
-> > (and possibly more threads) ?
->
-> Yes.  I use SO_REUSEPORT (16 sockets), I even use eBPF to distribute the
-> load over multiple sockets evenly, instead of the normal load balancing
-> algorithm built into SO_REUSEPORT.
->
+On 22/08/2025 11:08, Jack Ping CHNG wrote:
+> Introduce device-tree binding documentation for
+> MaxLinear LGM Network Processor
 
-Great. But if you have many receive queues, are you sure this choice does n=
-ot
-add false sharing ?
+Please wrap commit message according to Linux coding style / submission
+process (neither too early nor over the limit):
+https://elixir.bootlin.com/linux/v6.4-rc1/source/Documentation/process/submitting-patches.rst#L597
 
-> Sometimes the processing on the userspace side is heavy enough (think of
-> parsing, heuristics, data normalization) and the load on the box heavy
-> enough that I still see drops from time to time.
->
-> If a client sends 100k messages in a tight loop for a while, that's going=
- to
-> use a lot of buffer space.  What bothers me further is that it could be o=
-k
-> to lose a single packet, but any time we drop one packet, we will continu=
-e
-> to lose all of them, at least until we fetch 25% of SO_RCVBUF (or if the
-> receive buffer is completely emptied).  This problem, combined with small
-> packets (think of 100-150 byte payload) can easily cause excessive drops.=
- 25%
-> of the socket buffer is a huge offset.
+Bindings go before the user (see submitting bindings in DT dir).
 
-sock_writeable() uses a 50% threshold.
+> 
+> Signed-off-by: Jack Ping CHNG <jchng@maxlinear.com>
+> ---
+>  .../devicetree/bindings/net/mxl,lgm-eth.yaml  | 59 +++++++++++++++++++
+>  1 file changed, 59 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/mxl,lgm-eth.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/mxl,lgm-eth.yaml b/Documentation/devicetree/bindings/net/mxl,lgm-eth.yaml
+> new file mode 100644
+> index 000000000000..3d5b32b5b650
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/mxl,lgm-eth.yaml
+> @@ -0,0 +1,59 @@
+> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: "http://devicetree.org/schemas/net/mxl,lgm-eth.yaml#"
 
->
-> I am not sure how many packets warrants a sk_rmem_alloc update, but I'd
-> assume that 1 update every 100 packets should still be OK.
+You never tested it, did you?
 
-Maybe, but some UDP packets have a truesize around 128 KB or even more.
+> +$schema: "http://devicetree.org/meta-schemas/core.yaml#"
 
-Perhaps add a new UDP socket option to let the user decide on what
-they feel is better for them ?
+Nope. Please point me to any example if such syntax.
 
-I suspect that the main issue is about having a single drop in the first pl=
-ace,
-because of false sharing on sk->sk_drops
+I will finish the review here. I am sorry, but I think you really did
+not put enough of effort into this. There are so many basic mistakes
+here. Please watch my OSSE session explaining basics of bindings (or
+read the slides - they are already published).
 
-Perhaps we should move sk_drops on a dedicated cache line,
-and perhaps have two counters for NUMA servers.
+
+Best regards,
+Krzysztof
 
