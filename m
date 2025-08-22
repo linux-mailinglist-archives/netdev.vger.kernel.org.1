@@ -1,228 +1,408 @@
-Return-Path: <netdev+bounces-215894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81BB4B30D0E
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 05:54:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2988B30D19
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 05:59:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2ACA91CE422B
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 03:54:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF84960096C
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 03:59:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B02B7277CA2;
-	Fri, 22 Aug 2025 03:54:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1403226D4F9;
+	Fri, 22 Aug 2025 03:59:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=efault@gmx.de header.b="s0cTfwsx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t8zmBh3s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9147393DE2;
-	Fri, 22 Aug 2025 03:54:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BDB1393DC5
+	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 03:59:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755834873; cv=none; b=WMmspDRgWiyqcuBuepH7on1S8ewryV0qbaw50W7P+rbp492F+i2bradNYh7uEBvIC6RR+PnEXh/mVnIpKAawTflTf3IQMvcM41muHlGnUzhbeJQK3JuNmSIYrhT9zyJJIPSMOXuu51gNgS/PlbflqokZbhx/jFx7rzNLA9R9kuk=
+	t=1755835148; cv=none; b=UH4vpagITZOseEWBxq5FJRzJjWiRkmZg3fHkgaSqSRMnW4s0FDRQl41nElq4/zWTVQFFPObSMvCygXKJRZtbauw7IGr+p7LYJkcNyUrPba+9fFRJRfDmem6ffyWtB4wc8O9rnn5cPILTRk5hrbXgZQw0p8hC32PpFZnMMt6HaPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755834873; c=relaxed/simple;
-	bh=qI8bZAA2Zqy39VyGC8+39a/1c6k4LzwCc1SZ0CNmLkI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=tW9h8YujQiadtMk+QaTpPd2UJtyUdIQoMF1wI2YziRJYD8Tu6mQK58CzJhLKdEjH/SNR+O8onRaqNjXUUkYV05wUR6sbDX6qaKNS/SBEdN77GuE60995dYGNro2azU3brHX8K/0PO2FwooViO0CoYxGdIozKea/PLifoV8fkgJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=efault@gmx.de header.b=s0cTfwsx; arc=none smtp.client-ip=212.227.15.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1755834869; x=1756439669; i=efault@gmx.de;
-	bh=4EUYfaocQHlDFb92PRxw93GL+dbsyMJy8t+/CbeTSfE=;
-	h=X-UI-Sender-Class:Message-ID:Subject:From:To:Cc:Date:In-Reply-To:
-	 References:Content-Type:Content-Transfer-Encoding:MIME-Version:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=s0cTfwsxK4RBbmLl6G+Eiac33A2kwVQ/g21qhofUbWYywEr8e+hz2avzoHDgIReF
-	 kEcGbR1+/4xj0/mfl+CL4NB2+iZkqFEZPgVAuM66U48fskopfOOahBmJB9KTAwCpm
-	 QNQjsaa3ZmbM4UtJLKJ3kz0kVoXQhQZe75SaeqtEEVxvatN5f0eh6biBlCkOg+G2l
-	 e/pN+zY4fpMgaUftUFVuz3z3NvW7nVWxGtOM8e1xT4jhqcbbRuhYPT1s8dsQ2czLu
-	 NEr08bZQy76GnfeLi07zqw01bd8yWKNqwB4G+SE/zqhTMDjFjAfO+sMsBEEENEsvq
-	 q/pHdN2J+enpDnkNDQ==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from homer.fritz.box ([185.146.50.21]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1N95e9-1uRA1L3EzH-0174Wd; Fri, 22
- Aug 2025 05:54:28 +0200
-Message-ID: <5b509b1370d42fd0cc109fc8914272be6dcfcd54.camel@gmx.de>
-Subject: Re: netconsole: HARDIRQ-safe -> HARDIRQ-unsafe lock order warning
-From: Mike Galbraith <efault@gmx.de>
-To: Breno Leitao <leitao@debian.org>
-Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>,  Johannes Berg <johannes@sipsolutions.net>,
- paulmck@kernel.org, LKML <linux-kernel@vger.kernel.org>, 
- netdev@vger.kernel.org, boqun.feng@gmail.com
-Date: Fri, 22 Aug 2025 05:54:28 +0200
-In-Reply-To: <tx2ry3uwlgqenvz4fsy2hugdiq36jrtshwyo4a2jpxufeypesi@uceeo7ykvd6w>
-References: <3d20ce1b-7a9b-4545-a4a9-23822b675e0c@gmail.com>
-	 <20250815094217.1cce7116@kernel.org>
-	 <isnqkmh36mnzm5ic5ipymltzljkxx3oxapez5asp24tivwtar2@4mx56cvxtrnh>
-	 <3dd73125-7f9b-405c-b5cd-0ab172014d00@gmail.com>
-	 <hyc64wbklq2mv77ydzfxcqdigsl33leyvebvf264n42m2f3iq5@qgn5lljc4m5y>
-	 <b2qps3uywhmjaym4mht2wpxul4yqtuuayeoq4iv4k3zf5wdgh3@tocu6c7mj4lt>
-	 <4c4ed7b836828d966bc5bf6ef4d800389ba65e77.camel@gmx.de>
-	 <otlru5nr3g2npwplvwf4vcpozgx3kbpfstl7aav6rqz2zltvcf@famr4hqkwhuv>
-	 <d1679c5809ffdc82e4546c1d7366452d9e8433f0.camel@gmx.de>
-	 <7a2b44c9e95673829f6660cc74caf0f1c2c0cffe.camel@gmx.de>
-	 <tx2ry3uwlgqenvz4fsy2hugdiq36jrtshwyo4a2jpxufeypesi@uceeo7ykvd6w>
-Autocrypt: addr=efault@gmx.de;
- keydata=mQGiBE/h0fkRBACJWa+2g5r12ej5DQZEpm0cgmzjpwc9mo6Jz7PFSkDQGeNG8wGwFzFPKQrLk1JRdqNSq37FgtFDDYlYOzVyO/6rKp0Iar2Oel4tbzlUewaYWUWTTAtJoTC0vf4p9Aybyo9wjor+XNvPehtdiPvCWdONKZuGJHKFpemjXXj7lb9ifwCg7PLKdz/VMBFlvbIEDsweR0olMykD/0uSutpvD3tcTItitX230Z849Wue3cA1wsOFD3N6uTg3GmDZDz7IZF+jJ0kKt9xL8AedZGMHPmYNWD3Hwh2gxLjendZlcakFfCizgjLZF3O7k/xIj7Hr7YqBSUj5Whkbrn06CqXSRE0oCsA/rBitUHGAPguJfgETbtDNqx8RYJA2A/9PnmyAoqH33hMYO+k8pafEgXUXwxWbhx2hlWEgwFovcBPLtukH6mMVKXS4iik9obfPEKLwW1mmz0eoHzbNE3tS1AaagHDhOqnSMGDOjogsUACZjCJEe1ET4JHZWFM7iszyolEhuHbnz2ajwLL9Ge8uJrLATreszJd57u+NhAyEW7QeTWlrZSBHYWxicmFpdGggPGVmYXVsdEBnbXguZGU+iGIEExECACIFAk/h0fkCGyMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEMYmACnGfbb41A4AnjscsLm5ep+DSi7Bv8BmmoBGTCRnAJ9oXX0KtnBDttPkgUbaiDX56Z1+crkBDQRP4dH5EAQAtYCgoXJvq8VqoleWvqcNScHLrN4LkFxfGkDdqTyQe/79rDWr8su+8TH1ATZ/k+lC6W+vg7ygrdyOK7egA5u+T/GBA1VN+KqcqGqAEZqCLvjorKVQ6mgb5FfXouSGvtsblbRMireEEhJqIQPndq3DvZbKXHVkKrUBcco4MMGDVucABAsEAKXKCwGVEVuYcM/KdT2htDpziRH4JfUn3Ts2EC6F7rXIQ4NaIA6gAvL6HdD3q
-	y6yrWaxyqUg8CnZF/J5HR+IvRK+vu85xxwSLQsrVONH0Ita1jg2nhUW7yLZer8xrhxIuYCqrMgreo5BAA3+irHy37rmqiAFZcnDnCNDtJ4sz48tiEkEGBECAAkFAk/h0fkCGwwACgkQxiYAKcZ9tvgIMQCeIcgjSxwbGiGn2q/cv8IvHf1r/DIAnivw+bGITqTU7rhgfwe07dhBoIdz
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 
+	s=arc-20240116; t=1755835148; c=relaxed/simple;
+	bh=81hqPFmRmqOwwlHYVVtuKMqtStu0kVPfsYXXcqWAz/A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Vm1CjoB2C8RDm5XCm0SQcuqDHzjbt58aqRBXeUQoqHit2+dYNN0Y05CjpO9EXdRmx136oyyh2dBy2c4l2D4BBQ85X0KHbK3zwFQ2LnZpw9JFQyRd1RDstlDg1s1u7T9aJFPFVbvK9RZJx1B/ZyO0iIiazqiqP5XwcAihATZbOEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t8zmBh3s; arc=none smtp.client-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b47174b3429so1121394a12.2
+        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 20:59:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755835144; x=1756439944; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BQ4kGkX+vuvN02aUcSNxoSl3qwI2khYrDXoV7E8nVUM=;
+        b=t8zmBh3sc4ZBZUjQEoIumX29ZibhUH0rjCXz6WEccHI0wMLFBoOmUc/uztOa6FjZBK
+         Y/WJ805TDFLUbMdWotAf7k/EOelA7fSpF6ahxsjdU6zcDE6bzjfe5FTlQu25vtTb7asM
+         uw28KNBpDA3VgRfgxfsL9N3etNyqRcqL/2Lk2MSWC9RQ+pe2rG+QTgfxdj6w1luubFS1
+         1ODwkg/vQ9JSNtJrMH2KNj64WQ91okNqmbZUsn50m19hA+gzK8TTnotCsj5zAVk252xO
+         kUOacRdHCXXzJdvZZaAz6GKvzx9OEpkDuZRV+LpAFiW1LaQPmKWVpjX7FCooLQMEzY10
+         Y0nQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755835144; x=1756439944;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BQ4kGkX+vuvN02aUcSNxoSl3qwI2khYrDXoV7E8nVUM=;
+        b=LLuwQeuovBsi2WOzJxbTnI/5tp8wPnbDaK1Ha8PCmPlPl2Gc5rFio6QUZdwmwU4gbh
+         OLPDe9gcikwyv8J7K9mL8aSm83A3Rgm7YBkdPhDJBzbnqemlwdH78oNlpTI2ndjU/j1b
+         rqDsc4Nzku1IA2zrQ7g3pbJDzvtltmruzzXPFVunjBsDFdKS+YkUk8mLhNmrqPrZoiaC
+         vY/xNthQyv4abcBrprVLyGAE3pk2uW0GhOATFzQNpk6BOBerPOHeCBEl6lEwLQ3mYLR8
+         C883W2fv/ulkF5pFMiNJuCe0aEvEx7TR4bV4FUKeyT7JYEnzQqFgCDEd/Vmh5KGTC/OH
+         /tbw==
+X-Gm-Message-State: AOJu0YzvHOv1p+oUSoFes+HSwvf7azMmNAWGGJdHgCw55e6o7cJ7G8Om
+	LT6joNGRQkjGpUQjE499U2pPV3yi/2BTQiMtFhPkr6Hv031aBRgaI2+FROelCPxzY4Os7saeQPB
+	xlB4Fx70FscvBp2PUUSYRez1NZ+GWVE+LDn67RpGb
+X-Gm-Gg: ASbGnctERDXN3rXyfIqQ9pJZu36tgxdFt7tm3V4Q6pPenH8cc5C5d0XHFYy6K304rEK
+	hlG0iAAC2LlBIXER/SkuhwovmJg0aPH4y8fwckicEIf5xSEaJwtqr+vieOguFNoniVrt6NU69J4
+	yekoklb/sOlIvx5ye335lq+zFthBXhxUuOhYkAVM/eAPrLoDqfJ5SzCvS7NuUhLMRjQMF7vc1qZ
+	bBhy+wcmdmWYRJkdMurVAoj6Bt1hAqZq9o4621ey2WZ6Fi7UHRXavAygQZRAhapSAHp2LU5Jif2
+	1lE=
+X-Google-Smtp-Source: AGHT+IFmvLtcAG86L4BZSo5UjsR4i0EBi7q2h10mfcDj6K+VrCMjaUsWsfNCKslPLBeGiu7Bey3CAufj+xWmysDbhQU=
+X-Received: by 2002:a17:902:e542:b0:240:2eae:aecb with SMTP id
+ d9443c01a7336-2462ef872cemr25386145ad.43.1755835144157; Thu, 21 Aug 2025
+ 20:59:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Provags-ID: V03:K1:/NNsoQb8snN483P6iDaZ5PkM+rSso7dMoCUaQSm9KyGwibGbigh
- yeJGhqhzLHHf+Ux7otkljuLtYbL1A+uQKuZF8ELmxbjC0h8awgGjedFWbEk9O4VM2LNIoaP
- UdtEPpvXEFZJYzrZc6MRcYcX3jROvDhe0dtsKCWqKfqzZaeaSZw7aTIWhYrtj+POBBhBVT+
- PG4WGQR1km3dHDt+3ROOw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:RYCWiz9X3s8=;uLyMYQ7XmGXagNccL7HQ/U3nM0x
- 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
+References: <20250821-update-bind-bucket-state-on-unhash-v2-0-0c204543a522@cloudflare.com>
+ <20250821-update-bind-bucket-state-on-unhash-v2-1-0c204543a522@cloudflare.com>
+In-Reply-To: <20250821-update-bind-bucket-state-on-unhash-v2-1-0c204543a522@cloudflare.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Thu, 21 Aug 2025 20:58:52 -0700
+X-Gm-Features: Ac12FXz87g4Dc-bYunSu7wzjmJCishRPfmHJ8OCPaLKL6VYdnO9jtR7_bkZXgJY
+Message-ID: <CAAVpQUAV8KnFOxr61Qmb2grsd=CYP_aakP5XApis_Od424xM+g@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 1/2] tcp: Update bind bucket state on port release
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>, kernel-team@cloudflare.com, 
+	Lee Valentine <lvalentine@cloudflare.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2025-08-21 at 10:35 -0700, Breno Leitao wrote:
-> > On Thu, Aug 21, 2025 at 05:51:59AM +0200, Mike Galbraith wrote:
-=20
-> > > > --- a/drivers/net/netconsole.c
-> > > > +++ b/drivers/net/netconsole.c
-> > > > @@ -1952,12 +1952,12 @@ static void netcon_write_thread(struct c
-> > > > =C2=A0static void netconsole_device_lock(struct console *con, unsig=
-ned long *flags)
-> > > > =C2=A0{
-> > > > =C2=A0	/* protects all the targets at the same time */
-> > > > -	spin_lock_irqsave(&target_list_lock, *flags);
-> > > > +	spin_lock(&target_list_lock);
-> >=20
-> > I personally think this target_list_lock can be moved to an RCU lock.
-> >=20
-> > If that is doable, then we probably make netconsole_device_lock()
-> > to a simple `rcu_read_lock()`, which would solve this problem as well.
+On Thu, Aug 21, 2025 at 4:09=E2=80=AFAM Jakub Sitnicki <jakub@cloudflare.co=
+m> wrote:
+>
+> Currently, when an inet_bind_bucket enters a state where fastreuse >=3D 0=
+ or
+> fastreuseport >=3D 0, after a socket explicitly binds to a port, it stays=
+ in
+> that state until all associated sockets are removed and the bucket is
+> destroyed.
+>
+> In this state, the bucket is skipped during ephemeral port selection in
+> connect(). For applications using a small ephemeral port range (via
+> IP_LOCAL_PORT_RANGE option), this can lead to quicker port exhaustion
+> because "blocked" buckets remain excluded from reuse.
+>
+> The reason for not updating the bucket state on port release is unclear. =
+It
+> may have been a performance trade-off to avoid scanning bucket owners, or
+> simply an oversight.
+>
+> Address it by recalculating the bind bucket state when a socket releases =
+a
+> port. To minimize overhead, use a divide-and-conquer strategy: duplicate
+> the (fastreuse, fastreuseport) state in each inet_bind2_bucket. On port
+> release, we only need to scan the relevant port-addr bucket, and the
+> overall port bucket state can be derived from those.
+>
+> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+> ---
+>  include/net/inet_connection_sock.h |  5 +++--
+>  include/net/inet_hashtables.h      |  2 ++
+>  include/net/inet_sock.h            |  2 ++
+>  include/net/inet_timewait_sock.h   |  3 ++-
+>  include/net/tcp.h                  | 15 +++++++++++++++
+>  net/ipv4/inet_connection_sock.c    | 12 ++++++++----
+>  net/ipv4/inet_hashtables.c         | 32 +++++++++++++++++++++++++++++++-
+>  net/ipv4/inet_timewait_sock.c      |  1 +
+>  8 files changed, 64 insertions(+), 8 deletions(-)
+>
+> diff --git a/include/net/inet_connection_sock.h b/include/net/inet_connec=
+tion_sock.h
+> index 1735db332aab..072347f16483 100644
+> --- a/include/net/inet_connection_sock.h
+> +++ b/include/net/inet_connection_sock.h
+> @@ -322,8 +322,9 @@ int inet_csk_listen_start(struct sock *sk);
+>  void inet_csk_listen_stop(struct sock *sk);
+>
+>  /* update the fast reuse flag when adding a socket */
+> -void inet_csk_update_fastreuse(struct inet_bind_bucket *tb,
+> -                              struct sock *sk);
+> +void inet_csk_update_fastreuse(const struct sock *sk,
+> +                              struct inet_bind_bucket *tb,
+> +                              struct inet_bind2_bucket *tb2);
+>
+>  struct dst_entry *inet_csk_update_pmtu(struct sock *sk, u32 mtu);
+>
+> diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtables.=
+h
+> index 19dbd9081d5a..d6676746dabf 100644
+> --- a/include/net/inet_hashtables.h
+> +++ b/include/net/inet_hashtables.h
+> @@ -108,6 +108,8 @@ struct inet_bind2_bucket {
+>         struct hlist_node       bhash_node;
+>         /* List of sockets hashed to this bucket */
+>         struct hlist_head       owners;
+> +       signed char             fastreuse;
+> +       signed char             fastreuseport;
+>  };
+>
+>  static inline struct net *ib_net(const struct inet_bind_bucket *ib)
+> diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
+> index 1086256549fa..9614d0430471 100644
+> --- a/include/net/inet_sock.h
+> +++ b/include/net/inet_sock.h
+> @@ -279,6 +279,8 @@ enum {
+>         INET_FLAGS_RTALERT_ISOLATE =3D 28,
+>         INET_FLAGS_SNDFLOW      =3D 29,
+>         INET_FLAGS_RTALERT      =3D 30,
+> +       /* socket bound to a port at connect() time */
+> +       INET_FLAGS_AUTOBIND     =3D 31,
 
-The bigger issue for the nbcon patch would seem to be the seemingly
-required .write_atomic leading to landing here with disabled IRQs.
+AUTOBIND sounds like inet_autobind() was called.
 
-WRT my patch, seeing a hard RT crash on wired box cleanly logged with
-your nbcon patch applied (plus my twiddle mentioned earlier) tells me
-my patch has lost its original reason to exist.  It's relevant to this
-thread only in that those once thought to be RT specific IRQ disable
-spots turned out to actually be RT agnostic wireless sore spots.
+__inet_bind() saves similar flags in sk->sk_userlocks and
+it has 3 bits available.
 
-> > > > --- a/net/core/netpoll.c
-> > > > +++ b/net/core/netpoll.c
-> > > > @@ -58,6 +58,29 @@ static void zap_completion_queue(void);
-> > > > =C2=A0static unsigned int carrier_timeout =3D 4;
-> > > > =C2=A0module_param(carrier_timeout, uint, 0644);
-> > > > =C2=A0
-> > > > +DEFINE_PER_CPU(int, _netpoll_tx_running);
-> > > > +EXPORT_PER_CPU_SYMBOL(_netpoll_tx_running);
-> > > > +
-> > > > +#define
-> > > > netpoll_tx_begin(flags)					\
-> > > > +	do
-> > > > {							\
-> > > > +		if (IS_ENABLED(CONFIG_PREEMPT_RT)
-> > > > ||		\
-> > > > +		=C2=A0=C2=A0=C2=A0
-> > > > IS_ENABLED(CONFIG_NETCONSOLE_NBCON))	\
-> > > > +			local_bh_disable();	=09
-> > > > 	\
-> > > > +		else				=09
-> > > > 	\
-> > > > +			local_irq_save(flags);	=09
-> > > > 	\
-> > > > +		this_cpu_write(_netpoll_tx_running,
-> > > > 1);		\
-> > > > +	} while (0)
-> >=20
-> > Why can't we just use local_bh_disable() in both cases?
+How about flagging SOCK_BINDPORT_CONNECT in
+sk->sk_userlocks ?
 
-Yeah, believe so.
 
-> > >=20
-> > > > @@ -246,7 +269,7 @@ static void refill_skbs(struct netpoll *
-> > > > =C2=A0static void zap_completion_queue(void)
-> > > > =C2=A0{
-> > > > =C2=A0	unsigned long flags;
-> > > > -	struct softnet_data *sd =3D &get_cpu_var(softnet_data);
-> > > > +	struct softnet_data *sd =3D this_cpu_ptr(&softnet_data);
-> >=20
-> > How do I check if this is safe to do ?
+>  };
+>
+>  /* cmsg flags for inet */
+> diff --git a/include/net/inet_timewait_sock.h b/include/net/inet_timewait=
+_sock.h
+> index 67a313575780..ec99176d576f 100644
+> --- a/include/net/inet_timewait_sock.h
+> +++ b/include/net/inet_timewait_sock.h
+> @@ -70,7 +70,8 @@ struct inet_timewait_sock {
+>         unsigned int            tw_transparent  : 1,
+>                                 tw_flowlabel    : 20,
+>                                 tw_usec_ts      : 1,
+> -                               tw_pad          : 2,    /* 2 bits hole */
+> +                               tw_autobind     : 1,
+> +                               tw_pad          : 1,    /* 1 bit hole */
+>                                 tw_tos          : 8;
+>         u32                     tw_txhash;
+>         u32                     tw_priority;
+> diff --git a/include/net/tcp.h b/include/net/tcp.h
+> index 2936b8175950..c4bb6e56a668 100644
+> --- a/include/net/tcp.h
+> +++ b/include/net/tcp.h
+> @@ -2225,6 +2225,21 @@ static inline bool inet_sk_transparent(const struc=
+t sock *sk)
+>         return inet_test_bit(TRANSPARENT, sk);
+>  }
+>
+> +/**
+> + * inet_sk_autobind - Check if socket was bound to a port at connect() t=
+ime.
+> + * @sk: &struct inet_connection_sock or &struct inet_timewait_sock
+> + */
+> +static inline bool inet_sk_autobind(const struct sock *sk)
+> +{
+> +       switch (sk->sk_state) {
+> +       case TCP_TIME_WAIT:
+> +               return inet_twsk(sk)->tw_autobind;
+> +       case TCP_NEW_SYN_RECV:
+> +               return false; /* n/a to request sock */
 
-Too much water under the bridge, I don't recall my path to conclusion
-reached, and it seems to no longer matter.
+This never happens.  Maybe remove the case
+or add DEBUG_NET_WARN_ON_ONCE(1) ?
 
-	-Mike
+
+> +       }
+> +       return inet_test_bit(AUTOBIND, sk);
+> +}
+> +
+>  /* Determines whether this is a thin stream (which may suffer from
+>   * increased latency). Used to trigger latency-reducing mechanisms.
+>   */
+> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_s=
+ock.c
+> index 0ef1eacd539d..34e4fe0c7b4b 100644
+> --- a/net/ipv4/inet_connection_sock.c
+> +++ b/net/ipv4/inet_connection_sock.c
+> @@ -423,7 +423,7 @@ inet_csk_find_open_port(const struct sock *sk, struct=
+ inet_bind_bucket **tb_ret,
+>  }
+>
+>  static inline int sk_reuseport_match(struct inet_bind_bucket *tb,
+> -                                    struct sock *sk)
+> +                                    const struct sock *sk)
+>  {
+>         if (tb->fastreuseport <=3D 0)
+>                 return 0;
+> @@ -453,8 +453,9 @@ static inline int sk_reuseport_match(struct inet_bind=
+_bucket *tb,
+>                                     ipv6_only_sock(sk), true, false);
+>  }
+>
+> -void inet_csk_update_fastreuse(struct inet_bind_bucket *tb,
+> -                              struct sock *sk)
+> +void inet_csk_update_fastreuse(const struct sock *sk,
+> +                              struct inet_bind_bucket *tb,
+> +                              struct inet_bind2_bucket *tb2)
+>  {
+>         bool reuse =3D sk->sk_reuse && sk->sk_state !=3D TCP_LISTEN;
+>
+> @@ -501,6 +502,9 @@ void inet_csk_update_fastreuse(struct inet_bind_bucke=
+t *tb,
+>                         tb->fastreuseport =3D 0;
+>                 }
+>         }
+> +
+> +       tb2->fastreuse =3D tb->fastreuse;
+> +       tb2->fastreuseport =3D tb->fastreuseport;
+>  }
+>
+>  /* Obtain a reference to a local port for the given sock,
+> @@ -582,7 +586,7 @@ int inet_csk_get_port(struct sock *sk, unsigned short=
+ snum)
+>         }
+>
+>  success:
+> -       inet_csk_update_fastreuse(tb, sk);
+> +       inet_csk_update_fastreuse(sk, tb, tb2);
+>
+>         if (!inet_csk(sk)->icsk_bind_hash)
+>                 inet_bind_hash(sk, tb, tb2, port);
+> diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
+> index ceeeec9b7290..f644ffe43018 100644
+> --- a/net/ipv4/inet_hashtables.c
+> +++ b/net/ipv4/inet_hashtables.c
+> @@ -87,10 +87,22 @@ struct inet_bind_bucket *inet_bind_bucket_create(stru=
+ct kmem_cache *cachep,
+>   */
+>  void inet_bind_bucket_destroy(struct inet_bind_bucket *tb)
+>  {
+> +       const struct inet_bind2_bucket *tb2;
+> +
+>         if (hlist_empty(&tb->bhash2)) {
+>                 hlist_del_rcu(&tb->node);
+>                 kfree_rcu(tb, rcu);
+> +               return;
+> +       }
+> +
+> +       if (tb->fastreuse =3D=3D -1 && tb->fastreuseport =3D=3D -1)
+> +               return;
+> +       hlist_for_each_entry(tb2, &tb->bhash2, bhash_node) {
+> +               if (tb2->fastreuse !=3D -1 || tb2->fastreuseport !=3D -1)
+> +                       return;
+>         }
+> +       tb->fastreuse =3D -1;
+> +       tb->fastreuseport =3D -1;
+>  }
+>
+>  bool inet_bind_bucket_match(const struct inet_bind_bucket *tb, const str=
+uct net *net,
+> @@ -121,6 +133,8 @@ static void inet_bind2_bucket_init(struct inet_bind2_=
+bucket *tb2,
+>  #else
+>         tb2->rcv_saddr =3D sk->sk_rcv_saddr;
+>  #endif
+> +       tb2->fastreuse =3D 0;
+> +       tb2->fastreuseport =3D 0;
+>         INIT_HLIST_HEAD(&tb2->owners);
+>         hlist_add_head(&tb2->node, &head->chain);
+>         hlist_add_head(&tb2->bhash_node, &tb->bhash2);
+> @@ -143,11 +157,23 @@ struct inet_bind2_bucket *inet_bind2_bucket_create(=
+struct kmem_cache *cachep,
+>  /* Caller must hold hashbucket lock for this tb with local BH disabled *=
+/
+>  void inet_bind2_bucket_destroy(struct kmem_cache *cachep, struct inet_bi=
+nd2_bucket *tb)
+>  {
+> +       const struct sock *sk;
+> +
+>         if (hlist_empty(&tb->owners)) {
+>                 __hlist_del(&tb->node);
+>                 __hlist_del(&tb->bhash_node);
+>                 kmem_cache_free(cachep, tb);
+> +               return;
+> +       }
+> +
+> +       if (tb->fastreuse =3D=3D -1 && tb->fastreuseport =3D=3D -1)
+> +               return;
+> +       sk_for_each_bound(sk, &tb->owners) {
+> +               if (!inet_sk_autobind(sk))
+> +                       return;
+>         }
+> +       tb->fastreuse =3D -1;
+> +       tb->fastreuseport =3D -1;
+>  }
+>
+>  static bool inet_bind2_bucket_addr_match(const struct inet_bind2_bucket =
+*tb2,
+> @@ -191,6 +217,7 @@ static void __inet_put_port(struct sock *sk)
+>         tb =3D inet_csk(sk)->icsk_bind_hash;
+>         inet_csk(sk)->icsk_bind_hash =3D NULL;
+>         inet_sk(sk)->inet_num =3D 0;
+> +       inet_clear_bit(AUTOBIND, sk);
+>
+>         spin_lock(&head2->lock);
+>         if (inet_csk(sk)->icsk_bind2_hash) {
+> @@ -277,7 +304,7 @@ int __inet_inherit_port(const struct sock *sk, struct=
+ sock *child)
+>                 }
+>         }
+>         if (update_fastreuse)
+> -               inet_csk_update_fastreuse(tb, child);
+> +               inet_csk_update_fastreuse(child, tb, tb2);
+>         inet_bind_hash(child, tb, tb2, port);
+>         spin_unlock(&head2->lock);
+>         spin_unlock(&head->lock);
+> @@ -1136,6 +1163,8 @@ int __inet_hash_connect(struct inet_timewait_death_=
+row *death_row,
+>                                                head2, tb, sk);
+>                 if (!tb2)
+>                         goto error;
+> +               tb2->fastreuse =3D -1;
+> +               tb2->fastreuseport =3D -1;
+>         }
+>
+>         /* Here we want to add a little bit of randomness to the next sou=
+rce
+> @@ -1148,6 +1177,7 @@ int __inet_hash_connect(struct inet_timewait_death_=
+row *death_row,
+>
+>         /* Head lock still held and bh's disabled */
+>         inet_bind_hash(sk, tb, tb2, port);
+> +       inet_set_bit(AUTOBIND, sk);
+>
+>         if (sk_unhashed(sk)) {
+>                 inet_sk(sk)->inet_sport =3D htons(port);
+> diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.=
+c
+> index 875ff923a8ed..0150f5697040 100644
+> --- a/net/ipv4/inet_timewait_sock.c
+> +++ b/net/ipv4/inet_timewait_sock.c
+> @@ -206,6 +206,7 @@ struct inet_timewait_sock *inet_twsk_alloc(const stru=
+ct sock *sk,
+>                 tw->tw_hash         =3D sk->sk_hash;
+>                 tw->tw_ipv6only     =3D 0;
+>                 tw->tw_transparent  =3D inet_test_bit(TRANSPARENT, sk);
+> +               tw->tw_autobind     =3D inet_test_bit(AUTOBIND, sk);
+>                 tw->tw_prot         =3D sk->sk_prot_creator;
+>                 atomic64_set(&tw->tw_cookie, atomic64_read(&sk->sk_cookie=
+));
+>                 twsk_net_set(tw, sock_net(sk));
+>
+> --
+> 2.43.0
+>
 
