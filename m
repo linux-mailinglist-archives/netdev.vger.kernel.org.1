@@ -1,153 +1,183 @@
-Return-Path: <netdev+bounces-215997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B3E0B314D0
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 12:10:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7808B314D8
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 12:12:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A18A21895AE7
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 10:10:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3214CB6810F
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 10:08:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71F102C0260;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCDE52D3ED3;
 	Fri, 22 Aug 2025 10:09:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="1D3gQZVH"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="SG7D2pum"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011071.outbound.protection.outlook.com [52.101.70.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0C427EFF1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A17BB296BA0;
 	Fri, 22 Aug 2025 10:09:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755857384; cv=none; b=BPjCsMPvOCltZ0jN3Fsa+lXrsnPNAlS4fxbxSoZkjbCB2c0EwQJS5SGmOi4YOqq6Ob62xF3rDyiHPhXDzYgFkPUUkQXfOqT0sw6aZ1x9t7FS8qsl764vtRt2Tnz58qFATL1BUrNdvsVAt6WOMboJ4J3+EcXCB81xEIefjGpQXuw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.71
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755857384; cv=fail; b=t87gOnAQJPKKeQjwPftRKGA/cnaCZm89gU1PhzQjZPouRNOLE+wuhfVgwpntcrjMNr8hMDYvQYrRnSLeQLg3xm4QQ6bcDaW9KhLZ/ojnYWip9Y6F7apVaQ8OlG3wiQ3AuWHTgs6zw534IqxW53k2dhbatR2dq8H4y+rJCzpyGFw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1755857384; c=relaxed/simple;
-	bh=A8seymhPD/UjqZ8mH0/ODm0W3dD3W2Dvk1eT3zcM94A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mJch+Z33axP9xIOLvGgcqPRL0QCPuCnLtObU0KdEmHfX6WhwJbrYjn4siaPgj+4Jq2wE90vxNETddMagZmk0B7Aw08j/Kb7NzbVKzbt9IQE/GUOWtjXfb784gvZsMzpQ9dPv0TyA29Lc+64Fow+35gXrxPq+YbDbt8/+5faV4eE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=1D3gQZVH; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 960AA4E40BA0;
-	Fri, 22 Aug 2025 10:09:39 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 671B8604AD;
-	Fri, 22 Aug 2025 10:09:39 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 064AF1C22CE69;
-	Fri, 22 Aug 2025 12:09:23 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1755857378; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=6cVjVZ5wfnye80ZbXrAniO6QjKQrZFpfgRoqYcTlg4w=;
-	b=1D3gQZVHT49ReUfvBPoqsjhy5kAYBmEOOV3UyYLH7mKyxQqQDOi+nlP4rdGSfeKwuE7Hfr
-	0whhtCYevKSVM1zUub/qm+jbfOsQDsKCC3ry8/raGb19f+gru2PjyJ0f6lVSet5hj3AigZ
-	D/eSO0D57bC9mxgTjJLpLte7t/2xEH2JMjm1HpdvoOyCkL4A/AQo4RcU+vqy16i2k0yDtl
-	uZgasz8gZ1WPKGx2JxF4/y4rcL6DObniEvDvHYFNjdgBMtr4FCozKZhXhObVB19MYYpSu/
-	03d2cX2haqW3hwkWm0vEqOCPaz8NZUEHqVb/JEUWSeYn/eDjGazviSoFtIQ50A==
-Message-ID: <a30d00cd-9148-423b-a3e5-b11d6c5c270b@bootlin.com>
-Date: Fri, 22 Aug 2025 12:09:22 +0200
+	bh=a/Jqly8jVBtUUl7HDyYvmi5v984qbk1WTLVidod+biI=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=qulGswfVw9SXoZkuOguZBwSGOwwvtnmIRzmPYb0qdWeE5ehsJzTFvqYI1Ic+mZsdDdjZXEP3LPFYcNn+wyvz8ZfGAt6gLIrtUST6IIIZ8ZguLTqrOkhY86gswGLIys/JEtIb4JoW1IINKH8lUOlkLfvl7g7SqiaVh4pqDUVbfcc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=SG7D2pum; arc=fail smtp.client-ip=52.101.70.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=j5rzZSHnY+OkOt/4nanrPG72F0s5JaftC+c0WaC5pImpNhvYNCHtIHdAx9RD0wG++6QNYlLxEKeCW5PZjRmMjcriRN6M69UIYgHdcBZgk3GDbIfCF4t1hdkhoojeT9IMQhiVHxyL0+qkCD0agqHvHC/mB1WWZH1eIvULh49mylO669sk0PCTiKhV4f2LI7kmz/kXlqG5zQrZErrYTLl/kifIPHX181x4ZvaFrHiZh6fHeIlTIpjFufidAQo8ez4SNi5NzT5a1Kai6zVtGDSKggjkXqQPCAdSGatgNVrzK3bqvxuozZglHOmYixpbv7E0/1KNspCAfoqHefyM25BAog==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WWpZA2XtMd2RPv+RPQaaQtdBGy2QBN/UDAEjy1yzQaY=;
+ b=hjCWCmkYAoV7y3eA6Blzy/jOKGjovcVciwr5AlDbmOn+pf666zFk6/WncAwP4IHBWkzL36InbMwarJefbgd3mUmAGnl08U96/lEUbVqKx0XTXVKfQxjZ68z7QtshHO9VHP1OnLQqcdd1D3bAXiV/rwZGc0+7naIFQyEvbnUORa4VxpGtjD2T3+x4vHAHOflCU/adfs3TBzsAw8emF+pqRtKcjQxU69GM/Y4c6xNLtLjTd4byC6G24jjOqZTg1M0TVOuC0Fe86PoR63VBaJKkhCyQcwjeXH25C+icCrCkBy9pnX6D5HzVRwRuK26zLopk9OGuhucZAxm+4FJE1AH93w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WWpZA2XtMd2RPv+RPQaaQtdBGy2QBN/UDAEjy1yzQaY=;
+ b=SG7D2pumYuGzSR2mQDi5BOhPaHq5l6eghTGW7SCEi9/xs49zEoG5WFZhux4Ft44D2Dt5Pt5u4a/IfrPxinJv++Ip0QSyrjMQopMniHhR+mmbxkXdyoiOhEbVjF2/Wf9HSUx0+9SDQ/k/8PbdxR/EcH+HieM4ImEgCk0007GVrHo62XT1r/B6G30/3+L19gvPWqFB4RqcOJZUyXi4AVVODB39dRO+nM9LmLN52lB9cQvkGGZ7MuhANTAB/PmXmyw4EkqXwF9jRvVXjtHH2RusGefMCZ+B+jDWhtSkpq65w3ep3xxZW9o0O8xzEUxnuwe1UpDBsY5tfu9ygJdcSDMUKQ==
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by VE1PR04MB7471.eurprd04.prod.outlook.com (2603:10a6:800:1a7::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.15; Fri, 22 Aug
+ 2025 10:09:38 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db%5]) with mapi id 15.20.9031.012; Fri, 22 Aug 2025
+ 10:09:38 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Shenwei Wang <shenwei.wang@nxp.com>
+CC: Clark Wang <xiaoning.wang@nxp.com>, Stanislav Fomichev <sdf@fomichev.me>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, dl-linux-imx <linux-imx@nxp.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>
+Subject: RE: [PATCH v2 net-next 3/5] et: fec: add rx_frame_size to support
+ configurable RX length
+Thread-Topic: [PATCH v2 net-next 3/5] et: fec: add rx_frame_size to support
+ configurable RX length
+Thread-Index: AQHcEsoyoJ7sYfSghkG8db/Gx4Jg+bRucgcQ
+Date: Fri, 22 Aug 2025 10:09:38 +0000
+Message-ID:
+ <PAXPR04MB85106B9BAA426968D0C08678883DA@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <20250821183336.1063783-1-shenwei.wang@nxp.com>
+ <20250821183336.1063783-4-shenwei.wang@nxp.com>
+In-Reply-To: <20250821183336.1063783-4-shenwei.wang@nxp.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|VE1PR04MB7471:EE_
+x-ms-office365-filtering-correlation-id: 77b5cb8a-2642-4ad2-acf4-08dde16400e6
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|19092799006|7416014|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?4+OVS42lBpwGdKOgKsQ6ZQUKAwX9DhicwWQIbdLYNVt2XyDb6ZmmFtoBtnj0?=
+ =?us-ascii?Q?FvOGjigNGaKM82/0r7TLfXZI2xdDeSjutxHM3AXs7T0jP2u3+SnYJQZlFo+A?=
+ =?us-ascii?Q?sbU2p7Fj2M+O1s48UkwcMrPcTnoFrd5SAS/Yl3X88AjWeitA+agfFtLM5r85?=
+ =?us-ascii?Q?aaumjpF7pyluxtelK6RJz25z84ihr7xLmflSJk66LCGmjPa2B4iQN0WIxcTK?=
+ =?us-ascii?Q?PSKokc085mIyZ81zn6k2XXal/zPOOg5JH81nAeLX29mujxnMmw1U3atiT3pD?=
+ =?us-ascii?Q?5v+2vPaBlyPahEda3EMgGFtVoNmX9esSxElVMC1XXx16gd/ZmsrvkaE21yQY?=
+ =?us-ascii?Q?jpMpvo1RgaY4gxFouLtO6kPaJUDGSlqOsvxk++3PSFJU5Z9ItEHOSTdavzSY?=
+ =?us-ascii?Q?WEfZtNu/8DNjCE08c8/SP+H5lwguwrAoSqpd7b0ZpZ1h2NwygZnsl89iRcvw?=
+ =?us-ascii?Q?IM7hWosrO99GohschcDx7BhZ6QVG935a5nKZalN+RXfdCMdvWYKBIajLTVuH?=
+ =?us-ascii?Q?Pf9sotwAdG5F3TlEF0otxR2C6VHqfnZ3pmEHITVprd1dL7o5p69XInEiLp/z?=
+ =?us-ascii?Q?zn6+oDeAJqQMBIEcKdcbwVIxJ5h0hLZpp8HB8Vw0eKA3QOkvonIwLFEZZA0b?=
+ =?us-ascii?Q?/uvdZk5fefTg5iHh1LCtog1co0BCprKhZVnrUGMyGMDSqfcrMm8Rqzj1DTRA?=
+ =?us-ascii?Q?r47QwRJwhRcHJieyvmvpSDlenJsEAP+oeleVq4u4B33kmyo9ZCn4EwSHGLWn?=
+ =?us-ascii?Q?SYLwXvig1wwtv9UtkQJ5Zg8XygHeWAJDpTmG4MApAwtMbUnJM1Xy6L9H2IHE?=
+ =?us-ascii?Q?TOJLm5HGCHtf92XN30fQcJyOa/Ru6DWprPQm74jgBsQrtsHQs842pGjeanse?=
+ =?us-ascii?Q?6QBRFK4JXafXR+EqeZ30MqDsmCIxebJGjb9L/fhkSxiB2g/xafwEp8LlTAqJ?=
+ =?us-ascii?Q?44WJ3rGgavTMvmp4rrnfJpsvvPByA31J8lmSUtUqCUuf6UAD2i8BAMb8FTmi?=
+ =?us-ascii?Q?W7VA27oW629HtMho3cm6Utc5gMHqIgIMAbDj0gRQ+vZtT/KRyuTcLf5O7vOq?=
+ =?us-ascii?Q?WvPZ9OBFGqn3CLmFEWHa9dXuKlto/zfOXvX1fIvgZ1OPwQJ76YF5AXDeibyd?=
+ =?us-ascii?Q?hZrdLMbGf8G2GQnFH/190NnLgKaBES+celuR/Pou2g/KWkU6tx6qxNjAHzfe?=
+ =?us-ascii?Q?okSWOt7BW4mw9NdP7llzKk2MruwW51IgSYZSxxCvs4g6LNy4xZP9wixnzXDO?=
+ =?us-ascii?Q?dWfJkz6OfkpFo5Z8NFQ/LORDNr/Ch1Vp57XROXNifISuAqzqxEcyHPAbj3js?=
+ =?us-ascii?Q?1xUymFUaOc9KUeohyWsKBED4Z3KzLVroDapFqegfQrXJn0YO6sf5/lgjOM3M?=
+ =?us-ascii?Q?BWlSYT2TPNW3z0nQsSeEQBuRNyV0eGYyBDpWyKbQrOfwI3fX9zLAyNj2h9lT?=
+ =?us-ascii?Q?MEtr14AyxSBgZnzzZc7Ge5S3MRo4WT2CWAi2y+3mTBfXO868RMkWoQ=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(19092799006)(7416014)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?EW56l0VePzcwjjn97GPy/r9XPb57FjsOk6wBY8SRzoOBpFJq0vRXFFk1sD30?=
+ =?us-ascii?Q?9R2t1ar4mp7xs8vqwYfenKYvvZiKOOi0l58nncx1tohoQahXJV4VkmpQZCMQ?=
+ =?us-ascii?Q?LeSt3H2RbR8bj6UczA2gJi2qRURgYyXAAsMqE5iV4T1588sylUKYJqip8yOz?=
+ =?us-ascii?Q?0WxJo1hWDlRFfyzMbrBVeCbEEZqFiy/vfpB9zQaaLP30oHC0dwaF0piw1pGp?=
+ =?us-ascii?Q?Z5VTxlU+GjcYb1yLOo8Lo7SWdHL4EXQPk6CNxBRK00IbCMFVEwEhzkjgalPC?=
+ =?us-ascii?Q?psEpto4vt8o18lqui1/mry2jBSgu0CX23Crllfx0v/n8hYmFlqdcbnWe/ogK?=
+ =?us-ascii?Q?hZIUPosKRtGxVqTx5X1dlLPgFc/lvCh65BFIIVhEEyk5Z190QvxnoPtS4D0S?=
+ =?us-ascii?Q?wpaQEf0GdEw92nhupb4Un0teQwyzo7GYK6xY916Zf9qdzEkrherOaUcYTeZP?=
+ =?us-ascii?Q?LkCClDoZddhiKYVLcHJTEuUcPh0Kjzt5R1c4D/5TtUQLIT/VF9M3NeEsq5SU?=
+ =?us-ascii?Q?heDyHun1xikCBkHhEZ3mld5oiUTkBdae1HTS6TrzIBWKhhTBQgMTqdr2txa5?=
+ =?us-ascii?Q?N8MEG79h27CFR4AS739lg13EAZ+lEG+8NuYjXJF0jriGpJxelgWQSK5ksVs1?=
+ =?us-ascii?Q?hpEQQCxLp3srJ8RGibJJJTRmXFk3/yzTTxCFSHOCM35k1LywFVe1JbUZI3Oa?=
+ =?us-ascii?Q?8D6fJIutsksZic9RwUE63RvOES24TY5/XmL1FfgrDV+vuQL07TbRN0yrE7aW?=
+ =?us-ascii?Q?GKu41MzGlSGC3v2+Ebl3JGAnc6AOKzilXKuHxGRFzyy1EZuK7SSdmaiYWjcV?=
+ =?us-ascii?Q?DC2nP2Ccg/eBot4q5dXIcNo3BZTcqp1lESu3uaATu9dZ0SRDtRxcPX+fYUNb?=
+ =?us-ascii?Q?8I/NSkXYYnra+t9Qsp6HSnnisVUS4H/0w3tx6A6pOhAK9fnpUeMDEyuuZEk2?=
+ =?us-ascii?Q?jjUp1WVffZfeZPoMk0edsU5RBPYK8Zi4UOON/Lm2mKlirOVHKuASFgUslJUl?=
+ =?us-ascii?Q?Ej1eBNV4c0k7pCcHUK6ATdhkxAgmELmt7w4UBhUIM0qavXZRDzh1f7CGiBGG?=
+ =?us-ascii?Q?wriTFKKOhU4PAzHMozbJi4zWwSdCq/yqhO6+LMdMOBfvVHa/mTXXnZ8thB1K?=
+ =?us-ascii?Q?jU8GD8CfNsJqTr1vSdczlyxG4MkaW3Z3Cc02s6elzOJQo+0UXPIV/baLduc6?=
+ =?us-ascii?Q?ziHezFKk1GnUUckivBhQdrBA0TMT4oVfqbpSQHaRx1CiGzbLArnYvY/tWNPz?=
+ =?us-ascii?Q?QTUEoeDuupq0nIBtGMjWOL9sJRrZbTv8SN1GSKMrTXGS380x2XEHULGm47Xg?=
+ =?us-ascii?Q?H+Hq4kgnbcxtBuebiXP65vZxI1FlicKSNzhc9Xb8AtVbKg/TiAUrD+dCDhGh?=
+ =?us-ascii?Q?+8XLnz1aa+PDYwUi4BY9k4s0xo7s6aIgP8c+VK3aeooOtmumX2FXi4ETWiGt?=
+ =?us-ascii?Q?6mALq6T8OC8Y07I6lxwbKVEAlW/FDUXjA6yJfomCQnOcOgv15d2eO639FQLo?=
+ =?us-ascii?Q?6teXppIJvWTUz32XjhU6pUBGjT91TWuG6Clv1Meqtpd4T2KEzULfiv2EMW3n?=
+ =?us-ascii?Q?DD/uTM0D0KAoZKyyM/Y=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v10 07/15] net: phy: Introduce generic SFP
- handling for PHY drivers
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, linux-arm-kernel@lists.infradead.org,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
- =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
- Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
- Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
- Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
- Romain Gantois <romain.gantois@bootlin.com>,
- Daniel Golle <daniel@makrotopia.org>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-References: <20250722121623.609732-1-maxime.chevallier@bootlin.com>
- <20250722121623.609732-8-maxime.chevallier@bootlin.com>
- <aIX35MUxx-OkvX4G@shell.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <aIX35MUxx-OkvX4G@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 77b5cb8a-2642-4ad2-acf4-08dde16400e6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Aug 2025 10:09:38.4027
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: zopX0Oaewpd0PfUwOxfk0aixGu+OZE4nhFEfS86ejJG8etm4XRnRSAnBA9ilSnH707xpGNwZ9iNF+K+0Lu2ciA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR04MB7471
 
-Hello Russell,
+> @@ -4563,6 +4563,7 @@ fec_probe(struct platform_device *pdev)
+>  	pinctrl_pm_select_sleep_state(&pdev->dev);
+>=20
+>  	fep->pagepool_order =3D 0;
+> +	fep->rx_frame_size =3D FEC_ENET_RX_FRSIZE;
 
-I'm re-replying here even though a more recent version was sent, as I 
-realise I forgot to fully address that.
+According to the RM, to allow one maximum size frame per buffer,
+FEC_R_BUFF_SIZE must be set to FEC_R_CNTRL [MAX_FL] or larger.
+FEC_ENET_RX_FRSIZE is greater than PKT_MAXBUF_SIZE, I'm not
+sure whether it will cause some unknown issues.
 
-On 27/07/2025 11:56, Russell King (Oracle) wrote:
-> On Tue, Jul 22, 2025 at 02:16:12PM +0200, Maxime Chevallier wrote:
->> +static int phy_sfp_module_insert(void *upstream, const struct sfp_eeprom_id *id)
->> +{
->> +	struct phy_device *phydev = upstream;
->> +	struct phy_port *port = phy_get_sfp_port(phydev);
->> +
->> +	__ETHTOOL_DECLARE_LINK_MODE_MASK(sfp_support);
->> +	DECLARE_PHY_INTERFACE_MASK(interfaces);
->> +	phy_interface_t iface;
->> +
->> +	linkmode_zero(sfp_support);
->> +
->> +	if (!port)
->> +		return -EINVAL;
->> +
->> +	sfp_parse_support(phydev->sfp_bus, id, sfp_support, interfaces);
->> +
->> +	if (phydev->n_ports == 1)
->> +		phydev->port = sfp_parse_port(phydev->sfp_bus, id, sfp_support);
->> +
->> +	linkmode_and(sfp_support, port->supported, sfp_support);
->> +
->> +	if (linkmode_empty(sfp_support)) {
->> +		dev_err(&phydev->mdio.dev, "incompatible SFP module inserted\n");
->> +		return -EINVAL;
->> +	}
->> +
->> +	iface = sfp_select_interface(phydev->sfp_bus, sfp_support);
-> 
-> I've been moving phylink away from using sfp_select_interface() because
-> it requires two stages of translation - one from the module capabilties
-> to linkmodes, and then linkmodes to interfaces.
-> 
-> sfp_parse_support() now provides the interfaces that the optical module
-> supports, and the possible interfaces that a copper module _might_
-> support (but we don't know for certain about that until we discover a
-> PHY.)
-> 
-> The only place in phylink where this function continues to be used is
-> when there's an optical module which supports multiple different
-> speeds, and we need to select it based on the advertising mask provided
-> by userspace. Everywhere else shouldn't use this function, but should
-> instead use the interfaces returned from sfp_parse_support().
-> 
-
-In any case, we'll eventually have to select one of the interfaces if 
-there are multiple matches from the sfp_parse_support. phylink maintains 
-a sorted list of interfaces used as a preference, I think we should use 
-the same list for phy-driver SFP. I'm thinking about moving 
-phylink_choose_sfp_interface() in the sfp code, would you be OK with that ?
-
-Maxime
+>  	fep->max_buf_size =3D PKT_MAXBUF_SIZE;
+>  	ndev->max_mtu =3D fep->max_buf_size - ETH_HLEN - ETH_FCS_LEN;
 
 
