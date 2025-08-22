@@ -1,261 +1,81 @@
-Return-Path: <netdev+bounces-216145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3596EB32354
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 22:02:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1177AB323E5
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 23:02:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCED01D62BC0
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 20:01:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E13641BA6E8F
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 21:02:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A1252D838F;
-	Fri, 22 Aug 2025 20:01:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tXQnFbDl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC4FF239E7D;
+	Fri, 22 Aug 2025 21:02:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7262A2D836A;
-	Fri, 22 Aug 2025 20:01:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from elvis.franken.de (elvis.franken.de [193.175.24.41])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8133117BA3;
+	Fri, 22 Aug 2025 21:02:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.175.24.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755892864; cv=none; b=aqw6W0Ql+4SdVfzaoxH028A6n9ugvaZR47odlqFwYc2KAAE29gr7cV9W6A41QU4IUfO+X/inFFRKA6pGtzFE05dUH+rVRtrF6GI23FAnGZU84TJA48GFXUswy2RwIYO+qrziJPeyzoRRwqj21N8zPEUY0Evn3Z73I5NvikAKmYM=
+	t=1755896531; cv=none; b=sKGvwqh30YdBZWmdCMjacajA5EJSbTZSEwjlKwXeI40OpeB4o0IJwSMuu25PZJmRqS9hfH/f1n4kvIuPkJPul0PRCWjMQNaogJCSxuBIJL6NwQCrvSIVsD3LOPFK/xJUSQEV5dgssx8mJG18rbuxHM+EThNqx5Xab6V4+oSkqmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755892864; c=relaxed/simple;
-	bh=fL5reU7n2NLVmobpgo6XfsVUTbllY3GjlzYhlHdzEq4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FXi31hu+Uue4QINf9sCyNi//6vbnnpSE5XtahH9z7fyDuAN+4Q1cqhjCuvlxC13jEprkjQxMb6eiU+v5VeY15RGq6P39MBzOTvPSYkMxX5d1CaQ/u7r54HTPX/EPz2JNJXnFzQP95KET9ZOEXAXVL1nx8uzGb7uh+F1pALX/6dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tXQnFbDl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC979C16AAE;
-	Fri, 22 Aug 2025 20:01:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755892864;
-	bh=fL5reU7n2NLVmobpgo6XfsVUTbllY3GjlzYhlHdzEq4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tXQnFbDlnr+5y3h3yG9k8bjpHYduQcXDp+JulhoQVMor5fxt7FCXHIoHWJyKkMOHF
-	 jjhHLQQ9XowbKKCGIAmIJJui9QCQ8RQ6CAHFxmao8OdlJXoReU8neB78wSmJqH8phZ
-	 xvM4JjXvQpvaLNVf9tBSNn+FaPnryZ+tBY7KzqM5YwnLlvkEMJX9jfKt0LyyyOFmDj
-	 9rOTYg2XC55fbHpUD4bmGrlFLXGcdz1QJnbsEeM/Its2AH+mTHpSLpZhQvge5HKMLU
-	 hKH08NjX8Vq1spDkji6+UOBqoWeEQqfH7Wr+NngeADsw5a4mb9HhnoUdsuGR3FyP53
-	 bdM0kptZoKFqg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	almasrymina@google.com,
-	sdf@fomichev.me,
-	joe@dama.to,
-	linux-kselftest@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 4/4] selftests: drv-net: ncdevmem: configure and restore HDS threshold
-Date: Fri, 22 Aug 2025 13:00:52 -0700
-Message-ID: <20250822200052.1675613-5-kuba@kernel.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250822200052.1675613-1-kuba@kernel.org>
-References: <20250822200052.1675613-1-kuba@kernel.org>
+	s=arc-20240116; t=1755896531; c=relaxed/simple;
+	bh=N0od3Zda4p0wNa9XTkQyDqmvTL6HjPvbtZhHcqO6698=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KFJipr4pX5tKPiZfgmlOooA9Yhb/25RZXwP7rW1ehMci8UEY/yL2XOPW+RUpA492H2gkksbg3Y+xXhb/669Ipa3Jz1AXJ+7kcylojxLjgp+mLUCq7zkndZHoAlDsLV/GvUgauBruSYXn4sUWTSB6iB9TG86VTg4zgWclNOKsgUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alpha.franken.de; spf=pass smtp.mailfrom=alpha.franken.de; arc=none smtp.client-ip=193.175.24.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alpha.franken.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alpha.franken.de
+Received: from uucp by elvis.franken.de with local-rmail (Exim 3.36 #1)
+	id 1upYtZ-0007kR-00; Fri, 22 Aug 2025 23:01:57 +0200
+Received: by alpha.franken.de (Postfix, from userid 1000)
+	id F09F0C04FD; Fri, 22 Aug 2025 22:05:37 +0200 (CEST)
+Date: Fri, 22 Aug 2025 22:05:37 +0200
+From: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+To: Aleksander Jan Bajkowski <olek2@wp.pl>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, john@phrozen.org,
+	devicetree@vger.kernel.org, netdev@vger.kernel.org,
+	linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2 0/2] mips: lantiq: fix ethernet support
+Message-ID: <aKjNkagCFYlZTFXn@alpha.franken.de>
+References: <20250817131022.3796476-1-olek2@wp.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250817131022.3796476-1-olek2@wp.pl>
 
-Improve HDS handling. Make sure we set threshold to 0.
-Restore the previous settings before exiting.
+On Sun, Aug 17, 2025 at 02:49:05PM +0200, Aleksander Jan Bajkowski wrote:
+> This series fixes broken Ethernet in the upstream danube dts. The
+> driver doesn't attach due to missing burst length property. OpenWRT
+> has its own dts, which is correct, so the problem has only been
+> spotted now. Other dts inconsistencies with bindings have been
+> fixed as well.
+> 
+> ---
+> Changes in v2:
+> - renaming clocks in sysctrl
+> ---
+> Aleksander Jan Bajkowski (2):
+>   mips: dts: lantiq: danube: add missing burst length property
+>   mips: lantiq: xway: sysctrl: rename the etop node
+> 
+>  arch/mips/boot/dts/lantiq/danube_easy50712.dts |  5 ++++-
+>  arch/mips/lantiq/xway/sysctrl.c                | 10 +++++-----
+>  2 files changed, 9 insertions(+), 6 deletions(-)
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- .../selftests/drivers/net/hw/ncdevmem.c       | 96 +++++++++++++++++--
- 1 file changed, 87 insertions(+), 9 deletions(-)
+series applied to mips-fixes.
 
-diff --git a/tools/testing/selftests/drivers/net/hw/ncdevmem.c b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-index 580b4459a840..aa2904d1a3e1 100644
---- a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-+++ b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-@@ -419,6 +419,60 @@ static const char *tcp_data_split_str(int val)
- 	}
- }
- 
-+static struct ethtool_rings_get_rsp *get_ring_config(void)
-+{
-+	struct ethtool_rings_get_req *get_req;
-+	struct ethtool_rings_get_rsp *get_rsp;
-+	struct ynl_error yerr;
-+	struct ynl_sock *ys;
-+
-+	ys = ynl_sock_create(&ynl_ethtool_family, &yerr);
-+	if (!ys) {
-+		fprintf(stderr, "YNL: %s\n", yerr.msg);
-+		return NULL;
-+	}
-+
-+	get_req = ethtool_rings_get_req_alloc();
-+	ethtool_rings_get_req_set_header_dev_index(get_req, ifindex);
-+	get_rsp = ethtool_rings_get(ys, get_req);
-+	ethtool_rings_get_req_free(get_req);
-+
-+	ynl_sock_destroy(ys);
-+
-+	return get_rsp;
-+}
-+
-+static void restore_ring_config(const struct ethtool_rings_get_rsp *config)
-+{
-+	struct ethtool_rings_set_req *req;
-+	struct ynl_error yerr;
-+	struct ynl_sock *ys;
-+	int ret;
-+
-+	if (!config)
-+		return;
-+
-+	ys = ynl_sock_create(&ynl_ethtool_family, &yerr);
-+	if (!ys) {
-+		fprintf(stderr, "YNL: %s\n", yerr.msg);
-+		return;
-+	}
-+
-+	req = ethtool_rings_set_req_alloc();
-+	ethtool_rings_set_req_set_header_dev_index(req, ifindex);
-+	ethtool_rings_set_req_set_tcp_data_split(req,
-+						ETHTOOL_TCP_DATA_SPLIT_UNKNOWN);
-+	if (config->_present.hds_thresh)
-+		ethtool_rings_set_req_set_hds_thresh(req, config->hds_thresh);
-+
-+	ret = ethtool_rings_set(ys, req);
-+	if (ret < 0)
-+		fprintf(stderr, "YNL failed: %s\n", ys->err.msg);
-+	ethtool_rings_set_req_free(req);
-+
-+	ynl_sock_destroy(ys);
-+}
-+
- static int configure_headersplit(bool on)
- {
- 	struct ethtool_rings_get_req *get_req;
-@@ -436,8 +490,14 @@ static int configure_headersplit(bool on)
- 
- 	req = ethtool_rings_set_req_alloc();
- 	ethtool_rings_set_req_set_header_dev_index(req, ifindex);
--	/* 0 - off, 1 - auto, 2 - on */
--	ethtool_rings_set_req_set_tcp_data_split(req, on ? 2 : 0);
-+	if (on) {
-+		ethtool_rings_set_req_set_tcp_data_split(req,
-+						ETHTOOL_TCP_DATA_SPLIT_ENABLED);
-+		ethtool_rings_set_req_set_hds_thresh(req, 0);
-+	} else {
-+		ethtool_rings_set_req_set_tcp_data_split(req,
-+						ETHTOOL_TCP_DATA_SPLIT_UNKNOWN);
-+	}
- 	ret = ethtool_rings_set(ys, req);
- 	if (ret < 0)
- 		fprintf(stderr, "YNL failed: %s\n", ys->err.msg);
-@@ -745,6 +805,7 @@ static struct netdev_queue_id *create_queues(void)
- 
- static int do_server(struct memory_buffer *mem)
- {
-+	struct ethtool_rings_get_rsp *ring_config;
- 	char ctrl_data[sizeof(int) * 20000];
- 	size_t non_page_aligned_frags = 0;
- 	struct sockaddr_in6 client_addr;
-@@ -767,9 +828,15 @@ static int do_server(struct memory_buffer *mem)
- 		return -1;
- 	}
- 
-+	ring_config = get_ring_config();
-+	if (!ring_config) {
-+		pr_err("Failed to get current ring configuration");
-+		return -1;
-+	}
-+
- 	if (configure_headersplit(1)) {
- 		pr_err("Failed to enable TCP header split");
--		return -1;
-+		goto err_free_ring_config;
- 	}
- 
- 	/* Configure RSS to divert all traffic from our devmem queues */
-@@ -959,12 +1026,15 @@ static int do_server(struct memory_buffer *mem)
- err_reset_rss:
- 	reset_rss();
- err_reset_headersplit:
--	configure_headersplit(0);
-+	restore_ring_config(ring_config);
-+err_free_ring_config:
-+	ethtool_rings_get_rsp_free(ring_config);
- 	return err;
- }
- 
- int run_devmem_tests(void)
- {
-+	struct ethtool_rings_get_rsp *ring_config;
- 	struct netdev_queue_id *queues;
- 	struct memory_buffer *mem;
- 	struct ynl_sock *ys;
-@@ -976,10 +1046,16 @@ int run_devmem_tests(void)
- 		return -1;
- 	}
- 
-+	ring_config = get_ring_config();
-+	if (!ring_config) {
-+		pr_err("Failed to get current ring configuration");
-+		goto err_free_mem;
-+	}
-+
- 	/* Configure RSS to divert all traffic from our devmem queues */
- 	if (configure_rss()) {
- 		pr_err("rss error");
--		goto err_free_mem;
-+		goto err_free_ring_config;
- 	}
- 
- 	if (configure_headersplit(1)) {
-@@ -1000,13 +1076,13 @@ int run_devmem_tests(void)
- 
- 	if (configure_headersplit(0)) {
- 		pr_err("Failed to configure header split");
--		goto err_reset_rss;
-+		goto err_reset_headersplit;
- 	}
- 
- 	queues = create_queues();
- 	if (!queues) {
- 		pr_err("Failed to create queues");
--		goto err_reset_rss;
-+		goto err_reset_headersplit;
- 	}
- 
- 	if (!bind_rx_queue(ifindex, mem->fd, queues, num_queues, &ys)) {
-@@ -1016,7 +1092,7 @@ int run_devmem_tests(void)
- 
- 	if (configure_headersplit(1)) {
- 		pr_err("Failed to configure header split");
--		goto err_reset_rss;
-+		goto err_reset_headersplit;
- 	}
- 
- 	queues = create_queues();
-@@ -1042,9 +1118,11 @@ int run_devmem_tests(void)
- err_unbind:
- 	ynl_sock_destroy(ys);
- err_reset_headersplit:
--	configure_headersplit(0);
-+	restore_ring_config(ring_config);
- err_reset_rss:
- 	reset_rss();
-+err_free_ring_config:
-+	ethtool_rings_get_rsp_free(ring_config);
- err_free_mem:
- 	provider->free(mem);
- 	return err;
+Thomas.
+
 -- 
-2.50.1
-
+Crap can work. Given enough thrust pigs will fly, but it's not necessarily a
+good idea.                                                [ RFC1925, 2.3 ]
 
