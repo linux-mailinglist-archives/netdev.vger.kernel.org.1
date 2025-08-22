@@ -1,194 +1,159 @@
-Return-Path: <netdev+bounces-215986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 337BCB313DD
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 11:46:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22FC0B313F1
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 11:48:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1420A1D00806
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 09:41:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 964CE1D20B90
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 09:43:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 950442F6563;
-	Fri, 22 Aug 2025 09:35:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BB1D2FB639;
+	Fri, 22 Aug 2025 09:37:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="FUlBe9oD";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="XYDerVas";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="FUlBe9oD";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="XYDerVas"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="z/YYL4dX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B16C2F8BEE
-	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 09:35:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7702D2F0C7C
+	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 09:37:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755855332; cv=none; b=PaitqFT3zBWnPhfbgoh0PnH21jhwN/9Gib5AcWw7RAMglDfDNbMAGIhYD30pEtPi+zT8aMA4z/LDwqjeoHzMu1X+aEGaSfEtehJ8dGiMoSC9LXvTw35aIyKfobkuRTkVL5ry7hCtK/pDffJbFsXb3gkqhn0XAdG8bgkE1dZMoNQ=
+	t=1755855463; cv=none; b=QzmA0Smz5vMLe4tAETQvEvU0vOG9zBOWYoygFlzt+JaQ2m1u2p54D+wc8ply8aNShZeqQzxzLCneWHFforD/hfXOlIEzpzt3zVyQEMVPe3Q2XFeVjluR7dp1OEJNikktFVR0JlNtsDfRfnSkN1WtXXAPz/JjlyNDUtSI8hW0CZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755855332; c=relaxed/simple;
-	bh=eSnmXWts4lneydS0K/gTCRVPllwqwqUG5QtbWvHQzRg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=d36N3QXKQ5/oO09Ylx+tkiErCdqkmzv5Jfd6DCPmFwg7LTG1xA5wWi3hlUedcQIHab+T29wtvCqk/0vVF64dX6OrM0O4vlpYdbwFANK8SxB6tjCyN82aIg9/c4gvud+qGphOL2OayOuxzDFVzHJDvgzrtEMDsVHHvMTB2rTEia4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=FUlBe9oD; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=XYDerVas; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=FUlBe9oD; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=XYDerVas; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 4CB4221EF7;
-	Fri, 22 Aug 2025 09:35:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1755855315; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x3cvBSh7xfmCgersmZjZ++hf/VLsBTmIFoCXCaq9iVA=;
-	b=FUlBe9oD26o0XZdtDyHCgjBg62Z0OGVJO5zSxXGPr7Wz8cTYQnTti9yOvKF/S3OB/VDugC
-	tunprtW+mUJyBNWWyo0gHHlZRr3ZxpTMPjaZDX7Fp6G0rdG8hEeAH9kHuxivjZFbQ9fvUk
-	82Sgu1aMjrUsG9rq8MJLy0jjFDvPomg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1755855315;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x3cvBSh7xfmCgersmZjZ++hf/VLsBTmIFoCXCaq9iVA=;
-	b=XYDerVasOgVrlHTFHZVf9HKe46rgSqVEXgEyQ84aN+Nwp4pV3qm0CZK7iOMIM5f9RIg9vP
-	pcFtzOSdxAjxNMDA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1755855315; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x3cvBSh7xfmCgersmZjZ++hf/VLsBTmIFoCXCaq9iVA=;
-	b=FUlBe9oD26o0XZdtDyHCgjBg62Z0OGVJO5zSxXGPr7Wz8cTYQnTti9yOvKF/S3OB/VDugC
-	tunprtW+mUJyBNWWyo0gHHlZRr3ZxpTMPjaZDX7Fp6G0rdG8hEeAH9kHuxivjZFbQ9fvUk
-	82Sgu1aMjrUsG9rq8MJLy0jjFDvPomg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1755855315;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x3cvBSh7xfmCgersmZjZ++hf/VLsBTmIFoCXCaq9iVA=;
-	b=XYDerVasOgVrlHTFHZVf9HKe46rgSqVEXgEyQ84aN+Nwp4pV3qm0CZK7iOMIM5f9RIg9vP
-	pcFtzOSdxAjxNMDA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4660C13A31;
-	Fri, 22 Aug 2025 09:35:14 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id wK3sDtI5qGihMAAAD6G6ig
-	(envelope-from <svarbanov@suse.de>); Fri, 22 Aug 2025 09:35:14 +0000
-From: Stanimir Varbanov <svarbanov@suse.de>
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-rpi-kernel@lists.infradead.org,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrea della Porta <andrea.porta@suse.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Phil Elwell <phil@raspberrypi.com>,
-	Jonathan Bell <jonathan@raspberrypi.com>,
-	Dave Stevenson <dave.stevenson@raspberrypi.com>,
-	Stanimir Varbanov <svarbanov@suse.de>,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: [PATCH v2 5/5] arm64: dts: broadcom: Enable RP1 ethernet for Raspberry Pi 5
-Date: Fri, 22 Aug 2025 12:34:40 +0300
-Message-ID: <20250822093440.53941-6-svarbanov@suse.de>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20250822093440.53941-1-svarbanov@suse.de>
-References: <20250822093440.53941-1-svarbanov@suse.de>
+	s=arc-20240116; t=1755855463; c=relaxed/simple;
+	bh=KGxVlyktlvMg2J3Z7DFu9zukuowEvZnlKoc7wpeFJRc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Frth7PkTcbnuIgA+RhIgEnOmYkkSVrKxAuyZTVbSVVR+++1luYNNLms4XO5lxyzu+Vxwm2aeXD+9H91FM3sPUaujjByCpNUoA1vIpMfgsOIgZUmS8HUUVvumJFQ8ijkAUkEHjSXBA4DkHtmRP/rsB1RO9Tets1W522BHQ1HCo3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=z/YYL4dX; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4b109c6b9fcso20499861cf.3
+        for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 02:37:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755855460; x=1756460260; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G/wAkSeCI/p5BRy3MuUgX12/OtD3Iw4XHsnLLdUUoSk=;
+        b=z/YYL4dXbgcDD8ip5kDceSvuckS6z100K0HReJ5GmpXLGwnTx31/Y1HFEWU9p+6QAY
+         sQpkxHLCwHr1dMtlePe1gSnXrS9vqEyd1NYjNdFNVTggVhoyPAQEA8EorNNUomTzQU86
+         oxAQJMZI4jMNy9jtPy7d66J+Txmj2QWNBO86Ufvv65+gyOTPzYLJZJjiadXbc0rlY74R
+         4X4V2fsImkq5Cw2L/zBaQddDy4YLxSkHqOqzlVkvaxKVIj2NnXQ9V7gu/pOtzPb4thOr
+         bMzVfqUK217LNesPetxygHgHFunH3zu3BBy6Reu0PvSDzbVGYRnyPevKGZkmRk7n8T4W
+         TC/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755855460; x=1756460260;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=G/wAkSeCI/p5BRy3MuUgX12/OtD3Iw4XHsnLLdUUoSk=;
+        b=w1Qwz/Kk4vKTklzCBzn2m1S3e8VgiqhG6ycrHJDtNAF9hW08Ry/kFiyXNG2Ms28cvI
+         Koz4QMoQ8H8JsKJgdm34UGdcseSMBtiaAIxMuw8gxh9U8b5T7O7bau93cXcxD1PFFDMX
+         EnRoq4iQi9JJQY7mQzFK4k2kelgzXXvHbpgwyGhHOEVvt+fISR7SY0mhpIMPBPMfJ8Wt
+         e7JKJfnMAi2Lg+fnECliiOtUKxMtz5pPTv3qrZfK+dBkNa2S+GsZbkIT6WAbaU78UxwE
+         Sfon56C1HsjatiWD096gj5FY5oRAiWURkj8YVkzJpBBw2Sj273wQT9UWcg4sFqcr/W0M
+         TUBw==
+X-Gm-Message-State: AOJu0YyoQQJ6Cf1CClNhJxwqfdAYsHCeftRxbliGOyrOTIx74Mmx3lBc
+	9oPPIbZDwt4H1J2Kn3Jwrf4NkiW/tUVlXdI7P6UMdtlONgHxexQbCIPh+clq/eFS/DlWXzMt+fA
+	ZMQrojmbOfFbgDxE9JQhso9CrqEWhOItHvDB63Ogp
+X-Gm-Gg: ASbGnct9i8J+uilfGa1xGhSmeEEaCW5ZMSD1NnprRxNuKj6t2L3GEJlZP7qo2NNodU+
+	u34VcevVR7Hv7JU/VtJInv+vWHqU8LFCxVNyzOyRZ4JeKnSyS6g3+Q8p/ScWyl275HPFb3g/u6s
+	Qhesb9JlCY8wjNJkdHAZiwawXDgTgIeqvin+R595OiNy4q0QKPLaUMHwA+15h4rnSMLRFHWuaCB
+	Zz9n79U3DdcgU8=
+X-Google-Smtp-Source: AGHT+IGCJ82v4V9A6pgJMz352LL/ClfK8PaNlBmvVnfkOmiDocAdZv4anLPGxqxW4fN2Gqkb+zb4WTSiJIxlj91+3qA=
+X-Received: by 2002:ac8:5e0f:0:b0:4b2:9d9c:22d5 with SMTP id
+ d75a77b69052e-4b2aaa1a280mr23744591cf.6.1755855459705; Fri, 22 Aug 2025
+ 02:37:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-5.30 / 50.00];
-	REPLY(-4.00)[];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[dt,netdev];
-	DBL_PROHIBIT(0.00)[0.0.0.1:email];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RL7mwea5a3cdyragbzqhrtit3y)];
-	TO_MATCH_ENVRCPT_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo];
-	RCVD_COUNT_TWO(0.00)[2];
-	RCVD_TLS_ALL(0.00)[]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Spam-Score: -5.30
+References: <aKgnLcw6yzq78CIP@bzorp3> <CANn89iLy4znFBLK2bENWMfhPyjTc_gkLRswAf92uV7KY3bTdYg@mail.gmail.com>
+ <aKg1Qgtw-QyE8bLx@bzorp3>
+In-Reply-To: <aKg1Qgtw-QyE8bLx@bzorp3>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 22 Aug 2025 02:37:28 -0700
+X-Gm-Features: Ac12FXzkoTpl_TV3jzySZ_fT8mz-36-tbCfSCwa_lYkImkPo_yzbxROcGrHuCsc
+Message-ID: <CANn89i+GMqF91FkjxfGp3KGJ-dC6-Snu3DoBdGuxZqrq=iOOcQ@mail.gmail.com>
+Subject: Re: [RFC, RESEND] UDP receive path batching improvement
+To: Balazs Scheidler <bazsi77@gmail.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Enable RP1 ethernet DT node for Raspberry Pi 5.
+On Fri, Aug 22, 2025 at 2:15=E2=80=AFAM Balazs Scheidler <bazsi77@gmail.com=
+> wrote:
+>
+> On Fri, Aug 22, 2025 at 01:18:36AM -0700, Eric Dumazet wrote:
+> > On Fri, Aug 22, 2025 at 1:15=E2=80=AFAM Balazs Scheidler <bazsi77@gmail=
+.com> wrote:
+> > > The condition above uses "sk->sk_rcvbuf >> 2" as a trigger when the u=
+pdate is
+> > > done to the counter.
+> > >
+> > > In our case (syslog receive path via udp), socket buffers are general=
+ly
+> > > tuned up (in the order of 32MB or even more, I have seen 256MB as wel=
+l), as
+> > > the senders can generate spikes in their traffic and a lot of senders=
+ send
+> > > to the same port. Due to latencies, sometimes these buffers take MBs =
+of data
+> > > before the user-space process even has a chance to consume them.
+> > >
+> >
+> >
+> > This seems very high usage for a single UDP socket.
+> >
+> > Have you tried SO_REUSEPORT to spread incoming packets to more sockets
+> > (and possibly more threads) ?
+>
+> Yes.  I use SO_REUSEPORT (16 sockets), I even use eBPF to distribute the
+> load over multiple sockets evenly, instead of the normal load balancing
+> algorithm built into SO_REUSEPORT.
+>
 
-Signed-off-by: Stanimir Varbanov <svarbanov@suse.de>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
----
- .../boot/dts/broadcom/bcm2712-rpi-5-b.dts      | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+Great. But if you have many receive queues, are you sure this choice does n=
+ot
+add false sharing ?
 
-diff --git a/arch/arm64/boot/dts/broadcom/bcm2712-rpi-5-b.dts b/arch/arm64/boot/dts/broadcom/bcm2712-rpi-5-b.dts
-index a70a9b158df3..c70d1cb7f3b6 100644
---- a/arch/arm64/boot/dts/broadcom/bcm2712-rpi-5-b.dts
-+++ b/arch/arm64/boot/dts/broadcom/bcm2712-rpi-5-b.dts
-@@ -23,3 +23,21 @@ &pcie1 {
- &pcie2 {
- 	status = "okay";
- };
-+
-+&rp1_eth {
-+	status = "okay";
-+	phy-mode = "rgmii-id";
-+	phy-handle = <&phy1>;
-+
-+	mdio {
-+		reg = <0x1>;
-+		reset-gpios = <&rp1_gpio 32 GPIO_ACTIVE_LOW>;
-+		reset-delay-us = <5000>;
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+
-+		phy1: ethernet-phy@1 {
-+			reg = <0x1>;
-+		};
-+	};
-+};
--- 
-2.47.0
+> Sometimes the processing on the userspace side is heavy enough (think of
+> parsing, heuristics, data normalization) and the load on the box heavy
+> enough that I still see drops from time to time.
+>
+> If a client sends 100k messages in a tight loop for a while, that's going=
+ to
+> use a lot of buffer space.  What bothers me further is that it could be o=
+k
+> to lose a single packet, but any time we drop one packet, we will continu=
+e
+> to lose all of them, at least until we fetch 25% of SO_RCVBUF (or if the
+> receive buffer is completely emptied).  This problem, combined with small
+> packets (think of 100-150 byte payload) can easily cause excessive drops.=
+ 25%
+> of the socket buffer is a huge offset.
 
+sock_writeable() uses a 50% threshold.
+
+>
+> I am not sure how many packets warrants a sk_rmem_alloc update, but I'd
+> assume that 1 update every 100 packets should still be OK.
+
+Maybe, but some UDP packets have a truesize around 128 KB or even more.
+
+Perhaps add a new UDP socket option to let the user decide on what
+they feel is better for them ?
+
+I suspect that the main issue is about having a single drop in the first pl=
+ace,
+because of false sharing on sk->sk_drops
+
+Perhaps we should move sk_drops on a dedicated cache line,
+and perhaps have two counters for NUMA servers.
 
