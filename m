@@ -1,151 +1,178 @@
-Return-Path: <netdev+bounces-215963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1863B3128F
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 11:08:17 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05DADB31290
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 11:08:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B97797AE002
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 09:06:42 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DBB504E5B1F
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 09:08:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 763382EDD5C;
-	Fri, 22 Aug 2025 09:08:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C8FC2ED84E;
+	Fri, 22 Aug 2025 09:08:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=maxlinear.com header.i=@maxlinear.com header.b="A0K+YxLI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2074.outbound.protection.outlook.com [40.107.94.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9CF22EACE3
-	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 09:08:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755853687; cv=none; b=qJmrlySJ6QsI6Nj8pYmWUGVYx5geHomWCC091C4CJKVNeWcdd/HOts70ikyTx3oyzjc0hq/gCra6j+uuuMDwW93pMD3310k/H7MY8nBV2Nsr4PHO7B/Kpx7/kDjG9Pwz4kMi1g9JKEanm1g+ZxOAuB5GQ/XyIcR/IU9MOC2hFgA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755853687; c=relaxed/simple;
-	bh=9TSSZyKjJ0d3s2gjl1o0gZbkzbAiwGdZRFEiiOB7hX0=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=bmlL2EzJPRqk/zpfa7zQ22qdVJEP8YlyzRkf9IjsAlmOix9Cz0/9Jb+36Z4er2pUX0d+xgzJijbx4vvc7d5gQ06pPWfh5TQVIExRR4CBN1lVM4b2L2o4N9xQQBelEdiLR8ikv9+j8czded/1YOrX74vgyr0JDyO1vJPFmA2XG5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-88432e62d01so231406639f.3
-        for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 02:08:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755853685; x=1756458485;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VegEE/8h7OauzJkfJVbztSWMF3ODdKEV7dLA21bWxOs=;
-        b=itT9RgP1nRn65qyO3PGfS5f77gFZGujEFpNfSeIPfDxfxeOE9bBEoMlgmQXUJxk03t
-         g+MHE26eNSL5eUTagf70RXdwbj2kXla4ZmOPrufjBtO0ljt7x51WSTVB9wJEQSkP4nrx
-         44UxD13paWC8IAvo6QmxlOntXlUCdtIyQk2dX7KX8suX+BF7DLzJlCzzsfUXl8gi3qw7
-         7Mek9OgGRdDDHFR3JHcu0+2W2uD7K3wRipgxMm4tbRIeD/W9jhpy2o+dmUEHSjYuEdmd
-         dB3humII69E3UE+zNsOh5m8F0MTAwgMwt22pO55y7m6q9pqj9JUk/6650Kuc94/3cl8d
-         EL/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWLFkJ4UVH2T8CnWmm233NiQpN0XxueTYY5YQl3RnYeac1CBa9tirVrFrVnxAJEOsT9KdDubYg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbW6cRCXhBv3cltB/tVgdn07mF4DH9S1Qdc8POAFNQ+PRCFxZ6
-	jVMP2romZ149WRm2zZGPMn9qiBe6gD867PNLL6qjuEv1KnzhQUXAUrY9lqq5Vg7AxR54lptogEL
-	oYNeI8OloatD7FUDNkNfPFyTN3LcWAW7WfDt4g7Y3y7KpGfXyPFslp/T8QjE=
-X-Google-Smtp-Source: AGHT+IHmk+VNXNUi2Xo7de+YtmISF+yvT6EJoT90lW3ebCSHysHBUY2AA7+6I5d6kVDxmaCGW8xGL6feuNpo/gBuBLQpcQ1yKFbP
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A43B225762;
+	Fri, 22 Aug 2025 09:08:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.74
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755853714; cv=fail; b=Rq1/vXQzDjDwEjZCApaB/fRfr00nhS4SDgoc2iDIVzBAcD9lqtIB5F7X7Lo3LybXT7tKoo1LFbtFjFLjMpFIEyBvFoAThNGLoqdOOqmmWbPcWhsZ5fWIml384Xb85NyyRSFi6Ong5cnPcg66D9M9ja3aAf5xzq3Ti90Yu9ur4I4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755853714; c=relaxed/simple;
+	bh=636fccD9o+AY9gQUKpxakW/cCHZflZ1UxyP034rK/EU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rZZIwZzLErB+PDP3Hz/R/tXrZGnoL4JhXAJwh+DZaV4VmTh4pm4nWNrd4SJLpGZ7EIwHapx/LhkMQsHNElZJzIFIbiozFkgjVVzUqXcv0BNZK8SFiUREej9OAHXHpEMW8qD5aBzYNVjgXDZYRgKweugkWFRI4llrBaLVj1lp91A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=maxlinear.com; spf=pass smtp.mailfrom=maxlinear.com; dkim=pass (2048-bit key) header.d=maxlinear.com header.i=@maxlinear.com header.b=A0K+YxLI; arc=fail smtp.client-ip=40.107.94.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=maxlinear.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=maxlinear.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=WRDaXTAXU3IqEHL9psUovOhL2w1kRZOwrYVTwxIK7rAA1Bxu9c9UAzAWYrNilTimOOj0FdyU/kvG8lUz49bkTRwAwH7zp5iP80ySu6hXffkoPh/qn3K8sgWxEtntx6j2BnhGga4xLv3/kM1CMQxh2VlcIVA+Oqg0ZXVU+kAjaBtDN9fIwro/x/B+T3KR3/PPPlLEaB0sEkbS/CKu/Lyn8Uz23mr5nMzmhDArUS+STE3r2K/Tn7l+YWp9a/dokpaHTLc8vGVk636ahbq16dmGJmSd0y0JcFAJpN4kJ/e6zyuMBsJWMAMjlW5VncOM4UnTRTEEojSPGwl1dKmoVHBZJw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rxEmkj7WKZnmFTfPcPSBvmguCRvieEyfXi9xzmoBlF8=;
+ b=OzSWoQtCb7sHp50lEAuiMawReLVcoSzLHnAcov4HnrF7K6pKzdza72DSnVHZwEoeHELBkT50htO3+G9ThWh0LEhpQKQSS4pfIcNg3m1GlPEPHMn4IqAbS/CkN3wUK8Dl8WKx7nWwhqe7D4sRIvTiDBTAXNl0T+g1TsdWvPOpOBwcb7dTWzbhQ+J38bULrX7Lt+Mw53adiH0Jh/kTsiFx1wO+E+vZN0HMOew9N1mniz+HcoQAN7tcJPXozNEEBH2xLJ2KrIkKhkQnoDaiqF4HHCP/1l0HutVLnO+YMs0pWWqY0Zj2q1dwKFqOk/cMIOQqTJqehbF34s7X4/uDAgQ9pw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 174.47.1.83) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=maxlinear.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none
+ header.from=maxlinear.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=maxlinear.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rxEmkj7WKZnmFTfPcPSBvmguCRvieEyfXi9xzmoBlF8=;
+ b=A0K+YxLIVy5NmxItk6cdk6QVW5m9HlSXfJiRuIdrQAm5E55vq75vGJAHF6u2yLfpHw/+Sl39uy9BWNdUQTyDZeCsFt6Z6ubAXacz+aumhSAUpAh3R72zsKktj6TN3T+CnDlkPVkAXDgZvVQw1Ehufq3u4pFdUfsiGZ5fryJUU33C6pzLALeOg20hTEc3XEFUSbQ6IE7w0PGi7DzChJjQeev3H9BoaK6AcIPIeB0RwHoyMGVXY5fGw8AlxMs2icTvJ/bxiT1+AR7ak1cdbNaW0lkjVFV7N7w8OJczub3oXpSNY3d8W79zsEWrHanoLYxyRqY3eWFWWvsKfEfv3KHA1A==
+Received: from MN0PR04CA0008.namprd04.prod.outlook.com (2603:10b6:208:52d::22)
+ by SA3PR19MB8193.namprd19.prod.outlook.com (2603:10b6:806:37e::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.14; Fri, 22 Aug
+ 2025 09:08:27 +0000
+Received: from BL02EPF0001A0FC.namprd03.prod.outlook.com
+ (2603:10b6:208:52d:cafe::88) by MN0PR04CA0008.outlook.office365.com
+ (2603:10b6:208:52d::22) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9052.17 via Frontend Transport; Fri,
+ 22 Aug 2025 09:08:27 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 174.47.1.83)
+ smtp.mailfrom=maxlinear.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=maxlinear.com;
+Received-SPF: Pass (protection.outlook.com: domain of maxlinear.com designates
+ 174.47.1.83 as permitted sender) receiver=protection.outlook.com;
+ client-ip=174.47.1.83; helo=usmxlcas.maxlinear.com; pr=C
+Received: from usmxlcas.maxlinear.com (174.47.1.83) by
+ BL02EPF0001A0FC.mail.protection.outlook.com (10.167.242.103) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.9052.8 via Frontend Transport; Fri, 22 Aug 2025 09:08:26 +0000
+Received: from sgb016.sgsw.maxlinear.com (10.23.238.16) by mail.maxlinear.com
+ (10.23.38.120) with Microsoft SMTP Server id 15.1.2507.55; Fri, 22 Aug 2025
+ 02:08:21 -0700
+From: Jack Ping CHNG <jchng@maxlinear.com>
+To: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>
+CC: <davem@davemloft.net>, <andrew+netdev@lunn.ch>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <robh@kernel.org>,
+	<krzk+dt@kernel.org>, <conor+dt@kernel.org>, <yzhu@maxlinear.com>,
+	<sureshnagaraj@maxlinear.com>, Jack Ping CHNG <jchng@maxlinear.com>
+Subject: [PATCH net-next 0/2] Add MxL Ethernet driver & devicetree binding
+Date: Fri, 22 Aug 2025 17:08:07 +0800
+Message-ID: <20250822090809.1464232-1-jchng@maxlinear.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1564:b0:3e9:eec4:9b5f with SMTP id
- e9e14a558f8ab-3e9eec49ee0mr2649515ab.30.1755853684885; Fri, 22 Aug 2025
- 02:08:04 -0700 (PDT)
-Date: Fri, 22 Aug 2025 02:08:04 -0700
-In-Reply-To: <20250822-b4-tcp-ao-md5-rst-finwait2-v1-0-25825d085dcb@arista.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68a83374.050a0220.3809a8.0004.GAE@google.com>
-Subject: [syzbot ci] Re: tcp: Destroy TCP-AO, TCP-MD5 keys in .sk_destruct()
-From: syzbot ci <syzbot+cif1e3ec255ad34895@syzkaller.appspotmail.com>
-To: 0x7f454c46@gmail.com, davem@davemloft.net, devnull@kernel.org, 
-	dima@arista.com, dsahern@kernel.org, edumazet@google.com, gilligan@arista.com, 
-	horms@kernel.org, kuba@kernel.org, kuniyu@google.com, 
-	linux-kernel@vger.kernel.org, ncardwell@google.com, netdev@vger.kernel.org, 
-	noureddine@arista.com, pabeni@redhat.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF0001A0FC:EE_|SA3PR19MB8193:EE_
+X-MS-Office365-Filtering-Correlation-Id: c5fd845b-9c2e-492f-024d-08dde15b7429
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|36860700013|376014|1800799024|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Tjd6v14/ZWQxBaGs7o50E3u+agHvZyJ5NloIJBLbCXZ0DLbOPz0moPvB8kaF?=
+ =?us-ascii?Q?GIZm6ZdDhcCj09QnDVjgw4Ad+L38RHd1F7T1Q3XPtfRVg0FWuJV5uOVfEeyw?=
+ =?us-ascii?Q?lyaba3Er8qXxVsIPhqZpmw9hyGb9II2ys6swIH8/72kOTPCeQOLWQb/pOz5y?=
+ =?us-ascii?Q?vd+6nJK9h9ASEsJ50BkAYnrwtkezjBHJ7/jy2rvgADjm5JIwzXbnwlmm9DCT?=
+ =?us-ascii?Q?F0LV4NbBlg/SR71BXmQRH5iStDZccK43MHJO/oo0A+MUN4Hou5xGB35QjrTg?=
+ =?us-ascii?Q?YwB6Qdb4eWfkTyRo2Np45j7xKJeI5Z/h17B5wqETfVEjpHx0mgGV39sXKKPu?=
+ =?us-ascii?Q?mRy7nRpfn5mB4oXznOeJmHnJxEtGBWlfQM1DFBhKQcbc3kkRFVxJrRG0XlIX?=
+ =?us-ascii?Q?UGugZvkQEtw5MpsNdwduyM+ByDdxXs3BXa8w7KmATIqYcLz0lKk+P/+39Dcc?=
+ =?us-ascii?Q?VNV750UHeDcWAsidl7zzKIOahIvoNxGxaLEI+KHxbpEnXwQzaSy5tXPYyxPL?=
+ =?us-ascii?Q?U1AXQpy6Af9Y39rEiNqBy5aEgwNV03ezsq4PQ4t9YOVlsDO83rCTLb364mVb?=
+ =?us-ascii?Q?cQaVHJev1Kjm3TjkBkzuLT5BqoN/cPW58p2MoUSZZBEU1YJyEyV/Fa+FffUF?=
+ =?us-ascii?Q?cmWgabSZitGcqN01efZPIl07VLv9HdQP+XBbyyitYCpOP8SpWpeSPJ654Syn?=
+ =?us-ascii?Q?GkM8ZOtPJVp3g40yq5DrMnj0K5ETrpqTH5AVPIAYf8yQjCyh1dEstnDVwucD?=
+ =?us-ascii?Q?I9ujIxXyt4uHLYwXRvC2sG+fFanLhiB3gfse7lvZHLrUGaDCVznhM73afCdE?=
+ =?us-ascii?Q?xm61sTHnJ0zQci7halmMZ6OaZ6Z5M6gNK37+Qf/S90qNaMXHYUpPVbQ+A9V1?=
+ =?us-ascii?Q?3fK1vCnO09vS4vIWm0pvBMqpTk1Lze77J54EfnmJOij2/GzNZ9+2TfsqY4/M?=
+ =?us-ascii?Q?bC71IweQhAaz4Ll/ppuilkwZ9OdQVvAQdHU9ntruII3v5qY9V6KfD7RYeKpi?=
+ =?us-ascii?Q?PU8oTfyiBm0yXOtF+bk1UKi+xyTOoOzfzg+fvPThMnCuoNPktdedHoKwwfji?=
+ =?us-ascii?Q?8D91krRAbxt7ZWMDP+e+9cGHCPUVq2fC26e3UOIF2cmGm4sSrMfSlTxOv9TO?=
+ =?us-ascii?Q?6AB/EZnqeY0QIJeNVPgC8/RTn91/snpsEGD++7uF0o8WBtXvlP3/zo+y/zcT?=
+ =?us-ascii?Q?59yhLMF7eKdj694SE4yjYCSbFqB/vRMVe9yggpJGaMTRReh1jLdu22f2B9Rn?=
+ =?us-ascii?Q?DBGNfS/Rd1jJmMGWq7Ahylf50xDkQ3EtGxjNLd1ozFvGb1x4L+P3hzXuG4FN?=
+ =?us-ascii?Q?v1aFRwJ/onE7JsnmFGTr8KpBVJfjqf7JcSRu0dnA1NNgP23a6jtBMPEC2zxR?=
+ =?us-ascii?Q?YuytYW72TzYNFsnJ+b4yxI+BPeNhDKj6lrLWhZTzzmkr94t/y3SwsWit3HAF?=
+ =?us-ascii?Q?oSyQZpgJo4vGqStv8MRSf0Z07UGOhBQrNMcbMDqIzvYgeWi0CAgW16FmaJSU?=
+ =?us-ascii?Q?ufAunbY2yIi+yd0gOkXpfAtPem9clqz8zU4D?=
+X-Forefront-Antispam-Report:
+	CIP:174.47.1.83;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:usmxlcas.maxlinear.com;PTR:174-47-1-83.static.ctl.one;CAT:NONE;SFS:(13230040)(7416014)(36860700013)(376014)(1800799024)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: maxlinear.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Aug 2025 09:08:26.2083
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c5fd845b-9c2e-492f-024d-08dde15b7429
+X-MS-Exchange-CrossTenant-Id: dac28005-13e0-41b8-8280-7663835f2b1d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=dac28005-13e0-41b8-8280-7663835f2b1d;Ip=[174.47.1.83];Helo=[usmxlcas.maxlinear.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL02EPF0001A0FC.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR19MB8193
 
-syzbot ci has tested the following series
+Hello netdev maintainers,
 
-[v1] tcp: Destroy TCP-AO, TCP-MD5 keys in .sk_destruct()
-https://lore.kernel.org/all/20250822-b4-tcp-ao-md5-rst-finwait2-v1-0-25825d085dcb@arista.com
-* [PATCH net-next 1/2] tcp: Destroy TCP-AO, TCP-MD5 keys in .sk_destruct()
-* [PATCH net-next 2/2] tcp: Free TCP-AO/TCP-MD5 info/keys without RCU
+This patch series adds support for the MaxLinear LGM SoC's Ethernet
+controller, including:
 
-and found the following issue:
-WARNING in inet_sock_destruct
+Patch 1: Adds build infrastructure and the main driver for the MaxLinear LGM
+SoC Ethernet controller.
+Patch 2: Introduces the devicetree binding documentation for the MaxLinear LGM
+Network Processor.
 
-Full report is available here:
-https://ci.syzbot.org/series/4e53fc18-79b4-47d6-87c4-89e499e12879
+The driver supports multi-port operation and is integrated with standard Linux
+network device driver framework. The devicetree binding documents the required
+properties for the hardware description.
 
-***
+Please review and let me know if any changes are required.
 
-WARNING in inet_sock_destruct
+Jack Ping CHNG (2):
+  net: maxlinear: Add build support for MxL SoC
+  dt-bindings: net: mxl: Add MxL LGM Network Processor SoC
 
-tree:      net-next
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
-base:      a9af709fda7edafa17e072bffe610d9e7ed7a5df
-arch:      amd64
-compiler:  Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-config:    https://ci.syzbot.org/builds/d6e1c7cd-df1b-4192-bc2d-a2db69987793/config
-C repro:   https://ci.syzbot.org/findings/62fd81c8-8c8c-49fe-aa87-8e1418bcc053/c_repro
-syz repro: https://ci.syzbot.org/findings/62fd81c8-8c8c-49fe-aa87-8e1418bcc053/syz_repro
+ .../devicetree/bindings/net/mxl,lgm-eth.yaml  |  59 +++++
+ .../device_drivers/ethernet/index.rst         |   1 +
+ .../device_drivers/ethernet/maxlinear/mxl.rst |  72 ++++++
+ MAINTAINERS                                   |   7 +
+ drivers/net/ethernet/Kconfig                  |   1 +
+ drivers/net/ethernet/Makefile                 |   1 +
+ drivers/net/ethernet/maxlinear/Kconfig        |  15 ++
+ drivers/net/ethernet/maxlinear/Makefile       |   6 +
+ drivers/net/ethernet/maxlinear/mxl_eth.c      | 205 ++++++++++++++++++
+ 9 files changed, 367 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/mxl,lgm-eth.yaml
+ create mode 100644 Documentation/networking/device_drivers/ethernet/maxlinear/mxl.rst
+ create mode 100644 drivers/net/ethernet/maxlinear/Kconfig
+ create mode 100644 drivers/net/ethernet/maxlinear/Makefile
+ create mode 100644 drivers/net/ethernet/maxlinear/mxl_eth.c
 
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 6012 at net/ipv4/af_inet.c:153 inet_sock_destruct+0x5f9/0x730 net/ipv4/af_inet.c:153
-Modules linked in:
-CPU: 0 UID: 0 PID: 6012 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:inet_sock_destruct+0x5f9/0x730 net/ipv4/af_inet.c:153
-Code: 00 41 0f b6 74 24 12 48 c7 c7 20 91 9e 8c 4c 89 e2 48 83 c4 20 5b 41 5c 41 5d 41 5e 41 5f 5d e9 dd 38 24 f7 e8 68 44 bc f7 90 <0f> 0b 90 e9 62 fe ff ff e8 5a 44 bc f7 90 0f 0b 90 e9 95 fe ff ff
-RSP: 0018:ffffc90003a0fc58 EFLAGS: 00010293
-RAX: ffffffff8a0366c8 RBX: dffffc0000000000 RCX: ffff888106891cc0
-RDX: 0000000000000000 RSI: 00000000000003c0 RDI: 0000000000000000
-RBP: 00000000000003c0 R08: ffff88803bb429c3 R09: 1ffff11007768538
-R10: dffffc0000000000 R11: ffffed1007768539 R12: ffff88803bb42880
-R13: dffffc0000000000 R14: ffff88803bb429c0 R15: 1ffff11007768512
-FS:  00005555690ff500(0000) GS:ffff8880b861a000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000200000f65000 CR3: 0000000106d3a000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- __sk_destruct+0x89/0x660 net/core/sock.c:2339
- inet_release+0x144/0x190 net/ipv4/af_inet.c:435
- __sock_release net/socket.c:649 [inline]
- sock_close+0xc3/0x240 net/socket.c:1439
- __fput+0x44c/0xa70 fs/file_table.c:468
- task_work_run+0x1d4/0x260 kernel/task_work.c:227
- resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
- exit_to_user_mode_loop+0xec/0x110 kernel/entry/common.c:43
- exit_to_user_mode_prepare include/linux/irq-entry-common.h:225 [inline]
- syscall_exit_to_user_mode_work include/linux/entry-common.h:175 [inline]
- syscall_exit_to_user_mode include/linux/entry-common.h:210 [inline]
- do_syscall_64+0x2bd/0x3b0 arch/x86/entry/syscall_64.c:100
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fa54ab8ebe9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffc0978c268 EFLAGS: 00000246 ORIG_RAX: 00000000000001b4
-RAX: 0000000000000000 RBX: 000000000000ce2e RCX: 00007fa54ab8ebe9
-RDX: 0000000000000000 RSI: 000000000000001e RDI: 0000000000000003
-RBP: 0000000000000000 R08: 0000000000000001 R09: 000000040978c55f
-R10: 0000001b30220000 R11: 0000000000000246 R12: 00007fa54adb5fac
-R13: 00007fa54adb5fa0 R14: ffffffffffffffff R15: 0000000000000006
- </TASK>
+-- 
+2.34.1
 
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
