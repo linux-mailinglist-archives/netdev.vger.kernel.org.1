@@ -1,197 +1,215 @@
-Return-Path: <netdev+bounces-216013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DFC9B3180D
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 14:40:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91353B31854
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 14:51:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A214600D7A
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 12:40:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B06A11BA2783
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 12:50:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E67BE2FB98A;
-	Fri, 22 Aug 2025 12:40:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8B5C2FC894;
+	Fri, 22 Aug 2025 12:49:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="3BYFJHp4"
+	dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b="adS1WEBo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2061.outbound.protection.outlook.com [40.107.237.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09223271443
-	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 12:40:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755866409; cv=none; b=mH/2Jd0gg/7FqIrsa7/ajEJ8Zsu9wcSju1+Hw5Sl4zfqXBtB6RWNYHUQvVhIms0T2LyaUjMh+lmym/SuYYlVX/jrNlTMzYRyEEXrTC4LsBJXPUxbfVZH7x/UTDhLx7vDVFZrulhPaX6ZZkWa3ewJVZRR50z8QKQxo3+4RdlJxUE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755866409; c=relaxed/simple;
-	bh=dph5PYREDD1pA0b8chqVFqGvC+vOsxLs/HqOrSPAUes=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FAJT9bcGnpY1uI2Sqo3apjfOUUBG4m4J6R6NbIvTFD8uUE2xu2lZaOeVbPFM8f3SbMczd8/K4wWqYq65jGi+Pv3eEgZifqx1H/qx/7s4W1UnyDMR5jlZGsRqoYHoXlNHD/UzzMZ1p390SAwqR6XeQpW7kse/2LdjN29zgRfq1h4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=3BYFJHp4; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-76e2e6038cfso2401937b3a.0
-        for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 05:40:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1755866406; x=1756471206; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=B+yr9sRToH/PruAdIM7WqBdD3kL6ipM/1pLENcMhk1k=;
-        b=3BYFJHp4t8Uz2lOHeVi/WjBt60rnY+N2KcNxGq39dpJdpJTj5U5P6ezvTwrJUDU9l7
-         3Jb1iz+nD3Y+tkXLroqhSA6OEZfnaPRF79I7cLGR0WvunLaGZG3innM5YqJ8CFW4CGHq
-         JDy1qY/gpL0rctROy3bM5jEmA9JjIzr39ThsjIQa8vTWu1stkmeXc+HfwDRY/q1+dXAN
-         YLFCWaXJgrcE0bPYKCMuuJ/rvNl/mqedyse36M1i/+sq15UdBlAxvRaE74Eg7bZybk+s
-         gRFkt5Z6heJTOo+kH6YoZBuHFwwqIhFfDPGNyrjkEeUzkDsvdr9lKaMKhKSs9rbQ03Bj
-         6jnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755866406; x=1756471206;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B+yr9sRToH/PruAdIM7WqBdD3kL6ipM/1pLENcMhk1k=;
-        b=Kx41uu9TXydvf6HmvAnmunNU7GO7Ffowhe9TF2MH5ZxRns5WW90ZIUtHjfzTlU4prz
-         E+eeba2TCWn4OU1Mp5xLiAgrEXBK26LQOWYAuQ6VNV8AHr+AFSiQb/vvNQBuQZRPBxZ7
-         6EnV2L5d94D/J72ne/9qujJuCW7qS91cwohqF9SI2rbTMGylgPLKAQ1v4/DZOyLETLlP
-         NCA275t2y0IojfXJnFJ4kBJzddc2KFAR5q4MS/XQ9zSxvYyXHUsBl6huuLGEBS0JPL28
-         p0lCYnVlfVQGgyT1iQ90o1ZYuGycTQAAjMIgZA3rbRzAjN4KolGi75MExkibbKlYJAO9
-         XGCw==
-X-Forwarded-Encrypted: i=1; AJvYcCUqXCRGNTZvz8CYJTDDJe6lgqfr3xYuRKFKDW0dnCd4386ncDfCEQhRKzaHbTg+1Wm5Qyaz9t8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPDpTn/L8CkM8cF1daEpjJsgk4aIBiOVn6z/zfUZQC1wge7IUY
-	CkKslYChJ2JTsl9RT2h8N5ZYLsgKHB30B2eYxokQYZWwHQHdrUrGlsI1W8WJfZyjvQ==
-X-Gm-Gg: ASbGncuvloHaOUCdaINj6QqqfgnxftrmEQfaEoYS3f8Zbcjgu9WsMcEYKt/Bagf+egY
-	8aQEkOBMMyC0Erm1ypAVvhlYfaKagMW5g/cEVTdQha27nkor1emXfAVjqLJWuXxFwuSjBrPJlvp
-	Vv3PCQxIGlXE8X6d9WEbCzWX32GJeAOAu08KsVTa3OiE8W/gMMJyZYLott0EY7ADCn0EaSgHKcU
-	m2d4CmIXEque919oJ8rq6EpwLPrUCvOJpbkY6obE91eN+k5LUtqjI3UNAimmgA6w/63wXbJOJMV
-	GcfPHmL43PW+7gonhctlcZUh7018FI5J96wUtkuxMfDVefpWQqlJu+V62xgyskdhCiSuPnJxFav
-	mpXUz1aOwzbJbL4lCZuCAyfUVb8h+Pfxu7+PfvAHAoH6yBxyKwtnd9Ro5/+pul53yHLBQ
-X-Google-Smtp-Source: AGHT+IH5GwW/1LtdiOxW1n+MhOlbTwJKo2G4oIdIoLQEQsy6aOmCo5AeIoYMEsOb8r546lNVBC0s3w==
-X-Received: by 2002:a05:6a20:7fa0:b0:21f:5598:4c2c with SMTP id adf61e73a8af0-24340b01969mr4479905637.13.1755866406259;
-        Fri, 22 Aug 2025 05:40:06 -0700 (PDT)
-Received: from ?IPV6:2804:7f1:e2c3:f78a:6c07:66e5:2cc3:7521? ([2804:7f1:e2c3:f78a:6c07:66e5:2cc3:7521])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-325132487b3sm2485980a91.11.2025.08.22.05.40.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Aug 2025 05:40:05 -0700 (PDT)
-Message-ID: <98c5d450-e766-45cd-a300-bbeaf31cb0b9@mojatatu.com>
-Date: Fri, 22 Aug 2025 09:40:01 -0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38DC2FC895;
+	Fri, 22 Aug 2025 12:49:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.61
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755866956; cv=fail; b=JZZbyuEa6ZYp1MpnayIda80pWxDzoy+ii9SqsrGFqcbGWI7HeNfW7PzaD4ZOF24P6PiWT/EH+d18XNbL4WyDlcrHLASzP6SMCOf2x/qKORi+C/O3I4VMNbfjPIZkQaIKk0CkefPph8e9l3sRA5jXYg03HMtCCGs/1uFxDDsID10=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755866956; c=relaxed/simple;
+	bh=7nJHtsXvFzwyh8OaqWikdR7p1Yf4+yd/zYfBZ6stzYs=;
+	h=Message-ID:Date:From:Subject:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=K8CzEj0D0up+ofi1SzJB4sF64DYAUP0WeUaZo30ep0KRRM4HQuJ7KpOoM+aAFHHg/33sdFsM2iL/yJz3XyopFWzpiGtb+XidjzTBQRVqhqfvMM0khHiujn/b9sEhSQ0phezx8HO6B84R9t6+49Ag8oWGv2Gc9lt8N+C/IF2C4/I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=adS1WEBo; arc=fail smtp.client-ip=40.107.237.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altera.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=tDGtklFqNVGKr9dM2Do9oaNAs34zJvKqX2KmcnMFOpOU7W/89fc2tTuHLSjsCCXC9uTlRy0HD3hEBs6K4ZFQlfRP48TkXwfTrvYJsh+X46Gb6x5n8FIOog8S47w9dCcBpKB+Q1RswE7Z7sDVjyozc6NaiRh4heG2U7OPEUwB2JQE6zrvWt9QFZbWlf0bC8/OYy5J9zfvvoKpuYwJd/IAJgKtRZPJj7xUoYpeFzOuRiog9Zxt85HlQ6p8ZYmVKsarJtAJlq9V9q/mjwkJmUZniv8Xa8zQpM0/ZcDxuziJ88aCXPWvLouuUua9MsiDjZ+/59KJwvf/RBOjNcg3tUnXOg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7nJHtsXvFzwyh8OaqWikdR7p1Yf4+yd/zYfBZ6stzYs=;
+ b=gNtAym5oxU+mVTfYruH/8WgL1fqO7Qgao9CufDRENV3PeXPoPmXqwSCy4Dt/eH/o62vS9WMc/U1JTpCmw4aW8IUu6HRhITIWqBwwzWZvk28cxYHfQlaUJtJv0G1a9zzKGbV1tdcgY6h+WJOO1YZTYy5TnhRH0Z3G+K4PSteDXog+c+VUOMJUApx1cIV5vvzisY18HrFZmsRMeETxnkD5xWMxmb4KK7YW4zRutc7UB4P1CuRjj2vw/kJuhC0Z7Dg8mfqtn6rVt/9jUqvOGv4BOoFhKI0KBtI/CmymZXDtxYi7Lq/1M0iesqFgrAPfduAHoFeDXleCXqg2i5ovNA1iZA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
+ dkim=pass header.d=altera.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7nJHtsXvFzwyh8OaqWikdR7p1Yf4+yd/zYfBZ6stzYs=;
+ b=adS1WEBoWixyXWVLtLQOlvcDnPFk03Xb6uw/WmodQch4Umsi8u0fJSGmLYcPegPfd1ZZ+i77EP85ScLnHdl9FIqBVEUaITpACY38M6ASWf0KeQCLd6oSTPNjR9+IRgf9YrKYiGjzn8xCKeaqS07uGYEZnpUXtTgLc5Ve9pC/iCnKvaYvZ/57kPXGuXEhkwORSgbthfz8MM9taXxc6Im6ZO4Oa22cKSySmD/Tl9wM+lzk8G41AtAD7Lewv4WTWyO8y5tM3XdLYU2BsnKjZ3VRPlHyOirokyeOpl0IJ7UFILoGwqMUuc7UXx7uVBYv0266xIUnqIMAmagqrO5pwAP40Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=altera.com;
+Received: from DM6PR03MB5371.namprd03.prod.outlook.com (2603:10b6:5:24c::21)
+ by BY5PR03MB5156.namprd03.prod.outlook.com (2603:10b6:a03:224::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.17; Fri, 22 Aug
+ 2025 12:49:11 +0000
+Received: from DM6PR03MB5371.namprd03.prod.outlook.com
+ ([fe80::8d3c:c90d:40c:7076]) by DM6PR03MB5371.namprd03.prod.outlook.com
+ ([fe80::8d3c:c90d:40c:7076%3]) with mapi id 15.20.9052.014; Fri, 22 Aug 2025
+ 12:49:11 +0000
+Message-ID: <0f391b0a-6e9d-4581-9f3a-48e67ea90b31@altera.com>
+Date: Fri, 22 Aug 2025 18:19:01 +0530
+User-Agent: Mozilla Thunderbird
+From: "G Thomas, Rohan" <rohan.g.thomas@altera.com>
+Subject: Re: [PATCH net-next v2 3/3] net: stmmac: Set CIC bit only for TX
+ queues with COE
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Rohan G Thomas via B4 Relay
+ <devnull+rohan.g.thomas.altera.com@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Serge Semin <fancer.lancer@gmail.com>,
+ Romain Gantois <romain.gantois@bootlin.com>,
+ Jose Abreu <Jose.Abreu@synopsys.com>,
+ Ong Boon Leong <boon.leong.ong@intel.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Matthew Gerlach <matthew.gerlach@altera.com>
+References: <20250816-xgmac-minor-fixes-v2-0-699552cf8a7f@altera.com>
+ <20250816-xgmac-minor-fixes-v2-3-699552cf8a7f@altera.com>
+ <20250819182207.5d7b2faa@kernel.org>
+ <22947f6b-03f3-4ee5-974b-aa4912ea37a3@altera.com>
+ <20250820085446.61c50069@kernel.org> <20250820085652.5e4aa8cf@kernel.org>
+ <feb15456-2a16-4323-9d69-16aa842603f2@altera.com>
+ <20250821071739.2e05316a@kernel.org>
+Content-Language: en-US
+In-Reply-To: <20250821071739.2e05316a@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MA5PR01CA0003.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a01:174::13) To DM6PR03MB5371.namprd03.prod.outlook.com
+ (2603:10b6:5:24c::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] tcp: Destroy TCP-AO, TCP-MD5 keys in
- .sk_destruct()
-To: dima@arista.com, Eric Dumazet <edumazet@google.com>,
- Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>
-Cc: Bob Gilligan <gilligan@arista.com>,
- Salam Noureddine <noureddine@arista.com>,
- Dmitry Safonov <0x7f454c46@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250822-b4-tcp-ao-md5-rst-finwait2-v1-0-25825d085dcb@arista.com>
- <20250822-b4-tcp-ao-md5-rst-finwait2-v1-1-25825d085dcb@arista.com>
-Content-Language: en-US
-From: Victor Nogueira <victor@mojatatu.com>
-In-Reply-To: <20250822-b4-tcp-ao-md5-rst-finwait2-v1-1-25825d085dcb@arista.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR03MB5371:EE_|BY5PR03MB5156:EE_
+X-MS-Office365-Filtering-Correlation-Id: be3e2bc0-4d15-44cc-c7ff-08dde17a4ab8
+X-MS-Exchange-AtpMessageProperties: SA
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?eWtkQ1Yyazd0bkdVT3lJWXNLcDI0ZG5rWkhzK1I0ekNSQVA5bS9Ud29kWWgz?=
+ =?utf-8?B?b0JBTzZsUGFZUU5MNkJDeDRNcEFRUURrcjVMMFd2cWdON3Jab3ZZeWVGQjRQ?=
+ =?utf-8?B?WEdPN3N6OHZJNzdkL29mcHc2SXpyYStObkdBZFY3OEYvTHpDOHZRU0tPV3k3?=
+ =?utf-8?B?bTZ6KzhoR3lFM1hiZjFJRFZOMndpTnFWNmlCcklkek5yVExDYVJodmR5b3Jp?=
+ =?utf-8?B?b2R6SkZaeHE2ZXFtWlh5ZWJwWlU3QU5MeVF5U0xKNGJhUmFDNEN6VnlBU2Rr?=
+ =?utf-8?B?QjN5Zk1SK21ZdWJ0UG16UGZlMUZINEd5Q1hEa25HbE9BcGtuTTBlLzlQOXBv?=
+ =?utf-8?B?b1FOL0R2eWkzQmFGSHpHMUZtalhvVHFJR0JLTkJQUU9mQnRtejB0N3Q0RzVa?=
+ =?utf-8?B?YTVjWXh5empWYzRuK3Fta2I2MkxUOW5NTEpjMlM3NS9Ldlp6YmZQdGJiVVpZ?=
+ =?utf-8?B?VkgrOVlkV3JjUGxlemtRNERIQlc5U0RzZyt1bHg1QnRHcGFVOUsrZTF4K1lj?=
+ =?utf-8?B?WFVRYUJRRVJhb1UzdGpndmlCS3lYZ3NJUzVKVTI1UVJENk1xa1BKTHowbmNF?=
+ =?utf-8?B?VkhiZys5Vmx3c1BuRjhoSXVTZWNHVXFYNzNqOSs5VTkrMHoveUZXQ254Y3V5?=
+ =?utf-8?B?ajBHZVExaDJMelViU0JMOTRhNWMxZkVPamt4MWdaak5wVjJPQmxZSk1zaW9y?=
+ =?utf-8?B?V1h4Qm1nU2pkd3JKb1B1MkEzZnVYbUd2S2wvTHpSTWJOVmJSNHdwZ2U1YWxC?=
+ =?utf-8?B?Q0FBNTdXc2JpOXdzNlU2OEFmWHhEUzZ1VENPRFZ1WWYyR2xhSWR2bXUxUWNz?=
+ =?utf-8?B?bS9yS3ArcTBKZTAzbVlZSzRTUHlGdy9GWHRacU5Ic3d4YmhqRFFIS3k0cVpM?=
+ =?utf-8?B?S082b29kT2VTa012RWlYMGJuZ2E5aElJRmRtdmpyZE1ETFpJajIyMFhrRzJh?=
+ =?utf-8?B?T1ZWRG4yZ1k0bG5DM0x1ZFRCM1ErU1ZKRmlJWG5TSTJhWU01U2VoYi8rMW5S?=
+ =?utf-8?B?bHFuQjVaVUFJWkoyS3c2T2hKNURKTFVTN3N0Mm9ZdW9YVFJ6VEhab0V2MTVX?=
+ =?utf-8?B?aHZodXdTLzAxc2dRR0pYaEJ0RS9ScDFDUHdqakJzZ0MwYXNxeVk2a1JhNlIr?=
+ =?utf-8?B?ZkxXUmd4NGxXbmJQZzNna0s2MUpXVjNFTDJBQmJ5aXhuSTFoRkgvUnRFY1lH?=
+ =?utf-8?B?cUo0V0F3TytyckhiZ1BtblJFRDdHVEttQnRJMi9hYm5BcEJBZlJPOGNrN1BG?=
+ =?utf-8?B?cFZKcVY2Vm44NUZEZS9QQWg2Q0FKcGdYM2VQa0l0MTN2MytQN1hHamRUZUo3?=
+ =?utf-8?B?eFNVVmhJdjVPa0FzUnltWkRiV3IwOGJtS2VGR0h5eHRLVklKSGxQMHhRb2tv?=
+ =?utf-8?B?dkFBMDJuM0lKemdMS3diaWJUNjduZjdZV0lRNnFtRk9TWHdmRXNyeDNpbFV1?=
+ =?utf-8?B?WXMwbUVOU0lYNTRIbWJsY0ZtaUUxRjlzWXRCMGVyTGNnU2dzNEVOckRoNUdS?=
+ =?utf-8?B?K21rbHlKWUZWSG13elVZM01qNE9hMUNqU3BSdXpDMFVRTnhBTEJwUFZVb2Zr?=
+ =?utf-8?B?MyswWTVBNUV0SUMwYWdiUjlDUEI3VWVTY05CWmpVQWtTWW5lTGNqaGJGYm9H?=
+ =?utf-8?B?NmJERWtQLzMzMmhOZ3hpaFh0ajdRN213cmwzU1BUblgvUUkyWG9uUVVUNWdQ?=
+ =?utf-8?B?dVFSc04wOGM4czUyYm9PenB1eDFmNHNPL0FSUUV1RFJmcVVodjc0bW8wZnNo?=
+ =?utf-8?B?a3hqMzh3V2xZZHJNRlI1cEFRTTAzMSttKy9GSGI5MzZpaDRTemZ4NHd3bisv?=
+ =?utf-8?B?UExKOHQ5RnRuZEt0N1VSSVA2c1A5L2J3cU1uRzRYNG9MOUF2ZWtheU5pckE4?=
+ =?utf-8?B?blQ4WmwvOXlSbEl3MUNjUi80c3R1VzBCR0pTQXRuSlZvYWc9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR03MB5371.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?NUNRNXZuN0UvbWVEbVFGWWo1aXVRVXlTc0ljZnpGTXVadktzbmJ2MjJYNElD?=
+ =?utf-8?B?ODR6c2VycldrVTZtellQc2NURE1jRCtZN0dSRUZZeGd4RENWQzk0WVduV2Yx?=
+ =?utf-8?B?NDZSaWRPWUdUQ3dmZXgxS1plNVR6STlMazAyMC9qVmM5NWZiTDlwRzQ0UUQw?=
+ =?utf-8?B?bTB0VndDTThUaEtVOHFsbGs0K0hmVTZ0azVPbzM1L1E2dTdZeWs1K2xJTlpH?=
+ =?utf-8?B?RU9nSWpPdnZOenNhaUpYTEpmWHAwb0UyRTZPUEZnVVltZlN6K1YrcVVxUHhp?=
+ =?utf-8?B?M0JvOTFSeE44L3pORjZHQXlFTC9QSTFPSGVTM0ovcHNFcjVDUDB4Q3RPQVVN?=
+ =?utf-8?B?MjJWM2tnbW5FRWR0aVBaZXFpTHYzeGs1WFdGN281ZDFRazB1cFZ1Q01CbVBX?=
+ =?utf-8?B?cncyaHhJVDFaMDl0Y0ZTeklwUVphbS80SVhRQWx5djRhdTJqNjVHRnN6dEtx?=
+ =?utf-8?B?RzJZa09pMHI3aWFwNWloL21iTVRUdHpMNlJ1UTNJNzlZZktndHZnVFA3aUFY?=
+ =?utf-8?B?Vkk2ZEJtOU55TXo4b2QxclZHNzZZOWJvVjgyWUY3aXByTnFVbjJLWk1lMG85?=
+ =?utf-8?B?OW9RaHJJeGZuUk1zU2NMOERwdUZTdCt4dkpXUk1vSHNiYnByWUZjQVc3T0c2?=
+ =?utf-8?B?Y3ZUVGhULzlZSkdJcGkvaGRGeWs0Uk95YUNqZGkzQ3QvNlZsUURhT1pncWZP?=
+ =?utf-8?B?Y2hobUFxYWI0MTI1d25uOUx6ZFNOSlhXQXJOSjhKRnhDZFpJZVNqU1dFRjNs?=
+ =?utf-8?B?aEpaKzdoWDFvdVlGNHozbXF1UVVqZTEyMk1BM0ZOSG9DcUhweFVBWkNad1dC?=
+ =?utf-8?B?dHk2Z0FYY0JvY21mVEM2NDBma3k2RzQ3ZFR6L1FIbnVOaHNyVXRBUnR2eU9O?=
+ =?utf-8?B?QmtFbkR2OVJxc0I1UkFMSkFtN2VKeGY5R2luMllaUjJ4VnZzenV5OXRNM1JC?=
+ =?utf-8?B?Qm1lSXF5aEFjQVErY1VaTWZPYS83ZktkOVVkRTdVREVwY1pIQjQxZHkyZ3JL?=
+ =?utf-8?B?ZFNROElwZDB1bTNwbldFWFNreWdMdHJFakFwM012ZDJNTE1GQ0FBc24rOE0z?=
+ =?utf-8?B?bThmT2V5MnpuQTYrb1FuVmZVNFhKbmhWTmVsam15RzFuWjgzdUdpNzR3RjZt?=
+ =?utf-8?B?TlBwQW9wZXAzQmpGWitySVVNZWxYMnliYUJ1eFhOdnBUaThGdHFVWXh5R1VI?=
+ =?utf-8?B?ZXBVSE96cVhzQ0JDemdDWko4QU1rMitsdmZNbFFDd1FoUUpUVzdlQ0FGblo5?=
+ =?utf-8?B?SHZiSitwRmJRQ0VXS24xQWJQMnNkQmJVQlhjR2lwWVhzdnd3aEt3Wld2c1o3?=
+ =?utf-8?B?WW5lYnlCRWJvcWh0VHRMY1lLdmhaT3RmWkFPdDBYZXE0OFZRRWhGTmtKZEZ2?=
+ =?utf-8?B?dVprdmF5OHRudFRFWjMyR3ZxT2oraDFzaHFFbjhJNS84bWhIdnJkWFpNd0N2?=
+ =?utf-8?B?clIwODVsdkU3VDBCZnZ6RjRvb1NTYjBWTk9RbHFDd1J2eVFCbWc2Mk85bVV2?=
+ =?utf-8?B?ejVnNVZwSjNWMjB0R3NKeE0wY0I4cmZXSlI5MHcrem0vdFJydm1WVjZLU2ZG?=
+ =?utf-8?B?TUhuNHFsNE1NWjZlNlFhcHJzSk10MTE3b1RtTnRyNDNNVkRIaDRxY1VrNzdy?=
+ =?utf-8?B?cWRGY3lPbFVkOGcyVW53SnBTZm1aSC9TZ0Z5dEJrUnRGMTE2Y1dERCtTc1V4?=
+ =?utf-8?B?N1ZuM2gyQXc2Z3J0TldObXFOSEZhR3Nid3FPUnZ4a0lnTldrY2dpRVpCQk00?=
+ =?utf-8?B?OW10Q3huOEUwL0N6NE05RHUyUVVvYjhYQjJHVktWTHExZXNaQ2ZjUFpqMmdy?=
+ =?utf-8?B?a0ljaXdhTURUbDZReTdyNnozamJCUGpBclRSL2NDTHpyWjJrcHU1M1pBT1NT?=
+ =?utf-8?B?RkdnR3Z5OVJ6VGRSU2pWeDRURUR6dHowc1VQdndsTk03aTZURVBOcE5meld4?=
+ =?utf-8?B?OFBxQXpUdWNKaHJaSTVVeXR6VEZaZUpZejM4YWpyck9tejdNWXUxM1FlYnI3?=
+ =?utf-8?B?YWRJaCtyNXhWbjZLNTVDT1djT2FuZVQyRWt3anF0YVBKeE14M1VVMmRodENj?=
+ =?utf-8?B?Q2laRFNXczk5ay8yOFliUS92UWdES3R3OThCVGgzNFAyOFpoRm54NzNlVTVk?=
+ =?utf-8?B?SVBkaVNTMVpBcHdkTXJ1UmlWbStqelk5T3RvRk05emFBTGpPbG1aV0xqZmlF?=
+ =?utf-8?B?anc9PQ==?=
+X-OriginatorOrg: altera.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: be3e2bc0-4d15-44cc-c7ff-08dde17a4ab8
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR03MB5371.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Aug 2025 12:49:11.6529
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fbd72e03-d4a5-4110-adce-614d51f2077a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Ft3xtZ0YkUa2e71Hivs7Bna0ia3/8FXnq+Io2YnijMq4hKWft2CGEJmN91HlVUBMSp+fEaHwEm5vL1mOWoG5wSb6Hx10ySUDVO5EMmXYOUo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR03MB5156
 
-On 8/22/25 01:55, Dmitry Safonov via B4 Relay wrote:
-> From: Dmitry Safonov <dima@arista.com>
-> 
-> Currently there are a couple of minor issues with destroying the keys
-> tcp_v4_destroy_sock():
-> 
-> 1. The socket is yet in TCP bind buckets, making it reachable for
->     incoming segments [on another CPU core], potentially available to send
->     late FIN/ACK/RST replies.
-> 
-> 2. There is at least one code path, where tcp_done() is called before
->     sending RST [kudos to Bob for investigation]. This is a case of
->     a server, that finished sending its data and just called close().
-> 
->     The socket is in TCP_FIN_WAIT2 and has RCV_SHUTDOWN (set by
->     __tcp_close())
-> 
->     tcp_v4_do_rcv()/tcp_v6_do_rcv()
->       tcp_rcv_state_process()            /* LINUX_MIB_TCPABORTONDATA */
->         tcp_reset()
->           tcp_done_with_error()
->             tcp_done()
->               inet_csk_destroy_sock()    /* Destroys AO/MD5 keys */
->       /* tcp_rcv_state_process() returns SKB_DROP_REASON_TCP_ABORT_ON_DATA */
->     tcp_v4_send_reset()                  /* Sends an unsigned RST segment */
-> 
->     tcpdump:
->> 22:53:15.399377 00:00:b2:1f:00:00 > 00:00:01:01:00:00, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 33929, offset 0, flags [DF], proto TCP (6), length 60)
->>      1.0.0.1.34567 > 1.0.0.2.49848: Flags [F.], seq 2185658590, ack 3969644355, win 502, options [nop,nop,md5 valid], length 0
->> 22:53:15.399396 00:00:01:01:00:00 > 00:00:b2:1f:00:00, ethertype IPv4 (0x0800), length 86: (tos 0x0, ttl 64, id 51951, offset 0, flags [DF], proto TCP (6), length 72)
->>      1.0.0.2.49848 > 1.0.0.1.34567: Flags [.], seq 3969644375, ack 2185658591, win 128, options [nop,nop,md5 valid,nop,nop,sack 1 {2185658590:2185658591}], length 0
->> 22:53:16.429588 00:00:b2:1f:00:00 > 00:00:01:01:00:00, ethertype IPv4 (0x0800), length 60: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
->>      1.0.0.1.34567 > 1.0.0.2.49848: Flags [R], seq 2185658590, win 0, length 0
->> 22:53:16.664725 00:00:b2:1f:00:00 > 00:00:01:01:00:00, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
->>      1.0.0.1.34567 > 1.0.0.2.49848: Flags [R], seq 2185658591, win 0, options [nop,nop,md5 valid], length 0
->> 22:53:17.289832 00:00:b2:1f:00:00 > 00:00:01:01:00:00, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
->>      1.0.0.1.34567 > 1.0.0.2.49848: Flags [R], seq 2185658591, win 0, options [nop,nop,md5 valid], length 0
-> 
->    Note the signed RSTs later in the dump - those are sent by the server
->    when the fin-wait socket gets removed from hash buckets, by
->    the listener socket.
-> 
-> Instead of destroying AO/MD5 info and their keys in inet_csk_destroy_sock(),
-> slightly delay it until the actual socket .sk_destruct(). As shutdown'ed
-> socket can yet send non-data replies, they should be signed in order for
-> the peer to process them. Now it also matches how AO/MD5 gets destructed
-> for TIME-WAIT sockets (in tcp_twsk_destructor()).
-> 
-> This seems optimal for TCP-MD5, while for TCP-AO it seems to have an
-> open problem: once RST get sent and socket gets actually destructed,
-> there is no information on the initial sequence numbers. So, in case
-> this last RST gets lost in the network, the server's listener socket
-> won't be able to properly sign another RST. Nothing in RFC 1122
-> prescribes keeping any local state after non-graceful reset.
-> Luckily, BGP are known to use keep alive(s).
-> 
-> While the issue is quite minor/cosmetic, these days monitoring network
-> counters is a common practice and getting invalid signed segments from
-> a trusted BGP peer can get customers worried.
-> 
-> Investigated-by: Bob Gilligan <gilligan@arista.com>
-> Signed-off-by: Dmitry Safonov <dima@arista.com>
-> ---
->   net/ipv4/tcp.c      | 31 +++++++++++++++++++++++++++++++
->   net/ipv4/tcp_ipv4.c | 25 -------------------------
->   2 files changed, 31 insertions(+), 25 deletions(-)
-> 
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index 71a956fbfc5533224ee00e792de2cfdccd4d40aa..4e996e937e8e5f0e75764caa24240e25006deece 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -412,6 +412,36 @@ static u64 tcp_compute_delivery_rate(const struct tcp_sock *tp)
->   	return rate64;
->   }
-> [...]
-> +
-> +static void tcp_destruct_sock(struct sock *sk)
-> +{
-> +	struct tcp_sock *tp = tcp_sk(sk);
+Hi Jakub,
 
-It looks like this variable is unused when CONFIG_TCP_MD5SIG is not set 
+On 8/21/2025 7:47 PM, Jakub Kicinski wrote:
+>> Currently, in the stmmac driver, even though tmo_request_checksum is not
+>> implemented, checksum offloading is still effectively enabled for AF_XDP
+>> frames, as CIC bit for tx desc are set, which implies checksum
+>> calculation and insertion by hardware for IP packets. So, I'm thinking
+>> it is better to keep it as false only for queues that do not support
+>> COE.
+> Oh, so the device parses the packet and inserts the checksum whether
+> user asked for it or not? Damn, I guess it may indeed be too late
+> to fix, but that certainly_not_ how AF_XDP is supposed to work.
+> The frame should not be modified without user asking for it..
 
-and this is causing the test CI build to fail.
+Yes, I also agreed. But since not sure, currently any XDP applications
+are benefiting from hw checksum, I think it's more reasonable to keep
+csum flag as false only for queues that do not support COE, while
+maintaining current behavior for queues that do support it. Please let
+me know if you think otherwise.
 
-net/ipv4/tcp.c: In function ‘tcp_destruct_sock’:
-net/ipv4/tcp.c:417:26: error: unused variable ‘tp’ [-Werror=unused-variable]
-   417 |         struct tcp_sock *tp = tcp_sk(sk);
-       |                          ^~
-cc1: all warnings being treated as errors
-make[4]: *** [scripts/Makefile.build:287: net/ipv4/tcp.
-
-cheers,
-Victor
+Best Regards,
+Rohan
 
