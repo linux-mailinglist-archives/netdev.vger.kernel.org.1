@@ -1,135 +1,88 @@
-Return-Path: <netdev+bounces-216045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14231B31AEA
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 16:12:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A98CB31AD5
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 16:09:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E372BAA3FE0
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 14:07:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 183C91887263
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 14:05:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A9B6305E15;
-	Fri, 22 Aug 2025 14:06:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A09352FFDDA;
+	Fri, 22 Aug 2025 14:04:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=0x65c.net header.i=@0x65c.net header.b="gZCseIz5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OFVLq/5+"
 X-Original-To: netdev@vger.kernel.org
-Received: from m204-227.eu.mailgun.net (m204-227.eu.mailgun.net [161.38.204.227])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EFE6307487
-	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 14:06:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=161.38.204.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7932F2FDC3B
+	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 14:04:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755871610; cv=none; b=e37KZy4ttZNj8ubeEft7v9eFhoRU7aCBZre9oNLn8rACuF6HhalZpZsVOVdlktBDBtsfrtUmicjVG5KDFWa4cnh9qgh+EQuLlUXB1G6BsU1zlx5wd+L85KTHBE4VjvjpgZDap5DpaijjoaugrvZ5oOaO4AtuPRIAXfTyPBI6bHo=
+	t=1755871481; cv=none; b=HlahnTOkqaGZTBRrfRPblpERBiBs5Kbrx510kW7iFGMytYaIc03+22rxaGud0EH9U0Zq/ylpwAqjQBjKpNH1moAwI99jaXVuFBkTD8a3RiRGIEfOQ+kLamBMJvJXUA+c99sar23LKeARTzBoX9lFjfx8MF1cfdtlPD2nBO+wbjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755871610; c=relaxed/simple;
-	bh=A49T0iTuxKuH9Iw8EBG9Ezz7qGMChLoiwF1vQk0mQf8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UUq2hsNZ+MiwRjHrQWJdDHJlMc/eHs5bFJBhEdNFktO9Qv9tzBeieRp3pZcoGgPpETrGxqj6xX4ggMZQ72nO9UBZsVolhnFl5KfHnif2vzp7RUoipArFNakVOXqv2Sh3/hofh+B4k63M6kv4g05IsolVS9N0CjBcETulMX+4cbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x65c.net; spf=pass smtp.mailfrom=0x65c.net; dkim=pass (2048-bit key) header.d=0x65c.net header.i=@0x65c.net header.b=gZCseIz5; arc=none smtp.client-ip=161.38.204.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x65c.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0x65c.net
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=0x65c.net; q=dns/txt; s=email; t=1755871606; x=1755878806;
- h=Content-Transfer-Encoding: MIME-Version: References: In-Reply-To: Message-ID: Date: Subject: Subject: Cc: To: To: From: From: Sender: Sender;
- bh=4zeVSA5+Gic3I+n2aSoobR2zbfUVYcXif4yIK24vQoo=;
- b=gZCseIz5PKL3fepoBJu0ekmadE1Nv+O4F0q8D2KO/RByuf8AyuLAQphDwsn5vKvby850FhtMdM6FIcHDV81VWpdy/iDQQXj1LQLAIzaMI+mNFXY6D89D63SN6pUkvL7PV2sg9CQ5VMcXLeo1umD2kPLZXWwc5Ih/58g1HCV6dqeRkZnp/M/OPQPA0MUk0qdUD2qqOXRxSJor/8GWINhgOx9oUx3AMpc2dIv2ryKScGHFR7iFjGUURkAKC4DsjEV3pdDsHeH3Jxw1+emWgsNJfjQYhEpEyY5egimYerfwEYXEY8YnHxmbGR2RsDLX5ex55IUmY5RFUrsgBeJXUhoi0g==
-X-Mailgun-Sid: WyI2ZTA5MCIsIm5ldGRldkB2Z2VyLmtlcm5lbC5vcmciLCI1NGVmNCJd
-Received: from fedora (pub082136115007.dh-hfc.datazug.ch [82.136.115.7]) by
- 6daba92ea63ccfff060124925e5e264487e90b9321cf65b2c1448e79f35e349c with SMTP id
- 68a87974ec4fa32e70ac11e3; Fri, 22 Aug 2025 14:06:44 GMT
-X-Mailgun-Sending-Ip: 161.38.204.227
-Sender: alessandro@0x65c.net
-From: Alessandro Ratti <alessandro@0x65c.net>
-To: liuhangbin@gmail.com
-Cc: alessandro@0x65c.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	skhan@linuxfoundation.org
-Subject: [PATCH net-next v3] selftests: rtnetlink: skip tests if tools or feats are missing
-Date: Fri, 22 Aug 2025 16:03:40 +0200
-Message-ID: <20250822140633.891360-2-alessandro@0x65c.net>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250822140633.891360-1-alessandro@0x65c.net>
-References: <aKhqmsheZAqThrSu@fedora>
- <20250822140633.891360-1-alessandro@0x65c.net>
+	s=arc-20240116; t=1755871481; c=relaxed/simple;
+	bh=lnXfUbhwjwvmKYPmzSa4znMTh2n6CcVoBz5/ntha/kQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iyMzwzbYC73BKKdbGnL7dm82pNipMPqa7+jNaqB89kIDoPW3Ef0zlS5xUsDwZuIcw0oPOxA2H63U7I7SHxb+YzptoBgzWo2aTaKpDGxxfa4i7R+ZnIlGPEl+XX+E5GHCA3Bhso6f6PjXbbhey9ATplYfFd/Mwcsk7MxXOjGDAtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OFVLq/5+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB16DC4CEED;
+	Fri, 22 Aug 2025 14:04:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755871481;
+	bh=lnXfUbhwjwvmKYPmzSa4znMTh2n6CcVoBz5/ntha/kQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OFVLq/5+Ub4dj8tgte5CU3YyS+G3fbUUCVHF/U0fN2r4VHg5Qc2QgGjsZX6ikjnRX
+	 rwoJO+kNO+WT2C9Il4VcHqV9qGPlniquUYMxTaYPBFGsMalkVoT4P3yB4me7+FQxJO
+	 Ztkhi1ObxOocGbxM/jgyg44dUPONEq78O8ThI7eikBEXCREwhB030j+FXrdPhDYvP1
+	 SMASRyL/17cuNSMhyxVz5mBEto4pcz5tDDZEX7yRo9ihT7kpqXFLbITPtTAAqwnOAr
+	 7AOUvOW3X9kahbJk6a0IDLbfWFPKxadajkDdF0MhGTvd3hlBjdaUDsRBuLnt9ToNRQ
+	 /kIyrUWIcuj/Q==
+Date: Fri, 22 Aug 2025 07:04:40 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 2/3] net: airoha: Add airoha_ppe_dev struct
+ definition
+Message-ID: <20250822070440.71bdd804@kernel.org>
+In-Reply-To: <aKgVEYMftYgdynxw@lore-rh-laptop>
+References: <20250819-airoha-en7581-wlan-rx-offload-v1-0-71a097e0e2a1@kernel.org>
+	<20250819-airoha-en7581-wlan-rx-offload-v1-2-71a097e0e2a1@kernel.org>
+	<20250821183453.4136c5d3@kernel.org>
+	<aKgVEYMftYgdynxw@lore-rh-laptop>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Some rtnetlink selftests assume the presence of ifconfig and iproute2
-support for the `proto` keyword in `ip address` commands. These
-assumptions can cause test failures on modern systems (e.g. Debian
-Bookworm) where:
+On Fri, 22 Aug 2025 08:58:25 +0200 Lorenzo Bianconi wrote:
+> > On Tue, 19 Aug 2025 14:21:07 +0200 Lorenzo Bianconi wrote:  
+> > > +	pdev = of_find_device_by_node(np);
+> > > +  
+> > 
+> > did you mean to put the of_node_put() here?
+> >   
+> > > +	if (!pdev) {
+> > > +		dev_err(dev, "cannot find device node %s\n", np->name);
+> > > +		of_node_put(np);
+> > > +		return ERR_PTR(-ENODEV);
+> > > +	}
+> > > +	of_node_put(np);  
+> 
+> I moved the of_node_put() here (and in the if branch) in order to fix a similar
+> issue fixed by Alok for airoha_npu.
 
- - ifconfig is not installed by default
- - The iproute2 version lacks support for address protocol
-
-This patch improves test robustness by:
-
- - Skipping kci_test_promote_secondaries if ifconfig is missing
- - Skipping do_test_address_proto if ip address help does not mention
-   proto
-
-These changes ensure the tests degrade gracefully by reporting SKIP
-instead of FAIL when prerequisites are not met, improving portability
-across systems.
-
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
-
-Signed-off-by: Alessandro Ratti <alessandro@0x65c.net>
-
----
-v2:
-- Updated the patch based on review from Hangbin Liu
-- Changed subject and commit message to better reflect updated behavior
-- Added Reviewed-by tag
-
-v3:
-- Amend Reviewed-by tag position
----
- tools/testing/selftests/net/rtnetlink.sh | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
-index d6c00efeb664..c2a0e7f37391 100755
---- a/tools/testing/selftests/net/rtnetlink.sh
-+++ b/tools/testing/selftests/net/rtnetlink.sh
-@@ -323,6 +323,11 @@ kci_test_addrlft()
- 
- kci_test_promote_secondaries()
- {
-+	run_cmd ifconfig "$devdummy"
-+	if [ $ret -ne 0 ]; then
-+		end_test "SKIP: ifconfig not installed"
-+		return $ksft_skip
-+	fi
- 	promote=$(sysctl -n net.ipv4.conf.$devdummy.promote_secondaries)
- 
- 	sysctl -q net.ipv4.conf.$devdummy.promote_secondaries=1
-@@ -1201,6 +1206,12 @@ do_test_address_proto()
- 	local ret=0
- 	local err
- 
-+	run_cmd_grep 'proto' ip address help
-+	if [ $? -ne 0 ];then
-+		end_test "SKIP: addr proto ${what}: iproute2 too old"
-+		return $ksft_skip
-+	fi
-+
- 	ip address add dev "$devdummy" "$addr3"
- 	check_err $?
- 	proto=$(address_get_proto "$addr3")
--- 
-2.39.5
-
+Ah, didn't notice it in the print..
+maybe remove the empty line between the of_find_device.. and the null
+check on pdev then?
 
