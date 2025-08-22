@@ -1,204 +1,225 @@
-Return-Path: <netdev+bounces-215907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8074FB30D60
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 06:09:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADD56B30D87
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 06:24:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4259176069
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 04:09:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24EAF6870F5
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 04:23:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88C8828C878;
-	Fri, 22 Aug 2025 04:09:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A92F127A935;
+	Fri, 22 Aug 2025 04:23:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ekVL8Jce"
+	dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b="Eov/N93I"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE26528AAEE
-	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 04:09:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C68652773FC
+	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 04:23:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755835769; cv=none; b=YJlTJhAcr2lUgu40N+2bvdd1iVBJlN2wtv9ZLv/4TlY6QI6Yyrhvlgi6/qt1UCNi+RALDKURmkezwF17+uffUIdAf7vBJjE1mw5bJxpz5JbF4ND28oMSOZM9q9nlvLhGgTmIM4XYvQz1Rlbph7osYN8tgHCAKHC1xhubSM22SZI=
+	t=1755836605; cv=none; b=FPxQeGovmZ8yEBOn6CEghEhY2HPHvr6HhIwrvi0qF9poK6QyAnhhUPV5kh3wSY7ZheBokEGQLaLaj1Czo1Dtza4feKqXc2Gp4WyUbDJ/+VoFCuJrkpXHrIYJIg1xr+7q+1x0n5bcEdlRvg/LCZvvWiYYF6N5m9z1jOSo3Y9NHC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755835769; c=relaxed/simple;
-	bh=uvxGoPwpEkTnej/P9frRazHxG8UL+BClJE53WOAvyXQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T5domw/lg41PY1ZlhFGKxsUD5ONMtC/61qJozdVgnQVG5ojGRisj1NQs9VFQXwRLGVZBDEh5ac00r3spSYPgboAlnw+H/Nsv2LhGBQoxoQNCdAjdkPYB2QUkqXZMuKyCq4fKPnRCVPsCpnHcmJ7jzcWRsZXaatwL6hjh9gQreos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ekVL8Jce; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755835765;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wD6Kie9NmTYlBWSYITqg8VmPWCkzgpHh3Jn6J+e3AEM=;
-	b=ekVL8Jcem6q4cF0HM2y6xOx21D/FJFLgh+Adi11GsoKh93+dTphRUEqvPEAbV1jsnGf0+j
-	76vWlhnV/nsaTW5nDgWVAmPnyWUl0TtjWGi7aVu71PRBgkpV7KBux/J7eN3g1ihAEe3TSt
-	6lo4Vg1aDMs7A8C7PTZdjARZhrto0Jk=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-561-MczQw6GEMbKTn0gWJ3FTYw-1; Fri, 22 Aug 2025 00:09:23 -0400
-X-MC-Unique: MczQw6GEMbKTn0gWJ3FTYw-1
-X-Mimecast-MFC-AGG-ID: MczQw6GEMbKTn0gWJ3FTYw_1755835762
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-333f8ddf072so6799761fa.0
-        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 21:09:23 -0700 (PDT)
+	s=arc-20240116; t=1755836605; c=relaxed/simple;
+	bh=rcfw7pKOmFxog5o6Pv8xbpuXN5/vYailwsWhsRDTQPs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SmLguNn6n44YL7DGY+WDwlNiG5Xmu9wJa5T7nvJYUA3+1UwP8MuCdXvOKHFApilBN3cxpI7NX5htmietaVwnmWPb/fZcAcDKeZy4uaWs7GhpYyun3IO4HNqXjwvLt9MPXBkHHR4dmkxUWCogAkZYEXiDhS5p6/ZaCLJl82KDF4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org; spf=pass smtp.mailfrom=wbinvd.org; dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b=Eov/N93I; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wbinvd.org
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-b47174c8e45so1558600a12.2
+        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 21:23:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=wbinvd.org; s=wbinvd; t=1755836603; x=1756441403; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=8OYbr6Zeb0In7ciWZAGGuuclyk12KWAFQqeCkPJi8ew=;
+        b=Eov/N93IZjIkQ+77ciJVgTSnW6Ujqs8bTmTJKNvSRscUCK5WqKE0DiO8iGETuhQbGj
+         SAGK/cbBtR6ER+t8/NgZyj9kKWNxsS+oJxcvVAodtpicveJQTkhQWVBme0i+jNk4u4ZQ
+         IiVBD5wmsQlYhALJWtkDjUjimTadpCmxO/kPkAsF0rGA6TRUBo4Mr/hwBdvjwINq0uXF
+         +5urKAS79vt5J/g6lqgJKB2USSWxToQYBgm5R3FQDxEplw83YWMf3CpKzTjzI/dvUhIo
+         vEQwfBqMz81chUP1fp3eWV7UASSD8JYxGy58g/tYh3L5tXMa2Pk7OEvXbJlha8Qawlla
+         bxHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755835762; x=1756440562;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1755836603; x=1756441403;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wD6Kie9NmTYlBWSYITqg8VmPWCkzgpHh3Jn6J+e3AEM=;
-        b=wMOBwLTytEXcblEUlusTEcZ5eRtJdAvHuGug7x9oKTjFXglRsvUxBIyECqC4iCRBdk
-         EjWHy4aCU5BtS3bLzdkYRA0XggSiShFFaikdkWWxqaqKIDgZKgP6eZVyiqCffoCt9eFE
-         jBSLYu7BLZxLvV29TC8/pKnhMc41U+qOzsMjDsBjJeA3MwsmliH3GJUPX6sp5k80DQmn
-         Is4ijA52oXN/v/DP6xlkZY6T90wWXK51u1jWp9nOjyFv0yTlN65S3ETH6O+FXtS1D51x
-         KWu1mURXB+ZMcwBWiMpoo4ZHuTJu77c2h3NFYzE3SOZUn2aZotAP2/NOA3bkLC4ecZxh
-         91Hg==
-X-Forwarded-Encrypted: i=1; AJvYcCVMGW9ZT5ERQ9ijzqB51DUgShdrLEM88B/nRhLgPYEZgoY5XK0AXaSztMTFKeKWbuhaeCOxXIQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsAKjdgWWbt2XcLgoLAMVuBjqvFHgkwpZtlf/Uz31I+6naPZz7
-	ZEdktd8s/UjmlXIp0TSsI6XC726uLXV1tQ6X5R2oRG35JaW+01FTv6Hnmw7Ra6AYOrBTfCRAGyL
-	aVHlcFYHDEOSsKmmLcCWtJ8OfxkEZJMUSlMLkESrg0gSbLeYHo7/uWrLq
-X-Gm-Gg: ASbGncstu5cS5bdwaQpMdbnbJUg05Q8LhliDi5bRvDarTeUGNKgR3n/DWlRFuCPwP/5
-	yQ+e7hip+LeLhkgqnbqRPFdFAprhSqbq9zKP4xTbIL2dwN9JnXZYLR4t6b1LDXaxKSDIZxLAvky
-	EhelqS+baK24wV3RTZUjeBP4fZu4yQF/DC/7OPDZLMDcbrsjCoV1bX+j5eWaXbUTq3vdABVuILC
-	tXPIgDcUqX1n33BWa89uNA8M/JbBxejtc0B28+8b9f9cy6VHUzi8+hpN6KqjUy6+4W3TUcYKBHP
-	cI54HrJDLQQdo1YK3l8AO5MOcs6Cy9sjqcMW4dCxAFee5p0JvNkbFBDEbZcuHXYt5g==
-X-Received: by 2002:a2e:be0c:0:b0:333:b6b0:e665 with SMTP id 38308e7fff4ca-33650fa8605mr4319281fa.30.1755835762098;
-        Thu, 21 Aug 2025 21:09:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHIfwy5viYQG7CiACnNo0XJ1QLrkAQo6vQi0t/AKYxGuojOFc+bxzH8Oeop0sL+wr/cDEqByA==
-X-Received: by 2002:a2e:be0c:0:b0:333:b6b0:e665 with SMTP id 38308e7fff4ca-33650fa8605mr4319091fa.30.1755835761548;
-        Thu, 21 Aug 2025 21:09:21 -0700 (PDT)
-Received: from [192.168.1.86] (85-23-48-6.bb.dnainternet.fi. [85.23.48.6])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-3340a41e3cfsm35236551fa.6.2025.08.21.21.09.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Aug 2025 21:09:19 -0700 (PDT)
-Message-ID: <9156d191-9ec4-4422-bae9-2e8ce66f9d5e@redhat.com>
-Date: Fri, 22 Aug 2025 07:09:17 +0300
+        bh=8OYbr6Zeb0In7ciWZAGGuuclyk12KWAFQqeCkPJi8ew=;
+        b=V1NRfZSXCtx23MBGAs3Eh+WhZ7Yyfsrj2B9XlCjL8GycgZg3lMG39cAG2Qm+s/8puY
+         77RY55h87fYexjCBe9MoK8XOZRO7n8l2JJkgB0Jk3vV7nWim/UeE1ZqaSLWcyNqJ+jYR
+         XNeLCikOmo5aGQaTVhiVd4HVYYaK9hJcQRdj0E58njxwhiyR1KgNHD6DEIMWbiUkEWUd
+         6DWA89kXH4OeQjoAjdG4fOVeHKHP8AojOC6WIqze12WDDGLuKP7QItL4NhsxVjKlJFsp
+         GWDCjhTHV8NQpJ8C+YacJ3nkEvmOfQX02WoCrG/tQcnjLkoCUGnT/rqXHeOYQXKy3uKG
+         ZVxA==
+X-Forwarded-Encrypted: i=1; AJvYcCUzvMOFnarqod2bssrEGPnJ3VTpxN+PVcKgzoXndVF0sSTY3RfCBTp/g4seMwoOow12Viq4ZzY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxa1CEY32HTL6w1ZwI6aF+M8A4s3YAiO06ORIytEgEmc7FbfDzs
+	1gYj0Uresr/7QZEzNc66XH0MednlSB7EkJWmyOTlx3hACCJL2fJjdDg/WsEyv0GhoFc=
+X-Gm-Gg: ASbGnctVBdjUpY1HKLXNFQf86eb1TNyvTofNB1F3HKMd3ebT/tpOyw9BITia0Kv/Wy3
+	5KEuyrB4oDqNXdhjP7U9X+zRup9XVPkSruEl/FqpLIELhFvQ5znSTZK9K0WH6UltZLoyCLRjlaq
+	q4fL+cilOXmRF6QF5kBoHoYEJbNR7UD7NwmvZBde76bxlkLEPFAwVfQiJNesINAVWrLIV2bpYBW
+	QdjS7hQ7GR6mbrt3pjJQwC5zWIUtyAU2B7dV+cfYnrAEC35lkaLbS4D9XaQT4BTQRyUEkLQiEIf
+	TwuRocwDwFQuiQTFkmngSDgZAo0wlt7Q34UQUuH5DIWBgV+fG4/3uwr3x9mX8ONB/ncapg/d6Dl
+	eB/wgBlaYDKgC1WyC5aRd+/cI
+X-Google-Smtp-Source: AGHT+IGkr6KG1Nu9z0iOHepL9KnzdBIr5e1tJ3KsMa+xu1RZViZOdy4PjdjRbUW4MQjoOYoW45A27Q==
+X-Received: by 2002:a17:902:ce01:b0:245:fcc6:a9d8 with SMTP id d9443c01a7336-2462efbe05amr28662875ad.54.1755836603033;
+        Thu, 21 Aug 2025 21:23:23 -0700 (PDT)
+Received: from mozart.vkv.me ([192.184.167.117])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24636064715sm8694255ad.29.2025.08.21.21.23.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Aug 2025 21:23:22 -0700 (PDT)
+Date: Thu, 21 Aug 2025 21:23:20 -0700
+From: Calvin Owens <calvin@wbinvd.org>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Michal Schmidt <mschmidt@redhat.com>, netdev@vger.kernel.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+	Ivan Vecera <ivecera@redhat.com>, intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] i40e: Prevent unwanted interface name changes
+Message-ID: <aKfwuFXnvOzWx5De@mozart.vkv.me>
+References: <94d7d5c0bb4fc171154ccff36e85261a9f186923.1755661118.git.calvin@wbinvd.org>
+ <CADEbmW100menFu3KACm4p72yPSjbnQwnYumDCGRw+GxpgXeMJA@mail.gmail.com>
+ <aKXqVqj_bUefe1Nj@mozart.vkv.me>
+ <aKYI5wXcEqSjunfk@mozart.vkv.me>
+ <e71fe3bf-ec97-431e-b60c-634c5263ad82@intel.com>
+ <aKcr7FCOHZycDrsC@mozart.vkv.me>
+ <8f077022-e98a-4e30-901b-7e014fe5d5b2@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 10/35] mm/hugetlb: cleanup
- hugetlb_folio_init_tail_vmemmap()
-To: David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org
-Cc: Alexander Potapenko <glider@google.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
- Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- iommu@lists.linux.dev, io-uring@vger.kernel.org,
- Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
- Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
- kasan-dev@googlegroups.com, kvm@vger.kernel.org,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- Marco Elver <elver@google.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
- Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
- Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
- Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
- Robin Murphy <robin.murphy@arm.com>, Suren Baghdasaryan <surenb@google.com>,
- Tejun Heo <tj@kernel.org>, virtualization@lists.linux.dev,
- Vlastimil Babka <vbabka@suse.cz>, wireguard@lists.zx2c4.com, x86@kernel.org,
- Zi Yan <ziy@nvidia.com>
-References: <20250821200701.1329277-1-david@redhat.com>
- <20250821200701.1329277-11-david@redhat.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Mika_Penttil=C3=A4?= <mpenttil@redhat.com>
-In-Reply-To: <20250821200701.1329277-11-david@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8f077022-e98a-4e30-901b-7e014fe5d5b2@intel.com>
 
+On Thursday 08/21 at 22:39 +0200, Przemek Kitszel wrote:
+> On 8/21/25 16:23, Calvin Owens wrote:
+> > On Thursday 08/21 at 10:00 +0200, Przemek Kitszel wrote:
+> > > On 8/20/25 19:41, Calvin Owens wrote:
+> > > > On Wednesday 08/20 at 08:31 -0700, Calvin Owens wrote:
+> > > > > On Wednesday 08/20 at 08:42 +0200, Michal Schmidt wrote:
+> > > > > > On Wed, Aug 20, 2025 at 6:30 AM Calvin Owens <calvin@wbinvd.org> wrote:
+> > > > > > > The same naming regression which was reported in ixgbe and fixed in
+> > > > > > > commit e67a0bc3ed4f ("ixgbe: prevent from unwanted interface name
+> > > > > > > changes") still exists in i40e.
+> > > > > > > 
+> > > > > > > Fix i40e by setting the same flag, added in commit c5ec7f49b480
+> > > > > > > ("devlink: let driver opt out of automatic phys_port_name generation").
+> > > > > > > 
+> > > > > > > Fixes: 9e479d64dc58 ("i40e: Add initial devlink support")
+> > > > > > 
+> > > > > > But this one's almost two years old. By now, there may be more users
+> > > > > > relying on the new name than on the old one.
+> > > > > > Michal
+> > > > > 
+> > > > > Well, I was relying on the new ixgbe names, and I had to revert them
+> > > > > all in a bunch of configs yesterday after e67a0bc3ed4f :)
+> > > 
+> > > we have fixed (changed to old naming scheme) ixgbe right after the
+> > > kernel was used by real users (modulo usual delay needed to invent
+> > > a good solution)
+> > 
+> > No, the "fix" actually broke me for a *second time*, because I'd
+> > already converted my infrastructure to use the *new* names, which match
+> > i40e and the rest of the world.
+> > 
+> > We've seen *two* user ABI regressions in the last several months in
+> > ixgbe now, both of which completely broke networking on the system.
+> > 
+> > I'm not here to whine about that: I just want to save as many people out
+> > there in the real world as I can the trouble of having to do the same
+> > work (which has absolutely no benefit) over the next five years in i40e.
+> > 
+> > If it's acceptable to break me for a second time to "fix" this, because
+> > I'm the minority of users (a viewpoint I am in agreement with), it
+> > should also be acceptable to break the minority of i40e users who are
+> > running newer kernels to "fix" it there too.
+> > 
+> > Why isn't it?
+> 
+> I think we agree that it is ok-ish to sometime break setups for bleeding
+> edge users, then fix (aka undo). It's bad that this time it was with
+> effect equivalent to the first breakage (hope that it was easier to fix
+> locally when it occurred second time in a row).
 
-On 8/21/25 23:06, David Hildenbrand wrote:
+I just want to re-emphasize, it was *not* my intent to gripe at you
+about this. A big reason I test new kernels is in the hope I can hit
+things like this myself and get them fixed before they impact the wide
+userbase, I'm only frustrated I'm probably too late here to do that.
 
-> All pages were already initialized and set to PageReserved() with a
-> refcount of 1 by MM init code.
+> But we dispute over change from Oct 2023, for me it is carved in stone
+> at this point. Every user either adjusted or worked it around [1]
 
-Just to be sure, how is this working with MEMBLOCK_RSRV_NOINIT, where MM is supposed not to
-initialize struct pages?
+IMHO the date of the release (Jan 2024) is more relevant than the
+commit date, but it's not really that different in this case.
 
-> In fact, by using __init_single_page(), we will be setting the refcount to
-> 1 just to freeze it again immediately afterwards.
->
-> So drop the __init_single_page() and use __ClearPageReserved() instead.
-> Adjust the comments to highlight that we are dealing with an open-coded
-> prep_compound_page() variant.
->
-> Further, as we can now safely iterate over all pages in a folio, let's
-> avoid the page-pfn dance and just iterate the pages directly.
->
-> Note that the current code was likely problematic, but we never ran into
-> it: prep_compound_tail() would have been called with an offset that might
-> exceed a memory section, and prep_compound_tail() would have simply
-> added that offset to the page pointer -- which would not have done the
-> right thing on sparsemem without vmemmap.
->
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  mm/hugetlb.c | 21 ++++++++++-----------
->  1 file changed, 10 insertions(+), 11 deletions(-)
->
-> diff --git a/mm/hugetlb.c b/mm/hugetlb.c
-> index d12a9d5146af4..ae82a845b14ad 100644
-> --- a/mm/hugetlb.c
-> +++ b/mm/hugetlb.c
-> @@ -3235,17 +3235,14 @@ static void __init hugetlb_folio_init_tail_vmemmap(struct folio *folio,
->  					unsigned long start_page_number,
->  					unsigned long end_page_number)
->  {
-> -	enum zone_type zone = zone_idx(folio_zone(folio));
-> -	int nid = folio_nid(folio);
-> -	unsigned long head_pfn = folio_pfn(folio);
-> -	unsigned long pfn, end_pfn = head_pfn + end_page_number;
-> +	struct page *head_page = folio_page(folio, 0);
-> +	struct page *page = folio_page(folio, start_page_number);
-> +	unsigned long i;
->  	int ret;
->  
-> -	for (pfn = head_pfn + start_page_number; pfn < end_pfn; pfn++) {
-> -		struct page *page = pfn_to_page(pfn);
-> -
-> -		__init_single_page(page, pfn, zone, nid);
-> -		prep_compound_tail((struct page *)folio, pfn - head_pfn);
-> +	for (i = start_page_number; i < end_page_number; i++, page++) {
-> +		__ClearPageReserved(page);
-> +		prep_compound_tail(head_page, i);
->  		ret = page_ref_freeze(page, 1);
->  		VM_BUG_ON(!ret);
->  	}
-> @@ -3257,12 +3254,14 @@ static void __init hugetlb_folio_init_vmemmap(struct folio *folio,
->  {
->  	int ret;
->  
-> -	/* Prepare folio head */
-> +	/*
-> +	 * This is an open-coded prep_compound_page() whereby we avoid
-> +	 * walking pages twice by preparing+freezing them in the same go.
-> +	 */
->  	__folio_clear_reserved(folio);
->  	__folio_set_head(folio);
->  	ret = folio_ref_freeze(folio, 1);
->  	VM_BUG_ON(!ret);
-> -	/* Initialize the necessary tail struct pages */
->  	hugetlb_folio_init_tail_vmemmap(folio, 1, nr_pages);
->  	prep_compound_head((struct page *)folio, huge_page_order(h));
->  }
+I think there's merit to the idea that the lack of complaining is a sign
+that most users have not had to adjust yet, because if they had, they'd
+have complained about it. But I don't have any real data either way.
 
---Mika
+The objections raised over the new interface naming in ixgbe are in no
+way specific to ixgbe. You can s/ixgbe/i40e/ any mail about it and
+nothing really changes. They're generalized objections against the
+renaming of interfaces, so from a certain POV people *are* actively
+complaining.
 
+> > > > And, even if it is e67a0bc3ed4f that introduced it, v6.7 was the first
+> > > > release with it. I strongly suspect most servers with i40e NICs running
+> > > > in the wild are running older kernels than that, and have not yet
+> > > > encountered the naming regression. But you probably have much better
+> > > > data about that than I do :)
+> > > 
+> > > RedHat patches their kernels with current code of the drivers that their
+> > > customers use (including i40e and ixgbe)
+> > > One could expect that changes made today to those will reach RHEL 10.3,
+> > > even if it would be named "kernel 6.12".
+> > > 
+> > > (*) the changes will likely be also in 10.2, but I don't want to make
+> > > any promises from Intel or Redhat here
+> > 
+> > But how many i40e users are actually on the most recent version of RHEL?
+> > Not very many, is my guess. RHEL9 is 5.14, and has the old behavior.
+> 
+> RHEL 9 backported devlink for i40e in July 2024 [0], together with undo
+> of interface name change [1] (this likely tells why there were zero
+> complains from RH users).
+> 
+> [0]
+> https://gitlab.com/redhat/centos-stream/src/kernel/centos-stream-9/-/commit/bcbc349375ecd977aa429c3eff4d182b74dcdd8a
+> 
+> [1]
+> https://gitlab.com/redhat/centos-stream/src/kernel/centos-stream-9/-/commit/5ab8aa31dc2b44fbd6761bb19463f5427b9be245
+
+Heh. Thank you very much for checking that, and for the links.
+
+> > 
+> > If you actually have data on that, obviously that's different. But it
+> > sounds like you're guessing just like I am.
+> 
+> I could only guess about other OS Vendors, one could check it also
+> for Ubuntu in their public git, but I don't think we need more data, as
+> ultimate judge here are Stable Maintainers
+
+Maybe I'm barking up the wrong tree, it's udev after all that decides to
+read the thing in /sys and name the interfaces differently because it's
+there...
+
+In any case, Debian stable is on 6.12 and didn't patch it (just
+checked), so I concede, it is simply too late :/
+
+Thanks,
+Calvin
 
