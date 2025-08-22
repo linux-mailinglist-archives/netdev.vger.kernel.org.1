@@ -1,90 +1,120 @@
-Return-Path: <netdev+bounces-216049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FB2EB31BFD
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 16:39:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F910B31BEF
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 16:38:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2ACB1D61153
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 14:30:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 886296465D0
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 14:32:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 608C331AF36;
-	Fri, 22 Aug 2025 14:23:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C170A33A03C;
+	Fri, 22 Aug 2025 14:26:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qKwv2MBG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RKYiqPK7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38DC830BF6B;
-	Fri, 22 Aug 2025 14:23:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CFA1312828
+	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 14:26:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755872608; cv=none; b=iEsle9sNGCO/R91+sSBG59So8NI+X3MNYxmVkBUUGtuyDcyFD73ZDDcuUeyQl0L7TkkHfgfrOVFAVtxtLvzZu0ySh1Xm/LqCB+uGCosENPaWoh6gQGUaZ55xoXwoiapI2ijkgvkePyuWOzXhf8gYJtWfYRJTRP5qusz7fXX9X6E=
+	t=1755872770; cv=none; b=IvnOKErffdhc96dHy4ALzV5h+cM8e+pfHxNaArX8/MO3Te/Shuh5lRjJKEGBhTQr4ZJx21p+ffOf//Gvqc6oz1seFoz6gC5NLLk9BbmRN+90xDjS4dOBm+sQBhp0aNRFnpJoMIMIDsI1Skbf3wxqR5PLu8Eu1Eg43Gr1E+fT8Jw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755872608; c=relaxed/simple;
-	bh=NRmbokerOkaoNwUm/ECSYcST0Xx0kquTkzlGfTjqUAo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ei87yKKi9K+a34nkzNK9szqxOW+5l99IhgySSLXPLTb9hoJuDzoVZ0vo7/uXiKVuE+XdnM4bagu51UOY0cO9bCis2/7UUKR71Sfb+OzinQKyNYdWUmIZM1lvZs1nb+h1r1QUobbFaN1dC1QBrjQtpoI5Qn6/R1jN1HuuARV5gYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qKwv2MBG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77710C4CEED;
-	Fri, 22 Aug 2025 14:23:27 +0000 (UTC)
+	s=arc-20240116; t=1755872770; c=relaxed/simple;
+	bh=WSF2R7E4Mb2/hL4j6g0FeimKbh0L3weVkjdBGHjZ/88=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R0b+EKMZney/dImvXNdv3WOICsf1FB5aVXq5AKvxK8tahKYjyPd2Qq88X9FkfIs4kWRFVAlj77TZIoS8RFcAMAVQma4pmV4xlcGnTSeeT6rHoalcb3fuOfdDTSgOjXZWNttie/1aGZycx1oQfTbXTMQbzwm/VxFBiggJ27j0MKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RKYiqPK7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD0A1C113CF;
+	Fri, 22 Aug 2025 14:26:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755872607;
-	bh=NRmbokerOkaoNwUm/ECSYcST0Xx0kquTkzlGfTjqUAo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qKwv2MBGVd60tTdMjme/4HLd0iQIXLtwZmOtuD2UVfs5ZQEvImFR6TMHfvyxbnsFg
-	 B4CM5hMy0a4F2JmlzB2iTbhE3hTp0QgAareINSGbG8HzmMArh9KJxfigR197iBtoyr
-	 SUQdMXSaY2xt/JiVqShNh7EYBSMVASHgTEpiZmLa1EMiAmi1TXe82jp4zRkxh2tqaN
-	 Y9lOoCsTcUnwSh/j8iwN58YjrKBbNppGWw4IaERnrzbZCK/R8jqvCI9P7U/XeYGDmA
-	 E2C7RBa3YXRNlVFQOrbrfnjoCyXsgngRIvtX4m4r+LlgmwQTY0FCJXDkOCvn29HvZ3
-	 RRO9yeZQfePhw==
-Date: Fri, 22 Aug 2025 07:23:26 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Calvin Owens <calvin@wbinvd.org>
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>, Michal Schmidt
- <mschmidt@redhat.com>, netdev@vger.kernel.org, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
- Ivan Vecera <ivecera@redhat.com>, intel-wired-lan@lists.osuosl.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] i40e: Prevent unwanted interface name changes
-Message-ID: <20250822072326.725475ef@kernel.org>
-In-Reply-To: <aKfwuFXnvOzWx5De@mozart.vkv.me>
-References: <94d7d5c0bb4fc171154ccff36e85261a9f186923.1755661118.git.calvin@wbinvd.org>
-	<CADEbmW100menFu3KACm4p72yPSjbnQwnYumDCGRw+GxpgXeMJA@mail.gmail.com>
-	<aKXqVqj_bUefe1Nj@mozart.vkv.me>
-	<aKYI5wXcEqSjunfk@mozart.vkv.me>
-	<e71fe3bf-ec97-431e-b60c-634c5263ad82@intel.com>
-	<aKcr7FCOHZycDrsC@mozart.vkv.me>
-	<8f077022-e98a-4e30-901b-7e014fe5d5b2@intel.com>
-	<aKfwuFXnvOzWx5De@mozart.vkv.me>
+	s=k20201202; t=1755872770;
+	bh=WSF2R7E4Mb2/hL4j6g0FeimKbh0L3weVkjdBGHjZ/88=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RKYiqPK7OLe2vlUs8QaWsL9uZ17hNWV3VpK1Dz+4uMqooYDmgqakRouxbyZ0NDdcn
+	 ymEPZ1K4L/2FgFj3XapO7ZBwbphFXhaa3q7Q6WBMrKwTh8Shf4gEYxZQiTGm5poCro
+	 mBMSkX/JfXnrqH+0Zsl83jLLbKndT9DAxSxxDuftsEl155MOIcxsAGhbmdnfVyfvEA
+	 fPxh6VV0yn2S0D/llpfhk0Bjkayu/Ywi09DSwAuIxiAhf9GQ/wBPXXTjJG3OwLfc6x
+	 mSg5eQg0duAwyHupXZnrfSAzE+qRtvaqFr5nQpMdw1Ajv12glzCSRA8PlL9xTTp7BY
+	 fNI3MCwLRvKdg==
+Date: Fri, 22 Aug 2025 16:26:06 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 2/3] net: airoha: Add airoha_ppe_dev struct
+ definition
+Message-ID: <aKh9_g7mgvFxMdAz@lore-rh-laptop>
+References: <20250819-airoha-en7581-wlan-rx-offload-v1-0-71a097e0e2a1@kernel.org>
+ <20250819-airoha-en7581-wlan-rx-offload-v1-2-71a097e0e2a1@kernel.org>
+ <20250821183453.4136c5d3@kernel.org>
+ <aKgVEYMftYgdynxw@lore-rh-laptop>
+ <20250822070440.71bdd804@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="FXbdwn9GJNlxMjEH"
+Content-Disposition: inline
+In-Reply-To: <20250822070440.71bdd804@kernel.org>
 
-On Thu, 21 Aug 2025 21:23:20 -0700 Calvin Owens wrote:
-> > > If you actually have data on that, obviously that's different. But it
-> > > sounds like you're guessing just like I am.  
-> > 
-> > I could only guess about other OS Vendors, one could check it also
-> > for Ubuntu in their public git, but I don't think we need more data, as
-> > ultimate judge here are Stable Maintainers  
-> 
-> Maybe I'm barking up the wrong tree, it's udev after all that decides to
-> read the thing in /sys and name the interfaces differently because it's
-> there...
 
-Yeah, that's my feeling. Ideally there should be a systemd-networkd
-setting that let's user opt out of adding the phys_port_name on
-interfaces. 99% of users will not benefit from these, new drivers or
-old. We're kinda making everyone suffer for the 1% :(
+--FXbdwn9GJNlxMjEH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Aug 22, Jakub Kicinski wrote:
+> On Fri, 22 Aug 2025 08:58:25 +0200 Lorenzo Bianconi wrote:
+> > > On Tue, 19 Aug 2025 14:21:07 +0200 Lorenzo Bianconi wrote: =20
+> > > > +	pdev =3D of_find_device_by_node(np);
+> > > > + =20
+> > >=20
+> > > did you mean to put the of_node_put() here?
+> > >  =20
+> > > > +	if (!pdev) {
+> > > > +		dev_err(dev, "cannot find device node %s\n", np->name);
+> > > > +		of_node_put(np);
+> > > > +		return ERR_PTR(-ENODEV);
+> > > > +	}
+> > > > +	of_node_put(np); =20
+> >=20
+> > I moved the of_node_put() here (and in the if branch) in order to fix a=
+ similar
+> > issue fixed by Alok for airoha_npu.
+>=20
+> Ah, didn't notice it in the print..
+> maybe remove the empty line between the of_find_device.. and the null
+> check on pdev then?
+
+I am fine with it. I did it this way just to be consistent with NPU code:
+https://github.com/torvalds/linux/blob/master/drivers/net/ethernet/airoha/a=
+iroha_npu.c#L403
+Do you want me to post v3?
+
+Regards,
+Lorenzo
+
+--FXbdwn9GJNlxMjEH
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaKh9+wAKCRA6cBh0uS2t
+rCjXAQD/CFY6FZBfBcRt+bN2UykwgbP/5hNbqWoPrdltuQ8VKwD/VlSEjpbCiIVN
+JTzElzSc2kYY+9A/Of88HRuL0KmM2Q8=
+=/jOx
+-----END PGP SIGNATURE-----
+
+--FXbdwn9GJNlxMjEH--
 
