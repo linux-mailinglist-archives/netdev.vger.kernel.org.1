@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-216009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6AF9B3176F
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 14:17:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6CD0B31782
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 14:20:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF18CAE372B
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 12:15:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D665B63294
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 12:18:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 770592FD7A3;
-	Fri, 22 Aug 2025 12:14:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D1D43090CB;
+	Fri, 22 Aug 2025 12:16:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="LAYLKyig"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="vK5SYRbK"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB642FCBE8;
-	Fri, 22 Aug 2025 12:14:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 142F82FC007;
+	Fri, 22 Aug 2025 12:16:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755864878; cv=none; b=XSmABL5myv7s38wSVti8Qud9hQuFFyU6CzQhb6tOWXGBI2Nc1rDiL73VXua1ooXcR2CgdD6893v/rZXN18PyuynjmEasa5w4MydBb4IwLS5DXm9tPW/mCu6gCS7cegJCdEqhTULGsDC+fD+ubnNyM25jEzVhn5tU0AYpTWBC5So=
+	t=1755864978; cv=none; b=UnVbgHM/azXULeyzfpc5ajfwq+xr9nKMYq2n8RXAlEFZ3ujrT45KELB/itYT1cID2X6rzIt4/L0MdYhGjz6jfmu4EpCXefqhYhNV6Dol5AXik9xNV3NwrvYFt5hDe1RQwqi4d0ZDVtXNvN01Qq5Hxp88qHyv8hSmga0gKPXHKEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755864878; c=relaxed/simple;
-	bh=xUzCqw8G2JO1bhdytol3kfokW1GSmJ1/SVm3V50NR/g=;
+	s=arc-20240116; t=1755864978; c=relaxed/simple;
+	bh=3Ea7W0dwKnTlVfxRkgXHCe2WVUuOP11xif5wEmfOclM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=XexFkd716uxhmHVoM1gfIUfTJeJPuLpCA8HMmgzKuwGQPjE5e9zQ8QqLEOPa/vYxnHTwlHZpFXtbJ4funFZdwzSZR23XICEOK/7/rHS8uFOk64OQ/+RxtDqhbApdJqCwWp0dVPmuiqfybHVKlkCdipwi4S63oehAKTudC7peQWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=LAYLKyig; arc=none smtp.client-ip=68.232.153.233
+	 In-Reply-To:Content-Type; b=LQZ1jICEBMNzx4+Z+kpdEESDIeQUqdN4iRxKdDzQrT4DSDhWiAp3dY3we1h4FdY9S/J3/oYKzJvZqolzcHkVbiZ5Ckf519+EE4KYfmLTXpeSSxwKpioswf6iP8UW3Yl25SfuC+eIItIMGnnyaPCbClyIpsjRU+mBL0+d+tDJ+OE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=vK5SYRbK; arc=none smtp.client-ip=68.232.153.233
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1755864877; x=1787400877;
+  t=1755864978; x=1787400978;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=xUzCqw8G2JO1bhdytol3kfokW1GSmJ1/SVm3V50NR/g=;
-  b=LAYLKyigeTTjvC34kfVLH4i9EbjGdZko/yCTxg1NLSTWxnkwbLhDiE96
-   rmkCYHU/6nsb7XlRJnUDre2RKyLvmCf/L/XMzgYpDLIrYM//xkSVmVuHc
-   Y5hsB5F82+Y4aO6KeFxCY1IO7d1jde/3HCYdU2XTLt42UrCpZFo+/nKqe
-   W8nY5a/XEKcHulou0s5FEeubJXT4igk4KLqKBfn3gnkz7bqlsYSuBqWnA
-   o+D7gIt0T2o270kI0uTklHUXCvVI6bBz5gYsvbZ0N1jmRA7ySmsQcO89P
-   GPJwsKEe0l9CLNfN4B81cg1bvgj3VKqv5NZFks7U9pcTPgmlKtQTChsG2
-   w==;
-X-CSE-ConnectionGUID: UKvKOVZXRqugqNL71FaA+g==
-X-CSE-MsgGUID: /uRisEj6RXar0b2HQ8WGoQ==
+  bh=3Ea7W0dwKnTlVfxRkgXHCe2WVUuOP11xif5wEmfOclM=;
+  b=vK5SYRbKb8No+twO1Sq/8UVyGGoMYlqLdRLXXXu9ztsq6jncKmbOo6+1
+   shICueE5ZQ4WPleKmL/zDvaZghDlWQaE+u9ieMCIsnjUwRoNB5xSsFAML
+   13tsQRaR8XKfOhdjh1jl1S8g3/fiqGnUhenhPxrauL5K01M5yW2mZPavj
+   lCkvcCYxzC0deYNxd9Z7//5REpw3fq1Qvs5xMI3OM5y/p0f/CcAtMZJLs
+   V46810FIpF5xktsoxzvJlpvRyJvTGG8Ag5PxjKcJuU8CqUVHg8g11yZKD
+   UMs6z8VDWk+nnVcFfK3JLbqdLTYlUOSMzcOe/LUnGDlTEudkfjk/8ZcOg
+   A==;
+X-CSE-ConnectionGUID: jcwXdTWwTtyRRk6+L1Fb/g==
+X-CSE-MsgGUID: /sDrhHoERLykyKvbaKhrcg==
 X-IronPort-AV: E=Sophos;i="6.17,309,1747724400"; 
-   d="scan'208";a="45527384"
+   d="scan'208";a="276922450"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 22 Aug 2025 05:14:21 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 22 Aug 2025 05:16:13 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
+ chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Fri, 22 Aug 2025 05:13:59 -0700
+ 15.1.2507.44; Fri, 22 Aug 2025 05:15:51 -0700
 Received: from [10.159.245.205] (10.10.85.11) by chn-vm-ex02.mchp-main.com
  (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
- Transport; Fri, 22 Aug 2025 05:13:55 -0700
-Message-ID: <364fadbd-20fd-4f89-8a86-ed5b8d87ab42@microchip.com>
-Date: Fri, 22 Aug 2025 14:13:55 +0200
+ Transport; Fri, 22 Aug 2025 05:15:47 -0700
+Message-ID: <bc7b0167-7514-4aad-a4dd-bd1d9929e99b@microchip.com>
+Date: Fri, 22 Aug 2025 14:15:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,8 +67,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/5] net: cadence: macb: Add support for Raspberry Pi
- RP1 ethernet controller
+Subject: Re: [PATCH v2 2/5] dt-bindings: net: cdns,macb: Add compatible for
+ Raspberry Pi RP1
 To: Stanimir Varbanov <svarbanov@suse.de>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
 	<linux-arm-kernel@lists.infradead.org>,
@@ -82,63 +82,45 @@ CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
 	Andrea della Porta <andrea.porta@suse.com>, Claudiu Beznea
 	<claudiu.beznea@tuxon.dev>, Phil Elwell <phil@raspberrypi.com>, Jonathan Bell
 	<jonathan@raspberrypi.com>, Dave Stevenson <dave.stevenson@raspberrypi.com>,
-	Andrew Lunn <andrew@lunn.ch>
+	Andrew Lunn <andrew@lunn.ch>, Conor Dooley <conor.dooley@microchip.com>
 References: <20250822093440.53941-1-svarbanov@suse.de>
- <20250822093440.53941-4-svarbanov@suse.de>
+ <20250822093440.53941-3-svarbanov@suse.de>
 From: Nicolas Ferre <nicolas.ferre@microchip.com>
 Content-Language: en-US, fr
 Organization: microchip
-In-Reply-To: <20250822093440.53941-4-svarbanov@suse.de>
+In-Reply-To: <20250822093440.53941-3-svarbanov@suse.de>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 22/08/2025 at 11:34, Stanimir Varbanov wrote:
 > From: Dave Stevenson <dave.stevenson@raspberrypi.com>
 > 
-> The RP1 chip has the Cadence GEM block, but wants the tx_clock
-> to always run at 125MHz, in the same way as sama7g5.
-> Add the relevant configuration.
+> The Raspberry Pi RP1 chip has the Cadence GEM ethernet
+> controller, so add a compatible string for it.
 > 
 > Signed-off-by: Dave Stevenson <dave.stevenson@raspberrypi.com>
 > Signed-off-by: Stanimir Varbanov <svarbanov@suse.de>
 > Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Acked-by: Nicolas Ferre <nicolas.ferre@microchip.com>
+Reviewed-by: Nicolas Ferre <nicolas.ferre@microchip.com>
 
+> Acked-by: Conor Dooley <conor.dooley@microchip.com>
 > ---
->   drivers/net/ethernet/cadence/macb_main.c | 12 ++++++++++++
->   1 file changed, 12 insertions(+)
+>   Documentation/devicetree/bindings/net/cdns,macb.yaml | 1 +
+>   1 file changed, 1 insertion(+)
 > 
-> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-> index 36717e7e5811..260fdac46f4b 100644
-> --- a/drivers/net/ethernet/cadence/macb_main.c
-> +++ b/drivers/net/ethernet/cadence/macb_main.c
-> @@ -5135,6 +5135,17 @@ static const struct macb_config versal_config = {
->          .usrio = &macb_default_usrio,
->   };
-> 
-> +static const struct macb_config raspberrypi_rp1_config = {
-> +       .caps = MACB_CAPS_GIGABIT_MODE_AVAILABLE | MACB_CAPS_CLK_HW_CHG |
-> +               MACB_CAPS_JUMBO |
-> +               MACB_CAPS_GEM_HAS_PTP,
-> +       .dma_burst_length = 16,
-> +       .clk_init = macb_clk_init,
-> +       .init = macb_init,
-> +       .usrio = &macb_default_usrio,
-> +       .jumbo_max_len = 10240,
-> +};
-> +
->   static const struct of_device_id macb_dt_ids[] = {
->          { .compatible = "cdns,at91sam9260-macb", .data = &at91sam9260_config },
->          { .compatible = "cdns,macb" },
-> @@ -5155,6 +5166,7 @@ static const struct of_device_id macb_dt_ids[] = {
->          { .compatible = "microchip,mpfs-macb", .data = &mpfs_config },
->          { .compatible = "microchip,sama7g5-gem", .data = &sama7g5_gem_config },
->          { .compatible = "microchip,sama7g5-emac", .data = &sama7g5_emac_config },
-> +       { .compatible = "raspberrypi,rp1-gem", .data = &raspberrypi_rp1_config },
->          { .compatible = "xlnx,zynqmp-gem", .data = &zynqmp_config},
->          { .compatible = "xlnx,zynq-gem", .data = &zynq_config },
->          { .compatible = "xlnx,versal-gem", .data = &versal_config},
+> diff --git a/Documentation/devicetree/bindings/net/cdns,macb.yaml b/Documentation/devicetree/bindings/net/cdns,macb.yaml
+> index 559d0f733e7e..0591da97d434 100644
+> --- a/Documentation/devicetree/bindings/net/cdns,macb.yaml
+> +++ b/Documentation/devicetree/bindings/net/cdns,macb.yaml
+> @@ -54,6 +54,7 @@ properties:
+>             - cdns,np4-macb             # NP4 SoC devices
+>             - microchip,sama7g5-emac    # Microchip SAMA7G5 ethernet interface
+>             - microchip,sama7g5-gem     # Microchip SAMA7G5 gigabit ethernet interface
+> +          - raspberrypi,rp1-gem       # Raspberry Pi RP1 gigabit ethernet interface
+>             - sifive,fu540-c000-gem     # SiFive FU540-C000 SoC
+>             - cdns,emac                 # Generic
+>             - cdns,gem                  # Generic
 > --
 > 2.47.0
 > 
