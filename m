@@ -1,105 +1,77 @@
-Return-Path: <netdev+bounces-216016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216017-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10539B318C5
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 15:06:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E04EB318D6
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 15:09:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FF3C1C81CFC
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 13:01:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3949E606390
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 13:01:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D25D2FD1D2;
-	Fri, 22 Aug 2025 12:59:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 188832C0277;
+	Fri, 22 Aug 2025 13:00:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m1z4knZh"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ySk1i4Ja"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 326872E6114;
-	Fri, 22 Aug 2025 12:58:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BAA9302CC7;
+	Fri, 22 Aug 2025 13:00:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755867540; cv=none; b=mST5m3FZeS/kADycUsEPqBXNKp9s/lSrISE8MieOZyv0G71GJsvXPZLWvHKjyjoEIyDFBrEDHVbgWu8/dyvMR8GrZNEBqQPnWZ0QJ5l0ndBZVj+ELLwcnNP5NNi1W2pjjo8z3QqllVnjNwTl3LiQ7pEVDkljzJDOM7BuzxqChI0=
+	t=1755867606; cv=none; b=R0MXxbra21flMzgJY8gx5ri7gvNamQ0rk7T09kBsXZa+q7LOoUpp/2AILwxIlK2rLbw7iK5KUu3ns85usE/72ZQfa+l3Jd0VBzKx7uznx9aaoiUTy+LomyefJ5fMXK8SqZAQlAVuKsvP6zin/7jzOA213CENdf0wlIzKpbaG0j8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755867540; c=relaxed/simple;
-	bh=gRkkjX/EdfDu31YPDvy5ttFGv7KmWKXEGbB8WqkZ5sw=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=i9d+uuLB0B0QWbbRIa+waBciy3cFpJ4HQQpWOsZVLYZ7wDLyeg9Namp+dg+J7fs6XW7HEYMZsQ1lJo/nQKbU4CUjNfathjtNddDnFCsfMr4Q091soEHKn6wTROQMxbvZ6CKtYbZXif9h25L52QwSghbZcYcO4SQf1K9Ie1YCY4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m1z4knZh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F00FC113CF;
-	Fri, 22 Aug 2025 12:58:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755867539;
-	bh=gRkkjX/EdfDu31YPDvy5ttFGv7KmWKXEGbB8WqkZ5sw=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=m1z4knZhUJiPcUj33fKZiFYItL9YVRy7wJOmMm0xOBEAooFVLCtyH08b//fM140EM
-	 W7UhYnEzcsf1fSOdhnqIGRX0ICNlLDjqseF4lJrm6RcJBn/6upDVlI2lN6YOzUzdmH
-	 0HWOojpM88YPoM8hYwXJZ/hmUpjcAFp4yZp7EfU/qPuhISEpqJk3SvnVvF90MS/Fdo
-	 16bR+obgg7JebRKy/9b0e6yQzE4aDqo1Un+3QB2WKhcl/5wY/Zca8vmyLXjoW0r4eE
-	 DFhifQ2bjeAgYF2Q78TgCfkgYp6RWRx8J9hKzMn2hqujETTBqtrTTIBXAzuGlH801H
-	 vhQmbaUXRU5Qg==
-Date: Fri, 22 Aug 2025 07:58:58 -0500
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1755867606; c=relaxed/simple;
+	bh=OrVIPYS1E+djrOZ4LNmEbYam6+d+/9oqufM7Sapxb6c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aeEznmHNTrLENJb+RGoEe0yGZox9NDQYfVV3bW38VSiucnW+wf8riV4Peq/8As5KT1p0WoWrFE85y1SVPg1TN1WPW2h3WGDPsPkLSnwhYIKAse8ilFr40nYCDZj+U4S6/7ogwvz2/yQwHEVgAj/qyMymps+l/DiqhQWwgSidMr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ySk1i4Ja; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=zwhAsXIwgy930xIEIc3hqz2SZ32KH1hEL9whGsP/YPU=; b=ySk1i4JaLkNHQKa6Rgx7+NZAiP
+	T6lMu0roX8z0YB9obpFJMEON09A6hCC+GnrPfKeg6Qxy/VfpyexSBEpP+xccYfRjWKu4doOYxuWjp
+	+jnauKfAlQGsZ1hitamFDNRMDCFaxiJRtfMqv8PFMX9i/nigWKNmOkydAMPLdIsIqIAs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1upRN2-005ZzQ-1J; Fri, 22 Aug 2025 14:59:52 +0200
+Date: Fri, 22 Aug 2025 14:59:52 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Parthiban.Veerasooran@microchip.com
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] microchip: lan865x: fix missing ndo_eth_ioctl
+ handler to support PHY ioctl
+Message-ID: <5ac05a1f-0cd2-421c-8747-9159a62dce2b@lunn.ch>
+References: <20250821082832.62943-1-parthiban.veerasooran@microchip.com>
+ <204b8b3d-e981-41fa-b65c-46b012742bfe@lunn.ch>
+ <4a2e6ca1-7ae9-4959-a394-c84aab4b4c02@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: krzk+dt@kernel.org, andrew+netdev@lunn.ch, pabeni@redhat.com, 
- devicetree@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org, 
- davem@davemloft.net, conor+dt@kernel.org, sureshnagaraj@maxlinear.com, 
- edumazet@google.com, yzhu@maxlinear.com
-To: Jack Ping CHNG <jchng@maxlinear.com>
-In-Reply-To: <20250822090809.1464232-3-jchng@maxlinear.com>
-References: <20250822090809.1464232-1-jchng@maxlinear.com>
- <20250822090809.1464232-3-jchng@maxlinear.com>
-Message-Id: <175586751398.3283621.10950421213702804757.robh@kernel.org>
-Subject: Re: [PATCH net-next 2/2] dt-bindings: net: mxl: Add MxL LGM
- Network Processor SoC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4a2e6ca1-7ae9-4959-a394-c84aab4b4c02@microchip.com>
 
+> By the way, is there a possibility to submit or apply this patch to the 
+> older stable kernels as well, so that users on those versions can also 
+> benefit from this feature?
 
-On Fri, 22 Aug 2025 17:08:09 +0800, Jack Ping CHNG wrote:
-> Introduce device-tree binding documentation for
-> MaxLinear LGM Network Processor
-> 
-> Signed-off-by: Jack Ping CHNG <jchng@maxlinear.com>
-> ---
->  .../devicetree/bindings/net/mxl,lgm-eth.yaml  | 59 +++++++++++++++++++
->  1 file changed, 59 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/mxl,lgm-eth.yaml
-> 
+This is the sort of patch the machine learning bot picks up for back
+porting to stable. The Fixes: tag is only one indicator it looks for,
+it being a one liner and the words in the commit message might trigger
+it as well.
 
-My bot found errors running 'make dt_binding_check' on your patch:
-
-yamllint warnings/errors:
-./Documentation/devicetree/bindings/net/mxl,lgm-eth.yaml:5:10: [error] string value is redundantly quoted with any quotes (quoted-strings)
-
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/mxl,lgm-eth.yaml: patternProperties: '^interface$' should not be valid under {'pattern': '^\\^[a-zA-Z0-9,\\-._#@]+\\$$'}
-	hint: Fixed strings belong in 'properties', not 'patternProperties'
-	from schema $id: http://devicetree.org/meta-schemas/keywords.yaml#
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250822090809.1464232-3-jchng@maxlinear.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+	Andrew
 
