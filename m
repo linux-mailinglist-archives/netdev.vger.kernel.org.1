@@ -1,119 +1,125 @@
-Return-Path: <netdev+bounces-216074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DF62B31E38
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 17:21:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 867B3B31E54
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 17:24:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0BB891887314
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 15:17:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A095C5E003E
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 15:17:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4471212556;
-	Fri, 22 Aug 2025 15:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A850021CFF6;
+	Fri, 22 Aug 2025 15:16:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ViYRQC3d"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="M2OmbBgY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADBF71D8DFB
-	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 15:16:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 225822ECD32
+	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 15:16:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755875798; cv=none; b=jHVEZDiFn+YXu0xSQORwNRUq1ZE43yjezYth9VJG9hO0kaywUYDMOZxJM7jKAeGUP4yp+H+9XJ6wHTfM7qv5TKpYCN7dYoAAebqH/wqCmYxgMtao70VW4OrHtelaQNnfOaNU7wNxlAfQ76+KWQ9dk87IsqXejhtzAUh8SsSpkD4=
+	t=1755875815; cv=none; b=bROT41RLH/Q26XBfEk+z7UJHP07vFjR6pI2yS/Z9wXRQ0WvF5zopPBguwXazsbUxd9uHIYbpm8+asgL20nL9roi9p0V9rPu2RVmIO7r+RGf9IUugyX5jrF1ivapHYXqCnMHhPA7NBKk/d3hcjzmPHQPZVFvjXva4M9YxDBwkek4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755875798; c=relaxed/simple;
-	bh=oY0mk8KxQRWIvojXK2ESN4yhb+YTZY9xVqcXmvwTL6c=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NSYREDazTHzaKRaA1qFPQzDzJfI50K1VsXUdauTpf5lEiFsqgauaMQcm04pf0V037yFHTYu5x18unkIggxzm+XPYHHQ0rVW+ESeVHTDik1/aEko9K715JOWC2ZifqyK3RvlTpKCc5X//AM+HKepy+U0SHY44caILC954g6kUnpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ViYRQC3d; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755875797; x=1787411797;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=oY0mk8KxQRWIvojXK2ESN4yhb+YTZY9xVqcXmvwTL6c=;
-  b=ViYRQC3d5KV2oOStm4DAjVTGZQLgGRhfQK4vOc/+MgPoqrBoN8LLnzPU
-   mIDfy6/TlB4SykPmUCKyFwdKIp9wYifgE2QzA+O+RaMnF4zVvXEUnjPCs
-   imJRWKhz1x5IHWiq8si2pky4X0wT+ZMmW50zej4Gt/QgTJhMCt+y6Vfx9
-   uB2QzZqo4ogesTIMQAK71X5T37UtknpKGGT2QAU95uFN3sFiPsJJrW5De
-   B538kMBqy4ubDtvnpGnjldwGsZu7q3Vd+1NehOK+raYX+Vk1TAXGcdfK/
-   EsQphQAW82gA2sF+UZL3dU4igV1gsuPahInQQ0PynZsTmnZCqGV+vDu1x
-   Q==;
-X-CSE-ConnectionGUID: Z1hR4FybRJCIESkSdp9PEg==
-X-CSE-MsgGUID: RG97LaVGQcWB2VQbLR61gQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11529"; a="58135045"
-X-IronPort-AV: E=Sophos;i="6.17,309,1747724400"; 
-   d="scan'208";a="58135045"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2025 08:16:34 -0700
-X-CSE-ConnectionGUID: e09I/N5oSyasjeBqD4Wc4g==
-X-CSE-MsgGUID: Lrd2Pn0TQe6YY13vbLYEig==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,309,1747724400"; 
-   d="scan'208";a="172923721"
-Received: from boxer.igk.intel.com ([10.102.20.173])
-  by orviesa003.jf.intel.com with ESMTP; 22 Aug 2025 08:16:32 -0700
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	magnus.karlsson@intel.com,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Subject: [PATCH iwl-net] i40e: remove redundant memory barrier when cleaning Tx descs
-Date: Fri, 22 Aug 2025 17:16:17 +0200
-Message-Id: <20250822151617.2261094-1-maciej.fijalkowski@intel.com>
-X-Mailer: git-send-email 2.38.1
+	s=arc-20240116; t=1755875815; c=relaxed/simple;
+	bh=0dwyaRqGbilF5+78hipgtL3msbczA20QAW0v5uAXf6M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XGXy6rUaZW1aoRCIJOaJu2nIpjBfv31bkVn9ZCDk/U8KC6K0nv/NbfY5v6CvKbit70F48OO3O3K2NqDPd59As+gWmRSOt9OOJ9x1kF9S3WDhCvLZ52fh5iXBH3EHBh/jXiP5SWb1MiI+8WivLdZRSEI/eOk99i8rC9iBxk7N5eA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=M2OmbBgY; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-45a1b00e4a1so18246185e9.0
+        for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 08:16:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1755875811; x=1756480611; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VncA65wqs3Xw1Kli1LmPF8HpRGnNYdKn7A2d63G/g4o=;
+        b=M2OmbBgYh1VEQ6HBWy6Cv7jCkLeoWdO1J3KdrpyuQSnadHULFIkVzirEiYxMi7KvlI
+         IPsRRHWaO2UAYIIN/r/8782jJWs5ENME9+yCBr9YHTw1AX/d3loQNGh8ylgoe2XXUCCf
+         3LWhOenZCrAtfzdEdMV8XoUF61SWaLLgYIlretKi40Yl47F3p/E9EHRn/KNLKCy1NN+w
+         Zji/JeojCFugSsA/Su1+zvaIQtX8tuCHdwXP7Y224ZvfqrdsRFLOx4aMsnn+Cz5BEyrn
+         pe1zWYaBQkYaSXL41/ek2sap18bpDSo80zdfh4lewaXQoPW3qX8MbwcK//v26FNLkW4a
+         Rheg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755875811; x=1756480611;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VncA65wqs3Xw1Kli1LmPF8HpRGnNYdKn7A2d63G/g4o=;
+        b=L+8u9w/5BmpXWLh1il42k/ZcwF7tDUANc/RIvGH89E8Wb96fco/Wnb14R5kx9GWa/H
+         7OxYQEl7T8wQky34JYwVBn7qmn9D4/Cl/wZTxnxqulLYNbo5ZP05dEbhqQGAj2fj23Xb
+         mPGLbaimILg82zBaOFhc4rz6f8f8JZDaYT+naAOyZ6W0UVd+q7L6geT+XS1mUWpBwCgr
+         RXS6Q0JHXNCckcVjZD1e6XzXfjDuyd5UZ0bJ3h+HY5S+0EyFn3KXwdcSWKjeqYCnKqys
+         HXbjr5DcqkaM/2fV1hUycdAQbSte3VzRYiMh3Yu9W9HbRUGEXQR75UOT2hwt8j7p/Yd5
+         iLrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWVzfnVmCWDGe1iRjeUSpj3KQwCNjusHsBuXFSiRixY77t5nUo3kaXqaGV+q5ENYUuwp4XHarY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFX9cJcyI6wahUJEyx1uJuCFrSpWRP2zJ/n1OtFr5oZsejp56f
+	1jz8wICDMd70Uut5gAEJWiUg07KfON8FxXEmw0CuxhMIFjGsnhNoPkVNC7PZMQKVWz4=
+X-Gm-Gg: ASbGncvJjwUXHb1bxrP1iwv3xjMIT3eaM4Iuc45jVVRZ3lwPFHV/LoLAJIjYcnACG4p
+	8i7JhSCkwzHnvZE6QpsD/OrT3tiymKCHgL9wrd7NFaBu2suN1lYqWAPX5/ysOrYa7Q3QNIWcco7
+	7nCeVVUIHKAPCGmUja0EBBMhy8453JM1Hb5WR1I+v/B04AriADoTl5Fft21W6m9Bj3H156QvTyq
+	7TEQ63YG5Q1hhy934kkPNJQm9SO1jxDln1Q/KhgCIBaV+EXtK/ynvi0DD965cbRSg8vOAVimnHf
+	rEKJXX4TKAcuRunXBfaJT8pZBsIYiahEkH+3vwnTqFJhw9yuBtGsd+phB7qUq8/CrbBQiUS5Fwt
+	7mE6PzUMup+QrIUFexMC/6dlNKCpucQ==
+X-Google-Smtp-Source: AGHT+IHjt+7d5bsv8WuyVg2j/dbfTLKOl+Cjl6jkUNdsWRo33Z0S5ptgeOtzC4H+PPYP3sETkG74wA==
+X-Received: by 2002:a05:600c:4715:b0:456:1923:7549 with SMTP id 5b1f17b1804b1-45b517d294dmr25933535e9.26.1755875811111;
+        Fri, 22 Aug 2025 08:16:51 -0700 (PDT)
+Received: from [192.168.50.4] ([82.78.167.81])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3c6070264fbsm2830727f8f.67.2025.08.22.08.16.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 Aug 2025 08:16:50 -0700 (PDT)
+Message-ID: <86694152-3daa-451d-baa0-2d957a00644a@tuxon.dev>
+Date: Fri, 22 Aug 2025 18:16:48 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/5] net: cadence: macb: Set upper 32bits of DMA ring
+ buffer
+To: Stanimir Varbanov <svarbanov@suse.de>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-rpi-kernel@lists.infradead.org,
+ Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Florian Fainelli <florian.fainelli@broadcom.com>,
+ Andrea della Porta <andrea.porta@suse.com>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Phil Elwell <phil@raspberrypi.com>, Jonathan Bell
+ <jonathan@raspberrypi.com>, Dave Stevenson <dave.stevenson@raspberrypi.com>,
+ stable@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
+References: <20250822093440.53941-1-svarbanov@suse.de>
+ <20250822093440.53941-2-svarbanov@suse.de>
+From: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Content-Language: en-US
+In-Reply-To: <20250822093440.53941-2-svarbanov@suse.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-i40e has a feature which writes to memory location last descriptor
-successfully sent. Memory barrier in i40e_clean_tx_irq() was used to
-avoid forward-reading descriptor fields in case DD bit was not set.
-Having mentioned feature in place implies that such situation will not
-happen as we know in advance how many descriptors HW has dealt with.
 
-Besides, this barrier placement was wrong. Idea is to have this
-protection *after* reading DD bit from HW descriptor, not before.
-Digging through git history showed me that indeed barrier was before DD
-bit check, anyways the commit introducing i40e_get_head() should have
-wiped it out altogether.
 
-Also, there was one commit doing s/read_barrier_depends/smp_rmb when get
-head feature was already in place, but it was only theoretical based on
-ixgbe experiences, which is different in these terms as that driver has
-to read DD bit from HW descriptor.
+On 22.08.2025 12:34, Stanimir Varbanov wrote:
+> In case of rx queue reset and 64bit capable hardware, set the upper
+> 32bits of DMA ring buffer address.
+> 
+> Cc: stable@vger.kernel.org # v4.6+
+> Fixes: 9ba723b081a2 ("net: macb: remove BUG_ON() and reset the queue to handle RX errors")
+> Credits-to: Phil Elwell <phil@raspberrypi.com>
+> Credits-to: Jonathan Bell <jonathan@raspberrypi.com>
+> Signed-off-by: Stanimir Varbanov <svarbanov@suse.de>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Fixes: 1943d8ba9507 ("i40e/i40evf: enable hardware feature head write back")
-Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
----
- drivers/net/ethernet/intel/i40e/i40e_txrx.c | 3 ---
- 1 file changed, 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.c b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-index 048c33039130..b194eae03208 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-@@ -948,9 +948,6 @@ static bool i40e_clean_tx_irq(struct i40e_vsi *vsi,
- 		if (!eop_desc)
- 			break;
- 
--		/* prevent any other reads prior to eop_desc */
--		smp_rmb();
--
- 		i40e_trace(clean_tx_irq, tx_ring, tx_desc, tx_buf);
- 		/* we have caught up to head, no work left to do */
- 		if (tx_head == tx_desc)
--- 
-2.34.1
+Reviewed-by: Claudiu Beznea <claudiu.beznea@tuxon.dev>
 
 
