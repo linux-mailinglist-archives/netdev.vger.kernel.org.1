@@ -1,162 +1,101 @@
-Return-Path: <netdev+bounces-215884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5001B30BED
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 04:39:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2ABC0B30C53
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 05:10:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A24147A4452
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 02:37:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEBB3189CFEC
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 03:10:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C4221885AB;
-	Fri, 22 Aug 2025 02:38:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42EE2261B93;
+	Fri, 22 Aug 2025 03:10:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (l-sdnproxy.icoremail.net [20.188.111.126])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EDCE194A45;
-	Fri, 22 Aug 2025 02:38:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=20.188.111.126
+Received: from vps001.vanheusden.com (fatelectron.soleus.nu [94.142.246.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5134B433AC;
+	Fri, 22 Aug 2025 03:10:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.142.246.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755830322; cv=none; b=m8A6DgKZIj+Kdlv+9ix42c0Ctlq8P1W9tlq2DEvD+FiX1sZffaJpWbPegozv6lWCJu+k79f6ZBgJCIZJ1EIeWwIL2vXewe5j7U83wrfeGrTU1JfIZHTcmq3GTRlc7jHLRLjI1ybdIDxdEa7K79EPTDmO1pNE/8ioeG2BoGFV5r8=
+	t=1755832227; cv=none; b=b0ic8GnJ1mYX/GnDPVDNMnHoOHMQd2hyaba34d9XMpSmMLmA0/VyChAObMDU1+xKOVdZ6bVftuNtngr84O/AR9DPFJ8EckKHFekVk9XqIY3NWGXQVov2vaJWdA8XYWPpvxAlz5fzFQfHKHWGlQn8o0ZzRv5OEqScIscGgGQOLH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755830322; c=relaxed/simple;
-	bh=13uyK1WLkkJWQnCXhwaNVxQ4g+5FLa3gYjiKyQUA6aA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=d4g5hrGUhk4H6J9vliDUYTHJBKK5NpNAXvSW57qXrbjImLoJsk4Ek+WivFtqtdAYE+nZywQW/+zz/rI00vI3RiAL1M4fIIsh1ZNWWXSdGYcKFwM9Wz1XX5N/tEB5RrDgV3ObxLFpqjRdR4GwGu+xyQV8XZFt3PJG59ryzadlAwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=20.188.111.126
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
-Received: from lizhi2$eswincomputing.com ( [10.11.96.26] ) by
- ajax-webmail-app1 (Coremail) ; Fri, 22 Aug 2025 10:37:50 +0800 (GMT+08:00)
-Date: Fri, 22 Aug 2025 10:37:50 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: =?UTF-8?B?5p2O5b+X?= <lizhi2@eswincomputing.com>
-To: "Andrew Lunn" <andrew@lunn.ch>
-Cc: weishangjuan@eswincomputing.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com, rmk+kernel@armlinux.org.uk,
-	yong.liang.choong@linux.intel.com, vladimir.oltean@nxp.com,
-	jszhang@kernel.org, jan.petrous@oss.nxp.com,
-	prabhakar.mahadev-lad.rj@bp.renesas.com, inochiama@gmail.com,
-	boon.khai.ng@altera.com, dfustini@tenstorrent.com, 0x1207@gmail.com,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, ningyu@eswincomputing.com,
-	linmin@eswincomputing.com, pinkesh.vaghela@einfochips.com
-Subject: Re: Re: Re: Re: Re: Re: [PATCH v3 2/2] ethernet: eswin: Add eic7700
- ethernet driver
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2024.2-cmXT6 build
- 20241203(6b039d88) Copyright (c) 2002-2025 www.mailtech.cn
- mispb-72143050-eaf5-4703-89e0-86624513b4ce-eswincomputing.com
-In-Reply-To: <bad83fec-afca-4c41-bee4-e4e4f9ced57a@lunn.ch>
-References: <20250703091808.1092-1-weishangjuan@eswincomputing.com>
- <20250703092015.1200-1-weishangjuan@eswincomputing.com>
- <c212c50e-52ae-4330-8e67-792e83ab29e4@lunn.ch>
- <7ccc507d.34b1.1980d6a26c0.Coremail.lizhi2@eswincomputing.com>
- <e734f2fd-b96f-4981-9f00-a94f3fd03213@lunn.ch>
- <6c5f12cd.37b0.1982ada38e5.Coremail.lizhi2@eswincomputing.com>
- <6b3c8130-77f0-4266-b1ed-2de80e0113b0@lunn.ch>
- <006c01dbfafb$3a99e0e0$afcda2a0$@eswincomputing.com>
- <28a48738-af05-41a4-be4c-5ca9ec2071d3@lunn.ch>
- <2b4deeba.3f61.1985fb2e8d4.Coremail.lizhi2@eswincomputing.com>
- <bad83fec-afca-4c41-bee4-e4e4f9ced57a@lunn.ch>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1755832227; c=relaxed/simple;
+	bh=3v/UItQUkPnWr+6aYg27gw53Yu1purR0/0Y9QXeZR6c=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=K6p9Wy/xm7gSn69XMNGCTLdyuCczZ4uAv/i8841+jFkP2N1qbhQxkLuonYo9nUHSe+Jfa84AKxCWGDpQbWNdh+htoNYKpWAtm/NyfGM7Pp33FZjLVRkfL/uHRaoI7DEweKnj9vsUl3vHf2erowNcW/Wf/aFQ+XZcRA+a9OECqN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vanheusden.com; spf=pass smtp.mailfrom=vanheusden.com; arc=none smtp.client-ip=94.142.246.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vanheusden.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vanheusden.com
+Received: from webmail.vanheusden.com (unknown [172.29.0.1])
+	by vps001.vanheusden.com (Postfix) with ESMTPA id 22EC3503D5F;
+	Fri, 22 Aug 2025 05:10:14 +0200 (CEST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <3261748c.629.198cfa3bc10.Coremail.lizhi2@eswincomputing.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:TAJkCgB3jg8A2KdoOMjBAA--.11545W
-X-CM-SenderInfo: xol2xx2s6h245lqf0zpsxwx03jof0z/1tbiAQECDGinSfUNAAABsx
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+Date: Fri, 22 Aug 2025 05:10:14 +0200
+From: Folkert van Heusden <folkert@vanheusden.com>
+To: F6BVP <f6bvp@free.fr>
+Cc: linux-hams@vger.kernel.org, netdev <netdev@vger.kernel.org>, Dan Cross
+ <crossd@gmail.com>, David Ranch <dranch@trinnet.net>
+Subject: Re: [ROSE] [AX25] 6.15.10 long term stable kernel oops
+In-Reply-To: <6c525868-3e72-4baf-8df4-a1e5982ef783@free.fr>
+References: <11c5701d-4bf9-4661-ad8a-06690bbe1c1c@free.fr>
+ <fff0b3eb-ea42-4475-970d-30622dc25dca@free.fr>
+ <e92e23a7-1503-454f-a7a2-cedab6e55fe2@free.fr>
+ <acd04154-25a5-4721-a62b-36827a6e4e47@free.fr>
+ <CAEoi9W6kb0jZXY_Tu27CU7jkyx5O1ne5FOgvYqCk_GFBvnseiw@mail.gmail.com>
+ <11212ddf-bf32-4b11-afee-e234cdee5938@free.fr>
+ <4e4c9952-e445-41af-8942-e2f1c24a0586@free.fr>
+ <90efee88-b9dc-4f87-86f2-6ab60701c39f@free.fr>
+ <6c525868-3e72-4baf-8df4-a1e5982ef783@free.fr>
+Message-ID: <d073ac34a39c02287be6d67622229a1e@vanheusden.com>
+X-Sender: folkert@vanheusden.com
+Organization: www.vanheusden.com
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
 
-RGVhciBBbmRyZXcgTHVubiwKVGhhbmsgeW91IGZvciB5b3VyIHZhbHVhYmxlIGFuZCBwcm9mZXNz
-aW9uYWwgc3VnZ2VzdGlvbnMuClBsZWFzZSBmaW5kIG91ciBxdWVzdGlvbnMgYW5kIGV4cGxhbmF0
-aW9ucyBlbWJlZGRlZCBiZWxvdyB5b3VyIGNvbW1lbnRzCmluIHRoZSBvcmlnaW5hbCBlbWFpbC4K
-CkJlc3QgcmVnYXJkcywKCkxpIFpoaQpFc3dpbiBDb21wdXRpbmcKCgoKCgo+IC0tLS0t5Y6f5aeL
-6YKu5Lu2LS0tLS0KPiDlj5Hku7bkuro6ICJBbmRyZXcgTHVubiIgPGFuZHJld0BsdW5uLmNoPgo+
-IOWPkemAgeaXtumXtDoyMDI1LTA3LTMxIDIxOjMxOjUyICjmmJ/mnJ/lm5spCj4g5pS25Lu25Lq6
-OiDmnY7lv5cgPGxpemhpMkBlc3dpbmNvbXB1dGluZy5jb20+Cj4g5oqE6YCBOiB3ZWlzaGFuZ2p1
-YW5AZXN3aW5jb21wdXRpbmcuY29tLCBhbmRyZXcrbmV0ZGV2QGx1bm4uY2gsIGRhdmVtQGRhdmVt
-bG9mdC5uZXQsIGVkdW1hemV0QGdvb2dsZS5jb20sIGt1YmFAa2VybmVsLm9yZywgcm9iaEBrZXJu
-ZWwub3JnLCBrcnprK2R0QGtlcm5lbC5vcmcsIGNvbm9yK2R0QGtlcm5lbC5vcmcsIG5ldGRldkB2
-Z2VyLmtlcm5lbC5vcmcsIGRldmljZXRyZWVAdmdlci5rZXJuZWwub3JnLCBsaW51eC1rZXJuZWxA
-dmdlci5rZXJuZWwub3JnLCBtY29xdWVsaW4uc3RtMzJAZ21haWwuY29tLCBhbGV4YW5kcmUudG9y
-Z3VlQGZvc3Muc3QuY29tLCBybWsra2VybmVsQGFybWxpbnV4Lm9yZy51aywgeW9uZy5saWFuZy5j
-aG9vbmdAbGludXguaW50ZWwuY29tLCB2bGFkaW1pci5vbHRlYW5AbnhwLmNvbSwganN6aGFuZ0Br
-ZXJuZWwub3JnLCBqYW4ucGV0cm91c0Bvc3MubnhwLmNvbSwgcHJhYmhha2FyLm1haGFkZXYtbGFk
-LnJqQGJwLnJlbmVzYXMuY29tLCBpbm9jaGlhbWFAZ21haWwuY29tLCBib29uLmtoYWkubmdAYWx0
-ZXJhLmNvbSwgZGZ1c3RpbmlAdGVuc3RvcnJlbnQuY29tLCAweDEyMDdAZ21haWwuY29tLCBsaW51
-eC1zdG0zMkBzdC1tZC1tYWlsbWFuLnN0b3JtcmVwbHkuY29tLCBsaW51eC1hcm0ta2VybmVsQGxp
-c3RzLmluZnJhZGVhZC5vcmcsIG5pbmd5dUBlc3dpbmNvbXB1dGluZy5jb20sIGxpbm1pbkBlc3dp
-bmNvbXB1dGluZy5jb20sIHBpbmtlc2gudmFnaGVsYUBlaW5mb2NoaXBzLmNvbQo+IOS4u+mimDog
-UmU6IFJlOiBSZTogUmU6IFJlOiBbUEFUQ0ggdjMgMi8yXSBldGhlcm5ldDogZXN3aW46IEFkZCBl
-aWM3NzAwIGV0aGVybmV0IGRyaXZlcgo+IAo+ID4gPiBZb3UgaGFyZHdhcmUgaGFzIGEgbG90IG9m
-IGZsZXhpYmlsaXR5LCBidXQgbm9uZSBvZiBpZiBzaG91bGQgYWN0dWFsbHkKPiA+ID4gYmUgbmVl
-ZGVkLCBpZiB5b3UgZm9sbG93IHRoZSBzdGFuZGFyZC4KPiA+ID4gCj4gPiA+IFNvIHBoeS1tb2Rl
-ID0gInJnbWlpLWlkIjsgc2hvdWxkIGJlIGFsbCB5b3UgbmVlZCBmb3IgbW9zdCBib2FyZHMuCj4g
-PiA+IEV2ZXJ5dGhpbmcgZWxzZSBzaG91bGQgYmUgb3B0aW9uYWwsIHdpdGggc2Vuc2libGUgZGVm
-YXVsdHMuCj4gPiA+IAo+ID4gCj4gPiBPbiBvdXIgcGxhdGZvcm0sIHRoZSB2ZW5kb3Itc3BlY2lm
-aWMgYXR0cmlidXRlcyBlc3dpbixkbHktcGFyYW0tKiB3ZXJlCj4gPiBpbml0aWFsbHkgaW50cm9k
-dWNlZCB0byBjb21wZW5zYXRlIGZvciBib2FyZC1zcGVjaWZpYyB2YXJpYXRpb25zIGluIFJHTUlJ
-Cj4gPiBzaWduYWwgdGltaW5nLCBwcmltYXJpbHkgZHVlIHRvIGRpZmZlcmVuY2VzIGluIFBDQiB0
-cmFjZSBsZW5ndGhzLgo+IAo+IFNvIGl0IHNlZW1zIGxpa2UsIGJlY2F1c2UgeW91IGhhdmUgdGhl
-IGZsZXhpYmlsaXR5IGluIHRoZSBoYXJkd2FyZSwKPiB5b3UgZGVzaWduZWQgeW91ciBQQ0IgcG9v
-cmx5LCBicmVha2luZyB0aGUgc3RhbmRhcmQsIHNvIG5vdyBtdXN0IGhhdmUKPiB0aGVzZSBwcm9w
-ZXJ0aWVzLiAgSXQgd291bGQgb2YgYmVlbiBtdWNoIGJldHRlciBpZiB5b3UgaGFkIHN0dWNrIHRv
-Cj4gdGhlIHN0YW5kYXJkLi4uCj4gCj4gUGxlYXNlIGVuc3VyZSB5b3VyIGRlZmF1bHQgdmFsdWVz
-LCB3aGVuIG5vdGhpbmcgaXMgc3BlY2lmaWVkIGluIERULAo+IGNvcnJlc3BvbmQgdG8gYSBib2Fy
-ZCB3aGljaCBhY3R1YWxseSBmdWxmaWxzIHRoZSBzdGFuZGFyZC4gVGhlIG5leHQKPiBib2FyZCB3
-aGljaCBpcyBtYWRlIHVzaW5nIHRoaXMgZGV2aWNlIGNhbiB0aGVuIGF2b2lkIGhhdmluZyBhbnl0
-aGluZwo+IHNwZWNpYWwgaW4gdGhlcmUgRFQgYmxvYi4KPiAKPiA+IFRoZXNlIGF0dHJpYnV0ZXMg
-YWxsb3cgZmluZS1ncmFpbmVkLCBwZXItc2lnbmFsIGRlbGF5IGNvbnRyb2wgZm9yIFJYRCwgVFhE
-LAo+ID4gVFhFTiwgUlhEViwgUlhDTEssIGFuZCBUWENMSywgYmFzZWQgb24gZW1waXJpY2FsbHkg
-ZGVyaXZlZCBvcHRpbWFsIHBoYXNlCj4gPiBzZXR0aW5ncy4KPiA+IEluIG91ciBleHBlcmllbmNl
-LCBzZXR0aW5nIHBoeS1tb2RlID0gInJnbWlpLWlkIiBhbG9uZSwgYWxvbmcgd2l0aCBvbmx5Cj4g
-PiB0aGUgc3RhbmRhcmQgcHJvcGVydGllcyByeC1pbnRlcm5hbC1kZWxheS1wcyBhbmQgdHgtaW50
-ZXJuYWwtZGVsYXktcHMsCj4gPiBoYXMgcHJvdmVuIGluc3VmZmljaWVudCB0byBtZWV0IG91ciBo
-YXJkd2FyZSdzIHRpbWluZyByZXF1aXJlbWVudHMuCj4gCj4gWW91IGRvbid0IG5lZWQgdmVuZG9y
-IHByb3BlcnRpZXMgZm9yIFJYQ0xLIGFuZCBUWENMSywgdGhhdCBpcyB3aGF0Cj4gdHgtaW50ZXJu
-YWwtZGVsYXktcHMgYW5kIHJ4LWludGVybmFsLWRlbGF5LXBzIGRvLiBUaGV5IGNoYW5nZSB0aGUK
-PiBjbG9jayBzaWduYWwgcmVsYXRpdmUgdG8gVFggYW5kIFJYIGRhdGEuIFNvIHlvdSBvbmx5IG5l
-ZWQgcHJvcGVydGllcwo+IGZvciBUWEVOIGFuZCBSWERWLiBZb3Ugc2hvdWxkIHByb2JhYmx5IGNh
-bGwgdGhlc2UKPiBlc3dpbix0eGVuLWludGVybmFsLWRlbGF5LXBzIGFuZCBlc3dpbixyeGR2LWlu
-dGVybmFsLWRlbGF5LXBzLiAgSW4gdGhlCj4gYmluZGluZyB5b3UgbmVlZCB0byBjbGVhcmx5IGRl
-ZmluZSB3aGF0IHRoZXNlIG1lYW4sIGZvciB5b3VyIGhhcmR3YXJlLAo+IGkuZS4gIHdoYXQgaXMg
-dGhlIGRlbGF5IHJlbGF0aXZlIHRvPwo+IAo+ID4gMS4gU2V0dGluZyBhbGwgZGVsYXkgcGFyYW1l
-dGVycyAoUlhELCBUWEQsIFRYRU4sIFJYRFYsIFJYQ0xLLCBhbmQgVFhDTEspCj4gPiAgICB1c2lu
-ZyB2ZW5kb3Itc3BlY2lmaWMgYXR0cmlidXRlc8KgZXN3aW4sZGx5LXBhcmFtLSouCj4gPiAgICBl
-LmcuCj4gPiAgICBlc3dpbixkbHktcGFyYW0tMTAwMG0gPSA8MHgyMDIwMjAyMCAweDk2MjA1QTIw
-IDB4MjAyMDIwMjA+Owo+ID4gMi4gU2V0dGluZyBkZWxheSBwYXJhbWV0ZXJzIChSWEQsIFRYRCwg
-VFhFTiwgUlhEVikgdXNpbmcgdmVuZG9yLXNwZWNpZmljCj4gPiAgICBhdHRyaWJ1dGVzwqBlc3dp
-bixkbHktcGFyYW0tKsKgLCBSWENMSyB1c2luZyByeC1pbnRlcm5hbC1kZWxheS1wcyBhbmQKPiA+
-ICAgIFRYQ0xLIHVzaW5nIHR4LWludGVybmFsLWRlbGF5LXBzLgo+ID4gICAgZS5nCj4gPiAgICBl
-c3dpbixkbHktcGFyYW0tMTAwMG0gPSA8MHgyMDIwMjAyMCAweDgwMjAwMDIwIDB4MjAyMDIwMjA+
-Owo+ID4gICAgcngtaW50ZXJuYWwtZGVsYXktcHMgPSA8OTAwMD47Cj4gPiAgICB0eC1pbnRlcm5h
-bC1kZWxheS1wcyA9IDwyMjAwPjsKPiAKPiBOZWl0aGVyLiBEVCBzaG91bGQgbm90IGNvbnRhaW4g
-SFcgdmFsdWVzIHlvdSBwb2tlIGludG8gcmVnaXN0ZXJzLiBUaGV5Cj4gc2hvdWxkIGJlIFNJIHVz
-aW5nLCBpbiB0aGlzIGNhc2UsIHBpY28gc2Vjb25kcy4gRnJvbSB0aGVzZSBkZWxheXMgaW4KPiBw
-aWNvc2Vjb25kcywgaGF2ZSB0aGUgZHJpdmVyIGNhbGN1bGF0ZSB3aGF0IHZhbHVlcyBzaG91bGQg
-YmUgd3JpdHRlbgo+IGludG8gdGhlIHJlZ2lzdGVycy4KPiAKPiBBbmQgdGhlc2UgZGVsYXkgdmFs
-dWVzIGFyZSB1bmxpa2VseSB0byBiZSBjb3JyZWN0LiBZb3UgYXJlIHVzaW5nCj4gcmdtaWktaWQs
-IHNvIHRoZSBQSFkgaXMgYWRkaW5nIDJucy4gWW91IHdhbnQgdGhlIE1BQyB0byBtYWtlIHNtYWxs
-Cj4gdHVuaW5nIGFkanVzdG1lbnRzLCBzbyAyMDAgY291bGQgYmUgcmVhc29uYWJsZSwgYnV0IDkw
-MDBwcyBpcyB3YXkgdG9vCj4gYmlnLgo+IAoKV2UgcmUtdHVuZWQgYW5kIHZlcmlmaWVkIHRoYXQg
-c2V0dGluZyB0aGUgVFhEIGFuZCBSWEQgZGVsYXlzIHRvIDAgYW5kCmNvbmZpZ3VyaW5nIFRYRU4g
-YW5kIFJYRFYgdG8gMCB5aWVsZGVkIHRoZSBzYW1lIGhhcmR3YXJlIHBlcmZvcm1hbmNlIGFzCmxv
-bmcgYXMgd2Ugb25seSBhcHBsaWVkIGRlbGF5cyAoZS5nLiAyMDBwcykgdG8gVFhDTEsgYW5kIFJY
-Q0xLLgpUaGVyZWZvcmUsIGluIHRoZSBuZXh0IHBhdGNoLCB3ZSB3aWxsIGRyb3AgdGhlIHZlbmRv
-ci1zcGVjaWZpYyBwcm9wZXJ0aWVzCihlLmcuIGVzd2luLGRseS1wYXJhbS0qKSBhbmQga2VlcCBv
-bmx5IHRoZSBzdGFuZGFyZCBhdHRyaWJ1dGVzLCBuYW1lbHkKcngtaW50ZXJuYWwtZGVsYXktcHMg
-YW5kIHR4LWludGVybmFsLWRlbGF5LXBzLgpJcyB0aGlzIGNvcnJlY3Q/Cgo+IAlBbmRyZXcK
+Bernard,
+
+I skimmed over the diff between the latest 6.14.y and latest 6.15.y tags 
+of the raspberry pi linux kernel and didn't saw anything relevant 
+changed. Altough changes in 'arch' could in theory affect everything.
+
+
+On 2025-08-22 00:39, F6BVP wrote:
+> As I already reported mkiss never triggered any Oops kernel panic up to 
+> linux-6.14.11.
+> 
+> In that version I put a number of printk inside of mkiss.c in order to 
+> follow the normal behaviour and content outside and during FPAC 
+> functionning especially when issuing a connect request.
+> 
+> On the opposite an FPAC connect request systematically triggers a 
+> kernel panic with linux-6.15.2 and following kernels.
+> 
+> In 6.14.11 I observe that when mkiss runs core/dev is never activated 
+> i.e. neither __netif_receive_skb nor __netif_receive_skb_one_core.
+> 
+> These functions appear in kernel 6.15.2 panics after mkiss_receive_buf.
+> 
+> One can guess that mkiss_receive_buf() is triggering something wrong in 
+> kernel 6.15.2 and all following kernels up to net-next.
+> 
+> The challenge to locate the bug is quite difficult as I did not find 
+> the way to find relevant code differences between both kernels in 
+> absence of inc patch...
+> 
+> I sincerely regret not knowing how to go further.
+> 
+> Bernard,
+> hamradio f6bvp /ai7bg
+
+-- 
+www.vanheusden.com
 
