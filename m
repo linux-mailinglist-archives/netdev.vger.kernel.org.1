@@ -1,161 +1,133 @@
-Return-Path: <netdev+bounces-216023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E73DEB3194A
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 15:22:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE6A2B31955
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 15:23:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4B0B623A6D
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 13:20:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAD251603D2
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 13:21:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0DA3303C91;
-	Fri, 22 Aug 2025 13:19:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E6CC2FE574;
+	Fri, 22 Aug 2025 13:20:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TlbNRWv2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="z1cke+Om"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5771303C87;
-	Fri, 22 Aug 2025 13:19:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 831372FB993
+	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 13:20:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755868789; cv=none; b=u+x+TEUWvbMI2H5fwv2bIu3HPRM8nGiD2xQJtICROZCKG5Z4MXjSa3taCoM2R1XPvXw5luv2lMkOvNlv6HSfvzZQfhVH5lK3EhK/40YgPg9WciCHKd3SEozIOEaaPgv8OiIbsgzzdN6AI8GbRAN6UVvsKVmXIYYYU50GiQPhUpU=
+	t=1755868841; cv=none; b=lhET2sYlf+Vz6fg+E7ulvtQTc+/FV3IKCAAMrjKZ573qrZy0LXurzCYghkKV3329Chb+ocmZW6MRTalZXW4DLKwz/+Vkp53uo6DF2Oq50S9RqAZz3OCF7JVwd96aPRUVXVFCvjmZT/FY5twCNctcEBAEvOvgl7TVZI4YS+5enzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755868789; c=relaxed/simple;
-	bh=AmfhC4f3gfkz5oMJ/fDs0QSwi0saBraVHHxr250eZic=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=a+R9B+U9AOx67YERvB5j6UCsSVNcEDeG1F/ZFFOXyMjkXB7GrJxhIxofoxD7bOy5MU7e2Z4qi1RdtTuSKr0H63FSYwsatitf9ojCOqmunWUtTtbqlOtfQCMmGYEzsiIVZmw8+iZvIjzPM19TEO4UM9K4kAKNs1ZdgLNXh6zbrso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TlbNRWv2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F29E4C116B1;
-	Fri, 22 Aug 2025 13:19:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755868789;
-	bh=AmfhC4f3gfkz5oMJ/fDs0QSwi0saBraVHHxr250eZic=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=TlbNRWv2xjT93EUpqH9o/BObRhdYVDvHGKKbCk8PckrA6mtkxy+IN1EOyzyt+YQlK
-	 s+BYggS9VQonnhZkU5nbvzL9+bpwPmpJjWNwQIBFRdQDAruroYiDuuLehZAX8p7WaK
-	 EVCQ2t0RD7CLifcqPfYj/17WVl9uDgLY/JbGoiJBxfgjMY7vH8DeQ+6cRxK/8VKIEO
-	 4d1RI13wxPrWz8BI8TH4nkCe/JLcyG/GsSJRNBPO8QcqHd5XlahVinqK7p2dOHJdPX
-	 myYv2u0r6SYhEuCzdqx9qp4eXkhjmnDKJu3sREMBU8Cd8B7UlJWmLZpmH4LKI1ShGD
-	 ejgRyJmYC1wtQ==
-From: Jeff Layton <jlayton@kernel.org>
-Date: Fri, 22 Aug 2025 09:19:23 -0400
-Subject: [PATCH v2 2/2] sunrpc: add a Kconfig option to redirect dfprintk()
- output to trace buffer
+	s=arc-20240116; t=1755868841; c=relaxed/simple;
+	bh=UEA0I0OBek4RMYqNfE6NC8kYNpRUAS+tTluqow4AcGM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NPAhboYP85+ZhqorrPAm3JFH7svNeWNP1k2P5zZIwgV91ttoWqnSfz/kh8lI9v/LoZgdTx/JNh6bUrB7MRkEvjgMgoD7JNELnfvuTY99EK4Vnd6F+0Rg5nBgNtFrNj+Shc4b2X+KwIZ9rRpaoLQz4E2lwaBu6oaP9WAO8/HmVp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=z1cke+Om; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4b297962b9cso21007871cf.2
+        for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 06:20:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755868838; x=1756473638; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xETFehANMGWaAVgPe3RiL9S32v2mzS8mdqrngoJu4aM=;
+        b=z1cke+OmpnqKXYIyOX0t8maWENSG0DJxnvi5gtkRAFX/feK6i0/1LdjL5o88eiy+Ow
+         v/PUUQm83hJ14O8vrGi4pdGvN2+Bt3ZTgkLiMUWiSJgeofZTqLeOgcNMvCAil5dy02gx
+         uETaJOIcXIoPszSTqRqi1fAuKPCmwwEzeTistDJ3DWxTwut0nlA9Jym0fJNi9CHw7EZR
+         UhJPs6gO0EUw+m40s2o3o5nRxa96uFBocqiWoPkkJJ8kK3BuaFYXvKKf2nys+0Mg+/7d
+         duFvh9snZueoutn7BLcPoOU+bu+nD/BQD8rUamYmkPltia3Tr9743dwnievP+UIMt+DS
+         9uHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755868838; x=1756473638;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xETFehANMGWaAVgPe3RiL9S32v2mzS8mdqrngoJu4aM=;
+        b=Hg5Pz0bApvEgKHE8uUqizmwsWEKSMDPAEIFDVcV+vKu4jeM1nzUw5RAOLDs8XDXNYU
+         fYEfT9Xe5UhBtRepjaW/zd5AsEZVjUiY6pS/fLD8DU/jkmvDfU1N3e5AG1VDB4xqisdO
+         rQId3mDJLP50EM6rfUeztN3TMW7VECI4wCX0UhpR6i5nudArwcQpFCqYg+FgK9yj2AqM
+         iZLFbrReQMpbNbFiARi8vvv1LapxBQnJK3i9AdxCW2pUzG8abF+acypbA+yt5+X7MnBJ
+         hgqTXQ7n3edbvewZCAhowuEq0xWAfkmAaDiBGKyHBvJw9hGfT/Ftw+6KvbgKMmQiURF9
+         8w5A==
+X-Gm-Message-State: AOJu0Yx1X80xl14hwJGo9wriyiy6MzmGtIFftN4dBvmDluxASYV8AGYx
+	V5WvBuFMScYAzwN0kXVDkbj90Xtq/MACQHikxDNBYK76kyVw+KJixcnENlkC7VJGS4wzNYZk4sL
+	MD2yedGpN0Sn4dbg0VN3qVB8lJp/glZpkmUg+gllnCaoQyB18hQtZEWCjMoU=
+X-Gm-Gg: ASbGncut7MAWQF5YRfzzNzXWomihfHh1rDzX2YfgORyUT9/8pTbE+u3+DTZyJmPcJya
+	GG08yQwnoY7WvlbEUGWGAi7D5rhcTtfegGvhCWJKksxiDf/x6Bl2IQkmX+1L5hKh5gzwWjk5R7o
+	qOiArZUg6gtRLZlnbN02C2V5bLYgYjzZe0bB2LY1QcNaGcBl4HXZx9zBhxjDyMLYeIbBMr+kITc
+	3lvy4l1KqA6g8Y=
+X-Google-Smtp-Source: AGHT+IHs9rx9/zkamqK89P1S4FuJPEcW2Dda5ow0is/c7/qWci0ER7SJoxQjWeHAVtUhnpX1+K66vUhCrAogHd+zq10=
+X-Received: by 2002:a05:622a:181e:b0:4b0:c1c0:158b with SMTP id
+ d75a77b69052e-4b2aaa3c6abmr32297411cf.29.1755868837718; Fri, 22 Aug 2025
+ 06:20:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250822-nfs-testing-v2-2-5f6034b16e46@kernel.org>
-References: <20250822-nfs-testing-v2-0-5f6034b16e46@kernel.org>
-In-Reply-To: <20250822-nfs-testing-v2-0-5f6034b16e46@kernel.org>
-To: Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
- Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>, 
- Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
- Tom Talpey <tom@talpey.com>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, Jeff Layton <jlayton@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2819; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=AmfhC4f3gfkz5oMJ/fDs0QSwi0saBraVHHxr250eZic=;
- b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBoqG5wYtaTHzijD5oaj7MtUxrsCJnQcKKBm5X6o
- s14Caekx+CJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaKhucAAKCRAADmhBGVaC
- FRrZD/9f8TkP/JWpNJp4PYSfHUqeybIbKvgvrkxSJqfvQJm1AUdH0CHqUGvwnBSFHho2sc/SViE
- 7Bqowurj3YMnWX1Kls+9UQ5HTJwHh37QdO/RcE1OmUwJzncomZ5HIp9Ia6iWs5qpdxFZacAgfNp
- b/sLKznRWOtFUcOy0dCic9O34GwTPSoCS/ZoQVZyYRH1P9ynhK31bwl7m453Yfwz/6X90BHUIA5
- 4ywCXCBjBTrVH5IzWb4tqTvBwI52IdrGCA2gdYkekSx2Akg2AvK3+xGgE9I+gAFQZ6RJqQ0gGYF
- B9p5HprYvPIOzo8ah8UyW/AhZG/Afna6HQZoVYso7+RBd4k4IzXmf+wmfQUbIkeWSI2Q2el3p44
- 8o2yRKjp04IbSSirWbQXFfwKRLF2DGiK4Zd/ZnUc/DBa+f5StvBrboo/DkHLqTO2W+K4ApirNjn
- 6ifudEMj1NjcqsJWQSnYGx/JvpWMKx5Hkvqyp0VVtCaCMhNCbwDVyHHJ08nRrLGVQn0pJVVGU0Q
- tp18vbiNbaTMCnLwqMW6AiM/qYKNdEGcgR1y5fDq8YkRHpGTwZjYRhPlOiA991ZAReiouVnNw5u
- S2NK2nQOJNyu2lSXUXIOYFHwXTwhflFvZ1qg6XGWo9MdrupmFJH8AAR466IDvAO3LoVyyBRFUfd
- qKq9TtDIgrud8Sg==
-X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
- fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
+References: <aKgnLcw6yzq78CIP@bzorp3> <CANn89iLy4znFBLK2bENWMfhPyjTc_gkLRswAf92uV7KY3bTdYg@mail.gmail.com>
+ <aKg1Qgtw-QyE8bLx@bzorp3> <CANn89i+GMqF91FkjxfGp3KGJ-dC6-Snu3DoBdGuxZqrq=iOOcQ@mail.gmail.com>
+ <aKho5v5VwxdNstYy@bzorp3> <CANn89i+S1hyPbo5io2khLk_UTfoQgEtnjYUUJTzreYufmbii+A@mail.gmail.com>
+In-Reply-To: <CANn89i+S1hyPbo5io2khLk_UTfoQgEtnjYUUJTzreYufmbii+A@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 22 Aug 2025 06:20:25 -0700
+X-Gm-Features: Ac12FXyXl-pdAzKDjifHwg8N2t9NT0oNpueGbuFDgpPnESaDQC2CMnxh26WfmPE
+Message-ID: <CANn89iJ-Xqb2uOZwyatq-6gMHPVt0xga_dypiF_X8Z_L0eao4w@mail.gmail.com>
+Subject: Re: [RFC, RESEND] UDP receive path batching improvement
+To: Balazs Scheidler <bazsi77@gmail.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-We have a lot of old dprintk() call sites that aren't going anywhere
-anytime soon. At the same time, turning them up is a serious burden on
-the host due to the console locking overhead.
+On Fri, Aug 22, 2025 at 6:10=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
 
-Add a new Kconfig option that redirects dfprintk() output to the trace
-buffer. This is more efficient than logging to the console and allows
-for proper interleaving of dprintk and static tracepoint events.
+>
+> Can you post
+>
+> ss -aum src :1000  <replace 1000 with your UDP source port>
+>
+> We will check the dXXXX output (number of drops), per socket.
 
-Since using trace_printk() causes scary warnings to pop at boot time,
-this new option defaults to "n".
+Small experiment :
 
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
----
- include/linux/sunrpc/debug.h | 10 ++++++++--
- net/sunrpc/Kconfig           | 14 ++++++++++++++
- 2 files changed, 22 insertions(+), 2 deletions(-)
+otrv5:/home/edumazet# ./super_netperf 10 -t UDP_STREAM -H otrv6 -l10
+-- -n -P,1000 -m 1200
+   4304
 
-diff --git a/include/linux/sunrpc/debug.h b/include/linux/sunrpc/debug.h
-index 99a6fa4a1d6af0b275546a53957f07c9a509f2ac..891f6173c951a6644018237017c845d81b42aa76 100644
---- a/include/linux/sunrpc/debug.h
-+++ b/include/linux/sunrpc/debug.h
-@@ -30,17 +30,23 @@ extern unsigned int		nlm_debug;
- #if IS_ENABLED(CONFIG_SUNRPC_DEBUG)
- # define ifdebug(fac)		if (unlikely(rpc_debug & RPCDBG_##fac))
- 
-+# if IS_ENABLED(CONFIG_SUNRPC_DEBUG_TRACE)
-+#  define __sunrpc_printk(fmt, ...)	trace_printk(fmt, ##__VA_ARGS__)
-+# else
-+#  define __sunrpc_printk(fmt, ...)	printk(KERN_DEFAULT fmt, ##__VA_ARGS__)
-+# endif
-+
- # define dfprintk(fac, fmt, ...)					\
- do {									\
- 	ifdebug(fac)							\
--		printk(KERN_DEFAULT fmt, ##__VA_ARGS__);				\
-+		__sunrpc_printk(fmt, ##__VA_ARGS__);			\
- } while (0)
- 
- # define dfprintk_rcu(fac, fmt, ...)					\
- do {									\
- 	ifdebug(fac) {							\
- 		rcu_read_lock();					\
--		printk(KERN_DEFAULT fmt, ##__VA_ARGS__);				\
-+		__sunrpc_printk(fmt, ##__VA_ARGS__);			\
- 		rcu_read_unlock();					\
- 	}								\
- } while (0)
-diff --git a/net/sunrpc/Kconfig b/net/sunrpc/Kconfig
-index 2d8b67dac7b5b58a8a86c3022dd573746fb22547..a570e7adf270fb8976f751266bbffe39ef696c6a 100644
---- a/net/sunrpc/Kconfig
-+++ b/net/sunrpc/Kconfig
-@@ -101,6 +101,20 @@ config SUNRPC_DEBUG
- 
- 	  If unsure, say Y.
- 
-+config SUNRPC_DEBUG_TRACE
-+	bool "RPC: Send dfprintk() output to the trace buffer"
-+	depends on SUNRPC_DEBUG && TRACING
-+	default n
-+	help
-+          dprintk() output can be voluminous, which can overwhelm the
-+          kernel's logging facility as it must be sent to the console.
-+          This option causes dprintk() output to go to the trace buffer
-+          instead of the kernel log.
-+
-+          This will cause warnings about trace_printk() being used to be
-+          logged at boot time, so say N unless you are debugging a problem
-+          with sunrpc-based clients or services.
-+
- config SUNRPC_XPRT_RDMA
- 	tristate "RPC-over-RDMA transport"
- 	depends on SUNRPC && INFINIBAND && INFINIBAND_ADDR_TRANS
+If I remove the problematic sk_drops update :
 
--- 
-2.50.1
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index efd742279289fc13aec9369d0f01a3be3aa73151..8976399d4e52f21058f74fde13d=
+46e35c7617deb
+100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -1575,7 +1575,8 @@ int __udp_enqueue_schedule_skb(struct sock *sk,
+struct sk_buff *skb)
+        atomic_sub(skb->truesize, &sk->sk_rmem_alloc);
 
+ drop:
+-       atomic_inc(&sk->sk_drops);
++// Find a better way to make this operation not too expensive.
++//     atomic_inc(&sk->sk_drops);
+        busylock_release(busy);
+        return err;
+ }
+
+otrv5:/home/edumazet# ./super_netperf 10 -t UDP_STREAM -H otrv6 -l10
+-- -n -P,1000 -m 1200
+   6076
+
+So there is definitely room for a big improvement here.
 
