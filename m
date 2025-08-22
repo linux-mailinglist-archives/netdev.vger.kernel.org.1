@@ -1,65 +1,71 @@
-Return-Path: <netdev+bounces-215977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B174B31302
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 11:28:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6ABEB313A3
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 11:43:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38DA01C26FD2
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 09:26:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B204B016C2
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 09:37:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 468002EDD62;
-	Fri, 22 Aug 2025 09:26:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C46CC2F3C37;
+	Fri, 22 Aug 2025 09:31:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="aKEa4vT5"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D13A2EC561
-	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 09:26:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B40732EF65A
+	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 09:31:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755854768; cv=none; b=XhdUYCGWhROnvoFeI8bu306S6pTDtZ0FY7i3tA5wqhvPQq4WppxdaOMTAmaao9aiSKpMGYrNu7e/MKoxT7QfUyHzeaT7YiM68KuKf2h0N4/kGlKqANFhgtSjp+ii2oqi9fNF8aKxU92CFwgVgaVVtN9M4iSTfxvntOhd4VfEatw=
+	t=1755855083; cv=none; b=o1tvYZ19QqQQMymDyzq4zu+a0CStp2Oq2PEuSbdhrYVscR77rUuMO44QmUXRz2LsWwgklgDKHOxx3oTCAEYXGCu5alIz3gtLKPyCUx5dJExTpyWITH22LYgOzUg+qCjoxX2Dka/ckJBfSe3UDtJlZL2uQgefHlnvxApWilUOkdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755854768; c=relaxed/simple;
-	bh=YaGZ8UzxreJ2bwW0ZV2jA1hQAGuHkwObCV6di1gkDww=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ET+XX4KrMvmpm3UTiWT/KwaPiPqY+5pnzMwwhp4qUDFtCkDLxztAMsBBzLerhyb2R0pkTWJ1jcOEeQA7Z7ulD8sfj0/SvhmqVPdmw0kKtHYHdQv4Ba1/EgsVf811tUr3X0bGxRX2uCwLKPrsi+yG/TyCWOwszZJquvfdZA4Xh4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1upO21-00058x-1r; Fri, 22 Aug 2025 11:25:57 +0200
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1upO20-001YQ9-1H;
-	Fri, 22 Aug 2025 11:25:56 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1upO20-00C7Wz-12;
-	Fri, 22 Aug 2025 11:25:56 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Thangaraj Samynathan <Thangaraj.S@microchip.com>,
-	Rengarajan Sundararajan <Rengarajan.S@microchip.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: [PATCH net-next v1 1/1] net: usb: lan78xx: add support for generic net selftests via ethtool
-Date: Fri, 22 Aug 2025 11:25:55 +0200
-Message-Id: <20250822092555.2888870-1-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1755855083; c=relaxed/simple;
+	bh=N3NJ5tDeDCi3vhISESZJkIN7qYp9IUb8LelWUgmInQM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ICIf+1xcWg5iNASjiwCSAnH/0hE3qP+/ts2xSNN5fv6vTMvRYxNg8EXhzRzH9z43W0BTGyh48I882Zv/kG2VVFdGPKmhWiJflDzeu4RMK3ZU5L/53YJT2jOqmK2n4Cel6zzdFLAUuSU1NHM63AhH9bZqbwFAj0619d8cuPdJ2ho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=aKEa4vT5; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1755855074; x=1787391074;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=N3NJ5tDeDCi3vhISESZJkIN7qYp9IUb8LelWUgmInQM=;
+  b=aKEa4vT5x5FxUUBuuYnhZANZsb0BjpfdtEA4Spj9jKWLOTkcg8USRJ0J
+   7mGXC0eOU4koS2yJY2g+1n90UiyaJSIn0hXLZ7W/XDT7nmd7Ov2Gi1J5v
+   Im+PSk19/a5J9pl/0YYCd1JDrct7ShUhUZlmE/d42uQid8egNnJcpmWLy
+   OXcKM4RLHIA48dzsOjf8es5OugQ6Lbf2ctfITNUjgz4tx4j45VpormeCT
+   3HhDXb7fvLk3n466jzXqhIyc644PUGlo1JhcJvqShnvkotxlYSGV6frS0
+   w1ah2P2GpFj4YznSucOYxMpx5XZx1kni+4yvcCoTiUQtBljuFD38XL1bd
+   w==;
+X-CSE-ConnectionGUID: TnN8egzkSSO68KFi/UIkZw==
+X-CSE-MsgGUID: SDJ+zHwnRWmAKjcc0kjqKQ==
+X-IronPort-AV: E=Sophos;i="6.17,309,1747724400"; 
+   d="scan'208";a="212950473"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 22 Aug 2025 02:31:12 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Fri, 22 Aug 2025 02:30:44 -0700
+Received: from DEN-DL-M31836.microchip.com (10.10.85.11) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
+ 15.1.2507.44 via Frontend Transport; Fri, 22 Aug 2025 02:30:42 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <richardcochran@gmail.com>
+CC: <netdev@vger.kernel.org>, Horatiu Vultur <horatiu.vultur@microchip.com>
+Subject: [PATCH net-next 0/2] net: phy: micrel: Add PTP support for lan8842
+Date: Fri, 22 Aug 2025 11:27:12 +0200
+Message-ID: <20250822092714.2554262-1-horatiu.vultur@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,73 +73,22 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain
 
-Integrate generic net_selftest framework by wiring up
-.get_strings, .get_sset_count, and .self_test ethtool ops.
+The PTP block in lan8842 is the same as lan8814 so reuse all these
+functions.  The first patch of the series just does cosmetic changes such
+that lan8842 can reuse the function lan8814_ptp_probe. There should not be
+any functional changes here. While the second patch adds the PTP support
+to lan8842.
 
-This enables execution of standard self-tests using
-`ethtool -t <dev>` on LAN78xx devices.
+Horatiu Vultur (2):
+  net: phy: micrel: Introduce function __lan8814_ptp_probe_once
+  net: phy: micrel: Add PTP support for lan8842
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- drivers/net/usb/Kconfig   | 1 +
- drivers/net/usb/lan78xx.c | 6 ++++++
- 2 files changed, 7 insertions(+)
+ drivers/net/phy/micrel.c | 107 +++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 102 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/usb/Kconfig b/drivers/net/usb/Kconfig
-index 0a678e31cfaa..856e648d804e 100644
---- a/drivers/net/usb/Kconfig
-+++ b/drivers/net/usb/Kconfig
-@@ -116,6 +116,7 @@ config USB_LAN78XX
- 	select PHYLINK
- 	select MICROCHIP_PHY
- 	select CRC32
-+	imply NET_SELFTESTS
- 	help
- 	  This option adds support for Microchip LAN78XX based USB 2
- 	  & USB 3 10/100/1000 Ethernet adapters.
-diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
-index 1ff25f57329a..b56e2459ee3c 100644
---- a/drivers/net/usb/lan78xx.c
-+++ b/drivers/net/usb/lan78xx.c
-@@ -20,6 +20,7 @@
- #include <linux/mdio.h>
- #include <linux/phy.h>
- #include <net/ip6_checksum.h>
-+#include <net/selftests.h>
- #include <net/vxlan.h>
- #include <linux/interrupt.h>
- #include <linux/irqdomain.h>
-@@ -1702,12 +1703,16 @@ static void lan78xx_get_strings(struct net_device *netdev, u32 stringset,
- {
- 	if (stringset == ETH_SS_STATS)
- 		memcpy(data, lan78xx_gstrings, sizeof(lan78xx_gstrings));
-+	else if (stringset == ETH_SS_TEST)
-+		net_selftest_get_strings(data);
- }
- 
- static int lan78xx_get_sset_count(struct net_device *netdev, int sset)
- {
- 	if (sset == ETH_SS_STATS)
- 		return ARRAY_SIZE(lan78xx_gstrings);
-+	else if (sset == ETH_SS_TEST)
-+		return net_selftest_get_count();
- 	else
- 		return -EOPNOTSUPP;
- }
-@@ -1894,6 +1899,7 @@ static const struct ethtool_ops lan78xx_ethtool_ops = {
- 	.set_eeprom	= lan78xx_ethtool_set_eeprom,
- 	.get_ethtool_stats = lan78xx_get_stats,
- 	.get_sset_count = lan78xx_get_sset_count,
-+	.self_test	= net_selftest,
- 	.get_strings	= lan78xx_get_strings,
- 	.get_wol	= lan78xx_get_wol,
- 	.set_wol	= lan78xx_set_wol,
 -- 
-2.39.5
+2.34.1
 
 
