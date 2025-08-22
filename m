@@ -1,201 +1,132 @@
-Return-Path: <netdev+bounces-215924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C627B30EDF
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 08:25:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04A07B30EF5
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 08:32:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82FF15E7902
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 06:24:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52E661CE4A58
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 06:32:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8BDA2E542B;
-	Fri, 22 Aug 2025 06:24:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A36C2E54BE;
+	Fri, 22 Aug 2025 06:31:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UJwID/Ny"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="TW3GAKcV"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1859C2E3B1D
-	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 06:24:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 890022459CD;
+	Fri, 22 Aug 2025 06:31:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755843881; cv=none; b=iD6DiWwIBhr4hf1GD0XGWXDawglHwASLkfJ4fqY8aUfI7eHqvuUAzNBFTPJ2HUHOpm7oaMXJ3CfalQZJCdytoWzHH+uwZAkwS7ihJ6vuwFZbk4X1IAu0O5o4i/+jeaXSyFoLv4s1PqOcDXba8SeJhHbkpEN1xLfmJflcjMgIOiM=
+	t=1755844296; cv=none; b=p6zipxZS00qBEWp2jpCjwtovzn1HbY9nPFqlrr93DLrexJ/XVQvxZc3bkhEgfhd5j10GLSu1RmQWHwHN9o2DYcRntCXGCsGQ95OfpxNzaZImGffefHdecTlKW839YD5bgxtqmBsm5zTWNGNqSna4ek+03KieJFmKn2wBJbVK97E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755843881; c=relaxed/simple;
-	bh=fLX1vM4cjDsk9W/4BgtrD1gx0q/IoKCtlIVEIkFWTeQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cq2xty0d8VZXpCmYLQsktTRzUffTO+CGLqs8HJN0SJKqAwi0zMWas4bwZkJ/idPZnqHVS/bMz2MC9gF/N1wOEgA4OG3S3O3SCVXFFLTjDd3sSXBIqYT494rBGrOadUkJ4g2AIpylvueGch/O0eCbY4dY/ivfF9qlGBT14W6ibC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UJwID/Ny; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755843878;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=WiI+ZnCzEnb/n6DQfRPkU+9oejYIM/R2hKOTH1yevco=;
-	b=UJwID/Ny9BPDInw1YPGRiKYIqsfJIcRM6APajZRPAC861tVWZStwPqaU4lf0ELAT2FMEBW
-	CTYdqKYWjUKVDsIInd+Xaa4/UWaYmRIoS87In1H4aIZOKwCl7M+Gb4sFKOnG69NBgx5pBS
-	+2gKkd6e7fgdBX2gIX4O2cRyfn+3hzQ=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-604-x-UEVHM-MOy5RmOccFD2vQ-1; Fri, 22 Aug 2025 02:24:37 -0400
-X-MC-Unique: x-UEVHM-MOy5RmOccFD2vQ-1
-X-Mimecast-MFC-AGG-ID: x-UEVHM-MOy5RmOccFD2vQ_1755843875
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3b9e4f039ecso943527f8f.2
-        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 23:24:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755843875; x=1756448675;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WiI+ZnCzEnb/n6DQfRPkU+9oejYIM/R2hKOTH1yevco=;
-        b=qApHUGDm5I1GTFDEhVQsJk5hHErOawDzwlOZOKiFgwtS/GvY0T/zoTTfm1UVZo+cIb
-         v4eqw8tTzNC/trxSH2dqKpC9DephVmIbtPvzbAgykDTBJ3n/+F9uZc2s5nmGVbRrdr1W
-         2nCCsog+lSzF6mU4l0kQM75jV9GDdqj+vFisE50nSQ/r7a3hw6aj+EcvYg6mzzW5BX+k
-         rxkJgqUuhyu77ih7yQ1pvgTElGi3XLYiWKKUv/2ZDE6fjrbHQV88rM2FzQkY7mHDb4d2
-         U0Yb7OQrdbXNjLMTPc79AjbQ2/wUzNFiZYXDhcUZYDtzWzNVyag3kTGkgzSQAaKittBO
-         NKQw==
-X-Forwarded-Encrypted: i=1; AJvYcCU5uNs+LlYS4fH9tMIkTsehkVi0N6r767xmgE0E/4SKZXlxDkKSBGgqhCwjHnBPQyoHopmuRmQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLW+4M9LuyfWAUuCSHU1hpI6FnzWneL2sRVv+hGJdD3UcesB3v
-	s0BYNT+7P9an4x8skOh0Gdy5fdIayt5JpM/Tl0nivh1UpbV4rfaGkyQ03D2840hTjnKK1cWKEN0
-	kAZqWiXHNIWf8EXrXxtB02hFZ0+pV9l8gfwjO900/mOlbSX8uxHRCBtlz3w==
-X-Gm-Gg: ASbGncsyvpaQhaQ261tgQT6JzcehsVHwr7dR822/T/BtH2brpmMeRkGkY5JczRQnwk4
-	uA46Kw+Uqp0zxXcc1ELGLldUBFQSIFHJDD1EydHSV2JLeYE+zYnAP+1rUGsq/xK4k5IQ6Fxb3Z8
-	RG7yvXtMaNQ2UfNvD6+rV8/TksQ/fZ4PQJKqMWYwCAklFTHojOraux7WkF2wtAubiZwgcju4y2I
-	bzoNrsncctjK1v9rYtSGUrOQxl/AeIOzW5RFUqlHqz1CHn0Z0GoA7EmGIfqz907mbw5fL/1n/QD
-	o2+GdpMU1LwegZEjsFRW6x/MB5eAkfzB6yRMo96wyF7V7RyCeQHXNPz6xXoQ9f+gCHSyxg==
-X-Received: by 2002:a05:6000:26c1:b0:3a3:7ba5:93a5 with SMTP id ffacd0b85a97d-3c5daefc4a3mr930377f8f.26.1755843874978;
-        Thu, 21 Aug 2025 23:24:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGkMOIqwJnbz0zMoKzv9XjVteH9mRf82hflWECX8mqHGwhCkTy10DA8QnyI2PcknGc6Szk7/A==
-X-Received: by 2002:a05:6000:26c1:b0:3a3:7ba5:93a5 with SMTP id ffacd0b85a97d-3c5daefc4a3mr930326f8f.26.1755843874452;
-        Thu, 21 Aug 2025 23:24:34 -0700 (PDT)
-Received: from [192.168.3.141] (p4ff1f25c.dip0.t-ipconnect.de. [79.241.242.92])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3c6070264fbsm1198544f8f.67.2025.08.21.23.24.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Aug 2025 23:24:33 -0700 (PDT)
-Message-ID: <7077e09f-6ce9-43ba-8f87-47a290680141@redhat.com>
-Date: Fri, 22 Aug 2025 08:24:31 +0200
+	s=arc-20240116; t=1755844296; c=relaxed/simple;
+	bh=BfrIP2efQTPMIsUMGQ2GSf0G8ZxHl1U5ZvuSo5I4hyQ=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P/HEURU98k7A6NWUgjU60gtipPgGJxjwmuU2/UEgqtKt4psf5MAy8L3zVxyLRSxV/RvR32LJm0vQc4hBE6B+JfzbPw+k/9ui0ZO1IDdhoR0xgQFT6fK5ghO0oZnzlfDmrwyA7WeJmBUm2grAAHh7/OIvoj3Fi0kmNKq5ashxCno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=TW3GAKcV; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1755844294; x=1787380294;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=BfrIP2efQTPMIsUMGQ2GSf0G8ZxHl1U5ZvuSo5I4hyQ=;
+  b=TW3GAKcVH44HdG3Zo6uvknw8Xguz8k1+JrGgn7TjnUwbsdt/eDkpkf3Q
+   opMUcqM7ecyMQdqQsaiGLsmPzNu24NTUUx+tyWm2+WVri10VZ1XhKEZSH
+   zYturIAWXvQ+tZNteymRjtHNnOCqJs4XUkS7puH/Kl79bAC3565FYHJir
+   JO6vb9cOE+ipvCcJ4ABtax5ghC4h4smmDj88BVbE9vVrBXGvtuFQz4BJs
+   q90COHOJbBDIRP5sPWWJtYcTm0nyrL/Lyu4z3C4SLInaxzLH3o64u0ATM
+   0iNe+hG20xN2ycevP9+ctCje/6UZUVbsR3LeUL/bc1scIyjDLwxRQNh5A
+   g==;
+X-CSE-ConnectionGUID: FwPxws7BQ9CIjc8APoX4aw==
+X-CSE-MsgGUID: uBBIn80iTQO67UXCd/9b1Q==
+X-IronPort-AV: E=Sophos;i="6.17,309,1747724400"; 
+   d="scan'208";a="276910799"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Aug 2025 23:31:33 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Thu, 21 Aug 2025 23:30:53 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex02.mchp-main.com
+ (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
+ Transport; Thu, 21 Aug 2025 23:30:52 -0700
+Date: Fri, 22 Aug 2025 08:27:26 +0200
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+CC: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <richardcochran@gmail.com>, <vladimir.oltean@nxp.com>,
+	<rmk+kernel@armlinux.org.uk>, <rosenp@gmail.com>,
+	<christophe.jaillet@wanadoo.fr>, <viro@zeniv.linux.org.uk>,
+	<atenart@kernel.org>, <quentin.schulz@bootlin.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] phy: mscc: Fix when PTP clock is register and
+ unregister
+Message-ID: <20250822062726.cv7bdoorf6c4wkvt@DEN-DL-M31836.microchip.com>
+References: <20250821104628.2329569-1-horatiu.vultur@microchip.com>
+ <3f8cef10-fbfd-42b7-8ab7-f15d46938eb3@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 10/35] mm/hugetlb: cleanup
- hugetlb_folio_init_tail_vmemmap()
-To: =?UTF-8?Q?Mika_Penttil=C3=A4?= <mpenttil@redhat.com>,
- linux-kernel@vger.kernel.org
-Cc: Alexander Potapenko <glider@google.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
- Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- iommu@lists.linux.dev, io-uring@vger.kernel.org,
- Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
- Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
- kasan-dev@googlegroups.com, kvm@vger.kernel.org,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- Marco Elver <elver@google.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
- Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
- Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
- Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
- Robin Murphy <robin.murphy@arm.com>, Suren Baghdasaryan <surenb@google.com>,
- Tejun Heo <tj@kernel.org>, virtualization@lists.linux.dev,
- Vlastimil Babka <vbabka@suse.cz>, wireguard@lists.zx2c4.com, x86@kernel.org,
- Zi Yan <ziy@nvidia.com>
-References: <20250821200701.1329277-1-david@redhat.com>
- <20250821200701.1329277-11-david@redhat.com>
- <9156d191-9ec4-4422-bae9-2e8ce66f9d5e@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
- dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
- QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
- XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
- Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
- PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
- WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
- UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
- jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
- B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
- ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZoEEwEIAEQCGwMCF4ACGQEFCwkIBwICIgIG
- FQoJCAsCBBYCAwECHgcWIQQb2cqtc1xMOkYN/MpN3hD3AP+DWgUCaJzangUJJlgIpAAKCRBN
- 3hD3AP+DWhAxD/9wcL0A+2rtaAmutaKTfxhTP0b4AAp1r/eLxjrbfbCCmh4pqzBhmSX/4z11
- opn2KqcOsueRF1t2ENLOWzQu3Roiny2HOU7DajqB4dm1BVMaXQya5ae2ghzlJN9SIoopTWlR
- 0Af3hPj5E2PYvQhlcqeoehKlBo9rROJv/rjmr2x0yOM8qeTroH/ZzNlCtJ56AsE6Tvl+r7cW
- 3x7/Jq5WvWeudKrhFh7/yQ7eRvHCjd9bBrZTlgAfiHmX9AnCCPRPpNGNedV9Yty2Jnxhfmbv
- Pw37LA/jef8zlCDyUh2KCU1xVEOWqg15o1RtTyGV1nXV2O/mfuQJud5vIgzBvHhypc3p6VZJ
- lEf8YmT+Ol5P7SfCs5/uGdWUYQEMqOlg6w9R4Pe8d+mk8KGvfE9/zTwGg0nRgKqlQXrWRERv
- cuEwQbridlPAoQHrFWtwpgYMXx2TaZ3sihcIPo9uU5eBs0rf4mOERY75SK+Ekayv2ucTfjxr
- Kf014py2aoRJHuvy85ee/zIyLmve5hngZTTe3Wg3TInT9UTFzTPhItam6dZ1xqdTGHZYGU0O
- otRHcwLGt470grdiob6PfVTXoHlBvkWRadMhSuG4RORCDpq89vu5QralFNIf3EysNohoFy2A
- LYg2/D53xbU/aa4DDzBb5b1Rkg/udO1gZocVQWrDh6I2K3+cCs7BTQRVy5+RARAA59fefSDR
- 9nMGCb9LbMX+TFAoIQo/wgP5XPyzLYakO+94GrgfZjfhdaxPXMsl2+o8jhp/hlIzG56taNdt
- VZtPp3ih1AgbR8rHgXw1xwOpuAd5lE1qNd54ndHuADO9a9A0vPimIes78Hi1/yy+ZEEvRkHk
- /kDa6F3AtTc1m4rbbOk2fiKzzsE9YXweFjQvl9p+AMw6qd/iC4lUk9g0+FQXNdRs+o4o6Qvy
- iOQJfGQ4UcBuOy1IrkJrd8qq5jet1fcM2j4QvsW8CLDWZS1L7kZ5gT5EycMKxUWb8LuRjxzZ
- 3QY1aQH2kkzn6acigU3HLtgFyV1gBNV44ehjgvJpRY2cC8VhanTx0dZ9mj1YKIky5N+C0f21
- zvntBqcxV0+3p8MrxRRcgEtDZNav+xAoT3G0W4SahAaUTWXpsZoOecwtxi74CyneQNPTDjNg
- azHmvpdBVEfj7k3p4dmJp5i0U66Onmf6mMFpArvBRSMOKU9DlAzMi4IvhiNWjKVaIE2Se9BY
- FdKVAJaZq85P2y20ZBd08ILnKcj7XKZkLU5FkoA0udEBvQ0f9QLNyyy3DZMCQWcwRuj1m73D
- sq8DEFBdZ5eEkj1dCyx+t/ga6x2rHyc8Sl86oK1tvAkwBNsfKou3v+jP/l14a7DGBvrmlYjO
- 59o3t6inu6H7pt7OL6u6BQj7DoMAEQEAAcLBfAQYAQgAJgIbDBYhBBvZyq1zXEw6Rg38yk3e
- EPcA/4NaBQJonNqrBQkmWAihAAoJEE3eEPcA/4NaKtMQALAJ8PzprBEXbXcEXwDKQu+P/vts
- IfUb1UNMfMV76BicGa5NCZnJNQASDP/+bFg6O3gx5NbhHHPeaWz/VxlOmYHokHodOvtL0WCC
- 8A5PEP8tOk6029Z+J+xUcMrJClNVFpzVvOpb1lCbhjwAV465Hy+NUSbbUiRxdzNQtLtgZzOV
- Zw7jxUCs4UUZLQTCuBpFgb15bBxYZ/BL9MbzxPxvfUQIPbnzQMcqtpUs21CMK2PdfCh5c4gS
- sDci6D5/ZIBw94UQWmGpM/O1ilGXde2ZzzGYl64glmccD8e87OnEgKnH3FbnJnT4iJchtSvx
- yJNi1+t0+qDti4m88+/9IuPqCKb6Stl+s2dnLtJNrjXBGJtsQG/sRpqsJz5x1/2nPJSRMsx9
- 5YfqbdrJSOFXDzZ8/r82HgQEtUvlSXNaXCa95ez0UkOG7+bDm2b3s0XahBQeLVCH0mw3RAQg
- r7xDAYKIrAwfHHmMTnBQDPJwVqxJjVNr7yBic4yfzVWGCGNE4DnOW0vcIeoyhy9vnIa3w1uZ
- 3iyY2Nsd7JxfKu1PRhCGwXzRw5TlfEsoRI7V9A8isUCoqE2Dzh3FvYHVeX4Us+bRL/oqareJ
- CIFqgYMyvHj7Q06kTKmauOe4Nf0l0qEkIuIzfoLJ3qr5UyXc2hLtWyT9Ir+lYlX9efqh7mOY
- qIws/H2t
-In-Reply-To: <9156d191-9ec4-4422-bae9-2e8ce66f9d5e@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <3f8cef10-fbfd-42b7-8ab7-f15d46938eb3@linux.dev>
 
-On 22.08.25 06:09, Mika Penttilä wrote:
+The 08/21/2025 14:50, Vadim Fedorenko wrote:
+
+Hi Vadim,
+
 > 
-> On 8/21/25 23:06, David Hildenbrand wrote:
+> On 21/08/2025 11:46, Horatiu Vultur wrote:
+> > +static void __vsc8584_deinit_ptp(struct phy_device *phydev)
+> > +{
+> > +     struct vsc8531_private *vsc8531 = phydev->priv;
+> > 
+> > -     vsc8531->ptp->ptp_clock = ptp_clock_register(&vsc8531->ptp->caps,
+> > -                                                  &phydev->mdio.dev);
+> > -     return PTR_ERR_OR_ZERO(vsc8531->ptp->ptp_clock);
+> > +     ptp_clock_unregister(vsc8531->ptp->ptp_clock);
+> > +     skb_queue_purge(&vsc8531->rx_skbs_list);
+> >   }
+> > 
+> >   void vsc8584_config_ts_intr(struct phy_device *phydev)
+> > @@ -1552,6 +1549,18 @@ int vsc8584_ptp_init(struct phy_device *phydev)
+> >       return 0;
+> >   }
+> > 
+> > +void vsc8584_ptp_deinit(struct phy_device *phydev)
+> > +{
+> > +     switch (phydev->phy_id & phydev->drv->phy_id_mask) {
+> > +     case PHY_ID_VSC8572:
+> > +     case PHY_ID_VSC8574:
+> > +     case PHY_ID_VSC8575:
+> > +     case PHY_ID_VSC8582:
+> > +     case PHY_ID_VSC8584:
+> > +             return __vsc8584_deinit_ptp(phydev);
 > 
->> All pages were already initialized and set to PageReserved() with a
->> refcount of 1 by MM init code.
+> void function has no return value. as well as it shouldn't return
+> anything. I'm not quite sure why do you need __vsc8584_deinit_ptp()
+> at all, I think everything can be coded inside vsc8584_ptp_deinit()
+
+I understand, I can update not to return anything.
+Regarding __vsc8584_deinit_ptp, I have created that function just to be
+similar with the __vsc8584_init_ptp.
+
 > 
-> Just to be sure, how is this working with MEMBLOCK_RSRV_NOINIT, where MM is supposed not to
-> initialize struct pages?
-
-Excellent point, I did not know about that one.
-
-Spotting that we don't do the same for the head page made me assume that 
-it's just a misuse of __init_single_page().
-
-But the nasty thing is that we use memblock_reserved_mark_noinit() to 
-only mark the tail pages ...
-
-Let me revert back to __init_single_page() and add a big fat comment why 
-this is required.
-
-Thanks!
+> > +     }
+> > +}
 
 -- 
-Cheers
-
-David / dhildenb
-
+/Horatiu
 
