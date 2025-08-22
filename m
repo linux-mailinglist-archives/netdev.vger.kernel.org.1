@@ -1,99 +1,135 @@
-Return-Path: <netdev+bounces-216098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42CB9B32064
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 18:23:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 948CEB3208F
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 18:32:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B72E917FD71
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 16:20:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3054D3B69AC
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 16:27:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 330F826E6FB;
-	Fri, 22 Aug 2025 16:20:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B152874F2;
+	Fri, 22 Aug 2025 16:27:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kcItSYTd"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bFGa20Wf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AFD1265623;
-	Fri, 22 Aug 2025 16:20:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5360C279DD8
+	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 16:27:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755879601; cv=none; b=CLDlB3hos8KfEgvMZXBwysBZWVPyylhGXC5s10zxPGbHbeNCIMCouYpNp4uHRQ+tRd3mApRB0Ln7Zgi9hky/rEKtC1zl4EYi7aww58AG9EVCl9ZmMqj1Y+Pq1ym/BCpnrMIs8dBQVmZSDQCRreUvlxzxw1oK+u7PsEYuUeohAzo=
+	t=1755880041; cv=none; b=dR63ZAw694zPRWuIG5PJww+pzcGwBVIqkYu9UEXJKiDcwgyUShwNrbIoEj2fCo/05Rl0sbgwhbQw2wdEMlr/AkBcA7GrjBztO/rLb3f2jTrFxHzYmvgfHwSFoWfGeDGfKmwvmxcnWJT1CTE5MMl7h44glezCTGzH6MKGWT4b0X0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755879601; c=relaxed/simple;
-	bh=R0G3P8CW8myDEOBRhUDKwUQqPKYaMfY8M6jEwas7bRk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=paaa23nIgwRwBoUY2FGLlO7ep6nFMozQ65r3+3Xnx29Ad+G4VURNHet0qiQr4fkv1q2upaWmqFk/2D52yYD/4qkO6CuEXjBfSOus9N0pVV8oZxliFFFQEqsg6nhBMpeXPxk251oawlhSsda8PekJw8Poy1X3E/obKSNt6VG+chM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kcItSYTd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84931C4CEED;
-	Fri, 22 Aug 2025 16:20:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755879600;
-	bh=R0G3P8CW8myDEOBRhUDKwUQqPKYaMfY8M6jEwas7bRk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kcItSYTd3qHGz9XwR7Tx0edKCFODSlia8zVscyJoSOGX3i7QtcAgU/j1hijh84GDH
-	 7/c+Bx8LqAvp5ba37DDwo78QtevMpccBkHWVG7mjFYF4cfHU6x7pJ7NQL6TMsC0CWL
-	 o00JllDHUxuxxm/QpvF63MD8XdyIJTf28o+8I4bIbLS65nEyiCr5XOtTKNCG0ZRRzu
-	 nRH2N/JVwlA3L/p1FbFpZhjAA2N5YRb9xQqYk7G8QZ1F1T+S3/fPm9txqcXl0lK3sj
-	 6hvkUlfwuLNb8B3jHaiYShJ4Gr+4OnqpR3k+03jc592xqDUIR5y4qqmqNtUOGl9gaN
-	 1wpCd7z3r/icQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70EF0383BF69;
-	Fri, 22 Aug 2025 16:20:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1755880041; c=relaxed/simple;
+	bh=bLmUpZ+ZY1CaI4yXsUQZMAQ6DKkJ6xfcA78SgDLAJGg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pc/74CUZp8KQoyPc5P82CZn0DE3ylxMvlolBqmmpRvc3jGkaaz3fPVKwYZEA9csqN/7wefvFT/5OXHEBd/ErbEMuCX/JQqquEpkZBXLtWGRACZekWlbFcmcSY0KqIPukN2oXdILX/wCnONCJOFi6DQkL6uSDuOEpI4xihLOtyd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bFGa20Wf; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <27e8fb9f-0e9c-4a0b-b961-64ff9d2f5228@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1755880033;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=76stymdmYGxmCdV+zWc/JNXPWOmvJL9ShI/3xunZrbI=;
+	b=bFGa20Wf1ILzNwjk48Iy7jLaeJ07I53X9gl6W/KN8/FmrExc1kDdlmLIRqCCadGn9dXi6b
+	Xs2PYBwhru965WlLKiU1BcTbMpfNDp5dz16tjQBKhZ1gNihy3G/nUi0Ye7awFBzFQ5LMIc
+	W9KREGbWMWvvffZFSyoJVJeymfAc4Lw=
+Date: Fri, 22 Aug 2025 17:27:10 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v6 bpf] xsk: fix immature cq descriptor production
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175587960927.1895682.3818186077028275399.git-patchwork-notify@kernel.org>
-Date: Fri, 22 Aug 2025 16:20:09 +0000
-References: <20250820154416.2248012-1-maciej.fijalkowski@intel.com>
-In-Reply-To: <20250820154416.2248012-1-maciej.fijalkowski@intel.com>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com,
- stfomichev@gmail.com, aleksander.lobakin@intel.com,
- e.kubanski@partner.samsung.com
+Subject: Re: [PATCH iwl-next v2] igb: Convert Tx timestamping to PTP aux
+ worker
+To: Kurt Kanzenbach <kurt@linutronix.de>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Paul Menzel <pmenzel@molgen.mpg.de>, Miroslav Lichvar <mlichvar@redhat.com>,
+ Jacob Keller <jacob.e.keller@intel.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org
+References: <20250822-igb_irq_ts-v2-1-1ac37078a7a4@linutronix.de>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20250822-igb_irq_ts-v2-1-1ac37078a7a4@linutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hello:
-
-This patch was applied to bpf/bpf.git (master)
-by Daniel Borkmann <daniel@iogearbox.net>:
-
-On Wed, 20 Aug 2025 17:44:16 +0200 you wrote:
-> Eryk reported an issue that I have put under Closes: tag, related to
-> umem addrs being prematurely produced onto pool's completion queue.
-> Let us make the skb's destructor responsible for producing all addrs
-> that given skb used.
+On 22/08/2025 08:28, Kurt Kanzenbach wrote:
+> The current implementation uses schedule_work() which is executed by the
+> system work queue to retrieve Tx timestamps. This increases latency and can
+> lead to timeouts in case of heavy system load.
 > 
-> Introduce struct xsk_addrs which will carry descriptor count with array
-> of addresses taken from processed descriptors that will be carried via
-> skb_shared_info::destructor_arg. This way we can refer to it within
-> xsk_destruct_skb(). In order to mitigate the overhead that will be
-> coming from memory allocations, let us introduce kmem_cache of
-> xsk_addrs. There will be a single kmem_cache for xsk generic xmit on the
-> system.
+> Therefore, switch to the PTP aux worker which can be prioritized and pinned
+> according to use case. Tested on Intel i210.
 > 
-> [...]
+>    * igb_ptp_tx_work
+> - * @work: pointer to work struct
+> + * @ptp: pointer to ptp clock information
+>    *
+>    * This work function polls the TSYNCTXCTL valid bit to determine when a
+>    * timestamp has been taken for the current stored skb.
+>    **/
+> -static void igb_ptp_tx_work(struct work_struct *work)
+> +static long igb_ptp_tx_work(struct ptp_clock_info *ptp)
+>   {
+> -	struct igb_adapter *adapter = container_of(work, struct igb_adapter,
+> -						   ptp_tx_work);
+> +	struct igb_adapter *adapter = container_of(ptp, struct igb_adapter,
+> +						   ptp_caps);
+>   	struct e1000_hw *hw = &adapter->hw;
+>   	u32 tsynctxctl;
+>   
+>   	if (!adapter->ptp_tx_skb)
+> -		return;
+> +		return -1;
+>   
+>   	if (time_is_before_jiffies(adapter->ptp_tx_start +
+>   				   IGB_PTP_TX_TIMEOUT)) {
+> @@ -824,15 +824,17 @@ static void igb_ptp_tx_work(struct work_struct *work)
+>   		 */
+>   		rd32(E1000_TXSTMPH);
+>   		dev_warn(&adapter->pdev->dev, "clearing Tx timestamp hang\n");
+> -		return;
+> +		return -1;
+>   	}
+>   
+>   	tsynctxctl = rd32(E1000_TSYNCTXCTL);
+> -	if (tsynctxctl & E1000_TSYNCTXCTL_VALID)
+> +	if (tsynctxctl & E1000_TSYNCTXCTL_VALID) {
+>   		igb_ptp_tx_hwtstamp(adapter);
+> -	else
+> -		/* reschedule to check later */
+> -		schedule_work(&adapter->ptp_tx_work);
+> +		return -1;
+> +	}
+> +
+> +	/* reschedule to check later */
+> +	return 1;
 
-Here is the summary with links:
-  - [v6,bpf] xsk: fix immature cq descriptor production
-    https://git.kernel.org/bpf/bpf/c/dd9de524183a
+do_aux_work is expected to return delay in jiffies to re-schedule the
+work. it would be cleaner to use msec_to_jiffies macros to tell how much
+time the driver has to wait before the next try of retrieving the
+timestamp. AFAIU, the timestamp may come ASAP in this case, so it's
+actually reasonable to request immediate re-schedule of the worker by
+returning 0.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+>   }
 
