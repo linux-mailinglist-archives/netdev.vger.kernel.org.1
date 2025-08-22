@@ -1,258 +1,282 @@
-Return-Path: <netdev+bounces-216147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79BE3B3239C
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 22:35:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D56F3B32424
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 23:25:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E9C11D61091
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 20:36:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87F727B7E6F
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 21:24:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 171FD2D1F42;
-	Fri, 22 Aug 2025 20:35:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 895192F6190;
+	Fri, 22 Aug 2025 21:25:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O6ZPdqeV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kONTZkki"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 359D71D5174;
-	Fri, 22 Aug 2025 20:35:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA01027780C;
+	Fri, 22 Aug 2025 21:25:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755894940; cv=none; b=BN4rzf+hcmdPuVfV4h0xFX1VBohF1PIBlvGxnRrkJBSl4PO0DTaXHffEKclGPKq0ntMsLEnWevigXI/wLAxCBFROic/5zQRdgaHI1m8z18BbG2HTrq9m+n4GOOzzheZJb3+w9BiqoZKyFGtLcYafDMOO+gSAMVPpshuaVF1OFc8=
+	t=1755897948; cv=none; b=NmKTiOBiTth0kM9Kjr5jhuBUr0lRV9BI14LhhegaFeyWQa29Cp7/j+MSrDCXlXz6sVskoeMRPxzp8favRiqxx7e7miG7ArvNvfru+q1MgwLHND0L6uiCN5r3tWJbgs61rxybQ0t6aE0Z8Bo8nMnSlwjkFHGz6e38Q7fMCbIQ/1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755894940; c=relaxed/simple;
-	bh=ACmzXamtUkFOMJa6lmYz4KINABUO+0S4KsHWuUfFFqc=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=muHyeQzbffs2FVPqTCI3BJilc2XE/pqICCwsna63JG3YifVkYdRu7W+upucL1H+KAs4Nzi/UokH8ORyX/G1fSa2qCvG4MDLWhXTUV2XnUnrTnR9+Velg7wtXiVcnNtzFnBLXjBOqIX73Rg0y7tmvp+fRWF2p+nN4ATyU2RZUVE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O6ZPdqeV; arc=none smtp.client-ip=209.85.128.45
+	s=arc-20240116; t=1755897948; c=relaxed/simple;
+	bh=PyEJE4lX8bJRA4X2yjT0Huc+ZpwR/rAt/m/T/q1s4Qc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n/rD0fqJv1EH/KskUwaTaeIj3jYdSP7T8HooiQRLEIXPfDu41YbYUy8DJf4cs3Fca0jixrcqAma7KHaRr+aFsl+i0WqUbSRtDnYlX6RVzc5Vh2Ins0bpWkBnk6Sk2uUutb/xweuUMv1VyDJXaxkIrQQrfRNpl9JW3MiqiMsEIuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kONTZkki; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-45a1b00f23eso15246415e9.0;
-        Fri, 22 Aug 2025 13:35:36 -0700 (PDT)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-24457f581aeso19651115ad.0;
+        Fri, 22 Aug 2025 14:25:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755894935; x=1756499735; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:autocrypt:subject:from
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ngegEq4W7EG9N2JmbWEs/MfIfA90UpT+UDvgWSX3iDY=;
-        b=O6ZPdqeVSxBadujEWDpFlk8HaeMmz74QGcXKjX9/zM5wvvogyMpu7KNWZwuQERuGy8
-         83cFxjJqg21Akl+3X6ot3BLLBUKwFbE6CBVfCa2n6q+sIR0nWS9bZsrn8oPkUQzy/oQM
-         mBIRafkY4ppULqf8DHoF/W86cxkmSKovU2TjJ7REc8VtmcoOoj1SE0ifKIy9DGgP15qK
-         enLhJni9530AU//kjdv9d6hFQxXliY2KENhkMH4+temgpsGkAudYNHlKWykF7V3X1qnE
-         QdkFwcY4PgRz7RkSEQ42zS9xMQOKZMxsK0cCmWJxvNQIhdtvyfkzib6gs6uvpUH1dhuL
-         3ShQ==
+        d=gmail.com; s=20230601; t=1755897946; x=1756502746; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=noPk3pDZKA1ESTkZuU1/asvypuJ7e5/Eo8H7HZAECl0=;
+        b=kONTZkki44PC2urLVNCXcs+gwsgpXsH7OkHAzbtHkoSbfBmIPB8sArXpSxVV5iErQ9
+         vabu/YNayhaTXvbx1tjHKmouwM1ZRFlX8KeVoFcraYqgyhU5bJBUQt+NiZ556rVUfPFH
+         BaJ4SkLiZyYgnlo2F05j/DrB7bZ0b0pleWjj/9y22fEksJg3Cn/Ip5L0z1p/S+jau0fv
+         TDGUsnZDtWqc68wbnPgWbXyL9jH/UBKCVsp3Pk9nLLSH1CmVp3sUtI5mnQYVddEIdlOH
+         AE/1zaf08mQKVlplga8j0ypuMkaU/syxkzzKyT5Nvkh/VxzJpn3R6FlIrTitZmaVJSvK
+         2P9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755894935; x=1756499735;
-        h=content-transfer-encoding:cc:to:autocrypt:subject:from
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ngegEq4W7EG9N2JmbWEs/MfIfA90UpT+UDvgWSX3iDY=;
-        b=XYgq63Sgsd+K7H0VTJrnAh9JP5v4VIgyZZLjcT+axSUAHmpvneIgjdqgnUxtqW5ek/
-         utMFvBxvvHfYxAy1woxdVk2pS0uXyaud156QHoj0R6A/4Vw1iyWOAEWN9qM/SjMP4hFH
-         KfY0XaWxOocttOF+W0pKS2iiFoJD7FvrzXqjDqae+uHyiGXVr+nJA/NIpKPkuTMU+7zI
-         3/ritCXZZHJbFvdymuMAO1vH/MlrK28HoYlfjM5xc2da1aWbjE+65noPBxObzhiJon0e
-         YuXQOm7WGDp1+k5yeybBH5mndYp9cjxktyXU5llrAobkm4t/TiVnwfw4IC9yA4pna3b7
-         dTtg==
-X-Forwarded-Encrypted: i=1; AJvYcCVelgWj3MJvZtF/jWtnHdXzqR62cN1URJJ9yNh4mxUrbSaOqG/Dy9eeAmp5Ue9lWQPXwlcb+uM+TnGX@vger.kernel.org
-X-Gm-Message-State: AOJu0YzcOghGcYH5HsigCaGAkmT8uJ/accP4O+/oK9e/TG+ozvxsKbIo
-	JRgVgs9EJ8bKqj6XzTiyyAOQheXIkYrsdMm3qiTQHw7QI/fvFqNht5EBo8M3iw==
-X-Gm-Gg: ASbGncvfRY9NbekHJ5tsVhEi//kE3ZZITXqYnhWIKoikwIEY+qSwKcwRfWbxRDWdVje
-	32tx2kYw0Xc9wqW63X083s9xYtx0MX6JucGfYVgNQKqggoisyeYOEBZTlnKGIGaXiBkI1ykJAm7
-	n7M7YZV1QbQx9eVz//v1UluqK4PhCzDsVKA1eyznSkVJFlIiuxSF7D1lfe5LwCgIoKIWrWyokNj
-	Q6UUbsXaV0ePpMTde2a2au9XO26pHFT/kKXHMTu2HGnb/I+1ypH3lwUwl59CJhniI0qg2HGKTt+
-	YoV+sngWIcTTZv6Fh9Y6kEH8Z/OdQZMJTx5dlBskmLp9Tmtekl0KBB8lDKV8kMAXh4/m/FmqK/Q
-	saWxGdN6bEQ9UfLX4EyQKbQ/7um5Gne/QrY5iDSKTtx3ug7t6Bw2xAIovGObNQTJgdwjd18RRRU
-	4z/m3OI4PSak/pkpPpERpI+yelF6KvMTTEng2TcOvU9UxTVM2+jeDgU/ns4bs05rEeRWAgtw==
-X-Google-Smtp-Source: AGHT+IEOHOQoDPWM/XZQBfXXst8+83rwDz6NjfXLVy4d5VP6h9R+W+Z5jAABDa7tDFwF/394YtVJFg==
-X-Received: by 2002:a05:600c:3b95:b0:455:bd8a:7e7 with SMTP id 5b1f17b1804b1-45b5179ce2fmr36504465e9.9.1755894935129;
-        Fri, 22 Aug 2025 13:35:35 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f4c:4200:c3d:b19b:1c2c:62a3? (p200300ea8f4c42000c3db19b1c2c62a3.dip0.t-ipconnect.de. [2003:ea:8f4c:4200:c3d:b19b:1c2c:62a3])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-45b57498b37sm12110275e9.23.2025.08.22.13.35.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Aug 2025 13:35:34 -0700 (PDT)
-Message-ID: <762700e5-a0b1-41af-aa03-929822a39475@gmail.com>
-Date: Fri, 22 Aug 2025 22:36:11 +0200
+        d=1e100.net; s=20230601; t=1755897946; x=1756502746;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=noPk3pDZKA1ESTkZuU1/asvypuJ7e5/Eo8H7HZAECl0=;
+        b=mVX4A7qI8y+tJvITTqRMntAClA2uzQJlE1kqQ24j+yGevFW4njOvpsmfLmvecswkXz
+         ZVYXq4gGAfHmx+m6zu9QuY2egUDXswnF/NwxC9dQts4uEGgqcxjjhvjuuZprtBSyGkL1
+         DkHjdx9lxGbjBkbMipkAwfpGrnV+0kzZVI8s7WkzfkJJpImStyGXcN3+Ud537Wh7qlyW
+         S7UlM0eZ1qAYPjxgfOvUjCMBq0d1hG3Fl2mvRApNnsk1goptC7SU5OXmolxLP/I9AjXa
+         j/X/LGhwJqDwec/WXhKiJ2lI8Gq/cNMWlskd6XJrBKYjFY3nptvG0J+uVmhS6pWLQI5W
+         s0Zw==
+X-Forwarded-Encrypted: i=1; AJvYcCWqFZsdUkojLv53hFKxRpo9ko8u8lTXfx4dVeIJEZmp1Q2vyr04LdgK6AP8jmiuckbFgBdBMfx3@vger.kernel.org, AJvYcCXGz7wr/PN8+X+0tQVIW4d4VgIhQM/JjLXdchSbtfjcNZc3vxSSmjo1+FG+Fg1vwqUGob6ZHDq7ESNCDognIz4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIrcl2WcKA8DVddlnB3x/xuj4DVEs2/9f/YbTi8HttmUy1fAJe
+	/p9zI2eptb5J6hhICqXhJS6aeFxJpDiitCycxVs74fRLPUWdVxQKsGE=
+X-Gm-Gg: ASbGncvPB6ZAoSS9AGuRS9//0Rv4VAAgO0KhCoYHAq/DNfmzgNHNXRFTjUl95e2HoH8
+	4eKtquCZs5nxl83fl/fhvl5p3KbWGgI+xmg7XoKbj+/JyB6IJ9AijhWGQNa7zn3u+/rFM9d2fuE
+	YNUByQ42XiAokoSku5r2nNCZItfCDWQdKYIcKeNI9LhRGyjsLltP8Ks8wYsE2psia+BayJI/lKg
+	l4BQY5MNgp02fZIbtSwdWKuzc4m3ejhufwYYeE7jfQ+9xCpCMk1f/y3+lygHZ1Xsa+nxWQusZbU
+	QiNhtmlzHab6cXLaj7mP4joZeQOJqJSA1FBs0WU4TM1uN8feArcs/mxhQYGOUrsMHSSmTK6gUth
+	i5XLRdMSV1MoIM4H2DC/pYfV/ZmgdOoOXQSF7XFwAN8IB/prh0YaCnudTg7srfMSBvjr5cZNef1
+	2YmKZ9MqX48u4x/2xfKfWIW5WizKuLxnCoGFLecpTc4nLXKzY+f5gsvkv5v1vUKzyZ6EzXA0576
+	4PK
+X-Google-Smtp-Source: AGHT+IEGDqW6+HTW2RzMWj5gmi3mF4Tu6FZIcKtkuS/kUYAvwr8K1mdAa0goBkBIPSSKpl71Hq1TmA==
+X-Received: by 2002:a17:903:11c5:b0:240:3b9e:dd65 with SMTP id d9443c01a7336-2462ef44573mr54642815ad.38.1755897945870;
+        Fri, 22 Aug 2025 14:25:45 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2466885efc8sm5088955ad.90.2025.08.22.14.25.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Aug 2025 14:25:45 -0700 (PDT)
+Date: Fri, 22 Aug 2025 14:25:45 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	almasrymina@google.com, sdf@fomichev.me, joe@dama.to,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 1/4] selftests: drv-net: ncdevmem: remove use of
+ error()
+Message-ID: <aKjgWZnfWShtvi8m@mini-arch>
+References: <20250822200052.1675613-1-kuba@kernel.org>
+ <20250822200052.1675613-2-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] net: phy: fixed: let fixed_phy_add always use addr 0
- and remove return value
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-To: Greg Ungerer <gerg@linux-m68k.org>,
- Geert Uytterhoeven <geert@linux-m68k.org>, Hauke Mehrtens
- <hauke@hauke-m.de>, =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Andrew Lunn
- <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250822200052.1675613-2-kuba@kernel.org>
 
-We have only two users of fixed_phy_add(), both use address 0 and
-ignore the return value. So simplify fixed_phy_add() accordingly.
+On 08/22, Jakub Kicinski wrote:
+> Using error() makes it impossible for callers to unwind their
+> changes. Replace error() calls with proper error handling.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Whilst at it, constify the fixed_phy_status configs.
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
-Note:
-fixed_phy_add() is a legacy function which shouldn't be used in new
-code, as it's use may be problematic:
-- No check whether a fixed phy exists already at the given address
-- If fixed_phy_register() is called afterwards by any other driver,
-  then it will also use phy_addr 0, because fixed_phy_add() ignores
-  the ida which manages address assignment
-Drivers using a fixed phy created by fixed_phy_add() in platform code,
-should dynamically create a fixed phy with fixed_phy_register()
-instead.
+> ---
+>  .../selftests/drivers/net/hw/ncdevmem.c       | 528 ++++++++++++------
+>  1 file changed, 364 insertions(+), 164 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/drivers/net/hw/ncdevmem.c b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
+> index 71961a7688e6..e75adfed33ac 100644
+> --- a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
+> +++ b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
+> @@ -115,6 +115,21 @@ struct memory_provider {
+>  				   size_t off, int n);
+>  };
+>  
+> +static void pr_err(const char *fmt, ...)
+> +{
+> +	va_list args;
+> +
+> +	fprintf(stderr, "%s: ", TEST_PREFIX);
+> +
+> +	va_start(args, fmt);
+> +	vfprintf(stderr, fmt, args);
+> +	va_end(args);
+> +
+> +	if (errno != 0)
+> +		fprintf(stderr, ": %s", strerror(errno));
+> +	fprintf(stderr, "\n");
+> +}
+> +
+>  static struct memory_buffer *udmabuf_alloc(size_t size)
+>  {
+>  	struct udmabuf_create create;
+> @@ -123,27 +138,33 @@ static struct memory_buffer *udmabuf_alloc(size_t size)
+>  
+>  	ctx = malloc(sizeof(*ctx));
+>  	if (!ctx)
+> -		error(1, ENOMEM, "malloc failed");
+> +		return NULL;
+>  
+>  	ctx->size = size;
+>  
+>  	ctx->devfd = open("/dev/udmabuf", O_RDWR);
+> -	if (ctx->devfd < 0)
+> -		error(1, errno,
+> -		      "%s: [skip,no-udmabuf: Unable to access DMA buffer device file]\n",
+> -		      TEST_PREFIX);
+> +	if (ctx->devfd < 0) {
+> +		pr_err("[skip,no-udmabuf: Unable to access DMA buffer device file]");
+> +		goto err_free_ctx;
+> +	}
+>  
+>  	ctx->memfd = memfd_create("udmabuf-test", MFD_ALLOW_SEALING);
+> -	if (ctx->memfd < 0)
+> -		error(1, errno, "%s: [skip,no-memfd]\n", TEST_PREFIX);
+> +	if (ctx->memfd < 0) {
+> +		pr_err("[skip,no-memfd]");
+> +		goto err_close_dev;
+> +	}
+>  
+>  	ret = fcntl(ctx->memfd, F_ADD_SEALS, F_SEAL_SHRINK);
+> -	if (ret < 0)
+> -		error(1, errno, "%s: [skip,fcntl-add-seals]\n", TEST_PREFIX);
+> +	if (ret < 0) {
+> +		pr_err("[skip,fcntl-add-seals]");
+> +		goto err_close_memfd;
+> +	}
+>  
+>  	ret = ftruncate(ctx->memfd, size);
+> -	if (ret == -1)
+> -		error(1, errno, "%s: [FAIL,memfd-truncate]\n", TEST_PREFIX);
+> +	if (ret == -1) {
+> +		pr_err("[FAIL,memfd-truncate]");
+> +		goto err_close_memfd;
+> +	}
+>  
+>  	memset(&create, 0, sizeof(create));
+>  
+> @@ -151,15 +172,29 @@ static struct memory_buffer *udmabuf_alloc(size_t size)
+>  	create.offset = 0;
+>  	create.size = size;
+>  	ctx->fd = ioctl(ctx->devfd, UDMABUF_CREATE, &create);
+> -	if (ctx->fd < 0)
+> -		error(1, errno, "%s: [FAIL, create udmabuf]\n", TEST_PREFIX);
+> +	if (ctx->fd < 0) {
+> +		pr_err("[FAIL, create udmabuf]");
+> +		goto err_close_fd;
+> +	}
+>  
+>  	ctx->buf_mem = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED,
+>  			    ctx->fd, 0);
+> -	if (ctx->buf_mem == MAP_FAILED)
+> -		error(1, errno, "%s: [FAIL, map udmabuf]\n", TEST_PREFIX);
+> +	if (ctx->buf_mem == MAP_FAILED) {
+> +		pr_err("[FAIL, map udmabuf]");
+> +		goto err_close_fd;
+> +	}
+>  
+>  	return ctx;
+> +
+> +err_close_fd:
+> +	close(ctx->fd);
+> +err_close_memfd:
+> +	close(ctx->memfd);
+> +err_close_dev:
+> +	close(ctx->devfd);
+> +err_free_ctx:
+> +	free(ctx);
+> +	return NULL;
+>  }
+>  
+>  static void udmabuf_free(struct memory_buffer *ctx)
+> @@ -217,7 +252,7 @@ static void print_nonzero_bytes(void *ptr, size_t size)
+>  		putchar(p[i]);
+>  }
+>  
+> -void validate_buffer(void *line, size_t size)
+> +int validate_buffer(void *line, size_t size)
+>  {
+>  	static unsigned char seed = 1;
+>  	unsigned char *ptr = line;
+> @@ -232,8 +267,10 @@ void validate_buffer(void *line, size_t size)
+>  				"Failed validation: expected=%u, actual=%u, index=%lu\n",
+>  				expected, ptr[i], i);
+>  			errors++;
+> -			if (errors > 20)
+> -				error(1, 0, "validation failed.");
+> +			if (errors > 20) {
+> +				pr_err("validation failed");
+> +				return -1;
+> +			}
+>  		}
+>  		seed++;
+>  		if (seed == do_validation)
+> @@ -241,6 +278,7 @@ void validate_buffer(void *line, size_t size)
+>  	}
+>  
+>  	fprintf(stdout, "Validated buffer\n");
+> +	return 0;
+>  }
+>  
+>  static int rxq_num(int ifindex)
+> @@ -279,7 +317,7 @@ static int rxq_num(int ifindex)
+>  		system(command);                                        \
+>  	})
+>  
+> -static int reset_flow_steering(void)
+> +static void reset_flow_steering(void)
+>  {
+>  	/* Depending on the NIC, toggling ntuple off and on might not
+>  	 * be allowed. Additionally, attempting to delete existing filters
+> @@ -292,7 +330,6 @@ static int reset_flow_steering(void)
+>  	run_command(
+>  		"ethtool -n %s | grep 'Filter:' | awk '{print $2}' | xargs -n1 ethtool -N %s delete >&2",
+>  		ifname, ifname);
+> -	return 0;
+>  }
+>  
+>  static const char *tcp_data_split_str(int val)
+> @@ -354,6 +391,11 @@ static int configure_rss(void)
+>  	return run_command("ethtool -X %s equal %d >&2", ifname, start_queue);
+>  }
+>  
+> +static void reset_rss(void)
+> +{
+> +	run_command("ethtool -X %s default >&2", ifname, start_queue);
+> +}
+> +
+>  static int configure_channels(unsigned int rx, unsigned int tx)
+>  {
+>  	struct ethtool_channels_get_req *gchan;
+> @@ -479,6 +521,7 @@ static int bind_rx_queue(unsigned int ifindex, unsigned int dmabuf_fd,
+>  
+>  	*ys = ynl_sock_create(&ynl_netdev_family, &yerr);
+>  	if (!*ys) {
+> +		netdev_queue_id_free(queues);
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- arch/m68k/coldfire/m5272.c  | 4 ++--
- arch/mips/bcm47xx/setup.c   | 4 ++--
- drivers/net/phy/fixed_phy.c | 4 ++--
- include/linux/phy_fixed.h   | 8 ++------
- 4 files changed, 8 insertions(+), 12 deletions(-)
-
-diff --git a/arch/m68k/coldfire/m5272.c b/arch/m68k/coldfire/m5272.c
-index 5b70dfdab..918e2a323 100644
---- a/arch/m68k/coldfire/m5272.c
-+++ b/arch/m68k/coldfire/m5272.c
-@@ -108,7 +108,7 @@ void __init config_BSP(char *commandp, int size)
-  * an ethernet switch. In this case we need to use the fixed phy type,
-  * and we need to declare it early in boot.
-  */
--static struct fixed_phy_status nettel_fixed_phy_status __initdata = {
-+static const struct fixed_phy_status nettel_fixed_phy_status __initconst = {
- 	.link	= 1,
- 	.speed	= 100,
- 	.duplex	= 0,
-@@ -119,7 +119,7 @@ static struct fixed_phy_status nettel_fixed_phy_status __initdata = {
- static int __init init_BSP(void)
- {
- 	m5272_uarts_init();
--	fixed_phy_add(0, &nettel_fixed_phy_status);
-+	fixed_phy_add(&nettel_fixed_phy_status);
- 	clkdev_add_table(m5272_clk_lookup, ARRAY_SIZE(m5272_clk_lookup));
- 	return 0;
- }
-diff --git a/arch/mips/bcm47xx/setup.c b/arch/mips/bcm47xx/setup.c
-index de426a474..a93a4266d 100644
---- a/arch/mips/bcm47xx/setup.c
-+++ b/arch/mips/bcm47xx/setup.c
-@@ -256,7 +256,7 @@ static int __init bcm47xx_cpu_fixes(void)
- }
- arch_initcall(bcm47xx_cpu_fixes);
- 
--static struct fixed_phy_status bcm47xx_fixed_phy_status __initdata = {
-+static const struct fixed_phy_status bcm47xx_fixed_phy_status __initconst = {
- 	.link	= 1,
- 	.speed	= SPEED_100,
- 	.duplex	= DUPLEX_FULL,
-@@ -282,7 +282,7 @@ static int __init bcm47xx_register_bus_complete(void)
- 	bcm47xx_leds_register();
- 	bcm47xx_workarounds();
- 
--	fixed_phy_add(0, &bcm47xx_fixed_phy_status);
-+	fixed_phy_add(&bcm47xx_fixed_phy_status);
- 	return 0;
- }
- device_initcall(bcm47xx_register_bus_complete);
-diff --git a/drivers/net/phy/fixed_phy.c b/drivers/net/phy/fixed_phy.c
-index 7902b35c5..b39532abf 100644
---- a/drivers/net/phy/fixed_phy.c
-+++ b/drivers/net/phy/fixed_phy.c
-@@ -153,9 +153,9 @@ static int fixed_phy_add_gpiod(unsigned int irq, int phy_addr,
- 	return 0;
- }
- 
--int fixed_phy_add(int phy_addr, const struct fixed_phy_status *status)
-+void fixed_phy_add(const struct fixed_phy_status *status)
- {
--	return fixed_phy_add_gpiod(PHY_POLL, phy_addr, status, NULL);
-+	fixed_phy_add_gpiod(PHY_POLL, 0, status, NULL);
- }
- EXPORT_SYMBOL_GPL(fixed_phy_add);
- 
-diff --git a/include/linux/phy_fixed.h b/include/linux/phy_fixed.h
-index 5399b9e41..6227a1bde 100644
---- a/include/linux/phy_fixed.h
-+++ b/include/linux/phy_fixed.h
-@@ -17,7 +17,7 @@ struct net_device;
- 
- #if IS_ENABLED(CONFIG_FIXED_PHY)
- extern int fixed_phy_change_carrier(struct net_device *dev, bool new_carrier);
--int fixed_phy_add(int phy_id, const struct fixed_phy_status *status);
-+void fixed_phy_add(const struct fixed_phy_status *status);
- struct phy_device *fixed_phy_register(const struct fixed_phy_status *status,
- 				      struct device_node *np);
- 
-@@ -26,11 +26,7 @@ extern int fixed_phy_set_link_update(struct phy_device *phydev,
- 			int (*link_update)(struct net_device *,
- 					   struct fixed_phy_status *));
- #else
--static inline int fixed_phy_add(int phy_id,
--				const struct fixed_phy_status *status)
--{
--	return -ENODEV;
--}
-+static inline void fixed_phy_add(const struct fixed_phy_status *status) {}
- static inline struct phy_device *
- fixed_phy_register(const struct fixed_phy_status *status,
- 		   struct device_node *np)
--- 
-2.50.1
-
+Funny how you spotted this.. Ownership of these is complicated with ynl :-( 
 
