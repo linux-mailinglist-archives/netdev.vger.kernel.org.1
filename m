@@ -1,120 +1,73 @@
-Return-Path: <netdev+bounces-216050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F910B31BEF
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 16:38:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C1AAB31BA1
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 16:32:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 886296465D0
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 14:32:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01B2C7A8EE8
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 14:30:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C170A33A03C;
-	Fri, 22 Aug 2025 14:26:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D1CD3093DD;
+	Fri, 22 Aug 2025 14:27:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RKYiqPK7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QCgekmc5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CFA1312828
-	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 14:26:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6BF730748B;
+	Fri, 22 Aug 2025 14:27:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755872770; cv=none; b=IvnOKErffdhc96dHy4ALzV5h+cM8e+pfHxNaArX8/MO3Te/Shuh5lRjJKEGBhTQr4ZJx21p+ffOf//Gvqc6oz1seFoz6gC5NLLk9BbmRN+90xDjS4dOBm+sQBhp0aNRFnpJoMIMIDsI1Skbf3wxqR5PLu8Eu1Eg43Gr1E+fT8Jw=
+	t=1755872867; cv=none; b=LGwlDlK/TzCe09HTWPavb7p9jTgVjOFbXk2jHAwoV1lOGGAcYhkE6GZYMBDH4oRqwGxqYjFyVVnoJ7Yd0STDf9ABqIP6zd5XLB4RwN+mqwyQ2Vg/nEzy62CzsIlgLJljQEsSCpAVSoXHhRgrIELRER3btHbP3EQ3W12rv5fBb1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755872770; c=relaxed/simple;
-	bh=WSF2R7E4Mb2/hL4j6g0FeimKbh0L3weVkjdBGHjZ/88=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R0b+EKMZney/dImvXNdv3WOICsf1FB5aVXq5AKvxK8tahKYjyPd2Qq88X9FkfIs4kWRFVAlj77TZIoS8RFcAMAVQma4pmV4xlcGnTSeeT6rHoalcb3fuOfdDTSgOjXZWNttie/1aGZycx1oQfTbXTMQbzwm/VxFBiggJ27j0MKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RKYiqPK7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD0A1C113CF;
-	Fri, 22 Aug 2025 14:26:09 +0000 (UTC)
+	s=arc-20240116; t=1755872867; c=relaxed/simple;
+	bh=rdRrontDhsPp/Q6400n+syvBUOq8MstaY0GwaWkO7mw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KmVCCLRS3+jnQ1U8LESDxSUIXnJW8m3I4WgWi5uxzohf7uIFQTpQrM4OD7SJuem4gfJ+INvH7JHc31l2CUcUAb6YJ+IulyHnGOz9vYx3xb9jhnD+jAxroTLTomxLIXObrI80ylDvuQOoMiFvqFeMnQZO/o6eLHw3QPGVK9WLaTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QCgekmc5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2594BC4CEED;
+	Fri, 22 Aug 2025 14:27:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755872770;
-	bh=WSF2R7E4Mb2/hL4j6g0FeimKbh0L3weVkjdBGHjZ/88=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RKYiqPK7OLe2vlUs8QaWsL9uZ17hNWV3VpK1Dz+4uMqooYDmgqakRouxbyZ0NDdcn
-	 ymEPZ1K4L/2FgFj3XapO7ZBwbphFXhaa3q7Q6WBMrKwTh8Shf4gEYxZQiTGm5poCro
-	 mBMSkX/JfXnrqH+0Zsl83jLLbKndT9DAxSxxDuftsEl155MOIcxsAGhbmdnfVyfvEA
-	 fPxh6VV0yn2S0D/llpfhk0Bjkayu/Ywi09DSwAuIxiAhf9GQ/wBPXXTjJG3OwLfc6x
-	 mSg5eQg0duAwyHupXZnrfSAzE+qRtvaqFr5nQpMdw1Ajv12glzCSRA8PlL9xTTp7BY
-	 fNI3MCwLRvKdg==
-Date: Fri, 22 Aug 2025 16:26:06 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 2/3] net: airoha: Add airoha_ppe_dev struct
- definition
-Message-ID: <aKh9_g7mgvFxMdAz@lore-rh-laptop>
-References: <20250819-airoha-en7581-wlan-rx-offload-v1-0-71a097e0e2a1@kernel.org>
- <20250819-airoha-en7581-wlan-rx-offload-v1-2-71a097e0e2a1@kernel.org>
- <20250821183453.4136c5d3@kernel.org>
- <aKgVEYMftYgdynxw@lore-rh-laptop>
- <20250822070440.71bdd804@kernel.org>
+	s=k20201202; t=1755872867;
+	bh=rdRrontDhsPp/Q6400n+syvBUOq8MstaY0GwaWkO7mw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QCgekmc56J4w5cSUnqBCJX5OO5ISCZ5/AIbkfiX3sHtxlJ3U1Kx5yB3crwjVWkcup
+	 iMW8DhfmvV+xEXvX9H7d8tJL8pA52Muxuo3PQxB5rORPYZjR1Eg/ikN85OZKo1Qk9O
+	 hEn08RW+Jvhgfye0NHbjTgjcla4u7t8vERKZRWe/EAlzJC2hxL3F0JZuNIs9M+nA6X
+	 gV+PmqykX+45Nmc0+iz8KtuJPoqPF8U+FnCkRDNAqid9Kd3DzxLd/YnbBx1+8p2v7W
+	 AzCf87wejyJzuffLtaXmJcmHvOZSFhyNz6ZkIQ6t471uKU70mOSD9xSqWP/ARfk/tA
+	 3Sxu92cs1lvSQ==
+Date: Fri, 22 Aug 2025 07:27:46 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alessandro Ratti <alessandro@0x65c.net>
+Cc: liuhangbin@gmail.com, davem@davemloft.net, edumazet@google.com,
+ linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ skhan@linuxfoundation.org
+Subject: Re: [PATCH net-next v3] selftests: rtnetlink: skip tests if tools
+ or feats are missing
+Message-ID: <20250822072746.16ef5058@kernel.org>
+In-Reply-To: <20250822140633.891360-1-alessandro@0x65c.net>
+References: <aKhqmsheZAqThrSu@fedora>
+	<20250822140633.891360-1-alessandro@0x65c.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="FXbdwn9GJNlxMjEH"
-Content-Disposition: inline
-In-Reply-To: <20250822070440.71bdd804@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Fri, 22 Aug 2025 16:03:39 +0200 Alessandro Ratti wrote:
+> Thanks again for your feedback on the previous version.
+> 
+> This is v3 of the patch, with the `Reviewed-by:` tag now correctly
+> placed above the `Signed-off-by:` line as per your suggestion.
 
---FXbdwn9GJNlxMjEH
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Aug 22, Jakub Kicinski wrote:
-> On Fri, 22 Aug 2025 08:58:25 +0200 Lorenzo Bianconi wrote:
-> > > On Tue, 19 Aug 2025 14:21:07 +0200 Lorenzo Bianconi wrote: =20
-> > > > +	pdev =3D of_find_device_by_node(np);
-> > > > + =20
-> > >=20
-> > > did you mean to put the of_node_put() here?
-> > >  =20
-> > > > +	if (!pdev) {
-> > > > +		dev_err(dev, "cannot find device node %s\n", np->name);
-> > > > +		of_node_put(np);
-> > > > +		return ERR_PTR(-ENODEV);
-> > > > +	}
-> > > > +	of_node_put(np); =20
-> >=20
-> > I moved the of_node_put() here (and in the if branch) in order to fix a=
- similar
-> > issue fixed by Alok for airoha_npu.
->=20
-> Ah, didn't notice it in the print..
-> maybe remove the empty line between the of_find_device.. and the null
-> check on pdev then?
-
-I am fine with it. I did it this way just to be consistent with NPU code:
-https://github.com/torvalds/linux/blob/master/drivers/net/ethernet/airoha/a=
-iroha_npu.c#L403
-Do you want me to post v3?
-
-Regards,
-Lorenzo
-
---FXbdwn9GJNlxMjEH
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaKh9+wAKCRA6cBh0uS2t
-rCjXAQD/CFY6FZBfBcRt+bN2UykwgbP/5hNbqWoPrdltuQ8VKwD/VlSEjpbCiIVN
-JTzElzSc2kYY+9A/Of88HRuL0KmM2Q8=
-=/jOx
------END PGP SIGNATURE-----
-
---FXbdwn9GJNlxMjEH--
+Do me a favor and read this please:
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
 
