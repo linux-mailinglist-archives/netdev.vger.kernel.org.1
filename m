@@ -1,125 +1,191 @@
-Return-Path: <netdev+bounces-215918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 353E1B30E28
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 07:38:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 074AEB30E70
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 08:04:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D741668747A
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 05:38:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDC4EAA7AA6
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 06:04:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 503512E1F12;
-	Fri, 22 Aug 2025 05:38:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84CB52E040F;
+	Fri, 22 Aug 2025 06:04:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="UnVg07Ty"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8E3229E10F;
-	Fri, 22 Aug 2025 05:37:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C61A1662E7;
+	Fri, 22 Aug 2025 06:04:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755841084; cv=none; b=UkHGzSVUIkCvMWZMB2sHB8777AGFqepxJ4YXj1u3AYrS/GyeHd09IQmRsWKSeEm4nixIWxXBSe4c7IRXfV8Te0syKUg3Gj+gccZcO0RhtfbhOYfaqnzcxQUfcOHmwZ33s6E/cZh9YMAhSwAYCeyYHPgPIlB2pDUt18TkkTU58xE=
+	t=1755842671; cv=none; b=rleaB9MY6eHwqTCtPHR2oaZ2T7EmZfIP7X2J7fLLZeNshEumM+hClrw4VxL1O7TTltVXHikVsoAPpkI16S1nnn4uamYKGvuRx4GDwAMDzhDCxT/Bv0xHoa2ytsd+FZkwITFXWC4XRZpNuJzy58TG4LEhwBOCKGXYSnmrCp/wkmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755841084; c=relaxed/simple;
-	bh=P2OpMo8zKi5PbanOBvN3xsHsrhiGUSU6OkaETt+j7ZI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fNNe8+fJp/GL5yxPourjSS2VoakmAxRz8HjPoBhKAwl0TlZ6S1hO74E77XSzQA+I+liBtLOkeNqLzFJ/WMkGr1X7G2OwViaOTwecELqr0NPdvrkkFvmCmHxryBbmkklLztKm2dSib++8XVIjeWzv7cexUJSMN6cNW1pvAcIwu3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=18.132.163.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: esmtpsz18t1755841062t97b53618
-X-QQ-Originating-IP: hLpCTsEsbb/JUu8v3fMtu47Yfigv2mhcD7vKjgfus30=
-Received: from localhost ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 22 Aug 2025 13:37:39 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 14988215101374177968
-Date: Fri, 22 Aug 2025 13:37:40 +0800
-From: Yibo Dong <dong100@mucse.com>
-To: Parthiban.Veerasooran@microchip.com
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
-	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
-	lukas.bulwahn@redhat.com, alexanderduyck@fb.com,
-	richardcochran@gmail.com, kees@kernel.org, gustavoars@kernel.org,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH net-next v7 4/5] net: rnpgbe: Add basic mbx_fw support
-Message-ID: <7D780BA46B65623F+20250822053740.GC1931582@nic-Precision-5820-Tower>
-References: <20250822023453.1910972-1-dong100@mucse.com>
- <20250822023453.1910972-5-dong100@mucse.com>
- <9fc58eb7-e3d8-4593-9d62-82ec40d4c7d2@microchip.com>
+	s=arc-20240116; t=1755842671; c=relaxed/simple;
+	bh=6bdEFkPP9mtL8SXN2YyvE+O8XqCKf7T664vIzlyCJ+U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lmoD3ZSjfqPq52gb42jQax8IwLr99udU6hHAXsCp3Spbll013XT8RxD8dEY5APyrqnCdMvM0KMDQzhcec4QMiVdu9CSH/Qd+SSAEkDReZ2YlF25jJumitZhwZVWaty0RR/+yDNscFcQ4c4Jpb15gUjTU9EkfLJc8qQVSYDpnjyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=UnVg07Ty; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1755842665; h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+	bh=v8DQvhGd0hsTZwVKh2gZIsPRps/MXpijPs1f0x0Pe6U=;
+	b=UnVg07TyujxpwcAJHhK6CGD5MsE4yahq+Hj2IPrnl7jtFWQriLtyYJ9/mmENXmGwnNPTPleGMrgEExHS0JnP0Da49zG/kO63KTlNgczPAG8mlIamiMWhC+TEQUTw4K31orkdEFMOJfRAZ2pBC+3rY0GNUNKl9Gpa4fJ/FHS+V2Y=
+Received: from localhost.localdomain(mailfrom:mii.w@linux.alibaba.com fp:SMTPD_---0WmId2o._1755842662 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 22 Aug 2025 14:04:24 +0800
+From: 'MingMing Wang' <mii.w@linux.alibaba.com>
+To: edumazet@google.com,
+	ncardwell@google.com,
+	kuniyu@google.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	ycheng@google.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	MingMing Wang <mii.w@linux.alibaba.com>,
+	Dust Li <dust.li@linux.alibaba.com>
+Subject: [RFC net] tcp: Fix orphaned socket stalling indefinitely in FIN-WAIT-1
+Date: Fri, 22 Aug 2025 14:02:54 +0800
+Message-ID: <20250822060254.74708-1-mii.w@linux.alibaba.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9fc58eb7-e3d8-4593-9d62-82ec40d4c7d2@microchip.com>
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: NY7N4KDmsCacYkgy9A+vDKp3+1hyQx3R+XJ/UhRJTu4a6qMcvssW4j9X
-	pxv4MK/UggwZr+Esxz5KH3mGJx8WMAdm5JH6WAPQcGBvZfC8EU3tzapL+lkZBvHlOteL22U
-	nyh1OKXNj3TY7n1qlQiuw9uqjBtHMGHGQSAiqsRYBgtqMQmoFy5zhBKf8XXV4fgg1aYzo0z
-	1D0q3ZKCEdTO+YlzM1hTMqtuUXrHi40hF8PLd6Kp002qeEt4Sebw0pjdEOegx3fvkxYI3GS
-	LehzcUVtsuL9WfhiPmavQU8fbbrhkB1AM0/5rcr/S6GPIt3BMc/h67cPdlCVSPSzWG0wBSY
-	wMMWg6O2NUBAPNAl17J6pvmc1+utHS8qstZERCdeImcBkTxFosc+9s24/Opd44Tif8FaWEq
-	zriV9f0ojP4rolvmgsKCBLYxHOMJTBNj9AEfx1yaNsigHfW1bJiugAGvR8CFj94c45wX3se
-	Lg8xJ41ueyxRywnpfz+B4DeC/CuBrEeBDkrJF+goD7pJehkjOldva/GP9/hEKNy9RmVTak0
-	XSiPQCFegyCLcxtoTjhAjgDI0N0om7uf9/p2AbW8HaEDbIhNm8Z7fztU6YNL96uk+nh5lke
-	m1arDInkHqwA00So2BzmCKd3WAas+s3UYGVKmC2FhPxiJ7RpLZtaYK9A5w2Kjg1x9SJZB4H
-	+WUOD20uSd21pnMmn+Fk6cV8y8VMrm0RKCvUeKVrIL+h0osMwdCNMbm2KIbC0GHRwkIsysf
-	j91gSft8D+Nyq4oc4guc6NvG1i2c1F8uhBIvul3ju3BHqyUOHgV4l+0a5kcCV9fRfZsR6Vz
-	p4ozqoIk/xYm39sdZn4ro6f8aMv4V19hlcW7iWrlv4SEDPCNzO8/qaxkLrEPEnjLTUz8jZr
-	gf/I96YCtWbJ2Sd/hH2nTbPAnFHUTbgH5KsmF8TWjs1DIKdNZvFrUjHPcKA/f7M8x0L0hEI
-	xybLbmYEwd37CC9WsiKdnceo2CfuHPw4TnOwYy7i/MMGDTbvQaVZrVB6X6OATcFSjD+KCuF
-	X1/toosl6csANbZ4w3
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Aug 22, 2025 at 04:49:44AM +0000, Parthiban.Veerasooran@microchip.com wrote:
-> On 22/08/25 8:04 am, Dong Yibo wrote:
-> > +/**
-> > + * mucse_mbx_get_capability - Get hw abilities from fw
-> > + * @hw: pointer to the HW structure
-> > + *
-> > + * mucse_mbx_get_capability tries to get capabities from
-> > + * hw. Many retrys will do if it is failed.
-> > + *
-> > + * @return: 0 on success, negative on failure
-> > + **/
-> > +int mucse_mbx_get_capability(struct mucse_hw *hw)
-> > +{
-> > +       struct hw_abilities ability = {};
-> > +       int try_cnt = 3;
-> > +       int err = -EIO;
-> Here too you no need to assign -EIO as it is updated in the while.
-> 
-> Best regards,
-> Parthiban V
-> > +
-> > +       while (try_cnt--) {
-> > +               err = mucse_fw_get_capability(hw, &ability);
-> > +               if (err)
-> > +                       continue;
-> > +               hw->pfvfnum = le16_to_cpu(ability.pfnum) & GENMASK_U16(7, 0);
-> > +               return 0;
-> > +       }
-> > +       return err;
-> > +}
-> > +
+From: MingMing Wang <mii.w@linux.alibaba.com>
 
-err is updated because 'try_cnt = 3'. But to the code logic itself, it should
-not leave err uninitialized since no guarantee that codes 'whthin while'
-run at least once. Right?
+An orphaned TCP socket can stall indefinitely in FIN-WAIT-1
+if the following conditions are met:
+1. net.ipv4.tcp_retries2 is set to a value ≤ 8;
+2. The peer advertises a zero window, and the window never reopens.
 
-Thanks for your feedback.
+Steps to reproduce:
+1. Set up two instances with nmap installed: one will act as the server
+   the other as the client
+2. Execute on the server:
+   a. lower rmem : `sysctl -w net.ipv4.tcp_rmem="16 32 32"`
+   b. start a listener: `nc -l -p 1234`
+3. Execute on the client:
+   a. lower tcp_retries2: `sysctl -w net.ipv4.tcp_retries2=8`
+   b. send pakcets: `cat /dev/zero | nc <server-ip> 1234`
+   c. after five seconds, stop the process: `killall nc`
+4. Execute on the server: `killall -STOP nc`
+5. Expected abnormal result: using `ss` command, we'll notice that the
+   client connection remains stuck in the FIN_WAIT1 state, and the
+   backoff counter always be 8 and no longer increased, as shown below:
+   ```
+   FIN-WAIT-1 0      1389    172.16.0.2:50316    172.16.0.1:1234
+         cubic wscale:2,7 rto:201 backoff:8 rtt:0.078/0.007 mss:36
+		 ... other fields omitted ...
+   ```
+6. If we set tcp_retries2 to 15 and repeat the steps above, the FIN_WAIT1
+   state will be forcefully reclaimed after about 5 minutes.
+
+During the zero-window probe retry process, it will check whether the
+current connection is alive or not. If the connection is not alive and
+the counter of retries exceeds the maximum allowed `max_probes`, retry
+process will be terminated.
+
+In our case, when we set `net.ipv4.tcp_retries2` to 8 or a less value,
+according to the current implementation, the `icsk->icsk_backoff` counter
+will be capped at `net.ipv4.tcp_retries2`. The value calculated by
+`inet_csk_rto_backoff` will always be too small, which means the
+computed backoff duration will always be less than rto_max. As a result,
+the alive check will always return true. The condition before the
+`goto abort` statement is an logical AND condition, the abort branch
+can never be reached.
+
+So, the TCP retransmission backoff mechanism has two issues:
+
+1. `icsk->icsk_backoff` should monotonically increase during probe
+   transmission and, upon reaching the maximum backoff limit, the
+   connection should be terminated. However, the backoff value itself
+   must not be capped prematurely — it should only control when to abort.
+
+2. The condition for orphaned connection abort was incorrectly based on
+   connection liveness and probe count. It should instead consider whether
+   the number of orphaned probes exceeds the intended limit.
+
+To fix this, introduce a local variable `orphan_probes` to track orphan
+probe attempts separately from `max_probes`, which is used for RTO
+retransmissions. This decouples the two counters and prevents accidental
+overwrites, ensuring correct timeout behavior for orphaned connections.
+
+Fixes: b248230c34970 ("tcp: abort orphan sockets stalling on zero window probes")
+Co-developed-by: Dust Li <dust.li@linux.alibaba.com>
+Signed-off-by: Dust Li <dust.li@linux.alibaba.com>
+Co-developed-by: MingMing Wang <mii.w@linux.alibaba.com>
+Signed-off-by: MingMing Wang <mii.w@linux.alibaba.com>
+
+---
+We couldn't determine the rationale behind the following check in tcp_send_probe0():
+```
+if (icsk->icsk_backoff < READ_ONCE(net->ipv4.sysctl_tcp_retries2))
+    icsk->icsk_backoff++;
+```
+
+This condition appears to be the root cause of the observed stall.
+However, it has existed in the kernel for over 20 years — which suggests
+there might be a historical or subtle reason for its presence.
+
+We would greatly appreciate it if anyone could shed
+---
+ net/ipv4/tcp_output.c | 4 +---
+ net/ipv4/tcp_timer.c  | 4 ++--
+ 2 files changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index caf11920a878..21795d696e38 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -4385,7 +4385,6 @@ void tcp_send_probe0(struct sock *sk)
+ {
+ 	struct inet_connection_sock *icsk = inet_csk(sk);
+ 	struct tcp_sock *tp = tcp_sk(sk);
+-	struct net *net = sock_net(sk);
+ 	unsigned long timeout;
+ 	int err;
+ 
+@@ -4401,8 +4400,7 @@ void tcp_send_probe0(struct sock *sk)
+ 
+ 	icsk->icsk_probes_out++;
+ 	if (err <= 0) {
+-		if (icsk->icsk_backoff < READ_ONCE(net->ipv4.sysctl_tcp_retries2))
+-			icsk->icsk_backoff++;
++		icsk->icsk_backoff++;
+ 		timeout = tcp_probe0_when(sk, tcp_rto_max(sk));
+ 	} else {
+ 		/* If packet was not sent due to local congestion,
+diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
+index a207877270fb..4dba2928e1bf 100644
+--- a/net/ipv4/tcp_timer.c
++++ b/net/ipv4/tcp_timer.c
+@@ -419,9 +419,9 @@ static void tcp_probe_timer(struct sock *sk)
+ 	if (sock_flag(sk, SOCK_DEAD)) {
+ 		unsigned int rto_max = tcp_rto_max(sk);
+ 		const bool alive = inet_csk_rto_backoff(icsk, rto_max) < rto_max;
++		int orphan_probes = tcp_orphan_retries(sk, alive);
+ 
+-		max_probes = tcp_orphan_retries(sk, alive);
+-		if (!alive && icsk->icsk_backoff >= max_probes)
++		if (!alive || icsk->icsk_backoff >= orphan_probes)
+ 			goto abort;
+ 		if (tcp_out_of_resources(sk, true))
+ 			return;
+-- 
+2.46.0
 
 
