@@ -1,370 +1,100 @@
-Return-Path: <netdev+bounces-216162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46FC2B324FE
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 00:20:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 389CDB32502
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 00:23:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A878B06560
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 22:19:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 460981D20E44
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 22:21:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D71A63218B1;
-	Fri, 22 Aug 2025 22:19:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E688D27780C;
+	Fri, 22 Aug 2025 22:21:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g227RrXn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kg5vkRsw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CDF82BEFF8
-	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 22:19:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE26915539A;
+	Fri, 22 Aug 2025 22:21:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755901143; cv=none; b=ogXTvCrHg8B2EchpUAfYaY7TBfKdn3HOtIK888TgzN9ntQDNgY3tC1Fl/FU2lmYDx5Jl+RkQLyxDaEbgCgLUQAmblDKLdBcaGvUz1De2p3vPQnM1aSWn5lyu7OEYXusbrzNm4OxpCDvV8iAU0bjWTMXwFvr+qO2oQliMwfwG7fA=
+	t=1755901269; cv=none; b=r+9xCRCkeKk2Klq7lFizeWg7rk1Bs8EkhCbgnEAPDZvK5+3f6h2zbm/Wv8SPBVKjB9Xye4So3VGvjfm6zvpnI2OfjUHSanukcyEsEdFxFTkXysMXYkzGCwk7+yIMoN4G1RF+3rG/E6LAz0+YYWhg1eYxZ6f4hEr3c6x7obAuKTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755901143; c=relaxed/simple;
-	bh=fF0tcGk/Q5jLq4iBgfLzLpdJo/KhVvdeIYH1F4qLZik=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nkM6ieZajOFnNRh5jg43k155wJZJrFIUMdt7WYVWDO3BQfTTIDaITnuo7WuiiUkpxDK75rxjlq6OX3QeExCMH1+yZy9Gccds+Mqm1siF80wsmPlaDqaglrVW30ny4sWnjeNv8bO1KLRYUhYrJcvesg5Ot8LvQ0gh0YrJ42wx6ZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g227RrXn; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-244581ce388so55928485ad.2
-        for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 15:19:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755901141; x=1756505941; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YLGbZ1zUyhdUdP5HKrHdHonbPASOGZvy2+MP5vV9+Lk=;
-        b=g227RrXnHYKpF8kgrGm2ohcCKvsLerGIEv9rEPfUPcIfdAi/WH0QAXhghUyzGYl9kc
-         QnltNhu1mpdKYAn0aD95Z+Vj4437g/gtXs93mMnbdMtMTzvSbvpItGhjrJZXqa5CNU/i
-         o7du2HP74tm7DmUKx1NLLIEP57QKRNBkmNBemCKatxxsTA1gVxpOyRx79qnzQR6dPNZC
-         6Dn8ydBn2wwxzYykldVvknKIh4YMcX5vACI7fIxRjfPsloZPQMuZwlwCNbTYbCD9jRR7
-         fFX6QH6OMqCy9UyIYpP1A0A8hE+n+KWtfisqkAZsw2hcYnApUWUUmJK8o4Fr/mKc7AGA
-         FuMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755901141; x=1756505941;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YLGbZ1zUyhdUdP5HKrHdHonbPASOGZvy2+MP5vV9+Lk=;
-        b=R+5NYlGb7HYNxQ8oOhuNEvRU+oMXE4UtZV5eQKejxulnvVbzhZ07BK9Bsmhlmku7nY
-         DwFHrxlPCYValcdCzFp2zFdtxpVdRE2/xl0wiYNn4XY3QS5U3WAmdz3CcDZhJ5B7riDy
-         xOzf9ir/h4vXylSU0KOiS6MqN0/yDYR4A3xxlBPnid+sKG0wKriaJCOsb+u/89lMbQk3
-         MnE25WsSVLGoGPrnc4icTO2dDmxKuXm9Zy7lZT+NfHF63OC46qHXsQpigd/8tqox6Fzj
-         q7QijSZq2zgoNboUBiouho29O6a+7zCuZ/N+zhTTh/CyFr0WfRGRM0JsPtDfVw+RBLRH
-         Qvcw==
-X-Forwarded-Encrypted: i=1; AJvYcCX6dOKEwY6c7VuMjVGiMk1n38VLxD11KOd3XT5NZ3bdW+vSuugwJ4lugTf0pgT7SakLX0aPRGE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvuyLVvQ55nImj3pXUFJtSMgjlyhLik30CO1APyxHezna/psaq
-	6CeVGwAlshBiFF3h+3ooF0dYh3ZxKevOm7tkJJo0RQRygIdQi+u6rLUvCmZDVzBsgKjg+N5wYjC
-	2QLDBmg==
-X-Google-Smtp-Source: AGHT+IFy5kEfiWW0LyzxCAytfgyR+wOKWYkUJhbIKW09qWQsUhSQecd62glK5OfFguhfP5MHNEy4kqj5RM4=
-X-Received: from plaq19.prod.google.com ([2002:a17:903:2053:b0:23f:fd13:e74d])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ce81:b0:246:6446:8ae1
- with SMTP id d9443c01a7336-2466446a05cmr22921575ad.19.1755901141454; Fri, 22
- Aug 2025 15:19:01 -0700 (PDT)
-Date: Fri, 22 Aug 2025 22:18:03 +0000
-In-Reply-To: <20250822221846.744252-1-kuniyu@google.com>
+	s=arc-20240116; t=1755901269; c=relaxed/simple;
+	bh=1Z6GTjqZUoYLu0n+fPRDRUch1MWREiojl8WgKrm2nTA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Bvpj0iUZ0ulg564qcY2Q1OYEE02cSHNNaPngdmzjB7LmNB83c+0enpyH4sQ1lg7rZBNEwbDAEwueQIyOaBPJtXrXIeBR+9NrNBWQSMoVwP9NvNvIodpVPuhLs3nP2V0bHUFKa99nMobuoLXz1K/FgEySvGgRxi4IQrVhs4HxjcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kg5vkRsw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3EDCC4CEED;
+	Fri, 22 Aug 2025 22:21:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755901269;
+	bh=1Z6GTjqZUoYLu0n+fPRDRUch1MWREiojl8WgKrm2nTA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Kg5vkRswA36yWTffqxPpqyX8aeCy5H23GTbocMTenTyn+62tB7/2WaVT/o6edzngS
+	 Vuugl1X+g3nFRKIJ1dRWNYXIh45ybI0CqLG4iqNG3nnBfCMljAX6giNtxjITG3B/ft
+	 tKgHJsMhwvUypZ4Qh1m0dZ5sZ8oehuMs7ysYpxDXp48cT7Tk3n/D+EzLRjmQ6FU3aG
+	 8+hhlM5BI1gORlM7kSGryfxIuyNrITooB27Ux15cXG1amO0Z/0IZC2du2Q7Jg0NE5H
+	 +j/m7D0Ru8ShnxfigLFxX9MZ/eTfQSSDV2DDBLjKcFrJ0yF5T1Xjq0QmJGggUXdtLg
+	 U2V1hoDBZrP2w==
+Date: Fri, 22 Aug 2025 15:21:08 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mihai Moldovan <ionic@ionic.de>
+Cc: linux-arm-msm@vger.kernel.org, Manivannan Sadhasivam <mani@kernel.org>,
+ Denis Kenzior <denkenz@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemb@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Simon Horman <horms@kernel.org>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v5 01/11] net: qrtr: ns: validate msglen before ctrl_pkt
+ use
+Message-ID: <20250822152108.323af5e5@kernel.org>
+In-Reply-To: <d5ae397b-a33a-42c9-91a1-5ba3fcc367a5@ionic.de>
+References: <cover.1754962436.git.ionic@ionic.de>
+	<161d8d203f17fde87ac7dd2c9c24be6d1f35a3c1.1754962436.git.ionic@ionic.de>
+	<20250815110900.2da8f3c5@kernel.org>
+	<d5ae397b-a33a-42c9-91a1-5ba3fcc367a5@ionic.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250822221846.744252-1-kuniyu@google.com>
-X-Mailer: git-send-email 2.51.0.rc2.233.g662b1ed5c5-goog
-Message-ID: <20250822221846.744252-9-kuniyu@google.com>
-Subject: [PATCH v1 bpf-next/net 8/8] selftest: bpf: Add test for SK_BPF_MEMCG_SOCK_ISOLATED.
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>
-Cc: John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
-	Roman Gushchin <roman.gushchin@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-The test does the following for IPv4/IPv6 x TCP/UDP sockets
-with/without BPF prog.
+On Fri, 22 Aug 2025 21:08:47 +0200 Mihai Moldovan wrote:
+> >> diff --git a/net/qrtr/ns.c b/net/qrtr/ns.c
+> >> index 3de9350cbf30..2bcfe539dc3e 100644
+> >> --- a/net/qrtr/ns.c
+> >> +++ b/net/qrtr/ns.c
+> >> @@ -619,6 +619,9 @@ static void qrtr_ns_worker(struct work_struct *work)
+> >>   			break;
+> >>   		}
+> >>   
+> >> +		if ((size_t)msglen < sizeof(*pkt))
+> >> +			break;  
+> > 
+> > why not continue?  
+> 
+> I don't really know and am not familiar with the QRTR protocol, but here's my 
+> best guess:
+> 
+> Since we're using non-blocking I/O, it doesn't seem to make sense to continue, 
+> because the next receive call would just break out anyway once it returns no 
+> data at all. Notice that we're also breaking out for -EAGAIN.
+> 
+> Also, if we somehow got a short read, and we're currently dropping the buffer we 
+> just read, any additional data after a subsequent receive would be garbage to us 
+> anyway. We'd probably have to keep the old buffer content around and concatenate 
+> it with data returned from a new receive call.
 
-  1. Create socket pairs
-  2. Send a bunch of data that require more than 1000 pages
-  3. Read memory_allocated from the 3rd column in /proc/net/protocols
-  4. Check if unread data is charged to memory_allocated
-
-If BPF prog is attached, memory_allocated should not be changed,
-but we allow a small error (up to 10 pages) in case the test is ran
-concurrently with other tests using TCP/UDP sockets.
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- .../selftests/bpf/prog_tests/sk_memcg.c       | 214 ++++++++++++++++++
- tools/testing/selftests/bpf/progs/sk_memcg.c  |  29 +++
- 2 files changed, 243 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/sk_memcg.c
- create mode 100644 tools/testing/selftests/bpf/progs/sk_memcg.c
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/sk_memcg.c b/tools/testing/selftests/bpf/prog_tests/sk_memcg.c
-new file mode 100644
-index 000000000000..486e58277eec
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/sk_memcg.c
-@@ -0,0 +1,214 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2025 Google LLC */
-+
-+#include <test_progs.h>
-+#include "sk_memcg.skel.h"
-+#include "network_helpers.h"
-+
-+#define NR_SOCKETS	128
-+#define NR_SEND		128
-+
-+struct test_case {
-+	char name[10]; /* protocols (%-9s) in /proc/net/protocols, see proto_seq_printf(). */
-+	int family;
-+	int type;
-+	int (*create_sockets)(struct test_case *test_case, int sk[], int len);
-+};
-+
-+static int tcp_create_sockets(struct test_case *test_case, int sk[], int len)
-+{
-+	int server, i;
-+
-+	server = start_server(test_case->family, test_case->type, NULL, 0, 0);
-+	ASSERT_GE(server, 0, "start_server_str");
-+
-+	for (i = 0; i < len / 2; i++) {
-+		sk[i * 2] = connect_to_fd(server, 0);
-+		if (!ASSERT_GE(sk[i * 2], 0, "connect_to_fd"))
-+			return sk[i * 2];
-+
-+		sk[i * 2 + 1] = accept(server, NULL, NULL);
-+		if (!ASSERT_GE(sk[i * 2 + 1], 0, "accept"))
-+			return sk[i * 2 + 1];
-+	}
-+
-+	close(server);
-+
-+	return 0;
-+}
-+
-+static int udp_create_sockets(struct test_case *test_case, int sk[], int len)
-+{
-+	int i, err, rcvbuf = 1024 * NR_SEND;
-+
-+	for (i = 0; i < len / 2; i++) {
-+		sk[i * 2] = start_server(test_case->family, test_case->type, NULL, 0, 0);
-+		if (!ASSERT_GE(sk[i * 2], 0, "start_server"))
-+			return sk[i * 2];
-+
-+		sk[i * 2 + 1] = connect_to_fd(sk[i * 2], 0);
-+		if (!ASSERT_GE(sk[i * 2 + 1], 0, "connect_to_fd"))
-+			return sk[i * 2 + 1];
-+
-+		err = connect_fd_to_fd(sk[i * 2], sk[i * 2 + 1], 0);
-+		if (!ASSERT_EQ(err, 0, "connect_fd_to_fd"))
-+			return err;
-+
-+		err = setsockopt(sk[i * 2], SOL_SOCKET, SO_RCVBUF, &rcvbuf, sizeof(int));
-+		if (!ASSERT_EQ(err, 0, "setsockopt(SO_RCVBUF)"))
-+			return err;
-+
-+		err = setsockopt(sk[i * 2 + 1], SOL_SOCKET, SO_RCVBUF, &rcvbuf, sizeof(int));
-+		if (!ASSERT_EQ(err, 0, "setsockopt(SO_RCVBUF)"))
-+			return err;
-+	}
-+
-+	return 0;
-+}
-+
-+static int get_memory_allocated(struct test_case *test_case)
-+{
-+	long memory_allocated = -1;
-+	char *line = NULL;
-+	size_t unused;
-+	FILE *f;
-+
-+	f = fopen("/proc/net/protocols", "r");
-+	if (!ASSERT_OK_PTR(f, "fopen"))
-+		goto out;
-+
-+	while (getline(&line, &unused, f) != -1) {
-+		unsigned int unused_0;
-+		int unused_1;
-+		int ret;
-+
-+		if (strncmp(line, test_case->name, sizeof(test_case->name)))
-+			continue;
-+
-+		ret = sscanf(line + sizeof(test_case->name), "%4u %6d  %6ld",
-+			     &unused_0, &unused_1, &memory_allocated);
-+		ASSERT_EQ(ret, 3, "sscanf");
-+		break;
-+	}
-+
-+	ASSERT_NEQ(memory_allocated, -1, "get_memory_allocated");
-+
-+	free(line);
-+	fclose(f);
-+out:
-+	return memory_allocated;
-+}
-+
-+static int check_isolated(struct test_case *test_case, bool isolated)
-+{
-+	long memory_allocated[2];
-+	int sk[NR_SOCKETS] = {};
-+	char buf[1024] = {};
-+	int err = -1, i, j;
-+
-+	memory_allocated[0] = get_memory_allocated(test_case);
-+	if (!ASSERT_GE(memory_allocated[0], 0, "memory_allocated[0]"))
-+		goto out;
-+
-+	err = test_case->create_sockets(test_case, sk, ARRAY_SIZE(sk));
-+	if (err)
-+		goto close;
-+
-+	/* Must allocate pages >= net.core.mem_pcpu_rsv */
-+	for (i = 0; i < ARRAY_SIZE(sk); i++) {
-+		for (j = 0; j < NR_SEND; j++) {
-+			int bytes = send(sk[i], buf, sizeof(buf), 0);
-+
-+			ASSERT_EQ(bytes, sizeof(buf), "send");
-+		}
-+	}
-+
-+	memory_allocated[1] = get_memory_allocated(test_case);
-+	if (!ASSERT_GE(memory_allocated[1], 0, "memory_allocated[1]"))
-+		goto close;
-+
-+	if (isolated)
-+		ASSERT_LE(memory_allocated[1], memory_allocated[0] + 10, "isolated");
-+	else
-+		ASSERT_GT(memory_allocated[1], memory_allocated[0] + 1000, "not isolated");
-+
-+close:
-+	for (i = 0; i < ARRAY_SIZE(sk); i++)
-+		close(sk[i]);
-+
-+	/* Let RCU destruct sockets */
-+	sleep(1);
-+out:
-+	return err;
-+}
-+
-+void run_test(struct test_case *test_case)
-+{
-+	struct sk_memcg *skel;
-+	int cgroup, err;
-+
-+	skel = sk_memcg__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "open_and_load"))
-+		return;
-+
-+	cgroup = test__join_cgroup("/sk_memcg");
-+	if (!ASSERT_GE(cgroup, 0, "join_cgroup"))
-+		goto destroy_skel;
-+
-+	err = check_isolated(test_case, false);
-+	if (!ASSERT_EQ(err, 0, "test_isolated(false)"))
-+		goto close_cgroup;
-+
-+	skel->links.sock_create = bpf_program__attach_cgroup(skel->progs.sock_create, cgroup);
-+	if (!ASSERT_OK_PTR(skel->links.sock_create, "attach_cgroup(sock_create)"))
-+		goto close_cgroup;
-+
-+	skel->links.sock_accept = bpf_program__attach_cgroup(skel->progs.sock_accept, cgroup);
-+	if (!ASSERT_OK_PTR(skel->links.sock_accept, "attach_cgroup(sock_accept)"))
-+		goto close_cgroup;
-+
-+	err = check_isolated(test_case, true);
-+	ASSERT_EQ(err, 0, "test_isolated(false)");
-+
-+close_cgroup:
-+	close(cgroup);
-+destroy_skel:
-+	sk_memcg__destroy(skel);
-+}
-+
-+struct test_case test_cases[] = {
-+	{
-+		.name = "TCP       ",
-+		.family = AF_INET,
-+		.type = SOCK_STREAM,
-+		.create_sockets = tcp_create_sockets,
-+	},
-+	{
-+		.name = "UDP       ",
-+		.family = AF_INET,
-+		.type = SOCK_DGRAM,
-+		.create_sockets = udp_create_sockets,
-+	},
-+	{
-+		.name = "TCPv6     ",
-+		.family = AF_INET6,
-+		.type = SOCK_STREAM,
-+		.create_sockets = tcp_create_sockets,
-+	},
-+	{
-+		.name = "UDPv6     ",
-+		.family = AF_INET6,
-+		.type = SOCK_DGRAM,
-+		.create_sockets = udp_create_sockets,
-+	},
-+};
-+
-+void test_sk_memcg(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(test_cases); i++) {
-+		test__start_subtest(test_cases[i].name);
-+		run_test(&test_cases[i]);
-+	}
-+}
-diff --git a/tools/testing/selftests/bpf/progs/sk_memcg.c b/tools/testing/selftests/bpf/progs/sk_memcg.c
-new file mode 100644
-index 000000000000..8a43e05be14b
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/sk_memcg.c
-@@ -0,0 +1,29 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2025 Google LLC */
-+
-+#include "bpf_tracing_net.h"
-+#include <bpf/bpf_helpers.h>
-+
-+void isolate_memcg(struct bpf_sock *ctx)
-+{
-+	int flags = SK_BPF_MEMCG_SOCK_ISOLATED;
-+
-+	bpf_setsockopt(ctx, SOL_SOCKET, SK_BPF_MEMCG_FLAGS,
-+		       &flags, sizeof(flags));
-+}
-+
-+SEC("cgroup/sock_create")
-+int sock_create(struct bpf_sock *ctx)
-+{
-+	isolate_memcg(ctx);
-+	return 1;
-+}
-+
-+SEC("cgroup/sock_accept")
-+int sock_accept(struct bpf_sock *ctx)
-+{
-+	isolate_memcg(ctx);
-+	return 1;
-+}
-+
-+char LICENSE[] SEC("license") = "GPL";
--- 
-2.51.0.rc2.233.g662b1ed5c5-goog
-
+Okay, I don't know this proto and driver either. Just reading the
+existing code it seemed like it's only breaks if the socket itself
+has an error. If the command is not recognized or garbage the loop
+will at most print an error and carry on looping..
 
