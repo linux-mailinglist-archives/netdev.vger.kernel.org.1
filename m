@@ -1,217 +1,254 @@
-Return-Path: <netdev+bounces-216033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB35BB319F0
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 15:42:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F13EB319C5
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 15:38:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 593513BCCF0
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 13:35:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D3FD1BA59B0
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 13:36:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBC093054D4;
-	Fri, 22 Aug 2025 13:33:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B96C930BF6F;
+	Fri, 22 Aug 2025 13:33:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Ujquw01f"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NiW6kgtP"
 X-Original-To: netdev@vger.kernel.org
-Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013009.outbound.protection.outlook.com [40.107.162.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B966A3009C1;
-	Fri, 22 Aug 2025 13:33:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755869595; cv=fail; b=OHowl4mmfdu90+aTkW7T1u5L3UGb2gGIS5S2xbaVXWtfBBN9PXzCIt6uD2tc3unWXe9OPtXUNKQHDMlffYIM4X4XjdZGMkUktksLJHnBkUDm5xsG+7uQir+4FQokxBpmnHcWTzM/EHduK8AW1W01FJ+4KOfbXJcfkBN3YTwoniM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755869595; c=relaxed/simple;
-	bh=BpDvkdPAYu6JdbOzt7+ZTFSw4m9VT9KDvlHJQbUr66g=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=cQUjMIwQV+y7KOkDgMP9kTnBj/u4WJvTfoNXagvtT3az2uCckBGoSkozSdYlJxuFZOQk1/wlB6MMXBiV3xpLAgCfJry15yY+U5VFEX1hvhXStM98OMColCWDpKIphmVp9BRz7n/vfAYmeR5foNIDO8Wdb7E7FzEB02u0kon3el0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Ujquw01f; arc=fail smtp.client-ip=40.107.162.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ABrlGYIZ7BjXLPbogDz3IFZOF/6VwU3GN/j2NhnQvt1KwcVgWvEkvrqBdd86drTWl0wxrO+JYGVTK+Dm2JIOVt1GGY0qBuRVCm1F95nA5Zq0FK1UWF7Qs08vs0Y+3z3aHo7pBfbyTXwYcH+hq74EWbv8NT1jtDNugQhyaBD8ZBMZtfBkYd+fbHHBjrVneL47Cz8Xe60h7mv1+xAV+nILRhfS5httC3PlGZoPxL4YkyEaH6mF5L0gHaDiXzH7NCwwjUo6B5MZiOX2e8V7LLOEzauqijzR18dBEf2x0b3DsWQr4QnhcCGPIel6BGb+ztJLE01udnQ0b6r9GLxa7bSZgg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0XDerur7CHXoy8KzumcFntGsFQSHU2yDaBQM6zdwzeM=;
- b=xQdWcoiTJ1cnYFBo8X6wQBxd3Xs3T13d08pxRBL4HhcVHv4hERTcm8JjLorZri7YB/9bhbpDpU8PgkFeie8lFsf9OFdc/gU+ZzSQ582puhtMVUzxCo68FGw+3SwCXllD+5TP4PeboC9PTAvb3VhhvKlHD24sYw4nmMiW1Du1FCvv75KuwDrRK3TEYDfu2Cqz3L3n2X5b5JLvvvqjiymVwevfrqchaeIrq9wmfJQ1tie5P+N0S7qylqlEdyibLWQ/Be4esisIJSBXPmWOyK2Zwj3JRUWey08IVZ0oFLQO9uHRs6MmfCs4tkQdZArotmLAA1obpwj/GrBkZDynOAOqUQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0XDerur7CHXoy8KzumcFntGsFQSHU2yDaBQM6zdwzeM=;
- b=Ujquw01f007AuJ4Xc8E7XgmrbdIqUcD+0IpDPDrAL0KJilF+n+EqfHqhE24AOK8VCYOIFAYoD7zAXkN+QUBRut5WJ+T53HwHZphBcwwXjUdjQFDFR58xIacsumUrF/hZyZQvVhPfdBuv+o3nyKvlm9rAeoUoCTlIBcdQxj1quZGcMFeEvdkdycYx7Btjcr2e2aXfLzLxGkHtCtPpkDnZUEZ8sTfIL6weKahnMIiNW5zBjX0Z86nbRUGfNO1Jhjry7e+MrC/oa2gNmawHbiCTcLxMjd70JBSfOap9Re8FMqkbco1EEEw78PSNwnyGrTE+MiQ5/t6D4lCa/Cya41Uv2A==
-Received: from PAXPR04MB9185.eurprd04.prod.outlook.com (2603:10a6:102:231::11)
- by GV4PR04MB11305.eurprd04.prod.outlook.com (2603:10a6:150:297::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.17; Fri, 22 Aug
- 2025 13:33:09 +0000
-Received: from PAXPR04MB9185.eurprd04.prod.outlook.com
- ([fe80::21bf:975e:f24d:1612]) by PAXPR04MB9185.eurprd04.prod.outlook.com
- ([fe80::21bf:975e:f24d:1612%7]) with mapi id 15.20.9052.011; Fri, 22 Aug 2025
- 13:33:09 +0000
-From: Shenwei Wang <shenwei.wang@nxp.com>
-To: Wei Fang <wei.fang@nxp.com>
-CC: Clark Wang <xiaoning.wang@nxp.com>, Stanislav Fomichev <sdf@fomichev.me>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, dl-linux-imx <linux-imx@nxp.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
-	<daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
- Fastabend <john.fastabend@gmail.com>
-Subject: RE: [PATCH v2 net-next 3/5] et: fec: add rx_frame_size to support
- configurable RX length
-Thread-Topic: [PATCH v2 net-next 3/5] et: fec: add rx_frame_size to support
- configurable RX length
-Thread-Index: AQHcEsoxXGKzYnBdLUK9f8noPKEV4bRudCcAgAA2o3A=
-Date: Fri, 22 Aug 2025 13:33:09 +0000
-Message-ID:
- <PAXPR04MB918588241A96C60E7E7E4FE2893DA@PAXPR04MB9185.eurprd04.prod.outlook.com>
-References: <20250821183336.1063783-1-shenwei.wang@nxp.com>
- <20250821183336.1063783-4-shenwei.wang@nxp.com>
- <PAXPR04MB85106B9BAA426968D0C08678883DA@PAXPR04MB8510.eurprd04.prod.outlook.com>
-In-Reply-To:
- <PAXPR04MB85106B9BAA426968D0C08678883DA@PAXPR04MB8510.eurprd04.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB9185:EE_|GV4PR04MB11305:EE_
-x-ms-office365-filtering-correlation-id: e116a605-99c5-4c85-ad79-08dde1806f51
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|366016|7416014|376014|19092799006|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?p+5pjaMxX9ERF7vT4Y5ZX7YL590UYHh5UCubfPMaTmvHYRbsd9IfKWNWkFGV?=
- =?us-ascii?Q?lc1qKMAc4AFupdefRXboQ/bjGM0xv7qzoVGqTuVNBTbF+eaQ8cMqjy0atb9z?=
- =?us-ascii?Q?4+1KOTiMZqZNjGYS+1WXDQfDogeopI89rX6j7nLjjCj2t54jNRxkSQdkZl4E?=
- =?us-ascii?Q?ro9C61VC0e677/tAQ5nXpNiNeLj+YRuPmzEbr4/zJW6+HHFaBsk3Nb6ORrqP?=
- =?us-ascii?Q?gbiVYNvF5LULMtudXxv7DwJyopCcWj9ml0zIp9W1RIsnwSNAIm+9+E9lgrZI?=
- =?us-ascii?Q?iyJPcRhuS+yOU7XU7hnUX8nIEFemgDKcC5myrUb1HMSt34Sppo2I1fs+oAC2?=
- =?us-ascii?Q?JKSAT9Ib2kAKig13fODxTCkMSdydyFoJzmhhlWpPNsQ4XiWYgDLgJCeo97of?=
- =?us-ascii?Q?mEEd7+vJPdQYfDHep35ytaep56tDj1JaEIxIrOrYczGgRu1X3jRBHD/w22mZ?=
- =?us-ascii?Q?TogzFJXrpnHj1d2Edu3bYDuZrNAWAm2E08qDr42yChPRKJwEa+cALO/IwHmr?=
- =?us-ascii?Q?iwMlkolLDXesqDoIYV13CljMEEPqHQ3BnJ4nvSlN+qOWPsmhaOKP5uS0nYXs?=
- =?us-ascii?Q?kO5UluyBvfJ7hXk4wjWUxsOa4hN3mL+1nNN8O3T+k/gasFzF6dOuB4Lohfqz?=
- =?us-ascii?Q?+HjFlKS0VMlHogKgSLk0VD2gwEqEvQLe1X2BV10ixiuDrKDFBftVXBNe42GR?=
- =?us-ascii?Q?/nXpeadAAdHbmYMtm9p70I22u/o3zuIaA0zEqyKaven/YBj8mN4qb0UipcLi?=
- =?us-ascii?Q?qiqTb+r3uJNEnf+XlSyPWWP8X/A2q6qyP6wudt7SIYAOHrmJNn4oAvbFfb2P?=
- =?us-ascii?Q?HcjF0Q+OK67enXK26vBw7UU55c2cU+/a6BxtJ5tMSQ8TemtJzwzfjsojBpIQ?=
- =?us-ascii?Q?xzemBKL1DVXSYC9npVWWcgKrJRpxiQlAVGhFGFu34UvWoRzGvkS1hZGzEeNa?=
- =?us-ascii?Q?4PPg4Nj7U8DglLVbARvTX3dl2RQP1dyoVEHyVeTEJldkc3KWBZXDo2Xkb02X?=
- =?us-ascii?Q?y3+fpDsSroOYTHKJHyQRvECfLyoj1XRqtNeeZOnm9B2oQ3/QSVV+jcEnz01y?=
- =?us-ascii?Q?+wCx/A0+D2M920vfyBV9QpzGxsLa1M1FamWlkseHo/glwnjVvwtMtTeTY1mY?=
- =?us-ascii?Q?N0F/VPxd0crKsRv4HWpEAZHVFoYuzOuQbdv9jOcWovwHC1ple6ClxD+Ckfk5?=
- =?us-ascii?Q?oQv/D3xDLB6s3rYD3NmMaAHQNjx7WgcvkIKODB+BY6/UbKNVtbljjIYy68O2?=
- =?us-ascii?Q?CmrKYyfXZRTJUea1GaFQly/VXQvLj6gvUR7XnBOr2QJ/dx8u1tWmWmkqG6IE?=
- =?us-ascii?Q?cRco6DNNyXw8boa88EaxevC3TyhUIEG058dLrpweyZckZ2eoIILrFeAgztin?=
- =?us-ascii?Q?KQCuGx8KLwABhwWZdgUzuuPXfJVgNELZWEZod5fQlJ2q/UlNnwHKSG9Eonyp?=
- =?us-ascii?Q?McU0uVOtJuEWxTS8nuwbuKB1wg6iFF8VAHZzbB4ouiEowr136OeewQ=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9185.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(19092799006)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?arh4aGUXkzyFXBD/TLfBfPlfcfHpew6j1vBjml72eo17x7eUDAZ2iuCTHJHD?=
- =?us-ascii?Q?BgZE2GBYM/A0gksWez1yYN3d7HluC841+A2ph2wTm9TIIcVMvMXNoN+e4Zo9?=
- =?us-ascii?Q?88mBn/CAIw+NrDKBIuiQAg2tKJl6iy9Ybj/AJBRbl0h7zLtiF0xC+MuZnMKM?=
- =?us-ascii?Q?j5ojif2pcaTuZK04fLwU5Vy4GPoWSQqUr9zlYGnKUKdJjgMi+ndB3F/Ga2EJ?=
- =?us-ascii?Q?ulK3K7Bs+pDuG6b27qppWyJ5+JbMrw7ONE3oDZK+6/kbOxl8qemuKQ/UpCQ7?=
- =?us-ascii?Q?tsUWrBFGpXZCq1AlecEAY0Ao1IhqrjrVGc644cQEmA+oy7vGJ+1iCb4Q97ZQ?=
- =?us-ascii?Q?msjIOZ1L0++EKESUljkHZc5QMx+ZOg6XfvurI9NUJK6ywmLTtzzptA4k8LB8?=
- =?us-ascii?Q?SmqwSnz9mTIz+1Dn2zE3Oai3UJNpG2aNq1bEUEQu3NWlodKv1yesmLyejA2Q?=
- =?us-ascii?Q?7wxIZqYEbK8+dn/Jm52vFE4CIGeYHhzWa1cjBQ8O/6PWZnKL1VaEBWhQI+Gn?=
- =?us-ascii?Q?azL/qyVGz+cgHBYmnp4J5nir6lNgt9SyU+o0ZyVdo/4Ez8FoXqmQmCuCT+JA?=
- =?us-ascii?Q?qSpbRWgxKVCRMgDGsL/naSYrbX02t8NpcycbW0QSXtGjMl1kaykdrZitiQ+P?=
- =?us-ascii?Q?7INWt4IbnVFhvTAVn4PKMOF5+3QNM0leoHnxYkStF5ObyfeQOB8i9vQQDJwU?=
- =?us-ascii?Q?dcbgD1SALE9OduTLrjSj8gEnMcaEvzJyOubBuQLpg21pSefruSDYIGJPyAiE?=
- =?us-ascii?Q?Jg9r3S/bZtQYLwAY2gCLxfK2Fli4rABsbAM8Vuvm6dttpltsH2GOopCqwY1N?=
- =?us-ascii?Q?AQlMXy1A05RZKcRFVQQlRsXg2yejP0oaHt2nWNEoX2MNdFNE9+JYjN3PVkFe?=
- =?us-ascii?Q?ET3lJOJbHpeqkamc3ON8qmbFJIq282MHMpl8HYuum9NgHPJR0NPxPkcdvfXi?=
- =?us-ascii?Q?JVyxsVsnWWvYSRF+6YtD2x7t751JSvFB3hPg37VX9U2k4LT7DzLMqf+H5COi?=
- =?us-ascii?Q?xT6C3Cg0rxYCTv/cA05CHuwG3bp9PkQI30xhz3og4vqzVSX0vPAw8ShXX78i?=
- =?us-ascii?Q?Wt+bDHDU94lhbKZI4koEX5kTvhDx7l+DP+nH0tx/hhPBCQeiBvK5U/J7GFV1?=
- =?us-ascii?Q?pFxQ/KDoS5PdTDza08+ap0HA4q3bXZSjf2z7PeaLzG/Gx/ojeaVSj94Jr8Pi?=
- =?us-ascii?Q?SQcKzmiHwU0owC+akdiQ48jv6WCe8yy+I+4lXgNxaQyxFyt1PZVreDgLfsWu?=
- =?us-ascii?Q?NWc1W7vtwy4H3L+sIT8YCPmWciWvv4vJOI8l6NSbYLKSm6ajxp5gAIo8FC0p?=
- =?us-ascii?Q?EBSBZwmlvS3XqMrWSmjRp50xQMGTtHQh3gxARnefS9TksI8jFJtJ5jJtN+sZ?=
- =?us-ascii?Q?EjIq/aiIYckeplE193Z6KqtbX5xFZQinxY9+2pgV6w3NbCBjLQp1nZ1v01Qy?=
- =?us-ascii?Q?TlK+pxVvGbHB967HwA8iFUEpc4QxBYJhZFmQxE1WLPnjYWVeMZiIsBzIavUM?=
- =?us-ascii?Q?tOl3WLNcaDIyAC8jHg+1X3dssPsmyetPDv59YhQDvE3YXnZBraRFbYDrw59C?=
- =?us-ascii?Q?s+an/yRTeXn4p780Rds=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE39930AACC
+	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 13:33:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755869612; cv=none; b=JWooM0yNajA4WCbBQjWA9xQa6aA4gEdHl2l7LjzsXJU1EhdT7wd7+kDJ21aiOObY4DsEmht1RK2y7WrSFEM2SBTC58lsFvqTFfxjWmZQTh8wIsheF2B0q93r3dO+bPsWTQhXo0qxJEDM+JdWfrvuANSgBpqkSF9clVUvfHX1Abk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755869612; c=relaxed/simple;
+	bh=OXaVcXcdBV5f35+15muALcxBIYMjp4hObgTJs1F/Kc8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KAC8qDzkp0Q4kl9H7Uk13KqzbWjxfKtoNOR7pWsO/ep0Siotc0+NC8etgnsfPpk8TLyCQp+ndUqwH+eKoT+290Z/lWV0EQkU07ICubn3Y6ho7EHADInChHq3KVWDK+4VHpxtVv7mREyp94cpz+8CvROlcY7RmT8QIsJOPPgaNII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NiW6kgtP; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3b9e4193083so1625923f8f.3
+        for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 06:33:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755869609; x=1756474409; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ULXh+FdtSKdMbQN2ufiLticx/eFM3vpeoXJx5c7eLHs=;
+        b=NiW6kgtP46wRdzMspB/uejMrYd8cqLd2ieWpXhHqswIojCC0h9N9wdilq7ZvjmxDs8
+         Y7jvaRQc/fFUh82Dfy/n7bptrC7o50IWE1ZYbEYUKDoWmsMNmwQqy3afGRziiBhs055Q
+         QOFKpaAOc6nYVmFEuEtO4ayGOoObGoQJBntooeKR5AgJGwEf4h/ER1ZDQhI/IyuVO1fr
+         eFoIXhMY3/Hr6WoJWF35ENbh44O1Bi+JhDXGFQMC3YAo1T6n6rZXlBwrnOKnpAXAK5vg
+         Xuis7lX4BE5tKLLQX5zn/E5jc37DpsFjDqlU63h8RY5z0A6FXztmBhwKs6coXrKrlAa0
+         R4wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755869609; x=1756474409;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ULXh+FdtSKdMbQN2ufiLticx/eFM3vpeoXJx5c7eLHs=;
+        b=FS8kD0xH08GcFGB1psxGUHj4jF3klasPsYmz/aEtymt5Xrkmg1USdfAJO7rT/nJLlT
+         HgD8F3AzSX5WIw/gtRMKItXVgCX14cbhyUwkb6DTf+/wY9m7BS0ftre7mKqqjO3BNDb4
+         VeXZcM1Wfnryi4Fyb1AyrcO+V8BHELu3HyAruL5LW/uXDSI0ZZE3SxELDEyg/oO9oBau
+         NHDziJ4qcMnG8QPiOsWB8T7vpy723jKOcq21yiEWzfo/BW7hCPIuq+yFNM8mOnnHIXH8
+         O/8yT9DyF52udb6uyZ6SvkDWUrWqjLAHCCs20FyAv4VcvKyqfRHRDPJDD1aGJaqoFgH8
+         Tb4Q==
+X-Gm-Message-State: AOJu0YwW+59OTQ2v2aiUFbA0N41I1KP2msGrsEbt29YvToO//ZVbtoJJ
+	sUVl6JBwV+7ew4e4XwaKSwTz8LjrzIAEv0kArko95ornkGtEewqdtwAeKiISEQ==
+X-Gm-Gg: ASbGnctMmw07TB+tyKLcgRBITpPjYOBDSucbnTJteHQFpPbdB7dw6nb3R6FeKVw9fPU
+	3gH2mrx1rnzWfU70R63Ut3KkQehQI9AaHmcNq08CotVfVIf5uobd346E79lPD6457UNUqKjQAOD
+	Zz15tw7P2kSPSir9s+LGsE0iqgriOuiHEb3s4Hj/A2y2fvpk6BUZwyOR18RRCS00bdV/eBhKN8B
+	4P4F9FFikXMZxfwDPWj6V5+e//vIu8j03dUOYdR62cmoYZDQ9zWEVdviDJ6MiRMozHqkPWELpHi
+	5zxH7Conia/RgFI0ddE3HNJJRux8L2VTyo0Mp9hpMgSjpmwDLBRAyI5dBm+TtGlnlctu9CB1deO
+	ezlxB6jI34GP3mLTIqjcsN24pWq5ABRlABIjPmJiEhvLWi6M=
+X-Google-Smtp-Source: AGHT+IEVCipLkRXR+F6IhCXhI7KtClpif/opRs1py9b3O/Ws/9ogL9xOI1f5/FhwPE5gWfs8PXvA3A==
+X-Received: by 2002:a05:6000:18aa:b0:3b8:d1d9:70b0 with SMTP id ffacd0b85a97d-3c5dc638243mr2341369f8f.40.1755869608475;
+        Fri, 22 Aug 2025 06:33:28 -0700 (PDT)
+Received: from bzorp3 (178-164-188-58.pool.digikabel.hu. [178.164.188.58])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3c077c576b7sm15213473f8f.63.2025.08.22.06.33.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Aug 2025 06:33:27 -0700 (PDT)
+Date: Fri, 22 Aug 2025 15:33:26 +0200
+From: Balazs Scheidler <bazsi77@gmail.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com
+Subject: Re: [RFC, RESEND] UDP receive path batching improvement
+Message-ID: <aKhxpuawARQlCj29@bzorp3>
+References: <aKgnLcw6yzq78CIP@bzorp3>
+ <CANn89iLy4znFBLK2bENWMfhPyjTc_gkLRswAf92uV7KY3bTdYg@mail.gmail.com>
+ <aKg1Qgtw-QyE8bLx@bzorp3>
+ <CANn89i+GMqF91FkjxfGp3KGJ-dC6-Snu3DoBdGuxZqrq=iOOcQ@mail.gmail.com>
+ <aKho5v5VwxdNstYy@bzorp3>
+ <CANn89i+S1hyPbo5io2khLk_UTfoQgEtnjYUUJTzreYufmbii+A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9185.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e116a605-99c5-4c85-ad79-08dde1806f51
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Aug 2025 13:33:09.5730
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: OL2PXrBsT0VLOw3BQNNx4XU6Q4wjX+zIHUDXhATdKJDynWLwLQ1cYLHEv1kT5rShllAxmaNShGCQmAgXhTLq/g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV4PR04MB11305
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89i+S1hyPbo5io2khLk_UTfoQgEtnjYUUJTzreYufmbii+A@mail.gmail.com>
 
-
-
-> -----Original Message-----
-> From: Wei Fang <wei.fang@nxp.com>
-> Sent: Friday, August 22, 2025 5:10 AM
-> To: Shenwei Wang <shenwei.wang@nxp.com>
-> Cc: Clark Wang <xiaoning.wang@nxp.com>; Stanislav Fomichev
-> <sdf@fomichev.me>; imx@lists.linux.dev; netdev@vger.kernel.org; linux-
-> kernel@vger.kernel.org; dl-linux-imx <linux-imx@nxp.com>; Andrew Lunn
-> <andrew+netdev@lunn.ch>; David S. Miller <davem@davemloft.net>; Eric
-> Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo
-> Abeni <pabeni@redhat.com>; Alexei Starovoitov <ast@kernel.org>; Daniel
-> Borkmann <daniel@iogearbox.net>; Jesper Dangaard Brouer
-> <hawk@kernel.org>; John Fastabend <john.fastabend@gmail.com>
-> Subject: RE: [PATCH v2 net-next 3/5] et: fec: add rx_frame_size to suppor=
-t
-> configurable RX length
->=20
-> > @@ -4563,6 +4563,7 @@ fec_probe(struct platform_device *pdev)
-> >  	pinctrl_pm_select_sleep_state(&pdev->dev);
+On Fri, Aug 22, 2025 at 06:10:28AM -0700, Eric Dumazet wrote:
+> On Fri, Aug 22, 2025 at 5:56 AM Balazs Scheidler <bazsi77@gmail.com> wrote:
 > >
-> >  	fep->pagepool_order =3D 0;
-> > +	fep->rx_frame_size =3D FEC_ENET_RX_FRSIZE;
->=20
-> According to the RM, to allow one maximum size frame per buffer,
-> FEC_R_BUFF_SIZE must be set to FEC_R_CNTRL [MAX_FL] or larger.
-> FEC_ENET_RX_FRSIZE is greater than PKT_MAXBUF_SIZE, I'm not sure whether =
-it
-> will cause some unknown issues.
+> > On Fri, Aug 22, 2025 at 02:37:28AM -0700, Eric Dumazet wrote:
+> > > On Fri, Aug 22, 2025 at 2:15 AM Balazs Scheidler <bazsi77@gmail.com> wrote:
+> > > >
+> > > > On Fri, Aug 22, 2025 at 01:18:36AM -0700, Eric Dumazet wrote:
+> > > > > On Fri, Aug 22, 2025 at 1:15 AM Balazs Scheidler <bazsi77@gmail.com> wrote:
+> > > > > > The condition above uses "sk->sk_rcvbuf >> 2" as a trigger when the update is
+> > > > > > done to the counter.
+> > > > > >
+> > > > > > In our case (syslog receive path via udp), socket buffers are generally
+> > > > > > tuned up (in the order of 32MB or even more, I have seen 256MB as well), as
+> > > > > > the senders can generate spikes in their traffic and a lot of senders send
+> > > > > > to the same port. Due to latencies, sometimes these buffers take MBs of data
+> > > > > > before the user-space process even has a chance to consume them.
+> > > > > >
+> > > > >
+> > > > >
+> > > > > This seems very high usage for a single UDP socket.
+> > > > >
+> > > > > Have you tried SO_REUSEPORT to spread incoming packets to more sockets
+> > > > > (and possibly more threads) ?
+> > > >
+> > > > Yes.  I use SO_REUSEPORT (16 sockets), I even use eBPF to distribute the
+> > > > load over multiple sockets evenly, instead of the normal load balancing
+> > > > algorithm built into SO_REUSEPORT.
+> > > >
+> > >
+> > > Great. But if you have many receive queues, are you sure this choice does not
+> > > add false sharing ?
+> >
+> > I am not sure how that could trigger false sharing here.  I am using a
+> > "socket" filter, which generates a random number modulo the number of
+> > sockets:
+> >
+> > ```
+> > #include "vmlinux.h"
+> > #include <bpf/bpf_helpers.h>
+> >
+> > int number_of_sockets;
+> >
+> > SEC("socket")
+> > int random_choice(struct __sk_buff *skb)
+> > {
+> >   if (number_of_sockets == 0)
+> >     return -1;
+> >
+> >   return bpf_get_prandom_u32() % number_of_sockets;
+> > }
+> > ```
+> 
+> How many receive queues does your NIC have (ethtool -l eth0) ?
+> 
+> This filter causes huge contention on the receive queues and various
+> socket fields, accessed by different cpus.
+> 
+> You should instead perform a choice based on the napi_id (skb->napi_id)
 
-MAX_FL defines the maximum allowable frame length, while TRUNC_FL specifies=
- the threshold beyond=20
-which frames are truncated. Based on this logic, the documentation appears =
-to be incorrect-TRUNC_FL=20
-should never exceed MAX_FL, as doing so would make the truncation mechanism=
- ineffective.=20
+I don't have ssh access to the box, unfortunately.  I'll look into napi_id,
+my historical knowledge of the IP stack is that we are using a single thread
+to handle incoming datagrams, but I have to realize that information did not
+age well. Also, the kernel is ancient, 4.18 something, RHEL8 (no, I didn't
+have a say in that...).
 
-This has been confirmed through testing data.
+This box is a VM, but I am not even sure about the virtualization stack used, I
+am finding it out the number of receive queues.
 
-Regards,
-Shenwei
+But with that said, I was under the impression that the bottleneck is in
+userspace and the userspace's roundtrip to get back to receiving UDP. 
+The same event loop is processing a number of connections/UDP sockets in
+parallel.
 
->=20
-> >  	fep->max_buf_size =3D PKT_MAXBUF_SIZE;
-> >  	ndev->max_mtu =3D fep->max_buf_size - ETH_HLEN - ETH_FCS_LEN;
+Sometimes syslog-ng just doesn't get around quickly enough if there's too much to do
+with a specific datagram.  My assumption has been that it is this latency
+that causes datagrams to be dropped.
+
+> 
+> 
+> >
+> > Last I've checked the code, all it did was putting the incoming packet into
+> > the right socket buffer, as returned by the filter. What would be the false
+> > sharing in this case?
+> >
+> > >
+> > > > Sometimes the processing on the userspace side is heavy enough (think of
+> > > > parsing, heuristics, data normalization) and the load on the box heavy
+> > > > enough that I still see drops from time to time.
+> > > >
+> > > > If a client sends 100k messages in a tight loop for a while, that's going to
+> > > > use a lot of buffer space.  What bothers me further is that it could be ok
+> > > > to lose a single packet, but any time we drop one packet, we will continue
+> > > > to lose all of them, at least until we fetch 25% of SO_RCVBUF (or if the
+> > > > receive buffer is completely emptied).  This problem, combined with small
+> > > > packets (think of 100-150 byte payload) can easily cause excessive drops. 25%
+> > > > of the socket buffer is a huge offset.
+> > >
+> > > sock_writeable() uses a 50% threshold.
+> >
+> > I am not sure why this is relevant here, the write side of sockets can
+> > easily be flow controlled (e.g. the process waiting until it can send more
+> > data). Also my clients are not necessarily client boxes. PaloAlto firewalls
+> > can generate 70k events-per-second in syslog alone. And that does leave the
+> > firewall, and my challenge is to read all of that.
+> >
+> > >
+> > > >
+> > > > I am not sure how many packets warrants a sk_rmem_alloc update, but I'd
+> > > > assume that 1 update every 100 packets should still be OK.
+> > >
+> > > Maybe, but some UDP packets have a truesize around 128 KB or even more.
+> >
+> > I understand that the truesize incorporates struct sk_buff header and we may
+> > also see non-linear SKBs, which could inflate the number (saying this without really
+> > understanding all the specifics there).
+> >
+> > >
+> > > Perhaps add a new UDP socket option to let the user decide on what
+> > > they feel is better for them ?
+> >
+> > I wanted to avoid a knob for this, but I can easily implement this way. So
+> > should I create a patch for a setsockopt() that allows setting
+> > udp_sk->forward_threshold?
+> >
+> > >
+> > > I suspect that the main issue is about having a single drop in the first place,
+> > > because of false sharing on sk->sk_drops
+> > >
+> > > Perhaps we should move sk_drops on a dedicated cache line,
+> > > and perhaps have two counters for NUMA servers.
+> >
+> > I am looking into sk_drops, I don't know what it does at the moment, it's
+> > been a while I've last read this codebase :)
+> >
+> 
+> Can you post
+> 
+> ss -aum src :1000  <replace 1000 with your UDP source port>
+> 
+> We will check the dXXXX output (number of drops), per socket.
+
+I don't have access to "ss", but I have this screenshot about a similar
+metrics that we collect every 30 seconds:
+
+https://drive.google.com/file/d/1HrMHSrbrkwCILQiBgAZw-J1r39PBED0f/view?usp=sharing
+
+These metrics are collected via SK_MEMINFO from each of the sockets.
+
+Simmilar to this case, drops usually happen on all the threads at once, even
+if the receive rate is really low. Right now (when this screenshot was
+taken), the UDP socket buffer remained at ~400kB (the default, as the sysctl
+knobs were not persisted).
+
+-- 
+Bazsi
 
 
