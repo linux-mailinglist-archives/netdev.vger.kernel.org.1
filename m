@@ -1,199 +1,134 @@
-Return-Path: <netdev+bounces-215968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215970-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CFADB312A8
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 11:14:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C739B312AF
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 11:16:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA4A5A07BA7
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 09:13:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46A0E1CE5C02
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 09:16:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE1B72EC55B;
-	Fri, 22 Aug 2025 09:13:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0DA8194124;
+	Fri, 22 Aug 2025 09:15:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZLVflZt8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qm46M+sI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BCDD4D599;
-	Fri, 22 Aug 2025 09:13:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16727393DEB
+	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 09:15:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755854010; cv=none; b=DsMMaGnUrmPLiswOWwcd+T/ksrsoxl8jOBszVGNjtWSCza4bF/rdEUGdA1WUBHrNyBkAQUjSJXnzM+8PmrxCvQCojMWDFYb6mGL1rjXtuNYieolss0i+++vTudshbFl8JdGBJRjPofGwKMYRT5rKsb2NScp6Y5sWREo+HBA7dEc=
+	t=1755854152; cv=none; b=LplOSzebxybwYiMb+btirRdE0anMj1TLww35Gvw0bQpl+WArjfBf2b6sSoUGPzGITSGS/oFFV6SfODRCMl3WXiRDJLpk/sCNFVVt7p6L+JefEHmMUiVeSdGKxUdmvz6Kxhw3jDDvq9hOR8qV3z74+bj1bQmweDn8aeexUbBmurI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755854010; c=relaxed/simple;
-	bh=lrfZJO/Uhq7ZjXnlBDXeBqnUhtneJCKZUGg3Yce/cUU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Z6vv4WjUEtfRHNwhACCY29Z6/+zPed9f7YBKMvm4rZtDQATCANlQo0v5P3ebM4/DkmwDrGNHDccgy0Sbi4slf/5rNJQqU7iq3dxSkLE/Qk3860in7jbAsSlF9s2CArVhKnhA6xykN4URhfUREaNZ7qxxaHQybUCVG+V8R9ZWV0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZLVflZt8; arc=none smtp.client-ip=209.85.128.53
+	s=arc-20240116; t=1755854152; c=relaxed/simple;
+	bh=pvSz2Byxm2uVRbE+wzOFlcGdg+rrXKCtuNJBR7eFJ1c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e/tEHvItqfliT2O9Yz+zhQzMo3U7CoKiFGRsS8e/IhqlPimk6bOzmGJPGo8Luh1gtumLcTNY5h6dH1xP9FbkM725duuRqv2LY4Uu0hZSUAo6TORxTUfDtsY776QY3JKXB1XtCQtWBSeXLL9eChqsX8QzGkB9mWoVnIFylHMWLfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qm46M+sI; arc=none smtp.client-ip=209.85.218.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-45a1b00e4a1so15377575e9.0;
-        Fri, 22 Aug 2025 02:13:28 -0700 (PDT)
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-afcb78da8a7so282695066b.1
+        for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 02:15:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755854007; x=1756458807; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8WVB6Ufn8LQN8CYkitGQqrmJbX//AJCWVJHRLiQ2uSA=;
-        b=ZLVflZt8KolEJj2urXqrz8QTzfNCDvYHxDuOyK6sTDZaseFSqiulpKkjcj2aF4b2yf
-         49YrBu2kTM3y5l2tHN1bRY2+t4WH3dOvRWxjpTBLe5T5aMhFn+wvAkLfe6rGzfIKQf19
-         mXu29YTpqCJzEiA2BHGC1rpYQtlV+Tnn8ByHtEZQubw2aXrQkDgMHg/AgYTLGAPgAb9S
-         tS56FhIZkOkcg6jH6k5UoQrB2XZOJwpiKhAyQrJhG3ukKo9+D4iJnf/8a7uGJnviwOlj
-         U6OKzClqPYpCXMTtf2P1aUaZr/giuHeQLaENDMwompFi/FLroxolw4YoqBhyKPYRG8yH
-         4Meg==
+        d=gmail.com; s=20230601; t=1755854149; x=1756458949; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=IcYuqXwMMOHEAHK6AEjcauuepvcjq2vzOAXXoNc5zMk=;
+        b=Qm46M+sIs0J2AaicQ+km3mj/v0zUCKlrvGy77IUJoJJC0sCcKimlGlQPcvRMFpacFV
+         4A5oj23dH6VRTq+bMnDAS+sIwf7LbbUwo7I+WiRHu93gpDqeVFn2FERJ4m1o7gAXua3j
+         nHKCXUhK4j05olWWZP8mHKcd+fu+X3B12uISaKdVhmVV6g2WfkPt2i3PvDu356JmsdpY
+         LdLckdTSsYahtG/YKxUxrf3TiBSs+E/cF2TSKwy+e/q4rPJixFQcfM0ANnYhZXGWZ0Rv
+         +HOUVxtdNGA9PNWd27aWhHu56u5GgSe9slFwOScbxDCMEj8cd7dXzZLLGXzLBoi3LtHM
+         CeLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755854007; x=1756458807;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8WVB6Ufn8LQN8CYkitGQqrmJbX//AJCWVJHRLiQ2uSA=;
-        b=H4lfy0HwbbiaUwI5F68sVnJZPrR8HPG/zA7vAgmAJsjN2CDvMk9q1bAHmj0xTAlZzU
-         ILNr1BmNwJTYdt6tjqscoeVUPISaAypbHSiWNFoVLR1HiioNg8dBvoBPEM1HG2JXSydk
-         t9VemEdFljtIOh4T0h5//nmrmi/vfpo6W6JfPmK43m225oSoM/fTTxbBIGHVpgkm0LV9
-         0Q6B7wJn2xWNSPN1Y9K8XsiPYqd1kHFtdKWg5uC+yOTEany02m2y5Ica21cfgsmgBNrr
-         yFFSh+cStt1pTw9bmPdrd2RfYxIYBydv9ALQ8ppBSlRrk4MXn5uCR1GBs5kNrPhYk8mG
-         SGgA==
-X-Forwarded-Encrypted: i=1; AJvYcCUH4vtDns6pFaSqC7DIeqMxg755gqTQmvb8hWv/stEg+sLt/7hF0l7iywT9wqpNqiWLVGVEzem4@vger.kernel.org, AJvYcCVweR8D8RDmc0uy7U8czlGwK7ueVS+d/31kv4P7S23w1i0U9AsS5PQhI89MIKYU5uCRXt3Bt8OZNYE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5qg1EFTiN2wbx7q2DuQJUg5GQQEcDjuujR2sMW0S64IgeDwTB
-	1ctxiRL1WiBMUdJXVZCKeUNj19ge8IURbAJzlXlyK6RnfxdsAQZlVuwT
-X-Gm-Gg: ASbGncuxSCDWB2Qwy5JqDw61TyrsJ+0YfpAJ515r08jZXdokzNgDzkdUSYJFwmLRtLO
-	vu5OoV2HrpqqqwECOaUlv5J4SUNOx5JCesfYaXfedNrebIu+HLxRW1Un58QbylCeUQfFypdefyx
-	Tvrz+sWsMBjccuQSSQ28c4dEEGAdzZCBLRRWyaxB59iN5o3BsU084enN8ayFHdHY5RqNvkUpjul
-	6QidZUUDZHtsNiBxFhDtfyYGwqBPfCdwa/99DNh39XHfZL8vY0GxsXlPTuBqMyR+oH2ZiDFpXsT
-	G6n51PDiBMB+Ngr4PcDgOi4mrvhbqpOfR3RjDEh4zZi71j/RnCIBwQc4jB5QoJOAvfdEjyMsdns
-	tTlOgMQVhTqwskJSK3uKRK/pWvl1Ok8LIi9iAemNacpox5f9EYc13s6z+DZMRq0koBnVkXftNfW
-	cAvWv6L3DwPA6l4K61m3IgsllgraahDIQOHDd7gxg=
-X-Google-Smtp-Source: AGHT+IG3N5dVsjBj8GZEWqWjVgwu5w9EmG2QPXeLTSfWVw/oMqvB4o5x5tkd7aQFh6+jBLDbfCuQcA==
-X-Received: by 2002:a05:600c:350c:b0:45b:47e1:f5ff with SMTP id 5b1f17b1804b1-45b517dbf8amr16806835e9.35.1755854006975;
-        Fri, 22 Aug 2025 02:13:26 -0700 (PDT)
-Received: from labdl-itc-sw06.tmt.telital.com ([2a01:7d0:4800:a:8eec:4bff:febd:98b9])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b50dc40b7sm31170055e9.2.2025.08.22.02.13.25
+        d=1e100.net; s=20230601; t=1755854149; x=1756458949;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IcYuqXwMMOHEAHK6AEjcauuepvcjq2vzOAXXoNc5zMk=;
+        b=DWTy68h4+088WTy9v3scK1rVwTREyEafNBnZhVyvfktLN+bDkwFP3oymQpTDVS5NqO
+         pX1okdShoC2OcNovVgBjlSogqeXHWqMuFwx9afaB3fpc1We43kR65pTVCg493Y5jHnvF
+         UNjiRP0UbJnifrgnbVRfz84IGssXGYUsRXiMUpB9V4raz/9PlH5EuvoRbt76L43V0pSP
+         e7Eaiq+L85QxX1gCwt0SfEoMzkNP+3VtB5yIZwDHLNp4buNhOQAGqPiuY74xJUo8dL3V
+         o/+qP/Zl+tzLgeINxJznX+J1cSlHOfZrCNevlIjpET3+dpi291Waqp602y6C7jpmQYqv
+         dtgg==
+X-Gm-Message-State: AOJu0YwjDSUitmaREGWVFx3rSkPTEOULxbKVe1O+8rPXF5I7HUSZqREg
+	LuOMeGXkQb7Ip2BzmuAfa70OhqTy5PVnUIYlrTOyk4jLlwKr5bOyx/96
+X-Gm-Gg: ASbGncseJQNKm90/p2cA8XivtQTkEjlQccRU0LcZ4M6rIuKCTZteOAA2hoAAqubqvST
+	y3lKCv+gAMX60q4nwySfhL8sNJv9rI3LPbdT8TEcIwSGrAeK0PEN1iVbZPB3UAu7nJss4NZFUwp
+	bbDKwBMKf3ZPq6laFJFoMYuBuFFg1+/B52N1SEMhmTTyvXhZ8MNFlvs7MWDX8+ZbPulNiL5MUNQ
+	eXlJiNcuxO7syfkwnAzBVIIDkAEtS18Hi1Zv9sk2ra5PxbpmPfLhuHUIzZQoESyVWecFGePlgqR
+	ObuT4+SfYGshiioqF3DhQhZNkdBykxbRYWlsupIRHq62iuYgSMvwOcv+A/jXgYv77DpzYYeSviC
+	6rTiCOCSwH79/sqkb0H5DqwVxC3E1xl2b8quXpSS73eQGDvWv0TjQBo1EsQ==
+X-Google-Smtp-Source: AGHT+IFx+7umhxoGvvRasF+/fgNq+CQQOHxbtaOYLimA+4lHVda9qvy/BwXglNDFOnzuhbFXjFy5jQ==
+X-Received: by 2002:a17:907:1b29:b0:afa:1b3f:37a2 with SMTP id a640c23a62f3a-afe295d2b84mr202455066b.37.1755854149309;
+        Fri, 22 Aug 2025 02:15:49 -0700 (PDT)
+Received: from bzorp3 (178-164-207-89.pool.digikabel.hu. [178.164.207.89])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-afded478ff9sm565413666b.57.2025.08.22.02.15.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Aug 2025 02:13:26 -0700 (PDT)
-From: Fabio Porcedda <fabio.porcedda@gmail.com>
-X-Google-Original-From: Fabio Porcedda <Fabio.Porcedda@telit.com>
-To: =?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	Daniele Palmas <dnlplm@gmail.com>,
-	Fabio Porcedda <fabio.porcedda@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] net: usb: qmi_wwan: add Telit Cinterion LE910C4-WWX new compositions
-Date: Fri, 22 Aug 2025 11:13:24 +0200
-Message-ID: <20250822091324.39558-1-Fabio.Porcedda@telit.com>
-X-Mailer: git-send-email 2.51.0
+        Fri, 22 Aug 2025 02:15:48 -0700 (PDT)
+Date: Fri, 22 Aug 2025 11:15:46 +0200
+From: Balazs Scheidler <bazsi77@gmail.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com
+Subject: Re: [RFC, RESEND] UDP receive path batching improvement
+Message-ID: <aKg1Qgtw-QyE8bLx@bzorp3>
+References: <aKgnLcw6yzq78CIP@bzorp3>
+ <CANn89iLy4znFBLK2bENWMfhPyjTc_gkLRswAf92uV7KY3bTdYg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iLy4znFBLK2bENWMfhPyjTc_gkLRswAf92uV7KY3bTdYg@mail.gmail.com>
 
-From: Fabio Porcedda <fabio.porcedda@gmail.com>
+On Fri, Aug 22, 2025 at 01:18:36AM -0700, Eric Dumazet wrote:
+> On Fri, Aug 22, 2025 at 1:15 AM Balazs Scheidler <bazsi77@gmail.com> wrote:
+> > The condition above uses "sk->sk_rcvbuf >> 2" as a trigger when the update is
+> > done to the counter.
+> >
+> > In our case (syslog receive path via udp), socket buffers are generally
+> > tuned up (in the order of 32MB or even more, I have seen 256MB as well), as
+> > the senders can generate spikes in their traffic and a lot of senders send
+> > to the same port. Due to latencies, sometimes these buffers take MBs of data
+> > before the user-space process even has a chance to consume them.
+> >
+> 
+> 
+> This seems very high usage for a single UDP socket.
+> 
+> Have you tried SO_REUSEPORT to spread incoming packets to more sockets
+> (and possibly more threads) ?
 
-Add the following Telit Cinterion LE910C4-WWX new compositions:
+Yes.  I use SO_REUSEPORT (16 sockets), I even use eBPF to distribute the
+load over multiple sockets evenly, instead of the normal load balancing
+algorithm built into SO_REUSEPORT.
 
-0x1034: tty (AT) + tty (AT) + rmnet
-T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  8 Spd=480 MxCh= 0
-D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=1bc7 ProdID=1034 Rev=00.00
-S:  Manufacturer=Telit
-S:  Product=LE910C4-WWX
-S:  SerialNumber=93f617e7
-C:  #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=ff Driver=option
-E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=2ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=fe Prot=ff Driver=option
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=83(I) Atr=03(Int.) MxPS=  64 Ivl=2ms
-E:  Ad=84(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:  If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=ff Driver=qmi_wwan
-E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=85(I) Atr=03(Int.) MxPS=  64 Ivl=2ms
-E:  Ad=86(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+Sometimes the processing on the userspace side is heavy enough (think of
+parsing, heuristics, data normalization) and the load on the box heavy
+enough that I still see drops from time to time.
 
-0x1037: tty (diag) + tty (Telit custom) + tty (AT) + tty (AT) + rmnet
-T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#= 15 Spd=480 MxCh= 0
-D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=1bc7 ProdID=1037 Rev=00.00
-S:  Manufacturer=Telit
-S:  Product=LE910C4-WWX
-S:  SerialNumber=93f617e7
-C:  #Ifs= 5 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:  If#= 0 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
-E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=option
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:  If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=ff Driver=option
-E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=83(I) Atr=03(Int.) MxPS=  64 Ivl=2ms
-E:  Ad=84(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:  If#= 3 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=fe Prot=ff Driver=option
-E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=85(I) Atr=03(Int.) MxPS=  64 Ivl=2ms
-E:  Ad=86(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:  If#= 4 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=ff Driver=qmi_wwan
-E:  Ad=05(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=87(I) Atr=03(Int.) MxPS=  64 Ivl=2ms
-E:  Ad=88(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+If a client sends 100k messages in a tight loop for a while, that's going to
+use a lot of buffer space.  What bothers me further is that it could be ok
+to lose a single packet, but any time we drop one packet, we will continue
+to lose all of them, at least until we fetch 25% of SO_RCVBUF (or if the
+receive buffer is completely emptied).  This problem, combined with small
+packets (think of 100-150 byte payload) can easily cause excessive drops. 25%
+of the socket buffer is a huge offset. 
 
-0x1038: tty (Telit custom) + tty (AT) + tty (AT) + rmnet
-T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  9 Spd=480 MxCh= 0
-D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=1bc7 ProdID=1038 Rev=00.00
-S:  Manufacturer=Telit
-S:  Product=LE910C4-WWX
-S:  SerialNumber=93f617e7
-C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:  If#= 0 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=option
-E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=ff Driver=option
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=82(I) Atr=03(Int.) MxPS=  64 Ivl=2ms
-E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:  If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=fe Prot=ff Driver=option
-E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=84(I) Atr=03(Int.) MxPS=  64 Ivl=2ms
-E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:  If#= 3 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=ff Driver=qmi_wwan
-E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=86(I) Atr=03(Int.) MxPS=  64 Ivl=2ms
-E:  Ad=87(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I am not sure how many packets warrants a sk_rmem_alloc update, but I'd
+assume that 1 update every 100 packets should still be OK.
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Fabio Porcedda <fabio.porcedda@gmail.com>
----
- drivers/net/usb/qmi_wwan.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
-index e56901bb6ebc..11352d85475a 100644
---- a/drivers/net/usb/qmi_wwan.c
-+++ b/drivers/net/usb/qmi_wwan.c
-@@ -1355,6 +1355,9 @@ static const struct usb_device_id products[] = {
- 	{QMI_FIXED_INTF(0x2357, 0x0201, 4)},	/* TP-LINK HSUPA Modem MA180 */
- 	{QMI_FIXED_INTF(0x2357, 0x9000, 4)},	/* TP-LINK MA260 */
- 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1031, 3)}, /* Telit LE910C1-EUX */
-+	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1034, 2)}, /* Telit LE910C4-WWX */
-+	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1037, 4)}, /* Telit LE910C4-WWX */
-+	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1038, 3)}, /* Telit LE910C4-WWX */
- 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x103a, 0)}, /* Telit LE910C4-WWX */
- 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1040, 2)},	/* Telit LE922A */
- 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1050, 2)},	/* Telit FN980 */
 -- 
-2.51.0
-
+Bazsi
+Happy Logging!
 
