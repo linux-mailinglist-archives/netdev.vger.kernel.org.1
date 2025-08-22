@@ -1,140 +1,146 @@
-Return-Path: <netdev+bounces-216008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D222B31741
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 14:13:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6AF9B3176F
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 14:17:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF57D168420
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 12:13:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF18CAE372B
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 12:15:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 978C22FB60B;
-	Fri, 22 Aug 2025 12:13:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 770592FD7A3;
+	Fri, 22 Aug 2025 12:14:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="LAYLKyig"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EEB825BEF2
-	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 12:13:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB642FCBE8;
+	Fri, 22 Aug 2025 12:14:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755864790; cv=none; b=gNSzgkQGkmYHZ4MkBC9tOMa9jZRvlXyCgLMctSDxbp5T7WFGAfmCaOZgFMUXqcLiTyBgWW53J0ojzZnbT4txVCqCAnxg9XkLSt6tU37aovJD6O3k19d720e9jmHCxIONB3yWGDlo5/xQif8F+1ng0pKa6wkcKVgYoft0f6+I3j0=
+	t=1755864878; cv=none; b=XSmABL5myv7s38wSVti8Qud9hQuFFyU6CzQhb6tOWXGBI2Nc1rDiL73VXua1ooXcR2CgdD6893v/rZXN18PyuynjmEasa5w4MydBb4IwLS5DXm9tPW/mCu6gCS7cegJCdEqhTULGsDC+fD+ubnNyM25jEzVhn5tU0AYpTWBC5So=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755864790; c=relaxed/simple;
-	bh=zl3fBfFYqpvYyjZtF0IJRHUpHtolahh+GBfvrNKUNZQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eQWTQ48fBhzo9xjsaN3Tcjy9zsefJ14AFtChrh1fJzi/5O5Hgj8KbGRYPU1TPYIoVsDm3Fu8DdY2E8/+AgqVeqqB8EHeJUaRNwcZjTZ60YoIvxO/ue52jqzuLJElC9icgr9Sn97H/GzfeTtUHYrtStPRy4cr8axq6egVTvb+iZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1upQdC-0007ru-7h; Fri, 22 Aug 2025 14:12:30 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1upQd9-001ZgO-0K;
-	Fri, 22 Aug 2025 14:12:27 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1upQd8-00A84v-2z;
-	Fri, 22 Aug 2025 14:12:26 +0200
-Date: Fri, 22 Aug 2025 14:12:26 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Lukasz Majewski <lukma@denx.de>, Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Jiri Pirko <jiri@resnulli.us>, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Russell King <linux@armlinux.org.uk>, Divya.Koppera@microchip.com,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Stanislav Fomichev <sdf@fomichev.me>
-Subject: Re: [PATCH net-next v3 3/3] Documentation: net: add flow control
- guide and document ethtool API
-Message-ID: <aKheqhfqht1Cx31M@pengutronix.de>
-References: <20250820131023.855661-1-o.rempel@pengutronix.de>
- <20250820131023.855661-4-o.rempel@pengutronix.de>
- <20250822113519.y6maeu4ifoqx4mxe@skbuf>
+	s=arc-20240116; t=1755864878; c=relaxed/simple;
+	bh=xUzCqw8G2JO1bhdytol3kfokW1GSmJ1/SVm3V50NR/g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=XexFkd716uxhmHVoM1gfIUfTJeJPuLpCA8HMmgzKuwGQPjE5e9zQ8QqLEOPa/vYxnHTwlHZpFXtbJ4funFZdwzSZR23XICEOK/7/rHS8uFOk64OQ/+RxtDqhbApdJqCwWp0dVPmuiqfybHVKlkCdipwi4S63oehAKTudC7peQWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=LAYLKyig; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1755864877; x=1787400877;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=xUzCqw8G2JO1bhdytol3kfokW1GSmJ1/SVm3V50NR/g=;
+  b=LAYLKyigeTTjvC34kfVLH4i9EbjGdZko/yCTxg1NLSTWxnkwbLhDiE96
+   rmkCYHU/6nsb7XlRJnUDre2RKyLvmCf/L/XMzgYpDLIrYM//xkSVmVuHc
+   Y5hsB5F82+Y4aO6KeFxCY1IO7d1jde/3HCYdU2XTLt42UrCpZFo+/nKqe
+   W8nY5a/XEKcHulou0s5FEeubJXT4igk4KLqKBfn3gnkz7bqlsYSuBqWnA
+   o+D7gIt0T2o270kI0uTklHUXCvVI6bBz5gYsvbZ0N1jmRA7ySmsQcO89P
+   GPJwsKEe0l9CLNfN4B81cg1bvgj3VKqv5NZFks7U9pcTPgmlKtQTChsG2
+   w==;
+X-CSE-ConnectionGUID: UKvKOVZXRqugqNL71FaA+g==
+X-CSE-MsgGUID: /uRisEj6RXar0b2HQ8WGoQ==
+X-IronPort-AV: E=Sophos;i="6.17,309,1747724400"; 
+   d="scan'208";a="45527384"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 22 Aug 2025 05:14:21 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Fri, 22 Aug 2025 05:13:59 -0700
+Received: from [10.159.245.205] (10.10.85.11) by chn-vm-ex02.mchp-main.com
+ (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
+ Transport; Fri, 22 Aug 2025 05:13:55 -0700
+Message-ID: <364fadbd-20fd-4f89-8a86-ed5b8d87ab42@microchip.com>
+Date: Fri, 22 Aug 2025 14:13:55 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250822113519.y6maeu4ifoqx4mxe@skbuf>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/5] net: cadence: macb: Add support for Raspberry Pi
+ RP1 ethernet controller
+To: Stanimir Varbanov <svarbanov@suse.de>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<linux-rpi-kernel@lists.infradead.org>, Broadcom internal kernel review list
+	<bcm-kernel-feedback-list@broadcom.com>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrea della Porta <andrea.porta@suse.com>, Claudiu Beznea
+	<claudiu.beznea@tuxon.dev>, Phil Elwell <phil@raspberrypi.com>, Jonathan Bell
+	<jonathan@raspberrypi.com>, Dave Stevenson <dave.stevenson@raspberrypi.com>,
+	Andrew Lunn <andrew@lunn.ch>
+References: <20250822093440.53941-1-svarbanov@suse.de>
+ <20250822093440.53941-4-svarbanov@suse.de>
+From: Nicolas Ferre <nicolas.ferre@microchip.com>
+Content-Language: en-US, fr
+Organization: microchip
+In-Reply-To: <20250822093440.53941-4-svarbanov@suse.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 22, 2025 at 02:35:19PM +0300, Vladimir Oltean wrote:
-...
-> > +
-> > +* **Who uses it**: Any full-duplex link, from 10 Mbit/s to multi-gigabit speeds.
-> > +
-> > +The MAC (Media Access Controller)
-> > +---------------------------------
-> > +The MAC is the hardware component that actually sends and receives PAUSE
-> > +frames. Its capabilities define the upper limit of what the driver can support.
-> > +For link-wide PAUSE, MACs can vary in their support for symmetric (both
-> > +directions) or asymmetric (independent TX/RX) flow control.
-> > +
-> > +For PFC, the MAC must be capable of generating and interpreting the
-> > +priority-based PAUSE frames and managing separate pause states for each
-> > +traffic class.
-> > +
-> > +Many MACs also implement automatic PAUSE frame transmission based on the fill
-> > +level of their internal RX FIFO. This is typically configured with two
-> > +thresholds:
-> > +
-> > +* **FLOW_ON (High Water Mark)**: When the RX FIFO usage reaches this
-> > +  threshold, the MAC automatically transmits a PAUSE frame to stop the sender.
-> > +
-> > +* **FLOW_OFF (Low Water Mark)**: When the RX FIFO usage drops below this
-> > +  threshold, the MAC transmits a PAUSE frame with a quanta of zero to tell
-> > +  the sender it can resume transmission.
-> > +
-> > +The optimal values for these thresholds depend on the link's round-trip-time
-> > +(RTT) and the peer's internal processing latency. The high water mark must be
-> > +set low enough so that the MAC's RX FIFO does not overflow while waiting for
-> > +the peer to react to the PAUSE frame. The driver is responsible for configuring
-> > +sensible defaults according to the IEEE specification. User tuning should only
-> > +be necessary in special cases, such as on links with unusually long cable
-> > +lengths (e.g., long-haul fiber).
+On 22/08/2025 at 11:34, Stanimir Varbanov wrote:
+> From: Dave Stevenson <dave.stevenson@raspberrypi.com>
 > 
-> How would user tuning be achieved?
+> The RP1 chip has the Cadence GEM block, but wants the tx_clock
+> to always run at 125MHz, in the same way as sama7g5.
+> Add the relevant configuration.
+> 
+> Signed-off-by: Dave Stevenson <dave.stevenson@raspberrypi.com>
+> Signed-off-by: Stanimir Varbanov <svarbanov@suse.de>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Do you mean how such tuning could be exposed to user space (e.g. via
-ethtool/sysfs), or rather whether it makes sense to provide a user
-interface for this at all, since drivers normally set safe defaults?
+Acked-by: Nicolas Ferre <nicolas.ferre@microchip.com>
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+> ---
+>   drivers/net/ethernet/cadence/macb_main.c | 12 ++++++++++++
+>   1 file changed, 12 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+> index 36717e7e5811..260fdac46f4b 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -5135,6 +5135,17 @@ static const struct macb_config versal_config = {
+>          .usrio = &macb_default_usrio,
+>   };
+> 
+> +static const struct macb_config raspberrypi_rp1_config = {
+> +       .caps = MACB_CAPS_GIGABIT_MODE_AVAILABLE | MACB_CAPS_CLK_HW_CHG |
+> +               MACB_CAPS_JUMBO |
+> +               MACB_CAPS_GEM_HAS_PTP,
+> +       .dma_burst_length = 16,
+> +       .clk_init = macb_clk_init,
+> +       .init = macb_init,
+> +       .usrio = &macb_default_usrio,
+> +       .jumbo_max_len = 10240,
+> +};
+> +
+>   static const struct of_device_id macb_dt_ids[] = {
+>          { .compatible = "cdns,at91sam9260-macb", .data = &at91sam9260_config },
+>          { .compatible = "cdns,macb" },
+> @@ -5155,6 +5166,7 @@ static const struct of_device_id macb_dt_ids[] = {
+>          { .compatible = "microchip,mpfs-macb", .data = &mpfs_config },
+>          { .compatible = "microchip,sama7g5-gem", .data = &sama7g5_gem_config },
+>          { .compatible = "microchip,sama7g5-emac", .data = &sama7g5_emac_config },
+> +       { .compatible = "raspberrypi,rp1-gem", .data = &raspberrypi_rp1_config },
+>          { .compatible = "xlnx,zynqmp-gem", .data = &zynqmp_config},
+>          { .compatible = "xlnx,zynq-gem", .data = &zynq_config },
+>          { .compatible = "xlnx,versal-gem", .data = &versal_config},
+> --
+> 2.47.0
+> 
+
 
