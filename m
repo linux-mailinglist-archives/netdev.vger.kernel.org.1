@@ -1,166 +1,241 @@
-Return-Path: <netdev+bounces-216018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 622CEB318D9
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 15:09:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0F9FB31900
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 15:15:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3D203B66E3
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 13:03:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93EB0563C28
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 13:10:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 971B22D47FB;
-	Fri, 22 Aug 2025 13:03:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9FAE2FC03E;
+	Fri, 22 Aug 2025 13:10:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P+aXKs/k"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VV4H3Z/w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19DED4315C;
-	Fri, 22 Aug 2025 13:03:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF3B12EDD66
+	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 13:10:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755867811; cv=none; b=f3gzPgOlwmcjP/Zh8YNoaSCr6W0Csy4QFQzZaBdOMpjjAnR0lthbJcM/gLN7JiGFq0KOXcR50/HqOhC7iRUtdeZ2XvTbDFR2bATwObFv+aspnCPmW9xGiiG03evmwbijgZkibUxGwyBvP7eQYS5Ydx2NPYwFYbDl8OEES7WLJJI=
+	t=1755868244; cv=none; b=UanTbvmYP0j+2R0I2PYw2hpoYRklzI+9NwIQbTUd7rYP9PZeo/a9q0PGDczD2DT5OO2QR9yNUysJJE0K1wTMI3cHC4MDkTs4ivWIDQh/qixKbXtgT66QKY//PZ4UtzE6aUgbVJo3uG4Q6529oocbuXnmYuDQIaCFeCQ5F/iGvbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755867811; c=relaxed/simple;
-	bh=sq1yjttYIOiA0E2+VmkijmPVo4l/nZ9VSTfAag8YDCk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fIgBxJHf80xWIxr1s51HbfTCkW99ymhp/MaK5E0fFjHUWDDxgESuVSCmbk1P4eu8wKf1nYYAU4CgVtKZjWdmiLZ5s9BPdNzu2GzXP7CQZBKwebABaGbuBKQ+70V/HyJq3Tc8IN/LL38kotmhP+dgBQCV6hgX80pCVVpYsokGmLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P+aXKs/k; arc=none smtp.client-ip=209.85.215.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-b47175d02dcso1623989a12.3;
-        Fri, 22 Aug 2025 06:03:29 -0700 (PDT)
+	s=arc-20240116; t=1755868244; c=relaxed/simple;
+	bh=MSyTaEZJmjXFTo13z8H5zsonFqyt6Okx8f0zNJmvbOs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=n401RlP83AoIHvfYFEnuny9gSsVZVBIJIEEhXulc6d91tA9O6b/OyFdQ3CJmwnTDVF050v6Y3bGdJkP94CpFe9KxZTF01EFf067CPyiSudkJBp4TRKWgmzYqPvRsyZrep4ff950XHvP8FZqTlNMyYK2rfYRv4bRhuJY4PHh7BIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VV4H3Z/w; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4b0faa6601cso39539601cf.1
+        for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 06:10:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755867809; x=1756472609; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EPxDT3MTeT2ExWKSYIYcKX9QUqnfn+6TpIfMTLps2Wc=;
-        b=P+aXKs/kGtBoNjE78jT01+QP3hPMoOMLVLwBZgn08r2KPI7Y0x2UQa1KMdzthfS870
-         uT9umhKAlXHS9kSrQj59O5cZILNZWdE7x5P8sv96n9v9e1MKJg/kx9iy49vDD69d3RUw
-         pL6qlIusnOvRWcZIBmpCI5lYAVqDfCq48tjz9m41movmDeV8xOj84Cx+Szv7C0uTDuLm
-         3y84s5gOBHuS27yLXRvhG5BRqW3SiGSQg9irG5McAOuo/eh6tA6IDny5hQnFKzWC1s5J
-         ZQ31d8Vg2v+G7x/npjRGEw50hzMvZHyQyU/IpXDzJ1MyEEWR8E9qHTFXEfp3i0QJyq1P
-         +sLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755867809; x=1756472609;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1755868242; x=1756473042; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EPxDT3MTeT2ExWKSYIYcKX9QUqnfn+6TpIfMTLps2Wc=;
-        b=Isy5yxtyHCrI1P045nx4Nk4HxRzNhPqkToplwDEuhCgdvSz0HuP9XCpPRAk9lrjJ6h
-         TcKrsgUSQgdM958+uC1PV9zUr9sdWOTx4LIRHvFXvvKy4WQH8uxlH9ikG/xdJnmzcHVQ
-         U/9eV/KDRsnhPgvs7mJ4uskkATOLF2D/GkrKim8nyw2Bp22uZghWAEKu0x2UbJgMkMQh
-         9BENOIE1Z+Zkf3y9JzYJu/hkZovAwFV9U9GL4jK6OJfS6K5yK0RwC+xIZXtc5jL3zoxl
-         A4VDXHjs3eYFXQaERv1ZV5g22b8JnUH03lMNoepbzTyjU1OX7YnQHZrBEab9IoTpGrH/
-         HTYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUz5BPLjfiUC9xLJ12qFKcfrHzAMHENNexuRim+y/gjJiVxdLuV6h2tLahSb6i4VFpEyUUEjR7b@vger.kernel.org, AJvYcCX60+fy5VsbTz5ivxMfn2TlBkKqUB5VcrJiSvKpqaIyIlQqvE1CurzqbSoExJICYQ0MGIQ4ekJuzcEHvPyb/SY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrivOTrnrK0IrT4Z0XTCCvbg9UKGPtWXTwi+t+CGU/vSlmXKsX
-	OSVya7ouKT9nn86F7p6HDu6f5oSwM+NcumdskCi6qBcd81Hl+qozq3st
-X-Gm-Gg: ASbGncswNsxWWUB0mR5rbEJ5xDQ4lF1HbLzPnNhpmJp2TeyZC9Y/3a358L80FGYYcL4
-	kXvjko5x2zgZ8OCoX2WCITFH4FtT11S8uHuvJ87jYRI16WIWJRETJuFuk4Tr4uaaUtTjW68bwJi
-	D3dxwd323zB9Q6dp3spgguH5Zio1DKOhCk9R4MQNMW4Eu5+xRpXFf/cy5WiPO4NgXoW2P2EN8u6
-	N4676ZJLQUBHF7WFk4dLZLH/Hy+miVKGHHt4+eHGnG3Oc66e3dwVM8GOQN+6b7l79HLZpQzJuhn
-	98tnWjU/1Ss1/1hpQpYGGe9HrZzxA/GUkI+qZYFwlQMD7GfQnFOscvbhxtZ8x15abgJMcZngZ0Z
-	5trb2VbJeT4T7c/Wlcdx0rkE4EcE=
-X-Google-Smtp-Source: AGHT+IFEwzH4RJaeyrfnA+uUFTSQ/6I2xISEDAPtSPWHXSsMG30hN5l5J0+wd5yLFjlZbR74ST7NIw==
-X-Received: by 2002:a17:903:2ec4:b0:240:14f9:cf13 with SMTP id d9443c01a7336-2462ef948edmr34456545ad.51.1755867809240;
-        Fri, 22 Aug 2025 06:03:29 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-245ed4c73f2sm83615765ad.94.2025.08.22.06.03.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Aug 2025 06:03:28 -0700 (PDT)
-Date: Fri, 22 Aug 2025 13:03:22 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Alessandro Ratti <alessandro@0x65c.net>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, skhan@linuxfoundation.org
-Subject: Re: [PATCH net-next v2] selftests: rtnetlink: skip tests if tools or
- feats are missing
-Message-ID: <aKhqmsheZAqThrSu@fedora>
-References: <aKfDOSx3C8NbMJsw@fedora>
- <20250822121456.874759-1-alessandro@0x65c.net>
- <20250822121456.874759-2-alessandro@0x65c.net>
+        bh=N57JTsqxdhsLazPWHoDT0EjdNXy3KAszydZnqiovi1g=;
+        b=VV4H3Z/wXApGNQmIqQa1A3pmwNdJV0cQLhgRjoQOJxp7doDpfOwHvLouJJS1BTRLv2
+         NHcrxC2fOy+paBiM0/8XPj0HCqK8LPzsWs/Vgcld/iTyvxnmvvo1OTRtxtIp1OwQjLhC
+         Sqr3PncpzgtKKUqRA7NmwAKPYXgoCRv1g17YS40yvwVW1dbSo9h5U1EMiG3aRloKrcsE
+         jZSxhA9Gjep9ZVBmskmssrPzIcyoRr3k4ebgnbQo47imzOl5nybc1wIyLBid50KFCRlU
+         3YonSpRRF15PQclLa36fdIYgN4Jj/dkDr3UfsFAF5hI+umOF2VIZvAdA6glcd21iGvSr
+         3MRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755868242; x=1756473042;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=N57JTsqxdhsLazPWHoDT0EjdNXy3KAszydZnqiovi1g=;
+        b=GI/uhIjbk7ri6+EU0s9EGx6O9GKDI1HW6dUfWp0KmUEF0OV3RtKMy7sce46oT9wZhJ
+         vtCVWYnboGWWVC3nSK6tYk71P/mQyglaZtLj1raCEIrARpyBZW52LfViV+zoY8GOZUWO
+         ztRmxeFP28CDdiKS0Hempqp7YinVSgSLJ52WLUXsReRjAoB8m2xxelF1zxjO9055mPQq
+         /o9bvdRbhhO4M3wZzqLIHR4r2g1oL3WSV8sCG/Cv9nGiLssFyjuqNnGu4z9PKBur0Isg
+         WfHpkBT0ecoaPbtk4uW9VS+W/buX7GQHHcGjSH1TEcYwqnArHbe2CHCcR/0a3NyFBsyo
+         4GmA==
+X-Gm-Message-State: AOJu0Yw2JfLf0uDutrftcRmn5MnRDt/ZkA/M1a00bZYxgsQUpCqAGaIa
+	HSRHxli4j/YMC1lri9QHmhxtg5/GiuYWdNF4TuQONv3yAtcFRiFTAzXuS6YxH1ra6D9Hj2fQRMb
+	xy3KdUfcpl9VCZ4SJ/Sn9GPSuG1NyebrZcOhoGyKM
+X-Gm-Gg: ASbGncsqdt+AvNo1JMQu521epBEoOnmEcII3u2Buu5tsYUOf6D4fromI8QGvVzOJ8S3
+	OzMPqKmeckUfwEdmsE5eo16CnVi4uVBEX7zar6PtUPne+IBzHB1PecKHBEOomXdDsup58LQ1BCF
+	izPRGeR77RJohHr940Lztsywv2XJmp9NX5GvNJgzq+aZz4lnEeE/9WAfq13dAUzDxGCb1dOMq+S
+	ZtFqNB2ju4/xdmvh4ncwLIrdw==
+X-Google-Smtp-Source: AGHT+IFFfO9FAwB0bxBIAymSm2iH/ik4U523UowUTRHNYsIQTgXcMa6Murg0Cl9LRBDgp0xji4p4CcpYi6Kc9ZrNx0w=
+X-Received: by 2002:a05:622a:17c7:b0:4b2:8ac5:2597 with SMTP id
+ d75a77b69052e-4b2aafa126fmr30288821cf.42.1755868240939; Fri, 22 Aug 2025
+ 06:10:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250822121456.874759-2-alessandro@0x65c.net>
+References: <aKgnLcw6yzq78CIP@bzorp3> <CANn89iLy4znFBLK2bENWMfhPyjTc_gkLRswAf92uV7KY3bTdYg@mail.gmail.com>
+ <aKg1Qgtw-QyE8bLx@bzorp3> <CANn89i+GMqF91FkjxfGp3KGJ-dC6-Snu3DoBdGuxZqrq=iOOcQ@mail.gmail.com>
+ <aKho5v5VwxdNstYy@bzorp3>
+In-Reply-To: <aKho5v5VwxdNstYy@bzorp3>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 22 Aug 2025 06:10:28 -0700
+X-Gm-Features: Ac12FXyy7u6tVu7Pv87kjRB3iHWipFVZ6CUOjrpapoptaAhIe54P4_OqLIKwc8k
+Message-ID: <CANn89i+S1hyPbo5io2khLk_UTfoQgEtnjYUUJTzreYufmbii+A@mail.gmail.com>
+Subject: Re: [RFC, RESEND] UDP receive path batching improvement
+To: Balazs Scheidler <bazsi77@gmail.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 22, 2025 at 02:08:42PM +0200, Alessandro Ratti wrote:
-> Some rtnetlink selftests assume the presence of ifconfig and iproute2
-> support for the `proto` keyword in `ip address` commands. These
-> assumptions can cause test failures on modern systems (e.g. Debian
-> Bookworm) where:
-> 
->  - ifconfig is not installed by default
->  - The iproute2 version lacks support for address protocol
-> 
-> This patch improves test robustness by:
-> 
->  - Skipping kci_test_promote_secondaries if ifconfig is missing
->  - Skipping do_test_address_proto if ip address help does not mention
->    proto
-> 
-> These changes ensure the tests degrade gracefully by reporting SKIP
-> instead of FAIL when prerequisites are not met, improving portability
-> across systems.
-> 
+On Fri, Aug 22, 2025 at 5:56=E2=80=AFAM Balazs Scheidler <bazsi77@gmail.com=
+> wrote:
+>
+> On Fri, Aug 22, 2025 at 02:37:28AM -0700, Eric Dumazet wrote:
+> > On Fri, Aug 22, 2025 at 2:15=E2=80=AFAM Balazs Scheidler <bazsi77@gmail=
+.com> wrote:
+> > >
+> > > On Fri, Aug 22, 2025 at 01:18:36AM -0700, Eric Dumazet wrote:
+> > > > On Fri, Aug 22, 2025 at 1:15=E2=80=AFAM Balazs Scheidler <bazsi77@g=
+mail.com> wrote:
+> > > > > The condition above uses "sk->sk_rcvbuf >> 2" as a trigger when t=
+he update is
+> > > > > done to the counter.
+> > > > >
+> > > > > In our case (syslog receive path via udp), socket buffers are gen=
+erally
+> > > > > tuned up (in the order of 32MB or even more, I have seen 256MB as=
+ well), as
+> > > > > the senders can generate spikes in their traffic and a lot of sen=
+ders send
+> > > > > to the same port. Due to latencies, sometimes these buffers take =
+MBs of data
+> > > > > before the user-space process even has a chance to consume them.
+> > > > >
+> > > >
+> > > >
+> > > > This seems very high usage for a single UDP socket.
+> > > >
+> > > > Have you tried SO_REUSEPORT to spread incoming packets to more sock=
+ets
+> > > > (and possibly more threads) ?
+> > >
+> > > Yes.  I use SO_REUSEPORT (16 sockets), I even use eBPF to distribute =
+the
+> > > load over multiple sockets evenly, instead of the normal load balanci=
+ng
+> > > algorithm built into SO_REUSEPORT.
+> > >
+> >
+> > Great. But if you have many receive queues, are you sure this choice do=
+es not
+> > add false sharing ?
+>
+> I am not sure how that could trigger false sharing here.  I am using a
+> "socket" filter, which generates a random number modulo the number of
+> sockets:
+>
+> ```
+> #include "vmlinux.h"
+> #include <bpf/bpf_helpers.h>
+>
+> int number_of_sockets;
+>
+> SEC("socket")
+> int random_choice(struct __sk_buff *skb)
+> {
+>   if (number_of_sockets =3D=3D 0)
+>     return -1;
+>
+>   return bpf_get_prandom_u32() % number_of_sockets;
+> }
+> ```
 
-The Reviewed-by tag should be here
+How many receive queues does your NIC have (ethtool -l eth0) ?
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+This filter causes huge contention on the receive queues and various
+socket fields, accessed by different cpus.
 
-> Signed-off-by: Alessandro Ratti <alessandro@0x65c.net>
-> 
-> ---
-> v2:
-> - Updated the patch based on review from Hangbin Liu
-> - Changed subject and commit message to better reflect updated behavior
-> - Added Reviewed-by tag
-> 
-> Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
->  tools/testing/selftests/net/rtnetlink.sh | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
-> index d6c00efeb664..c2a0e7f37391 100755
-> --- a/tools/testing/selftests/net/rtnetlink.sh
-> +++ b/tools/testing/selftests/net/rtnetlink.sh
-> @@ -323,6 +323,11 @@ kci_test_addrlft()
->  
->  kci_test_promote_secondaries()
->  {
-> +	run_cmd ifconfig "$devdummy"
-> +	if [ $ret -ne 0 ]; then
-> +		end_test "SKIP: ifconfig not installed"
-> +		return $ksft_skip
-> +	fi
->  	promote=$(sysctl -n net.ipv4.conf.$devdummy.promote_secondaries)
->  
->  	sysctl -q net.ipv4.conf.$devdummy.promote_secondaries=1
-> @@ -1201,6 +1206,12 @@ do_test_address_proto()
->  	local ret=0
->  	local err
->  
-> +	run_cmd_grep 'proto' ip address help
-> +	if [ $? -ne 0 ];then
-> +		end_test "SKIP: addr proto ${what}: iproute2 too old"
-> +		return $ksft_skip
-> +	fi
-> +
->  	ip address add dev "$devdummy" "$addr3"
->  	check_err $?
->  	proto=$(address_get_proto "$addr3")
-> -- 
-> 2.39.5
-> 
+You should instead perform a choice based on the napi_id (skb->napi_id)
+
+
+>
+> Last I've checked the code, all it did was putting the incoming packet in=
+to
+> the right socket buffer, as returned by the filter. What would be the fal=
+se
+> sharing in this case?
+>
+> >
+> > > Sometimes the processing on the userspace side is heavy enough (think=
+ of
+> > > parsing, heuristics, data normalization) and the load on the box heav=
+y
+> > > enough that I still see drops from time to time.
+> > >
+> > > If a client sends 100k messages in a tight loop for a while, that's g=
+oing to
+> > > use a lot of buffer space.  What bothers me further is that it could =
+be ok
+> > > to lose a single packet, but any time we drop one packet, we will con=
+tinue
+> > > to lose all of them, at least until we fetch 25% of SO_RCVBUF (or if =
+the
+> > > receive buffer is completely emptied).  This problem, combined with s=
+mall
+> > > packets (think of 100-150 byte payload) can easily cause excessive dr=
+ops. 25%
+> > > of the socket buffer is a huge offset.
+> >
+> > sock_writeable() uses a 50% threshold.
+>
+> I am not sure why this is relevant here, the write side of sockets can
+> easily be flow controlled (e.g. the process waiting until it can send mor=
+e
+> data). Also my clients are not necessarily client boxes. PaloAlto firewal=
+ls
+> can generate 70k events-per-second in syslog alone. And that does leave t=
+he
+> firewall, and my challenge is to read all of that.
+>
+> >
+> > >
+> > > I am not sure how many packets warrants a sk_rmem_alloc update, but I=
+'d
+> > > assume that 1 update every 100 packets should still be OK.
+> >
+> > Maybe, but some UDP packets have a truesize around 128 KB or even more.
+>
+> I understand that the truesize incorporates struct sk_buff header and we =
+may
+> also see non-linear SKBs, which could inflate the number (saying this wit=
+hout really
+> understanding all the specifics there).
+>
+> >
+> > Perhaps add a new UDP socket option to let the user decide on what
+> > they feel is better for them ?
+>
+> I wanted to avoid a knob for this, but I can easily implement this way. S=
+o
+> should I create a patch for a setsockopt() that allows setting
+> udp_sk->forward_threshold?
+>
+> >
+> > I suspect that the main issue is about having a single drop in the firs=
+t place,
+> > because of false sharing on sk->sk_drops
+> >
+> > Perhaps we should move sk_drops on a dedicated cache line,
+> > and perhaps have two counters for NUMA servers.
+>
+> I am looking into sk_drops, I don't know what it does at the moment, it's
+> been a while I've last read this codebase :)
+>
+
+Can you post
+
+ss -aum src :1000  <replace 1000 with your UDP source port>
+
+We will check the dXXXX output (number of drops), per socket.
 
