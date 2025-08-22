@@ -1,93 +1,93 @@
-Return-Path: <netdev+bounces-215903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215904-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45F5CB30D3A
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 06:05:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB3B9B30D34
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 06:04:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20966A0458E
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 04:03:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 445485E8B40
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 04:03:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F013D25BEF4;
-	Fri, 22 Aug 2025 04:03:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2082B291C11;
+	Fri, 22 Aug 2025 04:03:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="cmnIBDve"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hMC1zOky"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f228.google.com (mail-oi1-f228.google.com [209.85.167.228])
+Received: from mail-pl1-f228.google.com (mail-pl1-f228.google.com [209.85.214.228])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09CC32459D1
-	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 04:03:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.228
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F15C263C90
+	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 04:03:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755835390; cv=none; b=MECOhC7az4TaSMTrIoeUWuNwHaa2hoGJ16kScUqq7tnNqWYRIi45aLshU7+2WWEEFb7Sw4q9zJdFp6FGTtgtpEQm2mD+VQG9KrF2r4FvbyDhx6e3TUgtGysM7EcfGSpAGLAeNd9HyH2rlegHOSFu4fTGjg5sNU1EjI2tI1KCzjg=
+	t=1755835393; cv=none; b=kmLx7YtO75Ql2yCPp4qCjo6EfxNYeIVnHZQ8acnSupgg7EQ559i5HTOXOcextbKmFYkDT+rodbfZjMDadNu17yy++2AOtIiLJpZ88jigkqnxGK9gD+B7XPsZvYyLPOjUJ+Se9L0yUc+u4FW0TgWHrfXzhTkN06IUZ82hLOQaT3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755835390; c=relaxed/simple;
-	bh=TIsik8++R/27mabka3M9kiy5YAv1vONc6jlOzZ5bxn8=;
+	s=arc-20240116; t=1755835393; c=relaxed/simple;
+	bh=8eHMI1dJpNfGmRPMeGeM17UxD4c2koHw4cAWay6VUcs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NoBrbjeC5ZIcFS5uJTExO5qfXnV1lsRb3sdiqNjT99ILJbi7lNQgQ0GNebkTnM+chdolCkfFbAntU3N2o5V/Yddl1IgteXaGUnbnNeRKNFfIxt/ZmMaPjokQCzW8heOIVbY8+uT+AjK87LxqYVNDKbrzvMA3/P+Bmg27ERiOgKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=cmnIBDve; arc=none smtp.client-ip=209.85.167.228
+	 MIME-Version; b=dQodUPgOW6nG3EPcZYd/ipO82WLE42txx+LaZvZ7LwOmXLfu/moKEV2TST+rZTbptREdZStG9uBYTi6mRw+uda/Ibe6fHkLUC8RFYRiTA24AFQpwDyYP22ujQpppnUGyve64E6WK1Qj3rT2MAleAv/T7XiLRVoTykEtYVl0tZ2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hMC1zOky; arc=none smtp.client-ip=209.85.214.228
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oi1-f228.google.com with SMTP id 5614622812f47-435de7aebb7so1127684b6e.2
-        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 21:03:08 -0700 (PDT)
+Received: by mail-pl1-f228.google.com with SMTP id d9443c01a7336-244582738b5so14997755ad.3
+        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 21:03:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755835388; x=1756440188;
+        d=1e100.net; s=20230601; t=1755835391; x=1756440191;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:dkim-signature
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UpLVCWhYNJHu5P2oJU2x+VekYsAhN0PPaGcsV8sCkwU=;
-        b=eI3gzxGLCS3CDvb8brtOGGBF5Jg0tSlnxSk+uCTjwbp4Ye/Kvx6BYLwuSTRDNn2BWj
-         ycwjlUMlG6lGlxzduhdrIlq3woFjQBOswhKvq90G2W3Dpzx+FcF+1R55u83WxFVqSCd8
-         /CXkUrb/GFrFyREEwNgh53CHDzQ0A8XmKBZHR7yCqE+hxIporD3xc6cALhbluOKex3Fw
-         ovyru1Uli5rj9bAIDP2mRZEmF1Z+2OHo21EebJxa0t4BwC62i5jz66NdHDZV6pYWZ/AW
-         QZlZP23jgYXneh3DkrJ+Ij/nGfZVLLUEPIcH9u4nt1lH8THAQNJHkY4O/9oxux1M//Hh
-         II+A==
-X-Forwarded-Encrypted: i=1; AJvYcCV9NbMQXU9Bv4xmob4NscAQA95oD4tSqe4hmTT6ca0ra3se2f1f9hpL5A5yDOhBJKChQ93/7aM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1pjrJ+xY9NDQEHsBXbrYzA45+l18jld6gNITTDTSYsJt/oZXv
-	cWyPZglhOq3iSjaxDkH/FA+lEJ6Lf6ZsM384kBLFLEl5pQExqBAl4tb8+nbPa2Pkfd12y/5p/fz
-	A2jZOI7n+R9LuLJyKiCnkHpFkN0S1Pel6kvpN5qZl3I8TYgcNfQNrn/hlScGkxeFpXwPBbduPcm
-	Va03OTTsr4BIN2uyv/bAunmvAE3CZvMn6f/231aQEXpQ0pf0OYyUj/jw/Mqqcr//fYmv95oGk69
-	aulR5CotGd7Lq80m108Wr++
-X-Gm-Gg: ASbGncuiz2K58nn+cdcZk0R4kPV4jS/W0WIb/2u4s+BZyhyyLo5Va/b/AE4/sdVY5G/
-	sMWZhunJ4Wxxiwyb247zvVNg7yUNLaTXsAAWtsklIUpMLTgWxYD0u4x/fcZ0AmC8bCelb4nW9FD
-	QAEPMzzqZu95347thmL5c25zawNejCfb/jdxhas/sk9r2eTfnPuaDN6xvmyARua/luihMnGgppR
-	cdp47Wj37GKK2xNUCqmqXkIAeZ97u3rVSC56NfXEPAqoe0faeMy+gKKaDP6fpjV8p0ZP8B+ydU4
-	EHlRS6uI+Rc3OrmAopd0Ucu23GV4wqzDY6cTWvBeF4mN2HLNkUyJaexQyuk0wh+tN+BlTydT4kC
-	5kIzoVN0ibsDodtez7aBgGbVfbpMHD+Mskxk2LOsEgIVRZ/MX/X54RMVzcSIGVrKeLEBGneZVGg
-	yQbjrhSRTtjRj0
-X-Google-Smtp-Source: AGHT+IEXhiR28AWT5kd6eUOAs178dvOju2OVjKgE7XlSacqTdOkgmScLXmmv97G9IqhYPTz9ktpUiZnrf8tH
-X-Received: by 2002:a05:6808:1186:b0:436:5dd:9a99 with SMTP id 5614622812f47-43784ff09d1mr914860b6e.0.1755835387984;
-        Thu, 21 Aug 2025 21:03:07 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-72.dlp.protect.broadcom.com. [144.49.247.72])
-        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-310ab9f454csm1912141fac.13.2025.08.21.21.03.07
+        bh=J/LMB3vSl06WMEV8FB1/kl58VTo4A3MhmlzJXN+ClZA=;
+        b=pgrJ7QrVTgqa5eMc1VpO53O4et5108dvAGvTZ4e0QKisPNA4SA6q0pdc9ihSV8wqMG
+         L80YrJaSc1YY9tzkAHKcpUrK51iDwhnaIPx9oWozU46+p1R08EvGVZIrjW8BJoii1pJd
+         kg443GJzbaFKBXGwKKJW9JtFVM1r10sESPcAJ0r4NeuHpDfqcZywKonAq1iC/Co90K+k
+         7hlV4rg5cUR5Knft6oIz7foRwyURTW+5fTPRjMoyYADVzMTE+1d1NHqZMRZVYXM+BEOu
+         RIpRbxjfqkb1F/lNuSKOhaFchbLNxaohIlPLLcEXRTI3R391DMn5cYKt2lM6Na1UcMas
+         1Ugw==
+X-Forwarded-Encrypted: i=1; AJvYcCU/69rwWXbggKFDVMGFSb6Yto7uGMrYxZPO5+73IUxKbbYW0arzEjk/rhngbLvie8jbsqpS+3I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+OdvS9+pPTl7o7Wn7dJvcnwc3RXpWvl6XtWUi/3KQDSk6Hp4g
+	fw9PAKhCMYY+e7O87+4+lMPgi9Ke9mrlQkRV2viqQjd8tviA5G1fDUVnZzxa3Jrnhv6LpKTHXak
+	AS2NlTwoTY5DebQaotz3HlcibcrVuIJx23cupifGhQYTFAagIyFTaJ8hhsNH63u8uu9uhh8PLc+
+	nz5UEUscyR+v8Es7Al+842iq4m1V7XO9IuEMncsWMUxca+HS7wrprpWESMvk04FT5gA4JKdYdSM
+	I6afCX5XgDWwD3R/AtrKCs8
+X-Gm-Gg: ASbGncs3NbF2lvBEa6VHuASWW/IFyV2PD5UDxM0YtJ2OtoST3HzyZSjZHSt87wqhxx+
+	rNhLIrosQMJ+yyKCKR6pwDpU1OP+2EXbzx1YOpUCaimNkBxsPUXtsjuN6Xzuk9mA7B5QuNMStP0
+	r4wrxBC7U4FAdQQLy0IlLHIDrzVAMrYZEjaub+XbRy1tRR+1WfLWLdFm62BY7o/Yfy4LUuqYZ/b
+	nszhXyQeDa9xm/8EZyHiprmta+tf0HXR3JY4kxUEeCEQjqG6FEvxect/+Yyw6SZG3FWxCzOT5Pt
+	mhoTzJApkxjiWzg7bjoClE7zx7BpkgRvxXsngjFkBz6w6QGN0DDaepeabpV+6cLKyLayvWRJ3kR
+	ocJYJve3lbFl4bqKl1sJUXNBil/IFfOYp+akECY/y9O28hXW3ZzfzhN64027ybgHQZJN80KC7CG
+	iWoqtY10z8hb16
+X-Google-Smtp-Source: AGHT+IGHvUl2rtqXG+oT5N8/3+gEUu7c+x1/JHlb04QnNqTcZdeHhBiShg3cBP/r6niQzbLswbuCFU5cu1aU
+X-Received: by 2002:a17:902:f705:b0:242:a3fa:edb4 with SMTP id d9443c01a7336-2462ef6ac7dmr21826925ad.44.1755835390836;
+        Thu, 21 Aug 2025 21:03:10 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-19.dlp.protect.broadcom.com. [144.49.247.19])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-245fc761736sm4060415ad.26.2025.08.21.21.03.10
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 21 Aug 2025 21:03:07 -0700 (PDT)
+        Thu, 21 Aug 2025 21:03:10 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-76e2eaecf8dso1484255b3a.2
-        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 21:03:07 -0700 (PDT)
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-3235e45b815so1978171a91.0
+        for <netdev@vger.kernel.org>; Thu, 21 Aug 2025 21:03:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1755835386; x=1756440186; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1755835389; x=1756440189; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UpLVCWhYNJHu5P2oJU2x+VekYsAhN0PPaGcsV8sCkwU=;
-        b=cmnIBDveIg0rY2frK99KhJEC1AyDzFDr/Nrkm8ftES6pWTnWtIUeteRw91MSg/3j8I
-         ozcGCBMDKjqtbSmnj3ByrHtcIEK405f4J4cqxyyMIqGM3uKt/N1pv1Pe0MQ2HikclaJn
-         3oYHB9ITRdQU/pxDvulj01cFZ9i7EhY68Y8wg=
-X-Forwarded-Encrypted: i=1; AJvYcCW6we908BVFUbmXlcUJSkZuXOokD7Nbrsf8bifxcKa1a7vUwNHgnaGyifQL/eFXtemWVkEJIQk=@vger.kernel.org
-X-Received: by 2002:a05:6a00:1a8b:b0:76b:da70:487b with SMTP id d2e1a72fcca58-7702faa636emr2229272b3a.15.1755835386184;
-        Thu, 21 Aug 2025 21:03:06 -0700 (PDT)
-X-Received: by 2002:a05:6a00:1a8b:b0:76b:da70:487b with SMTP id d2e1a72fcca58-7702faa636emr2229162b3a.15.1755835384666;
-        Thu, 21 Aug 2025 21:03:04 -0700 (PDT)
+        bh=J/LMB3vSl06WMEV8FB1/kl58VTo4A3MhmlzJXN+ClZA=;
+        b=hMC1zOkyqn5yOIdHB8bHUUNgOZTPpMi6vEcxKJxoiC9u/VR2nyGlSZuCsvBTMLcpTm
+         uyi6I3gUmwpWoLnq6lArQZV3rgOk1yLye8BM03kWSZCoooTMy3TSZNQ9rwADIuy8MkeC
+         3P6sAC7WUoUfS0FEJsgLHszFwd0+wh5lfpS9M=
+X-Forwarded-Encrypted: i=1; AJvYcCWgrcT17wFW08iiCc5faHEBcJ/0ijxBJuQzpj55CqDtYotOHLi1umEb6Vibuq7WpYpxq4Y0/fg=@vger.kernel.org
+X-Received: by 2002:a17:90b:4f8e:b0:321:38a:229a with SMTP id 98e67ed59e1d1-32515ee4be2mr2464109a91.7.1755835388865;
+        Thu, 21 Aug 2025 21:03:08 -0700 (PDT)
+X-Received: by 2002:a17:90b:4f8e:b0:321:38a:229a with SMTP id 98e67ed59e1d1-32515ee4be2mr2464057a91.7.1755835388267;
+        Thu, 21 Aug 2025 21:03:08 -0700 (PDT)
 Received: from dhcp-10-123-157-228.dhcp.broadcom.net ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76e7d0d3abdsm9659814b3a.11.2025.08.21.21.03.01
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76e7d0d3abdsm9659814b3a.11.2025.08.21.21.03.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Aug 2025 21:03:04 -0700 (PDT)
+        Thu, 21 Aug 2025 21:03:07 -0700 (PDT)
 From: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 To: leon@kernel.org,
 	jgg@ziepe.ca
@@ -98,10 +98,11 @@ Cc: linux-rdma@vger.kernel.org,
 	michael.chan@broadcom.com,
 	Saravanan Vajravel <saravanan.vajravel@broadcom.com>,
 	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Anantha Prabhu <anantha.prabhu@broadcom.com>,
 	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Subject: [PATCH rdma-next 07/10] RDMA/bnxt_re: Add support for flow create/destroy
-Date: Fri, 22 Aug 2025 09:37:58 +0530
-Message-ID: <20250822040801.776196-8-kalesh-anakkur.purayil@broadcom.com>
+Subject: [PATCH rdma-next 08/10] RDMA/bnxt_re: Initialize fw with roce_mirror support
+Date: Fri, 22 Aug 2025 09:37:59 +0530
+Message-ID: <20250822040801.776196-9-kalesh-anakkur.purayil@broadcom.com>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20250822040801.776196-1-kalesh-anakkur.purayil@broadcom.com>
 References: <20250822040801.776196-1-kalesh-anakkur.purayil@broadcom.com>
@@ -116,284 +117,106 @@ X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
 From: Saravanan Vajravel <saravanan.vajravel@broadcom.com>
 
-- Added support for create_flow and destroy_flow verbs. These
-  verbs are used on RawEth QP to add a specific flow action.
-- To support TCP dump on RoCE, added IB_FLOW_ATTR_SNIFFER
-  attribute.
-- In create_flow verb, driver allocates mirror_vnic and configure it
-  with RawEth QP. Once this is done, driver will enable mirroring.
-- In destroy_flow, driver will disable mirroring and free the mirror
-  vnic.
+- Check FW capability for roce_mirror support.
+- Initialize FW with roce_mirror support.
+- When modifying QP, use unique GID for sgid incase of RawEth QP.
 
 Signed-off-by: Saravanan Vajravel <saravanan.vajravel@broadcom.com>
 Reviewed-by: Kashyap Desai <kashyap.desai@broadcom.com>
 Reviewed-by: Selvin Xavier <selvin.xavier@broadcom.com>
+Reviewed-by: Anantha Prabhu <anantha.prabhu@broadcom.com>
 Signed-off-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 ---
- drivers/infiniband/hw/bnxt_re/bnxt_re.h  |  1 +
- drivers/infiniband/hw/bnxt_re/ib_verbs.c | 87 ++++++++++++++++++++++++
- drivers/infiniband/hw/bnxt_re/ib_verbs.h |  5 ++
- drivers/infiniband/hw/bnxt_re/main.c     |  2 +
- drivers/infiniband/hw/bnxt_re/qplib_sp.c | 37 ++++++++++
- drivers/infiniband/hw/bnxt_re/qplib_sp.h |  2 +
- drivers/infiniband/hw/bnxt_re/roce_hsi.h | 40 ++++++++++-
- 7 files changed, 173 insertions(+), 1 deletion(-)
+ drivers/infiniband/hw/bnxt_re/ib_verbs.c   |  2 ++
+ drivers/infiniband/hw/bnxt_re/main.c       |  2 ++
+ drivers/infiniband/hw/bnxt_re/qplib_fp.c   | 12 +++++++++---
+ drivers/infiniband/hw/bnxt_re/qplib_rcfw.c |  4 ++++
+ drivers/infiniband/hw/bnxt_re/roce_hsi.h   |  1 +
+ 5 files changed, 18 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/infiniband/hw/bnxt_re/bnxt_re.h b/drivers/infiniband/hw/bnxt_re/bnxt_re.h
-index 3f7f6cefe771..3a219d67746c 100644
---- a/drivers/infiniband/hw/bnxt_re/bnxt_re.h
-+++ b/drivers/infiniband/hw/bnxt_re/bnxt_re.h
-@@ -234,6 +234,7 @@ struct bnxt_re_dev {
- 	u16			mirror_vnic_id;
- 	union			ib_gid ugid;
- 	u32			ugid_index;
-+	u8			sniffer_flow_created:1;
- };
- 
- #define to_bnxt_re_dev(ptr, member)	\
 diff --git a/drivers/infiniband/hw/bnxt_re/ib_verbs.c b/drivers/infiniband/hw/bnxt_re/ib_verbs.c
-index c83809c72f5b..90c23d0ee262 100644
+index 90c23d0ee262..f12d6cd3ae93 100644
 --- a/drivers/infiniband/hw/bnxt_re/ib_verbs.c
 +++ b/drivers/infiniband/hw/bnxt_re/ib_verbs.c
-@@ -4449,6 +4449,93 @@ void bnxt_re_dealloc_ucontext(struct ib_ucontext *ib_uctx)
+@@ -1037,6 +1037,8 @@ static u8 __from_ib_qp_type(enum ib_qp_type type)
+ 		return CMDQ_CREATE_QP_TYPE_RC;
+ 	case IB_QPT_UD:
+ 		return CMDQ_CREATE_QP_TYPE_UD;
++	case IB_QPT_RAW_PACKET:
++		return CMDQ_CREATE_QP_TYPE_RAW_ETHERTYPE;
+ 	default:
+ 		return IB_QPT_MAX;
  	}
- }
- 
-+static int bnxt_re_setup_vnic(struct bnxt_re_dev *rdev, struct bnxt_re_qp *qp)
-+{
-+	int rc;
-+
-+	rc = bnxt_re_hwrm_alloc_vnic(rdev);
-+	if (rc)
-+		return rc;
-+
-+	rc = bnxt_re_hwrm_cfg_vnic(rdev, qp->qplib_qp.id);
-+	if (rc)
-+		goto out_free_vnic;
-+
-+	return 0;
-+out_free_vnic:
-+	bnxt_re_hwrm_free_vnic(rdev);
-+	return rc;
-+}
-+
-+struct ib_flow *bnxt_re_create_flow(struct ib_qp *ib_qp,
-+				    struct ib_flow_attr *attr,
-+				    struct ib_udata *udata)
-+{
-+	struct bnxt_re_qp *qp = container_of(ib_qp, struct bnxt_re_qp, ib_qp);
-+	struct bnxt_re_dev *rdev = qp->rdev;
-+	struct bnxt_re_flow *flow;
-+	int rc;
-+
-+	if (attr->type != IB_FLOW_ATTR_SNIFFER ||
-+	    !rdev->rcfw.roce_mirror)
-+		return ERR_PTR(-EOPNOTSUPP);
-+
-+	mutex_lock(&rdev->qp_lock);
-+	if (rdev->sniffer_flow_created) {
-+		ibdev_err(&rdev->ibdev, "RoCE Mirroring is already Configured\n");
-+		mutex_unlock(&rdev->qp_lock);
-+		return ERR_PTR(-EBUSY);
-+	}
-+
-+	flow = kzalloc(sizeof(*flow), GFP_KERNEL);
-+	if (!flow) {
-+		mutex_unlock(&rdev->qp_lock);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	flow->rdev = rdev;
-+
-+	rc = bnxt_re_setup_vnic(rdev, qp);
-+	if (rc)
-+		goto out_free_flow;
-+
-+	rc = bnxt_qplib_create_flow(&rdev->qplib_res);
-+	if (rc)
-+		goto out_free_vnic;
-+
-+	rdev->sniffer_flow_created = 1;
-+	mutex_unlock(&rdev->qp_lock);
-+
-+	return &flow->ib_flow;
-+
-+out_free_vnic:
-+	bnxt_re_hwrm_free_vnic(rdev);
-+out_free_flow:
-+	mutex_unlock(&rdev->qp_lock);
-+	kfree(flow);
-+	return ERR_PTR(rc);
-+}
-+
-+int bnxt_re_destroy_flow(struct ib_flow *flow_id)
-+{
-+	struct bnxt_re_flow *flow =
-+		container_of(flow_id, struct bnxt_re_flow, ib_flow);
-+	struct bnxt_re_dev *rdev = flow->rdev;
-+	int rc;
-+
-+	mutex_lock(&rdev->qp_lock);
-+	rc = bnxt_qplib_destroy_flow(&rdev->qplib_res);
-+	if (rc)
-+		ibdev_dbg(&rdev->ibdev, "failed to destroy_flow rc = %d\n", rc);
-+	rdev->sniffer_flow_created = 0;
-+
-+	bnxt_re_hwrm_free_vnic(rdev);
-+	mutex_unlock(&rdev->qp_lock);
-+	kfree(flow);
-+
-+	return rc;
-+}
-+
- static struct bnxt_re_cq *bnxt_re_search_for_cq(struct bnxt_re_dev *rdev, u32 cq_id)
- {
- 	struct bnxt_re_cq *cq = NULL, *tmp_cq;
-diff --git a/drivers/infiniband/hw/bnxt_re/ib_verbs.h b/drivers/infiniband/hw/bnxt_re/ib_verbs.h
-index 445a28b3cd96..76ba9ab04d5c 100644
---- a/drivers/infiniband/hw/bnxt_re/ib_verbs.h
-+++ b/drivers/infiniband/hw/bnxt_re/ib_verbs.h
-@@ -272,6 +272,11 @@ struct ib_mr *bnxt_re_reg_user_mr_dmabuf(struct ib_pd *ib_pd, u64 start,
- 					 struct uverbs_attr_bundle *attrs);
- int bnxt_re_alloc_ucontext(struct ib_ucontext *ctx, struct ib_udata *udata);
- void bnxt_re_dealloc_ucontext(struct ib_ucontext *context);
-+struct ib_flow *bnxt_re_create_flow(struct ib_qp *ib_qp,
-+				    struct ib_flow_attr *attr,
-+				    struct ib_udata *udata);
-+int bnxt_re_destroy_flow(struct ib_flow *flow_id);
-+
- int bnxt_re_mmap(struct ib_ucontext *context, struct vm_area_struct *vma);
- void bnxt_re_mmap_free(struct rdma_user_mmap_entry *rdma_entry);
- 
 diff --git a/drivers/infiniband/hw/bnxt_re/main.c b/drivers/infiniband/hw/bnxt_re/main.c
-index 07d25deffabe..fe1be036f8f2 100644
+index fe1be036f8f2..059a4963963a 100644
 --- a/drivers/infiniband/hw/bnxt_re/main.c
 +++ b/drivers/infiniband/hw/bnxt_re/main.c
-@@ -1383,6 +1383,8 @@ static const struct ib_device_ops bnxt_re_dev_ops = {
- 	.reg_user_mr_dmabuf = bnxt_re_reg_user_mr_dmabuf,
- 	.req_notify_cq = bnxt_re_req_notify_cq,
- 	.resize_cq = bnxt_re_resize_cq,
-+	.create_flow = bnxt_re_create_flow,
-+	.destroy_flow = bnxt_re_destroy_flow,
- 	INIT_RDMA_OBJ_SIZE(ib_ah, bnxt_re_ah, ib_ah),
- 	INIT_RDMA_OBJ_SIZE(ib_cq, bnxt_re_cq, ib_cq),
- 	INIT_RDMA_OBJ_SIZE(ib_pd, bnxt_re_pd, ib_pd),
-diff --git a/drivers/infiniband/hw/bnxt_re/qplib_sp.c b/drivers/infiniband/hw/bnxt_re/qplib_sp.c
-index d10741151543..9ef581ed785c 100644
---- a/drivers/infiniband/hw/bnxt_re/qplib_sp.c
-+++ b/drivers/infiniband/hw/bnxt_re/qplib_sp.c
-@@ -1106,3 +1106,40 @@ int bnxt_qplib_query_cc_param(struct bnxt_qplib_res *res,
- 	dma_free_coherent(&rcfw->pdev->dev, sbuf.size, sbuf.sb, sbuf.dma_addr);
- 	return rc;
+@@ -654,6 +654,8 @@ int bnxt_re_hwrm_qcaps(struct bnxt_re_dev *rdev)
+ 	flags_ext2 = le32_to_cpu(resp.flags_ext2);
+ 	cctx->modes.dbr_pacing = flags_ext2 & FUNC_QCAPS_RESP_FLAGS_EXT2_DBR_PACING_EXT_SUPPORTED ||
+ 				 flags_ext2 & FUNC_QCAPS_RESP_FLAGS_EXT2_DBR_PACING_V0_SUPPORTED;
++	cctx->modes.roce_mirror = !!(le32_to_cpu(resp.flags_ext3) &
++				     FUNC_QCAPS_RESP_FLAGS_EXT3_MIRROR_ON_ROCE_SUPPORTED);
+ 	return 0;
  }
-+
-+int bnxt_qplib_create_flow(struct bnxt_qplib_res *res)
-+{
-+	struct creq_roce_mirror_cfg_resp resp = {};
-+	struct bnxt_qplib_rcfw *rcfw = res->rcfw;
-+	struct cmdq_roce_mirror_cfg req = {};
-+	struct bnxt_qplib_cmdqmsg msg = {};
-+
-+	bnxt_qplib_rcfw_cmd_prep((struct cmdq_base *)&req,
-+				 CMDQ_BASE_OPCODE_ROCE_MIRROR_CFG,
-+				 sizeof(req));
-+
-+	req.mirror_flags = (u8)CMDQ_ROCE_MIRROR_CFG_MIRROR_ENABLE;
-+
-+	bnxt_qplib_fill_cmdqmsg(&msg, &req, &resp, NULL, sizeof(req),
-+				sizeof(resp), 0);
-+	return bnxt_qplib_rcfw_send_message(rcfw, &msg);
-+}
-+
-+int bnxt_qplib_destroy_flow(struct bnxt_qplib_res *res)
-+{
-+	struct creq_roce_mirror_cfg_resp resp = {};
-+	struct bnxt_qplib_rcfw *rcfw = res->rcfw;
-+	struct cmdq_roce_mirror_cfg req = {};
-+	struct bnxt_qplib_cmdqmsg msg = {};
-+
-+	bnxt_qplib_rcfw_cmd_prep((struct cmdq_base *)&req,
-+				 CMDQ_BASE_OPCODE_ROCE_MIRROR_CFG,
-+				 sizeof(req));
-+
-+	req.mirror_flags &= ~((u8)CMDQ_ROCE_MIRROR_CFG_MIRROR_ENABLE);
-+
-+	bnxt_qplib_fill_cmdqmsg(&msg, &req, &resp, NULL, sizeof(req),
-+				sizeof(resp), 0);
-+
-+	return bnxt_qplib_rcfw_send_message(rcfw, &msg);
-+}
-diff --git a/drivers/infiniband/hw/bnxt_re/qplib_sp.h b/drivers/infiniband/hw/bnxt_re/qplib_sp.h
-index 58f90f3e57f7..147b5d9c0313 100644
---- a/drivers/infiniband/hw/bnxt_re/qplib_sp.h
-+++ b/drivers/infiniband/hw/bnxt_re/qplib_sp.h
-@@ -360,6 +360,8 @@ int bnxt_qplib_read_context(struct bnxt_qplib_rcfw *rcfw, u8 type, u32 xid,
- int bnxt_qplib_query_cc_param(struct bnxt_qplib_res *res,
- 			      struct bnxt_qplib_cc_param *cc_param);
- void bnxt_qplib_query_version(struct bnxt_qplib_rcfw *rcfw);
-+int bnxt_qplib_create_flow(struct bnxt_qplib_res *res);
-+int bnxt_qplib_destroy_flow(struct bnxt_qplib_res *res);
  
- #define BNXT_VAR_MAX_WQE       4352
- #define BNXT_VAR_MAX_SLOT_ALIGN 256
+diff --git a/drivers/infiniband/hw/bnxt_re/qplib_fp.c b/drivers/infiniband/hw/bnxt_re/qplib_fp.c
+index 092310571dcc..43a4ef76272d 100644
+--- a/drivers/infiniband/hw/bnxt_re/qplib_fp.c
++++ b/drivers/infiniband/hw/bnxt_re/qplib_fp.c
+@@ -1335,6 +1335,7 @@ static bool is_optimized_state_transition(struct bnxt_qplib_qp *qp)
+ 
+ int bnxt_qplib_modify_qp(struct bnxt_qplib_res *res, struct bnxt_qplib_qp *qp)
+ {
++	struct bnxt_qplib_sgid_tbl *sgid_tbl = &res->sgid_tbl;
+ 	struct bnxt_qplib_rcfw *rcfw = res->rcfw;
+ 	struct creq_modify_qp_resp resp = {};
+ 	struct bnxt_qplib_cmdqmsg msg = {};
+@@ -1386,9 +1387,14 @@ int bnxt_qplib_modify_qp(struct bnxt_qplib_res *res, struct bnxt_qplib_qp *qp)
+ 	if (bmask & CMDQ_MODIFY_QP_MODIFY_MASK_FLOW_LABEL)
+ 		req.flow_label = cpu_to_le32(qp->ah.flow_label);
+ 
+-	if (bmask & CMDQ_MODIFY_QP_MODIFY_MASK_SGID_INDEX)
+-		req.sgid_index = cpu_to_le16(res->sgid_tbl.hw_id
+-					     [qp->ah.sgid_index]);
++	if (bmask & CMDQ_MODIFY_QP_MODIFY_MASK_SGID_INDEX) {
++		if (qp->type == CMDQ_CREATE_QP_TYPE_RAW_ETHERTYPE)
++			req.sgid_index =
++				cpu_to_le16(sgid_tbl->hw_id[qp->ugid_index]);
++		else
++			req.sgid_index =
++				cpu_to_le16(sgid_tbl->hw_id[qp->ah.sgid_index]);
++	}
+ 
+ 	if (bmask & CMDQ_MODIFY_QP_MODIFY_MASK_HOP_LIMIT)
+ 		req.hop_limit = qp->ah.hop_limit;
+diff --git a/drivers/infiniband/hw/bnxt_re/qplib_rcfw.c b/drivers/infiniband/hw/bnxt_re/qplib_rcfw.c
+index b97e75404139..5e34395472c5 100644
+--- a/drivers/infiniband/hw/bnxt_re/qplib_rcfw.c
++++ b/drivers/infiniband/hw/bnxt_re/qplib_rcfw.c
+@@ -905,6 +905,10 @@ int bnxt_qplib_init_rcfw(struct bnxt_qplib_rcfw *rcfw,
+ 		flags |= CMDQ_INITIALIZE_FW_FLAGS_OPTIMIZE_MODIFY_QP_SUPPORTED;
+ 	if (rcfw->res->en_dev->flags & BNXT_EN_FLAG_ROCE_VF_RES_MGMT)
+ 		flags |= CMDQ_INITIALIZE_FW_FLAGS_L2_VF_RESOURCE_MGMT;
++	if (bnxt_qplib_roce_mirror_supported(rcfw->res->cctx)) {
++		flags |= CMDQ_INITIALIZE_FW_FLAGS_MIRROR_ON_ROCE_SUPPORTED;
++		rcfw->roce_mirror = true;
++	}
+ 	req.flags |= cpu_to_le16(flags);
+ 	req.stat_ctx_id = cpu_to_le32(ctx->stats.fw_id);
+ 	bnxt_qplib_fill_cmdqmsg(&msg, &req, &resp, NULL, sizeof(req), sizeof(resp), 0);
 diff --git a/drivers/infiniband/hw/bnxt_re/roce_hsi.h b/drivers/infiniband/hw/bnxt_re/roce_hsi.h
-index f9ac37335a1d..cfdf69a3fe9a 100644
+index cfdf69a3fe9a..99ecd72e72e2 100644
 --- a/drivers/infiniband/hw/bnxt_re/roce_hsi.h
 +++ b/drivers/infiniband/hw/bnxt_re/roce_hsi.h
-@@ -144,7 +144,8 @@ struct cmdq_base {
- 	#define CMDQ_BASE_OPCODE_MODIFY_CQ              0x90UL
- 	#define CMDQ_BASE_OPCODE_QUERY_QP_EXTEND        0x91UL
- 	#define CMDQ_BASE_OPCODE_QUERY_ROCE_STATS_EXT   0x92UL
--	#define CMDQ_BASE_OPCODE_LAST                  CMDQ_BASE_OPCODE_QUERY_ROCE_STATS_EXT
-+	#define CMDQ_BASE_OPCODE_ROCE_MIRROR_CFG	0x99UL
-+	#define CMDQ_BASE_OPCODE_LAST                   CMDQ_BASE_OPCODE_ROCE_MIRROR_CFG
- 	u8	cmd_size;
- 	__le16	flags;
+@@ -219,6 +219,7 @@ struct cmdq_initialize_fw {
+ 	#define CMDQ_INITIALIZE_FW_FLAGS_HW_REQUESTER_RETX_SUPPORTED     0x2UL
+ 	#define CMDQ_INITIALIZE_FW_FLAGS_OPTIMIZE_MODIFY_QP_SUPPORTED    0x8UL
+ 	#define CMDQ_INITIALIZE_FW_FLAGS_L2_VF_RESOURCE_MGMT		 0x10UL
++	#define CMDQ_INITIALIZE_FW_FLAGS_MIRROR_ON_ROCE_SUPPORTED        0x80UL
  	__le16	cookie;
-@@ -2109,6 +2110,43 @@ struct creq_query_roce_stats_ext_resp_sb {
- 	__le64	dup_req;
- };
- 
-+/* cmdq_roce_mirror_cfg (size:192b/24B) */
-+struct cmdq_roce_mirror_cfg {
-+	u8      opcode;
-+	#define CMDQ_ROCE_MIRROR_CFG_OPCODE_ROCE_MIRROR_CFG	0x99UL
-+	#define CMDQ_ROCE_MIRROR_CFG_OPCODE_LAST		\
-+				CMDQ_ROCE_MIRROR_CFG_OPCODE_ROCE_MIRROR_CFG
-+	u8      cmd_size;
-+	__le16  flags;
-+	__le16  cookie;
-+	u8      resp_size;
-+	u8      reserved8;
-+	__le64  resp_addr;
-+	u8      mirror_flags;
-+	#define CMDQ_ROCE_MIRROR_CFG_MIRROR_ENABLE		0x1UL
-+	u8      rsvd[7];
-+};
-+
-+/* creq_roce_mirror_cfg_resp (size:128b/16B) */
-+struct creq_roce_mirror_cfg_resp {
-+	u8      type;
-+	#define CREQ_ROCE_MIRROR_CFG_RESP_TYPE_MASK	0x3fUL
-+	#define CREQ_ROCE_MIRROR_CFG_RESP_TYPE_SFT	0
-+	#define CREQ_ROCE_MIRROR_CFG_RESP_TYPE_QP_EVENT	0x38UL
-+	#define CREQ_ROCE_MIRROR_CFG_RESP_TYPE_LAST	\
-+			CREQ_ROCE_MIRROR_CFG_RESP_TYPE_QP_EVENT
-+	u8      status;
-+	__le16  cookie;
-+	__le32  reserved32;
-+	u8      v;
-+	#define CREQ_ROCE_MIRROR_CFG_RESP_V		0x1UL
-+	u8      event;
-+	#define CREQ_ROCE_MIRROR_CFG_RESP_EVENT_ROCE_MIRROR_CFG	0x99UL
-+	#define CREQ_ROCE_MIRROR_CFG_RESP_EVENT_LAST	\
-+			CREQ_ROCE_MIRROR_CFG_RESP_EVENT_ROCE_MIRROR_CFG
-+	u8      reserved48[6];
-+};
-+
- /* cmdq_query_func (size:128b/16B) */
- struct cmdq_query_func {
- 	u8	opcode;
+ 	u8	resp_size;
+ 	u8	reserved8;
 -- 
 2.43.5
 
