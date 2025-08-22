@@ -1,134 +1,109 @@
-Return-Path: <netdev+bounces-215970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C739B312AF
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 11:16:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1496AB312B4
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 11:17:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46A0E1CE5C02
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 09:16:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3C3756556C
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 09:17:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0DA8194124;
-	Fri, 22 Aug 2025 09:15:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A6AF1531C1;
+	Fri, 22 Aug 2025 09:17:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qm46M+sI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NAlEdtYb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16727393DEB
-	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 09:15:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D01A137750
+	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 09:17:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755854152; cv=none; b=LplOSzebxybwYiMb+btirRdE0anMj1TLww35Gvw0bQpl+WArjfBf2b6sSoUGPzGITSGS/oFFV6SfODRCMl3WXiRDJLpk/sCNFVVt7p6L+JefEHmMUiVeSdGKxUdmvz6Kxhw3jDDvq9hOR8qV3z74+bj1bQmweDn8aeexUbBmurI=
+	t=1755854251; cv=none; b=aOr4q/wt93u/zSwauB1D2zI+LqJtWUMkkfa8gk7IUgb2bE/s2TdtGNBtAbyjezN8Yfiz1QDD9JQ0lBlzcONNy92QOVPPOY9lmorJRpJTVOQfYH59KnvDP+sDOpafHuATUDkcFj4LTGcYFkGoTMZCSHtqBu8LbKXLIN8ul9rD4QE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755854152; c=relaxed/simple;
-	bh=pvSz2Byxm2uVRbE+wzOFlcGdg+rrXKCtuNJBR7eFJ1c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e/tEHvItqfliT2O9Yz+zhQzMo3U7CoKiFGRsS8e/IhqlPimk6bOzmGJPGo8Luh1gtumLcTNY5h6dH1xP9FbkM725duuRqv2LY4Uu0hZSUAo6TORxTUfDtsY776QY3JKXB1XtCQtWBSeXLL9eChqsX8QzGkB9mWoVnIFylHMWLfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qm46M+sI; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-afcb78da8a7so282695066b.1
-        for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 02:15:50 -0700 (PDT)
+	s=arc-20240116; t=1755854251; c=relaxed/simple;
+	bh=GCjhRfFf8n1mqTUGI0KtP+L2OhFy9XYhIkoHLSPDug0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=bBFUFLbE8XUV2rjd84EKsoRkx71i0DfZd7kENW3V2LcOMnVIZjfnAl5xN3YDhr2DFjgHFjRBlHKKYsID9v2PK4gqvA+Xw3xwcVys2fHDAKmdBevyfyJ64i7S8Onb+TxNYlW+uoXp3lD7YECB8diVrXz7eIB2VNoBYm14Un82Y7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NAlEdtYb; arc=none smtp.client-ip=209.85.219.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-70d7c7e9709so50396096d6.3
+        for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 02:17:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755854149; x=1756458949; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=IcYuqXwMMOHEAHK6AEjcauuepvcjq2vzOAXXoNc5zMk=;
-        b=Qm46M+sIs0J2AaicQ+km3mj/v0zUCKlrvGy77IUJoJJC0sCcKimlGlQPcvRMFpacFV
-         4A5oj23dH6VRTq+bMnDAS+sIwf7LbbUwo7I+WiRHu93gpDqeVFn2FERJ4m1o7gAXua3j
-         nHKCXUhK4j05olWWZP8mHKcd+fu+X3B12uISaKdVhmVV6g2WfkPt2i3PvDu356JmsdpY
-         LdLckdTSsYahtG/YKxUxrf3TiBSs+E/cF2TSKwy+e/q4rPJixFQcfM0ANnYhZXGWZ0Rv
-         +HOUVxtdNGA9PNWd27aWhHu56u5GgSe9slFwOScbxDCMEj8cd7dXzZLLGXzLBoi3LtHM
-         CeLA==
+        d=google.com; s=20230601; t=1755854249; x=1756459049; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=I/HbqLZYB/0SC7ABea9pboFHw4jdC2t89hunkTNtFTs=;
+        b=NAlEdtYbYUhYL1NByEPbFzudiZS7EbT2C0EPkp/TrGUcMI4wlLeOaNchMAvgth541E
+         nfg4EL+2PRw0BwHUqyePMij8QcXSnpIbNyEgbRwJd11vbswd/U7dMROieMZ3nw8PvkS1
+         z0jA0YEb23WIQN8FZy/KzOqubBzfLtkCkYd9XO7VsG4Ia/wtfGbxyR9k4NjQhcmvFjlt
+         3mVzF9oFhhtYmf+t0xpKnKHleDE//moPYmHk7iC0W9YRJVMt1QjDJm9wpuZnT0rzJ+5k
+         1ikaMAdId7/C5Qj7sNO48S5VG+uSJyrb/oq2UA6c+P4jhrvYUBl2eh9oKh+XH6/3KaMT
+         SBKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755854149; x=1756458949;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IcYuqXwMMOHEAHK6AEjcauuepvcjq2vzOAXXoNc5zMk=;
-        b=DWTy68h4+088WTy9v3scK1rVwTREyEafNBnZhVyvfktLN+bDkwFP3oymQpTDVS5NqO
-         pX1okdShoC2OcNovVgBjlSogqeXHWqMuFwx9afaB3fpc1We43kR65pTVCg493Y5jHnvF
-         UNjiRP0UbJnifrgnbVRfz84IGssXGYUsRXiMUpB9V4raz/9PlH5EuvoRbt76L43V0pSP
-         e7Eaiq+L85QxX1gCwt0SfEoMzkNP+3VtB5yIZwDHLNp4buNhOQAGqPiuY74xJUo8dL3V
-         o/+qP/Zl+tzLgeINxJznX+J1cSlHOfZrCNevlIjpET3+dpi291Waqp602y6C7jpmQYqv
-         dtgg==
-X-Gm-Message-State: AOJu0YwjDSUitmaREGWVFx3rSkPTEOULxbKVe1O+8rPXF5I7HUSZqREg
-	LuOMeGXkQb7Ip2BzmuAfa70OhqTy5PVnUIYlrTOyk4jLlwKr5bOyx/96
-X-Gm-Gg: ASbGncseJQNKm90/p2cA8XivtQTkEjlQccRU0LcZ4M6rIuKCTZteOAA2hoAAqubqvST
-	y3lKCv+gAMX60q4nwySfhL8sNJv9rI3LPbdT8TEcIwSGrAeK0PEN1iVbZPB3UAu7nJss4NZFUwp
-	bbDKwBMKf3ZPq6laFJFoMYuBuFFg1+/B52N1SEMhmTTyvXhZ8MNFlvs7MWDX8+ZbPulNiL5MUNQ
-	eXlJiNcuxO7syfkwnAzBVIIDkAEtS18Hi1Zv9sk2ra5PxbpmPfLhuHUIzZQoESyVWecFGePlgqR
-	ObuT4+SfYGshiioqF3DhQhZNkdBykxbRYWlsupIRHq62iuYgSMvwOcv+A/jXgYv77DpzYYeSviC
-	6rTiCOCSwH79/sqkb0H5DqwVxC3E1xl2b8quXpSS73eQGDvWv0TjQBo1EsQ==
-X-Google-Smtp-Source: AGHT+IFx+7umhxoGvvRasF+/fgNq+CQQOHxbtaOYLimA+4lHVda9qvy/BwXglNDFOnzuhbFXjFy5jQ==
-X-Received: by 2002:a17:907:1b29:b0:afa:1b3f:37a2 with SMTP id a640c23a62f3a-afe295d2b84mr202455066b.37.1755854149309;
-        Fri, 22 Aug 2025 02:15:49 -0700 (PDT)
-Received: from bzorp3 (178-164-207-89.pool.digikabel.hu. [178.164.207.89])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-afded478ff9sm565413666b.57.2025.08.22.02.15.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Aug 2025 02:15:48 -0700 (PDT)
-Date: Fri, 22 Aug 2025 11:15:46 +0200
-From: Balazs Scheidler <bazsi77@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com
-Subject: Re: [RFC, RESEND] UDP receive path batching improvement
-Message-ID: <aKg1Qgtw-QyE8bLx@bzorp3>
-References: <aKgnLcw6yzq78CIP@bzorp3>
- <CANn89iLy4znFBLK2bENWMfhPyjTc_gkLRswAf92uV7KY3bTdYg@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1755854249; x=1756459049;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=I/HbqLZYB/0SC7ABea9pboFHw4jdC2t89hunkTNtFTs=;
+        b=Ci8DQMa0wHbrILX3rwpZyYwF71LRt//3YFqVbhlxcsyoWDn+w4WsnFDypZG9s+Of79
+         j0gjYQ0IhKO0zXiV3BI87uA2VUtHMtisHBmMXHhCGXYtDFPZiQMKto44Knj+4S0STZAv
+         tiUmrkD/m/AmSukyWQ9m0IWQ8HheqQB0fNdHyoPpk/CrqAVitUQ7jof2e6pxjW6e8dlf
+         pTDScujyyysDgY2vd2IC3PR6I4gdkUJyS7LrTtYc3AZtA5pyLc/QjwrrwpGzGWj2TRAb
+         dbXDnKyZScHGc1M3qIEyWhygkXULOCDCT1fVhlazZEKD0V5BM+EHlwOKKhdk3gSxLcwA
+         jcyg==
+X-Forwarded-Encrypted: i=1; AJvYcCUjnzK+Hg5AyzzFbFzq/c3QjrrZifEiSeYjI2VQW8QMrg3yoS6rhow3vq9InhacKPMU+kQNUDc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2If6T3HwBCz+uHgAtOL7iNFlX4G4d3BFuqrEXMqAVtdkBeHB3
+	43u1dzG7wpgQcHuMtsY6ZL3NSj8a/0rTEgNCJpNxsSCu6DfAlWvcv1CpQsqs+SsK0oR3QVNTLUC
+	bhNdzHmUSDRL6Mw==
+X-Google-Smtp-Source: AGHT+IEcxVw+HBU77GHn8TPh7n4mu8wztPp2M772LQ4D93zaX1vmQ92aJJyf9YTjTeXRP+qedZAVlxnpswOsPA==
+X-Received: from qvnz3.prod.google.com ([2002:a0c:e983:0:b0:70d:827f:4410])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6214:2262:b0:707:56a4:5b56 with SMTP id 6a1803df08f44-70d9732b46amr24211756d6.40.1755854248873;
+ Fri, 22 Aug 2025 02:17:28 -0700 (PDT)
+Date: Fri, 22 Aug 2025 09:17:24 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iLy4znFBLK2bENWMfhPyjTc_gkLRswAf92uV7KY3bTdYg@mail.gmail.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.rc2.233.g662b1ed5c5-goog
+Message-ID: <20250822091727.835869-1-edumazet@google.com>
+Subject: [PATCH net-next 0/2] tcp: annotate data-races around icsk_retransmits
+ and icsk_probes_out
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Aug 22, 2025 at 01:18:36AM -0700, Eric Dumazet wrote:
-> On Fri, Aug 22, 2025 at 1:15 AM Balazs Scheidler <bazsi77@gmail.com> wrote:
-> > The condition above uses "sk->sk_rcvbuf >> 2" as a trigger when the update is
-> > done to the counter.
-> >
-> > In our case (syslog receive path via udp), socket buffers are generally
-> > tuned up (in the order of 32MB or even more, I have seen 256MB as well), as
-> > the senders can generate spikes in their traffic and a lot of senders send
-> > to the same port. Due to latencies, sometimes these buffers take MBs of data
-> > before the user-space process even has a chance to consume them.
-> >
-> 
-> 
-> This seems very high usage for a single UDP socket.
-> 
-> Have you tried SO_REUSEPORT to spread incoming packets to more sockets
-> (and possibly more threads) ?
+icsk->icsk_retransmits is read locklessly from inet_sk_diag_fill(),
+tcp_get_timestamping_opt_stats, get_tcp4_sock() and get_tcp6_sock().
 
-Yes.  I use SO_REUSEPORT (16 sockets), I even use eBPF to distribute the
-load over multiple sockets evenly, instead of the normal load balancing
-algorithm built into SO_REUSEPORT.
+icsk->icsk_probes_out is read locklessly from inet_sk_diag_fill(),
+get_tcp4_sock() and get_tcp6_sock().
 
-Sometimes the processing on the userspace side is heavy enough (think of
-parsing, heuristics, data normalization) and the load on the box heavy
-enough that I still see drops from time to time.
+Add corresponding READ_ONCE()/WRITE_ONCE() annotations.
 
-If a client sends 100k messages in a tight loop for a while, that's going to
-use a lot of buffer space.  What bothers me further is that it could be ok
-to lose a single packet, but any time we drop one packet, we will continue
-to lose all of them, at least until we fetch 25% of SO_RCVBUF (or if the
-receive buffer is completely emptied).  This problem, combined with small
-packets (think of 100-150 byte payload) can easily cause excessive drops. 25%
-of the socket buffer is a huge offset. 
+Eric Dumazet (2):
+  tcp: annotate data-races around icsk->icsk_retransmits
+  tcp: annotate data-races around icsk->icsk_probes_out
 
-I am not sure how many packets warrants a sk_rmem_alloc update, but I'd
-assume that 1 update every 100 packets should still be OK.
+ net/ipv4/inet_diag.c  | 6 +++---
+ net/ipv4/tcp.c        | 5 +++--
+ net/ipv4/tcp_input.c  | 8 ++++----
+ net/ipv4/tcp_ipv4.c   | 4 ++--
+ net/ipv4/tcp_output.c | 6 +++---
+ net/ipv4/tcp_timer.c  | 6 +++---
+ net/ipv6/tcp_ipv6.c   | 4 ++--
+ net/mptcp/protocol.c  | 3 ++-
+ 8 files changed, 22 insertions(+), 20 deletions(-)
 
 -- 
-Bazsi
-Happy Logging!
+2.51.0.rc2.233.g662b1ed5c5-goog
+
 
