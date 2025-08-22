@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-215850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-215851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AB2AB30A67
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 02:30:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4D27B30A68
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 02:30:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1080A7A5908
-	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 00:28:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 265012A4508
+	for <lists+netdev@lfdr.de>; Fri, 22 Aug 2025 00:30:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE2804502A;
-	Fri, 22 Aug 2025 00:30:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BF54126C1E;
+	Fri, 22 Aug 2025 00:30:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kvk0UQ8/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r4VCFcVU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4CF9249EB;
-	Fri, 22 Aug 2025 00:30:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 480BF3C2F
+	for <netdev@vger.kernel.org>; Fri, 22 Aug 2025 00:30:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755822620; cv=none; b=bezjh5bBjmTkM250N1WfTiDYZnXgdjTvGpVguNSbBapJ0QKV+rAhI/NpZpFZNPo1eP0aZ+Uu7E1t6gkOQzvFGGqy0lV0XKYo+KNq08tt7ED6rLiRusBspz9jWUdfcc0sJf/hBIoOuaIaaXihMbEMHGfuuyxZNf4kPcNY56EpYhI=
+	t=1755822622; cv=none; b=ZQ7V8urc4raji2JRmWVexjGY82zm2XZQ2fisPMKCLGhPLTnMc8TR+UjQqAC5fm+kWbMH1r4NhL5fefOYvGcFEgXUcyQDXVikXQ6OB4A616sZ86+fdLDGr0P+SIh7FCQhcNrbPCrsxLGC7Bo6QcnH7WjzJZEbmbxctuXHT9AdF8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755822620; c=relaxed/simple;
-	bh=oCu+21hpHHRslBrIc9JKmXmCaImpZ5fj5kM0iwWiGWM=;
+	s=arc-20240116; t=1755822622; c=relaxed/simple;
+	bh=7BDziKGy0nYnSWBVNd9Y5a/fWiagJtMenNbERVY62z4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=fi+CQOggoINgFuvEDxIJS3h40coAa/sf2Pq13mnypD9uwIuwKOA8GFKnKgXd4jgYgqqe4qxFODSfbi+HCg9hJx4Fb6Ubk+W2AZ3RwHKB53u4OuQsHDhHZgfn9aQrqoukWc4auRiDRMoU0XZgexNfI6qELSRpfMbHuEHIhK9Wz8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kvk0UQ8/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58AD6C4CEEB;
-	Fri, 22 Aug 2025 00:30:20 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=CunyiHDiwwvywAG1zxnApYEG7PHCkmRnE07PycflIpOPnYaEv289mC4MchLuZjhRbSo+Na9kzWcjolHy9sp5sHuYNMlYV1bqviNqZCmWT5uWTroMPJJO2Zei22r/Wi0rdSK06xiUDIXR+dvsja6vVznKE1bKGlgIQs/2oE59hV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r4VCFcVU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C636BC4CEED;
+	Fri, 22 Aug 2025 00:30:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755822620;
-	bh=oCu+21hpHHRslBrIc9JKmXmCaImpZ5fj5kM0iwWiGWM=;
+	s=k20201202; t=1755822621;
+	bh=7BDziKGy0nYnSWBVNd9Y5a/fWiagJtMenNbERVY62z4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kvk0UQ8/hI97OnJtaK61IEwaZgF48NpOXH5+UN/Wo6o/wIABG3Zm721wcOV9+X0hl
-	 EeR/DJSydgo/7KLdVkvLolFdB2IgHS4gDc/lOAt6zuKcIxD7mPp2XnaY65nflFBK/w
-	 nMEYL57PSZwq8HNYdk9YWapSYpNWtcamRIwt6JZVO5h7tTgSzIyQ9tuHkYhSHcaO9H
-	 O4NwtOUf/VQShYixxmxUM1be39PitpRQUP+Yf8JaR9S4EqdAx8HfSLYsXWkvjFVszR
-	 rZxa0sqHeuchYZiox+ORrdWWCrDsH3oCQbse96wHQdpiMFIhG5Hxc7FQPCuDyQwa3N
-	 wg5U3KP2Dhf2A==
+	b=r4VCFcVUOqFKQasKbMSVD1e7GJJ7Yq94Zh7XZXHQEfnBc460BPXaFvSUBnvI+mQHW
+	 LMF4ggA8+sTKBOqBwJudBQXKKupmlUClsHOwmTVXuyw8nENcN/92rfGYytfIjkOtwW
+	 ChxO81ClVPUvous5/b7+/yb3PnOW5h/v0WIswBFcsGhOxqWoQwk2AzRKONdOPHXisW
+	 USggvjcyYHZpTUvC8jtA0Thv3GEnb+/0Dc3rCE2S/emYyzyR+Sum4HaOyYQ3cdiKSH
+	 lB5xdqylwz+Gg+LnLkCqfwm+ytgBHwrAV2oILe2Rcp5FleispZDaHBjVnch834IGVF
+	 hXg//iKHfAPDA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF2B383BF68;
-	Fri, 22 Aug 2025 00:30:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33CF3383BF68;
+	Fri, 22 Aug 2025 00:30:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,48 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 1/6] netfilter: ctnetlink: remove refcounting in
- dying list dumping
+Subject: Re: [PATCH net-next] net: stmmac: fix stmmac_simple_pm_ops build
+ errors
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175582262950.1251664.18196776225165187942.git-patchwork-notify@kernel.org>
-Date: Fri, 22 Aug 2025 00:30:29 +0000
-References: <20250820144738.24250-2-fw@strlen.de>
-In-Reply-To: <20250820144738.24250-2-fw@strlen.de>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
- pablo@netfilter.org
+ <175582263074.1251664.13209370832398636375.git-patchwork-notify@kernel.org>
+Date: Fri, 22 Aug 2025 00:30:30 +0000
+References: <E1uojpo-00BMoL-4W@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1uojpo-00BMoL-4W@rmk-PC.armlinux.org.uk>
+To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com,
+ netdev@vger.kernel.org, pabeni@redhat.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
-by Florian Westphal <fw@strlen.de>:
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 20 Aug 2025 16:47:33 +0200 you wrote:
-> There is no need to keep the object alive via refcount, use a cookie and
-> then use that as the skip hint for dump resumption.
+On Wed, 20 Aug 2025 15:30:40 +0100 you wrote:
+> The kernel test robot reports that various drivers have an undefined
+> reference to stmmac_simple_pm_ops. This is caused by
+> EXPORT_SYMBOL_GPL_SIMPLE_DEV_PM_OPS() defining the struct as static
+> and omitting the export when CONFIG_PM=n, unlike DEFINE_SIMPLE_PM_OPS()
+> which still defines the struct non-static.
 > 
-> Unlike the two earlier, similar patches in this file, this is a cleanup
-> without intended side effects.
-> 
-> Signed-off-by: Florian Westphal <fw@strlen.de>
+> Switch to using DEFINE_SIMPLE_PM_OPS() + EXPORT_SYMBOL_GPL(), which
+> means we always define stmmac_simple_pm_ops, and it will always be
+> visible for dwmac-* to reference whether modular or built-in.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/6] netfilter: ctnetlink: remove refcounting in dying list dumping
-    https://git.kernel.org/netdev/net-next/c/08d07f25fd5e
-  - [net-next,2/6] netfilter: nft_set_pipapo_avx2: Drop the comment regarding protection
-    https://git.kernel.org/netdev/net-next/c/d11b26402a33
-  - [net-next,3/6] netfilter: nft_set_pipapo_avx2: split lookup function in two parts
-    https://git.kernel.org/netdev/net-next/c/416e53e39516
-  - [net-next,4/6] netfilter: nft_set_pipapo: use avx2 algorithm for insertions too
-    https://git.kernel.org/netdev/net-next/c/84c1da7b38d9
-  - [net-next,5/6] netfilter: nft_set_pipapo: Store real pointer, adjust later.
-    https://git.kernel.org/netdev/net-next/c/6aa67d5706f0
-  - [net-next,6/6] netfilter: nft_set_pipapo: Use nested-BH locking for nft_pipapo_scratch
-    https://git.kernel.org/netdev/net-next/c/456010c8b99e
+  - [net-next] net: stmmac: fix stmmac_simple_pm_ops build errors
+    https://git.kernel.org/netdev/net-next/c/dac72136aa6b
 
 You are awesome, thank you!
 -- 
