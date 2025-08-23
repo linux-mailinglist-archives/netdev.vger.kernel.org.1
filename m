@@ -1,173 +1,155 @@
-Return-Path: <netdev+bounces-216190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A58DBB326EF
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 07:37:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48C1DB3276C
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 09:29:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9441FA06168
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 05:37:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A0A65A1241
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 07:29:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FD8120C461;
-	Sat, 23 Aug 2025 05:37:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1C5D1E2853;
+	Sat, 23 Aug 2025 07:29:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TJCguNRV"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="KZSRQajT";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="x3FYBhyQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 463A41FA178
-	for <netdev@vger.kernel.org>; Sat, 23 Aug 2025 05:36:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30FE913B5AE
+	for <netdev@vger.kernel.org>; Sat, 23 Aug 2025 07:29:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755927421; cv=none; b=IHVrBs+E0Eldj8c/AGI04Vyz9Q3w8EPx8vsxSb2Aqb6KKdSN+Z1Nrr7uC/Y8/jeMxsXw1tWtOzn2vX4Dl0k4qYFFJfOjehm4/3W6xC/Hq5ZNFMrQVgltre5EBIrvgvlL9mKwnQB1iR2SqoqluIqWwwKDy/8hW/ELolugluddoRI=
+	t=1755934182; cv=none; b=GX1UUyZ5SlcYX02IfbDMfaLEByuANcGZqDCwMoKkKceF+kU4fRiWm4FTqB61dWcKcof8w1t1JyU/xuakHJRH+8f+0zLTFOROl1MNF5puN73iZqlJlybMPhXrBiEpOjWovUgdxR337EbVp/AKrlH6QYm2EefOvm5VnGPWU+46hOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755927421; c=relaxed/simple;
-	bh=uK/ueCfU4pns+bwPpZslSYBj9WPm/c7mPAKo4rXRMKw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UIFtelvk5UKkR5gHSM4+sh9jlwnmNKtwRTS+3D0ml1XKNPGKcOqQsljmFseJE6cwf35FelymGt3agoZtVHhLlQ6aw+vwlQUzNrg4sHGDjEzJ23kqzeDEqfgjIdkjINCITlJ/sUBBk/sJC288zoMGvNsSRh83EbCllpv5sXyYThQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TJCguNRV; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755927419; x=1787463419;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=uK/ueCfU4pns+bwPpZslSYBj9WPm/c7mPAKo4rXRMKw=;
-  b=TJCguNRVlngwzz1qzLVp7j2Bjh9HWCbzXHVG5WGGbuZ0jPBkkck2+v+q
-   Z6ATJKtI0t2XO2ty25FvbeRNdQXoVjB09r8hLkFMrcMrVZAJ1A/T9I3fZ
-   jP/l1DP28cexbQwgI4+zL/sH7lcViXMN0ZrM9RBz3z/bI9H7woUbQkPQn
-   xAOAvphSV6RfHxq+o+EQSChNrdqUocB8f1m2x0RMw5ARegCb4yvu8QT4n
-   kedakZI0RPazSPLn0Z7E5XS3dHigND+0/msEBxF/sGwSVM7LV5XK7+HWu
-   jdSRfwxm0dg0jTW2AowXfxwFRnYkl/N5dJDhmWgqpXCXT0z2bZSz4Hkm6
-   A==;
-X-CSE-ConnectionGUID: dT8muuQgQxOWbtN2UMRSQQ==
-X-CSE-MsgGUID: bV58a2fjQ/i0h0TBTbB0xQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11529"; a="75684108"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="75684108"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2025 22:36:59 -0700
-X-CSE-ConnectionGUID: vNBtLRQSSWqej6v2t+G8rA==
-X-CSE-MsgGUID: BkxMHIugTAe/Z93RHTc3+A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="168370247"
-Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
-  by fmviesa007.fm.intel.com with ESMTP; 22 Aug 2025 22:36:56 -0700
-Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1upgvu-000M6r-0p;
-	Sat, 23 Aug 2025 05:36:54 +0000
-Date: Sat, 23 Aug 2025 13:36:02 +0800
-From: kernel test robot <lkp@intel.com>
-To: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, pabeni@redhat.com,
-	edumazet@google.com, horms@kernel.org, kuba@kernel.org,
-	John Ousterhout <ouster@cs.stanford.edu>
-Subject: Re: [PATCH net-next v15 15/15] net: homa: create Makefile and Kconfig
-Message-ID: <202508231353.SNg0KuDi-lkp@intel.com>
-References: <20250818205551.2082-16-ouster@cs.stanford.edu>
+	s=arc-20240116; t=1755934182; c=relaxed/simple;
+	bh=CSisTzb0ZEcZoCDPrrYFo9jVwbhzmh4wyCpSwiEUlkA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=uUbpr9fLePZ6SkIHjSXXlfOQnwtiMLE8banlC567EbQBBG9XuYEGv7XfqPKuHob8Jc5IR+fOlFZN23a5J+DWYQQ4TPgXuQ/vtjPJU40bMczuDB7VuKHj1Wd2ujCRZIXA2CaXFe13wqDQxkdQ2oGPlGC6QrgHUUu+PHKseP9Zx48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=KZSRQajT; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=x3FYBhyQ; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1755934178;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dmrEX6c/xt+zlzACoXvBPVdXWpJelV17DivxJDQC/t8=;
+	b=KZSRQajTnvzW0clRD9RUz1/IrSo5Pbgo5ru0LFaHRnbZJqViAA3L4KZb88KfMJrKK2Rq3g
+	79m9I4NGkmve3uvvxTIXoDdHFFEVrZk75WwA5vcE+mW96VWbVsN2gojWHInHIcO4xZuPC7
+	Z5ur+8T/o0giuKb0D8j15Loi055fcu4KjLtzmLubi9XZzizeQ9cE06XAvfSPygVzeqp0dT
+	YRkoa0FkpIZpZPdgYjUfLVjjvA26TJ5yN2LD9Irth7iivKm2lviJp4WXEzWJAxUZdrGmSd
+	jJRCLU6HIbJYbe0xuDvS2SP8xlmGac5Uu0axl2yGwMijxJl9jJ1BS24GVnSJvg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1755934178;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dmrEX6c/xt+zlzACoXvBPVdXWpJelV17DivxJDQC/t8=;
+	b=x3FYBhyQyClhx66lvIleZcRz2eckqypt2oe3JAizqoGgUlibfO5aEcDE5ozNuj6zubAvsB
+	rdGnloBobHqDINDQ==
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Vinicius
+ Costa Gomes <vinicius.gomes@intel.com>, Paul Menzel
+ <pmenzel@molgen.mpg.de>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Miroslav Lichvar <mlichvar@redhat.com>, Jacob Keller
+ <jacob.e.keller@intel.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-next v2] igb: Convert Tx timestamping to PTP aux worker
+In-Reply-To: <20250822075200.L8_GUnk_@linutronix.de>
+References: <20250822-igb_irq_ts-v2-1-1ac37078a7a4@linutronix.de>
+ <20250822075200.L8_GUnk_@linutronix.de>
+Date: Sat, 23 Aug 2025 09:29:36 +0200
+Message-ID: <87ldna7axr.fsf@jax.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250818205551.2082-16-ouster@cs.stanford.edu>
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-Hi John,
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-kernel test robot noticed the following build errors:
+On Fri Aug 22 2025, Sebastian Andrzej Siewior wrote:
+> On 2025-08-22 09:28:10 [+0200], Kurt Kanzenbach wrote:
+>> The current implementation uses schedule_work() which is executed by the
+>> system work queue to retrieve Tx timestamps. This increases latency and =
+can
+>> lead to timeouts in case of heavy system load.
+>>=20
+>> Therefore, switch to the PTP aux worker which can be prioritized and pin=
+ned
+>> according to use case. Tested on Intel i210.
+>>=20
+>> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+>> ---
+>> Changes in v2:
+>> - Switch from IRQ to PTP aux worker due to NTP performance regression (M=
+iroslav)
+>> - Link to v1: https://lore.kernel.org/r/20250815-igb_irq_ts-v1-1-8c6fc03=
+53422@linutronix.de
+>
+> For the i210 it makes sense to read it directly from IRQ avoiding the
+> context switch and the delay resulting for it. For the e1000_82576 it
+> makes sense to avoid the system workqueue and use a dedicated thread
+> which is not CPU bound and could prioritized/ isolated further if
+> needed.
+> I don't understand *why* reading the TS in IRQ is causing this packet
+> loss.
 
-[auto build test ERROR on net-next/main]
+Me neither. I thought it could be the irqoff time. On my test systems
+the TS IRQ takes about ~16us with reading the timestamp. In the
+kworker/ptp aux thread scenario it takes about ~6us IRQ time + ~10us run
+time for the threads. All of that looks reasonable to me.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/John-Ousterhout/net-homa-define-user-visible-API-for-Homa/20250819-050052
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250818205551.2082-16-ouster%40cs.stanford.edu
-patch subject: [PATCH net-next v15 15/15] net: homa: create Makefile and Kconfig
-config: um-allmodconfig (https://download.01.org/0day-ci/archive/20250823/202508231353.SNg0KuDi-lkp@intel.com/config)
-compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250823/202508231353.SNg0KuDi-lkp@intel.com/reproduce)
+Also I couldn't really see a performance degradation with ntpperf. In my
+tests the IRQ variant reached an equal or higher rate. But sometimes I
+get 'Could not send requests at rate X'. No idea what that means.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202508231353.SNg0KuDi-lkp@intel.com/
+Anyway, this patch is basically a compromise. It works for Miroslav and
+my use case.
 
-All errors (new ones prefixed by >>):
+> This is also what the igc does and the performance improved
+> 	afa141583d827 ("igc: Retrieve TX timestamp during interrupt handling")
+>
+> and here it causes the opposite?
 
-   In file included from net/homa/homa_incoming.c:5:
-   In file included from net/homa/homa_impl.h:13:
-   In file included from include/linux/icmp.h:16:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/um/include/asm/hardirq.h:5:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:12:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:1175:55: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-    1175 |         return (port > MMIO_UPPER_LIMIT) ? NULL : PCI_IOBASE + port;
-         |                                                   ~~~~~~~~~~ ^
-   In file included from net/homa/homa_incoming.c:5:
-   In file included from net/homa/homa_impl.h:33:
->> arch/x86/include/asm/tsc.h:70:28: error: typedef redefinition with different types ('unsigned long long' vs 'unsigned long')
-      70 | typedef unsigned long long cycles_t;
-         |                            ^
-   include/asm-generic/timex.h:8:23: note: previous definition is here
-       8 | typedef unsigned long cycles_t;
-         |                       ^
-   In file included from net/homa/homa_incoming.c:5:
-   In file included from net/homa/homa_impl.h:33:
->> arch/x86/include/asm/tsc.h:77:24: error: redefinition of 'get_cycles'
-      77 | static inline cycles_t get_cycles(void)
-         |                        ^
-   include/asm-generic/timex.h:10:24: note: previous definition is here
-      10 | static inline cycles_t get_cycles(void)
-         |                        ^
-   In file included from net/homa/homa_incoming.c:5:
-   In file included from net/homa/homa_impl.h:33:
->> arch/x86/include/asm/tsc.h:80:7: error: call to undeclared function 'DISABLED_MASK_BIT_SET'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-      80 |             !cpu_feature_enabled(X86_FEATURE_TSC))
-         |              ^
-   arch/um/include/asm/cpufeature.h:52:32: note: expanded from macro 'cpu_feature_enabled'
-      52 |         (__builtin_constant_p(bit) && DISABLED_MASK_BIT_SET(bit) ? 0 : static_cpu_has(bit))
-         |                                       ^
-   1 warning and 3 errors generated.
+As said above, I'm out of ideas here.
 
+Thanks,
+Kurt
 
-vim +70 arch/x86/include/asm/tsc.h
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-288a4ff0ad29d1 arch/x86/include/asm/tsc.h Xin Li (Intel             2025-05-02  66) 
-2272b0e03ea573 include/asm-i386/tsc.h     Andres Salomon            2007-03-06  67  /*
-2272b0e03ea573 include/asm-i386/tsc.h     Andres Salomon            2007-03-06  68   * Standard way to access the cycle counter.
-2272b0e03ea573 include/asm-i386/tsc.h     Andres Salomon            2007-03-06  69   */
-2272b0e03ea573 include/asm-i386/tsc.h     Andres Salomon            2007-03-06 @70  typedef unsigned long long cycles_t;
-2272b0e03ea573 include/asm-i386/tsc.h     Andres Salomon            2007-03-06  71  
-2272b0e03ea573 include/asm-i386/tsc.h     Andres Salomon            2007-03-06  72  extern unsigned int cpu_khz;
-2272b0e03ea573 include/asm-i386/tsc.h     Andres Salomon            2007-03-06  73  extern unsigned int tsc_khz;
-73018a66e70fa6 include/asm-x86/tsc.h      Glauber de Oliveira Costa 2008-01-30  74  
-73018a66e70fa6 include/asm-x86/tsc.h      Glauber de Oliveira Costa 2008-01-30  75  extern void disable_TSC(void);
-2272b0e03ea573 include/asm-i386/tsc.h     Andres Salomon            2007-03-06  76  
-2272b0e03ea573 include/asm-i386/tsc.h     Andres Salomon            2007-03-06 @77  static inline cycles_t get_cycles(void)
-2272b0e03ea573 include/asm-i386/tsc.h     Andres Salomon            2007-03-06  78  {
-3bd4abc07a267e arch/x86/include/asm/tsc.h Jason A. Donenfeld        2022-04-08  79  	if (!IS_ENABLED(CONFIG_X86_TSC) &&
-3bd4abc07a267e arch/x86/include/asm/tsc.h Jason A. Donenfeld        2022-04-08 @80  	    !cpu_feature_enabled(X86_FEATURE_TSC))
-2272b0e03ea573 include/asm-i386/tsc.h     Andres Salomon            2007-03-06  81  		return 0;
-4ea1636b04dbd6 arch/x86/include/asm/tsc.h Andy Lutomirski           2015-06-25  82  	return rdtsc();
-6d63de8dbcda98 include/asm-x86/tsc.h      Andi Kleen                2008-01-30  83  }
-3bd4abc07a267e arch/x86/include/asm/tsc.h Jason A. Donenfeld        2022-04-08  84  #define get_cycles get_cycles
-2272b0e03ea573 include/asm-i386/tsc.h     Andres Salomon            2007-03-06  85  
+-----BEGIN PGP SIGNATURE-----
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmipbeETHGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgoTREACTR0YHHDXeAfhog0YtHT7jucGWdCID
+r99TTpdEJfQQvBSvDG1oSeDFEhBJRqHhv0BpuRKxiiCVB28K5eZM0rlDcf/434DG
+7e96GevAI/FzEePC3nsUxAV3aF1fHlBjYXkOp62fFYIXmlRCH01rLrhsEaj6d7oy
+aCzNILFGm0Q7RRsp53WrgMujZ/yszFMmKsTDA5ehkfvGWbF+3QnoIhnx28VZL47S
+irzeiRkAMvEue+n/jii/osRibm6tKdfnAO3vfB3X3yfiMDee5HqkJxK+898XuHGg
+a/nU4FQbMVNeLSulap0lyvyrYjygn8PbD1slg5W5HWsDd6sLOToTW7oiqDMIyDhx
+MSlvOy52C6IpP1hgx/HEaDATN+vask736P/ouEZ8Bl8gCPQdMgqGVarYYHBC0Ibe
+XNO2+0GDmkLImmM9uITafocQDQuHGlNHquOuw2y6xNS+47NUr6luxLvtK8bPBBnc
+u9JLDESmWYFStLDzt/JneezAFgWkQTsShtlwlRyG/nzKE8PMDZTnXyxEh+cHyu5T
+Kq54TvNPDk+Xhaz1NYd/vvjCoprpvvxX5mt05zoNjdODOdizk471TyohZjMyUAC8
+jD+NZKDxPrgfgmIrG0uGPrRYLEHgcInOnwbTDM2AdABB3+5imulSSyGZQAmpO0O1
+/Vh/6CzJb0qECg==
+=4JqL
+-----END PGP SIGNATURE-----
+--=-=-=--
 
