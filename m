@@ -1,186 +1,96 @@
-Return-Path: <netdev+bounces-216177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52A51B325BD
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 02:21:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A397B325CE
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 02:30:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F2725A7DC4
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 00:21:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A4AA1C281F7
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 00:30:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F6FD15E8B;
-	Sat, 23 Aug 2025 00:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C70E820B22;
+	Sat, 23 Aug 2025 00:29:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="Qkv3HLwc";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="UJQf4h56"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WCQmpO1N"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b1-smtp.messagingengine.com (fhigh-b1-smtp.messagingengine.com [202.12.124.152])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6FD747F;
-	Sat, 23 Aug 2025 00:21:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A05B21BC2A
+	for <netdev@vger.kernel.org>; Sat, 23 Aug 2025 00:29:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755908497; cv=none; b=T91Svrij6GGLblNjlXkaqtiX5sbR6SZKgxV9RIwfNXnE5LBFEmiFgUhKbZnQ3NEYiX29Ztp9/tfK4xDCYVsZlgJjBd9OrCeaSJkQHJd7RFxvK+CpfBdO9yvxyM8dqDPOcnS7ZUyHpgbGsPZr+k8AqraywWPfoGWY589VNMdvhfc=
+	t=1755908997; cv=none; b=lcx9ydXWb9ysYJ8zgxNfMHsr7ThUvMak1hTOHPivBvsLjishDR9MqLFcxJOayguASMGfXJ8xhFjabKMVtFddwdDTqHsayz22Z2r3Kwb5tsSJHg3BPTAVfliA4C31cVvAei8w31WdQfkaW9jwJ1ToKn0E4RiJpVsrG7g94NgTUnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755908497; c=relaxed/simple;
-	bh=LTJGD6JLyAaOd5JQ/zWVo7J6+vS/dumaengn/RMtIpQ=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=Z1tBJmT63N6jYmdZV1zQo9z7Xg86qcyBYeXXQHWzUczQpolXBJPyKJgB5/oyB5vNnXScmFV14Ut8OIA4oN0Sok4yqL/0YiOwB6Ojx73iO1KXmOwOYBZw/TDewM3vO5q+COPOl8ZyAvNmTcEQgabuWTjwXIP+ZbmVp1JiTxy2PE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=Qkv3HLwc; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=UJQf4h56; arc=none smtp.client-ip=202.12.124.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
-Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 42AD17A00D1;
-	Fri, 22 Aug 2025 20:21:33 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-12.internal (MEProxy); Fri, 22 Aug 2025 20:21:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm2;
-	 t=1755908493; x=1755994893; bh=Agxq40x54mBmQteI3c8NGdyKV8Zc84ga
-	mL9f6v24gsM=; b=Qkv3HLwcwUM2R/YlrbCt74hzF/ct0nEQrBM78izlbEzwUJ3/
-	cmwf+jObxAvvyE3+n9inhxOit4/dENfyjKSGC5Y3sWxCFHNi98Hb/wtxoYQTADco
-	eKhZgHGQ2w4Zk0/EBt8Pzy0iU2yCPgd0fvnW+O3wLLiiE+ZCWcbe11CBmD4e4lfr
-	UGyuLk1wtw1V8OhLzitmHOUIAqgNFTNjUihTODjF7cf1tFUS2gZZbA+i/I/km2en
-	arFcxG/vDNwPw9eJPXDRKxcbwIHmtkWZSmsIeMKGFKOmHfzknvYjnL1tVISNbLdS
-	WzlPtjGDJil6SYfBBcrk7DjvEtnHkchzziomWQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1755908493; x=
-	1755994893; bh=Agxq40x54mBmQteI3c8NGdyKV8Zc84gamL9f6v24gsM=; b=U
-	JQf4h56uExYOLPF7uSm1BuJ0l6EuL7Wc3r1T+9SnnmGoZprIJsiPE/7tyXrIZKMS
-	ct9UtWw7CigaXgx8aVMqj8Wo15zXhF5PkTskK18jPNWq21RWj0fyNiEOOc6BkYYN
-	hqgIqi0RR/+KrbCHnVN+SEHzepsqPdgLQv0UIOUdcdBtl72mdZoRtNldbh2Qr7FZ
-	mDbtxBTY71q0jxQwLuCKfthGq9FBPS9UuSHeEhWfhgPpG/Q7qRu6ZsPxWrDbSicn
-	Azh0OoZIIZ8BzPwSGdT+AvHh3g4fEUPB2JJf1YuWioJjB63l7om8YXJKwZdtR8AZ
-	f9TwAtDr4+SiY5rTl7SKw==
-X-ME-Sender: <xms:jAmpaNsaWJtZdvys-ICsIu_kIXpo2aFyGTty1F0JkMcueVmJaOvhAg>
-    <xme:jAmpaL_HEj-wmPdO4LESwByqmM-B1nzd3MvHxkVKCM8QbnXho021zgKkxnoIzm5HV
-    NewYajeG9VOYK0MQDU>
-X-ME-Received: <xmr:jAmpaP13h6t_2iJMq7dTWxt-8v8ARiOqOG98zjtix427oLjWbO55-Kcy05y33xsz-cK5ug>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdduieehudekucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhephffvvefujghfofggtgfgfffksehtqhertdertdejnecuhfhrohhmpeflrgihucgg
-    ohhssghurhhghhcuoehjvhesjhhvohhssghurhhghhdrnhgvtheqnecuggftrfgrthhtvg
-    hrnhepgeefgffhgffhhfejgfevkefhueekvefftefhgfdtuddtfeffueehleegleeiuefh
-    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepjhhvse
-    hjvhhoshgsuhhrghhhrdhnvghtpdhnsggprhgtphhtthhopeduvddpmhhouggvpehsmhht
-    phhouhhtpdhrtghpthhtoheprhgriihorhessghlrggtkhifrghllhdrohhrghdprhgtph
-    htthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheplhhiuhhh
-    rghnghgsihhnsehgmhgrihhlrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgoh
-    hoghhlvgdrtghomhdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgt
-    phhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshhhuhgrhheskh
-    gvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhn
-    rdgthhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
-X-ME-Proxy: <xmx:jAmpaIhyUIt4kDmdgu_ZCef66D0gJCIuwND-9VmnLg1o3zVakVf3lQ>
-    <xmx:jAmpaHZy8W-90cheywsy2y5OlGkCtIrFzicr06Jr5ICqj2WEH9rxXg>
-    <xmx:jAmpaMXhW-yeJD1g-v-jOluwkpSMCzKtG9I_sNsbuxLwTUeOM5AZzA>
-    <xmx:jAmpaHG-_4w2CppPXq461KDa-5Z2_Db1S2J2TdvRLjp7FzKy16wuMA>
-    <xmx:jQmpaDUr5PyxvYW1378QmU5eQ1aog1QS3lXLPOnZnrw28xm0qUjH4Jbu>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 22 Aug 2025 20:21:32 -0400 (EDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id D11CD9FCA6; Fri, 22 Aug 2025 17:21:30 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id CDECE9FC83;
-	Fri, 22 Aug 2025 17:21:30 -0700 (PDT)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: Hangbin Liu <liuhangbin@gmail.com>
-cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>,
-    Nikolay Aleksandrov <razor@blackwall.org>,
-    Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
-    linux-kselftest@vger.kernel.org, Qiuling Ren <qren@redhat.com>
-Subject: Re: [PATCH net 1/2] bonding: set random address only when slaves already exist
-In-reply-to: <20250820091009.393785-1-liuhangbin@gmail.com>
-References: <20250820091009.393785-1-liuhangbin@gmail.com>
-Comments: In-reply-to Hangbin Liu <liuhangbin@gmail.com>
-   message dated "Wed, 20 Aug 2025 09:10:08 -0000."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1755908997; c=relaxed/simple;
+	bh=fr9WqDO1kXpknKVJ9BLrEc7r1NzTIi3aSXwDL/pp+HU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=EUu97q2/wJdFhk/98yAw4rzKZ6PVph8A3PUPTIb0LD2L0mdbmGsWItohgOxuZ08RBYbBxo7P7kFeIGPnAKbj1BHLUCPJtT857Wr4d+d1gUwr7rzR845cuOvn/IqMEv2NrJ/h4gxACHoiaOAdThKIpO8ycbFc515hn2wGKZtpPZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WCQmpO1N; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27D07C4CEED;
+	Sat, 23 Aug 2025 00:29:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755908997;
+	bh=fr9WqDO1kXpknKVJ9BLrEc7r1NzTIi3aSXwDL/pp+HU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=WCQmpO1NvH8vhoCWkydcWFERJWdKsW5A4WBg4iaKtPMiUS2DoBRq5nS+w6UMpto2m
+	 nA1LC+eJ/8tVJc34NFxseYC+WhrenijULr1kevViF1iAzLeBa6AdMyqfboTX+eMqb4
+	 VlyCezAS0/u8x9cXcbv6oeiTdlSravoMz5DxVaOZJTGMgFTIK/OFQHj2xjvC2JsxUr
+	 gKFJkauvY6HKOD3wYndMLFTTscvCvASjn4U4fgjt2nLZ1WVRUafBj77pPBN71sFcBW
+	 Qlujftecs5qSO2+4et74m7qWchmbjBuWgTkjhdT38sEAXX8MLDHSpCekhX4JUZWpsW
+	 UiHdAwQFYHniw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33BFA383BF69;
+	Sat, 23 Aug 2025 00:30:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 22 Aug 2025 17:21:30 -0700
-Message-ID: <1546564.1755908490@famine>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1 net] atm: atmtcp: Prevent arbitrary write in
+ atmtcp_recv_control().
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175590900606.2040371.2846813817993723539.git-patchwork-notify@kernel.org>
+Date: Sat, 23 Aug 2025 00:30:06 +0000
+References: <20250821021901.2814721-1-kuniyu@google.com>
+In-Reply-To: <20250821021901.2814721-1-kuniyu@google.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: 3chas3@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, kuni1840@gmail.com,
+ linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+ syzbot+1741b56d54536f4ec349@syzkaller.appspotmail.com
 
-Hangbin Liu <liuhangbin@gmail.com> wrote:
+Hello:
 
->Commit 5c3bf6cba791 ("bonding: assign random address if device address is
->same as bond") fixed an issue where, after releasing the first slave and
->re-adding it to the bond with fail_over_mac=3Dfollow, both the active and
->backup slaves could end up with duplicate MAC addresses. To avoid this,
->the new slave was assigned a random address.
->
->However, if this happens when adding the very first slave, the bond=E2=80=
-=99s
->hardware address is set to match the slave=E2=80=99s. Later, during the
->fail_over_mac=3Dfollow check, the slave=E2=80=99s MAC is randomized becaus=
-e it
->naturally matches the bond, which is incorrect.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-	The description here seems confusing to me; what does "this"
-refer to?  I don't understand the sequence of events that lead to the
-issue being fixed here.
+On Thu, 21 Aug 2025 02:18:24 +0000 you wrote:
+> syzbot reported the splat below. [0]
+> 
+> When atmtcp_v_open() or atmtcp_v_close() is called via connect()
+> or close(), atmtcp_send_control() is called to send an in-kernel
+> special message.
+> 
+> The message has ATMTCP_HDR_MAGIC in atmtcp_control.hdr.length.
+> Also, a pointer of struct atm_vcc is set to atmtcp_control.vcc.
+> 
+> [...]
 
-	I wonder if there's another bug somewhere, since nominally when
-releasing the last interface in the bond, __bond_release_one() should
-randomize the bond's MAC address, so it shouldn't match when adding (or
-re-adding ?) the first interface to the bond.
+Here is the summary with links:
+  - [v1,net] atm: atmtcp: Prevent arbitrary write in atmtcp_recv_control().
+    https://git.kernel.org/netdev/net/c/ec79003c5f9d
 
-	-J
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
->The issue is normally hidden since the first slave usually becomes the
->active one, which restores the bond's MAC address. However, if another
->slave is selected as the initial active interface, the issue becomes visib=
-le.
->
->Fix this by assigning a random address only when slaves already exist in
->the bond.
->
->Fixes: 5c3bf6cba791 ("bonding: assign random address if device address is =
-same as bond")
->Reported-by: Qiuling Ren <qren@redhat.com>
->Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
->---
-> drivers/net/bonding/bond_main.c | 1 +
-> 1 file changed, 1 insertion(+)
->
->diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_ma=
-in.c
->index 257333c88710..8832bc9f107b 100644
->--- a/drivers/net/bonding/bond_main.c
->+++ b/drivers/net/bonding/bond_main.c
->@@ -2132,6 +2132,7 @@ int bond_enslave(struct net_device *bond_dev, struct=
- net_device *slave_dev,
-> 		memcpy(ss.__data, bond_dev->dev_addr, bond_dev->addr_len);
-> 	} else if (bond->params.fail_over_mac =3D=3D BOND_FOM_FOLLOW &&
-> 		   BOND_MODE(bond) =3D=3D BOND_MODE_ACTIVEBACKUP &&
->+		   bond_has_slaves(bond) &&
-> 		   memcmp(slave_dev->dev_addr, bond_dev->dev_addr, bond_dev->addr_len) =
-=3D=3D 0) {
-> 		/* Set slave to random address to avoid duplicate mac
-> 		 * address in later fail over.
->--=20
->2.50.1
->
-
----
-	-Jay Vosburgh, jv@jvosburgh.net
 
 
