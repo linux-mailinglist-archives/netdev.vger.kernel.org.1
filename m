@@ -1,143 +1,168 @@
-Return-Path: <netdev+bounces-216223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6683BB32A34
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 18:04:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E330FB32AD2
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 18:23:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA32A1C2452E
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 16:03:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6E6A1C25F3F
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 16:18:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CDFA2EBDFD;
-	Sat, 23 Aug 2025 16:00:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EEC920B7EC;
+	Sat, 23 Aug 2025 16:16:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PXzPEmz3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nee8vDpF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
+Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E627F2EBDD7;
-	Sat, 23 Aug 2025 16:00:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C95DC1FDE09;
+	Sat, 23 Aug 2025 16:16:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755964840; cv=none; b=s1MOez6qc+zCyjot6Hyv4hK0aOqu1DMq6/ryxGP8t/Q3lvbpNnIG6XFE+lnjmWEDzLw+5CbAnmMTavzM5QkyefdEdjJbAB0bSbC4eLwfF9hP3FcQ0ku5pD3/0iL+BVudeyl6u3lsuDG9B2duCzi8pdNAGhrwKyqUvzFPKGIwe90=
+	t=1755965767; cv=none; b=eYA1dk+CxQH9/sK98shRDnFBg2rWA0KxG5jimAp9NR/wz3DRJJ7rfJR2p2642be7ITnd996eMMWbyowEV3+r0lfRoy1tCoBx4G97PzkhCwn7iXrTPPyoltqO78DTL5O3T/HnVZoywR9u8OAvCauS1K4OB1GNG6xV9eH22Qhzkxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755964840; c=relaxed/simple;
-	bh=iO8Ut6aq0eYMHUnd4gxlenxyD0LxRDw24+ofb0GRSAk=;
+	s=arc-20240116; t=1755965767; c=relaxed/simple;
+	bh=Q3Ijr4ja96ac2m91zgKJC3FKj3CDJoRZdtohiWNdhjg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UQ32psTxPdjZsXw0sCxh9wimI3Nbc4pgtEqCMYhIJcXlVQfpUDo/hbXh5kBDpY4iskGr3c+CX+iBqmkEuS3c80i6qRYMdjVcWvi/Oo9NOowd0p5/U8cHjaMX78pfILPO26o09u8U55maj+BWseuGRVcpVTtyXJw3IVDQHB40Qn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PXzPEmz3; arc=none smtp.client-ip=209.85.219.175
+	 To:Cc:Content-Type; b=Emx/feM1nf/LwKGKcraUyGa1T/jIJ8PrJDZYZsKALJBitmjWA/ONTp80nXZnQITX16HKCt/TGGgdFgHCTMHU0NsQ9phAB7ZprnJRdSxFVUWqL0qSSi9byZuLWAwuv7D/wpFtu68/+ksyL2Z6+pKjQw6adZSqzfrt+VX76vxmeag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nee8vDpF; arc=none smtp.client-ip=209.85.166.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e953b4c88e5so8070276.3;
-        Sat, 23 Aug 2025 09:00:37 -0700 (PDT)
+Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-88432e1af6dso213078039f.2;
+        Sat, 23 Aug 2025 09:16:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755964837; x=1756569637; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1755965765; x=1756570565; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=iO8Ut6aq0eYMHUnd4gxlenxyD0LxRDw24+ofb0GRSAk=;
-        b=PXzPEmz3jv0KrzbgaFbB8VKAyM45Jgcp++yQW9eb570yT80h2gx8+tUG7CEK8AxfRM
-         3j6dkCENy4TitbabI2cNzWgmZPsesu6ac5lJH81DVIDPYKUt9KgjK0y8htjqTxyr1+3o
-         azm7tNB0vMu+cqJoeqLsMT/izCO4C1leGBnBzLQzPRdTq03oHL1hL6rZkVNB2Ump/hjn
-         a0OFYTJK7vJgVrWr3tlICkTnzQvmU6CyT2o1NYm4LQblsLokxEyhRF5t6tDa+zWSOYjE
-         HSK+zEwVdSAYXkE6eY9CeEFGEfHw/bRP2ywPOVCYqycaQ6wqpFAqQUve0OAEND0M8Gnk
-         ktsQ==
+        bh=AWgxItAgYQsCgLUpyil58tulWppM9RxDdbbAZq3mTH8=;
+        b=nee8vDpFz0utkWcGeW2qjAWDAWXJfhs7hOpwvX4ms9usH/29zCO8brHFspAVPeS8BZ
+         XqCbcYNmLBSM2NgsL7byfvZNB/8y1bUfSbDPTyJnycltfFJfZkHAmb3Afqb4e3k99ZNt
+         yyh4Wvy492iEg4JsWLZDoiHkN7B1xwl/GeLlVAvRUIjSJz4/NZKpewAq638SkJlohCyo
+         1V9DVXzo48gluJmQNDUwbO73RCsMHhP2DRocvnLNm4q5S5PxNBIHsB45ctIzK2rzZIwz
+         KbVjSS1JMRtZjOh9LmsQMKqr9urdu+e3qhsZv6R/wtYPCT3RyQE3JFz9afKeIIHZsqf3
+         qlWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755964837; x=1756569637;
+        d=1e100.net; s=20230601; t=1755965765; x=1756570565;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=iO8Ut6aq0eYMHUnd4gxlenxyD0LxRDw24+ofb0GRSAk=;
-        b=IveZQX7DDLwqmRPA5cKmcuN5VUlRfgN6X/xGOXjpHSvr9UdX+drTKdulE0Q0wnjdeN
-         68+eDwzQPB795Y8KPhC9qr6VwQx8nkWqqi0CM/27e3YCdaDT7kAW0gm/g2f7uGBlxPa7
-         4UZhYY+XRNgCTA/h7qFclm47YnpEhWMDKdApDRhqB5NxhiT4n7G8au/THSyEoWCGjOmv
-         VdHexREK4KVn1gdaLwl9USBqxWLsBhS+IrtijZ25M8EFA9KVQYNI6MsBvWVBDrqphMe4
-         rLNbHXu/zC0pRY7dMWNWzk8jrthKYv08EWYmq1+QHE7RhHi8smvajNNsfMQrkeA1r8nd
-         Bmkg==
-X-Forwarded-Encrypted: i=1; AJvYcCWyg5HZCnkAurQ+yrJSx+pmhpyV5t1cbzCXkXlqAtQUwf/yy5/wZCiJCdPfpJww3B+qD8FZSWSO@vger.kernel.org, AJvYcCXUzNMZH3Ne47aHgaSvEIJ2oqa+urUPXuVrYPRxpxVqL4pLU2IMgYd+3RCfEhhLvm/p8//Zf5g0qmNtiPI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfeHkIDZmmZpowQf+vjP8CUaT33V15EYO3L6S6c6LOvvNqC8Ur
-	6OOuvy7uOR9NJcov4vJ9/aQmAODb7fEHGkfsbuMbbToRfck8Rd9MWmaxEIZmBbXPzLnBMIaduwP
-	yM11+Mut4Hh/1vjz9Lyg+AWD9wrrVQJs=
-X-Gm-Gg: ASbGncuRGPJVg8jCUtGeE0Kbg+ktM6ukK5fagTbjlnekTKbgE6oBOSpoFvtdBB9R35p
-	KZWgoC4Svbw9VhbK+OMaoqIhMYPKU7hsVMNXID7DekCzqECIJcmOh7hb6fnEdDfHenLFBKKOoq5
-	KXKz/rs+yWPbYcHhPQT5wvpOsdR1TZTvL6fKzmkvh/yckL0eNkaf7dZwLJLpJs/YHjWKT+XFwhe
-	kFxEA==
-X-Google-Smtp-Source: AGHT+IES5ihDGjqAR0RRt3hF8QgCHXA+ZIjUzFa+DEVMA0B4xc/+RMPiK2gyU3CMD3MqULp5IJtN7L+EbjIGKUsJDXo=
-X-Received: by 2002:a05:690c:968f:b0:71e:719c:491c with SMTP id
- 00721157ae682-71fdc2e6c75mr73920927b3.18.1755964836651; Sat, 23 Aug 2025
- 09:00:36 -0700 (PDT)
+        bh=AWgxItAgYQsCgLUpyil58tulWppM9RxDdbbAZq3mTH8=;
+        b=T8l/YTlrGep+rXwoye3oBdSsrVWnkqcVLQqFaBTfo017RGinAkQEohcjMSIXDhgEeV
+         3VJDeOWpA5IkRbYvsh4NC1+mfXNgdqWRUXLzbPiuBomWUoWv1yBHerfdOqbtH/6YS66W
+         /SYCmoeuzJPp0DFl4xDWyzH3ALM5OV1BO11BRpD29XP0EJCx7UlB1aTH3paump+qPIP2
+         fvo5xQJIjB8CHliUJQo+6Ufz/2CLIt842/OFVLvsNRl7BE0kHI2s0Gmej1wWuA0a3K7O
+         kaIq8lQcSu48FJdHhtXDksAxSGCrZPSdXbPR6pt0Zwsk6m7GTXhf6QsWZgzs8aD93Yke
+         TM7w==
+X-Forwarded-Encrypted: i=1; AJvYcCVieCE9JVDdxqoonh/pOx9kLpuDzI2yApnhw9WdoJJC1aUDC9r7NUeWQQY4cg23o/GJvR2FCJBn4IYy@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7TmTpJ2+RcXdcco5VSIC51dggfOhJ+Pof/5DACvZwbKLCI5zm
+	9y3+y8Q70ZGIG6wXxgjVz5faqSP2GhAk4ZHH9o2WW6Q3e3+A4m4F8Gymib4M/xOOH9BPo6S3mYG
+	/sXXLRIAEfCLmj6CS8fgqoRxMo/b/bVY=
+X-Gm-Gg: ASbGnctNS6VQGEUVWisXK67xmjReMXqpjxy2KhAEK6KuyEsljXCVeu7MnKh/1X+E3Am
+	Y0qQF9nTgoTSQNUi+ZSV/9hbe5iSSX8xjqCGBtNs3B4OFRc/qHZaJB6aPE7NvelqAGse0zrTs7g
+	F6vHsZQjur3+hgZi6/2GEBRLIFvsf91w0bcr2KPFPtWxyDQbXTTmv6KXvZdIC5XVIrX4+0H3m8i
+	WdBUgro9QeFjTLlrBHW
+X-Google-Smtp-Source: AGHT+IGMB/8UuqwI+eA7R0raDmgE6VVQo9t0+NLRXm+dEW1N/1+RO5BG5zPgKsBurXL22e1u190cFKV4FZWjpQ/JLiY=
+X-Received: by 2002:a92:cd88:0:b0:3e5:4816:8bca with SMTP id
+ e9e14a558f8ab-3e921a5d7a2mr115332425ab.12.1755965764716; Sat, 23 Aug 2025
+ 09:16:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250823090617.15329-1-jonas.gorski@gmail.com>
- <4469d2cd-5927-4344-acb0-bc7d35925bb1@lunn.ch> <CAOiHx=nC5f9-2-XPCKBVuVsh93NSrmbSQJp8RqF3EObbEq+OOw@mail.gmail.com>
- <a0e637f9-e612-4651-8b12-8cb82dd23c55@lunn.ch>
-In-Reply-To: <a0e637f9-e612-4651-8b12-8cb82dd23c55@lunn.ch>
-From: Jonas Gorski <jonas.gorski@gmail.com>
-Date: Sat, 23 Aug 2025 18:00:25 +0200
-X-Gm-Features: Ac12FXy130jNTN6ZhiMK4cPK4U_24XPWcgZUHx7vEHaACavZpynUZkQEhvW7kSM
-Message-ID: <CAOiHx=mnXYmSsYzHQYDAnBg6vKzo0oj07hbiCJBVBegDbv4NAQ@mail.gmail.com>
-Subject: Re: [PATCH net] net: dsa: b53: fix ageing time for BCM53101
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+References: <cover.1755525878.git.lucien.xin@gmail.com> <e7d5e3954c0d779e999dc50a9b03d9f7ed94dbd2.1755525878.git.lucien.xin@gmail.com>
+ <7fd0f513-df05-43f4-b1dc-0fdb74e78378@akamai.com>
+In-Reply-To: <7fd0f513-df05-43f4-b1dc-0fdb74e78378@akamai.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Sat, 23 Aug 2025 12:15:53 -0400
+X-Gm-Features: Ac12FXy_8xGDeqHoDT-ySDSOepCnWzY4imjS_XVu68giUoWF9t-QKARx-CULpvw
+Message-ID: <CADvbK_dwH2WXWZFym5R2wbjBW0qkoLyxip+uRT751ELGqk0rog@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 07/15] quic: add connection id management
+To: Jason Baron <jbaron@akamai.com>
+Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net, kuba@kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
+	Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Benjamin Coddington <bcodding@redhat.com>, Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, 
+	Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe" <alibuda@linux.alibaba.com>, 
+	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Aug 23, 2025 at 5:31=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+On Fri, Aug 22, 2025 at 1:11=E2=80=AFPM Jason Baron <jbaron@akamai.com> wro=
+te:
 >
-> On Sat, Aug 23, 2025 at 05:27:02PM +0200, Jonas Gorski wrote:
-> > Hi,
-> >
-> > On Sat, Aug 23, 2025 at 5:00=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wr=
-ote:
-> > >
-> > > On Sat, Aug 23, 2025 at 11:06:16AM +0200, Jonas Gorski wrote:
-> > > > For some reason Broadcom decided that BCM53101 uses 0.5s increments=
- for
-> > > > the ageing time register, but kept the field width the same [1]. Du=
-e to
-> > > > this, the actual ageing time was always half of what was configured=
-.
-> > > >
-> > > > Fix this by adapting the limits and value calculation for BCM53101.
-> > > >
-> > > > [1] https://github.com/Broadcom-Network-Switching-Software/OpenMDK/=
-blob/master/cdk/PKG/chip/bcm53101/bcm53101_a0_defs.h#L28966
-> > >
-> > > Is line 28966 correct? In order to find a reference to age, i needed
-> > > to search further in the file.
-> >
-> > Hm, indeed, it's #30768. Not sure where that original line came from,
-> > maybe I miss-clicked before copying the link in the address bar.
+> Hi Xin,
 >
-> Or a new version has been dumped there, changing all the line numbers?
-> I've not looked, is there a tag you can use instead of master?
+> On 8/18/25 10:04 AM, Xin Long wrote:
+> > !-------------------------------------------------------------------|
+> >    This Message Is From an External Sender
+> >    This message came from outside your organization.
+> > |-------------------------------------------------------------------!
+> >
+> > This patch introduces 'struct quic_conn_id_set' for managing Connection
+> > IDs (CIDs), which are represented by 'struct quic_source_conn_id'
+> > and 'struct quic_dest_conn_id'.
+> >
+> > It provides helpers to add and remove CIDs from the set, and handles
+> > insertion of source CIDs into the global connection ID hash table
+> > when necessary.
+> >
+> > - quic_conn_id_add(): Add a new Connection ID to the set, and inserts
+> >    it to conn_id hash table if it is a source conn_id.
+> >
+> > - quic_conn_id_remove(): Remove connection IDs the set with sequence
+> >    numbers less than or equal to a number.
+> >
+> > It also adds utilities to look up CIDs by value or sequence number,
+> > search the global hash table for incoming packets, and check for
+> > stateless reset tokens among destination CIDs. These functions are
+> > essential for RX path connection lookup and stateless reset processing.
+> >
+> > - quic_conn_id_find(): Find a Connection ID in the set by seq number.
+> >
+> > - quic_conn_id_lookup(): Lookup a Connection ID from global hash table
+> >    using the ID value, typically used for socket lookup on the RX path.
+> >
+> > - quic_conn_id_token_exists(): Check if a stateless reset token exists
+> >    in any dest Connection ID (used during stateless reset processing).
+> >
+> > Signed-off-by: Xin Long <lucien.xin@gmail.com>
+> > ---
+>
+> Thanks Xin for all your work on this!
+>
+> For QUIC-LB, where the server endpoint may want to choose a specific
+> source CID to enable 'stateless' routing, I don't currently see an API
+> to allow that? It appears source CIDs are created with random values and
+> while userspace can get/set the indexes of the current ones in use, I
+> don't see a way to set specific CID values?
+>
+> For reference here is a proposal around it -
+> https://datatracker.ietf.org/doc/draft-ietf-quic-load-balancers/
+>
+> In the reference above, the source CID is encrypted to help protect
+> traceability if the connection migrates. Thus, if the kernel were to
+> support such a feature, I don't think it wants to enforce a specific
+> encoding scheme, but perhaps it might want to be a privileged operation,
+> perhaps requiring CAP_NET_ADMIN to set specific source CIDs.
+>
+Hi, Jason,
 
-Uh, indeed the repository was updated. I didn't expect that, since its
-was unchanged since its creation in 2020 with a single commit, so I
-assumed Broadcom abandoned it like they did with a lot of other
-repositories, and treated it as a static code dump.
+We currently support only the finalized QUIC RFCs. Drafts like
+'Load Balancers' and 'Multipath' aren=E2=80=99t covered yet. I think
+we will plan the APIs after they are standardized.
 
-Though they force pushed a new master. Well, "new". master is now
-v2.10.9, and was previously v2.11.0. Don't ask me. But at least they
-also added tags for the two versions.
-
-So https://github.com/Broadcom/OpenMDK/blob/v2.11.0/cdk/PKG/chip/bcm53101/b=
-cm53101_a0_defs.h#L28966
-is what the link should now be (they also moved the repository).
-
-That's not the first time I saw Broadcom force pushing to a public
-(SDK) repository, so that link might also break eventually anyway.
-
-Best regards,
-Jonas
+Thanks for pointing out this RFC.
 
