@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-216193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41BFFB32780
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 09:56:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29AE4B32781
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 09:56:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D8CD687445
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 07:56:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 434A65A63DF
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 07:56:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 720B7223338;
-	Sat, 23 Aug 2025 07:56:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67C2B22B5B8;
+	Sat, 23 Aug 2025 07:56:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WyQpAI8W"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cmBcOvuf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE07150997
-	for <netdev@vger.kernel.org>; Sat, 23 Aug 2025 07:56:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43970150997
+	for <netdev@vger.kernel.org>; Sat, 23 Aug 2025 07:56:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755935785; cv=none; b=EYP5VI8Ink7zwBkYCd3diWCQCLw4l83bYOrgFVosy/J69LFewhelI8Vj8+Fu2KrwiY5cLIwlginaMoz67yhceMe9hlxOYDbGDL5Zq7YWdAJQJBFaqYSO/djWyJW2U4006Py5F1rL3JgMVjSdKv4EJ76Dd9YLKF5OVYEfZ2bGRX8=
+	t=1755935788; cv=none; b=T7SIp9saF6cIeEm/NBO/Rl2NWTcZhlcgbgtUxo6/Dt9tXnW3k0XkFgwWtUO097RwIhnNowlI/Qz2OxG+s773WxeZvLvvffYvh7r+ssQXwf+kkpcOzZVF+YOzF/FpQu3ycMETHM+Aci/zevR3ZvIttkWM20UyBBrCDh/vkOrMgnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755935785; c=relaxed/simple;
-	bh=jH/zfECS1KSBq9y+UHL0sl+KGHKSrnJ/X+waTIEZKUs=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=TNrh7hHcj2noRBgajtJR1rprNkLyVgKdu/nFXZWwkQARADvPNOTZrYDcvBWOZEjZ5M2XRCsLFvCBLW7XfrxniLM4saW36bwsKxrAJSZqoynf7tPbT//mz4oJR1LD220tZAyxeLG9eSe6bVHcSle+mTRK3OIc1Yju7uU2cGSD8MU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WyQpAI8W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73F99C4CEE7;
-	Sat, 23 Aug 2025 07:56:24 +0000 (UTC)
+	s=arc-20240116; t=1755935788; c=relaxed/simple;
+	bh=bUhhisMpwunCiVpJimsogShTnS7b3lFsORIaZ4diA6I=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=Vu/FMtbI2lfnNxYhIZl8M3elAcjj7KAqwz2GvapNo93EkbhnR7eX+GYyteFvPoC2YH8Xd24C5qZ5HtYY+E3of8UDai46jTmUMggsvrWRTaljnjJ6ojrurTjNK67qPhPfii51mIPXqvpcoolq+613/Z8qxaIlCJV/IjHZOI92rjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cmBcOvuf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EE63C4CEE7;
+	Sat, 23 Aug 2025 07:56:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755935784;
-	bh=jH/zfECS1KSBq9y+UHL0sl+KGHKSrnJ/X+waTIEZKUs=;
-	h=From:Subject:Date:To:Cc:From;
-	b=WyQpAI8W8xXT2XCFMrkjkY3lqT3p0RkvOk1Ku7XJ/l2f52GHpOzG3g7yAELI9pOZD
-	 EWEUzAIoMXh7IMRDUVGkhAvJF6BwMJ6ei8KmZNnY+bKURE6GFx89IH/zPjbPpToE5Y
-	 e0y4Oueij+R+/GAIy3lsA8FB/cVHAGBDpsJaOdNI0y8/kdMki+Qa+yWldOesesTNip
-	 tG/bDgH6an8Qa9FAMyCodDOhalNmjwj8vvFyxynQ1wEHF7DQzmiz48aP6StHnFOM1x
-	 iBd3k60anVS4YJijSNu8hVJT/6E3OujL4n6Gb0UYAgS2e+od5t7IrgQO0qUh5yDGc1
-	 JtN4RagS/HsCg==
+	s=k20201202; t=1755935787;
+	bh=bUhhisMpwunCiVpJimsogShTnS7b3lFsORIaZ4diA6I=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=cmBcOvufqRiTIVI2CcRlHEkYOr9lQEMA+fzMI9PSFqFWxHhwLZMRrGVemG833UKyS
+	 2/zkTP3+JIkkKhoHjWn/j16HKtzH8gmYmRdb5CemGDQOwXD4pzF0JsOa9hKqwyxHNk
+	 kQ+yu4ZmzLMwJjG2PpvDsH7kN7WRCAiLxdr4mOzFokoqqeMJyeL5lUsUZsGJXFjRRv
+	 pYy7SxlK3i85hWDlwz9pQHohRtwAtdKZkPsYGUZVhF0L+HXya76UvAqxz56XBis9hi
+	 KSmLgtW8kK4YApjb6SXrjn/YhuJskKxmVrE+SA7KF3InKB9oSvFZdywPn9ZxMrCTi/
+	 NslgmI3XzSYqg==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Subject: [PATCH net-next v3 0/3] net: airoha: Add PPE support for RX wlan
- offload
-Date: Sat, 23 Aug 2025 09:56:01 +0200
-Message-Id: <20250823-airoha-en7581-wlan-rx-offload-v3-0-f78600ec3ed8@kernel.org>
+Date: Sat, 23 Aug 2025 09:56:02 +0200
+Subject: [PATCH net-next v3 1/3] net: airoha: Rely on airoha_eth struct in
+ airoha_ppe_flow_offload_cmd signature
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,11 +53,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIABF0qWgC/43NQQ6CMBCF4auYrh3TDkLBlfcwLiYwhUbSmtZUD
- OHuFla60uX/Ft+bReRgOYrTbhaBk43WuxzFfifagVzPYLvcAiWWslYNkA1+IGCny1rBcyQHYQJ
- vzOipA4VsTFW1BoujyMY9sLHT5l+uuQcbHz68truk1vVfOSmQoBXJRrNkJHW+cXA8HnzoxUon/
- OAQf3GYuZp0xaorDLf4xS3L8gbmzAWiGgEAAA==
-X-Change-ID: 20250819-airoha-en7581-wlan-rx-offload-12eff66cf234
+Message-Id: <20250823-airoha-en7581-wlan-rx-offload-v3-1-f78600ec3ed8@kernel.org>
+References: <20250823-airoha-en7581-wlan-rx-offload-v3-0-f78600ec3ed8@kernel.org>
+In-Reply-To: <20250823-airoha-en7581-wlan-rx-offload-v3-0-f78600ec3ed8@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -66,37 +64,97 @@ Cc: linux-arm-kernel@lists.infradead.org,
  linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
 X-Mailer: b4 0.14.2
 
-Introduce the missing bits to airoha ppe driver to offload traffic received
-by the MT76 driver (wireless NIC) and forwarded by the Packet Processor
-Engine (PPE) to the ethernet interface.
+Rely on airoha_eth struct in airoha_ppe_flow_offload_cmd routine
+signature and in all the called subroutines.
+This is a preliminary patch to introduce flowtable offload for traffic
+received by the wlan NIC and forwarded to the ethernet one.
 
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
-Changes in v3:
-- Fix compilation error when CONFIG_NET_AIROHA is not enabled
-- Link to v2: https://lore.kernel.org/r/20250822-airoha-en7581-wlan-rx-offload-v2-0-8a76e1d3fec2@kernel.org
+ drivers/net/ethernet/airoha/airoha_ppe.c | 20 ++++++++------------
+ 1 file changed, 8 insertions(+), 12 deletions(-)
 
-Changes in v2:
-- Rebase on top of net-next main branch
-- Link to v1: https://lore.kernel.org/r/20250819-airoha-en7581-wlan-rx-offload-v1-0-71a097e0e2a1@kernel.org
+diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
+index 0d5cd3a13a3ee3d877f344ee0644d76d1c9df74a..36b45e98279a1d18ef0c7e185d8fca7b32c70436 100644
+--- a/drivers/net/ethernet/airoha/airoha_ppe.c
++++ b/drivers/net/ethernet/airoha/airoha_ppe.c
+@@ -935,11 +935,10 @@ static int airoha_ppe_entry_idle_time(struct airoha_ppe *ppe,
+ 	return airoha_ppe_get_entry_idle_time(ppe, e->data.ib1);
+ }
+ 
+-static int airoha_ppe_flow_offload_replace(struct airoha_gdm_port *port,
++static int airoha_ppe_flow_offload_replace(struct airoha_eth *eth,
+ 					   struct flow_cls_offload *f)
+ {
+ 	struct flow_rule *rule = flow_cls_offload_flow_rule(f);
+-	struct airoha_eth *eth = port->qdma->eth;
+ 	struct airoha_flow_table_entry *e;
+ 	struct airoha_flow_data data = {};
+ 	struct net_device *odev = NULL;
+@@ -1136,10 +1135,9 @@ static int airoha_ppe_flow_offload_replace(struct airoha_gdm_port *port,
+ 	return err;
+ }
+ 
+-static int airoha_ppe_flow_offload_destroy(struct airoha_gdm_port *port,
++static int airoha_ppe_flow_offload_destroy(struct airoha_eth *eth,
+ 					   struct flow_cls_offload *f)
+ {
+-	struct airoha_eth *eth = port->qdma->eth;
+ 	struct airoha_flow_table_entry *e;
+ 
+ 	e = rhashtable_lookup(&eth->flow_table, &f->cookie,
+@@ -1182,10 +1180,9 @@ void airoha_ppe_foe_entry_get_stats(struct airoha_ppe *ppe, u32 hash,
+ 	rcu_read_unlock();
+ }
+ 
+-static int airoha_ppe_flow_offload_stats(struct airoha_gdm_port *port,
++static int airoha_ppe_flow_offload_stats(struct airoha_eth *eth,
+ 					 struct flow_cls_offload *f)
+ {
+-	struct airoha_eth *eth = port->qdma->eth;
+ 	struct airoha_flow_table_entry *e;
+ 	u32 idle;
+ 
+@@ -1209,16 +1206,16 @@ static int airoha_ppe_flow_offload_stats(struct airoha_gdm_port *port,
+ 	return 0;
+ }
+ 
+-static int airoha_ppe_flow_offload_cmd(struct airoha_gdm_port *port,
++static int airoha_ppe_flow_offload_cmd(struct airoha_eth *eth,
+ 				       struct flow_cls_offload *f)
+ {
+ 	switch (f->command) {
+ 	case FLOW_CLS_REPLACE:
+-		return airoha_ppe_flow_offload_replace(port, f);
++		return airoha_ppe_flow_offload_replace(eth, f);
+ 	case FLOW_CLS_DESTROY:
+-		return airoha_ppe_flow_offload_destroy(port, f);
++		return airoha_ppe_flow_offload_destroy(eth, f);
+ 	case FLOW_CLS_STATS:
+-		return airoha_ppe_flow_offload_stats(port, f);
++		return airoha_ppe_flow_offload_stats(eth, f);
+ 	default:
+ 		break;
+ 	}
+@@ -1288,7 +1285,6 @@ static int airoha_ppe_offload_setup(struct airoha_eth *eth)
+ int airoha_ppe_setup_tc_block_cb(struct net_device *dev, void *type_data)
+ {
+ 	struct airoha_gdm_port *port = netdev_priv(dev);
+-	struct flow_cls_offload *cls = type_data;
+ 	struct airoha_eth *eth = port->qdma->eth;
+ 	int err = 0;
+ 
+@@ -1297,7 +1293,7 @@ int airoha_ppe_setup_tc_block_cb(struct net_device *dev, void *type_data)
+ 	if (!eth->npu)
+ 		err = airoha_ppe_offload_setup(eth);
+ 	if (!err)
+-		err = airoha_ppe_flow_offload_cmd(port, cls);
++		err = airoha_ppe_flow_offload_cmd(eth, type_data);
+ 
+ 	mutex_unlock(&flow_offload_mutex);
+ 
 
----
-Lorenzo Bianconi (3):
-      net: airoha: Rely on airoha_eth struct in airoha_ppe_flow_offload_cmd signature
-      net: airoha: Add airoha_ppe_dev struct definition
-      net: airoha: Introduce check_skb callback in ppe_dev ops
-
- drivers/net/ethernet/airoha/airoha_eth.c  |   7 +-
- drivers/net/ethernet/airoha/airoha_eth.h  |  12 ++--
- drivers/net/ethernet/airoha/airoha_npu.c  |   1 -
- drivers/net/ethernet/airoha/airoha_ppe.c  | 112 +++++++++++++++++++++++-------
- include/linux/soc/airoha/airoha_offload.h |  55 +++++++++++++++
- 5 files changed, 150 insertions(+), 37 deletions(-)
----
-base-commit: b1c92cdf5af3198e8fbc1345a80e2a1dff386c02
-change-id: 20250819-airoha-en7581-wlan-rx-offload-12eff66cf234
-
-Best regards,
 -- 
-Lorenzo Bianconi <lorenzo@kernel.org>
+2.50.1
 
 
