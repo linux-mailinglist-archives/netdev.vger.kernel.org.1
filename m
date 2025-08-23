@@ -1,221 +1,163 @@
-Return-Path: <netdev+bounces-216201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 174B5B327DE
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 11:02:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 77C04B327D9
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 11:01:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 084491896BA0
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 09:02:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB8231899DD3
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 09:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43B77230BCE;
-	Sat, 23 Aug 2025 09:01:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4A2123E352;
+	Sat, 23 Aug 2025 09:00:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.co.jp header.i=@amazon.co.jp header.b="LHcJ42Yy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rOGkWtsU"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.34.181.151])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 873BF212545;
-	Sat, 23 Aug 2025 09:01:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.34.181.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E76D23D7DB;
+	Sat, 23 Aug 2025 09:00:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755939718; cv=none; b=tq62J3ujTwuIbdKII8g5U+XgEPQgd/UZZO1GGRuLgzKoh0NFk4G7iKqc/ytbStmv4d8T4VYfPZYfIcMKVbjfihpRW0jR/Z7GK5Bj+GmlxvcJh+P4k5q//ucKOoPIGv9kbacHuwVn7rtSBlOWDe4jrQJPYOKy0VjKy6LDZ39d9ZA=
+	t=1755939608; cv=none; b=dXrcrm8x496Q3BhRjfrSmPxOp10jyaAinCDl3BOpaKl4l+/KIdn03FlNPqs4ilQwhpbkb1umSvHME8OQCqxgTBWu6J9I6ZNqPiOMmDX8eAlzyh0aihrJAqHvO4mdNnbvAhsTDi8I3jWTrPbOxPZH6geh1gylc1FrKylxVqK3u/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755939718; c=relaxed/simple;
-	bh=D3vFASqPjDCmiPDNpgJvY/+g7nVIcCYSptQ1ahjgnO8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qrJV0khG/6u0+UGMobO0TIFqzh10JHdL00NjIZIckXAdnw6NE2cp0mbUANvMceUX+N1c3qI1j4L2ubx99vz6hfowTsISavI7PszRzELn+2tsIi2kkFoFF5DKojHK5JZrs+UFPli6wmB8r4ocNIzu42G9nIh+CfXcmxxILlrGcPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.jp; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.co.jp header.i=@amazon.co.jp header.b=LHcJ42Yy; arc=none smtp.client-ip=52.34.181.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.jp; i=@amazon.co.jp; q=dns/txt;
-  s=amazoncorp2; t=1755939716; x=1787475716;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=yfr0WjtUFSH+Xc22g+u7kEHxHSSPEEsg3kvT9H82znE=;
-  b=LHcJ42YyD6J+h2rb6hTd5an+bgqauZHagwEUZKVn4+zgN7pU05E1yDKo
-   2K13UgpIatfu/mGH9dZrMeVUZtxRXGb5t7fIT+Rz8vQtFFSWg0h4CKcYG
-   lvdDSaUdWi5SC6xfFycmR9EqmM0XxskcWAjpD27NIKujiNGqXIQrGRhBB
-   B6xTz2bDZ4X7Z6gz86e/Al8wlgtxjeaxUbaCGlYltk1u7nfXXCNi72mzO
-   iyzvEzcsSPTatDbwO46kGLd+s6O4hXOsZSCIpRTE7bmbAD4h5ACNyKzUD
-   KFCm9hJ/TnYZwakJ5K4Dfqw2loqhSMWVjLXOY/pnVxayedCNkQWWJnpI6
-   g==;
-X-CSE-ConnectionGUID: fB1qgJaSSqytTAnbea5jxQ==
-X-CSE-MsgGUID: GHamxantRCKxNhLDwgax0A==
-X-IronPort-AV: E=Sophos;i="6.17,312,1747699200"; 
-   d="scan'208";a="1668684"
-Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
-  by internal-pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2025 09:01:55 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:18856]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.52.244:2525] with esmtp (Farcaster)
- id 91958734-fe91-4d2d-a220-d0a76b824bb7; Sat, 23 Aug 2025 09:01:55 +0000 (UTC)
-X-Farcaster-Flow-ID: 91958734-fe91-4d2d-a220-d0a76b824bb7
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
- Sat, 23 Aug 2025 09:01:55 +0000
-Received: from 80a9974c3af6.amazon.com (10.37.244.14) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
- Sat, 23 Aug 2025 09:01:53 +0000
-From: Takamitsu Iwai <takamitz@amazon.co.jp>
-To: <linux-hams@vger.kernel.org>, <netdev@vger.kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Takamitsu Iwai
-	<takamitz@amazon.co.jp>, Kohei Enju <enjuk@amazon.com>, Ingo Molnar
-	<mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, "Jesper Dangaard
- Brouer" <hawk@kernel.org>, Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	<syzbot+942297eecf7d2d61d1f1@syzkaller.appspotmail.com>
-Subject: [PATCH v2 net 3/3] net: rose: include node references in rose_neigh refcount
-Date: Sat, 23 Aug 2025 17:58:57 +0900
-Message-ID: <20250823085857.47674-4-takamitz@amazon.co.jp>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250823085857.47674-1-takamitz@amazon.co.jp>
-References: <20250823085857.47674-1-takamitz@amazon.co.jp>
+	s=arc-20240116; t=1755939608; c=relaxed/simple;
+	bh=aU4s6rL8qphUf3ASSPtkvFhSbnF7KQL/5p/AkB6ZkD0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eUiIZIYSWxXBZ5vRjGUYEEVuNZoE907Mj7xmlK0WI1X4JtxeY1DqQqbAdzGyW4/Z7FamBh1rsXSz4dWNDT3q2Kr3UKbvUHrj1Iy0hTwIUfXEXhZ3TQ/mFBTJvm62+sgrlBm20EoYf5Qy3vfRayfDYY7ra+nyEcnfmQZeCMVMYks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rOGkWtsU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F35E6C113D0;
+	Sat, 23 Aug 2025 08:59:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755939608;
+	bh=aU4s6rL8qphUf3ASSPtkvFhSbnF7KQL/5p/AkB6ZkD0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rOGkWtsURQmqeVJWZZ8QU1TwZHK57H1RHXwc/i48rhECw+oAVRa4mF0zfqNM3aJ7b
+	 K4ufsfNlCAWHsLgknGRRJAM8fAg49ifByU7aHcJpd60KD5n2ftLsVEjekOSHSO2hKf
+	 TyNgVi/IP/sZ+Zv1HQC39pwpdaVXtYVat6Ea2uqdZXF6QBRAllDzvBMajMv+E6mXfL
+	 wV6BxOvsD2NYhNSk4hF0URYans98VMn0JY+kTDajsHLCy41MHKhsR0ynwpYDfvi23F
+	 uDIHwC7s5hdPOSqfKNvqn2djgrkhoLcYMLwZ0RX2xL3FelT1nsv2lD+CEaDl2f3oOX
+	 wFjm0sW7YW4bQ==
+Date: Sat, 23 Aug 2025 11:59:50 +0300
+From: Mike Rapoport <rppt@kernel.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: Mika =?iso-8859-1?Q?Penttil=E4?= <mpenttil@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	Alexander Potapenko <glider@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Brendan Jackman <jackmanb@google.com>,
+	Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>,
+	Dmitry Vyukov <dvyukov@google.com>, dri-devel@lists.freedesktop.org,
+	intel-gfx@lists.freedesktop.org, iommu@lists.linux.dev,
+	io-uring@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	John Hubbard <jhubbard@nvidia.com>, kasan-dev@googlegroups.com,
+	kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-arm-kernel@axis.com, linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Marco Elver <elver@google.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
+	Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
+	Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
+	virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
+	wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
+Subject: Re: [PATCH RFC 10/35] mm/hugetlb: cleanup
+ hugetlb_folio_init_tail_vmemmap()
+Message-ID: <aKmDBobyvEX7ZUWL@kernel.org>
+References: <20250821200701.1329277-1-david@redhat.com>
+ <20250821200701.1329277-11-david@redhat.com>
+ <9156d191-9ec4-4422-bae9-2e8ce66f9d5e@redhat.com>
+ <7077e09f-6ce9-43ba-8f87-47a290680141@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWC001.ant.amazon.com (10.13.139.241) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+In-Reply-To: <7077e09f-6ce9-43ba-8f87-47a290680141@redhat.com>
 
-Current implementation maintains two separate reference counting
-mechanisms: the 'count' field in struct rose_neigh tracks references from
-rose_node structures, while the 'use' field (now refcount_t) tracks
-references from rose_sock.
+On Fri, Aug 22, 2025 at 08:24:31AM +0200, David Hildenbrand wrote:
+> On 22.08.25 06:09, Mika Penttilä wrote:
+> > 
+> > On 8/21/25 23:06, David Hildenbrand wrote:
+> > 
+> > > All pages were already initialized and set to PageReserved() with a
+> > > refcount of 1 by MM init code.
+> > 
+> > Just to be sure, how is this working with MEMBLOCK_RSRV_NOINIT, where MM is supposed not to
+> > initialize struct pages?
+> 
+> Excellent point, I did not know about that one.
+> 
+> Spotting that we don't do the same for the head page made me assume that
+> it's just a misuse of __init_single_page().
+> 
+> But the nasty thing is that we use memblock_reserved_mark_noinit() to only
+> mark the tail pages ...
 
-This patch merges these two reference counting systems using 'use' field
-for proper reference management. Specifically, this patch adds incrementing
-and decrementing of rose_neigh->use when rose_neigh->count is incremented
-or decremented.
+And even nastier thing is that when CONFIG_DEFERRED_STRUCT_PAGE_INIT is
+disabled struct pages are initialized regardless of
+memblock_reserved_mark_noinit().
 
-This patch also modifies rose_rt_free(), rose_rt_device_down() and
-rose_clear_route() to properly release references to rose_neigh objects
-before freeing a rose_node through rose_remove_node().
+I think this patch should go in before your updates:
 
-These changes ensure rose_neigh structures are properly freed only when
-all references, including those from rose_node structures, are released.
-As a result, this resolves a slab-use-after-free issue reported by Syzbot.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: syzbot+942297eecf7d2d61d1f1@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=942297eecf7d2d61d1f1
-Signed-off-by: Takamitsu Iwai <takamitz@amazon.co.jp>
----
- net/rose/rose_route.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
-
-diff --git a/net/rose/rose_route.c b/net/rose/rose_route.c
-index 8efb9033c057..1adee1fbc2ed 100644
---- a/net/rose/rose_route.c
-+++ b/net/rose/rose_route.c
-@@ -178,6 +178,7 @@ static int __must_check rose_add_node(struct rose_route_struct *rose_route,
- 			}
- 		}
- 		rose_neigh->count++;
-+		rose_neigh_hold(rose_neigh);
+diff --git a/mm/hugetlb.c b/mm/hugetlb.c
+index 753f99b4c718..1c51788339a5 100644
+--- a/mm/hugetlb.c
++++ b/mm/hugetlb.c
+@@ -3230,6 +3230,22 @@ int __alloc_bootmem_huge_page(struct hstate *h, int nid)
+ 	return 1;
+ }
  
- 		goto out;
- 	}
-@@ -187,6 +188,7 @@ static int __must_check rose_add_node(struct rose_route_struct *rose_route,
- 		rose_node->neighbour[rose_node->count] = rose_neigh;
- 		rose_node->count++;
- 		rose_neigh->count++;
-+		rose_neigh_hold(rose_neigh);
- 	}
- 
- out:
-@@ -322,6 +324,7 @@ static int rose_del_node(struct rose_route_struct *rose_route,
- 	for (i = 0; i < rose_node->count; i++) {
- 		if (rose_node->neighbour[i] == rose_neigh) {
- 			rose_neigh->count--;
-+			rose_neigh_put(rose_neigh);
- 
- 			if (rose_neigh->count == 0) {
- 				rose_remove_neigh(rose_neigh);
-@@ -430,6 +433,7 @@ int rose_add_loopback_node(const rose_address *address)
- 	rose_node_list  = rose_node;
- 
- 	rose_loopback_neigh->count++;
-+	rose_neigh_hold(rose_loopback_neigh);
- 
- out:
- 	spin_unlock_bh(&rose_node_list_lock);
-@@ -461,6 +465,7 @@ void rose_del_loopback_node(const rose_address *address)
- 	rose_remove_node(rose_node);
- 
- 	rose_loopback_neigh->count--;
-+	rose_neigh_put(rose_loopback_neigh);
- 
- out:
- 	spin_unlock_bh(&rose_node_list_lock);
-@@ -500,6 +505,7 @@ void rose_rt_device_down(struct net_device *dev)
- 				memmove(&t->neighbour[i], &t->neighbour[i + 1],
- 					sizeof(t->neighbour[0]) *
- 						(t->count - i));
-+				rose_neigh_put(s);
- 			}
- 
- 			if (t->count <= 0)
-@@ -543,6 +549,7 @@ static int rose_clear_routes(void)
- {
- 	struct rose_neigh *s, *rose_neigh;
- 	struct rose_node  *t, *rose_node;
-+	int i;
- 
- 	spin_lock_bh(&rose_node_list_lock);
- 	spin_lock_bh(&rose_neigh_list_lock);
-@@ -553,8 +560,12 @@ static int rose_clear_routes(void)
- 	while (rose_node != NULL) {
- 		t         = rose_node;
- 		rose_node = rose_node->next;
--		if (!t->loopback)
++/*
++ * Tail pages in a huge folio allocated from memblock are marked as 'noinit',
++ * which means that when CONFIG_DEFERRED_STRUCT_PAGE_INIT is enabled their
++ * struct page won't be initialized
++ */
++#ifdef CONFIG_DEFERRED_STRUCT_PAGE_INIT
++static void __init hugetlb_init_tail_page(struct page *page, unsigned long pfn,
++					enum zone_type zone, int nid)
++{
++	__init_single_page(page, pfn, zone, nid);
++}
++#else
++static inline void hugetlb_init_tail_page(struct page *page, unsigned long pfn,
++					enum zone_type zone, int nid) {}
++#endif
 +
-+		if (!t->loopback) {
-+			for (i = 0; i < rose_node->count; i++)
-+				rose_neigh_put(t->neighbour[i]);
- 			rose_remove_node(t);
-+		}
- 	}
+ /* Initialize [start_page:end_page_number] tail struct pages of a hugepage */
+ static void __init hugetlb_folio_init_tail_vmemmap(struct folio *folio,
+ 					unsigned long start_page_number,
+@@ -3244,7 +3260,7 @@ static void __init hugetlb_folio_init_tail_vmemmap(struct folio *folio,
+ 	for (pfn = head_pfn + start_page_number; pfn < end_pfn; pfn++) {
+ 		struct page *page = pfn_to_page(pfn);
  
- 	while (rose_neigh != NULL) {
-@@ -1189,7 +1200,7 @@ static int rose_neigh_show(struct seq_file *seq, void *v)
- 			   (rose_neigh->loopback) ? "RSLOOP-0" : ax2asc(buf, &rose_neigh->callsign),
- 			   rose_neigh->dev ? rose_neigh->dev->name : "???",
- 			   rose_neigh->count,
--			   refcount_read(&rose_neigh->use) - 1,
-+			   refcount_read(&rose_neigh->use) - rose_neigh->count - 1,
- 			   (rose_neigh->dce_mode) ? "DCE" : "DTE",
- 			   (rose_neigh->restarted) ? "yes" : "no",
- 			   ax25_display_timer(&rose_neigh->t0timer) / HZ,
-@@ -1294,6 +1305,7 @@ void __exit rose_rt_free(void)
- 	struct rose_neigh *s, *rose_neigh = rose_neigh_list;
- 	struct rose_node  *t, *rose_node  = rose_node_list;
- 	struct rose_route *u, *rose_route = rose_route_list;
-+	int i;
+-		__init_single_page(page, pfn, zone, nid);
++		hugetlb_init_tail_page(page, pfn, zone, nid);
+ 		prep_compound_tail((struct page *)folio, pfn - head_pfn);
+ 		ret = page_ref_freeze(page, 1);
+ 		VM_BUG_ON(!ret);
  
- 	while (rose_neigh != NULL) {
- 		s          = rose_neigh;
-@@ -1307,6 +1319,8 @@ void __exit rose_rt_free(void)
- 		t         = rose_node;
- 		rose_node = rose_node->next;
- 
-+		for (i = 0; i < t->count; i++)
-+			rose_neigh_put(t->neighbour[i]);
- 		rose_remove_node(t);
- 	}
- 
--- 
-2.39.5 (Apple Git-154)
+> Let me revert back to __init_single_page() and add a big fat comment why
+> this is required.
+> 
+> Thanks!
 
+-- 
+Sincerely yours,
+Mike.
 
