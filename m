@@ -1,222 +1,136 @@
-Return-Path: <netdev+bounces-216230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13C7BB32B73
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 20:16:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AED76B32B79
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 20:33:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C128EAA25CB
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 18:16:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 634CB3BF53F
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 18:32:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6176F1B4248;
-	Sat, 23 Aug 2025 18:16:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCDE520AF67;
+	Sat, 23 Aug 2025 18:32:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gIhRj9Vj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QPrSFxDr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE7BE142E83;
-	Sat, 23 Aug 2025 18:16:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F43A1DF247;
+	Sat, 23 Aug 2025 18:32:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755972973; cv=none; b=mCZKe3oJsYYKsayeQuYm4dZ4ljdt8g0C9tyOSeFpJSyGhjRVPdN9EA/CrQ4GBdIIaIVTCfCWCx0IromiNyHLvHem7OStLFcWFlC53BD7hivtl4C8GlcYeeg35x+srosU99aJsBYaC16gjfHy1OY5w5Cb9GTPzz1MzS3nBgOMGDU=
+	t=1755973974; cv=none; b=EVf/HqINwxhesgapS66IRnZe22blCWlcJ3twgp/EK+CfAMH+S4ZLvbo4YSOqzEkP3lY28mKmX2V8OiXEJfoNi+/ovqEtX6MmFOHMVXERETZXEFkOPicl9BPiAqD4XcaV8X/iDxHwQxNHJAB/Vx1csq0Fs7bXaghuCxncvMgxNvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755972973; c=relaxed/simple;
-	bh=njSLvwIt8LiAq10rNFQp6mYMq/wOxOCeSrjPbSwxDqc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DRpT5nvZofCvJYlQv7ftXhaX8U5S9czfRZZU1g/hKBrZNwdiwowlmD8hi1QeBa1Jb0t3yAbD2PuYMudzI2Mgwpj7RiE/oE2G5qLgzZAQoikb46SkCnpHmL/8NAB3IllU/7r8pDLCVP23hmv4NJh8x0nqcBM+wNeknW9RMOjyflA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gIhRj9Vj; arc=none smtp.client-ip=209.85.166.181
+	s=arc-20240116; t=1755973974; c=relaxed/simple;
+	bh=aky10XdH4z1GJYT58eFzMQ0RV1473ZNoDqsCN4S1B4g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hpRbU8MGu0b/dlbKnlfDfC+JeyIGcG9U2Z5ZDEqXvIxYCEUP+WrHzLPylxlkEQzodtQi9mBf03Vzfq4UQin65RVgbuXwZT7Kf8bARVwjkP7v56pychBjMxDrmyafOsYPkWxf59+Ye9On9eMjV/HfW7Z0buKZPktrIn5UkIP2rYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QPrSFxDr; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3eb6da24859so2411375ab.3;
-        Sat, 23 Aug 2025 11:16:10 -0700 (PDT)
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-76e39ec6f30so3024676b3a.2;
+        Sat, 23 Aug 2025 11:32:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755972970; x=1756577770; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Sg2L8ubuEXpnhwtGksuVh66eJv1X6jJCQin96Spl1OI=;
-        b=gIhRj9VjbNYAI5A0Cj2NTh+bhErzAL2BaGW4G2bH9m7348RVwQP9vqZ6uax+Q5e6Cz
-         H+FVQS3mof4LVExHOJOEHHtJnbrAevnV8Ml1yaC603SkXuatbI13E0QWv/KMfBZHRqN3
-         sPmVcx/Fjw4vbJn5LAtNr8PWTROHLrNob+YPicoure2Fu7jprLgLtYZD5Uem3SGbzo9Z
-         okk0KivCtGALOForD9O2b2vp0HkWmf5A/5SfRAYcF8QZWuLWt3gfcp7ifDVRpezmDrc5
-         nLQbJDjVC64RLt18F0JNEdd2n8F41P7vuyWyTRqnnvyEcgx15CKLpN4g0johvQcZMI9t
-         crnQ==
+        d=gmail.com; s=20230601; t=1755973973; x=1756578773; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JrLGxP0FzW5aC42LhHQgFuaQh+ylY+xDXgAsW+i3YgY=;
+        b=QPrSFxDrchrUrXNV+iToap0zAtcyALoHplvXF+ydPBxfdIYW61texcH52MeYex6EfQ
+         BNLODenXXKwV33GOTdupVdAtBWlTHvwYL4AncV4ab/7vvaPXQRLmKkceiE6OFiz2WOEB
+         1RLlPl/n97a+tpWXbBxi6kMsOJxk4nP/difxjSZHgnoPTSSdYrawAgl6rP9VwhfFdhDb
+         rjjtp3OxYfoFH1ek+7nELscpZhiDoMFaczaVCn+MgWxTfQ/1G2xMJBBNUJuwH33gtwJd
+         jD39u7KAx9ghSGXU+yox5a30I4SbrOhcVWuwMKfwxv0b1Pat5XNkcNqyOU4oGmhQKs/Z
+         ryAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755972970; x=1756577770;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Sg2L8ubuEXpnhwtGksuVh66eJv1X6jJCQin96Spl1OI=;
-        b=F1IyFONsJ1Ef57m6XXm79Q9KEAtaQ0olRHGHLkB4wDoP1LzeRA/N97fbGTu3m/NHEz
-         BYxB9T1hrvlYSjhTD3SxKpLhqW4QVoG1q41Arx4JRlVu6WK2gfYkDoQK8rDlWBnaFrhV
-         MGKKhroPTZxXqS4xJ11k4/MnobiSs/L3QtCYwakRd3uM5XMlCQFmKdgrA079PhsClOOr
-         IPhYj70OAMtQUrKHb/LQrIEJauuB3RYc5aEyvxbt5Lh6Vkq2W9+NBRUbmqnkj5XxRpbz
-         gDetj+S6/ofglohrLUL++klU8qEevPqq2+HdCgP/Z0F4PpwW6LANb0OQopdDQ9w+O7ZQ
-         SrDw==
-X-Forwarded-Encrypted: i=1; AJvYcCVSX5394KBtPEhY3QrydS3pZSrp3jnI6CFsoaICIU0ulfkR5SNxfsB18HG1sqj/415LlhtCFgqHlpuO@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzw1bBpdWptIZVqnz1q58YtOEdInZQLu2dHz1/YwLDVLYknhRap
-	Axd6THEiQBJpL8aMosqxaB11KaRrgxAF/m2TH6nVNdqLDX33yAh8aiHNh4MFvRPUrTE7+sPXTib
-	LYAmGDy6vsNVcjVBjWiCCjdkpKmxDSFA=
-X-Gm-Gg: ASbGnctPGlnA9PlNGZNWrJREH9rnNChSGTPwK3yu5CraFYEHoTv6ndpj4kKqoaDqbCU
-	v4x2+OtQrw8t9xb1Wytxh78bpZej5Rx26by3ckVJM3oCVOZI22j43DmRoOckyc6+kTfj2War04q
-	ihyT6X0fkEr771k2KJb22C6WGGbVfmpTFbVU97/G53f7Z9MC0j1YX21DIvGUxCj60LDxP8czchQ
-	x6Xp0G7EOl983g+/8sN
-X-Google-Smtp-Source: AGHT+IEsgK/H0gyqBtqG9vpi3Iq1De6iE9KkdVlqWS5KyCYd33nd2HrGTegNdtikqERSb7XLsM7bvadHfWDP7iqnBCY=
-X-Received: by 2002:a05:6e02:1709:b0:3e6:7151:a895 with SMTP id
- e9e14a558f8ab-3e91d393a49mr102597415ab.0.1755972969699; Sat, 23 Aug 2025
- 11:16:09 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1755973973; x=1756578773;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JrLGxP0FzW5aC42LhHQgFuaQh+ylY+xDXgAsW+i3YgY=;
+        b=KMMRscsbaE7YsKhF6duoq+Ro4XrU0N9V6sjxDt0aK2fUa1byMWj6dqStdj5H4KdcA4
+         1icyYM9qJiwpOnJsGMeL79GJpX9BcNZ5q86b6VgH4UNIq1qHW3N6XuXkY8LaJHLX/fAa
+         ipN5Ya5X6KE0J0Z5aQ2cRdY93lcKYGvjAzHKNTMKMECY4fNDtGZSA9h62fEdj9v6qCBI
+         mbBG6a7SduO+/etrDVcS0va3hKUdb+e/oWI/t6qIO5eqSQVq71Nde0B27ZUcpCBugnv7
+         4xQORpsyK5H0UHEAizN8zhn61K0K0e2FEhMzgU4GOrYbuc6V1Esl8auIfWCHIa9LwzG4
+         ZDyA==
+X-Forwarded-Encrypted: i=1; AJvYcCUjuQoBMDhQW5X4f13wYqGpW7AzOpAqR3Q7zeoUkGekPeE4ZwMSLt8Jfnj5ercBJ8vr1w4GqMK+qc2igi4=@vger.kernel.org, AJvYcCVfr+2soJoSq4F5jrT07oWhvgo1PUuJukEU1o7LTdzAMPxLlebgNbnXayc3asBlC+ooQ8aA+jxj@vger.kernel.org
+X-Gm-Message-State: AOJu0YypIs+Axe9tQZSXaBPYy4fWUCCwIKInCpaqSt3c9YmLFa/X0MaC
+	v54HUN5UdV+QI8UmC45MrSu8sApiyomcyZgPaqaYRhptR7DZMBlyZjnR
+X-Gm-Gg: ASbGncufsb106eBBWc8xBUosuee/SFIiKKgrSHKJOZk7iYDDWonD4oDXLI7Nsrq9pu/
+	rLAQAxSH4JnM6/Vab2QL5RXP5xM2cGLvk4uLX3voDqOM9f1KNZEwRHj1ANig291NfJtRxExr4K4
+	md/s5V9NrTcCEHtgAHl7LoYR4XmGEKzrwhoUfgVVFPfEd1xB8hsojbw4f/YSGaWHvW751xFt5X+
+	kvAd0roYLiwlvdGcwbUeuQGmF+ZUk39axjizdHV0vWBUSbrlmCWiYCOZtWsuodIuWUdL3GEZ03i
+	ihccs1h+E3X0OsfzJJFSZUR6wQrixqOxXYCCUNd+q1ycXKPFEerqviJZ+2JchsbmE6hCCsuOsFr
+	qNqRliKpW6jkO+Gh6L7mKCam6h7A+BdObnwBszlr4YZvYeOsRk0LkTQ4w
+X-Google-Smtp-Source: AGHT+IFwWxk1s5YPhKGw33Kfe7fIVavSzsVWVgqRR+0TmOEr9GPrBuseBdyx6V1CG+iTzHNCpnk1eQ==
+X-Received: by 2002:a05:6a00:a02:b0:76e:987b:1dc with SMTP id d2e1a72fcca58-7702f9f5b6emr9585603b3a.12.1755973972577;
+        Sat, 23 Aug 2025 11:32:52 -0700 (PDT)
+Received: from mythos-cloud ([121.159.229.173])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7704ff442a8sm1133029b3a.32.2025.08.23.11.32.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 23 Aug 2025 11:32:52 -0700 (PDT)
+From: Yeounsu Moon <yyyynoom@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Yeounsu Moon <yyyynoom@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v3] net: dlink: fix multicast stats being counted incorrectly
+Date: Sun, 24 Aug 2025 03:29:24 +0900
+Message-ID: <20250823182927.6063-3-yyyynoom@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1755525878.git.lucien.xin@gmail.com> <7788ed89d491aa40183572a444b91dfdb28f20c4.1755525878.git.lucien.xin@gmail.com>
- <c06ff3eb-f69d-4bd8-b81a-a28b8b69ba52@redhat.com>
-In-Reply-To: <c06ff3eb-f69d-4bd8-b81a-a28b8b69ba52@redhat.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Sat, 23 Aug 2025 14:15:58 -0400
-X-Gm-Features: Ac12FXwqN5JfN3XpNwS7ROWPGnRJsuMytXn7hIk2yr-_xDtZWIh6E6fyFkzoCKE
-Message-ID: <CADvbK_e4=-JjYiVFWN-Uuroog-+AxCzgDsFg5OQqHND+RPw1Ow@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 03/15] quic: provide common utilities and data structures
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net, kuba@kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
-	Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Benjamin Coddington <bcodding@redhat.com>, Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, 
-	Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe" <alibuda@linux.alibaba.com>, 
-	Jason Baron <jbaron@akamai.com>, illiliti <illiliti@protonmail.com>, 
-	Sabrina Dubroca <sd@queasysnail.net>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
-	Daniel Stenberg <daniel@haxx.se>, Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Aug 21, 2025 at 8:58=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On 8/18/25 4:04 PM, Xin Long wrote:
-> [...]
-> > +void quic_hash_tables_destroy(void)
-> > +{
-> > +     struct quic_hash_table *ht;
-> > +     int table;
-> > +
-> > +     for (table =3D 0; table < QUIC_HT_MAX_TABLES; table++) {
-> > +             ht =3D &quic_hash_tables[table];
-> > +             ht->size =3D QUIC_HT_SIZE;
->
-> Why?
->
-> > +             kfree(ht->hash);
-> > +     }
-> > +}
-> > +
-> > +int quic_hash_tables_init(void)
-> > +{
-> > +     struct quic_hash_head *head;
-> > +     struct quic_hash_table *ht;
-> > +     int table, i;
-> > +
-> > +     for (table =3D 0; table < QUIC_HT_MAX_TABLES; table++) {
-> > +             ht =3D &quic_hash_tables[table];
-> > +             ht->size =3D QUIC_HT_SIZE;
->
-> AFAICS the hash table size is always QUIC_HT_SIZE, which feels like too
-> small for connection and possibly quick sockets.
-indeed.
+`McstFramesRcvdOk` counts the number of received multicast packets, and
+it reports the value correctly.
 
->
-> Do yoi need to differentiate the size among the different hash types?
-Yes, I will change to use alloc_large_system_hash() for these
-hashtables, align with TCP:
+However, reading `McstFramesRcvdOk` clears the register to zero. As a
+result, the driver was reporting only the packets since the last read,
+instead of the accumulated total.
 
-- source connection IDs hashtable -> tcp_hashinfo.ehash
-For Data receiving
-- QUIC listening sockets hashtable -> tcp_hashinfo.lhash2
-For New connections
-- UDP tunnel sockets hashtable -> tcp_hashinfo.bhash
-For binding
-- QUIC sockets hashtable -> tcp_hashinfo.bhash
-For some rare special cases, like receiving a stateless reset.
+Fix this by updating the multicast statistics accumulatively instaed of
+instantaneously.
 
->
-> > +             head =3D kmalloc_array(ht->size, sizeof(*head), GFP_KERNE=
-L);
->
-> If so, possibly you should resort to kvmalloc_array here.
->
-> > +             if (!head) {
-> > +                     quic_hash_tables_destroy();
-> > +                     return -ENOMEM;
-> > +             }
-> > +             for (i =3D 0; i < ht->size; i++) {
-> > +                     INIT_HLIST_HEAD(&head[i].head);
-> > +                     if (table =3D=3D QUIC_HT_UDP_SOCK) {
-> > +                             mutex_init(&head[i].m_lock);
-> > +                             continue;
-> > +                     }
-> > +                     spin_lock_init(&head[i].s_lock);
->
-> Doh, I missed the union mutex/spinlock. IMHO it would be cleaner to use
-> separate hash types.
-Yeah, I will separate them. :D
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Tested-on: D-Link DGE-550T Rev-A3
+Signed-off-by: Yeounsu Moon <yyyynoom@gmail.com>
+---
+Changelog:
+v1: https://lore.kernel.org/netdev/20250821114254.3384-1-yyyynoom@gmail.com/
+v2: https://lore.kernel.org/netdev/20250822120246.243898-2-yyyynoom@gmail.com/
+- Change subject `net-next` to `net`.
+- Add `Fixes:` tag.
+v3:
+- Correct commit reference in `Fixes:` tag.
+---
+ drivers/net/ethernet/dlink/dl2k.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->
-> [...]
-> > +/* Parse a comma-separated string into a 'quic_data' list format.
-> > + *
-> > + * Each comma-separated token is turned into a length-prefixed element=
-. The
-> > + * first byte of each element stores the length (minus one). Elements =
-are
-> > + * stored in 'to->data', and 'to->len' is updated.
-> > + */
-> > +void quic_data_from_string(struct quic_data *to, u8 *from, u32 len)
-> > +{
-> > +     struct quic_data d;
-> > +     u8 *p =3D to->data;
-> > +
-> > +     to->len =3D 0;
-> > +     while (len) {
-> > +             d.data =3D p++;
-> > +             d.len  =3D 1;
-> > +             while (len && *from =3D=3D ' ') {
-> > +                     from++;
-> > +                     len--;
-> > +             }
-> > +             while (len) {
-> > +                     if (*from =3D=3D ',') {
-> > +                             from++;
-> > +                             len--;
-> > +                             break;
-> > +                     }
-> > +                     *p++ =3D *from++;
-> > +                     len--;
-> > +                     d.len++;
-> > +             }
-> > +             *d.data =3D (u8)(d.len - 1);
-> > +             to->len +=3D d.len;
-> > +     }
->
-> The above does not perform any bound checking vs the destination buffer,
-> it feels fragile.
->
- This function needs two checks:
+diff --git a/drivers/net/ethernet/dlink/dl2k.c b/drivers/net/ethernet/dlink/dl2k.c
+index cc60ee454bf9..6bbf6e5584e5 100644
+--- a/drivers/net/ethernet/dlink/dl2k.c
++++ b/drivers/net/ethernet/dlink/dl2k.c
+@@ -1099,7 +1099,7 @@ get_stats (struct net_device *dev)
+ 	dev->stats.rx_bytes += dr32(OctetRcvOk);
+ 	dev->stats.tx_bytes += dr32(OctetXmtOk);
+ 
+-	dev->stats.multicast = dr32(McstFramesRcvdOk);
++	dev->stats.multicast += dr32(McstFramesRcvdOk);
+ 	dev->stats.collisions += dr32(SingleColFrames)
+ 			     +  dr32(MultiColFrames);
+ 
+-- 
+2.50.1
 
-1. len < U8_MAX
-2. to->data memory len >=3D len + 1.
-
-Although the caller like quic_sock_set_alpn() ensures that, I guess they
-should still be done in this function as a common helper.
-
-Thanks.
 
