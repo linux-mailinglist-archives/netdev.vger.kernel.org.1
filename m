@@ -1,131 +1,161 @@
-Return-Path: <netdev+bounces-216219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0A5CB32992
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 17:32:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E80CB329A8
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 17:39:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B55BD1B66549
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 15:32:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 410441C21E7E
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 15:39:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03BAD2561AB;
-	Sat, 23 Aug 2025 15:32:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF7102E7F1C;
+	Sat, 23 Aug 2025 15:38:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xsIDvRSi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dtuglmsZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548DC12B93;
-	Sat, 23 Aug 2025 15:32:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F4F2E7BDC;
+	Sat, 23 Aug 2025 15:38:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755963121; cv=none; b=L83ajsSJcfDSx1Exn5P43Ki++vKCOAUcs2xiA/LuVAiVQcJAi1KjL4Hwe9pSgXXV+bxWPjEBtruqprJvp6M/t4U6eXo41Bz+OYOrkKLEhJkkjVciwYikwAxEz3pd2vuF2wAv9eiwdQsMNy0TxDgXLkMw3L3CteHgvt4QDsq5tZY=
+	t=1755963536; cv=none; b=Gv+6yWjFxus0d0BK2NAtBLztwMT2mCYPpWObnieY5Jg1bDMUXSquxs0RciiXtdngeLcOpyylVg2LEtPb/1NJ3MiJbYTYWD8QMcwXqj3U8zjRbVh+oaR68Ijti9gXZpReeeDEaqSL2trsAeTpRuSSp7lCKT48tCBaI+dA+VtEfr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755963121; c=relaxed/simple;
-	bh=wXL+pvC99GOHYqNUpRrxI12/+Cl2nzb0cjhP/8jyUa0=;
+	s=arc-20240116; t=1755963536; c=relaxed/simple;
+	bh=2CKFaXXEg2LYAIZZ/UOO6SOKp9zzgRvKhyBppqFbZxA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KZyE0szOTKQ1jWXVcoMZGrVgWhmrTqOm3TWsnNtKZ+ESv3NyR/eOoLhjMQCwbZzZCcxTtfrf7uR7dRnm+4pcZJfpqM1OPfpq4bmaF0QiJnSQBwTZPWxT6reI7bQ0mlTktVeL0lhdBERvlhigo1+qCFHc2v14o9cYkELI9w9z8hU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xsIDvRSi; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=cf1HMZb2yq2UHmuZrlzPPNb9E3Vkfdo9fJxIjHEBHow=; b=xs
-	IDvRSiSLsTe2K8ZZuuLx5hKAuNUguLDOSupOhGYC4b3fchBBTdR6lhv9xNJE+BQuLX/LlSvrONXZL
-	1b7ZKSfa5Rf9huE2zoYFPqMBScuDkNQSWyYiLEYh7iqqLUWCzTmSXKp1dbI5MPwowi/QWltdWqD3C
-	D0YDo6NDTORbfsI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1upqDg-005lXW-Oe; Sat, 23 Aug 2025 17:31:52 +0200
-Date: Sat, 23 Aug 2025 17:31:52 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jonas Gorski <jonas.gorski@gmail.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=IxkBxIjJwrhmCWox4h7EzLdeT3FPksvrLk0x4iDH7hCuLsdtk+Fwt8BaWt0A1VnZjQNNtJknurVsIQRiZGvMAvOlbERuuMQEeg/qc1yunor8En0SnMeWZQ+d4xV5H9BaEq8KF5Y9Yv7Ng0/6HHfuJsiqHlpJ5jCKk3AH/OwNHXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dtuglmsZ; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755963535; x=1787499535;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=2CKFaXXEg2LYAIZZ/UOO6SOKp9zzgRvKhyBppqFbZxA=;
+  b=dtuglmsZ4ghXk+nfKeCQIRZE9gWaWLjqDhrjdGmGSS5kUE9K/S5moBHN
+   ckWCok+PlFsl2Xz7V61ZxRyM70Lr4q1Vl7OXU4/imjSQ6Tgs4ddxJTFPZ
+   eFwtSqMDby+pz7i2C1D6+D/iOnAgsokS/GjC2fJzm8PvLr3eucRZ4ByE+
+   dhyeBvuES6D6Ku2NNLRY85UR2d06VBobcLvtk/eC7HyVcE+vhK4V3rGjM
+   Q8PQUtIWZxehxsdYWzi/tIDP3ovuTfnatXTlYZm8KBW2uAS4DIgdYoyKE
+   PdgzVOO3ARBh9gSBNnO4Rq4wAYOwnQ7aH/TXIZ35GmR1iUQaje16y9sUo
+   Q==;
+X-CSE-ConnectionGUID: FnH8i//5QtSoORDvWQp/Hg==
+X-CSE-MsgGUID: O2okVptrR2+AVUwkIh3Ycg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="57262174"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="57262174"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2025 08:38:53 -0700
+X-CSE-ConnectionGUID: Wes7r59DTYKOEuQgrvtJNA==
+X-CSE-MsgGUID: NoleGkrySXu7qGfTOn6smQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="168164859"
+Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
+  by orviesa010.jf.intel.com with ESMTP; 23 Aug 2025 08:38:49 -0700
+Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1upqKM-000MNn-0p;
+	Sat, 23 Aug 2025 15:38:46 +0000
+Date: Sat, 23 Aug 2025 23:38:06 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Martin KaFai Lau <martin.lau@linux.dev>
+Cc: oe-kbuild-all@lists.linux.dev,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Michal Hocko <mhocko@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: dsa: b53: fix ageing time for BCM53101
-Message-ID: <a0e637f9-e612-4651-8b12-8cb82dd23c55@lunn.ch>
-References: <20250823090617.15329-1-jonas.gorski@gmail.com>
- <4469d2cd-5927-4344-acb0-bc7d35925bb1@lunn.ch>
- <CAOiHx=nC5f9-2-XPCKBVuVsh93NSrmbSQJp8RqF3EObbEq+OOw@mail.gmail.com>
+	Neal Cardwell <ncardwell@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Mina Almasry <almasrymina@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v1 bpf-next/net 6/8] bpf: Introduce SK_BPF_MEMCG_FLAGS
+ and SK_BPF_MEMCG_SOCK_ISOLATED.
+Message-ID: <202508232331.rxOqu50j-lkp@intel.com>
+References: <20250822221846.744252-7-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOiHx=nC5f9-2-XPCKBVuVsh93NSrmbSQJp8RqF3EObbEq+OOw@mail.gmail.com>
+In-Reply-To: <20250822221846.744252-7-kuniyu@google.com>
 
-On Sat, Aug 23, 2025 at 05:27:02PM +0200, Jonas Gorski wrote:
-> Hi,
-> 
-> On Sat, Aug 23, 2025 at 5:00 PM Andrew Lunn <andrew@lunn.ch> wrote:
-> >
-> > On Sat, Aug 23, 2025 at 11:06:16AM +0200, Jonas Gorski wrote:
-> > > For some reason Broadcom decided that BCM53101 uses 0.5s increments for
-> > > the ageing time register, but kept the field width the same [1]. Due to
-> > > this, the actual ageing time was always half of what was configured.
-> > >
-> > > Fix this by adapting the limits and value calculation for BCM53101.
-> > >
-> > > [1] https://github.com/Broadcom-Network-Switching-Software/OpenMDK/blob/master/cdk/PKG/chip/bcm53101/bcm53101_a0_defs.h#L28966
-> >
-> > Is line 28966 correct? In order to find a reference to age, i needed
-> > to search further in the file.
-> 
-> Hm, indeed, it's #30768. Not sure where that original line came from,
-> maybe I miss-clicked before copying the link in the address bar.
+Hi Kuniyuki,
 
-Or a new version has been dumped there, changing all the line numbers?
-I've not looked, is there a tag you can use instead of master?
+kernel test robot noticed the following build errors:
 
-> > Are these devices organised in families/generations. Are you sure this
-> > does not apply to:
-> >
-> >         BCM53101_DEVICE_ID = 0x53101,
-> 
-> This is the chip for which I am fixing/changing it :)
-> 
-> >         BCM53115_DEVICE_ID = 0x53115,
-> >         BCM53125_DEVICE_ID = 0x53125,
-> >         BCM53128_DEVICE_ID = 0x53128,
-> 
-> Yes, pretty sure:
-> 
-> $ grep -l -r "Specifies the aging time in 0.5 seconds" cdk/PKG/chip | sort
-> cdk/PKG/chip/bcm53101/bcm53101_a0_defs.h
-> 
-> $ grep -l -r "Specifies the aging time in seconds" cdk/PKG/chip | sort
-> cdk/PKG/chip/bcm53010/bcm53010_a0_defs.h
-> cdk/PKG/chip/bcm53020/bcm53020_a0_defs.h
-> cdk/PKG/chip/bcm53084/bcm53084_a0_defs.h
-> cdk/PKG/chip/bcm53115/bcm53115_a0_defs.h
-> cdk/PKG/chip/bcm53118/bcm53118_a0_defs.h
-> cdk/PKG/chip/bcm53125/bcm53125_a0_defs.h
-> cdk/PKG/chip/bcm53128/bcm53128_a0_defs.h
-> cdk/PKG/chip/bcm53134/bcm53134_a0_defs.h
-> cdk/PKG/chip/bcm53242/bcm53242_a0_defs.h
-> cdk/PKG/chip/bcm53262/bcm53262_a0_defs.h
-> cdk/PKG/chip/bcm53280/bcm53280_a0_defs.h
-> cdk/PKG/chip/bcm53280/bcm53280_b0_defs.h
-> cdk/PKG/chip/bcm53600/bcm53600_a0_defs.h
-> cdk/PKG/chip/bcm89500/bcm89500_a0_defs.h
+[auto build test ERROR on bpf-next/net]
 
-Thanks. That is pretty convincing. Lets see if Florian has anything to
-add.
+url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/tcp-Save-lock_sock-for-memcg-in-inet_csk_accept/20250823-062322
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git net
+patch link:    https://lore.kernel.org/r/20250822221846.744252-7-kuniyu%40google.com
+patch subject: [PATCH v1 bpf-next/net 6/8] bpf: Introduce SK_BPF_MEMCG_FLAGS and SK_BPF_MEMCG_SOCK_ISOLATED.
+config: arc-randconfig-002-20250823 (https://download.01.org/0day-ci/archive/20250823/202508232331.rxOqu50j-lkp@intel.com/config)
+compiler: arc-linux-gcc (GCC) 12.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250823/202508232331.rxOqu50j-lkp@intel.com/reproduce)
 
-	Andrew
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202508232331.rxOqu50j-lkp@intel.com/
 
+All errors (new ones prefixed by >>):
+
+   net/core/filter.c: In function 'sk_bpf_set_get_memcg_flags':
+>> net/core/filter.c:5290:9: error: implicit declaration of function 'mem_cgroup_sk_set_flags'; did you mean 'mem_cgroup_sk_get_flags'? [-Werror=implicit-function-declaration]
+    5290 |         mem_cgroup_sk_set_flags(sk, *optval);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~
+         |         mem_cgroup_sk_get_flags
+   cc1: some warnings being treated as errors
+
+
+vim +5290 net/core/filter.c
+
+  5269	
+  5270	static int sk_bpf_set_get_memcg_flags(struct sock *sk, int *optval, bool getopt)
+  5271	{
+  5272		if (!mem_cgroup_sk_enabled(sk))
+  5273			return -EOPNOTSUPP;
+  5274	
+  5275		if (getopt) {
+  5276			*optval = mem_cgroup_sk_get_flags(sk);
+  5277			return 0;
+  5278		}
+  5279	
+  5280		/* Don't allow once sk has been published to userspace.
+  5281		 * INET_CREATE is called without lock_sock() but with sk_socket
+  5282		 * INET_ACCEPT is called with lock_sock() but without sk_socket
+  5283		 */
+  5284		if (sock_owned_by_user_nocheck(sk) && sk->sk_socket)
+  5285			return -EBUSY;
+  5286	
+  5287		if (*optval <= 0 || *optval >= SK_BPF_MEMCG_FLAG_MAX)
+  5288			return -EINVAL;
+  5289	
+> 5290		mem_cgroup_sk_set_flags(sk, *optval);
+  5291	
+  5292		return 0;
+  5293	}
+  5294	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
