@@ -1,150 +1,126 @@
-Return-Path: <netdev+bounces-216185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAE9FB32657
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 03:58:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0875B3265D
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 04:02:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3CF43B60163
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 01:57:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6FBC174FF9
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 02:02:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F21571EE7B9;
-	Sat, 23 Aug 2025 01:58:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 965CF17A31B;
+	Sat, 23 Aug 2025 02:02:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
+Received: from mta21.hihonor.com (mta21.hihonor.com [81.70.160.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 850F7191F7E;
-	Sat, 23 Aug 2025 01:58:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1728035963;
+	Sat, 23 Aug 2025 02:01:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.70.160.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755914327; cv=none; b=efibYTva+dOduuyJ/k2Ixe7uKC8pB32NU8ItTH3iQj7yk5sdH3Lqw5SK3UrufcwzpJ6hty9Ju20u0isBDrNxBLYe0JTLmtP+aYRUfwz4dLPmHsxQH1UWNLmN2CYZtMe/r+w/orZ5Ek+oGyiVy6ApBcL8GBFUZ8IGKfu1nxThfKE=
+	t=1755914525; cv=none; b=FnD3cUTrpVwDhb7CbkmdiFVF4FkCqzaCBAVrWxj9IUDHFVSpM71HeglEky+Gc5VBLhhSYm139uYwqb87jzv7jgbfWClnQl6Cr62Xr7wpgFekJ4H+0xLVGdzNEPyPpYQa1CmMSsrIgplUdCUl7s+HaH22JdeBStevo8FKFNoJmrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755914327; c=relaxed/simple;
-	bh=DL7lJvSlF2uYNjqhrn7rHxrrv9ZYt7wI4V1rmKzypqM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KikkzyCgjpIFaWEdy2fUQAN7oGp6TFVJOJtahMhCQxsZ2LXcaZyVDMWv0BLSRojG/RvxlMqZnX/Hb7DRAX9NJCDHU/EnqXEBth26nWL9dLJ5Nfzw/oKQEkxWyZIrkLzFjoTcRBevP2v7l9PBcgSWAV/bFizEbaXXw0tGVLxElJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.206.34.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: esmtpsz20t1755914306t18ac98e2
-X-QQ-Originating-IP: 9m1i3pwX/AtOIuG45fGnU9FcBbfvOkYiHnLZOR3b2Mo=
-Received: from localhost ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Sat, 23 Aug 2025 09:58:24 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 8408012566057604248
-Date: Sat, 23 Aug 2025 09:58:24 +0800
-From: Yibo Dong <dong100@mucse.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
-	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org,
-	gustavoars@kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH net-next v7 4/5] net: rnpgbe: Add basic mbx_fw support
-Message-ID: <C2BF8A6A8A79FB29+20250823015824.GB1995939@nic-Precision-5820-Tower>
-References: <20250822023453.1910972-1-dong100@mucse.com>
- <20250822023453.1910972-5-dong100@mucse.com>
- <a066746c-2f12-4e70-b63a-7996392a9132@lunn.ch>
+	s=arc-20240116; t=1755914525; c=relaxed/simple;
+	bh=68uIIk/t327iWo6rNsAtv3FKCWScccbYXSU7TNuKJVg=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ONEj3xeYfuw4souQAL5hXLNq/m8lcsGOFsshSdZj3tFxYdQL28pLGb+3T35MEtSapsvqf/eG13H+YRoQD4KI/5q2MlVC9rAra6OT0bT4Uc+wtc9tz/LaiD3DE+rLooH6ONvVP4nBvyttKpOFkirLTuchld+pPolcNxcVC1A86Mw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=honor.com; spf=pass smtp.mailfrom=honor.com; arc=none smtp.client-ip=81.70.160.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=honor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=honor.com
+Received: from w003.hihonor.com (unknown [10.68.17.88])
+	by mta21.hihonor.com (SkyGuard) with ESMTPS id 4c80fW2KWJzYl4tT;
+	Sat, 23 Aug 2025 10:01:39 +0800 (CST)
+Received: from a011.hihonor.com (10.68.31.243) by w003.hihonor.com
+ (10.68.17.88) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Sat, 23 Aug
+ 2025 10:01:53 +0800
+Received: from localhost.localdomain (10.144.23.14) by a011.hihonor.com
+ (10.68.31.243) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Sat, 23 Aug
+ 2025 10:01:53 +0800
+From: wangzijie <wangzijie1@honor.com>
+To: <rsalvaterra@gmail.com>
+CC: <adobriyan@gmail.com>, <akpm@linux-foundation.org>,
+	<gregkh@linuxfoundation.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <openwrt-devel@lists.openwrt.org>,
+	<stable@vger.kernel.org>, <viro@zeniv.linux.org.uk>, <wangzijie1@honor.com>
+Subject: Re: [REGRESSION, BISECTED] IPv6 RA is broken with Linux 6.12.42+
+Date: Sat, 23 Aug 2025 10:01:52 +0800
+Message-ID: <20250823020152.1651585-1-wangzijie1@honor.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <CALjTZvZkDr8N18ocZ8jNND_4DwKqr-PV4BBXB60+=WXPF3vn=Q@mail.gmail.com>
+References: <CALjTZvZkDr8N18ocZ8jNND_4DwKqr-PV4BBXB60+=WXPF3vn=Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a066746c-2f12-4e70-b63a-7996392a9132@lunn.ch>
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: N4bqf7uc8PW19XP0trQQ+Rsb3QZc/woXInVpXcYjV9mq0x7aKC3grbok
-	nJu2P5DHHsQE4wPSEwK7S4Hq3iXRkE8CTW7EwRir3Skhp8aNYYv0TYF0N2LWiWNUFJF+a/7
-	LQ2gZkDYlUXSTtpezb4RS/+KamnaURkPHZf8hWsuNIuY5hNlTamZRDDt8fU+EMovNtxJrb1
-	OfsBnDNUcY/Eqt+5XT/f3ojtlUmzAgOk5XpK/OgmGYiPwMQ5/Fzju0UfpP0pUw/5KtnJKm9
-	NV03yknEXLUeHMyVKypZHCFm/+ChUYhl7uBgqCmUrKYVlxoaSoe6n5v0La864E4GMVtGWii
-	z5Ykg1pyHwYYMaTBZDFFQF+lbf2gOEEfMHGoPty4/ExbLEGSdfBMIR+RWB5C4tPifa1IBUI
-	sQMGL149hzPmfSN12ytVKsRfc1QGMnb3OLgLFm/C9oLXW5197HQ0TzS3hNEMi0tf2Y0X03n
-	z6rn5UrPCqIA+kB5eSGdEK16XBC8vHjaAZVDRMfiMf+uyUeqJ1R0NqDh4yeg2U3B1kf1ZZW
-	KmAe6AOn5bCbBa4LuYNl1f8ycWY0Y7aD1gSECDOA6tcOWECsdH/q6zKuyRLNHOtC13b+4fz
-	gEDURwbGRfpaAMzBJ/DQ++fCZdzUkoYrtM/pNZeE7wfsgcazLwOfmLWQwVNDW/hrct3n9VT
-	V++1W2YMzrn/lx0xE9/t12AaFIird+BnFFO49FsWZH4CtwSE9uAuXIjkcrU5iz1X4AagKHm
-	t9nzDeSFa3ECFun491qYTn90irbTUowuhyS0QluvLqEq49VqYc/h4FK+xQWxqkUH7tSBl/a
-	KXMqj8MrTtQjSv0aX/tsMoxmMhR3EI+uRPdL9CrQXY1qG5vbeFEPCePpZd1/XluE26T4Tup
-	nHsQaXYULFT80wvGVcOoGftBohNEos7hWbcJLNGXrhV0qlC5VEqDvFwoKId4+xQ9hMDmFHj
-	WodB1kV7ZV7zL+DaRalZQUet6E6nGWkTbsI0n0+vST5aQRK/cDoXy3Eip8lGV/XBU+7E=
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-X-QQ-RECHKSPAM: 0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: w011.hihonor.com (10.68.20.122) To a011.hihonor.com
+ (10.68.31.243)
 
-On Fri, Aug 22, 2025 at 04:43:16PM +0200, Andrew Lunn wrote:
-> > +/**
-> > + * mucse_mbx_get_capability - Get hw abilities from fw
-> > + * @hw: pointer to the HW structure
-> > + *
-> > + * mucse_mbx_get_capability tries to get capabities from
-> > + * hw. Many retrys will do if it is failed.
-> > + *
-> > + * @return: 0 on success, negative on failure
-> > + **/
-> > +int mucse_mbx_get_capability(struct mucse_hw *hw)
-> > +{
-> > +	struct hw_abilities ability = {};
-> > +	int try_cnt = 3;
-> > +	int err = -EIO;
-> > +
-> > +	while (try_cnt--) {
-> > +		err = mucse_fw_get_capability(hw, &ability);
-> > +		if (err)
-> > +			continue;
-> > +		hw->pfvfnum = le16_to_cpu(ability.pfnum) & GENMASK_U16(7, 0);
-> > +		return 0;
-> > +	}
-> > +	return err;
-> > +}
+> Hi, everyone,
 > 
-> Please could you add an explanation why it would fail? Is this to do
-> with getting the driver and firmware in sync? Maybe you should make
-> this explicit, add a function mucse_mbx_sync() with a comment that
-> this is used once during probe to synchronise communication with the
-> firmware. You can then remove this loop here.
-
-It is just get some fw capability(or info such as fw version).
-It is failed maybe:
-1. -EIO: return by mucse_obtain_mbx_lock_pf. The function tries to get
-pf-fw lock(in chip register, not driver), failed when fw hold the lock.
-2. -ETIMEDOUT: return by mucse_poll_for_xx. Failed when timeout.
-3. -ETIMEDOUT: return by mucse_fw_send_cmd_wait. Failed when wait
-response timeout.
-4. -EIO: return by mucse_fw_send_cmd_wait. Failed when error_code in
-response.
-5. err return by mutex_lock_interruptible.
-
 > 
-> I would also differentiate between different error codes. It is
-> pointless to try again with ENOMEM, EINVAL, etc. These are real errors
-> which should be reported. However TIMEDOUT might makes sense to
-> retry.
+> We noticed a regression in OpenWrt, with IPv6, which causes a router's
+> client devices to stop receiving the IPv6 default route. I have
+> bisected it down to (rather surprisingly)
+> fc1072d934f687e1221d685cf1a49a5068318f34 ("proc: use the same
+> treatment to check proc_lseek as ones for proc_read_iter et.al").
+> Reverting the aforementioned commit fixes the issue, of course.
 > 
-> 	Andrew
+> Git bisect log follows:
 > 
+> git bisect start
+> # status: waiting for both good and bad commits
+> # bad: [880e4ff5d6c8dc6b660f163a0e9b68b898cc6310] Linux 6.12.42
+> git bisect bad 880e4ff5d6c8dc6b660f163a0e9b68b898cc6310
+> # status: waiting for good commit(s), bad commit known
+> # good: [8f5ff9784f3262e6e85c68d86f8b7931827f2983] Linux 6.12.41
+> git bisect good 8f5ff9784f3262e6e85c68d86f8b7931827f2983
+> # good: [dab173bae3303f074f063750a8dead2550d8c782] RDMA/hns: Fix
+> double destruction of rsv_qp
+> git bisect good dab173bae3303f074f063750a8dead2550d8c782
+> # bad: [11fa01706a4f60e759fbee7c53095ff22eaf1595] PCI: pnv_php: Work
+> around switches with broken presence detection
+> git bisect bad 11fa01706a4f60e759fbee7c53095ff22eaf1595
+> # bad: [966460bace9e1dd8609c9d44cf4509844daea8bb] perf record: Cache
+> build-ID of hit DSOs only
+> git bisect bad 966460bace9e1dd8609c9d44cf4509844daea8bb
+> # bad: [f63bd615e58f43dbe4b2e4c3f3ffa0bfb7766007] hwrng: mtk - handle
+> devm_pm_runtime_enable errors
+> git bisect bad f63bd615e58f43dbe4b2e4c3f3ffa0bfb7766007
+> # bad: [9ea3f6b9a67be3476e331ce51cac316c2614a564] pinmux: fix race
+> causing mux_owner NULL with active mux_usecount
+> git bisect bad 9ea3f6b9a67be3476e331ce51cac316c2614a564
+> # good: [1209e33fe3afb6d9e543f963d41b30cfc04538ff] RDMA/hns: Get
+> message length of ack_req from FW
+> git bisect good 1209e33fe3afb6d9e543f963d41b30cfc04538ff
+> # good: [5f3c0301540bc27e74abbfbe31571e017957251b] RDMA/hns: Fix
+> -Wframe-larger-than issue
+> git bisect good 5f3c0301540bc27e74abbfbe31571e017957251b
+> # bad: [fc1072d934f687e1221d685cf1a49a5068318f34] proc: use the same
+> treatment to check proc_lseek as ones for proc_read_iter et.al
+> git bisect bad fc1072d934f687e1221d685cf1a49a5068318f34
+> # good: [ec437d0159681bbdb1cf1f26759d12e9650bffca] kernel: trace:
+> preemptirq_delay_test: use offstack cpu mask
+> git bisect good ec437d0159681bbdb1cf1f26759d12e9650bffca
+> # first bad commit: [fc1072d934f687e1221d685cf1a49a5068318f34] proc:
+> use the same treatment to check proc_lseek as ones for proc_read_iter
+> et.al
+> 
+> Please let me know if you need any additional information.
+> 
+> 
+> Kind regards,
+> 
+> Rui Salvaterra
 
-Yes, I didn't differentiate between different error codes. But it cost
-~0 to ask firmware again. And error will be reported after 'try_cnt' times
-retry to the function caller.
-Maybe can simply handle error codes link this?
-
-Thanks for your feedback.
-
-
-
-
-
+Hi Rui,
+Thanks. I have submitted a patch and I think it can fix this.
+https://lore.kernel.org/all/20250821105806.1453833-1-wangzijie1@honor.com
 
