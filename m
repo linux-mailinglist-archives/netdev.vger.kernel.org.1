@@ -1,157 +1,83 @@
-Return-Path: <netdev+bounces-216183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8849BB3261F
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 03:12:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C6A1B32636
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 03:32:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31FE7A042C7
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 01:12:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19E6C5A7C83
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 01:32:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 081C917B418;
-	Sat, 23 Aug 2025 01:12:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A493A13635C;
+	Sat, 23 Aug 2025 01:32:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rRRtUsef"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D772C190
-	for <netdev@vger.kernel.org>; Sat, 23 Aug 2025 01:12:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CAE023B0;
+	Sat, 23 Aug 2025 01:32:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755911567; cv=none; b=gNgcPjTsZ7gL7L5zu55N8MEf54c2q5I7lEzxUcIXXdpRwQDetjzW5+askj6XD459/dWgJuUpGzxORZS9L/fLxZuRul3GZ3dC74QdbG2RWN5xp7YJW629vWh+dRoMuocckIE9oUJfSWJWOWyhtgfO7RHtU3pV/2wr9voHM5wOqSQ=
+	t=1755912772; cv=none; b=pXIJV+o25KBtUpf9mdbJCBSm/3X0rbdAwypF931o9VcChWGvOm5RR1HyDK6vq0zWKa2f+AfQ+XB8lqMh8QCZ9cdjhtkQioodktn+4lsTHua7QF8uIS+JopL18NZ2nYothXF5RNIhAszwMJhINe4FW1ZvTrYVeCYqqYpw4Gs6+8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755911567; c=relaxed/simple;
-	bh=yA6j+LdZIh8VSNBUAvoV0zZeJUNVdCboDwO3ttQ8Akc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s2uoK7s1apIDx8pybmHKqs/9fLSsDxqXRQvWe3n4vPAYgzZMRHH1zjgnZHLmUL4cN/oiTESZe0sDeRM1bChUASGn/f+e1DlqG15oitxcV1/6hgW4vWxjX40MOQZ7yxuTxzErYs4p/X0YjIx5xoKA5ltbDtwBxB/qJGQ69qikWK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.207.22.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: zesmtpgz7t1755911541t30cf4573
-X-QQ-Originating-IP: CYYpVmL7PQRqYgMsqlkdc43DVUyX20KFhx33Uzp3ols=
-Received: from localhost ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Sat, 23 Aug 2025 09:12:18 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 15638722221360569384
-Date: Sat, 23 Aug 2025 09:12:18 +0800
-From: Yibo Dong <dong100@mucse.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
-	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 4/5] net: rnpgbe: Add basic mbx_fw support
-Message-ID: <EA6C27BA99B43454+20250823011218.GA1995939@nic-Precision-5820-Tower>
-References: <20250818112856.1446278-1-dong100@mucse.com>
- <20250818112856.1446278-5-dong100@mucse.com>
- <39262c11-b14f-462f-b9c0-4e7bd1f32f0d@lunn.ch>
- <458C8E59A94CE79B+20250821024916.GF1742451@nic-Precision-5820-Tower>
- <47aa140e-552b-4650-9031-8931475f0719@lunn.ch>
- <7FCBCC1F18AFE0F3+20250821033253.GA1754449@nic-Precision-5820-Tower>
- <d7a38afc-58c1-468a-be47-442cec6db728@lunn.ch>
+	s=arc-20240116; t=1755912772; c=relaxed/simple;
+	bh=2bJlQ73zMhkZi/w8Svsurn0QcFTsicZAyfdxSWwE4Do=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FsG1rvp5hX87SuwimFGEwYkKuBNhpxB8pBZm8HWZeZWz0MCkJV+GeqJBJ27aFzPyojR9cPELggUs8dTrbvAFGlEunWIP6L3CsQwJn7KotOiqScBPRHHexmZmqjdEYVgf/FPAilk0OGc2+yGPaSje1RDYZV6rtms+KSHfVTiq+Kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rRRtUsef; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D8AEC4CEED;
+	Sat, 23 Aug 2025 01:32:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755912771;
+	bh=2bJlQ73zMhkZi/w8Svsurn0QcFTsicZAyfdxSWwE4Do=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rRRtUsefvqRilZsk4SwuF02AFFr2GQfdOlwmdU4PwfZgBWq1FwoDpJ6mcf366dt6E
+	 Hsa6JAKNkFk6n0Y49YlS1+4az7XQFUqYhrpDYWqyJDHIxFLtGRBCYo9ln/mWHSbpzf
+	 CfmVfCGccIUucsacuAt5aVsBtpB4DGkrc/tqHVjqldbrZIll8mGS5Gu39y+Au1z4B8
+	 zYh8zKMRhRpmkc37d02IYfsdXBggdC+5ZpzC7/CzPfFvBGZom6fApxJWy4ZT5ZVnKe
+	 dCS5G7bMLgaHtIH8gkFBPy0b3KDnuqgzVQSdPVrLnS0xeAoLVlKl/7AA+VYL/tcgZW
+	 MzE3K0hITHyGw==
+Date: Fri, 22 Aug 2025 18:32:50 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Brett A C Sheffield <bacs@librecast.net>
+Cc: regressions@lists.linux.dev, netdev@vger.kernel.org,
+ stable@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ oscmaes92@gmail.com
+Subject: Re: [REGRESSION][BISECTED][PATCH] net: ipv4: fix regression in
+ broadcast routes
+Message-ID: <20250822183250.2a9cb92c@kernel.org>
+In-Reply-To: <20250822165231.4353-4-bacs@librecast.net>
+References: <20250822165231.4353-4-bacs@librecast.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d7a38afc-58c1-468a-be47-442cec6db728@lunn.ch>
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: Mc5bctYcq+Xu5ZimkCNhyte4JzLvHFeTtXMTphtDekXi2R6XskD+pGSa
-	5gBzmROmTfBsEw7HU/52G2BOpbdOnOne/1jQeo3Hk7neXtBsV1ElOH4arGcAgLv0KzWPdiX
-	pLn3nwydBOjhX79ueBMKOSUD6ggLuDAhwTE1AonEZh9tHVVBYbTKYrqEul3F+nNTlWh+pQg
-	9jDhqeGuJi4vlT6TlGZ3mRxKIPZ0g0QihsBQDQ1nHJj2VA0PSlX1/ioBBEZjZYF936YKZui
-	lD7DZQYdhcEouFeEOVSXR2yqWpd20nvD+ujLQeebtYseFS7gUIpeJXTZVe8JLmzjr775p3h
-	wNn2YNu0Rh+pIazN4mk47FKNtTlhGjCZfn1gGN+dd6eHTqm+HcM1JNBAcJ+3+BB+w7X+Tx8
-	/UqiV8vUAM99rnPpufUxitb6M78CSaAHZuX/AbA32Ef5anqllYTW7PQb4a07lnET25E07ID
-	HRXCcpznSD+45e90NzfKhq4S2glOaRIvXbGX2wys3gAlliVUdp+p0gYKS7dJKDPXCBmlWKk
-	NPWSXsYUNMe+uBUXPTrJ3fb+HFjZpTUFVwuBxZ6/e7rUHxzPfykLddBiBMUG9DxY8Pb2ZMT
-	WEXvvcKwN43uyd5JiA7K8EpmzcORzs7J5miMgDlBX/gFuuSjnmVEctDrhzhNzUwX0tJLCQS
-	T217zaG2Pf06JJYp9tttLLTWsZ1zf04qgG8uAaljiDBeIbPl0E512QkSAMAn+Swuxf6SWts
-	75Z6pKZb8PUFHlWgcjzisczi2kQjZlxPyPUuSmVolkpJRSzc3No0ZCyxWYT9YJro0lgnVZR
-	FHBpgqgwRf1fcNllNpAnthGo4XagaF4VhQI/CT+Aks1alYpNLdZAnYYJLmmWCLXmXYXPzmI
-	EVvZqGajdqFXdTETn8+PcengIWEriPcGCXeocx7amy9RIE1uCqe+7ZyQ9wrHzzOtkrqlDaU
-	8KH20/9FkvntBE+iRJpGjRnw5QmGDUuy0OUaBRhF+HMWXWCjIfaHQ9tHCfEKebto6yqQTr4
-	h1k2dQuA==
-X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 22, 2025 at 09:52:25PM +0200, Andrew Lunn wrote:
-> > 'Update firmware operation' will take long time, maybe more than
-> > 10s. If user use 'ethtool -f' to update firmware, and ^C before done?
-> > If ^C before mucse_write_mbx, return as soon as possible. If after mucse_write_mbx,
-> > wait until fw true response.
-> 
-> And what happens if the firmware writing is interrupted? Could you end
-> up with a brick? This is actually one of the operations i would not
-> expect to be able to ^C.
-> 
-> You might also want consider devlink flash.
-> 
-> https://www.kernel.org/doc/html/latest/networking/devlink/devlink-flash.html
-> 
->  It replaces the older ethtool-flash mechanism, and doesn’t require
->  taking any networking locks in the kernel to perform the flash
->  update.
-> 
-> I assume this is meaning ethtool take RTNL, and while that is held, no
-> other network configuration can be performed on any interface. devlink
-> has its own lock so avoids this.
-> 
->        Andrew
-> 
+Thanks for bisecting and fixing!
 
-ethtool or devlink both call mbx(mucse_mbx_fw_post_req)
-to do the true update to firmware. FW not end up with a brick, it has
-fault tolerance itself.
-But that's not the point. The original question is
-about 'wait_event_timeout', I add some comment link this in v6:
-Wait fw response without interruptible.
+> The broadcast_pmtu.sh selftest provided with the original patch still
+> passes with this patch applied.
 
-static int mucse_mbx_fw_post_req(struct mucse_hw *hw,
-                                struct mbx_fw_cmd_req *req,
-                                struct mbx_req_cookie *cookie)
-{
-       int len = le16_to_cpu(req->datalen);
-       int err;
+Hm, yes, AFACT we're losing PMTU discovery but perhaps original commit
+wasn't concerned with that. Hopefully Oscar can comment.
 
-       cookie->errcode = 0;
-       cookie->done = 0;
-       init_waitqueue_head(&cookie->wait);
-       err = mutex_lock_interruptible(&hw->mbx.lock);
-       if (err)
-               return err;
-       err = mucse_write_mbx_pf(hw, (u32 *)req, len);
-       if (err)
-               goto out;
-       /* if write succeeds, we must wait for firmware response or
-        * timeout to avoid using the already freed cookie->wait
-        */
-       err = wait_event_timeout(cookie->wait,
-                                cookie->done == 1,
-                                cookie->timeout_jiffies);
+On Fri, 22 Aug 2025 16:50:51 +0000 Brett A C Sheffield wrote:
+> +		if (type == RTN_BROADCAST) {
+> +			/* ensure MTU value for broadcast routes is retained */
+> +			ip_dst_init_metrics(&rth->dst, res->fi->fib_metrics);
 
-       if (!err)
-               err = -ETIMEDOUT;
-       else
-               err = 0;
-       if (!err && cookie->errcode)
-               err = cookie->errcode;
-out:
-       mutex_unlock(&hw->mbx.lock);
-       return err;
-}
+You need to check if res->fi is actually set before using it
+
+Could you add a selftest / test case for the scenario we broke?
+selftests can be in C / bash / Python. If bash hopefully socat
+can be used to repro, cause it looks like wakeonlan is not very
+widely packaged.
 
