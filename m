@@ -1,75 +1,78 @@
-Return-Path: <netdev+bounces-216210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3E59B328D5
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 15:44:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5252BB328D8
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 15:46:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 639F74E1506
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 13:44:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8DD5F188AC51
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 13:45:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7D8A25A350;
-	Sat, 23 Aug 2025 13:44:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13B5025BF1C;
+	Sat, 23 Aug 2025 13:44:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CDekaSHG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lls9MeGH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1559021CA10;
-	Sat, 23 Aug 2025 13:44:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43C0F244670;
+	Sat, 23 Aug 2025 13:44:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755956679; cv=none; b=fE+Vh5h9JXu1CfpnPpQe4vTbuJqMmoUvEmdwdWvHuwMlBZeqKoMV7p2kjD+Nvuk0iVWjO5Bb03Xvjm7YrgEwa2t9snX6ee0WRhxeC09WxEUMtn3Kf+ShkF52ZMmeMr9u8T70yvb4v+x+0ClKZ3BemLfyT76enwD28MZvB4QhkoM=
+	t=1755956680; cv=none; b=B5vPYd3zNqPEAF+qhY8rs8Y5Fhgyj+s8WqilqasTjB6U359Qx1MV5TWw5srL8Skm3C4e5bg6+v2/tdRHigWS3m7lo8ngIyvEk2iVzfsLUB2Ek6xI9DlNd2LQ4ZtoCnbJwkVUHTPRxx7mXfMOo0fvzNLqKSiI1/KANe5SYTTG5SE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755956679; c=relaxed/simple;
-	bh=Ey5j7k2Nt0EJ2wKwSSfsO6gTg7+LivmeH2vMSOfmmlQ=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=D++WnAJTWKSL622fIXN3sXYfEwW2x4UghwWCVu2qsRSHMF1fXTmteKota39zd6kVQJNpi0apPSGj0gBUawNKNHSzRXDlWPc2mOSebofDm9y/vuHDxvZ5vo8xvwV7tZ477UfwAYbzwQ/LpJ/TI2DfdUigyVbMvadGr5rWFFGN6zU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CDekaSHG; arc=none smtp.client-ip=209.85.221.51
+	s=arc-20240116; t=1755956680; c=relaxed/simple;
+	bh=4NY2yeWwO1/lySCuscD0X6YTArnddn4170u6EFF+HfY=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ofz7AhweuKvaegxIjvirAXf7Sn7PzmT1nug8C2p29P+hmZ1bF0BQQ1wZCCN/H+XZxQytFLtAPwMd7XA4WOt7KLBdWyqAyX8jimL04Q1SABXqncDbXWq6Sz942JKB3kmNTZITFQ6VAoSbhMzZA/JRlnol+vEyHapbtdApJKhqZk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lls9MeGH; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3b9e415a68fso2596589f8f.2;
-        Sat, 23 Aug 2025 06:44:35 -0700 (PDT)
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-45a1b0d224dso15095505e9.3;
+        Sat, 23 Aug 2025 06:44:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755956674; x=1756561474; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jjW1qfNz39D2HB5APzuebpHpOX0iU7j5m6Z8FNxRVSw=;
-        b=CDekaSHGk9fyAbrNiBoFr8j7AaTZhxshK0bFvjOIYYxYXHMmjDj5YjZZ86HbjYYKvu
-         fKc6T9XcIv0NiIKT+ZP+1woUKiDkzCR2GBIoiXlFw7ENvkcpVmSdU/kF2BHRWlqTIDUy
-         imzQcllgMYHZJbBRDiI/pRBJTuWLUzcwpCraWv+YBWMks7ZRtMjY5lZg2M/5S7+hPu/9
-         zBuLZPIlLCyb4toffUgIubHq+fjutsPi10vsbLNsoNRXdK+DNMYnnJGC675oTkAwBHD+
-         09bfguIUlmQ1w2caP+051U/oYJPh5s7o/HQAtJYX2sg+oZT42ImxDra+cFAKEHoKcmc7
-         ej5w==
+        d=gmail.com; s=20230601; t=1755956675; x=1756561475; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WxX71PXS3MJnJ5r/8RA04vZAE4FRLUH21Dt1zod0mbQ=;
+        b=Lls9MeGH62yFWV2agt8Ov7cl95McqR/jJncnZV96i9dXYc88xCwwsTmClXPiVBg6AG
+         kJo89CDDjvLwFeey5TNBrWI9Y+1du2TSrl2XY68XuUFBLY2PxxYF747XGY4PMZ3mVyww
+         ztRAcSWx6IHRs5lyuP56SqlKvWP/3IQk4e2mYKLgT4E6THFxFkkImKVYibRDNBK/wP38
+         8XWyJscab2rAuXTDA8cXQAX5KukefZEi8YxkY7ZcDUuK026nO5IH7EwuwzJoL3egJaCX
+         Q6fepGjw+AmkBS7QKSSvAH+DXmhsM34tEvdKPYaqk6IxYx1fj20WgtBkQ6LoJiPLkEMQ
+         Xklw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755956674; x=1756561474;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jjW1qfNz39D2HB5APzuebpHpOX0iU7j5m6Z8FNxRVSw=;
-        b=iB+BXO6vwrGpNE4SJKhZlTo/FHZT24J//ZY1sNzZuPiIGLFpoazE39z5C/uXLbKoq7
-         an2NpFu+edinNUUXs1HZY4uUjySWEpBW6+xjP8nOXKHXTnyukE11kAwU4SpPHwR1vbEt
-         DZiVyCmoDT1N+P0yZEiw6VT4qXoXQIgH8wrtXIAavHp37q91POhymKKkqaw6yLQ+OHXb
-         2/NVWHlWzcAS21nS51g+BYV9TGgSCiGAqG1vorO04Ckxavbe43xFq5DdqoyaAwhszaOu
-         gnq2V0VlyVR+RZ71c7VXi0pDiT+82yYmM+W+wJbREPBi/wU/zos10dBsnof6sFEwvfBh
-         grFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUyB0layfX3xQwwXixgYLJu9mZOlqg4m6raWMofX3ljiOUud/YztuTzaEJkqWtthgcrWXrpsZ2N@vger.kernel.org, AJvYcCX4gQ9slyA+ler8NwtnaGqbp+UIrecJk4V+gy6sgUyAz1ZbeMfmmwjLoy5eOzcjYFvLQiHaKDjC3ItO+Ic=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6yRUQadfljd/0apUpDm5dh7kQ+Gcu5ujpmMroIVmBOEj+aqV+
-	Zymtu5MhaTALcqDL0QBLfyVTgX4LzkUCySm8GYIYSsqqv7Mv8zcbDMmF
-X-Gm-Gg: ASbGncss1F4WS8sQlk0XS9DgVXU+HxNbgh3GtXqZ1QgxFxk566rT7s06lAEaW/uTmut
-	K8rRwNFWyjStTWS9Mi99yhdmKuqW2/zltsdXAcgyvzaFN2zzJxEPl23191y2SkmNdn+IeXgbeip
-	nnnhZ9vyoqSTucfueTi8Yd46kCnNuhzzbOCK/+XqCehgHg0WOpuOTM/e3zFsOAQKjJgOd+6tH6i
-	+Ixo5pmnWjXTUEKm7vztOe4Wl1xKIukwaUxSGS46deApGjTYWpcCgYsPcf/sDpdHcrHu8RRajxH
-	UlbcnlqMkucPoQt716XTtsEYWbk5+M7qWf0yxBmGS3exathYNIW0+dwr5nzhk91WdrKBhmCSr/g
-	CKID7jzu07V4WaITHyTOB7+yeR/fSXxMQOHcLCoVvhyZKTIpJ89+f/TmtXMoXg7d0IzCuAFg=
-X-Google-Smtp-Source: AGHT+IGgFx1Ps75H6j3SWeQKVWnNGqidWvkK/oN8XDd/UOMhhz42guErzCjyCAPD+64Z6aUJIex+vQ==
-X-Received: by 2002:a05:6000:2586:b0:3a5:243c:6042 with SMTP id ffacd0b85a97d-3c5da54e98bmr4499280f8f.2.1755956674153;
-        Sat, 23 Aug 2025 06:44:34 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1755956675; x=1756561475;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WxX71PXS3MJnJ5r/8RA04vZAE4FRLUH21Dt1zod0mbQ=;
+        b=YyOrxRUWOFIy2EdJIxh9mO7JR4QBty25wQ8Z//ueEj78G0bgKoEsyRZ6YkW53PlETa
+         Qz2yBrqCyZwkEn5u7fLdXaK+srOBoSkZjSwsQVBOcCrblcZ1bOjiFRhz9Ih3Kfl1KIhU
+         tMomkx+XWCVuLg3nPJh4cu3T9WTPkzFnUQ9PUvv+sctKWlDvB/1+QSksDl2/P1wSUHM4
+         T3PhA4P+1XzzGVhHrJBdwMQX4Nmzg1RZKQYJ1RBtMFgVG5EBc4wl0tVnNHv+BIEehPM6
+         Eq0QHLBxO99QB1yF629UmShuVMJl4P+K5yLGmh+OzmFBpwl+il4yOYSXsmvzQbjUvV+U
+         bLCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU1RN+UsHL+gNdkD4lSckTM5ZfTh8Pb2M8m/E8xdVvia08HS935ljDvrET0PZQtG/3tljE5KQyrTmNDveg=@vger.kernel.org, AJvYcCU9ZmApdBWvYf/0YD5RjBGvUepQIQFZfS5z4GYFBpo/I83XmFd1mArXXQ0NMloqfyWZNUA/gnbj@vger.kernel.org
+X-Gm-Message-State: AOJu0YyyJ2B1OfePuc/FF18s3E1TbYFESqrqjCwBex7jpq0kglW92mPo
+	+O+IgytjgFm5ydXZYe+/QUldmsK6U4sb4uEQACkBrOISp/TdC+Jjgddz
+X-Gm-Gg: ASbGncuELwg5p0VRHb/pHufh/ow5laAvlZHz+3qNa+e+OgWlCgIrk9HQEPiuw61HeGZ
+	EtDJPa2HkFUIGQ2X6hJP6H88/SUMMy9UaRrUcauRJftAEfVVxpfbPng0PYme1Q/NatWxQqAKDLL
+	09qSM3Svt7KSvi0dFicCJPjWyO/iHHf0SoZN1L+NTxKkeCJSmZiabNT4IM4HP+KLc8ycO3iC86F
+	8FVWEQPIzvU+Jl4OPB73j4uctSq0+2yhoTe+rq38B6qkdcLVL7Bn0pYt/zXYrUzHgP+Ll/i2F3J
+	BuOltB8zzAl2yeq+aKoSVO5N1kuVkM8GtE79miRqAavaJ9TjxhPQWSf651tbJyRH8yAB9X9jYjd
+	TsqquAdmfVwnYcxqMd8IPUTEHZJu5PniSCMuXt1yY2+fWOx2nm3dBnDT2Qs0h3B9Q1ki+x7M=
+X-Google-Smtp-Source: AGHT+IFXdbKOfUopKjvXDg6dQXtQ2fg8P7GgpoV+RVJxAHuph7/KLKt+fCVdWxWGoAMT9T2AgUzZMg==
+X-Received: by 2002:a5d:5f55:0:b0:3c8:2667:4e36 with SMTP id ffacd0b85a97d-3c826675780mr198469f8f.45.1755956675412;
+        Sat, 23 Aug 2025 06:44:35 -0700 (PDT)
 Received: from Ansuel-XPS24 (host-95-251-209-58.retail.telecomitalia.it. [95.251.209.58])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3c711211b19sm3761466f8f.39.2025.08.23.06.44.33
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3c711211b19sm3761466f8f.39.2025.08.23.06.44.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 23 Aug 2025 06:44:33 -0700 (PDT)
+        Sat, 23 Aug 2025 06:44:34 -0700 (PDT)
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Christian Marangi <ansuelsmth@gmail.com>,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -81,10 +84,12 @@ To: Christian Marangi <ansuelsmth@gmail.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [net-next PATCH v2 1/2] net: phy: introduce phy_id_compare_vendor() PHY ID helper
-Date: Sat, 23 Aug 2025 15:44:28 +0200
-Message-ID: <20250823134431.4854-1-ansuelsmth@gmail.com>
+Subject: [net-next PATCH v2 2/2] net: phy: as21xxx: better handle PHY HW reset on soft-reboot
+Date: Sat, 23 Aug 2025 15:44:29 +0200
+Message-ID: <20250823134431.4854-2-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.50.0
+In-Reply-To: <20250823134431.4854-1-ansuelsmth@gmail.com>
+References: <20250823134431.4854-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,61 +98,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce phy_id_compare_vendor() PHY ID helper to compare a PHY ID with
-the PHY ID Vendor using the generic PHY ID Vendor mask.
+On soft-reboot, with a reset GPIO defined for an Aeonsemi PHY, the
+special match_phy_device fails to correctly identify that the PHY
+needs to load the firmware again.
 
-While at it also rework the PHY_ID_MATCH macro and move the mask to
-dedicated define so that PHY driver can make use of the mask if needed.
+This is caused by the fact that PHY ID is read BEFORE the PHY reset
+GPIO (if present) is asserted, so we can be in the scenario where the
+phydev have the previous PHY ID (with the PHY firmware loaded) but
+after reset the generic AS21xxx PHY is present in the PHY ID registers.
 
+To better handle this, skip reading the PHY ID register only for the PHY
+that are not AS21xxx (by matching for the Aeonsemi Vendor) and always
+read the PHY ID for the other case to handle both firmware already
+loaded or an HW reset.
+
+Fixes: 830877d89edc ("net: phy: Add support for Aeonsemi AS21xxx PHYs")
 Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 ---
-Changes v2:
-- Fix kdoc error
+ drivers/net/phy/as21xxx.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
- include/linux/phy.h | 23 ++++++++++++++++++++---
- 1 file changed, 20 insertions(+), 3 deletions(-)
-
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 74c1bcf64b3c..66153ac1f728 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -1260,9 +1260,13 @@ struct phy_driver {
- #define to_phy_driver(d) container_of_const(to_mdio_common_driver(d),		\
- 				      struct phy_driver, mdiodrv)
+diff --git a/drivers/net/phy/as21xxx.c b/drivers/net/phy/as21xxx.c
+index 92697f43087d..005277360656 100644
+--- a/drivers/net/phy/as21xxx.c
++++ b/drivers/net/phy/as21xxx.c
+@@ -884,11 +884,12 @@ static int as21xxx_match_phy_device(struct phy_device *phydev,
+ 	u32 phy_id;
+ 	int ret;
  
--#define PHY_ID_MATCH_EXACT(id) .phy_id = (id), .phy_id_mask = GENMASK(31, 0)
--#define PHY_ID_MATCH_MODEL(id) .phy_id = (id), .phy_id_mask = GENMASK(31, 4)
--#define PHY_ID_MATCH_VENDOR(id) .phy_id = (id), .phy_id_mask = GENMASK(31, 10)
-+#define PHY_ID_MATCH_EXTACT_MASK GENMASK(31, 0)
-+#define PHY_ID_MATCH_MODEL_MASK GENMASK(31, 4)
-+#define PHY_ID_MATCH_VENDOR_MASK GENMASK(31, 10)
-+
-+#define PHY_ID_MATCH_EXACT(id) .phy_id = (id), .phy_id_mask = PHY_ID_MATCH_EXTACT_MASK
-+#define PHY_ID_MATCH_MODEL(id) .phy_id = (id), .phy_id_mask = PHY_ID_MATCH_MODEL_MASK
-+#define PHY_ID_MATCH_VENDOR(id) .phy_id = (id), .phy_id_mask = PHY_ID_MATCH_VENDOR_MASK
+-	/* Skip PHY that are not AS21xxx or already have firmware loaded */
+-	if (phydev->c45_ids.device_ids[MDIO_MMD_PCS] != PHY_ID_AS21XXX)
++	/* Skip PHY that are not AS21xxx */
++	if (!phy_id_compare_vendor(phydev->c45_ids.device_ids[MDIO_MMD_PCS],
++				   PHY_VENDOR_AEONSEMI))
+ 		return genphy_match_phy_device(phydev, phydrv);
  
- /**
-  * phy_id_compare - compare @id1 with @id2 taking account of @mask
-@@ -1278,6 +1282,19 @@ static inline bool phy_id_compare(u32 id1, u32 id2, u32 mask)
- 	return !((id1 ^ id2) & mask);
- }
- 
-+/**
-+ * phy_id_compare_vendor - compare @id with @vendor mask
-+ * @id: PHY ID
-+ * @vendor_mask: PHY Vendor mask
-+ *
-+ * Return: true if the bits from @id match @vendor using the
-+ *	   generic PHY Vendor mask.
-+ */
-+static inline bool phy_id_compare_vendor(u32 id, u32 vendor_mask)
-+{
-+	return phy_id_compare(id, vendor_mask, PHY_ID_MATCH_VENDOR_MASK);
-+}
-+
- /**
-  * phydev_id_compare - compare @id with the PHY's Clause 22 ID
-  * @phydev: the PHY device
+-	/* Read PHY ID to handle firmware just loaded */
++	/* Read PHY ID to handle firmware loaded or HW reset */
+ 	ret = phy_read_mmd(phydev, MDIO_MMD_PCS, MII_PHYSID1);
+ 	if (ret < 0)
+ 		return ret;
 -- 
 2.50.0
 
