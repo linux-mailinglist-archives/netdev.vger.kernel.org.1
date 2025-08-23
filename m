@@ -1,240 +1,143 @@
-Return-Path: <netdev+bounces-216222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B61DB32A2C
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 18:03:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6683BB32A34
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 18:04:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE1833B3A0F
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 16:00:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA32A1C2452E
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 16:03:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2323D2ED165;
-	Sat, 23 Aug 2025 15:58:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CDFA2EBDFD;
+	Sat, 23 Aug 2025 16:00:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P5bXb6S4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PXzPEmz3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A60C2ED141;
-	Sat, 23 Aug 2025 15:58:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E627F2EBDD7;
+	Sat, 23 Aug 2025 16:00:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755964690; cv=none; b=VO8YBLbMrdKE9l/2PMwnXw4urNmaHtD9PG2m2MevDIGuggudP5Pdu4m6N/RvnSuJLc09v7lEGU9oRQm7GbzKi/Nx+tBLt8ueZNOuA928Kes1FyoAbTH4sReacpZ7Ec906YAxQj46gZHd0HTkNQ8Oyc431wBrhtPdrQa0E5k0nZE=
+	t=1755964840; cv=none; b=s1MOez6qc+zCyjot6Hyv4hK0aOqu1DMq6/ryxGP8t/Q3lvbpNnIG6XFE+lnjmWEDzLw+5CbAnmMTavzM5QkyefdEdjJbAB0bSbC4eLwfF9hP3FcQ0ku5pD3/0iL+BVudeyl6u3lsuDG9B2duCzi8pdNAGhrwKyqUvzFPKGIwe90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755964690; c=relaxed/simple;
-	bh=CEss89D4rBcDaOXEtNPRHdQhEDfgyqGuolIWnEOZN24=;
+	s=arc-20240116; t=1755964840; c=relaxed/simple;
+	bh=iO8Ut6aq0eYMHUnd4gxlenxyD0LxRDw24+ofb0GRSAk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=S8Ad0+yI8uTv2Fu6mcwUKI4HxVY67cxZMCk+194y/L9iS8lsMLe7OIJHRwExzWsJZ3yhNfWjtGOGG1oYUz1MYDxZ6hfDdfCtidD3pIU0rZuRCIx3BW3atESdhqqRw62NJ/irKHiM7Whn9wuDPCIsvHEx1PfBgQD//l/t9mRoUjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P5bXb6S4; arc=none smtp.client-ip=209.85.166.171
+	 To:Cc:Content-Type; b=UQ32psTxPdjZsXw0sCxh9wimI3Nbc4pgtEqCMYhIJcXlVQfpUDo/hbXh5kBDpY4iskGr3c+CX+iBqmkEuS3c80i6qRYMdjVcWvi/Oo9NOowd0p5/U8cHjaMX78pfILPO26o09u8U55maj+BWseuGRVcpVTtyXJw3IVDQHB40Qn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PXzPEmz3; arc=none smtp.client-ip=209.85.219.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3e566327065so18259235ab.0;
-        Sat, 23 Aug 2025 08:58:08 -0700 (PDT)
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e953b4c88e5so8070276.3;
+        Sat, 23 Aug 2025 09:00:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755964687; x=1756569487; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1755964837; x=1756569637; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6uOB/+tg1Dp4KQdja5HyNTCSLbeGrw8GP5vJj1HJRJ4=;
-        b=P5bXb6S4ya2pnmCH/jFrfaOJwhDtPTSS/hmQ2ql371zjqPELn1RqRm8NTWxFS/BnRm
-         joSHIAaA00QT9FEVUaXY818RiSfl/mfCW8twSdb1RMZjMwDZ3NGvWoqd2VEitN+Eig/b
-         WirtstdpDtsgwfm1kruxwcrmjO7Nzzo4q7Iv4KajbGpHlfaS2HKxCruenB9Gq7vjzULt
-         sq/gdcgu6n/skMaMJ6nc7Mudqacn3PJjewcBoLqPFtNhqOVyaaYbc+iZGwXLwfBDfQHS
-         Tgs5KuHShUNbt7XGqtaEhgW9x9TuvUGD0RsTPDOWshYpOc19HPtLUFSeYl4l+T7Jc8SI
-         vC3Q==
+        bh=iO8Ut6aq0eYMHUnd4gxlenxyD0LxRDw24+ofb0GRSAk=;
+        b=PXzPEmz3jv0KrzbgaFbB8VKAyM45Jgcp++yQW9eb570yT80h2gx8+tUG7CEK8AxfRM
+         3j6dkCENy4TitbabI2cNzWgmZPsesu6ac5lJH81DVIDPYKUt9KgjK0y8htjqTxyr1+3o
+         azm7tNB0vMu+cqJoeqLsMT/izCO4C1leGBnBzLQzPRdTq03oHL1hL6rZkVNB2Ump/hjn
+         a0OFYTJK7vJgVrWr3tlICkTnzQvmU6CyT2o1NYm4LQblsLokxEyhRF5t6tDa+zWSOYjE
+         HSK+zEwVdSAYXkE6eY9CeEFGEfHw/bRP2ywPOVCYqycaQ6wqpFAqQUve0OAEND0M8Gnk
+         ktsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755964687; x=1756569487;
+        d=1e100.net; s=20230601; t=1755964837; x=1756569637;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6uOB/+tg1Dp4KQdja5HyNTCSLbeGrw8GP5vJj1HJRJ4=;
-        b=jPL/11oykXVT/93WBGnBF2qdo4TpCpTVmDVs9vjAa6UwLfxLl9d6Uak05ZPCITjMez
-         +FYwZvBvlll7jxZvwnFbIm1dmPIjbybStiZLirXlatW6vAzPSfMVOr0tTJ1SSGrtIUhu
-         dgkGf4C09MXBh7eRbiLZFILXbMA3LHz8UXHD3uVM9pkGUekNPs1ApH51fEq7cKAupzmI
-         UUAwXZ+mk8zuB3dljjnm6v8FNGWyCyq1qfLqVv4s7dhjsLkEGYbAKlML7c3vmB1FuH5c
-         Ho8cWf0PO4zczCqt0Hp+oylX5AbGC4I4l8Y9iW1KXZCIYrAmduoe97Fc2ftPetfSkxmN
-         C2lA==
-X-Forwarded-Encrypted: i=1; AJvYcCX/1lD3UPHbEPOo9QPppLJrlHxj9RD6iAGCysOeRJNIaKTaKhRdr3I5qBrJmjfkxIeaReQOzHxKQF6G@vger.kernel.org
-X-Gm-Message-State: AOJu0YznwpUc1w6ybCem030CPjrMAObtdBxQxuQu18iBAvlXDG4rBXrI
-	xnDIHv0VGjUc1jXDxdYe0qIhOaHo/H/HgT5eLS5FrR+h/sjjAB3P6xhrKgNYx7D4Jp1VqnwAZmS
-	l0PQviyUheMWFP/uVoJL6++uUYFDc2DM=
-X-Gm-Gg: ASbGnctfXetrvgkiVNFeIDRS5g7K7g71ZtGP62Dj8hPUYKX0r2+BJMUZe9HN2M6lpLB
-	l6eUA4FiXt1/omUtXPZ8UxggVVB15Dp0k0PbgE0div5ELc++JoPuUvpvz/GkersGl3BfFaMm71r
-	ZkwJvGCbMYpMIkzS6T1iXYsvVPA8qcXyln5Es6Mm14YQmex5A4/70tkjr5TJ3YyxnIAfLZ4HTvq
-	HgcVwjHOQ==
-X-Google-Smtp-Source: AGHT+IF7DvIt1E0z/6wT3rwFB77I1aID7CBLWX3CGdHH8OwOrHIkXssQnxHCXzuBMqbZLo+ZAHWp7pyACv5yRG02Iw0=
-X-Received: by 2002:a05:6e02:2604:b0:3e6:6f40:ccfd with SMTP id
- e9e14a558f8ab-3e6d7479749mr141369325ab.5.1755964687293; Sat, 23 Aug 2025
- 08:58:07 -0700 (PDT)
+        bh=iO8Ut6aq0eYMHUnd4gxlenxyD0LxRDw24+ofb0GRSAk=;
+        b=IveZQX7DDLwqmRPA5cKmcuN5VUlRfgN6X/xGOXjpHSvr9UdX+drTKdulE0Q0wnjdeN
+         68+eDwzQPB795Y8KPhC9qr6VwQx8nkWqqi0CM/27e3YCdaDT7kAW0gm/g2f7uGBlxPa7
+         4UZhYY+XRNgCTA/h7qFclm47YnpEhWMDKdApDRhqB5NxhiT4n7G8au/THSyEoWCGjOmv
+         VdHexREK4KVn1gdaLwl9USBqxWLsBhS+IrtijZ25M8EFA9KVQYNI6MsBvWVBDrqphMe4
+         rLNbHXu/zC0pRY7dMWNWzk8jrthKYv08EWYmq1+QHE7RhHi8smvajNNsfMQrkeA1r8nd
+         Bmkg==
+X-Forwarded-Encrypted: i=1; AJvYcCWyg5HZCnkAurQ+yrJSx+pmhpyV5t1cbzCXkXlqAtQUwf/yy5/wZCiJCdPfpJww3B+qD8FZSWSO@vger.kernel.org, AJvYcCXUzNMZH3Ne47aHgaSvEIJ2oqa+urUPXuVrYPRxpxVqL4pLU2IMgYd+3RCfEhhLvm/p8//Zf5g0qmNtiPI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfeHkIDZmmZpowQf+vjP8CUaT33V15EYO3L6S6c6LOvvNqC8Ur
+	6OOuvy7uOR9NJcov4vJ9/aQmAODb7fEHGkfsbuMbbToRfck8Rd9MWmaxEIZmBbXPzLnBMIaduwP
+	yM11+Mut4Hh/1vjz9Lyg+AWD9wrrVQJs=
+X-Gm-Gg: ASbGncuRGPJVg8jCUtGeE0Kbg+ktM6ukK5fagTbjlnekTKbgE6oBOSpoFvtdBB9R35p
+	KZWgoC4Svbw9VhbK+OMaoqIhMYPKU7hsVMNXID7DekCzqECIJcmOh7hb6fnEdDfHenLFBKKOoq5
+	KXKz/rs+yWPbYcHhPQT5wvpOsdR1TZTvL6fKzmkvh/yckL0eNkaf7dZwLJLpJs/YHjWKT+XFwhe
+	kFxEA==
+X-Google-Smtp-Source: AGHT+IES5ihDGjqAR0RRt3hF8QgCHXA+ZIjUzFa+DEVMA0B4xc/+RMPiK2gyU3CMD3MqULp5IJtN7L+EbjIGKUsJDXo=
+X-Received: by 2002:a05:690c:968f:b0:71e:719c:491c with SMTP id
+ 00721157ae682-71fdc2e6c75mr73920927b3.18.1755964836651; Sat, 23 Aug 2025
+ 09:00:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1755525878.git.lucien.xin@gmail.com> <e7d5e3954c0d779e999dc50a9b03d9f7ed94dbd2.1755525878.git.lucien.xin@gmail.com>
- <1cf31726-bfb9-4909-a077-6c2c45e0720a@redhat.com>
-In-Reply-To: <1cf31726-bfb9-4909-a077-6c2c45e0720a@redhat.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Sat, 23 Aug 2025 11:57:56 -0400
-X-Gm-Features: Ac12FXxwa94_Bx2cdn5RolEYeYrrVdm5JXgdGyE99iwZrdO0j4BDHWfh7nVrIGc
-Message-ID: <CADvbK_fLKuUaB1_M4DyLC6V==7ThXt+4heyZykBrLM5nL28DYw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 07/15] quic: add connection id management
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net, kuba@kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
-	Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Benjamin Coddington <bcodding@redhat.com>, Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, 
-	Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe" <alibuda@linux.alibaba.com>, 
-	Jason Baron <jbaron@akamai.com>, illiliti <illiliti@protonmail.com>, 
-	Sabrina Dubroca <sd@queasysnail.net>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
-	Daniel Stenberg <daniel@haxx.se>, Andy Gospodarek <andrew.gospodarek@broadcom.com>
+References: <20250823090617.15329-1-jonas.gorski@gmail.com>
+ <4469d2cd-5927-4344-acb0-bc7d35925bb1@lunn.ch> <CAOiHx=nC5f9-2-XPCKBVuVsh93NSrmbSQJp8RqF3EObbEq+OOw@mail.gmail.com>
+ <a0e637f9-e612-4651-8b12-8cb82dd23c55@lunn.ch>
+In-Reply-To: <a0e637f9-e612-4651-8b12-8cb82dd23c55@lunn.ch>
+From: Jonas Gorski <jonas.gorski@gmail.com>
+Date: Sat, 23 Aug 2025 18:00:25 +0200
+X-Gm-Features: Ac12FXy130jNTN6ZhiMK4cPK4U_24XPWcgZUHx7vEHaACavZpynUZkQEhvW7kSM
+Message-ID: <CAOiHx=mnXYmSsYzHQYDAnBg6vKzo0oj07hbiCJBVBegDbv4NAQ@mail.gmail.com>
+Subject: Re: [PATCH net] net: dsa: b53: fix ageing time for BCM53101
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 21, 2025 at 9:55=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
+On Sat, Aug 23, 2025 at 5:31=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
 >
-> On 8/18/25 4:04 PM, Xin Long wrote:
-> > This patch introduces 'struct quic_conn_id_set' for managing Connection
-> > IDs (CIDs), which are represented by 'struct quic_source_conn_id'
-> > and 'struct quic_dest_conn_id'.
+> On Sat, Aug 23, 2025 at 05:27:02PM +0200, Jonas Gorski wrote:
+> > Hi,
 > >
-> > It provides helpers to add and remove CIDs from the set, and handles
-> > insertion of source CIDs into the global connection ID hash table
-> > when necessary.
+> > On Sat, Aug 23, 2025 at 5:00=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wr=
+ote:
+> > >
+> > > On Sat, Aug 23, 2025 at 11:06:16AM +0200, Jonas Gorski wrote:
+> > > > For some reason Broadcom decided that BCM53101 uses 0.5s increments=
+ for
+> > > > the ageing time register, but kept the field width the same [1]. Du=
+e to
+> > > > this, the actual ageing time was always half of what was configured=
+.
+> > > >
+> > > > Fix this by adapting the limits and value calculation for BCM53101.
+> > > >
+> > > > [1] https://github.com/Broadcom-Network-Switching-Software/OpenMDK/=
+blob/master/cdk/PKG/chip/bcm53101/bcm53101_a0_defs.h#L28966
+> > >
+> > > Is line 28966 correct? In order to find a reference to age, i needed
+> > > to search further in the file.
 > >
-> > - quic_conn_id_add(): Add a new Connection ID to the set, and inserts
-> >   it to conn_id hash table if it is a source conn_id.
-> >
-> > - quic_conn_id_remove(): Remove connection IDs the set with sequence
-> >   numbers less than or equal to a number.
+> > Hm, indeed, it's #30768. Not sure where that original line came from,
+> > maybe I miss-clicked before copying the link in the address bar.
 >
-> It's unclear how many connections are expected to be contained in each
-> set. If more than an handful you should consider using RB-tree instead
-> of lists.
->
-We limit the max number of issued CIDs to 8 per connection, and the CID
-per connection traversal is not on the data path, so it's fine to use
-lists here.
+> Or a new version has been dumped there, changing all the line numbers?
+> I've not looked, is there a tag you can use instead of master?
 
-Note that one connection/sk has one source CID set which contains a
-couple of CIDs used for connection migration, and one dest CID set
-to saving peer's CIDs.
+Uh, indeed the repository was updated. I didn't expect that, since its
+was unchanged since its creation in 2020 with a single commit, so I
+assumed Broadcom abandoned it like they did with a lot of other
+repositories, and treated it as a static code dump.
 
-> [...]
-> > +static void quic_source_conn_id_free(struct quic_source_conn_id *s_con=
-n_id)
-> > +{
-> > +     u8 *data =3D s_conn_id->common.id.data;
-> > +     struct quic_hash_head *head;
-> > +
-> > +     if (!hlist_unhashed(&s_conn_id->node)) {
-> > +             head =3D quic_source_conn_id_head(sock_net(s_conn_id->sk)=
-, data);
-> > +             spin_lock_bh(&head->s_lock);
-> > +             hlist_del_init(&s_conn_id->node);
-> > +             spin_unlock_bh(&head->s_lock);
-> > +     }
-> > +
-> > +     /* Freeing is deferred via RCU to avoid use-after-free during con=
-current lookups. */
-> > +     call_rcu(&s_conn_id->rcu, quic_source_conn_id_free_rcu);
-> > +}
-> > +
-> > +static void quic_conn_id_del(struct quic_common_conn_id *common)
-> > +{
-> > +     list_del(&common->list);
-> > +     if (!common->hashed) {
-> > +             kfree(common);
-> > +             return;
-> > +     }
-> > +     quic_source_conn_id_free((struct quic_source_conn_id *)common);
->
-> It looks like the above cast is not needed.
-there will be a compiling error:
+Though they force pushed a new master. Well, "new". master is now
+v2.10.9, and was previously v2.11.0. Don't ask me. But at least they
+also added tags for the two versions.
 
-/root/quic/modules/net/quic/connid.c:68:66: note: expected =E2=80=98struct
-quic_source_conn_id *=E2=80=99 but argument is of type =E2=80=98struct
-quic_common_conn_id *=E2=80=99
-   68 | static void quic_source_conn_id_free(struct
-quic_source_conn_id *s_conn_id)
+So https://github.com/Broadcom/OpenMDK/blob/v2.11.0/cdk/PKG/chip/bcm53101/b=
+cm53101_a0_defs.h#L28966
+is what the link should now be (they also moved the repository).
 
-Or you mean change the parameter type of quic_source_conn_id_free() to:
+That's not the first time I saw Broadcom force pushing to a public
+(SDK) repository, so that link might also break eventually anyway.
 
-static void quic_source_conn_id_free(struct quic_common_conn_id *common)
-
->
-> > +}
-> > +
-> > +/* Add a connection ID with sequence number and associated private dat=
-a to the connection ID set. */
-> > +int quic_conn_id_add(struct quic_conn_id_set *id_set,
-> > +                  struct quic_conn_id *conn_id, u32 number, void *data=
-)
-> > +{
-> > +     struct quic_source_conn_id *s_conn_id;
-> > +     struct quic_dest_conn_id *d_conn_id;
-> > +     struct quic_common_conn_id *common;
-> > +     struct quic_hash_head *head;
-> > +     struct list_head *list;
-> > +
-> > +     /* Locate insertion point to keep list ordered by number. */
-> > +     list =3D &id_set->head;
-> > +     list_for_each_entry(common, list, list) {
-> > +             if (number =3D=3D common->number)
-> > +                     return 0; /* Ignore if it is already exists on th=
-e list. */
-> > +             if (number < common->number) {
-> > +                     list =3D &common->list;
-> > +                     break;
-> > +             }
-> > +     }
-> > +
-> > +     if (conn_id->len > QUIC_CONN_ID_MAX_LEN)
-> > +             return -EINVAL;
-> > +     common =3D kzalloc(id_set->entry_size, GFP_ATOMIC);
-> > +     if (!common)
-> > +             return -ENOMEM;
-> > +     common->id =3D *conn_id;
-> > +     common->number =3D number;
-> > +     if (id_set->entry_size =3D=3D sizeof(struct quic_dest_conn_id)) {
-> > +             /* For destination connection IDs, copy the stateless res=
-et token if available. */
-> > +             if (data) {
-> > +                     d_conn_id =3D (struct quic_dest_conn_id *)common;
-> > +                     memcpy(d_conn_id->token, data, QUIC_CONN_ID_TOKEN=
-_LEN);
-> > +             }
-> > +     } else {
-> > +             /* For source connection IDs, mark as hashed and insert i=
-nto the global source
-> > +              * connection ID hashtable.
-> > +              */
-> > +             common->hashed =3D 1;
-> > +             s_conn_id =3D (struct quic_source_conn_id *)common;
-> > +             s_conn_id->sk =3D data;
-> > +
-> > +             head =3D quic_source_conn_id_head(sock_net(s_conn_id->sk)=
-, common->id.data);
-> > +             spin_lock_bh(&head->s_lock);
-> > +             hlist_add_head(&s_conn_id->node, &head->head);
-> > +             spin_unlock_bh(&head->s_lock);
-> > +     }
-> > +     list_add_tail(&common->list, list);
->
-> It's unclear if/how id_set->list is protected vs concurrent accesses.
->
-id_set is per connection/socket, it's always protected by sock lock.
-I will leave an annotation in the description of the function for that.
-
-Thanks.
+Best regards,
+Jonas
 
