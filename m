@@ -1,161 +1,179 @@
-Return-Path: <netdev+bounces-216220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E80CB329A8
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 17:39:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CB1AB329AF
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 17:41:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 410441C21E7E
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 15:39:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C92F3A7C0B
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 15:41:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF7102E7F1C;
-	Sat, 23 Aug 2025 15:38:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6442E88AC;
+	Sat, 23 Aug 2025 15:41:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dtuglmsZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YL2mtwNG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F4F2E7BDC;
-	Sat, 23 Aug 2025 15:38:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378E812B93;
+	Sat, 23 Aug 2025 15:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755963536; cv=none; b=Gv+6yWjFxus0d0BK2NAtBLztwMT2mCYPpWObnieY5Jg1bDMUXSquxs0RciiXtdngeLcOpyylVg2LEtPb/1NJ3MiJbYTYWD8QMcwXqj3U8zjRbVh+oaR68Ijti9gXZpReeeDEaqSL2trsAeTpRuSSp7lCKT48tCBaI+dA+VtEfr8=
+	t=1755963665; cv=none; b=DwNDbkqiQu29E25OPjimJMca4FdNl53nVdIVIzF92yvg8SC8PVjyRY3XQbDkQpTD2xEPXixVKN9BgHEPStQlm7ue4ZUxNRwQKbl788gb/r9fByauIE4nKe6TIHVgEnOQnv/JmFnNw0GhASXUnhvuOmQmjcNyKeEuSsm82FsMtSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755963536; c=relaxed/simple;
-	bh=2CKFaXXEg2LYAIZZ/UOO6SOKp9zzgRvKhyBppqFbZxA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IxkBxIjJwrhmCWox4h7EzLdeT3FPksvrLk0x4iDH7hCuLsdtk+Fwt8BaWt0A1VnZjQNNtJknurVsIQRiZGvMAvOlbERuuMQEeg/qc1yunor8En0SnMeWZQ+d4xV5H9BaEq8KF5Y9Yv7Ng0/6HHfuJsiqHlpJ5jCKk3AH/OwNHXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dtuglmsZ; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755963535; x=1787499535;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=2CKFaXXEg2LYAIZZ/UOO6SOKp9zzgRvKhyBppqFbZxA=;
-  b=dtuglmsZ4ghXk+nfKeCQIRZE9gWaWLjqDhrjdGmGSS5kUE9K/S5moBHN
-   ckWCok+PlFsl2Xz7V61ZxRyM70Lr4q1Vl7OXU4/imjSQ6Tgs4ddxJTFPZ
-   eFwtSqMDby+pz7i2C1D6+D/iOnAgsokS/GjC2fJzm8PvLr3eucRZ4ByE+
-   dhyeBvuES6D6Ku2NNLRY85UR2d06VBobcLvtk/eC7HyVcE+vhK4V3rGjM
-   Q8PQUtIWZxehxsdYWzi/tIDP3ovuTfnatXTlYZm8KBW2uAS4DIgdYoyKE
-   PdgzVOO3ARBh9gSBNnO4Rq4wAYOwnQ7aH/TXIZ35GmR1iUQaje16y9sUo
-   Q==;
-X-CSE-ConnectionGUID: FnH8i//5QtSoORDvWQp/Hg==
-X-CSE-MsgGUID: O2okVptrR2+AVUwkIh3Ycg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="57262174"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="57262174"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2025 08:38:53 -0700
-X-CSE-ConnectionGUID: Wes7r59DTYKOEuQgrvtJNA==
-X-CSE-MsgGUID: NoleGkrySXu7qGfTOn6smQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="168164859"
-Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
-  by orviesa010.jf.intel.com with ESMTP; 23 Aug 2025 08:38:49 -0700
-Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1upqKM-000MNn-0p;
-	Sat, 23 Aug 2025 15:38:46 +0000
-Date: Sat, 23 Aug 2025 23:38:06 +0800
-From: kernel test robot <lkp@intel.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>
-Cc: oe-kbuild-all@lists.linux.dev,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Michal Hocko <mhocko@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Mina Almasry <almasrymina@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v1 bpf-next/net 6/8] bpf: Introduce SK_BPF_MEMCG_FLAGS
- and SK_BPF_MEMCG_SOCK_ISOLATED.
-Message-ID: <202508232331.rxOqu50j-lkp@intel.com>
-References: <20250822221846.744252-7-kuniyu@google.com>
+	s=arc-20240116; t=1755963665; c=relaxed/simple;
+	bh=6iU2aynSLSee+E5Dopkej0Rgy69kifMRkgq2/0PXcH8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SuXcBxlYGy2jcKuaYlbMwiBln7fwd1/iLfdJo7IuBAXI79OG4ToXL6ogbpZUWptJKHtnJzFUdqu+e25audmHytpmcAstyD84Hv/TKSQvwr5rjDKNGDe74mM3oma/U7WXvnFuYdjjKHzEuxSRSW+4Gpo3yJse+3BJbiVidzDGStU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YL2mtwNG; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3e7c238bc0eso10295535ab.3;
+        Sat, 23 Aug 2025 08:41:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755963663; x=1756568463; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GK970f6W8v3dUSj26yOJRFemswkS/yBYwR0vBetrEbo=;
+        b=YL2mtwNGAm4BkWOAfJnPVvW2/MImqlbz1VBii1qL2v16cb7GuT1Uo0FmAMs6N+b5Xp
+         yvcvYiS7JSpUIxbHw2JR8/+FVKsu9KFNDxbU1TuOAjoIbdL55N9YZluL4lLICe01i5Sa
+         ruFDH3C+821dS1Dobqvw/Agd3OSV+n6m7ul9KWZz41UeeMeYIiFr7XO+TdizzBW8RSW8
+         wZ2/HqJwcJRzie4kIg0Qoc9MPjbuKb8QcADBENX3t3dTg7u+yWDIGFVRODbeI08q866u
+         ZZbvJ1+A49PVWJtz0wSSRg/9xAF4h8Q+oQicmt4okjUEpxrxCj1BLINTvJPQad16ptPm
+         Anuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755963663; x=1756568463;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GK970f6W8v3dUSj26yOJRFemswkS/yBYwR0vBetrEbo=;
+        b=g+6DirlkdTL8OimIhOcBGwbUpF6qT17OyHD3jhf8UVYNHuoWnIEwnm97VngIW4d663
+         1srymoLBMJP+q655A8RHBqAY4f4HNJLz0NPKc+yqQmU+8iv9prFZw+9HZRvJK4zEJprz
+         cL7nCP7MuS+ui3CgtNxVH75WS+EHfMOqB5lxzyNVgAhSJS8svptKxCUdMpHmKo5SVpwY
+         CAy9mWWSoC3xx/s/OQqHGlJHJCEAzy1By5ptG/dEDb+g5KBVfzjbWr0U0MH8R4gY8eUZ
+         pQy1S17o8GcBbNoMcE8TEuM+116jINcsclVJzLokpzjizw73CKgmY+pBs8yP1KDSVYXi
+         d1pA==
+X-Forwarded-Encrypted: i=1; AJvYcCXqW8rPWOrwUZCc2b5H0VkowKk1e4V1HbQxmlIOteZ8zjPJtegKHdDNmKSQ6cjZdcOaKOObtaZeErHF@vger.kernel.org
+X-Gm-Message-State: AOJu0YyiNmt2Qvc8Pl3uwTTojKHKyY1njdJo80CMj4rWXqcZjvyhDiPn
+	NJg18fDafJ3jWcs21FJwVvROmeCSy5BYG04qad+S+Ns/Wx9HN/Y9Gomjiy8YEUTGuAB/8TuLHDp
+	oxYl6FthjDC/5EEFZqngPY0TeBWsJucI=
+X-Gm-Gg: ASbGncupcZRfAODg3QlciLOOrAEAqzanuZ0cBQg4MFc/rDrAOIIfZ5+L+ahuR99Wckt
+	tQ63eh069FFPjjjqdk/EddBBuvHosRidNEE/hd2xuf63mr+MazS4H+VsqoSOKxJGFdoS+d9SSqC
+	W6c7fgYI9yjQu4WfVU00wWkgjajakQ06wBpv/XvQgirpc9JB8nx5retk8INhc3CJsIalXfJP1kO
+	qu2WaeZnA==
+X-Google-Smtp-Source: AGHT+IESYRh8i7xlc71145sLwSk6o7jgXXpkeEyxFOYt+GdWSWEwp55HWkwzH5gnJnP9Y4VANKPEMbZ8VhasRb2Fw20=
+X-Received: by 2002:a05:6e02:1541:b0:3ea:9da1:b653 with SMTP id
+ e9e14a558f8ab-3ea9da1bb37mr37217535ab.16.1755963663223; Sat, 23 Aug 2025
+ 08:41:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250822221846.744252-7-kuniyu@google.com>
+References: <cover.1755525878.git.lucien.xin@gmail.com> <507c85525538f0dc64e536f7ccdd7862b542a227.1755525878.git.lucien.xin@gmail.com>
+ <a45ba272-685f-41dd-8582-6bbc5bc086bb@redhat.com>
+In-Reply-To: <a45ba272-685f-41dd-8582-6bbc5bc086bb@redhat.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Sat, 23 Aug 2025 11:40:52 -0400
+X-Gm-Features: Ac12FXzb4OuOZTD0SjAL8bodcf6jguLEYM91QZYQC9_n7a90QBtcGXoJbtIyI_M
+Message-ID: <CADvbK_eLTAQkFPNF58fBRqeZzRycBX0EeNk-P=HPc+Z-__JU9g@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 08/15] quic: add path management
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net, kuba@kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
+	Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Benjamin Coddington <bcodding@redhat.com>, Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, 
+	Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe" <alibuda@linux.alibaba.com>, 
+	Jason Baron <jbaron@akamai.com>, illiliti <illiliti@protonmail.com>, 
+	Sabrina Dubroca <sd@queasysnail.net>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
+	Daniel Stenberg <daniel@haxx.se>, Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Kuniyuki,
+On Thu, Aug 21, 2025 at 10:18=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+>
+> On 8/18/25 4:04 PM, Xin Long wrote:
+> > +/* Lookup a quic_udp_sock in the global hash table. If not found, crea=
+tes and returns a new one
+> > + * associated with the given kernel socket.
+> > + */
+> > +static struct quic_udp_sock *quic_udp_sock_lookup(struct sock *sk, uni=
+on quic_addr *a, u16 port)
+> > +{
+> > +     struct net *net =3D sock_net(sk);
+> > +     struct quic_hash_head *head;
+> > +     struct quic_udp_sock *us;
+> > +
+> > +     head =3D quic_udp_sock_head(net, port);
+> > +     hlist_for_each_entry(us, &head->head, node) {
+> > +             if (net !=3D sock_net(us->sk))
+> > +                     continue;
+> > +             if (a) {
+> > +                     if (quic_cmp_sk_addr(us->sk, &us->addr, a) &&
+> > +                         (!us->bind_ifindex || !sk->sk_bound_dev_if ||
+> > +                          us->bind_ifindex =3D=3D sk->sk_bound_dev_if)=
+)
+> > +                             return us;
+> > +                     continue;
+> > +             }
+> > +             if (ntohs(us->addr.v4.sin_port) =3D=3D port)
+> > +                     return us;
+> > +     }
+> > +     return NULL;
+> > +}
+>
+> The function description does not match the actual function implementatio=
+n.
+Right, I forgot to update the description after moving the creation out.
 
-kernel test robot noticed the following build errors:
+>
+> > +
+> > +/* Binds a QUIC path to a local port and sets up a UDP socket. */
+> > +int quic_path_bind(struct sock *sk, struct quic_path_group *paths, u8 =
+path)
+> > +{
+> > +     union quic_addr *a =3D quic_path_saddr(paths, path);
+> > +     int rover, low, high, remaining;
+> > +     struct net *net =3D sock_net(sk);
+> > +     struct quic_hash_head *head;
+> > +     struct quic_udp_sock *us;
+> > +     u16 port;
+> > +
+> > +     port =3D ntohs(a->v4.sin_port);
+> > +     if (port) {
+> > +             head =3D quic_udp_sock_head(net, port);
+> > +             mutex_lock(&head->m_lock);
+> > +             us =3D quic_udp_sock_lookup(sk, a, port);
+> > +             if (!quic_udp_sock_get(us)) {
+> > +                     us =3D quic_udp_sock_create(sk, a);
+> > +                     if (!us) {
+> > +                             mutex_unlock(&head->m_lock);
+> > +                             return -EINVAL;
+> > +                     }
+> > +             }
+> > +             mutex_unlock(&head->m_lock);
+> > +
+> > +             quic_udp_sock_put(paths->path[path].udp_sk);
+> > +             paths->path[path].udp_sk =3D us;
+> > +             return 0;
+> > +     }
+> > +
+> > +     inet_get_local_port_range(net, &low, &high);
+>
+> you could/should use inet_sk_get_local_port_range().
+>
+True, will update.
 
-[auto build test ERROR on bpf-next/net]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/tcp-Save-lock_sock-for-memcg-in-inet_csk_accept/20250823-062322
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git net
-patch link:    https://lore.kernel.org/r/20250822221846.744252-7-kuniyu%40google.com
-patch subject: [PATCH v1 bpf-next/net 6/8] bpf: Introduce SK_BPF_MEMCG_FLAGS and SK_BPF_MEMCG_SOCK_ISOLATED.
-config: arc-randconfig-002-20250823 (https://download.01.org/0day-ci/archive/20250823/202508232331.rxOqu50j-lkp@intel.com/config)
-compiler: arc-linux-gcc (GCC) 12.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250823/202508232331.rxOqu50j-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202508232331.rxOqu50j-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   net/core/filter.c: In function 'sk_bpf_set_get_memcg_flags':
->> net/core/filter.c:5290:9: error: implicit declaration of function 'mem_cgroup_sk_set_flags'; did you mean 'mem_cgroup_sk_get_flags'? [-Werror=implicit-function-declaration]
-    5290 |         mem_cgroup_sk_set_flags(sk, *optval);
-         |         ^~~~~~~~~~~~~~~~~~~~~~~
-         |         mem_cgroup_sk_get_flags
-   cc1: some warnings being treated as errors
-
-
-vim +5290 net/core/filter.c
-
-  5269	
-  5270	static int sk_bpf_set_get_memcg_flags(struct sock *sk, int *optval, bool getopt)
-  5271	{
-  5272		if (!mem_cgroup_sk_enabled(sk))
-  5273			return -EOPNOTSUPP;
-  5274	
-  5275		if (getopt) {
-  5276			*optval = mem_cgroup_sk_get_flags(sk);
-  5277			return 0;
-  5278		}
-  5279	
-  5280		/* Don't allow once sk has been published to userspace.
-  5281		 * INET_CREATE is called without lock_sock() but with sk_socket
-  5282		 * INET_ACCEPT is called with lock_sock() but without sk_socket
-  5283		 */
-  5284		if (sock_owned_by_user_nocheck(sk) && sk->sk_socket)
-  5285			return -EBUSY;
-  5286	
-  5287		if (*optval <= 0 || *optval >= SK_BPF_MEMCG_FLAG_MAX)
-  5288			return -EINVAL;
-  5289	
-> 5290		mem_cgroup_sk_set_flags(sk, *optval);
-  5291	
-  5292		return 0;
-  5293	}
-  5294	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks.
 
