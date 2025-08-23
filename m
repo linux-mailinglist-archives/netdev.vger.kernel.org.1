@@ -1,126 +1,113 @@
-Return-Path: <netdev+bounces-216186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0875B3265D
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 04:02:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 820D9B3265E
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 04:03:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6FBC174FF9
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 02:02:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C223AC0CE3
+	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 02:03:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 965CF17A31B;
-	Sat, 23 Aug 2025 02:02:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 007051F0E25;
+	Sat, 23 Aug 2025 02:03:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mta21.hihonor.com (mta21.hihonor.com [81.70.160.142])
+Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1728035963;
-	Sat, 23 Aug 2025 02:01:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.70.160.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6FD32C190;
+	Sat, 23 Aug 2025 02:03:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755914525; cv=none; b=FnD3cUTrpVwDhb7CbkmdiFVF4FkCqzaCBAVrWxj9IUDHFVSpM71HeglEky+Gc5VBLhhSYm139uYwqb87jzv7jgbfWClnQl6Cr62Xr7wpgFekJ4H+0xLVGdzNEPyPpYQa1CmMSsrIgplUdCUl7s+HaH22JdeBStevo8FKFNoJmrc=
+	t=1755914602; cv=none; b=lghXfRUJ0LPfrrxTjPwrc/XdGrn3HQJo78GfPShKkohP1DE6ns7f8Si0nCT/Dk6guWvfdtPcsSezSttHOI5u0+DpK5q98dCqB2vhD60F8boWhRf7aYiBloYxDixyKKAxxse/O9qj4wiRrasj/VvXZQ7cSPvVhm1N3w1yXZs6/J4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755914525; c=relaxed/simple;
-	bh=68uIIk/t327iWo6rNsAtv3FKCWScccbYXSU7TNuKJVg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ONEj3xeYfuw4souQAL5hXLNq/m8lcsGOFsshSdZj3tFxYdQL28pLGb+3T35MEtSapsvqf/eG13H+YRoQD4KI/5q2MlVC9rAra6OT0bT4Uc+wtc9tz/LaiD3DE+rLooH6ONvVP4nBvyttKpOFkirLTuchld+pPolcNxcVC1A86Mw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=honor.com; spf=pass smtp.mailfrom=honor.com; arc=none smtp.client-ip=81.70.160.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=honor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=honor.com
-Received: from w003.hihonor.com (unknown [10.68.17.88])
-	by mta21.hihonor.com (SkyGuard) with ESMTPS id 4c80fW2KWJzYl4tT;
-	Sat, 23 Aug 2025 10:01:39 +0800 (CST)
-Received: from a011.hihonor.com (10.68.31.243) by w003.hihonor.com
- (10.68.17.88) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Sat, 23 Aug
- 2025 10:01:53 +0800
-Received: from localhost.localdomain (10.144.23.14) by a011.hihonor.com
- (10.68.31.243) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Sat, 23 Aug
- 2025 10:01:53 +0800
-From: wangzijie <wangzijie1@honor.com>
-To: <rsalvaterra@gmail.com>
-CC: <adobriyan@gmail.com>, <akpm@linux-foundation.org>,
-	<gregkh@linuxfoundation.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <openwrt-devel@lists.openwrt.org>,
-	<stable@vger.kernel.org>, <viro@zeniv.linux.org.uk>, <wangzijie1@honor.com>
-Subject: Re: [REGRESSION, BISECTED] IPv6 RA is broken with Linux 6.12.42+
-Date: Sat, 23 Aug 2025 10:01:52 +0800
-Message-ID: <20250823020152.1651585-1-wangzijie1@honor.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <CALjTZvZkDr8N18ocZ8jNND_4DwKqr-PV4BBXB60+=WXPF3vn=Q@mail.gmail.com>
-References: <CALjTZvZkDr8N18ocZ8jNND_4DwKqr-PV4BBXB60+=WXPF3vn=Q@mail.gmail.com>
+	s=arc-20240116; t=1755914602; c=relaxed/simple;
+	bh=bBbzWA/lXi8mRYNfOXPInP3IDahU4cbSMWnmG/NhFP4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kUE53bHuk/UWI1TKedbGwGjlki09UBz/zjVQvdJTHFn2bSCfVS1GeDo8Egx0zNWd2z6NgMhiEI0AfCLfFMKa6Ras+CB5tqoJFGnpguZpSVNxxqMmgJDC11DJoU4AeS7znfQH3lAXRpRXMVORYove6Io0FFNTcjNXMmMaPMsRRps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.204.34.129
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: zesmtpsz6t1755914584taf0414ac
+X-QQ-Originating-IP: XQMkFPTld5aopUszAMtCZgJqYkOo5w3DSNONEnbYVFI=
+Received: from localhost ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Sat, 23 Aug 2025 10:03:02 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 18037205199112697214
+Date: Sat, 23 Aug 2025 10:03:02 +0800
+From: Yibo Dong <dong100@mucse.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Parthiban.Veerasooran@microchip.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
+	gur.stavi@huawei.com, maddy@linux.ibm.com, mpe@ellerman.id.au,
+	danishanwar@ti.com, lee@trager.us, gongfan1@huawei.com,
+	lorenzo@kernel.org, geert+renesas@glider.be,
+	lukas.bulwahn@redhat.com, alexanderduyck@fb.com,
+	richardcochran@gmail.com, kees@kernel.org, gustavoars@kernel.org,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH net-next v7 4/5] net: rnpgbe: Add basic mbx_fw support
+Message-ID: <1F30CBDD95FCBE06+20250823020302.GC1995939@nic-Precision-5820-Tower>
+References: <20250822023453.1910972-1-dong100@mucse.com>
+ <20250822023453.1910972-5-dong100@mucse.com>
+ <9fc58eb7-e3d8-4593-9d62-82ec40d4c7d2@microchip.com>
+ <7D780BA46B65623F+20250822053740.GC1931582@nic-Precision-5820-Tower>
+ <8fc334ac-cef8-447b-8a5b-9aa899e0d457@microchip.com>
+ <A1F3F9E0764A4308+20250822065132.GA1942990@nic-Precision-5820-Tower>
+ <b488b893-389f-4c20-b2c3-23071279272c@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: w011.hihonor.com (10.68.20.122) To a011.hihonor.com
- (10.68.31.243)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b488b893-389f-4c20-b2c3-23071279272c@lunn.ch>
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: M4B45z97fsbxfp6War9HhAiOAlD1ajijGbjCp4iYKrkcelqILvtBpOsv
+	F7+KA3a0ajs4JULHGlQSRrwbkOed5Txpe2KhwbiVeJF9YZvqtF21tf+KEc/ePfn7PVhciLY
+	qAaTaSB22ffC3i+B8DUm+OCKTGLMaMonnv6uXOHvGgtYjTvCpYRx/tUFonmqj1IQSU1lLfC
+	zZaF2BP7Ibu6zpOhXj67PZY++0LvHAHeRmDDq9FyFhSJphROhYpPw2PvVSSRWr4nYbEvLPX
+	Teok7gB/WzozPHHNJsH2xNviLG+xXn64INL5XPNfSkvyMBLGcKDqQ/5w4wkCq97AimDM3Yk
+	xpWC0tbx9cK02zdLVDbKnFWNpqCDtXbYHa2QWIwmCc+paITq011YOL64+PA9mphwPufr2dI
+	2g+Q68uXwI5CtnKoZBjDRW/sk+4pih8/+uhIHkjZszBaxqGFtp7i62FdmdN9Mznzp1QqrMS
+	6dw0Ofj3AuJwjQY314T3RBein8koroF7EcDkc7s/n92BylgE+YipMziqwrzoJCPMLZhPzjw
+	RspHcDWdm6dBBtJnz3PgbRTHl6mndUbBP5FGL2BiAubSWfsnsVw5gXZK/KPZ48eKTisOp/z
+	D1oMthpXhRCZ60SPdtoiP5LIQT3L+jDs6bfe0qPjoowZkH/MbG+pcAR+IQIjcGugcUjeGFn
+	GcX9aXTLY3h7950fW1EjyRJj89afHmNmvv/frEGCvh/EpdUJet8h2viQfKQGK4E9fdkLJsZ
+	Z8laryYTC761e6dCDuIDT8EwXOzUvDJw3TAcW8RSZZU5A09eojkCvcidmKzK/7t64oDDOf6
+	KJX2ysjgVKp7pJwfc4OPGJER+6VZ3EfgK6FeiY0PgmR1sucw3U/DaBYBroeinKqv2UmBHks
+	0tMccszajTVqQp4Eay7DJcBvj6xAnV6a+TdmnGnVaatb8CjLrJvwzOvhdLZKuj9LnRkmpV9
+	DyQfNBAqOY/ixQGJVP4uh0LBjyD1VjLbyyWybB8OP9OIlDn3uXcJeWyvypvXZDLdvWyBhJj
+	3z5lNhxTXQaZt6F7g6mOKqMTRrSuyNGGSkARR4gtWZQv8I/rcstMi6Z+/D0+P7EBofSktfQ
+	Sy8BS23LJdsBRBN9z7fRKo=
+X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
+X-QQ-RECHKSPAM: 0
 
-> Hi, everyone,
+On Fri, Aug 22, 2025 at 04:33:54PM +0200, Andrew Lunn wrote:
+> > /* Initialized as a defensive measure to handle edge cases
+> >  * where try_cnt might be modified
+> >  */
+> >  int err = -EIO;
 > 
+> We don't use defensive code in the kernel. Defensive code suggests you
+> don't actually know what your driver is doing and you are guessing
+> this might happen. You should convince yourself it is
+> possible/impossible and write the code as needed.
 > 
-> We noticed a regression in OpenWrt, with IPv6, which causes a router's
-> client devices to stop receiving the IPv6 default route. I have
-> bisected it down to (rather surprisingly)
-> fc1072d934f687e1221d685cf1a49a5068318f34 ("proc: use the same
-> treatment to check proc_lseek as ones for proc_read_iter et.al").
-> Reverting the aforementioned commit fixes the issue, of course.
+> 	Andrew
 > 
-> Git bisect log follows:
-> 
-> git bisect start
-> # status: waiting for both good and bad commits
-> # bad: [880e4ff5d6c8dc6b660f163a0e9b68b898cc6310] Linux 6.12.42
-> git bisect bad 880e4ff5d6c8dc6b660f163a0e9b68b898cc6310
-> # status: waiting for good commit(s), bad commit known
-> # good: [8f5ff9784f3262e6e85c68d86f8b7931827f2983] Linux 6.12.41
-> git bisect good 8f5ff9784f3262e6e85c68d86f8b7931827f2983
-> # good: [dab173bae3303f074f063750a8dead2550d8c782] RDMA/hns: Fix
-> double destruction of rsv_qp
-> git bisect good dab173bae3303f074f063750a8dead2550d8c782
-> # bad: [11fa01706a4f60e759fbee7c53095ff22eaf1595] PCI: pnv_php: Work
-> around switches with broken presence detection
-> git bisect bad 11fa01706a4f60e759fbee7c53095ff22eaf1595
-> # bad: [966460bace9e1dd8609c9d44cf4509844daea8bb] perf record: Cache
-> build-ID of hit DSOs only
-> git bisect bad 966460bace9e1dd8609c9d44cf4509844daea8bb
-> # bad: [f63bd615e58f43dbe4b2e4c3f3ffa0bfb7766007] hwrng: mtk - handle
-> devm_pm_runtime_enable errors
-> git bisect bad f63bd615e58f43dbe4b2e4c3f3ffa0bfb7766007
-> # bad: [9ea3f6b9a67be3476e331ce51cac316c2614a564] pinmux: fix race
-> causing mux_owner NULL with active mux_usecount
-> git bisect bad 9ea3f6b9a67be3476e331ce51cac316c2614a564
-> # good: [1209e33fe3afb6d9e543f963d41b30cfc04538ff] RDMA/hns: Get
-> message length of ack_req from FW
-> git bisect good 1209e33fe3afb6d9e543f963d41b30cfc04538ff
-> # good: [5f3c0301540bc27e74abbfbe31571e017957251b] RDMA/hns: Fix
-> -Wframe-larger-than issue
-> git bisect good 5f3c0301540bc27e74abbfbe31571e017957251b
-> # bad: [fc1072d934f687e1221d685cf1a49a5068318f34] proc: use the same
-> treatment to check proc_lseek as ones for proc_read_iter et.al
-> git bisect bad fc1072d934f687e1221d685cf1a49a5068318f34
-> # good: [ec437d0159681bbdb1cf1f26759d12e9650bffca] kernel: trace:
-> preemptirq_delay_test: use offstack cpu mask
-> git bisect good ec437d0159681bbdb1cf1f26759d12e9650bffca
-> # first bad commit: [fc1072d934f687e1221d685cf1a49a5068318f34] proc:
-> use the same treatment to check proc_lseek as ones for proc_read_iter
-> et.al
-> 
-> Please let me know if you need any additional information.
-> 
-> 
-> Kind regards,
-> 
-> Rui Salvaterra
 
-Hi Rui,
-Thanks. I have submitted a patch and I think it can fix this.
-https://lore.kernel.org/all/20250821105806.1453833-1-wangzijie1@honor.com
+Ok, I will change 'while' to 'do...while" and remove '= -EIO'.
+That can guarantee 'mucse_fw_get_capability' run at least once to init
+err.
+
+Thanks for your feedback.
+
 
