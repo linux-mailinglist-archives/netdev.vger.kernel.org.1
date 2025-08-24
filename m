@@ -1,131 +1,95 @@
-Return-Path: <netdev+bounces-216328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18964B3322E
-	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 20:59:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3954B33249
+	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 21:14:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE2373B1BED
-	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 18:59:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 998031B20788
+	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 19:15:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CDFE2264B8;
-	Sun, 24 Aug 2025 18:59:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9393C2264A1;
+	Sun, 24 Aug 2025 19:14:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b="ZSGN4OgV"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="sq0OQVgk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C11761B5EB5
-	for <netdev@vger.kernel.org>; Sun, 24 Aug 2025 18:59:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF0C572613;
+	Sun, 24 Aug 2025 19:14:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756061973; cv=none; b=WUjigLVDEMda32sZDQJXkC0XemE1gSZqbLvpoU6pRgTMWvJEDptzj5RY/xmaJu2o06jcAYsyjrxipbzMZp57tt4/9ZXAmejyqi68s3VtNY4ecxk0QjnwLFB4pFRurxBMnxbdBZM3vf+DPSvkZvLo7HK0ki6t/iIuQYhjhDtqZ7Y=
+	t=1756062875; cv=none; b=o1jY7vWWtGDiXx+50Mar37Srk4ylCLn/j5014AikGgMqkUmu+Rt0eN4RmBm7i6iqlMnUy9pxfiBHbkE2lK3IjDwPhssSvH7vg4hDX1qgVI1Msz0LH7a3AgVlkWHwdhLjo2PA/jBPImHmK2R8zOlQUigVpXaPr6LApF7eEtRfwKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756061973; c=relaxed/simple;
-	bh=BnvchpbfuwNWq7Nl3K1zjneGZqvsA6KybiXB/LPTQF0=;
+	s=arc-20240116; t=1756062875; c=relaxed/simple;
+	bh=Dqi5imgTMo+GIPv0TKUfIqfxBW/kuSOB2mlWatlCLew=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CwZWktStD90IWWsKHBdfUVFZiRyPqGG3lbso4W0IeNl44ld9QUAAmYTPPgoEqMCaYs8lqfY0zNHWHAzmwbQ+9c028c6CDxRD7GTtj37a3IT7H87vnBsZwkgRqDKit6cytXbGvRf/hIyc3fXiiIDkk+7hkWbWOYuo3Eu1NVxRyaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org; spf=pass smtp.mailfrom=wbinvd.org; dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b=ZSGN4OgV; arc=none smtp.client-ip=209.85.216.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wbinvd.org
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-323266d6f57so3871515a91.0
-        for <netdev@vger.kernel.org>; Sun, 24 Aug 2025 11:59:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=wbinvd.org; s=wbinvd; t=1756061971; x=1756666771; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WgUhXr4F5aTrg6STFBoaBNVOBpBCCAFD9jOjviiLi7U=;
-        b=ZSGN4OgVwgjXcCUFy18njiYNoSd9iH0ZuGhNJUQ54FANuJ8VNfWnYCGkNen+MF/i1G
-         +PoL47SQSJlta94q5BUoAuKW5kFJ6ys7MMe3vhwdH5fBI196yIl2Yb6kBzxnCV6Nx564
-         eJnkvS1OAvBMF9Cq0PMWoqjZ6Ub6JFoQ1awf7oK2gWo6BsiOpYbjB3bbAuaszwgGzqiE
-         uDtKHS4rcYRFXvJ9mOJW4bWB0BwQonn9CWSBnVWJcJRkeilc5aS/RZR6TD3793H723Ra
-         Qa918VrTiSa1Wi1g0xGZdSwe23sYNwgbdBpmuo8Rd+DKphhvdim/P1gdfumHink5WbDK
-         52og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756061971; x=1756666771;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WgUhXr4F5aTrg6STFBoaBNVOBpBCCAFD9jOjviiLi7U=;
-        b=vz8MV/32+SljVhmeV0a0QexdTdLAjZ0gLfllP7KEyp7c+ronlNRXEcFSPYXcYKWTIn
-         YHZjd5lYwEh1vF6f5/W9hAfdL+e44D9apAMZvQpJ9GxbQqAKc6ULYvZJo9GtPVO8pY04
-         R/ZRZZGcUekUVnBqIvxJBo226OnuffLfRE4daNY5v4oNuiDTLE/DDAhFfjl80au6vd7J
-         9SyI2dhOtv4dwypfmMLkXWPfS7EONCHaa1qXTTvU73DXDEb90qHXnjl5fHK8IjcPp7w/
-         CLRYS+ZZfPQIf86NSw6gF50QIdXEUqy6Yl9c9R8a6G+CrQpbR1gAsFDxdzH3Y2e4BPMk
-         Ehpg==
-X-Forwarded-Encrypted: i=1; AJvYcCXu8HPoRMFybUyMH90MsLMzusKDjnGYhKMrhmZEu09ztJLDmAPw03u7PkyiO+cyoztKqRKYk8s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxaHpxsDPkJeunI3SFrGRJvDytvW7Df4iRNkpyFwYUu9m23djMn
-	2woEfAYTxtVfkYlK2DmmqLr5GrrxKkAqYQ8r1XsMFxIC+NxdOeok/DKHB5gZ8/xHQy4=
-X-Gm-Gg: ASbGncthSFQCY4EdPUwRT2yON9ETRG1IoAztDT8cENgb9k5LxW7vvLMmxwIHWSa8E9C
-	Nc+YAN/iYnJq1QyAQP7JvNoUW8JzVm2X4RlDox9pKRuhkdWJ93x1ZW+xqpZkEgyQCZOJuIxUY99
-	fJGoZhfhQbijHfx9cX5SEF4KhOmrdxQiL+wewB0yydqQyTQdRZMtnphCHaTe1Bo+lz1GJvQwcfF
-	1krGwXzJsNRkl+CAZnr8DpoyDZULS2scAlarak2Ooqz5QYkoKqlBA6nINC92xp1d8C67tqBX4TV
-	nPD0/ahX1dwZyRrkWOSJTSyWwxK7AeTuC15N4dRC72oeN7Ga7hk/rGyyI/OUy6nke37e7Hqqbu/
-	UX+ioRIZMEoHCQR3Ig8n6DkC9v+2/q+3q7pA=
-X-Google-Smtp-Source: AGHT+IEBnPJSYGQSDsTaSJ2fe+K+NSUWm5ONkS7xAAjriSULC2FqOnxhgD/A++McgxcezIJd+A99AA==
-X-Received: by 2002:a17:90b:1f91:b0:325:83:e1d6 with SMTP id 98e67ed59e1d1-32515ee21bbmr11146129a91.2.1756061971113;
-        Sun, 24 Aug 2025 11:59:31 -0700 (PDT)
-Received: from mozart.vkv.me ([192.184.167.117])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3254aa503dasm5021039a91.15.2025.08.24.11.59.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 24 Aug 2025 11:59:30 -0700 (PDT)
-Date: Sun, 24 Aug 2025 11:59:27 -0700
-From: Calvin Owens <calvin@wbinvd.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Michal Schmidt <mschmidt@redhat.com>, netdev@vger.kernel.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=FkG43R3aS+xX1QYDW4rVsOBUNbltQrCa2XXw2qMY978X9420RK3dE5FEYKXPen1UHNY0nnEqg7NsG2FHTbVQMhuP9EmVO8taiospXM7+6JtND7lUyWKgGtqtdDT9Ylky6wuhVNgVjiWYroZfITeLrrQTLAjQNtYkODgz0ZEA0ck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=sq0OQVgk; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=aPxew34gLbgHlqv9pcRjA5Xq7NTu5xb+NdZW3VC1XTo=; b=sq0OQVgkLnBxktCtdjXV627GoW
+	wOvd47vuNzfW6p0qRC4uGVGY4rzx6PoEqb75kIC6pam5d4u7fNh73ak8uhTxKVJvLTp7qbifeY41a
+	BqJKs+fsSUCIL9Vs6CSWlhD2Y96r4bfNkS8nAGQ91qXI/B8rBmm+ihtFS9voTXu0WP8w=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uqGAX-005qy3-Ug; Sun, 24 Aug 2025 21:14:21 +0200
+Date: Sun, 24 Aug 2025 21:14:21 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Yangfl <mmyangfl@gmail.com>
+Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Ivan Vecera <ivecera@redhat.com>, intel-wired-lan@lists.osuosl.org,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] i40e: Prevent unwanted interface name changes
-Message-ID: <aKthD02IN3-l-Rbj@mozart.vkv.me>
-References: <94d7d5c0bb4fc171154ccff36e85261a9f186923.1755661118.git.calvin@wbinvd.org>
- <CADEbmW100menFu3KACm4p72yPSjbnQwnYumDCGRw+GxpgXeMJA@mail.gmail.com>
- <aKXqVqj_bUefe1Nj@mozart.vkv.me>
- <aKYI5wXcEqSjunfk@mozart.vkv.me>
- <e71fe3bf-ec97-431e-b60c-634c5263ad82@intel.com>
- <aKcr7FCOHZycDrsC@mozart.vkv.me>
- <8f077022-e98a-4e30-901b-7e014fe5d5b2@intel.com>
- <aKfwuFXnvOzWx5De@mozart.vkv.me>
- <20250822072326.725475ef@kernel.org>
+Subject: Re: [PATCH net-next v6 3/3] net: dsa: yt921x: Add support for
+ Motorcomm YT921x
+Message-ID: <d87a35c8-3d4c-469b-a490-9be116b982f3@lunn.ch>
+References: <20250824005116.2434998-1-mmyangfl@gmail.com>
+ <20250824005116.2434998-4-mmyangfl@gmail.com>
+ <ad61c240-eee3-4db4-b03e-de07f3efba12@lunn.ch>
+ <CAAXyoMP-Z8aYTSZwqJpDYRVcYQ9fzEgmDuAbQd=UEGp+o5Fdjg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250822072326.725475ef@kernel.org>
+In-Reply-To: <CAAXyoMP-Z8aYTSZwqJpDYRVcYQ9fzEgmDuAbQd=UEGp+o5Fdjg@mail.gmail.com>
 
-On Friday 08/22 at 07:23 -0700, Jakub Kicinski wrote:
-> On Thu, 21 Aug 2025 21:23:20 -0700 Calvin Owens wrote:
-> > > > If you actually have data on that, obviously that's different. But it
-> > > > sounds like you're guessing just like I am.  
-> > > 
-> > > I could only guess about other OS Vendors, one could check it also
-> > > for Ubuntu in their public git, but I don't think we need more data, as
-> > > ultimate judge here are Stable Maintainers  
-> > 
-> > Maybe I'm barking up the wrong tree, it's udev after all that decides to
-> > read the thing in /sys and name the interfaces differently because it's
-> > there...
-> 
-> Yeah, that's my feeling. Ideally there should be a systemd-networkd
-> setting that let's user opt out of adding the phys_port_name on
-> interfaces. 99% of users will not benefit from these, new drivers or
-> old. We're kinda making everyone suffer for the 1% :(
+> Port 10 is dedicated to the internal MCU. Although I could not use it,
+> anyone familiar with the chips would know it's Port 10 that is neither
+> internal nor external.
 
-Thanks Jakub.
+The mv88e639X family has an internal Z80 CPU and its own port on the
+switch. You will see code like:
 
-I let myself get too worked up about this, I apologize for being such a
-pig in this thread. My frustration is not directed at anybody here, I
-hope it hasn't come across that way.
+                .num_ports = 11,        /* 10 + Z80 */
+                .num_internal_phys = 8,
+
+It is considered external, in that there is no internal PHY attached
+In theory you could list it in DT, to instantiate the port, and then i
+guess bad things to happen :-(
+
+The good thing about this is, if you actually try use both the Z80 and
+DSA to manage the switch, bad things are going to happen anyway.
+
+So i would say there is some flexibility here, given how other drivers
+handle this.
+
+	Andrew
 
