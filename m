@@ -1,188 +1,138 @@
-Return-Path: <netdev+bounces-216307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2236BB3304B
-	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 16:05:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 42AEAB3305D
+	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 16:23:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CABDC189427D
-	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 14:05:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C878E189DBA9
+	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 14:23:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D02281E1DE3;
-	Sun, 24 Aug 2025 14:04:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C9851F4161;
+	Sun, 24 Aug 2025 14:23:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=free.fr header.i=@free.fr header.b="dZ0ipGiS"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="DDsGHn0h"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp4-g21.free.fr (smtp4-g21.free.fr [212.27.42.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2E421D90DF;
-	Sun, 24 Aug 2025 14:04:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.27.42.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5051B54791
+	for <netdev@vger.kernel.org>; Sun, 24 Aug 2025 14:23:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756044297; cv=none; b=KoVtfzNsp3ykeaSlSvLoH5kkliK2MfkAjGf5NitkPZPjMW7jZqrAZSmfTajxZLUcHQEkD8EOlBwBpzyD2d9RRcq2DN25DxbsG0vtmqW5VwnkbDtiwvDFIrFNuesPAExNHTEY6MX3+qnS3+3qXzk24DqpI5p2mTE8cldwg1hE8FI=
+	t=1756045404; cv=none; b=um6wOGXWoUQ1zVQknR67KFvvb5bPkIGHN1je1chIxpt8jj2OY0YrKkaQ9a7psWQ7IIjFjRTHQQA4i9dzMybZUKDatsgxhfiWjHM8A/8aGTfMtZnbqladGzw7TuASwErU0oWBM3HDZR4mPkNLnK5CUeDDIthvUUdQPxg5JGmicGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756044297; c=relaxed/simple;
-	bh=A13fB2Ee3SXl8R+pZaQxFmInqJUHANagrNRefvt5RY0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c+c6bATJsyKFvbLE0S6Lxu7uuXbWU0sERY8/kTideIajfLWClu69fLggSszOvsfSaSsSLYh9foDGIKOlEwDQLUGScDiGNVmJgcdKymJ0UGmvcrNesY3UMyc+OqH/srqIbTx3b50nYQZi/ELmrhRRcMyfz2/nQ59N27/mW/8BTQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=free.fr; spf=pass smtp.mailfrom=free.fr; dkim=pass (2048-bit key) header.d=free.fr header.i=@free.fr header.b=dZ0ipGiS; arc=none smtp.client-ip=212.27.42.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=free.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=free.fr
-Received: from [44.168.19.11] (unknown [86.195.82.193])
-	(Authenticated sender: f6bvp@free.fr)
-	by smtp4-g21.free.fr (Postfix) with ESMTPSA id DE3AA19F749;
-	Sun, 24 Aug 2025 16:04:41 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=free.fr;
-	s=smtp-20201208; t=1756044287;
-	bh=A13fB2Ee3SXl8R+pZaQxFmInqJUHANagrNRefvt5RY0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=dZ0ipGiSdbEOmpT3erlJGhlaju0W3LTMPsiiL6QT0gxyk8WdLglX5/Xqr7gx0PW/F
-	 M1tGJQnLVrQsvpIiuTH5dZWOt+OPacWW+FvDxF1qnIYe3mS5ztLpRonJrmRY9z/jfK
-	 EiG0pbToZxQ20U3e/EC1UApPwH78B7xmTIe0ysqxa32lewA7xq0JSR4SSYbmowVhI6
-	 HmzRIbtwJVFioZsX1Ip9jmMS5cZ8EeAktbEaD0R8kjkf9/Gebij5ut1eSjcoSrESfi
-	 2nrgnGoiUoa3tuSdogVuk+U/RUsQMDL14G0xzCxtPgOOceIiVZLxk5ES5sSR527tzZ
-	 4Ik9EVNW26kig==
-Message-ID: <6a5cf9cf-9984-4e1b-882f-b9b427d3c096@free.fr>
-Date: Sun, 24 Aug 2025 16:04:40 +0200
+	s=arc-20240116; t=1756045404; c=relaxed/simple;
+	bh=HbQDTUxdlU+JsjRT8oqHgD+pS0+PFIkKYqRZs+w2w8Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aK+D/6IbKeR4a7dxNGz7I/tulBNtErsuV420S7nn/FMiH/P3svmzDIkQ8rEDkLvWBJYO6tOcqJ0unFJd6ueevcsFVin1vD3vxMtBnlqHA5ANZ6MV1dsAw7ROEaIR7m///FUst8OnAHQNxks8FKL56WJsglhuvyvMbDf8QmUmKsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=DDsGHn0h; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-45a1b00f23eso20360425e9.0
+        for <netdev@vger.kernel.org>; Sun, 24 Aug 2025 07:23:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1756045400; x=1756650200; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GOuIHfjTex0fBkNdxEPBGnrXuEOZ2EKaD8EW46826LQ=;
+        b=DDsGHn0h2MxSIOQaroNzN4uIqgd6F6pSmFRYVzQsXsWKi7pNnOn3dwkbCozQYIMllt
+         HZJRcksfmqubQU0W48mlpAkFsyQH2vroInzLgbRV3Uux7AcAl6SB4QegIjYN+uv4+0KV
+         BqNPyy1ObsNj/UYXM3RBu4XxORhbep6QVRPexKAFLL/dSlUfjlETgMtQ2s33nscYha+x
+         uoVQ3A6W9HtHZCkRsXrJKBFzPuSfhObZa9VglUaXD9IUpiVX4OWptnKE45W+svLjuQw/
+         lZ5tyLFHnE1Ja5OprKgLXLQeHLJQictw+ex6cz5GFFvvI55IkA0qGFjgdRW5nWOS7ZVQ
+         Yd9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756045400; x=1756650200;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GOuIHfjTex0fBkNdxEPBGnrXuEOZ2EKaD8EW46826LQ=;
+        b=sb//zzvuT1zX+ivBiJ1Q3niO+m2mC2kyvgD6erP2KCWZe9TmW5ThBJhY6fyvHpLmhc
+         6KOCG7h0yYQyZky4oxHaAXBMV+p3ZkUT/0StVWusrnelAsFih55N4NQCVP5ZUo+4HIz1
+         nHibKay1h4tbxZ9xq0hqQRGI2j0BFgc02/sjw57oFJqHTB4xLWtbViQmSBCdjDrfft1z
+         pHgXtJ4mPoOcWt/n4C1xCZfGRXEcVkyaBD4y9PDBy44tV3/PfVdkEfxXYv8y82Gic1kk
+         zwqNcRERx7NpVNuX3LlaQkOUG6DyCV7lBQplK4i6VkxBQaN73qF4TXY74fM/Zw8bPwkB
+         /FKA==
+X-Forwarded-Encrypted: i=1; AJvYcCXSZA/h4zCZ5J8pMXWRDmuT1PQPopATZij6eJhxrfg2udFDx41UGBAcIFaotsavMP87IQSNtSg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDY566YxOLI/hFcvLJkNqnKFE1yO+TRSwHRXeGfRDbjIjiKYEL
+	R4DGsF+C/gWDuarRlZeckTB006O4QwyCbAnYxr4be40T4wk2Lxbiy2unWAyFP8IxxVg=
+X-Gm-Gg: ASbGncvGs6fMV2E+gb4JhmYovfGVENUPaR2rdnQO1PCBcIUXLJpRuOaIJa6ux+Uf/P5
+	JkEZy9BU4afM4QIV2IXeeZSGyDAS/2DIZWnmd9r8vZmek7ir4AlMr3IrPeGxc9CqWK5EAmpknCW
+	orinUefHZx0AuBp/D9TdFEM0zHmQxuPDy+T004QVT3isHr278+PhRJ5f3g4SOMHYAt7maVJ3z7P
+	nEROQ6WqkGXlvP3zELq6edfcais350EwrXjJI0dOD3RzsonYb6lU8OEAgrpmvAv36CJS5PTIP7s
+	lgffu9HhriTihHgEAKb7T9aw8ZieHXPU4olwkEyqJYod9vYKfPcyin//dnNL9fNaAzdUh4mMI+/
+	eh20ZK9zh/91Rgp1aT5zeroqfVj/IDWZqMXPIP9kAizNTb96UkhESbabvhMoa6HeSCEsnG5W1yf
+	M=
+X-Google-Smtp-Source: AGHT+IEPSUa+s2m+8fnU+ske8jyl8Z79aTfheJiuojVxru9/st56BKH/EacK52HG02Muzl4w3JZ6/Q==
+X-Received: by 2002:a05:600c:3ba3:b0:456:24aa:958e with SMTP id 5b1f17b1804b1-45b5755a6famr44387195e9.0.1756045400295;
+        Sun, 24 Aug 2025 07:23:20 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b574e607bsm71483455e9.0.2025.08.24.07.23.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 24 Aug 2025 07:23:19 -0700 (PDT)
+Date: Sun, 24 Aug 2025 07:23:14 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, dsahern@gmail.com,
+ netdev@vger.kernel.org, haiyangz@microsoft.com,
+ shradhagupta@linux.microsoft.com, ssengar@microsoft.com,
+ dipayanroy@microsoft.com, ernis@microsoft.com
+Subject: Re: [PATCH iproute2-next v3] iproute2: Add 'netshaper' command to
+ 'ip link' for netdev shaping
+Message-ID: <20250824072314.01f35db8@hermes.local>
+In-Reply-To: <20250824134017.GA2917@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1754895902-8790-1-git-send-email-ernis@linux.microsoft.com>
+	<20250816155510.03a99223@hermes.local>
+	<20250818083612.68a3c137@kernel.org>
+	<20250821110607.GC7364@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	<20250821071259.07059b0f@kernel.org>
+	<20250824134017.GA2917@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [ROSE] [AX25] 6.15.10 long term stable kernel oops
-To: linux-hams@vger.kernel.org, netdev <netdev@vger.kernel.org>
-Cc: Dan Cross <crossd@gmail.com>, David Ranch <dranch@trinnet.net>,
- Eric Dumazet <edumazet@google.com>,
- Folkert van Heusden <folkert@vanheusden.com>
-References: <11c5701d-4bf9-4661-ad8a-06690bbe1c1c@free.fr>
- <fff0b3eb-ea42-4475-970d-30622dc25dca@free.fr>
- <e92e23a7-1503-454f-a7a2-cedab6e55fe2@free.fr>
- <acd04154-25a5-4721-a62b-36827a6e4e47@free.fr>
- <CAEoi9W6kb0jZXY_Tu27CU7jkyx5O1ne5FOgvYqCk_GFBvnseiw@mail.gmail.com>
- <11212ddf-bf32-4b11-afee-e234cdee5938@free.fr>
- <4e4c9952-e445-41af-8942-e2f1c24a0586@free.fr>
- <90efee88-b9dc-4f87-86f2-6ab60701c39f@free.fr>
- <6c525868-3e72-4baf-8df4-a1e5982ef783@free.fr>
- <d073ac34a39c02287be6d67622229a1e@vanheusden.com>
-Content-Language: en-US
-From: F6BVP <f6bvp@free.fr>
-In-Reply-To: <d073ac34a39c02287be6d67622229a1e@vanheusden.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi All,
+On Sun, 24 Aug 2025 06:40:17 -0700
+Erni Sri Satya Vennela <ernis@linux.microsoft.com> wrote:
 
-I suspect I finally found the bug that triggered a kernel panic since 
-linux-15.1 version up to net-next.
-
-Actually I found a report from
-
-syzbot+dca31068cff20d2ad44d@syzkaller.appspotmail.com
-
-that directed me to the solution.
-
-A pointer *p to a buffer was declared in tty_buffer_alloc() buf not 
-initialized.
-
-Explanation :
-- Sometime AX25 can perform connexions via a kissattached Ethernet port.
-- In that case when an application sends a connect request from a 
-console, tty_port is used by mkiss.
-
-All kernel panic reports I sent earlier show that mkiss_receive_buf was 
-involved together with tty_port_default and tty_ldisc_receive_buf.
-
-It was sysbot detailed reporting KMSAN uninit value in mkiss_receive_buf 
-that led me to the solution. Although it took me a while to understand 
-the report for this is totally new for me...
-
-Looking at the code I found :
-
-static struct tty_buffer *tty_buffer_alloc(struct tty_port *port, size_t 
-size)
-  {
-  	struct llist_node *free;
-	struct tty_buffer *p;
-
-I first introduced a call to kmalloc in order to initialize pointer p 
-like it is done elsewhere in the function.
-
-This performed well and Oops disappeared.
-
-Then I tried to first initialize *p to NULL when it is declared :
-
-struct tty_buffer *p=NULL;
-
-When added it also performed correctly.
-
-And finally I removed the kmalloc early instruction and only kept the 
-*p=NULL initialization.
-
-Since then, I checked this simple initialization on both 6.15.2 and 
-6.17-rc2 and there was no more Oops.
-
-I will provide the following patch against net-next in due form if there 
-is no objection.
-
-diff --git a/drivers/tty/tty_buffer.c b/drivers/tty/tty_buffer.c
-index 67271fc0b223..33e7f675b06d 100644
---- a/drivers/tty/tty_buffer.c
-+++ b/drivers/tty/tty_buffer.c
-@@ -159,7 +159,7 @@ void tty_buffer_free_all(struct tty_port *port)
-  static struct tty_buffer *tty_buffer_alloc(struct tty_port *port, 
-size_t size)
-  {
-  	struct llist_node *free;
--	struct tty_buffer *p;
-+	struct tty_buffer *p=NULL;
-
-  	/* Round the buffer size out */
-  	size = __ALIGN_MASK(size, TTYB_ALIGN_MASK);
-
-
-Bernard
-
-
-Le 22/08/2025 à 05:10, Folkert van Heusden a écrit :
-> Bernard,
+> On Thu, Aug 21, 2025 at 07:12:59AM -0700, Jakub Kicinski wrote:
+> > On Thu, 21 Aug 2025 04:06:07 -0700 Erni Sri Satya Vennela wrote:  
+> > > > Somewhat related -- what's your take on integrating / vendoring in YNL?
+> > > > mnl doesn't provide any extack support..    
+> > > 
+> > > I have done some tests and found that if we install pkg-config and
+> > > libmnl packages beforehand. The extack error messages from the kernel
+> > > are being printed to the stdout.  
+> > 
+> > Sorry, I wasn't very precise, it supports printing the string messages.
+> > But nothing that requires actually understanding the message.
+> > No bad attribute errors, no missing attribute errors, no policy errors.  
 > 
-> I skimmed over the diff between the latest 6.14.y and latest 6.15.y tags 
-> of the raspberry pi linux kernel and didn't saw anything relevant 
-> changed. Altough changes in 'arch' could in theory affect everything.
+> Are you referring to the following error logs from the ynl tool?
 > 
+> $./tools/net/ynl/pyynl/cli.py
+>  --spec Documentation/netlink/specs/net_shaper.yaml
+>  --do set 
+>  --json '{"ifindex":'3',
+> 	  "handle":{"scope": "netdev", "id":'1' },
+> 	  "bw-max": 200001000 }'
 > 
-> On 2025-08-22 00:39, F6BVP wrote:
->> As I already reported mkiss never triggered any Oops kernel panic up 
->> to linux-6.14.11.
->>
->> In that version I put a number of printk inside of mkiss.c in order to 
->> follow the normal behaviour and content outside and during FPAC 
->> functionning especially when issuing a connect request.
->>
->> On the opposite an FPAC connect request systematically triggers a 
->> kernel panic with linux-6.15.2 and following kernels.
->>
->> In 6.14.11 I observe that when mkiss runs core/dev is never activated 
->> i.e. neither __netif_receive_skb nor __netif_receive_skb_one_core.
->>
->> These functions appear in kernel 6.15.2 panics after mkiss_receive_buf.
->>
->> One can guess that mkiss_receive_buf() is triggering something wrong 
->> in kernel 6.15.2 and all following kernels up to net-next.
->>
->> The challenge to locate the bug is quite difficult as I did not find 
->> the way to find relevant code differences between both kernels in 
->> absence of inc patch...
->>
->> I sincerely regret not knowing how to go further.
->>
->> Bernard,
->> hamradio f6bvp /ai7bg
+> Netlink error: Invalid argument
+> nl_len = 92 (76) nl_flags = 0x300 nl_type = 2
+>         error: -22
+>         extack: {'msg': 'mana: Please use multiples of 100Mbps for
+> bandwidth'}
 > 
+> If yes, would it be reasonable to add support in iproute2 itself for
+> displaying such error logs?
 
+other parts of iproute2 already use libmnl to display extack messages.
 
