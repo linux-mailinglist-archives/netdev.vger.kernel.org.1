@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-216311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 833FFB33124
-	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 17:22:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0E30B3312E
+	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 17:26:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 237CA7A7D52
-	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 15:20:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5343E446395
+	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 15:26:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD6D322B5AD;
-	Sun, 24 Aug 2025 15:22:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F2A1277017;
+	Sun, 24 Aug 2025 15:26:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hZkRoESl"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2X3zNeGt"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A9D01FB3;
-	Sun, 24 Aug 2025 15:22:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC5751F4C96;
+	Sun, 24 Aug 2025 15:26:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756048941; cv=none; b=TJFeG0itQBC1yPzEurOG5hw70gMwPGvHEPNUPCWRRhjxd2d5sQFViH5AZl+e8vCzJSZwl9sjmJGP4JBlrSEDI85eY6Vx5PR2x5OAvnYd3zsIn1h8VawRtASIU163/irwF6/nC6yl/SZanjF5APQR2yLIeZK/O/dlSewjajFzUI8=
+	t=1756049173; cv=none; b=GuWUQLZOdkj+5gioypEVB0uQLDclv0J0/jdYtmxQE4tq+QlmG6QqEZQd51MU6mk5OqqkkM/pdOTf6OJH1cT//h1HPDbH+yrr3gmpHiVF7CiEau61aQZpd4IJvZ7p8QPgQIglcwqlzNv4D1lP23fmsFUkanAhtYuM+oKnKfezbfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756048941; c=relaxed/simple;
-	bh=4kLuxK8jCVjLtWIsTNzDWHDRIzn9V3ffHYNkulU+10g=;
+	s=arc-20240116; t=1756049173; c=relaxed/simple;
+	bh=NDsbkcxVgInlfzgr07RiDDsGSSz67LENAxxnUp1kUbE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iDaWTJzMO6bioZOcp/wm955BaFTlocg5I9DRaOqti8xeIiTXHTRO0oqDWfBMxCK1+/TZwTu6hJo7QdNM/8atEbaHTVCFCkZoFIe4LfiSGd6N42sUStHVo2IRvg4z5ikvgcf8iWaOk/Ktd7ubYNTKz3y44QHpQtBy9MDrw1QDGDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hZkRoESl; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=tG+O2s43vW6ZYfwZlbHTmyJztkeHOnFwN9NbI7q11t00qwup2fZE+BlQX8AB6CWyLoiQrW+XtGMHUidqxGP4Og6lSq2z0u0MWV6MiQQAeR6nK3sD5ftg2vX8CVQO2yVHZxJRFDTzc0rsuyflOW8m7Hj5B91T9hyLrc+xt47dk1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2X3zNeGt; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Xt44HhPp9zEbrB0nhDDVzGBPmch5sFqvtKj/zCr7LZs=; b=hZkRoESlDM+TIXXco/k6P3KrjD
-	S2qyHgEU8ivZV9F5UhFcM3PKq6JchjnUQNenW2yVbVaML6+G/i+UIuPkof2LFS7sQ5DGfi13+SVBL
-	OeYLASB6vOfPvwfqLwIXJy/tZqMaArzCMfjcQWXdFGMFLqjS0T61L+f0eZEz4/sZPX3M=;
+	bh=tLUW+tRS5SWYfz5ZkZx3v6UAGyyEC+juyc+tith6m0k=; b=2X3zNeGt3pDGLjO7FlusvrjJTG
+	lpb5LUPKEGlKxK+dKdqRxbgIIuvPhXNjAu8Sup0pQkoQ9TqpCZO4m2w2VuSbpJRGHBAWSlXzfwqvT
+	u7QK6tI1TC8XeyxwJQAnCbV9ezzXURb8OG2uJu3LS3wfP8dTPLpQLuoGuRPuNMoompoA=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1uqCXr-005qBI-8v; Sun, 24 Aug 2025 17:22:11 +0200
-Date: Sun, 24 Aug 2025 17:22:11 +0200
+	id 1uqCbc-005qCa-Ay; Sun, 24 Aug 2025 17:26:04 +0200
+Date: Sun, 24 Aug 2025 17:26:04 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: David Yang <mmyangfl@gmail.com>
 Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
@@ -56,7 +56,7 @@ Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
 	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH net-next v6 3/3] net: dsa: yt921x: Add support for
  Motorcomm YT921x
-Message-ID: <f0dd9bb9-63bc-4ca4-bc4f-99b2e583f94d@lunn.ch>
+Message-ID: <08d551df-555f-4cde-b73b-0f2593c84823@lunn.ch>
 References: <20250824005116.2434998-1-mmyangfl@gmail.com>
  <20250824005116.2434998-4-mmyangfl@gmail.com>
 Precedence: bulk
@@ -69,15 +69,20 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20250824005116.2434998-4-mmyangfl@gmail.com>
 
-> +
-> +/******** hardware definitions ********/
+> +#define yt921x_port_is_internal(port) ((port) < 8)
+> +#define yt921x_port_is_external(port) (8 <= (port) && (port) < 9)
 
-> +/******** driver definitions ********/
+> +#define yt921x_info_port_is_internal(info, port) \
+> +	((info)->internal_mask & BIT(port))
+> +#define yt921x_info_port_is_external(info, port) \
+> +	((info)->external_mask & BIT(port))
 
-> +/******** smi ********/
+Do we really need two sets of macros?
 
-Comments like this don't add any value. And sometimes you need to move
-functions around because we don't allow forward references.
+And is there a third state? Can a port be not internal and not
+external?
+
+Maybe the code can just use !yt921x_info_port_is_internal(info, port)
 
 	Andrew
 
