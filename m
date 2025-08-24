@@ -1,205 +1,155 @@
-Return-Path: <netdev+bounces-216254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84AF2B32C9C
-	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 01:59:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C419B32CC1
+	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 02:53:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 470FB1BC12EF
-	for <lists+netdev@lfdr.de>; Sat, 23 Aug 2025 23:59:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E57A27A223B
+	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 00:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B18F224BD1A;
-	Sat, 23 Aug 2025 23:59:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6507278F51;
+	Sun, 24 Aug 2025 00:53:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HbE3MS0o"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YPcISu0I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF312192B7D;
-	Sat, 23 Aug 2025 23:59:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E494546BF;
+	Sun, 24 Aug 2025 00:53:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755993560; cv=none; b=ZPtUsMhqIBflqZTxhTqtiaAHPtY+tfeT2i6bq4jcZ1nW4nseXCtZxoHXNTqRpHZ9Ry9BpweR3WUe79NEol74NqYNqwR6+3a2Oc87QU3xMtFx8pzF16WzpsBrhV7VBHiZRqFhstGXTP2arSv+DidqX2YUy+OcEuPns7l0ryteO+E=
+	t=1755996813; cv=none; b=j+fJCj7MHAB2c7KQwPt1hKYlbNOWDC12aJ+2gGsIMWHQK35umpLNZmiVHGsLAr2/5DVwwLUsEWMZBATOlFPXqZjUl4r2CDQI4wg7xNetcaF1yEGvALXUI1CQV9iVoqW8hxqJzHU6DjNCzuK+vvILA/I9QxqmxNM8DXs6fK+jSLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755993560; c=relaxed/simple;
-	bh=w2cA3bdxWk74x40XqEhRqPOGCRlrl1fklqZbfR2uSY4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bQikIR4aWwC03dG/Wr1SIMon72Y3VpwOO2YeyRwIhMAQL6UePOBzajW6nW/Bu3LZHQZPVP5ACg94SLJ49KkysnTSq+HDl4ToYoYiLsZCCUP+FdT8TJ2hbMerpYLQ5OGcbvWC9dgQM5G427RnfkIPdwWifxuz768j+Cg2+7OESS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HbE3MS0o; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755993559; x=1787529559;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=w2cA3bdxWk74x40XqEhRqPOGCRlrl1fklqZbfR2uSY4=;
-  b=HbE3MS0oF3vMT5YcINpF7QRTM5n3fSVgFYbGXoLS4BXRxIsNtZ8U0BeE
-   K7Fzl1JEER38Kq6BrAeCebXtfoRqzNR/srtzFd90ajIqsX093TzvzTJ5S
-   OFwotdRPU4fBCaqtMgTDC9hWKTCSBqExm8v83dA6+7q0SqAdJR+aAgoiT
-   PAjcNE3BsmDlcSRE25UP+Gr2d/x21fC/pmEm6CK1NKjU/3gkafz8huHEE
-   WJ2obyItYcfERM7xL0AQi3xwIPNv7QRKIykKIjlxDGMBVhDc3C64Ohpz8
-   tZBbxK4yObC7mv325hemPQT6OprSSVNlhjv4uA7a7g6liOecfdizHnDua
-   A==;
-X-CSE-ConnectionGUID: DFzB+N4ITfS4iiYvTQ8wfw==
-X-CSE-MsgGUID: ixTmRnZPSbi6xbtyqf9eCg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="62069293"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="62069293"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2025 16:59:18 -0700
-X-CSE-ConnectionGUID: xmPdUvB1RGqfRAd93+Ihww==
-X-CSE-MsgGUID: 9aaYefKBTdiezdASp+RaZg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="206147438"
-Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
-  by orviesa001.jf.intel.com with ESMTP; 23 Aug 2025 16:59:13 -0700
-Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1upy8c-000Mf9-2H;
-	Sat, 23 Aug 2025 23:59:10 +0000
-Date: Sun, 24 Aug 2025 07:58:55 +0800
-From: kernel test robot <lkp@intel.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>
-Cc: oe-kbuild-all@lists.linux.dev,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Michal Hocko <mhocko@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
+	s=arc-20240116; t=1755996813; c=relaxed/simple;
+	bh=BaGOU3IFJlVva5JiZ/lq1xm0BXzmWHIiJ31EHMDePr4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=m3eQ+PK0RbXWXakjX6jDut57BN0KVz9j/+Ayr9peSf1/A3XE29Ka+UYy3M/WPpq8tvULrPXp9X1L+KUuozvjJGSNLWJnDmdfKsyk2phIo8qItfFfjKdOroyh+1DxkJ0ly8CUIX5o8k+quUXFHxAqs6VbaApOBQ1XPIkozKSEUmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YPcISu0I; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-32326e67c95so3569183a91.3;
+        Sat, 23 Aug 2025 17:53:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755996811; x=1756601611; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LGl7ywJWnMLVhYcOhEEdPTWdvtBYoj0FI5EpbNpy2oY=;
+        b=YPcISu0Icfmb1NHWMgZL34SuhuGeN7R38SpgY6e+KPQ1/GeuqyP8S6YZZdFXruujyD
+         pvBbIaBKxHQJMuopIcxiPLOOZu8MP41DMwCyB+jbAOOWq6uy26GQ+qAsQ5RfUf67QDwK
+         OegDskXPB4HY9nTb8lbvq+SYFd6ewlQuWGTtY/kCrammj3GoD3sVmzh+qlEOWSiwsehO
+         xPwGYb7FRu84vnQ2UooOu9y7h7Tppg8oZn2LVgZTFIs0DVh9RUzxdsOVlBwfmoyevXpV
+         vGg5onYjuARw1iP7TxFZcQi/fB4nt710hnVh/FsHY9WzDaHEHXVFU47hsU5pz3HadTgd
+         EZ4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755996811; x=1756601611;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LGl7ywJWnMLVhYcOhEEdPTWdvtBYoj0FI5EpbNpy2oY=;
+        b=rXUGCu9jtjZYrIx9GURl2vQUpipA3B+599FevuFcQUeotpRyI2tfer7yMMIil5WAwX
+         7hXNdZ8O8wW51gTfa14hDrU+9xT0SGB3wW5+TeS2HvfSM4gzjiavyD38SGvF2aZ6zznE
+         1lRdNXpC+0ET2YlLBT8Cz9jj/3jLrPovdX9r8KtG9Pm9z+efjhXepWpOQsIA2YcxUftC
+         ikVv96WI2X4HWVg3C6GsG6P4p4YfDsKxrcSsT78fxIGKp7u0RZ95dPPoC+63aR7ULrb9
+         UCM44KkF8edwBCorULx6VFI4VBvkAunS74j0J4uKSfLd0y2+Ps4VkM971QDfw5lp1kVC
+         8cqw==
+X-Forwarded-Encrypted: i=1; AJvYcCVemORevWXt7Zrw+2SgK1XXapYK9pQc+SA8DlEIUXf4tEVzO1W1bAD4NBygcGMK38EqGTP64AtG3RMP@vger.kernel.org, AJvYcCVw/mxlgpgUOg5ft48bVpq1D+QBb1xqJw1xiJkjCxbOdgYVe1QpLMZ7hLcOeskINCsDD4iDbPa/mg27dT3m@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxu3jSSde16UwORZ3o/BsJkvZ3T/QYYRrNE5+P9hl1RhUQVI9bQ
+	Iga1Qp4IRKN8nk/osfSOUl8TZd/ISeHT3RTbuYUgyY3u5iUyotsgPZ9ymwOFgQQ9
+X-Gm-Gg: ASbGnctB2NugQYibDsfX+JJleuL3mBsHtbSJy8duUuu2vKphXxG9tO/Hsc0f8VmP7Uv
+	aQZ2SfHcE40qJq0ijbCDfiMU0wfeLsHNtTjeWkoVZ95p7Vmdco1dNEfrOrJVL/Z6Yk5aMyb++i6
+	NVfUa8R5yWTH4/lCZVkBNlv2i+syntrcr2JzQ8545zHUw7BkvxpmlTX1qK0OOKVkYe8v5MZc9u1
+	VW3wYpMION6aiTUF0D+tclUij0XaSKxNVb7VpThE/aEoeMTCJ6As0vvEUJJ6voxxfESlqblhTtS
+	DoWX7ESTsRcv7GZAlzIlQygHe9nHL6hWBqG6j8ONuTkML1wT62UUznXH6QEQi3nru7l3sItjGY5
+	eCwq28V3v4IylhD6LeFtD3KqvNCNUDQ==
+X-Google-Smtp-Source: AGHT+IFf4Eg5Ex9fCRm8LSQY3U8PsuF4uwMY8YffYbjYFIF6TDtBuxsS9p/B4iBVXNytFK7cee7xQg==
+X-Received: by 2002:a17:90b:1016:b0:324:e6ea:f90f with SMTP id 98e67ed59e1d1-32515e4123bmr8263940a91.9.1755996810743;
+        Sat, 23 Aug 2025 17:53:30 -0700 (PDT)
+Received: from d.home.yangfl.dn42 ([104.28.247.164])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3254af4c38asm3172485a91.17.2025.08.23.17.53.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 23 Aug 2025 17:53:30 -0700 (PDT)
+From: David Yang <mmyangfl@gmail.com>
+To: netdev@vger.kernel.org
+Cc: David Yang <mmyangfl@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Mina Almasry <almasrymina@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v1 bpf-next/net 5/8] bpf: Support bpf_setsockopt() for
- BPF_CGROUP_INET_SOCK_(CREATE|ACCEPT).
-Message-ID: <202508240731.UPB4k4Uo-lkp@intel.com>
-References: <20250822221846.744252-6-kuniyu@google.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v6 0/3] net: dsa: yt921x: Add support for Motorcomm YT921x
+Date: Sun, 24 Aug 2025 08:51:08 +0800
+Message-ID: <20250824005116.2434998-1-mmyangfl@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250822221846.744252-6-kuniyu@google.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Kuniyuki,
+Motorcomm YT921x is a series of ethernet switches developed by Shanghai
+Motorcomm Electronic Technology, including:
 
-kernel test robot noticed the following build warnings:
+  - YT9215S / YT9215RB / YT9215SC: 5 GbE phys
+  - YT9213NB / YT9214NB: 2 GbE phys
+  - YT9218N / YT9218MB: 8 GbE phys
 
-[auto build test WARNING on bpf-next/net]
+and up to 2 serdes interfaces.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/tcp-Save-lock_sock-for-memcg-in-inet_csk_accept/20250823-062322
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git net
-patch link:    https://lore.kernel.org/r/20250822221846.744252-6-kuniyu%40google.com
-patch subject: [PATCH v1 bpf-next/net 5/8] bpf: Support bpf_setsockopt() for BPF_CGROUP_INET_SOCK_(CREATE|ACCEPT).
-config: arm-randconfig-r131-20250824 (https://download.01.org/0day-ci/archive/20250824/202508240731.UPB4k4Uo-lkp@intel.com/config)
-compiler: arm-linux-gnueabi-gcc (GCC) 8.5.0
-reproduce: (https://download.01.org/0day-ci/archive/20250824/202508240731.UPB4k4Uo-lkp@intel.com/reproduce)
+This patch adds basic support for a working DSA switch.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202508240731.UPB4k4Uo-lkp@intel.com/
+v5: https://lore.kernel.org/r/20250820075420.1601068-1-mmyangfl@gmail.com
+  - use enum for reg in dt binding
+  - fix phylink_mac_ops in the driver
+  - fix coding style
+v4: https://lore.kernel.org/r/20250818162445.1317670-1-mmyangfl@gmail.com
+  - remove switchid from dt binding
+  - remove hsr from tag driver
+  - use ratelimited log in tag driver
+v3: https://lore.kernel.org/r/20250816052323.360788-1-mmyangfl@gmail.com
+  - fix words and warnings in dt binding
+  - remove unnecessary dev_warn_ratelimited and u64_from_u32
+  - remove lag and mst
+  - check for mdio results and fix a unlocked write in conduit_state_change
+v2: https://lore.kernel.org/r/20250814065032.3766988-1-mmyangfl@gmail.com
+  - fix words in dt binding
+  - add support for lag and mst
+v1: https://lore.kernel.org/r/20250808173808.273774-1-mmyangfl@gmail.com
+  - fix coding style
+  - add dt binding
+  - add support for fdb, vlan and bridge
 
-sparse warnings: (new ones prefixed by >>)
-   net/core/filter.c:6322:9: sparse: sparse: switch with no cases
-   net/core/filter.c:6363:9: sparse: sparse: switch with no cases
-   net/core/filter.c:1440:39: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected struct sock_filter const *filter @@     got struct sock_filter [noderef] __user *filter @@
-   net/core/filter.c:1440:39: sparse:     expected struct sock_filter const *filter
-   net/core/filter.c:1440:39: sparse:     got struct sock_filter [noderef] __user *filter
-   net/core/filter.c:1518:39: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected struct sock_filter const *filter @@     got struct sock_filter [noderef] __user *filter @@
-   net/core/filter.c:1518:39: sparse:     expected struct sock_filter const *filter
-   net/core/filter.c:1518:39: sparse:     got struct sock_filter [noderef] __user *filter
->> net/core/filter.c:5752:29: sparse: sparse: symbol 'bpf_sock_setsockopt_proto' was not declared. Should it be static?
->> net/core/filter.c:5769:29: sparse: sparse: symbol 'bpf_unlocked_sock_setsockopt_proto' was not declared. Should it be static?
-   net/core/filter.c:11166:31: sparse: sparse: symbol 'cg_skb_verifier_ops' was not declared. Should it be static?
-   net/core/filter.c:11172:27: sparse: sparse: symbol 'cg_skb_prog_ops' was not declared. Should it be static?
-   net/core/filter.c:11216:31: sparse: sparse: symbol 'cg_sock_verifier_ops' was not declared. Should it be static?
-   net/core/filter.c:11222:27: sparse: sparse: symbol 'cg_sock_prog_ops' was not declared. Should it be static?
-   net/core/filter.c:11225:31: sparse: sparse: symbol 'cg_sock_addr_verifier_ops' was not declared. Should it be static?
-   net/core/filter.c:11231:27: sparse: sparse: symbol 'cg_sock_addr_prog_ops' was not declared. Should it be static?
-   net/core/filter.c:1948:43: sparse: sparse: incorrect type in argument 2 (different base types) @@     expected restricted __wsum [usertype] diff @@     got unsigned long long [usertype] to @@
-   net/core/filter.c:1948:43: sparse:     expected restricted __wsum [usertype] diff
-   net/core/filter.c:1948:43: sparse:     got unsigned long long [usertype] to
-   net/core/filter.c:1951:36: sparse: sparse: incorrect type in argument 2 (different base types) @@     expected restricted __be16 [usertype] old @@     got unsigned long long [usertype] from @@
-   net/core/filter.c:1951:36: sparse:     expected restricted __be16 [usertype] old
-   net/core/filter.c:1951:36: sparse:     got unsigned long long [usertype] from
-   net/core/filter.c:1951:42: sparse: sparse: incorrect type in argument 3 (different base types) @@     expected restricted __be16 [usertype] new @@     got unsigned long long [usertype] to @@
-   net/core/filter.c:1951:42: sparse:     expected restricted __be16 [usertype] new
-   net/core/filter.c:1951:42: sparse:     got unsigned long long [usertype] to
-   net/core/filter.c:1954:36: sparse: sparse: incorrect type in argument 2 (different base types) @@     expected restricted __be32 [usertype] from @@     got unsigned long long [usertype] from @@
-   net/core/filter.c:1954:36: sparse:     expected restricted __be32 [usertype] from
-   net/core/filter.c:1954:36: sparse:     got unsigned long long [usertype] from
-   net/core/filter.c:1954:42: sparse: sparse: incorrect type in argument 3 (different base types) @@     expected restricted __be32 [usertype] to @@     got unsigned long long [usertype] to @@
-   net/core/filter.c:1954:42: sparse:     expected restricted __be32 [usertype] to
-   net/core/filter.c:1954:42: sparse:     got unsigned long long [usertype] to
-   net/core/filter.c:2000:59: sparse: sparse: incorrect type in argument 3 (different base types) @@     expected restricted __wsum [usertype] diff @@     got unsigned long long [usertype] to @@
-   net/core/filter.c:2000:59: sparse:     expected restricted __wsum [usertype] diff
-   net/core/filter.c:2000:59: sparse:     got unsigned long long [usertype] to
-   net/core/filter.c:2003:52: sparse: sparse: incorrect type in argument 3 (different base types) @@     expected restricted __be16 [usertype] from @@     got unsigned long long [usertype] from @@
-   net/core/filter.c:2003:52: sparse:     expected restricted __be16 [usertype] from
-   net/core/filter.c:2003:52: sparse:     got unsigned long long [usertype] from
-   net/core/filter.c:2003:58: sparse: sparse: incorrect type in argument 4 (different base types) @@     expected restricted __be16 [usertype] to @@     got unsigned long long [usertype] to @@
-   net/core/filter.c:2003:58: sparse:     expected restricted __be16 [usertype] to
-   net/core/filter.c:2003:58: sparse:     got unsigned long long [usertype] to
-   net/core/filter.c:2006:52: sparse: sparse: incorrect type in argument 3 (different base types) @@     expected restricted __be32 [usertype] from @@     got unsigned long long [usertype] from @@
-   net/core/filter.c:2006:52: sparse:     expected restricted __be32 [usertype] from
-   net/core/filter.c:2006:52: sparse:     got unsigned long long [usertype] from
-   net/core/filter.c:2006:58: sparse: sparse: incorrect type in argument 4 (different base types) @@     expected restricted __be32 [usertype] to @@     got unsigned long long [usertype] to @@
-   net/core/filter.c:2006:58: sparse:     expected restricted __be32 [usertype] to
-   net/core/filter.c:2006:58: sparse:     got unsigned long long [usertype] to
-   net/core/filter.c:2073:35: sparse: sparse: incorrect type in return expression (different base types) @@     expected unsigned long long @@     got restricted __wsum [usertype] csum @@
-   net/core/filter.c:2073:35: sparse:     expected unsigned long long
-   net/core/filter.c:2073:35: sparse:     got restricted __wsum [usertype] csum
+David Yang (3):
+  dt-bindings: net: dsa: yt921x: Add Motorcomm YT921x switch support
+  net: dsa: tag_yt921x: add support for Motorcomm YT921x tags
+  net: dsa: yt921x: Add support for Motorcomm YT921x
 
-vim +/bpf_sock_setsockopt_proto +5752 net/core/filter.c
-
-  5751	
-> 5752	const struct bpf_func_proto bpf_sock_setsockopt_proto = {
-  5753		.func		= bpf_sock_setsockopt,
-  5754		.gpl_only	= false,
-  5755		.ret_type	= RET_INTEGER,
-  5756		.arg1_type	= ARG_PTR_TO_CTX,
-  5757		.arg2_type	= ARG_ANYTHING,
-  5758		.arg3_type	= ARG_ANYTHING,
-  5759		.arg4_type	= ARG_PTR_TO_MEM | MEM_RDONLY,
-  5760		.arg5_type	= ARG_CONST_SIZE,
-  5761	};
-  5762	
-  5763	BPF_CALL_5(bpf_unlocked_sock_setsockopt, struct sock *, sk, int, level,
-  5764		   int, optname, char *, optval, int, optlen)
-  5765	{
-  5766		return _bpf_setsockopt(sk, level, optname, optval, optlen);
-  5767	}
-  5768	
-> 5769	const struct bpf_func_proto bpf_unlocked_sock_setsockopt_proto = {
-  5770		.func		= bpf_unlocked_sock_setsockopt,
-  5771		.gpl_only	= false,
-  5772		.ret_type	= RET_INTEGER,
-  5773		.arg1_type	= ARG_PTR_TO_CTX,
-  5774		.arg2_type	= ARG_ANYTHING,
-  5775		.arg3_type	= ARG_ANYTHING,
-  5776		.arg4_type	= ARG_PTR_TO_MEM | MEM_RDONLY,
-  5777		.arg5_type	= ARG_CONST_SIZE,
-  5778	};
-  5779	
+ .../bindings/net/dsa/motorcomm,yt921x.yaml    |  150 +
+ drivers/net/dsa/Kconfig                       |    7 +
+ drivers/net/dsa/Makefile                      |    1 +
+ drivers/net/dsa/yt921x.c                      | 3596 +++++++++++++++++
+ include/net/dsa.h                             |    2 +
+ net/dsa/Kconfig                               |    6 +
+ net/dsa/Makefile                              |    1 +
+ net/dsa/tag_yt921x.c                          |  126 +
+ 8 files changed, 3889 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/dsa/motorcomm,yt921x.yaml
+ create mode 100644 drivers/net/dsa/yt921x.c
+ create mode 100644 net/dsa/tag_yt921x.c
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.50.1
+
 
