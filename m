@@ -1,193 +1,227 @@
-Return-Path: <netdev+bounces-216264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 760FFB32D5F
-	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 05:23:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF336B32D67
+	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 05:47:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39B7A1B6349B
-	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 03:24:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9D681B21E38
+	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 03:47:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E38219E968;
-	Sun, 24 Aug 2025 03:23:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QTsL18P+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4823F1A239A;
+	Sun, 24 Aug 2025 03:46:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C09041EEE6;
-	Sun, 24 Aug 2025 03:23:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C3993FF1;
+	Sun, 24 Aug 2025 03:46:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.243.244.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756005834; cv=none; b=hUjzAykIwySbkLguW5GXhCqdssRrvGAHuNruOFBIWImWCYHHpEF18tgO0pfx/Zv7BnVVe9rBS0xl9WqDQ9CnCwF+/Hgr+0XEXEDY48AfC5E/U7Lzgd9gAYPz1sJ+bcZh91nowt2/gkF8XDbzRb2OH0qAxIlmopz3kV3R3YVBRuI=
+	t=1756007216; cv=none; b=tdzBcsamlTcZKQ0tXwA1IhxWZyhyDTHPPRWD1UB3PolJLFvHg9bxjcLZzr9JOT8JegNWacfyOjSpgv8m9zGqzKvwrnMHV8mkn6evH3Zk9pAyyBWt6pSjFllTru51wNxpyB1367gDGZv07wo4004k6c/BPQPGy+G/1G+PC/NoJ3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756005834; c=relaxed/simple;
-	bh=pg/dlUkuztYMXWaPFPqoc72X3qOIYAxeaje7mI10Y0A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=unfhtKUZGAEaLjkmJaKdF/JaxkjRGLQxQxaJE01KngxUq9cVVQ5l5AfhBH/kH+gxezjcfQgj11DsX7W+nbXN0IyrygskpYgtKN3gCSjUdS5xkC4TWeV4ZaGTHUiqQ9RTN8NDhcqTpoSURuzsGZ9G/5ZoMuM540Vg7U8eUwqpJYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QTsL18P+; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-32326e8005bso3526318a91.3;
-        Sat, 23 Aug 2025 20:23:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756005832; x=1756610632; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=iW6U4cBUPheNzlaaIZxWL/gjHUJeJ0gapkBMT8T3g/w=;
-        b=QTsL18P+/g5fTTaqK8oAjPdErkOaRwCYHbeTwG0HzmOQvVu+rP7IVyChD7hC8PMRv7
-         kPNYyLVkikrokIH3DCdpcTcHYc+LtZN+lcAVFYpkK4SqQzIBA0rDoSnfZ6uNxUA8OrwE
-         4T+jQYx/QOUcV7kiP9CTE9AlR8Tx7bZodpx+dFl4ryq/zRf9LjYfFzaRyO/Gl5NOY55Y
-         BXwDhGX4J6vMNe3e8AIxybVcBWFVaVF71RWFGB8MY3hg9vuXRvM56cDRgudSLKfRUCk/
-         StR/m4CtVM/dDaMkwXDLIIAoMXBOCZnGS5I7DGLQzfZOQYZZ+N3jWrnW0su/brUcC84E
-         6PjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756005832; x=1756610632;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iW6U4cBUPheNzlaaIZxWL/gjHUJeJ0gapkBMT8T3g/w=;
-        b=GcPz9fNRMxW7Iba+TCUHhH2Y65eOXpyVkp70nqP+FMNgfs74xIQfABMmqjZj2talwG
-         UmN23aJS7itNWcM1gZZR6iE/vbFVTqKBIHueUMzYbr6S2UnEDs2yovgAh1S7fndk+XB3
-         X2mtEl+kDqycSgW7vfsJbaqcStog0SsQ6Hlv8naQpnN2dv+4M97cGX43uwKbRy3pNrS5
-         ic598H4EklXQnTLYd+5jdvO3pK3icUMrDQRBzqWhvYcGUtJVr2IVMmpwvNFud45RrhAb
-         +zKkP0yKmihUoUszbWRLiq9w/LWjq3Bu5iFN+suXRqX9vcbSDa0NzTaZ21/9Hj8GoIqE
-         5Xfg==
-X-Forwarded-Encrypted: i=1; AJvYcCUwyPcfMdKDOupVf1oZT2HoY3yMaBQ/pBEACyPerALGZJDBj823jjq5Jbnpm8QGU6gANBs2pbwGDUw9lbw=@vger.kernel.org, AJvYcCVhbChtspLtg5vgnPcInlhAcuVkDdILpe2QlVFkVbWspoyWnnSjVxeySv4HdSfoXxytyTxwypFQ@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywm0F9SNFhLgtC9Lg4BVjuERkVnO4HsP4sS19hmvvzA3E/jnsJS
-	XN9qdNXX/CceAdyXsFcYrUavjt3Z95ejQ0+STI485bjoGk9wOonD48/cKMnF9It2wXoe/pfmx7H
-	9pXnXLGC6Xv07bpcfd0sI5bEysYheZfI=
-X-Gm-Gg: ASbGncurG02etLeBjEl1j5/bcA9UZ+r27Dds9U4g0i851UTFf/dC1zgFhWdv9S2Y50Z
-	p7Y/8QeP2syiPgL8JsaMQeXJJP1egpp1gQH0d0bzVmjhZGxleF0PKuonBLNsE9SFGauZt5CAzK2
-	CqdHF58I4w08XY6/a9fzxsRD9ryTxOcHln6VbI0GSnoAlJUUaQpGAWyYkfzVdXcpXshnHFB3512
-	kgY5Zw7g9M40TnWt28EYSiTDhbAqGC6IrLgqhg=
-X-Google-Smtp-Source: AGHT+IHRLV0RP1aq8S5aiZBbBrOetAWgneSR9mnAFwe+pANIfARu2Bgi9xflrZAwPui9idjgashSlwcHLyC4ShfKLfU=
-X-Received: by 2002:a17:90b:1d8a:b0:321:ca4b:f6cf with SMTP id
- 98e67ed59e1d1-32515ef1564mr9688413a91.35.1756005831909; Sat, 23 Aug 2025
- 20:23:51 -0700 (PDT)
+	s=arc-20240116; t=1756007216; c=relaxed/simple;
+	bh=7NsPVMCHW3b1Vx15r4yqFlAmzigDPRtxfr7zQWHon4M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rt2fDL9bZsaVnhGOxUe+6kMFwINdY1wIAONG2SYbDNL+b9LZyL1ljXmQZJqSoO46b2Znl980vvKDilLvVJ9MT0Fp6yzE2//7V7NSuFuk/pZntqe9XfaHVc41QFdyozWluWFJFAwgvMJ3ugaCwgUSr+8mWBj7XJtqs4aGI19MIUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.243.244.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: zesmtpsz1t1756007191t87afa447
+X-QQ-Originating-IP: /b8F4qOljSL63w5YWiSnO2EBsVqZrdgslmlJy0HvWsc=
+Received: from localhost ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Sun, 24 Aug 2025 11:46:29 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 7436797028166713783
+Date: Sun, 24 Aug 2025 11:46:29 +0800
+From: Yibo Dong <dong100@mucse.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
+	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
+	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org,
+	gustavoars@kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH net-next v7 4/5] net: rnpgbe: Add basic mbx_fw support
+Message-ID: <54BB0DB525AEF5A4+20250824034629.GA2000422@nic-Precision-5820-Tower>
+References: <20250822023453.1910972-1-dong100@mucse.com>
+ <20250822023453.1910972-5-dong100@mucse.com>
+ <29475ad1-125a-4b20-bff3-0a61b347985e@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250728062649.469882-1-aha310510@gmail.com>
-In-Reply-To: <20250728062649.469882-1-aha310510@gmail.com>
-From: Jeongjun Park <aha310510@gmail.com>
-Date: Sun, 24 Aug 2025 12:23:40 +0900
-X-Gm-Features: Ac12FXzgLDu2LqkROQf_pTUZGbSVWSlaFao2L9SkwHpBIHYauUERIDITwV08hAI
-Message-ID: <CAO9qdTGswktFP=VLx4sqF6C25Shmory3TauSHYufuir+4N71nw@mail.gmail.com>
-Subject: Re: [PATCH net v4] ptp: prevent possible ABBA deadlock in ptp_clock_freerun()
-To: richardcochran@gmail.com, andrew+netdev@lunn.ch
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, yangbo.lu@nxp.com, vladimir.oltean@nxp.com, 
-	anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzbot+7cfb66a237c4a5fb22ad@syzkaller.appspotmail.com, 
-	syzbot+28ddd7a3988eea351eb3@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <29475ad1-125a-4b20-bff3-0a61b347985e@linux.dev>
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: Of2cEohDBRJBH64LpPw2uMtTV8uIswhxUwG9uC4k2NVVJrtA76Vw9ASO
+	7XWSuVP169u/9LAZ6m93zcSo4oBb/o/IOJ1OXIpPV7JlRwwyIixkv/zw5Acfj1qtnjiK4iC
+	foHJGn55c/YEwllWmM5OOXWXTyvX155EAZfDUdfyFb98LmphFtTCLit4xVytryjTAIg0wdl
+	Uuhb2VH/1EEQ03vszhLS0LuTcakyN8ARTUIpUbdgR0Im9Gi2VjeaXswmJLcJ6J37i7xjdL8
+	woU2dQgUZ0wtvHTB4Hh808ciEv417kVJjLubBNklibO0hWrCSOxUE3bvCyJs9lGo7AB0Qdh
+	RBfwQJHY2mhSW9UksEJHsP6evwAc6A2Azt3S2cNsBLZLNvYehC7ydVcAWeTQoFibgoHaMAB
+	nVQ5lDY/vBvfdNhVK2BIQSthBpDwgwA9tPAOdY0sMoVPPu9EqVrGpNWrMD7hOjW5pjK7XI8
+	6vineOtZS6omOkNsyUmlmt2LZeUW/Ay5FDTbfvU+4bfsgSGlX3l2ozPOyBp82LBuQWFv4w7
+	SsfXp7/uwipWCFlWQLKq+tt+I8YEdE0liEq1jlyvBxx3KzCmP442fYx+BuBbJPmuPMCRYYE
+	3Dv2FQD1EPVAf/FsaxZMynaJYr5uufukXF4j0LXTT5ycYLOsfMoMjm6hYIBgLsbh4TQrcxi
+	+ULm+Y5z/kHcjIye0DY51D3HyvYwbC0Jko6Dmna9/9dy3JDVVvGDkdqOT5t9+KijHLEiJin
+	12v4StUuA39Q0YKjdilUwlY1Ky1lLWDCnLOTKoV07Sf5Gp8/wZD3VEBLK4zx8qKpUtVXAN4
+	f19C7PGXy6KdTFPcuh3gIwKqgaI6Oh1EmLC5xt4w+kWQTdWDUWRkEyn1c5cWlJFjDK8wBe2
+	Vgxwu4nk2BPirZCDnuGjgGsv88xwxjOGILdt3s1iORgrYRdzFFG+vIBmt9k/Og/Z+ps3vGY
+	lQ9CGqkHUM22kMZqeMlF1yljIyhHS/jKxj/IKzGKY724UOqCPW6qM7DKpmr+TpwRkmLIpIU
+	VJFcA+DnLFLa4YQSJDWVg2vJUKh0nPKjl3k9ZeQw==
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+X-QQ-RECHKSPAM: 0
 
-Jeongjun Park <aha310510@gmail.com> wrote:
->
-> syzbot reported the following ABBA deadlock:
->
->        CPU0                           CPU1
->        ----                           ----
->   n_vclocks_store()
->     lock(&ptp->n_vclocks_mux) [1]
->         (physical clock)
->                                      pc_clock_adjtime()
->                                        lock(&clk->rwsem) [2]
->                                         (physical clock)
->                                        ...
->                                        ptp_clock_freerun()
->                                          ptp_vclock_in_use()
->                                            lock(&ptp->n_vclocks_mux) [3]
->                                               (physical clock)
->     ptp_clock_unregister()
->       posix_clock_unregister()
->         lock(&clk->rwsem) [4]
->           (virtual clock)
->
-> Since ptp virtual clock is registered only under ptp physical clock, both
-> ptp_clock and posix_clock must be physical clocks for ptp_vclock_in_use()
-> to lock &ptp->n_vclocks_mux and check ptp->n_vclocks.
->
-> However, when unregistering vclocks in n_vclocks_store(), the locking
-> ptp->n_vclocks_mux is a physical clock lock, but clk->rwsem of
-> ptp_clock_unregister() called through device_for_each_child_reverse()
-> is a virtual clock lock.
->
-> Therefore, clk->rwsem used in CPU0 and clk->rwsem used in CPU1 are
-> different locks, but in lockdep, a false positive occurs because the
-> possibility of deadlock is determined through lock-class.
->
-> To solve this, lock subclass annotation must be added to the posix_clock
-> rwsem of the vclock.
->
-> Reported-by: syzbot+7cfb66a237c4a5fb22ad@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=7cfb66a237c4a5fb22ad
+On Sat, Aug 23, 2025 at 04:02:29PM +0100, Vadim Fedorenko wrote:
+> On 22/08/2025 03:34, Dong Yibo wrote:
+> > Initialize basic mbx_fw ops, such as get_capability, reset phy
+> > and so on.
+> > 
+> > Signed-off-by: Dong Yibo <dong100@mucse.com>
+> 
+> [...]
+> 
+> > +/**
+> > + * mucse_mbx_fw_post_req - Posts a mbx req to firmware and wait reply
+> > + * @hw: pointer to the HW structure
+> > + * @req: pointer to the cmd req structure
+> > + * @cookie: pointer to the req cookie
+> > + *
+> > + * mucse_mbx_fw_post_req posts a mbx req to firmware and wait for the
+> > + * reply. cookie->wait will be set in irq handler.
+> > + *
+> > + * @return: 0 on success, negative on failure
+> > + **/
+> > +static int mucse_mbx_fw_post_req(struct mucse_hw *hw,
+> > +				 struct mbx_fw_cmd_req *req,
+> > +				 struct mbx_req_cookie *cookie)
+> > +{
+> > +	int len = le16_to_cpu(req->datalen);
+> > +	int err;
+> > +
+> > +	cookie->errcode = 0;
+> > +	cookie->done = 0;
+> > +	init_waitqueue_head(&cookie->wait);
+> > +	err = mutex_lock_interruptible(&hw->mbx.lock);
+> > +	if (err)
+> > +		return err;
+> > +	err = mucse_write_mbx_pf(hw, (u32 *)req, len);
+> > +	if (err)
+> > +		goto out;
+> > +	/* if write succeeds, we must wait for firmware response or
+> > +	 * timeout to avoid using the already freed cookie->wait
+> > +	 */
+> > +	err = wait_event_timeout(cookie->wait,
+> > +				 cookie->done == 1,
+> > +				 cookie->timeout_jiffies);
+> > +
+> > +	if (!err)
+> > +		err = -ETIMEDOUT;
+> > +	else
+> > +		err = 0;
+> > +	if (!err && cookie->errcode)
+> > +		err = cookie->errcode;
+> 
+> can cookie->errcode be non 0 if FW times out?
+> 
 
-Reported-by: syzbot+28ddd7a3988eea351eb3@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=28ddd7a3988eea351eb3
+cookie is alloced by kzalloc, if fw timeout, nochange for it.
+So cookie->errcode is 0 if FW times out.
 
-> Fixes: 73f37068d540 ("ptp: support ptp physical/virtual clocks conversion")
-> Signed-off-by: Jeongjun Park <aha310510@gmail.com>
-> ---
-> v4: Remove unnecessary lock class annotation and CC "POSIX CLOCKS and TIMERS" maintainer
-> - Link to v3: https://lore.kernel.org/all/20250719124022.1536524-1-aha310510@gmail.com/
-> v3: Annotate lock subclass to prevent false positives of lockdep
-> - Link to v2: https://lore.kernel.org/all/20250718114958.1473199-1-aha310510@gmail.com/
-> v2: Add CC Vladimir
-> - Link to v1: https://lore.kernel.org/all/20250705145031.140571-1-aha310510@gmail.com/
-> ---
->  drivers/ptp/ptp_private.h | 5 +++++
->  drivers/ptp/ptp_vclock.c  | 7 +++++++
->  2 files changed, 12 insertions(+)
->
-> diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
-> index a6aad743c282..b352df4cd3f9 100644
-> --- a/drivers/ptp/ptp_private.h
-> +++ b/drivers/ptp/ptp_private.h
-> @@ -24,6 +24,11 @@
->  #define PTP_DEFAULT_MAX_VCLOCKS 20
->  #define PTP_MAX_CHANNELS 2048
->
-> +enum {
-> +       PTP_LOCK_PHYSICAL = 0,
-> +       PTP_LOCK_VIRTUAL,
-> +};
-> +
->  struct timestamp_event_queue {
->         struct ptp_extts_event buf[PTP_MAX_TIMESTAMPS];
->         int head;
-> diff --git a/drivers/ptp/ptp_vclock.c b/drivers/ptp/ptp_vclock.c
-> index 7febfdcbde8b..8ed4b8598924 100644
-> --- a/drivers/ptp/ptp_vclock.c
-> +++ b/drivers/ptp/ptp_vclock.c
-> @@ -154,6 +154,11 @@ static long ptp_vclock_refresh(struct ptp_clock_info *ptp)
->         return PTP_VCLOCK_REFRESH_INTERVAL;
->  }
->
-> +static void ptp_vclock_set_subclass(struct ptp_clock *ptp)
-> +{
-> +       lockdep_set_subclass(&ptp->clock.rwsem, PTP_LOCK_VIRTUAL);
-> +}
-> +
->  static const struct ptp_clock_info ptp_vclock_info = {
->         .owner          = THIS_MODULE,
->         .name           = "ptp virtual clock",
-> @@ -213,6 +218,8 @@ struct ptp_vclock *ptp_vclock_register(struct ptp_clock *pclock)
->                 return NULL;
->         }
->
-> +       ptp_vclock_set_subclass(vclock->clock);
-> +
->         timecounter_init(&vclock->tc, &vclock->cc, 0);
->         ptp_schedule_worker(vclock->clock, PTP_VCLOCK_REFRESH_INTERVAL);
->
-> --
+> 
+> looks like this can be simplified to
+> 
+> if(!wait_event_timeout())
+>   err = -ETIMEDOUT
+> else
+>   err = cookie->errcode
+> 
+
+Got it, I will update it.
+
+> > +out:
+> > +	mutex_unlock(&hw->mbx.lock);
+> > +	return err;
+> > +}
+> > +
+> > +/**
+> > + * build_ifinsmod - build req with insmod opcode
+> > + * @req: pointer to the cmd req structure
+> > + * @status: true for insmod, false for rmmod
+> 
+> naming is misleading here, I believe.. no strong feeling, but
+> is_insmod might be better
+> 
+
+I see, I will fix it.
+
+> > + **/
+> > +static void build_ifinsmod(struct mbx_fw_cmd_req *req,
+> > +			   int status)
+> > +{
+> > +	req->flags = 0;
+> > +	req->opcode = cpu_to_le16(DRIVER_INSMOD);
+> > +	req->datalen = cpu_to_le16(sizeof(req->ifinsmod) +
+> > +				   MBX_REQ_HDR_LEN);
+> > +	req->cookie = NULL;
+> > +	req->reply_lo = 0;
+> > +	req->reply_hi = 0;
+> > +#define FIXED_VERSION 0xFFFFFFFF
+> > +	req->ifinsmod.version = cpu_to_le32(FIXED_VERSION);
+> > +	req->ifinsmod.status = cpu_to_le32(status);
+> > +}
+> > +
+> > +/**
+> > + * mucse_mbx_ifinsmod - Echo driver insmod status to hw
+> > + * @hw: pointer to the HW structure
+> > + * @status: true for insmod, false for rmmod
+> 
+> here as well
+> 
+
+Got it.
+
+> > + *
+> > + * @return: 0 on success, negative on failure
+> > + **/
+> > +int mucse_mbx_ifinsmod(struct mucse_hw *hw, int status)
+> > +{
+> > +	struct mbx_fw_cmd_req req = {};
+> > +	int len;
+> > +	int err;
+> > +
+> > +	build_ifinsmod(&req, status);
+> > +	len = le16_to_cpu(req.datalen);
+> > +	err = mutex_lock_interruptible(&hw->mbx.lock);
+> > +	if (err)
+> > +		return err;
+> > +
+> > +	if (status) {
+> > +		err = mucse_write_posted_mbx(hw, (u32 *)&req,
+> > +					     len);
+> > +	} else {
+> > +		err = mucse_write_mbx_pf(hw, (u32 *)&req,
+> > +					 len);
+> > +	}
+> > +
+> > +	mutex_unlock(&hw->mbx.lock);
+> > +	return err;
+> > +}
+> 
+
+Thanks for your feedback.
+
 
