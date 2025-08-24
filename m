@@ -1,207 +1,156 @@
-Return-Path: <netdev+bounces-216302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABA15B32F59
-	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 13:20:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29CBBB33015
+	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 15:24:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F3481B62BC0
-	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 11:21:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A69514406E1
+	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 13:24:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6278F2D5432;
-	Sun, 24 Aug 2025 11:20:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12EBD2DBF69;
+	Sun, 24 Aug 2025 13:24:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="RLklzLew"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SquWihWK"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-015.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-015.esa.us-west-2.outbound.mail-perimeter.amazon.com [50.112.246.219])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62352D541B
-	for <netdev@vger.kernel.org>; Sun, 24 Aug 2025 11:20:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=50.112.246.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C3D2393DE3;
+	Sun, 24 Aug 2025 13:24:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756034455; cv=none; b=JSIcDEnrO7p6AfZmayoEuU9+Y82Ch2toFCDkjyBZ7FLTZl4fHxwkX60JeDy47kh5RMKiY3b/elKp+m1sKJtoeAOrMYbcUxwjBJ4GWpd5AosvboQ5lKCpisp3G9lZLHtO9Ow0IZ5ltC0BwE+L43NfO9Qt86Y3wDrNm5LiZVXbgnE=
+	t=1756041880; cv=none; b=VP4If5ozBuciAvANxGkykqsy5cYI2s6CmQASw/YAAqldG3NPH1K2d8y3nT03z1xK/Wn/MdvkrTaq9qUZlXEUCoD/40poqJi68er6jh1Yub3tFG09ifLIjjzfKO3xKSDjiNqtrp20Ba01qgIiuANRSB3rkS3y4AFOqGTT5lYPJG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756034455; c=relaxed/simple;
-	bh=RLYd/H2YQiqleQ1J4Ut1KSoCEyu7WDfUVYLUbNshVoA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YK2urMSl04ejeFrc0vCfAFwDGOYmCtmU3WkkSV78AKT6SUMVlO4eIXQR7UVqRZZZjtxerKQsK937zd888+cHap+tSDb/t0qY/X02f1NKP/Pwbdh5XRDZj2WROUKkXb01Dz7Ga5iDqc2JjseWytU+jotnhQ3B8gMpGOHDCAcwtms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=RLklzLew; arc=none smtp.client-ip=50.112.246.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1756034453; x=1787570453;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Gb69M0T15EPJVx+owA6vhctBWH7/cBrs83/BAzuq11k=;
-  b=RLklzLew1dmiGnbr33p0FzREIicHx0mo1ZIF4iqrU2VBP6ga5nDkX9P8
-   mFg0mL5OnHBvqfsjomN76CCelUASKCMkt4rTuByh31ZL2av9ZwVnRdX/i
-   K8gJCQCkVcoAG+Vd0QFsaRktQC4QeUBm4hAo2Wa7yvmc7v3XFfIreqIsq
-   YLlZ1oeHrMyep2wuawzRgNUWfhBcySVAzR73QM337FxrarRySMIE4K/v6
-   0bmnAnvJfQb5T/0Wq+ce5RHHe74y3NhvyIVo2BiA6JJAXwCwCCbz3Pddi
-   JddTQDBLbg7Hyi7iJ7U7LnpVD+0u0I4nAj2CLGSRGyC7Ru5buwwG67GK2
-   A==;
-X-CSE-ConnectionGUID: C9K3J4jhTPur8Fu5fp/OmA==
-X-CSE-MsgGUID: fKoHJU7xSNODsEtJ9oCLlg==
-X-IronPort-AV: E=Sophos;i="6.17,312,1747699200"; 
-   d="scan'208";a="1577015"
-Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
-  by internal-pdx-out-015.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2025 11:20:50 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:56130]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.170:2525] with esmtp (Farcaster)
- id ef90aa2d-468e-45c2-95c1-34c7315244a8; Sun, 24 Aug 2025 11:20:50 +0000 (UTC)
-X-Farcaster-Flow-ID: ef90aa2d-468e-45c2-95c1-34c7315244a8
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
- Sun, 24 Aug 2025 11:20:49 +0000
-Received: from b0be8375a521.amazon.com (10.37.244.14) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
- Sun, 24 Aug 2025 11:20:47 +0000
-From: Kohei Enju <enjuk@amazon.com>
-To: <netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>
-CC: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
-	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<kohei.enju@gmail.com>, Kohei Enju <enjuk@amazon.com>
-Subject: [PATCH iwl-next v1] ixgbe: preserve RSS indirection table across admin down/up
-Date: Sun, 24 Aug 2025 20:20:01 +0900
-Message-ID: <20250824112037.32692-1-enjuk@amazon.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1756041880; c=relaxed/simple;
+	bh=ULWSWvx5qOQocuXhhEVwmUdZJ/jQrpo8zzXV1kr+XYk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ull+/HlBVmEZZhKNv/0sF3Fn0DS7SlawRmd45WFjUcqhk6vXZn+ZJRH0gdfvL+szbq3qH/vrNmxBQiRIDrUmnj5odiEMPyrVd8IVLdTS1jYwx3VQgA/2P1BdSidVqMXbvEYDwQ5VAJulrtq5kSIboWrVEqZwW0XH9JdD3c5I0ZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SquWihWK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4638C4CEEB;
+	Sun, 24 Aug 2025 13:24:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756041880;
+	bh=ULWSWvx5qOQocuXhhEVwmUdZJ/jQrpo8zzXV1kr+XYk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SquWihWK3f+VpRPVHREvb/KU1Ip2U18TP7N1MuJITOAx4rQrPZH3cvqtkOP5SvK7q
+	 i6NO1TPVUbZk8RWkAk3LTCsFqBTBZ14HIKev8nasvhFuIsLkIUiO3cKzio2Q51II/F
+	 wyed5FtAlddWEWPif7U0YGP0VU7Jz0WnTx8oiBRZXCVwF7SJXztCvl7h61L8oudm/m
+	 ZzJcPQiQ6a3vkdslZGaL+map5bzuxrOH69hNlp4a8gDkADVHKqlXnjP6H9fUKUPAle
+	 G5RP+5YSDJFPCZAOfsIK30ngRx5fl+uNMhMZuFtvohYRU68gjsyw/nUrRlnisE/5CR
+	 1GDLoGVBUCvXA==
+Date: Sun, 24 Aug 2025 16:24:23 +0300
+From: Mike Rapoport <rppt@kernel.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Brendan Jackman <jackmanb@google.com>,
+	Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>,
+	Dmitry Vyukov <dvyukov@google.com>, dri-devel@lists.freedesktop.org,
+	intel-gfx@lists.freedesktop.org, iommu@lists.linux.dev,
+	io-uring@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	John Hubbard <jhubbard@nvidia.com>, kasan-dev@googlegroups.com,
+	kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-arm-kernel@axis.com, linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Marco Elver <elver@google.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
+	Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
+	Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
+	virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
+	wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
+Subject: Re: [PATCH RFC 12/35] mm: limit folio/compound page sizes in
+ problematic kernel configs
+Message-ID: <aKsSh0OEjf4GLmIG@kernel.org>
+References: <20250821200701.1329277-1-david@redhat.com>
+ <20250821200701.1329277-13-david@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D032UWA002.ant.amazon.com (10.13.139.81) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250821200701.1329277-13-david@redhat.com>
 
-Currently, the RSS indirection table configured by user via ethtool is
-reinitialized to default values during interface resets (e.g., admin
-down/up, MTU change). As for RSS hash key, commit 3dfbfc7ebb95 ("ixgbe:
-Check for RSS key before setting value") made it persistent across
-interface resets.
+On Thu, Aug 21, 2025 at 10:06:38PM +0200, David Hildenbrand wrote:
+> Let's limit the maximum folio size in problematic kernel config where
+> the memmap is allocated per memory section (SPARSEMEM without
+> SPARSEMEM_VMEMMAP) to a single memory section.
+> 
+> Currently, only a single architectures supports ARCH_HAS_GIGANTIC_PAGE
+> but not SPARSEMEM_VMEMMAP: sh.
+> 
+> Fortunately, the biggest hugetlb size sh supports is 64 MiB
+> (HUGETLB_PAGE_SIZE_64MB) and the section size is at least 64 MiB
+> (SECTION_SIZE_BITS == 26), so their use case is not degraded.
+> 
+> As folios and memory sections are naturally aligned to their order-2 size
+> in memory, consequently a single folio can no longer span multiple memory
+> sections on these problematic kernel configs.
+> 
+> nth_page() is no longer required when operating within a single compound
+> page / folio.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-By adopting the same approach used in igc and igb drivers which
-reinitializes the RSS indirection table only when the queue count
-changes, let's make user configuration persistent as long as queue count
-remains unchanged.
+Acked-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
 
-Tested on Intel Corporation 82599ES 10-Gigabit SFI/SFP+ Network
-Connection.
+> ---
+>  include/linux/mm.h | 22 ++++++++++++++++++----
+>  1 file changed, 18 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/linux/mm.h b/include/linux/mm.h
+> index 77737cbf2216a..48a985e17ef4e 100644
+> --- a/include/linux/mm.h
+> +++ b/include/linux/mm.h
+> @@ -2053,11 +2053,25 @@ static inline long folio_nr_pages(const struct folio *folio)
+>  	return folio_large_nr_pages(folio);
+>  }
+>  
+> -/* Only hugetlbfs can allocate folios larger than MAX_ORDER */
+> -#ifdef CONFIG_ARCH_HAS_GIGANTIC_PAGE
+> -#define MAX_FOLIO_ORDER		PUD_ORDER
+> -#else
+> +#if !defined(CONFIG_ARCH_HAS_GIGANTIC_PAGE)
+> +/*
+> + * We don't expect any folios that exceed buddy sizes (and consequently
+> + * memory sections).
+> + */
+>  #define MAX_FOLIO_ORDER		MAX_PAGE_ORDER
+> +#elif defined(CONFIG_SPARSEMEM) && !defined(CONFIG_SPARSEMEM_VMEMMAP)
+> +/*
+> + * Only pages within a single memory section are guaranteed to be
+> + * contiguous. By limiting folios to a single memory section, all folio
+> + * pages are guaranteed to be contiguous.
+> + */
+> +#define MAX_FOLIO_ORDER		PFN_SECTION_SHIFT
+> +#else
+> +/*
+> + * There is no real limit on the folio size. We limit them to the maximum we
+> + * currently expect.
+> + */
+> +#define MAX_FOLIO_ORDER		PUD_ORDER
+>  #endif
+>  
+>  #define MAX_FOLIO_NR_PAGES	(1UL << MAX_FOLIO_ORDER)
+> -- 
+> 2.50.1
+> 
 
-Test:
-Set custom indirection table and check the value after interface down/up
-
-  # ethtool --set-rxfh-indir ens5 equal 2
-  # ethtool --show-rxfh-indir ens5 | head -5
-
-  RX flow hash indirection table for ens5 with 12 RX ring(s):
-      0:      0     1     0     1     0     1     0     1
-      8:      0     1     0     1     0     1     0     1
-     16:      0     1     0     1     0     1     0     1
-  # ip link set dev ens5 down && ip link set dev ens5 up
-
-Without patch:
-  # ethtool --show-rxfh-indir ens5 | head -5
-
-  RX flow hash indirection table for ens5 with 12 RX ring(s):
-      0:      0     1     2     3     4     5     6     7
-      8:      8     9    10    11     0     1     2     3
-     16:      4     5     6     7     8     9    10    11
-
-With patch:
-  # ethtool --show-rxfh-indir ens5 | head -5
-
-  RX flow hash indirection table for ens5 with 12 RX ring(s):
-      0:      0     1     0     1     0     1     0     1
-      8:      0     1     0     1     0     1     0     1
-     16:      0     1     0     1     0     1     0     1
-
-Signed-off-by: Kohei Enju <enjuk@amazon.com>
----
- drivers/net/ethernet/intel/ixgbe/ixgbe.h      |  1 +
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 37 +++++++++++++------
- 2 files changed, 27 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-index 14d275270123..d8b088c90b05 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-@@ -838,6 +838,7 @@ struct ixgbe_adapter {
-  */
- #define IXGBE_MAX_RETA_ENTRIES 512
- 	u8 rss_indir_tbl[IXGBE_MAX_RETA_ENTRIES];
-+	u16 last_rss_i;
- 
- #define IXGBE_RSS_KEY_SIZE     40  /* size of RSS Hash Key in bytes */
- 	u32 *rss_key;
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 80e6a2ef1350..dc5a8373b0c3 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -4318,14 +4318,22 @@ static void ixgbe_setup_reta(struct ixgbe_adapter *adapter)
- 	/* Fill out hash function seeds */
- 	ixgbe_store_key(adapter);
- 
--	/* Fill out redirection table */
--	memset(adapter->rss_indir_tbl, 0, sizeof(adapter->rss_indir_tbl));
-+	/* Update redirection table in memory on first init or queue count
-+	 * change, otherwise preserve user configurations. Then always
-+	 * write to hardware.
-+	 */
-+	if (adapter->last_rss_i != rss_i) {
-+		memset(adapter->rss_indir_tbl, 0,
-+		       sizeof(adapter->rss_indir_tbl));
-+
-+		for (i = 0, j = 0; i < reta_entries; i++, j++) {
-+			if (j == rss_i)
-+				j = 0;
- 
--	for (i = 0, j = 0; i < reta_entries; i++, j++) {
--		if (j == rss_i)
--			j = 0;
-+			adapter->rss_indir_tbl[i] = j;
-+		}
- 
--		adapter->rss_indir_tbl[i] = j;
-+		adapter->last_rss_i = rss_i;
- 	}
- 
- 	ixgbe_store_reta(adapter);
-@@ -4347,12 +4355,19 @@ static void ixgbe_setup_vfreta(struct ixgbe_adapter *adapter)
- 					*(adapter->rss_key + i));
- 	}
- 
--	/* Fill out the redirection table */
--	for (i = 0, j = 0; i < 64; i++, j++) {
--		if (j == rss_i)
--			j = 0;
-+	/* Update redirection table in memory on first init or queue count
-+	 * change, otherwise preserve user configurations. Then always
-+	 * write to hardware.
-+	 */
-+	if (adapter->last_rss_i != rss_i) {
-+		for (i = 0, j = 0; i < 64; i++, j++) {
-+			if (j == rss_i)
-+				j = 0;
-+
-+			adapter->rss_indir_tbl[i] = j;
-+		}
- 
--		adapter->rss_indir_tbl[i] = j;
-+		adapter->last_rss_i = rss_i;
- 	}
- 
- 	ixgbe_store_vfreta(adapter);
 -- 
-2.51.0
-
+Sincerely yours,
+Mike.
 
