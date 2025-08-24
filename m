@@ -1,97 +1,184 @@
-Return-Path: <netdev+bounces-216271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA79FB32E1F
-	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 10:12:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A810FB32E33
+	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 10:39:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E5C216657D
-	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 08:11:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81189204B01
+	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 08:39:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4350253F00;
-	Sun, 24 Aug 2025 08:11:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76F28258CED;
+	Sun, 24 Aug 2025 08:39:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="HeOyQU6W"
+	dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b="SyLxoB3m"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5418020322
-	for <netdev@vger.kernel.org>; Sun, 24 Aug 2025 08:11:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+Received: from azure-sdnproxy.icoremail.net (l-sdnproxy.icoremail.net [20.188.111.126])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2244E72623;
+	Sun, 24 Aug 2025 08:39:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=20.188.111.126
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756023093; cv=none; b=PJvYEdmvHUPtstVJBl3w0TkHyLklBbGxMkMyQVc00Ay8x7GwMLqRZVzOszT453kyeCasRpeu16fTgq13Z9G/sOWtLC2UWF/+rUzrkFtc5e5KX0moM6MLCrYw2dZtwVCchcil+MeuPkLChNf087IrzK7agZrrZLPt6ccubGEjrSE=
+	t=1756024766; cv=none; b=IfqIJ11yX+c2kT/qQk44EjlwL5I3ujNvYWo2C5ZFOiEyJjhqnz7tD72Q28NusB1C+T6lgXxORWhysHThKUuLQ+ByJAT6fPoXp95teOfBj11OKEf14j+YZMZKyr3vcd+JccfXR3dRm3sahXx5OMWkT68QghVl3G1v87D4GKf0rZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756023093; c=relaxed/simple;
-	bh=dI2dmhFKBKSuu8SXsd8RSLgN1C5YLcijf8g7MQMLNAc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=crW+GBPCJxcqUd9pjGAbEGMQ5UzNM/rfHMYhOAZ4iFLuCT3Xu9x0z54Q6SdZR1n0MBin4ZHN2g7s4a1E/+Ad7wDl4msRi/MggPZRiXCq2lReHu8NsUz1lFp9aZpZ+ysUQM2a/4wlrApJUegZFDw1ouW2NUxqD/zKamKt13MN1OY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=HeOyQU6W; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=F4cC3XUzyc3rsSFpq4Koplh7g/xLt2cfDRwi6s4wdy8=; b=HeOyQU6WBkuYeeK6lMlcg2yftE
-	f36uqNMh/TSPRgDZKZwDe6RPEpVzg+YWXo2WzK/jxXEDqu11z3oE4N5eQ+FYhcxw1FJUWsZcZQF0J
-	NxHkbMxsyHqGYMG/E6a+Cr2ANORdIuv2hVaecpVleptLqmXqqMmmbizss/wSgElBcPpn2cGd0hvSz
-	MP4jpN1Yt+RXlfyyw1juSlNCZfAGuNHImb7zFxj4+Y2F5dMgWiq3fdMnxQblsbB2UZeUhUzawbYRF
-	7sVUfI1qNPMz2rIcig4toKOKY8hBtnxFmCKOPomzKZ+BoEezbxv6fHUAkJl50afYJvGrnrxH62D0g
-	5Krsraow==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36376)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uq5ow-000000005N3-3KcA;
-	Sun, 24 Aug 2025 09:11:22 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uq5ou-000000006oI-04KJ;
-	Sun, 24 Aug 2025 09:11:20 +0100
-Date: Sun, 24 Aug 2025 09:11:19 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Miller <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: phy: fixed_phy: let fixed_phy_unregister
- free the phy_device
-Message-ID: <aKrJJ7xDYSjfd7nz@shell.armlinux.org.uk>
-References: <ad8dda9a-10ed-4060-916b-3f13bdbb899d@gmail.com>
+	s=arc-20240116; t=1756024766; c=relaxed/simple;
+	bh=lZp2Cl0qc6wb8coserP5WWmHbjV72Qo/rkklVqayqQc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NtpTXoP8pFkMNNlD/pYvA34QYbYlNGc3uCsISG8IkMCofaG3aqR7MygLqcCm6aP6TrHGh/csNszkxp07pFOoz1wpRWVl9PEaxeU3WpdSH2nsAO+WxAOEDNhNWvjiwr0XlfY5bxB84Fb558u4Lnl6nu/xolQw7LMREndEKV1wivY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=SyLxoB3m; arc=none smtp.client-ip=20.188.111.126
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mails.tsinghua.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
+	Date:Message-Id:MIME-Version:Content-Transfer-Encoding; bh=jHWpd
+	ARc43w4tAS2FUEDvn/HU28I0sReMTwTlphHACk=; b=SyLxoB3m5zHK+aGgQnCP3
+	SPUBvsnQDkz7sM9obKcYn5PMkpWwQDsDbIa9WPMR+YwTO/HBqKkhgWLClpnabKBY
+	G36EjReSws0azMCCqHrIWydII/N2XwOz7wAQj2fJwDaPi85PafDSBVT5i2yMM9Zn
+	N2PcB0BWM+MnNKBCJxPm4E=
+Received: from estar-Super-Server.. (unknown [103.233.162.254])
+	by web3 (Coremail) with SMTP id ygQGZQBXbCIlz6poet8KGg--.37470S2;
+	Sun, 24 Aug 2025 16:37:00 +0800 (CST)
+From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+To: netdev@vger.kernel.org
+Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] net/dccp: validate Reset/Close/CloseReq in DCCP_REQUESTING
+Date: Sun, 24 Aug 2025 16:36:53 +0800
+Message-Id: <20250824083653.1227318-1-zhaoyz24@mails.tsinghua.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ad8dda9a-10ed-4060-916b-3f13bdbb899d@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:ygQGZQBXbCIlz6poet8KGg--.37470S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxGrWktFyUuryxWry5Jry7KFg_yoWrJw4Upa
+	4xKFZ8Kr4DJFyxtFnayw4kXr1Ykr48AryfGFnFqrW8ZF1DJryfZ390krWjvry3CFZ3C342
+	93y7WFWrCw47Xa7anT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9m14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUtVWrXwAv7VC2z280aVAFwI0_Gr0_Cr
+	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IE
+	rcIFxwCY1x0262kKe7AKxVWUAVWUtwCY02Avz4vE14v_GFyl42xK82IYc2Ij64vIr41l4I
+	8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AK
+	xVWUGVWUWwC2zVAF1VAY17CE14v26r1Y6r17MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcV
+	AFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8I
+	cIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r
+	1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x0JUjZXOUUUUU=
+X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAQQEAWiqNtp+LgAAs+
 
-On Sat, Aug 23, 2025 at 11:25:05PM +0200, Heiner Kallweit wrote:
-> fixed_phy_register() creates and registers the phy_device. To be
-> symmetric, we should not only unregister, but also free the phy_device
-> in fixed_phy_unregister(). This allows to simplify code in users.
-> 
-> Note wrt of_phy_deregister_fixed_link():
-> put_device(&phydev->mdio.dev) and phy_device_free(phydev) are identical.
-> 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+DCCP sockets in DCCP_REQUESTING state do not check the sequence number
+or acknowledgment number for incoming Reset, CloseReq, and Close packets.
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+As a result, an attacker can send a spoofed Reset packet while the client
+is in the requesting state. The client will accept the packet without
+verification and immediately close the connection, causing a denial of
+service (DoS) attack.
 
-Thanks!
+This patch moves the processing of Reset, Close, and CloseReq packets
+into dccp_rcv_request_sent_state_process() and validates the ack number
+before accepting them.
 
+This fix should apply to Linux 5.x and 6.x, including stable versions.
+Note that DCCP was removed in Linux 6.16, so this patch is only relevant
+for older versions. We tested it on Ubuntu 24.04 LTS (Linux 6.8) and
+it worked as expected.
+
+Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+Cc: stable@vger.kernel.org
+---
+ net/dccp/input.c | 54 ++++++++++++++++++++++++++++--------------------
+ 1 file changed, 32 insertions(+), 22 deletions(-)
+
+diff --git a/net/dccp/input.c b/net/dccp/input.c
+index 2cbb757a8..0b1ffb044 100644
+--- a/net/dccp/input.c
++++ b/net/dccp/input.c
+@@ -397,21 +397,22 @@ static int dccp_rcv_request_sent_state_process(struct sock *sk,
+ 	 *	     / * Response processing continues in Step 10; Reset
+ 	 *		processing continues in Step 9 * /
+ 	*/
++	struct dccp_sock *dp = dccp_sk(sk);
++
++	if (!between48(DCCP_SKB_CB(skb)->dccpd_ack_seq,
++				dp->dccps_awl, dp->dccps_awh)) {
++		dccp_pr_debug("invalid ackno: S.AWL=%llu, "
++					"P.ackno=%llu, S.AWH=%llu\n",
++					(unsigned long long)dp->dccps_awl,
++			(unsigned long long)DCCP_SKB_CB(skb)->dccpd_ack_seq,
++					(unsigned long long)dp->dccps_awh);
++		goto out_invalid_packet;
++	}
++
+ 	if (dh->dccph_type == DCCP_PKT_RESPONSE) {
+ 		const struct inet_connection_sock *icsk = inet_csk(sk);
+-		struct dccp_sock *dp = dccp_sk(sk);
+-		long tstamp = dccp_timestamp();
+-
+-		if (!between48(DCCP_SKB_CB(skb)->dccpd_ack_seq,
+-			       dp->dccps_awl, dp->dccps_awh)) {
+-			dccp_pr_debug("invalid ackno: S.AWL=%llu, "
+-				      "P.ackno=%llu, S.AWH=%llu\n",
+-				      (unsigned long long)dp->dccps_awl,
+-			   (unsigned long long)DCCP_SKB_CB(skb)->dccpd_ack_seq,
+-				      (unsigned long long)dp->dccps_awh);
+-			goto out_invalid_packet;
+-		}
+ 
++		long tstamp = dccp_timestamp();
+ 		/*
+ 		 * If option processing (Step 8) failed, return 1 here so that
+ 		 * dccp_v4_do_rcv() sends a Reset. The Reset code depends on
+@@ -496,6 +497,13 @@ static int dccp_rcv_request_sent_state_process(struct sock *sk,
+ 		}
+ 		dccp_send_ack(sk);
+ 		return -1;
++	} else if (dh->dccph_type == DCCP_PKT_RESET) {
++		dccp_rcv_reset(sk, skb);
++		return 0;
++	} else if (dh->dccph_type == DCCP_PKT_CLOSEREQ) {
++		return dccp_rcv_closereq(sk, skb);
++	} else if (dh->dccph_type == DCCP_PKT_CLOSE) {
++		return dccp_rcv_close(sk, skb);
+ 	}
+ 
+ out_invalid_packet:
+@@ -658,17 +666,19 @@ int dccp_rcv_state_process(struct sock *sk, struct sk_buff *skb,
+ 	 *		Set TIMEWAIT timer
+ 	 *		Drop packet and return
+ 	 */
+-	if (dh->dccph_type == DCCP_PKT_RESET) {
+-		dccp_rcv_reset(sk, skb);
+-		return 0;
+-	} else if (dh->dccph_type == DCCP_PKT_CLOSEREQ) {	/* Step 13 */
+-		if (dccp_rcv_closereq(sk, skb))
+-			return 0;
+-		goto discard;
+-	} else if (dh->dccph_type == DCCP_PKT_CLOSE) {		/* Step 14 */
+-		if (dccp_rcv_close(sk, skb))
++	if (sk->sk_state != DCCP_REQUESTING) {
++		if (dh->dccph_type == DCCP_PKT_RESET) {
++			dccp_rcv_reset(sk, skb);
+ 			return 0;
+-		goto discard;
++		} else if (dh->dccph_type == DCCP_PKT_CLOSEREQ) {	/* Step 13 */
++			if (dccp_rcv_closereq(sk, skb))
++				return 0;
++			goto discard;
++		} else if (dh->dccph_type == DCCP_PKT_CLOSE) {		/* Step 14 */
++			if (dccp_rcv_close(sk, skb))
++				return 0;
++			goto discard;
++		}
+ 	}
+ 
+ 	switch (sk->sk_state) {
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.34.1
+
 
