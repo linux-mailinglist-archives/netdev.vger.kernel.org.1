@@ -1,84 +1,55 @@
-Return-Path: <netdev+bounces-216259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21C22B32CE4
-	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 03:30:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06F32B32CE9
+	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 03:40:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDC4E3BF038
-	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 01:30:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6722189C332
+	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 01:40:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 319F7128816;
-	Sun, 24 Aug 2025 01:30:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78D7317ADF8;
+	Sun, 24 Aug 2025 01:40:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NIK3YDZL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zgrbv9y0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B22C25C96;
-	Sun, 24 Aug 2025 01:30:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F4741FB3;
+	Sun, 24 Aug 2025 01:40:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755999051; cv=none; b=Zs2J/LQTtVV6EKr9eeq+G/INDMsMs2PGbAvfXpRP7IszyyiumbMiVb5v/35tj5DDHpvq5wI7J3j9hxyEWVX47xA0nJB6XF6UdWP30gSvnoUe1EmvKgd2VIQPjPwBd/dKuHW23swFotr6T2DdXDuvPIi2q+Vilb1uV6IFCqqC3AM=
+	t=1755999613; cv=none; b=L2iBJmaAbnFRmvQSGMpIWwciQ8xnli/lsxiP6oe716C7bN9hNx49g3aXcM4n14LjiQhmUOJXWKpCnkoTGVRuce0zdLNkUM695jO4rStLKN1oCc5Pl4hEXvP4Zvy1yzFP2jNkSqAKbQgj8Rk6sHoN498osIjlPr/698ASfSVabHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755999051; c=relaxed/simple;
-	bh=+sdc3xNv832iC8EdxMtXnKBHxlqOje9a8mDMzW2PzHk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dSQZ/QuyfRUAeqD8MPOZh9V5qrO22QhG1vsDgBroA+cP+8Gc/ExJV6LaJgBIBBxPl9NZJdlfRR7QZ+HhsUV1laU2bKFxGvzosDa9BpebAVv7HcfVi7HlBcuBxCZi6qTdODTHECJiRACQJD9omW9ozlhVz5q4s4Zn+IhIp9ZjTuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NIK3YDZL; arc=none smtp.client-ip=209.85.215.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-b4717543ed9so2199156a12.3;
-        Sat, 23 Aug 2025 18:30:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755999049; x=1756603849; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4OenbBBxBjUd5ddJh8x9yAvuiKz9EKNKjOuL7+opaP8=;
-        b=NIK3YDZL5V+XwrzjzCau0uS9iogq7zi3OWj/jcDaCEqVaTcJq1xfC+rcy3WBgfjl1o
-         GD9nfBYdyywfuCXSk6R0Og6HpbQUJ+e03bFQrRFuakYGGk8IJ7hJ/z9LnkTq8ezIOpTA
-         R5CNl1AOKSQUlGO3NnSkhOe9EtrNIczp05WS519eG8vHwZc0uLnbubzz3n5uxF9kh4RQ
-         Kcq6X9jkkWv4dX/YSQcnDmYun0liuBH3blFO6HjDMOnWDU48O3aBXt2RHdy71Kk4mcM5
-         Pmc4fJXWCXuiwQJjwNgKIElB0lLTeKaYDsY9bzUGWozfi1o1aRw3EMR0WjmCdvL8mz5b
-         QTmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755999049; x=1756603849;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4OenbBBxBjUd5ddJh8x9yAvuiKz9EKNKjOuL7+opaP8=;
-        b=VXOJXQfpm6fZxTAAfPwQftOPNLuNiZ/0yQWwjNuTz8BlIJPHULeFXqL5/VHoXld9dg
-         upHGB1PMYA8uJ4F4lyw00VVPmi5rTu+oDgfnY9YJap3xCqsgDyN716yphi817yZLN/xe
-         VFpRqBRFZUElq7/FeA5eLwEctDtwpdWBMslJkw3yuf+hG4uKjDakVX06SEqOlGlpNBHb
-         ZxLzuw2vcT1AQhHMa4jOg+UuqDJqxwHvCRPIy7WxCPRxF4vW6EximRF/qv4csU3R9m5T
-         YC3rLnjeOnFti7g74i4RdSc9XIYJyN8/2da+oAn8uGvkWaCE8t9vY3v+VTUYV/S+DmYe
-         ks5g==
-X-Forwarded-Encrypted: i=1; AJvYcCWObuWzNCQoAwzKhcGBENYZsJs95/N1f/7bu5FYwXDdmya/H2WdkNBggJqnzqhWtVBxtQqsoa5ytNBEjjw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvTRmOOZeSjfMEAkJLzcfi6el4u35rctDlRWa19HsN6DLjDgI0
-	gsb+y3ilZMF/E76Uv57/NiZwduYYm+6AqPzTqQ6l7+f4vseFRGxpMw3MwiSmYRPi
-X-Gm-Gg: ASbGnctB6tWKBqOLOLRk2SDbvuuJNX3jaZwtST+Lq3woC87JEOyLttfYNlBN709+UYq
-	rguP3xHW7bz/6eFjrswcc/VkB4WENBWJwkmYmnxGlpzg7MxuOgZw1egqX0Uz5L29M+orMrFmirz
-	LaJN+Q83MNNnnfVFsMHfPe11l/LSt5ajrgUZ0BZPVhyFA04Gb1ndVsXkAFSXt9GcnAn50LTDVVF
-	s8SH/cEdC7kJhkPGwYM/TT+o3yqqMn0HUaNM8VFomvF/xKUWDhikBmgW9aJP0xOd97KQMzAqpRT
-	7qOEopnN/Sv2ZxssqoV+OC+AiPWGbc3zIY95BNidDO+shOX8xacPJcsAP9vYAbDwqNBSqLeC+C0
-	arzF+DsNEm15XmhQ9RguRa7gZsvy3EA==
-X-Google-Smtp-Source: AGHT+IEPRKNV1sNaVjRbSLbFx605j7fjHRAPZ3wDmRv3IsG6v/OjwZRNJo9dE+/8pPwAjEaj+OF0Eg==
-X-Received: by 2002:a17:902:c410:b0:240:3f0d:f470 with SMTP id d9443c01a7336-2462ee50129mr113637985ad.20.1755999048877;
-        Sat, 23 Aug 2025 18:30:48 -0700 (PDT)
-Received: from d.home.yangfl.dn42 ([104.28.247.164])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2466885f2d1sm31947135ad.77.2025.08.23.18.30.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 23 Aug 2025 18:30:48 -0700 (PDT)
-From: David Yang <mmyangfl@gmail.com>
-To: netdev@vger.kernel.org
-Cc: David Yang <mmyangfl@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] net: phylink: remove stale an_enabled from doc
-Date: Sun, 24 Aug 2025 09:30:03 +0800
-Message-ID: <20250824013009.2443580-1-mmyangfl@gmail.com>
+	s=arc-20240116; t=1755999613; c=relaxed/simple;
+	bh=6EPVnLHz0Pz5WjonN5Q4v1n1t1qp2Lvggy/u4UvNalc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DwojC7slrqQTXc5FF2i0SuGGPalR/Ni4EAkE8ExffRpKcZPJ9Ahyb6+5mRy5Nybh9azJF8UARzGB6AfuRRCsm4kNIWJSNBdQTAt1Ot4KOHSAtsNeUSV0pASuo+XWA0hduT4voeuuo620MESlnKTlngeWND60eAt0nOtn/jjTGg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zgrbv9y0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C6F9C4CEE7;
+	Sun, 24 Aug 2025 01:40:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755999612;
+	bh=6EPVnLHz0Pz5WjonN5Q4v1n1t1qp2Lvggy/u4UvNalc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Zgrbv9y0JpXtEZCjuhrOevEaBPupj8EiLgrYnVOGNyyH0NKLR4Qhxspv946Svlgnm
+	 1eAojdW715iqJmo1VdSBzbSlKYVWmW211o7Qt10oKSDgEg4d9jYE3twBlQgDl24dWl
+	 lMr8fvpVeQBjNl4AZYv2uOqWfbwnK1iTA7x7wiB9RQlvihZlrGOUofm1lN3BCXkHcX
+	 P40IhPV/oHD3S0t5ELqzLcMCh7smgPWlmHcGaW5WJ0eVtSa8gyyQnrfUL3HR3BuTXI
+	 1KePYkz/xbcnsiw/JK187ozUV7KdSs3zIWcpqxWXDcl2p1OtXfoGwyoSRTWSZplsq0
+	 rKARaxRv1+VZg==
+From: Eric Biggers <ebiggers@kernel.org>
+To: netdev@vger.kernel.org,
+	Andrea Mayer <andrea.mayer@uniroma2.it>
+Cc: David Lebrun <dlebrun@google.com>,
+	Minhong He <heminhong@kylinos.cn>,
+	linux-crypto@vger.kernel.org,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH net-next v2 0/2] ipv6: sr: Simplify and optimize HMAC calculations
+Date: Sat, 23 Aug 2025 21:36:42 -0400
+Message-ID: <20250824013644.71928-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -88,40 +59,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-state->an_enabled was removed before, but is left in mac_config() doc,
-so clean it.
+This series simplifies and optimizes the HMAC calculations in
+IPv6 Segment Routing.
 
-Fixes: 4ee9b0dcf09f ("net: phylink: remove an_enabled")
-Signed-off-by: David Yang <mmyangfl@gmail.com>
----
- include/linux/phylink.h | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+Changed in v2:
+- Rebased on top of latest net-next.  Dropped "ipv6: sr: Fix MAC
+  comparison to be constant-time" since it was upstreamed already.
+  Moved key preparation to seg6_hmac_info_add().
 
-diff --git a/include/linux/phylink.h b/include/linux/phylink.h
-index 30659b615fca..9af0411761d7 100644
---- a/include/linux/phylink.h
-+++ b/include/linux/phylink.h
-@@ -320,9 +320,8 @@ int mac_prepare(struct phylink_config *config, unsigned int mode,
-  *   If in 802.3z mode, the link speed is fixed, dependent on the
-  *   @state->interface. Duplex and pause modes are negotiated via
-  *   the in-band configuration word. Advertised pause modes are set
-- *   according to the @state->an_enabled and @state->advertising
-- *   flags. Beware of MACs which only support full duplex at gigabit
-- *   and higher speeds.
-+ *   according to @state->advertising. Beware of MACs which only
-+ *   support full duplex at gigabit and higher speeds.
-  *
-  *   If in Cisco SGMII mode, the link speed and duplex mode are passed
-  *   in the serial bitstream 16-bit configuration word, and the MAC
-@@ -331,7 +330,7 @@ int mac_prepare(struct phylink_config *config, unsigned int mode,
-  *   responsible for reading the configuration word and configuring
-  *   itself accordingly.
-  *
-- *   Valid state members: interface, an_enabled, pause, advertising.
-+ *   Valid state members: interface, pause, advertising.
-  *
-  * Implementations are expected to update the MAC to reflect the
-  * requested settings - i.o.w., if nothing has changed between two
+Eric Biggers (2):
+  ipv6: sr: Use HMAC-SHA1 and HMAC-SHA256 library functions
+  ipv6: sr: Prepare HMAC key ahead of time
+
+ include/net/seg6_hmac.h |  20 ++--
+ net/ipv6/Kconfig        |   7 +-
+ net/ipv6/seg6.c         |   7 --
+ net/ipv6/seg6_hmac.c    | 211 ++++++----------------------------------
+ 4 files changed, 42 insertions(+), 203 deletions(-)
+
+
+base-commit: b1c92cdf5af3198e8fbc1345a80e2a1dff386c02
 -- 
 2.50.1
 
