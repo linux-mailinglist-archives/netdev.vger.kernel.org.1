@@ -1,62 +1,56 @@
-Return-Path: <netdev+bounces-216266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0F3CB32D79
-	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 06:11:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5ADDB32DA5
+	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 08:03:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2018F207E68
-	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 04:11:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E3A74423CA
+	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 06:03:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2A0A1EE7DC;
-	Sun, 24 Aug 2025 04:11:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10927823DD;
+	Sun, 24 Aug 2025 06:03:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="l0v9wvQK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C743D1F09A3;
-	Sun, 24 Aug 2025 04:11:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9B3734CF9;
+	Sun, 24 Aug 2025 06:03:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756008677; cv=none; b=W6WhYX1uDEw+iw0aiPfgh83aQR1/zVOSqR9QFTxZbyCsWFKv5HjMEHtVP5Xk30BnkZmag6PbncMCsEbk9I7JgmKefU41d2A4C5z4wWC2lLoXk1boQwEhjvNyA0l2/5JXRm6Rem69ExjnhhAGYUhGBTz3+3lVzom2/HvtIFnEfIc=
+	t=1756015426; cv=none; b=KAybDpsSmRmK5Vb+E6TOW6z6DDYRwNEJnh76qAkceyIB/LT24ufVvZRdEn4UK97pAKVse1HYOCSB5e+MlHFAZMQtc4P8ZHP0Jx4EPxBf6lZIjGYBSiXM1ITKcSDU9hZBmNcwgeZZ8sYMkpcRm0GQJAhWNeN5wh32n4ZSDWZPdC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756008677; c=relaxed/simple;
-	bh=eB+zjcUra3bYcA5QWUOIAXeG5bTP7GkgqMHVuIlrCJA=;
+	s=arc-20240116; t=1756015426; c=relaxed/simple;
+	bh=JM7Y8fZKei0R8TTZ4Y3zviWlvPivwcOmnRPos+eOBbo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d9Xo38RFRm+vXdDbisG47FrhItiYL9F0SHXZnbe4KGNoSgJEqnn6WU8DbMrotdACIuHboDgFwngd0pXOk/+zUem7lKid+GlmiEo3ovFtijy+YotTyM/RdCfSjDkX+S1IFjbqlHQtnxGeGWkL9mwd+nPdx5Yx23vPeQVLDi2X9AA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.206.34.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: esmtpgz10t1756008655t540b1348
-X-QQ-Originating-IP: EPudnYuXcQD4DchPgHmnm0BlP6r/SlIAuyr9jAbEI0g=
-Received: from localhost ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Sun, 24 Aug 2025 12:10:52 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 14133604353308470334
-Date: Sun, 24 Aug 2025 12:10:52 +0800
-From: Yibo Dong <dong100@mucse.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
-	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org,
-	gustavoars@kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH net-next v7 4/5] net: rnpgbe: Add basic mbx_fw support
-Message-ID: <424D721323023327+20250824041052.GB2000422@nic-Precision-5820-Tower>
-References: <20250822023453.1910972-1-dong100@mucse.com>
- <20250822023453.1910972-5-dong100@mucse.com>
- <a066746c-2f12-4e70-b63a-7996392a9132@lunn.ch>
- <C2BF8A6A8A79FB29+20250823015824.GB1995939@nic-Precision-5820-Tower>
- <f375e4bf-9b0b-49ca-b83d-addeb49384b8@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=O1Uz8NrcCKs3eTGWQaN3D/BucjiUBhpMSoC4Qishz95Nnx8DWoGSk1r9Lkn0nJ6MioZXqSHyK8l5ASs3gY2egQbvHN+GYV1T8Iuft8QXoSHWM8Lz8DadPxclvYBC5oLtpeyrMqb6JBSysfCD+O1Sue5//QsFRc6utYia6a/JWxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=l0v9wvQK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A92AAC4CEEB;
+	Sun, 24 Aug 2025 06:03:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1756015425;
+	bh=JM7Y8fZKei0R8TTZ4Y3zviWlvPivwcOmnRPos+eOBbo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=l0v9wvQKMzpfpolvZ+Nyp/fgokA3VxbM5xzjzQyFGDIuiPo7AXg6jJkxTLi2NEagM
+	 Txblo9OnsWHEVk8Ko+hncV+WEpw3FglCnds7sIAkycNIVfHq7W+aDaTTfwNGrXIcNy
+	 OlmoBaYY5PovvlDurbB4pRSpMB9nAn2syOB9UFc0=
+Date: Sun, 24 Aug 2025 08:03:42 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Chanho Min <chanho.min@lge.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, gunho.lee@lge.com,
+	stable@vger.kernel.org, Sasha Levin <sashal@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [PATCH] ipv6: mcast: extend RCU protection in igmp6_send()
+Message-ID: <2025082405-entomb-eligibly-c616@gregkh>
+References: <20250818092453.38281-1-chanho.min@lge.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,116 +59,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f375e4bf-9b0b-49ca-b83d-addeb49384b8@lunn.ch>
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: MlIcwAHh6GgKwOZPVFa7QyiDhPPc5muSlo7ME3Vkev37thWGpSwAyWc1
-	UfplUrPB6fXqP3/p8mxUB/Lr229y+PLDVEkxgQqO/gDo1A8JHIrP3WD+ZGzi7fdeL2TJUzZ
-	lB+EpQF1IIiL7ez4Rr3oKTSAkj/9R9lckis610pRM+V9HzoWHEz/OUQCmJKkO6ebki05xUC
-	XeDgfc3eQip4DLVQm8+4yBM+muzYbuAKTttNKxkl7d8C+GmOids7ROEtAUuyiwJLl00bus8
-	eBfcejzf9hADJgku32637Tdt/O+xTKO+38Ia82O0LUjdSIdaCvam0H/ILgAIEBaC+NPfiwN
-	mmxXgFvdK7OfaGjACc7f1ag77ArvAn7ozB4uDTEMzOCbbeMwJn1iK6VsjnMbxCy+C7aOrEY
-	CzwEoZUyKzTJcKdXHBouU9zMCZANCqZve2iXa1cmjvlScg3W2hu5Z5rQ05DXiwaPUMjJ7ZY
-	gdmPGjriJgiMNOGH7qGviGElUm3PUy0RyyAwRmL/IgVan/8G52CIiGv7DefZMC91/S3YBl2
-	izRXCuBQubVCONImVbD9AbfaLiQbo8pAth1uuYA3YsBA3l9BlhGvGA7imROdobQkG9LSVS5
-	uIczCmnv7X0QCp0+BN1rwl/OB0mY5uxjanws9FTzHBBuGbS+zJyWZaPrsFiJNgzOaCwlOX/
-	b8Wev/t49mEe/0jNmLeymQRj40da7uj0Vu8fjHWoPScqnBtN0Og4hLbRA+Ys8OWOJeqhGqo
-	gS9ms5F6L21Ewl85PyQiJDl8+Gd7E6K8fIKdnrSUaCvknw/gHDg4D8faO466S3e9Tu1uEDm
-	zDQJ4XJveJ0BtP4YFQrRiPVDyXFVFPRiwBR5IieFpkn2mLJzTm9N5Jq7SvjCNnxMbaaAQP0
-	lo33OSUbcffLbes2qGBlAaJHeExh8QC4g9qHqlzlm6I3xIZe8bARmVQljewj+EIggT5l6jd
-	Ip7CfGssxCVyVWW3wVVcoyVh/jbD0upiYozbw0KZauFcbfJETJVvQRS84/hw6qB0RgZwcHz
-	NdaqdeeXkbJd1cc2wQ
-X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
-X-QQ-RECHKSPAM: 0
+In-Reply-To: <20250818092453.38281-1-chanho.min@lge.com>
 
-On Sat, Aug 23, 2025 at 05:17:45PM +0200, Andrew Lunn wrote:
-> On Sat, Aug 23, 2025 at 09:58:24AM +0800, Yibo Dong wrote:
-> > On Fri, Aug 22, 2025 at 04:43:16PM +0200, Andrew Lunn wrote:
-> > > > +/**
-> > > > + * mucse_mbx_get_capability - Get hw abilities from fw
-> > > > + * @hw: pointer to the HW structure
-> > > > + *
-> > > > + * mucse_mbx_get_capability tries to get capabities from
-> > > > + * hw. Many retrys will do if it is failed.
-> > > > + *
-> > > > + * @return: 0 on success, negative on failure
-> > > > + **/
-> > > > +int mucse_mbx_get_capability(struct mucse_hw *hw)
-> > > > +{
-> > > > +	struct hw_abilities ability = {};
-> > > > +	int try_cnt = 3;
-> > > > +	int err = -EIO;
-> > > > +
-> > > > +	while (try_cnt--) {
-> > > > +		err = mucse_fw_get_capability(hw, &ability);
-> > > > +		if (err)
-> > > > +			continue;
-> > > > +		hw->pfvfnum = le16_to_cpu(ability.pfnum) & GENMASK_U16(7, 0);
-> > > > +		return 0;
-> > > > +	}
-> > > > +	return err;
-> > > > +}
-> > > 
-> > > Please could you add an explanation why it would fail? Is this to do
-> > > with getting the driver and firmware in sync? Maybe you should make
-> > > this explicit, add a function mucse_mbx_sync() with a comment that
-> > > this is used once during probe to synchronise communication with the
-> > > firmware. You can then remove this loop here.
-> > 
-> > It is just get some fw capability(or info such as fw version).
-> > It is failed maybe:
-> > 1. -EIO: return by mucse_obtain_mbx_lock_pf. The function tries to get
-> > pf-fw lock(in chip register, not driver), failed when fw hold the lock.
+On Mon, Aug 18, 2025 at 06:24:53PM +0900, Chanho Min wrote:
+> From: Eric Dumazet <edumazet@google.com>
 > 
-> If it cannot get the lock, isn't that fatal? You cannot do anything
-> without the lock.
+> [ Upstream commit 087c1faa594fa07a66933d750c0b2610aa1a2946 ]
 > 
-> > 2. -ETIMEDOUT: return by mucse_poll_for_xx. Failed when timeout.
-> > 3. -ETIMEDOUT: return by mucse_fw_send_cmd_wait. Failed when wait
-> > response timeout.
+> igmp6_send() can be called without RTNL or RCU being held.
 > 
-> If its dead, its dead. Why would it suddenly start responding?
+> Extend RCU protection so that we can safely fetch the net pointer
+> and avoid a potential UAF.
 > 
-> > 4. -EIO: return by mucse_fw_send_cmd_wait. Failed when error_code in
-> > response.
+> Note that we no longer can use sock_alloc_send_skb() because
+> ipv6.igmp_sk uses GFP_KERNEL allocations which can sleep.
 > 
-> Which should be fatal. No retries necessary.
+> Instead use alloc_skb() and charge the net->ipv6.igmp_sk
+> socket under RCU protection.
 > 
-> > 5. err return by mutex_lock_interruptible.
-> 
-> So you want the user to have to ^C three times?
-> 
-> And is mucse_mbx_get_capability() special, or will all interactions
-> with the firmware have three retries?
+> Cc: stable@vger.kernel.org # 5.4
+> Fixes: b8ad0cbc58f7 ("[NETNS][IPV6] mcast - handle several network namespace")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Reviewed-by: David Ahern <dsahern@kernel.org>
+> Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> Link: https://patch.msgid.link/20250207135841.1948589-9-edumazet@google.com
+> [ chanho: Backports to v5.4.y. v5.4.y does not include
+> commit b4a11b2033b7(net: fix IPSTATS_MIB_OUTPKGS increment in OutForwDatagrams),
+> so IPSTATS_MIB_OUTREQUESTS was changed to IPSTATS_MIB_OUTPKGS defined as
+> 'OutRequests'. ]
 
-It is the first 'cmd with response' from fw when probe. If it failed,
-return err and nothing else todo (no registe netdev ...). So, we design
-to give retry for it.
-fatal with no retry, maybe like this? 
+We can not take patches for only older kernel versions, as when you
+upgrade you would have a regression.  Please send backports for all of
+the missing stable versions and we will be glad to queue them up.
 
-int mucse_mbx_get_capability(struct mucse_hw *hw)
-{
-        struct hw_abilities ability = {};
-        int try_cnt = 3;
-        int err;
+thanks,
 
-        do {
-                err = mucse_fw_get_capability(hw, &ability);
-                if (err == -ETIMEDOUT)
-                        continue;
-
-		break;
-        } while(try_cnt--);
-
-	if (!err)
-		hw->pfvfnum = le16_to_cpu(ability.pfnum) & GENMASK_U16(7, 0);
-        return err;
-}
-
-> 
-> 	Andrew
-> 
-
-Thanks for your feedback.
-
+greg k-h
 
