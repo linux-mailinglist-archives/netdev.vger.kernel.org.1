@@ -1,167 +1,136 @@
-Return-Path: <netdev+bounces-216326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF9C7B331F2
-	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 20:13:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53571B331AF
+	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 19:58:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C778188C1A8
-	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 18:12:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F364617BB27
+	for <lists+netdev@lfdr.de>; Sun, 24 Aug 2025 17:58:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E988B2E5B33;
-	Sun, 24 Aug 2025 18:09:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71BF823F412;
+	Sun, 24 Aug 2025 17:58:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SDWCSPoB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WQMVdgVk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDF6F2E5B2B;
-	Sun, 24 Aug 2025 18:09:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D404413959D
+	for <netdev@vger.kernel.org>; Sun, 24 Aug 2025 17:58:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756058968; cv=none; b=rtfiplrLjVmF+fQQBvYd5f/nh79/TBq4RNpI72siHkCSvfQuDIgVplKp6k1qrt12V/DkblPmefLsk4CSRea49fyrMi0Ao1NyNCc7BXfbbIXvKD0UCBZlARFKpt38d96Sx76QRuxU7+UA1p/DAEwgaqarkJ2gZ0QQcj4szEQvXoA=
+	t=1756058282; cv=none; b=bHjXd+5gGiZBMBeFKXwL0pMB7aKjkfO5Zqk1skq0GQRbM+Ep4KfvKf4IAQv7zz43Xr++SIZt6hokpbf7p+naamoRANLF7AnFG6thfxhWIz+s5ehrMD77SL8O+afFAMV7J6tsvxgad1Dnsf1crjr9ReUuOARlu78qdnq38rYKPfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756058968; c=relaxed/simple;
-	bh=3jhT/EEyzXANyIz1YGE9FVNl0vOKgiphcREZ9lWL90g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ixjZZ2u2YMLIS3eeEAKz2G+3CYZAeWqsxOraCGYmCAxqMWwFYTftVe9zeoseF52o+Kxnwglf7haqqOIvd9ZyFdnyQHXl/b/bN4pHlrj0dsC9EHxplxBidf2Id1w2tyZn8SbENej4vbs3IjGaP9cBKfeBig57NU7+Eia2yGm0OMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SDWCSPoB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 492EEC4CEEB;
-	Sun, 24 Aug 2025 18:09:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756058968;
-	bh=3jhT/EEyzXANyIz1YGE9FVNl0vOKgiphcREZ9lWL90g=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=SDWCSPoBRgdCgPsYVUlXzW7x7CIMccXAS8j4MHVX9x+3JKLheKpgfFDM41V1CsoKx
-	 xweHNOguHSEN3nIZMAEvuYVnTG8U2YER6x150jLSvSVk+DFWdZYP/qpI7hNFTYBR+s
-	 KtFHMjH0By2bz22KKHj6Wix6AhoDJO2nnvEsYTLR0C6MRThsZGpiiAoAzXEhhvDfCK
-	 s6OJ3ZRgQE9u1DTG53SqHFYtkOKlRh0bootTRDCx5lEJ2Softk9ou9y39tjiGxs2Zo
-	 B1dyXgmK7dP5nuNtAbA818hipqF0LHgD8faj1vbA6T0al7fOZcqzVCFBfL/NWvJ139
-	 KiPiBwPAVXn3g==
-Message-ID: <0cb62840-845b-4a9f-94c6-e40d0b72ce95@kernel.org>
-Date: Sun, 24 Aug 2025 19:16:07 +0200
+	s=arc-20240116; t=1756058282; c=relaxed/simple;
+	bh=oWO76e1aLw3HEUKBlQb3yx7LJvlqYqffct57GCnu/xw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WgRSomeupGP0HT70pZ+C9/mEk/R3MJMkD5s9kFFLhQb1IBgJQ2pgGBxSvZCcPF1c82L2tfwMzzcEw3uftRJySEyZ7qtitCQ3Lo4hwJ5u6473/2HaI89Qv/rYH+kGy0D/r/OLBvoThcStE6u/l8mL3dez6z9tm5489o8P7EtsJcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WQMVdgVk; arc=none smtp.client-ip=209.85.166.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-3eaff77982eso15294905ab.1
+        for <netdev@vger.kernel.org>; Sun, 24 Aug 2025 10:58:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756058280; x=1756663080; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oWO76e1aLw3HEUKBlQb3yx7LJvlqYqffct57GCnu/xw=;
+        b=WQMVdgVkKiYT1MOKXbO2gTfLjeNSBfExmqWuOGeWkjB5RZt9cx/VZkLZuiLwyJkIpT
+         yWtSfgz5lFTwIqeTdWXPF9GnUgZbX8CPP54fNvSyCz83PJXZsx073QUJZ+iu+vXFZRuh
+         bA7uwNYIiGN3ZitKSYGa9RLJdF50SDKvsVNM5n5kZnkaK5VLrmskEUdBuypBRQ+ztXrH
+         Jn+Yk7vt+d4dctCmd+Nw4KvhSRF/2Vcf7YBlrZKEPsTNPUdM0Mw9LpIFi23IHkvbKGsz
+         o5za5KWOZYoh6CLqET00rtEaUnx0zhLK85LRTSVPLdBYZHBOo1+jo8RbA9Em0UxwLHy0
+         8O7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756058280; x=1756663080;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oWO76e1aLw3HEUKBlQb3yx7LJvlqYqffct57GCnu/xw=;
+        b=imEm5almKQ+Ql0AkwNncf1L7PZh6gYMtkfHC5t1eyPH6bAJYRRystNocXsFWHYxauO
+         oPQaRqCnuGEFH47f6EZowDdrgzz7iVrewjYWD7/v2BfNy+YHS+YbWme7WH8pzW0gURCG
+         AsRKAXtpTkIqPtB7XFA8ED3eloEbmsHFODkaxcWVUsfo9SjC6L86RXhfGAr/RO6obMei
+         Mq02iRgqBPKonHABVxL/a7XmNkW6bhdNjz6nI3I61WEF4uvJ0xsxf/bGBTFc2IrpDAfU
+         uIheqHtIY9aQlxClnldi8tGTF9W2V5qPkzui0ybcFwfDjPjo3ZBOJp5Lm8Cyt/EYEumV
+         J71g==
+X-Gm-Message-State: AOJu0Ywh5/KiNXYBT5fS/UYm8ltn47W8nZx7KH7rv69W1lrlIvBlF0bB
+	YfMpMaJOJnmV3pi83JOLajABDf6FPS3ClvYW3dpA/YUtkF99u6lkQ4mKW/SyHKrAPMwE1XxF3uC
+	dy3fQrDFlXUkprqvHjigdTd1jyrXarv0=
+X-Gm-Gg: ASbGncs4+Rju8pCdKHgqQDUTodUYoJ2y6JgR+rCmyauggv74vIIe2sLOQrz23zpreyK
+	V/MzoBIL9jg5uXsidgS5/ZR9JH97YOns6pr2K2Z9Shh5wZCE+t9xIneu4y/3fRlHmMxezbThAo+
+	OYyqrKOowP7DisIv+bi/wwC4LKJlNuoiHia27gVkaqMTBa0TPBxkvoezH91AL0ab6HqOYuwvVsZ
+	0UwvBpGgQ==
+X-Google-Smtp-Source: AGHT+IGBOV29qleVzkamd6i+YW/4W469UQcR6Gw8ApcifRy0J3Ys3Ad8SI/KyO5oFwbnC1kzi+hk4yM9yE72iCos3bg=
+X-Received: by 2002:a05:6e02:19c7:b0:3e5:6a2e:e3cf with SMTP id
+ e9e14a558f8ab-3e9203e6ef4mr138237865ab.10.1756058279737; Sun, 24 Aug 2025
+ 10:57:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 1/3] dt-bindings: net: dsa: yt921x: Add
- Motorcomm YT921x switch support
-To: Yangfl <mmyangfl@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
- Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250824005116.2434998-1-mmyangfl@gmail.com>
- <20250824005116.2434998-2-mmyangfl@gmail.com>
- <20250824-jolly-amaranth-panther-97a835@kuoka>
- <CAAXyoMOfhSWhRCiFudju-DNtvD+8kHGhLzT2NGBF2cK_Ctviyw@mail.gmail.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <CAAXyoMOfhSWhRCiFudju-DNtvD+8kHGhLzT2NGBF2cK_Ctviyw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <cover.1755525878.git.lucien.xin@gmail.com> <cb74facd-aa28-4c9d-b05f-84be3a135b20@app.fastmail.com>
+In-Reply-To: <cb74facd-aa28-4c9d-b05f-84be3a135b20@app.fastmail.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Sun, 24 Aug 2025 13:57:48 -0400
+X-Gm-Features: Ac12FXzDJGyjE62gGAfbygYFmkOBVBkIQpXbiCPP4Om7erTA8QBe7gCdmbbkrxo
+Message-ID: <CADvbK_f4v916nbx4t0fnkCj44S-buTytj_Paurd3j3Ro2tLDsQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 00/15] net: introduce QUIC infrastructure and
+ core subcomponents
+To: John Ericson <mail@johnericson.me>
+Cc: network dev <netdev@vger.kernel.org>, draft-lxin-quic-socket-apis@ietf.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 24/08/2025 11:25, Yangfl wrote:
-> On Sun, Aug 24, 2025 at 5:20 PM Krzysztof Kozlowski <krzk@kernel.org> wrote:
->>
->> On Sun, Aug 24, 2025 at 08:51:09AM +0800, David Yang wrote:
->>> The Motorcomm YT921x series is a family of Ethernet switches with up to
->>> 8 internal GbE PHYs and up to 2 GMACs.
->>>
->>> Signed-off-by: David Yang <mmyangfl@gmail.com>
->>> ---
->>
->> <form letter>
->> This is a friendly reminder during the review process.
->>
->> It looks like you received a tag and forgot to add it.
->>
->> If you do not know the process, here is a short explanation:
->> Please add Acked-by/Reviewed-by/Tested-by tags when posting new
->> versions of patchset, under or above your Signed-off-by tag, unless
->> patch changed significantly (e.g. new properties added to the DT
->> bindings). Tag is "received", when provided in a message replied to you
->> on the mailing list. Tools like b4 can help here. However, there's no
->> need to repost patches *only* to add the tags. The upstream maintainer
->> will do that for tags received on the version they apply.
->>
->> Please read:
->> https://elixir.bootlin.com/linux/v6.12-rc3/source/Documentation/process/submitting-patches.rst#L577
->>
->> *If a tag was not added on purpose, please state why* and what changed.
->> </form letter>
->>
->>
->> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
->>
->> Best regards,
->> Krzysztof
->>
-> 
-> Thanks.
-> 
->>  - use enum for reg in dt binding
-> 
-> I made a change in dt binding. If you are fine with that change, I'll
-> add the tag in the following versions (if any).
+On Sat, Aug 23, 2025 at 11:21=E2=80=AFAM John Ericson <mail@johnericson.me>=
+ wrote:
+>
+> (Note: This is an interface more than implementation question --- apologi=
+es in advanced if this is not the right place to ask. I originally sent thi=
+s message to [0] about the IETF internet draft [1], but then I realized tha=
+t is just an alias for the draft authors, and not a public mailing list, so=
+ I figured this would be better in order to have something in the public re=
+cord.)
+>
+> ---
+>
+> I was surprised to see that (if I understand correctly) in the current de=
+sign, all communication over one connection must happen with the same socke=
+t, and instead stream ids are the sole mechanism to distinguish between dif=
+ferent streams (e.g. for sending and receiving).
+>
+> This does work, but it is bad for application programming which wants to =
+take advantage of separate streams while being transport-agnostic. For exam=
+ple, it would be very nice to run an arbitrary program with stdout and stde=
+rr hooked up to separate QUIC streams. This can be elegantly accomplished i=
+f there is an option to create a fresh socket / file descriptor which is ju=
+st associated with a single stream. Then "regular" send/rescv, or even read=
+/write, can be used with multiple streams.
+>
+> I see that the SCTP socket interface has sctp_peeloff [2] for this purpos=
+e. Could something similar be included in this specification?
+Hi, John,
 
+That is a bit different. In SCTP, sctp_peeloff() detaches an
+association/connection from a one-to-many socket and returns it as a
+new socket. It does not peel off a stream. Stream send/receive
+operations in SCTP are actually quite similar to how QUIC handles
+streams in the proposed QUIC socket API.
 
-Cover letter must state the reason.
+For QUIC, supporting 'stream peeloff' might mean creating a new socket
+type that carries a stream ID and maps its sendmsg/recvmsg to the
+'parent' QUIC socket. But there are details to sort out, like whether
+the 'parent-child relationship' should be maintained. We also need to
+consider whether this is worth implementing in the kernel, or if a
+similar API could be provided in libquic.
 
+I=E2=80=99ll be requesting a mailing list for QUIC development and new
+interfaces, and this would be a good topic to continue there.
 
-Best regards,
-Krzysztof
+Thanks for your comment.
 
