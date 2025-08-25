@@ -1,124 +1,133 @@
-Return-Path: <netdev+bounces-216659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37E29B34CEF
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 22:55:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E6C0B34D9A
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 23:07:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC7283BAA37
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 20:55:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DC1420844D
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 21:07:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10BA2291864;
-	Mon, 25 Aug 2025 20:55:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFAD728D8D9;
+	Mon, 25 Aug 2025 21:07:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WS8WaGEL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BMWsAYs7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D936C179BD;
-	Mon, 25 Aug 2025 20:55:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C59275AFC
+	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 21:07:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756155329; cv=none; b=aQpbFQDPlKT7qHGylpJkwQEKu1CLzpyM8ZhbagmtTJ6wYiTI60wcKdM2TP0Cmz5KI4j/rBuVP6Pu8q+HbrVvD6XNqPxwOxqaR9nKWtP7gBhomlDyTuSk9fteC6rrWcyeMzRx5DC+0w6Kjj50ASWNoXPLLU6w9gmr3kiWXyukTks=
+	t=1756156074; cv=none; b=bU1MWZcaycIraoMV8gYXfeiUBc2JF7ADanONJ4acdiwjGo1w4RhuMcb4dFV0jmyVFju00rFNAmQ7KuOVta57xRCF5X03H6K9ps9CiYSOriO1uP98Jb4mEhnH1DUcltZ3MHogn8Y92nDA6MhgpM6E84Cg4mX8zuqNhrIoNZeSM0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756155329; c=relaxed/simple;
-	bh=JM6i/BBkoJtcy4KbG3Msr7B8vft4lS33A3YMhIcPYPY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vs5cOOnkjHg7ny5iUG/yCZE3UXS1zNmXq5ym7Rl/7Jf+5ItTuqN72Yls1b55v0z1WDPCHAID6sFtsAAS7sW04T4XiyZwHSCZVRF/s8P1V5bSFEGObONqC27x4MKBqiH+zr7/5YQccNiEZogE2EjmKDIQw7OS+Rsp6mLkGmxUb4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WS8WaGEL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E127FC4CEED;
-	Mon, 25 Aug 2025 20:55:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756155328;
-	bh=JM6i/BBkoJtcy4KbG3Msr7B8vft4lS33A3YMhIcPYPY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WS8WaGELzWx6JNeBXvzR0D1O5NKR6si6RJCL+ZYwcImmqVFMDQsGxpqpRGAXu/w4g
-	 lmLP5U9zoF3WMgJYXOKu9j1UoBTpdEUb4B5S7WfWbohDRiA+N9vlWQQZU/g2Ae3Bke
-	 LvfUa38rgtg33FGI0IXY8/jQa7orVNTV/kOb7a2dcwivnYgMQEae+tKYhlJ8b4XPLT
-	 3zZQYh/BIYe9gnjsQxplQT2L+1nxOtxQbXs/5odvSarD8VW/V9WNpXrsuBbS13yq/u
-	 1I4xF/1jFsn44qDR1JCPrNDChnsW6k/eRw4m7SdhEfcx3TlawnmRdccdYdmnSuBtoL
-	 qh04vuA/JrdtQ==
-Date: Mon, 25 Aug 2025 20:55:26 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Andrea Mayer <andrea.mayer@uniroma2.it>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	David Lebrun <dlebrun@google.com>,
-	Stefano Salsano <stefano.salsano@uniroma2.it>,
-	Paolo Lungaroni <paolo.lungaroni@uniroma2.it>,
-	Ahmed Abdelsalam <ahabdels.dev@gmail.com>, stable@vger.kernel.org
-Subject: Re: [PATCH net] ipv6: sr: fix destroy of seg6_hmac_info to prevent
- HMAC data leak
-Message-ID: <20250825205526.GA2130842@google.com>
-References: <20250825190715.1690-1-andrea.mayer@uniroma2.it>
- <CANn89i+UTv8nJ=cc67iKky=MLXOnzF5XyVRsV-TMXz7wUQ6Yvw@mail.gmail.com>
+	s=arc-20240116; t=1756156074; c=relaxed/simple;
+	bh=rsgQsADbJK9QUmMKxUDa/Fk0IhymXtnj4qX8ecK2uC8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kv9smeXqyjWhjWYaEzxxgF4MXd4o+SqQvH9mEk93VflQAreQFkKLumyw9cyv/mgxW3BxkV6MAkhC8F8a59g7R5F3WpqOD9pcKrgvm+4DBPTcaJ+GRmhbm7yu4Fsy/kt6P/d7Mwkuecn9UzozA444nWfIl4/Pi7a6l7RGmtWQ4Ik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BMWsAYs7; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2445806e03cso56758815ad.1
+        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 14:07:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756156072; x=1756760872; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rsgQsADbJK9QUmMKxUDa/Fk0IhymXtnj4qX8ecK2uC8=;
+        b=BMWsAYs7JLJw+2eVfaxp1YRFEQb2JUWOmhzQhuMbM/wS6rTkF4QM6Vb1djkCpeLSD/
+         E1aq7w47bDstEuTGP3YEGkuIfIoJXwZJ2tJlU57MZaR83wX797SCCvNRbepXohmCbbYJ
+         LfJY6I37vlTSDbtJVyPFPcqNe1+uHREyg1tzeJhefOInOH0M5jdbJnwUloky77D6mrB9
+         TXyUERKbXvOzo6cQFhOZ/WsWuGVBhwyEQE++bZwMKcEyTYrikSetPIniLD4KxdWr7gjB
+         48hwmqfy1oQS+tnC9/YkEu3X6BHZsOlNjOPeYVPbrTJ/GA5bF3Ll2l8cnJF/1MMYdfj9
+         kXEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756156072; x=1756760872;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rsgQsADbJK9QUmMKxUDa/Fk0IhymXtnj4qX8ecK2uC8=;
+        b=Uud/ASOB2Hwg9jUTB/aNobIfK+lR6NWRKJZ2ACeToEgHYXE2FbHxlRhU+xAS2/FbOj
+         ajZmab3DchIaWprPaHe6ftsdnCp3tck9JXfdfiPSsg5fFZzybp8AOI4ayD8m4gRB6eed
+         d+20F/PhqSSxb5puv4TbB2JcnGLEo89ACvHnWuqj5RbmUSII8XCKSPl7YDLjGyMo3PYg
+         t1Ly+sw9uwudw4jh8DQGx+OuYo2BiGJ6+yUJrJy6a5v9S9YsuKu3ljwO3VtbUIPtGq/Z
+         BXiS/C6j2uF2ho6mYMhF4CPq/Q1AAjeRithSeJFrPidpmkeTVvvecDJLn4uFRbbsxYGk
+         Q/+w==
+X-Forwarded-Encrypted: i=1; AJvYcCVLPnIKXgl64NfsqKAvTeOh0jilS72qh1v7unVTvs33/rbAaiKPgu7xoC8ON4bJRu78TLWOQAU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxbAA8loXDI6KSLodKEVYosQZeBYfE0XtV28PjyuTB7cejtnMzW
+	JwMQJu5GClrZMvWqrOq4gaE7R0fvgg/E2J2HRYQFlqjU/VHJSI9U4OUv9tqGcnYHWWzIPP0a5lK
+	GuBupYhfzvr2QKn6+iEXxnIB26W6U0aNviwu+yCEr
+X-Gm-Gg: ASbGncvAIzlhACq9NWdVCX4gPt2h9IiqQr+sBbsJZG+ip587epBuR1dHWcDwM+3DyUk
+	lxkaNy+YcDBoycCPmtkwOjPcKRC4NWBVa822C3dmDbmnXwoPQW0RzRnd1lrWbJlyIKhZ2qcCd49
+	Xe+UN8soH7AAZ4w1aGQPiq/ooL4dCRNDzrL5flkwA0yx/I1KuWf0C1F5tmT3Ey0HJPheRXy9YOQ
+	CL0/N1BUKPYrmt9m+OSMIzUyEgmLGjsS0WpqqPkstagN8uoGqI6TipfC+1q3WRNeCG9RCBa/kyL
+	fKLgPQnQ2A==
+X-Google-Smtp-Source: AGHT+IFG5RTfX6ud7JlnRAPMerHJf0Gbw2YzpqBK05FqAlo9zIJQqUl848H3iGoxvhe6mgAQlaJdiUZU7L2rrRtCD00=
+X-Received: by 2002:a17:903:41cc:b0:246:b351:36a3 with SMTP id
+ d9443c01a7336-246b3513841mr70712685ad.48.1756156072000; Mon, 25 Aug 2025
+ 14:07:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89i+UTv8nJ=cc67iKky=MLXOnzF5XyVRsV-TMXz7wUQ6Yvw@mail.gmail.com>
+References: <20250825204158.2414402-1-kuniyu@google.com> <20250825204158.2414402-3-kuniyu@google.com>
+ <aKzMxKViOGjxFhiW@mini-arch>
+In-Reply-To: <aKzMxKViOGjxFhiW@mini-arch>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Mon, 25 Aug 2025 14:07:39 -0700
+X-Gm-Features: Ac12FXw0Dtr1s8EQjHWjs5pMcjrpJOHq1fQzaS4zTIwkTNJhoX312mfmLMXMCzs
+Message-ID: <CAAVpQUBzWzVgvohLKOTS0U4ay9D29otB619T6O786m9W0YSWtg@mail.gmail.com>
+Subject: Re: [PATCH v2 bpf-next/net 2/8] bpf: Add a bpf hook in __inet_accept().
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
+	Roman Gushchin <roman.gushchin@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 25, 2025 at 12:33:26PM -0700, Eric Dumazet wrote:
-> On Mon, Aug 25, 2025 at 12:08 PM Andrea Mayer <andrea.mayer@uniroma2.it> wrote:
+On Mon, Aug 25, 2025 at 1:51=E2=80=AFPM Stanislav Fomichev <stfomichev@gmai=
+l.com> wrote:
+>
+> On 08/25, Kuniyuki Iwashima wrote:
+> > We will store a flag in sk->sk_memcg by bpf_setsockopt().
 > >
-> > The seg6_hmac_info structure stores information related to SRv6 HMAC
-> > configurations, including the secret key, HMAC ID, and hashing algorithm
-> > used to authenticate and secure SRv6 packets.
+> > For a new child socket, memcg is not allocated until accept(),
+> > and the child's sk_memcg is not always the parent's one.
 > >
-> > When a seg6_hmac_info object is no longer needed, it is destroyed via
-> > seg6_hmac_info_del(), which eventually calls seg6_hinfo_release(). This
-> > function uses kfree_rcu() to safely deallocate memory after an RCU grace
-> > period has elapsed.
-> > The kfree_rcu() releases memory without sanitization (e.g., zeroing out
-> > the memory). Consequently, sensitive information such as the HMAC secret
-> > and its length may remain in freed memory, potentially leading to data
-> > leaks.
+> > For details, see commit e876ecc67db8 ("cgroup: memcg: net: do not
+> > associate sock with unrelated cgroup") and commit d752a4986532
+> > ("net: memcg: late association of sock to memcg").
 > >
-> > To address this risk, we replaced kfree_rcu() with a custom RCU
-> > callback, seg6_hinfo_free_callback_rcu(). Within this callback, we
-> > explicitly sanitize the seg6_hmac_info object before deallocating it
-> > safely using kfree_sensitive(). This approach ensures the memory is
-> > securely freed and prevents potential HMAC info leaks.
-> > Additionally, in the control path, we ensure proper cleanup of
-> > seg6_hmac_info objects when seg6_hmac_info_add() fails: such objects are
-> > freed using kfree_sensitive() instead of kfree().
+> > Let's add a new hook for BPF_PROG_TYPE_CGROUP_SOCK in
+> > __inet_accept().
 > >
-> > Fixes: 4f4853dc1c9c ("ipv6: sr: implement API to control SR HMAC structure")
-> > Fixes: bf355b8d2c30 ("ipv6: sr: add core files for SR HMAC support")
-> 
-> Not sure if you are fixing a bug worth backports.
+> > This hook does not fail by not supporting bpf_set_retval().
+> >
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+>
+> And similarly to [0], doing it in sock_ops's BPF_SOCK_OPS_PASSIVE_ESTABLI=
+SHED_CB
+> is not an option because you want to run in the process context instead
+> of softirq?
 
-It can be considered a bug fix, or just hardening.  There are examples
-of both ways for this same type of issue.  I think the patch is fine
-as-is, though the commit message is a bit long.  Zeroizing crypto keys
-is a best practice that the kernel tries to follow elsewhere for all
-crypto keys, so this is nothing new.  The patch simply adds zeroization
-before freeing for a struct that contains a key.
+Yes, I considered the hook but ended up adding a new one
+in accept(), only when we know sk_memcg is the intended one.
 
-> >  static inline void seg6_hinfo_release(struct seg6_hmac_info *hinfo)
-> >  {
-> > -       kfree_rcu(hinfo, rcu);
-> > +       call_rcu(&hinfo->rcu, seg6_hinfo_free_callback_rcu);
-> >  }
-> 
-> If we worry a lot about sensitive data waiting too much in RCU land,
-> perhaps use call_rcu_hurry() here ?
 
-No, zeroization doesn't have stringent time constraints.  As long as it
-happens eventually it is fine.
-
-Reviewed-by: Eric Biggers <ebiggers@kernel.org>
-
-- Eric
+>
+> 0: https://lore.kernel.org/netdev/daa73a77-3366-45b4-a770-fde87d4f50d8@li=
+nux.dev/
 
