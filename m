@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-216618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53AA1B34B55
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 22:02:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A585B34B52
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 22:01:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37B7C241416
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 20:02:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FDD43AC382
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 20:01:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 170B52EC57B;
-	Mon, 25 Aug 2025 20:01:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A64028C5AA;
+	Mon, 25 Aug 2025 20:01:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fOP2URx3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LT0OHVSm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C00F428541F
-	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 20:01:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 370C3285C8F
+	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 20:01:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756152095; cv=none; b=TJ3VNvuEBF9JfKxqy+BJDIsTTMY2K0wWvgBFafxKKBg443xqpMVa4bv/KqCw0Q4C2d3NQMMZ4jxn97xD0UKzIdgYEIiEU+3unjZ0xqhj66DIj45MmAHzU//tck//mG2fph4s7ngX3+xgNJBQuiAHRlimVp8/xXpAIqQqKvzybCA=
+	t=1756152094; cv=none; b=UKWAbXfGfBk1ZBpcYyCFJNxXsitNvE14Y/0lk+Vp/Rvujb/iQQAWtFP95wy1r8WjnW0wtGWGMtwan6FJTn33s/23X31Rch09elT/sPKvxUF1J7JFQz+Vjd26upPbxrKQdyF7y2QH+A47R7rfLoa0zqD85SrOQvitCiVtbqVqltI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756152095; c=relaxed/simple;
-	bh=ZjZ+9XSRdL1NNJWECE4bR3b8xUgqec2jVVaXuyLs4mI=;
+	s=arc-20240116; t=1756152094; c=relaxed/simple;
+	bh=rPRgzNL4bPU/i06ENpnBmYg7okrE/jti2fQ3NNQNN/k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TouzftfEDCmjrX4s7VfsY8wF1iyiSDVUNSC4ug+ElHI6F+5ULLn8EQklmIaFdDiPpLbb8e4TRlObyrnA0FN6XysBCm9/9msIJvfLPlk+H8R2daeDBmA+xGmEKxZYk4OU3kU7nKp19dCQfrsEgUeG459b8fRFKQHk0NFt6YbCodU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fOP2URx3; arc=none smtp.client-ip=209.85.128.177
+	 MIME-Version; b=lLmKCHkdbm4RPjXMAsF+fS96rTrfM9axbkNnK8bJoSi1gQbRrcFMXSi6JDxNew0jYXwa5ZykEU4kPLlS6Mx6RLJc4871/HbQaKwCzw+gScd5KMHowP6hEsIXb55Qult5a1D0wbDyk9Fi34TAaxEld+gZ4fWdTlWKlTWiF4J9tjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LT0OHVSm; arc=none smtp.client-ip=209.85.219.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-71d6059f490so43249867b3.3
-        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 13:01:27 -0700 (PDT)
+Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-e952f877d67so1965248276.3
+        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 13:01:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756152086; x=1756756886; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1756152088; x=1756756888; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mCS3+f7av+InabTMNNCT7TnhPsUOD+ix7EtCirdhXZI=;
-        b=fOP2URx3nIvp7rw6k9FN3P7W3FhhzdhFyv6zagXmFZf/VGBh2s1IfnmU1ZPyFSTHGY
-         ynjLAacs1CTdXqFBs2LdtO69dl+FS6rkqvhS+QUxFDwyluibEDPdj7xa0HxaUBSekcOn
-         PQazs0dIo23uWlHARwIDMMnoHmUv55HhsmdO31H0EycH7n7F7MkPopFnvPXgtPUzij9O
-         5cDn8uoZX7ZCMbEfs8IoFcga8LiVqujYGPw6L1afKbLCv/UFNDQaYp3I8u9ntU+5cABR
-         /QQpCRy4+giG9ziLDET5lrbxEpV9YV2IP1ypAow1qEXo46VcGeTUGvkkEwrgjV7ZC1X8
-         xx1A==
+        bh=B/qzcyKs6Sijhx5eKCyG5tFaY81xPaszktH0lekGR70=;
+        b=LT0OHVSmad4HCL1F1x66ebPD8DuEeiIv5L1csRfIzrfCdjQYSLKrICInUBeYOQmcqO
+         2gc6oSbTABAycWQ4sQ9lzLJz0G3uqUQKz5ysMrwhq+ILGsS2Y7VhaFkAmbZOZIz7Rknx
+         l5k7bNxpyjl2axjDz5rnXrWjrXUT2dcY0U/Tg+S5PBUv+VBXB1/G8peGyp7GOUVa/1v7
+         8+tKcklP740QYA1wwHqcJJF99s+v48kqPb/tc1JcnM5EGHJYXAlynYEQ/TLx6JbtQN8P
+         8NAPh5pq9CjYT8f8Wgv5d8YqwfJ9890ZcSOrtFPFy+S3n+tWGOVbWOkd695iz5LqjDc4
+         bw0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756152086; x=1756756886;
+        d=1e100.net; s=20230601; t=1756152088; x=1756756888;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mCS3+f7av+InabTMNNCT7TnhPsUOD+ix7EtCirdhXZI=;
-        b=kUM8vM0P8K/MxpsHrYGG8XvzGrK6P489kqrGdmvXgXQ9FhQS+Tm9XtyHIhxd/LzlSU
-         +8124+P7bqusioNIARYz3lganYFYJu1wVlDctqJG7zM77FMgnTkyS3K4LGA6rbWMFvxo
-         wA6fQX/JQ2xZGyHYu5m1ySvJHu6l96vWM0hTHHiGDPPw9oaSwnWyaGBJDdPkjYb/mVWX
-         Zh5/1Jegh9dtMGL89yg7VTye4kCtyPlmtlyH5BikVwBs5sjKiPxBH3XMpbnhYEDmzGMr
-         JKN8E7cX5TuPoflyWs0QicyouNNHfZoEGNYj8jyynAxiufn7um1LHdO3BghXPX28WYwf
-         niRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXCMbWFk5SNrKlDQHaIZxIJGANzeSwQCpiGjTB71dxEnozogTV8BB3aMuUGg3fd5Heu+Hn9M88=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxi7QiJJ5xdlHGOpU6/VOykAJ+nNVDw/lHWnB4y90G3BpN1z6bd
-	qPgolvg3Cv9Ls+9Rwl4HvUcINRVtA1C99xS2VQCBMX1L+i0m8yK665fT
-X-Gm-Gg: ASbGncv62aObaXM1tTITOd7n5+gworgEViewEL/1AK7Y9oid38/EyNx/zuljzoJhUgi
-	BQgrTg4thT97P9J1rE21bQjx73hLflxCfTirj8nH2vfa5jOiV1RQHJxneImLbvDWg6R0i8VNmej
-	x/ER3fajTvML7mw43qYGjAGur9jFrddo2AwXRF1FiMINZaS92Hfb+k7HSkn8YZTxCTGNEq8e6mC
-	Jhq2bCdCbt5q2F6VVtc6nMGSLqTG9tsWYpx26DPfD+hk49l4FT+UKaciyyc7LPBWtMBCMw6pI2n
-	JUOFh7shmDQry4cKlOAcJKrP9LZXk8+P9BQpDOV1bPhkYncERkAEatbL+0HQ/uuE8UzAh8oXfDs
-	Fk6xdU7mI8nIkLsQ4TH5vbyudvsBTntY=
-X-Google-Smtp-Source: AGHT+IFO5rNmsy7PRTiuU49XWhp/R+W9WAnrNcnahA/NbtBu48LCVlEiyJda2wNADMN060pE4NwxvQ==
-X-Received: by 2002:a05:690c:4c05:b0:717:ca51:d781 with SMTP id 00721157ae682-71fdc3085b0mr149054097b3.17.1756152086435;
-        Mon, 25 Aug 2025 13:01:26 -0700 (PDT)
-Received: from localhost ([2a03:2880:25ff:4d::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-71ff18b4198sm19711307b3.66.2025.08.25.13.01.25
+        bh=B/qzcyKs6Sijhx5eKCyG5tFaY81xPaszktH0lekGR70=;
+        b=kXzN8cBl5l4RKcCWKRswWXxXbQnLiOzF1FrMQPk2p1A1WOn/5f8fHWu3u41dGx/gmH
+         C+d9QeoweCOeZNnoOYxlKSJuzYW10RW4otx5jgS6ZjKk+/HxJctBU1xqlAFLv1vAGzBt
+         t0D5fKuZz7EqmLzdmfdyO2KFilPv+UV8iyWyjSZvRDyghsBOzoc1dBcq9z2+ty07Zzv1
+         rUNa5CbcgI0iJNwXPvgkQUywH90InR6+o95p+x4dgbfhOT6wiWVVirMo6lnzzWaKhZZu
+         2+v0vEB0SqlD0lGnhrMIZ/292bXN1+IIGYj/iya2jl6oJJK3aNRLA4R733+kcJDVNy/o
+         6e3A==
+X-Forwarded-Encrypted: i=1; AJvYcCW2v7G+6tbO+Yv41uKtWxqeIBv0MJ7UvpiLUGGHCDSetSpLarx5tBGLfGX4j+VaH2YqBzm+Vpc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxK0PFTzXTevRFK0bVb3HXXShWlygCt6kfSIog/lQSWfKBlbwGi
+	WoGxG18zjaPObGf2iZBAOTkpe0Mwjv331UCxE7vPxCfHS5YDDlzNwYdB
+X-Gm-Gg: ASbGncuNB5YW0t3QYb2aAuPSONl5sdm7FsRoTwTcYll7SdREO1x3y3n1OKZ2ie/MJJH
+	SEEarydZ5rU5zSNZRiyA6mQ+ob9ZWFhGxZ/7/eI6ZixJ8YJ1W0yhEGzAuX1CetejlR/nB+gsgoT
+	aotZ2PDJ7u0tkKOQzh8Pu6DPX2mKY4w4K3FSlKeAc2NHLgEMxGWzGjI77zf4RYFbzfvH/C+xvZr
+	Pjp0CKCJrK2CdiZIF10dapEt4s8i7WHs4s/g4KtDPFuJPXyIfHAWZ2t0y2J7w+muK/MjsqinmGZ
+	Evvo5c5xiX3cxVxZ0avnHz8/c5taqxpRYIHiledfPBTA/CjjTizexCc7yoV0QQk1o65z33DbSlE
+	1mTJ+sKXSNGcp81sDNlIoUJZTh05Nl7o=
+X-Google-Smtp-Source: AGHT+IH0x+204sZOxkgkC7l+kY60o1cz8jHTBBWajab3lB2pg9HVDJk4e/6HniXgf+YgngKBzkHWeQ==
+X-Received: by 2002:a05:6902:3102:b0:e91:7b14:4d7d with SMTP id 3f1490d57ef6-e951c27ddd1mr13019252276.15.1756152087682;
+        Mon, 25 Aug 2025 13:01:27 -0700 (PDT)
+Received: from localhost ([2a03:2880:25ff:47::])
+        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e96dcf11652sm83562276.3.2025.08.25.13.01.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Aug 2025 13:01:25 -0700 (PDT)
+        Mon, 25 Aug 2025 13:01:27 -0700 (PDT)
 From: Daniel Zahka <daniel.zahka@gmail.com>
 To: Donald Hunter <donald.hunter@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -101,9 +101,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Kiran Kella <kiran.kella@broadcom.com>,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next v8 09/19] net: psp: update the TCP MSS to reflect PSP packet overhead
-Date: Mon, 25 Aug 2025 13:00:57 -0700
-Message-ID: <20250825200112.1750547-10-daniel.zahka@gmail.com>
+Subject: [PATCH net-next v8 10/19] psp: track generations of device key
+Date: Mon, 25 Aug 2025 13:00:58 -0700
+Message-ID: <20250825200112.1750547-11-daniel.zahka@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20250825200112.1750547-1-daniel.zahka@gmail.com>
 References: <20250825200112.1750547-1-daniel.zahka@gmail.com>
@@ -117,14 +117,28 @@ Content-Transfer-Encoding: 8bit
 
 From: Jakub Kicinski <kuba@kernel.org>
 
-PSP eats 32B of header space. Adjust MSS appropriately.
+There is a (somewhat theoretical in absence of multi-host support)
+possibility that another entity will rotate the key and we won't
+know. This may lead to accepting packets with matching SPI but
+which used different crypto keys than we expected.
 
-We can either modify tcp_mtu_to_mss() / tcp_mss_to_mtu()
-or reuse icsk_ext_hdr_len. The former option is more TCP
-specific and has runtime overhead. The latter is a bit
-of a hack as PSP is not an ext_hdr. If one squints hard
-enough, UDP encap is just a more practical version of
-IPv6 exthdr, so go with the latter. Happy to change.
+The PSP Architecture specification mentions that an implementation
+should track device key generation when device keys are managed by the
+NIC. Some PSP implementations may opt to include this key generation
+state in decryption metadata each time a device key is used to decrypt
+a packet. If that is the case, that key generation counter can also be
+used when policy checking a decrypted skb against a psp_assoc. This is
+an optional feature that is not explicitly part of the PSP spec, but
+can provide additional security in the case where an attacker may have
+the ability to force key rotations faster than rekeying can occur.
+
+Since we're tracking "key generations" more explicitly now,
+maintain different lists for associations from different generations.
+This way we can catch stale associations (the user space should
+listen to rotation notifications and change the keys).
+
+Drivers can "opt out" of generation tracking by setting
+the generation value to 0.
 
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
@@ -132,153 +146,155 @@ Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
 ---
 
 Notes:
-    v6:
-    - make psp_sk_overhead() add 40B of encapsulation overhead.
     v1:
-    - https://lore.kernel.org/netdev/20240510030435.120935-8-kuba@kernel.org/
+    - https://lore.kernel.org/netdev/20240510030435.120935-9-kuba@kernel.org/
 
- include/net/psp/functions.h | 14 ++++++++++++++
- include/net/psp/types.h     |  3 +++
- net/ipv4/tcp_ipv4.c         |  4 ++--
- net/ipv6/ipv6_sockglue.c    |  6 +++++-
- net/ipv6/tcp_ipv6.c         |  6 +++---
- net/psp/psp_sock.c          |  5 +++++
- 6 files changed, 32 insertions(+), 6 deletions(-)
+ include/net/psp/types.h | 10 ++++++++++
+ net/psp/psp.h           |  1 +
+ net/psp/psp_main.c      |  6 +++++-
+ net/psp/psp_nl.c        | 10 ++++++++++
+ net/psp/psp_sock.c      | 16 ++++++++++++++++
+ 5 files changed, 42 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/psp/functions.h b/include/net/psp/functions.h
-index bf703dcf353f..958c50dad34d 100644
---- a/include/net/psp/functions.h
-+++ b/include/net/psp/functions.h
-@@ -5,6 +5,7 @@
- 
- #include <linux/skbuff.h>
- #include <linux/rcupdate.h>
-+#include <linux/udp.h>
- #include <net/sock.h>
- #include <net/tcp.h>
- #include <net/psp/types.h>
-@@ -139,6 +140,14 @@ static inline struct psp_assoc *psp_skb_get_assoc_rcu(struct sk_buff *skb)
- 
- 	return psp_sk_get_assoc_rcu(skb->sk);
- }
-+
-+static inline unsigned int psp_sk_overhead(const struct sock *sk)
-+{
-+	int psp_encap = sizeof(struct udphdr) + PSP_HDR_SIZE + PSP_TRL_SIZE;
-+	bool has_psp = rcu_access_pointer(sk->psp_assoc);
-+
-+	return has_psp ? psp_encap : 0;
-+}
- #else
- static inline void psp_sk_assoc_free(struct sock *sk) { }
- static inline void
-@@ -178,6 +187,11 @@ static inline struct psp_assoc *psp_skb_get_assoc_rcu(struct sk_buff *skb)
- {
- 	return NULL;
- }
-+
-+static inline unsigned int psp_sk_overhead(const struct sock *sk)
-+{
-+	return 0;
-+}
- #endif
- 
- static inline unsigned long
 diff --git a/include/net/psp/types.h b/include/net/psp/types.h
-index b0e32e7165a3..f93ad0e6c04f 100644
+index f93ad0e6c04f..ec218747ced0 100644
 --- a/include/net/psp/types.h
 +++ b/include/net/psp/types.h
-@@ -93,6 +93,9 @@ struct psp_dev_caps {
+@@ -50,8 +50,12 @@ struct psp_dev_config {
+  * @lock:	instance lock, protects all fields
+  * @refcnt:	reference count for the instance
+  * @id:		instance id
++ * @generation:	current generation of the device key
+  * @config:	current device configuration
+  * @active_assocs:	list of registered associations
++ * @prev_assocs:	associations which use old (but still usable)
++ *			device key
++ * @stale_assocs:	associations which use a rotated out key
+  *
+  * @rcu:	RCU head for freeing the structure
+  */
+@@ -67,13 +71,19 @@ struct psp_dev {
  
- #define PSP_MAX_KEY	32
+ 	u32 id;
  
-+#define PSP_HDR_SIZE	16	/* We don't support optional fields, yet */
-+#define PSP_TRL_SIZE	16	/* AES-GCM/GMAC trailer size */
++	u8 generation;
 +
- struct psp_skb_ext {
- 	__be32 spi;
- 	u16 dev_id;
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 35e2a1ce87b8..3c3e8760f89b 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -293,9 +293,9 @@ int tcp_v4_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
- 	inet->inet_dport = usin->sin_port;
- 	sk_daddr_set(sk, daddr);
+ 	struct psp_dev_config config;
  
--	inet_csk(sk)->icsk_ext_hdr_len = 0;
-+	inet_csk(sk)->icsk_ext_hdr_len = psp_sk_overhead(sk);
- 	if (inet_opt)
--		inet_csk(sk)->icsk_ext_hdr_len = inet_opt->opt.optlen;
-+		inet_csk(sk)->icsk_ext_hdr_len += inet_opt->opt.optlen;
+ 	struct list_head active_assocs;
++	struct list_head prev_assocs;
++	struct list_head stale_assocs;
  
- 	tp->rx_opt.mss_clamp = TCP_MSS_DEFAULT;
+ 	struct rcu_head rcu;
+ };
  
-diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
-index e66ec623972e..a61e742794f9 100644
---- a/net/ipv6/ipv6_sockglue.c
-+++ b/net/ipv6/ipv6_sockglue.c
-@@ -49,6 +49,7 @@
- #include <net/xfrm.h>
- #include <net/compat.h>
- #include <net/seg6.h>
-+#include <net/psp.h>
- 
- #include <linux/uaccess.h>
- 
-@@ -107,7 +108,10 @@ struct ipv6_txoptions *ipv6_update_options(struct sock *sk,
- 		    !((1 << sk->sk_state) & (TCPF_LISTEN | TCPF_CLOSE)) &&
- 		    inet_sk(sk)->inet_daddr != LOOPBACK4_IPV6) {
- 			struct inet_connection_sock *icsk = inet_csk(sk);
--			icsk->icsk_ext_hdr_len = opt->opt_flen + opt->opt_nflen;
++#define PSP_GEN_VALID_MASK	0x7f
 +
-+			icsk->icsk_ext_hdr_len =
-+				psp_sk_overhead(sk) +
-+				opt->opt_flen + opt->opt_nflen;
- 			icsk->icsk_sync_mss(sk, icsk->icsk_pmtu_cookie);
- 		}
- 	}
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 6a89edda31c7..adf83ec25b66 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -302,10 +302,10 @@ static int tcp_v6_connect(struct sock *sk, struct sockaddr *uaddr,
- 	sk->sk_gso_type = SKB_GSO_TCPV6;
- 	ip6_dst_store(sk, dst, NULL, NULL);
- 
--	icsk->icsk_ext_hdr_len = 0;
-+	icsk->icsk_ext_hdr_len = psp_sk_overhead(sk);
- 	if (opt)
--		icsk->icsk_ext_hdr_len = opt->opt_flen +
--					 opt->opt_nflen;
-+		icsk->icsk_ext_hdr_len += opt->opt_flen +
-+					  opt->opt_nflen;
- 
- 	tp->rx_opt.mss_clamp = IPV6_MIN_MTU - sizeof(struct tcphdr) - sizeof(struct ipv6hdr);
- 
-diff --git a/net/psp/psp_sock.c b/net/psp/psp_sock.c
-index 9b761d186e80..66abf160e16c 100644
---- a/net/psp/psp_sock.c
-+++ b/net/psp/psp_sock.c
-@@ -180,6 +180,7 @@ int psp_sock_assoc_set_tx(struct sock *sk, struct psp_dev *psd,
+ /**
+  * struct psp_dev_caps - PSP device capabilities
+  */
+diff --git a/net/psp/psp.h b/net/psp/psp.h
+index defd3e3fd5e7..0f34e1a23fdd 100644
+--- a/net/psp/psp.h
++++ b/net/psp/psp.h
+@@ -27,6 +27,7 @@ int psp_sock_assoc_set_rx(struct sock *sk, struct psp_assoc *pas,
+ int psp_sock_assoc_set_tx(struct sock *sk, struct psp_dev *psd,
  			  u32 version, struct psp_key_parsed *key,
- 			  struct netlink_ext_ack *extack)
+ 			  struct netlink_ext_ack *extack);
++void psp_assocs_key_rotated(struct psp_dev *psd);
+ 
+ static inline void psp_dev_get(struct psp_dev *psd)
  {
-+	struct inet_connection_sock *icsk;
- 	struct psp_assoc *pas, *dummy;
+diff --git a/net/psp/psp_main.c b/net/psp/psp_main.c
+index a1ae3c8920c3..98ad8c85b58e 100644
+--- a/net/psp/psp_main.c
++++ b/net/psp/psp_main.c
+@@ -72,6 +72,8 @@ psp_dev_create(struct net_device *netdev,
+ 
+ 	mutex_init(&psd->lock);
+ 	INIT_LIST_HEAD(&psd->active_assocs);
++	INIT_LIST_HEAD(&psd->prev_assocs);
++	INIT_LIST_HEAD(&psd->stale_assocs);
+ 	refcount_set(&psd->refcnt, 1);
+ 
+ 	mutex_lock(&psp_devs_lock);
+@@ -125,7 +127,9 @@ void psp_dev_unregister(struct psp_dev *psd)
+ 	xa_store(&psp_devs, psd->id, NULL, GFP_KERNEL);
+ 	mutex_unlock(&psp_devs_lock);
+ 
+-	list_for_each_entry_safe(pas, next, &psd->active_assocs, assocs_list)
++	list_splice_init(&psd->active_assocs, &psd->prev_assocs);
++	list_splice_init(&psd->prev_assocs, &psd->stale_assocs);
++	list_for_each_entry_safe(pas, next, &psd->stale_assocs, assocs_list)
+ 		psp_dev_tx_key_del(psd, pas);
+ 
+ 	rcu_assign_pointer(psd->main_netdev->psp_dev, NULL);
+diff --git a/net/psp/psp_nl.c b/net/psp/psp_nl.c
+index 1b1d08fce637..8aaca62744c3 100644
+--- a/net/psp/psp_nl.c
++++ b/net/psp/psp_nl.c
+@@ -230,6 +230,7 @@ int psp_nl_key_rotate_doit(struct sk_buff *skb, struct genl_info *info)
+ 	struct psp_dev *psd = info->user_ptr[0];
+ 	struct genl_info ntf_info;
+ 	struct sk_buff *ntf, *rsp;
++	u8 prev_gen;
  	int err;
  
-@@ -236,6 +237,10 @@ int psp_sock_assoc_set_tx(struct sock *sk, struct psp_dev *psd,
- 	tcp_write_collapse_fence(sk);
- 	pas->upgrade_seq = tcp_sk(sk)->rcv_nxt;
+ 	rsp = psp_nl_reply_new(info);
+@@ -249,10 +250,19 @@ int psp_nl_key_rotate_doit(struct sk_buff *skb, struct genl_info *info)
+ 		goto err_free_ntf;
+ 	}
  
-+	icsk = inet_csk(sk);
-+	icsk->icsk_ext_hdr_len += psp_sk_overhead(sk);
-+	icsk->icsk_sync_mss(sk, icsk->icsk_pmtu_cookie);
++	/* suggest the next gen number, driver can override */
++	prev_gen = psd->generation;
++	psd->generation = (prev_gen + 1) & PSP_GEN_VALID_MASK;
 +
- exit_free_dummy:
- 	kfree(dummy);
- exit_unlock:
+ 	err = psd->ops->key_rotate(psd, info->extack);
+ 	if (err)
+ 		goto err_free_ntf;
+ 
++	WARN_ON_ONCE((psd->generation && psd->generation == prev_gen) ||
++		     psd->generation & ~PSP_GEN_VALID_MASK);
++
++	psp_assocs_key_rotated(psd);
++
+ 	nlmsg_end(ntf, (struct nlmsghdr *)ntf->data);
+ 	genlmsg_multicast_netns(&psp_nl_family, dev_net(psd->main_netdev), ntf,
+ 				0, PSP_NLGRP_USE, GFP_KERNEL);
+diff --git a/net/psp/psp_sock.c b/net/psp/psp_sock.c
+index 66abf160e16c..d74c86437e9b 100644
+--- a/net/psp/psp_sock.c
++++ b/net/psp/psp_sock.c
+@@ -60,6 +60,7 @@ struct psp_assoc *psp_assoc_create(struct psp_dev *psd)
+ 
+ 	pas->psd = psd;
+ 	pas->dev_id = psd->id;
++	pas->generation = psd->generation;
+ 	psp_dev_get(psd);
+ 	refcount_set(&pas->refcnt, 1);
+ 
+@@ -248,6 +249,21 @@ int psp_sock_assoc_set_tx(struct sock *sk, struct psp_dev *psd,
+ 	return err;
+ }
+ 
++void psp_assocs_key_rotated(struct psp_dev *psd)
++{
++	struct psp_assoc *pas, *next;
++
++	/* Mark the stale associations as invalid, they will no longer
++	 * be able to Rx any traffic.
++	 */
++	list_for_each_entry_safe(pas, next, &psd->prev_assocs, assocs_list)
++		pas->generation |= ~PSP_GEN_VALID_MASK;
++	list_splice_init(&psd->prev_assocs, &psd->stale_assocs);
++	list_splice_init(&psd->active_assocs, &psd->prev_assocs);
++
++	/* TODO: we should inform the sockets that got shut down */
++}
++
+ void psp_twsk_init(struct inet_timewait_sock *tw, const struct sock *sk)
+ {
+ 	struct psp_assoc *pas = psp_sk_assoc(sk);
 -- 
 2.47.3
 
