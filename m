@@ -1,228 +1,141 @@
-Return-Path: <netdev+bounces-216639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E03F8B34B65
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 22:04:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C752B34B89
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 22:12:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 808815E17F9
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 20:04:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 966171A810C4
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 20:13:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E20D73009D3;
-	Mon, 25 Aug 2025 20:02:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 025062857FA;
+	Mon, 25 Aug 2025 20:12:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D/UAov6w"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IZ5MYoxm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD9BF293B75
-	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 20:02:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0C422C355
+	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 20:12:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756152158; cv=none; b=hz79l4Q9+ayFOc6BoF9Jir9qYx1Oqbfv3LKc8eVwk8p43HBSh5kHc2J7IETOKlRzKBu3NjL+YokWR09fa5uNdLsAE/616wsBMwVgKGjQ+UjrN/9j4ATlwscLmZ2en0P5hNZZB3qBMwFqM/nEKNlU/A6MW5dr2pMDtsbm8HidYNQ=
+	t=1756152774; cv=none; b=nbvcbWqPfK6yRq2SS1amAjAbrQ61lnKuuoso6gziUMbylMvNYNyMbSDF/uRN9LX50sSwwx6Et0jp0rmXbf8Ma3tKZNn9BzAKCc1coUcTXD2YTFek/ocwy09tGy1nYw8LlzPRVutQrhiewg0ZCqwRgFidoA++Lcc4s3OXfKR1ehI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756152158; c=relaxed/simple;
-	bh=9lmt/qPzUzFQzSf+G2nmgdmqEKGqReRq3FV7Ja3nZOI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eWccDJLEBwZmNefkOwDBeCUEJ/PZwSHUgDRsfRaJGfh7f3yMnh7IkK7Q7L6RNxmpmvd5F1k6nBOTkWdePH2K+dq/YYMvc/GVBDHif2wlmjZndxGUQ0Vda74Uagh3E+vKoUY+p/0L5+nMiEmLJXHxj7XBwImR4/AwPHg2lyvoCFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D/UAov6w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F332AC4CEED;
-	Mon, 25 Aug 2025 20:02:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756152157;
-	bh=9lmt/qPzUzFQzSf+G2nmgdmqEKGqReRq3FV7Ja3nZOI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=D/UAov6wm6uoKHqde8mTsMAbgc5jtG2aiYFk/u1/X5HX5O7Yp6kwVRLuXOf9RjnAQ
-	 FLfY7qosnDHmn8XfbM5d1OTNMo175lDJ2CXIzX29G66B2lHmox4bllam95mYSbGzQk
-	 HfrmrrHgkB7EfSoFLHD918Be+RVfpTMQtIp8d4hn1lwaonscD8g2Ypz7lsard1afZ/
-	 PMqcm3bDa+xmpTnHqlS6KmZFzMHj3LPpQYqvdqMBRzLAIyzV4afaZ1S0C70tMQNM38
-	 ZyX0QoSHqOHUgug49Nrc9OMsUT/DYqv5Q2TF5VMbPUbIH3hJdn+eV6BHyoeAq/h8F2
-	 SeWnmEg4+XhYA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	mohsin.bashr@gmail.com,
-	vadim.fedorenko@linux.dev,
-	jacob.e.keller@intel.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 6/6] eth: fbnic: Add pause stats support
-Date: Mon, 25 Aug 2025 13:02:06 -0700
-Message-ID: <20250825200206.2357713-7-kuba@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250825200206.2357713-1-kuba@kernel.org>
-References: <20250825200206.2357713-1-kuba@kernel.org>
+	s=arc-20240116; t=1756152774; c=relaxed/simple;
+	bh=wKsNU9D3UfD+u45+zddpHRq7h2vPU602OrfZXYFUxUE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=axHkOPE+zygUqldxiJLmXoRcYhFNVmBBruGOMl511Ajd+cWmmDwx3yOv2rad46B/eBp/RFJ37udSqUIlpQcKyjc1bhI9DaMgy8h0GN9HSKpXX+cQzR6ser3UrTJofdKqjC/j/Ma5Hu4LYRipJGPLC6LE4Uw8kNM+UMko7yG27KI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IZ5MYoxm; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756152771;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ge5aJkVm13DDes+f3vmdSasrLK5Igm/nVj2nj448RRU=;
+	b=IZ5MYoxm6v2ScD1bunrhKSqR8otWYlwtaYOi2DqWOZWSQx/WNL6G61LNy0gfjPaLublzJ0
+	L4VqSwXPCq7H8o0+/ullcQkLEKjDM0oM10pfUbxlAYyrzJ4krYqnK5frPD0kgyC3tiT9iw
+	S3b2kG6Co1fkgd6jVh8WpWjnKY+ZXTA=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-340-BUpRu6PEOnOQ_fQdmEwSgA-1; Mon, 25 Aug 2025 16:12:50 -0400
+X-MC-Unique: BUpRu6PEOnOQ_fQdmEwSgA-1
+X-Mimecast-MFC-AGG-ID: BUpRu6PEOnOQ_fQdmEwSgA_1756152769
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-45a1b0ccb6cso24022235e9.3
+        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 13:12:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756152769; x=1756757569;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ge5aJkVm13DDes+f3vmdSasrLK5Igm/nVj2nj448RRU=;
+        b=JgW52nTG2wQ7ZkMRze2Vh1JByBxjJ2ldFi6CxGsJIJGA7utuSGqlEVRD6dRc0dUANq
+         Ts1jh1sZoyqJaDa4WnHWixHY4IDTsFOqhnxT2hExRP2LviRAs15XH7kA5/n6+tANkwA4
+         Moy0iKXIIg3D6fKLtD/vfOybw4E1UaJqdLvbwdBIsXhM7VYKzvv04UdsVsrnbT+J/z56
+         G0DOhw17JKd7DFuoQCMxAAevfgyNJnVHIDDbOj1QCDttugls9q4nGaco6/x6kyTZ9VD0
+         kUh/KhD2uQGyZp3Odv5WzSKnmb60uUXGErXurv43+OTPhD4/EkgW62A6BBfNJtKqol6M
+         TQVQ==
+X-Gm-Message-State: AOJu0YwbVJZGZolbJB5G60rQg2kAM2P+ud+JOiZdlx2IM4jbG7qG+fy7
+	ihEaVScvFCWjqLo5pgnXLMYd2+RG+N9zJngt382yVBKLUm7GQFnrHWbmHiRHRUd4yPhfMTUZiYI
+	uuJkkt5nc68KhG54GEEp5Hue7IKmuk8SoZRt65iRdRd5bcxwAthg01T0S9g==
+X-Gm-Gg: ASbGncso8E+O9NPGcPIUj2lE67wcOYjr08noQG3aOUfKhEMIQrlw9hVmcDte5XSWIHs
+	ZRZN4tHN0XkA1CPEqnSQf6mBDZN0uqTRdTg/PUdTJKBl2a9njAi7HA6VgpuQumDuzUcfrIIo95f
+	+PZK3+jsaJF4aMry3rQn+QsUnupg+HoJWce2vKzxYRbq4vDSUVqJDDDaml8yacGTzeYyprd88Wr
+	QItpJSEdp5sE1VN60XIBUyVDEZ0f3tqkdT3yg6jBH/ENW6e9yL+X28856q0Qf0J9EYQIBVmn+Q6
+	uFY3LNuTsmDpFUeslvF6J9YkiiUzVTcj8WwFugeGMgM=
+X-Received: by 2002:a05:600c:3b18:b0:45b:43cc:e559 with SMTP id 5b1f17b1804b1-45b517cc0eemr110897835e9.36.1756152768862;
+        Mon, 25 Aug 2025 13:12:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGRLXeJl7aJCa4KIqJLeoq6ckqhrtSz9kGCxKWJy3oTPoUOof+lLez+0mpRqdtSV115Vf/vVA==
+X-Received: by 2002:a05:600c:3b18:b0:45b:43cc:e559 with SMTP id 5b1f17b1804b1-45b517cc0eemr110897755e9.36.1756152768489;
+        Mon, 25 Aug 2025 13:12:48 -0700 (PDT)
+Received: from [192.168.68.125] ([147.235.216.242])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b6133d9f1sm48676745e9.14.2025.08.25.13.12.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Aug 2025 13:12:47 -0700 (PDT)
+Message-ID: <dbe283c0-76ea-46ca-b06d-9925b16d2a69@redhat.com>
+Date: Mon, 25 Aug 2025 23:12:46 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] sfc: remove ASSERT_RTNL() from get_ts_info function
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, ecree.xilinx@gmail.com
+References: <20250825135749.299534-1-mheib@redhat.com>
+ <338a2540-d64c-4d5c-9fa9-fc53e607252d@lunn.ch>
+Content-Language: en-US
+From: mohammad heib <mheib@redhat.com>
+In-Reply-To: <338a2540-d64c-4d5c-9fa9-fc53e607252d@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Mohsin Bashir <mohsin.bashr@gmail.com>
+Hi Andrew,
 
-Add support to read pause stats for fbnic. Unlike FEC and PCS stats,
-pause stats won't wrap, do not fetch them under the service task. Since,
-they are exclusively accessed via the ethtool API, don't include them in
-fbnic_get_hw_stats().
+Thanks for the feedback.
+My initial version was actually to add rtnl_lock inside 
+sock_set_timestamping since that function was added
+by this patch:
+https://patchwork.kernel.org/project/netdevbpf/patch/20210630081202.4423-9-yangbo.lu@nxp.com/
+without considering RTNL and the safety it provides.
 
-]# ethtool -I -a eth0
-Pause parameters for eth0:
-Autonegotiate:	on
-RX:		off
-TX:		off
-Statistics:
-  tx_pause_frames: 0
-  rx_pause_frames: 0
 
-Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- drivers/net/ethernet/meta/fbnic/fbnic_csr.h     |  4 ++++
- .../net/ethernet/meta/fbnic/fbnic_hw_stats.h    |  7 +++++++
- drivers/net/ethernet/meta/fbnic/fbnic_mac.h     |  2 ++
- drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c | 17 +++++++++++++++++
- .../net/ethernet/meta/fbnic/fbnic_hw_stats.c    |  1 +
- drivers/net/ethernet/meta/fbnic/fbnic_mac.c     | 11 +++++++++++
- 6 files changed, 42 insertions(+)
+I'm not that experienced with locking, and adding RTNL there felt like a 
+risky change to me even though it's
+a control path so I was a bit hesitant to do it.
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-index 69cb73ca8bca..e2fffe1597e9 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-@@ -844,6 +844,10 @@ enum {
- #define FBNIC_CSR_END_SIG		0x1184e /* CSR section delimiter */
- 
- #define FBNIC_CSR_START_MAC_STAT	0x11a00
-+#define FBNIC_MAC_STAT_RX_XOFF_STB_L	0x11a00		/* 0x46800 */
-+#define FBNIC_MAC_STAT_RX_XOFF_STB_H	0x11a01		/* 0x46804 */
-+#define FBNIC_MAC_STAT_TX_XOFF_STB_L	0x11a04		/* 0x46810 */
-+#define FBNIC_MAC_STAT_TX_XOFF_STB_H	0x11a05		/* 0x46814 */
- #define FBNIC_MAC_STAT_RX_BYTE_COUNT_L	0x11a08		/* 0x46820 */
- #define FBNIC_MAC_STAT_RX_BYTE_COUNT_H	0x11a09		/* 0x46824 */
- #define FBNIC_MAC_STAT_RX_ALIGN_ERROR_L	0x11a0a		/* 0x46828 */
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.h b/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.h
-index baffae1868a6..aa3f429a9aed 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.h
-@@ -50,6 +50,12 @@ struct fbnic_rmon_stats {
- 	struct fbnic_stat_counter hist_tx[ETHTOOL_RMON_HIST_MAX];
- };
- 
-+/* Note: not updated by fbnic_get_hw_stats() */
-+struct fbnic_pause_stats {
-+	struct fbnic_stat_counter tx_pause_frames;
-+	struct fbnic_stat_counter rx_pause_frames;
-+};
-+
- struct fbnic_eth_mac_stats {
- 	struct fbnic_stat_counter FramesTransmittedOK;
- 	struct fbnic_stat_counter FramesReceivedOK;
-@@ -73,6 +79,7 @@ struct fbnic_phy_stats {
- 
- struct fbnic_mac_stats {
- 	struct fbnic_eth_mac_stats eth_mac;
-+	struct fbnic_pause_stats pause;
- 	struct fbnic_eth_ctrl_stats eth_ctrl;
- 	struct fbnic_rmon_stats rmon;
- };
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mac.h b/drivers/net/ethernet/meta/fbnic/fbnic_mac.h
-index 92dd6efb920a..ede5ff0dae22 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_mac.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_mac.h
-@@ -85,6 +85,8 @@ struct fbnic_mac {
- 			      struct fbnic_pcs_stats *pcs_stats);
- 	void (*get_eth_mac_stats)(struct fbnic_dev *fbd, bool reset,
- 				  struct fbnic_eth_mac_stats *mac_stats);
-+	void (*get_pause_stats)(struct fbnic_dev *fbd, bool reset,
-+				struct fbnic_pause_stats *pause_stats);
- 	void (*get_eth_ctrl_stats)(struct fbnic_dev *fbd, bool reset,
- 				   struct fbnic_eth_ctrl_stats *ctrl_stats);
- 	void (*get_rmon_stats)(struct fbnic_dev *fbd, bool reset,
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-index 4194b30f1074..b4ff98ee2051 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-@@ -1641,6 +1641,22 @@ static void fbnic_set_counter(u64 *stat, struct fbnic_stat_counter *counter)
- 		*stat = counter->value;
- }
- 
-+static void
-+fbnic_get_pause_stats(struct net_device *netdev,
-+		      struct ethtool_pause_stats *pause_stats)
-+{
-+	struct fbnic_net *fbn = netdev_priv(netdev);
-+	struct fbnic_mac_stats *mac_stats;
-+	struct fbnic_dev *fbd = fbn->fbd;
-+
-+	mac_stats = &fbd->hw_stats.mac;
-+
-+	fbd->mac->get_pause_stats(fbd, false, &mac_stats->pause);
-+
-+	pause_stats->tx_pause_frames = mac_stats->pause.tx_pause_frames.value;
-+	pause_stats->rx_pause_frames = mac_stats->pause.rx_pause_frames.value;
-+}
-+
- static void
- fbnic_get_fec_stats(struct net_device *netdev,
- 		    struct ethtool_fec_stats *fec_stats)
-@@ -1801,6 +1817,7 @@ static const struct ethtool_ops fbnic_ethtool_ops = {
- 	.set_coalesce			= fbnic_set_coalesce,
- 	.get_ringparam			= fbnic_get_ringparam,
- 	.set_ringparam			= fbnic_set_ringparam,
-+	.get_pause_stats		= fbnic_get_pause_stats,
- 	.get_pauseparam			= fbnic_phylink_get_pauseparam,
- 	.set_pauseparam			= fbnic_phylink_set_pauseparam,
- 	.get_strings			= fbnic_get_strings,
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.c b/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.c
-index 9e7becba7386..8b9b2076beec 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.c
-@@ -536,6 +536,7 @@ static void fbnic_reset_hw_mac_stats(struct fbnic_dev *fbd,
- 	const struct fbnic_mac *mac = fbd->mac;
- 
- 	mac->get_eth_mac_stats(fbd, true, &mac_stats->eth_mac);
-+	mac->get_pause_stats(fbd, true, &mac_stats->pause);
- 	mac->get_eth_ctrl_stats(fbd, true, &mac_stats->eth_ctrl);
- 	mac->get_rmon_stats(fbd, true, &mac_stats->rmon);
- }
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-index ffdaebd4002a..8f998d26b9a3 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-@@ -709,6 +709,16 @@ fbnic_mac_get_eth_mac_stats(struct fbnic_dev *fbd, bool reset,
- 			    MAC_STAT_TX_BROADCAST);
- }
- 
-+static void
-+fbnic_mac_get_pause_stats(struct fbnic_dev *fbd, bool reset,
-+			  struct fbnic_pause_stats *pause_stats)
-+{
-+	fbnic_mac_stat_rd64(fbd, reset, pause_stats->tx_pause_frames,
-+			    MAC_STAT_TX_XOFF_STB);
-+	fbnic_mac_stat_rd64(fbd, reset, pause_stats->rx_pause_frames,
-+			    MAC_STAT_RX_XOFF_STB);
-+}
-+
- static void
- fbnic_mac_get_eth_ctrl_stats(struct fbnic_dev *fbd, bool reset,
- 			     struct fbnic_eth_ctrl_stats *ctrl_stats)
-@@ -856,6 +866,7 @@ static const struct fbnic_mac fbnic_mac_asic = {
- 	.get_fec_stats = fbnic_mac_get_fec_stats,
- 	.get_pcs_stats = fbnic_mac_get_pcs_stats,
- 	.get_eth_mac_stats = fbnic_mac_get_eth_mac_stats,
-+	.get_pause_stats = fbnic_mac_get_pause_stats,
- 	.get_eth_ctrl_stats = fbnic_mac_get_eth_ctrl_stats,
- 	.get_rmon_stats = fbnic_mac_get_rmon_stats,
- 	.link_down = fbnic_mac_link_down_asic,
--- 
-2.51.0
+That's why I decided instead to send this patch that removes the 
+assertion, mainly to get feedback and a heads-up
+from people with more experience in this area.
+
+if you think it will be safe to add rtnl lock inside the 
+sock_set_timestamping i can rework my change.
+
+On 8/25/25 7:25 PM, Andrew Lunn wrote:
+> On Mon, Aug 25, 2025 at 04:57:49PM +0300, mheib@redhat.com wrote:
+>> From: Mohammad Heib <mheib@redhat.com>
+>>
+>> The SFC driver currently asserts that the RTNL lock is held in
+>> efx_ptp_get_ts_info() using ASSERT_RTNL(). While this is correct for
+>> the ethtool ioctl path, this function can also be called from the
+>> SO_TIMESTAMPING socket path where RTNL is not held, which triggers
+>> kernel BUGs in debug builds.
+>>
+>> This patch removes the ASSERT_RTNL() to avoid these assertions in
+>> kernel logs when called from paths that do not hold RTNL.
+> What is missing from the commit message is an explanation of why RTNL
+> does not need to be held in this function. Maybe this is a real bug
+> and you are just hiding it, rather than fixing it?
+>
+>      Andrew
+>
 
 
