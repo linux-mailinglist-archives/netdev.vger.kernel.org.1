@@ -1,115 +1,162 @@
-Return-Path: <netdev+bounces-216540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCEB9B34680
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 17:58:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 92B22B3468D
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 17:59:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EC202A49C2
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 15:58:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BC3E2A47D9
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 15:59:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3E972FE595;
-	Mon, 25 Aug 2025 15:57:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81A8E2FE065;
+	Mon, 25 Aug 2025 15:59:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bBIwN+nB"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="FHEKm+tL";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="X9aqv0+X"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FA802D0278
-	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 15:57:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AB9A1E6DC5;
+	Mon, 25 Aug 2025 15:59:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756137477; cv=none; b=FIm+6two8IXJ+5GqpKfXLJXL/BgVNzUgbT7byZhSLNU7BaMFOrwD5st1fbVgY28X/j0ZvPw5t+yl4YiJ/2tPp8SVWxbI64NxwLprxRgPPTNoCGxLDIigMVQSGcTRAcMwFOgbRjJGADHK6usMCPZy7KkZ2qN8eDfrfEgGF4p/fKY=
+	t=1756137584; cv=none; b=r9672TgUta9b00yD1MoQ0X+bktcDWQRxAolcFb1JgFpesaUD6Enn8LYAoK9HAbBXP75tKMJSw4cxW/TC1pO696W8K/8eahGxIMHwLFknto2YSyIa/dBSTGaNhMuFVsxEsrU0hQX/koOunfabEwnUVLl5lLr1GdxKzK+Na6+T8t0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756137477; c=relaxed/simple;
-	bh=Vr5NE99oavi33Y3SF/I3tW6QtyNajfUPhB5mdYrmT5Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PFiWE3+pAEi8JPk5dYfi4Jsb6OOJ38p2DuBn9lDkXEyLl1l7JENYcbRDVOOWIJ3yNw+vrq4D6xSirxcC1zasLEvun7f7Whm2EjcD8+Z3sTvTYg8+1yeb9vlzZ1fnDAovi9ihr8nPsz4zBQ/XBPsGOVSctwWvFszCzPz7mg9pQs0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bBIwN+nB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7F50C4CEED;
-	Mon, 25 Aug 2025 15:57:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756137477;
-	bh=Vr5NE99oavi33Y3SF/I3tW6QtyNajfUPhB5mdYrmT5Y=;
-	h=From:To:Cc:Subject:Date:From;
-	b=bBIwN+nBBWsK6/c3UwRdrV7Pk3j7Z756sQz+PsRjqLTpurdS4RmelP1/LPGVK2uqU
-	 s2N+m2uoa9wVdVMDvSXKxtdQ2K8/SjTLXKtN64yyZZi5P55ETwyu4FThNLUsthG6zE
-	 IcRFsNK2nMiTrhjKZ9qAruMU1i1V+dCoXkEEo39deO9ZBbYENNCkGkcPzZCc9/c86r
-	 hOTi4rsHt+97xavckHCRQMhLVBl54wzlGCxaZ9FsffkNXJeLqthVNTaQfYSqYqVRvy
-	 X9rrFQqlGMU0ul9L0uiH7n18v3YFRhnew5c89ko4/tBEldzEiynbbOF3jLMTizggIA
-	 C9Wz9U6EoUlWw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net] MAINTAINERS: retire Boris from TLS maintainers
-Date: Mon, 25 Aug 2025 08:57:53 -0700
-Message-ID: <20250825155753.2178045-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1756137584; c=relaxed/simple;
+	bh=6AVyzHI2iFYDIZFegDLOeR2XzbkDZjqX9Z+YpuN4gbU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ilgxQbhMcODXZoM2/R765qFkRPFSRVFHp7JTRh5kQ3Mr3uyuKJ88fjt+XIw4NhrgDeJ11eD+4M+9HgqzfoHqlP+fSUANe49Tl7I0IedVFPukfW8pu7mS7eGFgsxSWMoOlkfnJzDFgiL02pVppUVjbo+DZCBWrHXy6NaGQQesims=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=FHEKm+tL; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=X9aqv0+X; arc=none smtp.client-ip=202.12.124.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 0A6FD7A0155;
+	Mon, 25 Aug 2025 11:59:40 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-06.internal (MEProxy); Mon, 25 Aug 2025 11:59:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1756137579; x=
+	1756223979; bh=vq+5e3Yyps41AjCQBIP2V+Qv6mMRbzV5pkZiyZR0hbw=; b=F
+	HEKm+tLvK5y33M96+a6GXefgaEMQSPOVG1mDYn4oqklyECFY2Ha6miWa/Gxv93b9
+	c2URDyE2EhfF45PqAbnlmYU/vkjn+4oTsKvSaNnReUQiMBnxO6KVMiStJy0OB6/I
+	Qz0UMjXeeVUMy21NKQ4X0B7TgYxmQ8oSrkzmOXYj/sfR17tb7OUFDIVqbjlbUnYp
+	LOQo0DliENOxjyURbVWDlkkrebccr2HTW1KCXjtZsJJlNyi1GePfPrbBSbxTvLrd
+	b5ElZmAnGriQvvnTT5ZoNigvno8Z+fnieu6wAVzQgPMsbJO4+UdDosEKDGA9AYu+
+	u+sb+oyo76qvhOtLFot5w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1756137579; x=1756223979; bh=vq+5e3Yyps41AjCQBIP2V+Qv6mMRbzV5pkZ
+	iyZR0hbw=; b=X9aqv0+XO1XvOcdk18qBgyXCrRr3cvRKYn+qCd5E28NB4Zr85ex
+	iI8Cxv9WODIx3LdTQTCQmO60qJNyFTmBsjAfea9gE0lMfQrCNJIa2hB9arkNSb04
+	kUWNt7H9/yu8pKa8DS3MdtjDRFQ9IWsV/h9kxqkfG6TSP3dM4E7ZVkiooM9px2yt
+	VeD9oqIrQSseIRhk4yY33u9r2qLJH/Qh3MG8oF6MqCiETUrtC4W98oogATdZNgXa
+	rDI4I0o/o0gD54Ka3NBu9lXJVMK+7tUTTki7tVAdWNjC0mXlrrjqzuuCAeXhs0H+
+	LllknU31Rt8g+HO9zxWtOILzGL5gsWphgvw==
+X-ME-Sender: <xms:aYisaAwXdbdP2YFhW1CJZSXJ6R9jQAenL2gno7t65L3kgJlKomDWKg>
+    <xme:aYisaOWiiY8Bz1j60RLMcGe-pA4_VSh_siXJvyfCmi8Y25mKaJnYLLgIwIBV7DTGu
+    Cj8gosYXWENN-lo93g>
+X-ME-Received: <xmr:aYisaHRlupQeaJsMH2dWAtv2LTpYX6UbrmLUzd-IjzJrihd633bgBJO6RelO>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddujedvkeduucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhephffggeeivedthffgudffveegheegvedvteetvedvieffuddvleeuueeg
+    ueeggeehnecuffhomhgrihhnpehshiiikhgrlhhlvghrrdgrphhpshhpohhtrdgtohhmne
+    cuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepshgusehq
+    uhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeduvddpmhhouggvpehsmh
+    htphhouhhtpdhrtghpthhtohepshihiigsohhtodgrvdehvggvleguvddtugefudgvgeek
+    fegsrgejsgesshihiihkrghllhgvrhdrrghpphhsphhothhmrghilhdrtghomhdprhgtph
+    htthhopehsrggrkhgrshhhkhhumhgrrhesmhgrrhhvvghllhdrtghomhdprhgtphhtthho
+    pehsthgvfhhfvghnrdhklhgrshhsvghrthesshgvtghunhgvthdrtghomhdprhgtphhtth
+    hopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdrohhrghdrrghupdhrtghpthht
+    ohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgrii
+    gvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdho
+    rhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlih
+    hnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:aYisaGRNYWN8XUbRXSo1XLU7X01lUUf0R7E3kyPoTRUjfahUj8GH4Q>
+    <xmx:aYisaPe-62lud-H2T-SO9ug5LwT5KG2Jx7GfVf50kzsZsoilJ2J6Iw>
+    <xmx:aYisaMeGHeyn8rrNYKwr7wwGGRh6adZyLNGNhV5EfN76vhAcCKuFYA>
+    <xmx:aYisaDZ0nRF8CMIUP9bm5s3z4C6mGaLs1CzxAuaDI4QzQVHbQsK4vw>
+    <xmx:a4isaLCE5E5hNDhT-w_7qzDQ-ds1E3I67e2CFxrT0NgrQH9jJ2NWPMdj>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 25 Aug 2025 11:59:37 -0400 (EDT)
+Date: Mon, 25 Aug 2025 17:59:34 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: syzbot <syzbot+a25ee9d20d31e483ba7b@syzkaller.appspotmail.com>,
+	Aakash Kumar S <saakashkumar@marvell.com>,
+	steffen.klassert@secunet.com, herbert@gondor.apana.org.au
+Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+	kuba@kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Write in
+ __xfrm_state_delete
+Message-ID: <aKyIZhcJBH1WyKYQ@krikkit>
+References: <68887370.a00a0220.b12ec.00cb.GAE@google.com>
+ <68ab6633.050a0220.37038e.0079.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <68ab6633.050a0220.37038e.0079.GAE@google.com>
 
-There's a steady stream of TLS changes and bugs. We need active
-maintainers in this area, and Boris hasn't been participating
-much in upstream work. Move him to CREDITS. While at it also
-add Dave Watson there who was the author of the initial SW
-implementation, AFAIU.
+2025-08-24, 12:21:23 -0700, syzbot wrote:
+> syzbot has found a reproducer for the following issue on:
+> 
+> HEAD commit:    b1c92cdf5af3 Merge branch 'net-wangxun-complete-ethtool-co..
+> git tree:       net-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=1411b062580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=67b99ceb67d33475
+> dashboard link: https://syzkaller.appspot.com/bug?extid=a25ee9d20d31e483ba7b
+> compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14221862580000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=159fba34580000
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- MAINTAINERS | 1 -
- CREDITS     | 7 +++++++
- 2 files changed, 7 insertions(+), 1 deletion(-)
+This splat seems to be caused by commit 94f39804d891 ("xfrm: Duplicate
+SPI Handling"), which removed the "newspi != 0" check before inserting
+the state on the byspi list. But __xfrm_state_delete will only remove
+states (in this case, when they expire) from the byspi list if
+x->id.spi != 0.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 9567c9448fc8..ccb2327b6133 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -17832,7 +17832,6 @@ F:	net/ipv6/syncookies.c
- F:	net/ipv6/tcp*.c
+So maybe something like this?
+
+-------- 8< --------
+diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+index 78fcbb89cf32..d213ca3653a8 100644
+--- a/net/xfrm/xfrm_state.c
++++ b/net/xfrm/xfrm_state.c
+@@ -2583,6 +2583,8 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
  
- NETWORKING [TLS]
--M:	Boris Pismenny <borisp@nvidia.com>
- M:	John Fastabend <john.fastabend@gmail.com>
- M:	Jakub Kicinski <kuba@kernel.org>
- L:	netdev@vger.kernel.org
-diff --git a/CREDITS b/CREDITS
-index a357f9cbb05d..a687c3c35c4c 100644
---- a/CREDITS
-+++ b/CREDITS
-@@ -3222,6 +3222,10 @@ D: AIC5800 IEEE 1394, RAW I/O on 1394
- D: Starter of Linux1394 effort
- S: ask per mail for current address
+ 	for (h = 0; h < range; h++) {
+ 		u32 spi = (low == high) ? low : get_random_u32_inclusive(low, high);
++		if (spi == 0)
++			goto next;
+ 		newspi = htonl(spi);
  
-+N: Boris Pismenny
-+E: borisp@mellanox.com
-+D: Kernel TLS implementation and offload support.
-+
- N: Nicolas Pitre
- E: nico@fluxnic.net
- D: StrongARM SA1100 support integrator & hacker
-@@ -4168,6 +4172,9 @@ S: 1513 Brewster Dr.
- S: Carrollton, TX 75010
- S: USA
+ 		spin_lock_bh(&net->xfrm.xfrm_state_lock);
+@@ -2598,6 +2600,7 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
+ 		xfrm_state_put(x0);
+ 		spin_unlock_bh(&net->xfrm.xfrm_state_lock);
  
-+N: Dave Watson
-+D: Kernel TLS implementation.
-+
- N: Tim Waugh
- E: tim@cyberelk.net
- D: Co-architect of the parallel-port sharing system
++next:
+ 		if (signal_pending(current)) {
+ 			err = -ERESTARTSYS;
+ 			goto unlock;
+
 -- 
-2.51.0
-
+Sabrina
 
