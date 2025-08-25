@@ -1,495 +1,246 @@
-Return-Path: <netdev+bounces-216663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81BDAB34DCA
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 23:19:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40E47B34DCC
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 23:19:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D5D11B2574F
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 21:19:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 261D7242847
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 21:19:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BE58246BA4;
-	Mon, 25 Aug 2025 21:19:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E14A2868A9;
+	Mon, 25 Aug 2025 21:19:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="nJSNDwPC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Hqb2rjyn"
 X-Original-To: netdev@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F9A623C8A0;
-	Mon, 25 Aug 2025 21:18:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756156744; cv=none; b=Y1640yz+oHhOS4mlEf8stu+ESUqNwVsap1QLPE6B16GfvSlQGfLEz3+31m1WIpg2/EGfKr+ASdOzMio5YUynYe2/QWPFBi6FFhkND2qH6Urv6h+K2yHi7Xf3wjv+++jyGmLnXqk9AzCwNkS8y30JO15BAyebC+cbwPvFo6z8iw4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756156744; c=relaxed/simple;
-	bh=IBf9R/jbM7FXbKp35VSZ+kbDW4k1c2DtMeNnvb/BPdM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Jw4h1QPd28RStFJB2HyWMH4ELcuYimj3hpfWLQFkkLe5dO62KxRERJjHoXp3uR/WEoFbWm5C2WTMY1ezVe6DKcm9EOc1i7DIffKyOKHKYELNHTPQRbGhV/S+EBg75Ac5MWEOrVERP8Anyu3m/Ba4cGXAAOC84FeSAlG0rqcBaDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=nJSNDwPC; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-Received: from simon-Latitude-5450.fritz.box (p5dc88c67.dip0.t-ipconnect.de [93.200.140.103])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 57PLIosS015318
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Mon, 25 Aug 2025 23:18:51 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1756156731;
-	bh=IBf9R/jbM7FXbKp35VSZ+kbDW4k1c2DtMeNnvb/BPdM=;
-	h=From:To:Cc:Subject:Date;
-	b=nJSNDwPCUYIp5yN8DisHP+MsHVgyaMlNRFP/lccQm/8MKLEO1CX8oju8QNry0HjkA
-	 NIUHcw8ARDKcfvZKyNTf5Ax1vu8m7SsKHzAbv18qP7EvCrF8Ye5jon6ksXlRTZEHPI
-	 HbSCVJxlw0UFEG6FE1+GWhDKTtnzSHgxMDQUMhKM=
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-To: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Simon Schippers <simon.schippers@tu-dortmund.de>,
-        Tim Gebauer <tim.gebauer@tu-dortmund.de>
-Subject: [PATCH net v3] TUN/TAP: Improving throughput and latency by avoiding SKB drops
-Date: Mon, 25 Aug 2025 23:16:03 +0200
-Message-ID: <20250825211832.84901-1-simon.schippers@tu-dortmund.de>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DCDD242D96;
+	Mon, 25 Aug 2025 21:19:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756156746; cv=fail; b=p3JIOfM8OxdK9+slnewPOzict0QHPHd/SpnTpmhwaExoFG2JWg+3UK6OSBKOvgSYawbwG8WEjnJeXqNqW/5Drin94/5eJrIpoF2uHL+/vIrwJVyhY2KlTeQ2X6PWSV/f+hxk+E2AmlLsflV7Tl9J4ttFj1qCgb3zIC8FaAuhY5I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756156746; c=relaxed/simple;
+	bh=+eHBDXOiXC4ZZbDakx02ZfkrIN2P7jhiJo27Nctn61o=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=NWWk0mGE5JWAfATKdUH3gknjL9ga9JUwaKxwZr3RoruPuvwlBC7s5UwynowYtTvS+N+zrZovVoPAJblikOkNjjbgrXXozW4ADkA9/NQYquNyJKCVaQK8LEOOhLpBX5EEtEfoo7WMGBhT1XkwW9QPlpP6s1Ppq/jZN/ISpEe3NU0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Hqb2rjyn; arc=fail smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756156745; x=1787692745;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=+eHBDXOiXC4ZZbDakx02ZfkrIN2P7jhiJo27Nctn61o=;
+  b=Hqb2rjynb6/jEhCi+79oAEVZZMmbU/dkpaaKZxr3PU/vpeKeDga1w+ey
+   vvIPopkOvOLzj5yh+dLukUYR/I++mRmP+d+XUyeDu2NFOfeEvgm1DCTFg
+   NjlmDXaKdwLKZhZ1eQV3a/Jp2RYi90RGkm/mXDqziSPqbJigUQIFBp+A5
+   mFhej4A+XG5sOGJZW1TfBvegLycsfGlBOFza0dzI144B1g75NUAygg+Ov
+   MHIO8aVJjkUyFhiPlHa8Zznab8kGkhMZB3p+uHdbxXgBOMKFxQG0UHa7F
+   ULy+13hfIyR0xp4j4CEjbAmHZxql7wrUm6eJ6pcIqmoKpj6TWvKRjABkh
+   A==;
+X-CSE-ConnectionGUID: N/kKlrrqSPKjUIW9dg1XpA==
+X-CSE-MsgGUID: E8twQprRSXSZWJR38wj3Sw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11533"; a="68973736"
+X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
+   d="scan'208";a="68973736"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2025 14:19:04 -0700
+X-CSE-ConnectionGUID: AiKXgnS7STiodVC9v/B5RA==
+X-CSE-MsgGUID: FnOd1bF/TISaUtpzawjdYw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
+   d="scan'208";a="174677622"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2025 14:19:03 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 25 Aug 2025 14:19:02 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Mon, 25 Aug 2025 14:19:02 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (40.107.236.79)
+ by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 25 Aug 2025 14:19:02 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qBpff6JzUNcXU/glRalMBlASQwgpOBNRpjqeB6C0iY8Hqy+7jOe0pjMTjYbBJs/NpzYxuLxqt9iDAYTMOyMtgUD3QvDGVYo8+RYBoXfl9qwuJjD3yUfb3Q9b16VK/k0GxSYuJHdzfd2f1s4gjy5B8nLHvPY+cQonvrikIDCI02C6ynHwUa98iSXI42ECkh39yBXhLauRIgXWIy6CqpCFUUyzunRMglXZdQl3Xacsz8W+qaNHgvbP8BWikT3FQZN1jPZfQ35tEwyr5yZrurTjAzRPAtODb69IHd2Lm334gr1NCqG+5nMNUy6kQlF0bdxXuWAIgyRZkxfg1df1wcnqzA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NbFzifc1stBF+cXV4453rfUTN+urnS+7KsK4r1pp+BY=;
+ b=gLhmUrErCqpYrBZjlBbHm1YlB+18r9zJVbFnI8zWswB2/NbgG/of4b8cAfNT2e9QJr/F7zzrZ+GYK7Pw55XQP4R87a1hbmaHPd+kfCTXEOWncUk80fr2Ja56Mf40o2Uxbk/XKcsq74ZKZlU/hgC7mlVLF1pEzvTsfUAHxSUcZ+vDXwfAQKZ3ZmfCpWMppw3BcgopUbr93c+j0Idj3BwnrVpE4QutQnV+EwKqhTLNKM+1LJhGbZs4nDrTzVkzp6fVp1qVDNpoAitfLjj0CiyAVLZDDYydpFPdHZuCSoRMFqZOAvcaNBoyaOu+opPhq69aH8GanXKoRCaZgSWKy+0wuw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ DS7PR11MB6014.namprd11.prod.outlook.com (2603:10b6:8:73::17) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9052.21; Mon, 25 Aug 2025 21:19:00 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca%4]) with mapi id 15.20.9052.019; Mon, 25 Aug 2025
+ 21:19:00 +0000
+Date: Mon, 25 Aug 2025 23:18:53 +0200
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <bjorn@kernel.org>, <magnus.karlsson@intel.com>,
+	<jonathan.lemon@gmail.com>, <sdf@fomichev.me>, <ast@kernel.org>,
+	<daniel@iogearbox.net>, <hawk@kernel.org>, <john.fastabend@gmail.com>,
+	<horms@kernel.org>, <andrew+netdev@lunn.ch>, <bpf@vger.kernel.org>,
+	<netdev@vger.kernel.org>, Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next v2 2/9] xsk: add descs parameter in
+ xskq_cons_read_desc_batch()
+Message-ID: <aKzTPW4fQ11fqb+b@boxer>
+References: <20250825135342.53110-1-kerneljasonxing@gmail.com>
+ <20250825135342.53110-3-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250825135342.53110-3-kerneljasonxing@gmail.com>
+X-ClientProxiedBy: DU6P191CA0031.EURP191.PROD.OUTLOOK.COM
+ (2603:10a6:10:53f::10) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|DS7PR11MB6014:EE_
+X-MS-Office365-Filtering-Correlation-Id: 56f53aea-ce39-4f6c-a464-08dde41d025a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?UZoFRQLn1jUOgi7POSQUq24dhQ/MwaQiCP68NqlvgxqVnrFrXAuj8ayoZlKt?=
+ =?us-ascii?Q?/8u4oi4lmjgyu7fF9bOUTx9zeCPXLb6sOEpQrdNH0SqYSyU9GVLuf5m7P3Ev?=
+ =?us-ascii?Q?RwiEEx6DyfAFB6QQUm50uXeozO1m2GHWNPWQgjDWZiZKgy6scHCJASXv3YoS?=
+ =?us-ascii?Q?Z6gThuBCZJLA/B/k2LLCPFlDk322qVNcsDMSM5fNjDyAgNjsM2zF9/0+jNbF?=
+ =?us-ascii?Q?c2md/SvIAAmhiM6yyuzcHYCUQbu1A36wJT71SVR7g5frvNX1/hJTE4ZXX/da?=
+ =?us-ascii?Q?+0GAnH/QCwtDyJSQ56mf5lAs4lWgZ6GmMhWm1NRwZeiKgSvpH/bzWCI8qBYT?=
+ =?us-ascii?Q?IVfOjwW1KpanZhQ28q9//SzwPNrU8eHrJzXtYpgMwMwmRUdv2ft4aWUDlU5l?=
+ =?us-ascii?Q?n4tW4C31EChbzg10rEquIiLcpijEGxudrN71zaeLWNiIcKTMEDZFsT1bamnF?=
+ =?us-ascii?Q?6AvfCnWHomtZGQ6F0ZPriyC9pXcpkPzr8BVAlIXeVY3cUo20LuyuxhQeUN2K?=
+ =?us-ascii?Q?x5o1Ridbg8OuAFjOZzFqHcxnEYKZJNv3rSsfqoksDHgRI1ShPZf0PNp8b180?=
+ =?us-ascii?Q?wFiuItiVwOUb+XBC09XmlLUR3A30ppmg4eQcmm53Ly+McHnwtXgPV5fnwWXk?=
+ =?us-ascii?Q?34iydBx6j7XocsyHTGp2HRnzcgZ6rzvelfuFl4HU7YBPYZXIBT1YqecZX8o8?=
+ =?us-ascii?Q?1zHwUDg5PMZh6o//pP1vACYWj1ToAGTjOZrK4p9zKSB9edriGlPHViqudDLr?=
+ =?us-ascii?Q?ESad5r1707b44IzPsD3rDcCAnR3xGMvC0AFQPh39Ll8NBcJutFm/4n9S+3bK?=
+ =?us-ascii?Q?kvMlDdWl0opYyj5fbdd4PLy0w9oSZTGdmiph4l29Uoh7lX76JHAjKfMB559q?=
+ =?us-ascii?Q?RWe2erdLVcmcDMjwwZkfIaHAbL/6tcPlFuoFNPXDcs1nksIaXTueQIEJ5AWv?=
+ =?us-ascii?Q?Q48gIY3U+sove7SmQyQ/3oPxyuW3F9LaNQk3IdNRx1vCRAGllEqcJBk4yV/W?=
+ =?us-ascii?Q?83v1Yr6bxXLWlZjJNTN2JdlVgotddxgKt1QRuwRv7S0VFTh0eNqSK4Sdkn8O?=
+ =?us-ascii?Q?e9QmJIajkWJEyR6vJZem47Ui6GBxPr46sugp0FUT/db0E7bZthEbVSNQasg3?=
+ =?us-ascii?Q?lX0myXXo0bRFqFTbRqpEHowaWKBAL/m5fBRhPE7CCSEYO/aAQJM5wPMJfOWg?=
+ =?us-ascii?Q?DxSJd8f7jyK6l4tvDv89ddaayzNBg680S30LimlwbOBsz6Zi0tx0C5Vp/HfK?=
+ =?us-ascii?Q?/HLP6O7VT9Xb0IZJKWWsTvzkIs2hkHjSmZ73oT6O+XGSRNlVzLYqRxXGfK1M?=
+ =?us-ascii?Q?BeIt77bl7sf8o5Ccm/5/TAftvmv8SjIn3PMd0a4xnvaLBn+hIbnFdM3StLdM?=
+ =?us-ascii?Q?N8pa8TceoohVt6taeK9UwMFYiRkgM91zQHMrCEuV5+5yOKUZvVLq+qXI1ioJ?=
+ =?us-ascii?Q?HaE91Y3YIeY=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ZLhRKPcj0lpVD/T1p2gzC4QsksaqKpqPC4heTQvqpPWZI9Dd3gk1/T4PBgkT?=
+ =?us-ascii?Q?2PB9K0BfNEh//1u5yWztad+nuUTIiCk2FCHNOg0RUqnoeacNGT67gNq1AJH/?=
+ =?us-ascii?Q?QlSU8bkPB+5ypomIOT+x7G67kilgULAs8p0mjeaRtqJVm3pXw8Sco6HavfDm?=
+ =?us-ascii?Q?2R3mYkiYdrNqd38dY0iKntKiGDjMi4cO4PNh2k3dffXD9VuO2kBoru8goMML?=
+ =?us-ascii?Q?Fx2opbsJ7gIP4Vmvb5gIibajtFvq80RkoSYO9Po8uqC3rrWKTTB9GJ+QePtS?=
+ =?us-ascii?Q?0odAiFzlNwJNPJOkz/gzKpU0sngxO4sEoLV8gwGNMjtA5aVTXbuKCAV2Oe0U?=
+ =?us-ascii?Q?O6MJBPTqOyCkKF6cpkzC5wAhKcx/L0U5mgbyAhDdZkUzERqLStX2ZRv4Hkjx?=
+ =?us-ascii?Q?ea+Ux2jYSxiHahErtnbOdr/BmuW/JBWRzD0xdHP5qzJFq/lhoCRzniA/+b3+?=
+ =?us-ascii?Q?bZkeIXUTqhUk6/KxTs6W+v5V6V4u3mWVzCBJixRYD3/+tRGgWP50QOUbFUPd?=
+ =?us-ascii?Q?h8CEebyoMKOP9B6dP5e1nvnDXQFZNTPfS/Q7wxEqb1jkrVolN5CntUI4ZTb4?=
+ =?us-ascii?Q?NVI80mtWwkozfnKkxaK2bRuaAIdJ5gsBy4ePcwJxc0jQWDAlLij/o03yf+bO?=
+ =?us-ascii?Q?BohhdcgTshIlZC+07VxCT/bhasQQOepcZHskzzII+69jT6gSJx0cQxbJSbnI?=
+ =?us-ascii?Q?+X4FZCc7IalL2orDZdyfmennxtibgFvmb6hiDnv0+yntsK/uyPFcITy0LGdu?=
+ =?us-ascii?Q?NeCY3regaE0aKsCyDC4KuOZ24l+n9NHn6xXL8aE3zfHCJYkZ6VOWaDbAQ8pq?=
+ =?us-ascii?Q?eqJHHlCilpJA1HCq4wVobWpaaWHuHdrtFiL/hqje7FLIyAqScr5g3SbjGOd1?=
+ =?us-ascii?Q?BdrbDspd9+VqL59/qX4sTLVR8wj2Ti0VmrHf05OnEUld2LBJHcJpy10aSZB+?=
+ =?us-ascii?Q?l1u9R0gXmK+Rs7wTwSOPBjwWu8mhhMRHw4ibVWzJTJa61e21Y3Hf+Q5UdJZS?=
+ =?us-ascii?Q?npHtOxeogdLmYuDKoPscg/FBGC/INSj0vl+5pczv+ZL7cegVWCxzf7mCBL7h?=
+ =?us-ascii?Q?5a/H4i3H9ru5JFj7reiVN2HiP58JSLpbx9qzQ5iDrrjIS3NaABuguFXtx3eD?=
+ =?us-ascii?Q?bBKhvKtSAzciojmpC5XJMqV5iTSKlPdCl8K/H1c0cY3naOlzcro85ZvSqNiz?=
+ =?us-ascii?Q?I1TWJhaK3piIPRpi2f8+oQyCdsyuKplowT7GSgGnGaPG27g0Z1ZRrzrW8wvC?=
+ =?us-ascii?Q?cjHnv4icyX1muq3e9riMLvJmeM/CR5iFRW7p4IGTSfa6b1wpN6AWADc1y9kr?=
+ =?us-ascii?Q?FTw7O07oPeEnQEIYmjSfYDY5dgnAgXJbQD7ZJ+YXLvt5YfckyNOFmlS0jLkM?=
+ =?us-ascii?Q?gq8hmkW3C9ZiysL33TP3MiFJjVD6Gnd5jVR+BL40W4VXmtVDpM4megxGeHjm?=
+ =?us-ascii?Q?+PggN7QFGhXR/Dpz/rQ3OGHSMZqt5DTaHb3AeKqULIC0TzjHQ62xOmLmrfQH?=
+ =?us-ascii?Q?h/P7dx3XRkIiezo1UXqAiWC5XhA0djvxoylXdOJKyRukKZm7E/87psG3jtkd?=
+ =?us-ascii?Q?BA086yJGDU1OTrTI2zbA7ednCjeSwM5dIrT+YSehCAYTDaNHp6THrTK5duRT?=
+ =?us-ascii?Q?FQ=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 56f53aea-ce39-4f6c-a464-08dde41d025a
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2025 21:19:00.2497
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: c3ZH2Psr2zJCrwlqKYQopuvQDUob/zwRIYOivLWzEtlFusrz1GcGEnzsDMC6jS/3zvQQSi1tTjNnUr2cc6dj/vaAIAdnkpMRPXGRSg/JwU0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB6014
+X-OriginatorOrg: intel.com
 
-This patch is a result of our paper [1] and deals with the tun_net_xmit
-function which drops SKB's with the reason SKB_DROP_REASON_FULL_RING
-whenever the tx_ring (TUN queue) is full. This behavior results in reduced
-TCP performance and packet loss for VPNs and VMs. In addition this patch
-also allows qdiscs to work properly (see [2]) and to reduce buffer bloat
-when reducing the TUN queue.
+On Mon, Aug 25, 2025 at 09:53:35PM +0800, Jason Xing wrote:
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> Add a new parameter to let generic xmit call this interface in the
+> subsequent patches.
+> 
+> Prior to this patch, pool->tx_descs in xskq_cons_read_desc_batch() is
+> only used to store a small number of descs in zerocopy mode. Later
+> another similar cache named xs->desc_batch will be used in copy mode.
+> So adjust the parameter for copy mode.
 
-TUN benchmarks:
-+-----------------------------------------------------------------+
-| Lab setup of our paper [1]:                                     |
-| TCP throughput of VPN solutions at varying RTT (values in Mbps) |
-+-----------+---------------+---------------+----------+----------+
-| RTT [ms]  | wireguard-go  | wireguard-go  | OpenVPN  | OpenVPN  |
-|           |               | patched       |          | patched  |
-+-----------+---------------+---------------+----------+----------+
-| 10        | 787.3         | 679.0         | 402.4    | 416.9    |
-+-----------+---------------+---------------+----------+----------+
-| 20        | 765.1         | 718.8         | 401.6    | 393.18   |
-+-----------+---------------+---------------+----------+----------+
-| 40        | 441.5         | 529.4         | 96.9     | 411.8    |
-+-----------+---------------+---------------+----------+----------+
-| 80        | 218.7         | 265.7         | 57.9     | 262.7    |
-+-----------+---------------+---------------+----------+----------+
-| 120       | 145.4         | 181.7         | 52.8     | 178.0    |
-+-----------+---------------+---------------+----------+----------+
+Explain why you couldn't reuse tx_descs as-is. Pool can not work both in
+copy and zero-copy modes at the same time so I don't see the reason why
+you couldn't reuse this for your needs?
 
-+--------------------------------------------------------------------+
-| Real-world setup of our paper [1]:                                 |
-| TCP throughput of VPN solutions without and with the patch         |
-| at a RTT of ~120 ms (values in Mbps)                               |
-+------------------+--------------+--------------+---------+---------+
-| TUN queue        | wireguard-go | wireguard-go | OpenVPN | OpenVPN |
-| length [packets] |              | patched      |         | patched |
-+------------------+--------------+--------------+---------+---------+
-| 5000             | 185.8        | 185.6        | 184.7   | 184.8   |
-+------------------+--------------+--------------+---------+---------+
-| 1000             | 185.1        | 184.9        | 177.1   | 183.0   |
-+------------------+--------------+--------------+---------+---------+
-| 500 (default)    | 137.5        | 184.9        | 117.4   | 184.6   |
-+------------------+--------------+--------------+---------+---------+
-| 100              | 99.8         | 185.3        | 66.4    | 183.5   |
-+------------------+--------------+--------------+---------+---------+
-| 50               | 59.4         | 185.7        | 21.6    | 184.7   |
-+------------------+--------------+--------------+---------+---------+
-| 10               | 1.7          | 185.4        | 1.6     | 183.6   |
-+------------------+--------------+--------------+---------+---------+
-
-TAP benchmarks:
-+------------------------------------------------------------------+
-| Lab Setup [3]:                                                   |
-| TCP throughput from host to Debian VM using TAP (values in Mbps) |
-+----------------------------+------------------+------------------+
-| TUN queue                  | Default          | Patched          |
-| length [packets]           |                  |                  |
-+----------------------------+------------------+------------------+
-| 1000 (default)             | 2194.3           | 2185.0           |
-+----------------------------+------------------+------------------+
-| 100                        | 1986.4           | 2268.5           |
-+----------------------------+------------------+------------------+
-| 10                         | 625.0            | 1988.9           |
-+----------------------------+------------------+------------------+
-| 1                          | 2.2              | 1112.7           |
-+----------------------------+------------------+------------------+
-|                                                                  |
-+------------------------------------------------------------------+
-| Measurement with 1000 packets queue and emulated delay           |
-+----------------------------+------------------+------------------+
-| RTT [ms]                   | Default          | Patched          |
-+----------------------------+------------------+------------------+
-| 60                         | 171.8            | 341.2            |
-+----------------------------+------------------+------------------+
-| 120                        | 98.3             | 255.0            |
-+----------------------------+------------------+------------------+
-
-TAP+vhost_net benchmarks:
-+----------------------------------------------------------------------+
-| Lab Setup [3]:                                                       |
-| TCP throughput from host to Debian VM using TAP+vhost_net            |
-| (values in Mbps)                                                     |
-+-----------------------------+--------------------+-------------------+
-| TUN queue                   | Default            | Patched           |
-| length [packets]            |                    |                   |
-+-----------------------------+--------------------+-------------------+
-| 1000 (default)              | 23403.9            | 23858.8           |
-+-----------------------------+--------------------+-------------------+
-| 100                         | 23372.5            | 23889.9           |
-+-----------------------------+--------------------+-------------------+
-| 10                          | 25837.5            | 23730.2           |
-+-----------------------------+--------------------+-------------------+
-| 1                           | 0.7                | 19244.8           |
-+-----------------------------+--------------------+-------------------+
-| Note: Default suffers from many retransmits, while patched does not. |
-+----------------------------------------------------------------------+
-|                                                                      |
-+----------------------------------------------------------------------+
-| Measurement with 1000 packets queue and emulated delay               |
-+-----------------------------+--------------------+-------------------+
-| RTT [ms]                    | Default            | Patched           |
-+-----------------------------+--------------------+-------------------+
-| 60                          | 397.1              | 397.8             |
-+-----------------------------+--------------------+-------------------+
-| 120                         | 200.7              | 199.9             |
-+-----------------------------+--------------------+-------------------+
-
-Implementation details:
-- The netdev queue start/stop flow control is utilized.
-- Compatible with multi-queue by only stopping/waking the specific
-netdevice subqueue.
-
-In the tun_net_xmit function:
-- Stopping the subqueue is done when the tx_ring gets full after inserting
-the SKB into the tx_ring.
-- In the unlikely case when the insertion with ptr_ring_produce fails, the
-old dropping behavior is used for this SKB.
-
-In the tun_ring_recv function:
-- Waking the subqueue is done after consuming a SKB from the tx_ring when
-the tx_ring is empty.
-- When the tx_ring is configured to be small (for example to hold 1 SKB),
-queuing might be stopped in the tun_net_xmit function while at the same
-time, ptr_ring_consume is not able to grab a SKB. This prevents
-tun_net_xmit from being called again and causes tun_ring_recv to wait
-indefinitely for a SKB in the blocking wait queue. Therefore, the netdev
-queue is woken in the wait queue.
-
-In the tap_do_read function:
-- Same behavior as in tun_ring_recv: Waking the subqueue when the tx_ring
-is empty & waking the subqueue in the blocking wait queue.
-- Here the netdev txq is obtained with a rcu read lock instead.
-
-In the vhost_net_buf_produce function:
-- Same behavior as in tun_ring_recv: Waking the subqueue when the tx_ring
-is empty.
-- Here the netdev_queue is saved in the vhost_net_virtqueue at init with
-new helpers.
-
-We are open to suggestions regarding the implementation :)
-Thank you for your work!
-
-[1] Link:
-https://cni.etit.tu-dortmund.de/storages/cni-etit/r/Research/Publications/2025/Gebauer_2025_VTCFall/Gebauer_VTCFall2025_AuthorsVersion.pdf
-[2] Link:
-https://unix.stackexchange.com/questions/762935/traffic-shaping-ineffective-on-tun-device
-[3] Link: https://github.com/tudo-cni/nodrop
-
-Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
----
-V2 -> V3: Added support for TAP and TAP+vhost_net.
-V1 -> V2: Removed NETDEV_TX_BUSY return case in tun_net_xmit and removed 
-unnecessary netif_tx_wake_queue in tun_ring_recv.
-
- drivers/net/tap.c      | 35 +++++++++++++++++++++++++++++++++++
- drivers/net/tun.c      | 39 +++++++++++++++++++++++++++++++++++----
- drivers/vhost/net.c    | 24 ++++++++++++++++++++++--
- include/linux/if_tap.h |  5 +++++
- include/linux/if_tun.h |  6 ++++++
- 5 files changed, 103 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-index 1197f245e873..df7e4063fb7c 100644
---- a/drivers/net/tap.c
-+++ b/drivers/net/tap.c
-@@ -758,6 +758,8 @@ static ssize_t tap_do_read(struct tap_queue *q,
- 			   int noblock, struct sk_buff *skb)
- {
- 	DEFINE_WAIT(wait);
-+	struct netdev_queue *txq;
-+	struct net_device *dev;
- 	ssize_t ret = 0;
- 
- 	if (!iov_iter_count(to)) {
-@@ -785,12 +787,26 @@ static ssize_t tap_do_read(struct tap_queue *q,
- 			ret = -ERESTARTSYS;
- 			break;
- 		}
-+		rcu_read_lock();
-+		dev = rcu_dereference(q->tap)->dev;
-+		txq = netdev_get_tx_queue(dev, q->queue_index);
-+		netif_tx_wake_queue(txq);
-+		rcu_read_unlock();
-+
- 		/* Nothing to read, let's sleep */
- 		schedule();
- 	}
- 	if (!noblock)
- 		finish_wait(sk_sleep(&q->sk), &wait);
- 
-+	if (ptr_ring_empty(&q->ring)) {
-+		rcu_read_lock();
-+		dev = rcu_dereference(q->tap)->dev;
-+		txq = netdev_get_tx_queue(dev, q->queue_index);
-+		netif_tx_wake_queue(txq);
-+		rcu_read_unlock();
-+	}
-+
- put:
- 	if (skb) {
- 		ret = tap_put_user(q, skb, to);
-@@ -1176,6 +1192,25 @@ struct socket *tap_get_socket(struct file *file)
- }
- EXPORT_SYMBOL_GPL(tap_get_socket);
- 
-+struct netdev_queue *tap_get_netdev_queue(struct file *file)
-+{
-+	struct netdev_queue *txq;
-+	struct net_device *dev;
-+	struct tap_queue *q;
-+
-+	if (file->f_op != &tap_fops)
-+		return ERR_PTR(-EINVAL);
-+	q = file->private_data;
-+	if (!q)
-+		return ERR_PTR(-EBADFD);
-+	rcu_read_lock();
-+	dev = rcu_dereference(q->tap)->dev;
-+	txq = netdev_get_tx_queue(dev, q->queue_index);
-+	rcu_read_unlock();
-+	return txq;
-+}
-+EXPORT_SYMBOL_GPL(tap_get_netdev_queue);
-+
- struct ptr_ring *tap_get_ptr_ring(struct file *file)
- {
- 	struct tap_queue *q;
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index cc6c50180663..30ddcd20fcd3 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -1060,13 +1060,16 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
- 
- 	nf_reset_ct(skb);
- 
--	if (ptr_ring_produce(&tfile->tx_ring, skb)) {
-+	queue = netdev_get_tx_queue(dev, txq);
-+	if (unlikely(ptr_ring_produce(&tfile->tx_ring, skb))) {
-+		netif_tx_stop_queue(queue);
- 		drop_reason = SKB_DROP_REASON_FULL_RING;
- 		goto drop;
- 	}
-+	if (ptr_ring_full(&tfile->tx_ring))
-+		netif_tx_stop_queue(queue);
- 
- 	/* dev->lltx requires to do our own update of trans_start */
--	queue = netdev_get_tx_queue(dev, txq);
- 	txq_trans_cond_update(queue);
- 
- 	/* Notify and wake up reader process */
-@@ -2110,9 +2113,10 @@ static ssize_t tun_put_user(struct tun_struct *tun,
- 	return total;
- }
- 
--static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
-+static void *tun_ring_recv(struct tun_struct *tun, struct tun_file *tfile, int noblock, int *err)
- {
- 	DECLARE_WAITQUEUE(wait, current);
-+	struct netdev_queue *txq;
- 	void *ptr = NULL;
- 	int error = 0;
- 
-@@ -2124,6 +2128,7 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
- 		goto out;
- 	}
- 
-+	txq = netdev_get_tx_queue(tun->dev, tfile->queue_index);
- 	add_wait_queue(&tfile->socket.wq.wait, &wait);
- 
- 	while (1) {
-@@ -2131,6 +2136,9 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
- 		ptr = ptr_ring_consume(&tfile->tx_ring);
- 		if (ptr)
- 			break;
-+
-+		netif_tx_wake_queue(txq);
-+
- 		if (signal_pending(current)) {
- 			error = -ERESTARTSYS;
- 			break;
-@@ -2147,6 +2155,10 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
- 	remove_wait_queue(&tfile->socket.wq.wait, &wait);
- 
- out:
-+	if (ptr_ring_empty(&tfile->tx_ring)) {
-+		txq = netdev_get_tx_queue(tun->dev, tfile->queue_index);
-+		netif_tx_wake_queue(txq);
-+	}
- 	*err = error;
- 	return ptr;
- }
-@@ -2165,7 +2177,7 @@ static ssize_t tun_do_read(struct tun_struct *tun, struct tun_file *tfile,
- 
- 	if (!ptr) {
- 		/* Read frames from ring */
--		ptr = tun_ring_recv(tfile, noblock, &err);
-+		ptr = tun_ring_recv(tun, tfile, noblock, &err);
- 		if (!ptr)
- 			return err;
- 	}
-@@ -3712,6 +3724,25 @@ struct socket *tun_get_socket(struct file *file)
- }
- EXPORT_SYMBOL_GPL(tun_get_socket);
- 
-+struct netdev_queue *tun_get_netdev_queue(struct file *file)
-+{
-+	struct netdev_queue *txq;
-+	struct net_device *dev;
-+	struct tun_file *tfile;
-+
-+	if (file->f_op != &tun_fops)
-+		return ERR_PTR(-EINVAL);
-+	tfile = file->private_data;
-+	if (!tfile)
-+		return ERR_PTR(-EBADFD);
-+	rcu_read_lock();
-+	dev = rcu_dereference(tfile->tun)->dev;
-+	txq = netdev_get_tx_queue(dev, tfile->queue_index);
-+	rcu_read_unlock();
-+	return txq;
-+}
-+EXPORT_SYMBOL_GPL(tun_get_netdev_queue);
-+
- struct ptr_ring *tun_get_tx_ring(struct file *file)
- {
- 	struct tun_file *tfile;
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 6edac0c1ba9b..045fc31c59ff 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -130,6 +130,7 @@ struct vhost_net_virtqueue {
- 	struct vhost_net_buf rxq;
- 	/* Batched XDP buffs */
- 	struct xdp_buff *xdp;
-+	struct netdev_queue *netdev_queue;
- };
- 
- struct vhost_net {
-@@ -182,6 +183,8 @@ static int vhost_net_buf_produce(struct vhost_net_virtqueue *nvq)
- 	rxq->head = 0;
- 	rxq->tail = ptr_ring_consume_batched(nvq->rx_ring, rxq->queue,
- 					      VHOST_NET_BATCH);
-+	if (ptr_ring_empty(nvq->rx_ring))
-+		netif_tx_wake_queue(nvq->netdev_queue);
- 	return rxq->tail;
- }
- 
-@@ -1469,6 +1472,21 @@ static struct socket *get_raw_socket(int fd)
- 	return ERR_PTR(r);
- }
- 
-+static struct netdev_queue *get_tap_netdev_queue(struct file *file)
-+{
-+	struct netdev_queue *q;
-+
-+	q = tun_get_netdev_queue(file);
-+	if (!IS_ERR(q))
-+		goto out;
-+	q = tap_get_netdev_queue(file);
-+	if (!IS_ERR(q))
-+		goto out;
-+	q = NULL;
-+out:
-+	return q;
-+}
-+
- static struct ptr_ring *get_tap_ptr_ring(struct file *file)
- {
- 	struct ptr_ring *ring;
-@@ -1570,10 +1588,12 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
- 		if (r)
- 			goto err_used;
- 		if (index == VHOST_NET_VQ_RX) {
--			if (sock)
-+			if (sock) {
- 				nvq->rx_ring = get_tap_ptr_ring(sock->file);
--			else
-+				nvq->netdev_queue = get_tap_netdev_queue(sock->file);
-+			} else {
- 				nvq->rx_ring = NULL;
-+			}
- 		}
- 
- 		oldubufs = nvq->ubufs;
-diff --git a/include/linux/if_tap.h b/include/linux/if_tap.h
-index 553552fa635c..b15c40c86819 100644
---- a/include/linux/if_tap.h
-+++ b/include/linux/if_tap.h
-@@ -10,6 +10,7 @@ struct socket;
- 
- #if IS_ENABLED(CONFIG_TAP)
- struct socket *tap_get_socket(struct file *);
-+struct netdev_queue *tap_get_netdev_queue(struct file *file);
- struct ptr_ring *tap_get_ptr_ring(struct file *file);
- #else
- #include <linux/err.h>
-@@ -18,6 +19,10 @@ static inline struct socket *tap_get_socket(struct file *f)
- {
- 	return ERR_PTR(-EINVAL);
- }
-+static inline struct netdev_queue *tap_get_netdev_queue(struct file *f)
-+{
-+	return ERR_PTR(-EINVAL);
-+}
- static inline struct ptr_ring *tap_get_ptr_ring(struct file *f)
- {
- 	return ERR_PTR(-EINVAL);
-diff --git a/include/linux/if_tun.h b/include/linux/if_tun.h
-index 80166eb62f41..552eb35f0299 100644
---- a/include/linux/if_tun.h
-+++ b/include/linux/if_tun.h
-@@ -21,6 +21,7 @@ struct tun_msg_ctl {
- 
- #if defined(CONFIG_TUN) || defined(CONFIG_TUN_MODULE)
- struct socket *tun_get_socket(struct file *);
-+struct netdev_queue *tun_get_netdev_queue(struct file *file);
- struct ptr_ring *tun_get_tx_ring(struct file *file);
- 
- static inline bool tun_is_xdp_frame(void *ptr)
-@@ -50,6 +51,11 @@ static inline struct socket *tun_get_socket(struct file *f)
- 	return ERR_PTR(-EINVAL);
- }
- 
-+static inline struct netdev_queue *tun_get_netdev_queue(struct file *f)
-+{
-+	return ERR_PTR(-EINVAL);
-+}
-+
- static inline struct ptr_ring *tun_get_tx_ring(struct file *f)
- {
- 	return ERR_PTR(-EINVAL);
--- 
-2.43.0
-
+> 
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+>  net/xdp/xsk.c       | 2 +-
+>  net/xdp/xsk_queue.h | 3 +--
+>  2 files changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> index e75a6e2bab83..173ad49379c3 100644
+> --- a/net/xdp/xsk.c
+> +++ b/net/xdp/xsk.c
+> @@ -509,7 +509,7 @@ u32 xsk_tx_peek_release_desc_batch(struct xsk_buff_pool *pool, u32 nb_pkts)
+>  	if (!nb_pkts)
+>  		goto out;
+>  
+> -	nb_pkts = xskq_cons_read_desc_batch(xs->tx, pool, nb_pkts);
+> +	nb_pkts = xskq_cons_read_desc_batch(xs->tx, pool, pool->tx_descs, nb_pkts);
+>  	if (!nb_pkts) {
+>  		xs->tx->queue_empty_descs++;
+>  		goto out;
+> diff --git a/net/xdp/xsk_queue.h b/net/xdp/xsk_queue.h
+> index 46d87e961ad6..47741b4c285d 100644
+> --- a/net/xdp/xsk_queue.h
+> +++ b/net/xdp/xsk_queue.h
+> @@ -235,10 +235,9 @@ static inline void parse_desc(struct xsk_queue *q, struct xsk_buff_pool *pool,
+>  
+>  static inline
+>  u32 xskq_cons_read_desc_batch(struct xsk_queue *q, struct xsk_buff_pool *pool,
+> -			      u32 max)
+> +			      struct xdp_desc *descs, u32 max)
+>  {
+>  	u32 cached_cons = q->cached_cons, nb_entries = 0;
+> -	struct xdp_desc *descs = pool->tx_descs;
+>  	u32 total_descs = 0, nr_frags = 0;
+>  
+>  	/* track first entry, if stumble upon *any* invalid descriptor, rewind
+> -- 
+> 2.41.3
+> 
 
