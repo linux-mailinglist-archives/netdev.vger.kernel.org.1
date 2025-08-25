@@ -1,55 +1,59 @@
-Return-Path: <netdev+bounces-216467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE7BEB33E84
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 13:56:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 845FAB33F00
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 14:11:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCBB71769A4
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 11:56:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57A2C1A84441
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 12:11:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35F9E2DC35F;
-	Mon, 25 Aug 2025 11:56:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 718632EE615;
+	Mon, 25 Aug 2025 12:08:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="RQ1TbUqC"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="oEHtE/we"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98AC72C15B6;
-	Mon, 25 Aug 2025 11:56:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E06F2EE601;
+	Mon, 25 Aug 2025 12:08:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756122989; cv=none; b=LfzVfKdXfYR6tKvUkkhIEU9TpnHNkhNkt4T4NNYPccWPPRChXF/8PTbK3tprLetzKANKJUBelGZz32d/IGG7P/li62lRv4XVvFfJYht98dKFoMMAnLRXfL6RJ2Ur5S+h96pQ8w1Z7qtrKFBFUUHR5BINZpeYr6SpDfU3kICNrWM=
+	t=1756123723; cv=none; b=XzHekOGFhDkwJt6tezlYDawRqtz0NCWkvvB45dN1j9RKoAylyz2XwB+ihvurYkiqwbkqvmjLFgfLqlUZam+GdJxJLuYTkCAxlF2CF3yxHPX4o3HGDJCEbEaT7bVXoL8T44nPcwx6Q2wGP42Bb/u+amMSBxJk3D4BGcxFQQrMXXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756122989; c=relaxed/simple;
-	bh=+UyVJcftW8wy1kqNJFR4cziUxI4qiB8Q+yu4CtBFzas=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=fDaxa6iVWLAVh2x9SKF5f8QJ7B4AVgz3aaK3w3tsibGqafEZV0a4oo4mCqwXpElm+9cvMgKt9Z/rpeXk6FKvM0AiUcPf7Rs0A0ICuPiIxhqksQIxosJ0t1fu5fkEvGZ5Kuzob0e0OCL6vrBzCRDSLY2ncGnl49Duna+80cXffWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=RQ1TbUqC; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1204)
-	id 3B63021175A9; Mon, 25 Aug 2025 04:56:27 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 3B63021175A9
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1756122987;
-	bh=r2QJ4yqs6HxKoAH1VttKGbQwT/tvDfkSW+pvLpawz9E=;
-	h=Date:From:To:Subject:From;
-	b=RQ1TbUqCbRrJ7NV40HuiCbFKF24VOu3KRKqxR1bQ6UL2hipLYvx4HAL6io/E+j/dc
-	 2TxennbuuLx5XX4TmTc1zk60iIkOjHKTyYo1PEnSBM+bhzqXahxHqfScxJylK+zlve
-	 1siXccBAUP3TlOX7irEWiCE2tCG9T/Xq3WB3GwII=
-Date: Mon, 25 Aug 2025 04:56:27 -0700
-From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-To: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dipayanroy@micorsoft.com,
-	ssengar@linux.microsoft.com
-Subject: [PATCH net] net: hv_netvsc: fix loss of early receive events from
- host during channel open.
-Message-ID: <20250825115627.GA32189@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	s=arc-20240116; t=1756123723; c=relaxed/simple;
+	bh=40pHvwMK7BcfxlID6AIO9kRTEyjTwNwdnjJttXS4c6w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JfNaQ0ORtwwpm/QkvNvnFNkyFO6um0hVX7fiJLAzbk+ab5UXZcQllY+OB5COI39SvtLpMChhKab1cobSZIOE+690eah5g3ZRUBXp/yp0MlNJ0OQHOreKChRCprkVqBoP2ROUUVs5iTGhPyZBXOjUohYn5zS4baZEqvA9jRLCqms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=oEHtE/we; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=YLkxYcm5PfbpwrBaYz99xb/BPKFw6g9w/mJk0x8ccdI=; b=oEHtE/we30b00BMf4C6OdWy1ea
+	d7aKAlkca/QFEFRqieM96p6tk7QJv0nqU6CAyIRaC6UmBp4FX13aoZDa55OQtDgFUMxkZLEHJ2Wky
+	Vn4xOw0NvOH3Ybb+fXIEUyfxOcRiqqfRjElvduUP61Uh0Nj3ejeToxbim6BuaVHEKakg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uqVzz-005wBj-7j; Mon, 25 Aug 2025 14:08:31 +0200
+Date: Mon, 25 Aug 2025 14:08:31 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alex Tran <alex.t.tran@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v1] Fixes: xircom auto-negoation timer
+Message-ID: <6214363b-0242-481d-9b93-2db9e1ba5913@lunn.ch>
+References: <20250825012821.492355-1-alex.t.tran@gmail.com>
+ <c6c354ec-e4fe-4b80-b2e5-9f6c8350b504@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,115 +62,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <c6c354ec-e4fe-4b80-b2e5-9f6c8350b504@gmail.com>
 
-The hv_netvsc driver currently enables NAPI after opening the primary and
-subchannels. This ordering creates a race: if the Hyper-V host places data
-in the host -> guest ring buffer and signals the channel before
-napi_enable() has been called, the channel callback will run but
-napi_schedule_prep() will return false. As a result, the NAPI poller never
-gets scheduled, the data in the ring buffer is not consumed, and the
-receive queue may remain permanently stuck until another interrupt happens
-to arrive.
+On Mon, Aug 25, 2025 at 08:44:18AM +0200, Heiner Kallweit wrote:
+> On 8/25/2025 3:28 AM, Alex Tran wrote:
+> > Auto negoation for DP83840A takes ~3.5 seconds.
+> > Removed sleeping in loop and replaced with timer based completion.
+> > 
+> You state this is a fix. Which problem does it fix?
+> 
+> IMO touching such legacy code makes only sense if you:
+> - fix an actual bug
+> - reduce complexity
+> - avoid using deprecated API's
+> 
+> Do you have this hardware for testing your patches?
+> 
+> You might consider migrating this driver to use phylib.
+> Provided this contributes to reducing complexity.
 
-Fix this by enabling NAPI and registering it with the RX/TX queues before
-vmbus channel is opened. This guarantees that any early host signal after
-open will correctly trigger NAPI scheduling and the ring buffer will be
-drained.
+There is plenty to reduce. There is a full bit-banging MDIO
+implementation which could be replaced with the core implementation.
 
-Fixes: 76bb5db5c749d ("netvsc: fix use after free on module removal")
-Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
----
- drivers/net/hyperv/netvsc.c       | 17 ++++++++---------
- drivers/net/hyperv/rndis_filter.c | 23 ++++++++++++++++-------
- 2 files changed, 24 insertions(+), 16 deletions(-)
+The harder part for converting to phylib will be the ML6692 and
+DP83840A. There are no Linux driver for these, but given the age,
+there is a good chance genphy will work.
 
-diff --git a/drivers/net/hyperv/netvsc.c b/drivers/net/hyperv/netvsc.c
-index 720104661d7f..60a4629fe6ba 100644
---- a/drivers/net/hyperv/netvsc.c
-+++ b/drivers/net/hyperv/netvsc.c
-@@ -1812,6 +1812,11 @@ struct netvsc_device *netvsc_device_add(struct hv_device *device,
- 
- 	/* Enable NAPI handler before init callbacks */
- 	netif_napi_add(ndev, &net_device->chan_table[0].napi, netvsc_poll);
-+	napi_enable(&net_device->chan_table[0].napi);
-+	netif_queue_set_napi(ndev, 0, NETDEV_QUEUE_TYPE_RX,
-+			     &net_device->chan_table[0].napi);
-+	netif_queue_set_napi(ndev, 0, NETDEV_QUEUE_TYPE_TX,
-+			     &net_device->chan_table[0].napi);
- 
- 	/* Open the channel */
- 	device->channel->next_request_id_callback = vmbus_next_request_id;
-@@ -1831,12 +1836,6 @@ struct netvsc_device *netvsc_device_add(struct hv_device *device,
- 	/* Channel is opened */
- 	netdev_dbg(ndev, "hv_netvsc channel opened successfully\n");
- 
--	napi_enable(&net_device->chan_table[0].napi);
--	netif_queue_set_napi(ndev, 0, NETDEV_QUEUE_TYPE_RX,
--			     &net_device->chan_table[0].napi);
--	netif_queue_set_napi(ndev, 0, NETDEV_QUEUE_TYPE_TX,
--			     &net_device->chan_table[0].napi);
--
- 	/* Connect with the NetVsp */
- 	ret = netvsc_connect_vsp(device, net_device, device_info);
- 	if (ret != 0) {
-@@ -1854,14 +1853,14 @@ struct netvsc_device *netvsc_device_add(struct hv_device *device,
- 
- close:
- 	RCU_INIT_POINTER(net_device_ctx->nvdev, NULL);
--	netif_queue_set_napi(ndev, 0, NETDEV_QUEUE_TYPE_TX, NULL);
--	netif_queue_set_napi(ndev, 0, NETDEV_QUEUE_TYPE_RX, NULL);
--	napi_disable(&net_device->chan_table[0].napi);
- 
- 	/* Now, we can close the channel safely */
- 	vmbus_close(device->channel);
- 
- cleanup:
-+	netif_queue_set_napi(ndev, 0, NETDEV_QUEUE_TYPE_TX, NULL);
-+	netif_queue_set_napi(ndev, 0, NETDEV_QUEUE_TYPE_RX, NULL);
-+	napi_disable(&net_device->chan_table[0].napi);
- 	netif_napi_del(&net_device->chan_table[0].napi);
- 
- cleanup2:
-diff --git a/drivers/net/hyperv/rndis_filter.c b/drivers/net/hyperv/rndis_filter.c
-index 9e73959e61ee..ed67b1e1293a 100644
---- a/drivers/net/hyperv/rndis_filter.c
-+++ b/drivers/net/hyperv/rndis_filter.c
-@@ -1252,17 +1252,26 @@ static void netvsc_sc_open(struct vmbus_channel *new_sc)
- 	new_sc->rqstor_size = netvsc_rqstor_size(netvsc_ring_bytes);
- 	new_sc->max_pkt_size = NETVSC_MAX_PKT_SIZE;
- 
-+	/* Enable napi before opening the vmbus channel to avoid races
-+	 * as the host placing data on the host->guest ring may be left
-+	 * out if napi was not enabled.
-+	 */
-+	napi_enable(&nvchan->napi);
-+	netif_queue_set_napi(ndev, chn_index, NETDEV_QUEUE_TYPE_RX,
-+			     &nvchan->napi);
-+	netif_queue_set_napi(ndev, chn_index, NETDEV_QUEUE_TYPE_TX,
-+			     &nvchan->napi);
-+
- 	ret = vmbus_open(new_sc, netvsc_ring_bytes,
- 			 netvsc_ring_bytes, NULL, 0,
- 			 netvsc_channel_cb, nvchan);
--	if (ret == 0) {
--		napi_enable(&nvchan->napi);
--		netif_queue_set_napi(ndev, chn_index, NETDEV_QUEUE_TYPE_RX,
--				     &nvchan->napi);
--		netif_queue_set_napi(ndev, chn_index, NETDEV_QUEUE_TYPE_TX,
--				     &nvchan->napi);
--	} else {
-+	if (ret != 0) {
- 		netdev_notice(ndev, "sub channel open failed: %d\n", ret);
-+		netif_queue_set_napi(ndev, chn_index, NETDEV_QUEUE_TYPE_TX,
-+				     NULL);
-+		netif_queue_set_napi(ndev, chn_index, NETDEV_QUEUE_TYPE_RX,
-+				     NULL);
-+		napi_disable(&nvchan->napi);
- 	}
- 
- 	if (atomic_inc_return(&nvscdev->open_chn) == nvscdev->num_chn)
--- 
-2.43.0
-
+	Andrew
 
