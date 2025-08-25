@@ -1,129 +1,426 @@
-Return-Path: <netdev+bounces-216701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52FA1B34F9F
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 01:14:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A98B5B34FA4
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 01:22:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BAC23A0577
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 23:14:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 524D748856D
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 23:22:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A49EE2BDC3B;
-	Mon, 25 Aug 2025 23:14:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42A00230BCE;
+	Mon, 25 Aug 2025 23:22:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Cpf/btbt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lHIKu8ay"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7F7B1E32DB
-	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 23:14:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FACF1A9FA4
+	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 23:22:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756163690; cv=none; b=NLXBmp8aPy0qpPgbVrQY1SWLnbbAQofrZZNerCjUa8hPjueUZRpQSIrX3XB4IwhHxAkCvsFi+5dTUz5jpJOaVTlvOWyLbojrlc4/ryhBY68wf+0uV4lDpiEkOuJL8vXUtNe6odJ7KpZUGu/P1eb6eem2t1Msmkj4A0QaEBnFpSI=
+	t=1756164169; cv=none; b=aX4nfmVMeLyfjIbOn8UJjKxYseaeiZ0v8UHFaBqfL4rEjmSAbdMv6TrC8U229hyJGWtu0TsaLrWRF0qnm75lf/tyVbzjTmsgKfAR4Xmei8OtvFGqKbUHwGT/bRnszrHpfXmtwbhoo/h/NZfU5zL+pLE44TSqcP9JCuTQN2Q+wWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756163690; c=relaxed/simple;
-	bh=LmSiDwcMgQKxO34arUC6nj7eXbX5FH5joo+FB1ueHu0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Hu7GTaTf/9mUoPFnrYmyGh6etMNZ/YMAVgoOn+BRzQk5uzX2fAOPFN0VRZ/p40K0eXcFn6eXxcwdVC5Z6OiU9qWOtekdkkQDxztzXhCuNpdbNLpyR2kMYuzQmDgxEAgKxhDC/YJ2n3ggf07Qt7D4nOmWLo+LexSf5Vm30b+jR/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Cpf/btbt; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <a8ebb0c6-5f67-411a-8513-a82c083abd8c@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1756163684;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ldnAJsm7Vh9h0iyz9zBqvXyPfBR7apAayjwl7UWt4UI=;
-	b=Cpf/btbt8uMGuiMspAtfSFgMpqPGrMg2jYgRj8l2CB3xPx172KkLPA+GYlpdWal6HqStRX
-	TGlIylV2i+Um94TLdt8Zzg9asS4vlp+zVWfaKTQMpSyWERB8rafqu9MV4B7DM9I2onrHe+
-	Zg2XPOclYNuxOMuCeLjY+Oi6VAc3ZSE=
-Date: Mon, 25 Aug 2025 16:14:35 -0700
+	s=arc-20240116; t=1756164169; c=relaxed/simple;
+	bh=LOH/5tzB9/sjEeDMj2JeCpbcCU7Apba9HCdI9JJmRcA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DlrzJ0al+4PVy2xJaQvDx7WxiKDz7e/s4m6HFHkcMOU1MseSwVG11BCjeH1Doa+Mo1WCoV9+V1I9wucrI90dWbz57NpKHTixGl7ybrJeWBgkTsLkI+7NbWrdwpDzK9t5yTIbHDHuRJ1C0QyCbdTZFz/HqzccZVbUJYQhEJEKHiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lHIKu8ay; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-246257e49c8so74805ad.0
+        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 16:22:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756164167; x=1756768967; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hCB/TVX99hrW81ENGF3mPEMvXDgQXDFGlc0HIfCdIlE=;
+        b=lHIKu8ayP0HL0zVBeFzv1EpBgd+JZKi85HuLdg/zdkPMyrJf52F8PKYA6LfegPXKGo
+         H3rsTk70vYq7/+xQsxqMQJXRUvLuyjNLEnlpffH5ycwnHWVtCWOCjuX3yWvrDyQJnRRX
+         sBoqkaDeGKbyWqp2tF6hTZxNlBCl9kXwfsjen2X1aR0n6CdVfM1jq+N+A2ofpF60Qyj4
+         zsYDpDvMcdVku5qyhA50vZRjaJ0a3GH/2Ov77p4V0toP3zOGjXsK81lwnDcsf8cuqiCa
+         daQ5gnhFsGiCUbWPQnSr3QOnetRG3RftMOcoZV4E7LR7mrGz66h28Us52GYcn3S8bQ/u
+         3Vdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756164167; x=1756768967;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hCB/TVX99hrW81ENGF3mPEMvXDgQXDFGlc0HIfCdIlE=;
+        b=RCp6Fz26zZfaTRUtUJpdNHbi2dEdxiI5mALKY3BpWpfPkRyhwuesRE7F493jGQHC9T
+         PQbUBmsjxp7pKP9xnMwIMreHO36gHoUDZDFr7xNTTXKgLFbG2zojlVd3qpgiasHCvm/e
+         inGc+4gDFHAGrHkqfg2A049K5PjNkmL+YBzp5/h5AGQFBvuEyJRrkZO+JjFopfjUAdQN
+         diOdIXLuZ6DAHy0QimJCtumv0w4ltq7iqGPwLPeFkOaV1iumCjppmErWspXFPAvwPcik
+         vTYvafQ9hI1V4PcDBvEc67BnSNlfPpr3zGMiFZWNrgnJG7zuel9CC8YhgVzdp1FV2yHW
+         TVSA==
+X-Forwarded-Encrypted: i=1; AJvYcCWpMlypSn716Zz0tBb44klMEik3HvwMT744tA48NQaloEUaCSUtJPA7GEPmdJXNK3TN9BTkpm8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxejHh6W6d44QR+f6daZNwhCVWE/EEKQMDx6EmK8MEHTmXN0QQw
+	GpxJNS9Q5TO/OL/ZI2xkBxzazPQ6UcxVuDSmFd/EOBpkKtcw59dpssOLp+U5qdNO9y0dTgAGFKw
+	Rmz5xqb0WAHjND6Xij6xbtczQ0nSHujvrAbS7XxgD
+X-Gm-Gg: ASbGncsA3BI3vSkwLULNJqT2YRS5DuzRbmTO0o9L2OKx1X8H6x/J21ZDI9Mq/NrHenv
+	UigDhP2LYil7loXCIOKda1bzX36caqNB4vvcbTZQyJHGleLFyBTjH7hZeVAv94gvtXj3oIHfXEv
+	ViGr0F+wS5f0g3BlyaoGTldrY/HM17jaL3bjmgdu1bXCmTwnwNn7Az33ayAEX84uQUjGpapO1eZ
+	TAZjyt0YrJ0Ucxzxuh5mvBCl8GlK1oCZabsJggLBA==
+X-Google-Smtp-Source: AGHT+IEIuadmfy/ouIPw2SQT6MoPu0lF9QbC3e0M5SyvYJaDnpoEJ141LpHWGV4iNhjvIdpj5CBQmPhy/bzfaWMuDXg=
+X-Received: by 2002:a17:902:e84b:b0:231:d0ef:e8ff with SMTP id
+ d9443c01a7336-2485ba39492mr1879145ad.8.1756164166259; Mon, 25 Aug 2025
+ 16:22:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v1 bpf-next/net 2/8] bpf: Add a bpf hook in
- __inet_accept().
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Johannes Weiner <hannes@cmpxchg.org>,
- Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>,
- Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima
- <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20250822221846.744252-1-kuniyu@google.com>
- <20250822221846.744252-3-kuniyu@google.com>
- <daa73a77-3366-45b4-a770-fde87d4f50d8@linux.dev>
- <CAAVpQUDUULCrcTP4AQ31B5bfo-+dtw3H8CQGq9_SQ7d28xXSvA@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <CAAVpQUDUULCrcTP4AQ31B5bfo-+dtw3H8CQGq9_SQ7d28xXSvA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20250824215418.257588-1-skhawaja@google.com> <aKy7fmowmZ8g9ZhH@mini-arch>
+ <CAAywjhQVVbK=CthODv=sVez1Q6yhYp+seuxHv5gstGHZz20vEg@mail.gmail.com> <aKzm660pL_JvcsdW@mini-arch>
+In-Reply-To: <aKzm660pL_JvcsdW@mini-arch>
+From: Samiullah Khawaja <skhawaja@google.com>
+Date: Mon, 25 Aug 2025 16:22:33 -0700
+X-Gm-Features: Ac12FXwopLPgn4CzqeWUk8ZadmSw6jc9i9K2tKY9R5bKSnF02hq_RU5PAuI59vs
+Message-ID: <CAAywjhSNLEZfbkSMt4kg1-ccSMZbO1naMS64Bt2y2oAwLFxhdg@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 0/2] Add support to do threaded napi busy poll
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, 
+	willemb@google.com, mkarsten@uwaterloo.ca, Joe Damato <joe@dama.to>, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 8/25/25 11:14 AM, Kuniyuki Iwashima wrote:
-> On Mon, Aug 25, 2025 at 10:57 AM Martin KaFai Lau <martin.lau@linux.dev> wrote:
->>
->> On 8/22/25 3:17 PM, Kuniyuki Iwashima wrote:
->>> diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
->>> index ae83ecda3983..ab613abdfaa4 100644
->>> --- a/net/ipv4/af_inet.c
->>> +++ b/net/ipv4/af_inet.c
->>> @@ -763,6 +763,8 @@ void __inet_accept(struct socket *sock, struct socket *newsock, struct sock *new
->>>                kmem_cache_charge(newsk, gfp);
->>>        }
->>>
->>> +     BPF_CGROUP_RUN_PROG_INET_SOCK_ACCEPT(newsk);
->>> +
->>>        if (mem_cgroup_sk_enabled(newsk)) {
->>>                int amt;
->>>
->>> diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
->>> index 233de8677382..80df246d4741 100644
->>> --- a/tools/include/uapi/linux/bpf.h
->>> +++ b/tools/include/uapi/linux/bpf.h
->>> @@ -1133,6 +1133,7 @@ enum bpf_attach_type {
->>>        BPF_NETKIT_PEER,
->>>        BPF_TRACE_KPROBE_SESSION,
->>>        BPF_TRACE_UPROBE_SESSION,
->>> +     BPF_CGROUP_INET_SOCK_ACCEPT,
->>
->> Instead of adding another hook, can the SK_BPF_MEMCG_SOCK_ISOLATED bit be
->> inherited from the listener?
-> 
-> Since e876ecc67db80 and d752a4986532c , we defer memcg allocation to
-> accept() because the child socket could be created during irq context with
-> unrelated cgroup.  This had another reason; if the listener was created in the
-> root cgroup and passed to a process under cgroup, child sockets would never
-> have sk_memcg if sk_memcg was inherited.
-> 
-> So, the child's memcg is not always the same one with the listener's, and
-> we cannot rely on the listener's sk_memcg.
+On Mon, Aug 25, 2025 at 3:42=E2=80=AFPM Stanislav Fomichev <stfomichev@gmai=
+l.com> wrote:
+>
+> On 08/25, Samiullah Khawaja wrote:
+> > On Mon, Aug 25, 2025 at 12:37=E2=80=AFPM Stanislav Fomichev
+> > <stfomichev@gmail.com> wrote:
+> > >
+> > > On 08/24, Samiullah Khawaja wrote:
+> > > > Extend the already existing support of threaded napi poll to do con=
+tinuous
+> > > > busy polling.
+> > > >
+> > > > This is used for doing continuous polling of napi to fetch descript=
+ors
+> > > > from backing RX/TX queues for low latency applications. Allow enabl=
+ing
+> > > > of threaded busypoll using netlink so this can be enabled on a set =
+of
+> > > > dedicated napis for low latency applications.
+> > > >
+> > > > Once enabled user can fetch the PID of the kthread doing NAPI polli=
+ng
+> > > > and set affinity, priority and scheduler for it depending on the
+> > > > low-latency requirements.
+> > > >
+> > > > Currently threaded napi is only enabled at device level using sysfs=
+. Add
+> > > > support to enable/disable threaded mode for a napi individually. Th=
+is
+> > > > can be done using the netlink interface. Extend `napi-set` op in ne=
+tlink
+> > > > spec that allows setting the `threaded` attribute of a napi.
+> > > >
+> > > > Extend the threaded attribute in napi struct to add an option to en=
+able
+> > > > continuous busy polling. Extend the netlink and sysfs interface to =
+allow
+> > > > enabling/disabling threaded busypolling at device or individual nap=
+i
+> > > > level.
+> > > >
+> > > > We use this for our AF_XDP based hard low-latency usecase with usec=
+s
+> > > > level latency requirement. For our usecase we want low jitter and s=
+table
+> > > > latency at P99.
+> > > >
+> > > > Following is an analysis and comparison of available (and compatibl=
+e)
+> > > > busy poll interfaces for a low latency usecase with stable P99. Ple=
+ase
+> > > > note that the throughput and cpu efficiency is a non-goal.
+> > > >
+> > > > For analysis we use an AF_XDP based benchmarking tool `xdp_rr`. The
+> > > > description of the tool and how it tries to simulate the real workl=
+oad
+> > > > is following,
+> > > >
+> > > > - It sends UDP packets between 2 machines.
+> > > > - The client machine sends packets at a fixed frequency. To maintai=
+n the
+> > > >   frequency of the packet being sent, we use open-loop sampling. Th=
+at is
+> > > >   the packets are sent in a separate thread.
+> > > > - The server replies to the packet inline by reading the pkt from t=
+he
+> > > >   recv ring and replies using the tx ring.
+> > > > - To simulate the application processing time, we use a configurabl=
+e
+> > > >   delay in usecs on the client side after a reply is received from =
+the
+> > > >   server.
+> > > >
+> > > > The xdp_rr tool is posted separately as an RFC for tools/testing/se=
+lftest.
+> > > >
+> > > > We use this tool with following napi polling configurations,
+> > > >
+> > > > - Interrupts only
+> > > > - SO_BUSYPOLL (inline in the same thread where the client receives =
+the
+> > > >   packet).
+> > > > - SO_BUSYPOLL (separate thread and separate core)
+> > > > - Threaded NAPI busypoll
+> > > >
+> > > > System is configured using following script in all 4 cases,
+> > > >
+> > > > ```
+> > > > echo 0 | sudo tee /sys/class/net/eth0/threaded
+> > > > echo 0 | sudo tee /proc/sys/kernel/timer_migration
+> > > > echo off | sudo tee  /sys/devices/system/cpu/smt/control
+> > > >
+> > > > sudo ethtool -L eth0 rx 1 tx 1
+> > > > sudo ethtool -G eth0 rx 1024
+> > > >
+> > > > echo 0 | sudo tee /proc/sys/net/core/rps_sock_flow_entries
+> > > > echo 0 | sudo tee /sys/class/net/eth0/queues/rx-0/rps_cpus
+> > > >
+> > > >  # pin IRQs on CPU 2
+> > > > IRQS=3D"$(gawk '/eth0-(TxRx-)?1/ {match($1, /([0-9]+)/, arr); \
+> > > >                               print arr[0]}' < /proc/interrupts)"
+> > > > for irq in "${IRQS}"; \
+> > > >       do echo 2 | sudo tee /proc/irq/$irq/smp_affinity_list; done
+> > > >
+> > > > echo -1 | sudo tee /proc/sys/kernel/sched_rt_runtime_us
+> > > >
+> > > > for i in /sys/devices/virtual/workqueue/*/cpumask; \
+> > > >                       do echo $i; echo 1,2,3,4,5,6 > $i; done
+> > > >
+> > > > if [[ -z "$1" ]]; then
+> > > >   echo 400 | sudo tee /proc/sys/net/core/busy_read
+> > > >   echo 100 | sudo tee /sys/class/net/eth0/napi_defer_hard_irqs
+> > > >   echo 15000   | sudo tee /sys/class/net/eth0/gro_flush_timeout
+> > > > fi
+> > > >
+> > > > sudo ethtool -C eth0 adaptive-rx off adaptive-tx off rx-usecs 0 tx-=
+usecs 0
+> > > >
+> > > > if [[ "$1" =3D=3D "enable_threaded" ]]; then
+> > > >   echo 0 | sudo tee /proc/sys/net/core/busy_poll
+> > > >   echo 0 | sudo tee /proc/sys/net/core/busy_read
+> > > >   echo 100 | sudo tee /sys/class/net/eth0/napi_defer_hard_irqs
+> > > >   echo 15000 | sudo tee /sys/class/net/eth0/gro_flush_timeout
+> > > >   echo 2 | sudo tee /sys/class/net/eth0/threaded
+> > > >   NAPI_T=3D$(ps -ef | grep napi | grep -v grep | awk '{ print $2 }'=
+)
+> > > >   sudo chrt -f  -p 50 $NAPI_T
+> > > >
+> > > >   # pin threaded poll thread to CPU 2
+> > > >   sudo taskset -pc 2 $NAPI_T
+> > > > fi
+> > > >
+> > > > if [[ "$1" =3D=3D "enable_interrupt" ]]; then
+> > > >   echo 0 | sudo tee /proc/sys/net/core/busy_read
+> > > >   echo 0 | sudo tee /sys/class/net/eth0/napi_defer_hard_irqs
+> > > >   echo 15000 | sudo tee /sys/class/net/eth0/gro_flush_timeout
+> > > > fi
+> > > > ```
+> > > >
+> > > > To enable various configurations, script can be run as following,
+> > > >
+> > > > - Interrupt Only
+> > > >   ```
+> > > >   <script> enable_interrupt
+> > > >   ```
+> > > >
+> > > > - SO_BUSYPOLL (no arguments to script)
+> > > >   ```
+> > > >   <script>
+> > > >   ```
+> > > >
+> > > > - NAPI threaded busypoll
+> > > >   ```
+> > > >   <script> enable_threaded
+> > > >   ```
+> > > >
+> > > > If using idpf, the script needs to be run again after launching the
+> > > > workload just to make sure that the configurations are not reverted=
+. As
+> > > > idpf reverts some configurations on software reset when AF_XDP prog=
+ram
+> > > > is attached.
+> > > >
+> > > > Once configured, the workload is run with various configurations us=
+ing
+> > > > following commands. Set period (1/frequency) and delay in usecs to
+> > > > produce results for packet frequency and application processing del=
+ay.
+> > > >
+> > > >  ## Interrupt Only and SO_BUSY_POLL (inline)
+> > > >
+> > > > - Server
+> > > > ```
+> > > > sudo chrt -f 50 taskset -c 3-5 ./xsk_rr -o 0 -B 400 -i eth0 -4 \
+> > > >       -D <IP-dest> -S <IP-src> -M <MAC-dst> -m <MAC-src> -p 54321 -=
+h -v
+> > > > ```
+> > > >
+> > > > - Client
+> > > > ```
+> > > > sudo chrt -f 50 taskset -c 3-5 ./xsk_rr -o 0 -B 400 -i eth0 -4 \
+> > > >       -S <IP-src> -D <IP-dest> -m <MAC-src> -M <MAC-dst> -p 54321 \
+> > > >       -P <Period-usecs> -d <Delay-usecs>  -T -l 1 -v
+> > > > ```
+> > > >
+> > > >  ## SO_BUSY_POLL(done in separate core using recvfrom)
+> > > >
+> > > > Argument -t spawns a seprate thread and continuously calls recvfrom=
+.
+> > > >
+> > > > - Server
+> > > > ```
+> > > > sudo chrt -f 50 taskset -c 3-5 ./xsk_rr -o 0 -B 400 -i eth0 -4 \
+> > > >       -D <IP-dest> -S <IP-src> -M <MAC-dst> -m <MAC-src> -p 54321 \
+> > > >       -h -v -t
+> > > > ```
+> > > >
+> > > > - Client
+> > > > ```
+> > > > sudo chrt -f 50 taskset -c 3-5 ./xsk_rr -o 0 -B 400 -i eth0 -4 \
+> > > >       -S <IP-src> -D <IP-dest> -m <MAC-src> -M <MAC-dst> -p 54321 \
+> > > >       -P <Period-usecs> -d <Delay-usecs>  -T -l 1 -v -t
+> > > > ```
+> > > >
+> > > >  ## NAPI Threaded Busy Poll
+> > > >
+> > > > Argument -n skips the recvfrom call as there is no recv kick needed=
+.
+> > > >
+> > > > - Server
+> > > > ```
+> > > > sudo chrt -f 50 taskset -c 3-5 ./xsk_rr -o 0 -B 400 -i eth0 -4 \
+> > > >       -D <IP-dest> -S <IP-src> -M <MAC-dst> -m <MAC-src> -p 54321 \
+> > > >       -h -v -n
+> > > > ```
+> > > >
+> > > > - Client
+> > > > ```
+> > > > sudo chrt -f 50 taskset -c 3-5 ./xsk_rr -o 0 -B 400 -i eth0 -4 \
+> > > >       -S <IP-src> -D <IP-dest> -m <MAC-src> -M <MAC-dst> -p 54321 \
+> > > >       -P <Period-usecs> -d <Delay-usecs>  -T -l 1 -v -n
+> > > > ```
+> > > >
+> > > > | Experiment | interrupts | SO_BUSYPOLL | SO_BUSYPOLL(separate) | N=
+API threaded |
+> > > > |---|---|---|---|---|
+> > > > | 12 Kpkt/s + 0us delay | | | | |
+> > > > |  | p5: 12700 | p5: 12900 | p5: 13300 | p5: 12800 |
+> > > > |  | p50: 13100 | p50: 13600 | p50: 14100 | p50: 13000 |
+> > > > |  | p95: 13200 | p95: 13800 | p95: 14400 | p95: 13000 |
+> > > > |  | p99: 13200 | p99: 13800 | p99: 14400 | p99: 13000 |
+> > > > | 32 Kpkt/s + 30us delay | | | | |
+> > > > |  | p5: 19900 | p5: 16600 | p5: 13100 | p5: 12800 |
+> > > > |  | p50: 21100 | p50: 17000 | p50: 13700 | p50: 13000 |
+> > > > |  | p95: 21200 | p95: 17100 | p95: 14000 | p95: 13000 |
+> > > > |  | p99: 21200 | p99: 17100 | p99: 14000 | p99: 13000 |
+> > > > | 125 Kpkt/s + 6us delay | | | | |
+> > > > |  | p5: 14600 | p5: 17100 | p5: 13300 | p5: 12900 |
+> > > > |  | p50: 15400 | p50: 17400 | p50: 13800 | p50: 13100 |
+> > > > |  | p95: 15600 | p95: 17600 | p95: 14000 | p95: 13100 |
+> > > > |  | p99: 15600 | p99: 17600 | p99: 14000 | p99: 13100 |
+> > > > | 12 Kpkt/s + 78us delay | | | | |
+> > > > |  | p5: 14100 | p5: 16700 | p5: 13200 | p5: 12600 |
+> > > > |  | p50: 14300 | p50: 17100 | p50: 13900 | p50: 12800 |
+> > > > |  | p95: 14300 | p95: 17200 | p95: 14200 | p95: 12800 |
+> > > > |  | p99: 14300 | p99: 17200 | p99: 14200 | p99: 12800 |
+> > > > | 25 Kpkt/s + 38us delay | | | | |
+> > > > |  | p5: 19900 | p5: 16600 | p5: 13000 | p5: 12700 |
+> > > > |  | p50: 21000 | p50: 17100 | p50: 13800 | p50: 12900 |
+> > > > |  | p95: 21100 | p95: 17100 | p95: 14100 | p95: 12900 |
+> > > > |  | p99: 21100 | p99: 17100 | p99: 14100 | p99: 12900 |
+> > > >
+> > > >  ## Observations
+> > > >
+> > > > - Here without application processing all the approaches give the s=
+ame
+> > > >   latency within 1usecs range and NAPI threaded gives minimum laten=
+cy.
+> > > > - With application processing the latency increases by 3-4usecs whe=
+n
+> > > >   doing inline polling.
+> > > > - Using a dedicated core to drive napi polling keeps the latency sa=
+me
+> > > >   even with application processing. This is observed both in usersp=
+ace
+> > > >   and threaded napi (in kernel).
+> > > > - Using napi threaded polling in kernel gives lower latency by
+> > > >   1-1.5usecs as compared to userspace driven polling in separate co=
+re.
+> > > > - With application processing userspace will get the packet from re=
+cv
+> > > >   ring and spend some time doing application processing and then do=
+ napi
+> > > >   polling. While application processing is happening a dedicated co=
+re
+> > > >   doing napi polling can pull the packet of the NAPI RX queue and
+> > > >   populate the AF_XDP recv ring. This means that when the applicati=
+on
+> > > >   thread is done with application processing it has new packets rea=
+dy to
+> > > >   recv and process in recv ring.
+> > > > - Napi threaded busy polling in the kernel with a dedicated core gi=
+ves
+> > > >   the consistent P5-P99 latency.
+> > >
+> > > The real take away for me is ~1us difference between SO_BUSYPOLL in a
+> > > thread and NAPI threaded. Presumably mostly because of the non-blocki=
+ng calls
+> > > to sk_busy_loop in the former? So it takes 1us extra to enter/leave t=
+he kernel
+> > > and setup/teardown the busy polling?
+> > >
+> > > And you haven't tried epoll based busy polling? I'd expect to see
+> > > results similar to your NAPI threaded (if it works correctly).
+> > I haven't attempted epoll-based NAPI polling because my understanding
+> > is that it only polls NAPI when no events are present. Let me check.
+>
+> I was under the impression that xsk won't actually add any (socket) event=
+s
+> to ep making it busy poll until timeout. But I might be wrong, still
+> worth it to double check.
+xsk.c has an xsk_poll implementation that is doing following (apart
+from other things):
 
-I didn't mean to inherit the entire sk_memcg pointer. I meant to only inherit 
-the SK_BPF_MEMCG_SOCK_ISOLATED bit.
+if (xs->rx && !xskq_prod_is_empty(xs->rx))
+                mask |=3D EPOLLIN | EPOLLRDNORM;
+if (xs->tx && xsk_tx_writeable(xs))
+                mask |=3D EPOLLOUT | EPOLLWRNORM;
 
-If it can only be done at accept, there is already an existing 
-SEC("lsm_cgroup/socket_accept") hook. Take a look at 
-tools/testing/selftests/bpf/progs/lsm_cgroup.c. The lsm socket_accept doesn't 
-have access to the "newsock->sk" but it should have access to the "sock->sk", do 
-bpf_setsockopt and then inherit by the newsock->sk (?)
-
-There are already quite enough cgroup-sk style hooks. I would prefer not to add 
-another cgroup attach_type and instead see if some of the existing ones can be 
-reused. There is also SEC("lsm/sock_graft").
+This means it should be providing events checking whether RX queue is
+not empty and whether it is tx writeable.
+>
+> > > (have nothing against the busy polling thread, mostly trying to
+> > > understand what we are missing from the existing setup)
+> > The missing piece is a mechanism to busy poll a NAPI instance in a
+> > dedicated thread while ignoring available events or packets,
+> > regardless of the userspace API. Most existing mechanisms are designed
+> > to work in a pattern where you poll until new packets or events are
+> > received, after which userspace is expected to handle them.
+> >
+> > As a result, one has to hack together a solution using a mechanism
+> > intended to receive packets or events, not to simply NAPI poll. NAPI
+> > threaded, on the other hand, provides this capability natively,
+> > independent of any userspace API.
+>
+> Agreed, yes. Would be nice to document it in the commit description. Expl=
+ain
+> how SO_BUSY_POLL in a thread is still not enough (polls only once,
+> doesn't busy-poll until the events are ready -> 1-2us of extra latency).
+> And the same for epoll depending on how it goes. If it ends up working,
+> kthread might still be more convenient to setup/manage.
+Agreed. I can add it to the cover letter.
 
