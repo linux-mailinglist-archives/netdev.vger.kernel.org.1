@@ -1,374 +1,176 @@
-Return-Path: <netdev+bounces-216656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1BF6B34C3F
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 22:43:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2EB0B34C5C
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 22:44:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A1B31A84AB7
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 20:43:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3AAE1A87585
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 20:44:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A65A7302773;
-	Mon, 25 Aug 2025 20:42:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E81C271475;
+	Mon, 25 Aug 2025 20:44:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l1ah9tOJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HjOA1FXR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E932D3009E7
-	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 20:42:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8389E23E32E
+	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 20:44:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756154535; cv=none; b=Cc0cexu5BPwO9wjXKlfpuEKsnZ75W6T5HJXc2nzW6NW+QzW+iXo7iS5h3FlqyN/P6srQoHCmyXibMrVkK5MyeIDgq0x1oXG+hIBEl6fOEl0LMigmgwDw7KUZff3uEmGqZIkpSpV7IvBBeQG8vNkocW/FOADk3vRi1plWm47YBnw=
+	t=1756154669; cv=none; b=DyqVYFq1TQEHDYi1tgVdOOSuiq43YBEcnSrJ+dJufaViqcwaxuOurYPgUFhkN2ZLEDcfbcvlj0e71iHzHFFy2c2JNVyjktqq4AV86D+dPH9j04KlEmw2DRajexGru7IIVo3zdqcVESN0T8k/XIUfQ/snt69dr1hzo6+n8PFzymU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756154535; c=relaxed/simple;
-	bh=We2VWSLZ7KScG5KJvhPKGwZp2lJAodATPsUe9LXmRzc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GAn2fQFuHyRmEYFxqxnGvDjee8/+ryVynvYVd4hoK4u1SG2C9KyGk0XOQQVpCjqpZa8D35SQsbePTdTSpMHknxswB6z1b2JOEpb+1ASz0z6LAoAARZ7PwT+Ddl87MpE5icduouudMn3aaEiGSQI8A/1iPQVfCC7VOv90+hPDbMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=l1ah9tOJ; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2464dc09769so73162935ad.0
-        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 13:42:13 -0700 (PDT)
+	s=arc-20240116; t=1756154669; c=relaxed/simple;
+	bh=GnxObfWfZltUdDz43wzOic2+HOKk/PahjYxZnTFp4HY=;
+	h=Message-ID:Date:MIME-Version:From:Subject:Cc:To:Content-Type; b=sel6VjZker2elxjpQn82yc8/EtY/C2UXJNAazyYBpW5M3VItFFlNOkKh0ACHvBCuOIL2nJCZlc+yaffdMLsj6jaYKHyqaBiT9u3nfQZpos5fAMl4uTrEdnDh0V4DGL+l0WCkicYS4CMdFa0cMbTAROTINZPR7HqWzQ0u/4tXoFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HjOA1FXR; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-45a1b05ac1eso26807145e9.1
+        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 13:44:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756154533; x=1756759333; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GHQoOZdA4txyBFUPMj7jPIG1cuPTm44XKvXJIPVPLKs=;
-        b=l1ah9tOJUpmO7kYxUrbss/liqJaDdg83zHu8j4XAuKHCYBejSdH0ExAPYZQ0YDs2Xc
-         HTTnPNSlaTeapKQ7l5UqoQbaYx6y1Zb3OUiU32tFpHYFkDHG95svEUaB+f8nai2MuJHi
-         7GU59CFf1sEvp64DmK4jp4+77BZTTaEDzwTOHg7jtGzXp7/rYoICL+0SfKcCNTRzs7aG
-         oTMJL1BgkKLy513LVQ39JZb4AxisOijQZpdcL3rB6ou5vhSrSTz1zLXm/npHokbvmy7N
-         5UlbIXhupkV8gfzoZqxnGjDeaGfgmnP1ty5Cb9p0DGKyVk5xCDqH1FvNFNXTR90QVvZs
-         fCeQ==
+        d=gmail.com; s=20230601; t=1756154666; x=1756759466; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:cc:autocrypt:subject:from
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nsELezScWH1i9p5FLlEDoDNvWNsHnNdlkt7LUk7TzI4=;
+        b=HjOA1FXRWiBN/stgpaaG0lzpLSTrXR4sbHxigaJBOz2XvpzjDLyxaCqaD4yP5d59DU
+         RzK9aCsHvQx7TA3RX0C7S54DeKOMGUKdmQDQnzSdDB1bEqejH9m8ScUX3pD6+PpeJh1d
+         GiuEisUbtzvEAyKY83Pb9fOGvLmS67XU0QPPrsBrg5v2yWGMHpit5H+A7G0P9hOzpIgq
+         jkhUvBrEKffubQdjiym7ZwxEqDhgV/ZXQ9a6wP3HWNbIOUGYantywsKKche7mn94ffqe
+         ca3Ezd8LTmjKXuSI117DSwkqyG70YnLOM9b1t/+4oDkBzTBPNY+YC9pYFQch02PO9iBk
+         ru4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756154533; x=1756759333;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GHQoOZdA4txyBFUPMj7jPIG1cuPTm44XKvXJIPVPLKs=;
-        b=iPPsO33RxESFrjD8Z6BJZdqmh8Xi057Vc0N5ymSVF27dIqcNznxq1OZg2KuxMHC48Q
-         HMzXfxtLYcckAiTqTbDnp+7i7x2+chU2mPLkqcbkDz26L7pdaufC5M6E/IEvGop8/SQ6
-         munkZtglFKQCjxnLAg+vgdq6DuPvwkiPsuSrBBuqdF0WREYpLP+LKb1yGkEuKfs/GcrC
-         5g4OEXeMUeHk3cAYp6pjHVWrZ9UOem4FOIv2qk2xE9bPxrYso6dK7QjaauRea/MhnEcY
-         rm3tGpMSaW9QiTCPPipq9ReeGHB2J4/X3q5+g9g+rp6NXNSHQV6Bm0xibz+PTjd8Db4y
-         BTJw==
-X-Forwarded-Encrypted: i=1; AJvYcCXEXwMXT7Pp4kvDPMCMOq3Ho+TW3n/VXwzlnH14sVQw1pQ0hpCAg9pLM1DwkgPwu/+odZOIEaM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyx1htOZLwia6uawAj7/WCIdFZlgIa61PJ33AIszBpF8thlIXu6
-	uoLuADua4wIPpSfBLijkbYkuwKRJ3cTfu7WZVrLGY/J5DCp7gABen9ufSxVjWrwLGeDAlS3pQJQ
-	aD59XOg==
-X-Google-Smtp-Source: AGHT+IHt3UBeME9oYTVRGeRMPP76FpcbZZf4L92MxpjaV0vadDgxF3aj9dIaUhyXNn7Z3W3+C5xwaRwWC4c=
-X-Received: from pldp2.prod.google.com ([2002:a17:902:eac2:b0:245:f002:d659])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:c40f:b0:244:99aa:54a1
- with SMTP id d9443c01a7336-2462ee0b77emr186465385ad.7.1756154533300; Mon, 25
- Aug 2025 13:42:13 -0700 (PDT)
-Date: Mon, 25 Aug 2025 20:41:31 +0000
-In-Reply-To: <20250825204158.2414402-1-kuniyu@google.com>
+        d=1e100.net; s=20230601; t=1756154666; x=1756759466;
+        h=content-transfer-encoding:to:cc:autocrypt:subject:from
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nsELezScWH1i9p5FLlEDoDNvWNsHnNdlkt7LUk7TzI4=;
+        b=eFTXPhlbPEutCFQobwldk9inDHQKhBy03+vtmMScyVgiUGgzLGjnbS3fg50lngh647
+         WfD3OuZKSH5qfG4siR9qKPb1zpV35NhPyS5jSFCqN5oieCUn3ZeegfyJG3mwC2tnSJzA
+         XiajChTWdfJuCd/QvJaScmxOvQPFeY8wngkjcgSd/ApxmL9SR2Ox+saaQotzJJeiQqWQ
+         JlnVZNusXP8cKYM8HSbnq4SsbvuJCAJcPMMAKRMY8Xz5NFgIEoxzmf0LKZL1oHBGQgbM
+         AA99RgCJvVeG24682RzbFdCMTNtz3xz0OL2biOe4gdJAQxE27ElPIRTvIrsOtI1EbvtE
+         Mp5Q==
+X-Gm-Message-State: AOJu0Yz+s9KQcOuOxxVaVMVrA5L6SZcyx+6aDc7NwPyL01K0kEfKTalL
+	RvyKUQu/73UUXTsgJxymicT8iktm0dVxQmQ+j8D318Qu0b4xwkjEsOW4
+X-Gm-Gg: ASbGncvxQsZ9Y0Kw07p+iaoUek+6MJb3xQ1qKoOmr4SAqVfN5M2R4GqwFBSJDzeBmps
+	JxGIrj02IKiGz4gYt94MHZ1SbngbHag9Pxi1wAjgrspDRszqZmlm+QgC5+emvZknxCa34zrDgMa
+	TMyrphjmihCZERgvkKJjze5dwMgwPnV9CUR2g+LIRMVYQDTV6SJyVQAx8KQ+ujdKoplFx6C2YbD
+	FaPyAZaApgfODoOVt1mI6WxgLVAP0TWatbH7E9ZnRwMrz+mn7xPIFlnnK+6CazkTqsf+b68ug3a
+	mPD7T4WTL9hwvJbYr79Kjofb7R8yEr3ox9SgyTDFOLLdgkZrSffGT2pEmfAwprMgnBZ9yqVJZiI
+	6vDgrxlEXLL5F+BT2ZGMeiwNXiKMWcDo4MsRLwDCxJzSMoy8xhwwpr2FS6PN5ntBhZjLgxRK6jr
+	YdzvjbfhDcqY4gMyOOUtmRHQHpQL4GlNbKJ9zXdYoP8IKMLVQumfMOaX2AAwuQSQ==
+X-Google-Smtp-Source: AGHT+IGqMkUOdMxWqpSVxqbbBb9qz0s9p4R8gTvK1/kR95DSU4Y+IZwsNpQq3t6RTwv9KWrLiAMzJg==
+X-Received: by 2002:a05:600c:1546:b0:458:c094:8ba5 with SMTP id 5b1f17b1804b1-45b517a0664mr116994865e9.12.1756154665628;
+        Mon, 25 Aug 2025 13:44:25 -0700 (PDT)
+Received: from ?IPV6:2003:ea:8f3e:d400:ad72:1084:ce31:f393? (p200300ea8f3ed400ad721084ce31f393.dip0.t-ipconnect.de. [2003:ea:8f3e:d400:ad72:1084:ce31:f393])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-45b5753503esm121228245e9.1.2025.08.25.13.44.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Aug 2025 13:44:25 -0700 (PDT)
+Message-ID: <3396d654-f32a-40bb-ba3b-9f749e5a29d5@gmail.com>
+Date: Mon, 25 Aug 2025 22:44:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250825204158.2414402-1-kuniyu@google.com>
-X-Mailer: git-send-email 2.51.0.261.g7ce5a0a67e-goog
-Message-ID: <20250825204158.2414402-9-kuniyu@google.com>
-Subject: [PATCH v2 bpf-next/net 8/8] selftest: bpf: Add test for SK_BPF_MEMCG_SOCK_ISOLATED.
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>
-Cc: John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
-	Roman Gushchin <roman.gushchin@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net] net: phy: fixed_phy: fix missing calls to gpiod_put in
+ fixed_mdio_bus_exit
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The test does the following for IPv4/IPv6 x TCP/UDP sockets
-with/without BPF prog.
+Cleanup in fixed_mdio_bus_exit() misses to call gpiod_put().
+Easiest fix is to call fixed_phy_del() for each possible phy address.
+This may consume a few cpu cycles more, but is much easier to read.
 
-  1. Create socket pairs
-  2. Send a bunch of data that require more than 1000 pages
-  3. Read memory_allocated from the 3rd column in /proc/net/protocols
-  4. Check if unread data is charged to memory_allocated
-
-If BPF prog is attached, memory_allocated should not be changed,
-but we allow a small error (up to 10 pages) in case the test is ran
-concurrently with other tests using TCP/UDP sockets.
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+Fixes: a5597008dbc2 ("phy: fixed_phy: Add gpio to determine link up/down.")
+Cc: stable@vger.kernel.org
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- .../selftests/bpf/prog_tests/sk_memcg.c       | 218 ++++++++++++++++++
- tools/testing/selftests/bpf/progs/sk_memcg.c  |  29 +++
- 2 files changed, 247 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/sk_memcg.c
- create mode 100644 tools/testing/selftests/bpf/progs/sk_memcg.c
+ drivers/net/phy/fixed_phy.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/sk_memcg.c b/tools/testing/selftests/bpf/prog_tests/sk_memcg.c
-new file mode 100644
-index 000000000000..053b833cdc27
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/sk_memcg.c
-@@ -0,0 +1,218 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2025 Google LLC */
-+
-+#include <test_progs.h>
-+#include "sk_memcg.skel.h"
-+#include "network_helpers.h"
-+
-+#define NR_SOCKETS	128
-+#define NR_SEND		128
-+#define BUF_SINGLE	1024
-+#define BUF_TOTAL	(BUF_SINGLE * NR_SEND)
-+
-+struct test_case {
-+	char name[10]; /* protocols (%-9s) in /proc/net/protocols, see proto_seq_printf(). */
-+	int family;
-+	int type;
-+	int (*create_sockets)(struct test_case *test_case, int sk[], int len);
-+};
-+
-+static int tcp_create_sockets(struct test_case *test_case, int sk[], int len)
-+{
-+	int server, i;
-+
-+	server = start_server(test_case->family, test_case->type, NULL, 0, 0);
-+	ASSERT_GE(server, 0, "start_server_str");
-+
-+	for (i = 0; i < len / 2; i++) {
-+		sk[i * 2] = connect_to_fd(server, 0);
-+		if (!ASSERT_GE(sk[i * 2], 0, "connect_to_fd"))
-+			return sk[i * 2];
-+
-+		sk[i * 2 + 1] = accept(server, NULL, NULL);
-+		if (!ASSERT_GE(sk[i * 2 + 1], 0, "accept"))
-+			return sk[i * 2 + 1];
-+	}
-+
-+	close(server);
-+
-+	return 0;
-+}
-+
-+static int udp_create_sockets(struct test_case *test_case, int sk[], int len)
-+{
-+	int i, err, rcvbuf = BUF_TOTAL;
-+
-+	for (i = 0; i < len / 2; i++) {
-+		sk[i * 2] = start_server(test_case->family, test_case->type, NULL, 0, 0);
-+		if (!ASSERT_GE(sk[i * 2], 0, "start_server"))
-+			return sk[i * 2];
-+
-+		sk[i * 2 + 1] = connect_to_fd(sk[i * 2], 0);
-+		if (!ASSERT_GE(sk[i * 2 + 1], 0, "connect_to_fd"))
-+			return sk[i * 2 + 1];
-+
-+		err = connect_fd_to_fd(sk[i * 2], sk[i * 2 + 1], 0);
-+		if (!ASSERT_EQ(err, 0, "connect_fd_to_fd"))
-+			return err;
-+
-+		err = setsockopt(sk[i * 2], SOL_SOCKET, SO_RCVBUF, &rcvbuf, sizeof(int));
-+		if (!ASSERT_EQ(err, 0, "setsockopt(SO_RCVBUF)"))
-+			return err;
-+
-+		err = setsockopt(sk[i * 2 + 1], SOL_SOCKET, SO_RCVBUF, &rcvbuf, sizeof(int));
-+		if (!ASSERT_EQ(err, 0, "setsockopt(SO_RCVBUF)"))
-+			return err;
-+	}
-+
-+	return 0;
-+}
-+
-+static int get_memory_allocated(struct test_case *test_case)
-+{
-+	long memory_allocated = -1;
-+	char *line = NULL;
-+	size_t unused;
-+	FILE *f;
-+
-+	f = fopen("/proc/net/protocols", "r");
-+	if (!ASSERT_OK_PTR(f, "fopen"))
-+		goto out;
-+
-+	while (getline(&line, &unused, f) != -1) {
-+		unsigned int unused_0;
-+		int unused_1;
-+		int ret;
-+
-+		if (strncmp(line, test_case->name, sizeof(test_case->name)))
-+			continue;
-+
-+		ret = sscanf(line + sizeof(test_case->name), "%4u %6d  %6ld",
-+			     &unused_0, &unused_1, &memory_allocated);
-+		ASSERT_EQ(ret, 3, "sscanf");
-+		break;
-+	}
-+
-+	ASSERT_NEQ(memory_allocated, -1, "get_memory_allocated");
-+
-+	free(line);
-+	fclose(f);
-+out:
-+	return memory_allocated;
-+}
-+
-+static int check_isolated(struct test_case *test_case, bool isolated)
-+{
-+	char buf[BUF_SINGLE] = {};
-+	long memory_allocated[2];
-+	int sk[NR_SOCKETS] = {};
-+	int err = -1, i, j;
-+
-+	memory_allocated[0] = get_memory_allocated(test_case);
-+	if (!ASSERT_GE(memory_allocated[0], 0, "memory_allocated[0]"))
-+		goto out;
-+
-+	err = test_case->create_sockets(test_case, sk, ARRAY_SIZE(sk));
-+	if (err)
-+		goto close;
-+
-+	/* Must allocate pages >= net.core.mem_pcpu_rsv */
-+	for (i = 0; i < ARRAY_SIZE(sk); i++) {
-+		for (j = 0; j < NR_SEND; j++) {
-+			int bytes = send(sk[i], buf, sizeof(buf), 0);
-+
-+			/* Avoid too noisy logs when something failed. */
-+			if (bytes != sizeof(buf))
-+				ASSERT_EQ(bytes, sizeof(buf), "send");
-+		}
-+	}
-+
-+	memory_allocated[1] = get_memory_allocated(test_case);
-+	if (!ASSERT_GE(memory_allocated[1], 0, "memory_allocated[1]"))
-+		goto close;
-+
-+	if (isolated)
-+		ASSERT_LE(memory_allocated[1], memory_allocated[0] + 10, "isolated");
-+	else
-+		ASSERT_GT(memory_allocated[1], memory_allocated[0] + 1000, "not isolated");
-+
-+close:
-+	for (i = 0; i < ARRAY_SIZE(sk); i++)
-+		close(sk[i]);
-+
-+	/* Let RCU destruct sockets */
-+	sleep(1);
-+out:
-+	return err;
-+}
-+
-+void run_test(struct test_case *test_case)
-+{
-+	struct sk_memcg *skel;
-+	int cgroup, err;
-+
-+	skel = sk_memcg__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "open_and_load"))
-+		return;
-+
-+	cgroup = test__join_cgroup("/sk_memcg");
-+	if (!ASSERT_GE(cgroup, 0, "join_cgroup"))
-+		goto destroy_skel;
-+
-+	err = check_isolated(test_case, false);
-+	if (!ASSERT_EQ(err, 0, "test_isolated(false)"))
-+		goto close_cgroup;
-+
-+	skel->links.sock_create = bpf_program__attach_cgroup(skel->progs.sock_create, cgroup);
-+	if (!ASSERT_OK_PTR(skel->links.sock_create, "attach_cgroup(sock_create)"))
-+		goto close_cgroup;
-+
-+	skel->links.sock_accept = bpf_program__attach_cgroup(skel->progs.sock_accept, cgroup);
-+	if (!ASSERT_OK_PTR(skel->links.sock_accept, "attach_cgroup(sock_accept)"))
-+		goto close_cgroup;
-+
-+	err = check_isolated(test_case, true);
-+	ASSERT_EQ(err, 0, "test_isolated(false)");
-+
-+close_cgroup:
-+	close(cgroup);
-+destroy_skel:
-+	sk_memcg__destroy(skel);
-+}
-+
-+struct test_case test_cases[] = {
-+	{
-+		.name = "TCP       ",
-+		.family = AF_INET,
-+		.type = SOCK_STREAM,
-+		.create_sockets = tcp_create_sockets,
-+	},
-+	{
-+		.name = "UDP       ",
-+		.family = AF_INET,
-+		.type = SOCK_DGRAM,
-+		.create_sockets = udp_create_sockets,
-+	},
-+	{
-+		.name = "TCPv6     ",
-+		.family = AF_INET6,
-+		.type = SOCK_STREAM,
-+		.create_sockets = tcp_create_sockets,
-+	},
-+	{
-+		.name = "UDPv6     ",
-+		.family = AF_INET6,
-+		.type = SOCK_DGRAM,
-+		.create_sockets = udp_create_sockets,
-+	},
-+};
-+
-+void test_sk_memcg(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(test_cases); i++) {
-+		test__start_subtest(test_cases[i].name);
-+		run_test(&test_cases[i]);
-+	}
-+}
-diff --git a/tools/testing/selftests/bpf/progs/sk_memcg.c b/tools/testing/selftests/bpf/progs/sk_memcg.c
-new file mode 100644
-index 000000000000..8a43e05be14b
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/sk_memcg.c
-@@ -0,0 +1,29 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright 2025 Google LLC */
-+
-+#include "bpf_tracing_net.h"
-+#include <bpf/bpf_helpers.h>
-+
-+void isolate_memcg(struct bpf_sock *ctx)
-+{
-+	int flags = SK_BPF_MEMCG_SOCK_ISOLATED;
-+
-+	bpf_setsockopt(ctx, SOL_SOCKET, SK_BPF_MEMCG_FLAGS,
-+		       &flags, sizeof(flags));
-+}
-+
-+SEC("cgroup/sock_create")
-+int sock_create(struct bpf_sock *ctx)
-+{
-+	isolate_memcg(ctx);
-+	return 1;
-+}
-+
-+SEC("cgroup/sock_accept")
-+int sock_accept(struct bpf_sock *ctx)
-+{
-+	isolate_memcg(ctx);
-+	return 1;
-+}
-+
-+char LICENSE[] SEC("license") = "GPL";
+diff --git a/drivers/net/phy/fixed_phy.c b/drivers/net/phy/fixed_phy.c
+index f0e8a6c52..616dff089 100644
+--- a/drivers/net/phy/fixed_phy.c
++++ b/drivers/net/phy/fixed_phy.c
+@@ -342,16 +342,12 @@ module_init(fixed_mdio_bus_init);
+ static void __exit fixed_mdio_bus_exit(void)
+ {
+ 	struct fixed_mdio_bus *fmb = &platform_fmb;
+-	struct fixed_phy *fp, *tmp;
+ 
+ 	mdiobus_unregister(fmb->mii_bus);
+ 	mdiobus_free(fmb->mii_bus);
+ 
+-	list_for_each_entry_safe(fp, tmp, &fmb->phys, node) {
+-		list_del(&fp->node);
+-		kfree(fp);
+-	}
+-	ida_destroy(&phy_fixed_ida);
++	for (int i = 0; i < PHY_MAX_ADDR; i++)
++		fixed_phy_del(i);
+ }
+ module_exit(fixed_mdio_bus_exit);
+ 
 -- 
-2.51.0.261.g7ce5a0a67e-goog
+2.50.1
 
 
