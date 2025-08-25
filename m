@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-216651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 345A5B34C31
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B55F7B34C32
 	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 22:42:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6DCE37B5E03
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 20:40:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 176B33ACF8F
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 20:42:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7359F29AAFD;
-	Mon, 25 Aug 2025 20:42:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC15629BD82;
+	Mon, 25 Aug 2025 20:42:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xnmBf/xw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O+qz9KxU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00EF7299923
-	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 20:42:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F8629AAE3
+	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 20:42:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756154527; cv=none; b=Ltw4rfa9afzJdDAPR2E0njm/3s2Hjex0RiDmiOUkQkkGw31OlZblW9cN9c2adI1QCj5WNrG+C6oBKztzS6WZOfZMFVeCx8sVT36ILQ3oTAuPqgJ3e9QdFfDTY3ZMT2lM7dRVyMY8RNvZWKks9rAHcoGGzBiyD6ubwRW8K4gOnV8=
+	t=1756154528; cv=none; b=QHjx4IsDmBrj89rpCQGzfymz307wmJGTqLYNzRwhfpuHW16yZZL+8givfkO6eu4iQuYg3xFRojGMjgDGq9IDydInqrTJX1cEkSHYoSJ7el0ZDUfivzSHu0tKzX/uZfNRSo69CN36pyXdmzwI2ZNSVouLkOIdMLtzOwEADL4OUTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756154527; c=relaxed/simple;
-	bh=4rXmMRFD64XHpP5U2HG6+KlmRMHsrl66jIkUtOubPRk=;
+	s=arc-20240116; t=1756154528; c=relaxed/simple;
+	bh=LS671NhhQdD8carTwkBj4ybZXZ/YovJU9pOCUsy5dgc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=aISVJB0SWOqwBOweRRM0Jyf7M/wT9Kajp0id1IbbxLn+upzzT/lHQ+9YJ/ODwCv/lZhzy7nQFTvYCtMWd9U60zQ9GdzAQm55gNIc5BSF6He9kDtY0Nx8qB/lOIjVrAPO7g+EPpT2O6CiRIPtd3c1XEpHhJUB8Gfk07nIvq48kM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xnmBf/xw; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=ENfm/bQqb6PhqjpMl6ptgNRqn1BXO7OJO5R/sr5Zx6gSw2o32EAjW0RSfIEYNWRMq59U8AA1ZFgqH0ojUhvJnJwUmzYztc/EAJM38DMrOzqko1Elo2ZFsB1/1uaDr2CaaXElwetjm1OBjkITl2i8vRXTHOmV4n5uCOlA2EalVC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O+qz9KxU; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2445805d386so55154915ad.1
-        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 13:42:05 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-325228e9bf0so3631296a91.2
+        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 13:42:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756154525; x=1756759325; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1756154527; x=1756759327; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=a1iEMvNSSHEK3UBfywaJhFVsUiqhT5a2Kaw2G5DT8bE=;
-        b=xnmBf/xw0aLcD+TsSfHGazl0w6oFJbU0oXksm2Rz6Zumbqd0CWDot/BUd2hx0cP+ye
-         y6eAozsK0MWnuV2nbkKHHWREtJ4ZGJcr47aDPLFRuaYTDovGW8Ry7xgUiqlEVrSkkc6Y
-         092dqADTWHpQE7EjBPu3d8RA4x9TjZAH4xaDlVu7q+ddxPEaePKJzPub81T/LWmPiz/i
-         eE6GJQ2+gQECeKwwlLqBd0Wqgx5tDdOrpw1gySiiCpVVB0Ll6baaDpW5ONwKL65643tV
-         +9aA6CXSvK8BU5lP3FTJusrKvKNkZoA05huayD2tI5xrJJtLSZItGW0aYR8CAuOXRONw
-         2OIA==
+        bh=+cMygPmSM6dCzNwKSL7a/sRqPm0XfUojhTDtJh8dGVo=;
+        b=O+qz9KxUIiTdXT7fk+yD1xMhS1kJYVDohUVqQ205MTuPT/AN2YCAriXL8ki3mdOyDt
+         aX3Vt9zHXRehnhGOr+c9fN2RReHTwt2O8u1UPctiEkSvsmlEN4ouU6e21Nx+Qpre4UhU
+         4lZLGCuCMAIDOxEa45XYOHFs5RTqRFw/aJat9SRaCbOHN+0/2i9yU3of9NmEDgZzkpAH
+         a1KosLST1WZUbk5GzZGpZii8pOpN9LDrujYKsIPmBGRnhG+PGADSonItcIvbMJ2TcQzR
+         cKOgrTVRrxOoLJ3ws5qN98PReOkc0XCyI69vP3JRIGMhBhfmamjCihcWr6ise8E6Cawm
+         a0Sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756154525; x=1756759325;
+        d=1e100.net; s=20230601; t=1756154527; x=1756759327;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=a1iEMvNSSHEK3UBfywaJhFVsUiqhT5a2Kaw2G5DT8bE=;
-        b=T9QviYuI8BSwr2o545af8fSqd4ROSOFVJRiA975LAPx8BxxmThlnMXDfQYR7Md5Oio
-         UZugfq6NpgMv7vAtVWOXcyaQ9R8oIVwyaRhi8LSxK5x+MAb/41c00fMZ78ZjNYLO5LSV
-         akn4/msF3+uy+7d+Pn5qGvOQLfIokyZe6ouljmib/vbjRwbpAg5JL8BQ7FTuYjH8Qm4b
-         Tl+FWFnDr4xRCWj1LjPbyv9wNbxGJp1h9xx5C2ladKMqKGdGnuHRi4uhj00iOim/YaVn
-         rK4Cdtb35IPJoxie8dIjeZQOBG638VsTveh4zWcF5JNPqLHMNPEbU96FCk/VpQXOspWn
-         IQsA==
-X-Forwarded-Encrypted: i=1; AJvYcCUVUW0qDyPlr0/qfVb10HCEB2jeifp922MPbQeVqJgWTfM7yLfly+cx8LDcvXEcBIrRD7dhdns=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWxOxRYhEfIch6Gx8iNwgHrVy/p47/zUPORq1PiJwdBmhcHyxl
-	G2S23JWTT6UMKAmQDq1TP0Yg0DnAIEFGdV4T+uOpFhsk8s+m+lSTY1l/VuCWTA1g/dEuxyMSpSj
-	KKTtluA==
-X-Google-Smtp-Source: AGHT+IEEx5IvnJax79C6l0WqmcNrk0h1qJqQQotsVTVYudQ+lM8kKGwGvQUv5XZ3YaB7jHef6d1SHrw8UK4=
-X-Received: from plbv20.prod.google.com ([2002:a17:903:44d4:b0:234:bca4:b7b3])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:32ce:b0:246:d385:233a
- with SMTP id d9443c01a7336-246d3852679mr52943455ad.25.1756154525223; Mon, 25
- Aug 2025 13:42:05 -0700 (PDT)
-Date: Mon, 25 Aug 2025 20:41:26 +0000
+        bh=+cMygPmSM6dCzNwKSL7a/sRqPm0XfUojhTDtJh8dGVo=;
+        b=D3E+h0HyAm7zEh3lh7LbTFh9LFvcO9+a2l5jJ6jQOmr3runlBir7PanF0diU1a5KJs
+         RDcO/odKQEgtB1B3g826RR2tvpRkh3xMZeY5OYcI4jRoUu7RTkxyhSZYanWaetcYDLnT
+         dbKJnI5wvlkXrMGrduwJY8s+VJ3Ig7RwnfPdeQksCcWT5ngNKceSEYoYuBSLZI0BI/ey
+         mDhcOU/cUX181ls1Rg2/n31f36tsLLuuyd+TOJ158RhCEaGuuEHet13IsvXPAumQtUtM
+         0k85gtf+lEUk/sAdPnghg7CHA/9MwmiDYPkfH4Yr1otTLGjb1WKlhDqLQWSzWGwqzKoY
+         MvZw==
+X-Forwarded-Encrypted: i=1; AJvYcCU+LYhJDyTH5IxgNXNt4rNrHGiS8PFDgINS+u3D9y4VfBnuuJ1bRbmbJVty8AhH27aLXp/Vvaw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxv62kam6MsACvbWes/E3d9jcyB1L6Rj7CHJX0HSAygCELzTRXb
+	ib8cxhfabgX9/mhfioktCLANyowhf5Ocig4J5mvVrXX89sK61nBl0Dok7yyQyr9o1WcJELlQSmE
+	i8T4l8A==
+X-Google-Smtp-Source: AGHT+IFD/FRGMPp/I7HaEhHJuo7Brtmh1xzlKhB4uWOGVmrBs3e9LUIXIMVuyKYEXZQfTl5Y8mnc1DtPKgc=
+X-Received: from pjur3.prod.google.com ([2002:a17:90a:d403:b0:325:74fd:b81])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1b47:b0:246:9a64:8cbe
+ with SMTP id d9443c01a7336-2469a648de7mr89403205ad.36.1756154526828; Mon, 25
+ Aug 2025 13:42:06 -0700 (PDT)
+Date: Mon, 25 Aug 2025 20:41:27 +0000
 In-Reply-To: <20250825204158.2414402-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250825204158.2414402-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.51.0.261.g7ce5a0a67e-goog
-Message-ID: <20250825204158.2414402-4-kuniyu@google.com>
-Subject: [PATCH v2 bpf-next/net 3/8] libbpf: Support BPF_CGROUP_INET_SOCK_ACCEPT.
+Message-ID: <20250825204158.2414402-5-kuniyu@google.com>
+Subject: [PATCH v2 bpf-next/net 4/8] bpftool: Support BPF_CGROUP_INET_SOCK_ACCEPT.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
 	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>
@@ -92,31 +92,41 @@ Content-Type: text/plain; charset="UTF-8"
 Let's support the new attach_type for cgroup prog to
 hook in __inet_accept().
 
+Now we can specify BPF_CGROUP_INET_SOCK_ACCEPT as
+cgroup_inet_sock_accept:
+
+  # bpftool cgroup attach /sys/fs/cgroup/test \
+      cgroup_inet_sock_accept pinned /sys/fs/bpf/sk_memcg_accept
+
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- tools/lib/bpf/libbpf.c | 2 ++
- 1 file changed, 2 insertions(+)
+ tools/bpf/bpftool/cgroup.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
-index 8f5a81b672e1..c1b28a3e6d6f 100644
---- a/tools/lib/bpf/libbpf.c
-+++ b/tools/lib/bpf/libbpf.c
-@@ -81,6 +81,7 @@ static const char * const attach_type_name[] = {
- 	[BPF_CGROUP_INET_INGRESS]	= "cgroup_inet_ingress",
- 	[BPF_CGROUP_INET_EGRESS]	= "cgroup_inet_egress",
- 	[BPF_CGROUP_INET_SOCK_CREATE]	= "cgroup_inet_sock_create",
-+	[BPF_CGROUP_INET_SOCK_ACCEPT]	= "cgroup_inet_sock_accept",
- 	[BPF_CGROUP_INET_SOCK_RELEASE]	= "cgroup_inet_sock_release",
- 	[BPF_CGROUP_SOCK_OPS]		= "cgroup_sock_ops",
- 	[BPF_CGROUP_DEVICE]		= "cgroup_device",
-@@ -9584,6 +9585,7 @@ static const struct bpf_sec_def section_defs[] = {
- 	SEC_DEF("cgroup_skb/egress",	CGROUP_SKB, BPF_CGROUP_INET_EGRESS, SEC_ATTACHABLE_OPT),
- 	SEC_DEF("cgroup/skb",		CGROUP_SKB, 0, SEC_NONE),
- 	SEC_DEF("cgroup/sock_create",	CGROUP_SOCK, BPF_CGROUP_INET_SOCK_CREATE, SEC_ATTACHABLE),
-+	SEC_DEF("cgroup/sock_accept",	CGROUP_SOCK, BPF_CGROUP_INET_SOCK_ACCEPT, SEC_ATTACHABLE),
- 	SEC_DEF("cgroup/sock_release",	CGROUP_SOCK, BPF_CGROUP_INET_SOCK_RELEASE, SEC_ATTACHABLE),
- 	SEC_DEF("cgroup/sock",		CGROUP_SOCK, BPF_CGROUP_INET_SOCK_CREATE, SEC_ATTACHABLE_OPT),
- 	SEC_DEF("cgroup/post_bind4",	CGROUP_SOCK, BPF_CGROUP_INET4_POST_BIND, SEC_ATTACHABLE),
+diff --git a/tools/bpf/bpftool/cgroup.c b/tools/bpf/bpftool/cgroup.c
+index 944ebe21a216..593dabcf1578 100644
+--- a/tools/bpf/bpftool/cgroup.c
++++ b/tools/bpf/bpftool/cgroup.c
+@@ -48,7 +48,8 @@ static const int cgroup_attach_types[] = {
+ 	BPF_CGROUP_SYSCTL,
+ 	BPF_CGROUP_GETSOCKOPT,
+ 	BPF_CGROUP_SETSOCKOPT,
+-	BPF_LSM_CGROUP
++	BPF_LSM_CGROUP,
++	BPF_CGROUP_INET_SOCK_ACCEPT,
+ };
+ 
+ #define HELP_SPEC_ATTACH_FLAGS						\
+@@ -68,7 +69,8 @@ static const int cgroup_attach_types[] = {
+ 	"                        cgroup_unix_sendmsg | cgroup_udp4_recvmsg |\n" \
+ 	"                        cgroup_udp6_recvmsg | cgroup_unix_recvmsg |\n" \
+ 	"                        cgroup_sysctl | cgroup_getsockopt |\n" \
+-	"                        cgroup_setsockopt | cgroup_inet_sock_release }"
++	"                        cgroup_setsockopt | cgroup_inet_sock_release |\n" \
++	"                        cgroup_inet_sock_accept }"
+ 
+ static unsigned int query_flags;
+ static struct btf *btf_vmlinux;
 -- 
 2.51.0.261.g7ce5a0a67e-goog
 
