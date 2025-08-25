@@ -1,105 +1,141 @@
-Return-Path: <netdev+bounces-216437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF18EB339AB
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 10:43:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B0EAB339DB
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 10:47:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C255A1B23AA4
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 08:43:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11D9E16552D
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 08:47:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 491C9280CF1;
-	Mon, 25 Aug 2025 08:40:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 385D729D283;
+	Mon, 25 Aug 2025 08:47:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="1XR0yl1R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A67592737FC
-	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 08:40:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B89974D599;
+	Mon, 25 Aug 2025 08:47:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756111246; cv=none; b=kQe1M7/5k6t8zINw/v6kOdGzT6vog2yGFFM3ZcLRX3dvTwdbuJss8O5Oywh+UgVDWbhPuozvwK/MkkXhxzB/RG+F4RNMYebyM1w5uMPXk+zNNGxt4+Gs9LCYV/RkSNbajyJwiZ6EJ8KD665jc9dx8WWTYeNhSz7mhyWB90IdB9w=
+	t=1756111672; cv=none; b=HrckrXeUep7HJ0scNO8yyk9QFrJKSFDz5Xge7zV7S70GdFbBDisObUlzZ20ynoVMiSr8ASsFaNNtlnJd1o/8a8ctUJsF87LliAZmWpcGkLBOTOvWoXP/JZfh3P2n8BrbrEs1GWHAJZ2P/hffHvAwSFUyG4Hu08ob34BzO2Dz1n0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756111246; c=relaxed/simple;
-	bh=X+2Fbj6S8nuzTyz+2ZgkfPG0CBKFKbl5r8jvD7hPPYw=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ecFw8DVvg1H8LMe5jzlLtuIhszmhlLgmyWZ0fRShrkH8T2gw5N0RrcGKRr/hmVEukXmgacBN05xbgAF6gCelCk0F7EjEflb/ZEuuSPmibGD5XY6GEqpOD3I7P/sAmqmjCNqWfAfrUScVEyXkF1O/SqJMjUXheCSrrOCZZlMTuiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3ed0f07fca2so5476425ab.0
-        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 01:40:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756111244; x=1756716044;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=e8Hdg78udQncgEx19zGqlBrSwHXLvMSvhZx9CS0nBD8=;
-        b=paXzyGOPdbaxUSHZubeH56u1iGsxjMqcrNk4zYfhxzM1RWwRVAroRxycX0p7dq0R2g
-         N8E7pxmI1XDwhI8V9czVrIv7F+nqzDYijmRQAjIRT+kswneC6s/cCx/brO4Wbx7IBv9x
-         yfVdoZLHQCDG19b0hef+XWeP3W+RUVKrSAyJ5qemwTlJ2bPPnG9BKEQndZdkDjG5dXuI
-         +mdS6A7z/Xv5QQbnPR4O1p5wQj90/VxfRo3qI0FTsxvK60BlEujGE0akENkxk/WOhvqx
-         VG8fHk4huEC4WZUOE1TGcMZOWbJNNj8UTrYIn1MfJPqYPF5FNsRH+3kmRQraklZRfZLc
-         ZqAg==
-X-Forwarded-Encrypted: i=1; AJvYcCVzsqB0zGOArWinIIg7IEsGsUgrNcKozpG+GHGiXhdD1p+Cg3QZePX3Jr4fmGYmAjcE5ldox9w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2kEApiY8HySzaKnfrXKGXHF4OHF8CPm01hIIGzascF9AxVVO6
-	6E4mucD4ey2oFHIKwYNybpoxKgpLbRfUDa+JwicbQ/yNUEeFkchRYkRASGj8eBXrhbhcFT82/2L
-	s3Zk180jpLS223g7E4cqCL9sQmOqykzIpvctN9LMaNCe1R963jzHI57f4GP8=
-X-Google-Smtp-Source: AGHT+IEQfoxqhW0ZEVExh/MHqvkydluHD+eOCLUCHY06tn4EmF6hVh3z9SaoiIVaJjMovJ0zERaluIe6O4SZp8xXKp0EnsfuGvQT
+	s=arc-20240116; t=1756111672; c=relaxed/simple;
+	bh=6/zd2oe4tQuTmgARpJtHt62iSQycVM6PzrqxAZU4Reo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=icack3vAvmnUkmtUVTuDHdFEz/HgUYQ1wfq/ByisYsHjv9TDkUGkPXgXEcsYhPmYRCePAEoVCCrd3Sfkuc+akk6RaGytU1H7YnG8C/x+RbKqcCVCcm8vGjDHNcWehXGrDRoHuJfhFZfcM7j9AWu4h2+8i41aNPbZfjF7NMmUym0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=1XR0yl1R; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 8BDE21A0666;
+	Mon, 25 Aug 2025 08:47:45 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 5A556605F1;
+	Mon, 25 Aug 2025 08:47:45 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C45C01C22DBF3;
+	Mon, 25 Aug 2025 10:47:22 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1756111664; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=6/zd2oe4tQuTmgARpJtHt62iSQycVM6PzrqxAZU4Reo=;
+	b=1XR0yl1RAKAsVxzi15g6YD2g1MurVf5QJ2qUaQn4GgcT51s545puimGwSlrxTkhVYsJd21
+	yN9HUMD0ioas3zw1ZGGzCA+1nEUobI+yNQaVpkhNP47OOudGFTccZeF+E7pV9PnJSaE91s
+	DlrivWeiMNJAZE0eupdl2HOwnIoWJm67ijADF9CgxwnsYROCG8X67bivSJTbTZPDZ5rgh2
+	/y2EhGdlca9H9vbdmIFlYJVVlt3U5we07LMDU8OUVufc/V/BF9PK2u8iLd0MY9J1th4DCA
+	E4AIBBRcDkS6CT0NK1J+wftdiO3SL299+tgruvM30Wec0D4N7sgSV0U0tCvPZg==
+Date: Mon, 25 Aug 2025 10:47:21 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, kernel@pengutronix.de, Dent Project
+ <dentproject@linuxfoundation.org>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Kyle Swenson <kyle.swenson@est.tech>
+Subject: Re: [PATCH net-next 2/2] net: pse-pd: pd692x0: Add sysfs interface
+ for configuration save/reset
+Message-ID: <20250825104721.28f127a2@kmaincent-XPS-13-7390>
+In-Reply-To: <d4bc2c95-7e25-4d76-994f-b68f1ead8119@lunn.ch>
+References: <20250822-feature_poe_permanent_conf-v1-0-dcd41290254d@bootlin.com>
+	<20250822-feature_poe_permanent_conf-v1-2-dcd41290254d@bootlin.com>
+	<d4bc2c95-7e25-4d76-994f-b68f1ead8119@lunn.ch>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:148c:b0:3e5:5269:89be with SMTP id
- e9e14a558f8ab-3e921a5d80dmr165890935ab.15.1756111243758; Mon, 25 Aug 2025
- 01:40:43 -0700 (PDT)
-Date: Mon, 25 Aug 2025 01:40:43 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68ac218b.a00a0220.33401d.0401.GAE@google.com>
-Subject: [syzbot] Monthly hams report (Aug 2025)
-From: syzbot <syzbot+listc5aabc82846dc8bee53a@syzkaller.appspotmail.com>
-To: linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-Hello hams maintainers/developers,
+Hello Andrew,
 
-This is a 31-day syzbot report for the hams subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/hams
+Le Fri, 22 Aug 2025 19:17:55 +0200,
+Andrew Lunn <andrew@lunn.ch> a =C3=A9crit :
 
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 9 issues are still open and 41 have already been fixed.
+> On Fri, Aug 22, 2025 at 05:37:02PM +0200, Kory Maincent wrote:
+> > From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+> >=20
+> > Add sysfs attributes save_conf and reset_conf to enable userspace
+> > management of the PSE's permanent configuration stored in EEPROM.
+> >=20
+> > The save_conf attribute allows saving the current configuration to
+> > EEPROM by writing '1'. The reset_conf attribute restores factory
+> > defaults and reinitializes the port matrix configuration. =20
+>=20
+> I'm not sure sysfs is the correct interface for this.
+>=20
+> Lets take a step back.
+>=20
+> I assume ethtool will report the correct state after a reboot when the
+> EEPROM has content? The driver does not hold configuration state which
+> cannot be represented in the EEPROM?
 
-Some of the still happening issues:
+In fact I assumed it is an EEPROM but it is described as non volatile memory
+so I don't know which type it is.
 
-Ref Crashes Repro Title
-<1> 5358    Yes   possible deadlock in nr_rt_device_down (3)
-                  https://syzkaller.appspot.com/bug?extid=ccdfb85a561b973219c7
-<2> 1111    Yes   possible deadlock in nr_rt_ioctl (2)
-                  https://syzkaller.appspot.com/bug?extid=14afda08dc3484d5db82
-<3> 327     Yes   possible deadlock in nr_remove_neigh (2)
-                  https://syzkaller.appspot.com/bug?extid=8863ad36d31449b4dc17
-<4> 155     No    possible deadlock in serial8250_handle_irq
-                  https://syzkaller.appspot.com/bug?extid=5fd749c74105b0e1b302
-<5> 28      Yes   KMSAN: kernel-infoleak in move_addr_to_user (7)
-                  https://syzkaller.appspot.com/bug?extid=346474e3bf0b26bd3090
-<6> 7       Yes   WARNING: refcount bug in ax25_setsockopt
-                  https://syzkaller.appspot.com/bug?extid=0ee4da32f91ae2a3f015
+Yes ethtool report the current configuration which match the saved one if i=
+t has
+been saved before. No the driver doesn't hold any state that can not be
+represented in the non-volatile memory.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> Is the EEPROM mandatory, or optional? Is it built into the controller?
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+It is built into the controller. It seem there are version of this
+controller that does not support it : "This command is not supported by
+PD69200M."
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+> How fast is it to store the settings?
 
-You may send multiple commands in a single email message.
+2 i2c messages and a 50 ms wait as described in the datasheet.
+=20
+> I'm wondering if rather than having this sysfs parameter, you just
+> store every configuration change? That could be more intuitive.
+
+I have not thought of it. I don't know if it is a good idea. We may need
+feedback from people that actually use PSE on field. Kyle any idea on this?
+In any case we still need a way to reset the configuration through sysfs or
+whatever other way.
+
+> I've not looked at the sysfs documentation. Are there other examples
+> of such a property?
+
+Not sure for that particular save/reset configuration case.
+Have you another implementation idea in mind?
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
