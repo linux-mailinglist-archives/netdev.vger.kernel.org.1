@@ -1,104 +1,110 @@
-Return-Path: <netdev+bounces-216414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A10CEB33820
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 09:49:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86DBCB33848
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 09:54:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE151189BD73
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 07:49:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FC12174767
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 07:54:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4431129B233;
-	Mon, 25 Aug 2025 07:48:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCC9029993A;
+	Mon, 25 Aug 2025 07:54:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b="F+CZpcEH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K5KRz0zF"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D355C221578;
-	Mon, 25 Aug 2025 07:48:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756108119; cv=pass; b=F2pwl1kzAZsJcM97E9ZC5+jvbGcOAAp15GIuDOOzDqpPEPeGJyQlbPiE9UJJ5UXCacMjlILdFCENjxFsK5ZCqpp6bVjQy7a90KhsbqwiwCVhNw9HTqoNPr6SzaFe4WFGEBbe8qHiV9uG1AQ0YHBrbenGjspeDBGTu0UJFUmJOTY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756108119; c=relaxed/simple;
-	bh=R5WQhVv7rK8cy7Q4wz4ZKiJYZYoscvA7NtPO3IDhYFw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ouYBTlir4PXZ+pAsmXmhRwSXSEgx/vtOxBsC8cLtaLakd5iHcsOSHz8OJq8a5FvkS7d/IihkDu75RpQTHsbLl4xO8i00BbK27cSpYB7GkHz3XGKDOv+93v7tZytr+I1IUd4ZciVae/fhWEUGobp5OYUhfMhDoebXrxptzgMyXK0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b=F+CZpcEH; arc=pass smtp.client-ip=136.143.188.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1756108093; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=Mif53jBa6MJhiFA3/aeaKEpanFEPOgAIH7H2ZuUdsrAtRPu/MgbOT3DP6FBY2rj6ePbMjSECj12yIiQqzo9EC3onYNcemMOPA7kexfcK9xKDYPuR6j4sRJVelnLZBLEQG0X38Apa47eBKSzmFFuNz9vrZ2uFGldXO/K346zQY/c=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1756108093; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=80dzrh8aYZfGg2XUHBNmSgUetz0wp59La7rrflIHLYk=; 
-	b=hTrQDB+vFRUoh2TzCLNct7ZH6mA+ZiLxyi08MHJ278n9kJefJSS8W0fZv6yV5vnJvzDAcQZhLzydoq1k/A5PczB6y4tbslyaC/qdgSZhpG/4L25+svqU468G3JXb+BZHKPSOMfmr/+kta3MYdiQArODPHxGvpuzc+7VGFRmUwYk=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=nicolas.frattaroli@collabora.com;
-	dmarc=pass header.from=<nicolas.frattaroli@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1756108093;
-	s=zohomail; d=collabora.com; i=nicolas.frattaroli@collabora.com;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Content-Type:Message-Id:Reply-To;
-	bh=80dzrh8aYZfGg2XUHBNmSgUetz0wp59La7rrflIHLYk=;
-	b=F+CZpcEHNCcVVD5E2eusUhfW3VOUS/ZWUIpDXxI5z5QeKjtOV9RCcGxyZ/bOxE14
-	x+XVoB1b6xaPLKM4peUQofBqgx8GIHy0CMMo5WJvpvX22tuJAS78545/+5x34SM4fh0
-	HU9zR45BRWmSNqHl8sXRyIGwQroD2o9wsHxVH/9U=
-Received: by mx.zohomail.com with SMTPS id 1756108090913704.2939268893988;
-	Mon, 25 Aug 2025 00:48:10 -0700 (PDT)
-From: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
-To: Stephen Boyd <sboyd@kernel.org>
-Cc: kernel@collabora.com, linux-kernel@vger.kernel.org,
- linux-mmc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-rockchip@lists.infradead.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-phy@lists.infradead.org,
- linux-sound@vger.kernel.org, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com, linux-pci@vger.kernel.org,
- linux-pm@vger.kernel.org, linux-clk@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH v2 19/20] clk: sp7021: switch to FIELD_PREP_WM16 macro
-Date: Mon, 25 Aug 2025 09:48:05 +0200
-Message-ID: <2795210.mvXUDI8C0e@workhorse>
-In-Reply-To: <175340605069.3513.18204498860033427106@lazor>
-References:
- <20250623-byeword-update-v2-0-cf1fc08a2e1f@collabora.com>
- <20250623-byeword-update-v2-19-cf1fc08a2e1f@collabora.com>
- <175340605069.3513.18204498860033427106@lazor>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 509BF28B3EB
+	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 07:54:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756108442; cv=none; b=fO6buGRnbOG2WGCkLlieWQlyLek+dk6q+sOCrRO4ADvo091pp9BjwhypmqCav2KErCoayuk0ZKl1vZkcbyWYdrYsUrT+cQFE9WIP1C3RsxtJGtY5WZumr4ZFgTkXjz6ZG+Pg2ksLZYH+FrQZxikDPKVpo9evWcLSQ9DaF6dJMkE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756108442; c=relaxed/simple;
+	bh=fJELBPGfr6DDdhGHLk15qKUnTRmXxrJKh2/NYGTN9vQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ac2Nm4aj5Gj/DGy16xRTnH6DEJXZHdiDbosnm/JQmxPqZPopLR/ISi19OoHgXBpCyRH3Ium/8AEjK0yeI/zJ8yVJh7D5SpS0IAwl2Lr26urV43ki/wEp0GGsik8ej96pd4i0BW8QT3TMpOB+teEf4OjjLhYQQhBTX8XKnbuioNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K5KRz0zF; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756108439;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6HSbEb9TE9a0hDvp7QsHnLnkasX81TE79idDzsvFWLk=;
+	b=K5KRz0zFZMoCubx5eW9wVvJqOBwWtvLE0S72gkqYUVbx97Bu5rs4fqPzv3iW5nUIEKlcZ2
+	GH+8oINfYpnh/K/U+sAyUWe54NyzvkGffgGnQ2FFNWRyBzZaghPZVejqDUAOmO2UJIUvEZ
+	weFqUAuYflf7ujvk3n4MPoX+82IyGeI=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-182-X2vwgUQBPU2mq6GV33TESg-1; Mon,
+ 25 Aug 2025 03:53:55 -0400
+X-MC-Unique: X2vwgUQBPU2mq6GV33TESg-1
+X-Mimecast-MFC-AGG-ID: X2vwgUQBPU2mq6GV33TESg_1756108432
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EEB51180035B;
+	Mon, 25 Aug 2025 07:53:51 +0000 (UTC)
+Received: from localhost (unknown [10.43.135.229])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BE621180044F;
+	Mon, 25 Aug 2025 07:53:46 +0000 (UTC)
+Date: Mon, 25 Aug 2025 09:53:44 +0200
+From: Miroslav Lichvar <mlichvar@redhat.com>
+To: Kurt Kanzenbach <kurt@linutronix.de>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Paul Menzel <pmenzel@molgen.mpg.de>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-next v2] igb: Convert Tx timestamping to PTP aux
+ worker
+Message-ID: <aKwWiGkbDyEOS9-z@localhost>
+References: <20250822-igb_irq_ts-v2-1-1ac37078a7a4@linutronix.de>
+ <20250822075200.L8_GUnk_@linutronix.de>
+ <87ldna7axr.fsf@jax.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87ldna7axr.fsf@jax.kurt.home>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Friday, 25 July 2025 03:14:10 Central European Summer Time Stephen Boyd wrote:
-> Quoting Nicolas Frattaroli (2025-06-23 09:05:47)
-> > The sp7021 clock driver has its own shifted high word mask macro,
-> > similar to the ones many Rockchip drivers have.
-> > 
-> > Remove it, and replace instances of it with hw_bitfield.h's
-> > FIELD_PREP_WM16 macro, which does the same thing except in a common
-> > macro that also does compile-time error checking.
-> > 
-> > This was compile-tested with 32-bit ARM with Clang, no runtime tests
-> > were performed as I lack the hardware. However, I verified that fix
-> > commit 5c667d5a5a3e ("clk: sp7021: Adjust width of _m in HWM_FIELD_PREP()")
-> > is not regressed. No warning is produced.
-> 
-> Does it generate the same code before and after?
-> 
+On Sat, Aug 23, 2025 at 09:29:36AM +0200, Kurt Kanzenbach wrote:
+> Also I couldn't really see a performance degradation with ntpperf.
 
-Yes, the generated machine code is exactly the same, at least with
-clang, and I'll assume it'll be the same for gcc.
+I was testing with an I350, not I210. Could that make a difference?
 
-Kind regards,
-Nicolas Frattaroli
+> In my
+> tests the IRQ variant reached an equal or higher rate. But sometimes I
+> get 'Could not send requests at rate X'. No idea what that means.
 
+That's ntpperf giving up as the HW is too slow to send requests at
+that rate (with a single process calling sendmmsg() in a loop). You
+can add the -l option to force ntpperf to continue, but the printed
+rate values will no longer be accurate, you would need to measure it
+by some other way, e.g. by monitoring the interface packet counters.
+
+-- 
+Miroslav Lichvar
 
 
