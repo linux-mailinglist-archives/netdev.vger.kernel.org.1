@@ -1,174 +1,171 @@
-Return-Path: <netdev+bounces-216647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E886B34C28
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 22:38:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7D38B34C2B
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 22:42:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E94BE7A0FB2
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 20:37:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C726B1A82BC6
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 20:42:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 302202367C9;
-	Mon, 25 Aug 2025 20:38:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E7A7271475;
+	Mon, 25 Aug 2025 20:42:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blaese.de header.i=@blaese.de header.b="UeXw7fEV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dIgXY5Uw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.sgstbr.de (mail.sgstbr.de [94.130.16.203])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B7535965;
-	Mon, 25 Aug 2025 20:38:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.130.16.203
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C41C230BF8
+	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 20:42:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756154316; cv=none; b=GGIpGOOi9wT06lmBvnbdPvAM/cD4xhH5ok+uBbhmHcwi4s5bLKSg/MBeBbjD4piPcv6DlQttA5+IpJjj3pgNxWtnALEciR9M4p7LbmywUPDNrqoZ9KI6Mry/h5BDnuPEYXnoReERHZygFqcNVf3jo3gawM0PxATeDHMOzfCmdwg=
+	t=1756154523; cv=none; b=I/HSxjuHcyIKpIA3hjJjPyelGXJteDJR75sb00O0P5Xg1XYK7QSHyqeLYOJEAGkAj3K0FNN/4e5ip0pd3VRCeoMH+Ca+8t5+260XsVrO4uZGDJbjwa2yF7Uk9J9oWyJp3myNotcrwgKt50pxXkHWfzy18EGdmuvRM9mXLYRofbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756154316; c=relaxed/simple;
-	bh=W13+6u4LQTAWAcuSSKawj+MWvwHUUfX5cEqIGcLDZBY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZdneqM+YvYx3gWUQTtsZJfthqhaBZLvgTuvw1hfQc/QXquuzIBylsO3hl0YCIDbtC8IQgcDQo3Vy6K7Ses9qbLpN9C/Na5tDFj2KYr4wiXDDYNmZjQg+w+Pk1ZnMOW2j+T5WBjKkQPDQyWokjAGP3e7VkRnZ61f0OLmYpoANusM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=blaese.de; spf=pass smtp.mailfrom=blaese.de; dkim=pass (2048-bit key) header.d=blaese.de header.i=@blaese.de header.b=UeXw7fEV; arc=none smtp.client-ip=94.130.16.203
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=blaese.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blaese.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=blaese.de; s=201803;
-	t=1756154312; bh=ZS2UruvdxdddcUS6w+USGX/o4ohUJXVdBYJWX+wqSqc=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=UeXw7fEV2p5aldUqJs9isTusuCqlCcoX0sTpZEeKGwY2QB6KOJ5+HhA7LYxo9GIu6
-	 e4TqQ3klRGV2CrUU4LgeK7mVjq0WE6VuiYXtPPg1pDl7/CCrSIyBDQl0sUm5n9X3zG
-	 utpqUMKBfmbgRPo5rQDrhyWpP4eGiv4SACryl9u5vDPWnpDLb3DXedgbegDs4TBUgZ
-	 XiZpOp2cnnrAo0SH1BTvbrHC1LXNu1ngfsj2kOB4aVLnZtOYL2v6sKYioP/zyIckfM
-	 ftB0qAESkFOO28R4Y8716Zu2F80O6OE2Ml3d/a51Dvoo94iWncofYzzNT2Q0+zPsIu
-	 cPVT9ADGkIB0A==
-Received: from fbl-xps (p200300cd3f1e76004353a7342282dcba.dip0.t-ipconnect.de [IPv6:2003:cd:3f1e:7600:4353:a734:2282:dcba])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fabian@blaese.de)
-	by mail.sgstbr.de (Postfix) with ESMTPSA id B363E24B485;
-	Mon, 25 Aug 2025 22:38:31 +0200 (CEST)
-From: =?UTF-8?q?Fabian=20Bl=C3=A4se?= <fabian@blaese.de>
-To: netdev@vger.kernel.org
-Cc: netfilter-devel@vger.kernel.org,
-	=?UTF-8?q?Fabian=20Bl=C3=A4se?= <fabian@blaese.de>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH v2] icmp: fix icmp_ndo_send address translation for reply direction
-Date: Mon, 25 Aug 2025 22:38:26 +0200
-Message-ID: <20250825203826.3231093-1-fabian@blaese.de>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250825201717.3217045-1-fabian@blaese.de>
-References: <20250825201717.3217045-1-fabian@blaese.de>
+	s=arc-20240116; t=1756154523; c=relaxed/simple;
+	bh=kYQAydJ1EbY++ZoDGw98a3TCSnvGYjIyMoBPPqEFuEo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=p1vuLs4B5E/cEcyBkkXjgBJkFt57cKKzgu8JZYX94Yvvg5i66ZeiqPffCZL1ssAk8RuaBtcgNJPfDzHbwsk8hvXeL7nUiN0AyDCksCReI3RJ4C3ExRMBc/Ok1WuQoYMOcZG6sn/edkU1N1iMzzQYebOOAvSAfbA1Hr+xK9tF/Ko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dIgXY5Uw; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-32505dbe23fso3227102a91.1
+        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 13:42:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756154521; x=1756759321; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=FMMTN25MPwEpLEWhbHeAChLLjarQ3wWFKtFm5KRVlQw=;
+        b=dIgXY5Uwu1q6yePVoWW5mtpF52PhrWJ4/MBGDL2hw6GN6qLt33VpWoypGeSlcOxSOn
+         WVP9Npd32EGaJR1PS3OnkV8YRBHXAw0FPpAahnIKFHdCB2eDwEWXfLK9RCenlg/ockCU
+         u/4hCXDnuT4ro6EjNc1ZOq2n+Qo9isMifEpIiutsLJoLJjIvESgbYV1A12rmULCBdx4u
+         hm/hXn/e8rFmoQ8k8LJwQd3WVW+PP1rn+8W2q8muwVUHdUApxOaz14WvWommExmJhBPV
+         239CTspPsBaCvaG0MoRrjbhp0HDwOjpWJFFN1w2m6ae/23+oTXPkXzQJZYismEiTtljT
+         pCbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756154521; x=1756759321;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FMMTN25MPwEpLEWhbHeAChLLjarQ3wWFKtFm5KRVlQw=;
+        b=wwVTJFObPMEKeSQ+qo3DM++gSdM4XsUVVt+Siw3lBwDl3hQQVIOOQNDyoqzrFj+3jl
+         LulqvuEeNjAjEBLITP8mK5lr9Mg7ZuniSo7YpE4eaxA/BGQyQL/xhgA7eolfbMIe/zV2
+         gYPMum0R5NYwbP2izOyyr/ukrlnL3sriUkvSR8flrdJqb/I73YwVlTAZMK6uR28FyMTJ
+         HUDGnlUJKQhMxUfztglwKMnTRoBnM7c+w52+83Zyt/5gVM01voyWh9/glMnaDYEq2OVk
+         ascqo8/AFEaqQfFMMXenAlElJQjJbsAoUMFfxG/hMhzvHQQueyf3t5B/a3whcfK6l9eQ
+         4iGw==
+X-Forwarded-Encrypted: i=1; AJvYcCW4zbasCwb/5yjJflJ3icdSXQJk4R4WutYexuy1A8JoZgSJd4+a+tsRGdM50e98mc18QjgZGUQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxwmOOTbRYlgHG5UorS85BrkVBQmP9C2PE5y4Mrq4JwL/EDn7UZ
+	pwc7yy25NVwsEE6JijX290N5GSQXwJUDjBmTW6C5+qPF+LQGZKLxBk26Dbbap7+04kECrwKReG4
+	jY09wsA==
+X-Google-Smtp-Source: AGHT+IHxionK0+nIcG7A4rlHEnd+nc/SyYieKdzrZkT3nTaWhI9foWjqT8Y4Pxxt719sWOwSeLtRUkkv12U=
+X-Received: from pjbsp3.prod.google.com ([2002:a17:90b:52c3:b0:31f:61fc:b283])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d918:b0:320:ff84:ceb5
+ with SMTP id 98e67ed59e1d1-32515edcae2mr15057069a91.16.1756154520765; Mon, 25
+ Aug 2025 13:42:00 -0700 (PDT)
+Date: Mon, 25 Aug 2025 20:41:23 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.261.g7ce5a0a67e-goog
+Message-ID: <20250825204158.2414402-1-kuniyu@google.com>
+Subject: [PATCH v2 bpf-next/net 0/8] bpf: Allow decoupling memcg from sk->sk_prot->memory_allocated.
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>
+Cc: John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
+	Roman Gushchin <roman.gushchin@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-The icmp_ndo_send function was originally introduced to ensure proper
-rate limiting when icmp_send is called by a network device driver,
-where the packet's source address may have already been transformed
-by NAT or MASQUERADE.
+Some protocols (e.g., TCP, UDP) have their own memory accounting for
+socket buffers and charge memory to global per-protocol counters such
+as /proc/net/ipv4/tcp_mem.
 
-However, the implementation only considered the IP_CT_DIR_ORIGINAL case
-and incorrectly applies the same logic to packets in reply direction.
+When running under a non-root cgroup, this memory is also charged to
+the memcg as sock in memory.stat.
 
-Therefore, an SNAT rule in the original direction causes icmp_ndo_send to
-translate the source IP of reply-direction packets, even though no
-translation is required. The source address is translated to the sender
-address of the original direction, because the original tuple's source
-address is used.
+Sockets of such protocols are still subject to the global limits,
+thus affected by a noisy neighbour outside cgroup.
 
-On the other hand, icmp_ndo_send incorrectly misses translating the
-source address of packets in reply-direction, leading to incorrect rate
-limiting. The generated ICMP error is translated by netfilter at a later
-stage, therefore the ICMP error is sent correctly.
+This makes it difficult to accurately estimate and configure appropriate
+global limits.
 
-Fix this by translating the address based on the connection direction:
-- CT_DIR_ORIGINAL: Use the original tuple's source address
-  (unchanged from current behavior)
-- CT_DIR_REPLY: Use the reply tuple's source address
-  (fixing the incorrect translation)
+This series allows decoupling memcg from the global memory accounting
+if socket is configured as such by BPF prog.
 
-Fixes: 0b41713b6066 ("icmp: introduce helper for nat'd source address in network device context")
+This simplifies the memcg configuration while keeping the global limits
+within a reasonable range, which is only 10% of the physical memory by
+default.
 
-Signed-off-by: Fabian Bläse <fabian@blaese.de>
-Cc: Jason A. Donenfeld <Jason@zx2c4.com>
----
-Changes v1->v2:
-- Implement fix for ICMPv6 as well
----
- net/ipv4/icmp.c     | 14 ++++++++++++--
- net/ipv6/ip6_icmp.c | 14 ++++++++++++--
- 2 files changed, 24 insertions(+), 4 deletions(-)
+Overview of the series:
 
-diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-index 2ffe73ea644f..a4fb0bc7c4cf 100644
---- a/net/ipv4/icmp.c
-+++ b/net/ipv4/icmp.c
-@@ -803,7 +803,13 @@ void icmp_ndo_send(struct sk_buff *skb_in, int type, int code, __be32 info)
- 	__be32 orig_ip;
- 
- 	ct = nf_ct_get(skb_in, &ctinfo);
--	if (!ct || !(ct->status & IPS_SRC_NAT)) {
-+	if (!ct) {
-+		__icmp_send(skb_in, type, code, info, &opts);
-+		return;
-+	}
-+
-+	if ( !(ct->status & IPS_SRC_NAT && CTINFO2DIR(ctinfo) == IP_CT_DIR_ORIGINAL)
-+		&& !(ct->status & IPS_DST_NAT && CTINFO2DIR(ctinfo) == IP_CT_DIR_REPLY)) {
- 		__icmp_send(skb_in, type, code, info, &opts);
- 		return;
- 	}
-@@ -818,7 +824,11 @@ void icmp_ndo_send(struct sk_buff *skb_in, int type, int code, __be32 info)
- 		goto out;
- 
- 	orig_ip = ip_hdr(skb_in)->saddr;
--	ip_hdr(skb_in)->saddr = ct->tuplehash[0].tuple.src.u3.ip;
-+	if (CTINFO2DIR(ctinfo) == IP_CT_DIR_ORIGINAL) {
-+		ip_hdr(skb_in)->saddr = ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple.src.u3.ip;
-+	} else {
-+		ip_hdr(skb_in)->saddr = ct->tuplehash[IP_CT_DIR_REPLY].tuple.src.u3.ip;
-+	}
- 	__icmp_send(skb_in, type, code, info, &opts);
- 	ip_hdr(skb_in)->saddr = orig_ip;
- out:
-diff --git a/net/ipv6/ip6_icmp.c b/net/ipv6/ip6_icmp.c
-index 9e3574880cb0..c6078694311c 100644
---- a/net/ipv6/ip6_icmp.c
-+++ b/net/ipv6/ip6_icmp.c
-@@ -58,7 +58,13 @@ void icmpv6_ndo_send(struct sk_buff *skb_in, u8 type, u8 code, __u32 info)
- 	struct nf_conn *ct;
- 
- 	ct = nf_ct_get(skb_in, &ctinfo);
--	if (!ct || !(ct->status & IPS_SRC_NAT)) {
-+	if (!ct) {
-+		__icmpv6_send(skb_in, type, code, info, &parm);
-+		return;
-+	}
-+
-+	if ( !(ct->status & IPS_SRC_NAT && CTINFO2DIR(ctinfo) == IP_CT_DIR_ORIGINAL)
-+		&& !(ct->status & IPS_DST_NAT && CTINFO2DIR(ctinfo) == IP_CT_DIR_REPLY)) {
- 		__icmpv6_send(skb_in, type, code, info, &parm);
- 		return;
- 	}
-@@ -73,7 +79,11 @@ void icmpv6_ndo_send(struct sk_buff *skb_in, u8 type, u8 code, __u32 info)
- 		goto out;
- 
- 	orig_ip = ipv6_hdr(skb_in)->saddr;
--	ipv6_hdr(skb_in)->saddr = ct->tuplehash[0].tuple.src.u3.in6;
-+	if (CTINFO2DIR(ctinfo) == IP_CT_DIR_ORIGINAL) {
-+		ipv6_hdr(skb_in)->saddr = ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple.src.u3.in6;
-+	} else {
-+		ipv6_hdr(skb_in)->saddr = ct->tuplehash[IP_CT_DIR_REPLY].tuple.src.u3.in6;
-+	}
- 	__icmpv6_send(skb_in, type, code, info, &parm);
- 	ipv6_hdr(skb_in)->saddr = orig_ip;
- out:
+  patch 1 is a prep
+  patch 2 ~ 4 add a new bpf hook for accept()
+  patch 5 & 6 intorduce SK_BPF_MEMCG_SOCK_ISOLATED for bpf_setsockopt()
+  patch 7 decouples memcg from sk_prot->memory_allocated based on the flag
+  patch 8 is selftest
+
+
+Changes:
+  v2:
+    * Patch 2
+      * Define BPF_CGROUP_RUN_PROG_INET_SOCK_ACCEPT() when CONFIG_CGROUP_BPF=n
+    * Patch 5
+      * Make 2 new bpf_func_proto static
+    * Patch 6
+      * s/mem_cgroup_sk_set_flag/mem_cgroup_sk_set_flags/ when CONFIG_MEMCG=n
+      * Use finer CONFIG_CGROUP_BPF instead of CONFIG_BPF_SYSCALL for ifdef
+
+  v1: https://lore.kernel.org/netdev/20250822221846.744252-1-kuniyu@google.com/
+
+
+Kuniyuki Iwashima (8):
+  tcp: Save lock_sock() for memcg in inet_csk_accept().
+  bpf: Add a bpf hook in __inet_accept().
+  libbpf: Support BPF_CGROUP_INET_SOCK_ACCEPT.
+  bpftool: Support BPF_CGROUP_INET_SOCK_ACCEPT.
+  bpf: Support bpf_setsockopt() for
+    BPF_CGROUP_INET_SOCK_(CREATE|ACCEPT).
+  bpf: Introduce SK_BPF_MEMCG_FLAGS and SK_BPF_MEMCG_SOCK_ISOLATED.
+  net-memcg: Allow decoupling memcg from global protocol memory
+    accounting.
+  selftest: bpf: Add test for SK_BPF_MEMCG_SOCK_ISOLATED.
+
+ include/linux/bpf-cgroup-defs.h               |   1 +
+ include/linux/bpf-cgroup.h                    |   5 +
+ include/net/proto_memory.h                    |  15 +-
+ include/net/sock.h                            |  48 ++++
+ include/net/tcp.h                             |  10 +-
+ include/uapi/linux/bpf.h                      |   7 +
+ kernel/bpf/cgroup.c                           |   2 +
+ kernel/bpf/syscall.c                          |   3 +
+ net/core/filter.c                             |  75 +++++-
+ net/core/sock.c                               |  64 +++--
+ net/ipv4/af_inet.c                            |  34 +++
+ net/ipv4/inet_connection_sock.c               |  26 +--
+ net/ipv4/tcp.c                                |   3 +-
+ net/ipv4/tcp_output.c                         |  10 +-
+ net/mptcp/protocol.c                          |   3 +-
+ net/tls/tls_device.c                          |   4 +-
+ tools/bpf/bpftool/cgroup.c                    |   6 +-
+ tools/include/uapi/linux/bpf.h                |   7 +
+ tools/lib/bpf/libbpf.c                        |   2 +
+ .../selftests/bpf/prog_tests/sk_memcg.c       | 218 ++++++++++++++++++
+ tools/testing/selftests/bpf/progs/sk_memcg.c  |  29 +++
+ 21 files changed, 513 insertions(+), 59 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/sk_memcg.c
+ create mode 100644 tools/testing/selftests/bpf/progs/sk_memcg.c
+
 -- 
-2.50.1
+2.51.0.261.g7ce5a0a67e-goog
 
 
