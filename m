@@ -1,186 +1,201 @@
-Return-Path: <netdev+bounces-216346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E275DB3338C
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 03:31:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B943CB33398
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 03:36:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A43B4172BB5
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 01:31:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E66E7A8673
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 01:34:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 789A313B2A4;
-	Mon, 25 Aug 2025 01:31:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B6A3215F6C;
+	Mon, 25 Aug 2025 01:36:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="DXa56wYt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011004.outbound.protection.outlook.com [52.101.70.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C68B1CA6F;
-	Mon, 25 Aug 2025 01:31:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756085480; cv=none; b=rxbOaSq5fojt4LbityX7pmO2W6KNUw8brXcl7J8wcmFB40XkE6ruqRyTpsPHuuM/OOmwHs8vf/AvuimVXldoUMFX/oKgFxHpCkJP5kjrOPeoRT+vzZfJfdXT2q0h+gv37kfsTK9++c4iCqtSALewqLRPl0aqbAqBQRV7FrWsIEM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756085480; c=relaxed/simple;
-	bh=ip4FvYYw88ouWT6itUmL/S531RHQ7rP5ltgGr1KS+qk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rQB2Z0IjnjURDHzPRCYnN92Xu4mowIUNAXRMXfe1Ga3hjFu6CTwV2myyKZ6sqvnfn/9nlJ9SD3SLfb7mShZ0XNmlK/c4uBxPmuUkYbIObDPR/huz7+0lpEtXd+LYBerDCcWaJ8GV8nPmtfnz/R7eLrtz2FikOckojId6mFj5mWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=18.132.163.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: esmtpsz10t1756085455t51d7e1a8
-X-QQ-Originating-IP: nHucB3JtzMCn34hcRKZD02jofGkp3qyqMaeH0wrqwoo=
-Received: from localhost ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 25 Aug 2025 09:30:53 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 11934234295190835703
-Date: Mon, 25 Aug 2025 09:30:53 +0800
-From: Yibo Dong <dong100@mucse.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
-	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org,
-	gustavoars@kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH net-next v7 4/5] net: rnpgbe: Add basic mbx_fw support
-Message-ID: <8989E7A85A9468B0+20250825013053.GA2006401@nic-Precision-5820-Tower>
-References: <20250822023453.1910972-1-dong100@mucse.com>
- <20250822023453.1910972-5-dong100@mucse.com>
- <a066746c-2f12-4e70-b63a-7996392a9132@lunn.ch>
- <C2BF8A6A8A79FB29+20250823015824.GB1995939@nic-Precision-5820-Tower>
- <f375e4bf-9b0b-49ca-b83d-addeb49384b8@lunn.ch>
- <424D721323023327+20250824041052.GB2000422@nic-Precision-5820-Tower>
- <809527f7-c838-4582-89cb-6cb9d24963dd@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28ADE18FDAF;
+	Mon, 25 Aug 2025 01:36:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.4
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756085778; cv=fail; b=k+fKS+5MkTumrlsiD2TFW55b/BbbHM7qwEprsV95cOGuLv7VRgz5yuPDqAHKrhu+RIrDGXH3DbD4B1gGi/fn8hF2tITwnIryqoSLvdkx8G6fcDV6qKHihTrkuu7V55LMBUFJj9Ja/HZ3mms+LxXYFSuijRynKgxODBWjhTxTBkc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756085778; c=relaxed/simple;
+	bh=fEh7pVWyOc7TFg+0Fvn+qQtVQ0fq2tN5mxVSh5OF5Sw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=V6d3ah0WNj5yRoA1IGhO3k2CcgD8vOU2nAcJOJBIBMAVMJS0lAwdlDiqpVXZGfaZ1mw7BW4WfhCUrKsGNooIkqm0gef6IoJhzkC73drApDTGcU518wdQ03XyfqMSG9+0NtQt9qeUuZa34e38r+6T2LUKcVT/tvy5YJCAleOhIzQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=DXa56wYt; arc=fail smtp.client-ip=52.101.70.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=VXSX4ymK21X0GApf7jd52fD5gEjwxN6nqsN95sSSchaKD1BzzY/SJfSWmx4zHbgpTaxQkd/s4SgrZ6wHlHL8JYmx5GG7pAzRiz+p3/QvQ/UTIa/oDqekSH5PzU9eLghcKovGvz1k98jhCbqk47M5QRGWrC40W3aapE1xvgRXe+96cqc/ySyMNdDBVjWSUNDatD9RVwhPU4aFWJV7YUzZdNUtZ8UKVqgqXRjzam7+DMJ5AtW+9+M5pFb7w97g+hcSKXM/mNNStvIoxuGpkFn48JxBo48Duc1tz9HCyKtNVc5xGqm9LHOHHNdYNh0t0HQ852ng0w5/uFWXwS++4Hudtg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3uaKrhXlWcufKkyU+Jr84iy7Y6JnYTJNoRKkfdhIoMs=;
+ b=QzLRSWocAEE+eQCJPvh/TDj/HNgtBRnDyoPz6knMBM7y9W0nffK//lgCkbu92MHCwqve0TwmNp2p44k3uYWpeDoU74QBaEfKOWuAAwavONqYVDcKFCTnIV87SBzQ4/7S6bxjGPZYMWRMLFX8SithnpZL6ZzXigBZ9aBHsha0AIcp49sMPSIDTFDGIKbvFBAeEn1AJ1xmZkXYyE8PzUkzyjR9dxqsCacgpi/Og8LDt0QaFC/f3Sc7s7VRAB/t7+iDx104xf8BHP+MeLUUvEC6Fc1F34BvVoPqTb57OEv3hZzeKF0qW4ASCGrl9UbnV6m3DgGktnZou37izqp0FqNXxg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3uaKrhXlWcufKkyU+Jr84iy7Y6JnYTJNoRKkfdhIoMs=;
+ b=DXa56wYtohNMVNr4Uryazq6tEAuD/RXsvZEQwkF3hQpRg2Rc9+nHTSOBdHAKHoHJifobmXV/h8CPeXoqxz8Jfr4EYJfavceCzxrHrlVHMdwxQTmesVBVEFdDzgUDBGDYPKsZPM20gU8XIZT4KNH1FM3wSttXfrrFhPesy0BGrODBD0r5tTERqPuHJHQ9ssJ7lBmq3xUqsxTUfNIN9ZFMWqKWfLm6IUk5UtZ4YC9bvbrsc0bCFCXZnOeNqBbd5IV6oB42iKiva/F/+JJVCqhURM9/zQeFoBaFWcgxjorTS6GZkl41jrVJgwfvBg4mzANTjiCUxNjwPB4HdN3d7BLmVA==
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by AM9PR04MB8259.eurprd04.prod.outlook.com (2603:10a6:20b:3e4::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.17; Mon, 25 Aug
+ 2025 01:36:13 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db%5]) with mapi id 15.20.9031.012; Mon, 25 Aug 2025
+ 01:36:13 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Shenwei Wang <shenwei.wang@nxp.com>
+CC: Clark Wang <xiaoning.wang@nxp.com>, Stanislav Fomichev <sdf@fomichev.me>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, dl-linux-imx <linux-imx@nxp.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>
+Subject: RE: [PATCH v2 net-next 4/5] net: fec: add change_mtu to support
+ dynamic buffer allocation
+Thread-Topic: [PATCH v2 net-next 4/5] net: fec: add change_mtu to support
+ dynamic buffer allocation
+Thread-Index: AQHcEso1Ue9PAAZZWkmtSe1X7IJrlLRuVqwwgAIyggCAAhIy8A==
+Date: Mon, 25 Aug 2025 01:36:13 +0000
+Message-ID:
+ <PAXPR04MB851036E98561133AF4945FA1883EA@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <20250821183336.1063783-1-shenwei.wang@nxp.com>
+ <20250821183336.1063783-5-shenwei.wang@nxp.com>
+ <PAXPR04MB85108182AB184083B5F32D3B883DA@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <PAXPR04MB9185F42CDE16107E3A29FF0B893CA@PAXPR04MB9185.eurprd04.prod.outlook.com>
+In-Reply-To:
+ <PAXPR04MB9185F42CDE16107E3A29FF0B893CA@PAXPR04MB9185.eurprd04.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|AM9PR04MB8259:EE_
+x-ms-office365-filtering-correlation-id: 37ed8f22-d419-4a47-667b-08dde377c6cb
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|7416014|376014|19092799006|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?VOWQLB2AiR+nonKs+tvxatCUTLONfqsDGjlI1/wJ9+nCGuyDb2icBkfPteTz?=
+ =?us-ascii?Q?gOgPZLhXEt7qZt5Pyuv/KwdCuGqPnXkySvG4aG7loYeUhbsOG7lYUf6OxGvo?=
+ =?us-ascii?Q?37KmsRLsj8dN48D5YpHweumqJV6kI5oclnuZepjU4Qy3kkufUMpJjhg2OSvJ?=
+ =?us-ascii?Q?XdgNvEqZcCAzDitfQ4M9b86IHmCtM/COh3Rbr7ZIZcn9OWpZsGzOJZQOm+Od?=
+ =?us-ascii?Q?0cADr1saxmxWJNEwMaUpGKREK26253w+RLlHXtjYY3pkGKPDDmlKQ/skuKGt?=
+ =?us-ascii?Q?bZGgoUFHpJ2M/pNNkde/XCmtMwEUCvMEqmtUqxscS7kaeFCHF4iNX/fauB49?=
+ =?us-ascii?Q?BFshh/JU7DBH8+OGDw91jx0C6BI0uyCwBIDTOdki0aFhw/HZzPvZXIcYf0wB?=
+ =?us-ascii?Q?KK0YF4xug0F2oKoWxJ00IX+0ryt/077wmYFKXqi76MmnUJRa+E+5YSx2GUbx?=
+ =?us-ascii?Q?cYpBxxd4tie7i7rd1YMN6dU3TWnY5ZZ0bOzhJaRQOMelfHS4ypm1Uslc0lU+?=
+ =?us-ascii?Q?ddECJp303ttvHm15P/iFskN1DGz4uxA7LqfJ9FDeQTkPh7+/9PQW9YOMSnot?=
+ =?us-ascii?Q?VagPKoBkho3qbysv2yB4IxIokieEpC+HNTK6boEWeGaPYPMSkKt5xR533nfL?=
+ =?us-ascii?Q?4zI+uGVyJvkHMYuW/0S5JA6ey002URmysKMX2WrwiGbS4AxvrApmGerddStf?=
+ =?us-ascii?Q?5buRrASL0AnRHQyGTlfpSVoziCAzUODvUlX9uvHz2/J3CwjOgWz39qjNq+K7?=
+ =?us-ascii?Q?umTdLc7PBeVmPwY+5gAZu+UXh3BbyzfRyVlCzN/wjrd0hhKdNlb/w/iaqd/I?=
+ =?us-ascii?Q?/csz3USYaqE9TvQSD9OM10IF1hcE9bbZWizhJm40WPmzhGPMxjdcTpMjor30?=
+ =?us-ascii?Q?cF7ZfA5WKM4v1emvOXMBDTtM3Jph92CWsrVgRWYqp7NJj+/5vOlVRyr+cp5Z?=
+ =?us-ascii?Q?B2JUfjyysXLBwZAIE/afcBsjYJ7g4o4YT+W2G2H0dnXbCDK7Djw/G8QPhQvu?=
+ =?us-ascii?Q?HVA1Izb3OYgQlIsZkqd5g40aWcW1g3FMFBMJNHVfiQKV67fdum5/e6fC7D9w?=
+ =?us-ascii?Q?Fo2ygUWk33d98ovu81H4pHCSfaCKkPQ8vePHXcfBsfSYnrBjcuI9IvVikmgU?=
+ =?us-ascii?Q?OFeS8JhEq3VrmH5kmqwm+/vFNiKMZhIFh4rB2jwSR7EkSLl9aaDEgUvA8Q9a?=
+ =?us-ascii?Q?W5BsJKPw0cQdRa0a4s4qg6U2gAaxV6dDlMKI3GT1leZZgSrfk5KZ59P6at/W?=
+ =?us-ascii?Q?yuqsqGetMlgEr7e4a409e/ZtCvCPeADTk2lhxfIjoiDMYnJvNt94Om1afwcE?=
+ =?us-ascii?Q?EzMxLAOi8D/h17K9rG9AoOIWY5/hj0VMEj67vf5XY5jQPEOeHWHPUNwrN0f8?=
+ =?us-ascii?Q?HVsS83etQ7I/JKi6YyA4nFBsbnwuhl7RqKGuUznf1aKmil0yMxMzwfzmDgZF?=
+ =?us-ascii?Q?vvA/EjgfFNr8p88d+67/YE4cBGU4GBdkv/ki9L8n2REydK8kMtfElg=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(19092799006)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?UZymOqi/QCGOMRysm1YH/w5XQVvZ/pnDfSNYiyDKYdxs+fHZf1HA4k8xfOVi?=
+ =?us-ascii?Q?TQOgU1arDywDaB6UF/9K1tvsTsl27SWk2f12FwoEiY6cNDm6FcVCJAY1xJ+T?=
+ =?us-ascii?Q?3nmPHV5InPy3c+RC6amZHPl0WlVs6BIe2mdNRRVhMv7uWOlCq0BoSvqH+3YB?=
+ =?us-ascii?Q?1R4hrOxDbWDECz2hYdkW8xEQ1FGrPKh8vPcqER5L8VKgT2kPkq6PM7RdQaGC?=
+ =?us-ascii?Q?1o/WWZsbi/jxXaJmmmzO/7GZK31NyPikRSjGvk+WCaJ2/3oRINPuk+7HDpN6?=
+ =?us-ascii?Q?dfoNj/RDgXpNAldBCekYGywRVcUxfcL7eq4R4YWGrybAM1GlaTfLm4FEAYEG?=
+ =?us-ascii?Q?J/Lz+j7HmtetnlKrEuA2v4ULI24b3fPjfC+Y2+YZpwblun5da0uY8ND3MQiC?=
+ =?us-ascii?Q?c6aeP3gng8JDYt9CFdnAQ4DqznylfDaeRi89FpOTMUxPyLxcVwF0RHipUBFp?=
+ =?us-ascii?Q?lIFJGYJz1x8bmBBs40o1Z0pRNIaONCtu5bRYQd6UG92pqo2AVj9OY5j3yYsg?=
+ =?us-ascii?Q?8hz9oiRWkLNjHh6uURB11ta5lG3Z91bjZFGR70V1tmDyy9CKNQp9/SEQi8Qt?=
+ =?us-ascii?Q?wf85pvpwiMRcAsl+hTSEAach3TRO4WyNC5UuNrVeWgus98QZ6/sq4w3lx/b3?=
+ =?us-ascii?Q?acpknU8VIjpjLTdeKluBmOjiR9qNK34TCr3se6cWz7YiShfPDy+ofu+mV8tG?=
+ =?us-ascii?Q?pnzt6rxBp7LnNWzMBuV5cuqXukqthK5Y8KUziAtGic8soUMbrg+szVkkpbM4?=
+ =?us-ascii?Q?CIMsR0k6coINTixUOT7GjT/G2H8nWzaCyC6luQZdu0K5/d5XoButHxz4LhwQ?=
+ =?us-ascii?Q?vD1BS74XhRio3jA2Rz4a4LA0+Z9OZRSCKFzQh8v/Hz4rTxdLtl/GLCdX4AUN?=
+ =?us-ascii?Q?dZsWBM6W00GQXUonF7sTCJFjfcCn0PUUTz/qN/6Ftm+zmbpfm8a1NKrmsGd2?=
+ =?us-ascii?Q?XMJvnG890xupC2PBpnAT2fiLJqKdSkXZcb7yQmImkEqUHknwsNvR9SgT3BYi?=
+ =?us-ascii?Q?feFcRaKvNNLdVnnEgoFB97QzmbrskRfNCpD1FcN4yasdmOwxksujpkAcpzc+?=
+ =?us-ascii?Q?JdlCLw6I+Kf/E8bNpxRDBiKV8tOJOq39ng2TfMXQGKZVhRgzUb7JQ0ETDKIX?=
+ =?us-ascii?Q?vps3T12hMTqso293sabMyN7qr6qe6kwllyQX1HA6qquewx99QZFXwdoRuXu3?=
+ =?us-ascii?Q?lDckuUdGlc+lbCKVXUc9y/cv1ykz4AWmh5AFZUdOmetqBn0OI/z4GAQKkGlK?=
+ =?us-ascii?Q?GxGAOgHp1YTBrzCeyH7runiR0OZPpyNA3czGhsc1imDSuJ8jirGRfjjLBaAA?=
+ =?us-ascii?Q?MYaB7NgV9fDnfaQqgEO88I3FKDFB3rw8OgyIGzzfGMsepH7XORSn6j5yabLa?=
+ =?us-ascii?Q?PQSjgYz6Kw8RYGquk0v1tbTYG//wYUByor4NU7wxFbMbWywwt8+TY5QsaSpa?=
+ =?us-ascii?Q?u35968QMjOywc1AYVQ8a+jLJ3hEnuwHVbEmYIJa2xhNUlWbBUCC+T6SaVnrk?=
+ =?us-ascii?Q?m2B2HasIrsA6J/83x/OaXNkShyQaFGjBxbYfi9GdqEYU6lboPm5DvYchUgMb?=
+ =?us-ascii?Q?Zk0PPgx19YEDyfkwz7M=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <809527f7-c838-4582-89cb-6cb9d24963dd@lunn.ch>
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: OBUGnm9pFasAiZ6W90wYeKsby/+S0wZ8wiyoTqCKQr2mZNPk/xuvOhnt
-	vPAIHQk5tb87rpyR8tBfYmrgCdVLT1kKCtCB/hsps9/XhR/yK1wlC5kFfqXStXS8d5hUHq3
-	UgjO1xgNlYbfNTrE/0Irj6zsTut6gGvcxeGp5aNYK5Ml2zdsOhcjYY0uhO4ATMPM5i3mDPP
-	RRCc/OcH2vtkfWRsx/T0iOJKTRlfhA+RH5N1JlWDVRRvbkYS+glx7cuFXJM1QOtKFyM+9v/
-	NW9axunD9HSRfmndx5E5zmtCyzvxHI7xZCjCOnDENvn//Oku01vlL7Fi62GhHMdtbjTQlUE
-	K3YtJLJ47FjbgoEx8fhvAyfyNeIylB7kQcCIuV7WYpy5gCHmAPZVH2QV9Hl5c0jJKA5S5oe
-	OzRCHoOpc+f4e+hP3oQ+lE4hOARCrKg4fjxxmQtmouAHfkd1Cb1bmoiTEGKvsyMXuiBMiHq
-	do8nkr/O90mZZ7CyKosJlQdmqoKFPpdI++Sqq2X5dLs15tyEXImnO+dnqch0ZP3yn6h+uWT
-	enHZ78B0ofJSDCz+D+iz0VJ5GoILj1eilNbEH20kIDamSP2ilJknDst9MkC6eESn19uNweV
-	mKaHwYg6OBrtj9uboNgX0S9mr6BLyHM+ZHabZsLBuBmBOsMssCLFAf2owXg7RVO0InrZImK
-	8Cu6zKQiKbdf2hVBHjnL0rXWLSpVj8nRryIbVNDgcYh//OGWYAgFkWfRCv6boljH1KMCki5
-	tji2SaOwLj/6dX2F0XzgPwUayCVKyHz/+uc+LAbe/qMg87N5Vjlu0auRyajVYY1Dmqd9PNt
-	vTu8WyXSZUh/+5ziPT2ACSzMgWhlgDR2tXpf5X6Q4NWzwKV+WyzckmjjUAYBqipM8S9AGI/
-	avvy1EZ8fZEXArLXQnz7EPGe4gOd8EuXPxcl30gWDa5wQ5YvMT2Sl7l/ptzwPZscs4Omdjg
-	7I25sBT/Ol0dkmkbhppZ5QUgD4O6yvtl3Ys1yROMg+KQQWSnsmJHvL1s7
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-X-QQ-RECHKSPAM: 0
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 37ed8f22-d419-4a47-667b-08dde377c6cb
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Aug 2025 01:36:13.1888
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: gKDwJ+zSXUax8tmK16kFQXIS51anaIcid4aNbBaptCsJ/fplphE+F/osqTNyhcmlL468W3yvHKWdAE8fIfDYgw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8259
 
-On Sun, Aug 24, 2025 at 05:15:25PM +0200, Andrew Lunn wrote:
-> On Sun, Aug 24, 2025 at 12:10:52PM +0800, Yibo Dong wrote:
-> > On Sat, Aug 23, 2025 at 05:17:45PM +0200, Andrew Lunn wrote:
-> > > On Sat, Aug 23, 2025 at 09:58:24AM +0800, Yibo Dong wrote:
-> > > > On Fri, Aug 22, 2025 at 04:43:16PM +0200, Andrew Lunn wrote:
-> > > > > > +/**
-> > > > > > + * mucse_mbx_get_capability - Get hw abilities from fw
-> > > > > > + * @hw: pointer to the HW structure
-> > > > > > + *
-> > > > > > + * mucse_mbx_get_capability tries to get capabities from
-> > > > > > + * hw. Many retrys will do if it is failed.
-> > > > > > + *
-> > > > > > + * @return: 0 on success, negative on failure
-> > > > > > + **/
-> > > > > > +int mucse_mbx_get_capability(struct mucse_hw *hw)
-> > > > > > +{
-> > > > > > +	struct hw_abilities ability = {};
-> > > > > > +	int try_cnt = 3;
-> > > > > > +	int err = -EIO;
-> > > > > > +
-> > > > > > +	while (try_cnt--) {
-> > > > > > +		err = mucse_fw_get_capability(hw, &ability);
-> > > > > > +		if (err)
-> > > > > > +			continue;
-> > > > > > +		hw->pfvfnum = le16_to_cpu(ability.pfnum) & GENMASK_U16(7, 0);
-> > > > > > +		return 0;
-> > > > > > +	}
-> > > > > > +	return err;
-> > > > > > +}
-> > > > > 
-> > > > > Please could you add an explanation why it would fail? Is this to do
-> > > > > with getting the driver and firmware in sync? Maybe you should make
-> > > > > this explicit, add a function mucse_mbx_sync() with a comment that
-> > > > > this is used once during probe to synchronise communication with the
-> > > > > firmware. You can then remove this loop here.
-> > > > 
-> > > > It is just get some fw capability(or info such as fw version).
-> > > > It is failed maybe:
-> > > > 1. -EIO: return by mucse_obtain_mbx_lock_pf. The function tries to get
-> > > > pf-fw lock(in chip register, not driver), failed when fw hold the lock.
-> > > 
-> > > If it cannot get the lock, isn't that fatal? You cannot do anything
-> > > without the lock.
-> > > 
-> > > > 2. -ETIMEDOUT: return by mucse_poll_for_xx. Failed when timeout.
-> > > > 3. -ETIMEDOUT: return by mucse_fw_send_cmd_wait. Failed when wait
-> > > > response timeout.
-> > > 
-> > > If its dead, its dead. Why would it suddenly start responding?
-> > > 
-> > > > 4. -EIO: return by mucse_fw_send_cmd_wait. Failed when error_code in
-> > > > response.
-> > > 
-> > > Which should be fatal. No retries necessary.
-> > > 
-> > > > 5. err return by mutex_lock_interruptible.
-> > > 
-> > > So you want the user to have to ^C three times?
-> > > 
-> > > And is mucse_mbx_get_capability() special, or will all interactions
-> > > with the firmware have three retries?
-> > 
-> 
-> > It is the first 'cmd with response' from fw when probe. If it failed,
-> > return err and nothing else todo (no registe netdev ...). So, we design
-> > to give retry for it.
-> > fatal with no retry, maybe like this? 
->  
-> Quoting myself:
-> 
-> > > > > Is this to do
-> > > > > with getting the driver and firmware in sync? Maybe you should make
-> > > > > this explicit, add a function mucse_mbx_sync() with a comment that
-> > > > > this is used once during probe to synchronise communication with the
-> > > > > firmware. You can then remove this loop here.
+> > > +static int fec_change_mtu(struct net_device *ndev, int new_mtu) {
+> > > +	struct fec_enet_private *fep =3D netdev_priv(ndev);
+> > > +	int order, done;
+> > > +	bool running;
+> > > +
+> > > +	order =3D get_order(new_mtu + ETH_HLEN + ETH_FCS_LEN);
+> > > +	if (fep->pagepool_order =3D=3D order) {
+> > > +		WRITE_ONCE(ndev->mtu, new_mtu);
+> >
+> > No need to write ndev->mtu, same below, because __netif_set_mtu() will
+> > help update it.
+>=20
+> It will only update the ndev->mtu if the driver doesn't have its own chan=
+g_mtu
+> handler.
+>=20
+> int __netif_set_mtu(struct net_device *dev, int new_mtu) {
+> 	const struct net_device_ops *ops =3D dev->netdev_ops;
+>=20
+> 	if (ops->ndo_change_mtu)
+> 		return ops->ndo_change_mtu(dev, new_mtu);
+>=20
+> 	/* Pairs with all the lockless reads of dev->mtu in the stack */
+> 	WRITE_ONCE(dev->mtu, new_mtu);
+> 	return 0;
+> }
 
-'mucse_mbx_get_capability' is used once during probe in fact, and won't be
-used anywhere.
-
-> 
-> Does the firmware offer a NOP command? Or one to get the firmware
-> version?  If you are trying to get the driver and firmware in sync, it
-> make sense to use an operation which is low value and won't be used
-> anywhere else.
-> 
-> 	Andrew
-> 
-
-No NOP command.. 'mucse_mbx_get_capability' can get the firmware version
-and in fact only used in probe, maybe I should rename it to 'mucse_mbx_sync',
-and add comment 'only be used once during probe'?
-Or keep the name with that comment?
-
-Thanks for your feedback.
+Oh, I misread the code, so sorry.
 
 
