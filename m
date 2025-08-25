@@ -1,94 +1,153 @@
-Return-Path: <netdev+bounces-216564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216565-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75C23B34894
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 19:23:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 819ADB34901
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 19:38:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D7E47AB154
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 17:21:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1746D17317D
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 17:38:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0574D3002C1;
-	Mon, 25 Aug 2025 17:22:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 375E5308F1E;
+	Mon, 25 Aug 2025 17:34:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="M2Pk6Cr/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HIcIdbEx"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B5F230277C
-	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 17:22:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99C01308F2A;
+	Mon, 25 Aug 2025 17:34:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756142529; cv=none; b=TKuqJvM/SwOFij7E3/+8K/6PGxYlQEJnvRV+sI8tyrHTWKrgJnFZlv0qxdtGd+skL6YRI6WwE1eypotaCWieOQgCIk3enA0lIY9vGHk2cf2wZBzcim44qwOCmQaGb65nUJ+by9OVr7BaaGbtn0bUWYUGIyROvFkgPG4cjZ+f93s=
+	t=1756143299; cv=none; b=mfptOkwcT1l19h08kq/zm4QBxrjOZe3kbLNrV/9kwccu8uFOFGQ/qkAi+GAtZ/ERzIBp7vWbd43dCU4dnN46VE5eAHWvUmS0xZFBQaf7YgemmL3Kc0yGlK8QATl03J0CaKsqaRyxgTVCQkTgRhFPyJmVxJeyk09am1UcMN5yVpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756142529; c=relaxed/simple;
-	bh=jT/ylMlEQRDNlFQw3ZQpII4o4YK4hEQMjtkjgsk9Zc8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=A6KL2C1i4SQHUYA0TA/nuNe7BLGnzAAWNznhPl03hal9JRCdN4sh1OGhVhCswDwI9mWxDpRJKRkOeawkyHoLIpULgmw8rYX4zhcyYdGEYcdmGqPLD6M23STV+o0xQXaV/28KaCi7l51OGudBMmbGpN6Pw34sMJYClxKaew4pBvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=M2Pk6Cr/; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1756142514;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=vTIzMbFo+qzt9TXdUaDMScLRHehevEhpnDaT3qnZd+8=;
-	b=M2Pk6Cr/NRoBM198R9TzybFkP0aG+rlM/lfiJS0dZPVd0h9B81MeZrarhd8s5viMlWK9FS
-	mD8yHIq5H/YfenXORLuHdhfQQn9zt2/RxrDF7/muHI/LtukH7FUN8ppXd8L9AZgll+cD0K
-	MbnXYlOQKFkKlLEVdozmXxwITQljMLE=
-From: Sean Anderson <sean.anderson@linux.dev>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Cc: Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	linux-kernel@vger.kernel.org,
-	Sean Anderson <sean.anderson@linux.dev>
-Subject: [PATCH net] net: macb: Fix offset error in gem_update_stats
-Date: Mon, 25 Aug 2025 13:21:34 -0400
-Message-Id: <20250825172134.681861-1-sean.anderson@linux.dev>
+	s=arc-20240116; t=1756143299; c=relaxed/simple;
+	bh=BF4TDhqQMFX1tdUCUnTsWrwYS2QKh698szOx84ZHXrU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kh+buXs8+3ziU2+yR5lX02r6unyy4linYdYYeYQw2AkCXQKHLg+vgb7MD678TO8VahaONcAoqF/eIUfXzikRGCZMW+W+vebXGNbdWtpImhK9CWHrkrhS2fBmnxr3Wbju3Bog1dJ4K+Av3jSmZ/WolvJTqtdhAFwIgZAAKOBoq6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HIcIdbEx; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-77031d4638bso2688336b3a.1;
+        Mon, 25 Aug 2025 10:34:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756143297; x=1756748097; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4uw/9uBbQYYP/tm1pCiHdt2MwBK9JCxPJmXEEuez5M8=;
+        b=HIcIdbExAtIxGUnCdiuSq6cEJABSaji2UpmlJ8hhwZtC1Yt6D7+wKpT/qauBSMn/0V
+         zqlV+JML8tntt4gNJQ71GpxYxHjF05jUTeQ/qdCGAOLBXrP+2SHC3EeAYKMBcXDHwTSh
+         qO9UzzOw19sGS8Tabb5Kvg7nNnb2bv4rTylcblKyXOG1n0kG9OCSD1s1hNLenX/WaeV+
+         YwMqojQSJVTZNN0CdoUo2IzSVtQVHa+TXWl56UCaTPzFgQuYomQvfl9tQYpdBCjnU6LL
+         L0iZa0XMiKpIJhLwEW8NSBV8d1LnrHrvahO7fIaBla1czvMzkL3EHEYQsfGTevctZpU1
+         uQ1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756143297; x=1756748097;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4uw/9uBbQYYP/tm1pCiHdt2MwBK9JCxPJmXEEuez5M8=;
+        b=YlG2dhDIdW+yHZTUVdzMlGW6riFEoTkTIUBCwOMyRki5/iImZ7ybmL6I1JbgZa4zqs
+         FX6fAnwbfBh/3CgGVjjt3HJxG4o2oHVGd+f117zlTCLTiaw0wrOcFTD1jwVoRXfHI7ca
+         VOe0v1FucHqztIbdKIyLUZzGggX7JyCCOrVmU8jNfWWnrsJg90rWEZw6iGgEqhbL+0W7
+         E/o9V4+5wHeO2+07xfiXo3hmS286MpJJXuYOvmizC0vnJpveOyXJCPD4zduuGFVlrAAP
+         FFirDODaP5geRqr3j4mydYAIGcT6UUC81WULokTBOe3RmvjivBWudNSRV/dy64ohNCZN
+         r3FQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUosSXW985yv2hNoFwxdRAmZjYtTKIJXzLu1HA9K+DLwvcSTMJSwDAsSSgZ767p1mSr8uC5jKBQ@vger.kernel.org, AJvYcCW0G2rhreKZJdBukBB45AzVvNum9f1XxhWMw811w6lADD274tQt9qMKQyyTyW3CLoiTNIA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwY58ByLEp0TLzPX6TuGDRNL3Qd6oiyviD50kO7ra7kPRqkzPp8
+	BPwOxfKzqRVxSIQ0nw22piRw3GxWJSojr2w2WEeKBlTZIkoAA5z15N4=
+X-Gm-Gg: ASbGncspGBN1OUFs3tnswYvJHMl2S1TrJ52/H550FxP149b3VC/41KijbmOCxftRthZ
+	epXQ0dUUyskWSLm0adHTCQ3CLU2vACzL6VFGvMheGWKbfIiLUX/GSG9Mi35zmv9jTznWHcJkBj3
+	EXj3w3e1H8+0pEKnLnZgabr21TGI1VFHruadG1Y/HBsT2lXLb9AopNneOFN2Cb++nQV+sMvRKP9
+	MNBi8D0JNu67NIzObWGrzCipGyVrJIkoxH4ZesD1kp8c/6A5+75gKOC9m1/Wpb1qTN6W2AaE8WA
+	P0khLWt6SsosjUpiBTopbym76mzYujCtEN2OwdohshJb4mCiM7nKJbyzBCZ32QtxEI7CjRs0dDp
+	O8A1Hl5QUZaLTY4xdc7aSK1TfX6FwAlcNf7aohhjpb9I3v1fTDIBB2DmT3ZIYblXiE0tzCUsn5s
+	HKTT5PMSpnCqOMfjanIncSAQDptS0dQQvL0XuTPZXJmkVrT6aNzRBcVYL4btvlLIDGa834ZwU3d
+	YIG
+X-Google-Smtp-Source: AGHT+IHwjdEj2wwT3CsUO4ccxosQQa8SCF4RTlUhjsBv1awtfLMaX9E3sw8/pqIj3XMXYO5tQdCRsw==
+X-Received: by 2002:a05:6a00:2d97:b0:770:5031:180b with SMTP id d2e1a72fcca58-77050311f1fmr8053956b3a.21.1756143296649;
+        Mon, 25 Aug 2025 10:34:56 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-771ead8f278sm2200781b3a.14.2025.08.25.10.34.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Aug 2025 10:34:56 -0700 (PDT)
+Date: Mon, 25 Aug 2025 10:34:55 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com,
+	sdf@fomichev.me, ast@kernel.org, daniel@iogearbox.net,
+	hawk@kernel.org, john.fastabend@gmail.com, horms@kernel.org,
+	andrew+netdev@lunn.ch, bpf@vger.kernel.org, netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next v2 6/9] xsk: add direct xmit in batch function
+Message-ID: <aKyev6DadDuL3Xlo@mini-arch>
+References: <20250825135342.53110-1-kerneljasonxing@gmail.com>
+ <20250825135342.53110-7-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250825135342.53110-7-kerneljasonxing@gmail.com>
 
-hw_stats now has only one variable for tx_octets/rx_octets, so we should
-only increment p once, not twice. This would cause the statistics to be
-reported under the wrong categories in `ethtool -S --all-groups` (which
-uses hw_stats) but not `ethtool -S` (which uses ethtool_stats).
+On 08/25, Jason Xing wrote:
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> Add batch xmit logic.
+> 
+> Only grabbing the lock and disable bottom half once and sent all
+> the aggregated packets in one loop.
+> 
+> Since previous patch puts descriptors in xs->skb_cache in a reversed
+> order, this patch sends each skb out from start to end when 'start' is
+> not smaller than 'end'.
+> 
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+>  include/linux/netdevice.h |  3 +++
+>  net/core/dev.c            | 19 +++++++++++++++++++
+>  2 files changed, 22 insertions(+)
+> 
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 5e5de4b0a433..8e2688e3f2e4 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -3352,6 +3352,9 @@ u16 dev_pick_tx_zero(struct net_device *dev, struct sk_buff *skb,
+>  
+>  int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev);
+>  int __dev_direct_xmit(struct sk_buff *skb, u16 queue_id);
+> +int xsk_direct_xmit_batch(struct sk_buff **skbs, struct net_device *dev,
+> +			  struct netdev_queue *txq, int *cur,
+> +			  int start, int end);
+>  
+>  static inline int dev_queue_xmit(struct sk_buff *skb)
+>  {
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 68dc47d7e700..a5a6b9a199e9 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -4742,6 +4742,25 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
+>  }
+>  EXPORT_SYMBOL(__dev_queue_xmit);
+>  
+> +int xsk_direct_xmit_batch(struct sk_buff **skbs, struct net_device *dev,
+> +			  struct netdev_queue *txq, int *cur,
+> +			  int start, int end)
+> +{
+> +	int ret = NETDEV_TX_BUSY;
+> +
+> +	local_bh_disable();
+> +	HARD_TX_LOCK(dev, txq, smp_processor_id());
+> +	for (*cur = start; *cur >= end; (*cur)--) {
 
-Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
-Fixes: f6af690a295a ("net: cadence: macb: Report standard stats")
----
-
- drivers/net/ethernet/cadence/macb_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index b29c3beae0b2..106885451147 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -3090,7 +3090,7 @@ static void gem_update_stats(struct macb *bp)
- 			/* Add GEM_OCTTXH, GEM_OCTRXH */
- 			val = bp->macb_reg_readl(bp, offset + 4);
- 			bp->ethtool_stats[i] += ((u64)val) << 32;
--			*(p++) += ((u64)val) << 32;
-+			*p += ((u64)val) << 32;
- 		}
- 	}
- 
--- 
-2.35.1.1320.gc452695387.dirty
-
+skbs support chaining (via list member), any reason not to use that for
+batching purposes?
 
