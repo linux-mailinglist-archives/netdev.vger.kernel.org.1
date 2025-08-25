@@ -1,153 +1,228 @@
-Return-Path: <netdev+bounces-216565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 819ADB34901
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 19:38:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A86E9B34908
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 19:39:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1746D17317D
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 17:38:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC1377A2EE9
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 17:38:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 375E5308F1E;
-	Mon, 25 Aug 2025 17:34:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HIcIdbEx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 386703002A2;
+	Mon, 25 Aug 2025 17:39:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99C01308F2A;
-	Mon, 25 Aug 2025 17:34:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6382E1A4E70
+	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 17:39:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756143299; cv=none; b=mfptOkwcT1l19h08kq/zm4QBxrjOZe3kbLNrV/9kwccu8uFOFGQ/qkAi+GAtZ/ERzIBp7vWbd43dCU4dnN46VE5eAHWvUmS0xZFBQaf7YgemmL3Kc0yGlK8QATl03J0CaKsqaRyxgTVCQkTgRhFPyJmVxJeyk09am1UcMN5yVpY=
+	t=1756143574; cv=none; b=ZztmzdI8oazvO1/GKRCMzkrHwtevRy0cK+jr+P5qjA6WfIIYw9q0GuMP2yChyzdjOmqx7VU9SP9i91ah7NWcfjmgTCoOQDcmCsJ/1Gb8WqTib4RrtSpBGYstp7s+vjqJfr9bmbMJVL75E0XFM59LCr30reRTd1qzW17cZj7uAlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756143299; c=relaxed/simple;
-	bh=BF4TDhqQMFX1tdUCUnTsWrwYS2QKh698szOx84ZHXrU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Kh+buXs8+3ziU2+yR5lX02r6unyy4linYdYYeYQw2AkCXQKHLg+vgb7MD678TO8VahaONcAoqF/eIUfXzikRGCZMW+W+vebXGNbdWtpImhK9CWHrkrhS2fBmnxr3Wbju3Bog1dJ4K+Av3jSmZ/WolvJTqtdhAFwIgZAAKOBoq6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HIcIdbEx; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-77031d4638bso2688336b3a.1;
-        Mon, 25 Aug 2025 10:34:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756143297; x=1756748097; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4uw/9uBbQYYP/tm1pCiHdt2MwBK9JCxPJmXEEuez5M8=;
-        b=HIcIdbExAtIxGUnCdiuSq6cEJABSaji2UpmlJ8hhwZtC1Yt6D7+wKpT/qauBSMn/0V
-         zqlV+JML8tntt4gNJQ71GpxYxHjF05jUTeQ/qdCGAOLBXrP+2SHC3EeAYKMBcXDHwTSh
-         qO9UzzOw19sGS8Tabb5Kvg7nNnb2bv4rTylcblKyXOG1n0kG9OCSD1s1hNLenX/WaeV+
-         YwMqojQSJVTZNN0CdoUo2IzSVtQVHa+TXWl56UCaTPzFgQuYomQvfl9tQYpdBCjnU6LL
-         L0iZa0XMiKpIJhLwEW8NSBV8d1LnrHrvahO7fIaBla1czvMzkL3EHEYQsfGTevctZpU1
-         uQ1w==
+	s=arc-20240116; t=1756143574; c=relaxed/simple;
+	bh=bMgUecEUwmuQ5iHcGsGcqiKcMRsbdbPMZOdOnzKFEHo=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=AzAeyUDo21Qww6DslV3K0Ewdj/6lQElxW9JR8PHV1s0qPuNThaDuMl7tOE6RGCc/ENA00h8bmhYmbI/zvQj5k10e875oAukdAFwVGkAtkP0I7CGn96QhxYBkFbui9levRerwF2+XJknPXTG8UlQZRdFS0TJdkNkB9lCHvWuEYio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3eb14eebe86so54692065ab.3
+        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 10:39:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756143297; x=1756748097;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4uw/9uBbQYYP/tm1pCiHdt2MwBK9JCxPJmXEEuez5M8=;
-        b=YlG2dhDIdW+yHZTUVdzMlGW6riFEoTkTIUBCwOMyRki5/iImZ7ybmL6I1JbgZa4zqs
-         FX6fAnwbfBh/3CgGVjjt3HJxG4o2oHVGd+f117zlTCLTiaw0wrOcFTD1jwVoRXfHI7ca
-         VOe0v1FucHqztIbdKIyLUZzGggX7JyCCOrVmU8jNfWWnrsJg90rWEZw6iGgEqhbL+0W7
-         E/o9V4+5wHeO2+07xfiXo3hmS286MpJJXuYOvmizC0vnJpveOyXJCPD4zduuGFVlrAAP
-         FFirDODaP5geRqr3j4mydYAIGcT6UUC81WULokTBOe3RmvjivBWudNSRV/dy64ohNCZN
-         r3FQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUosSXW985yv2hNoFwxdRAmZjYtTKIJXzLu1HA9K+DLwvcSTMJSwDAsSSgZ767p1mSr8uC5jKBQ@vger.kernel.org, AJvYcCW0G2rhreKZJdBukBB45AzVvNum9f1XxhWMw811w6lADD274tQt9qMKQyyTyW3CLoiTNIA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwY58ByLEp0TLzPX6TuGDRNL3Qd6oiyviD50kO7ra7kPRqkzPp8
-	BPwOxfKzqRVxSIQ0nw22piRw3GxWJSojr2w2WEeKBlTZIkoAA5z15N4=
-X-Gm-Gg: ASbGncspGBN1OUFs3tnswYvJHMl2S1TrJ52/H550FxP149b3VC/41KijbmOCxftRthZ
-	epXQ0dUUyskWSLm0adHTCQ3CLU2vACzL6VFGvMheGWKbfIiLUX/GSG9Mi35zmv9jTznWHcJkBj3
-	EXj3w3e1H8+0pEKnLnZgabr21TGI1VFHruadG1Y/HBsT2lXLb9AopNneOFN2Cb++nQV+sMvRKP9
-	MNBi8D0JNu67NIzObWGrzCipGyVrJIkoxH4ZesD1kp8c/6A5+75gKOC9m1/Wpb1qTN6W2AaE8WA
-	P0khLWt6SsosjUpiBTopbym76mzYujCtEN2OwdohshJb4mCiM7nKJbyzBCZ32QtxEI7CjRs0dDp
-	O8A1Hl5QUZaLTY4xdc7aSK1TfX6FwAlcNf7aohhjpb9I3v1fTDIBB2DmT3ZIYblXiE0tzCUsn5s
-	HKTT5PMSpnCqOMfjanIncSAQDptS0dQQvL0XuTPZXJmkVrT6aNzRBcVYL4btvlLIDGa834ZwU3d
-	YIG
-X-Google-Smtp-Source: AGHT+IHwjdEj2wwT3CsUO4ccxosQQa8SCF4RTlUhjsBv1awtfLMaX9E3sw8/pqIj3XMXYO5tQdCRsw==
-X-Received: by 2002:a05:6a00:2d97:b0:770:5031:180b with SMTP id d2e1a72fcca58-77050311f1fmr8053956b3a.21.1756143296649;
-        Mon, 25 Aug 2025 10:34:56 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-771ead8f278sm2200781b3a.14.2025.08.25.10.34.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Aug 2025 10:34:56 -0700 (PDT)
-Date: Mon, 25 Aug 2025 10:34:55 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com,
-	sdf@fomichev.me, ast@kernel.org, daniel@iogearbox.net,
-	hawk@kernel.org, john.fastabend@gmail.com, horms@kernel.org,
-	andrew+netdev@lunn.ch, bpf@vger.kernel.org, netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next v2 6/9] xsk: add direct xmit in batch function
-Message-ID: <aKyev6DadDuL3Xlo@mini-arch>
-References: <20250825135342.53110-1-kerneljasonxing@gmail.com>
- <20250825135342.53110-7-kerneljasonxing@gmail.com>
+        d=1e100.net; s=20230601; t=1756143571; x=1756748371;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eoKRMllrU2xAaVReY0OXakrcbaoMzAgMTduUHxr6ves=;
+        b=swqrTUZOpny2j3vnJ6Q4I/V4AmLmokF2T9UvTwCSvySj4XM1hy1g8Gs6SvsiD4pnXz
+         hvX9jg3aZRazMzy2VChcs/wKIP5WBsh+8B0gThbAiucmomM0Ie33nGrI5lBXPROWxdvf
+         VSk/wMvElCWHf6eFa0Zi+MBw+r5AI2BZg4VTrHtwF5rgbDrutEWded0UohTQmZC0uj7A
+         sofuwpn+z0onDY5yaf9X3Q9y7NOi3i5SAsraA9T8qWEsPHQF3cU9D7bkb8ABovg4Ma08
+         iLwTzkjXRah1Hued9HKYMz7zj0Ws9pBfyTe4Nl574ggEwhACbgSUXotTzbQOuyI3WXZ2
+         B2Nw==
+X-Forwarded-Encrypted: i=1; AJvYcCW2IDo0ysaiYmQngRS2hrTVUmf7J+58NoL8Auiq886QA5keYBDdrsrn9MJDfMkyuV3/DqP/Ino=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNKi+zQ66AMJpN/Q65yveNftR5ev8/McoNW73aNzs+1gj5A7ss
+	cvFXtOmWISOVp5DpAVSgH10CuknLj3/Ha9OR30DzsWxZSTA4BEa0/Zi7QBhmSjnrvNF8fYO2d2p
+	F9GgeThgidbm0pod/e3baojErDczBZzUtb6f2wU8V6DrdY2M3U5thz4jJ2OU=
+X-Google-Smtp-Source: AGHT+IHmCiGOEVGHGc2l2cwdhQN21F/LwlGC4TSPDlo5vcFOx/rJOlQ1oJynS4KKwWCv9rXb3U/EpMATPGjfOJ8DGFHnGHOO+gNt
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250825135342.53110-7-kerneljasonxing@gmail.com>
+X-Received: by 2002:a05:6e02:18cf:b0:3e6:7df0:ec19 with SMTP id
+ e9e14a558f8ab-3e9201f40afmr27100605ab.8.1756143571501; Mon, 25 Aug 2025
+ 10:39:31 -0700 (PDT)
+Date: Mon, 25 Aug 2025 10:39:31 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68ac9fd3.050a0220.37038e.0096.GAE@google.com>
+Subject: [syzbot] [bpf?] possible deadlock in __bpf_ringbuf_reserve (2)
+From: syzbot <syzbot+fa5c2814795b5adca240@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com, 
+	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
+	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
+	sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com, 
+	yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On 08/25, Jason Xing wrote:
-> From: Jason Xing <kernelxing@tencent.com>
-> 
-> Add batch xmit logic.
-> 
-> Only grabbing the lock and disable bottom half once and sent all
-> the aggregated packets in one loop.
-> 
-> Since previous patch puts descriptors in xs->skb_cache in a reversed
-> order, this patch sends each skb out from start to end when 'start' is
-> not smaller than 'end'.
-> 
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> ---
->  include/linux/netdevice.h |  3 +++
->  net/core/dev.c            | 19 +++++++++++++++++++
->  2 files changed, 22 insertions(+)
-> 
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index 5e5de4b0a433..8e2688e3f2e4 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -3352,6 +3352,9 @@ u16 dev_pick_tx_zero(struct net_device *dev, struct sk_buff *skb,
->  
->  int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev);
->  int __dev_direct_xmit(struct sk_buff *skb, u16 queue_id);
-> +int xsk_direct_xmit_batch(struct sk_buff **skbs, struct net_device *dev,
-> +			  struct netdev_queue *txq, int *cur,
-> +			  int start, int end);
->  
->  static inline int dev_queue_xmit(struct sk_buff *skb)
->  {
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 68dc47d7e700..a5a6b9a199e9 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -4742,6 +4742,25 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
->  }
->  EXPORT_SYMBOL(__dev_queue_xmit);
->  
-> +int xsk_direct_xmit_batch(struct sk_buff **skbs, struct net_device *dev,
-> +			  struct netdev_queue *txq, int *cur,
-> +			  int start, int end)
-> +{
-> +	int ret = NETDEV_TX_BUSY;
-> +
-> +	local_bh_disable();
-> +	HARD_TX_LOCK(dev, txq, smp_processor_id());
-> +	for (*cur = start; *cur >= end; (*cur)--) {
+Hello,
 
-skbs support chaining (via list member), any reason not to use that for
-batching purposes?
+syzbot found the following issue on:
+
+HEAD commit:    dd9de524183a xsk: Fix immature cq descriptor production
+git tree:       bpf
+console output: https://syzkaller.appspot.com/x/log.txt?x=102da862580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c321f33e4545e2a1
+dashboard link: https://syzkaller.appspot.com/bug?extid=fa5c2814795b5adca240
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=142da862580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1588aef0580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/5a3389c1558f/disk-dd9de524.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c97133192a27/vmlinux-dd9de524.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/3ae5a1a88637/bzImage-dd9de524.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+fa5c2814795b5adca240@syzkaller.appspotmail.com
+
+============================================
+WARNING: possible recursive locking detected
+syzkaller #0 Not tainted
+--------------------------------------------
+syz-execprog/5866 is trying to acquire lock:
+ffffc900048c10d8 (&rb->spinlock){-.-.}-{2:2}, at: __bpf_ringbuf_reserve+0x1c7/0x5a0 kernel/bpf/ringbuf.c:423
+
+but task is already holding lock:
+ffffc900048e90d8 (&rb->spinlock){-.-.}-{2:2}, at: __bpf_ringbuf_reserve+0x1c7/0x5a0 kernel/bpf/ringbuf.c:423
+
+other info that might help us debug this:
+ Possible unsafe locking scenario:
+
+       CPU0
+       ----
+  lock(&rb->spinlock);
+  lock(&rb->spinlock);
+
+ *** DEADLOCK ***
+
+ May be due to missing lock nesting notation
+
+6 locks held by syz-execprog/5866:
+ #0: ffff88807e021588 (vm_lock){++++}-{0:0}, at: lock_vma_under_rcu+0x19f/0x3d0 mm/mmap_lock.c:147
+ #1: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ #1: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
+ #1: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: ___pte_offset_map+0x29/0x250 mm/pgtable-generic.c:286
+ #2: ffff8880787b60d8 (ptlock_ptr(ptdesc)#2){+.+.}-{3:3}, at: spin_lock include/linux/spinlock.h:351 [inline]
+ #2: ffff8880787b60d8 (ptlock_ptr(ptdesc)#2){+.+.}-{3:3}, at: __pte_offset_map_lock+0x13e/0x210 mm/pgtable-generic.c:401
+ #3: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ #3: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
+ #3: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: __bpf_trace_run kernel/trace/bpf_trace.c:2256 [inline]
+ #3: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: bpf_trace_run2+0x186/0x4b0 kernel/trace/bpf_trace.c:2298
+ #4: ffffc900048e90d8 (&rb->spinlock){-.-.}-{2:2}, at: __bpf_ringbuf_reserve+0x1c7/0x5a0 kernel/bpf/ringbuf.c:423
+ #5: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ #5: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
+ #5: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: trace_call_bpf+0xb7/0x850 kernel/trace/bpf_trace.c:-1
+
+stack backtrace:
+CPU: 1 UID: 0 PID: 5866 Comm: syz-execprog Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ print_deadlock_bug+0x28b/0x2a0 kernel/locking/lockdep.c:3041
+ check_deadlock kernel/locking/lockdep.c:3093 [inline]
+ validate_chain+0x1a3f/0x2140 kernel/locking/lockdep.c:3895
+ __lock_acquire+0xab9/0xd20 kernel/locking/lockdep.c:5237
+ lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
+ __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+ _raw_spin_lock_irqsave+0xa7/0xf0 kernel/locking/spinlock.c:162
+ __bpf_ringbuf_reserve+0x1c7/0x5a0 kernel/bpf/ringbuf.c:423
+ ____bpf_ringbuf_reserve kernel/bpf/ringbuf.c:474 [inline]
+ bpf_ringbuf_reserve+0x5c/0x70 kernel/bpf/ringbuf.c:466
+ bpf_prog_df2ea1bb7efca089+0x36/0x54
+ bpf_dispatcher_nop_func include/linux/bpf.h:1332 [inline]
+ __bpf_prog_run include/linux/filter.h:718 [inline]
+ bpf_prog_run include/linux/filter.h:725 [inline]
+ bpf_prog_run_array include/linux/bpf.h:2292 [inline]
+ trace_call_bpf+0x326/0x850 kernel/trace/bpf_trace.c:146
+ perf_trace_run_bpf_submit+0x78/0x170 kernel/events/core.c:10911
+ do_perf_trace_contention_end include/trace/events/lock.h:122 [inline]
+ perf_trace_contention_end+0x253/0x2f0 include/trace/events/lock.h:122
+ __do_trace_contention_end include/trace/events/lock.h:122 [inline]
+ trace_contention_end+0x111/0x140 include/trace/events/lock.h:122
+ __pv_queued_spin_lock_slowpath+0x9f9/0xb60 kernel/locking/qspinlock.c:374
+ pv_queued_spin_lock_slowpath arch/x86/include/asm/paravirt.h:557 [inline]
+ queued_spin_lock_slowpath+0x43/0x50 arch/x86/include/asm/qspinlock.h:51
+ queued_spin_lock include/asm-generic/qspinlock.h:114 [inline]
+ do_raw_spin_lock+0x21f/0x290 kernel/locking/spinlock_debug.c:116
+ __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:111 [inline]
+ _raw_spin_lock_irqsave+0xb3/0xf0 kernel/locking/spinlock.c:162
+ __bpf_ringbuf_reserve+0x1c7/0x5a0 kernel/bpf/ringbuf.c:423
+ ____bpf_ringbuf_reserve kernel/bpf/ringbuf.c:474 [inline]
+ bpf_ringbuf_reserve+0x5c/0x70 kernel/bpf/ringbuf.c:466
+ bpf_prog_6979e45824a16319+0x36/0x66
+ bpf_dispatcher_nop_func include/linux/bpf.h:1332 [inline]
+ __bpf_prog_run include/linux/filter.h:718 [inline]
+ bpf_prog_run include/linux/filter.h:725 [inline]
+ __bpf_trace_run kernel/trace/bpf_trace.c:2257 [inline]
+ bpf_trace_run2+0x281/0x4b0 kernel/trace/bpf_trace.c:2298
+ __bpf_trace_tlb_flush+0xf5/0x150 include/trace/events/tlb.h:38
+ __traceiter_tlb_flush+0x76/0xd0 include/trace/events/tlb.h:38
+ __do_trace_tlb_flush include/trace/events/tlb.h:38 [inline]
+ trace_tlb_flush+0x115/0x140 include/trace/events/tlb.h:38
+ native_flush_tlb_multi+0x78/0x140 arch/x86/mm/tlb.c:-1
+ __flush_tlb_multi arch/x86/include/asm/paravirt.h:91 [inline]
+ flush_tlb_multi arch/x86/mm/tlb.c:1361 [inline]
+ flush_tlb_mm_range+0x6b1/0x12d0 arch/x86/mm/tlb.c:1451
+ flush_tlb_page arch/x86/include/asm/tlbflush.h:324 [inline]
+ ptep_clear_flush+0x120/0x170 mm/pgtable-generic.c:101
+ wp_page_copy mm/memory.c:3618 [inline]
+ do_wp_page+0x1bc2/0x5800 mm/memory.c:4013
+ handle_pte_fault mm/memory.c:6068 [inline]
+ __handle_mm_fault+0x1033/0x5440 mm/memory.c:6195
+ handle_mm_fault+0x40a/0x8e0 mm/memory.c:6364
+ do_user_addr_fault+0xa81/0x1390 arch/x86/mm/fault.c:1336
+ handle_page_fault arch/x86/mm/fault.c:1476 [inline]
+ exc_page_fault+0x76/0xf0 arch/x86/mm/fault.c:1532
+ asm_exc_page_fault+0x26/0x30 arch/x86/include/asm/idtentry.h:623
+RIP: 0033:0x410964
+Code: b9 01 00 00 00 90 e8 3b 36 06 00 84 00 48 8d 50 10 83 3d be 5f d9 02 00 74 10 e8 87 d9 06 00 49 89 13 48 8b 48 10 49 89 4b 08 <48> 89 50 10 48 89 c1 48 8b 54 24 20 48 8b 1a 66 89 59 18 83 3d 92
+RSP: 002b:000000c0000e7608 EFLAGS: 00010246
+RAX: 000000c0080e0000 RBX: 0000000000000070 RCX: 0000000007b2a8a0
+RDX: 000000c0080e0010 RSI: 000000000b1130e1 RDI: 0000000009e14d67
+RBP: 000000c0000e7638 R08: 00007f16e8ad96e0 R09: 7fffffffffffffff
+R10: 0000000000000001 R11: 00007f16e8a2e000 R12: 000000c0080e0000
+R13: 0000000000000049 R14: 000000c0026156c0 R15: 000000c0080c1c20
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
