@@ -1,228 +1,119 @@
-Return-Path: <netdev+bounces-216566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A86E9B34908
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 19:39:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D8EAB34911
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 19:41:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC1377A2EE9
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 17:38:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A738C7A77BE
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 17:39:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 386703002A2;
-	Mon, 25 Aug 2025 17:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC3C22877FA;
+	Mon, 25 Aug 2025 17:40:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l0r2xmBU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6382E1A4E70
-	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 17:39:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48062221F32;
+	Mon, 25 Aug 2025 17:40:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756143574; cv=none; b=ZztmzdI8oazvO1/GKRCMzkrHwtevRy0cK+jr+P5qjA6WfIIYw9q0GuMP2yChyzdjOmqx7VU9SP9i91ah7NWcfjmgTCoOQDcmCsJ/1Gb8WqTib4RrtSpBGYstp7s+vjqJfr9bmbMJVL75E0XFM59LCr30reRTd1qzW17cZj7uAlc=
+	t=1756143659; cv=none; b=nenCQgq5g9+VPfJgR1y1IfVvPiGumSuaLJ4K1YhCjUS18yS1F1IZcIqdJeKufMqWQU+NVmJlj/OE1d+cxknNNoxDsZJ3vNpg5gJWXT9MdWQzEtIbA/FEJ9PmZVR/r3/+u+3VueRKoiZ7OpbwaHJ6TDpf9Els4s/Y2Cf5vxsLXZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756143574; c=relaxed/simple;
-	bh=bMgUecEUwmuQ5iHcGsGcqiKcMRsbdbPMZOdOnzKFEHo=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=AzAeyUDo21Qww6DslV3K0Ewdj/6lQElxW9JR8PHV1s0qPuNThaDuMl7tOE6RGCc/ENA00h8bmhYmbI/zvQj5k10e875oAukdAFwVGkAtkP0I7CGn96QhxYBkFbui9levRerwF2+XJknPXTG8UlQZRdFS0TJdkNkB9lCHvWuEYio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3eb14eebe86so54692065ab.3
-        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 10:39:32 -0700 (PDT)
+	s=arc-20240116; t=1756143659; c=relaxed/simple;
+	bh=EePKVazDHk0zLLlZcjQ7KTrD/d9vwPmLdJBvvtGO6O8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=n6dflc1/GNWKjuxkjCTbK9DqEaiPziLl+hbebR55vQaepCe4mFihxfFNoapdI6HvDd81PyL8GR/jFW35WVsSgMrS9JPuYEPMfY1XFTHgr4rNyn8KjlpheWJYbkVWH6CBMwhYqer9UZPidI3ZWnWA1ZHR9CybsB9o+kZuHTa2rMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l0r2xmBU; arc=none smtp.client-ip=209.85.221.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-53fa87d437bso666175e0c.3;
+        Mon, 25 Aug 2025 10:40:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756143657; x=1756748457; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=9O+V4Dq1sbmSy7X9m4img8VETFnwGACT+BLxqajMHug=;
+        b=l0r2xmBUyeW+suzxoidD54BVbgUp8LTLz54ahfYqWucNgtK3bA+y0v8XlWFxcnMdQC
+         cZ0lRHXRUxqpsapxB8n04Rsc761MsPn0QXcGuH8YxvZTBjbqvv1rgEq/VTT0L3Wualwh
+         4jxcClvroBob3rsK1YXuFKueJmUago174gbbitq1FDhNZaBFc5VOZFxDmrJholGa8Ao5
+         L+zlmR09S0YGSu1t+lL8ZsyOMPhlxV3qkY1HEwDp1dORZG35LmaJGWElj33XqV/XI8/m
+         z/fkE34N/POxQWVAy1ypgHVvhnBMm6Jr+I8/ywxOQNe4CGGCRvyQb7JoYoqhmhmWOQw0
+         rjpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756143571; x=1756748371;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eoKRMllrU2xAaVReY0OXakrcbaoMzAgMTduUHxr6ves=;
-        b=swqrTUZOpny2j3vnJ6Q4I/V4AmLmokF2T9UvTwCSvySj4XM1hy1g8Gs6SvsiD4pnXz
-         hvX9jg3aZRazMzy2VChcs/wKIP5WBsh+8B0gThbAiucmomM0Ie33nGrI5lBXPROWxdvf
-         VSk/wMvElCWHf6eFa0Zi+MBw+r5AI2BZg4VTrHtwF5rgbDrutEWded0UohTQmZC0uj7A
-         sofuwpn+z0onDY5yaf9X3Q9y7NOi3i5SAsraA9T8qWEsPHQF3cU9D7bkb8ABovg4Ma08
-         iLwTzkjXRah1Hued9HKYMz7zj0Ws9pBfyTe4Nl574ggEwhACbgSUXotTzbQOuyI3WXZ2
-         B2Nw==
-X-Forwarded-Encrypted: i=1; AJvYcCW2IDo0ysaiYmQngRS2hrTVUmf7J+58NoL8Auiq886QA5keYBDdrsrn9MJDfMkyuV3/DqP/Ino=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNKi+zQ66AMJpN/Q65yveNftR5ev8/McoNW73aNzs+1gj5A7ss
-	cvFXtOmWISOVp5DpAVSgH10CuknLj3/Ha9OR30DzsWxZSTA4BEa0/Zi7QBhmSjnrvNF8fYO2d2p
-	F9GgeThgidbm0pod/e3baojErDczBZzUtb6f2wU8V6DrdY2M3U5thz4jJ2OU=
-X-Google-Smtp-Source: AGHT+IHmCiGOEVGHGc2l2cwdhQN21F/LwlGC4TSPDlo5vcFOx/rJOlQ1oJynS4KKwWCv9rXb3U/EpMATPGjfOJ8DGFHnGHOO+gNt
+        d=1e100.net; s=20230601; t=1756143657; x=1756748457;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9O+V4Dq1sbmSy7X9m4img8VETFnwGACT+BLxqajMHug=;
+        b=QUGJDb5URegq/Cp810XPeTeVnEm15uK/VQk/nmmD/y+ZOqzkDsG9zP3WFdZ+F06jjm
+         Xx+h5gTQRUsyE7GZBWgtiQy8ErQHI174+lnxUwpWX1k7nSzGAsqT2zZDC+IR8aIqodwq
+         nThJrHiUbJ+/JToegmRkmji/qfuVbm9SJ3oVYIsFyWpqByFL7vsW9z5RrK3lq+saQVZG
+         0TpcjJ+1q/HkMfjgzxoak0mS0TYJrnrR20z8q38Wlx/EsAZuQB3zpX0CXAQAGqPKc9E8
+         waOEfbYMpALzHUDLM9KV299d1BKzs3AxX5Nbl1Mf5a+7fjA22QY6ZDkbra8lEwFmS1aY
+         TqGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWj2MDjAqeTQ3JGHD2D7JuSqmrzLDwGLdrGp4llsc6TIBuZiWQEB3nvEBmherEMSr65hheedZnwFS6hk0Q=@vger.kernel.org, AJvYcCWoE7hAjzxZBE/3gIg6bJ5EZdHGwuvOF2iZ8Y9gFfvZv8l5E6DcwlHLTt3nAhHfYeJPEF+8oy96@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHliQ9NumyICtbHXN4YHn7Kv8Za3dlJBOu+uE0omGfNHx380zM
+	XSHfdfQ8HzVPyPBj/cryxHLqacix++IBYDlHfKwxvUJx99+L8qvG/ThLqGZ+7y7aHRdyqkxVuFZ
+	M07vKh/PVT/vP+/HtrNTdkUGa7mabsZY=
+X-Gm-Gg: ASbGncvfbbNPxI5SQ5pqmhB4/VQEwTNlq3QCyyqennRWNtVniBOgZE/Q0wmXN5FXSdW
+	etoZ238r/Hb4r8jejrAeQMkEsj15Ck2tOG9xtNPX3+8uKk8t/w0hVABo2B3NnDgSCh39SpA4tgW
+	DVgEga7xISDkfyyWOk7ZQk5MOyS86gbaZPfG4VYzNZpxDgI0y9cxWsR1noZfIpSwKT+Ow/B7bQ0
+	YMUdPXETFIrzA7hBn9/Gl4oxoajXMhRTLEjRFWK
+X-Google-Smtp-Source: AGHT+IFY2DOWJQ9y7UOJ2CuQdXLiXGzwE0UkGTy6pv96Se7XdZdVeG2Gmoc+QD+IbAackPBdqjgWRCdwPWE/CUfv/5o=
+X-Received: by 2002:a05:6122:1a85:b0:53f:8fcb:b630 with SMTP id
+ 71dfb90a1353d-53f8fcbc13bmr1822566e0c.4.1756143656893; Mon, 25 Aug 2025
+ 10:40:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:18cf:b0:3e6:7df0:ec19 with SMTP id
- e9e14a558f8ab-3e9201f40afmr27100605ab.8.1756143571501; Mon, 25 Aug 2025
- 10:39:31 -0700 (PDT)
-Date: Mon, 25 Aug 2025 10:39:31 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68ac9fd3.050a0220.37038e.0096.GAE@google.com>
-Subject: [syzbot] [bpf?] possible deadlock in __bpf_ringbuf_reserve (2)
-From: syzbot <syzbot+fa5c2814795b5adca240@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com, 
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
-	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
-	sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com, 
-	yonghong.song@linux.dev
+References: <20250825012821.492355-1-alex.t.tran@gmail.com>
+ <c6c354ec-e4fe-4b80-b2e5-9f6c8350b504@gmail.com> <6214363b-0242-481d-9b93-2db9e1ba5913@lunn.ch>
+In-Reply-To: <6214363b-0242-481d-9b93-2db9e1ba5913@lunn.ch>
+From: Alex Tran <alex.t.tran@gmail.com>
+Date: Mon, 25 Aug 2025 10:40:45 -0700
+X-Gm-Features: Ac12FXwjzcnhrb3wEVYVL5CehQGWbmO1jqgeZah08W4sZZ669qT88QOCnL5heag
+Message-ID: <CA+hkOd72gg-8VVfdpNpATbunJt-Oc7Dujor9crQP7sFiDj_L8w@mail.gmail.com>
+Subject: Re: [PATCH net v1] Fixes: xircom auto-negoation timer
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+> > You state this is a fix. Which problem does it fix?
+The change was originally suggested under a FIXME comment but it seems
+like more of a cleanup.
 
-syzbot found the following issue on:
+> > Do you have this hardware for testing your patches?
+I do not have the physical hardware. The change was made based on code
+analysis and successful kselftests and kernel compilation on all yes
+config.
 
-HEAD commit:    dd9de524183a xsk: Fix immature cq descriptor production
-git tree:       bpf
-console output: https://syzkaller.appspot.com/x/log.txt?x=102da862580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c321f33e4545e2a1
-dashboard link: https://syzkaller.appspot.com/bug?extid=fa5c2814795b5adca240
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=142da862580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1588aef0580000
+> > You might consider migrating this driver to use phylib.
+> > Provided this contributes to reducing complexity.
+>
+> There is plenty to reduce. There is a full bit-banging MDIO
+> implementation which could be replaced with the core implementation.
+>
+> The harder part for converting to phylib will be the ML6692 and
+> DP83840A. There are no Linux driver for these, but given the age,
+> there is a good chance genphy will work.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/5a3389c1558f/disk-dd9de524.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/c97133192a27/vmlinux-dd9de524.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/3ae5a1a88637/bzImage-dd9de524.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+fa5c2814795b5adca240@syzkaller.appspotmail.com
-
-============================================
-WARNING: possible recursive locking detected
-syzkaller #0 Not tainted
---------------------------------------------
-syz-execprog/5866 is trying to acquire lock:
-ffffc900048c10d8 (&rb->spinlock){-.-.}-{2:2}, at: __bpf_ringbuf_reserve+0x1c7/0x5a0 kernel/bpf/ringbuf.c:423
-
-but task is already holding lock:
-ffffc900048e90d8 (&rb->spinlock){-.-.}-{2:2}, at: __bpf_ringbuf_reserve+0x1c7/0x5a0 kernel/bpf/ringbuf.c:423
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock(&rb->spinlock);
-  lock(&rb->spinlock);
-
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-6 locks held by syz-execprog/5866:
- #0: ffff88807e021588 (vm_lock){++++}-{0:0}, at: lock_vma_under_rcu+0x19f/0x3d0 mm/mmap_lock.c:147
- #1: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
- #1: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
- #1: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: ___pte_offset_map+0x29/0x250 mm/pgtable-generic.c:286
- #2: ffff8880787b60d8 (ptlock_ptr(ptdesc)#2){+.+.}-{3:3}, at: spin_lock include/linux/spinlock.h:351 [inline]
- #2: ffff8880787b60d8 (ptlock_ptr(ptdesc)#2){+.+.}-{3:3}, at: __pte_offset_map_lock+0x13e/0x210 mm/pgtable-generic.c:401
- #3: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
- #3: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
- #3: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: __bpf_trace_run kernel/trace/bpf_trace.c:2256 [inline]
- #3: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: bpf_trace_run2+0x186/0x4b0 kernel/trace/bpf_trace.c:2298
- #4: ffffc900048e90d8 (&rb->spinlock){-.-.}-{2:2}, at: __bpf_ringbuf_reserve+0x1c7/0x5a0 kernel/bpf/ringbuf.c:423
- #5: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
- #5: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
- #5: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: trace_call_bpf+0xb7/0x850 kernel/trace/bpf_trace.c:-1
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 5866 Comm: syz-execprog Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_deadlock_bug+0x28b/0x2a0 kernel/locking/lockdep.c:3041
- check_deadlock kernel/locking/lockdep.c:3093 [inline]
- validate_chain+0x1a3f/0x2140 kernel/locking/lockdep.c:3895
- __lock_acquire+0xab9/0xd20 kernel/locking/lockdep.c:5237
- lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
- __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
- _raw_spin_lock_irqsave+0xa7/0xf0 kernel/locking/spinlock.c:162
- __bpf_ringbuf_reserve+0x1c7/0x5a0 kernel/bpf/ringbuf.c:423
- ____bpf_ringbuf_reserve kernel/bpf/ringbuf.c:474 [inline]
- bpf_ringbuf_reserve+0x5c/0x70 kernel/bpf/ringbuf.c:466
- bpf_prog_df2ea1bb7efca089+0x36/0x54
- bpf_dispatcher_nop_func include/linux/bpf.h:1332 [inline]
- __bpf_prog_run include/linux/filter.h:718 [inline]
- bpf_prog_run include/linux/filter.h:725 [inline]
- bpf_prog_run_array include/linux/bpf.h:2292 [inline]
- trace_call_bpf+0x326/0x850 kernel/trace/bpf_trace.c:146
- perf_trace_run_bpf_submit+0x78/0x170 kernel/events/core.c:10911
- do_perf_trace_contention_end include/trace/events/lock.h:122 [inline]
- perf_trace_contention_end+0x253/0x2f0 include/trace/events/lock.h:122
- __do_trace_contention_end include/trace/events/lock.h:122 [inline]
- trace_contention_end+0x111/0x140 include/trace/events/lock.h:122
- __pv_queued_spin_lock_slowpath+0x9f9/0xb60 kernel/locking/qspinlock.c:374
- pv_queued_spin_lock_slowpath arch/x86/include/asm/paravirt.h:557 [inline]
- queued_spin_lock_slowpath+0x43/0x50 arch/x86/include/asm/qspinlock.h:51
- queued_spin_lock include/asm-generic/qspinlock.h:114 [inline]
- do_raw_spin_lock+0x21f/0x290 kernel/locking/spinlock_debug.c:116
- __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:111 [inline]
- _raw_spin_lock_irqsave+0xb3/0xf0 kernel/locking/spinlock.c:162
- __bpf_ringbuf_reserve+0x1c7/0x5a0 kernel/bpf/ringbuf.c:423
- ____bpf_ringbuf_reserve kernel/bpf/ringbuf.c:474 [inline]
- bpf_ringbuf_reserve+0x5c/0x70 kernel/bpf/ringbuf.c:466
- bpf_prog_6979e45824a16319+0x36/0x66
- bpf_dispatcher_nop_func include/linux/bpf.h:1332 [inline]
- __bpf_prog_run include/linux/filter.h:718 [inline]
- bpf_prog_run include/linux/filter.h:725 [inline]
- __bpf_trace_run kernel/trace/bpf_trace.c:2257 [inline]
- bpf_trace_run2+0x281/0x4b0 kernel/trace/bpf_trace.c:2298
- __bpf_trace_tlb_flush+0xf5/0x150 include/trace/events/tlb.h:38
- __traceiter_tlb_flush+0x76/0xd0 include/trace/events/tlb.h:38
- __do_trace_tlb_flush include/trace/events/tlb.h:38 [inline]
- trace_tlb_flush+0x115/0x140 include/trace/events/tlb.h:38
- native_flush_tlb_multi+0x78/0x140 arch/x86/mm/tlb.c:-1
- __flush_tlb_multi arch/x86/include/asm/paravirt.h:91 [inline]
- flush_tlb_multi arch/x86/mm/tlb.c:1361 [inline]
- flush_tlb_mm_range+0x6b1/0x12d0 arch/x86/mm/tlb.c:1451
- flush_tlb_page arch/x86/include/asm/tlbflush.h:324 [inline]
- ptep_clear_flush+0x120/0x170 mm/pgtable-generic.c:101
- wp_page_copy mm/memory.c:3618 [inline]
- do_wp_page+0x1bc2/0x5800 mm/memory.c:4013
- handle_pte_fault mm/memory.c:6068 [inline]
- __handle_mm_fault+0x1033/0x5440 mm/memory.c:6195
- handle_mm_fault+0x40a/0x8e0 mm/memory.c:6364
- do_user_addr_fault+0xa81/0x1390 arch/x86/mm/fault.c:1336
- handle_page_fault arch/x86/mm/fault.c:1476 [inline]
- exc_page_fault+0x76/0xf0 arch/x86/mm/fault.c:1532
- asm_exc_page_fault+0x26/0x30 arch/x86/include/asm/idtentry.h:623
-RIP: 0033:0x410964
-Code: b9 01 00 00 00 90 e8 3b 36 06 00 84 00 48 8d 50 10 83 3d be 5f d9 02 00 74 10 e8 87 d9 06 00 49 89 13 48 8b 48 10 49 89 4b 08 <48> 89 50 10 48 89 c1 48 8b 54 24 20 48 8b 1a 66 89 59 18 83 3d 92
-RSP: 002b:000000c0000e7608 EFLAGS: 00010246
-RAX: 000000c0080e0000 RBX: 0000000000000070 RCX: 0000000007b2a8a0
-RDX: 000000c0080e0010 RSI: 000000000b1130e1 RDI: 0000000009e14d67
-RBP: 000000c0000e7638 R08: 00007f16e8ad96e0 R09: 7fffffffffffffff
-R10: 0000000000000001 R11: 00007f16e8a2e000 R12: 000000c0080e0000
-R13: 0000000000000049 R14: 000000c0026156c0 R15: 000000c0080c1c20
- </TASK>
+Migrating the driver to use phylib sounds like a good idea. I can
+rework this patch and send in a v2 with the changes if you all are
+fine with moving forward with this.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-- 
+Alex Tran
 
