@@ -1,162 +1,156 @@
-Return-Path: <netdev+bounces-216381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28BF2B335B7
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 07:07:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C0A0B3361A
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 08:02:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D6A61B2033F
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 05:07:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9BCB1B211E3
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 06:03:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE66123CEF9;
-	Mon, 25 Aug 2025 05:07:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03FD018DF62;
+	Mon, 25 Aug 2025 06:02:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Zvhm+YTR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vdur1+Rh"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51EB272627;
-	Mon, 25 Aug 2025 05:07:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 356B828F4;
+	Mon, 25 Aug 2025 06:02:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756098426; cv=none; b=iBY5XGU99JX0iBuKD/RXlEmCDdJxW7u0NMhZO5XSbQWxq9Hv/7McqVRaRiLcen4+7WIeUGzMuyT/kfFfr1KvaqmwVs6FDBcfsg2X0AeuyimHU2rivkaC3Gha9lUA6ZyKyDMVL+TRKjJDRhifwJlxZgxNPATte0LcuSOO7hNX9c0=
+	t=1756101761; cv=none; b=qm8oOc2xQjYaL7phmaXirsVnYGuad3T+/KYw2Q1LPoAonJxEK4YjhDRgrpl/zdKsWAeW8AWKt6o0lSXVuHByYEL8/L23J8eIDB/lgWPRRN12hpWxWlnhECzc/USYvEkN7m93LTDr4YW7Tr0JRG1KAk6Z+Y97qGpAlJfY3By8B+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756098426; c=relaxed/simple;
-	bh=CKnI+uQNf+KVjexwVCKM5ZrCgqpglIoTmizpooUa76M=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kpJT68mUN1BqPKZU89kJeDFAgrbbrPqp0JoIdKKK8znXrk7CB2rVUQ96VvNl1zkArs9e58FCkl5AoZ6KsxdRoBDWDkhI57Y8NMMeNDoR63BM60kawcxovKwxSVRYpZQtPoxA7WPXTIQs+sBvr6Mm1VBjVtzYhXNuA2WNxQEUh6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Zvhm+YTR; arc=none smtp.client-ip=117.135.210.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=zp
-	cWxOtKXy5d6EuCfY1TPJPyTbuk1GdgU+bYTYEPKBk=; b=Zvhm+YTRatEfBpgQ7J
-	gPTHVmRgTy5lMMs47GwIFj7R8gE7m6jDaDDgJOoANXZgsUN8nP9v/QsWzv2Qe2tH
-	U2RtQcY3TNRwvRRGl0XP56sD4hHTu+nLmH9Lt/GrOSomufnHzIERbB+cHIoJvRyv
-	5p4X3ts03rg/5lxT+xugfYW3M=
-Received: from zhaoxin-MS-7E12.. (unknown [])
-	by gzga-smtp-mtada-g0-2 (Coremail) with SMTP id _____wBXHkJU76toR3+ODw--.7007S2;
-	Mon, 25 Aug 2025 13:06:28 +0800 (CST)
-From: Xin Zhao <jackzxcui1989@163.com>
-To: willemdebruijn.kernel@gmail.com,
-	edumazet@google.com,
-	ferenc@fejes.dev
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v6] net: af_packet: Use hrtimer to do the retire operation
-Date: Mon, 25 Aug 2025 13:06:28 +0800
-Message-Id: <20250825050628.124977-1-jackzxcui1989@163.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1756101761; c=relaxed/simple;
+	bh=Q8hj22B2MpR2JFzyBxlgxl1D95+tk574OJ1xEorYG0Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qaG+Sn6MrHbKhtSiJ2cnaN2TQa4xOBPRgfeLH/4dQgy9UdsshSiWtqpkOIPtcM5ePWYXApNZBVuz7xwGvEEvrpDvZarOinJ55Db/EKCB960IHRAkQx1O9iXKBNvWMwvfV/lb9QPWCq0+tFj3i7PXYqLwceZTnedUDa5AkxWGG3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vdur1+Rh; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-45a1b001f55so20770985e9.0;
+        Sun, 24 Aug 2025 23:02:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756101758; x=1756706558; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5DyuRX2zEK/K9xsQep6iSkKr0C42JRzdyda0+bFIm3s=;
+        b=Vdur1+RhS8SeqRrstYn/deq/2RXEjAEPnuZnGt1lu9+29hPsTgehasBWvlwa3kL+hm
+         Lna3LaI4xBo3v6mF2e5WYAVQTKr45Gn0Sn4tE8agfnYdNIyEM7PltIr+0KgknHCtSF+R
+         S79rRgBTR0AXgxR7xbLO27mK46Oi6CTII99Y4AxEsFhvQoGF55Z4no3q97uujpVstmwR
+         wIHUcMHAsQE3LOj/hwAoe4GffAAOKquVF/ZJCHhWpzHq+dcqB90XQKK1Bymx1cw8bCYV
+         54pfXzDFnQAJ+ZMjSM0/oen/uYo4yF6RjmxQ9F3Hw/yLyGb0IcxQ+COgpKTlKXaNXsCk
+         hIQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756101758; x=1756706558;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5DyuRX2zEK/K9xsQep6iSkKr0C42JRzdyda0+bFIm3s=;
+        b=UDJf/ZcF/rn0Tmoby9hFm26H/yhsdjLJ3hz1bslpA6im+QqwJIYQJe5NraptsHKjQQ
+         DLglVJr6VsUuIFC6fkaC6PswKyXm36BJCGH7APZ/MkFAKRjEDehEDRXxlQfnl1bz3PRb
+         28sO2lOCI6QCwJ8nl8SdKWnDfwMmtAlsZ743KIF7vE1rTIa0VJyxzUsGz7PzR+y8CC+N
+         h7/t1C4N6EnXxJIw/zC5MiXObXEOcGMpu8L+jb69w7DTC+b2rk3Uibm/ZEMbvh07ddHG
+         Ef1ElweUVYln6peXPKbNPFfG9hkS6a5ZRgiWgU34uG+g/38loECvn9XfhdxCYUu9T3nG
+         sWRA==
+X-Forwarded-Encrypted: i=1; AJvYcCWJQ+6zV1ueklpOlabzUkvP/U6X+szXOhmwGwhzlHwU5T0pkiV+O5mi/EL8JvKcaEK/ecolIsY=@vger.kernel.org, AJvYcCXLzhIJUq1xMHfYVCiY71OQhlOlWw0CiRPYAnQ3B8pH0EBMoYduPpyGN2wpuKy1T7vsIBpcG0UA@vger.kernel.org
+X-Gm-Message-State: AOJu0YwR0eP2Nr9Q7iO/qQpYWJHCMb9iQ46s4eQhAl2wzm/B6UdQffcI
+	E/+Ot4sRmFFlm0tJQAIsgPO3yptJ1itV5SZJ/Ha+ZSQU6iORKNqCG99wzUbvTCEY
+X-Gm-Gg: ASbGnctPxy+ncjlFd5rCoer9xI2AoUVV9QfgMeCCUw+fORZ/vaogB0DO/cRw9OHhanR
+	Am6I42Czs46IiHQaqCO1JqRMoACL+NVXr1n490u5gw8m6Phh1jmM7J5HQWr3U8x1II/YfMT4/o+
+	cHqdoeJL63pPkaQHglL2/+gU8QWIqukQlpntO1Wh48DCwQbi9Az3q7cL1O9Sa9Uh8NZYbOsoqdJ
+	fnIGNyM4zF9FF3cTdkUgeE08b3ylJsUFEe+WH5f/+MPcN/Vnmvy2y6DoDfv/JGq4xgomaxYf+QR
+	xcjJ7ZUPkLDayPeTz6igMhZ8QrScQzYwqzOfwrekJrnNmmasF/9hccLtmuCgmD5mlLkwOBl+rm5
+	TWGAQFo8TqlBjU4RQ+5Mw3/Y8iTihVfAQ2gw=
+X-Google-Smtp-Source: AGHT+IGNTe6zPGTVY8MUfMP/Fkn+/GW7mAVSeut+h3YojmOGNkurifYNNXvSOJwskSim/u4d8P6+2w==
+X-Received: by 2002:a05:600c:4e8f:b0:459:e370:d065 with SMTP id 5b1f17b1804b1-45b5179f623mr82250875e9.15.1756101758296;
+        Sun, 24 Aug 2025 23:02:38 -0700 (PDT)
+Received: from localhost.localdomain ([45.128.133.220])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b5744e9b1sm93229695e9.11.2025.08.24.23.02.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 24 Aug 2025 23:02:37 -0700 (PDT)
+Date: Mon, 25 Aug 2025 08:02:29 +0200
+From: Oscar Maes <oscmaes92@gmail.com>
+To: Brett Sheffield <brett@librecast.net>,
+	Brett A C Sheffield <bacs@librecast.net>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: regressions@lists.linux.dev, netdev@vger.kernel.org,
+	stable@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org
+Subject: Re: [REGRESSION][BISECTED][PATCH] net: ipv4: fix regression in
+ broadcast routes
+Message-ID: <20250825060229-oscmaes92@gmail.com>
+References: <20250822165231.4353-4-bacs@librecast.net>
+ <20250822183250.2a9cb92c@kernel.org>
+ <aKmzB57MKbpXh-_Z@karahi.gladserv.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wBXHkJU76toR3+ODw--.7007S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxAryUuw13Kr43tw48Zr17Awb_yoWrGF1kpa
-	y2qry7Ar1kZr42va1xZF4kJFy5JwsxAr47Jr1fGr1jkFnrGF1UtFWjqFySqFW7Gr4rt3Z2
-	yr48Xr13ArnYk3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UHbyZUUUUU=
-X-CM-SenderInfo: pmdfy650fxxiqzyzqiywtou0bp/1tbiowCzCmirRh303wABso
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aKmzB57MKbpXh-_Z@karahi.gladserv.com>
 
-On Mon, 2025-08-25 at 2:08 +0800, Willem wrote:
-
-> This is getting more complex than needed.
+On Sat, Aug 23, 2025 at 02:24:39PM +0200, Brett Sheffield wrote:
+> On 2025-08-22 18:32, Jakub Kicinski wrote:
+> > Thanks for bisecting and fixing!
+> > 
+> > > The broadcast_pmtu.sh selftest provided with the original patch still
+> > > passes with this patch applied.
+> > 
+> > Hm, yes, AFACT we're losing PMTU discovery but perhaps original commit
+> > wasn't concerned with that. Hopefully Oscar can comment.
 > 
-> Essentially the lifecycle is that packet_set_ring calls hrtimer_setup
-> and hrtimer_del_sync.
+> Indeed. This takes it back to the previous behaviour.
 > 
-> Inbetween, while the ring is configured, the timer is either
+> > On Fri, 22 Aug 2025 16:50:51 +0000 Brett A C Sheffield wrote:
+> > > +		if (type == RTN_BROADCAST) {
+> > > +			/* ensure MTU value for broadcast routes is retained */
+> > > +			ip_dst_init_metrics(&rth->dst, res->fi->fib_metrics);
+> > 
+> > You need to check if res->fi is actually set before using it
 > 
-> - scheduled from tpacket_rcv and !is_scheduled
->     -> call hrtimer_start
-> - scheduled from tpacket_rcv and is_scheduled
->     -> call hrtimer_set_expires
-
-We cannot use hrtimer_set_expires/hrtimer_forward_now when a hrtimer is
-already enqueued.  
-The WARN_ON(timer->state & HRTIMER_STATE_ENQUEUED) in hrtimer_forward
-already clearly indicates this point. The reason for not adding this
-WARN_ON in hrtimer_set_expires is that hrtimer_set_expires is an inline
-function, wory about increase code size.
-The implementation of perf_mux_hrtimer_restart actually checks whether
-the hrtimer is active when restarting the hrtimer.
-
-static int perf_mux_hrtimer_restart(struct perf_cpu_pmu_context *cpc)
-{
-	struct hrtimer *timer = &cpc->hrtimer;
-	unsigned long flags;
-
-	raw_spin_lock_irqsave(&cpc->hrtimer_lock, flags);
-	if (!cpc->hrtimer_active) {
-		cpc->hrtimer_active = 1;
-		hrtimer_forward_now(timer, cpc->hrtimer_interval);
-		hrtimer_start_expires(timer, HRTIMER_MODE_ABS_PINNED_HARD);
-	}
-	raw_spin_unlock_irqrestore(&cpc->hrtimer_lock, flags);
-
-	return 0;
-}
-
-Therefore, according to the overall design of the hrtimer, once the
-hrtimer is active, it is not allowed to set the timeout outside of the
-hrtimer callback nor is it allowed to restart the hrtimer.
-
-So two ways to update the hrtimer timeout:
-1. update expire time in the callback
-2. Call the hrtimer_cancel and then call hrtimer_start
-According to your suggestion, we don't call hrtimer_start inside the
-callback, would you accept calling hrtimer_cancel first and then calling
-hrtimer_start in the callback? However, this approach also requires
-attention, as hrtimer_cancel will block until the callback is running,
-so it is essential to ensure that it is not called within the hrtimer
-callback; otherwise, it could lead to a deadlock.
-
-
-> - rescheduled from the timer callback
->     -> call hrtimer_set_expires and return HRTIMER_RESTART
+> Ah, yes.  Fixed.
 > 
-> The only complication is that the is_scheduled check can race with the
-> HRTIMER_RESTART restart, as that happens outside the sk_receive_queue
-> critical section.
+> > Could you add a selftest / test case for the scenario we broke?
+> > selftests can be in C / bash / Python. If bash hopefully socat
+> > can be used to repro, cause it looks like wakeonlan is not very
+> > widely packaged.
 > 
-> One option that I suggested before is to convert pkc->delete_blk_timer
-> to pkc->blk_timer_scheduled to record whether the timer is scheduled
-> without relying on hrtimer_is_queued. Set it on first open_block and
-> clear it from the callback when returning HR_NORESTART.
+> Self-test added using socat as requested. If you want this wrapped in namespaces
+> etc. let me know. I started doing that, but decided a simpler test without
+> requiring root was better and cleaner.
+> 
+> Thanks for the review Jakub.  v2 patches sent.
+> 
+> Cheers,
+> 
+> 
+> Brett
+> -- 
+> Brett Sheffield (he/him)
+> Librecast - Decentralising the Internet with Multicast
+> https://librecast.net/
+> https://blog.brettsheffield.com/
 
-Do you agree with adding a callback variable to distinguish between
-scheduled from tpacket_rcv and scheduled from the callback? I really
-couldn't think of a better solution.
+Replying to you both.
 
+I missed this regression when I tested the blamed commit. Glad this surfaced quickly.
 
-So, a possible solution may be?
-1. Continue to keep the callback parameter to strictly ensure whether it
-is within the callback.
-2. Use hrtimer_set_expires within the callback to update the timeout (the
-hrtimer module will enqueue the hrtimer when callback return)
-3. If it is not in callback, call hrtimer_cancel + hrtimer_start to restart
-the timer.
-4. To avoid the potential issue of the enqueue in step 2 and the
-hrtimer_start in step 3 happening simultaneously, which could lead to
-hrtimer_start being triggered twice in a very short period, the logic should
-be:
-if (hrtimer_cancel(...))
-    hrtimer_start(...);
-Additionally, the hrtimer_cancel check will also avoid hrtimer callback
-triggered once more when just called prb_del_retire_blk_timer by packet_set_ring.
-The hrtimer should be in an active state beginning from when
-prb_setup_retire_blk_timer is called to the time when prb_del_retire_blk_timer
-is called.
+Just to clarify, the issue isn't that the destination address is "mangled".
+The removal of fi = NULL inadvertently causes a gateway to be assigned to
+local broadcast packets (see the call to rt_set_nexthop), which results in the
+observed regression. __mkroute_output is still correct for directed broadcast packets
+due to them having their own routes in the local table. The regression can easily be
+fixed by setting the fib info to NULL for lbcast packets.
 
+The submitted selftest only fails if a default gateway is configured, but does not
+set one up. I'll submit my own patches to fix the regression and improve the
+selftest shortly.
 
-Thanks
-Xin Zhao
-
+Oscar
 
