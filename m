@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-216653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BDE9B34C3A
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 22:42:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8909B34C39
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 22:42:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3B4F7B5B94
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 20:41:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47F5C3B18F6
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 20:42:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8360229AAE3;
-	Mon, 25 Aug 2025 20:42:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78EA22FDC38;
+	Mon, 25 Aug 2025 20:42:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="algnNJqw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WOaNXZ71"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3B8429BDB8
-	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 20:42:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C35F12F83A5
+	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 20:42:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756154530; cv=none; b=qqkzKVGYlk9/MopPi8OzPVnCsnk/zrBwwm7ONhNIBZs6hOkET3b9XxOGZ8UE1You1ZsV4PYl2+5O1Uff3sYyHnF8s3K2HIPAwr2arvxZ8XioYWy/iZm8+uGwPJnlhVqXu4/vmsXescWecOx8R7Jw2o7P047Q1w6MrYUFMyCrhPU=
+	t=1756154532; cv=none; b=fC/pJGRHE5sj0dTmXerOuh+3HmMSCfiA+Yy5+PWnINsbP0tyWksnxoBu0g6SRiISfv2JpnqtAih9G/17f1QI1qw38jzQabF91M/EMW2LxREwvVnlLpJgb7qNs8MwbkQUGNYQDZXOzOEBTH2eJN/D5fIz06AxrvkPGFogyvfXCRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756154530; c=relaxed/simple;
-	bh=J4sq2HVpzm8ou0LFMByfXyLT3uq1CSFAUpdCkJLN0fY=;
+	s=arc-20240116; t=1756154532; c=relaxed/simple;
+	bh=8J91X27kwkG3J1o/KwmX8tCJqR6ZHQPHGOmeCjEAYnM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=oGYumOkeCQVGCtnvU2gZLaB5QfrGSrr2gk/Pfjg2KFMau6xluz53k5SMxhQFumxr+dnvVrRPaHs7ha4OMinJwOzBJjfHJ6PHPehyFeIIg5VliW0/VaEKECzdqnBun4M4yDMhZ7TFzV5z8Xv4itFQHbakaOMcU1ymIeTfBv35gNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=algnNJqw; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=nhltIYDmygJDhoAKRyLStyxChCif9cyiWnD0n1sAW9BOuU/jzXjdLYYZETnvTm4HyeEzUPPygRscF6r9TyVQWhyouZkj++xErualB48xCEY4J8xfZqIkyKxIHc26imM1b0ZgRxBW/8tz5ab8UGT54bs2rFgboySK166O7cv+CLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WOaNXZ71; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-324fbd47789so4115908a91.3
-        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 13:42:08 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b47173a00e8so3669818a12.1
+        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 13:42:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756154528; x=1756759328; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1756154530; x=1756759330; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+UdZkVzjW5oGtGGFKrP9IRh3u4x1tuXdRI3VCIV41aw=;
-        b=algnNJqwwOIbZOCrWBM/nVpZOfIkdHc4MYELCqUrKL/pqzVI61Do262YDASuYi7QeP
-         H+aHsD7kl7Evghew/L7m+BjjOzour0qle/eS8AscA38YbKDDZDakKHla4B0Vb5JzJj8s
-         o0rmHD1aXBiOsNZz6Ixav00iawLAaso3lvGAOVJLzhFr8JceBeNUhdcsFWmQVg9hIn1k
-         V9X6IVkQF4pPyoU8n7CHZ1h2QfXCAxuW5TNSN27QsxrK9bFj5M68qyLuN04ElnanW+Xh
-         UUiQoZy55hbm27MRoEETqq1NYFh7/QF0dnFMeKu6xV1Ex21ViQGLBPoZwagkYd7GO9eD
-         6ENQ==
+        bh=mZbqORmGAVXvrcsrYy+vWRcR/4pp02lgb0ulvhwqppc=;
+        b=WOaNXZ71yCOQaWTuBJXfQe37/mGMn1HLtA2y6kh2iB5zH4SWJZWe+Wx3DrEnS++Jdn
+         mv4xdMUvBg1Ke7C+ZZs0kTS5NMcjbPMqQn3WLT+p/heuC1+xVhovFGB6NC8slh+H+ct6
+         ymlroG4JULbH0mS+0CSYzSDWaHDCemYDOID9gFHSz4t4OIpq3qA9sN9t2Ky5+JWAj8h/
+         bNdNIuMv1H6plgPo296sNf/8tp5F6THpUJUXIT1nHbqGIEHih8AdfXSakvZf69g1hkD0
+         NeucFhxdRgkdaMS2f72uZgKtiVXFAa61TWGW8xJPycnugzc+dBsj+cnJ0+kMko5u4f2y
+         WBFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756154528; x=1756759328;
+        d=1e100.net; s=20230601; t=1756154530; x=1756759330;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+UdZkVzjW5oGtGGFKrP9IRh3u4x1tuXdRI3VCIV41aw=;
-        b=oHADprp9tphL+6eWz8Tmu4+S8CCmnTQlsCQGHMSiem3TSQkWjs+EYNoehftVAEfPrq
-         n83lwqd88WyyI+JFqEqnxp8CjhVL4DAsZKTN5hdHaF5RzZ56dd4tv2nPNs8kD/IXKNU9
-         qw9LCezOKGlDXWJr3Lp0K77QGFCEixrf8f6SXJH7sYHIS+SgdKCPTIdj/33cy02nv4Wh
-         qO8vnq4CBs/JwaUGMksJd9fQi/AK3PveYj/k4uFO2UggrWozIrLDmbptu4qW9K/ACoxM
-         BkZbeY/WB0hGh61kMKwuzn/QcRgUxTq+/Ag5nxV2p+iQI0UaKB0lctwN+S4p1xLTVToE
-         c63w==
-X-Forwarded-Encrypted: i=1; AJvYcCWlvQ/HU8ZiPu/uIO4QMF8Z0RoGRnRgN4v0FWEa4JFBFaHtYVne3+d0zrEuI5jmW62D8a1AfgY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy57ZNQcvKytgPDSU3QRQ2vNcItoy9X2yB1Sr2YiRvBV1nNjC2g
-	6UNrDeOZ0qL6UJPzuEAH0CW0mTOLREE5CzmmZJBZbRsE/dIACG7W/aikvAQQ7ytJdFrFONwRC9G
-	SXqmZrQ==
-X-Google-Smtp-Source: AGHT+IFXCw3JqKqAP6NeUuK4c91n9d43KxLQoQA2UskYGS6nqsHtcqlZzi3V3FSnC1mitkCd3MPJSSkP2y4=
-X-Received: from pjff11.prod.google.com ([2002:a17:90b:562b:b0:31e:cdb5:aa34])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:224d:b0:325:322b:7c43
- with SMTP id 98e67ed59e1d1-325322b7d91mr15095767a91.8.1756154528412; Mon, 25
- Aug 2025 13:42:08 -0700 (PDT)
-Date: Mon, 25 Aug 2025 20:41:28 +0000
+        bh=mZbqORmGAVXvrcsrYy+vWRcR/4pp02lgb0ulvhwqppc=;
+        b=RnP78CPn6kr8ut7V1V8+vcNnl/HYD6mbLBldr8HJPc4GpOcCVpRFA1WEOO1otufOZg
+         4WLrWSMbepUChyDKntAYAH8u1ZLHec82VyeIRKMiHwLHttJNndCETwbZ9zLeXbPGMofm
+         DyahExsLIf2OKP1udiQkJjc6rj/D6LOY51nFhug/VdS4CPBbLYmdlu5BTF5TNcuBADNf
+         PImffhQhwX7shHzsRgu5BvzpXNN9NKiQGzfAj6nwTr0XU/rGdBiGRTSe3GwURnDeOzaO
+         X2REt+ewHSFjQ4pTIafNepJLfwUzmjeIvYoiz4PDnOuUzXJ/uyGwUHRi3+ynKFzfnSpx
+         gHWg==
+X-Forwarded-Encrypted: i=1; AJvYcCW/a1PLC+UPlD2SNLzsyCLQee6qQyBFinz+98V47cmwCmOjGXse3bITsa6kkNI5TDj01l9FBBU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlR//AWh8AexkBIUZWAvYrpRXHbK8hokW5Eofkle9/PcqBdhUj
+	jfTHlSg98RBKAfOY4ogaKCP9F4H7eu2Cmt77vRc+hzPQFZgTBpA/WmpzFUWmM0xLOorWhR8z6Pn
+	NIcZSvQ==
+X-Google-Smtp-Source: AGHT+IEbQhuHGnZeecHiqABL2up3AfDnhKI2khVJ9XYYnLg+6J7dFB95hkuLG+azsczwAJBNl+L7oBx1xyg=
+X-Received: from pjd5.prod.google.com ([2002:a17:90b:54c5:b0:2fb:fa85:1678])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:41c6:b0:246:a90e:9179
+ with SMTP id d9443c01a7336-246a90eaf13mr88700315ad.28.1756154529862; Mon, 25
+ Aug 2025 13:42:09 -0700 (PDT)
+Date: Mon, 25 Aug 2025 20:41:29 +0000
 In-Reply-To: <20250825204158.2414402-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250825204158.2414402-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.51.0.261.g7ce5a0a67e-goog
-Message-ID: <20250825204158.2414402-6-kuniyu@google.com>
-Subject: [PATCH v2 bpf-next/net 5/8] bpf: Support bpf_setsockopt() for BPF_CGROUP_INET_SOCK_(CREATE|ACCEPT).
+Message-ID: <20250825204158.2414402-7-kuniyu@google.com>
+Subject: [PATCH v2 bpf-next/net 6/8] bpf: Introduce SK_BPF_MEMCG_FLAGS and SK_BPF_MEMCG_SOCK_ISOLATED.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
 	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>
@@ -89,90 +89,232 @@ Cc: John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.
 	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-We will store a flag in sk->sk_memcg by bpf_setsockopt() during
-socket() and accept().
+We will decouple sockets from the global protocol memory accounting
+if sockets have SK_BPF_MEMCG_SOCK_ISOLATED.
 
-BPF_CGROUP_INET_SOCK_CREATE and BPF_CGROUP_INET_SOCK_ACCEPT are
-invoked by __cgroup_bpf_run_filter_sk() that passes a pointer to
-struct sock to the bpf prog as void *ctx.
+This can be flagged via bpf_setsockopt() during socket() or accept():
 
-But there are no bpf_func_proto for bpf_setsockopt() that receives
-the ctx as a pointer to struct sock.
+  flags = SK_BPF_MEMCG_SOCK_ISOLATED;
+  bpf_setsockopt(ctx, SOL_SOCKET, SK_BPF_MEMCG_FLAGS,
+                 &flags, sizeof(flags));
 
-Let's add new bpf_setsockopt() variants and support them in two
-attach types.
+Given sk->sk_memcg can be accessed in the fast path, it would
+be preferable to place the flag field in the same cache line as
+sk->sk_memcg.
 
-Note that __inet_accept() is under lock_sock() but inet_create()
-is not.
+However, struct sock does not have such a 1-byte hole.
+
+Let's store the flag in the lowest bit of sk->sk_memcg and add
+a helper to check the bit.
+
+In the next patch, if mem_cgroup_sk_isolated() returns true,
+the socket will not be charged to sk->sk_prot->memory_allocated.
+
+Note that we do not support other hooks because UDP charges memory
+under sk->sk_receive_queue.lock instead of lock_sock().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
-v2: Make 2 new bpf_func_proto static
+v2:
+  * s/mem_cgroup_sk_set_flag/mem_cgroup_sk_set_flags/ when CONFIG_MEMCG=n
+  * Use CONFIG_CGROUP_BPF instead of CONFIG_BPF_SYSCALL for ifdef
 ---
- net/core/filter.c | 43 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
+ include/net/sock.h             | 48 ++++++++++++++++++++++++++++++++++
+ include/uapi/linux/bpf.h       |  6 +++++
+ net/core/filter.c              | 32 ++++++++++++++++++++++-
+ tools/include/uapi/linux/bpf.h |  6 +++++
+ 4 files changed, 91 insertions(+), 1 deletion(-)
 
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 63f3baee2daf..1fa40b4d3d85 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -5743,6 +5743,40 @@ static const struct bpf_func_proto bpf_sock_ops_setsockopt_proto = {
- 	.arg5_type	= ARG_CONST_SIZE,
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 63a6a48afb48..d41a2f8f8b30 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -2596,10 +2596,39 @@ static inline gfp_t gfp_memcg_charge(void)
+ 	return in_softirq() ? GFP_ATOMIC : GFP_KERNEL;
+ }
+ 
++#define SK_BPF_MEMCG_FLAG_MASK	(SK_BPF_MEMCG_FLAG_MAX - 1)
++#define SK_BPF_MEMCG_PTR_MASK	~SK_BPF_MEMCG_FLAG_MASK
++
+ #ifdef CONFIG_MEMCG
++static inline void mem_cgroup_sk_set_flags(struct sock *sk, unsigned short flags)
++{
++	unsigned long val = (unsigned long)sk->sk_memcg;
++
++	val |= flags;
++	sk->sk_memcg = (struct mem_cgroup *)val;
++}
++
++static inline unsigned short mem_cgroup_sk_get_flags(const struct sock *sk)
++{
++#ifdef CONFIG_CGROUP_BPF
++	unsigned long val = (unsigned long)sk->sk_memcg;
++
++	return val & SK_BPF_MEMCG_FLAG_MASK;
++#else
++	return 0;
++#endif
++}
++
+ static inline struct mem_cgroup *mem_cgroup_from_sk(const struct sock *sk)
+ {
++#ifdef CONFIG_CGROUP_BPF
++	unsigned long val = (unsigned long)sk->sk_memcg;
++
++	val &= SK_BPF_MEMCG_PTR_MASK;
++	return (struct mem_cgroup *)val;
++#else
+ 	return sk->sk_memcg;
++#endif
+ }
+ 
+ static inline bool mem_cgroup_sk_enabled(const struct sock *sk)
+@@ -2607,6 +2636,11 @@ static inline bool mem_cgroup_sk_enabled(const struct sock *sk)
+ 	return mem_cgroup_sockets_enabled && mem_cgroup_from_sk(sk);
+ }
+ 
++static inline bool mem_cgroup_sk_isolated(const struct sock *sk)
++{
++	return mem_cgroup_sk_get_flags(sk) & SK_BPF_MEMCG_SOCK_ISOLATED;
++}
++
+ static inline bool mem_cgroup_sk_under_memory_pressure(const struct sock *sk)
+ {
+ 	struct mem_cgroup *memcg = mem_cgroup_from_sk(sk);
+@@ -2624,6 +2658,15 @@ static inline bool mem_cgroup_sk_under_memory_pressure(const struct sock *sk)
+ 	return false;
+ }
+ #else
++static inline void mem_cgroup_sk_set_flags(struct sock *sk, unsigned short flags)
++{
++}
++
++static inline unsigned short mem_cgroup_sk_get_flags(const struct sock *sk)
++{
++	return 0;
++}
++
+ static inline struct mem_cgroup *mem_cgroup_from_sk(const struct sock *sk)
+ {
+ 	return NULL;
+@@ -2634,6 +2677,11 @@ static inline bool mem_cgroup_sk_enabled(const struct sock *sk)
+ 	return false;
+ }
+ 
++static inline bool mem_cgroup_sk_isolated(const struct sock *sk)
++{
++	return false;
++}
++
+ static inline bool mem_cgroup_sk_under_memory_pressure(const struct sock *sk)
+ {
+ 	return false;
+diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+index 80df246d4741..9657496e0f3c 100644
+--- a/include/uapi/linux/bpf.h
++++ b/include/uapi/linux/bpf.h
+@@ -7183,6 +7183,7 @@ enum {
+ 	TCP_BPF_SYN_MAC         = 1007, /* Copy the MAC, IP[46], and TCP header */
+ 	TCP_BPF_SOCK_OPS_CB_FLAGS = 1008, /* Get or Set TCP sock ops flags */
+ 	SK_BPF_CB_FLAGS		= 1009, /* Get or set sock ops flags in socket */
++	SK_BPF_MEMCG_FLAGS	= 1010, /* Get or Set flags saved in sk->sk_memcg */
  };
  
-+BPF_CALL_5(bpf_sock_setsockopt, struct sock *, sk, int, level,
-+	   int, optname, char *, optval, int, optlen)
-+{
-+	return __bpf_setsockopt(sk, level, optname, optval, optlen);
-+}
-+
-+static const struct bpf_func_proto bpf_sock_setsockopt_proto = {
-+	.func		= bpf_sock_setsockopt,
-+	.gpl_only	= false,
-+	.ret_type	= RET_INTEGER,
-+	.arg1_type	= ARG_PTR_TO_CTX,
-+	.arg2_type	= ARG_ANYTHING,
-+	.arg3_type	= ARG_ANYTHING,
-+	.arg4_type	= ARG_PTR_TO_MEM | MEM_RDONLY,
-+	.arg5_type	= ARG_CONST_SIZE,
+ enum {
+@@ -7205,6 +7206,11 @@ enum {
+ 						 */
+ };
+ 
++enum {
++	SK_BPF_MEMCG_SOCK_ISOLATED	= (1UL << 0),
++	SK_BPF_MEMCG_FLAG_MAX		= (1UL << 1),
 +};
 +
-+BPF_CALL_5(bpf_unlocked_sock_setsockopt, struct sock *, sk, int, level,
-+	   int, optname, char *, optval, int, optlen)
+ struct bpf_perf_event_value {
+ 	__u64 counter;
+ 	__u64 enabled;
+diff --git a/net/core/filter.c b/net/core/filter.c
+index 1fa40b4d3d85..a78356682442 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -5267,6 +5267,31 @@ static int sk_bpf_set_get_cb_flags(struct sock *sk, char *optval, bool getopt)
+ 	return 0;
+ }
+ 
++static int sk_bpf_set_get_memcg_flags(struct sock *sk, int *optval, bool getopt)
 +{
-+	return _bpf_setsockopt(sk, level, optname, optval, optlen);
++	if (!mem_cgroup_sk_enabled(sk))
++		return -EOPNOTSUPP;
++
++	if (getopt) {
++		*optval = mem_cgroup_sk_get_flags(sk);
++		return 0;
++	}
++
++	/* Don't allow once sk has been published to userspace.
++	 * INET_SOCK_CREATE is called without lock_sock() but with sk_socket
++	 * INET_SOCK_ACCEPT is called with lock_sock() but without sk_socket
++	 */
++	if (sock_owned_by_user_nocheck(sk) && sk->sk_socket)
++		return -EBUSY;
++
++	if (*optval <= 0 || *optval >= SK_BPF_MEMCG_FLAG_MAX)
++		return -EINVAL;
++
++	mem_cgroup_sk_set_flags(sk, *optval);
++
++	return 0;
 +}
 +
-+static const struct bpf_func_proto bpf_unlocked_sock_setsockopt_proto = {
-+	.func		= bpf_unlocked_sock_setsockopt,
-+	.gpl_only	= false,
-+	.ret_type	= RET_INTEGER,
-+	.arg1_type	= ARG_PTR_TO_CTX,
-+	.arg2_type	= ARG_ANYTHING,
-+	.arg3_type	= ARG_ANYTHING,
-+	.arg4_type	= ARG_PTR_TO_MEM | MEM_RDONLY,
-+	.arg5_type	= ARG_CONST_SIZE,
-+};
-+
- static int bpf_sock_ops_get_syn(struct bpf_sock_ops_kern *bpf_sock,
- 				int optname, const u8 **start)
- {
-@@ -8051,6 +8085,15 @@ sock_filter_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
- 		return &bpf_sk_storage_get_cg_sock_proto;
- 	case BPF_FUNC_ktime_get_coarse_ns:
- 		return &bpf_ktime_get_coarse_ns_proto;
-+	case BPF_FUNC_setsockopt:
-+		switch (prog->expected_attach_type) {
-+		case BPF_CGROUP_INET_SOCK_CREATE:
-+			return &bpf_unlocked_sock_setsockopt_proto;
-+		case BPF_CGROUP_INET_SOCK_ACCEPT:
-+			return &bpf_sock_setsockopt_proto;
-+		default:
-+			return NULL;
-+		}
- 	default:
- 		return bpf_base_func_proto(func_id, prog);
+ static int sol_socket_sockopt(struct sock *sk, int optname,
+ 			      char *optval, int *optlen,
+ 			      bool getopt)
+@@ -5284,6 +5309,7 @@ static int sol_socket_sockopt(struct sock *sk, int optname,
+ 	case SO_BINDTOIFINDEX:
+ 	case SO_TXREHASH:
+ 	case SK_BPF_CB_FLAGS:
++	case SK_BPF_MEMCG_FLAGS:
+ 		if (*optlen != sizeof(int))
+ 			return -EINVAL;
+ 		break;
+@@ -5293,8 +5319,12 @@ static int sol_socket_sockopt(struct sock *sk, int optname,
+ 		return -EINVAL;
  	}
+ 
+-	if (optname == SK_BPF_CB_FLAGS)
++	switch (optname) {
++	case SK_BPF_CB_FLAGS:
+ 		return sk_bpf_set_get_cb_flags(sk, optval, getopt);
++	case SK_BPF_MEMCG_FLAGS:
++		return sk_bpf_set_get_memcg_flags(sk, (int *)optval, getopt);
++	}
+ 
+ 	if (getopt) {
+ 		if (optname == SO_BINDTODEVICE)
+diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
+index 80df246d4741..9657496e0f3c 100644
+--- a/tools/include/uapi/linux/bpf.h
++++ b/tools/include/uapi/linux/bpf.h
+@@ -7183,6 +7183,7 @@ enum {
+ 	TCP_BPF_SYN_MAC         = 1007, /* Copy the MAC, IP[46], and TCP header */
+ 	TCP_BPF_SOCK_OPS_CB_FLAGS = 1008, /* Get or Set TCP sock ops flags */
+ 	SK_BPF_CB_FLAGS		= 1009, /* Get or set sock ops flags in socket */
++	SK_BPF_MEMCG_FLAGS	= 1010, /* Get or Set flags saved in sk->sk_memcg */
+ };
+ 
+ enum {
+@@ -7205,6 +7206,11 @@ enum {
+ 						 */
+ };
+ 
++enum {
++	SK_BPF_MEMCG_SOCK_ISOLATED	= (1UL << 0),
++	SK_BPF_MEMCG_FLAG_MAX		= (1UL << 1),
++};
++
+ struct bpf_perf_event_value {
+ 	__u64 counter;
+ 	__u64 enabled;
 -- 
 2.51.0.261.g7ce5a0a67e-goog
 
