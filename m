@@ -1,140 +1,117 @@
-Return-Path: <netdev+bounces-216509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02C06B342CF
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 16:11:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 59B17B342EA
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 16:15:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7B4716EF5C
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 14:09:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BCE716810F
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 14:15:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6076D2EDD6D;
-	Mon, 25 Aug 2025 14:09:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 271E92F6593;
+	Mon, 25 Aug 2025 14:15:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="Ge2ZC4VK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kegO1Kg7"
 X-Original-To: netdev@vger.kernel.org
-Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9291F21773F;
-	Mon, 25 Aug 2025 14:09:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70B7E2F6572;
+	Mon, 25 Aug 2025 14:15:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756130987; cv=none; b=W0kdm3hnNr/K7k0afJFe1V8Y3crPUNX0td/tuC0jCveMFud+/nYORTvj9yC4PRJ8H3nfBb1LAYdwfUBcCWICJZMeSWMDvbReHDyTJMrI72YalmVjfRktPxO1Gh+DgjP9+hiCKCBICeJD13lwzQELGDsyD10RkeXqgfw2F96DvwA=
+	t=1756131338; cv=none; b=CGYRnBMFMkdHoHxtkxyik696qCZRorBYfebMA8CBerWYmPIZ5gl/1x1jn7ZRzurgohs4bg46Na/jJg6w+2WHhxuz8XniYr2yFpIlq2g/XNy941VKcF3LdwfgZI+lpbjUcY9cEoFdIhfyL+jVRhC+XWbG6EJRl7WLsVlEy/NwuTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756130987; c=relaxed/simple;
-	bh=Nc/C+Uz9sI4IAH7BzAHFC+jOEg5BudUYmXbAWP/XQwc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=IbJUdoHhfFx570qu8bDgQueM5Y6rFfq/XsnbyJj3okgYnq4DcZuzsotS4jitjp9A6TiPcieeHNeI7qfkMH17D279NWbg+APs+HstbE57ep4J1Lxr0moNGg5/80JKiJbKPvBH04jtbCN3dFNBCd8mw5w/1wU+oSZeHzLCBA/agD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=Ge2ZC4VK; arc=none smtp.client-ip=193.68.50.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
-Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
-	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id CDBF2A01D2;
-	Mon, 25 Aug 2025 16:09:40 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:from:from:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=mail; bh=qikWbUtqVmNTODGhbr83i6EXZE+fIqqYsVSThC2Lx7o=; b=
-	Ge2ZC4VKQ5WtBrus8o6tRBczDgySjYzbeEVOHy0qAmpmsiVFfp2AwfqRNtCbu82c
-	zjbwbaHfs067Kf7O6/15e6mlNwj5dBgO4frOj/QPJhQXL3TnETa51oNzZ8kjpxT+
-	C8N8MsD6NmUWO6mbsBTUcawXH8QwOx8oIIaEsN2LWNY99GqjYC4pf9hR93Giebr4
-	24k01OxnfVwmRFml1QhgJafA2bi59Nfaj28CbXpWMDVayMpY7ZahxoJFL9xuUaKY
-	nw/YFT9bDjLnzgXydchMTtrdTO40e6i9ZOs7XK0sRJL21avIwoPrO31//fz93ual
-	27JjhutmAJJhmNl6sV172/BzcbiKVRQNAaAInqBYxuMWhmMrWGOnXLScwP5TiK6f
-	H64xIYfK6kUKe+9BL2BX6lct48x5deBu50u2QW5Fmsr/ms1VfnZ6UxOTx64lLcK+
-	CLUeZSHGqDvNFthz0UK1aCVLGEKMhSIQ5UNnrwqUna0FunM5pzVZOuVEBtgg+GFA
-	1qvq7RAkPgx4/tAi4646CJez9svpDj07fQ3rqVH6aneF4uzzQsP6/fsPQThjnZMU
-	rfttxDakx1CgKFhf3SMqA2xB4MhMxVuvAdyrf+nmUMjdPN9GRGT42oApvL9vZS47
-	qn07wcW5E5khRJCef+Fq5ZrfGR0Jb+1TKnH2I6qh5Nw=
-From: =?utf-8?q?Bence_Cs=C3=B3k=C3=A1s?= <csokas.bence@prolan.hu>
-Date: Mon, 25 Aug 2025 16:09:34 +0200
-Subject: [PATCH] net: mdiobus: Move all reset registration to
- `mdiobus_register_reset()`
+	s=arc-20240116; t=1756131338; c=relaxed/simple;
+	bh=lPbSBg/HZD4mkzSOvmio9GUHRaKTggiGyiEtzltqpl0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JE6h56xMUZqEZyVtHDvHL/D2xs5n31k0+/aM1LFDYX2cpo3rtRWJTRoMqY8/nXNrQgGs09JcQqbq1uoWFhWZ0ssszImmdh0vOVA7CtLdsOOJ7jbsru12trUTSDDJvV8fc8rSuhzlnRDTAViq0kUxXnCyVSZqJpe/LA3RNXDTB1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kegO1Kg7; arc=none smtp.client-ip=209.85.215.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-b4c29d2ea05so304401a12.0;
+        Mon, 25 Aug 2025 07:15:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756131336; x=1756736136; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lPbSBg/HZD4mkzSOvmio9GUHRaKTggiGyiEtzltqpl0=;
+        b=kegO1Kg7P44nbbGE6x09NGxE69yhGTyRQuHPq3gJy4rZRwzEuK2l7iK2D/hGPWmspF
+         b+i9CzzkCI/HhA1Ks17ItItMVSBqfbcEl2Onume7BQ4Ofln8s5oMESoal8oMM9UirqyQ
+         KidZ7F+VZz7z+vRWN976vg2elfE5l3h+/eeDul/eA10GWP4i2WENdNyoMrg/Cxc0PDqD
+         6Z+2peYmkxIzLfl3CXjiEiOMOaYPY7O31LHxw3BwJTC4wWMapLCqWgo5P+s2G/JYZObo
+         zMXoWUL4b4IfM1B7LweOM+vVH8L9KOZv1kb/VGAPMXjJ8FhXPZxIRyAfUptibs+h86kJ
+         mSbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756131336; x=1756736136;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lPbSBg/HZD4mkzSOvmio9GUHRaKTggiGyiEtzltqpl0=;
+        b=iqC0Nt11E3AK/88NZwxOyc+LIbLWCtD/QHkN/a6V8P3d9MGoV/oKe1joeYksaMplhG
+         XXMDUC771MC3DVjiKJUpW44Ffj95CvLdEQz+RRIlc2QyTTAHEBayhyQk3fRw5Q1YUyYz
+         fx0JJhzWgkIyjIkwrWozSvgAWrIt/zWoqt1OaxtsKg/QgeK7eGyZsH9QUC08E5NqZ30p
+         FpTt7KJRg654eFp7ej45ibYrgHiNOu4B/nR/ZDtjUP6PrVCPbPixls3lvFTq6/DMZoA+
+         FjPTigeF/RxxSkRUBMmEY2OSFMUc2W1XIlrLeGfLvamfs4B80ej1r2I5AnAMWWtHkfFN
+         AmJg==
+X-Forwarded-Encrypted: i=1; AJvYcCVJABBPwhnQywlG/ESFgvJMtY9dUN+xqLQUsqImNlqlOUKVY7m0F/V9QvbfCo/xkfWlTnhxZ9qk@vger.kernel.org, AJvYcCWiXn8NlCaHyx5Fo/Jqn18F9jB4JryJkFvjABCPq3mM2ZSablhACXO87rg9lIMeQFXAhS7y5KpD2Gj2@vger.kernel.org, AJvYcCXLsQKtYm3ma3Vzcq9zCJjcIrbxLySwI1qYaVZL4TStV9XJW+94pgbyrcNkBZv71M46OoY6Yc+UngnRIshO@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUdzLN5O9w2n6JHtH7VoufAFdjR5of2GqlAltTtgeihkrwtaRz
+	2OKHaTNbuGWI7nZKljF/qyM+2qm6rhQ0+0SjJcqRwAGoh1ep05D7D0FzA1ZCfYO6IvkH/zAOtjo
+	FYimof2QC7pkr3G4kv/nPSPLXQCv1WQk=
+X-Gm-Gg: ASbGncvDS1dnu6g/Cu5bf6T9c+QFLRD/imF3Y3J9yGtOcfOxN6pbqsePgXs/sAnSKFZ
+	pAq7IIjUKBTsyWLe34RAtkmOny51AsRWKS2M0Gmedu6mHgR7ICAv4cUBdW3UFZq9ci2gA4dQL02
+	EeieGB0WugvRUaG3zf5yzvjS+5tCOAGA+PZoz6ozdla/5pqL1TmT0Pm2EQELfVmRkRXArUKxBPA
+	BBNhbRb7MFf8h3vPGZHm1vc235Q0v98LcTn0hb0
+X-Google-Smtp-Source: AGHT+IG9xxdJx93iYDQX/6SZ6WjyjVrCHNliEzb/AcDE2CBxa/sVl1b/VT2POs8qj5NrrwdFtcJ93grxcdcul8ysWPc=
+X-Received: by 2002:a17:90b:4a81:b0:314:2cd2:595d with SMTP id
+ 98e67ed59e1d1-3251d49713dmr14093421a91.8.1756131335631; Mon, 25 Aug 2025
+ 07:15:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-ID: <20250825-b4-phy-rst-mv-prep-v1-1-6298349df7ca@prolan.hu>
-X-B4-Tracking: v=1; b=H4sIAJ1urGgC/x3MQQ6CMBCF4auQWTtJaUDFqxgXLR3sLKjNDCESw
- t0ZXX4vef8OSsKk8Gh2EFpZ+VMM7aWBMYfyJuRkBu987+6+x9hhzRuKLjivWIUquiHRtU3dbXA
- T2NHGib//6PNljkEJo4Qy5l9qDrqQwHGcT4S72X0AAAA=
-X-Change-ID: 20250825-b4-phy-rst-mv-prep-09de61d4790f
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Philipp Zabel
-	<p.zabel@pengutronix.de>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	=?utf-8?q?Bence_Cs=C3=B3k=C3=A1s?= <csokas.bence@prolan.hu>
-X-Mailer: b4 0.14.2
-X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1756130979;VERSION=7996;MC=1807055755;ID=536864;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
-X-ESET-Antispam: OK
-X-EsetResult: clean, is OK
-X-EsetId: 37303A2998FD515E607067
+References: <20250824005116.2434998-1-mmyangfl@gmail.com> <20250824005116.2434998-4-mmyangfl@gmail.com>
+ <ad61c240-eee3-4db4-b03e-de07f3efba12@lunn.ch> <CAAXyoMP-Z8aYTSZwqJpDYRVcYQ9fzEgmDuAbQd=UEGp+o5Fdjg@mail.gmail.com>
+ <aKtWej0nymW-baTC@shell.armlinux.org.uk>
+In-Reply-To: <aKtWej0nymW-baTC@shell.armlinux.org.uk>
+From: Yangfl <mmyangfl@gmail.com>
+Date: Mon, 25 Aug 2025 22:14:58 +0800
+X-Gm-Features: Ac12FXxbis4qzSLpapWtF5EldTFXL44GkD5DDrIiURWKiYRn5HHmlminAhIXoBQ
+Message-ID: <CAAXyoMNot+aZ35Xtx=YiTEmGk_c8XT7VGiQ-DUn8T1vPUnO-9Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 3/3] net: dsa: yt921x: Add support for
+ Motorcomm YT921x
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org, 
+	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Simon Horman <horms@kernel.org>, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Make `mdiobus_register_reset()` function handle both gpiod and
-reset-controller-based reset registration.
+On Mon, Aug 25, 2025 at 2:14=E2=80=AFAM Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+>
+> On Mon, Aug 25, 2025 at 12:38:20AM +0800, Yangfl wrote:
+> > They are used in phylink_get_caps(), since I don't want to declare a
+> > port which we know it does not exist on some chips. But the info_* set
+> > might be inlined and removed since it is not used elsewhere.
+>
+> The problem is... if you have a port in 0..N that DSA thinks should be
+> used, but is neither internal or external, DSA's initialisation of it
+> will fail, because without any caps declared for it, phylink_create()
+> will return an error, causing dsa_port_phylink_create() to fail,
+> dsa_shared_port_phylink_register() or dsa_user_phy_setup(),
+> dsa_shared_port_link_register_of() or dsa_user_create()... etc. It
+> eventually gets propagated up causing the entire switch probe to fail.
+>
+> Again... read the code!
 
-Signed-off-by: Bence Csókás <csokas.bence@prolan.hu>
----
- drivers/net/phy/mdio_bus.c | 15 +++------------
- 1 file changed, 3 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
-index cad6ed3aa10b643ad63fac15bfe7551446c8dca1..9117f0f93756f38acb2c367e163ef06616eab6e4 100644
---- a/drivers/net/phy/mdio_bus.c
-+++ b/drivers/net/phy/mdio_bus.c
-@@ -33,8 +33,10 @@
- #define CREATE_TRACE_POINTS
- #include <trace/events/mdio.h>
- 
--static int mdiobus_register_gpiod(struct mdio_device *mdiodev)
-+static int mdiobus_register_reset(struct mdio_device *mdiodev)
- {
-+	struct reset_control *reset;
-+
- 	/* Deassert the optional reset signal */
- 	mdiodev->reset_gpio = gpiod_get_optional(&mdiodev->dev,
- 						 "reset", GPIOD_OUT_LOW);
-@@ -44,13 +46,6 @@ static int mdiobus_register_gpiod(struct mdio_device *mdiodev)
- 	if (mdiodev->reset_gpio)
- 		gpiod_set_consumer_name(mdiodev->reset_gpio, "PHY reset");
- 
--	return 0;
--}
--
--static int mdiobus_register_reset(struct mdio_device *mdiodev)
--{
--	struct reset_control *reset;
--
- 	reset = reset_control_get_optional_exclusive(&mdiodev->dev, "phy");
- 	if (IS_ERR(reset))
- 		return PTR_ERR(reset);
-@@ -68,10 +63,6 @@ int mdiobus_register_device(struct mdio_device *mdiodev)
- 		return -EBUSY;
- 
- 	if (mdiodev->flags & MDIO_DEVICE_FLAG_PHY) {
--		err = mdiobus_register_gpiod(mdiodev);
--		if (err)
--			return err;
--
- 		err = mdiobus_register_reset(mdiodev);
- 		if (err)
- 			return err;
-
----
-base-commit: 1b237f190eb3d36f52dffe07a40b5eb210280e00
-change-id: 20250825-b4-phy-rst-mv-prep-09de61d4790f
-
-Best regards,
--- 
-Bence Csókás <csokas.bence@prolan.hu>
-
-
+What would you expect when you specify Port 0 in DT when only Port 1,
+3, 8 are available on the chip (YT9213NB)? Probe error.
 
