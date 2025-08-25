@@ -1,143 +1,150 @@
-Return-Path: <netdev+bounces-216462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40966B33D83
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 13:03:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1761DB33DBE
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 13:11:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 138D516A7B1
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 11:03:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C73183BB7A0
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 11:11:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B1892D6E51;
-	Mon, 25 Aug 2025 11:03:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8513429BDBE;
+	Mon, 25 Aug 2025 11:11:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="NSgUljRS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XSljBp30"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C08EB2D0623;
-	Mon, 25 Aug 2025 11:03:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A46651E9B2A
+	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 11:11:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756119798; cv=none; b=ie2l2keK5g+H/kthzFka24JQYA9yF1Mxo/j4eEY5bIjwN8jS6Er0ynCYHnHX8ZVEnYGYBb5ZaAQK+J4PeJDt2WzKnWHk5226vcrtgLJjYcidX1+IfxflfyBdoG9gdGlyVQ24a+57UPMv1PN5f9DVkDu7A2AOngi3cRvgD72ukys=
+	t=1756120293; cv=none; b=JUpJDV1immlY/Th+YSrdoNoA2mlsKnT10HpkNydVZ+fcrNZjl8uXdNA9SbIQ1+N8XCF5YwqHdPDhvmSgEYZW2q3i8N4iQZDDS+3674p1AkU0ynQNDAmJcRCtylgDlVWMBrZtHvV3atLlceE90KNcQSyLLX84rowKJC0REtgKO28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756119798; c=relaxed/simple;
-	bh=i7Bh1lmrcNhrpuE5kAEpZHyG48GyUCraJrr1KmwINdE=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=kpqme/JcS8IqIO88nfwGBOScucInKG9d92rHtFxE7FiDPT8j3RR4FbDqcMI1SpWJPWM18+4zQ/oc1oovxOejqyis1FtihptGPvgZ+GoNF4xIuSw7vURZvnYFxTl6G++etfrxrAWlYPkwfnnYf4CKrEyjuVHG595oKt1fVpWA1xQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=NSgUljRS; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1127)
-	id 41746211828C; Mon, 25 Aug 2025 04:03:16 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 41746211828C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1756119796;
-	bh=QN/7ZaTct3LU/anujYLQq8OzF8EQzpibQw8k4S15RNg=;
-	h=From:To:Cc:Subject:Date:From;
-	b=NSgUljRSt6JU7MeyF6jX3RTLdwdrpx12Fnt802jxi7LXi3Pwvh3ozejSAPvaYRwyC
-	 nn5JIjm3EbeiMF9j1vn44jrnaseEf7lbxYFlZl6g/KJinmTlm3KfyIn7sphcFrUVah
-	 G7N8CijyWKlszwcZo0Q5NAqnAcwOk4+DPKG/tTJM=
-From: Saurabh Sengar <ssengar@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shradhagupta@linux.microsoft.com,
-	ernis@linux.microsoft.com,
-	dipayanroy@linux.microsoft.com,
-	shirazsaleem@microsoft.com,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: ssengar@microsoft.com,
-	stable@vger.kernel.org,
-	Saurabh Sengar <ssengar@linux.microsoft.com>
-Subject: [PATCH net] net: mana: Remove redundant netdev_lock_ops_to_full() calls
-Date: Mon, 25 Aug 2025 04:03:14 -0700
-Message-Id: <1756119794-20110-1-git-send-email-ssengar@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
+	s=arc-20240116; t=1756120293; c=relaxed/simple;
+	bh=S/AVvkNGBd6Gm8v/g7yHzl+7AikAnvCVwRBdnYj5GLA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fYem+OcA0NLkDuroToi5SSM/akJN3IhlLxCKHEwasqk9PKbHFnLkwFJTKoMIpYEysqCnSiY5SFwzUSyURscMKW+qUubDsV/8t64pLuWSK5sRmDi5Bd5p20+lVT1pIA9g+ossFGxDhoovXawHSRre66YyirGCxgl7rwlySqwyadM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XSljBp30; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756120290;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=W239AlvnODs74e/fid8BQsKhtn+64cB0NifVKNxUMOk=;
+	b=XSljBp30tUbRe6/+j7KG/hqNzLRusctGKdg3yh6btKXnQQRWPLE4i3Xyy2W5uVhgpZMYdh
+	M59NKNApXhDlTDFSFpeoAZtqMtK9QnAzcjBScqmU12FvuQR+TaiM3MbzbTsncDo795fT3Z
+	U+hipH/dt1CIGm8w9MDlIinLCq2co5s=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-625-QMvEvE3CNVmE1Fg4jkIGgg-1; Mon,
+ 25 Aug 2025 07:11:27 -0400
+X-MC-Unique: QMvEvE3CNVmE1Fg4jkIGgg-1
+X-Mimecast-MFC-AGG-ID: QMvEvE3CNVmE1Fg4jkIGgg_1756120286
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4D6F71956089;
+	Mon, 25 Aug 2025 11:11:26 +0000 (UTC)
+Received: from queeg (unknown [10.43.135.229])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6163218003FC;
+	Mon, 25 Aug 2025 11:11:24 +0000 (UTC)
+From: Miroslav Lichvar <mlichvar@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Miroslav Lichvar <mlichvar@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	John Stultz <jstultz@google.com>,
+	Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH RESEND net-next] ptp: Limit time setting of PTP clocks
+Date: Mon, 25 Aug 2025 13:11:13 +0200
+Message-ID: <20250825111117.3846097-1-mlichvar@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-NET_SHAPER is always selected for MANA driver. When NET_SHAPER is enabled,
-netdev_lock_ops_to_full() reduces effectively to only an assert for lock,
-which is always held in the path when NET_SHAPER is enabled.
+Networking drivers implementing PTP clocks and kernel socket code
+handling hardware timestamps use the 64-bit signed ktime_t type counting
+nanoseconds. When a PTP clock reaches the maximum value in year 2262,
+the timestamps returned to applications will overflow into year 1667.
+The same thing happens when injecting a large offset with
+clock_adjtime(ADJ_SETOFFSET).
 
-Remove the redundant netdev_lock_ops_to_full() call.
+The commit 7a8e61f84786 ("timekeeping: Force upper bound for setting
+CLOCK_REALTIME") limited the maximum accepted value setting the system
+clock to 30 years before the maximum representable value (i.e. year
+2232) to avoid the overflow, assuming the system will not run for more
+than 30 years.
 
-Fixes: d5c8f0e4e0cb ("net: mana: Fix potential deadlocks in mana napi ops")
-Cc: stable@vger.kernel.org
-Signed-off-by: Saurabh Sengar <ssengar@linux.microsoft.com>
+Enforce the same limit for PTP clocks. Don't allow negative values and
+values closer than 30 years to the maximum value. Drivers may implement
+an even lower limit if the hardware registers cannot represent the whole
+interval between years 1970 and 2262 in the required resolution.
+
+Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+Cc: Richard Cochran <richardcochran@gmail.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: John Stultz <jstultz@google.com>
+Cc: Arnd Bergmann <arnd@arndb.de>
 ---
- drivers/net/ethernet/microsoft/mana/mana_en.c | 10 ----------
- 1 file changed, 10 deletions(-)
 
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 550843e2164b..f0dbf4e82e0b 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -2100,10 +2100,8 @@ static void mana_destroy_txq(struct mana_port_context *apc)
- 		napi = &apc->tx_qp[i].tx_cq.napi;
- 		if (apc->tx_qp[i].txq.napi_initialized) {
- 			napi_synchronize(napi);
--			netdev_lock_ops_to_full(napi->dev);
- 			napi_disable_locked(napi);
- 			netif_napi_del_locked(napi);
--			netdev_unlock_full_to_ops(napi->dev);
- 			apc->tx_qp[i].txq.napi_initialized = false;
- 		}
- 		mana_destroy_wq_obj(apc, GDMA_SQ, apc->tx_qp[i].tx_object);
-@@ -2256,10 +2254,8 @@ static int mana_create_txq(struct mana_port_context *apc,
- 		mana_create_txq_debugfs(apc, i);
- 
- 		set_bit(NAPI_STATE_NO_BUSY_POLL, &cq->napi.state);
--		netdev_lock_ops_to_full(net);
- 		netif_napi_add_locked(net, &cq->napi, mana_poll);
- 		napi_enable_locked(&cq->napi);
--		netdev_unlock_full_to_ops(net);
- 		txq->napi_initialized = true;
- 
- 		mana_gd_ring_cq(cq->gdma_cq, SET_ARM_BIT);
-@@ -2295,10 +2291,8 @@ static void mana_destroy_rxq(struct mana_port_context *apc,
- 	if (napi_initialized) {
- 		napi_synchronize(napi);
- 
--		netdev_lock_ops_to_full(napi->dev);
- 		napi_disable_locked(napi);
- 		netif_napi_del_locked(napi);
--		netdev_unlock_full_to_ops(napi->dev);
+Notes:
+    Original submission: https://lkml.org/lkml/2024/9/9/999
+
+ drivers/ptp/ptp_clock.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+index 1cc06b7cb17e..72cf00655391 100644
+--- a/drivers/ptp/ptp_clock.c
++++ b/drivers/ptp/ptp_clock.c
+@@ -100,6 +100,9 @@ static int ptp_clock_settime(struct posix_clock *pc, const struct timespec64 *tp
+ 		return -EBUSY;
  	}
- 	xdp_rxq_info_unreg(&rxq->xdp_rxq);
  
-@@ -2549,18 +2543,14 @@ static struct mana_rxq *mana_create_rxq(struct mana_port_context *apc,
++	if (!timespec64_valid_settod(tp))
++		return -EINVAL;
++
+ 	return  ptp->info->settime64(ptp->info, tp);
+ }
  
- 	gc->cq_table[cq->gdma_id] = cq->gdma_cq;
+@@ -130,7 +133,7 @@ static int ptp_clock_adjtime(struct posix_clock *pc, struct __kernel_timex *tx)
+ 	ops = ptp->info;
  
--	netdev_lock_ops_to_full(ndev);
- 	netif_napi_add_weight_locked(ndev, &cq->napi, mana_poll, 1);
--	netdev_unlock_full_to_ops(ndev);
+ 	if (tx->modes & ADJ_SETOFFSET) {
+-		struct timespec64 ts;
++		struct timespec64 ts, ts2;
+ 		ktime_t kt;
+ 		s64 delta;
  
- 	WARN_ON(xdp_rxq_info_reg(&rxq->xdp_rxq, ndev, rxq_idx,
- 				 cq->napi.napi_id));
- 	WARN_ON(xdp_rxq_info_reg_mem_model(&rxq->xdp_rxq, MEM_TYPE_PAGE_POOL,
- 					   rxq->page_pool));
+@@ -140,7 +143,14 @@ static int ptp_clock_adjtime(struct posix_clock *pc, struct __kernel_timex *tx)
+ 		if (!(tx->modes & ADJ_NANO))
+ 			ts.tv_nsec *= 1000;
  
--	netdev_lock_ops_to_full(ndev);
- 	napi_enable_locked(&cq->napi);
--	netdev_unlock_full_to_ops(ndev);
+-		if ((unsigned long) ts.tv_nsec >= NSEC_PER_SEC)
++		/* Make sure the offset is valid */
++		err = ptp_clock_gettime(pc, &ts2);
++		if (err)
++			return err;
++		ts2 = timespec64_add(ts2, ts);
++
++		if ((unsigned long) ts.tv_nsec >= NSEC_PER_SEC ||
++		    !timespec64_valid_settod(&ts2))
+ 			return -EINVAL;
  
- 	mana_gd_ring_cq(cq->gdma_cq, SET_ARM_BIT);
- out:
+ 		kt = timespec64_to_ktime(ts);
 -- 
-2.43.0
+2.50.1
 
 
