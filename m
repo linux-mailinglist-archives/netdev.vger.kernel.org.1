@@ -1,133 +1,177 @@
-Return-Path: <netdev+bounces-216660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E6C0B34D9A
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 23:07:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66612B34DB7
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 23:11:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DC1420844D
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 21:07:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25F073AA610
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 21:11:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFAD728D8D9;
-	Mon, 25 Aug 2025 21:07:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DB2329A9FA;
+	Mon, 25 Aug 2025 21:11:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BMWsAYs7"
+	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="l9ClzoDj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx4.wp.pl (mx4.wp.pl [212.77.101.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C59275AFC
-	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 21:07:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9616229B764
+	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 21:11:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756156074; cv=none; b=bU1MWZcaycIraoMV8gYXfeiUBc2JF7ADanONJ4acdiwjGo1w4RhuMcb4dFV0jmyVFju00rFNAmQ7KuOVta57xRCF5X03H6K9ps9CiYSOriO1uP98Jb4mEhnH1DUcltZ3MHogn8Y92nDA6MhgpM6E84Cg4mX8zuqNhrIoNZeSM0g=
+	t=1756156273; cv=none; b=l6yPmodfnGlYa45P5l1xDIH5k+DQhZHYHHmZhmBCtsAzqRRa0Ls5sKWgZnfOhNPKzWzeUzpIzX9u6yRyDaIx60AtlYVx5noLI1mVazC2QxgzeTEoxZb0HbF4VZl+UuUsSUTp3p8YCMnxhV1HHVRbs771keIbgh6KOZ90ZB0dlRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756156074; c=relaxed/simple;
-	bh=rsgQsADbJK9QUmMKxUDa/Fk0IhymXtnj4qX8ecK2uC8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kv9smeXqyjWhjWYaEzxxgF4MXd4o+SqQvH9mEk93VflQAreQFkKLumyw9cyv/mgxW3BxkV6MAkhC8F8a59g7R5F3WpqOD9pcKrgvm+4DBPTcaJ+GRmhbm7yu4Fsy/kt6P/d7Mwkuecn9UzozA444nWfIl4/Pi7a6l7RGmtWQ4Ik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BMWsAYs7; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2445806e03cso56758815ad.1
-        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 14:07:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756156072; x=1756760872; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rsgQsADbJK9QUmMKxUDa/Fk0IhymXtnj4qX8ecK2uC8=;
-        b=BMWsAYs7JLJw+2eVfaxp1YRFEQb2JUWOmhzQhuMbM/wS6rTkF4QM6Vb1djkCpeLSD/
-         E1aq7w47bDstEuTGP3YEGkuIfIoJXwZJ2tJlU57MZaR83wX797SCCvNRbepXohmCbbYJ
-         LfJY6I37vlTSDbtJVyPFPcqNe1+uHREyg1tzeJhefOInOH0M5jdbJnwUloky77D6mrB9
-         TXyUERKbXvOzo6cQFhOZ/WsWuGVBhwyEQE++bZwMKcEyTYrikSetPIniLD4KxdWr7gjB
-         48hwmqfy1oQS+tnC9/YkEu3X6BHZsOlNjOPeYVPbrTJ/GA5bF3Ll2l8cnJF/1MMYdfj9
-         kXEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756156072; x=1756760872;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rsgQsADbJK9QUmMKxUDa/Fk0IhymXtnj4qX8ecK2uC8=;
-        b=Uud/ASOB2Hwg9jUTB/aNobIfK+lR6NWRKJZ2ACeToEgHYXE2FbHxlRhU+xAS2/FbOj
-         ajZmab3DchIaWprPaHe6ftsdnCp3tck9JXfdfiPSsg5fFZzybp8AOI4ayD8m4gRB6eed
-         d+20F/PhqSSxb5puv4TbB2JcnGLEo89ACvHnWuqj5RbmUSII8XCKSPl7YDLjGyMo3PYg
-         t1Ly+sw9uwudw4jh8DQGx+OuYo2BiGJ6+yUJrJy6a5v9S9YsuKu3ljwO3VtbUIPtGq/Z
-         BXiS/C6j2uF2ho6mYMhF4CPq/Q1AAjeRithSeJFrPidpmkeTVvvecDJLn4uFRbbsxYGk
-         Q/+w==
-X-Forwarded-Encrypted: i=1; AJvYcCVLPnIKXgl64NfsqKAvTeOh0jilS72qh1v7unVTvs33/rbAaiKPgu7xoC8ON4bJRu78TLWOQAU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbAA8loXDI6KSLodKEVYosQZeBYfE0XtV28PjyuTB7cejtnMzW
-	JwMQJu5GClrZMvWqrOq4gaE7R0fvgg/E2J2HRYQFlqjU/VHJSI9U4OUv9tqGcnYHWWzIPP0a5lK
-	GuBupYhfzvr2QKn6+iEXxnIB26W6U0aNviwu+yCEr
-X-Gm-Gg: ASbGncvAIzlhACq9NWdVCX4gPt2h9IiqQr+sBbsJZG+ip587epBuR1dHWcDwM+3DyUk
-	lxkaNy+YcDBoycCPmtkwOjPcKRC4NWBVa822C3dmDbmnXwoPQW0RzRnd1lrWbJlyIKhZ2qcCd49
-	Xe+UN8soH7AAZ4w1aGQPiq/ooL4dCRNDzrL5flkwA0yx/I1KuWf0C1F5tmT3Ey0HJPheRXy9YOQ
-	CL0/N1BUKPYrmt9m+OSMIzUyEgmLGjsS0WpqqPkstagN8uoGqI6TipfC+1q3WRNeCG9RCBa/kyL
-	fKLgPQnQ2A==
-X-Google-Smtp-Source: AGHT+IFG5RTfX6ud7JlnRAPMerHJf0Gbw2YzpqBK05FqAlo9zIJQqUl848H3iGoxvhe6mgAQlaJdiUZU7L2rrRtCD00=
-X-Received: by 2002:a17:903:41cc:b0:246:b351:36a3 with SMTP id
- d9443c01a7336-246b3513841mr70712685ad.48.1756156072000; Mon, 25 Aug 2025
- 14:07:52 -0700 (PDT)
+	s=arc-20240116; t=1756156273; c=relaxed/simple;
+	bh=Uh2yBMXE/pscYd1mqmI/JTw78W6S2ubOyJMDmz70AwM=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=JFVK4P0VI1OnOchrGLsEkOW2NnEZm38hdT2T9laAUnxBoyDYlVGzjPQn9dUcqilxaOy3DBHVdmiwPoKQJw2DzUpmKTAfoPNVEbeINHrRGd7JRo1R2qFABflFB3U8/w+yc4g07pvIhCY2MjTgDs1UIN8ZV+hERyJ7uYx0lsONOCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=l9ClzoDj; arc=none smtp.client-ip=212.77.101.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
+Received: (wp-smtpd smtp.wp.pl 15683 invoked from network); 25 Aug 2025 23:11:01 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
+          t=1756156261; bh=pgHnVnF6wcMMDTHLkcv210vPP9+FRghiIsIMN6rFI/4=;
+          h=From:To:Subject;
+          b=l9ClzoDjJn57tyPWKxLCLARkA//rDeRQX8ImVPsLAsU9C+TpzkHlb1VM0Todvvp0q
+           S9Vex+cXUBB/Mi4kn0kLScUxjrMI/u3F2/VGrED7Jolm26Voqz3JwIPAGNKBGVnjPS
+           iaVxWxNVAyETAqlANTDgu1Vk1pNtR+7oapvx7JgeOSb4cLL5bHvJz9jPvVrZmG+Tth
+           CwfJyMMmbG3DnuUPRG8ulbZyHu3jA9s74GoM4WPH7zLCc9MCClSc3Pv4ohGllD7YFn
+           aLp+LihnHQVivWDiFdPMqxpNUxc2ZxatuKcZoAIH1yuPaE6QHxYFrUh19sxqSv8lOG
+           vBe5RtCfBz/DQ==
+Received: from 83.24.136.119.ipv4.supernova.orange.pl (HELO laptop-olek.lan) (olek2@wp.pl@[83.24.136.119])
+          (envelope-sender <olek2@wp.pl>)
+          by smtp.wp.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
+          for <andrew@lunn.ch>; 25 Aug 2025 23:11:01 +0200
+From: Aleksander Jan Bajkowski <olek2@wp.pl>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	michael@fossekall.de,
+	daniel@makrotopia.org,
+	daniel.braunwarth@kuka.com,
+	olek2@wp.pl,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: phy: realtek: support for TRIGGER_NETDEV_LINK on RTL8211E and RTL8211F
+Date: Mon, 25 Aug 2025 23:09:49 +0200
+Message-ID: <20250825211059.143231-1-olek2@wp.pl>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250825204158.2414402-1-kuniyu@google.com> <20250825204158.2414402-3-kuniyu@google.com>
- <aKzMxKViOGjxFhiW@mini-arch>
-In-Reply-To: <aKzMxKViOGjxFhiW@mini-arch>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Mon, 25 Aug 2025 14:07:39 -0700
-X-Gm-Features: Ac12FXw0Dtr1s8EQjHWjs5pMcjrpJOHq1fQzaS4zTIwkTNJhoX312mfmLMXMCzs
-Message-ID: <CAAVpQUBzWzVgvohLKOTS0U4ay9D29otB619T6O786m9W0YSWtg@mail.gmail.com>
-Subject: Re: [PATCH v2 bpf-next/net 2/8] bpf: Add a bpf hook in __inet_accept().
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
-	Roman Gushchin <roman.gushchin@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-WP-MailID: 32360dec30e1a5d38e5915a5e4cf53e8
+X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
+X-WP-SPAM: NO 0000000 [cRM0]                               
 
-On Mon, Aug 25, 2025 at 1:51=E2=80=AFPM Stanislav Fomichev <stfomichev@gmai=
-l.com> wrote:
->
-> On 08/25, Kuniyuki Iwashima wrote:
-> > We will store a flag in sk->sk_memcg by bpf_setsockopt().
-> >
-> > For a new child socket, memcg is not allocated until accept(),
-> > and the child's sk_memcg is not always the parent's one.
-> >
-> > For details, see commit e876ecc67db8 ("cgroup: memcg: net: do not
-> > associate sock with unrelated cgroup") and commit d752a4986532
-> > ("net: memcg: late association of sock to memcg").
-> >
-> > Let's add a new hook for BPF_PROG_TYPE_CGROUP_SOCK in
-> > __inet_accept().
-> >
-> > This hook does not fail by not supporting bpf_set_retval().
-> >
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
->
-> And similarly to [0], doing it in sock_ops's BPF_SOCK_OPS_PASSIVE_ESTABLI=
-SHED_CB
-> is not an option because you want to run in the process context instead
-> of softirq?
+This patch adds support for the TRIGGER_NETDEV_LINK trigger. It activates
+the LED when a link is established, regardless of the speed.
 
-Yes, I considered the hook but ended up adding a new one
-in accept(), only when we know sk_memcg is the intended one.
+Tested on Orange Pi PC2 with RTL8211E PHY.
 
+Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+---
+ drivers/net/phy/realtek/realtek_main.c | 39 +++++++++++++++++++++-----
+ 1 file changed, 32 insertions(+), 7 deletions(-)
 
->
-> 0: https://lore.kernel.org/netdev/daa73a77-3366-45b4-a770-fde87d4f50d8@li=
-nux.dev/
+diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
+index dd0d675149ad..688c031c27d9 100644
+--- a/drivers/net/phy/realtek/realtek_main.c
++++ b/drivers/net/phy/realtek/realtek_main.c
+@@ -648,7 +648,8 @@ static int rtl821x_resume(struct phy_device *phydev)
+ static int rtl8211x_led_hw_is_supported(struct phy_device *phydev, u8 index,
+ 					unsigned long rules)
+ {
+-	const unsigned long mask = BIT(TRIGGER_NETDEV_LINK_10) |
++	const unsigned long mask = BIT(TRIGGER_NETDEV_LINK) |
++				   BIT(TRIGGER_NETDEV_LINK_10) |
+ 				   BIT(TRIGGER_NETDEV_LINK_100) |
+ 				   BIT(TRIGGER_NETDEV_LINK_1000) |
+ 				   BIT(TRIGGER_NETDEV_RX) |
+@@ -706,6 +707,12 @@ static int rtl8211f_led_hw_control_get(struct phy_device *phydev, u8 index,
+ 	if (val & RTL8211F_LEDCR_LINK_1000)
+ 		__set_bit(TRIGGER_NETDEV_LINK_1000, rules);
+ 
++	if ((val & RTL8211F_LEDCR_LINK_10) &&
++	    (val & RTL8211F_LEDCR_LINK_100) &&
++	    (val & RTL8211F_LEDCR_LINK_1000)) {
++		__set_bit(TRIGGER_NETDEV_LINK, rules);
++	}
++
+ 	if (val & RTL8211F_LEDCR_ACT_TXRX) {
+ 		__set_bit(TRIGGER_NETDEV_RX, rules);
+ 		__set_bit(TRIGGER_NETDEV_TX, rules);
+@@ -723,14 +730,20 @@ static int rtl8211f_led_hw_control_set(struct phy_device *phydev, u8 index,
+ 	if (index >= RTL8211x_LED_COUNT)
+ 		return -EINVAL;
+ 
+-	if (test_bit(TRIGGER_NETDEV_LINK_10, &rules))
++	if (test_bit(TRIGGER_NETDEV_LINK, &rules) ||
++	    test_bit(TRIGGER_NETDEV_LINK_10, &rules)) {
+ 		reg |= RTL8211F_LEDCR_LINK_10;
++	}
+ 
+-	if (test_bit(TRIGGER_NETDEV_LINK_100, &rules))
++	if (test_bit(TRIGGER_NETDEV_LINK, &rules) ||
++	    test_bit(TRIGGER_NETDEV_LINK_100, &rules)) {
+ 		reg |= RTL8211F_LEDCR_LINK_100;
++	}
+ 
+-	if (test_bit(TRIGGER_NETDEV_LINK_1000, &rules))
++	if (test_bit(TRIGGER_NETDEV_LINK, &rules) ||
++	    test_bit(TRIGGER_NETDEV_LINK_1000, &rules)) {
+ 		reg |= RTL8211F_LEDCR_LINK_1000;
++	}
+ 
+ 	if (test_bit(TRIGGER_NETDEV_RX, &rules) ||
+ 	    test_bit(TRIGGER_NETDEV_TX, &rules)) {
+@@ -778,6 +791,12 @@ static int rtl8211e_led_hw_control_get(struct phy_device *phydev, u8 index,
+ 	if (cr2 & RTL8211E_LEDCR2_LINK_1000)
+ 		__set_bit(TRIGGER_NETDEV_LINK_1000, rules);
+ 
++	if ((cr2 & RTL8211E_LEDCR2_LINK_10) &&
++	    (cr2 & RTL8211E_LEDCR2_LINK_100) &&
++	    (cr2 & RTL8211E_LEDCR2_LINK_1000)) {
++		__set_bit(TRIGGER_NETDEV_LINK, rules);
++	}
++
+ 	return ret;
+ }
+ 
+@@ -805,14 +824,20 @@ static int rtl8211e_led_hw_control_set(struct phy_device *phydev, u8 index,
+ 	if (ret < 0)
+ 		return ret;
+ 
+-	if (test_bit(TRIGGER_NETDEV_LINK_10, &rules))
++	if (test_bit(TRIGGER_NETDEV_LINK, &rules) ||
++	    test_bit(TRIGGER_NETDEV_LINK_10, &rules)) {
+ 		cr2 |= RTL8211E_LEDCR2_LINK_10;
++	}
+ 
+-	if (test_bit(TRIGGER_NETDEV_LINK_100, &rules))
++	if (test_bit(TRIGGER_NETDEV_LINK, &rules) ||
++	    test_bit(TRIGGER_NETDEV_LINK_100, &rules)) {
+ 		cr2 |= RTL8211E_LEDCR2_LINK_100;
++	}
+ 
+-	if (test_bit(TRIGGER_NETDEV_LINK_1000, &rules))
++	if (test_bit(TRIGGER_NETDEV_LINK, &rules) ||
++	    test_bit(TRIGGER_NETDEV_LINK_1000, &rules)) {
+ 		cr2 |= RTL8211E_LEDCR2_LINK_1000;
++	}
+ 
+ 	cr2 <<= RTL8211E_LEDCR2_SHIFT * index;
+ 	ret = rtl821x_modify_ext_page(phydev, RTL8211E_LEDCR_EXT_PAGE,
+-- 
+2.47.2
+
 
