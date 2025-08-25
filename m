@@ -1,148 +1,162 @@
-Return-Path: <netdev+bounces-216371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F36DB33536
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 06:38:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28BF2B335B7
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 07:07:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1B59189EA29
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 04:39:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D6A61B2033F
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 05:07:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D1D92820D5;
-	Mon, 25 Aug 2025 04:37:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE66123CEF9;
+	Mon, 25 Aug 2025 05:07:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ingqzI70"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Zvhm+YTR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10B5028151E;
-	Mon, 25 Aug 2025 04:37:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51EB272627;
+	Mon, 25 Aug 2025 05:07:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756096630; cv=none; b=DxGZnOyOLbAJ0vXBDK2EHhdZ/pUnHy24p1Wgyh1VBjAoSBDOxTq7JWQ98g3VQWQVjLVl9kEr8zadPZ+1E2jZ94OcQMpn2niTX52HOaLnkc6nydvH2QzEyNz0gZk5mGb7zuDsmj6Ng0V9cqp0hdG270FhzPW1skfTQGKg4xxUV9Q=
+	t=1756098426; cv=none; b=iBY5XGU99JX0iBuKD/RXlEmCDdJxW7u0NMhZO5XSbQWxq9Hv/7McqVRaRiLcen4+7WIeUGzMuyT/kfFfr1KvaqmwVs6FDBcfsg2X0AeuyimHU2rivkaC3Gha9lUA6ZyKyDMVL+TRKjJDRhifwJlxZgxNPATte0LcuSOO7hNX9c0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756096630; c=relaxed/simple;
-	bh=wwBDo6blRSFBdQltLRz6YF2EM5a8biOLLNX0om5ESo8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=VNYpN5togGrRoclL3qWGW0mE+PnPiRhaUDMAMfyWWDps3c5S2IeE947ugHIl4F+Cx9TCJsc0SE23XyQ/XjDhODeMRlBMh38SEanuzxp9jZlNW8qn5R3TngGxAxoYl2VMBzji8jGeRpF7da6fn1RbI9cbX0/TOjKJQk5B++ZPFow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ingqzI70; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9EA11C19421;
-	Mon, 25 Aug 2025 04:37:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756096629;
-	bh=wwBDo6blRSFBdQltLRz6YF2EM5a8biOLLNX0om5ESo8=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=ingqzI70i6HXHgnFLwoVGatOuF3KLFBApNL2jOz7nyXw3URUo7qLEAapFvxs7HezL
-	 UobJM/jjX1HbxOwIZHqs9VoIPGy7RkNqUw8szQwDGBtXnDvP1ySSO1BQa7MymOSbfu
-	 gasDZdY50aT3n951/cf2YTgfQq91vIev3QpgUKDoDSOrRezbE6TUC+dlvcorn0vmWM
-	 CMYyzuyyNzSIFzHMmvtwnCUof8uveJPsvx7BzJuvCfr4cDddG7BsOMDrP6HPO3o7Dh
-	 cCjH+0mjuOdCFsMOEzLWkWlpWWo3i57Nqb1nWCKpTzBJOxRVDsV/G0yngMRJW1e9Nd
-	 q2ypFskKkk5pA==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C3E6CA0EED;
-	Mon, 25 Aug 2025 04:37:09 +0000 (UTC)
-From: Rohan G Thomas via B4 Relay <devnull+rohan.g.thomas.altera.com@kernel.org>
-Date: Mon, 25 Aug 2025 12:36:54 +0800
-Subject: [PATCH net v3 3/3] net: stmmac: Set CIC bit only for TX queues
- with COE
+	s=arc-20240116; t=1756098426; c=relaxed/simple;
+	bh=CKnI+uQNf+KVjexwVCKM5ZrCgqpglIoTmizpooUa76M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kpJT68mUN1BqPKZU89kJeDFAgrbbrPqp0JoIdKKK8znXrk7CB2rVUQ96VvNl1zkArs9e58FCkl5AoZ6KsxdRoBDWDkhI57Y8NMMeNDoR63BM60kawcxovKwxSVRYpZQtPoxA7WPXTIQs+sBvr6Mm1VBjVtzYhXNuA2WNxQEUh6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Zvhm+YTR; arc=none smtp.client-ip=117.135.210.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=zp
+	cWxOtKXy5d6EuCfY1TPJPyTbuk1GdgU+bYTYEPKBk=; b=Zvhm+YTRatEfBpgQ7J
+	gPTHVmRgTy5lMMs47GwIFj7R8gE7m6jDaDDgJOoANXZgsUN8nP9v/QsWzv2Qe2tH
+	U2RtQcY3TNRwvRRGl0XP56sD4hHTu+nLmH9Lt/GrOSomufnHzIERbB+cHIoJvRyv
+	5p4X3ts03rg/5lxT+xugfYW3M=
+Received: from zhaoxin-MS-7E12.. (unknown [])
+	by gzga-smtp-mtada-g0-2 (Coremail) with SMTP id _____wBXHkJU76toR3+ODw--.7007S2;
+	Mon, 25 Aug 2025 13:06:28 +0800 (CST)
+From: Xin Zhao <jackzxcui1989@163.com>
+To: willemdebruijn.kernel@gmail.com,
+	edumazet@google.com,
+	ferenc@fejes.dev
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v6] net: af_packet: Use hrtimer to do the retire operation
+Date: Mon, 25 Aug 2025 13:06:28 +0800
+Message-Id: <20250825050628.124977-1-jackzxcui1989@163.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250825-xgmac-minor-fixes-v3-3-c225fe4444c0@altera.com>
-References: <20250825-xgmac-minor-fixes-v3-0-c225fe4444c0@altera.com>
-In-Reply-To: <20250825-xgmac-minor-fixes-v3-0-c225fe4444c0@altera.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Jose Abreu <Jose.Abreu@synopsys.com>, 
- Romain Gantois <romain.gantois@bootlin.com>, 
- Serge Semin <fancer.lancer@gmail.com>, 
- Ong Boon Leong <boon.leong.ong@intel.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- Rohan G Thomas <rohan.g.thomas@altera.com>, 
- Matthew Gerlach <matthew.gerlach@altera.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1756096627; l=2589;
- i=rohan.g.thomas@altera.com; s=20250815; h=from:subject:message-id;
- bh=ufHiTveJv2qBm24xiMB0gFsw0pu0zMd7hgFCJ9lPQkI=;
- b=J9xTvnesrv2sisMNAGCxcdrQoTHV2SLh3+3iW7faARF6ra+9ADLML6lJxH36GguS6UndD/PB5
- eTShfFdRmoiBgCrCLRf6pVPz270nXnPUja344HDqgLcK5teGx39zsAD
-X-Developer-Key: i=rohan.g.thomas@altera.com; a=ed25519;
- pk=5yZXkXswhfUILKAQwoIn7m6uSblwgV5oppxqde4g4TY=
-X-Endpoint-Received: by B4 Relay for rohan.g.thomas@altera.com/20250815
- with auth_id=494
-X-Original-From: Rohan G Thomas <rohan.g.thomas@altera.com>
-Reply-To: rohan.g.thomas@altera.com
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wBXHkJU76toR3+ODw--.7007S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxAryUuw13Kr43tw48Zr17Awb_yoWrGF1kpa
+	y2qry7Ar1kZr42va1xZF4kJFy5JwsxAr47Jr1fGr1jkFnrGF1UtFWjqFySqFW7Gr4rt3Z2
+	yr48Xr13ArnYk3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UHbyZUUUUU=
+X-CM-SenderInfo: pmdfy650fxxiqzyzqiywtou0bp/1tbiowCzCmirRh303wABso
 
-From: Rohan G Thomas <rohan.g.thomas@altera.com>
+On Mon, 2025-08-25 at 2:08 +0800, Willem wrote:
 
-Currently, in the AF_XDP transmit paths, the CIC bit of
-TX Desc3 is set for all packets. Setting this bit for
-packets transmitting through queues that don't support
-checksum offloading causes the TX DMA to get stuck after
-transmitting some packets. This patch ensures the CIC bit
-of TX Desc3 is set only if the TX queue supports checksum
-offloading.
+> This is getting more complex than needed.
+> 
+> Essentially the lifecycle is that packet_set_ring calls hrtimer_setup
+> and hrtimer_del_sync.
+> 
+> Inbetween, while the ring is configured, the timer is either
+> 
+> - scheduled from tpacket_rcv and !is_scheduled
+>     -> call hrtimer_start
+> - scheduled from tpacket_rcv and is_scheduled
+>     -> call hrtimer_set_expires
 
-Fixes: 132c32ee5bc0 ("net: stmmac: Add TX via XDP zero-copy socket")
-Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
-Reviewed-by: Matthew Gerlach <matthew.gerlach@altera.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+We cannot use hrtimer_set_expires/hrtimer_forward_now when a hrtimer is
+already enqueued.  
+The WARN_ON(timer->state & HRTIMER_STATE_ENQUEUED) in hrtimer_forward
+already clearly indicates this point. The reason for not adding this
+WARN_ON in hrtimer_set_expires is that hrtimer_set_expires is an inline
+function, wory about increase code size.
+The implementation of perf_mux_hrtimer_restart actually checks whether
+the hrtimer is active when restarting the hrtimer.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index fa3d26c285025d01c72cef51add534fc722552b8..143e68639548f390e97b5a8dd09f3f4af12cec43 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -2585,6 +2585,7 @@ static bool stmmac_xdp_xmit_zc(struct stmmac_priv *priv, u32 queue, u32 budget)
- 	struct netdev_queue *nq = netdev_get_tx_queue(priv->dev, queue);
- 	struct stmmac_tx_queue *tx_q = &priv->dma_conf.tx_queue[queue];
- 	struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[queue];
-+	bool csum = !priv->plat->tx_queues_cfg[queue].coe_unsupported;
- 	struct xsk_buff_pool *pool = tx_q->xsk_pool;
- 	unsigned int entry = tx_q->cur_tx;
- 	struct dma_desc *tx_desc = NULL;
-@@ -2672,7 +2673,7 @@ static bool stmmac_xdp_xmit_zc(struct stmmac_priv *priv, u32 queue, u32 budget)
- 		}
- 
- 		stmmac_prepare_tx_desc(priv, tx_desc, 1, xdp_desc.len,
--				       true, priv->mode, true, true,
-+				       csum, priv->mode, true, true,
- 				       xdp_desc.len);
- 
- 		stmmac_enable_dma_transmission(priv, priv->ioaddr, queue);
-@@ -4987,6 +4988,7 @@ static int stmmac_xdp_xmit_xdpf(struct stmmac_priv *priv, int queue,
- {
- 	struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[queue];
- 	struct stmmac_tx_queue *tx_q = &priv->dma_conf.tx_queue[queue];
-+	bool csum = !priv->plat->tx_queues_cfg[queue].coe_unsupported;
- 	unsigned int entry = tx_q->cur_tx;
- 	struct dma_desc *tx_desc;
- 	dma_addr_t dma_addr;
-@@ -5038,7 +5040,7 @@ static int stmmac_xdp_xmit_xdpf(struct stmmac_priv *priv, int queue,
- 	stmmac_set_desc_addr(priv, tx_desc, dma_addr);
- 
- 	stmmac_prepare_tx_desc(priv, tx_desc, 1, xdpf->len,
--			       true, priv->mode, true, true,
-+			       csum, priv->mode, true, true,
- 			       xdpf->len);
- 
- 	tx_q->tx_count_frames++;
+static int perf_mux_hrtimer_restart(struct perf_cpu_pmu_context *cpc)
+{
+	struct hrtimer *timer = &cpc->hrtimer;
+	unsigned long flags;
 
--- 
-2.25.1
+	raw_spin_lock_irqsave(&cpc->hrtimer_lock, flags);
+	if (!cpc->hrtimer_active) {
+		cpc->hrtimer_active = 1;
+		hrtimer_forward_now(timer, cpc->hrtimer_interval);
+		hrtimer_start_expires(timer, HRTIMER_MODE_ABS_PINNED_HARD);
+	}
+	raw_spin_unlock_irqrestore(&cpc->hrtimer_lock, flags);
 
+	return 0;
+}
+
+Therefore, according to the overall design of the hrtimer, once the
+hrtimer is active, it is not allowed to set the timeout outside of the
+hrtimer callback nor is it allowed to restart the hrtimer.
+
+So two ways to update the hrtimer timeout:
+1. update expire time in the callback
+2. Call the hrtimer_cancel and then call hrtimer_start
+According to your suggestion, we don't call hrtimer_start inside the
+callback, would you accept calling hrtimer_cancel first and then calling
+hrtimer_start in the callback? However, this approach also requires
+attention, as hrtimer_cancel will block until the callback is running,
+so it is essential to ensure that it is not called within the hrtimer
+callback; otherwise, it could lead to a deadlock.
+
+
+> - rescheduled from the timer callback
+>     -> call hrtimer_set_expires and return HRTIMER_RESTART
+> 
+> The only complication is that the is_scheduled check can race with the
+> HRTIMER_RESTART restart, as that happens outside the sk_receive_queue
+> critical section.
+> 
+> One option that I suggested before is to convert pkc->delete_blk_timer
+> to pkc->blk_timer_scheduled to record whether the timer is scheduled
+> without relying on hrtimer_is_queued. Set it on first open_block and
+> clear it from the callback when returning HR_NORESTART.
+
+Do you agree with adding a callback variable to distinguish between
+scheduled from tpacket_rcv and scheduled from the callback? I really
+couldn't think of a better solution.
+
+
+So, a possible solution may be?
+1. Continue to keep the callback parameter to strictly ensure whether it
+is within the callback.
+2. Use hrtimer_set_expires within the callback to update the timeout (the
+hrtimer module will enqueue the hrtimer when callback return)
+3. If it is not in callback, call hrtimer_cancel + hrtimer_start to restart
+the timer.
+4. To avoid the potential issue of the enqueue in step 2 and the
+hrtimer_start in step 3 happening simultaneously, which could lead to
+hrtimer_start being triggered twice in a very short period, the logic should
+be:
+if (hrtimer_cancel(...))
+    hrtimer_start(...);
+Additionally, the hrtimer_cancel check will also avoid hrtimer callback
+triggered once more when just called prb_del_retire_blk_timer by packet_set_ring.
+The hrtimer should be in an active state beginning from when
+prb_setup_retire_blk_timer is called to the time when prb_del_retire_blk_timer
+is called.
+
+
+Thanks
+Xin Zhao
 
 
