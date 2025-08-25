@@ -1,426 +1,314 @@
-Return-Path: <netdev+bounces-216702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A98B5B34FA4
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 01:22:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA269B34FA6
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 01:23:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 524D748856D
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 23:22:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC58A1A88358
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 23:24:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42A00230BCE;
-	Mon, 25 Aug 2025 23:22:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60B7D29B8CE;
+	Mon, 25 Aug 2025 23:23:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lHIKu8ay"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dHlXmRp2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FACF1A9FA4
-	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 23:22:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756164169; cv=none; b=aX4nfmVMeLyfjIbOn8UJjKxYseaeiZ0v8UHFaBqfL4rEjmSAbdMv6TrC8U229hyJGWtu0TsaLrWRF0qnm75lf/tyVbzjTmsgKfAR4Xmei8OtvFGqKbUHwGT/bRnszrHpfXmtwbhoo/h/NZfU5zL+pLE44TSqcP9JCuTQN2Q+wWk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756164169; c=relaxed/simple;
-	bh=LOH/5tzB9/sjEeDMj2JeCpbcCU7Apba9HCdI9JJmRcA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DlrzJ0al+4PVy2xJaQvDx7WxiKDz7e/s4m6HFHkcMOU1MseSwVG11BCjeH1Doa+Mo1WCoV9+V1I9wucrI90dWbz57NpKHTixGl7ybrJeWBgkTsLkI+7NbWrdwpDzK9t5yTIbHDHuRJ1C0QyCbdTZFz/HqzccZVbUJYQhEJEKHiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lHIKu8ay; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-246257e49c8so74805ad.0
-        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 16:22:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756164167; x=1756768967; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hCB/TVX99hrW81ENGF3mPEMvXDgQXDFGlc0HIfCdIlE=;
-        b=lHIKu8ayP0HL0zVBeFzv1EpBgd+JZKi85HuLdg/zdkPMyrJf52F8PKYA6LfegPXKGo
-         H3rsTk70vYq7/+xQsxqMQJXRUvLuyjNLEnlpffH5ycwnHWVtCWOCjuX3yWvrDyQJnRRX
-         sBoqkaDeGKbyWqp2tF6hTZxNlBCl9kXwfsjen2X1aR0n6CdVfM1jq+N+A2ofpF60Qyj4
-         zsYDpDvMcdVku5qyhA50vZRjaJ0a3GH/2Ov77p4V0toP3zOGjXsK81lwnDcsf8cuqiCa
-         daQ5gnhFsGiCUbWPQnSr3QOnetRG3RftMOcoZV4E7LR7mrGz66h28Us52GYcn3S8bQ/u
-         3Vdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756164167; x=1756768967;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hCB/TVX99hrW81ENGF3mPEMvXDgQXDFGlc0HIfCdIlE=;
-        b=RCp6Fz26zZfaTRUtUJpdNHbi2dEdxiI5mALKY3BpWpfPkRyhwuesRE7F493jGQHC9T
-         PQbUBmsjxp7pKP9xnMwIMreHO36gHoUDZDFr7xNTTXKgLFbG2zojlVd3qpgiasHCvm/e
-         inGc+4gDFHAGrHkqfg2A049K5PjNkmL+YBzp5/h5AGQFBvuEyJRrkZO+JjFopfjUAdQN
-         diOdIXLuZ6DAHy0QimJCtumv0w4ltq7iqGPwLPeFkOaV1iumCjppmErWspXFPAvwPcik
-         vTYvafQ9hI1V4PcDBvEc67BnSNlfPpr3zGMiFZWNrgnJG7zuel9CC8YhgVzdp1FV2yHW
-         TVSA==
-X-Forwarded-Encrypted: i=1; AJvYcCWpMlypSn716Zz0tBb44klMEik3HvwMT744tA48NQaloEUaCSUtJPA7GEPmdJXNK3TN9BTkpm8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxejHh6W6d44QR+f6daZNwhCVWE/EEKQMDx6EmK8MEHTmXN0QQw
-	GpxJNS9Q5TO/OL/ZI2xkBxzazPQ6UcxVuDSmFd/EOBpkKtcw59dpssOLp+U5qdNO9y0dTgAGFKw
-	Rmz5xqb0WAHjND6Xij6xbtczQ0nSHujvrAbS7XxgD
-X-Gm-Gg: ASbGncsA3BI3vSkwLULNJqT2YRS5DuzRbmTO0o9L2OKx1X8H6x/J21ZDI9Mq/NrHenv
-	UigDhP2LYil7loXCIOKda1bzX36caqNB4vvcbTZQyJHGleLFyBTjH7hZeVAv94gvtXj3oIHfXEv
-	ViGr0F+wS5f0g3BlyaoGTldrY/HM17jaL3bjmgdu1bXCmTwnwNn7Az33ayAEX84uQUjGpapO1eZ
-	TAZjyt0YrJ0Ucxzxuh5mvBCl8GlK1oCZabsJggLBA==
-X-Google-Smtp-Source: AGHT+IEIuadmfy/ouIPw2SQT6MoPu0lF9QbC3e0M5SyvYJaDnpoEJ141LpHWGV4iNhjvIdpj5CBQmPhy/bzfaWMuDXg=
-X-Received: by 2002:a17:902:e84b:b0:231:d0ef:e8ff with SMTP id
- d9443c01a7336-2485ba39492mr1879145ad.8.1756164166259; Mon, 25 Aug 2025
- 16:22:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8192881720
+	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 23:23:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756164219; cv=fail; b=chaB/WztIK/KUbNvErkObzdJTxImjjOqy4A+z/TcivZT6pJtTXhZtksLlNdjwrYb/VaIidld2fo4rSblxxzx7CRxRiE9IkX/06dNKr+nHM857FtlAJy95MtMeBftovQ48jqw4x2kypQcCH9jKEgqs3WOHkov7DToWTOk7AjP5T8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756164219; c=relaxed/simple;
+	bh=dP6y0+bG19EkWQgt+WUOMG88zhaubOY6vJ4w0d4pTCg=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=lkAZcYkCBtfTf8Ac3TAMvA5C0CUnNS13xKkUdsd+WIz9ISEPzimsWuKoedu1vKVyE8GsqmZiicq97w9hvWNjJh5ENGcl+31DwanV7fETyrSf7M3+eNI+Kmjypre9bUWziWoIAO8emLBSlqHN/xFwc2G5ykDyIXvCAJhiS3c0wlY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dHlXmRp2; arc=fail smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756164218; x=1787700218;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:mime-version;
+  bh=dP6y0+bG19EkWQgt+WUOMG88zhaubOY6vJ4w0d4pTCg=;
+  b=dHlXmRp2Ra5ZhnBSR9G5A/4mtXS0fSgFvlF3cAYcAPx67uXfyXicEJJy
+   rm0Pnad8kikn7cNgISTs4+t0LDMzvo9YMdPPKx9kk1XBQP8zqdlXs7zke
+   toBtYJz+CqGYcvscac2ZHYYOBj4kRXMzY1LnYY6oCkndzXf7/AIVXUHzZ
+   6NqIvhZQoMskI3WX2OF27AtII51miPPd6ny6FebAZLOvDbsxdFdkPatFI
+   z5WH511Dc3H40hKxgTYz5HF6P9KXGSvo2NrksYvVIpxw1fiY0nhwcAbI/
+   5fe25gDDPOt+XCg5YMlB1Aka7uwNVCA7WeSUwko4eg4joIDbXOeH4r7bi
+   A==;
+X-CSE-ConnectionGUID: AHwy75csRw+6E9gg8a/VDg==
+X-CSE-MsgGUID: ftOlps83R2+nFYgTYEqUgA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11533"; a="58534727"
+X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
+   d="asc'?scan'208";a="58534727"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2025 16:23:35 -0700
+X-CSE-ConnectionGUID: ya33EjLkQFKb4kzgmsVGkA==
+X-CSE-MsgGUID: ySahIAJ/S++zjzjvyxGCtA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
+   d="asc'?scan'208";a="173819284"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2025 16:23:34 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 25 Aug 2025 16:23:34 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Mon, 25 Aug 2025 16:23:34 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (40.107.243.50)
+ by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 25 Aug 2025 16:23:33 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=HtFmmrjzUcYRHqjn8OUCKuDBiKe8UxnyUXEIq5JSWMuxfjYMwwrFJyDoT9yuM5RJm9zl+05PCHOhIe9DzcEfp3138lsCTuqRzuxUiUXhaYU1wy6zcs8EHtZdYdOeFsmT7USBJrVirRDjwSeWzo32Mv1Tg2zh9Bk/oHCzue0KefFz5UA5KXf911EXGJEgl50fq63KJ6hsZqgmF1annztdhfCzenxULO3AoRLOhw0A081OKiI0EicsG4j2/JgzUdLgiBo8OWl1NPamx5bl0qIfc5LdoLey9CrHbsi4PNuU4AaKAePtoPpi3kfW4a13ltxee2vJ9bntVXWf963D6MUPAA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dP6y0+bG19EkWQgt+WUOMG88zhaubOY6vJ4w0d4pTCg=;
+ b=LvcVz8ovvqrplmiuzb5uYrxXIQWD0WmfguNAMIlivogCQiIGvNW/AS8REyp/1oT3mJ2o56zPoyi5efNhWCYlNSihSYjNiegKk+48BccqD7LMnZUl37eZjiIUgMhYZE8h+9ecScORkOFN4dWeupgFlmaYBg88UpqEPBtuIf/a4DVpise2TPax7gaJEBEV+c1VNYVhWEgVBNiapzpRZAsyIvgjTE/CYIqH0VWcPcPtdsp0vA5FyIALm00C05JWtgByX0kaXuyqGt52PnTYm7PIW83iMawqzzZSaBYcwR0yt44v/wFuzLy3m0qPNhAWSVirsvyFrA1AoRTHo1b0mcsKZg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by SA1PR11MB8325.namprd11.prod.outlook.com (2603:10b6:806:38c::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.17; Mon, 25 Aug
+ 2025 23:23:27 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3%5]) with mapi id 15.20.9052.019; Mon, 25 Aug 2025
+ 23:23:27 +0000
+Message-ID: <edd81dec-c914-45c9-9618-6042fdab60da@intel.com>
+Date: Mon, 25 Aug 2025 16:23:25 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2] igb: Convert Tx
+ timestamping to PTP aux worker
+To: Kurt Kanzenbach <kurt@linutronix.de>, Miroslav Lichvar
+	<mlichvar@redhat.com>
+CC: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>, Paul Menzel
+	<pmenzel@molgen.mpg.de>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
+References: <20250822-igb_irq_ts-v2-1-1ac37078a7a4@linutronix.de>
+ <20250822075200.L8_GUnk_@linutronix.de> <87ldna7axr.fsf@jax.kurt.home>
+ <aKwWiGkbDyEOS9-z@localhost> <87o6s3oivk.fsf@jax.kurt.home>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+Autocrypt: addr=jacob.e.keller@intel.com; keydata=
+ xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
+ J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
+ qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
+ CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
+ UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
+ MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
+ apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
+ cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
+In-Reply-To: <87o6s3oivk.fsf@jax.kurt.home>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="------------KPsdwxKzIurJT5r21z4V0JUd"
+X-ClientProxiedBy: MW4PR03CA0238.namprd03.prod.outlook.com
+ (2603:10b6:303:b9::33) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250824215418.257588-1-skhawaja@google.com> <aKy7fmowmZ8g9ZhH@mini-arch>
- <CAAywjhQVVbK=CthODv=sVez1Q6yhYp+seuxHv5gstGHZz20vEg@mail.gmail.com> <aKzm660pL_JvcsdW@mini-arch>
-In-Reply-To: <aKzm660pL_JvcsdW@mini-arch>
-From: Samiullah Khawaja <skhawaja@google.com>
-Date: Mon, 25 Aug 2025 16:22:33 -0700
-X-Gm-Features: Ac12FXwopLPgn4CzqeWUk8ZadmSw6jc9i9K2tKY9R5bKSnF02hq_RU5PAuI59vs
-Message-ID: <CAAywjhSNLEZfbkSMt4kg1-ccSMZbO1naMS64Bt2y2oAwLFxhdg@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 0/2] Add support to do threaded napi busy poll
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, 
-	willemb@google.com, mkarsten@uwaterloo.ca, Joe Damato <joe@dama.to>, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|SA1PR11MB8325:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5d58af41-db0e-4458-f603-08dde42e64d3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?c0xsa1BvMzg2cUFiUkdLbXBvdWNxOEloWVRtOEVJTFZZUXh4MHZrK2lyVDZ2?=
+ =?utf-8?B?anVNOVdWelp5RlJVTjhEWDJaVFAwQ3pDclo0RXVtNWJNSDNUeDFndnUxcU5x?=
+ =?utf-8?B?eWgzVjBaRXFjTE1jL2dDWmRlenNkOXVNWncwZjB0WDhsQjVhTVRxczFIYlNU?=
+ =?utf-8?B?N1VQOFpPWjJiOVRlS3VJakdodnlSd2RGU29tYlhrWTJXRzYxWVNVVGxlVVlj?=
+ =?utf-8?B?ZXV5UEVndlpqWThyTjJOVlgwbGVGZzh1UlNwMENCbE1zVi9ZZWU0b0x1UXFP?=
+ =?utf-8?B?SkMxT1ZCNGswbnFNa3ViR3Q2OG5Rb1Fzam5jQ0xtTk94STFXayswdzdGbmtM?=
+ =?utf-8?B?dUhMTjhGQ3NsWERaYmxTS0c2d0RSTHhiZndrNkloK1ZpRzZka3UxM0RxV25k?=
+ =?utf-8?B?K3NlV1dVZHJrL2tCNng3NERINUI0dHFQbUdXUEJkQnpFRWxKejVkS1FFcHJF?=
+ =?utf-8?B?bkxOWjhQOUtlMDZUeW4xbERZUmJqZXFMb2hZT2I4dDROVjM0UHptaWI4Yjlp?=
+ =?utf-8?B?ZEpRMEpRWUxQaE0rcTlYMjJNOVlHbFB5YnA5M0wrcnlZemg1R2dPdGdKalBN?=
+ =?utf-8?B?RU5aWHVEMWY2U3M5SDN0TXhtZndwK3huV2hxK05zdytYQWVFUGNhWjN5TDVo?=
+ =?utf-8?B?TTFrb0J5MHJqSUpKNGdEclpPRFV5UldweHlmU0tTSDQwWms3YmhiREtJTUVo?=
+ =?utf-8?B?RGphc1UxOG55RnBlc1RWai9ka1MrOWl5aWU0TUVzNEEwbit1R0VFa2JDb3Bq?=
+ =?utf-8?B?N3FBckVkMjB1L3k3LzZCczJ4TDdaK1R6NUZMcFF2S21jcE5BRFR3Z2hZc0Jp?=
+ =?utf-8?B?YzB0YldCUzJtR3lsaWk2MitWTWNzTDZVMmNITzFsaUNkMWF6Nm5ZMGNnZFIw?=
+ =?utf-8?B?RE40VGh6enJjemxTYkdKUWd6alFkZHlIUERjNTdqdmRLRWp2Z3JoUmRUQWNi?=
+ =?utf-8?B?d2h4MmZlaEhGWHlra0duRlB4aFlFdjdJbUhpM3g0TjlHeVVNZ0podEdjTTZS?=
+ =?utf-8?B?d3ZGN3ZhTFJKVzA1RXoyMHA0MUpBQmY0My90UnlieDEzMVVyWCtSVjFOdkhl?=
+ =?utf-8?B?RVh5c1o1ekh2eis2cHJWcTNoVTNpd2szNTNsMENXcklpOFZncENhUW1rS05v?=
+ =?utf-8?B?djBDbkRwZHhqd0RNWEUzV05OWm5VVEJKYWRjQU4yNkxDT2tmeVRpckVJMmRQ?=
+ =?utf-8?B?SjRXalowamlkMlNzVGU1Qzd4b0djYmkxOWsrNUtNVDdIaGhaTnhDelNScStq?=
+ =?utf-8?B?Y1ovYXM5N29yUUpOZUZ6WkpDeXRLU0VQbkVYc3VheFV3S2I5QjFnakhzQmRS?=
+ =?utf-8?B?WVF4MldHcUhPS3ZBTkpWY2puOEQzNTk1b2NWTWpXUXI3OFc4cEM5T0xLSDBL?=
+ =?utf-8?B?YVNhcmNhTTg1MkQ1TFBwTWRPVlZqOVovNm8zbXJtMDZzcnB6dUkrbFBabEQy?=
+ =?utf-8?B?c2cvNzJtem0yYUxmMk9LZGNqRzg1dmJ4dTRMOGwwL050ekVrT1RwMlNCeFVX?=
+ =?utf-8?B?TGdZQnpQWGhRakZ6VnprVFQ1RVBKNW5EQWh5ak8rOFo5Y2lrVTg4LytIWGVG?=
+ =?utf-8?B?cUtPbm8zbFMvTWFmZnR4d0lGZ2RmUXlOY3F2NStvQVZKaG1lSVJQL2NQeDBJ?=
+ =?utf-8?B?UWFlL2tTVkN3NHFnNnl4L0xpTEFscXZqWmpaK09oNVUxQTNZUEJBeWNvRm0y?=
+ =?utf-8?B?VUxGVEpSNVVvYXdOaCsxdXRCdldNSFNnb1ljcFhSMXhzdjI3NUc0a2hrbS93?=
+ =?utf-8?B?dDEycWU4R0hDRGZpVHpod3pjK1YxOFJaSzVJTlZyL2hzSmR5M2Jpd0pDcXRw?=
+ =?utf-8?B?Vjk4YzR4SWFZeUd1YS9mQXNIa2hpbUZXSHZKYTZaTU1HdnRBNjRGSDZDb2E4?=
+ =?utf-8?B?TUdTWDY2bjdPWkVWOHZzeExnL0sxcXd4OWR6WCtSTjNUSTduUDU5d29OeXhk?=
+ =?utf-8?Q?cX797ZBm3zo=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QVMvWUVVNnFGVXhLTHhpRE9FRDhGZjlUMW96eEdlRStEQm05S1BucGExdDlR?=
+ =?utf-8?B?WWJQaHFVYU11b3h2WUk5ekNTRjNNTDB3YzFvZU1hNndrb2t5Q2w1c0pUeFIv?=
+ =?utf-8?B?SlIzT0hOclczSCtZcDk2U0Mrd2dneERoRUlNNnU2WTF4RzBSbDVlTGkyblp4?=
+ =?utf-8?B?bExWSi9RSWRuM0hHWTlERXFsU1hSZzA5S1oybHpXVjFBL2VuVzRwdW9sbVUx?=
+ =?utf-8?B?em1uVXJWMDNEMjl5SHpSMFp6ekJEajJCTWxabmU5dGVTU0pVZkIrQU9vUGxZ?=
+ =?utf-8?B?UHJlRzdNNEw2T3JnMHRJMDdlQ1hxMGtPYk9VT0l1emYvcDA5Sm1KTEVTcDBk?=
+ =?utf-8?B?WittbEorNVExbW0ybWozbk9Tek8zYkh1aTNqSjlKZ3dRS2FSUjI1ZlhMSUFI?=
+ =?utf-8?B?eU1jckltcVA2c2ZzeGNXckJ5c1I5TG85QjV5QWtvZWhJK3NOY0xoVmpJdGs5?=
+ =?utf-8?B?aVFFcEpzSnhVbjdOZWFQcUZCLzY2Nmk1dHBBTGV1N3JKeVlqUFFsT1cwSm9Q?=
+ =?utf-8?B?TGJiQ0RjVUVWdUs4SCtqSVFVcVExbXgzMDdvSUlSMDAyYi9pMG9HbFBsb1NR?=
+ =?utf-8?B?aFhDWVBibGxvWkJMUWVaWG8xdGwwemE2bEUzckc2SzI5QXh5dzNveGJ0YzAr?=
+ =?utf-8?B?SDhHZ1dHNm9BY1VhZGc3aGNrRjBVZldnTWpVWUEyWjJaNFNtY3pFc2NpVGRo?=
+ =?utf-8?B?aXpwUzZ4RlFXZk9DN2paamREQWdPb3dHTG1iTThDNURJdVowczcrSFgyT1Fh?=
+ =?utf-8?B?NVNXaUxSOWlOZFFuUnZuMXNCY3R4d0VOemRJM0VWN2MzemlJaDNFbDEvdWhV?=
+ =?utf-8?B?Mk80Njljc08waEFBT0syY01CMFg4OUN5QmR4emszZjV0Nlk3b2ZvYkIxbU9l?=
+ =?utf-8?B?NzFHdGl4ZEpQM2tJcjRrUWpIQ2hqZGlQQnZVeFJmbVN6NTBUYm02QzljSStw?=
+ =?utf-8?B?bEtXa3hyQkR0SFE0VVhaVTJKajdIWmM2R0hOTGN4WGY3SHdVd2U2TG5vUGtG?=
+ =?utf-8?B?NnFHNElTOHdIN0VrL3NDdTBKdjFOb01ZZmNSSVVSOXk2MlFEbzlQSmJJeDlG?=
+ =?utf-8?B?ZHlJTjI3K0M4aDQwcmR2T0pLYTRvZ2VGamh4RVJIQS9uT3Y0bnRPcmQ3bk1y?=
+ =?utf-8?B?bWlVa1lZcSszaExNNFlUb0V2VGFyRDVmaTQzdVhEZVNKbXdpNUJ5SlBXNFo2?=
+ =?utf-8?B?OCs2eDVRZnNQYm5zWjN1VDhVM1E0ckNkZUJrbTVuUStWVlRRcmo1bWF1TVBX?=
+ =?utf-8?B?UFhoeG1tQUJqblhUYnJMc3EvTTFMWTNFVE5QbHVIM2lTUk1EdjBSVFV1WlB6?=
+ =?utf-8?B?am1qUW00a1d0TDEzTlh3QUt4SkRldFZET0JDbjBDRFV1Y0IvVFlYVTIzU0Y0?=
+ =?utf-8?B?dXJYSDh4QlhyRGJydnd5NkppU3dreHlNWTZjUkZGM2ZSUWE5MTdlcHhMZFh2?=
+ =?utf-8?B?STAvT1pxS2ZUeTZ4WXlxYU5iRGRmcUgzZmFWZkVuMDJ0MXZuSVVDaUtKWmFr?=
+ =?utf-8?B?cWgzYnJaOVV2dWxrSy9sY29nYVlkQmpYSEJhRmtoalpiZXZlUTJUQVFOck1Z?=
+ =?utf-8?B?UU1Cb0wxVEpKQ3ZaRlZ5QU9UL0hVL2ZLd1RqQVJoTnYydHYzdWtweWt0Ymxm?=
+ =?utf-8?B?TjEyMjZYNGdzN0VIamN0UjZDaFY0RUc2VXd0MW9kMjNBNlZaME42eGs3VHFS?=
+ =?utf-8?B?Qm5XK2ppZTNNT3FodklxVG9OdVJEV1g3VndmSWZra0xGK0ZwR3h5NjY2a3RV?=
+ =?utf-8?B?dEFYRCtIOXJhejNDU25GRFYzaWdiNjdFSFdhMzU5YWlHVDhjVEdOVGd6YU50?=
+ =?utf-8?B?ZmllblFrazMwU3hwalNHWjMveHRZQk9QQmJIQTF1OTdERkRQS1JWWlZ0TjhY?=
+ =?utf-8?B?L0RFMm43V1RFdnZMUTU2SGQxQTNheG9IM3RadjVEWTZhaHRvL012Q01qT1Nr?=
+ =?utf-8?B?b3BlMDgybWp3c2J1SjNDOU5Bc3hmUFRucG82MmNCZElPZFBMSUJKcTViZVVn?=
+ =?utf-8?B?aTRTd2Rwc2ZoYmZmcDVwNFZrVHh0NnFqazFuNndGRVloTStSTlB1ZEtlK0Ro?=
+ =?utf-8?B?eXlOaEtUYnhQUDB2UDZINytFSnVOQkdLdnNmNWEvbWtIM2lybElDU0U3RG5T?=
+ =?utf-8?B?bERpZ3NQQmJ6cUtVc1NUVG03TFcwdS9wNVVHc1RvOWk0WWlSWGdqY0Jja2cr?=
+ =?utf-8?B?V2c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5d58af41-db0e-4458-f603-08dde42e64d3
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2025 23:23:26.9317
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8Ah5OuXbmPOxq0WCY1Kw+cWSuDl1mAR/6UWV6coBMyxHMtvl026onj0zL4y5hpPQ5jFvipVF2GJbeVNGb5XT1dKwfnA5WjmskY3+QNhTHfI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8325
+X-OriginatorOrg: intel.com
+
+--------------KPsdwxKzIurJT5r21z4V0JUd
+Content-Type: multipart/mixed; boundary="------------dHgjpIWR9AS00sVVKUMkNrot";
+ protected-headers="v1"
+From: Jacob Keller <jacob.e.keller@intel.com>
+To: Kurt Kanzenbach <kurt@linutronix.de>,
+ Miroslav Lichvar <mlichvar@redhat.com>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+ Paul Menzel <pmenzel@molgen.mpg.de>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Message-ID: <edd81dec-c914-45c9-9618-6042fdab60da@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2] igb: Convert Tx
+ timestamping to PTP aux worker
+References: <20250822-igb_irq_ts-v2-1-1ac37078a7a4@linutronix.de>
+ <20250822075200.L8_GUnk_@linutronix.de> <87ldna7axr.fsf@jax.kurt.home>
+ <aKwWiGkbDyEOS9-z@localhost> <87o6s3oivk.fsf@jax.kurt.home>
+In-Reply-To: <87o6s3oivk.fsf@jax.kurt.home>
+
+--------------dHgjpIWR9AS00sVVKUMkNrot
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 25, 2025 at 3:42=E2=80=AFPM Stanislav Fomichev <stfomichev@gmai=
-l.com> wrote:
->
-> On 08/25, Samiullah Khawaja wrote:
-> > On Mon, Aug 25, 2025 at 12:37=E2=80=AFPM Stanislav Fomichev
-> > <stfomichev@gmail.com> wrote:
-> > >
-> > > On 08/24, Samiullah Khawaja wrote:
-> > > > Extend the already existing support of threaded napi poll to do con=
-tinuous
-> > > > busy polling.
-> > > >
-> > > > This is used for doing continuous polling of napi to fetch descript=
-ors
-> > > > from backing RX/TX queues for low latency applications. Allow enabl=
-ing
-> > > > of threaded busypoll using netlink so this can be enabled on a set =
-of
-> > > > dedicated napis for low latency applications.
-> > > >
-> > > > Once enabled user can fetch the PID of the kthread doing NAPI polli=
-ng
-> > > > and set affinity, priority and scheduler for it depending on the
-> > > > low-latency requirements.
-> > > >
-> > > > Currently threaded napi is only enabled at device level using sysfs=
-. Add
-> > > > support to enable/disable threaded mode for a napi individually. Th=
-is
-> > > > can be done using the netlink interface. Extend `napi-set` op in ne=
-tlink
-> > > > spec that allows setting the `threaded` attribute of a napi.
-> > > >
-> > > > Extend the threaded attribute in napi struct to add an option to en=
-able
-> > > > continuous busy polling. Extend the netlink and sysfs interface to =
-allow
-> > > > enabling/disabling threaded busypolling at device or individual nap=
-i
-> > > > level.
-> > > >
-> > > > We use this for our AF_XDP based hard low-latency usecase with usec=
-s
-> > > > level latency requirement. For our usecase we want low jitter and s=
-table
-> > > > latency at P99.
-> > > >
-> > > > Following is an analysis and comparison of available (and compatibl=
-e)
-> > > > busy poll interfaces for a low latency usecase with stable P99. Ple=
-ase
-> > > > note that the throughput and cpu efficiency is a non-goal.
-> > > >
-> > > > For analysis we use an AF_XDP based benchmarking tool `xdp_rr`. The
-> > > > description of the tool and how it tries to simulate the real workl=
-oad
-> > > > is following,
-> > > >
-> > > > - It sends UDP packets between 2 machines.
-> > > > - The client machine sends packets at a fixed frequency. To maintai=
-n the
-> > > >   frequency of the packet being sent, we use open-loop sampling. Th=
-at is
-> > > >   the packets are sent in a separate thread.
-> > > > - The server replies to the packet inline by reading the pkt from t=
-he
-> > > >   recv ring and replies using the tx ring.
-> > > > - To simulate the application processing time, we use a configurabl=
-e
-> > > >   delay in usecs on the client side after a reply is received from =
-the
-> > > >   server.
-> > > >
-> > > > The xdp_rr tool is posted separately as an RFC for tools/testing/se=
-lftest.
-> > > >
-> > > > We use this tool with following napi polling configurations,
-> > > >
-> > > > - Interrupts only
-> > > > - SO_BUSYPOLL (inline in the same thread where the client receives =
-the
-> > > >   packet).
-> > > > - SO_BUSYPOLL (separate thread and separate core)
-> > > > - Threaded NAPI busypoll
-> > > >
-> > > > System is configured using following script in all 4 cases,
-> > > >
-> > > > ```
-> > > > echo 0 | sudo tee /sys/class/net/eth0/threaded
-> > > > echo 0 | sudo tee /proc/sys/kernel/timer_migration
-> > > > echo off | sudo tee  /sys/devices/system/cpu/smt/control
-> > > >
-> > > > sudo ethtool -L eth0 rx 1 tx 1
-> > > > sudo ethtool -G eth0 rx 1024
-> > > >
-> > > > echo 0 | sudo tee /proc/sys/net/core/rps_sock_flow_entries
-> > > > echo 0 | sudo tee /sys/class/net/eth0/queues/rx-0/rps_cpus
-> > > >
-> > > >  # pin IRQs on CPU 2
-> > > > IRQS=3D"$(gawk '/eth0-(TxRx-)?1/ {match($1, /([0-9]+)/, arr); \
-> > > >                               print arr[0]}' < /proc/interrupts)"
-> > > > for irq in "${IRQS}"; \
-> > > >       do echo 2 | sudo tee /proc/irq/$irq/smp_affinity_list; done
-> > > >
-> > > > echo -1 | sudo tee /proc/sys/kernel/sched_rt_runtime_us
-> > > >
-> > > > for i in /sys/devices/virtual/workqueue/*/cpumask; \
-> > > >                       do echo $i; echo 1,2,3,4,5,6 > $i; done
-> > > >
-> > > > if [[ -z "$1" ]]; then
-> > > >   echo 400 | sudo tee /proc/sys/net/core/busy_read
-> > > >   echo 100 | sudo tee /sys/class/net/eth0/napi_defer_hard_irqs
-> > > >   echo 15000   | sudo tee /sys/class/net/eth0/gro_flush_timeout
-> > > > fi
-> > > >
-> > > > sudo ethtool -C eth0 adaptive-rx off adaptive-tx off rx-usecs 0 tx-=
-usecs 0
-> > > >
-> > > > if [[ "$1" =3D=3D "enable_threaded" ]]; then
-> > > >   echo 0 | sudo tee /proc/sys/net/core/busy_poll
-> > > >   echo 0 | sudo tee /proc/sys/net/core/busy_read
-> > > >   echo 100 | sudo tee /sys/class/net/eth0/napi_defer_hard_irqs
-> > > >   echo 15000 | sudo tee /sys/class/net/eth0/gro_flush_timeout
-> > > >   echo 2 | sudo tee /sys/class/net/eth0/threaded
-> > > >   NAPI_T=3D$(ps -ef | grep napi | grep -v grep | awk '{ print $2 }'=
-)
-> > > >   sudo chrt -f  -p 50 $NAPI_T
-> > > >
-> > > >   # pin threaded poll thread to CPU 2
-> > > >   sudo taskset -pc 2 $NAPI_T
-> > > > fi
-> > > >
-> > > > if [[ "$1" =3D=3D "enable_interrupt" ]]; then
-> > > >   echo 0 | sudo tee /proc/sys/net/core/busy_read
-> > > >   echo 0 | sudo tee /sys/class/net/eth0/napi_defer_hard_irqs
-> > > >   echo 15000 | sudo tee /sys/class/net/eth0/gro_flush_timeout
-> > > > fi
-> > > > ```
-> > > >
-> > > > To enable various configurations, script can be run as following,
-> > > >
-> > > > - Interrupt Only
-> > > >   ```
-> > > >   <script> enable_interrupt
-> > > >   ```
-> > > >
-> > > > - SO_BUSYPOLL (no arguments to script)
-> > > >   ```
-> > > >   <script>
-> > > >   ```
-> > > >
-> > > > - NAPI threaded busypoll
-> > > >   ```
-> > > >   <script> enable_threaded
-> > > >   ```
-> > > >
-> > > > If using idpf, the script needs to be run again after launching the
-> > > > workload just to make sure that the configurations are not reverted=
-. As
-> > > > idpf reverts some configurations on software reset when AF_XDP prog=
-ram
-> > > > is attached.
-> > > >
-> > > > Once configured, the workload is run with various configurations us=
-ing
-> > > > following commands. Set period (1/frequency) and delay in usecs to
-> > > > produce results for packet frequency and application processing del=
-ay.
-> > > >
-> > > >  ## Interrupt Only and SO_BUSY_POLL (inline)
-> > > >
-> > > > - Server
-> > > > ```
-> > > > sudo chrt -f 50 taskset -c 3-5 ./xsk_rr -o 0 -B 400 -i eth0 -4 \
-> > > >       -D <IP-dest> -S <IP-src> -M <MAC-dst> -m <MAC-src> -p 54321 -=
-h -v
-> > > > ```
-> > > >
-> > > > - Client
-> > > > ```
-> > > > sudo chrt -f 50 taskset -c 3-5 ./xsk_rr -o 0 -B 400 -i eth0 -4 \
-> > > >       -S <IP-src> -D <IP-dest> -m <MAC-src> -M <MAC-dst> -p 54321 \
-> > > >       -P <Period-usecs> -d <Delay-usecs>  -T -l 1 -v
-> > > > ```
-> > > >
-> > > >  ## SO_BUSY_POLL(done in separate core using recvfrom)
-> > > >
-> > > > Argument -t spawns a seprate thread and continuously calls recvfrom=
-.
-> > > >
-> > > > - Server
-> > > > ```
-> > > > sudo chrt -f 50 taskset -c 3-5 ./xsk_rr -o 0 -B 400 -i eth0 -4 \
-> > > >       -D <IP-dest> -S <IP-src> -M <MAC-dst> -m <MAC-src> -p 54321 \
-> > > >       -h -v -t
-> > > > ```
-> > > >
-> > > > - Client
-> > > > ```
-> > > > sudo chrt -f 50 taskset -c 3-5 ./xsk_rr -o 0 -B 400 -i eth0 -4 \
-> > > >       -S <IP-src> -D <IP-dest> -m <MAC-src> -M <MAC-dst> -p 54321 \
-> > > >       -P <Period-usecs> -d <Delay-usecs>  -T -l 1 -v -t
-> > > > ```
-> > > >
-> > > >  ## NAPI Threaded Busy Poll
-> > > >
-> > > > Argument -n skips the recvfrom call as there is no recv kick needed=
-.
-> > > >
-> > > > - Server
-> > > > ```
-> > > > sudo chrt -f 50 taskset -c 3-5 ./xsk_rr -o 0 -B 400 -i eth0 -4 \
-> > > >       -D <IP-dest> -S <IP-src> -M <MAC-dst> -m <MAC-src> -p 54321 \
-> > > >       -h -v -n
-> > > > ```
-> > > >
-> > > > - Client
-> > > > ```
-> > > > sudo chrt -f 50 taskset -c 3-5 ./xsk_rr -o 0 -B 400 -i eth0 -4 \
-> > > >       -S <IP-src> -D <IP-dest> -m <MAC-src> -M <MAC-dst> -p 54321 \
-> > > >       -P <Period-usecs> -d <Delay-usecs>  -T -l 1 -v -n
-> > > > ```
-> > > >
-> > > > | Experiment | interrupts | SO_BUSYPOLL | SO_BUSYPOLL(separate) | N=
-API threaded |
-> > > > |---|---|---|---|---|
-> > > > | 12 Kpkt/s + 0us delay | | | | |
-> > > > |  | p5: 12700 | p5: 12900 | p5: 13300 | p5: 12800 |
-> > > > |  | p50: 13100 | p50: 13600 | p50: 14100 | p50: 13000 |
-> > > > |  | p95: 13200 | p95: 13800 | p95: 14400 | p95: 13000 |
-> > > > |  | p99: 13200 | p99: 13800 | p99: 14400 | p99: 13000 |
-> > > > | 32 Kpkt/s + 30us delay | | | | |
-> > > > |  | p5: 19900 | p5: 16600 | p5: 13100 | p5: 12800 |
-> > > > |  | p50: 21100 | p50: 17000 | p50: 13700 | p50: 13000 |
-> > > > |  | p95: 21200 | p95: 17100 | p95: 14000 | p95: 13000 |
-> > > > |  | p99: 21200 | p99: 17100 | p99: 14000 | p99: 13000 |
-> > > > | 125 Kpkt/s + 6us delay | | | | |
-> > > > |  | p5: 14600 | p5: 17100 | p5: 13300 | p5: 12900 |
-> > > > |  | p50: 15400 | p50: 17400 | p50: 13800 | p50: 13100 |
-> > > > |  | p95: 15600 | p95: 17600 | p95: 14000 | p95: 13100 |
-> > > > |  | p99: 15600 | p99: 17600 | p99: 14000 | p99: 13100 |
-> > > > | 12 Kpkt/s + 78us delay | | | | |
-> > > > |  | p5: 14100 | p5: 16700 | p5: 13200 | p5: 12600 |
-> > > > |  | p50: 14300 | p50: 17100 | p50: 13900 | p50: 12800 |
-> > > > |  | p95: 14300 | p95: 17200 | p95: 14200 | p95: 12800 |
-> > > > |  | p99: 14300 | p99: 17200 | p99: 14200 | p99: 12800 |
-> > > > | 25 Kpkt/s + 38us delay | | | | |
-> > > > |  | p5: 19900 | p5: 16600 | p5: 13000 | p5: 12700 |
-> > > > |  | p50: 21000 | p50: 17100 | p50: 13800 | p50: 12900 |
-> > > > |  | p95: 21100 | p95: 17100 | p95: 14100 | p95: 12900 |
-> > > > |  | p99: 21100 | p99: 17100 | p99: 14100 | p99: 12900 |
-> > > >
-> > > >  ## Observations
-> > > >
-> > > > - Here without application processing all the approaches give the s=
-ame
-> > > >   latency within 1usecs range and NAPI threaded gives minimum laten=
-cy.
-> > > > - With application processing the latency increases by 3-4usecs whe=
-n
-> > > >   doing inline polling.
-> > > > - Using a dedicated core to drive napi polling keeps the latency sa=
-me
-> > > >   even with application processing. This is observed both in usersp=
-ace
-> > > >   and threaded napi (in kernel).
-> > > > - Using napi threaded polling in kernel gives lower latency by
-> > > >   1-1.5usecs as compared to userspace driven polling in separate co=
-re.
-> > > > - With application processing userspace will get the packet from re=
-cv
-> > > >   ring and spend some time doing application processing and then do=
- napi
-> > > >   polling. While application processing is happening a dedicated co=
-re
-> > > >   doing napi polling can pull the packet of the NAPI RX queue and
-> > > >   populate the AF_XDP recv ring. This means that when the applicati=
-on
-> > > >   thread is done with application processing it has new packets rea=
-dy to
-> > > >   recv and process in recv ring.
-> > > > - Napi threaded busy polling in the kernel with a dedicated core gi=
-ves
-> > > >   the consistent P5-P99 latency.
-> > >
-> > > The real take away for me is ~1us difference between SO_BUSYPOLL in a
-> > > thread and NAPI threaded. Presumably mostly because of the non-blocki=
-ng calls
-> > > to sk_busy_loop in the former? So it takes 1us extra to enter/leave t=
-he kernel
-> > > and setup/teardown the busy polling?
-> > >
-> > > And you haven't tried epoll based busy polling? I'd expect to see
-> > > results similar to your NAPI threaded (if it works correctly).
-> > I haven't attempted epoll-based NAPI polling because my understanding
-> > is that it only polls NAPI when no events are present. Let me check.
->
-> I was under the impression that xsk won't actually add any (socket) event=
-s
-> to ep making it busy poll until timeout. But I might be wrong, still
-> worth it to double check.
-xsk.c has an xsk_poll implementation that is doing following (apart
-from other things):
 
-if (xs->rx && !xskq_prod_is_empty(xs->rx))
-                mask |=3D EPOLLIN | EPOLLRDNORM;
-if (xs->tx && xsk_tx_writeable(xs))
-                mask |=3D EPOLLOUT | EPOLLWRNORM;
 
-This means it should be providing events checking whether RX queue is
-not empty and whether it is tx writeable.
->
-> > > (have nothing against the busy polling thread, mostly trying to
-> > > understand what we are missing from the existing setup)
-> > The missing piece is a mechanism to busy poll a NAPI instance in a
-> > dedicated thread while ignoring available events or packets,
-> > regardless of the userspace API. Most existing mechanisms are designed
-> > to work in a pattern where you poll until new packets or events are
-> > received, after which userspace is expected to handle them.
-> >
-> > As a result, one has to hack together a solution using a mechanism
-> > intended to receive packets or events, not to simply NAPI poll. NAPI
-> > threaded, on the other hand, provides this capability natively,
-> > independent of any userspace API.
->
-> Agreed, yes. Would be nice to document it in the commit description. Expl=
-ain
-> how SO_BUSY_POLL in a thread is still not enough (polls only once,
-> doesn't busy-poll until the events are ready -> 1-2us of extra latency).
-> And the same for epoll depending on how it goes. If it ends up working,
-> kthread might still be more convenient to setup/manage.
-Agreed. I can add it to the cover letter.
+On 8/25/2025 2:22 AM, Kurt Kanzenbach wrote:
+> On Mon Aug 25 2025, Miroslav Lichvar wrote:
+>> On Sat, Aug 23, 2025 at 09:29:36AM +0200, Kurt Kanzenbach wrote:
+>>> Also I couldn't really see a performance degradation with ntpperf.
+>>
+>> I was testing with an I350, not I210. Could that make a difference?
+>=20
+> Jup, it could make a difference.
+>=20
+
+Yes, that could make a significant difference. I350 is a different MAC
+architecture. According to its datasheet, I can see that it uses a
+similar TXTSTMP registers, and it appears to have an interrupt cause,
+TIME_SYNC bit set which an additional cause register TSICR indicates
+which specific event occurred.
+
+It does look like the logic in the driver checks TSICR and doesn't just
+randomly call this function each time, as it relies on the presence of
+the TSICR register.. Hm.
+
+At first I thought it might be because I350 also has an interrupt
+trigger for receive timestamps, but this cause is masked in the TSIM
+register, so it shouldn't be a concern.
+>>
+>>> In my
+>>> tests the IRQ variant reached an equal or higher rate. But sometimes =
+I
+>>> get 'Could not send requests at rate X'. No idea what that means.
+>>
+>> That's ntpperf giving up as the HW is too slow to send requests at
+>> that rate (with a single process calling sendmmsg() in a loop). You
+>> can add the -l option to force ntpperf to continue, but the printed
+>> rate values will no longer be accurate, you would need to measure it
+>> by some other way, e.g. by monitoring the interface packet counters.
+>=20
+> I see.
+>=20
+> Thanks,
+> Kurt
+
+
+--------------dHgjpIWR9AS00sVVKUMkNrot--
+
+--------------KPsdwxKzIurJT5r21z4V0JUd
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wnsEABYIACMWIQQgQFSp1zOQVirsQx5qll0+bw8o6AUCaKzwbQUDAAAAAAAKCRBqll0+bw8o6E7W
+APwKtvHZXPjm8hpgzF30+TX3sOQZA4dE4gpmedHhcggbGwD/dWNyVc/6T5eS0gBklRCSJ3wa5Raw
+qi3Fc8AuNczmkAY=
+=5mhZ
+-----END PGP SIGNATURE-----
+
+--------------KPsdwxKzIurJT5r21z4V0JUd--
 
