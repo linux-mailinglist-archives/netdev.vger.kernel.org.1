@@ -1,154 +1,112 @@
-Return-Path: <netdev+bounces-216530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52F86B34507
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 17:04:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2E5EB34513
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 17:05:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 647A216DD07
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 15:02:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F3535E58AB
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 15:03:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86A902FE561;
-	Mon, 25 Aug 2025 14:59:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EAB02E0921;
+	Mon, 25 Aug 2025 15:01:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jn0AZo3p"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="YMUV2YRj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19FA619DF62;
-	Mon, 25 Aug 2025 14:59:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A81C9111BF;
+	Mon, 25 Aug 2025 15:01:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756133980; cv=none; b=qYr26YGLLBA2DF4CLgY2tlsaN0Ubql442KwVdVO35eaU0X32lbAff34a9hYhkx1tkNYID0c8o0FcFzMaOKLPYtjMewHyzgu1Td2+UxOw+MUR51xgsDx8T1h0kWvmhS9a5kyXFfcmDiG6So2t7v8s4Fv2CKK6IV9PgXbQ+4qvsU8=
+	t=1756134090; cv=none; b=PT2IIOIQll87j9FXnpVqmV8Icwy1lZzBq+8MbC4U8YG/C9bWI7Wie9vDZEtN8CpXY/ZX3rv0O1KXOomX7/wWSTM3FTWUxJtwsTxOh6jl5QbPjNGmSaFst3JsW7eIXdG0TlW/lWZZEKfklv2Z9/Q3O3XLOINK2vzgJ3e5JG6aDiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756133980; c=relaxed/simple;
-	bh=YtWwiemXxXk/HndwfafEfgJsQeylyFu02jnoMvbgzgo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YGCWp0A5VhuY724yB1LV0CFqLv+ny+x6qWXamyNo5yg00vIkF+lSv0u2Wdf1C2kRSxZBf5dNE1VlD2WIrODCGqRhJQQSOKfclLJKjrZutKBLumd9uYkJ+LnPexySPu11/BFElss08JOM39geZsUPYQ5fwBprxtfZ5uW9O2euhbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jn0AZo3p; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B3D6C4CEED;
-	Mon, 25 Aug 2025 14:59:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756133979;
-	bh=YtWwiemXxXk/HndwfafEfgJsQeylyFu02jnoMvbgzgo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Jn0AZo3pPFK0BugUL3OMCDpCV1HmeNy40TLdNKtLX5SypUoRptbAF9EKk4ejmZPkz
-	 4+fhto2i95Q8o+P1Az66DJeNk8sJ/NyNwPVZIk6s6vBe389Ho9bI4oPnQEWOp80T7O
-	 GtLnp1xpVgMb/AC15WB27oS0HJcJwkR6UUktQVbU3ti8iXBP/sjXLozRWAuvgf0GjM
-	 wZgTeBgQn1M3OOuOkCDIwQMCPIaP4blPKHTb9cXNDnLZlHu07Wyh1OfkyGZAnS83zw
-	 dhcVTO4etdblD/32knv8disDXUulJuw7B97TzcOXKyT3A66aD23GWc4jfTztl6wlSw
-	 r5yMDLTA1mfKw==
-Date: Mon, 25 Aug 2025 17:59:22 +0300
-From: Mike Rapoport <rppt@kernel.org>
-To: David Hildenbrand <david@redhat.com>
-Cc: Mika =?iso-8859-1?Q?Penttil=E4?= <mpenttil@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	Alexander Potapenko <glider@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Brendan Jackman <jackmanb@google.com>,
-	Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>,
-	Dmitry Vyukov <dvyukov@google.com>, dri-devel@lists.freedesktop.org,
-	intel-gfx@lists.freedesktop.org, iommu@lists.linux.dev,
-	io-uring@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	John Hubbard <jhubbard@nvidia.com>, kasan-dev@googlegroups.com,
-	kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	linux-arm-kernel@axis.com, linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org, linux-ide@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-mmc@vger.kernel.org, linux-mm@kvack.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Marco Elver <elver@google.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
-	Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
-	Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
-	virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
-	wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
-Subject: Re: [PATCH RFC 10/35] mm/hugetlb: cleanup
- hugetlb_folio_init_tail_vmemmap()
-Message-ID: <aKx6SlYrj_hiPXBB@kernel.org>
-References: <20250821200701.1329277-1-david@redhat.com>
- <20250821200701.1329277-11-david@redhat.com>
- <9156d191-9ec4-4422-bae9-2e8ce66f9d5e@redhat.com>
- <7077e09f-6ce9-43ba-8f87-47a290680141@redhat.com>
- <aKmDBobyvEX7ZUWL@kernel.org>
- <a90cf9a3-d662-4239-ad54-7ea917c802a5@redhat.com>
- <aKxz9HLQTflFNYEu@kernel.org>
- <a72080b4-5156-4add-ac7c-1160b44e0dfe@redhat.com>
+	s=arc-20240116; t=1756134090; c=relaxed/simple;
+	bh=RMimBFG4FlqEvtp6v1dBdftJCWrHc+FKNd3AtGUu5vI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=nC5ZBHvQAlFT0sXa4kS9juake5cRPY6vawpU4ifhSNYnaY68Xd2hqJSddhU5MdDpYMBAO3WeOK6Uwu54M4KCQFw2kWwGNnahHXA86YEk97plySeDORRTcKGLLFTTw2M6QWWVa2cc0ZS08oGwOU8z7deU3FGCu/rF2OIWAxAjLJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=YMUV2YRj; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 80AD9A0B9C;
+	Mon, 25 Aug 2025 17:01:20 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=mail; bh=+Atn993zu+xTI4sKFEPw
+	tu3dFIccwWGD6f2ILNMtxTc=; b=YMUV2YRjO1mx1K9PTBAd44Q6fB4QUlIljb03
+	E29U6JT5siWeza5ouQQ5b5YiI4aCy1U62YZImtkwTnxu/5x/s2UEnOTfLC1EN8Dc
+	47A4S5Y/4ZxwwDp7MnP0VA+WSlJEh6n2ktGEHtUGQo05UTPRimvc9kcDwfKXLzDu
+	BAAb9l0AhEFZzD7i+XeVtR8Txb1HfM4d45SsuqZzSOT30N486VUu7nJfZf/nHOxh
+	D6otYAGfwoP9RSEE4ZqQPpTdjhUbd3pxgcpA17DKZ6q/z9nEUieQDNj6lK4VNMZR
+	slzIihLC/x7ejB7ghCE6uHNAtGXLFInu7Sm0wCHuk6haZioTY0o1iBoZsyKXjmuY
+	NsSUBkcgKFaIxVfUF2enYWSw3TMoLshzxN/x5BEUtZLl2AJXfbVVXAIt2Z5P6RqX
+	0rIDyWn7MsXuCazrT4UflsvNkwN8CvJzbzXkFpQGGPrj5IzIS5EIAheJBdHeQrPy
+	svnB20WzIFmazIyTZxN0OViA+Hhhbds0M/aX8Sf8MLV89cYTKrrOx3kqCEd5a/pm
+	fKAMbpJ/I9JCWzcH+kp0pmELb54ZtIwSaaYO0h4Ca3BatSLKEQWpqRfiBqX8EQdt
+	+CIwq4PR0jBI9MCZsoqBX5/cafP/WtU9p7KQfJu0CapQiDS1Ib+V0PixSWYXEuqc
+	ghEHjRM=
+Message-ID: <4876fc17-6118-418c-9a7c-dd3feeb4fa88@prolan.hu>
+Date: Mon, 25 Aug 2025 17:01:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <a72080b4-5156-4add-ac7c-1160b44e0dfe@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: mdiobus: Move all reset registration to
+ `mdiobus_register_reset()`
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+CC: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Philipp
+ Zabel" <p.zabel@pengutronix.de>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20250825-b4-phy-rst-mv-prep-v1-1-6298349df7ca@prolan.hu>
+ <aKxwVNffu9w8Mepl@shell.armlinux.org.uk>
+ <724f69f0-7eab-40aa-84f0-07055f051175@prolan.hu>
+ <aKx5DX09QZcbrXA6@shell.armlinux.org.uk>
+Content-Language: en-US
+From: =?UTF-8?B?Q3PDs2vDoXMgQmVuY2U=?= <csokas.bence@prolan.hu>
+In-Reply-To: <aKx5DX09QZcbrXA6@shell.armlinux.org.uk>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: sinope.intranet.prolan.hu (10.254.0.237) To
+ ATLAS.intranet.prolan.hu (10.254.0.229)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A296767155E607067
 
-On Mon, Aug 25, 2025 at 04:38:03PM +0200, David Hildenbrand wrote:
-> On 25.08.25 16:32, Mike Rapoport wrote:
-> > On Mon, Aug 25, 2025 at 02:48:58PM +0200, David Hildenbrand wrote:
-> > > On 23.08.25 10:59, Mike Rapoport wrote:
-> > > > On Fri, Aug 22, 2025 at 08:24:31AM +0200, David Hildenbrand wrote:
-> > > > > On 22.08.25 06:09, Mika Penttilä wrote:
-> > > > > > 
-> > > > > > On 8/21/25 23:06, David Hildenbrand wrote:
-> > > > > > 
-> > > > > > > All pages were already initialized and set to PageReserved() with a
-> > > > > > > refcount of 1 by MM init code.
-> > > > > > 
-> > > > > > Just to be sure, how is this working with MEMBLOCK_RSRV_NOINIT, where MM is supposed not to
-> > > > > > initialize struct pages?
-> > > > > 
-> > > > > Excellent point, I did not know about that one.
-> > > > > 
-> > > > > Spotting that we don't do the same for the head page made me assume that
-> > > > > it's just a misuse of __init_single_page().
-> > > > > 
-> > > > > But the nasty thing is that we use memblock_reserved_mark_noinit() to only
-> > > > > mark the tail pages ...
-> > > > 
-> > > > And even nastier thing is that when CONFIG_DEFERRED_STRUCT_PAGE_INIT is
-> > > > disabled struct pages are initialized regardless of
-> > > > memblock_reserved_mark_noinit().
-> > > > 
-> > > > I think this patch should go in before your updates:
-> > > 
-> > > Shouldn't we fix this in memblock code?
-> > > 
-> > > Hacking around that in the memblock_reserved_mark_noinit() user sound wrong
-> > > -- and nothing in the doc of memblock_reserved_mark_noinit() spells that
-> > > behavior out.
-> > 
-> > We can surely update the docs, but unfortunately I don't see how to avoid
-> > hacking around it in hugetlb.
-> > Since it's used to optimise HVO even further to the point hugetlb open
-> > codes memmap initialization, I think it's fair that it should deal with all
-> > possible configurations.
-> 
-> Remind me, why can't we support memblock_reserved_mark_noinit() when
-> CONFIG_DEFERRED_STRUCT_PAGE_INIT is disabled?
+Hi,
 
-When CONFIG_DEFERRED_STRUCT_PAGE_INIT is disabled we initialize the entire
-memmap early (setup_arch()->free_area_init()), and we may have a bunch of
-memblock_reserved_mark_noinit() afterwards
- 
-> -- 
-> Cheers
-> 
-> David / dhildenb
-> 
+On 2025. 08. 25. 16:54, Russell King (Oracle) wrote:
+> Now, I could nitpick your "because the PHY was never reset" - that's
+> untrue. The common problem is the PHY is _held_ in reset mode making
+> the PHY unresponsive on the MDIO bus.
 
--- 
-Sincerely yours,
-Mike.
+In our case, the problem is that refclk is turned off during init, and 
+then before PHY probe, it is turned back on, but reset is not being 
+asserted.
+
+> If your goal is to fix this, then rather than submitting piecemeal
+> patches with no explanation, I suggest you work on the problem and
+> come up with a solution as a series of patches (with commit
+> descriptions that explain _what_ and _why_ changes are being made)
+> and submit it with a cover message explaining the overall issue
+> that is being addressed.
+> 
+> That means we can review the patch series as a whole rather than
+> being drip-fed individual patches, which is going to take a very
+> long time to make forward progress.
+
+We are still working on the comprehensive solution. I thought that in 
+the meantime, these small and lower-risk pieces could be reviewed and 
+picked up.
+
+Bence
+
 
