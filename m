@@ -1,116 +1,190 @@
-Return-Path: <netdev+bounces-216507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216508-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46810B342C5
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 16:10:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 54B30B342C6
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 16:10:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFA7616203B
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 14:06:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F586165C62
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 14:08:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9756F27510B;
-	Mon, 25 Aug 2025 14:06:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gJuzxpVf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2190A2EB854;
+	Mon, 25 Aug 2025 14:08:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 132E8270EBB
-	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 14:06:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E92382ECE98;
+	Mon, 25 Aug 2025 14:08:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756130781; cv=none; b=ld9HDbCw10j1slDZtCezUvWeOu9AtbXB/7dP86QEw83ATiXnGndvpjlAWEw9CHcedXHpbLyeegUxmXyh0krznanM54NT7jhrIpuCde04uzedzR2NEfDIohiLI9lAve28MLh8sCmnmE72dn0AxGkmQwl/StE0onoO82+/eszhWb4=
+	t=1756130887; cv=none; b=ueclONUcnr9Gx8sYYke9I0I4pMDxDA+XMjL//uV4MgPewZcYu/IkppLeG1znBcIGZ56Mxy8tBa6VdquXs44y/dtOszrV1Mvu7AFrW3h8rGLggPG8ru6h4+8QNcAN5bpcVXRnfANiJejuZ8vK77qM3qF5GImfRVHMvSECil7RH8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756130781; c=relaxed/simple;
-	bh=0NmoVODVaV93z6Plmuqd09AhbeJjAwP9TZKUaMoQOaU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=npt3uStXr0dPgZOrNSs94kTkZXBMbCyD48XWh1LeJpcVEu7Vbw+yES3LZmC4GsGAj2Xsn77NMQRQ2m66v/Cwn1MAgaUcShclNgBQbaue2IBTfIpJrMoflchKxvcE4VwS5t+rSlcQCMHqktHeRevtcXhzesRfPR6IlgtqLWkGEaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gJuzxpVf; arc=none smtp.client-ip=209.85.166.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3e571d40088so40226185ab.1
-        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 07:06:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756130779; x=1756735579; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HUk68waEmLiLSEeNzstQygO/7zRHyPkWgUTafNVmqZc=;
-        b=gJuzxpVfCA/WYVF/NRc/bmkMyHzCYNWK2QhkF0UvR4SCn3h66ZAkKX5lxoB37BCKra
-         wJiq/pTWC/HXeD0jkHzni9CfQ72caTVyjptAlgpFE1LdfkjUbVDp4L4JbpZZT1EHTiu1
-         QkRqSBv2qufEAgVU5SkDZqd1tLWd/kurJbqjMQ9GuhnkOgfDDvhm+HyXuC3dbS6Jxu1P
-         XVnbpTn5Rnl33aspULdeCbnubyaKQYJt0ds+aX95snWZ6KuBXdwNSGLHPAYfTL1l8TRB
-         Y5pyX0iP3aj4Os9c0yc9i15k6FYB+Fd3iFbYEGVwW19q1iMWVrTDc+AKRtCXhCb2LhFS
-         Ga+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756130779; x=1756735579;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HUk68waEmLiLSEeNzstQygO/7zRHyPkWgUTafNVmqZc=;
-        b=Rh3H/u9SLQn6tPyIeAgVS2dCb3PwBNYAk/VF3qbjsP79YBxYuwS/BuIrsRt0EQDF7h
-         v87LJjX7NSgyrPwVj9rd/gk0gDlCCFdaIIC40+nybt0Ming2S84PeIGWHyasRJ+nZFCw
-         mYLqYOghvcvCKatSMA2pbVKoPGd6442n3rsKM3LigYPMWZiZf97lyHFCQ7l4h6l1/0ck
-         Gf2ODm3pXvhffoYNoU6AZixNoU9dx3KB+x9L+9oQGJX8LnFa6Liz3DvlaXQYsnnuGz2h
-         2MM6ErbphylcDwMd++6+7g9MZWy45mPhiiy0DXC44ZY3S7N2hCPOIXCs5ESwxa4nL2R+
-         EWXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXVYlUM0n2IngrbRw61RIFvcdZtTuiZJCQ3HoqA3vz4t5umN/i1ZnsPUzLnIYSxJMn3S6eqnFg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHQFGzUsZkKcL3usZC5nqZFF3ypIoYmhHLboM/QfgPpm+Uihns
-	xEe/cPxmXQdfkGACHGfwUvskJpFgvuOdqYnXxz9LsRqZfSlrBhYS6Bcal8dCxDpLATOFoS+Sf+Y
-	mdYhqmfP5o+mJGHbhdLMV65i2QTr39p6poS/ks9l3TgR952zie26pneZi
-X-Gm-Gg: ASbGncvHD8pghWHp7ezjDLFsXdRiCyxksCD8lRefSchRjeI94IcGTT1A/lPyB9SaoBO
-	saOHuwtmEGqq92Lp3k9q/OIWSDLcM7OybbIXA3HvqdeMi2Whlza4gUDGqdzYVkElhuwxXwCok2/
-	Bqz3vPS3/Hlg3PNfFLshKf3JHHCZv1BDpYS/1NdFWyOkz9r393hJP0Z4F7QRnIaAOUDrIvCn8As
-	WV9hn77y4Dn
-X-Google-Smtp-Source: AGHT+IG+baG80ggynxRrI09GUOhyFXK+dnaZ3AT2q3XS7oax1jWQxVvgWBIAH3PiFXmZ3oH3El25fb0aTBCw0418Z9s=
-X-Received: by 2002:ac8:7d49:0:b0:4b0:e1bd:a2bb with SMTP id
- d75a77b69052e-4b2aaafa22bmr158190671cf.50.1756130417250; Mon, 25 Aug 2025
- 07:00:17 -0700 (PDT)
+	s=arc-20240116; t=1756130887; c=relaxed/simple;
+	bh=udiX7xi6DrbH3//1h51tOaNo1oF7wTdzpq3UxSarm5E=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=MeeSYufbiMoVX60ltZGwGL0TvadDeqJrocVhfu2nK7LEIWt4Xz2Lxj4pVjt790jymgOQDkjuObh+A8HKRmLKcGQFSPGJxX4p3QgYsYp1N+Z21wtj8jb4oT5ymw249R3wD+TFDpnTDPyZt+EZ3lwSLeHmiMd3yn0bdOC5ss+I108=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 57PE7Ph4008586;
+	Mon, 25 Aug 2025 23:07:25 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 57PE7OW4008580
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Mon, 25 Aug 2025 23:07:25 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <ac9db9a4-6c30-416e-8b94-96e6559d55b2@I-love.SAKURA.ne.jp>
+Date: Mon, 25 Aug 2025 23:07:24 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250822190803.540788-1-kuniyu@google.com> <20250822190803.540788-6-kuniyu@google.com>
-In-Reply-To: <20250822190803.540788-6-kuniyu@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 25 Aug 2025 07:00:03 -0700
-X-Gm-Features: Ac12FXwPT3mvxAJcGEAzFCobcN2aE5JklEPalIZdSsp7-MUgMd0iGd1-zH78MZY
-Message-ID: <CANn89iL_D6p0CwvBpPVWvQu0m6vN4Trgum40-F6txjOwz9T1cw@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 5/6] tcp: Don't pass hashinfo to inet_diag helpers.
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, 
-	David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH] can: j1939: implement NETDEV_UNREGISTER notification handler
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Robin van der Gracht <robin@protonic.nl>, kernel@pengutronix.de,
+        Oliver Hartkopp <socketcan@hartkopp.net>,
+        Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Network Development <netdev@vger.kernel.org>,
+        Kurt Van Dijck <dev.kurt@vandijck-laurijssen.be>
+References: <50055a40-6fd9-468f-8e59-26d1b5b3c23d@I-love.SAKURA.ne.jp>
+ <aKg9mTaSxzBVpTVI@pengutronix.de>
+ <bb595640-0597-4d18-a9e1-f6eb8e6bb50e@I-love.SAKURA.ne.jp>
+ <c1e50f41-da30-4cea-859c-05db0ab8040b@I-love.SAKURA.ne.jp>
+Content-Language: en-US
+In-Reply-To: <c1e50f41-da30-4cea-859c-05db0ab8040b@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Virus-Status: clean
+X-Anti-Virus-Server: fsav102.rs.sakura.ne.jp
 
-On Fri, Aug 22, 2025 at 12:08=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.c=
-om> wrote:
->
-> These inet_diag functions required struct inet_hashinfo because
-> they are shared by TCP and DCCP:
->
->   * inet_diag_dump_icsk()
->   * inet_diag_dump_one_icsk()
->   * inet_diag_find_one_icsk()
->
-> DCCP has gone, and we don't need to pass hashinfo down to them.
->
-> Let's fetch net->ipv4.tcp_death_row.hashinfo directly in the first
-> 2 functions.
->
-> Note that inet_diag_find_one_icsk() don't need hashinfo since the
-> previous patch.
->
-> We will move TCP-specific functions to tcp_diag.c in the next patch.
->
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+syzbot is reporting
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+  unregister_netdevice: waiting for vcan0 to become free. Usage count = 2
+
+problem, for j1939 protocol did not have NETDEV_UNREGISTER notification
+handler for undoing changes made by j1939_sk_bind().
+
+Commit 25fe97cb7620 ("can: j1939: move j1939_priv_put() into sk_destruct
+callback") expects that a call to j1939_priv_put() can be unconditionally
+delayed until j1939_sk_sock_destruct() is called. But we need to call
+j1939_priv_put() against an extra ref held by j1939_sk_bind() call
+(as a part of undoing changes made by j1939_sk_bind()) as soon as
+NETDEV_UNREGISTER notification fires (i.e. before j1939_sk_sock_destruct()
+is called via j1939_sk_release()). Otherwise, the extra ref on "struct
+j1939_priv" held by j1939_sk_bind() call prevents "struct net_device" from
+dropping the usage count to 1; making it impossible for
+unregister_netdevice() to continue.
+
+Reported-by: syzbot <syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com>
+Closes: https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
+Tested-by: syzbot <syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com>
+Fixes: 9d71dd0c7009 ("can: add support of SAE J1939 protocol")
+Fixes: 25fe97cb7620 ("can: j1939: move j1939_priv_put() into sk_destruct callback")
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+ net/can/j1939/j1939-priv.h |  1 +
+ net/can/j1939/main.c       |  3 +++
+ net/can/j1939/socket.c     | 49 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 53 insertions(+)
+
+diff --git a/net/can/j1939/j1939-priv.h b/net/can/j1939/j1939-priv.h
+index 31a93cae5111..81f58924b4ac 100644
+--- a/net/can/j1939/j1939-priv.h
++++ b/net/can/j1939/j1939-priv.h
+@@ -212,6 +212,7 @@ void j1939_priv_get(struct j1939_priv *priv);
+ 
+ /* notify/alert all j1939 sockets bound to ifindex */
+ void j1939_sk_netdev_event_netdown(struct j1939_priv *priv);
++void j1939_sk_netdev_event_unregister(struct j1939_priv *priv);
+ int j1939_cancel_active_session(struct j1939_priv *priv, struct sock *sk);
+ void j1939_tp_init(struct j1939_priv *priv);
+ 
+diff --git a/net/can/j1939/main.c b/net/can/j1939/main.c
+index 7e8a20f2fc42..3706a872ecaf 100644
+--- a/net/can/j1939/main.c
++++ b/net/can/j1939/main.c
+@@ -377,6 +377,9 @@ static int j1939_netdev_notify(struct notifier_block *nb,
+ 		j1939_sk_netdev_event_netdown(priv);
+ 		j1939_ecu_unmap_all(priv);
+ 		break;
++	case NETDEV_UNREGISTER:
++		j1939_sk_netdev_event_unregister(priv);
++		break;
+ 	}
+ 
+ 	j1939_priv_put(priv);
+diff --git a/net/can/j1939/socket.c b/net/can/j1939/socket.c
+index 493f49bfaf5d..72c649cec9e1 100644
+--- a/net/can/j1939/socket.c
++++ b/net/can/j1939/socket.c
+@@ -1303,6 +1303,55 @@ void j1939_sk_netdev_event_netdown(struct j1939_priv *priv)
+ 	read_unlock_bh(&priv->j1939_socks_lock);
+ }
+ 
++void j1939_sk_netdev_event_unregister(struct j1939_priv *priv)
++{
++	struct sock *sk;
++	struct j1939_sock *jsk;
++	bool wait_rcu = false;
++
++ rescan: /* The caller is holding a ref on this "priv" via j1939_priv_get_by_ndev(). */
++	read_lock_bh(&priv->j1939_socks_lock);
++	list_for_each_entry(jsk, &priv->j1939_socks, list) {
++		/* Skip if j1939_jsk_add() is not called on this socket. */
++		if (!(jsk->state & J1939_SOCK_BOUND))
++			continue;
++		sk = &jsk->sk;
++		sock_hold(sk);
++		read_unlock_bh(&priv->j1939_socks_lock);
++		/* Check if j1939_jsk_del() is not yet called on this socket after holding
++		 * socket's lock, for both j1939_sk_bind() and j1939_sk_release() call
++		 * j1939_jsk_del() with socket's lock held.
++		 */
++		lock_sock(sk);
++		if (jsk->state & J1939_SOCK_BOUND) {
++			/* Neither j1939_sk_bind() nor j1939_sk_release() called j1939_jsk_del().
++			 * Make this socket no longer bound, by pretending as if j1939_sk_bind()
++			 * dropped old references but did not get new references.
++			 */
++			j1939_jsk_del(priv, jsk);
++			j1939_local_ecu_put(priv, jsk->addr.src_name, jsk->addr.sa);
++			j1939_netdev_stop(priv);
++			/* Call j1939_priv_put() now and prevent j1939_sk_sock_destruct() from
++			 * calling the corresponding j1939_priv_put().
++			 *
++			 * j1939_sk_sock_destruct() is supposed to call j1939_priv_put() after
++			 * an RCU grace period. But since the caller is holding a ref on this
++			 * "priv", we can defer synchronize_rcu() until immediately before
++			 * the caller calls j1939_priv_put().
++			 */
++			j1939_priv_put(priv);
++			jsk->priv = NULL;
++			wait_rcu = true;
++		}
++		release_sock(sk);
++		sock_put(sk);
++		goto rescan;
++	}
++	read_unlock_bh(&priv->j1939_socks_lock);
++	if (wait_rcu)
++		synchronize_rcu();
++}
++
+ static int j1939_sk_no_ioctlcmd(struct socket *sock, unsigned int cmd,
+ 				unsigned long arg)
+ {
+-- 
+2.51.0
+
 
