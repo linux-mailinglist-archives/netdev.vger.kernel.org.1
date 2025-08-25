@@ -1,135 +1,189 @@
-Return-Path: <netdev+bounces-216646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97887B34BA8
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 22:23:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 854C3B34B94
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 22:17:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC2547A1561
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 20:22:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6916A1A8826D
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 20:17:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD148285CAD;
-	Mon, 25 Aug 2025 20:23:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2086E22C355;
+	Mon, 25 Aug 2025 20:17:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blaese.de header.i=@blaese.de header.b="twSachDG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T2DKZD7t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.sgstbr.de (mail.sgstbr.de [94.130.16.203])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE515275AF0;
-	Mon, 25 Aug 2025 20:23:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.130.16.203
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CDBB28153A
+	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 20:17:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756153423; cv=none; b=bPzvO35weBvgXHrK/kMkG8ahhVGpiE9vLMzYy0Qv5li4FBvX4GlZKYtVO5SWM3BDBVxbRlhZUQUmzV9DvgwMrHngQ3oCJTTzSIKugmzfxkYj9GCODqEpMMdMm1xWZyBfeTyfKCRO9V15I+p5hm4O6OTaWzE8+mfwOJos8tFLOGc=
+	t=1756153057; cv=none; b=ijT+j80YyqolGPVzrgP7zznzJX8WSgA1fhqduAT3ERRZTPW+6RluxLxNTk+6zEwpLBT1nJvXsQ0jyOM2O/I1lDQJQY/TF8H9HvbhUq21xKcciUGETacfBGrZXkGuWdDF7pcSyIMo2PRX7E5fNmccOtGQRdtVDYUaIOE5Ww0l8h4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756153423; c=relaxed/simple;
-	bh=9gF0dd0h2XiWBlQmIm+2msy2NXr1BAnnfR1pZBMu59k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=aMJdKikoEtiKWZP/srnQVOtq+3WmkF66OoHX/btq/lToGmdP0fjUERX3NrOKKKZXBbMVEO0Jl3rpvs3wZxopU9Db0Y57uIC6Gf2xqZXVT2kRl200oRnsUViHL/ObMMQPuWrD4sHThyYHOajR0zzTFVeAyQi3Qcg30xVYXBO2Kzo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=blaese.de; spf=pass smtp.mailfrom=blaese.de; dkim=pass (2048-bit key) header.d=blaese.de header.i=@blaese.de header.b=twSachDG; arc=none smtp.client-ip=94.130.16.203
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=blaese.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blaese.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=blaese.de; s=201803;
-	t=1756153104; bh=2dbN+/ubPjTAEansV5KOQruQjh4gtBDJqjkiYUH6VmY=;
-	h=From:To:Subject:Date:From;
-	b=twSachDGXs/dS1XbwuMpFXiRbU8PnlATvugfGPD5vUbDkhSdKlTcgOUPjSe6tTVu3
-	 gnxS81toOkO4wS0DijkzPonGdCoCOMBBqvKH4g0FK1fCuQL2k9RcPMm1B00fTr0lSz
-	 6mIyhBz2IPdMge2LUHaifMEI6ObS1pegm/9EZov1/Uvjq40kTXU7lJjaLw/rCx9OeM
-	 T2SrqKoUErQzo38uOCwEDhEJvZWDk87QfZ2DwdDNmVDGWNL339CFhhZmVxnon/cMki
-	 3t8ksCEJp3l/iolF803G1GwLs4sU2C7xIxhcrMgqTU3g0GUHJHEwBPYjqtnc1s/9OM
-	 XR3X22o+5NsVg==
-Received: from fbl-xps (p200300cd3f1e76004353a7342282dcba.dip0.t-ipconnect.de [IPv6:2003:cd:3f1e:7600:4353:a734:2282:dcba])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fabian@blaese.de)
-	by mail.sgstbr.de (Postfix) with ESMTPSA id 756B924B485;
-	Mon, 25 Aug 2025 22:18:23 +0200 (CEST)
-From: =?UTF-8?q?Fabian=20Bl=C3=A4se?= <fabian@blaese.de>
-To: netdev@vger.kernel.org
-Cc: netfilter-devel@vger.kernel.org,
-	=?UTF-8?q?Fabian=20Bl=C3=A4se?= <fabian@blaese.de>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH] icmp: fix icmp_ndo_send address translation for reply direction
-Date: Mon, 25 Aug 2025 22:17:17 +0200
-Message-ID: <20250825201717.3217045-1-fabian@blaese.de>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1756153057; c=relaxed/simple;
+	bh=BT7gbQqNyNbBUdjc8yDBlFvyUQ/SPV9uvzCpHQAnKd8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hjXJpZQAgEJiBC3yripf5zLupUy6WbuhffjU3JRsFIaGRhoQUPAbz+nT554cR5qw4vvMCoA/6fKHOl5tB7ka3MTki9gjCC4ITd5i2ehYrtAxGpNQWkiBGXZqW+N4g7o2ign52L4ARWBT1aoE1yh9XJMb4AXEZuCeX6GORIKRbvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=T2DKZD7t; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-b4c29d2ea05so608781a12.0
+        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 13:17:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756153053; x=1756757853; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1XsjqR7enywy8/exz6ZOmZmhzo4A0EEOQ8Bcl9WBb48=;
+        b=T2DKZD7tRnYBgsfw57of9Bs6it0KEgFcKIciYi+0axpxoxjf/YnOr0CNLYx/kJVFwc
+         f3O1EN5gjvCybaazAuTKkLNtFxI+x7jWU9dLQoE2BE1G3jcch0/157NLLWg0KY1tkEly
+         TamIPVWtQVws7cCXA0RSEzvHZvurmOTnoFtKLVD9yhG1A7MD9evMQeI/pEm0DWBftkJE
+         HGgGMPlVBJYw9L2kDb/plMsLfE/u/rawbDGbRVuPRnHVBqms5xXL2OH06TsnpsuLE7YS
+         c5/izz6tjKjxt2sva3QY68nt4kXFkW+vZaU7BHgVOfZOtP+kjvDKSL8Nm2ooYkQqRbqu
+         S4iw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756153053; x=1756757853;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1XsjqR7enywy8/exz6ZOmZmhzo4A0EEOQ8Bcl9WBb48=;
+        b=E25xmsJzRBTIeIYgtn9ozTyZnWiMHsQAg3AutdSg7dZwoZV8oqU1GSg0HHJj2/oxRO
+         s/QNYsg/COYHOycbHm9V6apdnpv6nThUknK4b5o0DH8nLmyRUQV/kvYWlGOWwH3/6BqH
+         YoyYmtyHgK39bJhnsmRd6Aps1gQaA3O+sWsNAyhEwtEN253rojV/NXP0tv/+McuW1DR5
+         McvqmlNBulp8nirMGTDOlZcVTHfOZdEkb7UXuekJRE1RxFBCdh3Qe7tQppnnG6MqWOVc
+         wfDCbo46UqoysAwV555z3gVqTfEwCV2SvXX1hS6MkL7D5lvf0iuwEyvwiaVYJWePMx6n
+         BKIg==
+X-Forwarded-Encrypted: i=1; AJvYcCVIZQ1FOpBTGnTdgaYGhRh2vQxwg4fE/27csl8PVpBstprev63Jq/mQsZBjs1w6uDeYkBq8hdk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwctSB/pbV3Wb7osSyhbja2ILquEr+UAp8Wq66x66LaWXCjeB+5
+	CdGCc3ASMpBEtjiR/2Yw8GMfg5rn7prAWR0lGRt9jeO9KDHlfJDP5DAkbu8xnmhOpoE17yz5zcH
+	9Tiv0knbHXR/vW19xmSW+Cwo8R4OISvlwc8MazQXO
+X-Gm-Gg: ASbGncuEzRIrBXWt3f6TJTb5pR/otFFK1H5h9IHVmolW7eMOXYE4VxlKCRpHmjWrcyJ
+	tutfTDjlAgZtoZ/RXjGiouDPbDjMLpJUwDYp90ZpqvKMqOCNrsyRyRz3sXdfDOFQi0tB6Bfxgv2
+	+kEMU1AhNFtSYWCwd9W4tcaRUpPUaA7dDAleKFs/AkAdyWBKY1vhwcYK+EOh8ZtMi1cDzCoRuAR
+	squbuFGyQ5QecVVpF4XnB4R7ekkSbJtZ7NLKYrOFSK5dpXJBP5fDifPR4tL/wHoFdjD+o6Jlpo=
+X-Google-Smtp-Source: AGHT+IH2vigvxLTkn5G8aJIVwzqKiUsL4r+kRCPHFruwpiGc6z5bMapnJZothCiISbcc6af7rwhfjXnQmdteDvJPJ1M=
+X-Received: by 2002:a17:903:3bcc:b0:235:f091:11e5 with SMTP id
+ d9443c01a7336-2483df2deffmr8443255ad.10.1756153052650; Mon, 25 Aug 2025
+ 13:17:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20250825195947.4073595-1-edumazet@google.com> <20250825195947.4073595-3-edumazet@google.com>
+In-Reply-To: <20250825195947.4073595-3-edumazet@google.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Mon, 25 Aug 2025 13:17:21 -0700
+X-Gm-Features: Ac12FXwovtMjAKEpiEXymXWLyyqW5g8iVHIZTAc6Izac5h_8D2w28dDFPZsB9ao
+Message-ID: <CAAVpQUBRV2jEArNrBJumKaUep4V5uL7ez2iSKgvd0L51-1Co8w@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/3] net: move sk_drops out of sock_write_rx group
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Willem de Bruijn <willemb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The icmp_ndo_send function was originally introduced to ensure proper
-rate limiting when icmp_send is called by a network device driver,
-where the packet's source address may have already been transformed
-by NAT or MASQUERADE.
+On Mon, Aug 25, 2025 at 12:59=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
+ wrote:
+>
+> Move sk_drops into a dedicated cache line.
+>
+> When a packet flood hits one or more sockets, many cpus
+> have to update sk->sk_drops.
+>
+> This slows down consumers, because currently
+> sk_drops is in sock_write_rx group.
+>
+> Moving sk->sk_drops into a dedicated cache line
+> makes sure that consumers no longer suffer from
+> false sharing if/when producers only change sk->sk_drops.
+>
+> Tested with the following stress test, sending about 11 Mpps:
+>
+> super_netperf 20 -t UDP_STREAM -H DUT -l10 -- -n -P,1000 -m 120
+> Note: due to socket lookup, only one UDP socket will receive
+> packets on DUT.
+>
+> Then measure receiver (DUT) behavior. We can see both
+> consumer and BH handlers can process more packets per second.
+>
+> Before:
+>
+> nstat -n ; sleep 1 ; nstat | grep Udp
+> Udp6InDatagrams                 615091             0.0
+> Udp6InErrors                    3904277            0.0
+> Udp6RcvbufErrors                3904277            0.0
+>
+> After:
+> nstat -n ; sleep 1 ; nstat | grep Udp
+> Udp6InDatagrams                 855592             0.0
+> Udp6InErrors                    5621467            0.0
+> Udp6RcvbufErrors                5621467            0.0
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-However, the implementation only considered the IP_CT_DIR_ORIGINAL case
-and incorrectly applies the same logic to packets in reply direction.
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
-Therefore, an SNAT rule in the original direction causes icmp_ndo_send to
-translate the source IP of reply-direction packets, even though no
-translation is required. The source address is translated to the sender
-address of the original direction, because the original tuple's source
-address is used.
 
-On the other hand, icmp_ndo_send incorrectly misses translating the
-source address of packets in reply-direction, leading to incorrect rate
-limiting. The generated ICMP error is translated by netfilter at a later
-stage, therefore the ICMP error is sent correctly.
-
-Fix this by translating the address based on the connection direction:
-- CT_DIR_ORIGINAL: Use the original tuple's source address
-  (unchanged from current behavior)
-- CT_DIR_REPLY: Use the reply tuple's source address
-  (fixing the incorrect translation)
-
-Fixes: 0b41713b6066 ("icmp: introduce helper for nat'd source address in network device context")
-
-Signed-off-by: Fabian Bläse <fabian@blaese.de>
-Cc: Jason A. Donenfeld <Jason@zx2c4.com>
----
- net/ipv4/icmp.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
-
-diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-index 2ffe73ea644f..a4fb0bc7c4cf 100644
---- a/net/ipv4/icmp.c
-+++ b/net/ipv4/icmp.c
-@@ -803,7 +803,13 @@ void icmp_ndo_send(struct sk_buff *skb_in, int type, int code, __be32 info)
- 	__be32 orig_ip;
- 
- 	ct = nf_ct_get(skb_in, &ctinfo);
--	if (!ct || !(ct->status & IPS_SRC_NAT)) {
-+	if (!ct) {
-+		__icmp_send(skb_in, type, code, info, &opts);
-+		return;
-+	}
-+
-+	if ( !(ct->status & IPS_SRC_NAT && CTINFO2DIR(ctinfo) == IP_CT_DIR_ORIGINAL)
-+		&& !(ct->status & IPS_DST_NAT && CTINFO2DIR(ctinfo) == IP_CT_DIR_REPLY)) {
- 		__icmp_send(skb_in, type, code, info, &opts);
- 		return;
- 	}
-@@ -818,7 +824,11 @@ void icmp_ndo_send(struct sk_buff *skb_in, int type, int code, __be32 info)
- 		goto out;
- 
- 	orig_ip = ip_hdr(skb_in)->saddr;
--	ip_hdr(skb_in)->saddr = ct->tuplehash[0].tuple.src.u3.ip;
-+	if (CTINFO2DIR(ctinfo) == IP_CT_DIR_ORIGINAL) {
-+		ip_hdr(skb_in)->saddr = ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple.src.u3.ip;
-+	} else {
-+		ip_hdr(skb_in)->saddr = ct->tuplehash[IP_CT_DIR_REPLY].tuple.src.u3.ip;
-+	}
- 	__icmp_send(skb_in, type, code, info, &opts);
- 	ip_hdr(skb_in)->saddr = orig_ip;
- out:
--- 
-2.50.1
-
+> ---
+>  include/net/sock.h | 6 +++---
+>  net/core/sock.c    | 1 -
+>  2 files changed, 3 insertions(+), 4 deletions(-)
+>
+> diff --git a/include/net/sock.h b/include/net/sock.h
+> index 34d7029eb622773e40e7c4ebd422d33b1c0a7836..f40e3c4883be32c8282694ab2=
+15bcf79eb87cbd7 100644
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -390,7 +390,6 @@ struct sock {
+>
+>         __cacheline_group_begin(sock_write_rx);
+>
+> -       atomic_t                sk_drops;
+>         __s32                   sk_peek_off;
+>         struct sk_buff_head     sk_error_queue;
+>         struct sk_buff_head     sk_receive_queue;
+> @@ -564,13 +563,14 @@ struct sock {
+>  #ifdef CONFIG_BPF_SYSCALL
+>         struct bpf_local_storage __rcu  *sk_bpf_storage;
+>  #endif
+> -       struct rcu_head         sk_rcu;
+> -       netns_tracker           ns_tracker;
+>         struct xarray           sk_user_frags;
+>
+>  #if IS_ENABLED(CONFIG_PROVE_LOCKING) && IS_ENABLED(CONFIG_MODULES)
+>         struct module           *sk_owner;
+>  #endif
+> +       atomic_t                sk_drops ____cacheline_aligned_in_smp;
+> +       struct rcu_head         sk_rcu;
+> +       netns_tracker           ns_tracker;
+>  };
+>
+>  struct sock_bh_locked {
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 75368823969a7992a55a6f40d87ffb8886de2f39..cd7c7ed7ff51070d20658684f=
+f796c58c8c09995 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -4436,7 +4436,6 @@ EXPORT_SYMBOL(sk_ioctl);
+>
+>  static int __init sock_struct_check(void)
+>  {
+> -       CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_write_rx, sk_drop=
+s);
+>         CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_write_rx, sk_peek=
+_off);
+>         CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_write_rx, sk_erro=
+r_queue);
+>         CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_write_rx, sk_rece=
+ive_queue);
+> --
+> 2.51.0.261.g7ce5a0a67e-goog
+>
 
