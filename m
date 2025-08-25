@@ -1,369 +1,265 @@
-Return-Path: <netdev+bounces-216590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF5E8B34A7B
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 20:37:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 851CDB34AAC
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 20:54:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A0E3B204065
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 18:37:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BBDDE7A9C7B
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 18:52:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9619303CAE;
-	Mon, 25 Aug 2025 18:37:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD25C27EFF1;
+	Mon, 25 Aug 2025 18:54:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XM/svf8G"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tLDdJRwo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDC4B1DE2AD
-	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 18:37:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D7A27E076
+	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 18:54:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756147050; cv=none; b=Wt647tjAupUM8v3apT1EHMgAoNnxhXYx0bw3baXF/KIIG8Ffm8tl7o6hv3VDV1nD/dcop29VcOASxaaq8RlCeCyASnmFzOKhL/zzYB9fdPWUQpii5BWvzwq4xeVvlEDA853l5jbJebTH/YUtRMvgDvsM8a+iqNUiTtH78BWdQHU=
+	t=1756148053; cv=none; b=gQx7UbQj41Ebjviofwq8TToFMLmKeRAD9o1NnL9X7Ew3DaSrubbvdsZWSUpD1Q/FuX0PIVv962uztAOjXzznRSgBRJFN17zTOjIVuDBhTS24FYg+UJGpkNURJfOsXh9pgXp9AMhhzD7OP4csfdwvCUHJrKf+DfS4G/OXg43fJl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756147050; c=relaxed/simple;
-	bh=Mh0JiGJVDfLn03giVtHWmMTBn8ivU/DJfnkkW/oIefo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tB3+iafIKh/HhBaX+jYf/Gxskdj2UOJB9hPGrAIWSTyIwQBYABRVkwyTgQ9fVyeLwgU5xfIjLqgAfDQ4cnO1IjYQz/jXUBCBxzXScYgCXB97uXCeqU/l/tCmchanO4fpvHSoPaU1gwd2nAAhd1aHi/hZ0Q+mADvCxL/8hmwa7WU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XM/svf8G; arc=none smtp.client-ip=209.85.128.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-71d603cebd9so53873367b3.1
-        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 11:37:28 -0700 (PDT)
+	s=arc-20240116; t=1756148053; c=relaxed/simple;
+	bh=TUFgEHJN57hAmHBOAkzyDc+uf8964QaJzI/sn07Ifsk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tcda2wy15JuXgkh2bTwZwHJNRGGttp2CnhQ69fSq/H8utMFrmIvdZxxtMeDQ4x1oU+xGi9OctbTbGICAt3HkKU25q9fuBORiodIu3TPLy3qUudzJPa9zPlVxj5hLffCVuoiVXtf331jdFl3ha2r7UIDZPn2R3wFYtxqZgc2/N/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tLDdJRwo; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-246013de800so31395ad.0
+        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 11:54:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756147048; x=1756751848; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hdZFm6yc+D3wCRZIdUGbgttcq+5XP5QbEtN3yUQA2bQ=;
-        b=XM/svf8GmrD5za9RLuO5ibOhUC3ToYC0qkh9HEnXjtrsO7PUMQwCJx30SIAXlva2AL
-         KiQKQnZbNxZS9ZpmVKdrLO4ZVXKrvCJSo41u9KIwRJYgYW45eeyTejOf3QAqFkhtt//M
-         pZWcfoDRuzNkJuQs0RUQ1nAhhPz73itmU6PvleDOFQV/hrTAoPhb+SongB8NYhJVixxB
-         SJFUtwRBbtEh9fAbriv2nTqU36dtqQICJrOLeWZttQBCVcO4bnWacwHyMkhwomZYUn2T
-         FCmUyykGmU8/WHu+Kd6f+5rbxdcslX8zGd0+9nkVk4binqwqzkjdF0gNgwKQ14VMq+LF
-         V+dA==
+        d=google.com; s=20230601; t=1756148051; x=1756752851; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rWhSehJQ/cmVas35BHDzVEfyuG1ktcLe1thgeglKcvk=;
+        b=tLDdJRwohyFnokDd96iarswiZgT/Fr5E7dIrwo+8JJo4VzcusSdTm1NR0od1cQ+r1x
+         YdxjtWRjERSpdTyS8eZgsyvSyODGtGmRLzLyO7ZFIOnWfZ/t9wiDnWLg9yD0ddHWG9Og
+         9ffcFa8xEJsO91GyLU/deURQRLFTgfYpHPXerLeAVK9AcwDUR/GYpUD0xPvb0kvtNEYK
+         433C5WVtg3EY0tuDuLu2hpDV8HJXN1K89hGbN74ZNj4QdJILw7lEYSOCzeDKv2oqmbHv
+         EtdQiEweeOzOdqEeIWdYBPZiar96TEacQI+SarrI529ro2uQ1qlNEQ6l+3d/N63MQdKN
+         4NtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756147048; x=1756751848;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hdZFm6yc+D3wCRZIdUGbgttcq+5XP5QbEtN3yUQA2bQ=;
-        b=Ty1PQEBVM4e8ZFZVha4rLugMYb5YH8ICxu2gc9nldsu+ooOO4FcOHYohVECSCV06to
-         gsN9qJhRQWIXmZWwgtB6/IP6CGkJysdqIuIDaiPMx37pzNbfDlh+oM4Za5eTuQHmYpaw
-         sZgE5xoZTgq656kuHYbZSQTFx0ee2aB3hT9oW7FHb/N8ZgKooDuDVh+QpcVGmLwG8dHr
-         6vH2s279ioHom3NDFYqewwDurCUi5Fe9b1dp57JwAhAr6Li1vOwLXg9J6yrOUAUSzynn
-         bEBMKCJGEoxtpnvsrcnKecEm30IShgFbApPGkIXhmQzHVzs/uDpTi3LytdNtzSF4b+uf
-         yCBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWGkwGzLSfbOMd0L1O0NVWLEiWsqanYJ4D2+wWHwIOBR+Bb2/zm/cUMpIiACuwPwH1Ee0BCvVQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqCPv4ArTqYxQj6OFSwngH2yYUmeGV4OYyPPA/0hVWJn3XX+Vh
-	TcyMk77PjlLLlLlXN3KYsEI9VcGz6UdAuGyNWrp4T5EWeR5iDOD+8yyv
-X-Gm-Gg: ASbGncvPJJb/ZrCSVhV7Ze4UCJH+JsJli5joleFeNHPHfDIc1/tupTQ7J/PJadNVxR0
-	2fQ2oRhAtSRPJBad8eW98Ih6D9wPXaP8oQtDI0vk86LgnJQuoIrsZ5fgZB3+529LxEnja49rTXb
-	Q9pC5BCxc+hNK2VKf8yIeBk2txzBcXeSJobT/iY03nmbn7/lFXUv4u1z4OPFs5QeIpO1XJ5cp2p
-	5LtmotQpBByBpDUQg9dX+5H9uqTtRKHkz2euZBvsOsRR+c7ZBrACtQ6lQdr8Hi8oCzq1MmWAnkc
-	wJUXjO+E+nXbf8BBJpYqupOTR8um/KI1bBRElu56awvswUaSWUXsJhwB1ce18eRyFobMHzooOlV
-	QfUXf55HVOKelQB31BAjIfBErTW3lyNkyRLW8+g4S
-X-Google-Smtp-Source: AGHT+IHqTmKRUsR0ZyiaE/NEuvZxZlxFdaZDy7LVtt4e8rcw2gUqiURQHeuR6mWevRUAEjlZGUek2Q==
-X-Received: by 2002:a05:690c:91:b0:71e:7dcb:ab37 with SMTP id 00721157ae682-71fdc32733bmr142868907b3.16.1756147047625;
-        Mon, 25 Aug 2025 11:37:27 -0700 (PDT)
-Received: from localhost ([2a03:2880:25ff:9::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-71ff18b036bsm19027967b3.61.2025.08.25.11.37.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Aug 2025 11:37:27 -0700 (PDT)
-From: Daniel Zahka <daniel.zahka@gmail.com>
-To: Donald Hunter <donald.hunter@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Boris Pismenny <borisp@nvidia.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	Neal Cardwell <ncardwell@google.com>,
-	Patrisious Haddad <phaddad@nvidia.com>,
-	Raed Salem <raeds@nvidia.com>,
-	Jianbo Liu <jianbol@nvidia.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Kiran Kella <kiran.kella@broadcom.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v8 00/19] add basic PSP encryption for TCP connections
-Date: Mon, 25 Aug 2025 11:37:05 -0700
-Message-ID: <20250825183726.1320357-1-daniel.zahka@gmail.com>
-X-Mailer: git-send-email 2.47.3
+        d=1e100.net; s=20230601; t=1756148051; x=1756752851;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rWhSehJQ/cmVas35BHDzVEfyuG1ktcLe1thgeglKcvk=;
+        b=weKgyE0zGcHEUmpeD/F65UIFYud3xAGNWD/8MJfXuGjFbCN7/jttrgouOBIqbeCqFh
+         5M5yMgR+HczaBVcSX7KbSypwZFnZ8lnrZF7RsyHfTt6x6HFuhtTnhMQDeTj1hEknX2NQ
+         SKLMFPVSJnljIPJARIvM+xLazuQJfV8DmVzDrXfLcalyW7aN61AXetowhpmRg8WxCtes
+         l3u57Qth1O6CxNtbSzMbmQuTIxRW4sfdfPYbkNXqzIy5izzwqyRpeJMkLdg2YgN08PU6
+         raOlMjtlE/bk53lc6zmZW/b33kRbTTv5DrlOHnlK0+21bUIcs+miydW+To49SveosiP5
+         K0xA==
+X-Forwarded-Encrypted: i=1; AJvYcCUpW6nq7SG+ILo8Had+gLa8oQGcwHVOu19NGfRXltpuA6naQaPrAB+EYMASiruvWXmLEfDuCx0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymxPZAnQRM72/HnktL93ymKKwESE5X6B0vgz2Y93xvFXv0YZZX
+	7ZMJXnhNthlFxdtyam3Ev1mS2fJQKbDPdM7r1RRB1UpfP/d5rsWkCTn0UVWfVut1Vs+hlJujBo1
+	LEWUTSsIPJjM5d6FwVsE77Xdtdzor/ORFXBUBBy56
+X-Gm-Gg: ASbGnctYv4tLxCPF9Rhnu5FTGTnKZRV4EqIH/jNEybhWA8rwUnmfloL2YJDE/QRIOmP
+	rvrCGJEWORRRJjaOcCNXLXcYBrIjJrs5xIRha+JTw0f3zwyELZgy2Iv7YMVDNXP8xbx+CNacuTu
+	/y2/Ul1c4hW3quhCLntHXFUQ/P50Ep7NX7HqdvJsAVjyqdysMuLC1KouF8Tl19ftVvXAVU4qUGO
+	WAx51Yy3LGYx/9rv/KnX2QEmw9NIR01Rx7YkekXt0Sa
+X-Google-Smtp-Source: AGHT+IGx0GByvuXs/wDo+Eg0WhuHYIVXZCyPUB1Gao+IenWlXpZgrPvNrMU7DTuFgD+oB4dRw+BF0XcZW+owqV1YU1Q=
+X-Received: by 2002:a17:903:2444:b0:245:f7a8:bc60 with SMTP id
+ d9443c01a7336-2485bd93e9cmr333435ad.16.1756148050815; Mon, 25 Aug 2025
+ 11:54:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250824215418.257588-1-skhawaja@google.com> <8407a1e5-c6ad-47da-9b41-978730cd5420@uwaterloo.ca>
+ <CAAywjhT-CEvHUSpjyXQkpkGRN0iX7qMc1p=QOn-iCNQxdycr2A@mail.gmail.com> <d2b52ee5-d7a7-4a97-ba9a-6c99e1470d9b@uwaterloo.ca>
+In-Reply-To: <d2b52ee5-d7a7-4a97-ba9a-6c99e1470d9b@uwaterloo.ca>
+From: Samiullah Khawaja <skhawaja@google.com>
+Date: Mon, 25 Aug 2025 11:53:58 -0700
+X-Gm-Features: Ac12FXxEnHQH8DpGBmGg3RBa5SMsfo6tVdZXLN_U7-PWKJI5jCNAufveF4V3kEc
+Message-ID: <CAAywjhStweQXMcc5LoDssLaXYpHRp7Pend2R-h_N16Q_Xa++yQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 0/2] Add support to do threaded napi busy poll
+To: Martin Karsten <mkarsten@uwaterloo.ca>
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, 
+	willemb@google.com, Joe Damato <joe@dama.to>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This is v8 of the PSP RFC [1] posted by Jakub Kicinski one year
-ago. General developments since v1 include a fork of packetdrill [2]
-with support for PSP added, as well as some test cases, and an
-implementation of PSP key exchange and connection upgrade [3]
-integrated into the fbthrift RPC library. Both [2] and [3] have been
-tested on server platforms with PSP-capable CX7 NICs. Below is the
-cover letter from the original RFC:
-
-Add support for PSP encryption of TCP connections.
-
-PSP is a protocol out of Google:
-https://github.com/google/psp/blob/main/doc/PSP_Arch_Spec.pdf
-which shares some similarities with IPsec. I added some more info
-in the first patch so I'll keep it short here.
-
-The protocol can work in multiple modes including tunneling.
-But I'm mostly interested in using it as TLS replacement because
-of its superior offload characteristics. So this patch does three
-things:
-
- - it adds "core" PSP code
-   PSP is offload-centric, and requires some additional care and
-   feeding, so first chunk of the code exposes device info.
-   This part can be reused by PSP implementations in xfrm, tunneling etc.
-
- - TCP integration TLS style
-   Reuse some of the existing concepts from TLS offload, such as
-   attaching crypto state to a socket, marking skbs as "decrypted",
-   egress validation. PSP does not prescribe key exchange protocols.
-   To use PSP as a more efficient TLS offload we intend to perform
-   a TLS handshake ("inline" in the same TCP connection) and negotiate
-   switching to PSP based on capabilities of both endpoints.
-   This is also why I'm not including a software implementation.
-   Nobody would use it in production, software TLS is faster,
-   it has larger crypto records.
-
- - mlx5 implementation
-   That's mostly other people's work, not 100% sure those folks
-   consider it ready hence the RFC in the title. But it works :)
-
-Not posted, queued a branch [4] are follow up pieces:
- - standard stats
- - netdevsim implementation and tests
-
-[1] https://lore.kernel.org/netdev/20240510030435.120935-1-kuba@kernel.org/ 
-[2] https://github.com/danieldzahka/packetdrill
-[3] https://github.com/danieldzahka/fbthrift/tree/dzahka/psp
-[4] https://github.com/kuba-moo/linux/tree/psp
-
-Comments we intend to defer to future series:
-   - we prefer to keep the version field in the tx-assoc netlink
-     request, because it makes parsing keys require less state early
-     on, but we are willing to change in the next version of this
-     series.
-   - using a static branch to wrap psp_enqueue_set_decrypted() and
-     other functions called from tcp.
-   - using INDIRECT_CALL for tls/psp in sk_validate_xmit_skb(). We
-     prefer to address this in a dedicated patch series, so that this
-     series does not need to modify the way tls_validate_xmit_skb() is
-     declared and stubbed out.
-
-CHANGES:
-v8:
-    - rebase series
-v7: https://lore.kernel.org/netdev/20250820113120.992829-1-daniel.zahka@gmail.com/
-    - use flexible array declaration instead of 0-length array declaration
-      in struct mlx5_ifc_psp_gen_spi_out_bits
-    - check that 31 LSBs of the SPI are non-zero in psp_nl_parse_key()
-    - add details about GRO and TCP coalescing in commit message of
-      fourth patch.
-    - add comment explaining use of xa_store()/xa_erase() in
-      psp_dev_unregister()/psp_dev_destroy().
-v6: https://lore.kernel.org/netdev/20250812003009.2455540-1-daniel.zahka@gmail.com/
-    - make psp_sk_overhead() add 40B of encapsulation overhead.
-    - use PSP_CMD_KEY_ROTATE_NTF instead of PSP_CMD_KEY_ROTATE as arg to
-      genl_info_init_ntf()
-    - fix errors reported by static analysis
-v5: https://lore.kernel.org/netdev/20250723203454.519540-1-daniel.zahka@gmail.com/
-    - rebase series
-v4: https://lore.kernel.org/netdev/20250716144551.3646755-1-daniel.zahka@gmail.com/
-    - rename psp_rcv() to psp_dev_rcv()
-    - add strip_icv param psp_dev_rcv() to make trailer stripping optional
-    - replace memcpy in mlx5e_psp_set_state()
-    - rename psp_encapsulate() to psp_dev_encapsulate()
-    - delete unused struct mlx5e_psp_sa_entry declaration
-    - use psp_key_size() instead of pas->key_sz in mlx5e_psp_assoc_add()
-    - remove unneeded psp.c/psp.h files in mlx5
-    - remove unneeded struct psp_key_spi usage in mlx5
-    - fix EXPORT_IPV6_MOD_GPL(psp_reply_set_decrypted) semicolon
-    - remove version from netlink rx-assoc reply
-    - remove key_sz field from struct psp_assoc
-    - rename psd_get_for_sock() to psp_dev_get_for_sock()
-    - use sk_is_tcp() to check sock in psp_assoc_device_get_locked()
-    - add comment to tcp_timewait_state_process() explaining TCP_TW_SYN
-      case.
-    - psp_twsk_init() accepts const pointer, so caller does not need to
-      cast const away.
-    - add missing psp_twsk_rx_policy_check() to TCP_TW_SYN case of
-      do_timewait in tcp_v4_rcv().
-    - remove unused PSP_KEY_V0/PSP_KEY_V1 defines
-
-v3: https://lore.kernel.org/netdev/20250702171326.3265825-1-daniel.zahka@gmail.com/
-    - move psp_rcv() and psp_encapsulate() driver helpers into
-      psp_main.c
-    - lift pse/pas comparison code into new function:
-      psp_pse_matches_pas()
-    - explicitly mark rcu critical section psp_reply_set_decrypted()
-    - use rcu_dereference_proteced() instead of rcu_read_lock() in
-      psp_sk_assoc_free() and psp_twsk_assoc_free()
-    - rename psp_is_nondata() to psp_is_allowed_nondata()
-    - psp_reply_set_decrypted() should not call psp_sk_assoc(). Call
-      psp_sk_get_assoc_rcu() instead.
-    - lift common code from timewait and regular socks into new
-      function psp_sk_get_assoc_rcu()
-    - export symbols in psp_sock.c with EXPORT_IPV6_MOD_GPL()
-    - check for sk_is_inet() before casting to inet_twsk() in
-      sk_validate_xmit() and in psp_get_assoc_rcu()
-    - psp_reply_set_decrypted() does not use stuct sock* arg. Drop it.
-    - reword driver requirement about double rotating keys when the device
-      supports requesting arbitrary spi key pairs.
-    
-v2: https://lore.kernel.org/netdev/20250625135210.2975231-1-daniel.zahka@gmail.com/
-    - add pas->dev_id == pse->dev_id to policy checks
-    - __psp_sk_rx_policy_check() now allows pure ACKs, FINs, and RSTs to
-      be non-psp authenticated before "PSP Full" state.
-    - assign tw_validate_skb funtion during psp_twsk_init()
-    - psp_skb_get_rcu() also checks if sk is a tcp timewait sock when
-      looking for psp assocs.
-    - scan ofo queue non-psp data during psp_sock_recv_queue_check()
-    - add tcp_write_collapse_fence() to psp_sock_assoc_set_tx()
-    - Add psp_reply_set_decrypted() to encapsulate ACKs, FINs, and RSTs
-      sent from control socks on behalf of full or timewait socks with PSP
-      state.
-    - Add dev_id field to psp_skb_ext
-    - Move psp_assoc from struct tcp_timewait_sock to struct
-      inet_timewait_sock
-    - Move psp_sk_assoc_free() from sk_common_release() to
-      inet_sock_destruct()
-    - add documentation about MITM deletion attack, and expectation
-      from userspace
-    - add information about accepting clear text ACKs, RSTs, and FINs
-      to `Securing Connections` section.
-
-v1: https://lore.kernel.org/netdev/20240510030435.120935-1-kuba@kernel.org/
-
-Daniel Zahka (2):
-  net: move sk_validate_xmit_skb() to net/core/dev.c
-  net: tcp: allow tcp_timewait_sock to validate skbs before handing to
-    device
-
-Jakub Kicinski (8):
-  psp: add documentation
-  psp: base PSP device support
-  net: modify core data structures for PSP datapath support
-  tcp: add datapath logic for PSP with inline key exchange
-  psp: add op for rotation of device key
-  net: psp: add socket security association code
-  net: psp: update the TCP MSS to reflect PSP packet overhead
-  psp: track generations of device key
-
-Raed Salem (9):
-  net/mlx5e: Support PSP offload functionality
-  net/mlx5e: Implement PSP operations .assoc_add and .assoc_del
-  psp: provide encapsulation helper for drivers
-  net/mlx5e: Implement PSP Tx data path
-  net/mlx5e: Add PSP steering in local NIC RX
-  net/mlx5e: Configure PSP Rx flow steering rules
-  psp: provide decapsulation and receive helper for drivers
-  net/mlx5e: Add Rx data path offload
-  net/mlx5e: Implement PSP key_rotate operation
-
- Documentation/netlink/specs/psp.yaml          | 187 +++++
- Documentation/networking/index.rst            |   1 +
- Documentation/networking/psp.rst              | 183 +++++
- .../net/ethernet/mellanox/mlx5/core/Kconfig   |  11 +
- .../net/ethernet/mellanox/mlx5/core/Makefile  |   3 +
- drivers/net/ethernet/mellanox/mlx5/core/en.h  |   6 +-
- .../net/ethernet/mellanox/mlx5/core/en/fs.h   |   2 +-
- .../ethernet/mellanox/mlx5/core/en/params.c   |   4 +-
- .../mellanox/mlx5/core/en_accel/en_accel.h    |  50 +-
- .../mellanox/mlx5/core/en_accel/ipsec_rxtx.h  |   2 +-
- .../mellanox/mlx5/core/en_accel/psp.c         | 195 +++++
- .../mellanox/mlx5/core/en_accel/psp.h         |  49 ++
- .../mellanox/mlx5/core/en_accel/psp_fs.c      | 736 ++++++++++++++++++
- .../mellanox/mlx5/core/en_accel/psp_fs.h      |  30 +
- .../mellanox/mlx5/core/en_accel/psp_offload.c |  44 ++
- .../mellanox/mlx5/core/en_accel/psp_rxtx.c    | 200 +++++
- .../mellanox/mlx5/core/en_accel/psp_rxtx.h    | 121 +++
- .../net/ethernet/mellanox/mlx5/core/en_main.c |   9 +
- .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  49 +-
- .../net/ethernet/mellanox/mlx5/core/en_tx.c   |  10 +-
- drivers/net/ethernet/mellanox/mlx5/core/fw.c  |   6 +
- .../ethernet/mellanox/mlx5/core/lib/crypto.h  |   1 +
- .../net/ethernet/mellanox/mlx5/core/main.c    |   1 +
- .../mellanox/mlx5/core/steering/hws/definer.c |   2 +-
- include/linux/mlx5/device.h                   |   4 +
- include/linux/mlx5/mlx5_ifc.h                 |  95 ++-
- include/linux/netdevice.h                     |   4 +
- include/linux/skbuff.h                        |   3 +
- include/net/dropreason-core.h                 |   6 +
- include/net/inet_timewait_sock.h              |   8 +
- include/net/psp.h                             |  12 +
- include/net/psp/functions.h                   | 206 +++++
- include/net/psp/types.h                       | 184 +++++
- include/net/sock.h                            |  26 +-
- include/uapi/linux/psp.h                      |  66 ++
- net/Kconfig                                   |   1 +
- net/Makefile                                  |   1 +
- net/core/dev.c                                |  32 +
- net/core/gro.c                                |   2 +
- net/core/skbuff.c                             |   4 +
- net/ipv4/af_inet.c                            |   2 +
- net/ipv4/inet_timewait_sock.c                 |   6 +-
- net/ipv4/ip_output.c                          |   5 +-
- net/ipv4/tcp.c                                |   2 +
- net/ipv4/tcp_ipv4.c                           |  18 +-
- net/ipv4/tcp_minisocks.c                      |  20 +
- net/ipv4/tcp_output.c                         |  17 +-
- net/ipv6/ipv6_sockglue.c                      |   6 +-
- net/ipv6/tcp_ipv6.c                           |  17 +-
- net/psp/Kconfig                               |  15 +
- net/psp/Makefile                              |   5 +
- net/psp/psp-nl-gen.c                          | 119 +++
- net/psp/psp-nl-gen.h                          |  39 +
- net/psp/psp.h                                 |  54 ++
- net/psp/psp_main.c                            | 278 +++++++
- net/psp/psp_nl.c                              | 505 ++++++++++++
- net/psp/psp_sock.c                            | 302 +++++++
- tools/net/ynl/Makefile.deps                   |   1 +
- 58 files changed, 3905 insertions(+), 62 deletions(-)
- create mode 100644 Documentation/netlink/specs/psp.yaml
- create mode 100644 Documentation/networking/psp.rst
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.c
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.h
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_fs.c
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_fs.h
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_offload.c
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_rxtx.c
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_rxtx.h
- create mode 100644 include/net/psp.h
- create mode 100644 include/net/psp/functions.h
- create mode 100644 include/net/psp/types.h
- create mode 100644 include/uapi/linux/psp.h
- create mode 100644 net/psp/Kconfig
- create mode 100644 net/psp/Makefile
- create mode 100644 net/psp/psp-nl-gen.c
- create mode 100644 net/psp/psp-nl-gen.h
- create mode 100644 net/psp/psp.h
- create mode 100644 net/psp/psp_main.c
- create mode 100644 net/psp/psp_nl.c
- create mode 100644 net/psp/psp_sock.c
-
--- 
-2.47.3
-
+On Mon, Aug 25, 2025 at 10:41=E2=80=AFAM Martin Karsten <mkarsten@uwaterloo=
+.ca> wrote:
+>
+> On 2025-08-25 13:20, Samiullah Khawaja wrote:
+> > On Sun, Aug 24, 2025 at 5:03=E2=80=AFPM Martin Karsten <mkarsten@uwater=
+loo.ca> wrote:
+> >>
+> >> On 2025-08-24 17:54, Samiullah Khawaja wrote:
+> >>> Extend the already existing support of threaded napi poll to do conti=
+nuous
+> >>> busy polling.
+> >>>
+> >>> This is used for doing continuous polling of napi to fetch descriptor=
+s
+> >>> from backing RX/TX queues for low latency applications. Allow enablin=
+g
+> >>> of threaded busypoll using netlink so this can be enabled on a set of
+> >>> dedicated napis for low latency applications.
+> >>>
+> >>> Once enabled user can fetch the PID of the kthread doing NAPI polling
+> >>> and set affinity, priority and scheduler for it depending on the
+> >>> low-latency requirements.
+> >>>
+> >>> Currently threaded napi is only enabled at device level using sysfs. =
+Add
+> >>> support to enable/disable threaded mode for a napi individually. This
+> >>> can be done using the netlink interface. Extend `napi-set` op in netl=
+ink
+> >>> spec that allows setting the `threaded` attribute of a napi.
+> >>>
+> >>> Extend the threaded attribute in napi struct to add an option to enab=
+le
+> >>> continuous busy polling. Extend the netlink and sysfs interface to al=
+low
+> >>> enabling/disabling threaded busypolling at device or individual napi
+> >>> level.
+> >>>
+> >>> We use this for our AF_XDP based hard low-latency usecase with usecs
+> >>> level latency requirement. For our usecase we want low jitter and sta=
+ble
+> >>> latency at P99.
+> >>>
+> >>> Following is an analysis and comparison of available (and compatible)
+> >>> busy poll interfaces for a low latency usecase with stable P99. Pleas=
+e
+> >>> note that the throughput and cpu efficiency is a non-goal.
+> >>>
+> >>> For analysis we use an AF_XDP based benchmarking tool `xdp_rr`. The
+> >>> description of the tool and how it tries to simulate the real workloa=
+d
+> >>> is following,
+> >>>
+> >>> - It sends UDP packets between 2 machines.
+> >>> - The client machine sends packets at a fixed frequency. To maintain =
+the
+> >>>     frequency of the packet being sent, we use open-loop sampling. Th=
+at is
+> >>>     the packets are sent in a separate thread.
+> >>> - The server replies to the packet inline by reading the pkt from the
+> >>>     recv ring and replies using the tx ring.
+> >>> - To simulate the application processing time, we use a configurable
+> >>>     delay in usecs on the client side after a reply is received from =
+the
+> >>>     server.
+> >>>
+> >>> The xdp_rr tool is posted separately as an RFC for tools/testing/self=
+test.
+> >>>
+> >>> We use this tool with following napi polling configurations,
+> >>>
+> >>> - Interrupts only
+> >>> - SO_BUSYPOLL (inline in the same thread where the client receives th=
+e
+> >>>     packet).
+> >>> - SO_BUSYPOLL (separate thread and separate core)
+> > This one uses separate thread and core for polling the napi.
+>
+> That's not what I am referring to below.
+>
+> [snip]
+>
+> >>> | Experiment | interrupts | SO_BUSYPOLL | SO_BUSYPOLL(separate) | NAP=
+I threaded |
+> >>> |---|---|---|---|---|
+> >>> | 12 Kpkt/s + 0us delay | | | | |
+> >>> |  | p5: 12700 | p5: 12900 | p5: 13300 | p5: 12800 |
+> >>> |  | p50: 13100 | p50: 13600 | p50: 14100 | p50: 13000 |
+> >>> |  | p95: 13200 | p95: 13800 | p95: 14400 | p95: 13000 |
+> >>> |  | p99: 13200 | p99: 13800 | p99: 14400 | p99: 13000 |
+> >>> | 32 Kpkt/s + 30us delay | | | | |
+> >>> |  | p5: 19900 | p5: 16600 | p5: 13100 | p5: 12800 |
+> >>> |  | p50: 21100 | p50: 17000 | p50: 13700 | p50: 13000 |
+> >>> |  | p95: 21200 | p95: 17100 | p95: 14000 | p95: 13000 |
+> >>> |  | p99: 21200 | p99: 17100 | p99: 14000 | p99: 13000 |
+> >>> | 125 Kpkt/s + 6us delay | | | | |
+> >>> |  | p5: 14600 | p5: 17100 | p5: 13300 | p5: 12900 |
+> >>> |  | p50: 15400 | p50: 17400 | p50: 13800 | p50: 13100 |
+> >>> |  | p95: 15600 | p95: 17600 | p95: 14000 | p95: 13100 |
+> >>> |  | p99: 15600 | p99: 17600 | p99: 14000 | p99: 13100 |
+> >>> | 12 Kpkt/s + 78us delay | | | | |
+> >>> |  | p5: 14100 | p5: 16700 | p5: 13200 | p5: 12600 |
+> >>> |  | p50: 14300 | p50: 17100 | p50: 13900 | p50: 12800 |
+> >>> |  | p95: 14300 | p95: 17200 | p95: 14200 | p95: 12800 |
+> >>> |  | p99: 14300 | p99: 17200 | p99: 14200 | p99: 12800 |
+> >>> | 25 Kpkt/s + 38us delay | | | | |
+> >>> |  | p5: 19900 | p5: 16600 | p5: 13000 | p5: 12700 |
+> >>> |  | p50: 21000 | p50: 17100 | p50: 13800 | p50: 12900 |
+> >>> |  | p95: 21100 | p95: 17100 | p95: 14100 | p95: 12900 |
+> >>> |  | p99: 21100 | p99: 17100 | p99: 14100 | p99: 12900 |
+> >>>
+> >>>    ## Observations
+> >>
+> >> Hi Samiullah,
+> >>
+> > Thanks for the review
+> >> I believe you are comparing apples and oranges with these experiments.
+> >> Because threaded busy poll uses two cores at each end (at 100%), you
+> > The SO_BUSYPOLL(separate) column is actually running in a separate
+> > thread and using two cores. So this is actually comparing apples to
+> > apples.
+>
+> I am not referring to SO_BUSYPOLL, but to the column labelled
+> "interrupts". This is single-core, yes?
+>
+> >> should compare with 2 pairs of xsk_rr processes using interrupt mode,
+> >> but each running at half the rate. I am quite certain you would then s=
+ee
+> >> the same latency as in the baseline experiment - at much reduced cpu
+> >> utilization.
+> >>
+> >> Threaded busy poll reduces p99 latency by just 100 nsec, while
+> > The table in the experiments show much larger differences in latency.
+>
+> Yes, because all but the first experiment add processing delay to
+> simulate 100% load and thus most likely show queuing effects.
+>
+> Since "interrupts" uses just one core and "NAPI threaded" uses two, a
+> fair comparison would be for "interrupts" to run two pairs of xsk_rr at
+> half the rate each. Then the load would be well below 100%, no queueing,
+> and latency would probably go back to the values measured in the "0us
+> delay" experiments. At least that's what I would expect.
+Two set of xsk_rr will go to two different NIC queues with two
+different interrupts (I think). That would be comparing apples to
+oranges, as all the other columns use a single NIC queue. Having
+(Forcing user to have) two xsk sockets to deliver packets at a certain
+rate is a completely different use case.
+>
+> Reproduction is getting a bit difficult, because you haven't updated the
+> xsk_rr RFC and judging from the compilation error, maybe not built/run
+> these experiments for a while now? It would be nice to have a working
+> reproducible setup.
+Oh. Let me check the xsk_rr and see whether it is outdated. I will
+send out another RFC for it if it's outdated.
+>
+> >> busy-spinning two cores, at each end - not more not less. I continue t=
+o
+> >> believe that this trade-off and these limited benefits need to be
+> >> clearly and explicitly spelled out in the cover letter.
+> > Yes, if you just look at the first row of the table then there is
+> > virtually no difference.
+> I'm not sure what you mean by this. I compare "interrupts" with "NAPI
+> threaded" for the case "12 Kpkt/s + 0us delay" and I have explained why
+> I believe the other experiments are not meaningful.
+Yes that is exactly what I am disagreeing with. I don't think other
+rows are "not meaningful". The xsk_rr is trying to "simulate the
+application processing" by adding a cpu delay and the table clearly
+shows the comparison between various mechanisms and how they perform
+with in load.
+>
+> Thanks,
+> Martin
+>
 
