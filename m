@@ -1,162 +1,312 @@
-Return-Path: <netdev+bounces-216481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16936B3400A
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 14:50:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6329CB34012
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 14:52:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4AFD3BC22D
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 12:50:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34B461645E3
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 12:52:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A4D1EDA1B;
-	Mon, 25 Aug 2025 12:50:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A4D4219319;
+	Mon, 25 Aug 2025 12:52:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="oCIv7t3t";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="c9Sol54t"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="YtWd7wd/"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B6E1E766E
-	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 12:50:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53DE71EB36;
+	Mon, 25 Aug 2025 12:52:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756126244; cv=none; b=QKloEiJK2FUp4Wwvi2P9QuzVDVTqQ0L6zx63ffOGf1sPPAHUmOwNx1KmfQbetTIJD7y565Qn77Uor0d2vM/rStQD8wUiGchK4DBVn8urtHt1g0PSsXwHiHGQY/5uKUkvixQQol1K8/s1vMvfl2dx0sFIf/o+oBQ8GyDYPKPZ8DM=
+	t=1756126368; cv=none; b=OcesXZYG6UBjo/W1FucAye0LRIHoIivgeu2DKjK4/MjFv42RBFDQPcwtTyMdvcMQOA3GUHTJbBfnpcczX8NzKVT8UuyX04BMGGZGjtcuniUYOEncDkprn1KYXeNpXPRC6reitEX030BUI4O8f27qsAEJX9yhN5BlsYFhqqFNdks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756126244; c=relaxed/simple;
-	bh=QmEe885vDSsDy0lPS+GgdWXoWuZLsB++7oV3cIxDabg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i1DRloBeZsFNryYj+3mjS1w6MRuJ/+dqQSlePn5g9jH9JjKHVLXpLBP0Zoqon5R9IBnVXFzbOQgNQqV4oIIJRBQGuxI8kiFhLDrG8gjdPsbTP71CHdukIMqritXcwXa6TuZqKV0VnYeuJIzNgokV7ZCm4BDeB7lxxHFVVUh45PI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=oCIv7t3t; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=c9Sol54t; arc=none smtp.client-ip=202.12.124.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 558A17A014D;
-	Mon, 25 Aug 2025 08:50:39 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-01.internal (MEProxy); Mon, 25 Aug 2025 08:50:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
-	:from:in-reply-to:message-id:mime-version:reply-to:subject
-	:subject:to:to; s=fm2; t=1756126239; x=1756212639; bh=oBNHh1A3es
-	RFb6VbZWr3WMfdMz8XkWWlIcfEgy4oseo=; b=oCIv7t3tTX+q3RA8gWcb6vC7ge
-	aEEEAFzxSpKuA9nI3iKJU9HURs1S4ORKVJYrXCXALjg3N0KwDOcQrtbp1WWGggP5
-	mEpUQ0m6ds/K8hw3WDnewRF/8z0lHTZhX1Ab/wGQHD7BWe/cPtdeKT+qnN6aX6wR
-	1RpPYhv1okwnXUD+OgjwJfaeb8U3YVbgI57M9VD2iTX/pGD2fMmlGT4QCI/4dXFL
-	15X978PMx/PnNRHSpeoQhtRdGK+PTIqawKameki2t/u7SgYkVPnft0NRJlkMOrOh
-	UitcP9ST2jgCX+sFz1FuWTw34mDhk4TOOMLMe8YPWfJ0ELlXNtX5FJeD7oJQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1756126239; x=1756212639; bh=oBNHh1A3esRFb6VbZWr3WMfdMz8XkWWlIcf
-	Egy4oseo=; b=c9Sol54tUPOEYSxbzBEMJN5PxmB4D1KuLR39MDPJA8P9iwoydgQ
-	DuYSDLrZsBIEIdAitTUvgW6cmiMSb2cWgx7fV2m0kIdW0kRgRs9Psa4GIx4crH9U
-	I4J5Ss9bgpb+j0nVFsT9zHd9LkVQKqaXevL3WzRUBqTuMeP9VQZHzVsyV/FaIlp1
-	/zVP45fDVL9CaZMM3410tLIfcNMtE60D1YuGiExSV/T1OOBNHdDEWwGIzJfBZDL3
-	v/g8n2n1sTwgruhv5At7nrapD1Bylf9NrsMFCSbuGlTjYOxjG/92tc872cZf+cIu
-	nl6kobI6UPhzEf0iq9hPTA1LHBpKVWk3syw==
-X-ME-Sender: <xms:HlysaDaPpcrRXBnqQfTnpyFN8HgdB2YDriI6NvOqqfZUNc-D3QHvZg>
-    <xme:HlysaK3Ysyng3RjqUP8aPvoJRkR7-EUwHeHMZbRZUAOYWdVDvvRvT1XSS85grKp7m
-    8jwHPHV76s3Oma7Dqk>
-X-ME-Received: <xmr:HlysaGYfqP_ecTf836GieFxnhzVOzOGSwZykgpjdoegUXpj6m8MZRpbkmgz6>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddujedvgeegucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepufgrsghrihhnrgcu
-    ffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrfgrth
-    htvghrnhepjedtuefgffekjeefheekieeivdejhedvudffveefteeuffehgeettedvhfff
-    veffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsh
-    gusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeeipdhmohguvgep
-    shhmthhpohhuthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdroh
-    hrghdprhgtphhtthhopehsugesqhhuvggrshihshhnrghilhdrnhgvthdprhgtphhtthho
-    peihrghnjhhunhdriihhuheslhhinhhugidruggvvhdprhgtphhtthhopehlvghonhhroh
-    esnhhvihguihgrrdgtohhmpdhrtghpthhtohepshhtvghffhgvnhdrkhhlrghsshgvrhht
-    sehsvggtuhhnvghtrdgtohhmpdhrtghpthhtohepgihmuhesrhgvughhrghtrdgtohhm
-X-ME-Proxy: <xmx:HlysaKLRSLMm8RuqVus4S1Q8ZSmthbcF_YBDQybowyoCC7e_og8N3Q>
-    <xmx:HlysaNHs4A5OzhrUrH_pB61t3mQGXEYLGbXdgWTK0DSPVSueR6gDJw>
-    <xmx:HlysaJsRPQeZAkPstZBNptIH9IlXm55pdUZqowqq1PfbZ22xLpiY4w>
-    <xmx:HlysaEvFg5YfjJRceJAtpEOWTjEDcO4qpuyE7fxtigFUbw7eZ6jeAg>
-    <xmx:H1ysaEgUyjHxquxf27knW24-s7lnpYh3Lf0Z7wVZD6ltIWgOAF4x16We>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 25 Aug 2025 08:50:37 -0400 (EDT)
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: netdev@vger.kernel.org
-Cc: Sabrina Dubroca <sd@queasysnail.net>,
-	Zhu Yanjun <yanjun.zhu@linux.dev>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Xiumei Mu <xmu@redhat.com>
-Subject: [PATCH ipsec] xfrm: fix offloading of cross-family tunnels
-Date: Mon, 25 Aug 2025 14:50:23 +0200
-Message-ID: <1aaa7c722713167b09a9a22120a9870a25c87eda.1756126057.git.sd@queasysnail.net>
-X-Mailer: git-send-email 2.50.0
+	s=arc-20240116; t=1756126368; c=relaxed/simple;
+	bh=5XWcstv/n0jB+QypykxUok+dX73nLTfw2ADRcqaWENA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dieE1yK+qEI4DmhRwMuPe1AejR0YaNfC8eWWO5UJ5g3fecxwbu2Z4BudiwLiyy1MRgHAWhAmaLgebCmzkK8VF48TelyNYpCgJFLTUW+fmloFR5Xrd3ICo7wlcekLs8QMOJP9PdpaEIh0XSb/jqDpZX/Fz0X5nX+2rODDDHD5K90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=YtWd7wd/; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1756126364;
+	bh=5XWcstv/n0jB+QypykxUok+dX73nLTfw2ADRcqaWENA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=YtWd7wd/Do6104b1d43xPf32kEqsxn0ax0rbs1jHoUeav7dcdgR3puSSqsBE4hdyc
+	 bstHtSbFFuFMEBNTddQR9weAQHwYXS98MrEUIO24lf0yXeHBHkSs1zBaC+XYdCPosq
+	 Ka2NZ6ZKHSOSVQH1CDxlxUcEhNl3jTsTlX4ZXH8BVkmH62Huu487ybcpQdrNEOMeaB
+	 UCU1JVJ1WPuQGcIcY3xcSlc2rYY90dKKzokp9FjcpD9zl10b5yYgPXGUWr0gYcl/Xa
+	 0SOrXk0Z//US+n1EGoVE2trHxcjWYlH8YBTC8aFFkTd5SMCQ01h2xLjeuuTFndql2w
+	 ASPxPnnV5QXfg==
+Received: from laura.lan (unknown [IPv6:2001:b07:646b:e2:b1df:895a:e67b:5cd4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: laura.nao)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 8A46D17E0478;
+	Mon, 25 Aug 2025 14:52:43 +0200 (CEST)
+From: Laura Nao <laura.nao@collabora.com>
+To: wenst@chromium.org
+Cc: angelogioacchino.delregno@collabora.com,
+	conor+dt@kernel.org,
+	devicetree@vger.kernel.org,
+	guangjie.song@mediatek.com,
+	kernel@collabora.com,
+	krzk+dt@kernel.org,
+	laura.nao@collabora.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-clk@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	matthias.bgg@gmail.com,
+	mturquette@baylibre.com,
+	netdev@vger.kernel.org,
+	nfraprado@collabora.com,
+	p.zabel@pengutronix.de,
+	richardcochran@gmail.com,
+	robh@kernel.org,
+	sboyd@kernel.org
+Subject: Re: [PATCH v4 07/27] clk: mediatek: clk-gate: Add ops for gates with HW voter
+Date: Mon, 25 Aug 2025 14:51:41 +0200
+Message-Id: <20250825125141.209860-1-laura.nao@collabora.com>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <CAGXv+5HRKFrdjjXkwN6=OLtk=bK3C3mBnrDtmkEWeuxjz0pFKg@mail.gmail.com>
+References: <CAGXv+5HRKFrdjjXkwN6=OLtk=bK3C3mBnrDtmkEWeuxjz0pFKg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Xiumei reported a regression in IPsec offload tests over xfrmi, where
-IPv6 over IPv4 tunnels are no longer offloaded after commit
-cc18f482e8b6 ("xfrm: provide common xdo_dev_offload_ok callback
-implementation").
+On 8/15/25 05:37, Chen-Yu Tsai wrote:
+> On Tue, Aug 5, 2025 at 10:55 PM Laura Nao <laura.nao@collabora.com> wrote:
+>>
+>> MT8196 use a HW voter for gate enable/disable control. Voting is
+>> performed using set/clr regs, with a status bit used to verify the vote
+>> state. Add new set of gate clock operations with support for voting via
+>> set/clr regs.
+>>
+>> Reviewed-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+>> Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+>> Signed-off-by: Laura Nao <laura.nao@collabora.com>
+>> ---
+>>  drivers/clk/mediatek/clk-gate.c | 77 +++++++++++++++++++++++++++++++--
+>>  drivers/clk/mediatek/clk-gate.h |  3 ++
+>>  2 files changed, 77 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/clk/mediatek/clk-gate.c b/drivers/clk/mediatek/clk-gate.c
+>> index 0375ccad4be3..426f3a25763d 100644
+>> --- a/drivers/clk/mediatek/clk-gate.c
+>> +++ b/drivers/clk/mediatek/clk-gate.c
+>> @@ -5,6 +5,7 @@
+>>   */
+>>
+>>  #include <linux/clk-provider.h>
+>> +#include <linux/dev_printk.h>
+>>  #include <linux/mfd/syscon.h>
+>>  #include <linux/module.h>
+>>  #include <linux/printk.h>
+>> @@ -12,14 +13,19 @@
+>>  #include <linux/slab.h>
+>>  #include <linux/types.h>
+>>
+>> +#include "clk-mtk.h"
+>>  #include "clk-gate.h"
+>>
+>>  struct mtk_clk_gate {
+>>         struct clk_hw   hw;
+>>         struct regmap   *regmap;
+>> +       struct regmap   *regmap_hwv;
+>>         int             set_ofs;
+>>         int             clr_ofs;
+>>         int             sta_ofs;
+>> +       unsigned int    hwv_set_ofs;
+>> +       unsigned int    hwv_clr_ofs;
+>> +       unsigned int    hwv_sta_ofs;
+>>         u8              bit;
+>>  };
+>>
+>> @@ -100,6 +106,28 @@ static void mtk_cg_disable_inv(struct clk_hw *hw)
+>>         mtk_cg_clr_bit(hw);
+>>  }
+>>
+>> +static int mtk_cg_hwv_set_en(struct clk_hw *hw, bool enable)
+>> +{
+>> +       struct mtk_clk_gate *cg = to_mtk_clk_gate(hw);
+>> +       u32 val;
+>> +
+>> +       regmap_write(cg->regmap_hwv, enable ? cg->hwv_set_ofs : cg->hwv_clr_ofs, BIT(cg->bit));
+>> +
+>> +       return regmap_read_poll_timeout_atomic(cg->regmap_hwv, cg->hwv_sta_ofs, val,
+>> +                                              val & BIT(cg->bit),
+>> +                                              0, MTK_WAIT_HWV_DONE_US);
+>> +}
+>> +
+>> +static int mtk_cg_hwv_enable(struct clk_hw *hw)
+>> +{
+>> +       return mtk_cg_hwv_set_en(hw, true);
+>> +}
+>> +
+>> +static void mtk_cg_hwv_disable(struct clk_hw *hw)
+>> +{
+>> +       mtk_cg_hwv_set_en(hw, false);
+>> +}
+>> +
+>>  static int mtk_cg_enable_no_setclr(struct clk_hw *hw)
+>>  {
+>>         mtk_cg_clr_bit_no_setclr(hw);
+>> @@ -124,6 +152,15 @@ static void mtk_cg_disable_inv_no_setclr(struct clk_hw *hw)
+>>         mtk_cg_clr_bit_no_setclr(hw);
+>>  }
+>>
+>> +static bool mtk_cg_uses_hwv(const struct clk_ops *ops)
+>> +{
+>> +       if (ops == &mtk_clk_gate_hwv_ops_setclr ||
+>> +           ops == &mtk_clk_gate_hwv_ops_setclr_inv)
+>> +               return true;
+>> +
+>> +       return false;
+>> +}
+>> +
+>>  const struct clk_ops mtk_clk_gate_ops_setclr = {
+>>         .is_enabled     = mtk_cg_bit_is_cleared,
+>>         .enable         = mtk_cg_enable,
+>> @@ -138,6 +175,20 @@ const struct clk_ops mtk_clk_gate_ops_setclr_inv = {
+>>  };
+>>  EXPORT_SYMBOL_GPL(mtk_clk_gate_ops_setclr_inv);
+>>
+>> +const struct clk_ops mtk_clk_gate_hwv_ops_setclr = {
+>> +       .is_enabled     = mtk_cg_bit_is_cleared,
+>> +       .enable         = mtk_cg_hwv_enable,
+>> +       .disable        = mtk_cg_hwv_disable,
+>> +};
+>> +EXPORT_SYMBOL_GPL(mtk_clk_gate_hwv_ops_setclr);
+>> +
+>> +const struct clk_ops mtk_clk_gate_hwv_ops_setclr_inv = {
+>> +       .is_enabled     = mtk_cg_bit_is_set,
+>> +       .enable         = mtk_cg_hwv_enable,
+>> +       .disable        = mtk_cg_hwv_disable,
+>> +};
+>> +EXPORT_SYMBOL_GPL(mtk_clk_gate_hwv_ops_setclr_inv);
+>> +
+>>  const struct clk_ops mtk_clk_gate_ops_no_setclr = {
+>>         .is_enabled     = mtk_cg_bit_is_cleared,
+>>         .enable         = mtk_cg_enable_no_setclr,
+>> @@ -153,8 +204,9 @@ const struct clk_ops mtk_clk_gate_ops_no_setclr_inv = {
+>>  EXPORT_SYMBOL_GPL(mtk_clk_gate_ops_no_setclr_inv);
+>>
+>>  static struct clk_hw *mtk_clk_register_gate(struct device *dev,
+>> -                                               const struct mtk_gate *gate,
+>> -                                               struct regmap *regmap)
+>> +                                           const struct mtk_gate *gate,
+>> +                                           struct regmap *regmap,
+>> +                                           struct regmap *regmap_hwv)
+>>  {
+>>         struct mtk_clk_gate *cg;
+>>         int ret;
+>> @@ -169,11 +221,22 @@ static struct clk_hw *mtk_clk_register_gate(struct device *dev,
+>>         init.parent_names = gate->parent_name ? &gate->parent_name : NULL;
+>>         init.num_parents = gate->parent_name ? 1 : 0;
+>>         init.ops = gate->ops;
+>> +       if (mtk_cg_uses_hwv(init.ops) && !regmap_hwv) {
+>> +               dev_err(dev, "regmap not found for hardware voter clocks\n");
+>> +               return ERR_PTR(-ENXIO);
+>
+> return dev_err_probe()?
+>
+> I believe the same applies to the previous patch.
+>
 
-Commit cc18f482e8b6 added a generic version of existing checks
-attempting to prevent packets with IPv4 options or IPv6 extension
-headers from being sent to HW that doesn't support offloading such
-packets. The check mistakenly uses x->props.family (the outer family)
-to determine the inner packet's family and verify if
-options/extensions are present.
+mtk_clk_register_gate and mtk_clk_register_mux actually both return a
+struct clk_hw *.
 
-In the case of IPv6 over IPv4, the check compares some of the traffic
-class bits to the expected no-options ihl value (5). The original
-check was introduced in commit 2ac9cfe78223 ("net/mlx5e: IPSec, Add
-Innova IPSec offload TX data path"), and then duplicated in the other
-drivers. Before commit cc18f482e8b6, the loose check (ihl > 5) passed
-because those traffic class bits were not set to a value that
-triggered the no-offload codepath. Packets with options/extension
-headers that should have been handled in SW went through the offload
-path, and were likely dropped by the NIC or incorrectly
-processed. Since commit cc18f482e8b6, the check is now strict (ihl !=
-5), and in a basic setup (no traffic class configured), all packets go
-through the no-offload codepath.
+>> +       }
+>>
+>>         cg->regmap = regmap;
+>> +       cg->regmap_hwv = regmap_hwv;
+>>         cg->set_ofs = gate->regs->set_ofs;
+>>         cg->clr_ofs = gate->regs->clr_ofs;
+>>         cg->sta_ofs = gate->regs->sta_ofs;
+>> +       if (gate->hwv_regs) {
+>> +               cg->hwv_set_ofs = gate->hwv_regs->set_ofs;
+>> +               cg->hwv_clr_ofs = gate->hwv_regs->clr_ofs;
+>> +               cg->hwv_sta_ofs = gate->hwv_regs->sta_ofs;
+>> +       }
+>> +
+>>         cg->bit = gate->shift;
+>>
+>>         cg->hw.init = &init;
+>> @@ -206,6 +269,7 @@ int mtk_clk_register_gates(struct device *dev, struct device_node *node,
+>>         int i;
+>>         struct clk_hw *hw;
+>>         struct regmap *regmap;
+>> +       struct regmap *regmap_hwv;
+>>
+>>         if (!clk_data)
+>>                 return -ENOMEM;
+>> @@ -216,6 +280,13 @@ int mtk_clk_register_gates(struct device *dev, struct device_node *node,
+>>                 return PTR_ERR(regmap);
+>>         }
+>>
+>> +       regmap_hwv = mtk_clk_get_hwv_regmap(node);
+>> +       if (IS_ERR(regmap_hwv)) {
+>> +               pr_err("Cannot find hardware voter regmap for %pOF: %pe\n",
+>> +                      node, regmap_hwv);
+>> +               return PTR_ERR(regmap_hwv);
+>
+> return dev_err_probe();
+>
 
-The commits that introduced the incorrect family checks in each driver
-are:
-2ac9cfe78223 ("net/mlx5e: IPSec, Add Innova IPSec offload TX data path")
-8362ea16f69f ("crypto: chcr - ESN for Inline IPSec Tx")
-859a497fe80c ("nfp: implement xfrm callbacks and expose ipsec offload feature to upper layer")
-32188be805d0 ("cn10k-ipsec: Allow ipsec crypto offload for skb with SA")
-[ixgbe/ixgbevf commits are ignored, as that HW does not support tunnel
-mode, thus no cross-family setups are possible]
+Will do.
 
-Fixes: cc18f482e8b6 ("xfrm: provide common xdo_dev_offload_ok callback implementation")
-Reported-by: Xiumei Mu <xmu@redhat.com>
-Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
----
- net/xfrm/xfrm_device.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks,
 
-diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-index c7a1f080d2de..44b9de6e4e77 100644
---- a/net/xfrm/xfrm_device.c
-+++ b/net/xfrm/xfrm_device.c
-@@ -438,7 +438,7 @@ bool xfrm_dev_offload_ok(struct sk_buff *skb, struct xfrm_state *x)
- 
- 	check_tunnel_size = x->xso.type == XFRM_DEV_OFFLOAD_PACKET &&
- 			    x->props.mode == XFRM_MODE_TUNNEL;
--	switch (x->props.family) {
-+	switch (x->inner_mode.family) {
- 	case AF_INET:
- 		/* Check for IPv4 options */
- 		if (ip_hdr(skb)->ihl != 5)
--- 
-2.50.0
+Laura
 
+> ChenYu
+>
+>> +       }
+>> +
+>>         for (i = 0; i < num; i++) {
+>>                 const struct mtk_gate *gate = &clks[i];
+>>
+>> @@ -225,7 +296,7 @@ int mtk_clk_register_gates(struct device *dev, struct device_node *node,
+>>                         continue;
+>>                 }
+>>
+>> -               hw = mtk_clk_register_gate(dev, gate, regmap);
+>> +               hw = mtk_clk_register_gate(dev, gate, regmap, regmap_hwv);
+>>
+>>                 if (IS_ERR(hw)) {
+>>                         pr_err("Failed to register clk %s: %pe\n", gate->name,
+>> diff --git a/drivers/clk/mediatek/clk-gate.h b/drivers/clk/mediatek/clk-gate.h
+>> index 1a46b4c56fc5..4f05b9855dae 100644
+>> --- a/drivers/clk/mediatek/clk-gate.h
+>> +++ b/drivers/clk/mediatek/clk-gate.h
+>> @@ -19,6 +19,8 @@ extern const struct clk_ops mtk_clk_gate_ops_setclr;
+>>  extern const struct clk_ops mtk_clk_gate_ops_setclr_inv;
+>>  extern const struct clk_ops mtk_clk_gate_ops_no_setclr;
+>>  extern const struct clk_ops mtk_clk_gate_ops_no_setclr_inv;
+>> +extern const struct clk_ops mtk_clk_gate_hwv_ops_setclr;
+>> +extern const struct clk_ops mtk_clk_gate_hwv_ops_setclr_inv;
+>>
+>>  struct mtk_gate_regs {
+>>         u32 sta_ofs;
+>> @@ -31,6 +33,7 @@ struct mtk_gate {
+>>         const char *name;
+>>         const char *parent_name;
+>>         const struct mtk_gate_regs *regs;
+>> +       const struct mtk_gate_regs *hwv_regs;
+>>         int shift;
+>>         const struct clk_ops *ops;
+>>         unsigned long flags;
+>> --
+>> 2.39.5
+>>
 
