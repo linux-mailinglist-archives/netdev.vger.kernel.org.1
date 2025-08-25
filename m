@@ -1,335 +1,195 @@
-Return-Path: <netdev+bounces-216458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B740EB33B93
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 11:49:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0BAAB33F31
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 14:20:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 342D01B25A11
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 09:49:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C195216AB89
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 12:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1668E2D12F5;
-	Mon, 25 Aug 2025 09:48:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8D241A0712;
+	Mon, 25 Aug 2025 12:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="W1b+taTs"
+	dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b="fX6zBgaT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from mail-m1973195.qiye.163.com (mail-m1973195.qiye.163.com [220.197.31.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D48D2D12E7
-	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 09:48:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756115313; cv=fail; b=VOMLj/MDqVekMJSdTiv9PKmR2qhi7DlM7XMhT5a84nGEw/oBp4oQrhBrIGOTsec58Z7hrQwbzPxaAUekQsB2ogduGaG0xl+wmh2Y0JGh+qR2fX9hc6SDUzeNZfKbr0r4eIzadtnnqX/TCGtz1FiYwgFLjDkCE7gOnhlz39Kgy+M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756115313; c=relaxed/simple;
-	bh=V3G6UpAfDUJD2wveu3IYO9QRRwOXLYhkh5tyh/j4KYk=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=XUgmwYSOsPX0ME94AtV2F/udrm+vbdM7vywysxfPMry3DtpoGL4WfRi8pTynCJJpZyhtPbtHu4EMhJ9XdjxhXxt2XtlGDkJN31xHuL87h94t+z7QLRTLcpgFbVCVwbgFW9QwdcH0RASgbCaWaW7JFKwfLe7+kO/XCG1tkUUCs+s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=W1b+taTs; arc=fail smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756115311; x=1787651311;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=V3G6UpAfDUJD2wveu3IYO9QRRwOXLYhkh5tyh/j4KYk=;
-  b=W1b+taTsITSTESZrP0t67XIKSdSOlO5FKnqUoLkfbB582HZdfmth/jUN
-   93yBlK/PWA4MG8/xSfQhhqT1cjKDIsXWYhkXfF/16KCntK+nfg/jhsa5S
-   Hy/8GYVyceeEWLVLnrGqdVQRyFn7nCbObwGt0sXrt8DU/4xN7VRzj8v7j
-   YUIIOGiCuZUlBlVMdHqli5MjSF9u9dpAViBO4WQW+8Sp6ddikIf56ztMP
-   UA8luEJx48UO19AuQJJFVCz3VTBzrYyHV98cVyiDUv6C0vMjYNoGv2l9q
-   E/16PvjZQ3lP9eFdaPhLvWjcw9p3EcwWLSSyk6Xy4ArdAtOXvki8KUGHP
-   g==;
-X-CSE-ConnectionGUID: 9G2hYeYjTMin3C1+WlEA7g==
-X-CSE-MsgGUID: 8+jECKZBRjeLuOWNz9u7OA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11532"; a="69695573"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="69695573"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2025 02:48:30 -0700
-X-CSE-ConnectionGUID: gcFnX6BqRKu45D2/aBNfMg==
-X-CSE-MsgGUID: H55qpelwTWWusL3q0xx7iQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="200194892"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2025 02:48:30 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Mon, 25 Aug 2025 02:48:29 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Mon, 25 Aug 2025 02:48:29 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (40.107.92.62) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Mon, 25 Aug 2025 02:48:29 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=K1hW6EwgNHzp7wavtE9xh8E2zR2GdEwgSPPwp/Jc/UhLyI4I7/9RBnY0WataEGkWC3uaa1SO1Oc28cv5GWX+H1sIENlbJr7ujg1cQJ+b64z/xDQ2UytkqyYpIlsSRymArIUfuwipYWy6snd3ojCgPVHu0ZDW80PJB3tpH+GhnoAXBBrtDuphD+B70Km7zVKPmNXtKzTfNwHFGqfHPj7mRzdbIBe81shOAceufHUw9VkES/bNmFzGl4rafEIJ2+rWd9TYUAxja9ArOI1nMAZXcyBb35jDFPaqE0nRjBQ5gTrojqTVUmAe5tvpW7kYksaIaAcfCzEePPpOS6ALfK2Sgw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NCuep8obNB2DWQXt28Mivt4+NNa+7eH1uJSdQAwQoWo=;
- b=D7wzouj4xdxhrUZaCvbj7fDtakqjT/y6BsCaQnR7+SOH9LPf3pRTUBx6IIzjnLFr8r61Ya8GqUjb21E4FhSiBejRWiF3hHkDweok7wI+Rs7g1gtumrbsV8c1fe07bm+68QjSRdB/tJ6dTr5qPPDEgvoYm3zYK3yZkQGSkRVlHBXd9dFfxOh8VF+abatNL4Gqu0obDYbaQZ9KoiBI5QGxUrLOp5YlY/3u29TRg/Dmc2ACydwIs8oYZHjV8kPEbXY2Myxn5NrS3K4dB2Q2mWBtkMU1aRX+D1yqxdVrqhdF+1NxO0X10BVu9rXXRpAi//heJW+Ker3LDY8w9EcnTjvdOw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by SJ0PR11MB5939.namprd11.prod.outlook.com (2603:10b6:a03:42e::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.21; Mon, 25 Aug
- 2025 09:48:26 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.9052.019; Mon, 25 Aug 2025
- 09:48:26 +0000
-Message-ID: <781791cb-b22f-4197-a4e6-ff11a6fba8d9@intel.com>
-Date: Mon, 25 Aug 2025 11:48:21 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next v1] ixgbe: preserve RSS indirection table across
- admin down/up
-To: Kohei Enju <enjuk@amazon.com>
-CC: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <kohei.enju@gmail.com>
-References: <20250824112037.32692-1-enjuk@amazon.com>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-In-Reply-To: <20250824112037.32692-1-enjuk@amazon.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DU7P251CA0019.EURP251.PROD.OUTLOOK.COM
- (2603:10a6:10:551::10) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC782A1D1;
+	Mon, 25 Aug 2025 12:20:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.95
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756124424; cv=none; b=cy7Pkl1b+wV3IS6kJ3xaKLEQmFVTNP89+3rJZRR4jF4juIgDU1bK9Rzdo/Nv7v7R9xVoMnI0oB1aKEEPY7i/qqMz40UCGgAm/NPwYKBhAK6k7VQ6wMIi4xZ1rEPu1GeP1DvsQfcQy22Y9unUtYfqHcVI0QEf69T8ETTwjfBnjs4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756124424; c=relaxed/simple;
+	bh=lV7sceRjjC2f2qDWsPGndVZ6JWnmY4Sm0KIRNOfc3D4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iQttea3zSpkmq9iAd2pvpbe5B6jeyRZXnD5AMC8ppHPbFmzjawQ4iZrMnmKF+bYEPu0RERvorNiupdxR5u+fxYx6RyhmE+2InO9jD0cXmLXgT+3wHjosyQ0hE916ALlZEfs1TZw7OSDR3CKnrCJH1VD0kxByPUsWTg/XmndbzjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rock-chips.com; spf=pass smtp.mailfrom=rock-chips.com; dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b=fX6zBgaT; arc=none smtp.client-ip=220.197.31.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rock-chips.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rock-chips.com
+Received: from [172.16.12.153] (unknown [58.22.7.114])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 2082e1fe5;
+	Mon, 25 Aug 2025 17:57:46 +0800 (GMT+08:00)
+Message-ID: <d0fe6d16-181f-4b38-9457-1099fb6419d0@rock-chips.com>
+Date: Mon, 25 Aug 2025 17:57:45 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|SJ0PR11MB5939:EE_
-X-MS-Office365-Filtering-Correlation-Id: 79d8cc54-55ed-4f97-acce-08dde3bc8a01
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?VDlIRTRIeGxvNXR5UW45WHNtUmh2UFBvREM5NFYvOW50cXdVcmZ4NWhCanhu?=
- =?utf-8?B?bTBNd05jNnVEUUZKSVBVSHAwK3F5b2JMQXNpUnRZdjkycmY4TUJqVXVHVVZJ?=
- =?utf-8?B?ODREQ253MlZzWTV5RWR5U3REajJBcU4vMExLcEdBMUtEY0lxbTF6TGhHbW1X?=
- =?utf-8?B?NTNYdU1BUzcrQThMZEFVZFl1TjBWb2ozc3Q4dDlQdFpxM1J2M28vMDd2aFJS?=
- =?utf-8?B?UGtlTXNFWDVwclJzODljNHJXTTA2dnV3ZXMwZE5ic2F5SXBDTHc5V0NtRXYz?=
- =?utf-8?B?c1hSdUM1dWhHWVEwek5EeWl4aDFUVDJ0bXg4MGhUb2l2YXpwNEE1amtrb0Js?=
- =?utf-8?B?UmJQZ1FtVFhnekthNFpoSWJ1emlXZFR5MnBaejNWbUs1WDNOcFU0amR4eUxE?=
- =?utf-8?B?cEZxNEdlY1JXNEwwbTUweHh4c1VrRVZ4cDJkWUZrSnJKTFM4cU1aL3dyWnNh?=
- =?utf-8?B?RmQzd014bkpkeGhveTRnZkJjQkNab3d1YUZjWi9TSmVqVXBZUEN3djFRSC8v?=
- =?utf-8?B?WlVVd05OaUxoSVNNb3IvdUpsZmRyd2lnTGFEZjdBVjdrTGxXSlUxMnVucWl3?=
- =?utf-8?B?aVl4WXpZRjNuU1cxM0RtYlk0RkVXckJ4R2dzSGhqajN5S3BER1A2NldxazJG?=
- =?utf-8?B?ZmFUTkhEblRsMnV1NW11bXg2d3pXN2JQeDJsWUVGTVJpSXZKcXJRS0lSaVFK?=
- =?utf-8?B?NXA0MzZqVWJNYW42VFlPY3JOQXhveWRja2tzd3FEb3ZQMnJya3hTcS9ld0xz?=
- =?utf-8?B?dHlsUmNnRUlnVmxwV2xKRG9mV1JtZllrTFZFT3hhLzltckxiYVg5ejdhcUIx?=
- =?utf-8?B?eEhBcEFLZmpRZzBzZ2FjOWhmcklHWFloSTVmOXhNSkZrQ3RUSFFjc2RKYTND?=
- =?utf-8?B?V2xIWUZocHNKTnlEeVIyUkZ0M0RTU25EbS9SSWVMY2lBTlI5QVRhSmxqLzFZ?=
- =?utf-8?B?SURaQWpzajIxZDFjZzAwbFZSbHVNTmt1MVdaZUoxTlhudWFVWTlmcWJPR3lI?=
- =?utf-8?B?bDUxdmU3b1BiNGxjRjB4aW5aZUNlMGpLbFdySDNlSmVnT2R2NXdXVE9YZUdt?=
- =?utf-8?B?Tldua1dKRGtlelBvRWwwSGh4NUJ5eEVLUDJtWld5VVRCMHpxYyt4djU1ZnBo?=
- =?utf-8?B?emVPVnhHT2Q3T00vT3VHeEpPbHMxbHhpK2lTSDUzQ0hNd3VDU3k4R2RHYk52?=
- =?utf-8?B?amt1THVienUramd5VVZsbkZFWkZRM1dTR2czeVV2b1RHaHlXLzFxY3laNXJK?=
- =?utf-8?B?eFo1emY1cjk3TWJyYmlHSkxEVmxFVWdzOGtSN2lzeXJ2aFZZV0RpMnhqN2FG?=
- =?utf-8?B?aWxaMGh3MDhEN2haS01GQ3ZiSGdCQ28zTlFNa01PbnVXdzl0OTZlakF6b1A4?=
- =?utf-8?B?bk1mK0lTVGFTSHVUUVc1OTZjQURyVVU3dzJnWkZGSi8zQ01pKzNXR1pySnRz?=
- =?utf-8?B?Y2lFbnlZMnFObUpNVGUyd2xRdTkyanBFN3JteVdtelMwZVN4Umk2RThjQU9l?=
- =?utf-8?B?ZEFnaXNmazk4MGRSNmVZdk5HeTl6eHpOZG9zWWRtOWN3ZnFjK3FsWFNIRC9H?=
- =?utf-8?B?MSszOXFPY2tPSzBOR3ZYekxxWkc3YkFmYkY5UTdvZkJPbjNKWDNqWEdmbVFp?=
- =?utf-8?B?TnZBUlUrZnRqQVJyeFZPQUJhN2tEUE05eHRrQk5wSmFvQ29veVJEbWdmd2hK?=
- =?utf-8?B?dHRvOCtYN2hkWWNQYVR0YlVEWUd5cGNHNDJRcWVvNDkyV2JDQ0Z4c1I5cHVB?=
- =?utf-8?B?WkdWQkJ5eEovdHd1UUhDV1ErNEhvandKWDVtQXpVQ2FpQlhla3JJSFFlUDRk?=
- =?utf-8?B?TVpnNlJ3eUNHL1hZS2d0Zkx2M2VtODRTMWhsdEZZbkg2eitKdkhEMEJ5N2R3?=
- =?utf-8?B?dndwczVNaFJ5MjBYT0lZeEUzZ3pXRnRjbUMzaVdSZjRtcWxEK3UyY1l5OUFO?=
- =?utf-8?Q?Z9syXjafoEk=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WWRMYU92VVlGNi9nTmRjYmRPWjJ6K3k2VEkwMzRPV1lPZnFhRHY1U0c1VkxS?=
- =?utf-8?B?cThzYS81MlVHVHFUR3lXMEJsdWJkMEVmY1VPcHR0YnhhWGtBazA3VXhHWkEv?=
- =?utf-8?B?amJGWk85Mi9oZFcyNXQ3UmMxdkpQWDNJY0ZUYU8vQkdHaks2akY3MjVlRXFj?=
- =?utf-8?B?SVJJUFMzZWNQSjVIU0NSWTc1ZjFzR0d1UUF4L0hsdGJEOEMzZmk1S0R1bkdh?=
- =?utf-8?B?OVpzTm45T0NnZWhkNDhJQ0Nxalc5clJBSC9mUE11ZnVmTVZMRStYMmxxL3A1?=
- =?utf-8?B?ZmYrNEp0Nm92QjNQM2RxRlhXU2E0SUVIZDRJbEpXUjI5RC90bDVEL0dXMUQv?=
- =?utf-8?B?aDN4NnJIampmcnZUcGFweEY0R2dMZkpEanlhRDBOQXNHbGd0UytnSWZIeVU5?=
- =?utf-8?B?Q0hndkprVWg2Ujhxd0ozNGY1bFhuMVR0QUJBOFNVTkR0bm9JblkzM0JmZjNH?=
- =?utf-8?B?UFV3T2lhOVFCaDNBMTd6T2FMRkNHVkViSkpVUnR2b2ZhRG9MSmkyZzBYWW52?=
- =?utf-8?B?K2xsSmpoNzd5Vnc5T1lpZEp2WjJLc05kSFkwSVlITHlNRENSRXNQMlhyUGF6?=
- =?utf-8?B?WjZWeEJ2NklIQmxtVSttNWphQ0xYNWdMWk5KaGlpQjZjbWdwckNNZWMyWStG?=
- =?utf-8?B?TENob3pBamlRVXZBT1FGeGVnUlNuUEJxSVJER0g4MXhwaGFnUzV1N281cmQ5?=
- =?utf-8?B?ekNHRzNQYnU5dHRZOW0yVmxKYlczS2ZpMmFTT2ZXbkczdlgwT0ltZkxJSnFE?=
- =?utf-8?B?ZFdLT1FFaGNVZHVRR2pWVWFRM3pSZlluNDQycGNlaVcybUxZbVZzWGozaHNQ?=
- =?utf-8?B?RjVNU1BOUXcyaTRNd1NOa1RLWnhOZGxjTlpsM2FzT3UwRUtjUzBqR1pBTExs?=
- =?utf-8?B?K3ZBUlYzdzNNb0cwcUI3V0ZFa0ZaeW5DREcrdndHbUVpSDg4cjFsQlpPRk9J?=
- =?utf-8?B?R3NCT2kzbkxrTytraVAzSlRPWFc0YmdPc1BlZTA1UEs4d25PTkkxUDdZWHFl?=
- =?utf-8?B?T1ZEOXhFL25JdzFXa3JaRlF6cldXTVBYeUp4K3BTMkRTU2c0MEN6OUpkUE9V?=
- =?utf-8?B?Ujcwc0h5RFZ4U1RkNzUxZDhYbUtBdTNMeTJJcTh3RjgySjJ0WWl0dURFNU9p?=
- =?utf-8?B?VVBSWklWWHVnTGVRRnpObkplNk0zWHZTWjRnUWYxeTJhUmJGMmVSQ1lsQnBQ?=
- =?utf-8?B?V3RHU2ZNN0s2QVpDT3RpNmdsS29XWWZtOUdXQ0hsdW5KckJ3U1dieVhBcXBw?=
- =?utf-8?B?aDNUVUlPejM4REVRb1RWeHdSWGQxWWZGVjM3L0xuUUNQRE9sZGRVRTFpK2Iy?=
- =?utf-8?B?cTFNWXhnRjFRQnFYdlQxNlYzazFiQ1hkc3pvL3RDZi84UDIzY3htcEZrVW1i?=
- =?utf-8?B?clUvVStueHB6RE5FY2VIa0hYb012OHdrN1lqL3VyajJyNzdCRmdmWVZMeGlh?=
- =?utf-8?B?Z1AyZ3FRSjcwREU5V25iNHhjNGgyK2dvd3dFakRrcllmektHelU5dUJ3UWZ0?=
- =?utf-8?B?aWFNa1YyeVpSaXFkUzZ0MG81eHRxWFNoZDluNWZzUytJTWNPYXJ2S1lnYjJL?=
- =?utf-8?B?b204K29EdXFpTHF6SktPK0Y5Vlh4c0NqL29oWFREUXdOMCs4TEk5a2ZHb3RX?=
- =?utf-8?B?T2drZXF1N3BTVEFQNzVWK2dBYnpxa0d3NjRjazJBd1ZvRURxalNBQm9ycDM3?=
- =?utf-8?B?a0g4MHZIbXU2eExrWHgyTjY2cnBZY0ZUMnIxMVVMS3ZvcjBZTUZScHU1Y1ps?=
- =?utf-8?B?L2tLM3VSWHk2L2tabmRHM0FmV2dPaDY1ZkQ2TE1sK3NvcERWaitGY0pHWHNZ?=
- =?utf-8?B?d0dQYzkxUDVYWnF2eWNQeHVaenRoclY0SG83alhLc1J0MnlwRGhTeEs3QmI4?=
- =?utf-8?B?Mm4zc1hBMEl5b1hMblAvYTBKQjhrekhGTm1qV0NEc0dxY1owS2svMENreGN2?=
- =?utf-8?B?ZkRyc3pGM1I2TWRjbzc0RzlEM3FwcFhZSVRxY1VMa3VBb3BnZ01kNk9Sbk9q?=
- =?utf-8?B?ZllzOWxQWXhHY2NaUVA3TFlJZ2dYWGJyYkdRdUlOZ0Yrc1h0aDNOWGx2Sktt?=
- =?utf-8?B?MjdJd0JCVUxtUGhkMzBkVjh6SDQybzVkUE1HUkpvVFlSc2l1L1VSUnFKM2hw?=
- =?utf-8?B?NDdJeWkxM1MyVnlWY3kyQ2had2tXUVZkcG9McDhsN1lSU0FiRGs5bVBRVzNZ?=
- =?utf-8?B?c0E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 79d8cc54-55ed-4f97-acce-08dde3bc8a01
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2025 09:48:26.6906
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dJDpKIW0jaxm0dgWE7PWo62s57l3JgXeE0neCsiAnLzVlPyRePfygd1XV6WRzitZBoOth2bwhrxMe7WcUb4Pp9ts/5gJ2g/lcZFPAzznQKA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5939
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3] net: ethernet: stmmac: dwmac-rk: Make the
+ clk_phy could be used for external phy
+To: Marek Szyprowski <m.szyprowski@samsung.com>,
+ Chaoyi Chen <kernel@airkyi.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Jonas Karlman <jonas@kwiboo.se>, David Wu <david.wu@rock-chips.com>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-rockchip@lists.infradead.org
+References: <20250815023515.114-1-kernel@airkyi.com>
+ <CGME20250825072312eucas1p2d4751199c0ea069c7938218be60e5e93@eucas1p2.samsung.com>
+ <a30a8c97-6b96-45ba-bad7-8a40401babc2@samsung.com>
+Content-Language: en-US
+From: Chaoyi Chen <chaoyi.chen@rock-chips.com>
+In-Reply-To: <a30a8c97-6b96-45ba-bad7-8a40401babc2@samsung.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-HM-Tid: 0a98e0a9922903abkunm8d311f8d115b06e
+X-HM-MType: 1
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFDSUNOT01LS0k3V1ktWUFJV1kPCRoVCBIfWUFZQk0ZSlYfTR1CGB8dSx9IS01WFRQJFh
+	oXVRMBExYaEhckFA4PWVdZGBILWUFZTkNVSUlVTFVKSk9ZV1kWGg8SFR0UWUFZT0tIVUpLSU9PT0
+	hVSktLVUpCS0tZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=fX6zBgaTEeGN0mpna6Hvlzu9hPBOaJ7ysGmaTVSCNEshJ9NI0YvqT5dN41kV5vWU0MQxI0TSU8F7UxzWsQA9frFPm3X79taqass4ZUIJaPhcySrUKlvo3GWS8gfLxFa1RstO8YkKTk7RqkHJ2hQjZJeTm8Bl3jwoy9sEqJzh9HQ=; c=relaxed/relaxed; s=default; d=rock-chips.com; v=1;
+	bh=EVpH2Wm83g8Rb+u3uT+a83bsfBledd8G1BDKOR8Jgq0=;
+	h=date:mime-version:subject:message-id:from;
 
-On 8/24/25 13:20, Kohei Enju wrote:
-> Currently, the RSS indirection table configured by user via ethtool is
-> reinitialized to default values during interface resets (e.g., admin
-> down/up, MTU change). As for RSS hash key, commit 3dfbfc7ebb95 ("ixgbe:
-> Check for RSS key before setting value") made it persistent across
-> interface resets.
-> 
-> By adopting the same approach used in igc and igb drivers which
-> reinitializes the RSS indirection table only when the queue count
-> changes, let's make user configuration persistent as long as queue count
-> remains unchanged.
-> 
-> Tested on Intel Corporation 82599ES 10-Gigabit SFI/SFP+ Network
-> Connection.
-> 
-> Test:
-> Set custom indirection table and check the value after interface down/up
-> 
->    # ethtool --set-rxfh-indir ens5 equal 2
->    # ethtool --show-rxfh-indir ens5 | head -5
-> 
->    RX flow hash indirection table for ens5 with 12 RX ring(s):
->        0:      0     1     0     1     0     1     0     1
->        8:      0     1     0     1     0     1     0     1
->       16:      0     1     0     1     0     1     0     1
->    # ip link set dev ens5 down && ip link set dev ens5 up
-> 
-> Without patch:
->    # ethtool --show-rxfh-indir ens5 | head -5
-> 
->    RX flow hash indirection table for ens5 with 12 RX ring(s):
->        0:      0     1     2     3     4     5     6     7
->        8:      8     9    10    11     0     1     2     3
->       16:      4     5     6     7     8     9    10    11
-> 
-> With patch:
->    # ethtool --show-rxfh-indir ens5 | head -5
-> 
->    RX flow hash indirection table for ens5 with 12 RX ring(s):
->        0:      0     1     0     1     0     1     0     1
->        8:      0     1     0     1     0     1     0     1
->       16:      0     1     0     1     0     1     0     1
-> 
-> Signed-off-by: Kohei Enju <enjuk@amazon.com>
-> ---
->   drivers/net/ethernet/intel/ixgbe/ixgbe.h      |  1 +
->   drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 37 +++++++++++++------
->   2 files changed, 27 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-> index 14d275270123..d8b088c90b05 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-> @@ -838,6 +838,7 @@ struct ixgbe_adapter {
->    */
->   #define IXGBE_MAX_RETA_ENTRIES 512
->   	u8 rss_indir_tbl[IXGBE_MAX_RETA_ENTRIES];
-> +	u16 last_rss_i;
->   
->   #define IXGBE_RSS_KEY_SIZE     40  /* size of RSS Hash Key in bytes */
->   	u32 *rss_key;
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> index 80e6a2ef1350..dc5a8373b0c3 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> @@ -4318,14 +4318,22 @@ static void ixgbe_setup_reta(struct ixgbe_adapter *adapter)
->   	/* Fill out hash function seeds */
->   	ixgbe_store_key(adapter);
->   
-> -	/* Fill out redirection table */
-> -	memset(adapter->rss_indir_tbl, 0, sizeof(adapter->rss_indir_tbl));
-> +	/* Update redirection table in memory on first init or queue count
-> +	 * change, otherwise preserve user configurations. Then always
-> +	 * write to hardware.
-> +	 */
-> +	if (adapter->last_rss_i != rss_i) {
-> +		memset(adapter->rss_indir_tbl, 0,
-> +		       sizeof(adapter->rss_indir_tbl));
+Hi Marek,
 
-Thank you for the patch,
-I see no point in the memset() above, especially given 0 as a valid
-entry in the table.
+On 8/25/2025 3:23 PM, Marek Szyprowski wrote:
+> On 15.08.2025 04:35, Chaoyi Chen wrote:
+>> From: Chaoyi Chen <chaoyi.chen@rock-chips.com>
+>>
+>> For external phy, clk_phy should be optional, and some external phy
+>> need the clock input from clk_phy. This patch adds support for setting
+>> clk_phy for external phy.
+>>
+>> Signed-off-by: David Wu <david.wu@rock-chips.com>
+>> Signed-off-by: Chaoyi Chen <chaoyi.chen@rock-chips.com>
+>> ---
+>>
+>> Changes in v3:
+>> - Link to V2: https://lore.kernel.org/netdev/20250812012127.197-1-kernel@airkyi.com/
+>> - Rebase to net-next/main
+>>
+>> Changes in v2:
+>> - Link to V1: https://lore.kernel.org/netdev/20250806011405.115-1-kernel@airkyi.com/
+>> - Remove get clock frequency from DT prop
+>>
+>>    drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 11 +++++++----
+>>    1 file changed, 7 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+>> index ac8288301994..5d921e62c2f5 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+>> @@ -1412,12 +1412,15 @@ static int rk_gmac_clk_init(struct plat_stmmacenet_data *plat)
+>>    		clk_set_rate(plat->stmmac_clk, 50000000);
+>>    	}
+>>    
+>> -	if (plat->phy_node && bsp_priv->integrated_phy) {
+>> +	if (plat->phy_node) {
+>>    		bsp_priv->clk_phy = of_clk_get(plat->phy_node, 0);
+>>    		ret = PTR_ERR_OR_ZERO(bsp_priv->clk_phy);
+>> -		if (ret)
+>> -			return dev_err_probe(dev, ret, "Cannot get PHY clock\n");
+>> -		clk_set_rate(bsp_priv->clk_phy, 50000000);
+>> +		/* If it is not integrated_phy, clk_phy is optional */
+>> +		if (bsp_priv->integrated_phy) {
+>> +			if (ret)
+>> +				return dev_err_probe(dev, ret, "Cannot get PHY clock\n");
+>> +			clk_set_rate(bsp_priv->clk_phy, 50000000);
+>> +		}
 
-> +
-> +		for (i = 0, j = 0; i < reta_entries; i++, j++) {
-> +			if (j == rss_i)
-> +				j = 0;
->   
-> -	for (i = 0, j = 0; i < reta_entries; i++, j++) {
-> -		if (j == rss_i)
-> -			j = 0;
-> +			adapter->rss_indir_tbl[i] = j;
-> +		}
->   
-> -		adapter->rss_indir_tbl[i] = j;
-> +		adapter->last_rss_i = rss_i;
->   	}
->   
->   	ixgbe_store_reta(adapter);
-> @@ -4347,12 +4355,19 @@ static void ixgbe_setup_vfreta(struct ixgbe_adapter *adapter)
->   					*(adapter->rss_key + i));
->   	}
->   
-> -	/* Fill out the redirection table */
-> -	for (i = 0, j = 0; i < 64; i++, j++) {
-> -		if (j == rss_i)
-> -			j = 0;
-> +	/* Update redirection table in memory on first init or queue count
-> +	 * change, otherwise preserve user configurations. Then always
-> +	 * write to hardware.
-> +	 */
-> +	if (adapter->last_rss_i != rss_i) {
-> +		for (i = 0, j = 0; i < 64; i++, j++) {
-> +			if (j == rss_i)
-> +				j = 0;
-> +
-> +			adapter->rss_indir_tbl[i] = j;
-> +		}
->   
-> -		adapter->rss_indir_tbl[i] = j;
-> +		adapter->last_rss_i = rss_i;
->   	}
->   
->   	ixgbe_store_vfreta(adapter);
+I think  we should set bsp_priv->clk_phy to NULL here if we failed to get the clock.
 
+Could you try this on your board? Thank you.
+
+>>    	}
+>>    
+>>    	return 0;
+> The above change lacks the following check ingmac_clk_enable(): if (!bsp_priv->integrated_phy) return 0;
+>
+> Otherwise it blows on machines with integrated PHY, like Hardkernel's Odroid-M1 (RK3568 based):
+>
+> rk_gmac-dwmac fe2a0000.ethernet: IRQ eth_lpi not found
+> rk_gmac-dwmac fe2a0000.ethernet: IRQ sfty not found
+> rk_gmac-dwmac fe2a0000.ethernet: clock input or output? (output).
+> rk_gmac-dwmac fe2a0000.ethernet: TX delay(0x4f).
+> rk_gmac-dwmac fe2a0000.ethernet: RX delay(0x2d).
+> rk_gmac-dwmac fe2a0000.ethernet: integrated PHY? (no).
+> Unable to handle kernel paging request at virtual address fffffffffffffffe
+> Mem abort info:
+>     ESR = 0x0000000096000006
+>     EC = 0x25: DABT (current EL), IL = 32 bits
+>     SET = 0, FnV = 0
+>     EA = 0, S1PTW = 0
+>     FSC = 0x06: level 2 translation fault
+> Data abort info:
+>     ISV = 0, ISS = 0x00000006, ISS2 = 0x00000000
+>     CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+>     GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+> swapper pgtable: 4k pages, 48-bit VAs, pgdp=000000000249e000
+> [fffffffffffffffe] pgd=0000000000000000, p4d=000000000376f403, pud=0000000003770403, pmd=0000000000000000
+> Internal error: Oops: 0000000096000006 [#1]  SMP
+> Modules linked in: snd_soc_rockchip_i2s_tdm snd_soc_rk817 snd_soc_core snd_compress snd_pcm_dmaengine rockchip_thermal snd_pcm dwmac_rk(+) hantro_vpu rockchip_saradc industrialio_triggered_buffer kfifo_buf stmmac_platform rockchip_rga v4l2_vp9 stmmac spi_rockchip_sfc(+) v4l2_h264 snd_timer pcs_xpcs rockchipdrm(+) videobuf2_dma_sg v4l2_jpeg rk805_pwrkey v4l2_mem2mem videobuf2_dma_contig dw_hdmi_qp rockchip_dfi rk817_charger videobuf2_memops analogix_dp videobuf2_v4l2 dw_mipi_dsi panfrost snd rtc_rk808 drm_dp_aux_bus videodev drm_shmem_helper soundcore dw_hdmi videobuf2_common drm_display_helper mc gpu_sched ahci_dwc ipv6
+> CPU: 3 UID: 0 PID: 154 Comm: systemd-udevd Not tainted 6.17.0-rc1+ #10875 PREEMPT
+> Hardware name: Hardkernel ODROID-M1 (DT)
+> pstate: 60400009 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+> pc : clk_prepare+0x18/0x44
+> lr : gmac_clk_enable+0xf8/0x188 [dwmac_rk]
+> ..
+> Call trace:
+>    clk_prepare+0x18/0x44 (P)
+>    gmac_clk_enable+0xf8/0x188 [dwmac_rk]
+>    rk_gmac_powerup+0x4c/0x1f0 [dwmac_rk]
+>    rk_gmac_probe+0x3b4/0x5c8 [dwmac_rk]
+>    platform_probe+0x5c/0xac
+>    really_probe+0xbc/0x298
+>    __driver_probe_device+0x78/0x12c
+>    driver_probe_device+0x40/0x164
+>    __driver_attach+0x9c/0x1ac
+>    bus_for_each_dev+0x74/0xd0
+>    driver_attach+0x24/0x30
+>    bus_add_driver+0xe4/0x208
+>    driver_register+0x60/0x128
+>    __platform_driver_register+0x24/0x30
+>    rk_gmac_dwmac_driver_init+0x20/0x1000 [dwmac_rk]
+>    do_one_initcall+0x64/0x308
+>    do_init_module+0x58/0x23c
+>    load_module+0x1b48/0x1dc4
+>    init_module_from_file+0x84/0xc4
+>    idempotent_init_module+0x188/0x280
+>    __arm64_sys_finit_module+0x68/0xac
+>    invoke_syscall+0x48/0x110
+>    el0_svc_common.constprop.0+0xc8/0xe8
+>    do_el0_svc+0x20/0x2c
+>    el0_svc+0x4c/0x160
+>    el0t_64_sync_handler+0xa0/0xe4
+>    el0t_64_sync+0x198/0x19c
+> Code: 910003fd f9000bf3 52800013 b40000e0 (f9400013)
+> ---[ end trace 0000000000000000 ]---
+>
+> Best regards
 
