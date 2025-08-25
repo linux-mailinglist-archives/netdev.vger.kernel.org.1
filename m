@@ -1,110 +1,139 @@
-Return-Path: <netdev+bounces-216608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44349B34B2B
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 21:54:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 815DFB34B46
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 21:59:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E2D71A8787D
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 19:54:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E381C7A6895
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 19:58:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9672A286416;
-	Mon, 25 Aug 2025 19:54:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAFF428314E;
+	Mon, 25 Aug 2025 19:59:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IoeOEwER"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3IofVtIW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB5826B08F;
-	Mon, 25 Aug 2025 19:54:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39E4BA41
+	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 19:59:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756151643; cv=none; b=d4f/GTyI7VP/QMko/j9+LU4p1lAuDH0aN/c8zlLW+zGizRjqqLb0kV/JKCot6zgBWasZdJb5TutpvhIEhd6KXzscfZT2C3D95YqqwLRdogq2oMo08JZ5HWnKFbzucbNmopf6C1smK5pR1q6KFZWoUVk1kkPciTUxYfJCWP3PYsk=
+	t=1756151991; cv=none; b=MBNhFwKDIgszHsqxswYoVMYidwja8CE20x3CdTIgUIm9E/cTWRdldXm+wRpovxHOaTxge3KrcDOaCHHJY8c2l7urp9zXMyuovK95sj5njA0UFy/KpZSwtNQvYoSEL8s8ay4ohTMruVkPXV1xuWNO0lE5Ai+NrlLxYg43nYJxHyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756151643; c=relaxed/simple;
-	bh=pncAPkXt8am82BvZrMraZwDvu8s/RK9Sq6BRR53zrHo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LBDdK1qofmmRHFk5xBOD4olTpAswGwhSKsijh9Q2nSQ5RVPTlFrgRRTr/YUonY800w2SEYgS/Y44XOIoa5LdcggZsqdmoSUmpbbZgbS9iNbHmtU1VWvZFKZ4xsQU9tWnjXPvGWW1CTXraKsgRpgkLEPWRGFhSX/tcv6/sY86E1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IoeOEwER; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2460757107bso43719315ad.2;
-        Mon, 25 Aug 2025 12:54:01 -0700 (PDT)
+	s=arc-20240116; t=1756151991; c=relaxed/simple;
+	bh=glsm83R6oNoVhhgrfjwM08D8039fsQNqkjfxbjJ2ffE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=a36ftL884cJK+Xc8cOpGelbd+wmeLeAuw1XNhGPAUAlEWBElXACK84dlZbL5MPo1V5OV8cPF5rv0zIzM3vK8UvXNTbWX+ifh6uXu8CyyezJOHQI41L2WZw6lkICiaYDO6WGeSznZkEp/jzb9WdwZrxvViXTqehufYoHugHvfWQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3IofVtIW; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-7e8706abd44so1212224385a.3
+        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 12:59:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756151641; x=1756756441; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hblcTV6SRi+i2kQ1j/WNk4ZeI9irz/NCFtS96Usun4A=;
-        b=IoeOEwERTcleGECFUBx0/Y+3J6AkhXQ4uckSclPnVwMsFo6K62WLpNNgbMIBycPW9s
-         2+ROF/Wel7FYM8CoYTnQEJoL6M8OBB8PUrpCzekGfe2xna3vJUSgkdCvvEaDtRhGffJX
-         wCTkqN906DprVb9VdphzrtQwPNYRqLvE9uhfUPYb09b/ZFkbeaPgm6tB4sup0YAabnNk
-         Ng7Rw/GoHbffS0MPLD84NuTn7kwB3THWuAT5SICHBfTDYWhRpBKlZGhKF4LIVbKeGiad
-         GFnnXCFNF+FelPAVpOlcOR6NHwOKB2eel55ChXwIeWTL3ww+9QtfAn5B9pOh7+N0ndqR
-         UCBg==
+        d=google.com; s=20230601; t=1756151989; x=1756756789; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=g+VF5JeaL2SpqPPN38+S2J3BhfJbB+3/JLIjXWvGWzY=;
+        b=3IofVtIW1yWEohFN2fYvTfPC8HBeAvrlyIkue1GvBphCdA2/Ma4vbVLPWkbM+vEHn/
+         hA60DKLTXRheSNL1UpzdyPBKXsYdZwiDKA1u6fU22tabjUORw7nGfpkP80ovA0FfPigJ
+         Zu6wsWz8zpkr+nrYSkRCT+00o8y6UdWmHe3KufeJh2cRl4Uq/syUsIMlBbX/ot9WvC7K
+         8mrnKvDyGYqlEY6I+B1/HjnsuJScrtO+xdl6CN69UzhlvyUmZ1+TRx7BvtBgA92//2rX
+         R3P578t589PRzOa34vUERyRNFV+oV/nQGY36AeJ79es33gV8dV/NvLQltkotB6mBlj9o
+         AjyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756151641; x=1756756441;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hblcTV6SRi+i2kQ1j/WNk4ZeI9irz/NCFtS96Usun4A=;
-        b=i/QVdcx3e5b6qM60yMZ+wtLp2y7ijsdQe5ehjlkEFpTWYL3KrbzEWXL9AZBFB9ZmJc
-         wiRpTwg9aEK4t/nka4rsoKPPbPlKRCox7xpKAIVtN8ToqH8TsX75TDXUnISHF6/f9Zp3
-         t7mU0QJHDthmugnCnku1SdQPdxERaSoMZSZ1la0mz3B+2iqoYvV3jhWrTvDKPYIUQL62
-         /IucJ6FIrcnpcjg+Mv3MGkoJgy7eDM04WKVOotKtx8KN2Nfd5T2/zyKMKhlQ/+mfNBgw
-         W0xvieLym0LwL+uxcJUtUqmp9ZGXJcdbwbHo2IoSr0w+3biK9lIiVZzqx7PqE9dTleSi
-         CRbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWOUcF3+RV96SYMWBIg/9Ksq16IZNDf1GLqh8Pi09YL9ET8Ihb3Tu1o/x42QTHrPRDQwETdIKxE58PU4lG3MIQ=@vger.kernel.org, AJvYcCXs4jgaXVwe82/wl4CJAAdqipwgkEKYkvJ3dEcmsnteM2wmSmgYUPYz+0RcBMQHP1IAkOFjD3d0@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHctd4M/8VqghHu6jJMm/WBZLPQD3aOB5L7YnBrSpUC6kEnC/9
-	i3woXadtztBJfn7BhC6HtE1EGY+Mg7NdmsfK5lNimKLJNfkOAl8CoXI=
-X-Gm-Gg: ASbGnctRzLiX3jTGs2naP1dXi3StZ0ulYwJIDYzhkbUplwMdTJdmTluCo8Haim7Irz3
-	k9qKfqQRStmVz5qtyCPfjMXq67fx8+53T/dSKnvAC77CBrnJ6tMxKo6LOolIL8NYr5XilGks88+
-	0qaE3LyWWmzBj1Zy3u3ryyaKDCjz9YlGUrLMImC6iqj0l4R3FSQ5A9I3jqFOE+3ewVkWR93yrSS
-	gJpiaXBNt0xjRppopheKpDD5A73YKjwQuwrb21owEy+TPhVm87zgpKaZ+wuXgqpBC6DqF824ie8
-	6byXad/SoZCXtAZFY0SKPMteQdRqn07NVvuFpPAgBYbOrIGY1MtZRpBQoW3qUHgIfcipkNvrYve
-	j39ZckdwGO54tBFCdjnBgPrUHDk3etmC1x8Buxo6QDW0BV3sbUaiDmF5+a52crWtzb90PAZWRUb
-	BzF8TqyZ2qHHIGodblVAnrK7mzYPMS+0FQQT6SyLwdGj8+ag7Oo891VhkblKw7VTjMWgxLpxWav
-	MZeUEjb/Ej0aTU=
-X-Google-Smtp-Source: AGHT+IHSI9Jv0vkVHj88ZxRs9n3Bdir5DaO8ys4HWy9D8pgM4ip5mTtAJ0fVKE+2dWyrIUgE6o1Suw==
-X-Received: by 2002:a17:903:3845:b0:21f:1202:f2f5 with SMTP id d9443c01a7336-2462edabc8fmr159339055ad.8.1756151641220;
-        Mon, 25 Aug 2025 12:54:01 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2466889dcd4sm75611285ad.158.2025.08.25.12.54.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Aug 2025 12:54:00 -0700 (PDT)
-Date: Mon, 25 Aug 2025 12:54:00 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	shuah@kernel.org, almasrymina@google.com, sdf@fomichev.me,
-	joe@dama.to, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v2 5/5] selftests: drv-net: ncdevmem: explicitly
- set HDS threshold to 0
-Message-ID: <aKy_WJPrwNwOxOAc@mini-arch>
-References: <20250825180447.2252977-1-kuba@kernel.org>
- <20250825180447.2252977-6-kuba@kernel.org>
+        d=1e100.net; s=20230601; t=1756151989; x=1756756789;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=g+VF5JeaL2SpqPPN38+S2J3BhfJbB+3/JLIjXWvGWzY=;
+        b=T2+GWgbTZ216m/7NaAu4jQ1bsH0nNu8cKoLoW0G3s2tGAU0I5iazixouK9A9ZZyKQL
+         EA0RSFCH7uW7RMV0FK1c6h92ko3vVq+A7bLkSme/gab+kH/IBaZPHgtmeZRQMJHp1qKA
+         cQXUu8eyO7AjHTlajTSKY+4Bhpmw72oIOaaJfYDNrm0ocCAyt/nMmLO/9zBfhdMbSvTZ
+         xKn0Wc4F0Ov1y4gFXNBxw9xhv2Zbo0nJlMeP2ZOdK/Zuibo3QjEgR4xFpOc3xhgvbL/Y
+         RzE9YNs1Yh3ILuwri54/0HekL0JJtHOyyjbHN+V7JTGqtw+sOJz3zzoJcrHMI+5LkIJu
+         43yQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUOzf2cQpaqQLPyUCP2YyN2wYr8hcoj+Uk6cnB5Y/QYAAOo+27+Ev4mEl7PBRW4cQnALmWrP5c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoUa9UmPu6PyJ9uFZuODyLMdPQ2XR4mhHKxDypU3wmjWAJkr1a
+	brRIyoclsZczcyf5o3O/mhwjxtVj2ZoTRqqTypkE8yxP6FGThKwubh6kpHfCp6LCQme5E3DRZEp
+	MkCF99/bnw4stFw==
+X-Google-Smtp-Source: AGHT+IFEWTkmWFqqU9uC3yPnlRh8CjzOFfpX93y6JrmmEGK1eF8VqyQvmGl3nYf8nWRbb0XT6dNZIVfw/e59xg==
+X-Received: from qknpq1.prod.google.com ([2002:a05:620a:84c1:b0:7e2:e9ed:1448])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:a80c:b0:7e8:18d5:4b8d with SMTP id af79cd13be357-7ea11096af1mr1341562185a.42.1756151989047;
+ Mon, 25 Aug 2025 12:59:49 -0700 (PDT)
+Date: Mon, 25 Aug 2025 19:59:44 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250825180447.2252977-6-kuba@kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.261.g7ce5a0a67e-goog
+Message-ID: <20250825195947.4073595-1-edumazet@google.com>
+Subject: [PATCH net-next 0/3] net: better drop accounting
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 08/25, Jakub Kicinski wrote:
-> Make sure we set HDS threshold to 0 if the device supports changing it.
-> It's required for ZC.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> v2:
->  - split from previous patch
->  - only touch hds if device supports it
+Incrementing sk->sk_drops for every dropped packet can
+cause serious cache line contention.
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+Move sk_drops into a separate cache line so that
+the consumer reads packets faster.
+
+Add sk->sk_drops1 field for basic NUMA awareness
+at low memory cost.
+
+Tested:
+see the 2nd patch changelog for test setup.
+(One UDP receiving socket)
+
+Before:
+
+Udp6InDatagrams                 615091             0.0
+Udp6InErrors                    3904277            0.0
+Udp6RcvbufErrors                3904277            0.0
+
+After:
+
+Udp6InDatagrams                 914537             0.0
+Udp6InErrors                    6888487            0.0
+Udp6RcvbufErrors                6888487            0.0
+
+Eric Dumazet (3):
+  net: add sk_drops_read(), sk_drops_inc() and sk_drops_reset() helpers
+  net: move sk_drops out of sock_write_rx group
+  net: add new sk->sk_drops1 field
+
+ include/net/sock.h                            | 43 +++++++++++++++++--
+ include/net/tcp.h                             |  2 +-
+ net/core/datagram.c                           |  2 +-
+ net/core/sock.c                               | 15 +++----
+ net/ipv4/ping.c                               |  2 +-
+ net/ipv4/raw.c                                |  6 +--
+ net/ipv4/udp.c                                | 14 +++---
+ net/ipv6/datagram.c                           |  2 +-
+ net/ipv6/raw.c                                |  8 ++--
+ net/ipv6/udp.c                                |  6 +--
+ net/iucv/af_iucv.c                            |  4 +-
+ net/netlink/af_netlink.c                      |  4 +-
+ net/packet/af_packet.c                        |  2 +-
+ net/phonet/pep.c                              |  6 +--
+ net/phonet/socket.c                           |  2 +-
+ net/sctp/diag.c                               |  2 +-
+ net/tipc/socket.c                             |  6 +--
+ .../selftests/bpf/progs/bpf_iter_netlink.c    |  3 +-
+ .../selftests/bpf/progs/bpf_iter_udp4.c       |  2 +-
+ .../selftests/bpf/progs/bpf_iter_udp6.c       |  2 +-
+ 20 files changed, 84 insertions(+), 49 deletions(-)
+
+-- 
+2.51.0.261.g7ce5a0a67e-goog
+
 
