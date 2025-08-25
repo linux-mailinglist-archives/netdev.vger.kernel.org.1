@@ -1,281 +1,495 @@
-Return-Path: <netdev+bounces-216662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 434AAB34DC3
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 23:15:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 81BDAB34DCA
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 23:19:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C4DA1B25638
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 21:16:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D5D11B2574F
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 21:19:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8BEB1DE4CE;
-	Mon, 25 Aug 2025 21:15:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BE58246BA4;
+	Mon, 25 Aug 2025 21:19:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K0UWJXym"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="nJSNDwPC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6D37AD2C;
-	Mon, 25 Aug 2025 21:15:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756156541; cv=fail; b=u79FJynR4CCuTjSuB5V6MKvTEt5utrnxdn5nGkSiJqMMndVS7e/JVL654NPwf5tTlpM2cEcHGBOoQqmJMa9evwqRr7ZsspAESIRyNBqQhWQAEEl8ZpffAMAwcAZUKb0//4rb/7OYukcTcsOCPjG4rYvMrdssUYvyQYwvAXYlNoE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756156541; c=relaxed/simple;
-	bh=owj4cmMb39od/MH2bPj1cZH8xSyh3d4rh+/VUT42Y0g=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=CUF67/e4QASlGR0SVpij7NAobo2LRUI9YrisJd8oLJD0sYaYhi2VBy2YbOaXEh0cfW3/K4Kh4YQmtHKjcHG7+HqR3R8gfQbHPn4UL52vVe44dkigyXmknZ7/4crhoSTZ1mSZKlj5qa/+Ei4s/JI38nsRhh7PVuRFStguUVK8/X0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K0UWJXym; arc=fail smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756156540; x=1787692540;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=owj4cmMb39od/MH2bPj1cZH8xSyh3d4rh+/VUT42Y0g=;
-  b=K0UWJXymQUnGMU6S+AXblkfBtJZ2HgiXD/CRx3fuxqoHE9bSaVAhxfew
-   qJusXpdk0lQZIxMUkw0e61TzgVcXqQwgbs51PmhBkRwePQC/03yDIQPrL
-   PFxTRskyDEIDYQo0SPYSXW1FDbxvr4rapakbQUdsTtvVR5cS29tK60MUn
-   UhgbQ7gHi1vm36nZkMnw7x6+gSgvB24UFq/pd/a4m7THyE7d61YOg6cRD
-   Xy9OdLb33urJTtgebkrxww/7oLKvQSftJRn26/jSImVFXbraMX4SAAcfV
-   AySB6ieGhbQdght8mtv/H8MMJqo/dDDNHDPBMRv8TU5jjRwPZ/N+6Fbi4
-   g==;
-X-CSE-ConnectionGUID: 4XxvzTqIQcO3vs8UlsFs6Q==
-X-CSE-MsgGUID: TATdTjbZR5mm1Pi0Kg0dAQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11533"; a="58241754"
-X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
-   d="scan'208";a="58241754"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2025 14:15:36 -0700
-X-CSE-ConnectionGUID: QxXmt5wMTdau0LQ6yKhvyQ==
-X-CSE-MsgGUID: RLGpccB0T0etNQTm7bK5tg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
-   d="scan'208";a="168609786"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2025 14:15:36 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Mon, 25 Aug 2025 14:15:35 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Mon, 25 Aug 2025 14:15:35 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (40.107.237.41)
- by edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Mon, 25 Aug 2025 14:15:35 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Ox4Nt2Yc2JNlUvIIbPqVdmxm61c1mWw1Dp20Jg9iSo5INQgnwDc0LqDis+7UoYyzqQWfJxU/roWCFVEcxN+0DI2vtmsyqD6F2dvJgDVPzb2VJgHmLk+lY9xHBt+aHw1z3eRHhP7v/7gP242dbYQP32qlEblKI6PyWAT4s/yk2Er8KvwiVPUD15Cjha+Z5OCZnKxlAVHjPy15JpeVn7M3BWdjzLGHCO8KMluUQ/C/55WaNTmXujiHGOwx1TzmP2j8Mw/OQa61cjGPkV+0TuQCd0oq8LHGPon7EFmAeULbuWBd56bvO2PHbBPaZa9Ntr9XBIf2Fc9nzRTwaix2BbltXA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ICK1RyAlUORSpyI1A1+r6Ucy8tuo2tlGpeTjzEhO7BQ=;
- b=Axu/jvAaJWzmkRb/AxBdqmv8QepnEKaQqzPEoXy6NMJL1zbjk58fihKsDHbYcXuS207wtMlQmJGlxf90B/UwyjtapUL803AiFSmSbPHRQNnYMIXPkp70GIJMfpkHD1HQBVMKpTfgK2lN2wTuv7UMLviF/QOnuvlf7RKgloYLeBORyVPAoXGdl3Wg8GGFZrmBHpymw2crrUsGp8gunqswuQGJXsfjG/KnzJgimh8HwualYZRQJcNplkYedCK/7S+hR3XY+GYkoxbIgCJIB6TeuyCIuSrKY0OUpOwPO/lLJBb7f68Rh/THfWS/5kymvlsD+8+dFtYgIgjV4/OyScpQQQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- PH0PR11MB4968.namprd11.prod.outlook.com (2603:10b6:510:39::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9052.21; Mon, 25 Aug 2025 21:15:33 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca%4]) with mapi id 15.20.9052.019; Mon, 25 Aug 2025
- 21:15:33 +0000
-Date: Mon, 25 Aug 2025 23:15:20 +0200
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <bjorn@kernel.org>, <magnus.karlsson@intel.com>,
-	<jonathan.lemon@gmail.com>, <sdf@fomichev.me>, <ast@kernel.org>,
-	<daniel@iogearbox.net>, <hawk@kernel.org>, <john.fastabend@gmail.com>,
-	<horms@kernel.org>, <andrew+netdev@lunn.ch>, <bpf@vger.kernel.org>,
-	<netdev@vger.kernel.org>, Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next v2 0/9] xsk: improvement performance in copy mode
-Message-ID: <aKzSaA73Kq3mZ+Mp@boxer>
-References: <20250825135342.53110-1-kerneljasonxing@gmail.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250825135342.53110-1-kerneljasonxing@gmail.com>
-X-ClientProxiedBy: DB7PR02CA0013.eurprd02.prod.outlook.com
- (2603:10a6:10:52::26) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F9A623C8A0;
+	Mon, 25 Aug 2025 21:18:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756156744; cv=none; b=Y1640yz+oHhOS4mlEf8stu+ESUqNwVsap1QLPE6B16GfvSlQGfLEz3+31m1WIpg2/EGfKr+ASdOzMio5YUynYe2/QWPFBi6FFhkND2qH6Urv6h+K2yHi7Xf3wjv+++jyGmLnXqk9AzCwNkS8y30JO15BAyebC+cbwPvFo6z8iw4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756156744; c=relaxed/simple;
+	bh=IBf9R/jbM7FXbKp35VSZ+kbDW4k1c2DtMeNnvb/BPdM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Jw4h1QPd28RStFJB2HyWMH4ELcuYimj3hpfWLQFkkLe5dO62KxRERJjHoXp3uR/WEoFbWm5C2WTMY1ezVe6DKcm9EOc1i7DIffKyOKHKYELNHTPQRbGhV/S+EBg75Ac5MWEOrVERP8Anyu3m/Ba4cGXAAOC84FeSAlG0rqcBaDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=nJSNDwPC; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from simon-Latitude-5450.fritz.box (p5dc88c67.dip0.t-ipconnect.de [93.200.140.103])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 57PLIosS015318
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 25 Aug 2025 23:18:51 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1756156731;
+	bh=IBf9R/jbM7FXbKp35VSZ+kbDW4k1c2DtMeNnvb/BPdM=;
+	h=From:To:Cc:Subject:Date;
+	b=nJSNDwPCUYIp5yN8DisHP+MsHVgyaMlNRFP/lccQm/8MKLEO1CX8oju8QNry0HjkA
+	 NIUHcw8ARDKcfvZKyNTf5Ax1vu8m7SsKHzAbv18qP7EvCrF8Ye5jon6ksXlRTZEHPI
+	 HbSCVJxlw0UFEG6FE1+GWhDKTtnzSHgxMDQUMhKM=
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+To: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Simon Schippers <simon.schippers@tu-dortmund.de>,
+        Tim Gebauer <tim.gebauer@tu-dortmund.de>
+Subject: [PATCH net v3] TUN/TAP: Improving throughput and latency by avoiding SKB drops
+Date: Mon, 25 Aug 2025 23:16:03 +0200
+Message-ID: <20250825211832.84901-1-simon.schippers@tu-dortmund.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|PH0PR11MB4968:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8568d42a-ea7f-4130-6b19-08dde41c86ec
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?vtY75u+2EAr77CWqdwHrph2FUpuIFllrXP06gUXm9e526TGRExKJCoiEygtq?=
- =?us-ascii?Q?uPTY3qF6NI07dq1U18bsnxQaYVLoxaaurlL01LqUDLU7TvRp5cWYqiLNkyM9?=
- =?us-ascii?Q?I0I23nADEiubfGyC22gidj6yjVg+VgF6/B0KcwEGVOSTM1uZOoUVy9jBZgFP?=
- =?us-ascii?Q?GeWWwhrUB3EmR3D0tANXKfpGcJyeIImGb4MavkTNISXpyCmDFTGIRStifZ+W?=
- =?us-ascii?Q?/z4FKHUafiUWIMUJS2PHpWN4d2AdIVTXCFMwTqxOM9dm97+7hG30tXFC/mV1?=
- =?us-ascii?Q?GqbmszCNM0mNwkM4A9YGEiSLYKi0CcKJF5qEmELcu4AsXhcK487JZJkS6mcU?=
- =?us-ascii?Q?kEM6nko6kQFdCqwYo78sOx/yYmupGYqoz81r1oA3QiUS+ygpJPCEImcXBkb3?=
- =?us-ascii?Q?Ttdv8YsfhfXr/dNobVXPPhzDyZkoornO4KtzI3WqY8jDdooUDvG1ffUSKPRU?=
- =?us-ascii?Q?ctbrjabSPs8Ke4srtlZ2PoCm2MdYFGC29cpfmZcNrOU9XhFMxPu4lQ9J9YR9?=
- =?us-ascii?Q?EYK5oN1xz3zgPtTRrDKu1DhGnNpEHVUHZm1l1h75lAK8+twxFjbiHZxuYa1h?=
- =?us-ascii?Q?Dkj4McoreLvA6LnEsP9ASxz4la+TocadaEA8SriFgaZ23+0mo97qjVp6RBTa?=
- =?us-ascii?Q?TtKbPFA6HDrPw0J9suD6fOYBuy2h5FDtxoy6IiFOkacZ0XzzM0CtnIpRVSGI?=
- =?us-ascii?Q?xH2d29ZawJJ5U5ZWzcKXbzjYJxbbo8CWz01jk3MfBmvGeeKg8fs8UWplm6zU?=
- =?us-ascii?Q?FIgXAl88VKeqx+LMaX2lEavsUx6gZ9RwZAvDOfH7/woCk3sfwawpcIc8SD9g?=
- =?us-ascii?Q?3M8N8tN8YL3oVIgB1nAGboPUFeXSIBEM7pWRZ0uOYY/OrcWiPRDu9vtRdXFQ?=
- =?us-ascii?Q?sL59CgXwPRMNtp1EnijAqK9jciiLfihqUDVGuFcvNhFfNq7iM8xDIwMlAGYl?=
- =?us-ascii?Q?7tvoL24OU8NgM5W67sKdhxI0Lg+wzAMp+H0TyuNqv5cdj7Cs5zGAT4FqqdaD?=
- =?us-ascii?Q?AVZ2SlOxjpIlKQp4eLbj1XQmsXeJVESfDTZNebu15ie4bsjefbhDn45zL66V?=
- =?us-ascii?Q?82m9HvG44JzQgDKJ5FU7fHNfLWgtgPS1iVr2fIHCBT5OEOTJT4uT+1AvDGY5?=
- =?us-ascii?Q?3K/IMbBA1zjsDc9RXDC6LqwEJhSAETih5LZI8SOUS2a+NVyzIv0duqUe8d3i?=
- =?us-ascii?Q?T//l7hmpLwQPwv/Zkyb1ldXyyd0BwSIGZuiZ4bnJlljlXGKZAHenrnehNTZD?=
- =?us-ascii?Q?lzlJV0Fcm6WMNRAipUeX8oMn1uIGm/2VuLuUkpXSfX3p0+1BRB1BFmXNd+NL?=
- =?us-ascii?Q?D/kNcVrOKtz8LanKX/STQZsPjoaIul6FES/mpojyoD40vKGOeEedr/XcgOwd?=
- =?us-ascii?Q?L5X2HP0JZmpkbutIcemDNt8hfxeyVBTygUIk0rjgjM/J4VY4cM1nbt81f2Ee?=
- =?us-ascii?Q?vHqZGkM6FYg=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?TJYIpLtdm6IHr7i8d8ZPFVdrvNfGOjQCjrJviF0w5O7RsPn+o7ec4NffpkP8?=
- =?us-ascii?Q?Dlh7vNxzdQ3u9N3lJwrV9ByWvMDjXCP1oFN6nKvjndL4jZqh82icjbfB3AH1?=
- =?us-ascii?Q?PSUCh9Kfc44OJuK6J6EA1stC1Dt1v9IePWXRxMk4I9D8FdTbf5bcHQtMASFg?=
- =?us-ascii?Q?rEiXHmJJHwlZvPHzEESFd0fI6uuGJbW1yFaQQK4t2/wkVMogJ4QZ+tkWpEjC?=
- =?us-ascii?Q?9r8qilcmAZfFBFmx7Xas+juA7NSF5u4T8ulHkKoeYbSCzWOvvpR+sbjaRRdV?=
- =?us-ascii?Q?aia0eQkay4nyjjQE8FW/nD6ojGP/Owyd229v8kzl35CwUcZvpfryJZk08f37?=
- =?us-ascii?Q?Et25AQyfESouL9lajQMBVt/RehninLRQAAS3zzotw7Vpj9IfNK/OrE2a8Q1M?=
- =?us-ascii?Q?nlWc1QOqdbVqVs/d0tWbyV6Z3IoR/6sGJkq5fobyj2ZiplD/Vsf7dKvHO1L5?=
- =?us-ascii?Q?/7QvBX/NjwQ9y+rsrGCq15kBKpxb1KkEau6LNhuwBYeqdDQCrgy9EwqMdAGa?=
- =?us-ascii?Q?swQrWjbqhMGw2BAv6+ZyNcnZlCtspt66TeRUPY2A34hxAIf3xxETw5dgK7aE?=
- =?us-ascii?Q?ROepRcof6jq+eqzanBLl0eXutXKDpngBOM2Z/XeeOwVk2eR2sRsFvVyxSKMO?=
- =?us-ascii?Q?EUmSkPk79q4uUT2Pat2c/A26KqkcnrrbmmCjsutIY3YHSgIN4oQjNKiULDMk?=
- =?us-ascii?Q?hWs77hAK+jQmIev3ryAmj/hgSwvoBpVXl2RVxh73NEAKdtEQ7rLiZJEbXiMw?=
- =?us-ascii?Q?xOjl0aBd6+B2CjeQiI4GGOoPsBsaY6thRTZxLI2J9HfW35O/jODQG/uZ2Wfe?=
- =?us-ascii?Q?rWiS6hbOhfmZd1C8aHRY/rD39K+vHHsiL1VctatralHkoQuKwLjGsV74c+GH?=
- =?us-ascii?Q?ZH44c6cazAfEakUIiSdjjN9NQnEjssV72r6LzUKUa9cBX73WQ+FrEAOiOqfL?=
- =?us-ascii?Q?tlkiJg0AaJ2IlIuWdHkcho7aRMjfy9A3GF0K7EEU6MajAYhczade6M0xjUVp?=
- =?us-ascii?Q?kbNt7d/N/s7bPEmXDfj7EyDhlut23bwAoM/7pYw2KwVmREAY2P/Jo6H856dL?=
- =?us-ascii?Q?U4wA5cHTm7Zu5XAWQWLzS6BhFBEL/CK77y6bA4er62pO2TA0lrU+OeZyekKF?=
- =?us-ascii?Q?JanhrT47rX7yXIH+z+m1hDzf2lEHxd+sJFT4LnsiiWFRunFm7PVSMYW3lZMU?=
- =?us-ascii?Q?PWTA3N5fwAPLYFBNtPG6gvBqNjlltzK/n0SviruRqORuyhj+ToTVy88KgGwa?=
- =?us-ascii?Q?yBKWtmSNWhws9LvcpffVIDqk3Y9DSMzLc133A8NsTWCJvlCPAM4LWgwXSh3W?=
- =?us-ascii?Q?gHsGdYUiQRDKAPQQDATgiZQedWzZQ7JxJVzwzeJajC6CE6d9pk1kcEhJ3mUG?=
- =?us-ascii?Q?gJWBiwiOu4rwU9Jt2VdbEdWOgaWVBAArVYfN1Ta2ic1tczg82Uq8xhopCcN5?=
- =?us-ascii?Q?hWLOR4rE2p7Kp9xGvYOniYCT/fS0uni+Crw17Gqjv1WvQvfpDMfYlpGkTKo1?=
- =?us-ascii?Q?AY1ScQFBtyn+707TMC0SqGNweCvFTeUU+OjjIgBLX0c5SYrvI42X0DW6kb7e?=
- =?us-ascii?Q?1P2qYQEjp5SEL1xk9GCuze/6ubdUNKFpjHmjVa1D6AP4h2Tiuj3CFAmdOJ7P?=
- =?us-ascii?Q?jg=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8568d42a-ea7f-4130-6b19-08dde41c86ec
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2025 21:15:33.1836
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gWlHpXSosgaqYVbFZXUIvtyQcJ68SeNrZ859LUWLIHBKzS+Z4DxwLWzXoVzDQ2wqE2elMb1378lgviYOnn0jrdOIZiMVKWAe+gV+jwTeXY4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4968
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
-On Mon, Aug 25, 2025 at 09:53:33PM +0800, Jason Xing wrote:
-> From: Jason Xing <kernelxing@tencent.com>
-> 
-> Like in VM using virtio_net, there are not that many machines supporting
-> advanced functions like multi buffer and zerocopy. Using xsk copy mode
-> becomes a default choice.
+This patch is a result of our paper [1] and deals with the tun_net_xmit
+function which drops SKB's with the reason SKB_DROP_REASON_FULL_RING
+whenever the tx_ring (TUN queue) is full. This behavior results in reduced
+TCP performance and packet loss for VPNs and VMs. In addition this patch
+also allows qdiscs to work properly (see [2]) and to reduce buffer bloat
+when reducing the TUN queue.
 
-Are you saying that lack of multi-buffer support in xsk zc virtio_net's
-support stops you from using zc in your setup? or is it something else?
+TUN benchmarks:
++-----------------------------------------------------------------+
+| Lab setup of our paper [1]:                                     |
+| TCP throughput of VPN solutions at varying RTT (values in Mbps) |
++-----------+---------------+---------------+----------+----------+
+| RTT [ms]  | wireguard-go  | wireguard-go  | OpenVPN  | OpenVPN  |
+|           |               | patched       |          | patched  |
++-----------+---------------+---------------+----------+----------+
+| 10        | 787.3         | 679.0         | 402.4    | 416.9    |
++-----------+---------------+---------------+----------+----------+
+| 20        | 765.1         | 718.8         | 401.6    | 393.18   |
++-----------+---------------+---------------+----------+----------+
+| 40        | 441.5         | 529.4         | 96.9     | 411.8    |
++-----------+---------------+---------------+----------+----------+
+| 80        | 218.7         | 265.7         | 57.9     | 262.7    |
++-----------+---------------+---------------+----------+----------+
+| 120       | 145.4         | 181.7         | 52.8     | 178.0    |
++-----------+---------------+---------------+----------+----------+
 
-> 
-> Zerocopy mode has a good feature named multi buffer while copy mode
-> has to transmit skb one by one like normal flows. The latter becomes a
-> half bypass mechanism to some extent compared to thorough bypass plan
-> like DPDK. To avoid much consumption in kernel as much as possible,
-> then bulk/batch xmit plan is proposed. The thought of batch xmit is
-> to aggregate packets in a certain small group like GSO/GRO and then
-> read/allocate/build/send them in different loops.
-> 
-> Experiments:
-> 1) Tested on virtio_net on Tencent Cloud.
-> copy mode:     767,743 pps
-> batch mode:  1,055,201 pps (+37.4%)
-> xmit.more:     940,398 pps (+22.4%)
-> Side note:
-> 1) another interesting test is if we test with another thread
-> competing the same queue, a 28% increase (from 405,466 pps to 52,1076 pps)
++--------------------------------------------------------------------+
+| Real-world setup of our paper [1]:                                 |
+| TCP throughput of VPN solutions without and with the patch         |
+| at a RTT of ~120 ms (values in Mbps)                               |
++------------------+--------------+--------------+---------+---------+
+| TUN queue        | wireguard-go | wireguard-go | OpenVPN | OpenVPN |
+| length [packets] |              | patched      |         | patched |
++------------------+--------------+--------------+---------+---------+
+| 5000             | 185.8        | 185.6        | 184.7   | 184.8   |
++------------------+--------------+--------------+---------+---------+
+| 1000             | 185.1        | 184.9        | 177.1   | 183.0   |
++------------------+--------------+--------------+---------+---------+
+| 500 (default)    | 137.5        | 184.9        | 117.4   | 184.6   |
++------------------+--------------+--------------+---------+---------+
+| 100              | 99.8         | 185.3        | 66.4    | 183.5   |
++------------------+--------------+--------------+---------+---------+
+| 50               | 59.4         | 185.7        | 21.6    | 184.7   |
++------------------+--------------+--------------+---------+---------+
+| 10               | 1.7          | 185.4        | 1.6     | 183.6   |
++------------------+--------------+--------------+---------+---------+
 
-wrong comma - 521,076
+TAP benchmarks:
++------------------------------------------------------------------+
+| Lab Setup [3]:                                                   |
+| TCP throughput from host to Debian VM using TAP (values in Mbps) |
++----------------------------+------------------+------------------+
+| TUN queue                  | Default          | Patched          |
+| length [packets]           |                  |                  |
++----------------------------+------------------+------------------+
+| 1000 (default)             | 2194.3           | 2185.0           |
++----------------------------+------------------+------------------+
+| 100                        | 1986.4           | 2268.5           |
++----------------------------+------------------+------------------+
+| 10                         | 625.0            | 1988.9           |
++----------------------------+------------------+------------------+
+| 1                          | 2.2              | 1112.7           |
++----------------------------+------------------+------------------+
+|                                                                  |
++------------------------------------------------------------------+
+| Measurement with 1000 packets queue and emulated delay           |
++----------------------------+------------------+------------------+
+| RTT [ms]                   | Default          | Patched          |
++----------------------------+------------------+------------------+
+| 60                         | 171.8            | 341.2            |
++----------------------------+------------------+------------------+
+| 120                        | 98.3             | 255.0            |
++----------------------------+------------------+------------------+
 
-> can be observed.
-> 2) xmit 'more' item is built on top of batch mode. The number can slightly
-> decrease according to different implementations in host.
-> 
-> 2) Tested on i40e at 10Gb/sec.
-> copy mode:   1,109,754 pps
-> batch mode:  2,393,498 pps (+115.6%)
-> xmit.more:   3,024,110 pps (+172.5%)
-> zc mode:    14,879,414 pps
-> 
-> [2]: ./xdpsock -i eth1 -t  -S -s 64
+TAP+vhost_net benchmarks:
++----------------------------------------------------------------------+
+| Lab Setup [3]:                                                       |
+| TCP throughput from host to Debian VM using TAP+vhost_net            |
+| (values in Mbps)                                                     |
++-----------------------------+--------------------+-------------------+
+| TUN queue                   | Default            | Patched           |
+| length [packets]            |                    |                   |
++-----------------------------+--------------------+-------------------+
+| 1000 (default)              | 23403.9            | 23858.8           |
++-----------------------------+--------------------+-------------------+
+| 100                         | 23372.5            | 23889.9           |
++-----------------------------+--------------------+-------------------+
+| 10                          | 25837.5            | 23730.2           |
++-----------------------------+--------------------+-------------------+
+| 1                           | 0.7                | 19244.8           |
++-----------------------------+--------------------+-------------------+
+| Note: Default suffers from many retransmits, while patched does not. |
++----------------------------------------------------------------------+
+|                                                                      |
++----------------------------------------------------------------------+
+| Measurement with 1000 packets queue and emulated delay               |
++-----------------------------+--------------------+-------------------+
+| RTT [ms]                    | Default            | Patched           |
++-----------------------------+--------------------+-------------------+
+| 60                          | 397.1              | 397.8             |
++-----------------------------+--------------------+-------------------+
+| 120                         | 200.7              | 199.9             |
++-----------------------------+--------------------+-------------------+
 
-Have you tested jumbo frames? Did you run xskxceiver tests?
+Implementation details:
+- The netdev queue start/stop flow control is utilized.
+- Compatible with multi-queue by only stopping/waking the specific
+netdevice subqueue.
 
-IMHO this should be sent as RFC. In some further patch you're saying you
-were not sure about some certain thing, so let us discuss it and overall
-approach.
+In the tun_net_xmit function:
+- Stopping the subqueue is done when the tx_ring gets full after inserting
+the SKB into the tx_ring.
+- In the unlikely case when the insertion with ptr_ring_produce fails, the
+old dropping behavior is used for this SKB.
 
-Besides, please work on top of the recent fix that got accepted:
-https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?id=dd9de524183a1ca0a3c0317a083e8892e0f0eaea
+In the tun_ring_recv function:
+- Waking the subqueue is done after consuming a SKB from the tx_ring when
+the tx_ring is empty.
+- When the tx_ring is configured to be small (for example to hold 1 SKB),
+queuing might be stopped in the tun_net_xmit function while at the same
+time, ptr_ring_consume is not able to grab a SKB. This prevents
+tun_net_xmit from being called again and causes tun_ring_recv to wait
+indefinitely for a SKB in the blocking wait queue. Therefore, the netdev
+queue is woken in the wait queue.
 
-> 
-> It's worth mentioning batch process might bring high latency in certain
-> cases like shortage of memroy. So I didn't turn it as the default
+In the tap_do_read function:
+- Same behavior as in tun_ring_recv: Waking the subqueue when the tx_ring
+is empty & waking the subqueue in the blocking wait queue.
+- Here the netdev txq is obtained with a rcu read lock instead.
 
-memory
+In the vhost_net_buf_produce function:
+- Same behavior as in tun_ring_recv: Waking the subqueue when the tx_ring
+is empty.
+- Here the netdev_queue is saved in the vhost_net_virtqueue at init with
+new helpers.
 
-> feature for copy mode. The recommended value is 32.
-> 
-> ---
-> V2
-> Link: https://lore.kernel.org/all/20250811131236.56206-1-kerneljasonxing@gmail.com/
-> 1. add xmit.more sub-feature (Jesper)
-> 2. add kmem_cache_alloc_bulk (Jesper and Maciej)
-> 
-> Jason Xing (9):
->   xsk: introduce XDP_GENERIC_XMIT_BATCH setsockopt
->   xsk: add descs parameter in xskq_cons_read_desc_batch()
->   xsk: introduce locked version of xskq_prod_write_addr_batch
->   xsk: extend xsk_build_skb() to support passing an already allocated
->     skb
->   xsk: add xsk_alloc_batch_skb() to build skbs in batch
->   xsk: add direct xmit in batch function
->   xsk: support batch xmit main logic
->   xsk: support generic batch xmit in copy mode
->   xsk: support dynamic xmit.more control for batch xmit
-> 
->  Documentation/networking/af_xdp.rst |  11 ++
->  include/linux/netdevice.h           |   3 +
->  include/net/xdp_sock.h              |  10 ++
->  include/uapi/linux/if_xdp.h         |   1 +
->  net/core/dev.c                      |  21 +++
->  net/core/skbuff.c                   | 103 ++++++++++++++
->  net/xdp/xsk.c                       | 200 ++++++++++++++++++++++++++--
->  net/xdp/xsk_queue.h                 |  29 +++-
->  tools/include/uapi/linux/if_xdp.h   |   1 +
->  9 files changed, 360 insertions(+), 19 deletions(-)
-> 
-> -- 
-> 2.41.3
-> 
+We are open to suggestions regarding the implementation :)
+Thank you for your work!
+
+[1] Link:
+https://cni.etit.tu-dortmund.de/storages/cni-etit/r/Research/Publications/2025/Gebauer_2025_VTCFall/Gebauer_VTCFall2025_AuthorsVersion.pdf
+[2] Link:
+https://unix.stackexchange.com/questions/762935/traffic-shaping-ineffective-on-tun-device
+[3] Link: https://github.com/tudo-cni/nodrop
+
+Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+---
+V2 -> V3: Added support for TAP and TAP+vhost_net.
+V1 -> V2: Removed NETDEV_TX_BUSY return case in tun_net_xmit and removed 
+unnecessary netif_tx_wake_queue in tun_ring_recv.
+
+ drivers/net/tap.c      | 35 +++++++++++++++++++++++++++++++++++
+ drivers/net/tun.c      | 39 +++++++++++++++++++++++++++++++++++----
+ drivers/vhost/net.c    | 24 ++++++++++++++++++++++--
+ include/linux/if_tap.h |  5 +++++
+ include/linux/if_tun.h |  6 ++++++
+ 5 files changed, 103 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+index 1197f245e873..df7e4063fb7c 100644
+--- a/drivers/net/tap.c
++++ b/drivers/net/tap.c
+@@ -758,6 +758,8 @@ static ssize_t tap_do_read(struct tap_queue *q,
+ 			   int noblock, struct sk_buff *skb)
+ {
+ 	DEFINE_WAIT(wait);
++	struct netdev_queue *txq;
++	struct net_device *dev;
+ 	ssize_t ret = 0;
+ 
+ 	if (!iov_iter_count(to)) {
+@@ -785,12 +787,26 @@ static ssize_t tap_do_read(struct tap_queue *q,
+ 			ret = -ERESTARTSYS;
+ 			break;
+ 		}
++		rcu_read_lock();
++		dev = rcu_dereference(q->tap)->dev;
++		txq = netdev_get_tx_queue(dev, q->queue_index);
++		netif_tx_wake_queue(txq);
++		rcu_read_unlock();
++
+ 		/* Nothing to read, let's sleep */
+ 		schedule();
+ 	}
+ 	if (!noblock)
+ 		finish_wait(sk_sleep(&q->sk), &wait);
+ 
++	if (ptr_ring_empty(&q->ring)) {
++		rcu_read_lock();
++		dev = rcu_dereference(q->tap)->dev;
++		txq = netdev_get_tx_queue(dev, q->queue_index);
++		netif_tx_wake_queue(txq);
++		rcu_read_unlock();
++	}
++
+ put:
+ 	if (skb) {
+ 		ret = tap_put_user(q, skb, to);
+@@ -1176,6 +1192,25 @@ struct socket *tap_get_socket(struct file *file)
+ }
+ EXPORT_SYMBOL_GPL(tap_get_socket);
+ 
++struct netdev_queue *tap_get_netdev_queue(struct file *file)
++{
++	struct netdev_queue *txq;
++	struct net_device *dev;
++	struct tap_queue *q;
++
++	if (file->f_op != &tap_fops)
++		return ERR_PTR(-EINVAL);
++	q = file->private_data;
++	if (!q)
++		return ERR_PTR(-EBADFD);
++	rcu_read_lock();
++	dev = rcu_dereference(q->tap)->dev;
++	txq = netdev_get_tx_queue(dev, q->queue_index);
++	rcu_read_unlock();
++	return txq;
++}
++EXPORT_SYMBOL_GPL(tap_get_netdev_queue);
++
+ struct ptr_ring *tap_get_ptr_ring(struct file *file)
+ {
+ 	struct tap_queue *q;
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index cc6c50180663..30ddcd20fcd3 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -1060,13 +1060,16 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+ 
+ 	nf_reset_ct(skb);
+ 
+-	if (ptr_ring_produce(&tfile->tx_ring, skb)) {
++	queue = netdev_get_tx_queue(dev, txq);
++	if (unlikely(ptr_ring_produce(&tfile->tx_ring, skb))) {
++		netif_tx_stop_queue(queue);
+ 		drop_reason = SKB_DROP_REASON_FULL_RING;
+ 		goto drop;
+ 	}
++	if (ptr_ring_full(&tfile->tx_ring))
++		netif_tx_stop_queue(queue);
+ 
+ 	/* dev->lltx requires to do our own update of trans_start */
+-	queue = netdev_get_tx_queue(dev, txq);
+ 	txq_trans_cond_update(queue);
+ 
+ 	/* Notify and wake up reader process */
+@@ -2110,9 +2113,10 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+ 	return total;
+ }
+ 
+-static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
++static void *tun_ring_recv(struct tun_struct *tun, struct tun_file *tfile, int noblock, int *err)
+ {
+ 	DECLARE_WAITQUEUE(wait, current);
++	struct netdev_queue *txq;
+ 	void *ptr = NULL;
+ 	int error = 0;
+ 
+@@ -2124,6 +2128,7 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+ 		goto out;
+ 	}
+ 
++	txq = netdev_get_tx_queue(tun->dev, tfile->queue_index);
+ 	add_wait_queue(&tfile->socket.wq.wait, &wait);
+ 
+ 	while (1) {
+@@ -2131,6 +2136,9 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+ 		ptr = ptr_ring_consume(&tfile->tx_ring);
+ 		if (ptr)
+ 			break;
++
++		netif_tx_wake_queue(txq);
++
+ 		if (signal_pending(current)) {
+ 			error = -ERESTARTSYS;
+ 			break;
+@@ -2147,6 +2155,10 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+ 	remove_wait_queue(&tfile->socket.wq.wait, &wait);
+ 
+ out:
++	if (ptr_ring_empty(&tfile->tx_ring)) {
++		txq = netdev_get_tx_queue(tun->dev, tfile->queue_index);
++		netif_tx_wake_queue(txq);
++	}
+ 	*err = error;
+ 	return ptr;
+ }
+@@ -2165,7 +2177,7 @@ static ssize_t tun_do_read(struct tun_struct *tun, struct tun_file *tfile,
+ 
+ 	if (!ptr) {
+ 		/* Read frames from ring */
+-		ptr = tun_ring_recv(tfile, noblock, &err);
++		ptr = tun_ring_recv(tun, tfile, noblock, &err);
+ 		if (!ptr)
+ 			return err;
+ 	}
+@@ -3712,6 +3724,25 @@ struct socket *tun_get_socket(struct file *file)
+ }
+ EXPORT_SYMBOL_GPL(tun_get_socket);
+ 
++struct netdev_queue *tun_get_netdev_queue(struct file *file)
++{
++	struct netdev_queue *txq;
++	struct net_device *dev;
++	struct tun_file *tfile;
++
++	if (file->f_op != &tun_fops)
++		return ERR_PTR(-EINVAL);
++	tfile = file->private_data;
++	if (!tfile)
++		return ERR_PTR(-EBADFD);
++	rcu_read_lock();
++	dev = rcu_dereference(tfile->tun)->dev;
++	txq = netdev_get_tx_queue(dev, tfile->queue_index);
++	rcu_read_unlock();
++	return txq;
++}
++EXPORT_SYMBOL_GPL(tun_get_netdev_queue);
++
+ struct ptr_ring *tun_get_tx_ring(struct file *file)
+ {
+ 	struct tun_file *tfile;
+diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+index 6edac0c1ba9b..045fc31c59ff 100644
+--- a/drivers/vhost/net.c
++++ b/drivers/vhost/net.c
+@@ -130,6 +130,7 @@ struct vhost_net_virtqueue {
+ 	struct vhost_net_buf rxq;
+ 	/* Batched XDP buffs */
+ 	struct xdp_buff *xdp;
++	struct netdev_queue *netdev_queue;
+ };
+ 
+ struct vhost_net {
+@@ -182,6 +183,8 @@ static int vhost_net_buf_produce(struct vhost_net_virtqueue *nvq)
+ 	rxq->head = 0;
+ 	rxq->tail = ptr_ring_consume_batched(nvq->rx_ring, rxq->queue,
+ 					      VHOST_NET_BATCH);
++	if (ptr_ring_empty(nvq->rx_ring))
++		netif_tx_wake_queue(nvq->netdev_queue);
+ 	return rxq->tail;
+ }
+ 
+@@ -1469,6 +1472,21 @@ static struct socket *get_raw_socket(int fd)
+ 	return ERR_PTR(r);
+ }
+ 
++static struct netdev_queue *get_tap_netdev_queue(struct file *file)
++{
++	struct netdev_queue *q;
++
++	q = tun_get_netdev_queue(file);
++	if (!IS_ERR(q))
++		goto out;
++	q = tap_get_netdev_queue(file);
++	if (!IS_ERR(q))
++		goto out;
++	q = NULL;
++out:
++	return q;
++}
++
+ static struct ptr_ring *get_tap_ptr_ring(struct file *file)
+ {
+ 	struct ptr_ring *ring;
+@@ -1570,10 +1588,12 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
+ 		if (r)
+ 			goto err_used;
+ 		if (index == VHOST_NET_VQ_RX) {
+-			if (sock)
++			if (sock) {
+ 				nvq->rx_ring = get_tap_ptr_ring(sock->file);
+-			else
++				nvq->netdev_queue = get_tap_netdev_queue(sock->file);
++			} else {
+ 				nvq->rx_ring = NULL;
++			}
+ 		}
+ 
+ 		oldubufs = nvq->ubufs;
+diff --git a/include/linux/if_tap.h b/include/linux/if_tap.h
+index 553552fa635c..b15c40c86819 100644
+--- a/include/linux/if_tap.h
++++ b/include/linux/if_tap.h
+@@ -10,6 +10,7 @@ struct socket;
+ 
+ #if IS_ENABLED(CONFIG_TAP)
+ struct socket *tap_get_socket(struct file *);
++struct netdev_queue *tap_get_netdev_queue(struct file *file);
+ struct ptr_ring *tap_get_ptr_ring(struct file *file);
+ #else
+ #include <linux/err.h>
+@@ -18,6 +19,10 @@ static inline struct socket *tap_get_socket(struct file *f)
+ {
+ 	return ERR_PTR(-EINVAL);
+ }
++static inline struct netdev_queue *tap_get_netdev_queue(struct file *f)
++{
++	return ERR_PTR(-EINVAL);
++}
+ static inline struct ptr_ring *tap_get_ptr_ring(struct file *f)
+ {
+ 	return ERR_PTR(-EINVAL);
+diff --git a/include/linux/if_tun.h b/include/linux/if_tun.h
+index 80166eb62f41..552eb35f0299 100644
+--- a/include/linux/if_tun.h
++++ b/include/linux/if_tun.h
+@@ -21,6 +21,7 @@ struct tun_msg_ctl {
+ 
+ #if defined(CONFIG_TUN) || defined(CONFIG_TUN_MODULE)
+ struct socket *tun_get_socket(struct file *);
++struct netdev_queue *tun_get_netdev_queue(struct file *file);
+ struct ptr_ring *tun_get_tx_ring(struct file *file);
+ 
+ static inline bool tun_is_xdp_frame(void *ptr)
+@@ -50,6 +51,11 @@ static inline struct socket *tun_get_socket(struct file *f)
+ 	return ERR_PTR(-EINVAL);
+ }
+ 
++static inline struct netdev_queue *tun_get_netdev_queue(struct file *f)
++{
++	return ERR_PTR(-EINVAL);
++}
++
+ static inline struct ptr_ring *tun_get_tx_ring(struct file *f)
+ {
+ 	return ERR_PTR(-EINVAL);
+-- 
+2.43.0
+
 
