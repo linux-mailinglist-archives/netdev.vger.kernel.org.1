@@ -1,514 +1,224 @@
-Return-Path: <netdev+bounces-216390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216391-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EABD7B3365B
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 08:24:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76609B33673
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 08:28:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E8B63A1F60
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 06:24:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 415AE200AEE
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 06:28:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C14E51D63C5;
-	Mon, 25 Aug 2025 06:24:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0DD327FB34;
+	Mon, 25 Aug 2025 06:28:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="VW77D3vp"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OGyiev46"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f228.google.com (mail-pg1-f228.google.com [209.85.215.228])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E7D269811
-	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 06:24:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.228
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756103090; cv=none; b=U0nw/M1GT0B8tD9uHGlaiJUu/IjOXS6OVyJlo41Y6ydB7oZcZU+BGJ5Xk5EO/66oY5rVUWNTh2B1fXpiiOafANLmcKy/xzj0VUcYTsGeN60gZIt9SXBsOLz0LvfuoTUJwzxHL8wB4VnupYrEFy9CoLncNr03WlyjQwWSKISck4o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756103090; c=relaxed/simple;
-	bh=41LhHVmjFPYn9KDh33xptbOHcdx6lUM9HXzo97MhuHo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UHAf8fzhdCQ+HWp5na6et9/BjKh0Yvy+YPIpe43snkE+wZn8RkuI4qqZwwZeKwyY2vbQnT03m4sCWBEv2i0nSYTGvD+sFCuQP6rtnpQ1KoXM8wbcLghF5bW7/imegYe0PNIzVPLekvq4YF2Awi1lDAiwfPLv/00vKR2APhN/yjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=VW77D3vp; arc=none smtp.client-ip=209.85.215.228
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f228.google.com with SMTP id 41be03b00d2f7-b47173749dbso2811157a12.1
-        for <netdev@vger.kernel.org>; Sun, 24 Aug 2025 23:24:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756103088; x=1756707888;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Hj729TUeGpdnWZxZxNSW6tYulN0f0iQYSLTWvlKFhwo=;
-        b=gSpZ/mpViZy/jZyZE3xcAbSARIFrw3PXHff/H919SDJamE/p9dHtx/pDOZNYsTKipx
-         DeZEXI1RXtVDQVkEIvmtm0q4mZC1lQThwJPPDizEtrTFE0t85SxZpsag7kPHr2ev/UW1
-         3rJinzf5P7cjYQKtE5dpxDegIEjkDk28nO3klcn9BVBOTKnh1OsLJFXrZF4/r4wmhtrw
-         tHIEf9d9oU1l0RPanGq7CJnp0V6+mrXkIxmxEAEjikjXDoENkYT1gdUS6OV+z79PrE2V
-         SS7a4rgv0Ror2A/+Qt3BmjVrjY+QVCplTL6f06J98zHTHP70ASG6MHz9ATSeTvWSyMDZ
-         I7eQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXijmJPlSe1SHjXTezIQLcJFVuxcHuEETriV/CWPpvEEwcLpmtvpHxlgYMsallfj3imZ1r0rLo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yysvv9HYIuM4hnCc4pJf91lL0afyAePU9dE9OG4x9ZhIhMFqxHz
-	TvwwoaMy6cRgsaPzs/tulbmw0+6O+DfLpodRpDqNeJG1QbEBu0DPftevfcfgWdxPQIt6FCFICVW
-	31So+e95iMnCPWRsshMQh/5SJINB+BQsgrcse1E6d2Bk4ArTiY+jtyV2oHR5opRdK+1+fu8TwtY
-	nZyXafvK76J8MpDbLbk5R1jEQiYTs8VBAX4YrCT4+GEMTAJXbAw1BTth0nkpgR+UGQkyCBoNnG2
-	gsUEQy76urG
-X-Gm-Gg: ASbGncti/3KuTie8mtH7JOwXzoFGqbQ0MLcx88nrnhOiK7baVgHWwUObLFKr7BV7Vd/
-	TH4TKH5Jzhm3OngzwfkxP8qLuUS1qhxZciJyCxXdcZh92+cw1cYlrbl1kDcxqAIWSOcAzRAYP78
-	Dc5jNLlkYKRUtQq44ECUYPxNUrwPwK83jj9AE3Yjcn52YmhtprDXSszhn0xcwTFq6FWiJFJzsce
-	UOCUmKiO31rNqDW4GXDFG/a67/ElHnVhdjSe3kICkglTN6BlsKtglCOhv/5Zbblr7wXwNw6MgEp
-	EHkNKd9HDgSyxgFDpi+wh6/2Ka+uT27HH4g2C1F3apGbo/U0f5zhKYbA9MUw4D57mydKT4YLljd
-	x0hgoe5L9XTp8infTg1rBcCzXXbJAWCf/V5nd5vr3kTyAb98BIvX4W+4zr9D2wlatiUWeKK9yb7
-	bN
-X-Google-Smtp-Source: AGHT+IHZIkf8yFJBSzOSqnZI1YM9X3nFNge1CgRVgfBfGr9omwKQL/qJZkGfaRGpxqrTtbuq6BNfGWzBrUSN
-X-Received: by 2002:a17:902:e888:b0:240:640a:c560 with SMTP id d9443c01a7336-2462ee54507mr154111795ad.24.1756103088090;
-        Sun, 24 Aug 2025 23:24:48 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-16.dlp.protect.broadcom.com. [144.49.247.16])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-246688ae187sm5626485ad.75.2025.08.24.23.24.47
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 24 Aug 2025 23:24:48 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-ua1-f72.google.com with SMTP id a1e0cc1a2514c-89018ea59e0so6944736241.0
-        for <netdev@vger.kernel.org>; Sun, 24 Aug 2025 23:24:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1756103087; x=1756707887; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Hj729TUeGpdnWZxZxNSW6tYulN0f0iQYSLTWvlKFhwo=;
-        b=VW77D3vp6MQ7+Nqess5doS519Dkej6YYaAmBMPXj4WdJ5+XRYo+o1aaW12Widxn95k
-         XHro9gAE4J99Kw+wHkXq+EAxTurnSm1tBaTihO3f7AHC8BvsawCBbhXamrpLQwEaMGx3
-         eDv+tZak3cXYS+gGdinhpjDiAv02cUFduEle0=
-X-Forwarded-Encrypted: i=1; AJvYcCXpuWyK2cfYihjaEz4uDeSMv3JxGKYR5IE8cq7dJoY9HE6jQ6vEZCrUO+IJ1PV+J2iNKlyetFY=@vger.kernel.org
-X-Received: by 2002:a05:6102:26c4:b0:522:551b:de8a with SMTP id ada2fe7eead31-522551be1e9mr547657137.15.1756103087122;
-        Sun, 24 Aug 2025 23:24:47 -0700 (PDT)
-X-Received: by 2002:a05:6102:26c4:b0:522:551b:de8a with SMTP id
- ada2fe7eead31-522551be1e9mr547644137.15.1756103086668; Sun, 24 Aug 2025
- 23:24:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DDA227FD5A
+	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 06:28:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756103323; cv=fail; b=Ph1BfNZ7dXp6lGElbayecsoX1Dds4Kl1pSiQZtZVioci9Y24tgpyCDxzAozfdhvin4yEz0vay4hocn2ESeha31FK0/0rIP6hIJDpph2VZLOfuBaLv+ExqVwvz0GfF4M8k/YgZpJNkqjxCY2BTY/2uqaCDrT5NRmLFvGEOpEMzi8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756103323; c=relaxed/simple;
+	bh=MoECBey9NCILz5jXFqyS2LH5LapxJtHszuuUzkwatRE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=sIv8+o26tvGDiYGyteHLrZ4thlvPtE2g5Rh7kYkO3oMhnDphRJ2R4lU/mpFejTzSk8QsSXms0mharoG9sDz3KlIoI1hy6rOxIOV7Mm1aCStR4bZiI/AklrPEvCHOP6npH5H/+juA0fSABLPWf+vJjH0e/l1bllS1oNBRcUeiJwc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OGyiev46; arc=fail smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756103322; x=1787639322;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=MoECBey9NCILz5jXFqyS2LH5LapxJtHszuuUzkwatRE=;
+  b=OGyiev4611rrwVWhk5aE5l5SKpSrhNygtJo6+4Z0MJf1A4441azLK7uC
+   UgxLMWFjEAdCUAljKBZOMcvFf4lBzlCMLdEVDhRifCvNAbNA7h7Daz2Co
+   4wkcFlkYcWAsDXSG8Ws6UReQztfGgSDFw6BWkcbZWFEMx5DaVSzcUGY/k
+   cubVjfGzkl9xmDYxXDpRVIm8HWWXM/2GwwM4O6Noct+tHtSsLaCEYGmAZ
+   ijuNYUC2xzJ4so0Jdbj3HoaNN/KMZytPYoQ5A6CEbYpZ859UzOLvUD9Y1
+   xNQ0rgwoAfJH7mSQcs7mQddcXx3ftstwBYwnQgj/VqWsZtWsH65u098ME
+   g==;
+X-CSE-ConnectionGUID: 9yo8D7PySPeni5+A/BZ9vw==
+X-CSE-MsgGUID: lkGPyRsgQfypindt23Ph0Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11532"; a="58165984"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="58165984"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2025 23:28:37 -0700
+X-CSE-ConnectionGUID: BTKJfgjxRuKgB506tfnlPg==
+X-CSE-MsgGUID: UgMjk2LERJydQu/utUkneg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="169587641"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2025 23:28:37 -0700
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Sun, 24 Aug 2025 23:28:36 -0700
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Sun, 24 Aug 2025 23:28:36 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (40.107.92.82) by
+ edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Sun, 24 Aug 2025 23:28:35 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Yv3FHnF7UmHsM4YP3LzHeBJNv9qmTOpKZnIFL2/85/0VFxwPrMOyecnbF1Hy7zaPeoc+r7zJHjd8z/vFvL7gynN4+8t+vCk2uIof99av2Lg5pkyRSwYGgCVXsQ6bL6J5PxSdhDUObz3rx7E7CGX3zA7VC3+1+CHmMwSxCKxGXoev98Za0nvwA6sPPKyMppQoop21pgyUNf/hqFRoS+qpBuDSfi4NqawKuw2fbZY5Wy2IPYSVxbRjl2rzrEZNIWFWbqGqNmVRAuKGWOGZlf24ftzFBl9fWA0sSycocKpXbwV2zyaewN6IMPBWyeuSUTA+1ayZdWpbF710GXlwHPFNYg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1/z0KuemCmuV6RWjjZJrA5c2hZbQAqUOP5ofPdnWJEA=;
+ b=LLdgUNVFFMEpoju9SXaxyTFP6wBF4XctPDWTsm5WFAOu1xmOqK7fhand5pQ0WUarywOT6YJa+pQ/CPp+amkPS+SutoV/1bpHPqb6+jFDT/Q4b+fogftH6i+RKtKnWCDWCprVtxx4uUVYYU36t6lUN35Wo6plKV0XERKlB3KbBSnmuQTfTOSgO1vUhrB4Tks/DnSEGOnZGToAUgxujqbMICPEtYpnTHmvcMbQngUBFjuJrtOqtagX/sfS3jfJXj3Si7Zx/Pob4Ve2JiaLSVPFQIciCJ2r3g2e74qnZWFJBccyna2ik3VVy/Un/FhU0N9okpL2JdM23rx5/3e/J3sIvQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com (2603:10b6:208:3e9::5)
+ by SJ5PPFE5BD61D44.namprd11.prod.outlook.com (2603:10b6:a0f:fc02::85a) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.17; Mon, 25 Aug
+ 2025 06:28:31 +0000
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::7ac8:884c:5d56:9919]) by IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::7ac8:884c:5d56:9919%4]) with mapi id 15.20.9052.019; Mon, 25 Aug 2025
+ 06:28:29 +0000
+From: "Rinitha, SX" <sx.rinitha@intel.com>
+To: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>,
+	"Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-net v2] ixgbe: fix
+ ixgbe_orom_civd_info struct layout
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v2] ixgbe: fix
+ ixgbe_orom_civd_info struct layout
+Thread-Index: AQHcAhtkKi8AT96XVkaahJhcUCP7j7RzDVug
+Date: Mon, 25 Aug 2025 06:28:29 +0000
+Message-ID: <IA1PR11MB6241B7CCCFAC319D622B5F5D8B3EA@IA1PR11MB6241.namprd11.prod.outlook.com>
+References: <20250731124533.1683307-1-jedrzej.jagielski@intel.com>
+In-Reply-To: <20250731124533.1683307-1-jedrzej.jagielski@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR11MB6241:EE_|SJ5PPFE5BD61D44:EE_
+x-ms-office365-filtering-correlation-id: 21ce5b73-e87f-4ef8-9a37-08dde3a09b4d
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7053199007|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?Z5IUq9Fn/9UmIsJ/HApk6PBC/ODvQc0kN+r/xToQ0ZtXakf4ciI6A4W2TJUH?=
+ =?us-ascii?Q?ftfFQnZwkZiC5tRfIGEzJwnEgIKjbur3A9DHkj4T6cYyb7wY7nAwmlwKwIhi?=
+ =?us-ascii?Q?m9UiPsNc2lORuU2ndbqBQg/LDj8pdL6sYgHnTFbu1rOa5XAkt4h4caQd3oZU?=
+ =?us-ascii?Q?sz+FT0TJEHZuobZYywRgWEo2JkKy8B+NfABVlvDkqp831kHDAOnsArcdQ79k?=
+ =?us-ascii?Q?H+fqWGUOsQvMriyIItmst8Rrc3S4j2TjZqF400JtWpRDraPscDYS6UaQx5LB?=
+ =?us-ascii?Q?GXmjXnI9YyBUAaB7dhDtOxQy4BJJHs7Jfok6pbIMA+jcXNg5cDvZh+V7NDcM?=
+ =?us-ascii?Q?WHEEVEODvkRPOiDla/RL+hAJPtrqLe9rDligdHvfR0e77/yQPTyqG2NTA63f?=
+ =?us-ascii?Q?7l5o7aMdQz6eGzcakqJthjc2Rt2c+clkIIVVN3x9fSwBLVCwfxhbDAMSyZGW?=
+ =?us-ascii?Q?HIf0BPthJaz3z1mNyj5kEA6j5LBNUVPrBVx5By2/xPzSHKSEwdm1IyHzkK/S?=
+ =?us-ascii?Q?/m/eZpKUq6EatYhr3nHHsMdoSpldeIV9305b3J1L2//Rwvn7wQa7CZUr09Hp?=
+ =?us-ascii?Q?WvKtNW8wHD86CUtuoRwdly+vNCZDsKOSeOL7ksVDd7m6Ld6RJ+yEKnmSFXSj?=
+ =?us-ascii?Q?4LMAWdGmHqTKNToBQbh+F4MvVkW2pr3/Geh8d9CuHXTLn+GYKu3ByrHMRS6N?=
+ =?us-ascii?Q?5qQ8LgL0hqzM6q+oZfx6g3ydvejmi522P/nNp+MHIckf1NNDt+JWuvHR8lFi?=
+ =?us-ascii?Q?9qEcg8wKa0Bto9TMe0bFR7u0AnttavThrPfIC44Z0ykwVkP5oRxy0zG1BF/I?=
+ =?us-ascii?Q?0zNyauX2y7VWe9VW8dO9NBALmR/IMQ7oVmlPb8COrNOj7NSC0RnP7r0sjXkV?=
+ =?us-ascii?Q?2KcIv6IY9X0SzwDMcWrHFLYEkwXjkINdG/OHd8J4yh+JaJxiFgm0iDND8Xmy?=
+ =?us-ascii?Q?cIaZ8lfkbkPP8b0a4V3YrBJZbX5IhdAcM6QtZFfKYXY+qGbj1xLCM3GnuoVq?=
+ =?us-ascii?Q?Uk3oXG4z0WFGe8NdhwpsSIs3+NTO1ikrVw68J3BCyYzf8IyG2Ak2BeVzYkOV?=
+ =?us-ascii?Q?mV4Qoq0nzi+vOQPvpbPVj0UCrDgfTv46Yz6weP99g0TpDOlByN/NZ3bybY4X?=
+ =?us-ascii?Q?/G9dnOahc50mXpcE8FKw7rP329ERAFrDrPw9LuXgN9ihhnjH0+PE1/YFlHGD?=
+ =?us-ascii?Q?85tEkZzeLD6DQuZYfEZ2e6fmSVPX9AmeaG/7uyexEMHBJ0m3vIz/oNFztJO+?=
+ =?us-ascii?Q?g4MtffVpDpHZcDnDr9WEM/0hjMD24GgGsLrCc7B6M1CXUb+gJgqZ+1FxAHLw?=
+ =?us-ascii?Q?xFJ4cNMFGrTKWrALzv6dfYLKel8220xA03ApGmB+5oywW/ECvV+sS0LSj2ue?=
+ =?us-ascii?Q?tVNp8Xspb5OG9+lRUs6ZuoeQN7onlKHCwyumSY3COulvIvxDvID+7OnfnASM?=
+ =?us-ascii?Q?fooZIgDy7DTHWYxDfMwFHmymdNAXXt+RbBgYTiWcZRQVDGDby1KUyD/CbyZY?=
+ =?us-ascii?Q?rEFqlC9KDfRKu1Q=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7053199007)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Ma26EcE8WRFCi60NPhQHWvSixmMjSokEJiqpD3+eeb/vvVnu6SH0saBA9NoL?=
+ =?us-ascii?Q?9z2YgnsjGdiisJp2LKNe2pa7HZxRAFE9QpdlJMHFSBWaSy8/AAN7idqoHZyt?=
+ =?us-ascii?Q?Mky3ginAeVM81fzH6YqElXdU1VwlFSsbCxqpsT/dW6OMDKGi7JLToEMlPRnv?=
+ =?us-ascii?Q?tFXaiWfvOut2Sg1IHAUNcJtu8EGGLV3kqnKsjjBMFo7oJV2bWtI/Mvlinekf?=
+ =?us-ascii?Q?/qnwlScbQEGBNtj1petWOdlAc3OrgqcCnldSloauuhALh4glTc4q3DeSHEjl?=
+ =?us-ascii?Q?g39MFScAbkYItw/d+bBV08ukWUniPIFnEcFSfCHhIrMjA+QdetTFyfIwZZ6v?=
+ =?us-ascii?Q?XF/i9rfex0hqxNkiLKhTcbiObq4cG8Eio6PyCOjvdbigSQpNu1mi2r+amAUl?=
+ =?us-ascii?Q?FfiNWcee0dW6Lc1dlV4FykU/u1W4kNkQVjCr5Oy8q5XJOYv/wQ7JPdD3o5I0?=
+ =?us-ascii?Q?7x75Ex5A2ktKv996tiFn397Y/K3cPcgyDTA1FRstHtu278NJ3dtZvGsnbuMa?=
+ =?us-ascii?Q?TTdL8BjAiFRJwL2IQtyVF6TohHdrXxt+Q+qydXXH13Cd8SMA2bwhW7ukFgsR?=
+ =?us-ascii?Q?zpMut+Twga14JHruzwhb9VoY6/jdwOtu0JQvcT5dVIxDYglZoCZ0Jf4pRE5C?=
+ =?us-ascii?Q?AnweupWclE6rU9cKAc7qgwfFUoGSoqVCwPqnrv56/uKbWnZ0gsnQtuFMDRir?=
+ =?us-ascii?Q?NDtP2ggc05/Ycl6JCHij/r5TjIQ09pDwAKuRQHeRfUzNc5cTfmcDJDq2U7FS?=
+ =?us-ascii?Q?zzRBeMRHT4RxA7TyHyhwn7VII2EjnnIVfYF6zbJIZb6ZISuDOsfZlREOPmS7?=
+ =?us-ascii?Q?jZBP/73tDf1Hva19+cpGNO7uHwmy3K00wVwb5iCLl7vpEClX7qba30Q1X+oT?=
+ =?us-ascii?Q?nmYO10YWyij4K+nzsQ7GbR2hAWZJ7uePkMy8BaWgVo2lE4Z7TKuq6piBjFBx?=
+ =?us-ascii?Q?YFTfxcd7XDj7285vI7XugewLLYwg4DujwgWFtfeX48Z6KTceVZ2Wr2Ropm3V?=
+ =?us-ascii?Q?hZ8//q3pl0QMQ4b8IqgrXGIgg5iU3/qcAZoII8+8E38LXnZopLW1p6X5mMf9?=
+ =?us-ascii?Q?93yJG+zwlQeiIxoO7nDPGH+VXCDqX7WqjbH6cDcbznBgw/Zx2ygILXPQqB/J?=
+ =?us-ascii?Q?xyACeIHlAjGFmrq23yKYNJn5OoqfK6SOnSrqII0R/eMSYhPW9pA+46gU9id7?=
+ =?us-ascii?Q?nzEGl5vFa3VkuKNNunVpOq3gBt2HFbIy8qvPmKrXPHdLtst2/c7qWt7Igy7Q?=
+ =?us-ascii?Q?z7fDFDaAQI+2beT/BcSc51dwJRgdKydZmCmTMr+XBSYgPL3261czq7kPSq67?=
+ =?us-ascii?Q?vtLrihKShcFrD85fEOLUJ4Nm44cci9qZ0Z8TpsZhLoJJOT5hbpgzpB3OSC+2?=
+ =?us-ascii?Q?gbe0c+JsPFiw9yNISKa1Os1aGY9ZV9IkbxX8TPgJ9uuBNlUfljyLqrCAzs7Z?=
+ =?us-ascii?Q?xieYWqMwRUEsfzcYi+V93WG7Id1Z7kh0cnTqntjx7IhF9VXO35egJgK2jc8K?=
+ =?us-ascii?Q?B/BbM6RRxxq3Qv5mTrENMFjtIWDHmu7n/0YXzToJb3dKm7+OErCWnBvI/Huw?=
+ =?us-ascii?Q?kTvNqhqhqR28paWqc/h+xGVuJn7bcf1v8jcdHS8b?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1755499375.git.asml.silence@gmail.com> <397938dd32c6465250a137b55944f2ba46c6cc34.1755499376.git.asml.silence@gmail.com>
-In-Reply-To: <397938dd32c6465250a137b55944f2ba46c6cc34.1755499376.git.asml.silence@gmail.com>
-From: Somnath Kotur <somnath.kotur@broadcom.com>
-Date: Mon, 25 Aug 2025 11:54:35 +0530
-X-Gm-Features: Ac12FXyl2EixPxg7HMJchmyPpRJt9Ok3Fz-TI7h8PzOk4L8-I4PWchVwgu-OrbI
-Message-ID: <CAOBf=mt_3rJHztyncv=hF9nPhz8ZuOJscsyHgz_fapOQ9Twgrg@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 16/23] eth: bnxt: store the rx buf size per queue
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, andrew+netdev@lunn.ch, horms@kernel.org, 
-	davem@davemloft.net, sdf@fomichev.me, almasrymina@google.com, dw@davidwei.uk, 
-	michael.chan@broadcom.com, dtatulea@nvidia.com, ap420073@gmail.com, 
-	linux-kernel@vger.kernel.org, io-uring@vger.kernel.org
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000b7c3e5063d2a9c52"
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6241.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 21ce5b73-e87f-4ef8-9a37-08dde3a09b4d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Aug 2025 06:28:29.5775
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: bKit8DibG1czzZp5hB+908seeVqLCJdJDiP5iNAtg7mythg5K6Yn/kqnoQ9qj+QGZaM4qqBW7xtZ/lXueHtc5w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPFE5BD61D44
+X-OriginatorOrg: intel.com
 
---000000000000b7c3e5063d2a9c52
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Aug 18, 2025 at 7:45=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.=
-com> wrote:
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of J=
+edrzej Jagielski
+> Sent: 31 July 2025 18:16
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; netdev@vger.kernel.or=
+g; Jagielski, Jedrzej <jedrzej.jagielski@intel.com>; Loktionov, Aleksandr <=
+aleksandr.loktionov@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-net v2] ixgbe: fix ixgbe_orom_civd_=
+info struct layout
 >
-> From: Jakub Kicinski <kuba@kernel.org>
+> The current layout of struct ixgbe_orom_civd_info causes incorrect data s=
+torage due to compiler-inserted padding. This results in issues when writin=
+g OROM data into the structure.
 >
-> In normal operation only a subset of queues is configured for
-> zero-copy. Since zero-copy is the main use for larger buffer
-> sizes we need to configure the sizes per queue.
+> Add the __packed attribute to ensure the structure layout matches the exp=
+ected binary format without padding.
 >
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> Fixes: 70db0788a262 ("ixgbe: read the OROM version information")
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
 > ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 46 ++++++++++---------
->  drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  1 +
->  drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |  6 +--
->  drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h |  2 +-
->  4 files changed, 30 insertions(+), 25 deletions(-)
+> v2: use get_unaligned_le32() per Simon's suggestion
+> ---
+> drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c      | 2 +-
+> drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h | 2 +-
+> 2 files changed, 2 insertions(+), 2 deletions(-)
 >
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethe=
-rnet/broadcom/bnxt/bnxt.c
-> index 467e8a0745e1..50f663777843 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> @@ -900,7 +900,7 @@ static void bnxt_tx_int(struct bnxt *bp, struct bnxt_=
-napi *bnapi, int budget)
->
->  static bool bnxt_separate_head_pool(struct bnxt_rx_ring_info *rxr)
->  {
-> -       return rxr->need_head_pool || PAGE_SIZE > rxr->bnapi->bp->rx_page=
-_size;
-> +       return rxr->need_head_pool || PAGE_SIZE > rxr->rx_page_size;
->  }
->
->  static struct page *__bnxt_alloc_rx_page(struct bnxt *bp, dma_addr_t *ma=
-pping,
-> @@ -910,9 +910,9 @@ static struct page *__bnxt_alloc_rx_page(struct bnxt =
-*bp, dma_addr_t *mapping,
->  {
->         struct page *page;
->
-> -       if (PAGE_SIZE > bp->rx_page_size) {
-> +       if (PAGE_SIZE > rxr->rx_page_size) {
->                 page =3D page_pool_dev_alloc_frag(rxr->page_pool, offset,
-> -                                               bp->rx_page_size);
-> +                                               rxr->rx_page_size);
->         } else {
->                 page =3D page_pool_dev_alloc_pages(rxr->page_pool);
->                 *offset =3D 0;
-> @@ -1150,9 +1150,9 @@ static struct sk_buff *bnxt_rx_multi_page_skb(struc=
-t bnxt *bp,
->                 return NULL;
->         }
->         dma_addr -=3D bp->rx_dma_offset;
-> -       dma_sync_single_for_cpu(&bp->pdev->dev, dma_addr, bp->rx_page_siz=
-e,
-> +       dma_sync_single_for_cpu(&bp->pdev->dev, dma_addr, rxr->rx_page_si=
-ze,
->                                 bp->rx_dir);
-> -       skb =3D napi_build_skb(data_ptr - bp->rx_offset, bp->rx_page_size=
-);
-> +       skb =3D napi_build_skb(data_ptr - bp->rx_offset, rxr->rx_page_siz=
-e);
->         if (!skb) {
->                 page_pool_recycle_direct(rxr->page_pool, page);
->                 return NULL;
-> @@ -1184,7 +1184,7 @@ static struct sk_buff *bnxt_rx_page_skb(struct bnxt=
- *bp,
->                 return NULL;
->         }
->         dma_addr -=3D bp->rx_dma_offset;
-> -       dma_sync_single_for_cpu(&bp->pdev->dev, dma_addr, bp->rx_page_siz=
-e,
-> +       dma_sync_single_for_cpu(&bp->pdev->dev, dma_addr, rxr->rx_page_si=
-ze,
->                                 bp->rx_dir);
->
->         if (unlikely(!payload))
-> @@ -1198,7 +1198,7 @@ static struct sk_buff *bnxt_rx_page_skb(struct bnxt=
- *bp,
->
->         skb_mark_for_recycle(skb);
->         off =3D (void *)data_ptr - page_address(page);
-> -       skb_add_rx_frag(skb, 0, page, off, len, bp->rx_page_size);
-> +       skb_add_rx_frag(skb, 0, page, off, len, rxr->rx_page_size);
->         memcpy(skb->data - NET_IP_ALIGN, data_ptr - NET_IP_ALIGN,
->                payload + NET_IP_ALIGN);
->
-> @@ -1283,7 +1283,7 @@ static u32 __bnxt_rx_agg_netmems(struct bnxt *bp,
->                 if (skb) {
->                         skb_add_rx_frag_netmem(skb, i, cons_rx_buf->netme=
-m,
->                                                cons_rx_buf->offset,
-> -                                              frag_len, bp->rx_page_size=
-);
-> +                                              frag_len, rxr->rx_page_siz=
-e);
->                 } else {
->                         skb_frag_t *frag =3D &shinfo->frags[i];
->
-> @@ -1308,7 +1308,7 @@ static u32 __bnxt_rx_agg_netmems(struct bnxt *bp,
->                         if (skb) {
->                                 skb->len -=3D frag_len;
->                                 skb->data_len -=3D frag_len;
-> -                               skb->truesize -=3D bp->rx_page_size;
-> +                               skb->truesize -=3D rxr->rx_page_size;
->                         }
->
->                         --shinfo->nr_frags;
-> @@ -1323,7 +1323,7 @@ static u32 __bnxt_rx_agg_netmems(struct bnxt *bp,
->                 }
->
->                 page_pool_dma_sync_netmem_for_cpu(rxr->page_pool, netmem,=
- 0,
-> -                                                 bp->rx_page_size);
-> +                                                 rxr->rx_page_size);
->
->                 total_frag_len +=3D frag_len;
->                 prod =3D NEXT_RX_AGG(prod);
-> @@ -2276,8 +2276,7 @@ static int bnxt_rx_pkt(struct bnxt *bp, struct bnxt=
-_cp_ring_info *cpr,
->                         if (!skb)
->                                 goto oom_next_rx;
->                 } else {
-> -                       skb =3D bnxt_xdp_build_skb(bp, skb, agg_bufs,
-> -                                                rxr->page_pool, &xdp);
-> +                       skb =3D bnxt_xdp_build_skb(bp, skb, agg_bufs, rxr=
-, &xdp);
->                         if (!skb) {
->                                 /* we should be able to free the old skb =
-here */
->                                 bnxt_xdp_buff_frags_free(rxr, &xdp);
-> @@ -3825,7 +3824,7 @@ static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
->         if (BNXT_RX_PAGE_MODE(bp))
->                 pp.pool_size +=3D bp->rx_ring_size / rx_size_fac;
->
-> -       pp.order =3D get_order(bp->rx_page_size);
-> +       pp.order =3D get_order(rxr->rx_page_size);
->         pp.nid =3D numa_node;
->         pp.netdev =3D bp->dev;
->         pp.dev =3D &bp->pdev->dev;
-> @@ -4318,6 +4317,8 @@ static void bnxt_init_ring_struct(struct bnxt *bp)
->                 if (!rxr)
->                         goto skip_rx;
->
-> +               rxr->rx_page_size =3D bp->rx_page_size;
-> +
->                 ring =3D &rxr->rx_ring_struct;
->                 rmem =3D &ring->ring_mem;
->                 rmem->nr_pages =3D bp->rx_nr_pages;
-> @@ -4477,7 +4478,7 @@ static void bnxt_init_one_rx_agg_ring_rxbd(struct b=
-nxt *bp,
->         ring =3D &rxr->rx_agg_ring_struct;
->         ring->fw_ring_id =3D INVALID_HW_RING_ID;
->         if ((bp->flags & BNXT_FLAG_AGG_RINGS)) {
-> -               type =3D ((u32)bp->rx_page_size << RX_BD_LEN_SHIFT) |
-> +               type =3D ((u32)rxr->rx_page_size << RX_BD_LEN_SHIFT) |
->                         RX_BD_TYPE_RX_AGG_BD | RX_BD_FLAGS_SOP;
->
->                 bnxt_init_rxbd_pages(ring, type);
-> @@ -7042,6 +7043,7 @@ static void bnxt_hwrm_ring_grp_free(struct bnxt *bp=
-)
->
->  static void bnxt_set_rx_ring_params_p5(struct bnxt *bp, u32 ring_type,
->                                        struct hwrm_ring_alloc_input *req,
-> +                                      struct bnxt_rx_ring_info *rxr,
->                                        struct bnxt_ring_struct *ring)
->  {
->         struct bnxt_ring_grp_info *grp_info =3D &bp->grp_info[ring->grp_i=
-dx];
-> @@ -7051,7 +7053,7 @@ static void bnxt_set_rx_ring_params_p5(struct bnxt =
-*bp, u32 ring_type,
->         if (ring_type =3D=3D HWRM_RING_ALLOC_AGG) {
->                 req->ring_type =3D RING_ALLOC_REQ_RING_TYPE_RX_AGG;
->                 req->rx_ring_id =3D cpu_to_le16(grp_info->rx_fw_ring_id);
-> -               req->rx_buf_size =3D cpu_to_le16(bp->rx_page_size);
-> +               req->rx_buf_size =3D cpu_to_le16(rxr->rx_page_size);
->                 enables |=3D RING_ALLOC_REQ_ENABLES_RX_RING_ID_VALID;
->         } else {
->                 req->rx_buf_size =3D cpu_to_le16(bp->rx_buf_use_size);
-> @@ -7065,6 +7067,7 @@ static void bnxt_set_rx_ring_params_p5(struct bnxt =
-*bp, u32 ring_type,
->  }
->
->  static int hwrm_ring_alloc_send_msg(struct bnxt *bp,
-> +                                   struct bnxt_rx_ring_info *rxr,
->                                     struct bnxt_ring_struct *ring,
->                                     u32 ring_type, u32 map_index)
->  {
-> @@ -7121,7 +7124,8 @@ static int hwrm_ring_alloc_send_msg(struct bnxt *bp=
-,
->                               cpu_to_le32(bp->rx_ring_mask + 1) :
->                               cpu_to_le32(bp->rx_agg_ring_mask + 1);
->                 if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS)
-> -                       bnxt_set_rx_ring_params_p5(bp, ring_type, req, ri=
-ng);
-> +                       bnxt_set_rx_ring_params_p5(bp, ring_type, req,
-> +                                                  rxr, ring);
->                 break;
->         case HWRM_RING_ALLOC_CMPL:
->                 req->ring_type =3D RING_ALLOC_REQ_RING_TYPE_L2_CMPL;
-> @@ -7269,7 +7273,7 @@ static int bnxt_hwrm_rx_ring_alloc(struct bnxt *bp,
->         u32 map_idx =3D bnapi->index;
->         int rc;
->
-> -       rc =3D hwrm_ring_alloc_send_msg(bp, ring, type, map_idx);
-> +       rc =3D hwrm_ring_alloc_send_msg(bp, rxr, ring, type, map_idx);
->         if (rc)
->                 return rc;
->
-> @@ -7289,7 +7293,7 @@ static int bnxt_hwrm_rx_agg_ring_alloc(struct bnxt =
-*bp,
->         int rc;
->
->         map_idx =3D grp_idx + bp->rx_nr_rings;
-> -       rc =3D hwrm_ring_alloc_send_msg(bp, ring, type, map_idx);
-> +       rc =3D hwrm_ring_alloc_send_msg(bp, rxr, ring, type, map_idx);
->         if (rc)
->                 return rc;
->
-> @@ -7313,7 +7317,7 @@ static int bnxt_hwrm_cp_ring_alloc_p5(struct bnxt *=
-bp,
->
->         ring =3D &cpr->cp_ring_struct;
->         ring->handle =3D BNXT_SET_NQ_HDL(cpr);
-> -       rc =3D hwrm_ring_alloc_send_msg(bp, ring, type, map_idx);
-> +       rc =3D hwrm_ring_alloc_send_msg(bp, NULL, ring, type, map_idx);
->         if (rc)
->                 return rc;
->         bnxt_set_db(bp, &cpr->cp_db, type, map_idx, ring->fw_ring_id);
-> @@ -7328,7 +7332,7 @@ static int bnxt_hwrm_tx_ring_alloc(struct bnxt *bp,
->         const u32 type =3D HWRM_RING_ALLOC_TX;
->         int rc;
->
-> -       rc =3D hwrm_ring_alloc_send_msg(bp, ring, type, tx_idx);
-> +       rc =3D hwrm_ring_alloc_send_msg(bp, NULL, ring, type, tx_idx);
->         if (rc)
->                 return rc;
->         bnxt_set_db(bp, &txr->tx_db, type, tx_idx, ring->fw_ring_id);
-> @@ -7354,7 +7358,7 @@ static int bnxt_hwrm_ring_alloc(struct bnxt *bp)
->
->                 vector =3D bp->irq_tbl[map_idx].vector;
->                 disable_irq_nosync(vector);
-> -               rc =3D hwrm_ring_alloc_send_msg(bp, ring, type, map_idx);
-> +               rc =3D hwrm_ring_alloc_send_msg(bp, NULL, ring, type, map=
-_idx);
->                 if (rc) {
->                         enable_irq(vector);
->                         goto err_out;
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethe=
-rnet/broadcom/bnxt/bnxt.h
-> index 56aafae568f8..4f9d4c71c0e2 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-> @@ -1107,6 +1107,7 @@ struct bnxt_rx_ring_info {
->
->         unsigned long           *rx_agg_bmap;
->         u16                     rx_agg_bmap_size;
-> +       u16                     rx_page_size;
->         bool                    need_head_pool;
->
->         dma_addr_t              rx_desc_mapping[MAX_RX_PAGES];
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/drivers/net/=
-ethernet/broadcom/bnxt/bnxt_xdp.c
-> index 41d3ba56ba41..19dda0201c69 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-> @@ -183,7 +183,7 @@ void bnxt_xdp_buff_init(struct bnxt *bp, struct bnxt_=
-rx_ring_info *rxr,
->                         u16 cons, u8 *data_ptr, unsigned int len,
->                         struct xdp_buff *xdp)
->  {
-> -       u32 buflen =3D bp->rx_page_size;
-> +       u32 buflen =3D rxr->rx_page_size;
->         struct bnxt_sw_rx_bd *rx_buf;
->         struct pci_dev *pdev;
->         dma_addr_t mapping;
-> @@ -461,7 +461,7 @@ int bnxt_xdp(struct net_device *dev, struct netdev_bp=
-f *xdp)
->
->  struct sk_buff *
->  bnxt_xdp_build_skb(struct bnxt *bp, struct sk_buff *skb, u8 num_frags,
-> -                  struct page_pool *pool, struct xdp_buff *xdp)
-> +                  struct bnxt_rx_ring_info *rxr, struct xdp_buff *xdp)
->  {
->         struct skb_shared_info *sinfo =3D xdp_get_shared_info_from_buff(x=
-dp);
->
-> @@ -470,7 +470,7 @@ bnxt_xdp_build_skb(struct bnxt *bp, struct sk_buff *s=
-kb, u8 num_frags,
->
->         xdp_update_skb_shared_info(skb, num_frags,
->                                    sinfo->xdp_frags_size,
-> -                                  bp->rx_page_size * num_frags,
-> +                                  rxr->rx_page_size * num_frags,
->                                    xdp_buff_is_frag_pfmemalloc(xdp));
->         return skb;
->  }
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h b/drivers/net/=
-ethernet/broadcom/bnxt/bnxt_xdp.h
-> index 220285e190fc..8933a0dec09a 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h
-> @@ -32,6 +32,6 @@ void bnxt_xdp_buff_init(struct bnxt *bp, struct bnxt_rx=
-_ring_info *rxr,
->  void bnxt_xdp_buff_frags_free(struct bnxt_rx_ring_info *rxr,
->                               struct xdp_buff *xdp);
->  struct sk_buff *bnxt_xdp_build_skb(struct bnxt *bp, struct sk_buff *skb,
-> -                                  u8 num_frags, struct page_pool *pool,
-> +                                  u8 num_frags, struct bnxt_rx_ring_info=
- *rxr,
->                                    struct xdp_buff *xdp);
->  #endif
-> --
-> 2.49.0
->
->
-Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
 
---000000000000b7c3e5063d2a9c52
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-MIIQYwYJKoZIhvcNAQcCoIIQVDCCEFACAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
-gg3HMIIFDTCCA/WgAwIBAgIQeEqpED+lv77edQixNJMdADANBgkqhkiG9w0BAQsFADBMMSAwHgYD
-VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
-AxMKR2xvYmFsU2lnbjAeFw0yMDA5MTYwMDAwMDBaFw0yODA5MTYwMDAwMDBaMFsxCzAJBgNVBAYT
-AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBS
-MyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
-vbCmXCcsbZ/a0fRIQMBxp4gJnnyeneFYpEtNydrZZ+GeKSMdHiDgXD1UnRSIudKo+moQ6YlCOu4t
-rVWO/EiXfYnK7zeop26ry1RpKtogB7/O115zultAz64ydQYLe+a1e/czkALg3sgTcOOcFZTXk38e
-aqsXsipoX1vsNurqPtnC27TWsA7pk4uKXscFjkeUE8JZu9BDKaswZygxBOPBQBwrA5+20Wxlk6k1
-e6EKaaNaNZUy30q3ArEf30ZDpXyfCtiXnupjSK8WU2cK4qsEtj09JS4+mhi0CTCrCnXAzum3tgcH
-cHRg0prcSzzEUDQWoFxyuqwiwhHu3sPQNmFOMwIDAQABo4IB2jCCAdYwDgYDVR0PAQH/BAQDAgGG
-MGAGA1UdJQRZMFcGCCsGAQUFBwMCBggrBgEFBQcDBAYKKwYBBAGCNxQCAgYKKwYBBAGCNwoDBAYJ
-KwYBBAGCNxUGBgorBgEEAYI3CgMMBggrBgEFBQcDBwYIKwYBBQUHAxEwEgYDVR0TAQH/BAgwBgEB
-/wIBADAdBgNVHQ4EFgQUljPR5lgXWzR1ioFWZNW+SN6hj88wHwYDVR0jBBgwFoAUj/BLf6guRSSu
-TVD6Y5qL3uLdG7wwegYIKwYBBQUHAQEEbjBsMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC5nbG9i
-YWxzaWduLmNvbS9yb290cjMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5j
-b20vY2FjZXJ0L3Jvb3QtcjMuY3J0MDYGA1UdHwQvMC0wK6ApoCeGJWh0dHA6Ly9jcmwuZ2xvYmFs
-c2lnbi5jb20vcm9vdC1yMy5jcmwwWgYDVR0gBFMwUTALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgEo
-CjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAN
-BgkqhkiG9w0BAQsFAAOCAQEAdAXk/XCnDeAOd9nNEUvWPxblOQ/5o/q6OIeTYvoEvUUi2qHUOtbf
-jBGdTptFsXXe4RgjVF9b6DuizgYfy+cILmvi5hfk3Iq8MAZsgtW+A/otQsJvK2wRatLE61RbzkX8
-9/OXEZ1zT7t/q2RiJqzpvV8NChxIj+P7WTtepPm9AIj0Keue+gS2qvzAZAY34ZZeRHgA7g5O4TPJ
-/oTd+4rgiU++wLDlcZYd/slFkaT3xg4qWDepEMjT4T1qFOQIL+ijUArYS4owpPg9NISTKa1qqKWJ
-jFoyms0d0GwOniIIbBvhI2MJ7BSY9MYtWVT5jJO3tsVHwj4cp92CSFuGwunFMzCCA18wggJHoAMC
-AQICCwQAAAAAASFYUwiiMA0GCSqGSIb3DQEBCwUAMEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9v
-dCBDQSAtIFIzMRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5
-MDMxODEwMDAwMFoXDTI5MDMxODEwMDAwMFowTDEgMB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENB
-IC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqG
-SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMJXaQeQZ4Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0E
-XyTLLkvhYIJG4VKrDIFHcGzdZNHr9SyjD4I9DCuul9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+J
-J5U4nwbXPsnLJlkNc96wyOkmDoMVxu9bi9IEYMpJpij2aTv2y8gokeWdimFXN6x0FNx04Druci8u
-nPvQu7/1PQDhBjPogiuuU6Y6FnOM3UEOIDrAtKeh6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTv
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBU8wggQ3oAMCAQICDHrACvo11BjSxMYbtzANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODE4NDJaFw0yNTA5MTAwODE4NDJaMIGQ
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xFjAUBgNVBAMTDVNvbW5hdGggS290dXIxKTAnBgkqhkiG9w0B
-CQEWGnNvbW5hdGgua290dXJAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB
-CgKCAQEAwSM6HryOBKGRppHga4G18QnbgnWFlW7A7HePfwcVN3QOMgkXq0EfqT2hd3VAX9Dgoi2U
-JeG28tGwAJpNxAD+aAlL0MVG7D4IcsTW9MrBzUGFMBpeUqG+81YWwUNqxL47kkNHZU5ecEbaUto9
-ochP8uGU16ud4wv60eNK59ZvoBDzhc5Po2bEQxrJ5c8V5JHX1K2czTnR6IH6aPmycffF/qHXfWHN
-nSGLsSobByQoGh1GyLfFTXI7QOGn/6qvrJ7x9Oem5V7miUTD0wGAIozD7MCVoluf5Psa4Q2a5AFV
-gROLty059Ex4oK55Op/0e3Aa/a8hZD/tPBT3WE70owdiCwIDAQABo4IB2zCCAdcwDgYDVR0PAQH/
-BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3VyZS5nbG9i
-YWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEGCCsGAQUF
-BzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAy
-MDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93d3cuZ2xv
-YmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6hjhodHRw
-Oi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNybDAlBgNV
-HREEHjAcgRpzb21uYXRoLmtvdHVyQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAf
-BgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUabMpSsFcjDNUWMvGf76o
-yB7jBJUwDQYJKoZIhvcNAQELBQADggEBAJBDQpQ1TqY57vpQbwtXYP0N01q8J3tfNA/K2vOiNOpv
-IufqZ5WKdKEtmT21nujCeuaCQ6SmpWqCUJVkLd+u/sHR62vCo8j2fb1pTkA7jeuCAuT9YMPRE86M
-sUphsGDq2ylriQ7y5kvl728hZ0Oakm3xUCnZ9DYS/32sFGSZyrCGZipTBnjK4n5uLQ0yekSLACiD
-R0zi4nzkbhwXqDbDaB+Duk52ec/Vj4xuc2uWu9rTmJNVjdk0qu9vh48xcd/BzrlmwY0crGTijAC/
-r4x2/y9OfG0FyVmakU0qwDnZX982aa66tXnKNgae2k20WCDVMM5FPTrbMsQyz6Hrv3bg6qgxggJg
-MIICXAIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYD
-VQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgx6wAr6NdQY0sTG
-G7cwDQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEIE8j0snl/kn8ar/l3/MvZFDQEgDm
-zG4ETmz5+Y0xBS+aMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1
-MDgyNTA2MjQ0N1owXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsG
-CWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3
-DQEBAQUABIIBAL89O02MlFtDpmQhWuEZUF4vnkHQH+1KkZToQB6unjZVcM6CTAvenTpjYXqrUBys
-VfzXmPKE5MyCE8Q9/dLC7GWgAbuMAi4RDei5mmScoXXuRr0rRuJQ0VxIUl/7HgSXnbKlIkX5stpK
-diQOHCPNIPf/Uv6/BXy8b6F4QKG/P6zi/rzc9vRPCdQtxxJ7ynnV5FEX2JJO7w+0pgaIAxQs+KVF
-oA73lavnElDS1P/WWuI8PpxEbnfDFTjFd7EnBd1DqA0GEoeJgeqtN12DJhfkjNcuYNIvjkkPp2EA
-e61Ctu75zOMrjVwg4JJuV/LnEg21UqMe3OLKKjrYe/duKDbA9vU=
---000000000000b7c3e5063d2a9c52--
+Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 
