@@ -1,87 +1,87 @@
-Return-Path: <netdev+bounces-216506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28B78B342AE
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 16:07:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46810B342C5
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 16:10:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1E5E1B21E0A
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 14:03:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFA7616203B
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 14:06:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D2D82ECD32;
-	Mon, 25 Aug 2025 13:59:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9756F27510B;
+	Mon, 25 Aug 2025 14:06:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1vV3nULP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gJuzxpVf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD6812D1F61
-	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 13:59:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 132E8270EBB
+	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 14:06:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756130366; cv=none; b=XesMB6UEwXBPXHmzjkkVNg84lG7etPbFpEwCFeU8xZZrkntP6TnjyYqlHMembCFIIdRqLyjF6n/FuIKAGL/tjCvMl3zfsL8VuxKIUHcpogyO/Je9m0TpTY0OBgSKuOv1n42pkR1P7L3huh/6dpJFg4IEyTukJE/BVih7pDhBjLQ=
+	t=1756130781; cv=none; b=ld9HDbCw10j1slDZtCezUvWeOu9AtbXB/7dP86QEw83ATiXnGndvpjlAWEw9CHcedXHpbLyeegUxmXyh0krznanM54NT7jhrIpuCde04uzedzR2NEfDIohiLI9lAve28MLh8sCmnmE72dn0AxGkmQwl/StE0onoO82+/eszhWb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756130366; c=relaxed/simple;
-	bh=aENDtU7SN3nb+sH0t4FgGbaHhMkD2QD7dkaUBCnJUMM=;
+	s=arc-20240116; t=1756130781; c=relaxed/simple;
+	bh=0NmoVODVaV93z6Plmuqd09AhbeJjAwP9TZKUaMoQOaU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LdqM+FtshURrdoIiFAFKOVLCnDzzbzNAaN/3BdQuGbgmYunk2ROd3aWPfwByK02McktY6cIxA7py/IL6gXdoJkNTpCN6ggX5CyD7YlD9dZQbQSsbDarUUdyKduvV4xwJRWKPgT+BhXIsQMdBagg5Lzz/NMovfgndwFQQbw5+EG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1vV3nULP; arc=none smtp.client-ip=209.85.222.181
+	 To:Cc:Content-Type; b=npt3uStXr0dPgZOrNSs94kTkZXBMbCyD48XWh1LeJpcVEu7Vbw+yES3LZmC4GsGAj2Xsn77NMQRQ2m66v/Cwn1MAgaUcShclNgBQbaue2IBTfIpJrMoflchKxvcE4VwS5t+rSlcQCMHqktHeRevtcXhzesRfPR6IlgtqLWkGEaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gJuzxpVf; arc=none smtp.client-ip=209.85.166.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7e8704c7a46so537813185a.1
-        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 06:59:24 -0700 (PDT)
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3e571d40088so40226185ab.1
+        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 07:06:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756130363; x=1756735163; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1756130779; x=1756735579; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=o7AcYOQXixbFv7ykzQpGuPz3LwvAdYFN1nVF8sWs+Fs=;
-        b=1vV3nULPfQO3X/j3400lcEjOOuncD3NypojvcqiyaM1+ubeGGssYne8TFcrl+SEO6v
-         K2C4eYA0BGBF2+TvaU57Hyx04+IxYRcVsuRYYwKMFUVd1gbj97nwgezc4y3b6A2WaJyn
-         M8mtLcHIPmb90Btj8ZbC9Z6fcdDKDoTfLEFmYnB2VMGPnxR9P+jLDPyVHea8E/Va8i8g
-         DmwkezcEB+y3D00qlcMr8r/WZH402mkLU1pJuwFY7pKRKL3F41ydcNCGmIf/XM9rKZEp
-         0fRjRb9tr9Oj+D3a/tBz8CK/w1aPME2oK69mQwj9awJ3UTpqWylho8NmsSaef4uzMF5U
-         nNQA==
+        bh=HUk68waEmLiLSEeNzstQygO/7zRHyPkWgUTafNVmqZc=;
+        b=gJuzxpVfCA/WYVF/NRc/bmkMyHzCYNWK2QhkF0UvR4SCn3h66ZAkKX5lxoB37BCKra
+         wJiq/pTWC/HXeD0jkHzni9CfQ72caTVyjptAlgpFE1LdfkjUbVDp4L4JbpZZT1EHTiu1
+         QkRqSBv2qufEAgVU5SkDZqd1tLWd/kurJbqjMQ9GuhnkOgfDDvhm+HyXuC3dbS6Jxu1P
+         XVnbpTn5Rnl33aspULdeCbnubyaKQYJt0ds+aX95snWZ6KuBXdwNSGLHPAYfTL1l8TRB
+         Y5pyX0iP3aj4Os9c0yc9i15k6FYB+Fd3iFbYEGVwW19q1iMWVrTDc+AKRtCXhCb2LhFS
+         Ga+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756130363; x=1756735163;
+        d=1e100.net; s=20230601; t=1756130779; x=1756735579;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=o7AcYOQXixbFv7ykzQpGuPz3LwvAdYFN1nVF8sWs+Fs=;
-        b=prYhX2AcP3BW/fuWo7K407v+tGJbptrl+JHTFI/fOqZ5XNrxfkpv+1Gnl2DLKc1Zcw
-         4pLr6OX5USTFYJXhC3BnXYqUO6FBnyeyV0slkRHIlu9+/fhudQAw6ijgZxhU6bb+Hjc1
-         zsOAZUoLzyoaMAsr3FgNoPOjXsHUW4n9YG4Jk+520OvPtMhW6W5zj9EPf8Q1pXxtzEme
-         tOTc2aMsJtgtuJh+crL/fBPqPtBta93lQMpGA8YeBXXd+y3heuJCOe+y32zvBIEIG8eC
-         Y6vFIPsOLK6k29ihru0Ihh0EtSE3Gptoq97ttrL7kB+h8xWHQbakGF5f92bGMmcuYaMM
-         LHBA==
-X-Forwarded-Encrypted: i=1; AJvYcCU9f9vdprvos1pXexmtGKkj7OSrz/sc5RRdSz6VW0BhD23Rjc9DSFMur2Z6IVDBZdjlMgZq01c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxt7H3KheFNHoQnxgqRLkFPIgLKXMKat0ZqMSPk2IfmswbD1wjq
-	KLouViINd0zLmqYmWa2Ync+YpRUHb9dZ6ibnDv7z3aUnagEpcUVVMQt1jMwXYbLh0KghDnOKwE+
-	2YBYD9ZYQNQtkoexIuyHBSkniKaW3CiBG/pqAR9ea
-X-Gm-Gg: ASbGncscNXI72z5lVAZCQnZIo4N6Q19OTilTQ7Xw2Vug5+3UKYWXNSQenyYXft5GsBO
-	zqRslYRZOKdqlkhc8L+uGOBZ/pRgcbhUAYHZ6Td5Oq0kdg8gP4bU/w2icHJNspBFvmCV8nTePXs
-	OOJMPIPuhrMnj9jzdsIiAUOierTMYnRq/vAE8uWcW777BZODSaTRBukyD2GIpkdPBurMaQ/HOBz
-	IB/seyZhCqE
-X-Google-Smtp-Source: AGHT+IGW0Bo6dDN/OjygA2zGUopkllC6s4EeoANdDL7FtOYgRMhUA3qOMkCvCzq5W7Xlbe60H480YJSJzL7OiJFlTxA=
-X-Received: by 2002:a05:620a:2982:b0:7e8:221c:c968 with SMTP id
- af79cd13be357-7ea110bb914mr1455309685a.65.1756130362861; Mon, 25 Aug 2025
- 06:59:22 -0700 (PDT)
+        bh=HUk68waEmLiLSEeNzstQygO/7zRHyPkWgUTafNVmqZc=;
+        b=Rh3H/u9SLQn6tPyIeAgVS2dCb3PwBNYAk/VF3qbjsP79YBxYuwS/BuIrsRt0EQDF7h
+         v87LJjX7NSgyrPwVj9rd/gk0gDlCCFdaIIC40+nybt0Ming2S84PeIGWHyasRJ+nZFCw
+         mYLqYOghvcvCKatSMA2pbVKoPGd6442n3rsKM3LigYPMWZiZf97lyHFCQ7l4h6l1/0ck
+         Gf2ODm3pXvhffoYNoU6AZixNoU9dx3KB+x9L+9oQGJX8LnFa6Liz3DvlaXQYsnnuGz2h
+         2MM6ErbphylcDwMd++6+7g9MZWy45mPhiiy0DXC44ZY3S7N2hCPOIXCs5ESwxa4nL2R+
+         EWXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXVYlUM0n2IngrbRw61RIFvcdZtTuiZJCQ3HoqA3vz4t5umN/i1ZnsPUzLnIYSxJMn3S6eqnFg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHQFGzUsZkKcL3usZC5nqZFF3ypIoYmhHLboM/QfgPpm+Uihns
+	xEe/cPxmXQdfkGACHGfwUvskJpFgvuOdqYnXxz9LsRqZfSlrBhYS6Bcal8dCxDpLATOFoS+Sf+Y
+	mdYhqmfP5o+mJGHbhdLMV65i2QTr39p6poS/ks9l3TgR952zie26pneZi
+X-Gm-Gg: ASbGncvHD8pghWHp7ezjDLFsXdRiCyxksCD8lRefSchRjeI94IcGTT1A/lPyB9SaoBO
+	saOHuwtmEGqq92Lp3k9q/OIWSDLcM7OybbIXA3HvqdeMi2Whlza4gUDGqdzYVkElhuwxXwCok2/
+	Bqz3vPS3/Hlg3PNfFLshKf3JHHCZv1BDpYS/1NdFWyOkz9r393hJP0Z4F7QRnIaAOUDrIvCn8As
+	WV9hn77y4Dn
+X-Google-Smtp-Source: AGHT+IG+baG80ggynxRrI09GUOhyFXK+dnaZ3AT2q3XS7oax1jWQxVvgWBIAH3PiFXmZ3oH3El25fb0aTBCw0418Z9s=
+X-Received: by 2002:ac8:7d49:0:b0:4b0:e1bd:a2bb with SMTP id
+ d75a77b69052e-4b2aaafa22bmr158190671cf.50.1756130417250; Mon, 25 Aug 2025
+ 07:00:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250822190803.540788-1-kuniyu@google.com> <20250822190803.540788-5-kuniyu@google.com>
-In-Reply-To: <20250822190803.540788-5-kuniyu@google.com>
+References: <20250822190803.540788-1-kuniyu@google.com> <20250822190803.540788-6-kuniyu@google.com>
+In-Reply-To: <20250822190803.540788-6-kuniyu@google.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 25 Aug 2025 06:59:11 -0700
-X-Gm-Features: Ac12FXwu7VdxzddSX_XWWq0CVDpyTWWDh6a9M3dLlgIIaTLmSJ_7_Ee5j0hY_ls
-Message-ID: <CANn89i+wyBVnG0nx0jeWodfeJoZ0-P_H+mzBTaZ5iRtkAKkrDA@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 4/6] tcp: Don't pass hashinfo to socket lookup helpers.
+Date: Mon, 25 Aug 2025 07:00:03 -0700
+X-Gm-Features: Ac12FXwPT3mvxAJcGEAzFCobcN2aE5JklEPalIZdSsp7-MUgMd0iGd1-zH78MZY
+Message-ID: <CANn89iL_D6p0CwvBpPVWvQu0m6vN4Trgum40-F6txjOwz9T1cw@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 5/6] tcp: Don't pass hashinfo to inet_diag helpers.
 To: Kuniyuki Iwashima <kuniyu@google.com>
 Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, 
@@ -93,23 +93,24 @@ Content-Transfer-Encoding: quoted-printable
 On Fri, Aug 22, 2025 at 12:08=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.c=
 om> wrote:
 >
-> These socket lookup functions required struct inet_hashinfo because
-> they are shared by TCP and DCCP.
+> These inet_diag functions required struct inet_hashinfo because
+> they are shared by TCP and DCCP:
 >
->   * __inet_lookup_established()
->   * __inet_lookup_listener()
->   * __inet6_lookup_established()
->   * inet6_lookup_listener()
+>   * inet_diag_dump_icsk()
+>   * inet_diag_dump_one_icsk()
+>   * inet_diag_find_one_icsk()
 >
 > DCCP has gone, and we don't need to pass hashinfo down to them.
 >
-> Let's fetch net->ipv4.tcp_death_row.hashinfo directly in the above
-> 4 functions.
+> Let's fetch net->ipv4.tcp_death_row.hashinfo directly in the first
+> 2 functions.
+>
+> Note that inet_diag_find_one_icsk() don't need hashinfo since the
+> previous patch.
+>
+> We will move TCP-specific functions to tcp_diag.c in the next patch.
 >
 > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-> ---
-
-Okay, although this is a lot of code churn.
 
 Reviewed-by: Eric Dumazet <edumazet@google.com>
 
