@@ -1,105 +1,75 @@
-Return-Path: <netdev+bounces-216407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C828B336AC
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 08:46:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F35DEB33707
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 09:00:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A949B7A51FB
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 06:44:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CFDF177C29
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 07:00:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADB48285404;
-	Mon, 25 Aug 2025 06:45:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6100C288513;
+	Mon, 25 Aug 2025 07:00:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VlYHHI8y"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="g0NkESml"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D341C3C08;
-	Mon, 25 Aug 2025 06:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 950A92882C9;
+	Mon, 25 Aug 2025 07:00:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756104351; cv=none; b=FDjEeuUuf2H0oRUPthyuJwqN2Db4wW+ffpYVbXO4OAcwqRyzbt3YR5L52a67dXQu0AGQdNkC8usRxSsmw+07jjIhlnwy4p0c56VjvwC0NXyo1a8xZ6p8m3l6osJWHl2vAMSlgnB+RMmc44avCGMtcBpvnU4eAJhyK84ygj51cpw=
+	t=1756105224; cv=none; b=EduBwzK02qX6OXYRBWSJykOo9oKNMzA+xZgsdnKRPJj4XJeMXiwiJq7ExMsQ2eA++LOCzX6o3hKg46Cu/NeQqXt71VIjBpK5tq3oB2OGspjyS54Ax+dRzLCAdnNwo6TJ7knKs7A2zaZhIy5WYUe/YGWj1zED0cqUJ0WqjAPgHwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756104351; c=relaxed/simple;
-	bh=5MuhzqEAFp7z83EOi2YR4P8OPG5HOJB5/UgcWmFry40=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R9gRqLtWcU25sM0nqSqEVLBKErrG9xHfuNVjVf8CR79V+ompKgjRtAq9N5ag26obtwDgd85CSMR5De30Wn9Mltl+9zTBdLhqjUHNTNiTjrIqHL9rD8UiYy75xXxq4F0uNCm2mHnb3fDPoTfEgGeb+rDQ9dZJN+ML7aeyWCUwW60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VlYHHI8y; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-32326e5f058so2690807a91.3;
-        Sun, 24 Aug 2025 23:45:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756104349; x=1756709149; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zsbo+qPYTYiB/DwrByFJVbv6Ae3Kqkg6hVhhkSUAjYg=;
-        b=VlYHHI8yiqdWWzhDJxaGA/mm6YABW78LzdqPSH44SzrrgXD5wKC3FW54ZY+VinZQdB
-         h45avvmTg9oq+eRS+yjzP23HXiAFBjx72MANT8GHWT9bTzaBn7J0riTrYPQ+LLjS5uBE
-         t2zHhPZE9W0i0CLK4Ns3SN3RaIZ44AIu3NRonghE4LPh6ApAs8oVfvjNg2K6eA2Gt6F0
-         o+MVi3fmmA4AIUKLeQmktpBfYw4GGhrG1mySjgDHI0xoSA0ROZvO5UmcAcf2ZST5pDg+
-         +dfPAEKUNLzmFtAaA0MvheYeYpx0NtpzIc0A+SwJoqLZ3wmK5uoMUK1EKKZSx/9JQsvz
-         wJzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756104349; x=1756709149;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zsbo+qPYTYiB/DwrByFJVbv6Ae3Kqkg6hVhhkSUAjYg=;
-        b=Z0PLHFxUGilcVgV9TkeNZTuIhbK2SvhYIZM/c1riflB9Bs/3kYMmROuPVFD7YhQd02
-         iWnw4PdSPYnbZI9JmchSLhXWSplccrl/6fJ1mmLlUIWVOWw96F+gdrwZgWXI5oI+TXwh
-         15d4EIRpexRfTpCkntp+E6IOQZcGFnphg6dJ/atlczHSh0v4eOZ6LOF0WE9E7RXvGRhs
-         mxiIYPa3p24938wGE9N4I89qnWyh8n9Dyjc8wzAvGQqFn3ViucxU32ncJc+KHJQUJhBp
-         r/n98MZqY8OG2Nc/a/PUPTADY0NyiTdjiq+w2ANrThpRPqHlT/CkoR0n+A5rH9XHlWiQ
-         kYIg==
-X-Forwarded-Encrypted: i=1; AJvYcCUfIKBjrodsUW1AdtHF8ssPYbtzR92pK9iehVRq4N6SoKzvdGS/LMXIyaxx1UJc/swpfP8AfZT6CHU=@vger.kernel.org, AJvYcCXGpOVEsaXK2KyTefBN08dgDjU4CzTr5oUf+A3c6VfDndPhMSZIzGIpbi9QsjeH3mEZ4CKGg7d0+bwoe/PwVajd@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBOzdUwb5jVJTtYjYzomydGksSDcwlqwbJgNEeTgGTgDookFIy
-	AAobw6PGIFcuAVyoC7UwohW4gtwZLOOiNM3vFe832vBDsPei5FF0FbvDtae+2+9n
-X-Gm-Gg: ASbGncsMbgxUPAWHKYcMN7IX0pH7fQMvmzW+cN9Om115hHAMNiCFr9R16m67CmPME9t
-	N3MHCaCFrXkFI/p2bqP5sry8w/cbLTXfUBWgKfh4NB+EktskBc0jDFTEZ+4Na/hUuVViAhEl5Xs
-	/OWcxAtnB+vGX32XgfA1ATmM8ZAl6kWM3Qyo0EJbCNy0Jt15Gi/AP+KSS/f7LmvPYSTIRkpwtXD
-	MuwkzFGYPCVmMf+cpfndsdB5mpKuGyqdyAX6IJfvldthiWnXLB+k0lqA0keHhAetlRdSypEl4sH
-	v3eB4O25QR94rZ42k+rOv/cwzjKQkvOswoHsIKQbgHJtnvIA7XdYC19ijQRsvyXGntBsADfnjvR
-	fZ8XeAwW/1nCUfiuEwJ40Zfc1KIBtHGkTfWqUgAUbDw==
-X-Google-Smtp-Source: AGHT+IGjp/d27B15mh/iCxgYPyzUdq+NSC0q/HP11fpvNtIbvXHSgjkABwKputpsq9n74L3QPU6/OA==
-X-Received: by 2002:a17:90b:1b4c:b0:31e:f351:bfec with SMTP id 98e67ed59e1d1-32515d111e9mr13119625a91.0.1756104348890;
-        Sun, 24 Aug 2025 23:45:48 -0700 (PDT)
-Received: from fedora.redhat.com ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3254af4c347sm5978118a91.18.2025.08.24.23.45.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 24 Aug 2025 23:45:48 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Petr Machata <petrm@nvidia.com>,
-	Amit Cohen <amcohen@nvidia.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	David Ahern <dsahern@gmail.com>,
-	Jonas Gorski <jonas.gorski@gmail.com>,
-	linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv4 net-next 3/3] selftests: bonding: add test for LACP actor port priority
-Date: Mon, 25 Aug 2025 06:45:16 +0000
-Message-ID: <20250825064516.421275-4-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250825064516.421275-1-liuhangbin@gmail.com>
-References: <20250825064516.421275-1-liuhangbin@gmail.com>
+	s=arc-20240116; t=1756105224; c=relaxed/simple;
+	bh=M9DdtMppJEOnfLbFcRRL0+dJkP45g7dKObfDHa3BZ+4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GJW1H6lLkz8+etvJ9DwoAAwzewYsrVkBVOaag3AJIJxVDyfZ1udgoTThH9GL6S83BGzak5zzUY5hUQC/RdWsGKPyCqeXQUCUOw3b1V1LYNU44gqZb4Wpr4phvHvH8lvUOtBzN3qGFn4+qLngnbH1wDbBQcxNlR+BDt3QH7fGv7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=g0NkESml; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1756105223; x=1787641223;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=M9DdtMppJEOnfLbFcRRL0+dJkP45g7dKObfDHa3BZ+4=;
+  b=g0NkESmlPCgRgoHNoJdZ4B7R/GNiwjdznoXOWSnacsBbTM5JKUnJoT7t
+   QWCuuwCgiMpTADbRt8v9ekrbUpcFqx8kxFVbns+9XPDfhdtzOrsYfo1K6
+   P/sHeSzrfXH99JEm0VfLMRdJTSoyq+3TQhl9yafe69XL26ulCiE03wGBI
+   fGPoXGqs55LCrl+JGF8TVnKc3X7YfeWhK+X9lULOg2EIRVEUXALbPi7sZ
+   jAv+VJvPev7qphqx64v/mrtmYOiN/pdr/UUUC5QjJJIpa3wXV6qjtWg4N
+   Tk1a53AThdbMTsjee3pv7USP6RIghOeAWLW21ga90VCvXPX5wZsqi7+XO
+   w==;
+X-CSE-ConnectionGUID: S2m4b2uJQ2uL0XJDsEcpSQ==
+X-CSE-MsgGUID: KhUbRrPbS0WOF8bnRqfyeQ==
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="276992244"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Aug 2025 00:00:22 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Sun, 24 Aug 2025 23:59:55 -0700
+Received: from DEN-DL-M31836.microchip.com (10.10.85.11) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
+ 15.1.2507.44 via Frontend Transport; Sun, 24 Aug 2025 23:59:51 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <richardcochran@gmail.com>, <vladimir.oltean@nxp.com>,
+	<rmk+kernel@armlinux.org.uk>, <vadim.fedorenko@linux.dev>,
+	<christophe.jaillet@wanadoo.fr>, <rosenp@gmail.com>,
+	<viro@zeniv.linux.org.uk>, <atenart@kernel.org>, <quentin.schulz@bootlin.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>
+Subject: [PATCH net v2] phy: mscc: Fix when PTP clock is register and unregister
+Date: Mon, 25 Aug 2025 08:55:43 +0200
+Message-ID: <20250825065543.2916334-1-horatiu.vultur@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -107,224 +77,132 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Add comprehensive selftest to verify:
-- Per-port actor priority setting via ad_actor_port_prio
-- Aggregator selection behavior with port_priority ad_select policy
+It looks like that every time when the interface was set down and up the
+driver was creating a new ptp clock. On top of this the function
+ptp_clock_unregister was never called.
+Therefore fix this by calling ptp_clock_register and initialize the
+mii_ts struct inside the probe function and call ptp_clock_unregister when
+driver is removed.
 
-Also move cmd_jq helper from forwarding/lib.sh to net/lib.sh for
-broader reusability across network selftests.
+Fixes: 7d272e63e0979d ("net: phy: mscc: timestamping and PHC support")
+Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
 
-Here is the result output
-  # ./bond_lacp_prio.sh
-  TEST: bond 802.3ad (ad_actor_port_prio setting)                  [ OK ]
-  TEST: bond 802.3ad (ad_actor_port_prio select)                   [ OK ]
-  TEST: bond 802.3ad (ad_actor_port_prio switch)                   [ OK ]
-
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
- .../selftests/drivers/net/bonding/Makefile    |   3 +-
- .../drivers/net/bonding/bond_lacp_prio.sh     | 107 ++++++++++++++++++
- tools/testing/selftests/net/forwarding/lib.sh |  24 ----
- tools/testing/selftests/net/lib.sh            |  24 ++++
- 4 files changed, 133 insertions(+), 25 deletions(-)
- create mode 100755 tools/testing/selftests/drivers/net/bonding/bond_lacp_prio.sh
+v1->v2:
+- move implementation of __vsc8584_deinit_ptp into vsc8584_ptp_deinit
+- drop the PHY matching and check if ptp_clock is valid.
+---
+ drivers/net/phy/mscc/mscc.h      |  4 ++++
+ drivers/net/phy/mscc/mscc_main.c |  4 +---
+ drivers/net/phy/mscc/mscc_ptp.c  | 34 ++++++++++++++++++++------------
+ 3 files changed, 26 insertions(+), 16 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/bonding/Makefile b/tools/testing/selftests/drivers/net/bonding/Makefile
-index 44b98f17f8ff..3462783ed3ac 100644
---- a/tools/testing/selftests/drivers/net/bonding/Makefile
-+++ b/tools/testing/selftests/drivers/net/bonding/Makefile
-@@ -11,7 +11,8 @@ TEST_PROGS := \
- 	bond_options.sh \
- 	bond-eth-type-change.sh \
- 	bond_macvlan_ipvlan.sh \
--	bond_passive_lacp.sh
-+	bond_passive_lacp.sh \
-+	bond_lacp_prio.sh
- 
- TEST_FILES := \
- 	lag_lib.sh \
-diff --git a/tools/testing/selftests/drivers/net/bonding/bond_lacp_prio.sh b/tools/testing/selftests/drivers/net/bonding/bond_lacp_prio.sh
-new file mode 100755
-index 000000000000..5d067b8ee707
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/bonding/bond_lacp_prio.sh
-@@ -0,0 +1,107 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Testing if bond lacp per port priority works
-+#
-+#          Switch (s_ns)          Backup Switch (b_ns)
-+#  +-------------------------+ +-------------------------+
-+#  |          bond0          | |          bond0          |
-+#  |            +            | |            +            |
-+#  |      eth0  |  eth1      | |      eth0  |  eth1      |
-+#  |        +---+---+        | |        +---+---+        |
-+#  |        |       |        | |        |       |        |
-+#  +-------------------------+ +-------------------------+
-+#           |       |                   |       |
-+#  +-----------------------------------------------------+
-+#  |        |       |                   |       |        |
-+#  |        +-------+---------+---------+-------+        |
-+#  |      eth0     eth1       |       eth2     eth3      |
-+#  |                          +                          |
-+#  |                        bond0                        |
-+#  +-----------------------------------------------------+
-+#                        Client (c_ns)
-+
-+lib_dir=$(dirname "$0")
-+# shellcheck disable=SC1091
-+source "$lib_dir"/../../../net/lib.sh
-+
-+setup_links()
-+{
-+	# shellcheck disable=SC2154
-+	ip -n "${c_ns}" link add eth0 type veth peer name eth0 netns "${s_ns}"
-+	ip -n "${c_ns}" link add eth1 type veth peer name eth1 netns "${s_ns}"
-+	# shellcheck disable=SC2154
-+	ip -n "${c_ns}" link add eth2 type veth peer name eth0 netns "${b_ns}"
-+	ip -n "${c_ns}" link add eth3 type veth peer name eth1 netns "${b_ns}"
-+
-+	ip -n "${c_ns}" link add bond0 type bond mode 802.3ad miimon 100 \
-+		lacp_rate fast ad_select prio
-+	ip -n "${s_ns}" link add bond0 type bond mode 802.3ad miimon 100 \
-+		lacp_rate fast
-+	ip -n "${b_ns}" link add bond0 type bond mode 802.3ad miimon 100 \
-+		lacp_rate fast
-+
-+	ip -n "${c_ns}" link set eth0 master bond0
-+	ip -n "${c_ns}" link set eth1 master bond0
-+	ip -n "${c_ns}" link set eth2 master bond0
-+	ip -n "${c_ns}" link set eth3 master bond0
-+	ip -n "${s_ns}" link set eth0 master bond0
-+	ip -n "${s_ns}" link set eth1 master bond0
-+	ip -n "${b_ns}" link set eth0 master bond0
-+	ip -n "${b_ns}" link set eth1 master bond0
-+
-+	ip -n "${c_ns}" link set bond0 up
-+	ip -n "${s_ns}" link set bond0 up
-+	ip -n "${b_ns}" link set bond0 up
-+}
-+
-+test_port_prio_setting()
-+{
-+	RET=0
-+	ip -n "${c_ns}" link set eth0 type bond_slave actor_port_prio 1000
-+	prio=$(cmd_jq "ip -n ${c_ns} -d -j link show eth0" \
-+		".[].linkinfo.info_slave_data.actor_port_prio")
-+	[ "$prio" -ne 1000 ] && RET=1
-+	ip -n "${c_ns}" link set eth2 type bond_slave actor_port_prio 10
-+	prio=$(cmd_jq "ip -n ${c_ns} -d -j link show eth2" \
-+		".[].linkinfo.info_slave_data.actor_port_prio")
-+	[ "$prio" -ne 10 ] && RET=1
-+}
-+
-+test_agg_reselect()
-+{
-+	local bond_agg_id slave_agg_id
-+	local expect_slave="$1"
-+	RET=0
-+
-+	# Trigger link state change to reselect the aggregator
-+	ip -n "${c_ns}" link set eth1 down
-+	sleep 1
-+	ip -n "${c_ns}" link set eth1 up
-+
-+	bond_agg_id=$(cmd_jq "ip -n ${c_ns} -d -j link show bond0" \
-+		".[].linkinfo.info_data.ad_info.aggregator")
-+	slave_agg_id=$(cmd_jq "ip -n ${c_ns} -d -j link show $expect_slave" \
-+		".[].linkinfo.info_slave_data.ad_aggregator_id")
-+	# shellcheck disable=SC2034
-+	[ "${bond_agg_id}" -ne "${slave_agg_id}" ] && \
-+		RET=1
-+}
-+
-+trap cleanup_all_ns EXIT
-+setup_ns c_ns s_ns b_ns
-+setup_links
-+
-+test_port_prio_setting
-+log_test "bond 802.3ad" "actor_port_prio setting"
-+
-+test_agg_reselect eth0
-+log_test "bond 802.3ad" "actor_port_prio select"
-+
-+# Change the actor port prio and re-test
-+ip -n "${c_ns}" link set eth0 type bond_slave actor_port_prio 10
-+ip -n "${c_ns}" link set eth2 type bond_slave actor_port_prio 1000
-+test_agg_reselect eth2
-+log_test "bond 802.3ad" "actor_port_prio switch"
-+
-+exit "${EXIT_STATUS}"
-diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-index 890b3374dacd..08121cb9dc26 100644
---- a/tools/testing/selftests/net/forwarding/lib.sh
-+++ b/tools/testing/selftests/net/forwarding/lib.sh
-@@ -571,30 +571,6 @@ wait_for_dev()
-         fi
- }
- 
--cmd_jq()
--{
--	local cmd=$1
--	local jq_exp=$2
--	local jq_opts=$3
--	local ret
--	local output
--
--	output="$($cmd)"
--	# it the command fails, return error right away
--	ret=$?
--	if [[ $ret -ne 0 ]]; then
--		return $ret
--	fi
--	output=$(echo $output | jq -r $jq_opts "$jq_exp")
--	ret=$?
--	if [[ $ret -ne 0 ]]; then
--		return $ret
--	fi
--	echo $output
--	# return success only in case of non-empty output
--	[ ! -z "$output" ]
--}
--
- pre_cleanup()
+diff --git a/drivers/net/phy/mscc/mscc.h b/drivers/net/phy/mscc/mscc.h
+index b8c6ba7c7834e..2d8eca54c40a2 100644
+--- a/drivers/net/phy/mscc/mscc.h
++++ b/drivers/net/phy/mscc/mscc.h
+@@ -484,6 +484,7 @@ static inline void vsc8584_config_macsec_intr(struct phy_device *phydev)
+ void vsc85xx_link_change_notify(struct phy_device *phydev);
+ void vsc8584_config_ts_intr(struct phy_device *phydev);
+ int vsc8584_ptp_init(struct phy_device *phydev);
++void vsc8584_ptp_deinit(struct phy_device *phydev);
+ int vsc8584_ptp_probe_once(struct phy_device *phydev);
+ int vsc8584_ptp_probe(struct phy_device *phydev);
+ irqreturn_t vsc8584_handle_ts_interrupt(struct phy_device *phydev);
+@@ -498,6 +499,9 @@ static inline int vsc8584_ptp_init(struct phy_device *phydev)
  {
- 	if [ "${PAUSE_ON_CLEANUP}" = "yes" ]; then
-diff --git a/tools/testing/selftests/net/lib.sh b/tools/testing/selftests/net/lib.sh
-index c7add0dc4c60..4dca6893aa8a 100644
---- a/tools/testing/selftests/net/lib.sh
-+++ b/tools/testing/selftests/net/lib.sh
-@@ -645,3 +645,27 @@ wait_local_port_listen()
- 		sleep 0.1
- 	done
+ 	return 0;
  }
-+
-+cmd_jq()
++static inline void vsc8584_ptp_deinit(struct phy_device *phydev)
 +{
-+	local cmd=$1
-+	local jq_exp=$2
-+	local jq_opts=$3
-+	local ret
-+	local output
-+
-+	output="$($cmd)"
-+	# it the command fails, return error right away
-+	ret=$?
-+	if [[ $ret -ne 0 ]]; then
-+		return $ret
-+	fi
-+	output=$(echo $output | jq -r $jq_opts "$jq_exp")
-+	ret=$?
-+	if [[ $ret -ne 0 ]]; then
-+		return $ret
-+	fi
-+	echo $output
-+	# return success only in case of non-empty output
-+	[ ! -z "$output" ]
 +}
+ static inline int vsc8584_ptp_probe_once(struct phy_device *phydev)
+ {
+ 	return 0;
+diff --git a/drivers/net/phy/mscc/mscc_main.c b/drivers/net/phy/mscc/mscc_main.c
+index 800da302ae632..a034a8a8dde51 100644
+--- a/drivers/net/phy/mscc/mscc_main.c
++++ b/drivers/net/phy/mscc/mscc_main.c
+@@ -2370,9 +2370,7 @@ static int vsc85xx_probe(struct phy_device *phydev)
+ 
+ static void vsc85xx_remove(struct phy_device *phydev)
+ {
+-	struct vsc8531_private *priv = phydev->priv;
+-
+-	skb_queue_purge(&priv->rx_skbs_list);
++	vsc8584_ptp_deinit(phydev);
+ }
+ 
+ /* Microsemi VSC85xx PHYs */
+diff --git a/drivers/net/phy/mscc/mscc_ptp.c b/drivers/net/phy/mscc/mscc_ptp.c
+index de6c7312e8f29..72847320cb652 100644
+--- a/drivers/net/phy/mscc/mscc_ptp.c
++++ b/drivers/net/phy/mscc/mscc_ptp.c
+@@ -1298,7 +1298,6 @@ static void vsc8584_set_input_clk_configured(struct phy_device *phydev)
+ 
+ static int __vsc8584_init_ptp(struct phy_device *phydev)
+ {
+-	struct vsc8531_private *vsc8531 = phydev->priv;
+ 	static const u32 ltc_seq_e[] = { 0, 400000, 0, 0, 0 };
+ 	static const u8  ltc_seq_a[] = { 8, 6, 5, 4, 2 };
+ 	u32 val;
+@@ -1515,17 +1514,7 @@ static int __vsc8584_init_ptp(struct phy_device *phydev)
+ 
+ 	vsc85xx_ts_eth_cmp1_sig(phydev);
+ 
+-	vsc8531->mii_ts.rxtstamp = vsc85xx_rxtstamp;
+-	vsc8531->mii_ts.txtstamp = vsc85xx_txtstamp;
+-	vsc8531->mii_ts.hwtstamp = vsc85xx_hwtstamp;
+-	vsc8531->mii_ts.ts_info  = vsc85xx_ts_info;
+-	phydev->mii_ts = &vsc8531->mii_ts;
+-
+-	memcpy(&vsc8531->ptp->caps, &vsc85xx_clk_caps, sizeof(vsc85xx_clk_caps));
+-
+-	vsc8531->ptp->ptp_clock = ptp_clock_register(&vsc8531->ptp->caps,
+-						     &phydev->mdio.dev);
+-	return PTR_ERR_OR_ZERO(vsc8531->ptp->ptp_clock);
++	return 0;
+ }
+ 
+ void vsc8584_config_ts_intr(struct phy_device *phydev)
+@@ -1552,6 +1541,16 @@ int vsc8584_ptp_init(struct phy_device *phydev)
+ 	return 0;
+ }
+ 
++void vsc8584_ptp_deinit(struct phy_device *phydev)
++{
++	struct vsc8531_private *vsc8531 = phydev->priv;
++
++	if (vsc8531->ptp->ptp_clock) {
++		ptp_clock_unregister(vsc8531->ptp->ptp_clock);
++		skb_queue_purge(&vsc8531->rx_skbs_list);
++	}
++}
++
+ irqreturn_t vsc8584_handle_ts_interrupt(struct phy_device *phydev)
+ {
+ 	struct vsc8531_private *priv = phydev->priv;
+@@ -1612,7 +1611,16 @@ int vsc8584_ptp_probe(struct phy_device *phydev)
+ 
+ 	vsc8531->ptp->phydev = phydev;
+ 
+-	return 0;
++	vsc8531->mii_ts.rxtstamp = vsc85xx_rxtstamp;
++	vsc8531->mii_ts.txtstamp = vsc85xx_txtstamp;
++	vsc8531->mii_ts.hwtstamp = vsc85xx_hwtstamp;
++	vsc8531->mii_ts.ts_info  = vsc85xx_ts_info;
++	phydev->mii_ts = &vsc8531->mii_ts;
++
++	memcpy(&vsc8531->ptp->caps, &vsc85xx_clk_caps, sizeof(vsc85xx_clk_caps));
++	vsc8531->ptp->ptp_clock = ptp_clock_register(&vsc8531->ptp->caps,
++						     &phydev->mdio.dev);
++	return PTR_ERR_OR_ZERO(vsc8531->ptp->ptp_clock);
+ }
+ 
+ int vsc8584_ptp_probe_once(struct phy_device *phydev)
 -- 
-2.50.1
+2.34.1
 
 
