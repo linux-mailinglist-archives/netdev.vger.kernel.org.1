@@ -1,173 +1,341 @@
-Return-Path: <netdev+bounces-216595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 735B5B34AF0
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 21:33:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 97060B34AFB
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 21:37:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89510178EEE
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 19:33:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55B5217BAA0
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 19:37:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE46B284B4E;
-	Mon, 25 Aug 2025 19:33:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ADE228466C;
+	Mon, 25 Aug 2025 19:37:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JGpq1sP5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cCG/5y/C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A05284686
-	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 19:33:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4487A169AE6
+	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 19:37:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756150421; cv=none; b=E9ymsxuZZBiRdBrHKFhafg74SfaKbr+tKnhuaAzhSskhTcljpQ25y7+gYLKUAgzp8UPqvVQ09NCu237hgJTgoC4YNgDUk1dBJy1nCYgmkjaPICIui/fzuKmG9wvveC4onM4IkdTmlvjjer+PeDXsbD8R/pK0JmjvdBf9qO0xJm8=
+	t=1756150657; cv=none; b=DFUnLh6dnabhWGQt8qzlHNY/oJOH4E1vWyJd3/ONBwFMx150VcDalteMUQJz9Ms+tdBEgbH9a/s59nYExOaoUCX3s9t9a2gqM9KtzbRsgYd048YSmPnHCFf9aMrYPczceO3w0jmb5CuXh+o1Sxl8H0pjwQbKt5oy+1erYm+A+TI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756150421; c=relaxed/simple;
-	bh=S7AAqN5jURT5/z3vahcejf5DpecFFf0mqMMmmi7onvo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tktbFk3c+rGJN7xrzmHurSevKA30Bc6dUULIzDkgvWwZYRpl/Ir16VUZVgZqhDjdNS1+59yqDXiwfxBXl5hWsH2yLDXu8hNPbnVFBiop1+5l1+Yy7L8fpt1jQ1r5vQkM3u9OSgvGJqk51K1UFxkH+0HmwhST32Gz1szwDyzLcWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JGpq1sP5; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4b109a95f09so35914631cf.1
-        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 12:33:38 -0700 (PDT)
+	s=arc-20240116; t=1756150657; c=relaxed/simple;
+	bh=K10h3M9KbOE5hMC4c+vdDyM6WXJwS/HGxhRInopiXV8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H0Hb1QyU0cBHwhQJz2MOwahKnPMBHJJExXDBq9uiEzUsIkLSOh3pfUbR0atq+wnCQEXmpmuSH2sTCCg3S/RBHvMWFECyVSrF80rLitQWGMFFst1SrkhbGBAlUy1O5cnCc2odfYQwVuCKBZ45FCcEEDe7w4iXRwWls1wm1mMunyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cCG/5y/C; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-76e2e88c6a6so4207012b3a.1
+        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 12:37:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756150418; x=1756755218; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OxffX3a0/5wfsp9GphcAYcfX3auUfB5UZgtehPW6yAk=;
-        b=JGpq1sP5wIsLMDuR6Z5zYhOes4tz/rqHSEtCAAESVKrAE1//VRxmucTHxpYZnkVHLG
-         gNu+V+HmPi4qyxQEuWajl7lEuJrI3ExDJvMyfJVzRf2yWLvfuj5ziSt7UgjWHwhKQaHb
-         Xmknb0R+c9I4/bgC66u9sTJ5gNKqVcY0tgDLpnEwcD95YaWwZ+bjxH3+/aY/CumVVadq
-         Qta/jurfPf6IwSFC+H4oSphCSNz4R5/PI7TJieLKiNLsrtgzFv7T0eQX4EJ/XY95e+cI
-         1b54AqNXFc1lQE6ePo5VX18IlWGL/ZtsmGl224c4L48LNSCr8xNO95RaBuQcyodasQuZ
-         A3kw==
+        d=gmail.com; s=20230601; t=1756150655; x=1756755455; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JspAce57i6qHqxwzi6a3rYAAXGsJT3LXkyDZDvwF1lw=;
+        b=cCG/5y/C1U+VlnwpN6UqfGInU7CWbbuiOEzO2UWsfs2iKIZJoPLRgIETEHQtscGDfx
+         M+V/0y683330tXvADM9dph1vaLYJARxKf+akegh3++bxwj5Cd1c0FWfmhTz+VSyMlkyZ
+         WjjeUyfqNsWf8BPkPF31V4jolEj+6kXvsPdyoPNaQySvc6CmiqHO6q5MUtG7rNsrtDvy
+         2e0KtInIAldAYtBtzwyDNYmWT8z6t0V8ULfVz31uRWYdMG8U0Tz0+JWML/vS7V0wu62Z
+         G0q9s6R0+R5LssTdJkuOM6JFthoMvDqouTZbRGwRl7xPJ5IChWuGKH2DIOCqQymiClkD
+         l+ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756150418; x=1756755218;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OxffX3a0/5wfsp9GphcAYcfX3auUfB5UZgtehPW6yAk=;
-        b=FIRZTHvYsxvMgYwzL8cujg6IeBHknBCoaBsarDq11KmgT3uUWqqynm3DF4zTH6q+k0
-         TqZhmSIOEk6BuoK5KXCQsOZu73MqI5t4fJMMg9D4+tJvxyLScdG3TEjgqKOdEB9vouZY
-         rfODT4J7Vc/bHgiYvRnvUYht4HwSUUemWL5H3WS6u4MIL3IZwIKTJ+wroi5X2aqBdBB6
-         EJVeJLYJqhiSGwxOJXIVbMqCbEyF6eSq9lCRtryFX/E4j/6yqAjtut+Wv66hGA4U1Gp1
-         muqyeyowkroPXj7BhXbN9Fwpjgtzgi8xTe7O6iPyGydfBIN+2LErjtjIcho/WqGFeYV7
-         dCBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXyWrIJfqMGNaXvdQNQZLHDaNcnl1V0w7gInLZq9WHVpEQWAXToZQhN/ftrB8MYhYZL4bJoG08=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFQ6cIAPPSUBbnKkQKXPF1kZ7ANq+30BYQnWwFGTIpepgA+65m
-	5GcHIjwb6Npme90yRJZ71Y0MFLa09D/C6dt3/XHkE/3uV3U7xTXGCO/pSkwgFALVG/jOv5uXhKo
-	sLFxIryeKx2QBxAwZjL3t/20qBA9fEz4CTdb5E+wX
-X-Gm-Gg: ASbGncsR4Uqe+aP8BrTAQb7GtNkOTv+tk9p+OTPZaLrXBRD0xICnDVm6mQmJ+zUfOaD
-	E9VR0royyWAlyWcOuNmhGihnEgOmIorgVD/vwJms6GnE50H+EFvDrT+LR0QY/NjjzlR4J9LFygl
-	tCEpOjTDY9Uq7TSK4ZghhOvTldQY1yWSSWb6W83Hz27173GqRn0hUb/Hh/IqXdhxjbjVMGoPRf3
-	JMaIbAosr/lqu0=
-X-Google-Smtp-Source: AGHT+IEtf/9wf7+2/c/rNT0NYgi10xYmRrdVN2JDXyvdU2/6uZzQBPwxIFBBNmJNsr9XwCc4R2Dzkd9jHijR6MgVSrc=
-X-Received: by 2002:a05:622a:47ce:b0:4b1:dd3:e39c with SMTP id
- d75a77b69052e-4b2aab467c5mr152508311cf.63.1756150417382; Mon, 25 Aug 2025
- 12:33:37 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1756150655; x=1756755455;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JspAce57i6qHqxwzi6a3rYAAXGsJT3LXkyDZDvwF1lw=;
+        b=AoDWFPOe1kGyZyprIUG1mK4bOQm1QZlgqCUeA36Fr63pFPklCze5wyIA7LHOv1eqHy
+         a4BTskZuWZcHfj7FE3uUThHuvlRvs59u6PpYmz6htbYNG20XfIjEn1o76mrf+rQJuN0t
+         biuOhWfHjL/a5cqR9EYCyGYcRNnY59kWyZ5lDw+sHuanHSf10foadhAVH83jjEqppPQs
+         l812Q5PVeF/m6Hve2yxMNKQAbx012YwPE9NjFQGW0VywFhiiKF7IHr588vWxLX0NawnT
+         l8R5polbaOpXoKwIB1n9q6RaJiUh+GzsoTBeNtQVrQ6YwlD/ADRdepQ8Ql+gZx5av00/
+         2W3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVWHVovWY1qQNahHJiWr9sC4a2Gk2CUaxlTqkdkLhbl7NsLUiIc1pyN61XEtm4pz8RrExChAPU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKZGbZlXPPB4SVxspv2in1VE1w8vG2xE6CwLdBnRRtp2HBBJlH
+	OyoNlTQY2MVRgFHddBxK8UB5VtTKgtK9IKLmf18Tcf5bPclECis9sKc=
+X-Gm-Gg: ASbGncv4jkrmSKuRTC1r5Q2lox0uR1jUxETsuHbwbb5Uciyfud1pu3PnfRssv4uH/Nl
+	ykoDMZa5yZvLBPASeZP5Suo3RC3c7UheFhtRW01H7FOs4slSi1Pxw1BI8Gs5dFLzyDwyVKLaAOk
+	kk1pRF2oB212uV3L9Gk8V0eNDleJIDbJBMbHj/35WcQoGAKA6rZbLpBJlUVLYf+QGx62n1QmmTV
+	wtSZLq2uB3DjA59kECFqU3n4LYDp8ugi96+mijzewsHa4HXprYW1nBCq3+2fkMb8pBeaX6KQ9vc
+	TmuxDkEisR28MxqvIzCOyJxZPdpOKT+o3LdTAdFTealKppvSycmSYFTvJ0pF7qVk5BkITVEOHb0
+	cO9CnGCbN8aOwNX6bAIDHP3qIHF+UVX3ZcBGxywh6fvyhrCGsm0CjrIp3bEkDgf0Q6jwQ2XEgNK
+	wxn3QiUVKHl1+LTxa64wF1x8pUIOaMxl4pLLtvTNN2WOPThl/SZS4p1zhcpYc5py2JH8hURbFPS
+	HW7
+X-Google-Smtp-Source: AGHT+IEzou8X8pz2beNTkpAR6bLvAktH1PlEXDIMYf0PhcVCPQ/4h6wR79IX35VLPhRCMXJXY3pJkg==
+X-Received: by 2002:a05:6a00:b45:b0:770:556d:32e8 with SMTP id d2e1a72fcca58-770556d5e86mr7829473b3a.24.1756150655285;
+        Mon, 25 Aug 2025 12:37:35 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-771e6535272sm2962471b3a.24.2025.08.25.12.37.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Aug 2025 12:37:35 -0700 (PDT)
+Date: Mon, 25 Aug 2025 12:37:34 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Samiullah Khawaja <skhawaja@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller " <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	almasrymina@google.com, willemb@google.com, mkarsten@uwaterloo.ca,
+	Joe Damato <joe@dama.to>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v7 0/2] Add support to do threaded napi busy poll
+Message-ID: <aKy7fmowmZ8g9ZhH@mini-arch>
+References: <20250824215418.257588-1-skhawaja@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250825190715.1690-1-andrea.mayer@uniroma2.it>
-In-Reply-To: <20250825190715.1690-1-andrea.mayer@uniroma2.it>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 25 Aug 2025 12:33:26 -0700
-X-Gm-Features: Ac12FXz0I9GuTz90X-rPTA1ZksZsbDknybu0BHszaMYs1YDI6C_dwuD3QVo4i00
-Message-ID: <CANn89i+UTv8nJ=cc67iKky=MLXOnzF5XyVRsV-TMXz7wUQ6Yvw@mail.gmail.com>
-Subject: Re: [PATCH net] ipv6: sr: fix destroy of seg6_hmac_info to prevent
- HMAC data leak
-To: Andrea Mayer <andrea.mayer@uniroma2.it>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	Eric Biggers <ebiggers@kernel.org>, David Lebrun <dlebrun@google.com>, 
-	Stefano Salsano <stefano.salsano@uniroma2.it>, Paolo Lungaroni <paolo.lungaroni@uniroma2.it>, 
-	Ahmed Abdelsalam <ahabdels.dev@gmail.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250824215418.257588-1-skhawaja@google.com>
 
-On Mon, Aug 25, 2025 at 12:08=E2=80=AFPM Andrea Mayer <andrea.mayer@uniroma=
-2.it> wrote:
->
-> The seg6_hmac_info structure stores information related to SRv6 HMAC
-> configurations, including the secret key, HMAC ID, and hashing algorithm
-> used to authenticate and secure SRv6 packets.
->
-> When a seg6_hmac_info object is no longer needed, it is destroyed via
-> seg6_hmac_info_del(), which eventually calls seg6_hinfo_release(). This
-> function uses kfree_rcu() to safely deallocate memory after an RCU grace
-> period has elapsed.
-> The kfree_rcu() releases memory without sanitization (e.g., zeroing out
-> the memory). Consequently, sensitive information such as the HMAC secret
-> and its length may remain in freed memory, potentially leading to data
-> leaks.
->
-> To address this risk, we replaced kfree_rcu() with a custom RCU
-> callback, seg6_hinfo_free_callback_rcu(). Within this callback, we
-> explicitly sanitize the seg6_hmac_info object before deallocating it
-> safely using kfree_sensitive(). This approach ensures the memory is
-> securely freed and prevents potential HMAC info leaks.
-> Additionally, in the control path, we ensure proper cleanup of
-> seg6_hmac_info objects when seg6_hmac_info_add() fails: such objects are
-> freed using kfree_sensitive() instead of kfree().
->
-> Fixes: 4f4853dc1c9c ("ipv6: sr: implement API to control SR HMAC structur=
-e")
-> Fixes: bf355b8d2c30 ("ipv6: sr: add core files for SR HMAC support")
+On 08/24, Samiullah Khawaja wrote:
+> Extend the already existing support of threaded napi poll to do continuous
+> busy polling.
+> 
+> This is used for doing continuous polling of napi to fetch descriptors
+> from backing RX/TX queues for low latency applications. Allow enabling
+> of threaded busypoll using netlink so this can be enabled on a set of
+> dedicated napis for low latency applications.
+> 
+> Once enabled user can fetch the PID of the kthread doing NAPI polling
+> and set affinity, priority and scheduler for it depending on the
+> low-latency requirements.
+> 
+> Currently threaded napi is only enabled at device level using sysfs. Add
+> support to enable/disable threaded mode for a napi individually. This
+> can be done using the netlink interface. Extend `napi-set` op in netlink
+> spec that allows setting the `threaded` attribute of a napi.
+> 
+> Extend the threaded attribute in napi struct to add an option to enable
+> continuous busy polling. Extend the netlink and sysfs interface to allow
+> enabling/disabling threaded busypolling at device or individual napi
+> level.
+> 
+> We use this for our AF_XDP based hard low-latency usecase with usecs
+> level latency requirement. For our usecase we want low jitter and stable
+> latency at P99.
+> 
+> Following is an analysis and comparison of available (and compatible)
+> busy poll interfaces for a low latency usecase with stable P99. Please
+> note that the throughput and cpu efficiency is a non-goal.
+> 
+> For analysis we use an AF_XDP based benchmarking tool `xdp_rr`. The
+> description of the tool and how it tries to simulate the real workload
+> is following,
+> 
+> - It sends UDP packets between 2 machines.
+> - The client machine sends packets at a fixed frequency. To maintain the
+>   frequency of the packet being sent, we use open-loop sampling. That is
+>   the packets are sent in a separate thread.
+> - The server replies to the packet inline by reading the pkt from the
+>   recv ring and replies using the tx ring.
+> - To simulate the application processing time, we use a configurable
+>   delay in usecs on the client side after a reply is received from the
+>   server.
+> 
+> The xdp_rr tool is posted separately as an RFC for tools/testing/selftest.
+> 
+> We use this tool with following napi polling configurations,
+> 
+> - Interrupts only
+> - SO_BUSYPOLL (inline in the same thread where the client receives the
+>   packet).
+> - SO_BUSYPOLL (separate thread and separate core)
+> - Threaded NAPI busypoll
+> 
+> System is configured using following script in all 4 cases,
+> 
+> ```
+> echo 0 | sudo tee /sys/class/net/eth0/threaded
+> echo 0 | sudo tee /proc/sys/kernel/timer_migration
+> echo off | sudo tee  /sys/devices/system/cpu/smt/control
+> 
+> sudo ethtool -L eth0 rx 1 tx 1
+> sudo ethtool -G eth0 rx 1024
+> 
+> echo 0 | sudo tee /proc/sys/net/core/rps_sock_flow_entries
+> echo 0 | sudo tee /sys/class/net/eth0/queues/rx-0/rps_cpus
+> 
+>  # pin IRQs on CPU 2
+> IRQS="$(gawk '/eth0-(TxRx-)?1/ {match($1, /([0-9]+)/, arr); \
+> 				print arr[0]}' < /proc/interrupts)"
+> for irq in "${IRQS}"; \
+> 	do echo 2 | sudo tee /proc/irq/$irq/smp_affinity_list; done
+> 
+> echo -1 | sudo tee /proc/sys/kernel/sched_rt_runtime_us
+> 
+> for i in /sys/devices/virtual/workqueue/*/cpumask; \
+> 			do echo $i; echo 1,2,3,4,5,6 > $i; done
+> 
+> if [[ -z "$1" ]]; then
+>   echo 400 | sudo tee /proc/sys/net/core/busy_read
+>   echo 100 | sudo tee /sys/class/net/eth0/napi_defer_hard_irqs
+>   echo 15000   | sudo tee /sys/class/net/eth0/gro_flush_timeout
+> fi
+> 
+> sudo ethtool -C eth0 adaptive-rx off adaptive-tx off rx-usecs 0 tx-usecs 0
+> 
+> if [[ "$1" == "enable_threaded" ]]; then
+>   echo 0 | sudo tee /proc/sys/net/core/busy_poll
+>   echo 0 | sudo tee /proc/sys/net/core/busy_read
+>   echo 100 | sudo tee /sys/class/net/eth0/napi_defer_hard_irqs
+>   echo 15000 | sudo tee /sys/class/net/eth0/gro_flush_timeout
+>   echo 2 | sudo tee /sys/class/net/eth0/threaded
+>   NAPI_T=$(ps -ef | grep napi | grep -v grep | awk '{ print $2 }')
+>   sudo chrt -f  -p 50 $NAPI_T
+> 
+>   # pin threaded poll thread to CPU 2
+>   sudo taskset -pc 2 $NAPI_T
+> fi
+> 
+> if [[ "$1" == "enable_interrupt" ]]; then
+>   echo 0 | sudo tee /proc/sys/net/core/busy_read
+>   echo 0 | sudo tee /sys/class/net/eth0/napi_defer_hard_irqs
+>   echo 15000 | sudo tee /sys/class/net/eth0/gro_flush_timeout
+> fi
+> ```
+> 
+> To enable various configurations, script can be run as following,
+> 
+> - Interrupt Only
+>   ```
+>   <script> enable_interrupt
+>   ```
+> 
+> - SO_BUSYPOLL (no arguments to script)
+>   ```
+>   <script>
+>   ```
+> 
+> - NAPI threaded busypoll
+>   ```
+>   <script> enable_threaded
+>   ```
+> 
+> If using idpf, the script needs to be run again after launching the
+> workload just to make sure that the configurations are not reverted. As
+> idpf reverts some configurations on software reset when AF_XDP program
+> is attached.
+> 
+> Once configured, the workload is run with various configurations using
+> following commands. Set period (1/frequency) and delay in usecs to
+> produce results for packet frequency and application processing delay.
+> 
+>  ## Interrupt Only and SO_BUSY_POLL (inline)
+> 
+> - Server
+> ```
+> sudo chrt -f 50 taskset -c 3-5 ./xsk_rr -o 0 -B 400 -i eth0 -4 \
+> 	-D <IP-dest> -S <IP-src> -M <MAC-dst> -m <MAC-src> -p 54321 -h -v
+> ```
+> 
+> - Client
+> ```
+> sudo chrt -f 50 taskset -c 3-5 ./xsk_rr -o 0 -B 400 -i eth0 -4 \
+> 	-S <IP-src> -D <IP-dest> -m <MAC-src> -M <MAC-dst> -p 54321 \
+> 	-P <Period-usecs> -d <Delay-usecs>  -T -l 1 -v
+> ```
+> 
+>  ## SO_BUSY_POLL(done in separate core using recvfrom)
+> 
+> Argument -t spawns a seprate thread and continuously calls recvfrom.
+> 
+> - Server
+> ```
+> sudo chrt -f 50 taskset -c 3-5 ./xsk_rr -o 0 -B 400 -i eth0 -4 \
+> 	-D <IP-dest> -S <IP-src> -M <MAC-dst> -m <MAC-src> -p 54321 \
+> 	-h -v -t
+> ```
+> 
+> - Client
+> ```
+> sudo chrt -f 50 taskset -c 3-5 ./xsk_rr -o 0 -B 400 -i eth0 -4 \
+> 	-S <IP-src> -D <IP-dest> -m <MAC-src> -M <MAC-dst> -p 54321 \
+> 	-P <Period-usecs> -d <Delay-usecs>  -T -l 1 -v -t
+> ```
+> 
+>  ## NAPI Threaded Busy Poll
+> 
+> Argument -n skips the recvfrom call as there is no recv kick needed.
+> 
+> - Server
+> ```
+> sudo chrt -f 50 taskset -c 3-5 ./xsk_rr -o 0 -B 400 -i eth0 -4 \
+> 	-D <IP-dest> -S <IP-src> -M <MAC-dst> -m <MAC-src> -p 54321 \
+> 	-h -v -n
+> ```
+> 
+> - Client
+> ```
+> sudo chrt -f 50 taskset -c 3-5 ./xsk_rr -o 0 -B 400 -i eth0 -4 \
+> 	-S <IP-src> -D <IP-dest> -m <MAC-src> -M <MAC-dst> -p 54321 \
+> 	-P <Period-usecs> -d <Delay-usecs>  -T -l 1 -v -n
+> ```
+> 
+> | Experiment | interrupts | SO_BUSYPOLL | SO_BUSYPOLL(separate) | NAPI threaded |
+> |---|---|---|---|---|
+> | 12 Kpkt/s + 0us delay | | | | |
+> |  | p5: 12700 | p5: 12900 | p5: 13300 | p5: 12800 |
+> |  | p50: 13100 | p50: 13600 | p50: 14100 | p50: 13000 |
+> |  | p95: 13200 | p95: 13800 | p95: 14400 | p95: 13000 |
+> |  | p99: 13200 | p99: 13800 | p99: 14400 | p99: 13000 |
+> | 32 Kpkt/s + 30us delay | | | | |
+> |  | p5: 19900 | p5: 16600 | p5: 13100 | p5: 12800 |
+> |  | p50: 21100 | p50: 17000 | p50: 13700 | p50: 13000 |
+> |  | p95: 21200 | p95: 17100 | p95: 14000 | p95: 13000 |
+> |  | p99: 21200 | p99: 17100 | p99: 14000 | p99: 13000 |
+> | 125 Kpkt/s + 6us delay | | | | |
+> |  | p5: 14600 | p5: 17100 | p5: 13300 | p5: 12900 |
+> |  | p50: 15400 | p50: 17400 | p50: 13800 | p50: 13100 |
+> |  | p95: 15600 | p95: 17600 | p95: 14000 | p95: 13100 |
+> |  | p99: 15600 | p99: 17600 | p99: 14000 | p99: 13100 |
+> | 12 Kpkt/s + 78us delay | | | | |
+> |  | p5: 14100 | p5: 16700 | p5: 13200 | p5: 12600 |
+> |  | p50: 14300 | p50: 17100 | p50: 13900 | p50: 12800 |
+> |  | p95: 14300 | p95: 17200 | p95: 14200 | p95: 12800 |
+> |  | p99: 14300 | p99: 17200 | p99: 14200 | p99: 12800 |
+> | 25 Kpkt/s + 38us delay | | | | |
+> |  | p5: 19900 | p5: 16600 | p5: 13000 | p5: 12700 |
+> |  | p50: 21000 | p50: 17100 | p50: 13800 | p50: 12900 |
+> |  | p95: 21100 | p95: 17100 | p95: 14100 | p95: 12900 |
+> |  | p99: 21100 | p99: 17100 | p99: 14100 | p99: 12900 |
+> 
+>  ## Observations
+> 
+> - Here without application processing all the approaches give the same
+>   latency within 1usecs range and NAPI threaded gives minimum latency.
+> - With application processing the latency increases by 3-4usecs when
+>   doing inline polling.
+> - Using a dedicated core to drive napi polling keeps the latency same
+>   even with application processing. This is observed both in userspace
+>   and threaded napi (in kernel).
+> - Using napi threaded polling in kernel gives lower latency by
+>   1-1.5usecs as compared to userspace driven polling in separate core.
+> - With application processing userspace will get the packet from recv
+>   ring and spend some time doing application processing and then do napi
+>   polling. While application processing is happening a dedicated core
+>   doing napi polling can pull the packet of the NAPI RX queue and
+>   populate the AF_XDP recv ring. This means that when the application
+>   thread is done with application processing it has new packets ready to
+>   recv and process in recv ring.
+> - Napi threaded busy polling in the kernel with a dedicated core gives
+>   the consistent P5-P99 latency.
 
-Not sure if you are fixing a bug worth backports.
+The real take away for me is ~1us difference between SO_BUSYPOLL in a
+thread and NAPI threaded. Presumably mostly because of the non-blocking calls
+to sk_busy_loop in the former? So it takes 1us extra to enter/leave the kernel
+and setup/teardown the busy polling?
 
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Andrea Mayer <andrea.mayer@uniroma2.it>
-> ---
->  net/ipv6/seg6.c      |  2 +-
->  net/ipv6/seg6_hmac.c | 10 +++++++++-
->  2 files changed, 10 insertions(+), 2 deletions(-)
->
-> diff --git a/net/ipv6/seg6.c b/net/ipv6/seg6.c
-> index 180da19c148c..88782bdab843 100644
-> --- a/net/ipv6/seg6.c
-> +++ b/net/ipv6/seg6.c
-> @@ -215,7 +215,7 @@ static int seg6_genl_sethmac(struct sk_buff *skb, str=
-uct genl_info *info)
->
->         err =3D seg6_hmac_info_add(net, hmackeyid, hinfo);
->         if (err)
-> -               kfree(hinfo);
-> +               kfree_sensitive(hinfo);
->
->  out_unlock:
->         mutex_unlock(&sdata->lock);
-> diff --git a/net/ipv6/seg6_hmac.c b/net/ipv6/seg6_hmac.c
-> index fd58426f222b..19cdf3791ebf 100644
-> --- a/net/ipv6/seg6_hmac.c
-> +++ b/net/ipv6/seg6_hmac.c
-> @@ -57,9 +57,17 @@ static int seg6_hmac_cmpfn(struct rhashtable_compare_a=
-rg *arg, const void *obj)
->         return (hinfo->hmackeyid !=3D *(__u32 *)arg->key);
->  }
->
-> +static void seg6_hinfo_free_callback_rcu(struct rcu_head *head)
-> +{
-> +       struct seg6_hmac_info *hinfo;
-> +
-> +       hinfo =3D container_of(head, struct seg6_hmac_info, rcu);
-> +       kfree_sensitive(hinfo);
-> +}
-> +
->  static inline void seg6_hinfo_release(struct seg6_hmac_info *hinfo)
->  {
-> -       kfree_rcu(hinfo, rcu);
-> +       call_rcu(&hinfo->rcu, seg6_hinfo_free_callback_rcu);
->  }
+And you haven't tried epoll based busy polling? I'd expect to see
+results similar to your NAPI threaded (if it works correctly).
 
-If we worry a lot about sensitive data waiting too much in RCU land,
-perhaps use call_rcu_hurry() here ?
+(have nothing against the busy polling thread, mostly trying to
+understand what we are missing from the existing setup)
 
