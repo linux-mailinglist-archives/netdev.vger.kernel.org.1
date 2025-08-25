@@ -1,177 +1,281 @@
-Return-Path: <netdev+bounces-216661-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66612B34DB7
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 23:11:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 434AAB34DC3
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 23:15:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25F073AA610
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 21:11:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C4DA1B25638
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 21:16:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DB2329A9FA;
-	Mon, 25 Aug 2025 21:11:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8BEB1DE4CE;
+	Mon, 25 Aug 2025 21:15:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="l9ClzoDj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K0UWJXym"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx4.wp.pl (mx4.wp.pl [212.77.101.11])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9616229B764
-	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 21:11:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756156273; cv=none; b=l6yPmodfnGlYa45P5l1xDIH5k+DQhZHYHHmZhmBCtsAzqRRa0Ls5sKWgZnfOhNPKzWzeUzpIzX9u6yRyDaIx60AtlYVx5noLI1mVazC2QxgzeTEoxZb0HbF4VZl+UuUsSUTp3p8YCMnxhV1HHVRbs771keIbgh6KOZ90ZB0dlRQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756156273; c=relaxed/simple;
-	bh=Uh2yBMXE/pscYd1mqmI/JTw78W6S2ubOyJMDmz70AwM=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=JFVK4P0VI1OnOchrGLsEkOW2NnEZm38hdT2T9laAUnxBoyDYlVGzjPQn9dUcqilxaOy3DBHVdmiwPoKQJw2DzUpmKTAfoPNVEbeINHrRGd7JRo1R2qFABflFB3U8/w+yc4g07pvIhCY2MjTgDs1UIN8ZV+hERyJ7uYx0lsONOCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=l9ClzoDj; arc=none smtp.client-ip=212.77.101.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
-Received: (wp-smtpd smtp.wp.pl 15683 invoked from network); 25 Aug 2025 23:11:01 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
-          t=1756156261; bh=pgHnVnF6wcMMDTHLkcv210vPP9+FRghiIsIMN6rFI/4=;
-          h=From:To:Subject;
-          b=l9ClzoDjJn57tyPWKxLCLARkA//rDeRQX8ImVPsLAsU9C+TpzkHlb1VM0Todvvp0q
-           S9Vex+cXUBB/Mi4kn0kLScUxjrMI/u3F2/VGrED7Jolm26Voqz3JwIPAGNKBGVnjPS
-           iaVxWxNVAyETAqlANTDgu1Vk1pNtR+7oapvx7JgeOSb4cLL5bHvJz9jPvVrZmG+Tth
-           CwfJyMMmbG3DnuUPRG8ulbZyHu3jA9s74GoM4WPH7zLCc9MCClSc3Pv4ohGllD7YFn
-           aLp+LihnHQVivWDiFdPMqxpNUxc2ZxatuKcZoAIH1yuPaE6QHxYFrUh19sxqSv8lOG
-           vBe5RtCfBz/DQ==
-Received: from 83.24.136.119.ipv4.supernova.orange.pl (HELO laptop-olek.lan) (olek2@wp.pl@[83.24.136.119])
-          (envelope-sender <olek2@wp.pl>)
-          by smtp.wp.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
-          for <andrew@lunn.ch>; 25 Aug 2025 23:11:01 +0200
-From: Aleksander Jan Bajkowski <olek2@wp.pl>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	michael@fossekall.de,
-	daniel@makrotopia.org,
-	daniel.braunwarth@kuka.com,
-	olek2@wp.pl,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] net: phy: realtek: support for TRIGGER_NETDEV_LINK on RTL8211E and RTL8211F
-Date: Mon, 25 Aug 2025 23:09:49 +0200
-Message-ID: <20250825211059.143231-1-olek2@wp.pl>
-X-Mailer: git-send-email 2.47.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6D37AD2C;
+	Mon, 25 Aug 2025 21:15:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756156541; cv=fail; b=u79FJynR4CCuTjSuB5V6MKvTEt5utrnxdn5nGkSiJqMMndVS7e/JVL654NPwf5tTlpM2cEcHGBOoQqmJMa9evwqRr7ZsspAESIRyNBqQhWQAEEl8ZpffAMAwcAZUKb0//4rb/7OYukcTcsOCPjG4rYvMrdssUYvyQYwvAXYlNoE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756156541; c=relaxed/simple;
+	bh=owj4cmMb39od/MH2bPj1cZH8xSyh3d4rh+/VUT42Y0g=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=CUF67/e4QASlGR0SVpij7NAobo2LRUI9YrisJd8oLJD0sYaYhi2VBy2YbOaXEh0cfW3/K4Kh4YQmtHKjcHG7+HqR3R8gfQbHPn4UL52vVe44dkigyXmknZ7/4crhoSTZ1mSZKlj5qa/+Ei4s/JI38nsRhh7PVuRFStguUVK8/X0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K0UWJXym; arc=fail smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756156540; x=1787692540;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=owj4cmMb39od/MH2bPj1cZH8xSyh3d4rh+/VUT42Y0g=;
+  b=K0UWJXymQUnGMU6S+AXblkfBtJZ2HgiXD/CRx3fuxqoHE9bSaVAhxfew
+   qJusXpdk0lQZIxMUkw0e61TzgVcXqQwgbs51PmhBkRwePQC/03yDIQPrL
+   PFxTRskyDEIDYQo0SPYSXW1FDbxvr4rapakbQUdsTtvVR5cS29tK60MUn
+   UhgbQ7gHi1vm36nZkMnw7x6+gSgvB24UFq/pd/a4m7THyE7d61YOg6cRD
+   Xy9OdLb33urJTtgebkrxww/7oLKvQSftJRn26/jSImVFXbraMX4SAAcfV
+   AySB6ieGhbQdght8mtv/H8MMJqo/dDDNHDPBMRv8TU5jjRwPZ/N+6Fbi4
+   g==;
+X-CSE-ConnectionGUID: 4XxvzTqIQcO3vs8UlsFs6Q==
+X-CSE-MsgGUID: TATdTjbZR5mm1Pi0Kg0dAQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11533"; a="58241754"
+X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
+   d="scan'208";a="58241754"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2025 14:15:36 -0700
+X-CSE-ConnectionGUID: QxXmt5wMTdau0LQ6yKhvyQ==
+X-CSE-MsgGUID: RLGpccB0T0etNQTm7bK5tg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
+   d="scan'208";a="168609786"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2025 14:15:36 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 25 Aug 2025 14:15:35 -0700
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Mon, 25 Aug 2025 14:15:35 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (40.107.237.41)
+ by edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 25 Aug 2025 14:15:35 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Ox4Nt2Yc2JNlUvIIbPqVdmxm61c1mWw1Dp20Jg9iSo5INQgnwDc0LqDis+7UoYyzqQWfJxU/roWCFVEcxN+0DI2vtmsyqD6F2dvJgDVPzb2VJgHmLk+lY9xHBt+aHw1z3eRHhP7v/7gP242dbYQP32qlEblKI6PyWAT4s/yk2Er8KvwiVPUD15Cjha+Z5OCZnKxlAVHjPy15JpeVn7M3BWdjzLGHCO8KMluUQ/C/55WaNTmXujiHGOwx1TzmP2j8Mw/OQa61cjGPkV+0TuQCd0oq8LHGPon7EFmAeULbuWBd56bvO2PHbBPaZa9Ntr9XBIf2Fc9nzRTwaix2BbltXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ICK1RyAlUORSpyI1A1+r6Ucy8tuo2tlGpeTjzEhO7BQ=;
+ b=Axu/jvAaJWzmkRb/AxBdqmv8QepnEKaQqzPEoXy6NMJL1zbjk58fihKsDHbYcXuS207wtMlQmJGlxf90B/UwyjtapUL803AiFSmSbPHRQNnYMIXPkp70GIJMfpkHD1HQBVMKpTfgK2lN2wTuv7UMLviF/QOnuvlf7RKgloYLeBORyVPAoXGdl3Wg8GGFZrmBHpymw2crrUsGp8gunqswuQGJXsfjG/KnzJgimh8HwualYZRQJcNplkYedCK/7S+hR3XY+GYkoxbIgCJIB6TeuyCIuSrKY0OUpOwPO/lLJBb7f68Rh/THfWS/5kymvlsD+8+dFtYgIgjV4/OyScpQQQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ PH0PR11MB4968.namprd11.prod.outlook.com (2603:10b6:510:39::15) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9052.21; Mon, 25 Aug 2025 21:15:33 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca%4]) with mapi id 15.20.9052.019; Mon, 25 Aug 2025
+ 21:15:33 +0000
+Date: Mon, 25 Aug 2025 23:15:20 +0200
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <bjorn@kernel.org>, <magnus.karlsson@intel.com>,
+	<jonathan.lemon@gmail.com>, <sdf@fomichev.me>, <ast@kernel.org>,
+	<daniel@iogearbox.net>, <hawk@kernel.org>, <john.fastabend@gmail.com>,
+	<horms@kernel.org>, <andrew+netdev@lunn.ch>, <bpf@vger.kernel.org>,
+	<netdev@vger.kernel.org>, Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next v2 0/9] xsk: improvement performance in copy mode
+Message-ID: <aKzSaA73Kq3mZ+Mp@boxer>
+References: <20250825135342.53110-1-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250825135342.53110-1-kerneljasonxing@gmail.com>
+X-ClientProxiedBy: DB7PR02CA0013.eurprd02.prod.outlook.com
+ (2603:10a6:10:52::26) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-WP-MailID: 32360dec30e1a5d38e5915a5e4cf53e8
-X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
-X-WP-SPAM: NO 0000000 [cRM0]                               
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|PH0PR11MB4968:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8568d42a-ea7f-4130-6b19-08dde41c86ec
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?vtY75u+2EAr77CWqdwHrph2FUpuIFllrXP06gUXm9e526TGRExKJCoiEygtq?=
+ =?us-ascii?Q?uPTY3qF6NI07dq1U18bsnxQaYVLoxaaurlL01LqUDLU7TvRp5cWYqiLNkyM9?=
+ =?us-ascii?Q?I0I23nADEiubfGyC22gidj6yjVg+VgF6/B0KcwEGVOSTM1uZOoUVy9jBZgFP?=
+ =?us-ascii?Q?GeWWwhrUB3EmR3D0tANXKfpGcJyeIImGb4MavkTNISXpyCmDFTGIRStifZ+W?=
+ =?us-ascii?Q?/z4FKHUafiUWIMUJS2PHpWN4d2AdIVTXCFMwTqxOM9dm97+7hG30tXFC/mV1?=
+ =?us-ascii?Q?GqbmszCNM0mNwkM4A9YGEiSLYKi0CcKJF5qEmELcu4AsXhcK487JZJkS6mcU?=
+ =?us-ascii?Q?kEM6nko6kQFdCqwYo78sOx/yYmupGYqoz81r1oA3QiUS+ygpJPCEImcXBkb3?=
+ =?us-ascii?Q?Ttdv8YsfhfXr/dNobVXPPhzDyZkoornO4KtzI3WqY8jDdooUDvG1ffUSKPRU?=
+ =?us-ascii?Q?ctbrjabSPs8Ke4srtlZ2PoCm2MdYFGC29cpfmZcNrOU9XhFMxPu4lQ9J9YR9?=
+ =?us-ascii?Q?EYK5oN1xz3zgPtTRrDKu1DhGnNpEHVUHZm1l1h75lAK8+twxFjbiHZxuYa1h?=
+ =?us-ascii?Q?Dkj4McoreLvA6LnEsP9ASxz4la+TocadaEA8SriFgaZ23+0mo97qjVp6RBTa?=
+ =?us-ascii?Q?TtKbPFA6HDrPw0J9suD6fOYBuy2h5FDtxoy6IiFOkacZ0XzzM0CtnIpRVSGI?=
+ =?us-ascii?Q?xH2d29ZawJJ5U5ZWzcKXbzjYJxbbo8CWz01jk3MfBmvGeeKg8fs8UWplm6zU?=
+ =?us-ascii?Q?FIgXAl88VKeqx+LMaX2lEavsUx6gZ9RwZAvDOfH7/woCk3sfwawpcIc8SD9g?=
+ =?us-ascii?Q?3M8N8tN8YL3oVIgB1nAGboPUFeXSIBEM7pWRZ0uOYY/OrcWiPRDu9vtRdXFQ?=
+ =?us-ascii?Q?sL59CgXwPRMNtp1EnijAqK9jciiLfihqUDVGuFcvNhFfNq7iM8xDIwMlAGYl?=
+ =?us-ascii?Q?7tvoL24OU8NgM5W67sKdhxI0Lg+wzAMp+H0TyuNqv5cdj7Cs5zGAT4FqqdaD?=
+ =?us-ascii?Q?AVZ2SlOxjpIlKQp4eLbj1XQmsXeJVESfDTZNebu15ie4bsjefbhDn45zL66V?=
+ =?us-ascii?Q?82m9HvG44JzQgDKJ5FU7fHNfLWgtgPS1iVr2fIHCBT5OEOTJT4uT+1AvDGY5?=
+ =?us-ascii?Q?3K/IMbBA1zjsDc9RXDC6LqwEJhSAETih5LZI8SOUS2a+NVyzIv0duqUe8d3i?=
+ =?us-ascii?Q?T//l7hmpLwQPwv/Zkyb1ldXyyd0BwSIGZuiZ4bnJlljlXGKZAHenrnehNTZD?=
+ =?us-ascii?Q?lzlJV0Fcm6WMNRAipUeX8oMn1uIGm/2VuLuUkpXSfX3p0+1BRB1BFmXNd+NL?=
+ =?us-ascii?Q?D/kNcVrOKtz8LanKX/STQZsPjoaIul6FES/mpojyoD40vKGOeEedr/XcgOwd?=
+ =?us-ascii?Q?L5X2HP0JZmpkbutIcemDNt8hfxeyVBTygUIk0rjgjM/J4VY4cM1nbt81f2Ee?=
+ =?us-ascii?Q?vHqZGkM6FYg=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?TJYIpLtdm6IHr7i8d8ZPFVdrvNfGOjQCjrJviF0w5O7RsPn+o7ec4NffpkP8?=
+ =?us-ascii?Q?Dlh7vNxzdQ3u9N3lJwrV9ByWvMDjXCP1oFN6nKvjndL4jZqh82icjbfB3AH1?=
+ =?us-ascii?Q?PSUCh9Kfc44OJuK6J6EA1stC1Dt1v9IePWXRxMk4I9D8FdTbf5bcHQtMASFg?=
+ =?us-ascii?Q?rEiXHmJJHwlZvPHzEESFd0fI6uuGJbW1yFaQQK4t2/wkVMogJ4QZ+tkWpEjC?=
+ =?us-ascii?Q?9r8qilcmAZfFBFmx7Xas+juA7NSF5u4T8ulHkKoeYbSCzWOvvpR+sbjaRRdV?=
+ =?us-ascii?Q?aia0eQkay4nyjjQE8FW/nD6ojGP/Owyd229v8kzl35CwUcZvpfryJZk08f37?=
+ =?us-ascii?Q?Et25AQyfESouL9lajQMBVt/RehninLRQAAS3zzotw7Vpj9IfNK/OrE2a8Q1M?=
+ =?us-ascii?Q?nlWc1QOqdbVqVs/d0tWbyV6Z3IoR/6sGJkq5fobyj2ZiplD/Vsf7dKvHO1L5?=
+ =?us-ascii?Q?/7QvBX/NjwQ9y+rsrGCq15kBKpxb1KkEau6LNhuwBYeqdDQCrgy9EwqMdAGa?=
+ =?us-ascii?Q?swQrWjbqhMGw2BAv6+ZyNcnZlCtspt66TeRUPY2A34hxAIf3xxETw5dgK7aE?=
+ =?us-ascii?Q?ROepRcof6jq+eqzanBLl0eXutXKDpngBOM2Z/XeeOwVk2eR2sRsFvVyxSKMO?=
+ =?us-ascii?Q?EUmSkPk79q4uUT2Pat2c/A26KqkcnrrbmmCjsutIY3YHSgIN4oQjNKiULDMk?=
+ =?us-ascii?Q?hWs77hAK+jQmIev3ryAmj/hgSwvoBpVXl2RVxh73NEAKdtEQ7rLiZJEbXiMw?=
+ =?us-ascii?Q?xOjl0aBd6+B2CjeQiI4GGOoPsBsaY6thRTZxLI2J9HfW35O/jODQG/uZ2Wfe?=
+ =?us-ascii?Q?rWiS6hbOhfmZd1C8aHRY/rD39K+vHHsiL1VctatralHkoQuKwLjGsV74c+GH?=
+ =?us-ascii?Q?ZH44c6cazAfEakUIiSdjjN9NQnEjssV72r6LzUKUa9cBX73WQ+FrEAOiOqfL?=
+ =?us-ascii?Q?tlkiJg0AaJ2IlIuWdHkcho7aRMjfy9A3GF0K7EEU6MajAYhczade6M0xjUVp?=
+ =?us-ascii?Q?kbNt7d/N/s7bPEmXDfj7EyDhlut23bwAoM/7pYw2KwVmREAY2P/Jo6H856dL?=
+ =?us-ascii?Q?U4wA5cHTm7Zu5XAWQWLzS6BhFBEL/CK77y6bA4er62pO2TA0lrU+OeZyekKF?=
+ =?us-ascii?Q?JanhrT47rX7yXIH+z+m1hDzf2lEHxd+sJFT4LnsiiWFRunFm7PVSMYW3lZMU?=
+ =?us-ascii?Q?PWTA3N5fwAPLYFBNtPG6gvBqNjlltzK/n0SviruRqORuyhj+ToTVy88KgGwa?=
+ =?us-ascii?Q?yBKWtmSNWhws9LvcpffVIDqk3Y9DSMzLc133A8NsTWCJvlCPAM4LWgwXSh3W?=
+ =?us-ascii?Q?gHsGdYUiQRDKAPQQDATgiZQedWzZQ7JxJVzwzeJajC6CE6d9pk1kcEhJ3mUG?=
+ =?us-ascii?Q?gJWBiwiOu4rwU9Jt2VdbEdWOgaWVBAArVYfN1Ta2ic1tczg82Uq8xhopCcN5?=
+ =?us-ascii?Q?hWLOR4rE2p7Kp9xGvYOniYCT/fS0uni+Crw17Gqjv1WvQvfpDMfYlpGkTKo1?=
+ =?us-ascii?Q?AY1ScQFBtyn+707TMC0SqGNweCvFTeUU+OjjIgBLX0c5SYrvI42X0DW6kb7e?=
+ =?us-ascii?Q?1P2qYQEjp5SEL1xk9GCuze/6ubdUNKFpjHmjVa1D6AP4h2Tiuj3CFAmdOJ7P?=
+ =?us-ascii?Q?jg=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8568d42a-ea7f-4130-6b19-08dde41c86ec
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2025 21:15:33.1836
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: gWlHpXSosgaqYVbFZXUIvtyQcJ68SeNrZ859LUWLIHBKzS+Z4DxwLWzXoVzDQ2wqE2elMb1378lgviYOnn0jrdOIZiMVKWAe+gV+jwTeXY4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4968
+X-OriginatorOrg: intel.com
 
-This patch adds support for the TRIGGER_NETDEV_LINK trigger. It activates
-the LED when a link is established, regardless of the speed.
+On Mon, Aug 25, 2025 at 09:53:33PM +0800, Jason Xing wrote:
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> Like in VM using virtio_net, there are not that many machines supporting
+> advanced functions like multi buffer and zerocopy. Using xsk copy mode
+> becomes a default choice.
 
-Tested on Orange Pi PC2 with RTL8211E PHY.
+Are you saying that lack of multi-buffer support in xsk zc virtio_net's
+support stops you from using zc in your setup? or is it something else?
 
-Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
----
- drivers/net/phy/realtek/realtek_main.c | 39 +++++++++++++++++++++-----
- 1 file changed, 32 insertions(+), 7 deletions(-)
+> 
+> Zerocopy mode has a good feature named multi buffer while copy mode
+> has to transmit skb one by one like normal flows. The latter becomes a
+> half bypass mechanism to some extent compared to thorough bypass plan
+> like DPDK. To avoid much consumption in kernel as much as possible,
+> then bulk/batch xmit plan is proposed. The thought of batch xmit is
+> to aggregate packets in a certain small group like GSO/GRO and then
+> read/allocate/build/send them in different loops.
+> 
+> Experiments:
+> 1) Tested on virtio_net on Tencent Cloud.
+> copy mode:     767,743 pps
+> batch mode:  1,055,201 pps (+37.4%)
+> xmit.more:     940,398 pps (+22.4%)
+> Side note:
+> 1) another interesting test is if we test with another thread
+> competing the same queue, a 28% increase (from 405,466 pps to 52,1076 pps)
 
-diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-index dd0d675149ad..688c031c27d9 100644
---- a/drivers/net/phy/realtek/realtek_main.c
-+++ b/drivers/net/phy/realtek/realtek_main.c
-@@ -648,7 +648,8 @@ static int rtl821x_resume(struct phy_device *phydev)
- static int rtl8211x_led_hw_is_supported(struct phy_device *phydev, u8 index,
- 					unsigned long rules)
- {
--	const unsigned long mask = BIT(TRIGGER_NETDEV_LINK_10) |
-+	const unsigned long mask = BIT(TRIGGER_NETDEV_LINK) |
-+				   BIT(TRIGGER_NETDEV_LINK_10) |
- 				   BIT(TRIGGER_NETDEV_LINK_100) |
- 				   BIT(TRIGGER_NETDEV_LINK_1000) |
- 				   BIT(TRIGGER_NETDEV_RX) |
-@@ -706,6 +707,12 @@ static int rtl8211f_led_hw_control_get(struct phy_device *phydev, u8 index,
- 	if (val & RTL8211F_LEDCR_LINK_1000)
- 		__set_bit(TRIGGER_NETDEV_LINK_1000, rules);
- 
-+	if ((val & RTL8211F_LEDCR_LINK_10) &&
-+	    (val & RTL8211F_LEDCR_LINK_100) &&
-+	    (val & RTL8211F_LEDCR_LINK_1000)) {
-+		__set_bit(TRIGGER_NETDEV_LINK, rules);
-+	}
-+
- 	if (val & RTL8211F_LEDCR_ACT_TXRX) {
- 		__set_bit(TRIGGER_NETDEV_RX, rules);
- 		__set_bit(TRIGGER_NETDEV_TX, rules);
-@@ -723,14 +730,20 @@ static int rtl8211f_led_hw_control_set(struct phy_device *phydev, u8 index,
- 	if (index >= RTL8211x_LED_COUNT)
- 		return -EINVAL;
- 
--	if (test_bit(TRIGGER_NETDEV_LINK_10, &rules))
-+	if (test_bit(TRIGGER_NETDEV_LINK, &rules) ||
-+	    test_bit(TRIGGER_NETDEV_LINK_10, &rules)) {
- 		reg |= RTL8211F_LEDCR_LINK_10;
-+	}
- 
--	if (test_bit(TRIGGER_NETDEV_LINK_100, &rules))
-+	if (test_bit(TRIGGER_NETDEV_LINK, &rules) ||
-+	    test_bit(TRIGGER_NETDEV_LINK_100, &rules)) {
- 		reg |= RTL8211F_LEDCR_LINK_100;
-+	}
- 
--	if (test_bit(TRIGGER_NETDEV_LINK_1000, &rules))
-+	if (test_bit(TRIGGER_NETDEV_LINK, &rules) ||
-+	    test_bit(TRIGGER_NETDEV_LINK_1000, &rules)) {
- 		reg |= RTL8211F_LEDCR_LINK_1000;
-+	}
- 
- 	if (test_bit(TRIGGER_NETDEV_RX, &rules) ||
- 	    test_bit(TRIGGER_NETDEV_TX, &rules)) {
-@@ -778,6 +791,12 @@ static int rtl8211e_led_hw_control_get(struct phy_device *phydev, u8 index,
- 	if (cr2 & RTL8211E_LEDCR2_LINK_1000)
- 		__set_bit(TRIGGER_NETDEV_LINK_1000, rules);
- 
-+	if ((cr2 & RTL8211E_LEDCR2_LINK_10) &&
-+	    (cr2 & RTL8211E_LEDCR2_LINK_100) &&
-+	    (cr2 & RTL8211E_LEDCR2_LINK_1000)) {
-+		__set_bit(TRIGGER_NETDEV_LINK, rules);
-+	}
-+
- 	return ret;
- }
- 
-@@ -805,14 +824,20 @@ static int rtl8211e_led_hw_control_set(struct phy_device *phydev, u8 index,
- 	if (ret < 0)
- 		return ret;
- 
--	if (test_bit(TRIGGER_NETDEV_LINK_10, &rules))
-+	if (test_bit(TRIGGER_NETDEV_LINK, &rules) ||
-+	    test_bit(TRIGGER_NETDEV_LINK_10, &rules)) {
- 		cr2 |= RTL8211E_LEDCR2_LINK_10;
-+	}
- 
--	if (test_bit(TRIGGER_NETDEV_LINK_100, &rules))
-+	if (test_bit(TRIGGER_NETDEV_LINK, &rules) ||
-+	    test_bit(TRIGGER_NETDEV_LINK_100, &rules)) {
- 		cr2 |= RTL8211E_LEDCR2_LINK_100;
-+	}
- 
--	if (test_bit(TRIGGER_NETDEV_LINK_1000, &rules))
-+	if (test_bit(TRIGGER_NETDEV_LINK, &rules) ||
-+	    test_bit(TRIGGER_NETDEV_LINK_1000, &rules)) {
- 		cr2 |= RTL8211E_LEDCR2_LINK_1000;
-+	}
- 
- 	cr2 <<= RTL8211E_LEDCR2_SHIFT * index;
- 	ret = rtl821x_modify_ext_page(phydev, RTL8211E_LEDCR_EXT_PAGE,
--- 
-2.47.2
+wrong comma - 521,076
 
+> can be observed.
+> 2) xmit 'more' item is built on top of batch mode. The number can slightly
+> decrease according to different implementations in host.
+> 
+> 2) Tested on i40e at 10Gb/sec.
+> copy mode:   1,109,754 pps
+> batch mode:  2,393,498 pps (+115.6%)
+> xmit.more:   3,024,110 pps (+172.5%)
+> zc mode:    14,879,414 pps
+> 
+> [2]: ./xdpsock -i eth1 -t  -S -s 64
+
+Have you tested jumbo frames? Did you run xskxceiver tests?
+
+IMHO this should be sent as RFC. In some further patch you're saying you
+were not sure about some certain thing, so let us discuss it and overall
+approach.
+
+Besides, please work on top of the recent fix that got accepted:
+https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?id=dd9de524183a1ca0a3c0317a083e8892e0f0eaea
+
+> 
+> It's worth mentioning batch process might bring high latency in certain
+> cases like shortage of memroy. So I didn't turn it as the default
+
+memory
+
+> feature for copy mode. The recommended value is 32.
+> 
+> ---
+> V2
+> Link: https://lore.kernel.org/all/20250811131236.56206-1-kerneljasonxing@gmail.com/
+> 1. add xmit.more sub-feature (Jesper)
+> 2. add kmem_cache_alloc_bulk (Jesper and Maciej)
+> 
+> Jason Xing (9):
+>   xsk: introduce XDP_GENERIC_XMIT_BATCH setsockopt
+>   xsk: add descs parameter in xskq_cons_read_desc_batch()
+>   xsk: introduce locked version of xskq_prod_write_addr_batch
+>   xsk: extend xsk_build_skb() to support passing an already allocated
+>     skb
+>   xsk: add xsk_alloc_batch_skb() to build skbs in batch
+>   xsk: add direct xmit in batch function
+>   xsk: support batch xmit main logic
+>   xsk: support generic batch xmit in copy mode
+>   xsk: support dynamic xmit.more control for batch xmit
+> 
+>  Documentation/networking/af_xdp.rst |  11 ++
+>  include/linux/netdevice.h           |   3 +
+>  include/net/xdp_sock.h              |  10 ++
+>  include/uapi/linux/if_xdp.h         |   1 +
+>  net/core/dev.c                      |  21 +++
+>  net/core/skbuff.c                   | 103 ++++++++++++++
+>  net/xdp/xsk.c                       | 200 ++++++++++++++++++++++++++--
+>  net/xdp/xsk_queue.h                 |  29 +++-
+>  tools/include/uapi/linux/if_xdp.h   |   1 +
+>  9 files changed, 360 insertions(+), 19 deletions(-)
+> 
+> -- 
+> 2.41.3
+> 
 
