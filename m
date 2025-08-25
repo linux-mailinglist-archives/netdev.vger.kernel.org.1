@@ -1,239 +1,186 @@
-Return-Path: <netdev+bounces-216345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43390B33387
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 03:28:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E275DB3338C
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 03:31:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 172421B224AA
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 01:28:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A43B4172BB5
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 01:31:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49F8B1E8323;
-	Mon, 25 Aug 2025 01:28:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LMq7PBU3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 789A313B2A4;
+	Mon, 25 Aug 2025 01:31:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B25BF8834;
-	Mon, 25 Aug 2025 01:28:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C68B1CA6F;
+	Mon, 25 Aug 2025 01:31:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756085313; cv=none; b=ii003jMcFroGQxWA+8G4QoUFtfrcg9pgE3tEpPdEaZ6lTQwy4tB1h6/7wsWPVd+v8dwRJF82x0z2iNOgftdkGx4O1mGBtM1kfDb7hVf69SAwSCpb88TdJwguUsQ09xzqhwzOLvvX0NWM+Lsrzgh8jseF4C87fnI437hiZOGqe5M=
+	t=1756085480; cv=none; b=rxbOaSq5fojt4LbityX7pmO2W6KNUw8brXcl7J8wcmFB40XkE6ruqRyTpsPHuuM/OOmwHs8vf/AvuimVXldoUMFX/oKgFxHpCkJP5kjrOPeoRT+vzZfJfdXT2q0h+gv37kfsTK9++c4iCqtSALewqLRPl0aqbAqBQRV7FrWsIEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756085313; c=relaxed/simple;
-	bh=mWjmv8nS+0hMtTfIlk2YI24AKZd72l8+M58ZvUGENTU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PaKcMAlkk5duQhUpUuwD/bV9F2hpYp3hfET5IVUi+EK8qXSGMkHWzxgh1kCv/ri4x1rC03rzEpwoI+RB+iRWY3hzGBellhjbFfnCs2enKcrDOCjsJ7abAVXZkKWp6uXCOJjfTGzAUgMTy1pKlHBMqSYLA5lV0QhNWE3fFO94zy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LMq7PBU3; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-76e34c4ce54so3139765b3a.0;
-        Sun, 24 Aug 2025 18:28:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756085311; x=1756690111; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jLTz8EuNv2P1jX8ids+qXdU9eb4foeqMQi2kaAA03Ss=;
-        b=LMq7PBU3cKy1+k2/B/BHlPv39RMpMjiTgoXGLH2ueZHtR9buZBvW3aK3xPAHvWhQQ7
-         GFRCu/t8gUGErGBljeRsVtgN/w2gUNVMYZOtKxBzEi8UDrPvnA0eNFO7AecUnTZIiPL7
-         0poMHsFMCUb+W0GHZd6QMJs2VGmJtAgkgDCvn+OK3SC5kYFAr1S8FDclPfIh65t+WQET
-         fSsMNfaCb61oOJ0j12VlU0r6U1xDG+OcQ97yzDUTBGaGwDkLeCD2lapl6GrvVP+jT8Zf
-         KYqlQKqnj7O1B8kZczM3nYlUlzuB9zd6f0wPEXOQq5DEvRPumxXIg5Y7qx3FxzlGRMd6
-         kkdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756085311; x=1756690111;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jLTz8EuNv2P1jX8ids+qXdU9eb4foeqMQi2kaAA03Ss=;
-        b=ZYP51AYxCLFzUzoS5CLNmGUMfoRCvVMkGRS8FOdCnFqjY+OV+tBl86slZLjaXytrbe
-         NuAUxo0i5MrL+pXZVoZz6wTehwacj+/qtJygFoKlyYZgU9tREwcaJW2ORPaJdyvgnhqC
-         sHWK0gFHDnx6TNJHvfFAz+99NfmhPGwSOe9FpF+WeBlIii/SNK7hMQ19XH+J0zzOe2Bc
-         01d9Sfz4EmQQuflC24LvFR8GRaZnCUIZeOvISi+QplRLfODjfXRxZ+ezGkLLXhzW30HH
-         wyI4W9fa6aERh3IDcwzcT0BRY+W5D1eYJXtojUsaHRhAzc+c3e5uzmi2PrN0c2ofHNpw
-         Da8A==
-X-Forwarded-Encrypted: i=1; AJvYcCU72+V107UAkiUfpLuVKiNKwYQajP3ZTE/AjPBw18TKr0DD2bajyQ2308mS/Z/KN3KIYsavFyfTEXvyZeA=@vger.kernel.org, AJvYcCXEzb5MNMX2gbxUYwZ3/CJ2s0SEHw4WJmZr6oyQOkCtBq8oa2ZHWEIY+oy/baqT4DtV5KjLQrnt@vger.kernel.org
-X-Gm-Message-State: AOJu0YxpsDCOtRwr6j4Kz+jHj4T34eZIlkEBQRgVe/tvxZQlxgJU1NLr
-	bGWpB4azCPZ41ap+LJlWIxeAJIeNauVAkcW7SH3id3jfiHODXEkokjhz
-X-Gm-Gg: ASbGncsBCfTnZEPo1AZXWfh2L8qa1MV938hN/17LbZVxAERtbIwTjJa7guneyXaajVQ
-	RVGQpbUcqSILJmvtOyHAMKGggVNKULkXXF3eKYEs38mS0/ZTPSjRmrwoxs02oLh40EtZjEzi+xd
-	s6HtGinVKNl0DfWUhi2zoa0xOscSL0jHfXuKaTu1sZLvP5hR6JKh1+xPcaZzi3+6aoPHdBBkymU
-	j2zZPg3jtbCrHDw46MY5hegnwSTPaUDHfQ+k8YNKl7gX2QUPELWz6A7OsN8TjeNFt31/iCAJ60I
-	Wt4Lljyz9NuSlpKWm7vnE7jV5URPzcX/G35x/EcuSFuXqEhVmynokUhtu8V31EVTpLTuc4joUNH
-	xY7wkmMc6f/7tGVpUtDqH+6OhjTq/4lV6HH4YPJZ/ntURnf+V6F4k
-X-Google-Smtp-Source: AGHT+IG9+K1FJPLf7FqFjjyuA4Onx8fz6b3EE2IGUZMWkS9dLz+Am3xXjDIAdBZ+6dP7kK+UVKvOGw==
-X-Received: by 2002:a05:6a00:4b16:b0:76e:7ab9:a236 with SMTP id d2e1a72fcca58-76ea30f4f65mr16004138b3a.13.1756085310798;
-        Sun, 24 Aug 2025 18:28:30 -0700 (PDT)
-Received: from fedora ([172.59.162.44])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77040021393sm5773113b3a.49.2025.08.24.18.28.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 24 Aug 2025 18:28:30 -0700 (PDT)
-From: Alex Tran <alex.t.tran@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Alex Tran <alex.t.tran@gmail.com>
-Subject: [PATCH net v1] Fixes: xircom auto-negoation timer
-Date: Sun, 24 Aug 2025 18:28:21 -0700
-Message-ID: <20250825012821.492355-1-alex.t.tran@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1756085480; c=relaxed/simple;
+	bh=ip4FvYYw88ouWT6itUmL/S531RHQ7rP5ltgGr1KS+qk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rQB2Z0IjnjURDHzPRCYnN92Xu4mowIUNAXRMXfe1Ga3hjFu6CTwV2myyKZ6sqvnfn/9nlJ9SD3SLfb7mShZ0XNmlK/c4uBxPmuUkYbIObDPR/huz7+0lpEtXd+LYBerDCcWaJ8GV8nPmtfnz/R7eLrtz2FikOckojId6mFj5mWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=18.132.163.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: esmtpsz10t1756085455t51d7e1a8
+X-QQ-Originating-IP: nHucB3JtzMCn34hcRKZD02jofGkp3qyqMaeH0wrqwoo=
+Received: from localhost ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 25 Aug 2025 09:30:53 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 11934234295190835703
+Date: Mon, 25 Aug 2025 09:30:53 +0800
+From: Yibo Dong <dong100@mucse.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
+	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
+	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org,
+	gustavoars@kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH net-next v7 4/5] net: rnpgbe: Add basic mbx_fw support
+Message-ID: <8989E7A85A9468B0+20250825013053.GA2006401@nic-Precision-5820-Tower>
+References: <20250822023453.1910972-1-dong100@mucse.com>
+ <20250822023453.1910972-5-dong100@mucse.com>
+ <a066746c-2f12-4e70-b63a-7996392a9132@lunn.ch>
+ <C2BF8A6A8A79FB29+20250823015824.GB1995939@nic-Precision-5820-Tower>
+ <f375e4bf-9b0b-49ca-b83d-addeb49384b8@lunn.ch>
+ <424D721323023327+20250824041052.GB2000422@nic-Precision-5820-Tower>
+ <809527f7-c838-4582-89cb-6cb9d24963dd@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <809527f7-c838-4582-89cb-6cb9d24963dd@lunn.ch>
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: OBUGnm9pFasAiZ6W90wYeKsby/+S0wZ8wiyoTqCKQr2mZNPk/xuvOhnt
+	vPAIHQk5tb87rpyR8tBfYmrgCdVLT1kKCtCB/hsps9/XhR/yK1wlC5kFfqXStXS8d5hUHq3
+	UgjO1xgNlYbfNTrE/0Irj6zsTut6gGvcxeGp5aNYK5Ml2zdsOhcjYY0uhO4ATMPM5i3mDPP
+	RRCc/OcH2vtkfWRsx/T0iOJKTRlfhA+RH5N1JlWDVRRvbkYS+glx7cuFXJM1QOtKFyM+9v/
+	NW9axunD9HSRfmndx5E5zmtCyzvxHI7xZCjCOnDENvn//Oku01vlL7Fi62GhHMdtbjTQlUE
+	K3YtJLJ47FjbgoEx8fhvAyfyNeIylB7kQcCIuV7WYpy5gCHmAPZVH2QV9Hl5c0jJKA5S5oe
+	OzRCHoOpc+f4e+hP3oQ+lE4hOARCrKg4fjxxmQtmouAHfkd1Cb1bmoiTEGKvsyMXuiBMiHq
+	do8nkr/O90mZZ7CyKosJlQdmqoKFPpdI++Sqq2X5dLs15tyEXImnO+dnqch0ZP3yn6h+uWT
+	enHZ78B0ofJSDCz+D+iz0VJ5GoILj1eilNbEH20kIDamSP2ilJknDst9MkC6eESn19uNweV
+	mKaHwYg6OBrtj9uboNgX0S9mr6BLyHM+ZHabZsLBuBmBOsMssCLFAf2owXg7RVO0InrZImK
+	8Cu6zKQiKbdf2hVBHjnL0rXWLSpVj8nRryIbVNDgcYh//OGWYAgFkWfRCv6boljH1KMCki5
+	tji2SaOwLj/6dX2F0XzgPwUayCVKyHz/+uc+LAbe/qMg87N5Vjlu0auRyajVYY1Dmqd9PNt
+	vTu8WyXSZUh/+5ziPT2ACSzMgWhlgDR2tXpf5X6Q4NWzwKV+WyzckmjjUAYBqipM8S9AGI/
+	avvy1EZ8fZEXArLXQnz7EPGe4gOd8EuXPxcl30gWDa5wQ5YvMT2Sl7l/ptzwPZscs4Omdjg
+	7I25sBT/Ol0dkmkbhppZ5QUgD4O6yvtl3Ys1yROMg+KQQWSnsmJHvL1s7
+X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
+X-QQ-RECHKSPAM: 0
 
-Auto negoation for DP83840A takes ~3.5 seconds.
-Removed sleeping in loop and replaced with timer based completion.
+On Sun, Aug 24, 2025 at 05:15:25PM +0200, Andrew Lunn wrote:
+> On Sun, Aug 24, 2025 at 12:10:52PM +0800, Yibo Dong wrote:
+> > On Sat, Aug 23, 2025 at 05:17:45PM +0200, Andrew Lunn wrote:
+> > > On Sat, Aug 23, 2025 at 09:58:24AM +0800, Yibo Dong wrote:
+> > > > On Fri, Aug 22, 2025 at 04:43:16PM +0200, Andrew Lunn wrote:
+> > > > > > +/**
+> > > > > > + * mucse_mbx_get_capability - Get hw abilities from fw
+> > > > > > + * @hw: pointer to the HW structure
+> > > > > > + *
+> > > > > > + * mucse_mbx_get_capability tries to get capabities from
+> > > > > > + * hw. Many retrys will do if it is failed.
+> > > > > > + *
+> > > > > > + * @return: 0 on success, negative on failure
+> > > > > > + **/
+> > > > > > +int mucse_mbx_get_capability(struct mucse_hw *hw)
+> > > > > > +{
+> > > > > > +	struct hw_abilities ability = {};
+> > > > > > +	int try_cnt = 3;
+> > > > > > +	int err = -EIO;
+> > > > > > +
+> > > > > > +	while (try_cnt--) {
+> > > > > > +		err = mucse_fw_get_capability(hw, &ability);
+> > > > > > +		if (err)
+> > > > > > +			continue;
+> > > > > > +		hw->pfvfnum = le16_to_cpu(ability.pfnum) & GENMASK_U16(7, 0);
+> > > > > > +		return 0;
+> > > > > > +	}
+> > > > > > +	return err;
+> > > > > > +}
+> > > > > 
+> > > > > Please could you add an explanation why it would fail? Is this to do
+> > > > > with getting the driver and firmware in sync? Maybe you should make
+> > > > > this explicit, add a function mucse_mbx_sync() with a comment that
+> > > > > this is used once during probe to synchronise communication with the
+> > > > > firmware. You can then remove this loop here.
+> > > > 
+> > > > It is just get some fw capability(or info such as fw version).
+> > > > It is failed maybe:
+> > > > 1. -EIO: return by mucse_obtain_mbx_lock_pf. The function tries to get
+> > > > pf-fw lock(in chip register, not driver), failed when fw hold the lock.
+> > > 
+> > > If it cannot get the lock, isn't that fatal? You cannot do anything
+> > > without the lock.
+> > > 
+> > > > 2. -ETIMEDOUT: return by mucse_poll_for_xx. Failed when timeout.
+> > > > 3. -ETIMEDOUT: return by mucse_fw_send_cmd_wait. Failed when wait
+> > > > response timeout.
+> > > 
+> > > If its dead, its dead. Why would it suddenly start responding?
+> > > 
+> > > > 4. -EIO: return by mucse_fw_send_cmd_wait. Failed when error_code in
+> > > > response.
+> > > 
+> > > Which should be fatal. No retries necessary.
+> > > 
+> > > > 5. err return by mutex_lock_interruptible.
+> > > 
+> > > So you want the user to have to ^C three times?
+> > > 
+> > > And is mucse_mbx_get_capability() special, or will all interactions
+> > > with the firmware have three retries?
+> > 
+> 
+> > It is the first 'cmd with response' from fw when probe. If it failed,
+> > return err and nothing else todo (no registe netdev ...). So, we design
+> > to give retry for it.
+> > fatal with no retry, maybe like this? 
+>  
+> Quoting myself:
+> 
+> > > > > Is this to do
+> > > > > with getting the driver and firmware in sync? Maybe you should make
+> > > > > this explicit, add a function mucse_mbx_sync() with a comment that
+> > > > > this is used once during probe to synchronise communication with the
+> > > > > firmware. You can then remove this loop here.
 
-Ignored the CHECK from checkpatch.pl:
-CHECK: Avoid CamelCase: <MediaSelect>
-GetByte(XIRCREG_ESR) & MediaSelect) ? 1 : 2;
+'mucse_mbx_get_capability' is used once during probe in fact, and won't be
+used anywhere.
 
-This can be addressed in a separate refactoring patch.
+> 
+> Does the firmware offer a NOP command? Or one to get the firmware
+> version?  If you are trying to get the driver and firmware in sync, it
+> make sense to use an operation which is low value and won't be used
+> anywhere else.
+> 
+> 	Andrew
+> 
 
-Signed-off-by: Alex Tran <alex.t.tran@gmail.com>
----
- drivers/net/ethernet/xircom/xirc2ps_cs.c | 76 ++++++++++++++++--------
- 1 file changed, 50 insertions(+), 26 deletions(-)
+No NOP command.. 'mucse_mbx_get_capability' can get the firmware version
+and in fact only used in probe, maybe I should rename it to 'mucse_mbx_sync',
+and add comment 'only be used once during probe'?
+Or keep the name with that comment?
 
-diff --git a/drivers/net/ethernet/xircom/xirc2ps_cs.c b/drivers/net/ethernet/xircom/xirc2ps_cs.c
-index a31d5d5e6..6e552f79b 100644
---- a/drivers/net/ethernet/xircom/xirc2ps_cs.c
-+++ b/drivers/net/ethernet/xircom/xirc2ps_cs.c
-@@ -100,6 +100,11 @@
- /* Time in jiffies before concluding Tx hung */
- #define TX_TIMEOUT	((400*HZ)/1000)
- 
-+/* Time in jiffies before autoneg interval ends*/
-+#define AUTONEG_TIMEOUT ((100 * HZ) / 1000)
-+
-+#define RUN_AT(x) (jiffies + (x))
-+
- /****************
-  * Some constants used to access the hardware
-  */
-@@ -281,6 +286,9 @@ struct local_info {
-     unsigned last_ptr_value; /* last packets transmitted value */
-     const char *manf_str;
-     struct work_struct tx_timeout_task;
-+	struct timer_list timer; /* auto negotiation timer*/
-+	int autoneg_attempts;
-+	struct completion autoneg_done;
- };
- 
- /****************
-@@ -300,6 +308,7 @@ static const struct ethtool_ops netdev_ethtool_ops;
- static void hardreset(struct net_device *dev);
- static void do_reset(struct net_device *dev, int full);
- static int init_mii(struct net_device *dev);
-+static void autoneg_timer(struct timer_list *t);
- static void do_powerdown(struct net_device *dev);
- static int do_stop(struct net_device *dev);
- 
-@@ -1561,6 +1570,8 @@ do_reset(struct net_device *dev, int full)
-     PutByte(XIRCREG40_TXST1,  0x00); /* TEN, rsv, PTD, EXT, retry_counter:4  */
- 
-     if (full && local->mohawk && init_mii(dev)) {
-+	if (local->probe_port)
-+		wait_for_completion(&local->autoneg_done);
- 	if (dev->if_port == 4 || local->dingo || local->new_mii) {
- 	    netdev_info(dev, "MII selected\n");
- 	    SelectPage(2);
-@@ -1629,8 +1640,7 @@ init_mii(struct net_device *dev)
- {
-     struct local_info *local = netdev_priv(dev);
-     unsigned int ioaddr = dev->base_addr;
--    unsigned control, status, linkpartner;
--    int i;
-+	unsigned int control, status;
- 
-     if (if_port == 4 || if_port == 1) { /* force 100BaseT or 10BaseT */
- 	dev->if_port = if_port;
-@@ -1663,35 +1673,49 @@ init_mii(struct net_device *dev)
-     if (local->probe_port) {
- 	/* according to the DP83840A specs the auto negotiation process
- 	 * may take up to 3.5 sec, so we use this also for our ML6692
--	 * Fixme: Better to use a timer here!
- 	 */
--	for (i=0; i < 35; i++) {
--	    msleep(100);	 /* wait 100 msec */
--	    status = mii_rd(ioaddr,  0, 1);
--	    if ((status & 0x0020) && (status & 0x0004))
--		break;
-+	local->dev = dev;
-+	local->autoneg_attempts = 0;
-+	init_completion(&local->autoneg_done);
-+	timer_setup(&local->timer, autoneg_timer, 0);
-+	local->timer.expires = RUN_AT(AUTONEG_TIMEOUT); /* 100msec intervals*/
-+	add_timer(&local->timer);
- 	}
- 
--	if (!(status & 0x0020)) {
--	    netdev_info(dev, "autonegotiation failed; using 10mbs\n");
--	    if (!local->new_mii) {
--		control = 0x0000;
--		mii_wr(ioaddr,  0, 0, control, 16);
--		udelay(100);
--		SelectPage(0);
--		dev->if_port = (GetByte(XIRCREG_ESR) & MediaSelect) ? 1 : 2;
--	    }
-+	return 1;
-+}
-+
-+static void autoneg_timer(struct timer_list *t)
-+{
-+	struct local_info *local = timer_container_of(local, t, timer);
-+	unsigned int ioaddr = local->dev->base_addr;
-+	unsigned int status, linkpartner, control;
-+
-+	status = mii_rd(ioaddr, 0, 1);
-+	if ((status & 0x0020) && (status & 0x0004)) {
-+		linkpartner = mii_rd(ioaddr, 0, 5);
-+		netdev_info(local->dev, "MII link partner: %04x\n",
-+			    linkpartner);
-+		if (linkpartner & 0x0080)
-+			local->dev->if_port = 4;
-+		else
-+			local->dev->if_port = 1;
-+		complete(&local->autoneg_done);
-+	} else if (local->autoneg_attempts++ < 35) {
-+		mod_timer(&local->timer, RUN_AT(AUTONEG_TIMEOUT));
- 	} else {
--	    linkpartner = mii_rd(ioaddr, 0, 5);
--	    netdev_info(dev, "MII link partner: %04x\n", linkpartner);
--	    if (linkpartner & 0x0080) {
--		dev->if_port = 4;
--	    } else
--		dev->if_port = 1;
-+		netdev_info(local->dev,
-+			    "autonegotiation failed; using 10mbs\n");
-+		if (!local->new_mii) {
-+			control = 0x0000;
-+			mii_wr(ioaddr, 0, 0, control, 16);
-+			usleep_range(100, 150);
-+			SelectPage(0);
-+			local->dev->if_port =
-+				(GetByte(XIRCREG_ESR) & MediaSelect) ? 1 : 2;
-+		}
-+		complete(&local->autoneg_done);
- 	}
--    }
--
--    return 1;
- }
- 
- static void
--- 
-2.51.0
+Thanks for your feedback.
 
 
