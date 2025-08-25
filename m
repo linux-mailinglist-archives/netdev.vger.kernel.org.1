@@ -1,144 +1,198 @@
-Return-Path: <netdev+bounces-216513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51CBDB34419
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 16:37:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A08CB34426
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 16:38:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31114188DFDF
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 14:35:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A67D21885BE2
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 14:36:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2827D2FE58D;
-	Mon, 25 Aug 2025 14:32:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC378275AFC;
+	Mon, 25 Aug 2025 14:35:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n7YZsnMU"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Z+eMafDz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2071.outbound.protection.outlook.com [40.107.212.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05212FE581;
-	Mon, 25 Aug 2025 14:32:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756132362; cv=none; b=rvaKFmxPUXNMBH2MAesz5Qlpp/xkFerUU/SKfTXcIoOtlqi/YtFO9qUgSjde1sEIck4M0f9LjgFbLzGFxb5rEvRBuXjB6DUdWyWUBhPQ8m85JpvwgUQojiBmfA/49tA3flosM8W6RLpXW2O3I2NrUXZNy4Z0HyIncL44H02QLBY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756132362; c=relaxed/simple;
-	bh=DU+1S4Dtf6BzIA9TMfJpqm5TRVwGVofXB+Dj9RHsm1g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h5U2W8teEHwEHSAEReWUSuboArGJz/KcccWbLgRYbbEqsTqBX7LtXHdcNag1oRJzbwFhEryM52hhe0TnA5ZWLQyqFZVJgJ3hsiVibG+jzAkGTNAQkhNYKhjeeNexmu3cbMcSiMUUWrzRocKGYTpXeRxqMADeLqRxW5OjwxAsRf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n7YZsnMU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28395C4CEED;
-	Mon, 25 Aug 2025 14:32:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756132360;
-	bh=DU+1S4Dtf6BzIA9TMfJpqm5TRVwGVofXB+Dj9RHsm1g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=n7YZsnMUaPKieR6Aen8NXplrqXq649ng2cWds08Paw0ZE1V9/s04MYuzfMJunBPPM
-	 e9q5l/4IYbHR+zLW6tZ3Ain+SM/EPsptEidQNiwcBG+gIXbD0MDb3NpuMIodH9q/bK
-	 gfUkw7ZqtLUllteesZei9c9/9Nob4tERnp37xBWgOfA8ssretvfGAj7ddnS1nJ/eSw
-	 gYK9m1P9+EEv6DvwLeTd0I1ynl3rIVfEsEIPpMbPhXNcaQgQQCdndA/xeV7DIotpxx
-	 J60e7ZU1ZivKd3L40DdBa/CHbHS/SOS0E/lE/sJu2Rz1DevUCKw6IvTf/zpKfAvZXV
-	 BIxp/l6R3haNQ==
-Date: Mon, 25 Aug 2025 17:32:20 +0300
-From: Mike Rapoport <rppt@kernel.org>
-To: David Hildenbrand <david@redhat.com>
-Cc: Mika =?iso-8859-1?Q?Penttil=E4?= <mpenttil@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	Alexander Potapenko <glider@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Brendan Jackman <jackmanb@google.com>,
-	Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>,
-	Dmitry Vyukov <dvyukov@google.com>, dri-devel@lists.freedesktop.org,
-	intel-gfx@lists.freedesktop.org, iommu@lists.linux.dev,
-	io-uring@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	John Hubbard <jhubbard@nvidia.com>, kasan-dev@googlegroups.com,
-	kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	linux-arm-kernel@axis.com, linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org, linux-ide@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-mmc@vger.kernel.org, linux-mm@kvack.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Marco Elver <elver@google.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
-	Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
-	Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
-	virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
-	wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
-Subject: Re: [PATCH RFC 10/35] mm/hugetlb: cleanup
- hugetlb_folio_init_tail_vmemmap()
-Message-ID: <aKxz9HLQTflFNYEu@kernel.org>
-References: <20250821200701.1329277-1-david@redhat.com>
- <20250821200701.1329277-11-david@redhat.com>
- <9156d191-9ec4-4422-bae9-2e8ce66f9d5e@redhat.com>
- <7077e09f-6ce9-43ba-8f87-47a290680141@redhat.com>
- <aKmDBobyvEX7ZUWL@kernel.org>
- <a90cf9a3-d662-4239-ad54-7ea917c802a5@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 120B31E3DFE;
+	Mon, 25 Aug 2025 14:35:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.71
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756132505; cv=fail; b=uYVjQwLoiFJjXwzRpYtuUD6avn7TI1Z1h+Oljp4w3jHiW0bOvd7VFgfNUJs5oc3DkqpD78GVaxJnaautHNet8wFdQ3P7b2B6fgfZUE34RKRCTLcrG5ClLnLEuP1UmHwQKNpI/ov1xY5/CamT5zChapZwQiay8ObaXHz9sravhXk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756132505; c=relaxed/simple;
+	bh=k3BXMbj1OeltXIXRzCS8eUEZo3ROh7h0Dj9cDg7hueI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=g3hLyEeoBbcCzp5xvp6XrXLfMLHEo94NkaCiSDAs2wkAxS9s/kJ2+rnR7sDC64O1KbtM8gtbU6cIrIR0ye0vmE2m/w7IxQUayEmH/3BNxAAlvK60IZK3/Z248FJcsbmRUzSwv8AUqiIH+YWwH/PBuQO9XimCCn4tqkdmyhf8zh8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Z+eMafDz; arc=fail smtp.client-ip=40.107.212.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=fObWHmHEsSh/64r9qPpMwOCLPMp27fMFMA2TvE+5D7sbLB8ZHoR+Rk+C2F/a+BYBe82tNVKFRUZkNraJG4G00RpYwFE8+s1BMNAiu5l5k0r1A+KDIQkomOKaorwOEGiiRd0YfXPTalL4UfvTuDJXzeQkZHCndkVrbpKaKuzkPZqmHInsRpHdgJV45CD8vbfMD+3pQBXxeazrUq3vqsdPmOvyt+VCbXe0yAxxFN/W2YLo7Ujw1ahtGXLfsEbDQTM0gYEnKeeQS+NRzZRvaL3d1ZN8uf2ZJYkQy/sN6jszc+GaHD8MqjtQgPtchApquABNEsQqIm4L/FTHImQf5mOwDw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kcNJ1bZmTFxfkuLwUsmzkNznz0HF2tkImWp/SCDNGnc=;
+ b=uCXP6Zfa1wCJqUuBwaJKIIr8DW+Ezpac727EbeUQwsLbHwwpGl4Z8gblcrh4BYDoJwmPbrBDFVSdWueRlMpT1Mw99sGS1cSglhrUB/1G8G7+u1yPKhPmUDHNcGTh+7llj9TVHIIEqX2TlKT0Z4UFm3KIxjN50X4FSSkyAGOkgdT2ed++eYK4lESB7rVBZK9zS//lv3P7pfaXulhJh8Fl77ZCyoaWA9xirpZt6lxEFy4pxEHvgEDicAioUWpiMi377mr9SaB0JGAuvIKwxj3yncCc5YCfC0WnMw24us+/dkKnjwCgQdVGDQPM1SZY9MgK0cuXLsr3sKlSdMrs38ew+A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kcNJ1bZmTFxfkuLwUsmzkNznz0HF2tkImWp/SCDNGnc=;
+ b=Z+eMafDz+PaqzJpdgT6EI+Gc4p0b9p16h6qoePNA7yRlluf92OpixAG2CE/RKbKGPEJdo1D26/v7PWfaW+BIp+jKOYoM6wu8QsGyTjxk3FyKZOhPcck89cdNFpdSxkTen+whPNaLJMBUccRG3MAktUHiAsS8minXpN519oDevpFb3igfbklxNVeeoV4K9WeR3RPZ9hgYRkZ/7AICZ1hICUDy4jccVKTTVbzDhUBG/wgK3a91NwMTjipNHU4x4X/XLUoPELdmPiyeHOkpZJyaebeCd6dznZVoJxnsXvAOgmIoqNHJkIGp/H3EeGao91iE8P7xsPu9QWDFlo2qLiyv+A==
+Received: from CH0PR13CA0044.namprd13.prod.outlook.com (2603:10b6:610:b2::19)
+ by DM6PR12MB4316.namprd12.prod.outlook.com (2603:10b6:5:21a::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.17; Mon, 25 Aug
+ 2025 14:35:00 +0000
+Received: from CH2PEPF0000014A.namprd02.prod.outlook.com
+ (2603:10b6:610:b2:cafe::f3) by CH0PR13CA0044.outlook.office365.com
+ (2603:10b6:610:b2::19) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9073.10 via Frontend Transport; Mon,
+ 25 Aug 2025 14:35:00 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ CH2PEPF0000014A.mail.protection.outlook.com (10.167.244.107) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9052.8 via Frontend Transport; Mon, 25 Aug 2025 14:35:00 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Mon, 25 Aug
+ 2025 07:34:46 -0700
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Mon, 25 Aug 2025 07:34:45 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
+ (10.126.190.181) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
+ Transport; Mon, 25 Aug 2025 07:34:42 -0700
+From: Mark Bloch <mbloch@nvidia.com>
+To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>
+CC: Tariq Toukan <tariqt@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	"Saeed Mahameed" <saeedm@nvidia.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Gal Pressman <gal@nvidia.com>,
+	<linux-rdma@vger.kernel.org>, Mark Bloch <mbloch@nvidia.com>
+Subject: [PATCH net V2 00/11] mlx5 misc fixes 2025-08-25
+Date: Mon, 25 Aug 2025 17:34:23 +0300
+Message-ID: <20250825143435.598584-1-mbloch@nvidia.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <a90cf9a3-d662-4239-ad54-7ea917c802a5@redhat.com>
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PEPF0000014A:EE_|DM6PR12MB4316:EE_
+X-MS-Office365-Filtering-Correlation-Id: 22e65e24-0d38-414e-5b38-08dde3e49293
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?0alS1Y+6Z21GWMmWo3sIpC54yw0x64h8kA4qz4kDMbZ9HHac16Dj/uvK0e1l?=
+ =?us-ascii?Q?BNeGz8P+NQ5YlfOE4cxunvOuoSx1Kx9FfNnWw/BzyFoI4XY60dt7Sy5CZ4mu?=
+ =?us-ascii?Q?fFDY7brnh3Qy2VAYlcO6EhtTziekBMmoyti2ydCJ4HOuJ6yG75tQzOIpDgKn?=
+ =?us-ascii?Q?2gJBA78iRhh583jHlIn1ylt5JzESdhbhN/HGiQzcflVtWNajhslQbBtxpJ/p?=
+ =?us-ascii?Q?HCZd4jE7ZTt/5OuNLTU34WtoEIJTAo2Q2rqUMQhsLh46g3TXham/xoFJlCby?=
+ =?us-ascii?Q?vYaPlUvWJ4ho+7CgMMtNHjaFd2PxUx8nZMWyEUN3niskRzuQok/8k51r1v5t?=
+ =?us-ascii?Q?BwToF52PXsaSxEMqG+xRW2FuD1pXC84ZZ2eUL2fEB/XYgaa5apW00FdDY7hB?=
+ =?us-ascii?Q?x99ZSg5wnIgWwye0WA2HPPQM2uJUpYOuknjfhvj2gfuQnp0XnPU3jSMmmYUn?=
+ =?us-ascii?Q?PPUMjW9zqbGtgHY2QRVPyTcToRBcrtE1MAo2xCv1V9cH9WMXNzNDAKCh/zfm?=
+ =?us-ascii?Q?L+IP6FtZR9cT0TRluVK4xICRNOjVY0WMrBN79BzCEIJtPg/WIYLrnU7ytSgx?=
+ =?us-ascii?Q?JwNP8iFiJIVY2AxDFBZDWCPCP3JGDf0wGq/pztMk0FkmPYDWa27xcFYtOuYj?=
+ =?us-ascii?Q?Zu5S+lagDw5LjIjA1ArnOienCAXgmW/QNHSSoAoZtlCIpYtuoakXCBx+8IQ2?=
+ =?us-ascii?Q?SS71JZhf0SN5F8Ej5oWClV82Bxc5bDfobFfdIxQ81D8CeDyitq566P2zFg7C?=
+ =?us-ascii?Q?PUxjQgcrWKwofApG1/rGKHruYrOFU6tO4dED+b6p6h62NU9rebA9Q4DqUeuu?=
+ =?us-ascii?Q?KUwmApg/i4nX1A7tY1oHa3FW2EbdsYVz1UfTc9i6SJdj/2+tKRibOGjtuLno?=
+ =?us-ascii?Q?HAYOvTBB17ObUVV+Lh7VHk9K1gQApLdbGN+uwdzWVL8KxbAt+kk2b7jzcdWs?=
+ =?us-ascii?Q?/xpLy4RZiLfJX6lShPCAO2y7Hg+V7zeSXdVh3Gukw9g0XfJiGCrHRItiNavW?=
+ =?us-ascii?Q?QdGumbzyC9tmxe3K4B2BSjO/v+1RxXpcRSS81bv7Mj85eOrBTGUgf3LRxw9Z?=
+ =?us-ascii?Q?cIxaM3s5gx9tEyVLHpdp3bK1/FCRg1ksPt3CKrRXBaiCjZKeuKUpzPCSbjPW?=
+ =?us-ascii?Q?CAl+K/iOQ52bfE6jyLVu/iIaxminUATY5rxwqwaMCr5TjtBcqp0PAXq2GaAO?=
+ =?us-ascii?Q?5p0FR0Qu8bp+c9Zxl0AOZjLNuc24AYZAoTiH0RsOZv6CA66QKrYexP+7xsTC?=
+ =?us-ascii?Q?+8rALH+kLtz2vZmd0rI2vuTpAR0q6+gw8oD6qvvdeklnhVd/9VZK6sr3MVWs?=
+ =?us-ascii?Q?iDlO4lLtyjlFnQLDb/cb1WiLvIhNTajEVwXkc7JciC95c8WlNpwTSMmoNV54?=
+ =?us-ascii?Q?DpOewGkpBEq3o5fJYAcK4TzvC3yWGnjfGgEY+z2yRN6s5ZYmbT2FiQOY6urZ?=
+ =?us-ascii?Q?st/2dbC+alQqcctrVu0SiaYiiBli6j2El9UTk1h00hGf+IQpSalkyS9H8j8L?=
+ =?us-ascii?Q?IgBxjdeOZSu2+ZTgY0z5NOoH/6SkfXnGcBkU?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2025 14:35:00.6148
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 22e65e24-0d38-414e-5b38-08dde3e49293
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH2PEPF0000014A.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4316
 
-On Mon, Aug 25, 2025 at 02:48:58PM +0200, David Hildenbrand wrote:
-> On 23.08.25 10:59, Mike Rapoport wrote:
-> > On Fri, Aug 22, 2025 at 08:24:31AM +0200, David Hildenbrand wrote:
-> > > On 22.08.25 06:09, Mika Penttilä wrote:
-> > > > 
-> > > > On 8/21/25 23:06, David Hildenbrand wrote:
-> > > > 
-> > > > > All pages were already initialized and set to PageReserved() with a
-> > > > > refcount of 1 by MM init code.
-> > > > 
-> > > > Just to be sure, how is this working with MEMBLOCK_RSRV_NOINIT, where MM is supposed not to
-> > > > initialize struct pages?
-> > > 
-> > > Excellent point, I did not know about that one.
-> > > 
-> > > Spotting that we don't do the same for the head page made me assume that
-> > > it's just a misuse of __init_single_page().
-> > > 
-> > > But the nasty thing is that we use memblock_reserved_mark_noinit() to only
-> > > mark the tail pages ...
-> > 
-> > And even nastier thing is that when CONFIG_DEFERRED_STRUCT_PAGE_INIT is
-> > disabled struct pages are initialized regardless of
-> > memblock_reserved_mark_noinit().
-> > 
-> > I think this patch should go in before your updates:
-> 
-> Shouldn't we fix this in memblock code?
-> 
-> Hacking around that in the memblock_reserved_mark_noinit() user sound wrong
-> -- and nothing in the doc of memblock_reserved_mark_noinit() spells that
-> behavior out.
+Hi,
 
-We can surely update the docs, but unfortunately I don't see how to avoid
-hacking around it in hugetlb. 
-Since it's used to optimise HVO even further to the point hugetlb open
-codes memmap initialization, I think it's fair that it should deal with all
-possible configurations.
- 
-> -- 
-> Cheers
-> 
-> David / dhildenb
-> 
-> 
+This patchset provides misc bug fixes from the team to the mlx5 core and
+Eth drivers.
 
+V1: https://lore.kernel.org/all/20250824083944.523858-1-mbloch@nvidia.com/
+
+Changelog:
+
+V1->V2:
+- Patch 9 was fixed to address build warning found by kernel test robot.
+
+Alexei Lazar (3):
+  net/mlx5e: Update and set Xon/Xoff upon MTU set
+  net/mlx5e: Update and set Xon/Xoff upon port speed set
+  net/mlx5e: Set local Xoff after FW update
+
+Lama Kayal (4):
+  net/mlx5: HWS, Fix memory leak in hws_pool_buddy_init error path
+  net/mlx5: HWS, Fix memory leak in hws_action_get_shared_stc_nic error flow
+  net/mlx5: HWS, Fix uninitialized variables in mlx5hws_pat_calc_nop error flow
+  net/mlx5: HWS, Fix pattern destruction in mlx5hws_pat_get_pattern error path
+
+Moshe Shemesh (4):
+  net/mlx5: Reload auxiliary drivers on fw_activate
+  net/mlx5: Fix lockdep assertion on sync reset unload event
+  net/mlx5: Nack sync reset when SFs are present
+  net/mlx5: Prevent flow steering mode changes in switchdev mode
+
+ .../net/ethernet/mellanox/mlx5/core/devlink.c |   2 +-
+ .../mellanox/mlx5/core/en/port_buffer.c       |   3 +-
+ .../mellanox/mlx5/core/en/port_buffer.h       |  12 ++
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |  19 ++-
+ .../net/ethernet/mellanox/mlx5/core/fs_core.c |  15 +--
+ .../ethernet/mellanox/mlx5/core/fw_reset.c    | 126 ++++++++++--------
+ .../ethernet/mellanox/mlx5/core/fw_reset.h    |   1 +
+ .../ethernet/mellanox/mlx5/core/sf/devlink.c  |  10 ++
+ .../net/ethernet/mellanox/mlx5/core/sf/sf.h   |   6 +
+ .../mellanox/mlx5/core/steering/hws/action.c  |   2 +-
+ .../mellanox/mlx5/core/steering/hws/pat_arg.c |   6 +-
+ .../mellanox/mlx5/core/steering/hws/pool.c    |   1 +
+ 12 files changed, 136 insertions(+), 67 deletions(-)
+
+
+base-commit: ec79003c5f9d2c7f9576fc69b8dbda80305cbe3a
 -- 
-Sincerely yours,
-Mike.
+2.34.1
+
 
