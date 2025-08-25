@@ -1,107 +1,130 @@
-Return-Path: <netdev+bounces-216447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B846B33A6D
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 11:16:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16447B33AB1
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 11:23:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 776854E2E74
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 09:16:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5DD9168B15
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 09:23:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CFA02C1581;
-	Mon, 25 Aug 2025 09:14:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3095283FE2;
+	Mon, 25 Aug 2025 09:23:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="XGt0pugQ";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="46EqGMpo"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B382A29E116
-	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 09:14:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 692A3280CF1
+	for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 09:22:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756113267; cv=none; b=ZRn27Jk3mbHYaBkWdNRa17sZJP1sz/5iHgHn+ChVphZJJnztoXqcTWHWTD2TZVS5VzrN3T0HVARxBKRgjExQU5eqK5HOfHKw3ply4R/czttYjQzgKdCHLJgVCRU0CYK7tz/R7Gmyr3kkxE69Ipdv2RahO0ngNc6t3OdMq/9YNjs=
+	t=1756113781; cv=none; b=uLQCsHHTB3HUeEzH1Tb7Cq/Gbccknb9Lz9BnMcBrnk742xkdPRliGFxW4Sxm/FvcsLPuKjhyJmioGE3nUbnzqnyWk6y09NPkXOl45OzC54Pun4zRN5coOMjmh6Q2sl4IeMyeI1pu5QDoYKOcujty5qHA2DOTT28ApRjeJbtnogg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756113267; c=relaxed/simple;
-	bh=IZE2IObkGus8MxAtOBzoPr06fFPibuycSoUDGf/CF4Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cLPXfeRr6bTYjB1UYlfot8ecNirY0/8VWfNFcsMvzwVGA7Hfw0OiSvS1oqy5LPYsVwZyO2wVOUGIB7Smi/41QK9WK5lDkdYlfc4WG6Ku/SzvBZOcNRqWqZqp2qeJ/tGJX+CcE0DUfWUVMvBL0HvnZMItUVfg/Lnm83ystbk6l7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uqTHB-0007QK-A7; Mon, 25 Aug 2025 11:14:05 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uqTH9-0022kd-2f;
-	Mon, 25 Aug 2025 11:14:03 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uqTH9-00GI4f-2J;
-	Mon, 25 Aug 2025 11:14:03 +0200
-Date: Mon, 25 Aug 2025 11:14:03 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	kernel@pengutronix.de,
-	Dent Project <dentproject@linuxfoundation.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Kyle Swenson <kyle.swenson@est.tech>
-Subject: Re: [PATCH net-next 2/2] net: pse-pd: pd692x0: Add sysfs interface
- for configuration save/reset
-Message-ID: <aKwpW-c-nZidEBe0@pengutronix.de>
-References: <20250822-feature_poe_permanent_conf-v1-0-dcd41290254d@bootlin.com>
- <20250822-feature_poe_permanent_conf-v1-2-dcd41290254d@bootlin.com>
- <d4bc2c95-7e25-4d76-994f-b68f1ead8119@lunn.ch>
- <20250825104721.28f127a2@kmaincent-XPS-13-7390>
+	s=arc-20240116; t=1756113781; c=relaxed/simple;
+	bh=OldsM0mTe0gUZlhTr/mMd3s5ex5qEiHcv6VNhYROMGQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=mXDEqtgPG4raLy8S7zLGhXH3gWdeHop1Js6sDzMMeqsY+FIU/jW8ukVr871O8eOBpTzhSiq1Xpa3Sc+Et6vWrIPhjVH5Q9ZS6MW1OMHckiLWbAyTBA1zUY6U5NAaEQl60B4uhtnWYwpiVorVKUJabVVEtF+R3GWgTWfl9C86uLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=XGt0pugQ; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=46EqGMpo; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1756113776;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OldsM0mTe0gUZlhTr/mMd3s5ex5qEiHcv6VNhYROMGQ=;
+	b=XGt0pugQksHOTwpSgow0iV5dMvEriijJXSVyT5cmhLpalpOYBZ4L18xluXdzNq8rpxIRzH
+	VVcuu2BBdpNxVpKT8uqfo733AyiGVK7YsOdLQdJCIllLhMm3BB43tvqpa93Itrgv7ThtBE
+	YNRxRCPAQcCnbcGIXynbljUxqcVfVu3s7zNrc7h9coYGIF2gMREODnxwDjJgg28UbkQWnY
+	P0h6N/DLd8IcTkGi0k5YUG5Tpo6S/7aRE20bOjzGsTEzg71vjWfp4G5pvqdLRqgg7c+gl2
+	MtwLRLEa8mQvG+kp7pA8DYd30XOUh87MqbBxBV1J4Iwy7KPHaTutx4hwBD98iQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1756113776;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OldsM0mTe0gUZlhTr/mMd3s5ex5qEiHcv6VNhYROMGQ=;
+	b=46EqGMpoRP9YtsfP5Z5aq8RqQVNc2MIqjGwToDZkSZeJZNVAr/hdm0j6UIsYDvwi0Awaqp
+	qWoMpRS+xf+7ihCw==
+To: Miroslav Lichvar <mlichvar@redhat.com>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Vinicius
+ Costa Gomes <vinicius.gomes@intel.com>, Paul Menzel
+ <pmenzel@molgen.mpg.de>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Jacob Keller <jacob.e.keller@intel.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-next v2] igb: Convert Tx timestamping to PTP aux worker
+In-Reply-To: <aKwWiGkbDyEOS9-z@localhost>
+References: <20250822-igb_irq_ts-v2-1-1ac37078a7a4@linutronix.de>
+ <20250822075200.L8_GUnk_@linutronix.de> <87ldna7axr.fsf@jax.kurt.home>
+ <aKwWiGkbDyEOS9-z@localhost>
+Date: Mon, 25 Aug 2025 11:22:55 +0200
+Message-ID: <87o6s3oivk.fsf@jax.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250825104721.28f127a2@kmaincent-XPS-13-7390>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-Hello Kory,
+--=-=-=
+Content-Type: text/plain
 
-On Mon, Aug 25, 2025 at 10:47:21AM +0200, Kory Maincent wrote:
-> > I've not looked at the sysfs documentation. Are there other examples
-> > of such a property?
-> 
-> Not sure for that particular save/reset configuration case.
-> Have you another implementation idea in mind?
+On Mon Aug 25 2025, Miroslav Lichvar wrote:
+> On Sat, Aug 23, 2025 at 09:29:36AM +0200, Kurt Kanzenbach wrote:
+>> Also I couldn't really see a performance degradation with ntpperf.
+>
+> I was testing with an I350, not I210. Could that make a difference?
 
-My personal preference would be to use devlink (netlink based)
-interface. We will have more controller/domain specific functions which can't
-be represented per port.
+Jup, it could make a difference.
 
-PS: if you are on the OSS Amsterdam, we can talk in person about it.
+>
+>> In my
+>> tests the IRQ variant reached an equal or higher rate. But sometimes I
+>> get 'Could not send requests at rate X'. No idea what that means.
+>
+> That's ntpperf giving up as the HW is too slow to send requests at
+> that rate (with a single process calling sendmmsg() in a loop). You
+> can add the -l option to force ntpperf to continue, but the printed
+> rate values will no longer be accurate, you would need to measure it
+> by some other way, e.g. by monitoring the interface packet counters.
 
-Best Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+I see.
+
+Thanks,
+Kurt
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmisK28THGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgu1rD/9qUKqoJzxPjCwmyM7a0nf/OU96P6av
+LtDv0y6jPOr/Mf62KBqI228u8HfdTxSyXV6gfuKG+xcklnwdkH5SeHHTYVIYzmIb
+tIuoswVSL7CXj6+/GtUxGq3kK4MQIFiR6Qc/Gtz/v7r4HpPSW5NT0e5nmypL4APj
+ic185xMi63zaoWBrSpLviaMh2piTyYHI5mOW0EwVPDAQ3Zu6kKXjJUHvxH++Y99y
+jXv2QJGooEEboDMweJaL1vLlx9q/f7xFBABLXHnBXhdy1kFMGHr5c0eNmuAoHqU8
+zdGus1oVrdUby/7n1Dp64tgQ3ZSG/meCF+aKTlpdTdHs7ikhFH6t0JJYvEg53QH5
+QkIKEAgH6j4Dz5BkqUb7C1gXB+OFJ1xuTJ35Wpf0/OqM2xxm2SQVFnvitDdvarW2
+lqI/CciQaSuL+nEwjGF7Hh9jC6ElLhffXrK9EyyvsTee4qhuv5xH+czHISPk8/3o
+YfelX4qlAhQ6fqlzgGvn+ka+XS3Zl6KpZfvMoUCL8granrq++8YjAfsKkkjkBVCE
+z9TGkAViao0ktKkYgFk19htzNx2xXx192V3kD/K3/CQ5T4bwasAqbimkovG2YwYe
+nxtwgkf7AfbpLty6aosF4q8ZAu4rHEOW+Z/2iDn0OfP7pIeSWmlI6ReJ4/zUREH4
+rcSt3nhUPrrpQg==
+=rszz
+-----END PGP SIGNATURE-----
+--=-=-=--
 
