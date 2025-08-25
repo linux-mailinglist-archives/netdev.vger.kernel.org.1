@@ -1,247 +1,213 @@
-Return-Path: <netdev+bounces-216548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDD54B346F1
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 18:18:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 994EFB34709
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 18:20:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B25431B22F1C
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 16:18:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C7B6D7A32CE
+	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 16:18:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDFA1301006;
-	Mon, 25 Aug 2025 16:17:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B12882FDC27;
+	Mon, 25 Aug 2025 16:20:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z1X+B0ZG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BtcZn9AX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D2D72ECE8A;
-	Mon, 25 Aug 2025 16:17:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01810271A9D;
+	Mon, 25 Aug 2025 16:20:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756138641; cv=none; b=SptbKSJop3H7dgWw1sL735/1gEinjzjDUprwQm+xPwGYIz5BQqS1la+ZzdpdyQqWHvXJbbKHZQJxzGDqFLeKeM0d3uPmzx6cNdCye0KYVKPVjQv7p2yasunQfr8+yNVJliOe5vHm9v8uqZlmuyCet75Xlo86rqV8WCVbj5E17UI=
+	t=1756138822; cv=none; b=QjfK4rRGIO5ZjCokN2I+dXDSitY4H8VzOmSoJbI4ncAP+1Y513xly2Si8vVgsZXCAoy10r4dy64sgpcSz0aXFQukwFgDfuk2MA23VijtKDvcJLPi8iS8gQMy1Lgq3xdrT0rQZHh0o08Bal5xgZgUptgFltHkKTSv3YQd6tFI4NI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756138641; c=relaxed/simple;
-	bh=FANVRTF6GTKZEwwkEPlW/tWs0ubXGJ7R1OcvtRKQmn8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=exXjb3hRCCddd9pnWyEM1lCdYwwTOq1uHNa87hzixgaPOPZaUmdcfACUnD6E/i0azY9+gQgJm44/RYe/CmXANipS+8B2ZFeZhl5JME324D+zb8lOLXNOPpk36G+eGiSYLlyjmr4CYxjxP1/LgckZ49wki91Xkp8Wii2hFXXCq08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z1X+B0ZG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3323DC4CEED;
-	Mon, 25 Aug 2025 16:17:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756138640;
-	bh=FANVRTF6GTKZEwwkEPlW/tWs0ubXGJ7R1OcvtRKQmn8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Z1X+B0ZGv7uHOoHuOLd4SJt16FexWEbZsjEQFQqRUrapr3OCpVgaCrasYjPdbbOyy
-	 eytOcCBL+pDQ3AWWdM11/NupldPVN7n787Ac52JA6muufv5Aq5hmbyZm6HiI3UG9/E
-	 S3WLhadcDWFA0vrOLjkLNWku02BCbOZumOEeIy+mLkW7A9OWvR0HBF0JMJQllwxMjH
-	 McwQict10AbNwzUaf3Fe4rhbDyKvQqV4mNkpdYsg1XXv1bkWDE2ZZQycNZSZHCAubw
-	 xxCEDJgzUrllwHg0O5i5LR3vB8H9ddKiEeoiX5nxByJsLox/KvefidsYGinF192ZU3
-	 LkZva/mIcA0xQ==
-Date: Mon, 25 Aug 2025 19:17:02 +0300
-From: Mike Rapoport <rppt@kernel.org>
-To: David Hildenbrand <david@redhat.com>
-Cc: Mika =?iso-8859-1?Q?Penttil=E4?= <mpenttil@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	Alexander Potapenko <glider@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Brendan Jackman <jackmanb@google.com>,
-	Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>,
-	Dmitry Vyukov <dvyukov@google.com>, dri-devel@lists.freedesktop.org,
-	intel-gfx@lists.freedesktop.org, iommu@lists.linux.dev,
-	io-uring@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	John Hubbard <jhubbard@nvidia.com>, kasan-dev@googlegroups.com,
-	kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	linux-arm-kernel@axis.com, linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org, linux-ide@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-mmc@vger.kernel.org, linux-mm@kvack.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Marco Elver <elver@google.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
-	Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
-	Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
-	virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
-	wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
-Subject: Re: [PATCH RFC 10/35] mm/hugetlb: cleanup
- hugetlb_folio_init_tail_vmemmap()
-Message-ID: <aKyMfvWe8JetkbRL@kernel.org>
-References: <20250821200701.1329277-1-david@redhat.com>
- <20250821200701.1329277-11-david@redhat.com>
- <9156d191-9ec4-4422-bae9-2e8ce66f9d5e@redhat.com>
- <7077e09f-6ce9-43ba-8f87-47a290680141@redhat.com>
- <aKmDBobyvEX7ZUWL@kernel.org>
- <a90cf9a3-d662-4239-ad54-7ea917c802a5@redhat.com>
- <aKxz9HLQTflFNYEu@kernel.org>
- <a72080b4-5156-4add-ac7c-1160b44e0dfe@redhat.com>
- <aKx6SlYrj_hiPXBB@kernel.org>
- <f8140a17-c4ec-489b-b314-d45abe48bf36@redhat.com>
+	s=arc-20240116; t=1756138822; c=relaxed/simple;
+	bh=TAcfmgI9LeesTtIHoLhIZ/JHO7GaVWax2M9oNJmKprQ=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=U8lrQM/0Koj2sytD/j+O64JwmXqKLr80LdGsAWigtAixeUv9W//WJDbxTyYH32Uufvm1pMNydLSFq1vh8AWCtjnvqfE9z2zdZg+phyQgxAtcDWvCaUzYizjD4O0XRaa+6Rkz6Ehv6E5sl1y8tPS6vGWIpPe6uqJfv27vp21zGps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BtcZn9AX; arc=none smtp.client-ip=209.85.221.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-540e0970ae2so509740e0c.1;
+        Mon, 25 Aug 2025 09:20:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756138819; x=1756743619; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cQK66bSWdpR/3neM6ZuMukiV+gZsLXj9dgiuTjYX2AA=;
+        b=BtcZn9AXCrHxvLk0Vu/OLj4mvTA9QKbmWnXqKq67GWGRW8NDfMPAm5Q6I7TtZnE7mf
+         +xqK6FO6PLWLyHXwe94mqJEi7VE1cZxX3TMZm9rp3kKynrQvVgnIo7McpJ8adRqYUbVc
+         nuEYhCDJRP1hIFWdZ+ANS/O4pq8fqCoC41XNvMLLrRhd2Y3Tzvg5PKFYEupjgxTg5XsY
+         J4q2wH+WHwj0YFw88Ikb/1aiqHjcfyTGQyqgiVtH5A0jqjyoRzo6bGoQ62vvDWtlJ9no
+         Wpkqdb2hQkDkU8Qi5/lTuLDU0xuzTJ9WrYy1ITEndlj8y2VgxkvwAYhhh2hgCzNr5vw5
+         kwBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756138819; x=1756743619;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=cQK66bSWdpR/3neM6ZuMukiV+gZsLXj9dgiuTjYX2AA=;
+        b=LGziLM3veU+ihTghpXtFlEvi5q5PscHj+R9YgLdeWoazFxA+nmtXvy3+4+2mIqTBq3
+         kLSf5RNRGpQO8ErxrudxY1C56nAvwu9bpiPF8s5wCDMEbd0c4SXye6IdsTd1/+PaVUck
+         LlZ/bq+zAFGg2Ss2+x+9qJI3XvDHkKNW9NlX5s79Osr4HXc8joWL12XjBr2sQ9U9glDj
+         VTDwj6sIfQ2ab37yfSIqRykxMlwIFpljQr9sk1k/B+oMW0En6kQ5MyvvRBEiZYU/iYL8
+         U+TjgWnOr46xQHCztlvYZSp/Fuo98af4fCYOXCBvw4WjCWTYS+teqfV0/dqQv8nM8FV7
+         VMlQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUu83Ebo8Iiv+SII+Kzv70vJyBCI6BSM7aNl/TzcmtHd+KuLbOZ+uJL18ifvqjkJEsK0E4b3eFVJtApRyQ=@vger.kernel.org, AJvYcCXjbre7A7IqlSJ8ldKCdFb3wuAAVfFXquVpufmXLZ3b9tyCOs6lra9qmg1Z18RUIUpovfSgVpYy@vger.kernel.org
+X-Gm-Message-State: AOJu0YyAstOe1RNTidLpXBirVnDauvQUmbdHd94YoTsAExhYhuNIr4f+
+	IEcmlbD4qoYQynFu3VRUzwxfgIHJwew+VSP6UclFyStDH/GF5SQcQyBY
+X-Gm-Gg: ASbGncte58m4RRaDFm4EnKvdHpM01ZgJbp0y+bpbmKKMeL9b9W92jdhquZEYRgE59I9
+	eumXHUOAqRt3sf/PdJa1CcOtaGe62soOIbloT3L2nrSli5+JwNDbHmTo430dWWgFiUWJth5kNnG
+	a84s84Pm7RX3nfXurjhj8fLU1PKH1OsnCXwGvcQU4q/KDvRoRkzJyxlRc4j5M6QbYAXkwirisY4
+	8e5rWEXSOiBOvm8lrH8UX04eCCBCk2JBS33fjkgQElUl1zebCNdFNcxRADbUT6W2TkLh93yUVF1
+	xSgPVkkEBZfQj391wMoYi/m1wpYqSl7hIUO4JCCt+++c/BSpTvbqJh1GywZQlY3MiLDlYIZ793L
+	/mH4M18q7JvACSayxn3yO3AMNUUCIZ1o+/fnjIgJy+KjhdZQ7QC40AM7bPbBwsccS+Q/Z0A==
+X-Google-Smtp-Source: AGHT+IG+DDyinrOkYJVWmDmJqNIEOlqMrV1fm+S8myMgd86vycFol54MLKDK798r08P9S1+6Mp7TvQ==
+X-Received: by 2002:a05:6122:8d0:b0:538:d227:a364 with SMTP id 71dfb90a1353d-53c8a2bde65mr3110548e0c.3.1756138818726;
+        Mon, 25 Aug 2025 09:20:18 -0700 (PDT)
+Received: from gmail.com (128.5.86.34.bc.googleusercontent.com. [34.86.5.128])
+        by smtp.gmail.com with UTF8SMTPSA id 71dfb90a1353d-541b1dbcffcsm496071e0c.4.2025.08.25.09.20.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Aug 2025 09:20:18 -0700 (PDT)
+Date: Mon, 25 Aug 2025 12:20:17 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Xin Zhao <jackzxcui1989@163.com>, 
+ willemdebruijn.kernel@gmail.com, 
+ edumazet@google.com, 
+ ferenc@fejes.dev
+Cc: davem@davemloft.net, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ horms@kernel.org, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+Message-ID: <willemdebruijn.kernel.26d6abeee5c4c@gmail.com>
+In-Reply-To: <20250825050628.124977-1-jackzxcui1989@163.com>
+References: <20250825050628.124977-1-jackzxcui1989@163.com>
+Subject: Re: [PATCH net-next v6] net: af_packet: Use hrtimer to do the retire
+ operation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f8140a17-c4ec-489b-b314-d45abe48bf36@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Aug 25, 2025 at 05:42:33PM +0200, David Hildenbrand wrote:
-> On 25.08.25 16:59, Mike Rapoport wrote:
-> > On Mon, Aug 25, 2025 at 04:38:03PM +0200, David Hildenbrand wrote:
-> > > On 25.08.25 16:32, Mike Rapoport wrote:
-> > > > On Mon, Aug 25, 2025 at 02:48:58PM +0200, David Hildenbrand wrote:
-> > > > > On 23.08.25 10:59, Mike Rapoport wrote:
-> > > > > > On Fri, Aug 22, 2025 at 08:24:31AM +0200, David Hildenbrand wrote:
-> > > > > > > On 22.08.25 06:09, Mika Penttilä wrote:
-> > > > > > > > 
-> > > > > > > > On 8/21/25 23:06, David Hildenbrand wrote:
-> > > > > > > > 
-> > > > > > > > > All pages were already initialized and set to PageReserved() with a
-> > > > > > > > > refcount of 1 by MM init code.
-> > > > > > > > 
-> > > > > > > > Just to be sure, how is this working with MEMBLOCK_RSRV_NOINIT, where MM is supposed not to
-> > > > > > > > initialize struct pages?
-> > > > > > > 
-> > > > > > > Excellent point, I did not know about that one.
-> > > > > > > 
-> > > > > > > Spotting that we don't do the same for the head page made me assume that
-> > > > > > > it's just a misuse of __init_single_page().
-> > > > > > > 
-> > > > > > > But the nasty thing is that we use memblock_reserved_mark_noinit() to only
-> > > > > > > mark the tail pages ...
-> > > > > > 
-> > > > > > And even nastier thing is that when CONFIG_DEFERRED_STRUCT_PAGE_INIT is
-> > > > > > disabled struct pages are initialized regardless of
-> > > > > > memblock_reserved_mark_noinit().
-> > > > > > 
-> > > > > > I think this patch should go in before your updates:
-> > > > > 
-> > > > > Shouldn't we fix this in memblock code?
-> > > > > 
-> > > > > Hacking around that in the memblock_reserved_mark_noinit() user sound wrong
-> > > > > -- and nothing in the doc of memblock_reserved_mark_noinit() spells that
-> > > > > behavior out.
-> > > > 
-> > > > We can surely update the docs, but unfortunately I don't see how to avoid
-> > > > hacking around it in hugetlb.
-> > > > Since it's used to optimise HVO even further to the point hugetlb open
-> > > > codes memmap initialization, I think it's fair that it should deal with all
-> > > > possible configurations.
-> > > 
-> > > Remind me, why can't we support memblock_reserved_mark_noinit() when
-> > > CONFIG_DEFERRED_STRUCT_PAGE_INIT is disabled?
+Xin Zhao wrote:
+> On Mon, 2025-08-25 at 2:08 +0800, Willem wrote:
+> 
+> > This is getting more complex than needed.
 > > 
-> > When CONFIG_DEFERRED_STRUCT_PAGE_INIT is disabled we initialize the entire
-> > memmap early (setup_arch()->free_area_init()), and we may have a bunch of
-> > memblock_reserved_mark_noinit() afterwards
+> > Essentially the lifecycle is that packet_set_ring calls hrtimer_setup
+> > and hrtimer_del_sync.
+> > 
+> > Inbetween, while the ring is configured, the timer is either
+> > 
+> > - scheduled from tpacket_rcv and !is_scheduled
+> >     -> call hrtimer_start
+> > - scheduled from tpacket_rcv and is_scheduled
+> >     -> call hrtimer_set_expires
 > 
-> Oh, you mean that we get effective memblock modifications after already
-> initializing the memmap.
-> 
-> That sounds ... interesting :)
+> We cannot use hrtimer_set_expires/hrtimer_forward_now when a hrtimer is
+> already enqueued.  
 
-It's memmap, not the free lists. Without deferred init, memblock is active
-for a while after memmap initialized and before the memory goes to the free
-lists.
- 
-> So yeah, we have to document this for memblock_reserved_mark_noinit().
-> 
-> Is it also a problem for kexec_handover?
+Perhaps we need to simplify and stop trying to adjust the timer from
+tpacket_rcv once scheduled. Let the callback handle that.
 
-With KHO it's also interesting, but it does not support deferred struct
-page init for now :)
- 
-> We should do something like:
+> The WARN_ON(timer->state & HRTIMER_STATE_ENQUEUED) in hrtimer_forward
+> already clearly indicates this point. The reason for not adding this
+> WARN_ON in hrtimer_set_expires is that hrtimer_set_expires is an inline
+> function, wory about increase code size.
+> The implementation of perf_mux_hrtimer_restart actually checks whether
+> the hrtimer is active when restarting the hrtimer.
 > 
-> diff --git a/mm/memblock.c b/mm/memblock.c
-> index 154f1d73b61f2..ed4c563d72c32 100644
-> --- a/mm/memblock.c
-> +++ b/mm/memblock.c
-> @@ -1091,13 +1091,16 @@ int __init_memblock memblock_clear_nomap(phys_addr_t base, phys_addr_t size)
->  /**
->   * memblock_reserved_mark_noinit - Mark a reserved memory region with flag
-> - * MEMBLOCK_RSRV_NOINIT which results in the struct pages not being initialized
-> - * for this region.
-> + * MEMBLOCK_RSRV_NOINIT which allows for the "struct pages" corresponding
-> + * to this region not getting initialized, because the caller will take
-> + * care of it.
->   * @base: the base phys addr of the region
->   * @size: the size of the region
->   *
-> - * struct pages will not be initialized for reserved memory regions marked with
-> - * %MEMBLOCK_RSRV_NOINIT.
-> + * "struct pages" will not be initialized for reserved memory regions marked
-> + * with %MEMBLOCK_RSRV_NOINIT if this function is called before initialization
-> + * code runs. Without CONFIG_DEFERRED_STRUCT_PAGE_INIT, it is more likely
-> + * that this function is not effective.
->   *
->   * Return: 0 on success, -errno on failure.
->   */
+> static int perf_mux_hrtimer_restart(struct perf_cpu_pmu_context *cpc)
+> {
+> 	struct hrtimer *timer = &cpc->hrtimer;
+> 	unsigned long flags;
+> 
+> 	raw_spin_lock_irqsave(&cpc->hrtimer_lock, flags);
+> 	if (!cpc->hrtimer_active) {
+> 		cpc->hrtimer_active = 1;
+> 		hrtimer_forward_now(timer, cpc->hrtimer_interval);
+> 		hrtimer_start_expires(timer, HRTIMER_MODE_ABS_PINNED_HARD);
+> 	}
+> 	raw_spin_unlock_irqrestore(&cpc->hrtimer_lock, flags);
+> 
+> 	return 0;
+> }
+> 
+> Therefore, according to the overall design of the hrtimer, once the
+> hrtimer is active, it is not allowed to set the timeout outside of the
+> hrtimer callback nor is it allowed to restart the hrtimer.
+> 
+> So two ways to update the hrtimer timeout:
+> 1. update expire time in the callback
+> 2. Call the hrtimer_cancel and then call hrtimer_start
 
-I have a different version :)
- 
-diff --git a/include/linux/memblock.h b/include/linux/memblock.h
-index b96746376e17..d20d091c6343 100644
---- a/include/linux/memblock.h
-+++ b/include/linux/memblock.h
-@@ -40,8 +40,9 @@ extern unsigned long long max_possible_pfn;
-  * via a driver, and never indicated in the firmware-provided memory map as
-  * system RAM. This corresponds to IORESOURCE_SYSRAM_DRIVER_MANAGED in the
-  * kernel resource tree.
-- * @MEMBLOCK_RSRV_NOINIT: memory region for which struct pages are
-- * not initialized (only for reserved regions).
-+ * @MEMBLOCK_RSRV_NOINIT: memory region for which struct pages don't have
-+ * PG_Reserved set and are completely not initialized when
-+ * %CONFIG_DEFERRED_STRUCT_PAGE_INIT is enabled (only for reserved regions).
-  * @MEMBLOCK_RSRV_KERN: memory region that is reserved for kernel use,
-  * either explictitly with memblock_reserve_kern() or via memblock
-  * allocation APIs. All memblock allocations set this flag.
-diff --git a/mm/memblock.c b/mm/memblock.c
-index 154f1d73b61f..02de5ffb085b 100644
---- a/mm/memblock.c
-+++ b/mm/memblock.c
-@@ -1091,13 +1091,15 @@ int __init_memblock memblock_clear_nomap(phys_addr_t base, phys_addr_t size)
- 
- /**
-  * memblock_reserved_mark_noinit - Mark a reserved memory region with flag
-- * MEMBLOCK_RSRV_NOINIT which results in the struct pages not being initialized
-- * for this region.
-+ * MEMBLOCK_RSRV_NOINIT
-+ *
-  * @base: the base phys addr of the region
-  * @size: the size of the region
-  *
-- * struct pages will not be initialized for reserved memory regions marked with
-- * %MEMBLOCK_RSRV_NOINIT.
-+ * The struct pages for the reserved regions marked %MEMBLOCK_RSRV_NOINIT will
-+ * not have %PG_Reserved flag set.
-+ * When %CONFIG_DEFERRED_STRUCT_PAGE_INIT is enabled, setting this flags also
-+ * completly bypasses the initialization of struct pages for this region.
-  *
-  * Return: 0 on success, -errno on failure.
-  */
- 
-> Optimizing the hugetlb code could be done, but I am not sure how high
-> the priority is (nobody complained so far about the double init).
+1 seems preferable. The intent of the API.
+
+> According to your suggestion, we don't call hrtimer_start inside the
+> callback, would you accept calling hrtimer_cancel first and then calling
+> hrtimer_start in the callback? However, this approach also requires
+> attention, as hrtimer_cancel will block until the callback is running,
+> so it is essential to ensure that it is not called within the hrtimer
+> callback; otherwise, it could lead to a deadlock.
 > 
-> -- 
-> Cheers
 > 
-> David / dhildenb
+> > - rescheduled from the timer callback
+> >     -> call hrtimer_set_expires and return HRTIMER_RESTART
+> > 
+> > The only complication is that the is_scheduled check can race with the
+> > HRTIMER_RESTART restart, as that happens outside the sk_receive_queue
+> > critical section.
+> > 
+> > One option that I suggested before is to convert pkc->delete_blk_timer
+> > to pkc->blk_timer_scheduled to record whether the timer is scheduled
+> > without relying on hrtimer_is_queued. Set it on first open_block and
+> > clear it from the callback when returning HR_NORESTART.
+> 
+> Do you agree with adding a callback variable to distinguish between
+> scheduled from tpacket_rcv and scheduled from the callback? I really
+> couldn't think of a better solution.
+
+Yes, no objections to that if necessary.
+> 
+> 
+> So, a possible solution may be?
+> 1. Continue to keep the callback parameter to strictly ensure whether it
+> is within the callback.
+> 2. Use hrtimer_set_expires within the callback to update the timeout (the
+> hrtimer module will enqueue the hrtimer when callback return)
+> 3. If it is not in callback, call hrtimer_cancel + hrtimer_start to restart
+> the timer.
+
+Instead, I would use an in_scheduled param, as in my previous reply and
+simply skip trying to schedule if already scheduled.
+
+> 4. To avoid the potential issue of the enqueue in step 2 and the
+> hrtimer_start in step 3 happening simultaneously, which could lead to
+> hrtimer_start being triggered twice in a very short period, the logic should
+> be:
+> if (hrtimer_cancel(...))
+>     hrtimer_start(...);
+> Additionally, the hrtimer_cancel check will also avoid hrtimer callback
+> triggered once more when just called prb_del_retire_blk_timer by packet_set_ring.
+> The hrtimer should be in an active state beginning from when
+> prb_setup_retire_blk_timer is called to the time when prb_del_retire_blk_timer
+> is called.
+> 
+> 
+> Thanks
+> Xin Zhao
 > 
 
--- 
-Sincerely yours,
-Mike.
+
 
