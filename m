@@ -1,220 +1,160 @@
-Return-Path: <netdev+bounces-216909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 864FEB35EFD
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 14:18:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04487B35F13
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 14:23:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39766461484
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 12:18:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 926133AAF01
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 12:23:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE891334371;
-	Tue, 26 Aug 2025 12:18:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B32CC334396;
+	Tue, 26 Aug 2025 12:23:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RH0ZOT/i"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="jm4vazqy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E02631987F;
-	Tue, 26 Aug 2025 12:18:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C1CE393DF2;
+	Tue, 26 Aug 2025 12:23:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756210710; cv=none; b=bPw6qt5LU7L0FAZWG1royPhelXrNxM2pHEBAf5rKybFgD2isylLETHkqk1R2B24MgFxmU3GTeLyAcT49/yb4doApPtDkafBHhWkVbRZic3l0kv/dG22ykQJLYyyw6C9jlIt9xrpq14wlTb6R1CB6TZIq6apFYWj7fU6Hu9e8ZqI=
+	t=1756211026; cv=none; b=mZFDoyBmEBICjyJaaSqngG4TZb0ZCcTV30tUu5+lky+okBYCjN2+idaYOlrQW1Wb7730iezyid5CGtf8+RDE7UTsi1FHLmwG5s/Hm8yCKDKgF9ou1SmbYRHDCGpXpHI4tqTcVt6Iejo/c+UPFl4iRqvjktPvVS/LipNQ2mGykpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756210710; c=relaxed/simple;
-	bh=xl7TGiKrLZLjjRkY4r2IBQ4zmCgxfGdphk5O0Hawwnk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=m4njptMu5alT+MjXxnZGmNE9kasKJLgOZ9FiSIf9OLEhKKBEOfye8XY4cNeD8GRxnJaSLsPCDf3e6qQpjOLbEEbU/j0to0Ld7MyVv2jP5Kd2NFzwW7BhncUgTtQ8hqpp0guzGIjyQwqYjDnbgQcl4OmbndR6P1KMOg95O5mbB9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RH0ZOT/i; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-45b627ea685so12851055e9.1;
-        Tue, 26 Aug 2025 05:18:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756210707; x=1756815507; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uUquV0WS+fxJUivCT1xUeaF0YeOMY0unvquPcAzHaLs=;
-        b=RH0ZOT/iBWcnwIjnL9sPGRq0kllVPxVwHR+iGnOJZ3KFES5GBQg6ye+1htZ4E5MOJ4
-         UPmA7RllvtrlAzLUhmNH3e4ZdosoA2/Ny0sDb2xgHFPql8KQs3Xqa1ppJmaBnEBuAEaB
-         oG1eVx5xHBkfw2PN/zdxEseTmOuDkc32uOaHzPaqMaWRp/YNvo7BxvFTibIlPdhdjWH/
-         YmEyN6Ui7aDQ4KyDA9WIJKsMcndk8yMU1Hl3PZWy5ljQAnTNGWZf81hY6wj97pEQxCnz
-         /4M9fQd5NsqygN0ua7+gZl4iqlbmrNj7hGjXYLS9aqp0EWBeFB8LSmTHhq7+1BoiL1Zp
-         ugsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756210707; x=1756815507;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uUquV0WS+fxJUivCT1xUeaF0YeOMY0unvquPcAzHaLs=;
-        b=bCVYVIimYAnkU6ve1Vr0fNAzaP6fOl2CddynDnGyqfF4epMwVr9DgenMNSm4mid+uL
-         8l5yz1KH8TJVta2vOCNxRqY/4a7qHO3CBN1mAsTyZjCO2nD/KcqVL0njoySo/gTpAR0S
-         sVmD/oSnzvE5uSwgHM7RfR9RuV/QHhNk+G2rJYDvu3/S97U2vVGF6H7hJ1HHj/bi2K6V
-         7Brxye5CB6pvZdAkf3C0kguMHKUeHl/tqYw67flDsKPmeOA2u7lVEYlsV0jM/w02NLJU
-         HbgkboIilS81BWofQVi5vaA02UNSqhAIIOfxMzi96MVAhTQwp/KiAFx5WEOgi7w9Ub3C
-         iRyw==
-X-Forwarded-Encrypted: i=1; AJvYcCV4+qyXA0vyfUSf51JeS4Ig8Bq+fWjiyYxlTW3vXa+lNShdJLAo+O51mHOqRbuKa1YP/PCRyiU=@vger.kernel.org, AJvYcCVqcohrvfXaf9XwpwC/aRY49bv5HZGkfGM31Ou36mgkIfn81z2LRSZK0jiykqAbOs8cgEibFhN8@vger.kernel.org
-X-Gm-Message-State: AOJu0YybvMOAzGmGFB1/56zDesrZ9IaRRXdAAAkOUqUq6A5gDxlHTKlr
-	Mao7z1riykIliZ5wH2ZwBIeof0Ye6gZLzDI8fOdfoMPZNSRKpzZWIgA3
-X-Gm-Gg: ASbGnctIpF7//I5TtCV+Ruz+toPH4sVYaUXkdZPfxNv7vmJb3kKdE6esHABsOBRn7UD
-	1R2gBXmz+NH/5kZudDLxAfTQMNyJR8wAXDyPeCjbVglGwLYUVkhTYT66HE9BTdSwgrmqHQ30A15
-	CPj8FgYUqiZ8sXlWjECLbh5tIwotINyRBJLo4Jri3hA/nEAqh+Q5WiO3Fz4EPMn0sv0J5Kq1UQs
-	CK0yfCHhC+38Z6ueHdnkxSbqporZ6SC3S/JhbVJahtUBjNy87lNB+iJic+wSJdWCqnl/3VBy8/l
-	6I6QOMMaCZQtDKcZW7uWguDxPiJ3jsQUqU36JACz+XGgYX6piUAf4FNzf3NHDlc93s/uUowH3JE
-	+rJBGeeA34miJI+R47oceKNP49UTQXyfr
-X-Google-Smtp-Source: AGHT+IFA+w9zyLiHWHSxzU53Rb5LUj410W6JWkcnK35EtrBXTWpbfg8retqet4NA+n39H/gbCoK57Q==
-X-Received: by 2002:a05:600c:3b85:b0:459:d780:3604 with SMTP id 5b1f17b1804b1-45b689f27ddmr12881755e9.3.1756210706739;
-        Tue, 26 Aug 2025 05:18:26 -0700 (PDT)
-Received: from oscar-xps.. ([45.128.133.231])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b5758a0bfsm149513675e9.20.2025.08.26.05.18.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Aug 2025 05:18:26 -0700 (PDT)
-From: Oscar Maes <oscmaes92@gmail.com>
-To: bacs@librecast.net,
-	brett@librecast.net,
-	kuba@kernel.org
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	netdev@vger.kernel.org,
-	regressions@lists.linux.dev,
-	stable@vger.kernel.org,
-	Oscar Maes <oscmaes92@gmail.com>
-Subject: [PATCH net v2 2/2] selftests: net: add test for destination in broadcast packets
-Date: Tue, 26 Aug 2025 14:17:50 +0200
-Message-Id: <20250826121750.8451-2-oscmaes92@gmail.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250826121126-oscmaes92@gmail.com>
-References: <20250826121126-oscmaes92@gmail.com>
+	s=arc-20240116; t=1756211026; c=relaxed/simple;
+	bh=wA9foqPg8s+WdSP4+Ky0hw0coquCM+EUeWCGH1X6EvU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bRUPrSMldijoGEHk1RYxhAE5fn1+wowjkMUTcUVDnyzn/l/pehb6JFQX2p7AObmQxX/tMdgUWWVArlWInEPCRRWCbAEjoUtoeONB69DY+q182xL9x4R27nktD6iu0g/80xgOQG18iQQpmanZlxsAQOeA0uGZSOQOEUqUhZCAcB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=jm4vazqy; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=vB02QNImWSbbaqIoWc1ZnNit3MRPcPQo5QYCLV2curY=; b=jm4vazqyvovqKfpsZ0MCUJJ5w8
+	qb57Br4jVdwI3gOeJJOwgg3BMaLKfM5UYRfvvc4/Fl4qNTQVYZtC53HDfo0n7bhjGfCkl8J3fIa/j
+	CjvHSGH1ln+7VW59U/fDX4B8JZXrU+SpjQV1tsKudI/UJPaHK5ozWbD2lmA1RHtlhCo0gM4u+DbER
+	uVmacE8KkkElZhtTpQdTnnFGpDpU6e8La1jZXmv1FPnIGnMVFTWkjPhj7aTauxJ+s8kbmoBxYTLBP
+	GOxouwu0Mn0wYzbrrmooV+Fa7fP0zoJB9ysFOmH0If9X4GHh/LWJd6QhFbiDvvWSyTTyvuo0PAucU
+	C4VgsBWA==;
+Received: from sslproxy03.your-server.de ([88.198.220.132])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1uqsi7-0007gp-2a;
+	Tue, 26 Aug 2025 14:23:35 +0200
+Received: from localhost ([127.0.0.1])
+	by sslproxy03.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1uqsi6-000MZP-2S;
+	Tue, 26 Aug 2025 14:23:35 +0200
+Message-ID: <089fa206-1511-4fd9-bc12-f73ab8a08bb6@iogearbox.net>
+Date: Tue, 26 Aug 2025 14:23:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 bpf] xsk: fix immature cq descriptor production
+To: Dan Carpenter <dan.carpenter@linaro.org>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, andrii@kernel.org,
+ netdev@vger.kernel.org, magnus.karlsson@intel.com, stfomichev@gmail.com,
+ aleksander.lobakin@intel.com, Eryk Kubanski <e.kubanski@partner.samsung.com>
+References: <20250820154416.2248012-1-maciej.fijalkowski@intel.com>
+ <aK1sz42QLX42u6Eo@stanley.mountain>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <aK1sz42QLX42u6Eo@stanley.mountain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: Clear (ClamAV 1.0.7/27744/Tue Aug 26 10:26:45 2025)
 
-Add test to check the broadcast ethernet destination field is set
-correctly.
+On 8/26/25 10:14 AM, Dan Carpenter wrote:
+> On Wed, Aug 20, 2025 at 05:44:16PM +0200, Maciej Fijalkowski wrote:
+>>   			return ERR_PTR(err);
+>>   
+>>   		skb_reserve(skb, hr);
+>> +
+>> +		addrs = kmem_cache_zalloc(xsk_tx_generic_cache, GFP_KERNEL);
+>> +		if (!addrs) {
+>> +			kfree(skb);
+> 
+> This needs to be kfree_skb(skb);
 
-This test sends a broadcast ping, captures it using tcpdump and
-ensures that all bits of the 6 octet ethernet destination address
-are correctly set by examining the output capture file.
+Oh well, good catch! Maciej, given this commit did not land yet in Linus' tree,
+I can toss the commit from bpf tree assuming you send a v7?
 
-Signed-off-by: Oscar Maes <oscmaes92@gmail.com>
----
+Also, looking at xsk_build_skb(), do we similarly need to free that allocated
+skb when we hit the ERR_PTR(-EOVERFLOW) ? Mentioned function has the following
+in the free_err path:
 
-Thanks to Brett Sheffield for the initial selftest!
----
- tools/testing/selftests/net/Makefile          |  1 +
- .../selftests/net/broadcast_ether_dst.sh      | 82 +++++++++++++++++++
- 2 files changed, 83 insertions(+)
- create mode 100755 tools/testing/selftests/net/broadcast_ether_dst.sh
+         if (first_frag && skb)
+                 kfree_skb(skb);
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index eef0b8f8a7b0..9bbe1d010f5a 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -116,6 +116,7 @@ TEST_GEN_FILES += skf_net_off
- TEST_GEN_FILES += tfo
- TEST_PROGS += tfo_passive.sh
- TEST_PROGS += broadcast_pmtu.sh
-+TEST_PROGS += broadcast_ether_dst.sh
- TEST_PROGS += ipv6_force_forwarding.sh
- TEST_PROGS += route_hint.sh
- 
-diff --git a/tools/testing/selftests/net/broadcast_ether_dst.sh b/tools/testing/selftests/net/broadcast_ether_dst.sh
-new file mode 100755
-index 000000000000..865b5c7c8c8a
---- /dev/null
-+++ b/tools/testing/selftests/net/broadcast_ether_dst.sh
-@@ -0,0 +1,82 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Author: Brett A C Sheffield <bacs@librecast.net>
-+# Author: Oscar Maes <oscmaes92@gmail.com>
-+#
-+# Ensure destination ethernet field is correctly set for
-+# broadcast packets
-+
-+source lib.sh
-+
-+CLIENT_IP4="192.168.0.1"
-+GW_IP4="192.168.0.2"
-+
-+setup() {
-+	setup_ns CLIENT_NS SERVER_NS
-+
-+	ip -net "${SERVER_NS}" link add link1 type veth \
-+		peer name link0 netns "${CLIENT_NS}"
-+
-+	ip -net "${CLIENT_NS}" link set link0 up
-+	ip -net "${CLIENT_NS}" addr add "${CLIENT_IP4}"/24 dev link0
-+
-+	ip -net "${SERVER_NS}" link set link1 up
-+
-+	ip -net "${CLIENT_NS}" route add default via "${GW_IP4}"
-+	ip netns exec "${CLIENT_NS}" arp -s "${GW_IP4}" 00:11:22:33:44:55
-+}
-+
-+cleanup() {
-+	rm -f "${CAPFILE}"
-+	ip -net "${SERVER_NS}" link del link1
-+	cleanup_ns "${CLIENT_NS}" "${SERVER_NS}"
-+}
-+
-+test_broadcast_ether_dst() {
-+	local rc=0
-+	CAPFILE=$(mktemp -u cap.XXXXXXXXXX)
-+
-+	echo "Testing ethernet broadcast destination"
-+
-+	# start tcpdump listening for icmp
-+	# tcpdump will exit after receiving a single packet
-+	# timeout will kill tcpdump if it is still running after 2s
-+	timeout 2s ip netns exec "${CLIENT_NS}" \
-+		tcpdump -i link0 -c 1 -w "${CAPFILE}" icmp &> /dev/null &
-+	pid=$!
-+	sleep 0.1 # let tcpdump wake up
-+
-+	# send broadcast ping
-+	ip netns exec "${CLIENT_NS}" \
-+		ping -W0.01 -c1 -b 255.255.255.255 &> /dev/null
-+
-+	# wait for tcpdump for exit after receiving packet
-+	wait "${pid}"
-+
-+	# compare ethernet destination field to ff:ff:ff:ff:ff:ff
-+	ether_dst=$(tcpdump -r "${CAPFILE}" -tnne 2>/dev/null | \
-+			awk '{sub(/,/,"",$3); print $3}')
-+	if [[ "${ether_dst}" == "ff:ff:ff:ff:ff:ff" ]]; then
-+		echo "[ OK ]"
-+		rc="${ksft_pass}"
-+	else
-+		echo "[FAIL] expected dst ether addr to be ff:ff:ff:ff:ff:ff," \
-+			"got ${ether_dst}"
-+		rc="${ksft_fail}"
-+	fi
-+
-+	return "${rc}"
-+}
-+
-+if [ ! -x "$(command -v tcpdump)" ]; then
-+	echo "SKIP: Could not run test without tcpdump tool"
-+	exit "${ksft_skip}"
-+fi
-+
-+trap cleanup EXIT
-+
-+setup
-+test_broadcast_ether_dst
-+
-+exit $?
--- 
-2.39.5
+Pls double check.
+
+> regards,
+> dan carpenter
+> 
+>> +			return ERR_PTR(-ENOMEM);
+>> +		}
+>> +
+>> +		xsk_set_destructor_arg(skb, addrs);
+>>   	}
+>>   
+>>   	addr = desc->addr;
+> 
 
 
