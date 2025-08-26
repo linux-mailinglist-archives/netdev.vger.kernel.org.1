@@ -1,133 +1,161 @@
-Return-Path: <netdev+bounces-217076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D980FB3748F
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 23:51:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ABC38B37493
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 23:58:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08E751B2712C
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 21:51:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE1591B20B17
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 21:58:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E674D284678;
-	Tue, 26 Aug 2025 21:51:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C6DA288522;
+	Tue, 26 Aug 2025 21:58:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="HMkYVmT+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R/QGV1+y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FAF430CD91
-	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 21:51:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94FBC72605;
+	Tue, 26 Aug 2025 21:58:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756245094; cv=none; b=sUwiYPnG6jKG4JkI/ZGjM/gUC3m1ap4jV3keUqWJSuwEQUt4n5H+kTM7uH0tMVt+XqHfps1wzxTAoRLnWdcTZhiSdDwZIQRydAeMNHDK9pzJ8YxiDn7PxYgQ0eSqXFoxbckyL7Vcr65apzmw5+b0vM5IwRVOUt6xCH6I4Fhwg+0=
+	t=1756245504; cv=none; b=Mte/mELFE/0YV5muKWNIgMbFVuI1CeBpNR50/Hk2u2IkHWUnk4THzXLRFqtqPH7+x+ryj81Cz9jSw3mXc5AfD9AXSY7tEntJF2qvEf3fEqKWCOVITp0qt73XKF2QXuxA+Qs20HBO4yG8GM0xATVnc4jkVwii/+/vh8RsNIqQtqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756245094; c=relaxed/simple;
-	bh=+WZfAppP5EdPTH/m75UWXwXzqlXjDLyIMNMUcPcZhDU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tOFUfCTp/Whv1QM9sP7sb9E/r4XEWHhatFZMQX2YAm6q8rTopLCYMo35/UA8GN5k3e/biChFU3QuNSlob1J8Z0G0KAkvK3n+MK9BIo5xnuEo3DyHCLZ8VljbihZk2gAGXgtXQAq1Ld+MFA4RKp4yCdmEva0ElXLKGE/NoB7TTvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=HMkYVmT+; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57QKrXAK004580;
-	Tue, 26 Aug 2025 21:51:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=k53dMA/VpV1qwXI/AmvEm4osx56FzjOfeEX
-	sxcZvoKg=; b=HMkYVmT+XgsK9UGhUEcIhuv4BeV/YwUmX/NgSxxplsVqQ8JfjAK
-	6YHH/RJ0GqQGlX5rdGGMKaKJSENji00K60K1iOYgbn8FU+3Eg19MKCdr/G6Hp+xk
-	aNcabKagF+Kl4M0w438nmnn04uwCZFnn7xvkrUbDz2Y+GcyyUeIXizP6AeHPJhq1
-	x5dHl4Q9nawVG5D7HO0b4bphjGXrnvW96j8sU+KTJc/Aw1vOMRFE9codMdvstmFi
-	b4dmzRsCG6T9wxLMDVDl8X4dW4XlxI3GxLSz7uUfdxk+92QawXB3hvBaaroB10n6
-	KubIB3NLqvtYgo4+NC2UZrQCbsS4DYYfeGQ==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48q5umakgq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 26 Aug 2025 21:51:26 +0000 (GMT)
-Received: from pps.filterd (NALASPPMTA03.qualcomm.com [127.0.0.1])
-	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 57QLpPnQ000930;
-	Tue, 26 Aug 2025 21:51:25 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by NALASPPMTA03.qualcomm.com (PPS) with ESMTPS id 48sktprk00-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 26 Aug 2025 21:51:25 +0000
-Received: from NALASPPMTA03.qualcomm.com (NALASPPMTA03.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 57QLpPwp000924;
-	Tue, 26 Aug 2025 21:51:25 GMT
-Received: from hu-devc-lv-u22-c.qualcomm.com (hu-subashab-lv.qualcomm.com [10.81.24.15])
-	by NALASPPMTA03.qualcomm.com (PPS) with ESMTPS id 57QLpP3O000923
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 26 Aug 2025 21:51:25 +0000
-Received: by hu-devc-lv-u22-c.qualcomm.com (Postfix, from userid 212624)
-	id E7EE85B4; Tue, 26 Aug 2025 14:51:24 -0700 (PDT)
-From: Subash Abhinov Kasiviswanathan <subash.a.kasiviswanathan@oss.qualcomm.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org
-Cc: Subash Abhinov Kasiviswanathan <subash.a.kasiviswanathan@oss.qualcomm.com>,
-        Sean Tranchetti <sean.tranchetti@oss.qualcomm.com>
-Subject: [PATCH net] MAINTAINERS: rmnet: Update email addresses
-Date: Tue, 26 Aug 2025 14:50:46 -0700
-Message-Id: <20250826215046.865530-1-subash.a.kasiviswanathan@oss.qualcomm.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1756245504; c=relaxed/simple;
+	bh=7og0ebwTITtMBLgXjZzovotMGTTEhC8mG8IL7WcTZgk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EFevGSkU4sKJ63Jzrk+95ow12xmM4hTziaDQHnEo2DklZGRU2xUgkppDrv1eRHaWQrW4N6+eQfxNHFXEFvM3RwOAPcu4mTEU7wSIyEx2vlHUCEEtqIHwgjgQt9UaMqn5JJKIYP0h44yv5PBaIw651GFEebBVzXGxgotp7ftp0es=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R/QGV1+y; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-76e6cbb991aso5390240b3a.1;
+        Tue, 26 Aug 2025 14:58:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756245503; x=1756850303; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=k5nnO3x/znO+lzylBCVNGWC7wrma/MeDdlI5AhhD234=;
+        b=R/QGV1+yHUDubA/dlwBMZk1I7F4MYB/R0mIJxcjNzpqCU3+U91K1y1UGJWuIuR3pMf
+         rBBVX5KaQNbXBmy7LyO0MfzZ/BqVJy3kWaP+5oJ+SNmK584On9VPLgVrJXXdaE/cuUQr
+         iwqBcguTTB8yqW+4rSQpob+m2jK5neTTgEIDt7FiKxOueRKTvxUMoq9421Dv19/XMXKo
+         QbXLbMkkoAGVvswHAAGE1IAcl1MK7EfKzFLmz6NXtsVrIEs35yglpn73qBBDa5OIkMDv
+         gwcpTbI28cGjNHLxvCqmOSA1Js9mU9vXW7byHBMbFA3SvoBZ2/9dh2HfI7RnsPAtj2fy
+         xVMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756245503; x=1756850303;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=k5nnO3x/znO+lzylBCVNGWC7wrma/MeDdlI5AhhD234=;
+        b=iKA2iAnxaTIFfzwbcc/xhOGMqZFJFLr3At2ikWNdqQSToM3TqqQXdTOlAu6l82TzH4
+         GTKEuw9lUDLXVo1b1UVXa7VG41K83jg/keK/aat80qWjOMGQQ+Q204vf49hvPQLUScpW
+         WNg6BkmxIH2vNWdqBF0DTKUmOQhaPGTlPWpggMx8wSJ8dQicO/k/TofWJsikvFn5Ql5C
+         /Fz+fFhFeGCDAcC+ajzSlrVgprTG4juA2LLznmz65S8/ZzIEPFPrlMkvvdGXZOVh0E8Y
+         7A4bPNmsaUrJL4qRvcHQ1slwX6EIaL6vrIF3GALkVoUTcgMXFCTjpmJShHIzNUw5OXgr
+         VDCw==
+X-Forwarded-Encrypted: i=1; AJvYcCVicmy//OR4Xj4wUXuP6O+4SxdRy4JOmJOTBMcs9xw8wI0jlaSNDqM6CH7POG3/WmRfADnwd50F@vger.kernel.org, AJvYcCXx1AVRghvxKlOmzhtFdczH5AZGDrbmJBjIm4T/ZXoi4XJQ+5UgCiLdUilHpPQE8tXtB2U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5VeV0qxI1kr8Qz5yzZCsPsR5yCUphGkaua9u+0PeyHeTeM7jM
+	/69Jd4ZM0k/Ckb7BygvBTV3/dNTAx7F799Xhj3UIu83ElFN8mDHyJsE=
+X-Gm-Gg: ASbGncvuD+SDbEYxgadRbrcgwxCF7+x4QsQIptpDfgjd1XJS+WIebwPKuFlUAsovlTD
+	6aQhGdgdRthxEnc1mNNkItOH1aRM78xBANcoP46JK94nWFz2MGD3XLPkUTbNfy/DLY71YTzcNTB
+	rEGsdoSRhz185gryxk0Qp47rSGeTUvJ2sD+jufl3ordHjoEURzj5Z3cN2VQ8s0F+giGtvoR1GVB
+	DWw3goFiFFwtlR/WG24XXXwZ5Duj6YXQWiDHTO5t4tlngXZT1IAX4x9ghgsyBxSwG2NwcC6mYQA
+	bp/i6Yy/TMinTXlovqA9wChRoiuQKZxBVblkmD9cC6PQwitc28dbGB1agGpe0CkOv7qQ98Wa/cX
+	P3an6muzj0dHarbswG7+7oJTBaPJLQHKgrxaPxSbZgvasnurntndVXg7QZS/cWiB0MmmAb2Z2Ks
+	cpUa6ocGOp4V5aWAV4hVqp/GTPq1R9kRgFvuMijVL/TVPSxXQ2YfMfJH4mlGMtOqCDJvymX+tbu
+	xBk
+X-Google-Smtp-Source: AGHT+IGqHWsIihV89DVEObbsVPW7ishIdg+HsllpSsJhPdnfxoRVuM8uybMcvOlIZzkQPV0PL1Gujg==
+X-Received: by 2002:a05:6a21:99aa:b0:21a:ecf5:ea71 with SMTP id adf61e73a8af0-24340b5b4cemr25802196637.15.1756245502773;
+        Tue, 26 Aug 2025 14:58:22 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-3275c05e1a6sm724812a91.1.2025.08.26.14.58.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Aug 2025 14:58:22 -0700 (PDT)
+Date: Tue, 26 Aug 2025 14:58:21 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Michal Hocko <mhocko@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Mina Almasry <almasrymina@google.com>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v3 bpf-next/net 2/5] bpf: Support bpf_setsockopt() for
+ BPF_CGROUP_INET_SOCK_CREATE.
+Message-ID: <aK4t_RfpophZTFWI@mini-arch>
+References: <20250826183940.3310118-1-kuniyu@google.com>
+ <20250826183940.3310118-3-kuniyu@google.com>
+ <aK4g640zGakSxlD9@mini-arch>
+ <CAAVpQUARxRTbmFiNE5GuO03qQAikddhT=BLcTWJVHvwK_Yq=Pg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Authority-Analysis: v=2.4 cv=VtIjA/2n c=1 sm=1 tr=0 ts=68ae2c5e cx=c_pps
- a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
- a=2OwXVqhp2XgA:10 a=EUspDBNiAAAA:8 a=COk6AnOGAAAA:8 a=VwQbUJbxAAAA:8
- a=4VVcHpUFlTeZ-k0x__MA:9 a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODIzMDAzMiBTYWx0ZWRfX+tLgtNVryyY2
- aeNvF9bcrM2HsAfpJjLvFHVjnlYk40P4s3/vkuQjs09Z74/XT2wAuNxuaIw9hldHruoOOyk3Udc
- 01YZEs55jO1nuOkKJGUYjqjQz5LD3aJbIhpJjBMiqXmKhqJg3iyVZzfjstY8OLDngZ0q2Fb68Xc
- m7zXG3DyvfAQURRDHwGQnV3o6BbrPfFA6UgX03Y54NsPl+Z4tAuGm/GoQTXva1d7S2slhwZ6V2E
- J+W9v6fy4sOslO5HchhjK/Kvz1Cc/tP4UXRwf913DFu4uRSBkALpXvKUxsXWccZhjpE5evAuEtP
- CJ/Tw1KRyk0Ait08M5Gelp7Y2Nxk8HZ/9e1MwRJxVNAD/D+R4eorxbqNZhWcod7tWs0T1Bt9/K1
- PIziugtJ
-X-Proofpoint-GUID: lWFjk5UnvwTD0otJw1zN2iOROPvnL1eY
-X-Proofpoint-ORIG-GUID: lWFjk5UnvwTD0otJw1zN2iOROPvnL1eY
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-26_02,2025-08-26_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1011 phishscore=0 priorityscore=1501 impostorscore=0 bulkscore=0
- suspectscore=0 malwarescore=0 adultscore=0 spamscore=0 classifier=typeunknown
- authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2508230032
+In-Reply-To: <CAAVpQUARxRTbmFiNE5GuO03qQAikddhT=BLcTWJVHvwK_Yq=Pg@mail.gmail.com>
 
-Switch to oss.qualcomm.com ids.
+On 08/26, Kuniyuki Iwashima wrote:
+> On Tue, Aug 26, 2025 at 2:02 PM Stanislav Fomichev <stfomichev@gmail.com> wrote:
+> >
+> > On 08/26, Kuniyuki Iwashima wrote:
+> > > We will store a flag in sk->sk_memcg by bpf_setsockopt() during
+> > > socket() or before sk->sk_memcg is set in accept().
+> > >
+> > > BPF_CGROUP_INET_SOCK_CREATE is invoked by __cgroup_bpf_run_filter_sk()
+> > > that passes a pointer to struct sock to the bpf prog as void *ctx.
+> > >
+> > > But there are no bpf_func_proto for bpf_setsockopt() that receives
+> > > the ctx as a pointer to struct sock.
+> > >
+> > > Let's add a new bpf_setsockopt() variant for BPF_CGROUP_INET_SOCK_CREATE.
+> >
+> > [..]
+> >
+> > > Note that inet_create() is not under lock_sock().
+> >
+> > Does anything prevent us from grabbing the lock before running
+> > SOCK_CREATE progs? This is not the fast path, so should be ok?
+> > Will make it easier to reason about socket options (where all paths
+> > are locked). We do similar things for sock_addr progs in
+> > BPF_CGROUP_RUN_SA_PROG_LOCK.
+> 
+> We can do that, but the reasoning here is exactly same with
+> how we allow unlocked setsockopt() for LSM hooks.  Also, SA_
+> prog actually needs lock_sock() to prevent sk->{addr fields} from
+> being changed concurrently.
+> 
+> ---8<---
+> /* List of LSM hooks that trigger while the socket is _not_ locked,
+>  * but it's ok to call bpf_{g,s}etsockopt because the socket is still
+>  * in the early init phase.
+>  */
+> BTF_SET_START(bpf_lsm_unlocked_sockopt_hooks)
+> #ifdef CONFIG_SECURITY_NETWORK
+> BTF_ID(func, bpf_lsm_socket_post_create)
+> BTF_ID(func, bpf_lsm_socket_socketpair)
+> #endif
+> BTF_SET_END(bpf_lsm_unlocked_sockopt_hooks)
+> ---8<---
 
-Signed-off-by: Sean Tranchetti <sean.tranchetti@oss.qualcomm.com>
-Signed-off-by: Subash Abhinov Kasiviswanathan <subash.a.kasiviswanathan@oss.qualcomm.com>
----
- MAINTAINERS | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index fed6cd812d79..20f80340d249 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -20878,8 +20878,8 @@ S:	Maintained
- F:	drivers/firmware/qcom/qcom_qseecom_uefisecapp.c
- 
- QUALCOMM RMNET DRIVER
--M:	Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>
--M:	Sean Tranchetti <quic_stranche@quicinc.com>
-+M:	Subash Abhinov Kasiviswanathan <subash.a.kasiviswanathan@oss.qualcomm.com>
-+M:	Sean Tranchetti <sean.tranchetti@oss.qualcomm.com>
- L:	netdev@vger.kernel.org
- S:	Maintained
- F:	Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
--- 
-2.34.1
-
+Good point, I forgot about these :-(
 
