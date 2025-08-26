@@ -1,112 +1,93 @@
-Return-Path: <netdev+bounces-216714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 776F3B34FCF
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 01:53:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87D43B34FD5
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 02:00:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CAA1486AD2
-	for <lists+netdev@lfdr.de>; Mon, 25 Aug 2025 23:53:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92E8C1A8011D
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 00:00:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD7D42C15B1;
-	Mon, 25 Aug 2025 23:53:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61C4F29E116;
+	Mon, 25 Aug 2025 23:59:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LDLJvmbU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EF+gcWJ1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B0EA51C5A;
-	Mon, 25 Aug 2025 23:53:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35D3124DD11;
+	Mon, 25 Aug 2025 23:59:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756165992; cv=none; b=ilGeLxgzYqOoxFckkrz2lBTHYbAJE6eDQnBZlmEKBqKQ1NxLDQHUKpCAu36DCcLI5KABUOkf5MrO+rtKugZlOgXJFczgttJJ6GMZ/e4qaHaU3Y5goWK60yVZe9Woofu0KD3slz8lgW+ZfCvpzP2/BnhkRfYO3gY7aMlrNZW61S8=
+	t=1756166398; cv=none; b=Iqk0PWHyVVDssP/nKXiEwV50gspa1MbLELR66Pfzio3w6TxgpFC4B0CpgZJtRYkPUpDaZAPgwqTw0MDYhpdNh1OH9Q0TYs1vk2ntyC1Y3zf8k/vCSrBX7lX7G7epY1QT+LlRMpbsCo7rs+bdgOTq5a1NmK/SV3I2IZjpXIz0nSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756165992; c=relaxed/simple;
-	bh=OSFizG0G8sYZyxXrUnI/kUtdTxY7DmYTz4FmYAkcABA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fXtw/3DgXrV7ocT9+4GWLJJXSnQ0iW+iDQ+5js1E+PN2xzi9oP/cmKN46ZOGRwaQAZ2MSIJvKNQOeHO9RFuel/fgGh66xAqdBUYF9Wnt8HIiJBAHG2zjuuhb9S0UdUCHCXKA0LP/XF3mVs2CmjtAFmL7TgDq9O/zH6dC8tiDbe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LDLJvmbU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E533C4CEED;
-	Mon, 25 Aug 2025 23:53:11 +0000 (UTC)
+	s=arc-20240116; t=1756166398; c=relaxed/simple;
+	bh=Kx+uNVzxjyH1EYgEofeMMEKSp9G6uluyOGjSNvMaTS8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bJ0jOyHsOfT8hDvMI2OzritER6pJCz0sCWsCBiCOVKlZUPh4w/M87Z8r1FIuCMmOnm4f4Uw6bwT+cBKvo0TQ7PafngTyK4+LOiZEoq9ZxAkOy5cP+aNo1ov/WeqJlorTfERPRauBd1kTNowgQ4vwbBXxZbrjP+MhW8tVFnTGPVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EF+gcWJ1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09F82C4CEED;
+	Mon, 25 Aug 2025 23:59:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756165992;
-	bh=OSFizG0G8sYZyxXrUnI/kUtdTxY7DmYTz4FmYAkcABA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LDLJvmbUwIA7DVd7La2/nDraaRDNjuq6eOXjb7WjGUBke0MHAE6gSENBkjOuv3xSk
-	 G/lvWZrBAIAgAbwXr9DyoSrKDbTpdvbG6ywD10b7dsCR872nd02rpjWFSeB/U8ZGRT
-	 nDMzcugkTDMc6Dec/Fk7j6M3PpyHKI2EYylPvrHnee+xu9wkNH+/HdM0ICeJtdRdv3
-	 51pw9kyAAzkF+h0dw4+kxlCPScc3CdolgjN15HZawluYOQ70LuqyWjdur0xJfMJNiH
-	 B9RnkiIoGzzF7fcAlLSexGp4+odDp6RuxLNcePNnw/nfwXINVdFrmiiXjiFeym1O6D
-	 98dSxXnqdb42g==
-Date: Mon, 25 Aug 2025 16:53:10 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stanimir Varbanov <svarbanov@suse.de>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-rpi-kernel@lists.infradead.org, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Florian Fainelli <florian.fainelli@broadcom.com>,
- Andrea della Porta <andrea.porta@suse.com>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Phil Elwell <phil@raspberrypi.com>, Jonathan Bell
- <jonathan@raspberrypi.com>, Dave Stevenson
- <dave.stevenson@raspberrypi.com>, stable@vger.kernel.org, Andrew Lunn
- <andrew@lunn.ch>, =?UTF-8?B?VGjDqW8=?= Lebrun <theo.lebrun@bootlin.com>
-Subject: Re: [PATCH v2 1/5] net: cadence: macb: Set upper 32bits of DMA ring
- buffer
-Message-ID: <20250825165310.64027275@kernel.org>
-In-Reply-To: <20250822093440.53941-2-svarbanov@suse.de>
-References: <20250822093440.53941-1-svarbanov@suse.de>
-	<20250822093440.53941-2-svarbanov@suse.de>
+	s=k20201202; t=1756166398;
+	bh=Kx+uNVzxjyH1EYgEofeMMEKSp9G6uluyOGjSNvMaTS8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=EF+gcWJ1rDIWjlt9l5+pFp1CJdtRyLSVhbdU9C38/gIIls9Lmv7vsEgShWXPmJuk2
+	 UkeRrRyP2/vaHdtB0B+s4DC8+mAregliJJCn5mb//faLOcO4Vw/PqwnT6idbDs6pZu
+	 QVUymI6FUjSXAh6x/0ey3UD6Ox/lRq6C+PgSwUCnnApUFe8P9pPPSsx3aK5eqF7kuL
+	 4r1L0lBqrrd+GOSIy9FOTVzeu7vR0DDjv7BSbT/KKol5INV3Sg0LwC2DwTMUkEdGvy
+	 T5OZk1Noq+X+EBsZ+F4qgWYEGW0fOVEybHRaTQkIScJ439TEQep3SwqT8dXLJJFedO
+	 qy6vrUoGy5GIg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B13383BF70;
+	Tue, 26 Aug 2025 00:00:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3] ppp: remove rwlock usage
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175616640601.3599990.16967946967905767902.git-patchwork-notify@kernel.org>
+Date: Tue, 26 Aug 2025 00:00:06 +0000
+References: <20250822012548.6232-1-dqfext@gmail.com>
+In-Reply-To: <20250822012548.6232-1-dqfext@gmail.com>
+To: Qingfang Deng <dqfext@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-ppp@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Fri, 22 Aug 2025 12:34:36 +0300 Stanimir Varbanov wrote:
-> In case of rx queue reset and 64bit capable hardware, set the upper
-> 32bits of DMA ring buffer address.
->=20
-> Cc: stable@vger.kernel.org # v4.6+
-> Fixes: 9ba723b081a2 ("net: macb: remove BUG_ON() and reset the queue to h=
-andle RX errors")
-> Credits-to: Phil Elwell <phil@raspberrypi.com>
-> Credits-to: Jonathan Bell <jonathan@raspberrypi.com>
-> Signed-off-by: Stanimir Varbanov <svarbanov@suse.de>
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Hello:
 
-> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ether=
-net/cadence/macb_main.c
-> index ce95fad8cedd..36717e7e5811 100644
-> --- a/drivers/net/ethernet/cadence/macb_main.c
-> +++ b/drivers/net/ethernet/cadence/macb_main.c
-> @@ -1634,7 +1634,11 @@ static int macb_rx(struct macb_queue *queue, struc=
-t napi_struct *napi,
->  		macb_writel(bp, NCR, ctrl & ~MACB_BIT(RE));
-> =20
->  		macb_init_rx_ring(queue);
-> -		queue_writel(queue, RBQP, queue->rx_ring_dma);
-> +		queue_writel(queue, RBQP, lower_32_bits(queue->rx_ring_dma));
-> +#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
-> +		if (bp->hw_dma_cap & HW_DMA_CAP_64B)
-> +			macb_writel(bp, RBQPH, upper_32_bits(queue->rx_ring_dma));
-> +#endif
-> =20
->  		macb_writel(bp, NCR, ctrl | MACB_BIT(RE));
-> =20
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Looks like a subset of Th=C3=A9o Lebrun's work:
-https://lore.kernel.org/all/20250820-macb-fixes-v4-0-23c399429164@bootlin.c=
-om/
-let's wait for his patches to get merged instead?
+On Fri, 22 Aug 2025 09:25:47 +0800 you wrote:
+> In struct channel, the upl lock is implemented using rwlock_t,
+> protecting access to pch->ppp and pch->bridge.
+> 
+> As previously discussed on the list, using rwlock in the network fast
+> path is not recommended.
+> This patch replaces the rwlock with a spinlock for writers, and uses RCU
+> for readers.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v3] ppp: remove rwlock usage
+    https://git.kernel.org/netdev/net-next/c/b8844aab519a
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
