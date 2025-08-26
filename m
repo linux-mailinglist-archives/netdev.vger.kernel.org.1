@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-216891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 412F2B35C72
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 13:34:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36E09B35CA5
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 13:36:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1EF2188181C
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 11:30:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB698362E5F
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 11:30:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A74C34165F;
-	Tue, 26 Aug 2025 11:28:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 392E13431FE;
+	Tue, 26 Aug 2025 11:28:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iaPlXh+R"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GrXCDwJ0"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 864F0321F5C;
-	Tue, 26 Aug 2025 11:28:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9AB7326D62;
+	Tue, 26 Aug 2025 11:28:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756207694; cv=none; b=ZNM8s769wp5th91Iewsjw4ly1/nHI4a7DAH887/Pmiit05UatdP0aqkMUZWABCj2bfs5UOa6NZq3Di3YOzQjSA1/6njOTrlLHzK5TNe4cRXPTlrWC26GWV9pVMCEVyv7sda2m2KChvofk3/IqnMUvaQDQNI/4uW9roKiY4HXkaA=
+	t=1756207697; cv=none; b=HoRsGEVHqmBgGFEY5A+Q7Z/Lbb77fhWUntT3ccH7VHfwm6LbWAw53LvMQH1291Ki6BFlp3Dc9FJ3ohKUaOnsgTvriXrJKWeNN6qHtC1O4wbGr42Fl7mApzK/Hl8PDg05lc02XUdEj6De6j2F3PmDmYgTZ9ryqW//noRpTsswAsM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756207694; c=relaxed/simple;
-	bh=eXfl58E1fRta3YHdqeADtIDJlpOXBQxOXSwkGGvk58M=;
+	s=arc-20240116; t=1756207697; c=relaxed/simple;
+	bh=vQJJHBnM+iEXU5V6yK0xFFHTCOFo+SL5ltPFgOxU6M8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ea1w7uNwvgLhvmpboKG3y5+6gEBQQpYSBQDv2NOuWCnlJ+F8wIHHz8ikdPBBswtk1rq0tVhgboZJvgyZ60cxeblWTPiVmP2SdmEaOYB8sstRsSKa1nMMCeP2taUgNtUSZ1eg18QXjZtsPQBzjGoMdRQY7PoJzr9GenprnQp7wFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iaPlXh+R; arc=none smtp.client-ip=198.175.65.14
+	 MIME-Version; b=Ce+qu5t1Tv2lrEY4pDMvUpc2KRlkNQrZ7cvsZI7au2m21N6vD1fI43H14d9R4DQuYnt211AfOxZQ1bF1XtzitEHRw14/cxL0b4sy3U8phr5UxYTJD2S6fCYe1prVrYbYmxG4BmOcU8Z6CPWuuWI9GVLcmXGw3y0ocrReIoA6VSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GrXCDwJ0; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756207693; x=1787743693;
+  t=1756207696; x=1787743696;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=eXfl58E1fRta3YHdqeADtIDJlpOXBQxOXSwkGGvk58M=;
-  b=iaPlXh+RzqXvs0VEhwfcu7a4Nb+qjPvMm/r1hsC+nLdB9hT+a2/dRklS
-   fbxoZo3gvsZwT/xde19pjSCQCy0J1CZ4xvOL5r43jdNVfOrPtvfr9cGVe
-   /lQ6eQXPVJBt3Pltrsq3AIU9vTUVMQuDUZ9PDU1arfkuExxjRehmgczHW
-   K95URHul8Knc4u02MwiekXlg+dG/Q8cPt3FJnHsDtvHnQuk+XLwUH1oaj
-   zSsmarWubYixAFQE5S9wcneNYiYveellYUld9DMiXtbt3MqnMOzeDHLRd
-   WZyMDMlU0t6Oi/GzomTlfWHDlDRRdwS4I1xpvqMh2nixe6OWdUeKHWB5g
-   g==;
-X-CSE-ConnectionGUID: bMBN01myRa+gLKiXTHnq+g==
-X-CSE-MsgGUID: 5Zcbff3vQEOJoyGQP0wguA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="62269259"
+  bh=vQJJHBnM+iEXU5V6yK0xFFHTCOFo+SL5ltPFgOxU6M8=;
+  b=GrXCDwJ049Rxlsnhwz8+GqbRElXaP5asjgXEduQXnrfVClX3XN6zdIcv
+   5ovddaYUd5wd2hZ7LGrnNG4x4VUUUEDU5Doy6ivOpqqQVYj0rqxY0C+fx
+   lUdhKxnC51WykN1JXz4wK2o77WX8jOMC7N3mf4rRfIfoLjm9w19C9sCmi
+   SWNtcZZIUS4sv8JZjABhsivDYXOMyGRaOv5fnioQoKbtYqh/lQXRcg10i
+   fG5OMqfCJQA7qmFCk4cOHcAG/vJ2uYY5Ha3hzibmtis02jEag40B5dcTh
+   RBBjIi4IsCS7sloUqjF4PrQidqF/eHxOrfUcNcQLuXe7Q8p5005eesZK5
+   A==;
+X-CSE-ConnectionGUID: I31oGmEtR4ypJC06jI0SZw==
+X-CSE-MsgGUID: htKj/Jd7Sm6bHe3WkdJNTw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="62269268"
 X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="62269259"
+   d="scan'208";a="62269268"
 Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2025 04:28:13 -0700
-X-CSE-ConnectionGUID: ivV1y4e/RiSMoUFjfUHx9Q==
-X-CSE-MsgGUID: um33PhChRrOAGcsIaiZ4oA==
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2025 04:28:16 -0700
+X-CSE-ConnectionGUID: m25XV0MxTFu/T2ff/fMB8g==
+X-CSE-MsgGUID: sEdKLqKgSaiPwQzh1Fsgdw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
-   d="scan'208";a="173725764"
+   d="scan'208";a="173725795"
 Received: from gklab-kleszczy-dev.igk.intel.com ([10.102.25.215])
-  by orviesa003.jf.intel.com with ESMTP; 26 Aug 2025 04:28:10 -0700
+  by orviesa003.jf.intel.com with ESMTP; 26 Aug 2025 04:28:13 -0700
 From: Konrad Leszczynski <konrad.leszczynski@intel.com>
 To: davem@davemloft.net,
 	andrew+netdev@lunn.ch,
@@ -68,10 +68,11 @@ Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	cezary.rojewski@intel.com,
 	sebastian.basierski@intel.com,
+	Piotr Warpechowski <piotr.warpechowski@intel.com>,
 	Konrad Leszczynski <konrad.leszczynski@intel.com>
-Subject: [PATCH net-next 1/7] net: stmmac: replace memcpy with strscpy in ethtool
-Date: Tue, 26 Aug 2025 13:32:41 +0200
-Message-Id: <20250826113247.3481273-2-konrad.leszczynski@intel.com>
+Subject: [PATCH net-next 2/7] net: stmmac: correct Tx descriptors debugfs prints
+Date: Tue, 26 Aug 2025 13:32:42 +0200
+Message-Id: <20250826113247.3481273-3-konrad.leszczynski@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250826113247.3481273-1-konrad.leszczynski@intel.com>
 References: <20250826113247.3481273-1-konrad.leszczynski@intel.com>
@@ -83,44 +84,71 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Fix kernel exception by replacing memcpy with strscpy when used with
-safety feature strings in ethtool logic.
+From: Piotr Warpechowski <piotr.warpechowski@intel.com>
 
-[  +0.000023] BUG: KASAN: global-out-of-bounds in stmmac_get_strings+0x17d/0x520 [stmmac]
-[  +0.000115] Read of size 32 at addr ffffffffc0cfab20 by task ethtool/2571
+It was observed that extended descriptors are not printed out fully and
+enhanced descriptors are completely omitted in stmmac_rings_status_show().
 
-[  +0.000005] Call Trace:
-[  +0.000004]  <TASK>
-[  +0.000003]  dump_stack_lvl+0x6c/0x90
-[  +0.000016]  print_report+0xce/0x610
-[  +0.000011]  ? stmmac_get_strings+0x17d/0x520 [stmmac]
-[  +0.000108]  ? kasan_addr_to_slab+0xd/0xa0
-[  +0.000008]  ? stmmac_get_strings+0x17d/0x520 [stmmac]
-[  +0.000101]  kasan_report+0xd4/0x110
-[  +0.000010]  ? stmmac_get_strings+0x17d/0x520 [stmmac]
-[  +0.000102]  kasan_check_range+0x3a/0x1c0
-[  +0.000010]  __asan_memcpy+0x24/0x70
-[  +0.000008]  stmmac_get_strings+0x17d/0x520 [stmmac]
+Correct printing according to documentation and other existing prints in
+the driver.
 
+Reviewed-by: Konrad Leszczynski <konrad.leszczynski@intel.com>
 Reviewed-by: Sebastian Basierski <sebastian.basierski@intel.com>
-Signed-off-by: Konrad Leszczynski <konrad.leszczynski@intel.com>
+Signed-off-by: Piotr Warpechowski <piotr.warpechowski@intel.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 31 ++++++++++++++-----
+ 1 file changed, 23 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-index f702f7b7bf9f..219a2df578ae 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-@@ -795,7 +795,7 @@ static void stmmac_get_strings(struct net_device *dev, u32 stringset, u8 *data)
- 				if (!stmmac_safety_feat_dump(priv,
- 							&priv->sstats, i,
- 							NULL, &desc)) {
--					memcpy(p, desc, ETH_GSTRING_LEN);
-+					strscpy(p, desc, ETH_GSTRING_LEN);
- 					p += ETH_GSTRING_LEN;
- 				}
- 			}
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index b948df1bff9a..bda1a83607c0 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -6349,14 +6349,25 @@ static void sysfs_display_ring(void *head, int size, int extend_desc,
+ 	desc_size = extend_desc ? sizeof(*ep) : sizeof(*p);
+ 	for (i = 0; i < size; i++) {
+ 		dma_addr = dma_phy_addr + i * desc_size;
+-		seq_printf(seq, "%d [%pad]: 0x%x 0x%x 0x%x 0x%x\n",
+-				i, &dma_addr,
+-				le32_to_cpu(p->des0), le32_to_cpu(p->des1),
+-				le32_to_cpu(p->des2), le32_to_cpu(p->des3));
+-		if (extend_desc)
+-			p = &(++ep)->basic;
+-		else
++		if (extend_desc) {
++			seq_printf(seq, "%d [%pad]: 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\n",
++				   i, &dma_addr,
++				   le32_to_cpu(ep->basic.des0),
++				   le32_to_cpu(ep->basic.des1),
++				   le32_to_cpu(ep->basic.des2),
++				   le32_to_cpu(ep->basic.des3),
++				   le32_to_cpu(ep->des4),
++				   le32_to_cpu(ep->des5),
++				   le32_to_cpu(ep->des6),
++				   le32_to_cpu(ep->des7));
++			ep++;
++		} else {
++			seq_printf(seq, "%d [%pad]: 0x%x 0x%x 0x%x 0x%x\n",
++				   i, &dma_addr,
++				   le32_to_cpu(p->des0), le32_to_cpu(p->des1),
++				   le32_to_cpu(p->des2), le32_to_cpu(p->des3));
+ 			p++;
++		}
+ 	}
+ }
+ 
+@@ -6396,7 +6407,11 @@ static int stmmac_rings_status_show(struct seq_file *seq, void *v)
+ 			seq_printf(seq, "Extended descriptor ring:\n");
+ 			sysfs_display_ring((void *)tx_q->dma_etx,
+ 					   priv->dma_conf.dma_tx_size, 1, seq, tx_q->dma_tx_phy);
+-		} else if (!(tx_q->tbs & STMMAC_TBS_AVAIL)) {
++		} else if (tx_q->tbs & STMMAC_TBS_AVAIL) {
++			seq_printf(seq, "Enhanced descriptor ring:\n");
++			sysfs_display_ring((void *)tx_q->dma_entx,
++					   priv->dma_conf.dma_tx_size, 1, seq, tx_q->dma_tx_phy);
++		} else {
+ 			seq_printf(seq, "Descriptor ring:\n");
+ 			sysfs_display_ring((void *)tx_q->dma_tx,
+ 					   priv->dma_conf.dma_tx_size, 0, seq, tx_q->dma_tx_phy);
 -- 
 2.34.1
 
