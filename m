@@ -1,65 +1,41 @@
-Return-Path: <netdev+bounces-216863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7725B358DA
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 11:28:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E3ADB35903
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 11:34:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D95E168182
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 09:28:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E78E93A753E
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 09:34:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 239EA2FDC22;
-	Tue, 26 Aug 2025 09:28:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C17130AAD2;
+	Tue, 26 Aug 2025 09:34:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="l8+OreqH"
+	dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b="d+nvem5r"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from mail-m49246.qiye.163.com (mail-m49246.qiye.163.com [45.254.49.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A0629ACDB;
-	Tue, 26 Aug 2025 09:27:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3EC2FF166;
+	Tue, 26 Aug 2025 09:34:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756200481; cv=none; b=CUpSmBiuw1HJIQtb8yqWsM7prNR9VG5aZkfiedU8k60aZBnR4DOHSz17tqOeiVXiueUosT/w8id+/1AipwjM9eTHK0k5oEpnymrXv8DYX9bP8JdgSt5PKrEUE746kVSiBgai9CBmkZb/vq/mUqnMRa/HJu3SgXlf43D4dTTTYuU=
+	t=1756200870; cv=none; b=OrudDkMSImsIuyrSUm/E7QXOo4+hOkOS/sKjXFKoGEmN9Tn/YDSidxvmVIsY1+rasb4/7vmDqs4YUXNxR29R21Y4i1RM7JpiO5sOH2pVyLPB+wDel0X5PG6tpvL+OvzDw4eLO1LOwhTRpi81ASnVtKjLpcHF1T9PY63b92bWP9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756200481; c=relaxed/simple;
-	bh=I2yhGHVhERBe7uNdR16HUj2j56kAwXIRLmWhj3vFdYM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=kM7z4Cl70N+y3h/09NQU9lcoUE5rur0Jzf4mtj0xk6dl6bo2p6gX02oMHUvZK4SWWTEGqvRQ6/PkWFh/zHpg3phaAc54BfoNseK5+S+O3Dsqpv1xwdwzR4sthk1t+djy4Bm3ZXnocVBCIiwqU7f0tHkBZgG2hPWGmPePOqU2gDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=l8+OreqH; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1756200479; x=1787736479;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=I2yhGHVhERBe7uNdR16HUj2j56kAwXIRLmWhj3vFdYM=;
-  b=l8+OreqHkLxHnnkkW07uKEBRgcgd/01a8hoLpckCZmlsgKU60HdhFhqO
-   p2sjap9UQ+NqrRXjJetrhzeV4XdrHgroNPa0Kp2cWu2wafd4zaHmzTaeO
-   kHK6foRp3oBmkrtdpArASaNYWaIBwmpFiVQfn3XRAuU0URBsbIPsQQpzB
-   xsBncwcTt/Kmd3D42JGsoc/7RqjyVU79mCayxSWaPDY7iM83lQxEme9KJ
-   CUCB7I3NIBYmATd46L7kjwMaLBuDyQJZSQv3aPGupYCINza6kveX7NI54
-   WdCPz5pEV/ckfd8ePK5QohyWMfYvH1ynSqrdPzjzHZvGNtxUMJeWx8h0T
-   w==;
-X-CSE-ConnectionGUID: HPcLko+0T12Lr7BpqvofZA==
-X-CSE-MsgGUID: FHJWgdLpQe2L+nuMAQg2QA==
-X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
-   d="scan'208";a="45654231"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Aug 2025 02:27:58 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Tue, 26 Aug 2025 02:27:26 -0700
-Received: from [10.159.245.205] (10.10.85.11) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
- Transport; Tue, 26 Aug 2025 02:27:23 -0700
-Message-ID: <8a97b5a0-d21e-431b-9b4e-5f73960becdb@microchip.com>
-Date: Tue, 26 Aug 2025 11:27:22 +0200
+	s=arc-20240116; t=1756200870; c=relaxed/simple;
+	bh=mFV+XxuFxFv8isEZatVz54NqgXb1Jr5GkM0Fs8jON+0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UO65jqbvMRurupyRM8lC29u/aLFVF8SayzbBc/Bzp1vS9YBRb7fb1LgvTi4FGQhocGrKvzdZRiawPaOBzMmEPpFV+4gcQ6mhV1EX0h+AF1VeRrQ8qsy2oVhs8cZkF3XJkBMDid4V6Bix/JY+1B1OaKBs2QeAUXg6utp0XUr4WJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rock-chips.com; spf=pass smtp.mailfrom=rock-chips.com; dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b=d+nvem5r; arc=none smtp.client-ip=45.254.49.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rock-chips.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rock-chips.com
+Received: from [172.16.12.153] (unknown [58.22.7.114])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 20a66879b;
+	Tue, 26 Aug 2025 17:29:06 +0800 (GMT+08:00)
+Message-ID: <ae11b993-5844-4da1-b433-c27b5a73060a@rock-chips.com>
+Date: Tue, 26 Aug 2025 17:29:04 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,227 +43,127 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v4 2/5] net: macb: remove illusion about TBQPH/RBQPH
- being per-queue
-To: =?UTF-8?Q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
-	<krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Claudiu Beznea
-	<claudiu.beznea@tuxon.dev>, Geert Uytterhoeven <geert@linux-m68k.org>, Harini
- Katakam <harini.katakam@xilinx.com>, Richard Cochran
-	<richardcochran@gmail.com>, Russell King <linux@armlinux.org.uk>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Thomas Petazzoni
-	<thomas.petazzoni@bootlin.com>, Tawfik Bayouk <tawfik.bayouk@mobileye.com>,
-	Sean Anderson <sean.anderson@linux.dev>
-References: <20250820-macb-fixes-v4-0-23c399429164@bootlin.com>
- <20250820-macb-fixes-v4-2-23c399429164@bootlin.com>
-From: Nicolas Ferre <nicolas.ferre@microchip.com>
-Content-Language: en-US, fr
-Organization: microchip
-In-Reply-To: <20250820-macb-fixes-v4-2-23c399429164@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Subject: Re: [PATCH net-next v3] net: ethernet: stmmac: dwmac-rk: Make the
+ clk_phy could be used for external phy
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
+ Chaoyi Chen <kernel@airkyi.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jonas Karlman <jonas@kwiboo.se>, David Wu <david.wu@rock-chips.com>,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-rockchip@lists.infradead.org
+References: <20250815023515.114-1-kernel@airkyi.com>
+ <CGME20250825072312eucas1p2d4751199c0ea069c7938218be60e5e93@eucas1p2.samsung.com>
+ <a30a8c97-6b96-45ba-bad7-8a40401babc2@samsung.com>
+ <d0fe6d16-181f-4b38-9457-1099fb6419d0@rock-chips.com>
+ <809848c9-2ffa-4743-adda-b8b714b404de@samsung.com>
+ <aKxnHFSrVeM7Be5A@shell.armlinux.org.uk>
+ <8240a3cc-aade-40d8-b2f4-09681f76be68@rock-chips.com>
+ <aK19bSmrbXjoVXdO@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Chaoyi Chen <chaoyi.chen@rock-chips.com>
+In-Reply-To: <aK19bSmrbXjoVXdO@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-HM-Tid: 0a98e5b5b15b03abkunm7ebc238e12acdf2
+X-HM-MType: 1
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFDSUNOT01LS0k3V1ktWUFJV1kPCRoVCBIfWUFZQkpJHVZIGUJDTEtPTR9JH0tWFRQJFh
+	oXVRMBExYaEhckFA4PWVdZGBILWUFZTkNVSUlVTFVKSk9ZV1kWGg8SFR0UWUFZT0tIVUpLSU9PT0
+	hVSktLVUpCS0tZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=d+nvem5rq+OdX5QANolTVxd6PoZAEDv1TqtFvJ3xCapUp0mrt5rvGanWBQuRmxpya0wc2AL+cDxtbWGKDw1ZAleQS4w0XgNjQvhsDvLOodrUm5jzmofqfL0aOAV645iDH7xQIjlMx/bZ0IEstSGFCxriCCPC15is03iEJTesAgg=; c=relaxed/relaxed; s=default; d=rock-chips.com; v=1;
+	bh=lBlDCclLQ1+AiQeVLpAB/kctkShHB5e19AZ8+JDxJP0=;
+	h=date:mime-version:subject:message-id:from;
 
-On 20/08/2025 at 16:55, Théo Lebrun wrote:
-> The MACB driver acts as if TBQPH/RBQPH are configurable on a per queue
-> basis; this is a lie. A single register configures the upper 32 bits of
-> each DMA descriptor buffers for all queues.
-> 
-> Concrete actions:
-> 
->   - Drop GEM_TBQPH/GEM_RBQPH macros which have a queue index argument.
->     Only use MACB_TBQPH/MACB_RBQPH constants.
-> 
->   - Drop struct macb_queue->TBQPH/RBQPH fields.
-> 
->   - In macb_init_buffers(): do a single write to TBQPH and RBQPH for all
->     queues instead of a write per queue.
-> 
->   - In macb_tx_error_task(): drop the write to TBQPH.
-> 
->   - In macb_alloc_consistent(): if allocations give different upper
->     32-bits, fail. Previously, it would have lead to silent memory
->     corruption as queues would have used the upper 32 bits of the alloc
->     from queue 0 and their own low 32 bits.
-> 
->   - In macb_suspend(): if we use the tie off descriptor for suspend, do
->     the write once for all queues instead of once per queue.
+On 8/26/2025 5:25 PM, Russell King (Oracle) wrote:
 
-Indeed, agreed.
+> On Tue, Aug 26, 2025 at 04:08:40PM +0800, Chaoyi Chen wrote:
+>> Hi Russell,
+>>
+>> On 8/25/2025 9:37 PM, Russell King (Oracle) wrote:
+>>> On Mon, Aug 25, 2025 at 12:53:37PM +0200, Marek Szyprowski wrote:
+>>>> On 25.08.2025 11:57, Chaoyi Chen wrote:
+>>>>> On 8/25/2025 3:23 PM, Marek Szyprowski wrote:
+>>>>>> On 15.08.2025 04:35, Chaoyi Chen wrote:
+>>>>>>> From: Chaoyi Chen <chaoyi.chen@rock-chips.com>
+>>>>>>>
+>>>>>>> For external phy, clk_phy should be optional, and some external phy
+>>>>>>> need the clock input from clk_phy. This patch adds support for setting
+>>>>>>> clk_phy for external phy.
+>>>>>>>
+>>>>>>> Signed-off-by: David Wu <david.wu@rock-chips.com>
+>>>>>>> Signed-off-by: Chaoyi Chen <chaoyi.chen@rock-chips.com>
+>>>>>>> ---
+>>>>>>>
+>>>>>>> Changes in v3:
+>>>>>>> - Link to V2:
+>>>>>>> https://lore.kernel.org/netdev/20250812012127.197-1-kernel@airkyi.com/
+>>>>>>> - Rebase to net-next/main
+>>>>>>>
+>>>>>>> Changes in v2:
+>>>>>>> - Link to V1:
+>>>>>>> https://lore.kernel.org/netdev/20250806011405.115-1-kernel@airkyi.com/
+>>>>>>> - Remove get clock frequency from DT prop
+>>>>>>>
+>>>>>>>      drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 11 +++++++----
+>>>>>>>      1 file changed, 7 insertions(+), 4 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+>>>>>>> b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+>>>>>>> index ac8288301994..5d921e62c2f5 100644
+>>>>>>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+>>>>>>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+>>>>>>> @@ -1412,12 +1412,15 @@ static int rk_gmac_clk_init(struct
+>>>>>>> plat_stmmacenet_data *plat)
+>>>>>>>              clk_set_rate(plat->stmmac_clk, 50000000);
+>>>>>>>          }
+>>>>>>>      -    if (plat->phy_node && bsp_priv->integrated_phy) {
+>>>>>>> +    if (plat->phy_node) {
+>>>>>>>              bsp_priv->clk_phy = of_clk_get(plat->phy_node, 0);
+>>>>>>>              ret = PTR_ERR_OR_ZERO(bsp_priv->clk_phy);
+>>>>>>> -        if (ret)
+>>>>>>> -            return dev_err_probe(dev, ret, "Cannot get PHY clock\n");
+>>>>>>> -        clk_set_rate(bsp_priv->clk_phy, 50000000);
+>>>>>>> +        /* If it is not integrated_phy, clk_phy is optional */
+>>>>>>> +        if (bsp_priv->integrated_phy) {
+>>>>>>> +            if (ret)
+>>>>>>> +                return dev_err_probe(dev, ret, "Cannot get PHY
+>>>>>>> clock\n");
+>>>>>>> +            clk_set_rate(bsp_priv->clk_phy, 50000000);
+>>>>>>> +        }
+>>>>> I think  we should set bsp_priv->clk_phy to NULL here if we failed to
+>>>>> get the clock.
+>>>>>
+>>>>> Could you try this on your board? Thank you.
+>>>> Right, the following change also fixes this issue:
+>>>>
+>>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+>>>> b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+>>>> index 9fc41207cc45..2d19d48be01f 100644
+>>>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+>>>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+>>>> @@ -1415,6 +1415,8 @@ static int rk_gmac_clk_init(struct
+>>>> plat_stmmacenet_data *plat)
+>>>>            if (plat->phy_node) {
+>>>>                    bsp_priv->clk_phy = of_clk_get(plat->phy_node, 0);
+>>>>                    ret = PTR_ERR_OR_ZERO(bsp_priv->clk_phy);
+>>>> +               if (ret)
+>>>> +                       bsp_priv->clk_phy = NULL;
+>>> Or just:
+>>>
+>>> 		clk = of_clk_get(plat->phy_node, 0);
+>>> 		if (clk == ERR_PTR(-EPROBE_DEFER))
+>> Do we actually need this? Maybe other devm_clk_get() before it would fail in advance.
+> Is it the same clock as devm_clk_get()? If it is, what's the point of
+> getting it a second time. If it isn't, then it could be a different
+> clock which may be yet to probe.
 
-> Fixes: fff8019a08b6 ("net: macb: Add 64 bit addressing support for GEM")
-> Fixes: ae1f2a56d273 ("net: macb: Added support for many RX queues")
-> Reviewed-by: Sean Anderson <sean.anderson@linux.dev>
-> Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
+It's not the same clock, but it should be use the same clock controller driver, which is the CRU on the Rockchip platform.
 
-Acked-by: Nicolas Ferre <nicolas.ferre@microchip.com>
-
-Thanks Théo, best regards,
-   Nicolas
-
-> ---
->   drivers/net/ethernet/cadence/macb.h      |  4 ---
->   drivers/net/ethernet/cadence/macb_main.c | 57 ++++++++++++++------------------
->   2 files changed, 24 insertions(+), 37 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
-> index c9a5c8beb2fa8166195d1d83f187d2d0c62668a8..a7e845fee4b3a2e3d14abb49abdbaf3e8e6ea02b 100644
-> --- a/drivers/net/ethernet/cadence/macb.h
-> +++ b/drivers/net/ethernet/cadence/macb.h
-> @@ -213,10 +213,8 @@
-> 
->   #define GEM_ISR(hw_q)          (0x0400 + ((hw_q) << 2))
->   #define GEM_TBQP(hw_q)         (0x0440 + ((hw_q) << 2))
-> -#define GEM_TBQPH(hw_q)                (0x04C8)
->   #define GEM_RBQP(hw_q)         (0x0480 + ((hw_q) << 2))
->   #define GEM_RBQS(hw_q)         (0x04A0 + ((hw_q) << 2))
-> -#define GEM_RBQPH(hw_q)                (0x04D4)
->   #define GEM_IER(hw_q)          (0x0600 + ((hw_q) << 2))
->   #define GEM_IDR(hw_q)          (0x0620 + ((hw_q) << 2))
->   #define GEM_IMR(hw_q)          (0x0640 + ((hw_q) << 2))
-> @@ -1214,10 +1212,8 @@ struct macb_queue {
->          unsigned int            IDR;
->          unsigned int            IMR;
->          unsigned int            TBQP;
-> -       unsigned int            TBQPH;
->          unsigned int            RBQS;
->          unsigned int            RBQP;
-> -       unsigned int            RBQPH;
-> 
->          /* Lock to protect tx_head and tx_tail */
->          spinlock_t              tx_ptr_lock;
-> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-> index ce95fad8cedd7331d4818ba9f73fb6970249e85c..69325665c766927797ca2e1eb1384105bcde3cb5 100644
-> --- a/drivers/net/ethernet/cadence/macb_main.c
-> +++ b/drivers/net/ethernet/cadence/macb_main.c
-> @@ -495,19 +495,19 @@ static void macb_init_buffers(struct macb *bp)
->          struct macb_queue *queue;
->          unsigned int q;
-> 
-> +#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
-> +       /* Single register for all queues' high 32 bits. */
-> +       if (bp->hw_dma_cap & HW_DMA_CAP_64B) {
-> +               macb_writel(bp, RBQPH,
-> +                           upper_32_bits(bp->queues[0].rx_ring_dma));
-> +               macb_writel(bp, TBQPH,
-> +                           upper_32_bits(bp->queues[0].tx_ring_dma));
-> +       }
-> +#endif
-> +
->          for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
->                  queue_writel(queue, RBQP, lower_32_bits(queue->rx_ring_dma));
-> -#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
-> -               if (bp->hw_dma_cap & HW_DMA_CAP_64B)
-> -                       queue_writel(queue, RBQPH,
-> -                                    upper_32_bits(queue->rx_ring_dma));
-> -#endif
->                  queue_writel(queue, TBQP, lower_32_bits(queue->tx_ring_dma));
-> -#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
-> -               if (bp->hw_dma_cap & HW_DMA_CAP_64B)
-> -                       queue_writel(queue, TBQPH,
-> -                                    upper_32_bits(queue->tx_ring_dma));
-> -#endif
->          }
->   }
-> 
-> @@ -1166,10 +1166,6 @@ static void macb_tx_error_task(struct work_struct *work)
-> 
->          /* Reinitialize the TX desc queue */
->          queue_writel(queue, TBQP, lower_32_bits(queue->tx_ring_dma));
-> -#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
-> -       if (bp->hw_dma_cap & HW_DMA_CAP_64B)
-> -               queue_writel(queue, TBQPH, upper_32_bits(queue->tx_ring_dma));
-> -#endif
->          /* Make TX ring reflect state of hardware */
->          queue->tx_head = 0;
->          queue->tx_tail = 0;
-> @@ -2542,6 +2538,7 @@ static int macb_alloc_consistent(struct macb *bp)
->   {
->          struct macb_queue *queue;
->          unsigned int q;
-> +       u32 upper;
->          int size;
-> 
->          for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
-> @@ -2549,7 +2546,9 @@ static int macb_alloc_consistent(struct macb *bp)
->                  queue->tx_ring = dma_alloc_coherent(&bp->pdev->dev, size,
->                                                      &queue->tx_ring_dma,
->                                                      GFP_KERNEL);
-> -               if (!queue->tx_ring)
-> +               upper = upper_32_bits(queue->tx_ring_dma);
-> +               if (!queue->tx_ring ||
-> +                   upper != upper_32_bits(bp->queues[0].tx_ring_dma))
->                          goto out_err;
->                  netdev_dbg(bp->dev,
->                             "Allocated TX ring for queue %u of %d bytes at %08lx (mapped %p)\n",
-> @@ -2563,8 +2562,11 @@ static int macb_alloc_consistent(struct macb *bp)
-> 
->                  size = RX_RING_BYTES(bp) + bp->rx_bd_rd_prefetch;
->                  queue->rx_ring = dma_alloc_coherent(&bp->pdev->dev, size,
-> -                                                &queue->rx_ring_dma, GFP_KERNEL);
-> -               if (!queue->rx_ring)
-> +                                                   &queue->rx_ring_dma,
-> +                                                   GFP_KERNEL);
-> +               upper = upper_32_bits(queue->rx_ring_dma);
-> +               if (!queue->rx_ring ||
-> +                   upper != upper_32_bits(bp->queues[0].rx_ring_dma))
->                          goto out_err;
->                  netdev_dbg(bp->dev,
->                             "Allocated RX ring of %d bytes at %08lx (mapped %p)\n",
-> @@ -4305,12 +4307,6 @@ static int macb_init(struct platform_device *pdev)
->                          queue->TBQP = GEM_TBQP(hw_q - 1);
->                          queue->RBQP = GEM_RBQP(hw_q - 1);
->                          queue->RBQS = GEM_RBQS(hw_q - 1);
-> -#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
-> -                       if (bp->hw_dma_cap & HW_DMA_CAP_64B) {
-> -                               queue->TBQPH = GEM_TBQPH(hw_q - 1);
-> -                               queue->RBQPH = GEM_RBQPH(hw_q - 1);
-> -                       }
-> -#endif
->                  } else {
->                          /* queue0 uses legacy registers */
->                          queue->ISR  = MACB_ISR;
-> @@ -4319,12 +4315,6 @@ static int macb_init(struct platform_device *pdev)
->                          queue->IMR  = MACB_IMR;
->                          queue->TBQP = MACB_TBQP;
->                          queue->RBQP = MACB_RBQP;
-> -#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
-> -                       if (bp->hw_dma_cap & HW_DMA_CAP_64B) {
-> -                               queue->TBQPH = MACB_TBQPH;
-> -                               queue->RBQPH = MACB_RBQPH;
-> -                       }
-> -#endif
->                  }
-> 
->                  /* get irq: here we use the linux queue index, not the hardware
-> @@ -5450,6 +5440,11 @@ static int __maybe_unused macb_suspend(struct device *dev)
->                   */
->                  tmp = macb_readl(bp, NCR);
->                  macb_writel(bp, NCR, tmp & ~(MACB_BIT(TE) | MACB_BIT(RE)));
-> +#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
-> +               if (!(bp->caps & MACB_CAPS_QUEUE_DISABLE))
-> +                       macb_writel(bp, RBQPH,
-> +                                   upper_32_bits(bp->rx_ring_tieoff_dma));
-> +#endif
->                  for (q = 0, queue = bp->queues; q < bp->num_queues;
->                       ++q, ++queue) {
->                          /* Disable RX queues */
-> @@ -5459,10 +5454,6 @@ static int __maybe_unused macb_suspend(struct device *dev)
->                                  /* Tie off RX queues */
->                                  queue_writel(queue, RBQP,
->                                               lower_32_bits(bp->rx_ring_tieoff_dma));
-> -#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
-> -                               queue_writel(queue, RBQPH,
-> -                                            upper_32_bits(bp->rx_ring_tieoff_dma));
-> -#endif
->                          }
->                          /* Disable all interrupts */
->                          queue_writel(queue, IDR, -1);
-> 
-> --
-> 2.50.1
-> 
 
 
