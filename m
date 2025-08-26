@@ -1,279 +1,194 @@
-Return-Path: <netdev+bounces-216798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE38AB353A2
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 07:57:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05748B35487
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 08:26:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEAED683D5C
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 05:57:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4415F3AD3B5
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 06:25:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A45672F3C00;
-	Tue, 26 Aug 2025 05:57:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W8paAhKn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 233F82F60B2;
+	Tue, 26 Aug 2025 06:25:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC18E2EF64A
-	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 05:57:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 910CC2D77E2;
+	Tue, 26 Aug 2025 06:24:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756187829; cv=none; b=BLlT57S7czQMsrJXuh9PJY7dnHmTXtsE3ck4PaxKdCyr9KqUgrCEik7BHJjga0pP74GUini6izQgbHX1W61acw50BpMEqQkDlqI22c1vVof77G5BYyDNCyc9ITcZS7pbdBsw518DfTpjd8RwMa8J5aNEy95woJsMUDXnsdt4hDI=
+	t=1756189500; cv=none; b=fKdaORiymJpCDlG1cRXnzA9WSidooS1KkDsLvHtG6JLu0vvrvZNGlPiHn8tqUjx4/32yu4qciRppGwKbAyg3shqmaLLnOcdFklhGr6/nWbopfr1q2wY2ibLG4HTV3wPScTyWyHjbHB6oeXJYD0Gx5Afc/TYHfTB1zONedwDKFZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756187829; c=relaxed/simple;
-	bh=CWNR4pYtCuYnSNovOXmow6EDXueugkkaxhIaiMS+Pow=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hnLGuNDi0Z6ZmOeQxVnAcgGg9JAD4i9hZTlhkYIO2ZCBjFqCwAaO/gxHEkZH/MoemV6pVKCeoyS8wA4apyfxApBRNPVKC8qcJTkLFVqS9tTmyME6UbT8iWr3aDnUc2gO11DDkSptmO65WlQD+SlKRC3Yg2LEuaZ2w7gFgIbB95o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=W8paAhKn; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2460757107bso47396935ad.2
-        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 22:57:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756187827; x=1756792627; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rgbQAPgFawIL/zBvvVhjwDaQFO9CcGxN18S3VJouTLA=;
-        b=W8paAhKn7NL+g2W+p9gSvj0jTTjs7e3WG7K2n4PCvxF859O541y0RYNnBlejabWA86
-         uZq4+ivfIiqRBmfmpKN1nGqr1+S0jCo0VIxYXR138qMVEZ+rnBshAWhu1GgAJR4iXiIW
-         6Ey+pF6Q7qgIajBSq5NiVMZTKGhTSDSh/VaUH924yTQdvU9NYsftI3VyMNBjnQDmTg1P
-         7hX/H84eDHeY9l6dWFg1Sx4WSdLNcmY7TD+EXzJ/yBTtlUnDl2Luy10ogX4dnrQeuNDh
-         uIEs5WYSlYUaEfTGOZ+1rmcc2AR9V+yHGgGcs2pb4XPWfyK4yOfVCx2slYBmxrJnpRou
-         NZHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756187827; x=1756792627;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rgbQAPgFawIL/zBvvVhjwDaQFO9CcGxN18S3VJouTLA=;
-        b=UV+p7hSyweCb3ZHeprIwPK2vCPg3jsc6M0qexTKEAGz1NMQMasGsTgAP50PPGwbVXm
-         6wLhilj9wCSLkL10xas0Dn8sm+Hf7EedHXtJwrdictDKQ8ad1dsz/Fas/FgVtKN+bXOe
-         1rHgBgsQnQ27brQHR0Go3bwwBwCxUGJcJGY8tPWRmfO0qeDfu1CVvHZ+AsT81754rJri
-         q9TNzz3fuR212jdjp5EJE2kMzSq55ZVUanLkEEICwrb862lbyNImcmRSlz8aAmOuggjw
-         Nw608asyh75/TUmQxB4DzqlyoX4zb1aQ9G1+l663KxIkIx0M5hPkfuSaFy7ZbLs00RP2
-         b7DQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVzjVuW2U10xoZBQnCHcW/2Q/d/lDiX8lQD6q9K6KxjiyxAzeF1/TvHkOgdjbpTofw00+BhCaA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YylTgIvqfbc5l6PjWwd0pI8fL3TucEmdEdtjHOqtujKVMgD2oVU
-	6SGhfQFZaAp/EkjtFQZTRJaOkoMmGBnjX24v3wrh2QuLW6VKx7iF1H9b7bfxeC3A8LoABLMXW3H
-	LFZ7648TMXVesV5qwdcTIry/3YO3cZq79/G14ETKy
-X-Gm-Gg: ASbGncsvWxQJVb4W0potDSRrI7RaJm3dmnt3lnTZN/UDtDYWKpmaAoZB1yaQm7QFhLd
-	uxiw8QlJcp81vEbiKrZX6DvK0mmoBCZ36FGBnh1masfnxiHEwoHLSRL3uXiZFEegqBwP9G0cdVI
-	HEjQpetI7fPUt02mz59DWiB3NWqu1crLu7B601Mki+EChvec/PV/Q61Evq9dY7tQ3PTMSsgSLDi
-	kyO2zPztfsrk9H61YquJr61POKglw80P6tXqj4WgBtDtyYrRIfOTNYcUk0yGYiVSewzEhBD+QJS
-	caMPWougzzQgfQ==
-X-Google-Smtp-Source: AGHT+IEK4QY4XTpXjl2k6Hzn67giNNVzvE+bnIENMpk2dnpR63nxlEMp+0+O7Fp86ljMfvPxWrztDtR28s6hlusU09w=
-X-Received: by 2002:a17:902:f54b:b0:246:f13b:1bb9 with SMTP id
- d9443c01a7336-246f13b2a8emr50300355ad.58.1756187826801; Mon, 25 Aug 2025
- 22:57:06 -0700 (PDT)
+	s=arc-20240116; t=1756189500; c=relaxed/simple;
+	bh=wW/ix9zYlP6C+zDAqfxs5K/PUdYH0a5DtlY7WLJMujo=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=YezfgcX6mxEdPXHBh7a87sbwlWYbzWc1sJPc+tE3GOG9jUtq6TxdRMAIbpgEZaAuoNZJAX01E/9IZ4EmcKt6LS60j7of4z9bWjGmcy6Rvs5DWGW0qb7Wf3e39rohz5SYcaOXYfkTIC2PXCnzuPK5GR7AWIVIGahazc2y+bKE2yY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from [127.0.0.2] (unknown [114.241.87.235])
+	by APP-03 (Coremail) with SMTP id rQCowAAnu3z2Uq1oqXNPDw--.2143S2;
+	Tue, 26 Aug 2025 14:23:52 +0800 (CST)
+From: Vivian Wang <wangruikang@iscas.ac.cn>
+Subject: [PATCH net-next v7 0/5] Add Ethernet MAC support for SpacemiT K1
+Date: Tue, 26 Aug 2025 14:23:45 +0800
+Message-Id: <20250826-net-k1-emac-v7-0-5bc158d086ae@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250825195947.4073595-1-edumazet@google.com> <20250825195947.4073595-4-edumazet@google.com>
- <CAAVpQUCiSJnv9QMuAFbomEeF3D=0iJYSJSmMhpQpyCFxQUgK_A@mail.gmail.com> <CANn89iLsA1N7NDz71GRaoMWn2xWmJvMP4oPs=yMCbLvE--R8kQ@mail.gmail.com>
-In-Reply-To: <CANn89iLsA1N7NDz71GRaoMWn2xWmJvMP4oPs=yMCbLvE--R8kQ@mail.gmail.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Mon, 25 Aug 2025 22:56:55 -0700
-X-Gm-Features: Ac12FXyuxmEDZJKZHoECdT3tLuccD7n-lNUAdxq_h5E80AZaO7chH8dpX2K4Kgg
-Message-ID: <CAAVpQUDPUuntSi7Zxg+nKkRYzBPQxJF1FYFU3n7s=h_Qs-ZHgg@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/3] net: add new sk->sk_drops1 field
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Willem de Bruijn <willemb@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAPFSrWgC/23QzW6DMAwH8Fepcl6QE/JFT3uPaYdgnDWagI4w1
+ Kni3ZfSSYWyo2X//Ld8ZYmGSIkdD1c20BRT7Ltc2JcDw5PvPojHJtdMgtRgwPCORv4pOLUeeUn
+ CCQ2OvFEsi/NAIV6WbW/sNtjRZWTv985AX995/fjXrn0ijn3bxvF4mEwhLB9QLMOnmMZ++Flum
+ sQyfY8X5SZ+Ehw4ogkVaQHG2NeY0KfCY4HdsmmSa+22WmZdqaADWCmtd3tdPrQFudVl1s7JBrV
+ WoEK512qtny5XWRtnGqhQYfgvWz+0E0/ZOuumERZVBTqoaq/NSkvYanP7miDpgqxdTXqr53n+B
+ QCNi1sVAgAA
+X-Change-ID: 20250606-net-k1-emac-3e181508ea64
+To: Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>, 
+ Vivian Wang <wangruikang@iscas.ac.cn>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
+ Paul Walmsley <paul.walmsley@sifive.com>, 
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+ Alexandre Ghiti <alex@ghiti.fr>
+Cc: Vivian Wang <uwu@dram.page>, 
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+ Junhui Liu <junhui.liu@pigmoral.tech>, Simon Horman <horms@kernel.org>, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-riscv@lists.infradead.org, 
+ spacemit@lists.linux.dev, linux-kernel@vger.kernel.org, 
+ Conor Dooley <conor.dooley@microchip.com>, 
+ Hendrik Hamerlinck <hendrik.hamerlinck@hammernet.be>
+X-Mailer: b4 0.14.2
+X-CM-TRANSID:rQCowAAnu3z2Uq1oqXNPDw--.2143S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxur43Kw18tr47CF4fJryftFb_yoWrCFW7pF
+	W8ArZI9wsrJrWIgFs7uw47uFyfXan5t343WF1Ut3yrXa1DAFyUAr9akw43CF1UZrWrJ342
+	ya1UAFn7CFyDA3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9014x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
+	VFxhVjvjDU0xZFpf9x0pRl_MsUUUUU=
+X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 
-On Mon, Aug 25, 2025 at 10:46=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> On Mon, Aug 25, 2025 at 1:19=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.=
-com> wrote:
-> >
-> > On Mon, Aug 25, 2025 at 12:59=E2=80=AFPM Eric Dumazet <edumazet@google.=
-com> wrote:
-> > >
-> > > sk->sk_drops can be heavily contended when
-> > > changed from many cpus.
-> > >
-> > > Instead using too expensive per-cpu data structure,
-> > > add a second sk->sk_drops1 field and change
-> > > sk_drops_inc() to be NUMA aware.
-> > >
-> > > This patch adds 64 bytes per socket.
-> > >
-> > > For hosts having more than two memory nodes, sk_drops_inc()
-> > > might not be optimal and can be refined later.
-> > >
-> > > Tested with the following stress test, sending about 11 Mpps
-> > > to a dual socket AMD EPYC 7B13 64-Core.
-> > >
-> > > super_netperf 20 -t UDP_STREAM -H DUT -l10 -- -n -P,1000 -m 120
-> > > Note: due to socket lookup, only one UDP socket will receive
-> > > packets on DUT.
-> > >
-> > > Then measure receiver (DUT) behavior. We can see
-> > > consumer and BH handlers can process more packets per second.
-> > >
-> > > Before:
-> > >
-> > > nstat -n ; sleep 1 ; nstat | grep Udp
-> > > Udp6InDatagrams                 855592             0.0
-> > > Udp6InErrors                    5621467            0.0
-> > > Udp6RcvbufErrors                5621467            0.0
-> > >
-> > > After:
-> > > nstat -n ; sleep 1 ; nstat | grep Udp
-> > > Udp6InDatagrams                 914537             0.0
-> > > Udp6InErrors                    6888487            0.0
-> > > Udp6RcvbufErrors                6888487            0.0
-> > >
-> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > > ---
-> > >  include/net/sock.h                            | 20 +++++++++++++++++=
-++
-> > >  .../selftests/bpf/progs/bpf_iter_netlink.c    |  3 ++-
-> > >  .../selftests/bpf/progs/bpf_iter_udp4.c       |  2 +-
-> > >  .../selftests/bpf/progs/bpf_iter_udp6.c       |  2 +-
-> > >  4 files changed, 24 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/include/net/sock.h b/include/net/sock.h
-> > > index f40e3c4883be32c8282694ab215bcf79eb87cbd7..318169eb1a3d40eefac50=
-147012551614abc6f7a 100644
-> > > --- a/include/net/sock.h
-> > > +++ b/include/net/sock.h
-> > > @@ -282,6 +282,7 @@ struct sk_filter;
-> > >    *    @sk_err_soft: errors that don't cause failure but are the cau=
-se of a
-> > >    *                  persistent failure not just 'timed out'
-> > >    *    @sk_drops: raw/udp drops counter
-> > > +  *    @sk_drops1: second drops counter
-> > >    *    @sk_ack_backlog: current listen backlog
-> > >    *    @sk_max_ack_backlog: listen backlog set in listen()
-> > >    *    @sk_uid: user id of owner
-> > > @@ -571,6 +572,11 @@ struct sock {
-> > >         atomic_t                sk_drops ____cacheline_aligned_in_smp=
-;
-> > >         struct rcu_head         sk_rcu;
-> > >         netns_tracker           ns_tracker;
-> > > +#if defined(CONFIG_NUMA)
-> > > +       atomic_t                sk_drops1 ____cacheline_aligned_in_sm=
-p;
-> > > +#else
-> > > +       atomic_t                sk_drops1;
-> >
-> > Is this #else to be friendly to bpf selftests ?
->
-> Sure !
->
-> What problem are you seeing exactly ?
+SpacemiT K1 has two gigabit Ethernet MACs with RGMII and RMII support.
+Add devicetree bindings, driver, and DTS for it.
 
-No problem, sk_drops is aligned anyway, I was just curious :)
+Tested primarily on BananaPi BPI-F3. Basic TX/RX functionality also
+tested on Milk-V Jupiter.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+I would like to note that even though some bit field names superficially
+resemble that of DesignWare MAC, all other differences point to it in
+fact being a custom design.
 
-Thank you, Eric !
+Based on SpacemiT drivers [1]. These patches are also available at:
 
->
->
-> >
-> >
-> > > +#endif
-> > >  };
-> > >
-> > >  struct sock_bh_locked {
-> > > @@ -2684,17 +2690,31 @@ struct sock_skb_cb {
-> > >
-> > >  static inline void sk_drops_inc(struct sock *sk)
-> > >  {
-> > > +#if defined(CONFIG_NUMA)
-> > > +       int n =3D numa_node_id() % 2;
-> > > +
-> > > +       if (n)
-> > > +               atomic_inc(&sk->sk_drops1);
-> > > +       else
-> > > +               atomic_inc(&sk->sk_drops);
-> > > +#else
-> > >         atomic_inc(&sk->sk_drops);
-> > > +#endif
-> > >  }
-> > >
-> > >  static inline int sk_drops_read(const struct sock *sk)
-> > >  {
-> > > +#if defined(CONFIG_NUMA)
-> > > +       return atomic_read(&sk->sk_drops) + atomic_read(&sk->sk_drops=
-1);
-> > > +#else
-> > >         return atomic_read(&sk->sk_drops);
-> > > +#endif
-> > >  }
-> > >
-> > >  static inline void sk_drops_reset(struct sock *sk)
-> > >  {
-> > >         atomic_set(&sk->sk_drops, 0);
-> > > +       atomic_set(&sk->sk_drops1, 0);
-> > >  }
-> > >
-> > >  static inline void
-> > > diff --git a/tools/testing/selftests/bpf/progs/bpf_iter_netlink.c b/t=
-ools/testing/selftests/bpf/progs/bpf_iter_netlink.c
-> > > index 00b2ceae81fb0914f2de3634eb342004e8bc3c5b..31ad9fcc6022d5d31b9c6=
-a35daacaad7c887a51f 100644
-> > > --- a/tools/testing/selftests/bpf/progs/bpf_iter_netlink.c
-> > > +++ b/tools/testing/selftests/bpf/progs/bpf_iter_netlink.c
-> > > @@ -57,7 +57,8 @@ int dump_netlink(struct bpf_iter__netlink *ctx)
-> > >                 inode =3D SOCK_INODE(sk);
-> > >                 bpf_probe_read_kernel(&ino, sizeof(ino), &inode->i_in=
-o);
-> > >         }
-> > > -       BPF_SEQ_PRINTF(seq, "%-8u %-8lu\n", s->sk_drops.counter, ino)=
-;
-> > > +       BPF_SEQ_PRINTF(seq, "%-8u %-8lu\n",
-> > > +                      s->sk_drops.counter + s->sk_drops1.counter, in=
-o);
-> > >
-> > >         return 0;
-> > >  }
-> > > diff --git a/tools/testing/selftests/bpf/progs/bpf_iter_udp4.c b/tool=
-s/testing/selftests/bpf/progs/bpf_iter_udp4.c
-> > > index ffbd4b116d17ffbb9f14440c788e50490fb0f4e0..192ab5693a7131c1ec587=
-9e539651c21f6f3c9ae 100644
-> > > --- a/tools/testing/selftests/bpf/progs/bpf_iter_udp4.c
-> > > +++ b/tools/testing/selftests/bpf/progs/bpf_iter_udp4.c
-> > > @@ -64,7 +64,7 @@ int dump_udp4(struct bpf_iter__udp *ctx)
-> > >                        0, 0L, 0, ctx->uid, 0,
-> > >                        sock_i_ino(&inet->sk),
-> > >                        inet->sk.sk_refcnt.refs.counter, udp_sk,
-> > > -                      inet->sk.sk_drops.counter);
-> > > +                      inet->sk.sk_drops.counter + inet->sk.sk_drops1=
-.counter);
-> > >
-> > >         return 0;
-> > >  }
-> > > diff --git a/tools/testing/selftests/bpf/progs/bpf_iter_udp6.c b/tool=
-s/testing/selftests/bpf/progs/bpf_iter_udp6.c
-> > > index 47ff7754f4fda4c9db92fbf1dc2e6a68f044174e..5170bdf458fa1b9a4eea9=
-240fbaa5934182a7776 100644
-> > > --- a/tools/testing/selftests/bpf/progs/bpf_iter_udp6.c
-> > > +++ b/tools/testing/selftests/bpf/progs/bpf_iter_udp6.c
-> > > @@ -72,7 +72,7 @@ int dump_udp6(struct bpf_iter__udp *ctx)
-> > >                        0, 0L, 0, ctx->uid, 0,
-> > >                        sock_i_ino(&inet->sk),
-> > >                        inet->sk.sk_refcnt.refs.counter, udp_sk,
-> > > -                      inet->sk.sk_drops.counter);
-> > > +                      inet->sk.sk_drops.counter + inet->sk.sk_drops1=
-.counter);
-> > >
-> > >         return 0;
-> > >  }
-> > > --
-> > > 2.51.0.261.g7ce5a0a67e-goog
-> > >
+https://github.com/dramforever/linux/tree/k1/ethernet/v7
+
+[1]: https://github.com/spacemit-com/linux-k1x
+
+---
+Changes in v7:
+- Removed scoped_guard usage
+- Renamed error handling path labels after destinations
+- Fix skb free error handling path in emac_start_xmit and emac_tx_mem_map
+- Cancel tx_timeout_task to prevent schedule_work lifetime problems
+- Minor changes:
+  - Remove unnecessary timer_delete_sync in emac_down
+  - Use dev_err_ratelimited in a few more places
+  - Cosmetic fixes in error messages
+- Link to v6: https://lore.kernel.org/r/20250820-net-k1-emac-v6-0-c1e28f2b8be5@iscas.ac.cn
+
+Changes in v6:
+- Implement pause frame support
+- Minor changes:
+  - Convert comment for emac_stats_update() into assert_spin_locked()
+  - Cosmetic fixes for some comments and whitespace
+  - emac_set_mac_addr() is now refactored
+- Link to v5: https://lore.kernel.org/r/20250812-net-k1-emac-v5-0-dd17c4905f49@iscas.ac.cn
+
+Changes in v5:
+- Rebased on v6.17-rc1, add back DTS now that they apply cleanly
+- Use standard statistics interface, handle 32-bit statistics overflow
+- Minor changes:
+  - Fix clock resource handling in emac_resume
+  - Ratelimit the message in emac_rx_frame_status
+  - Add ndo_validate_addr = eth_validate_addr
+  - Remove unnecessary parens in emac_set_mac_addr
+  - Change some functions that never fail to return void instead of int
+  - Minor rewording
+- Link to v4: https://lore.kernel.org/r/20250703-net-k1-emac-v4-0-686d09c4cfa8@iscas.ac.cn
+
+Changes in v4:
+- Resource handling on probe and remove: timer_delete_sync and
+  of_phy_deregister_fixed_link
+- Drop DTS changes and dependencies (will send through SpacemiT tree)
+- Minor changes:
+  - Remove redundant phy_stop() and setting of ndev->phydev
+  - Fix error checking for emac_open in emac_resume
+  - Fix one missed dev_err -> dev_err_probe
+  - Fix type of emac_start_xmit
+  - Fix one missed reverse xmas tree formatting
+  - Rename some functions for consistency between emac_* and ndo_*
+- Link to v3: https://lore.kernel.org/r/20250702-net-k1-emac-v3-0-882dc55404f3@iscas.ac.cn
+
+Changes in v3:
+- Refactored and simplified emac_tx_mem_map
+- Addressed other minor v2 review comments
+- Removed what was patch 3 in v2, depend on DMA buses instead
+- DT nodes in alphabetical order where appropriate
+- Link to v2: https://lore.kernel.org/r/20250618-net-k1-emac-v2-0-94f5f07227a8@iscas.ac.cn
+
+Changes in v2:
+- dts: Put eth0 and eth1 nodes under a bus with dma-ranges
+- dts: Added Milk-V Jupiter
+- Fix typo in emac_init_hw() that broke the driver (Oops!)
+- Reformatted line lengths to under 80
+- Addressed other v1 review comments
+- Link to v1: https://lore.kernel.org/r/20250613-net-k1-emac-v1-0-cc6f9e510667@iscas.ac.cn
+
+---
+Vivian Wang (5):
+      dt-bindings: net: Add support for SpacemiT K1
+      net: spacemit: Add K1 Ethernet MAC
+      riscv: dts: spacemit: Add Ethernet support for K1
+      riscv: dts: spacemit: Add Ethernet support for BPI-F3
+      riscv: dts: spacemit: Add Ethernet support for Jupiter
+
+ .../devicetree/bindings/net/spacemit,k1-emac.yaml  |   81 +
+ arch/riscv/boot/dts/spacemit/k1-bananapi-f3.dts    |   46 +
+ arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts  |   46 +
+ arch/riscv/boot/dts/spacemit/k1-pinctrl.dtsi       |   48 +
+ arch/riscv/boot/dts/spacemit/k1.dtsi               |   22 +
+ drivers/net/ethernet/Kconfig                       |    1 +
+ drivers/net/ethernet/Makefile                      |    1 +
+ drivers/net/ethernet/spacemit/Kconfig              |   29 +
+ drivers/net/ethernet/spacemit/Makefile             |    6 +
+ drivers/net/ethernet/spacemit/k1_emac.c            | 2193 ++++++++++++++++++++
+ drivers/net/ethernet/spacemit/k1_emac.h            |  426 ++++
+ 11 files changed, 2899 insertions(+)
+---
+base-commit: 062b3e4a1f880f104a8d4b90b767788786aa7b78
+change-id: 20250606-net-k1-emac-3e181508ea64
+
+Best regards,
+-- 
+Vivian "dramforever" Wang
+
 
