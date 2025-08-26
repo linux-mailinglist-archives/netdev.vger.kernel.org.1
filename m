@@ -1,94 +1,94 @@
-Return-Path: <netdev+bounces-216939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D19F1B362E2
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 15:23:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06935B36335
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 15:27:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05F7618846C4
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 13:19:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C6DA467FC8
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 13:19:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC62C34DCCA;
-	Tue, 26 Aug 2025 13:17:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECABF34A30B;
+	Tue, 26 Aug 2025 13:17:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="NzTaAwBd";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="XLQWyoiS"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="Ofa2KOwF";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="DpdOaCrY"
 X-Original-To: netdev@vger.kernel.org
 Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB8334DCEC
-	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 13:17:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46AC534F461
+	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 13:17:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756214234; cv=none; b=nI/E2PoT/YjgKY/HQJU5dPY0bHUz+eM63J8JQjKwIms+x/i+0rrI05AI4zqKfeNlB4oz5EIaRo7FvmKhCajeqw8bzvFUufXzwP6os7kAQSamK758SdGOx+2N6C2fA1T7USGWuvHTm3oh80y8V4mkdKqm2AHSyKeRv/bLdIXJc2Y=
+	t=1756214237; cv=none; b=g45N4ivKu7Ul4rXFrOXgz1976GqcUD8ZbEi23tSLvfjNTbGTnrkRHtOYNSj2hJQioPvMWFUvaQNmj155Cp0hSIuVCrNKun323NvPpiSR/srVNOdX5HarLdFttJpd2UBdiu8D3QT8YEKl8lidVvRdcn+pVM2FMN3pblE9DS1it9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756214234; c=relaxed/simple;
-	bh=sQIVbcLXGfJ8N+k5+EEn4Fom7/NBPEh4i2TJ20sO8Xg=;
+	s=arc-20240116; t=1756214237; c=relaxed/simple;
+	bh=XLMWIpqXdqcRFjBaSwdCVeJm1S6kOzbh71xOIc8oTCk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=b6z17CDm8yEb4ZIh16MmHuYGuwVaYDZ6GnslDIkUyDZop/K3gHEajyjn1brS7wxsO9Xs4uPMyotIgtRWFyhCbA1ZPUi64QmWqH5nfkrkjP0saCgezKidsq81xiyzKNuR/+sJWgGf8jZ6JAQeQA5hY7jJtfrFGZv+WsU2gfZgK9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=NzTaAwBd; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=XLQWyoiS; arc=none smtp.client-ip=202.12.124.155
+	 MIME-Version; b=Lbmrzr6Vm0nqkuUPpBXUYMh/Du0lMh2gUbXSiTR0z5EFnnhl1sb7h9+Tx6RdeBQv8GzDv2yEVhVE5xPhDNvd47CkYosP+z0miQPCFoIjt/QRnVsrGi0lrgCNQbtlVnBBFsy0NiNEJ2Vwz4qM3u/P1ly2a46qy9M60qCO8g0WGuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Ofa2KOwF; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=DpdOaCrY; arc=none smtp.client-ip=202.12.124.155
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 3A3597A012E;
-	Tue, 26 Aug 2025 09:17:12 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-03.internal (MEProxy); Tue, 26 Aug 2025 09:17:12 -0400
+Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 5E7FE7A00AE;
+	Tue, 26 Aug 2025 09:17:14 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-09.internal (MEProxy); Tue, 26 Aug 2025 09:17:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
 	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
 	:from:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1756214232; x=
-	1756300632; bh=9zCQhtEa/0kVMC61qI+LG+B8tsTSqioc+uQP9rg9Jjo=; b=N
-	zTaAwBdvMKY1dDeRt/pOFGDDJUALkT64F9jQ9iYVJDC9mUelKRZhyXr+owT5Xl8N
-	k0ODqbJV8qNG+7EHS1cHjGKJzyM7aC1BWeatAVgGABTa4TIihXBCbZ2mte7dXkzB
-	7S+XspANLfCt+V1eIa9ra6BcgTp0hXkSkLTau5D9YFJKTf8+LuUsk1lXn2AH8aR6
-	WfMCX7IKweS2qp/GQC7Uz1toUgt/QCidSM+9D3k6xb343qoITYWdHWME6aM4fhcG
-	pYnC1Y20wOi9EmdExb6M1gqcP4bCft02cXHMbPe97XQ+seHdA0v1nMAQguDxXYST
-	CeXIrJsDk17s9iG2pIb8w==
+	:reply-to:subject:subject:to:to; s=fm2; t=1756214234; x=
+	1756300634; bh=tWKxOyKezG7+Qv7netGITtgK5gdntMPrh2QFCUntRH8=; b=O
+	fa2KOwFklmx/7tQyQ0l6NJ8d6k+BWeYuUKn0RqBs3ZhQyJ7EfCFL5hmiq3YjjJMM
+	8e0EUXKCgzY2SqJOgQJPxrh4xEo0cEY3H9MTFdsb8suQboY3i5jyqIJZvB9GaG8G
+	Sla46j5oQaJrs8v7nAy5TqTM/N6CYyCrD5vy6Rz+DeIxHzY09dsbu2aNQ4H4cKMX
+	MiNiS5rP0AHRYZZ3OdS0h0gfwjHHu7DAQAISJp2O4iPyK4oSk2013Tq7fkxB3Ssq
+	u312fsBIS7Lu5yi/8RvAoq5dlK/0vkkLX7QTxXt4M1B2AXwU0o4jhc3r2ZIeCy/w
+	0bbObHj6wdzvNel4b9mcA==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
 	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm1; t=1756214232; x=1756300632; bh=9
-	zCQhtEa/0kVMC61qI+LG+B8tsTSqioc+uQP9rg9Jjo=; b=XLQWyoiSt51Ym6miY
-	pXY90nFDL8kydjVm9zpBjsMVMy5xGrEDHZuqzuEcEwEiHl1NDXUa2SDScHwwfvQy
-	RrOk2gK2Vh4ZpMBVGgalZIMO9ebv8O13K4IbsIpOs/YbJ3063GTFW0mNdv/mmjAR
-	vQH4L1yjbFuy8EWwtn66dh/8t2rSkAtibhNMZnFgRu3O+JEGhXMEJy+jbGXJGeXS
-	VP0ImwFft1dOsCtBTVyLRFFJ5qtG3g0SPGyTys1B0GhTpYc/eWka4Y9e+q/C9TET
-	5bhMxBiGEKM3OO4P+pebrIFf2p/t5EjcNyPdOrGxciPuDWed/pivVIODUXq7T5BW
-	B536A==
-X-ME-Sender: <xms:17OtaJ9Myur6LPjlsOwr8VgUip9ZHm_hmeBLj_l0BNT0p9vG8ehkwQ>
-    <xme:17OtaN5v1nGcQx-zruUk0gV_cvYEah_7RhfA_rm8NRZ3pz8kBZ_xmoBmNr486dJrJ
-    43sj3tmoofdDrt2Ptk>
-X-ME-Received: <xmr:17OtaI1eUe3Wj3tfUCQA1P3Vxb7wE1M9R0wcjYiaHePjzqjJB4Oe3po_Lw2z>
+	:x-me-sender:x-sasl-enc; s=fm1; t=1756214234; x=1756300634; bh=t
+	WKxOyKezG7+Qv7netGITtgK5gdntMPrh2QFCUntRH8=; b=DpdOaCrYGjQJLlORC
+	3ELpGeWOqJXgLRsxBzvzjylTaANVXrnx9o6jeklXl3dNzZ9aFQvq7Pn1Bkz5weC2
+	LNyux92w3fHqw91qzHzhQ7fzUEaNDXTn0Bwuadi/CxWvVDqsfPkYpH2Xdvlde3q9
+	zc0JqoRFNKwOXS9j8V/lGDqVP/4O7Ms1dHDgBVGs80YhUUJvCN+RlpAtVCwA7Aie
+	kmpFcE/8W08wuTj3GjAN+/h2xwfD6Xax+rjYPAKO1jwQbXbj0a5278KeNjHi6AzD
+	bp44qdKZ+BkMHz8o2FuaNb2xkgQEk4ySuDHPlfnFCVw3HJQ4W9WE6PvpNxI/vwsd
+	oQQJw==
+X-ME-Sender: <xms:2rOtaPfD0gwj67ZynUFES79JPXSh_ZxpJxZaC9w9DcY8W83ioQq2KA>
+    <xme:2rOtaFZQyt9i67Dy0-4SNjqF7-VqD-EBM7cK1rg5xAh0XmdqbwPuloVx3OzhYjRDF
+    j3k2J2bbXymjeQf3MY>
+X-ME-Received: <xmr:2rOtaKXBc9iNdLuOHm2Ce330goWBu0hoLXlg1PrkWJ6Gz2P1Z6bu4zRgl7Vu>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddujeehfeejucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucenucfjughrpefhvfevufffkffojghfggfgsedtkeertd
     ertddtnecuhfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghs
     hihsnhgrihhlrdhnvghtqeenucggtffrrghtthgvrhhnpeeiieeuieethedtfeehkefhhf
-    egveeuhfetveeuleejieejieevhefghedugfehgfenucevlhhushhtvghrufhiiigvpedt
+    egveeuhfetveeuleejieejieevhefghedugfehgfenucevlhhushhtvghrufhiiigvpedu
     necurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvth
     dpnhgspghrtghpthhtohepvddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepnhgv
     thguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshgusehquhgvrg
     hshihsnhgrihhlrdhnvght
-X-ME-Proxy: <xmx:17OtaMBtWoBDK6Qtv1fBv9YKidUlqEdFJcOymZHiXcOvT3LyxnzHtw>
-    <xmx:17OtaC0msy_pXfO1RDhpDBjBEXMY9w9fsVjkbWYZmjCgRs7TpcEUCw>
-    <xmx:17OtaOthpFafkgbSNbUx4PZFNkNKR6kRK4v-cgMPe--ulylc3XF-yg>
-    <xmx:17OtaK7KbFQj7z_N3yqEnXaKV36km-WNDlPPseeBAJ4vSf2vipVKHg>
-    <xmx:2LOtaMgD0ZDT6JTCCCau2HuaUm64_0HDPdfzK4O3_SfHrAAVQZGKmQ6M>
+X-ME-Proxy: <xmx:2rOtaPguJq2LlhWR6FwIDKtc8Ir06NU_hgrThCLkYAz_ASOQvzYqqw>
+    <xmx:2rOtaAW7rAFnOutrBQK3WKNVI8InvIB-R_dsos0yjQbgkQhJ_-dPWg>
+    <xmx:2rOtaOPRwoCiEv8HaZbf6KlF1FRhFVXNUe4Xkqd282xOZO6Fq50ztw>
+    <xmx:2rOtaEZHm-SmBj1x2MMIIhDd9Cmb5YG8EdZ3b_1V3Sn98gpftCm0Jw>
+    <xmx:2rOtaCAH4EwIveTgArkL5zrhZqAaKUTUingdKeP0N3YI6aLfWhWT4wOK>
 Feedback-ID: i934648bf:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 26 Aug 2025 09:17:11 -0400 (EDT)
+ 26 Aug 2025 09:17:13 -0400 (EDT)
 From: Sabrina Dubroca <sd@queasysnail.net>
 To: netdev@vger.kernel.org
 Cc: Sabrina Dubroca <sd@queasysnail.net>
-Subject: [PATCH net-next v2 10/13] macsec: use NLA_POLICY_VALIDATE_FN to validate IFLA_MACSEC_CIPHER_SUITE
-Date: Tue, 26 Aug 2025 15:16:28 +0200
-Message-ID: <015e43ade9548c7682c9739087eba0853b3a1331.1756202772.git.sd@queasysnail.net>
+Subject: [PATCH net-next v2 11/13] macsec: validate IFLA_MACSEC_VALIDATION with NLA_POLICY_MAX
+Date: Tue, 26 Aug 2025 15:16:29 +0200
+Message-ID: <629efe0b2150b30abc6472074018cbd521b46578.1756202772.git.sd@queasysnail.net>
 X-Mailer: git-send-email 2.50.0
 In-Reply-To: <cover.1756202772.git.sd@queasysnail.net>
 References: <cover.1756202772.git.sd@queasysnail.net>
@@ -100,90 +100,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Unfortunately, since the value of MACSEC_DEFAULT_CIPHER_ID doesn't fit
-near the others, we can't use a simple range in the policy.
-
 Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
 ---
- drivers/net/macsec.c | 34 ++++++++++++++++++----------------
- 1 file changed, 18 insertions(+), 16 deletions(-)
-
-v2: remove unused csid variable (spotted by Jakub Kicinski and kernel
-    test robot)
+ drivers/net/macsec.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
 diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
-index 9589e8f9a8c9..5680e4b78dda 100644
+index 5680e4b78dda..dc17b91dce2d 100644
 --- a/drivers/net/macsec.c
 +++ b/drivers/net/macsec.c
-@@ -3757,11 +3757,13 @@ static const struct device_type macsec_type = {
- 	.name = "macsec",
+@@ -3772,7 +3772,7 @@ static const struct nla_policy macsec_rtnl_policy[IFLA_MACSEC_MAX + 1] = {
+ 	[IFLA_MACSEC_ES] = { .type = NLA_U8 },
+ 	[IFLA_MACSEC_SCB] = { .type = NLA_U8 },
+ 	[IFLA_MACSEC_REPLAY_PROTECT] = { .type = NLA_U8 },
+-	[IFLA_MACSEC_VALIDATION] = { .type = NLA_U8 },
++	[IFLA_MACSEC_VALIDATION] = NLA_POLICY_MAX(NLA_U8, MACSEC_VALIDATE_MAX),
+ 	[IFLA_MACSEC_OFFLOAD] = NLA_POLICY_MAX(NLA_U8, MACSEC_OFFLOAD_MAX),
  };
  
-+static int validate_cipher_suite(const struct nlattr *attr,
-+				 struct netlink_ext_ack *extack);
- static const struct nla_policy macsec_rtnl_policy[IFLA_MACSEC_MAX + 1] = {
- 	[IFLA_MACSEC_SCI] = { .type = NLA_U64 },
- 	[IFLA_MACSEC_PORT] = { .type = NLA_U16 },
- 	[IFLA_MACSEC_ICV_LEN] = NLA_POLICY_RANGE(NLA_U8, MACSEC_MIN_ICV_LEN, MACSEC_STD_ICV_LEN),
--	[IFLA_MACSEC_CIPHER_SUITE] = { .type = NLA_U64 },
-+	[IFLA_MACSEC_CIPHER_SUITE] = NLA_POLICY_VALIDATE_FN(NLA_U64, validate_cipher_suite),
- 	[IFLA_MACSEC_WINDOW] = { .type = NLA_U32 },
- 	[IFLA_MACSEC_ENCODING_SA] = { .type = NLA_U8 },
- 	[IFLA_MACSEC_ENCRYPT] = { .type = NLA_U8 },
-@@ -4225,10 +4227,24 @@ static int macsec_newlink(struct net_device *dev,
- 	return err;
- }
+@@ -4288,10 +4288,6 @@ static int macsec_validate_attr(struct nlattr *tb[], struct nlattr *data[],
+ 	if ((sci && (scb || es)) || (scb && es))
+ 		return -EINVAL;
  
-+static int validate_cipher_suite(const struct nlattr *attr,
-+				 struct netlink_ext_ack *extack)
-+{
-+	switch (nla_get_u64(attr)) {
-+	case MACSEC_CIPHER_ID_GCM_AES_128:
-+	case MACSEC_CIPHER_ID_GCM_AES_256:
-+	case MACSEC_CIPHER_ID_GCM_AES_XPN_128:
-+	case MACSEC_CIPHER_ID_GCM_AES_XPN_256:
-+	case MACSEC_DEFAULT_CIPHER_ID:
-+		return 0;
-+	default:
-+		return -EINVAL;
-+	}
-+}
-+
- static int macsec_validate_attr(struct nlattr *tb[], struct nlattr *data[],
- 				struct netlink_ext_ack *extack)
- {
--	u64 csid = MACSEC_DEFAULT_CIPHER_ID;
- 	u8 icv_len = MACSEC_DEFAULT_ICV_LEN;
- 	int flag;
- 	bool es, scb, sci;
-@@ -4236,9 +4252,6 @@ static int macsec_validate_attr(struct nlattr *tb[], struct nlattr *data[],
- 	if (!data)
- 		return 0;
- 
--	if (data[IFLA_MACSEC_CIPHER_SUITE])
--		csid = nla_get_u64(data[IFLA_MACSEC_CIPHER_SUITE]);
--
- 	if (data[IFLA_MACSEC_ICV_LEN]) {
- 		icv_len = nla_get_u8(data[IFLA_MACSEC_ICV_LEN]);
- 		if (icv_len != MACSEC_DEFAULT_ICV_LEN) {
-@@ -4254,17 +4267,6 @@ static int macsec_validate_attr(struct nlattr *tb[], struct nlattr *data[],
- 		}
- 	}
- 
--	switch (csid) {
--	case MACSEC_CIPHER_ID_GCM_AES_128:
--	case MACSEC_CIPHER_ID_GCM_AES_256:
--	case MACSEC_CIPHER_ID_GCM_AES_XPN_128:
--	case MACSEC_CIPHER_ID_GCM_AES_XPN_256:
--	case MACSEC_DEFAULT_CIPHER_ID:
--		break;
--	default:
+-	if (data[IFLA_MACSEC_VALIDATION] &&
+-	    nla_get_u8(data[IFLA_MACSEC_VALIDATION]) > MACSEC_VALIDATE_MAX)
 -		return -EINVAL;
--	}
 -
- 	if (data[IFLA_MACSEC_ENCODING_SA]) {
- 		if (nla_get_u8(data[IFLA_MACSEC_ENCODING_SA]) >= MACSEC_NUM_AN)
- 			return -EINVAL;
+ 	if ((data[IFLA_MACSEC_REPLAY_PROTECT] &&
+ 	     nla_get_u8(data[IFLA_MACSEC_REPLAY_PROTECT])) &&
+ 	    !data[IFLA_MACSEC_WINDOW])
 -- 
 2.50.0
 
