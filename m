@@ -1,307 +1,318 @@
-Return-Path: <netdev+bounces-217067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17275B373E2
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 22:32:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF553B373E5
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 22:32:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A24A1BA4416
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 20:32:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 788D83637DC
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 20:32:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BE1A221265;
-	Tue, 26 Aug 2025 20:32:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6761728980F;
+	Tue, 26 Aug 2025 20:32:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=openai.com header.i=@openai.com header.b="JvdZBeYy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EtQiRqCl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 634D9366
-	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 20:31:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756240320; cv=none; b=I5fUY75Vay8F50KXJJnHX/qrcGS2Q4JxGa2WKGSEX59XL3ohRUC0YQQgpB2tlK19Fwro+S0vsLGBX0xRfKzYuckYcvFUqouJr/hzpOH4uh1kWT0mG54UN8jseYuRKsqMyyNyPSM8LNsmyhC9hAEuna7RJtlzPGPXEgbx0fr2U2A=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756240320; c=relaxed/simple;
-	bh=fNVrdOY5HyQqKeF3cwlpJjIRSB0zwEDboNJzdlzXVzk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=POFauJH2AHYs3cB2CFCqORw1WV8qh876kjDb+Dg0WW6dKBSmpkaYL2GoADbAV4dJ8gTlx2avv6bmgcBTeY9ekp0IV9iWERL4mAya/AJte+/lBtDIUeg6+N9utoGHpVWdu4KcFqpKAkyYKCaG8+UJ6l1jwIH4FMMRjPyW4WcgSWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=openai.com; spf=pass smtp.mailfrom=openai.com; dkim=pass (1024-bit key) header.d=openai.com header.i=@openai.com header.b=JvdZBeYy; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=openai.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openai.com
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-333f7ebc44dso3174221fa.0
-        for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 13:31:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openai.com; s=google; t=1756240316; x=1756845116; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1Va1n1gV/MLT4QqnP3ruFE6lhI0hoKBLxprKjH74yr4=;
-        b=JvdZBeYyrx8a+3+JKDsrhEoN7LNWMeA53E+PVaI8ueh136ZYAi9HE3CMrhMEjKxKmL
-         KXl+SBrf1gF13D7ciGef6O/b6UPvlTQRZz2GOGfYhW+NYeN48pm6ZE5q5mlSyThol6WC
-         z6zDDQp/1wkQpwIYcuHieXtXB8nqrBGSUg9w0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756240316; x=1756845116;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1Va1n1gV/MLT4QqnP3ruFE6lhI0hoKBLxprKjH74yr4=;
-        b=nUyXa14nrwvslIrM+yRlHEO//vddJpY4T6lWl51XWuJxI0oNB9OPx/kI59RY8ggX04
-         NuR6vu5bj5jd02znz4RmSJ9FeP2iVqqNjAt6gEVVaB9cwhjBCWAkUc5mjeFmBnY0JfT+
-         dX2NrXA6vF+lP7rbFwSK5F6zlTu8h4lcqmD/0nF5Wzgf4rMOvaAXP/9rDBMh0/F0j1Rb
-         MbZzmPN8Dddgm6nT+Dhoo2RiZ2UH4Mq0TwNloxCksIVvNBYuduWvzcqLSpE8Mm5+VP03
-         Q3XWsElBo6uDaJFCPSzfgDCbsewF12J3XojZgr+UrlgNzyZzz7C2ZgqeF0FU5su0aA8k
-         VlgA==
-X-Forwarded-Encrypted: i=1; AJvYcCV0+ZBQPOGRQ7OQOtor8Bc196xbWSLq27WuZHssKdH/KMDOuHRT2+JJgGqoVOn93PguwNVoj7E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyA4TTMN/tDjZPeIOoPi0QDco2FPoJmYDHNuwAx2oMh6okH/yHr
-	Zk7cHszMWrQwQ/hKvNVhjb/WtvlHTVQwPA8FURC3roppGt5vnx3EmylcA0n5YIBkgBkrzj9THIU
-	9YgLDQI6PkiPnfqhs7U1o31FllIGXO4dQqthcimxLAw==
-X-Gm-Gg: ASbGncvbUwuIfxBl8d4lTT1qjC+LwII6wPYclnHV0H731oY+pa5B52kL7XTrbiSFRIw
-	ESoAMg8Whvap/Yc89bcF2VE2xCnifSyJu15IuAHtrXPbgwxs8xt2GrchBjW3ArBY6zQ6WITvDfZ
-	m9UhfqlWDb7BCAlqtFbnDu2NZH+Jy2wl8YcW94ogaXPCEdZuITh2ntL8iYCITsM8n5uTQYKv0+t
-	786nvgfQDcrhFWjGGLQzDRk32//xpXGjCnNwmPwGzf27ga+yiBONu4=
-X-Google-Smtp-Source: AGHT+IHjuWUItN7jLMA8SQKOzEzYHXroZMef9H8zmej/tCFSWQwK7Psol/oNTl7eZnooCQY3DbPxDhnc4MxpJ27+l9A=
-X-Received: by 2002:a05:651c:31c2:b0:329:1550:1446 with SMTP id
- 38308e7fff4ca-3368b720e58mr5951491fa.0.1756240316457; Tue, 26 Aug 2025
- 13:31:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17FD627703A;
+	Tue, 26 Aug 2025 20:32:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756240365; cv=fail; b=HxQs19csCcvEWUjL7MGkt0q7k73w7nZKgvFBy293FOP+ApWAatGYGGqGFJP7wl4KrrcSqrYqrjAYjrf9UonTZHnugwtZFgVExkjlO2crWJPXSja/W5GxKDLR2XbTjxIXeAu+v5bvQuClZ1s1r8Q9BhNfiUdxFreqJcROQkFGKIA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756240365; c=relaxed/simple;
+	bh=PglwnPquXkcDmkkdO+Z9bMcP9Qovz4XxcvrEThjSVj0=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=O02I81ZCgG/hFkuAzuG9EF1Nz2oY8QqhArx0vQS5l0cFcsA3QLrT48h8ljlPJtccjvNWiohMVWZzdEGujkk2lb+5Hzispia69aX9XSzpbY9KcDzFRcTp70hjwfv1ornxx7JEG2/XclZaixVapSDc9J7/ZtCZ9nbpQfW58t1znEY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EtQiRqCl; arc=fail smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756240363; x=1787776363;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=PglwnPquXkcDmkkdO+Z9bMcP9Qovz4XxcvrEThjSVj0=;
+  b=EtQiRqClhyJPNm8BAefUwGM5WV6dh6yBvCdmPahXQkiU2mga9We3B0xJ
+   km7YqI8SekLQr9bzgB6C7Ydo2yQmlY86Gaf/GBu3m9QvwiXuKy7FQxNUv
+   yAsudDyFW+AUr1cPMX5inoYOBEC50OFfG2rlLEl2zGU1bSESMr2iJ7u6k
+   Serci7W7V210f/rQPsV8YSW+ppb8J9XnzbeMKrEtckbnSWGrLjCIu3Fkx
+   slBBBkSxIej06ok5teJd9WpqHyhWz34LQqP5LuKOm+VMWGGpPHhTx18Ox
+   FytD8DK1S6CXDPKq3JGamFEvvMq7byBS/42nlJnNhqgSMPRIYYEj8RHiL
+   g==;
+X-CSE-ConnectionGUID: O1lsgjMETnWwCErAAXOjPw==
+X-CSE-MsgGUID: SIb9BqqwRHKp1xGnfOa0TA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11534"; a="57691585"
+X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
+   d="scan'208";a="57691585"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2025 13:32:41 -0700
+X-CSE-ConnectionGUID: UC8+EUT7RI661PiAM0p+zQ==
+X-CSE-MsgGUID: I+WJ3kXgTAStyhjPNhEQRw==
+X-ExtLoop1: 1
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2025 13:32:41 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Tue, 26 Aug 2025 13:32:40 -0700
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Tue, 26 Aug 2025 13:32:40 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (40.107.223.68)
+ by edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Tue, 26 Aug 2025 13:32:40 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=TyrxMvsdFb3u+UT26KxJ89qw3R9HrA7tFFi+DmLS/OObgTYjlhvhE6UvWRlMepVZTb01x4crpdftbmyW3n3F4ecmWp/wcQnUFJxXlc63HIo1coab22zqET61c4KZpbA5PMCX+MVRX3+MzUYkGOVSddVsHPj2IW2ckNOGE1u13D1S4q3U8MTfWdLTGBmDZ1NsXhnQ7n9+iFantRTwDUcf9NY9BiZPs6GDGHRGLtLPOyRvSTByXPvLUg/mWrjWKXtdLkkZ9kn2PJXhzZbi5YjTXiszYwa6xtGkreAXU3LWMdZzDaydV/OiEKAn1oVJ6JKVvi5npu7TH+oDqnQjLF87Xw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mhgk0wSAQ4xBmp/G1cSa2mMKl/E0HU5CFSEWSCxTjRU=;
+ b=TwlGCEzn7WFASpkMRE3H5lOzAfi1QiwY3n4xEDF7Wx3VjdMqMbuQN3/DiSItTgB+PEl5MnjgZfxreqd8bOYOcp1Jp32keCpAImPUwjnZd0CsuDVumAsM96tq8fQh3igN4Zfa7fGpMZi3soSV4gq7o6ru8BW1k2DceKF41Wy6yPco15ob0BdAkUQwHx9FU2wci5PeoNgFBYIl4F3CKVMUxSdylJS0rQnCQGXYdBuYGfpmcA41FpFpwPgeTtPUDpno+AdsOJUva7T2XntOQ7Zs9yxsxmfzDUAGvE0Co72OHaIfaKYb/Q+W2iY3lSFi7Q+HIz8VsLDIr0K+FKAjUctKxw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by DM4PR11MB6191.namprd11.prod.outlook.com (2603:10b6:8:ac::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.14; Tue, 26 Aug
+ 2025 20:32:39 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.9052.019; Tue, 26 Aug 2025
+ 20:32:39 +0000
+Message-ID: <f94db328-fe7a-44b4-8fd9-bda904bd9540@intel.com>
+Date: Tue, 26 Aug 2025 22:32:33 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v1] ice: add support for unmanaged dpll on E830
+ NIC
+To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Aleksandr Loktionov
+	<aleksandr.loktionov@intel.com>
+CC: <netdev@vger.kernel.org>, <anthony.l.nguyen@intel.com>,
+	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>
+References: <20250826153118.2129807-1-arkadiusz.kubalewski@intel.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <20250826153118.2129807-1-arkadiusz.kubalewski@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DB3PR06CA0029.eurprd06.prod.outlook.com (2603:10a6:8:1::42)
+ To MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250825-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v3-0-5527e9eb6efc@openai.com>
- <20250825-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v3-2-5527e9eb6efc@openai.com>
- <CANn89iJ5brG-tSdyEPYH67BL1rkU5CKfvUO4Jc03twfVFKFPqQ@mail.gmail.com>
-In-Reply-To: <CANn89iJ5brG-tSdyEPYH67BL1rkU5CKfvUO4Jc03twfVFKFPqQ@mail.gmail.com>
-From: Christoph Paasch <cpaasch@openai.com>
-Date: Tue, 26 Aug 2025 13:31:44 -0700
-X-Gm-Features: Ac12FXzJ_jAqqOuphOMKptwcKZJmM02rSAIzsiVI-7ZjS3MJatM0p50mEOvd67Q
-Message-ID: <CADg4-L9GdJUVcGBoR3+jAt5QsSEwtiQptx2KY7UF8ga1yA7SWQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 2/2] net/mlx5: Avoid copying payload to the
- skb's linear part
-To: Eric Dumazet <edumazet@google.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
-	Mark Bloch <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, Gal Pressman <gal@nvidia.com>, 
-	Dragos Tatulea <dtatulea@nvidia.com>, linux-rdma@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|DM4PR11MB6191:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8b42fe4c-44d4-41e4-cc42-08dde4dfb30b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?S2NySzJCcktIeXdmSXM2OWtUWU82MFNzdkhBL3BPQ3ZFTTBLZG9CbU8wYVhG?=
+ =?utf-8?B?VGNRbE5LVXMzOGlNZ0h2NEM4NVBSRWtWUXlqREt5SFRNQWRqcE1Xd3I1TEk4?=
+ =?utf-8?B?K0NxWFprSHFqOUZOd01HOE1oOXVmbm1SUitaL2NudnN2S2luMndVUHZaUHdB?=
+ =?utf-8?B?QjYraUxjM3FxbzBSN3kxcHlhTzgzNiswWWx1S2pYN2R0Z3hGUDFYVFJDL2s1?=
+ =?utf-8?B?WDFDOTh2VzN5WXZNbVluMTBQbzVuMzQzZElzKzhNL3l5MTBiMDlEUzlDMytj?=
+ =?utf-8?B?YmlnV2g2TUxlR00zaXlQUHJidmViSDlNRjFHdS9YUWJ4NitIa2xYNkFuNTdx?=
+ =?utf-8?B?MTU0TldrVThyTDdDOWd0TkVEbm9CbnY2Z0NObCt1R3o4dkJyL1Q2UENVcVNR?=
+ =?utf-8?B?NFZ2STJqQWNMV09DYkNBQzFYY0pwUVFaNVBQWTQ2MVY2WTY0SHNqZ3hldjNC?=
+ =?utf-8?B?aG81ZnBZV3ZMTUhnRWUrZVNPSGVUVTdoaHRWQTBkUGcwb0dQTjY5bWZvMGpz?=
+ =?utf-8?B?OSszMzNsSVk4Q21PVjhZdlRuMzVCTWdCNWRuK0pVWlJGZ1h2aUhQN2pmSjdP?=
+ =?utf-8?B?Tnp5MU9waGdibHIzMTI0Z2FFVTQrSHR1eHNlQmNYYUFiVnk0VnN2M1RKSEZE?=
+ =?utf-8?B?UjZ1cWFzV2pNU1M5YzlBNzI5L09VSnFSSnpZMG1jSnBFQTdXdDNZQmFMU0pH?=
+ =?utf-8?B?RE9wL0YrUHdvb2JQc1JXbE5GaXdkOVJtZEdwTUFkaXFPQlVhd0F2SWNpZzcz?=
+ =?utf-8?B?ZGJNWksrUkwrYXRTZ2YxY2JSVSthQmU4b0V0RDVXZmE2Y1hla1ZZYTJYMDV6?=
+ =?utf-8?B?cTlUQXdGT1I4UG80eWdXS05ZUE4rMUtBVnN6aXJqOFBqM3B1d2lQd1dUUDh6?=
+ =?utf-8?B?aGQ0c1pQOVUvMWw5c05HQmZ1SFJIQ1V4QjRESENlVUw4RmxoK1Zid3NWcWVi?=
+ =?utf-8?B?QmhCOHFPSFVKTEMzTEhsYzRMdXRNc1RHZFhabTNYSFNqN3FMemM0QklsVUNj?=
+ =?utf-8?B?ZjU5S2dPbHAvS2lZUTFxb1NySDhncEFTcFphenRWcXIwd0FWZ01ta3hTMUF5?=
+ =?utf-8?B?dFA4ZHJpeGNZSWowR2daWURWWmN2Q21ZYWpWMi9VTnc4TUUyVW9PWXY2TVlQ?=
+ =?utf-8?B?SlpoRmMrZUNxUnBVOUp6ei9aVENudjZGZzB5ZHVEWFZyOFNvbmNCN29mUlRB?=
+ =?utf-8?B?L21uMVN4OHF3bm4wVDZ1V3JGZ0JuRnhCWk0vL3g4KzdNMDd2NVg0MW50QkY1?=
+ =?utf-8?B?WnAwdkdqWXMzY2lES2JUMzQrM2UyL21haGZlRlMxL1R6TEc3bFhhMG5FVjNV?=
+ =?utf-8?B?NjlVd2gwZjVvWUFXZzR5VlNIYU5xSEpBYnpUS1gxOUpweG5NY2h3WjZSb28x?=
+ =?utf-8?B?dnpBWDNWZkNDbWphZDJxb21jdnA5SEttZ0c5b1R4L3cvNkg0Q1lWcVVwZklI?=
+ =?utf-8?B?WkFIV1pwSW1KQlFMSTR4akJEZ2szM2sxY252K00zbjVOU3lCaWUyRHE4NU1O?=
+ =?utf-8?B?WjI4SGx0MWcxZWdieTQxLzMvVmNaUHhHbDhDeHpVcmx6bmFVRDdLbkRSS3Ny?=
+ =?utf-8?B?cDU1enJBK2hyR2p4ckhmcDQzQzdqUlNTYkxRa3hySktMeUtseDJlZEd4ZmFu?=
+ =?utf-8?B?YnJWQnlqcWRETUEyK2RxTlBvMHBIakhtOW9WVzVoNk5TYlltdXhLTXgxbU9i?=
+ =?utf-8?B?MVNneG1uWm55N0g0SW5raTF0VHNnSFBQZmdRZEpreVZBZmN2R1k5b2hoWGox?=
+ =?utf-8?B?YTJyeEh5aDFIMVRuSURmeXJ5R3dwOS9WOEJJU0hrVHhGdUNyL21JZVltZzZn?=
+ =?utf-8?B?YmRFL0ZjL1ZMMm9ic2xDOThiWnJjNWlDVmNlLzNCSlJHdS92MFJwOWo4VjZV?=
+ =?utf-8?B?RDlKaFkyTHBwZ0FiTmQ1c2w0TkprKzBDTUpmVnhBNjdnMlJSQWR5Mk1WS0dG?=
+ =?utf-8?Q?hwXrs/IDIlA=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?S0IzZEJvTCtDS3M1MVhTa1lPQzlHaFoxWVBCWTJlTlk5Wm5mREViSGVmSnJo?=
+ =?utf-8?B?Q0JtNUhxZXQ0OVdpZ2hMenpJM0JSWkpidk9UUzVDZmZFTlJ3dUlkK0FtN2JU?=
+ =?utf-8?B?VlhxQTVtYUpCcEkySUdOREx1WXprTmF1amMrTmNhSERnOVJhbWszREVhTnVx?=
+ =?utf-8?B?VXdOYUtrYWVNV3pQcWxwa2h2YkhTZkN6emZZMzQ1Q0VnTnRWcSt3YVptQm1H?=
+ =?utf-8?B?eVc0Nmw5L29BbThVVmhBNER3WnhFZkQzWjBYd0laazJyMU83c28xdVErd0ta?=
+ =?utf-8?B?TEZnVkROblEwTG9jblR2YlJVamZZM0ZqMGNCVlNodlJMUzRLT2dsRUVUZ1RJ?=
+ =?utf-8?B?Y3NZeFB4L0JGN0h0dDBlQW9kVzlpcXhxWjNRNHBrRzQ3aWdJdHgza3BaUTFM?=
+ =?utf-8?B?ZDFLdC9IbjNBSEpEaUJJV0pDaHZZMlNpMVNCemVhSWM4N09VTGQ5eWVLQmVh?=
+ =?utf-8?B?Ujl4RmVzY2VFZWZsT2ZWVnhyOUJpZTNOVXRsL0U1bVNjeUZqdnRuL3gvMzYy?=
+ =?utf-8?B?UkgzQzhGdlAxZnhBL3FPQkVpVkNqLzdORDI3STVJTk1RMDJzN29POWtobWFl?=
+ =?utf-8?B?dko1Rks2aVQ2Y0VRQWluYTBhM2FkZXpWdmdRN3c1WDR2ckJnRm1GV0RrZUU4?=
+ =?utf-8?B?V0JLZndKMmZ4YUJRK09jMVZmeFkzMGw1K2c2VVVhWEVXcFJXL2srbnBWTjBt?=
+ =?utf-8?B?YitOd1VOSFVBOHA3aXBxNHVCM3EvMW8vYXpmSHgyTEJtS25vcWlpcHRORTJT?=
+ =?utf-8?B?UEJNSk4wVGxDRVR0ZnlydERFSlNJUFZoMlpReEZrbC94ek00UkRrQjZhcHE4?=
+ =?utf-8?B?WFhCdHNlL0RMNXJyeTV6ZC9zK1dkeGUrdTBycW02UlhIeDQ0cG1QMnJKMmJs?=
+ =?utf-8?B?a25WMHBTSnRHdWwySzBLbnVVL2dhdGZYU1I2WGM1dmJLT0U3NzRzVy9Xc01G?=
+ =?utf-8?B?VFhLUGplRU5wQS9Tck1FZUtBRjdaU1lGNXBEMHdFNDduSFg3RXMrVHVGRy80?=
+ =?utf-8?B?d01hV0p4NjVTMlI2WTZrS0R6SDRFR0RkZ09vMVcxeTZaOHV4UnJ2eGZkUnRQ?=
+ =?utf-8?B?dnpCQUYwem1OcEZZbU9udG9hSFdiSjB3RlZSaG1wYWlrOHNSd29XVFl6RW1i?=
+ =?utf-8?B?NEszcjA3YmVJVFUrLzdCOTlkL3RzR2tRWkFiYm0rbC9zUEwrajNSM0I1Uzh3?=
+ =?utf-8?B?Y2FuTDZsd3RManc5dVNwbS94d00yUjVIblY0R0VORU9rVkVxdzJXaWRGajM0?=
+ =?utf-8?B?eXN6KzdDdEwwbmZEYWdzUXVBS2FvSFhtazlYdy9CWHhrUFZBVVp6TTRWellG?=
+ =?utf-8?B?TEZKU0dpMEkvWTFXMUY0eXEvbTRIYUFzb1VURWJRMmlRSENsdHgzRUtiYlIx?=
+ =?utf-8?B?aWU2cnNxTW9hQWU4cldXcGkzNGdQR3grSEpxdWxVUXhkaCtacDRmMDQrM3FR?=
+ =?utf-8?B?Qy8xVDdEdlFid1BKeGpEZ1FXdkVQbTRKYTc5WHpkTEF5NmpHOU44VkF2dFJR?=
+ =?utf-8?B?N2liYXlxQTB5Yk1jR1pIY2hlZWZ3T0FXaXJlank4MW5BNElwbTV6V3puMEhl?=
+ =?utf-8?B?VGlhVTVWVGFaOGovd2hEamIvN1FsTXRXaGVKWnAwYWFnTEZLUDR0YndYK0Vh?=
+ =?utf-8?B?ZVFLaS9Ea0t0aDR4WW81cVNCaUxLeGZmQWNkUU11UlluWW5kMzRtT3plZGVF?=
+ =?utf-8?B?emhvMk1pYXlhSDIrNnFiNUtOSVYwSmptNW9IaEdSY0Y2YlcrekR3R3d3V3Fw?=
+ =?utf-8?B?Umk1NmZUWjh2TlN3UmJENmQweEdIR011MFc0Y2xZRlRvSWdVZTVqcG9oRzRz?=
+ =?utf-8?B?dngxdWY3SHFBSm5xSHFFRzFyOXM4VWkvelFrbWxoQVlvT1lBQTdUZzUzQkli?=
+ =?utf-8?B?amJ4ZmY5a1NWNE9GMkZaZjNDZHJxckVYU2FCNFl6OVJ4c2dxTlVrOGp3Q2Nw?=
+ =?utf-8?B?cFhMUUJXOXF2OXFXQ2ZnSTUzOGRISjJCdFgvL1JXallXMlVIYW91d3hVZzFL?=
+ =?utf-8?B?dG80VnY4MkZBTm5sTzZNODBFVFBSKzE3SDNCTUVZNTZoaGVPY01GVWFjRnp2?=
+ =?utf-8?B?NFZybFlyS3VBOTIveENQdEJNenJlcEN5dWIwcVc5YW5yOHI1MGZ0QTBHdThR?=
+ =?utf-8?B?alRVSjJDbzQxY0RYZlU3VXlUZFZsUlhObHFrM3VnbTZ4eXpZd1I4bk1MZVpj?=
+ =?utf-8?Q?uS4geKcYMm3QWInPgR5w0dE=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8b42fe4c-44d4-41e4-cc42-08dde4dfb30b
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2025 20:32:39.0252
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: eO+hMQ9sy0wLx1Rzq/26dOsoRCPFFIUx3KlXMOawf5L+EVuglCdRRVAXXjyd3sftuWuGX64TX5+puL+5sLw/j2jwJxFm5ncQ+diUzhIyVms=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6191
+X-OriginatorOrg: intel.com
 
-On Mon, Aug 25, 2025 at 11:38=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> On Mon, Aug 25, 2025 at 8:47=E2=80=AFPM Christoph Paasch via B4 Relay
-> <devnull+cpaasch.openai.com@kernel.org> wrote:
-> >
-> > From: Christoph Paasch <cpaasch@openai.com>
-> >
-> > mlx5e_skb_from_cqe_mpwrq_nonlinear() copies MLX5E_RX_MAX_HEAD (256)
-> > bytes from the page-pool to the skb's linear part. Those 256 bytes
-> > include part of the payload.
-> >
-> > When attempting to do GRO in skb_gro_receive, if headlen > data_offset
-> > (and skb->head_frag is not set), we end up aggregating packets in the
-> > frag_list.
-> >
-> > This is of course not good when we are CPU-limited. Also causes a worse
-> > skb->len/truesize ratio,...
-> >
-> > So, let's avoid copying parts of the payload to the linear part. The
-> > goal here is to err on the side of caution and prefer to copy too littl=
-e
-> > instead of copying too much (because once it has been copied over, we
-> > trigger the above described behavior in skb_gro_receive).
-> >
-> > So, we can do a rough estimate of the header-space by looking at
-> > cqe_l3/l4_hdr_type. This is now done in mlx5e_cqe_estimate_hdr_len().
-> > We always assume that TCP timestamps are present, as that's the most co=
-mmon
-> > use-case.
-> >
-> > That header-len is then used in mlx5e_skb_from_cqe_mpwrq_nonlinear for
-> > the headlen (which defines what is being copied over). We still
-> > allocate MLX5E_RX_MAX_HEAD for the skb so that if the networking stack
-> > needs to call pskb_may_pull() later on, we don't need to reallocate
-> > memory.
-> >
-> > This gives a nice throughput increase (ARM Neoverse-V2 with CX-7 NIC an=
-d
-> > LRO enabled):
-> >
-> > BEFORE:
-> > =3D=3D=3D=3D=3D=3D=3D
-> > (netserver pinned to core receiving interrupts)
-> > $ netperf -H 10.221.81.118 -T 80,9 -P 0 -l 60 -- -m 256K -M 256K
-> >  87380  16384 262144    60.01    32547.82
-> >
-> > (netserver pinned to adjacent core receiving interrupts)
-> > $ netperf -H 10.221.81.118 -T 80,10 -P 0 -l 60 -- -m 256K -M 256K
-> >  87380  16384 262144    60.00    52531.67
-> >
-> > AFTER:
-> > =3D=3D=3D=3D=3D=3D
-> > (netserver pinned to core receiving interrupts)
-> > $ netperf -H 10.221.81.118 -T 80,9 -P 0 -l 60 -- -m 256K -M 256K
-> >  87380  16384 262144    60.00    52896.06
-> >
-> > (netserver pinned to adjacent core receiving interrupts)
-> >  $ netperf -H 10.221.81.118 -T 80,10 -P 0 -l 60 -- -m 256K -M 256K
-> >  87380  16384 262144    60.00    85094.90
-> >
-> > Additional tests across a larger range of parameters w/ and w/o LRO, w/
-> > and w/o IPv6-encapsulation, different MTUs (1500, 4096, 9000), differen=
-t
-> > TCP read/write-sizes as well as UDP benchmarks, all have shown equal or
-> > better performance with this patch.
-> >
-> > Signed-off-by: Christoph Paasch <cpaasch@openai.com>
-> > ---
-> >  drivers/net/ethernet/mellanox/mlx5/core/en_rx.c | 49 +++++++++++++++++=
-+++++++-
-> >  1 file changed, 48 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/=
-net/ethernet/mellanox/mlx5/core/en_rx.c
-> > index b8c609d91d11bd315e8fb67f794a91bd37cd28c0..050f3efca34f3b8984c30f3=
-35ee43f487fef33ac 100644
-> > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> > @@ -1991,13 +1991,54 @@ mlx5e_shampo_fill_skb_data(struct sk_buff *skb,=
- struct mlx5e_rq *rq,
-> >         } while (data_bcnt);
-> >  }
-> >
-> > +static u16
-> > +mlx5e_cqe_estimate_hdr_len(const struct mlx5_cqe64 *cqe, u16 cqe_bcnt)
-> > +{
-> > +       u8 l3_type, l4_type;
-> > +       u16 hdr_len;
-> > +
-> > +       hdr_len =3D sizeof(struct ethhdr);
-> > +
-> > +       if (cqe_has_vlan(cqe))
-> > +               hdr_len +=3D VLAN_HLEN;
-> > +
-> > +       l3_type =3D get_cqe_l3_hdr_type(cqe);
-> > +       if (l3_type =3D=3D CQE_L3_HDR_TYPE_IPV4) {
-> > +               hdr_len +=3D sizeof(struct iphdr);
-> > +       } else if (l3_type =3D=3D CQE_L3_HDR_TYPE_IPV6) {
-> > +               hdr_len +=3D sizeof(struct ipv6hdr);
-> > +       } else {
-> > +               hdr_len =3D MLX5E_RX_MAX_HEAD;
-> > +               goto out;
-> > +       }
-> > +
-> > +       l4_type =3D get_cqe_l4_hdr_type(cqe);
-> > +       if (l4_type =3D=3D CQE_L4_HDR_TYPE_UDP) {
-> > +               hdr_len +=3D sizeof(struct udphdr);
-> > +       } else if (l4_type & (CQE_L4_HDR_TYPE_TCP_NO_ACK |
-> > +                             CQE_L4_HDR_TYPE_TCP_ACK_NO_DATA |
-> > +                             CQE_L4_HDR_TYPE_TCP_ACK_AND_DATA)) {
-> > +               /* ACK_NO_ACK | ACK_NO_DATA | ACK_AND_DATA =3D=3D 0x7, =
-but
-> > +                * the previous condition checks for _UDP which is 0x2.
-> > +                *
-> > +                * As we know that l4_type !=3D 0x2, we can simply chec=
-k
-> > +                * if any of the bits of 0x7 is set.
-> > +                */
-> > +               hdr_len +=3D sizeof(struct tcphdr) + TCPOLEN_TSTAMP_ALI=
-GNED;
-> > +       } else {
-> > +               hdr_len =3D MLX5E_RX_MAX_HEAD;
-> > +       }
-> > +
-> > +out:
-> > +       return min3(hdr_len, cqe_bcnt, MLX5E_RX_MAX_HEAD);
-> > +}
-> > +
->
-> Hi Christoph
->
-> I wonder if you have tried to use eth_get_headlen() instead of yet
-> another dissector ?
-
-I just tried eth_get_headlen() out - and indeed, no measurable perf differe=
-nce.
-
-I will submit a new version.
+On 8/26/25 17:31, Arkadiusz Kubalewski wrote:
+> Hardware variants of E830 may support an unmanaged DPLL where the
+> configuration is hardcoded within the hardware and firmware, meaning
+> users cannot modify settings. However, users are able to check the DPLL
+> lock status and obtain configuration information through the Linux DPLL
+> subsystem.
+> 
+> Availability of 'loss of lock' health status code determines if such
+> support is available, if true, register single dpll device with 1 input
+> and 1 output and provide hardcoded/read only properties of a pin and
+> dpll device. User is only allowed to check dpll device status and receive
+> notifications on dpll lock status change.
+> 
+> When present, the DPLL device locks to an external signal provided
+> through the PCIe/OCP pin. The expected input signal is 1PPS
+> (1 Pulse Per Second) embedded on a 10MHz reference clock.
+> The DPLL produces output:
+> - for MAC (Media Access Control) & PHY (Physical Layer) clocks,
+> - 1PPS for synchronization of onboard PHC (Precision Hardware Clock) timer.
+> 
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+> ---
+>   .../device_drivers/ethernet/intel/ice.rst     |  83 +++++
+>   .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   4 +
+>   drivers/net/ethernet/intel/ice/ice_common.c   | 110 +++++++
+>   drivers/net/ethernet/intel/ice/ice_common.h   |   7 +
+>   drivers/net/ethernet/intel/ice/ice_dpll.c     | 306 ++++++++++++++++--
+>   drivers/net/ethernet/intel/ice/ice_dpll.h     |  11 +
+>   drivers/net/ethernet/intel/ice/ice_main.c     |  14 +-
+>   drivers/net/ethernet/intel/ice/ice_ptp_hw.c   |  46 +++
+>   drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |   1 +
+>   9 files changed, 560 insertions(+), 22 deletions(-)
+> 
 
 
-Christoph
+> +int ice_is_health_status_code_supported(struct ice_hw *hw, u16 code,
+> +					bool *supported)
+> +{
+> +	struct ice_aqc_health_status_elem *buff __free(kfree) = NULL;
 
->
-> I doubt you will see a performance difference.
->
-> commit cfecec56ae7c7c40f23fbdac04acee027ca3bd66
-> Author: Eric Dumazet <edumazet@google.com>
-> Date:   Fri Sep 5 18:29:45 2014 -0700
->
->     mlx4: only pull headers into skb head
->
->     Use the new fancy eth_get_headlen() to pull exactly the headers
->     into skb->head.
->
->     This speeds up GRE traffic (or more generally tunneled traffuc),
->     as GRO can aggregate up to 17 MSS per GRO packet instead of 8.
->
->     (Pulling too much data was forcing GRO to keep 2 frags per MSS)
->
->     Signed-off-by: Eric Dumazet <edumazet@google.com>
->     Cc: Amir Vadai <amirv@mellanox.com>
->     Signed-off-by: David S. Miller <davem@davemloft.net>
->
->
-> >  static struct sk_buff *
-> >  mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_rq *rq, struct mlx5e_m=
-pw_info *wi,
-> >                                    struct mlx5_cqe64 *cqe, u16 cqe_bcnt=
-, u32 head_offset,
-> >                                    u32 page_idx)
-> >  {
-> >         struct mlx5e_frag_page *frag_page =3D &wi->alloc_units.frag_pag=
-es[page_idx];
-> > -       u16 headlen =3D min_t(u16, MLX5E_RX_MAX_HEAD, cqe_bcnt);
-> >         struct mlx5e_frag_page *head_page =3D frag_page;
-> >         struct mlx5e_xdp_buff *mxbuf =3D &rq->mxbuf;
-> >         u32 frag_offset    =3D head_offset;
-> > @@ -2009,6 +2050,7 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_r=
-q *rq, struct mlx5e_mpw_info *w
-> >         u32 linear_frame_sz;
-> >         u16 linear_data_len;
-> >         u16 linear_hr;
-> > +       u16 headlen;
-> >         void *va;
-> >
-> >         prog =3D rcu_dereference(rq->xdp_prog);
-> > @@ -2039,6 +2081,8 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_r=
-q *rq, struct mlx5e_mpw_info *w
-> >                 net_prefetchw(va); /* xdp_frame data area */
-> >                 net_prefetchw(skb->data);
-> >
-> > +               headlen =3D mlx5e_cqe_estimate_hdr_len(cqe, cqe_bcnt);
-> > +
-> >                 frag_offset +=3D headlen;
-> >                 byte_cnt -=3D headlen;
-> >                 linear_hr =3D skb_headroom(skb);
-> > @@ -2115,6 +2159,9 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_r=
-q *rq, struct mlx5e_mpw_info *w
-> >                                 pagep->frags++;
-> >                         while (++pagep < frag_page);
-> >                 }
-> > +
-> > +               headlen =3D mlx5e_cqe_estimate_hdr_len(cqe, cqe_bcnt);
-> > +
-> >                 __pskb_pull_tail(skb, headlen);
-> >         } else {
-> >                 dma_addr_t addr;
-> >
-> > --
-> > 2.50.1
-> >
-> >
+observation: netdev maintainers don't like __free
+
+> +	const int BUFF_SIZE = ICE_AQC_HEALTH_STATUS_CODE_NUM;
+> +	int ret;
+> +
+> +	*supported = false;
+
+it's best to don't change output pointers on error
+
+> +
+> +	buff = kcalloc(BUFF_SIZE, sizeof(*buff), GFP_KERNEL);
+> +	if (!buff)
+> +		return -ENOMEM;
+> +	ret = ice_aq_get_health_status_supported(hw, buff, BUFF_SIZE);
+> +	if (ret)
+> +		return ret;
+> +	for (int i = 0; i < BUFF_SIZE && buff[i].health_status_code; i++)
+> +		if (le16_to_cpu(buff[i].health_status_code) == code) {
+> +			*supported = true;
+
+so, this line should be enough
+
+> +			break;
+> +		}
+> +
+> +	return 0;
+> +}
+> +
+> +/**
+> + * ice_get_last_health_status_code - get last health status for given code
+> + * @hw: pointer to the hardware structure
+> + * @out: pointer to the health status struct to be filled
+> + * @code: health status code to check
+> + *
+> + * Return: 0 on success, negative error code otherwise
+> + */
+> +int ice_get_last_health_status_code(struct ice_hw *hw,
+> +				    struct ice_aqc_health_status_elem *out,
+> +				    u16 code)
+> +{
+> +	struct ice_aqc_health_status_elem *buff __free(kfree) = NULL;
+> +	const int BUFF_SIZE = ICE_AQC_HEALTH_STATUS_CODE_NUM;
+> +	int last_status = -1, ret;
+
+nit: variables with initial value set should be on the end of given
+declaration line (here @ret should be first)
+
+> +
+> +	buff = kcalloc(BUFF_SIZE, sizeof(*buff), GFP_KERNEL);
+> +	if (!buff)
+> +		return -ENOMEM;
+> +	ret = ice_aq_get_health_status(hw, buff, BUFF_SIZE);
+> +	if (ret)
+> +		return ret;
+> +	for (int i = 0; i < BUFF_SIZE && buff[i].health_status_code; i++)
+> +		if (le16_to_cpu(buff[i].health_status_code) == code)
+> +			last_status = i;
+> +
+> +	if (last_status >= 0 && last_status < BUFF_SIZE)
+
+second part of the contidion is always true
+
+> +		memcpy(out, &buff[last_status], sizeof(*out));
+> +	else
+> +		memset(out, 0, sizeof(*out));
+
+weird, but let it be
+
+> +
+> +	return ret;
+> +}
 
