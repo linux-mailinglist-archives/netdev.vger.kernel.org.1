@@ -1,674 +1,235 @@
-Return-Path: <netdev+bounces-216954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AA9AB36750
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 16:05:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04325B3668A
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 15:58:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 989EA8E5CA7
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 13:53:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3C599B6151A
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 13:56:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92A6A352FE1;
-	Tue, 26 Aug 2025 13:51:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B767350D64;
+	Tue, 26 Aug 2025 13:56:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UG5Wugfz"
+	dkim=pass (2048-bit key) header.d=gmx.de header.i=efault@gmx.de header.b="WRuQxmhr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1777225390;
-	Tue, 26 Aug 2025 13:51:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C9682B9A7;
+	Tue, 26 Aug 2025 13:56:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756216301; cv=none; b=P2A3D/UAYMz44d+Gvl6F9zdopUuODNvSNSkWrTYM4A1NidEJs/KcY9/i96fbHbLUqps982veqqf6gkiJH66oOocKIHoHJEwRSjKTOF53ch/4dauV5YMvRZ+roj0Fy9bn04N9VMnoIJv6C/IHREe/u07Z/d0y5zuRXhNv0Vg2S/g=
+	t=1756216582; cv=none; b=Mcz8JEZSOeJs9AIIgzJhRJhJ4GrUMUogb9SQdLjinBefC3DZrHJ/WQkNBTrH+tzC7e4kWtTDnfJ0QIAT0b7QqdN5fVOQt+kgFDKtHUZUrdKWHXBvYdPSKDFy9HZBOqcMXrFz00mCQy5C6lwypmShUzBtaadIrCvPUxCcNY1JZ0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756216301; c=relaxed/simple;
-	bh=SIw362ifD+ufSkuQj8iP4FiWJdIeDGR76AzxDKtwiCw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nxRaBAni5DCL2D1FeT4Q/W2T4WrDnCSydcNXBDMsEhNgXNX1bgWfDHdXQlp8ateXJ5mRuztHYY0M8ckw54m/KoxohkqN45bxL8rezk0SYg3Pjpt4GQoyoR14m+QQdBDNTkooeHIKOHmgMvvvRHusVD+joAv3Kpv+UMuXp1YKLJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UG5Wugfz; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-45a1b05a59dso5410845e9.1;
-        Tue, 26 Aug 2025 06:51:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756216294; x=1756821094; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Ywd60c3QRi+wtoh5EX+H9Sap8GLDH/kDWZe0fMofRPA=;
-        b=UG5WugfzAH1ND5Z34AXj7BGfzuthQmOc+ZCDJNzdjrjR9nqb4nB9Xfy1A9NmvFtFUX
-         2H9n/Z9Q72UTDs1LHHY2A689o7askYimeV/s+5EABnvOSyKtLuH6fk3Ti1yCbYS/RXsW
-         JwNSu5P+HztNRBv/q5xdlXy9ZzGo9c7EneCVvLjCMAdYZgWEGXmgCqu5n3U+5iL30N7r
-         8W19pXytjA+peg2pZpCRUDWPfb6YlwLcR3P+IMKaVQRVe/I0l87w6ZAau88NdNSQsTtm
-         v57UIYjUqFxUGDfhk0bR8+/TVZLplQs66XJFS0Ux3ba+VYWzADvK+bWr0zkV/86TA58N
-         cZWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756216294; x=1756821094;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ywd60c3QRi+wtoh5EX+H9Sap8GLDH/kDWZe0fMofRPA=;
-        b=NCIaSj0B7bvaEuSrDHDe8Fvfzr04AsseuTfm7VEhQtfjQnJq2dCpX6HDxcalq0189t
-         rTa05RSQB6Zg+2Kv2O8XhLzyQyCs+oMx4Zqg2Sj+pu81Qig2SEh78hLqoxlym4GuqHrN
-         xuIRZyvqe3w9EuulJuq/9y0R55fJwiEQbLl1QuQv2/Y44U5mxxzUPlpPDejvEvyKkTfA
-         WPjqyaY/DqWF2gzSGeEyp5knGFuvfrhjQbC8iLvmCQlE0nQdw/JmjCuQjzKHhoUbh7Ch
-         9lIfoZtwBHJ2PwWjJ486SDCNkM+EO9jzlzba8sGIEqx3oVByhMFuUTEVnxWMt9IEaqnb
-         uqPA==
-X-Forwarded-Encrypted: i=1; AJvYcCXS26C0yIiVJbgRzd9EPrE4wxnOHh0T6WTegrsKJ7RrwxX8qEWA5G9KC54wQ2h6bWeK44vmu2yoyb6OiR96@vger.kernel.org, AJvYcCXxyAJnkvYDbqme0P3idFSVYsN81d8qZJpuL8UrrZFiaIC5+B9/iwDagNBrnVmNawPkeKr8gRnGzJe+@vger.kernel.org
-X-Gm-Message-State: AOJu0YwyJuGfb6nQqeUwIElPK+6zYLM3s1HIfBrJqnXC1HadT8H4AedR
-	CtiZV7SeV6Rh83jmtiloxFRVlptAWde3buuoHyUpyZlVzaB9n3ALw3fi
-X-Gm-Gg: ASbGncvLzf2o6Ac9mvB8wGHGkRNZfhh4FapIGTyQSeELCmwK0uva/KqshuHbLYLDEaM
-	RDOd4NTHkt+i2lR1o0wFZqje4F8DZV7kpsdsFoiYzJx35NlhpeiGFizwSmuY7D2TuPrFKcY11US
-	DiM0dlSDHWK854mR0ZmRgGcZads+hapqfZ0eI9ZYpHWku/IwADJ+0IxcoQLRZ/+yUTTy7EDYVVO
-	AYs0cxVE3HElNHM1IR5xgdvfa4ABikKhdtllqmuYH4Bpg/PiWOKCXTYgRc8rQxO7Fc63WiYJAYk
-	y9CaxSP2aMGSR+7Ya8zkIMXGtwmgibVnhRQdoHqZs7sBfn3FbI99H4Jm00N6NNFaFuyfx5vQfQk
-	N34g0BdzS1QQc1rP+hrA7KH9v
-X-Google-Smtp-Source: AGHT+IE2CbHpFJdF5EwM7Jkrq/EmxXnw4LDO+wdIGj4AKnAGlKfdOuZcCP+ZNPQCxcXaZQX6jhB9kQ==
-X-Received: by 2002:a05:600c:4715:b0:459:ddd6:1cbf with SMTP id 5b1f17b1804b1-45b517396aemr64705215e9.0.1756216293541;
-        Tue, 26 Aug 2025 06:51:33 -0700 (PDT)
-Received: from skbuf ([2a02:2f04:d005:3b00:63b:fbf0:5e17:81ec])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3c7116e1478sm16289614f8f.46.2025.08.26.06.51.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Aug 2025 06:51:32 -0700 (PDT)
-Date: Tue, 26 Aug 2025 16:51:30 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Yangfl <mmyangfl@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v6 3/3] net: dsa: yt921x: Add support for
- Motorcomm YT921x
-Message-ID: <20250826135130.fyflt62y3fjoekmg@skbuf>
-References: <20250824005116.2434998-1-mmyangfl@gmail.com>
- <20250824005116.2434998-4-mmyangfl@gmail.com>
- <20250825212357.3acgen2qezuy533y@skbuf>
- <CAAXyoMOVY7EvY9CtAphWcZrfNpz+JuUXcTf3M79FSYkbLSTvhg@mail.gmail.com>
+	s=arc-20240116; t=1756216582; c=relaxed/simple;
+	bh=Wxh9CyDqfJUe93SkJLh7S5XxhL5F9zPer4yWVfDpO+Q=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=TyPboyLC3tiUQx/wd6YFWQZS3FAALPNSnWxHqE0xHjDxfNWdPcvuTkeVXbKUQwYpk3ehTRDyRmTatlmItkIdIoQXvs+Zaw4o2/HPcEJ8GKs2czmTCRSdSGKuu+I2AQhKxzCaTGQbygCwo5Dm08RY9m+VSlRronbzJsXngyI3z5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=efault@gmx.de header.b=WRuQxmhr; arc=none smtp.client-ip=212.227.17.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
+	s=s31663417; t=1756216567; x=1756821367; i=efault@gmx.de;
+	bh=nAnjvL2palqw0IYUeTqSWpneuRn9XvKOA3DVCbCc/cE=;
+	h=X-UI-Sender-Class:Message-ID:Subject:From:To:Cc:Date:In-Reply-To:
+	 References:Content-Type:Content-Transfer-Encoding:MIME-Version:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=WRuQxmhrSLR3zrQEhb2HBoOAsQeHQfFxL0nrBYZA53dXz04R1ugzDJ54fJp1UJHE
+	 lkYH9qZFwK9/HDMp3Apaj7COXGG5Y4iShXawJOH+jdUZpNBB0fHDnvX+edecl4biU
+	 tCw3cOfQ2lU4+mz5+DfwaGX4rGVOvnMrnKxncY9M8xNZe/GHkh6RcNX00r3ppUkn9
+	 SX0Go2YZ8zFhDEmkskSIau07kORZEqfo4QpyRb5pyDWprVdFZJRI0qb/X3dIcXO73
+	 6d4ATjkOUDa13ch+dVTlMnNPmaZA2w295YIsXCtJrzWaZjEGqrOjFNIgM61sUlnkf
+	 ZHnN3CMQ1g+VtjmMGQ==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from homer.fritz.box ([185.146.50.56]) by mail.gmx.net (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1M8QS8-1uvHrr1nYO-00FyaM; Tue, 26
+ Aug 2025 15:56:07 +0200
+Message-ID: <6bc3af45969936668200657112140b78615e3873.camel@gmx.de>
+Subject: Re: netconsole: HARDIRQ-safe -> HARDIRQ-unsafe lock order warning
+From: Mike Galbraith <efault@gmx.de>
+To: Breno Leitao <leitao@debian.org>, Simon Horman <horms@kernel.org>, 
+	kuba@kernel.org, calvin@wbinvd.org
+Cc: Pavel Begunkov <asml.silence@gmail.com>, Johannes Berg
+ <johannes@sipsolutions.net>, paulmck@kernel.org, LKML
+ <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, boqun.feng@gmail.com
+Date: Tue, 26 Aug 2025 15:56:06 +0200
+In-Reply-To: <tgp5ddd2xdcvmkrhsyf2r6iav5a6ksvxk66xdw6ghur5g5ggee@cuz2o53younx>
+References: 
+	<isnqkmh36mnzm5ic5ipymltzljkxx3oxapez5asp24tivwtar2@4mx56cvxtrnh>
+	 <3dd73125-7f9b-405c-b5cd-0ab172014d00@gmail.com>
+	 <hyc64wbklq2mv77ydzfxcqdigsl33leyvebvf264n42m2f3iq5@qgn5lljc4m5y>
+	 <b2qps3uywhmjaym4mht2wpxul4yqtuuayeoq4iv4k3zf5wdgh3@tocu6c7mj4lt>
+	 <4c4ed7b836828d966bc5bf6ef4d800389ba65e77.camel@gmx.de>
+	 <otlru5nr3g2npwplvwf4vcpozgx3kbpfstl7aav6rqz2zltvcf@famr4hqkwhuv>
+	 <d1679c5809ffdc82e4546c1d7366452d9e8433f0.camel@gmx.de>
+	 <7a2b44c9e95673829f6660cc74caf0f1c2c0cffe.camel@gmx.de>
+	 <tx2ry3uwlgqenvz4fsy2hugdiq36jrtshwyo4a2jpxufeypesi@uceeo7ykvd6w>
+	 <5b509b1370d42fd0cc109fc8914272be6dcfcd54.camel@gmx.de>
+	 <tgp5ddd2xdcvmkrhsyf2r6iav5a6ksvxk66xdw6ghur5g5ggee@cuz2o53younx>
+Autocrypt: addr=efault@gmx.de;
+ keydata=mQGiBE/h0fkRBACJWa+2g5r12ej5DQZEpm0cgmzjpwc9mo6Jz7PFSkDQGeNG8wGwFzFPKQrLk1JRdqNSq37FgtFDDYlYOzVyO/6rKp0Iar2Oel4tbzlUewaYWUWTTAtJoTC0vf4p9Aybyo9wjor+XNvPehtdiPvCWdONKZuGJHKFpemjXXj7lb9ifwCg7PLKdz/VMBFlvbIEDsweR0olMykD/0uSutpvD3tcTItitX230Z849Wue3cA1wsOFD3N6uTg3GmDZDz7IZF+jJ0kKt9xL8AedZGMHPmYNWD3Hwh2gxLjendZlcakFfCizgjLZF3O7k/xIj7Hr7YqBSUj5Whkbrn06CqXSRE0oCsA/rBitUHGAPguJfgETbtDNqx8RYJA2A/9PnmyAoqH33hMYO+k8pafEgXUXwxWbhx2hlWEgwFovcBPLtukH6mMVKXS4iik9obfPEKLwW1mmz0eoHzbNE3tS1AaagHDhOqnSMGDOjogsUACZjCJEe1ET4JHZWFM7iszyolEhuHbnz2ajwLL9Ge8uJrLATreszJd57u+NhAyEW7QeTWlrZSBHYWxicmFpdGggPGVmYXVsdEBnbXguZGU+iGIEExECACIFAk/h0fkCGyMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEMYmACnGfbb41A4AnjscsLm5ep+DSi7Bv8BmmoBGTCRnAJ9oXX0KtnBDttPkgUbaiDX56Z1+crkBDQRP4dH5EAQAtYCgoXJvq8VqoleWvqcNScHLrN4LkFxfGkDdqTyQe/79rDWr8su+8TH1ATZ/k+lC6W+vg7ygrdyOK7egA5u+T/GBA1VN+KqcqGqAEZqCLvjorKVQ6mgb5FfXouSGvtsblbRMireEEhJqIQPndq3DvZbKXHVkKrUBcco4MMGDVucABAsEAKXKCwGVEVuYcM/KdT2htDpziRH4JfUn3Ts2EC6F7rXIQ4NaIA6gAvL6HdD3q
+	y6yrWaxyqUg8CnZF/J5HR+IvRK+vu85xxwSLQsrVONH0Ita1jg2nhUW7yLZer8xrhxIuYCqrMgreo5BAA3+irHy37rmqiAFZcnDnCNDtJ4sz48tiEkEGBECAAkFAk/h0fkCGwwACgkQxiYAKcZ9tvgIMQCeIcgjSxwbGiGn2q/cv8IvHf1r/DIAnivw+bGITqTU7rhgfwe07dhBoIdz
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAXyoMOVY7EvY9CtAphWcZrfNpz+JuUXcTf3M79FSYkbLSTvhg@mail.gmail.com>
+X-Provags-ID: V03:K1:9uT6Z0M9IpWj0Lsri5lbd3yJ237dOwF4ME+2CEQ267QHgUwrPTi
+ 7ZPmGHcDitxcNpgGnBuMJv0slpE02PSpsUVMhfTRoADpauspmq1dYLi/481vWDXvuYfz6RI
+ qn4cjUCtcf6aWZGDuv+phSXP71OqQ3x+E441SDl3R/sGaet2+FXNW7GBh+P3WC+AwCnTWbg
+ zRmXPqXmf0JzzdHtWv4wg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:m5LYjiNdxNw=;GBRMmTk6YtFgM08RXBxksGvIVIT
+ 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
+ twgd+lOS+np04SXhs01bbtLrkBJm
 
-On Tue, Aug 26, 2025 at 01:19:58PM +0800, Yangfl wrote:
-> On Tue, Aug 26, 2025 at 5:24 AM Vladimir Oltean <olteanv@gmail.com> wrote:
-> > > +#define YT921X_PVID_DEFAULT          1
-> >
-> > If you have a VLAN-unaware bridge with learning enabled, this will
-> > learn MAC addresses in VID 1. If you also have a VLAN-aware bridge with
-> > default_pvid 1 on a different port group, this will also learn MAC
-> > addresses in VID 1.
-> 
-> I could set PVID to 0, but I checked my mv88e6352 device and it learns
-> MAC addresses in VID 4095 when egress is untagged, so I might place a
-> PVID here anyway.
-> 
-> > Are the two FDB databases isolated, or if two stations with the same MAC
-> > address are present in both bridges, will the switch attempt to forward
-> > packets from one bridge to another (leading to packet drops)?
-> > This can happen, for example, with the MAC addresses of user ports,
-> > which all inherit the conduit's MAC address when there is no address
-> > specified in the device tree.
-> 
-> FDB isolation is not supported, but port isolation is enforced here.
+On Tue, 2025-08-26 at 05:43 -0700, Breno Leitao wrote:
+> On Fri, Aug 22, 2025 at 05:54:28AM +0200, Mike Galbraith wrote:
+> > On Thu, 2025-08-21 at 10:35 -0700, Breno Leitao wrote:
+> > > > On Thu, Aug 21, 2025 at 05:51:59AM +0200, Mike Galbraith wrote:
+> > =C2=A0
+> > > > > > --- a/drivers/net/netconsole.c
+> > > > > > +++ b/drivers/net/netconsole.c
+> > > > > > @@ -1952,12 +1952,12 @@ static void netcon_write_thread(struct =
+c
+> > > > > > =C2=A0static void netconsole_device_lock(struct console *con, u=
+nsigned long *flags)
+> > > > > > =C2=A0{
+> > > > > > =C2=A0	/* protects all the targets at the same time */
+> > > > > > -	spin_lock_irqsave(&target_list_lock, *flags);
+> > > > > > +	spin_lock(&target_list_lock);
+> > > >=20
+> > > > I personally think this target_list_lock can be moved to an RCU loc=
+k.
+> > > >=20
+> > > > If that is doable, then we probably make netconsole_device_lock()
+> > > > to a simple `rcu_read_lock()`, which would solve this problem as we=
+ll.
+> >=20
+> > The bigger issue for the nbcon patch would seem to be the seemingly
+> > required .write_atomic leading to landing here with disabled IRQs.
+>=20
+> In this case, instead of transmitting through netpoll directly in the
+> .write_atomic context, we could queue the messages for later delivery.
+>=20
+> With the current implementation, this is not straightforward unless we
+> introduce an additional message copy at the start of .write_atomic.
+>=20
+> This is where the interface between netpoll and netconsole becomes
+> problematic. Ideally, we would avoid carrying extra data into netconsole
+> and instead copy the message into an SKB and queue the SKB for
+> transmission.
+>=20
+> The core issue is that netpoll and netconsole are tightly coupled, and
+> several pieces of functionality that live in netpoll really belong in
+> netconsole. A good example is the SKB pool: that=E2=80=99s a netconsole c=
+oncept,
+> not a netpoll one. None of the other netpoll users send raw char *
+> messages. They all work directly with skbs, so, in order to achieve it,
+> we need to move the concept of skb pool into netconsole, and give
+> netconsole the management of the skb pool.
+>=20
+> > WRT my patch, seeing a hard RT crash on wired box cleanly logged with
+> > your nbcon patch applied (plus my twiddle mentioned earlier) tells me
+> > my patch has lost its original reason to exist.=C2=A0 It's relevant to =
+this
+> > thread only in that those once thought to be RT specific IRQ disable
+> > spots turned out to actually be RT agnostic wireless sore spots.
+>=20
+> Thanks. As a follow-up, I would suggest the following steps:
+>=20
+> 1) Decouple the SKB pool from netpoll and move it into netconsole
+>=20
+> =C2=A0 * This makes netconsole behave like any other netpoll user,
+> =C2=A0=C2=A0=C2=A0 interacting with netpoll by sending SKBs.
+> 	* The SKB population logic would then reside in netconsole, where it
+> 	=C2=A0 logically belongs.
+>=20
+> =C2=A0 * Enable NBCONS in netconsole, guarded by NETCONSOLE_NBCON
+> 	* In normal .write_atomic() mode, messages should be queued in
+> 	=C2=A0 a workqueue.
+> 	* If oops_in_progress is set, we bypass the queue and
+> 	=C2=A0 transmit the SKB immediately. (Maybe disabling lockdep?!).
+>=20
+> Any concern with this plan?
 
-Somehow, I fail to see how this answer addresses what I said.
+Nope, sounds like progress to me.
 
-When writing a new device driver, you have to think about FDB isolation.
-At the most basic level, that can be achieved by not reusing the same
-VLAN across multiple forwarding domains where MAC address namespace
-collisions might exist. That is all.
+From an RT perspective, the further netconsole gets from the netpoll's
+definition of acceptable IRQ holdoff, the better.  For a death rattle,
+it doesn't matter, but for mundane kernel squeaks that's a fail.
 
-There are things I don't understand in what you're trying to transmit,
-such as:
-- "I might place a PVID here anyway" - do you have the option of _not_
-having a default port PVID, for when the port is standalone? I don't
-understand the optionality of "I might".
-- "my mv88e6352 device (...) learns MAC addresses in VID 4095 when egress
-is untagged" - actually it learns in MV88E6XXX_VID_BRIDGED when under a
-VLAN-unaware bridge, not when "egress is untagged".
-
-but I strongly suggest taking a look at the selftests before you follow
-up to this part again.
-
-> > > +static int
-> > > +yt921x_dsa_port_mirror_add(struct dsa_switch *ds, int port,
-> > > +                        struct dsa_mall_mirror_tc_entry *mirror,
-> > > +                        bool ingress, struct netlink_ext_ack *extack)
-> > > +{
-> > > +     struct yt921x_priv *priv = to_yt921x_priv(ds);
-> > > +     struct device *dev = to_device(priv);
-> > > +     u32 ctrl;
-> > > +     u32 val;
-> > > +     int res;
-> > > +
-> > > +     dev_dbg(dev, "%s: port %d, ingress %d\n", __func__, port, ingress);
-> > > +
-> > > +     yt921x_smi_acquire(priv);
-> > > +     do {
-> > > +             u32 srcs;
-> > > +
-> > > +             res = yt921x_smi_read(priv, YT921X_MIRROR, &val);
-> > > +             if (res)
-> > > +                     break;
-> > > +
-> > > +             if (ingress)
-> > > +                     srcs = YT921X_MIRROR_IGR_PORTn(port);
-> > > +             else
-> > > +                     srcs = YT921X_MIRROR_EGR_PORTn(port);
-> > > +
-> > > +             ctrl = val;
-> > > +             ctrl |= srcs;
-> > > +             ctrl &= ~YT921X_MIRROR_PORT_M;
-> > > +             ctrl |= YT921X_MIRROR_PORT(mirror->to_local_port);
-> > > +             if (ctrl == val)
-> > > +                     break;
-> >
-> > yt921x_smi_update_bits() would have helped here, this is a bit hard to
-> > follow.
-> 
-> I need the original value of the register which cannot be returned by
-> yt921x_smi_update_bits(), but I could make it nicer.
-
-Some of the API functions like regmap_update_bits_base() or
-phy_modify_changed() have a way of telling the caller whether there was
-any change in the original value or not. Maybe you can draw some
-inspiration from them.
-
-> > > +
-> > > +             /* other mirror tasks & different dst port -> conflict */
-> > > +             if ((val & ~srcs & (YT921X_MIRROR_EGR_PORTS_M |
-> > > +                                 YT921X_MIRROR_IGR_PORTS_M)) != 0 &&
-> > > +                 ((ctrl ^ val) & YT921X_MIRROR_PORT_M) != 0) {
-> > > +                     res = -EEXIST;
-> >
-> > Use NL_SET_ERR_MSG_MOD(extack) to signal this.
-> >
-> > > +                     break;
-> > > +             }
-> > > +
-> > > +             res = yt921x_smi_write(priv, YT921X_MIRROR, ctrl);
-> > > +     } while (0);
-> > > +     yt921x_smi_release(priv);
-> > > +
-> > > +     return res;
-> > > +}
-> > > +
-> > > +/******** vlan ********/
-> > > +
-> > > +static int
-> > > +yt921x_vlan_filtering(struct yt921x_priv *priv, int port, bool vlan_filtering)
-> > > +{
-> > > +     struct yt921x_port *pp = &priv->ports[port];
-> > > +     u32 mask;
-> > > +     u32 ctrl;
-> > > +     int res;
-> > > +
-> > > +     res = yt921x_smi_toggle_bits(priv, YT921X_VLAN_IGR_FILTER,
-> > > +                                  YT921X_VLAN_IGR_FILTER_PORTn_EN(port),
-> > > +                                  vlan_filtering);
-> > > +     if (res)
-> > > +             return res;
-> > > +
-> > > +     mask = YT921X_PORT_VLAN_CTRL1_CVLAN_DROP_TAGGED |
-> > > +            YT921X_PORT_VLAN_CTRL1_CVLAN_DROP_UNTAGGED;
-> > > +     ctrl = 0;
-> > > +     if (vlan_filtering) {
-> > > +             if (!pp->pvid)
-> > > +                     ctrl |= YT921X_PORT_VLAN_CTRL1_CVLAN_DROP_UNTAGGED;
-> > > +             if (!pp->vids_cnt)
-> > > +                     ctrl |= YT921X_PORT_VLAN_CTRL1_CVLAN_DROP_TAGGED;
-> > > +     }
-> > > +     res = yt921x_smi_update_bits(priv, YT921X_PORTn_VLAN_CTRL1(port),
-> > > +                                  mask, ctrl);
-> > > +     if (res)
-> > > +             return res;
-> > > +
-> > > +     pp->vlan_filtering = vlan_filtering;
-> >
-> > The PVID depends on the VLAN filtering state of the port, so this
-> > function needs to update the PVID.
-> 
-> If I got it right the PVID is already set and programmed below by pvid_set().
-
-Yes, and yt921x_pvid_set() is not called from yt921x_vlan_filtering().
-Have a look at Documentation/networking/switchdev.rst section, it
-explains that the PVID configured by the bridge should only take effect
-if the port is currently VLAN-aware, which is a state that
-yt921x_vlan_filtering() changes. If the hardware PVID remains the same
-when the port is VLAN-aware and VLAN-unaware, there is probably a bug
-somewhere.
-
-> > > +     return 0;
-> > > +}
-> > > +
-> > > +/* Seems port_vlan_add() is not state transition method... */
-> >
-> > I'm not sure what's a state transition method, but .port_vlan_add() is
-> > called if and only if a VLAN is added or the flags (PVID, untagged) of
-> > an existing VLAN are changed.
-> 
-> So it's not "adding" VLANs and I cannot always pp->vids_cnt++.
-
-In theory, it's adding VLANs as long as struct switchdev_obj_port_vlan :: changed
-is false. Though, because switchdev_obj_port_vlan objects are added from
-two sources (switchdev and .ndo_vlan_rx_add_vid()), there might still be
-bugs which allow a switchdev VLAN to change an .ndo_vlan_rx_add_vid()
-VLAN and not set the "changed" flag, or vice versa. Those would be just
-bugs that need to be better sealed, though, since the goal is to not
-permit multiple sources from adding the same VLAN ID to a port. One
-would need to delete the first before adding the second.
-
-This is just for your general information. I am wondering when will your
-logic of tracking the number of VLAN IDs, and setting YT921X_PORT_VLAN_CTRL1_CVLAN_DROP_TAGGED,
-make a difference? If there is no VLAN ID configured and the port is
-VLAN-aware, won't the port drop all tagged packets without this flag set?
-It seems extra complexity with no clear benefit.
-
-> > > +static int
-> > > +yt921x_pvid_clear(struct yt921x_priv *priv, int port)
-> > > +{
-> > > +     struct yt921x_port *pp = &priv->ports[port];
-> > > +     u32 mask;
-> > > +     u32 ctrl;
-> > > +     int res;
-> > > +
-> > > +     mask = YT921X_PORT_VLAN_CTRL_CVID_M;
-> > > +     ctrl = YT921X_PORT_VLAN_CTRL_CVID(YT921X_PVID_DEFAULT);
-> > > +     res = yt921x_smi_update_bits(priv, YT921X_PORTn_VLAN_CTRL(port),
-> > > +                                  mask, ctrl);
-> > > +     if (res)
-> > > +             return res;
-> > > +
-> > > +     if (pp->vlan_filtering) {
-> > > +             mask = YT921X_PORT_VLAN_CTRL1_CVLAN_DROP_UNTAGGED;
-> > > +             res = yt921x_smi_set_bits(priv, YT921X_PORTn_VLAN_CTRL1(port),
-> > > +                                       mask);
-> > > +             if (res)
-> > > +                     return res;
-> > > +     }
-> > > +
-> > > +     pp->pvid = 0;
-> >
-> > A bit confusing that the hardware is programmed with YT921X_PVID_DEFAULT
-> > (1) but pp->pvid is 0. You might want to rename this to vlan_aware_pvid,
-> > for clarity. Though on user ports, you can always query it directly
-> > using br_vlan_get_pvid().
-> 
-> See above, if there is no consequence programming to 0.
-
-I think we're talking past each other, and my previous comment wasn't
-expressed in the clearest way.
-
-You have to decide what pp->pvid means - whether it tracks only the PVID
-from the bridge layer (as it currently does), or the PVID which the port
-is programmed with, and which will have a different value from the
-above, in the situations that the port is standalone or under a bridge
-that is currently VLAN-unaware.
-
-The bridge layer indeed will not attempt to add VID 0 or VID 4095, so
-you could use any of these values as an indication that the port has no
-bridge PVID (and should drop untagged and VID0-tagged packets). You are
-currently using pp->pvid == 0 as an indication of "no bridge PVID", and
-that is functionally fine.
-
-I suggested that you rename pp->pvid to pp->vlan_aware_pvid, in order to
-make it clearer that the two uses of the number 0 are different. It is
-valid for the hardware PVID programmed to YT921X_PORT_VLAN_CTRL_CVID to
-be 0, and it is valid for the bridge VLAN-aware PVID to be absent, but
-the two are absolutely independent and separate conditions.
-
-Whereas you are responding to this comment by saying (rephrased) "to
-solve the inconsistency, I can program YT921X_PORT_VLAN_CTRL_CVID to 0
-and that shouldn't have any consequences", but this further blurs the
-line between the two PVID concepts instead of separating them.
-
-I don't believe that when the bridge PVID gets deleted and the port is
-VLAN-aware, the port should be reconfigured to YT921X_PVID_DEFAULT.
-It should be sufficient that YT921X_PORT_VLAN_CTRL1_CVLAN_DROP_UNTAGGED
-gets set - the hardware PVID in this case can be whatever it may.
-
-> > > +     return 0;
-> > > +}
-> > > +
-> > > +/******** bridge ********/
-> > > +
-> > > +/* It's caller's responsibility to decide whether ports_mask contains cpu
-> > > + * ports
-> > > + */
-> >
-> > I don't understand this comment. What did the caller decide after all?
-> 
-> They can make a bridge without cpu ports. Of course it's never the
-> case in DSA, but it also serves as a reminder bitwise-oring your cpu
-> ports after collecting user ports.
-
-Perhaps for you it's clear, but for me it still isn't. If, as you say,
-DSA always expects the CPU port to be in the forwarding mask, then what
-decision is left in the caller's responsibility? To do what it has to do?
-
-It would be, for me, much clearer to express what you just said as:
-"The caller must make sure that the CPU port is part of the ports_mask".
-
-> > > +static int yt921x_bridge(struct yt921x_priv *priv, u16 ports_mask)
-> > > +{
-> > > +     u16 targets_mask = ports_mask & ~priv->cpu_ports_mask;
-> > > +     u32 isolated_mask;
-> > > +     u32 ctrl;
-> > > +     int res;
-> > > +
-> > > +     isolated_mask = 0;
-> > > +     for (u16 pm = targets_mask; pm ; ) {
-> > > +             struct yt921x_port *pp;
-> > > +             int port = __fls(pm);
-> > > +
-> > > +             pm &= ~BIT(port);
-> >
-> > for_each_set_bit() would be easier to follow.
-> >
-> > > +             pp = &priv->ports[port];
-> > > +
-> > > +             if (pp->isolated)
-> > > +                     isolated_mask |= BIT(port);
-> > > +     }
-> > > +
-> > > +     /* Block from non-cpu bridge ports ... */
-> > > +     for (u16 pm = targets_mask; pm ; ) {
-> > > +             struct yt921x_port *pp;
-> > > +             int port = __fls(pm);
-> > > +
-> > > +             pm &= ~BIT(port);
-> > > +             pp = &priv->ports[port];
-> > > +
-> > > +             /* to non-bridge ports */
-> > > +             ctrl = ~ports_mask;
-> > > +             /* to isolated ports when isolated */
-> > > +             if (pp->isolated)
-> > > +                     ctrl |= isolated_mask;
-> > > +             /* to itself when non-hairpin */
-> > > +             if (!pp->hairpin)
-> > > +                     ctrl |= BIT(port);
-> > > +             else
-> > > +                     ctrl &= ~BIT(port);
-> > > +
-> > > +             res = yt921x_smi_write(priv, YT921X_PORTn_ISOLATION(port),
-> > > +                                    ctrl);
-> >
-> > Doesn't this write ones outside of the YT921X_PORT_ISOLATION_BLOCKn
-> > field? I suppose there are some reserved high-order values which should
-> > be preserved when writing?
-> 
-> No, it's safe to write excessive 1s here.
-
-Still not the best practice, but ok.
-
-> > > +             if (res)
-> > > +                     return res;
-> > > +     }
-> > > +
-> > > +     for (u16 pm = targets_mask; pm ; ) {
-> > > +             struct yt921x_port *pp;
-> > > +             int port = __fls(pm);
-> > > +
-> > > +             pm &= ~BIT(port);
-> > > +             pp = &priv->ports[port];
-> > > +
-> > > +             pp->bridge_mask = ports_mask;
-> > > +     }
-> > > +
-> > > +     return 0;
-> > > +}
-> > > +
-> > > +static int yt921x_bridge_force(struct yt921x_priv *priv, u16 ports_mask)
-> >
-> > The bridge_force() function name is a bit unconventional, what does it
-> > mean?
-> >
-> > > +{
-> > > +     u16 targets_mask = ~ports_mask & (BIT(YT921X_PORT_NUM) - 1) &
-> > > +                        ~priv->cpu_ports_mask;
-> >
-> > What is the intention here? Assume you have one bridge with ports A and B,
-> > and another with ports C and D.
-> >
-> > Port D leaves the bridge, then targets_mask, the mask of ports which
-> > will become standalone, is comprised of ports A, B and D. Why? This
-> > sounds like a bug, ports A and B should remain untouched, as ports of an
-> > unrelated bridge.
-> 
-> bridge_force() does not know it's Port D/E/F... leaving the bridge.
-> 
-> Although DSA does tell us which port is leaving, we choose to rely on
-> hardware registers as much as possible, and wipe (force) configs on
-> all (non-bridge) ports. This also helps killing any unintentional port
-> leftovers if that (bug) does exist, otherwise errors would accumulate
-> until a reset is unavoidable. (Should errors emerge in bridge(),
-> bridge_force() would take care of them.)
-
-Did you understand what I said? It doesn't look like it, or I don't
-understand in which way what you said is related to it.
-
-In yt921x_bridge_force(), targets_mask holds the user ports which are
-not part of this bridge (all of them). You force them all as standalone.
-
-But in the example I gave with two bridges, you are configuring the
-ports of br0 as standalone, when an unrelated port leaves br1. According
-to my understanding of the code, that isolates the ports of br0 from
-each other, which is not what the user has asked for.
-
-> > > +/******** fdb ********/
-> > > +
-> > > +static int yt921x_fdb_wait(struct yt921x_priv *priv, u32 *valp)
-> > > +{
-> > > +     struct device *dev = to_device(priv);
-> > > +     u32 val;
-> > > +     int res;
-> > > +
-> > > +     res = yt921x_smi_read(priv, YT921X_FDB_RESULT, &val);
-> > > +     if (res)
-> > > +             return res;
-> > > +     if ((val & YT921X_FDB_RESULT_DONE) == 0) {
-> > > +             yt921x_smi_release(priv);
-> >
-> > yuck, why is it ok to release the SMI lock here? What's the point of the
-> > lock in the first place?
-> 
-> It's the bus lock, not the driver lock. We need to release the bus
-> lock when we want to sleep.
-
-What Andrew said, basically.
-
-> > As a matter of fact, .port_fdb_add() and .port_fdb_del() are one of the
-> > few operations which DSA emits which aren't serialized by rtnl_lock().
-> > They can absolutely be concurrent with .port_fdb_dump(), .port_mdb_add(),
-> > .port_mdb_del() etc. It seems like higher-level locking is needed.
-> >
-> > > +             res = read_poll_timeout(yt921x_smi_read_burst, res,
-> > > +                                     (val & YT921X_FDB_RESULT_DONE) != 0,
-> > > +                                     YT921X_MDIO_SLEEP_US,
-> > > +                                     YT921X_MDIO_TIMEOUT_US,
-> > > +                                     true, priv, YT921X_FDB_RESULT,
-> > > +                                     &val);
-> > > +             yt921x_smi_acquire(priv);
-> > > +             if (res) {
-> > > +                     dev_warn(dev, "Probably an FDB hang happened\n");
-> > > +                     return res;
-> > > +             }
-> > > +     }
-> > > +
-> > > +     *valp = val;
-> > > +     return 0;
-> > > +}
-> > > +
-> > > +static void yt921x_dsa_port_fast_age(struct dsa_switch *ds, int port)
-> > > +{
-> > > +     struct yt921x_priv *priv = to_yt921x_priv(ds);
-> > > +     struct device *dev = to_device(priv);
-> > > +     int res;
-> > > +
-> > > +     dev_dbg(dev, "%s: port %d\n", __func__, port);
-> > > +
-> > > +     yt921x_smi_acquire(priv);
-> > > +     res = yt921x_fdb_flush(priv, BIT(port), 0, false);
-> > > +     yt921x_smi_release(priv);
-> > > +
-> > > +     if (res)
-> > > +             dev_dbg(dev, "%s: %i\n", __func__, res);
-> > > +}
-> > > +
-> > > +static int
-> > > +yt921x_dsa_port_vlan_fast_age(struct dsa_switch *ds, int port, u16 vid)
-> > > +{
-> > > +     struct yt921x_priv *priv = to_yt921x_priv(ds);
-> > > +     struct device *dev = to_device(priv);
-> > > +     int res;
-> > > +
-> > > +     dev_dbg(dev, "%s: port %d, vlan %d\n", __func__, port, vid);
-> > > +
-> > > +     yt921x_smi_acquire(priv);
-> > > +     res = yt921x_fdb_flush(priv, BIT(port), vid, false);
-> > > +     yt921x_smi_release(priv);
-> > > +
-> > > +     return res;
-> > > +}
-> >
-> > .port_vlan_fast_age() is dead code until dsa_port_supports_mst() returns
-> > true. I advise you to delete it.
-> >
-> > > +
-> > > +static int
-> > > +yt921x_dsa_set_ageing_time(struct dsa_switch *ds, unsigned int msecs)
-> > > +{
-> > > +     struct yt921x_priv *priv = to_yt921x_priv(ds);
-> > > +     struct device *dev = to_device(priv);
-> > > +     u32 ctrl;
-> > > +     int res;
-> > > +
-> > > +     dev_dbg(dev, "%s: %d\n", __func__, msecs);
-> > > +
-> > > +     /* AGEING reg is set in 5s step */
-> > > +     ctrl = msecs / 5000;
-> > > +
-> > > +     /* Handle case with 0 as val to NOT disable learning */
-> >
-> > learning? maybe ageing?
-> 
-> 0 = immediate aged = not learning
-
-Ok, I had other hardware in mind, where ageing_time==0 was a special
-value for "never age".
-
-> > > +     if (!ctrl)
-> > > +             ctrl = 1;
-> > > +     else if (ctrl > 0xffff)
-> > > +             ctrl = 0xffff;
-> > > +
-> > > +     yt921x_smi_acquire(priv);
-> > > +     res = yt921x_smi_write(priv, YT921X_AGEING, ctrl);
-> > > +     yt921x_smi_release(priv);
-> > > +
-> > > +     return res;
-> > > +}
-> > > +
-> > > +static int
-> > > +yt921x_dsa_get_eeprom(struct dsa_switch *ds, struct ethtool_eeprom *eeprom,
-> > > +                   u8 *data)
-> > > +{
-> > > +     struct yt921x_priv *priv = to_yt921x_priv(ds);
-> > > +     unsigned int i = 0;
-> > > +     int res;
-> > > +
-> > > +     yt921x_smi_acquire(priv);
-> > > +     do {
-> > > +             res = yt921x_edata_wait(priv);
-> > > +             if (res)
-> > > +                     break;
-> > > +             for (; i < eeprom->len; i++) {
-> > > +                     unsigned int offset = eeprom->offset + i;
-> > > +
-> > > +                     res = yt921x_edata_read_cont(priv, offset, &data[i]);
-> > > +                     if (res)
-> > > +                             break;
-> > > +             }
-> > > +     } while (0);
-> > > +     yt921x_smi_release(priv);
-> > > +
-> > > +     eeprom->len = i;
-> > > +     return res;
-> >
-> > What is contained in this EEPROM?
-> >
-> 
-> No description, sorry.
-
-So why do you dump it?
-
-> > I guess you got this snippet from mv88e6xxx_mdios_register(), which is
-> > different from your case because it is an old driver which has to
-> > support older device trees, before conventions changed.
-> >
-> > Please only register the internal MDIO bus if it is present in the
-> > device tree. This simplifies the driver and dt-bindings by having a
-> > single way of describing ports with internal PHYs. Also, remove the
-> > ds->user_mii_bus assignment after you do that.
-> 
-> How to access internal PHYs without registering the internal MDIO bus?
-> I know .phy_read and .phy_write, but all dsa_user_mii_bus_init() does
-> is to register and assign to ds->user_mii_bus for you using
-> phy_read/phy_write. Giving that we have an external bus to register,
-> it's pretty wired to register buses in two different ways. Also
-> mt7530.c does so for its internal bus.
-
-What Andrew said. If you need the internal MDIO bus, you describe it in
-the device tree.
-
-> > No STP state handling?
-> 
-> Support for (M)STP was suggested for a future series in previous reviews.
-
-Ok, I expect yt921x_dsa_port_vlan_fast_age() will be removed from next
-submissions until it isn't dead code anymore.
-
-> > NACK for exposing a sysfs which allows user space to modify switch
-> > registers without the driver updating its internal state.
-> >
-> > For reading -- also not so sure. There are many higher-level debug
-> > interfaces which you should prefer implementing before resorting to raw
-> > register reads. If there's any latching register in hardware, user space
-> > can mess it up. What use case do you have?
-> 
-> It is not possible to debug the device without a register sysfs, see
-> previous replies for why we need to lock the bus (but not necessarily
-> the MDIO bus). And if they are to modify switch registers, that's what
-> they want.
-
-When I said "higher level debugging interfaces", I had in mind "higher
-level" in the sense Andrew mentioned - devlink regions, etc for
-functional areas of interest that the developer has foreseen - and not
-"lower level" like MDIO bus level access, which is even worse than the
-sysfs due to the non-atomic accesses that you mention.
-
-> So it's also kind of development leftover, but if anyone wants to
-> improve the driver, they would come up with pretty the same debug
-> solution as this, thus I consider it useful in the future. If that
-> effort is still not appreciated, it might be wrapped inside a #ifdef
-> DEBUG block so it will not be enabled to end users.
-
-I see no problem with people who want to debug building their own
-modified kernel with extra yt921x_smi_read() and yt921x_smi_write()
-calls for the register of interest. That's pretty far from "anybody who
-wants to debug has to have the sysfs".
+	-Mike
 
