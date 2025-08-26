@@ -1,56 +1,84 @@
-Return-Path: <netdev+bounces-216786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48319B35232
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 05:19:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94DB7B35218
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 05:11:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59B8F1A8495E
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 03:19:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BE8BA7AA4A1
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 03:09:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3C922594B7;
-	Tue, 26 Aug 2025 03:19:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C8472D1F40;
+	Tue, 26 Aug 2025 03:11:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="FvpEa0SX"
+	dkim=pass (2048-bit key) header.d=maxlinear.com header.i=@maxlinear.com header.b="rknTMKcf"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BFDB111BF;
-	Tue, 26 Aug 2025 03:19:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756178364; cv=none; b=FJB96T5616dHu7bdY6gSpQ8l2KCYB8KTwa3K2boNKEMmUu8vViqzQuQmRmrArNCd5NSy5Yr3xSoolBS3X5oNebYGi9DYYqN7tJSMh2pQJBIqYJuxrpfuoTKpfJr7u5lEHifPgmvQoLvhlDOYZZKSmChLyY07CsaGSDyN4YG9hRM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756178364; c=relaxed/simple;
-	bh=wi8sbdKRlrXo0kWBOE2JRx8vCNBDwrKiFlY3fNVuc3E=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jIMwPtYRRiDf+/02zjn3s5FBuNpTSkWYLYb5xb7IHkyk1Gl8BXNgmyaeTjyIov4JUPo8pBPLFSDSwtLt2dTgUWVFiBlyPnXYFxtI4lFS6Uz9Mi2SPTLl30uXRSDl2zpMtWS9AQa4qxfDBn1Plt+ay6y3i4HtpJg2SrCFKcjE3F4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=FvpEa0SX; arc=none smtp.client-ip=220.197.31.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=8U
-	KRPKWH6JXfLDs9LyaWay1d2b/APYWFOa54QlGQgsU=; b=FvpEa0SX45Kdz2xu7W
-	6JFmFOSi27E1gUhtUyZ4XnpJiptQ8/SwL1gBvS9hSL8zKTR6yYn/fpxVhr/ahD0A
-	12sPrA890JOhaZ3LioUNw5nJZcE/+46A9z23ShPnlsbJJs1CeYI+FwryD8cdoNhK
-	B22oBGjXA2im/gsYQiO/UMWK0=
-Received: from zhaoxin-MS-7E12.. (unknown [])
-	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wAn7zcAJK1oxxy_Dw--.24255S2;
-	Tue, 26 Aug 2025 11:03:30 +0800 (CST)
-From: Xin Zhao <jackzxcui1989@163.com>
-To: willemdebruijn.kernel@gmail.com,
-	edumazet@google.com,
-	ferenc@fejes.dev
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v7] net: af_packet: Use hrtimer to do the retire operation
-Date: Tue, 26 Aug 2025 11:03:28 +0800
-Message-Id: <20250826030328.878001-1-jackzxcui1989@163.com>
-X-Mailer: git-send-email 2.34.1
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2080.outbound.protection.outlook.com [40.107.93.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B19D2D1911;
+	Tue, 26 Aug 2025 03:11:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.80
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756177870; cv=fail; b=gIfZHdWtGZQjZtAY0Ai88GoJq2STT0C9C81hdlt/TxocreD2gttes2Nowd9V6HWw24YB0INAj1f/8Le3xAN5DEDiKrn4s2oiz3npPQLOYcugOss30lf7PxV0DQk9pCosVzuIwFk/Zeq6tbXZZws3CSLkuOrkP4I/iAe0WqI0nuw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756177870; c=relaxed/simple;
+	bh=U8LcLKl/85ThB3ZXyVRFTlgC1csH+MtMK6Th/DGb+Ns=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MSGeHf6jd0sVtmAQSA0FNMOyyS5eOs9BUbfVwhT+lIIq7wh3OS0AdstNAgLupH5LNDaFG6RXK02CpPFvw5BuaxaJezEsqbH5hW1IL4KhvhZa1X92ocXyLyeu1JEWxIHgp1ZPS9QU1YOWdC9Cfz0JLirOk+ogQQqX0le6FEVUWWQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=maxlinear.com; spf=pass smtp.mailfrom=maxlinear.com; dkim=pass (2048-bit key) header.d=maxlinear.com header.i=@maxlinear.com header.b=rknTMKcf; arc=fail smtp.client-ip=40.107.93.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=maxlinear.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=maxlinear.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=t6PVbgFg9+Ef03lqxbMMHQgmFTV5mPgzPjrz+6+O86uwJGNemOGTw30T37+34Get+emKQVBP5jVycKx+l0+P/Jv5WTUVUVR0gLiLkOFfAuz6HJ5qg6znWjNVq1ow4sCcNEOQgmEop0w7X9/7Pf3H2XQc5e4idQF4CQwB3iRVGfZnKLJNLdzBrBR+mXL1e+SQjR3KAwalp4PvXUGLZNhhs71kcs6cp067cMK5UDPSpB5tOiIYcFWD9c9NXR0l0t+/2tiRlF7IeKJYLSVIYZf6IYvi3IMqOG/SrR1xki9c9MaFnXFuJM5w45nKa1ygDdXF6Syn31gzSwLSJb+Qb4IcAg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5oR1V7zd84yvxFXEjJre7wm9Y5wGBzobOcSi+RfxFTk=;
+ b=Y6wEdHxGC4hoz+aa/ObUIQgL/SmXWKryK5DlWkrVAhTUUML23h3XbZsbTakYqryrAJUsXmyJiKZSQeWqGAfDSfGliRJFLk3AG9XJb3YLFPTag+0Nag1Kdqbx7TP1tAraR3H9h4fwLgV9hh3IiYn63VUVloqsZhCC9izs2gHzVDJQKjpFm6ngUndh5SMJ/geAy8lq4DDxwq6lhiLj67jOY276P8gJM4tNdxFuq101P3u2IGFeJHhg3ngQto1QCLyy5XLdnV/x4vyZHztdQlei3LEq3Y64YyuDbgEimYBNPvDmJ0oa/dvThk0QqFx5+dyEDJFdpEJgcSQ1uFEUsXwi3w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 174.47.1.92) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=maxlinear.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none
+ header.from=maxlinear.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=maxlinear.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5oR1V7zd84yvxFXEjJre7wm9Y5wGBzobOcSi+RfxFTk=;
+ b=rknTMKcfCChm935CmAwE8Gczr1lkpjab6uk56ExV/G8fda9t61+wKC6ohrQSti79SU3ozpwBOl97oiQhcuq3maMnSlMkkyba/jZkBiEZByy+YGn8EEQfm+kAb22Xc8NN99h4M1YPWASEJbiMEb+U5T7nYY85T4/cckJXTTx97VvgWCdjivPFBJm10IJn5higQSGsxeaTEm1gAeJ8qp5HS/r/4GfDC+GrFM3RxgmNGAvtJM/Npg6J2/TGUV/9mGp0DPbjJMeI0iAHm3up2ZlVU2EkVLVAXq3LDWkxP0mmX/XsqJ429VaqgsONnIn3DkYEuIrDgOhz2cart6kTAcTV4Q==
+Received: from CH0PR03CA0223.namprd03.prod.outlook.com (2603:10b6:610:e7::18)
+ by MN0PR19MB6432.namprd19.prod.outlook.com (2603:10b6:208:3d3::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.14; Tue, 26 Aug
+ 2025 03:11:00 +0000
+Received: from CH1PEPF0000A347.namprd04.prod.outlook.com
+ (2603:10b6:610:e7:cafe::be) by CH0PR03CA0223.outlook.office365.com
+ (2603:10b6:610:e7::18) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9052.21 via Frontend Transport; Tue,
+ 26 Aug 2025 03:11:00 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 174.47.1.92)
+ smtp.mailfrom=maxlinear.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=maxlinear.com;
+Received-SPF: Pass (protection.outlook.com: domain of maxlinear.com designates
+ 174.47.1.92 as permitted sender) receiver=protection.outlook.com;
+ client-ip=174.47.1.92; helo=usmxlcas.maxlinear.com; pr=C
+Received: from usmxlcas.maxlinear.com (174.47.1.92) by
+ CH1PEPF0000A347.mail.protection.outlook.com (10.167.244.7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9073.11 via Frontend Transport; Tue, 26 Aug 2025 03:11:00 +0000
+Received: from sgb016.sgsw.maxlinear.com (10.23.238.16) by mail.maxlinear.com
+ (10.23.38.31) with Microsoft SMTP Server id 15.2.1544.25; Mon, 25 Aug 2025
+ 20:10:56 -0700
+From: Jack Ping CHNG <jchng@maxlinear.com>
+To: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>
+CC: <davem@davemloft.net>, <andrew+netdev@lunn.ch>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <robh@kernel.org>,
+	<krzk+dt@kernel.org>, <conor+dt@kernel.org>, <yzhu@maxlinear.com>,
+	<sureshnagaraj@maxlinear.com>, Jack Ping CHNG <jchng@maxlinear.com>
+Subject: [PATCH net-next v2 0/2] Add MxL Ethernet driver & devicetree binding
+Date: Tue, 26 Aug 2025 11:10:42 +0800
+Message-ID: <20250826031044.563778-1-jchng@maxlinear.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,95 +86,102 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wAn7zcAJK1oxxy_Dw--.24255S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxCF1fuF47XryDWFyDGw17Wrg_yoWrGw4kpa
-	yaq347Jr1kZrWIvF1xZa1kXFy5J393AF47Gr1fGF1FywnrCFyxtFWjqFWFgFW7C395twsF
-	vw48XrnxAwnYk37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UqZXrUUUUU=
-X-CM-SenderInfo: pmdfy650fxxiqzyzqiywtou0bp/1tbibgO1CmitIq0lPwAAsC
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000A347:EE_|MN0PR19MB6432:EE_
+X-MS-Office365-Filtering-Correlation-Id: 71b01c44-e545-47e2-b4d2-08dde44e2f26
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014|7416014|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?YcUek8WNjkSz1VLkLK0sdSTlAs+sESmqiSCqRoXzHu37S6xdKFD9BlwPe1uY?=
+ =?us-ascii?Q?tLVHmmC2BxaLwTViL2Qbd0n7gAX1wCqw/QLBJ0zrd0oY9DOV9cE8Ygjm9UO1?=
+ =?us-ascii?Q?+HmGl+ccZDSUHoh1Az5YyKAk4poBFs4y+l6E+02y3IGCgIhFkdob8PTmiXok?=
+ =?us-ascii?Q?1QpL9+QIbAE6WwiEa4exLXi2b/NwhofG2cZ3KkuPC/bZoeHoxX+OzrH9csVo?=
+ =?us-ascii?Q?x6HO1ypIFRzgUJ0IgGVuenWkkzvjSmtg+xX4Rvk8lPmdS6sTyERxwEPc8Hnu?=
+ =?us-ascii?Q?Po2J3nWhWe1BG2zV8bSDYgVuotZE3sitKjKiFDPGgE0SZthjE2RK/RNR9bFZ?=
+ =?us-ascii?Q?uPqVutJRJzMPiYRzz+rn6chpNs0pl8SAB5aYZ4L+XTZa30oqbjjLEQ+oXZgO?=
+ =?us-ascii?Q?OcFl8hzgztIc77ytr/lqKi3eINRk+bYKhZspWCQ/WYujhhcGJB5KVma1eALE?=
+ =?us-ascii?Q?RDcm5UheWuivlNJYEt0DXmj5qgeAQKEoaBE9hc+bhjDZ7gbSaTmGxL9DL/G0?=
+ =?us-ascii?Q?aRy5NI/mG2JpnCw+fc1y8Es/PvWcFYHwW8x5xU6bbkrus3L9LpiDwt311Q5H?=
+ =?us-ascii?Q?flDoM6vq1eNhFaY4FKZMS263bFGFHD09aMr9W/ZLuhanay5H5MRtS7aKxL5I?=
+ =?us-ascii?Q?cZgMFW/pCLeNr4CdRexNjsysyLCZxwfy/uKMpYzBJmcVMpIaGkrEcvqJDsEp?=
+ =?us-ascii?Q?aLfnAwEJ82B3FG4eNlyVE1qlc7ox7Ds7ynqVfwn5sHcPtoTQ/1FBhyUID83P?=
+ =?us-ascii?Q?yozTBOO0WIhg1MFb2jRpoQbyB58kw7BWiUUb20CzLSNoLKVnoi/J7FQQKyWS?=
+ =?us-ascii?Q?USyWW0t7PQIsL1PTCpUZn+aJdLxeWU156GwnGF4EwOb0uuAfVJwpPCLY/D17?=
+ =?us-ascii?Q?3mklogo6/y5oMiXOlhQtDp7dtJca8U1aatf6c6rcg/hL+Pm/H4G8wjfRAJnL?=
+ =?us-ascii?Q?bBA9Ju1A2avicBwaYuDPPP4bU2lIVfF5CFvGsxw4/42niqaOLrkUZs7E1NYJ?=
+ =?us-ascii?Q?KiXwkdKANUlS6/eomMRovDEojt9ItMPWleOi85zr3lZ71mSdZ9BymKbsKdbW?=
+ =?us-ascii?Q?jB+81ZEkWY1g2xuXEWutVWqhaC5bSavcBLBwmLXDbBMLh6sOP+ini9NIkRbB?=
+ =?us-ascii?Q?Cc3BrdgjknCTsJU3APUpPGmNMG3iDyLIrhazWmXCpVXskSgTrUhb3ihLnr0w?=
+ =?us-ascii?Q?yxN6zvr39M5Q/oEsj2OlY2ns1g4VVYD5kWCbqFuO/qBy35tzCM9dEPoGX7vl?=
+ =?us-ascii?Q?RHCp8pq/OH3vKBxx68oqiXiFWLBzjHY0zX96Xoz5LpkrXzudFnmk8AzVSq8l?=
+ =?us-ascii?Q?th4fpCexb/lOLZPFuKxw/zO4N4G7I+BEz9VHgRSvYJru8E2SSnQspwSaL3jv?=
+ =?us-ascii?Q?FGnCnmnRUeMzcbiiSSvz6B3LyZzed6mIFgHk80JC4Sc0Rd+fd0LeTYM6tGDL?=
+ =?us-ascii?Q?YQX0JF30mfnLexqGvVvzh00WJS7Eb20nDWcPbAACXlxtSWUhAIFa1W0+/6tN?=
+ =?us-ascii?Q?gFb1Mv62mUX8k/twZmJLmTBk+XfbwAGO5x/GTuUwOO8Apz4/SnOI0TyjtA?=
+ =?us-ascii?Q?=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:174.47.1.92;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:usmxlcas.maxlinear.com;PTR:174-47-1-92.static.ctl.one;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014)(7416014)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: maxlinear.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2025 03:11:00.4939
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 71b01c44-e545-47e2-b4d2-08dde44e2f26
+X-MS-Exchange-CrossTenant-Id: dac28005-13e0-41b8-8280-7663835f2b1d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=dac28005-13e0-41b8-8280-7663835f2b1d;Ip=[174.47.1.92];Helo=[usmxlcas.maxlinear.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH1PEPF0000A347.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR19MB6432
 
-On Tue, 2025-08-25 at 0:20 +0800, Willem wrote:
+Hello netdev maintainers,
 
-> > We cannot use hrtimer_set_expires/hrtimer_forward_now when a hrtimer is
-> > already enqueued.  
-> > The WARN_ON(timer->state & HRTIMER_STATE_ENQUEUED) in hrtimer_forward
-> > already clearly indicates this point. The reason for not adding this
-> > WARN_ON in hrtimer_set_expires is that hrtimer_set_expires is an inline
-> > function, wory about increase code size.
-> > The implementation of perf_mux_hrtimer_restart actually checks whether
-> > the hrtimer is active when restarting the hrtimer.
-> 
-> Perhaps we need to simplify and stop trying to adjust the timer from
-> tpacket_rcv once scheduled. Let the callback handle that.
-> 
+This patch series adds support for the MaxLinear LGM SoC's Ethernet
+controller, including:
 
-Okay, I would also like to modify the timeout only within the callback,
-so I think PATCH v7 might be a better solution. Additionally, in terms of
-performance, it should be more efficient than frequently calling
-hrtimer_cancel/hrtimer_start functions to change the timeout outside the
-callback.
+Patch 1: Introduces the devicetree binding documentation for the MaxLinear
+LGM Network Processor.
+Patch 2: Adds build infrastructure and the main driver for the MaxLinear
+LGM SoC Ethernet controller.
 
-Why do I add the pkc->expire_ktime in PATCH v7?
+The driver supports multi-port operation and is integrated with standard
+Linux network device driver framework. The devicetree binding documents
+the required properties for the hardware description.
 
-For example 8ms retire timeout.
-T means the time callback/tpacket_rcv call _prb_refresh_rx_retire_blk_timer.
-T1 means time T plus 1ms, T2 means time T plus 2ms...
+Changelog:
+v1 -> v2:
+  - Moved devicetree bindings to the first patch in the series
+  - Verified bindings with 'make dt_binding_check DT_SCHEMA_FILES=mxl,lgm-eth.yaml'
+  - Reformatted commit messages to follow Linux kernel submission guidelines.
+  - Removed redundant code and addressed all reviewer comments.
 
-timeline: past -----------> -----------> -----------> future
-callback:      T	           T8
-tpacket_rcv:                 T7
+links:
+v1: https://lore.kernel.org/netdev/20250822090809.1464232-1-jchng@maxlinear.com/
 
-Considering the situation in the above diagram, at time T7, the tpacket_rcv
-function processes the network and finds that a new block needs to be opened,
-which requires setting a timeout of T7 + 8ms which is T15ms. However, we
-cannot directly set the timeout within tpacket_rcv, so we use a variable
-expire_ktime to record this value. At time T8, in the hrtimer callback, we
-check that expire_ktime which is T15 is greater than the current timeout of
-the hrtimer, which is T8. Therefore, we simply return from the hrtimer
-callback at T8, the next execution time of the hrtimer callback will be T15.
-This achieves the same effect as executing hrtimer_start in tpacket_rcv
-using a "one shot" approach.
+Jack Ping CHNG (2):
+  dt-bindings: net: mxl: Add MxL LGM Network Processor SoC
+  net: maxlinear: Add support for MxL LGM SoC
 
+ .../devicetree/bindings/net/mxl,lgm-eth.yaml  |  73 +++++++
+ .../device_drivers/ethernet/index.rst         |   1 +
+ .../device_drivers/ethernet/maxlinear/mxl.rst |  61 ++++++
+ MAINTAINERS                                   |   8 +
+ drivers/net/ethernet/Kconfig                  |   1 +
+ drivers/net/ethernet/Makefile                 |   1 +
+ drivers/net/ethernet/maxlinear/Kconfig        |  15 ++
+ drivers/net/ethernet/maxlinear/Makefile       |   6 +
+ drivers/net/ethernet/maxlinear/mxl_eth.c      | 189 ++++++++++++++++++
+ 9 files changed, 355 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/mxl,lgm-eth.yaml
+ create mode 100644 Documentation/networking/device_drivers/ethernet/maxlinear/mxl.rst
+ create mode 100644 drivers/net/ethernet/maxlinear/Kconfig
+ create mode 100644 drivers/net/ethernet/maxlinear/Makefile
+ create mode 100644 drivers/net/ethernet/maxlinear/mxl_eth.c
 
-> > Do you agree with adding a callback variable to distinguish between
-> > scheduled from tpacket_rcv and scheduled from the callback? I really
-> > couldn't think of a better solution.
-> 
-> Yes, no objections to that if necessary.
-
-So it seems that the logic of 'adding a callback variable to distinguish' in 
-PATCH v7 is OK?
-
-
-> > So, a possible solution may be?
-> > 1. Continue to keep the callback parameter to strictly ensure whether it
-> > is within the callback.
-> > 2. Use hrtimer_set_expires within the callback to update the timeout (the
-> > hrtimer module will enqueue the hrtimer when callback return)
-> > 3. If it is not in callback, call hrtimer_cancel + hrtimer_start to restart
-> > the timer.
->
-> Instead, I would use an in_scheduled param, as in my previous reply and
-> simply skip trying to schedule if already scheduled.
-
-I understand that the additional in_scheduled variable is meant to prevent
-multiple calls to hrtimer_start. However, based on the current logic
-implementation, the only scenario that would cancel the hrtimer is after calling
-prb_shutdown_retire_blk_timer. Therefore, once we have called hrtimer_start in
-prb_setup_retire_blk_timer, we don't need to worry about the hrtimer stopping,
-and we don't need to execute hrtimer_start again or check if the hrtimer is in
-an active state. We can simply update the timeout in the callback.
-Additionally, we don't need to worry about the situation where packet_set_ring
-is entered twice, leading to multiple calls to hrtimer_start, because there is
-a check for pg_vec before executing init_prb_bdqc in packet_set_ring. If pg_vec
-is non-zero, it will go to the out label.
-
-So is PATCH v7 good to go? Besides I think that ktime_after should be used
-instead of ktime_compare, I haven't noticed any other areas in PATCH v7 that
-need modification. What do you think?
-
-
-Thanks
-Xin Zhao
+-- 
+2.34.1
 
 
