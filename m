@@ -1,132 +1,125 @@
-Return-Path: <netdev+bounces-216820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50C2CB354CC
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 08:53:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E2B7B354D7
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 08:55:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F8E224477B
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 06:53:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 538F9171B97
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 06:55:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 310D62F60CF;
-	Tue, 26 Aug 2025 06:53:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA2432D0C6C;
+	Tue, 26 Aug 2025 06:55:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="qWjUerfn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XsmuFAYD"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6D6D2882D7;
-	Tue, 26 Aug 2025 06:53:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05326502BE
+	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 06:55:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756191184; cv=none; b=m5QXxa12z/TAQ/MWqKBV8XUlG2KN8z8bGzWJtDzJUECp54RNmMCNpTTHBG49ydN5OdITBb3r9HtGoWrMKbHhGEdFXzYX2pH6zUVoOpEUQYKXgnG9/Ay1fNgn2q5XFo4lmDpMIHo/AGb8rFyBi9CsXpw2NIp3I6HfZfj62J/AFgk=
+	t=1756191333; cv=none; b=GhybduNCqVh6+oE4zjpmRJt24HlFFSeBYFOp+R6zZGSYp36i0lKhnK3STalJSRrJnL1hGkdAmi9eX3fq2HHKhaiWrunq5FqDK5me8NMnDVKQouEalNdLgcNErsLcdhQTUxwjrPtKL18lV0uAQilAyRYa5r2zylPIKVoG1Vy9Ve8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756191184; c=relaxed/simple;
-	bh=jH5bxK6EaSvWBxLcpjk++ZL/7lRyN+YA0ftWMGDqgc4=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lcXI3Ijk/EMlzFr9yNHMyVBs51QBAnRNwuDpg3cT5EarIISd+tCBLdbM7Kp8ct7ZRTfAL3o9xDD6aTHFS/n3FN9zhFIP8kDbEBGxLNAwLgHJZkuPav3xKe63lAxhcFGR/uwlSmio+GXBJMyYOaYiEqy3gk66U+L+FRw90eAoqic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=qWjUerfn; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1756191183; x=1787727183;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=jH5bxK6EaSvWBxLcpjk++ZL/7lRyN+YA0ftWMGDqgc4=;
-  b=qWjUerfnj3iM7b8ewKJZXalqSx/LqklC957niFXsBSMXJfKuH+YfQXi8
-   bcGSNSRvuYKw11YTtbRfh7KrD2YabaAzydxnNAEWvCQdLV0Q1xyDUMZwf
-   6hPD4t3ScVyKLIPQsQqWhIJ1lZ1GaIUdxcFc/N+QYfjHprk8LRxI+uSmV
-   qv+mah4x1J860h/M/1ups8Xs7SvomjS0rlckbXr1ESOOvu9AaVluEJkNo
-   SZapjX7s6d0b9jhOkL1o+Vp8vzZ+zorph9SKlR8aUqPdWLJE3JG2acsHb
-   u2iBWj3TYoYfCJNmqOj9KxqeFUbc21OTlz6b3DmBDJsxeAWp4iPOTZLU0
-   g==;
-X-CSE-ConnectionGUID: vjBvharrSgWpaC/5HfU8uA==
-X-CSE-MsgGUID: pdQwCPcSRSGCepZAD+3zLw==
-X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
-   d="scan'208";a="277036521"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Aug 2025 23:52:57 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Mon, 25 Aug 2025 23:52:49 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex02.mchp-main.com
- (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
- Transport; Mon, 25 Aug 2025 23:52:49 -0700
-Date: Tue, 26 Aug 2025 08:49:18 +0200
-From: Horatiu Vultur - M31836 <Horatiu.Vultur@microchip.com>
-To: Parthiban Veerasooran - I17164 <Parthiban.Veerasooran@microchip.com>
-CC: "andrew@lunn.ch" <andrew@lunn.ch>, "hkallweit1@gmail.com"
-	<hkallweit1@gmail.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "richardcochran@gmail.com"
-	<richardcochran@gmail.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 2/2] net: phy: micrel: Add PTP support for
- lan8842
-Message-ID: <20250826064918.xhqwgndlnhbfnvnb@DEN-DL-M31836.microchip.com>
-References: <20250825063136.2884640-1-horatiu.vultur@microchip.com>
- <20250825063136.2884640-3-horatiu.vultur@microchip.com>
- <0b754e84-45d0-4d3e-aa14-564ab5528b98@microchip.com>
+	s=arc-20240116; t=1756191333; c=relaxed/simple;
+	bh=lfYDEmq/PJ3a1IV7rqEkbYnZYxrR/rNVv2UdEgAHyRw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OJkokEMd4qSdubYv2XU6AqSIhF0+uLco5TIfia0QcDDF98trd5Xor2LuQ2T/Sca1FFicVhC97FhT1cdCZsM8CLl/igCzyPVeBcWpJtxmra1s5wRRjXwV++SkueFeQ+XnAYtgujfeSFMt2HbBgPW9SI2903nsmvLAk1U2HP7bWoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XsmuFAYD; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756191330;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Q60KSVuyNOUDgOYXDvtWxnNnwoxcnqjIk3EQCjfaX0U=;
+	b=XsmuFAYDbpTP5xdZ9sLcAlmm84QgrMPr54TecDwnNEUmno2HuVaJQHEQw5c2RUamy+5qUu
+	RsDLxnoutj575WFKEQ/RoitgXQVofK2kZcaufUVKnK0D37BOtnlnD9/HvEFEDf6yt0wBDC
+	B8VFMQGeObPeybMHMXfNVUL/LkrCV3o=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-546-LTLM8eZWOFOeZkUdDolJcQ-1; Tue, 26 Aug 2025 02:55:28 -0400
+X-MC-Unique: LTLM8eZWOFOeZkUdDolJcQ-1
+X-Mimecast-MFC-AGG-ID: LTLM8eZWOFOeZkUdDolJcQ_1756191327
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-45a1b0d221aso26023295e9.3
+        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 23:55:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756191327; x=1756796127;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Q60KSVuyNOUDgOYXDvtWxnNnwoxcnqjIk3EQCjfaX0U=;
+        b=RV7K8NCwWmH06yv0xomQZlaWxOMVy9o292Qkin1O7yNZBi4ljWQ48Ku4Qm1MAItIEB
+         SsUfiMaWoOdIZ/JGu2nO+H2eNxNd4huTZd7CB+gyZtAU9BuRaud9gKvn1MKWBp8A892w
+         4OYBSNZZw+VfCs2su7ZVNIU4nT+l6gc+pDY9nzHD+bYfiBEssfozRQTqjZBa2tBWWFp9
+         Z7+6Nf39uTcCCmJNKX99TgfdJh+hrT2IUF/SbiIA+OjcTQ37DOVkfuaiNJ3UcXGlJ5tM
+         zD+hcAUjqXR74VV3mjDZWzJfalUYO7oGG0Wu7sAiOvpOAAfhifxS0vGrrKs0v5re8HHX
+         oWpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVPk+DW5GEDdBmAlLRfiGcVVXjKhJQUrJlEVoPKPp008ejPuY1dRedKNVhohT7b5JVAgvSNb7I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhNnvIKqNanB8QMKmVLEaFYNoVFm5Sr9Oyf069Ic98s88HL1VF
+	87vSj246Kuv8eMiIdhlPIVUzUGPMofIgN+klli+R00mhFyfaPIWKAjXfXnJ8yOl4K+oOwpIRPCI
+	wmVgP42zyT9ukM6dfvbWAt9R6QMY7s6JrBDR855rfaH3QzItSMHxUCDSPIg==
+X-Gm-Gg: ASbGnctjdwQNdQFOxXrBPsTw/ZZs7Z0MVx6danIT3ychiQgJvV0v7X9AdSZPp4dxL8m
+	GYe0Q+seWKtDMKM79PaAuE7UeIE/vW0eIfrjaPn2iOZCuwZvN6l5QnE4rbYytrLueFFtkkwaVmK
+	ET27hFze1YeSYNp3YCVxDLQ0Eeullau6vwO9IfVl6GeTQKeYOGJFwYmCTmHWppVsx7Yd0qoxQnr
+	llEPiJpf6TqF2E646ITm3ToZMgjuFtmBXcQYfGy2Tht5iytIYld/WvbiiAgX589r9zemw0IG4dp
+	Zqh4VNTnJ7b4Wp2y4WlAhqF+dWhk8umCKF7Ng3nPDAtK+fPl32tBFsbvU08+R9pQuYN0
+X-Received: by 2002:a05:600c:1546:b0:458:c094:8ba5 with SMTP id 5b1f17b1804b1-45b517a0664mr126115925e9.12.1756191327466;
+        Mon, 25 Aug 2025 23:55:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGDI3qwfBcTEIfwvsnd/l72H+vatlsmpc7c/ZdgRSmE4QbIjhKLn2UZpi56KC0gXi9QrzwQDA==
+X-Received: by 2002:a05:600c:1546:b0:458:c094:8ba5 with SMTP id 5b1f17b1804b1-45b517a0664mr126115755e9.12.1756191327119;
+        Mon, 25 Aug 2025 23:55:27 -0700 (PDT)
+Received: from maya.myfinge.rs (ifcgrfdd.trafficplex.cloud. [176.103.220.4])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b66b6985bsm9070115e9.2.2025.08.25.23.55.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Aug 2025 23:55:26 -0700 (PDT)
+Date: Tue, 26 Aug 2025 08:55:25 +0200
+From: Stefano Brivio <sbrivio@redhat.com>
+To: Paul Wayper <pwayper@redhat.com>
+Cc: Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org,
+ paulway@redhat.com, jbainbri@redhat.com
+Subject: Re: [PATCH iproute2] ss: Don't pad the last (enabled) column
+Message-ID: <20250826085525.748ed6b3@elisabeth>
+In-Reply-To: <20250826002237.19995-1-paulway@redhat.com>
+References: <20250826002237.19995-1-paulway@redhat.com>
+Organization: Red Hat
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.49; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0b754e84-45d0-4d3e-aa14-564ab5528b98@microchip.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-The 08/25/2025 09:03, Parthiban Veerasooran - I17164 wrote:
+On Tue, 26 Aug 2025 10:22:37 +1000
+Paul Wayper <pwayper@redhat.com> wrote:
 
-Hi Parthiban,
-
+> ss will emit spaces on the right hand side of a left-justified, enabled
+> column even if it's the last column.  In situations where one or more
+> lines are very long - e.g. because of a large PROCESS field value - this
+> causes a lot of excess output.
 > 
-> On 25/08/25 12:01 pm, Horatiu Vultur wrote:
-> > +	/* As the lan8814 and lan8842 has the same IP for the PTP block, the
-> > +	 * only difference is the number of the GPIOs, then make sure that the
-> > +	 * lan8842 initialized also the shared data pointer as this is used in
-> > +	 * all the PTP functions for lan8814. The lan8842 doesn't have multiple
-> > +	 * PHYs in the same package.
-> > +	 */
-> > +	addr = lanphy_read_page_reg(phydev, LAN8814_PAGE_COMMON_REGS,
-> > +				    LAN8842_STRAP_REG);
-> > +	addr &= LAN8842_STRAP_REG_PHYADDR_MASK;
-> > +	if (addr < 0)
-> > +		return addr;
-> > +
-> > +	devm_phy_package_join(&phydev->mdio.dev, phydev, addr,
-> > +			      sizeof(struct lan8814_shared_priv));
-> Shouldn't you check the return value of devm_phy_package_join()?
-> Apologies — I missed to comment in my previous review.
-
-Yes, I should check the return value. I will fix this in the next
-version.
-No worries, thanks for catching this.
-
+> Firstly, calculate the last enabled column.  Then use this in the check
+> for whether to emit trailing spaces on the last column.
 > 
-> Best regards,
-> Parthiban V
-> > +	if (phy_package_init_once(phydev)) {
-> > +		ret = lan8842_ptp_probe_once(phydev);
-> > +		if (ret)
-> > +			return ret;
-> > +	}
-> > +
-> > +	lan8814_ptp_init(phydev);
-> > +
-> >   	return 0;
-> >   }
+> Also name the 'EXT' column as 'Details' and mark it as disabled by
+> default, enabled when the -e or --extended options are supplied.
+> 
+> Fixes: 59f46b7b5be86 ("ss: Introduce columns lightweight abstraction")
+> Signed-off-by: Paul Wayper <paulway@redhat.com>
+
+Thanks for the new version (this should have "v2" in the subject line).
+I'll have a look and test in a bit.
 
 -- 
-/Horatiu
+Stefano
+
 
