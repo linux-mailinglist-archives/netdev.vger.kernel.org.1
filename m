@@ -1,108 +1,131 @@
-Return-Path: <netdev+bounces-216783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B8E6B35222
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 05:16:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D756B35229
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 05:17:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EDC5E4E3172
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 03:16:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77A077B1CB8
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 03:15:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 393091F8691;
-	Tue, 26 Aug 2025 03:16:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A06222D1936;
+	Tue, 26 Aug 2025 03:17:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Wmt6NYM1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FowuDkiE"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78A5F111BF;
-	Tue, 26 Aug 2025 03:16:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03A5C2BE04F
+	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 03:17:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756178182; cv=none; b=ohmHjzvEWHa1n/jH2vn1/cMQYQ0naOkl66knQ3Wjr2vRToVxcbVaDzR04QITlshQ9zPljQxxVotgUZJYAlAkCoQeLCA4IQNgFfkG+Dw/5+S8c52CKeDhoj/y5psXRETGAch74BMZS+AVVZ/BsCpcQ67IhzdFROAxvJ9cjsodrMg=
+	t=1756178238; cv=none; b=EoIsZAJ5MMGjeFTNpAh0xtZEMTUIONyXBOvyrBMyUZBPW3yERlFelydAODFBgA7tGkb6yIcU1Tt3NX3X4hSryVDAoPgOLGIJdq9UwBmTle+xIVPYQGvd06ctok4HG5WrXemg2WDHUanJr9QP5XKTurrEiXYZMWYEk19vBiTuUrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756178182; c=relaxed/simple;
-	bh=9zT4hWxS3/93eiB1fYlXIG8klRDOKyVmSADjtbJ/Sog=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Dtooxv1mcL5ioOtPZ1RvjUC7TQWU2Wmx3WhtAOsuGmfvHh8HAHpZrWsqZAgxbyDVIjm45zAOPo7ecWwuav8aMPizHjp5PqjIZnrXnL6Wbc3Xu2dv+SePQ+SplkJuPwn/8euzo7n+CD9DJCQvXK/6bEyuJRj/4Wptk0XC4xjT+xQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Wmt6NYM1; arc=none smtp.client-ip=220.197.31.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=/u
-	/MkC1hJIU5or58FyCsCRK1iVr+/aJ7pfuUQnsJ8uk=; b=Wmt6NYM1HTPl1oKM1r
-	edp2Q2YLqFRVYCJL9eFXeVswve1UACtDQl4Ib/uF04MrGjXyuICyuyJFgKddn9Sj
-	AZwFAFbJqdHDtrAq+ukeTFgdWkuZ/QEP9HN0NpD4bfaMbE4cgcdELqjn0xi+YjEQ
-	48vdC5SuIf/MJnVXGRTtdFLt8=
-Received: from thinkpadx13gen2i.. (unknown [])
-	by gzsmtp5 (Coremail) with SMTP id QCgvCgC3aQveJq1oOSNvAg--.56318S2;
-	Tue, 26 Aug 2025 11:15:43 +0800 (CST)
-From: Zongmin Zhou <min_halo@163.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	shuah@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Zongmin Zhou <zhouzongmin@kylinos.cn>
-Subject: [PATCH] selftests: net: avoid memory leak
-Date: Tue, 26 Aug 2025 11:15:40 +0800
-Message-Id: <20250826031540.28010-1-min_halo@163.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1756178238; c=relaxed/simple;
+	bh=lQuyaZzCmOSly1JmwYweBeBbaXEnm2B+RIRBOXir5n8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=u7aGQwja7fMqDCKltlWHeKMwCnw2t/SYxF+XYX9jQbRRG7NaJMiWjUIZznj3TXei/dynrgBv6w70jxN9Cf50A/OcP+dPMC21aMg52k/4O//WWe1g175LBk3olwpOcz8bTCGcZORrilxh84lu+TSO53Ex6Rsg7RwXnQ36eYhzl5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FowuDkiE; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2445827be70so50467015ad.3
+        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 20:17:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756178235; x=1756783035; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F1h4kvq+D+km1eVNwFE06zF6nsAzszroz7jTJgfoLFY=;
+        b=FowuDkiEtJEO4C7+tmcIk2xp62hJXoIgffGp3axz6hQK3Q3ayb+ufJuZb9g/v7dWpQ
+         SYIwbLwHx4AoJ48bgCNa2zsTgjMgmXdUNfkMTSTI+pYcWHfnoUGnHgEerFl0EtULfjp6
+         WwKEIgAePcXwyCXIFrJbafVVhi4e0quwhJmK1BOX2Fp9Ac5MGRvskOcddYtR4kzbmtJy
+         UiM4JZADTzNsfYY0TNTJ0U7SDKkAJkJgZN3NjJd31RgnQvF8kR6wJAU5Q8lBLCB2muFP
+         eiFesfortttybDHQJq09VMZQwcxbYqfA2aiUQLMie+qaoH6oRNz+0A5EpVAOuELlZjRo
+         yTgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756178235; x=1756783035;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=F1h4kvq+D+km1eVNwFE06zF6nsAzszroz7jTJgfoLFY=;
+        b=rIzEyQOlR4iW3H14lMTcD+6otS5Co/qsHgQ7sWcmvarFrI17EIbzWqtcjbmzaay8u0
+         F4Zoinda0JZmoUoh+eV3WdioNKeXMKA8VII2hK+jJf09/0O8I80Mo9hNZk+UImXnC3oE
+         Q3KqQIy3LTweo7TMSTeCLHrvoYrBZ1NbhSsW9nBChv2rBzNw+/5Du2CWm9z42N9F2pkC
+         buSaN8WvYVcHD/vvbG20jZGuUA+oIKE9wOcS1QPGK8yh7XfuVrgIaiKYZCoL/KP4URmY
+         SvjYGCNFzPvXayNtgNBH9NiDo6Z6ZD1e0BfQWK0xCm7X697KjqPDJnv+Zm/VrP7TbaFg
+         H6/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXceEcGfBlKisfLVC8oUs7Zl9szBaA7r+3nbVif2+Zas2oYU0iRf2miY7lP/VsGRn2tPYm5gXU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+ZO53Mo9qdozfXOGg9vldzt/SM6BaqIuvtfdCYxqD09YeYRFH
+	qbZF7lHjws7tjprEqzzg2yMcxWTNRtOBjzRu5PXmiH+Sl3MKgcHOcnrKcXphGSyzkAM3sXtcTt1
+	om/NZKgQSkhKpW3wr/KPC0z3E7Mg+X4e20hbYnJW4
+X-Gm-Gg: ASbGncszibqQzb11wCyTmNyikBXpQ90GxU/slJ68NXw1l4993jv5Dy9+DVQJLWWytZW
+	pwDfP3DBkZFR/IUtBgFGSgTDb8nmKw2dI1lO3TOxI+veNJs2MhhUJ+J/xJ0T8HpCXCVDhwjlDVQ
+	A6J9yjg2EFDkpqsH+N7VX3XOiMjONCSb1qncsOIm+BsdAUWnGLfjSCjWxbuZCTLQpsmCR3sTLCW
+	6Je1Zm3T0MkZlZcf6QPE26St5bOkeJMdy4e7euJeXeEiFL+DwzeHhY+vUbVLeInicRct9ledF/e
+	+OqjG359trjdVA==
+X-Google-Smtp-Source: AGHT+IESsrXr4/A9HV9CM4eWH41gEwhxKYe0NGRGYhWCv7FkNw6cH3wSdOT9yrR2tLXLXf1QXj5cDFh41SU75hN8Ze8=
+X-Received: by 2002:a17:902:c94c:b0:246:273:c694 with SMTP id
+ d9443c01a7336-2462edac306mr225808385ad.12.1756178235138; Mon, 25 Aug 2025
+ 20:17:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:QCgvCgC3aQveJq1oOSNvAg--.56318S2
-X-Coremail-Antispam: 1Uf129KBjvdXoWrZFWktF15uF18Cw1fGFy8Zrb_yoWDCFXE9r
-	Z2vFZ7Gr4vyF1qk3sFg3s5ur93Ka98Crs7JFnrJa13K34jqay5GFZ7C34kAFn3Wan5ta43
-	Z3WfArZ3C3yj9jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUj_-P5UUUUU==
-X-CM-SenderInfo: pplqsxxdorqiywtou0bp/xtbBzQu1q2itImCIgAAAsX
+References: <20250826025206.303325-1-yuehaibing@huawei.com>
+In-Reply-To: <20250826025206.303325-1-yuehaibing@huawei.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Mon, 25 Aug 2025 20:17:03 -0700
+X-Gm-Features: Ac12FXxSntQxaYwjVLf685rn5gNURA2vkqomZn26jKlmintI2ILPln9QYxxQ68s
+Message-ID: <CAAVpQUDA5gCi--n9N7PQZC3rDBxhZxMW8AUFoaGs+09oT6Vebg@mail.gmail.com>
+Subject: Re: [PATCH net-next] ipv6: annotate data-races around devconf->rpl_seg_enabled
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Zongmin Zhou <zhouzongmin@kylinos.cn>
+On Mon, Aug 25, 2025 at 7:51=E2=80=AFPM Yue Haibing <yuehaibing@huawei.com>=
+ wrote:
+>
+> devconf->rpl_seg_enabled can be changed concurrently from
+> /proc/sys/net/ipv6/conf, annotate lockless reads on it.
+>
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+> ---
+>  net/ipv6/exthdrs.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+>
+> diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
+> index d1ef9644f826..a23eb8734e15 100644
+> --- a/net/ipv6/exthdrs.c
+> +++ b/net/ipv6/exthdrs.c
+> @@ -494,10 +494,8 @@ static int ipv6_rpl_srh_rcv(struct sk_buff *skb)
+>
+>         idev =3D __in6_dev_get(skb->dev);
+>
+> -       accept_rpl_seg =3D net->ipv6.devconf_all->rpl_seg_enabled;
+> -       if (accept_rpl_seg > idev->cnf.rpl_seg_enabled)
+> -               accept_rpl_seg =3D idev->cnf.rpl_seg_enabled;
+> -
+> +       accept_rpl_seg =3D min(READ_ONCE(net->ipv6.devconf_all->rpl_seg_e=
+nabled),
+> +                            READ_ONCE(idev->cnf.rpl_seg_enabled));
+>         if (!accept_rpl_seg) {
 
-The buffer be used without free,fix it to avoid memory leak.
+Orthogonal to this change, but rpl_seg_enabled is missing .extra1/2
+or this condition should be adjusted like other knobs that recognises
+ <0 as disabled, .e.g. keep_addr_on_down, etc.
 
-Signed-off-by: Zongmin Zhou <zhouzongmin@kylinos.cn>
----
- tools/testing/selftests/net/cmsg_sender.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/tools/testing/selftests/net/cmsg_sender.c b/tools/testing/selftests/net/cmsg_sender.c
-index a825e628aee7..5358aa09ecb9 100644
---- a/tools/testing/selftests/net/cmsg_sender.c
-+++ b/tools/testing/selftests/net/cmsg_sender.c
-@@ -491,6 +491,7 @@ int main(int argc, char *argv[])
- 	if (err) {
- 		fprintf(stderr, "Can't resolve address [%s]:%s\n",
- 			opt.host, opt.service);
-+		free(buf);
- 		return ERN_SOCK_CREATE;
- 	}
- 
-@@ -501,6 +502,7 @@ int main(int argc, char *argv[])
- 	if (fd < 0) {
- 		fprintf(stderr, "Can't open socket: %s\n", strerror(errno));
- 		freeaddrinfo(ai);
-+		free(buf);
- 		return ERN_RESOLVE;
- 	}
- 
-@@ -575,5 +577,6 @@ int main(int argc, char *argv[])
- err_out:
- 	close(fd);
- 	freeaddrinfo(ai);
-+	free(buf);
- 	return err;
- }
--- 
-2.34.1
-
+>                 kfree_skb(skb);
+>                 return -1;
+> --
+> 2.34.1
+>
 
