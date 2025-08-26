@@ -1,245 +1,132 @@
-Return-Path: <netdev+bounces-216871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF9C1B359EB
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 12:15:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 346EFB35A06
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 12:22:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86D6C3A9A58
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 10:15:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 030042A7FEC
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 10:22:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 335FA30AAA5;
-	Tue, 26 Aug 2025 10:15:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F263F2BD5AE;
+	Tue, 26 Aug 2025 10:22:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vKi90Lq8"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="lbgXN7I4"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3890C233128;
-	Tue, 26 Aug 2025 10:15:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 481911CEAB2
+	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 10:22:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756203308; cv=none; b=E0ATxZil9/LVBUuI0Kq1ffJRuChq01v0GPiI0yv11bUVmiaWydCabcJ4aEl660ixi6jZT/pUUsfFHXUvuzUiZ1CBsPXEb0/nu0qJlA/q3oi1Hbk+TT/bzr2cCpL9ErS5yNn6492zdMnnR1wgSd7MyZ61cy9wudJPEUiIp5xlhY4=
+	t=1756203771; cv=none; b=E00CHy/VQT3EBMJxiKXPKLQCaUxzrYsSiOvqEng3BLdqXMP7cUWc2wNVPZnVyf5PTmWy4Seck99iLdfxH1RC/cJukG+qw7uflcMSy7+WWmp8h/CCDXgH8wIej0cNUBaI9K8nZkQSFUD8oy/2ZSfoKHcKviThecoErxWreaqib9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756203308; c=relaxed/simple;
-	bh=jzCx4AJYjfVdLu4lvm7viYZkDwKumPWXqnVTmygMhf8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uSqpa1qwopVnXXcGQ+aMTftplK6j35WnM5GKhTCQhU+MTd/Ip0THrWZtmdOsoNsHqstPToYO0peudLfbMW3r7T6cZQsVR26Yrm3gdkaUFU3x0V57qAQHtBsr/mAYQ4IjRpjMtwzhqCsdtxIxSQ2yYnghFTPM+g7piDe7UtOIHuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vKi90Lq8; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <bbdabd48-61c0-46f9-bf33-c49d6d27ffb0@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1756203292;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=93BSLKjqwuhfuo1d7BbPvsz9FaxJknFZQrYjXgjX3Wc=;
-	b=vKi90Lq8N/rLBoHV/tqnWppuyM5doMlL1lAFpjC9LmAx77dqYYLv2dujjcgkPedcv4S1Z9
-	iMCUV/m4kMoYXj77kIMW/nhAhgV8WbG8og5OB9JvwilZ4AcQrp8cqsIAXz/O0+kuy7o6GX
-	6200GzoLUS2Tj99Sr5Lx6WpG/etTCik=
-Date: Tue, 26 Aug 2025 11:14:19 +0100
+	s=arc-20240116; t=1756203771; c=relaxed/simple;
+	bh=U8sHNox6tXtijzWygbCGYQGngJa/DQ4g/y4l3ZhTr9U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B3hiHX2nl2bbcbYXh1+/o6bc1DDaJ30fOHMmXaglx9oejSDI/Cr4coLG1hIEepEmfMbhOEMVCK5lUOVi4DmsRS3AH9PSrkj2EobDq3cV88SF77w9r0Ow/ClNpujG65Xl/48frU1oGRW6Ki7ZmPCkU7GgXDL5m5KxJ6A0I7Jj5aI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=lbgXN7I4; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57Q8lsM2001264;
+	Tue, 26 Aug 2025 10:22:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=S+31LDF1Z2WhM1uyqtnd3y4W2aDT6
+	M/Q5pg0v1GbW40=; b=lbgXN7I4bJecbfq5XRvTpGgxj2mn3KosAiOcZH2cecWNC
+	r5rx4EJimO0JbMI6MYG/2wrW6m5NbtZEXNfaTcShKugT1udXEf386JtMHfkkwlhT
+	HKrIt981KqUIs2L0kLuuksjluhwxYETMCFlg2f6EWpOtDoMKUigsgf8qpZJ1zjJh
+	WDXFMX73+n2iwbLynE7L/XpJlzPUa45y9TNTjIq/yufzLTiyRB7hBlLtsCIicDZG
+	TruwIbX6EzbuhMw1i5tUhD0+MQTj8JYbPALqPyFhbfqFK6QIaIcj8Mgf6U2qHoW/
+	a+xZYykqn9ZOIrLeS3vnQb+a6zU1/Yo+kRl5NK2RQ==
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48q5pt46pr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 26 Aug 2025 10:22:23 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 57QAIxI8004960;
+	Tue, 26 Aug 2025 10:22:22 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 48q439hy0y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 26 Aug 2025 10:22:22 +0000
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 57QAML6S028589;
+	Tue, 26 Aug 2025 10:22:21 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 48q439hy0j-1;
+	Tue, 26 Aug 2025 10:22:21 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: david.wu@rock-chips.com, jonas@kwiboo.se, rmk+kernel@armlinux.org.uk,
+        mcoquelin.stm32@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        horms@kernel.org, netdev@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com
+Cc: alok.a.tiwari@oracle.com, linux-arm-kernel@lists.infradead.org
+Subject: [PATCH net-next] net: stmmac: rk: remove incorrect _DLY_DISABLE bit definition
+Date: Tue, 26 Aug 2025 03:22:15 -0700
+Message-ID: <20250826102219.49656-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v7 4/5] net: rnpgbe: Add basic mbx_fw support
-To: Yibo Dong <dong100@mucse.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
- gur.stavi@huawei.com, maddy@linux.ibm.com, mpe@ellerman.id.au,
- danishanwar@ti.com, lee@trager.us, gongfan1@huawei.com, lorenzo@kernel.org,
- geert+renesas@glider.be, Parthiban.Veerasooran@microchip.com,
- lukas.bulwahn@redhat.com, alexanderduyck@fb.com, richardcochran@gmail.com,
- kees@kernel.org, gustavoars@kernel.org, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-hardening@vger.kernel.org
-References: <20250822023453.1910972-1-dong100@mucse.com>
- <20250822023453.1910972-5-dong100@mucse.com>
- <316f57e3-5953-4db6-84aa-df9278461d30@linux.dev>
- <82E3BE49DB4195F0+20250826013113.GA6582@nic-Precision-5820-Tower>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <82E3BE49DB4195F0+20250826013113.GA6582@nic-Precision-5820-Tower>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-26_02,2025-08-26_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 bulkscore=0
+ mlxlogscore=999 spamscore=0 suspectscore=0 malwarescore=0 mlxscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2508110000 definitions=main-2508260091
+X-Proofpoint-ORIG-GUID: A1rNZuMOzBCLBqP3JjLXHJ8H1V0uDCAP
+X-Proofpoint-GUID: A1rNZuMOzBCLBqP3JjLXHJ8H1V0uDCAP
+X-Authority-Analysis: v=2.4 cv=EcXIQOmC c=1 sm=1 tr=0 ts=68ad8adf b=1 cx=c_pps
+ a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17
+ a=2OwXVqhp2XgA:10 a=yPCof4ZbAAAA:8 a=drNr5Ij397O-Cq_uu80A:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODIzMDAzMCBTYWx0ZWRfX3TR+YKZXLVXZ
+ xl2yVtGEp/AIv0M866KYyb+u8f5fb7ceY2nkPFimDfmLd2nqCucW8HjqC2dbr7rg1V5Wf9ShqOa
+ 04A2YOBt96ozsA5MXyWo7qDXPi61+qrgissBks4ME/knlm1W1S6fE0eggX3UjipTE9Vl+ecnXBa
+ qnwHUtEqxhWiKrhahiGKHu5niwRjcdA7zrTL3+HtV8FU/y8wLVwvuoFh6PleEtG0ITNy5PAoCJ1
+ CwKGoMj74OgW3g8wxykn52SNhGQFTTk+REiQCmMjgoc/3ZSbmwaJXiLgk4IgG+n14/Q0Vt+5MXF
+ KTDIb0e9zts1Sl5HFr9m6vISoThoZPb6wNVspCBhrU9p9gKhM3Pe0sbmrP6govHmvUaKYGB/xvE
+ gGcmYWt+
 
-On 26/08/2025 02:31, Yibo Dong wrote:
-> On Mon, Aug 25, 2025 at 05:37:27PM +0100, Vadim Fedorenko wrote:
->> On 22/08/2025 03:34, Dong Yibo wrote:
->>
->> [...]
->>> +/**
->>> + * mucse_mbx_fw_post_req - Posts a mbx req to firmware and wait reply
->>> + * @hw: pointer to the HW structure
->>> + * @req: pointer to the cmd req structure
->>> + * @cookie: pointer to the req cookie
->>> + *
->>> + * mucse_mbx_fw_post_req posts a mbx req to firmware and wait for the
->>> + * reply. cookie->wait will be set in irq handler.
->>> + *
->>> + * @return: 0 on success, negative on failure
->>> + **/
->>> +static int mucse_mbx_fw_post_req(struct mucse_hw *hw,
->>> +				 struct mbx_fw_cmd_req *req,
->>> +				 struct mbx_req_cookie *cookie)
->>> +{
->>> +	int len = le16_to_cpu(req->datalen);
->>> +	int err;
->>> +
->>> +	cookie->errcode = 0;
->>> +	cookie->done = 0;
->>> +	init_waitqueue_head(&cookie->wait);
->>> +	err = mutex_lock_interruptible(&hw->mbx.lock);
->>> +	if (err)
->>> +		return err;
->>> +	err = mucse_write_mbx_pf(hw, (u32 *)req, len);
->>> +	if (err)
->>> +		goto out;
->>> +	/* if write succeeds, we must wait for firmware response or
->>> +	 * timeout to avoid using the already freed cookie->wait
->>> +	 */
->>> +	err = wait_event_timeout(cookie->wait,
->>> +				 cookie->done == 1,
->>> +				 cookie->timeout_jiffies);
->>
->> it's unclear to me, what part of the code is managing values of cookie
->> structure? I didn't get the reason why are you putting the address of
->> cookie structure into request which is then directly passed to the FW.
->> Is the FW supposed to change values in cookie?
->>
-> 
-> cookie will be used in an irq-handler. like this:
-> static int rnpgbe_mbx_fw_reply_handler(struct mucse *mucse,
->                                         struct mbx_fw_cmd_reply *reply)
-> {
->          struct mbx_req_cookie *cookie;
-> 
->          cookie = reply->cookie;
-> 
->          if (cookie->priv_len > 0)
->                  memcpy(cookie->priv, reply->data, cookie->priv_len);
->          cookie->done = 1;
->          if (le16_to_cpu(reply->flags) & FLAGS_ERR)
->                  cookie->errcode = -EIO;
->          else
->                  cookie->errcode = 0;
->          wake_up(&cookie->wait);
->          return 0;
-> }
-> That is why we must wait for firmware response.
-> But irq is not added in this patch series. Maybe I should move all
-> cookie relative codes to the patch will add irq?
+The RK3328 GMAC clock delay macros define enable/disable controls for
+TX and RX clock delay. While the TX definitions are correct, the
+RXCLK_DLY_DISABLE macro incorrectly clears bit 0.
 
-well, yes, in general it's better to introduce the code as a solid
-solution. this way it's much easier to review
+The macros RK3328_GMAC_TXCLK_DLY_DISABLE and
+RK3328_GMAC_RXCLK_DLY_DISABLE are not referenced anywhere
+in the driver code. Remove them to clean up unused definitions.
 
-> 
->>> +
->>> +	if (!err)
->>> +		err = -ETIMEDOUT;
->>> +	else
->>> +		err = 0;
->>> +	if (!err && cookie->errcode)
->>> +		err = cookie->errcode;
->>> +out:
->>> +	mutex_unlock(&hw->mbx.lock);
->>> +	return err;
->>> +}
->>
->> [...]
->>
->>> +struct mbx_fw_cmd_req {
->>> +	__le16 flags;
->>> +	__le16 opcode;
->>> +	__le16 datalen;
->>> +	__le16 ret_value;
->>> +	union {
->>> +		struct {
->>> +			__le32 cookie_lo;
->>> +			__le32 cookie_hi;
->>> +		};
->>> +
->>> +		void *cookie;
->>> +	};
->>> +	__le32 reply_lo;
->>> +	__le32 reply_hi;
->>
->> what do these 2 fields mean? are you going to provide reply's buffer
->> address directly to FW?
->>
-> 
-> No, this is defined by fw. Some fw can access physical address.
-> But I don't use it in this driver.
+No functional change.
 
-FW can access physical address without previously configuring IOMMU?
-How can that be?
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-> 
->>> +	union {
->>> +		u8 data[32];
->>> +		struct {
->>> +			__le32 version;
->>> +			__le32 status;
->>> +		} ifinsmod;
->>> +		struct {
->>> +			__le32 port_mask;
->>> +			__le32 pfvf_num;
->>> +		} get_mac_addr;
->>> +	};
->>> +} __packed;
->>> +
->>> +struct mbx_fw_cmd_reply {
->>> +	__le16 flags;
->>> +	__le16 opcode;
->>> +	__le16 error_code;
->>> +	__le16 datalen;
->>> +	union {
->>> +		struct {
->>> +			__le32 cookie_lo;
->>> +			__le32 cookie_hi;
->>> +		};
->>> +		void *cookie;
->>> +	};
->>
->> This part looks like the request, apart from datalen and error_code are
->> swapped in the header. And it actually means that the FW will put back
->> the address of provided cookie into reply, right? If yes, then it
->> doesn't look correct at all...
->>
-> 
-> It is yes. cookie is used in irq handler as show above.
-> Sorry, I didn't understand 'the not correct' point?
-
-The example above showed that the irq handler uses some value received
-from the device as a pointer to kernel memory. That's not safe, you
-cannot be sure that provided value is valid pointer, and that it points
-to previously allocated cookie structure. It is a clear way to corrupt
-memory.
-
-> 
->>> +	union {
->>> +		u8 data[40];
->>> +		struct mac_addr {
->>> +			__le32 ports;
->>> +			struct _addr {
->>> +				/* for macaddr:01:02:03:04:05:06
->>> +				 * mac-hi=0x01020304 mac-lo=0x05060000
->>> +				 */
->>> +				u8 mac[8];
->>> +			} addrs[4];
->>> +		} mac_addr;
->>> +		struct hw_abilities hw_abilities;
->>> +	};
->>> +} __packed;
->>
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+index f6687c2f30f6..9e9ae8525720 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+@@ -557,9 +557,7 @@ static const struct rk_gmac_ops rk3308_ops = {
+ #define RK3328_GMAC_RMII_MODE		GRF_BIT(9)
+ #define RK3328_GMAC_RMII_MODE_CLR	GRF_CLR_BIT(9)
+ #define RK3328_GMAC_TXCLK_DLY_ENABLE	GRF_BIT(0)
+-#define RK3328_GMAC_TXCLK_DLY_DISABLE	GRF_CLR_BIT(0)
+ #define RK3328_GMAC_RXCLK_DLY_ENABLE	GRF_BIT(1)
+-#define RK3328_GMAC_RXCLK_DLY_DISABLE	GRF_CLR_BIT(0)
+ 
+ /* RK3328_GRF_MACPHY_CON1 */
+ #define RK3328_MACPHY_RMII_MODE		GRF_BIT(9)
+-- 
+2.50.1
 
 
