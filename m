@@ -1,129 +1,144 @@
-Return-Path: <netdev+bounces-216957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D1E9B36990
+	by mail.lfdr.de (Postfix) with ESMTPS id C63DCB36992
 	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 16:28:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82AE48E3147
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 14:12:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E125C980C83
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 14:13:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C637350D44;
-	Tue, 26 Aug 2025 14:10:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="Tc4kWRzt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4626F3568FD;
+	Tue, 26 Aug 2025 14:11:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8C4374C4;
-	Tue, 26 Aug 2025 14:10:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06566352FD5
+	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 14:11:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756217425; cv=none; b=m7MVssChcv9bYS8X6/zBI0g48fRfC/NRbjZPbL1GyY4LsLjSrqEza+D5BGYVYIE0nWu3vsVNIMDLfufAyuVU8JCmYh0YdRNBEhsvJjph+tsHGN1NQzibPU4S4k0tAl5JvSow1C311Bz+kivul2o9T093HPRgSYZQCH0dRbwIDbc=
+	t=1756217509; cv=none; b=X8EXbuU4+GeNmcIESVQX8LKV63TpHphKnl+rGlhswfmaDEyep1LwnadQW9iiQOz+E6yh7Fe/bNpadqFg7YvGJO3RKOFTg8Ee/9qGuXuMxpvlJznvE6priiP5K3TG/tWyOqVI78qcJDH0MCSmZstMwhaNrOFamAMYGl53U9q/LZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756217425; c=relaxed/simple;
-	bh=Qwl9rI707fi2KSMqHzwqOIYprkRMmkQI9sfsdfuq3os=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=bkYvfKiUGUhnN2BCDVzLYgzLmY/YJcDH6RPfVYdhgreU5q9JnSRBOSUaoTm615Ugsoxqg/8cIFPhnEOIKV2GGMJVhbDrt9TgYEiO65+DXVKkc+dfSMxmcfHWtppYSKZBdQv6TBuotmvSIFegbV+Wz7w+0zkf2d1ZC1d2HJaYs+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=Tc4kWRzt; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=9M+n4kA2pS5d3rKzerjLvH+nIbGSZpDhSlPqAQjJvhg=;
-	t=1756217423; x=1757427023; b=Tc4kWRztGhIp210EvqQiGlTSYLR2saJMoxRIFe172J73iEZ
-	z/CxcndGlY2iIITCcw2o3lH/yg7WTIfufqreD5zVxDXotkL3GIG96x1EKDzQJlapTpp/WGNCOOwiI
-	Zt7qeflrKVi1MIEHQTYJ1UsDUqB9aqIQFGr6yIg3Bsyd7a0gzLa+Wg8YTIjWP4w18kjNCqoBFwpu1
-	3ftoyV8iOHYvk0sW4YegthE8ExUAZTz3zjv7ZZHNZS5Qp13dJoSvE/oRLNMnNPfaLlXcB1HuVoQCW
-	taSAjxYYoX+1EeFdSoLCVk1KhmN0VnOKkq9UpEhJjDaZMas73iXg8vguNZ7b3wKA==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1uquNR-00000003j0P-1Cp0;
-	Tue, 26 Aug 2025 16:10:21 +0200
-Message-ID: <2f22c98bee6c549205efed3cb03b82805cb54977.camel@sipsolutions.net>
-Subject: Re: netconsole: HARDIRQ-safe -> HARDIRQ-unsafe lock order warning
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Jakub Kicinski <kuba@kernel.org>, Pavel Begunkov <asml.silence@gmail.com>
-Cc: Breno Leitao <leitao@debian.org>, Mike Galbraith <efault@gmx.de>, 
-	paulmck@kernel.org, LKML <linux-kernel@vger.kernel.org>,
- netdev@vger.kernel.org, 	boqun.feng@gmail.com
-Date: Tue, 26 Aug 2025 16:10:20 +0200
-In-Reply-To: <20250815094217.1cce7116@kernel.org>
-References: <fb38cfe5153fd67f540e6e8aff814c60b7129480.camel@gmx.de>
-		<oth5t27z6acp7qxut7u45ekyil7djirg2ny3bnsvnzeqasavxb@nhwdxahvcosh>
-		<20250814172326.18cf2d72@kernel.org>
-		<3d20ce1b-7a9b-4545-a4a9-23822b675e0c@gmail.com>
-	 <20250815094217.1cce7116@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
+	s=arc-20240116; t=1756217509; c=relaxed/simple;
+	bh=IP84VAMKe+7JTHAUzdsvcaNy4u+T33/yrU6dHhzYJ7o=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=MJQXjgpt+m2+ytJH3BgXIlFDnSBIDn/afoJO0kR4dSuw8rFnDcPs+8bK5jW8OveURKBrFoJUEfKnBZOi5wgE8/iNCcnWgteD2PS8DuPuHQcG5FEyDUzgn1WtmTrchJNQpY4qzB2Speptd7/OQG+THhQguVuRp1yLNdOwcij3Zgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-88432e1eaa5so1391751139f.2
+        for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 07:11:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756217506; x=1756822306;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Pj99mwpeuh+2ZIqK32jcmt2O8E4ycT5xDz+MznD3w5c=;
+        b=U4zYbqZk06SoBmX9HwDAGWL846/BfVvtAN4mJ82avqxIW/7VckfJ5RDehgSwU2y9t3
+         YVOqsWeutawFbZEgAWIEDLR4m8eU0k1acB4ecJ9/ixHM8u5pa6tJYFftaWj+eVRxpVDu
+         CdEwt8Gjwgu22efHESC1HqqfLkPlFS3h5FyVPTJKtUjK2Z9TBURsQ/DoocEAIgopy9Jj
+         htDysPFXQ6MB750Bsbu66L8rdlA22cjEgK4qxNabr8iwvJPmDDvicqMjeMv4tgk6uLRP
+         sxHsRsYxHb4PDy3u0hu+Ak+Z0gLVK6G5JDRuXAQMbdshYrCEbS+XR7B9i8NdRE3JWHOT
+         6lfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUEvhj/4cUK2S+4Svbi0vr1/43jJ1As+PW7rwWSEQrE1ylMvHdo/9DlOcGYYfcxO+mu4vw1Qao=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfyeGhU6HjI+6dcEV8WqQQEKWHVTemUGNH6Dd+l+G/jSCgzjGM
+	1dD0+yMTCBtCqd9PF/x4c9sE06ooZRjToJvag2xa1ZnUGUPUrJOBb+Ru0kNQlyLZSp74aGY+Ae9
+	3AcHRv1LwxqcmkT8N/tmqaGwvagFs1QnkdqmBuYrPh8kD2TX2zJG7WXpXqsU=
+X-Google-Smtp-Source: AGHT+IFDGCMXRz7a4pX8apUV6UfYH//IeuRbVeU+ESSTX+Rav46Nqm4Ry1ybDr1OfMxJhH2AcDn1fhDL5IX0YIwfvK2EmElpyH/g
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+X-Received: by 2002:a05:6e02:3e92:b0:3ef:8763:bf96 with SMTP id
+ e9e14a558f8ab-3ef8763cd79mr4521405ab.7.1756217506060; Tue, 26 Aug 2025
+ 07:11:46 -0700 (PDT)
+Date: Tue, 26 Aug 2025 07:11:46 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68adc0a2.050a0220.37038e.00c4.GAE@google.com>
+Subject: [syzbot] [sctp?] KMSAN: uninit-value in __sctp_v6_cmp_addr (2)
+From: syzbot <syzbot+e69f06a0f30116c68056@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-sctp@vger.kernel.org, 
+	lucien.xin@gmail.com, marcelo.leitner@gmail.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 2025-08-15 at 09:42 -0700, Jakub Kicinski wrote:
-> On Fri, 15 Aug 2025 11:44:45 +0100 Pavel Begunkov wrote:
-> > On 8/15/25 01:23, Jakub Kicinski wrote:
-> > > On Thu, 14 Aug 2025 03:16:11 -0700 Breno Leitao wrote: =20
-> > > >   2.2) netpoll 				// net poll will call the network subsystem to s=
-end the packet
-> > > >   2.3) lock(&fq->lock);			// Try to get the lock while the lock was=
- already held =20
-> >=20
-> > The report for reference:
-> >=20
-> > https://lore.kernel.org/all/fb38cfe5153fd67f540e6e8aff814c60b7129480.ca=
-mel@gmx.de/>=20
-> > > Where does netpoll take fq->lock ? =20
-> >=20
-> > the dependencies between the lock to be acquired
-> > [  107.985514]  and HARDIRQ-irq-unsafe lock:
-> > [  107.985531] -> (&fq->lock){+.-.}-{3:3} {
-> > ...
-> > [  107.988053]  ... acquired at:
-> > [  107.988054]    check_prev_add+0xfb/0xca0
-> > [  107.988058]    validate_chain+0x48c/0x530
-> > [  107.988061]    __lock_acquire+0x550/0xbc0
-> > [  107.988064]    lock_acquire.part.0+0xa1/0x210
-> > [  107.988068]    _raw_spin_lock_bh+0x38/0x50
-> > [  107.988070]    ieee80211_queue_skb+0xfd/0x350 [mac80211]
-> > [  107.988198]    __ieee80211_xmit_fast+0x202/0x360 [mac80211]
-> > [  107.988314]    ieee80211_xmit_fast+0xfb/0x1f0 [mac80211]
-> > [  107.988424]    __ieee80211_subif_start_xmit+0x14e/0x3d0 [mac80211]
-> > [  107.988530]    ieee80211_subif_start_xmit+0x46/0x230 [mac80211]
->=20
-> Ah, that's WiFi's stack queuing. Dunno whether we expect netpoll to=20
-> work over WiFi. I suspect disabling netconsole over WiFi may be the=20
-> most sensible way out. Johannes, do you expect mac80211 Tx to be IRQ-safe=
-?
+Hello,
 
-I see there's a long thread beyond this, but I just got back from
-vacation and haven't read all of it.
+syzbot found the following issue on:
 
-As for this question itself, I'd say no. In some cases it probably could
-be made safe for mac80211 _itself_ (by adjust that lock and maybe
-another one or two), but that wouldn't extend to the drivers, so it'd be
-up to the individual drivers. In most cases mac80211 calls wake_tx_queue
-(either driver or its own implementation) and that will pull frame(s),
-but either way it's going to go all the way into the driver, with
-unknown results.
+HEAD commit:    69fd6b99b8f8 Merge tag 'perf_urgent_for_v6.17_rc3' of git:..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=10adec42580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6ccfdce02093e91f
+dashboard link: https://syzkaller.appspot.com/bug?extid=e69f06a0f30116c68056
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=130d8462580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10bfb862580000
 
-I guess we could do that async since we queue there anyway, but in this
-case (of wanting to get things out of a dying system) that'd probably be
-counter-productive...
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/ce22f4296138/disk-69fd6b99.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/36a2af954ef6/vmlinux-69fd6b99.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/594a8181f23a/bzImage-69fd6b99.xz
 
-Maybe if it's an individual driver opt-in, but I don't really see it
-working for most drivers.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+e69f06a0f30116c68056@syzkaller.appspotmail.com
 
-johannes
+=====================================================
+BUG: KMSAN: uninit-value in __sctp_v6_cmp_addr+0x887/0x8c0 net/sctp/ipv6.c:649
+ __sctp_v6_cmp_addr+0x887/0x8c0 net/sctp/ipv6.c:649
+ sctp_inet6_cmp_addr+0x4f2/0x510 net/sctp/ipv6.c:983
+ sctp_bind_addr_conflict+0x22a/0x3b0 net/sctp/bind_addr.c:390
+ sctp_get_port_local+0x21eb/0x2440 net/sctp/socket.c:8452
+ sctp_get_port net/sctp/socket.c:8523 [inline]
+ sctp_listen_start net/sctp/socket.c:8567 [inline]
+ sctp_inet_listen+0x710/0xfd0 net/sctp/socket.c:8636
+ __sys_listen_socket net/socket.c:1912 [inline]
+ __sys_listen net/socket.c:1927 [inline]
+ __do_sys_listen net/socket.c:1932 [inline]
+ __se_sys_listen net/socket.c:1930 [inline]
+ __x64_sys_listen+0x343/0x4c0 net/socket.c:1930
+ x64_sys_call+0x271d/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:51
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Local variable t.i created at:
+ __do_sys_futex kernel/futex/syscalls.c:165 [inline]
+ __se_sys_futex+0x4d/0x740 kernel/futex/syscalls.c:160
+ __x64_sys_futex+0x114/0x1a0 kernel/futex/syscalls.c:160
+
+CPU: 1 UID: 0 PID: 6089 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(none) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
