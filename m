@@ -1,95 +1,82 @@
-Return-Path: <netdev+bounces-217023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96231B37186
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 19:44:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E476B371B2
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 19:49:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6666189B0C2
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 17:44:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F6903A5609
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 17:49:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CB962E3705;
-	Tue, 26 Aug 2025 17:43:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80B04242D9A;
+	Tue, 26 Aug 2025 17:49:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EmTeOrKE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cnD9afI1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2851E2BEFF7
-	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 17:43:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5369431A577;
+	Tue, 26 Aug 2025 17:49:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756230239; cv=none; b=Kc6+dB1xXi2lscKASiMg5hnG25futis978SBU7a1sLOISfEeLqMt0fdzc2sW9HuehXlA4+Jh2an22BuvZcmgfHusuMQB2xk7g2Kx6hEtxjFH5QGhKI4GTtDhVSdGOKJkagkHmyTFu3w1MttbAnc1ALOlxb5gmE4yLZGeeBpzNJ4=
+	t=1756230580; cv=none; b=Si1qENhG9/c5F/2lVrwzzBG9Bk41TnYufiEDtpCL7MrFDkOC8XwWMnTs+4ofPJjycbYq1TAq/QUd/O95A01gPIb15PPpOCheCbJPsAzJn+a2un+ijr3MWGrU+pqw00zUvpP+9EgwUQIlWq5iwFHBjnywqnAcj+AItw/b/8pufgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756230239; c=relaxed/simple;
-	bh=KfIK98iHpFl4xX9GWUkDuIHW4w9/i0rlce5U2zyUgmA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rJAIVB2Zpy5fnjjXPUEYsGpTirfDfCyc6VIOCufUCy0LsvxOwGHER+YFtNN40IwjZf1dRQap6uH3YgML7/9VA/JDWxb548ign7R+3+BarWICdJVw+b1Az0FVdEdORhY7JlPR7Wv3aixqH+yno79svX46AmkOzsovWXGYmVIXaKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EmTeOrKE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3041C4CEF1;
-	Tue, 26 Aug 2025 17:43:55 +0000 (UTC)
+	s=arc-20240116; t=1756230580; c=relaxed/simple;
+	bh=6TMtBzRFBOVX2bHF383YJhY34ok6iHyjIHKEfFFcpIY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QvTKlc/8ZWDrpcAUGMipMpDXjReWPsArECGtxv2AOttbWM1JjedWu7PXGZXyRIeSKzgVmcdA4pMF0PIXPRxJZ9rVeHxE0ntAv3cFEYnv36fpgjj6pXE0mEe9zOYmIOUW8XCw/GboS9dbWq9hfL6yrMWfZp/o4Vbg4qmRpLDbP7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cnD9afI1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECF08C4CEF1;
+	Tue, 26 Aug 2025 17:49:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756230238;
-	bh=KfIK98iHpFl4xX9GWUkDuIHW4w9/i0rlce5U2zyUgmA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EmTeOrKEdtWN2VaptUpZAekTyCN40xu2K14Z7938FNUBbPVoO5g9eILWaSgHnLzsG
-	 /C8M4L1dOmI7vNj16JAcNp4eGaUoqOHxRo4O7f6G0FgMjoaCSWrgNJ78fx9Q5SVghm
-	 TEwHtdsnXLe/+ZzU5bq5nq4G8g3P8Fg4vFxyFXB5OecYNlQeWjiO3KpSvT2LBm5jsD
-	 sZlemhGEDdBAAeH/Y9qUfxakNAzBRsKUWpd3vsczrjC4LjP6LblSPt26YFe50JC2xV
-	 91UPbPq0rzjz8va0VZGgrf6PesVM8Z/WAUpvl8oa4GAV63F3OG9GCpnRfim/MJodr6
-	 kn1pJV6lPVHPQ==
-Date: Tue, 26 Aug 2025 18:43:53 +0100
-From: Simon Horman <horms@kernel.org>
-To: Emil Tantilov <emil.s.tantilov@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Aleksandr.Loktionov@intel.com, przemyslaw.kitszel@intel.com,
-	anthony.l.nguyen@intel.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, jianliu@redhat.com, mschmidt@redhat.com,
-	decot@google.com, willemb@google.com, joshua.a.hay@intel.com,
-	pmenzel@molgen.mpg.de
-Subject: Re: [PATCH iwl-net v3] idpf: set mac type when adding and removing
- MAC filters
-Message-ID: <20250826174353.GN5892@horms.kernel.org>
-References: <20250814234300.2926-1-emil.s.tantilov@intel.com>
+	s=k20201202; t=1756230579;
+	bh=6TMtBzRFBOVX2bHF383YJhY34ok6iHyjIHKEfFFcpIY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=cnD9afI1IWZDgoRRrVAa/8aSd0Rh24QzMGtIGcX1RUIzd+bSp+ssj7+b1we/mECYk
+	 TCjT1kAGZIwACflpQlmUaMqBrxgNx+A4yFCA+IMIkILs7RE9cYXTPjnubqzQim8vJj
+	 uESnp3zf9k+nxUe275Br+eyoQlIaCbubO5XWBQa1H8ibsfE+Ynz4yrMTzqMMqxcAiJ
+	 0l09EQG0XHAjDxHVQCcm8iORlqMy7Fu0T8lT+rvz3l6IO+QWMwhSLZMznFTP92G5EL
+	 aeKll2Ev0WzeKN9SP+4SIUyVXbZ2uSdHb1l+oxv+t0g67PWKzf2Ev5RVRP+9uwAEhL
+	 8jPG+16eBzi7w==
+Date: Tue, 26 Aug 2025 10:49:38 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, linux-doc@vger.kernel.org, Jonathan Corbet
+ <corbet@lwn.net>, Bjorn Helgaas <helgaas@kernel.org>, luosifu
+ <luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>, Shen Chenyang
+ <shenchenyang1@hisilicon.com>, Zhou Shuai <zhoushuai28@huawei.com>, Wu Like
+ <wulike1@huawei.com>, Shi Jing <shijing34@huawei.com>, Meny Yossefi
+ <meny.yossefi@huawei.com>, Gur Stavi <gur.stavi@huawei.com>, Lee Trager
+ <lee@trager.us>, Michael Ellerman <mpe@ellerman.id.au>, Suman Ghosh
+ <sumang@marvell.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: Re: [PATCH net-next v01 10/12] hinic3: Add Rss function
+Message-ID: <20250826104938.20980ea7@kernel.org>
+In-Reply-To: <53206f29-7da8-4145-aef0-7bdacef3bb55@linux.dev>
+References: <cover.1756195078.git.zhuyikai1@h-partners.com>
+	<13ffd1d836eb7aa6563ad93bf5fa5196afdf0053.1756195078.git.zhuyikai1@h-partners.com>
+	<53206f29-7da8-4145-aef0-7bdacef3bb55@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250814234300.2926-1-emil.s.tantilov@intel.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 14, 2025 at 04:43:00PM -0700, Emil Tantilov wrote:
-> On control planes that allow changing the MAC address of the interface,
-> the driver must provide a MAC type to avoid errors such as:
+On Tue, 26 Aug 2025 18:06:42 +0100 Vadim Fedorenko wrote:
+> > +	nic_dev->rss_hkey = kzalloc(L2NIC_RSS_KEY_SIZE, GFP_KERNEL);  
 > 
-> idpf 0000:0a:00.0: Transaction failed (op 535)
-> idpf 0000:0a:00.0: Received invalid MAC filter payload (op 535) (len 0)
-> idpf 0000:0a:00.0: Transaction failed (op 536)
-> 
-> These errors occur during driver load or when changing the MAC via:
-> ip link set <iface> address <mac>
-> 
-> Add logic to set the MAC type when sending ADD/DEL (opcodes 535/536) to
-> the control plane. Since only one primary MAC is supported per vport, the
-> driver only needs to send an ADD opcode when setting it. Remove the old
-> address by calling __idpf_del_mac_filter(), which skips the message and
-> just clears the entry from the internal list. This avoids an error on DEL
-> as it attempts to remove an address already cleared by the preceding ADD
-> opcode.
-> 
-> Fixes: ce1b75d0635c ("idpf: add ptypes and MAC filter support")
-> Reported-by: Jian Liu <jianliu@redhat.com>
-> Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+> no need to request zero'ed allocation if you are going to overwrite it
+> completely on the very next line.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-
+exactly, please use kmemdump().
 
