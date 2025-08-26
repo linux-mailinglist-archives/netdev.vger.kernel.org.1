@@ -1,245 +1,199 @@
-Return-Path: <netdev+bounces-216843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 728EBB357A2
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 10:51:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CBF7B357B5
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 10:55:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 819937AB37C
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 08:50:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B0723AAC14
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 08:55:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC6C32FCC02;
-	Tue, 26 Aug 2025 08:51:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFFCF1B6D08;
+	Tue, 26 Aug 2025 08:55:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 084FA2F99AD
-	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 08:51:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A78D69460
+	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 08:55:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756198297; cv=none; b=K4/zK81VYZDMTJJtqbpz1ITSJ41koyH14C0yiSnjPA16mNrftoLEUVApaHeUOMDUkEXi36Xauh9W8BeR+0Yjl2xO20yfLYWH3uQYeOxBf3NAXWwQaCX/btpBYxjvGRVQzojbR1OCBS539OpX7quhPq4pVQ3474ZNOeu1KA5ISX0=
+	t=1756198511; cv=none; b=c8R/wZAGgJNC7FnI2FI1fHPNeOOrQ/BKyPEmMx7B3+rFlh9kGoU95RYkLypr3obO/8MrnXN1vt/SkfK0xZrTn6JbC1aAWmy4EIKx8Jt/cy6APG9ptvwZkTFDXo90GlJRn8q21T07aJ3p1E9eW2j8bYjTWg3yMoBsVgXZ90C/T98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756198297; c=relaxed/simple;
-	bh=rqbzpIMNF8lcLo+xCfnXXVC+y3Ijjnd4uYWZXRDrsAQ=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=ctVAsptUtK1q6N9z3HNdSVXqkwN43vuTlWaAmxI00VVN50r42YtXwIdQ9gCuA56ZD6D/53qkMIBy2OtO53U1xFfUuTtevjp4rMmqVfaI90Y3kuX6TPAvmo2gg5XXa+P3+hy34VHCzElzZZZw9Zz4ZDKSANSNRbu3bv2+qFjU6Dg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3e6670d5bafso139646995ab.2
-        for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 01:51:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756198295; x=1756803095;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V5Z8geFiUzuvb4xav6QXnStSoxIENWrkMk1y8NFINgg=;
-        b=T4+XogzBJ6bFE5/RxBuHDLtvo8rR70hNBEna4eFRceKQJVPUx1rEUhxKNPPRaUFcaJ
-         2sljkfXmmgYOQAUvJ0oL1ejCqltSz/HLxHwmxbzIasCqDM21rDpLCuZT8BjezHufukTa
-         1EetU9o3mKQgM8aRIRTE4CFHUke8cydQl+C1qQcFsEx1dCVIIYtamx1WP8u+H7f1Nc/f
-         CcVhoHoVF0FtqIENulwBVb2uty2V0O2Pi8hWb2tprIxpiWOoHLamLI9OTlYgjKwSffgw
-         /ur+3WcWFaBtb0z7DnvN5BXSpAcHiO8SdwGgJVrfPmGPGLgL4ax/1EVVUAz7qBc6RA8W
-         59uw==
-X-Forwarded-Encrypted: i=1; AJvYcCXwaPRdsjTMcuHwsflvWWJOzMIi6pDNeXu2ojXK6yQV+IFqM1Un43SuvIOl0YjxfigM7dES5OI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvWy3thcD9kSSsuLQ4lB/jq5PyGJ32nF2Rf0MG01ASRPbZ907/
-	0+8Jmkc2GPRwLZ5Vgpm/MxEq9pIfa8ToVt5fQY+kW7bm0p3JyjK+bz97CzzRJ1ir67SxNytBIjm
-	uj53RZFjzICWTGshOnW7fKd9wHzgkW9Nyh6aLCUikUahFMuWPd6oZg6Y2Vro=
-X-Google-Smtp-Source: AGHT+IGyCWr0r9RDJeiW8aRxDMVAR/RmplC1QNzX7o7NXNCYjeAEdE8Lnppx22aFBoWOaVC2roEIjfX0CoBvLEDs8itAl1OaB3FS
+	s=arc-20240116; t=1756198511; c=relaxed/simple;
+	bh=d+h2PRJM2l08TaXnGzcsmwZ3+8ua03+lAD5/yxQMu+4=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=YrYSWeA9ZuukNZx2Wf83xZFl+RheNQuxspI5lC+YdebpsX7q2MAcjBR2FnHJYDQYhiclLccrhOabQFnd69ErBLTdgxl6OFiOx5pogY/R277a5huo9+cixlXbD/Oa8EsSX+GZ4bdO+UWhW6rxKv7lj6ESWdZKZch8MeXCVu1S5Z8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <p.zabel@pengutronix.de>)
+	id 1uqpRq-0003j9-Qa; Tue, 26 Aug 2025 10:54:34 +0200
+Received: from lupine.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::4e] helo=lupine)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <p.zabel@pengutronix.de>)
+	id 1uqpRn-002Cb2-1w;
+	Tue, 26 Aug 2025 10:54:31 +0200
+Received: from pza by lupine with local (Exim 4.96)
+	(envelope-from <p.zabel@pengutronix.de>)
+	id 1uqpRn-0005k0-1e;
+	Tue, 26 Aug 2025 10:54:31 +0200
+Message-ID: <eb127fd167cfbd885099a7c4c962eb1135a5a8a0.camel@pengutronix.de>
+Subject: Re: [PATCH net-next v7 2/5] net: spacemit: Add K1 Ethernet MAC
+From: Philipp Zabel <p.zabel@pengutronix.de>
+To: Vivian Wang <wangruikang@iscas.ac.cn>, Andrew Lunn
+ <andrew+netdev@lunn.ch>,  Jakub Kicinski <kuba@kernel.org>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>, Palmer
+ Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Alexandre
+ Ghiti <alex@ghiti.fr>
+Cc: Vivian Wang <uwu@dram.page>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>,  Junhui Liu <junhui.liu@pigmoral.tech>, Simon
+ Horman <horms@kernel.org>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-riscv@lists.infradead.org, 
+ spacemit@lists.linux.dev, linux-kernel@vger.kernel.org
+Date: Tue, 26 Aug 2025 10:54:31 +0200
+In-Reply-To: <20250826-net-k1-emac-v7-2-5bc158d086ae@iscas.ac.cn>
+References: <20250826-net-k1-emac-v7-0-5bc158d086ae@iscas.ac.cn>
+	 <20250826-net-k1-emac-v7-2-5bc158d086ae@iscas.ac.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3c03:b0:3e8:78b5:6834 with SMTP id
- e9e14a558f8ab-3e91fc22a64mr220178895ab.2.1756198295079; Tue, 26 Aug 2025
- 01:51:35 -0700 (PDT)
-Date: Tue, 26 Aug 2025 01:51:35 -0700
-In-Reply-To: <20250826041148.426598-1-liuhangbin@gmail.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68ad7597.050a0220.37038e.00b7.GAE@google.com>
-Subject: [syzbot ci] Re: hsr: add rcu lock for all hsr_for_each_port caller
-From: syzbot ci <syzbot+cie5eccf65446b6e53@syzkaller.appspotmail.com>
-To: aleksander.lobakin@intel.com, arvid.brodin@alten.se, danishanwar@ti.com, 
-	davem@davemloft.net, edumazet@google.com, ffmancera@riseup.net, 
-	horms@kernel.org, jkarrenpalo@gmail.com, johannes.berg@intel.com, 
-	kuba@kernel.org, kuniyu@google.com, liaoyu15@huawei.com, liuhangbin@gmail.com, 
-	m-karicheri2@ti.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	sdf@fomichev.me, shaw.leon@gmail.com, w-kwok2@ti.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: p.zabel@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-syzbot ci has tested the following series
+On Di, 2025-08-26 at 14:23 +0800, Vivian Wang wrote:
+> The Ethernet MACs found on SpacemiT K1 appears to be a custom design
+> that only superficially resembles some other embedded MACs. SpacemiT
+> refers to them as "EMAC", so let's just call the driver "k1_emac".
+>=20
+> Supports RGMII and RMII interfaces. Includes support for MAC hardware
+> statistics counters. PTP support is not implemented.
+>=20
+> Tested-by: Junhui Liu <junhui.liu@pigmoral.tech>
+> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
+> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> ---
+>  drivers/net/ethernet/Kconfig            |    1 +
+>  drivers/net/ethernet/Makefile           |    1 +
+>  drivers/net/ethernet/spacemit/Kconfig   |   29 +
+>  drivers/net/ethernet/spacemit/Makefile  |    6 +
+>  drivers/net/ethernet/spacemit/k1_emac.c | 2193 +++++++++++++++++++++++++=
+++++++
+>  drivers/net/ethernet/spacemit/k1_emac.h |  426 ++++++
+>  6 files changed, 2656 insertions(+)
+>=20
+[...]
+> diff --git a/drivers/net/ethernet/spacemit/k1_emac.c b/drivers/net/ethern=
+et/spacemit/k1_emac.c
+> new file mode 100644
+> index 0000000000000000000000000000000000000000..9e558d5893cfbbda0baa7ad21=
+a7209dadda9487e
+> --- /dev/null
+> +++ b/drivers/net/ethernet/spacemit/k1_emac.c
+> @@ -0,0 +1,2193 @@
+[...]
+> +static int emac_probe(struct platform_device *pdev)
+> +{
+> +	struct device *dev =3D &pdev->dev;
+> +	struct reset_control *reset;
+> +	struct net_device *ndev;
+> +	struct emac_priv *priv;
+> +	int ret;
+> +
+> +	ndev =3D devm_alloc_etherdev(dev, sizeof(struct emac_priv));
+> +	if (!ndev)
+> +		return -ENOMEM;
+> +
+> +	ndev->hw_features =3D NETIF_F_SG;
+> +	ndev->features |=3D ndev->hw_features;
+> +
+> +	ndev->max_mtu =3D EMAC_RX_BUF_4K - (ETH_HLEN + ETH_FCS_LEN);
+> +
+> +	priv =3D netdev_priv(ndev);
+> +	priv->ndev =3D ndev;
+> +	priv->pdev =3D pdev;
+> +	platform_set_drvdata(pdev, priv);
+> +
+> +	ret =3D emac_config_dt(pdev, priv);
+> +	if (ret < 0) {
+> +		dev_err_probe(dev, ret, "Configuration failed\n");
+> +		goto err;
 
-[v1] hsr: add rcu lock for all hsr_for_each_port caller
-https://lore.kernel.org/all/20250826041148.426598-1-liuhangbin@gmail.com
-* [PATCH net] hsr: add rcu lock for all hsr_for_each_port caller
+I'd just
+		return dev_err_probe(...);
+here.
 
-and found the following issue:
-BUG: sleeping function called from invalid context in dev_set_allmulti
+> +	}
+> +
+> +	ndev->watchdog_timeo =3D 5 * HZ;
+> +	ndev->base_addr =3D (unsigned long)priv->iobase;
+> +	ndev->irq =3D priv->irq;
+> +
+> +	ndev->ethtool_ops =3D &emac_ethtool_ops;
+> +	ndev->netdev_ops =3D &emac_netdev_ops;
+> +
+> +	devm_pm_runtime_enable(&pdev->dev);
+> +
+> +	priv->bus_clk =3D devm_clk_get_enabled(&pdev->dev, NULL);
+> +	if (IS_ERR(priv->bus_clk)) {
+> +		ret =3D dev_err_probe(dev, PTR_ERR(priv->bus_clk),
+> +				    "Failed to get clock\n");
+> +		goto err;
 
-Full report is available here:
-https://ci.syzbot.org/series/3992f7f8-7052-4440-bc88-86be6f350cec
+Same here.
 
-***
+> +	}
+> +
+> +	reset =3D devm_reset_control_get_optional_exclusive_deasserted(&pdev->d=
+ev,
+> +								     NULL);
+> +	if (IS_ERR(reset)) {
+> +		ret =3D dev_err_probe(dev, PTR_ERR(reset),
+> +				    "Failed to get reset\n");
+> +		goto err;
 
-BUG: sleeping function called from invalid context in dev_set_allmulti
+And here.
 
-tree:      net
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
-base:      51f27beeb79f9f92682158999bab489ff4fa16f6
-arch:      amd64
-compiler:  Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-config:    https://ci.syzbot.org/builds/1a20cfb3-c3a6-4ba9-9bda-2f49b971b39c/config
-C repro:   https://ci.syzbot.org/findings/9de559bc-f498-4b86-ab2e-34f1510e4fe4/c_repro
-syz repro: https://ci.syzbot.org/findings/9de559bc-f498-4b86-ab2e-34f1510e4fe4/syz_repro
+> +	}
+> +
+> +	emac_sw_init(priv);
+> +
+> +	if (of_phy_is_fixed_link(dev->of_node)) {
+> +		ret =3D of_phy_register_fixed_link(dev->of_node);
+> +		if (ret) {
+> +			dev_err_probe(dev, ret,
+> +				      "Failed to register fixed-link");
+> +			goto err_timer_delete;
 
-hsr1: entered promiscuous mode
-hsr1: entered allmulticast mode
-bond0: entered allmulticast mode
-bond_slave_0: entered allmulticast mode
-bond_slave_1: entered allmulticast mode
-BUG: sleeping function called from invalid context at kernel/locking/mutex.c:575
-in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 5996, name: syz.0.17
-preempt_count: 0, expected: 0
-RCU nest depth: 1, expected: 0
-3 locks held by syz.0.17/5996:
- #0: ffffffff8fa59670 (&ops->srcu#2){.+.+}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
- #0: ffffffff8fa59670 (&ops->srcu#2){.+.+}-{0:0}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
- #0: ffffffff8fa59670 (&ops->srcu#2){.+.+}-{0:0}, at: rtnl_link_ops_get+0x23/0x250 net/core/rtnetlink.c:570
- #1: ffffffff8f537c08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
- #1: ffffffff8f537c08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock net/core/rtnetlink.c:341 [inline]
- #1: ffffffff8f537c08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_newlink+0x8db/0x1c70 net/core/rtnetlink.c:4056
- #2: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
- #2: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
- #2: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: hsr_change_rx_flags+0x28/0x2d0 net/hsr/hsr_device.c:522
-CPU: 0 UID: 0 PID: 5996 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- __might_resched+0x495/0x610 kernel/sched/core.c:8957
- __mutex_lock_common kernel/locking/mutex.c:575 [inline]
- __mutex_lock+0x109/0x1360 kernel/locking/mutex.c:760
- netdev_lock include/linux/netdevice.h:2761 [inline]
- netdev_lock_ops include/net/netdev_lock.h:42 [inline]
- dev_set_allmulti+0x10e/0x260 net/core/dev_api.c:312
- hsr_change_rx_flags+0x1b2/0x2d0 net/hsr/hsr_device.c:530
- dev_change_rx_flags net/core/dev.c:9332 [inline]
- netif_set_allmulti+0x212/0x380 net/core/dev.c:9430
- __dev_change_flags+0x52e/0x6d0 net/core/dev.c:9571
- rtnl_configure_link net/core/rtnetlink.c:3579 [inline]
- rtnl_newlink_create+0x555/0xb00 net/core/rtnetlink.c:3835
- __rtnl_newlink net/core/rtnetlink.c:3942 [inline]
- rtnl_newlink+0x16d6/0x1c70 net/core/rtnetlink.c:4057
- rtnetlink_rcv_msg+0x7cf/0xb70 net/core/rtnetlink.c:6946
- netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2552
- netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
- netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1346
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
- sock_sendmsg_nosec net/socket.c:714 [inline]
- __sock_sendmsg+0x21c/0x270 net/socket.c:729
- ____sys_sendmsg+0x505/0x830 net/socket.c:2614
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
- __sys_sendmsg net/socket.c:2700 [inline]
- __do_sys_sendmsg net/socket.c:2705 [inline]
- __se_sys_sendmsg net/socket.c:2703 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2703
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7ff4b418ebe9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffef8386cc8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007ff4b43b5fa0 RCX: 00007ff4b418ebe9
-RDX: 00000000000080c0 RSI: 00002000000002c0 RDI: 0000000000000003
-RBP: 00007ff4b4211e19 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007ff4b43b5fa0 R14: 00007ff4b43b5fa0 R15: 0000000000000003
- </TASK>
+If you can move this section before emac_sw_init(), this could also
+just return.
 
-=============================
-[ BUG: Invalid wait context ]
-syzkaller #0 Tainted: G        W          
------------------------------
-syz.0.17/5996 is trying to lock:
-ffff888110848d30 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2761 [inline]
-ffff888110848d30 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: netdev_lock_ops include/net/netdev_lock.h:42 [inline]
-ffff888110848d30 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: dev_set_allmulti+0x10e/0x260 net/core/dev_api.c:312
-other info that might help us debug this:
-context-{5:5}
-3 locks held by syz.0.17/5996:
- #0: ffffffff8fa59670 (&ops->srcu#2){.+.+}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
- #0: ffffffff8fa59670 (&ops->srcu#2){.+.+}-{0:0}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
- #0: ffffffff8fa59670 (&ops->srcu#2){.+.+}-{0:0}, at: rtnl_link_ops_get+0x23/0x250 net/core/rtnetlink.c:570
- #1: ffffffff8f537c08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
- #1: ffffffff8f537c08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock net/core/rtnetlink.c:341 [inline]
- #1: ffffffff8f537c08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_newlink+0x8db/0x1c70 net/core/rtnetlink.c:4056
- #2: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
- #2: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
- #2: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: hsr_change_rx_flags+0x28/0x2d0 net/hsr/hsr_device.c:522
-stack backtrace:
-CPU: 0 UID: 0 PID: 5996 Comm: syz.0.17 Tainted: G        W           syzkaller #0 PREEMPT(full) 
-Tainted: [W]=WARN
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_lock_invalid_wait_context kernel/locking/lockdep.c:4830 [inline]
- check_wait_context kernel/locking/lockdep.c:4902 [inline]
- __lock_acquire+0xbcb/0xd20 kernel/locking/lockdep.c:5187
- lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
- __mutex_lock_common kernel/locking/mutex.c:598 [inline]
- __mutex_lock+0x187/0x1360 kernel/locking/mutex.c:760
- netdev_lock include/linux/netdevice.h:2761 [inline]
- netdev_lock_ops include/net/netdev_lock.h:42 [inline]
- dev_set_allmulti+0x10e/0x260 net/core/dev_api.c:312
- hsr_change_rx_flags+0x1b2/0x2d0 net/hsr/hsr_device.c:530
- dev_change_rx_flags net/core/dev.c:9332 [inline]
- netif_set_allmulti+0x212/0x380 net/core/dev.c:9430
- __dev_change_flags+0x52e/0x6d0 net/core/dev.c:9571
- rtnl_configure_link net/core/rtnetlink.c:3579 [inline]
- rtnl_newlink_create+0x555/0xb00 net/core/rtnetlink.c:3835
- __rtnl_newlink net/core/rtnetlink.c:3942 [inline]
- rtnl_newlink+0x16d6/0x1c70 net/core/rtnetlink.c:4057
- rtnetlink_rcv_msg+0x7cf/0xb70 net/core/rtnetlink.c:6946
- netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2552
- netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
- netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1346
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
- sock_sendmsg_nosec net/socket.c:714 [inline]
- __sock_sendmsg+0x21c/0x270 net/socket.c:729
- ____sys_sendmsg+0x505/0x830 net/socket.c:2614
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
- __sys_sendmsg net/socket.c:2700 [inline]
- __do_sys_sendmsg net/socket.c:2705 [inline]
- __se_sys_sendmsg net/socket.c:2703 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2703
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7ff4b418ebe9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffef8386cc8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007ff4b43b5fa0 RCX: 00007ff4b418ebe9
-RDX: 00000000000080c0 RSI: 00002000000002c0 RDI: 0000000000000003
-RBP: 00007ff4b4211e19 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007ff4b43b5fa0 R14: 00007ff4b43b5fa0 R15: 0000000000000003
- </TASK>
-dummy0: entered allmulticast mode
+> +		}
+
+Then here a function calling of_phy_deregister_fixed_link() could be
+registered with devm_add_action_or_reset(), to avoid duplicated cleanup
+in the error path and in emac_remove().
 
 
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+regards
+Philipp
 
