@@ -1,166 +1,117 @@
-Return-Path: <netdev+bounces-216837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AD6BB356B2
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 10:24:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCB5FB3567B
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 10:14:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FAB11B66927
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 08:24:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83704680856
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 08:14:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E8342877E3;
-	Tue, 26 Aug 2025 08:24:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B0592F5316;
+	Tue, 26 Aug 2025 08:14:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b="UusjxQNF"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bVuMTRfv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m15588.qiye.163.com (mail-m15588.qiye.163.com [101.71.155.88])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4E727AC45;
-	Tue, 26 Aug 2025 08:24:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.71.155.88
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AACE284678
+	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 08:14:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756196655; cv=none; b=PT2mXUAcLomksyPtZqTuL44n8uHWeEqWuxwJiytWwZU73GkeUmtq6XYZzcYyFoomdNquuNuukw6+b5RIZ487rtYJPXy8kMvbdQlwjS8pjp8q26wI3y+BKVnvmnApxlAeceGZPZYUTibe4lUu6CvVz+dagIqNMn9Lwkmt3ku0CkA=
+	t=1756196054; cv=none; b=iIhVrWhI5VuVnemg9mnXBX0P52O/2b8kIzMyUeIofkcMMFzOZlCCgYsxcvQXtC2+1wr/1uUG4ZqVCvmZPUD5qxgfUm/iojzr39SyBbEL0FDYKvaw5sR4fkxiGu0DYs74AwECGA+cwGICrVIfXKRHIlPGEeOBC7zP4a/qVjVaFa8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756196655; c=relaxed/simple;
-	bh=NYQxuzRoyE3fAv952wesSvek/3GuuzRVk1hPqosGcc0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CPSGJqBKd0VMPymdj+5TLb72yURy3yEhXibNnk4v7hiZ4+Rj1jALU9XcO331dxTyQzZ/rKV0/r1+kHBBUn9DD6xW4LOwp23JCD7I27wXLSuuzhZOt3GMLGrDYMoz2+hczW5vb60qsTJoy7u4YBoxOzU8OjCZgk3NUeait9neYg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rock-chips.com; spf=pass smtp.mailfrom=rock-chips.com; dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b=UusjxQNF; arc=none smtp.client-ip=101.71.155.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rock-chips.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rock-chips.com
-Received: from [172.16.12.153] (unknown [58.22.7.114])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 20a3254b0;
-	Tue, 26 Aug 2025 16:08:42 +0800 (GMT+08:00)
-Message-ID: <8240a3cc-aade-40d8-b2f4-09681f76be68@rock-chips.com>
-Date: Tue, 26 Aug 2025 16:08:40 +0800
+	s=arc-20240116; t=1756196054; c=relaxed/simple;
+	bh=h9u7C3pqJnM4zMdMnReRGZ/HSmB+17GO3ew7kK7JkGo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J6/K3vGbDkR/hbSuzkJ75NhmzX8yOU2UInAQnEvv5e5R3z0UkRkiPN0Cag1J4rekKF6IPWT0GPX9n0wn6qJY9ybCJ328M89itSSRVkWQKXqpWmleiE/nIJ07sm+eNY9z0AR3eLu6BCTPNRqdD8nyUGw0VjWS+2IptJF8K27Jf6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=bVuMTRfv; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3cbe70a7923so48813f8f.2
+        for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 01:14:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1756196051; x=1756800851; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=htJocjFCbY0wQ75QkTSmsj/N5xHgBbkFNdLz93b0Td0=;
+        b=bVuMTRfvNT6Nd/XoPZDgckoqxjbbpew+NVXLtXdZQtL8tDZcMf67niLfrMFEdzBIPv
+         Jw+vL79zNlvW3QSxbwGf65HfhVRbhS9KuOi+6AlJrEgBerEJqfKTDcmsPvf4WgRzBnEh
+         YDMcx3xqAhFBxt8nJQWqI5BRQLRAw2Brd2HAfNIkMQmOuTICknMY0NDYXNPfzGguGhoo
+         6zHduYFlfw67yd6D0bCD+g6GdnaDBQIePWFOAiDD4FhU9ctet1iDGQLvsTmU4QgZ6I1i
+         XBuwrh1HYHvh9zEuVuj8i1x5t13IRaAicmNi2m3U3ogjiG3wXzVFr6UqM+y94oo2jO5U
+         Ac6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756196051; x=1756800851;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=htJocjFCbY0wQ75QkTSmsj/N5xHgBbkFNdLz93b0Td0=;
+        b=tS91JC/MCXj2OpFsSPbMsyLlcSp+6CJe3NFHFOm0lVHxehhicPLe0LhtuwHuxZ3Poo
+         osee0haimgKVb+sJqzg6UpA+uaBHftOOr9ahfC3WK3mUBcpPHbWVO2YaWvzJTb+RpVbI
+         Ogd4dYMHeHDY8pvIangg5NJl29slp5ayYwSbtecKF1cuy9KvveqeILUi1Dhi34PC8/Lc
+         7lEQAa3xJdmCmgYhFkbEjHqe5bBsyvhz89MkzVg7mq02xkpSOomfzrIM0TkGPoz8DsDQ
+         3Wpe86BJwRCn0YTq+AJIMvp355vqOh6ZJP5IqlqiNpmCAg5uE8bFIAOjvZDy9G9EFYxX
+         p3aA==
+X-Forwarded-Encrypted: i=1; AJvYcCUbqHGPt8gqG5ednZpECNC/JdLp5ys9dg2g/11Wwa6/cByLefb/fwebZ7IuKnX+64HjyeJHQMg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1g/pJPIVuBXbtDExNPnmKSXKWfU0G3dtkGqbtkYZPaKljdMMV
+	DN5eeqFYoI96pYwYZzGQPNy4xBA441RAeSWR7ZK6TPzJelJ0HfHBwWgIeRPFaLzAGMI=
+X-Gm-Gg: ASbGncsPPXaoYnBMvFCZ/W2UtxJdRHPhLIPngmc+AA7SeKljrVfG8buXrtx9y1MvNI+
+	yvBJRWaGLXOYYU+qv/VCMVGRyDdYDD3TfHd6XHn0420K5yzkx+0RREY+8PTPHUnyYPl5zJ4GJ9w
+	zMH4GDOFDHkUUD4Vka4b6mm+vUcTDlba7iAVC665JH+mSGO2NhFjJvXq0Gyt+n9ptexq0NMl+7z
+	ivV/t534UcoJQeGWt93T78k7aLs45SCXQXEwPXPzEEac/KAQxm2rrjPjQpYc3DyRu0265dvu/yL
+	cD16mRrkt4p4PczbrTXUtx/tHU50r32YPQFh0F7B9x6efQCy3PhRE7LJz77klM9iA1k1/Sja5I7
+	NAYEBfBDxa+gjxYzpj9T9JUbt80s=
+X-Google-Smtp-Source: AGHT+IEbKxCrV/crYXvaOYg+DOzSnDljX8XhhperEq+dcEo354TQCGi1v3zOaG9kMQNx5o6N4Me2oQ==
+X-Received: by 2002:a5d:5f8e:0:b0:3c8:443:4066 with SMTP id ffacd0b85a97d-3c804434575mr6485502f8f.61.1756196051410;
+        Tue, 26 Aug 2025 01:14:11 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-3ca8f2811d9sm4480136f8f.20.2025.08.26.01.14.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Aug 2025 01:14:10 -0700 (PDT)
+Date: Tue, 26 Aug 2025 11:14:07 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+	andrii@kernel.org, netdev@vger.kernel.org,
+	magnus.karlsson@intel.com, stfomichev@gmail.com,
+	aleksander.lobakin@intel.com,
+	Eryk Kubanski <e.kubanski@partner.samsung.com>
+Subject: Re: [PATCH v6 bpf] xsk: fix immature cq descriptor production
+Message-ID: <aK1sz42QLX42u6Eo@stanley.mountain>
+References: <20250820154416.2248012-1-maciej.fijalkowski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3] net: ethernet: stmmac: dwmac-rk: Make the
- clk_phy could be used for external phy
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Marek Szyprowski <m.szyprowski@samsung.com>
-Cc: Chaoyi Chen <kernel@airkyi.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jonas Karlman <jonas@kwiboo.se>, David Wu <david.wu@rock-chips.com>,
- netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-rockchip@lists.infradead.org
-References: <20250815023515.114-1-kernel@airkyi.com>
- <CGME20250825072312eucas1p2d4751199c0ea069c7938218be60e5e93@eucas1p2.samsung.com>
- <a30a8c97-6b96-45ba-bad7-8a40401babc2@samsung.com>
- <d0fe6d16-181f-4b38-9457-1099fb6419d0@rock-chips.com>
- <809848c9-2ffa-4743-adda-b8b714b404de@samsung.com>
- <aKxnHFSrVeM7Be5A@shell.armlinux.org.uk>
-Content-Language: en-US
-From: Chaoyi Chen <chaoyi.chen@rock-chips.com>
-In-Reply-To: <aKxnHFSrVeM7Be5A@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a98e56c163203abkunmeb456a22128a486
-X-HM-MType: 1
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFDSUNOT01LS0k3V1ktWUFJV1kPCRoVCBIfWUFZQhlJTFZJHRpIT0lNTh1KT0hWFRQJFh
-	oXVRMBExYaEhckFA4PWVdZGBILWUFZTkNVSUlVTFVKSk9ZV1kWGg8SFR0UWUFZT0tIVUpLSU9PT0
-	hVSktLVUpCS0tZBg++
-DKIM-Signature: a=rsa-sha256;
-	b=UusjxQNFmrhgPsBeO4BSS3vwfcXBVWMPRqRdZNCreD0Y3L9qO8EqBSlYU2i1ULdp+iyY6GbBaf/00QZeXLzGw3wjtT9ZJo4HN1rR7oYsMs2ha4d9dM+kLxiPLGjbAciiCssQvAVh1ppofzqZbMudcpH4MkQE7IH114QtmiGhntE=; c=relaxed/relaxed; s=default; d=rock-chips.com; v=1;
-	bh=59s5xl47iUIECmsf5jnpdKqma5NgiHbA2ceA9PEBxGI=;
-	h=date:mime-version:subject:message-id:from;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250820154416.2248012-1-maciej.fijalkowski@intel.com>
 
-Hi Russell,
+On Wed, Aug 20, 2025 at 05:44:16PM +0200, Maciej Fijalkowski wrote:
+>  			return ERR_PTR(err);
+>  
+>  		skb_reserve(skb, hr);
+> +
+> +		addrs = kmem_cache_zalloc(xsk_tx_generic_cache, GFP_KERNEL);
+> +		if (!addrs) {
+> +			kfree(skb);
 
-On 8/25/2025 9:37 PM, Russell King (Oracle) wrote:
-> On Mon, Aug 25, 2025 at 12:53:37PM +0200, Marek Szyprowski wrote:
->> On 25.08.2025 11:57, Chaoyi Chen wrote:
->>> On 8/25/2025 3:23 PM, Marek Szyprowski wrote:
->>>> On 15.08.2025 04:35, Chaoyi Chen wrote:
->>>>> From: Chaoyi Chen <chaoyi.chen@rock-chips.com>
->>>>>
->>>>> For external phy, clk_phy should be optional, and some external phy
->>>>> need the clock input from clk_phy. This patch adds support for setting
->>>>> clk_phy for external phy.
->>>>>
->>>>> Signed-off-by: David Wu <david.wu@rock-chips.com>
->>>>> Signed-off-by: Chaoyi Chen <chaoyi.chen@rock-chips.com>
->>>>> ---
->>>>>
->>>>> Changes in v3:
->>>>> - Link to V2:
->>>>> https://lore.kernel.org/netdev/20250812012127.197-1-kernel@airkyi.com/
->>>>> - Rebase to net-next/main
->>>>>
->>>>> Changes in v2:
->>>>> - Link to V1:
->>>>> https://lore.kernel.org/netdev/20250806011405.115-1-kernel@airkyi.com/
->>>>> - Remove get clock frequency from DT prop
->>>>>
->>>>>     drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 11 +++++++----
->>>>>     1 file changed, 7 insertions(+), 4 deletions(-)
->>>>>
->>>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
->>>>> b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
->>>>> index ac8288301994..5d921e62c2f5 100644
->>>>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
->>>>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
->>>>> @@ -1412,12 +1412,15 @@ static int rk_gmac_clk_init(struct
->>>>> plat_stmmacenet_data *plat)
->>>>>             clk_set_rate(plat->stmmac_clk, 50000000);
->>>>>         }
->>>>>     -    if (plat->phy_node && bsp_priv->integrated_phy) {
->>>>> +    if (plat->phy_node) {
->>>>>             bsp_priv->clk_phy = of_clk_get(plat->phy_node, 0);
->>>>>             ret = PTR_ERR_OR_ZERO(bsp_priv->clk_phy);
->>>>> -        if (ret)
->>>>> -            return dev_err_probe(dev, ret, "Cannot get PHY clock\n");
->>>>> -        clk_set_rate(bsp_priv->clk_phy, 50000000);
->>>>> +        /* If it is not integrated_phy, clk_phy is optional */
->>>>> +        if (bsp_priv->integrated_phy) {
->>>>> +            if (ret)
->>>>> +                return dev_err_probe(dev, ret, "Cannot get PHY
->>>>> clock\n");
->>>>> +            clk_set_rate(bsp_priv->clk_phy, 50000000);
->>>>> +        }
->>> I think  we should set bsp_priv->clk_phy to NULL here if we failed to
->>> get the clock.
->>>
->>> Could you try this on your board? Thank you.
->> Right, the following change also fixes this issue:
->>
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
->> b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
->> index 9fc41207cc45..2d19d48be01f 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
->> @@ -1415,6 +1415,8 @@ static int rk_gmac_clk_init(struct
->> plat_stmmacenet_data *plat)
->>           if (plat->phy_node) {
->>                   bsp_priv->clk_phy = of_clk_get(plat->phy_node, 0);
->>                   ret = PTR_ERR_OR_ZERO(bsp_priv->clk_phy);
->> +               if (ret)
->> +                       bsp_priv->clk_phy = NULL;
-> Or just:
->
-> 		clk = of_clk_get(plat->phy_node, 0);
-> 		if (clk == ERR_PTR(-EPROBE_DEFER))
+This needs to be kfree_skb(skb);
 
-Do we actually need this? Maybe other devm_clk_get() before it would fail in advance.
+regards,
+dan carpenter
 
-
-> 			...
-> 		else if (!IS_ERR)
-> 			bsp_priv->clk_phy = clk;
->
-> I don't have a free terminal to work out what "..." should be.
->
+> +			return ERR_PTR(-ENOMEM);
+> +		}
+> +
+> +		xsk_set_destructor_arg(skb, addrs);
+>  	}
+>  
+>  	addr = desc->addr;
 
