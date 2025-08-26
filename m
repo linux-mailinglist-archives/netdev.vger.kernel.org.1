@@ -1,222 +1,417 @@
-Return-Path: <netdev+bounces-216987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C72B5B36FBC
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 18:14:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 028FCB37006
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 18:21:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE4ED3B31E5
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 16:12:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EECDC8E3B8B
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 16:18:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0F772773F6;
-	Tue, 26 Aug 2025 16:12:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B07303164C5;
+	Tue, 26 Aug 2025 16:17:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="S+Dl8pgM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ODQINFJd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f225.google.com (mail-pf1-f225.google.com [209.85.210.225])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2939E31A569
-	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 16:12:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 996EF39FD9
+	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 16:17:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756224751; cv=none; b=Bvm0W1VqAxb0wVNOledVfOAyk7/P94AiA3+hTCgphP3quz4xNvU0GpdmvdsUZIe35xikHnvZBpI7ao1qlx+6E6Gx/3nQ8OUOjQtPDdHOUWR2oYaWZdBEqwqGRTIbHKjcLuRpNb4qcPibqxQXRHtEFvuWmsXPr4qvAefMTfxBf1A=
+	t=1756225038; cv=none; b=tKsAZF3HcpaAM8U2YkYv+ITgwHsxUYVLSrcGK5loBL0cn5VcjxX0ihCJ8/cWPR4tbH2IC2nwBPD4J5m6SUn15rpmZJWhI2n1F6n07d2Uk/SCe+xgTFox9LiIWQmeuqHVSPw4HCr92IRzk523RGTyZyrHECd5AGtv5ItrGgr3nJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756224751; c=relaxed/simple;
-	bh=IFXtu7DyTHzZu9lv5ZR8zj1mOgB6S8QFYifY9uhoWK8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nQ+09Kmf2lfvSvMxVQVZ1jYKlkM9stOeXVhP46F8Xnma11DE5CjaPm45fCGShEWLk8lfEcpb/hJBsTaSW3C9PdxJmaf8TcYpvncosDxGHvx64WuNai17jrotsQtSfcjBS6tP0MLWEvwCM+Ue/EHuz6xZoduE9y2p9b5gBA9UA2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=S+Dl8pgM; arc=none smtp.client-ip=209.85.210.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f225.google.com with SMTP id d2e1a72fcca58-771eecebb09so2167138b3a.3
-        for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 09:12:29 -0700 (PDT)
+	s=arc-20240116; t=1756225038; c=relaxed/simple;
+	bh=X4rJZfHelLtW4kAljhPw+wOfc6Wit6OmCPYcbQE9drw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ArTGGoWqWo5C8yHme8VIUlSjbsRGw0te1ZrUyk8tkrl8aymNlkXT1ZAL22MeriFtcKPFsx72HyN+8+XTC9Bn9sS9rhEEjQMYfkCCaZ66ixICoTt/Vm9+al33VyiymdCkHdvyiKitcuviKD1Bfh1msRakY66bikRZlquFPhrcPEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ODQINFJd; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756225035;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UQD4x7//hMaxWvIhnPOEmLdTTFc0kGImBjXwi7ePdOs=;
+	b=ODQINFJdy9o7tS/Pite9bER8OWLv22EgTYwuS+NoLKsBRVzKZ3/SwtMod9XUwgBcRpAzkG
+	MBkk2xZHkYBVIqV6YU9k5FOXbNw3rV//U1qPRA8lkbHXq92FmgyBVPNfXp+yK40NuJADEe
+	vjEPnDLv8JGntTuMJ3NhLzQVeS+M/WU=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-8-zCpGj8n7MoOnl_Sw2MsGaQ-1; Tue, 26 Aug 2025 12:17:14 -0400
+X-MC-Unique: zCpGj8n7MoOnl_Sw2MsGaQ-1
+X-Mimecast-MFC-AGG-ID: zCpGj8n7MoOnl_Sw2MsGaQ_1756225033
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4b1098f6142so113030241cf.0
+        for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 09:17:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756224749; x=1756829549;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=2WF1nXmPTckn36Fjl3rH1CQDxpfT0BomPnvGDxBvgyw=;
-        b=iENLHcDXEsCBMsfom9ri66zs4BU3nZXHGLEoA5TKxflbxLRIUKtGkWZZxw9WWQCT1I
-         mwT6njdjBnp2IaWE0LtlNnujJoPr0HQDrexmF5HcF4qpNzmil3YyO2GVoElRhQ8S0Ix/
-         IQWqQ2QqX6NaE6wHffMQAwBNCL79qzvxRuCGaKd6p1JHFuG5XVMEz0IYgAXb1C6DlLRy
-         G+4IpijwUDfMS8zkgAJqwpxRLZ8PG76PlR4xqNPcHj+TLA3W03NZPlpn5m6mR1zBMqBj
-         jXvVi0ANGYt8pTLkIzy34qYgih8IP7zDGX7IIe7tBCwNVNB8Db3tusKeoDzxClEERfMp
-         5YAw==
-X-Forwarded-Encrypted: i=1; AJvYcCUwuxvvary4CRd7xToL6m8roDDWs2gfDi2Mb65sNPmpNGnAfUSDWL4ICKCCskt08cHPbeD15og=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz++qkxAWpfE/iUTqMP+XZbAgHcTKWgBqlqBUF4rBvf2Z4zAfs9
-	SOSmOFLAp072MIM2lQdXtsLBNDdOe1tVxIHVG9oco71y+FJIqOJaf2kqux0vhkTQW8L2GS75ie/
-	bmMftDh/zgncCPxwslXdfLqQhtweux1+Tc+vgMCNMTE41Ezz3uaPgGsElwCxGS8fav+XRJUrwz1
-	FtST40FkjZsLBvYOOaOyevA0t5PzAY45XnUE4t/UEMLdNR9MsM8ieggjBz580ZMJhhmMcxDuRwx
-	jw/brWZgKFb7YKONNyh
-X-Gm-Gg: ASbGnctvkjR0tBmtACbQjvw9ZgIGdw4ee28rDj9z0lZL8HjBC0WSSzcKy4DsnxplfDS
-	xHQLb6Zac3aruhC8BTAM/lr9ggr38qbhCCxePVf3sBdF9YS9t5ykBp7bfxDtbYG2CIk5lhkp4aL
-	Lip27zdwqd20SvPtwArQuG+DO77KWI9aWg03Fg0X2Lj8MV3fUstjxs4qGNgn/xGmH3XVvKpe6L5
-	FE9nbERk82YLNVM3JCXB9y7G28nV1COoVE/Evxn29swVvWnkb/d5cVdxHGwFliHl5/sAx7HwWe0
-	Y1eiz6o7RD8iA4C9SCj3Y5Py2yYgzTaP13sjN+JsjZzioT1smqfQoEMkFuHg8gCmXE6/AbUAR9T
-	UM69QGWqA22lQCVeLekkAEertBpJZP60ruESh+Q0KNDAkpWMmSnYY/hOiSQG92roP1CzTbT7+sd
-	7J9TROHg==
-X-Google-Smtp-Source: AGHT+IFbWx2e2S8Ob0Ga8C3qQ2lHP3kw2+egDSb48iWa/UBDW0CtpPswwYfPtD4NAP345ug/qNfylQPFGQE0
-X-Received: by 2002:a17:902:da47:b0:246:cf6a:f009 with SMTP id d9443c01a7336-246cf6af466mr92608395ad.46.1756224749241;
-        Tue, 26 Aug 2025 09:12:29 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-16.dlp.protect.broadcom.com. [144.49.247.16])
-        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-32752fb99besm93147a91.9.2025.08.26.09.12.28
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 26 Aug 2025 09:12:29 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-325e31cecd8so2144775a91.3
-        for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 09:12:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1756224747; x=1756829547; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=2WF1nXmPTckn36Fjl3rH1CQDxpfT0BomPnvGDxBvgyw=;
-        b=S+Dl8pgMdRbXHO7NWorJ8esZKcJOhBeORb1ZofOQUn7vT/nT2YlQ9lFU8OHZiZT2OQ
-         ckQY3O9iPFiARsWVEMG9sjIwXyDKFbS0VObSrjoVhTE3CZvph0/y8yplBa8VjFiTc+Mo
-         JYRvuDByi055NdI1MevNsOzXjxNMcQc5MDMIQ=
-X-Forwarded-Encrypted: i=1; AJvYcCWBUDd8eVKKfcfuIee57/LdqxZQbq/L3XbfK7UkKDW8oqz6L7HngfCpvCDuY09Vo3kvxiIXaqM=@vger.kernel.org
-X-Received: by 2002:a17:90b:1d8a:b0:321:ca4b:f6cf with SMTP id 98e67ed59e1d1-32515ef1564mr19461556a91.35.1756224747261;
-        Tue, 26 Aug 2025 09:12:27 -0700 (PDT)
-X-Received: by 2002:a17:90b:1d8a:b0:321:ca4b:f6cf with SMTP id
- 98e67ed59e1d1-32515ef1564mr19461529a91.35.1756224746887; Tue, 26 Aug 2025
- 09:12:26 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1756225033; x=1756829833;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UQD4x7//hMaxWvIhnPOEmLdTTFc0kGImBjXwi7ePdOs=;
+        b=Rswnz3EsplAuVdyPRBIQ46Gi6lDlXDpAb/MDepXUizkZHf2NohvPE951i85bJMzoQU
+         +8roH/fIlGesvi3Y7ep2hj3wjF1kojv3n6C3WTl0/VR8Zk+TmOEXs2rD7WCr/T/J5xr8
+         bgM9qkd0/6q2gRiBIXY+1x+gOO0l0SDpuVXF5BiJ5modxguAwOYMfdENATW6qJauehCT
+         tff7tICWCS1iZX4ujsfMug3Z7cLcM/EWjBSScmpVn994wi4qLQT4yHviIlyu3mFTr3P5
+         Zkj4iSQkli7FP+lXpkXv0baO8AmRbaQHe1Re4XBmE4Dnh1wXH7wj9QGVA7cn1hgh9nLr
+         Vjbg==
+X-Forwarded-Encrypted: i=1; AJvYcCUbPzIZwVNfIYEACqpkCTXjJGA6jpPtusZRoDa96V0QzYrAzaDiSw5DFd+f7w60Gk8gHSfnjbQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyrezYJnvM1/iIaWoNsQoafkwOxiqOVh2njGea1GkqnWPuXY+YA
+	4A8mXUzvpNVDPhVaB0ppRs+8pvsGEyGb8GTirxIHaQA0m2nghnZYYJ1FJg1rMq5HIbbSs6/ZbRP
+	7w2+jGuOaJcrLNzi334Vfb2/bDo5VmoFUu32wgk+3mhfpycd+1m7yZf3f4Q==
+X-Gm-Gg: ASbGnctc1lUTc7wYuVoH2Kf35wyNhLudwFHqZOXKVyr6e30hoY6wCrakCtLkD9DiryP
+	cFTkE7jvMRXa5u1b963ac8zifSdAsPePeaIVedvkW07APiVKV5X3taOouRMaUsFDxc8e8kY4ukL
+	0pQREbkPSbPZ7IWI0q5pLDBB+48SBQsItGnlaAMOwp4Ehyu+7A0nMZ0d0/5aB6SFMKTWBxWpLEN
+	QxFpMWrlI/+yA8NzqKZU5Kc/ISJzhFSWkZ3MkvLklKJ8N2Y6kQbhxvVv6hi5tv8SJk/qWQb78cA
+	Qz8NLa1Vp7M4sHo3nCAup+fmJfHoGXpFPs/dA0TYCC0kNh3DUWtpxlG3sYBm1c2cBqKDoyyiFQY
+	wC1eiLs1k6uM=
+X-Received: by 2002:a05:622a:552:b0:4af:4bac:e523 with SMTP id d75a77b69052e-4b2aaa2801dmr177903171cf.8.1756225032985;
+        Tue, 26 Aug 2025 09:17:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH9+dXXYCHz4z4s2jD0XCyJZAOQlENoCcuOTDMorPpnjSxVAev14M5eRLGZMcGQUodzjmRpVw==
+X-Received: by 2002:a05:622a:552:b0:4af:4bac:e523 with SMTP id d75a77b69052e-4b2aaa2801dmr177902191cf.8.1756225032061;
+        Tue, 26 Aug 2025 09:17:12 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b2b8de632csm74458141cf.36.2025.08.26.09.17.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Aug 2025 09:17:11 -0700 (PDT)
+Message-ID: <a2dec2d0-84be-4a4f-bfd4-b5f56219ac82@redhat.com>
+Date: Tue, 26 Aug 2025 18:17:09 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250826164412.220565-1-bhargava.marreddy@broadcom.com>
- <20250826164412.220565-4-bhargava.marreddy@broadcom.com> <a4ad132d-ffb7-465d-b19a-4c5e0c0665fa@oracle.com>
-In-Reply-To: <a4ad132d-ffb7-465d-b19a-4c5e0c0665fa@oracle.com>
-From: Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>
-Date: Tue, 26 Aug 2025 21:42:10 +0530
-X-Gm-Features: Ac12FXzqerVz7iI6d4FC_-NZmbbB-YF94XV5JZ2hKsaJ74_jQiDxEF2mfFdG5ng
-Message-ID: <CANXQDtaM725=xtAPH_wK1y5WjTXz286u8gM_BRp1Ni+9Jx12DA@mail.gmail.com>
-Subject: Re: [v4, net-next 3/9] bng_en: Introduce VNIC
-To: ALOK TIWARI <alok.a.tiwari@oracle.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	michael.chan@broadcom.com, pavan.chebbi@broadcom.com, 
-	vsrama-krishna.nemani@broadcom.com, Vikas Gupta <vikas.gupta@broadcom.com>, 
-	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000003d009b063d46f09b"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v15 14/15] net: homa: create homa_plumbing.c
+To: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org
+Cc: edumazet@google.com, horms@kernel.org, kuba@kernel.org
+References: <20250818205551.2082-1-ouster@cs.stanford.edu>
+ <20250818205551.2082-15-ouster@cs.stanford.edu>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250818205551.2082-15-ouster@cs.stanford.edu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
---0000000000003d009b063d46f09b
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 8/18/25 10:55 PM, John Ousterhout wrote:
+> +/* This variable contains the address of the statically-allocated struct homa
+> + * used throughout Homa. This variable should almost never be used directly:
+> + * it should be passed as a parameter to functions that need it. This
+> + * variable is used only by a few functions called from Linux where there
+> + * is no struct homa* available.
+> + */
+> +static struct homa *global_homa = &homa_data;
 
-On Tue, Aug 26, 2025 at 8:31=E2=80=AFPM ALOK TIWARI <alok.a.tiwari@oracle.c=
-om> wrote:
->
->
->
-> On 8/26/2025 10:14 PM, Bhargava Marreddy wrote:
-> > +             /* Allocate rss table and hash key */
-> > +             size =3D L1_CACHE_ALIGN(HW_HASH_INDEX_SIZE * sizeof(u16))=
-;
-> > +             size =3D L1_CACHE_ALIGN(BNGE_MAX_RSS_TABLE_SIZE);
-> > +
-> > +             vnic->rss_table_size =3D size + HW_HASH_KEY_SIZE;
-> > +             vnic->rss_table =3D dma_alloc_coherent(bd->dev,
-> > +                                                  vnic->rss_table_size=
-,
-> > +                                                  &vnic->rss_table_dma=
-_addr,
-> > +                                                  GFP_KERNEL);
->
-> @size, first calculation is overwritten by the second.
-Ack. I will fix it in v5.
->
-> Thanks,
-> Alok
+No need for this, use hame_data directly everywhere.
 
---0000000000003d009b063d46f09b
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+> +static struct proto homav6_prot = {
+> +	.name		   = "HOMAv6",
+> +	.owner		   = THIS_MODULE,
+> +	.close		   = homa_close,
+> +	.connect	   = ip6_datagram_connect,
+> +	.ioctl		   = homa_ioctl,
+> +	.init		   = homa_socket,
+> +	.destroy	   = homa_sock_destroy,
+> +	.setsockopt	   = homa_setsockopt,
+> +	.getsockopt	   = homa_getsockopt,
+> +	.sendmsg	   = homa_sendmsg,
+> +	.recvmsg	   = homa_recvmsg,
+> +	.hash		   = homa_hash,
+> +	.unhash		   = homa_unhash,
+> +	.obj_size	   = sizeof(struct homa_v6_sock),
+> +	.ipv6_pinfo_offset = offsetof(struct homa_v6_sock, inet6),
+> +
+> +	.no_autobind       = 1,
 
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBWIwggRKoAMCAQICDH/Bh55Nn6Pe2/qMjjANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODE4MzdaFw0yNTA5MTAwODE4MzdaMIGf
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xITAfBgNVBAMTGEJoYXJnYXZhIENoZW5uYSBNYXJyZWRkeTEt
-MCsGCSqGSIb3DQEJARYeYmhhcmdhdmEubWFycmVkZHlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG
-9w0BAQEFAAOCAQ8AMIIBCgKCAQEApKt+sLxPSTFE+ruMyTpA8tU2ux9z4w711yS/nB4tbYArbQNC
-KF9dH3b5h4X3Q6Fq9BLFbCWH7pJ/tEiQ7W19TQkQxiJbj1gdIzalTi4YFPMdTzD6/BaU8IELCGCs
-Gjv4zuV2kN5uGAZ/K+WtRFRipB33fat/f0FWZ/FhdjAgTCTBrJ4nt7ENYOjNOZN4fjh78vjZqsul
-Q+65ExyCjaRwqzdvCy5NQIZ78a6tvGl2Oj1lK7931edumLgCU6qbvk2FfhcD6tRp0xNL2jwL6Yn1
-i2qNOdId5F0Uw9myUIwlW7Zg22U2c0Ce3GZggAfhiUwLYFfT2HXj+2kqrhLjK1T8qQIDAQABo4IB
-3zCCAdswDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0
-cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIw
-MjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVy
-c29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYm
-aHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8E
-QjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24y
-Y2EyMDIwLmNybDApBgNVHREEIjAggR5iaGFyZ2F2YS5tYXJyZWRkeUBicm9hZGNvbS5jb20wEwYD
-VR0lBAwwCgYIKwYBBQUHAwQwHwYDVR0jBBgwFoAUljPR5lgXWzR1ioFWZNW+SN6hj88wHQYDVR0O
-BBYEFFh9UQJiPboINUMOwOo9HGoA4rwXMA0GCSqGSIb3DQEBCwUAA4IBAQCx4SG9qg18y5lkgQ4d
-aBLzpJdJ9WDhmZ44XpTLWPl1MfjO1slu0OOnDU5YVCMikelOWoIm8CK4bkTJtEj/byNXz/X4yJ0p
-Gc6hcQ+sxONsIIJxJiNHbpbUaA/cnobVUgEfxvz1tIDMKsHYia+tKFdJ63yd9IXdtBwark1k/D+L
-+dDHf0sRsASxceuhNMc+BAs4rNgE6dqAhyNJnd0jL7m0SiCjJsHYElWwYrVH73TUAWgxOFw9ow68
-wsf9W+/wSEvI3N6OBMoRcIL34Z0xhrMZDHNOkYxArYhN5BraAmSU/obLBAbwbfEsOtHgFQpTtcHo
-C+fgh5U7No8Z3dJYOsl0MYICYDCCAlwCAQEwazBbMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQR2xv
-YmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMgUGVyc29uYWxTaWduIDIg
-Q0EgMjAyMAIMf8GHnk2fo97b+oyOMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCCt
-qgB3sAYiDf5W5SIZ9F67qq63a55GinpzpLGm4SWxOjAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcB
-MBwGCSqGSIb3DQEJBTEPFw0yNTA4MjYxNjEyMjdaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUD
-BAEqMAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsG
-CWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAcwkaXY835vOz+9HdtgxxXZEJFT+zN0MSZcxX1
-hwO6G7FTUsS7Bxa2mlvtgxUaauY4P8tUF0TeFRdHqMjSOH4UxyB0e2Dp7OPQgtqga3EAn5US+0I7
-wsCbPILBXVZ+oaeio3ttWcMhqA7yDS/MDLE6O/J/5TTwpUFIyhDrre+UWJJJxKBS7jzVQ9ZFp/PB
-HXrWoY2ExtBmPEDv0AXIVsXjemOyPRm/9pYKJIDcU85d6YdIXrNyaT5Ncg2vDREdt/8f0T9xXjhi
-q/gPjhecs1n0IUcWP02QSShmYrjEhZKzeeWcySQSiZhhRHfvSAIBMt/cnP036hy0DpSFo5QV+wMy
---0000000000003d009b063d46f09b--
+Minor nit: no empty line above
+
+> +};
+> +
+> +/* Top-level structure describing the Homa protocol. */
+> +static struct inet_protosw homa_protosw = {
+> +	.type              = SOCK_DGRAM,
+> +	.protocol          = IPPROTO_HOMA,
+> +	.prot              = &homa_prot,
+> +	.ops               = &homa_proto_ops,
+> +	.flags             = INET_PROTOSW_REUSE,
+> +};
+> +
+> +static struct inet_protosw homav6_protosw = {
+> +	.type              = SOCK_DGRAM,
+> +	.protocol          = IPPROTO_HOMA,
+> +	.prot              = &homav6_prot,
+> +	.ops               = &homav6_proto_ops,
+> +	.flags             = INET_PROTOSW_REUSE,
+> +};
+> +
+> +/* This structure is used by IP to deliver incoming Homa packets to us. */
+> +static struct net_protocol homa_protocol = {
+> +	.handler =	homa_softirq,
+> +	.err_handler =	homa_err_handler_v4,
+> +	.no_policy =     1,
+> +};
+> +
+> +static struct inet6_protocol homav6_protocol = {
+> +	.handler =	homa_softirq,
+> +	.err_handler =	homa_err_handler_v6,
+> +	.flags =        INET6_PROTO_NOPOLICY | INET6_PROTO_FINAL,
+> +};
+> +
+> +/* Sizes of the headers for each Homa packet type, in bytes. */
+> +static u16 header_lengths[] = {
+> +	sizeof(struct homa_data_hdr),
+> +	0,
+> +	sizeof(struct homa_resend_hdr),
+> +	sizeof(struct homa_rpc_unknown_hdr),
+> +	sizeof(struct homa_busy_hdr),
+> +	0,
+> +	0,
+> +	sizeof(struct homa_need_ack_hdr),
+> +	sizeof(struct homa_ack_hdr)
+> +};
+> +
+> +/* Thread that runs timer code to detect lost packets and crashed peers. */
+> +static struct task_struct *timer_kthread;
+> +static DECLARE_COMPLETION(timer_thread_done);
+> +
+> +/* Used to wakeup timer_kthread at regular intervals. */
+> +static struct hrtimer hrtimer;
+> +
+> +/* Nonzero is an indication to the timer thread that it should exit. */
+> +static int timer_thread_exit;
+> +
+> +/**
+> + * homa_load() - invoked when this module is loaded into the Linux kernel
+> + * Return: 0 on success, otherwise a negative errno.
+> + */
+> +int __init homa_load(void)
+> +{
+> +	struct homa *homa = global_homa;
+> +	bool init_protocol6 = false;
+> +	bool init_protosw6 = false;
+> +	bool init_protocol = false;
+> +	bool init_protosw = false;
+> +	bool init_net_ops = false;
+> +	bool init_proto6 = false;
+> +	bool init_proto = false;
+> +	bool init_homa = false;
+> +	int status;
+> +
+> +	/* Compile-time validations that no packet header is longer
+> +	 * than HOMA_MAX_HEADER.
+> +	 */
+> +	BUILD_BUG_ON(sizeof(struct homa_data_hdr) > HOMA_MAX_HEADER);
+> +	BUILD_BUG_ON(sizeof(struct homa_resend_hdr) > HOMA_MAX_HEADER);
+> +	BUILD_BUG_ON(sizeof(struct homa_rpc_unknown_hdr) > HOMA_MAX_HEADER);
+> +	BUILD_BUG_ON(sizeof(struct homa_busy_hdr) > HOMA_MAX_HEADER);
+> +	BUILD_BUG_ON(sizeof(struct homa_need_ack_hdr) > HOMA_MAX_HEADER);
+> +	BUILD_BUG_ON(sizeof(struct homa_ack_hdr) > HOMA_MAX_HEADER);
+> +
+> +	/* Extra constraints on data packets:
+> +	 * - Ensure minimum header length so Homa doesn't have to worry about
+> +	 *   padding data packets.
+> +	 * - Make sure data packet headers are a multiple of 4 bytes (needed
+> +	 *   for TCP/TSO compatibility).
+> +	 */
+> +	BUILD_BUG_ON(sizeof(struct homa_data_hdr) < HOMA_MIN_PKT_LENGTH);
+> +	BUILD_BUG_ON((sizeof(struct homa_data_hdr) -
+> +		      sizeof(struct homa_seg_hdr)) & 0x3);
+> +
+> +	/* Detect size changes in uAPI structs. */
+> +	BUILD_BUG_ON(sizeof(struct homa_sendmsg_args) != 24);
+> +	BUILD_BUG_ON(sizeof(struct homa_recvmsg_args) != 88);
+> +
+> +	pr_err("Homa module loading\n");
+
+Please use pr_notice() instead.
+
+> +	status = proto_register(&homa_prot, 1);
+> +	if (status != 0) {
+> +		pr_err("proto_register failed for homa_prot: %d\n", status);
+> +		goto error;
+> +	}
+> +	init_proto = true;
+
+The standard way of handling the error paths it to avoid local flags and
+use different goto labels.
+
+> +
+> +	status = proto_register(&homav6_prot, 1);
+> +	if (status != 0) {
+> +		pr_err("proto_register failed for homav6_prot: %d\n", status);
+> +		goto error;
+> +	}
+> +	init_proto6 = true;
+> +
+> +	inet_register_protosw(&homa_protosw);
+> +	init_protosw = true;
+> +
+> +	status = inet6_register_protosw(&homav6_protosw);
+> +	if (status != 0) {
+> +		pr_err("inet6_register_protosw failed in %s: %d\n", __func__,
+> +		       status);
+> +		goto error;
+> +	}
+> +	init_protosw6 = true;
+> +
+> +	status = inet_add_protocol(&homa_protocol, IPPROTO_HOMA);
+> +	if (status != 0) {
+> +		pr_err("inet_add_protocol failed in %s: %d\n", __func__,
+> +		       status);
+> +		goto error;
+> +	}
+> +	init_protocol = true;
+> +
+> +	status = inet6_add_protocol(&homav6_protocol, IPPROTO_HOMA);
+> +	if (status != 0) {
+> +		pr_err("inet6_add_protocol failed in %s: %d\n",  __func__,
+> +		       status);
+> +		goto error;
+> +	}
+> +	init_protocol6 = true;
+> +
+> +	status = homa_init(homa);
+> +	if (status)
+> +		goto error;
+> +	init_homa = true;
+
+home_init() should be likely the first call in this function
+
+> +
+> +	status = register_pernet_subsys(&homa_net_ops);
+> +	if (status != 0) {
+> +		pr_err("Homa got error from register_pernet_subsys: %d\n",
+> +		       status);
+> +		goto error;
+> +	}
+> +	init_net_ops = true;
+> +
+> +	timer_kthread = kthread_run(homa_timer_main, homa, "homa_timer");
+> +	if (IS_ERR(timer_kthread)) {
+> +		status = PTR_ERR(timer_kthread);
+> +		pr_err("couldn't create Homa timer thread: error %d\n",
+> +		       status);
+> +		timer_kthread = NULL;
+> +		goto error;
+> +	}
+> +
+> +	return 0;
+> +
+> +error:
+> +	if (timer_kthread) {
+> +		timer_thread_exit = 1;
+> +		wake_up_process(timer_kthread);
+> +		wait_for_completion(&timer_thread_done);
+> +	}
+> +	if (init_net_ops)
+> +		unregister_pernet_subsys(&homa_net_ops);
+> +	if (init_homa)
+> +		homa_destroy(homa);
+> +	if (init_protocol)
+> +		inet_del_protocol(&homa_protocol, IPPROTO_HOMA);
+> +	if (init_protocol6)
+> +		inet6_del_protocol(&homav6_protocol, IPPROTO_HOMA);
+> +	if (init_protosw)
+> +		inet_unregister_protosw(&homa_protosw);
+> +	if (init_protosw6)
+> +		inet6_unregister_protosw(&homav6_protosw);
+> +	if (init_proto)
+> +		proto_unregister(&homa_prot);
+> +	if (init_proto6)
+> +		proto_unregister(&homav6_prot);
+> +	return status;
+> +}
+> +
+> +/**
+> + * homa_unload() - invoked when this module is unloaded from the Linux kernel.
+> + */
+> +void __exit homa_unload(void)
+> +{
+> +	struct homa *homa = global_homa;
+> +
+> +	pr_notice("Homa module unloading\n");
+> +
+> +	unregister_pernet_subsys(&homa_net_ops);
+> +	homa_destroy(homa);
+
+home_destroy() should likely be the last call of this function.
+
+> +/**
+> + * homa_softirq() - This function is invoked at SoftIRQ level to handle
+> + * incoming packets.
+> + * @skb:   The incoming packet.
+> + * Return: Always 0
+> + */
+> +int homa_softirq(struct sk_buff *skb)
+> +{
+> +	struct sk_buff *packets, *other_pkts, *next;
+> +	struct sk_buff **prev_link, **other_link;
+> +	struct homa_common_hdr *h;
+> +	int header_offset;
+> +
+> +	/* skb may actually contain many distinct packets, linked through
+> +	 * skb_shinfo(skb)->frag_list by the Homa GRO mechanism. Make a
+> +	 * pass through the list to process all of the short packets,
+> +	 * leaving the longer packets in the list. Also, perform various
+> +	 * prep/cleanup/error checking functions.
+
+It's hard to tell without the GRO/GSO code handy, but I guess the
+implementation here could be simplified invoking __skb_gso_segment()...
+
+> +	 */
+> +	skb->next = skb_shinfo(skb)->frag_list;
+> +	skb_shinfo(skb)->frag_list = NULL;
+> +	packets = skb;
+> +	prev_link = &packets;
+> +	for (skb = packets; skb; skb = next) {
+> +		next = skb->next;
+> +
+> +		/* Make the header available at skb->data, even if the packet
+> +		 * is fragmented. One complication: it's possible that the IP
+> +		 * header hasn't yet been removed (this happens for GRO packets
+> +		 * on the frag_list, since they aren't handled explicitly by IP.
+
+... at very least it will avoif this complication and will simplify the
+list handling.
+
+> +		 */
+> +		if (!homa_make_header_avl(skb))
+> +			goto discard;
+
+It looks like the above is too aggressive, i.e. pskb_may_pull() may fail
+for a correctly formatted homa_ack_hdr - or any other packet with hdr
+size < HOMA_MAX_HEADER
+
+> +		header_offset = skb_transport_header(skb) - skb->data;
+> +		if (header_offset)
+> +			__skb_pull(skb, header_offset);
+> +
+> +		/* Reject packets that are too short or have bogus types. */
+> +		h = (struct homa_common_hdr *)skb->data;
+> +		if (unlikely(skb->len < sizeof(struct homa_common_hdr) ||
+> +			     h->type < DATA || h->type > MAX_OP ||
+> +			     skb->len < header_lengths[h->type - DATA]))
+> +			goto discard;
+> +
+> +		/* Process the packet now if it is a control packet or
+> +		 * if it contains an entire short message.
+> +		 */
+> +		if (h->type != DATA || ntohl(((struct homa_data_hdr *)h)
+> +				->message_length) < 1400) {
+
+I could not fined where `message_length` is validated. AFAICS
+data_hdr->message_length could be > skb->len.
+
+Also I don't see how the condition checked above ensures that the pkt
+contains the whole message.
+
+/P
+
 
