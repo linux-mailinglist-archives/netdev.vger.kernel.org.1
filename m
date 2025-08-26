@@ -1,470 +1,358 @@
-Return-Path: <netdev+bounces-217038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34B97B37233
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 20:23:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C10AEB37236
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 20:24:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD5AF1B27D39
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 18:23:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD22A1B20D1E
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 18:24:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E5B536C086;
-	Tue, 26 Aug 2025 18:23:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C10B28850E;
+	Tue, 26 Aug 2025 18:24:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VrseOo+H"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bCsqhQpk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2245136C08B;
-	Tue, 26 Aug 2025 18:23:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756232600; cv=none; b=qc1rkrO6wX4mll8/VTJU/QMV7GVzRGDp3nZYqNlJuvg6t6/5db2SE8nXsG3tCLb1HFj4371i35fm05rttanySPGSHH+Uycx35o2trKrVnKDcsb7nWOob+hbOVi7kW/mT4QvvoZgTIhQS+ul7bLmFIpNEgYWPyxhOCxqCVfW/61k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756232600; c=relaxed/simple;
-	bh=nG0LAoDZdbxXuN/Hr/0F6rww6bawQ9DQyl8dy8CNHmQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LOZfA9UHdsmVqTRMdqfNpwGL59gUGozg+PPFp69ue5bHItiahazwP1QCF3P5pjWR/j7ST0BP71JPJYLw4Ud4PSdmu+dY3SD/6ZxccbWV1lx631KJsAmgKrlfNg7i9KMR7t9eAvEHZkgKYOJyXr/vBzVQ2mVOd1XSSjLasvolc3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VrseOo+H; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-70dd6c93071so6375026d6.3;
-        Tue, 26 Aug 2025 11:23:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756232596; x=1756837396; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r0foMCM1hvjEeKXaZN/6MBKUAq8npEAyxEc6PIGRqNY=;
-        b=VrseOo+HfLGGfrEaH0OBhSxWtQadExyjljlnNqmfG30HZ2ClaVtGXXvnEnnA/agtcQ
-         rM53z1IHY0NYw/9y22IdJB4hysmXa0OTIjb62Jz3b6CTehl3Swl1KcN4csVuLPDN1sdd
-         Z1HncLhYaX9pslz1d4F+OhFCylhhPZc/8ImVwjoOB4EMOkau6cUPJ3yom/3x5GYMETHN
-         GgQPAunMAitTiulejef9Htqzz5mCYK45s/zVfEZAKyTFL4UBu9127FW8sNyBGxaXxnkH
-         oQXk9WIwilrVVfD4Yi8bVXTCkLibKRYBDRehcdyVMokF0Go3Alyk4965DthhzAa3ePIP
-         Tu/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756232596; x=1756837396;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=r0foMCM1hvjEeKXaZN/6MBKUAq8npEAyxEc6PIGRqNY=;
-        b=WM9Qv80h4ASqxMupC0xzeYPqltihVVeI/8dgj7Bc55NCTKSeLlfZtFq9vl7fMRWojv
-         6zqRcEH1Xns5fxab/nIKamkNWpxF8/vBE8/CKwqDfedqYRxbEfwPUCOfreQ9DLTHeJUr
-         jRnm9fsPEO4mCzgcexuOvnmv6Nu942rWIto5wc6Ce52AHu/9ownPRcJGx+gKYoNNWgZH
-         gYr1whL5OY1qOA+MMsTL5oumE6G0E9jW82Wl5i1P9sSY9nGx2q4Z4t5sH77CcKklAoHb
-         V59mQ14q6A87ln+ItNNDoyEb1+EK8MDQGO0e5TOLT3GREtNrYJzuohIRluNE0P2QR0iN
-         uAvg==
-X-Forwarded-Encrypted: i=1; AJvYcCV4Lk7+MJIl98wdah/D+PthIT3FwuFRU3MpOsl7BSn6THlMM9l9itZVtESAic2IFDzEP+N50pnS@vger.kernel.org, AJvYcCVLtgvC8Z/RdvkJmvtjjG53xM73K2twPOK39aXOoZj11W84UyPMf8Srh4SKcAJttld8pbQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/AY2x/0X9ojqqCwzLi7EmfRphClugk2Wqm5fQH4t5VAlRC6ZZ
-	xN7mBHBuhFsB+63LTGGddJoAb2AH9Zu9gS/4gvYgleRhWETE6zBnjFEg5psK7O+lJvM9uC6yO+e
-	11umUo2tGS/xTyl715Knsc+Mn3/f73ys=
-X-Gm-Gg: ASbGnctfMGjP5fXnq7xQheH7bHMB5akBZyC/gXG8SBI68W2TM0sDQ7hUdl/P8aS9Wsa
-	4Cwi2oP2c16Zn+u9tdhmX9NA7stRjwc/BRnayZg+dLVvaeboOxDTd8NMqiHOAtWaa/aybgWDrdw
-	FzzDwYolLNmTpRaJqRx5cygOcpttY0F/cZtYjnZOTtuuFRKKnOqiaN5Cmz0eb8zD1RTLHRy1ZF5
-	LB6S7kj
-X-Google-Smtp-Source: AGHT+IEVnvtJqP/mct1oC46f9ueuzZHZZeXUWdZh3wHq0B/KLm5wsasZDFPdETADAGAT18pn6+xJSaadZyrhdztr5v0=
-X-Received: by 2002:a05:6214:4b02:b0:70d:9f16:9a37 with SMTP id
- 6a1803df08f44-70d9f16c223mr183770166d6.62.1756232595587; Tue, 26 Aug 2025
- 11:23:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2FA02DE6E9
+	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 18:24:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756232643; cv=fail; b=lSKXN7uItwOxMFJYxkf/wAtUIuP7Lkzuk1DTKm/qZ6w2afyTv7IDz5sUQH2IJX1meemzjKcEkXU0ioPKdWknU5mEbV3jA4PyR7inJIFPDWNjnYraXj5LNwjxwD9d8jjqz30I2PnkiOowf0lfwMPLuulF0DxLB0ke5n8FUaS8PmA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756232643; c=relaxed/simple;
+	bh=rmYQKt8W90JX2YiqEgzkvJkYTegukrDXv+5QRAM4lUo=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=oyIpbwOJV8ylb29IXBbGO+WR+IWeACXxiw8gG6PKCpEBIq38t6X6+COQIyf9JlV182XPBRc/1AnWsRI8gtIyzynQpQW3bEkRds4HUK7ixemsjZekOenw2iYDHWsdkKMeGdndtMKUdIgDEsSNX9M6hDzKrM1GsgkueLgNYSVccPA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bCsqhQpk; arc=fail smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756232642; x=1787768642;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:mime-version;
+  bh=rmYQKt8W90JX2YiqEgzkvJkYTegukrDXv+5QRAM4lUo=;
+  b=bCsqhQpk7nbayIAWvVRk614w7rwOtXwt/5+YPBhd6HiWcWCLQnO+hirS
+   R4ZTSNOF1sxZesZKU1z2AVcz6BtqRAvAUslkbuSMWW6kMELg5VEDQUN/3
+   SW1ERqZDsBz0J1oOdnSCuCCU+/Rp4Mb1k8SO96uuur7gkkWJtdahnoguS
+   3nvEQDiPdkXiofMQWX40/D9e71fnqyibZX8xC0qjJh3A8nLWYZOtJmhez
+   O0CX+s+QbA+/o4rgVGUYRHYCEqOOqsjsvvjBghCRXSnUhPLcKdIpvQuqp
+   pbn3JPfTEPgoVJj9dzYnPnSMPFZKLvFsI6tgUfGFjhErqvsdBQNoYoA1i
+   w==;
+X-CSE-ConnectionGUID: TCvDkYu5QNm7SyROcaSPpg==
+X-CSE-MsgGUID: 1EDFOYcmRWWHDKpTcZM07g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11534"; a="57680598"
+X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
+   d="asc'?scan'208";a="57680598"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2025 11:23:59 -0700
+X-CSE-ConnectionGUID: RqZliL2zT2u6VDx7pFa7MA==
+X-CSE-MsgGUID: VwjSCzHmSz+rc4gseTmhdQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
+   d="asc'?scan'208";a="174902019"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2025 11:23:59 -0700
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Tue, 26 Aug 2025 11:23:58 -0700
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Tue, 26 Aug 2025 11:23:58 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (40.107.244.84)
+ by edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Tue, 26 Aug 2025 11:23:58 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=UrzGXshWvTUoJyVRHrzS+udF9GiYz6Egd1KpITIcT2GJjQQuI2v3Xh3AOgEhDZ5DuJx0JAOE36mKexzlMPeqyiUFXT/a8pvz30N46+wZl6GsjNJzOxLgfMd2i7871/oCnVrbIK0UqnQRYEC+jsD5fVj67XL1ZK4Xo+pc2vNS7lJexpPviKTJhcZC4AxN1f8DIF8GEdDxu+zvvcDtEKZ4neau9f9zlmlUTnSLtOPsUuNeWcxqFzR9bASgggxPNAF009EqZnuiYGD27M7FORGJ46YTKZk9bulNzSupzbfJDROX8WPHIW6dJ0Zw8jeIhv2EEdFSYx08c5R6ov4kmy8mog==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6Ozv/0Xd70AcXlqwlfrfwA2O+a3Rf47lEskje41emwA=;
+ b=iF52n7YkNH5p/F74j0yqE0syjT0PiWMc/nTzcu/2Sie6XqpRX6czSb0xGvseDQubjUvy2x1xFpJS3gB21fYXh8LIiqTHVdCej6ou9LqbUrqs8fqJ5xl9494CvTKXu+nVY0R69aHVDPpZF2uSLJ5GNSMYPjcs861+f0p+Muk05cIT5XSjdS/vTjAtCfRMzmJsS9pcNIkf5R6QnctF9Q9C2whz5TbzqpXTHqAgikx2Rh70vf+e+8/aflW7iaVJQO0d+75cpmFIKh4vGrvGaPDzX9Rcv8vgamkxG/QCBjRQ/lFGzwxuu7MsCbct03GaaKLJJjKGgcdA37GzTZxMqoiyyg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by DS4PPFC77662F02.namprd11.prod.outlook.com (2603:10b6:f:fc02::4c) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.13; Tue, 26 Aug
+ 2025 18:23:56 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3%5]) with mapi id 15.20.9052.019; Tue, 26 Aug 2025
+ 18:23:56 +0000
+Message-ID: <e656a4ee-281c-4205-9183-bc3c7dbc9173@intel.com>
+Date: Tue, 26 Aug 2025 11:23:55 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v2] igb: Convert Tx timestamping to PTP aux
+ worker
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+CC: Kurt Kanzenbach <kurt@linutronix.de>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>, Paul Menzel
+	<pmenzel@molgen.mpg.de>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Miroslav Lichvar <mlichvar@redhat.com>, <intel-wired-lan@lists.osuosl.org>,
+	<netdev@vger.kernel.org>
+References: <20250822-igb_irq_ts-v2-1-1ac37078a7a4@linutronix.de>
+ <20250822075200.L8_GUnk_@linutronix.de> <87ldna7axr.fsf@jax.kurt.home>
+ <02d40de4-5447-45bf-b839-f22a8f062388@intel.com>
+ <20250826125912.q0OhVCZJ@linutronix.de>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+Autocrypt: addr=jacob.e.keller@intel.com; keydata=
+ xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
+ J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
+ qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
+ CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
+ UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
+ MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
+ apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
+ cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
+In-Reply-To: <20250826125912.q0OhVCZJ@linutronix.de>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="------------8Vxe8Nm10V3qNdSj0f8msAM5"
+X-ClientProxiedBy: MW3PR06CA0005.namprd06.prod.outlook.com
+ (2603:10b6:303:2a::10) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250820154416.2248012-1-maciej.fijalkowski@intel.com> <CAL+tcoD3Kj6h=RvkEJ_9vmJPWKGVcaLj4ws=JqRbE0TiyjDDWg@mail.gmail.com>
-In-Reply-To: <CAL+tcoD3Kj6h=RvkEJ_9vmJPWKGVcaLj4ws=JqRbE0TiyjDDWg@mail.gmail.com>
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-Date: Tue, 26 Aug 2025 20:23:04 +0200
-X-Gm-Features: Ac12FXxh9dXBN_CQ0mKUK-fHC6Hxit2dnlUBB4nf4-f-lGJ75BEyztz8Tk5lz3U
-Message-ID: <CAJ8uoz0v4sdj8YwadpCKpDSpY1JrJnO_kkEfHHyv+qAFMiKOOQ@mail.gmail.com>
-Subject: Re: [PATCH v6 bpf] xsk: fix immature cq descriptor production
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, netdev@vger.kernel.org, 
-	magnus.karlsson@intel.com, stfomichev@gmail.com, aleksander.lobakin@intel.com, 
-	Eryk Kubanski <e.kubanski@partner.samsung.com>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|DS4PPFC77662F02:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3bef4a41-093c-4053-022f-08dde4cdb7fd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?VHo5TDJKQ3FjNDZZYjdDTVZjblNVaVBvN3lvSGdrUzNSQ2JMSE4wSU5GaFlr?=
+ =?utf-8?B?NGdnSXJqR3pzR1JmT1FYSEFod0IyNUdHd1FsdE9HTnhNdkFmOEl4TTFsazhN?=
+ =?utf-8?B?Q2FaWkxzeVdaSVowQVB4QkFhSmhidWNwTWJMd3NyanBhU0dlMGQ3bWVFL1hl?=
+ =?utf-8?B?OEovZ3Z5UjNmUnFLZG1XTm9Wd3d5blphL0p1QklhTlJQN003a0ZCVlVFVW9D?=
+ =?utf-8?B?eUZYMG5LdGxPL0ZudytjazhOSURsY2lVbDFoZ0xXdWtLb1VTczZhY2ZWcGdu?=
+ =?utf-8?B?UnpBK1JWMWlLWGpkZHJ5VHJFN3B2R245N2NCY21KZmEwZTFscXBmVTZSazEv?=
+ =?utf-8?B?Y1NRL0JpNlBnUmp0aDBoaEhGN0pGdjIvd2V3UUp4b0t0VWUyd1dHSnRTWTB4?=
+ =?utf-8?B?dnNkZjkrZ0x3RWgxSTlUeUZDcjVVV0tyMzIrMEdGNnBqSlFhUlEzZERLMXBG?=
+ =?utf-8?B?c3hoQkdtVDZrVmV6MGJtZlFJRkJxVDV1YmNFbzZka0owdHRsUDVrMWZURFAr?=
+ =?utf-8?B?TnpoOSt5T216MnpEVEo2YU9lODlqNzFYWTB2OFBlZjUwbytpaTIrb2lIOVJr?=
+ =?utf-8?B?clZiVHdocko2Ti9nSTkyNzRTL3I3RWlOb2VEckVqampnbndDZWlpaXkvT0w5?=
+ =?utf-8?B?aTNYOXNEeUptMmV1NFdENi9Pc29rNkVmTHdoekhMWkk0a2dvdWFaVGd5eXll?=
+ =?utf-8?B?S1FnTS8yZ1l3bTFCcFc5cEg1SytOOFZ2OHhHSWYzcUFMK0tIOW9lRDk0Q09a?=
+ =?utf-8?B?aGlmaW92NkZOcG5SRFNlOVR0SEFJTXFGYVlnb09oUU8wck9la0JUWXB6SXJB?=
+ =?utf-8?B?TTlNa051Wm42SFFHKyt6Qm1UMnNubklNUDZxVmpiZGluMkZhb2ozcThXQmFC?=
+ =?utf-8?B?cHNJNnZZeWI3bDV0cUdrRXIxQ2Z1SFpxU3RYL1dsZGJhN1ZHSVpWc2kwZGp6?=
+ =?utf-8?B?blp5c0R3T3BKZEx2ck0wT292dlVjWEIzUzYyc0ZjUUVWbmxaV29SUlFFMTJE?=
+ =?utf-8?B?VTc3cWI1WEQ4cWwxdW1xM1F5Y0ZBQTBGbjIzK2VLRVdlVmRmdC9TemxyMktL?=
+ =?utf-8?B?Nkc3eHh4eWVCckQzSlpGbzR5cTBDQ1haNVd1UmhrN3YvUWtETjRqb1EwTC8y?=
+ =?utf-8?B?R2QrMlh3R05ZMUhzYXo0ZHJPZXRZRGV3M1NWQTdHSXp2UFVRVU1lMVN1N1M1?=
+ =?utf-8?B?b2M2eUROYys2cnVmWnpPbFVTV3hlTk5WSExZbTh1Sm1vakF0N2J3WWVhSnVV?=
+ =?utf-8?B?c1p1U2dYSm53TlZZKzhWNkQvMHVhTUZObjFSMUJsSGQwcmhOalZsTCtiSExS?=
+ =?utf-8?B?V0EvWFRZcHh0WUI5QWs3am5RaTRlQUVXcnRhZDl5UzRiZzRPRE10aEdhOVV0?=
+ =?utf-8?B?SzRVVVlCaEpzNFkvZDBTaXBvOE1tSFoxTUpmQ2FET2IxTFVLS3FORGdHOEMw?=
+ =?utf-8?B?djd6eXNKQ3hQeFp4MTROck45bzFFcW5CL24rVnY4ZkxUMUQxU210UkZCMXo1?=
+ =?utf-8?B?aGxLdEpWWUdHRDVRNEVZajk2YlorL05aTG1XU2FyT3kxZlRnZmNDcHV4aVRu?=
+ =?utf-8?B?S21VdnJEMkZhUS9odmJWQVVSZExrYVJsN0l5bDk5bHBFWW5lcTU4Sng2YVpo?=
+ =?utf-8?B?TzZaZFM0QVlRYmtJTXh3OTIxNlUvWXBHRTc1NjRaYnlhWVhidE91NEt5Rmo5?=
+ =?utf-8?B?Ty91QjhnRU83ZWFsbkpiejd1NVlJeUtpMjhwQUwxTXFjM1MyNGl2QllOK2hh?=
+ =?utf-8?B?Y3VESlRjaWgxcEg0b2RLeHFjUjYrOTdOQ0JVQTV1OTdVVE5OTVZ2WG1rZGJs?=
+ =?utf-8?B?Z0doSmVab1o0L0xhYzhMb3VWZTc0SXhUeEVwakFEVWlIajZaOElIdGdQakky?=
+ =?utf-8?B?cnM5cEk1c2pvZmVtUjAxRmtIODdDM3lLczcraDlCakVGUmFmdkNjRi9NcTlo?=
+ =?utf-8?Q?ZdfSZSKzQgY=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MjVicjBlRVh5L1hKOENVcFRRZmduQ09sLzJ5eWg3OHNkWldLZkxyNlFkRTFR?=
+ =?utf-8?B?aUJWc2JjL2FjM3hHUWJucm9HNUFDZHNQL0lRZE9HTGdIejlzejM4emhwMUVu?=
+ =?utf-8?B?Q01wdTVBUDJqRjlQNVQxYWlpZkFuTkNYdlBKSW9LenVQK2ZOOGFhaEt3OExX?=
+ =?utf-8?B?Z0VWa2JlZlFvQlkzOHM1MUU1aitEdFduQW1KbmNKSC9LSHVyY21FaFFaaDFB?=
+ =?utf-8?B?MUtNemhRbmRmelorTXNyczhLTGxMYldmblpwSHkyb2VnL0xGTTdRWGkwclhO?=
+ =?utf-8?B?cU1IMWJwU21Bc2JHVVYyUmRRdzd3TzZXNnByYy84NXB0ZlZiZkdzdjNEdnlZ?=
+ =?utf-8?B?NXJPOVo5S2JXY3FKN29rRVcrNHd2MnB1a0k2VzVrdDZ3dmh1YUZqV3Noa0hB?=
+ =?utf-8?B?REdGeWpXS0VUTHRnRXp4QjNlczRHdWQ0dC9wNlcxYjRCa1NhbmxONlFsWXdi?=
+ =?utf-8?B?bnlqaXZlajdGakpuNFd1dnUzSG5IUTgxOWxIandRRldPSWhMdks3eEtUQ2JU?=
+ =?utf-8?B?Y0JnNFR5bURtZTFjV0NxS3pjS1FaZStxYkdkN3R4MFk0UGVqYW9DeWFxWG05?=
+ =?utf-8?B?K3pUNlNpbFNSRUt5a3Exa2RHeGM2dEZleGZWazdnSXBzbk5IWnY0K09oWVho?=
+ =?utf-8?B?SUZGdWRTc3hFTCt6VnRwalY2UXRMMVRDYk1mcDBoMUszVktWZDhwZ0NDLzFa?=
+ =?utf-8?B?eXVTN1NzTWVOaFY3NHNTUXZYVlNyVWxqb0h2UDYyY2JYc3ZINEtnZURMSXZo?=
+ =?utf-8?B?S2RXbUlaOEhBeU9PNUdBZ1FRV1pHU2I0RHVvUkZnNGppTmltK1lRSDlMS1Bv?=
+ =?utf-8?B?UFVtQVBTYXdIME1wSU1CQWZ1bWo4Z3BLM0Y4b3ljWTI4Q1ljQmFtVStialds?=
+ =?utf-8?B?eEVyT05nT2JFU2daQXVxZy9mY1h1SWg0enJXVkhWUFBhODM4MVhiQmJrdGRh?=
+ =?utf-8?B?ZkptUjl4YUZ1YzRadzNVREN2QmlJQVFhZjBXQ1ZtQ3hNejZJNWJvOGpYYVJU?=
+ =?utf-8?B?NUpyNU9LRHVqUUErOFBJS2JQNE13TFNUazRLcTlOVGhqckZmTjJuZ0VqZjd6?=
+ =?utf-8?B?TUZQV0g1QVdYOUVNaXZMb2pMMkhwbGU4NDZQVnhkT1NIQmpyeVlLTWQybVVi?=
+ =?utf-8?B?VnFad1hnc0RXS2FkWFJZNG9yVEowRzdYV2hZZkMvUUpvWkV2NnVTK3FRcjc2?=
+ =?utf-8?B?K2o1ZUxINTNTcytPN3R5WEd3SCtOTVp0MGVyVGR6NVZlNnRpT1JGbkJvdklM?=
+ =?utf-8?B?clk5SFMvZXBsRW1XbER3d2xaYXNmUXJ4RzlBdXRnaUJXcUcrNTRSUDI0eVYr?=
+ =?utf-8?B?Zm5zaUZPZ25ZN3ErRnhyaVl5eFlHa2xJdHU1QlFyNDRScmpON2hFU3FIQ2hB?=
+ =?utf-8?B?VEY3WkFMbHNjY2w3QVJpWCtkaU1SNWhpR01GMDgzSWZIS3doTFdkN3htS1l6?=
+ =?utf-8?B?RkF5REFFNW1MdVprZHY4VzNFeEl4K2R2S0U0YkY2UllJUldxQmErb21Edmdr?=
+ =?utf-8?B?SUhCanp4aGtCalA4WW5zUDhyR2ZFREEvbE9HV1FUb1doeGkxenM0eGpPWkQ2?=
+ =?utf-8?B?Q0hDMGZVaksxNXc3T0gxc0tzSGhwU2JsTkhyM2VzQnpOREpSWGVBbGFvUVdj?=
+ =?utf-8?B?cm1tZWZmTnR3dkhCVHgwc2JOSnR1OFRJZDZPMVdsMHZKajN4NkFXdkVaamJ5?=
+ =?utf-8?B?STVSS2h1aXREMDB1eTk3L2hneFJuK3UwNEtZYUowci9kYXNLZ2NWU1BJVXAz?=
+ =?utf-8?B?c3o1bGlTRU12Q0hWMmpDdk1jZVpUbzQ3UkFnWkR1cEhDaUVUbjU2VzN3VnVJ?=
+ =?utf-8?B?aDAybHY4YVRhM2JxTEFuNUZNeHJwS3UyTk9JR05NOG9OWERrTWFZL3lhbXBG?=
+ =?utf-8?B?Z1NNSlJ2S3Yvbk51NE05OUJtSDIrMnVsbVQ2THNNdW9mRG8vcllOUkpqeVJ3?=
+ =?utf-8?B?Um8rRlBDVklMNTM2UHJ6OUVWMnF3TVYxWFhNay82UWg1M1RaeDB6dUEzaG94?=
+ =?utf-8?B?dGlBM2R4RnNlMVJ1SGdqRjBkYmlWMFY2d3phdjBtVlBDSjVXb2hXOWtDU2FI?=
+ =?utf-8?B?T0dEZHVYZXk2YkhVcWt5dkhmSk5JUDRrWWNzRW9oOGhhbnZUWE8zYVh5aEhi?=
+ =?utf-8?B?RE5LaEJicC9LRjNhNUhabGVwMjNvTVdTd2t6YlFMenhGQzJIeVkwQlppbnc5?=
+ =?utf-8?B?UEE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3bef4a41-093c-4053-022f-08dde4cdb7fd
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2025 18:23:56.4503
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3ZTYzAhrKrJ1Od7p9GuSSlFH/19c0wo4Togi8EHaeRDkmbCeB9yBMWNMtQnFVMkLZQgGdAzEIWPKjrxuxCQT1EfPHoJH1iFGlyEc0GedW9s=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PPFC77662F02
+X-OriginatorOrg: intel.com
+
+--------------8Vxe8Nm10V3qNdSj0f8msAM5
+Content-Type: multipart/mixed; boundary="------------XFhp8kAKCz8QDz6uuIiFbFhX";
+ protected-headers="v1"
+From: Jacob Keller <jacob.e.keller@intel.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Kurt Kanzenbach <kurt@linutronix.de>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+ Paul Menzel <pmenzel@molgen.mpg.de>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Miroslav Lichvar <mlichvar@redhat.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org
+Message-ID: <e656a4ee-281c-4205-9183-bc3c7dbc9173@intel.com>
+Subject: Re: [PATCH iwl-next v2] igb: Convert Tx timestamping to PTP aux
+ worker
+References: <20250822-igb_irq_ts-v2-1-1ac37078a7a4@linutronix.de>
+ <20250822075200.L8_GUnk_@linutronix.de> <87ldna7axr.fsf@jax.kurt.home>
+ <02d40de4-5447-45bf-b839-f22a8f062388@intel.com>
+ <20250826125912.q0OhVCZJ@linutronix.de>
+In-Reply-To: <20250826125912.q0OhVCZJ@linutronix.de>
+
+--------------XFhp8kAKCz8QDz6uuIiFbFhX
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 26 Aug 2025 at 18:07, Jason Xing <kerneljasonxing@gmail.com> wrote:
->
-> On Wed, Aug 20, 2025 at 11:49=E2=80=AFPM Maciej Fijalkowski
-> <maciej.fijalkowski@intel.com> wrote:
-> >
-> > Eryk reported an issue that I have put under Closes: tag, related to
-> > umem addrs being prematurely produced onto pool's completion queue.
-> > Let us make the skb's destructor responsible for producing all addrs
-> > that given skb used.
-> >
-> > Introduce struct xsk_addrs which will carry descriptor count with array
-> > of addresses taken from processed descriptors that will be carried via
-> > skb_shared_info::destructor_arg. This way we can refer to it within
-> > xsk_destruct_skb(). In order to mitigate the overhead that will be
-> > coming from memory allocations, let us introduce kmem_cache of
-> > xsk_addrs. There will be a single kmem_cache for xsk generic xmit on th=
-e
-> > system.
-> >
-> > Commit from fixes tag introduced the buggy behavior, it was not broken
-> > from day 1, but rather when xsk multi-buffer got introduced.
-> >
-> > Fixes: b7f72a30e9ac ("xsk: introduce wrappers and helpers for supportin=
-g multi-buffer in Tx path")
-> > Reported-by: Eryk Kubanski <e.kubanski@partner.samsung.com>
-> > Closes: https://lore.kernel.org/netdev/20250530103456.53564-1-e.kubansk=
-i@partner.samsung.com/
-> > Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
-> > Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> > ---
-> >
-> > v1:
-> > https://lore.kernel.org/bpf/20250702101648.1942562-1-maciej.fijalkowski=
-@intel.com/
-> > v2:
-> > https://lore.kernel.org/bpf/20250705135512.1963216-1-maciej.fijalkowski=
-@intel.com/
-> > v3:
-> > https://lore.kernel.org/bpf/20250806154127.2161434-1-maciej.fijalkowski=
-@intel.com/
-> > v4:
-> > https://lore.kernel.org/bpf/20250813171210.2205259-1-maciej.fijalkowski=
-@intel.com/
-> > v5:
-> > https://lore.kernel.org/bpf/aKXBHGPxjpBDKOHq@boxer/T/
-> >
-> > v1->v2:
-> > * store addrs in array carried via destructor_arg instead having them
-> >   stored in skb headroom; cleaner and less hacky approach;
-> > v2->v3:
-> > * use kmem_cache for xsk_addrs allocation (Stan/Olek)
-> > * set err when xsk_addrs allocation fails (Dan)
-> > * change xsk_addrs layout to avoid holes
-> > * free xsk_addrs on error path
-> > * rebase
-> > v3->v4:
-> > * have kmem_cache as percpu vars
-> > * don't drop unnecessary braces (unrelated) (Stan)
-> > * use idx + i in xskq_prod_write_addr (Stan)
-> > * alloc kmem_cache on bind (Stan)
-> > * keep num_descs as first member in xsk_addrs (Magnus)
-> > * add ack from Magnus
-> > v4->v5:
-> > * have a single kmem_cache per xsk subsystem (Stan)
-> > v5->v6:
-> > * free skb in xsk_build_skb_zerocopy() when xsk_addrs allocation fails
-> >   (Stan)
-> > * unregister netdev notifier if creating kmem_cache fails (Stan)
-> >
-> > ---
-> >  net/xdp/xsk.c       | 95 +++++++++++++++++++++++++++++++++++++--------
-> >  net/xdp/xsk_queue.h | 12 ++++++
-> >  2 files changed, 91 insertions(+), 16 deletions(-)
-> >
-> > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-> > index 9c3acecc14b1..989d5ffb4273 100644
-> > --- a/net/xdp/xsk.c
-> > +++ b/net/xdp/xsk.c
-> > @@ -36,6 +36,13 @@
-> >  #define TX_BATCH_SIZE 32
-> >  #define MAX_PER_SOCKET_BUDGET 32
-> >
-> > +struct xsk_addrs {
-> > +       u32 num_descs;
-> > +       u64 addrs[MAX_SKB_FRAGS + 1];
-> > +};
-> > +
-> > +static struct kmem_cache *xsk_tx_generic_cache;
->
-> IMHO, adding a few heavy operations of allocating and freeing from
-> cache in the hot path is not a good choice. What I've been trying so
-> hard lately is to minimize the times of manipulating memory as much as
-> possible :( Memory hotspot can be easily captured by perf.
->
-> We might provide an new option in setsockopt() to let users
-> specifically support this use case since it does harm to normal cases?
 
-Agree with you that we should not harm the normal case here. Instead
-of introducing a setsockopt, how about we detect the case when this
-can happen in the code? If I remember correctly, it can only occur in
-the XDP_SHARED_UMEM mode were the xsk pool is shared between
-processes. If this can be tested (by introducing a new bit in the xsk
-pool if that is necessary), we could have two potential skb
-destructors: the old one for the "normal" case and the new one with
-the list of addresses to complete (using the expensive allocations and
-deallocations) when it is strictly required i.e., when the xsk pool is
-shared. Maciej, you are more in to the details of this, so what do you
-think? Would something like this be a potential path forward?
 
->
-> > +
-> >  void xsk_set_rx_need_wakeup(struct xsk_buff_pool *pool)
-> >  {
-> >         if (pool->cached_need_wakeup & XDP_WAKEUP_RX)
-> > @@ -532,25 +539,39 @@ static int xsk_wakeup(struct xdp_sock *xs, u8 fla=
-gs)
-> >         return dev->netdev_ops->ndo_xsk_wakeup(dev, xs->queue_id, flags=
-);
-> >  }
-> >
-> > -static int xsk_cq_reserve_addr_locked(struct xsk_buff_pool *pool, u64 =
-addr)
-> > +static int xsk_cq_reserve_locked(struct xsk_buff_pool *pool)
-> >  {
-> >         unsigned long flags;
-> >         int ret;
-> >
-> >         spin_lock_irqsave(&pool->cq_lock, flags);
-> > -       ret =3D xskq_prod_reserve_addr(pool->cq, addr);
-> > +       ret =3D xskq_prod_reserve(pool->cq);
-> >         spin_unlock_irqrestore(&pool->cq_lock, flags);
-> >
-> >         return ret;
-> >  }
-> >
-> > -static void xsk_cq_submit_locked(struct xsk_buff_pool *pool, u32 n)
-> > +static void xsk_cq_submit_addr_locked(struct xdp_sock *xs,
-> > +                                     struct sk_buff *skb)
-> >  {
-> > +       struct xsk_buff_pool *pool =3D xs->pool;
-> > +       struct xsk_addrs *xsk_addrs;
-> >         unsigned long flags;
-> > +       u32 num_desc, i;
-> > +       u32 idx;
-> > +
-> > +       xsk_addrs =3D (struct xsk_addrs *)skb_shinfo(skb)->destructor_a=
-rg;
-> > +       num_desc =3D xsk_addrs->num_descs;
-> >
-> >         spin_lock_irqsave(&pool->cq_lock, flags);
-> > -       xskq_prod_submit_n(pool->cq, n);
-> > +       idx =3D xskq_get_prod(pool->cq);
-> > +
-> > +       for (i =3D 0; i < num_desc; i++)
-> > +               xskq_prod_write_addr(pool->cq, idx + i, xsk_addrs->addr=
-s[i]);
-> > +       xskq_prod_submit_n(pool->cq, num_desc);
-> > +
-> >         spin_unlock_irqrestore(&pool->cq_lock, flags);
-> > +       kmem_cache_free(xsk_tx_generic_cache, xsk_addrs);
-> >  }
-> >
-> >  static void xsk_cq_cancel_locked(struct xsk_buff_pool *pool, u32 n)
-> > @@ -562,11 +583,6 @@ static void xsk_cq_cancel_locked(struct xsk_buff_p=
-ool *pool, u32 n)
-> >         spin_unlock_irqrestore(&pool->cq_lock, flags);
-> >  }
-> >
-> > -static u32 xsk_get_num_desc(struct sk_buff *skb)
-> > -{
-> > -       return skb ? (long)skb_shinfo(skb)->destructor_arg : 0;
-> > -}
-> > -
-> >  static void xsk_destruct_skb(struct sk_buff *skb)
-> >  {
-> >         struct xsk_tx_metadata_compl *compl =3D &skb_shinfo(skb)->xsk_m=
-eta;
-> > @@ -576,21 +592,37 @@ static void xsk_destruct_skb(struct sk_buff *skb)
-> >                 *compl->tx_timestamp =3D ktime_get_tai_fast_ns();
-> >         }
-> >
-> > -       xsk_cq_submit_locked(xdp_sk(skb->sk)->pool, xsk_get_num_desc(sk=
-b));
-> > +       xsk_cq_submit_addr_locked(xdp_sk(skb->sk), skb);
-> >         sock_wfree(skb);
-> >  }
-> >
-> > -static void xsk_set_destructor_arg(struct sk_buff *skb)
-> > +static u32 xsk_get_num_desc(struct sk_buff *skb)
-> >  {
-> > -       long num =3D xsk_get_num_desc(xdp_sk(skb->sk)->skb) + 1;
-> > +       struct xsk_addrs *addrs;
-> >
-> > -       skb_shinfo(skb)->destructor_arg =3D (void *)num;
-> > +       addrs =3D (struct xsk_addrs *)skb_shinfo(skb)->destructor_arg;
-> > +       return addrs->num_descs;
-> > +}
-> > +
-> > +static void xsk_set_destructor_arg(struct sk_buff *skb, struct xsk_add=
-rs *addrs)
-> > +{
-> > +       skb_shinfo(skb)->destructor_arg =3D (void *)addrs;
-> > +}
-> > +
-> > +static void xsk_inc_skb_descs(struct sk_buff *skb)
-> > +{
-> > +       struct xsk_addrs *addrs;
-> > +
-> > +       addrs =3D (struct xsk_addrs *)skb_shinfo(skb)->destructor_arg;
-> > +       addrs->num_descs++;
-> >  }
-> >
-> >  static void xsk_consume_skb(struct sk_buff *skb)
-> >  {
-> >         struct xdp_sock *xs =3D xdp_sk(skb->sk);
-> >
-> > +       kmem_cache_free(xsk_tx_generic_cache,
-> > +                       (struct xsk_addrs *)skb_shinfo(skb)->destructor=
-_arg);
->
-> Replying to Daniel here: when EOVERFLOW occurs, it will finally go to
-> above function and clear the allocated memory and skb.
->
-> >         skb->destructor =3D sock_wfree;
-> >         xsk_cq_cancel_locked(xs->pool, xsk_get_num_desc(skb));
-> >         /* Free skb without triggering the perf drop trace */
-> > @@ -609,6 +641,7 @@ static struct sk_buff *xsk_build_skb_zerocopy(struc=
-t xdp_sock *xs,
-> >  {
-> >         struct xsk_buff_pool *pool =3D xs->pool;
-> >         u32 hr, len, ts, offset, copy, copied;
-> > +       struct xsk_addrs *addrs =3D NULL;
->
-> nit: no need to set to "NULL" at the begining.
->
-> >         struct sk_buff *skb =3D xs->skb;
-> >         struct page *page;
-> >         void *buffer;
-> > @@ -623,6 +656,14 @@ static struct sk_buff *xsk_build_skb_zerocopy(stru=
-ct xdp_sock *xs,
-> >                         return ERR_PTR(err);
-> >
-> >                 skb_reserve(skb, hr);
-> > +
-> > +               addrs =3D kmem_cache_zalloc(xsk_tx_generic_cache, GFP_K=
-ERNEL);
-> > +               if (!addrs) {
-> > +                       kfree(skb);
-> > +                       return ERR_PTR(-ENOMEM);
-> > +               }
-> > +
-> > +               xsk_set_destructor_arg(skb, addrs);
-> >         }
-> >
-> >         addr =3D desc->addr;
-> > @@ -662,6 +703,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_soc=
-k *xs,
-> >  {
-> >         struct xsk_tx_metadata *meta =3D NULL;
-> >         struct net_device *dev =3D xs->dev;
-> > +       struct xsk_addrs *addrs =3D NULL;
-> >         struct sk_buff *skb =3D xs->skb;
-> >         bool first_frag =3D false;
-> >         int err;
-> > @@ -694,6 +736,15 @@ static struct sk_buff *xsk_build_skb(struct xdp_so=
-ck *xs,
-> >                         err =3D skb_store_bits(skb, 0, buffer, len);
-> >                         if (unlikely(err))
-> >                                 goto free_err;
-> > +
-> > +                       addrs =3D kmem_cache_zalloc(xsk_tx_generic_cach=
-e, GFP_KERNEL);
-> > +                       if (!addrs) {
-> > +                               err =3D -ENOMEM;
-> > +                               goto free_err;
-> > +                       }
-> > +
-> > +                       xsk_set_destructor_arg(skb, addrs);
-> > +
-> >                 } else {
-> >                         int nr_frags =3D skb_shinfo(skb)->nr_frags;
-> >                         struct page *page;
-> > @@ -759,7 +810,9 @@ static struct sk_buff *xsk_build_skb(struct xdp_soc=
-k *xs,
-> >         skb->mark =3D READ_ONCE(xs->sk.sk_mark);
-> >         skb->destructor =3D xsk_destruct_skb;
-> >         xsk_tx_metadata_to_compl(meta, &skb_shinfo(skb)->xsk_meta);
-> > -       xsk_set_destructor_arg(skb);
-> > +
-> > +       addrs =3D (struct xsk_addrs *)skb_shinfo(skb)->destructor_arg;
-> > +       addrs->addrs[addrs->num_descs++] =3D desc->addr;
-> >
-> >         return skb;
-> >
-> > @@ -769,7 +822,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_soc=
-k *xs,
-> >
-> >         if (err =3D=3D -EOVERFLOW) {
-> >                 /* Drop the packet */
-> > -               xsk_set_destructor_arg(xs->skb);
-> > +               xsk_inc_skb_descs(xs->skb);
-> >                 xsk_drop_skb(xs->skb);
-> >                 xskq_cons_release(xs->tx);
-> >         } else {
-> > @@ -812,7 +865,7 @@ static int __xsk_generic_xmit(struct sock *sk)
-> >                  * if there is space in it. This avoids having to imple=
-ment
-> >                  * any buffering in the Tx path.
-> >                  */
-> > -               err =3D xsk_cq_reserve_addr_locked(xs->pool, desc.addr)=
-;
-> > +               err =3D xsk_cq_reserve_locked(xs->pool);
-> >                 if (err) {
-> >                         err =3D -EAGAIN;
-> >                         goto out;
-> > @@ -1815,8 +1868,18 @@ static int __init xsk_init(void)
-> >         if (err)
-> >                 goto out_pernet;
-> >
-> > +       xsk_tx_generic_cache =3D kmem_cache_create("xsk_generic_xmit_ca=
-che",
-> > +                                                sizeof(struct xsk_addr=
-s), 0,
-> > +                                                SLAB_HWCACHE_ALIGN, NU=
-LL);
-> > +       if (!xsk_tx_generic_cache) {
-> > +               err =3D -ENOMEM;
-> > +               goto out_unreg_notif;
-> > +       }
-> > +
-> >         return 0;
-> >
-> > +out_unreg_notif:
-> > +       unregister_netdevice_notifier(&xsk_netdev_notifier);
-> >  out_pernet:
-> >         unregister_pernet_subsys(&xsk_net_ops);
-> >  out_sk:
-> > diff --git a/net/xdp/xsk_queue.h b/net/xdp/xsk_queue.h
-> > index 46d87e961ad6..f16f390370dc 100644
-> > --- a/net/xdp/xsk_queue.h
-> > +++ b/net/xdp/xsk_queue.h
-> > @@ -344,6 +344,11 @@ static inline u32 xskq_cons_present_entries(struct=
- xsk_queue *q)
-> >
-> >  /* Functions for producers */
-> >
-> > +static inline u32 xskq_get_prod(struct xsk_queue *q)
-> > +{
-> > +       return READ_ONCE(q->ring->producer);
-> > +}
-> > +
-> >  static inline u32 xskq_prod_nb_free(struct xsk_queue *q, u32 max)
-> >  {
-> >         u32 free_entries =3D q->nentries - (q->cached_prod - q->cached_=
-cons);
-> > @@ -390,6 +395,13 @@ static inline int xskq_prod_reserve_addr(struct xs=
-k_queue *q, u64 addr)
-> >         return 0;
-> >  }
-> >
-> > +static inline void xskq_prod_write_addr(struct xsk_queue *q, u32 idx, =
-u64 addr)
-> > +{
-> > +       struct xdp_umem_ring *ring =3D (struct xdp_umem_ring *)q->ring;
-> > +
-> > +       ring->desc[idx & q->ring_mask] =3D addr;
-> > +}
-> > +
-> >  static inline void xskq_prod_write_addr_batch(struct xsk_queue *q, str=
-uct xdp_desc *descs,
-> >                                               u32 nb_entries)
-> >  {
-> > --
-> > 2.34.1
-> >
-> >
->
+On 8/26/2025 5:59 AM, Sebastian Andrzej Siewior wrote:
+> On 2025-08-25 16:28:38 [-0700], Jacob Keller wrote:
+>> Ya, I don't think we fully understand either. Miroslav said he tested =
+on
+>> I350 which is a different MAC from the I210, so it could be something
+>> there. Theoretically we could handle just I210 directly in the interru=
+pt
+>> and leave the other variants to the kworker.. but I don't know how muc=
+h
+>> benefit we get from that. The data sheet for the I350 appears to have
+>> more or less the same logic for Tx timestamps. It is significantly
+>> different for Rx timestamps though.
+>=20
+> From logical point of view it makes sense to retrieve the HW timestamp
+> immediately when it becomes available and feed it to the stack. I can't=
+
+> imagine how delaying it to yet another thread improves the situation.
+> The benchmark is about > 1k packets/ second while in reality you have
+> less than 20 packets a second. With multiple applications you usually
+> need a "second timestamp register" or you may lose packets.
+>=20
+> Delaying it to the AUX worker makes sense for hardware which can't fire=
+
+> an interrupt and polling is the only option left. This is sane in this
+> case but I don't like this solution as some kind compromise for
+> everyone. Simply because it adds overhead and requires additional
+> configuration.
+>=20
+
+I agree. Its just frustrating that doing so appears to cause a
+regression in at least one test setup on hardware which uses this method.=
+
+
+>>> Also I couldn't really see a performance degradation with ntpperf. In=
+ my
+>>> tests the IRQ variant reached an equal or higher rate. But sometimes =
+I
+>>> get 'Could not send requests at rate X'. No idea what that means.
+>>>
+>>> Anyway, this patch is basically a compromise. It works for Miroslav a=
+nd
+>>> my use case.
+>>>
+>>>> This is also what the igc does and the performance improved
+>>>> 	afa141583d827 ("igc: Retrieve TX timestamp during interrupt handlin=
+g")
+>>>>
+>>
+>> igc supports several hardware variations which are all a lot similar t=
+o
+>> i210 than i350 is to i210 in igb. I could see this working fine for i2=
+10
+>> if it works fine in igb.. I honestly am at a loss currently why i350 i=
+s
+>> much worse.
+>>
+>>>> and here it causes the opposite?
+>>>
+>>> As said above, I'm out of ideas here.
+>>>
+>>
+>> Same. It may be one of those things where the effort to dig up precise=
+ly
+>> what has gone wrong is so large that it becomes not feasible relative =
+to
+>> the gain :(
+>=20
+> Could we please use the direct retrieval/ submission for HW which
+> supports it and fallback to the AUX worker (instead of the kworker) for=
+
+> HW which does not have an interrupt for it?
+>=20
+
+I have no objection. Perhaps we could assume the high end of the ntpperf
+benchmark is not reflective of normal use case? We *are* limited to only
+one timestamp register, which the igb driver does protect by bitlock.
+
+>>> Thanks,
+>>> Kurt
+>=20
+> Sebastian
+
+
+--------------XFhp8kAKCz8QDz6uuIiFbFhX--
+
+--------------8Vxe8Nm10V3qNdSj0f8msAM5
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wnsEABYIACMWIQQgQFSp1zOQVirsQx5qll0+bw8o6AUCaK37uwUDAAAAAAAKCRBqll0+bw8o6Mms
+APsHaXZeqHhaGRZpl6JkEzTlUO3ptBIrdljEheP3LQp6OgD/TnD6aO9o7xC19F/354kposgJwv7V
+nLDavWY3VxHPNAA=
+=5e4f
+-----END PGP SIGNATURE-----
+
+--------------8Vxe8Nm10V3qNdSj0f8msAM5--
 
