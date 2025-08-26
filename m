@@ -1,91 +1,96 @@
-Return-Path: <netdev+bounces-216755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C5CBB350D1
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 03:10:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4503BB350DF
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 03:15:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8867F24530F
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 01:10:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F9FB1B21AE7
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 01:15:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02C42264A76;
-	Tue, 26 Aug 2025 01:10:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50CE314A09C;
+	Tue, 26 Aug 2025 01:15:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mKIhFQLt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gpy5badJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF558223301;
-	Tue, 26 Aug 2025 01:09:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 268CEC133;
+	Tue, 26 Aug 2025 01:15:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756170599; cv=none; b=bwf2UuUc1v+J37xmez75/drwGEOP3puhT37uHbd56NsdgXEpeI+L14DLQ2zmq4ACdUaAnysKXFqtVLGZJuT6gt8B++UsWXn3VoT9wJLN33GXr9v1DMUqY+axLSCfDl4a/Aw5htDhYGG75dWLSCSrY/Fay7uaTPDBUWzVi2Bw6iU=
+	t=1756170934; cv=none; b=sfQBjPBBLWafsUyDHnLrvYLr1rnvaaIJB4MAyX5QJMm96T3mYCIgQRzg7o/bT+RvnwsMdLNY3Jts9fxycNugpg3l6Nb9y4htlp2UHdjBNsSCuUvM4Mn1RTZ3JHHRAR0xv92KM8E6caElfM0hN4ielEJfdAOGjmElCbrwcznkPG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756170599; c=relaxed/simple;
-	bh=2MU1wsisj2bpi9gw4bNtqYogONq6KHZrFXV+50sZ3WE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dH5K6oa5JkmuYL/mU13h54H/rUdtFuU1fyAG+6Jt9nxsV1uGmQ5Gau/PFF0fIAD1slTYzvKoFolvxqxnZjLQ4TmL/mEpHn9ng6rldJy7SpUjPQ063gGPaTB7nebshYQf3fYEdqJGLkiPKSrUBDeBNtqBzlF44FhroohroiJaZTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mKIhFQLt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59356C4CEF1;
-	Tue, 26 Aug 2025 01:09:58 +0000 (UTC)
+	s=arc-20240116; t=1756170934; c=relaxed/simple;
+	bh=TFasoV4Wgbuy8d8WaLKLa5ZeC0ESXfKE9EW8yM7BQZw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hEOh3T9LIY3AzV/xOlEEEnSDx/+Qmvjeo0W9pfjvOnGHvYGBYQgntQRmwGrzuw7+QLhvKaOtpA4G7r7fLJOdCFe5GrEMpmRwEABLNJFUadqwoY2Vn+M3o23NqxMHHNxxwdZ0J5RDj/uNYEuQouXnT6IDP2X7uguiQ29DpR/Rl5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gpy5badJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1ED4C4CEED;
+	Tue, 26 Aug 2025 01:15:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756170598;
-	bh=2MU1wsisj2bpi9gw4bNtqYogONq6KHZrFXV+50sZ3WE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=mKIhFQLtK2Yjz+ZCyjolsgwwzaWjvM7Osc/Bf3GkYHP2qhDYF9kaCMG0JVhG6Xau8
-	 W8L6h4ICepCDdZsWoLeQ29jS6YFrBL0oC7ZdNPl5ehtSWzh/Q/BjLJwuwjwcKfj7CT
-	 5a1vQfLWrU1XNlB4D8uO6dDGZLn/Z6WiosO0TAFF3XgPVJz/9WEzQ6uGe0AFeDDbeZ
-	 vC2ry6ov1mkO+HwALBx2jx0mpNwMVYJv2/NRCO/hdbDu1d8Fs37FpDkLDXhFD2R+bm
-	 CuUfnNC73StpbVo1MTOfTXF55NveyXbGSCaBkh/Y1jtA2amIwalKM1bqA0M0fReOH1
-	 zu9dT9yCQqhVQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D26383BF70;
-	Tue, 26 Aug 2025 01:10:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1756170933;
+	bh=TFasoV4Wgbuy8d8WaLKLa5ZeC0ESXfKE9EW8yM7BQZw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Gpy5badJ7D3W9wGp5gqfPIPYZjenUKnNqDBcHNxHtUmGD4kStDFErNKPdl035RDs2
+	 EaRGg0tI8HsLAQh50QyDCvDFy4ATzAEPO6JkMxl7JiOMNJiBrbXGxf8s+SqXc2sDXo
+	 qMmnwaLNwt3eEM+Pu5l9UEjNPMkwYuGQZpqlsQLA270AXY0U3mprCDFPYK/xsTAirP
+	 vAhGoc/jfpdYInV2L21MDYXtykyypqI7ysDqDszL0NAtHVM8ZeAiqcpVEQ9OXdOhy1
+	 JU5gfzXLTxmNLUARmwxa/NakUXI5Tu8STZUl562T9pcc2dtZXUSet7nLrl2CJmupwT
+	 ch+fFomi6e+jg==
+Date: Mon, 25 Aug 2025 18:15:32 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ bjorn@kernel.org, magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
+ jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org,
+ daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+ horms@kernel.org, andrew+netdev@lunn.ch, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next v2 0/9] xsk: improvement performance in copy
+ mode
+Message-ID: <20250825181532.1b6ae14f@kernel.org>
+In-Reply-To: <CAL+tcoCa3nfO+PJE-uccnOfQaZnUa+78AmJXwjaLod4WvPPfog@mail.gmail.com>
+References: <20250825135342.53110-1-kerneljasonxing@gmail.com>
+	<20250825104437.5349512c@kernel.org>
+	<CAL+tcoCxzyBxhCes-4OfBAePpQK3jvSRSBufo0eu6afb4hdSaA@mail.gmail.com>
+	<20250825172928.234fd75c@kernel.org>
+	<CAL+tcoCa3nfO+PJE-uccnOfQaZnUa+78AmJXwjaLod4WvPPfog@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: phylink: remove stale an_enabled from doc
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175617060625.3613843.15947704573135304216.git-patchwork-notify@kernel.org>
-Date: Tue, 26 Aug 2025 01:10:06 +0000
-References: <20250824013009.2443580-1-mmyangfl@gmail.com>
-In-Reply-To: <20250824013009.2443580-1-mmyangfl@gmail.com>
-To: Yangfl <mmyangfl@gmail.com>
-Cc: netdev@vger.kernel.org, linux@armlinux.org.uk,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sun, 24 Aug 2025 09:30:03 +0800 you wrote:
-> state->an_enabled was removed before, but is left in mac_config() doc,
-> so clean it.
+On Tue, 26 Aug 2025 08:51:24 +0800 Jason Xing wrote:
+> > > Sorry for missing the question. I'm not very familiar with how to run the
+> > > test based on AF_PACKET. Could you point it out for me? Thanks.
+> > >
+> > > I remember the very initial version of AF_XDP was pure AF_PACKET. So
+> > > may I ask why we expect to see the comparison between them?  
+> >
+> > Pretty sure I told you this at least twice but the point of AF_XDP
+> > is the ZC mode. Without a comparison to AF_PACKET which has similar
+> > functionality optimizing AF_XDP copy mode seems unjustified.  
 > 
-> Fixes: 4ee9b0dcf09f ("net: phylink: remove an_enabled")
-> Signed-off-by: David Yang <mmyangfl@gmail.com>
-> ---
->  include/linux/phylink.h | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
+> Oh, I see. Let me confirm again that you expect to see a demo like the
+> copy mode of AF_PACKET v4 [1] and see the differences in performance,
+> right?
+> 
+> If AF_PACKET eventually outperforms AF_XDP, do we need to reinvent the
+> copy mode based on AF_PACKET?
+> 
+> And if a quick/simple implementation is based on AF_PACKET, it
+> shouldn't be that easy to use the same benchmark to see which one is
+> better. That means inventing a new unified benchmark tool is
+> necessary?
 
-Here is the summary with links:
-  - [net-next] net: phylink: remove stale an_enabled from doc
-    https://git.kernel.org/netdev/net-next/c/df534e757321
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+To be honest I suspect you can get an LLM to convert your AF_XDP test
+to use AF_PACKET..
 
