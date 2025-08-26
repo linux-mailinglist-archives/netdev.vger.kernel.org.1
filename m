@@ -1,115 +1,245 @@
-Return-Path: <netdev+bounces-216836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA809B356AF
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 10:23:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 728EBB357A2
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 10:51:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5326116E96E
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 08:22:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 819937AB37C
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 08:50:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 915C12F83D2;
-	Tue, 26 Aug 2025 08:22:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC6C32FCC02;
+	Tue, 26 Aug 2025 08:51:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E5672F746F;
-	Tue, 26 Aug 2025 08:22:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 084FA2F99AD
+	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 08:51:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756196552; cv=none; b=NAUHI/cfSRrMbjNd2tbwaw/mhn5njiJZwLAyaZkOcC/kIwRpDaawEZurxlen/d3KZ2n2/fq1qFyzsBd5qIyDfEMAUNGRetx8+gk1N3ojvPO8qmGmHm0NlIKYY6iWlEjVrb1eNRhvOKn6KPITQTZhHMnm/jWOjRZJ0XGSWzNTrGc=
+	t=1756198297; cv=none; b=K4/zK81VYZDMTJJtqbpz1ITSJ41koyH14C0yiSnjPA16mNrftoLEUVApaHeUOMDUkEXi36Xauh9W8BeR+0Yjl2xO20yfLYWH3uQYeOxBf3NAXWwQaCX/btpBYxjvGRVQzojbR1OCBS539OpX7quhPq4pVQ3474ZNOeu1KA5ISX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756196552; c=relaxed/simple;
-	bh=paTBoj9DCUhl33v0IoUbRwFxDjdcIXIy94zu1Z1jVGg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ccd7sRZPPTwDXyzmLdsY+wBuinhm10z445l7t26tWd9WAaYpD4Z0K0dsKeOOBUEhFqCfxxC4eASwSJ2LV7Igq+ezWvfxOICwFYYabPGxx5WyMw8oaQ3YofnDUsaTQ901OvQUratky6c0ksP5KigeWQigMpim4jn7Fbks2+GJ1Ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4cB0v60bh9z1R96x;
-	Tue, 26 Aug 2025 16:19:30 +0800 (CST)
-Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
-	by mail.maildlp.com (Postfix) with ESMTPS id D36CE1402CA;
-	Tue, 26 Aug 2025 16:22:25 +0800 (CST)
-Received: from huawei.com (10.50.159.234) by dggpemf500015.china.huawei.com
- (7.185.36.143) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 26 Aug
- 2025 16:22:24 +0800
-From: Liu Jian <liujian56@huawei.com>
-To: <alibuda@linux.alibaba.com>, <dust.li@linux.alibaba.com>,
-	<sidraya@linux.ibm.com>, <wenjia@linux.ibm.com>, <mjambigi@linux.ibm.com>,
-	<tonylu@linux.alibaba.com>, <guwen@linux.alibaba.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<horms@kernel.org>, <guangguan.wang@linux.alibaba.com>
-CC: <linux-rdma@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-	<netdev@vger.kernel.org>
-Subject: [PATCH net] net/smc: fix one NULL pointer dereference in smc_ib_is_sg_need_sync()
-Date: Tue, 26 Aug 2025 16:44:42 +0800
-Message-ID: <20250826084442.322587-1-liujian56@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1756198297; c=relaxed/simple;
+	bh=rqbzpIMNF8lcLo+xCfnXXVC+y3Ijjnd4uYWZXRDrsAQ=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=ctVAsptUtK1q6N9z3HNdSVXqkwN43vuTlWaAmxI00VVN50r42YtXwIdQ9gCuA56ZD6D/53qkMIBy2OtO53U1xFfUuTtevjp4rMmqVfaI90Y3kuX6TPAvmo2gg5XXa+P3+hy34VHCzElzZZZw9Zz4ZDKSANSNRbu3bv2+qFjU6Dg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3e6670d5bafso139646995ab.2
+        for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 01:51:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756198295; x=1756803095;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=V5Z8geFiUzuvb4xav6QXnStSoxIENWrkMk1y8NFINgg=;
+        b=T4+XogzBJ6bFE5/RxBuHDLtvo8rR70hNBEna4eFRceKQJVPUx1rEUhxKNPPRaUFcaJ
+         2sljkfXmmgYOQAUvJ0oL1ejCqltSz/HLxHwmxbzIasCqDM21rDpLCuZT8BjezHufukTa
+         1EetU9o3mKQgM8aRIRTE4CFHUke8cydQl+C1qQcFsEx1dCVIIYtamx1WP8u+H7f1Nc/f
+         CcVhoHoVF0FtqIENulwBVb2uty2V0O2Pi8hWb2tprIxpiWOoHLamLI9OTlYgjKwSffgw
+         /ur+3WcWFaBtb0z7DnvN5BXSpAcHiO8SdwGgJVrfPmGPGLgL4ax/1EVVUAz7qBc6RA8W
+         59uw==
+X-Forwarded-Encrypted: i=1; AJvYcCXwaPRdsjTMcuHwsflvWWJOzMIi6pDNeXu2ojXK6yQV+IFqM1Un43SuvIOl0YjxfigM7dES5OI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvWy3thcD9kSSsuLQ4lB/jq5PyGJ32nF2Rf0MG01ASRPbZ907/
+	0+8Jmkc2GPRwLZ5Vgpm/MxEq9pIfa8ToVt5fQY+kW7bm0p3JyjK+bz97CzzRJ1ir67SxNytBIjm
+	uj53RZFjzICWTGshOnW7fKd9wHzgkW9Nyh6aLCUikUahFMuWPd6oZg6Y2Vro=
+X-Google-Smtp-Source: AGHT+IGyCWr0r9RDJeiW8aRxDMVAR/RmplC1QNzX7o7NXNCYjeAEdE8Lnppx22aFBoWOaVC2roEIjfX0CoBvLEDs8itAl1OaB3FS
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- dggpemf500015.china.huawei.com (7.185.36.143)
+X-Received: by 2002:a05:6e02:3c03:b0:3e8:78b5:6834 with SMTP id
+ e9e14a558f8ab-3e91fc22a64mr220178895ab.2.1756198295079; Tue, 26 Aug 2025
+ 01:51:35 -0700 (PDT)
+Date: Tue, 26 Aug 2025 01:51:35 -0700
+In-Reply-To: <20250826041148.426598-1-liuhangbin@gmail.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68ad7597.050a0220.37038e.00b7.GAE@google.com>
+Subject: [syzbot ci] Re: hsr: add rcu lock for all hsr_for_each_port caller
+From: syzbot ci <syzbot+cie5eccf65446b6e53@syzkaller.appspotmail.com>
+To: aleksander.lobakin@intel.com, arvid.brodin@alten.se, danishanwar@ti.com, 
+	davem@davemloft.net, edumazet@google.com, ffmancera@riseup.net, 
+	horms@kernel.org, jkarrenpalo@gmail.com, johannes.berg@intel.com, 
+	kuba@kernel.org, kuniyu@google.com, liaoyu15@huawei.com, liuhangbin@gmail.com, 
+	m-karicheri2@ti.com, netdev@vger.kernel.org, pabeni@redhat.com, 
+	sdf@fomichev.me, shaw.leon@gmail.com, w-kwok2@ti.com
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-BUG: kernel NULL pointer dereference, address: 00000000000002ec
-PGD 0 P4D 0
-Oops: Oops: 0000 [#1] SMP PTI
-CPU: 28 UID: 0 PID: 343 Comm: kworker/28:1 Kdump: loaded Tainted: G        OE       6.17.0-rc2+ #9 NONE
-Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
-Workqueue: smc_hs_wq smc_listen_work [smc]
-RIP: 0010:smc_ib_is_sg_need_sync+0x9e/0xd0 [smc]
-...
+syzbot ci has tested the following series
+
+[v1] hsr: add rcu lock for all hsr_for_each_port caller
+https://lore.kernel.org/all/20250826041148.426598-1-liuhangbin@gmail.com
+* [PATCH net] hsr: add rcu lock for all hsr_for_each_port caller
+
+and found the following issue:
+BUG: sleeping function called from invalid context in dev_set_allmulti
+
+Full report is available here:
+https://ci.syzbot.org/series/3992f7f8-7052-4440-bc88-86be6f350cec
+
+***
+
+BUG: sleeping function called from invalid context in dev_set_allmulti
+
+tree:      net
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
+base:      51f27beeb79f9f92682158999bab489ff4fa16f6
+arch:      amd64
+compiler:  Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+config:    https://ci.syzbot.org/builds/1a20cfb3-c3a6-4ba9-9bda-2f49b971b39c/config
+C repro:   https://ci.syzbot.org/findings/9de559bc-f498-4b86-ab2e-34f1510e4fe4/c_repro
+syz repro: https://ci.syzbot.org/findings/9de559bc-f498-4b86-ab2e-34f1510e4fe4/syz_repro
+
+hsr1: entered promiscuous mode
+hsr1: entered allmulticast mode
+bond0: entered allmulticast mode
+bond_slave_0: entered allmulticast mode
+bond_slave_1: entered allmulticast mode
+BUG: sleeping function called from invalid context at kernel/locking/mutex.c:575
+in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 5996, name: syz.0.17
+preempt_count: 0, expected: 0
+RCU nest depth: 1, expected: 0
+3 locks held by syz.0.17/5996:
+ #0: ffffffff8fa59670 (&ops->srcu#2){.+.+}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ #0: ffffffff8fa59670 (&ops->srcu#2){.+.+}-{0:0}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
+ #0: ffffffff8fa59670 (&ops->srcu#2){.+.+}-{0:0}, at: rtnl_link_ops_get+0x23/0x250 net/core/rtnetlink.c:570
+ #1: ffffffff8f537c08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
+ #1: ffffffff8f537c08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock net/core/rtnetlink.c:341 [inline]
+ #1: ffffffff8f537c08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_newlink+0x8db/0x1c70 net/core/rtnetlink.c:4056
+ #2: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ #2: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
+ #2: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: hsr_change_rx_flags+0x28/0x2d0 net/hsr/hsr_device.c:522
+CPU: 0 UID: 0 PID: 5996 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
 Call Trace:
  <TASK>
- smcr_buf_map_link+0x211/0x2a0 [smc]
- __smc_buf_create+0x522/0x970 [smc]
- smc_buf_create+0x3a/0x110 [smc]
- smc_find_rdma_v2_device_serv+0x18f/0x240 [smc]
- ? smc_vlan_by_tcpsk+0x7e/0xe0 [smc]
- smc_listen_find_device+0x1dd/0x2b0 [smc]
- smc_listen_work+0x30f/0x580 [smc]
- process_one_work+0x18c/0x340
- worker_thread+0x242/0x360
- kthread+0xe7/0x220
- ret_from_fork+0x13a/0x160
- ret_from_fork_asm+0x1a/0x30
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ __might_resched+0x495/0x610 kernel/sched/core.c:8957
+ __mutex_lock_common kernel/locking/mutex.c:575 [inline]
+ __mutex_lock+0x109/0x1360 kernel/locking/mutex.c:760
+ netdev_lock include/linux/netdevice.h:2761 [inline]
+ netdev_lock_ops include/net/netdev_lock.h:42 [inline]
+ dev_set_allmulti+0x10e/0x260 net/core/dev_api.c:312
+ hsr_change_rx_flags+0x1b2/0x2d0 net/hsr/hsr_device.c:530
+ dev_change_rx_flags net/core/dev.c:9332 [inline]
+ netif_set_allmulti+0x212/0x380 net/core/dev.c:9430
+ __dev_change_flags+0x52e/0x6d0 net/core/dev.c:9571
+ rtnl_configure_link net/core/rtnetlink.c:3579 [inline]
+ rtnl_newlink_create+0x555/0xb00 net/core/rtnetlink.c:3835
+ __rtnl_newlink net/core/rtnetlink.c:3942 [inline]
+ rtnl_newlink+0x16d6/0x1c70 net/core/rtnetlink.c:4057
+ rtnetlink_rcv_msg+0x7cf/0xb70 net/core/rtnetlink.c:6946
+ netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2552
+ netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+ netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1346
+ netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
+ sock_sendmsg_nosec net/socket.c:714 [inline]
+ __sock_sendmsg+0x21c/0x270 net/socket.c:729
+ ____sys_sendmsg+0x505/0x830 net/socket.c:2614
+ ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
+ __sys_sendmsg net/socket.c:2700 [inline]
+ __do_sys_sendmsg net/socket.c:2705 [inline]
+ __se_sys_sendmsg net/socket.c:2703 [inline]
+ __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2703
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7ff4b418ebe9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffef8386cc8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007ff4b43b5fa0 RCX: 00007ff4b418ebe9
+RDX: 00000000000080c0 RSI: 00002000000002c0 RDI: 0000000000000003
+RBP: 00007ff4b4211e19 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ff4b43b5fa0 R14: 00007ff4b43b5fa0 R15: 0000000000000003
  </TASK>
 
-If the software RoCE device is used, ibdev->dma_device is a null pointer.
-As a result, the problem occurs. Null pointer detection is added to
-prevent problems.
+=============================
+[ BUG: Invalid wait context ]
+syzkaller #0 Tainted: G        W          
+-----------------------------
+syz.0.17/5996 is trying to lock:
+ffff888110848d30 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2761 [inline]
+ffff888110848d30 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: netdev_lock_ops include/net/netdev_lock.h:42 [inline]
+ffff888110848d30 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: dev_set_allmulti+0x10e/0x260 net/core/dev_api.c:312
+other info that might help us debug this:
+context-{5:5}
+3 locks held by syz.0.17/5996:
+ #0: ffffffff8fa59670 (&ops->srcu#2){.+.+}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ #0: ffffffff8fa59670 (&ops->srcu#2){.+.+}-{0:0}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
+ #0: ffffffff8fa59670 (&ops->srcu#2){.+.+}-{0:0}, at: rtnl_link_ops_get+0x23/0x250 net/core/rtnetlink.c:570
+ #1: ffffffff8f537c08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
+ #1: ffffffff8f537c08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock net/core/rtnetlink.c:341 [inline]
+ #1: ffffffff8f537c08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_newlink+0x8db/0x1c70 net/core/rtnetlink.c:4056
+ #2: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ #2: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
+ #2: ffffffff8e139ea0 (rcu_read_lock){....}-{1:3}, at: hsr_change_rx_flags+0x28/0x2d0 net/hsr/hsr_device.c:522
+stack backtrace:
+CPU: 0 UID: 0 PID: 5996 Comm: syz.0.17 Tainted: G        W           syzkaller #0 PREEMPT(full) 
+Tainted: [W]=WARN
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ print_lock_invalid_wait_context kernel/locking/lockdep.c:4830 [inline]
+ check_wait_context kernel/locking/lockdep.c:4902 [inline]
+ __lock_acquire+0xbcb/0xd20 kernel/locking/lockdep.c:5187
+ lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
+ __mutex_lock_common kernel/locking/mutex.c:598 [inline]
+ __mutex_lock+0x187/0x1360 kernel/locking/mutex.c:760
+ netdev_lock include/linux/netdevice.h:2761 [inline]
+ netdev_lock_ops include/net/netdev_lock.h:42 [inline]
+ dev_set_allmulti+0x10e/0x260 net/core/dev_api.c:312
+ hsr_change_rx_flags+0x1b2/0x2d0 net/hsr/hsr_device.c:530
+ dev_change_rx_flags net/core/dev.c:9332 [inline]
+ netif_set_allmulti+0x212/0x380 net/core/dev.c:9430
+ __dev_change_flags+0x52e/0x6d0 net/core/dev.c:9571
+ rtnl_configure_link net/core/rtnetlink.c:3579 [inline]
+ rtnl_newlink_create+0x555/0xb00 net/core/rtnetlink.c:3835
+ __rtnl_newlink net/core/rtnetlink.c:3942 [inline]
+ rtnl_newlink+0x16d6/0x1c70 net/core/rtnetlink.c:4057
+ rtnetlink_rcv_msg+0x7cf/0xb70 net/core/rtnetlink.c:6946
+ netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2552
+ netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+ netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1346
+ netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
+ sock_sendmsg_nosec net/socket.c:714 [inline]
+ __sock_sendmsg+0x21c/0x270 net/socket.c:729
+ ____sys_sendmsg+0x505/0x830 net/socket.c:2614
+ ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
+ __sys_sendmsg net/socket.c:2700 [inline]
+ __do_sys_sendmsg net/socket.c:2705 [inline]
+ __se_sys_sendmsg net/socket.c:2703 [inline]
+ __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2703
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7ff4b418ebe9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffef8386cc8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007ff4b43b5fa0 RCX: 00007ff4b418ebe9
+RDX: 00000000000080c0 RSI: 00002000000002c0 RDI: 0000000000000003
+RBP: 00007ff4b4211e19 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ff4b43b5fa0 R14: 00007ff4b43b5fa0 R15: 0000000000000003
+ </TASK>
+dummy0: entered allmulticast mode
 
-Fixes: 0ef69e788411c ("net/smc: optimize for smc_sndbuf_sync_sg_for_device and smc_rmb_sync_sg_for_cpu")
-Signed-off-by: Liu Jian <liujian56@huawei.com>
+
+***
+
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
+
 ---
- net/smc/smc_ib.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
-index 53828833a3f7..85501d2c1f1b 100644
---- a/net/smc/smc_ib.c
-+++ b/net/smc/smc_ib.c
-@@ -747,6 +747,8 @@ bool smc_ib_is_sg_need_sync(struct smc_link *lnk,
- 		    buf_slot->sgt[lnk->link_idx].nents, i) {
- 		if (!sg_dma_len(sg))
- 			break;
-+		if (!lnk->smcibdev->ibdev->dma_device)
-+			break;
- 		if (dma_need_sync(lnk->smcibdev->ibdev->dma_device,
- 				  sg_dma_address(sg))) {
- 			ret = true;
--- 
-2.34.1
-
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
