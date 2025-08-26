@@ -1,193 +1,286 @@
-Return-Path: <netdev+bounces-217019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE14AB37140
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 19:22:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E657AB37158
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 19:30:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB9901BA7A0B
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 17:22:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5EE61BC003C
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 17:30:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B40B52E2EE4;
-	Tue, 26 Aug 2025 17:22:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08BF32D3A7B;
+	Tue, 26 Aug 2025 17:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="102IUmBb";
-	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="oE9ZWqIT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cuSDmrss"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.42])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B59472E1EF2;
-	Tue, 26 Aug 2025 17:21:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17D3E21FF2A
+	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 17:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756228922; cv=none; b=IuqakYU1Xh9ylxk697FO4TRgldvhE562NlyyaFM2binY4KEyk44VFHw/2SRBb1uPq8dlTFEUPMtJu7UmJ+5DrUDTs0sdqxYMySUvZjxebOgega9bB0iDDuMYVM9wTKfJzSbFzaQI6mzn5ofcY5pMKtwds+3nAv+Px3L2jqgaxfU=
+	t=1756229429; cv=none; b=kOQidvbjxQ9nKvICHW+ww0KWWSdXXiQ3tnej/zVHsvYHDpA7TOuJlBLpqYDCcVCD2qhEf62NAzIqC3iYGsi5W7VPKQPJw7lTV2Yt5Z8p6i3U/4udw34OXsrMW3Fuhlq0q3rl9v+RzkeRmNlI7B9NMuFu7pkvNRA2bkN9UYaFSnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756228922; c=relaxed/simple;
-	bh=SjBOXldlVtyTO1rVvTQT4inDDhNHA6OlzRlvyaHWM5w=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=BSgFT5GhBhXqJaUfyNMpGiBMGA1izaoCIYlAYm8bWm6TOBUyFfh3SIJe2KQGrPbUfwrwGI0hX+tPx6FyxK38mWMSXLp3dW2LOJ/rJTDu8oSFHVNvsIuAXCnV/NnQ3g4UJyHqji+NN0wLr6pp25B5tyZeqiWq3jCEPPGWQYfUHF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=102IUmBb; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=oE9ZWqIT; arc=none smtp.client-ip=160.80.4.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
-Received: from smtpauth-2019-1.uniroma2.it (smtpauth.uniroma2.it [160.80.5.46])
-	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 57QHLUUg014664;
-	Tue, 26 Aug 2025 19:21:36 +0200
-Received: from lubuntu-18.04 (unknown [160.80.103.126])
-	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id 8B3161203EC;
-	Tue, 26 Aug 2025 19:21:24 +0200 (CEST)
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
-	s=ed201904; t=1756228886; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nRPnemMRjIqS8FLYYPeKQSBIW++wmsT0i3d527WY1QQ=;
-	b=102IUmBbew/idnRZVrXRcJobmTaRbZf3e7ywGOS3DVJKsjYUXYLjlCEVVIhxGOVXWX3WB4
-	aqZk76di7uZr7GBg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
-	t=1756228886; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nRPnemMRjIqS8FLYYPeKQSBIW++wmsT0i3d527WY1QQ=;
-	b=oE9ZWqITK6kmNw6wJvBabqgVC9BdeSk27UpSMn0CUew/4dj770o89XUX3FeHN8S9CveZXb
-	/gmBma5fSVGu7OtAoq3sLBxdHVIsJL9A/tQAQQGPuiG5KYzSducGmGBuzzSS3LsmUBzpeB
-	I8VvfJTJfs5N59w+yViL9Rn5id2q9vF87wCSSd7HvSS/gZnP4wxlEUbBlVJc320gsuhw3c
-	encQz+b5TT0JyJ+jIytiH7W8kK/m3AWwn5bcuFhuFyGM2+fWoOlHP8eixoQV0Z9qYFxH07
-	AqYpiY2+V/s4CDEiwWSah8g+t3sePrIL+z4KwC6gHcpaMgGSgNXlYxQhKi647A==
-Date: Tue, 26 Aug 2025 19:21:23 +0200
-From: Andrea Mayer <andrea.mayer@uniroma2.it>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, David Ahern
- <dsahern@kernel.org>,
-        Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, Eric Biggers
- <ebiggers@kernel.org>,
-        David Lebrun <dlebrun@google.com>,
-        Stefano Salsano
- <stefano.salsano@uniroma2.it>,
-        Paolo Lungaroni
- <paolo.lungaroni@uniroma2.it>,
-        Ahmed Abdelsalam <ahabdels.dev@gmail.com>, stable@vger.kernel.org,
-        Andrea Mayer <andrea.mayer@uniroma2.it>
-Subject: Re: [PATCH net] ipv6: sr: fix destroy of seg6_hmac_info to prevent
- HMAC data leak
-Message-Id: <20250826192123.612cd0eabbbb57795a0bbdbc@uniroma2.it>
-In-Reply-To: <CANn89i+UTv8nJ=cc67iKky=MLXOnzF5XyVRsV-TMXz7wUQ6Yvw@mail.gmail.com>
-References: <20250825190715.1690-1-andrea.mayer@uniroma2.it>
-	<CANn89i+UTv8nJ=cc67iKky=MLXOnzF5XyVRsV-TMXz7wUQ6Yvw@mail.gmail.com>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1756229429; c=relaxed/simple;
+	bh=gIRqVD0xnusfTyI+imAkgRe9N5heTs/2qwMWXDhw6W4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WAM9QE9m+wye96aNTsxpfR+3/beeha/+AQlkf9BK6kcdRQCPQe2QiWxXbokFeADOh3zXsGZYPGgLZIw6dtrDZVsV3xvv1tZ79xeQQF6mZJNwCxcZeM6DQsiUIP4b7gt6BOfuzzr7eMMmSAhNrmZCuOiGmhlmXId3R4jIxAx1+lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cuSDmrss; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756229428; x=1787765428;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=gIRqVD0xnusfTyI+imAkgRe9N5heTs/2qwMWXDhw6W4=;
+  b=cuSDmrsshjNXoEFs6kDpehAdbDcEDzioUSn4PEQxiaRB05m6KcoYd0rh
+   2sAHQ0e8DnK+M9C7LvCVmwGnq2ngz2Whskz0fCWvdryCEPdm/5GFSoB9m
+   tap416ET5COBN7kiqoAPaQotU2afzWE54SW3Z5OHzuv0NnG511cWEDuOg
+   jlVd3TuTMBQMzuCEuHnZoDqi1RvRQUJ8lqrU/M7/cH0UXMv1rWhmMFlNb
+   rKXZruRHL8KE48BLkjqbKqEHe/CZ3HOsUt/fAz4BY77TkL1RsnHTbuJjo
+   Si69VArfgHk3EDM3HsdCgNAbUPjFSApRIUcT6MfUDrKxHMXwv8Z9xsRV3
+   Q==;
+X-CSE-ConnectionGUID: h/hQbu4ERV6/kLsy44tEsw==
+X-CSE-MsgGUID: 1o2SRPfvQZGmA14Zok4qBg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11534"; a="69066642"
+X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
+   d="scan'208";a="69066642"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2025 10:30:27 -0700
+X-CSE-ConnectionGUID: yjvAvLVdSomqemernELU6g==
+X-CSE-MsgGUID: s2ink+oXSoevvPx/oJCjag==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
+   d="scan'208";a="170011578"
+Received: from unknown (HELO localhost.jf.intel.com) ([10.166.80.55])
+  by fmviesa008.fm.intel.com with ESMTP; 26 Aug 2025 10:30:27 -0700
+From: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: madhu.chittim@intel.com,
+	netdev@vger.kernel.org,
+	Pavan Kumar Linga <pavan.kumar.linga@intel.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>
+Subject: [PATCH net-next v1] idpf: add support for IDPF PCI programming interface
+Date: Tue, 26 Aug 2025 10:28:45 -0700
+Message-ID: <20250826172845.265142-1-pavan.kumar.linga@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
-X-Virus-Status: Clean
 
-On Mon, 25 Aug 2025 12:33:26 -0700
-Eric Dumazet <edumazet@google.com> wrote:
+At present IDPF supports only 0x1452 and 0x145C as PF and VF device IDs
+on our current generation hardware. Future hardware exposes a new set of
+device IDs for each generation. To avoid adding a new device ID for each
+generation and to make the driver forward and backward compatible,
+make use of the IDPF PCI programming interface to load the driver.
 
-> On Mon, Aug 25, 2025 at 12:08 PM Andrea Mayer <andrea.mayer@uniroma2.it> wrote:
-> >
-> > The seg6_hmac_info structure stores information related to SRv6 HMAC
-> > configurations, including the secret key, HMAC ID, and hashing algorithm
-> > used to authenticate and secure SRv6 packets.
-> >
-> > When a seg6_hmac_info object is no longer needed, it is destroyed via
-> > seg6_hmac_info_del(), which eventually calls seg6_hinfo_release(). This
-> > function uses kfree_rcu() to safely deallocate memory after an RCU grace
-> > period has elapsed.
-> > The kfree_rcu() releases memory without sanitization (e.g., zeroing out
-> > the memory). Consequently, sensitive information such as the HMAC secret
-> > and its length may remain in freed memory, potentially leading to data
-> > leaks.
-> >
-> > To address this risk, we replaced kfree_rcu() with a custom RCU
-> > callback, seg6_hinfo_free_callback_rcu(). Within this callback, we
-> > explicitly sanitize the seg6_hmac_info object before deallocating it
-> > safely using kfree_sensitive(). This approach ensures the memory is
-> > securely freed and prevents potential HMAC info leaks.
-> > Additionally, in the control path, we ensure proper cleanup of
-> > seg6_hmac_info objects when seg6_hmac_info_add() fails: such objects are
-> > freed using kfree_sensitive() instead of kfree().
-> >
-> > Fixes: 4f4853dc1c9c ("ipv6: sr: implement API to control SR HMAC structure")
-> > Fixes: bf355b8d2c30 ("ipv6: sr: add core files for SR HMAC support")
-> 
-> Not sure if you are fixing a bug worth backports.
-> 
+Write and read the VF_ARQBAL mailbox register to find if the current
+device is a PF or a VF.
 
-I believe failing to delete sensitive data, such as HMAC keys, from memory
-before releasing it could pose security risks.
-Therefore, I considered this a bug to be fixed in the stable versions.
+PCI SIG allocated a new programming interface for the IDPF compliant
+ethernet network controller devices. It can be found at:
+https://members.pcisig.com/wg/PCI-SIG/document/20113
+with the document titled as 'PCI Code and ID Assignment Revision 1.16'
+or any latest revisions.
 
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Andrea Mayer <andrea.mayer@uniroma2.it>
-> > ---
-> >  net/ipv6/seg6.c      |  2 +-
-> >  net/ipv6/seg6_hmac.c | 10 +++++++++-
-> >  2 files changed, 10 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/net/ipv6/seg6.c b/net/ipv6/seg6.c
-> > index 180da19c148c..88782bdab843 100644
-> > --- a/net/ipv6/seg6.c
-> > +++ b/net/ipv6/seg6.c
-> > @@ -215,7 +215,7 @@ static int seg6_genl_sethmac(struct sk_buff *skb, struct genl_info *info)
-> >
-> >         err = seg6_hmac_info_add(net, hmackeyid, hinfo);
-> >         if (err)
-> > -               kfree(hinfo);
-> > +               kfree_sensitive(hinfo);
-> >
-> >  out_unlock:
-> >         mutex_unlock(&sdata->lock);
-> > diff --git a/net/ipv6/seg6_hmac.c b/net/ipv6/seg6_hmac.c
-> > index fd58426f222b..19cdf3791ebf 100644
-> > --- a/net/ipv6/seg6_hmac.c
-> > +++ b/net/ipv6/seg6_hmac.c
-> > @@ -57,9 +57,17 @@ static int seg6_hmac_cmpfn(struct rhashtable_compare_arg *arg, const void *obj)
-> >         return (hinfo->hmackeyid != *(__u32 *)arg->key);
-> >  }
-> >
-> > +static void seg6_hinfo_free_callback_rcu(struct rcu_head *head)
-> > +{
-> > +       struct seg6_hmac_info *hinfo;
-> > +
-> > +       hinfo = container_of(head, struct seg6_hmac_info, rcu);
-> > +       kfree_sensitive(hinfo);
-> > +}
-> > +
-> >  static inline void seg6_hinfo_release(struct seg6_hmac_info *hinfo)
-> >  {
-> > -       kfree_rcu(hinfo, rcu);
-> > +       call_rcu(&hinfo->rcu, seg6_hinfo_free_callback_rcu);
-> >  }
-> 
-> If we worry a lot about sensitive data waiting too much in RCU land,
-> perhaps use call_rcu_hurry() here ?
-
-My concern is not so much about how long the sensitive data remains in RCU
-land. Instead, I would like to ensure that the memory associated with the
-seg6_hmac_info object is properly zeroed out before it is freed. I believe that
-using call_rcu() (with seg6_hinfo_free_callback_rcu()) would be sufficient to
-achieve this goal.
-
+Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
+Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
+Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
 ---
+ drivers/net/ethernet/intel/idpf/idpf.h        |  1 +
+ drivers/net/ethernet/intel/idpf/idpf_main.c   | 73 ++++++++++++++-----
+ drivers/net/ethernet/intel/idpf/idpf_vf_dev.c | 37 ++++++++++
+ 3 files changed, 94 insertions(+), 17 deletions(-)
 
-Aside from improving the commit message (thanks to Eric Bigger), what other
-changes should we consider implementing for version 2?
-Should we classify this patch as an enhancement rather than a bug fix?
+diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
+index 19a248d5b124..4b8e944994cb 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf.h
++++ b/drivers/net/ethernet/intel/idpf/idpf.h
+@@ -983,6 +983,7 @@ void idpf_mbx_task(struct work_struct *work);
+ void idpf_vc_event_task(struct work_struct *work);
+ void idpf_dev_ops_init(struct idpf_adapter *adapter);
+ void idpf_vf_dev_ops_init(struct idpf_adapter *adapter);
++int idpf_is_vf_device(struct pci_dev *pdev, u8 *is_vf);
+ int idpf_intr_req(struct idpf_adapter *adapter);
+ void idpf_intr_rel(struct idpf_adapter *adapter);
+ u16 idpf_get_max_tx_hdr_size(struct idpf_adapter *adapter);
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
+index 8c46481d2e1f..b161715e1168 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_main.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
+@@ -7,11 +7,57 @@
+ 
+ #define DRV_SUMMARY	"Intel(R) Infrastructure Data Path Function Linux Driver"
+ 
++#define IDPF_NETWORK_ETHERNET_PROGIF				0x01
++#define IDPF_CLASS_NETWORK_ETHERNET_PROGIF			\
++	(PCI_CLASS_NETWORK_ETHERNET << 8 | IDPF_NETWORK_ETHERNET_PROGIF)
++
+ MODULE_DESCRIPTION(DRV_SUMMARY);
+ MODULE_IMPORT_NS("LIBETH");
+ MODULE_IMPORT_NS("LIBETH_XDP");
+ MODULE_LICENSE("GPL");
+ 
++/**
++ * idpf_dev_init - Initialize device specific parameters
++ * @adapter: adapter to initialize
++ * @ent: entry in idpf_pci_tbl
++ *
++ * Return: %0 on success, -%errno on failure.
++ */
++static int idpf_dev_init(struct idpf_adapter *adapter,
++			 const struct pci_device_id *ent)
++{
++	u8 is_vf = 0;
++	int err;
++
++	switch (ent->device) {
++	case IDPF_DEV_ID_PF:
++		goto dev_ops_init;
++	case IDPF_DEV_ID_VF:
++		is_vf = 1;
++		goto dev_ops_init;
++	default:
++		if (ent->class == IDPF_CLASS_NETWORK_ETHERNET_PROGIF)
++			goto check_vf;
++
++		return -ENODEV;
++	}
++
++check_vf:
++	err = idpf_is_vf_device(adapter->pdev, &is_vf);
++	if (err)
++		return err;
++
++dev_ops_init:
++	if (is_vf) {
++		idpf_vf_dev_ops_init(adapter);
++		adapter->crc_enable = true;
++	} else {
++		idpf_dev_ops_init(adapter);
++	}
++
++	return 0;
++}
++
+ /**
+  * idpf_remove - Device removal routine
+  * @pdev: PCI device information struct
+@@ -165,21 +211,6 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	adapter->req_tx_splitq = true;
+ 	adapter->req_rx_splitq = true;
+ 
+-	switch (ent->device) {
+-	case IDPF_DEV_ID_PF:
+-		idpf_dev_ops_init(adapter);
+-		break;
+-	case IDPF_DEV_ID_VF:
+-		idpf_vf_dev_ops_init(adapter);
+-		adapter->crc_enable = true;
+-		break;
+-	default:
+-		err = -ENODEV;
+-		dev_err(&pdev->dev, "Unexpected dev ID 0x%x in idpf probe\n",
+-			ent->device);
+-		goto err_free;
+-	}
+-
+ 	adapter->pdev = pdev;
+ 	err = pcim_enable_device(pdev);
+ 	if (err)
+@@ -259,11 +290,18 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	/* setup msglvl */
+ 	adapter->msg_enable = netif_msg_init(-1, IDPF_AVAIL_NETIF_M);
+ 
++	err = idpf_dev_init(adapter, ent);
++	if (err) {
++		dev_err(&pdev->dev, "Unexpected dev ID 0x%x in idpf probe\n",
++			ent->device);
++		goto destroy_vc_event_wq;
++	}
++
+ 	err = idpf_cfg_hw(adapter);
+ 	if (err) {
+ 		dev_err(dev, "Failed to configure HW structure for adapter: %d\n",
+ 			err);
+-		goto err_cfg_hw;
++		goto destroy_vc_event_wq;
+ 	}
+ 
+ 	mutex_init(&adapter->vport_ctrl_lock);
+@@ -284,7 +322,7 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 
+ 	return 0;
+ 
+-err_cfg_hw:
++destroy_vc_event_wq:
+ 	destroy_workqueue(adapter->vc_event_wq);
+ err_vc_event_wq_alloc:
+ 	destroy_workqueue(adapter->stats_wq);
+@@ -304,6 +342,7 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ static const struct pci_device_id idpf_pci_tbl[] = {
+ 	{ PCI_VDEVICE(INTEL, IDPF_DEV_ID_PF)},
+ 	{ PCI_VDEVICE(INTEL, IDPF_DEV_ID_VF)},
++	{ PCI_DEVICE_CLASS(IDPF_CLASS_NETWORK_ETHERNET_PROGIF, 0xffffff)},
+ 	{ /* Sentinel */ }
+ };
+ MODULE_DEVICE_TABLE(pci, idpf_pci_tbl);
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
+index 4cc58c83688c..5bf9d3ccb624 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
+@@ -7,6 +7,43 @@
+ 
+ #define IDPF_VF_ITR_IDX_SPACING		0x40
+ 
++#define IDPF_VF_TEST_VAL		0xFEED0000
++
++/**
++ * idpf_is_vf_device - Helper to find if it is a VF device
++ * @pdev: PCI device information struct
++ * @is_vf: used to update VF device status
++ *
++ * Return: %0 on success, -%errno on failure.
++ */
++int idpf_is_vf_device(struct pci_dev *pdev, u8 *is_vf)
++{
++	struct resource mbx_region;
++	resource_size_t mbx_start;
++	void __iomem *mbx_addr;
++	long len;
++
++	resource_set_range(&mbx_region,	VF_BASE, IDPF_VF_MBX_REGION_SZ);
++
++	mbx_start = pci_resource_start(pdev, 0) + mbx_region.start;
++	len = resource_size(&mbx_region);
++
++	mbx_addr = ioremap(mbx_start, len);
++	if (!mbx_addr)
++		return -EIO;
++
++	writel(IDPF_VF_TEST_VAL, mbx_addr + VF_ARQBAL - VF_BASE);
++
++	/* Force memory write to complete before reading it back */
++	wmb();
++
++	*is_vf = readl(mbx_addr + VF_ARQBAL - VF_BASE) == IDPF_VF_TEST_VAL;
++
++	iounmap(mbx_addr);
++
++	return 0;
++}
++
+ /**
+  * idpf_vf_ctlq_reg_init - initialize default mailbox registers
+  * @adapter: adapter structure
+-- 
+2.43.0
 
-Thank you all for your time,
-Andrea
 
