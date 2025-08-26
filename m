@@ -1,140 +1,124 @@
-Return-Path: <netdev+bounces-216726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9349B3500D
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 02:13:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 598C1B35011
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 02:13:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 755763BC652
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 00:13:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F33E53BD5CA
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 00:13:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AA5F78F20;
-	Tue, 26 Aug 2025 00:13:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A58E676025;
+	Tue, 26 Aug 2025 00:13:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jpfy1AyD"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9924113957E;
-	Tue, 26 Aug 2025 00:12:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18A9ADF49;
+	Tue, 26 Aug 2025 00:13:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756167181; cv=none; b=Sq8WrVkZJzayrv7E0tnMdHzgevuZhblkol43rs7DnHOZgAZpJWGExop7ZYVLiSkCcCwUjIgjF4FUykqbXcQiCT5Mj4OIto5vQmqC7RdfY0c+LXPgcIrmev7ccuaVIK4I1PWBmfKn1MWJNwkej++F0It5TQvFwcVDlTd80PWKVR4=
+	t=1756167230; cv=none; b=q8CCbDKo+tR+VJOYW79MaRfg2uSI2UlOTKfPb4adhQFMlWGOhpIehQuQcaqj/QB8vE13bVvpMTsl/9YPa08J/7RCp1NyZsCXWS6ueAI50QTYZsrk7BrnXI09lfexNWbBpiraAKi9sqQgWst3ZmNe6hmx1Ce3c0OAmz6NY1MYAWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756167181; c=relaxed/simple;
-	bh=GWpRGVfRYZ0o9ai6+LSW4CJ8TZy/KweJErFZ2YA+nvw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QPT7+7zDHYLA8S14BPs7hvOMBRUR6Ie/BbR0/BQ9j4kNRw26k2hr1aEcxg+4DLkEeZ/lGMqhTosCUjzjpTDOLRjcVylpbEkKiVvPILLBYvh6IRNA42a6m4DWcicPcm+oIZcrF+hPWRgxhAWM6pVFKkwKIWJEOCFqHYKwiYOqWpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1uqhJ0-000000005kX-12IJ;
-	Tue, 26 Aug 2025 00:12:54 +0000
-Date: Tue, 26 Aug 2025 01:12:51 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Andreas Schirm <andreas.schirm@siemens.com>,
-	Lukas Stockmann <lukas.stockmann@siemens.com>,
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Peter Christen <peter.christen@siemens.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next 2/6] net: dsa: lantiq_gswip: support model-specific
- mac_select_pcs()
-Message-ID: <7576c237814016ee5e18572b2788f955071a922c.1756163848.git.daniel@makrotopia.org>
-References: <cover.1756163848.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1756167230; c=relaxed/simple;
+	bh=TI3E1caWndf12wBEakxIoMw329/lzJIf9otvle6Nu2U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eSUpdBsgzFBwm6TbyawLgr6b/dnJ1CaDL1GjL6tnhQ49xQkpMgumPQ4dln14U/RGfuQ3VUs59pCKFx6vCu3qgRs0YkfzFfkM/zPWh5GhHHEku6mIVTejsu1VaBuB0bXjhanc0Vj/dZCUim/Y9zlzDyKIQidFNnaP5pyoV4NRXq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jpfy1AyD; arc=none smtp.client-ip=209.85.166.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3ea8b3a64a7so14040375ab.0;
+        Mon, 25 Aug 2025 17:13:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756167228; x=1756772028; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TI3E1caWndf12wBEakxIoMw329/lzJIf9otvle6Nu2U=;
+        b=jpfy1AyDRPGSxWKSvcYMZpdcuxwww5c+exInOIuvBjCDWY/Z/maXByF6bDDIjHK7/6
+         U45XY0oBB+PdE+SPgCz1VQElWWCr5TysfPnWFSghvw/ebx9EgVzuoRir7E5mJF9YLJKO
+         AewmdLuba7aeDXJ/bIAYV3OCBxe+3Ex/hj9ssUQCUGbNw5gqzLJP82XHSIZB9M06vqRb
+         Cul6MkKdw0Y3UUTWPkoelodYAFQLO+5gvLkHCo4HbD0BQACEvXH7kW+WAlGWg3b8HV7y
+         5kC2HT6s+1HF3XuIIjJd4rf1RNnYA4O4azcW4hLXxSGgMTaqc+e6xSsN1kLu10t6j1w1
+         7vfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756167228; x=1756772028;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TI3E1caWndf12wBEakxIoMw329/lzJIf9otvle6Nu2U=;
+        b=BcuWjqUlUN2GsKQTkSkTi2BJVSqa6YMeZzg9hQfxpNd6e+UbEeqClI7MjFaFmWGpAK
+         CqTyraDhJl1+KPBSxx5+KWyhpS1ksKmQm1JkpWz2Y1zEQk5luxwQ9FBtOpyW1MCZLSba
+         CQ152WZPLsGA9VHpQKCYo04VlUwyTDbZsJGfSiPWxVKCh24etGuaokRPKZ2eth58lCfF
+         M7XMra2S1OcZJvg73uLNBusXpGAvPX8ZMfthkNLTDQcOSEcLZ5NxunSiILH+1pyh9Jrm
+         q19Rdoh2XjqW+fFOsOJBJ+k3Xvsk4EM8iiZ3mp8TrnNzX7JSiL2xD+uQ/jI3PnnfLBm0
+         Nbeg==
+X-Forwarded-Encrypted: i=1; AJvYcCWHDCVehWijoRyBJSN4U1LKjEIN6YFF7sbZp5b0IZSCWqpQRWdzouT+SuU6nOMy8dAq2w28VnC9@vger.kernel.org, AJvYcCXbcMTFyBvFNaifLwSa3jbUub7nt8mwMkc5cCwS5/0B0VTaRdFSVvQ45QbtrFk0NF3O2PA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5z2KtkCWWHmPBQEyPK4vEdzUeUeh4AUYsKft0nMo+N1ksSWp6
+	5mUDUhCXFz1MxsLEBBEUqeCNb+5FCYyCsTHjGx/2usm7xq2pubrNiCde21wj8tgfL2vi+I9S1mq
+	KBeo4XIsyKxngykXbCIIW7jqz7A5j1usf7h8kt3I=
+X-Gm-Gg: ASbGnctCCeO1lpefG6TiMGr1+j8C2K6712UTYa7mSsY50JwTIBjZ8DR0kq5QXkiAKhb
+	ACT5OlAqxChiZRODfYAehTxMqUayCZda3MmzF27rNLHeuVpuex1Ojq4NcE/Gb1kFn3utiBZBymf
+	EJf97nS/WpsXYaGx5uzYSo7GIg+ePehVf5MNY1RwiBb6+5tdvgR1uNYbOxLfnr8dJcWA1uaN4bH
+	frppXrw5nSfU60Qjg==
+X-Google-Smtp-Source: AGHT+IFo2CuYMKtENYuCFNtE/t/CHZ6hXuF2s2u+bH8Fbmxdincn8CVkuul/O8l0xnE3hFR8Hoo2weDO1NQb2Xx0Az0=
+X-Received: by 2002:a05:6e02:1947:b0:3ec:461f:fccb with SMTP id
+ e9e14a558f8ab-3ec461fff1dmr70928345ab.8.1756167228115; Mon, 25 Aug 2025
+ 17:13:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1756163848.git.daniel@makrotopia.org>
+References: <20250825135342.53110-1-kerneljasonxing@gmail.com>
+ <20250825135342.53110-4-kerneljasonxing@gmail.com> <aKzY4Ke0EdohiQXj@boxer>
+In-Reply-To: <aKzY4Ke0EdohiQXj@boxer>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 26 Aug 2025 08:13:12 +0800
+X-Gm-Features: Ac12FXx0xnevsbWn825K52Qtxyg2vBRrS_FvqYNhGgXKIJ9V-wzhPeWYSc5uHR8
+Message-ID: <CAL+tcoARrUz3Ao_ieELvLFisMy7F0hvDDjPB8hxdKSsQtpS4oQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 3/9] xsk: introduce locked version of xskq_prod_write_addr_batch
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
+	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
+	horms@kernel.org, andrew+netdev@lunn.ch, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Call mac_select_pcs() function if provided in struct gswip_hwinfo.
-The MaxLinear GSW1xx series got one port wired to a SerDes PCS and
-PHY which can do 1000Base-X, 2500Base-X and SGMII. Support for the
-SerDes port will be provided using phylink_pcs, so provide a
-convenient way for mac_select_pcs() to differ based on the hardware
-model.
+On Tue, Aug 26, 2025 at 5:43=E2=80=AFAM Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
+>
+> On Mon, Aug 25, 2025 at 09:53:36PM +0800, Jason Xing wrote:
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > Add xskq_prod_write_addr_batch_locked() helper for batch xmit.
+> >
+> > xskq_prod_write_addr_batch() is used in the napi poll env which is
+> > already in the softirq so it doesn't need any lock protection. Later
+> > this function will be used in the generic xmit path that is non irq,
+> > so the locked version as this patch adds is needed.
+> >
+> > Also add nb_pkts in xskq_prod_write_addr_batch() to count how many
+> > skbs instead of descs will be used in the batch xmit at one time, so
+> > that main batch xmit function can decide how many skbs will be
+> > allocated. Note that xskq_prod_write_addr_batch() was designed to
+> > help zerocopy mode because it only cares about descriptors/data itself.
+>
+> I am not sure if this patch is valid after patch I cited in response to
+> your cover letter. in copy mode, skb destructor is responsible now for
+> producing cq entries.
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
- drivers/net/dsa/lantiq_gswip.c | 21 +++++++++++++++++----
- drivers/net/dsa/lantiq_gswip.h |  3 +++
- 2 files changed, 20 insertions(+), 4 deletions(-)
+Please give me more time to think about it. Seems that I have to change a l=
+ot.
 
-diff --git a/drivers/net/dsa/lantiq_gswip.c b/drivers/net/dsa/lantiq_gswip.c
-index 67919c3935e4..4822812bba27 100644
---- a/drivers/net/dsa/lantiq_gswip.c
-+++ b/drivers/net/dsa/lantiq_gswip.c
-@@ -1592,10 +1592,23 @@ static int gswip_get_sset_count(struct dsa_switch *ds, int port, int sset)
- 	return ARRAY_SIZE(gswip_rmon_cnt);
- }
- 
--static const struct phylink_mac_ops gswip_phylink_mac_ops = {
--	.mac_config	= gswip_phylink_mac_config,
--	.mac_link_down	= gswip_phylink_mac_link_down,
--	.mac_link_up	= gswip_phylink_mac_link_up,
-+static struct phylink_pcs *gswip_phylink_mac_select_pcs(struct phylink_config *config,
-+							phy_interface_t interface)
-+{
-+	struct dsa_port *dp = dsa_phylink_to_port(config);
-+	struct gswip_priv *priv = dp->ds->priv;
-+
-+	if (priv->hw_info->mac_select_pcs)
-+		return priv->hw_info->mac_select_pcs(config, interface);
-+
-+	return NULL;
-+}
-+
-+const struct phylink_mac_ops gswip_phylink_mac_ops = {
-+	.mac_config		= gswip_phylink_mac_config,
-+	.mac_link_down		= gswip_phylink_mac_link_down,
-+	.mac_link_up		= gswip_phylink_mac_link_up,
-+	.mac_select_pcs		= gswip_phylink_mac_select_pcs,
- };
- 
- static const struct dsa_switch_ops gswip_switch_ops = {
-diff --git a/drivers/net/dsa/lantiq_gswip.h b/drivers/net/dsa/lantiq_gswip.h
-index 620c2d560cbe..19bbe6fddf04 100644
---- a/drivers/net/dsa/lantiq_gswip.h
-+++ b/drivers/net/dsa/lantiq_gswip.h
-@@ -4,6 +4,7 @@
- 
- #include <linux/clk.h>
- #include <linux/mutex.h>
-+#include <linux/phylink.h>
- #include <linux/platform_device.h>
- #include <linux/regmap.h>
- #include <linux/reset.h>
-@@ -237,6 +238,8 @@ struct gswip_hw_info {
- 	enum dsa_tag_protocol tag_protocol;
- 	void (*phylink_get_caps)(struct dsa_switch *ds, int port,
- 				 struct phylink_config *config);
-+	struct phylink_pcs *(*mac_select_pcs)(struct phylink_config *config,
-+					      phy_interface_t interface);
- };
- 
- struct gswip_gphy_fw {
--- 
-2.50.1
+Thanks,
+Jason
 
