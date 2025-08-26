@@ -1,104 +1,216 @@
-Return-Path: <netdev+bounces-216924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 135E7B36157
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 15:08:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3771B361AF
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 15:11:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5917A1BA6BD2
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 13:05:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E834F1BA53E7
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 13:09:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82E7F223DE5;
-	Tue, 26 Aug 2025 13:05:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5195307AE8;
+	Tue, 26 Aug 2025 13:08:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YqITwN81"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EqPZWql6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5725B211491;
-	Tue, 26 Aug 2025 13:05:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9563278771
+	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 13:08:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756213511; cv=none; b=ICUK0V7iPwmuQp0dXTD6t0CwZP0Zv4ONneYVYhlOgOZDfc0+B/P2gLv88gc9sYP/nzlAQoDa5ni/8ffzA3K7xb4eCwRIi8R7zzGvNzmSTyczlI8E+IJsLXWAp0LDHxNMsOxqx12pRWBXOPgy3TwQ4FF5N4JjgAE+jiW1RPwbov4=
+	t=1756213700; cv=none; b=WhYnH8EJ3sAjhRXuyfr/NEHRiJWYW2HDOeUjpwsH7f/qx6OXYJMlX7zhK7JUkD1ErN3yIuHg4WblR1xWDvcYnZAaSwej7mYPtkMGCvfJIPy0C9abKjNFT1dXk1YzXgeLpEbzZJ8nUjnNUuf+0Pt9tYRrXMuCGc5rqLjhnTmxrRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756213511; c=relaxed/simple;
-	bh=oVWUaTb9JTJ6VCjQWJr2JJZLQXbpB2cQ8kVN0SOUbIQ=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=GdGX+VkoWB2m/3IOna0MpX7JUOabsUGJ0IzcB2oDfjcXuXeEC3CT1Z2uzJd6Bfow5+1MTcG3SqSGN5uGsFf+M4EZ6mB16Ni/hZ75yUIITbbFHIUM3JiVote3gOGXtWCkcwVy5gDkyZ3uXnuzjAs00Cx7cyFsgMQiDrnXu44qPms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YqITwN81; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0B2CC4CEF1;
-	Tue, 26 Aug 2025 13:05:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756213511;
-	bh=oVWUaTb9JTJ6VCjQWJr2JJZLQXbpB2cQ8kVN0SOUbIQ=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=YqITwN81aCSIAjjlRKtqxxMDT3OwGtG79wvALWYqfA+M5IqocJpi05LSUm0H8PbgG
-	 8sQwtQYClfF/XTptMACHPrWYEysboEIWprljjQAe/oVj8KqmS+Dg44gDpDPopsEp+m
-	 WeZwK2Evi5/FcHJTxaFaFr/ViRI0l4tzYFFRkOAm0p1eIQKHq4+B79cJNYTHE/701/
-	 KqXZHEwZS15xV5ZD2MmywNhVa8HJ7w6D+V16nyRuTH53wA8L33Uhmwy+8t83DzgVTy
-	 VHWxUCVdk4t4P7YzyMtipTKATGkl+apXLzlJzY6NInaTSBiw6iwDjq88iN4NO3xspy
-	 mjwNqtK5RKutA==
-Date: Tue, 26 Aug 2025 08:05:09 -0500
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1756213700; c=relaxed/simple;
+	bh=96oZjGpBhsGM6T5RqD1Jhcz8DPmt/ETyRKKVXbbqnx8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hWgy8za4JAQwbvIE+WOfB0Abfw8M1nPomTyA4wuVsP+yPPsgE+ivJCVfBU+UO2aGOCzcnry/5X1I1+pLtt8+148j9H2flFF3dM7eyU+WA01TtvH0azVDY3e+fCF5q0AZ1bzrjihBqFU2DrDtW33d3NYrFbi82/ByxwJAKIFMsD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EqPZWql6; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756213695;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=+33Ue2Cu5Y5oxJByCwLn3TsnRWViKb51w/F+XvIasfg=;
+	b=EqPZWql64KDxB59p+q4slC/veTjpxGuWK7Wy3CFytfxKsm0zGMCr9ZfZk7ESvvA8DAzCN0
+	c47JMjdHow1OUVRjs3kY5Q/E97KL6sHOr+yYTZFacsSPhZRyciaMHcLaTogGBOvHdQHqCE
+	KLZJGQDcawXlR0bdtJ4AWYVhcWAQwoc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-562-Yfr6kYc1OoG4l6rLPajf-Q-1; Tue, 26 Aug 2025 09:08:13 -0400
+X-MC-Unique: Yfr6kYc1OoG4l6rLPajf-Q-1
+X-Mimecast-MFC-AGG-ID: Yfr6kYc1OoG4l6rLPajf-Q_1756213692
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-45b612dbc28so13620145e9.0
+        for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 06:08:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756213692; x=1756818492;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+33Ue2Cu5Y5oxJByCwLn3TsnRWViKb51w/F+XvIasfg=;
+        b=PG99bPcB0HBtqzKnWR35pk2ZzPN7iA1nyLB+vK25jPLvnUd2wNmOYqZbGrQJfr7157
+         5LYJ3swktwji1zk73UwhJugDa2mTl9+HU7UvpDy3wfxtR4drILwlNc5Epkz575jICov5
+         iXUHSrANgp9UIaAve7sYd64YUuDETG9bNK3ZEi4jhQSVZBBu3rXkviUHGvOMEsvCTEhT
+         ktaRwOnczadgztDPfTCpMnHb7yPgxUm4k2j/bgGaMkq5LjEDes3+0mLcXwhoFqUgrJQh
+         WUOL2t+mmoyU4adAYxiEED5/9fXFS+O7AI8vrtjgPUUNUdRWdARshqqRfDU7+bXgBd0I
+         4Q5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVMQS/1L1J1HT3benS5+LAdKvkLa6iLKXhwtHejdmBU99cR2KpeR5QYLQVcCbyBBLpViD51E6E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrimIipG4OBFocKGUmAsltyMA9Pv+Zv0ePfcaeDU2tkWNO/bun
+	Ght4onoVEBFyjWygrrlg1zBrUj3zR7EMvhTNmXn1tF50OtsJ46zyuKYDBMs+3/3o62v4Vx1BHmq
+	Kssj+glFMTMoRR599f0/nCFMiH7/8ts6JTKrO3KouhZeTzzghwpOzUxCBVg==
+X-Gm-Gg: ASbGncu0Vt1/eAKHhNre6HLN3ONxmCYx7UHVPsTgr7QG2mpxhnPcRBu0BIdX9NoV+1+
+	bNnONfQeJ9nzYFVkH6FOHMDKDvcLl/WqDcyAlGjBabKOAS93l2PxTDZ01Qw0BPi36QObFVvzQXs
+	joZPP49MjEJy+S/M5a0fGc/qg5Tr11EwhySHQ1zDfnzHhwe3n69Qj25DPA4pFWL9BvGEw8S1ew+
+	6UieMZdwfZrk95ERwEccrt2uoyIXS3tyBjkS+BrvXMI+HA3NhTAQmUeM0u42SiYZks+Q96NFuKf
+	O3Rfv8Ln+vnZm7t23MhPF6v8fWbb8w5TmjtqZTK4qHqEhFDOPUzxT0MPGqHb4bUC9lbmKpr/cQ=
+	=
+X-Received: by 2002:a05:600c:19cb:b0:458:6733:fb5c with SMTP id 5b1f17b1804b1-45b517d2751mr126238715e9.28.1756213691672;
+        Tue, 26 Aug 2025 06:08:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE0uVvd3bkBu8Q9HfrtdCgTiP652NIGyMgKGC7lB/H2NXiQPCgnz3LGDq701BEdJbsSh2Pm8g==
+X-Received: by 2002:a05:600c:19cb:b0:458:6733:fb5c with SMTP id 5b1f17b1804b1-45b517d2751mr126238015e9.28.1756213691060;
+        Tue, 26 Aug 2025 06:08:11 -0700 (PDT)
+Received: from ?IPV6:2a09:80c0:192:0:5dac:bf3d:c41:c3e7? ([2a09:80c0:192:0:5dac:bf3d:c41:c3e7])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b57444963sm165603375e9.3.2025.08.26.06.08.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Aug 2025 06:08:10 -0700 (PDT)
+Message-ID: <ecc599ee-4175-4356-ab66-1d76a75f44f7@redhat.com>
+Date: Tue, 26 Aug 2025 15:08:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: davem@davemloft.net, pabeni@redhat.com, conor+dt@kernel.org, 
- sureshnagaraj@maxlinear.com, edumazet@google.com, 
- devicetree@vger.kernel.org, andrew+netdev@lunn.ch, kuba@kernel.org, 
- krzk+dt@kernel.org, yzhu@maxlinear.com, netdev@vger.kernel.org
-To: Jack Ping CHNG <jchng@maxlinear.com>
-In-Reply-To: <20250826031044.563778-2-jchng@maxlinear.com>
-References: <20250826031044.563778-1-jchng@maxlinear.com>
- <20250826031044.563778-2-jchng@maxlinear.com>
-Message-Id: <175621343176.4659.6580069253445672718.robh@kernel.org>
-Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: mxl: Add MxL LGM
- Network Processor SoC
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 21/35] mm/cma: refuse handing out non-contiguous page
+ ranges
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
+ Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+ iommu@lists.linux.dev, io-uring@vger.kernel.org,
+ Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
+ Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
+ kasan-dev@googlegroups.com, kvm@vger.kernel.org,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
+ linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Marco Elver <elver@google.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
+ Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
+ Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
+ Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
+ Robin Murphy <robin.murphy@arm.com>, Suren Baghdasaryan <surenb@google.com>,
+ Tejun Heo <tj@kernel.org>, virtualization@lists.linux.dev,
+ Vlastimil Babka <vbabka@suse.cz>, wireguard@lists.zx2c4.com, x86@kernel.org,
+ Zi Yan <ziy@nvidia.com>
+References: <20250821200701.1329277-1-david@redhat.com>
+ <20250821200701.1329277-22-david@redhat.com> <aK2QZnzS1ErHK5tP@raptor>
+ <ad521f4f-47aa-4728-916f-3704bf01f770@redhat.com> <aK2wlGYvCaFQXzBm@raptor>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <aK2wlGYvCaFQXzBm@raptor>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-
-On Tue, 26 Aug 2025 11:10:43 +0800, Jack Ping CHNG wrote:
-> Introduce device-tree binding documentation for MaxLinear LGM Network
-> Processor
+On 26.08.25 15:03, Alexandru Elisei wrote:
+> Hi David,
 > 
-> Signed-off-by: Jack Ping CHNG <jchng@maxlinear.com>
-> ---
->  .../devicetree/bindings/net/mxl,lgm-eth.yaml  | 73 +++++++++++++++++++
->  1 file changed, 73 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/mxl,lgm-eth.yaml
+> On Tue, Aug 26, 2025 at 01:04:33PM +0200, David Hildenbrand wrote:
+> ..
+>>> Just so I can better understand the problem being fixed, I guess you can have
+>>> two consecutive pfns with non-consecutive associated struct page if you have two
+>>> adjacent memory sections spanning the same physical memory region, is that
+>>> correct?
+>>
+>> Exactly. Essentially on SPARSEMEM without SPARSEMEM_VMEMMAP it is not
+>> guaranteed that
+>>
+>> 	pfn_to_page(pfn + 1) == pfn_to_page(pfn) + 1
+>>
+>> when we cross memory section boundaries.
+>>
+>> It can be the case for early boot memory if we allocated consecutive areas
+>> from memblock when allocating the memmap (struct pages) per memory section,
+>> but it's not guaranteed.
 > 
+> Thank you for the explanation, but I'm a bit confused by the last paragraph. I
+> think what you're saying is that we can also have the reverse problem, where
+> consecutive struct page * represent non-consecutive pfns, because memmap
+> allocations happened to return consecutive virtual addresses, is that right?
 
-My bot found errors running 'make dt_binding_check' on your patch:
+Exactly, that's something we have to deal with elsewhere [1]. For this 
+code, it's not a problem because we always allocate a contiguous PFN range.
 
-yamllint warnings/errors:
+> 
+> If that's correct, I don't think that's the case for CMA, which deals out
+> contiguous physical memory. Or were you just trying to explain the other side of
+> the problem, and I'm just overthinking it?
 
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/mxl,lgm-eth.example.dtb: eth (mxl,lgm-eth): interface@1:compatible:0: 'mxl,lgm-mac' was expected
-	from schema $id: http://devicetree.org/schemas/net/mxl,lgm-eth.yaml#
-Documentation/devicetree/bindings/net/mxl,lgm-eth.example.dtb: /example-0/eth/interface@1: failed to match any schema with compatible: ['mxl,eth-mac']
+The latter :)
 
-doc reference errors (make refcheckdocs):
+[1] https://lkml.kernel.org/r/20250814064714.56485-2-lizhe.67@bytedance.com
 
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250826031044.563778-2-jchng@maxlinear.com
+-- 
+Cheers
 
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
+David / dhildenb
 
 
