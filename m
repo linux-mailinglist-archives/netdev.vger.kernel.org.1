@@ -1,50 +1,51 @@
-Return-Path: <netdev+bounces-216750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49D8FB3508E
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 03:00:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F864B350BB
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 03:06:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6349B1A8149C
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 01:00:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B99F4486CBD
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 01:06:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2FE92550CD;
-	Tue, 26 Aug 2025 01:00:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC9DF85C4A;
+	Tue, 26 Aug 2025 01:06:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kaQqHfye"
+	dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b="gNQRQzHN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DCE226A1A4
-	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 01:00:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from sgoci-sdnproxy-4.icoremail.net (sgoci-sdnproxy-4.icoremail.net [129.150.39.64])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C3A3273F9;
+	Tue, 26 Aug 2025 01:06:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.150.39.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756170005; cv=none; b=SIcUpW9anovGm/pUh9AQnzaNUmC+FvkKR2xgnSJe/nMvSVBa3fTf1H9r2l4ZcrpGE0IL75nar6I/ZzHtAXY8wqQMGfGcScXznkDUhPDJIV4ZkO+nm7bTAqQmI5TcdYZEGCilVheg0NEsW9+FJkHzEiCRW7uSq2ZkSBQYkYaSxjk=
+	t=1756170414; cv=none; b=YdyEJdKDzBYBivOTPwHKtHnbmlVz3GuEQadKCUKQhAOlWw9XbsfEqYFGDZaJh7j6nqkmPZz1s3E2bg9eqovzYuR9raHZibOH9Jd6kCxRXHGC4qT86H27+Q+CmUC6WhVJAMdSz/RdVTQZ/CnPPMBz4kbIkwz3x/SOuTZRamcnb2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756170005; c=relaxed/simple;
-	bh=J3/x2DnraeVU3FW7kfgA91LNG8vtWmvlQzQ1SN+yuy0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tAvy1N9Q3yck6nr8z8tiQdGzUs9wc0k6MsoFuJOq9eysGa1kS7QCZIq6nA6otrRhZ6unr2j5ZpTI8JKs63xCZYqP5H81PljKhM9XRJFeNN6VsPtyy31GlvX/qtDUNeYAX4iVUjj0LYiAayYVlN1GSPTEGBkt++U5+3lvf791Q8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kaQqHfye; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17056C4CEED;
-	Tue, 26 Aug 2025 01:00:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756170005;
-	bh=J3/x2DnraeVU3FW7kfgA91LNG8vtWmvlQzQ1SN+yuy0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kaQqHfyefVZbihHUoTXADgbpmxDBZzl4wEiRN5TZS6tIlvLBvvDudCskozzMBBdLj
-	 maGhdK2kbUSN56XkwaEHv1x+thstscHUaCKEW05XnGe+zcX13iiHSEPGTTdn0eqKwK
-	 kSu7709SBmcWO7ScBIcLdke2BDdPqKaEeanXWCny7SQugXyyzxhUkZzA6LwuAtL2ib
-	 Mg9mOMYfwmJmRbl8NXb6Yq/8/3FSj6gbFgB/i56Gaw70yN6cxP/qVwxFQ9AD9HTNOC
-	 p7xrFyuGT/Ad59qtcAcqLGj8BxS/VtN5uLRjkLirSEqv+vhe0EueR3mxzrQlMX8dHG
-	 5xAHC5gbtF6Iw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B81383BF70;
-	Tue, 26 Aug 2025 01:00:14 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1756170414; c=relaxed/simple;
+	bh=2Ho7cC/QIRp0Nf1M5vwKTw1qpgnUTOb+pHhtsLDR8lM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eKXd9UFhBCV0O7GQBR/fdo+JBMTW493k7KPL5LQi1ZxejEu5Y7pV8GeMRIGblGgJZR8PpQTuCz5dsKGLo57gN4O0c2oH9L1F/7VYC2kUpYZ5+0tM6GEkB4YguZGb4BgODpiSSM3gMcscdck9986iwuFuju3tiRhDUN6WolkiJ38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=gNQRQzHN; arc=none smtp.client-ip=129.150.39.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mails.tsinghua.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
+	Date:Message-Id:MIME-Version:Content-Transfer-Encoding; bh=2PWa4
+	RDVbm9vqx+uSESMnuoRp/E021uZvmdOICI1JZM=; b=gNQRQzHNsqU0rVR+w+7ta
+	4rjgqK85BcNKf73FkUIqc0d3RqEVZdwC4nR326NWDMf7RaGGJ+MFgVu1vNFaHPTP
+	oK224flH5C0xegh5LgygQk2fty/BOVlOtxeY0cBkDRyVTdRbAKBNABsHdQi3xc94
+	Ib25UGqMN8U6khyZWPcO94=
+Received: from estar-Super-Server.. (unknown [103.233.162.254])
+	by web4 (Coremail) with SMTP id ywQGZQCnsjcfCK1oXLtKIA--.57357S2;
+	Tue, 26 Aug 2025 09:04:40 +0800 (CST)
+From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+To: netdev@vger.kernel.org
+Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] net/dccp: validate Reset/Close/CloseReq in DCCP_REQUESTING
+Date: Tue, 26 Aug 2025 09:03:46 +0800
+Message-Id: <20250826010346.1374390-1-zhaoyz24@mails.tsinghua.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,51 +53,133 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net-next 0/6] tcp: Follow up for DCCP removal.
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175617001301.3612382.4616195762654179835.git-patchwork-notify@kernel.org>
-Date: Tue, 26 Aug 2025 01:00:13 +0000
-References: <20250822190803.540788-1-kuniyu@google.com>
-In-Reply-To: <20250822190803.540788-1-kuniyu@google.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, ncardwell@google.com, dsahern@kernel.org,
- horms@kernel.org, kuni1840@gmail.com, netdev@vger.kernel.org
+X-CM-TRANSID:ywQGZQCnsjcfCK1oXLtKIA--.57357S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxGrWktFyUurWxWF1xtw1kXwb_yoWrGF17pa
+	4xKFZIkr1UJFyxtFnayw4DXr15Cr4kAryfGFnFqry8ZF1DJryfZ39IkrWjvry5CFZ3C342
+	g3y7WFWrCr47Ja7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvv14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr
+	1j6rxdM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVAC
+	Y4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJV
+	W8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI2
+	0VAGYxC7MxkIecxEwVAFwVWkMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r
+	4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF
+	67AKxVWUXVWUAwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2I
+	x0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2
+	z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73Uj
+	IFyTuYvjfU5eHqDUUUU
+X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAQEGAWis2dorJAABsO
 
-Hello:
+DCCP sockets in DCCP_REQUESTING state do not check the sequence number
+or acknowledgment number for incoming Reset, CloseReq, and Close packets.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+As a result, an attacker can send a spoofed Reset packet while the client
+is in the requesting state. The client will accept the packet without
+verification and immediately close the connection, causing a denial of
+service (DoS) attack.
 
-On Fri, 22 Aug 2025 19:06:55 +0000 you wrote:
-> As I mentioned in [0], TCP still has code for DCCP.
-> 
-> This series cleans up such leftovers.
-> 
-> [0]: https://patch.msgid.link/20250410023921.11307-3-kuniyu@amazon.com
-> 
-> 
-> [...]
+This patch moves the processing of Reset, Close, and CloseReq packets
+into dccp_rcv_request_sent_state_process() and validates the ack number
+before accepting them.
 
-Here is the summary with links:
-  - [v2,net-next,1/6] tcp: Remove sk_protocol test for tcp_twsk_unique().
-    https://git.kernel.org/netdev/net-next/c/9db0163e3cad
-  - [v2,net-next,2/6] tcp: Remove timewait_sock_ops.twsk_destructor().
-    https://git.kernel.org/netdev/net-next/c/2d842b6c670b
-  - [v2,net-next,3/6] tcp: Remove hashinfo test for inet6?_lookup_run_sk_lookup().
-    https://git.kernel.org/netdev/net-next/c/8150f3a44b17
-  - [v2,net-next,4/6] tcp: Don't pass hashinfo to socket lookup helpers.
-    https://git.kernel.org/netdev/net-next/c/cb16f4b6c73d
-  - [v2,net-next,5/6] tcp: Don't pass hashinfo to inet_diag helpers.
-    https://git.kernel.org/netdev/net-next/c/f1241200cd66
-  - [v2,net-next,6/6] tcp: Move TCP-specific diag functions to tcp_diag.c.
-    https://git.kernel.org/netdev/net-next/c/382a4d9cb6dc
+This fix should apply to stable versions *only* in Linux 5.x and 6.x.
+Note that DCCP was removed in Linux 6.16, so this patch is only relevant
+for older versions. We tested it on Ubuntu 24.04 LTS (Linux 6.8) and
+it worked as expected.
 
-You are awesome, thank you!
+Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+Cc: stable@vger.kernel.org
+Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+---
+ net/dccp/input.c | 54 ++++++++++++++++++++++++++++--------------------
+ 1 file changed, 32 insertions(+), 22 deletions(-)
+
+diff --git a/net/dccp/input.c b/net/dccp/input.c
+index 2cbb757a8..0b1ffb044 100644
+--- a/net/dccp/input.c
++++ b/net/dccp/input.c
+@@ -397,21 +397,22 @@ static int dccp_rcv_request_sent_state_process(struct sock *sk,
+ 	 *	     / * Response processing continues in Step 10; Reset
+ 	 *		processing continues in Step 9 * /
+ 	*/
++	struct dccp_sock *dp = dccp_sk(sk);
++
++	if (!between48(DCCP_SKB_CB(skb)->dccpd_ack_seq,
++				dp->dccps_awl, dp->dccps_awh)) {
++		dccp_pr_debug("invalid ackno: S.AWL=%llu, "
++					"P.ackno=%llu, S.AWH=%llu\n",
++					(unsigned long long)dp->dccps_awl,
++			(unsigned long long)DCCP_SKB_CB(skb)->dccpd_ack_seq,
++					(unsigned long long)dp->dccps_awh);
++		goto out_invalid_packet;
++	}
++
+ 	if (dh->dccph_type == DCCP_PKT_RESPONSE) {
+ 		const struct inet_connection_sock *icsk = inet_csk(sk);
+-		struct dccp_sock *dp = dccp_sk(sk);
+-		long tstamp = dccp_timestamp();
+-
+-		if (!between48(DCCP_SKB_CB(skb)->dccpd_ack_seq,
+-			       dp->dccps_awl, dp->dccps_awh)) {
+-			dccp_pr_debug("invalid ackno: S.AWL=%llu, "
+-				      "P.ackno=%llu, S.AWH=%llu\n",
+-				      (unsigned long long)dp->dccps_awl,
+-			   (unsigned long long)DCCP_SKB_CB(skb)->dccpd_ack_seq,
+-				      (unsigned long long)dp->dccps_awh);
+-			goto out_invalid_packet;
+-		}
+ 
++		long tstamp = dccp_timestamp();
+ 		/*
+ 		 * If option processing (Step 8) failed, return 1 here so that
+ 		 * dccp_v4_do_rcv() sends a Reset. The Reset code depends on
+@@ -496,6 +497,13 @@ static int dccp_rcv_request_sent_state_process(struct sock *sk,
+ 		}
+ 		dccp_send_ack(sk);
+ 		return -1;
++	} else if (dh->dccph_type == DCCP_PKT_RESET) {
++		dccp_rcv_reset(sk, skb);
++		return 0;
++	} else if (dh->dccph_type == DCCP_PKT_CLOSEREQ) {
++		return dccp_rcv_closereq(sk, skb);
++	} else if (dh->dccph_type == DCCP_PKT_CLOSE) {
++		return dccp_rcv_close(sk, skb);
+ 	}
+ 
+ out_invalid_packet:
+@@ -658,17 +666,19 @@ int dccp_rcv_state_process(struct sock *sk, struct sk_buff *skb,
+ 	 *		Set TIMEWAIT timer
+ 	 *		Drop packet and return
+ 	 */
+-	if (dh->dccph_type == DCCP_PKT_RESET) {
+-		dccp_rcv_reset(sk, skb);
+-		return 0;
+-	} else if (dh->dccph_type == DCCP_PKT_CLOSEREQ) {	/* Step 13 */
+-		if (dccp_rcv_closereq(sk, skb))
+-			return 0;
+-		goto discard;
+-	} else if (dh->dccph_type == DCCP_PKT_CLOSE) {		/* Step 14 */
+-		if (dccp_rcv_close(sk, skb))
++	if (sk->sk_state != DCCP_REQUESTING) {
++		if (dh->dccph_type == DCCP_PKT_RESET) {
++			dccp_rcv_reset(sk, skb);
+ 			return 0;
+-		goto discard;
++		} else if (dh->dccph_type == DCCP_PKT_CLOSEREQ) {	/* Step 13 */
++			if (dccp_rcv_closereq(sk, skb))
++				return 0;
++			goto discard;
++		} else if (dh->dccph_type == DCCP_PKT_CLOSE) {		/* Step 14 */
++			if (dccp_rcv_close(sk, skb))
++				return 0;
++			goto discard;
++		}
+ 	}
+ 
+ 	switch (sk->sk_state) {
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.34.1
 
 
