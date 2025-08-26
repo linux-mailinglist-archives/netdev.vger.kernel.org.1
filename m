@@ -1,144 +1,133 @@
-Return-Path: <netdev+bounces-217075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AA0BB3748A
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 23:48:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D980FB3748F
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 23:51:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26E4C361F33
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 21:48:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08E751B2712C
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 21:51:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC37E279DC5;
-	Tue, 26 Aug 2025 21:48:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E674D284678;
+	Tue, 26 Aug 2025 21:51:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ws7aiz/c"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="HMkYVmT+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E2052343BE
-	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 21:48:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FAF430CD91
+	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 21:51:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756244922; cv=none; b=G2OCgG2Eq47W+BsOB3nDumHTa5S0asUZUosD+oaSVUk/aOesVBzWBphGw4ABFtWt7ewMI8TelxBnvQ8oYXDdUNGxjEwW+qbzqynay1UpSdOIKIBJyiAwqZOi0Q7QR4A5TEGlyEbTOX4KOJI3Be4ryG4AoZJvyLdXTIOm5CbnYGg=
+	t=1756245094; cv=none; b=sUwiYPnG6jKG4JkI/ZGjM/gUC3m1ap4jV3keUqWJSuwEQUt4n5H+kTM7uH0tMVt+XqHfps1wzxTAoRLnWdcTZhiSdDwZIQRydAeMNHDK9pzJ8YxiDn7PxYgQ0eSqXFoxbckyL7Vcr65apzmw5+b0vM5IwRVOUt6xCH6I4Fhwg+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756244922; c=relaxed/simple;
-	bh=eJQ6MWOdZCJ25Q+ugQ5m4yaofmX6Ei6SYfuK7vBemOc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=d9jgZvGrUI47KedXNhCeACdwaXCtks6Cvq53jQEVjIXx3H8hSpSxypTnBW5kYtXcbFvnASBPUteEo6+XXh29rPY/MjQ9qx8DsuNLw4mT+dpXU+9J1Vk8xi9iR5S8UU7IY7FvDAMyTqVtw1TLMfp15p+RqauIgIF8QoGkxoHq4P0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ws7aiz/c; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-32326e5f0bfso5070113a91.3
-        for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 14:48:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756244920; x=1756849720; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eJQ6MWOdZCJ25Q+ugQ5m4yaofmX6Ei6SYfuK7vBemOc=;
-        b=Ws7aiz/cA6w0MiDcaOtxY419NHhg7ZcYn+HV07uLHaBnNQaurAPN78caUgiyfFiakV
-         xaE8iFmL3ozsNI/RGJ9sCveaFYsRBCHusdTI9xskcNFKQoK40ouyKHCrsm7ZuihlhrPl
-         AmGhBCpD6uzwkQLebzYXhRLIfviozjMvta579O8B8lR2Q0mmz6EwKDTMHgsR5OdBljxK
-         bdOEncIUIlHEbonT1m+BErPN25lZ0Wr383CzK28H/oyI8wH3CPin903BQMQtCkT8UtGt
-         IAZaKBnytS0LuXzi2XZz09f+47PSJBwnJE/Yn4fr6fOgiBrL/STQ9ABL0QLodKKU4l6r
-         feBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756244920; x=1756849720;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eJQ6MWOdZCJ25Q+ugQ5m4yaofmX6Ei6SYfuK7vBemOc=;
-        b=Wu8DmNLPfEjVWPKFsnjYp1JBHtRwQ0ISrd3B2QVLiAYJBXpbt9bdI/5WNWX0V/HnDf
-         hy05NF4h5F5pSZFeNk/ketnRLGbojh5l1far7KPJnwepu01NOApk7jizXUWMS3mOuuRU
-         C4ZlSYq8llHbkh9FYrENCS8gnzlLM/MB+xa6ysQvdO2vqvHaWRElPzxwaZUCMpj2H44c
-         HTOz7o2IavpXQUyW10gG3qpTv9W3j1Wh7hCr+1C46jQGioaAn9uV6lZWB4qUX1CCJPEn
-         IV0hDSgEKdH+VNjiQOjpuBuzVOU855l7LEgpNjLkQ8Z1WU5QoCljbCPCVjXysrFP7yQk
-         qzEA==
-X-Gm-Message-State: AOJu0YxS2RV1zCllzILwAfcD49d7K0i5IRrWJWVttRlhMorD2OSLs5UM
-	FPlg4lEi76zyEn5KnI5VcvG/XkdkxSYjOBW4FgC43CX+qbVFLXpDYw4CvEjRcx+vV0Ta7dn4IGl
-	A3Cd/e9A8O1nhS3KXNFM0/yuxW2fXDUpEDD9P
-X-Gm-Gg: ASbGnctOpXCdxCbYJHY73upWUtCGUA7AewJ9Sj9pdqbhghmMryIbbWX7M/8gDRdcF5p
-	eymaCx/AMc2nGdOdlCwOfghAujkGEi7psnPxARX9q44P33+VGZdOO2a1AJWVh5P80yJpXHCoI8b
-	oBJOlC49iB/kJid1L+PEMOpQJu5ExEGGCMATxYofxXVinF1AdwYYY36ahER4Ou/Yksa8rwPWDkI
-	DPOdU+l5dktKXkK0bjdB+fjqO2tEUag0PutN8TM/Luk4xLkKA==
-X-Google-Smtp-Source: AGHT+IGzdVhjfVQh6LPWA67zc99Ei23/KM92yJvizgNof07b+aPpgdeUrXv8li+pdsrFv27/xZH6I3n08KSE0zJJR9U=
-X-Received: by 2002:a17:90b:4b8f:b0:327:41c8:8840 with SMTP id
- 98e67ed59e1d1-32741c8899emr5585440a91.37.1756244920401; Tue, 26 Aug 2025
- 14:48:40 -0700 (PDT)
+	s=arc-20240116; t=1756245094; c=relaxed/simple;
+	bh=+WZfAppP5EdPTH/m75UWXwXzqlXjDLyIMNMUcPcZhDU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tOFUfCTp/Whv1QM9sP7sb9E/r4XEWHhatFZMQX2YAm6q8rTopLCYMo35/UA8GN5k3e/biChFU3QuNSlob1J8Z0G0KAkvK3n+MK9BIo5xnuEo3DyHCLZ8VljbihZk2gAGXgtXQAq1Ld+MFA4RKp4yCdmEva0ElXLKGE/NoB7TTvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=HMkYVmT+; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57QKrXAK004580;
+	Tue, 26 Aug 2025 21:51:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=k53dMA/VpV1qwXI/AmvEm4osx56FzjOfeEX
+	sxcZvoKg=; b=HMkYVmT+XgsK9UGhUEcIhuv4BeV/YwUmX/NgSxxplsVqQ8JfjAK
+	6YHH/RJ0GqQGlX5rdGGMKaKJSENji00K60K1iOYgbn8FU+3Eg19MKCdr/G6Hp+xk
+	aNcabKagF+Kl4M0w438nmnn04uwCZFnn7xvkrUbDz2Y+GcyyUeIXizP6AeHPJhq1
+	x5dHl4Q9nawVG5D7HO0b4bphjGXrnvW96j8sU+KTJc/Aw1vOMRFE9codMdvstmFi
+	b4dmzRsCG6T9wxLMDVDl8X4dW4XlxI3GxLSz7uUfdxk+92QawXB3hvBaaroB10n6
+	KubIB3NLqvtYgo4+NC2UZrQCbsS4DYYfeGQ==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48q5umakgq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 26 Aug 2025 21:51:26 +0000 (GMT)
+Received: from pps.filterd (NALASPPMTA03.qualcomm.com [127.0.0.1])
+	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 57QLpPnQ000930;
+	Tue, 26 Aug 2025 21:51:25 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by NALASPPMTA03.qualcomm.com (PPS) with ESMTPS id 48sktprk00-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 26 Aug 2025 21:51:25 +0000
+Received: from NALASPPMTA03.qualcomm.com (NALASPPMTA03.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 57QLpPwp000924;
+	Tue, 26 Aug 2025 21:51:25 GMT
+Received: from hu-devc-lv-u22-c.qualcomm.com (hu-subashab-lv.qualcomm.com [10.81.24.15])
+	by NALASPPMTA03.qualcomm.com (PPS) with ESMTPS id 57QLpP3O000923
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 26 Aug 2025 21:51:25 +0000
+Received: by hu-devc-lv-u22-c.qualcomm.com (Postfix, from userid 212624)
+	id E7EE85B4; Tue, 26 Aug 2025 14:51:24 -0700 (PDT)
+From: Subash Abhinov Kasiviswanathan <subash.a.kasiviswanathan@oss.qualcomm.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org
+Cc: Subash Abhinov Kasiviswanathan <subash.a.kasiviswanathan@oss.qualcomm.com>,
+        Sean Tranchetti <sean.tranchetti@oss.qualcomm.com>
+Subject: [PATCH net] MAINTAINERS: rmnet: Update email addresses
+Date: Tue, 26 Aug 2025 14:50:46 -0700
+Message-Id: <20250826215046.865530-1-subash.a.kasiviswanathan@oss.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1755525878.git.lucien.xin@gmail.com> <cb74facd-aa28-4c9d-b05f-84be3a135b20@app.fastmail.com>
- <CADvbK_f4v916nbx4t0fnkCj44S-buTytj_Paurd3j3Ro2tLDsQ@mail.gmail.com>
-In-Reply-To: <CADvbK_f4v916nbx4t0fnkCj44S-buTytj_Paurd3j3Ro2tLDsQ@mail.gmail.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Tue, 26 Aug 2025 17:48:28 -0400
-X-Gm-Features: Ac12FXzUryOp5o2sZFp0DBeCGGxf7TEZk5lsZKWx27o1ya7d4lotCZr6WCswwNY
-Message-ID: <CADvbK_e9sNbvHSCNuvetOCFY5OQPG99tmZLW=odcRzcN9xK8rQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 00/15] net: introduce QUIC infrastructure and
- core subcomponents
-To: John Ericson <mail@johnericson.me>
-Cc: network dev <netdev@vger.kernel.org>, draft-lxin-quic-socket-apis@ietf.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Authority-Analysis: v=2.4 cv=VtIjA/2n c=1 sm=1 tr=0 ts=68ae2c5e cx=c_pps
+ a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
+ a=2OwXVqhp2XgA:10 a=EUspDBNiAAAA:8 a=COk6AnOGAAAA:8 a=VwQbUJbxAAAA:8
+ a=4VVcHpUFlTeZ-k0x__MA:9 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODIzMDAzMiBTYWx0ZWRfX+tLgtNVryyY2
+ aeNvF9bcrM2HsAfpJjLvFHVjnlYk40P4s3/vkuQjs09Z74/XT2wAuNxuaIw9hldHruoOOyk3Udc
+ 01YZEs55jO1nuOkKJGUYjqjQz5LD3aJbIhpJjBMiqXmKhqJg3iyVZzfjstY8OLDngZ0q2Fb68Xc
+ m7zXG3DyvfAQURRDHwGQnV3o6BbrPfFA6UgX03Y54NsPl+Z4tAuGm/GoQTXva1d7S2slhwZ6V2E
+ J+W9v6fy4sOslO5HchhjK/Kvz1Cc/tP4UXRwf913DFu4uRSBkALpXvKUxsXWccZhjpE5evAuEtP
+ CJ/Tw1KRyk0Ait08M5Gelp7Y2Nxk8HZ/9e1MwRJxVNAD/D+R4eorxbqNZhWcod7tWs0T1Bt9/K1
+ PIziugtJ
+X-Proofpoint-GUID: lWFjk5UnvwTD0otJw1zN2iOROPvnL1eY
+X-Proofpoint-ORIG-GUID: lWFjk5UnvwTD0otJw1zN2iOROPvnL1eY
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-26_02,2025-08-26_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1011 phishscore=0 priorityscore=1501 impostorscore=0 bulkscore=0
+ suspectscore=0 malwarescore=0 adultscore=0 spamscore=0 classifier=typeunknown
+ authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2507300000 definitions=main-2508230032
 
-On Sun, Aug 24, 2025 at 1:57=E2=80=AFPM Xin Long <lucien.xin@gmail.com> wro=
-te:
->
-> On Sat, Aug 23, 2025 at 11:21=E2=80=AFAM John Ericson <mail@johnericson.m=
-e> wrote:
-> >
-> > (Note: This is an interface more than implementation question --- apolo=
-gies in advanced if this is not the right place to ask. I originally sent t=
-his message to [0] about the IETF internet draft [1], but then I realized t=
-hat is just an alias for the draft authors, and not a public mailing list, =
-so I figured this would be better in order to have something in the public =
-record.)
-> >
-> > ---
-> >
-> > I was surprised to see that (if I understand correctly) in the current =
-design, all communication over one connection must happen with the same soc=
-ket, and instead stream ids are the sole mechanism to distinguish between d=
-ifferent streams (e.g. for sending and receiving).
-> >
-> > This does work, but it is bad for application programming which wants t=
-o take advantage of separate streams while being transport-agnostic. For ex=
-ample, it would be very nice to run an arbitrary program with stdout and st=
-derr hooked up to separate QUIC streams. This can be elegantly accomplished=
- if there is an option to create a fresh socket / file descriptor which is =
-just associated with a single stream. Then "regular" send/rescv, or even re=
-ad/write, can be used with multiple streams.
-> >
-> > I see that the SCTP socket interface has sctp_peeloff [2] for this purp=
-ose. Could something similar be included in this specification?
-> Hi, John,
->
-> That is a bit different. In SCTP, sctp_peeloff() detaches an
-> association/connection from a one-to-many socket and returns it as a
-> new socket. It does not peel off a stream. Stream send/receive
-> operations in SCTP are actually quite similar to how QUIC handles
-> streams in the proposed QUIC socket API.
->
-> For QUIC, supporting 'stream peeloff' might mean creating a new socket
-> type that carries a stream ID and maps its sendmsg/recvmsg to the
-> 'parent' QUIC socket. But there are details to sort out, like whether
-> the 'parent-child relationship' should be maintained. We also need to
-> consider whether this is worth implementing in the kernel, or if a
-> similar API could be provided in libquic.
->
-> I=E2=80=99ll be requesting a mailing list for QUIC development and new
-> interfaces, and this would be a good topic to continue there.
->
-Hi, John,
+Switch to oss.qualcomm.com ids.
 
-Feel free to create a thread on quic@lists.linux.dev for this.
+Signed-off-by: Sean Tranchetti <sean.tranchetti@oss.qualcomm.com>
+Signed-off-by: Subash Abhinov Kasiviswanathan <subash.a.kasiviswanathan@oss.qualcomm.com>
+---
+ MAINTAINERS | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thanks.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index fed6cd812d79..20f80340d249 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -20878,8 +20878,8 @@ S:	Maintained
+ F:	drivers/firmware/qcom/qcom_qseecom_uefisecapp.c
+ 
+ QUALCOMM RMNET DRIVER
+-M:	Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>
+-M:	Sean Tranchetti <quic_stranche@quicinc.com>
++M:	Subash Abhinov Kasiviswanathan <subash.a.kasiviswanathan@oss.qualcomm.com>
++M:	Sean Tranchetti <sean.tranchetti@oss.qualcomm.com>
+ L:	netdev@vger.kernel.org
+ S:	Maintained
+ F:	Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
+-- 
+2.34.1
+
 
