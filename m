@@ -1,91 +1,91 @@
-Return-Path: <netdev+bounces-217003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217004-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 581D9B3702C
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 18:25:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B6D1B37032
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 18:26:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 144EC683306
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 16:25:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B78FE1BC20F5
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 16:26:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 906C530BBA9;
-	Tue, 26 Aug 2025 16:25:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 303563164C0;
+	Tue, 26 Aug 2025 16:25:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cSzEix6g"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XyQqJ/Y3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 146912BE7DD;
-	Tue, 26 Aug 2025 16:25:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8065C30BBA9;
+	Tue, 26 Aug 2025 16:25:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756225524; cv=none; b=em1TpklfXeiWyqw2UoIVJ6QjzdgaA0PVC9pRh0aDDsc6p1kPAyZ6aG6LmwQQgwDTKyqu8XBTCO1qlIVdqU/FuHRIbfBxLL0KgbBVVv21yBn3je6sQukH1sK7ui7TBfjtSO5/TuZ2v7KSBCNQ5BiGfZ9IXX6No5QAM63Zg70Yf1I=
+	t=1756225551; cv=none; b=eaDMhlfRdIqnxdnguaP61WKD8LkCn7+L24V8HBqhEm4o2yukt/mvqOSaX98rNuD+vMc7CshoaYNvggxj9MpVxtdv3OkoPuRftUpCS3O3qZ5jY51pKvw2jsGPUfDhCDjbj2dL9Q2UOswbF7y7JPH2CX/zCefEBkBDP+sRujU+Wgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756225524; c=relaxed/simple;
-	bh=ke9w2PS1ILArXMo8oJty01ETax0KHAEkfxohtDRM9C0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tjK77XBs7rjn5Vz1/ubOTyS9ri4A3Eh7Z2LVqaASslUShAKqIwvNrKHjJTfK1GJ/BexgRlpVahMrGxxkjJc0+xKkAbs+4LFyfl6acR76P3rhwsFnphCGvEav4XkODCazaf3i02mmnLsMn7utPDp4E18/jF4RvjvKKYoUlBDgyBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cSzEix6g; arc=none smtp.client-ip=209.85.214.179
+	s=arc-20240116; t=1756225551; c=relaxed/simple;
+	bh=HlecRIw67pAp5poCPfrus4ZNYKndhJf68o/6Jd5qT8g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ujd4TkowtZ52QrTD5nc/WHlQi9INyqi4fEQCu6+a+cr5TW+nCBHvm/2AHGEbodNBk3OwUtY1XXztq35uVcaSMlcvYxF2A9VgKYKO0k2Ogdn1shk//ZQ4Wy1oEgXr8fNlYGKr7fxeGb16LkynuZKoRpoAMNJmFXZd+iD+HgfWPSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XyQqJ/Y3; arc=none smtp.client-ip=209.85.215.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-244580523a0so57506225ad.1;
-        Tue, 26 Aug 2025 09:25:12 -0700 (PDT)
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-b474e8d6d01so3798392a12.0;
+        Tue, 26 Aug 2025 09:25:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756225512; x=1756830312; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1756225549; x=1756830349; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fR5vwrJbbj/HV2dnidcan/snaQbDkfj7Zbi5rY84dV4=;
-        b=cSzEix6grDDBi3b9bj9x3NaDfm2ogkPQ5WjtS1t6ufIpZwtCrf720Lg4O14IJv8dpS
-         IyuttY9RJHyYqb3o7YFUQfaUmdqUGYErVusW+p6BUr5/KW7ufi2dw88VOlkSC0aDCVmp
-         vmBnf7+ZE9AfpsT2J8R5EIlgFWzWPOr5ZfLiCKg6ogVMi/2+JdcrONWc7EDePTSEIg/p
-         jDo0NUv8zLIWFrLXHh6waNIL/rtBPPCWAXvChDJlc38SWrqTe2RgyCYq0lYRS24WZ39Z
-         ot6y6/BoVyuCQJuF6H/4IfpOejvpQwCzVw8BDYASLQ4K3Dq/WbIFP9938Xtacbap1qM8
-         wE9A==
+        bh=+4hwMSWkFKvIkVO0RU7YO/luDgoIsCOGIlfvguNRUx4=;
+        b=XyQqJ/Y3rLLhtZqJFCQP/X72KPALGXpMsDIDoVWZwlkrFPw24WscTN2Uej8aEiqLFs
+         GpyuEQntz37SPkvAxY4q++dcknhnVdhBelevHUOZlxOwf2sYQOykvu8Nxj0Hqhm6v6h4
+         29YZhAMtglrWI8ERMEfdJT9eYoxuUf2MZCNvoXRJ6impNKozv0PEM7YRKZv4ifHFnRuk
+         Av2w4UG29ra05jWr38IhhfCAk1smo1HvcSKL+C6N+cJnDJnAwvzDUtb2E4pSNDNtcjbQ
+         QngCk9D55/fK4YPW8SjUk9091HF6/VITAh4Ud7/MpJqoeRMjOzc62RovycTHaOJEZsYo
+         /Ueg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756225512; x=1756830312;
+        d=1e100.net; s=20230601; t=1756225549; x=1756830349;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=fR5vwrJbbj/HV2dnidcan/snaQbDkfj7Zbi5rY84dV4=;
-        b=rPaN9G/iEo1vxhHqgKT7D3u1pIXIIJXhpGIg8ktG+LmuxuOthAsa78KEK/H9KBK+LQ
-         4B66B23v7cfReNzvNRRVSjVdWtlN6x9ZcTcNcnPbC85Gj80ZaVMV5FbpO/iOYzeps1l3
-         YzBcvv6bjLiEEUDy4Pcgi24Kk9In+9XIi9oOvysTnQbR1A5IKFbVQF3mz9n1lZ2R/1Kx
-         75cXcaMCGId49u3MIP9pVZvtu5HGaTjvW9aULqOwRLoyNiRpKk2mAh/pFaWY4ph0+TpE
-         emlJwsWJqlTosNDdRIr2WWH8dY9mvp7Vw25D5tDGZyI7N9wlKiCvLAkGx1NbGRriNS9D
-         zRpw==
-X-Forwarded-Encrypted: i=1; AJvYcCV4BgXf9mPpJF+twvGLbv6kNqCUPBJh/WRjkcepIQzQ0yxsOH62aK9y2q53MGLLeFT/mIj7pXxXQ9vkYjE=@vger.kernel.org, AJvYcCWwQBLRM44wmXh0/D5w9AlfbsxuDbvbIl8G8O8zPi0f+fsTAZ/wSFctujCUHvWyuI4fSEGwHaXc@vger.kernel.org
-X-Gm-Message-State: AOJu0Yys+Th3jNW+U/ae3Cg+d0eKdcEF5w0fxe5MF1uyZRsHFdgWUpr3
-	U+fCpBBbbEIXKvXmsmN+tuLDiPBJ2ZvHZYHffdTIaQ0oPRLyVh660dU/
-X-Gm-Gg: ASbGnctYaXwVhghjxu+VCKkt/hXgQTMsXDL3wjksPpopZ7gMmFRBgGLgpX8hj4W3vsn
-	D0NvqPGKBZQ1DycvvXcUWMG+gwac8XNf++VxTFeWDujh+nK9H1rTIQXbvkwPhUFb//ANClypc6u
-	0kVHsXmvJ9D0ADrIZ6V9c5GgAeQ0NuK/QviXdtaK4/tOBNL9X6iH5lrhy3xTbqEXQGuTkV9yWoJ
-	nbBDuqitsTy4xBpf4qaXWI5f5kvwIaxikQLxwO+Ums8CFAS4ZLAT+5j01JYyVcBpsTDsclxhpFK
-	s9cmN7TpGKV+cmU4U4zDSh5X+N13qmRFVd4Dlm5/F/wvR1vspYE2C8udYGuJfC25QEV1n5Uyq0F
-	pSeet0dq6iRAJ+ShK7gmhLQpmYU9vUwIg61Bkb//f2j6To3z3PD0pfLZx44ejQM8fLCC6b+h95B
-	bQ
-X-Google-Smtp-Source: AGHT+IGrN0ZWHT5Q17mya96qh+0DIr6EHO/QaLIVBEYM8Df7t9SSax0fsSOgoRV5P/RBv24IT/MdZg==
-X-Received: by 2002:a17:903:8c6:b0:240:3eb9:5363 with SMTP id d9443c01a7336-2462ee7390emr193734845ad.27.1756225512211;
-        Tue, 26 Aug 2025 09:25:12 -0700 (PDT)
+        bh=+4hwMSWkFKvIkVO0RU7YO/luDgoIsCOGIlfvguNRUx4=;
+        b=m9F0/3c2ILUbo76vz/RmVa+EecdypY+cGIJem4HUsZ6cb0WR8ccYCL4JWqcIbUf6qo
+         lelkiE0GxaZpgOO8d32mi7Q/oL/Q5IZgJ047OZpfOTo3TLaD+9+vxzzvhNQ/EzuGckx4
+         99m0MZ724vWoLiBjl9R36yg5Zkmsq0Pb0Z3WZ+x4fKfCp77JUB116OosU+ev5KT4S3Hs
+         EWV3RdH57Kia3yoAnSR+MqYXDOFIpNku/eNwzXnexy/Wc6pOQ21vxZ/H7nsB90ddz0xZ
+         CVrZOLtF8OfSU4G6OIgz/LEns0ikDB8ORNmQdnoozt9vEU6ymc7Y8nuRARqXf1LL2DmN
+         Fcig==
+X-Forwarded-Encrypted: i=1; AJvYcCXBf5pFqyDyKhq4ysGxjweqe7Qc+mDTLSvOGW5d8YOd7Aq/BhfAvLDorpNvQzKBoZkW6s4zpIzBAQ62HoE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbE01qXJW8qWTBD7hOAXB2pxFWEd3UKwNRxe8jon4ZMjzr3ylW
+	4nDRGT0kK/eqwqZrWjLgL4M78XyCoIAlLwMM40ZwVrLZ/X5o7nwvlsUmkPSOt6u00CkAMEgY
+X-Gm-Gg: ASbGncuHwztSKSbwHb4lpMkmu9nuTXLQeQ4PimpFQA4uqL8E/iV+6JjiI3CQuX6/AOe
+	GEvFOg7hAzDiIljtnZeACCjFMrHllKdd/JcOjl6lSIxRrl+fp1oYJy234GKsNnF37e04WyaPylc
+	eD0vLub0/nxbkjnbx/7D2j5Gihxh7pHe4jFuyGfHV1ClTXh1WdZ/bjobd84bfAbBlb7+U1YEuMe
+	mgaHRJ5V9u1Qopkz7qeoz0+ZG7Nh79x0/wrkm0wwS9Bi1Bs5dJF0VzGShHt4ecZmJp1gdiuG7+f
+	CUa3svFIMhlgU/iZnabpSQSiaCjdT+NNXwielC4hZkzsPGzc8/5kGHnhtbZgydiPUt8oBkkdq5/
+	j4OKjFZ47ASoP+qmJuFSlPOW2sGXHCuCpgSpGJ+OvLzWI2x8Psq3idwcN+Yscjqs3p0D+U0Blhv
+	u0
+X-Google-Smtp-Source: AGHT+IE8+aaT57yva/CiX1UPjZQV7m4gj1JYI1bG56fZxydlN4wD1RtVDoBRR8qkOCmZx+1fnGqYtQ==
+X-Received: by 2002:a17:902:e94d:b0:248:70b9:c0dd with SMTP id d9443c01a7336-24870b9c2c3mr33262765ad.2.1756225548729;
+        Tue, 26 Aug 2025 09:25:48 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.6.55])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2487a5cc611sm13600195ad.114.2025.08.26.09.25.08
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-246687b0c61sm100172345ad.56.2025.08.26.09.25.45
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 26 Aug 2025 09:25:11 -0700 (PDT)
+        Tue, 26 Aug 2025 09:25:48 -0700 (PDT)
 From: qianjiaru77@gmail.com
-To: steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au,
+To: michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: horms@kernel.org,
-	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch
+Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	qianjiaru <qianjiaru77@gmail.com>
-Subject: [PATCH 1/1] Reference Counting Vulnerability in Linux XFRM PolicyManagement
-Date: Wed, 27 Aug 2025 00:25:00 +0800
-Message-ID: <20250826162500.34292-1-qianjiaru77@gmail.com>
+Subject: [PATCH 1/1] VF Resource State Inconsistency Vulnerability in Linux bnxt_en Driver
+Date: Wed, 27 Aug 2025 00:25:41 +0800
+Message-ID: <20250826162541.34705-1-qianjiaru77@gmail.com>
 X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -97,132 +97,139 @@ Content-Transfer-Encoding: 8bit
 
 From: qianjiaru <qianjiaru77@gmail.com>
 
-A reference counting management vulnerability exists in the 
-Linux kernel's XFRM (IPsec Transform) policy subsystem. 
-Based on variant analysis of CVE-2022-36879, this 
-vulnerability involves improper policy object lifecycle
-management in the `__xfrm_policy_check()` function, 
-potentially leading to double free conditions 
-and system instability.
+A state management vulnerability exists in the 
+`bnxt_hwrm_reserve_vf_rings()` function of the Linux kernel's
+bnxt_en network driver. The vulnerability causes incomplete 
+resource state updates in SR-IOV Virtual Function (VF) environments,
+potentially leading to system instability and resource allocation
+ failures in virtualized deployments.
+
+## Root Cause Analysis
+
+The vulnerability exists in the VF resource reservation logic 
+where older firmware versions receive incomplete state updates.
 
 ## Vulnerability Mechanism
 
-The issue follows the same pattern as CVE-2022-36879 but in a different code path:
+1. **Incomplete State Update**: 
+Old firmware path only updates `resv_tx_rings`, 
+ignoring other critical fields
+2. **Missing Hardware Sync**:
+ No call to `bnxt_hwrm_get_rings()` to sync complete state  
+3. **Inconsistent Resource Records**: 
+`bp->hw_resc` structure contains stale/inconsistent values
+4. **False Success**: 
+Returns success without performing actual hardware resource reservation
 
-1. **Policy Reference Acquired**: 
-`pols[0]` contains a valid policy with acquired reference
-2. **Secondary Lookup Fails**: 
-`xfrm_policy_lookup_bytype()` returns error for `pols[1]`
-3. **Partial Cleanup**: 
-Error path calls `xfrm_pol_put(pols[0])` but doesn't clear policy array state
-4. **Caller Confusion**: 
-Calling function may not be aware that `pols[0]` has already been released
-5. **Double Release Risk**: 
-If caller attempts cleanup based on incomplete state information
+## Missing State Updates
 
-## Comparison with CVE-2022-36879
+The vulnerable code fails to update these critical fields:
 
-**CVE-2022-36879 (Fixed)**: 
-`xfrm_expand_policies()` had double reference counting issues
 ```c
-// Original vulnerability pattern (now fixed):
-if (IS_ERR(pols[1])) {
-    xfrm_pols_put(pols, *num_pols);  // Released references
-    return PTR_ERR(pols[1]);         // But didn't set *num_pols = 0
-}
+struct bnxt_hw_resc {
+    u16 resv_rx_rings;      // NOT UPDATED - stale value
+    u16 resv_vnics;         // NOT UPDATED - stale value  
+    u16 resv_rsscos_ctxs;   // NOT UPDATED - stale value
+    u16 resv_cp_rings;      // NOT UPDATED - stale value
+    u16 resv_hw_ring_grps;  // NOT UPDATED - stale value
+    u16 resv_tx_rings;      // ONLY field updated
+    // ... other resource fields also not updated
+};
 ```
 
-**This Variant**: 
-Similar reference management issues in different function
-```c
-// Current potential issue:
-if (IS_ERR(pols[1])) {
-    xfrm_pol_put(pols[0]);     // Releases pols[0]
-    return 0;                  // But pols[0] pointer remains unchanged
-}
-```
+### Attack Scenario
 
-## Attack Scenario
+1. **VF Configuration**:
+ Administrator reconfigures VF network resources (RX/TX rings)
+2. **Partial Update**: 
+`bnxt_hwrm_reserve_vf_rings()` only updates TX ring count in `bp->hw_resc`
+3. **State Inconsistency**: 
+Other resource counters (RX, VNICs, RSS contexts) remain stale
+4. **Subsequent Operations**: 
+Other driver functions rely on incorrect resource state information
+5. **Resource Allocation Failure**: 
+Attempts to use resources based on stale state information fail
+6. **System Impact**: 
+VF network functionality degraded or system crashes
 
-1. **Policy Lookup**: 
-Network packet triggers `__xfrm_policy_check()` 
-with sub-policy configuration
-2. **Primary Policy Found**: 
-`pols[0]` gets a valid policy reference
-3. **Secondary Lookup Fails**: 
-`xfrm_policy_lookup_bytype()` fails, returns error in `pols[1]`
-4. **Partial Cleanup**: 
-Function releases `pols[0]` reference but doesn't clear the pointer
-5. **Caller Misunderstanding**: 
-Calling function may attempt to use or release `pols[0]` again
-6. **Memory Corruption**: 
-Double free or use-after-free leads to system instability
+## Comparison with Similar Vulnerabilities
+
+This vulnerability is part of the same 
+**firmware compatibility anti-pattern** family as:
+
+- **CVE-2024-44933**:
+RSS table mismanagement due to firmware-specific logic
+- **bnxt_rfs_capable() bypass**: 
+Validation bypassed for old firmware versions
+
+All share the common flaw:
+incomplete logic paths for older firmware versions
+that compromise system state integrity.
+
+The pattern appears to be systematic in the bnxt driver
+where legacy firmware support consistently introduces
+ security vulnerabilities.
 
 ## Proposed Fix
 
-The vulnerability should be fixed by ensuring 
-complete state cleanup in error paths:
+The vulnerability should be fixed by 
+ensuring complete state management 
+for all firmware versions:
 
 ```c
-// Current potentially vulnerable code:
-if (IS_ERR(pols[1])) {
-    XFRM_INC_STATS(net, LINUX_MIB_XFRMINPOLERROR);
-    xfrm_pol_put(pols[0]);
+// Current vulnerable code:
+if (!BNXT_NEW_RM(bp)) {
+    bp->hw_resc.resv_tx_rings = hwr->tx;
     return 0;
 }
 
 // Proposed secure fix:
-if (IS_ERR(pols[1])) {
-    XFRM_INC_STATS(net, LINUX_MIB_XFRMINPOLERROR);
-    xfrm_pol_put(pols[0]);
-    pols[0] = NULL;   // Clear pointer to prevent reuse
-    return 0;
-}
-```
-
-### Alternative Comprehensive Fix
-
-If the calling context requires more extensive cleanup:
-
-```c
-if (IS_ERR(pols[1])) {
-    XFRM_INC_STATS(net, LINUX_MIB_XFRMINPOLERROR);
-    xfrm_pol_put(pols[0]);
-    memset(pols, 0, sizeof(pols));  // Clear entire policy array
-    npols = 0;                      // Reset policy count
+if (!BNXT_NEW_RM(bp)) {
+    // Update all relevant resource state, not just TX rings
+    bp->hw_resc.resv_tx_rings = hwr->tx;
+    bp->hw_resc.resv_rx_rings = hwr->rx;
+    bp->hw_resc.resv_vnics = hwr->vnic;
+    bp->hw_resc.resv_rsscos_ctxs = hwr->rss_ctx;
+    bp->hw_resc.resv_cp_rings = hwr->cp;
+    bp->hw_resc.resv_hw_ring_grps = hwr->grp;
     return 0;
 }
 ```
 
 ## References
 
-- **Original CVE**: 
-CVE-2022-36879 (xfrm_expand_policies double free)
-- **Linux XFRM Documentation**: 
-`Documentation/networking/xfrm_*.txt`
-- **XFRM Source**: 
-`net/xfrm/xfrm_policy.c`
-- **IPsec RFCs**: 
-RFC 4301, RFC 4306
-
+- **Related CVE**: 
+CVE-2024-44933 (bnxt resource management)
+- **Linux SR-IOV Documentation**: 
+`Documentation/networking/sriov.rst`
+- **Broadcom bnxt Driver**: 
+`drivers/net/ethernet/broadcom/bnxt/`
+- **PCI SR-IOV Specification**: 
+PCI-SIG SR-IOV 1.1 specification
 
 Signed-off-by: qianjiaru <qianjiaru77@gmail.com>
 ---
- net/xfrm/xfrm_policy.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index c5035a9bc..50943fa4e 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -3786,6 +3786,7 @@ int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb,
- 			if (IS_ERR(pols[1])) {
- 				XFRM_INC_STATS(net, LINUX_MIB_XFRMINPOLERROR);
- 				xfrm_pol_put(pols[0]);
-+				pols[0] = NULL;           // Clear pointer to prevent reuse
- 				return 0;
- 			}
- 			/* This write can happen from different cpus. */
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 207a8bb36..2d06b0ddc 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -7801,7 +7801,13 @@ bnxt_hwrm_reserve_vf_rings(struct bnxt *bp, struct bnxt_hw_rings *hwr)
+ 	int rc;
+ 
+ 	if (!BNXT_NEW_RM(bp)) {
++		// Update all relevant resource state, not just TX rings
+ 		bp->hw_resc.resv_tx_rings = hwr->tx;
++		bp->hw_resc.resv_rx_rings = hwr->rx;
++		bp->hw_resc.resv_vnics = hwr->vnic;
++		bp->hw_resc.resv_rsscos_ctxs = hwr->rss_ctx;
++		bp->hw_resc.resv_cp_rings = hwr->cp;
++		bp->hw_resc.resv_hw_ring_grps = hwr->grp;
+ 		return 0;
+ 	}
+ 
 -- 
 2.34.1
 
