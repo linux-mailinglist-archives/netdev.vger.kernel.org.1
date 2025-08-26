@@ -1,83 +1,89 @@
-Return-Path: <netdev+bounces-217055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217056-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CEB7B37357
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 21:44:48 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63EBDB37358
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 21:44:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D77D464CEF
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 19:44:48 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C164D4E2DB2
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 19:44:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFF4030CDA5;
-	Tue, 26 Aug 2025 19:44:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABBC430CDA5;
+	Tue, 26 Aug 2025 19:44:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HhKI/9m7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UfHHObu+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 849B030CD9E
-	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 19:44:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1136E30CDB0
+	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 19:44:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756237484; cv=none; b=fqVWEav6TQpk/RL74wk76iDoIAsmDulxVsRCbyFYKf6o0DkecaZHrhUUmgo7/wMUAvD6zgo0h44hrb7TG12xkGrQdfBSjd7FODo/RB7Mkl41A6uM1VFAJl+VPNhN09c20fEjlBT59hdV9BtrPl+9xY7VMm9ZA6YTXHT/JGH9gU8=
+	t=1756237491; cv=none; b=gL7W0R4JgCrTbwgZ6ROJPdGktzKUdwRgkAfoNkgC3MqyJYWhRcpSaIpFGjOmWBk3SJvMGFyQqO06ybSE4/bd+gUaRJzVXK8A1aRdwLHg0iPEG39vqKaG+jJqUmsmmpza18a9KIhvMZpCcd0P2CSHHSWOynoNRdRciWvDYCITJUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756237484; c=relaxed/simple;
-	bh=rxv6SGSfoaM8DK1R4c075MN41q07lPHihYRx77RCBgA=;
-	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=MgHMSKLzI4oQZ9ksE+UWdBQoj2/mEOtzGtR2RtdOXt37GIRMQYxpYrzd/dDYpUW/E6NwcKNm11TrgJPIeFh+uipIS0WihS5seMJHKpO3vGitLLpsbDhCUD6jGWfOkhx0WsXHWp3ALhxGS4+DvJUMLhQapUXW2ivo/NzPdA6Bz+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HhKI/9m7; arc=none smtp.client-ip=209.85.210.177
+	s=arc-20240116; t=1756237491; c=relaxed/simple;
+	bh=GmDwa12rAe06S4TWASqpPuotKrqpkbnlNwhUqqnBUQ8=;
+	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kG581Tvbj4nolHjjypc6EEw9pozrigSQogPPYP3+w56znNRZ/u+9B/VChukBcskZStmsObYSxIW5b7zhayZzq4FpflIxoaC9FHKGWBkHKZdCzFwRGZ2dCkAsytLY0yuFEcG5+LmyqwQ2qLHVYSFjvfsbkn44JSeZLI1y6RgofHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UfHHObu+; arc=none smtp.client-ip=209.85.216.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-76e2e88c6a6so5386645b3a.1
-        for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 12:44:43 -0700 (PDT)
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-3276f46c1caso7021a91.1
+        for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 12:44:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756237483; x=1756842283; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:user-agent:message-id:date
-         :cc:to:from:subject:from:to:cc:subject:date:message-id:reply-to;
-        bh=uBCQcOF8/dkBYQETDVM8wn4O+4XlR+kOSO9NZybPkRw=;
-        b=HhKI/9m73wuRbVCX9rPjAmsBZycL64epUH080XU0b4kpUWWAgxR25hqan+i8wKnv96
-         DJixHLlDs+QlcTl3kXx9YANaWxDMs90MsbS9wH4kt/QkrG/rjyO9IDJxNxct1rFIPVf6
-         jMvS+GJZOQLpHQXs6KHhH9eKpq5asEKOdA6+KDVriicrK7a6yTkhiu8JK/3HoN8lJR2E
-         xPKU95YbH31AmO5LMXj/PeF2W+hs61fspNF0beW74C2ChtgMS9HIj9W+EoHaYHnw6gK4
-         /+YBgrDVkwaJok7TK4mQdFtkR9R6sM5YQ0wkzfI3TTR8/MEOCmQ2Jsv9UXFShjatm+B3
-         LGQA==
+        d=gmail.com; s=20230601; t=1756237489; x=1756842289; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:message-id:date:cc:to:from:subject:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=tWVsVAxPPY4+LglRvD9uUMDb8HqUEBDw0txmTE1f7gU=;
+        b=UfHHObu++0fiRkH0ZJSdoqk6DFScILGvE8ijGAX5PkdSYt+NdWBSrgyYsHJtvLPLvN
+         JFwnBbY7oQGkfGIScFltKMb4QlfQntHQARWe6WbuByvRJC2TwtS2glmrt6yhmlwarT8U
+         qJNs4MY25DYTQ3vTwdN0n1eRZgwW1S5z14/kekvxVK6EkYlFZD2OHTr50/rkVsZUrumz
+         kWHleS8MfMIICINwLMuPtSfeeAhhNbpl8FEA+evXF57MBdqMYjOicJkgWAlifq4UKgpa
+         He7CiUEwgpnzwj+0c4x2W9o9w8YNlPNQf7pBo0zA21Wxpo3fGiNwHAbcZdJnvKXRBfRW
+         sVKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756237483; x=1756842283;
-        h=content-transfer-encoding:mime-version:user-agent:message-id:date
-         :cc:to:from:subject:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uBCQcOF8/dkBYQETDVM8wn4O+4XlR+kOSO9NZybPkRw=;
-        b=ZVyAvQa83UcSRVaVq8JRp90XOvVnftLSgyoE9VP2rfKsODY8h2OoFmzGq7e9UZ5tt1
-         R6cMzJVC+azyTcE1DmIqsZjXGgfyihVDZsjSbarEXHsI9W5L6yqZbQ984LEHokRT0qH8
-         Wslp/7ng7niPu4Cc1kW3NmhpfLb8R4kQ6+9tFPQsEAOpVSCyoB+RjcHVccpDNd3nkJcs
-         VHQUl8tXoWiO9aZx70xmU41tjrIglZ8bIw6TzC+Z+ogkK6nLxARB+F96oq2sd1dJfKpD
-         vBr9Jrho2XZBaMFzk0vNg1HZZiwcncTuIhVjpmFWBA/KTvXUeNxyGqcU7HGfXUHuj6CV
-         ugFQ==
-X-Gm-Message-State: AOJu0Yx9yTx9wSsJLIUZWjl8THc8k5oRZiGTs7bierUHck12/63wPQwQ
-	3IBO7JskEilX7tCzoAfknjDxewYdqTo76E2waRZWxgseSRzI3Y9rRkI1
-X-Gm-Gg: ASbGnctYK9zAITFkjhSXsI2AhSIwcDJ0UcWWavkFlGsgEo+p3RRiRVes8VLFDV3V7c3
-	XI4Cf5+e/dsD2/eJzNqWHNDPAlMqguMOwHFxbGl0kzvsI0ZWi78CRYekaOtOULQLrkR3a3LTg3j
-	UM6mX/K54eYZAMRF9MUUb7iugDY4GcdBC3OP0WwCfG6PwYKy/5La3wSpbUwU89zprLD1XafkQ9x
-	qwAwNr9i2NY0kY3zWh088urd35lKcO9ogG1iFlZPjv6K+fVT8JEKEl5KMUPxMDulr0paXitb2go
-	VEM6P7zba8S8YqKmn4/J1S+8I/4FMk7466mmh0PlgSWhp+0VO0v5Vz97zEYCSwA/ffDTb2zdlQG
-	4ON9knBcNs8MQq2MSxEqg5uf3xyMlCDnaq+FuyvqSu6TbEfN0bMAD2qSEoAZRc5hVZ3BTCUUgyN
-	7qJw==
-X-Google-Smtp-Source: AGHT+IFeOBrGz4aou90F4Kv+zAYxcH/ypImfF45vtw9rZTYk3oQ24Pvia6FClWWKsbiUt+tTUD2INg==
-X-Received: by 2002:a05:6a00:3e27:b0:770:4d54:6234 with SMTP id d2e1a72fcca58-7704d546526mr13989657b3a.3.1756237482508;
-        Tue, 26 Aug 2025 12:44:42 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1756237489; x=1756842289;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:message-id:date:cc:to:from:subject:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tWVsVAxPPY4+LglRvD9uUMDb8HqUEBDw0txmTE1f7gU=;
+        b=XrzNSXGnDfe7RJubMS5U0rtpmcNpYlQbTiPdzw8RJhIcJ1bQPHb+FIgaHleggSJGNy
+         WDrzymzg5btMmxFrzoxIbkZoRX+if+OS2fD0eT0WL9aKOk/1gnSLhLeeEbAfINsLYSA7
+         OPZcyxf4g5qNySuRiUZ+49aJQE8hjVJqM/LVV3aURKQOqGfhE9HM/XJywPm6qNn3v4Q3
+         ST51fERjWYWvS2XuS1yW+RiNnyyzGStBmUzZi2gJ4UJUIqx0Y4WfOgpzZjtDDQrrjajc
+         DZF5GqUTTATJL1iCTkdL6GHvImLxgKX+CBJDN+sP1CSQf/EPA54E8G4udlA8J03jxOpL
+         11CQ==
+X-Gm-Message-State: AOJu0Yzez1gPwG1BEffQDhSO8GZSPL+vLfWKqDJskGqSDMK7jHicyGRs
+	hFkrZQcE2JnmRbNxdRABHEX1Q1eEMwd17fW2nh8Vq8luM1IsLIYSVos9
+X-Gm-Gg: ASbGncsqPveVMLs3SjNOh8lhk4ddzqXmIfD5opezsaeUNAcu3MrJG3N9NUpadWgbpuB
+	Ube7UKTvw8GKyjA9kUWo0tKYCBR+RnlY3vlaiv2pnflhX9joY/WFUqErkWHBvA5PGQNkiw3l82Z
+	6Y+v9papS2KaMB0AMuOzc2Pi241L6mLKWgl8K8LYpx2BbK8bH5lWhN51xMVNAVza9NwZaWzJTCE
+	b/WpTuLkR7l6OMgouud7n1yZzSAY4oYjpCZS3iBKjbByBh0yA+9sZRrq1q3D6Y27ijRTgSJQPTK
+	7eUKZA+ZOt40bbconjBXiJ3mUqHnVhzfqlCOUkdQoyQLvaCzEQweAJlPtfyHI5GDUBZJQN0z4JH
+	OmGMNrjPIAMyKeC9NyhfHIWEO7ToSr+R7cKiJAqRxTaFuegwoIaUke5kIK5Ac22EUILA=
+X-Google-Smtp-Source: AGHT+IHzafFexTco6p+snlfUfBcAxLkApUmeYZk9+3tqnIElhMIaiKrZ+b0shuqW2fbDOCIO/metPg==
+X-Received: by 2002:a17:90b:5647:b0:324:e74a:117c with SMTP id 98e67ed59e1d1-3275085dceamr3947912a91.13.1756237489182;
+        Tue, 26 Aug 2025 12:44:49 -0700 (PDT)
 Received: from ahduyck-xeon-server.home.arpa ([2605:59c8:829:4c00:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-771f7fe29b0sm3046107b3a.9.2025.08.26.12.44.41
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b49cb891cc9sm9917309a12.10.2025.08.26.12.44.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Aug 2025 12:44:42 -0700 (PDT)
-Subject: [net-next PATCH 0/4] fbnic: Synchronize address handling with BMC
+        Tue, 26 Aug 2025 12:44:48 -0700 (PDT)
+Subject: [net-next PATCH 1/4] fbnic: Move promisc_sync out of netdev code and
+ into RPC path
 From: Alexander Duyck <alexander.duyck@gmail.com>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org, kernel-team@meta.com, andrew+netdev@lunn.ch,
  pabeni@redhat.com, davem@davemloft.net
-Date: Tue, 26 Aug 2025 12:44:41 -0700
+Date: Tue, 26 Aug 2025 12:44:47 -0700
 Message-ID: 
+ <175623748769.2246365.2130394904175851458.stgit@ahduyck-xeon-server.home.arpa>
+In-Reply-To: 
+ <175623715978.2246365.7798520806218461199.stgit@ahduyck-xeon-server.home.arpa>
+References: 
  <175623715978.2246365.7798520806218461199.stgit@ahduyck-xeon-server.home.arpa>
 User-Agent: StGit/1.5
 Precedence: bulk
@@ -89,39 +95,148 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 
-The fbnic driver needs to communicate with the BMC if it is operating on
-the RMII-based transport (RBT) of the same port the host is on. To enable
-this we need to add rules that will route BMC traffic to the RBT/BMC and
-the BMC and firmware need to configure rules on the RBT side of the
-interface to route traffic from the BMC to the host instead of the MAC.
+From: Alexander Duyck <alexanderduyck@fb.com>
 
-To enable that this patch set addresses two issues. First it will cause the
-TCAM to be reconfigured in the event that the BMC was not previously
-present when the driver was loaded, but the FW sends a notification that
-the FW capabilities have changed and a BMC w/ various MAC addresses is now
-present. Second it adds support for sending a message to the firmware so
-that if the host adds additional MAC addresses the FW can be made aware and
-route traffic for those addresses from the RBT to the host instead of the
-MAC.
+In order for us to support the BMC possibly connecting, disconnecting, and
+then reconnecting we need to be able to support entities outside of just
+the NIC setting up promiscuous mode as the BMC can use a multicast
+promiscuous setup.
 
+To support that we should move the promisc_sync code out of the netdev and
+into the RPC section of the driver so that it is reachable from more paths.
+
+Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
 ---
+ drivers/net/ethernet/meta/fbnic/fbnic_netdev.c |   45 +-----------------------
+ drivers/net/ethernet/meta/fbnic/fbnic_rpc.c    |   44 +++++++++++++++++++++++
+ drivers/net/ethernet/meta/fbnic/fbnic_rpc.h    |    3 ++
+ 3 files changed, 49 insertions(+), 43 deletions(-)
 
-Alexander Duyck (4):
-      fbnic: Move promisc_sync out of netdev code and into RPC path
-      fbnic: Pass fbnic_dev instead of netdev to __fbnic_set/clear_rx_mode
-      fbnic: Add logic to repopulate RPC TCAM if BMC enables channel
-      fbnic: Push local unicast MAC addresses to FW to populate TCAMs
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+index b8b684ad376b..c75c849a9cb2 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+@@ -220,49 +220,8 @@ void __fbnic_set_rx_mode(struct net_device *netdev)
+ 	uc_promisc |= !!(netdev->flags & IFF_PROMISC);
+ 	mc_promisc |= !!(netdev->flags & IFF_ALLMULTI) || uc_promisc;
+ 
+-	/* Populate last TCAM entry with promiscuous entry and 0/1 bit mask */
+-	mac_addr = &fbd->mac_addr[FBNIC_RPC_TCAM_MACDA_PROMISC_IDX];
+-	if (uc_promisc) {
+-		if (!is_zero_ether_addr(mac_addr->value.addr8) ||
+-		    mac_addr->state != FBNIC_TCAM_S_VALID) {
+-			eth_zero_addr(mac_addr->value.addr8);
+-			eth_broadcast_addr(mac_addr->mask.addr8);
+-			clear_bit(FBNIC_MAC_ADDR_T_ALLMULTI,
+-				  mac_addr->act_tcam);
+-			set_bit(FBNIC_MAC_ADDR_T_PROMISC,
+-				mac_addr->act_tcam);
+-			mac_addr->state = FBNIC_TCAM_S_ADD;
+-		}
+-	} else if (mc_promisc &&
+-		   (!fbnic_bmc_present(fbd) || !fbd->fw_cap.all_multi)) {
+-		/* We have to add a special handler for multicast as the
+-		 * BMC may have an all-multi rule already in place. As such
+-		 * adding a rule ourselves won't do any good so we will have
+-		 * to modify the rules for the ALL MULTI below if the BMC
+-		 * already has the rule in place.
+-		 */
+-		if (!is_multicast_ether_addr(mac_addr->value.addr8) ||
+-		    mac_addr->state != FBNIC_TCAM_S_VALID) {
+-			eth_zero_addr(mac_addr->value.addr8);
+-			eth_broadcast_addr(mac_addr->mask.addr8);
+-			mac_addr->value.addr8[0] ^= 1;
+-			mac_addr->mask.addr8[0] ^= 1;
+-			set_bit(FBNIC_MAC_ADDR_T_ALLMULTI,
+-				mac_addr->act_tcam);
+-			clear_bit(FBNIC_MAC_ADDR_T_PROMISC,
+-				  mac_addr->act_tcam);
+-			mac_addr->state = FBNIC_TCAM_S_ADD;
+-		}
+-	} else if (mac_addr->state == FBNIC_TCAM_S_VALID) {
+-		if (test_bit(FBNIC_MAC_ADDR_T_BMC, mac_addr->act_tcam)) {
+-			clear_bit(FBNIC_MAC_ADDR_T_ALLMULTI,
+-				  mac_addr->act_tcam);
+-			clear_bit(FBNIC_MAC_ADDR_T_PROMISC,
+-				  mac_addr->act_tcam);
+-		} else {
+-			mac_addr->state = FBNIC_TCAM_S_DELETE;
+-		}
+-	}
++	/* Update the promiscuous rules */
++	fbnic_promisc_sync(fbd, uc_promisc, mc_promisc);
+ 
+ 	/* Add rules for BMC all multicast if it is enabled */
+ 	fbnic_bmc_rpc_all_multi_config(fbd, mc_promisc);
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_rpc.c b/drivers/net/ethernet/meta/fbnic/fbnic_rpc.c
+index a4dc1024c0c2..d5badaced6c3 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_rpc.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_rpc.c
+@@ -454,6 +454,50 @@ int __fbnic_xc_unsync(struct fbnic_mac_addr *mac_addr, unsigned int tcam_idx)
+ 	return 0;
+ }
+ 
++void fbnic_promisc_sync(struct fbnic_dev *fbd,
++			bool uc_promisc, bool mc_promisc)
++{
++	struct fbnic_mac_addr *mac_addr;
++
++	/* Populate last TCAM entry with promiscuous entry and 0/1 bit mask */
++	mac_addr = &fbd->mac_addr[FBNIC_RPC_TCAM_MACDA_PROMISC_IDX];
++	if (uc_promisc) {
++		if (!is_zero_ether_addr(mac_addr->value.addr8) ||
++		    mac_addr->state != FBNIC_TCAM_S_VALID) {
++			eth_zero_addr(mac_addr->value.addr8);
++			eth_broadcast_addr(mac_addr->mask.addr8);
++			clear_bit(FBNIC_MAC_ADDR_T_ALLMULTI,
++				  mac_addr->act_tcam);
++			set_bit(FBNIC_MAC_ADDR_T_PROMISC,
++				mac_addr->act_tcam);
++			mac_addr->state = FBNIC_TCAM_S_ADD;
++		}
++	} else if (mc_promisc &&
++		   (!fbnic_bmc_present(fbd) || !fbd->fw_cap.all_multi)) {
++		/* We have to add a special handler for multicast as the
++		 * BMC may have an all-multi rule already in place. As such
++		 * adding a rule ourselves won't do any good so we will have
++		 * to modify the rules for the ALL MULTI below if the BMC
++		 * already has the rule in place.
++		 */
++		if (!is_multicast_ether_addr(mac_addr->value.addr8) ||
++		    mac_addr->state != FBNIC_TCAM_S_VALID) {
++			eth_zero_addr(mac_addr->value.addr8);
++			eth_broadcast_addr(mac_addr->mask.addr8);
++			mac_addr->value.addr8[0] ^= 1;
++			mac_addr->mask.addr8[0] ^= 1;
++			set_bit(FBNIC_MAC_ADDR_T_ALLMULTI,
++				mac_addr->act_tcam);
++			clear_bit(FBNIC_MAC_ADDR_T_PROMISC,
++				  mac_addr->act_tcam);
++			mac_addr->state = FBNIC_TCAM_S_ADD;
++		}
++	} else if (mac_addr->state == FBNIC_TCAM_S_VALID) {
++		__fbnic_xc_unsync(mac_addr, FBNIC_MAC_ADDR_T_ALLMULTI);
++		__fbnic_xc_unsync(mac_addr, FBNIC_MAC_ADDR_T_PROMISC);
++	}
++}
++
+ void fbnic_sift_macda(struct fbnic_dev *fbd)
+ {
+ 	int dest, src;
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_rpc.h b/drivers/net/ethernet/meta/fbnic/fbnic_rpc.h
+index 6892414195c3..d9db7781a49b 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_rpc.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_rpc.h
+@@ -201,6 +201,9 @@ struct fbnic_mac_addr *__fbnic_mc_sync(struct fbnic_dev *fbd,
+ void fbnic_sift_macda(struct fbnic_dev *fbd);
+ void fbnic_write_macda(struct fbnic_dev *fbd);
+ 
++void fbnic_promisc_sync(struct fbnic_dev *fbd,
++			bool uc_promisc, bool mc_promisc);
++
+ struct fbnic_ip_addr *__fbnic_ip4_sync(struct fbnic_dev *fbd,
+ 				       struct fbnic_ip_addr *ip_addr,
+ 				       const struct in_addr *addr,
 
-
- drivers/net/ethernet/meta/fbnic/fbnic_fw.c    | 106 ++++++++++++++++++
- drivers/net/ethernet/meta/fbnic/fbnic_fw.h    |  23 +++-
- .../net/ethernet/meta/fbnic/fbnic_netdev.c    |  60 ++--------
- .../net/ethernet/meta/fbnic/fbnic_netdev.h    |   4 +-
- drivers/net/ethernet/meta/fbnic/fbnic_pci.c   |   6 +-
- drivers/net/ethernet/meta/fbnic/fbnic_rpc.c   |  86 ++++++++++++--
- drivers/net/ethernet/meta/fbnic/fbnic_rpc.h   |   4 +
- 7 files changed, 225 insertions(+), 64 deletions(-)
-
---
 
 
