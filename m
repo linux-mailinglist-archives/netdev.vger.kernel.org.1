@@ -1,317 +1,399 @@
-Return-Path: <netdev+bounces-216845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAE0FB35804
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 11:06:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52D0EB35823
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 11:08:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 806392A4533
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 09:06:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC3DD7C0DCB
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 09:08:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 033842874F5;
-	Tue, 26 Aug 2025 09:06:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dukWorCc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C99DA30BF64;
+	Tue, 26 Aug 2025 09:06:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FDE22820BA
-	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 09:05:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908BF30146D;
+	Tue, 26 Aug 2025 09:06:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756199160; cv=none; b=DDnunu8MX6Sz9WT4yP1eTCRXJwdxqaaazl+V5xYFgieFZN1StYXezUqM/7DsjNJDGqP3wtBKUroPhmIQKgdjI9MmRuHea67uU/GflRt+AK4/fFHhYNCx/hRLLjNY0emnioO49DFFqIyXmL8zzK6X6tMXBhZj82w3Wyltj+D0SKU=
+	t=1756199198; cv=none; b=ZFHc8dPDKiGZe86rR/yYCo2LnyOIYyPHzqEocZxyxmKaXlw7sKXcC8nHzdc1rGqNn0p5s525FeMfOsd5fptUaDmqAM9eIB1Mob29S8bxyEMcPdo/+adNcl4DN+54fbdAWZ49/BNYpp5qph8b1IY46J6b6r2s91aTpLMC5gkP1v0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756199160; c=relaxed/simple;
-	bh=rF9Am1Yzid/Jm5g/LlOtUyVYFUrDH+b5dV3gfybCfOo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ossIPqzzX+l7ZAsa7rKszgoYzh36Gg821Rg1HhTI0PaiTjWtpnEJiYnZXUUmB8aNHjeNrX22dzv7EXCOZm8zcKxJYskF7+wXOcs+PbCUD5F4lkkdG6KWr306b6EHD7jc8vh1Zj1VOnEjpyyJCmOtV6G1FAhLy4A+Yvwuuo9eTi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dukWorCc; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756199158;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2MHo5H3mIDWBDpjMr1q5nuYEn9BTPnopBU4tC0IkY94=;
-	b=dukWorCcxHKzBrd0EcLVOKPWnQgVnggWVN8Htuu83YUeeg02UC7M/VT+jvVUnj4rMOc8f5
-	zkkDRRsaZdsaofQ41rDPbmfDyxX3fbF4VwyX2D9LOSZdVVgqWVa8sFdx2nShp4bpZ/sQo0
-	YsW6uZ49h63s9A3vGOuUQ2CRTWZlKIs=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-412-92NY1NkpNeelpZS2kRVT8A-1; Tue, 26 Aug 2025 05:05:56 -0400
-X-MC-Unique: 92NY1NkpNeelpZS2kRVT8A-1
-X-Mimecast-MFC-AGG-ID: 92NY1NkpNeelpZS2kRVT8A_1756199156
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4b2d09814efso31615211cf.0
-        for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 02:05:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756199156; x=1756803956;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2MHo5H3mIDWBDpjMr1q5nuYEn9BTPnopBU4tC0IkY94=;
-        b=eR1B3NBdHgMi0RwsN0efOURl2HR7FYuvBAD0UsZ36WORUAx8bespMMa9RO/jFYwRdV
-         iAvAvO2KPINHbdPdDtqkY/NjM/n9QUL36+TQH5EX+1rFWQKohhfgTOl2fP3/sxKmST02
-         X5lxuugu06Z40uqWl2EyPb/KQ/caRVJ59UhDlHx1ugZLLhJCssT+SqPNwgO3QM9oi6Ne
-         qnzKCJFyQ/U6wU6Qh8Q69bIjIXCz50reG2dIISYsn8LYGSD8tjb5u4R9U45PUqcFyMBB
-         Z5KlPZnAS6zsZIib3fJchr3ZgYMmuHi8NciIWKhbNDda70vxemHyg0Ddc1dcJd5IOMSZ
-         RYWA==
-X-Forwarded-Encrypted: i=1; AJvYcCUdmNQNtVHq4wZYeE6pM8ysv03Bj0ncXEcNco17CTv0N0k6aRf1AgsyRNEW1K81zfwAy/y/+/8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRqCxQg6jzwbZOZdTJLAuJTsx/s6sOp7b7fr4hO2eIoXKof3eo
-	EJBlOaEoFGI9f0fEs9Eoy1isrDNWnJvVW5w0aCvLmNhWQf3prH4L0ES25vhQpbtQ2X4r899pKzz
-	okDhBgPTorpJyKlm7mQGW61z3tECNUhFKS0GUIw6QAMT/sLDn4H+/pFGk7g==
-X-Gm-Gg: ASbGncuKgROtTfXuIU8Y0S0GZ9KLr/x1QEcvzMTdfB921M/+IlLWCJeLwoXTK2RraoU
-	0HW5rrdzM0bi3HRNJL/yO3iEAGw7SzMtcac4m8lG6B/IjnpSiEUQyufBJpOb5/c3CVe9Smlizmp
-	u4MDtLaC65MYCdwRHeQBc45nc7TUeYKCs8PZlAOCbDpyedeYbLVqjbAt/HGQ7jV1fs5FbbEY3Sy
-	c2Go79jS3YvrFeCsMUTd7KUgmIvNrZDhtQKF/C+ktAEzecbGlId5axKzizRNPYHw9nGKl9cjnuw
-	yXfApd193J/+q+3/dOwQDyT137J0qM3MJV7gPnlvimUGcDqwJGFWU6yD7UVwAUEXpKRs5VJa6oj
-	8eUiUvLApFLg=
-X-Received: by 2002:a05:622a:15c7:b0:4b2:e166:7a84 with SMTP id d75a77b69052e-4b2e1667bb4mr24538631cf.0.1756199155441;
-        Tue, 26 Aug 2025 02:05:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF5hWfUAGjGThM9s464g2oD6cfZ5KM0cDcrbdKMSQH1bOmNu4hdeyST70zq36P8UQsuAfWXDQ==
-X-Received: by 2002:a05:622a:15c7:b0:4b2:e166:7a84 with SMTP id d75a77b69052e-4b2e1667bb4mr24538371cf.0.1756199154930;
-        Tue, 26 Aug 2025 02:05:54 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7ebed8911aesm643603285a.19.2025.08.26.02.05.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Aug 2025 02:05:54 -0700 (PDT)
-Message-ID: <ce4f62a8-1114-47b9-af08-51656e08c2b5@redhat.com>
-Date: Tue, 26 Aug 2025 11:05:51 +0200
+	s=arc-20240116; t=1756199198; c=relaxed/simple;
+	bh=kEjhAlW0g8NJnH9RwPWugShPTRnXx15c6B4FEjr/gng=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Q+LcM9JMNrYIIG3JrWK5TNhOjOtaRegBR3nVm0e4p1cMoWpJfD0g1Qy6TOTgJjeycdU/Pq7tQj4AEw5/cMnbRwEhsHbtXaq8BCaMzKXNiMhum1QaFG0O2rBnujY/J/t7YvJW2oWTntmuV1J4KMqOZr2iZ4onc7B3GoFAiOcyD8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4cB1xF4vyDz14McZ;
+	Tue, 26 Aug 2025 17:06:25 +0800 (CST)
+Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
+	by mail.maildlp.com (Postfix) with ESMTPS id 22AAF18049C;
+	Tue, 26 Aug 2025 17:06:32 +0800 (CST)
+Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.189.55) by
+ kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 26 Aug 2025 17:06:30 +0800
+From: Fan Gong <gongfan1@huawei.com>
+To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	<linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Bjorn Helgaas
+	<helgaas@kernel.org>, luosifu <luosifu@huawei.com>, Xin Guo
+	<guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>, Zhou
+ Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
+	<shijing34@huawei.com>, Meny Yossefi <meny.yossefi@huawei.com>, Gur Stavi
+	<gur.stavi@huawei.com>, Lee Trager <lee@trager.us>, Michael Ellerman
+	<mpe@ellerman.id.au>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, Suman
+ Ghosh <sumang@marvell.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Joe Damato <jdamato@fastly.com>, Christophe JAILLET
+	<christophe.jaillet@wanadoo.fr>
+Subject: [PATCH net-next v01 09/12] hinic3: Tx & Rx configuration
+Date: Tue, 26 Aug 2025 17:05:51 +0800
+Message-ID: <f647c1082c01bc88aabd82aa518f85e26e250f7c.1756195078.git.zhuyikai1@h-partners.com>
+X-Mailer: git-send-email 2.51.0.windows.1
+In-Reply-To: <cover.1756195078.git.zhuyikai1@h-partners.com>
+References: <cover.1756195078.git.zhuyikai1@h-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v15 03/15] net: homa: create shared Homa header
- files
-To: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org
-Cc: edumazet@google.com, horms@kernel.org, kuba@kernel.org
-References: <20250818205551.2082-1-ouster@cs.stanford.edu>
- <20250818205551.2082-4-ouster@cs.stanford.edu>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250818205551.2082-4-ouster@cs.stanford.edu>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ kwepemf100013.china.huawei.com (7.202.181.12)
 
-On 8/18/25 10:55 PM, John Ousterhout wrote:
-> +/**
-> + * struct homa_net - Contains Homa information that is specific to a
-> + * particular network namespace.
-> + */
-> +struct homa_net {
-> +	/** @net: Network namespace corresponding to this structure. */
-> +	struct net *net;
-> +
-> +	/** @homa: Global Homa information. */
-> +	struct homa *homa;
+Configure Tx & Rx queue common attributes.
 
-It's not clear why the above 2 fields are needed. You could access
-directly the global struct homa instance, and 'struct net' is usually
-available when struct home_net is avail.
+Co-developed-by: Xin Guo <guoxin09@huawei.com>
+Signed-off-by: Xin Guo <guoxin09@huawei.com>
+Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
+Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
+Signed-off-by: Fan Gong <gongfan1@huawei.com>
+---
+ .../huawei/hinic3/hinic3_mgmt_interface.h     | 15 +++++
+ .../huawei/hinic3/hinic3_netdev_ops.c         | 56 ++++++++++++++++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.c   | 25 ++++++++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.h   |  2 +
+ .../net/ethernet/huawei/hinic3/hinic3_rx.c    | 64 +++++++++++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_rx.h    |  2 +
+ .../net/ethernet/huawei/hinic3/hinic3_tx.c    | 32 ++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_tx.h    |  2 +
+ 8 files changed, 198 insertions(+)
 
-
-> +/**
-> + * is_homa_pkt() - Return true if @skb is a Homa packet, false otherwise.
-> + * @skb:    Packet buffer to check.
-> + * Return:  see above.
-> + */
-> +static inline bool is_homa_pkt(struct sk_buff *skb)
-> +{
-> +	int protocol;
-> +
-> +	/* If the network header hasn't been created yet, assume it's a
-> +	 * Homa packet (Homa never generates any non-Homa packets).
-> +	 */
-> +	if (skb->network_header == 0)
-> +		return true;
-> +	protocol = (skb_is_ipv6(skb)) ? ipv6_hdr(skb)->nexthdr :
-> +					ip_hdr(skb)->protocol;
-> +	return protocol == IPPROTO_HOMA;
-> +}
-
-This helper is apparently unused in this series, just drop it / add it
-later
-
-> +#define UNIT_LOG(...)
-> +#define UNIT_HOOK(...)
-
-Also apparently unused.
-
-> +extern unsigned int homa_net_id;
-> +
-> +/**
-> + * homa_net_from_net() - Return the struct homa_net associated with a particular
-> + * struct net.
-> + * @net:     Get the Homa data for this net namespace.
-> + * Return:   see above.
-> + */
-> +static inline struct homa_net *homa_net_from_net(struct net *net)
-
-The customary name for this kind of helper is homa_net()
-
-> +{
-> +	return (struct homa_net *)net_generic(net, homa_net_id);
-> +}
-> +
-> +/**
-> + * homa_from_skb() - Return the struct homa associated with a particular
-> + * sk_buff.
-> + * @skb:     Get the struct homa for this packet buffer.
-> + * Return:   see above.
-> + */
-> +static inline struct homa *homa_from_skb(struct sk_buff *skb)
-> +{
-> +	struct homa_net *hnet;
-> +
-> +	hnet = net_generic(dev_net(skb->dev), homa_net_id);
-> +	return hnet->homa;
-
-You can implement this using homa_net_from_skb(), avoiding some code
-duplication
-
-> +}
-> +
-> +/**
-> + * homa_net_from_skb() - Return the struct homa_net associated with a particular
-> + * sk_buff.
-> + * @skb:     Get the struct homa for this packet buffer.
-> + * Return:   see above.
-> + */
-> +static inline struct homa_net *homa_net_from_skb(struct sk_buff *skb)
-> +{
-> +	struct homa_net *hnet;
-> +
-> +	hnet = net_generic(dev_net(skb->dev), homa_net_id);
-> +	return hnet;
-
-You can implement this using homa_net(), avoid some code duplication.
-
-> +}
-> +
-> +/**
-> + * homa_clock() - Return a fine-grain clock value that is monotonic and
-> + * consistent across cores.
-> + * Return: see above.
-> + */
-> +static inline u64 homa_clock(void)
-> +{
-> +	/* As of May 2025 there does not appear to be a portable API that
-> +	 * meets Homa's needs:
-> +	 * - The Intel X86 TSC works well but is not portable.
-> +	 * - sched_clock() does not guarantee monotonicity or consistency.
-> +	 * - ktime_get_mono_fast_ns and ktime_get_raw_fast_ns are very slow
-> +	 *   (27 ns to read, vs 8 ns for TSC)
-> +	 * Thus we use a hybrid approach that uses TSC (via get_cycles) where
-> +	 * available (which should be just about everywhere Homa runs).
-> +	 */
-> +#ifdef CONFIG_X86_TSC
-> +	return get_cycles();
-> +#else
-> +	return ktime_get_mono_fast_ns();
-> +#endif /* CONFIG_X86_TSC */
-> +}
-
-ktime_get*() variant are fast enough to allow e.g. pktgen deals with
-millions of packets x seconds. Both tsc() and ktime_get_mono_fast_ns()
-suffer of various inconsistencies which will cause the most unexpected
-issues in the most dangerous situation. I strongly advice against this
-early optimization.
-
-> +/**
-> + * homa_usecs_to_cycles() - Convert from units of microseconds to units of
-> + * homa_clock().
-> + * @usecs:   A time measurement in microseconds
-> + * Return:   The time in homa_clock() units corresponding to @usecs.
-> + */
-> +static inline u64 homa_usecs_to_cycles(u64 usecs)
-> +{
-> +	u64 tmp;
-> +
-> +	tmp = usecs * homa_clock_khz();
-> +	do_div(tmp, 1000);
-> +	return tmp;
-> +}
-
-Apparently not used in this series.
-FWIW do_div() would likely be much more costly than timestamp fetching.
-
-> +
-> +/* Homa Locking Strategy:
-> + *
-> + * (Note: this documentation is referenced in several other places in the
-> + * Homa code)
-> + *
-> + * In the Linux TCP/IP stack the primary locking mechanism is a sleep-lock
-> + * per socket. However, per-socket locks aren't adequate for Homa, because
-> + * sockets are "larger" in Homa. In TCP, a socket corresponds to a single
-> + * connection between two peers; an application can have hundreds or
-> + * thousands of sockets open at once, so per-socket locks leave lots of
-> + * opportunities for concurrency. With Homa, a single socket can be used for
-> + * communicating with any number of peers, so there will typically be just
-> + * one socket per thread. As a result, a single Homa socket must support many
-> + * concurrent RPCs efficiently, and a per-socket lock would create a bottleneck
-> + * (Homa tried this approach initially).
-> + *
-> + * Thus, the primary locks used in Homa spinlocks at RPC granularity. This
-> + * allows operations on different RPCs for the same socket to proceed
-> + * concurrently. Homa also has socket locks (which are spinlocks different
-> + * from the official socket sleep-locks) but these are used much less
-> + * frequently than RPC locks.
-> + *
-> + * Lock Ordering:
-> + *
-> + * There are several other locks in Homa besides RPC locks, all of which
-> + * are spinlocks. When multiple locks are held, they must be acquired in a
-> + * consistent order in order to prevent deadlock. Here are the rules for Homa:
-> + * 1. Except for RPC and socket locks, all locks should be considered
-> + *    "leaf" locks: don't acquire other locks while holding them.
-> + * 2. The lock order is:
-> + *    * RPC lock
-> + *    * Socket lock
-> + *    * Other lock
-> + * 3. It is not safe to wait on an RPC lock while holding any other lock.
-> + * 4. It is safe to wait on a socket lock while holding an RPC lock, but
-> + *    not while holding any other lock.
-
-The last 2 points are not needed: are obviously implied by the previous
-ones.
-
-> + *
-> + * It may seem surprising that RPC locks are acquired *before* socket locks,
-> + * but this is essential for high performance. Homa has been designed so that
-> + * many common operations (such as processing input packets) can be performed
-> + * while holding only an RPC lock; this allows operations on different RPCs
-> + * to proceed in parallel. Only a few operations, such as handing off an
-> + * incoming message to a waiting thread, require the socket lock. If socket
-> + * locks had to be acquired first, any operation that might eventually need
-> + * the socket lock would have to acquire it before the RPC lock, which would
-> + * severely restrict concurrency.
-
-FWIW, I think the above scheme can offer good performances if and only
-if any operation requiring the socket lock is slow-path: multiple
-RPCs/cores can content the same socket lock experiencing false sharing
-and cache contention/misses and will hit performances badly.
-
-If the operations requiring the socket lock are slow-path, the
-RPC/socket lock order should be irrelevant for performances.
-
-[...]
-> +static inline void homa_skb_get(struct sk_buff *skb, void *dest, int offset,
-> +				int length)
-> +{
-> +	memcpy(dest, skb_transport_header(skb) + offset, length);
-> +}
-
-Apparently unused.
-
-/P
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_mgmt_interface.h b/drivers/net/ethernet/huawei/hinic3/hinic3_mgmt_interface.h
+index b891290a3d6e..20d37670e133 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_mgmt_interface.h
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_mgmt_interface.h
+@@ -75,6 +75,21 @@ struct l2nic_cmd_force_pkt_drop {
+ 	u8                   rsvd1[3];
+ };
+ 
++struct l2nic_cmd_set_dcb_state {
++	struct mgmt_msg_head head;
++	u16                  func_id;
++	/* 0 - get dcb state, 1 - set dcb state */
++	u8                   op_code;
++	/* 0 - disable, 1 - enable dcb */
++	u8                   state;
++	/* 0 - disable, 1 - enable dcb */
++	u8                   port_state;
++	u8                   rsvd[7];
++};
++
++/* IEEE 802.1Qaz std */
++#define L2NIC_DCB_COS_MAX     0x8
++
+ /* Commands between NIC to fw */
+ enum l2nic_cmd {
+ 	/* FUNC CFG */
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c b/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
+index 054afb2b1460..baca07733a80 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
+@@ -190,6 +190,47 @@ static void hinic3_free_txrxq_resources(struct net_device *netdev,
+ 	q_params->txqs_res = NULL;
+ }
+ 
++static int hinic3_configure_txrxqs(struct net_device *netdev,
++				   struct hinic3_dyna_txrxq_params *q_params)
++{
++	int err;
++
++	err = hinic3_configure_txqs(netdev, q_params->num_qps,
++				    q_params->sq_depth, q_params->txqs_res);
++	if (err) {
++		netdev_err(netdev, "Failed to configure txqs\n");
++		return err;
++	}
++
++	err = hinic3_configure_rxqs(netdev, q_params->num_qps,
++				    q_params->rq_depth, q_params->rxqs_res);
++	if (err) {
++		netdev_err(netdev, "Failed to configure rxqs\n");
++		return err;
++	}
++
++	return 0;
++}
++
++static int hinic3_configure(struct net_device *netdev)
++{
++	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
++	int err;
++
++	netdev->min_mtu = HINIC3_MIN_MTU_SIZE;
++	netdev->max_mtu = HINIC3_MAX_JUMBO_FRAME_SIZE;
++	err = hinic3_set_port_mtu(netdev, netdev->mtu);
++	if (err) {
++		netdev_err(netdev, "Failed to set mtu\n");
++		return err;
++	}
++
++	/* Ensure DCB is disabled */
++	hinic3_sync_dcb_state(nic_dev->hwdev, 1, 0);
++
++	return 0;
++}
++
+ static int hinic3_alloc_channel_resources(struct net_device *netdev,
+ 					  struct hinic3_dyna_qp_params *qp_params,
+ 					  struct hinic3_dyna_txrxq_params *trxq_params)
+@@ -238,14 +279,29 @@ static int hinic3_open_channel(struct net_device *netdev)
+ 		return err;
+ 	}
+ 
++	err = hinic3_configure_txrxqs(netdev, &nic_dev->q_params);
++	if (err) {
++		netdev_err(netdev, "Failed to configure txrxqs\n");
++		goto err_free_qp_ctxts;
++	}
++
+ 	err = hinic3_qps_irq_init(netdev);
+ 	if (err) {
+ 		netdev_err(netdev, "Failed to init txrxq irq\n");
+ 		goto err_free_qp_ctxts;
+ 	}
+ 
++	err = hinic3_configure(netdev);
++	if (err) {
++		netdev_err(netdev, "Failed to init txrxq irq\n");
++		goto err_uninit_qps_irq;
++	}
++
+ 	return 0;
+ 
++err_uninit_qps_irq:
++	hinic3_qps_irq_uninit(netdev);
++
+ err_free_qp_ctxts:
+ 	hinic3_free_qp_ctxts(nic_dev);
+ 
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
+index 4a3dd859fcc9..8f9c806681ef 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
+@@ -290,3 +290,28 @@ int hinic3_force_drop_tx_pkt(struct hinic3_hwdev *hwdev)
+ 
+ 	return pkt_drop.msg_head.status;
+ }
++
++int hinic3_sync_dcb_state(struct hinic3_hwdev *hwdev, u8 op_code, u8 state)
++{
++	struct l2nic_cmd_set_dcb_state dcb_state = {};
++	struct mgmt_msg_params msg_params = {};
++	int err;
++
++	dcb_state.op_code = op_code;
++	dcb_state.state = state;
++	dcb_state.func_id = hinic3_global_func_id(hwdev);
++
++	mgmt_msg_params_init_default(&msg_params, &dcb_state,
++				     sizeof(dcb_state));
++
++	err = hinic3_send_mbox_to_mgmt(hwdev, MGMT_MOD_L2NIC,
++				       L2NIC_CMD_QOS_DCB_STATE, &msg_params);
++	if (err || dcb_state.head.status) {
++		dev_err(hwdev->dev,
++			"Failed to set dcb state, err: %d, status: 0x%x\n",
++			err, dcb_state.head.status);
++		return -EFAULT;
++	}
++
++	return 0;
++}
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h
+index dd1615745f02..719b81e2bc2a 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h
+@@ -52,4 +52,6 @@ int hinic3_set_ci_table(struct hinic3_hwdev *hwdev,
+ 			struct hinic3_sq_attr *attr);
+ int hinic3_force_drop_tx_pkt(struct hinic3_hwdev *hwdev);
+ 
++int hinic3_sync_dcb_state(struct hinic3_hwdev *hwdev, u8 op_code, u8 state);
++
+ #endif
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_rx.c b/drivers/net/ethernet/huawei/hinic3/hinic3_rx.c
+index 56135d0dd0c4..7b565ffbf352 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_rx.c
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_rx.c
+@@ -91,6 +91,27 @@ static int rx_alloc_mapped_page(struct page_pool *page_pool,
+ 	return 0;
+ }
+ 
++/* Associate fixed completion element to every wqe in the rq. Every rq wqe will
++ * always post completion to the same place.
++ */
++static void rq_associate_cqes(struct hinic3_rxq *rxq)
++{
++	struct hinic3_queue_pages *qpages;
++	struct hinic3_rq_wqe *rq_wqe;
++	dma_addr_t cqe_dma;
++	u32 i;
++
++	qpages = &rxq->rq->wq.qpages;
++
++	for (i = 0; i < rxq->q_depth; i++) {
++		rq_wqe = get_q_element(qpages, i, NULL);
++		cqe_dma = rxq->cqe_start_paddr +
++			  i * sizeof(struct hinic3_rq_cqe);
++		rq_wqe->cqe_hi_addr = cpu_to_le32(upper_32_bits(cqe_dma));
++		rq_wqe->cqe_lo_addr = cpu_to_le32(lower_32_bits(cqe_dma));
++	}
++}
++
+ static void rq_wqe_buf_set(struct hinic3_io_queue *rq, uint32_t wqe_idx,
+ 			   dma_addr_t dma_addr, u16 len)
+ {
+@@ -451,6 +472,49 @@ void hinic3_free_rxqs_res(struct net_device *netdev, u16 num_rq,
+ 	}
+ }
+ 
++int hinic3_configure_rxqs(struct net_device *netdev, u16 num_rq,
++			  u32 rq_depth, struct hinic3_dyna_rxq_res *rxqs_res)
++{
++	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
++	struct hinic3_dyna_rxq_res *rqres;
++	struct msix_entry *msix_entry;
++	struct hinic3_rxq *rxq;
++	u16 q_id;
++	u32 pkts;
++
++	for (q_id = 0; q_id < num_rq; q_id++) {
++		rxq = &nic_dev->rxqs[q_id];
++		rqres = &rxqs_res[q_id];
++		msix_entry = &nic_dev->qps_msix_entries[q_id];
++
++		rxq->irq_id = msix_entry->vector;
++		rxq->msix_entry_idx = msix_entry->entry;
++		rxq->next_to_update = 0;
++		rxq->next_to_alloc = rqres->next_to_alloc;
++		rxq->q_depth = rq_depth;
++		rxq->delta = rxq->q_depth;
++		rxq->q_mask = rxq->q_depth - 1;
++		rxq->cons_idx = 0;
++
++		rxq->cqe_arr = rqres->cqe_start_vaddr;
++		rxq->cqe_start_paddr = rqres->cqe_start_paddr;
++		rxq->rx_info = rqres->rx_info;
++		rxq->page_pool = rqres->page_pool;
++
++		rxq->rq = &nic_dev->nic_io->rq[rxq->q_id];
++
++		rq_associate_cqes(rxq);
++
++		pkts = hinic3_rx_fill_buffers(rxq);
++		if (!pkts) {
++			netdev_err(netdev, "Failed to fill Rx buffer\n");
++			return -ENOMEM;
++		}
++	}
++
++	return 0;
++}
++
+ int hinic3_rx_poll(struct hinic3_rxq *rxq, int budget)
+ {
+ 	struct hinic3_nic_dev *nic_dev = netdev_priv(rxq->netdev);
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_rx.h b/drivers/net/ethernet/huawei/hinic3/hinic3_rx.h
+index 20c1b21e2b79..3147a4669bda 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_rx.h
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_rx.h
+@@ -97,6 +97,8 @@ int hinic3_alloc_rxqs_res(struct net_device *netdev, u16 num_rq,
+ 			  u32 rq_depth, struct hinic3_dyna_rxq_res *rxqs_res);
+ void hinic3_free_rxqs_res(struct net_device *netdev, u16 num_rq,
+ 			  u32 rq_depth, struct hinic3_dyna_rxq_res *rxqs_res);
++int hinic3_configure_rxqs(struct net_device *netdev, u16 num_rq,
++			  u32 rq_depth, struct hinic3_dyna_rxq_res *rxqs_res);
+ int hinic3_rx_poll(struct hinic3_rxq *rxq, int budget);
+ 
+ #endif
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c b/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
+index 14ea34f3893e..92c43c05e3f2 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
+@@ -704,6 +704,38 @@ void hinic3_free_txqs_res(struct net_device *netdev, u16 num_sq,
+ 	}
+ }
+ 
++int hinic3_configure_txqs(struct net_device *netdev, u16 num_sq,
++			  u32 sq_depth, struct hinic3_dyna_txq_res *txqs_res)
++{
++	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
++	struct hinic3_dyna_txq_res *tqres;
++	struct hinic3_txq *txq;
++	u16 q_id;
++	u32 idx;
++
++	for (q_id = 0; q_id < num_sq; q_id++) {
++		txq = &nic_dev->txqs[q_id];
++		tqres = &txqs_res[q_id];
++
++		txq->q_depth = sq_depth;
++		txq->q_mask = sq_depth - 1;
++
++		txq->tx_stop_thrs = min(HINIC3_DEFAULT_STOP_THRS,
++					sq_depth / 20);
++		txq->tx_start_thrs = min(HINIC3_DEFAULT_START_THRS,
++					 sq_depth / 10);
++
++		txq->tx_info = tqres->tx_info;
++		for (idx = 0; idx < sq_depth; idx++)
++			txq->tx_info[idx].dma_info =
++				&tqres->bds[idx * HINIC3_BDS_PER_SQ_WQEBB];
++
++		txq->sq = &nic_dev->nic_io->sq[q_id];
++	}
++
++	return 0;
++}
++
+ bool hinic3_tx_poll(struct hinic3_txq *txq, int budget)
+ {
+ 	struct net_device *netdev = txq->netdev;
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_tx.h b/drivers/net/ethernet/huawei/hinic3/hinic3_tx.h
+index 9ec6968b6688..7e1b872ba752 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_tx.h
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_tx.h
+@@ -137,6 +137,8 @@ int hinic3_alloc_txqs_res(struct net_device *netdev, u16 num_sq,
+ 			  u32 sq_depth, struct hinic3_dyna_txq_res *txqs_res);
+ void hinic3_free_txqs_res(struct net_device *netdev, u16 num_sq,
+ 			  u32 sq_depth, struct hinic3_dyna_txq_res *txqs_res);
++int hinic3_configure_txqs(struct net_device *netdev, u16 num_sq,
++			  u32 sq_depth, struct hinic3_dyna_txq_res *txqs_res);
+ 
+ netdev_tx_t hinic3_xmit_frame(struct sk_buff *skb, struct net_device *netdev);
+ bool hinic3_tx_poll(struct hinic3_txq *txq, int budget);
+-- 
+2.43.0
 
 
