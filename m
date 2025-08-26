@@ -1,109 +1,167 @@
-Return-Path: <netdev+bounces-216771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F14A9B3518D
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 04:22:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2141FB35193
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 04:24:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B45263AEAA6
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 02:22:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB2C63AC79B
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 02:24:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40BE8215077;
-	Tue, 26 Aug 2025 02:22:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A65BD213254;
+	Tue, 26 Aug 2025 02:24:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lsFB/2yS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Br2rGx3W"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A381961FCE;
-	Tue, 26 Aug 2025 02:22:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDAA71A08AF;
+	Tue, 26 Aug 2025 02:24:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756174937; cv=none; b=SUg4TQeb3kQq8rJjdy4x2mY9B6fGy+2gGLWSi1t/bYAZOAouoah4samyQUfjQWHKZRkjQKQCozgbqtbMTsxrSoE/2LIEvPjVaTPD1u8ekNz/4MFfF3wqSJZD73BU3wqw233PqZWeBluD1eDVUVPxN67H2Hber5Nxl8gZAXk0o24=
+	t=1756175045; cv=none; b=iVnxWUt7ObWlbxKLf8ORKjjJ6N/YVLeBp5IpCN5FdanWolKltWDgLm5Cg18CIuymx0G/v+k0REeI2khPjNxKEAVU4p6E6Bl8PROiwt/P3wGrqAVPztuGJzaYxG1nE4H/WRNHILpThrTvofHabk6qePZoEZ94o0OZHxPh0stC+Co=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756174937; c=relaxed/simple;
-	bh=tmT/tLAdcoowbyD+cIQdPgCED88KbN3cZAQcTx5kPnk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ou2dj47YvIcR8l7LXC7FDQNMP7gBqyKOPxmRe3keZCWsdCplFf2itlb7yatrPMNhY0N/3L+DrUV4nW9AEQSnlCTTcm+5c2Rl64ml4njlPOs3wzJBrN31/kmy9u6XDp6orMaDWrUC9qAlTc/5ZavW1htcvTn4Yf8npuItAgIhuOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=lsFB/2yS; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=g3/SB8WVXUI9MW5KiqhvBEppVZwamrXCShDQl7NKXqU=; b=lsFB/2ySab8xzmslwml7+LxKRV
-	GXfCIehZvf1IHYXp6XeSx6v2zDPbK/um552AljNY2OS07OgrmcHCQqnlDT7XPi4mEpBWTgGUdHDVD
-	viorhoS5eYgoszCjltQ+XwCcSfZv0GeL1spHRo+rHx95NXrG247x0KQqyn0y04LyIzaM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uqjJz-0061ZI-SP; Tue, 26 Aug 2025 04:22:03 +0200
-Date: Tue, 26 Aug 2025 04:22:03 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: "robh@kernel.org" <robh@kernel.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
-	Frank Li <frank.li@nxp.com>,
-	"shawnguo@kernel.org" <shawnguo@kernel.org>,
-	"s.hauer@pengutronix.de" <s.hauer@pengutronix.de>,
-	"festevam@gmail.com" <festevam@gmail.com>,
-	"F.S. Peng" <fushi.peng@nxp.com>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>,
-	"kernel@pengutronix.de" <kernel@pengutronix.de>
-Subject: Re: [PATCH v5 net-next 08/15] ptp: netc: add debugfs support to loop
- back pulse signal
-Message-ID: <bb07efd0-d429-4fe0-bb55-b50b77e1cf88@lunn.ch>
-References: <20250825041532.1067315-1-wei.fang@nxp.com>
- <20250825041532.1067315-9-wei.fang@nxp.com>
- <13c4fe5a-878c-4a08-87df-f5bb96f0b589@lunn.ch>
- <AM9PR04MB85057F4330081C86176805E78839A@AM9PR04MB8505.eurprd04.prod.outlook.com>
+	s=arc-20240116; t=1756175045; c=relaxed/simple;
+	bh=IyryyYq9LIyTXnCp4o750OCcSejlmku3y6BBodY9pAs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PT6zVCbnCIYsRNAXh2QiNfy+s6o+ZmJyEtoeews4uh9yUXkAff2EIctXxBTysP+/nR8gbg4eKUPOiHhp1i3XffY6Pu7Bn74U0b7LdvbgGqhpnQIItqEpUbXUsExe38Qz4cOF8b3CddvPmjPByZvhBY06gEct2zQ2s9kEcRVjGGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Br2rGx3W; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-45a1b04f8b5so30998625e9.1;
+        Mon, 25 Aug 2025 19:24:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756175042; x=1756779842; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Nnw5Io3YoXIrEN5f5+9xJT+J+1J+f3588PWlwvqSRJU=;
+        b=Br2rGx3WrXpr7uVR/ccE6zYtDvDTNzDY6kMk11bTzEMxuoDdmGaFcgBK8W3TQuGXQy
+         rAsDq2snPvwYL6GCRJIXLz6MbRIM3XSTFaoEHCSoJ07V7B/jx7YAUTKfjNkaA9FcQ8va
+         qlLG8/HZ9X2XZhiuCc0/hWPtSdSd1Apl58zmr4bImvo5WqmP66z+OOdzOvJ2gXpR+sKS
+         a2dMZiHLvFLz64a7BkQl9p5CLV2GgECHYTcF+vpOjQwKGCM2xg1d6oMVGF/uPZjzFKCw
+         jzLiXm37BR+o7bb2C4ZbMU0scuzkmbeBTCXdjHS1/OlG3bNhbiL4Iu3lh1M4ZFwWmBKr
+         JJBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756175042; x=1756779842;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Nnw5Io3YoXIrEN5f5+9xJT+J+1J+f3588PWlwvqSRJU=;
+        b=tmqJSTa2pgLA61Sr6RhkFhY1PSvfWhOgybfJmN4qHyzGemcCEAbXQdiAVxAC9qF0J2
+         GGhl8G/YhT4FR6Hjf3mDXuG0RnjG/pb2hvYwCgxczKMk145Pg16v4SNbpWJBiE1PpHre
+         Our70HaPWB4OzteqQsLClI3Mt3gYh7uGMSLktEkpH28ZKqiOjA0N1n6sPIRmn3yD5pW0
+         PVAo/BtrbC/M1RTLi5Ffx3yzs+PLTqaP/K3U4r8JMLMGYBbfQy8uYNdcEWKJpyOtRMy8
+         n9X3KvmV6Hf9PnEFah6F/qDNfroCCv8kSj9eN6JwUIHf9acFwLFBr7+CndVpcNgZZmRZ
+         Yl6w==
+X-Forwarded-Encrypted: i=1; AJvYcCUX5B59dqHLOMvuLpuQXNAeqrk3DDbekCIRj1pIqd5NrFWX+yclQznyQXhOkIqGSgcoIVeSS+86@vger.kernel.org, AJvYcCWBQetUP521fFu8RGxfOk9YTSPHl9+RH6TNERgJUUSrxS+Vu27DfGNNH/2tFX4N36h0n68=@vger.kernel.org, AJvYcCXMLnCBDGQqchFdSmorHxmDkDqQV/CML/RdT0g/fCyeWShbt7KwCFmWVaUXtobOv2REasBwXMR75c5Gq3cX@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2PvJ4ETOJiWRCMhlSHFadjfSIAtAd5tzG+Ew2JkUjN8IuA7m4
+	h+taLF2JShWd9DncgTAtfZaq0VHFB/1cI9sJ8DTHLYjSEILbgRsG2UAikefDjVP+Q9Up7FDSD9T
+	I+n4aCeZ+HLe13UOZZ8UVa471mCJybG8=
+X-Gm-Gg: ASbGncs0Uj4/wKvyXLQ8TxZdEMcgKZDbBg9GJCTrT1T57GazI4ZgdJMxsFxBYvS6o7g
+	/pVyifP+s/oN+yb45GjCMxxmP43tmjxiJkChqTAuVYiox/B6nLDFfH14ZIhIued0THAwPl7BopV
+	1r+h6IlbqVc/4my9vqF9HB6Q834DcBsULgUEkZRHXxAk//9e9Gw+Z/THlYK7/5w6a9PmR1Vz03H
+	3j8nsKKD676ABoBO05/hYeeuglevWn0E8g8bfrhkimqAs8=
+X-Google-Smtp-Source: AGHT+IG5ssaQcamDRDWmXnILVYwRUi/oBBKimzvnLH92kL1Jx4ptCMX3SUD+IGckg91A6UO7P/m8ZlV09CZ0UOcsnBQ=
+X-Received: by 2002:a05:600c:314f:b0:456:191b:9e8d with SMTP id
+ 5b1f17b1804b1-45b5179f5admr114139635e9.11.1756175042128; Mon, 25 Aug 2025
+ 19:24:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AM9PR04MB85057F4330081C86176805E78839A@AM9PR04MB8505.eurprd04.prod.outlook.com>
+References: <68ac9fd3.050a0220.37038e.0096.GAE@google.com> <50f069c5-d962-4743-a8b0-dc1bc4811599@gmail.com>
+In-Reply-To: <50f069c5-d962-4743-a8b0-dc1bc4811599@gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Mon, 25 Aug 2025 19:23:50 -0700
+X-Gm-Features: Ac12FXxBFqcbocd5P_A4HYBlTVL4Nf-8_zzEQxpfVAjmi095qFKuKSBMMPJ8v1o
+Message-ID: <CAADnVQ+p76vYLjs9zivq694PSqiPPjv7LJOSXCHsLGuMwgG1jw@mail.gmail.com>
+Subject: Re: [syzbot] [bpf?] possible deadlock in __bpf_ringbuf_reserve (2)
+To: Leon Hwang <hffilwlqm@gmail.com>
+Cc: syzbot <syzbot+fa5c2814795b5adca240@syzkaller.appspotmail.com>, 
+	Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Eduard <eddyz87@gmail.com>, Hao Luo <haoluo@google.com>, 
+	John Fastabend <john.fastabend@gmail.com>, Jiri Olsa <jolsa@kernel.org>, 
+	KP Singh <kpsingh@kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Network Development <netdev@vger.kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Song Liu <song@kernel.org>, 
+	syzkaller-bugs <syzkaller-bugs@googlegroups.com>, Yonghong Song <yonghong.song@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 26, 2025 at 01:50:06AM +0000, Wei Fang wrote:
-> > On Mon, Aug 25, 2025 at 12:15:25PM +0800, Wei Fang wrote:
-> > > The NETC Timer supports to loop back the output pulse signal of Fiper-n
-> > > into Trigger-n input, so that we can leverage this feature to validate
-> > > some other features without external hardware support.
-> > 
-> > This seems like it should be a common feature which more PTP clocks
-> > will support? Did you search around and see if there are other devices
-> > with this?
-> 
-> Actually, the NETC v4 Timer is the same IP used in the QorIQ platforms,
-> but it is a different version, and the ptp_qoriq driver is not compatible
-> with NETC v4 Timer, I have stated in the patch ("ptp: netc: add NETC V4
-> Timer PTP driver support").
+On Mon, Aug 25, 2025 at 7:20=E2=80=AFPM Leon Hwang <hffilwlqm@gmail.com> wr=
+ote:
+>
+>
+>
+> On 26/8/25 01:39, syzbot wrote:
+> > Hello,
+> >
+> > syzbot found the following issue on:
+> >
+> > HEAD commit:    dd9de524183a xsk: Fix immature cq descriptor production
+> > git tree:       bpf
+> > console output: https://syzkaller.appspot.com/x/log.txt?x=3D102da862580=
+000
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dc321f33e454=
+5e2a1
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=3Dfa5c2814795b5=
+adca240
+> > compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6=
+049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D142da8625=
+80000
+> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D1588aef0580=
+000
+> >
+> > Downloadable assets:
+> > disk image: https://storage.googleapis.com/syzbot-assets/5a3389c1558f/d=
+isk-dd9de524.raw.xz
+> > vmlinux: https://storage.googleapis.com/syzbot-assets/c97133192a27/vmli=
+nux-dd9de524.xz
+> > kernel image: https://storage.googleapis.com/syzbot-assets/3ae5a1a88637=
+/bzImage-dd9de524.xz
+> >
+> > IMPORTANT: if you fix the issue, please add the following tag to the co=
+mmit:
+> > Reported-by: syzbot+fa5c2814795b5adca240@syzkaller.appspotmail.com
+> >
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > WARNING: possible recursive locking detected
+> > syzkaller #0 Not tainted
+> > --------------------------------------------
+> > syz-execprog/5866 is trying to acquire lock:
+> > ffffc900048c10d8 (&rb->spinlock){-.-.}-{2:2}, at: __bpf_ringbuf_reserve=
++0x1c7/0x5a0 kernel/bpf/ringbuf.c:423
+> >
+> > but task is already holding lock:
+> > ffffc900048e90d8 (&rb->spinlock){-.-.}-{2:2}, at: __bpf_ringbuf_reserve=
++0x1c7/0x5a0 kernel/bpf/ringbuf.c:423
+> >
+> > other info that might help us debug this:
+> >  Possible unsafe locking scenario:
+> >
+> >        CPU0
+> >        ----
+> >   lock(&rb->spinlock);
+> >   lock(&rb->spinlock);
+> >
+> >  *** DEADLOCK ***
+> >
+> >  May be due to missing lock nesting notation
+>
+> Confirmed.
+>
+> I can reproduce this deadlock issue and will work on a fix.
 
-That does not answer my question. Does Marvell have this loopback
-concept? Intel? Freescale? Microchip? Is there anything which prevents
-other vendors implementing it?
+Don't.
 
-	Andrew
-
+It's due to revert.
+Once rqspinlock is fixed the revert will be reverted.
 
