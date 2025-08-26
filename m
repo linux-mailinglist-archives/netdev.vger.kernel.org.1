@@ -1,137 +1,179 @@
-Return-Path: <netdev+bounces-216860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E068B35885
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 11:17:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 535E5B358C8
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 11:25:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 287991886111
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 09:16:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA63A165022
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 09:25:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA49D306D57;
-	Tue, 26 Aug 2025 09:14:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54F5E308F2F;
+	Tue, 26 Aug 2025 09:25:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="2PdBgyoO"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="FRQv3YmS"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 391882FE069;
-	Tue, 26 Aug 2025 09:14:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A06F27FD75;
+	Tue, 26 Aug 2025 09:25:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756199691; cv=none; b=afpcio4jFrfT8dAq8iqupr75CtI2r4vvA7RYTVXmV/7cTrdId1M3pCmUPpYb9FjKQa/P5Q1+9mnsqKrnnaAdjKNxeQu1wS8xdjEOqQ54PZjq+U7UXzz+Wy/ZjKNRugbKbYm5tWvz4v+d8j7wULCLIbspbt4mdtbmoozt7Bdew0I=
+	t=1756200332; cv=none; b=qxlig5e9Z5D9PejFuhZcI++OgMzmxTL897JmbHU0QSbjpy7DmpbOHjAxLDbQItocbspzrL9X3UvN1Jv5kdxispOCADbSkM1JR07UtrQUVpK65ZtoHCOmPZZMg0YJdExRdYOZFh0/KiF4wHxJ4v0vqQ9NXtRwiLtB8cgrHgTEaCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756199691; c=relaxed/simple;
-	bh=Lxn6j1kzDkH/WTga4d/2k5vCxhia+Sp6of3N/hIKY/s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=sJildRD5ULu5Y38MAJ9Yi1qcvhhW7XxxGkHTW3GdFu/p9x7A+ziULO5Jp4oeS5UjozAk6YJnsaOWc3d1ATrqgc3TxrFLdao+ShMi5cChg3uAPmUFf4vn4aGC9Lfb4oVsEKwb4VFhRcw5RM4uJUO8o4O8D3SoDjgQ5u3DogEH7Fg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=2PdBgyoO; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1756199690; x=1787735690;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Lxn6j1kzDkH/WTga4d/2k5vCxhia+Sp6of3N/hIKY/s=;
-  b=2PdBgyoOHoV6cSjJpGWLXaXxW7Vezpp3hUiDEH8DGKYCAXK5f23ZuJA7
-   sYUJKLxGrXlSdVb8LRKRDgihmyOUplqjMWQvLq5qUGvH0hcIcsrNm4Bkz
-   c56vN3XS2M3ZcezIO0dm0p+Xy+/hTMasB57sKcA/2hgcTjI7xGQitQ1C7
-   GQ5AVuz7Y7P7uxgln1HgZk7SzMjfNrKSI6mawan+MZnS4BBYr8lA1ksRH
-   HKI2fHiCFmX0zWdMQxeqNqgUScIg+hgovPNgk1ANRS1suU69nW2otoRqT
-   MG1fhAy9m/5gmDDYIcYEMLbWhrRw9hfdKpP8lxjSWC2pdhFMSquCi8inw
-   A==;
-X-CSE-ConnectionGUID: oz5noQKVS6yv1ppRAce+jQ==
-X-CSE-MsgGUID: k1iAyTw3SpukqoVYCbsjww==
-X-IronPort-AV: E=Sophos;i="6.18,214,1751266800"; 
-   d="scan'208";a="213074774"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Aug 2025 02:14:48 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
- chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Tue, 26 Aug 2025 02:14:23 -0700
-Received: from [10.159.245.205] (10.10.85.11) by chn-vm-ex02.mchp-main.com
- (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
- Transport; Tue, 26 Aug 2025 02:14:19 -0700
-Message-ID: <3bccf773-abd6-4ade-a1c5-99f2a773b723@microchip.com>
-Date: Tue, 26 Aug 2025 11:14:18 +0200
+	s=arc-20240116; t=1756200332; c=relaxed/simple;
+	bh=Yd4oUhWia/XMLxKUHIEQXnM6Wzj7DtcAaAJgjlj1CjM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R8495oBYe1NQqKXlGEgiDMtfT26IvGwBO43zr0kzlTeTCup4SXBEh7f1Gb8hjy9+AbxLgCO/1EEUrBbEex+j/PEnxEwn4mk0DCqq5xWYFFKoJgApnWyy7bjU3EZgIVUY6koqQbVjYN22+rHKx8r0I9rgHE1ngUdbtePLbhWiU8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=FRQv3YmS; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=EZLmmxLsJLc5gk0wgGNitzJFT6rBOeESCPORDcRzzpg=; b=FRQv3YmSJgzipze9JFAMvq5qaC
+	V+BTLxR6lVRumi2AL350wCzKmYriTjqDERiPQ8fkSOaWtjnf96MWR9yPaq1moY8E4L25h9oVBja1U
+	4OBeidVNFkPVGjsDFObo2qaXiuW33nT3kXqrox3kqzJqf2cnlOVokin8LljE+xdW0idr0Q5GLpNn6
+	Arz2vEN6a0tlpRggAplvBJwn2GjUO6NHqyB23Ea/i3VgpCPO2VWnxbjiE3mMvrieDsXiZogBpRsBz
+	iXcGxvpU2GJPFL5VATHFIoU8FeqZlH7eknIg1AyGmF+esZcv8Q6re+A2HSTJb7ZhD1y51p9xyoiNP
+	VFhdIK0g==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51124)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uqpvQ-000000007eE-0erY;
+	Tue, 26 Aug 2025 10:25:08 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uqpvJ-0000000017V-3YDI;
+	Tue, 26 Aug 2025 10:25:01 +0100
+Date: Tue, 26 Aug 2025 10:25:01 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Chaoyi Chen <chaoyi.chen@rock-chips.com>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
+	Chaoyi Chen <kernel@airkyi.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jonas Karlman <jonas@kwiboo.se>, David Wu <david.wu@rock-chips.com>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-rockchip@lists.infradead.org
+Subject: Re: [PATCH net-next v3] net: ethernet: stmmac: dwmac-rk: Make the
+ clk_phy could be used for external phy
+Message-ID: <aK19bSmrbXjoVXdO@shell.armlinux.org.uk>
+References: <20250815023515.114-1-kernel@airkyi.com>
+ <CGME20250825072312eucas1p2d4751199c0ea069c7938218be60e5e93@eucas1p2.samsung.com>
+ <a30a8c97-6b96-45ba-bad7-8a40401babc2@samsung.com>
+ <d0fe6d16-181f-4b38-9457-1099fb6419d0@rock-chips.com>
+ <809848c9-2ffa-4743-adda-b8b714b404de@samsung.com>
+ <aKxnHFSrVeM7Be5A@shell.armlinux.org.uk>
+ <8240a3cc-aade-40d8-b2f4-09681f76be68@rock-chips.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/5] net: cadence: macb: Set upper 32bits of DMA ring
- buffer
-To: Jakub Kicinski <kuba@kernel.org>, Stanimir Varbanov <svarbanov@suse.de>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-rpi-kernel@lists.infradead.org>, Broadcom internal kernel review list
-	<bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Florian
- Fainelli <florian.fainelli@broadcom.com>, Andrea della Porta
-	<andrea.porta@suse.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, Phil
- Elwell <phil@raspberrypi.com>, Jonathan Bell <jonathan@raspberrypi.com>, Dave
- Stevenson <dave.stevenson@raspberrypi.com>, <stable@vger.kernel.org>, Andrew
- Lunn <andrew@lunn.ch>, =?UTF-8?Q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-References: <20250822093440.53941-1-svarbanov@suse.de>
- <20250822093440.53941-2-svarbanov@suse.de>
- <20250825165310.64027275@kernel.org>
-From: Nicolas Ferre <nicolas.ferre@microchip.com>
-Content-Language: en-US, fr
-Organization: microchip
-In-Reply-To: <20250825165310.64027275@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <8240a3cc-aade-40d8-b2f4-09681f76be68@rock-chips.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 26/08/2025 at 01:53, Jakub Kicinski wrote:
-> On Fri, 22 Aug 2025 12:34:36 +0300 Stanimir Varbanov wrote:
->> In case of rx queue reset and 64bit capable hardware, set the upper
->> 32bits of DMA ring buffer address.
->>
->> Cc: stable@vger.kernel.org # v4.6+
->> Fixes: 9ba723b081a2 ("net: macb: remove BUG_ON() and reset the queue to handle RX errors")
->> Credits-to: Phil Elwell <phil@raspberrypi.com>
->> Credits-to: Jonathan Bell <jonathan@raspberrypi.com>
->> Signed-off-by: Stanimir Varbanov <svarbanov@suse.de>
->> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+On Tue, Aug 26, 2025 at 04:08:40PM +0800, Chaoyi Chen wrote:
+> Hi Russell,
 > 
->> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
->> index ce95fad8cedd..36717e7e5811 100644
->> --- a/drivers/net/ethernet/cadence/macb_main.c
->> +++ b/drivers/net/ethernet/cadence/macb_main.c
->> @@ -1634,7 +1634,11 @@ static int macb_rx(struct macb_queue *queue, struct napi_struct *napi,
->>                macb_writel(bp, NCR, ctrl & ~MACB_BIT(RE));
->>
->>                macb_init_rx_ring(queue);
->> -             queue_writel(queue, RBQP, queue->rx_ring_dma);
->> +             queue_writel(queue, RBQP, lower_32_bits(queue->rx_ring_dma));
->> +#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
->> +             if (bp->hw_dma_cap & HW_DMA_CAP_64B)
->> +                     macb_writel(bp, RBQPH, upper_32_bits(queue->rx_ring_dma));
->> +#endif
->>
->>                macb_writel(bp, NCR, ctrl | MACB_BIT(RE));
->>
+> On 8/25/2025 9:37 PM, Russell King (Oracle) wrote:
+> > On Mon, Aug 25, 2025 at 12:53:37PM +0200, Marek Szyprowski wrote:
+> > > On 25.08.2025 11:57, Chaoyi Chen wrote:
+> > > > On 8/25/2025 3:23 PM, Marek Szyprowski wrote:
+> > > > > On 15.08.2025 04:35, Chaoyi Chen wrote:
+> > > > > > From: Chaoyi Chen <chaoyi.chen@rock-chips.com>
+> > > > > > 
+> > > > > > For external phy, clk_phy should be optional, and some external phy
+> > > > > > need the clock input from clk_phy. This patch adds support for setting
+> > > > > > clk_phy for external phy.
+> > > > > > 
+> > > > > > Signed-off-by: David Wu <david.wu@rock-chips.com>
+> > > > > > Signed-off-by: Chaoyi Chen <chaoyi.chen@rock-chips.com>
+> > > > > > ---
+> > > > > > 
+> > > > > > Changes in v3:
+> > > > > > - Link to V2:
+> > > > > > https://lore.kernel.org/netdev/20250812012127.197-1-kernel@airkyi.com/
+> > > > > > - Rebase to net-next/main
+> > > > > > 
+> > > > > > Changes in v2:
+> > > > > > - Link to V1:
+> > > > > > https://lore.kernel.org/netdev/20250806011405.115-1-kernel@airkyi.com/
+> > > > > > - Remove get clock frequency from DT prop
+> > > > > > 
+> > > > > >  †† drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 11 +++++++----
+> > > > > >  †† 1 file changed, 7 insertions(+), 4 deletions(-)
+> > > > > > 
+> > > > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> > > > > > b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> > > > > > index ac8288301994..5d921e62c2f5 100644
+> > > > > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> > > > > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> > > > > > @@ -1412,12 +1412,15 @@ static int rk_gmac_clk_init(struct
+> > > > > > plat_stmmacenet_data *plat)
+> > > > > >  †††††††††† clk_set_rate(plat->stmmac_clk, 50000000);
+> > > > > >  †††††† }
+> > > > > >  †† -††† if (plat->phy_node && bsp_priv->integrated_phy) {
+> > > > > > +††† if (plat->phy_node) {
+> > > > > >  †††††††††† bsp_priv->clk_phy = of_clk_get(plat->phy_node, 0);
+> > > > > >  †††††††††† ret = PTR_ERR_OR_ZERO(bsp_priv->clk_phy);
+> > > > > > -††††††† if (ret)
+> > > > > > -††††††††††† return dev_err_probe(dev, ret, "Cannot get PHY clock\n");
+> > > > > > -††††††† clk_set_rate(bsp_priv->clk_phy, 50000000);
+> > > > > > +††††††† /* If it is not integrated_phy, clk_phy is optional */
+> > > > > > +††††††† if (bsp_priv->integrated_phy) {
+> > > > > > +††††††††††† if (ret)
+> > > > > > +††††††††††††††† return dev_err_probe(dev, ret, "Cannot get PHY
+> > > > > > clock\n");
+> > > > > > +††††††††††† clk_set_rate(bsp_priv->clk_phy, 50000000);
+> > > > > > +††††††† }
+> > > > I think† we should set bsp_priv->clk_phy to NULL here if we failed to
+> > > > get the clock.
+> > > > 
+> > > > Could you try this on your board? Thank you.
+> > > Right, the following change also fixes this issue:
+> > > 
+> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> > > b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> > > index 9fc41207cc45..2d19d48be01f 100644
+> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> > > @@ -1415,6 +1415,8 @@ static int rk_gmac_clk_init(struct
+> > > plat_stmmacenet_data *plat)
+> > >   ††††††† if (plat->phy_node) {
+> > >   ††††††††††††††† bsp_priv->clk_phy = of_clk_get(plat->phy_node, 0);
+> > >   ††††††††††††††† ret = PTR_ERR_OR_ZERO(bsp_priv->clk_phy);
+> > > +†††††††††††††† if (ret)
+> > > +†††††††††††††††††††††† bsp_priv->clk_phy = NULL;
+> > Or just:
+> > 
+> > 		clk = of_clk_get(plat->phy_node, 0);
+> > 		if (clk == ERR_PTR(-EPROBE_DEFER))
 > 
-> Looks like a subset of Th√©o Lebrun's work:
-> https://lore.kernel.org/all/20250820-macb-fixes-v4-0-23c399429164@bootlin.com/
-> let's wait for his patches to get merged instead?
+> Do we actually need this?†Maybe other devm_clk_get() before it would fail in advance.
 
-Yes, we can certainly wait. As RBOPH changes by Th√©o are key, they will 
-probably remove the need for this fix altogether: but I count on you 
-Stanimir to monitor that (as I don't have a 64 bit capable platform at 
-hand).
+Is it the same clock as devm_clk_get()? If it is, what's the point of
+getting it a second time. If it isn't, then it could be a different
+clock which may be yet to probe.
 
-Best regards,
-   Nicolas
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
