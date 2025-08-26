@@ -1,241 +1,193 @@
-Return-Path: <netdev+bounces-217018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28D5BB370F6
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 19:07:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE14AB37140
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 19:22:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 092341624ED
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 17:07:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB9901BA7A0B
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 17:22:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A42292DC35F;
-	Tue, 26 Aug 2025 17:07:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B40B52E2EE4;
+	Tue, 26 Aug 2025 17:22:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VhKLsoxy"
+	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="102IUmBb";
+	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="oE9ZWqIT"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807BB1993B9
-	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 17:06:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B59472E1EF2;
+	Tue, 26 Aug 2025 17:21:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756228020; cv=none; b=InNc84jbx35aoH/ekSfiP23sv13Hcml3zjQJNdaEUl+vz2oa8WudcqFnslEJEgSY+DQJVJ7jAod0SZLU+6G//h44rHB1tTqzRH6BnG/TxuqzC2oHoGIprl9plAOnIW3RpXOK/P7yh+2ONeP6U0P4BUx+GrSEKYZx1i3tjimlI+M=
+	t=1756228922; cv=none; b=IuqakYU1Xh9ylxk697FO4TRgldvhE562NlyyaFM2binY4KEyk44VFHw/2SRBb1uPq8dlTFEUPMtJu7UmJ+5DrUDTs0sdqxYMySUvZjxebOgega9bB0iDDuMYVM9wTKfJzSbFzaQI6mzn5ofcY5pMKtwds+3nAv+Px3L2jqgaxfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756228020; c=relaxed/simple;
-	bh=GvSTxOPtUE53lmjPHKq/RKUZcYoiENdRBWDD5/B3goo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Qc9IuLmOg7LI//ChbfM7FQmrtPDWSsATUlh63sCfVZb16t9lL5e8MiSur2NAHLLp+ipLabKH/BmTT/tM+U8KXqrVUUt+M6ZXYWOFjLzo39lz8lHM/1iipJutsyiGW9UuU5oZ233xeVWZxb/H8OjUo6zoCYb5YC4jSkvEqKC1kv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VhKLsoxy; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <53206f29-7da8-4145-aef0-7bdacef3bb55@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1756228006;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	s=arc-20240116; t=1756228922; c=relaxed/simple;
+	bh=SjBOXldlVtyTO1rVvTQT4inDDhNHA6OlzRlvyaHWM5w=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=BSgFT5GhBhXqJaUfyNMpGiBMGA1izaoCIYlAYm8bWm6TOBUyFfh3SIJe2KQGrPbUfwrwGI0hX+tPx6FyxK38mWMSXLp3dW2LOJ/rJTDu8oSFHVNvsIuAXCnV/NnQ3g4UJyHqji+NN0wLr6pp25B5tyZeqiWq3jCEPPGWQYfUHF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=102IUmBb; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=oE9ZWqIT; arc=none smtp.client-ip=160.80.4.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
+Received: from smtpauth-2019-1.uniroma2.it (smtpauth.uniroma2.it [160.80.5.46])
+	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 57QHLUUg014664;
+	Tue, 26 Aug 2025 19:21:36 +0200
+Received: from lubuntu-18.04 (unknown [160.80.103.126])
+	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id 8B3161203EC;
+	Tue, 26 Aug 2025 19:21:24 +0200 (CEST)
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
+	s=ed201904; t=1756228886; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=lUSGVh5t0eKmU5xZTYGVizH4JYXHlSf3+YcRJVZFWyI=;
-	b=VhKLsoxyO8361/XLlLzAej6W3Csm1Jsf54qsyRxP8Ju0DojLEXeTAMTX/H20GOI2/EEpQV
-	lFSY3Q/DG2Ja+WT2121VswyveUsnt561XxnfRBl4aJ0iKwijXqVYw2gcvawgr5Aitlwb+U
-	HQ4mYATwAL22bGt/+Il5Hd0X6+HtNAc=
-Date: Tue, 26 Aug 2025 18:06:42 +0100
+	bh=nRPnemMRjIqS8FLYYPeKQSBIW++wmsT0i3d527WY1QQ=;
+	b=102IUmBbew/idnRZVrXRcJobmTaRbZf3e7ywGOS3DVJKsjYUXYLjlCEVVIhxGOVXWX3WB4
+	aqZk76di7uZr7GBg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
+	t=1756228886; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nRPnemMRjIqS8FLYYPeKQSBIW++wmsT0i3d527WY1QQ=;
+	b=oE9ZWqITK6kmNw6wJvBabqgVC9BdeSk27UpSMn0CUew/4dj770o89XUX3FeHN8S9CveZXb
+	/gmBma5fSVGu7OtAoq3sLBxdHVIsJL9A/tQAQQGPuiG5KYzSducGmGBuzzSS3LsmUBzpeB
+	I8VvfJTJfs5N59w+yViL9Rn5id2q9vF87wCSSd7HvSS/gZnP4wxlEUbBlVJc320gsuhw3c
+	encQz+b5TT0JyJ+jIytiH7W8kK/m3AWwn5bcuFhuFyGM2+fWoOlHP8eixoQV0Z9qYFxH07
+	AqYpiY2+V/s4CDEiwWSah8g+t3sePrIL+z4KwC6gHcpaMgGSgNXlYxQhKi647A==
+Date: Tue, 26 Aug 2025 19:21:23 +0200
+From: Andrea Mayer <andrea.mayer@uniroma2.it>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, David Ahern
+ <dsahern@kernel.org>,
+        Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, Eric Biggers
+ <ebiggers@kernel.org>,
+        David Lebrun <dlebrun@google.com>,
+        Stefano Salsano
+ <stefano.salsano@uniroma2.it>,
+        Paolo Lungaroni
+ <paolo.lungaroni@uniroma2.it>,
+        Ahmed Abdelsalam <ahabdels.dev@gmail.com>, stable@vger.kernel.org,
+        Andrea Mayer <andrea.mayer@uniroma2.it>
+Subject: Re: [PATCH net] ipv6: sr: fix destroy of seg6_hmac_info to prevent
+ HMAC data leak
+Message-Id: <20250826192123.612cd0eabbbb57795a0bbdbc@uniroma2.it>
+In-Reply-To: <CANn89i+UTv8nJ=cc67iKky=MLXOnzF5XyVRsV-TMXz7wUQ6Yvw@mail.gmail.com>
+References: <20250825190715.1690-1-andrea.mayer@uniroma2.it>
+	<CANn89i+UTv8nJ=cc67iKky=MLXOnzF5XyVRsV-TMXz7wUQ6Yvw@mail.gmail.com>
+X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH net-next v01 10/12] hinic3: Add Rss function
-To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
- Bjorn Helgaas <helgaas@kernel.org>, luosifu <luosifu@huawei.com>,
- Xin Guo <guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>,
- Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
- Shi Jing <shijing34@huawei.com>, Meny Yossefi <meny.yossefi@huawei.com>,
- Gur Stavi <gur.stavi@huawei.com>, Lee Trager <lee@trager.us>,
- Michael Ellerman <mpe@ellerman.id.au>, Suman Ghosh <sumang@marvell.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-References: <cover.1756195078.git.zhuyikai1@h-partners.com>
- <13ffd1d836eb7aa6563ad93bf5fa5196afdf0053.1756195078.git.zhuyikai1@h-partners.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <13ffd1d836eb7aa6563ad93bf5fa5196afdf0053.1756195078.git.zhuyikai1@h-partners.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
+X-Virus-Status: Clean
 
-On 26/08/2025 10:05, Fan Gong wrote:
-> Initialize rss functions. Configure rss hash data and HW resources.
+On Mon, 25 Aug 2025 12:33:26 -0700
+Eric Dumazet <edumazet@google.com> wrote:
+
+> On Mon, Aug 25, 2025 at 12:08 PM Andrea Mayer <andrea.mayer@uniroma2.it> wrote:
+> >
+> > The seg6_hmac_info structure stores information related to SRv6 HMAC
+> > configurations, including the secret key, HMAC ID, and hashing algorithm
+> > used to authenticate and secure SRv6 packets.
+> >
+> > When a seg6_hmac_info object is no longer needed, it is destroyed via
+> > seg6_hmac_info_del(), which eventually calls seg6_hinfo_release(). This
+> > function uses kfree_rcu() to safely deallocate memory after an RCU grace
+> > period has elapsed.
+> > The kfree_rcu() releases memory without sanitization (e.g., zeroing out
+> > the memory). Consequently, sensitive information such as the HMAC secret
+> > and its length may remain in freed memory, potentially leading to data
+> > leaks.
+> >
+> > To address this risk, we replaced kfree_rcu() with a custom RCU
+> > callback, seg6_hinfo_free_callback_rcu(). Within this callback, we
+> > explicitly sanitize the seg6_hmac_info object before deallocating it
+> > safely using kfree_sensitive(). This approach ensures the memory is
+> > securely freed and prevents potential HMAC info leaks.
+> > Additionally, in the control path, we ensure proper cleanup of
+> > seg6_hmac_info objects when seg6_hmac_info_add() fails: such objects are
+> > freed using kfree_sensitive() instead of kfree().
+> >
+> > Fixes: 4f4853dc1c9c ("ipv6: sr: implement API to control SR HMAC structure")
+> > Fixes: bf355b8d2c30 ("ipv6: sr: add core files for SR HMAC support")
 > 
-> Co-developed-by: Xin Guo <guoxin09@huawei.com>
-> Signed-off-by: Xin Guo <guoxin09@huawei.com>
-> Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
-> Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
-> Signed-off-by: Fan Gong <gongfan1@huawei.com>
-> ---
->   drivers/net/ethernet/huawei/hinic3/Makefile   |   1 +
->   .../net/ethernet/huawei/hinic3/hinic3_main.c  |   9 +-
->   .../huawei/hinic3/hinic3_mgmt_interface.h     |  55 +++
->   .../huawei/hinic3/hinic3_netdev_ops.c         |  18 +
->   .../ethernet/huawei/hinic3/hinic3_nic_dev.h   |   5 +
->   .../net/ethernet/huawei/hinic3/hinic3_rss.c   | 359 ++++++++++++++++++
->   .../net/ethernet/huawei/hinic3/hinic3_rss.h   |  14 +
->   7 files changed, 460 insertions(+), 1 deletion(-)
-[...]
+> Not sure if you are fixing a bug worth backports.
+> 
 
-> +static int alloc_rss_resource(struct net_device *netdev)
-> +{
-> +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-> +	static const u8 default_rss_key[L2NIC_RSS_KEY_SIZE] = {
-> +		0x6d, 0x5a, 0x56, 0xda, 0x25, 0x5b, 0x0e, 0xc2,
-> +		0x41, 0x67, 0x25, 0x3d, 0x43, 0xa3, 0x8f, 0xb0,
-> +		0xd0, 0xca, 0x2b, 0xcb, 0xae, 0x7b, 0x30, 0xb4,
-> +		0x77, 0xcb, 0x2d, 0xa3, 0x80, 0x30, 0xf2, 0x0c,
-> +		0x6a, 0x42, 0xb7, 0x3b, 0xbe, 0xac, 0x01, 0xfa};
-> +
-> +	nic_dev->rss_hkey = kzalloc(L2NIC_RSS_KEY_SIZE, GFP_KERNEL);
+I believe failing to delete sensitive data, such as HMAC keys, from memory
+before releasing it could pose security risks.
+Therefore, I considered this a bug to be fixed in the stable versions.
 
-no need to request zero'ed allocation if you are going to overwrite it
-completely on the very next line.
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Andrea Mayer <andrea.mayer@uniroma2.it>
+> > ---
+> >  net/ipv6/seg6.c      |  2 +-
+> >  net/ipv6/seg6_hmac.c | 10 +++++++++-
+> >  2 files changed, 10 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/net/ipv6/seg6.c b/net/ipv6/seg6.c
+> > index 180da19c148c..88782bdab843 100644
+> > --- a/net/ipv6/seg6.c
+> > +++ b/net/ipv6/seg6.c
+> > @@ -215,7 +215,7 @@ static int seg6_genl_sethmac(struct sk_buff *skb, struct genl_info *info)
+> >
+> >         err = seg6_hmac_info_add(net, hmackeyid, hinfo);
+> >         if (err)
+> > -               kfree(hinfo);
+> > +               kfree_sensitive(hinfo);
+> >
+> >  out_unlock:
+> >         mutex_unlock(&sdata->lock);
+> > diff --git a/net/ipv6/seg6_hmac.c b/net/ipv6/seg6_hmac.c
+> > index fd58426f222b..19cdf3791ebf 100644
+> > --- a/net/ipv6/seg6_hmac.c
+> > +++ b/net/ipv6/seg6_hmac.c
+> > @@ -57,9 +57,17 @@ static int seg6_hmac_cmpfn(struct rhashtable_compare_arg *arg, const void *obj)
+> >         return (hinfo->hmackeyid != *(__u32 *)arg->key);
+> >  }
+> >
+> > +static void seg6_hinfo_free_callback_rcu(struct rcu_head *head)
+> > +{
+> > +       struct seg6_hmac_info *hinfo;
+> > +
+> > +       hinfo = container_of(head, struct seg6_hmac_info, rcu);
+> > +       kfree_sensitive(hinfo);
+> > +}
+> > +
+> >  static inline void seg6_hinfo_release(struct seg6_hmac_info *hinfo)
+> >  {
+> > -       kfree_rcu(hinfo, rcu);
+> > +       call_rcu(&hinfo->rcu, seg6_hinfo_free_callback_rcu);
+> >  }
+> 
+> If we worry a lot about sensitive data waiting too much in RCU land,
+> perhaps use call_rcu_hurry() here ?
 
-> +	if (!nic_dev->rss_hkey)
-> +		return -ENOMEM;
-> +
-> +	memcpy(nic_dev->rss_hkey, default_rss_key, L2NIC_RSS_KEY_SIZE);
+My concern is not so much about how long the sensitive data remains in RCU
+land. Instead, I would like to ensure that the memory associated with the
+seg6_hmac_info object is properly zeroed out before it is freed. I believe that
+using call_rcu() (with seg6_hinfo_free_callback_rcu()) would be sufficient to
+achieve this goal.
 
-I would better move this line after both allocations when the code flow
-has no way to fail.
+---
 
-> +	nic_dev->rss_indir = kcalloc(L2NIC_RSS_INDIR_SIZE, sizeof(u32),
-> +				     GFP_KERNEL);
+Aside from improving the commit message (thanks to Eric Bigger), what other
+changes should we consider implementing for version 2?
+Should we classify this patch as an enhancement rather than a bug fix?
 
-why do you allocate L2NIC_RSS_INDIR_SIZE of u32 when the HW table has
-le16 type for the entry?
-
-> +	if (!nic_dev->rss_indir) {
-> +		kfree(nic_dev->rss_hkey);
-> +		nic_dev->rss_hkey = NULL;
-> +		return -ENOMEM;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int hinic3_rss_set_indir_tbl(struct hinic3_hwdev *hwdev,
-> +				    const u32 *indir_table)
-> +{
-> +	struct l2nic_cmd_rss_set_indir_tbl *indir_tbl;
-> +	struct hinic3_cmd_buf *cmd_buf;
-> +	__le64 out_param;
-> +	int err;
-> +	u32 i;
-> +
-> +	cmd_buf = hinic3_alloc_cmd_buf(hwdev);
-> +	if (!cmd_buf) {
-> +		dev_err(hwdev->dev, "Failed to allocate cmd buf\n");
-> +		return -ENOMEM;
-> +	}
-> +
-> +	cmd_buf->size = cpu_to_le16(sizeof(struct l2nic_cmd_rss_set_indir_tbl));
-> +	indir_tbl = cmd_buf->buf;
-> +	memset(indir_tbl, 0, sizeof(*indir_tbl));
-> +
-> +	for (i = 0; i < L2NIC_RSS_INDIR_SIZE; i++)
-> +		indir_tbl->entry[i] = cpu_to_le16((u16)indir_table[i]);
-> +
-> +	hinic3_cmdq_buf_swab32(indir_tbl, sizeof(*indir_tbl));
-> +
-> +	err = hinic3_cmdq_direct_resp(hwdev, MGMT_MOD_L2NIC,
-> +				      L2NIC_UCODE_CMD_SET_RSS_INDIR_TBL,
-> +				      cmd_buf, &out_param);
-> +	if (err || out_param != 0) {
-
-no need for "!= 0"
-
-> +		dev_err(hwdev->dev, "Failed to set rss indir table\n");
-> +		err = -EFAULT;
-> +	}
-> +
-> +	hinic3_free_cmd_buf(hwdev, cmd_buf);
-> +
-> +	return err;
-> +}
-
-[...]
-
-> +static int hinic3_rss_cfg_hash_key(struct hinic3_hwdev *hwdev, u8 opcode,
-> +				   u8 *key)
-> +{
-> +	struct l2nic_cmd_cfg_rss_hash_key hash_key = {};
-> +	struct mgmt_msg_params msg_params = {};
-> +	int err;
-> +
-> +	hash_key.func_id = hinic3_global_func_id(hwdev);
-> +	hash_key.opcode = opcode;
-> +
-> +	if (opcode == MGMT_MSG_CMD_OP_SET)
-> +		memcpy(hash_key.key, key, L2NIC_RSS_KEY_SIZE);
-
-here you copy hash key to a stack allocated structure ...
-
-> +
-> +	mgmt_msg_params_init_default(&msg_params, &hash_key, sizeof(hash_key));
-
-
-... which is copied to another stack allocated structure ...
-
-> +
-> +	err = hinic3_send_mbox_to_mgmt(hwdev, MGMT_MOD_L2NIC,
-> +				       L2NIC_CMD_CFG_RSS_HASH_KEY, &msg_params);
-> +	if (err || hash_key.msg_head.status) {
-> +		dev_err(hwdev->dev, "Failed to %s hash key, err: %d, status: 0x%x\n",
-> +			opcode == MGMT_MSG_CMD_OP_SET ? "set" : "get",
-> +			err, hash_key.msg_head.status);
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (opcode == MGMT_MSG_CMD_OP_GET)
-> +		memcpy(key, hash_key.key, L2NIC_RSS_KEY_SIZE);
-> +
-> +	return 0;
-> +}
-> +
-> +static int hinic3_rss_set_hash_key(struct hinic3_hwdev *hwdev, const u8 *key)
-> +{
-> +	u8 hash_key[L2NIC_RSS_KEY_SIZE];
-> +
-> +	memcpy(hash_key, key, L2NIC_RSS_KEY_SIZE);
-
-... but it was already copied to stack allocated buffer ...
-
-> +
-> +	return hinic3_rss_cfg_hash_key(hwdev, MGMT_MSG_CMD_OP_SET, hash_key);
-> +}
-> +
-> +static int hinic3_set_hw_rss_parameters(struct net_device *netdev, u8 rss_en)
-> +{
-> +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-> +	int err;
-> +
-> +	err = hinic3_rss_set_hash_key(nic_dev->hwdev, nic_dev->rss_hkey);
-
-... which is previously copied from static array.
-
-It's 4 copies in total to configure one simple thing. Looks like too
-much of copying with no good reason
-
-
-> +	if (err)
-> +		return err;
-> +
+Thank you all for your time,
+Andrea
 
