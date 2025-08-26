@@ -1,279 +1,272 @@
-Return-Path: <netdev+bounces-216876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 908AEB35A50
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 12:46:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1067CB35A77
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 12:54:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C236D16C0AB
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 10:46:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42E6A1889B32
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 10:55:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A191308F2A;
-	Tue, 26 Aug 2025 10:46:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 340B62E267D;
+	Tue, 26 Aug 2025 10:54:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CZXtGBJ8"
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB77932C8B;
-	Tue, 26 Aug 2025 10:46:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48E492FD7DE
+	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 10:54:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756205172; cv=none; b=lVpRpw3XdbcxyhAIssUAeGT68p2NO2QaBX1pOtCDlQqRWe94K/sn0cobj7Aje7Gu2S6e/wv1qd/6kAC+50vYMSY6pnkHqoKDhlxeLbtOxlGQuY6RkegK9T8HM+ky9I0zXvkfjc3jQsdmlQ4tm9BLq03D3zy7D7t17GKHMlo+360=
+	t=1756205648; cv=none; b=MZDNLh9IfV4GcL6GhtxlNDoJClbqAYgJWkXxYeetg52OOzK+HmDQc2rJfabUjwk7ZMySb7rB0v2cmWLa9RsiV+Ec/EUWhqhrh/ZXtkdP0FABofmtPqH9ujTt6EJ6jicoCFhpSiN1RVTf/Vv6nTnZmvKDVaBUs7zCE4uhBxN4g+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756205172; c=relaxed/simple;
-	bh=RlYaQIsXPj/hYp0IY2hzpcUql9s2CJOIs/Vq55SuaEg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dpxrCLdKufhXareDb3Vurb23Q14RmhzSBQHMZlnn3rWYiIGT7ffwO2HGosclr3zfH+S72E4e4IAKI1ATPilOCkeo1PJR+rDFtKuLm9PKqJqqhj9fzs6ugOYq++ktRobp+eFY/CJ9MVDDrB41/sf/a1pf4Q1Pgo+hJaErhPS/Otw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0AD2A1A00;
-	Tue, 26 Aug 2025 03:46:01 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 93FC13F694;
-	Tue, 26 Aug 2025 03:46:01 -0700 (PDT)
-Date: Tue, 26 Aug 2025 11:45:58 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Brendan Jackman <jackmanb@google.com>,
-	Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>,
-	Dmitry Vyukov <dvyukov@google.com>, dri-devel@lists.freedesktop.org,
-	intel-gfx@lists.freedesktop.org, iommu@lists.linux.dev,
-	io-uring@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	John Hubbard <jhubbard@nvidia.com>, kasan-dev@googlegroups.com,
-	kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	linux-arm-kernel@axis.com, linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org, linux-ide@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-mmc@vger.kernel.org, linux-mm@kvack.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Marco Elver <elver@google.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
-	Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
-	Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
-	virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
-	wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
-Subject: Re: [PATCH RFC 21/35] mm/cma: refuse handing out non-contiguous page
- ranges
-Message-ID: <aK2QZnzS1ErHK5tP@raptor>
-References: <20250821200701.1329277-1-david@redhat.com>
- <20250821200701.1329277-22-david@redhat.com>
+	s=arc-20240116; t=1756205648; c=relaxed/simple;
+	bh=lp4qUB/iFCiDO2bbcS0i4IsaitqmrQGgBtH+G+JOMso=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PMHtsy6q+gGdNEqdieMxXosPUO+MyZ46T86t+Pzh4nCVxe1JTKFT+NZDt626cVM+TxPQ4fYzDCDLVnq2ptC0eOOxBX9sQYJ2SYPbqhE4YKOduwdTnmS8jO+P0NLeDP4wAzNOBxf23kS/bRJi+uCbrlQf9SsosXqdnaGlCa+yclo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CZXtGBJ8; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756205645;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NmZInkyqroxO61jCOvr1Vj+N6nNqACCevIwWJbuiovk=;
+	b=CZXtGBJ8owkbOiccVMteMvm+d4TnafApIlpS1ZXA3+pOyluPxnbGzG2r0jeLABfek+/+19
+	r7IIJp9GEsPjm+5k8ZUlAfYXMdRGOuO2RVGZ6b1nM7nyD2B2vIg/kNcmN2O+o7p04PAKlC
+	apkJPjlc6PmW6CitcRVbUudZOrTRcoU=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-494-RSk3OVfaMsqjILfKdSITtA-1; Tue, 26 Aug 2025 06:54:03 -0400
+X-MC-Unique: RSk3OVfaMsqjILfKdSITtA-1
+X-Mimecast-MFC-AGG-ID: RSk3OVfaMsqjILfKdSITtA_1756205643
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7f2942a1aa1so372141785a.0
+        for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 03:54:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756205643; x=1756810443;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NmZInkyqroxO61jCOvr1Vj+N6nNqACCevIwWJbuiovk=;
+        b=sPXCkGFFs5AkeOtjt3SsCzrexEOmyGytI50sXE9dJt2nxE/X4x311J6clH/4MZI8O9
+         AvrpRxv0dRhXT04xOukKjRyb24BwpUhytrgezoUQ41NwlwMhZTheHzravsnrDEbZJ30z
+         sXmd0QMNcuvMWcKwhplSkAx7sQ6SFpYSfSWmwZoppZpRCDAyHnrXZt8u8A+N7dkkmPbp
+         Ssr8ZYgacM5Buv0lzSvFb5EkBGunSo0ueA4v84kegt4lWUj+7/wo93DJC6aE/o71Uqeh
+         eXqoArTuJQ6VRvj4P1uwgCrQU8g0JLoQqgDWdsqxB+Fokd42Oacx2w38scqHKvJmsQjW
+         acZg==
+X-Forwarded-Encrypted: i=1; AJvYcCV+W6I1fZ0Qq6qUfjld1zg9RJ8Pm8XlqZMFoi2yQcJW0aQoAguNLb2KaTkvUXS8R//NaZ03Mnc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyGj5kjHJNxVnfQvlaKeNQv8fKHMYgyoGofEEHDflv2yVlIC7Q
+	wP3viWh04pYwj37+lN7eimx/rvuVF1XG9qC3nynFAu5rSnQBRm+tqQHxakMMud7e6oLzIZBWYII
+	0JYEvwRTc1wJGL6xR1OmfDKnmfwdH2RmPH7DzVDCwGIyVa3E5Y3Yg535iOg==
+X-Gm-Gg: ASbGncvHbeMGWRJafEONsdIagWKC8phZvDK5g8KKG8TxfIi6lRVxey/PpDkn2LDADnm
+	6d78h6bHPtK5yiYA7zhvArpYpYOXr8tInB3E4Xg+Q4LXq2O7xh9axpMOS5ktLXw3zA7bPHvWXYa
+	3nOaCXieyRVfFtI3c4wvyeT2mQNl8Ffii6T2R8d20XWw5kFItfnu4ioXKdsq09G4luf1BaBb+5U
+	XNzq+T40BlhCJk+G38GFU3JGgmuwMOxgZfoVnrfkNTWQ9nL4cYoH2KOJWlRotpaGwW4SJphPzCN
+	ofJpTnOYmv+jyn0F1EI/havhVnnD5zPlOy7t3+sAyasxXdJqF7esBW3btaMox24nI0RZADqHzzL
+	XOdZCv9OdQ68=
+X-Received: by 2002:a05:620a:19a8:b0:7e8:271:aa81 with SMTP id af79cd13be357-7f58d941cd2mr74802485a.19.1756205643238;
+        Tue, 26 Aug 2025 03:54:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF7mJd8n3IxmD7p6z1XMuV5erwlZh5IxTZ6t9Ayq0MH6ODZNkoPFoJgQtjU3Byi3QYQ+rpgLw==
+X-Received: by 2002:a05:620a:19a8:b0:7e8:271:aa81 with SMTP id af79cd13be357-7f58d941cd2mr74799985a.19.1756205642729;
+        Tue, 26 Aug 2025 03:54:02 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7ebf4178d59sm656023485a.66.2025.08.26.03.54.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Aug 2025 03:54:01 -0700 (PDT)
+Message-ID: <3b432e20-cca3-4163-b7ac-139efe6a8427@redhat.com>
+Date: Tue, 26 Aug 2025 12:53:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250821200701.1329277-22-david@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v15 08/15] net: homa: create homa_pacer.h and
+ homa_pacer.c
+To: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org
+Cc: edumazet@google.com, horms@kernel.org, kuba@kernel.org
+References: <20250818205551.2082-1-ouster@cs.stanford.edu>
+ <20250818205551.2082-9-ouster@cs.stanford.edu>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250818205551.2082-9-ouster@cs.stanford.edu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi David,
-
-On Thu, Aug 21, 2025 at 10:06:47PM +0200, David Hildenbrand wrote:
-> Let's disallow handing out PFN ranges with non-contiguous pages, so we
-> can remove the nth-page usage in __cma_alloc(), and so any callers don't
-> have to worry about that either when wanting to blindly iterate pages.
-> 
-> This is really only a problem in configs with SPARSEMEM but without
-> SPARSEMEM_VMEMMAP, and only when we would cross memory sections in some
-> cases.
-> 
-> Will this cause harm? Probably not, because it's mostly 32bit that does
-> not support SPARSEMEM_VMEMMAP. If this ever becomes a problem we could
-> look into allocating the memmap for the memory sections spanned by a
-> single CMA region in one go from memblock.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  include/linux/mm.h |  6 ++++++
->  mm/cma.c           | 36 +++++++++++++++++++++++-------------
->  mm/util.c          | 33 +++++++++++++++++++++++++++++++++
->  3 files changed, 62 insertions(+), 13 deletions(-)
-> 
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index ef360b72cb05c..f59ad1f9fc792 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -209,9 +209,15 @@ extern unsigned long sysctl_user_reserve_kbytes;
->  extern unsigned long sysctl_admin_reserve_kbytes;
->  
->  #if defined(CONFIG_SPARSEMEM) && !defined(CONFIG_SPARSEMEM_VMEMMAP)
-> +bool page_range_contiguous(const struct page *page, unsigned long nr_pages);
->  #define nth_page(page,n) pfn_to_page(page_to_pfn((page)) + (n))
->  #else
->  #define nth_page(page,n) ((page) + (n))
-> +static inline bool page_range_contiguous(const struct page *page,
-> +		unsigned long nr_pages)
-> +{
-> +	return true;
-> +}
->  #endif
->  
->  /* to align the pointer to the (next) page boundary */
-> diff --git a/mm/cma.c b/mm/cma.c
-> index 2ffa4befb99ab..1119fa2830008 100644
-> --- a/mm/cma.c
-> +++ b/mm/cma.c
-> @@ -780,10 +780,8 @@ static int cma_range_alloc(struct cma *cma, struct cma_memrange *cmr,
->  				unsigned long count, unsigned int align,
->  				struct page **pagep, gfp_t gfp)
->  {
-> -	unsigned long mask, offset;
-> -	unsigned long pfn = -1;
-> -	unsigned long start = 0;
->  	unsigned long bitmap_maxno, bitmap_no, bitmap_count;
-> +	unsigned long start, pfn, mask, offset;
->  	int ret = -EBUSY;
->  	struct page *page = NULL;
->  
-> @@ -795,7 +793,7 @@ static int cma_range_alloc(struct cma *cma, struct cma_memrange *cmr,
->  	if (bitmap_count > bitmap_maxno)
->  		goto out;
->  
-> -	for (;;) {
-> +	for (start = 0; ; start = bitmap_no + mask + 1) {
->  		spin_lock_irq(&cma->lock);
->  		/*
->  		 * If the request is larger than the available number
-> @@ -812,6 +810,22 @@ static int cma_range_alloc(struct cma *cma, struct cma_memrange *cmr,
->  			spin_unlock_irq(&cma->lock);
->  			break;
->  		}
-> +
-> +		pfn = cmr->base_pfn + (bitmap_no << cma->order_per_bit);
-> +		page = pfn_to_page(pfn);
-> +
-> +		/*
-> +		 * Do not hand out page ranges that are not contiguous, so
-> +		 * callers can just iterate the pages without having to worry
-> +		 * about these corner cases.
-> +		 */
-> +		if (!page_range_contiguous(page, count)) {
-> +			spin_unlock_irq(&cma->lock);
-> +			pr_warn_ratelimited("%s: %s: skipping incompatible area [0x%lx-0x%lx]",
-> +					    __func__, cma->name, pfn, pfn + count - 1);
-> +			continue;
-> +		}
-> +
->  		bitmap_set(cmr->bitmap, bitmap_no, bitmap_count);
->  		cma->available_count -= count;
->  		/*
-> @@ -821,29 +835,25 @@ static int cma_range_alloc(struct cma *cma, struct cma_memrange *cmr,
->  		 */
->  		spin_unlock_irq(&cma->lock);
->  
-> -		pfn = cmr->base_pfn + (bitmap_no << cma->order_per_bit);
->  		mutex_lock(&cma->alloc_mutex);
->  		ret = alloc_contig_range(pfn, pfn + count, ACR_FLAGS_CMA, gfp);
->  		mutex_unlock(&cma->alloc_mutex);
-> -		if (ret == 0) {
-> -			page = pfn_to_page(pfn);
-> +		if (!ret)
->  			break;
-> -		}
->  
->  		cma_clear_bitmap(cma, cmr, pfn, count);
->  		if (ret != -EBUSY)
->  			break;
->  
->  		pr_debug("%s(): memory range at pfn 0x%lx %p is busy, retrying\n",
-> -			 __func__, pfn, pfn_to_page(pfn));
-> +			 __func__, pfn, page);
->  
->  		trace_cma_alloc_busy_retry(cma->name, pfn, pfn_to_page(pfn),
-
-Nitpick: I think you already have the page here.
-
->  					   count, align);
-> -		/* try again with a bit different memory target */
-> -		start = bitmap_no + mask + 1;
->  	}
->  out:
-> -	*pagep = page;
-> +	if (!ret)
-> +		*pagep = page;
->  	return ret;
->  }
->  
-> @@ -882,7 +892,7 @@ static struct page *__cma_alloc(struct cma *cma, unsigned long count,
->  	 */
->  	if (page) {
->  		for (i = 0; i < count; i++)
-> -			page_kasan_tag_reset(nth_page(page, i));
-> +			page_kasan_tag_reset(page + i);
-
-Had a look at it, not very familiar with CMA, but the changes look equivalent to
-what was before. Not sure that's worth a Reviewed-by tag, but here it in case
-you want to add it:
-
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Just so I can better understand the problem being fixed, I guess you can have
-two consecutive pfns with non-consecutive associated struct page if you have two
-adjacent memory sections spanning the same physical memory region, is that
-correct?
-
-Thanks,
-Alex
-
->  	}
->  
->  	if (ret && !(gfp & __GFP_NOWARN)) {
-> diff --git a/mm/util.c b/mm/util.c
-> index d235b74f7aff7..0bf349b19b652 100644
-> --- a/mm/util.c
-> +++ b/mm/util.c
-> @@ -1280,4 +1280,37 @@ unsigned int folio_pte_batch(struct folio *folio, pte_t *ptep, pte_t pte,
->  {
->  	return folio_pte_batch_flags(folio, NULL, ptep, &pte, max_nr, 0);
->  }
-> +
-> +#if defined(CONFIG_SPARSEMEM) && !defined(CONFIG_SPARSEMEM_VMEMMAP)
+On 8/18/25 10:55 PM, John Ousterhout wrote:
 > +/**
-> + * page_range_contiguous - test whether the page range is contiguous
-> + * @page: the start of the page range.
-> + * @nr_pages: the number of pages in the range.
-> + *
-> + * Test whether the page range is contiguous, such that they can be iterated
-> + * naively, corresponding to iterating a contiguous PFN range.
-> + *
-> + * This function should primarily only be used for debug checks, or when
-> + * working with page ranges that are not naturally contiguous (e.g., pages
-> + * within a folio are).
-> + *
-> + * Returns true if contiguous, otherwise false.
+> + * homa_pacer_alloc() - Allocate and initialize a new pacer object, which
+> + * will hold pacer-related information for @homa.
+> + * @homa:   Homa transport that the pacer will be associated with.
+> + * Return:  A pointer to the new struct pacer, or a negative errno.
 > + */
-> +bool page_range_contiguous(const struct page *page, unsigned long nr_pages)
+> +struct homa_pacer *homa_pacer_alloc(struct homa *homa)
 > +{
-> +	const unsigned long start_pfn = page_to_pfn(page);
-> +	const unsigned long end_pfn = start_pfn + nr_pages;
-> +	unsigned long pfn;
+> +	struct homa_pacer *pacer;
+> +	int err;
 > +
-> +	/*
-> +	 * The memmap is allocated per memory section. We need to check
-> +	 * each involved memory section once.
+> +	pacer = kzalloc(sizeof(*pacer), GFP_KERNEL);
+> +	if (!pacer)
+> +		return ERR_PTR(-ENOMEM);
+> +	pacer->homa = homa;
+> +	spin_lock_init(&pacer->mutex);
+> +	pacer->fifo_count = 1000;
+> +	spin_lock_init(&pacer->throttle_lock);
+> +	INIT_LIST_HEAD_RCU(&pacer->throttled_rpcs);
+> +	pacer->fifo_fraction = 50;
+> +	pacer->max_nic_queue_ns = 5000;
+> +	pacer->throttle_min_bytes = 1000;
+> +	init_waitqueue_head(&pacer->wait_queue);
+> +	pacer->kthread = kthread_run(homa_pacer_main, pacer, "homa_pacer");
+> +	if (IS_ERR(pacer->kthread)) {
+> +		err = PTR_ERR(pacer->kthread);
+> +		pr_err("Homa couldn't create pacer thread: error %d\n", err);
+> +		goto error;
+> +	}
+> +	atomic64_set(&pacer->link_idle_time, homa_clock());
+> +
+> +	homa_pacer_update_sysctl_deps(pacer);
+
+IMHO this does not fit mergeable status:
+- the static init (@25Gbs)
+- never updated on link changes
+- assumes a single link in the whole system
+
+I think it's better to split the pacer part out of this series, or the
+above points should be addressed and it would be difficult fitting a
+reasonable series size.
+
+Also a single thread for all the reap RPC looks like a potentially high
+contended spot.
+
+> +/**
+> + * homa_pacer_xmit() - Transmit packets from  the throttled list until
+> + * either (a) the throttled list is empty or (b) the NIC queue has
+> + * reached maximum allowable length. Note: this function may be invoked
+> + * from either process context or softirq (BH) level. This function is
+> + * invoked from multiple places, not just in the pacer thread. The reason
+> + * for this is that (as of 10/2019) Linux's scheduling of the pacer thread
+> + * is unpredictable: the thread may block for long periods of time (e.g.,
+> + * because it is assigned to the same CPU as a busy interrupt handler).
+> + * This can result in poor utilization of the network link. So, this method
+> + * gets invoked from other places as well, to increase the likelihood that we
+> + * keep the link busy. Those other invocations are not guaranteed to happen,
+> + * so the pacer thread provides a backstop.
+> + * @pacer:    Pacer information for a Homa transport.
+> + */
+> +void homa_pacer_xmit(struct homa_pacer *pacer)
+> +{
+> +	struct homa_rpc *rpc;
+> +	s64 queue_cycles;
+> +
+> +	/* Make sure only one instance of this function executes at a time. */
+> +	if (!spin_trylock_bh(&pacer->mutex))
+> +		return;
+> +
+> +	while (1) {
+> +		queue_cycles = atomic64_read(&pacer->link_idle_time) -
+> +					     homa_clock();
+> +		if (queue_cycles >= pacer->max_nic_queue_cycles)
+> +			break;
+> +		if (list_empty(&pacer->throttled_rpcs))
+> +			break;
+> +
+> +		/* Select an RPC to transmit (either SRPT or FIFO) and
+> +		 * take a reference on it. Must do this while holding the
+> +		 * throttle_lock to prevent the RPC from being reaped. Then
+> +		 * release the throttle lock and lock the RPC (can't acquire
+> +		 * the RPC lock while holding the throttle lock; see "Homa
+> +		 * Locking Strategy" in homa_impl.h).
+> +		 */
+> +		homa_pacer_throttle_lock(pacer);
+> +		pacer->fifo_count -= pacer->fifo_fraction;
+> +		if (pacer->fifo_count <= 0) {
+> +			struct homa_rpc *cur;
+> +			u64 oldest = ~0;
+> +
+> +			pacer->fifo_count += 1000;
+> +			rpc = NULL;
+> +			list_for_each_entry(cur, &pacer->throttled_rpcs,
+> +					    throttled_links) {
+> +				if (cur->msgout.init_time < oldest) {
+> +					rpc = cur;
+> +					oldest = cur->msgout.init_time;
+> +				}
+> +			}
+> +		} else {
+> +			rpc = list_first_entry_or_null(&pacer->throttled_rpcs,
+> +						       struct homa_rpc,
+> +						       throttled_links);
+> +		}
+> +		if (!rpc) {
+> +			homa_pacer_throttle_unlock(pacer);
+> +			break;
+> +		}
+> +		homa_rpc_hold(rpc);
+
+It's unclear what ensures that 'rpc' is valid at this point.
+
+> +		homa_pacer_throttle_unlock(pacer);
+> +		homa_rpc_lock(rpc);
+> +		homa_xmit_data(rpc, true);
+> +
+> +		/* Note: rpc->state could be RPC_DEAD here, but the code
+> +		 * below should work anyway.
+> +		 */
+> +		if (!*rpc->msgout.next_xmit)
+> +			/* No more data can be transmitted from this message
+> +			 * (right now), so remove it from the throttled list.
+> +			 */
+> +			homa_pacer_unmanage_rpc(rpc);
+> +		homa_rpc_unlock(rpc);
+> +		homa_rpc_put(rpc);
+
+All the loop is atomic context, you should likely place a cond_resched()
+here - releasing and reaquiring the mutex as needed.
+
+> +/**
+> + * struct homa_pacer - Contains information that the pacer users to
+> + * manage packet output. There is one instance of this object stored
+> + * in each struct homa.
+> + */
+> +struct homa_pacer {
+> +	/** @homa: Transport that this pacer is associated with. */
+> +	struct homa *homa;
+
+Should be removed
+
+> +/**
+> + * homa_pacer_check() - This method is invoked at various places in Homa to
+> + * see if the pacer needs to transmit more packets and, if so, transmit
+> + * them. It's needed because the pacer thread may get descheduled by
+> + * Linux, result in output stalls.
+> + * @pacer:    Pacer information for a Homa transport.
+> + */
+> +static inline void homa_pacer_check(struct homa_pacer *pacer)
+> +{
+> +	if (list_empty(&pacer->throttled_rpcs))
+> +		return;
+> +
+> +	/* The ">> 1" in the line below gives homa_pacer_main the first chance
+> +	 * to queue new packets; if the NIC queue becomes more than half
+> +	 * empty, then we will help out here.
 > +	 */
-> +	for (pfn = ALIGN(start_pfn, PAGES_PER_SECTION);
-> +	     pfn < end_pfn; pfn += PAGES_PER_SECTION)
-> +		if (unlikely(page + (pfn - start_pfn) != pfn_to_page(pfn)))
-> +			return false;
-> +	return true;
+> +	if ((homa_clock() + (pacer->max_nic_queue_cycles >> 1)) <
+> +			atomic64_read(&pacer->link_idle_time))
+> +		return;
+> +	homa_pacer_xmit(pacer);
 > +}
-> +#endif
->  #endif /* CONFIG_MMU */
-> -- 
-> 2.50.1
-> 
-> 
+
+apparently not used in this series.
+
+/P
+
 
