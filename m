@@ -1,101 +1,140 @@
-Return-Path: <netdev+bounces-216748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE613B3507C
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 02:50:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C6E8B35083
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 02:52:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E252242D07
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 00:50:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D099B7AFDA2
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 00:50:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D52B1BE23F;
-	Tue, 26 Aug 2025 00:50:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0872A23BD17;
+	Tue, 26 Aug 2025 00:52:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OcoSPHfI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f6HWOrHs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48694482EB
-	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 00:50:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7756C239E9B;
+	Tue, 26 Aug 2025 00:52:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756169402; cv=none; b=iEqKocGUpI/Ps76In1UxEthiao47IjC7TkIIJnmXokXUe6mpGwLwc0ctxpP0f2bRLeaZ4WkCdw8fdIEWNkKVTf1HXYOIl6lFeBBmaAWNiitObxujkCNZL6POG6itB8ZQH4RoxFKrE0AiYK15viHGeUSxyHViLcjcCQMKS3/450s=
+	t=1756169523; cv=none; b=a9HsoTLldoD7MT7uRB1yhe2i9pnrIHa5yKvx2tlzC18+NkX5uzVHCsZegZuxgMeSsaO9RGi/jDq5xoF4mz/ksgffgOBntx0gp2/ld+GD78i82sYvZShFpoq6yBMenuM7qZCrtBFfbMhbRbPbUjDK2jPLXs6hVSlELaR1Cf1aWxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756169402; c=relaxed/simple;
-	bh=nDRA1Tds71oq7lboJgaRNpeXobXorqZWQAvxAvuigEM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=phddzcTUAGumzOOYuImG8jepkhV2hk9ZnA3cGyMA1Xs87k4QegmIVjOGeX8llPn9L26n/Vwb4GK7MKzdr/v/WaeuocUxlkq5HkC7Z2d6oBFPitf4+arAMcebnLi4+XyFSG6aAUSPRLomHF51+fRkDRWJ/QZWD+1oUgO+G3C9cU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OcoSPHfI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC85DC4CEED;
-	Tue, 26 Aug 2025 00:50:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756169401;
-	bh=nDRA1Tds71oq7lboJgaRNpeXobXorqZWQAvxAvuigEM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=OcoSPHfIUBQl1xIRHVsfjzVLMeBmlwrSw2M72DHtRntuR55A/fglMAL/P3jtCWzxQ
-	 Z2HsvCnspVf67NJfcoF1ez4WWwyZJHUYKK4gamEOKHp6JrJ2WDnCnXaSNTzyQw04w2
-	 XOn4ArDBxO/rndR26G+Dwum8jUnIJFu0+RBWM0llQyJf5G/0D0ZbX4xnDdE18UGeG9
-	 iwZqLMOUUWIuTuJ/FN0a4OTPLbKY5PdRdurORn15q49APCu5lfrfxht5fgtOm/WHbg
-	 vWoScC5/UvND+wSVyZQiLHbw1e72ZCnP720xt6r/By44hvBAdfb6mk4d1Q3i/EcncM
-	 lhUTrhKiFAY0A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB1C0383BF70;
-	Tue, 26 Aug 2025 00:50:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1756169523; c=relaxed/simple;
+	bh=AY/3qc6duOWO+wuq51Y9LVeB+srEpg+tuupMwtFG4CE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Etsnh8e1q9OswQI12L96KAvt0lQbxF3W3uw9w++RMQI9RaDSj6hN8PgLmzfdcnl/egggSbIaIYUxaMdhT37cuK4MdSKpo2vZm1RMXgvbfi7UjhQSNIT1uM1QjyQFHHV5NHVjlDkwbgwFtfdz6reb3OeyQ+asrG+7K/9NN3/wp34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f6HWOrHs; arc=none smtp.client-ip=209.85.166.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3ee6485e7d7so5064155ab.3;
+        Mon, 25 Aug 2025 17:52:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756169521; x=1756774321; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6SjzXmsoNG9tezThv2jXhDq+AS/yG0+qJZwh8uyk8D4=;
+        b=f6HWOrHsOdHTVdQepvCIg/j75JPaI0x+87+SaXqVJNCnxYzgXOhDfu2IDfl/Ug9OU5
+         am05j8ey9ndN+0f+aNYfiIlyEqGaD4k9KQEi1gbGx8cXK0WaaYb6Bh0SWdtwZquNxzRH
+         y5Ot/UfscvV+/QYgZt2o+uJEd2+x050329ezOBMWHbPQaASQWO8KhF5V6Kimy096Us5E
+         wHtc1CYESWR6luXJOUIMVqGTSjGqp1mpXDs6PcxAvCbvGNXl+28H0o2pWADH2eEKlCz0
+         i28269pzyYZh2yLornsNlhsiya36k4i52RiC+RzAL+iZsJdd9paq2BYnJVsNBG+ZtqzV
+         ajPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756169521; x=1756774321;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6SjzXmsoNG9tezThv2jXhDq+AS/yG0+qJZwh8uyk8D4=;
+        b=HBovKdG7UTMSkVud1kqYGnr/KkvRxCSl2De0sIA7iyoQwBQwzkZrsjB4cOfFkQH2Ji
+         KrH4/Fw2q0Dp2NOqDXy/mtkcKhdUoj8l0/R3NJcTI+rPcIYkp5D/KcvbzMbx2uF5EOY8
+         kwELaQZ5ZFITWYgAcBIIlUIbYv2vZWHMwjER92VopqlNDfG4e7p6ZAQ7hm1figsQceY5
+         /IEOwNi7+M7EVC+6YZME1kWjuePWQl8ye1hOS0hD+arzB4NsOQriSu3RXr+uXJE4pYne
+         TuSHlQPtenoTCUGTIDPC/3qbRTVHAvMiEUxSGzHl+WOzG350dpngq7J++9vJgiyu6ZJv
+         iEqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV02+cUD2FOEKzBu/UmvO1nrDdDXDINg/85NElZTvGqWvWT+jT9x7ny7YNlVrGWVkrhEtfWwFd7@vger.kernel.org, AJvYcCWXp9VimGDbplzrHRT9pr+JGC8KkuNLdnVi3n3J/8U26qo6nUIAkDXJpMKHaRgV/OhueC4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzS0cf+iLeeb9218ZegxM5L9QzTmE60lqIFLPNCloi5hNdi2K05
+	b9vVbwY/MSM7cvXY/S9vtud59pEUArE5003GXXC0NXLnboLHDVSLSAf9CdPA8XTmfeVOQEzarXg
+	PWnsIzPMX2g40eDCq3DD2KzIpydR6KZE=
+X-Gm-Gg: ASbGncuiZV+FlOuq9LM9+Sz6ysaV6+8USZd6bzFpznXDpt7RhpMFUrJ2rgnYS95BmHp
+	Eea96m5pCzROiv+j4Mygu8G2A6XLkRVcSz/YMipS+wYL5cnzMAs+F1XNHDWCkCYoLLuox/raFte
+	oDRhVos+5bNllaG3tacYEi5QA/UjklYFgNwZHdx8eLectCezR24DLr/yRqQCweytM1Y8xFEORoF
+	bgb3w==
+X-Google-Smtp-Source: AGHT+IFm6LjwOEbGNI66waAjKyiA0SM/Skiw3YWBHoGHcCGN48FjY6pwl/CYa0m+iMVLib0EAwEowKhV3KRHDfehLEM=
+X-Received: by 2002:a05:6e02:18cf:b0:3e6:7df0:ec19 with SMTP id
+ e9e14a558f8ab-3e9201f40afmr44543745ab.8.1756169521333; Mon, 25 Aug 2025
+ 17:52:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/3] net: airoha: Add PPE support for RX wlan
- offload
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175616940975.3610531.11567535063308274967.git-patchwork-notify@kernel.org>
-Date: Tue, 26 Aug 2025 00:50:09 +0000
-References: 
- <20250823-airoha-en7581-wlan-rx-offload-v3-0-f78600ec3ed8@kernel.org>
-In-Reply-To: 
- <20250823-airoha-en7581-wlan-rx-offload-v3-0-f78600ec3ed8@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+References: <20250825135342.53110-1-kerneljasonxing@gmail.com>
+ <20250825104437.5349512c@kernel.org> <CAL+tcoCxzyBxhCes-4OfBAePpQK3jvSRSBufo0eu6afb4hdSaA@mail.gmail.com>
+ <20250825172928.234fd75c@kernel.org>
+In-Reply-To: <20250825172928.234fd75c@kernel.org>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 26 Aug 2025 08:51:24 +0800
+X-Gm-Features: Ac12FXx0c0QNcFelQ_ZqD84FYMUKpBt16D-434_JVWSl5UT361BtMNzzH9iPaQQ
+Message-ID: <CAL+tcoCa3nfO+PJE-uccnOfQaZnUa+78AmJXwjaLod4WvPPfog@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 0/9] xsk: improvement performance in copy mode
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	bjorn@kernel.org, magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
+	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
+	horms@kernel.org, andrew+netdev@lunn.ch, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Tue, Aug 26, 2025 at 8:29=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Tue, 26 Aug 2025 08:01:03 +0800 Jason Xing wrote:
+> > On Tue, Aug 26, 2025 at 1:44=E2=80=AFAM Jakub Kicinski <kuba@kernel.org=
+> wrote:
+> > > On Mon, 25 Aug 2025 21:53:33 +0800 Jason Xing wrote:
+> > > > copy mode:   1,109,754 pps
+> > > > batch mode:  2,393,498 pps (+115.6%)
+> > > > xmit.more:   3,024,110 pps (+172.5%)
+> > > > zc mode:    14,879,414 pps
+> > >
+> > > I've asked you multiple times to add comparison with the performance
+> > > of AF_PACKET. What's the disconnect?
+> >
+> > Sorry for missing the question. I'm not very familiar with how to run t=
+he
+> > test based on AF_PACKET. Could you point it out for me? Thanks.
+> >
+> > I remember the very initial version of AF_XDP was pure AF_PACKET. So
+> > may I ask why we expect to see the comparison between them?
+>
+> Pretty sure I told you this at least twice but the point of AF_XDP
+> is the ZC mode. Without a comparison to AF_PACKET which has similar
+> functionality optimizing AF_XDP copy mode seems unjustified.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Oh, I see. Let me confirm again that you expect to see a demo like the
+copy mode of AF_PACKET v4 [1] and see the differences in performance,
+right?
 
-On Sat, 23 Aug 2025 09:56:01 +0200 you wrote:
-> Introduce the missing bits to airoha ppe driver to offload traffic received
-> by the MT76 driver (wireless NIC) and forwarded by the Packet Processor
-> Engine (PPE) to the ethernet interface.
-> 
-> ---
-> Changes in v3:
-> - Fix compilation error when CONFIG_NET_AIROHA is not enabled
-> - Link to v2: https://lore.kernel.org/r/20250822-airoha-en7581-wlan-rx-offload-v2-0-8a76e1d3fec2@kernel.org
-> 
-> [...]
+If AF_PACKET eventually outperforms AF_XDP, do we need to reinvent the
+copy mode based on AF_PACKET?
 
-Here is the summary with links:
-  - [net-next,v3,1/3] net: airoha: Rely on airoha_eth struct in airoha_ppe_flow_offload_cmd signature
-    https://git.kernel.org/netdev/net-next/c/524a43c3a0c1
-  - [net-next,v3,2/3] net: airoha: Add airoha_ppe_dev struct definition
-    https://git.kernel.org/netdev/net-next/c/f45fc18b6de0
-  - [net-next,v3,3/3] net: airoha: Introduce check_skb callback in ppe_dev ops
-    https://git.kernel.org/netdev/net-next/c/a7cc1aa151e3
+And if a quick/simple implementation is based on AF_PACKET, it
+shouldn't be that easy to use the same benchmark to see which one is
+better. That means inventing a new unified benchmark tool is
+necessary?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+[1]: https://lore.kernel.org/all/20171031124145.9667-1-bjorn.topel@gmail.co=
+m/
 
-
+Thanks,
+Jason
 
