@@ -1,132 +1,335 @@
-Return-Path: <netdev+bounces-216873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 346EFB35A06
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 12:22:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21A7BB35A0B
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 12:24:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 030042A7FEC
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 10:22:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D22693A8230
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 10:24:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F263F2BD5AE;
-	Tue, 26 Aug 2025 10:22:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 948392BE03C;
+	Tue, 26 Aug 2025 10:24:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="lbgXN7I4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fwmNDbLy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 481911CEAB2
-	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 10:22:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756203771; cv=none; b=E00CHy/VQT3EBMJxiKXPKLQCaUxzrYsSiOvqEng3BLdqXMP7cUWc2wNVPZnVyf5PTmWy4Seck99iLdfxH1RC/cJukG+qw7uflcMSy7+WWmp8h/CCDXgH8wIej0cNUBaI9K8nZkQSFUD8oy/2ZSfoKHcKviThecoErxWreaqib9k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756203771; c=relaxed/simple;
-	bh=U8sHNox6tXtijzWygbCGYQGngJa/DQ4g/y4l3ZhTr9U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B3hiHX2nl2bbcbYXh1+/o6bc1DDaJ30fOHMmXaglx9oejSDI/Cr4coLG1hIEepEmfMbhOEMVCK5lUOVi4DmsRS3AH9PSrkj2EobDq3cV88SF77w9r0Ow/ClNpujG65Xl/48frU1oGRW6Ki7ZmPCkU7GgXDL5m5KxJ6A0I7Jj5aI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=lbgXN7I4; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57Q8lsM2001264;
-	Tue, 26 Aug 2025 10:22:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=S+31LDF1Z2WhM1uyqtnd3y4W2aDT6
-	M/Q5pg0v1GbW40=; b=lbgXN7I4bJecbfq5XRvTpGgxj2mn3KosAiOcZH2cecWNC
-	r5rx4EJimO0JbMI6MYG/2wrW6m5NbtZEXNfaTcShKugT1udXEf386JtMHfkkwlhT
-	HKrIt981KqUIs2L0kLuuksjluhwxYETMCFlg2f6EWpOtDoMKUigsgf8qpZJ1zjJh
-	WDXFMX73+n2iwbLynE7L/XpJlzPUa45y9TNTjIq/yufzLTiyRB7hBlLtsCIicDZG
-	TruwIbX6EzbuhMw1i5tUhD0+MQTj8JYbPALqPyFhbfqFK6QIaIcj8Mgf6U2qHoW/
-	a+xZYykqn9ZOIrLeS3vnQb+a6zU1/Yo+kRl5NK2RQ==
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48q5pt46pr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 26 Aug 2025 10:22:23 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 57QAIxI8004960;
-	Tue, 26 Aug 2025 10:22:22 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 48q439hy0y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 26 Aug 2025 10:22:22 +0000
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 57QAML6S028589;
-	Tue, 26 Aug 2025 10:22:21 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 48q439hy0j-1;
-	Tue, 26 Aug 2025 10:22:21 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: david.wu@rock-chips.com, jonas@kwiboo.se, rmk+kernel@armlinux.org.uk,
-        mcoquelin.stm32@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        horms@kernel.org, netdev@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com
-Cc: alok.a.tiwari@oracle.com, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH net-next] net: stmmac: rk: remove incorrect _DLY_DISABLE bit definition
-Date: Tue, 26 Aug 2025 03:22:15 -0700
-Message-ID: <20250826102219.49656-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B02232BDC2C
+	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 10:24:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756203894; cv=fail; b=PwpCndV6nnGHVq9kPeg17CIWplMdmqb/aYm7bfsxOhvUGo0ZbCmiUb+Yt6LTnp4nKlL8JdYb5iUs/pRqsYtQpG7ZwfHlcXyc6pMeXub6l2VHvUECRy6ndkjIQKhfQrMfv1ymZ17t1jXFnyufMJq0FZe+W08yYSZGEaHZD7mDeS8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756203894; c=relaxed/simple;
+	bh=t7+dkdDQ3GmZKn17mf/7vr2jw3dq59rPAK5I6IDak6Y=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=UzafEAp8HK84BsvAFHE+44UhHYSzwM0R2Gi9XUaLU4630VcP68LOBYD2KtspB0T3CbLWQD902N+tpNM5PZ3RoV/GB32UViC9gKSpwGEwdJOcfALsUh+6U/QUVUsJKSicYWEsw/AEBfuSor0G4mgPoLk82BzSE3V5XduDdFom+74=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fwmNDbLy; arc=fail smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756203893; x=1787739893;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=t7+dkdDQ3GmZKn17mf/7vr2jw3dq59rPAK5I6IDak6Y=;
+  b=fwmNDbLyrDjdSNIDhvSkqC2x+kjga+gcIKwTp4GXg05j2ei0vgM5C4wk
+   Yvr0YgH0lHhRIYTsbYANZ+ZvBFaAbk4U6lAtL1E4+ZD7jyXr5z6FpZbCK
+   8eOtrueGLGWneLwcC0jdwAxC1E6TIVmU7XP/+VxIIwA1TPx42WIavfhMK
+   xH83cQymvxVzn0Ng5yvDXqBsZcpZM8ytJW7kTFYmTbfQp/HwB7pAYEVYT
+   GJ/h8erb3hFjP8Gq6zEVknpJNNYkl3r0N8hqqNjtUarNgRekhRbiylfFr
+   DFqWKOUOM/FNnAdH7spbujW3yQykOMnuRfnWbwhamrJizESlxHLuGkdVu
+   g==;
+X-CSE-ConnectionGUID: VnGeWHebRQ6D/r97GJBB+g==
+X-CSE-MsgGUID: 6TQCEG0wSBy9T0Zjptl0Aw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="58374484"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="58374484"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2025 03:24:52 -0700
+X-CSE-ConnectionGUID: pfRLlxw6SKygdngaqakJ7w==
+X-CSE-MsgGUID: nOu91ZHHSQ+GMRJDk86COw==
+X-ExtLoop1: 1
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2025 03:24:52 -0700
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Tue, 26 Aug 2025 03:24:51 -0700
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Tue, 26 Aug 2025 03:24:51 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (40.107.237.47)
+ by edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Tue, 26 Aug 2025 03:24:51 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=pIXJ9T+OOKEIYJ0LD1hZdgCL7DlD/mttt4D6erUuDjYHkLn+b4NYgkzDdnVZK4B3zZ5Z23FfdXXpWTUhsIqM3aF43LUwL0MeZFxjAJT7eTCQgcH4K/S9tYkqkHNrRE/hagUK/dmfgEdfXgTPfLXC0lofmXl2kIBgrqPCxbjitFEXzPeQi43K/hQzspNPzl9RYifcxLORMj1FL0x7/mJOT27TZdrehx0mPvuTRoxFaNhSx9jiAA0CqdUCQPILPXjThG1SPcfAqZrrV0Qr5jM7pxBMMB5tGgK4iDmTyNHDSLvaWjpA8Oa9WYrmB3jwp+vK7tZQBul3ZZr2/KHti7lCpg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xsUeOi3Mp5SHYAHLFMPJfoK4OjGDJ7EO9Nz7+XiYEgs=;
+ b=UpkF+s/QDTUbyKzjxwDNikGzBrKHHF6nrTD2o10kVXxxsaz6LaCApaS1BdrZDeh9iqHtSIok7meVAcylzf64MIIQw2BcXKaLuxCNpLOWBOPyuLYgxbO5dmVgvWqsWNOp4Maf5KrHhevN0s6S4nk7A/4m4uYXfYwe3zZBdYRMALGAL1mIQDNIh6Ey7Jz1v5wSkqJW3KSU0fCDnI1NnTIGmeHinJJXSqVj7HcSTaH5b3M/B5Cg8iB8CaAgu6aGbpIsgpnEadowh2+626ocRa2nJt0bmZ6j/n1GEa6/pWCXDBAkI/fWI27biR6kt8cZzSqOUhvFAUS7EACDUi3BWGOXXQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8665.namprd11.prod.outlook.com (2603:10b6:8:1b8::6) by
+ DM4PR11MB6312.namprd11.prod.outlook.com (2603:10b6:8:a5::11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9052.21; Tue, 26 Aug 2025 10:24:48 +0000
+Received: from DS0PR11MB8665.namprd11.prod.outlook.com
+ ([fe80::8e7e:4f8:f7e4:3955]) by DS0PR11MB8665.namprd11.prod.outlook.com
+ ([fe80::8e7e:4f8:f7e4:3955%3]) with mapi id 15.20.9052.021; Tue, 26 Aug 2025
+ 10:24:48 +0000
+Date: Tue, 26 Aug 2025 12:24:36 +0200
+From: Michal Kubiak <michal.kubiak@intel.com>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+CC: Jacob Keller <jacob.e.keller@intel.com>, Anthony Nguyen
+	<anthony.l.nguyen@intel.com>, Intel Wired LAN
+	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>, "Christoph
+ Petrausch" <christoph.petrausch@deepl.com>, Jaroslav Pulchart
+	<jaroslav.pulchart@gooddata.com>, kernel-team <kernel-team@cloudflare.com>
+Subject: Re: [PATCH iwl-net v2] ice: fix Rx page leak on multi-buffer frames
+Message-ID: <aK2LZCedKkXuG1I_@localhost.localdomain>
+References: <20250825-jk-ice-fix-rx-mem-leak-v2-1-5afbb654aebb@intel.com>
+ <85c2fea0-686f-435a-a539-81491a316e46@kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <85c2fea0-686f-435a-a539-81491a316e46@kernel.org>
+X-ClientProxiedBy: WA0P291CA0008.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1::24) To DS0PR11MB8665.namprd11.prod.outlook.com
+ (2603:10b6:8:1b8::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-26_02,2025-08-26_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 bulkscore=0
- mlxlogscore=999 spamscore=0 suspectscore=0 malwarescore=0 mlxscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2508110000 definitions=main-2508260091
-X-Proofpoint-ORIG-GUID: A1rNZuMOzBCLBqP3JjLXHJ8H1V0uDCAP
-X-Proofpoint-GUID: A1rNZuMOzBCLBqP3JjLXHJ8H1V0uDCAP
-X-Authority-Analysis: v=2.4 cv=EcXIQOmC c=1 sm=1 tr=0 ts=68ad8adf b=1 cx=c_pps
- a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17
- a=2OwXVqhp2XgA:10 a=yPCof4ZbAAAA:8 a=drNr5Ij397O-Cq_uu80A:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODIzMDAzMCBTYWx0ZWRfX3TR+YKZXLVXZ
- xl2yVtGEp/AIv0M866KYyb+u8f5fb7ceY2nkPFimDfmLd2nqCucW8HjqC2dbr7rg1V5Wf9ShqOa
- 04A2YOBt96ozsA5MXyWo7qDXPi61+qrgissBks4ME/knlm1W1S6fE0eggX3UjipTE9Vl+ecnXBa
- qnwHUtEqxhWiKrhahiGKHu5niwRjcdA7zrTL3+HtV8FU/y8wLVwvuoFh6PleEtG0ITNy5PAoCJ1
- CwKGoMj74OgW3g8wxykn52SNhGQFTTk+REiQCmMjgoc/3ZSbmwaJXiLgk4IgG+n14/Q0Vt+5MXF
- KTDIb0e9zts1Sl5HFr9m6vISoThoZPb6wNVspCBhrU9p9gKhM3Pe0sbmrP6govHmvUaKYGB/xvE
- gGcmYWt+
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8665:EE_|DM4PR11MB6312:EE_
+X-MS-Office365-Filtering-Correlation-Id: 42c31f52-5719-4987-1f71-08dde48ac8b1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?98R0ex2JScACx9zvYP8ZnxzraIS7Mbz+XO3R4XIZNt9PBAAyDOZk6eZTYN5n?=
+ =?us-ascii?Q?G0K4RcL9mb7bMmgQXkIU8mWiPRPUXgxOiDO2vduaOgNx5RRDPb54Y4DYg/MG?=
+ =?us-ascii?Q?CRmE5bmeYbygn81ilpDyWPFsPDYwV4TeE1eEXYD5iW44o77FicZXszIP/UXZ?=
+ =?us-ascii?Q?tp9Fu+RkyvwiofinaJM0yaJ2+DYaqd/KR6lHZIzPNgE+gf85E4ftfIu9qPMk?=
+ =?us-ascii?Q?X38WCR1uw8Sy6qeKUmElTc8mpLT4/dA3ZhR3Co3NF8hFzGEhODAjv0y8EB47?=
+ =?us-ascii?Q?uXtTeBoH6f0Qd41nNQWToSuxeI7RCMGAAoPIzXKuo0E195FsrH+gHcBHugMn?=
+ =?us-ascii?Q?or9nH1s6WhkZAKePEmzewad+hEbht1EhAOOQ4j98WQqsX3RqBbP0QsiJYR/u?=
+ =?us-ascii?Q?JlLfnC503KLvZ+RAfQEL3gvu0IZ6vrX9f4wwC3hwwwvtbFgRW8iOED8JIwHU?=
+ =?us-ascii?Q?Vvu+M0wFRmMggRfT1FzecKTMfxtKGf2+92fqFxeCEgok+yFQYjjm7pQVtsk8?=
+ =?us-ascii?Q?TylWiQDG8lEiVW5FFlnj4gJftQnsoVf8gRMwyqeIhihxIHNbGgsUG4cXgsCV?=
+ =?us-ascii?Q?6bvsarC6+5fGpfhzbKndWNDYDTUB4sZ/i/Velw6X/koaMyLOdupmRTL0UTni?=
+ =?us-ascii?Q?qwxCHeHCq5185N9wlxIqIWQg3JCRZM/BkZlQ/phPCnmNG8iXXk1Wp0yLaHfW?=
+ =?us-ascii?Q?mwDg+xL9/hcRyFuctqfJDW4TfuxIE5dFXjpXRm1YOUSIM7Gugx2PsPNKt2NI?=
+ =?us-ascii?Q?I6PD1V10q7ICXB1MUj9//ZDGJUX9NkFn4Z1zddz9DrmbwyrsapPBcWyiCu3x?=
+ =?us-ascii?Q?OH3FFWcHVrdyqR/8VL75sOfxRGt4Xytn+UBW+/j3aBovFZxyiqMOUtQGGtwH?=
+ =?us-ascii?Q?bRIPlUMJb8WJkevpXe8s+6CNTGwuZHLThHVkm0nRJZIhalTKFKfDdHl2lX8p?=
+ =?us-ascii?Q?M5UMn6dE8Nqna73+x8/zXxdath98TvASEXLuYamr+2bBmxUrHnw5FwOKCtEu?=
+ =?us-ascii?Q?lFMsbVmqUFiCgfocsAcsS0zZvyusZCz2h1/7OUlU1y8SOI4pNVJrwxfPIpBi?=
+ =?us-ascii?Q?+xxfLWsE+qnxauyG+DTktJXDS9QqPFsvtlSUzJ0Rw98Un1lp/6SXOk11vAWz?=
+ =?us-ascii?Q?CT1KEgGAgu2/OFQrebrICgpeDMwaJt2Q9UZMEZukVExq4+qbpgQjP6tUHNh/?=
+ =?us-ascii?Q?0lZgX47wbkJaGSrkR0Q6irC+jzeLsegMPo5S97SybMU0D4coEUgOs3uqxz9t?=
+ =?us-ascii?Q?genMKN6EW2lOP3hdonkmjpTKSrIWi1nCTJje0zbAd2sJZgES7TRXOfFW82t8?=
+ =?us-ascii?Q?cV9vTBKk2J1oi7TwlslEoZb8xACcDYWDosR6pczshS5waJm4Z/LRdILGjBeY?=
+ =?us-ascii?Q?rFljvnGtUZws1j3+DySIjETS3SQ0?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8665.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?4wnMQPNFeZkHS7pd0lmY02lqeuPkv1n7rMIpZVVtr4nIrOg1JwB66GaM6as6?=
+ =?us-ascii?Q?nLiay8D8ZtejBg4dIttPJd5vTQf2XRlais6h/ptcrhGdCXaeLTD+1otAAGPp?=
+ =?us-ascii?Q?HC4T07io4CFkFKpb43BN75kfbyTsB3wgWZIKLEjsCTULxx0rB24tmvI8Xdk2?=
+ =?us-ascii?Q?5KYlyRa+G0OLpdNaxkiR3Q1s39lkTMP/LbvsYPrSWKmixFvQ3mKGC3k8RUyQ?=
+ =?us-ascii?Q?9OZGoOLsF5crYQ0duZIotOns1DYZsB6R2AgknBjRLKkmsycFEuMQvpRqHLCT?=
+ =?us-ascii?Q?/W5U+nBCuhBde7buQU9PvH/AMBEjZAHu4erEC3r3bWXrqguheYAOzH0xAWXQ?=
+ =?us-ascii?Q?Y6kBtx6h1E/5qP+AWyPtuR6Q4jin0TWANtbp4ijn1qfasxO0JS9gkjhYr7Vb?=
+ =?us-ascii?Q?I1j11AoMiKuPTvp3YUypre3so2x/y2ZuXATpQvaBSOP1pjc9f/pQKxFUnj+l?=
+ =?us-ascii?Q?Q2T8TBOh5qHaysDOxxj0YnSSc+3ojPkpWP+AUr/4aacXzM/fhOkX/Pm7/uAl?=
+ =?us-ascii?Q?e+4/SsdImdHgTyMeLE1AgqmxrlCFiaH71E3RnqUsIfcEt0OlVLUpb+ExzdLJ?=
+ =?us-ascii?Q?jgVXd9jlkOuxIV2alRXZrzeu3vi9ysD/s/S/t4kPaDtRA+3iwZ92IURe69zC?=
+ =?us-ascii?Q?bz3tsrKYU/ZHj14eid7pRxWW8K4QG4Ci+A58NUAni8NMarHN2G2HJteWNN1Q?=
+ =?us-ascii?Q?Kc+rY4u7XDFnqnuCFnBdx/rW0NfL3ajh5NUfrhILVBbi0DZiJKJEyn2EmLFR?=
+ =?us-ascii?Q?lx8aYQv6FvywqFZ6XK82BqsLleBSAe9t+ZkHs169k5CyED/KNKWaJzQmgi/X?=
+ =?us-ascii?Q?K+zf8M9xDNX46ERlPiTESTGxwx+N7Ix4DBOoB1b5n4CgwOi/Zo0TzuzsViIe?=
+ =?us-ascii?Q?c1Z355zoOnr5oPD7qktc2pznuKjUDVWf48Q8Sk3pt+t0YFfM5QWXIfaXwy9n?=
+ =?us-ascii?Q?ADTec6zN3TIYaR3evMNzDkWc3H4VGiQkJ0rFQpbEUvQ76VzynrefjJh6Y859?=
+ =?us-ascii?Q?eCDFW1mewbFeiDiWGcqd34s/4il7Xk8FJisKHxa3KG4n8PQIzUMwykMSB0bx?=
+ =?us-ascii?Q?/2xuBC9eftLg0aSmJXvavf8QakV+yfuHs0Y4+hU9hc9zm7xGYXfDkewwfvXh?=
+ =?us-ascii?Q?tEvT2InjzDyZBDLM3wPaIq0hBX29sY0k7vaBIOzS80aUswZ7SP4IW4NlO8AT?=
+ =?us-ascii?Q?Kdr754g4QbqhCZX5ATx5vlxwVf36Muxs/DBC5NEm2e0j7txatZ5h7D/Pm4w1?=
+ =?us-ascii?Q?JBf7M2Znx8cQUx5yCy4P2LJdZtCjOZv68B/jC1QOVEG5gSa5MkIth8iUIyz+?=
+ =?us-ascii?Q?NckmU4b/NEjSU06iub+DJSHfwdZi52EnBHlaB+m5mZFs+J74J9+JrV2Qwkc2?=
+ =?us-ascii?Q?4HQJiAR9jlHxJwkQbZBO+m6iTSVrNZ1Ud2MG4rCEDrL9FaF6Yf2uouhvV8QA?=
+ =?us-ascii?Q?wVQKltLOZjorEk12740s5gg0dyopRTPuQU+tMvn6h0hAYcmLekgAId44h3fD?=
+ =?us-ascii?Q?Rcymbk1IQ2+yBIt+j+0XpQY8HgBlhzuX+7tsvFKzokwTLOgHFYuaNStHSslc?=
+ =?us-ascii?Q?Ah9CbL0a/guO/mWLN8dA1jofJI5ExSAd6jJgXvQKZHvGnUEBZEyyEEO/4bGI?=
+ =?us-ascii?Q?Dw=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 42c31f52-5719-4987-1f71-08dde48ac8b1
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8665.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2025 10:24:48.1446
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: WtX8dYY2kYgeqyDwcUzy+NYuuCGXOvw5KlmtaoAVGu71sxLq/+hc9G2YNHHwdtOlw+8oyHAj5MLgjuchooTTdw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6312
+X-OriginatorOrg: intel.com
 
-The RK3328 GMAC clock delay macros define enable/disable controls for
-TX and RX clock delay. While the TX definitions are correct, the
-RXCLK_DLY_DISABLE macro incorrectly clears bit 0.
+On Tue, Aug 26, 2025 at 10:35:30AM +0200, Jesper Dangaard Brouer wrote:
+> 
+> 
+> On 26/08/2025 01.00, Jacob Keller wrote:
+> > XDP_DROP performance has been tested for this version, thanks to work from
+> > Michal Kubiak. The results are quite promising, with 3 versions being
+> > compared:
+> > 
+> > * baseline net-next tree
+> > * v1 applied
+> > * v2 applied
+> > 
+> > Michal said:
+> > 
+> >    I run the XDP_DROP performance comparison tests on my setup in the way I
+> >    usually do. I didn't have the pktgen configured on my link partner, but I
+> >    used 6 instances of the xdpsock running in Tx-only mode to generate
+> >    high-bandwith traffic. Also, I tried to replicate the conditions according
+> >    to Jesper's description, making sure that all the traffic is directed to a
+> >    single Rx queue and one CPU is 100% loaded.
+> > 
+> 
+> Thank you for replicating the test setup.  Using xdpsock as a traffic
+> generator is fine, as long as we make sure that the generator TX speeds
+> exceeds the Device Under Test RX XDP_DROP speed.  It is also important
+> for the test that packets hits a single RX queue and we verify one CPU is
+> 100% load, as you describe.
+> 
+> As a reminder the pktgen kernel module comes with ready-to-use sample
+> shell-scripts[1].
+> 
+>  [1] https://elixir.bootlin.com/linux/v6.16.3/source/samples/pktgen
+> 
 
-The macros RK3328_GMAC_TXCLK_DLY_DISABLE and
-RK3328_GMAC_RXCLK_DLY_DISABLE are not referenced anywhere
-in the driver code. Remove them to clean up unused definitions.
+Thank you! I am aware of that and also use those scripts.
+The xdpsock solution was just the quickest option for that specific
+moment, so I decided not to change my link partner setup, (since I
+successfully reproduced the performance drop in v1).
 
-No functional change.
+> > The performance hit from v1 is replicated, and shown to be gone in v2, with
+> > our results showing even an increase compared to baseline instead of a
+> > drop. I've included the relative packet per second deltas compared against
+> > a baseline test with neither v1 or v2.
+> > 
+> 
+> Thanks for also replicating the performance hit from v1 as I did in [2].
+> 
+> To Michal: What CPU did you use?
+>  - I used CPU: AMD EPYC 9684X (with SRSO=IBPB)
 
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 2 --
- 1 file changed, 2 deletions(-)
+In my test I used: Intel(R) Xeon(R) Platinum 8358 CPU @ 2.60GHz
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-index f6687c2f30f6..9e9ae8525720 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-@@ -557,9 +557,7 @@ static const struct rk_gmac_ops rk3308_ops = {
- #define RK3328_GMAC_RMII_MODE		GRF_BIT(9)
- #define RK3328_GMAC_RMII_MODE_CLR	GRF_CLR_BIT(9)
- #define RK3328_GMAC_TXCLK_DLY_ENABLE	GRF_BIT(0)
--#define RK3328_GMAC_TXCLK_DLY_DISABLE	GRF_CLR_BIT(0)
- #define RK3328_GMAC_RXCLK_DLY_ENABLE	GRF_BIT(1)
--#define RK3328_GMAC_RXCLK_DLY_DISABLE	GRF_CLR_BIT(0)
- 
- /* RK3328_GRF_MACPHY_CON1 */
- #define RK3328_MACPHY_RMII_MODE		GRF_BIT(9)
--- 
-2.50.1
+> 
+> One of the reasons that I saw a larger percentage drop is that this CPU
+> doesn't have DDIO/DCA, which deliver the packet to L3 cache (and a L2
+> cache-miss will obviously take less time than a full main memory cache-
+> miss). (Details: Newer AMD CPUs will get something called PCIe TLP
+> Processing Hints (TPH), which resembles DDIO).
+> 
+> Point is that I see some opportunities in driver to move some of the
+> prefetches earlier. But we want to make sure it benefits both CPU types,
+> and I can test on the AMD platform. (This CPU is a large part of our
+> fleet so it makes sense for us to optimize this).
+> 
+> > baseline to v1, no-touch:
+> >    -8,387,677 packets per second (17%) decrease.
+> > 
+> > baseline to v2, no-touch:
+> >    +4,057,000 packets per second (8%) increase!
+> > 
+> > baseline to v1, read data:
+> >    -411,709 packets per second (1%) decrease.
+> > 
+> > baseline to v2, read data:
+> >    +4,331,857 packets per second (11%) increase!
+> 
+> Thanks for providing these numbers.
+> I would also like to know the throughput PPS packet numbers before and
+> after, as this allows me to calculate the nanosec difference. Using
+> percentages are usually useful, but it can be misleading when dealing
+> with XDP_DROP speeds, because a small nanosec change will get
+> "magnified" too much.
+> 
 
+I was usually told to share the percentage data, because absolute numbers may
+depend on various circumstances.
+However, I understand your point regarding XDP_DROP. In such case it may
+be justified. Please see my raw results (from xdp-bench summary) below:
+
+
+net-next (main) (drop, no touch)
+  Duration            : 105.7s
+  Packets received    : 4,960,778,583
+  Average packets/s   : 46,951,873
+  Rx dropped          : 4,960,778,583
+
+
+net-next (main) (drop, read data)
+  Duration            : 94.5s
+  Packets received    : 3,524,346,352
+  Average packets/s   : 37,295,056
+  Rx dropped          : 3,524,346,352
+
+
+net-next (main+v1) (drop, no touch)
+  Duration            : 122.5s
+  Packets received    : 4,722,510,839
+  Average packets/s   : 38,564,196
+  Rx dropped          : 4,722,510,839
+
+
+net-next (main+v1) (drop, read data)
+  Duration            : 115.7s
+  Packets received    : 4,265,991,147
+  Average packets/s   : 36,883,347
+  Rx dropped          : 4,265,991,147
+
+
+net-next (main+v2) (drop, no touch)
+  Duration            : 130.6s
+  Packets received    : 6,664,104,907
+  Average packets/s   : 51,008,873
+  Rx dropped          : 6,664,104,907
+
+
+net-next (main+v2) (drop, read data)
+  Duration            : 143.6s
+  Packets received    : 5,975,991,044
+  Average packets/s   : 41,626,913
+  Rx dropped          : 5,975,991,044
+
+
+Thanks,
+Michal
+
+> > ---
+> > Changes in v2:
+> > - Only access shared info for fragmented frames
+> > - Link to v1: https://lore.kernel.org/netdev/20250815204205.1407768-4-anthony.l.nguyen@intel.com/
+> 
+> [2] https://lore.kernel.org/netdev/6e2cbea1-8c70-4bfa-9ce4-1d07b545a705@kernel.org/
+> 
+> > ---
+> >   drivers/net/ethernet/intel/ice/ice_txrx.h |  1 -
+> >   drivers/net/ethernet/intel/ice/ice_txrx.c | 80 +++++++++++++------------------
+> >   2 files changed, 34 insertions(+), 47 deletions(-)
+> 
+> Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
 
