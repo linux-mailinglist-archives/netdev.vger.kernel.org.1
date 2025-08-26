@@ -1,89 +1,131 @@
-Return-Path: <netdev+bounces-216816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C488B3549E
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 08:30:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C14DB354A8
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 08:34:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C3BD3AD248
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 06:30:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 761391899A5F
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 06:34:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B75EE2D3A85;
-	Tue, 26 Aug 2025 06:30:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C198172633;
+	Tue, 26 Aug 2025 06:34:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="P31hKE4o";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="43nXdEzQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iKw72sCd"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7278E29D05;
-	Tue, 26 Aug 2025 06:29:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C4FCDF72
+	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 06:33:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756189800; cv=none; b=G8o0vdGcdQv6xUCqKPyVYe5O5hoM+mXtDPMc0tAPRhaXYuM5HSiPsdmcuuD8OKRQHpPcLo93ORxhCV6wv0kV+A53fmdPmcS6veRiwftMLW295H9EoCyN+Kn8HM5yLGcnR3MOvK8h+Wh8oMS2rxGXkAPYOdJiuQnW39hfb1fUDnY=
+	t=1756190044; cv=none; b=nIs6EoMCgvxv82wInavQQ6gRlEYnxxDsOYw/lzvmU95RxY63XQzw19ADp18mC1hTHKq/dZ3iLJDBZEIZxUir1rC3IXYGd2A2gj8InqMCdocjZadTbCRUtxzt1mv5BAg8IYjJ8aUDmYQdKyChd0+aENebez05DwnWFw4DwIfeQGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756189800; c=relaxed/simple;
-	bh=qpmfk+xfq/qcYNhcqT9cFC1mP1WvTyD18P6Uq/e6gC0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FLY3ygKv9+W9ZzoB9HCI/oA7QuqyEf+RHLG8xoZE3PCfnKY+UrIF5gNs/n6r3/uXLo7/Oc+1/du+ynqD1G69/GCV/ine2ieVNgmA0gTSSOLFCUk4yMWczWxarYA+0I9pIcoFHcXwTmFFHgBScx9soovyV+exN2ywLfp1DVcBdgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=P31hKE4o; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=43nXdEzQ; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Tue, 26 Aug 2025 08:29:52 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1756189793;
+	s=arc-20240116; t=1756190044; c=relaxed/simple;
+	bh=H5UPk8soSD1Dhj6vQ5tlVwR8UNMznm24d/sBs7unIAo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=j9g/jBdFJv+xkamrt9mJJbIP3wA/4oe5+hEaGWrx7mn2K2V8Of4lp6hAYTmg8+e8dGfT1JExrewpPkdAsiEc12fMLh77GUOFQfAOCqjeOhWUvnNCRRUuf7wXU9a0Ja56RqlnPomOB2MMdWZMdmFA+W7OtcvuAR9nvch3XJ0nkCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iKw72sCd; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756190038;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=wsqQrehpilHddnDvFR3sXC4btLIz8Vlzv0GVLkTTpNk=;
-	b=P31hKE4o3kX/G/zyz/dlj1MNG+6bFvJrakMcRfGHmbsOSNlD8HfOfkRG34jbCQ901GAg1F
-	o9LGzz4tUm8EfkrAhvVsAnK5GJXlg73fYwFKOWe8+mLP8mhTXImGZMRvcsivJZfn5i42m/
-	bteLNcq5jJAuY6jYbkmGz3RRtd/Wu/SMsm+EFZLHBWdIP77o7fQevPH7lSYjEtM9bNjcGr
-	WXNRVIv0W8fEXQqYAgUOjBPBfJXl+hzY+r9cKGiuNMdRiOLKdhj3N3iim/k3kytyJYTk2J
-	24cGSjB/gh93Jq1HNXRcrw6AlIVob9aGoWAWJMjb89kqGqj1qJyeQXUs6FE83Q==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1756189793;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wsqQrehpilHddnDvFR3sXC4btLIz8Vlzv0GVLkTTpNk=;
-	b=43nXdEzQK0DNDN/8V97czMOpuC3TDyyjWE6PjXwXA7SoMZ7zLV/hvhgsylyBWbg7C4MmQv
-	2NWCiPQ53aQB1pDQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/3] vhost_task: Allow caller to omit handle_sigkill()
- callback
-Message-ID: <20250826062952.pMTsCcyH@linutronix.de>
-References: <20250826004012.3835150-1-seanjc@google.com>
- <20250826004012.3835150-3-seanjc@google.com>
+	bh=3cuxbKrEyYDYBV80DSoYDo0tQloL94Ba/yPGVe5TeKo=;
+	b=iKw72sCdrTEUsRQvGAX+ewd2V3gTPO2S0yR6UGe8NqJCoc+1Ghk6k5NN+OYNDKv3Ov3fv1
+	PWFgFqQk3ctC9YK3LjGyb5FhZ1dUndvxp4r8M4dCNk3VzNgG6X4nmPjWw10w8pxRmeWjvN
+	L6+z/OwsZYTN/fsdi1R4W7oAY8jmNEc=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-508-SNZkmTfNMKypmhyUJ_NMHQ-1; Tue, 26 Aug 2025 02:33:55 -0400
+X-MC-Unique: SNZkmTfNMKypmhyUJ_NMHQ-1
+X-Mimecast-MFC-AGG-ID: SNZkmTfNMKypmhyUJ_NMHQ_1756190035
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-4b109c4c2cfso200326681cf.3
+        for <netdev@vger.kernel.org>; Mon, 25 Aug 2025 23:33:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756190035; x=1756794835;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3cuxbKrEyYDYBV80DSoYDo0tQloL94Ba/yPGVe5TeKo=;
+        b=uYWezpSxTi9z8Z9/99OygXsae6QRE1Qnrl+7Jvsu8PJ/+h93ZA32P0diOX+flZe2QR
+         a+xAhFchKTBnSHAPv7MFyqyf7Ux4tcvf7zLRQPpZlMgGl+Et+4rFKn6WAz+wQ7BEXjtJ
+         t6JSBY0elkj/h8p+IbqKEbi2FXGLjs/5oZr7VkM/cHg/K5XDHgRJ3My1uj3LFnWJ/kJI
+         n+xEJAi7dGS6THWV4+Ih9Fd7NBRBeLckooWgyRLbG9vqajKPtRc1Ei9RbNAG9pJ/lpOi
+         YaUVqJ7X4NzB/qptODVxANypg4GNu6xjN0IOft6cQhTZiZHD310ehvCGs0ehgV9y9D9q
+         AS2g==
+X-Forwarded-Encrypted: i=1; AJvYcCVu2pKQsDJCsLWsg6Eers0ZArauraVeaKerTLLkrwIOJiilS9NuID6XFL+6IvCECRhkdMlz19U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/fl+s5WcSPQGS37Fnrg3XLuuk1mHKc9KXWnbeqv6hQcUWdHAJ
+	OJUrNJhiHoaXfrKv1bGGmBeQjyijEkgrM5PmxNuO63f3SAVF0F/jJweMLPf7VfwHvDy5J9DmSIT
+	K1U10C9MkSO3PlMOHlSnTUZgez0tQghrrjXTJ0vRtWM4JC7AdvKuYz+HoQw==
+X-Gm-Gg: ASbGncuLuePr2uwot4PBUMOW2olawahHng1qKJNaghBk03+ysBb82PU0bjANjbY9wO2
+	BennsbUFRxXPp1kk7+gnnG4ek45K4RUClCXzjwZJqM2PvE+7CCBPTVw9SYncBAsjuqZ22ATC/Ti
+	nJ3dg5JSRll+M4Evuch9qtFiVkoRzJ+pVSpwUNzIgF5am2EGhjWhZlchgDbHhedDIGF8yBX/CgR
+	hlpv5VL+MePObmuSragnPUwoWfbAyBOa6G6iktjJ4JZGt/W3P2cmIp1VEB2mVKNMEGcR9ybrKUb
+	xeoknridEpo35uIIVikPxKZKRBDftjRtb5otQ2T2kdauFGtwKFeWYUfhZp21yeHvesoA5nwA96t
+	T5WbJIkZhd5c=
+X-Received: by 2002:a05:622a:5c88:b0:4b0:6b99:c25f with SMTP id d75a77b69052e-4b2aaa80e4amr164149001cf.17.1756190035486;
+        Mon, 25 Aug 2025 23:33:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGWxrpP3Lw3J4fpP3qDin/UJ8aCgE2YbSjwYLth4M7ZyGpSlWJ6/fJ+x3zBZU7m4exEUNp+/Q==
+X-Received: by 2002:a05:622a:5c88:b0:4b0:6b99:c25f with SMTP id d75a77b69052e-4b2aaa80e4amr164148851cf.17.1756190035141;
+        Mon, 25 Aug 2025 23:33:55 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7f4eef7101asm58756085a.38.2025.08.25.23.33.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Aug 2025 23:33:53 -0700 (PDT)
+Message-ID: <6e645155-1d2d-4b64-a19a-a6e90a12b684@redhat.com>
+Date: Tue, 26 Aug 2025 08:33:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20250826004012.3835150-3-seanjc@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 3/3] net: add new sk->sk_drops1 field
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com, Willem de Bruijn <willemb@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>
+References: <20250825195947.4073595-1-edumazet@google.com>
+ <20250825195947.4073595-4-edumazet@google.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250825195947.4073595-4-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 2025-08-25 17:40:10 [-0700], Sean Christopherson wrote:
-> Now that vhost_task provides an API to safely wake a task without relying
-> on the caller to react to signalas, make handle_sigkill() optional and
-                                  ^
-Sounds Spanish :)
+On 8/25/25 9:59 PM, Eric Dumazet wrote:
+> sk->sk_drops can be heavily contended when
+> changed from many cpus.
+> 
+> Instead using too expensive per-cpu data structure,
+> add a second sk->sk_drops1 field and change
+> sk_drops_inc() to be NUMA aware.
+> 
+> This patch adds 64 bytes per socket.
 
-=E2=80=A6
+I'm wondering: since the main target for dealing with drops are UDP
+sockets, have you considered adding sk_drops1 to udp_sock, instead?
 
-Sebastian
+Plus an additional conditional/casting in sk_drops_{read,inc,reset}.
+
+That would save some memory also offer the opportunity to use more
+memory to deal with  NUMA hosts.
+
+(I had the crazy idea to keep sk_drop on a contended cacheline and use 2
+(or more) cacheline aligned fields for udp_sock only).
+
+Thanks,
+
+Paolo
+
 
