@@ -1,95 +1,101 @@
-Return-Path: <netdev+bounces-216747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FF15B35076
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 02:45:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE613B3507C
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 02:50:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3EAF53BE1AB
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 00:45:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E252242D07
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 00:50:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6B055D8F0;
-	Tue, 26 Aug 2025 00:45:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D52B1BE23F;
+	Tue, 26 Aug 2025 00:50:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XeFWRknx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OcoSPHfI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 768671FC8;
-	Tue, 26 Aug 2025 00:45:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48694482EB
+	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 00:50:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756169143; cv=none; b=iJx6RDUKMjOHzsGRWX4ZgOjYQaAO5RUELa6MWyDkbM22E1mpB7QU+FsNoWcNHwAuXnR4LDLOF/xMlXb4iADXTxlf1sO0FuighQ0b4uTlIcrkJoT5xw2mH1kvJ85pkz/nkOJK1qNWaNR8UW0aXEx1dxkchm503+uubGp/9Dcake4=
+	t=1756169402; cv=none; b=iEqKocGUpI/Ps76In1UxEthiao47IjC7TkIIJnmXokXUe6mpGwLwc0ctxpP0f2bRLeaZ4WkCdw8fdIEWNkKVTf1HXYOIl6lFeBBmaAWNiitObxujkCNZL6POG6itB8ZQH4RoxFKrE0AiYK15viHGeUSxyHViLcjcCQMKS3/450s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756169143; c=relaxed/simple;
-	bh=q/ApEimL52B+G+oVZ7OXV1FFoAOegw1ViaoJS/+MNwc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e80Xi0O5DV/08O2MmtZvtvJzzxFI1Ty5FUvIQj7gsw5PJJrcfWif4dQZcNrc76BbZtwhH9yfQujXx2aAh0SXiGNAfrEHIr7EVowZZQnfTwTZDkHjUW/G32tPFpVcJ1PFpp0OGnqBvEyuw4ziANsjvKOmoaN9FsCgMBw05lJiYlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XeFWRknx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3D56C4CEED;
-	Tue, 26 Aug 2025 00:45:42 +0000 (UTC)
+	s=arc-20240116; t=1756169402; c=relaxed/simple;
+	bh=nDRA1Tds71oq7lboJgaRNpeXobXorqZWQAvxAvuigEM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=phddzcTUAGumzOOYuImG8jepkhV2hk9ZnA3cGyMA1Xs87k4QegmIVjOGeX8llPn9L26n/Vwb4GK7MKzdr/v/WaeuocUxlkq5HkC7Z2d6oBFPitf4+arAMcebnLi4+XyFSG6aAUSPRLomHF51+fRkDRWJ/QZWD+1oUgO+G3C9cU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OcoSPHfI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC85DC4CEED;
+	Tue, 26 Aug 2025 00:50:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756169143;
-	bh=q/ApEimL52B+G+oVZ7OXV1FFoAOegw1ViaoJS/+MNwc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XeFWRknx/CgQmmppS1Rtba/7nc3xKgrrDbrqRIsjNm76sSC5ssitJPyJA+9jdmqYT
-	 /y1w3s2Z3+CLijpYNUBejPdahHObW9KZESVOZvcq5d2aRf6gcgb5zBTKVfMZR92ry1
-	 H0WIe/NbPWHWfJi0QHSpe/XsBF3zd9izXQH+u1FdWAUbo99DtmuZWCYEs+bvf/qEY9
-	 7D4WCLPHNNEiqWCo5hXYP/lTYvVqh8YJmdK5DLwkja546HjMjaqDrm1GhxXKVtzvig
-	 NLNc2GQJ9kN0vxrJFwDQtbpWlhIIz25ZDiozANlylK5Easv94FoPCvUzZQmh+KB63U
-	 gZFiv5l6M3o1Q==
-Date: Mon, 25 Aug 2025 17:45:42 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Harini Katakam <harini.katakam@xilinx.com>, Neil Mandir
- <neil.mandir@seco.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Shubhrajyoti Datta <shubhrajyoti.datta@xilinx.com>, Nicolas Ferre
- <nicolas.ferre@microchip.com>
-Subject: Re: [PATCH net] net: macb: Disable clocks once
-Message-ID: <20250825174542.2ece797c@kernel.org>
-In-Reply-To: <20250825165925.679275-1-sean.anderson@linux.dev>
-References: <20250825165925.679275-1-sean.anderson@linux.dev>
+	s=k20201202; t=1756169401;
+	bh=nDRA1Tds71oq7lboJgaRNpeXobXorqZWQAvxAvuigEM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=OcoSPHfIUBQl1xIRHVsfjzVLMeBmlwrSw2M72DHtRntuR55A/fglMAL/P3jtCWzxQ
+	 Z2HsvCnspVf67NJfcoF1ez4WWwyZJHUYKK4gamEOKHp6JrJ2WDnCnXaSNTzyQw04w2
+	 XOn4ArDBxO/rndR26G+Dwum8jUnIJFu0+RBWM0llQyJf5G/0D0ZbX4xnDdE18UGeG9
+	 iwZqLMOUUWIuTuJ/FN0a4OTPLbKY5PdRdurORn15q49APCu5lfrfxht5fgtOm/WHbg
+	 vWoScC5/UvND+wSVyZQiLHbw1e72ZCnP720xt6r/By44hvBAdfb6mk4d1Q3i/EcncM
+	 lhUTrhKiFAY0A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB1C0383BF70;
+	Tue, 26 Aug 2025 00:50:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 0/3] net: airoha: Add PPE support for RX wlan
+ offload
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175616940975.3610531.11567535063308274967.git-patchwork-notify@kernel.org>
+Date: Tue, 26 Aug 2025 00:50:09 +0000
+References: 
+ <20250823-airoha-en7581-wlan-rx-offload-v3-0-f78600ec3ed8@kernel.org>
+In-Reply-To: 
+ <20250823-airoha-en7581-wlan-rx-offload-v3-0-f78600ec3ed8@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
 
-On Mon, 25 Aug 2025 12:59:25 -0400 Sean Anderson wrote:
-> From: Neil Mandir <neil.mandir@seco.com>
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sat, 23 Aug 2025 09:56:01 +0200 you wrote:
+> Introduce the missing bits to airoha ppe driver to offload traffic received
+> by the MT76 driver (wireless NIC) and forwarded by the Packet Processor
+> Engine (PPE) to the ethernet interface.
 > 
-> When the driver is removed the clocks are twice: once by the driver and a
-> second time by runtime pm. Remove the redundant clock disabling. Disable
-> wakeup so all the clocks are disabled. Always suspend the device as we
-> always set it active in probe.
+> ---
+> Changes in v3:
+> - Fix compilation error when CONFIG_NET_AIROHA is not enabled
+> - Link to v2: https://lore.kernel.org/r/20250822-airoha-en7581-wlan-rx-offload-v2-0-8a76e1d3fec2@kernel.org
+> 
+> [...]
 
-needs a rebase:
+Here is the summary with links:
+  - [net-next,v3,1/3] net: airoha: Rely on airoha_eth struct in airoha_ppe_flow_offload_cmd signature
+    https://git.kernel.org/netdev/net-next/c/524a43c3a0c1
+  - [net-next,v3,2/3] net: airoha: Add airoha_ppe_dev struct definition
+    https://git.kernel.org/netdev/net-next/c/f45fc18b6de0
+  - [net-next,v3,3/3] net: airoha: Introduce check_skb callback in ppe_dev ops
+    https://git.kernel.org/netdev/net-next/c/a7cc1aa151e3
 
-$ git pw series apply 995325
-Failed to apply patch:
-Applying: net: macb: Disable clocks once
-Using index info to reconstruct a base tree...
-M	drivers/net/ethernet/cadence/macb_main.c
-Falling back to patching base and 3-way merge...
-Auto-merging drivers/net/ethernet/cadence/macb_main.c
-CONFLICT (content): Merge conflict in drivers/net/ethernet/cadence/macb_main.c
-Recorded preimage for 'drivers/net/ethernet/cadence/macb_main.c'
-error: Failed to merge in the changes.
-hint: Use 'git am --show-current-patch=diff' to see the failed patch
-hint: When you have resolved this problem, run "git am --continue".
-hint: If you prefer to skip this patch, run "git am --skip" instead.
-hint: To restore the original branch and stop patching, run "git am --abort".
-hint: Disable this message with "git config set advice.mergeConflict false"
-Patch failed at 0001 net: macb: Disable clocks once
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
