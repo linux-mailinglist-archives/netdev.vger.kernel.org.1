@@ -1,200 +1,128 @@
-Return-Path: <netdev+bounces-216962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04997B369C2
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 16:30:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3132AB369E9
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 16:32:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9298F5815E2
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 14:20:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18DAB56379A
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 14:19:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F0A1356914;
-	Tue, 26 Aug 2025 14:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C455635691B;
+	Tue, 26 Aug 2025 14:17:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VmEZTJ7K"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g0X7S72p"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50D422C0F60
-	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 14:17:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 475A934F49D;
+	Tue, 26 Aug 2025 14:17:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756217877; cv=none; b=RIeR3izpzQS5wZXKM7HcE4H5Z3bo1/upGAdtOikWPKFxfJ2mdpQn/NFObk2esDDYZSN/j6fMBXpfqOMg6WUL/fGZIRY6MBw9iTv/Q/TZrGKnpextvSYvvMryrnn0O8SAlILVyz421OvGbWGmOkDmZE9ZhzgEcLWQksuWdwxCJ3Y=
+	t=1756217871; cv=none; b=VFAj40bwQ7oy397npDa7ZV/B6EYHeu+D47TGD0xTqbUgzYa6t1mIMP1LF8YW4J014HrQ5zDp1T7zLmkR/FhaNh204rA3abxDINYWXODHZJ2NitKMwbbylS/+Pl9wzj2P7+bjPjVPVT4gz/Ua43mDA8Bi+PGy2gXi7qIquBeuAUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756217877; c=relaxed/simple;
-	bh=vAFqRkUVU9nLETZfB79IylLrMizQW+Ict1VoMM7PA8Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cGnLWIYhxhaVTRhatl4Vq4sV+a6f/g1TlpNlkNJXPG80nsgPESy6eHYXwbgWocu4ACqe68Dpb9W9FxVdrW1oA8IjEdDxrPYukMDgDtuS51e4oNxBrG8wamcMNghwLMcOegJBG7DxAUKjo7DtwYQP2c99ouIViUCWe25dcDxjlnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VmEZTJ7K; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <66f3bae8-a386-4205-97b2-7c75bc2ac378@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1756217872;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cfxa6V11+XKXn5kTcarhix2gi4YAWPXrw99RS4I7v7E=;
-	b=VmEZTJ7KSXpFbz7WQgz0lsknA09EhZ1lQco7D88dCcQkDOqPgSmbxn+t9meYZf84jXZ/00
-	m0oA21tzCPQZYk+EMz4QgaLTsXyLmtRrgYyAhsqOaj89s8AYhraz2jRSw/FrIKE1qohl2k
-	8eLtRiRNVGyvPY1fPb1MOAJNpm892Yc=
-Date: Tue, 26 Aug 2025 15:17:28 +0100
+	s=arc-20240116; t=1756217871; c=relaxed/simple;
+	bh=ZvhL4mM5O7RcKKgdV5IEIL28EGhE4mqTAjWjo4eUjmQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tcPudNkjO4nKwoWhvcFICfZ2iKsTQ623mTtYJoixIBYyNAZPMvli1YccmJ8GIPahYSUnEaPNQhDR8eAuAk/8zgGyja0ha0mL3MYV3iEdQXOjX8Y43Sv0o1GxrdzI6AlRgZtZcrUBhonenVKJvtZaO2t8N3c267aiSVlQ0JmmaaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g0X7S72p; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-770530175b2so2132640b3a.3;
+        Tue, 26 Aug 2025 07:17:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756217869; x=1756822669; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BymyHutB1XKcchz9Bb/SXorAOZz+b/iEchUrFWQbsM8=;
+        b=g0X7S72pfOXIGczH7sUbT+KJ32yy2eKa6RFs2ecxS51R9/lgUz3XPKrAh7+pMd0518
+         CSdcHz2M27/yIrgAhyA4i8aBF+XWP0e6p7UfLKgxcAtUVcMBSSMCGlPM3LymBn6dQZX8
+         dsPL0iNNswKxgSaz9hAZMdKYivtlbLKcfGYDFiy7spGTlXNxJaK/V1iZJndvGovV50I+
+         XizsxBiSmfbDezdphVQ6nUM+EpUpetkF/NeQm9Jw4rQC5BLvCOSk5/lRmArlAHr4ZTTo
+         aFKtwVmxAewfym1/vC/ZW5QkG6pn+HX9mvMReZhRJEaEL65mxnJzeYDxFM6eJE6ciWv7
+         8H8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756217869; x=1756822669;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BymyHutB1XKcchz9Bb/SXorAOZz+b/iEchUrFWQbsM8=;
+        b=Wf2i5bEbf4lvD8B+lb+DylXezVl9TtG5QhG1Jgjkiud5Xg3AlC3ElKA4D7rQf1PO2e
+         LaahBe++gSmcjqJKJu0Wh1MseVWGJG0cwYUMwuqhAB1fpQ6CLzFPznCAVfURwSNpWQNL
+         uABRXTtKg+AklKtuwRciCKU58En5QCY84EjJ7zdDqHQmiEjeuC4ZX9gd8ISq8n2PyMCW
+         sOeC1aixglUBYcVnqe+8uqTiFFvw5gB0pJvgK3dbB7cdrut9lFObbYSY1vALV6kxxo30
+         0T9k8dv9cfq39I1Hjrq7r+hW0Vu7rLQn05m/UoDRsNJnZ/WhvM1GfPvpf9LTfwn/F48R
+         MO5A==
+X-Forwarded-Encrypted: i=1; AJvYcCVdJle8k1a2Eq2xU1dxCBm6f62QgtCxznTP4RH7Rr6yq5ziau39+1jnS5R0UCFS0PQn5aZ+Qxm/@vger.kernel.org, AJvYcCW6yrJS6Kgh/iNvXo/J6F9Yo9Jz/gHhpLVFiLiyow0wd87cIlzcQeIOnov1549JFcfCfZ/4otWEGqTO@vger.kernel.org
+X-Gm-Message-State: AOJu0YwY8tWo14yR1uvD0HbjzOlYh2tTUaCPv09mRe23ql4xNSdDUDTH
+	4voZzKKYnphkvRDCugf1wFCH92zlGOPqtDlHW440IF4t4sgTIa21WEjJ
+X-Gm-Gg: ASbGncsp77fZ8wMGefuzMzROFcBY5ir/0FSnAN12BdgwimZLmiYnE9lSy5tsv0HQE1R
+	7OeUW58StIEkMasyq8qskGwnrsJ/sxnJbrngDIdIw75YmzGXOjfrSdvXIOvw+pRqHuDIgTBSJxK
+	0XGBqffV6/7EzH+3H3MHleNMjdNq2qEfSRN7IuIrS03wDhL6JAi6R7tvQR4ujClm2+U8jSsI/2P
+	z1RjL5owR71l6O92LKj4iZ2IL7aDA1JqIolRZmtwuNtVVQHS2RWX/MK1WUxwsyLVnsHiyRc3qtw
+	Frsl1gY3D7N2Pi3tGYBns8xK9ocuDTk2NelG0bJrSjjm09Um/gKs28q9wYiivOpzcrQxOKiMiC0
+	r1iLgYuX/4ZSUmEVL5SzY24v6c4UBsegHOEQ=
+X-Google-Smtp-Source: AGHT+IHBZf7nP/IklGTBlmzviWZdGdZZuwqs2Fz/jpEJAsBWmh94iU322L0qGtfQ+MGPMXD9RvAi4g==
+X-Received: by 2002:a05:6a21:6da8:b0:218:96ad:720d with SMTP id adf61e73a8af0-24340b7c601mr21735141637.1.1756217868851;
+        Tue, 26 Aug 2025 07:17:48 -0700 (PDT)
+Received: from fabio-Precision-3551.. ([2804:14c:485:4b61:e9f:3f15:20cb:c34f])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b49cbb9ce58sm9250854a12.40.2025.08.26.07.17.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Aug 2025 07:17:48 -0700 (PDT)
+From: Fabio Estevam <festevam@gmail.com>
+To: krzk@kernel.org
+Cc: mgreer@animalcreek.com,
+	robh@kernel.org,
+	conor+dt@kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	Fabio Estevam <festevam@gmail.com>,
+	Conor Dooley <conor.dooley@microchip.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH v2 net-next] dt-bindings: nfc: ti,trf7970a: Restrict the ti,rx-gain-reduction-db values
+Date: Tue, 26 Aug 2025 11:17:36 -0300
+Message-Id: <20250826141736.712827-1-festevam@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v01 04/12] hinic3: HW capability initialization
-To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
- Bjorn Helgaas <helgaas@kernel.org>, luosifu <luosifu@huawei.com>,
- Xin Guo <guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>,
- Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
- Shi Jing <shijing34@huawei.com>, Meny Yossefi <meny.yossefi@huawei.com>,
- Gur Stavi <gur.stavi@huawei.com>, Lee Trager <lee@trager.us>,
- Michael Ellerman <mpe@ellerman.id.au>, Suman Ghosh <sumang@marvell.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Joe Damato <jdamato@fastly.com>,
- Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-References: <cover.1756195078.git.zhuyikai1@h-partners.com>
- <b0c4ffc4ed52ca0921dc029e6f2fc8459a5df933.1756195078.git.zhuyikai1@h-partners.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <b0c4ffc4ed52ca0921dc029e6f2fc8459a5df933.1756195078.git.zhuyikai1@h-partners.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On 26/08/2025 10:05, Fan Gong wrote:
-> Use mailbox to get device capability for initializing driver capability.
-> 
-> Co-developed-by: Xin Guo <guoxin09@huawei.com>
-> Signed-off-by: Xin Guo <guoxin09@huawei.com>
-> Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
-> Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
-> Signed-off-by: Fan Gong <gongfan1@huawei.com>
-> ---
->   .../ethernet/huawei/hinic3/hinic3_hw_cfg.c    | 66 +++++++++++++++++++
->   .../ethernet/huawei/hinic3/hinic3_hw_cfg.h    |  1 +
->   .../ethernet/huawei/hinic3/hinic3_hw_intf.h   | 42 ++++++++++++
->   .../net/ethernet/huawei/hinic3/hinic3_hwdev.c |  6 ++
->   4 files changed, 115 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.c b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.c
-> index e7ef450c4971..24b929690f64 100644
-> --- a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.c
-> +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.c
-> @@ -8,6 +8,67 @@
->   #include "hinic3_hwif.h"
->   #include "hinic3_mbox.h"
->   
-> +#define HINIC3_CFG_MAX_QP  256
-> +
-> +static void parse_pub_res_cap(struct hinic3_hwdev *hwdev,
-> +			      struct hinic3_dev_cap *cap,
-> +			      const struct cfg_cmd_dev_cap *dev_cap,
-> +			      enum hinic3_func_type type)
-> +{
-> +	cap->port_id = dev_cap->port_id;
-> +	cap->supp_svcs_bitmap = dev_cap->svc_cap_en;
-> +}
-> +
-> +static void parse_l2nic_res_cap(struct hinic3_hwdev *hwdev,
-> +				struct hinic3_dev_cap *cap,
-> +				const struct cfg_cmd_dev_cap *dev_cap,
-> +				enum hinic3_func_type type)
-> +{
-> +	struct hinic3_nic_service_cap *nic_svc_cap = &cap->nic_svc_cap;
-> +
-> +	nic_svc_cap->max_sqs = min(dev_cap->nic_max_sq_id + 1,
-> +				   HINIC3_CFG_MAX_QP);
-> +}
-> +
-> +static void parse_dev_cap(struct hinic3_hwdev *hwdev,
-> +			  const struct cfg_cmd_dev_cap *dev_cap,
-> +			  enum hinic3_func_type type)
-> +{
-> +	struct hinic3_dev_cap *cap = &hwdev->cfg_mgmt->cap;
-> +
-> +	/* Public resource */
-> +	parse_pub_res_cap(hwdev, cap, dev_cap, type);
-> +
-> +	/* L2 NIC resource */
-> +	if (hinic3_support_nic(hwdev))
-> +		parse_l2nic_res_cap(hwdev, cap, dev_cap, type);
-> +}
+Instead of stating the supported values for the ti,rx-gain-reduction-db
+property in free text format, add an enum entry that can help validating
+the devicetree files.
 
-Could you please prepend local functions with the scope (hinic3) to be
-consistent with naming? Some of functions have pretty common name and
-may potentially overlap with some core functions.
+Signed-off-by: Fabio Estevam <festevam@gmail.com>
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+---
+Changes since v1:
+- Added net-next prefix. (Krzysztof)
+- Collected tags.
 
-> +
-> +static int get_cap_from_fw(struct hinic3_hwdev *hwdev,
-> +			   enum hinic3_func_type type)
-> +{
-> +	struct mgmt_msg_params msg_params = {};
-> +	struct cfg_cmd_dev_cap dev_cap = {};
-> +	int err;
-> +
-> +	dev_cap.func_id = hinic3_global_func_id(hwdev);
-> +
-> +	mgmt_msg_params_init_default(&msg_params, &dev_cap, sizeof(dev_cap));
-> +
-> +	err = hinic3_send_mbox_to_mgmt(hwdev, MGMT_MOD_CFGM,
-> +				       CFG_CMD_GET_DEV_CAP, &msg_params);
-> +	if (err || dev_cap.head.status) {
-> +		dev_err(hwdev->dev,
-> +			"Failed to get capability from FW, err: %d, status: 0x%x\n",
-> +			err, dev_cap.head.status);
-> +		return -EIO;
-> +	}
-> +
-> +	parse_dev_cap(hwdev, &dev_cap, type);
-> +
-> +	return 0;
-> +}
-> +
->   static int hinic3_init_irq_info(struct hinic3_hwdev *hwdev)
->   {
->   	struct hinic3_cfg_mgmt_info *cfg_mgmt = hwdev->cfg_mgmt;
-> @@ -180,6 +241,11 @@ void hinic3_free_irq(struct hinic3_hwdev *hwdev, u32 irq_id)
->   	mutex_unlock(&irq_info->irq_mutex);
->   }
->   
-> +int init_capability(struct hinic3_hwdev *hwdev)
-> +{
-> +	return get_cap_from_fw(hwdev, HINIC3_FUNC_TYPE_VF);
-> +}
-> +
->   bool hinic3_support_nic(struct hinic3_hwdev *hwdev)
->   {
->   	return hwdev->cfg_mgmt->cap.supp_svcs_bitmap &
-> diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.h b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.h
-> index 5978cbd56fb2..8900b40e3c42 100644
-> --- a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.h
-> +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.h
-> @@ -49,6 +49,7 @@ int hinic3_alloc_irqs(struct hinic3_hwdev *hwdev, u16 num,
->   		      struct msix_entry *alloc_arr, u16 *act_num);
->   void hinic3_free_irq(struct hinic3_hwdev *hwdev, u32 irq_id);
->   
-> +int init_capability(struct hinic3_hwdev *hwdev);
+ Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-and especially non-static functions has to be prefixed with the
-scope, please
+diff --git a/Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml b/Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml
+index 783a85b84893..7e96a625f0cf 100644
+--- a/Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml
++++ b/Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml
+@@ -58,7 +58,8 @@ properties:
+   ti,rx-gain-reduction-db:
+     description: |
+       Specify an RX gain reduction to reduce antenna sensitivity with 5dB per
+-      increment, with a maximum of 15dB. Supported values: [0, 5, 10, 15].
++      increment, with a maximum of 15dB.
++    enum: [ 0, 5, 10, 15]
+ 
+ required:
+   - compatible
+-- 
+2.34.1
 
->   bool hinic3_support_nic(struct hinic3_hwdev *hwdev);
->   u16 hinic3_func_max_qnum(struct hinic3_hwdev *hwdev);
->   u8 hinic3_physical_port_id(struct hinic3_hwdev *hwdev);
-
-[...]
 
