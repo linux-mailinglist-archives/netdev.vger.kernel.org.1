@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-216916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD8DBB35FA9
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 14:52:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E11AB35FAD
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 14:52:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E77D97C4BDB
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 12:51:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A53857C596C
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 12:51:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F9F31B424F;
-	Tue, 26 Aug 2025 12:50:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16AB41547CC;
+	Tue, 26 Aug 2025 12:50:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WkqJOfcS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X18mQadT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f74.google.com (mail-vs1-f74.google.com [209.85.217.74])
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD4471D5147
-	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 12:50:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF971DEFE7
+	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 12:50:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756212641; cv=none; b=RBXD8AbIxNrDuFAgELJetErXx1bOZOkPZCIreWNFM/CMW/SbRQkBaC5OOol5v0H8AexnHPN3Dxp4mx1XtL4hv8s8Tj67/jdSVHeGiIbabQ+xJoMvhUOHuYUnMlwEW4uZx3wJywF/rR7ls1zSaGPxlC7hCbLTns7+H0DJbIeMJk8=
+	t=1756212645; cv=none; b=Rt2aChuwBMVqoR4LzuCgI1J1iGZGHcKl0ttWtfba9vAT93SpEycXNNXFW/kK7Ql843HHIxuyTY31lZ+1Vm9mY/aVWn6OXejxGGqwMphwVmoAOMEBRJyeMq0axLhK3MwllVW6BFGIIFFe+PmNqrecTqpoxR7HRBNYI2Wr9Avz1nQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756212641; c=relaxed/simple;
-	bh=C/+u3325u4tRujDXUdBYu7o/f7blOncJc0leKc5bHnU=;
+	s=arc-20240116; t=1756212645; c=relaxed/simple;
+	bh=ZOtL0ZPoqBe5ux9EPaLNsds3WG0mkUjKe9oYh8qGvKI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pB05lN37DMfCiEceFrt2Ah/TBnLW0xNCVNymGdnk2AgS+ab1GDn+l+N+a7U/ClWVchchwbwgFkXoCIfB0iMT7/ugWa85Ea2SGvugfQS7p5WhtRRQXXy1qXc/P/3XO06yUEHH2CkjrPIycA6orQ0VWhCG2PT3wrsSwCNsxhRt3Bc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WkqJOfcS; arc=none smtp.client-ip=209.85.217.74
+	 To:Cc:Content-Type; b=c4ctVR1uiddlyFnisMCeCN0AjGbfT0WZyFgCOmCNbIPpRGKU8wGZLXUT0AmSVV059XCKJ6nazYBVzLS5WnPAyo/Bf8JtWvHnFVdPh2VB8ww4DjDJAiYDqBq837fV41vR249GyyGZhtiakM9RAx0OxE/fcZu/JKUzV+wTDBBXmiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X18mQadT; arc=none smtp.client-ip=209.85.160.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-vs1-f74.google.com with SMTP id ada2fe7eead31-50f8bf67fbbso9032420137.3
-        for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 05:50:39 -0700 (PDT)
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-4b109bccebaso155722441cf.2
+        for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 05:50:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756212638; x=1756817438; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1756212641; x=1756817441; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=W6WCfi7gaYnyN+wBiEsvJb0Qyo4DkGX6mHwmL0tyAdM=;
-        b=WkqJOfcS1+byBiDjaR87K34tsCJ5AYBUgeO+/DfGxVqo0yXeFuNomebZN9/TQEro1p
-         XFAlPsfnzUNKhDGMiGrQuItmVkao8Olk6BR57jyShTbyytU9HmLaP9oE4RwU1LUsLIdh
-         X/7KZn+lJYsmMCoorgSNf7VO8HrdWBMffWxb4i7gBFGn1/AxXkqvjZ7psmzcFAVxTkoq
-         6whD3lUTFVAKpxvF5TTRikdMsiFlr8gp5mNU89fOqqpVXZYh+g3uMfUbRFtXDEfhv/lp
-         779YXBWHRPEdMfQuIxqrHmZ+vCx2/1vuOjos3JV+zJBsKG94UnFfKb+sndzQIYumTz4v
-         gQOA==
+        bh=tYprzfNrVX6u0XYu21Gxqs3ZWUo8HdoXzhyU/xjkBdQ=;
+        b=X18mQadT/epFFPeq/K5KO1StDCSzbXbDwepgPoFq+T1weTUXsZSwRwBvZlJHukp0/9
+         pHj/4Cb397c7P7jRW7UnRLhw466+tsraNpKVycj+vqAZT5igEcO3p6aWRptTMdtoUXd8
+         Ju70sVFD+tmslPB5uU/Swvz0NY7CrSGinDGb3iMr1bWSuxB2w8kh3x0GQs/OvDYEffls
+         yqb8TGrS/aaHBdPevIvaS90bxzlxypYsxdY3a6QDiU02HtM0kGgTEDCtE965CCEYBzDb
+         A1ZnMzHcBdzXiqaKflJHhmmtbSW2BF87hZo7yk5uwR42RSCocUiENXW15kUHtczkm2iM
+         OObg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756212638; x=1756817438;
+        d=1e100.net; s=20230601; t=1756212641; x=1756817441;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W6WCfi7gaYnyN+wBiEsvJb0Qyo4DkGX6mHwmL0tyAdM=;
-        b=fB2JVSg/ld/O14k9vhutDXHM4Q/Coz0mdFK4Kh3YFqYe/hkKfgG/Njce3EKGxz6jyK
-         LmlxhkBAV0NzEkL+ldT+YQIeCa7P95QGxNLVmeGmUHKGpb1qCyshhnI46fmx73sl66Lk
-         SUFlu8SHmbU2Cqws2xREB3+biRF+ZahFfXbRUZiVv/neJ3Sbt1vvaBK0qEIvCZZMwCAv
-         iUi0/LNVBbtbFv6tCMlkECn8Zan8BRiN7CKXaz8BKgeBakdor0NkHm3xalHEcajiEoGw
-         wPPzU9zAzSErz8I+PR5WzZwk5y1DjrUKydBGZfnDfizycc4nD5P4eJ/ePteBD5z7sWQG
-         i6Nw==
-X-Forwarded-Encrypted: i=1; AJvYcCXsbpOWlmQPiRAS23C0V5sLk8YSEpSIfeFTEKaaE7DQlyqxk53BkrUrFVn37iL8JA4Oa1HXQy0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwiBY75mPbrfdTcf7LbTBfx/wIYKonVmKXNkau4jih1HLL+UwSN
-	DhgAKhg3jqf1NY6drWGaN0yvdX8ipQj+zXSw2eBcZQBr7hHPql3n3FuJ16FQM9KDRhVTIzA1TGM
-	AyXwLDWMG8EMD6g==
-X-Google-Smtp-Source: AGHT+IFuhSyjemYXfxuf8xgmOhJYpQqpZPEtRmJgniGmW0ym50CA4zSndGS8U+HG4jw4Mx3MweUy0jJLe7f5xA==
-X-Received: from vsbbq6.prod.google.com ([2002:a05:6102:5346:b0:523:1f32:e6d4])
+        bh=tYprzfNrVX6u0XYu21Gxqs3ZWUo8HdoXzhyU/xjkBdQ=;
+        b=OrvOfsmP0BpQktcbxT2CD4HZYnNVOmaN9tZiO1pVkLQYC21Hio+POAl68hkVmjBQpA
+         1myTrpfUhFvVaiOlBuhIAK7Pe1YxcZ+h0Q5XX/B4lsOwI4rcBLhSobD5HjhM5BdlA+t9
+         qKSPLqaTIFEdryC9snqo0iBRZgFqt8pSjEsqbBkiTNM69918lE0juwEUMa33KlcOpkNH
+         oSsItjJWxH3mKlHlJvsIEmxlcHscb5jCXsw4+L2zntRT7O+cqmuq4nNU/TU6k5eZUxPg
+         sEgdRzoRO06GUATMXfScoXa/dGl3l57YYD6BQcdJyDwbfuPXgQwlvbyUGM1zf7bp94R+
+         Q+Mw==
+X-Forwarded-Encrypted: i=1; AJvYcCVB1G85nlJSGNNeMJEshrFl1/xkxOiF7x82/AWBMB64Hzdv19THgHWHQc2fR3GiTDHB+gRS0gM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxVMe6PoCRQ3YDiCJxj2ztDjWw0G0KxoBldzMdOCOW0pePdoo/
+	l8H0qwATAsYhmM67ked+4BbYFqxRzgkfT9kH2BVcHCj9IFT7S0ctPzlMjaf181PFfzq6bQPSnqz
+	NZ9/T0ykPon/VpQ==
+X-Google-Smtp-Source: AGHT+IFTYgks3wCbm/LKR6tnFOucALP6TdgPu1KuK06Ot4kIfRAKywxIEGhgqkW1wMm3I/r/KWjMpnYuaKCAWg==
+X-Received: from qtjw6.prod.google.com ([2002:ac8:7e86:0:b0:4b0:7502:bc38])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6102:5687:b0:4c3:6393:83f4 with SMTP id ada2fe7eead31-51d0cbece39mr4866976137.2.1756212638523;
- Tue, 26 Aug 2025 05:50:38 -0700 (PDT)
-Date: Tue, 26 Aug 2025 12:50:28 +0000
+ 2002:a05:622a:5445:b0:4b2:d0a5:c3c1 with SMTP id d75a77b69052e-4b2d0a5c6b5mr60625141cf.56.1756212641232;
+ Tue, 26 Aug 2025 05:50:41 -0700 (PDT)
+Date: Tue, 26 Aug 2025 12:50:29 +0000
 In-Reply-To: <20250826125031.1578842-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250826125031.1578842-1-edumazet@google.com>
 X-Mailer: git-send-email 2.51.0.261.g7ce5a0a67e-goog
-Message-ID: <20250826125031.1578842-3-edumazet@google.com>
-Subject: [PATCH v2 net-next 2/5] net: add sk_drops_skbadd() helper
+Message-ID: <20250826125031.1578842-4-edumazet@google.com>
+Subject: [PATCH v2 net-next 3/5] net: add sk->sk_drop_counters
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -84,151 +84,123 @@ Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Existing sk_drops_add() helper is renamed to sk_drops_skbadd().
+Some sockets suffer from heavy false sharing on sk->sk_drops,
+and fields in the same cache line.
 
-Add sk_drops_add() and convert sk_drops_inc() to use it.
+Add sk->sk_drop_counters to:
+
+- move the drop counter(s) to dedicated cache lines.
+- Add basic NUMA awareness to these drop counter(s).
+
+Following patches will use this infrastructure for UDP and RAW sockets.
+
+sk_clone_lock() is not yet ready, it would need to properly
+set newsk->sk_drop_counters if we plan to use this for TCP sockets.
+
+v2: used Paolo suggestion from https://lore.kernel.org/netdev/8f09830a-d83d-43c9-b36b-88ba0a23e9b2@redhat.com/
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/linux/skmsg.h |  2 +-
- include/net/sock.h    | 11 ++++++++---
- include/net/udp.h     |  2 +-
- net/ipv4/tcp_input.c  |  2 +-
- net/ipv4/tcp_ipv4.c   |  4 ++--
- net/ipv6/tcp_ipv6.c   |  4 ++--
- net/mptcp/protocol.c  |  2 +-
- 7 files changed, 16 insertions(+), 11 deletions(-)
+ include/net/sock.h | 32 +++++++++++++++++++++++++++++++-
+ net/core/sock.c    |  2 ++
+ 2 files changed, 33 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
-index 0b9095a281b8988dfd06c69254d2bcbedcfaf6b4..49847888c287ab980531c4b78f5ab4aac5018240 100644
---- a/include/linux/skmsg.h
-+++ b/include/linux/skmsg.h
-@@ -315,7 +315,7 @@ static inline bool sk_psock_test_state(const struct sk_psock *psock,
- 
- static inline void sock_drop(struct sock *sk, struct sk_buff *skb)
- {
--	sk_drops_add(sk, skb);
-+	sk_drops_skbadd(sk, skb);
- 	kfree_skb(skb);
- }
- 
 diff --git a/include/net/sock.h b/include/net/sock.h
-index 34d7029eb622773e40e7c4ebd422d33b1c0a7836..9edb42ff06224cb8a1dd4f84af25bc22d1803ca9 100644
+index 9edb42ff06224cb8a1dd4f84af25bc22d1803ca9..73cd3316e288bde912dd96637e52d226575c2ffd 100644
 --- a/include/net/sock.h
 +++ b/include/net/sock.h
-@@ -2682,9 +2682,14 @@ struct sock_skb_cb {
- #define sock_skb_cb_check_size(size) \
- 	BUILD_BUG_ON((size) > SOCK_SKB_CB_OFFSET)
+@@ -102,6 +102,11 @@ struct net;
+ typedef __u32 __bitwise __portpair;
+ typedef __u64 __bitwise __addrpair;
  
-+static inline void sk_drops_add(struct sock *sk, int segs)
-+{
-+	atomic_add(segs, &sk->sk_drops);
-+}
++struct socket_drop_counters {
++	atomic_t	drops0 ____cacheline_aligned_in_smp;
++	atomic_t	drops1 ____cacheline_aligned_in_smp;
++};
 +
- static inline void sk_drops_inc(struct sock *sk)
+ /**
+  *	struct sock_common - minimal network layer representation of sockets
+  *	@skc_daddr: Foreign IPv4 addr
+@@ -282,6 +287,7 @@ struct sk_filter;
+   *	@sk_err_soft: errors that don't cause failure but are the cause of a
+   *		      persistent failure not just 'timed out'
+   *	@sk_drops: raw/udp drops counter
++  *	@sk_drop_counters: optional pointer to socket_drop_counters
+   *	@sk_ack_backlog: current listen backlog
+   *	@sk_max_ack_backlog: listen backlog set in listen()
+   *	@sk_uid: user id of owner
+@@ -449,6 +455,7 @@ struct sock {
+ #ifdef CONFIG_XFRM
+ 	struct xfrm_policy __rcu *sk_policy[2];
+ #endif
++	struct socket_drop_counters *sk_drop_counters;
+ 	__cacheline_group_end(sock_read_rxtx);
+ 
+ 	__cacheline_group_begin(sock_write_rxtx);
+@@ -2684,7 +2691,18 @@ struct sock_skb_cb {
+ 
+ static inline void sk_drops_add(struct sock *sk, int segs)
  {
--	atomic_inc(&sk->sk_drops);
-+	sk_drops_add(sk, 1);
+-	atomic_add(segs, &sk->sk_drops);
++	struct socket_drop_counters *sdc = sk->sk_drop_counters;
++
++	if (sdc) {
++		int n = numa_node_id() % 2;
++
++		if (n)
++			atomic_add(segs, &sdc->drops1);
++		else
++			atomic_add(segs, &sdc->drops0);
++	} else {
++		atomic_add(segs, &sk->sk_drops);
++	}
  }
+ 
+ static inline void sk_drops_inc(struct sock *sk)
+@@ -2694,11 +2712,23 @@ static inline void sk_drops_inc(struct sock *sk)
  
  static inline int sk_drops_read(const struct sock *sk)
-@@ -2704,11 +2709,11 @@ sock_skb_set_dropcount(const struct sock *sk, struct sk_buff *skb)
- 						sk_drops_read(sk) : 0;
- }
- 
--static inline void sk_drops_add(struct sock *sk, const struct sk_buff *skb)
-+static inline void sk_drops_skbadd(struct sock *sk, const struct sk_buff *skb)
  {
- 	int segs = max_t(u16, 1, skb_shinfo(skb)->gso_segs);
- 
--	atomic_add(segs, &sk->sk_drops);
-+	sk_drops_add(sk, segs);
++	const struct socket_drop_counters *sdc = sk->sk_drop_counters;
++
++	if (sdc) {
++		DEBUG_NET_WARN_ON_ONCE(atomic_read(&sk->sk_drops));
++		return atomic_read(&sdc->drops0) + atomic_read(&sdc->drops1);
++	}
+ 	return atomic_read(&sk->sk_drops);
  }
  
- static inline ktime_t sock_read_timestamp(struct sock *sk)
-diff --git a/include/net/udp.h b/include/net/udp.h
-index e2af3bda90c9327105bb329927fd3521e51926d8..7b26d4c50f33b94507933c407531c14b8edd306a 100644
---- a/include/net/udp.h
-+++ b/include/net/udp.h
-@@ -627,7 +627,7 @@ static inline struct sk_buff *udp_rcv_segment(struct sock *sk,
- 	return segs;
- 
- drop:
--	atomic_add(drop_count, &sk->sk_drops);
-+	sk_drops_add(sk, drop_count);
- 	SNMP_ADD_STATS(__UDPX_MIB(sk, ipv4), UDP_MIB_INERRORS, drop_count);
- 	kfree_skb(skb);
- 	return NULL;
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index a52a747d8a55e6a405d2fb1608e979abceb51c07..f1be65af1a777a803ae402c933e539cdabff7202 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -4830,7 +4830,7 @@ static bool tcp_ooo_try_coalesce(struct sock *sk,
- noinline_for_tracing static void
- tcp_drop_reason(struct sock *sk, struct sk_buff *skb, enum skb_drop_reason reason)
+ static inline void sk_drops_reset(struct sock *sk)
  {
--	sk_drops_add(sk, skb);
-+	sk_drops_skbadd(sk, skb);
- 	sk_skb_reason_drop(sk, skb, reason);
++	struct socket_drop_counters *sdc = sk->sk_drop_counters;
++
++	if (sdc) {
++		atomic_set(&sdc->drops0, 0);
++		atomic_set(&sdc->drops1, 0);
++	}
+ 	atomic_set(&sk->sk_drops, 0);
  }
  
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index a0c93b24c6e0ca2eb477686e477d164b0b132e7a..7c1d612afca18b424b32ee5e97b99a68062d8436 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -2254,7 +2254,7 @@ int tcp_v4_rcv(struct sk_buff *skb)
- 						       &iph->saddr, &iph->daddr,
- 						       AF_INET, dif, sdif);
- 		if (unlikely(drop_reason)) {
--			sk_drops_add(sk, skb);
-+			sk_drops_skbadd(sk, skb);
- 			reqsk_put(req);
- 			goto discard_it;
- 		}
-@@ -2399,7 +2399,7 @@ int tcp_v4_rcv(struct sk_buff *skb)
- 	return 0;
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 75368823969a7992a55a6f40d87ffb8886de2f39..e66ad1ec3a2d969b71835a492806563519459749 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -2505,6 +2505,7 @@ struct sock *sk_clone_lock(const struct sock *sk, const gfp_t priority)
+ 	newsk->sk_wmem_queued	= 0;
+ 	newsk->sk_forward_alloc = 0;
+ 	newsk->sk_reserved_mem  = 0;
++	DEBUG_NET_WARN_ON_ONCE(newsk->sk_drop_counters);
+ 	sk_drops_reset(newsk);
+ 	newsk->sk_send_head	= NULL;
+ 	newsk->sk_userlocks	= sk->sk_userlocks & ~SOCK_BINDPORT_LOCK;
+@@ -4457,6 +4458,7 @@ static int __init sock_struct_check(void)
+ #ifdef CONFIG_MEMCG
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_read_rxtx, sk_memcg);
+ #endif
++	CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_read_rxtx, sk_drop_counters);
  
- discard_and_relse:
--	sk_drops_add(sk, skb);
-+	sk_drops_skbadd(sk, skb);
- 	if (refcounted)
- 		sock_put(sk);
- 	goto discard_it;
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 8b2e7b7afbd847b5d94b30ab27779e4dc705710d..b4e56b8772730579cb85f10b147a15acce03f8e4 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -1809,7 +1809,7 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
- 						       &hdr->saddr, &hdr->daddr,
- 						       AF_INET6, dif, sdif);
- 		if (drop_reason) {
--			sk_drops_add(sk, skb);
-+			sk_drops_skbadd(sk, skb);
- 			reqsk_put(req);
- 			goto discard_it;
- 		}
-@@ -1948,7 +1948,7 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
- 	return 0;
- 
- discard_and_relse:
--	sk_drops_add(sk, skb);
-+	sk_drops_skbadd(sk, skb);
- 	if (refcounted)
- 		sock_put(sk);
- 	goto discard_it;
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index f2e728239480444ffdb297efc35303848d4c4a31..ad41c48126e44fda646f1ec1c81957db1407a6cc 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -137,7 +137,7 @@ struct sock *__mptcp_nmpc_sk(struct mptcp_sock *msk)
- 
- static void mptcp_drop(struct sock *sk, struct sk_buff *skb)
- {
--	sk_drops_add(sk, skb);
-+	sk_drops_skbadd(sk, skb);
- 	__kfree_skb(skb);
- }
- 
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_write_rxtx, sk_lock);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct sock, sock_write_rxtx, sk_reserved_mem);
 -- 
 2.51.0.261.g7ce5a0a67e-goog
 
