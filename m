@@ -1,96 +1,97 @@
-Return-Path: <netdev+bounces-216967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216968-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2A84B36C49
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 16:54:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0736FB36CA4
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 16:58:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 441FC1C46005
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 14:42:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A9CBA071A9
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 14:43:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF3FF35FC19;
-	Tue, 26 Aug 2025 14:38:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD31F353379;
+	Tue, 26 Aug 2025 14:41:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IXlW3t9S"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q7BsG3yu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3E735AAB4;
-	Tue, 26 Aug 2025 14:38:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5EB03375BD
+	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 14:40:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756219136; cv=none; b=QBWM95UW6iARig6KfFTcucpFnmU4MJD70OTymGq/6yUO2l3gg5Pw3I7ryfojOaSJwx1/8ZU0TS/JA93qT9bBLujxnGa58qHJF30gHqVQ8G8lCGhB76dEAb/412D/my2QlnpxJT/xnSknZIfay2/sKUivZvWAdEyQgQ0aok6/v3g=
+	t=1756219260; cv=none; b=PPPq0NTFSUWDHRysb2ojAsUo64vYb49Bsea7jc1JKk0FxS36rNTOQ9/5P79g1vnwQkJE0tiWkncV4MLV61vZaqSBTjErQeDqVEnEeQwUev/+uCLZok0vOl455VcdTI+T7y/yyoQWKHEVdtTK1VZkFYdC//+Wfay+l1bIsj5KGcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756219136; c=relaxed/simple;
-	bh=Y6APwQxwvGhqQiU0qnlk9kFVimX4KbrPK3kJnYGAEwQ=;
+	s=arc-20240116; t=1756219260; c=relaxed/simple;
+	bh=UV6QsGJaNRCIjLl6uGJScd++GUZtMzgSHcsM6bVx3c4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pe1umEH650eb+9BTA92r+xJJRxEkL+uIMBy4n2/v/hKhG163z3OqaVNrh+ppSQ8ZGYNSo6uee0muHgOniAv8hOjlt6vHHo/wi3i8cXMYengFcfA5NtNzGa6mAGo6MgS41Vqr7/y7WM5XaqHgTlVNMGAGw+R+SyIALsZhr7GsyZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IXlW3t9S; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-6188b72d690so898701a12.2;
-        Tue, 26 Aug 2025 07:38:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756219132; x=1756823932; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=d6d4F5lWcv+eLekx7HNLggfgjBWTBT95yOAIkuEoxMk=;
-        b=IXlW3t9SzXp3SmY1cZce//wKOIC4yBgyfIdXatIrR+bGGMnDGcrp+F040dZqsQqx0w
-         UF79BI+DQYWH1Fftxe4j3SznOjof9cra6sg29lMRaGJXBxOwg/Z4kkf07cz0u7qd2VNZ
-         Q+kXSAOHZJ0HXDJQgKYffo894QwINQtmUD8AgdCwguafBIm3xXVrtPqkdsjreJbzGAvP
-         MjPZ9QEdP/l/dlgpjyYoVOGySdbQZTXYDtF7UjEMR0Wr57jk/x59ywYJJMJBYX2jP2dO
-         4zfFvssn67DFqouze09eL9ba33v8u8cspRbe9dmqqTIW2/jRQqfjO/4w1XCTRQKNq4y2
-         97pA==
+	 Content-Type:Content-Disposition:In-Reply-To; b=NrcT1z70jTDScypIMij1qOyp/yyArUR444Xg1/FPy9s9dv+qhD7SMxUnrRSLqy9v6UeYsKGsoOUrwqGAEOnIegHg51IrpULV/PtGpSI8FjaY3uEVSE1oKu+3KybX1BglSnsxsKgVlhZBeykRzlYPZ1Z/4dHN1NVaP511T6Ch0D8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q7BsG3yu; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756219257;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1ihfy3FuhJ2wqfa7u6CNmaEum1YBa2rsl3CeJYStFWI=;
+	b=Q7BsG3yuOeERvLdZA55b4Rd0RHFvclPJS10RWHCjHFH4L91aqFtlEByHMUiDwnm1lWlC3H
+	yJ6se1RbAjLj8cCpGqqGR3+DK9K+SdsACWkByOgiIEh0IL0Vz8pK6HlPEnmWy6V6AZuFmA
+	luBAdin6wIO/YapQ9xfOHOpJGlq/N60=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-660-k52ShtS8PUqc0CS3_hqq2A-1; Tue, 26 Aug 2025 10:40:56 -0400
+X-MC-Unique: k52ShtS8PUqc0CS3_hqq2A-1
+X-Mimecast-MFC-AGG-ID: k52ShtS8PUqc0CS3_hqq2A_1756219255
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-45a1b0511b3so33846285e9.1
+        for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 07:40:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756219132; x=1756823932;
+        d=1e100.net; s=20230601; t=1756219254; x=1756824054;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=d6d4F5lWcv+eLekx7HNLggfgjBWTBT95yOAIkuEoxMk=;
-        b=E85WC9GlHgHaIv6Af1wZGYwKdcQ31F23Bp5Nq4FnLRxLXAQplrBz2pr4XQUIrXzAFU
-         pw1ZCJ5XIBNh9M02kAqhHXuWxV55BHe2Wr+Bs+CG6rENhN7sEzJ6SrKlAM8hRTuwG4tm
-         EgYkOO4VJ+Pl9SiFlBnEQ4NsVUFgY2q/6IntfdXt9jUptSCQcZwt2NGA49ZEK19Tegdj
-         srAXmUydekmVuOhHBd7ojgI7CWAJeDoJLkImDDWoxFI3QiBU0Uh3gUE677YygMVCQ0ft
-         PMoIJH54L51wKEfebF1O08kgz9kJVhFNqbeFxGDWF19nRvR4wyKxyit8Q+ncHN1PD9hm
-         06qA==
-X-Forwarded-Encrypted: i=1; AJvYcCWTTfsNIIX1lMye/wmRSTmCX4N3EtfJDNvkId6DKisRQP70zjM22cx3Og7QI8pXU60vWbIy3WjFtZZe6wqQ@vger.kernel.org, AJvYcCXL/dzVIN8AmDrKzGkITbn+75WiXwbWXFgQzTqdnsOvvjSkbz4ell6CgQGjYGTcHmDC67nP4yTGH+1A@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/ZW1qUiQmd6/nNF/F1iRyfLk5PKVzhNz/r6xz44PIQ7vmc8nu
-	pLo74bD28it/4CrA5zGb1Ub2+Ep3nsIkUFFyjRb9soVzzoRC0RAo+1DQ
-X-Gm-Gg: ASbGncuZ88LapkbflyAeOdaxRieAwN5FaBy1q8TmApFXueemWlnvsfYDZIbU8wT0qzB
-	DAyuZKgy/IUZTSIOGgfvz9x019qMImWiRhy6f/kGybh7Bez9VvE2lHZCQrP8i1/xbGBngCKUJOU
-	b8Uszw9kvzOMz24jjcvJ19uB9SqW+gAaqmQ6wfxHeXU1VdLqKANUeY/sElDozQn4raHyjXqlOlE
-	p7vx4yHy8PO9PcDNZJkDaKuQ3xfvNbRLD8ea/fI2Sdnp63rvIynaY+DOWx4zf1pvT4kV/jDs5Eh
-	j5cljxy5VZ6KJnA5HwSwoqjQyZIODz/jp5SJDsHk037ljYFBMh56XzA02rwWaIaeWd6jXoHrb30
-	UCw3Fi24eA+ZHWw==
-X-Google-Smtp-Source: AGHT+IETPXxxMpJyeesJWYBnsu+A3CD+BFs8jRFWez5lq7PWwxLL73ZZJjY/I5QKHSkfBf3w4iFvWw==
-X-Received: by 2002:a05:6402:510a:b0:61c:8205:f3d8 with SMTP id 4fb4d7f45d1cf-61c8205f61cmr2116423a12.4.1756219131642;
-        Tue, 26 Aug 2025 07:38:51 -0700 (PDT)
-Received: from skbuf ([2a02:2f04:d005:3b00:63b:fbf0:5e17:81ec])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-61c31703d8esm6917552a12.26.2025.08.26.07.38.49
+        bh=1ihfy3FuhJ2wqfa7u6CNmaEum1YBa2rsl3CeJYStFWI=;
+        b=lugeP0RYZ2b07OdaebPFGX0igTIE51VPyzW7LnTOmdHe5B6YpS5uFfT3bAJk/9WTcB
+         p4LWXqhpxCcHhEKTtks/aWJahCmJ9NtrLmvqQ6J3tvVG+1Kzfi4tuory6EQVcaAcjJjJ
+         8lgvEWezvvKSe9hzQwKHQrfm8iNJ3ja9z2WOvEJoJp2rQ3JN3OrXvctNJGCDt1j03Nm3
+         1OCzJzgMurFPT64pTi/gW0SU36k1RHGXkijhGlwmPu3e3ipN3jyPyAMI/l8gWvVvVc57
+         Q22qKuNfhJuaIa0aM1S2uTzkxnQMy2Ppzcuo9btXmaNkNKhQgvvL7LZpWB6f8CJweEKd
+         O7nQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW2r03onZNCh6I3Nq5q/5Fav6hV9IrLd9jNOYr6ksfzEf2lNL13otBV6kPOTit2sbMDr2rhUnk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzazfWHYHkkXCoHuISTAnmD0n8maoIQP0bpvbGlmOdkbOsEtRVA
+	O0xeACUa6YRdPCKWzrJC2nzVkELU0XCjnbYLsee+VseU8jPKQmlp6WLKCoBa7JXNPAXF1bNvu5F
+	sPMXxMnYMG35L7auHAzrB2dY0/r1kapFcIzCrvOsxztHiwazWcfjMP8pWYodnHTm1mBqLl2s=
+X-Gm-Gg: ASbGncs8i45F11lA19wzBAlHxUnuYaic0WBy39/+a5hcAPfB+QcaAOXVK1ynrUztcPJ
+	MwTsNAwFcEUicx3lwnqKTi0dyszTHXURAasM2OIau2lHHYGoPaHo4wjfwApecJTYR1zdtOCczw5
+	Tle/3ip1/5/3W9RrG4g0FjQYZVQiWnMRiAjcdiiO5LHPtxkg5PB0vb3GyglwNbqKadYNVMOlD9C
+	FRdh5YEufpmwfodv+BlNGccdtYWpSeHnOfeme0p5511z8m4KFqInIT9asAn2v6I4nj3+UCJ8c/m
+	f+pCg6+Ts6odJrN9Al4CHIcaSKDqtoM=
+X-Received: by 2002:a05:600c:5251:b0:455:f380:32e2 with SMTP id 5b1f17b1804b1-45b517ca54cmr149244065e9.18.1756219254604;
+        Tue, 26 Aug 2025 07:40:54 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHQn6JvvJeT7MlM5vxv7NDmMYfGEo1DRscOYnhsp0L3inuZrfVRfxK+fMUnsbs9Tx6WF6MBXA==
+X-Received: by 2002:a05:600c:5251:b0:455:f380:32e2 with SMTP id 5b1f17b1804b1-45b517ca54cmr149243805e9.18.1756219254143;
+        Tue, 26 Aug 2025 07:40:54 -0700 (PDT)
+Received: from redhat.com ([185.137.39.227])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b5df6b356sm112346715e9.0.2025.08.26.07.40.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Aug 2025 07:38:50 -0700 (PDT)
-Date: Tue, 26 Aug 2025 17:38:47 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Yangfl <mmyangfl@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v6 2/3] net: dsa: tag_yt921x: add support for
- Motorcomm YT921x tags
-Message-ID: <20250826143847.wwczaqgafl6y7ped@skbuf>
-References: <20250824005116.2434998-1-mmyangfl@gmail.com>
- <20250824005116.2434998-3-mmyangfl@gmail.com>
- <20250825221507.vfvnuaxs7hh2jy7d@skbuf>
- <CAAXyoMNh-6_NtYGBYYBhbiH0UPWCOoiZNhMkgeGqPzKP3HA-_g@mail.gmail.com>
+        Tue, 26 Aug 2025 07:40:53 -0700 (PDT)
+Date: Tue, 26 Aug 2025 10:40:50 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: Re: [PATCH 1/3] vhost_task: KVM: Don't wake KVM x86's recovery
+ thread if vhost task was killed
+Message-ID: <20250826103625-mutt-send-email-mst@kernel.org>
+References: <20250826004012.3835150-1-seanjc@google.com>
+ <20250826004012.3835150-2-seanjc@google.com>
+ <20250826034937-mutt-send-email-mst@kernel.org>
+ <aK2-tQLL-WN7Mqpb@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,64 +100,122 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAAXyoMNh-6_NtYGBYYBhbiH0UPWCOoiZNhMkgeGqPzKP3HA-_g@mail.gmail.com>
+In-Reply-To: <aK2-tQLL-WN7Mqpb@google.com>
 
-On Tue, Aug 26, 2025 at 09:47:34AM +0800, Yangfl wrote:
-> > The tag format sort of becomes fixed ABI as soon as user space is able
-> > to run "cat /sys/class/net/eth0/dsa/tagging", see "yt921x", and record
-> > it to a pcap file. Unless the EtherType bears some other meaning rather
-> > than being a fixed value, then if you change it later to some other
-> > value than 0x9988, you'd better also change the protocol name to
-> > distinguish it from "yt921x".
+On Tue, Aug 26, 2025 at 07:03:33AM -0700, Sean Christopherson wrote:
+> On Tue, Aug 26, 2025, Michael S. Tsirkin wrote:
+> > On Mon, Aug 25, 2025 at 05:40:09PM -0700, Sean Christopherson wrote:
+> > > Provide an API in vhost task instead of forcing KVM to solve the problem,
+> > > as KVM would literally just add an equivalent to VHOST_TASK_FLAGS_KILLED,
+> > > along with a new lock to protect said flag.  In general, forcing simple
+> > > usage of vhost task to care about signals _and_ take non-trivial action to
+> > > do the right thing isn't developer friendly, and is likely to lead to
+> > > similar bugs in the future.
+> > > 
+> > > Debugged-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> > > Link: https://lore.kernel.org/all/aKkLEtoDXKxAAWju@google.com
+> > > Link: https://lore.kernel.org/all/aJ_vEP2EHj6l0xRT@google.com
+> > > Suggested-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> > > Fixes: d96c77bd4eeb ("KVM: x86: switch hugepage recovery thread to vhost_task")
+> > > Cc: stable@vger.kernel.org
+> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > 
+> > OK but I dislike the API.
 > 
-> "EtherType" here does not necessarily become EtherType; better to
-> think it is a key to enable port control over the switch. It could be
-> a dynamic random value as long as everyone gets the same value all
-> over the kernel, see the setup process of the switch driver. Ideally
-> only the remaining content of the tag should become the ABI (and is
-> actually enforced by the switch), but making a dynamic "EtherType" is
-> clearly a worse idea so I don't know how to clarify the fact...
+> FWIW, I don't love it either.
 > 
-> > Also, you can _not_ use yt921x_priv :: tag_eth_p, because doing so would
-> > assume that typeof(ds->priv) == struct yt921x_priv. In principle we
-> > would like to be able to run the tagging protocols on the dsa_loop
-> > driver as well, which can be attached to any network interface. Very
-> > few, if any, tagging protocol drivers don't work on dsa_loop.
-> > > +
-> > > +static struct sk_buff *
-> > > +yt921x_tag_rcv(struct sk_buff *skb, struct net_device *netdev)
-> > > +{
-> > > +     unsigned int port;
-> > > +     __be16 *tag;
-> > > +     u16 rx;
-> > > +
-> > > +     if (unlikely(!pskb_may_pull(skb, YT921X_TAG_LEN)))
-> > > +             return NULL;
-> > > +
-> > > +     tag = (__be16 *)skb->data;
-> >
-> > Use dsa_etype_header_pos_rx() and validate the CPU_TAG_TPID_TPID as well.
+> > Default APIs should be safe. So vhost_task_wake_safe should be
+> > vhost_task_wake
+> > 
+> > This also reduces the changes to kvm.
+> > 
+> > 
+> > It does not look like we need the "unsafe" variant, so pls drop it.
 > 
-> See the above explanation why rx "EtherType" is not considered part of ABI.
+> vhost_vq_work_queue() calls
+> 
+>   vhost_worker_queue()
+>   |
+>   -> worker->ops->wakeup(worker)
+>      |
+>      -> vhost_task_wakeup()
+>         |
+>         -> vhost_task_wake()
+> 
+> while holding RCU and so can't sleep.
+> 
+> 	rcu_read_lock();
+> 	worker = rcu_dereference(vq->worker);
+> 	if (worker) {
+> 		queued = true;
+> 		vhost_worker_queue(worker, work);
+> 	}
+> 	rcu_read_unlock();
+> 
+> And the call from __vhost_worker_flush() is done while holding a vhost_worker.mutex.
+> That's probably ok?  But there are many paths that lead to __vhost_worker_flush(),
+> which makes it difficult to audit all flows.  So even if there is an easy change
+> for the RCU conflict, I wouldn't be comfortable adding a mutex_lock() to so many
+> flows in a patch that needs to go to stable@.
+> 
+> > If we do need it, it should be called __vhost_task_wake.
+> 
+> I initially had that, but didn't like that vhost_task_wake() wouldn't call
+> __vhost_task_wake(), i.e. wouldn't follow the semi-standard pattern of the
+> no-underscores function being a wrapper for the double-underscores function.
 
-So what I don't understand is: it's impossible to separate RX from TX in
-current DSA taggers. If TX hardcodes the assumption that the switch was
-configured to use EtherType 0x9988, why would we expect RX to use anything else?
-What valid configuration would we prevent, if we ensured that RX packets
-have the same EtherType?
+Eh. that's not really a standard. the standard is that __ is an unsafe
+variant.
 
-It should be ok if you documented that the EtherType is self-assigned
-and must be hardcoded to 0x9988 by local convention for the moment, but
-is otherwise configurable, and the meaning of a different value is
-undefined. Even if self-assigned, I suppose you could still add the
-value to include/uapi/linux/if_ether.h to avoid conflicts with other
-uses.
+> I'm definitely not opposed to that though (or any other naming options).  Sans
+> comments, this was my other idea for names:
+> 
+> 
+> static void ____vhost_task_wake(struct vhost_task *vtsk)
 
-Even better if you clarify the expectations by writing a libpcap
-dissector for the new tagging protocol, which you need to do anyway for
-recent tcpdump versions to work on the conduit interface (otherwise it
-fails with "unsupported protocol"). See
-https://github.com/the-tcpdump-group/libpcap/pull/1463
-The libpcap dissector uses the /sys/class/net/eth0/dsa/tagging text to
-identify the protocol in use, not the EtherType.
+That's way too many __. Just vhost_task_wake_up_process will do.
+
+> {
+> 	wake_up_process(vtsk->task);
+> }
+
+
+
+Pls add docs explaining the usage of __vhost_task_wake
+and vhost_task_wake respectively.
+
+> void __vhost_task_wake(struct vhost_task *vtsk)
+> {
+> 	WARN_ON_ONCE(!vtsk->handle_sigkill);
+> 
+> 	if (WARN_ON_ONCE(test_bit(VHOST_TASK_FLAGS_KILLED, &vtsk->flags)))
+> 		return;
+
+Add comments here please explaining why we warn.
+
+> 	____vhost_task_wake(vtsk);
+> }
+> EXPORT_SYMBOL_GPL(__vhost_task_wake);
+
+
+
+> void vhost_task_wake(struct vhost_task *vtsk)
+
+
+> {
+> 	guard(mutex)(&vtsk->exit_mutex);
+> 
+> 	if (WARN_ON_ONCE(test_bit(VHOST_TASK_FLAGS_STOP, &vtsk->flags)))
+
+Add comments here please explaining why we warn.
+
+> 		return;
+> 
+> 	if (test_bit(VHOST_TASK_FLAGS_KILLED, &vtsk->flags))
+> 		return;
+> 
+> 	____vhost_task_wake(vtsk);
+> }
+> EXPORT_SYMBOL_GPL(vhost_task_wake);
+
 
