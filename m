@@ -1,260 +1,470 @@
-Return-Path: <netdev+bounces-217037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1944EB37231
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 20:23:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 34B97B37233
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 20:23:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEB331B2879E
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 18:23:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD5AF1B27D39
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 18:23:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E771372888;
-	Tue, 26 Aug 2025 18:21:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E5B536C086;
+	Tue, 26 Aug 2025 18:23:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Ef7EOomc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VrseOo+H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB6363728A4
-	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 18:21:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2245136C08B;
+	Tue, 26 Aug 2025 18:23:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756232512; cv=none; b=J4CYneGlQ+jLfp4VcepLVGz3ovJmXtouSdcRJUqzWC0i+itkKf+wm2tAuphgfPWeT4xvRSAoKIgye3oded+Hs/SQzUzbXl6Du8MkUmxgsSn+Z78iNW4cQw3b6fhqQAO6ZIJORyFTxgoPwba2Al34ra3DQrQ4aW67Eqc4zODdpds=
+	t=1756232600; cv=none; b=qc1rkrO6wX4mll8/VTJU/QMV7GVzRGDp3nZYqNlJuvg6t6/5db2SE8nXsG3tCLb1HFj4371i35fm05rttanySPGSHH+Uycx35o2trKrVnKDcsb7nWOob+hbOVi7kW/mT4QvvoZgTIhQS+ul7bLmFIpNEgYWPyxhOCxqCVfW/61k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756232512; c=relaxed/simple;
-	bh=611L3O+47ctGIN5esrQ9A5H4Oub7w7q3hEDu5ciaR7M=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=R7xzxofzpNWBrfkSuMSsdXhjtA1bD4D6+pLu64EviT55Rx4luke6GgGpvqApEIe3+WvvvbjWoUAq+oIj/Fi3Q8ECKDsAtn4JA63NZzlzqb8dyyeaa8kUlvkJUSw724JEx/l3i/I9la5xB1xrKZ1VxNZN2oouA66O7ngL9Yyrp3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Ef7EOomc; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57QC4ESM006105
-	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 18:21:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	uHo1gjefBDo7Rz4UcCwYzZ4ege4oDD7nzc30CiMEuYw=; b=Ef7EOomclIE0NqMt
-	u2pygFc2Tnw1cYmgZdOprkOU+vhXdWC+ovShZFd8GHsw0K6Ag3v1HVAGEi3GvkB1
-	E+PVgfXslUljEFoRsob1Vx2jmYw9/zj3pxwevIJniqO1uDE4yOHJRI/xYBzHlH7W
-	/EBXbM7rJRja34lc1PwIPF2PXlqK50lWdLfTxBejuHFvCisA84ekzAdNIDZMwLY8
-	o+PRIh7NK10gKVKV47kauwLpyroXDOzXPkWUWvsuMU2K8PQqM0U/8vZ+/t8GHrYz
-	UY5+kXE6+WJXCcyb63SYzJTumyviYibu1UoGgpjfhE3A28gJ2L62Uh+YJK39u+fB
-	afuT9A==
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48rtpevbf0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 18:21:49 +0000 (GMT)
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-771f28ed113so1584100b3a.0
-        for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 11:21:49 -0700 (PDT)
+	s=arc-20240116; t=1756232600; c=relaxed/simple;
+	bh=nG0LAoDZdbxXuN/Hr/0F6rww6bawQ9DQyl8dy8CNHmQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LOZfA9UHdsmVqTRMdqfNpwGL59gUGozg+PPFp69ue5bHItiahazwP1QCF3P5pjWR/j7ST0BP71JPJYLw4Ud4PSdmu+dY3SD/6ZxccbWV1lx631KJsAmgKrlfNg7i9KMR7t9eAvEHZkgKYOJyXr/vBzVQ2mVOd1XSSjLasvolc3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VrseOo+H; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-70dd6c93071so6375026d6.3;
+        Tue, 26 Aug 2025 11:23:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756232596; x=1756837396; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=r0foMCM1hvjEeKXaZN/6MBKUAq8npEAyxEc6PIGRqNY=;
+        b=VrseOo+HfLGGfrEaH0OBhSxWtQadExyjljlnNqmfG30HZ2ClaVtGXXvnEnnA/agtcQ
+         rM53z1IHY0NYw/9y22IdJB4hysmXa0OTIjb62Jz3b6CTehl3Swl1KcN4csVuLPDN1sdd
+         Z1HncLhYaX9pslz1d4F+OhFCylhhPZc/8ImVwjoOB4EMOkau6cUPJ3yom/3x5GYMETHN
+         GgQPAunMAitTiulejef9Htqzz5mCYK45s/zVfEZAKyTFL4UBu9127FW8sNyBGxaXxnkH
+         oQXk9WIwilrVVfD4Yi8bVXTCkLibKRYBDRehcdyVMokF0Go3Alyk4965DthhzAa3ePIP
+         Tu/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756232509; x=1756837309;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1756232596; x=1756837396;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uHo1gjefBDo7Rz4UcCwYzZ4ege4oDD7nzc30CiMEuYw=;
-        b=S51EOilpeX3E7ScU87MHRIFs3RTF5i4Auc25ih+bkhek13o8pogtd4BHSn5XpRM/HJ
-         Y0t10EI89ZwVBBbUf/tmDRZzbrMUZ9u5n0eMXer9WWNXWl2PCbCSZSmXkW3YH/GWfQAD
-         xxJuSIaS8unGbnABq6O71rqajIgBPSy5tK3JRx2QOvpS1jkCU9Ix+NbYXjVTvTAVt80z
-         40S1ohJt8ceycl8A83yrAoDs5YSMUKhAlH+yyEuogW6pJ5HaqNA+iJ9S5QeIB7ezApGa
-         /HvkMu4Znt9v/eoJX8xHFFMAyBiwtq4LVbC4dg1zoGy3BwowO0NQ0HbzHFpdeEaXo1at
-         pvjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUMkkjfGsEGxbMOCdKTaW+defJl/Le6BvNryl6Ze2glTTmkyT67q8mb6oB42C/b0sybzGCpDys=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7V0WwtJXMvqZwMcZk/XvaFGUFOJqa2J51sTbfJV9bz6EA/3oo
-	Hi8VO9IbgcugnICweMppgMUagWGPgmuZ9dUchGSmC7NWt8oTD3R2qCik/lM371h9PXa2JFCSn5H
-	W+Ef0og4FKaJXrwL1LXVTc+UedME/Z5UFwpkKBw4A2axb+0C5cTlQOSXCgnQ=
-X-Gm-Gg: ASbGncsnNH6RO1F+nVMYi51Ip8OGXagYAZyamf7Os08f34fyDpq0rJ0o70qmiSwmg6f
-	xAk145oA4IwbuXQNuuvuPlqPCIu9XgShoHy97kfltPaBTQ6vJODpCCkY4bfo00a7i9bBrQtNIeq
-	E6XFNSmL2a90QlQZ3yLDN/QQZQ42TGSMTYA5TbOV0eGLgV6O4jCKGERxffDM7l4Cfi89SkF2euu
-	oKDvDl9ZrAscdEx9awe9WgsbJuVXYPrxUKL2vjUbiKqWNIytwvFOglzuwjgDrPxE80OgL4K8/jY
-	nEuTwD/BMn2GHmJbIGM4hbpKACLEUJJPVBZFYiBfWZyJ/xKr5vO7gtHyicCdch6kkP4T
-X-Received: by 2002:a05:6a20:a10c:b0:23d:54cb:2df6 with SMTP id adf61e73a8af0-24340ad1f86mr25124329637.3.1756232508559;
-        Tue, 26 Aug 2025 11:21:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG7ijJ29Va7yrV4zp5p8NjWdZ782LaBYYQF/4cU8PsHszSgbxWHP1GGb2H0frlcDXBmyhlLlA==
-X-Received: by 2002:a05:6a20:a10c:b0:23d:54cb:2df6 with SMTP id adf61e73a8af0-24340ad1f86mr25124289637.3.1756232508052;
-        Tue, 26 Aug 2025 11:21:48 -0700 (PDT)
-Received: from hu-wasimn-hyd.qualcomm.com ([202.46.22.19])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-77048989fe6sm9881803b3a.51.2025.08.26.11.21.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Aug 2025 11:21:47 -0700 (PDT)
-From: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
-Date: Tue, 26 Aug 2025 23:51:04 +0530
-Subject: [PATCH 5/5] arm64: dts: qcom: lemans-evk: Add sound card
+        bh=r0foMCM1hvjEeKXaZN/6MBKUAq8npEAyxEc6PIGRqNY=;
+        b=WM9Qv80h4ASqxMupC0xzeYPqltihVVeI/8dgj7Bc55NCTKSeLlfZtFq9vl7fMRWojv
+         6zqRcEH1Xns5fxab/nIKamkNWpxF8/vBE8/CKwqDfedqYRxbEfwPUCOfreQ9DLTHeJUr
+         jRnm9fsPEO4mCzgcexuOvnmv6Nu942rWIto5wc6Ce52AHu/9ownPRcJGx+gKYoNNWgZH
+         gYr1whL5OY1qOA+MMsTL5oumE6G0E9jW82Wl5i1P9sSY9nGx2q4Z4t5sH77CcKklAoHb
+         V59mQ14q6A87ln+ItNNDoyEb1+EK8MDQGO0e5TOLT3GREtNrYJzuohIRluNE0P2QR0iN
+         uAvg==
+X-Forwarded-Encrypted: i=1; AJvYcCV4Lk7+MJIl98wdah/D+PthIT3FwuFRU3MpOsl7BSn6THlMM9l9itZVtESAic2IFDzEP+N50pnS@vger.kernel.org, AJvYcCVLtgvC8Z/RdvkJmvtjjG53xM73K2twPOK39aXOoZj11W84UyPMf8Srh4SKcAJttld8pbQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/AY2x/0X9ojqqCwzLi7EmfRphClugk2Wqm5fQH4t5VAlRC6ZZ
+	xN7mBHBuhFsB+63LTGGddJoAb2AH9Zu9gS/4gvYgleRhWETE6zBnjFEg5psK7O+lJvM9uC6yO+e
+	11umUo2tGS/xTyl715Knsc+Mn3/f73ys=
+X-Gm-Gg: ASbGnctfMGjP5fXnq7xQheH7bHMB5akBZyC/gXG8SBI68W2TM0sDQ7hUdl/P8aS9Wsa
+	4Cwi2oP2c16Zn+u9tdhmX9NA7stRjwc/BRnayZg+dLVvaeboOxDTd8NMqiHOAtWaa/aybgWDrdw
+	FzzDwYolLNmTpRaJqRx5cygOcpttY0F/cZtYjnZOTtuuFRKKnOqiaN5Cmz0eb8zD1RTLHRy1ZF5
+	LB6S7kj
+X-Google-Smtp-Source: AGHT+IEVnvtJqP/mct1oC46f9ueuzZHZZeXUWdZh3wHq0B/KLm5wsasZDFPdETADAGAT18pn6+xJSaadZyrhdztr5v0=
+X-Received: by 2002:a05:6214:4b02:b0:70d:9f16:9a37 with SMTP id
+ 6a1803df08f44-70d9f16c223mr183770166d6.62.1756232595587; Tue, 26 Aug 2025
+ 11:23:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250826-lemans-evk-bu-v1-5-08016e0d3ce5@oss.qualcomm.com>
-References: <20250826-lemans-evk-bu-v1-0-08016e0d3ce5@oss.qualcomm.com>
-In-Reply-To: <20250826-lemans-evk-bu-v1-0-08016e0d3ce5@oss.qualcomm.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>
-Cc: kernel@oss.qualcomm.com, linux-mmc@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
-        Mohammad Rafi Shaik <mohammad.rafi.shaik@oss.qualcomm.com>,
-        Wasim Nazir <wasim.nazir@oss.qualcomm.com>
-X-Mailer: b4 0.15-dev-e44bb
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1756232476; l=3032;
- i=wasim.nazir@oss.qualcomm.com; s=20250807; h=from:subject:message-id;
- bh=UMnWnX+QTp0SrMk1v6WQGdCaQDzxYKHt7lrDS4z1rOc=;
- b=vvOwPlUHfYZYBlh0B2Im01YpZHJDFfRJ5ZkGHfDe3nN4FX3P1X2ntIbChYdre22CGaot++nfI
- /ezJDoCRq3uCO9DepaefrgxOKiQuc5ngAhs497ny0q5LZGpYX95mE1y
-X-Developer-Key: i=wasim.nazir@oss.qualcomm.com; a=ed25519;
- pk=4ymqwKogZUOQnbcvSUHyO19kcEVTLEk3Qc4u795hiZM=
-X-Proofpoint-GUID: etVnlwV5HwuOFftY0Sv6xHOE_NjlK2Ml
-X-Proofpoint-ORIG-GUID: etVnlwV5HwuOFftY0Sv6xHOE_NjlK2Ml
-X-Authority-Analysis: v=2.4 cv=Hd8UTjE8 c=1 sm=1 tr=0 ts=68adfb3d cx=c_pps
- a=WW5sKcV1LcKqjgzy2JUPuA==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
- a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=EUspDBNiAAAA:8 a=gcRert6Kt2c8YO7gZrEA:9
- a=QEXdDO2ut3YA:10 a=OpyuDcXvxspvyRM73sMx:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODI1MDE0MiBTYWx0ZWRfX38YnEUMAjKr2
- DCupTrRRFiS/4W86kzq7YO9Nh4kgaHsne5bpOByi8En8urdhbWhVoMsCBA4mxIMhrvnMutV2Avh
- HsYuEOd+9twaRSm8DBXxEavY9DbW4AcC39EfmkfQquYxbyaTxmWSATyHas2uY2UmCYpukzbkiBg
- 0BeU+1bReXNwHpEGfu7EDcvqDAEz2g6pidLSvhPAYqH+8v0hqqSW8XhoTdk3A74bE3KxBAXIywV
- Mynvpgwr/VGXekTdfe1QD7TZvNxQa7ypM3HN56dZK9tPFR171S5h2nkqPJHVOjy2gU1rmiyv/Q+
- 7E3BXR2GoiY84JSNh3NedziFJe2J4tAKXR9ZGCT+rcGXrRN1b799G+QK3+w5KQ176TxQ3Mh7Sv9
- LzbSCd5p
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-26_02,2025-08-26_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0
- adultscore=0 clxscore=1015 impostorscore=0 spamscore=0 classifier=typeunknown
- authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2508250142
+References: <20250820154416.2248012-1-maciej.fijalkowski@intel.com> <CAL+tcoD3Kj6h=RvkEJ_9vmJPWKGVcaLj4ws=JqRbE0TiyjDDWg@mail.gmail.com>
+In-Reply-To: <CAL+tcoD3Kj6h=RvkEJ_9vmJPWKGVcaLj4ws=JqRbE0TiyjDDWg@mail.gmail.com>
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+Date: Tue, 26 Aug 2025 20:23:04 +0200
+X-Gm-Features: Ac12FXxh9dXBN_CQ0mKUK-fHC6Hxit2dnlUBB4nf4-f-lGJ75BEyztz8Tk5lz3U
+Message-ID: <CAJ8uoz0v4sdj8YwadpCKpDSpY1JrJnO_kkEfHHyv+qAFMiKOOQ@mail.gmail.com>
+Subject: Re: [PATCH v6 bpf] xsk: fix immature cq descriptor production
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, netdev@vger.kernel.org, 
+	magnus.karlsson@intel.com, stfomichev@gmail.com, aleksander.lobakin@intel.com, 
+	Eryk Kubanski <e.kubanski@partner.samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Mohammad Rafi Shaik <mohammad.rafi.shaik@oss.qualcomm.com>
+On Tue, 26 Aug 2025 at 18:07, Jason Xing <kerneljasonxing@gmail.com> wrote:
+>
+> On Wed, Aug 20, 2025 at 11:49=E2=80=AFPM Maciej Fijalkowski
+> <maciej.fijalkowski@intel.com> wrote:
+> >
+> > Eryk reported an issue that I have put under Closes: tag, related to
+> > umem addrs being prematurely produced onto pool's completion queue.
+> > Let us make the skb's destructor responsible for producing all addrs
+> > that given skb used.
+> >
+> > Introduce struct xsk_addrs which will carry descriptor count with array
+> > of addresses taken from processed descriptors that will be carried via
+> > skb_shared_info::destructor_arg. This way we can refer to it within
+> > xsk_destruct_skb(). In order to mitigate the overhead that will be
+> > coming from memory allocations, let us introduce kmem_cache of
+> > xsk_addrs. There will be a single kmem_cache for xsk generic xmit on th=
+e
+> > system.
+> >
+> > Commit from fixes tag introduced the buggy behavior, it was not broken
+> > from day 1, but rather when xsk multi-buffer got introduced.
+> >
+> > Fixes: b7f72a30e9ac ("xsk: introduce wrappers and helpers for supportin=
+g multi-buffer in Tx path")
+> > Reported-by: Eryk Kubanski <e.kubanski@partner.samsung.com>
+> > Closes: https://lore.kernel.org/netdev/20250530103456.53564-1-e.kubansk=
+i@partner.samsung.com/
+> > Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
+> > Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> > ---
+> >
+> > v1:
+> > https://lore.kernel.org/bpf/20250702101648.1942562-1-maciej.fijalkowski=
+@intel.com/
+> > v2:
+> > https://lore.kernel.org/bpf/20250705135512.1963216-1-maciej.fijalkowski=
+@intel.com/
+> > v3:
+> > https://lore.kernel.org/bpf/20250806154127.2161434-1-maciej.fijalkowski=
+@intel.com/
+> > v4:
+> > https://lore.kernel.org/bpf/20250813171210.2205259-1-maciej.fijalkowski=
+@intel.com/
+> > v5:
+> > https://lore.kernel.org/bpf/aKXBHGPxjpBDKOHq@boxer/T/
+> >
+> > v1->v2:
+> > * store addrs in array carried via destructor_arg instead having them
+> >   stored in skb headroom; cleaner and less hacky approach;
+> > v2->v3:
+> > * use kmem_cache for xsk_addrs allocation (Stan/Olek)
+> > * set err when xsk_addrs allocation fails (Dan)
+> > * change xsk_addrs layout to avoid holes
+> > * free xsk_addrs on error path
+> > * rebase
+> > v3->v4:
+> > * have kmem_cache as percpu vars
+> > * don't drop unnecessary braces (unrelated) (Stan)
+> > * use idx + i in xskq_prod_write_addr (Stan)
+> > * alloc kmem_cache on bind (Stan)
+> > * keep num_descs as first member in xsk_addrs (Magnus)
+> > * add ack from Magnus
+> > v4->v5:
+> > * have a single kmem_cache per xsk subsystem (Stan)
+> > v5->v6:
+> > * free skb in xsk_build_skb_zerocopy() when xsk_addrs allocation fails
+> >   (Stan)
+> > * unregister netdev notifier if creating kmem_cache fails (Stan)
+> >
+> > ---
+> >  net/xdp/xsk.c       | 95 +++++++++++++++++++++++++++++++++++++--------
+> >  net/xdp/xsk_queue.h | 12 ++++++
+> >  2 files changed, 91 insertions(+), 16 deletions(-)
+> >
+> > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> > index 9c3acecc14b1..989d5ffb4273 100644
+> > --- a/net/xdp/xsk.c
+> > +++ b/net/xdp/xsk.c
+> > @@ -36,6 +36,13 @@
+> >  #define TX_BATCH_SIZE 32
+> >  #define MAX_PER_SOCKET_BUDGET 32
+> >
+> > +struct xsk_addrs {
+> > +       u32 num_descs;
+> > +       u64 addrs[MAX_SKB_FRAGS + 1];
+> > +};
+> > +
+> > +static struct kmem_cache *xsk_tx_generic_cache;
+>
+> IMHO, adding a few heavy operations of allocating and freeing from
+> cache in the hot path is not a good choice. What I've been trying so
+> hard lately is to minimize the times of manipulating memory as much as
+> possible :( Memory hotspot can be easily captured by perf.
+>
+> We might provide an new option in setsockopt() to let users
+> specifically support this use case since it does harm to normal cases?
 
-Add the sound card node with tested playback over max98357a
-I2S speakers amplifier and I2S mic.
+Agree with you that we should not harm the normal case here. Instead
+of introducing a setsockopt, how about we detect the case when this
+can happen in the code? If I remember correctly, it can only occur in
+the XDP_SHARED_UMEM mode were the xsk pool is shared between
+processes. If this can be tested (by introducing a new bit in the xsk
+pool if that is necessary), we could have two potential skb
+destructors: the old one for the "normal" case and the new one with
+the list of addresses to complete (using the expensive allocations and
+deallocations) when it is strictly required i.e., when the xsk pool is
+shared. Maciej, you are more in to the details of this, so what do you
+think? Would something like this be a potential path forward?
 
-Introduce HS (High-Speed) MI2S pin control support.
-The I2S max98357a speaker amplifier is connected via HS0 and I2S
-microphones utilize the HS2 interface.
-
-Signed-off-by: Mohammad Rafi Shaik <mohammad.rafi.shaik@oss.qualcomm.com>
-Signed-off-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
----
- arch/arm64/boot/dts/qcom/lemans-evk.dts | 52 +++++++++++++++++++++++++++++++++
- arch/arm64/boot/dts/qcom/lemans.dtsi    | 14 +++++++++
- 2 files changed, 66 insertions(+)
-
-diff --git a/arch/arm64/boot/dts/qcom/lemans-evk.dts b/arch/arm64/boot/dts/qcom/lemans-evk.dts
-index 642b66c4ad1e..4adf0f956580 100644
---- a/arch/arm64/boot/dts/qcom/lemans-evk.dts
-+++ b/arch/arm64/boot/dts/qcom/lemans-evk.dts
-@@ -7,6 +7,7 @@
- 
- #include <dt-bindings/gpio/gpio.h>
- #include <dt-bindings/regulator/qcom,rpmh-regulator.h>
-+#include <dt-bindings/sound/qcom,q6afe.h>
- 
- #include "lemans.dtsi"
- #include "lemans-pmics.dtsi"
-@@ -26,6 +27,17 @@ chosen {
- 		stdout-path = "serial0:115200n8";
- 	};
- 
-+	dmic: audio-codec-0 {
-+		compatible = "dmic-codec";
-+		#sound-dai-cells = <0>;
-+		num-channels = <1>;
-+	};
-+
-+	max98357a: audio-codec-1 {
-+		compatible = "maxim,max98357a";
-+		#sound-dai-cells = <0>;
-+	};
-+
- 	edp0-connector {
- 		compatible = "dp-connector";
- 		label = "EDP0";
-@@ -73,6 +85,46 @@ vreg_sdc: regulator-vreg-sdc {
- 		states = <1800000 0x1
- 			  2950000 0x0>;
- 	};
-+
-+	sound {
-+		compatible = "qcom,qcs9100-sndcard";
-+		model = "LEMANS-EVK";
-+
-+		pinctrl-0 = <&hs0_mi2s_active>, <&hs2_mi2s_active>;
-+		pinctrl-names = "default";
-+
-+		hs0-mi2s-playback-dai-link {
-+			link-name = "HS0 MI2S Playback";
-+
-+			codec {
-+				sound-dai = <&max98357a>;
-+			};
-+
-+			cpu {
-+				sound-dai = <&q6apmbedai PRIMARY_MI2S_RX>;
-+			};
-+
-+			platform {
-+				sound-dai = <&q6apm>;
-+			};
-+		};
-+
-+		hs2-mi2s-capture-dai-link {
-+			link-name = "HS2 MI2S Capture";
-+
-+			codec {
-+				sound-dai = <&dmic>;
-+			};
-+
-+			cpu {
-+				sound-dai = <&q6apmbedai TERTIARY_MI2S_TX>;
-+			};
-+
-+			platform {
-+				sound-dai = <&q6apm>;
-+			};
-+		};
-+	};
- };
- 
- &apps_rsc {
-diff --git a/arch/arm64/boot/dts/qcom/lemans.dtsi b/arch/arm64/boot/dts/qcom/lemans.dtsi
-index 28f0976ab526..c8e6246b6062 100644
---- a/arch/arm64/boot/dts/qcom/lemans.dtsi
-+++ b/arch/arm64/boot/dts/qcom/lemans.dtsi
-@@ -5047,6 +5047,20 @@ dp1_hot_plug_det: dp1-hot-plug-det-state {
- 				bias-disable;
- 			};
- 
-+			hs0_mi2s_active: hs0-mi2s-active-state {
-+				pins = "gpio114", "gpio115", "gpio116", "gpio117";
-+				function = "hs0_mi2s";
-+				drive-strength = <8>;
-+				bias-disable;
-+			};
-+
-+			hs2_mi2s_active: hs2-mi2s-active-state {
-+				pins = "gpio122", "gpio123", "gpio124", "gpio125";
-+				function = "hs2_mi2s";
-+				drive-strength = <8>;
-+				bias-disable;
-+			};
-+
- 			qup_i2c0_default: qup-i2c0-state {
- 				pins = "gpio20", "gpio21";
- 				function = "qup0_se0";
-
--- 
-2.51.0
-
+>
+> > +
+> >  void xsk_set_rx_need_wakeup(struct xsk_buff_pool *pool)
+> >  {
+> >         if (pool->cached_need_wakeup & XDP_WAKEUP_RX)
+> > @@ -532,25 +539,39 @@ static int xsk_wakeup(struct xdp_sock *xs, u8 fla=
+gs)
+> >         return dev->netdev_ops->ndo_xsk_wakeup(dev, xs->queue_id, flags=
+);
+> >  }
+> >
+> > -static int xsk_cq_reserve_addr_locked(struct xsk_buff_pool *pool, u64 =
+addr)
+> > +static int xsk_cq_reserve_locked(struct xsk_buff_pool *pool)
+> >  {
+> >         unsigned long flags;
+> >         int ret;
+> >
+> >         spin_lock_irqsave(&pool->cq_lock, flags);
+> > -       ret =3D xskq_prod_reserve_addr(pool->cq, addr);
+> > +       ret =3D xskq_prod_reserve(pool->cq);
+> >         spin_unlock_irqrestore(&pool->cq_lock, flags);
+> >
+> >         return ret;
+> >  }
+> >
+> > -static void xsk_cq_submit_locked(struct xsk_buff_pool *pool, u32 n)
+> > +static void xsk_cq_submit_addr_locked(struct xdp_sock *xs,
+> > +                                     struct sk_buff *skb)
+> >  {
+> > +       struct xsk_buff_pool *pool =3D xs->pool;
+> > +       struct xsk_addrs *xsk_addrs;
+> >         unsigned long flags;
+> > +       u32 num_desc, i;
+> > +       u32 idx;
+> > +
+> > +       xsk_addrs =3D (struct xsk_addrs *)skb_shinfo(skb)->destructor_a=
+rg;
+> > +       num_desc =3D xsk_addrs->num_descs;
+> >
+> >         spin_lock_irqsave(&pool->cq_lock, flags);
+> > -       xskq_prod_submit_n(pool->cq, n);
+> > +       idx =3D xskq_get_prod(pool->cq);
+> > +
+> > +       for (i =3D 0; i < num_desc; i++)
+> > +               xskq_prod_write_addr(pool->cq, idx + i, xsk_addrs->addr=
+s[i]);
+> > +       xskq_prod_submit_n(pool->cq, num_desc);
+> > +
+> >         spin_unlock_irqrestore(&pool->cq_lock, flags);
+> > +       kmem_cache_free(xsk_tx_generic_cache, xsk_addrs);
+> >  }
+> >
+> >  static void xsk_cq_cancel_locked(struct xsk_buff_pool *pool, u32 n)
+> > @@ -562,11 +583,6 @@ static void xsk_cq_cancel_locked(struct xsk_buff_p=
+ool *pool, u32 n)
+> >         spin_unlock_irqrestore(&pool->cq_lock, flags);
+> >  }
+> >
+> > -static u32 xsk_get_num_desc(struct sk_buff *skb)
+> > -{
+> > -       return skb ? (long)skb_shinfo(skb)->destructor_arg : 0;
+> > -}
+> > -
+> >  static void xsk_destruct_skb(struct sk_buff *skb)
+> >  {
+> >         struct xsk_tx_metadata_compl *compl =3D &skb_shinfo(skb)->xsk_m=
+eta;
+> > @@ -576,21 +592,37 @@ static void xsk_destruct_skb(struct sk_buff *skb)
+> >                 *compl->tx_timestamp =3D ktime_get_tai_fast_ns();
+> >         }
+> >
+> > -       xsk_cq_submit_locked(xdp_sk(skb->sk)->pool, xsk_get_num_desc(sk=
+b));
+> > +       xsk_cq_submit_addr_locked(xdp_sk(skb->sk), skb);
+> >         sock_wfree(skb);
+> >  }
+> >
+> > -static void xsk_set_destructor_arg(struct sk_buff *skb)
+> > +static u32 xsk_get_num_desc(struct sk_buff *skb)
+> >  {
+> > -       long num =3D xsk_get_num_desc(xdp_sk(skb->sk)->skb) + 1;
+> > +       struct xsk_addrs *addrs;
+> >
+> > -       skb_shinfo(skb)->destructor_arg =3D (void *)num;
+> > +       addrs =3D (struct xsk_addrs *)skb_shinfo(skb)->destructor_arg;
+> > +       return addrs->num_descs;
+> > +}
+> > +
+> > +static void xsk_set_destructor_arg(struct sk_buff *skb, struct xsk_add=
+rs *addrs)
+> > +{
+> > +       skb_shinfo(skb)->destructor_arg =3D (void *)addrs;
+> > +}
+> > +
+> > +static void xsk_inc_skb_descs(struct sk_buff *skb)
+> > +{
+> > +       struct xsk_addrs *addrs;
+> > +
+> > +       addrs =3D (struct xsk_addrs *)skb_shinfo(skb)->destructor_arg;
+> > +       addrs->num_descs++;
+> >  }
+> >
+> >  static void xsk_consume_skb(struct sk_buff *skb)
+> >  {
+> >         struct xdp_sock *xs =3D xdp_sk(skb->sk);
+> >
+> > +       kmem_cache_free(xsk_tx_generic_cache,
+> > +                       (struct xsk_addrs *)skb_shinfo(skb)->destructor=
+_arg);
+>
+> Replying to Daniel here: when EOVERFLOW occurs, it will finally go to
+> above function and clear the allocated memory and skb.
+>
+> >         skb->destructor =3D sock_wfree;
+> >         xsk_cq_cancel_locked(xs->pool, xsk_get_num_desc(skb));
+> >         /* Free skb without triggering the perf drop trace */
+> > @@ -609,6 +641,7 @@ static struct sk_buff *xsk_build_skb_zerocopy(struc=
+t xdp_sock *xs,
+> >  {
+> >         struct xsk_buff_pool *pool =3D xs->pool;
+> >         u32 hr, len, ts, offset, copy, copied;
+> > +       struct xsk_addrs *addrs =3D NULL;
+>
+> nit: no need to set to "NULL" at the begining.
+>
+> >         struct sk_buff *skb =3D xs->skb;
+> >         struct page *page;
+> >         void *buffer;
+> > @@ -623,6 +656,14 @@ static struct sk_buff *xsk_build_skb_zerocopy(stru=
+ct xdp_sock *xs,
+> >                         return ERR_PTR(err);
+> >
+> >                 skb_reserve(skb, hr);
+> > +
+> > +               addrs =3D kmem_cache_zalloc(xsk_tx_generic_cache, GFP_K=
+ERNEL);
+> > +               if (!addrs) {
+> > +                       kfree(skb);
+> > +                       return ERR_PTR(-ENOMEM);
+> > +               }
+> > +
+> > +               xsk_set_destructor_arg(skb, addrs);
+> >         }
+> >
+> >         addr =3D desc->addr;
+> > @@ -662,6 +703,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_soc=
+k *xs,
+> >  {
+> >         struct xsk_tx_metadata *meta =3D NULL;
+> >         struct net_device *dev =3D xs->dev;
+> > +       struct xsk_addrs *addrs =3D NULL;
+> >         struct sk_buff *skb =3D xs->skb;
+> >         bool first_frag =3D false;
+> >         int err;
+> > @@ -694,6 +736,15 @@ static struct sk_buff *xsk_build_skb(struct xdp_so=
+ck *xs,
+> >                         err =3D skb_store_bits(skb, 0, buffer, len);
+> >                         if (unlikely(err))
+> >                                 goto free_err;
+> > +
+> > +                       addrs =3D kmem_cache_zalloc(xsk_tx_generic_cach=
+e, GFP_KERNEL);
+> > +                       if (!addrs) {
+> > +                               err =3D -ENOMEM;
+> > +                               goto free_err;
+> > +                       }
+> > +
+> > +                       xsk_set_destructor_arg(skb, addrs);
+> > +
+> >                 } else {
+> >                         int nr_frags =3D skb_shinfo(skb)->nr_frags;
+> >                         struct page *page;
+> > @@ -759,7 +810,9 @@ static struct sk_buff *xsk_build_skb(struct xdp_soc=
+k *xs,
+> >         skb->mark =3D READ_ONCE(xs->sk.sk_mark);
+> >         skb->destructor =3D xsk_destruct_skb;
+> >         xsk_tx_metadata_to_compl(meta, &skb_shinfo(skb)->xsk_meta);
+> > -       xsk_set_destructor_arg(skb);
+> > +
+> > +       addrs =3D (struct xsk_addrs *)skb_shinfo(skb)->destructor_arg;
+> > +       addrs->addrs[addrs->num_descs++] =3D desc->addr;
+> >
+> >         return skb;
+> >
+> > @@ -769,7 +822,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_soc=
+k *xs,
+> >
+> >         if (err =3D=3D -EOVERFLOW) {
+> >                 /* Drop the packet */
+> > -               xsk_set_destructor_arg(xs->skb);
+> > +               xsk_inc_skb_descs(xs->skb);
+> >                 xsk_drop_skb(xs->skb);
+> >                 xskq_cons_release(xs->tx);
+> >         } else {
+> > @@ -812,7 +865,7 @@ static int __xsk_generic_xmit(struct sock *sk)
+> >                  * if there is space in it. This avoids having to imple=
+ment
+> >                  * any buffering in the Tx path.
+> >                  */
+> > -               err =3D xsk_cq_reserve_addr_locked(xs->pool, desc.addr)=
+;
+> > +               err =3D xsk_cq_reserve_locked(xs->pool);
+> >                 if (err) {
+> >                         err =3D -EAGAIN;
+> >                         goto out;
+> > @@ -1815,8 +1868,18 @@ static int __init xsk_init(void)
+> >         if (err)
+> >                 goto out_pernet;
+> >
+> > +       xsk_tx_generic_cache =3D kmem_cache_create("xsk_generic_xmit_ca=
+che",
+> > +                                                sizeof(struct xsk_addr=
+s), 0,
+> > +                                                SLAB_HWCACHE_ALIGN, NU=
+LL);
+> > +       if (!xsk_tx_generic_cache) {
+> > +               err =3D -ENOMEM;
+> > +               goto out_unreg_notif;
+> > +       }
+> > +
+> >         return 0;
+> >
+> > +out_unreg_notif:
+> > +       unregister_netdevice_notifier(&xsk_netdev_notifier);
+> >  out_pernet:
+> >         unregister_pernet_subsys(&xsk_net_ops);
+> >  out_sk:
+> > diff --git a/net/xdp/xsk_queue.h b/net/xdp/xsk_queue.h
+> > index 46d87e961ad6..f16f390370dc 100644
+> > --- a/net/xdp/xsk_queue.h
+> > +++ b/net/xdp/xsk_queue.h
+> > @@ -344,6 +344,11 @@ static inline u32 xskq_cons_present_entries(struct=
+ xsk_queue *q)
+> >
+> >  /* Functions for producers */
+> >
+> > +static inline u32 xskq_get_prod(struct xsk_queue *q)
+> > +{
+> > +       return READ_ONCE(q->ring->producer);
+> > +}
+> > +
+> >  static inline u32 xskq_prod_nb_free(struct xsk_queue *q, u32 max)
+> >  {
+> >         u32 free_entries =3D q->nentries - (q->cached_prod - q->cached_=
+cons);
+> > @@ -390,6 +395,13 @@ static inline int xskq_prod_reserve_addr(struct xs=
+k_queue *q, u64 addr)
+> >         return 0;
+> >  }
+> >
+> > +static inline void xskq_prod_write_addr(struct xsk_queue *q, u32 idx, =
+u64 addr)
+> > +{
+> > +       struct xdp_umem_ring *ring =3D (struct xdp_umem_ring *)q->ring;
+> > +
+> > +       ring->desc[idx & q->ring_mask] =3D addr;
+> > +}
+> > +
+> >  static inline void xskq_prod_write_addr_batch(struct xsk_queue *q, str=
+uct xdp_desc *descs,
+> >                                               u32 nb_entries)
+> >  {
+> > --
+> > 2.34.1
+> >
+> >
+>
 
