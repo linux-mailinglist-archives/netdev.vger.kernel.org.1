@@ -1,114 +1,104 @@
-Return-Path: <netdev+bounces-216923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEA12B36116
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 15:06:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 135E7B36157
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 15:08:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABFB91BC21EB
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 13:03:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5917A1BA6BD2
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 13:05:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95EFD225417;
-	Tue, 26 Aug 2025 13:03:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82E7F223DE5;
+	Tue, 26 Aug 2025 13:05:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YqITwN81"
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 338221FBE9B;
-	Tue, 26 Aug 2025 13:03:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5725B211491;
+	Tue, 26 Aug 2025 13:05:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756213409; cv=none; b=YYKLJLgtX0P9ZjVxnyH1jr/DA9TrgfmLqLlgKF5LQ2rN/gLduE9IYFP4OradlZQpgn5kXXpxUp1aqDTnoYlvMXes78XIapXm7WU4ej4p9fh4ybcIlTYvtAGlLtzZwwqRLSIf39rfmTd+d6n21knZcBq3ZAT3un2F2JFGOlvuE8s=
+	t=1756213511; cv=none; b=ICUK0V7iPwmuQp0dXTD6t0CwZP0Zv4ONneYVYhlOgOZDfc0+B/P2gLv88gc9sYP/nzlAQoDa5ni/8ffzA3K7xb4eCwRIi8R7zzGvNzmSTyczlI8E+IJsLXWAp0LDHxNMsOxqx12pRWBXOPgy3TwQ4FF5N4JjgAE+jiW1RPwbov4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756213409; c=relaxed/simple;
-	bh=T9Gkxrj+Jbh4BEF2Xoy+VopdtFjdz7eGQjhjbYkar1Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qtWmARSB3t93ksPeigFaw03FdIV/swq5lerGJxmziRLiCNXa0zyBPkEaQWZ3t1w1Mocd65b8S6Sc2Nd2zoqZbMjQ5Ob/pZ/nqcbk9y/jNbYv53T+nMo1uBRbzckOyruxf53xPKi457Iy+G41tDbMn+Rrp2YFKqoKUBSqPUqQ6i8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 025E02C23;
-	Tue, 26 Aug 2025 06:03:18 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A5B423F63F;
-	Tue, 26 Aug 2025 06:03:19 -0700 (PDT)
-Date: Tue, 26 Aug 2025 14:03:16 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Brendan Jackman <jackmanb@google.com>,
-	Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>,
-	Dmitry Vyukov <dvyukov@google.com>, dri-devel@lists.freedesktop.org,
-	intel-gfx@lists.freedesktop.org, iommu@lists.linux.dev,
-	io-uring@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	John Hubbard <jhubbard@nvidia.com>, kasan-dev@googlegroups.com,
-	kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	linux-arm-kernel@axis.com, linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org, linux-ide@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-mmc@vger.kernel.org, linux-mm@kvack.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Marco Elver <elver@google.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
-	Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
-	Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
-	virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
-	wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
-Subject: Re: [PATCH RFC 21/35] mm/cma: refuse handing out non-contiguous page
- ranges
-Message-ID: <aK2wlGYvCaFQXzBm@raptor>
-References: <20250821200701.1329277-1-david@redhat.com>
- <20250821200701.1329277-22-david@redhat.com>
- <aK2QZnzS1ErHK5tP@raptor>
- <ad521f4f-47aa-4728-916f-3704bf01f770@redhat.com>
+	s=arc-20240116; t=1756213511; c=relaxed/simple;
+	bh=oVWUaTb9JTJ6VCjQWJr2JJZLQXbpB2cQ8kVN0SOUbIQ=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=GdGX+VkoWB2m/3IOna0MpX7JUOabsUGJ0IzcB2oDfjcXuXeEC3CT1Z2uzJd6Bfow5+1MTcG3SqSGN5uGsFf+M4EZ6mB16Ni/hZ75yUIITbbFHIUM3JiVote3gOGXtWCkcwVy5gDkyZ3uXnuzjAs00Cx7cyFsgMQiDrnXu44qPms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YqITwN81; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0B2CC4CEF1;
+	Tue, 26 Aug 2025 13:05:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756213511;
+	bh=oVWUaTb9JTJ6VCjQWJr2JJZLQXbpB2cQ8kVN0SOUbIQ=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=YqITwN81aCSIAjjlRKtqxxMDT3OwGtG79wvALWYqfA+M5IqocJpi05LSUm0H8PbgG
+	 8sQwtQYClfF/XTptMACHPrWYEysboEIWprljjQAe/oVj8KqmS+Dg44gDpDPopsEp+m
+	 WeZwK2Evi5/FcHJTxaFaFr/ViRI0l4tzYFFRkOAm0p1eIQKHq4+B79cJNYTHE/701/
+	 KqXZHEwZS15xV5ZD2MmywNhVa8HJ7w6D+V16nyRuTH53wA8L33Uhmwy+8t83DzgVTy
+	 VHWxUCVdk4t4P7YzyMtipTKATGkl+apXLzlJzY6NInaTSBiw6iwDjq88iN4NO3xspy
+	 mjwNqtK5RKutA==
+Date: Tue, 26 Aug 2025 08:05:09 -0500
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ad521f4f-47aa-4728-916f-3704bf01f770@redhat.com>
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, conor+dt@kernel.org, 
+ sureshnagaraj@maxlinear.com, edumazet@google.com, 
+ devicetree@vger.kernel.org, andrew+netdev@lunn.ch, kuba@kernel.org, 
+ krzk+dt@kernel.org, yzhu@maxlinear.com, netdev@vger.kernel.org
+To: Jack Ping CHNG <jchng@maxlinear.com>
+In-Reply-To: <20250826031044.563778-2-jchng@maxlinear.com>
+References: <20250826031044.563778-1-jchng@maxlinear.com>
+ <20250826031044.563778-2-jchng@maxlinear.com>
+Message-Id: <175621343176.4659.6580069253445672718.robh@kernel.org>
+Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: mxl: Add MxL LGM
+ Network Processor SoC
 
-Hi David,
 
-On Tue, Aug 26, 2025 at 01:04:33PM +0200, David Hildenbrand wrote:
-..
-> > Just so I can better understand the problem being fixed, I guess you can have
-> > two consecutive pfns with non-consecutive associated struct page if you have two
-> > adjacent memory sections spanning the same physical memory region, is that
-> > correct?
+On Tue, 26 Aug 2025 11:10:43 +0800, Jack Ping CHNG wrote:
+> Introduce device-tree binding documentation for MaxLinear LGM Network
+> Processor
 > 
-> Exactly. Essentially on SPARSEMEM without SPARSEMEM_VMEMMAP it is not
-> guaranteed that
+> Signed-off-by: Jack Ping CHNG <jchng@maxlinear.com>
+> ---
+>  .../devicetree/bindings/net/mxl,lgm-eth.yaml  | 73 +++++++++++++++++++
+>  1 file changed, 73 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/mxl,lgm-eth.yaml
 > 
-> 	pfn_to_page(pfn + 1) == pfn_to_page(pfn) + 1
-> 
-> when we cross memory section boundaries.
-> 
-> It can be the case for early boot memory if we allocated consecutive areas
-> from memblock when allocating the memmap (struct pages) per memory section,
-> but it's not guaranteed.
 
-Thank you for the explanation, but I'm a bit confused by the last paragraph. I
-think what you're saying is that we can also have the reverse problem, where
-consecutive struct page * represent non-consecutive pfns, because memmap
-allocations happened to return consecutive virtual addresses, is that right?
+My bot found errors running 'make dt_binding_check' on your patch:
 
-If that's correct, I don't think that's the case for CMA, which deals out
-contiguous physical memory. Or were you just trying to explain the other side of
-the problem, and I'm just overthinking it?
+yamllint warnings/errors:
 
-Thanks,
-Alex
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/mxl,lgm-eth.example.dtb: eth (mxl,lgm-eth): interface@1:compatible:0: 'mxl,lgm-mac' was expected
+	from schema $id: http://devicetree.org/schemas/net/mxl,lgm-eth.yaml#
+Documentation/devicetree/bindings/net/mxl,lgm-eth.example.dtb: /example-0/eth/interface@1: failed to match any schema with compatible: ['mxl,eth-mac']
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250826031044.563778-2-jchng@maxlinear.com
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
 
