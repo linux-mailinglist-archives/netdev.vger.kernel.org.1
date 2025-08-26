@@ -1,60 +1,75 @@
-Return-Path: <netdev+bounces-216922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FFA2B3610D
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 15:06:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEA12B36116
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 15:06:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD0841BA7A4C
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 13:03:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABFB91BC21EB
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 13:03:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 541DF1F0E29;
-	Tue, 26 Aug 2025 13:03:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lL+kZGgP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95EFD225417;
+	Tue, 26 Aug 2025 13:03:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7291A1ADFFE;
-	Tue, 26 Aug 2025 13:03:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 338221FBE9B;
+	Tue, 26 Aug 2025 13:03:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756213394; cv=none; b=n26VEh7TTx2c/G9cYlL0zyQtR+1B7fQuPSmPbMBPmuGamgQqxoNwQH1TDXAOcCLLc6s11c1pkJYw9399XlV0XOschEH/A9wArYtwL3VRIoKpdQXAT+k9SHlLjn0cf8yZr9y5CVP5m4o3bJihBFQUJshPobJCdDZV/Y/uW9in2lE=
+	t=1756213409; cv=none; b=YYKLJLgtX0P9ZjVxnyH1jr/DA9TrgfmLqLlgKF5LQ2rN/gLduE9IYFP4OradlZQpgn5kXXpxUp1aqDTnoYlvMXes78XIapXm7WU4ej4p9fh4ybcIlTYvtAGlLtzZwwqRLSIf39rfmTd+d6n21knZcBq3ZAT3un2F2JFGOlvuE8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756213394; c=relaxed/simple;
-	bh=28S8eGGHQNJ7T95lYZZNUxv9w0zda1zMBGBrbV1mjS4=;
+	s=arc-20240116; t=1756213409; c=relaxed/simple;
+	bh=T9Gkxrj+Jbh4BEF2Xoy+VopdtFjdz7eGQjhjbYkar1Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z4okMvwMoYuHZVYOXl2qo6hYc+62aO1W4x9WLuWdGfeUz6MiNo5DcDNte1tnnp6HrnpXWDOKk/ceeH7BdKeev78AvUvkui/T1/5BBNVSa6IfXFX+iCFbVZOe5LBublBtp6++89uzI4imkKK38EEn+r4LL/Ut0AnjFtjWB5ZmyAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=lL+kZGgP; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=cJxbv7ncMMoa1RAgUxCp9znd/FcDXWjXkUE09s858Lk=; b=lL+kZGgPmLS72YgEpZvxyxawBu
-	5URBKI+mj+gPDGzmjyjG76w/xIl1jT/nE5wtrQp5zwlDNjqVflQvptam65LeyRCEL7TsT22ivMHGy
-	UeM+p+ibJRY/4/zv26gS/368O0ED7Ho9DlsV8dRK2L1X4g05cbA0dF56MkTO5ZmqpqEg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uqtKO-0065of-F9; Tue, 26 Aug 2025 15:03:08 +0200
-Date: Tue, 26 Aug 2025 15:03:08 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jack Ping CHNG <jchng@maxlinear.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, davem@davemloft.net,
-	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, yzhu@maxlinear.com,
-	sureshnagaraj@maxlinear.com
-Subject: Re: [PATCH net-next v2 2/2] net: maxlinear: Add support for MxL LGM
- SoC
-Message-ID: <4a3c0158-eda0-42bc-acfe-daddf8332bf3@lunn.ch>
-References: <20250826031044.563778-1-jchng@maxlinear.com>
- <20250826031044.563778-3-jchng@maxlinear.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qtWmARSB3t93ksPeigFaw03FdIV/swq5lerGJxmziRLiCNXa0zyBPkEaQWZ3t1w1Mocd65b8S6Sc2Nd2zoqZbMjQ5Ob/pZ/nqcbk9y/jNbYv53T+nMo1uBRbzckOyruxf53xPKi457Iy+G41tDbMn+Rrp2YFKqoKUBSqPUqQ6i8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 025E02C23;
+	Tue, 26 Aug 2025 06:03:18 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A5B423F63F;
+	Tue, 26 Aug 2025 06:03:19 -0700 (PDT)
+Date: Tue, 26 Aug 2025 14:03:16 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Brendan Jackman <jackmanb@google.com>,
+	Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>,
+	Dmitry Vyukov <dvyukov@google.com>, dri-devel@lists.freedesktop.org,
+	intel-gfx@lists.freedesktop.org, iommu@lists.linux.dev,
+	io-uring@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	John Hubbard <jhubbard@nvidia.com>, kasan-dev@googlegroups.com,
+	kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-arm-kernel@axis.com, linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Marco Elver <elver@google.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
+	Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
+	Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
+	virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
+	wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
+Subject: Re: [PATCH RFC 21/35] mm/cma: refuse handing out non-contiguous page
+ ranges
+Message-ID: <aK2wlGYvCaFQXzBm@raptor>
+References: <20250821200701.1329277-1-david@redhat.com>
+ <20250821200701.1329277-22-david@redhat.com>
+ <aK2QZnzS1ErHK5tP@raptor>
+ <ad521f4f-47aa-4728-916f-3704bf01f770@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,77 +78,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250826031044.563778-3-jchng@maxlinear.com>
+In-Reply-To: <ad521f4f-47aa-4728-916f-3704bf01f770@redhat.com>
 
-> +Maintainers
-> +===========
-> +
-> +See the MAINTAINERS file:
-> +
-> +    MAXLINEAR ETHERNET DRIVER
-> +    M: Jack Ping Chng <jchng@maxlinear.com>
-> +    L: netdev@vger.kernel.org
-> +    S: Supported
-> +    F: drivers/net/ethernet/maxlinear/
+Hi David,
 
-Please don't duplicate what is in MAINTAINERs. We have scripts which
-monitor how active Maintainers are, and update the file, removing
-inactive Maintainers. This duplication will not be updated.
+On Tue, Aug 26, 2025 at 01:04:33PM +0200, David Hildenbrand wrote:
+..
+> > Just so I can better understand the problem being fixed, I guess you can have
+> > two consecutive pfns with non-consecutive associated struct page if you have two
+> > adjacent memory sections spanning the same physical memory region, is that
+> > correct?
+> 
+> Exactly. Essentially on SPARSEMEM without SPARSEMEM_VMEMMAP it is not
+> guaranteed that
+> 
+> 	pfn_to_page(pfn + 1) == pfn_to_page(pfn) + 1
+> 
+> when we cross memory section boundaries.
+> 
+> It can be the case for early boot memory if we allocated consecutive areas
+> from memblock when allocating the memmap (struct pages) per memory section,
+> but it's not guaranteed.
 
-> +
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index fe168477caa4..e4765bd73615 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -15102,6 +15102,14 @@ W:	https://linuxtv.org
->  T:	git git://linuxtv.org/media.git
->  F:	drivers/media/radio/radio-maxiradio*
->  
-> +MAXLINEAR ETHERNET DRIVER
-> +M:	Jack Ping Chng <jchng@maxlinear.com>
-> +L:	netdev@vger.kernel.org
-> +S:	Maintained
-> +F:	Documentation/devicetree/bindings/net/mxl,lgm-eth.yaml
-> +F:	Documentation/networking/device_drivers/ethernet/maxlinear/mxl.rst
-> +F:	drivers/net/ethernet/maxlinear/mxl_eth.c
+Thank you for the explanation, but I'm a bit confused by the last paragraph. I
+think what you're saying is that we can also have the reverse problem, where
+consecutive struct page * represent non-consecutive pfns, because memmap
+allocations happened to return consecutive virtual addresses, is that right?
 
-It is probably better to just use drivers/net/ethernet/maxlinear/ so
-all files in that directory are covered, like the Makefile, Kconfig
-etc.
+If that's correct, I don't think that's the case for CMA, which deals out
+contiguous physical memory. Or were you just trying to explain the other side of
+the problem, and I'm just overthinking it?
 
-> +static int mxl_eth_probe(struct platform_device *pdev)
-> +{
-> +	struct mxl_eth_drvdata *drvdata;
-> +	struct reset_control *rst;
-> +	struct net_device *ndev;
-> +	struct device_node *np;
-> +	int ret, i;
-> +
-> +	drvdata = devm_kzalloc(&pdev->dev, sizeof(*drvdata), GFP_KERNEL);
-> +	if (!drvdata)
-> +		return -ENOMEM;
-> +
-> +	drvdata->clks = devm_clk_get_enabled(&pdev->dev, "ethif");
-> +	if (IS_ERR(drvdata->clks))
-> +		return dev_err_probe(&pdev->dev, PTR_ERR(drvdata->clks),
-> +				     "failed to get/enable clock\n");
-> +
-> +	rst = devm_reset_control_get_optional(&pdev->dev, NULL);
-
-Why is this optional? Are there some variants which don't have a
-reset?
-
-> +	i = 0;
-> +	for_each_available_child_of_node(pdev->dev.of_node, np) {
-> +		if (!of_device_is_compatible(np, "mxl,eth-mac"))
-> +			continue;
-
-Are there going to be other devices here, with different compatibles?
-
-> +
-> +		ret = mxl_eth_create_ndev(pdev, np, &ndev);
-
-Shouldn't you validate reg before creating the device?
-
-	Andrew
+Thanks,
+Alex
 
