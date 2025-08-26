@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-217085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D058B37538
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 01:07:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82AF0B3753B
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 01:07:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69E53360FD0
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 23:07:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEFCC1B68B73
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 23:08:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 905B32DF6EA;
-	Tue, 26 Aug 2025 23:06:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 155C22F6588;
+	Tue, 26 Aug 2025 23:06:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BC1F2D8DA9;
-	Tue, 26 Aug 2025 23:06:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67DB02D8DA9;
+	Tue, 26 Aug 2025 23:06:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756249594; cv=none; b=OPAY4LqOV3veMmScMQCqs5JVlgoiIdVsydRrLipflBcZZnticdnxL5VzKKTbVOGDlb5G0/SKCtwMHRaTooPUWQUfki278M4s5qPWd4ndw+6sLjmLiZIMbs+WAqdAQs9c5YNixmzV6dFAL3S9tCiT+hH25Gn9+8ab2g3ayZOErPE=
+	t=1756249605; cv=none; b=tWdXtbrTOp3XhJjgCw5LPC7CFUZ5Vum0mtC0o8apawFLqft4EsVq78zj+GpnwVpyGno5fJisXEJ99RU1s0YXBCnqZAAkgVXlq7NlrcXkz2GUg2Zjr62UVab9Ph+hRMW2QjeD0vKEOBlCcYz1WawdJmVdVQ6jT+FNy5lFbX9LZgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756249594; c=relaxed/simple;
-	bh=gPW8/s2OSqyRhSLj9Ov1snpbX2gPu55ctTsANI6JoUM=;
+	s=arc-20240116; t=1756249605; c=relaxed/simple;
+	bh=/72rdYd6xm4poZPJOLwHCbqWmzFsBPRRRk/gZLulOiA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OeuMaf94sx1SCay/ZGUl2e90oRpw3aK6Z0ODqUMT41xDgXizzjmb9g0oPXlgYepcCgiZDp7ywUh5yVVcT6LdGxTpxUYoX9e7Lt19mM83L28WsZu05AKRv7eu7dGCuIcje9HPdZMrE9lQfF6Yrn2/XWKRjpngs+pgRcsG1XExEaQ=
+	 Content-Type:Content-Disposition:In-Reply-To; b=ONPg4QZWNt3P0lwIDW0icgV+wg2KdDxgYL0yPUI8ZLhj0O2NpJZ+K1bzQi9DPAHviCm3edR4LQ5z3ZvHQIFSgl8+sYHgLvI4C8VaFXRejq/M8U6co0ZOf5SgVVjTGAIwBms0GrGmklUA+vwn2Seydz8pMx2kKjyjshxwisuSkl4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,9 +33,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1ur2kG-000000001to-1ACB;
-	Tue, 26 Aug 2025 23:06:28 +0000
-Date: Wed, 27 Aug 2025 00:06:24 +0100
+	id 1ur2kQ-000000001u2-1vMX;
+	Tue, 26 Aug 2025 23:06:38 +0000
+Date: Wed, 27 Aug 2025 00:06:35 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -55,9 +55,9 @@ Cc: Andreas Schirm <andreas.schirm@siemens.com>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next v2 5/6] net: dsa: lantiq_gswip: support standard
- MDIO node name
-Message-ID: <c8c3b44fd5d81d86dc771df522088f4cc3bc9296.1756228750.git.daniel@makrotopia.org>
+Subject: [PATCH net-next v2 6/6] net: dsa: lantiq_gswip: move MDIO bus
+ registration to .setup()
+Message-ID: <fbe86601753d6c43138133842787a7ece03dd09c.1756228750.git.daniel@makrotopia.org>
 References: <cover.1756228750.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -69,33 +69,50 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1756228750.git.daniel@makrotopia.org>
 
-Instead of matching against the child node's compatible string also
-support locating the node of the device tree node of the MDIO bus
-in the standard way by referencing the node name ("mdio").
+Instead of registering the switch MDIO bus in the probe() function, move
+the call to gswip_mdio() into the .setup() DSA switch op, so it can be
+reused independently of the probe() function.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Reviewed-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
 ---
 v2: no changes
 
- drivers/net/dsa/lantiq/lantiq_gswip.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/net/dsa/lantiq/lantiq_gswip.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.c b/drivers/net/dsa/lantiq/lantiq_gswip.c
-index 64e378852284..9fd5e5938384 100644
+index 9fd5e5938384..a6a76db7ef52 100644
 --- a/drivers/net/dsa/lantiq/lantiq_gswip.c
 +++ b/drivers/net/dsa/lantiq/lantiq_gswip.c
-@@ -286,6 +286,9 @@ static int gswip_mdio(struct gswip_priv *priv)
- 	int err = 0;
+@@ -627,6 +627,13 @@ static int gswip_setup(struct dsa_switch *ds)
+ 	/* Configure the MDIO Clock 2.5 MHz */
+ 	gswip_mdio_mask(priv, 0xff, 0x09, GSWIP_MDIO_MDC_CFG1);
  
- 	mdio_np = of_get_compatible_child(switch_np, "lantiq,xrx200-mdio");
-+	if (!mdio_np)
-+		mdio_np = of_get_child_by_name(switch_np, "mdio");
++	/* bring up the mdio bus */
++	err = gswip_mdio(priv);
++	if (err) {
++		dev_err(priv->dev, "mdio bus setup failed\n");
++		return err;
++	}
 +
- 	if (!of_device_is_available(mdio_np))
- 		goto out_put_node;
+ 	/* Disable the xMII interface and clear it's isolation bit */
+ 	for (i = 0; i < priv->hw_info->max_ports; i++)
+ 		gswip_mii_mask_cfg(priv,
+@@ -1973,13 +1980,6 @@ static int gswip_probe(struct platform_device *pdev)
+ 					     "gphy fw probe failed\n");
+ 	}
  
+-	/* bring up the mdio bus */
+-	err = gswip_mdio(priv);
+-	if (err) {
+-		dev_err_probe(dev, err, "mdio probe failed\n");
+-		goto gphy_fw_remove;
+-	}
+-
+ 	err = dsa_register_switch(priv->ds);
+ 	if (err) {
+ 		dev_err_probe(dev, err, "dsa switch registration failed\n");
 -- 
 2.51.0
 
