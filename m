@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-216854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71BFFB35826
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 11:09:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5A44B35818
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 11:07:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E5B13B3E28
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 09:08:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60AEC1B619B6
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 09:08:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 590AC30EF94;
-	Tue, 26 Aug 2025 09:06:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B933E3093D3;
+	Tue, 26 Aug 2025 09:06:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36EB5308F30;
-	Tue, 26 Aug 2025 09:06:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6CEB3054E5;
+	Tue, 26 Aug 2025 09:06:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756199200; cv=none; b=C5W2gfk4BM0ZiGbhEpPU7gR4lCKvJmKtXEqKtYo9+pS5d5HA1yPD+z73cYa0Yy2vPEGYjhsB8+V+ArT/Z/Ei0anSj+kgzqOHI2hyjJMnvCL3Bd50CP7yHmD/lU989weXV2KcSOo7UDw4yiiknQlrXsJs4f5HU98+YHF3+pvjc0I=
+	t=1756199197; cv=none; b=LkMhqkGszwqvcDZKsZSKiCDKg6pD2y0RXNJoucjdJkcv8VaYa5ysRtPNkGFa3CUnNgQvLKKEf9j7oZ21CctqjOdwjxjJ2Yhh6foC/pgQjVBioMiCviiei2yePlMpyVBp56WBqZvIZywvJfMRchZVsbRyNz/7tAUthpuvLyG0+OY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756199200; c=relaxed/simple;
-	bh=GPZLIMHzlf4O4jkSlruByNK+snU2RRR69ZB8EbMmz/Q=;
+	s=arc-20240116; t=1756199197; c=relaxed/simple;
+	bh=+8dB4f7KuDX0KOKar0NpEbxin0QEi9eWjFrpJg1AOlY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eHGwVyO1fG+EB2/xVlrDxUyC9eK7dKw2WLXVkRNZiS/BQBvyvLFOtRz2cI9hCHBZq3wfAH6USdF+i/yTVFMWpiYMxYCIvmmEB4UN6+pA/ttFdP6BsvKNidqLz5bun0jmSQ8rq8ST3kndAg++URU+og7n/SG/Ur8Nn04RvkMQxog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+	 MIME-Version:Content-Type; b=d8L6MecrfSqId+dBX3JYMZccFPWgoTum5lPYLr4Suiukli+GDkTwHSu+lK/0JqH/A/xtcwDUt/Vvo5Oe8hfDKYfIcMfUa+uCkEOhFNG1pmU64kbNJ2p9DHn6qBJj3rIvwA5rsY+J+HTNKF4IQu3NGvGUx7wSwd7Y1Eg78aKpXWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4cB1yY5G0Fz27jCh;
-	Tue, 26 Aug 2025 17:07:33 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4cB1s45fXvz13NK3;
+	Tue, 26 Aug 2025 17:02:48 +0800 (CST)
 Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
-	by mail.maildlp.com (Postfix) with ESMTPS id 462381402CA;
-	Tue, 26 Aug 2025 17:06:27 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id B23501402CF;
+	Tue, 26 Aug 2025 17:06:29 +0800 (CST)
 Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.189.55) by
  kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 26 Aug 2025 17:06:25 +0800
+ 15.2.1544.11; Tue, 26 Aug 2025 17:06:28 +0800
 From: Fan Gong <gongfan1@huawei.com>
 To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
@@ -55,9 +55,9 @@ CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
  Ghosh <sumang@marvell.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	Joe Damato <jdamato@fastly.com>, Christophe JAILLET
 	<christophe.jaillet@wanadoo.fr>
-Subject: [PATCH net-next v01 07/12] hinic3: Queue pair resource initialization
-Date: Tue, 26 Aug 2025 17:05:49 +0800
-Message-ID: <f1be4fdf9c760c29eb53763836796e8bc003bb1c.1756195078.git.zhuyikai1@h-partners.com>
+Subject: [PATCH net-next v01 08/12] hinic3: Queue pair context initialization
+Date: Tue, 26 Aug 2025 17:05:50 +0800
+Message-ID: <fc3dd2c0d29c54332169bc5a2e5be4e4eac77b07.1756195078.git.zhuyikai1@h-partners.com>
 X-Mailer: git-send-email 2.51.0.windows.1
 In-Reply-To: <cover.1756195078.git.zhuyikai1@h-partners.com>
 References: <cover.1756195078.git.zhuyikai1@h-partners.com>
@@ -72,8 +72,7 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
  kwepemf100013.china.huawei.com (7.202.181.12)
 
-Add Tx & Rx queue resources and functions for packet transmission
-and reception.
+Initialize queue pair context of hardware interaction.
 
 Co-developed-by: Xin Guo <guoxin09@huawei.com>
 Signed-off-by: Xin Guo <guoxin09@huawei.com>
@@ -81,1273 +80,928 @@ Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
 Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
 Signed-off-by: Fan Gong <gongfan1@huawei.com>
 ---
- .../huawei/hinic3/hinic3_netdev_ops.c         | 259 +++++++++++++++++-
- .../ethernet/huawei/hinic3/hinic3_nic_io.c    | 243 ++++++++++++++++
- .../ethernet/huawei/hinic3/hinic3_nic_io.h    |  36 ++-
- .../net/ethernet/huawei/hinic3/hinic3_rx.c    | 170 +++++++++++-
- .../net/ethernet/huawei/hinic3/hinic3_rx.h    |  38 ++-
- .../net/ethernet/huawei/hinic3/hinic3_tx.c    | 152 +++++++---
- .../net/ethernet/huawei/hinic3/hinic3_tx.h    |  28 +-
- 7 files changed, 848 insertions(+), 78 deletions(-)
+ .../ethernet/huawei/hinic3/hinic3_hw_comm.c   |  88 +++
+ .../ethernet/huawei/hinic3/hinic3_hw_comm.h   |   3 +
+ .../huawei/hinic3/hinic3_mgmt_interface.h     |  20 +
+ .../huawei/hinic3/hinic3_netdev_ops.c         |  42 ++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.c   |  35 ++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.h   |  12 +
+ .../ethernet/huawei/hinic3/hinic3_nic_io.c    | 579 ++++++++++++++++++
+ .../ethernet/huawei/hinic3/hinic3_nic_io.h    |   3 +
+ 8 files changed, 782 insertions(+)
 
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
+index c28df49e08c0..662187ffa6c6 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
+@@ -337,3 +337,91 @@ int hinic3_func_rx_tx_flush(struct hinic3_hwdev *hwdev)
+ 
+ 	return ret;
+ }
++
++static int get_hw_rx_buf_size_idx(int rx_buf_sz, u16 *buf_sz_idx)
++{
++	/* Supported RX buffer sizes in bytes. Configured by array index. */
++	static const int supported_sizes[16] = {
++		[0] = 32,     [1] = 64,     [2] = 96,     [3] = 128,
++		[4] = 192,    [5] = 256,    [6] = 384,    [7] = 512,
++		[8] = 768,    [9] = 1024,   [10] = 1536,  [11] = 2048,
++		[12] = 3072,  [13] = 4096,  [14] = 8192,  [15] = 16384,
++	};
++	u16 idx;
++
++	/* Scan from biggest to smallest. Choose supported size that is equal or
++	 * smaller. For smaller value HW will under-utilize posted buffers. For
++	 * bigger value HW may overrun posted buffers.
++	 */
++	idx = ARRAY_SIZE(supported_sizes);
++	while (idx > 0) {
++		idx--;
++		if (supported_sizes[idx] <= rx_buf_sz) {
++			*buf_sz_idx = idx;
++			return 0;
++		}
++	}
++
++	return -EINVAL;
++}
++
++int hinic3_set_root_ctxt(struct hinic3_hwdev *hwdev, u32 rq_depth, u32 sq_depth,
++			 int rx_buf_sz)
++{
++	struct comm_cmd_set_root_ctxt root_ctxt = {};
++	struct mgmt_msg_params msg_params = {};
++	u16 buf_sz_idx;
++	int err;
++
++	err = get_hw_rx_buf_size_idx(rx_buf_sz, &buf_sz_idx);
++	if (err)
++		return err;
++
++	root_ctxt.func_id = hinic3_global_func_id(hwdev);
++
++	root_ctxt.set_cmdq_depth = 0;
++	root_ctxt.cmdq_depth = 0;
++
++	root_ctxt.lro_en = 1;
++
++	root_ctxt.rq_depth  = ilog2(rq_depth);
++	root_ctxt.rx_buf_sz = buf_sz_idx;
++	root_ctxt.sq_depth  = ilog2(sq_depth);
++
++	mgmt_msg_params_init_default(&msg_params, &root_ctxt,
++				     sizeof(root_ctxt));
++
++	err = hinic3_send_mbox_to_mgmt(hwdev, MGMT_MOD_COMM,
++				       COMM_CMD_SET_VAT, &msg_params);
++	if (err || root_ctxt.head.status) {
++		dev_err(hwdev->dev,
++			"Failed to set root context, err: %d, status: 0x%x\n",
++			err, root_ctxt.head.status);
++		return -EFAULT;
++	}
++
++	return 0;
++}
++
++int hinic3_clean_root_ctxt(struct hinic3_hwdev *hwdev)
++{
++	struct comm_cmd_set_root_ctxt root_ctxt = {};
++	struct mgmt_msg_params msg_params = {};
++	int err;
++
++	root_ctxt.func_id = hinic3_global_func_id(hwdev);
++
++	mgmt_msg_params_init_default(&msg_params, &root_ctxt,
++				     sizeof(root_ctxt));
++
++	err = hinic3_send_mbox_to_mgmt(hwdev, MGMT_MOD_COMM,
++				       COMM_CMD_SET_VAT, &msg_params);
++	if (err || root_ctxt.head.status) {
++		dev_err(hwdev->dev,
++			"Failed to set root context, err: %d, status: 0x%x\n",
++			err, root_ctxt.head.status);
++		return -EFAULT;
++	}
++
++	return 0;
++}
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h
+index 35b93e36e004..304f5691f0c2 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h
+@@ -40,5 +40,8 @@ int hinic3_set_wq_page_size(struct hinic3_hwdev *hwdev, u16 func_idx,
+ 			    u32 page_size);
+ int hinic3_set_cmdq_depth(struct hinic3_hwdev *hwdev, u16 cmdq_depth);
+ int hinic3_func_rx_tx_flush(struct hinic3_hwdev *hwdev);
++int hinic3_set_root_ctxt(struct hinic3_hwdev *hwdev, u32 rq_depth, u32 sq_depth,
++			 int rx_buf_sz);
++int hinic3_clean_root_ctxt(struct hinic3_hwdev *hwdev);
+ 
+ #endif
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_mgmt_interface.h b/drivers/net/ethernet/huawei/hinic3/hinic3_mgmt_interface.h
+index c4434efdc7f7..b891290a3d6e 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_mgmt_interface.h
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_mgmt_interface.h
+@@ -56,6 +56,19 @@ struct l2nic_cmd_update_mac {
+ 	u8                   new_mac[ETH_ALEN];
+ };
+ 
++struct l2nic_cmd_set_ci_attr {
++	struct mgmt_msg_head msg_head;
++	u16                  func_idx;
++	u8                   dma_attr_off;
++	u8                   pending_limit;
++	u8                   coalescing_time;
++	u8                   intr_en;
++	u16                  intr_idx;
++	u32                  l2nic_sqn;
++	u32                  rsvd;
++	u64                  ci_addr;
++};
++
+ struct l2nic_cmd_force_pkt_drop {
+ 	struct mgmt_msg_head msg_head;
+ 	u8                   port;
+@@ -82,6 +95,13 @@ enum l2nic_cmd {
+ 	L2NIC_CMD_MAX                 = 256,
+ };
+ 
++/* NIC CMDQ MODE */
++enum l2nic_ucode_cmd {
++	L2NIC_UCODE_CMD_MODIFY_QUEUE_CTX  = 0,
++	L2NIC_UCODE_CMD_CLEAN_QUEUE_CTX   = 1,
++	L2NIC_UCODE_CMD_SET_RSS_INDIR_TBL = 4,
++};
++
+ enum hinic3_nic_feature_cap {
+ 	HINIC3_NIC_F_CSUM           = BIT(0),
+ 	HINIC3_NIC_F_SCTP_CRC       = BIT(1),
 diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c b/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
-index 71104a6b8bef..f0749a02ff80 100644
+index f0749a02ff80..054afb2b1460 100644
 --- a/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
 +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
-@@ -11,16 +11,267 @@
- #include "hinic3_rx.h"
- #include "hinic3_tx.h"
+@@ -227,6 +227,39 @@ static void hinic3_free_channel_resources(struct net_device *netdev,
+ 	hinic3_free_qps(nic_dev, qp_params);
+ }
  
-+/* try to modify the number of irq to the target number,
-+ * and return the actual number of irq.
-+ */
-+static u16 hinic3_qp_irq_change(struct net_device *netdev,
-+				u16 dst_num_qp_irq)
++static int hinic3_open_channel(struct net_device *netdev)
 +{
 +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	struct msix_entry *qps_msix_entries;
-+	u16 resp_irq_num, irq_num_gap, i;
-+	u16 idx;
 +	int err;
 +
-+	qps_msix_entries = nic_dev->qps_msix_entries;
-+	if (dst_num_qp_irq > nic_dev->num_qp_irq) {
-+		irq_num_gap = dst_num_qp_irq - nic_dev->num_qp_irq;
-+		err = hinic3_alloc_irqs(nic_dev->hwdev, irq_num_gap,
-+					&qps_msix_entries[nic_dev->num_qp_irq],
-+					&resp_irq_num);
-+		if (err) {
-+			netdev_err(netdev, "Failed to alloc irqs\n");
-+			return nic_dev->num_qp_irq;
-+		}
-+
-+		nic_dev->num_qp_irq += resp_irq_num;
-+	} else if (dst_num_qp_irq < nic_dev->num_qp_irq) {
-+		irq_num_gap = nic_dev->num_qp_irq - dst_num_qp_irq;
-+		for (i = 0; i < irq_num_gap; i++) {
-+			idx = (nic_dev->num_qp_irq - i) - 1;
-+			hinic3_free_irq(nic_dev->hwdev,
-+					qps_msix_entries[idx].vector);
-+			qps_msix_entries[idx].vector = 0;
-+			qps_msix_entries[idx].entry = 0;
-+		}
-+		nic_dev->num_qp_irq = dst_num_qp_irq;
-+	}
-+
-+	return nic_dev->num_qp_irq;
-+}
-+
-+static void hinic3_config_num_qps(struct net_device *netdev,
-+				  struct hinic3_dyna_txrxq_params *q_params)
-+{
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	u16 alloc_num_irq, cur_num_irq;
-+	u16 dst_num_irq;
-+
-+	if (!test_bit(HINIC3_RSS_ENABLE, &nic_dev->flags))
-+		q_params->num_qps = 1;
-+
-+	if (nic_dev->num_qp_irq >= q_params->num_qps)
-+		goto out;
-+
-+	cur_num_irq = nic_dev->num_qp_irq;
-+
-+	alloc_num_irq = hinic3_qp_irq_change(netdev, q_params->num_qps);
-+	if (alloc_num_irq < q_params->num_qps) {
-+		q_params->num_qps = alloc_num_irq;
-+		netdev_warn(netdev, "Can not get enough irqs, adjust num_qps to %u\n",
-+			    q_params->num_qps);
-+
-+		/* The current irq may be in use, we must keep it */
-+		dst_num_irq = max_t(u16, cur_num_irq, q_params->num_qps);
-+		hinic3_qp_irq_change(netdev, dst_num_irq);
-+	}
-+
-+out:
-+	netdev_dbg(netdev, "Finally num_qps: %u\n", q_params->num_qps);
-+}
-+
-+static int hinic3_setup_num_qps(struct net_device *netdev)
-+{
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+
-+	nic_dev->num_qp_irq = 0;
-+
-+	if (!nic_dev->max_qps) {
-+		netdev_err(netdev, "Cannot allocate zero size entries\n");
-+		return -EINVAL;
-+	}
-+	nic_dev->qps_msix_entries = kcalloc(nic_dev->max_qps,
-+					    sizeof(struct msix_entry),
-+					    GFP_KERNEL);
-+	if (!nic_dev->qps_msix_entries)
-+		return -ENOMEM;
-+
-+	hinic3_config_num_qps(netdev, &nic_dev->q_params);
-+
-+	return 0;
-+}
-+
-+static void hinic3_destroy_num_qps(struct net_device *netdev)
-+{
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	u16 i;
-+
-+	for (i = 0; i < nic_dev->num_qp_irq; i++)
-+		hinic3_free_irq(nic_dev->hwdev,
-+				nic_dev->qps_msix_entries[i].vector);
-+
-+	kfree(nic_dev->qps_msix_entries);
-+}
-+
-+static int hinic3_alloc_txrxq_resources(struct net_device *netdev,
-+					struct hinic3_dyna_txrxq_params *q_params)
-+{
-+	int err;
-+
-+	q_params->txqs_res = kcalloc(q_params->num_qps,
-+				     sizeof(*q_params->txqs_res), GFP_KERNEL);
-+	if (!q_params->txqs_res)
-+		return -ENOMEM;
-+
-+	q_params->rxqs_res = kcalloc(q_params->num_qps,
-+				     sizeof(*q_params->rxqs_res), GFP_KERNEL);
-+	if (!q_params->rxqs_res) {
-+		err = -ENOMEM;
-+		goto err_free_txqs_res_arr;
-+	}
-+
-+	q_params->irq_cfg = kcalloc(q_params->num_qps,
-+				    sizeof(*q_params->irq_cfg), GFP_KERNEL);
-+	if (!q_params->irq_cfg) {
-+		err = -ENOMEM;
-+		goto err_free_rxqs_res_arr;
-+	}
-+
-+	err = hinic3_alloc_txqs_res(netdev, q_params->num_qps,
-+				    q_params->sq_depth, q_params->txqs_res);
++	err = hinic3_init_qp_ctxts(nic_dev);
 +	if (err) {
-+		netdev_err(netdev, "Failed to alloc txqs resource\n");
-+		goto err_free_irq_cfg;
++		netdev_err(netdev, "Failed to init qps\n");
++		return err;
 +	}
 +
-+	err = hinic3_alloc_rxqs_res(netdev, q_params->num_qps,
-+				    q_params->rq_depth, q_params->rxqs_res);
++	err = hinic3_qps_irq_init(netdev);
 +	if (err) {
-+		netdev_err(netdev, "Failed to alloc rxqs resource\n");
-+		goto err_free_txqs_res;
++		netdev_err(netdev, "Failed to init txrxq irq\n");
++		goto err_free_qp_ctxts;
 +	}
 +
 +	return 0;
 +
-+err_free_txqs_res:
-+	hinic3_free_txqs_res(netdev, q_params->num_qps, q_params->sq_depth,
-+			     q_params->txqs_res);
-+
-+err_free_irq_cfg:
-+	kfree(q_params->irq_cfg);
-+	q_params->irq_cfg = NULL;
-+
-+err_free_rxqs_res_arr:
-+	kfree(q_params->rxqs_res);
-+	q_params->rxqs_res = NULL;
-+
-+err_free_txqs_res_arr:
-+	kfree(q_params->txqs_res);
-+	q_params->txqs_res = NULL;
++err_free_qp_ctxts:
++	hinic3_free_qp_ctxts(nic_dev);
 +
 +	return err;
 +}
 +
-+static void hinic3_free_txrxq_resources(struct net_device *netdev,
-+					struct hinic3_dyna_txrxq_params *q_params)
-+{
-+	hinic3_free_rxqs_res(netdev, q_params->num_qps, q_params->rq_depth,
-+			     q_params->rxqs_res);
-+	hinic3_free_txqs_res(netdev, q_params->num_qps, q_params->sq_depth,
-+			     q_params->txqs_res);
-+
-+	kfree(q_params->irq_cfg);
-+	q_params->irq_cfg = NULL;
-+
-+	kfree(q_params->rxqs_res);
-+	q_params->rxqs_res = NULL;
-+
-+	kfree(q_params->txqs_res);
-+	q_params->txqs_res = NULL;
-+}
-+
-+static int hinic3_alloc_channel_resources(struct net_device *netdev,
-+					  struct hinic3_dyna_qp_params *qp_params,
-+					  struct hinic3_dyna_txrxq_params *trxq_params)
-+{
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	int err;
-+
-+	qp_params->num_qps = trxq_params->num_qps;
-+	qp_params->sq_depth = trxq_params->sq_depth;
-+	qp_params->rq_depth = trxq_params->rq_depth;
-+
-+	err = hinic3_alloc_qps(nic_dev, qp_params);
-+	if (err) {
-+		netdev_err(netdev, "Failed to alloc qps\n");
-+		return err;
-+	}
-+
-+	err = hinic3_alloc_txrxq_resources(netdev, trxq_params);
-+	if (err) {
-+		netdev_err(netdev, "Failed to alloc txrxq resources\n");
-+		hinic3_free_qps(nic_dev, qp_params);
-+		return err;
-+	}
-+
-+	return 0;
-+}
-+
-+static void hinic3_free_channel_resources(struct net_device *netdev,
-+					  struct hinic3_dyna_qp_params *qp_params,
-+					  struct hinic3_dyna_txrxq_params *trxq_params)
++static void hinic3_close_channel(struct net_device *netdev)
 +{
 +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
 +
-+	hinic3_free_txrxq_resources(netdev, trxq_params);
-+	hinic3_free_qps(nic_dev, qp_params);
++	hinic3_qps_irq_uninit(netdev);
++	hinic3_free_qp_ctxts(nic_dev);
 +}
 +
  static int hinic3_open(struct net_device *netdev)
  {
--	/* Completed by later submission due to LoC limit. */
--	return -EFAULT;
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	struct hinic3_dyna_qp_params qp_params;
-+	int err;
-+
-+	err = hinic3_init_nicio_res(nic_dev);
-+	if (err) {
-+		netdev_err(netdev, "Failed to init nicio resources\n");
-+		return err;
-+	}
-+
-+	err = hinic3_setup_num_qps(netdev);
-+	if (err) {
-+		netdev_err(netdev, "Failed to setup num_qps\n");
-+		goto err_free_nicio_res;
-+	}
-+
-+	err = hinic3_alloc_channel_resources(netdev, &qp_params,
-+					     &nic_dev->q_params);
-+	if (err)
-+		goto err_destroy_num_qps;
-+
-+	hinic3_init_qps(nic_dev, &qp_params);
-+
-+	return 0;
-+
-+err_destroy_num_qps:
-+	hinic3_destroy_num_qps(netdev);
-+
-+err_free_nicio_res:
-+	hinic3_free_nicio_res(nic_dev);
-+
-+	return err;
- }
+ 	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
+@@ -252,8 +285,16 @@ static int hinic3_open(struct net_device *netdev)
  
- static int hinic3_close(struct net_device *netdev)
- {
--	/* Completed by later submission due to LoC limit. */
--	return -EFAULT;
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	struct hinic3_dyna_qp_params qp_params;
+ 	hinic3_init_qps(nic_dev, &qp_params);
+ 
++	err = hinic3_open_channel(netdev);
++	if (err)
++		goto err_uninit_qps;
 +
+ 	return 0;
+ 
++err_uninit_qps:
 +	hinic3_uninit_qps(nic_dev, &qp_params);
 +	hinic3_free_channel_resources(netdev, &qp_params, &nic_dev->q_params);
 +
+ err_destroy_num_qps:
+ 	hinic3_destroy_num_qps(netdev);
+ 
+@@ -268,6 +309,7 @@ static int hinic3_close(struct net_device *netdev)
+ 	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
+ 	struct hinic3_dyna_qp_params qp_params;
+ 
++	hinic3_close_channel(netdev);
+ 	hinic3_uninit_qps(nic_dev, &qp_params);
+ 	hinic3_free_channel_resources(netdev, &qp_params, &nic_dev->q_params);
+ 
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
+index d42ddf63b3a5..4a3dd859fcc9 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
+@@ -230,6 +230,41 @@ int hinic3_update_mac(struct hinic3_hwdev *hwdev, const u8 *old_mac,
+ 			err, mac_info.msg_head.status);
+ 		return -EIO;
+ 	}
++
 +	return 0;
++}
++
++int hinic3_set_ci_table(struct hinic3_hwdev *hwdev, struct hinic3_sq_attr *attr)
++{
++	struct l2nic_cmd_set_ci_attr cons_idx_attr = {};
++	struct mgmt_msg_params msg_params = {};
++	int err;
++
++	cons_idx_attr.func_idx = hinic3_global_func_id(hwdev);
++	cons_idx_attr.dma_attr_off  = attr->dma_attr_off;
++	cons_idx_attr.pending_limit = attr->pending_limit;
++	cons_idx_attr.coalescing_time  = attr->coalescing_time;
++
++	if (attr->intr_en) {
++		cons_idx_attr.intr_en = attr->intr_en;
++		cons_idx_attr.intr_idx = attr->intr_idx;
++	}
++
++	cons_idx_attr.l2nic_sqn = attr->l2nic_sqn;
++	cons_idx_attr.ci_addr = attr->ci_dma_base;
++
++	mgmt_msg_params_init_default(&msg_params, &cons_idx_attr,
++				     sizeof(cons_idx_attr));
++
++	err = hinic3_send_mbox_to_mgmt(hwdev, MGMT_MOD_L2NIC,
++				       L2NIC_CMD_SET_SQ_CI_ATTR, &msg_params);
++	if (err || cons_idx_attr.msg_head.status) {
++		dev_err(hwdev->dev,
++			"Failed to set ci attribute table, err: %d, status: 0x%x\n",
++			err, cons_idx_attr.msg_head.status);
++		return -EFAULT;
++	}
++
+ 	return 0;
  }
  
- static int hinic3_change_mtu(struct net_device *netdev, int new_mtu)
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h
+index 6b6851650a37..dd1615745f02 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h
+@@ -22,6 +22,16 @@ enum hinic3_nic_event_type {
+ 	HINIC3_NIC_EVENT_LINK_UP   = 1,
+ };
+ 
++struct hinic3_sq_attr {
++	u8  dma_attr_off;
++	u8  pending_limit;
++	u8  coalescing_time;
++	u8  intr_en;
++	u16 intr_idx;
++	u32 l2nic_sqn;
++	u64 ci_dma_base;
++};
++
+ int hinic3_get_nic_feature_from_hw(struct hinic3_nic_dev *nic_dev);
+ int hinic3_set_nic_feature_to_hw(struct hinic3_nic_dev *nic_dev);
+ bool hinic3_test_support(struct hinic3_nic_dev *nic_dev,
+@@ -38,6 +48,8 @@ int hinic3_del_mac(struct hinic3_hwdev *hwdev, const u8 *mac_addr, u16 vlan_id,
+ int hinic3_update_mac(struct hinic3_hwdev *hwdev, const u8 *old_mac,
+ 		      u8 *new_mac, u16 vlan_id, u16 func_id);
+ 
++int hinic3_set_ci_table(struct hinic3_hwdev *hwdev,
++			struct hinic3_sq_attr *attr);
+ int hinic3_force_drop_tx_pkt(struct hinic3_hwdev *hwdev);
+ 
+ #endif
 diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.c b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.c
-index dd3e704ad3b5..56c6de60d029 100644
+index 56c6de60d029..535d37eaaa9c 100644
 --- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.c
 +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.c
-@@ -9,6 +9,14 @@
+@@ -1,6 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0
+ // Copyright (c) Huawei Technologies Co., Ltd. 2025. All rights reserved.
+ 
++#include "hinic3_cmdq.h"
+ #include "hinic3_hw_comm.h"
+ #include "hinic3_hw_intf.h"
+ #include "hinic3_hwdev.h"
+@@ -9,6 +10,11 @@
  #include "hinic3_nic_dev.h"
  #include "hinic3_nic_io.h"
  
-+#define HINIC3_CI_Q_ADDR_SIZE                (64)
++#define HINIC3_DEFAULT_TX_CI_PENDING_LIMIT    1
++#define HINIC3_DEFAULT_TX_CI_COALESCING_TIME  1
++#define HINIC3_DEFAULT_DROP_THD_ON            (0xFFFF)
++#define HINIC3_DEFAULT_DROP_THD_OFF           0
 +
-+#define HINIC3_CI_TABLE_SIZE(num_qps)  \
-+	(ALIGN((num_qps) * HINIC3_CI_Q_ADDR_SIZE, HINIC3_MIN_PAGE_SIZE))
+ #define HINIC3_CI_Q_ADDR_SIZE                (64)
+ 
+ #define HINIC3_CI_TABLE_SIZE(num_qps)  \
+@@ -17,6 +23,186 @@
+ #define HINIC3_CI_VADDR(base_addr, q_id)  \
+ 	((u8 *)(base_addr) + (q_id) * HINIC3_CI_Q_ADDR_SIZE)
+ 
++#define HINIC3_CI_PADDR(base_paddr, q_id)  \
++	((base_paddr) + (q_id) * HINIC3_CI_Q_ADDR_SIZE)
 +
-+#define HINIC3_CI_VADDR(base_addr, q_id)  \
-+	((u8 *)(base_addr) + (q_id) * HINIC3_CI_Q_ADDR_SIZE)
++#define SQ_WQ_PREFETCH_MAX        1
++#define SQ_WQ_PREFETCH_MIN        1
++#define SQ_WQ_PREFETCH_THRESHOLD  16
++
++#define RQ_WQ_PREFETCH_MAX        4
++#define RQ_WQ_PREFETCH_MIN        1
++#define RQ_WQ_PREFETCH_THRESHOLD  256
++
++/* (2048 - 8) / 64 */
++#define HINIC3_Q_CTXT_MAX         31
++
++enum hinic3_qp_ctxt_type {
++	HINIC3_QP_CTXT_TYPE_SQ = 0,
++	HINIC3_QP_CTXT_TYPE_RQ = 1,
++};
++
++struct hinic3_qp_ctxt_hdr {
++	__le16 num_queues;
++	__le16 queue_type;
++	__le16 start_qid;
++	__le16 rsvd;
++};
++
++struct hinic3_sq_ctxt {
++	__le32 ci_pi;
++	__le32 drop_mode_sp;
++	__le32 wq_pfn_hi_owner;
++	__le32 wq_pfn_lo;
++
++	__le32 rsvd0;
++	__le32 pkt_drop_thd;
++	__le32 global_sq_id;
++	__le32 vlan_ceq_attr;
++
++	__le32 pref_cache;
++	__le32 pref_ci_owner;
++	__le32 pref_wq_pfn_hi_ci;
++	__le32 pref_wq_pfn_lo;
++
++	__le32 rsvd8;
++	__le32 rsvd9;
++	__le32 wq_block_pfn_hi;
++	__le32 wq_block_pfn_lo;
++};
++
++struct hinic3_rq_ctxt {
++	__le32 ci_pi;
++	__le32 ceq_attr;
++	__le32 wq_pfn_hi_type_owner;
++	__le32 wq_pfn_lo;
++
++	__le32 rsvd[3];
++	__le32 cqe_sge_len;
++
++	__le32 pref_cache;
++	__le32 pref_ci_owner;
++	__le32 pref_wq_pfn_hi_ci;
++	__le32 pref_wq_pfn_lo;
++
++	__le32 pi_paddr_hi;
++	__le32 pi_paddr_lo;
++	__le32 wq_block_pfn_hi;
++	__le32 wq_block_pfn_lo;
++};
++
++struct hinic3_sq_ctxt_block {
++	struct hinic3_qp_ctxt_hdr cmdq_hdr;
++	struct hinic3_sq_ctxt     sq_ctxt[HINIC3_Q_CTXT_MAX];
++};
++
++struct hinic3_rq_ctxt_block {
++	struct hinic3_qp_ctxt_hdr cmdq_hdr;
++	struct hinic3_rq_ctxt     rq_ctxt[HINIC3_Q_CTXT_MAX];
++};
++
++struct hinic3_clean_queue_ctxt {
++	struct hinic3_qp_ctxt_hdr cmdq_hdr;
++	__le32                    rsvd;
++};
++
++#define SQ_CTXT_SIZE(num_sqs)  \
++	(sizeof(struct hinic3_qp_ctxt_hdr) +  \
++	(num_sqs) * sizeof(struct hinic3_sq_ctxt))
++
++#define RQ_CTXT_SIZE(num_rqs)  \
++	(sizeof(struct hinic3_qp_ctxt_hdr) +  \
++	(num_rqs) * sizeof(struct hinic3_rq_ctxt))
++
++#define SQ_CTXT_PREF_CI_HI_SHIFT           12
++#define SQ_CTXT_PREF_CI_HI(val)            ((val) >> SQ_CTXT_PREF_CI_HI_SHIFT)
++
++#define SQ_CTXT_PI_IDX_MASK                GENMASK(15, 0)
++#define SQ_CTXT_CI_IDX_MASK                GENMASK(31, 16)
++#define SQ_CTXT_CI_PI_SET(val, member)  \
++	FIELD_PREP(SQ_CTXT_##member##_MASK, val)
++
++#define SQ_CTXT_MODE_SP_FLAG_MASK          BIT(0)
++#define SQ_CTXT_MODE_PKT_DROP_MASK         BIT(1)
++#define SQ_CTXT_MODE_SET(val, member)  \
++	FIELD_PREP(SQ_CTXT_MODE_##member##_MASK, val)
++
++#define SQ_CTXT_WQ_PAGE_HI_PFN_MASK        GENMASK(19, 0)
++#define SQ_CTXT_WQ_PAGE_OWNER_MASK         BIT(23)
++#define SQ_CTXT_WQ_PAGE_SET(val, member)  \
++	FIELD_PREP(SQ_CTXT_WQ_PAGE_##member##_MASK, val)
++
++#define SQ_CTXT_PKT_DROP_THD_ON_MASK       GENMASK(15, 0)
++#define SQ_CTXT_PKT_DROP_THD_OFF_MASK      GENMASK(31, 16)
++#define SQ_CTXT_PKT_DROP_THD_SET(val, member)  \
++	FIELD_PREP(SQ_CTXT_PKT_DROP_##member##_MASK, val)
++
++#define SQ_CTXT_GLOBAL_SQ_ID_MASK          GENMASK(12, 0)
++#define SQ_CTXT_GLOBAL_QUEUE_ID_SET(val, member)  \
++	FIELD_PREP(SQ_CTXT_##member##_MASK, val)
++
++#define SQ_CTXT_VLAN_INSERT_MODE_MASK      GENMASK(20, 19)
++#define SQ_CTXT_VLAN_CEQ_EN_MASK           BIT(23)
++#define SQ_CTXT_VLAN_CEQ_SET(val, member)  \
++	FIELD_PREP(SQ_CTXT_VLAN_##member##_MASK, val)
++
++#define SQ_CTXT_PREF_CACHE_THRESHOLD_MASK  GENMASK(13, 0)
++#define SQ_CTXT_PREF_CACHE_MAX_MASK        GENMASK(24, 14)
++#define SQ_CTXT_PREF_CACHE_MIN_MASK        GENMASK(31, 25)
++
++#define SQ_CTXT_PREF_CI_HI_MASK            GENMASK(3, 0)
++#define SQ_CTXT_PREF_OWNER_MASK            BIT(4)
++
++#define SQ_CTXT_PREF_WQ_PFN_HI_MASK        GENMASK(19, 0)
++#define SQ_CTXT_PREF_CI_LOW_MASK           GENMASK(31, 20)
++#define SQ_CTXT_PREF_SET(val, member)  \
++	FIELD_PREP(SQ_CTXT_PREF_##member##_MASK, val)
++
++#define SQ_CTXT_WQ_BLOCK_PFN_HI_MASK       GENMASK(22, 0)
++#define SQ_CTXT_WQ_BLOCK_SET(val, member)  \
++	FIELD_PREP(SQ_CTXT_WQ_BLOCK_##member##_MASK, val)
++
++#define RQ_CTXT_PI_IDX_MASK                GENMASK(15, 0)
++#define RQ_CTXT_CI_IDX_MASK                GENMASK(31, 16)
++#define RQ_CTXT_CI_PI_SET(val, member)  \
++	FIELD_PREP(RQ_CTXT_##member##_MASK, val)
++
++#define RQ_CTXT_CEQ_ATTR_INTR_MASK         GENMASK(30, 21)
++#define RQ_CTXT_CEQ_ATTR_EN_MASK           BIT(31)
++#define RQ_CTXT_CEQ_ATTR_SET(val, member)  \
++	FIELD_PREP(RQ_CTXT_CEQ_ATTR_##member##_MASK, val)
++
++#define RQ_CTXT_WQ_PAGE_HI_PFN_MASK        GENMASK(19, 0)
++#define RQ_CTXT_WQ_PAGE_WQE_TYPE_MASK      GENMASK(29, 28)
++#define RQ_CTXT_WQ_PAGE_OWNER_MASK         BIT(31)
++#define RQ_CTXT_WQ_PAGE_SET(val, member)  \
++	FIELD_PREP(RQ_CTXT_WQ_PAGE_##member##_MASK, val)
++
++#define RQ_CTXT_CQE_LEN_MASK               GENMASK(29, 28)
++#define RQ_CTXT_CQE_LEN_SET(val, member)  \
++	FIELD_PREP(RQ_CTXT_##member##_MASK, val)
++
++#define RQ_CTXT_PREF_CACHE_THRESHOLD_MASK  GENMASK(13, 0)
++#define RQ_CTXT_PREF_CACHE_MAX_MASK        GENMASK(24, 14)
++#define RQ_CTXT_PREF_CACHE_MIN_MASK        GENMASK(31, 25)
++
++#define RQ_CTXT_PREF_CI_HI_MASK            GENMASK(3, 0)
++#define RQ_CTXT_PREF_OWNER_MASK            BIT(4)
++
++#define RQ_CTXT_PREF_WQ_PFN_HI_MASK        GENMASK(19, 0)
++#define RQ_CTXT_PREF_CI_LOW_MASK           GENMASK(31, 20)
++#define RQ_CTXT_PREF_SET(val, member)  \
++	FIELD_PREP(RQ_CTXT_PREF_##member##_MASK, val)
++
++#define RQ_CTXT_WQ_BLOCK_PFN_HI_MASK       GENMASK(22, 0)
++#define RQ_CTXT_WQ_BLOCK_SET(val, member)  \
++	FIELD_PREP(RQ_CTXT_WQ_BLOCK_##member##_MASK, val)
++
++#define WQ_PAGE_PFN_SHIFT       12
++#define WQ_BLOCK_PFN_SHIFT      9
++#define WQ_PAGE_PFN(page_addr)  ((page_addr) >> WQ_PAGE_PFN_SHIFT)
++#define WQ_BLOCK_PFN(page_addr) ((page_addr) >> WQ_BLOCK_PFN_SHIFT)
 +
  static int init_nic_io(struct hinic3_nic_io **nic_io)
  {
  	*nic_io = kzalloc(sizeof(**nic_io), GFP_KERNEL);
-@@ -74,3 +82,238 @@ void hinic3_free_nic_io(struct hinic3_nic_dev *nic_dev)
- 	nic_dev->nic_io = NULL;
- 	kfree(nic_io);
+@@ -317,3 +503,396 @@ void hinic3_uninit_qps(struct hinic3_nic_dev *nic_dev,
+ 	qp_params->rqs = nic_io->rq;
+ 	qp_params->num_qps = nic_io->num_qps;
  }
 +
-+int hinic3_init_nicio_res(struct hinic3_nic_dev *nic_dev)
++static void hinic3_qp_prepare_cmdq_header(struct hinic3_qp_ctxt_hdr *qp_ctxt_hdr,
++					  enum hinic3_qp_ctxt_type ctxt_type,
++					  u16 num_queues, u16 q_id)
++{
++	qp_ctxt_hdr->queue_type = cpu_to_le16(ctxt_type);
++	qp_ctxt_hdr->num_queues = cpu_to_le16(num_queues);
++	qp_ctxt_hdr->start_qid = cpu_to_le16(q_id);
++	qp_ctxt_hdr->rsvd = 0;
++}
++
++static void hinic3_sq_prepare_ctxt(struct hinic3_io_queue *sq, u16 sq_id,
++				   struct hinic3_sq_ctxt *sq_ctxt)
++{
++	u64 wq_page_addr, wq_page_pfn, wq_block_pfn;
++	u32 wq_block_pfn_hi, wq_block_pfn_lo;
++	u32 wq_page_pfn_hi, wq_page_pfn_lo;
++	u16 pi_start, ci_start;
++
++	ci_start = hinic3_get_sq_local_ci(sq);
++	pi_start = hinic3_get_sq_local_pi(sq);
++
++	wq_page_addr = hinic3_wq_get_first_wqe_page_addr(&sq->wq);
++
++	wq_page_pfn = WQ_PAGE_PFN(wq_page_addr);
++	wq_page_pfn_hi = upper_32_bits(wq_page_pfn);
++	wq_page_pfn_lo = lower_32_bits(wq_page_pfn);
++
++	wq_block_pfn = WQ_BLOCK_PFN(sq->wq.wq_block_paddr);
++	wq_block_pfn_hi = upper_32_bits(wq_block_pfn);
++	wq_block_pfn_lo = lower_32_bits(wq_block_pfn);
++
++	sq_ctxt->ci_pi =
++		cpu_to_le32(SQ_CTXT_CI_PI_SET(ci_start, CI_IDX) |
++			    SQ_CTXT_CI_PI_SET(pi_start, PI_IDX));
++
++	sq_ctxt->drop_mode_sp =
++		cpu_to_le32(SQ_CTXT_MODE_SET(0, SP_FLAG) |
++			    SQ_CTXT_MODE_SET(0, PKT_DROP));
++
++	sq_ctxt->wq_pfn_hi_owner =
++		cpu_to_le32(SQ_CTXT_WQ_PAGE_SET(wq_page_pfn_hi, HI_PFN) |
++			    SQ_CTXT_WQ_PAGE_SET(1, OWNER));
++
++	sq_ctxt->wq_pfn_lo = cpu_to_le32(wq_page_pfn_lo);
++
++	sq_ctxt->pkt_drop_thd =
++		cpu_to_le32(SQ_CTXT_PKT_DROP_THD_SET(HINIC3_DEFAULT_DROP_THD_ON, THD_ON) |
++			    SQ_CTXT_PKT_DROP_THD_SET(HINIC3_DEFAULT_DROP_THD_OFF, THD_OFF));
++
++	sq_ctxt->global_sq_id =
++		cpu_to_le32(SQ_CTXT_GLOBAL_QUEUE_ID_SET((u32)sq_id,
++							GLOBAL_SQ_ID));
++
++	/* enable insert c-vlan by default */
++	sq_ctxt->vlan_ceq_attr =
++		cpu_to_le32(SQ_CTXT_VLAN_CEQ_SET(0, CEQ_EN) |
++			    SQ_CTXT_VLAN_CEQ_SET(1, INSERT_MODE));
++
++	sq_ctxt->rsvd0 = 0;
++
++	sq_ctxt->pref_cache =
++		cpu_to_le32(SQ_CTXT_PREF_SET(SQ_WQ_PREFETCH_MIN, CACHE_MIN) |
++			    SQ_CTXT_PREF_SET(SQ_WQ_PREFETCH_MAX, CACHE_MAX) |
++			    SQ_CTXT_PREF_SET(SQ_WQ_PREFETCH_THRESHOLD, CACHE_THRESHOLD));
++
++	sq_ctxt->pref_ci_owner =
++		cpu_to_le32(SQ_CTXT_PREF_SET(SQ_CTXT_PREF_CI_HI(ci_start), CI_HI) |
++			    SQ_CTXT_PREF_SET(1, OWNER));
++
++	sq_ctxt->pref_wq_pfn_hi_ci =
++		cpu_to_le32(SQ_CTXT_PREF_SET(ci_start, CI_LOW) |
++			    SQ_CTXT_PREF_SET(wq_page_pfn_hi, WQ_PFN_HI));
++
++	sq_ctxt->pref_wq_pfn_lo = cpu_to_le32(wq_page_pfn_lo);
++
++	sq_ctxt->wq_block_pfn_hi =
++		cpu_to_le32(SQ_CTXT_WQ_BLOCK_SET(wq_block_pfn_hi, PFN_HI));
++
++	sq_ctxt->wq_block_pfn_lo = cpu_to_le32(wq_block_pfn_lo);
++}
++
++static void hinic3_rq_prepare_ctxt_get_wq_info(struct hinic3_io_queue *rq,
++					       u32 *wq_page_pfn_hi,
++					       u32 *wq_page_pfn_lo,
++					       u32 *wq_block_pfn_hi,
++					       u32 *wq_block_pfn_lo)
++{
++	u64 wq_page_addr, wq_page_pfn, wq_block_pfn;
++
++	wq_page_addr = hinic3_wq_get_first_wqe_page_addr(&rq->wq);
++
++	wq_page_pfn = WQ_PAGE_PFN(wq_page_addr);
++	*wq_page_pfn_hi = upper_32_bits(wq_page_pfn);
++	*wq_page_pfn_lo = lower_32_bits(wq_page_pfn);
++
++	wq_block_pfn = WQ_BLOCK_PFN(rq->wq.wq_block_paddr);
++	*wq_block_pfn_hi = upper_32_bits(wq_block_pfn);
++	*wq_block_pfn_lo = lower_32_bits(wq_block_pfn);
++}
++
++static void hinic3_rq_prepare_ctxt(struct hinic3_io_queue *rq,
++				   struct hinic3_rq_ctxt *rq_ctxt)
++{
++	u32 wq_block_pfn_hi, wq_block_pfn_lo;
++	u32 wq_page_pfn_hi, wq_page_pfn_lo;
++	u16 pi_start, ci_start;
++
++	ci_start = (rq->wq.cons_idx & rq->wq.idx_mask) << HINIC3_NORMAL_RQ_WQE;
++	pi_start = (rq->wq.prod_idx & rq->wq.idx_mask) << HINIC3_NORMAL_RQ_WQE;
++
++	hinic3_rq_prepare_ctxt_get_wq_info(rq, &wq_page_pfn_hi, &wq_page_pfn_lo,
++					   &wq_block_pfn_hi, &wq_block_pfn_lo);
++
++	rq_ctxt->ci_pi =
++		cpu_to_le32(RQ_CTXT_CI_PI_SET(ci_start, CI_IDX) |
++			    RQ_CTXT_CI_PI_SET(pi_start, PI_IDX));
++
++	rq_ctxt->ceq_attr =
++		cpu_to_le32(RQ_CTXT_CEQ_ATTR_SET(0, EN) |
++			    RQ_CTXT_CEQ_ATTR_SET(rq->msix_entry_idx, INTR));
++
++	rq_ctxt->wq_pfn_hi_type_owner =
++		cpu_to_le32(RQ_CTXT_WQ_PAGE_SET(wq_page_pfn_hi, HI_PFN) |
++			    RQ_CTXT_WQ_PAGE_SET(1, OWNER));
++
++	/* use 16Byte WQE */
++	rq_ctxt->wq_pfn_hi_type_owner |=
++		cpu_to_le32(RQ_CTXT_WQ_PAGE_SET(2, WQE_TYPE));
++	rq_ctxt->cqe_sge_len = cpu_to_le32(RQ_CTXT_CQE_LEN_SET(1, CQE_LEN));
++
++	rq_ctxt->wq_pfn_lo = cpu_to_le32(wq_page_pfn_lo);
++
++	rq_ctxt->pref_cache =
++		cpu_to_le32(RQ_CTXT_PREF_SET(RQ_WQ_PREFETCH_MIN, CACHE_MIN) |
++			    RQ_CTXT_PREF_SET(RQ_WQ_PREFETCH_MAX, CACHE_MAX) |
++			    RQ_CTXT_PREF_SET(RQ_WQ_PREFETCH_THRESHOLD, CACHE_THRESHOLD));
++
++	rq_ctxt->pref_ci_owner =
++		cpu_to_le32(RQ_CTXT_PREF_SET(SQ_CTXT_PREF_CI_HI(ci_start), CI_HI) |
++			    RQ_CTXT_PREF_SET(1, OWNER));
++
++	rq_ctxt->pref_wq_pfn_hi_ci =
++		cpu_to_le32(RQ_CTXT_PREF_SET(wq_page_pfn_hi, WQ_PFN_HI) |
++			    RQ_CTXT_PREF_SET(ci_start, CI_LOW));
++
++	rq_ctxt->pref_wq_pfn_lo = cpu_to_le32(wq_page_pfn_lo);
++
++	rq_ctxt->wq_block_pfn_hi =
++		cpu_to_le32(RQ_CTXT_WQ_BLOCK_SET(wq_block_pfn_hi, PFN_HI));
++
++	rq_ctxt->wq_block_pfn_lo = cpu_to_le32(wq_block_pfn_lo);
++}
++
++static int init_sq_ctxts(struct hinic3_nic_dev *nic_dev)
 +{
 +	struct hinic3_nic_io *nic_io = nic_dev->nic_io;
 +	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
-+	void __iomem *db_base;
-+	int err;
++	struct hinic3_sq_ctxt_block *sq_ctxt_block;
++	u16 q_id, curr_id, max_ctxts, i;
++	struct hinic3_sq_ctxt *sq_ctxt;
++	struct hinic3_cmd_buf *cmd_buf;
++	struct hinic3_io_queue *sq;
++	__le64 out_param;
++	int err = 0;
 +
-+	nic_io->max_qps = hinic3_func_max_qnum(hwdev);
-+
-+	err = hinic3_alloc_db_addr(hwdev, &db_base, NULL);
-+	if (err) {
-+		dev_err(hwdev->dev, "Failed to allocate doorbell for sqs\n");
-+		return err;
-+	}
-+	nic_io->sqs_db_addr = db_base;
-+
-+	err = hinic3_alloc_db_addr(hwdev, &db_base, NULL);
-+	if (err) {
-+		hinic3_free_db_addr(hwdev, nic_io->sqs_db_addr);
-+		dev_err(hwdev->dev, "Failed to allocate doorbell for rqs\n");
-+		return err;
-+	}
-+	nic_io->rqs_db_addr = db_base;
-+
-+	nic_io->ci_vaddr_base =
-+		dma_alloc_coherent(hwdev->dev,
-+				   HINIC3_CI_TABLE_SIZE(nic_io->max_qps),
-+				   &nic_io->ci_dma_base,
-+				   GFP_KERNEL);
-+	if (!nic_io->ci_vaddr_base) {
-+		hinic3_free_db_addr(hwdev, nic_io->sqs_db_addr);
-+		hinic3_free_db_addr(hwdev, nic_io->rqs_db_addr);
++	cmd_buf = hinic3_alloc_cmd_buf(hwdev);
++	if (!cmd_buf) {
++		dev_err(hwdev->dev, "Failed to allocate cmd buf\n");
 +		return -ENOMEM;
 +	}
 +
-+	return 0;
-+}
++	q_id = 0;
++	while (q_id < nic_io->num_qps) {
++		sq_ctxt_block = cmd_buf->buf;
++		sq_ctxt = sq_ctxt_block->sq_ctxt;
 +
-+void hinic3_free_nicio_res(struct hinic3_nic_dev *nic_dev)
-+{
-+	struct hinic3_nic_io *nic_io = nic_dev->nic_io;
-+	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
++		max_ctxts = (nic_io->num_qps - q_id) > HINIC3_Q_CTXT_MAX ?
++			     HINIC3_Q_CTXT_MAX : (nic_io->num_qps - q_id);
 +
-+	dma_free_coherent(hwdev->dev,
-+			  HINIC3_CI_TABLE_SIZE(nic_io->max_qps),
-+			  nic_io->ci_vaddr_base, nic_io->ci_dma_base);
++		hinic3_qp_prepare_cmdq_header(&sq_ctxt_block->cmdq_hdr,
++					      HINIC3_QP_CTXT_TYPE_SQ, max_ctxts,
++					      q_id);
 +
-+	hinic3_free_db_addr(hwdev, nic_io->sqs_db_addr);
-+	hinic3_free_db_addr(hwdev, nic_io->rqs_db_addr);
-+}
++		for (i = 0; i < max_ctxts; i++) {
++			curr_id = q_id + i;
++			sq = &nic_io->sq[curr_id];
++			hinic3_sq_prepare_ctxt(sq, curr_id, &sq_ctxt[i]);
++		}
 +
-+static int hinic3_create_sq(struct hinic3_hwdev *hwdev,
-+			    struct hinic3_io_queue *sq,
-+			    u16 q_id, u32 sq_depth, u16 sq_msix_idx)
-+{
-+	int err;
++		hinic3_cmdq_buf_swab32(sq_ctxt_block, sizeof(*sq_ctxt_block));
 +
-+	/* sq used & hardware request init 1 */
-+	sq->owner = 1;
++		cmd_buf->size = cpu_to_le16(SQ_CTXT_SIZE(max_ctxts));
++		err = hinic3_cmdq_direct_resp(hwdev, MGMT_MOD_L2NIC,
++					      L2NIC_UCODE_CMD_MODIFY_QUEUE_CTX,
++					      cmd_buf, &out_param);
++		if (err || out_param != 0) {
++			dev_err(hwdev->dev, "Failed to set SQ ctxts, err: %d, out_param: 0x%llx\n",
++				err, out_param);
++			err = -EFAULT;
++			break;
++		}
 +
-+	sq->q_id = q_id;
-+	sq->msix_entry_idx = sq_msix_idx;
-+
-+	err = hinic3_wq_create(hwdev, &sq->wq, sq_depth,
-+			       BIT(HINIC3_SQ_WQEBB_SHIFT));
-+	if (err) {
-+		dev_err(hwdev->dev, "Failed to create tx queue %u wq\n",
-+			q_id);
-+		return err;
++		q_id += max_ctxts;
 +	}
 +
-+	return 0;
-+}
-+
-+static int hinic3_create_rq(struct hinic3_hwdev *hwdev,
-+			    struct hinic3_io_queue *rq,
-+			    u16 q_id, u32 rq_depth, u16 rq_msix_idx)
-+{
-+	int err;
-+
-+	rq->q_id = q_id;
-+	rq->msix_entry_idx = rq_msix_idx;
-+
-+	err = hinic3_wq_create(hwdev, &rq->wq, rq_depth,
-+			       BIT(HINIC3_RQ_WQEBB_SHIFT +
-+				   HINIC3_NORMAL_RQ_WQE));
-+	if (err) {
-+		dev_err(hwdev->dev, "Failed to create rx queue %u wq\n",
-+			q_id);
-+		return err;
-+	}
-+
-+	return 0;
-+}
-+
-+static int hinic3_create_qp(struct hinic3_hwdev *hwdev,
-+			    struct hinic3_io_queue *sq,
-+			    struct hinic3_io_queue *rq, u16 q_id, u32 sq_depth,
-+			    u32 rq_depth, u16 qp_msix_idx)
-+{
-+	int err;
-+
-+	err = hinic3_create_sq(hwdev, sq, q_id, sq_depth, qp_msix_idx);
-+	if (err) {
-+		dev_err(hwdev->dev, "Failed to create sq, qid: %u\n",
-+			q_id);
-+		return err;
-+	}
-+
-+	err = hinic3_create_rq(hwdev, rq, q_id, rq_depth, qp_msix_idx);
-+	if (err) {
-+		dev_err(hwdev->dev, "Failed to create rq, qid: %u\n",
-+			q_id);
-+		goto err_destory_sq_wq;
-+	}
-+
-+	return 0;
-+
-+err_destory_sq_wq:
-+	hinic3_wq_destroy(hwdev, &sq->wq);
++	hinic3_free_cmd_buf(hwdev, cmd_buf);
 +
 +	return err;
 +}
 +
-+static void hinic3_destroy_qp(struct hinic3_hwdev *hwdev,
-+			      struct hinic3_io_queue *sq,
-+			      struct hinic3_io_queue *rq)
++static int init_rq_ctxts(struct hinic3_nic_dev *nic_dev)
 +{
-+	hinic3_wq_destroy(hwdev, &sq->wq);
-+	hinic3_wq_destroy(hwdev, &rq->wq);
-+}
-+
-+int hinic3_alloc_qps(struct hinic3_nic_dev *nic_dev,
-+		     struct hinic3_dyna_qp_params *qp_params)
-+{
-+	struct msix_entry *qps_msix_entries = nic_dev->qps_msix_entries;
 +	struct hinic3_nic_io *nic_io = nic_dev->nic_io;
 +	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
-+	struct hinic3_io_queue *sqs;
-+	struct hinic3_io_queue *rqs;
++	struct hinic3_rq_ctxt_block *rq_ctxt_block;
++	u16 q_id, curr_id, max_ctxts, i;
++	struct hinic3_rq_ctxt *rq_ctxt;
++	struct hinic3_cmd_buf *cmd_buf;
++	struct hinic3_io_queue *rq;
++	__le64 out_param;
++	int err = 0;
++
++	cmd_buf = hinic3_alloc_cmd_buf(hwdev);
++	if (!cmd_buf) {
++		dev_err(hwdev->dev, "Failed to allocate cmd buf\n");
++		return -ENOMEM;
++	}
++
++	q_id = 0;
++	while (q_id < nic_io->num_qps) {
++		rq_ctxt_block = cmd_buf->buf;
++		rq_ctxt = rq_ctxt_block->rq_ctxt;
++
++		max_ctxts = (nic_io->num_qps - q_id) > HINIC3_Q_CTXT_MAX ?
++				HINIC3_Q_CTXT_MAX : (nic_io->num_qps - q_id);
++
++		hinic3_qp_prepare_cmdq_header(&rq_ctxt_block->cmdq_hdr,
++					      HINIC3_QP_CTXT_TYPE_RQ, max_ctxts,
++					      q_id);
++
++		for (i = 0; i < max_ctxts; i++) {
++			curr_id = q_id + i;
++			rq = &nic_io->rq[curr_id];
++			hinic3_rq_prepare_ctxt(rq, &rq_ctxt[i]);
++		}
++
++		hinic3_cmdq_buf_swab32(rq_ctxt_block, sizeof(*rq_ctxt_block));
++
++		cmd_buf->size = cpu_to_le16(RQ_CTXT_SIZE(max_ctxts));
++
++		err = hinic3_cmdq_direct_resp(hwdev, MGMT_MOD_L2NIC,
++					      L2NIC_UCODE_CMD_MODIFY_QUEUE_CTX,
++					      cmd_buf, &out_param);
++		if (err || out_param != 0) {
++			dev_err(hwdev->dev, "Failed to set RQ ctxts, err: %d, out_param: 0x%llx\n",
++				err, out_param);
++			err = -EFAULT;
++			break;
++		}
++
++		q_id += max_ctxts;
++	}
++
++	hinic3_free_cmd_buf(hwdev, cmd_buf);
++
++	return err;
++}
++
++static int init_qp_ctxts(struct hinic3_nic_dev *nic_dev)
++{
++	int err;
++
++	err = init_sq_ctxts(nic_dev);
++	if (err)
++		return err;
++
++	err = init_rq_ctxts(nic_dev);
++	if (err)
++		return err;
++
++	return 0;
++}
++
++static int clean_queue_offload_ctxt(struct hinic3_nic_dev *nic_dev,
++				    enum hinic3_qp_ctxt_type ctxt_type)
++{
++	struct hinic3_nic_io *nic_io = nic_dev->nic_io;
++	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
++	struct hinic3_clean_queue_ctxt *ctxt_block;
++	struct hinic3_cmd_buf *cmd_buf;
++	__le64 out_param;
++	int err;
++
++	cmd_buf = hinic3_alloc_cmd_buf(hwdev);
++	if (!cmd_buf) {
++		dev_err(hwdev->dev, "Failed to allocate cmd buf\n");
++		return -ENOMEM;
++	}
++
++	ctxt_block = cmd_buf->buf;
++	ctxt_block->cmdq_hdr.num_queues = cpu_to_le16(nic_io->max_qps);
++	ctxt_block->cmdq_hdr.queue_type = cpu_to_le16(ctxt_type);
++	ctxt_block->cmdq_hdr.start_qid = 0;
++	ctxt_block->cmdq_hdr.rsvd = 0;
++	ctxt_block->rsvd = 0;
++
++	hinic3_cmdq_buf_swab32(ctxt_block, sizeof(*ctxt_block));
++
++	cmd_buf->size = cpu_to_le16(sizeof(*ctxt_block));
++
++	err = hinic3_cmdq_direct_resp(hwdev, MGMT_MOD_L2NIC,
++				      L2NIC_UCODE_CMD_CLEAN_QUEUE_CTX,
++				      cmd_buf, &out_param);
++	if ((err) || (out_param)) {
++		dev_err(hwdev->dev, "Failed to clean queue offload ctxts, err: %d,out_param: 0x%llx\n",
++			err, out_param);
++
++		err = -EFAULT;
++	}
++
++	hinic3_free_cmd_buf(hwdev, cmd_buf);
++
++	return err;
++}
++
++static int clean_qp_offload_ctxt(struct hinic3_nic_dev *nic_dev)
++{
++	/* clean LRO/TSO context space */
++	return (clean_queue_offload_ctxt(nic_dev, HINIC3_QP_CTXT_TYPE_SQ) ||
++		clean_queue_offload_ctxt(nic_dev, HINIC3_QP_CTXT_TYPE_RQ));
++}
++
++/* init qps ctxt and set sq ci attr and arm all sq */
++int hinic3_init_qp_ctxts(struct hinic3_nic_dev *nic_dev)
++{
++	struct hinic3_nic_io *nic_io = nic_dev->nic_io;
++	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
++	struct hinic3_sq_attr sq_attr;
++	u32 rq_depth;
 +	u16 q_id;
 +	int err;
 +
-+	if (qp_params->num_qps > nic_io->max_qps || !qp_params->num_qps)
-+		return -EINVAL;
-+
-+	sqs = kcalloc(qp_params->num_qps, sizeof(*sqs), GFP_KERNEL);
-+	if (!sqs) {
-+		err = -ENOMEM;
-+		goto err_out;
++	err = init_qp_ctxts(nic_dev);
++	if (err) {
++		dev_err(hwdev->dev, "Failed to init QP ctxts\n");
++		return err;
 +	}
 +
-+	rqs = kcalloc(qp_params->num_qps, sizeof(*rqs), GFP_KERNEL);
-+	if (!rqs) {
-+		err = -ENOMEM;
-+		goto err_free_sqs;
++	/* clean LRO/TSO context space */
++	err = clean_qp_offload_ctxt(nic_dev);
++	if (err) {
++		dev_err(hwdev->dev, "Failed to clean qp offload ctxts\n");
++		return err;
 +	}
 +
-+	for (q_id = 0; q_id < qp_params->num_qps; q_id++) {
-+		err = hinic3_create_qp(hwdev, &sqs[q_id], &rqs[q_id], q_id,
-+				       qp_params->sq_depth, qp_params->rq_depth,
-+				       qps_msix_entries[q_id].entry);
++	rq_depth = nic_io->rq[0].wq.q_depth << HINIC3_NORMAL_RQ_WQE;
++
++	err = hinic3_set_root_ctxt(hwdev, rq_depth, nic_io->sq[0].wq.q_depth,
++				   nic_io->rx_buf_len);
++	if (err) {
++		dev_err(hwdev->dev, "Failed to set root context\n");
++		return err;
++	}
++
++	for (q_id = 0; q_id < nic_io->num_qps; q_id++) {
++		sq_attr.ci_dma_base =
++			HINIC3_CI_PADDR(nic_io->ci_dma_base, q_id) >> 0x2;
++		sq_attr.pending_limit = HINIC3_DEFAULT_TX_CI_PENDING_LIMIT;
++		sq_attr.coalescing_time = HINIC3_DEFAULT_TX_CI_COALESCING_TIME;
++		sq_attr.intr_en = 1;
++		sq_attr.intr_idx = nic_io->sq[q_id].msix_entry_idx;
++		sq_attr.l2nic_sqn = q_id;
++		sq_attr.dma_attr_off = 0;
++		err = hinic3_set_ci_table(hwdev, &sq_attr);
 +		if (err) {
-+			dev_err(hwdev->dev, "Failed to allocate qp %u, err: %d\n",
-+				q_id, err);
-+			goto err_destroy_qp;
++			dev_err(hwdev->dev, "Failed to set ci table\n");
++			goto err_clean_root_ctxt;
 +		}
 +	}
 +
-+	qp_params->sqs = sqs;
-+	qp_params->rqs = rqs;
-+
 +	return 0;
 +
-+err_destroy_qp:
-+	while (q_id > 0) {
-+		q_id--;
-+		hinic3_destroy_qp(hwdev, &sqs[q_id], &rqs[q_id]);
-+	}
++err_clean_root_ctxt:
++	hinic3_clean_root_ctxt(hwdev);
 +
-+	kfree(rqs);
-+
-+err_free_sqs:
-+	kfree(sqs);
-+
-+err_out:
 +	return err;
 +}
 +
-+void hinic3_free_qps(struct hinic3_nic_dev *nic_dev,
-+		     struct hinic3_dyna_qp_params *qp_params)
++void hinic3_free_qp_ctxts(struct hinic3_nic_dev *nic_dev)
 +{
-+	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
-+	u16 q_id;
-+
-+	for (q_id = 0; q_id < qp_params->num_qps; q_id++)
-+		hinic3_destroy_qp(hwdev, &qp_params->sqs[q_id],
-+				  &qp_params->rqs[q_id]);
-+
-+	kfree(qp_params->sqs);
-+	kfree(qp_params->rqs);
-+}
-+
-+void hinic3_init_qps(struct hinic3_nic_dev *nic_dev,
-+		     struct hinic3_dyna_qp_params *qp_params)
-+{
-+	struct hinic3_nic_io *nic_io = nic_dev->nic_io;
-+	struct hinic3_io_queue *sqs = qp_params->sqs;
-+	struct hinic3_io_queue *rqs = qp_params->rqs;
-+	u16 q_id;
-+
-+	nic_io->num_qps = qp_params->num_qps;
-+	nic_io->sq = qp_params->sqs;
-+	nic_io->rq = qp_params->rqs;
-+	for (q_id = 0; q_id < nic_io->num_qps; q_id++) {
-+		sqs[q_id].cons_idx_addr =
-+			(u16 *)HINIC3_CI_VADDR(nic_io->ci_vaddr_base, q_id);
-+		/* clear ci value */
-+		WRITE_ONCE(*sqs[q_id].cons_idx_addr, 0);
-+
-+		sqs[q_id].db_addr = nic_io->sqs_db_addr;
-+		rqs[q_id].db_addr = nic_io->rqs_db_addr;
-+	}
-+}
-+
-+void hinic3_uninit_qps(struct hinic3_nic_dev *nic_dev,
-+		       struct hinic3_dyna_qp_params *qp_params)
-+{
-+	struct hinic3_nic_io *nic_io = nic_dev->nic_io;
-+
-+	qp_params->sqs = nic_io->sq;
-+	qp_params->rqs = nic_io->rq;
-+	qp_params->num_qps = nic_io->num_qps;
++	hinic3_clean_root_ctxt(nic_dev->hwdev);
 +}
 diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.h b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.h
-index 865ba6878c48..c103095c37ef 100644
+index c103095c37ef..12eefabcf1db 100644
 --- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.h
 +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.h
-@@ -75,8 +75,8 @@ static inline u16 hinic3_get_sq_hw_ci(const struct hinic3_io_queue *sq)
- #define DB_CFLAG_DP_RQ   1
+@@ -139,4 +139,7 @@ void hinic3_init_qps(struct hinic3_nic_dev *nic_dev,
+ void hinic3_uninit_qps(struct hinic3_nic_dev *nic_dev,
+ 		       struct hinic3_dyna_qp_params *qp_params);
  
- struct hinic3_nic_db {
--	u32 db_info;
--	u32 pi_hi;
-+	__le32 db_info;
-+	__le32 pi_hi;
- };
- 
- static inline void hinic3_write_db(struct hinic3_io_queue *queue, int cos,
-@@ -84,15 +84,25 @@ static inline void hinic3_write_db(struct hinic3_io_queue *queue, int cos,
- {
- 	struct hinic3_nic_db db;
- 
--	db.db_info = DB_INFO_SET(DB_SRC_TYPE, TYPE) |
--		     DB_INFO_SET(cflag, CFLAG) |
--		     DB_INFO_SET(cos, COS) |
--		     DB_INFO_SET(queue->q_id, QID);
--	db.pi_hi = DB_PI_HIGH(pi);
-+	db.db_info =
-+		cpu_to_le32(DB_INFO_SET(DB_SRC_TYPE, TYPE) |
-+			    DB_INFO_SET(cflag, CFLAG) |
-+			    DB_INFO_SET(cos, COS) |
-+			    DB_INFO_SET(queue->q_id, QID));
-+	db.pi_hi = cpu_to_le32(DB_PI_HIGH(pi));
- 
- 	writeq(*((u64 *)&db), DB_ADDR(queue, pi));
- }
- 
-+struct hinic3_dyna_qp_params {
-+	u16                    num_qps;
-+	u32                    sq_depth;
-+	u32                    rq_depth;
-+
-+	struct hinic3_io_queue *sqs;
-+	struct hinic3_io_queue *rqs;
-+};
-+
- struct hinic3_nic_io {
- 	struct hinic3_io_queue *sq;
- 	struct hinic3_io_queue *rq;
-@@ -117,4 +127,16 @@ struct hinic3_nic_io {
- int hinic3_init_nic_io(struct hinic3_nic_dev *nic_dev);
- void hinic3_free_nic_io(struct hinic3_nic_dev *nic_dev);
- 
-+int hinic3_init_nicio_res(struct hinic3_nic_dev *nic_dev);
-+void hinic3_free_nicio_res(struct hinic3_nic_dev *nic_dev);
-+
-+int hinic3_alloc_qps(struct hinic3_nic_dev *nic_dev,
-+		     struct hinic3_dyna_qp_params *qp_params);
-+void hinic3_free_qps(struct hinic3_nic_dev *nic_dev,
-+		     struct hinic3_dyna_qp_params *qp_params);
-+void hinic3_init_qps(struct hinic3_nic_dev *nic_dev,
-+		     struct hinic3_dyna_qp_params *qp_params);
-+void hinic3_uninit_qps(struct hinic3_nic_dev *nic_dev,
-+		       struct hinic3_dyna_qp_params *qp_params);
++int hinic3_init_qp_ctxts(struct hinic3_nic_dev *nic_dev);
++void hinic3_free_qp_ctxts(struct hinic3_nic_dev *nic_dev);
 +
  #endif
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_rx.c b/drivers/net/ethernet/huawei/hinic3/hinic3_rx.c
-index 860163e9d66c..56135d0dd0c4 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_rx.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_rx.c
-@@ -35,13 +35,41 @@
- 
- int hinic3_alloc_rxqs(struct net_device *netdev)
- {
--	/* Completed by later submission due to LoC limit. */
--	return -EFAULT;
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
-+	struct pci_dev *pdev = nic_dev->pdev;
-+	u16 num_rxqs = nic_dev->max_qps;
-+	struct hinic3_rxq *rxq;
-+	u16 q_id;
-+
-+	if (!num_rxqs) {
-+		dev_err(hwdev->dev, "Cannot allocate zero size rxqs\n");
-+		return -EINVAL;
-+	}
-+
-+	nic_dev->rxqs = kcalloc(num_rxqs, sizeof(*nic_dev->rxqs), GFP_KERNEL);
-+	if (!nic_dev->rxqs)
-+		return -ENOMEM;
-+
-+	for (q_id = 0; q_id < num_rxqs; q_id++) {
-+		rxq = &nic_dev->rxqs[q_id];
-+		rxq->netdev = netdev;
-+		rxq->dev = &pdev->dev;
-+		rxq->q_id = q_id;
-+		rxq->buf_len = nic_dev->rx_buf_len;
-+		rxq->buf_len_shift = ilog2(nic_dev->rx_buf_len);
-+		rxq->q_depth = nic_dev->q_params.rq_depth;
-+		rxq->q_mask = nic_dev->q_params.rq_depth - 1;
-+	}
-+
-+	return 0;
- }
- 
- void hinic3_free_rxqs(struct net_device *netdev)
- {
--	/* Completed by later submission due to LoC limit. */
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+
-+	kfree(nic_dev->rxqs);
- }
- 
- static int rx_alloc_mapped_page(struct page_pool *page_pool,
-@@ -50,6 +78,9 @@ static int rx_alloc_mapped_page(struct page_pool *page_pool,
- 	struct page *page;
- 	u32 page_offset;
- 
-+	if (likely(rx_info->page))
-+		return 0;
-+
- 	page = page_pool_dev_alloc_frag(page_pool, &page_offset, buf_len);
- 	if (unlikely(!page))
- 		return -ENOMEM;
-@@ -66,8 +97,8 @@ static void rq_wqe_buf_set(struct hinic3_io_queue *rq, uint32_t wqe_idx,
- 	struct hinic3_rq_wqe *rq_wqe;
- 
- 	rq_wqe = get_q_element(&rq->wq.qpages, wqe_idx, NULL);
--	rq_wqe->buf_hi_addr = upper_32_bits(dma_addr);
--	rq_wqe->buf_lo_addr = lower_32_bits(dma_addr);
-+	rq_wqe->buf_hi_addr = cpu_to_le32(upper_32_bits(dma_addr));
-+	rq_wqe->buf_lo_addr = cpu_to_le32(lower_32_bits(dma_addr));
- }
- 
- static u32 hinic3_rx_fill_buffers(struct hinic3_rxq *rxq)
-@@ -102,6 +133,41 @@ static u32 hinic3_rx_fill_buffers(struct hinic3_rxq *rxq)
- 	return i;
- }
- 
-+static u32 hinic3_alloc_rx_buffers(struct hinic3_dyna_rxq_res *rqres,
-+				   u32 rq_depth, u16 buf_len)
-+{
-+	u32 free_wqebbs = rq_depth - 1;
-+	u32 idx;
-+	int err;
-+
-+	for (idx = 0; idx < free_wqebbs; idx++) {
-+		err = rx_alloc_mapped_page(rqres->page_pool,
-+					   &rqres->rx_info[idx], buf_len);
-+		if (err)
-+			break;
-+	}
-+
-+	return idx;
-+}
-+
-+static void hinic3_free_rx_buffers(struct hinic3_dyna_rxq_res *rqres,
-+				   u32 q_depth)
-+{
-+	struct hinic3_rx_info *rx_info;
-+	u32 i;
-+
-+	/* Free all the Rx ring sk_buffs */
-+	for (i = 0; i < q_depth; i++) {
-+		rx_info = &rqres->rx_info[i];
-+
-+		if (rx_info->page) {
-+			page_pool_put_full_page(rqres->page_pool,
-+						rx_info->page, false);
-+			rx_info->page = NULL;
-+		}
-+	}
-+}
-+
- static void hinic3_add_rx_frag(struct hinic3_rxq *rxq,
- 			       struct hinic3_rx_info *rx_info,
- 			       struct sk_buff *skb, u32 size)
-@@ -215,7 +281,7 @@ static void hinic3_pull_tail(struct sk_buff *skb)
- static void hinic3_rx_csum(struct hinic3_rxq *rxq, u32 offload_type,
- 			   u32 status, struct sk_buff *skb)
- {
--	u32 pkt_fmt = RQ_CQE_OFFOLAD_TYPE_GET(offload_type, TUNNEL_PKT_FORMAT);
-+	u32 pkt_fmt = RQ_CQE_OFFOLAD_TYPE_GET(offload_type, TUNNEL_PKT_FMT);
- 	u32 pkt_type = RQ_CQE_OFFOLAD_TYPE_GET(offload_type, PKT_TYPE);
- 	u32 ip_type = RQ_CQE_OFFOLAD_TYPE_GET(offload_type, IP_TYPE);
- 	u32 csum_err = RQ_CQE_STATUS_GET(status, CSUM_ERR);
-@@ -279,7 +345,7 @@ static int recv_one_pkt(struct hinic3_rxq *rxq, struct hinic3_rq_cqe *rx_cqe,
- 	if (skb_is_nonlinear(skb))
- 		hinic3_pull_tail(skb);
- 
--	offload_type = rx_cqe->offload_type;
-+	offload_type = le32_to_cpu(rx_cqe->offload_type);
- 	hinic3_rx_csum(rxq, offload_type, status, skb);
- 
- 	num_lro = RQ_CQE_STATUS_GET(status, NUM_LRO);
-@@ -299,6 +365,92 @@ static int recv_one_pkt(struct hinic3_rxq *rxq, struct hinic3_rq_cqe *rx_cqe,
- 	return 0;
- }
- 
-+int hinic3_alloc_rxqs_res(struct net_device *netdev, u16 num_rq,
-+			  u32 rq_depth, struct hinic3_dyna_rxq_res *rxqs_res)
-+{
-+	u64 cqe_mem_size = sizeof(struct hinic3_rq_cqe) * rq_depth;
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	struct page_pool_params pp_params = {};
-+	struct hinic3_dyna_rxq_res *rqres;
-+	u32 pkt_idx;
-+	int idx;
-+
-+	for (idx = 0; idx < num_rq; idx++) {
-+		rqres = &rxqs_res[idx];
-+		rqres->rx_info = kcalloc(rq_depth, sizeof(*rqres->rx_info),
-+					 GFP_KERNEL);
-+		if (!rqres->rx_info)
-+			goto err_free_rqres;
-+
-+		rqres->cqe_start_vaddr =
-+			dma_alloc_coherent(&nic_dev->pdev->dev, cqe_mem_size,
-+					   &rqres->cqe_start_paddr, GFP_KERNEL);
-+		if (!rqres->cqe_start_vaddr) {
-+			netdev_err(netdev, "Failed to alloc rxq%d rx cqe\n",
-+				   idx);
-+			goto err_free_rx_info;
-+		}
-+
-+		pp_params.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
-+		pp_params.pool_size = rq_depth * nic_dev->rx_buf_len /
-+				      PAGE_SIZE;
-+		pp_params.nid = dev_to_node(&nic_dev->pdev->dev);
-+		pp_params.dev = &nic_dev->pdev->dev;
-+		pp_params.dma_dir = DMA_FROM_DEVICE;
-+		pp_params.max_len = PAGE_SIZE;
-+		rqres->page_pool = page_pool_create(&pp_params);
-+		if (!rqres->page_pool) {
-+			netdev_err(netdev, "Failed to create rxq%d page pool\n",
-+				   idx);
-+			goto err_free_cqe;
-+		}
-+
-+		pkt_idx = hinic3_alloc_rx_buffers(rqres, rq_depth,
-+						  nic_dev->rx_buf_len);
-+		if (!pkt_idx) {
-+			netdev_err(netdev, "Failed to alloc rxq%d rx buffers\n",
-+				   idx);
-+			goto err_destroy_page_pool;
-+		}
-+		rqres->next_to_alloc = pkt_idx;
-+	}
-+
-+	return 0;
-+
-+err_destroy_page_pool:
-+	page_pool_destroy(rqres->page_pool);
-+err_free_cqe:
-+	dma_free_coherent(&nic_dev->pdev->dev, cqe_mem_size,
-+			  rqres->cqe_start_vaddr,
-+			  rqres->cqe_start_paddr);
-+err_free_rx_info:
-+	kfree(rqres->rx_info);
-+err_free_rqres:
-+	hinic3_free_rxqs_res(netdev, idx, rq_depth, rxqs_res);
-+
-+	return -ENOMEM;
-+}
-+
-+void hinic3_free_rxqs_res(struct net_device *netdev, u16 num_rq,
-+			  u32 rq_depth, struct hinic3_dyna_rxq_res *rxqs_res)
-+{
-+	u64 cqe_mem_size = sizeof(struct hinic3_rq_cqe) * rq_depth;
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	struct hinic3_dyna_rxq_res *rqres;
-+	int idx;
-+
-+	for (idx = 0; idx < num_rq; idx++) {
-+		rqres = &rxqs_res[idx];
-+
-+		hinic3_free_rx_buffers(rqres, rq_depth);
-+		page_pool_destroy(rqres->page_pool);
-+		dma_free_coherent(&nic_dev->pdev->dev, cqe_mem_size,
-+				  rqres->cqe_start_vaddr,
-+				  rqres->cqe_start_paddr);
-+		kfree(rqres->rx_info);
-+	}
-+}
-+
- int hinic3_rx_poll(struct hinic3_rxq *rxq, int budget)
- {
- 	struct hinic3_nic_dev *nic_dev = netdev_priv(rxq->netdev);
-@@ -311,14 +463,14 @@ int hinic3_rx_poll(struct hinic3_rxq *rxq, int budget)
- 	while (likely(nr_pkts < budget)) {
- 		sw_ci = rxq->cons_idx & rxq->q_mask;
- 		rx_cqe = rxq->cqe_arr + sw_ci;
--		status = rx_cqe->status;
-+		status = le32_to_cpu(rx_cqe->status);
- 		if (!RQ_CQE_STATUS_GET(status, RXDONE))
- 			break;
- 
- 		/* make sure we read rx_done before packet length */
- 		rmb();
- 
--		vlan_len = rx_cqe->vlan_len;
-+		vlan_len = le32_to_cpu(rx_cqe->vlan_len);
- 		pkt_len = RQ_CQE_SGE_GET(vlan_len, LEN);
- 		if (recv_one_pkt(rxq, rx_cqe, pkt_len, vlan_len, status))
- 			break;
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_rx.h b/drivers/net/ethernet/huawei/hinic3/hinic3_rx.h
-index 1cca21858d40..20c1b21e2b79 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_rx.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_rx.h
-@@ -9,7 +9,7 @@
- 
- #define RQ_CQE_OFFOLAD_TYPE_PKT_TYPE_MASK           GENMASK(4, 0)
- #define RQ_CQE_OFFOLAD_TYPE_IP_TYPE_MASK            GENMASK(6, 5)
--#define RQ_CQE_OFFOLAD_TYPE_TUNNEL_PKT_FORMAT_MASK  GENMASK(11, 8)
-+#define RQ_CQE_OFFOLAD_TYPE_TUNNEL_PKT_FMT_MASK     GENMASK(11, 8)
- #define RQ_CQE_OFFOLAD_TYPE_VLAN_EN_MASK            BIT(21)
- #define RQ_CQE_OFFOLAD_TYPE_GET(val, member) \
- 	FIELD_GET(RQ_CQE_OFFOLAD_TYPE_##member##_MASK, val)
-@@ -27,21 +27,21 @@
- 
- /* RX Completion information that is provided by HW for a specific RX WQE */
- struct hinic3_rq_cqe {
--	u32 status;
--	u32 vlan_len;
--	u32 offload_type;
--	u32 rsvd3;
--	u32 rsvd4;
--	u32 rsvd5;
--	u32 rsvd6;
--	u32 pkt_info;
-+	__le32 status;
-+	__le32 vlan_len;
-+	__le32 offload_type;
-+	__le32 rsvd3;
-+	__le32 rsvd4;
-+	__le32 rsvd5;
-+	__le32 rsvd6;
-+	__le32 pkt_info;
- };
- 
- struct hinic3_rq_wqe {
--	u32 buf_hi_addr;
--	u32 buf_lo_addr;
--	u32 cqe_hi_addr;
--	u32 cqe_lo_addr;
-+	__le32 buf_hi_addr;
-+	__le32 buf_lo_addr;
-+	__le32 cqe_hi_addr;
-+	__le32 cqe_lo_addr;
- };
- 
- struct hinic3_rx_info {
-@@ -82,9 +82,21 @@ struct hinic3_rxq {
- 	dma_addr_t             cqe_start_paddr;
- } ____cacheline_aligned;
- 
-+struct hinic3_dyna_rxq_res {
-+	u16                   next_to_alloc;
-+	struct hinic3_rx_info *rx_info;
-+	dma_addr_t            cqe_start_paddr;
-+	void                  *cqe_start_vaddr;
-+	struct page_pool      *page_pool;
-+};
-+
- int hinic3_alloc_rxqs(struct net_device *netdev);
- void hinic3_free_rxqs(struct net_device *netdev);
- 
-+int hinic3_alloc_rxqs_res(struct net_device *netdev, u16 num_rq,
-+			  u32 rq_depth, struct hinic3_dyna_rxq_res *rxqs_res);
-+void hinic3_free_rxqs_res(struct net_device *netdev, u16 num_rq,
-+			  u32 rq_depth, struct hinic3_dyna_rxq_res *rxqs_res);
- int hinic3_rx_poll(struct hinic3_rxq *rxq, int budget);
- 
- #endif
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c b/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
-index f1c745ee3087..14ea34f3893e 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
-@@ -81,10 +81,10 @@ static int hinic3_tx_map_skb(struct net_device *netdev, struct sk_buff *skb,
- 
- 	dma_info[0].len = skb_headlen(skb);
- 
--	wqe_desc->hi_addr = upper_32_bits(dma_info[0].dma);
--	wqe_desc->lo_addr = lower_32_bits(dma_info[0].dma);
-+	wqe_desc->hi_addr = cpu_to_le32(upper_32_bits(dma_info[0].dma));
-+	wqe_desc->lo_addr = cpu_to_le32(lower_32_bits(dma_info[0].dma));
- 
--	wqe_desc->ctrl_len = dma_info[0].len;
-+	wqe_desc->ctrl_len = cpu_to_le32(dma_info[0].len);
- 
- 	for (i = 0; i < skb_shinfo(skb)->nr_frags; i++) {
- 		frag = &(skb_shinfo(skb)->frags[i]);
-@@ -116,6 +116,7 @@ static int hinic3_tx_map_skb(struct net_device *netdev, struct sk_buff *skb,
- 	}
- 	dma_unmap_single(&pdev->dev, dma_info[0].dma, dma_info[0].len,
- 			 DMA_TO_DEVICE);
-+
- 	return err;
- }
- 
-@@ -138,6 +139,23 @@ static void hinic3_tx_unmap_skb(struct net_device *netdev,
- 			 dma_info[0].len, DMA_TO_DEVICE);
- }
- 
-+static void free_all_tx_skbs(struct net_device *netdev, u32 sq_depth,
-+			     struct hinic3_tx_info *tx_info_arr)
-+{
-+	struct hinic3_tx_info *tx_info;
-+	u32 idx;
-+
-+	for (idx = 0; idx < sq_depth; idx++) {
-+		tx_info = &tx_info_arr[idx];
-+		if (tx_info->skb) {
-+			hinic3_tx_unmap_skb(netdev, tx_info->skb,
-+					    tx_info->dma_info);
-+			dev_kfree_skb_any(tx_info->skb);
-+			tx_info->skb = NULL;
-+		}
-+	}
-+}
-+
- union hinic3_ip {
- 	struct iphdr   *v4;
- 	struct ipv6hdr *v6;
-@@ -197,7 +215,8 @@ static int hinic3_tx_csum(struct hinic3_txq *txq, struct hinic3_sq_task *task,
- 		union hinic3_ip ip;
- 		u8 l4_proto;
- 
--		task->pkt_info0 |= SQ_TASK_INFO0_SET(1, TUNNEL_FLAG);
-+		task->pkt_info0 |= cpu_to_le32(SQ_TASK_INFO0_SET(1,
-+								 TUNNEL_FLAG));
- 
- 		ip.hdr = skb_network_header(skb);
- 		if (ip.v4->version == 4) {
-@@ -226,7 +245,7 @@ static int hinic3_tx_csum(struct hinic3_txq *txq, struct hinic3_sq_task *task,
- 		}
- 	}
- 
--	task->pkt_info0 |= SQ_TASK_INFO0_SET(1, INNER_L4_EN);
-+	task->pkt_info0 |= cpu_to_le32(SQ_TASK_INFO0_SET(1, INNER_L4_EN));
- 
- 	return 1;
- }
-@@ -255,26 +274,28 @@ static void get_inner_l3_l4_type(struct sk_buff *skb, union hinic3_ip *ip,
- 	}
- }
- 
--static void hinic3_set_tso_info(struct hinic3_sq_task *task, u32 *queue_info,
-+static void hinic3_set_tso_info(struct hinic3_sq_task *task, __le32 *queue_info,
- 				enum hinic3_l4_offload_type l4_offload,
- 				u32 offset, u32 mss)
- {
- 	if (l4_offload == HINIC3_L4_OFFLOAD_TCP) {
--		*queue_info |= SQ_CTRL_QUEUE_INFO_SET(1, TSO);
--		task->pkt_info0 |= SQ_TASK_INFO0_SET(1, INNER_L4_EN);
-+		*queue_info |= cpu_to_le32(SQ_CTRL_QUEUE_INFO_SET(1, TSO));
-+		task->pkt_info0 |= cpu_to_le32(SQ_TASK_INFO0_SET(1,
-+								 INNER_L4_EN));
- 	} else if (l4_offload == HINIC3_L4_OFFLOAD_UDP) {
--		*queue_info |= SQ_CTRL_QUEUE_INFO_SET(1, UFO);
--		task->pkt_info0 |= SQ_TASK_INFO0_SET(1, INNER_L4_EN);
-+		*queue_info |= cpu_to_le32(SQ_CTRL_QUEUE_INFO_SET(1, UFO));
-+		task->pkt_info0 |= cpu_to_le32(SQ_TASK_INFO0_SET(1,
-+								 INNER_L4_EN));
- 	}
- 
- 	/* enable L3 calculation */
--	task->pkt_info0 |= SQ_TASK_INFO0_SET(1, INNER_L3_EN);
-+	task->pkt_info0 |= cpu_to_le32(SQ_TASK_INFO0_SET(1, INNER_L3_EN));
- 
--	*queue_info |= SQ_CTRL_QUEUE_INFO_SET(offset >> 1, PLDOFF);
-+	*queue_info |= cpu_to_le32(SQ_CTRL_QUEUE_INFO_SET(offset >> 1, PLDOFF));
- 
- 	/* set MSS value */
--	*queue_info &= ~SQ_CTRL_QUEUE_INFO_MSS_MASK;
--	*queue_info |= SQ_CTRL_QUEUE_INFO_SET(mss, MSS);
-+	*queue_info &= cpu_to_le32(~SQ_CTRL_QUEUE_INFO_MSS_MASK);
-+	*queue_info |= cpu_to_le32(SQ_CTRL_QUEUE_INFO_SET(mss, MSS));
- }
- 
- static __sum16 csum_magic(union hinic3_ip *ip, unsigned short proto)
-@@ -284,7 +305,7 @@ static __sum16 csum_magic(union hinic3_ip *ip, unsigned short proto)
- 		csum_ipv6_magic(&ip->v6->saddr, &ip->v6->daddr, 0, proto, 0);
- }
- 
--static int hinic3_tso(struct hinic3_sq_task *task, u32 *queue_info,
-+static int hinic3_tso(struct hinic3_sq_task *task, __le32 *queue_info,
- 		      struct sk_buff *skb)
- {
- 	enum hinic3_l4_offload_type l4_offload;
-@@ -305,15 +326,17 @@ static int hinic3_tso(struct hinic3_sq_task *task, u32 *queue_info,
- 	if (skb->encapsulation) {
- 		u32 gso_type = skb_shinfo(skb)->gso_type;
- 		/* L3 checksum is always enabled */
--		task->pkt_info0 |= SQ_TASK_INFO0_SET(1, OUT_L3_EN);
--		task->pkt_info0 |= SQ_TASK_INFO0_SET(1, TUNNEL_FLAG);
-+		task->pkt_info0 |= cpu_to_le32(SQ_TASK_INFO0_SET(1, OUT_L3_EN));
-+		task->pkt_info0 |= cpu_to_le32(SQ_TASK_INFO0_SET(1,
-+								 TUNNEL_FLAG));
- 
- 		l4.hdr = skb_transport_header(skb);
- 		ip.hdr = skb_network_header(skb);
- 
- 		if (gso_type & SKB_GSO_UDP_TUNNEL_CSUM) {
- 			l4.udp->check = ~csum_magic(&ip, IPPROTO_UDP);
--			task->pkt_info0 |= SQ_TASK_INFO0_SET(1, OUT_L4_EN);
-+			task->pkt_info0 |=
-+				cpu_to_le32(SQ_TASK_INFO0_SET(1, OUT_L4_EN));
- 		}
- 
- 		ip.hdr = skb_inner_network_header(skb);
-@@ -343,13 +366,14 @@ static void hinic3_set_vlan_tx_offload(struct hinic3_sq_task *task,
- 	 * 2=select TPID2 in IPSU, 3=select TPID3 in IPSU,
- 	 * 4=select TPID4 in IPSU
- 	 */
--	task->vlan_offload = SQ_TASK_INFO3_SET(vlan_tag, VLAN_TAG) |
--			     SQ_TASK_INFO3_SET(vlan_tpid, VLAN_TPID) |
--			     SQ_TASK_INFO3_SET(1, VLAN_TAG_VALID);
-+	task->vlan_offload =
-+		cpu_to_le32(SQ_TASK_INFO3_SET(vlan_tag, VLAN_TAG) |
-+			    SQ_TASK_INFO3_SET(vlan_tpid, VLAN_TPID) |
-+			    SQ_TASK_INFO3_SET(1, VLAN_TAG_VALID));
- }
- 
- static u32 hinic3_tx_offload(struct sk_buff *skb, struct hinic3_sq_task *task,
--			     u32 *queue_info, struct hinic3_txq *txq)
-+			     __le32 *queue_info, struct hinic3_txq *txq)
- {
- 	u32 offload = 0;
- 	int tso_cs_en;
-@@ -440,39 +464,41 @@ static u16 hinic3_set_wqe_combo(struct hinic3_txq *txq,
- }
- 
- static void hinic3_prepare_sq_ctrl(struct hinic3_sq_wqe_combo *wqe_combo,
--				   u32 queue_info, int nr_descs, u16 owner)
-+				   __le32 queue_info, int nr_descs, u16 owner)
- {
- 	struct hinic3_sq_wqe_desc *wqe_desc = wqe_combo->ctrl_bd0;
- 
- 	if (wqe_combo->wqe_type == SQ_WQE_COMPACT_TYPE) {
- 		wqe_desc->ctrl_len |=
--		    SQ_CTRL_SET(SQ_NORMAL_WQE, DATA_FORMAT) |
--		    SQ_CTRL_SET(wqe_combo->wqe_type, EXTENDED) |
--		    SQ_CTRL_SET(owner, OWNER);
-+			cpu_to_le32(SQ_CTRL_SET(SQ_NORMAL_WQE, DATA_FORMAT) |
-+				    SQ_CTRL_SET(wqe_combo->wqe_type, EXTENDED) |
-+				    SQ_CTRL_SET(owner, OWNER));
- 
- 		/* compact wqe queue_info will transfer to chip */
- 		wqe_desc->queue_info = 0;
- 		return;
- 	}
- 
--	wqe_desc->ctrl_len |= SQ_CTRL_SET(nr_descs, BUFDESC_NUM) |
--			      SQ_CTRL_SET(wqe_combo->task_type, TASKSECT_LEN) |
--			      SQ_CTRL_SET(SQ_NORMAL_WQE, DATA_FORMAT) |
--			      SQ_CTRL_SET(wqe_combo->wqe_type, EXTENDED) |
--			      SQ_CTRL_SET(owner, OWNER);
-+	wqe_desc->ctrl_len |=
-+		cpu_to_le32(SQ_CTRL_SET(nr_descs, BUFDESC_NUM) |
-+			    SQ_CTRL_SET(wqe_combo->task_type, TASKSECT_LEN) |
-+			    SQ_CTRL_SET(SQ_NORMAL_WQE, DATA_FORMAT) |
-+			    SQ_CTRL_SET(wqe_combo->wqe_type, EXTENDED) |
-+			    SQ_CTRL_SET(owner, OWNER));
- 
- 	wqe_desc->queue_info = queue_info;
--	wqe_desc->queue_info |= SQ_CTRL_QUEUE_INFO_SET(1, UC);
-+	wqe_desc->queue_info |= cpu_to_le32(SQ_CTRL_QUEUE_INFO_SET(1, UC));
- 
- 	if (!SQ_CTRL_QUEUE_INFO_GET(wqe_desc->queue_info, MSS)) {
- 		wqe_desc->queue_info |=
--		    SQ_CTRL_QUEUE_INFO_SET(HINIC3_TX_MSS_DEFAULT, MSS);
-+		    cpu_to_le32(SQ_CTRL_QUEUE_INFO_SET(HINIC3_TX_MSS_DEFAULT, MSS));
- 	} else if (SQ_CTRL_QUEUE_INFO_GET(wqe_desc->queue_info, MSS) <
- 		   HINIC3_TX_MSS_MIN) {
- 		/* mss should not be less than 80 */
--		wqe_desc->queue_info &= ~SQ_CTRL_QUEUE_INFO_MSS_MASK;
-+		wqe_desc->queue_info &=
-+		    cpu_to_le32(~SQ_CTRL_QUEUE_INFO_MSS_MASK);
- 		wqe_desc->queue_info |=
--		    SQ_CTRL_QUEUE_INFO_SET(HINIC3_TX_MSS_MIN, MSS);
-+		    cpu_to_le32(SQ_CTRL_QUEUE_INFO_SET(HINIC3_TX_MSS_MIN, MSS));
- 	}
- }
- 
-@@ -482,12 +508,13 @@ static netdev_tx_t hinic3_send_one_skb(struct sk_buff *skb,
- {
- 	struct hinic3_sq_wqe_combo wqe_combo = {};
- 	struct hinic3_tx_info *tx_info;
--	u32 offload, queue_info = 0;
- 	struct hinic3_sq_task task;
- 	u16 wqebb_cnt, num_sge;
-+	__le32 queue_info = 0;
- 	u16 saved_wq_prod_idx;
- 	u16 owner, pi = 0;
- 	u8 saved_sq_owner;
-+	u32 offload;
- 	int err;
- 
- 	if (unlikely(skb->len < MIN_SKB_LEN)) {
-@@ -575,6 +602,7 @@ netdev_tx_t hinic3_xmit_frame(struct sk_buff *skb, struct net_device *netdev)
- 
- err_drop_pkt:
- 	dev_kfree_skb_any(skb);
-+
- 	return NETDEV_TX_OK;
- }
- 
-@@ -624,6 +652,58 @@ void hinic3_flush_txqs(struct net_device *netdev)
- #define HINIC3_BDS_PER_SQ_WQEBB \
- 	(HINIC3_SQ_WQEBB_SIZE / sizeof(struct hinic3_sq_bufdesc))
- 
-+int hinic3_alloc_txqs_res(struct net_device *netdev, u16 num_sq,
-+			  u32 sq_depth, struct hinic3_dyna_txq_res *txqs_res)
-+{
-+	struct hinic3_dyna_txq_res *tqres;
-+	int idx;
-+
-+	for (idx = 0; idx < num_sq; idx++) {
-+		tqres = &txqs_res[idx];
-+
-+		tqres->tx_info = kcalloc(sq_depth, sizeof(*tqres->tx_info),
-+					 GFP_KERNEL);
-+		if (!tqres->tx_info)
-+			goto err_free_tqres;
-+
-+		tqres->bds = kcalloc(sq_depth * HINIC3_BDS_PER_SQ_WQEBB +
-+				     HINIC3_MAX_SQ_SGE, sizeof(*tqres->bds),
-+				     GFP_KERNEL);
-+		if (!tqres->bds) {
-+			kfree(tqres->tx_info);
-+			goto err_free_tqres;
-+		}
-+	}
-+
-+	return 0;
-+
-+err_free_tqres:
-+	while (idx > 0) {
-+		idx--;
-+		tqres = &txqs_res[idx];
-+
-+		kfree(tqres->bds);
-+		kfree(tqres->tx_info);
-+	}
-+
-+	return -ENOMEM;
-+}
-+
-+void hinic3_free_txqs_res(struct net_device *netdev, u16 num_sq,
-+			  u32 sq_depth, struct hinic3_dyna_txq_res *txqs_res)
-+{
-+	struct hinic3_dyna_txq_res *tqres;
-+	int idx;
-+
-+	for (idx = 0; idx < num_sq; idx++) {
-+		tqres = &txqs_res[idx];
-+
-+		free_all_tx_skbs(netdev, sq_depth, tqres->tx_info);
-+		kfree(tqres->bds);
-+		kfree(tqres->tx_info);
-+	}
-+}
-+
- bool hinic3_tx_poll(struct hinic3_txq *txq, int budget)
- {
- 	struct net_device *netdev = txq->netdev;
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_tx.h b/drivers/net/ethernet/huawei/hinic3/hinic3_tx.h
-index 9e505cc19dd5..9ec6968b6688 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_tx.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_tx.h
-@@ -58,7 +58,7 @@ enum hinic3_tx_offload_type {
- #define SQ_CTRL_QUEUE_INFO_SET(val, member) \
- 	FIELD_PREP(SQ_CTRL_QUEUE_INFO_##member##_MASK, val)
- #define SQ_CTRL_QUEUE_INFO_GET(val, member) \
--	FIELD_GET(SQ_CTRL_QUEUE_INFO_##member##_MASK, val)
-+	FIELD_GET(SQ_CTRL_QUEUE_INFO_##member##_MASK, le32_to_cpu(val))
- 
- #define SQ_CTRL_MAX_PLDOFF  221
- 
-@@ -77,17 +77,17 @@ enum hinic3_tx_offload_type {
- 	FIELD_PREP(SQ_TASK_INFO3_##member##_MASK, val)
- 
- struct hinic3_sq_wqe_desc {
--	u32 ctrl_len;
--	u32 queue_info;
--	u32 hi_addr;
--	u32 lo_addr;
-+	__le32 ctrl_len;
-+	__le32 queue_info;
-+	__le32 hi_addr;
-+	__le32 lo_addr;
- };
- 
- struct hinic3_sq_task {
--	u32 pkt_info0;
--	u32 ip_identify;
--	u32 rsvd;
--	u32 vlan_offload;
-+	__le32 pkt_info0;
-+	__le32 ip_identify;
-+	__le32 rsvd;
-+	__le32 vlan_offload;
- };
- 
- struct hinic3_sq_wqe_combo {
-@@ -125,9 +125,19 @@ struct hinic3_txq {
- 	struct hinic3_io_queue  *sq;
- } ____cacheline_aligned;
- 
-+struct hinic3_dyna_txq_res {
-+	struct hinic3_tx_info  *tx_info;
-+	struct hinic3_dma_info *bds;
-+};
-+
- int hinic3_alloc_txqs(struct net_device *netdev);
- void hinic3_free_txqs(struct net_device *netdev);
- 
-+int hinic3_alloc_txqs_res(struct net_device *netdev, u16 num_sq,
-+			  u32 sq_depth, struct hinic3_dyna_txq_res *txqs_res);
-+void hinic3_free_txqs_res(struct net_device *netdev, u16 num_sq,
-+			  u32 sq_depth, struct hinic3_dyna_txq_res *txqs_res);
-+
- netdev_tx_t hinic3_xmit_frame(struct sk_buff *skb, struct net_device *netdev);
- bool hinic3_tx_poll(struct hinic3_txq *txq, int budget);
- void hinic3_flush_txqs(struct net_device *netdev);
 -- 
 2.43.0
 
