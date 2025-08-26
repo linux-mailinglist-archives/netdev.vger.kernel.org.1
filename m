@@ -1,182 +1,129 @@
-Return-Path: <netdev+bounces-216956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02CF2B36807
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 16:12:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D1E9B36990
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 16:28:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A250A984AE3
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 14:05:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82AE48E3147
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 14:12:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 398EC352FD2;
-	Tue, 26 Aug 2025 14:03:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C637350D44;
+	Tue, 26 Aug 2025 14:10:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dYpDFYMj"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="Tc4kWRzt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1679352FC3
-	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 14:03:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8C4374C4;
+	Tue, 26 Aug 2025 14:10:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756217019; cv=none; b=dyUdjZMKlShNsQKfjyruUwQHZP6Fkvy8b9Amyk7KB/6zPwOOfL5nKH+j4CFBO9d9IRo0VY5Sg5gpkAypku9vAGA5Bl4QgkLfkxRKf01l1siZHWjxNxl2N1sdCBrH8/Ch/nUU9CvoTun/XHm39Ej7ntdA2VuaZdubvk0GUuFPRSM=
+	t=1756217425; cv=none; b=m7MVssChcv9bYS8X6/zBI0g48fRfC/NRbjZPbL1GyY4LsLjSrqEza+D5BGYVYIE0nWu3vsVNIMDLfufAyuVU8JCmYh0YdRNBEhsvJjph+tsHGN1NQzibPU4S4k0tAl5JvSow1C311Bz+kivul2o9T093HPRgSYZQCH0dRbwIDbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756217019; c=relaxed/simple;
-	bh=rjO0Dgpa+MvkB9kGuQaPMB5g0ekLMqstP2ZTtpD2Nsk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YjRfQAs9Zq5SE2rDbPULQp+8RW/jbIwTVAITI7IFT3+BTf+KJ/BmdME/cXn601tznAzHP+oLppdIlB0iHvTHNEhlPOdBFNYWRt/kZqlKp1GC6OY7t6CmLurVlaOel12XqVTILIHn2HPCBsHHQW1+6nfAtiJoG7RvLgvUjyljfL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dYpDFYMj; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-244582bc5e4so70118485ad.2
-        for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 07:03:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756217016; x=1756821816; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aY0FrXGLxgZ/wGxfA4ovaT2GypQmDVl6QRK8fd0deSc=;
-        b=dYpDFYMjq5A4M7IdLrWxOslxljdScIseJH/KmQM2oMg8jfL2soS10kjHsbQpy9NdBS
-         pvl/BX9yfZBfv3tJrQER2yhJsx4mG0B8/vacsDgMCmZdIgoIriJPIl7sD98+CQYP+U7u
-         TzpMXJhnuvNbOotiHzIaZb9yhA6Lq6bvhlou0PwsW8uxT74El1ZKxyi6xvDPnTyNCCyc
-         09WBVrr3BkT2C2sQ99hS9UfbFhYmh6hBhrCTS5HlBv0S+efTDZZHOraer2XkYCXnVG/9
-         d38KZ+ujwROvZV/0Js9rPueHfzfWmz1Hv9IEA4/TCIv6/TQUlaL3iB29hz37LmbccjYJ
-         89PA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756217016; x=1756821816;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aY0FrXGLxgZ/wGxfA4ovaT2GypQmDVl6QRK8fd0deSc=;
-        b=pz1wZe+9sybIwa6h0o9aiTpbc7iOu+HcW1TsGYPHSZFYzCz+XILTIpQ2njydqBb69A
-         97y7t3Sh4w0yfrtY502lMCHUDcyQ285R8rXbj86XuYxrp5YBR97pzkKz9mANKO7ZiSGv
-         /1Ro1/pxdeSodNvA19OIFIyWD52IK5/RmpRJBsUziMSIcx3H9vlTIXV0ejxkA1mOHAMe
-         FDEb9/FJy/V4L+u2/piH89PoB7fWhuZU1ZvTYICZWbT7UqBQZaNW9bMNXTlm1Nu/I7fw
-         6eNuBRK6NMRAXRbTiYeGEZsUjqEEDqHuGpVSc80l+HsSOsEjRoVh0m+c7jzXVJ4/GgI3
-         051w==
-X-Forwarded-Encrypted: i=1; AJvYcCWqM2CRMfmxygggw0k2unxt8uxSn5vt07S7cDP7IEr6U9xyqQtlh6hlg8++5d9AAE7lg6MJwp8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJ+4/TM+nht9QbS4nrtQSR5bgIQD2QeZ/lMsMmGK9OnooS4+kR
-	NnSvBsbfoq2h/LT/9ql/SsmRjiicsTzTZz+536ly6jpVFFqzMBgnXDe5cQnicHkC4TjX36LNKoj
-	6GYFNiQ==
-X-Google-Smtp-Source: AGHT+IGVJFRNMksQGpAlkIJ4vRSKOikAD8qcNdNTZurK//e/TKsMdmUxA10VRE8eqTCLKXiBB2hNPFQ1m8o=
-X-Received: from pjbso3.prod.google.com ([2002:a17:90b:1f83:b0:320:e3e2:6877])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:db0c:b0:240:10dc:b7c9
- with SMTP id d9443c01a7336-2462ee2ba4dmr144692975ad.9.1756217015845; Tue, 26
- Aug 2025 07:03:35 -0700 (PDT)
-Date: Tue, 26 Aug 2025 07:03:33 -0700
-In-Reply-To: <20250826034937-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1756217425; c=relaxed/simple;
+	bh=Qwl9rI707fi2KSMqHzwqOIYprkRMmkQI9sfsdfuq3os=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=bkYvfKiUGUhnN2BCDVzLYgzLmY/YJcDH6RPfVYdhgreU5q9JnSRBOSUaoTm615Ugsoxqg/8cIFPhnEOIKV2GGMJVhbDrt9TgYEiO65+DXVKkc+dfSMxmcfHWtppYSKZBdQv6TBuotmvSIFegbV+Wz7w+0zkf2d1ZC1d2HJaYs+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=Tc4kWRzt; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=9M+n4kA2pS5d3rKzerjLvH+nIbGSZpDhSlPqAQjJvhg=;
+	t=1756217423; x=1757427023; b=Tc4kWRztGhIp210EvqQiGlTSYLR2saJMoxRIFe172J73iEZ
+	z/CxcndGlY2iIITCcw2o3lH/yg7WTIfufqreD5zVxDXotkL3GIG96x1EKDzQJlapTpp/WGNCOOwiI
+	Zt7qeflrKVi1MIEHQTYJ1UsDUqB9aqIQFGr6yIg3Bsyd7a0gzLa+Wg8YTIjWP4w18kjNCqoBFwpu1
+	3ftoyV8iOHYvk0sW4YegthE8ExUAZTz3zjv7ZZHNZS5Qp13dJoSvE/oRLNMnNPfaLlXcB1HuVoQCW
+	taSAjxYYoX+1EeFdSoLCVk1KhmN0VnOKkq9UpEhJjDaZMas73iXg8vguNZ7b3wKA==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1uquNR-00000003j0P-1Cp0;
+	Tue, 26 Aug 2025 16:10:21 +0200
+Message-ID: <2f22c98bee6c549205efed3cb03b82805cb54977.camel@sipsolutions.net>
+Subject: Re: netconsole: HARDIRQ-safe -> HARDIRQ-unsafe lock order warning
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Jakub Kicinski <kuba@kernel.org>, Pavel Begunkov <asml.silence@gmail.com>
+Cc: Breno Leitao <leitao@debian.org>, Mike Galbraith <efault@gmx.de>, 
+	paulmck@kernel.org, LKML <linux-kernel@vger.kernel.org>,
+ netdev@vger.kernel.org, 	boqun.feng@gmail.com
+Date: Tue, 26 Aug 2025 16:10:20 +0200
+In-Reply-To: <20250815094217.1cce7116@kernel.org>
+References: <fb38cfe5153fd67f540e6e8aff814c60b7129480.camel@gmx.de>
+		<oth5t27z6acp7qxut7u45ekyil7djirg2ny3bnsvnzeqasavxb@nhwdxahvcosh>
+		<20250814172326.18cf2d72@kernel.org>
+		<3d20ce1b-7a9b-4545-a4a9-23822b675e0c@gmail.com>
+	 <20250815094217.1cce7116@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250826004012.3835150-1-seanjc@google.com> <20250826004012.3835150-2-seanjc@google.com>
- <20250826034937-mutt-send-email-mst@kernel.org>
-Message-ID: <aK2-tQLL-WN7Mqpb@google.com>
-Subject: Re: [PATCH 1/3] vhost_task: KVM: Don't wake KVM x86's recovery thread
- if vhost task was killed
-From: Sean Christopherson <seanjc@google.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, 
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+X-malware-bazaar: not-scanned
 
-On Tue, Aug 26, 2025, Michael S. Tsirkin wrote:
-> On Mon, Aug 25, 2025 at 05:40:09PM -0700, Sean Christopherson wrote:
-> > Provide an API in vhost task instead of forcing KVM to solve the problem,
-> > as KVM would literally just add an equivalent to VHOST_TASK_FLAGS_KILLED,
-> > along with a new lock to protect said flag.  In general, forcing simple
-> > usage of vhost task to care about signals _and_ take non-trivial action to
-> > do the right thing isn't developer friendly, and is likely to lead to
-> > similar bugs in the future.
-> > 
-> > Debugged-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> > Link: https://lore.kernel.org/all/aKkLEtoDXKxAAWju@google.com
-> > Link: https://lore.kernel.org/all/aJ_vEP2EHj6l0xRT@google.com
-> > Suggested-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> > Fixes: d96c77bd4eeb ("KVM: x86: switch hugepage recovery thread to vhost_task")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> 
-> OK but I dislike the API.
+On Fri, 2025-08-15 at 09:42 -0700, Jakub Kicinski wrote:
+> On Fri, 15 Aug 2025 11:44:45 +0100 Pavel Begunkov wrote:
+> > On 8/15/25 01:23, Jakub Kicinski wrote:
+> > > On Thu, 14 Aug 2025 03:16:11 -0700 Breno Leitao wrote: =20
+> > > >   2.2) netpoll 				// net poll will call the network subsystem to s=
+end the packet
+> > > >   2.3) lock(&fq->lock);			// Try to get the lock while the lock was=
+ already held =20
+> >=20
+> > The report for reference:
+> >=20
+> > https://lore.kernel.org/all/fb38cfe5153fd67f540e6e8aff814c60b7129480.ca=
+mel@gmx.de/>=20
+> > > Where does netpoll take fq->lock ? =20
+> >=20
+> > the dependencies between the lock to be acquired
+> > [  107.985514]  and HARDIRQ-irq-unsafe lock:
+> > [  107.985531] -> (&fq->lock){+.-.}-{3:3} {
+> > ...
+> > [  107.988053]  ... acquired at:
+> > [  107.988054]    check_prev_add+0xfb/0xca0
+> > [  107.988058]    validate_chain+0x48c/0x530
+> > [  107.988061]    __lock_acquire+0x550/0xbc0
+> > [  107.988064]    lock_acquire.part.0+0xa1/0x210
+> > [  107.988068]    _raw_spin_lock_bh+0x38/0x50
+> > [  107.988070]    ieee80211_queue_skb+0xfd/0x350 [mac80211]
+> > [  107.988198]    __ieee80211_xmit_fast+0x202/0x360 [mac80211]
+> > [  107.988314]    ieee80211_xmit_fast+0xfb/0x1f0 [mac80211]
+> > [  107.988424]    __ieee80211_subif_start_xmit+0x14e/0x3d0 [mac80211]
+> > [  107.988530]    ieee80211_subif_start_xmit+0x46/0x230 [mac80211]
+>=20
+> Ah, that's WiFi's stack queuing. Dunno whether we expect netpoll to=20
+> work over WiFi. I suspect disabling netconsole over WiFi may be the=20
+> most sensible way out. Johannes, do you expect mac80211 Tx to be IRQ-safe=
+?
 
-FWIW, I don't love it either.
+I see there's a long thread beyond this, but I just got back from
+vacation and haven't read all of it.
 
-> Default APIs should be safe. So vhost_task_wake_safe should be
-> vhost_task_wake
-> 
-> This also reduces the changes to kvm.
-> 
-> 
-> It does not look like we need the "unsafe" variant, so pls drop it.
+As for this question itself, I'd say no. In some cases it probably could
+be made safe for mac80211 _itself_ (by adjust that lock and maybe
+another one or two), but that wouldn't extend to the drivers, so it'd be
+up to the individual drivers. In most cases mac80211 calls wake_tx_queue
+(either driver or its own implementation) and that will pull frame(s),
+but either way it's going to go all the way into the driver, with
+unknown results.
 
-vhost_vq_work_queue() calls
+I guess we could do that async since we queue there anyway, but in this
+case (of wanting to get things out of a dying system) that'd probably be
+counter-productive...
 
-  vhost_worker_queue()
-  |
-  -> worker->ops->wakeup(worker)
-     |
-     -> vhost_task_wakeup()
-        |
-        -> vhost_task_wake()
+Maybe if it's an individual driver opt-in, but I don't really see it
+working for most drivers.
 
-while holding RCU and so can't sleep.
-
-	rcu_read_lock();
-	worker = rcu_dereference(vq->worker);
-	if (worker) {
-		queued = true;
-		vhost_worker_queue(worker, work);
-	}
-	rcu_read_unlock();
-
-And the call from __vhost_worker_flush() is done while holding a vhost_worker.mutex.
-That's probably ok?  But there are many paths that lead to __vhost_worker_flush(),
-which makes it difficult to audit all flows.  So even if there is an easy change
-for the RCU conflict, I wouldn't be comfortable adding a mutex_lock() to so many
-flows in a patch that needs to go to stable@.
-
-> If we do need it, it should be called __vhost_task_wake.
-
-I initially had that, but didn't like that vhost_task_wake() wouldn't call
-__vhost_task_wake(), i.e. wouldn't follow the semi-standard pattern of the
-no-underscores function being a wrapper for the double-underscores function.
-
-I'm definitely not opposed to that though (or any other naming options).  Sans
-comments, this was my other idea for names:
-
-
-static void ____vhost_task_wake(struct vhost_task *vtsk)
-{
-	wake_up_process(vtsk->task);
-}
-
-void __vhost_task_wake(struct vhost_task *vtsk)
-{
-	WARN_ON_ONCE(!vtsk->handle_sigkill);
-
-	if (WARN_ON_ONCE(test_bit(VHOST_TASK_FLAGS_KILLED, &vtsk->flags)))
-		return;
-
-	____vhost_task_wake(vtsk);
-}
-EXPORT_SYMBOL_GPL(__vhost_task_wake);
-
-void vhost_task_wake(struct vhost_task *vtsk)
-{
-	guard(mutex)(&vtsk->exit_mutex);
-
-	if (WARN_ON_ONCE(test_bit(VHOST_TASK_FLAGS_STOP, &vtsk->flags)))
-		return;
-
-	if (test_bit(VHOST_TASK_FLAGS_KILLED, &vtsk->flags))
-		return;
-
-	____vhost_task_wake(vtsk);
-}
-EXPORT_SYMBOL_GPL(vhost_task_wake);
+johannes
 
