@@ -1,108 +1,121 @@
-Return-Path: <netdev+bounces-216945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-216946-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E84DEB36496
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 15:40:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DC9DB3647A
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 15:38:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C5F31BC7A2C
-	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 13:34:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E98117BEBA0
+	for <lists+netdev@lfdr.de>; Tue, 26 Aug 2025 13:36:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F28E62AD04;
-	Tue, 26 Aug 2025 13:32:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1EEF269D17;
+	Tue, 26 Aug 2025 13:37:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K/p4mXQu"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85C683376BA;
-	Tue, 26 Aug 2025 13:32:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 483FB2F60C1
+	for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 13:37:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756215171; cv=none; b=DY2EJgtWGt4paAdGTwK8huCtDky+ohewix3KB9OQzIssAoTBATO79XSr1vQCLYXrDsEGWy+2/TlmIHenGkTm0IefmIsOqMPpgPKVlwsW05olCJ9YoZ2GWjoqfym2Hs25/eIgN/tldYsLjH0G039lfAPgJlc4hFAzHS3n2jvGnJ0=
+	t=1756215433; cv=none; b=hb8xoNMyGY5bn088Xrts8aZZts7vhKFDqXXDCB1PD2LPKO/SOv2wIYIylLQYLjJYJzgY9YcPQziYidxzvo7j7bxKU3FPPiXOqxAhGl0O1El1DK/buPWFTVrxXXvcdNmA/KFQJpVeRuzhqwmlydG4kpjlxYnfTegubg4K5sWiHKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756215171; c=relaxed/simple;
-	bh=2P/jEUIrcly5M6ffvXr+n6/JwLUJRxYguv1L+Q/9jP0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=qOFiQUn78tQc3rpOhAe9KSDMS2T2UTaI/V2DUwg5usgZOsGwIS86WXsQAijCp1bfjRWmvSOnQ8j4fsi35a5lkF4JvTWd8tEi/xwfHIOLQ7NWVCVl1Xn/HI7Al1/q+jIkLEvxLdN/WytqjVlB7x2NQXTArl3ihLh8WvItIUeXULk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4cB7lQ0x1JzdcGS;
-	Tue, 26 Aug 2025 21:28:18 +0800 (CST)
-Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
-	by mail.maildlp.com (Postfix) with ESMTPS id DAC1C18048F;
-	Tue, 26 Aug 2025 21:32:43 +0800 (CST)
-Received: from [10.174.179.113] (10.174.179.113) by
- dggpemf500002.china.huawei.com (7.185.36.57) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 26 Aug 2025 21:32:42 +0800
-Message-ID: <ab973374-88cd-4b06-986f-56393b32ce06@huawei.com>
-Date: Tue, 26 Aug 2025 21:32:34 +0800
+	s=arc-20240116; t=1756215433; c=relaxed/simple;
+	bh=UWKcaQet9GG4coXO/bspCLJgGio5qNvxiIgBeW1qqtI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fOPOrKK19zQgEwfc5U5IUDDhDdbuFIozieqWcErUGGgogUcAmxEZ3UcMtryG/reuuhOYoNho/EmlCHeq9c4JNI0Sq8TFwbqZHu6AO8zvRg2SWJpxPYRN3nvH/2aUFQEoIMQG79qEPnPA2CzELOOMrw9MeNZScW8zSu4Y669BGBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K/p4mXQu; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4b109919a09so70334871cf.0
+        for <netdev@vger.kernel.org>; Tue, 26 Aug 2025 06:37:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756215431; x=1756820231; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UWKcaQet9GG4coXO/bspCLJgGio5qNvxiIgBeW1qqtI=;
+        b=K/p4mXQuGOFQHci8xWo4hdz13MOF+8fmXVvCiDYi1cyGJAjhID0n/3jEoLzZV2Bese
+         Ezm3yLuuH0y4jKNKKAUbjJEiq9Z4r+u/0TSDgl7iqsYwZjDaqrv9ZCNKFGhwSCJrzwfa
+         a5nPahhWb29H/wJ4AlD72fS3f/P41qT2v7BnBwsms8yogVQDfYcXYGYdk3NKVfsfTf5C
+         3KzT1WeiCc8vWfTQwFTd5Ixn2yJqlBOSTCKQT4WP2pX2EQn0eKV0vQFy+QrWHpUb3Rp6
+         3/jSJy+Jf5eI9V41b+bsv5WimvETqzPzwpapCOqDepyicjWThskjUnDMvri2ZnSBxuun
+         +toA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756215431; x=1756820231;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UWKcaQet9GG4coXO/bspCLJgGio5qNvxiIgBeW1qqtI=;
+        b=SBvbwSq/qw0qqGxDBqGNCTgOLpSu1isGMSyGoxMtjSNT3zngFd+9Wa+ydM53Ryg/yV
+         g1BgjZWp/4zEkxnrbV9ILhH/TUMcpSwRlbX3bBbOJpPHh7ugUkKdrGPqzoE+jRUmfkI0
+         br84SI5aLFSvT4zcZj3OcqrwHxoCqS/ZxCpVDZO0aAQnMtwDAkQSrPWWAjSW0VLZMbhy
+         94Xf0CqZLchmMaqyuyxCCZknPlbeIL3ed5eT9DtgX+z5Dzz+FcLvWyjKMdcKIfo21prj
+         K5e4uwmeFPwpq1gFucQFA076VpuxXaAu07md6W6+b1zO68apsgNO59KgQykH1aLKpy64
+         22tg==
+X-Forwarded-Encrypted: i=1; AJvYcCVIPnvC5oJMrrqU5XrqU7gySTr88o0oez67lrZqbwsZW/L+3nNG59wELKVdZTpXnL5eLElR704=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLtm5Fa/0NH0Z6whAAIk4+K23dct9QxFyp75INmYXebYgFdb2B
+	sDrTkbhDRCd4YRTQPWs5fYXI0kRSRhsLHq18c88BdnNAYGxKknKo2sEzao1UEgU1kabACzPl/2U
+	LsWvD7aQkvYJDJbnCbFI/NvaHbilwtVTdeMZjhXKdRqHhfEtgFRoExI/hrio=
+X-Gm-Gg: ASbGnctEcRfs0beagHpJe55taqkm9w/07oOZE2Mxj4dBT/SMflmR9plTE1mk3kPsvrp
+	MnBWk8Y1iXtHFuXUdCbyEbQxBDWTw7AFPCOvkQVSuDHCBeUImZymvC+FbMhO8o5DgYlmlKYJAXl
+	Idgtj9x+1bFD7i6oFkYj2//ii281crbS8AnN55nqzqDbMX08Jh3YI0x6y9gAfyBdUt9tCucR+u9
+	SrWMP7xfLB+
+X-Google-Smtp-Source: AGHT+IHrqOk5SmffLvdK/bqJjBp80w2upAJzBf78+g6wJP/zWkCTzR7bBDn1IaMjULRpq6wErimmbZnDFHc4midNifE=
+X-Received: by 2002:a05:622a:1ccd:b0:4b2:8ac5:2584 with SMTP id
+ d75a77b69052e-4b2aab78871mr169722741cf.75.1756215430791; Tue, 26 Aug 2025
+ 06:37:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] ipv6: annotate data-races around
- devconf->rpl_seg_enabled
-To: Kuniyuki Iwashima <kuniyu@google.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20250826025206.303325-1-yuehaibing@huawei.com>
- <CAAVpQUDA5gCi--n9N7PQZC3rDBxhZxMW8AUFoaGs+09oT6Vebg@mail.gmail.com>
-Content-Language: en-US
-From: Yue Haibing <yuehaibing@huawei.com>
-In-Reply-To: <CAAVpQUDA5gCi--n9N7PQZC3rDBxhZxMW8AUFoaGs+09oT6Vebg@mail.gmail.com>
+References: <fff0b3eb-ea42-4475-970d-30622dc25dca@free.fr> <e92e23a7-1503-454f-a7a2-cedab6e55fe2@free.fr>
+ <acd04154-25a5-4721-a62b-36827a6e4e47@free.fr> <CAEoi9W6kb0jZXY_Tu27CU7jkyx5O1ne5FOgvYqCk_GFBvnseiw@mail.gmail.com>
+ <11212ddf-bf32-4b11-afee-e234cdee5938@free.fr> <4e4c9952-e445-41af-8942-e2f1c24a0586@free.fr>
+ <90efee88-b9dc-4f87-86f2-6ab60701c39f@free.fr> <6c525868-3e72-4baf-8df4-a1e5982ef783@free.fr>
+ <d073ac34a39c02287be6d67622229a1e@vanheusden.com> <6a5cf9cf-9984-4e1b-882f-b9b427d3c096@free.fr>
+ <aKxZy7XVRhYiHu7c@stanley.mountain> <0c694353-2904-40c2-bf65-181fe4841ea0@free.fr>
+In-Reply-To: <0c694353-2904-40c2-bf65-181fe4841ea0@free.fr>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 26 Aug 2025 06:36:58 -0700
+X-Gm-Features: Ac12FXyf89HBHm7imLexRw9jKiyzhTuYmW54Ay61Lj-JdQeGJGH0d8xxujuA8Dk
+Message-ID: <CANn89iJ6QYYXhzuF1Z3nUP=7+u_-GhKmCbBb4yr15q-it4rrUA@mail.gmail.com>
+Subject: Re: [ROSE] [AX25] 6.15.10 long term stable kernel oops
+To: F6BVP <f6bvp@free.fr>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>, linux-hams@vger.kernel.org, 
+	netdev <netdev@vger.kernel.org>, Dan Cross <crossd@gmail.com>, 
+	David Ranch <dranch@trinnet.net>, Folkert van Heusden <folkert@vanheusden.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- dggpemf500002.china.huawei.com (7.185.36.57)
+Content-Transfer-Encoding: quoted-printable
 
-On 2025/8/26 11:17, Kuniyuki Iwashima wrote:
-> On Mon, Aug 25, 2025 at 7:51 PM Yue Haibing <yuehaibing@huawei.com> wrote:
->>
->> devconf->rpl_seg_enabled can be changed concurrently from
->> /proc/sys/net/ipv6/conf, annotate lockless reads on it.
->>
->> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
->> ---
->>  net/ipv6/exthdrs.c | 6 ++----
->>  1 file changed, 2 insertions(+), 4 deletions(-)
->>
->> diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
->> index d1ef9644f826..a23eb8734e15 100644
->> --- a/net/ipv6/exthdrs.c
->> +++ b/net/ipv6/exthdrs.c
->> @@ -494,10 +494,8 @@ static int ipv6_rpl_srh_rcv(struct sk_buff *skb)
->>
->>         idev = __in6_dev_get(skb->dev);
->>
->> -       accept_rpl_seg = net->ipv6.devconf_all->rpl_seg_enabled;
->> -       if (accept_rpl_seg > idev->cnf.rpl_seg_enabled)
->> -               accept_rpl_seg = idev->cnf.rpl_seg_enabled;
->> -
->> +       accept_rpl_seg = min(READ_ONCE(net->ipv6.devconf_all->rpl_seg_enabled),
->> +                            READ_ONCE(idev->cnf.rpl_seg_enabled));
->>         if (!accept_rpl_seg) {
-> 
-> Orthogonal to this change, but rpl_seg_enabled is missing .extra1/2
-> or this condition should be adjusted like other knobs that recognises
->  <0 as disabled, .e.g. keep_addr_on_down, etc.
+On Tue, Aug 26, 2025 at 6:31=E2=80=AFAM F6BVP <f6bvp@free.fr> wrote:
+>
+> Dan, I thank you for explaining why the patch actually did not prevent
+> the bug to be still present.
+>
+> I captured via netconsole two occurence of kernel panic that did not
+> follow exactly the same chain.
+>
+> I hope these files may help to find where things go bad.
+>
+> Bug is systematically triggered when running netromd daemon and
+> performing a connexion using ax25_call()
+>
+> [syzbot] mail reported KMSAN found uinit-value both in kiss_unesc
+> (mkiss.c:303) and in mkiss_receive_buf() (mkiss.c:901).
+>
+> However I did not identified the bug.
+>
+> Regards,
+>
 
-Thanks, will add .extra1/2 check for this in v2.
+Make sure to add symbols to these logs, otherwise we can not really help.
 
-> 
-> 
->>                 kfree_skb(skb);
->>                 return -1;
->> --
->> 2.34.1
->>
-> 
+cat CRASH | scripts/decode_stacktrace.sh ./vmlinux
 
