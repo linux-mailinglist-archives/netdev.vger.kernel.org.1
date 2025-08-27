@@ -1,136 +1,170 @@
-Return-Path: <netdev+bounces-217129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A432B37718
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 03:38:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D1D24B37747
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 03:43:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E2817C37FC
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 01:38:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4912D8E0286
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 01:43:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F0531FBEA2;
-	Wed, 27 Aug 2025 01:37:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="dWKkA+4x"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C18E1F582A;
+	Wed, 27 Aug 2025 01:42:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A4E61F9F73;
-	Wed, 27 Aug 2025 01:37:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1600530CD95;
+	Wed, 27 Aug 2025 01:42:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756258637; cv=none; b=H32GJW+siyA8/KNXTf1j/ZrkgwcTmyp5TV0lyaF8L9K721IdHn4XFGFSniiYFV8oZagAGg5V/cdxMa6msBHmt35a7KR8qflm/6RxMYB+lYLjHKRj+rnAu0eQ4sbng4VSNxv+wQLRZOBgDRN5TA+E/nWP+cRNHIa+AjF089MlpNM=
+	t=1756258962; cv=none; b=ibktkUvPc6kEtpLJTo8FWLSLp4bkbE+5uCUkSQU4Pgy+ZD1aq82GGWb/o65V23D7x+ZlFyBwtH5NAIsUa3zlRNCr/44+dgs5KVNJjzMtkqEW6D8mdtScmmYuaIb4T5Rx/Zfjl+YMDNui5HiMjQpobxgXFma96lgOV5VJfSUvGzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756258637; c=relaxed/simple;
-	bh=qieCpC4qKgHe/LUKPcyqId76dvfn1MSxURgqm1C2HYY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=aCiGaIOV8S9EcGagUy+Uoq7SjhGyJe9272VZZR3vkIKf+t85MrkeHgJnAYhI+HOhYhXHbxYupJw2+EEyJLQZaZXBvrjMdQleAAcn6teVL52gPakPTOR/YfhZ2gtvzH61IDmiaiP9p3g/AusC6t7qtm5JI6Zvnju7hJkm6RTlCJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=dWKkA+4x; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1756258626;
-	bh=hmEypw3ibVYz9avq0Z0wnujG0VUx9zY5LohNPbzGV8s=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=dWKkA+4xRrRfKm9DCisGrAVA1clImwiPlC878nnBOZpwFaOJvWveBz0w1JFMAE9e3
-	 1OsQlJhbNAj1jDvs66Lw6e4GfWoMIrCnzkhe+SC9jdvkzEbdhiCjZWv0C80mT6PwiW
-	 NFzU01KU5WKd+atsyBiCWq7kLwUymnWciJag+YCYi9F/gGRTK5vDAg9vhe7Pdmn1uN
-	 W1mgT//F6/gHLOrqLo6U85p6Cg3+Xk03FPe+IdZnlQVPP2v0WSvyPzY1OBVs+oqzlc
-	 Tl7Y+HVoM/70utYe1qXzZzTaK2932Lr2MoNscKNMmDRF6mIoHrq+KxGZ5id0MGMLjT
-	 ieSYYsLw/cs1Q==
-Received: from pecola.lan (unknown [159.196.93.152])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id DF2576B49E;
-	Wed, 27 Aug 2025 09:37:05 +0800 (AWST)
-Message-ID: <9b66a22a2fe689a993d9ff83baf8b7bbecbb8c90.camel@codeconstruct.com.au>
-Subject: Re: [PATCH net-next v25 1/1] mctp pcc: Implement MCTP over PCC
- Transport
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: Adam Young <admiyo@amperemail.onmicrosoft.com>, 
- admiyo@os.amperecomputing.com, Matt Johnston <matt@codeconstruct.com.au>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Sudeep Holla
-	 <sudeep.holla@arm.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
-	Huisong Li <lihuisong@huawei.com>
-Date: Wed, 27 Aug 2025 09:37:05 +0800
-In-Reply-To: <d15313f4-46d1-4096-bdf1-783afd8e439d@amperemail.onmicrosoft.com>
-References: <20250819205159.347561-1-admiyo@os.amperecomputing.com>
-	 <20250819205159.347561-2-admiyo@os.amperecomputing.com>
-	 <88a67cc10907926204a478c58e361cb6706a939a.camel@codeconstruct.com.au>
-	 <d15313f4-46d1-4096-bdf1-783afd8e439d@amperemail.onmicrosoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+	s=arc-20240116; t=1756258962; c=relaxed/simple;
+	bh=uH2VFSJMyCnSLjpcnGx56opsnpfl5naJHZ3WXF5SFAM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FWEEeKqu/8RgS81NY3rFwGip0t4pkXeSesXxllCRwCjp1rr9WLER5gJO/56qzNgi0SyJwNzPjiFrds+SwiiRxtvEocEcAmgl77vds/Iigpg/vLOph3g3CwZHkhn0pr/U0q/pCfGzTHHoDbnJfU2ms+38Uu8E9M2zNDLsfxj55Is=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.206.16.166
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: esmtpsz20t1756258933t53080512
+X-QQ-Originating-IP: 1lOMaAuA9nfuwe2FeABSvz6MykdgCUNe1qBMkBQJ4Vg=
+Received: from localhost ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 27 Aug 2025 09:42:11 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 10885226712742933272
+Date: Wed, 27 Aug 2025 09:42:11 +0800
+From: Yibo Dong <dong100@mucse.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
+	gur.stavi@huawei.com, maddy@linux.ibm.com, mpe@ellerman.id.au,
+	danishanwar@ti.com, lee@trager.us, gongfan1@huawei.com,
+	lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org,
+	gustavoars@kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH net-next v7 4/5] net: rnpgbe: Add basic mbx_fw support
+Message-ID: <05B2D818DB1348E6+20250827014211.GA469112@nic-Precision-5820-Tower>
+References: <20250822023453.1910972-1-dong100@mucse.com>
+ <20250822023453.1910972-5-dong100@mucse.com>
+ <316f57e3-5953-4db6-84aa-df9278461d30@linux.dev>
+ <82E3BE49DB4195F0+20250826013113.GA6582@nic-Precision-5820-Tower>
+ <bbdabd48-61c0-46f9-bf33-c49d6d27ffb0@linux.dev>
+ <8C1007761115185D+20250826110539.GA461663@nic-Precision-5820-Tower>
+ <bd1d77b2-c218-4dce-bbf6-1cbdecabb30b@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bd1d77b2-c218-4dce-bbf6-1cbdecabb30b@lunn.ch>
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: MNsLylogNlqc6nEp4WVIUhq56of8guHz52MSHB8r89kVkvD5Sqrq9HQD
+	7V1CMGDOCVUhFU4MNcBTcz4D+A+5nJmGIiU/HOh+0o3A1KzX6gRwhbARZJ9Jh7jPegIH80M
+	xqRrxn840BbUOJBXhtaDbLpb3OtHqi/3rqpP+7vM7h9DPb+BGHAaEcij6/VQzDjBjLahzWr
+	SukMm0WfpCrbPOlSq/8BWYA45jhx/rqSTxYB6MPh38iqKSc8g3uHkxQJyuZcRO7oyEp7glv
+	MtU07FrRXgTgUXDIjOYWkjTFw0bpCM8NibLSehKerqXOAj1oBsz3p37B0NjJuJ7a8LKDkKZ
+	YROF59AsqPduzBBYpgjakUOt3l5nSV+1Z8yg+7PxaIaDVBhiL4HN+lvsvNU+WEteW1/P1ng
+	x/WfoUqt1CzhPjzyTZLmuXij5WIj5aQu+yGW4dLzjHJ3IGF4fdsrsh+w0cy1Xul9mfyxq+u
+	YmmnMFZysLpccjPKVt8/qU6omzGArZXpnHmF7eBsh2JDUmJGXW7YBGZQUzIL7B1kVVWrGfz
+	7fFQPPseO8huV2WchoUM2MMWRVFEH9GvZP4dWnCztZRAcQumInWnFn7pFAPNQYrHupKkvs/
+	Tzh3D2jVcfI9DwobeFgv5+8SqmGcDeBqnvRhxhe07dvA+PzxCp8IDvb8E9xNUV8aVd3LoHm
+	sjsSQYbI84wGqSL0eLHEjEdvzS6iNCYDYM47uJHTIhLUVR/zU/3TOwB4Om9RVYOODYEnz6D
+	pad7SxviHVzTwDKSQWqjaDX8/oH31wcjdPsp7Fd0ItmwBL9JVuxgp//Vu9BfGGzAG8rvX45
+	8sTj05502IWdtL1fxgFFMgRVlL8a5dUmrHmu5wT3BtKdCB+ustkp3vj+Eg347yh8igVV0G8
+	gPPCziKvbdWVZRgFygVMji6gqm0Hf/RkSE/dDtXuRjODqzKgwoyCgbVfcbyc7xedNiH37Pp
+	Ffqyzbeto8fzam3t714l2BYyLBIHDq7zDkvpwWa/XeWEUNlJFL7OcjvE/
+X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
+X-QQ-RECHKSPAM: 0
 
-Hi Adam,
+On Tue, Aug 26, 2025 at 02:39:07PM +0200, Andrew Lunn wrote:
+> > Yes. It is not safe, so I 'must wait_event_timeout before free cookie'....
+> > But is there a safe way to do it?
+> > Maybe:
+> > ->allocate cookie
+> >   -> map it to an unique id
+> >     ->set the id to req->cookie
+> >       ->receive response and check id valid? Then access cookie?
+> 
+> This is part of why adding cookies in a separate patch with a good
+> commit message is important.
+> 
+> Please take a step back. What is the big picture? Why do you need a
+> cookie? What is it used for? If you describe what your requirements
+> are, we might be able to suggest a better solution, or point you at a
+> driver you can copy code from.
+> 
+> 	Andrew
+> 
 
-> In addition to the below comment, I am removing the additional lock on
-> the skb lists and using the internal one for all operations.=C2=A0 It lea=
-ds
-> to leaner and cleaner code.
+I try to explain the it:
 
-Ok, neat!
+driver-->fw, we has two types request:
+1. without response, such as mucse_mbx_ifinsmod
+2. with response, such as mucse_fw_get_macaddr
 
-Just be careful with locking as you're iterating the queues. Your
-current approach of doing the drain under one lock acquire is probably
-the best, if you can do the same with the queue-internal locking.
+fw --> driver, we has one types request:
+1. link status (link speed, duplex, pause status...)
 
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mctp_pcc_ndev->inbox.chan-=
->rx_alloc =3D mctp_pcc_rx_alloc;
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mctp_pcc_ndev->outbox.chan=
-->manage_writes =3D true;
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* There is no clean way t=
-o pass the MTU to the callback function
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * used for registration, =
-so set the values ahead of time.
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
-> > For my own clarity, what's "the callback function used for
-> > registration"?
->=20
->=20
-> Actually, this is not longer true: we can do it in ndo_open, and it
-> is clean.=C2=A0 Removed the comment.
+fw tiggers irq when it sends response or request.
+In order to handle link status timely, we do an irqhandle like this:
 
-OK, The current patch *does* do it in ndo_open though, hence my
-confusion.
+static int rnpgbe_rcv_msg_from_fw(struct mucse *mucse)
+{
+        u32 msgbuf[MUCSE_FW_MAILBOX_WORDS];
+        struct mucse_hw *hw = &mucse->hw;
+        struct mbx_fw_cmd_reply *reply;
+        int retval;
+	/* read mbx data out */
+        retval = mucse_read_mbx(hw, msgbuf, MUCSE_FW_MAILBOX_WORDS);
+        if (retval)
+                return retval;
 
-From your other reply:
+        reply = (struct mbx_fw_cmd_reply *)msgbuf;
+	/* judge request or response */
+        if (le16_to_cpu(reply->flags) & FLAGS_DD) {
+		/* if it is a response, call wake_up(cookie) */
+                return rnpgbe_mbx_fw_reply_handler(mucse,
+                                (struct mbx_fw_cmd_reply *)msgbuf);
+        } else {
+		/* if it is a request, handle link status */
+                return rnpgbe_mbx_fw_req_handler(mucse,
+                                (struct mbx_fw_cmd_req *)msgbuf);
+        }
+}
 
-> > > +static int mctp_pcc_ndo_open(struct net_device *ndev)
-> > > +{
-> > > +       struct mctp_pcc_ndev *mctp_pcc_ndev =3D
-> > > +           netdev_priv(ndev);
-> > > +       struct mctp_pcc_mailbox *outbox =3D
-> > > +           &mctp_pcc_ndev->outbox;
-> > > +       struct mctp_pcc_mailbox *inbox =3D
-> > > +           &mctp_pcc_ndev->inbox;
-> > Minor: I don't think these need wrapping?
->=20
-> The outbox and inbox lines are longer than the mctp_pcc_ndev line, and
-> they depend on it.  This ordering and wrapping passes the xmas  tree
-> check and keeps assignment with declaration.
+And driver requests with response is bellow 'without' irqhandle:
 
-If you need a specific ordering for actual correctness, no need to
-force that into a reverse-christmas-tree. Spacing requirements like that
-are secondary.
+static int mucse_fw_send_cmd_wait(struct mucse_hw *hw,
+				  struct mbx_fw_cmd_req *req,
+				  struct mbx_fw_cmd_reply *reply)
+{
+...
+	mucse_write_posted_mbx(hw, (u32 *)req, len);
 
-The only remaining query I had was the TX flow control. You're returning
-NETDEV_TX_BUSY while the queues are still running, so are likely to get
-repeated TX in a loop there.
+	...
+	/* but as irqhandle be added, mbx data is read out in the
+	 * handler, mucse_read_posted_mbx cannot read anything */
+	mucse_read_posted_mbx(hw, (u32 *)reply, sizeof(*reply));
 
-Cheers,
+}
 
+To solve mucse_read_posted_mbx cannot read data with irq, we add 'cookie'.
+After mucse_write_posted_mbx, call wait_event_timeout. wake_up is called
+in irqhandle.
 
-Jeremy
+Thanks for your feedback.
+
 
