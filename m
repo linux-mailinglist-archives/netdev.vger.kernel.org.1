@@ -1,50 +1,81 @@
-Return-Path: <netdev+bounces-217236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4022B37EE9
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 11:35:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5FDEB37F13
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 11:42:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4A338E0770
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 09:35:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A099B1BA3EF2
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 09:43:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22930345721;
-	Wed, 27 Aug 2025 09:35:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16CE03469E7;
+	Wed, 27 Aug 2025 09:42:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="eEu4XHGh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eq493+Om"
 X-Original-To: netdev@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E5863451AD;
-	Wed, 27 Aug 2025 09:35:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC913451D1;
+	Wed, 27 Aug 2025 09:42:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756287306; cv=none; b=BYRVRMafFZ3vAmQVFoo2BFemNKqV+dtBvT4Ekg9cZlGIGF/FPBdFqyzGm0nkr0Ca/PKJqlxsIy/dvWnkAcDbCfFKCSVYIlOJM3Z9VktXP0OXFU6NswGeWAA0V5aeCCokeFHBZGQppVxdi32khAXSeFiXah6K1q7h6WzC7cdgWjo=
+	t=1756287762; cv=none; b=nEwjm6CQGT+ALnULD2o6mBDuHpY9yOei6EKhRNECi7QqIpvr0v30qMHJNeJZoil1gow1eMFJ8+dE9zqNm5X/XIBwzCt7p57RY0DJX+j4+BODGt2bkL3a+BEYJo8mIR+M79Tq6+hm3fhjaqVMX866fCEXI0beXWqHtBf6RGi0JKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756287306; c=relaxed/simple;
-	bh=vzvd2Cvmcar+3CFoTi/zJ5CsUim01bxEhVNGUrPYXFw=;
+	s=arc-20240116; t=1756287762; c=relaxed/simple;
+	bh=A0KNxlVGHuvT2hmaoiFbUd67u8sxODxt85QG+mrnbSE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GuEfqEB27VP8MEc1qzK+ztw7nsZ0aqyaAsd4yWS+nIEvQBxBR8LFDXHb7eID+HUmtrRopSZh8DKc87Gq9QMjNoCuO7KZAZoK0OhtPATyCl7FJKQNu3RAEgl508QBfenrGujI5l/kwrmqKW3A0Q0JRm42syDoKL1FTMXPEyDuNBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=eEu4XHGh; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-Received: from [129.217.186.178] ([129.217.186.178])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 57R9YpF9010783
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 27 Aug 2025 11:34:51 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1756287291;
-	bh=vzvd2Cvmcar+3CFoTi/zJ5CsUim01bxEhVNGUrPYXFw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=eEu4XHGh+0SwkrtsuiGrH/E/phgUzpNkSMHNmMxUfr62eSTOJnQ/xLvn3dNR0VXnn
-	 PhJuaFK6OEtRRI/VGnnhkjEMYDFE7G3IlPxhVzR39EafQYBf7/olFOakE9tioxHiW9
-	 I4CGThf3M8C6nOYlLmL2O/aVy73Tog+09micS1Dc=
-Message-ID: <74b28e67-da36-4bb4-b1eb-58dd51762bab@tu-dortmund.de>
-Date: Wed, 27 Aug 2025 11:34:51 +0200
+	 In-Reply-To:Content-Type; b=j79R7A3GCROk2ruAAuKDSgSrH794YN9YWD2icaxlv/z6gnGiNISfH9hEcl56DsFtszrir5+CdE+J0hNWdTKNLW9DrizVbSY95a7+4Yo3x7feeZlt8Htq+OsgkU5tfKAI01lwHpLbiOwe5iZmvKetqMUmmIMXVLQMIyLDX2feDYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eq493+Om; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3c84925055aso2676474f8f.2;
+        Wed, 27 Aug 2025 02:42:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756287759; x=1756892559; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=s4gNirUawo/2N73RGh/VZFmiZovBEw6Zvsz5pkyBSog=;
+        b=eq493+OmhqNBlrHmEpRZnEz1udJxBnU8wy/od2pb0QmbYFaKRSHxFcsAqHxsJ2TEzG
+         QBqejTxuUzbOVndo32LSzbSSp0rCDlR1WdSjwC3FA3DDY4NQeEbvmkxL+op4Ry1Dw9zQ
+         OORjwVyiKB660OR+sRd3CJ+vaL+LinNcNuq0rl15XuqSNQnmRP4qzaVekokcOd2D+dy3
+         dUFa5PMQezCzhuB179mlCs/5zfgfrc1lKHcDCjIiR915l+JZftBJvMbPLaFLMIvO03tx
+         TYzdoy6btAPmODdrW7nnnPzJthrK5xVn9J6LJC22uVNGCCzA1VZDXL/GZqGef9v9szJ3
+         Li7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756287759; x=1756892559;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=s4gNirUawo/2N73RGh/VZFmiZovBEw6Zvsz5pkyBSog=;
+        b=XJtmg7UHoVD30CoT+FKblYoZtABzlu4N3DZ6dhhPiXEfpoV9kU+NAB9KR09ra3D8dk
+         NoYjfcZlSyXnyhkrkSNqUTXFdeh490Syntu19fnH93P7KzOt3T59CcNzH1ks4e+/lboE
+         trtBxQ2orJLgABNv4jpYJ8XmGp8faHXf1VU9YiAtURgcCqwW5EIWaBoIdEdT3zYXf6j6
+         NPArsqk+0psPvBmEhyWitc9Md87LJVbBRar+9rp72JlvQPq1XC4tztmcat2hTuy3iJO4
+         huGbKp4QFhw6E5eaEVJOzL7f8F9juzjhkAWq7IWbYwi3KBNLcNeHwA5OYhRc8sE3T7On
+         Kw2A==
+X-Forwarded-Encrypted: i=1; AJvYcCUSCD9fILJ+28uBSDuNZsU5f7Pv/8U1R315+LkMl037ggSCsORSMSvIIsT8BI1aAx5UD7jzqk9fKgAt@vger.kernel.org, AJvYcCUevdMQ2U6BknqNgrRAup+8086qnra1hkhgnS8kGZwYBR8aHMwvZ2s+9Z+/7FR0Rg7zY+RZ0Iz3@vger.kernel.org, AJvYcCUwjwj2psJ3u1NTKFkvIuSk7XPiUFns5EOn/VS/D1k4GTM648TpyZF0gG4qowylcaP4+o+OyxsHSxh7b3lx@vger.kernel.org, AJvYcCVSuYnGxLEuak2LpXneBP47Ev8FwkhXNK4DhZPDbzn9+gI4U22dlBn6NSOMVxI0Y0agjI18swxby6NK+g==@vger.kernel.org, AJvYcCWHItbwDNtWiQSBUrmigpBGdHJmeHDQ0zMuMT4ythMTaaoWqMrV65v2O0zj9OS5r9kvc4rH2aHBRp92CGS8@vger.kernel.org, AJvYcCWPkyZ4ts8gDVwGjo+LVW3NWm3mKfxk/0RP7WQiR5U9Purif6HzR4nw+5MJutgu3rxI72A1baGBwviE9A==@vger.kernel.org, AJvYcCWVxViLACC6YPP+7vcfD03FZmgBbpqoP5faJU93MPVgOC+qnfp3h8nuDLn2YMvpZkIWCMbD1osNAw==@vger.kernel.org, AJvYcCWtpBu505T4zFzQadPKj4FGpkvdL3mU7z3XzmGucBfhTRR7DuFuaQJG23q8n0xbTQMdKcBcGG8miYUS@vger.kernel.org, AJvYcCX2R2aDmNtVcBcxZWgIWrEiBWjFndVBvXbAzZSXgbZn4VJ5T93jH7HlViJj6gWByHrxRqlVPP704Yim/fS+gFQW@vger.kernel.org, AJvYcCXFCJRx/mLbMBsp6wVmhJjhZVhz
+ FvPeRvdqDo3M3lMOAEMTk7+m55WqSEA8xQzvuXszF1rD@vger.kernel.org, AJvYcCXej6CLaLomb7S9q6UVEExPEuszQhiKxOb0t4ZOUjJGyQq/Oeh/JFpg2PJ5msw8r2CU0aBLZ6vyc3bPZA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3uH3XZwv1aBKWmz5rKen1jHgk3kkc+6ikF+oKvmYvv/hHoraV
+	YZto5Bc54QVEQI5XbHTi6VZ5QWjg0Eyxi1xBd7F8GPRBxGs39WuwJnyaqLgB95lE
+X-Gm-Gg: ASbGncux/p/IiTYT3fmUWgdFSu7VtvaeWMCBAcjB6Kdi5nqKmW7qlNYoWmYaihgfJRa
+	KrH7dgFPBmGdi0WMemHtFgyXlPvXydVsnmhjduvmD0zkRxm6ZU3Y2Ah53Hnt7ZEQgU270wSGFMd
+	mdoeOsI4ZRL3ttNGA0d+PLGkO0amO22cOqwv8Rmg1XdfWpi7cUGvfNd6OJFyAOqmTKvU1fnLd4E
+	Th9WaZbUAhhlQpJRm3w9UK/Ueps4M8gEo/m+fan+l3NYcIlMcsEtPsX5q7iIfoaSiMuXVC5C93R
+	m+7/zdVKbc8avq5UFxnSZmJW7a13AVpMoUrHcpBk/KD6Mv6sehhvrsTVie4QKVQ9c+I3RdVrnro
+	KYBnYQaeDHgtAVLM4ooYW0ZattqFcH+27TLMH8dXnqE/temY5qZKyGbEbJwEdf0Elmg==
+X-Google-Smtp-Source: AGHT+IFkjO5GHbU1+2MUuKQvNL0fwH2etmLb7S57NgBpdq01aCYpWSgROxwdQQpXxfO8aoPZevSNpQ==
+X-Received: by 2002:a05:6000:3105:b0:3b8:d672:3cf8 with SMTP id ffacd0b85a97d-3c5dcb10b6amr14770182f8f.43.1756287759105;
+        Wed, 27 Aug 2025 02:42:39 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:4a1a])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3cc4b102889sm3363615f8f.51.2025.08.27.02.42.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Aug 2025 02:42:38 -0700 (PDT)
+Message-ID: <46d09557-1873-4d97-b073-ce0c7296b954@gmail.com>
+Date: Wed, 27 Aug 2025 10:43:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,545 +83,82 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net v3] TUN/TAP: Improving throughput and latency by avoiding
- SKB drops
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, jasowang@redhat.com,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-References: <20250825211832.84901-1-simon.schippers@tu-dortmund.de>
- <willemdebruijn.kernel.2310f82f3e55a@gmail.com>
+Subject: Re: [PATCH RFC 18/35] io_uring/zcrx: remove "struct io_copy_cache"
+ and one nth_page() usage
+To: David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, Alexander Potapenko <glider@google.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
+ Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+ iommu@lists.linux.dev, io-uring@vger.kernel.org,
+ Jason Gunthorpe <jgg@nvidia.com>, Johannes Weiner <hannes@cmpxchg.org>,
+ John Hubbard <jhubbard@nvidia.com>, kasan-dev@googlegroups.com,
+ kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
+ linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Marco Elver <elver@google.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
+ Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
+ Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
+ Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
+ Robin Murphy <robin.murphy@arm.com>, Suren Baghdasaryan <surenb@google.com>,
+ Tejun Heo <tj@kernel.org>, virtualization@lists.linux.dev,
+ Vlastimil Babka <vbabka@suse.cz>, wireguard@lists.zx2c4.com, x86@kernel.org,
+ Zi Yan <ziy@nvidia.com>
+References: <20250821200701.1329277-1-david@redhat.com>
+ <20250821200701.1329277-19-david@redhat.com>
+ <b5b08ad3-d8cd-45ff-9767-7cf1b22b5e03@gmail.com>
+ <473f3576-ddf3-4388-aeec-d486f639950a@redhat.com>
 Content-Language: en-US
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-In-Reply-To: <willemdebruijn.kernel.2310f82f3e55a@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <473f3576-ddf3-4388-aeec-d486f639950a@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Willem de Bruijn wrote:
-> Target net-next
-> 
-> Also please have the subject line summarize the functional change
-> (only). Something like "tun: replace tail drop with queue pause
-> when full."
-> 
-
-Thank you very much for your detailed reply!
-Yes, I will target net-next instead and change the title.
-
-> Simon Schippers wrote:
->> This patch is a result of our paper [1] and deals with the tun_net_xmit
->> function which drops SKB's with the reason SKB_DROP_REASON_FULL_RING
->> whenever the tx_ring (TUN queue) is full. This behavior results in reduced
->> TCP performance and packet loss for VPNs and VMs. In addition this patch
->> also allows qdiscs to work properly (see [2]) and to reduce buffer bloat
->> when reducing the TUN queue.
+On 8/22/25 14:59, David Hildenbrand wrote:
+> On 22.08.25 13:32, Pavel Begunkov wrote:
+>> On 8/21/25 21:06, David Hildenbrand wrote:
+>>> We always provide a single dst page, it's unclear why the io_copy_cache
+>>> complexity is required.
 >>
->> TUN benchmarks:
->> +-----------------------------------------------------------------+
->> | Lab setup of our paper [1]:                                     |
->> | TCP throughput of VPN solutions at varying RTT (values in Mbps) |
->> +-----------+---------------+---------------+----------+----------+
->> | RTT [ms]  | wireguard-go  | wireguard-go  | OpenVPN  | OpenVPN  |
->> |           |               | patched       |          | patched  |
->> +-----------+---------------+---------------+----------+----------+
->> | 10        | 787.3         | 679.0         | 402.4    | 416.9    |
->> +-----------+---------------+---------------+----------+----------+
->> | 20        | 765.1         | 718.8         | 401.6    | 393.18   |
->> +-----------+---------------+---------------+----------+----------+
->> | 40        | 441.5         | 529.4         | 96.9     | 411.8    |
->> +-----------+---------------+---------------+----------+----------+
->> | 80        | 218.7         | 265.7         | 57.9     | 262.7    |
->> +-----------+---------------+---------------+----------+----------+
->> | 120       | 145.4         | 181.7         | 52.8     | 178.0    |
->> +-----------+---------------+---------------+----------+----------+
->>
->> +--------------------------------------------------------------------+
->> | Real-world setup of our paper [1]:                                 |
->> | TCP throughput of VPN solutions without and with the patch         |
->> | at a RTT of ~120 ms (values in Mbps)                               |
->> +------------------+--------------+--------------+---------+---------+
->> | TUN queue        | wireguard-go | wireguard-go | OpenVPN | OpenVPN |
->> | length [packets] |              | patched      |         | patched |
->> +------------------+--------------+--------------+---------+---------+
->> | 5000             | 185.8        | 185.6        | 184.7   | 184.8   |
->> +------------------+--------------+--------------+---------+---------+
->> | 1000             | 185.1        | 184.9        | 177.1   | 183.0   |
->> +------------------+--------------+--------------+---------+---------+
->> | 500 (default)    | 137.5        | 184.9        | 117.4   | 184.6   |
->> +------------------+--------------+--------------+---------+---------+
->> | 100              | 99.8         | 185.3        | 66.4    | 183.5   |
->> +------------------+--------------+--------------+---------+---------+
->> | 50               | 59.4         | 185.7        | 21.6    | 184.7   |
->> +------------------+--------------+--------------+---------+---------+
->> | 10               | 1.7          | 185.4        | 1.6     | 183.6   |
->> +------------------+--------------+--------------+---------+---------+
->>
->> TAP benchmarks:
->> +------------------------------------------------------------------+
->> | Lab Setup [3]:                                                   |
->> | TCP throughput from host to Debian VM using TAP (values in Mbps) |
->> +----------------------------+------------------+------------------+
->> | TUN queue                  | Default          | Patched          |
->> | length [packets]           |                  |                  |
->> +----------------------------+------------------+------------------+
->> | 1000 (default)             | 2194.3           | 2185.0           |
->> +----------------------------+------------------+------------------+
->> | 100                        | 1986.4           | 2268.5           |
->> +----------------------------+------------------+------------------+
->> | 10                         | 625.0            | 1988.9           |
->> +----------------------------+------------------+------------------+
->> | 1                          | 2.2              | 1112.7           |
->> +----------------------------+------------------+------------------+
->> |                                                                  |
->> +------------------------------------------------------------------+
->> | Measurement with 1000 packets queue and emulated delay           |
->> +----------------------------+------------------+------------------+
->> | RTT [ms]                   | Default          | Patched          |
->> +----------------------------+------------------+------------------+
->> | 60                         | 171.8            | 341.2            |
->> +----------------------------+------------------+------------------+
->> | 120                        | 98.3             | 255.0            |
->> +----------------------------+------------------+------------------+
->>
->> TAP+vhost_net benchmarks:
->> +----------------------------------------------------------------------+
->> | Lab Setup [3]:                                                       |
->> | TCP throughput from host to Debian VM using TAP+vhost_net            |
->> | (values in Mbps)                                                     |
->> +-----------------------------+--------------------+-------------------+
->> | TUN queue                   | Default            | Patched           |
->> | length [packets]            |                    |                   |
->> +-----------------------------+--------------------+-------------------+
->> | 1000 (default)              | 23403.9            | 23858.8           |
->> +-----------------------------+--------------------+-------------------+
->> | 100                         | 23372.5            | 23889.9           |
->> +-----------------------------+--------------------+-------------------+
->> | 10                          | 25837.5            | 23730.2           |
->> +-----------------------------+--------------------+-------------------+
->> | 1                           | 0.7                | 19244.8           |
->> +-----------------------------+--------------------+-------------------+
->> | Note: Default suffers from many retransmits, while patched does not. |
->> +----------------------------------------------------------------------+
->> |                                                                      |
->> +----------------------------------------------------------------------+
->> | Measurement with 1000 packets queue and emulated delay               |
->> +-----------------------------+--------------------+-------------------+
->> | RTT [ms]                    | Default            | Patched           |
->> +-----------------------------+--------------------+-------------------+
->> | 60                          | 397.1              | 397.8             |
->> +-----------------------------+--------------------+-------------------+
->> | 120                         | 200.7              | 199.9             |
->> +-----------------------------+--------------------+-------------------+
->>
->> Implementation details:
->> - The netdev queue start/stop flow control is utilized.
->> - Compatible with multi-queue by only stopping/waking the specific
->> netdevice subqueue.
->>
->> In the tun_net_xmit function:
->> - Stopping the subqueue is done when the tx_ring gets full after inserting
->> the SKB into the tx_ring.
->> - In the unlikely case when the insertion with ptr_ring_produce fails, the
->> old dropping behavior is used for this SKB.
->>
->> In the tun_ring_recv function:
->> - Waking the subqueue is done after consuming a SKB from the tx_ring when
->> the tx_ring is empty.
->> - When the tx_ring is configured to be small (for example to hold 1 SKB),
+>> Because it'll need to be pulled outside the loop to reuse the page for
+>> multiple copies, i.e. packing multiple fragments of the same skb into
+>> it. Not finished, and currently it's wasting memory.
 > 
-> That's an exaggerated case that hopefully we do not have to support.
-> Can this be configured? Maybe we should round_up user input to a sane
-> lower bound instead.
-> 
+> Okay, so what you're saying is that there will be follow-up work that will actually make this structure useful.
 
-I do not think that this issue will disappear with a bigger tx_ring, it 
-will just get more unlikely.
-Just waking the netdev queue in the blocking wait queue is fine in my 
-opinion.
-And small tx_ring sizes like 1 might be used by a possible dynamic queue 
-limits since my benchmarks showed that the performance can be okay with 
-such small tx_ring sizes.
+Exactly
 
->> queuing might be stopped in the tun_net_xmit function while at the same
->> time, ptr_ring_consume is not able to grab a SKB. This prevents
->> tun_net_xmit from being called again and causes tun_ring_recv to wait
->> indefinitely for a SKB in the blocking wait queue. Therefore, the netdev
->> queue is woken in the wait queue.
->>
->> In the tap_do_read function:
->> - Same behavior as in tun_ring_recv: Waking the subqueue when the tx_ring
->> is empty & waking the subqueue in the blocking wait queue.
->> - Here the netdev txq is obtained with a rcu read lock instead.
->>
->> In the vhost_net_buf_produce function:
->> - Same behavior as in tun_ring_recv: Waking the subqueue when the tx_ring
->> is empty.
->> - Here the netdev_queue is saved in the vhost_net_virtqueue at init with
->> new helpers.
->>
->> We are open to suggestions regarding the implementation :)
->> Thank you for your work!
+>> Why not do as below? Pages there never cross boundaries of their folios. > Do you want it to be taken into the io_uring tree?
 > 
-> Similarly, in the commit message, lead with the technical explanation.
-> Brief benchmark results are great, but this is not an academic paper.
-> Best concise and below the main take-away. Or in the cover letter if a
-> multi patch series. ..
-> 
+> This should better all go through the MM tree where we actually guarantee contiguous pages within a folio. (see the cover letter)
 
-Okay, I will shorten the benchmarks to a minimum and lead with the 
-technical explanation.
+Makes sense. No objection, hopefully it won't cause too many conflicts.
 
->>
->> [1] Link:
->> https://cni.etit.tu-dortmund.de/storages/cni-etit/r/Research/Publications/2025/Gebauer_2025_VTCFall/Gebauer_VTCFall2025_AuthorsVersion.pdf
->> [2] Link:
->> https://unix.stackexchange.com/questions/762935/traffic-shaping-ineffective-on-tun-device
->> [3] Link: https://github.com/tudo-cni/nodrop
->>
->> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
->> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
->> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
->> ---
->> V2 -> V3: Added support for TAP and TAP+vhost_net.
+>> diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+>> index e5ff49f3425e..18c12f4b56b6 100644
+>> --- a/io_uring/zcrx.c
+>> +++ b/io_uring/zcrx.c
+>> @@ -975,9 +975,9 @@ static ssize_t io_copy_page(struct io_copy_cache *cc, struct page *src_page,
+>>            if (folio_test_partial_kmap(page_folio(dst_page)) ||
+>>                folio_test_partial_kmap(page_folio(src_page))) {
+>> -            dst_page = nth_page(dst_page, dst_offset / PAGE_SIZE);
+>> +            dst_page += dst_offset / PAGE_SIZE;
+>>                dst_offset = offset_in_page(dst_offset);
+>> -            src_page = nth_page(src_page, src_offset / PAGE_SIZE);
+>> +            src_page += src_offset / PAGE_SIZE;
 > 
-> .. please split into a series, with separate patches for TUN, TAP and
-> vhost-net.
-> 
-> Or, start with one and once that is merged after revisions, repeat
-> for the others. That is likely less work.
-> 
+> Yeah, I can do that in the next version given that you have plans on extending that code soon.
 
-I will split it into a series with separate changes.
-Merging one after another will not work since TUN, TAP and vhost-net share 
-tun_net_xmit as a common method.
-Stopping the netdev queue there without waking it again will break stuff.
+If we go with this version:
 
->> V1 -> V2: Removed NETDEV_TX_BUSY return case in tun_net_xmit and removed 
->> unnecessary netif_tx_wake_queue in tun_ring_recv.
->>
->>  drivers/net/tap.c      | 35 +++++++++++++++++++++++++++++++++++
->>  drivers/net/tun.c      | 39 +++++++++++++++++++++++++++++++++++----
->>  drivers/vhost/net.c    | 24 ++++++++++++++++++++++--
->>  include/linux/if_tap.h |  5 +++++
->>  include/linux/if_tun.h |  6 ++++++
->>  5 files changed, 103 insertions(+), 6 deletions(-)
->>
->> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
->> index 1197f245e873..df7e4063fb7c 100644
->> --- a/drivers/net/tap.c
->> +++ b/drivers/net/tap.c
->> @@ -758,6 +758,8 @@ static ssize_t tap_do_read(struct tap_queue *q,
->>  			   int noblock, struct sk_buff *skb)
->>  {
->>  	DEFINE_WAIT(wait);
->> +	struct netdev_queue *txq;
->> +	struct net_device *dev;
->>  	ssize_t ret = 0;
->>  
->>  	if (!iov_iter_count(to)) {
->> @@ -785,12 +787,26 @@ static ssize_t tap_do_read(struct tap_queue *q,
->>  			ret = -ERESTARTSYS;
->>  			break;
->>  		}
->> +		rcu_read_lock();
->> +		dev = rcu_dereference(q->tap)->dev;
->> +		txq = netdev_get_tx_queue(dev, q->queue_index);
->> +		netif_tx_wake_queue(txq);
->> +		rcu_read_unlock();
->> +
-> 
-> This wakes the queue only once entirely empty? That seems aggressive.
-> 
+Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
 
-This waking of the netdev queue is only for the "exaggerated" case, see 
-described above for TUN.
-However you are right that only waking the netdev queue when the tx_ring 
-is empty (which is done with the condition below) is aggressive.
-In previous testing waking the queue when the tx_ring is not full anymore 
-(instead of completely empty) showed crashes. But I will reevaluate this 
-logic.
+-- 
+Pavel Begunkov
 
-> Where is the matching netif_tx_stop_queue. I had expected that
-> arund the ptr_ring_produce calls in tap_handle_frame.
-> 
-
-TAP uses tun_net_xmit as .ndo_start_xmit. However, tap_handle_frame is 
-used by ipvtap and macvtap. It could also be considered in the patch 
-series, I guess?
-
->>  		/* Nothing to read, let's sleep */
->>  		schedule();
->>  	}
->>  	if (!noblock)
->>  		finish_wait(sk_sleep(&q->sk), &wait);
->>  
->> +	if (ptr_ring_empty(&q->ring)) {
->> +		rcu_read_lock();
->> +		dev = rcu_dereference(q->tap)->dev;
->> +		txq = netdev_get_tx_queue(dev, q->queue_index);
->> +		netif_tx_wake_queue(txq);
->> +		rcu_read_unlock();
->> +	}
->> +
-> 
-> Why the second test for the same condition: ring empty?
-> 
-
-See previous comment.
-
->>  put:
->>  	if (skb) {
->>  		ret = tap_put_user(q, skb, to);
->> @@ -1176,6 +1192,25 @@ struct socket *tap_get_socket(struct file *file)
->>  }
->>  EXPORT_SYMBOL_GPL(tap_get_socket);
->>  
->> +struct netdev_queue *tap_get_netdev_queue(struct file *file)
->> +{
->> +	struct netdev_queue *txq;
->> +	struct net_device *dev;
->> +	struct tap_queue *q;
->> +
->> +	if (file->f_op != &tap_fops)
->> +		return ERR_PTR(-EINVAL);
->> +	q = file->private_data;
->> +	if (!q)
->> +		return ERR_PTR(-EBADFD);
->> +	rcu_read_lock();
->> +	dev = rcu_dereference(q->tap)->dev;
->> +	txq = netdev_get_tx_queue(dev, q->queue_index);
->> +	rcu_read_unlock();
-> 
-> If the dev is only safe to be accessed inside an RCU readside critical
-> section, is it safe to use txq outside of it?
-> 
-
-You are right, this might be a bad idea as the queues might be messed with.
-However, I am not sure how to access the txq in another way?
-
->> +	return txq;
->> +}
->> +EXPORT_SYMBOL_GPL(tap_get_netdev_queue);
->> +
->>  struct ptr_ring *tap_get_ptr_ring(struct file *file)
->>  {
->>  	struct tap_queue *q;
->> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
->> index cc6c50180663..30ddcd20fcd3 100644
->> --- a/drivers/net/tun.c
->> +++ b/drivers/net/tun.c
->> @@ -1060,13 +1060,16 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
->>  
->>  	nf_reset_ct(skb);
->>  
->> -	if (ptr_ring_produce(&tfile->tx_ring, skb)) {
->> +	queue = netdev_get_tx_queue(dev, txq);
->> +	if (unlikely(ptr_ring_produce(&tfile->tx_ring, skb))) {
->> +		netif_tx_stop_queue(queue);
->>  		drop_reason = SKB_DROP_REASON_FULL_RING;
-> 
-> again, stop the queue before dropping is needed. Which is what the
-> new ptr_ring_full code below does I guess. If so, when is this reached?
-> 
-
-Yes, you are right this is what the ptr_ring_full code below does. It is 
-reached when a SKB is successfully inserted into the tx_ring and with that 
-the tx_ring becomes full. Then the queue is stopped which avoids packet 
-drops.
-
->>  		goto drop;
->>  	}
->> +	if (ptr_ring_full(&tfile->tx_ring))
->> +		netif_tx_stop_queue(queue);
->>  
->>  	/* dev->lltx requires to do our own update of trans_start */
->> -	queue = netdev_get_tx_queue(dev, txq);
->>  	txq_trans_cond_update(queue);
->>  
->>  	/* Notify and wake up reader process */
->> @@ -2110,9 +2113,10 @@ static ssize_t tun_put_user(struct tun_struct *tun,
->>  	return total;
->>  }
->>  
->> -static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
->> +static void *tun_ring_recv(struct tun_struct *tun, struct tun_file *tfile, int noblock, int *err)
->>  {
->>  	DECLARE_WAITQUEUE(wait, current);
->> +	struct netdev_queue *txq;
->>  	void *ptr = NULL;
->>  	int error = 0;
->>  
->> @@ -2124,6 +2128,7 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
->>  		goto out;
->>  	}
->>  
->> +	txq = netdev_get_tx_queue(tun->dev, tfile->queue_index);
->>  	add_wait_queue(&tfile->socket.wq.wait, &wait);
->>  
->>  	while (1) {
->> @@ -2131,6 +2136,9 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
->>  		ptr = ptr_ring_consume(&tfile->tx_ring);
->>  		if (ptr)
->>  			break;
->> +
->> +		netif_tx_wake_queue(txq);
->> +
->>  		if (signal_pending(current)) {
->>  			error = -ERESTARTSYS;
->>  			break;
->> @@ -2147,6 +2155,10 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
->>  	remove_wait_queue(&tfile->socket.wq.wait, &wait);
->>  
->>  out:
->> +	if (ptr_ring_empty(&tfile->tx_ring)) {
->> +		txq = netdev_get_tx_queue(tun->dev, tfile->queue_index);
->> +		netif_tx_wake_queue(txq);
->> +	}
->>  	*err = error;
->>  	return ptr;
->>  }
->> @@ -2165,7 +2177,7 @@ static ssize_t tun_do_read(struct tun_struct *tun, struct tun_file *tfile,
->>  
->>  	if (!ptr) {
->>  		/* Read frames from ring */
->> -		ptr = tun_ring_recv(tfile, noblock, &err);
->> +		ptr = tun_ring_recv(tun, tfile, noblock, &err);
->>  		if (!ptr)
->>  			return err;
->>  	}
->> @@ -3712,6 +3724,25 @@ struct socket *tun_get_socket(struct file *file)
->>  }
->>  EXPORT_SYMBOL_GPL(tun_get_socket);
->>  
->> +struct netdev_queue *tun_get_netdev_queue(struct file *file)
->> +{
->> +	struct netdev_queue *txq;
->> +	struct net_device *dev;
->> +	struct tun_file *tfile;
->> +
->> +	if (file->f_op != &tun_fops)
->> +		return ERR_PTR(-EINVAL);
->> +	tfile = file->private_data;
->> +	if (!tfile)
->> +		return ERR_PTR(-EBADFD);
->> +	rcu_read_lock();
->> +	dev = rcu_dereference(tfile->tun)->dev;
->> +	txq = netdev_get_tx_queue(dev, tfile->queue_index);
->> +	rcu_read_unlock();
->> +	return txq;
->> +}
->> +EXPORT_SYMBOL_GPL(tun_get_netdev_queue);
->> +
->>  struct ptr_ring *tun_get_tx_ring(struct file *file)
->>  {
->>  	struct tun_file *tfile;
->> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
->> index 6edac0c1ba9b..045fc31c59ff 100644
->> --- a/drivers/vhost/net.c
->> +++ b/drivers/vhost/net.c
->> @@ -130,6 +130,7 @@ struct vhost_net_virtqueue {
->>  	struct vhost_net_buf rxq;
->>  	/* Batched XDP buffs */
->>  	struct xdp_buff *xdp;
->> +	struct netdev_queue *netdev_queue;
->>  };
->>  
->>  struct vhost_net {
->> @@ -182,6 +183,8 @@ static int vhost_net_buf_produce(struct vhost_net_virtqueue *nvq)
->>  	rxq->head = 0;
->>  	rxq->tail = ptr_ring_consume_batched(nvq->rx_ring, rxq->queue,
->>  					      VHOST_NET_BATCH);
->> +	if (ptr_ring_empty(nvq->rx_ring))
->> +		netif_tx_wake_queue(nvq->netdev_queue);
->>  	return rxq->tail;
->>  }
->>  
->> @@ -1469,6 +1472,21 @@ static struct socket *get_raw_socket(int fd)
->>  	return ERR_PTR(r);
->>  }
->>  
->> +static struct netdev_queue *get_tap_netdev_queue(struct file *file)
->> +{
->> +	struct netdev_queue *q;
->> +
->> +	q = tun_get_netdev_queue(file);
->> +	if (!IS_ERR(q))
->> +		goto out;
->> +	q = tap_get_netdev_queue(file);
->> +	if (!IS_ERR(q))
->> +		goto out;
->> +	q = NULL;
->> +out:
->> +	return q;
->> +}
->> +
->>  static struct ptr_ring *get_tap_ptr_ring(struct file *file)
->>  {
->>  	struct ptr_ring *ring;
->> @@ -1570,10 +1588,12 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
->>  		if (r)
->>  			goto err_used;
->>  		if (index == VHOST_NET_VQ_RX) {
->> -			if (sock)
->> +			if (sock) {
->>  				nvq->rx_ring = get_tap_ptr_ring(sock->file);
->> -			else
->> +				nvq->netdev_queue = get_tap_netdev_queue(sock->file);
->> +			} else {
->>  				nvq->rx_ring = NULL;
->> +			}
->>  		}
->>  
->>  		oldubufs = nvq->ubufs;
->> diff --git a/include/linux/if_tap.h b/include/linux/if_tap.h
->> index 553552fa635c..b15c40c86819 100644
->> --- a/include/linux/if_tap.h
->> +++ b/include/linux/if_tap.h
->> @@ -10,6 +10,7 @@ struct socket;
->>  
->>  #if IS_ENABLED(CONFIG_TAP)
->>  struct socket *tap_get_socket(struct file *);
->> +struct netdev_queue *tap_get_netdev_queue(struct file *file);
->>  struct ptr_ring *tap_get_ptr_ring(struct file *file);
->>  #else
->>  #include <linux/err.h>
->> @@ -18,6 +19,10 @@ static inline struct socket *tap_get_socket(struct file *f)
->>  {
->>  	return ERR_PTR(-EINVAL);
->>  }
->> +static inline struct netdev_queue *tap_get_netdev_queue(struct file *f)
->> +{
->> +	return ERR_PTR(-EINVAL);
->> +}
->>  static inline struct ptr_ring *tap_get_ptr_ring(struct file *f)
->>  {
->>  	return ERR_PTR(-EINVAL);
->> diff --git a/include/linux/if_tun.h b/include/linux/if_tun.h
->> index 80166eb62f41..552eb35f0299 100644
->> --- a/include/linux/if_tun.h
->> +++ b/include/linux/if_tun.h
->> @@ -21,6 +21,7 @@ struct tun_msg_ctl {
->>  
->>  #if defined(CONFIG_TUN) || defined(CONFIG_TUN_MODULE)
->>  struct socket *tun_get_socket(struct file *);
->> +struct netdev_queue *tun_get_netdev_queue(struct file *file);
->>  struct ptr_ring *tun_get_tx_ring(struct file *file);
->>  
->>  static inline bool tun_is_xdp_frame(void *ptr)
->> @@ -50,6 +51,11 @@ static inline struct socket *tun_get_socket(struct file *f)
->>  	return ERR_PTR(-EINVAL);
->>  }
->>  
->> +static inline struct netdev_queue *tun_get_netdev_queue(struct file *f)
->> +{
->> +	return ERR_PTR(-EINVAL);
->> +}
->> +
->>  static inline struct ptr_ring *tun_get_tx_ring(struct file *f)
->>  {
->>  	return ERR_PTR(-EINVAL);
->> -- 
->> 2.43.0
->>
-> 
-> 
 
