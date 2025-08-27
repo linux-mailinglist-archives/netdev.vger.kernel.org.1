@@ -1,71 +1,112 @@
-Return-Path: <netdev+bounces-217099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A776CB375C6
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 02:02:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32B92B3760B
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 02:20:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 581857C0047
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 00:02:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D63E189EA91
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 00:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FAA720ED;
-	Wed, 27 Aug 2025 00:02:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CF2284A2B;
+	Wed, 27 Aug 2025 00:20:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W/7SNo5Q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gIcHo2Au"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78B6F189;
-	Wed, 27 Aug 2025 00:02:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4015F219EB;
+	Wed, 27 Aug 2025 00:20:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756252960; cv=none; b=mqbTP3uoI+XKfgjj9uEOeN17C5yfpVs9ugbNW8RC+1pOeoMSInjd+x9ZwHPW6vkGrWzcbiSKmbb7rMx45gtD59GgBgfCu93DZvcB9TBbw62s/dCuA+MG04CUNyc4n5lkaKoIQFKADUFbB5d7MHv2p6HnTU1Uvc5sr7uKEdDGxMw=
+	t=1756254002; cv=none; b=iLbjFyBe6t8s7/RScs7PwlEIy7v0C4riPKqLL5HehximiZXqqK+xSmfnOGSUZp3nxGzJf3hYGv1EatkWhreccq6uw+VWPlXYUikb5haFpW5f4gIP2hVSG+JDy0kB6ppGJvB1EJWMZiYFaR62q+Qj16zU/B0FzRrncVz2nRnPFVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756252960; c=relaxed/simple;
-	bh=ZFEKkcmzQf9xYxqrEb9OKbXitIi2zDjpRGT/RGXKm1Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ScmXzMGLTV5Vw55o/e1vOUV79ru/gnBTx5BR+9ILezVNXFefgWHAFvfItm2L9RZ+QnRBOMT9IzGC8yoWvc/z49EWwvNrVB+A2bC5Ie589sfkN05VoDR15UlYNFSHG3F6rDirSsxXuAVOVP5BpHwCAiI6EXQqie/u389PDoCEQ9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W/7SNo5Q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D414C4CEF1;
-	Wed, 27 Aug 2025 00:02:39 +0000 (UTC)
+	s=arc-20240116; t=1756254002; c=relaxed/simple;
+	bh=CUqjJTDn42AU9aihGGGRqwzymVVnZVgyspIVU6cz4BI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=BYLpszm5INdeUQxiY37c9M6/sVt9r/MFvOgKyRL9Gy5GeQ2ZtMtETOk96g6Ma1g8gpSMbVOBNE0C8Opnp2coc9hF4ge3hLQhY28tw+U4lrZdfIZJQKfR+OVFDQhGYYKXmu6W7KjWUSTaWVnvQxgfx7eeFREK56774w73niracCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gIcHo2Au; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEBE4C4CEF1;
+	Wed, 27 Aug 2025 00:20:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756252960;
-	bh=ZFEKkcmzQf9xYxqrEb9OKbXitIi2zDjpRGT/RGXKm1Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=W/7SNo5Q8/0kaZbHBjpqtEp91cgacqq/wJp4/VB5GHO5y12coCmfIjX6bZDdm//E3
-	 WWqOJjOhSpEV1aNbnjyCNTf+aJt4kb+Yj/dignBZQpy6fMfMxoaPLWN+F3sRht5iol
-	 67264mAJFZ83eSWnIys6QNf5zNe3ji4ZwsMn2ROelSJg8F+vnjhV3auxzD1RTeUI9t
-	 Pa+WSu3WCMbH1gfgJGUh8NlvESN34DErTCLkWpfkGYSXrNIW69XWzK1qS7DjEV96qX
-	 JSL8g3ywTFOVmYg62IGmeWauhemiG7ICje6ftphmevivcpasnf0KHXCYAsvRyFmoEb
-	 axY2wL3Iz8lmg==
-Date: Tue, 26 Aug 2025 17:02:38 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: qianjiaru77@gmail.com
-Cc: michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/1] VF Resource State Inconsistency Vulnerability in
- Linux bnxt_en Driver
-Message-ID: <20250826170238.6014a818@kernel.org>
-In-Reply-To: <20250826162541.34705-1-qianjiaru77@gmail.com>
-References: <20250826162541.34705-1-qianjiaru77@gmail.com>
+	s=k20201202; t=1756254000;
+	bh=CUqjJTDn42AU9aihGGGRqwzymVVnZVgyspIVU6cz4BI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=gIcHo2AuyWKJotZssrpdk7L0eZ//QzifIcYL1GhIYtAT+NmjTdCss/9jH7ZtQsUXE
+	 o6IjhM+plquBwmvTNt6T7LTAuyYXhtQ1+FujMHDleuQfEeUdh5z2m4FVtxQmEd+AhL
+	 Ch9kum+n9fBfRIRYccnpjcPQSX6csSKMP43oAyI5NkzE9vLODPhdaTUVkja8eZ/A/O
+	 xfCGsBlTqhUWn0duEHZTHfNXqAQc8QsWX70DBgch7fYNPLZoGagn9bwpZz1/HxkSSr
+	 gNX1sQyWV31vjgBDj7OTrWSIJp1LVx+unxAE/yeyTWiBFpSDktvNC3MKrg/vKog0qz
+	 1BOmAYRinKD3g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB5A9383BF70;
+	Wed, 27 Aug 2025 00:20:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] net: usb: qmi_wwan: add Telit Cinterion LE910C4-WWX new
+ compositions
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175625400775.147674.147296191175890132.git-patchwork-notify@kernel.org>
+Date: Wed, 27 Aug 2025 00:20:07 +0000
+References: <20250822091324.39558-1-Fabio.Porcedda@telit.com>
+In-Reply-To: <20250822091324.39558-1-Fabio.Porcedda@telit.com>
+To: Fabio Porcedda <fabio.porcedda@gmail.com>
+Cc: bjorn@mork.no, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-usb@vger.kernel.org, dnlplm@gmail.com,
+ stable@vger.kernel.org
 
-On Wed, 27 Aug 2025 00:25:41 +0800 qianjiaru77@gmail.com wrote:
-> Subject: [PATCH 1/1] VF Resource State Inconsistency Vulnerability in Linux bnxt_en Driver
+Hello:
 
-If you want this to be merged please read process documentation, 
-or at least git history for the relevant code and format the commit
-message correctly. I'm dropping your 3 submissions from networking
-patch review.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri, 22 Aug 2025 11:13:24 +0200 you wrote:
+> From: Fabio Porcedda <fabio.porcedda@gmail.com>
+> 
+> Add the following Telit Cinterion LE910C4-WWX new compositions:
+> 
+> 0x1034: tty (AT) + tty (AT) + rmnet
+> T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  8 Spd=480 MxCh= 0
+> D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+> P:  Vendor=1bc7 ProdID=1034 Rev=00.00
+> S:  Manufacturer=Telit
+> S:  Product=LE910C4-WWX
+> S:  SerialNumber=93f617e7
+> C:  #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=500mA
+> I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=ff Driver=option
+> E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=2ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=fe Prot=ff Driver=option
+> E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=83(I) Atr=03(Int.) MxPS=  64 Ivl=2ms
+> E:  Ad=84(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> I:  If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=ff Driver=qmi_wwan
+> E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=85(I) Atr=03(Int.) MxPS=  64 Ivl=2ms
+> E:  Ad=86(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> 
+> [...]
+
+Here is the summary with links:
+  - net: usb: qmi_wwan: add Telit Cinterion LE910C4-WWX new compositions
+    https://git.kernel.org/netdev/net/c/e81a7f65288c
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
