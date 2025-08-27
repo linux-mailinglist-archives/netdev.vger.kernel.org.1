@@ -1,197 +1,179 @@
-Return-Path: <netdev+bounces-217285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFDF4B382E4
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 14:54:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81D97B38315
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 14:58:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EDD41BA1F94
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 12:54:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18834685BDF
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 12:58:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85A9134AB1A;
-	Wed, 27 Aug 2025 12:54:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 965CD34F463;
+	Wed, 27 Aug 2025 12:57:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bGzekVmZ"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="cYBYpS5Z";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="AHOjvoa1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF5D234DCD2
-	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 12:54:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D4A350D53
+	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 12:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756299248; cv=none; b=CcNuMJi6YfDjO/h6ahpdSX3238Fz5ZZzomCGmvvqePyRQdgZzfjPmFPcWkD1gyMrezu/BoziYPo5iuc/U6D4+p9Ii3j+Wyq2NEMbFT0zktLfrRdY/8MKvFn6AtEU2yo8hvtnQDBgERbIMkFh7RhcykgVlycypU/Ikm/6b3DMvlY=
+	t=1756299462; cv=none; b=mV7cW68tV0O8xsz7CIBVAt2e4tyaKFMuHP5hJ5zXjWuy+ftvFLivV3iD79b4GdOVILolJs2xk+9Ei2uaU59V8s155b/HlFU6OcaOgrzQ9mYDnAAYnG+jH9k9L/CzoYgv0ZzUPkMshqe0ohCFSc9JKLyhuo9BaN/tNl/iBKxoWYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756299248; c=relaxed/simple;
-	bh=t7keYkahwLI3m1DIEtzWANMbakVd/tBC1sDtUz/sOpc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=aVJKaIT8BhhIhx+FtwwfxPFYHGM6jqjsJXTBZnOxuMvgNRUCFZ/oBnvbaEAFbQG4mxNxMzExFBjH1lALnPdvR2a1sAUJHQoZeuLaiSw+sjKdMRjAhdof/Aoy0QhAWo7UuOHBpvPOqVyPg7YJ6R48kEFMUTfqoW7zxab/SV/CwLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bGzekVmZ; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7f674810ddbso316570585a.3
-        for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 05:54:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756299244; x=1756904044; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cF1clRdyNjbempIEUQ66e1bj2W1Th4RhUSzzw5xkIeE=;
-        b=bGzekVmZWba7LCkXHJ64O7xKH4EXIFf9F2VxngluJ+xff7NtJgq0olwpJ+wCM1Iktl
-         G90oZNoNwhSEEtps+V6XRwim+JFhbyHDxCh4OmMxkIUogXOoEYejFNovT19gfVNPD+Ju
-         8mb4MVpFV8Uin1DwA9GBmDAi20iJ531IEcZTQtUyFEMpTvs6J4I1eDb7+CJHVzT8OHoa
-         HAm7gag0waQEIroU2HGEM5S5xIdh6Ux/0USKuPztJKSg5UutdAsWvoPjjxqKLuaD9osJ
-         7UFVhuxnbUTDx488rqfxNnbksSvunHzoqoiPQpfCSNVPH1XWwMrDe6yVN119Tex1H9FA
-         UnVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756299244; x=1756904044;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cF1clRdyNjbempIEUQ66e1bj2W1Th4RhUSzzw5xkIeE=;
-        b=OidXW7TeXjBU0DFrS7o5DFX3JfervsWJgWqLEAYOWvjQ6kXmxyTWYgKLFwakHijRvk
-         1w4Nlxq490H9Ic1b5N4LoWYgp0Q1uNNVAvw1VNP/OnjoJPWcjq6k+MyLQcvb2/p0EIIB
-         JBcVRStfBZSKBbShTh4WeXIoSWTuvcIghzvk4jhJNM6ZwEJ2bCrBiu16O1lER1sfrxAh
-         /W4LXtscfcxY6TojwnHUvK5+HQ3BphsnGhma7s7ew/7atr3i51bJJp/WdRV7Qd19mLj2
-         tR+xlk0m6SrkGvi6z+zO3iq1TNd+3rGF/KgkNaxnrYrqotBvJjOSn+0o91xOgruEXnPR
-         LwEA==
-X-Forwarded-Encrypted: i=1; AJvYcCWbRSk3dcDHxfAsiRmllfisaoG5/Sr3zHZDDeOIqXZD3dESP6ZopJYGK9MJMfnijX11veOEcEE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxP+gsSe8TSVpo9bMnjKwMleM4OF0bHM9R//EnYpBh/53M5hoIn
-	4BVXlcNVLGbvNZm7uZisuoLDMOVK03IFJ7M1v9kZHa61fkXzwmJizemj39SX9eh0PYavVw5G17L
-	Va0RO2oGmELf6kw==
-X-Google-Smtp-Source: AGHT+IE0+QY78Gqw0blamf5DEd5j2GU1hN7GGlLHPcUfrQzy7xHr9SwzsQG7cnlYW1SPV90PHEhGWJLJ5/yG4A==
-X-Received: from qkbdx10.prod.google.com ([2002:a05:620a:608a:b0:7e8:7199:dfc9])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:2995:b0:7e6:9ce4:198a with SMTP id af79cd13be357-7ea11068c07mr2283821385a.43.1756299244608;
- Wed, 27 Aug 2025 05:54:04 -0700 (PDT)
-Date: Wed, 27 Aug 2025 12:53:49 +0000
-In-Reply-To: <20250827125349.3505302-1-edumazet@google.com>
+	s=arc-20240116; t=1756299462; c=relaxed/simple;
+	bh=ygxOk/LkhqL6HuDXdX9Yy9ooczBaUoJL77YHePSVVv4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=lj+swn/icaC6KPQZYkTSWGYMSiBUsaZBwFO1PiTTBedHRV9OxWvc/6uI5+GyzS076M3Agm3Bxc2YfoMjm68y32CvN46PpudVQmQ94tPC0i84yuiz4xu5d4cFJv0ZHaNw90ghcdXlUc8E0olylImUsHnowYY0QTW4rVSr2ZV1sNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=cYBYpS5Z; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=AHOjvoa1; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1756299457;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lV5YY2KxYAYcMrdQAvjAnPLYR/NFDUczGvU03DTrv/I=;
+	b=cYBYpS5ZxYCk3mIG9ubOSXUfqCVpqX/4k+pWHMqYK1jzVwF8WeW4BeE8CHUj9Y7RqlRNhB
+	2+dHhvFQ9z7xorK05g0NxgRBQhbBP9ZvYCP/cfMC186R4DR4In+X92Vooa+G8SL60DrTkp
+	NM2mjJoOt3BApEJskjeckAabU9MZJAn7G8IDaaQJ6lowzbcvQmZGkydmqDinif4EvdgafO
+	pynEJ3tCGAjVnic/NOCrOerA4B6CEaB+FWnvmRHwSrq/3xx5WC6Q1lMxMgWquAUOsDBVsq
+	4zvWQxedvFVM5xI6LvraW9nr8Y/15kvNt0OFoPtUi+yVQ8MCizGrj1Vj8REo1A==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1756299457;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lV5YY2KxYAYcMrdQAvjAnPLYR/NFDUczGvU03DTrv/I=;
+	b=AHOjvoa10tLSvMo2jnKhGgp6pngYPLAqQyt6Xe6h+jonmBKlnk2fr0t3w4pfYX58JeRntY
+	G+T0KYbHT9lchpCA==
+To: Jacob Keller <jacob.e.keller@intel.com>, Sebastian Andrzej Siewior
+ <bigeasy@linutronix.de>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>, Paul Menzel
+ <pmenzel@molgen.mpg.de>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Miroslav Lichvar <mlichvar@redhat.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-next v2] igb: Convert Tx timestamping to PTP aux worker
+In-Reply-To: <e656a4ee-281c-4205-9183-bc3c7dbc9173@intel.com>
+References: <20250822-igb_irq_ts-v2-1-1ac37078a7a4@linutronix.de>
+ <20250822075200.L8_GUnk_@linutronix.de> <87ldna7axr.fsf@jax.kurt.home>
+ <02d40de4-5447-45bf-b839-f22a8f062388@intel.com>
+ <20250826125912.q0OhVCZJ@linutronix.de>
+ <e656a4ee-281c-4205-9183-bc3c7dbc9173@intel.com>
+Date: Wed, 27 Aug 2025 14:57:36 +0200
+Message-ID: <87ecswq5vj.fsf@jax.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250827125349.3505302-1-edumazet@google.com>
-X-Mailer: git-send-email 2.51.0.261.g7ce5a0a67e-goog
-Message-ID: <20250827125349.3505302-5-edumazet@google.com>
-Subject: [PATCH net-next 4/4] net_sched: act_skbmod: use RCU in tcf_skbmod_dump()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-Also storing tcf_action into struct tcf_skbmod_params
-makes sure there is no discrepancy in tcf_skbmod_act().
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-No longer block BH in tcf_skbmod_init() when acquiring tcf_lock.
+On Tue Aug 26 2025, Jacob Keller wrote:
+> On 8/26/2025 5:59 AM, Sebastian Andrzej Siewior wrote:
+>> On 2025-08-25 16:28:38 [-0700], Jacob Keller wrote:
+>>> Ya, I don't think we fully understand either. Miroslav said he tested on
+>>> I350 which is a different MAC from the I210, so it could be something
+>>> there. Theoretically we could handle just I210 directly in the interrupt
+>>> and leave the other variants to the kworker.. but I don't know how much
+>>> benefit we get from that. The data sheet for the I350 appears to have
+>>> more or less the same logic for Tx timestamps. It is significantly
+>>> different for Rx timestamps though.
+>>=20
+>> From logical point of view it makes sense to retrieve the HW timestamp
+>> immediately when it becomes available and feed it to the stack. I can't
+>> imagine how delaying it to yet another thread improves the situation.
+>> The benchmark is about > 1k packets/ second while in reality you have
+>> less than 20 packets a second. With multiple applications you usually
+>> need a "second timestamp register" or you may lose packets.
+>>=20
+>> Delaying it to the AUX worker makes sense for hardware which can't fire
+>> an interrupt and polling is the only option left. This is sane in this
+>> case but I don't like this solution as some kind compromise for
+>> everyone. Simply because it adds overhead and requires additional
+>> configuration.
+>>=20
+>
+> I agree. Its just frustrating that doing so appears to cause a
+> regression in at least one test setup on hardware which uses this method.
+>
+>>>> Also I couldn't really see a performance degradation with ntpperf. In =
+my
+>>>> tests the IRQ variant reached an equal or higher rate. But sometimes I
+>>>> get 'Could not send requests at rate X'. No idea what that means.
+>>>>
+>>>> Anyway, this patch is basically a compromise. It works for Miroslav and
+>>>> my use case.
+>>>>
+>>>>> This is also what the igc does and the performance improved
+>>>>> 	afa141583d827 ("igc: Retrieve TX timestamp during interrupt handling=
+")
+>>>>>
+>>>
+>>> igc supports several hardware variations which are all a lot similar to
+>>> i210 than i350 is to i210 in igb. I could see this working fine for i210
+>>> if it works fine in igb.. I honestly am at a loss currently why i350 is
+>>> much worse.
+>>>
+>>>>> and here it causes the opposite?
+>>>>
+>>>> As said above, I'm out of ideas here.
+>>>>
+>>>
+>>> Same. It may be one of those things where the effort to dig up precisely
+>>> what has gone wrong is so large that it becomes not feasible relative to
+>>> the gain :(
+>>=20
+>> Could we please use the direct retrieval/ submission for HW which
+>> supports it and fallback to the AUX worker (instead of the kworker) for
+>> HW which does not have an interrupt for it?
+>>=20
+>
+> I have no objection. Perhaps we could assume the high end of the ntpperf
+> benchmark is not reflective of normal use case? We *are* limited to only
+> one timestamp register, which the igb driver does protect by bitlock.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/net/tc_act/tc_skbmod.h |  1 +
- net/sched/act_skbmod.c         | 26 ++++++++++++--------------
- 2 files changed, 13 insertions(+), 14 deletions(-)
+Does that mean we're going back to v1 + the AUX worker for 82576? Let me
+prepare v3 then.
 
-diff --git a/include/net/tc_act/tc_skbmod.h b/include/net/tc_act/tc_skbmod.h
-index 7c240d2fed4e3cdf686016588cd78eb52b80765b..626704cd6241b37f20539f9dd1270275ba19e578 100644
---- a/include/net/tc_act/tc_skbmod.h
-+++ b/include/net/tc_act/tc_skbmod.h
-@@ -12,6 +12,7 @@
- struct tcf_skbmod_params {
- 	struct rcu_head	rcu;
- 	u64	flags; /*up to 64 types of operations; extend if needed */
-+	int	action;
- 	u8	eth_dst[ETH_ALEN];
- 	u16	eth_type;
- 	u8	eth_src[ETH_ALEN];
-diff --git a/net/sched/act_skbmod.c b/net/sched/act_skbmod.c
-index dc022969346188c17a43f3ef40f3c203272954c4..fce625eafcb2b793cba7bebb740b136bf8498aa1 100644
---- a/net/sched/act_skbmod.c
-+++ b/net/sched/act_skbmod.c
-@@ -27,19 +27,18 @@ TC_INDIRECT_SCOPE int tcf_skbmod_act(struct sk_buff *skb,
- 				     struct tcf_result *res)
- {
- 	struct tcf_skbmod *d = to_skbmod(a);
--	int action, max_edit_len, err;
- 	struct tcf_skbmod_params *p;
-+	int max_edit_len, err;
- 	u64 flags;
- 
- 	tcf_lastuse_update(&d->tcf_tm);
- 	bstats_update(this_cpu_ptr(d->common.cpu_bstats), skb);
- 
--	action = READ_ONCE(d->tcf_action);
--	if (unlikely(action == TC_ACT_SHOT))
-+	p = rcu_dereference_bh(d->skbmod_p);
-+	if (unlikely(p->action == TC_ACT_SHOT))
- 		goto drop;
- 
- 	max_edit_len = skb_mac_header_len(skb);
--	p = rcu_dereference_bh(d->skbmod_p);
- 	flags = p->flags;
- 
- 	/* tcf_skbmod_init() guarantees "flags" to be one of the following:
-@@ -85,7 +84,7 @@ TC_INDIRECT_SCOPE int tcf_skbmod_act(struct sk_buff *skb,
- 		INET_ECN_set_ce(skb);
- 
- out:
--	return action;
-+	return p->action;
- 
- drop:
- 	qstats_overlimit_inc(this_cpu_ptr(d->common.cpu_qstats));
-@@ -193,9 +192,9 @@ static int tcf_skbmod_init(struct net *net, struct nlattr *nla,
- 	}
- 
- 	p->flags = lflags;
--
-+	p->action = parm->action;
- 	if (ovr)
--		spin_lock_bh(&d->tcf_lock);
-+		spin_lock(&d->tcf_lock);
- 	/* Protected by tcf_lock if overwriting existing action. */
- 	goto_ch = tcf_action_set_ctrlact(*a, parm->action, goto_ch);
- 	p_old = rcu_dereference_protected(d->skbmod_p, 1);
-@@ -209,7 +208,7 @@ static int tcf_skbmod_init(struct net *net, struct nlattr *nla,
- 
- 	rcu_assign_pointer(d->skbmod_p, p);
- 	if (ovr)
--		spin_unlock_bh(&d->tcf_lock);
-+		spin_unlock(&d->tcf_lock);
- 
- 	if (p_old)
- 		kfree_rcu(p_old, rcu);
-@@ -248,10 +247,9 @@ static int tcf_skbmod_dump(struct sk_buff *skb, struct tc_action *a,
- 	opt.index   = d->tcf_index;
- 	opt.refcnt  = refcount_read(&d->tcf_refcnt) - ref;
- 	opt.bindcnt = atomic_read(&d->tcf_bindcnt) - bind;
--	spin_lock_bh(&d->tcf_lock);
--	opt.action = d->tcf_action;
--	p = rcu_dereference_protected(d->skbmod_p,
--				      lockdep_is_held(&d->tcf_lock));
-+	rcu_read_lock();
-+	p = rcu_dereference(d->skbmod_p);
-+	opt.action = p->action;
- 	opt.flags  = p->flags;
- 	if (nla_put(skb, TCA_SKBMOD_PARMS, sizeof(opt), &opt))
- 		goto nla_put_failure;
-@@ -269,10 +267,10 @@ static int tcf_skbmod_dump(struct sk_buff *skb, struct tc_action *a,
- 	if (nla_put_64bit(skb, TCA_SKBMOD_TM, sizeof(t), &t, TCA_SKBMOD_PAD))
- 		goto nla_put_failure;
- 
--	spin_unlock_bh(&d->tcf_lock);
-+	rcu_read_unlock();
- 	return skb->len;
- nla_put_failure:
--	spin_unlock_bh(&d->tcf_lock);
-+	rcu_read_unlock();
- 	nlmsg_trim(skb, b);
- 	return -1;
- }
--- 
-2.51.0.261.g7ce5a0a67e-goog
+Thanks,
+Kurt
 
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmivAMATHGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgn09EACundGRrW9W+DW5FnYEnEYmdeuhJ/Su
+bZqDYZo6QCYGY1/M7hPGPcBM1USaiwdNDv/MnzhkWqdZmBNcIeQDL7PHJr+5MIMi
+gFvQxpGAq6o95sTcMWXtOjfEHIRVb0BYC4badCIHsdAx5kP7n/389D1jYUxXM1dz
+Ssj5mgAb1lYzsj4TdNKIFo/iHWCvSgSwKqrs51g6UUCLKi3x1ne4KQQiJVwoShD9
+g8u4vuz3MS8d2Yga1q7OPIITHIL5nAgE8/4q2pbfKsaoMklickhtS5OWI8NpHjSe
+GSFAeYh2svBI7DOPbaPUD8USTfW22he3DGdBERr6x+QJ6GyNSIAzQPLRJ2ySuU3z
+8iKyR3U50wvC/Ak4hLzkj5/XsauNNdxKG3NhDcz+boj7blHM0KwUcJcAo5ogvFd+
+qXY8dckvCp41yvieHCPlaZ2zs0xRzA3t66syt4oi1AGAJGBczfb0rLtsfGZWtUK4
+6KfLutlEzkJYk83VekNxrDFW71VZ49EAGXC52cUmQFX/DhYR2BKZLOoor/wYUzf+
+munnmDUXcH7d9BPlJ7FO19UdD4LAYs0FYhSjjgMY6msm29lYcCuexwFPJ3PJ0wbh
+kPhta3ViNj49dD6D4AtCgwKeILaBGhPO7kBA899ZxjyhsboGhoemiW8k2zY/uNf4
+SiFdfVM5vPlP4A==
+=51tg
+-----END PGP SIGNATURE-----
+--=-=-=--
 
