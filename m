@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-217168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9ABCB37AC1
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 08:48:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26BD5B37ABE
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 08:48:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46C5F3B877F
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 06:48:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E3CF1B617C3
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 06:48:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9649278170;
-	Wed, 27 Aug 2025 06:48:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79EE9278170;
+	Wed, 27 Aug 2025 06:48:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
+Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26A28A55
-	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 06:48:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A50B218AB4
+	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 06:48:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756277303; cv=none; b=QZw4P/7YZ47JSxYqPvsP63dL3ghohFAJ/OdVs4NE7663b47R117lbpjVlJgoQUmdFsAmeA5rHLI/l6x3uOpJ9KOryqNqQI8CByqIygatOwBBav2K98qOU8oBfy1qCuytQrmSugmiOWBHsYbnC/llmB+9cMKC03vdgoyhNCqN66o=
+	t=1756277293; cv=none; b=omrl2JBMZMJqguNw6fYy+LZCZg/pa+5E+F/yHfomhqgd+oGgNHCa8WJfzg4IVRE38wt/PIaW8ENiPubQTGhrgp3PBNfy0k762u2ebd+DrUG2eN+0G2EjkZhgLweDIYPqeUHypCG0NbtPMKRzgUCg88z+l3379XGccOZG1maK8ek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756277303; c=relaxed/simple;
-	bh=TeeR9SNqUxnZKklV2+V4CZGDMbZoup5Ii48viD+jawY=;
+	s=arc-20240116; t=1756277293; c=relaxed/simple;
+	bh=+NgSGu4iA4f5vCfDkyfNZMeBmwuC3tLiYMiLCAV3A6Q=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Wfqz+F/8MEuu7b1xy/SzfKBvK1Y1oGaYELgDecm0Cf6J1OJkng0xsw90wecw9SFuvqbPR0L0eQsa+MOc1gCiV/Jc1HQ926MXsDUa+mnMr2TcdlO06d2k1tyOHqMaLOQXWGKhc6+RLrX8E3cNCILIa6AzzqFDAncleaO7kTJIIcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.92.39.34
+	 MIME-Version; b=VmUZbLv+SrDWxP3i58ipV39bX993A4tCKJTZfbnLOUbzq6UA6XUhZW/FMoW/u+d7aOPdxKoRgJm32Mowj/t7zy9UzdCKAs3YuYH5XKUlL9Fk7dEru7UIwK4SOJ4T0qL1dqkCZj2C7euH5FIrIxgkFWdZBadjVDZlfw2fhor7v+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.204.34.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: zesmtpgz8t1756277216t46721afa
-X-QQ-Originating-IP: X/c0+75w4aisH3FrS2flk7zTBUnifgifSsWFyWkfHdk=
+X-QQ-mid: zesmtpgz8t1756277218t4c7554d6
+X-QQ-Originating-IP: OSW4fHn6OHaZHguZMHhKER2sQw4dRG7ngLey92lJU2s=
 Received: from lap-jiawenwu.trustnetic.com ( [60.188.194.79])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 27 Aug 2025 14:46:54 +0800 (CST)
+	id ; Wed, 27 Aug 2025 14:46:57 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 5294194605172644418
+X-BIZMAIL-ID: 14614664731754484277
 EX-QQ-RecipientCnt: 9
 From: Jiawen Wu <jiawenwu@trustnetic.com>
 To: netdev@vger.kernel.org,
@@ -48,9 +48,9 @@ To: netdev@vger.kernel.org,
 	Simon Horman <horms@kernel.org>
 Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
 	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next 1/2] net: libwx: support multiple RSS for every pool
-Date: Wed, 27 Aug 2025 14:46:33 +0800
-Message-Id: <20250827064634.18436-2-jiawenwu@trustnetic.com>
+Subject: [PATCH net-next 2/2] net: wangxun: add RSS reta and rxfh fields support
+Date: Wed, 27 Aug 2025 14:46:34 +0800
+Message-Id: <20250827064634.18436-3-jiawenwu@trustnetic.com>
 X-Mailer: git-send-email 2.21.0.windows.1
 In-Reply-To: <20250827064634.18436-1-jiawenwu@trustnetic.com>
 References: <20250827064634.18436-1-jiawenwu@trustnetic.com>
@@ -63,313 +63,275 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: MP1WLfctJNZWIi05xSdtzpUKeVHnibbPgW7WuDAC3JVuu9BwFRqTdHmc
-	Oytv1aLb1I5JgiN1jwe9JT0u5m5KJp7++ycKltdDLXioMRrLz0kPoiNK4WLdheOd4mkKLql
-	NbhloSD19Sx37cg96O1urjsAY+MJ8NUKAZ++U/Sft38+9HoqTvQaWcYPK0x3HYKwfFhZRYJ
-	PRdJE/IsDeS+liPqUh+7Qq/tiPiyp1PW0ocf5Y5H1XMt7nJko/CZ9nUIiHdTVZip4PaCYei
-	6rrzerq+f6FDc37nMQ/tntqm0gplH1zkqQv+/rYCjjmYqVfPvEJfsoM0ra+opGDti4VCzXH
-	1hD8UN5E8G9DjW5TcUUAIKEEBgwSavnhPAzUUR5MWLnN4NXCLYKpqAmWbc3pw1gO9ODbSC9
-	5/X2Ht/A9jPX1AwGrGeKiJugut89DunlmoH/MPc5+c0R1InBzWlhdhR/MVv7nSjFH887A+p
-	Bt5tMJ6XcJx5C1XeX9VmjeuH89TSEtM93N1x8VxlSmBKGX4KYOuQtUyGwlu/SbgcRcssm/J
-	nxGZZfw+tMyXF58LJ8txNqIKQe37oIFyq6TDkKTw/lkhMPisPgo24ZETE/VlLmdY3mi8/Xc
-	71h5sQjmXLSyJwF1tzaVxGkRFS7IqRnREMWeep0n24gvLivyQ0XxnK69wCM8bv4oLtNJFku
-	wgf904denumB84o4mz58Z0SR7sDZE5U2lqImU2OauV30kY95qmwH4LEu9olPRK6FSJxQprJ
-	/yCgWoNiBWnSqi/YIQV5Xkgsi3//PY//V0DhqnLqYiP+PNaOKSOGXjAJCXmhck+3aN49MZU
-	f3u/OwcZwZEB9HHHHUKDN889VRaqxRi4GIXFqhHVeA/7zhYB3lIJYDxJMkTPK35wwQ4gOVc
-	OGlrfftxPxUgn4shTilMSCzb93YvTtB7xlBAk7z3eHvchmD4fzJ9Db2SN01JVtvHHSQh57Z
-	F1wwVRXzDid40mICvDPJNTEz8gGS/cDPFh8vR3LI01BCd1TwWLwFKJYMlAKImnwW5pK4diz
-	jKwlIUclO3fNzq7ixJ
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
+X-QQ-XMAILINFO: M0YfekmnA1Ql7OKvKfBEYSpHhDRLRyKETAjFvSNr3eV+cRhHuM1kmbyQ
+	/OrxPPK8zOrv+lDCTzaKrqvJhQ4qbQbRTuq/NrlmRAFpjriMvXvoyfXZIrKOeORaG+xqm8T
+	6Vp3HpFvoJDHL9eKHU68hyey9P+6ge2cJFLNkXoAKobQm1GQZrk1MwzTifvBP069zUUcXk+
+	5YUDMmmQS4A6oEWwTPhcAgTNsEAwB0+lzW954E9YVMYkQ1uV6fUG4fnrLV+/Rh3b5IPoYPL
+	c7tl6SllKcFW9gR601uDQ20PwapKhUmy7N+6nUpc2og7+GGtr2hOXmpLzdfH/zOYSyDOP15
+	F17aP8E00NIAAeH707nXwftS9pRvYOLNbRrSIs8Ow6+Baa3K/pQRc7FnpPlpBmMl0OVKmH/
+	+xcQV7/zdeYh6WrIroUKG5OSHXuto/eDiQ3q7f+BtnSFr7LNUisigDWQlsKOGADa2FCr2K/
+	Kj78mOWRG9uQ+3WofkMEmbqr3Ju63DjlSOidF0pZCtd1X8srPUxvh+gOxWbw2ff+M3AV4PT
+	Xnwj5JAcf7jN8iHeGrgyHVt8FW4VU5Pgst9QFGv+unr7zFXuVYYAXq2WcIJPAWf5o9oYWgP
+	7fBPScukdTPFenmO62tqPG7vDE4oWLhFMgE3/Hlnr9BOQ7Na9SAlc7CCR+Vuu+DeIdc/2sI
+	YBkvi1gXRrq3x3kFICo5LF2U+jy46eJWDQyWcme/7SViEsGhNtc476AxYDc1SWyTXqPLLww
+	q0tuZOIuln8EgvV0BVZ29Uiz7URJl0usN0kei3Q+u3VERbhwHSEWHLmssCEI3cYdcZDh3Gf
+	XuEwnNw+AC32IzqRDnPROXckfIEJYCuP3TBAl7NvQcdMZ5iPTm8jp2OYEOyGN18dPWV8UkJ
+	vjqeg8rtNqkCoYbmYPY06IdKpdxcnMZxvngr0bQkR9Bi2I1CEWdgoVJeaNWy5Rtp8Uif3rq
+	tKQGqshEi/H4RtouGxbw2znwxPJjzpsGoZd1K6WRFkWhNej4LT21HKV69auz36BWSxtTzPz
+	Xh4cgtnG5Q9x6tNrU3BuJ57FURi+CJRg8U++6lFcGo4eBzVJRn6fyt+di/iKs=
+X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
 X-QQ-RECHKSPAM: 0
 
-For those devices which support 64 pools, they also support PF and VF
-(i.e. different pools) to configure different RSS key. Enable multiple
-RSS, use up to 64 RSS keys and that is one key per pool.
+Add ethtool ops for Rx flow hashing, query and set RSS indirection table
+and hash key. And support to configure L4 header fields with
+TCP/UDP/SCTP for flow hasing.
 
 Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 ---
- drivers/net/ethernet/wangxun/libwx/wx_hw.c   | 111 ++++++++++++++-----
- drivers/net/ethernet/wangxun/libwx/wx_hw.h   |   5 +
- drivers/net/ethernet/wangxun/libwx/wx_lib.c  |  10 +-
- drivers/net/ethernet/wangxun/libwx/wx_type.h |  18 +++
- 4 files changed, 113 insertions(+), 31 deletions(-)
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 152 ++++++++++++++++++
+ .../net/ethernet/wangxun/libwx/wx_ethtool.h   |  12 ++
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |   6 +
+ .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  |   6 +
+ .../ethernet/wangxun/txgbe/txgbe_ethtool.c    |   6 +
+ 5 files changed, 182 insertions(+)
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-index bcd07a715752..9c56e2b11672 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-@@ -1998,8 +1998,17 @@ static void wx_restore_vlan(struct wx *wx)
- 		wx_vlan_rx_add_vid(wx->netdev, htons(ETH_P_8021Q), vid);
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+index 9572b9f28e59..a0a46b1b4f9e 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+@@ -481,6 +481,158 @@ int wx_set_channels(struct net_device *dev,
  }
+ EXPORT_SYMBOL(wx_set_channels);
  
--static void wx_store_reta(struct wx *wx)
-+u32 wx_rss_indir_tbl_entries(struct wx *wx)
- {
++u32 wx_rss_indir_size(struct net_device *netdev)
++{
++	struct wx *wx = netdev_priv(netdev);
++
++	return wx_rss_indir_tbl_entries(wx);
++}
++EXPORT_SYMBOL(wx_rss_indir_size);
++
++u32 wx_get_rxfh_key_size(struct net_device *netdev)
++{
++	return WX_RSS_KEY_SIZE;
++}
++EXPORT_SYMBOL(wx_get_rxfh_key_size);
++
++static void wx_get_reta(struct wx *wx, u32 *indir)
++{
++	int i, reta_size = wx_rss_indir_tbl_entries(wx);
++	u16 rss_m = wx->ring_feature[RING_F_RSS].mask;
++
 +	if (test_bit(WX_FLAG_SRIOV_ENABLED, wx->flags))
-+		return 64;
-+	else
-+		return 128;
++		rss_m = wx->ring_feature[RING_F_RSS].indices - 1;
++
++	for (i = 0; i < reta_size; i++)
++		indir[i] = wx->rss_indir_tbl[i] & rss_m;
 +}
 +
-+void wx_store_reta(struct wx *wx)
++int wx_get_rxfh(struct net_device *netdev,
++		struct ethtool_rxfh_param *rxfh)
 +{
-+	u32 reta_entries = wx_rss_indir_tbl_entries(wx);
- 	u8 *indir_tbl = wx->rss_indir_tbl;
- 	u32 reta = 0;
- 	u32 i;
-@@ -2007,36 +2016,55 @@ static void wx_store_reta(struct wx *wx)
- 	/* Fill out the redirection table as follows:
- 	 *  - 8 bit wide entries containing 4 bit RSS index
- 	 */
--	for (i = 0; i < WX_MAX_RETA_ENTRIES; i++) {
-+	for (i = 0; i < reta_entries; i++) {
- 		reta |= indir_tbl[i] << (i & 0x3) * 8;
- 		if ((i & 3) == 3) {
--			wr32(wx, WX_RDB_RSSTBL(i >> 2), reta);
-+			if (test_bit(WX_FLAG_SRIOV_ENABLED, wx->flags) &&
-+			    test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags))
-+				wr32(wx, WX_RDB_VMRSSTBL(i >> 2, wx->num_vfs), reta);
++	struct wx *wx = netdev_priv(netdev);
++
++	rxfh->hfunc = ETH_RSS_HASH_TOP;
++
++	if (rxfh->indir)
++		wx_get_reta(wx, rxfh->indir);
++
++	if (rxfh->key)
++		memcpy(rxfh->key, wx->rss_key, WX_RSS_KEY_SIZE);
++
++	return 0;
++}
++EXPORT_SYMBOL(wx_get_rxfh);
++
++int wx_set_rxfh(struct net_device *netdev,
++		struct ethtool_rxfh_param *rxfh,
++		struct netlink_ext_ack *extack)
++{
++	struct wx *wx = netdev_priv(netdev);
++	u32 reta_entries;
++	int i;
++
++	if (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
++	    rxfh->hfunc != ETH_RSS_HASH_TOP)
++		return -EOPNOTSUPP;
++
++	reta_entries = wx_rss_indir_tbl_entries(wx);
++	/* Fill out the redirection table */
++	if (rxfh->indir) {
++		int max_queues = min_t(int, wx->num_rx_queues,
++				       WX_RSS_INDIR_TBL_MAX);
++
++		/*Allow at least 2 queues w/ SR-IOV.*/
++		if (test_bit(WX_FLAG_SRIOV_ENABLED, wx->flags) &&
++		    max_queues < 2)
++			max_queues = 2;
++
++		/* Verify user input. */
++		for (i = 0; i < reta_entries; i++)
++			if (rxfh->indir[i] >= max_queues)
++				return -EINVAL;
++
++		for (i = 0; i < reta_entries; i++)
++			wx->rss_indir_tbl[i] = rxfh->indir[i];
++
++		wx_store_reta(wx);
++	}
++
++	/* Fill out the rss hash key */
++	if (rxfh->key) {
++		memcpy(wx->rss_key, rxfh->key, WX_RSS_KEY_SIZE);
++		wx_store_rsskey(wx);
++	}
++
++	return 0;
++}
++EXPORT_SYMBOL(wx_set_rxfh);
++
++static const struct wx_rss_flow_map rss_flow_table[] = {
++	{ TCP_V4_FLOW, RXH_L4_B_0_1 | RXH_L4_B_2_3, WX_RSS_FIELD_IPV4_TCP},
++	{ TCP_V6_FLOW, RXH_L4_B_0_1 | RXH_L4_B_2_3, WX_RSS_FIELD_IPV6_TCP},
++	{ UDP_V4_FLOW, RXH_L4_B_0_1 | RXH_L4_B_2_3, WX_RSS_FIELD_IPV4_UDP},
++	{ UDP_V6_FLOW, RXH_L4_B_0_1 | RXH_L4_B_2_3, WX_RSS_FIELD_IPV6_UDP},
++	{ SCTP_V4_FLOW, RXH_L4_B_0_1 | RXH_L4_B_2_3, WX_RSS_FIELD_IPV4_SCTP},
++	{ SCTP_V6_FLOW, RXH_L4_B_0_1 | RXH_L4_B_2_3, WX_RSS_FIELD_IPV6_SCTP},
++};
++
++int wx_get_rxfh_fields(struct net_device *dev,
++		       struct ethtool_rxfh_fields *nfc)
++{
++	struct wx *wx = netdev_priv(dev);
++	int i;
++
++	nfc->data = RXH_IP_SRC | RXH_IP_DST;
++
++	for (i = 0; i < ARRAY_SIZE(rss_flow_table); i++) {
++		const struct wx_rss_flow_map *entry = &rss_flow_table[i];
++
++		if (entry->flow_type == nfc->flow_type) {
++			if (wx->rss_flags & entry->flag)
++				nfc->data |= entry->data;
++			break;
++		}
++	}
++
++	return 0;
++}
++EXPORT_SYMBOL(wx_get_rxfh_fields);
++
++int wx_set_rxfh_fields(struct net_device *dev,
++		       const struct ethtool_rxfh_fields *nfc,
++		       struct netlink_ext_ack *extack)
++{
++	struct wx *wx = netdev_priv(dev);
++	u8 flags = wx->rss_flags;
++	int i;
++
++	if (!(nfc->data & RXH_IP_SRC) ||
++	    !(nfc->data & RXH_IP_DST))
++		return -EINVAL;
++
++	for (i = 0; i < ARRAY_SIZE(rss_flow_table); i++) {
++		const struct wx_rss_flow_map *entry = &rss_flow_table[i];
++
++		if (entry->flow_type == nfc->flow_type) {
++			if (nfc->data & entry->data)
++				flags |= entry->flag;
 +			else
-+				wr32(wx, WX_RDB_RSSTBL(i >> 2), reta);
- 			reta = 0;
- 		}
- 	}
- }
- 
-+void wx_store_rsskey(struct wx *wx)
-+{
-+	u32 random_key_size = WX_RSS_KEY_SIZE / 4;
-+	u32 i;
++				flags &= ~entry->flag;
 +
-+	if (test_bit(WX_FLAG_SRIOV_ENABLED, wx->flags) &&
-+	    test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags)) {
-+		for (i = 0; i < random_key_size; i++)
-+			wr32(wx, WX_RDB_VMRSSRK(i, wx->num_vfs),
-+			     *(wx->rss_key + i));
-+	} else {
-+		for (i = 0; i < random_key_size; i++)
-+			wr32(wx, WX_RDB_RSSRK(i), wx->rss_key[i]);
++			if (flags != wx->rss_flags) {
++				wx->rss_flags = flags;
++				wx_config_rss_field(wx);
++			}
++
++			return 0;
++		}
 +	}
-+}
 +
- static void wx_setup_reta(struct wx *wx)
++	return -EINVAL;
++}
++EXPORT_SYMBOL(wx_set_rxfh_fields);
++
+ u32 wx_get_msglevel(struct net_device *netdev)
  {
- 	u16 rss_i = wx->ring_feature[RING_F_RSS].indices;
--	u32 random_key_size = WX_RSS_KEY_SIZE / 4;
-+	u32 reta_entries = wx_rss_indir_tbl_entries(wx);
- 	u32 i, j;
- 
- 	if (test_bit(WX_FLAG_SRIOV_ENABLED, wx->flags)) {
--		if (wx->mac.type == wx_mac_em)
--			rss_i = 1;
-+		if (test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags))
-+			rss_i = rss_i < 2 ? 2 : rss_i;
- 		else
--			rss_i = rss_i < 4 ? 4 : rss_i;
-+			rss_i = 1;
- 	}
- 
- 	/* Fill out hash function seeds */
--	for (i = 0; i < random_key_size; i++)
--		wr32(wx, WX_RDB_RSSRK(i), wx->rss_key[i]);
-+	wx_store_rsskey(wx);
- 
- 	/* Fill out redirection table */
- 	memset(wx->rss_indir_tbl, 0, sizeof(wx->rss_indir_tbl));
- 
--	for (i = 0, j = 0; i < WX_MAX_RETA_ENTRIES; i++, j++) {
-+	for (i = 0, j = 0; i < reta_entries; i++, j++) {
- 		if (j == rss_i)
- 			j = 0;
- 
-@@ -2046,6 +2074,50 @@ static void wx_setup_reta(struct wx *wx)
- 	wx_store_reta(wx);
- }
- 
-+void wx_config_rss_field(struct wx *wx)
-+{
-+	u32 rss_field;
-+
-+	if (test_bit(WX_FLAG_SRIOV_ENABLED, wx->flags) &&
-+	    test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags)) {
-+		rss_field = rd32(wx, WX_RDB_PL_CFG(wx->num_vfs));
-+		rss_field &= ~WX_RDB_PL_CFG_RSS_MASK;
-+		rss_field |= wx->rss_flags << WX_RSS_FIELD_SHIFT;
-+		wr32(wx, WX_RDB_PL_CFG(wx->num_vfs), rss_field);
-+
-+		/* Enable global RSS and multiple RSS to make the RSS
-+		 * field of each pool take effect.
-+		 */
-+		wr32m(wx, WX_RDB_RA_CTL,
-+		      WX_RDB_RA_CTL_MULTI_RSS | WX_RDB_RA_CTL_RSS_EN,
-+		      WX_RDB_RA_CTL_MULTI_RSS | WX_RDB_RA_CTL_RSS_EN);
-+	} else {
-+		rss_field = rd32(wx, WX_RDB_RA_CTL);
-+		rss_field &= ~WX_RDB_RA_CTL_RSS_MASK;
-+		rss_field |= wx->rss_flags << WX_RSS_FIELD_SHIFT;
-+		wr32(wx, WX_RDB_RA_CTL, rss_field);
-+	}
-+}
-+
-+void wx_enable_rss(struct wx *wx, bool enable)
-+{
-+	if (test_bit(WX_FLAG_SRIOV_ENABLED, wx->flags) &&
-+	    test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags)) {
-+		if (enable)
-+			wr32m(wx, WX_RDB_PL_CFG(wx->num_vfs),
-+			      WX_RDB_PL_CFG_RSS_EN, WX_RDB_PL_CFG_RSS_EN);
-+		else
-+			wr32m(wx, WX_RDB_PL_CFG(wx->num_vfs),
-+			      WX_RDB_PL_CFG_RSS_EN, 0);
-+	} else {
-+		if (enable)
-+			wr32m(wx, WX_RDB_RA_CTL, WX_RDB_RA_CTL_RSS_EN,
-+			      WX_RDB_RA_CTL_RSS_EN);
-+		else
-+			wr32m(wx, WX_RDB_RA_CTL, WX_RDB_RA_CTL_RSS_EN, 0);
-+	}
-+}
-+
- #define WX_RDB_RSS_PL_2		FIELD_PREP(GENMASK(31, 29), 1)
- #define WX_RDB_RSS_PL_4		FIELD_PREP(GENMASK(31, 29), 2)
- static void wx_setup_psrtype(struct wx *wx)
-@@ -2076,8 +2148,6 @@ static void wx_setup_psrtype(struct wx *wx)
- 
- static void wx_setup_mrqc(struct wx *wx)
- {
--	u32 rss_field = 0;
--
- 	/* VT, and RSS do not coexist at the same time */
- 	if (test_bit(WX_FLAG_VMDQ_ENABLED, wx->flags))
- 		return;
-@@ -2085,22 +2155,11 @@ static void wx_setup_mrqc(struct wx *wx)
- 	/* Disable indicating checksum in descriptor, enables RSS hash */
- 	wr32m(wx, WX_PSR_CTL, WX_PSR_CTL_PCSD, WX_PSR_CTL_PCSD);
- 
--	/* Perform hash on these packet types */
--	rss_field = WX_RDB_RA_CTL_RSS_IPV4 |
--		    WX_RDB_RA_CTL_RSS_IPV4_TCP |
--		    WX_RDB_RA_CTL_RSS_IPV4_UDP |
--		    WX_RDB_RA_CTL_RSS_IPV6 |
--		    WX_RDB_RA_CTL_RSS_IPV6_TCP |
--		    WX_RDB_RA_CTL_RSS_IPV6_UDP;
--
- 	netdev_rss_key_fill(wx->rss_key, sizeof(wx->rss_key));
- 
-+	wx_config_rss_field(wx);
-+	wx_enable_rss(wx, wx->rss_enabled);
- 	wx_setup_reta(wx);
--
--	if (wx->rss_enabled)
--		rss_field |= WX_RDB_RA_CTL_RSS_EN;
--
--	wr32(wx, WX_RDB_RA_CTL, rss_field);
- }
- 
- /**
-@@ -2393,6 +2452,8 @@ int wx_sw_init(struct wx *wx)
- 		wx_err(wx, "rss key allocation failed\n");
- 		return err;
- 	}
-+	wx->rss_flags = WX_RSS_FIELD_IPV4 | WX_RSS_FIELD_IPV4_TCP |
-+			WX_RSS_FIELD_IPV6 | WX_RSS_FIELD_IPV6_TCP;
- 
- 	wx->mac_table = kcalloc(wx->mac.num_rar_entries,
- 				sizeof(struct wx_mac_addr),
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.h b/drivers/net/ethernet/wangxun/libwx/wx_hw.h
-index 2393a743b564..13857376bbad 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_hw.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.h
-@@ -39,6 +39,11 @@ void wx_set_rx_mode(struct net_device *netdev);
- int wx_change_mtu(struct net_device *netdev, int new_mtu);
- void wx_disable_rx_queue(struct wx *wx, struct wx_ring *ring);
- void wx_enable_rx_queue(struct wx *wx, struct wx_ring *ring);
-+u32 wx_rss_indir_tbl_entries(struct wx *wx);
-+void wx_store_reta(struct wx *wx);
-+void wx_store_rsskey(struct wx *wx);
-+void wx_config_rss_field(struct wx *wx);
-+void wx_enable_rss(struct wx *wx, bool enable);
- void wx_configure_rx(struct wx *wx);
- void wx_configure(struct wx *wx);
- void wx_start_hw(struct wx *wx);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-index 5086db060c61..5ec26349c91b 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-@@ -3016,14 +3016,12 @@ int wx_set_features(struct net_device *netdev, netdev_features_t features)
  	struct wx *wx = netdev_priv(netdev);
- 	bool need_reset = false;
- 
--	if (features & NETIF_F_RXHASH) {
--		wr32m(wx, WX_RDB_RA_CTL, WX_RDB_RA_CTL_RSS_EN,
--		      WX_RDB_RA_CTL_RSS_EN);
-+	if (features & NETIF_F_RXHASH)
- 		wx->rss_enabled = true;
--	} else {
--		wr32m(wx, WX_RDB_RA_CTL, WX_RDB_RA_CTL_RSS_EN, 0);
-+	else
- 		wx->rss_enabled = false;
--	}
-+
-+	wx_enable_rss(wx, wx->rss_enabled);
- 
- 	netdev->features = features;
- 
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
+index 9e002e699eca..2ddd4039d5d2 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
+@@ -38,6 +38,18 @@ void wx_get_channels(struct net_device *dev,
+ 		     struct ethtool_channels *ch);
+ int wx_set_channels(struct net_device *dev,
+ 		    struct ethtool_channels *ch);
++u32 wx_rss_indir_size(struct net_device *netdev);
++u32 wx_get_rxfh_key_size(struct net_device *netdev);
++int wx_get_rxfh(struct net_device *netdev,
++		struct ethtool_rxfh_param *rxfh);
++int wx_set_rxfh(struct net_device *netdev,
++		struct ethtool_rxfh_param *rxfh,
++		struct netlink_ext_ack *extack);
++int wx_get_rxfh_fields(struct net_device *dev,
++		       struct ethtool_rxfh_fields *cmd);
++int wx_set_rxfh_fields(struct net_device *dev,
++		       const struct ethtool_rxfh_fields *nfc,
++		       struct netlink_ext_ack *extack);
+ u32 wx_get_msglevel(struct net_device *netdev);
+ void wx_set_msglevel(struct net_device *netdev, u32 data);
+ int wx_get_ts_info(struct net_device *dev,
 diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index ec63e7ec8b24..9fd0f3a5a48c 100644
+index 9fd0f3a5a48c..7971bc22e869 100644
 --- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
 +++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -168,9 +168,12 @@
- #define WX_RDB_PL_CFG_L2HDR          BIT(3)
- #define WX_RDB_PL_CFG_TUN_TUNHDR     BIT(4)
- #define WX_RDB_PL_CFG_TUN_OUTL2HDR   BIT(5)
-+#define WX_RDB_PL_CFG_RSS_EN         BIT(24)
-+#define WX_RDB_PL_CFG_RSS_MASK       GENMASK(23, 16)
- #define WX_RDB_RSSTBL(_i)            (0x19400 + ((_i) * 4))
- #define WX_RDB_RSSRK(_i)             (0x19480 + ((_i) * 4))
- #define WX_RDB_RA_CTL                0x194F4
-+#define WX_RDB_RA_CTL_MULTI_RSS      BIT(0)
- #define WX_RDB_RA_CTL_RSS_EN         BIT(2) /* RSS Enable */
- #define WX_RDB_RA_CTL_RSS_IPV4_TCP   BIT(16)
- #define WX_RDB_RA_CTL_RSS_IPV4       BIT(17)
-@@ -178,8 +181,12 @@
- #define WX_RDB_RA_CTL_RSS_IPV6_TCP   BIT(21)
- #define WX_RDB_RA_CTL_RSS_IPV4_UDP   BIT(22)
- #define WX_RDB_RA_CTL_RSS_IPV6_UDP   BIT(23)
-+#define WX_RDB_RA_CTL_RSS_MASK       GENMASK(23, 16)
- #define WX_RDB_FDIR_MATCH            0x19558
- #define WX_RDB_FDIR_MISS             0x1955C
-+/* VM RSS */
-+#define WX_RDB_VMRSSRK(_i, _p)       (0x1A000 + ((_i) * 4) + ((_p) * 0x40))
-+#define WX_RDB_VMRSSTBL(_i, _p)      (0x1B000 + ((_i) * 4) + ((_p) * 0x40))
+@@ -1209,6 +1209,12 @@ struct vf_macvlans {
+ #define WX_RSS_FIELD_IPV4_UDP      BIT(6)
+ #define WX_RSS_FIELD_IPV6_UDP      BIT(7)
  
- /******************************* PSR Registers *******************************/
- /* psr control */
-@@ -1192,6 +1199,16 @@ struct vf_macvlans {
- 	u8 vf_macvlan[ETH_ALEN];
- };
- 
-+#define WX_RSS_FIELD_SHIFT         16
-+#define WX_RSS_FIELD_IPV4_TCP      BIT(0)
-+#define WX_RSS_FIELD_IPV4          BIT(1)
-+#define WX_RSS_FIELD_IPV4_SCTP     BIT(2)
-+#define WX_RSS_FIELD_IPV6_SCTP     BIT(3)
-+#define WX_RSS_FIELD_IPV6_TCP      BIT(4)
-+#define WX_RSS_FIELD_IPV6          BIT(5)
-+#define WX_RSS_FIELD_IPV4_UDP      BIT(6)
-+#define WX_RSS_FIELD_IPV6_UDP      BIT(7)
++struct wx_rss_flow_map {
++	u8 flow_type;
++	u32 data;
++	u32 flag;
++};
 +
  enum wx_pf_flags {
  	WX_FLAG_MULTI_64_FUNC,
  	WX_FLAG_SWFW_RING,
-@@ -1302,6 +1319,7 @@ struct wx {
- #define WX_MAX_RETA_ENTRIES 128
- #define WX_RSS_INDIR_TBL_MAX 64
- 	u8 rss_indir_tbl[WX_MAX_RETA_ENTRIES];
-+	u8 rss_flags;
- 	bool rss_enabled;
- #define WX_RSS_KEY_SIZE     40  /* size of RSS Hash Key in bytes */
- 	u32 *rss_key;
+diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
+index 4363bab33496..662f28bdde8a 100644
+--- a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
++++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
+@@ -137,6 +137,12 @@ static const struct ethtool_ops ngbe_ethtool_ops = {
+ 	.set_coalesce		= wx_set_coalesce,
+ 	.get_channels		= wx_get_channels,
+ 	.set_channels		= ngbe_set_channels,
++	.get_rxfh_fields	= wx_get_rxfh_fields,
++	.set_rxfh_fields	= wx_set_rxfh_fields,
++	.get_rxfh_indir_size	= wx_rss_indir_size,
++	.get_rxfh_key_size	= wx_get_rxfh_key_size,
++	.get_rxfh		= wx_get_rxfh,
++	.set_rxfh		= wx_set_rxfh,
+ 	.get_msglevel		= wx_get_msglevel,
+ 	.set_msglevel		= wx_set_msglevel,
+ 	.get_ts_info		= wx_get_ts_info,
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
+index b496ec502fed..e285b088c7b2 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
+@@ -560,6 +560,12 @@ static const struct ethtool_ops txgbe_ethtool_ops = {
+ 	.set_channels		= txgbe_set_channels,
+ 	.get_rxnfc		= txgbe_get_rxnfc,
+ 	.set_rxnfc		= txgbe_set_rxnfc,
++	.get_rxfh_fields	= wx_get_rxfh_fields,
++	.set_rxfh_fields	= wx_set_rxfh_fields,
++	.get_rxfh_indir_size	= wx_rss_indir_size,
++	.get_rxfh_key_size	= wx_get_rxfh_key_size,
++	.get_rxfh		= wx_get_rxfh,
++	.set_rxfh		= wx_set_rxfh,
+ 	.get_msglevel		= wx_get_msglevel,
+ 	.set_msglevel		= wx_set_msglevel,
+ 	.get_ts_info		= wx_get_ts_info,
 -- 
 2.48.1
 
