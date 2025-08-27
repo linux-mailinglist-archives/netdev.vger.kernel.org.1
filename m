@@ -1,73 +1,94 @@
-Return-Path: <netdev+bounces-217110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2240CB37631
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 02:46:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D1D2B3763B
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 02:50:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C7D87AB666
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 00:44:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7471E17E864
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 00:50:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0743719A288;
-	Wed, 27 Aug 2025 00:46:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FED91D618A;
+	Wed, 27 Aug 2025 00:50:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qqII1PjP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ack80bo6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E9C30CD93;
-	Wed, 27 Aug 2025 00:46:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 765211C9DE5;
+	Wed, 27 Aug 2025 00:50:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756255565; cv=none; b=GRun8sL8SCab8AgZKWR4X2wOCF953lv4ZRwgD9BIrMd2/IzRUH0vSA565r+icN+KcjYetiN5i2WIHyT2VGFPuvgj/xJL5c1SxgujF/q8OiF5/CPLb4VmNjBPyNcmGL0rYfaDVJmLh+GfOqFrUuYUx3WQaKuOmR+0F3WXH9ojAJ0=
+	t=1756255801; cv=none; b=AUM8A6iqrACiYTXAChkG51h0SrzwJ0tVTnvE9V8wts3vv72d10Iy3J7xOuNJvyAaMl2Np9uUg9eGdNcQtkAjKG8HlXUKlLygrjKmAGyRHZNBpAKFX30Sp1UUPVFXj32OhB0hDjPxtm5Xl39BPm3Kh94a3GZgm2FQaogbt4wCeb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756255565; c=relaxed/simple;
-	bh=gXzyGGMGuuqC8RiKBvHqCeM3fcJnAsqd+qzqkEmdzGo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RdsAVZhD7hnTC+c4Y7AyShl8dCrUIO0e3u51CoZm9u3ak1M2OafEPz6iYYLm8YM369U97f05kkuijeXKnXzbujXdMtry3NPV/Q8ChjU4Bmf++LZr/+n/IvY0iMS/eG0iqc7t4shQNF2P9dHa/9nE8XHWX989zqfhcsZXt0BQhHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qqII1PjP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E958C4CEF1;
-	Wed, 27 Aug 2025 00:46:05 +0000 (UTC)
+	s=arc-20240116; t=1756255801; c=relaxed/simple;
+	bh=+H8klAL/riVemsqz8qkZr7HZoKVNZhLlkM/cfFsoVQk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=fS7XcbYEHLEIajWxMF4f5u9cqTTvj6P3ofhK5jQvnXrSVfttDTfkhXFdklsWSW9sP+ggWBbh3VTPqvbJKJ+DgpWKk0R6X2gvmmZK/RzUrhVwS+PINIFy5KcrYgCZzfnIQm98AifnwsnUDqhkxgmFhItDpQmOHp+Os3HQgAJQLDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ack80bo6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 882C4C4CEF1;
+	Wed, 27 Aug 2025 00:50:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756255565;
-	bh=gXzyGGMGuuqC8RiKBvHqCeM3fcJnAsqd+qzqkEmdzGo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qqII1PjP5mx56n8aF3z9wHiIq1WOjHErZkab7vXLzzu/lzc9HrtEvQ8wxOXNxzoof
-	 xKRpXMII4p2VQfjv7U3p4ecU7Kf2imHWdmVdNiI1Eu/mT5pyJsqnxG3dYW+mkcylM8
-	 FCO2kZScbC6pe2+NXt4kgx5yMmg5o3iCsRHHf0UJMkS8gubACKjs8XoQxcBNG78wSN
-	 l9gJ2YctTirPbdzmRfunDA83b9azFQAr7jZf78pJb2TV4P6zyfX0upxKqdaNthNR1X
-	 o+anfFGEoWmQ3y6+aVf9KtcD2yiR2ZPKo+OLciLAiczu+QnU5ZlO0prhOSVY4hSr1k
-	 gY1qNT/78aT8Q==
-Date: Tue, 26 Aug 2025 17:46:04 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: <zhang.enpei@zte.com.cn>
-Cc: <chessman@tux.org>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
- <edumazet@google.com>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2] ethernet: tlan: Convert to use jiffies macro
-Message-ID: <20250826174604.320a63bd@kernel.org>
-In-Reply-To: <20250825184102534B6FAD5gv_p5nAHbiIyFqx@zte.com.cn>
-References: <20250825184102534B6FAD5gv_p5nAHbiIyFqx@zte.com.cn>
+	s=k20201202; t=1756255800;
+	bh=+H8klAL/riVemsqz8qkZr7HZoKVNZhLlkM/cfFsoVQk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Ack80bo6LQWq3uUJ8w7681ZznOUvpLebslYjDe10sX5MS/xuw/1wlNJyl1T8Ey7R+
+	 f8F9RWUuA/qFYZRKyO+KGUvN7qQN5hVrg30+VzVJiQ2uzuvUNF21FaoalrJxmK3P8a
+	 Zd7VMzdXK2vibCf8bnABjFa8M45ESXSCxB+MQk14dltY8RnA9Fx4dPhiiX+gRbiBPP
+	 Wvf8FA9FRSowbJbP/tOL/UFEEQx5CTK+7kG45nMMPYryJLeRgoFKzPU+wuaEwb4YAz
+	 GdrS1MivYnrsHV2bfkZoiLbFr1ZZa+oMb8yTCqZp6h94sIvmGbjT+4xDCTD4EQGUX9
+	 lhLdQVkL5FnLQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3415B383BF70;
+	Wed, 27 Aug 2025 00:50:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: macb: Fix offset error in gem_update_stats
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175625580800.152740.10775103761853498420.git-patchwork-notify@kernel.org>
+Date: Wed, 27 Aug 2025 00:50:08 +0000
+References: <20250825172134.681861-1-sean.anderson@linux.dev>
+In-Reply-To: <20250825172134.681861-1-sean.anderson@linux.dev>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ claudiu.beznea@tuxon.dev, nicolas.ferre@microchip.com,
+ linux-kernel@vger.kernel.org
 
-On Mon, 25 Aug 2025 18:41:02 +0800 (CST) zhang.enpei@zte.com.cn wrote:
-> From: Zhang Enpei <zhang.enpei@zte.com.cn>
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 25 Aug 2025 13:21:34 -0400 you wrote:
+> hw_stats now has only one variable for tx_octets/rx_octets, so we should
+> only increment p once, not twice. This would cause the statistics to be
+> reported under the wrong categories in `ethtool -S --all-groups` (which
+> uses hw_stats) but not `ethtool -S` (which uses ethtool_stats).
 > 
-> Use time_after_eq macro instead of using jiffies directly to handle
-> wraparound.
+> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+> Fixes: f6af690a295a ("net: cadence: macb: Report standard stats")
+> 
+> [...]
 
-Patch does not apply, looks like your email client or sever converted
-tabs to spaces.
+Here is the summary with links:
+  - [net] net: macb: Fix offset error in gem_update_stats
+    https://git.kernel.org/netdev/net/c/16c8a3a67ec7
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
