@@ -1,93 +1,128 @@
-Return-Path: <netdev+bounces-217369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D11F5B38777
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 18:10:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB74DB38791
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 18:13:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8599E1C20BF8
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 16:10:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F00B3AC04E
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 16:12:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39D6D343D9B;
-	Wed, 27 Aug 2025 16:09:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4716B352090;
+	Wed, 27 Aug 2025 16:12:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vRhf9J3i"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sxxYMjWV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 013D432BF3D;
-	Wed, 27 Aug 2025 16:09:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A60FF350852
+	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 16:12:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756310990; cv=none; b=bjdM/CkMqEIqyDL7LlHspl36xrsfw8B5nD+6Ys0qWXbTjaDDJUAgCi/ezSv+T3cAgwqAMNpO84UTXdya7F2qY0H9LP436JaVTMVX+pD+b9DZ+S43+jQ/a7SNGWgpoN9hD6Tan9r54XgR+fvw17aeekhkW4HNXwdiGCVwdFKJ73o=
+	t=1756311144; cv=none; b=J2o2NgZjDV7KvjjzNl9YcqairNfyg3UKNcsqK0JAVD+A7IbvwzFEfY5WUGz5pKEiazdsW5fxMDC+cnMNcX5TedxhHeSfXpcono7U3sURhaZKjmC6DLB57OPfdudvwYLRT+oCYTSPYOmZxjkgpXwJMdnNL2oOEW5d3dGWslBB5sc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756310990; c=relaxed/simple;
-	bh=QD3kLgq34CY++IsN8XVnnQSyo5Jh98WQg23u1O6HVYs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qwedIZfQfNgFj3jgQKgXq1TWp8szWEp7vhnYC4zSciPfIXa0hMTLVs/zXRUhCVd5q0CCUsWvJ3w+7DcNCwmLwL9i6FgblDsuoZmyBN1iTgdcEw5gSf0zyfeppnnhslgY8u4v75L+6ykOXuGEVGqUmUO4iIf+alcxoMD/VnvmUek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vRhf9J3i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B187C4CEEB;
-	Wed, 27 Aug 2025 16:09:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756310989;
-	bh=QD3kLgq34CY++IsN8XVnnQSyo5Jh98WQg23u1O6HVYs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=vRhf9J3iQXrjKVnr3uDRMstK2OgzhWUA4lHyIWgFgUgI872SVisQWDx7qfGXJ0mqr
-	 pDTSLFOsj1Y2Nv7B0GrumPIbHEmrVn4y/xESSi0vnQBoK8eDfqUbBY5w+oG8nXsnkC
-	 clZiRGBbgyWRmU5+IMSuo1kYfPwHrfnD3LoMhbwhJqZ9hNUkYXSgRTtS2YEzBO8xYa
-	 LM7YGmcRRbv1xC6az6NAz3QqBXHx2tPnoCYyJM/LVWqdxhn7EBnJaQ+Hyge0Q9jePu
-	 uNcYmj2qUmLAHLrXdGbGXvqa0LabETbhqyF1iEeBUd20+Oq5r2UHeXMaf60ToPqFb7
-	 hf6hFPFivHUWw==
-Message-ID: <a42b28d5-e81e-4131-8c00-8925b097070a@kernel.org>
-Date: Wed, 27 Aug 2025 10:09:48 -0600
+	s=arc-20240116; t=1756311144; c=relaxed/simple;
+	bh=IUdqkkL+FqmZnQ5cV2Tj1y+ulywJNbs4f9RW9hniOY4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WobQmNKhC8QFVVNKm/z4ixQovT/nPDFWSvpi1y7bOF10/oOQ3P7Ti8TiDM4/wGyJxffgIQKDpp+bgvp/KePhTz0YO8oQzcx7eW1uFSztb+szU+QtxYDbQQFWAOACvFQJ3XT5sKV3uWfIY8hAvDt7aYb2OcGKNKGXEm769wDK6t8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sxxYMjWV; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-7f8ea864d68so9735185a.0
+        for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 09:12:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756311141; x=1756915941; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7sWCxzZAAFSLpgy4vYbOgl/Xp28Y6qUVGYsyNTB2z28=;
+        b=sxxYMjWViaISw0GwKsEsBqmhUbB+4r4HnqEJ29Gx5NAxmI+2DkDGFqs3C4MxCrgZV6
+         YNVPKYQvuKcHHgip6Fssc9BjdiICLOvdPNH9HdcY4gk2n3FFeZSXxPJYwxtXs8VwNYzR
+         d5ZtAOKV/n2ynX+9dNwHkR8VlgxtUf/NX4aFFy2tvUQnqK0ZGvZc7BMiYODYHMCeGwhn
+         VouRga/aAtw69CfY7lWSqIv0dAmVAA44AmZFKZuCKrZjR9AvzoBRrNBNP8JaRX1ELvq8
+         eDNML74hf26qKF6EZCk+ZhdWresofaL+bUm8JUIjhHz5rmPs3MXuhIK1HodRacTAaTB7
+         jJXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756311141; x=1756915941;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7sWCxzZAAFSLpgy4vYbOgl/Xp28Y6qUVGYsyNTB2z28=;
+        b=lvbQ9Nm5IvekG1U52T9sZw7IKCE9Rc4Sf3T2o2EBl6qeYBOGgppa3TGvxMbATJfBpM
+         HOjFfQkO+qnh5mbX6vyriGOrxhQIXZ7v+AXGlg9CAqjx0OBM/OGtMM4iphzoG7BNsy4v
+         IXrfWiJQ1nNVV3gvjlP2/o0C5E7mF5Ja+DwOG/qXJYQ8hB4kb8cl6kfu4k4A/eWklBhb
+         Ab2Ro3Uat8jxq4OigFLyZjOMm9Ww+kvgtrX4LN2MjbkkI88JUQpz1FeFNTPswCh+CyLY
+         XqecTaiSyKhDBj96YlOrNpumwiQLU2qKFxr/Fr6pYAP5W75sdaifaNDi+v6r2jpgOiqQ
+         /3zA==
+X-Forwarded-Encrypted: i=1; AJvYcCW3fAlqpEHUn3vf793VTbvV3Ix5J6HjtHCC4vFHbAsCgMIZzo22tRcBX2R8x6ivftrlAEbVigY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxh1eEmJxcHwxycgIMWlbhprX88MKRTcVC+hGWCbRW0lB+yURa+
+	kGQqUMQnacSBBm/SD8m5XdVmJZDN+A5a+q86bVtUSyxftAChsY8iZ0F17WeoLQEIUu7W/EUwALo
+	YPrWeLfm1hz7cZGtZ4TFjOmhfP1nd6zHKYQW7yCrS
+X-Gm-Gg: ASbGncteSLLkxVOQ57aVyI3firWj/xFSOLHwC4NnGARXNIENzIUyLaedq1phIXtWRVr
+	X9066wixcxvwapshgV5P8y34NsVPbo7yjcb3raZny53wir8MIK35hFjXcgozqoNwWkWuBW1y4C3
+	ytuiX2bXn2O1mGL5Wvfvda8EKw3yf0thhZdH23rvKLzzIQr6bfR+mt9Mi3I1916qDJSpv6vL2n0
+	GQhrOGGxir8BvA=
+X-Google-Smtp-Source: AGHT+IFfDl0QtGAhABzZAxOiqRGAAui91INmTBPHKOkkwqnN+a2UlV7wcjKCOvP1sNO5osgtZEbLgaoNgIL4ajWs7yc=
+X-Received: by 2002:a05:620a:7084:b0:7f9:882c:6e98 with SMTP id
+ af79cd13be357-7f9882c6f42mr23878685a.67.1756311140451; Wed, 27 Aug 2025
+ 09:12:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3 1/2] net: ipv4: fix regression in local-broadcast
- routes
-Content-Language: en-US
-To: Oscar Maes <oscmaes92@gmail.com>, netdev@vger.kernel.org,
- bacs@librecast.net, brett@librecast.net, kuba@kernel.org
-Cc: davem@davemloft.net, regressions@lists.linux.dev, stable@vger.kernel.org
-References: <20250827062322.4807-1-oscmaes92@gmail.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20250827062322.4807-1-oscmaes92@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250827120503.3299990-1-edumazet@google.com> <20250827120503.3299990-2-edumazet@google.com>
+ <b6013a6b-5423-4cfd-9b19-94ee26b95028@kernel.org>
+In-Reply-To: <b6013a6b-5423-4cfd-9b19-94ee26b95028@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 27 Aug 2025 09:12:09 -0700
+X-Gm-Features: Ac12FXz-O0M7mTvn40FIy-G8eFGhddWKlzYxRWKLNHOmdR-p_oBDWOezmaluXy8
+Message-ID: <CANn89iKF+DFQQyNJoYA2U-wf4QDPOUG2yNOd8fSu45hQ+TxJ5Q@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/3] inet: ping: check sock_net() in ping_get_port()
+To: David Ahern <dsahern@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 8/27/25 12:23 AM, Oscar Maes wrote:
-> Commit 9e30ecf23b1b ("net: ipv4: fix incorrect MTU in broadcast routes")
-> introduced a regression where local-broadcast packets would have their
-> gateway set in __mkroute_output, which was caused by fi = NULL being
-> removed.
-> 
-> Fix this by resetting the fib_info for local-broadcast packets. This
-> preserves the intended changes for directed-broadcast packets.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 9e30ecf23b1b ("net: ipv4: fix incorrect MTU in broadcast routes")
-> Reported-by: Brett A C Sheffield <bacs@librecast.net>
-> Closes: https://lore.kernel.org/regressions/20250822165231.4353-4-bacs@librecast.net
-> Signed-off-by: Oscar Maes <oscmaes92@gmail.com>
-> ---
-> Link to discussion:
-> https://lore.kernel.org/netdev/20250822165231.4353-4-bacs@librecast.net/
-> 
-> Thanks to Brett Sheffield for finding the regression and writing
-> the initial fix!
-> 
->  net/ipv4/route.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
-> 
+On Wed, Aug 27, 2025 at 7:50=E2=80=AFAM David Ahern <dsahern@kernel.org> wr=
+ote:
+>
+> On 8/27/25 6:05 AM, Eric Dumazet wrote:
+> > We need to check socket netns before considering them in ping_get_port(=
+).
+> > Otherwise, one malicious netns could 'consume' all ports.
+> >
+> > Fixes: c319b4d76b9e ("net: ipv4: add IPPROTO_ICMP socket kind")
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > ---
+> >  net/ipv4/ping.c | 12 ++++++++----
+> >  1 file changed, 8 insertions(+), 4 deletions(-)
+> >
+>
+> Reviewed-by: David Ahern <dsahern@kernel.org>
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+I will add in V2 this part as well, and will retain your tag.
 
+diff --git a/net/ipv4/ping.c b/net/ipv4/ping.c
+index accfc249f6ceb29805e3bbec25d0721d2563cb4f..b6b336dac961bbabbc30f7f7fb5=
+fe41d2ee54125
+100644
+--- a/net/ipv4/ping.c
++++ b/net/ipv4/ping.c
+@@ -181,6 +181,8 @@ static struct sock *ping_lookup(struct net *net,
+struct sk_buff *skb, u16 ident)
+        }
 
+        sk_for_each_rcu(sk, hslot) {
++               if (!net_eq(sock_net(sk), net))
++                       continue;
+                isk =3D inet_sk(sk);
+
+                pr_debug("iterate\n");
 
