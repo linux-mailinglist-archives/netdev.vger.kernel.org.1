@@ -1,79 +1,82 @@
-Return-Path: <netdev+bounces-217395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9256DB3887E
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 19:24:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1143B38886
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 19:25:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA0821B2290A
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 17:24:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD7DD7B1E54
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 17:24:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D32F2D238D;
-	Wed, 27 Aug 2025 17:24:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mtk9YdDa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B14852D3EDD;
+	Wed, 27 Aug 2025 17:25:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A5B42D061C;
-	Wed, 27 Aug 2025 17:24:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23DF61E260A;
+	Wed, 27 Aug 2025 17:25:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756315451; cv=none; b=Q6jCfY9sy7k9TBYQWHS9eQUNb7aCLpNCJrVXqgMbxv2ku2g3T5h2pxtXmVELaal0y4n+M3KuNfkkedgvPTL/Zt1DYVvhkrXtHGs8JrFQyvjm4mu0Rf2PqqDtAid+d41YRld+4GqeIb7TMMvoDIqtfoNfOJ7DrorvlZUSWSrecLU=
+	t=1756315536; cv=none; b=X0xJFnBj5+tE/JyutKpw+1tH+ogl4lSnq6W3zcY+KZ/1CZ62EnrmnDl0xGk/bdT4lcb46tkYb9qZ3nHka7oMGeetSOjknj8yJIzOKjRbfweah+0so5MVeiCMrmZbRUtPOhRIVULM6/EuVrTa93qbbH/4P9w0BuRzaQjPPOhFvto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756315451; c=relaxed/simple;
-	bh=3eWm1ndCPbeq4+Uwm7c8oAy0V/FmWVSF4NbyqjdoRrA=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=IPKS2fiWDN8PDlw7upLO82Li3qyzwPLiRaMnxM24jLyba51W7vIkVew64v4HbRGcwkwJi9+rZK12CWQNxtqEoGgbHjd9OBP80t0ikk4Fe8omOy65Hy9LG+GU7T/oZIUNiyVy5ScF20YZJz0/G0Q9zC4wdTYnmcOh4kh9yxlNxiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mtk9YdDa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22E5CC4CEEB;
-	Wed, 27 Aug 2025 17:24:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756315451;
-	bh=3eWm1ndCPbeq4+Uwm7c8oAy0V/FmWVSF4NbyqjdoRrA=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=mtk9YdDaZfjiA5p52xMC5gPa+PC1HAnZ4GTkSKKCt2k1IlsOmsgxNeatDdtsV8tia
-	 5sZfHlBdbhrHQxaHs89wA7Z6HCFTcJAHL9Imd2IsM48LQBvvjp8c1cpGh6QEbOUDaE
-	 FqvDL/cOQ8mVxc688ufsZoKrb7k31MpPk0QcZczmPmqejhhgmSBisMNe7/7nbrNhEx
-	 z/RJB0bvu49ZJS9XSjHgwVLr4AqH1ZfA/AXyLUitFBdO7PnMJrkN/bX+edmaABuVDW
-	 qPv3XE5lONron7ScVL6Vy9tz5htFDascGTK7H0khfo6k68jcYPxJE8ebU6wEmLkMo2
-	 20cFqV9c45sTQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE282383BF76;
-	Wed, 27 Aug 2025 17:24:19 +0000 (UTC)
-Subject: Re: [GIT PULL] virtio,vhost: fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20250827102004-mutt-send-email-mst@kernel.org>
-References: <20250827102004-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-List-Id: <virtualization.lists.linux.dev>
-X-PR-Tracked-Message-Id: <20250827102004-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-X-PR-Tracked-Commit-Id: 45d8ef6322b8a828d3b1e2cfb8893e2ff882cb23
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 39f90c1967215375f7d87b81d14b0f3ed6b40c29
-Message-Id: <175631545834.782678.18372880333763945686.pr-tracker-bot@kernel.org>
-Date: Wed, 27 Aug 2025 17:24:18 +0000
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, arbn@yandex-team.com, igor.torrente@collabora.com, junnan01.wu@samsung.com, kniv@yandex-team.ru, leiyang@redhat.com, liming.wu@jaguarmicro.com, mst@redhat.com, namhyung@kernel.org, stable@vger.kernel.org, ying01.gao@samsung.com, ying123.xu@samsung.com
+	s=arc-20240116; t=1756315536; c=relaxed/simple;
+	bh=wm5q3311w3PMeL0qpicmfZ/AZ2IOTk8tndI7x4ZOfDc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PgGvTblqJn39YWz0alcV8XAvq7MJ2z/amAfwf+WRLWaEh93CymbvVE86KObAbuilQgJOdE4vu5knDg5rLow6auwCkxhIjqMWYnypFlrMzIhNyz/GT8sDpELdFneZ9qrN/h6WPDLGRl4ov+jYRbOAskzwW/Nb7cbOr+eRzTjL0m4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id B99E36034D; Wed, 27 Aug 2025 19:25:31 +0200 (CEST)
+Date: Wed, 27 Aug 2025 19:25:31 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Fabian =?iso-8859-1?Q?Bl=E4se?= <fabian@blaese.de>
+Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH v2] icmp: fix icmp_ndo_send address translation for reply
+ direction
+Message-ID: <aK8_i-_-Kmbozl0H@strlen.de>
+References: <20250825201717.3217045-1-fabian@blaese.de>
+ <20250825203826.3231093-1-fabian@blaese.de>
+ <aK7KYr5D7bD3OcHb@strlen.de>
+ <e1bf6193-d075-4593-81ef-99e8b93a4f74@blaese.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e1bf6193-d075-4593-81ef-99e8b93a4f74@blaese.de>
 
-The pull request you sent on Wed, 27 Aug 2025 10:20:04 -0400:
+Fabian Bläse <fabian@blaese.de> wrote:
+> To avoid unnecessary translations, I suggested the direction-specific checks.
+> Another option is to simplify them to:
+> 
+>      if (!(ct->status & IPS_NAT_MASK)) { … }
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+Yes, you can update the test from
+        if (!ct || !(ct->status & IPS_SRC_NAT)) {
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/39f90c1967215375f7d87b81d14b0f3ed6b40c29
+to
+        if (!ct || !(ct->status & IPS_NAT_MASK)) {
 
-Thank you!
+Not related to your change:
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+I suspect there is a very small risk that kcsan could report a data
+race here, given ct->status can be modified on other CPU.
+
+But maybe, while at it, replace this with
+READ_ONCE(ct->status) & ...
+
+> Correct — the change not only fixes SNAT-in-reply handling, but also adds
+> proper handling for DNAT in the reply direction, which was missing entirely.
+> I will update the commit message to reflect this.
+
+Thanks!
 
