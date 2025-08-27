@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-217275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34905B3826E
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 14:34:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06018B38271
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 14:34:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1F8B17AD57
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 12:33:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F3C317B301
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 12:34:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59C923176E8;
-	Wed, 27 Aug 2025 12:33:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 616EA312819;
+	Wed, 27 Aug 2025 12:33:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DuxqXpGY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z6Mf1Uwh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F0573128A2;
-	Wed, 27 Aug 2025 12:33:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3793D3128A2;
+	Wed, 27 Aug 2025 12:33:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756298036; cv=none; b=nHt14M1Y6lZx7Ew6bcmIHT+pMsKpihNuz5cItwSWu/dbu5neJQkA69yYOChYbQcPLUcrLVgyg28RTrGD5BfCSQP+N0lxC7S4xd93xmQJ6CGEuyVCUqnNoSuQVGCATLWjbBIot1fSMlgCWd2PZwMRk1f/Mfx16DuJRSDcGBqZjG4=
+	t=1756298038; cv=none; b=hU6dNi0rJI3B94+fWVBpcfe8uOqoujRojVwEdKYxoBnzncVHRcpjJwLkXEjYCFBJ1jHq/8xwRe9tRuQA/Q4pPS67F8BQxWdyHRjfixKG+vX+Io0t66NcPNcPEIaBxc5K2JA/j7WTi3mdaclPHL3QDrkkELP5e+/DUGrdMd8ttrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756298036; c=relaxed/simple;
-	bh=QFFLnxve5jfnt/aj0qAy6wDyKiWXv43SteeeAz2KkOA=;
+	s=arc-20240116; t=1756298038; c=relaxed/simple;
+	bh=EMk0faYz8xJaX5aw4XPFGv8hRTtC4GU6Tnps39VJKdE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m+1j+5kirxJKQS25Cra8nsh/BB57WHJQH++eO5Cf1b7YXd0+2LkOejqe6/M2XiEaoHibz3h4S/K7Y+AwD2XJyE4w/Vz1dVXekgt4qbYRRTGSVRdvl0+231FCfEKKW2MQGvLG2uOWJTeIke9HL4XnHadp00m7SCBQRwSxXc2tIQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DuxqXpGY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33F62C4CEEB;
-	Wed, 27 Aug 2025 12:33:52 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=pEAm286Y41jwEz/nKkVlX22yTa2TX7ECto212ccGMaPJSbKvAnffgqt/xDIF9lWTGkg2qjw3ai59/vImvCNIoOgIBBVLQq1oVv3bZLytqocb6QqtQQtLlc+SQKQFEEGEzDwxbNU42QoM/KN015Lc+e26vhNqCtUR8PaVAu+cSYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z6Mf1Uwh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4826CC4CEF4;
+	Wed, 27 Aug 2025 12:33:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756298034;
-	bh=QFFLnxve5jfnt/aj0qAy6wDyKiWXv43SteeeAz2KkOA=;
+	s=k20201202; t=1756298037;
+	bh=EMk0faYz8xJaX5aw4XPFGv8hRTtC4GU6Tnps39VJKdE=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=DuxqXpGYfRjDp8pk+06vRhqHzG9UoVmolVwVHT7MKMrwUtzuyMarn72G6dB+t63Ps
-	 5bTHs235Y1ead8EoKO0D54Td5b4YcDsLmBVxRa2lz7VoS1HmfZjp8Fi4aTbWB92wPA
-	 qPWKG0TtCnZNDXK76pydCJMN7Rw7Xi5W2jefO4rMmwQr8tc98Wz0egvyK+FyjkTd49
-	 HE2QVBsv+P57SgX+FVVvYhZ0CaeaZidfXM+Wo0KgxyBrUU90b7KzXWJKGzSq/G1A4X
-	 LRzC3mSih9CyWLMOO4G/J2cmdOAivJKPPMRCXg24U/C8QIdgRGWThxoiNsyMsyR3SW
-	 033KoqsSYuQjQ==
-Message-ID: <bb08014c-c85d-48cd-98d3-0a3fe8f890c6@kernel.org>
-Date: Wed, 27 Aug 2025 14:33:50 +0200
+	b=Z6Mf1UwhwQ1IhN9kJ9zW+Lg5BBTOw28tpcK8eJxGvwBSPxF6Z8hq/bWtLmyLKbc8M
+	 quwtaSaTBUQ0JMla4Qg03wqQ+B+5ucH/7vijaWqrq97HMbykxBexRgKoi+aOJeg9Vv
+	 Suv9RZFbyhqhfjuxCbncEw+pNvD1Smx1OfgJtK5olu+NbbboPR/Grz0igNg5l+u+yw
+	 OK4TxyUGHL0pcqj5WXC3MjgwodoJgp6/muDtJcjAk4GbAj3bz8p1G2yvnjFuKwfn3i
+	 TCmmfy/2DZhlZ65RceHofuSEi2lMGxTb/5mmDdmCdSR3l6wj53EkWVS/E8qyubjySN
+	 JnrMs5d4LZ7Gw==
+Message-ID: <182444f3-6d94-46de-94d2-afa70d863db5@kernel.org>
+Date: Wed, 27 Aug 2025 14:33:54 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,15 +50,15 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 2/2] net: maxlinear: Add support for MxL LGM
- SoC
+Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: mxl: Add MxL LGM
+ Network Processor SoC
 To: Jack Ping CHNG <jchng@maxlinear.com>, netdev@vger.kernel.org,
  devicetree@vger.kernel.org
 Cc: davem@davemloft.net, andrew+netdev@lunn.ch, edumazet@google.com,
  kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
  conor+dt@kernel.org, yzhu@maxlinear.com, sureshnagaraj@maxlinear.com
 References: <20250826031044.563778-1-jchng@maxlinear.com>
- <20250826031044.563778-3-jchng@maxlinear.com>
+ <20250826031044.563778-2-jchng@maxlinear.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -104,133 +104,100 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20250826031044.563778-3-jchng@maxlinear.com>
+In-Reply-To: <20250826031044.563778-2-jchng@maxlinear.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 26/08/2025 05:10, Jack Ping CHNG wrote:
-> Introduce the build system integration and initial implementation for the
+> +maintainers:
+> +  - Jack Ping Chng <jchng@maxlinear.com>
+> +
+> +description:
+> +  Binding for MaxLinear LGM Ethernet controller
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - mxl,lgm-eth
 
-Nothing improved - do not describe how kernel works, builds. We all know
-Kconfig.
-
-Describe the driver and hardware.
-
-> MaxLinear LGM SoC Ethernet driver. This patch adds Kconfig and Makefile
-
-Please do not use "This commit/patch/change", but imperative mood. See
-longer explanation here:
-https://elixir.bootlin.com/linux/v5.17.1/source/Documentation/process/submitting-patches.rst#L95
-
-
-...
+No such vendor prefix.
 
 > +
-> +static int mxl_eth_probe(struct platform_device *pdev)
-> +{
-> +	struct mxl_eth_drvdata *drvdata;
-> +	struct reset_control *rst;
-> +	struct net_device *ndev;
-> +	struct device_node *np;
-> +	int ret, i;
+> +  clocks:
+> +    maxItems: 1
 > +
-> +	drvdata = devm_kzalloc(&pdev->dev, sizeof(*drvdata), GFP_KERNEL);
-> +	if (!drvdata)
-> +		return -ENOMEM;
+> +  clock-names:
+> +    items:
+> +      - const: ethif
 > +
-> +	drvdata->clks = devm_clk_get_enabled(&pdev->dev, "ethif");
-> +	if (IS_ERR(drvdata->clks))
-> +		return dev_err_probe(&pdev->dev, PTR_ERR(drvdata->clks),
+> +  resets:
+> +    maxItems: 1
+> +
+> +  '#address-cells':
+> +    const: 1
 
-That's correct...
+Blank line
 
-> +				     "failed to get/enable clock\n");
+> +  '#size-cells':
+> +    const: 0
 > +
-> +	rst = devm_reset_control_get_optional(&pdev->dev, NULL);
-> +	if (IS_ERR(rst)) {
-> +		dev_err(&pdev->dev,
-> +			"failed to get optional reset control: %ld\n",
-> +			PTR_ERR(rst));
+> +patternProperties:
+> +  "^interface@[1-4]$":
 
+Use consistent quotes, either ' or "
 
-But here nothing improved.
+I don't quite get what's this node is for.
 
-Please look how ALL DRIVERS do it? What syntax they use?
+> +    type: object
+> +    properties:
+> +      compatible:
+> +        const: mxl,lgm-mac
+> +
+> +      reg:
+> +        minimum: 1
+> +        maximum: 4
+> +
+> +    required:
+> +      - compatible
+> +      - reg
+> +
+> +required:
+> +  - compatible
+> +  - clocks
+> +  - clock-names
+> +  - '#address-cells'
+> +  - '#size-cells'
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    eth {
 
-Do your homework and really work on this driver. If I pointed issue on
-clocks, YOU MUST fix it everywhere, not just clocks.
+ethernet? How is it called everywhere else?
 
+Node names should be generic. See also an explanation and list of
+examples (not exhaustive) in DT specification:
+https://devicetree-specification.readthedocs.io/en/latest/chapter2-devicetree-basics.html#generic-names-recommendation
 
-> +		ret = PTR_ERR(rst);
-> +		goto err_cleanup;
-> +	}
+> +      compatible = "mxl,lgm-eth";
+> +      clocks = <&cgu0 32>;
+> +      clock-names = "ethif";
+> +      resets = <&rcu0 0x70 8>;
+> +      #address-cells = <1>;
+> +      #size-cells = <0>;
 > +
-> +	if (rst) {
-> +		ret = reset_control_assert(rst);
-> +		if (ret)
-> +			goto err_cleanup;
-> +
-> +		udelay(1);
-> +
-> +		ret = reset_control_deassert(rst);
-> +		if (ret)
-> +			goto err_cleanup;
-> +	}
-> +
-> +	platform_set_drvdata(pdev, drvdata);
-> +
-> +	i = 0;
-> +	for_each_available_child_of_node(pdev->dev.of_node, np) {
-> +		if (!of_device_is_compatible(np, "mxl,eth-mac"))
-> +			continue;
-> +
-> +		ret = mxl_eth_create_ndev(pdev, np, &ndev);
-> +		if (ret)
-> +			goto err_cleanup;
+> +      mac: interface@1 {
+> +        compatible = "mxl,eth-mac";
+> +        reg = <1>;
 
-You leak of node. Use scoped loop.
+No resources here, so this is not really a subnode... unless you wanted
+to reference something from ethernet controllers.
 
-> +
-> +		drvdata->ndevs[i++] = ndev;
-> +		if (i >= MXL_NUM_PORT)
-> +			break;
-> +	}
-> +
-> +	return 0;
-> +
-> +err_cleanup:
-> +	mxl_eth_cleanup(drvdata);
-> +	return ret;
-> +}
-> +
-> +static void mxl_eth_remove(struct platform_device *pdev)
-> +{
-> +	struct mxl_eth_drvdata *drvdata = platform_get_drvdata(pdev);
-> +
-> +	mxl_eth_cleanup(drvdata);
-> +}
-> +
-> +/* Device Tree match table */
-> +static const struct of_device_id mxl_eth_of_match[] = {
-> +	{ .compatible = "mxl,lgm-eth" },
-> +	{ /* sentinel */ }
-> +};
-> +MODULE_DEVICE_TABLE(of, mxl_eth_of_match);
-> +
-> +/* Platform driver struct */
-> +static struct platform_driver mxl_eth_drv = {
-> +	.probe    = mxl_eth_probe,
-> +	.remove   = mxl_eth_remove,
-> +	.driver = {
-> +		.name = KBUILD_MODNAME,
-> +		.of_match_table = mxl_eth_of_match,
-> +	},
-> +};
-> +
-> +module_platform_driver(mxl_eth_drv);
-> +
-> +MODULE_LICENSE("GPL");
-> +MODULE_DESCRIPTION("Ethernet driver for MxL SoC");
+This looks pretty incomplete.
+
+> +      };
+> +    };
 
 
 Best regards,
