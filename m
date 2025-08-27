@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-217283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23179B382E2
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 14:54:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39D9CB382E3
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 14:54:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C8221BA1B7B
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 12:54:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D29E04619B7
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 12:54:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1F09307AFD;
-	Wed, 27 Aug 2025 12:54:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21AC634A32B;
+	Wed, 27 Aug 2025 12:54:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g3kwoHsv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cGE76VaH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f73.google.com (mail-ua1-f73.google.com [209.85.222.73])
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F15CE30CD81
-	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 12:53:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D89034F48C
+	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 12:54:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756299240; cv=none; b=mDLXivHiAenDvPss2jzgWGwLdkaW2gbeBPyS+EDt7IKVl89fQqWTs/WrKA6DDstncKjno6TeJnBRYghYyPzr2BnO2JPmBKLphM9DdpcZf7jk0vazXGjZ7sRidFSf6cjYoKKOPPki3UMCDYW7+BZFEkYReVIn4RqWbZfBpDU6rBE=
+	t=1756299243; cv=none; b=dNTMI/2/gh6hi12hdG6NmNNHDr7usgkz9Kx8L9DWqAf4fSey1/D3YgVDOqIeAWajXkiaze1O7iVSREXwnM/YKB93LpPrZ/j4qAEQdPWs47gL7lGSc5AKroV9cuJyZ9bXRKwJKiWmOiMpUtiGDX5Y098hvi0vOKx3JkLwiNqzC3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756299240; c=relaxed/simple;
-	bh=FqFV21eSvZGLhuYXdH2ncw/Vjfmb+l+Gjvy6yyPMRRU=;
+	s=arc-20240116; t=1756299243; c=relaxed/simple;
+	bh=KEaQpTosP7yv7EcJkJl03TAwgxaWV3BXJqVnn1/W9pI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nOcNV5h/i2UdR5ArIlSEQnve8Eehuzqmm+ck8Z5yvi4yxJM5ACBEr0fPSLT/ZMta5drwI88dScfI5hWRhyzJPKnn7pSMCBJCRhHkOn26/uP5bRkYoyEJiFAAQVbSqVovzsquGu4s1x2BO6MTpiNzIV5KSq+FTzBqDo1np3g9ZKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g3kwoHsv; arc=none smtp.client-ip=209.85.222.73
+	 To:Cc:Content-Type; b=i76JWAITOe1N9POmYFm5tdmmPWAlZYI32H6syrF1j/M3dNyWDSDpyqP4qheCOXxmMsMZCna6xayTYSolYpn1sKxp6fkO3PIplzJS4GNKentAuD7fuyM0fBzBJ+PA0GP1BJIZo9gd2X3cftG4HGocn1zUNBbeqEHPoTkqnNDeqVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cGE76VaH; arc=none smtp.client-ip=209.85.160.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-ua1-f73.google.com with SMTP id a1e0cc1a2514c-89253c490d4so1120092241.0
-        for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 05:53:58 -0700 (PDT)
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-4b109ae72caso156720701cf.1
+        for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 05:54:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756299238; x=1756904038; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1756299240; x=1756904040; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=p1mXdwSJgWtaF8V/jI1eYiSOr+Vr35IjVnOPWEHaKWM=;
-        b=g3kwoHsvnkyVqzWUPRmWr3kFxEfPYazEWPU7iU/R9J76l0AlcHDaGThzNvcVQ16/P9
-         xOLFsPlTAU177mQ/Uj69ohYLFxQJn6gN7s8Hk7/ZUKk/k0AAwoZAUo8JyEWzfTVHf8Cw
-         rJCn0xBXWrK8yoKDcbdrCyKaHFK6KOzs87BAX7qtEUaUnZclqLwlrCGQVozUwk5/WEm/
-         I7dlzipA5qLoOpcEvPUO0CIfz+P0u0nGrGwOz5FL/xw9EggYBb0TqWfo/qXOK2SwMa4U
-         xr92RPVjEQoBef9HqzEbOtcx9tQblttsu1pHP/8QKkCeTo0E0669NuLj/0mPcntIpbPe
-         UZ7Q==
+        bh=uYnEb5GDIb0yKDrnqeExnL93xyX1gOO5EFHnsF1W7qs=;
+        b=cGE76VaH01D5BmRXScPbb3yEAWGIT3pua8dNMba8FuggWHM3tEeFM+QGU4kGiFt67Q
+         F9PbekeMCXBHfI7ROd+E1FThb9yjKWm7BDnYkiHKq83LD+sieQEN96PN2rD+4bmJ+9A1
+         rGR4XCBaI792SW5xTT/h1g5nEgMoLcG1SbsJuYuNE2bKexOykqa4aQCaUjWbIjLqZLNs
+         6OYYbc3ez/90TySqMSzvk10Ko7cvxcHdfLx7AU2fs5YEUDykS7XQ0TQcTNbAh6ndcNE8
+         mkCKluxHzfreuTF8uSY3ZxcyKveICUimFrWXhrTIcRteVDXwhMUowun0xhpYKuDhiS+A
+         OaaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756299238; x=1756904038;
+        d=1e100.net; s=20230601; t=1756299240; x=1756904040;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=p1mXdwSJgWtaF8V/jI1eYiSOr+Vr35IjVnOPWEHaKWM=;
-        b=ajLuOoH4CAZaQxsLPMxZul5Z2wlAOaxhnfzlR3n75YESUSxQvgHdYSyGaHLDYyZsYP
-         IOEL0EgeSae8NV4MDZaakqVPEKyCTM7I+QZUp1/xqH22U8LcL1fAdqdaQaaRQZuJ6vmA
-         obcVzcwpLy07ahIl7isPn+eO6yadRCZ1h1CT+QQmrqS6HQB+uizV3e1lm8riPNzAwS9o
-         u5i03EbRfUGfYuKENn6ChKqLzqmXrI/B6p78+XVpsMQ7yC5t6NybElMWbCHl2R210BaU
-         iRJ1wlfx7jTCt9fVbe4vlCXtILH10xyqIl/Hezc2vOM8VmKVtK5rTDhhnouELQ27/pRt
-         29kQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWlEphUbi19Vm0atKzSwJISoqxCox8tyde2PhM1N7imaPEfixK6z9KCqR4KcHePMMxEPNfeoZc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxVE1KyWnwFyK9ANCMMxwOhRE08upGXE8s5wE/sZnqYsL66dbiR
-	OK7IO8BzK+FY8Cvfid1DS+WlqkmmT8Y3/yVK8G9LVaWIQP3/kiTMzkhNXNErohm64XqXmIJ6mAC
-	CAKsvIOytRE5SUA==
-X-Google-Smtp-Source: AGHT+IHQ7bTyWuCSW0C74/TZeobhN/EreLw0cuvvkWg79kBlKx8o/Yjnhhjf6+myR6BGJ9TOOqKBsx+s3L2Khg==
-X-Received: from vshx25.prod.google.com ([2002:a05:6102:919:b0:523:846d:1120])
+        bh=uYnEb5GDIb0yKDrnqeExnL93xyX1gOO5EFHnsF1W7qs=;
+        b=u6KKdsRNHX0K+vCRMO3cNprykJaXVUAfQYCkoYv/DdMUGg7jvR5OwzOpVHt+ReMcLa
+         79RpoOqeu69rBL084yiJt7P4VkKs2A5xiUZGciIDb47gm/1EU1rEv3GFTCO4Cosce6de
+         LvkgXhVzrzFag6QlS+MEfv4ncIy/ey4Pw+jW0sumAo8G+Hon5G+5++BdvcofXQxKoVI5
+         gKqmczJ4mLDnkAlsxg9sgispk2/wZOpNHlPO6LmrAMMomz/XkLELPqDOJIEy/njVnQ0w
+         brJNQp9eRQ6KMKRdkxT12l7ZPkPnRcUdkh/gMsSti3TByYsR2Y+jcm55xhHha9yyUqiI
+         1LEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVrRgklhfkFpFCB2AlGLV05RaS/yEaLglDtQJtwjsNIBD2Bdp87R7O0U80y5LcgGWjTm2VR0Vc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzprfDmmhBH3hgakPzYGUsXtLC1J9TTjAvo0sL0yQLkl1/8YNkd
+	LiGLNkJ0nbdCvjetxSmC898y5Y5SjXTgMqBPsoGPLea7EN19d+Afv19VDCz3y5v+ZtA+9uLhuYi
+	ikSFB6X9PxHtfXA==
+X-Google-Smtp-Source: AGHT+IGDmnxbJPHWkf4RwreO1YzQKirJNNzixE1Z9s+saybEnj+6AYcBlkn+wvMaJ6jNfLowMkrYMRar0O4HGQ==
+X-Received: from qvbgv14.prod.google.com ([2002:a05:6214:262e:b0:70b:b295:d2a])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6102:4a95:b0:519:534a:6c20 with SMTP id ada2fe7eead31-51d0f9073a3mr6194707137.30.1756299237544;
- Wed, 27 Aug 2025 05:53:57 -0700 (PDT)
-Date: Wed, 27 Aug 2025 12:53:47 +0000
+ 2002:ad4:5cc9:0:b0:707:4f43:eed6 with SMTP id 6a1803df08f44-70d97251887mr234478896d6.19.1756299240157;
+ Wed, 27 Aug 2025 05:54:00 -0700 (PDT)
+Date: Wed, 27 Aug 2025 12:53:48 +0000
 In-Reply-To: <20250827125349.3505302-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250827125349.3505302-1-edumazet@google.com>
 X-Mailer: git-send-email 2.51.0.261.g7ce5a0a67e-goog
-Message-ID: <20250827125349.3505302-3-edumazet@google.com>
-Subject: [PATCH net-next 2/4] net_sched: act_vlan: use RCU in tcf_vlan_dump()
+Message-ID: <20250827125349.3505302-4-edumazet@google.com>
+Subject: [PATCH net-next 3/4] net_sched: act_tunnel_key: use RCU in tunnel_key_dump()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -84,97 +84,96 @@ Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>,
 	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Also storing tcf_action into struct tcf_vlan_params
-makes sure there is no discrepancy in tcf_vlan_act().
+Also storing tcf_action into struct tcf_tunnel_key_params
+makes sure there is no discrepancy in tunnel_key_act().
 
-No longer block BH in tcf_vlan_init() when acquiring tcf_lock.
+No longer block BH in tunnel_key_init() when acquiring tcf_lock.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/tc_act/tc_vlan.h |  1 +
- net/sched/act_vlan.c         | 20 +++++++++-----------
+ include/net/tc_act/tc_tunnel_key.h |  1 +
+ net/sched/act_tunnel_key.c         | 20 +++++++++-----------
  2 files changed, 10 insertions(+), 11 deletions(-)
 
-diff --git a/include/net/tc_act/tc_vlan.h b/include/net/tc_act/tc_vlan.h
-index 3f5e9242b5e83d082b8a633b3702feadd5672b47..beadee41669a22d7519adaf348fb602cac7d273f 100644
---- a/include/net/tc_act/tc_vlan.h
-+++ b/include/net/tc_act/tc_vlan.h
-@@ -10,6 +10,7 @@
- #include <linux/tc_act/tc_vlan.h>
+diff --git a/include/net/tc_act/tc_tunnel_key.h b/include/net/tc_act/tc_tunnel_key.h
+index 879fe8cff581951c759076b159d3ee16f9db34c1..0f1925f97520209b3a9f110d3c7e9bb3c5ef2968 100644
+--- a/include/net/tc_act/tc_tunnel_key.h
++++ b/include/net/tc_act/tc_tunnel_key.h
+@@ -14,6 +14,7 @@
+ struct tcf_tunnel_key_params {
+ 	struct rcu_head		rcu;
+ 	int			tcft_action;
++	int			action;
+ 	struct metadata_dst     *tcft_enc_metadata;
+ };
  
- struct tcf_vlan_params {
-+	int		  action;
- 	int               tcfv_action;
- 	unsigned char     tcfv_push_dst[ETH_ALEN];
- 	unsigned char     tcfv_push_src[ETH_ALEN];
-diff --git a/net/sched/act_vlan.c b/net/sched/act_vlan.c
-index 383bf18b6862f9a7a96087f1ed786fb869b70415..b46f980f3b2ae0bc50f1a37442945d281b7abddd 100644
---- a/net/sched/act_vlan.c
-+++ b/net/sched/act_vlan.c
-@@ -25,7 +25,6 @@ TC_INDIRECT_SCOPE int tcf_vlan_act(struct sk_buff *skb,
+diff --git a/net/sched/act_tunnel_key.c b/net/sched/act_tunnel_key.c
+index 2cef4b08befbecf498ea836d45abdef1ee4e06b5..e1c8b48c217c339d5e806d031ba287df2a57b1aa 100644
+--- a/net/sched/act_tunnel_key.c
++++ b/net/sched/act_tunnel_key.c
+@@ -29,13 +29,11 @@ TC_INDIRECT_SCOPE int tunnel_key_act(struct sk_buff *skb,
  {
- 	struct tcf_vlan *v = to_vlan(a);
- 	struct tcf_vlan_params *p;
+ 	struct tcf_tunnel_key *t = to_tunnel_key(a);
+ 	struct tcf_tunnel_key_params *params;
 -	int action;
- 	int err;
- 	u16 tci;
  
-@@ -38,8 +37,6 @@ TC_INDIRECT_SCOPE int tcf_vlan_act(struct sk_buff *skb,
- 	if (skb_at_tc_ingress(skb))
- 		skb_push_rcsum(skb, skb->mac_len);
+ 	params = rcu_dereference_bh(t->params);
  
--	action = READ_ONCE(v->tcf_action);
--
- 	p = rcu_dereference_bh(v->vlan_p);
+ 	tcf_lastuse_update(&t->tcf_tm);
+ 	tcf_action_update_bstats(&t->common, skb);
+-	action = READ_ONCE(t->tcf_action);
  
- 	switch (p->tcfv_action) {
-@@ -97,7 +94,7 @@ TC_INDIRECT_SCOPE int tcf_vlan_act(struct sk_buff *skb,
- 		skb_pull_rcsum(skb, skb->mac_len);
- 
- 	skb_reset_mac_len(skb);
--	return action;
-+	return p->action;
- 
- drop:
- 	tcf_action_inc_drop_qstats(&v->common);
-@@ -255,10 +252,11 @@ static int tcf_vlan_init(struct net *net, struct nlattr *nla,
- 			   ETH_ALEN);
+ 	switch (params->tcft_action) {
+ 	case TCA_TUNNEL_KEY_ACT_RELEASE:
+@@ -51,7 +49,7 @@ TC_INDIRECT_SCOPE int tunnel_key_act(struct sk_buff *skb,
+ 		break;
  	}
  
--	spin_lock_bh(&v->tcf_lock);
-+	p->action = parm->action;
-+	spin_lock(&v->tcf_lock);
- 	goto_ch = tcf_action_set_ctrlact(*a, parm->action, goto_ch);
- 	p = rcu_replace_pointer(v->vlan_p, p, lockdep_is_held(&v->tcf_lock));
--	spin_unlock_bh(&v->tcf_lock);
-+	spin_unlock(&v->tcf_lock);
+-	return action;
++	return params->action;
+ }
  
+ static const struct nla_policy
+@@ -532,11 +530,12 @@ static int tunnel_key_init(struct net *net, struct nlattr *nla,
+ 	params_new->tcft_action = parm->t_action;
+ 	params_new->tcft_enc_metadata = metadata;
+ 
+-	spin_lock_bh(&t->tcf_lock);
++	params_new->action = parm->action;
++	spin_lock(&t->tcf_lock);
+ 	goto_ch = tcf_action_set_ctrlact(*a, parm->action, goto_ch);
+ 	params_new = rcu_replace_pointer(t->params, params_new,
+ 					 lockdep_is_held(&t->tcf_lock));
+-	spin_unlock_bh(&t->tcf_lock);
++	spin_unlock(&t->tcf_lock);
+ 	tunnel_key_release_params(params_new);
  	if (goto_ch)
  		tcf_chain_put_by_act(goto_ch);
-@@ -297,9 +295,9 @@ static int tcf_vlan_dump(struct sk_buff *skb, struct tc_action *a,
+@@ -726,10 +725,9 @@ static int tunnel_key_dump(struct sk_buff *skb, struct tc_action *a,
  	};
- 	struct tcf_t t;
+ 	struct tcf_t tm;
  
--	spin_lock_bh(&v->tcf_lock);
--	opt.action = v->tcf_action;
--	p = rcu_dereference_protected(v->vlan_p, lockdep_is_held(&v->tcf_lock));
+-	spin_lock_bh(&t->tcf_lock);
+-	params = rcu_dereference_protected(t->params,
+-					   lockdep_is_held(&t->tcf_lock));
+-	opt.action   = t->tcf_action;
 +	rcu_read_lock();
-+	p = rcu_dereference(v->vlan_p);
-+	opt.action = p->action;
- 	opt.v_action = p->tcfv_action;
- 	if (nla_put(skb, TCA_VLAN_PARMS, sizeof(opt), &opt))
++	params = rcu_dereference(t->params);
++	opt.action   = params->action;
+ 	opt.t_action = params->tcft_action;
+ 
+ 	if (nla_put(skb, TCA_TUNNEL_KEY_PARMS, sizeof(opt), &opt))
+@@ -766,12 +764,12 @@ static int tunnel_key_dump(struct sk_buff *skb, struct tc_action *a,
+ 	if (nla_put_64bit(skb, TCA_TUNNEL_KEY_TM, sizeof(tm),
+ 			  &tm, TCA_TUNNEL_KEY_PAD))
  		goto nla_put_failure;
-@@ -325,12 +323,12 @@ static int tcf_vlan_dump(struct sk_buff *skb, struct tc_action *a,
- 	tcf_tm_dump(&t, &v->tcf_tm);
- 	if (nla_put_64bit(skb, TCA_VLAN_TM, sizeof(t), &t, TCA_VLAN_PAD))
- 		goto nla_put_failure;
--	spin_unlock_bh(&v->tcf_lock);
+-	spin_unlock_bh(&t->tcf_lock);
 +	rcu_read_unlock();
  
  	return skb->len;
  
  nla_put_failure:
--	spin_unlock_bh(&v->tcf_lock);
+-	spin_unlock_bh(&t->tcf_lock);
 +	rcu_read_unlock();
  	nlmsg_trim(skb, b);
  	return -1;
