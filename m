@@ -1,224 +1,185 @@
-Return-Path: <netdev+bounces-217449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BD30B38BAB
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 23:51:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 707E2B38BB5
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 23:53:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00CE67B49C7
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 21:49:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51AB87B8E17
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 21:51:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB8FF30F7E7;
-	Wed, 27 Aug 2025 21:50:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58B76309DDC;
+	Wed, 27 Aug 2025 21:53:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kxdfYA/s"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PLQ0qBjX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4059A30E0FA;
-	Wed, 27 Aug 2025 21:50:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8C0730CDB2;
+	Wed, 27 Aug 2025 21:53:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756331448; cv=none; b=TxEx/xSKt1TNE8GrohuwHvUTJuxKhFN7pDUIbiek1jrWLXGlvXH+kME0UdKlBI5VaPiHogc7XbiNiI4MFRZtu+sYhKUHT7px/8mgJk9JWkOH4nTMRAF9QNnWeoAXWytOo5otZXAhgoWTBW0p/IkQeE5lRTNvZgOrTuEi0aE9H/4=
+	t=1756331592; cv=none; b=t3HP1uEAKBx1ovdad9yoreT7ktMZBE+mikD5k4RrmYsU/kebo4Yu7aO2C+LVVaClKg4/Y1kYpu/57SQF/asOueQPakrdjjoCpnGnb/PsFBQzsfUJqFeyYzP111pmcqaxwuXEC0PGD6+PWF2SRss4XJsKoEPyHzVVqdxQ8ZYubiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756331448; c=relaxed/simple;
-	bh=BuujTLAWedRDy5YEAJ0tpz38DoweFsg1ZztFXHJET6g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fRMLkDWjCCXvH29JdA7TsmKnGoNcFDHZnzkQhcdti74JG2WqdWnHUlHUGA+0fkqp5DQfi1IZyppfzkm1ua1eN1ew3vSkcWP6qcijmd0EIMolxo0kawvdDVIm2KCXMWmnzr+qwpGo3y4tzuZEsh+6eYLAIlzpGs8neNKxQ7JTj0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kxdfYA/s; arc=none smtp.client-ip=209.85.214.170
+	s=arc-20240116; t=1756331592; c=relaxed/simple;
+	bh=JmD+WMWxUegH+EbXCwoviJ0ZlvUZdbPJnTN1DfD7jJU=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=KzzFNdCSRAmRkhAz/4+sCt0Kjr3382kQ8UaT0nNymRlNnMvhzkIdZbVYOYETl4LHx5o4+6tMrjqWgzG66rXgsFiDnMd/P42wpHK/O7d1lwlp52HQTANbk3lUolGYn/Ydpn/Z/zRWbkdbNSofbJ1S9CCb6ANQTdyKG4R6NSWUyAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PLQ0qBjX; arc=none smtp.client-ip=209.85.221.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-246151aefaaso11881515ad.1;
-        Wed, 27 Aug 2025 14:50:47 -0700 (PDT)
+Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-54475262383so337635e0c.0;
+        Wed, 27 Aug 2025 14:53:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756331446; x=1756936246; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1756331589; x=1756936389; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UozAhkcUiSjKYUMUoDcNOQ4O68AAuW0dIDQ3a9gM49k=;
-        b=kxdfYA/swpmYaQ/XETjCeuISTPEeor5DbFpzegA0X/QEKJzay4To6tRagh1tEFKd14
-         52NsCNG0Qi4IsJEy7jOAm8/FMIHmY8LUULFxeEeNowWq5ddfROeuVQwurUflVdfUUUBC
-         7P89IspOGoP/0zyAbL0QgEFh7Z3yPwyWoJQSooOwRcqb/jVWvNZX1MSw1Dss7UJ+QciZ
-         3Xiw8OsV4hwp5qHuPvGnA9tq0k2lhaLiw9dJV6V6ES/RNgoj/iawsR8B5Fbj/mo5I++x
-         795E2gYmYxDOi2BDxN/TN69FdCYW7pFPr11KQ4duidTbbuw79WIhXTm+RnL5c8kFUjfQ
-         YjHA==
+        bh=olLihN7iGE+H0GKDuBA0F38F7thEW/DNGdW0yAxA+Eo=;
+        b=PLQ0qBjXUORp3GTcsPW0gapF00d0fQYeGAeuZcv7vYZcbpNDJNOpw4KbY5XvSQaPf8
+         vLRQf5LlMrQAndlCCZXm9ucJcjbtNNWCfjVdTInR2yC9oGQ3L+nBgvbcf4ZeOhS+cdkY
+         4uRfs4KCR0HMtUkRrtGrZPASTnJahlnBc3hjx8N1ap9ALjwW6vnfErDewFBjv24Y1iW6
+         cm53Xq5UQqiIUfuZ1JGDsgMtHq/t3qWhmEUJiIKGr/EtRCujKcqRDgCyuGExwdZqxfAT
+         KS18LNVmtscyHN9kWwk/ROALoQVsJ2locKBEUD/z9U3oN2ExoVJ2rYrQ6jOzAfRdLwkT
+         KTMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756331446; x=1756936246;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UozAhkcUiSjKYUMUoDcNOQ4O68AAuW0dIDQ3a9gM49k=;
-        b=KfGtSwGi1omuXptliB1KEpuy7diQkZMH+6h+hKTyyu6e8ox29Ki48P6tVIxSOQ2iiS
-         vz82rRBb0lQZTY30KBc264AxqG8hD1OzVq0IySfY4iFyeig29lFZU2VvTbSAQ14tUV4Y
-         NV+726vdbGamD0H9sXUQdjFTQMGEtQjOJvwK1o3u34t4lTcDCZrLmZ70HppyLOq6mfMz
-         6ensAxxP3cIyQqmTjYT8aQaU7J0+mnAxP1EVffFZoEvd2lQdz1l0MZpht5OyCZrTXFKc
-         evSbsPRBP7Bk/8p+mKaLnChesdUNNz8eC53wgt+IV5Dl61ajIefhkQSYiNZZ+kC2utXF
-         g1DQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVqbWkWDURSeTb/gnGy2SA4Rcu4qW8rCG6C6f7xhPwQLUch8nDyyfuyyZ9ra6XA1w7w6/cGb9bk0rN+B98=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxcw6WFwIw+5uCvMWiNmAanhibeBUmyuD6PC05gGPeY+ErTI9U0
-	SB8YejLz1xevaA4s0mj3MNAelp9QG1s74amZxYvdW0/j1Q1PsYmhqiopFD4WPNFb
-X-Gm-Gg: ASbGncugYluJ2uN3KtVtize5sih7NDUgJmASSjGmzvscMwLle8UCqN2jhPeKy6mAfT1
-	Q+hKzE99VqBeIWgjBG4NyLc02uxRpMAxiD0tgVUDVg6oSpmB8MX1tQCyFZwYHDmbnGj3r7mmiSF
-	AE5XclHPzlof+N+xwrJ35x6ICz3vQjMOYPTdk0128LZwFe+EL8ajDUE+/s8ffBoisTcSg3V1o13
-	cLUNyC3fuW1Y0dk1zd/LppXb8rtLkAqq8lBlB4fpPZoLJxpBfpuOHVHePzBpqA1E2jKc0OHjRNZ
-	WxW/hIBd3uQ8Uhe3xdQYTdsRgKZY31XouGdVpNMgpDsiu6dwYzGsD5qCkImpLg5ENIiVDUtmorE
-	C2USmdc9VgA57Rb8CgONxYAjhl600N2ef+3gLMdJS+0Pm+Di2Oad5FrP+q3ehrDs7UQ==
-X-Google-Smtp-Source: AGHT+IGnTAMKIVfAwB2LXmoA547rKUXRuIiaxwK76d1wWSo2cP6MFhn1mVcVqwUXH36PVIHv0Xp+5A==
-X-Received: by 2002:a17:902:e5cc:b0:246:d5b3:6310 with SMTP id d9443c01a7336-2487539f6b8mr76316115ad.23.1756331446269;
-        Wed, 27 Aug 2025 14:50:46 -0700 (PDT)
-Received: from archlinux.lan ([2601:644:8200:acc7::1f6])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-248cd2cd5desm6430765ad.147.2025.08.27.14.50.45
+        d=1e100.net; s=20230601; t=1756331589; x=1756936389;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=olLihN7iGE+H0GKDuBA0F38F7thEW/DNGdW0yAxA+Eo=;
+        b=FfSkxF2/l7msY+UzCnZRI44qbzoU9n6WHt4fCKtHlW85Bh69yLIWdnrumZ8lfiOSVh
+         jFUQC9H/2IbS2vEsinN157PW49HucW7GzTY0VxbTf7eLDyhJvyP3huaxr+lai+Ni1+SX
+         f+b2d0QSRPXx20zZyzFQsttbQhH0X/8KCOqms71YfJiR+7R9RSxXktSmZTZkNTVhpNTb
+         Ilzn2dQhU2DdgxX4Ql0Z5ll40mE/z5Q72LY1OYUPij3mutiScS40J780/TomwgWiohSa
+         BJ5u+MeEhhc3bE/Xyrvb9K0lJ2n6XAbQyCLPNMro7DedSk8SPSgvAcA0MQaCnhXrePB2
+         dqSA==
+X-Forwarded-Encrypted: i=1; AJvYcCU61aj4p/rY7H3q4PO2xTrKsJ17/PyVrtHJfRMoEG+2haGmq3nYzZYhG5DPo13rb5JV0Rtew1W/0Cldz+4=@vger.kernel.org, AJvYcCW+YMEYPHwi4aq0l+5KmiOpoWcbw8+w68Jzk/SLSjORuhkT2ub72x3EuSQ6eBnEQWWLYqBzjR9H@vger.kernel.org
+X-Gm-Message-State: AOJu0YwrSw2rpyKOdrfxbsd5ghLMHJNIE5zt9VMhF899UcwzxpOLqbiR
+	DqpASfmRAw/AcKYPnwxksgFBT1vkZK4S098eaccVK2y42/RzjoJiWY7usfLcFg==
+X-Gm-Gg: ASbGncvFqt2OWmsl7IzQNCUnNPGwHDX/LSyzlcc8OwYggTNTOcP7y/4NprNVFMtmlOk
+	v/Rx3Ybb2UizW8ejGGw9GpWV2lL2f3vsbnwEAtLLFKaBb0lDTXKTVP2talAT6ijxLRvcT/RCVtF
+	vrvCq1Bkn7Y92SCPVvZHyV9Qic/gOqhHO3Q++Q9z3EN6R2ajNS8PX1oYPZT2Zldh1V3QzDVqZ9U
+	An9wTeP+DUBZUiO4IhkEnz/3rUvU1HY+8M22tZtrLx64Yi761yMTOsBNQjRro+iqc7Nwjw0i98n
+	6AVwY4jYEy99un6Pf4X3IAS1hSMVhIAc/OMfCCzNcAmhWww4Fz+YUDSb0PKPiQvfa5Y96DqYvyw
+	cIwCpwj6lXFLgmjM/88NKypapbj3yqAc8v0yrkAGd8K08fSBZLhoss2+lgPYG/oZa3sWnYcTyDX
+	1lbA==
+X-Google-Smtp-Source: AGHT+IH74uxSZvh5SzFH2g6KUcNiA/0oo+dw0XHY5TfWmNp2WlhPOzDO87TvjOEuvaalF9IooO2OOw==
+X-Received: by 2002:a05:6122:4686:b0:542:97fa:2b17 with SMTP id 71dfb90a1353d-54297fa3821mr4075321e0c.9.1756331589512;
+        Wed, 27 Aug 2025 14:53:09 -0700 (PDT)
+Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id 71dfb90a1353d-5443005c642sm1502305e0c.20.2025.08.27.14.53.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Aug 2025 14:50:45 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Horatiu Vultur <horatiu.vultur@microchip.com>,
-	UNGLinuxDriver@microchip.com (maintainer:MICROCHIP LAN966X ETHERNET DRIVER),
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk> (maintainer:SFF/SFP/SFP+ MODULE SUPPORT:Keyword:phylink\.h|struct\s+phylink|\.phylink|>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next 2/2] net: lan966x: convert fwnode to of
-Date: Wed, 27 Aug 2025 14:50:42 -0700
-Message-ID: <20250827215042.79843-3-rosenp@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250827215042.79843-1-rosenp@gmail.com>
-References: <20250827215042.79843-1-rosenp@gmail.com>
+        Wed, 27 Aug 2025 14:53:08 -0700 (PDT)
+Date: Wed, 27 Aug 2025 17:53:08 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Xin Zhao <jackzxcui1989@163.com>, 
+ willemdebruijn.kernel@gmail.com, 
+ edumazet@google.com, 
+ ferenc@fejes.dev
+Cc: davem@davemloft.net, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ horms@kernel.org, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Xin Zhao <jackzxcui1989@163.com>
+Message-ID: <willemdebruijn.kernel.e7f6fdfe20e3@gmail.com>
+In-Reply-To: <20250827150131.2193485-1-jackzxcui1989@163.com>
+References: <20250827150131.2193485-1-jackzxcui1989@163.com>
+Subject: Re: [PATCH net-next v8] net: af_packet: Use hrtimer to do the retire
+ operation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-This is a purely OF driver. There's no need for fwnode to handle any of
-this, with the exception being phylik_create. Use of_fwnode_handle for
-that.
+Xin Zhao wrote:
+> In a system with high real-time requirements, the timeout mechanism of
+> ordinary timers with jiffies granularity is insufficient to meet the
+> demands for real-time performance. Meanwhile, the optimization of CPU
+> usage with af_packet is quite significant. Use hrtimer instead of timer
+> to help compensate for the shortcomings in real-time performance.
+> In HZ=100 or HZ=250 system, the update of TP_STATUS_USER is not real-time
+> enough, with fluctuations reaching over 8ms (on a system with HZ=250).
+> This is unacceptable in some high real-time systems that require timely
+> processing of network packets. By replacing it with hrtimer, if a timeout
+> of 2ms is set, the update of TP_STATUS_USER can be stabilized to within
+> 3 ms.
+> 
+> Signed-off-by: Xin Zhao <jackzxcui1989@163.com>
+> 
+> ---
+> Changes in v8:
+> - Delete delete_blk_timer field, as suggested by Willem de Bruijn,
+>   hrtimer_cancel will check and wait until the timer callback return and ensure
+>   enter enter callback again;
+> - Simplify the logic related to setting timeout, as suggestd by Willem de Bruijn.
+>   Currently timer callback just restarts itself unconditionally, so delete the
+>  'out:' label, do not forward hrtimer in prb_open_block, call hrtimer_forward_now
+>   directly and always return HRTIMER_RESTART. The only special case is when
+>   prb_open_block is called from tpacket_rcv. That would set the timeout further
+>   into the future than the already queued timer. An earlier timeout is not
+>   problematic. No need to add complexity to avoid that.
 
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- .../ethernet/microchip/lan966x/lan966x_main.c | 32 ++++++++++---------
- .../ethernet/microchip/lan966x/lan966x_main.h |  2 +-
- 2 files changed, 18 insertions(+), 16 deletions(-)
+This simplifies the timer logic tremendously. I like this direction a lot.
+ 
+>  static void prb_setup_retire_blk_timer(struct packet_sock *po)
+> @@ -603,9 +592,10 @@ static void prb_setup_retire_blk_timer(struct packet_sock *po)
+>  	struct tpacket_kbdq_core *pkc;
+>  
+>  	pkc = GET_PBDQC_FROM_RB(&po->rx_ring);
+> -	timer_setup(&pkc->retire_blk_timer, prb_retire_rx_blk_timer_expired,
+> -		    0);
+> -	pkc->retire_blk_timer.expires = jiffies;
+> +	hrtimer_setup(&pkc->retire_blk_timer, prb_retire_rx_blk_timer_expired,
+> +		      CLOCK_MONOTONIC, HRTIMER_MODE_REL_SOFT);
+> +	hrtimer_start(&pkc->retire_blk_timer, pkc->interval_ktime,
+> +		      HRTIMER_MODE_REL_SOFT);
 
-diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-index 8bf28915c030..d778806dcfc6 100644
---- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-+++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-@@ -183,7 +183,7 @@ static int lan966x_port_open(struct net_device *dev)
- 		ANA_PORT_CFG_PORTID_VAL,
- 		lan966x, ANA_PORT_CFG(port->chip_port));
- 
--	err = phylink_fwnode_phy_connect(port->phylink, port->fwnode, 0);
-+	err = phylink_of_phy_connect(port->phylink, port->dnode, 0);
- 	if (err) {
- 		netdev_err(dev, "Could not attach to PHY\n");
- 		return err;
-@@ -767,8 +767,8 @@ static void lan966x_cleanup_ports(struct lan966x *lan966x)
- 			port->phylink = NULL;
- 		}
- 
--		if (port->fwnode)
--			fwnode_handle_put(port->fwnode);
-+		if (port->dnode)
-+			of_node_put(port->dnode);
- 	}
- 
- 	disable_irq(lan966x->xtr_irq);
-@@ -1081,7 +1081,7 @@ static int lan966x_reset_switch(struct lan966x *lan966x)
- 
- static int lan966x_probe(struct platform_device *pdev)
- {
--	struct fwnode_handle *ports, *portnp;
-+	struct device_node *ports, *portnp;
- 	struct lan966x *lan966x;
- 	int err;
- 
-@@ -1179,7 +1179,7 @@ static int lan966x_probe(struct platform_device *pdev)
- 		}
- 	}
- 
--	ports = device_get_named_child_node(&pdev->dev, "ethernet-ports");
-+	ports = of_get_child_by_name(pdev->dev.of_node, "ethernet-ports");
- 	if (!ports)
- 		return dev_err_probe(&pdev->dev, -ENODEV,
- 				     "no ethernet-ports child found\n");
-@@ -1191,25 +1191,27 @@ static int lan966x_probe(struct platform_device *pdev)
- 	lan966x_stats_init(lan966x);
- 
- 	/* go over the child nodes */
--	fwnode_for_each_available_child_node(ports, portnp) {
-+	for_each_available_child_of_node(ports, portnp) {
- 		phy_interface_t phy_mode;
- 		struct phy *serdes;
- 		u32 p;
- 
--		if (fwnode_property_read_u32(portnp, "reg", &p))
-+		if (of_property_read_u32(portnp, "reg", &p))
- 			continue;
- 
--		phy_mode = fwnode_get_phy_mode(portnp);
--		err = lan966x_probe_port(lan966x, p, phy_mode, portnp);
-+		err = of_get_phy_mode(portnp, &phy_mode);
-+		if (err)
-+			goto cleanup_ports;
-+
-+		err = lan966x_probe_port(lan966x, p, phy_mode, of_fwnode_handle(portnp));
- 		if (err)
- 			goto cleanup_ports;
- 
- 		/* Read needed configuration */
- 		lan966x->ports[p]->config.portmode = phy_mode;
--		lan966x->ports[p]->fwnode = fwnode_handle_get(portnp);
-+		lan966x->ports[p]->dnode = of_node_get(portnp);
- 
--		serdes = devm_of_phy_optional_get(lan966x->dev,
--						  to_of_node(portnp), NULL);
-+		serdes = devm_of_phy_optional_get(lan966x->dev, portnp, NULL);
- 		if (IS_ERR(serdes)) {
- 			err = PTR_ERR(serdes);
- 			goto cleanup_ports;
-@@ -1222,7 +1224,7 @@ static int lan966x_probe(struct platform_device *pdev)
- 			goto cleanup_ports;
- 	}
- 
--	fwnode_handle_put(ports);
-+	of_node_put(ports);
- 
- 	lan966x_mdb_init(lan966x);
- 	err = lan966x_fdb_init(lan966x);
-@@ -1255,8 +1257,8 @@ static int lan966x_probe(struct platform_device *pdev)
- 	lan966x_fdb_deinit(lan966x);
- 
- cleanup_ports:
--	fwnode_handle_put(ports);
--	fwnode_handle_put(portnp);
-+	of_node_put(ports);
-+	of_node_put(portnp);
- 
- 	lan966x_cleanup_ports(lan966x);
- 
-diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.h b/drivers/net/ethernet/microchip/lan966x/lan966x_main.h
-index 4f75f0688369..bafb8f5ee64d 100644
---- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.h
-+++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.h
-@@ -407,7 +407,7 @@ struct lan966x_port {
- 	struct lan966x_port_config config;
- 	struct phylink *phylink;
- 	struct phy *serdes;
--	struct fwnode_handle *fwnode;
-+	struct device_node *dnode;
- 
- 	u8 ptp_tx_cmd;
- 	bool ptp_rx_cmd;
--- 
-2.51.0
+Since this is only called from init_prb_bdqc, we can further remove
+this whole function and move the two hrtimer calls to the parent.
 
+>  }
+>  
+>  static int prb_calc_retire_blk_tmo(struct packet_sock *po,
+> @@ -672,11 +662,10 @@ static void init_prb_bdqc(struct packet_sock *po,
+>  	p1->last_kactive_blk_num = 0;
+>  	po->stats.stats3.tp_freeze_q_cnt = 0;
+>  	if (req_u->req3.tp_retire_blk_tov)
+> -		p1->retire_blk_tov = req_u->req3.tp_retire_blk_tov;
+> +		p1->interval_ktime = ms_to_ktime(req_u->req3.tp_retire_blk_tov);
+>  	else
+> -		p1->retire_blk_tov = prb_calc_retire_blk_tmo(po,
+> -						req_u->req3.tp_block_size);
+> -	p1->tov_in_jiffies = msecs_to_jiffies(p1->retire_blk_tov);
+> +		p1->interval_ktime = ms_to_ktime(prb_calc_retire_blk_tmo(po,
+> +						req_u->req3.tp_block_size));
+>  	p1->blk_sizeof_priv = req_u->req3.tp_sizeof_priv;
+>  	rwlock_init(&p1->blk_fill_in_prog_lock);
+>  
+> @@ -686,16 +675,6 @@ static void init_prb_bdqc(struct packet_sock *po,
+>  	prb_open_block(p1, pbd);
+>  }
+>  
+> -/*  Do NOT update the last_blk_num first.
+> - *  Assumes sk_buff_head lock is held.
+> - */
+> -static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core *pkc)
+> -{
+> -	mod_timer(&pkc->retire_blk_timer,
+> -			jiffies + pkc->tov_in_jiffies);
+> -	pkc->last_kactive_blk_num = pkc->kactive_blk_num;
+
+last_kactive_blk_num is now only updated on prb_open_block. It still
+needs to be updated on each timer callback? To see whether the active
+block did not change since the last callback.
 
