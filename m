@@ -1,65 +1,56 @@
-Return-Path: <netdev+bounces-217398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E723B3889B
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 19:28:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 115B0B388AA
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 19:30:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B4807AA319
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 17:27:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4031E1B26E93
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 17:31:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 398442D6E5A;
-	Wed, 27 Aug 2025 17:28:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PqU8HTMS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BCBF298CD7;
+	Wed, 27 Aug 2025 17:30:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 102062D6418;
-	Wed, 27 Aug 2025 17:28:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F99528B51E;
+	Wed, 27 Aug 2025 17:30:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756315716; cv=none; b=NHxDvVnRrDsIQk/dtq3uRTT/tC7cgL7aTRPpQ794yJtHwSdqbdoPLovtA7Gni/MVmuP+Ty0vjkuO2ftgcAOoEgTIpKbs0fzKx7WkTDOm6K0cHNfryTlKujmE2hEx745lsxrBm55sUM1z2sstFLd3sJ28XwUeNUfnUkSuAqMPxQU=
+	t=1756315838; cv=none; b=eQjuJUUIJV37/D+FKNvveTljFQ25FQzsJYOdWjtBJG4DVQcs290w1kUVVjb4+e/l5yU50aO2jWuYw6SDuD4aH6X+cMvB65Q+ewXyd4eKhYNF8w9nHs9ItnwYfcvBYDxVU/nbUjEZG0vh8SoP12S8lPOlgipEkwWhZJ8XbhY5C9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756315716; c=relaxed/simple;
-	bh=UtrbolA1HHDmLzgsn3xYeflYPsigIkwUh0momqKEeHk=;
+	s=arc-20240116; t=1756315838; c=relaxed/simple;
+	bh=HxRmy5lo9fMc6veiwYDQoLPN6GW42YC+ed1V+NnH/bA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=btFvVokbSZxUuWLbSRwoWgNyDucski/lHF9pLv49hElHS4JVUqhbppVJCCFHVDVgoyoVEdXilExvWaysshsuKQqZiMQhTNmb0Fobsdvxv81/8tfRKv7AHdBqgQ8PFp88+OH2sYxSGHVWdAgvzJlePdKmoo+iYN2gNPY0hxwjCMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PqU8HTMS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 620B1C4CEEB;
-	Wed, 27 Aug 2025 17:28:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756315713;
-	bh=UtrbolA1HHDmLzgsn3xYeflYPsigIkwUh0momqKEeHk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PqU8HTMSa5I6ObcVPSD4d6fKFh1wfzdb23B3poxfHNfoGUDbJCIqkxP6+I4ROQbd2
-	 Z6xA07kdpSE/mdfKDSKk+ea2P5RvKDCmcmk9GQ2e/M41195zoHe20Yc4cCoRhjrmQm
-	 GN3g9T4c7il6y5uFDmLbfIqONUInMwlXcDlgfcdS5ZMSBmP/S6CmkvquFnzYZMdtHx
-	 gRKpt14RcBAfZ1nR9UYvuLDLQ8L+tVLj7CopjeLh4i31juvpj2ak2NT2vwh/nUL3Wr
-	 w+x0MN175xpyHRzneD8cpnC70V4KmE74o56eLhzuUlFhYrxaL0+6necozhXfn6n/V6
-	 nBOgBoF20lxwg==
-Date: Wed, 27 Aug 2025 18:28:28 +0100
-From: Simon Horman <horms@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	nxne.cnse.osdt.itp.upstreaming@intel.com, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH iwl-next v5 00/13] idpf: add XDP support
-Message-ID: <20250827172828.GP10519@horms.kernel.org>
-References: <20250826155507.2138401-1-aleksander.lobakin@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=b4SjVd+nzBi53+M89NEh6/xB5QIvCpyNFqJnGGkpkk7AQguA7zGUUqxjasEA8WN6F58NkHhMxmMmW8R45hVERVF8tpVT46KwzEufubdKjHr2MaVfqqz6/2X6iHXwStKKmATQe0PP2BFd2Yo9Ao+Wi41lQWylIm0Vx/HbcuRJ/hA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 2030B60288; Wed, 27 Aug 2025 19:30:34 +0200 (CEST)
+Date: Wed, 27 Aug 2025 19:30:33 +0200
+From: Florian Westphal <fw@strlen.de>
+To: F6BVP <f6bvp@free.fr>
+Cc: Eric Dumazet <edumazet@google.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	linux-hams@vger.kernel.org, netdev <netdev@vger.kernel.org>,
+	Dan Cross <crossd@gmail.com>, David Ranch <dranch@trinnet.net>,
+	Folkert van Heusden <folkert@vanheusden.com>
+Subject: Re: [ROSE] [AX25] 6.15.10 long term stable kernel oops
+Message-ID: <aK9AuSkhr37VnRQS@strlen.de>
+References: <11212ddf-bf32-4b11-afee-e234cdee5938@free.fr>
+ <4e4c9952-e445-41af-8942-e2f1c24a0586@free.fr>
+ <90efee88-b9dc-4f87-86f2-6ab60701c39f@free.fr>
+ <6c525868-3e72-4baf-8df4-a1e5982ef783@free.fr>
+ <d073ac34a39c02287be6d67622229a1e@vanheusden.com>
+ <6a5cf9cf-9984-4e1b-882f-b9b427d3c096@free.fr>
+ <aKxZy7XVRhYiHu7c@stanley.mountain>
+ <0c694353-2904-40c2-bf65-181fe4841ea0@free.fr>
+ <CANn89iJ6QYYXhzuF1Z3nUP=7+u_-GhKmCbBb4yr15q-it4rrUA@mail.gmail.com>
+ <4542b595-2398-4219-b643-4eda70a487f3@free.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,26 +59,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250826155507.2138401-1-aleksander.lobakin@intel.com>
+In-Reply-To: <4542b595-2398-4219-b643-4eda70a487f3@free.fr>
 
-On Tue, Aug 26, 2025 at 05:54:54PM +0200, Alexander Lobakin wrote:
-> Add XDP support (w/o XSk for now) to the idpf driver using the libeth_xdp
-> sublib. All possible verdicts, .ndo_xdp_xmit(), multi-buffer etc. are here.
-> In general, nothing outstanding comparing to ice, except performance --
-> let's say, up to 2x for .ndo_xdp_xmit() on certain platforms and
-> scenarios.
-> idpf doesn't support VLAN Rx offload, so only the hash hint is
-> available for now.
-> 
-> Patches 1-7 are prereqs, without which XDP would either not work at all or
-> work slower/worse/...
+F6BVP <f6bvp@free.fr> wrote:
+> Here I am. Next step is probably to discover why the call to 
+> receive_buf() fails when bytes are not small and tty_ldisc_deref() is 
+> acting after flush_to_ldisc probably leading to an error. What value is 
+> wrong ? ld->tty , p, f ?
 
-Hi Alexander,
+Did you enable CONFIG_KASAN?
 
-I'm wondering if you could give a hash that this patch-set applies to.
-Or a branch where it has been applied.
+Also, since you seem to be able to reproduce this easily, did you
+try a 'git bisect' to identify the breaking change?
 
-I suspect it's terribly obvious how to do this, but I'm drawing a blank here.
+That would allow to CC the author of that change.
 
-Thanks!
+> 4,19346,153786988,-;Hardware name: To be filled by O.E.M. To be filled by O.E.M./CK3, BIOS 5.011 09/16/2020
+> 4,19347,153786990,-;Workqueue: events_unbound flush_to_ldisc
+> 4,19348,153786998,-;Here I am: tty_ldisc_deref:283 !tty
+> 4,19349,153787003,-;Here I am: tty_ldisc_deref:283 !tty
+> 4,19350,153787005,-;RIP: 0010:__netif_receive_skb_core.constprop.0+0xfe5/0x12d0
+> 4,19398,153787265,-; __netif_receive_skb_one_core+0x3d/0xa0
+
+as Eric noted, you need to pipe this through
+
+scripts/decode_stacktrace.sh so this gets translated to line numbers.
 
