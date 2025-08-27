@@ -1,100 +1,82 @@
-Return-Path: <netdev+bounces-217330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71C95B3856B
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 16:50:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F319B38572
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 16:51:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9772171D6E
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 14:50:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 341061882251
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 14:51:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11BB421B9C0;
-	Wed, 27 Aug 2025 14:50:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0630C219A86;
+	Wed, 27 Aug 2025 14:50:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BDGAIxao"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oUZWibvb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE394207DF3;
-	Wed, 27 Aug 2025 14:50:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D41761CD208
+	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 14:50:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756306203; cv=none; b=lN+3No+qGkvQu4Hmj8Xo204jn45sIZ4CDC+dYXs2A8OUbAKyoLHsI92AE9w8hkdsTq8Ens45HaZGmPvmBZfmg1NwfwSCE2pOL9y/FFXSo9gTkvJYMVwt4X3bDC68qz6y5az0vQu6kYEcOCdGwdFr1uEXanqaNq03f9kJp7UolGs=
+	t=1756306258; cv=none; b=uVx6E2uTXp5I+FI9pobshiAHsk7BYKr8woWmij+N/28dG9fglSvQQgwx+viAOyqkaE2cvCb7SVGIZi5NM+N6AgKSoYm6GaH6coUbDWRU+2Aje0upIJGX4HxVh38hDKkXUzDR8487KTERMYpCejhKFN2t1cC0c64t+bCW0Av/+Pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756306203; c=relaxed/simple;
-	bh=zTE/enmrm1QNB+7hQxJH6uD7gf9rwRAERAzg/sPIi5s=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ApA+mc88iebuVNKTDwor4QLYVEf/GMGEkpduQA+52d5Yos0VsnPai+LhlBQKdfTHoH0y65DJYLvs+8av+DKsE/vtZoCZFkrb/STOUeyKK2dHWwiVdVo8Xlj90ZfJGjO2HKvcCJDSY3YkKsappvYdMzHNuGopp7Q15XDibAz7Mjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BDGAIxao; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62C85C4CEF5;
-	Wed, 27 Aug 2025 14:50:02 +0000 (UTC)
+	s=arc-20240116; t=1756306258; c=relaxed/simple;
+	bh=JSgeEyBekHllUgbbuBBQYaUvf4t/SBuLMVrjEFA+VHU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Y7j0YU1HR59jx4Y6c2reFfoMd5O6Gtg4Bfnj/5X/uhLags4AgHmRZwwqI2sdhUW++aOw6mT7vj4jgRwTn/C+W29g5wmLoDQgSEQPx08m5uHQTioK5QVfn1cjD3/fH+r3ewlylDzaDV2tcRIU4/8B5QSt8M7wkv5RQIkZazSP0mc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oUZWibvb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 349DFC4CEEB;
+	Wed, 27 Aug 2025 14:50:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756306202;
-	bh=zTE/enmrm1QNB+7hQxJH6uD7gf9rwRAERAzg/sPIi5s=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=BDGAIxaoPEQW3yBifYjve5PL57ydxz64jhsM1ZbBqbfXn6TSuadzEL4NRxH7RMgL9
-	 gErjYnzXSJTKxiej5gHKKkSYq4ZnktPmVSVq+jnuO/T+YtBITxZXDtFtBxX/D9x9Rp
-	 GHJP3V0Wzr5Iz9MmTIDXLDeMYQCt3umo4VCvQWm988crNJlFibVtcqpfHdjx4EMj+e
-	 KBXCZcqDZBbN+qpZBA2gxTK12qM/KJ6O5JFsm/Do3HtDTfTDCsKJr9DuTtf3/DYRZE
-	 JGSlo0Nf2mo0Hkkl1Tanga7vkveQjCcCbrrftx5GmoSOW+LCXQbkf6Ht1vtejwpoXy
-	 IYbh3yL/VlrGQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB02E383BF76;
-	Wed, 27 Aug 2025 14:50:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1756306258;
+	bh=JSgeEyBekHllUgbbuBBQYaUvf4t/SBuLMVrjEFA+VHU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=oUZWibvbbI67455c2RE/MpXu7RosiPCh53YnRBwFcVTVdlDLxTo5F0kzpFc8otYCh
+	 kZL2QIomPU9pSdlDaox3F4IrbsInpGdc1EpjNe54CZdfnXrQ9JGswzTFEyj0JoYhtU
+	 PH2a8/AEMqk88ZChbRkhyNSSYzHdLvxgTWz3i+c9Fg9AyBdSzyp8UmZ4RgrT+Ospda
+	 yzCn3yxzp6sH+K7+Km0mN7ut5kq6KciaBTQIoewMXcFvi8hWa9uB297Y2rQnQot1Fj
+	 gTX+0Lo8ts0IsIXcq728CxHcnV0slQ9NC63fT0MXwSXW0vgQ7EaeiVZ4Et4C8xPFV0
+	 FsvT4TR0QQVtg==
+Message-ID: <b6013a6b-5423-4cfd-9b19-94ee26b95028@kernel.org>
+Date: Wed, 27 Aug 2025 08:50:57 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net 0/3] Introduce refcount_t for reference counting of
- rose_neigh
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175630620975.735595.12172150017758308565.git-patchwork-notify@kernel.org>
-Date: Wed, 27 Aug 2025 14:50:09 +0000
-References: <20250823085857.47674-1-takamitz@amazon.co.jp>
-In-Reply-To: <20250823085857.47674-1-takamitz@amazon.co.jp>
-To: Takamitsu Iwai <takamitz@amazon.co.jp>
-Cc: linux-hams@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- enjuk@amazon.com, mingo@kernel.org, tglx@linutronix.de, hawk@kernel.org,
- n.zhandarovich@fintech.ru, kuniyu@google.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/3] inet: ping: check sock_net() in
+ ping_get_port()
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com
+References: <20250827120503.3299990-1-edumazet@google.com>
+ <20250827120503.3299990-2-edumazet@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20250827120503.3299990-2-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sat, 23 Aug 2025 17:58:54 +0900 you wrote:
-> The current implementation of rose_neigh uses 'use' and 'count' field of
-> type unsigned short as a reference count. This approach lacks atomicity,
-> leading to potential race conditions. As a result, syzbot has reported
-> slab-use-after-free errors due to unintended removals.
+On 8/27/25 6:05 AM, Eric Dumazet wrote:
+> We need to check socket netns before considering them in ping_get_port().
+> Otherwise, one malicious netns could 'consume' all ports.
 > 
-> This series introduces refcount_t for reference counting to ensure
-> atomicity and prevent race conditions. The patches are structured as
-> follows:
+> Fixes: c319b4d76b9e ("net: ipv4: add IPPROTO_ICMP socket kind")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  net/ipv4/ping.c | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
 > 
-> [...]
 
-Here is the summary with links:
-  - [v2,net,1/3] net: rose: split remove and free operations in rose_remove_neigh()
-    https://git.kernel.org/netdev/net/c/dcb34659028f
-  - [v2,net,2/3] net: rose: convert 'use' field to refcount_t
-    https://git.kernel.org/netdev/net/c/d860d1faa6b2
-  - [v2,net,3/3] net: rose: include node references in rose_neigh refcount
-    https://git.kernel.org/netdev/net/c/da9c9c877597
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
 
 
