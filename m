@@ -1,111 +1,127 @@
-Return-Path: <netdev+bounces-217402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17A7DB388BD
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 19:36:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18178B388E0
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 19:48:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 196D95E80D5
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 17:36:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB2EC461B86
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 17:48:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DA06299AAA;
-	Wed, 27 Aug 2025 17:36:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77E8619E82A;
+	Wed, 27 Aug 2025 17:48:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KR/qvhYr"
+	dkim=pass (2048-bit key) header.d=sarinay.com header.i=@sarinay.com header.b="rK1g6VF3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from natrix.sarinay.com (natrix.sarinay.com [159.100.251.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9B2F274659;
-	Wed, 27 Aug 2025 17:36:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A13E8273F9;
+	Wed, 27 Aug 2025 17:48:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.100.251.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756316161; cv=none; b=JEEBThaSeQeGQegk9s6ZyaJ1Ag17XGJyvfhYLuSTdTcgZDJaR9UcFkklQBOQvXjB38lPjBA1fyXnbYZlu0Obu/Y7Mzo9k8R2O6JaoSw5i30pF5rv6stB2G4wTP0IUKbWCBl6swRZ1FJ25Kn9AgHiLbxSU5N/b57V39dClFFGIe0=
+	t=1756316924; cv=none; b=suX3QOlu3SXK57hrPuu7Dsn7WgEp1Z/X/7Cq4BmOV9GdYgWB+0aFijP3qBfXCb5bHSje7NcW8Pih8kapWH1N+tfNHPNXP/zfl1Fv2bo4rxOlTLDFY5fqRTP0Nhw5p3hnXmCxRj6dTQcao5+kmDI7Gj0V/LoyI2ILbC/CdNhFUKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756316161; c=relaxed/simple;
-	bh=bp3zc4zA0mhhj8oOq8MCGeII2K8a1NvOHUUUV4QYvD4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EwMRiB7ScJ3IhcSrLFpVrREKUAYmVVixowg2oxJ7Ru7gsAgtqii9ob/iEsXakI0dNpXdL6QQSOrqyraht3Lwex3lEATegJWcaSmGXQysCWA2eIRPL8ec0kHZWDEI3ejhkcl0rOzae81Ow7C1LEVs/qGD7plPEOrb/PrwsEL045E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KR/qvhYr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7848C4CEEB;
-	Wed, 27 Aug 2025 17:35:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756316160;
-	bh=bp3zc4zA0mhhj8oOq8MCGeII2K8a1NvOHUUUV4QYvD4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=KR/qvhYr7SXjPmTcV8fSFYWJwlqGs5p2uhICBuyfRttXmUhpMXlM0WZQEhiheJUS7
-	 +dHKPZaMjSxDvBKhl3xbrXQwE2tJrZEH0WCQHcutxeZh9SPIozB0qeNN04axqOdjoD
-	 g3ubjqZwcQzqjR+cul6DfzBn1GMPlbnCMKQqD0rKvfT8q3q/5CjTrouMrDvgasSWCc
-	 hSRfY2EGYCw4fpixri1esGOjMx0HN6xptpH/a4/BGuIkEAfW9x6rcwI8auF17CM0Bz
-	 H0iT8dXcEC6h6Hwe0QiysQLk64/Eo3itSdRpb/cl+Q5a60qiXyOWoHtC6xYssH8qty
-	 qkCobRD9UbOSA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	shuah@kernel.org,
-	ecree.xilinx@gmail.com,
-	gal@nvidia.com,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next] selftests: drv-net: rss_ctx: fix the queue count check
-Date: Wed, 27 Aug 2025 10:35:58 -0700
-Message-ID: <20250827173558.3259072-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1756316924; c=relaxed/simple;
+	bh=MzK6hjdsHzWjAx0dhXNnuYZv03t2+HCtYmmUM0F3X1k=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=muxYhCGg6uSvejWWs9JTFhUJxss9XujMf7Hd9yqQQzXtkxvFcAeS77OSMivHn64iSlNmb+nQGvRc9OzjnJyfvOTedEy1Oy+3KC+eQojJJIxr0Lw5r7G1mJXuGi/TdVOu1A1WA86MCQUJLoHBx5RZn8wcJOmaXH0RY2P+Cee+UlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sarinay.com; spf=pass smtp.mailfrom=sarinay.com; dkim=pass (2048-bit key) header.d=sarinay.com header.i=@sarinay.com header.b=rK1g6VF3; arc=none smtp.client-ip=159.100.251.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sarinay.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sarinay.com
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=sarinay.com; s=2023;
+	t=1756316914; bh=MzK6hjdsHzWjAx0dhXNnuYZv03t2+HCtYmmUM0F3X1k=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=rK1g6VF3F6SHGb6Mw5MO2zxHiD+vSdYorLiUxui14xmqBfvavHfON18EOHDwH7eK4
+	 2APagwjRbYXXU36tMraF4EdnCfuarLDOBZCmLe1otjpfkkWkLHGAkkbR9DY0Ip9ZzO
+	 LdnD3Wr7CuB42V6fRDfZyGXiiBVUpv7UX9l4aoCHU78AwzeCplA1vkSPZsPfvRnjhr
+	 6ljxad2sVMzzHfmAwHxfVagxrDanQVbTMq9zjFSw30oYx7oR/EStxUAb3/iNqrTArN
+	 me+FdB04stmFNylNSWwCaYMxY/Czjc9mrMw+lauQcbfyUYbuT1Q80Me1Hd6bZk4SUz
+	 +moY/6A88gVmg==
+Message-ID: <518333811aeda4dc42445efd6d9cee6cc580145a.camel@sarinay.com>
+Subject: Re: [PATCH net-next v2] net: nfc: nci: Turn data timeout into a
+ module parameter and increase the default
+From: Juraj =?UTF-8?Q?=C5=A0arinay?= <juraj@sarinay.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, mingo@kernel.org, horms@kernel.org, 
+	tglx@linutronix.de
+Date: Wed, 27 Aug 2025 19:48:33 +0200
+In-Reply-To: <c0c14ec0-f582-4e26-bc7e-35a26a7ff1ce@kernel.org>
+References: <20250825234354.855755-1-juraj@sarinay.com>
+	 <c0c14ec0-f582-4e26-bc7e-35a26a7ff1ce@kernel.org>
+Autocrypt: addr=juraj@sarinay.com; prefer-encrypt=mutual;
+ keydata=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
+ oiRvevraR4S+FMeNg+HrhPNNRy45eF4M2RQ==
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Commit 0d6ccfe6b319 ("selftests: drv-net: rss_ctx: check for all-zero keys")
-added a skip exception if NIC has fewer than 3 queues enabled,
-but it's just constructing the object, it's not actually rising
-this exception.
+On Wed, 2025-08-27 at 15:29 +0200, Krzysztof Kozlowski wrote:
 
-Before:
+> CardOS is the software running on the NFC card, right?=C2=A0
 
-  # Exception| net.lib.py.utils.CmdExitFailure: Command failed: ethtool -X enp1s0 equal 3 hkey d1:cc:77:47:9d:ea:15:f2:b9:6c:ef:68:62:c0:45:d5:b0:99:7d:cf:29:53:40:06:3d:8e:b9:bc:d4:70:89:b8:8d:59:04:ea:a9:c2:21:b3:55:b8:ab:6b:d9:48:b4:bd:4c:ff:a5:f0:a8:c2
-  not ok 1 rss_ctx.test_rss_key_indir
+Yes it is. I may have been too specific, all I am saying is that I made
+some measurements.
 
-After:
+> If so, why would this be Linux kernel module param? Kernel runtime setup =
+is really
+> independent of what NFC card people will use.
 
-  ok 1 rss_ctx.test_rss_key_indir # SKIP Device has fewer than 3 queues (or doesn't support queue stats)
+I suggested a tunable timeout because I am not sure what the new
+universal upper bound should be. It may depend on the NFC card one is
+communicating with. I have since learned that module parameters are
+strongly discouraged (within netdev at least).
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-I spotted that NIPA instances with 4 CPUs are failing this test case.
-They have only 4/2=2 queues. I bumped their CPU count to 6, but test
-is clearly wrong.
+> I think this should be unconditionally raised
 
-CC: shuah@kernel.org
-CC: ecree.xilinx@gmail.com
-CC: gal@nvidia.com
-CC: linux-kselftest@vger.kernel.org
----
- tools/testing/selftests/drivers/net/hw/rss_ctx.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I am fine with that, but would argue for an even more generous timeout.
+Five seconds, say? One can always set a shorter SO_RCVTIMEO from user
+space if needed.
 
-diff --git a/tools/testing/selftests/drivers/net/hw/rss_ctx.py b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
-index 7bb552f8b182..9838b8457e5a 100755
---- a/tools/testing/selftests/drivers/net/hw/rss_ctx.py
-+++ b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
-@@ -118,7 +118,7 @@ from lib.py import ethtool, ip, defer, GenerateTraffic, CmdExitFailure
- 
-     qcnt = len(_get_rx_cnts(cfg))
-     if qcnt < 3:
--        KsftSkipEx("Device has fewer than 3 queues (or doesn't support queue stats)")
-+        raise KsftSkipEx("Device has fewer than 3 queues (or doesn't support queue stats)")
- 
-     data = get_rss(cfg)
-     want_keys = ['rss-hash-key', 'rss-hash-function', 'rss-indirection-table']
--- 
-2.51.0
+Ideally, the kernel would also honor a longer SO_RCVTIMEO and treat
+NCI_DATA_TIMEOUT as a default rather than a rigid limit, completely
+obviating my subjective need for a parameter. I have not explored the
+idea further, given that a somewhat higher value of NCI_DATA_TIMEOUT
+solves most problems.
 
+Best,
+Juraj
 
