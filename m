@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-217115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A3D7B37662
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 03:00:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68402B37664
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 03:00:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18E703B2E58
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 01:00:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FE8017EBD8
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 01:00:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1FF31E832A;
-	Wed, 27 Aug 2025 01:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AF9E1EFFB4;
+	Wed, 27 Aug 2025 01:00:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fJ/mvdEb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c3ONXkFE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEFB01DF755
-	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 01:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F1423595C;
+	Wed, 27 Aug 2025 01:00:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756256410; cv=none; b=rFNKV186gS8HIpKTAkte4zVR1cFrtisfEsKjGEHxMWdYZO7/aV8C8NdqVDI46/ekGIOLfsbb1SU9RQxpciJ6loodOYD6wu3d6PtcTWMM5E4CWdWMwSzldhHbBUoaeD3PaWw5H6DGcAQWeghqD3+0g4WKctoMaWHyOtkBRy19jcY=
+	t=1756256421; cv=none; b=MssUvpRNFFC2eI0kn55jPbEQuhGUNPg6XUDR1Dzd74NSDm/0U9j8q7ILMzDzjzotID5Baq5bC0fPeUr2jVhPM1ilwAWDgSeCr2It8Zwdgo52Qvie1l79PPj11TwHgDShVjNKHNGZqof5bz2ddxcqc8GeM59fnYLMFjzz2CBZIyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756256410; c=relaxed/simple;
-	bh=2/slfL/neMkEd38IUqy5kzLgMu0G9o5h7SZjNTRuHkY=;
+	s=arc-20240116; t=1756256421; c=relaxed/simple;
+	bh=Qb0Bn6XOd6kOJUcc0HaKqexJdc+0YjozBiZtiT/nIlw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=UkF0g3TU++Aw+9xwpY18SIp2lHX3EuwkJkLhnTch90e9SDqbqzYcu4PfzcvjZQKiEFIiXh67l//dTSuxM7+8gfQnfse/pIMCu4B/7RfnFSD5/4Lr++OoYjFbFlMeGjl6tPPgqh8PglF8r53akboLJjU6TMv65XjZuYdLhXFEME8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fJ/mvdEb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22BD3C4CEF1;
-	Wed, 27 Aug 2025 01:00:10 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ESad0wj4Qc7ZGGZc4k1MhCCLqrSU3o/KZAKc59jWJUqJmghCVJTvhgU4VQfbF47uoZSioVrO5e6OFDm+EqnAHoQUQDd2fDQpaGsBjKKuKzKnw5Nc07UfjkSu+uZ0XOY9n1oXlye6N0cRpucwpl32XCWv3JRVmB0n97LxNg6kqV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c3ONXkFE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8842C4CEF1;
+	Wed, 27 Aug 2025 01:00:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756256410;
-	bh=2/slfL/neMkEd38IUqy5kzLgMu0G9o5h7SZjNTRuHkY=;
+	s=k20201202; t=1756256420;
+	bh=Qb0Bn6XOd6kOJUcc0HaKqexJdc+0YjozBiZtiT/nIlw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fJ/mvdEbY3wwPkNiZveLmXJ9tMuPK8/R2iNDSniDutfyFqCROrs25Hkp91FcAz0Xf
-	 Qna3TqVpqEPHc9kN0mlb9segYQbKchR8gnpbtaoUN3DhIFCLG0oD+rZd9KJOj3m09u
-	 p0yrLzTP4FeNE20Mu2jaqj1pNeD2GCKOY9UwUozaZuMwxHN3A0A0DSXQhZjuT7Di/m
-	 fKzjaUDhZgmLxTWmC4DSzgvB8TKfbMrsx60PR1gcrSUFTyXSwhoacIuY+5T15Bz6BU
-	 q7vVYlytWoTwLZqWXY4y9CMD2J+tJgD7VRtmbNq+lyExmf0WkQYqTdYspRmfhEQs+g
-	 2xx3JWrH9Y9yA==
+	b=c3ONXkFEaLLe35SdcifFyxf+BbiwGZz1ONX7WISfe6qkcB0QzAhHe6yV++szA7s1Q
+	 Mc772RnRopgA2aghhQGN+rWf1DJhM4W3OHg5lplipSep0xdBkzL61TE0/2gltqlPKR
+	 VBUeukasPgc1p1e9XEWXJeNwPbA0AooXr1zdQg2Zi4Vhwrz0ERKpV/Vylye4C9VxlT
+	 vayeDO1pwbX+03dzQE+FFJUEXZjK9IMG6gwozk2dCbapSFHvyh4FyxR4IoQYkc2327
+	 bgHRhcEWYFy0R+IpuWxC/0EtlinAJocqbGi2wpf+3KWtnM2XG6QYrgU031TCF9mcoP
+	 bOeMs2ZX3DJHQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB2EC383BF70;
-	Wed, 27 Aug 2025 01:00:18 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F22383BF70;
+	Wed, 27 Aug 2025 01:00:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,45 +52,53 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/5][pull request] Intel Wired LAN Driver Updates
- 2025-08-25 (ice, ixgbe)
+Subject: Re: [PATCH net-next v2 0/5] selftests: drv-net: ncdevmem: fix error
+ paths
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175625641772.155051.13155790283466540733.git-patchwork-notify@kernel.org>
-Date: Wed, 27 Aug 2025 01:00:17 +0000
-References: <20250825215019.3442873-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20250825215019.3442873-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org
+ <175625642798.155051.9564153907183706947.git-patchwork-notify@kernel.org>
+Date: Wed, 27 Aug 2025 01:00:27 +0000
+References: <20250825180447.2252977-1-kuba@kernel.org>
+In-Reply-To: <20250825180447.2252977-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
+ almasrymina@google.com, sdf@fomichev.me, joe@dama.to,
+ linux-kselftest@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 25 Aug 2025 14:50:11 -0700 you wrote:
-> For ice:
-> Emil adds a check to ensure auxiliary device was created before tear
-> down to prevent NULL a pointer dereference.
+On Mon, 25 Aug 2025 11:04:42 -0700 you wrote:
+> Make ncdevmem clean up after itself. While at it make sure it sets
+> HDS threshold to 0 automatically.
 > 
-> Jake reworks flow for failed Tx scheduler configuration to allow for
-> proper recovery and operation. He also adjusts ice_adapter index for
-> E825C devices as use of DSN is incompatible with this device.
+> v2: rework patch 4 into separate patches 4 and 5
+> v1: https://lore.kernel.org/20250822200052.1675613-1-kuba@kernel.org
+> 
+> Jakub Kicinski (5):
+>   selftests: drv-net: ncdevmem: remove use of error()
+>   selftests: drv-net: ncdevmem: save IDs of flow rules we added
+>   selftests: drv-net: ncdevmem: restore old channel config
+>   selftests: drv-net: ncdevmem: restore original HDS setting before
+>     exiting
+>   selftests: drv-net: ncdevmem: explicitly set HDS threshold to 0
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/5] ice: fix NULL pointer dereference in ice_unplug_aux_dev() on reset
-    https://git.kernel.org/netdev/net/c/60dfe2434eed
-  - [net,2/5] ice: don't leave device non-functional if Tx scheduler config fails
-    https://git.kernel.org/netdev/net/c/86aae43f21cf
-  - [net,3/5] ice: use fixed adapter index for E825C embedded devices
-    https://git.kernel.org/netdev/net/c/5c5e5b52bf05
-  - [net,4/5] ice: fix incorrect counter for buffer allocation failures
-    https://git.kernel.org/netdev/net/c/b1a0c977c6f1
-  - [net,5/5] ixgbe: fix ixgbe_orom_civd_info struct layout
-    https://git.kernel.org/netdev/net/c/ed913b343dcf
+  - [net-next,v2,1/5] selftests: drv-net: ncdevmem: remove use of error()
+    https://git.kernel.org/netdev/net-next/c/6925f6171439
+  - [net-next,v2,2/5] selftests: drv-net: ncdevmem: save IDs of flow rules we added
+    https://git.kernel.org/netdev/net-next/c/6d04b36c73fd
+  - [net-next,v2,3/5] selftests: drv-net: ncdevmem: restore old channel config
+    https://git.kernel.org/netdev/net-next/c/b9f4f9529828
+  - [net-next,v2,4/5] selftests: drv-net: ncdevmem: restore original HDS setting before exiting
+    https://git.kernel.org/netdev/net-next/c/6351fadbd5bb
+  - [net-next,v2,5/5] selftests: drv-net: ncdevmem: explicitly set HDS threshold to 0
+    https://git.kernel.org/netdev/net-next/c/a9d533fbba0d
 
 You are awesome, thank you!
 -- 
