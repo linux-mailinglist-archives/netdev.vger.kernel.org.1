@@ -1,63 +1,45 @@
-Return-Path: <netdev+bounces-217313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87298B384E1
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 16:24:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FA25B384EB
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 16:27:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16C52684523
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 14:24:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5952C1885ED7
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 14:27:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3004A35AAA1;
-	Wed, 27 Aug 2025 14:24:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q+0JCzlG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB07A33CE90;
+	Wed, 27 Aug 2025 14:27:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bregans-0.gladserv.net (bregans-0.gladserv.net [185.128.210.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03D5135A2BD;
-	Wed, 27 Aug 2025 14:24:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A67551C1F12;
+	Wed, 27 Aug 2025 14:26:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.128.210.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756304657; cv=none; b=S8EuabAABzyFfslHtjGs8IFepsLW7kt57xy3sy/wnhJwmNK6WQZFbv2iEWZri7iaRA8nCx+03AskpDaykZBa8SPPjljsm/lIkxt91/NufgpW5LwpOJPXGWDijY8MWC4QMwO+5drtY+JauKAufSXq/zvC6Ix15DSmZOHgZT3y5VE=
+	t=1756304822; cv=none; b=NgXekyzNSjv5Tle/m0eqYsyXdCBftQnzxTqYi8Dq8jqwGDmPewOfoyeLGIcIl67Ak+pakd8o0NaT+BCZgm5HgDTd+RM9uB7b2pBUJzEBG62vrqnNX2Cs5MiPP0L7FCtS/4hCnk0e9f7EGUOnoDwYjL3M1yg5JmjrR+Mrnf9ppmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756304657; c=relaxed/simple;
-	bh=mq9eSuFgiPBFkbu6qC8Z66lM09Kcv4mvMXmdIBs42NY=;
+	s=arc-20240116; t=1756304822; c=relaxed/simple;
+	bh=QpuHB39nAGQwyhSesxsgKIlahRSa5eB803jWfbfWbxA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PWd2Z6e0q728mBDHt9OV1cc9IpmHoTx4+rBAXd6BkpPPoqC89aH1PPZPxX+n+EaS0VXoAbIqVDnshCgMrzbE72Phk8wXhB4IPgyiWjGKuNTlF558bJt0dqPhSuuvOU1tpJXpeuvJ0pO01fZrD3EnGJqEfvITRnPx0Ppemqyp/4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q+0JCzlG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84B36C4CEF9;
-	Wed, 27 Aug 2025 14:24:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756304656;
-	bh=mq9eSuFgiPBFkbu6qC8Z66lM09Kcv4mvMXmdIBs42NY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=q+0JCzlG6B+n6qBFikQl3S57CnpOcdupphg1A6UY5gA449o44tY+LGxZfTq4XZXXb
-	 SMKW8L/G29ftL1VZ38NPUGfJBp1L/q8Vv3mJl2nChLpR1srL1sUHEkJ0UPjpoFFI94
-	 Y3i510ecQLUQlUx4G4nuvyiX5AAlzkP27Ec4PPprSseg6LaH2ufCfir2/y5+VPR+tM
-	 4MXmItP0XBFafte5sOul6z6qQ9JZwabbmj7DCBST5NywTfo9iwzR6pDHl/LWO5CHNW
-	 DUVQmvw5doaIrxenIIIYUge7Q/ExAaZY1hnMehupnEwtdnSf6ZO53KQBbqcTrXR712
-	 sopcfqSzdIXwg==
-Date: Wed, 27 Aug 2025 15:24:11 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>,
-	Olga Kornievskaia <okorniev@redhat.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] sunrpc: add a Kconfig option to redirect
- dfprintk() output to trace buffer
-Message-ID: <20250827142411.GF5652@horms.kernel.org>
-References: <20250822-nfs-testing-v2-0-5f6034b16e46@kernel.org>
- <20250822-nfs-testing-v2-2-5f6034b16e46@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=DwJkRfz7At+8vHDgvNe50O/S6Nd6iqM7UG/Cy1PFpCkhbrdvY9Zm8wHAXpWr5dRVfDNkTA0ectvddeqxGy3nvhwBzFPEpbsozG7nctszUPQNnh9x4ARloHe4FliI3qqCSkhj9mer9QlEhrFo7A4vc2bHFzwA7C/RbibSfOhua2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=librecast.net; spf=pass smtp.mailfrom=librecast.net; arc=none smtp.client-ip=185.128.210.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=librecast.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=librecast.net
+Date: Wed, 27 Aug 2025 14:26:47 +0000
+From: Brett A C Sheffield <bacs@librecast.net>
+To: Oscar Maes <oscmaes92@gmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
+	dsahern@kernel.org, regressions@lists.linux.dev,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net v3 2/2] selftests: net: add test for destination in
+ broadcast packets
+Message-ID: <aK8Vp6yrrIoQEmxr@auntie>
+References: <20250827062322.4807-1-oscmaes92@gmail.com>
+ <20250827062322.4807-2-oscmaes92@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,22 +48,141 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250822-nfs-testing-v2-2-5f6034b16e46@kernel.org>
+In-Reply-To: <20250827062322.4807-2-oscmaes92@gmail.com>
 
-On Fri, Aug 22, 2025 at 09:19:23AM -0400, Jeff Layton wrote:
-> We have a lot of old dprintk() call sites that aren't going anywhere
-> anytime soon. At the same time, turning them up is a serious burden on
-> the host due to the console locking overhead.
+On 2025-08-27 08:23, Oscar Maes wrote:
+> Add test to check the broadcast ethernet destination field is set
+> correctly.
 > 
-> Add a new Kconfig option that redirects dfprintk() output to the trace
-> buffer. This is more efficient than logging to the console and allows
-> for proper interleaving of dprintk and static tracepoint events.
+> This test sends a broadcast ping, captures it using tcpdump and
+> ensures that all bits of the 6 octet ethernet destination address
+> are correctly set by examining the output capture file.
 > 
-> Since using trace_printk() causes scary warnings to pop at boot time,
-> this new option defaults to "n".
+> Signed-off-by: Oscar Maes <oscmaes92@gmail.com>
+> ---
+> Link to discussion:
+> https://lore.kernel.org/netdev/20250822165231.4353-4-bacs@librecast.net/
 > 
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> Thanks to Brett Sheffield for writing the initial version of this
+> selftest!
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Thanks for leaving my author name in the file.  Perhaps you might consider
+adding:
 
+Co-Authored-By: Brett A C Sheffield <bacs@librecast.net>
+
+to your commit message. I spend quite a bit of my Saturday bisecting and
+diagnosing,  and writing the patch and test.
+
+>  tools/testing/selftests/net/Makefile          |  1 +
+>  .../selftests/net/broadcast_ether_dst.sh      | 82 +++++++++++++++++++
+>  2 files changed, 83 insertions(+)
+>  create mode 100755 tools/testing/selftests/net/broadcast_ether_dst.sh
+> 
+> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+> index b31a71f2b372..56ad10ea6628 100644
+> --- a/tools/testing/selftests/net/Makefile
+> +++ b/tools/testing/selftests/net/Makefile
+> @@ -115,6 +115,7 @@ TEST_PROGS += skf_net_off.sh
+>  TEST_GEN_FILES += skf_net_off
+>  TEST_GEN_FILES += tfo
+>  TEST_PROGS += tfo_passive.sh
+> +TEST_PROGS += broadcast_ether_dst.sh
+>  TEST_PROGS += broadcast_pmtu.sh
+>  TEST_PROGS += ipv6_force_forwarding.sh
+>  
+> diff --git a/tools/testing/selftests/net/broadcast_ether_dst.sh b/tools/testing/selftests/net/broadcast_ether_dst.sh
+> new file mode 100755
+> index 000000000000..865b5c7c8c8a
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/broadcast_ether_dst.sh
+> @@ -0,0 +1,82 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0
+> +#
+> +# Author: Brett A C Sheffield <bacs@librecast.net>
+> +# Author: Oscar Maes <oscmaes92@gmail.com>
+> +#
+> +# Ensure destination ethernet field is correctly set for
+> +# broadcast packets
+> +
+> +source lib.sh
+> +
+> +CLIENT_IP4="192.168.0.1"
+> +GW_IP4="192.168.0.2"
+> +
+> +setup() {
+> +	setup_ns CLIENT_NS SERVER_NS
+> +
+> +	ip -net "${SERVER_NS}" link add link1 type veth \
+> +		peer name link0 netns "${CLIENT_NS}"
+> +
+> +	ip -net "${CLIENT_NS}" link set link0 up
+> +	ip -net "${CLIENT_NS}" addr add "${CLIENT_IP4}"/24 dev link0
+> +
+> +	ip -net "${SERVER_NS}" link set link1 up
+> +
+> +	ip -net "${CLIENT_NS}" route add default via "${GW_IP4}"
+> +	ip netns exec "${CLIENT_NS}" arp -s "${GW_IP4}" 00:11:22:33:44:55
+> +}
+> +
+> +cleanup() {
+> +	rm -f "${CAPFILE}"
+> +	ip -net "${SERVER_NS}" link del link1
+> +	cleanup_ns "${CLIENT_NS}" "${SERVER_NS}"
+> +}
+> +
+> +test_broadcast_ether_dst() {
+> +	local rc=0
+> +	CAPFILE=$(mktemp -u cap.XXXXXXXXXX)
+> +
+> +	echo "Testing ethernet broadcast destination"
+> +
+> +	# start tcpdump listening for icmp
+> +	# tcpdump will exit after receiving a single packet
+> +	# timeout will kill tcpdump if it is still running after 2s
+> +	timeout 2s ip netns exec "${CLIENT_NS}" \
+> +		tcpdump -i link0 -c 1 -w "${CAPFILE}" icmp &> /dev/null &
+> +	pid=$!
+> +	sleep 0.1 # let tcpdump wake up
+> +
+> +	# send broadcast ping
+> +	ip netns exec "${CLIENT_NS}" \
+> +		ping -W0.01 -c1 -b 255.255.255.255 &> /dev/null
+> +
+> +	# wait for tcpdump for exit after receiving packet
+> +	wait "${pid}"
+> +
+> +	# compare ethernet destination field to ff:ff:ff:ff:ff:ff
+> +	ether_dst=$(tcpdump -r "${CAPFILE}" -tnne 2>/dev/null | \
+> +			awk '{sub(/,/,"",$3); print $3}')
+> +	if [[ "${ether_dst}" == "ff:ff:ff:ff:ff:ff" ]]; then
+> +		echo "[ OK ]"
+> +		rc="${ksft_pass}"
+> +	else
+> +		echo "[FAIL] expected dst ether addr to be ff:ff:ff:ff:ff:ff," \
+> +			"got ${ether_dst}"
+> +		rc="${ksft_fail}"
+> +	fi
+> +
+> +	return "${rc}"
+> +}
+> +
+> +if [ ! -x "$(command -v tcpdump)" ]; then
+> +	echo "SKIP: Could not run test without tcpdump tool"
+> +	exit "${ksft_skip}"
+> +fi
+> +
+> +trap cleanup EXIT
+> +
+> +setup
+> +test_broadcast_ether_dst
+> +
+> +exit $?
+> -- 
+> 2.39.5
+> 
+> 
+
+-- 
 
