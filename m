@@ -1,127 +1,149 @@
-Return-Path: <netdev+bounces-217403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18178B388E0
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 19:48:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D31ABB388F5
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 19:55:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB2EC461B86
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 17:48:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 964277A8CB1
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 17:54:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77E8619E82A;
-	Wed, 27 Aug 2025 17:48:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97B9F2D7DED;
+	Wed, 27 Aug 2025 17:55:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sarinay.com header.i=@sarinay.com header.b="rK1g6VF3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OH6omwl0"
 X-Original-To: netdev@vger.kernel.org
-Received: from natrix.sarinay.com (natrix.sarinay.com [159.100.251.32])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A13E8273F9;
-	Wed, 27 Aug 2025 17:48:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.100.251.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEA332D7D2E;
+	Wed, 27 Aug 2025 17:55:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756316924; cv=none; b=suX3QOlu3SXK57hrPuu7Dsn7WgEp1Z/X/7Cq4BmOV9GdYgWB+0aFijP3qBfXCb5bHSje7NcW8Pih8kapWH1N+tfNHPNXP/zfl1Fv2bo4rxOlTLDFY5fqRTP0Nhw5p3hnXmCxRj6dTQcao5+kmDI7Gj0V/LoyI2ILbC/CdNhFUKo=
+	t=1756317318; cv=none; b=HsudBPll7RHb3/ufmvFQ27dyb1UJX5LR7H40uSNlIEJWTw1r3GMJ0CuoIReSiOzvM92vRRDimBFELkFPnxi8/mm2IkiRQrYdfEGwEjNlpo7juB/EojFwvlc31uMxJqrH2Kqp6CwDDFXglZ0VDPm9c1i2p/z0e2iNugsc1Ak/5Ow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756316924; c=relaxed/simple;
-	bh=MzK6hjdsHzWjAx0dhXNnuYZv03t2+HCtYmmUM0F3X1k=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=muxYhCGg6uSvejWWs9JTFhUJxss9XujMf7Hd9yqQQzXtkxvFcAeS77OSMivHn64iSlNmb+nQGvRc9OzjnJyfvOTedEy1Oy+3KC+eQojJJIxr0Lw5r7G1mJXuGi/TdVOu1A1WA86MCQUJLoHBx5RZn8wcJOmaXH0RY2P+Cee+UlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sarinay.com; spf=pass smtp.mailfrom=sarinay.com; dkim=pass (2048-bit key) header.d=sarinay.com header.i=@sarinay.com header.b=rK1g6VF3; arc=none smtp.client-ip=159.100.251.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sarinay.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sarinay.com
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=sarinay.com; s=2023;
-	t=1756316914; bh=MzK6hjdsHzWjAx0dhXNnuYZv03t2+HCtYmmUM0F3X1k=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=rK1g6VF3F6SHGb6Mw5MO2zxHiD+vSdYorLiUxui14xmqBfvavHfON18EOHDwH7eK4
-	 2APagwjRbYXXU36tMraF4EdnCfuarLDOBZCmLe1otjpfkkWkLHGAkkbR9DY0Ip9ZzO
-	 LdnD3Wr7CuB42V6fRDfZyGXiiBVUpv7UX9l4aoCHU78AwzeCplA1vkSPZsPfvRnjhr
-	 6ljxad2sVMzzHfmAwHxfVagxrDanQVbTMq9zjFSw30oYx7oR/EStxUAb3/iNqrTArN
-	 me+FdB04stmFNylNSWwCaYMxY/Czjc9mrMw+lauQcbfyUYbuT1Q80Me1Hd6bZk4SUz
-	 +moY/6A88gVmg==
-Message-ID: <518333811aeda4dc42445efd6d9cee6cc580145a.camel@sarinay.com>
-Subject: Re: [PATCH net-next v2] net: nfc: nci: Turn data timeout into a
- module parameter and increase the default
-From: Juraj =?UTF-8?Q?=C5=A0arinay?= <juraj@sarinay.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, mingo@kernel.org, horms@kernel.org, 
-	tglx@linutronix.de
-Date: Wed, 27 Aug 2025 19:48:33 +0200
-In-Reply-To: <c0c14ec0-f582-4e26-bc7e-35a26a7ff1ce@kernel.org>
-References: <20250825234354.855755-1-juraj@sarinay.com>
-	 <c0c14ec0-f582-4e26-bc7e-35a26a7ff1ce@kernel.org>
-Autocrypt: addr=juraj@sarinay.com; prefer-encrypt=mutual;
- keydata=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
- oiRvevraR4S+FMeNg+HrhPNNRy45eF4M2RQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1756317318; c=relaxed/simple;
+	bh=kwd198YuCgA0kZ9xjDCn4ZtyCIY8uP5Rn5q+t2dyKX4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JnQC8cMlfNAznc4Jbk54UHZJfZkSxyuY57C0+Qfn29RD5o+di7FwS4Lb8M35jP38ux0/8moUQ4Mb8IYX9fglyKXgtdE+uERsxTrTbVeDYeaQy6Ltq8g4GDlEJlbrMH4MskLB+CX0jyfINeKQPbbj6DXlOvl7TLAFmpYKesVGnKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OH6omwl0; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756317317; x=1787853317;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=kwd198YuCgA0kZ9xjDCn4ZtyCIY8uP5Rn5q+t2dyKX4=;
+  b=OH6omwl0wypxKmY5p8vMJ/joYLwk3qUtBI8QTQKd8NBJFCKIUlswQXd9
+   oDe37oODsOwuBSzsqRoj6nw6/dnVj03pRXDz5V1UkzTtj0Wo0hHOFcdr7
+   ZVzBqg1xJ7S6HRADfr3WDNnLwGar4jy3tYwEnEJVJn/Vv7kGUbni86WfE
+   B+QHiFxKBzadn+KLzdh3Ilvv4vWWLPXHj6lzNXwG+0vWuYCgETDNU8mqJ
+   AHG46J74NiUvSfJiDcmnGehNRpUGwAcDmYfIkKYPZoLriPLSI+Ee3uCQr
+   K1CbCKv3FULE1mL9s2LL0wl1CR2r9aBpmGu9EUdxi187bmFgSSxfbvKnw
+   w==;
+X-CSE-ConnectionGUID: yz0s/XILSO+Jj1EemJBQqw==
+X-CSE-MsgGUID: uIqsf7B5RnK/Q1x3EzarhA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11535"; a="62220510"
+X-IronPort-AV: E=Sophos;i="6.18,217,1751266800"; 
+   d="scan'208";a="62220510"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2025 10:55:16 -0700
+X-CSE-ConnectionGUID: knnLbb9kSuCnrXBl4xYRgg==
+X-CSE-MsgGUID: st431V+TTTabCjdhhUGtfQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,217,1751266800"; 
+   d="scan'208";a="207062895"
+Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
+  by orviesa001.jf.intel.com with ESMTP; 27 Aug 2025 10:55:13 -0700
+Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1urKMO-000T8R-18;
+	Wed, 27 Aug 2025 17:55:02 +0000
+Date: Thu, 28 Aug 2025 01:54:48 +0800
+From: kernel test robot <lkp@intel.com>
+To: admiyo@os.amperecomputing.com, Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Huisong Li <lihuisong@huawei.com>
+Subject: Re: [PATCH net-next v25 1/1] mctp pcc: Implement MCTP over PCC
+ Transport
+Message-ID: <202508280145.bix2s4fv-lkp@intel.com>
+References: <20250827044810.152775-2-admiyo@os.amperecomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250827044810.152775-2-admiyo@os.amperecomputing.com>
 
-On Wed, 2025-08-27 at 15:29 +0200, Krzysztof Kozlowski wrote:
+Hi,
 
-> CardOS is the software running on the NFC card, right?=C2=A0
+kernel test robot noticed the following build warnings:
 
-Yes it is. I may have been too specific, all I am saying is that I made
-some measurements.
+[auto build test WARNING on net-next/main]
 
-> If so, why would this be Linux kernel module param? Kernel runtime setup =
-is really
-> independent of what NFC card people will use.
+url:    https://github.com/intel-lab-lkp/linux/commits/admiyo-os-amperecomputing-com/mctp-pcc-Implement-MCTP-over-PCC-Transport/20250827-124953
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250827044810.152775-2-admiyo%40os.amperecomputing.com
+patch subject: [PATCH net-next v25 1/1] mctp pcc: Implement MCTP over PCC Transport
+config: i386-randconfig-002-20250827 (https://download.01.org/0day-ci/archive/20250828/202508280145.bix2s4fv-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250828/202508280145.bix2s4fv-lkp@intel.com/reproduce)
 
-I suggested a tunable timeout because I am not sure what the new
-universal upper bound should be. It may depend on the NFC card one is
-communicating with. I have since learned that module parameters are
-strongly discouraged (within netdev at least).
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202508280145.bix2s4fv-lkp@intel.com/
 
-> I think this should be unconditionally raised
+All warnings (new ones prefixed by >>):
 
-I am fine with that, but would argue for an even more generous timeout.
-Five seconds, say? One can always set a shorter SO_RCVTIMEO from user
-space if needed.
+>> drivers/net/mctp/mctp-pcc.c:110:24: warning: variable 'mctp_pcc_ndev' set but not used [-Wunused-but-set-variable]
+     110 |         struct mctp_pcc_ndev *mctp_pcc_ndev;
+         |                               ^
+   1 warning generated.
 
-Ideally, the kernel would also honor a longer SO_RCVTIMEO and treat
-NCI_DATA_TIMEOUT as a default rather than a rigid limit, completely
-obviating my subjective need for a parameter. I have not explored the
-idea further, given that a somewhat higher value of NCI_DATA_TIMEOUT
-solves most problems.
 
-Best,
-Juraj
+vim +/mctp_pcc_ndev +110 drivers/net/mctp/mctp-pcc.c
+
+   107	
+   108	static void mctp_pcc_tx_done(struct mbox_client *c, void *mssg, int r)
+   109	{
+ > 110		struct mctp_pcc_ndev *mctp_pcc_ndev;
+   111		struct mctp_pcc_mailbox *box;
+   112		struct sk_buff *skb = NULL;
+   113		struct sk_buff *curr_skb;
+   114	
+   115		mctp_pcc_ndev = container_of(c, struct mctp_pcc_ndev, outbox.client);
+   116		box = container_of(c, struct mctp_pcc_mailbox, client);
+   117		spin_lock(&box->packets.lock);
+   118		skb_queue_walk(&box->packets, curr_skb) {
+   119			skb = curr_skb;
+   120			if (skb->data == mssg) {
+   121				__skb_unlink(skb, &box->packets);
+   122				break;
+   123			}
+   124		}
+   125		spin_unlock(&box->packets.lock);
+   126	
+   127		if (skb)
+   128			dev_consume_skb_any(skb);
+   129	}
+   130	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
