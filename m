@@ -1,292 +1,166 @@
-Return-Path: <netdev+bounces-217392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23F62B38843
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 19:09:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FBC1B38858
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 19:12:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03DC37AB6CC
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 17:08:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62BDB16EBA1
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 17:12:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BA6C2F60B4;
-	Wed, 27 Aug 2025 17:09:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A250130C37C;
+	Wed, 27 Aug 2025 17:12:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k1bDLmD0"
+	dkim=pass (2048-bit key) header.d=blaese.de header.i=@blaese.de header.b="NpZ8pKvV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from mail.sgstbr.de (mail.sgstbr.de [94.130.16.203])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 532B3227BA4
-	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 17:09:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93FE52F0671;
+	Wed, 27 Aug 2025 17:12:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.130.16.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756314581; cv=none; b=CZJBAi43qYIJZIW3Rhraj/CfbOc1xKTJW058OHqGtAKBLrPZd/5B0xB3EnA2wuchvYALc4G+C1eR+/+4s9lQ0dcqLFxdT8QrBTQA4segGYsszMnXkO4iyzuFe2dbsZit7FXAKykLOK3w+sLG5xRwZ6/ZHlPbm3QqJu9Wv6vVoIU=
+	t=1756314756; cv=none; b=vFk5rGb3vxcKyJP7rIdk3kAebcQNc86YuYv16Y66N4/3jVXMxbY+hLgI8fQ5oJKICwZYfb/J8scok5ZTxexksiMyDB9gbF0Zm/eHa58x62adUa3/vX/gnT1UjwhqFLIls865Ydwi3JodIafb5WeEgfK0W06xzxMrITj1eMFunZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756314581; c=relaxed/simple;
-	bh=A9AomUIKs59ti1CXS8VU41SHgT03cDP59EObbJz83N4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=E3rtYh8xU+gZAy/Rtc+GoeIrkXz9DP6zCPap7gb1aWmexVi5ID8dlm2+HIDDqIb67pz88Mv4GC0fVHJfeKMC2jsDpXwoLz0OcHiysPYdmAVoXoAeWWhXkKl4jrnsoZ1T70RCLPpew/P/WxtWtexXcPg4tuJkwCKWIvn7DHiVYYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=k1bDLmD0; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756314579; x=1787850579;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=A9AomUIKs59ti1CXS8VU41SHgT03cDP59EObbJz83N4=;
-  b=k1bDLmD068Uc0hcRIY+ltzwsnU/4PRJzLsH04WUsnck2Y4ruHtsuMJbu
-   uKCM+69t7SCpGhw+uYpkg1Z/TwxDcpDlABpTP/v/XxPJeijQtwl0CXAzO
-   RHg700CZAcfEIrt5T24fJPIQJQ+tYR8CZpj7yvA/QGuBX63FqIh6n0MBW
-   V083kVueQdHLBbxku8Nhm2VMnoUcdj4He5bCer4mmXI6EsS9e+lXYONfz
-   T7a0XdPsfxjzGhSFS9eCq7ScHwFEWo1iN9XIqBHdAP/FBJMVLD06chPEn
-   vb/7z64ElKwOBEj/UiV7KiExJnSC9m+cM6qvg/xTqn1YhDRcA8BIJFMPH
-   g==;
-X-CSE-ConnectionGUID: 8vFaxesHTPuGebdZPEFLGw==
-X-CSE-MsgGUID: UHYJ667cSNmPQnxSkXu8sQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="58515374"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="58515374"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2025 10:09:38 -0700
-X-CSE-ConnectionGUID: GU3iTpwuQ++Q6BqN3cwUCQ==
-X-CSE-MsgGUID: E3oI8Il5T5q0XfT8rz/Sqg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,217,1751266800"; 
-   d="scan'208";a="174055092"
-Received: from unknown (HELO localhost.jf.intel.com) ([10.166.80.55])
-  by orviesa003.jf.intel.com with ESMTP; 27 Aug 2025 10:09:38 -0700
-From: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: madhu.chittim@intel.com,
-	netdev@vger.kernel.org,
-	Pavan Kumar Linga <pavan.kumar.linga@intel.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>
-Subject: [PATCH net-next v2] idpf: add support for IDPF PCI programming interface
-Date: Wed, 27 Aug 2025 10:09:19 -0700
-Message-ID: <20250827170919.51563-1-pavan.kumar.linga@intel.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1756314756; c=relaxed/simple;
+	bh=txdx1s8qFjy7bZfp6A8JGTnYvXtIPXGL5WG4K4rhisU=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=NDYpxQcrK5ypyijzpuIiaT/S9TceRuAOKlMEWBu6GVZjuS7DK8JRcOQNFsPCzMZf2A+ObioupdbpPenh4Pl82+ZiE9LZb3tj5tmsoykgPudMf/6FJlNDsP//zxJ2xwWipVewykLwRqEbF7YCFQVR+pZ+fieXA/bnwWW/Fxhj01o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=blaese.de; spf=pass smtp.mailfrom=blaese.de; dkim=pass (2048-bit key) header.d=blaese.de header.i=@blaese.de header.b=NpZ8pKvV; arc=none smtp.client-ip=94.130.16.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=blaese.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blaese.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=blaese.de; s=201803;
+	t=1756314743; bh=w3BdMIdi4mu9DyHfL8aSx5oylHchPpBewyakd30mWLQ=;
+	h=Date:From:Subject:To:References:In-Reply-To:From;
+	b=NpZ8pKvVCFxkJMlRixFVcLXUzjnRGo8w0dVLdGIJBMjrgSQIOzY3FQB//q91IToh/
+	 SyYc4jvc7vkC2e+foi0G/zzwAOIfnGynoKsZNFvlqSU5OlBDanmbPnWsBYAKg/eMC0
+	 AzPrebvWm8ePzreYUA2Kc8kfACRryB8j6XjZenPLE5sZeszEPb0ShXAnxxa3SwIq7N
+	 cPSF1bS9EDioqr9caUID6FV3Sn3Fa0dZarrrMg+QI11mb2MIM7NXdnlUEu1sBiRalp
+	 6qWhFGsa9/paWfjMzM/pxlj78uRGVC3lhRIXufwpbh7mshK1nimN+qiZRiSUa9MOdw
+	 YraZHV3/Pe6Fg==
+Received: from [IPV6:2a0b:f4c0:c8:6d:77a2:ec00:2663:dfdb] (2a0b.f4c0.00c8.006d.77a2.ec00.2663.dfdb.rdns.f3netze.de [IPv6:2a0b:f4c0:c8:6d:77a2:ec00:2663:dfdb])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fabian@blaese.de)
+	by mail.sgstbr.de (Postfix) with ESMTPSA id 5E16F24B485;
+	Wed, 27 Aug 2025 19:12:22 +0200 (CEST)
+Message-ID: <e1bf6193-d075-4593-81ef-99e8b93a4f74@blaese.de>
+Date: Wed, 27 Aug 2025 19:12:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+From: =?UTF-8?Q?Fabian_Bl=C3=A4se?= <fabian@blaese.de>
+Subject: Re: [PATCH v2] icmp: fix icmp_ndo_send address translation for reply
+ direction
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ "Jason A. Donenfeld" <Jason@zx2c4.com>
+References: <20250825201717.3217045-1-fabian@blaese.de>
+ <20250825203826.3231093-1-fabian@blaese.de> <aK7KYr5D7bD3OcHb@strlen.de>
+Content-Language: de-DE, en-US
+Autocrypt: addr=fabian@blaese.de; keydata=
+ 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
+In-Reply-To: <aK7KYr5D7bD3OcHb@strlen.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-At present IDPF supports only 0x1452 and 0x145C as PF and VF device IDs
-on our current generation hardware. Future hardware exposes a new set of
-device IDs for each generation. To avoid adding a new device ID for each
-generation and to make the driver forward and backward compatible,
-make use of the IDPF PCI programming interface to load the driver.
+On 27.08.25 11:05, Florian Westphal wrote:
+> If the connection isn't subject to snat, why to we need to mangle the
+> source address in the first place?
+It is not limited to SNAT/MASQUERADE.
+DNAT also affects which source address should be used, depending on the packet
+direction.
 
-Write and read the VF_ARQBAL mailbox register to find if the current
-device is a PF or a VF.
+With DNAT, the *destination* of the original direction is changed.
+In the reply direction, this becomes the *source* address.
 
-PCI SIG allocated a new programming interface for the IDPF compliant
-ethernet network controller devices. It can be found at:
-https://members.pcisig.com/wg/PCI-SIG/document/20113
-with the document titled as 'PCI Code and ID Assignment Revision 1.16'
-or any latest revisions.
+So reply packets of a DNAT connection are effectively subject to source address
+translation. If icmp_ndo_send doesn’t account for this, rate limiting breaks,
+which is exactly the problem this function was meant to solve.
 
-Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
-Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+> Don't understand this either.  Why these checks?
+> AFAICS you can keep the original check in place, and then:
+> 
+> replace this
+>>  	orig_ip = ip_hdr(skb_in)->saddr;
+>> -	ip_hdr(skb_in)->saddr = ct->tuplehash[0].tuple.src.u3.ip;
+> 
+> ... with ...
+You are right: the code can be simplified. I'm not sure show this slipped through.
+I will send an updated patch with this change — thanks for the suggestion.
+However, the old check (IPS_SRC_NAT only) cannot be kept, because:
+- Reply packets of a DNAT connection also need handling.
+- Reply packets of a pure SNAT connection don’t need it, but replacing the
+   address is a no-op in that case (tuple == skb address).
 
----
-v2:
-- replace *u8 with *bool in idpf_is_vf_device function parameter
-- use ~0 instead of 0xffffff in PCI_DEVICE_CLASS parameter
+To avoid unnecessary translations, I suggested the direction-specific checks.
+Another option is to simplify them to:
 
----
- drivers/net/ethernet/intel/idpf/idpf.h        |  1 +
- drivers/net/ethernet/intel/idpf/idpf_main.c   | 73 ++++++++++++++-----
- drivers/net/ethernet/intel/idpf/idpf_vf_dev.c | 37 ++++++++++
- 3 files changed, 94 insertions(+), 17 deletions(-)
+     if (!(ct->status & IPS_NAT_MASK)) { … }
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
-index 19a248d5b124..a1c5253e1df2 100644
---- a/drivers/net/ethernet/intel/idpf/idpf.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf.h
-@@ -983,6 +983,7 @@ void idpf_mbx_task(struct work_struct *work);
- void idpf_vc_event_task(struct work_struct *work);
- void idpf_dev_ops_init(struct idpf_adapter *adapter);
- void idpf_vf_dev_ops_init(struct idpf_adapter *adapter);
-+int idpf_is_vf_device(struct pci_dev *pdev, bool *is_vf);
- int idpf_intr_req(struct idpf_adapter *adapter);
- void idpf_intr_rel(struct idpf_adapter *adapter);
- u16 idpf_get_max_tx_hdr_size(struct idpf_adapter *adapter);
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
-index 8c46481d2e1f..a69e66cecfbd 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_main.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
-@@ -7,11 +7,57 @@
- 
- #define DRV_SUMMARY	"Intel(R) Infrastructure Data Path Function Linux Driver"
- 
-+#define IDPF_NETWORK_ETHERNET_PROGIF				0x01
-+#define IDPF_CLASS_NETWORK_ETHERNET_PROGIF			\
-+	(PCI_CLASS_NETWORK_ETHERNET << 8 | IDPF_NETWORK_ETHERNET_PROGIF)
-+
- MODULE_DESCRIPTION(DRV_SUMMARY);
- MODULE_IMPORT_NS("LIBETH");
- MODULE_IMPORT_NS("LIBETH_XDP");
- MODULE_LICENSE("GPL");
- 
-+/**
-+ * idpf_dev_init - Initialize device specific parameters
-+ * @adapter: adapter to initialize
-+ * @ent: entry in idpf_pci_tbl
-+ *
-+ * Return: %0 on success, -%errno on failure.
-+ */
-+static int idpf_dev_init(struct idpf_adapter *adapter,
-+			 const struct pci_device_id *ent)
-+{
-+	bool is_vf = false;
-+	int err;
-+
-+	switch (ent->device) {
-+	case IDPF_DEV_ID_PF:
-+		goto dev_ops_init;
-+	case IDPF_DEV_ID_VF:
-+		is_vf = true;
-+		goto dev_ops_init;
-+	default:
-+		if (ent->class == IDPF_CLASS_NETWORK_ETHERNET_PROGIF)
-+			goto check_vf;
-+
-+		return -ENODEV;
-+	}
-+
-+check_vf:
-+	err = idpf_is_vf_device(adapter->pdev, &is_vf);
-+	if (err)
-+		return err;
-+
-+dev_ops_init:
-+	if (is_vf) {
-+		idpf_vf_dev_ops_init(adapter);
-+		adapter->crc_enable = true;
-+	} else {
-+		idpf_dev_ops_init(adapter);
-+	}
-+
-+	return 0;
-+}
-+
- /**
-  * idpf_remove - Device removal routine
-  * @pdev: PCI device information struct
-@@ -165,21 +211,6 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	adapter->req_tx_splitq = true;
- 	adapter->req_rx_splitq = true;
- 
--	switch (ent->device) {
--	case IDPF_DEV_ID_PF:
--		idpf_dev_ops_init(adapter);
--		break;
--	case IDPF_DEV_ID_VF:
--		idpf_vf_dev_ops_init(adapter);
--		adapter->crc_enable = true;
--		break;
--	default:
--		err = -ENODEV;
--		dev_err(&pdev->dev, "Unexpected dev ID 0x%x in idpf probe\n",
--			ent->device);
--		goto err_free;
--	}
--
- 	adapter->pdev = pdev;
- 	err = pcim_enable_device(pdev);
- 	if (err)
-@@ -259,11 +290,18 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	/* setup msglvl */
- 	adapter->msg_enable = netif_msg_init(-1, IDPF_AVAIL_NETIF_M);
- 
-+	err = idpf_dev_init(adapter, ent);
-+	if (err) {
-+		dev_err(&pdev->dev, "Unexpected dev ID 0x%x in idpf probe\n",
-+			ent->device);
-+		goto destroy_vc_event_wq;
-+	}
-+
- 	err = idpf_cfg_hw(adapter);
- 	if (err) {
- 		dev_err(dev, "Failed to configure HW structure for adapter: %d\n",
- 			err);
--		goto err_cfg_hw;
-+		goto destroy_vc_event_wq;
- 	}
- 
- 	mutex_init(&adapter->vport_ctrl_lock);
-@@ -284,7 +322,7 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 
- 	return 0;
- 
--err_cfg_hw:
-+destroy_vc_event_wq:
- 	destroy_workqueue(adapter->vc_event_wq);
- err_vc_event_wq_alloc:
- 	destroy_workqueue(adapter->stats_wq);
-@@ -304,6 +342,7 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- static const struct pci_device_id idpf_pci_tbl[] = {
- 	{ PCI_VDEVICE(INTEL, IDPF_DEV_ID_PF)},
- 	{ PCI_VDEVICE(INTEL, IDPF_DEV_ID_VF)},
-+	{ PCI_DEVICE_CLASS(IDPF_CLASS_NETWORK_ETHERNET_PROGIF, ~0)},
- 	{ /* Sentinel */ }
- };
- MODULE_DEVICE_TABLE(pci, idpf_pci_tbl);
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
-index 4cc58c83688c..d5b09996caa8 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
-@@ -7,6 +7,43 @@
- 
- #define IDPF_VF_ITR_IDX_SPACING		0x40
- 
-+#define IDPF_VF_TEST_VAL		0xFEED0000
-+
-+/**
-+ * idpf_is_vf_device - Helper to find if it is a VF device
-+ * @pdev: PCI device information struct
-+ * @is_vf: used to update VF device status
-+ *
-+ * Return: %0 on success, -%errno on failure.
-+ */
-+int idpf_is_vf_device(struct pci_dev *pdev, bool *is_vf)
-+{
-+	struct resource mbx_region;
-+	resource_size_t mbx_start;
-+	void __iomem *mbx_addr;
-+	long len;
-+
-+	resource_set_range(&mbx_region,	VF_BASE, IDPF_VF_MBX_REGION_SZ);
-+
-+	mbx_start = pci_resource_start(pdev, 0) + mbx_region.start;
-+	len = resource_size(&mbx_region);
-+
-+	mbx_addr = ioremap(mbx_start, len);
-+	if (!mbx_addr)
-+		return -EIO;
-+
-+	writel(IDPF_VF_TEST_VAL, mbx_addr + VF_ARQBAL - VF_BASE);
-+
-+	/* Force memory write to complete before reading it back */
-+	wmb();
-+
-+	*is_vf = readl(mbx_addr + VF_ARQBAL - VF_BASE) == IDPF_VF_TEST_VAL;
-+
-+	iounmap(mbx_addr);
-+
-+	return 0;
-+}
-+
- /**
-  * idpf_vf_ctlq_reg_init - initialize default mailbox registers
-  * @adapter: adapter structure
--- 
-2.43.0
+This ensures we only ever touch connections with NAT, while keeping the code
+straightforward.
 
+> Without dnat, the reply tuple saddr == original tuple daddr.
+> 
+> With dnat, its the dnat targets' address (i.e., the real destination
+> the client is talking to).
+Yes, exactly.
+
+> If you are worried about "dnat to", then please update the commit
+> message, which only mentions masquerade/snat.
+Correct — the change not only fixes SNAT-in-reply handling, but also adds
+proper handling for DNAT in the reply direction, which was missing entirely.
+I will update the commit message to reflect this.
+
+Best regards,
+Fabian
 
