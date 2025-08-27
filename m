@@ -1,166 +1,274 @@
-Return-Path: <netdev+bounces-217441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 442E9B38B42
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 23:15:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CDDAB38B47
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 23:18:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EECDA362DB4
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 21:15:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20B001C21859
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 21:18:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6588130C62A;
-	Wed, 27 Aug 2025 21:15:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DEB92C2377;
+	Wed, 27 Aug 2025 21:18:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bmNpAkwU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EYyGemqb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3BC92DBF51
-	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 21:15:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CBB42192F4
+	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 21:18:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756329302; cv=none; b=pocD9iHYv9l1FfI7ykwzfQfze+zZH5XpF4vaO29KsK4qPYdc8fDCesP43rvPVQgoC3f5PxeW6ZAnPxBu+vOUkGXTRbOY8HrW1wciTi3F7kEhFLRdkWpCICUf4TgTZHVwgCfd0owge2xvDX5tjwQY7/aIM1U7lb2CrcUFExd0OHg=
+	t=1756329492; cv=none; b=e2/krBk/bUKcns6dWqBtGc3C0Dp56x1aYfTWUD3hdfRUI1UdYgG3u2d0yVerKjd3YXkRe0vJXx7Qmll9jUBvPDlcFQPdQmvPK7wo1jHNN+PsCrnn8CJ9tuLmobuZSlYjDS62oLnwd5uaMnL7myhEcxkKmDhIvC3sbNU0rEoY0Dg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756329302; c=relaxed/simple;
-	bh=jsLzs4lzPss9t9zx5K467G4blO9Luowh7mUVJzo0HyE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gvYdmDM/zMPNG0blQzarMON/bMMO30nbceE0YVQb0PS1TIFD5O7SXFVrTk1vmklCy8UWhvmLs+wkjf8VA5/6PPN8+OHOSqxJd+byuU4KeW7iBdynIUIrLnaiHfDDLKnYMWkImew9lVv7Epoj1Htt9b17gncERhxtSMl/Lgioec0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bmNpAkwU; arc=none smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4b109a95f09so2340021cf.1
-        for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 14:15:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756329299; x=1756934099; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=n9ABox5zOemlHPyUgf+QrPeMwuOYbBHW8XM2x5EcKhc=;
-        b=bmNpAkwUJczbLYSjH2OCRIlpTLzI9OcmZMNO3JZMq4+Ge0mkbzK61W/KTon8fns9WM
-         AnbAQNRimooH5DRJwlaVaXpL2MxT99GTwcYJQYW6M4lfa2INj9ey5h1Yebb3oozUFb7H
-         llS953ShGB+i0NwmTyhafaOrQ8iHAj2k1G2nl4247wBwa6fTMg+bHvY+k/Rxhumn6AYL
-         sf5ta29xG131pbPcEAIzfEio9zhxbqSxxCy2DJHRHDUYzpShX5vzHl6GEvxBXa5nk+QS
-         xekv2s7QRE19jXh2uIIpTkcyWAy2ChuZkqdovoY2j+42MjQ/xC0TD+vbxaDFXEcAScso
-         puQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756329299; x=1756934099;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=n9ABox5zOemlHPyUgf+QrPeMwuOYbBHW8XM2x5EcKhc=;
-        b=DjBYqAUmrqDjAd0g+XuOuoPL6KjZNc8q307TdUuUTr+5FDRi4h9uAx1WaM8+oeMXbV
-         TNm3bmY6o50+2QXUUljtimiPNjwL/lxSlFOH4q7w4462OyV7714Hb/Y0mKbpDlT+hkP9
-         I68oI9v27Ma97ElPt+YCZjgvN+nckAQ/72VLVuqDMcbD/rGZ2S7YaR037FI6/fjio2NS
-         yxOL4ixia2BLq2pLnDmDNctmAObAh1AG7Ahvf7AH0M3YpemYDTTA6twDjMeRUslWpnXT
-         LooEubrYIp/YtQ8R68KatPC+V8xxiNx6SfqlgYRD0IFpMsH2nxxSxC+KQ/DAVBsHzGdg
-         fMaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW1BGlO3rAMbQMD2Zj/gZ/YIDsdasBj4WG4wmAuWm8Ju71kd6YDvelS3t+FT49R4MmCcg4pNiA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywo/JqyVS42zz4lCaZ4cXL+SoRsY4QhG7BcRu/+zsJK9FXh6PKt
-	fHvBd0OO+J/HssU+CfUbo+xzLGG3b6nObuVvPLv5ng0xSyQ+dO67i5Iu
-X-Gm-Gg: ASbGncsO3ide5lmLNR2CTEgl/qwfptntEPP8pRSXYtnVHoTYVJvC6qfNEh7AQrZOPoN
-	DdgYGUY9Trz5ke6HfgDpyq0SOSXAe1rW880qlWR1AlcZ3mm6ESV805111S3Hb9CPyM3k9ejL9n4
-	2KW2SCu+LnpmMY8CS25FcO8wAIIUr0XrZIW0mcmYdOGkdfgpcUeAIL5IgHkIInxX24OxTFYLzEC
-	pTOMBon9BFzewmtbjjwR8IEKmeoITRZYRj1eigC06wL0SIAtwyf0uFuAns0bjACR5BflcUCm649
-	ArvqsMzdBAmaewyYoSFNDWf1YPQXfFnHB7qVAw6wb99KkReOerb4GiDJi71YwNyOXtRv00q+Uoq
-	6HHy3lp3mkuAOpam+DSpBdRrDv1ZtJDRavvVLU2vi2SIUNFDf+ZbFo0a9dIXN
-X-Google-Smtp-Source: AGHT+IFmWvYk/gjNmy2QmdoD3q5ra1OdpSSgyF0dRxnbPyOj2+r9XEX3x9pggf7JW27DgwE1wWl7Yw==
-X-Received: by 2002:ac8:5754:0:b0:4b2:9ac2:6858 with SMTP id d75a77b69052e-4b2aab66b53mr228735461cf.75.1756329299350;
-        Wed, 27 Aug 2025 14:14:59 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b2b8c67929sm101568311cf.6.2025.08.27.14.14.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Aug 2025 14:14:58 -0700 (PDT)
-Message-ID: <7f390adf-5ee2-44cd-8793-36b04f1fe73f@gmail.com>
-Date: Wed, 27 Aug 2025 14:14:54 -0700
+	s=arc-20240116; t=1756329492; c=relaxed/simple;
+	bh=tn6EVHu8sY4G0Bw0cvnGYUOHgfvWC1wVHiDE8mxKM5w=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=LXijbqw3uqIUMuODy3kXAgEeGxVKSnc9l5R0lGy6/Xb/IUUIF0tjCAJUaoNOKqebH8rwccDkiVLklUYen9E9sjIpDgD5bLt/tra2207KX89SDU86OrvdO6tsUvdLUVe7b3aHhmAU17gpRPSYANLpb0RO7e4w5FJfew76DZpk/LM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EYyGemqb; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756329491; x=1787865491;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:to:cc;
+  bh=tn6EVHu8sY4G0Bw0cvnGYUOHgfvWC1wVHiDE8mxKM5w=;
+  b=EYyGemqbvghTRhFhGroGAweHEJ8ejBJUkMkp1PzWCsdxvRovF81Txaac
+   jUXDGP97Bw6/KWyRJv7xHeGC3HDJoI2tnIsrGuxIFVKgMHeS2xAipq2Jy
+   pd7erhL6qaW1hnfUnbfiKB5xI1H+97vPP2MlY7/Et6flr6aicxqU2ktvi
+   Fu2+BjdozAdCvOCzCWOJnNtardUL6f8IXsDuRr58vVeFlmeC2Y3LMon+e
+   8RDiXp1jaHdtqx2X4OYEUzcwSEAYxkjSOSnTSzqQQtfU27sDa/BYxWgyL
+   8z/rwY9u7wqvzw2gCT0inFYo8rNsAHyVkyt31VappSgOII/X1NUu768OT
+   Q==;
+X-CSE-ConnectionGUID: Wro/IJyiRlirQMuFPOVPcw==
+X-CSE-MsgGUID: FhIHGkTARsqTrJW01mh9gQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11535"; a="62412344"
+X-IronPort-AV: E=Sophos;i="6.18,217,1751266800"; 
+   d="scan'208";a="62412344"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2025 14:18:10 -0700
+X-CSE-ConnectionGUID: abDajAz7TAWPLUS6E55idg==
+X-CSE-MsgGUID: 05L5hV2UTLas6ygaNCECzA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,217,1751266800"; 
+   d="scan'208";a="169188315"
+Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.70]) ([10.166.28.70])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2025 14:18:09 -0700
+From: Jacob Keller <jacob.e.keller@intel.com>
+Date: Wed, 27 Aug 2025 14:17:36 -0700
+Subject: [PATCH iwl-net v3] i40e: fix Jumbo Frame support after iPXE boot
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 net] net: phy: fixed_phy: fix missing calls to
- gpiod_put in fixed_mdio_bus_exit
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <b3fae8d9-a595-4eb8-a90e-de2f9caebca0@gmail.com>
- <aK90BbEGJAVFiPAC@shell.armlinux.org.uk>
-Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- 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
- WlfRzlpjIPmdjgoicA==
-In-Reply-To: <aK90BbEGJAVFiPAC@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20250827-jk-fix-i40e-ice-pxe-9k-mtu-v3-1-14341728e572@intel.com>
+X-B4-Tracking: v=1; b=H4sIAPB1r2gC/43PTQ6CQAwF4KuYWVvD/DAzuPIexoWUjlYFDCBqD
+ Hd3YKWJUZfNa77XPkRLDVMrlrOHaKjnlusqDno+E7jfVjsCLuIsVKLSxEsNhyMEvgGbJEZIcL4
+ RZEcouwuo3BaJtkpikYkInBuKqxO+Fnw9QUWd2MRgz21XN/eptJdT/I/fS5DgtDPSbgOixBVXH
+ Z0WWJdj3d9ECPHCkAeTu8+E+UmgzpRV3oXc+RdifK5Xrw+lXyk1UuRThwVa49+oYRielcB8Hp4
+ BAAA=
+X-Change-ID: 20250813-jk-fix-i40e-ice-pxe-9k-mtu-2b6d03621cd9
+To: Intel Wired LAN <intel-wired-lan@lists.osuosl.org>, 
+ Anthony Nguyen <anthony.l.nguyen@intel.com>, netdev@vger.kernel.org
+Cc: Jacob Keller <jacob.e.keller@intel.com>
+X-Mailer: b4 0.15-dev-c61db
+X-Developer-Signature: v=1; a=openpgp-sha256; l=8440;
+ i=jacob.e.keller@intel.com; h=from:subject:message-id;
+ bh=tn6EVHu8sY4G0Bw0cvnGYUOHgfvWC1wVHiDE8mxKM5w=;
+ b=owGbwMvMwCWWNS3WLp9f4wXjabUkhoz1ZbznZv57Ou2O5L43y/SCsoQlvF3kUqWD2rZP38O9u
+ 9n5V+L/jlIWBjEuBlkxRRYFh5CV140nhGm9cZaDmcPKBDKEgYtTACbyLZGR4avlu1OWFxMr6lc/
+ y/u4s7d8cmr5rXNbXtuXW2idF712dTXDH26jg5ty4pT8+wzOV12/LhBx+UKkqu+X9c+VU2QPHSw
+ pZwQA
+X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
+ fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
 
-On 8/27/25 14:09, Russell King (Oracle) wrote:
-> On Wed, Aug 27, 2025 at 11:02:55PM +0200, Heiner Kallweit wrote:
->> Cleanup in fixed_mdio_bus_exit() misses to call gpiod_put().
->> Easiest fix is to call fixed_phy_del() for each possible phy address.
->> This may consume a few cpu cycles more, but is much easier to read.
->>
->> Fixes: a5597008dbc2 ("phy: fixed_phy: Add gpio to determine link up/down.")
-> 
-> Here's a question that should be considered as well. Do we still need
-> to keep the link-gpios for fixed-phy?
-> 
-> $ grep -r link-gpios arch/*/boot/dts/
-> arch/arm/boot/dts/nxp/vf/vf610-zii-dev-rev-b.dts:                              link-gpios = <&gpio6 2
-> arch/arm/boot/dts/nxp/vf/vf610-zii-dev-rev-b.dts:                              link-gpios = <&gpio6 3
-> 
-> These are used with the mv88e6xxx DSA switch, and DSA being fully
-> converted to phylink, means that fixed-phy isn't used for these
-> link-gpios properties, and hasn't been for some time.
-> 
-> So, is this now redundant code that can be removed, or should we
-> consider updating it for another kernel cycle but print a deprecation
-> notice should someone use it (e.g. openwrt.)
-> 
-> Should we also describe the SFF modules on Zii rev B properly?
-> 
+The i40e hardware has multiple hardware settings which define the Maximum
+Frame Size (MFS) of the physical port. The firmware has an AdminQ command
+(0x0603) to configure the MFS, but the i40e Linux driver never issues this
+command.
 
-Do we need to maintain the ZII Device Tree sources given that there has 
-not been any work done on those, and it's unclear if they are still even 
-as useful as they once were?
--- 
-Florian
+In most cases this is no problem, as the NVM default value has the device
+configured for its maximum value of 9728. Unfortunately, recent versions of
+the iPXE intelxl driver now issue the 0x0603 Set Mac Config command,
+modifying the MFS and reducing it from its default value of 9728.
+
+This occurred as part of iPXE commit 6871a7de705b ("[intelxl] Use admin
+queue to set port MAC address and maximum frame size"), a prerequisite
+change for supporting the E800 series hardware in iPXE. Both the E700 and
+E800 firmware support the AdminQ command, and the iPXE code shares much of
+the logic between the two device drivers.
+
+The ice E800 Linux driver already issues the 0x0603 Set Mac Config command
+early during probe, and is thus unaffected by the iPXE change.
+
+Since commit 3a2c6ced90e1 ("i40e: Add a check to see if MFS is set"), the
+i40e driver does check the I40E_PRTGL_SAH register, but it only logs a
+warning message if its value is below the 9728 default. This register also
+only covers received packets and not transmitted packets. A warning can
+inform system administrators, but does not correct the issue. No
+interactions from userspace cause the driver to write to PRTGL_SAH or issue
+the 0x0603 AdminQ command. Only a GLOBR reset will restore the value to its
+default value. There is no obvious method to trigger a GLOBR reset from
+user space.
+
+To fix this, introduce the i40e_aq_set_mac_config() function, similar to
+the one from the ice driver. Call this during early probe to ensure that
+the device configuration matches driver expectation. Unlike E800, the E700
+firmware also has a bit to control whether the MAC should append CRC data.
+It is on by default, but setting a 0 to this bit would disable CRC. The
+i40e implementation must set this bit to ensure CRC will be appended by the
+MAC.
+
+In addition to the AQ command, instead of just checking the I40E_PRTGL_SAH
+register, update its value to the 9728 default and write it back. This
+ensures that the hardware is in the expected state, regardless of whether
+the iPXE (or any other early boot driver) has modified this state.
+
+This is a better user experience, as we now fix the issues with larger MTU
+instead of merely warning. It also aligns with the way the ice E800 series
+driver works.
+
+A final note: The Fixes tag provided here is not strictly accurate. The
+issue occurs as a result of an external entity (the iPXE intelxl driver),
+and this is not a regression specifically caused by the mentioned change.
+However, I believe the original change to just warn about PRTGL_SAH being
+too low was an insufficient fix.
+
+Fixes: 3a2c6ced90e1 ("i40e: Add a check to see if MFS is set")
+Link: https://github.com/ipxe/ipxe/commit/6871a7de705b6f6a4046f0d19da9bcd689c3bc8e
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+---
+Changes in v3:
+- Don't disable CRC. Otherwise, Tx traffic will not be accepted
+  appropriately.
+- Link to v2: https://lore.kernel.org/r/20250815-jk-fix-i40e-ice-pxe-9k-mtu-v2-1-ce857cdc6488@intel.com
+
+Changes in v2:
+- Rewrite commit message with feedback from Paul Menzel.
+- Add missing initialization of cmd via libie_aq_raw().
+- Fix the Kdoc comment for i40e_aq_set_mac_config().
+- Move clarification of the Fixes tag to the commit message.
+- Link to v1: https://lore.kernel.org/r/20250814-jk-fix-i40e-ice-pxe-9k-mtu-v1-1-c3926287fb78@intel.com
+---
+ drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h |  1 +
+ drivers/net/ethernet/intel/i40e/i40e_prototype.h  |  2 ++
+ drivers/net/ethernet/intel/i40e/i40e_common.c     | 34 +++++++++++++++++++++++
+ drivers/net/ethernet/intel/i40e/i40e_main.c       | 17 ++++++++----
+ 4 files changed, 48 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h b/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h
+index 76d872b91a38..cc02a85ad42b 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h
+@@ -1561,6 +1561,7 @@ I40E_CHECK_CMD_LENGTH(i40e_aq_set_phy_config);
+ struct i40e_aq_set_mac_config {
+ 	__le16	max_frame_size;
+ 	u8	params;
++#define I40E_AQ_SET_MAC_CONFIG_CRC_EN	BIT(2)
+ 	u8	tx_timer_priority; /* bitmap */
+ 	__le16	tx_timer_value;
+ 	__le16	fc_refresh_threshold;
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_prototype.h b/drivers/net/ethernet/intel/i40e/i40e_prototype.h
+index aef5de53ce3b..26bb7bffe361 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_prototype.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_prototype.h
+@@ -98,6 +98,8 @@ int i40e_aq_set_mac_loopback(struct i40e_hw *hw,
+ 			     struct i40e_asq_cmd_details *cmd_details);
+ int i40e_aq_set_phy_int_mask(struct i40e_hw *hw, u16 mask,
+ 			     struct i40e_asq_cmd_details *cmd_details);
++int i40e_aq_set_mac_config(struct i40e_hw *hw, u16 max_frame_size,
++			   struct i40e_asq_cmd_details *cmd_details);
+ int i40e_aq_clear_pxe_mode(struct i40e_hw *hw,
+ 			   struct i40e_asq_cmd_details *cmd_details);
+ int i40e_aq_set_link_restart_an(struct i40e_hw *hw,
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_common.c b/drivers/net/ethernet/intel/i40e/i40e_common.c
+index 270e7e8cf9cf..59f5c1e810eb 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_common.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_common.c
+@@ -1189,6 +1189,40 @@ int i40e_set_fc(struct i40e_hw *hw, u8 *aq_failures,
+ 	return status;
+ }
+ 
++/**
++ * i40e_aq_set_mac_config - Configure MAC settings
++ * @hw: pointer to the hw struct
++ * @max_frame_size: Maximum Frame Size to be supported by the port
++ * @cmd_details: pointer to command details structure or NULL
++ *
++ * Set MAC configuration (0x0603). Note that max_frame_size must be greater
++ * than zero.
++ *
++ * Return: 0 on success, or a negative error code on failure.
++ */
++int i40e_aq_set_mac_config(struct i40e_hw *hw, u16 max_frame_size,
++			   struct i40e_asq_cmd_details *cmd_details)
++{
++	struct i40e_aq_set_mac_config *cmd;
++	struct libie_aq_desc desc;
++
++	cmd = libie_aq_raw(&desc);
++
++	if (max_frame_size == 0)
++		return -EINVAL;
++
++	i40e_fill_default_direct_cmd_desc(&desc, i40e_aqc_opc_set_mac_config);
++
++	cmd->max_frame_size = cpu_to_le16(max_frame_size);
++	cmd->params = I40E_AQ_SET_MAC_CONFIG_CRC_EN;
++
++#define I40E_AQ_SET_MAC_CONFIG_FC_DEFAULT_THRESHOLD	0x7FFF
++	cmd->fc_refresh_threshold =
++		cpu_to_le16(I40E_AQ_SET_MAC_CONFIG_FC_DEFAULT_THRESHOLD);
++
++	return i40e_asq_send_command(hw, &desc, NULL, 0, cmd_details);
++}
++
+ /**
+  * i40e_aq_clear_pxe_mode
+  * @hw: pointer to the hw struct
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+index b83f823e4917..4796fdd0b966 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+@@ -16045,13 +16045,18 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		dev_dbg(&pf->pdev->dev, "get supported phy types ret =  %pe last_status =  %s\n",
+ 			ERR_PTR(err), libie_aq_str(pf->hw.aq.asq_last_status));
+ 
+-	/* make sure the MFS hasn't been set lower than the default */
+ #define MAX_FRAME_SIZE_DEFAULT 0x2600
+-	val = FIELD_GET(I40E_PRTGL_SAH_MFS_MASK,
+-			rd32(&pf->hw, I40E_PRTGL_SAH));
+-	if (val < MAX_FRAME_SIZE_DEFAULT)
+-		dev_warn(&pdev->dev, "MFS for port %x (%d) has been set below the default (%d)\n",
+-			 pf->hw.port, val, MAX_FRAME_SIZE_DEFAULT);
++
++	err = i40e_aq_set_mac_config(hw, MAX_FRAME_SIZE_DEFAULT, NULL);
++	if (err) {
++		dev_warn(&pdev->dev, "set mac config ret =  %pe last_status =  %s\n",
++			 ERR_PTR(err), libie_aq_str(pf->hw.aq.asq_last_status));
++	}
++
++	/* Make sure the MFS is set to the expected value */
++	val = rd32(hw, I40E_PRTGL_SAH);
++	FIELD_MODIFY(I40E_PRTGL_SAH_MFS_MASK, &val, MAX_FRAME_SIZE_DEFAULT);
++	wr32(hw, I40E_PRTGL_SAH, val);
+ 
+ 	/* Add a filter to drop all Flow control frames from any VSI from being
+ 	 * transmitted. By doing so we stop a malicious VF from sending out
+
+---
+base-commit: ceb9515524046252c522b16f38881e8837ec0d91
+change-id: 20250813-jk-fix-i40e-ice-pxe-9k-mtu-2b6d03621cd9
+
+Best regards,
+--  
+Jacob Keller <jacob.e.keller@intel.com>
+
 
