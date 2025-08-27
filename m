@@ -1,148 +1,170 @@
-Return-Path: <netdev+bounces-217517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE68BB38F5C
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 01:48:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1924B38F68
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 01:56:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 119CC1C24099
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 23:48:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92ED97AB22A
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 23:55:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50D4E21147B;
-	Wed, 27 Aug 2025 23:48:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tmEt1cmU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0709F30DEC0;
+	Wed, 27 Aug 2025 23:56:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B847260A
-	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 23:48:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4287F2D0C64
+	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 23:56:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756338499; cv=none; b=Dge87AoDVGqoCl7rIPgMTGsyI/7DSYFESqjRNhkfPK0A4+0NZGkUqAeE8LrQyTqnYjbukAUimUTwcJ2KJvMmtajMJkbNQPgZwaqroJxiDrFyomrji5L+jQ5EZYg6l1F0j5QUbSY6A/Egonx6ezt0wT5vU0BPKvD5MB/boMH6MT4=
+	t=1756338989; cv=none; b=JwfEvPQjVXBryt0UbegX7HkoGaZMIcR5rPjy8LRTM4lCPVCXYD0rCwmxGxh03BX5VcGrg92ehMebO4ZXG+M978uYC4kA0mIGPljOU6NnF+Hg8iKTWP5XgFsL/xruu7XICiAa8UnaK0idAOasrR0XuaniVDiaLSk4yDio/7Ry0V0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756338499; c=relaxed/simple;
-	bh=f/Qiy73V/ZJ7zsraRhexgT97PVGlssecOmU8Hlg2jgY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iJg6iMCtWtsU2LQGzI6rGwyZOnHu0S+NXspi+7yQKSY9H+gOIoeXVPJeVGkQFsBZuhkSArKSvzh3R8H/oO95jDetb7gVbhk0MOdudhskdFxFigXetZ5Rcnb9K6GDqwO+5EVbQA1153mCU6loFmCTxAbx2wAKdu0KpP7KGFP0qTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tmEt1cmU; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <9919daa2-b6e0-4d5c-b349-39b055eaaed2@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1756338494;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cR+n5ZWIx4K7+wW5JjUKJHp42I9G5jLg44eeFXN6wNs=;
-	b=tmEt1cmUgyUNwyRWU3i+CndLkDJkC+2KVtOI+dGGBay2+RiMISjjHNsJdYSySttX1F36z+
-	CjeKM+E1C/FOyAh/Dr4tNR+/hn3v7rJnhqOuUECemkLkyzxgemAigjiu7wfIR4yhZ1RnsP
-	2Xqs+2WBw3aDCPXnxHQzEPZkdgrsv0U=
-Date: Wed, 27 Aug 2025 16:48:07 -0700
+	s=arc-20240116; t=1756338989; c=relaxed/simple;
+	bh=hzHwndWEpS0xTFzEybcfdp9UUiSixkUsYAWoAuFCkvw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=LXqQ9BaAi0Y71L0Wm6pB3p4vQt4FVb+HKXyC7cFK6od9+egkKrr87LUFS0w/iOV/hSuK6zquSmrVVTy92FZsWdzNYU6Q2+BlTLd3Gc09wzo7L7On8wehCIPdvk4I/f9t5OUGk16Njt1dk9Yes7XmcRXp4hGedVjrKqRoj0kfbgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3ed0f07fca2so5043035ab.0
+        for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 16:56:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756338987; x=1756943787;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XhWQ9iGoM04g6lfAV7PCS2cBnF3cJ7MMLrdxlmgfU58=;
+        b=ixQFAHIa31J3MGQtMw07SFvhxS0B9+cR02BLC8Ds+3NrL6iCO8OUy422/INQyWrJYR
+         cqXmd5sz0rFh7DQNgO5qniCSxZx+GvMHieqckTzQbrPFoSFM6ObRB0Qbe4fbBvAc3BoS
+         jf0JCmyxdAIlnvbRWwGDAmCa9Jy0qd4Jjj1Ywgrtilk6ju3IZzTruWjRyzDAzo/Yb0a8
+         70cZRGd7Q2KKjdhUJo1RywadXDjz/ElzmJvHheS2cQ6YA183H9/SFGKhaUX/Zh+h4hME
+         5DCL2iZS5+CngLudns5KFYSVpNkCacCt7LiAlSXaQuggQgQw890WYkGAuHCPcGLeTvlg
+         NSMw==
+X-Forwarded-Encrypted: i=1; AJvYcCVwPTyQ3G1WOTAbZJ3J8jgUpioqZuSi4p5AyGC/4yad0d1WIxOTxQtEgdJdrJaq2iRtM3oh5mo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJ0wHMLMZIVxflZdFfX7iIqrB1fc0fx2ketYayz878ZhNLeuTd
+	rTwYM9B+GuYZ/RdMnWjjUwhwn9nyFeKfWsGLhD9IdDYoaC8I+d4ktdrPCnLNoDAXV4CweLO4CoR
+	XRdutxP3tLdz8jUKddyP18uBFosxkfKyGP2sClGHd5/WQj01Re8o/wypU2rQ=
+X-Google-Smtp-Source: AGHT+IHYTpCmTA9elqP3yQfROErw/tzlU6n6h5Za5qE+Y2KuAVEcc+6LONSRIgaB18ds0rawccpxgaGQwtGeymsNR5DgDbYgYjeS
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3 bpf-next/net 3/5] bpf: Introduce SK_BPF_MEMCG_FLAGS and
- SK_BPF_MEMCG_SOCK_ISOLATED.
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Johannes Weiner <hannes@cmpxchg.org>,
- Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>,
- Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima
- <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20250826183940.3310118-1-kuniyu@google.com>
- <20250826183940.3310118-4-kuniyu@google.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20250826183940.3310118-4-kuniyu@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-Received: by 2002:a05:6e02:3e02:b0:3ec:2275:244c with SMTP id
+ e9e14a558f8ab-3ec22752632mr192176585ab.0.1756338987431; Wed, 27 Aug 2025
+ 16:56:27 -0700 (PDT)
+Date: Wed, 27 Aug 2025 16:56:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68af9b2b.a00a0220.2929dc.0008.GAE@google.com>
+Subject: [syzbot] [bpf?] [net?] BUG: sleeping function called from invalid
+ context in sock_map_delete_elem
+From: syzbot <syzbot+1f1fbecb9413cdbfbef8@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
+	edumazet@google.com, haoluo@google.com, horms@kernel.org, 
+	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
+	netdev@vger.kernel.org, pabeni@redhat.com, sdf@fomichev.me, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On 8/26/25 11:38 AM, Kuniyuki Iwashima wrote:
-> The main targets are BPF_CGROUP_INET_SOCK_CREATE and
-> BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB as demonstrated in the selftest.
-> 
-> Note that we do not support modifying the flag once sk->sk_memcg is set
-> especially because UDP charges memory under sk->sk_receive_queue.lock
-> instead of lock_sock().
-> 
+Hello,
 
-[ ... ]
+syzbot found the following issue on:
 
-> diff --git a/include/net/sock.h b/include/net/sock.h
-> index 63a6a48afb48..d41a2f8f8b30 100644
-> --- a/include/net/sock.h
-> +++ b/include/net/sock.h
-> @@ -2596,10 +2596,39 @@ static inline gfp_t gfp_memcg_charge(void)
->   	return in_softirq() ? GFP_ATOMIC : GFP_KERNEL;
->   }
->   
-> +#define SK_BPF_MEMCG_FLAG_MASK	(SK_BPF_MEMCG_FLAG_MAX - 1)
-> +#define SK_BPF_MEMCG_PTR_MASK	~SK_BPF_MEMCG_FLAG_MASK
-> +
->   #ifdef CONFIG_MEMCG
-> +static inline void mem_cgroup_sk_set_flags(struct sock *sk, unsigned short flags)
-> +{
-> +	unsigned long val = (unsigned long)sk->sk_memcg;
-> +
-> +	val |= flags;
-> +	sk->sk_memcg = (struct mem_cgroup *)val;
-> +}
-> +
+HEAD commit:    8d245acc1e88 Merge tag 'char-misc-6.17-rc3' of git://git.k..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11513062580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e1e1566c7726877e
+dashboard link: https://syzkaller.appspot.com/bug?extid=1f1fbecb9413cdbfbef8
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=109d7062580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=126bea34580000
 
-[ ... ]
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/096739d8f0ec/disk-8d245acc.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/83a21aa9b978/vmlinux-8d245acc.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/7e7f165a3b29/bzImage-8d245acc.xz
 
-> +static int sk_bpf_set_get_memcg_flags(struct sock *sk, int *optval, bool getopt)
-> +{
-> +	if (!sk_has_account(sk))
-> +		return -EOPNOTSUPP;
-> +
-> +	if (getopt) {
-> +		*optval = mem_cgroup_sk_get_flags(sk);
-> +		return 0;
-> +	}
-> +
-> +	if (sock_owned_by_user_nocheck(sk) && mem_cgroup_from_sk(sk))
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+1f1fbecb9413cdbfbef8@syzkaller.appspotmail.com
 
-I still don't see how this can stop some of the bh bpf prog to set/clear the bit 
-after mem_cgroup_sk_alloc() is done. For example, in BPF_SOCK_OPS_RETRANS_CB, 
-bh_lock_sock() is held but not owned by user, so the bpf prog can continue to 
-change the SK_BPF_MEMCG_FLAGS. What am I missing?
-
-Passing some more args to __bpf_setsockopt() for caller context purpose is quite 
-ugly which I think you also mentioned/tried earlier. May be it can check "if 
-(in_softirq() && mem_cgroup_from_sk(sk)) return -EBUSY" but looks quite tricky 
-together with the sock_owned_by_user_nocheck().
-
-It seems this sk_memcg bit change is only needed for sock_ops hook and create 
-hook? sock_ops already has its only func_proto bpf_sock_ops_setsockopt(). 
-bpf_sock_ops_setsockopt can directly call sk_bpf_set_get_memcg_flags() but limit 
-it to the BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB. Is it also safe to allow it for 
-BPF_SOCK_OPS_TCP_LISTEN_CB? For the create hook, create a new func proto which 
-can directly call sk_bpf_set_get_memcg_flags(). wdyt?
-
-> +		return -EBUSY;
-> +
-> +	if (*optval <= 0 || *optval >= SK_BPF_MEMCG_FLAG_MAX)
-
-It seems the bit cannot be cleared (the *optval <= 0 check). There could be 
-multiple bpf progs running in a cgroup which want to clear this bit. e.g. the 
-parent cgroup's prog may want to ensure this bit is not set.
+BUG: sleeping function called from invalid context at kernel/locking/spinlock_rt.c:48
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 6107, name: syz.0.17
+preempt_count: 1, expected: 0
+RCU nest depth: 1, expected: 1
+3 locks held by syz.0.17/6107:
+ #0: ffffffff8d9a8b80 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ #0: ffffffff8d9a8b80 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
+ #0: ffffffff8d9a8b80 (rcu_read_lock){....}-{1:3}, at: bpf_test_timer_enter+0x1a/0x140 net/bpf/test_run.c:40
+ #1: ffffffff8d84a760 (local_bh){.+.+}-{1:3}, at: __local_bh_disable_ip+0xa1/0x400 kernel/softirq.c:163
+ #2: ffff888032e15a98 (&stab->lock){+...}-{3:3}, at: spin_lock_bh include/linux/spinlock_rt.h:88 [inline]
+ #2: ffff888032e15a98 (&stab->lock){+...}-{3:3}, at: __sock_map_delete net/core/sock_map.c:421 [inline]
+ #2: ffff888032e15a98 (&stab->lock){+...}-{3:3}, at: sock_map_delete_elem+0xb7/0x170 net/core/sock_map.c:452
+Preemption disabled at:
+[<ffffffff891fce58>] bpf_test_timer_enter+0xf8/0x140 net/bpf/test_run.c:42
+CPU: 0 UID: 0 PID: 6107 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ __might_resched+0x44b/0x5d0 kernel/sched/core.c:8957
+ __rt_spin_lock kernel/locking/spinlock_rt.c:48 [inline]
+ rt_spin_lock+0xc7/0x2c0 kernel/locking/spinlock_rt.c:57
+ spin_lock_bh include/linux/spinlock_rt.h:88 [inline]
+ __sock_map_delete net/core/sock_map.c:421 [inline]
+ sock_map_delete_elem+0xb7/0x170 net/core/sock_map.c:452
+ bpf_prog_2c29ac5cdc6b1842+0x43/0x4b
+ bpf_dispatcher_nop_func include/linux/bpf.h:1332 [inline]
+ __bpf_prog_run include/linux/filter.h:718 [inline]
+ bpf_prog_run include/linux/filter.h:725 [inline]
+ bpf_prog_run_pin_on_cpu include/linux/filter.h:742 [inline]
+ bpf_flow_dissect+0x132/0x400 net/core/flow_dissector.c:1024
+ bpf_prog_test_run_flow_dissector+0x37c/0x5c0 net/bpf/test_run.c:1416
+ bpf_prog_test_run+0x2ca/0x340 kernel/bpf/syscall.c:4590
+ __sys_bpf+0x581/0x870 kernel/bpf/syscall.c:6047
+ __do_sys_bpf kernel/bpf/syscall.c:6139 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:6137 [inline]
+ __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6137
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f637004ebe9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fffc4e2e8a8 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 00007f6370275fa0 RCX: 00007f637004ebe9
+RDX: 0000000000000050 RSI: 0000200000000180 RDI: 000000000000000a
+RBP: 00007f63700d1e19 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f6370275fa0 R14: 00007f6370275fa0 R15: 0000000000000003
+ </TASK>
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
