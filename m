@@ -1,84 +1,134 @@
-Return-Path: <netdev+bounces-217429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA1AEB38A45
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 21:37:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB02FB38A53
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 21:41:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 785FF4E2648
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 19:37:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C8C03BDD3B
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 19:41:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA19A2EBDD6;
-	Wed, 27 Aug 2025 19:37:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 163FB2EC57B;
+	Wed, 27 Aug 2025 19:41:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BEEKmRTW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AuF7t/qO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 819A427815F;
-	Wed, 27 Aug 2025 19:37:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7760727281C
+	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 19:41:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756323437; cv=none; b=nEAxJ1disIbuV9z7ZQpx7YnfQ/xHXoDlCw3fqE115HWCoeyD+iuCFDYBgVZ5M9lV3tVWBz1pU+CSn9QVUhj2++q/s+Egp2jK5NNjtTT5NFSebdCDq02AlfU5DoQJu3/5ahtLKkXJbM0M+czn8ASKerl89EZQf/TcgxxLIkkOzZE=
+	t=1756323675; cv=none; b=sr3s2z9/ZcZcUpwYIksw2dc/Omt2uVW1N0tpT79kbfjl48lqcBbUyWUlDAeODrZbRzC6xpOUCZDI+gbx3IlfECogImLLAHK3WYZBx9YoU2riFrk3FH4pxk6M5wg7LLCfrLwMlSf57aq6EQ4M7LO5Wn8vini6bRfD+ZWehvKDB+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756323437; c=relaxed/simple;
-	bh=K1XTGE4MN2P+aCGgRWfp/hPBijxkjr+OSHnR1IeqAE4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J52bZRyh1k0CqTpqL42MXRAShrA8H2eCvkp8CtIxLCyco0DU+cWJYk/aHV6JrqEnjw+fdypyyu8YmNNWr7RxH35hQCT4Nf6Av7x05ccaD0IXlTDu/ePJ5OlyAXLH/9FlHrPeKsIk2I8sTVANXjdNw0EVJqPDl47Zh6AMWtT8H7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BEEKmRTW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE080C4CEEB;
-	Wed, 27 Aug 2025 19:37:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756323435;
-	bh=K1XTGE4MN2P+aCGgRWfp/hPBijxkjr+OSHnR1IeqAE4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BEEKmRTWeodVBjBbH73lkZAxwH1UfRtlk5C6OJ9rRDfTH/5+stFleldq5xVQ8Q51D
-	 O1Wh59nNNaGkNOgSJWC3ipzV1KcbAaFmhPmlEjA16F0X+vQUryS5UrzNRwWUFpJvk4
-	 GGQL/kdyPcmiqTnaVeYaEP04FmrYH+79HJjsBgwq4bq6etdL0Sk+phfVmS605EG/g+
-	 7V0C/YiIAcBVL0MUb8OUKTFsIfooDyAaLYI9Ldm0ZezPdN12Onq7dqBvpRoTkWBF4N
-	 LyXdCyW9Y2n8ErWnTZeGn0oL2GuPGTJEksw5piExZp97N9rflX05hGHWjPnFyt+J21
-	 roHQNq3oElBoA==
-Date: Wed, 27 Aug 2025 20:37:10 +0100
-From: Simon Horman <horms@kernel.org>
-To: Konrad Leszczynski <konrad.leszczynski@intel.com>
-Cc: davem@davemloft.net, andrew+netdev@lunn.ch, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, cezary.rojewski@intel.com,
-	sebastian.basierski@intel.com,
-	Karol Jurczenia <karol.jurczenia@intel.com>
-Subject: Re: [PATCH net-next 7/7] net: stmmac: add TC flower filter support
- for IP EtherType
-Message-ID: <20250827193710.GT10519@horms.kernel.org>
-References: <20250826113247.3481273-1-konrad.leszczynski@intel.com>
- <20250826113247.3481273-8-konrad.leszczynski@intel.com>
+	s=arc-20240116; t=1756323675; c=relaxed/simple;
+	bh=x/i6BRd0cWtRfp3CxZsaVLLtvufEWdcUwwghTxEVFpA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Of7dqMe6SEPgehdbaYrZ8sm2PYOv2QgAJbWidlhBy+c6wfTAMQT3RRTAQX88vAqPvIa+Pw+S4eGGYiERqKcqn58/4CML8hV05l2C8wsmMcF351RcFrY+7QT2Dq4Vdijq9OpCIIS+ziBs6vzB0x0Fw35jZnA+aNmrOHa2zxV7GL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AuF7t/qO; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-77057266cd8so161836b3a.2
+        for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 12:41:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756323673; x=1756928473; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vWAmWKV0YCAe3PkG8+/flyHk3YjgRL//qGGe4nfIRiE=;
+        b=AuF7t/qOQm6qKXSPMaMLuRN6BsIljh2hAs2n96cSqDebchzPlBSsE6uIbP/MOkevzZ
+         ET95rIxOvWEA61A0wwiarEBik76TxH8frvDqebgaviaGRVpaxr3WrY3HdhqNYyJdiMhL
+         cUqloxI/T+NMiPzmfIM/MCpn+L6MD5XISHL2mrNO+emqa+a1ZYov+P1ely7+yn4CMGxo
+         JntqgxWSRawdSoglQ5yaW7YZsdo7WcM4nrhm2I8mQyDt/bxa4Ye62pU2HfIIObJ53mfU
+         BFtWGHkw1NGsjAkal3Mxu3HVIPfNIhpXYXouQ7Qn2rdISurIq1hO639HnfLw+gpc6l00
+         /9Xg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756323673; x=1756928473;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vWAmWKV0YCAe3PkG8+/flyHk3YjgRL//qGGe4nfIRiE=;
+        b=XDmlmZ6cbqVE1PERqE1j0qamPk7cBLX1PMCwdh4vS3pw7nPB5wUfdkr1P7nplHsKt1
+         YROkPBKGSmrQNskzGsRynpanCcDtWhkafeLwIwcGrA2vxsqd9RWzdMZL2M1iOvSQ5Fg7
+         +pgqW0ehnnhpnrc17a9aZ8ziOgxeEhOsU6yUc04gONNGR/Ta1dDPYynLO5/XyE0dSeV3
+         rBbLkCsK4mRsbcZwr7kqDhTN3mseB+Px5Nq76i8fx/y4VF5ZxmwW9fcNtjO3eNZyuIKZ
+         d/+rGmCnTmy0g4jH7C+MINwH72XPDtnnw91mqAgNFmYJQaC7WMXsAzXlNK1rvPsXwd5w
+         82JQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVszc4jcShdrqr9MQO9nqH2uRA3V00gJqyVF8T0G3PjRxq3DmvuvsPM7ymSpuu4iDlB+5XmTTM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWNp5YUZNUL2hI/CQ/BDU/mk+ngi8hzeU306Ewmzz4naqopBC6
+	aiNqQsBEhF3sEFzfeuLkcurwT0HGlCsXfkE7ToNSjnwo/bwQUu69beRxrea5mqIRHStyQv4etqz
+	zSiWWYw==
+X-Google-Smtp-Source: AGHT+IF3kgndwMxobuC1w46DvzTQVQ+70Io5X5LupzuJERdtYH2UT2HutkGftTPmJvqTvDvQz3iwKQFDQfQ=
+X-Received: from pfjf14.prod.google.com ([2002:a05:6a00:22ce:b0:772:49a:524f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:b45:b0:770:556d:32e8
+ with SMTP id d2e1a72fcca58-770556d5e86mr17407883b3a.24.1756323672784; Wed, 27
+ Aug 2025 12:41:12 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Wed, 27 Aug 2025 12:41:04 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250826113247.3481273-8-konrad.leszczynski@intel.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.268.g9569e192d0-goog
+Message-ID: <20250827194107.4142164-1-seanjc@google.com>
+Subject: [PATCH v2 0/3] vhost_task: Fix a bug where KVM wakes an exited task
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Aug 26, 2025 at 01:32:47PM +0200, Konrad Leszczynski wrote:
-> From: Karol Jurczenia <karol.jurczenia@intel.com>
-> 
-> Add missing Traffic Control (TC) offload for flower filters matching the
-> IP EtherType (ETH_P_IP).
-> 
-> Reviewed-by: Konrad Leszczynski <konrad.leszczynski@intel.com>
-> Reviewed-by: Sebastian Basierski <sebastian.basierski@intel.com>
-> Signed-off-by: Karol Jurczenia <karol.jurczenia@intel.com>
+Michael,
 
-Konrad,
+Do you want to take this through the vhost tree?  It technically fixes a KVM
+bug, but this obviously touches far more vhost code than KVM code, and the
+patch that needs to go into 6.17 doesn't touch KVM at all.
 
-As per my comment on an earlier patch, your SoB line needs to go here.
 
-Otherwise, this looks good to me.
+Fix a bug where KVM attempts to wake a vhost task that has already exited in
+response to a fatal signal, and tack on a few cleanups to harden against
+introducing similar bugs in the future.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+The issue is firmly a KVM problem, but I opted to fix the bug by making
+vhost_task_wake() safe against an exited task as doing so is far simpler and
+cleaner than implementing the same functionality in KVM, and I suspect that
+if there are other users of vhost_tasks in the future, then there's a good
+chance they will want/expect vhost_task to handle that detail.
+
+Note, this only started causing problems when commit 56180dd20c19 ("futex:
+Use RCU-based per-CPU reference counting instead of rcuref_t") landed, so
+the explosions are "new" in 6.17, but the bug has existed since KVM switched
+to vhost_task back in 6.13.
+
+v2:
+ - Drop the "safe" postfix variant and make the "default" vhost_task_wake()
+   safe. [Michael].
+ - Use vhost_task_wake() and __vhost_task_wake() for the public APIs, and
+   vhost_task_wake_up_process() for the local helper. [Michael]
+ - Drag the signalas back from their Spanish holiday. [Sebastian]
+
+v1: https://lore.kernel.org/all/20250826004012.3835150-1-seanjc@google.com
+
+Sean Christopherson (3):
+  vhost_task: Don't wake KVM x86's recovery thread if vhost task was
+    killed
+  vhost_task: Allow caller to omit handle_sigkill() callback
+  KVM: x86/mmu: Don't register a sigkill callback for NX hugepage
+    recovery tasks
+
+ arch/x86/kvm/mmu/mmu.c           |  7 +---
+ drivers/vhost/vhost.c            |  2 +-
+ include/linux/sched/vhost_task.h |  1 +
+ kernel/vhost_task.c              | 62 +++++++++++++++++++++++++++-----
+ 4 files changed, 56 insertions(+), 16 deletions(-)
+
+
+base-commit: 1b237f190eb3d36f52dffe07a40b5eb210280e00
+-- 
+2.51.0.268.g9569e192d0-goog
+
 
