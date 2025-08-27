@@ -1,193 +1,137 @@
-Return-Path: <netdev+bounces-217197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE7D4B37B62
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 09:21:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB7D5B37B75
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 09:22:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D57377AC1CD
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 07:19:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B3F16859CC
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 07:22:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB70F2C15AF;
-	Wed, 27 Aug 2025 07:21:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B87B0317703;
+	Wed, 27 Aug 2025 07:22:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="htpDpUq7"
+	dkim=pass (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b="paqG0/bt"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEDB31EA7CF
-	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 07:21:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC001E8342;
+	Wed, 27 Aug 2025 07:22:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.11.138.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756279286; cv=none; b=hURaCND4HxhlwX+zctwm9fuDo0dZEh7NIfwoxDqXnNeYTGo8JM0xXTA4Xn2MYfA7BDkPtTfJ/atORksAEwFnR/F595g1VlxHRJs3x5yQVEwlcMpe669DenRx4891Z0vL5PSgmldKNG0/3i54PTKvi5S9eNXvWbJkAbjMTofR2G8=
+	t=1756279358; cv=none; b=uGX6ynxlyr209styAtdI7XkVGo0MJQu61yorK1jiI370xH7YKODeAdEBqCM3Cgwm14GuecTlmjJxqdkSIqpNWY7/1LKwnPezT7bub5G5fcULgHtusopYsXEyMEDsLMLtkeWkkmRjxEARVlro9OXCl+8ny7xve3LSZhr+9dMbAhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756279286; c=relaxed/simple;
-	bh=kI+3LthwjG22y7VcirsJ4BmcsSRBi1+iY3WJee8vZsc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n27C+oRqxyDWUXkwsafJaXq9Fy+POTNbbTDGo++GUpA2H5Vw+o3Gw2Tk4A0s5rOUbRgNWR9Vb9Fmmi7N5hhC2p/oHYs8l23Sq80ZVq7jjnW/ncmgTLRUBDc6+L/2eTczVQnTMsWIIn5kekSz2KYe4aNW2F+cAfL9U0A6s8L0qaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=htpDpUq7; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756279283;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5JGC+85HqbaPLKuXMq3g087QMtLlIBsZdKv3F1ohVrk=;
-	b=htpDpUq7+A4NqwJkL05w/CIFJ3PugcPhTorXP138za0JZ4cfJwIukt4W7QTsTqvRDhzz4T
-	0YzLFlZ01EXoZ4iX+eZ0HyysbFiDlJWQnU8jDteHV4Ou0ZqQ1p6FN9BZ8B5JF/h9L5CL6b
-	ielSnCCdkTdMfGlnm+O8CxRaTuIxIyM=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-455-tnmme-oCOdKeXlEzoS5D7A-1; Wed, 27 Aug 2025 03:21:21 -0400
-X-MC-Unique: tnmme-oCOdKeXlEzoS5D7A-1
-X-Mimecast-MFC-AGG-ID: tnmme-oCOdKeXlEzoS5D7A_1756279281
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3c85ac51732so959988f8f.2
-        for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 00:21:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756279281; x=1756884081;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5JGC+85HqbaPLKuXMq3g087QMtLlIBsZdKv3F1ohVrk=;
-        b=hGLWJJx65UCzOQ9M3hlXWtthM1Qf2TBbefpXKyvPn9865fYlC9VpakVZjVYY+Pcf9p
-         uusytUsJVCobm6rN2+Glfm99wVoTCDgl1vzK/EC1/z9wyCIFR60C7vGUw3Ra+H+SaDoe
-         Zb32+90fLr218v6ZmD73zrriAwNh4SRRDShnFWI/JmVQuRKanXmxXSRdkdDfs5wfmaB6
-         29iPwoQazD6LkGnU2iGM440wvX3Y9ZU7ztgo1dCQmDh6bHNxUdDAMVVY5ZmRT51SFTyl
-         0SDOCJI6dEVbS/X1mQAaPVypcGXu138eudKw8JoRHOr0AVCj8iHxlO24a0s0qzrhqfpP
-         SSsA==
-X-Gm-Message-State: AOJu0Yz0feGZIcQEijrJWwXMg4Y0zUIwHdHpn9wh/j/Sp5iWGhAnRgV+
-	hPRyX6TRiiCfxVsJ/QgNU+kv8UcauwO2x47iCQD+x+5832vWqo3QFy55t7QQTd6NPUQMbsnXEvU
-	nCx+g6fcUATo7ooKFc/q9W0Xws4jjVBXA1K7RQunkwW5u03T5ItjQngigGw==
-X-Gm-Gg: ASbGncuVk9r4GLia+Bqc+5yqkyASEviKs+9NZ/8srzlWUJcgEStBFlrtr8cugf5cxXi
-	F2WSOiiDybXu3Bwg2GIOdfxglbZHNb8aVsvCoPDmAag6jZIeC01vmYSZmyk3DJWgp5NWOSypXp3
-	8bMR41fahZhStiAkA4Jc0HA7fP2stIJ/Blg8sQYlC0gpAfccwilMBpGZ2vg0USpzpAaFAWkzVEN
-	JkEIBmiXCjH0XufbdskHTxA/cLk+W16V4C/Vho0hTzngrfOkkr3M+wKV3Y61QksGCCoBviwoqMh
-	cYLSla4rnNBxx4PkcTIFn+iv2ZzwGJrocV9IKCikyxgovB7IRaAJfB9+Qk1zXmIOIk9o/KrEG9T
-	tWHHxc7N5rlM=
-X-Received: by 2002:a5d:588e:0:b0:3aa:34f4:d437 with SMTP id ffacd0b85a97d-3c5dd8a9fa2mr13685356f8f.37.1756279280683;
-        Wed, 27 Aug 2025 00:21:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFFzc1iRnfdv7Uz78ukwWUS52/akIOKNurW4UrrjZQJ6s/znsbudcOgNbIUMuo1lIv4bKS1Rw==
-X-Received: by 2002:a5d:588e:0:b0:3aa:34f4:d437 with SMTP id ffacd0b85a97d-3c5dd8a9fa2mr13685338f8f.37.1756279280212;
-        Wed, 27 Aug 2025 00:21:20 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3c70e4ba078sm21180994f8f.4.2025.08.27.00.21.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Aug 2025 00:21:19 -0700 (PDT)
-Message-ID: <6d99c24c-a327-471b-964f-cfe02aef7ce2@redhat.com>
-Date: Wed, 27 Aug 2025 09:21:18 +0200
+	s=arc-20240116; t=1756279358; c=relaxed/simple;
+	bh=G+hmXrHggGQu/DFm2iaN9YOAsgDAVtUlcX4wbDIaTAM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gT2CqTUhQB7mj9sfaXFwIqSImjC1VU/VzP0rnOvm3DTWKqtxp8Byk6M8sWACmQlywhIFkHa6R8p9KG44WEQdPBJXlygFB1DZoBjko89DgTF2fdBCWOelIACLgR/5q6biqt8q/UaQx+c2p6gW6QPGpDIYgxofYUqjsHaFq4fQ8ZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sntech.de; spf=pass smtp.mailfrom=sntech.de; dkim=pass (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b=paqG0/bt; arc=none smtp.client-ip=185.11.138.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sntech.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sntech.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=sntech.de;
+	s=gloria202408; h=Content-Type:Content-Transfer-Encoding:MIME-Version:
+	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Reply-To;
+	bh=G+hmXrHggGQu/DFm2iaN9YOAsgDAVtUlcX4wbDIaTAM=; b=paqG0/btPjpriUue1ZLq40xLBd
+	GBgOWrFL05XOmF286hGkQVhrhfZqZimImLzlqfvnvVlVMHo57pYqqanZe5p+RWyExLLfK8pM6Q5Cq
+	xdTc0nJjioWVaXjKpM6xHGG33hNdJlVOqRRL+S4OzGg7IrzrmTrdXDfSV/OniMWb8NfMr7hViTPqT
+	qh4CArG3EfgYiwDGIxDxzDICg/hr95MIGKc/d2Fy1Rh+nq9Okcnz7bP4oClR/Liyw76jtlNxiWYgk
+	upeAZRYX6mfLnf/YA7pnADtT8ZXvkmab4GGfHfUpjyupzxU/QmqBCPG9/xLHsUBttuD7WbfOzPmK7
+	upjPzyNA==;
+Received: from [213.244.170.152] (helo=phil.localnet)
+	by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <heiko@sntech.de>)
+	id 1urATt-00078I-85; Wed, 27 Aug 2025 09:22:05 +0200
+From: Heiko Stuebner <heiko@sntech.de>
+To: Yury Norov <yury.norov@gmail.com>,
+ Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+ Jaehoon Chung <jh80.chung@samsung.com>, Ulf Hansson <ulf.hansson@linaro.org>,
+ Shreeya Patel <shreeya.patel@collabora.com>,
+ Mauro Carvalho Chehab <mchehab@kernel.org>, Sandy Huang <hjc@rock-chips.com>,
+ Andy Yan <andy.yan@rock-chips.com>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>,
+ Nicolas Frattaroli <frattaroli.nicolas@gmail.com>,
+ Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Shawn Lin <shawn.lin@rock-chips.com>,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ Krzysztof =?UTF-8?B?V2lsY3p5xYRza2k=?= <kwilczynski@kernel.org>,
+ Manivannan Sadhasivam <mani@kernel.org>, Rob Herring <robh@kernel.org>,
+ Bjorn Helgaas <bhelgaas@google.com>, Chanwoo Choi <cw00.choi@samsung.com>,
+ MyungJoo Ham <myungjoo.ham@samsung.com>,
+ Kyungmin Park <kyungmin.park@samsung.com>, Qin Jian <qinjian@cqplus1.com>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>,
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+Cc: kernel@collabora.com, linux-kernel@vger.kernel.org,
+ linux-mmc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-rockchip@lists.infradead.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-phy@lists.infradead.org,
+ linux-sound@vger.kernel.org, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com, linux-pci@vger.kernel.org,
+ linux-pm@vger.kernel.org, linux-clk@vger.kernel.org, llvm@lists.linux.dev,
+ Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+Subject:
+ Re: [PATCH v3 07/20] drm/rockchip: dsi: switch to FIELD_PREP_WM16* macros
+Date: Wed, 27 Aug 2025 09:22:04 +0200
+Message-ID: <4886676.atdPhlSkOF@phil>
+In-Reply-To: <20250825-byeword-update-v3-7-947b841cdb29@collabora.com>
+References:
+ <20250825-byeword-update-v3-0-947b841cdb29@collabora.com>
+ <20250825-byeword-update-v3-7-947b841cdb29@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v15 03/15] net: homa: create shared Homa header
- files
-To: John Ousterhout <ouster@cs.stanford.edu>
-Cc: netdev@vger.kernel.org, edumazet@google.com, horms@kernel.org,
- kuba@kernel.org
-References: <20250818205551.2082-1-ouster@cs.stanford.edu>
- <20250818205551.2082-4-ouster@cs.stanford.edu>
- <ce4f62a8-1114-47b9-af08-51656e08c2b5@redhat.com>
- <CAGXJAmzwk87WCjxrxQbTn3bM8nemKcnzHzOeFTBJiKWABRf+Nw@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CAGXJAmzwk87WCjxrxQbTn3bM8nemKcnzHzOeFTBJiKWABRf+Nw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
 
-On 8/27/25 1:10 AM, John Ousterhout wrote:
-> On Tue, Aug 26, 2025 at 2:06 AM Paolo Abeni <pabeni@redhat.com> wrote:
->> On 8/18/25 10:55 PM, John Ousterhout wrote:
->>> +/**
->>> + * struct homa_net - Contains Homa information that is specific to a
->>> + * particular network namespace.
->>> + */
->>> +struct homa_net {
->>> +     /** @net: Network namespace corresponding to this structure. */
->>> +     struct net *net;
->>> +
->>> +     /** @homa: Global Homa information. */
->>> +     struct homa *homa;
->>
->> It's not clear why the above 2 fields are needed. You could access
->> directly the global struct homa instance, and 'struct net' is usually
->> available when struct home_net is avail.
-> 
-> I have eliminated net but would like to retain homa. I have tried very
-> hard to avoid global variables in Homa, both for general pedagogical
-> reasons and because it simplifies unit testing. Right now there is no
-> need for a global homa except a couple of places in homa_plumbing.c,
-> and I'd like to maintain that encapsulation.
+Am Montag, 25. August 2025, 10:28:27 Mitteleurop=C3=A4ische Sommerzeit schr=
+ieb Nicolas Frattaroli:
+> The era of hand-rolled HIWORD_UPDATE macros is over, at least for those
+> drivers that use constant masks.
+>=20
+> Remove this driver's HIWORD_UPDATE macro, and replace instances of it
+> with either FIELD_PREP_WM16 or FIELD_PREP_WM16_CONST, depending on
+> whether they're in an initializer. This gives us better error checking,
+> which already saved me some trouble during this refactor.
+>=20
+> The driver's HIWORD_UPDATE macro doesn't shift up the value, but expects
+> a pre-shifted value. Meanwhile, FIELD_PREP_WM16 and
+> FIELD_PREP_WM16_CONST will shift the value for us, based on the given
+> mask. So a few things that used to be a HIWORD_UPDATE(VERY_LONG_FOO,
+> VERY_LONG_FOO) are now a somewhat more pleasant
+> FIELD_PREP_WM16(VERY_LONG_FOO, 1).
+>=20
+> There are some non-trivial refactors here. A few literals needed a UL
+> suffix added to stop them from unintentionally overflowing as a signed
+> long. To make sure all of these cases are caught, and not just the ones
+> where the FIELD_PREP_WM16* macros use such a value as a mask, just mark
+> every literal that's used as a mask as unsigned.
+>=20
+> Non-contiguous masks also have to be split into multiple
+> FIELD_PREP_WM16* instances, as the macro's checks and shifting logic
+> rely on contiguous masks.
+>=20
+> This is compile-tested only.
+>=20
+> Signed-off-by: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
 
-Note that there is no kernel convention against global per protocol
-variables, when that does not prevent scaling.
+Reviewed-by: Heiko Stuebner <heiko@sntech.de>
 
-> 
->>> +/**
->>> + * homa_clock() - Return a fine-grain clock value that is monotonic and
->>> + * consistent across cores.
->>> + * Return: see above.
->>> + */
->>> +static inline u64 homa_clock(void)
->>> +{
->>> +     /* As of May 2025 there does not appear to be a portable API that
->>> +      * meets Homa's needs:
->>> +      * - The Intel X86 TSC works well but is not portable.
->>> +      * - sched_clock() does not guarantee monotonicity or consistency.
->>> +      * - ktime_get_mono_fast_ns and ktime_get_raw_fast_ns are very slow
->>> +      *   (27 ns to read, vs 8 ns for TSC)
->>> +      * Thus we use a hybrid approach that uses TSC (via get_cycles) where
->>> +      * available (which should be just about everywhere Homa runs).
->>> +      */
->>> +#ifdef CONFIG_X86_TSC
->>> +     return get_cycles();
->>> +#else
->>> +     return ktime_get_mono_fast_ns();
->>> +#endif /* CONFIG_X86_TSC */
->>> +}
->>
->> ktime_get*() variant are fast enough to allow e.g. pktgen deals with
->> millions of packets x seconds. Both tsc() and ktime_get_mono_fast_ns()
->> suffer of various inconsistencies which will cause the most unexpected
->> issues in the most dangerous situation. I strongly advice against this
->> early optimization.
-> 
-> Which ktime_get variant do you recommend instead of ktime_get_mono_fast_ns?
-> 
-> I feel pretty strongly about retaining the use of TSC on Intel
-> platforms. As I have said before, Homa is attempting to operate in a
-> much more aggressive latency domain than Linux is used to, and
-> nanoseconds matter. I have been using TSC on Intel and AMD platforms
-> for more than 15 years and I have never had any problems. Is there a
-> specific inconsistency you know of that will cause "unexpected issues
-> in the most dangerous situations"? 
-
-The TSC raw value depends on the current CPU. According to the relevant
-documentation ktime_get_mono_fast_ns() is allowed to jump under certain
-conditions: with either of them you can get sudden/unexpected tick
-increases.
-
-> If not, I would prefer to retain
-> the use of TSC until someone can identify a real problem. Note that
-> the choice of clock is now well encapsulated, so if a change should
-> become necessary it will be very easy to make.
-
-AFAICS, in the current revision there are several points that could
-cause much greater latency - i.e. the long loops under BH lock with no
-reschedule. I'm surprised they don't show as ms-latency bottle-necks
-under stress test.
-
-I suggest removing such issues before doing micro optimization that at
-very least use APIs that are explicitly discouraged.
-
-/P
 
 
