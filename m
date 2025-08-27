@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-217350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDC34B3870B
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 17:54:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A4E6B3870F
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 17:54:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99BBB6881F6
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 15:54:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EB5247B430A
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 15:52:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AD382FF172;
-	Wed, 27 Aug 2025 15:53:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAD2D2FC008;
+	Wed, 27 Aug 2025 15:53:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E5CC/zQo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bnmqF+o1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED282FC008
-	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 15:53:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6152ED16D
+	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 15:53:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756310027; cv=none; b=X6nhexYUHhoveguOb1iuPyAO3zV6Xzps6i0IEHXbLXxfEZR8RkeKk994eYpTHQbc/NUG/HA+8qrs+hkyHCIsfRkdrzp06sIpM4o0gMR6NCDbjYDXa6cVPFy/WxcmrfU7IQ3KEFRfzWqvWMkiPbuhhOZa1KOwAfnCXVa3rB1ZNa4=
+	t=1756310029; cv=none; b=OzavMd8FHiQ0B4WAbqWeTUzr5nJ/MlAjOvmCpx1SR8BX6Ya9BcL/gErdXUxOyTY6zlkKVJxHbMG9kbM5KepSvDopvrMqmWmNqKOyyJVs/uimE9o4NCBtLqtdsMi4aqVh6siwRPWAuLBqtbEMDEXh3zkSJOX7HYXm7TFahQg1llY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756310027; c=relaxed/simple;
-	bh=wXxb3T+ojKcAOnkcnRiZIVSxq2WhvzhMfNUH/C0QFkU=;
+	s=arc-20240116; t=1756310029; c=relaxed/simple;
+	bh=Cal/F8RymBGUTNT4URDUgcW6wjPBW/Yfbl2OoGRl2Gs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GjTpSpIPyeYaE5wuRjwFzSjxOjCCIz23K9kBqHMJRedqNqx4VyQT4Z2aYhWkrGLSh8GvH6j85hLx8yjytImMOCUfYH4qN4MS6kMbVUgSkbvEZTmkyXncHNpzPSx1goQgZ79NMj9fF23wX3z4zEYH27TOgqETJTxve/bJxtA/Qpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E5CC/zQo; arc=none smtp.client-ip=209.85.219.170
+	 MIME-Version; b=AJSY0c13HnjV17smuk3NBs63zKyYLwFNOO/1Z0YCkbYGj1T1aRNBXIe48HCsrmydDs2RB18zYCPAoO7V1oR0vCHNQXxnpMllE9Zt3txT++6rl6KOkEyF69EcNWRNtwyfZuHe7TiPxtIUmIgqRxe3wn6qwwE3yBtENooUAZN3VJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bnmqF+o1; arc=none smtp.client-ip=209.85.219.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-e931c71a1baso10120600276.0
-        for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 08:53:45 -0700 (PDT)
+Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e96eb999262so1020111276.2
+        for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 08:53:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756310025; x=1756914825; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1756310026; x=1756914826; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nkc+Q1yRDGa9YbcIEK8b5kG1vwMNmj84EpwkL+jH+GE=;
-        b=E5CC/zQoWHdPNfQskSiWy9I/KDBmkBaPp4LyIx8+GsEWmZH5F5w6CMlE9PuDY8w+0n
-         f5ZyspyB9n5B7P4iTa1y/3l3+AlG2JtUUjxawfOgyuDpfcHCSTfeGDHogK2AYHutTByS
-         repO6EhMAp2GQsneUaG8ESmSmYofwWXmAiHTYU2DeMRM8N7jveg1AXKhKNF5ppoUH3Lo
-         PahMEmbytFaB5R5/6lboAPKGnNLT3jLQImqH01hCKCKaKXR+uneWwWXGQC/N6DeBbGuW
-         8k60W4ghdjkTtIR36T0QsL0Nz88iie3G/M8ctqyR/Dj0ie70uPUHCG6SchxyizFqVM7z
-         y4wA==
+        bh=XjYKQuaexHyUsOPM6YkPVRK5O4asd9doifnuCZErYBE=;
+        b=bnmqF+o1+UWsmt2SiAtMlvVbWV2NSSFy+IG5PI84aId64AvSq2lIp4hB2nsFrpd5ON
+         VuSUiC9ZnYS19KwsU3OyP6RiFqXKePNoP8K21SfaeMBZ75k7owD4f9G2m8RrvqDwKJT8
+         4n6h+NEjWJpYCO6z64ZzVuDRg2rHW8RmuqW6bdaWTf0pS5fZewMLSp6DIIoAKXnPUgNx
+         m1ugvlicbW1z6H2IQWNdBs254sjeNQiFYjfPFQQuuJwjPp3Dz4uKPmUYxgTWu1WVuYMM
+         6HpMBspQ9xnuaseuGxH3W7Drf+Y8nFx3WlOlzUowLXAaWqe30RJ1mz1z2A7srTlEG7qG
+         3G9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756310025; x=1756914825;
+        d=1e100.net; s=20230601; t=1756310026; x=1756914826;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=nkc+Q1yRDGa9YbcIEK8b5kG1vwMNmj84EpwkL+jH+GE=;
-        b=t1bBGPrmJmqe9dhPkl7AMUBsUcSgxsx7/RYAQE56Z2gR4s0wE/C7sQw9hsLzWiEMZj
-         0o4GHC/dvSb1lIz9SoPZwC2BC4e3yI+ZYed9Ayzl4r2K4bNHqHppEJyl36RKnjMCeSUI
-         PqPLJruv1IfdJleVOVOVZux1pgYYrmxlp1hFodgPugphSTu9+5OCwF7cFbOxQRSCHobb
-         VJygjgCry+KSSrN5wYE1F1cVwS4QcwVx64nl3gJridkQgzzjBUS3bVuUOjGFB8qgcn/0
-         CcEkJuBDGb9nXqX3C5rbck7YSwP3v27iDjyotSL9jArSFxE5J8rPdF5A8iYAUvLe2HDa
-         4/GA==
-X-Forwarded-Encrypted: i=1; AJvYcCUy7+WemSpjVfVxIYI4rhfndi9Pc+hKOBwqDm6SB0ScUtBzDLe0We69DUvSdU12RSoglYggmOE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysU5j4iqEYaUCwIp4mCw54r6j/CWonDWuv7YZt0JqaUJkeEEHX
-	rPoxHC/EF6RogV3x1XiFN33tq++CrQ6VSgVzeuRhuFPeLCwcHRlAmHcv
-X-Gm-Gg: ASbGnctTAu9slJErxCNj4rkyTESqojR1FEcaD36R0biIJgtV8kX1gtjUdkNF6D5FWKn
-	pca8i0tehmjpFGPrl/08/EtdDjjCYI4zZLD7AOmEktV++X5FYOcLRlJu3mRd1qZpAlvtfzvGbgp
-	/evbyJQpdZsxg2WOHmVArfZnstJoNbLh1dHSA9TPTZYGn+j2vicy2ZcgODqqHd0gqwEkS9MZQ9/
-	nDW2L7VoaGNzE3XrNAZ1cccsAQK6KAyt8WbEhZ/IDaPWCdWPdD0/KwD6Irw738Wu/8mWyZ6QsFh
-	pyzo90dYIANXBSoAn9GY1Oi3vmcbqOqhHlACpPLYqctvKmmjZ/J9lDtD9YOOJ7Hr7skjQkHe4K3
-	4ZpK1L7ZfKgeTi1q/7APph1skQI9Oh5A=
-X-Google-Smtp-Source: AGHT+IHeC+qSxSg2XBEsEBcpVoz2t0RExco4KpqjXOQa8VwGLuKd35QrH01hyvV0yOY7dsz+sIOiQQ==
-X-Received: by 2002:a05:690c:c18:b0:721:21f7:e987 with SMTP id 00721157ae682-72121f7f333mr95484487b3.51.1756310025025;
-        Wed, 27 Aug 2025 08:53:45 -0700 (PDT)
-Received: from localhost ([2a03:2880:25ff:4f::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-71ff188128csm32003127b3.35.2025.08.27.08.53.44
+        bh=XjYKQuaexHyUsOPM6YkPVRK5O4asd9doifnuCZErYBE=;
+        b=WV/0jYtvg7J4+zhcxobhVxScRMNvMYc/DBDXF4uhBglyuc+PyRekA7n6MNk49qQsw0
+         GljANdmQRoCUupJmstFAmC/wdF2HZbwQ/fJiCPAELA53IejIH3vau2fPvBOeSS03Xxe1
+         v0DdGjmtS5f0Oat1y96J7X57NxH3MGuO0qtbWWa8CWA3g/4c2ESUVZu9Gy9DsrDgFSsl
+         j+lkEeKWzcdvBBH7FxgJQkVGisslPdywEymoXTz0nbz6TuuMEl4aGRUfSMFXjxpb8DwS
+         C+OBNTzTYEHLkuIZGFWvUwh9f29DYvAOPfic12ho8KyMvjSF9sJHjfF8z2wpUSQelI6i
+         1hEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXAPqB7MoKtAXalPMfvGsNz16n/e228uuwQdHlnTn1EKyu2SqYpYJqGBiTOsnAjRqiWwCEMbXk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQO2PYQe8P5cQhetoavXDcoZw4VUC0cxI3FzV5WfOcVLUSWCTk
+	W8ysi34uw5LFOhC9iydAULnP4YHjAC9V0tomW2wVV/prmemj30+WwBOj
+X-Gm-Gg: ASbGnctqJIcH93Ul0WcRHFvcWOfDuaFyuR4Bl4XJNRM/m0iWsi+XMVnhyEM/TDYauWU
+	sWL1U1YX59YjeKy09KCpPDTTJg/bW43nirkZ9WZ19qdJTYWo8tEqufEuSk++OUGna1CSnCBTxmk
+	TdMsRybUZWFUl2RhNmnbTeBwwjnlzPVzHpFK2Uu60w8iwyzF5qyurLF2gEaFNXHDWBhyTqGTbQq
+	e3QW0amt7TLqXL7fnuHSCUuOI/qvomlcE79BbjTeQjyQ4WV/jv9kX3HWGOfPlVkBepUmdKLJKxw
+	RxxVMAWHqM7qWG7mM1cSLfCd1d7+g7hVnMEOWQkRuztBI7RK8dvvWcy+bynhEJKXEqwTosDqKgy
+	z9I1JRUj/YbuhmY4tR7M=
+X-Google-Smtp-Source: AGHT+IEsj5vOcNkL+WLd0cO4Y0eeLNxVKJlxe3FMe//P8Amh2uhPpWz/Dnwb+GxgLtr3RgaiB2Nuaw==
+X-Received: by 2002:a05:690c:6102:b0:71f:f866:bba4 with SMTP id 00721157ae682-71ff866f374mr177300907b3.17.1756310026226;
+        Wed, 27 Aug 2025 08:53:46 -0700 (PDT)
+Received: from localhost ([2a03:2880:25ff:d::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-721243ea829sm14661077b3.68.2025.08.27.08.53.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Aug 2025 08:53:44 -0700 (PDT)
+        Wed, 27 Aug 2025 08:53:45 -0700 (PDT)
 From: Daniel Zahka <daniel.zahka@gmail.com>
 To: Donald Hunter <donald.hunter@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -101,9 +101,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Kiran Kella <kiran.kella@broadcom.com>,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next v9 03/19] net: modify core data structures for PSP datapath support
-Date: Wed, 27 Aug 2025 08:53:20 -0700
-Message-ID: <20250827155340.2738246-4-daniel.zahka@gmail.com>
+Subject: [PATCH net-next v9 04/19] tcp: add datapath logic for PSP with inline key exchange
+Date: Wed, 27 Aug 2025 08:53:21 -0700
+Message-ID: <20250827155340.2738246-5-daniel.zahka@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20250827155340.2738246-1-daniel.zahka@gmail.com>
 References: <20250827155340.2738246-1-daniel.zahka@gmail.com>
@@ -117,9 +117,42 @@ Content-Transfer-Encoding: 8bit
 
 From: Jakub Kicinski <kuba@kernel.org>
 
-Add pointers to psp data structures to core networking structs,
-and an SKB extension to carry the PSP information from the drivers
-to the socket layer.
+Add validation points and state propagation to support PSP key
+exchange inline, on TCP connections. The expectation is that
+application will use some well established mechanism like TLS
+handshake to establish a secure channel over the connection and
+if both endpoints are PSP-capable - exchange and install PSP keys.
+Because the connection can existing in PSP-unsecured and PSP-secured
+state we need to make sure that there are no race conditions or
+retransmission leaks.
+
+On Tx - mark packets with the skb->decrypted bit when PSP key
+is at the enqueue time. Drivers should only encrypt packets with
+this bit set. This prevents retransmissions getting encrypted when
+original transmission was not. Similarly to TLS, we'll use
+sk->sk_validate_xmit_skb to make sure PSP skbs can't "escape"
+via a PSP-unaware device without being encrypted.
+
+On Rx - validation is done under socket lock. This moves the validation
+point later than xfrm, for example. Please see the documentation patch
+for more details on the flow of securing a connection, but for
+the purpose of this patch what's important is that we want to
+enforce the invariant that once connection is secured any skb
+in the receive queue has been encrypted with PSP.
+
+Add GRO and coalescing checks to prevent PSP authenticated data from
+being combined with cleartext data, or data with non-matching PSP
+state. On Rx, check skb's with psp_skb_coalesce_diff() at points
+before psp_sk_rx_policy_check(). After skb's are policy checked and on
+the socket receive queue, skb_cmp_decrypted() is sufficient for
+checking for coalescable PSP state. On Tx, tcp_write_collapse_fence()
+should be called when transitioning a socket into PSP Tx state to
+prevent data sent as cleartext from being coalesced with PSP
+encapsulated data.
+
+This change only adds the validation points, for ease of review.
+Subsequent change will add the ability to install keys, and flesh
+the enforcement logic out
 
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
@@ -128,176 +161,497 @@ Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
 ---
 
 Notes:
+    v7:
+    - add comments about GRO and TCP coalescing to the commit message.
+    v4:
+    - add comment to tcp_timewait_state_process() explaining TCP_TW_SYN
+      case.
+    - psp_twsk_init() accepts const pointer, so caller does not need to
+      cast const away.
+    - add missing psp_twsk_rx_policy_check() to TCP_TW_SYN case of
+      do_timewait in tcp_v4_rcv().
+    v3:
+    - psp_reply_set_decrypted() does not use stuct sock* arg. Drop it.
     v2:
-    - Add dev_id field to psp_skb_ext
-    - Move psp_assoc from struct tcp_timewait_sock to struct
-      inet_timewait_sock
-    - Move psp_sk_assoc_free() from sk_common_release() to
-      inet_sock_destruct()
+    - Add psp_reply_set_decrypted() to encapsulate ACKs, FINs, and RSTs
+      sent from control socks on behalf of full or timewait socks with PSP
+      state.
     v1:
-      - https://lore.kernel.org/netdev/20240510030435.120935-4-kuba@kernel.org/
+    - https://lore.kernel.org/netdev/20240510030435.120935-5-kuba@kernel.org/
 
- include/linux/skbuff.h           | 3 +++
- include/net/inet_timewait_sock.h | 3 +++
- include/net/psp/functions.h      | 6 ++++++
- include/net/psp/types.h          | 7 +++++++
- include/net/sock.h               | 4 ++++
- net/core/skbuff.c                | 4 ++++
- net/ipv4/af_inet.c               | 2 ++
- net/ipv4/tcp_minisocks.c         | 2 ++
- 8 files changed, 31 insertions(+)
+ include/net/dropreason-core.h |  6 +++
+ include/net/psp/functions.h   | 77 +++++++++++++++++++++++++++++++++++
+ net/core/gro.c                |  2 +
+ net/ipv4/inet_timewait_sock.c |  2 +
+ net/ipv4/ip_output.c          |  5 ++-
+ net/ipv4/tcp.c                |  2 +
+ net/ipv4/tcp_ipv4.c           | 14 ++++++-
+ net/ipv4/tcp_minisocks.c      | 18 ++++++++
+ net/ipv4/tcp_output.c         | 17 +++++---
+ net/ipv6/tcp_ipv6.c           | 11 +++++
+ net/psp/Kconfig               |  1 +
+ 11 files changed, 147 insertions(+), 8 deletions(-)
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index ca8be45dd8be..4b77b856f025 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -4899,6 +4899,9 @@ enum skb_ext_id {
- #endif
- #if IS_ENABLED(CONFIG_MCTP_FLOWS)
- 	SKB_EXT_MCTP,
-+#endif
-+#if IS_ENABLED(CONFIG_INET_PSP)
-+	SKB_EXT_PSP,
- #endif
- 	SKB_EXT_NUM, /* must be last */
- };
-diff --git a/include/net/inet_timewait_sock.h b/include/net/inet_timewait_sock.h
-index 67a313575780..c1295246216c 100644
---- a/include/net/inet_timewait_sock.h
-+++ b/include/net/inet_timewait_sock.h
-@@ -81,6 +81,9 @@ struct inet_timewait_sock {
- 	struct timer_list	tw_timer;
- 	struct inet_bind_bucket	*tw_tb;
- 	struct inet_bind2_bucket	*tw_tb2;
-+#if IS_ENABLED(CONFIG_INET_PSP)
-+	struct psp_assoc __rcu	  *psp_assoc;
-+#endif
- };
- #define tw_tclass tw_tos
+diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+index d8ff24a33459..58d91ccc56e0 100644
+--- a/include/net/dropreason-core.h
++++ b/include/net/dropreason-core.h
+@@ -127,6 +127,8 @@
+ 	FN(CANXL_RX_INVALID_FRAME)	\
+ 	FN(PFMEMALLOC)	\
+ 	FN(DUALPI2_STEP_DROP)		\
++	FN(PSP_INPUT)			\
++	FN(PSP_OUTPUT)			\
+ 	FNe(MAX)
  
+ /**
+@@ -610,6 +612,10 @@ enum skb_drop_reason {
+ 	 * threshold of DualPI2 qdisc.
+ 	 */
+ 	SKB_DROP_REASON_DUALPI2_STEP_DROP,
++	/** @SKB_DROP_REASON_PSP_INPUT: PSP input checks failed */
++	SKB_DROP_REASON_PSP_INPUT,
++	/** @SKB_DROP_REASON_PSP_OUTPUT: PSP output checks failed */
++	SKB_DROP_REASON_PSP_OUTPUT,
+ 	/**
+ 	 * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, which
+ 	 * shouldn't be used as a real 'reason' - only for tracing code gen
 diff --git a/include/net/psp/functions.h b/include/net/psp/functions.h
-index 074f9df9afc3..d0043bd14299 100644
+index d0043bd14299..1ccc5fc238b8 100644
 --- a/include/net/psp/functions.h
 +++ b/include/net/psp/functions.h
-@@ -5,10 +5,16 @@
+@@ -3,6 +3,8 @@
+ #ifndef __NET_PSP_HELPERS_H
+ #define __NET_PSP_HELPERS_H
  
++#include <linux/skbuff.h>
++#include <net/sock.h>
  #include <net/psp/types.h>
  
-+struct inet_timewait_sock;
-+
- /* Driver-facing API */
- struct psp_dev *
- psp_dev_create(struct net_device *netdev, struct psp_dev_ops *psd_ops,
- 	       struct psp_dev_caps *psd_caps, void *priv_ptr);
+ struct inet_timewait_sock;
+@@ -14,7 +16,82 @@ psp_dev_create(struct net_device *netdev, struct psp_dev_ops *psd_ops,
  void psp_dev_unregister(struct psp_dev *psd);
  
-+/* Kernel-facing API */
+ /* Kernel-facing API */
++#if IS_ENABLED(CONFIG_INET_PSP)
+ static inline void psp_sk_assoc_free(struct sock *sk) { }
++static inline void
++psp_twsk_init(struct inet_timewait_sock *tw, const struct sock *sk) { }
+ static inline void psp_twsk_assoc_free(struct inet_timewait_sock *tw) { }
++static inline void
++psp_reply_set_decrypted(struct sk_buff *skb) { }
++
++static inline void
++psp_enqueue_set_decrypted(struct sock *sk, struct sk_buff *skb)
++{
++}
++
++static inline unsigned long
++__psp_skb_coalesce_diff(const struct sk_buff *one, const struct sk_buff *two,
++			unsigned long diffs)
++{
++	return diffs;
++}
++
++static inline enum skb_drop_reason
++psp_sk_rx_policy_check(struct sock *sk, struct sk_buff *skb)
++{
++	return 0;
++}
++
++static inline enum skb_drop_reason
++psp_twsk_rx_policy_check(struct inet_timewait_sock *tw, struct sk_buff *skb)
++{
++	return 0;
++}
++
++static inline struct psp_assoc *psp_skb_get_assoc_rcu(struct sk_buff *skb)
++{
++	return NULL;
++}
++#else
 +static inline void psp_sk_assoc_free(struct sock *sk) { }
++static inline void
++psp_twsk_init(struct inet_timewait_sock *tw, const struct sock *sk) { }
 +static inline void psp_twsk_assoc_free(struct inet_timewait_sock *tw) { }
++static inline void
++psp_reply_set_decrypted(struct sk_buff *skb) { }
 +
++static inline void
++psp_enqueue_set_decrypted(struct sock *sk, struct sk_buff *skb) { }
++
++static inline unsigned long
++__psp_skb_coalesce_diff(const struct sk_buff *one, const struct sk_buff *two,
++			unsigned long diffs)
++{
++	return diffs;
++}
++
++static inline enum skb_drop_reason
++psp_sk_rx_policy_check(struct sock *sk, struct sk_buff *skb)
++{
++	return 0;
++}
++
++static inline enum skb_drop_reason
++psp_twsk_rx_policy_check(struct inet_timewait_sock *tw, struct sk_buff *skb)
++{
++	return 0;
++}
++
++static inline struct psp_assoc *psp_skb_get_assoc_rcu(struct sk_buff *skb)
++{
++	return NULL;
++}
++#endif
++
++static inline unsigned long
++psp_skb_coalesce_diff(const struct sk_buff *one, const struct sk_buff *two)
++{
++	return __psp_skb_coalesce_diff(one, two, 0);
++}
+ 
  #endif /* __NET_PSP_HELPERS_H */
-diff --git a/include/net/psp/types.h b/include/net/psp/types.h
-index d242b1ecee7d..4922fc8d42fd 100644
---- a/include/net/psp/types.h
-+++ b/include/net/psp/types.h
-@@ -84,6 +84,13 @@ struct psp_dev_caps {
- 
- #define PSP_MAX_KEY	32
- 
-+struct psp_skb_ext {
-+	__be32 spi;
-+	u16 dev_id;
-+	u8 generation;
-+	u8 version;
-+};
-+
- /**
-  * struct psp_dev_ops - netdev driver facing PSP callbacks
-  */
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 63a6a48afb48..e589eef6ce0f 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -249,6 +249,7 @@ struct sk_filter;
-   *	@sk_dst_cache: destination cache
-   *	@sk_dst_pending_confirm: need to confirm neighbour
-   *	@sk_policy: flow policy
-+  *	@psp_assoc: PSP association, if socket is PSP-secured
-   *	@sk_receive_queue: incoming packets
-   *	@sk_wmem_alloc: transmit queue bytes committed
-   *	@sk_tsq_flags: TCP Small Queues flags
-@@ -448,6 +449,9 @@ struct sock {
- #endif
- #ifdef CONFIG_XFRM
- 	struct xfrm_policy __rcu *sk_policy[2];
-+#endif
-+#if IS_ENABLED(CONFIG_INET_PSP)
-+	struct psp_assoc __rcu	*psp_assoc;
- #endif
- 	__cacheline_group_end(sock_read_rxtx);
- 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 23b776cd9879..d331e607edfb 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -79,6 +79,7 @@
- #include <net/mptcp.h>
- #include <net/mctp.h>
- #include <net/page_pool/helpers.h>
-+#include <net/psp/types.h>
- #include <net/dropreason.h>
- 
- #include <linux/uaccess.h>
-@@ -5062,6 +5063,9 @@ static const u8 skb_ext_type_len[] = {
- #if IS_ENABLED(CONFIG_MCTP_FLOWS)
- 	[SKB_EXT_MCTP] = SKB_EXT_CHUNKSIZEOF(struct mctp_flow),
- #endif
-+#if IS_ENABLED(CONFIG_INET_PSP)
-+	[SKB_EXT_PSP] = SKB_EXT_CHUNKSIZEOF(struct psp_skb_ext),
-+#endif
- };
- 
- static __always_inline unsigned int skb_ext_total_length(void)
-diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
-index 76e38092cd8a..e298dacb4a06 100644
---- a/net/ipv4/af_inet.c
-+++ b/net/ipv4/af_inet.c
-@@ -102,6 +102,7 @@
+diff --git a/net/core/gro.c b/net/core/gro.c
+index b350e5b69549..5ba4504cfd28 100644
+--- a/net/core/gro.c
++++ b/net/core/gro.c
+@@ -1,4 +1,5 @@
+ // SPDX-License-Identifier: GPL-2.0-or-later
++#include <net/psp.h>
  #include <net/gro.h>
- #include <net/gso.h>
+ #include <net/dst_metadata.h>
+ #include <net/busy_poll.h>
+@@ -376,6 +377,7 @@ static void gro_list_prepare(const struct list_head *head,
+ 			diffs |= skb_get_nfct(p) ^ skb_get_nfct(skb);
+ 
+ 			diffs |= gro_list_prepare_tc_ext(skb, p, diffs);
++			diffs |= __psp_skb_coalesce_diff(skb, p, diffs);
+ 		}
+ 
+ 		NAPI_GRO_CB(p)->same_flow = !diffs;
+diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
+index 5b5426b8ee92..1f83f333b8ac 100644
+--- a/net/ipv4/inet_timewait_sock.c
++++ b/net/ipv4/inet_timewait_sock.c
+@@ -16,6 +16,7 @@
+ #include <net/inet_timewait_sock.h>
+ #include <net/ip.h>
  #include <net/tcp.h>
 +#include <net/psp.h>
- #include <net/udp.h>
- #include <net/udplite.h>
- #include <net/ping.h>
-@@ -158,6 +159,7 @@ void inet_sock_destruct(struct sock *sk)
- 	kfree(rcu_dereference_protected(inet->inet_opt, 1));
- 	dst_release(rcu_dereference_protected(sk->sk_dst_cache, 1));
- 	dst_release(rcu_dereference_protected(sk->sk_rx_dst, 1));
-+	psp_sk_assoc_free(sk);
- }
- EXPORT_SYMBOL(inet_sock_destruct);
  
-diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-index d1c9e4088646..17ecdbc66f05 100644
---- a/net/ipv4/tcp_minisocks.c
-+++ b/net/ipv4/tcp_minisocks.c
-@@ -23,6 +23,7 @@
+ /**
+  *	inet_twsk_bind_unhash - unhash a timewait socket from bind hash
+@@ -219,6 +220,7 @@ struct inet_timewait_sock *inet_twsk_alloc(const struct sock *sk,
+ 		refcount_set(&tw->tw_refcnt, 0);
+ 
+ 		__module_get(tw->tw_prot->owner);
++		psp_twsk_init(tw, sk);
+ 	}
+ 
+ 	return tw;
+diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+index 2b96651d719b..5ca97ede979c 100644
+--- a/net/ipv4/ip_output.c
++++ b/net/ipv4/ip_output.c
+@@ -84,6 +84,7 @@
+ #include <linux/netfilter_bridge.h>
+ #include <linux/netlink.h>
+ #include <linux/tcp.h>
++#include <net/psp.h>
+ 
+ static int
+ ip_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
+@@ -1665,8 +1666,10 @@ void ip_send_unicast_reply(struct sock *sk, const struct sock *orig_sk,
+ 			  arg->csumoffset) = csum_fold(csum_add(nskb->csum,
+ 								arg->csum));
+ 		nskb->ip_summed = CHECKSUM_NONE;
+-		if (orig_sk)
++		if (orig_sk) {
+ 			skb_set_owner_edemux(nskb, (struct sock *)orig_sk);
++			psp_reply_set_decrypted(nskb);
++		}
+ 		if (transmit_time)
+ 			nskb->tstamp_type = SKB_CLOCK_MONOTONIC;
+ 		if (txhash)
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 9bc8317e92b7..ba5a23e5c261 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -275,6 +275,7 @@
+ #include <net/proto_memory.h>
  #include <net/xfrm.h>
+ #include <net/ip.h>
++#include <net/psp.h>
+ #include <net/sock.h>
+ #include <net/rstreason.h>
+ 
+@@ -687,6 +688,7 @@ void tcp_skb_entail(struct sock *sk, struct sk_buff *skb)
+ 	tcb->seq     = tcb->end_seq = tp->write_seq;
+ 	tcb->tcp_flags = TCPHDR_ACK;
+ 	__skb_header_release(skb);
++	psp_enqueue_set_decrypted(sk, skb);
+ 	tcp_add_write_queue_tail(sk, skb);
+ 	sk_wmem_queued_add(sk, skb->truesize);
+ 	sk_mem_charge(sk, skb->truesize);
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index a0c93b24c6e0..13263aaeffa5 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -74,6 +74,7 @@
+ #include <net/secure_seq.h>
  #include <net/busy_poll.h>
  #include <net/rstreason.h>
 +#include <net/psp.h>
  
- static bool tcp_in_window(u32 seq, u32 end_seq, u32 s_win, u32 e_win)
- {
-@@ -400,6 +401,7 @@ void tcp_twsk_destructor(struct sock *sk)
- 	}
- #endif
- 	tcp_ao_destroy_sock(sk, true);
-+	psp_twsk_assoc_free(inet_twsk(sk));
- }
+ #include <linux/inet.h>
+ #include <linux/ipv6.h>
+@@ -1905,6 +1906,10 @@ int tcp_v4_do_rcv(struct sock *sk, struct sk_buff *skb)
+ 	enum skb_drop_reason reason;
+ 	struct sock *rsk;
  
- void tcp_twsk_purge(struct list_head *net_exit_list)
++	reason = psp_sk_rx_policy_check(sk, skb);
++	if (reason)
++		goto err_discard;
++
+ 	if (sk->sk_state == TCP_ESTABLISHED) { /* Fast path */
+ 		struct dst_entry *dst;
+ 
+@@ -1966,6 +1971,7 @@ int tcp_v4_do_rcv(struct sock *sk, struct sk_buff *skb)
+ 	reason = SKB_DROP_REASON_TCP_CSUM;
+ 	trace_tcp_bad_csum(skb);
+ 	TCP_INC_STATS(sock_net(sk), TCP_MIB_CSUMERRORS);
++err_discard:
+ 	TCP_INC_STATS(sock_net(sk), TCP_MIB_INERRS);
+ 	goto discard;
+ }
+@@ -2067,7 +2073,9 @@ bool tcp_add_backlog(struct sock *sk, struct sk_buff *skb,
+ 	     (TCPHDR_ECE | TCPHDR_CWR | TCPHDR_AE)) ||
+ 	    !tcp_skb_can_collapse_rx(tail, skb) ||
+ 	    thtail->doff != th->doff ||
+-	    memcmp(thtail + 1, th + 1, hdrlen - sizeof(*th)))
++	    memcmp(thtail + 1, th + 1, hdrlen - sizeof(*th)) ||
++	    /* prior to PSP Rx policy check, retain exact PSP metadata */
++	    psp_skb_coalesce_diff(tail, skb))
+ 		goto no_coalesce;
+ 
+ 	__skb_pull(skb, hdrlen);
+@@ -2435,6 +2443,10 @@ int tcp_v4_rcv(struct sk_buff *skb)
+ 			__this_cpu_write(tcp_tw_isn, isn);
+ 			goto process;
+ 		}
++
++		drop_reason = psp_twsk_rx_policy_check(inet_twsk(sk), skb);
++		if (drop_reason)
++			break;
+ 	}
+ 		/* to ACK */
+ 		fallthrough;
+diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+index 17ecdbc66f05..eddfd3f2f7a9 100644
+--- a/net/ipv4/tcp_minisocks.c
++++ b/net/ipv4/tcp_minisocks.c
+@@ -104,9 +104,16 @@ tcp_timewait_state_process(struct inet_timewait_sock *tw, struct sk_buff *skb,
+ 	struct tcp_timewait_sock *tcptw = tcp_twsk((struct sock *)tw);
+ 	u32 rcv_nxt = READ_ONCE(tcptw->tw_rcv_nxt);
+ 	struct tcp_options_received tmp_opt;
++	enum skb_drop_reason psp_drop;
+ 	bool paws_reject = false;
+ 	int ts_recent_stamp;
+ 
++	/* Instead of dropping immediately, wait to see what value is
++	 * returned. We will accept a non psp-encapsulated syn in the
++	 * case where TCP_TW_SYN is returned.
++	 */
++	psp_drop = psp_twsk_rx_policy_check(tw, skb);
++
+ 	tmp_opt.saw_tstamp = 0;
+ 	ts_recent_stamp = READ_ONCE(tcptw->tw_ts_recent_stamp);
+ 	if (th->doff > (sizeof(*th) >> 2) && ts_recent_stamp) {
+@@ -124,6 +131,9 @@ tcp_timewait_state_process(struct inet_timewait_sock *tw, struct sk_buff *skb,
+ 	if (READ_ONCE(tw->tw_substate) == TCP_FIN_WAIT2) {
+ 		/* Just repeat all the checks of tcp_rcv_state_process() */
+ 
++		if (psp_drop)
++			goto out_put;
++
+ 		/* Out of window, send ACK */
+ 		if (paws_reject ||
+ 		    !tcp_in_window(TCP_SKB_CB(skb)->seq, TCP_SKB_CB(skb)->end_seq,
+@@ -194,6 +204,9 @@ tcp_timewait_state_process(struct inet_timewait_sock *tw, struct sk_buff *skb,
+ 	     (TCP_SKB_CB(skb)->seq == TCP_SKB_CB(skb)->end_seq || th->rst))) {
+ 		/* In window segment, it may be only reset or bare ack. */
+ 
++		if (psp_drop)
++			goto out_put;
++
+ 		if (th->rst) {
+ 			/* This is TIME_WAIT assassination, in two flavors.
+ 			 * Oh well... nobody has a sufficient solution to this
+@@ -247,6 +260,9 @@ tcp_timewait_state_process(struct inet_timewait_sock *tw, struct sk_buff *skb,
+ 		return TCP_TW_SYN;
+ 	}
+ 
++	if (psp_drop)
++		goto out_put;
++
+ 	if (paws_reject) {
+ 		*drop_reason = SKB_DROP_REASON_TCP_RFC7323_TW_PAWS;
+ 		__NET_INC_STATS(twsk_net(tw), LINUX_MIB_PAWS_TW_REJECTED);
+@@ -265,6 +281,8 @@ tcp_timewait_state_process(struct inet_timewait_sock *tw, struct sk_buff *skb,
+ 		return tcp_timewait_check_oow_rate_limit(
+ 			tw, skb, LINUX_MIB_TCPACKSKIPPEDTIMEWAIT);
+ 	}
++
++out_put:
+ 	inet_twsk_put(tw);
+ 	return TCP_TW_SUCCESS;
+ }
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index 06b26a6efd62..d680c1b8bb2b 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -40,6 +40,7 @@
+ #include <net/tcp.h>
+ #include <net/mptcp.h>
+ #include <net/proto_memory.h>
++#include <net/psp.h>
+ 
+ #include <linux/compiler.h>
+ #include <linux/gfp.h>
+@@ -403,13 +404,15 @@ static void tcp_ecn_send(struct sock *sk, struct sk_buff *skb,
+ /* Constructs common control bits of non-data skb. If SYN/FIN is present,
+  * auto increment end seqno.
+  */
+-static void tcp_init_nondata_skb(struct sk_buff *skb, u32 seq, u16 flags)
++static void tcp_init_nondata_skb(struct sk_buff *skb, struct sock *sk,
++				 u32 seq, u16 flags)
+ {
+ 	skb->ip_summed = CHECKSUM_PARTIAL;
+ 
+ 	TCP_SKB_CB(skb)->tcp_flags = flags;
+ 
+ 	tcp_skb_pcount_set(skb, 1);
++	psp_enqueue_set_decrypted(sk, skb);
+ 
+ 	TCP_SKB_CB(skb)->seq = seq;
+ 	if (flags & (TCPHDR_SYN | TCPHDR_FIN))
+@@ -1510,6 +1513,7 @@ static void tcp_queue_skb(struct sock *sk, struct sk_buff *skb)
+ 	/* Advance write_seq and place onto the write_queue. */
+ 	WRITE_ONCE(tp->write_seq, TCP_SKB_CB(skb)->end_seq);
+ 	__skb_header_release(skb);
++	psp_enqueue_set_decrypted(sk, skb);
+ 	tcp_add_write_queue_tail(sk, skb);
+ 	sk_wmem_queued_add(sk, skb->truesize);
+ 	sk_mem_charge(sk, skb->truesize);
+@@ -3624,7 +3628,7 @@ void tcp_send_fin(struct sock *sk)
+ 		skb_reserve(skb, MAX_TCP_HEADER);
+ 		sk_forced_mem_schedule(sk, skb->truesize);
+ 		/* FIN eats a sequence byte, write_seq advanced by tcp_queue_skb(). */
+-		tcp_init_nondata_skb(skb, tp->write_seq,
++		tcp_init_nondata_skb(skb, sk, tp->write_seq,
+ 				     TCPHDR_ACK | TCPHDR_FIN);
+ 		tcp_queue_skb(sk, skb);
+ 	}
+@@ -3652,7 +3656,7 @@ void tcp_send_active_reset(struct sock *sk, gfp_t priority,
+ 
+ 	/* Reserve space for headers and prepare control bits. */
+ 	skb_reserve(skb, MAX_TCP_HEADER);
+-	tcp_init_nondata_skb(skb, tcp_acceptable_seq(sk),
++	tcp_init_nondata_skb(skb, sk, tcp_acceptable_seq(sk),
+ 			     TCPHDR_ACK | TCPHDR_RST);
+ 	tcp_mstamp_refresh(tcp_sk(sk));
+ 	/* Send it off. */
+@@ -4149,7 +4153,7 @@ int tcp_connect(struct sock *sk)
+ 	/* SYN eats a sequence byte, write_seq updated by
+ 	 * tcp_connect_queue_skb().
+ 	 */
+-	tcp_init_nondata_skb(buff, tp->write_seq, TCPHDR_SYN);
++	tcp_init_nondata_skb(buff, sk, tp->write_seq, TCPHDR_SYN);
+ 	tcp_mstamp_refresh(tp);
+ 	tp->retrans_stamp = tcp_time_stamp_ts(tp);
+ 	tcp_connect_queue_skb(sk, buff);
+@@ -4274,7 +4278,8 @@ void __tcp_send_ack(struct sock *sk, u32 rcv_nxt, u16 flags)
+ 
+ 	/* Reserve space for headers and prepare control bits. */
+ 	skb_reserve(buff, MAX_TCP_HEADER);
+-	tcp_init_nondata_skb(buff, tcp_acceptable_seq(sk), TCPHDR_ACK | flags);
++	tcp_init_nondata_skb(buff, sk,
++			     tcp_acceptable_seq(sk), TCPHDR_ACK | flags);
+ 
+ 	/* We do not want pure acks influencing TCP Small Queues or fq/pacing
+ 	 * too much.
+@@ -4320,7 +4325,7 @@ static int tcp_xmit_probe_skb(struct sock *sk, int urgent, int mib)
+ 	 * end to send an ack.  Don't queue or clone SKB, just
+ 	 * send it.
+ 	 */
+-	tcp_init_nondata_skb(skb, tp->snd_una - !urgent, TCPHDR_ACK);
++	tcp_init_nondata_skb(skb, sk, tp->snd_una - !urgent, TCPHDR_ACK);
+ 	NET_INC_STATS(sock_net(sk), mib);
+ 	return tcp_transmit_skb(sk, skb, 0, (__force gfp_t)0);
+ }
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index 8b2e7b7afbd8..c25c834ba5bc 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -62,6 +62,7 @@
+ #include <net/hotdata.h>
+ #include <net/busy_poll.h>
+ #include <net/rstreason.h>
++#include <net/psp.h>
+ 
+ #include <linux/proc_fs.h>
+ #include <linux/seq_file.h>
+@@ -972,6 +973,7 @@ static void tcp_v6_send_response(const struct sock *sk, struct sk_buff *skb, u32
+ 	if (sk) {
+ 		/* unconstify the socket only to attach it to buff with care. */
+ 		skb_set_owner_edemux(buff, (struct sock *)sk);
++		psp_reply_set_decrypted(buff);
+ 
+ 		if (sk->sk_state == TCP_TIME_WAIT)
+ 			mark = inet_twsk(sk)->tw_mark;
+@@ -1606,6 +1608,10 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff *skb)
+ 	if (skb->protocol == htons(ETH_P_IP))
+ 		return tcp_v4_do_rcv(sk, skb);
+ 
++	reason = psp_sk_rx_policy_check(sk, skb);
++	if (reason)
++		goto err_discard;
++
+ 	/*
+ 	 *	socket locking is here for SMP purposes as backlog rcv
+ 	 *	is currently called with bh processing disabled.
+@@ -1685,6 +1691,7 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff *skb)
+ 	reason = SKB_DROP_REASON_TCP_CSUM;
+ 	trace_tcp_bad_csum(skb);
+ 	TCP_INC_STATS(sock_net(sk), TCP_MIB_CSUMERRORS);
++err_discard:
+ 	TCP_INC_STATS(sock_net(sk), TCP_MIB_INERRS);
+ 	goto discard;
+ 
+@@ -1989,6 +1996,10 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
+ 			__this_cpu_write(tcp_tw_isn, isn);
+ 			goto process;
+ 		}
++
++		drop_reason = psp_twsk_rx_policy_check(inet_twsk(sk), skb);
++		if (drop_reason)
++			break;
+ 	}
+ 		/* to ACK */
+ 		fallthrough;
+diff --git a/net/psp/Kconfig b/net/psp/Kconfig
+index 55f9dd87446b..5e3908a40945 100644
+--- a/net/psp/Kconfig
++++ b/net/psp/Kconfig
+@@ -5,6 +5,7 @@
+ config INET_PSP
+ 	bool "PSP Security Protocol support"
+ 	depends on INET
++	select SKB_DECRYPTED
+ 	help
+ 	Enable kernel support for the PSP protocol.
+ 	For more information see:
 -- 
 2.47.3
 
