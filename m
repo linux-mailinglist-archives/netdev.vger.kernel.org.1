@@ -1,180 +1,151 @@
-Return-Path: <netdev+bounces-217294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 150FFB383DA
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 15:40:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74BF4B383D9
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 15:40:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D19B33A80BC
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 13:40:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B5DD189B979
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 13:41:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8E813568E1;
-	Wed, 27 Aug 2025 13:40:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vasama.org header.i=@vasama.org header.b="Iz9XGkdC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28975350D42;
+	Wed, 27 Aug 2025 13:40:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74101352FED
-	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 13:40:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B07931E112
+	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 13:40:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756302008; cv=none; b=VuB+S4nTpFqr2M8LQC+eWQEuwPOysh+a/AaKY3SpTtKxTp1izEw6BuFrdO1GKz5O353QryFOYHK8jYrvi/H0xq92/ugdjeOPZ3Ooelseua6/z067fb/6ul+046POIEEOZhjndkSU6KI6Qq8wbL5ATi4p+GOXBmLDyI74ILYeDTc=
+	t=1756302049; cv=none; b=KcWg6xtvNQ33LYdZBNGNAwRtwM7nEAvkiVGabanxfzesrfOdEmQhjEzi+P6+5job4bPmul109gC1bgQuqRJwwlSJvUzwyzWsgT+27f4nziltqcw7/cmbdNaGruz/8oIoXz8TPBU2sQndNz+R+2w/LTAiJ247P0xaO4R1C04sBhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756302008; c=relaxed/simple;
-	bh=D+lUVgJMEwIFc1P/nCQWWdEyr5YF/+9aw/YBibb75hg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tro7rKot3+okZcQ2r5+zqiZqtmtYdu1QRYncJY66nO6htVhtqEFIBssgItK71Apk/9mUHapqXNT/hGin10gX2FMyCsm6QvKbcO4491LkT8XPXjhxv448DYdDn8WrFVA6dKStjDwH8KNkwX4Hqa0qOEkKlYktzp2PrdNjNzfk2Tw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vasama.org; spf=pass smtp.mailfrom=vasama.org; dkim=pass (1024-bit key) header.d=vasama.org header.i=@vasama.org header.b=Iz9XGkdC; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vasama.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vasama.org
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vasama.org; s=key1;
-	t=1756301992;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Bm9rJ8OhJh58CJfDwiENOqiWNHMg/YizQnJOZe32I8E=;
-	b=Iz9XGkdCGEOLeWt+/qF5laScjckCgrRAZhyTV6bKlvlibhVTZRgRY7RryaETSIvjLjnRw/
-	d1D+/D/GJRTMGOjoIPy3LZpUIfmNPXaM3Ze5COMZypXOH5ydAjnGY58rl58/7QpqHD2mAm
-	lD9tc2Az1ZCwayFnMysAC5Zbunqv6sc=
-From: Lauri Vasama <git@vasama.org>
-To: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Lauri Vasama <git@vasama.org>,
-	Jan Kara <jack@suse.cz>,
-	Simon Horman <horms@kernel.org>,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH] Add RWF_NOSIGNAL flag for pwritev2
-Date: Wed, 27 Aug 2025 16:39:00 +0300
-Message-ID: <20250827133901.1820771-1-git@vasama.org>
+	s=arc-20240116; t=1756302049; c=relaxed/simple;
+	bh=YZSW/JhS8eG5W+NL0XbvPL29It5aZ+AGRYmBVN8Sidc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XLGA2ldJP0AkmyF6gVTYcrdGRwzANnDYssnwwi2pSU/bVabu4k3WPgGg9ayC8KMQtd6FRTT+lR8oXNI+2IU+OLHNLx6AT1ccfUaYAO8T6fm2MJqZi7DVUOwgYoChIY+nH7L0q85lTXtUHrPo+ymZn8tLjUzFe1lK1IKZI/1yxnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [172.16.0.106] (unknown [213.71.9.131])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 07D6E60213AC1;
+	Wed, 27 Aug 2025 15:39:36 +0200 (CEST)
+Message-ID: <aefa86a1-8959-4e5f-8203-78ce4c50b3bd@molgen.mpg.de>
+Date: Wed, 27 Aug 2025 15:39:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v2] igb: Convert Tx timestamping to PTP aux
+ worker
+To: Kurt Kanzenbach <kurt@linutronix.de>
+Cc: Jacob Keller <jacob.e.keller@intel.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Miroslav Lichvar <mlichvar@redhat.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org
+References: <20250822-igb_irq_ts-v2-1-1ac37078a7a4@linutronix.de>
+ <20250822075200.L8_GUnk_@linutronix.de> <87ldna7axr.fsf@jax.kurt.home>
+ <02d40de4-5447-45bf-b839-f22a8f062388@intel.com>
+ <20250826125912.q0OhVCZJ@linutronix.de>
+ <e656a4ee-281c-4205-9183-bc3c7dbc9173@intel.com>
+ <87ecswq5vj.fsf@jax.kurt.home>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <87ecswq5vj.fsf@jax.kurt.home>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-For a user mode library to avoid generating SIGPIPE signals (e.g.
-because this behaviour is not portable across operating systems) is
-cumbersome. It is generally bad form to change the process-wide signal
-mask in a library, so a local solution is needed instead.
+Dear Linux folks,
 
-For I/O performed directly using system calls (synchronous or readiness
-based asynchronous) this currently involves applying a thread-specific
-signal mask before the operation and reverting it afterwards. This can be
-avoided when it is known that the file descriptor refers to neither a
-pipe nor a socket, but a conservative implementation must always apply
-the mask. This incurs the cost of two additional system calls. In the
-case of sockets, the existing MSG_NOSIGNAL flag can be used with send.
 
-For asynchronous I/O performed using io_uring, currently the only option
-(apart from MSG_NOSIGNAL for sockets), is to mask SIGPIPE entirely in the
-call to io_uring_enter. Thankfully io_uring_enter takes a signal mask, so
-only a single syscall is needed. However, copying the signal mask on
-every call incurs a non-zero performance penalty. Furthermore, this mask
-applies to all completions, meaning that if the non-signaling behaviour
-is desired only for some subset of operations, the desired signals must
-be raised manually from user-mode depending on the completed operation.
+A very interesting issue.
 
-Add RWF_NOSIGNAL flag for pwritev2. This flag prevents the SIGPIPE signal
-from being raised when writing on disconnected pipes or sockets. The flag
-is handled directly by the pipe filesystem and converted to the existing
-MSG_NOSIGNAL flag for sockets.
+Am 27.08.25 um 14:57 schrieb Kurt Kanzenbach:
+> On Tue Aug 26 2025, Jacob Keller wrote:
+>> On 8/26/2025 5:59 AM, Sebastian Andrzej Siewior wrote:
+>>> On 2025-08-25 16:28:38 [-0700], Jacob Keller wrote:
+>>>> Ya, I don't think we fully understand either. Miroslav said he tested on
+>>>> I350 which is a different MAC from the I210, so it could be something
+>>>> there. Theoretically we could handle just I210 directly in the interrupt
+>>>> and leave the other variants to the kworker.. but I don't know how much
+>>>> benefit we get from that. The data sheet for the I350 appears to have
+>>>> more or less the same logic for Tx timestamps. It is significantly
+>>>> different for Rx timestamps though.
+>>>
+>>> From logical point of view it makes sense to retrieve the HW timestamp
+>>> immediately when it becomes available and feed it to the stack. I can't
+>>> imagine how delaying it to yet another thread improves the situation.
+>>> The benchmark is about > 1k packets/ second while in reality you have
+>>> less than 20 packets a second. With multiple applications you usually
+>>> need a "second timestamp register" or you may lose packets.
+>>>
+>>> Delaying it to the AUX worker makes sense for hardware which can't fire
+>>> an interrupt and polling is the only option left. This is sane in this
+>>> case but I don't like this solution as some kind compromise for
+>>> everyone. Simply because it adds overhead and requires additional
+>>> configuration.
+>>
+>> I agree. Its just frustrating that doing so appears to cause a
+>> regression in at least one test setup on hardware which uses this method.
+>>
+>>>>> Also I couldn't really see a performance degradation with ntpperf. In my
+>>>>> tests the IRQ variant reached an equal or higher rate. But sometimes I
+>>>>> get 'Could not send requests at rate X'. No idea what that means.
+>>>>>
+>>>>> Anyway, this patch is basically a compromise. It works for Miroslav and
+>>>>> my use case.
+>>>>>
+>>>>>> This is also what the igc does and the performance improved
+>>>>>> 	afa141583d827 ("igc: Retrieve TX timestamp during interrupt handling")
+>>>>
+>>>> igc supports several hardware variations which are all a lot similar to
+>>>> i210 than i350 is to i210 in igb. I could see this working fine for i210
+>>>> if it works fine in igb.. I honestly am at a loss currently why i350 is
+>>>> much worse.
+>>>>
+>>>>>> and here it causes the opposite?
+>>>>>
+>>>>> As said above, I'm out of ideas here.
+>>>>
+>>>> Same. It may be one of those things where the effort to dig up precisely
+>>>> what has gone wrong is so large that it becomes not feasible relative to
+>>>> the gain :(
+>>>
+>>> Could we please use the direct retrieval/ submission for HW which
+>>> supports it and fallback to the AUX worker (instead of the kworker) for
+>>> HW which does not have an interrupt for it?
+>>
+>> I have no objection. Perhaps we could assume the high end of the ntpperf
+>> benchmark is not reflective of normal use case? We *are* limited to only
+>> one timestamp register, which the igb driver does protect by bitlock.
+> 
+> Does that mean we're going back to v1 + the AUX worker for 82576? Let me
+> prepare v3 then.
 
-Signed-off-by: Lauri Vasama <git@vasama.org>
----
- fs/pipe.c               | 6 ++++--
- include/linux/fs.h      | 1 +
- include/uapi/linux/fs.h | 5 ++++-
- net/socket.c            | 3 +++
- 4 files changed, 12 insertions(+), 3 deletions(-)
+Good question. Personally, I’d interpret Linux’ no-regression-policy 
+that, if a possible regression is known, even for a synthetic benchmark, 
+it must not be introduced unrelated how upsetting this is. So the 
+current approach needs to be taken.
 
-diff --git a/fs/pipe.c b/fs/pipe.c
-index 731622d0738d..42fead1efe52 100644
---- a/fs/pipe.c
-+++ b/fs/pipe.c
-@@ -458,7 +458,8 @@ anon_pipe_write(struct kiocb *iocb, struct iov_iter *from)
- 	mutex_lock(&pipe->mutex);
- 
- 	if (!pipe->readers) {
--		send_sig(SIGPIPE, current, 0);
-+		if ((iocb->ki_flags & IOCB_NOSIGNAL) == 0)
-+			send_sig(SIGPIPE, current, 0);
- 		ret = -EPIPE;
- 		goto out;
- 	}
-@@ -498,7 +499,8 @@ anon_pipe_write(struct kiocb *iocb, struct iov_iter *from)
- 
- 	for (;;) {
- 		if (!pipe->readers) {
--			send_sig(SIGPIPE, current, 0);
-+			if ((iocb->ki_flags & IOCB_NOSIGNAL) == 0)
-+				send_sig(SIGPIPE, current, 0);
- 			if (!ret)
- 				ret = -EPIPE;
- 			break;
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index d7ab4f96d705..e440c5ae5d99 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -356,6 +356,7 @@ struct readahead_control;
- #define IOCB_APPEND		(__force int) RWF_APPEND
- #define IOCB_ATOMIC		(__force int) RWF_ATOMIC
- #define IOCB_DONTCACHE		(__force int) RWF_DONTCACHE
-+#define IOCB_NOSIGNAL		(__force int) RWF_NOSIGNAL
- 
- /* non-RWF related bits - start at 16 */
- #define IOCB_EVENTFD		(1 << 16)
-diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-index 0bd678a4a10e..beb4c2d1e41c 100644
---- a/include/uapi/linux/fs.h
-+++ b/include/uapi/linux/fs.h
-@@ -430,10 +430,13 @@ typedef int __bitwise __kernel_rwf_t;
- /* buffered IO that drops the cache after reading or writing data */
- #define RWF_DONTCACHE	((__force __kernel_rwf_t)0x00000080)
- 
-+/* prevent pipe and socket writes from raising SIGPIPE */
-+#define RWF_NOSIGNAL	((__force __kernel_rwf_t)0x00000100)
-+
- /* mask of flags supported by the kernel */
- #define RWF_SUPPORTED	(RWF_HIPRI | RWF_DSYNC | RWF_SYNC | RWF_NOWAIT |\
- 			 RWF_APPEND | RWF_NOAPPEND | RWF_ATOMIC |\
--			 RWF_DONTCACHE)
-+			 RWF_DONTCACHE | RWF_NOSIGNAL)
- 
- #define PROCFS_IOCTL_MAGIC 'f'
- 
-diff --git a/net/socket.c b/net/socket.c
-index 682969deaed3..bac335ecee4c 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -1176,6 +1176,9 @@ static ssize_t sock_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	if (sock->type == SOCK_SEQPACKET)
- 		msg.msg_flags |= MSG_EOR;
- 
-+	if (iocb->ki_flags & IOCB_NOSIGNAL)
-+		msg.msg_flags |= MSG_NOSIGNAL;
-+
- 	res = __sock_sendmsg(sock, &msg);
- 	*from = msg.msg_iter;
- 	return res;
 
-base-commit: fab1beda7597fac1cecc01707d55eadb6bbe773c
--- 
-2.43.0
+Kind regards,
 
+Paul
 
