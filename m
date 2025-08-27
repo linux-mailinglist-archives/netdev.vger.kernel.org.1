@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-217107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C027B37626
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 02:40:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A602CB37628
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 02:40:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC8C2360CDC
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 00:40:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1668E1B23528
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 00:40:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F07961C5D77;
-	Wed, 27 Aug 2025 00:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B6701DE8AF;
+	Wed, 27 Aug 2025 00:40:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TdOZGNqI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U05FXyj1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF8F30CD93
-	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 00:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 128971DC997;
+	Wed, 27 Aug 2025 00:40:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756255208; cv=none; b=uYYtDU5DlPsUOnil1k6YugLOmF/8eFgnqpfF8kGMLpzJJCt18S70hvFB6hJmJr5Qd9XO5M945ZRE7foQ+vA/05oXTKmKMMyLc9BJhVXKQ75tGmIClLP2iggyKPjeW5qxiGYU2KX8p3E3m/8+QD20odsLM1nQDsDuP/mqLjbOvhI=
+	t=1756255210; cv=none; b=BGRwdG3mJiaVT9B4mOBoiUhvTELL00mzHfQRcmbld7lWsDqvXWnqhWuoRMsUDeuEIrTKExPbhQbaca5LL+dKbJDMev3Ek7LqhCOVkpVOGGCnym5l9l9JEK0L7KOJWNKoibzKtwB/MpznNWWY7DcfafSqCC2cJOPmnftIj+INv2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756255208; c=relaxed/simple;
-	bh=rOWd0dad/JaZgS9UaS6gp7tqvB0WK7HHN/V7LN1DzOA=;
+	s=arc-20240116; t=1756255210; c=relaxed/simple;
+	bh=dGZ2wYBerLgYG3xUDdHol7gEDoSc9y7MhwIAQo1Wsso=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MiMImmAyV67WfvTkwBAzfeFGoKRevVoY3cVTJNEpt9KhBnh95X30qa2fFKDWJ4g2vtP++GdghrsEbEoZeVQ0g3FlqAyYUF6G7aTm97WDqbYa5CxlCzPJVC2jWCrgkDAQRNgmTmlg5lO+rLdnmzkEWn2GS+Sox4hhnz9u0VEcVOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TdOZGNqI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A07D5C4CEF1;
-	Wed, 27 Aug 2025 00:40:08 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Oz9erZ8wHpIxjkO4yLXUWAhst8ppwlu0m0hWAFbHxrLVoa/u2iP5ia7wdYgZ3vXFMd3TmMGCJoJt4Qm9gBK/N6vnW87dAtj1F9jB90L8JpVM4l+4m9CXRvyu9JTCWPZJy8fLIiASvHp3+8uui//sdQO3U/hAlF7LpQOPe57b2yQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U05FXyj1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D702BC4CEF4;
+	Wed, 27 Aug 2025 00:40:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756255208;
-	bh=rOWd0dad/JaZgS9UaS6gp7tqvB0WK7HHN/V7LN1DzOA=;
+	s=k20201202; t=1756255209;
+	bh=dGZ2wYBerLgYG3xUDdHol7gEDoSc9y7MhwIAQo1Wsso=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TdOZGNqIQLOXj0+uDLvXJg4L3Zx0KgmU2Y+eUPmTHGAsGUQFEQHrAnsvvPSTZ/r7Y
-	 P1JUdW3ZKlpOQrCPvQ+8YZQUA1hQ3xdFYtKWiM4GAiUMgl1Y7K4WBvvbtSlVHV/XoA
-	 3yT5fpu32oDQiYQ12CpGo+N8DV64CXsnI32k8bPRLqbrmBN2RlopYnJ8nL99uyL0is
-	 I0kYHLj+W2SzTB4jIrqkUgi++11E+p6Ic8bgLpUPy0r2V3/i8jlgrEQzzFsCe7Wsse
-	 HV5Mc8GhvIXE1bfNnLodM4ESfDHC7dM3xn+5dNULlba7P1axowmVYygSWu1KHLB6gL
-	 yHQAoZ8s0Y/7A==
+	b=U05FXyj1G44ix+RrHQyyIvoknDIAbVNruoay9H4OoEpNMZhrR7v8TWKsMS/Jx2gn/
+	 zP20CKe2jJjJsDzbghxi9II6SvtejsKVUpdvMO53M1Ejtf0oD9pcU4ao82wr1S8FmV
+	 5IfCCKuwS8jJfdooEAaJtbXzM6IlanvuNNn5j84VwnGTE11lGDgXPLPEMBVoEW7Sm4
+	 IHF0Q9AnF3TxIb26uKFaWWOqJWX6o7ZADz4fjYwsYFa42MT+oiezq/nqzqzvt1lFyZ
+	 kj11a/FDDV/aUgMTWywqZGGHQtayq2kj7HexGFvKUMOXtWaAbbiT09sK6Gob8KTrs3
+	 3botVLJ9sm6Pg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DEF383BF70;
-	Wed, 27 Aug 2025 00:40:17 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD04383BF70;
+	Wed, 27 Aug 2025 00:40:18 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: phy: fixed_phy: let fixed_phy_unregister
- free
- the phy_device
+Subject: Re: [PATCH net-next] net: phy: fixed: let fixed_phy_add always use
+ addr 0
+ and remove return value
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175625521599.151180.8772997408710007776.git-patchwork-notify@kernel.org>
-Date: Wed, 27 Aug 2025 00:40:15 +0000
-References: <ad8dda9a-10ed-4060-916b-3f13bdbb899d@gmail.com>
-In-Reply-To: <ad8dda9a-10ed-4060-916b-3f13bdbb899d@gmail.com>
+ <175625521749.151180.6244131462600024014.git-patchwork-notify@kernel.org>
+Date: Wed, 27 Aug 2025 00:40:17 +0000
+References: <762700e5-a0b1-41af-aa03-929822a39475@gmail.com>
+In-Reply-To: <762700e5-a0b1-41af-aa03-929822a39475@gmail.com>
 To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: olteanv@gmail.com, andrew@lunn.ch, andrew+netdev@lunn.ch,
- linux@armlinux.org.uk, kuba@kernel.org, pabeni@redhat.com,
- davem@davemloft.net, edumazet@google.com, netdev@vger.kernel.org
+Cc: gerg@linux-m68k.org, geert@linux-m68k.org, hauke@hauke-m.de,
+ zajec5@gmail.com, tsbogend@alpha.franken.de, andrew@lunn.ch,
+ andrew+netdev@lunn.ch, linux@armlinux.org.uk, pabeni@redhat.com,
+ edumazet@google.com, kuba@kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
+ linux-mips@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat, 23 Aug 2025 23:25:05 +0200 you wrote:
-> fixed_phy_register() creates and registers the phy_device. To be
-> symmetric, we should not only unregister, but also free the phy_device
-> in fixed_phy_unregister(). This allows to simplify code in users.
+On Fri, 22 Aug 2025 22:36:11 +0200 you wrote:
+> We have only two users of fixed_phy_add(), both use address 0 and
+> ignore the return value. So simplify fixed_phy_add() accordingly.
 > 
-> Note wrt of_phy_deregister_fixed_link():
-> put_device(&phydev->mdio.dev) and phy_device_free(phydev) are identical.
+> Whilst at it, constify the fixed_phy_status configs.
+> 
+> Note:
+> fixed_phy_add() is a legacy function which shouldn't be used in new
+> code, as it's use may be problematic:
+> - No check whether a fixed phy exists already at the given address
+> - If fixed_phy_register() is called afterwards by any other driver,
+>   then it will also use phy_addr 0, because fixed_phy_add() ignores
+>   the ida which manages address assignment
+> Drivers using a fixed phy created by fixed_phy_add() in platform code,
+> should dynamically create a fixed phy with fixed_phy_register()
+> instead.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: phy: fixed_phy: let fixed_phy_unregister free the phy_device
-    https://git.kernel.org/netdev/net-next/c/a0f849c1cc6d
+  - [net-next] net: phy: fixed: let fixed_phy_add always use addr 0 and remove return value
+    https://git.kernel.org/netdev/net-next/c/39e94fdce45f
 
 You are awesome, thank you!
 -- 
