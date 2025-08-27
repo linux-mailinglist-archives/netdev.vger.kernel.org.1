@@ -1,166 +1,180 @@
-Return-Path: <netdev+bounces-217393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FBC1B38858
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 19:12:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88BB3B38870
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 19:19:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62BDB16EBA1
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 17:12:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 046C43BD161
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 17:19:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A250130C37C;
-	Wed, 27 Aug 2025 17:12:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blaese.de header.i=@blaese.de header.b="NpZ8pKvV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA9FA2D0C72;
+	Wed, 27 Aug 2025 17:19:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.sgstbr.de (mail.sgstbr.de [94.130.16.203])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93FE52F0671;
-	Wed, 27 Aug 2025 17:12:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.130.16.203
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE69747F
+	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 17:19:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756314756; cv=none; b=vFk5rGb3vxcKyJP7rIdk3kAebcQNc86YuYv16Y66N4/3jVXMxbY+hLgI8fQ5oJKICwZYfb/J8scok5ZTxexksiMyDB9gbF0Zm/eHa58x62adUa3/vX/gnT1UjwhqFLIls865Ydwi3JodIafb5WeEgfK0W06xzxMrITj1eMFunZ8=
+	t=1756315179; cv=none; b=bRP13Dpo9SOJNOMMQEnNlKHc/aOG6Bu+pJsKBRNDlvEqpAGcWyATRgcaweQfc6k+xAEBu+AwI4j8OvdlC9AUPysgqNbRCFyw9wZjX82ybOuBRUUIVabHNPyBxnJPms+/OArSOpGTW70yw6O7EdDkoQPA9Ycf/ZdjckipnUQsCqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756314756; c=relaxed/simple;
-	bh=txdx1s8qFjy7bZfp6A8JGTnYvXtIPXGL5WG4K4rhisU=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=NDYpxQcrK5ypyijzpuIiaT/S9TceRuAOKlMEWBu6GVZjuS7DK8JRcOQNFsPCzMZf2A+ObioupdbpPenh4Pl82+ZiE9LZb3tj5tmsoykgPudMf/6FJlNDsP//zxJ2xwWipVewykLwRqEbF7YCFQVR+pZ+fieXA/bnwWW/Fxhj01o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=blaese.de; spf=pass smtp.mailfrom=blaese.de; dkim=pass (2048-bit key) header.d=blaese.de header.i=@blaese.de header.b=NpZ8pKvV; arc=none smtp.client-ip=94.130.16.203
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=blaese.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blaese.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=blaese.de; s=201803;
-	t=1756314743; bh=w3BdMIdi4mu9DyHfL8aSx5oylHchPpBewyakd30mWLQ=;
-	h=Date:From:Subject:To:References:In-Reply-To:From;
-	b=NpZ8pKvVCFxkJMlRixFVcLXUzjnRGo8w0dVLdGIJBMjrgSQIOzY3FQB//q91IToh/
-	 SyYc4jvc7vkC2e+foi0G/zzwAOIfnGynoKsZNFvlqSU5OlBDanmbPnWsBYAKg/eMC0
-	 AzPrebvWm8ePzreYUA2Kc8kfACRryB8j6XjZenPLE5sZeszEPb0ShXAnxxa3SwIq7N
-	 cPSF1bS9EDioqr9caUID6FV3Sn3Fa0dZarrrMg+QI11mb2MIM7NXdnlUEu1sBiRalp
-	 6qWhFGsa9/paWfjMzM/pxlj78uRGVC3lhRIXufwpbh7mshK1nimN+qiZRiSUa9MOdw
-	 YraZHV3/Pe6Fg==
-Received: from [IPV6:2a0b:f4c0:c8:6d:77a2:ec00:2663:dfdb] (2a0b.f4c0.00c8.006d.77a2.ec00.2663.dfdb.rdns.f3netze.de [IPv6:2a0b:f4c0:c8:6d:77a2:ec00:2663:dfdb])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fabian@blaese.de)
-	by mail.sgstbr.de (Postfix) with ESMTPSA id 5E16F24B485;
-	Wed, 27 Aug 2025 19:12:22 +0200 (CEST)
-Message-ID: <e1bf6193-d075-4593-81ef-99e8b93a4f74@blaese.de>
-Date: Wed, 27 Aug 2025 19:12:19 +0200
+	s=arc-20240116; t=1756315179; c=relaxed/simple;
+	bh=xc5Gs1BKnZMD2Jn2qmEE5N1BLIigyY6nGB+0F7DakPs=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=csyfpSUkr7eRQNbfFRxml26kHJ/WIuE/NZhqU9CPH26MbI8KrOn4sh/qyF4hGFLeBagLk9KoRQFgZM5l+2xCYJ2WkuQ1NHdqv1L/COq2FNkV9ukGVDj36k/wAbjgT78eb4qqH8Qz51BFEB2lQ8E13NJS8swxp/oKq6Gmq7hH4uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-886e18b5e13so9124639f.2
+        for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 10:19:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756315177; x=1756919977;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sjiXdLCfctwMNg9bkhL6n+ycMUPOZUiVReHJWB1zxBw=;
+        b=CUjvLggvMdx4vbmQ2mlBqIo5ugCT4h+QWNUNIdCzawj0tHqP0QGs71Awi6ZCt4mrPR
+         8HUKoKE+5rfxhBIN4K/9NAhBEJpZWPVIV083c+7mjKc5xlLDLPGLusHb57tPaNo2ELE4
+         dAy/1tUrgv3Vz8g+6NbIbqx6qm7qCD9UOqjxK8rBBi/1KTgH7/5lsVqfn9N26+X7RH8b
+         kgcsrtCHF5aH9CKzlrP3unMWwTVwiRmEjehssODggncxU1zTdK46c31T2RrgqbprduQZ
+         GlSStW7InlIOS8734GpX+UmONHt0+nRpbCFbHoutlDS6BOW5XUzNcshJD658gjq1dUG+
+         Wjqg==
+X-Forwarded-Encrypted: i=1; AJvYcCW8t4ReMtn+8mymcIbn75SaYggLxL77vftw2ZK68c2MyZSLpEfc/Ix2d53q7SSf59oHTACa+O0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKdn5cabbGh2xGOZ0gbxiWzNI1QM9IpqcgSS7OhAkkMCJKpMkc
+	jnd29RDZZ4WNTMN2f9r8B0CY3XJbQTE5Ekr3I1V40zNA17PzhrqEUQa0Vj5FzolETQgzXaWdsJ1
+	F8kLJcIkQwc4nYnpuCo5YPaHUGfMpdr13joctPbLVzmt7UqQeFf5vORXFUlU=
+X-Google-Smtp-Source: AGHT+IEco9XwsvuSdkgVLocpTlpW4+Fen1aDiOmyXkgy8ZvjTrTqKXoicYuvhN5wflACRlNUiPVnS/1w1eA1w1FxJ8vkCZSGXByj
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: =?UTF-8?Q?Fabian_Bl=C3=A4se?= <fabian@blaese.de>
-Subject: Re: [PATCH v2] icmp: fix icmp_ndo_send address translation for reply
- direction
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
- "Jason A. Donenfeld" <Jason@zx2c4.com>
-References: <20250825201717.3217045-1-fabian@blaese.de>
- <20250825203826.3231093-1-fabian@blaese.de> <aK7KYr5D7bD3OcHb@strlen.de>
-Content-Language: de-DE, en-US
-Autocrypt: addr=fabian@blaese.de; keydata=
- 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
-In-Reply-To: <aK7KYr5D7bD3OcHb@strlen.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:1988:b0:3e5:51bb:9cd9 with SMTP id
+ e9e14a558f8ab-3e91fc29a4emr287844375ab.8.1756315177086; Wed, 27 Aug 2025
+ 10:19:37 -0700 (PDT)
+Date: Wed, 27 Aug 2025 10:19:37 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68af3e29.a70a0220.3cafd4.002e.GAE@google.com>
+Subject: [syzbot] [hams?] general protection fault in rose_rt_ioctl
+From: syzbot <syzbot+2eb8d1719f7cfcfa6840@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 27.08.25 11:05, Florian Westphal wrote:
-> If the connection isn't subject to snat, why to we need to mangle the
-> source address in the first place?
-It is not limited to SNAT/MASQUERADE.
-DNAT also affects which source address should be used, depending on the packet
-direction.
+Hello,
 
-With DNAT, the *destination* of the original direction is changed.
-In the reply direction, this becomes the *source* address.
+syzbot found the following issue on:
 
-So reply packets of a DNAT connection are effectively subject to source address
-translation. If icmp_ndo_send doesn’t account for this, rate limiting breaks,
-which is exactly the problem this function was meant to solve.
+HEAD commit:    ceb951552404 Merge branch 'introduce-refcount_t-for-refere..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=1038cfbc580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=292f3bc9f654adeb
+dashboard link: https://syzkaller.appspot.com/bug?extid=2eb8d1719f7cfcfa6840
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
 
-> Don't understand this either.  Why these checks?
-> AFAICS you can keep the original check in place, and then:
-> 
-> replace this
->>  	orig_ip = ip_hdr(skb_in)->saddr;
->> -	ip_hdr(skb_in)->saddr = ct->tuplehash[0].tuple.src.u3.ip;
-> 
-> ... with ...
-You are right: the code can be simplified. I'm not sure show this slipped through.
-I will send an updated patch with this change — thanks for the suggestion.
-However, the old check (IPS_SRC_NAT only) cannot be kept, because:
-- Reply packets of a DNAT connection also need handling.
-- Reply packets of a pure SNAT connection don’t need it, but replacing the
-   address is a no-op in that case (tuple == skb address).
+Unfortunately, I don't have any reproducer for this issue yet.
 
-To avoid unnecessary translations, I suggested the direction-specific checks.
-Another option is to simplify them to:
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/7a0a7a3f8dbc/disk-ceb95155.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/ec99703c0bdd/vmlinux-ceb95155.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/248da817e5e1/bzImage-ceb95155.xz
 
-     if (!(ct->status & IPS_NAT_MASK)) { … }
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+2eb8d1719f7cfcfa6840@syzkaller.appspotmail.com
 
-This ensures we only ever touch connections with NAT, while keeping the code
-straightforward.
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000002: 0000 [#1] SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
+CPU: 1 UID: 0 PID: 21085 Comm: syz.4.4642 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+RIP: 0010:rose_clear_routes net/rose/rose_route.c:565 [inline]
+RIP: 0010:rose_rt_ioctl+0x162/0x1250 net/rose/rose_route.c:760
+Code: 3f 31 ff 44 89 fe e8 3d de 52 f7 45 85 ff 74 0a e8 33 db 52 f7 e9 76 02 00 00 48 8b 44 24 28 48 8d 50 10 49 89 d7 49 c1 ef 03 <43> 0f b6 04 2f 84 c0 48 89 54 24 20 0f 85 87 02 00 00 44 0f b6 22
+RSP: 0018:ffffc9000bb77ae0 EFLAGS: 00010202
+RAX: 0000000000000000 RBX: ffff8880529fd800 RCX: 0000000000000000
+RDX: 0000000000000010 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: ffffc9000bb77c10 R08: 0000000000000003 R09: 0000000000000004
+R10: dffffc0000000000 R11: fffff5200176ef4c R12: dffffc0000000000
+R13: dffffc0000000000 R14: ffff88804bc15300 R15: 0000000000000002
+FS:  00007f4e974376c0(0000) GS:ffff888125d1b000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b32163fff CR3: 000000006a0fe000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ rose_ioctl+0x3ce/0x8b0 net/rose/af_rose.c:1381
+ sock_do_ioctl+0xd9/0x300 net/socket.c:1238
+ sock_ioctl+0x576/0x790 net/socket.c:1359
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:598 [inline]
+ __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:584
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f4e9658ebe9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f4e97437038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f4e967b5fa0 RCX: 00007f4e9658ebe9
+RDX: 0000000000000000 RSI: 00000000000089e4 RDI: 0000000000000004
+RBP: 00007f4e96611e19 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f4e967b6038 R14: 00007f4e967b5fa0 R15: 00007ffe31b011d8
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:rose_clear_routes net/rose/rose_route.c:565 [inline]
+RIP: 0010:rose_rt_ioctl+0x162/0x1250 net/rose/rose_route.c:760
+Code: 3f 31 ff 44 89 fe e8 3d de 52 f7 45 85 ff 74 0a e8 33 db 52 f7 e9 76 02 00 00 48 8b 44 24 28 48 8d 50 10 49 89 d7 49 c1 ef 03 <43> 0f b6 04 2f 84 c0 48 89 54 24 20 0f 85 87 02 00 00 44 0f b6 22
+RSP: 0018:ffffc9000bb77ae0 EFLAGS: 00010202
+RAX: 0000000000000000 RBX: ffff8880529fd800 RCX: 0000000000000000
+RDX: 0000000000000010 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: ffffc9000bb77c10 R08: 0000000000000003 R09: 0000000000000004
+R10: dffffc0000000000 R11: fffff5200176ef4c R12: dffffc0000000000
+R13: dffffc0000000000 R14: ffff88804bc15300 R15: 0000000000000002
+FS:  00007f4e974376c0(0000) GS:ffff888125d1b000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b32163fff CR3: 000000006a0fe000 CR4: 00000000003526f0
+----------------
+Code disassembly (best guess), 1 bytes skipped:
+   0:	31 ff                	xor    %edi,%edi
+   2:	44 89 fe             	mov    %r15d,%esi
+   5:	e8 3d de 52 f7       	call   0xf752de47
+   a:	45 85 ff             	test   %r15d,%r15d
+   d:	74 0a                	je     0x19
+   f:	e8 33 db 52 f7       	call   0xf752db47
+  14:	e9 76 02 00 00       	jmp    0x28f
+  19:	48 8b 44 24 28       	mov    0x28(%rsp),%rax
+  1e:	48 8d 50 10          	lea    0x10(%rax),%rdx
+  22:	49 89 d7             	mov    %rdx,%r15
+  25:	49 c1 ef 03          	shr    $0x3,%r15
+* 29:	43 0f b6 04 2f       	movzbl (%r15,%r13,1),%eax <-- trapping instruction
+  2e:	84 c0                	test   %al,%al
+  30:	48 89 54 24 20       	mov    %rdx,0x20(%rsp)
+  35:	0f 85 87 02 00 00    	jne    0x2c2
+  3b:	44 0f b6 22          	movzbl (%rdx),%r12d
 
-> Without dnat, the reply tuple saddr == original tuple daddr.
-> 
-> With dnat, its the dnat targets' address (i.e., the real destination
-> the client is talking to).
-Yes, exactly.
 
-> If you are worried about "dnat to", then please update the commit
-> message, which only mentions masquerade/snat.
-Correct — the change not only fixes SNAT-in-reply handling, but also adds
-proper handling for DNAT in the reply direction, which was missing entirely.
-I will update the commit message to reflect this.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Best regards,
-Fabian
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
