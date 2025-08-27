@@ -1,1861 +1,326 @@
-Return-Path: <netdev+bounces-217225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B3F1B37DE6
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 10:32:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55801B37E02
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 10:41:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBCAC1B60969
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 08:33:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA8FD460C54
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 08:41:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53260338F50;
-	Wed, 27 Aug 2025 08:32:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8FB033A03B;
+	Wed, 27 Aug 2025 08:41:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="FBHyVWhq";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="pzkMvWPB"
+	dkim=pass (2048-bit key) header.d=westermo.com header.i=@westermo.com header.b="kVBEzM/L";
+	dkim=pass (1024-bit key) header.d=beijerelectronicsab.onmicrosoft.com header.i=@beijerelectronicsab.onmicrosoft.com header.b="Am10sdY2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+Received: from mx07-0057a101.pphosted.com (mx07-0057a101.pphosted.com [205.220.184.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02650308F37;
-	Wed, 27 Aug 2025 08:32:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756283573; cv=none; b=ls9g83099kHjux/IBHP2IESwu7mvQ4X7v2F/XkWuC3DvyMnwFO0XKRrvPDFDZ9k8IejnHXLAUtmlt0SiBkFp5otDRM76MCyWBeqeee4QVx1HTLw1XXw5lyNfg0Fp+7nktbdKqNVw74QWtLTgBJVxn01jJt0EQ6atbed1W0ewSOI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756283573; c=relaxed/simple;
-	bh=MvkYX0fcmxa0uqR++gUI7FW5HpOrcx+4mhdV1n9+gb4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FnwWlyKGZjJDVanwS7j+gwsR4YdXIMNAu5EjNX7iYJLd5IapsTrEgUi4AKBQg/qB8fkmba85Ctha6lQel6Cy6WwmBy7xUrIVQYRmilHlE0tPy4wTjjNPJ2QX96MRyC8V6t/vqaToperafpMWdoZIQ0qoxgwSCFMZN2TTxKHXmA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=FBHyVWhq; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=pzkMvWPB reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C668A2F1FE7;
+	Wed, 27 Aug 2025 08:41:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.184.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756284099; cv=fail; b=lavhQegH+WEISh3mYUyMaUUit3HhB1NmBUhGGyEVms4SieLgPEKbrBQl1dpEy0NFjQXlTfng0kx3jTHBExn75O7GCg41/M5yugwzI+0FeSuHPVf9Dy4ISitlRrrGm96BhYRIbG46gjCQCYSqEZNtMttKVGYNX1cgu2x99PGS1Ug=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756284099; c=relaxed/simple;
+	bh=WjJiaBrCHCrKcSSPQ0rmF8gDBHoCGUGONsZaxQJKQgE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Dz0XIcqls8cx7urEI5FJxx1vvkNH3JorK/4UPagz9mPtR9oK9F5E+WQLgNNoEAIUddc9tm7BaW7RQDAAUsgcBHP6Ytyt/Y/g5xd8/wYvW2CP6ftCYd/7wT0lRC79fQM4ZGhVT6utdFKLRu41CnXiWHHEvYEWtm+XRB2LKtE18zI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=westermo.com; spf=pass smtp.mailfrom=westermo.com; dkim=pass (2048-bit key) header.d=westermo.com header.i=@westermo.com header.b=kVBEzM/L; dkim=pass (1024-bit key) header.d=beijerelectronicsab.onmicrosoft.com header.i=@beijerelectronicsab.onmicrosoft.com header.b=Am10sdY2; arc=fail smtp.client-ip=205.220.184.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=westermo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=westermo.com
+Received: from pps.filterd (m0214197.ppops.net [127.0.0.1])
+	by mx07-0057a101.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 57R6C5lJ2120151;
+	Wed, 27 Aug 2025 10:41:18 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=westermo.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=270620241; bh=
+	S1/edIvkc4ltIRGFvgFfWz9noKC0zVh4h4mCJWY+Xas=; b=kVBEzM/LcUnq+mfl
+	QQ9Ge4sAUs1JPm8i4GBcWay9snEZvvgk0REAKpy1k8q4UQw8m89TvEHfFkKTmbid
+	5owbstw4D7g1am70nu7NLpbAgw95DFbdDGLBBNUqcVulcMT5OOHCGor/THPBfJZ7
+	FuJqxby3+wYbN8aNHPo2LgPIMZedh455e21T6b3b3B34jIppP36PdbCVwiU95P1u
+	pUt4MAvuPFASvQOtQQY4pctmXIAciNWKiM/XlGH7IL2n+/aoVfAeaamrMyXkj3Dc
+	L5Zqzqi1DxKx6URfPNhzTwudOK5LhDMcmFpq3ykpxsfYSxcUQWRg9s9F8ll/NO51
+	Oi82Fw==
+Received: from eur05-db8-obe.outbound.protection.outlook.com (mail-db8eur05on2116.outbound.protection.outlook.com [40.107.20.116])
+	by mx07-0057a101.pphosted.com (PPS) with ESMTPS id 48q32ebxrb-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 27 Aug 2025 10:41:18 +0200 (MEST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hMBwbkaGHG80RF2V9Bc3lftTJ7pGHHJ9W/DbPczFYZ71YcRP4iOQv7s7Pfg7soElgbHcHokk+yR+jNQ1Sp50fmMgU2vh2MmkqiqMn/crsJK+8iFvJRKiVFv9wIz9l/yjkFR1u3zkO1jBAPMWFHLd97K+xGQKx2gKUJEJpLtE/vgXvcgv/f1JnQFVaHubYWi0U/aUtbS4GtAbo2sue98lunuSPxaSNA5OC9SWbNe9pIorWiEpOxExn7t8euamKzsdri/li26OjMWfeO3qE4acdnjFVbUKPGeSzWTkp9ndH3dy4iQDgwgjuCRLLys6/x/97emEf8+mgV2s62BB/Vxs1g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=S1/edIvkc4ltIRGFvgFfWz9noKC0zVh4h4mCJWY+Xas=;
+ b=Cg4sfEjsUfdfgBOhSZKv7dddFA5f61pA1cB9lP+gXLetW0Rs5PVnRFeAvDr4TDVjJoRw6Zn0xKN91kRRyHdoVoVy7wY4+CIDH6WAsP4z/36ZCm8g/H/fjuM1SH+a+IkPOJsC92InQORHME3jnnkmhqhGJPc0ZuNH6YQ3RfYRozDBgKUBqF3SfKDUU0hn8CjXqPeTHtpnZqQCRQKRQGzMJsjHNMZmizsvP42LnsmAIddHUlczR+pTjg9o7KcWWSDv/GRr27bkO1FAFlCCokkUqHBL6y02Tqr2IEfK2dn+qLn36GoJxl1hnWMjPbgoyKLWYhhA5bSRuBQmy1lCSs+aPg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=westermo.com; dmarc=pass action=none header.from=westermo.com;
+ dkim=pass header.d=westermo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1756283568; x=1787819568;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ayIDx4N/D2mhtT/NhR+/h5uppbTLXv9G9g/MuIWqPeo=;
-  b=FBHyVWhqBB9ZhwqHmETS3yrFsgb7Kqr3BHTxUtDGBffc8deeUBbpBj50
-   WSuZbKCqCA0jRDhGdLZqCnFa/F8lsMdt/jjBpCa1N0Q2Ge/UNsu1Rfg3c
-   Tz6ko6mlog+38xEAS/I46VEVDuHxjg8hNBoNwtPQNJiDX/akT87mC0ufa
-   8iHzKQCrnKEBhrvuVoqAiJzothhcSFEyqS27EEoEiDffDYHybb9SoFqGP
-   oPsOcYUUylLnQfJqmnjTRASVMmfN6/FxsG062F7mFLKpqPfNJQUUGUh4w
-   lAXX1F2sEV8Ea8VvFtgsQ/NWRaCPqRJ3e1SZRPlPftJS0htLA9kVNt72f
-   Q==;
-X-CSE-ConnectionGUID: 5oWBWxrZRcaDIIgBMPrIOA==
-X-CSE-MsgGUID: qoibrt+fQTaDc55BUV7UfQ==
-X-IronPort-AV: E=Sophos;i="6.18,214,1751234400"; 
-   d="scan'208";a="45929668"
-Received: from vmailcow01.tq-net.de ([10.150.86.48])
-  by mx1.tq-group.com with ESMTP; 27 Aug 2025 10:32:42 +0200
-X-CheckPoint: {68AEC2AA-57-20CAA7DA-EC9DC758}
-X-MAIL-CPID: FE6E029ACFA4C8000FC429B018F5E59D_0
-X-Control-Analysis: str=0001.0A00210C.68AEC268.008A,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 4709A1610A4;
-	Wed, 27 Aug 2025 10:32:34 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
-	s=dkim; t=1756283558;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=ayIDx4N/D2mhtT/NhR+/h5uppbTLXv9G9g/MuIWqPeo=;
-	b=pzkMvWPByjkZBCW9QBZdodSTQ4JYDdwpMjlOVNenUHBTdvzVLMV4/f1D+PeS/RXsrfaupW
-	ezd/HPGYg3F/ChixXGJI25/37xn3J/o9hYlNL2qAoqoPL2hd/vJgOUvX4meDbWpUhmuv3E
-	WPAsSS7TgAIq8Q3Oigsu0+foFYJmtnHLNezL8Pn88XXlfSgJ/xTnBvFsTJJihbGh2JpUmG
-	Osr6GTRQMeXSMC+VffVluw5pnjWnocYNItzq3aNxQnwL/dn1E0zzyvWIsQzcxWv3wTSTht
-	dYQH5jXPQD7/g24UlJtLi2YeoHo97LK+tU/aqry252si7/a+2GS3DkhtLhCmPg==
-From: Alexander Stein <alexander.stein@ew.tq-group.com>
-To: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- shawnguo@kernel.org, s.hauer@pengutronix.de, kernel@pengutronix.de,
- festevam@gmail.com, richardcochran@gmail.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
- frieder.schrempf@kontron.de, primoz.fiser@norik.com, othacehe@gnu.org,
- Markus.Niebel@ew.tq-group.com, Joy Zou <joy.zou@nxp.com>
-Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux@ew.tq-group.com, netdev@vger.kernel.org, linux-pm@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com, Frank.Li@nxp.com
-Subject:
- Re: [PATCH v9 2/6] arm64: dts: freescale: rename imx93.dtsi to
- imx91_93_common.dtsi and modify them
-Date: Wed, 27 Aug 2025 10:32:33 +0200
-Message-ID: <2326064.iZASKD2KPV@steina-w>
-Organization: TQ-Systems GmbH
-In-Reply-To: <20250825091223.1378137-3-joy.zou@nxp.com>
-References:
- <20250825091223.1378137-1-joy.zou@nxp.com>
- <20250825091223.1378137-3-joy.zou@nxp.com>
+ d=beijerelectronicsab.onmicrosoft.com;
+ s=selector1-beijerelectronicsab-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=S1/edIvkc4ltIRGFvgFfWz9noKC0zVh4h4mCJWY+Xas=;
+ b=Am10sdY2kRU4Z4UL1Kt3mA2eK2NDNoqoplYdD8/oIra5kimHYDSfw9EVkMxkzBEzwcEXLUQ4OIGYbJzAk4rrB94RfsiyJutblmSveappBrqjDHTRHqWOy1JGtpIeTh3wurpSPz9P1ubuEDBSfRcwzTYwAWqYJthSd0uEuY6MOto=
+Received: from FRWP192MB2997.EURP192.PROD.OUTLOOK.COM (2603:10a6:d10:17c::10)
+ by VE1P192MB0829.EURP192.PROD.OUTLOOK.COM (2603:10a6:800:161::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.20; Wed, 27 Aug
+ 2025 08:41:15 +0000
+Received: from FRWP192MB2997.EURP192.PROD.OUTLOOK.COM
+ ([fe80::8e66:c97e:57a6:c2b0]) by FRWP192MB2997.EURP192.PROD.OUTLOOK.COM
+ ([fe80::8e66:c97e:57a6:c2b0%5]) with mapi id 15.20.9073.010; Wed, 27 Aug 2025
+ 08:41:15 +0000
+Date: Wed, 27 Aug 2025 10:41:11 +0200
+From: Alexander Wilhelm <alexander.wilhelm@westermo.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: Aquantia PHY in OCSGMII mode?
+Message-ID: <aK7Ep7Khdw58hyA0@FUE-ALEWI-WINX>
+References: <20250804134115.cf4vzzopf5yvglxk@skbuf>
+ <aJDH56uXX9UVMZOf@FUE-ALEWI-WINX>
+ <20250804160037.bqfb2cmwfay42zka@skbuf>
+ <20250804160234.dp3mgvtigo3txxvc@skbuf>
+ <aJG5/d8OgVPsXmvx@FUE-ALEWI-WINX>
+ <20250805102056.qg3rbgr7gxjsl3jd@skbuf>
+ <aJH8n0zheqB8tWzb@FUE-ALEWI-WINX>
+ <20250806145856.kyxognjnm4fnh4m6@skbuf>
+ <aK6eSEOGhKAcPzBq@FUE-ALEWI-WINX>
+ <20250827073120.6i4wbuimecdplpha@skbuf>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250827073120.6i4wbuimecdplpha@skbuf>
+User-Agent: Mutt/2.1.4 (2021-12-11)
+X-ClientProxiedBy: GV3PEPF00007A8E.SWEP280.PROD.OUTLOOK.COM
+ (2603:10a6:158:401::60b) To FRWP192MB2997.EURP192.PROD.OUTLOOK.COM
+ (2603:10a6:d10:17c::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
-X-Last-TLS-Session-Version: TLSv1.3
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: FRWP192MB2997:EE_|VE1P192MB0829:EE_
+X-MS-Office365-Filtering-Correlation-Id: c3e911ff-b27b-40dc-5928-08dde5457bfd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Sm1KNG1KOGQ2WjZzeVIwRFc5Zm9zNUQ5TmNDVUtJTTVjQjUwVzUyU0xiR0lH?=
+ =?utf-8?B?VDg5aUdsM0JMVzlFQXh3NlN6ZlN4emErajBSSytuWEhiaGlYV3VnVDNVTWtL?=
+ =?utf-8?B?Q2Q3blByeUtLb0VLOXUzUFlsVStkYkt6SjFiZUh6RTNqR05uSWNoQW55VVlS?=
+ =?utf-8?B?ZUwvaytCblJ4T2ZHNFl5cjErVkkxejI5SDB3eFBTZXpZOUw5TUF2cHN4eVFU?=
+ =?utf-8?B?TG9Ec3MzN1grc3Q3cUtHS1pmNjIvUWs0bFljQ2ZEMkUzQXhZNTFKSXp4OU1T?=
+ =?utf-8?B?UDdTSlRpazBQYjNzYVFZOTgxTkwrWlh1VXJkbisxY0hlcitxbWRMWEYyYzRG?=
+ =?utf-8?B?YS92T09id3BVdFFsSWMwUFNqL05rdWszOVRKeng2TjBkdXJpZXFtRyt3ZktN?=
+ =?utf-8?B?ZlRGNVdCWHFtTHo0RUFZRWhSeSsvcFlRcmlwbXp3aEk2eGV0ZkxPWnBTYmVW?=
+ =?utf-8?B?ZUVuRkhnMDVmb1FmMktWdGlvcHZqYVNKWnJXVlNmRU5UUEhJeERiNDhUMlhI?=
+ =?utf-8?B?TDJOeGczYjA5OUFJQ0RhQkpWR3VJVlNaRU1FY0xZTnpjeFZVVkZyTFVnQWNP?=
+ =?utf-8?B?ODR2TWtNZFVmSUFhelNEVk9LaGNPVXEwWlJrdHd4RkQ0Rzl5bHBVckplSGYy?=
+ =?utf-8?B?bERCMVhFNWIyZHhjbXRyOWg1amE5anZZZVBOYlMzQUdhdmIrN0Jlb09kdW5D?=
+ =?utf-8?B?ZzZrUDdTbldPVzJta0g5cHhmdGZUQUoxV081dGxRckpGMUErcnljZ2lsUFlr?=
+ =?utf-8?B?TFl5eThEMHJ2RURkL2YwSWFDYUdWQnVyUXJUU2t2VW9PVkNFaDZLS0hOTGFV?=
+ =?utf-8?B?VnBrNFc1MmpYOXJHdU9NQWJRYSttbHVITXhjWWhVTVRlUGVXVlMvMStVYk0x?=
+ =?utf-8?B?M3NWWW9jK08yMk1WSWx3WlFVMWoyMzVFVUxwa1NieVZma1E1Ylp2OXZvYjIx?=
+ =?utf-8?B?QnUrVjRkUEJuVlpDbmhLbjJTekFDb0hGb1JVZ2g4MjFwQXNxOGgxV0E0NlNU?=
+ =?utf-8?B?Vkw4ZWVHb08xVHFhR1pSVlM2LzFYdG8wVUwwdjlNYUIzRjkxTUpUelVOamx2?=
+ =?utf-8?B?Wll5b0x1UEFuSWJFb21tdm15TkJicWxSSGVmM09qTmNGUVNLZ1llSkdRRGJ3?=
+ =?utf-8?B?U3JyOUFUUFU4VE9aL0VOM0RlSythMFA0bXcyMTFrVUliTnNzL0tsQjV0dngy?=
+ =?utf-8?B?Ri84NnNyK25iVFFPbkhibVBtN2JSN1E3Y2REZ2tZcEs2eWY4aHcrL3Bjc3Na?=
+ =?utf-8?B?NFh1RjJRWHRRdlg0aUladjRnbzdqWUd4TFJpSFh2bVhCOXliVE5iVlk4YVZG?=
+ =?utf-8?B?WVk4MGtpalpJTjEyMFVNUy83dkx1WHVESitCd0J0OWtNOFprdURYRWhRUnFL?=
+ =?utf-8?B?cGdOQUdFc3pNUTJUZ2JtdnJSTG1pdEJTa2ovcjRiU2FZVWJ3QzdmNTA4OERj?=
+ =?utf-8?B?akJRRjlVeEpqbUZhdHAzRHlmMWdwQmZIYTRNYXVYYk5pZ3R6S3lDSDlLSGlz?=
+ =?utf-8?B?TWtkZnNKWXAyRGQ3cS80SDlkWkdOZXpTT25mQnAybXNUYWJSeU1DYnh6bVZ0?=
+ =?utf-8?B?SjlDdjdUYzVPalpKbEhxaElPdzFXOVp4dHRvNFZ4alFOVTVaVmkzbDkybUZP?=
+ =?utf-8?B?NzVDWndXc0x3Y1ZoQXBVUlpLMTdsQ3VoVURldnZmNUZGNElJcVFZOFNzeVps?=
+ =?utf-8?B?Y3l3UzJYQ2tINTdqV2VVbnNITGJqT3BNdUJsVDhLTWhCZjV5T0tEWnFxN0hL?=
+ =?utf-8?B?amx2S1ZHbTV2Q0ZvbXhRWUZzbzVqeXREL3laS0lWTGJ5YkkzNjRsbnBUbDlo?=
+ =?utf-8?B?NmlJNkp5bUpzMmpIM0Zvc3k1WjMzdDNqSXI5T0dudHh1L0FVSkcrMjAxUW5V?=
+ =?utf-8?B?aUo5OWl5WlpCMmFoUjRFMEs5UWZYUGQvd0hiTFdRSU1oME9iNGwxZXRQWG5K?=
+ =?utf-8?Q?b9wHr0Ob41Q=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:FRWP192MB2997.EURP192.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Vndta1k4MUFHSkN0WE5ycHU5TTF1S3VQejRXblNPbXRjcmFNMXFsaWFCR2lW?=
+ =?utf-8?B?aTU0NkxBNUdOK25RYTAxOWZLNzhaZ1ozN2x5RzRvemdKMkdYbFhEeFFSZ3Zm?=
+ =?utf-8?B?QmpxVUlIWFZQb09Ucno4SVdYckYrWFZTcnNudTVjVnFFa1VVNVozY1ZoQ29V?=
+ =?utf-8?B?cXRrUkFIVUZCUzZUMlhPVVB2elUreGgzdXZkS3dIRXduNW1od2hxLzg0SGhp?=
+ =?utf-8?B?dElsRE5pd1B1S2M3dDgwdVFKU1hOOEZQL2wzcUo0Rm9xRnh6azJsN3lmNFpm?=
+ =?utf-8?B?bzBQaEVYb3NQOE4yb0pyWHdhNkoxYVFrRVlzVUtOTE9UZFliQ3pVT0xaOW5l?=
+ =?utf-8?B?aWVQc0tpT2ovSVRKSGlrMm9tRTZLRitlWW1mQW50TlREUk1ZUlJtcWVFNzh3?=
+ =?utf-8?B?YzNtNUQ3ZUJvaXBVeWtQNVYwdHVwRWllVTJkN0ZhZWFFczNzZXBoUkhzdmU2?=
+ =?utf-8?B?YmszOHpqSkhESzA3ZU1nU255bnpPa1VGZVlhTG40c2YzbEdkeHNKMjkvTE1u?=
+ =?utf-8?B?UElacUltUCtCRm54aGowZW5Mbk1RcnZxZyttR2pIK3BUZVJvb0dBNDlBbGNT?=
+ =?utf-8?B?Y2d4MkNrcUVvYVFHYk93OUJRZTh6MkwvSm9wMVNBUm1JNUdwQ053dEtoT2tR?=
+ =?utf-8?B?SXI3TDdHNGNKSERiOFBKV3ZOOXNvODZFRTJsQ3ZwSW10eVRGeXd0ZGF5Q1JC?=
+ =?utf-8?B?M2g5UElvVUJURE1RSUJVdFB1WE5wSXA3cEswQlRZamROSzRLTVR1bytaT0Jh?=
+ =?utf-8?B?OG1ubXhXakp6WjVJODJxcnRYUTEzaml0TVpIbGFOQWVMRDRYQUpxMnVxUUhK?=
+ =?utf-8?B?UU5OYUhqVU92OHJrQUdyZlYvUmhhKzNkcHVaWkNnNVFOM2NUVDRmNm16V3k2?=
+ =?utf-8?B?blR1ZjEvVHc0UHhTeFRjVEFHTmRaQlZZNnc4QUpEOGE0Zy9CeFJGWDV2TDAx?=
+ =?utf-8?B?b0RRRHJkKzVDZW94ckRpVWU3NkxOWjJwRCtyWm1xMU5ORHQyaTE3WTRKaWpt?=
+ =?utf-8?B?RnVETmVJdzhMN3dDKy9DZ215cmV0OHVDSENYT2lvYk1nQWs5QVdqVGJYSURK?=
+ =?utf-8?B?eEx1Lzkvc0VOUitvSUdkTU9oL1kvY0kxNUIwU1h4cDFqblFrY3p0L2lzeWRY?=
+ =?utf-8?B?eStXR21PZlc3VTk0MXU1SWVaVzA3K3VybFBXTEJOZG5iUXVXOWhyWUNrRWxm?=
+ =?utf-8?B?aUNKTU5uQ2twWDZXN0xudWhTcm8wQnh4UjZRbTkyb2RpcXVlelVDNkhMNnQ1?=
+ =?utf-8?B?THdyQnR3YkMyTGd5M1pLMVlvQnFUeFliakJLc3o1U2Q1eWo5Szg5cndEd0lh?=
+ =?utf-8?B?TXZZVUFQRmw3bzNqSWVESUZXSGNnc3pLN1lPd3FYelBtbmRUY3VpeFIwNWh6?=
+ =?utf-8?B?NVNXanI0UW1QcFprQ0FTQTVVdkc0elZQY084c3E5dUZubUhhWTBDOVE0VVBH?=
+ =?utf-8?B?L2JEYUtvSnlCZ0hUOUY2YklpamFJRTZ0aitCZTFYS242cG1Zc0w2OHA0M3lr?=
+ =?utf-8?B?NFJKbmxyeG02Nmhya1VLQnNRbVdmNkw4bU1iblRzVldJcXFvMC80eCtlUnVZ?=
+ =?utf-8?B?MzJsKzlYTlhVL2xVcnhZc0d3Z3dqeWRJd2p2Q1crOTBBckRTV3NXWUVWSjJu?=
+ =?utf-8?B?M2RZQkhzUXlZMDQwbVBLNXhoZjFLS0pmd0RiR0hTUlhUZVd0cmQya05STERo?=
+ =?utf-8?B?RlJwMTJCWFVjU3d1WWE3QkJkblRuOUpuRGlGN2pYUndhL0dZOWZOOUtrTWRO?=
+ =?utf-8?B?dlBOZVJFdUJLMEVvVzBML0VzRVhvVDd4aXlIaGlRdzc3Um9Ob3o3L3hOWk10?=
+ =?utf-8?B?VC9LSjBJNzZ1cVUvOUhBaWJEc3RkNUdacUNjbzYrVUMwaXRTc0psM2NzeXZR?=
+ =?utf-8?B?S1B1QVIrRW5rQnFVUlNXZEk3cU9kQUxubDlmK1dNclhQMklPQVQrdEs1a3FK?=
+ =?utf-8?B?UWtHRGhGaXBJdXAyNkh1dVpqQXdQNU80N0ppbUdMTlBOVXFwUzMyVkkxaXhH?=
+ =?utf-8?B?MmNHVnJXZkJuUC9wL2RtUERLNysrZmRzUWtVNmlRYUlkSDY2bDBVSXY4Rnhx?=
+ =?utf-8?B?eTNxQU9aSlJNMWs4KzBIaHZQdUc1cHJ4VHRvV2ZtcmJEc1BDWTVCSEVCeFU1?=
+ =?utf-8?Q?Y+VsnPGICn9EtUrec3VuWClI5?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	aqm3Ayk9jfk5U1AnDsjwaTokLe3CO8YNw+NHLWU6glXweN4vho96dQe77R3d8EQppjXT5WJsRomeASAQzwxwRPrOnmSJqwPB4mWriKhbhA0nZozxnpvmGVYDufhHbHgCuvIJosbowj+CGiz+vfiuzPdr5V1wk5bGIKlqMBJosEq2tIQp1Jn1zlYFf3gDSd2wv66XoWrxzYISdFXQASnniaI9Ba8eHvXPr1tt1L17Ds+SnygyAidYWfqmdm1DGA+eVpf6Qi0yqldzBwtKmRweuwpqC0YmlwOKdb6Pk275Y6QJ6rlgbo0X9j37PMhKiiyPsh1MCq7Hd7T7c+uV2XTZvyRBCtsrCmIg8ndrtxoovTcE9XIIKiiZUA/S9nCku6a9DKNRmtxvdWesVeu8OHo/dtARpoZ4iVH2AR5SRWpyIYyOeedPYbOAs8U2IxVWu/mk/2uiFOUzG6UMjd5APLvMEHg0dAtAtPLRsQvoKVFATGjZqdXFoq/fMZZME7stpeQ8UvG/67tgewIZKBNBF/YUW5SArGZoPoyKmToq+asHvjyeYMsqC8EhCL1OAlq7mS4vaNZ4oOav05q/J1eOJl2Hkzmm7zJoh2ESJST1RB1eL0QHL7UeH9dF9ZYs7r7vh7YH
+X-OriginatorOrg: westermo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c3e911ff-b27b-40dc-5928-08dde5457bfd
+X-MS-Exchange-CrossTenant-AuthSource: FRWP192MB2997.EURP192.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Aug 2025 08:41:15.2717
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4b2e9b91-de77-4ca7-8130-c80faee67059
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: X91x8FMOX62iAYNNmVajThXiFfqTnaOVQtoVw+KVbP83UXG5pl5ZGKBxBwt2q8N5MXI49/m9/ko+fx3nXc+okw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1P192MB0829
+X-MS-Exchange-CrossPremises-AuthSource: FRWP192MB2997.EURP192.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossPremises-AuthAs: Internal
+X-MS-Exchange-CrossPremises-AuthMechanism: 14
+X-MS-Exchange-CrossPremises-Mapi-Admin-Submission:
+X-MS-Exchange-CrossPremises-MessageSource: StoreDriver
+X-MS-Exchange-CrossPremises-BCC:
+X-MS-Exchange-CrossPremises-OriginalClientIPAddress: 104.151.95.196
+X-MS-Exchange-CrossPremises-TransportTrafficType: Email
+X-MS-Exchange-CrossPremises-Antispam-ScanContext:
+	DIR:Originating;SFV:NSPM;SKIP:0;
+X-MS-Exchange-CrossPremises-SCL: 1
+X-MS-Exchange-CrossPremises-Processed-By-Journaling: Journal Agent
+X-OrganizationHeadersPreserved: VE1P192MB0829.EURP192.PROD.OUTLOOK.COM
+X-Proofpoint-GUID: H3U1uI0qSTQ2qSBsbMATNu_REOgMRHAD
+X-Proofpoint-ORIG-GUID: H3U1uI0qSTQ2qSBsbMATNu_REOgMRHAD
+X-Authority-Analysis: v=2.4 cv=P+U6hjAu c=1 sm=1 tr=0 ts=68aec4ae cx=c_pps
+ a=X+pbzE9IfnmIeJfM3VPqZQ==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19
+ a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
+ a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19
+ a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=8gLI3H-aZtYA:10
+ a=kb6Zq_f-WW3Ge5vyytYA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODI3MDA3MiBTYWx0ZWRfXy8V7pXDWDmD4
+ BvyG6ZDsRFjAy1fbU6kNTHgCJcXEAAR2lxUH5QqSIyrQRZOxy226IgV6P1h98aNiMvoUqzdCaNk
+ ZowsiV+hW/sGVUVSL/Eb5zP/Wt/hsPXIQjuP9p3hohqA8Jg1sKzN1GkY03dAZfO3mOrS5rj5G1G
+ AdiZj52fpum9BRUPGQX71DZA/ZKi3SL0lUi+VEiMuGUgTHAlkf4+mFoiChPOKPYmLq8I7adoy3D
+ zEu5q9oBTgdKGV1MWViyHV3vbOqaxP+3+PuUGvQpJaA0KuSlTM8QsU+tVcz5WZrfWVlyllhdYDq
+ a+KyjA/IVGWY0hLb9ENNoR4bq7t186ZByIj+8xeQM70im7hSiws5Ixk/AlQHDg=
 
-Hi,
+Am Wed, Aug 27, 2025 at 10:31:20AM +0300 schrieb Vladimir Oltean:
+> Hi Alexander,
+> 
+> On Wed, Aug 27, 2025 at 07:57:28AM +0200, Alexander Wilhelm wrote:
+> > Hi Vladimir,
+> > 
+> > One of our hardware engineers has looked into the issue with the 100M link and
+> > found the following: the Aquantia AQR115 always uses 2500BASE-X (GMII) on the
+> > host side. For both 1G and 100M operation, it enables pause rate adaptation.
+> > However, our MAC only applies rate adaptation for 1G links. For 100M, it uses a
+> > 10x symbol replication instead.
+> > 
+> > We’re exploring a workaround where the MAC is configured to believe it’s
+> > operating at 1G, so it continues using pause rate adaptation, since flow control
+> 
+> Why at 1G and not at 2.5G?
 
-Am Montag, 25. August 2025, 11:12:19 CEST schrieb Joy Zou:
-> The design of i.MX91 platform is very similar to i.MX93 and only
-> some small differences.
->=20
-> If the imx91.dtsi include the imx93.dtsi, each add to imx93.dtsi
-> requires an remove in imx91.dtsi for this unique to i.MX93, e.g. NPU.
-> The i.MX91 isn't the i.MX93 subset, if the imx93.dtsi include the
-> imx91.dtsi, the same problem will occur.
->=20
-> Common + delta is better than common - delta, so add imx91_93_common.dtsi
-> for i.MX91 and i.MX93, then the imx93.dtsi and imx91.dtsi will include the
-> imx91_93_common.dtsi.
->=20
-> Rename imx93.dtsi to imx91_93_common.dtsi and move i.MX93 specific
-> part from imx91_93_common.dtsi to imx93.dtsi.
->=20
-> Reviewed-by: Frank Li <Frank.Li@nxp.com>
-> Signed-off-by: Joy Zou <joy.zou@nxp.com>
-> ---
-> Changes for v7:
-> 1.The aliases are removed from common.dtsi because the imx93.dtsi aliases
->   are removed.
->=20
-> Changes for v6:
-> 1. merge rename imx93.dtsi to imx91_93_common.dtsi and move i.MX93
->    specific part from imx91_93_common.dtsi to imx93.dtsi patch.
-> 2. restore copyright time and add modification time.
-> 3. remove unused map0 label in imx91_93_common.dtsi.
-> ---
->  .../{imx93.dtsi =3D> imx91_93_common.dtsi}      |  140 +-
->  arch/arm64/boot/dts/freescale/imx93.dtsi      | 1484 ++---------------
->  2 files changed, 163 insertions(+), 1461 deletions(-)
->  copy arch/arm64/boot/dts/freescale/{imx93.dtsi =3D> imx91_93_common.dtsi=
-} (91%)
->  rewrite arch/arm64/boot/dts/freescale/imx93.dtsi (97%)
+Good point. Actually it is 2.5G, but the source code does not really
+differentiate between them. All register configurations are the same for both 1G
+and 2.5G.
+[...]
 
-It's not shown in the diff, but can you add a 'soc' phandle for 'soc@0' nod=
-e?
-So it can be referenced by imx91 or imx93 individually.
+> To be crystal clear, are you talking about the T1023 FMan mEMAC as being
+> the one which at 100M uses 10x symbol replication? Because the AQR115
+> PHY also contains a MAC block inside - this is what provides the MACsec
+> and rate adaptation functionality.
+
+Exactly that is what our hardware engineer measured.
+
+> And if so, I don't know _how_ can that be - in mainline there is no code
+> that would reconfigure the SerDes lane from 2500base-x to SGMII. These
+> use different baud rates, so the lane would need to be moved to a
+> different PLL which provides the required clock net. Or are you using a
+> different kernel code base where this logic exists?
+
+That is the problem I'm trying to understand. I've also not seen any code that
+changes that. I'm using OpenWRT v24.10.0 with default kernel v6.6.73. The only
+patches applied are the ones you've provided to me.
+
+> Also, I don't understand _why_ would the FMan mEMAC change its protocol
+> from 2500base-x to SGMII. It certainly doesn't do that by itself.
+> Rate adaptation is handled by phylink (phylink_link_up() sets rx_pause
+> unconditionally to true when in RATE_MATCH_PAUSE mode), and the MAC
+> should be kept in the same configuration for different media-side speeds.
+> 
+> Could you print phy_modes(state->interface) in memac_mac_config(), as
+> well as phy_modes(interface), speed, duplex, tx_pause, rx_pause in
+> memac_link_up()? This is to confirm that the mEMAC configuration is
+> identical when the PHY links at 1G and 100M.
+
+Sure. I set speed on host connected to the DUT. Here are the logs:
+
+Started with 2.5G:
+
+    fsl_dpaa_mac: [DEBUG] <memac_mac_config> called
+    fsl_dpaa_mac: [DEBUG] * phy_modes(state->interface): 2500base-x
+    fsl_dpaa_mac: [DEBUG] <memac_link_up> called
+    fsl_dpaa_mac: [DEBUG] * mode: 0
+    fsl_dpaa_mac: [DEBUG] * phy_mode(interface): 2500base-x
+    fsl_dpaa_mac: [DEBUG] * memac_if_mode: 00000002 (IF_MODE_GMII)
+    fsl_dpaa_mac: [DEBUG] * speed: 2500
+    fsl_dpaa_mac: [DEBUG] * duplex: 1
+    fsl_dpaa_mac: [DEBUG] * tx_pause: 1
+    fsl_dpaa_mac: [DEBUG] * rx_pause: 1
+
+Set to 1G:
+
+    fsl_dpaa_mac: [DEBUG] <memac_link_down> called
+    fsl_dpaa_mac: [DEBUG] <memac_link_up> called
+    fsl_dpaa_mac: [DEBUG] * mode: 0
+    fsl_dpaa_mac: [DEBUG] * phy_mode(interface): 2500base-x
+    fsl_dpaa_mac: [DEBUG] * memac_if_mode: 00000002 (IF_MODE_GMII)
+    fsl_dpaa_mac: [DEBUG] * speed: 2500
+    fsl_dpaa_mac: [DEBUG] * duplex: 1
+    fsl_dpaa_mac: [DEBUG] * tx_pause: 1
+    fsl_dpaa_mac: [DEBUG] * rx_pause: 1
+
+Set to 100M:
+
+    fsl_dpaa_mac: [DEBUG] <memac_link_down> called
+    fsl_dpaa_mac: [DEBUG] <memac_link_up> called
+    fsl_dpaa_mac: [DEBUG] * mode: 0
+    fsl_dpaa_mac: [DEBUG] * phy_mode(interface): 2500base-x
+    fsl_dpaa_mac: [DEBUG] * memac_if_mode: 00000002 (IF_MODE_GMII)
+    fsl_dpaa_mac: [DEBUG] * speed: 2500
+    fsl_dpaa_mac: [DEBUG] * duplex: 1
+    fsl_dpaa_mac: [DEBUG] * tx_pause: 1
+    fsl_dpaa_mac: [DEBUG] * rx_pause: 1
+
 
 Best regards
-Alexander
-
->=20
-> diff --git a/arch/arm64/boot/dts/freescale/imx93.dtsi b/arch/arm64/boot/d=
-ts/freescale/imx91_93_common.dtsi
-> similarity index 91%
-> copy from arch/arm64/boot/dts/freescale/imx93.dtsi
-> copy to arch/arm64/boot/dts/freescale/imx91_93_common.dtsi
-> index d505f9dfd8ee..c48f3ecb91ed 100644
-> --- a/arch/arm64/boot/dts/freescale/imx93.dtsi
-> +++ b/arch/arm64/boot/dts/freescale/imx91_93_common.dtsi
-> @@ -1,6 +1,6 @@
->  // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
->  /*
-> - * Copyright 2022 NXP
-> + * Copyright 2022,2025 NXP
->   */
-> =20
->  #include <dt-bindings/clock/imx93-clock.h>
-> @@ -18,7 +18,7 @@ / {
->  	#address-cells =3D <2>;
->  	#size-cells =3D <2>;
-> =20
-> -	cpus {
-> +	cpus: cpus {
->  		#address-cells =3D <1>;
->  		#size-cells =3D <0>;
-> =20
-> @@ -43,58 +43,6 @@ A55_0: cpu@0 {
->  			enable-method =3D "psci";
->  			#cooling-cells =3D <2>;
->  			cpu-idle-states =3D <&cpu_pd_wait>;
-> -			i-cache-size =3D <32768>;
-> -			i-cache-line-size =3D <64>;
-> -			i-cache-sets =3D <128>;
-> -			d-cache-size =3D <32768>;
-> -			d-cache-line-size =3D <64>;
-> -			d-cache-sets =3D <128>;
-> -			next-level-cache =3D <&l2_cache_l0>;
-> -		};
-> -
-> -		A55_1: cpu@100 {
-> -			device_type =3D "cpu";
-> -			compatible =3D "arm,cortex-a55";
-> -			reg =3D <0x100>;
-> -			enable-method =3D "psci";
-> -			#cooling-cells =3D <2>;
-> -			cpu-idle-states =3D <&cpu_pd_wait>;
-> -			i-cache-size =3D <32768>;
-> -			i-cache-line-size =3D <64>;
-> -			i-cache-sets =3D <128>;
-> -			d-cache-size =3D <32768>;
-> -			d-cache-line-size =3D <64>;
-> -			d-cache-sets =3D <128>;
-> -			next-level-cache =3D <&l2_cache_l1>;
-> -		};
-> -
-> -		l2_cache_l0: l2-cache-l0 {
-> -			compatible =3D "cache";
-> -			cache-size =3D <65536>;
-> -			cache-line-size =3D <64>;
-> -			cache-sets =3D <256>;
-> -			cache-level =3D <2>;
-> -			cache-unified;
-> -			next-level-cache =3D <&l3_cache>;
-> -		};
-> -
-> -		l2_cache_l1: l2-cache-l1 {
-> -			compatible =3D "cache";
-> -			cache-size =3D <65536>;
-> -			cache-line-size =3D <64>;
-> -			cache-sets =3D <256>;
-> -			cache-level =3D <2>;
-> -			cache-unified;
-> -			next-level-cache =3D <&l3_cache>;
-> -		};
-> -
-> -		l3_cache: l3-cache {
-> -			compatible =3D "cache";
-> -			cache-size =3D <262144>;
-> -			cache-line-size =3D <64>;
-> -			cache-sets =3D <256>;
-> -			cache-level =3D <3>;
-> -			cache-unified;
->  		};
->  	};
-> =20
-> @@ -150,44 +98,6 @@ gic: interrupt-controller@48000000 {
->  		interrupt-parent =3D <&gic>;
->  	};
-> =20
-> -	thermal-zones {
-> -		cpu-thermal {
-> -			polling-delay-passive =3D <250>;
-> -			polling-delay =3D <2000>;
-> -
-> -			thermal-sensors =3D <&tmu 0>;
-> -
-> -			trips {
-> -				cpu_alert: cpu-alert {
-> -					temperature =3D <80000>;
-> -					hysteresis =3D <2000>;
-> -					type =3D "passive";
-> -				};
-> -
-> -				cpu_crit: cpu-crit {
-> -					temperature =3D <90000>;
-> -					hysteresis =3D <2000>;
-> -					type =3D "critical";
-> -				};
-> -			};
-> -
-> -			cooling-maps {
-> -				map0 {
-> -					trip =3D <&cpu_alert>;
-> -					cooling-device =3D
-> -						<&A55_0 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
-> -						<&A55_1 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
-> -				};
-> -			};
-> -		};
-> -	};
-> -
-> -	cm33: remoteproc-cm33 {
-> -		compatible =3D "fsl,imx93-cm33";
-> -		clocks =3D <&clk IMX93_CLK_CM33_GATE>;
-> -		status =3D "disabled";
-> -	};
-> -
->  	mqs1: mqs1 {
->  		compatible =3D "fsl,imx93-mqs";
->  		gpr =3D <&aonmix_ns_gpr>;
-> @@ -274,15 +184,6 @@ aonmix_ns_gpr: syscon@44210000 {
->  				reg =3D <0x44210000 0x1000>;
->  			};
-> =20
-> -			mu1: mailbox@44230000 {
-> -				compatible =3D "fsl,imx93-mu", "fsl,imx8ulp-mu";
-> -				reg =3D <0x44230000 0x10000>;
-> -				interrupts =3D <GIC_SPI 22 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_MU1_B_GATE>;
-> -				#mbox-cells =3D <2>;
-> -				status =3D "disabled";
-> -			};
-> -
->  			system_counter: timer@44290000 {
->  				compatible =3D "nxp,sysctr-timer";
->  				reg =3D <0x44290000 0x30000>;
-> @@ -486,14 +387,6 @@ src: system-controller@44460000 {
->  				#size-cells =3D <1>;
->  				ranges;
-> =20
-> -				mlmix: power-domain@44461800 {
-> -					compatible =3D "fsl,imx93-src-slice";
-> -					reg =3D <0x44461800 0x400>, <0x44464800 0x400>;
-> -					#power-domain-cells =3D <0>;
-> -					clocks =3D <&clk IMX93_CLK_ML_APB>,
-> -						 <&clk IMX93_CLK_ML>;
-> -				};
-> -
->  				mediamix: power-domain@44462400 {
->  					compatible =3D "fsl,imx93-src-slice";
->  					reg =3D <0x44462400 0x400>, <0x44465800 0x400>;
-> @@ -509,26 +402,6 @@ clock-controller@44480000 {
->  				#clock-cells =3D <1>;
->  			};
-> =20
-> -			tmu: tmu@44482000 {
-> -				compatible =3D "fsl,qoriq-tmu";
-> -				reg =3D <0x44482000 0x1000>;
-> -				interrupts =3D <GIC_SPI 83 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_TMC_GATE>;
-> -				little-endian;
-> -				fsl,tmu-range =3D <0x800000da 0x800000e9
-> -						 0x80000102 0x8000012a
-> -						 0x80000166 0x800001a7
-> -						 0x800001b6>;
-> -				fsl,tmu-calibration =3D <0x00000000 0x0000000e
-> -						       0x00000001 0x00000029
-> -						       0x00000002 0x00000056
-> -						       0x00000003 0x000000a2
-> -						       0x00000004 0x00000116
-> -						       0x00000005 0x00000195
-> -						       0x00000006 0x000001b2>;
-> -				#thermal-sensor-cells =3D <1>;
-> -			};
-> -
->  			micfil: micfil@44520000 {
->  				compatible =3D "fsl,imx93-micfil";
->  				reg =3D <0x44520000 0x10000>;
-> @@ -645,15 +518,6 @@ wakeupmix_gpr: syscon@42420000 {
->  				reg =3D <0x42420000 0x1000>;
->  			};
-> =20
-> -			mu2: mailbox@42440000 {
-> -				compatible =3D "fsl,imx93-mu", "fsl,imx8ulp-mu";
-> -				reg =3D <0x42440000 0x10000>;
-> -				interrupts =3D <GIC_SPI 24 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_MU2_B_GATE>;
-> -				#mbox-cells =3D <2>;
-> -				status =3D "disabled";
-> -			};
-> -
->  			wdog3: watchdog@42490000 {
->  				compatible =3D "fsl,imx93-wdt";
->  				reg =3D <0x42490000 0x10000>;
-> diff --git a/arch/arm64/boot/dts/freescale/imx93.dtsi b/arch/arm64/boot/d=
-ts/freescale/imx93.dtsi
-> dissimilarity index 97%
-> index d505f9dfd8ee..7b27012dfcb5 100644
-> --- a/arch/arm64/boot/dts/freescale/imx93.dtsi
-> +++ b/arch/arm64/boot/dts/freescale/imx93.dtsi
-> @@ -1,1323 +1,161 @@
-> -// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
-> -/*
-> - * Copyright 2022 NXP
-> - */
-> -
-> -#include <dt-bindings/clock/imx93-clock.h>
-> -#include <dt-bindings/dma/fsl-edma.h>
-> -#include <dt-bindings/gpio/gpio.h>
-> -#include <dt-bindings/input/input.h>
-> -#include <dt-bindings/interrupt-controller/arm-gic.h>
-> -#include <dt-bindings/power/fsl,imx93-power.h>
-> -#include <dt-bindings/thermal/thermal.h>
-> -
-> -#include "imx93-pinfunc.h"
-> -
-> -/ {
-> -	interrupt-parent =3D <&gic>;
-> -	#address-cells =3D <2>;
-> -	#size-cells =3D <2>;
-> -
-> -	cpus {
-> -		#address-cells =3D <1>;
-> -		#size-cells =3D <0>;
-> -
-> -		idle-states {
-> -			entry-method =3D "psci";
-> -
-> -			cpu_pd_wait: cpu-pd-wait {
-> -				compatible =3D "arm,idle-state";
-> -				arm,psci-suspend-param =3D <0x0010033>;
-> -				local-timer-stop;
-> -				entry-latency-us =3D <10000>;
-> -				exit-latency-us =3D <7000>;
-> -				min-residency-us =3D <27000>;
-> -				wakeup-latency-us =3D <15000>;
-> -			};
-> -		};
-> -
-> -		A55_0: cpu@0 {
-> -			device_type =3D "cpu";
-> -			compatible =3D "arm,cortex-a55";
-> -			reg =3D <0x0>;
-> -			enable-method =3D "psci";
-> -			#cooling-cells =3D <2>;
-> -			cpu-idle-states =3D <&cpu_pd_wait>;
-> -			i-cache-size =3D <32768>;
-> -			i-cache-line-size =3D <64>;
-> -			i-cache-sets =3D <128>;
-> -			d-cache-size =3D <32768>;
-> -			d-cache-line-size =3D <64>;
-> -			d-cache-sets =3D <128>;
-> -			next-level-cache =3D <&l2_cache_l0>;
-> -		};
-> -
-> -		A55_1: cpu@100 {
-> -			device_type =3D "cpu";
-> -			compatible =3D "arm,cortex-a55";
-> -			reg =3D <0x100>;
-> -			enable-method =3D "psci";
-> -			#cooling-cells =3D <2>;
-> -			cpu-idle-states =3D <&cpu_pd_wait>;
-> -			i-cache-size =3D <32768>;
-> -			i-cache-line-size =3D <64>;
-> -			i-cache-sets =3D <128>;
-> -			d-cache-size =3D <32768>;
-> -			d-cache-line-size =3D <64>;
-> -			d-cache-sets =3D <128>;
-> -			next-level-cache =3D <&l2_cache_l1>;
-> -		};
-> -
-> -		l2_cache_l0: l2-cache-l0 {
-> -			compatible =3D "cache";
-> -			cache-size =3D <65536>;
-> -			cache-line-size =3D <64>;
-> -			cache-sets =3D <256>;
-> -			cache-level =3D <2>;
-> -			cache-unified;
-> -			next-level-cache =3D <&l3_cache>;
-> -		};
-> -
-> -		l2_cache_l1: l2-cache-l1 {
-> -			compatible =3D "cache";
-> -			cache-size =3D <65536>;
-> -			cache-line-size =3D <64>;
-> -			cache-sets =3D <256>;
-> -			cache-level =3D <2>;
-> -			cache-unified;
-> -			next-level-cache =3D <&l3_cache>;
-> -		};
-> -
-> -		l3_cache: l3-cache {
-> -			compatible =3D "cache";
-> -			cache-size =3D <262144>;
-> -			cache-line-size =3D <64>;
-> -			cache-sets =3D <256>;
-> -			cache-level =3D <3>;
-> -			cache-unified;
-> -		};
-> -	};
-> -
-> -	osc_32k: clock-osc-32k {
-> -		compatible =3D "fixed-clock";
-> -		#clock-cells =3D <0>;
-> -		clock-frequency =3D <32768>;
-> -		clock-output-names =3D "osc_32k";
-> -	};
-> -
-> -	osc_24m: clock-osc-24m {
-> -		compatible =3D "fixed-clock";
-> -		#clock-cells =3D <0>;
-> -		clock-frequency =3D <24000000>;
-> -		clock-output-names =3D "osc_24m";
-> -	};
-> -
-> -	clk_ext1: clock-ext1 {
-> -		compatible =3D "fixed-clock";
-> -		#clock-cells =3D <0>;
-> -		clock-frequency =3D <133000000>;
-> -		clock-output-names =3D "clk_ext1";
-> -	};
-> -
-> -	pmu {
-> -		compatible =3D "arm,cortex-a55-pmu";
-> -		interrupts =3D <GIC_PPI 7 (GIC_CPU_MASK_SIMPLE(2) | IRQ_TYPE_LEVEL_HIG=
-H)>;
-> -	};
-> -
-> -	psci {
-> -		compatible =3D "arm,psci-1.0";
-> -		method =3D "smc";
-> -	};
-> -
-> -	timer {
-> -		compatible =3D "arm,armv8-timer";
-> -		interrupts =3D <GIC_PPI 13 (GIC_CPU_MASK_SIMPLE(6) | IRQ_TYPE_LEVEL_LO=
-W)>,
-> -			     <GIC_PPI 14 (GIC_CPU_MASK_SIMPLE(6) | IRQ_TYPE_LEVEL_LOW)>,
-> -			     <GIC_PPI 11 (GIC_CPU_MASK_SIMPLE(6) | IRQ_TYPE_LEVEL_LOW)>,
-> -			     <GIC_PPI 10 (GIC_CPU_MASK_SIMPLE(6) | IRQ_TYPE_LEVEL_LOW)>;
-> -		clock-frequency =3D <24000000>;
-> -		arm,no-tick-in-suspend;
-> -		interrupt-parent =3D <&gic>;
-> -	};
-> -
-> -	gic: interrupt-controller@48000000 {
-> -		compatible =3D "arm,gic-v3";
-> -		reg =3D <0 0x48000000 0 0x10000>,
-> -		      <0 0x48040000 0 0xc0000>;
-> -		#interrupt-cells =3D <3>;
-> -		interrupt-controller;
-> -		interrupts =3D <GIC_PPI 9 IRQ_TYPE_LEVEL_HIGH>;
-> -		interrupt-parent =3D <&gic>;
-> -	};
-> -
-> -	thermal-zones {
-> -		cpu-thermal {
-> -			polling-delay-passive =3D <250>;
-> -			polling-delay =3D <2000>;
-> -
-> -			thermal-sensors =3D <&tmu 0>;
-> -
-> -			trips {
-> -				cpu_alert: cpu-alert {
-> -					temperature =3D <80000>;
-> -					hysteresis =3D <2000>;
-> -					type =3D "passive";
-> -				};
-> -
-> -				cpu_crit: cpu-crit {
-> -					temperature =3D <90000>;
-> -					hysteresis =3D <2000>;
-> -					type =3D "critical";
-> -				};
-> -			};
-> -
-> -			cooling-maps {
-> -				map0 {
-> -					trip =3D <&cpu_alert>;
-> -					cooling-device =3D
-> -						<&A55_0 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
-> -						<&A55_1 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
-> -				};
-> -			};
-> -		};
-> -	};
-> -
-> -	cm33: remoteproc-cm33 {
-> -		compatible =3D "fsl,imx93-cm33";
-> -		clocks =3D <&clk IMX93_CLK_CM33_GATE>;
-> -		status =3D "disabled";
-> -	};
-> -
-> -	mqs1: mqs1 {
-> -		compatible =3D "fsl,imx93-mqs";
-> -		gpr =3D <&aonmix_ns_gpr>;
-> -		status =3D "disabled";
-> -	};
-> -
-> -	mqs2: mqs2 {
-> -		compatible =3D "fsl,imx93-mqs";
-> -		gpr =3D <&wakeupmix_gpr>;
-> -		status =3D "disabled";
-> -	};
-> -
-> -	usbphynop1: usbphynop1 {
-> -		compatible =3D "usb-nop-xceiv";
-> -		#phy-cells =3D <0>;
-> -		clocks =3D <&clk IMX93_CLK_USB_PHY_BURUNIN>;
-> -		clock-names =3D "main_clk";
-> -	};
-> -
-> -	usbphynop2: usbphynop2 {
-> -		compatible =3D "usb-nop-xceiv";
-> -		#phy-cells =3D <0>;
-> -		clocks =3D <&clk IMX93_CLK_USB_PHY_BURUNIN>;
-> -		clock-names =3D "main_clk";
-> -	};
-> -
-> -	soc@0 {
-> -		compatible =3D "simple-bus";
-> -		#address-cells =3D <1>;
-> -		#size-cells =3D <1>;
-> -		ranges =3D <0x0 0x0 0x0 0x80000000>,
-> -			 <0x28000000 0x0 0x28000000 0x10000000>;
-> -
-> -		aips1: bus@44000000 {
-> -			compatible =3D "fsl,aips-bus", "simple-bus";
-> -			reg =3D <0x44000000 0x800000>;
-> -			#address-cells =3D <1>;
-> -			#size-cells =3D <1>;
-> -			ranges;
-> -
-> -			edma1: dma-controller@44000000 {
-> -				compatible =3D "fsl,imx93-edma3";
-> -				reg =3D <0x44000000 0x200000>;
-> -				#dma-cells =3D <3>;
-> -				dma-channels =3D <31>;
-> -				interrupts =3D <GIC_SPI 95 IRQ_TYPE_LEVEL_HIGH>,  //  0: Reserved
-> -					     <GIC_SPI 96 IRQ_TYPE_LEVEL_HIGH>,  //  1: CANFD1
-> -					     <GIC_SPI 97 IRQ_TYPE_LEVEL_HIGH>,  //  2: Reserved
-> -					     <GIC_SPI 98 IRQ_TYPE_LEVEL_HIGH>,  //  3: GPIO1 CH0
-> -					     <GIC_SPI 99 IRQ_TYPE_LEVEL_HIGH>,  //  4: GPIO1 CH1
-> -					     <GIC_SPI 100 IRQ_TYPE_LEVEL_HIGH>, //  5: I3C1 TO Bus
-> -					     <GIC_SPI 101 IRQ_TYPE_LEVEL_HIGH>, //  6: I3C1 From Bus
-> -					     <GIC_SPI 102 IRQ_TYPE_LEVEL_HIGH>, //  7: LPI2C1 M TX
-> -					     <GIC_SPI 103 IRQ_TYPE_LEVEL_HIGH>, //  8: LPI2C1 S TX
-> -					     <GIC_SPI 104 IRQ_TYPE_LEVEL_HIGH>, //  9: LPI2C2 M RX
-> -					     <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>, // 10: LPI2C2 S RX
-> -					     <GIC_SPI 106 IRQ_TYPE_LEVEL_HIGH>, // 11: LPSPI1 TX
-> -					     <GIC_SPI 107 IRQ_TYPE_LEVEL_HIGH>, // 12: LPSPI1 RX
-> -					     <GIC_SPI 108 IRQ_TYPE_LEVEL_HIGH>, // 13: LPSPI2 TX
-> -					     <GIC_SPI 109 IRQ_TYPE_LEVEL_HIGH>, // 14: LPSPI2 RX
-> -					     <GIC_SPI 110 IRQ_TYPE_LEVEL_HIGH>, // 15: LPTMR1
-> -					     <GIC_SPI 111 IRQ_TYPE_LEVEL_HIGH>, // 16: LPUART1 TX
-> -					     <GIC_SPI 112 IRQ_TYPE_LEVEL_HIGH>, // 17: LPUART1 RX
-> -					     <GIC_SPI 113 IRQ_TYPE_LEVEL_HIGH>, // 18: LPUART2 TX
-> -					     <GIC_SPI 114 IRQ_TYPE_LEVEL_HIGH>, // 19: LPUART2 RX
-> -					     <GIC_SPI 115 IRQ_TYPE_LEVEL_HIGH>, // 20: S400
-> -					     <GIC_SPI 116 IRQ_TYPE_LEVEL_HIGH>, // 21: SAI TX
-> -					     <GIC_SPI 117 IRQ_TYPE_LEVEL_HIGH>, // 22: SAI RX
-> -					     <GIC_SPI 118 IRQ_TYPE_LEVEL_HIGH>, // 23: TPM1 CH0/CH2
-> -					     <GIC_SPI 119 IRQ_TYPE_LEVEL_HIGH>, // 24: TPM1 CH1/CH3
-> -					     <GIC_SPI 120 IRQ_TYPE_LEVEL_HIGH>, // 25: TPM1 Overflow
-> -					     <GIC_SPI 121 IRQ_TYPE_LEVEL_HIGH>, // 26: TMP2 CH0/CH2
-> -					     <GIC_SPI 122 IRQ_TYPE_LEVEL_HIGH>, // 27: TMP2 CH1/CH3
-> -					     <GIC_SPI 123 IRQ_TYPE_LEVEL_HIGH>, // 28: TMP2 Overflow
-> -					     <GIC_SPI 124 IRQ_TYPE_LEVEL_HIGH>, // 29: PDM
-> -					     <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>, // 30: ADC1
-> -					     <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>;  // err
-> -				clocks =3D <&clk IMX93_CLK_EDMA1_GATE>;
-> -				clock-names =3D "dma";
-> -			};
-> -
-> -			aonmix_ns_gpr: syscon@44210000 {
-> -				compatible =3D "fsl,imx93-aonmix-ns-syscfg", "syscon";
-> -				reg =3D <0x44210000 0x1000>;
-> -			};
-> -
-> -			mu1: mailbox@44230000 {
-> -				compatible =3D "fsl,imx93-mu", "fsl,imx8ulp-mu";
-> -				reg =3D <0x44230000 0x10000>;
-> -				interrupts =3D <GIC_SPI 22 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_MU1_B_GATE>;
-> -				#mbox-cells =3D <2>;
-> -				status =3D "disabled";
-> -			};
-> -
-> -			system_counter: timer@44290000 {
-> -				compatible =3D "nxp,sysctr-timer";
-> -				reg =3D <0x44290000 0x30000>;
-> -				interrupts =3D <GIC_SPI 74 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&osc_24m>;
-> -				clock-names =3D "per";
-> -				nxp,no-divider;
-> -			};
-> -
-> -			wdog1: watchdog@442d0000 {
-> -				compatible =3D "fsl,imx93-wdt";
-> -				reg =3D <0x442d0000 0x10000>;
-> -				interrupts =3D <GIC_SPI 38 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_WDOG1_GATE>;
-> -				timeout-sec =3D <40>;
-> -				status =3D "disabled";
-> -			};
-> -
-> -			wdog2: watchdog@442e0000 {
-> -				compatible =3D "fsl,imx93-wdt";
-> -				reg =3D <0x442e0000 0x10000>;
-> -				interrupts =3D <GIC_SPI 39 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_WDOG2_GATE>;
-> -				timeout-sec =3D <40>;
-> -				status =3D "disabled";
-> -			};
-> -
-> -			tpm1: pwm@44310000 {
-> -				compatible =3D "fsl,imx7ulp-pwm";
-> -				reg =3D <0x44310000 0x1000>;
-> -				clocks =3D <&clk IMX93_CLK_TPM1_GATE>;
-> -				#pwm-cells =3D <3>;
-> -				status =3D "disabled";
-> -			};
-> -
-> -			tpm2: pwm@44320000 {
-> -				compatible =3D "fsl,imx7ulp-pwm";
-> -				reg =3D <0x44320000 0x10000>;
-> -				clocks =3D <&clk IMX93_CLK_TPM2_GATE>;
-> -				#pwm-cells =3D <3>;
-> -				status =3D "disabled";
-> -			};
-> -
-> -			i3c1: i3c@44330000 {
-> -				compatible =3D "silvaco,i3c-master-v1";
-> -				reg =3D <0x44330000 0x10000>;
-> -				interrupts =3D <GIC_SPI 12 IRQ_TYPE_LEVEL_HIGH>;
-> -				#address-cells =3D <3>;
-> -				#size-cells =3D <0>;
-> -				clocks =3D <&clk IMX93_CLK_BUS_AON>,
-> -					 <&clk IMX93_CLK_I3C1_GATE>,
-> -					 <&clk IMX93_CLK_I3C1_SLOW>;
-> -				clock-names =3D "pclk", "fast_clk", "slow_clk";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			lpi2c1: i2c@44340000 {
-> -				compatible =3D "fsl,imx93-lpi2c", "fsl,imx7ulp-lpi2c";
-> -				reg =3D <0x44340000 0x10000>;
-> -				#address-cells =3D <1>;
-> -				#size-cells =3D <0>;
-> -				interrupts =3D <GIC_SPI 13 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_LPI2C1_GATE>,
-> -					 <&clk IMX93_CLK_BUS_AON>;
-> -				clock-names =3D "per", "ipg";
-> -				dmas =3D <&edma1 7 0 0>, <&edma1 8 0 FSL_EDMA_RX>;
-> -				dma-names =3D "tx", "rx";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			lpi2c2: i2c@44350000 {
-> -				compatible =3D "fsl,imx93-lpi2c", "fsl,imx7ulp-lpi2c";
-> -				reg =3D <0x44350000 0x10000>;
-> -				#address-cells =3D <1>;
-> -				#size-cells =3D <0>;
-> -				interrupts =3D <GIC_SPI 14 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_LPI2C2_GATE>,
-> -					 <&clk IMX93_CLK_BUS_AON>;
-> -				clock-names =3D "per", "ipg";
-> -				dmas =3D <&edma1 9 0 0>, <&edma1 10 0 FSL_EDMA_RX>;
-> -				dma-names =3D "tx", "rx";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			lpspi1: spi@44360000 {
-> -				#address-cells =3D <1>;
-> -				#size-cells =3D <0>;
-> -				compatible =3D "fsl,imx93-spi", "fsl,imx7ulp-spi";
-> -				reg =3D <0x44360000 0x10000>;
-> -				interrupts =3D <GIC_SPI 16 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_LPSPI1_GATE>,
-> -					 <&clk IMX93_CLK_BUS_AON>;
-> -				clock-names =3D "per", "ipg";
-> -				dmas =3D <&edma1 11 0 0>, <&edma1 12 0 FSL_EDMA_RX>;
-> -				dma-names =3D "tx", "rx";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			lpspi2: spi@44370000 {
-> -				#address-cells =3D <1>;
-> -				#size-cells =3D <0>;
-> -				compatible =3D "fsl,imx93-spi", "fsl,imx7ulp-spi";
-> -				reg =3D <0x44370000 0x10000>;
-> -				interrupts =3D <GIC_SPI 17 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_LPSPI2_GATE>,
-> -					 <&clk IMX93_CLK_BUS_AON>;
-> -				clock-names =3D "per", "ipg";
-> -				dmas =3D <&edma1 13 0 0>, <&edma1 14 0 FSL_EDMA_RX>;
-> -				dma-names =3D "tx", "rx";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			lpuart1: serial@44380000 {
-> -				compatible =3D "fsl,imx93-lpuart", "fsl,imx8ulp-lpuart", "fsl,imx7ul=
-p-lpuart";
-> -				reg =3D <0x44380000 0x1000>;
-> -				interrupts =3D <GIC_SPI 19 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_LPUART1_GATE>;
-> -				clock-names =3D "ipg";
-> -				dmas =3D <&edma1 17 0 FSL_EDMA_RX>, <&edma1 16 0 0>;
-> -				dma-names =3D "rx", "tx";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			lpuart2: serial@44390000 {
-> -				compatible =3D "fsl,imx93-lpuart", "fsl,imx8ulp-lpuart", "fsl,imx7ul=
-p-lpuart";
-> -				reg =3D <0x44390000 0x1000>;
-> -				interrupts =3D <GIC_SPI 20 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_LPUART2_GATE>;
-> -				clock-names =3D "ipg";
-> -				dmas =3D <&edma1 19 0 FSL_EDMA_RX>, <&edma1 18 0 0>;
-> -				dma-names =3D "rx", "tx";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			flexcan1: can@443a0000 {
-> -				compatible =3D "fsl,imx93-flexcan";
-> -				reg =3D <0x443a0000 0x10000>;
-> -				interrupts =3D <GIC_SPI 8 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_BUS_AON>,
-> -					 <&clk IMX93_CLK_CAN1_GATE>;
-> -				clock-names =3D "ipg", "per";
-> -				assigned-clocks =3D <&clk IMX93_CLK_CAN1>;
-> -				assigned-clock-parents =3D <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
-> -				assigned-clock-rates =3D <40000000>;
-> -				fsl,clk-source =3D /bits/ 8 <0>;
-> -				fsl,stop-mode =3D <&aonmix_ns_gpr 0x14 0>;
-> -				status =3D "disabled";
-> -			};
-> -
-> -			sai1: sai@443b0000 {
-> -				compatible =3D "fsl,imx93-sai";
-> -				reg =3D <0x443b0000 0x10000>;
-> -				interrupts =3D <GIC_SPI 45 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_SAI1_IPG>, <&clk IMX93_CLK_DUMMY>,
-> -					 <&clk IMX93_CLK_SAI1_GATE>, <&clk IMX93_CLK_DUMMY>,
-> -					 <&clk IMX93_CLK_DUMMY>;
-> -				clock-names =3D "bus", "mclk0", "mclk1", "mclk2", "mclk3";
-> -				dmas =3D <&edma1 22 0 FSL_EDMA_RX>, <&edma1 21 0 0>;
-> -				dma-names =3D "rx", "tx";
-> -				#sound-dai-cells =3D <0>;
-> -				status =3D "disabled";
-> -			};
-> -
-> -			iomuxc: pinctrl@443c0000 {
-> -				compatible =3D "fsl,imx93-iomuxc";
-> -				reg =3D <0x443c0000 0x10000>;
-> -				status =3D "okay";
-> -			};
-> -
-> -			bbnsm: bbnsm@44440000 {
-> -				compatible =3D "nxp,imx93-bbnsm", "syscon", "simple-mfd";
-> -				reg =3D <0x44440000 0x10000>;
-> -
-> -				bbnsm_rtc: rtc {
-> -					compatible =3D "nxp,imx93-bbnsm-rtc";
-> -					interrupts =3D <GIC_SPI 73 IRQ_TYPE_LEVEL_HIGH>;
-> -				};
-> -
-> -				bbnsm_pwrkey: pwrkey {
-> -					compatible =3D "nxp,imx93-bbnsm-pwrkey";
-> -					interrupts =3D <GIC_SPI 73 IRQ_TYPE_LEVEL_HIGH>;
-> -					linux,code =3D <KEY_POWER>;
-> -				};
-> -			};
-> -
-> -			clk: clock-controller@44450000 {
-> -				compatible =3D "fsl,imx93-ccm";
-> -				reg =3D <0x44450000 0x10000>;
-> -				#clock-cells =3D <1>;
-> -				clocks =3D <&osc_32k>, <&osc_24m>, <&clk_ext1>;
-> -				clock-names =3D "osc_32k", "osc_24m", "clk_ext1";
-> -				assigned-clocks =3D <&clk IMX93_CLK_AUDIO_PLL>;
-> -				assigned-clock-rates =3D <393216000>;
-> -				status =3D "okay";
-> -			};
-> -
-> -			src: system-controller@44460000 {
-> -				compatible =3D "fsl,imx93-src", "syscon";
-> -				reg =3D <0x44460000 0x10000>;
-> -				#address-cells =3D <1>;
-> -				#size-cells =3D <1>;
-> -				ranges;
-> -
-> -				mlmix: power-domain@44461800 {
-> -					compatible =3D "fsl,imx93-src-slice";
-> -					reg =3D <0x44461800 0x400>, <0x44464800 0x400>;
-> -					#power-domain-cells =3D <0>;
-> -					clocks =3D <&clk IMX93_CLK_ML_APB>,
-> -						 <&clk IMX93_CLK_ML>;
-> -				};
-> -
-> -				mediamix: power-domain@44462400 {
-> -					compatible =3D "fsl,imx93-src-slice";
-> -					reg =3D <0x44462400 0x400>, <0x44465800 0x400>;
-> -					#power-domain-cells =3D <0>;
-> -					clocks =3D <&clk IMX93_CLK_NIC_MEDIA_GATE>,
-> -						 <&clk IMX93_CLK_MEDIA_APB>;
-> -				};
-> -			};
-> -
-> -			clock-controller@44480000 {
-> -				compatible =3D "fsl,imx93-anatop";
-> -				reg =3D <0x44480000 0x2000>;
-> -				#clock-cells =3D <1>;
-> -			};
-> -
-> -			tmu: tmu@44482000 {
-> -				compatible =3D "fsl,qoriq-tmu";
-> -				reg =3D <0x44482000 0x1000>;
-> -				interrupts =3D <GIC_SPI 83 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_TMC_GATE>;
-> -				little-endian;
-> -				fsl,tmu-range =3D <0x800000da 0x800000e9
-> -						 0x80000102 0x8000012a
-> -						 0x80000166 0x800001a7
-> -						 0x800001b6>;
-> -				fsl,tmu-calibration =3D <0x00000000 0x0000000e
-> -						       0x00000001 0x00000029
-> -						       0x00000002 0x00000056
-> -						       0x00000003 0x000000a2
-> -						       0x00000004 0x00000116
-> -						       0x00000005 0x00000195
-> -						       0x00000006 0x000001b2>;
-> -				#thermal-sensor-cells =3D <1>;
-> -			};
-> -
-> -			micfil: micfil@44520000 {
-> -				compatible =3D "fsl,imx93-micfil";
-> -				reg =3D <0x44520000 0x10000>;
-> -				interrupts =3D <GIC_SPI 202 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 201 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 200 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 199 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_PDM_IPG>,
-> -					 <&clk IMX93_CLK_PDM_GATE>,
-> -					 <&clk IMX93_CLK_AUDIO_PLL>;
-> -				clock-names =3D "ipg_clk", "ipg_clk_app", "pll8k";
-> -				dmas =3D <&edma1 29 0 5>;
-> -				dma-names =3D "rx";
-> -				#sound-dai-cells =3D <0>;
-> -				status =3D "disabled";
-> -			};
-> -
-> -			adc1: adc@44530000 {
-> -				compatible =3D "nxp,imx93-adc";
-> -				reg =3D <0x44530000 0x10000>;
-> -				interrupts =3D <GIC_SPI 217 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 218 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 219 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_ADC1_GATE>;
-> -				clock-names =3D "ipg";
-> -				#io-channel-cells =3D <1>;
-> -				status =3D "disabled";
-> -			};
-> -		};
-> -
-> -		aips2: bus@42000000 {
-> -			compatible =3D "fsl,aips-bus", "simple-bus";
-> -			reg =3D <0x42000000 0x800000>;
-> -			#address-cells =3D <1>;
-> -			#size-cells =3D <1>;
-> -			ranges;
-> -
-> -			edma2: dma-controller@42000000 {
-> -				compatible =3D "fsl,imx93-edma4";
-> -				reg =3D <0x42000000 0x210000>;
-> -				#dma-cells =3D <3>;
-> -				dma-channels =3D <64>;
-> -				interrupts =3D <GIC_SPI 128 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 128 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 129 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 129 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 130 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 130 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 131 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 131 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 132 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 132 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 133 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 133 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 134 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 134 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 135 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 135 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 136 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 136 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 137 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 137 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 138 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 138 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 139 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 139 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 140 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 140 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 141 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 141 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 142 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 142 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 143 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 143 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 144 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 144 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 145 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 145 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 146 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 146 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 147 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 147 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 148 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 148 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 149 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 149 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 150 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 150 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 151 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 151 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 152 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 152 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 153 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 153 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 154 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 154 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 155 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 155 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 156 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 156 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 157 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 157 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 158 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 158 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 159 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 159 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 127 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_EDMA2_GATE>;
-> -				clock-names =3D "dma";
-> -			};
-> -
-> -			wakeupmix_gpr: syscon@42420000 {
-> -				compatible =3D "fsl,imx93-wakeupmix-syscfg", "syscon";
-> -				reg =3D <0x42420000 0x1000>;
-> -			};
-> -
-> -			mu2: mailbox@42440000 {
-> -				compatible =3D "fsl,imx93-mu", "fsl,imx8ulp-mu";
-> -				reg =3D <0x42440000 0x10000>;
-> -				interrupts =3D <GIC_SPI 24 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_MU2_B_GATE>;
-> -				#mbox-cells =3D <2>;
-> -				status =3D "disabled";
-> -			};
-> -
-> -			wdog3: watchdog@42490000 {
-> -				compatible =3D "fsl,imx93-wdt";
-> -				reg =3D <0x42490000 0x10000>;
-> -				interrupts =3D <GIC_SPI 79 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_WDOG3_GATE>;
-> -				timeout-sec =3D <40>;
-> -				status =3D "disabled";
-> -			};
-> -
-> -			wdog4: watchdog@424a0000 {
-> -				compatible =3D "fsl,imx93-wdt";
-> -				reg =3D <0x424a0000 0x10000>;
-> -				interrupts =3D <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_WDOG4_GATE>;
-> -				timeout-sec =3D <40>;
-> -				status =3D "disabled";
-> -			};
-> -
-> -			wdog5: watchdog@424b0000 {
-> -				compatible =3D "fsl,imx93-wdt";
-> -				reg =3D <0x424b0000 0x10000>;
-> -				interrupts =3D <GIC_SPI 81 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_WDOG5_GATE>;
-> -				timeout-sec =3D <40>;
-> -				status =3D "disabled";
-> -			};
-> -
-> -			tpm3: pwm@424e0000 {
-> -				compatible =3D "fsl,imx7ulp-pwm";
-> -				reg =3D <0x424e0000 0x1000>;
-> -				clocks =3D <&clk IMX93_CLK_TPM3_GATE>;
-> -				#pwm-cells =3D <3>;
-> -				status =3D "disabled";
-> -			};
-> -
-> -			tpm4: pwm@424f0000 {
-> -				compatible =3D "fsl,imx7ulp-pwm";
-> -				reg =3D <0x424f0000 0x10000>;
-> -				clocks =3D <&clk IMX93_CLK_TPM4_GATE>;
-> -				#pwm-cells =3D <3>;
-> -				status =3D "disabled";
-> -			};
-> -
-> -			tpm5: pwm@42500000 {
-> -				compatible =3D "fsl,imx7ulp-pwm";
-> -				reg =3D <0x42500000 0x10000>;
-> -				clocks =3D <&clk IMX93_CLK_TPM5_GATE>;
-> -				#pwm-cells =3D <3>;
-> -				status =3D "disabled";
-> -			};
-> -
-> -			tpm6: pwm@42510000 {
-> -				compatible =3D "fsl,imx7ulp-pwm";
-> -				reg =3D <0x42510000 0x10000>;
-> -				clocks =3D <&clk IMX93_CLK_TPM6_GATE>;
-> -				#pwm-cells =3D <3>;
-> -				status =3D "disabled";
-> -			};
-> -
-> -			i3c2: i3c@42520000 {
-> -				compatible =3D "silvaco,i3c-master-v1";
-> -				reg =3D <0x42520000 0x10000>;
-> -				interrupts =3D <GIC_SPI 61 IRQ_TYPE_LEVEL_HIGH>;
-> -				#address-cells =3D <3>;
-> -				#size-cells =3D <0>;
-> -				clocks =3D <&clk IMX93_CLK_BUS_WAKEUP>,
-> -					 <&clk IMX93_CLK_I3C2_GATE>,
-> -					 <&clk IMX93_CLK_I3C2_SLOW>;
-> -				clock-names =3D "pclk", "fast_clk", "slow_clk";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			lpi2c3: i2c@42530000 {
-> -				compatible =3D "fsl,imx93-lpi2c", "fsl,imx7ulp-lpi2c";
-> -				reg =3D <0x42530000 0x10000>;
-> -				#address-cells =3D <1>;
-> -				#size-cells =3D <0>;
-> -				interrupts =3D <GIC_SPI 62 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_LPI2C3_GATE>,
-> -					 <&clk IMX93_CLK_BUS_WAKEUP>;
-> -				clock-names =3D "per", "ipg";
-> -				dmas =3D <&edma2 8 0 0>, <&edma2 9 0 FSL_EDMA_RX>;
-> -				dma-names =3D "tx", "rx";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			lpi2c4: i2c@42540000 {
-> -				compatible =3D "fsl,imx93-lpi2c", "fsl,imx7ulp-lpi2c";
-> -				reg =3D <0x42540000 0x10000>;
-> -				#address-cells =3D <1>;
-> -				#size-cells =3D <0>;
-> -				interrupts =3D <GIC_SPI 63 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_LPI2C4_GATE>,
-> -					 <&clk IMX93_CLK_BUS_WAKEUP>;
-> -				clock-names =3D "per", "ipg";
-> -				dmas =3D <&edma2 10 0 0>, <&edma2 11 0 FSL_EDMA_RX>;
-> -				dma-names =3D "tx", "rx";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			lpspi3: spi@42550000 {
-> -				#address-cells =3D <1>;
-> -				#size-cells =3D <0>;
-> -				compatible =3D "fsl,imx93-spi", "fsl,imx7ulp-spi";
-> -				reg =3D <0x42550000 0x10000>;
-> -				interrupts =3D <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_LPSPI3_GATE>,
-> -					 <&clk IMX93_CLK_BUS_WAKEUP>;
-> -				clock-names =3D "per", "ipg";
-> -				dmas =3D <&edma2 12 0 0>, <&edma2 13 0 FSL_EDMA_RX>;
-> -				dma-names =3D "tx", "rx";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			lpspi4: spi@42560000 {
-> -				#address-cells =3D <1>;
-> -				#size-cells =3D <0>;
-> -				compatible =3D "fsl,imx93-spi", "fsl,imx7ulp-spi";
-> -				reg =3D <0x42560000 0x10000>;
-> -				interrupts =3D <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_LPSPI4_GATE>,
-> -					 <&clk IMX93_CLK_BUS_WAKEUP>;
-> -				clock-names =3D "per", "ipg";
-> -				dmas =3D <&edma2 14 0 0>, <&edma2 15 0 FSL_EDMA_RX>;
-> -				dma-names =3D "tx", "rx";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			lpuart3: serial@42570000 {
-> -				compatible =3D "fsl,imx93-lpuart", "fsl,imx8ulp-lpuart", "fsl,imx7ul=
-p-lpuart";
-> -				reg =3D <0x42570000 0x1000>;
-> -				interrupts =3D <GIC_SPI 68 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_LPUART3_GATE>;
-> -				clock-names =3D "ipg";
-> -				dmas =3D <&edma2 18 0 FSL_EDMA_RX>, <&edma2 17 0 0>;
-> -				dma-names =3D "rx", "tx";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			lpuart4: serial@42580000 {
-> -				compatible =3D "fsl,imx93-lpuart", "fsl,imx8ulp-lpuart", "fsl,imx7ul=
-p-lpuart";
-> -				reg =3D <0x42580000 0x1000>;
-> -				interrupts =3D <GIC_SPI 69 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_LPUART4_GATE>;
-> -				clock-names =3D "ipg";
-> -				dmas =3D <&edma2 20 0 FSL_EDMA_RX>, <&edma2 19 0 0>;
-> -				dma-names =3D "rx", "tx";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			lpuart5: serial@42590000 {
-> -				compatible =3D "fsl,imx93-lpuart", "fsl,imx8ulp-lpuart", "fsl,imx7ul=
-p-lpuart";
-> -				reg =3D <0x42590000 0x1000>;
-> -				interrupts =3D <GIC_SPI 70 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_LPUART5_GATE>;
-> -				clock-names =3D "ipg";
-> -				dmas =3D <&edma2 22 0 FSL_EDMA_RX>, <&edma2 21 0 0>;
-> -				dma-names =3D "rx", "tx";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			lpuart6: serial@425a0000 {
-> -				compatible =3D "fsl,imx93-lpuart", "fsl,imx8ulp-lpuart", "fsl,imx7ul=
-p-lpuart";
-> -				reg =3D <0x425a0000 0x1000>;
-> -				interrupts =3D <GIC_SPI 71 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_LPUART6_GATE>;
-> -				clock-names =3D "ipg";
-> -				dmas =3D <&edma2 24 0 FSL_EDMA_RX>, <&edma2 23 0 0>;
-> -				dma-names =3D "rx", "tx";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			flexcan2: can@425b0000 {
-> -				compatible =3D "fsl,imx93-flexcan";
-> -				reg =3D <0x425b0000 0x10000>;
-> -				interrupts =3D <GIC_SPI 51 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_BUS_WAKEUP>,
-> -					 <&clk IMX93_CLK_CAN2_GATE>;
-> -				clock-names =3D "ipg", "per";
-> -				assigned-clocks =3D <&clk IMX93_CLK_CAN2>;
-> -				assigned-clock-parents =3D <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
-> -				assigned-clock-rates =3D <40000000>;
-> -				fsl,clk-source =3D /bits/ 8 <0>;
-> -				fsl,stop-mode =3D <&wakeupmix_gpr 0x0c 2>;
-> -				status =3D "disabled";
-> -			};
-> -
-> -			flexspi1: spi@425e0000 {
-> -				compatible =3D "nxp,imx8mm-fspi";
-> -				reg =3D <0x425e0000 0x10000>, <0x28000000 0x10000000>;
-> -				reg-names =3D "fspi_base", "fspi_mmap";
-> -				#address-cells =3D <1>;
-> -				#size-cells =3D <0>;
-> -				interrupts =3D <GIC_SPI 55 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_FLEXSPI1_GATE>,
-> -					 <&clk IMX93_CLK_FLEXSPI1_GATE>;
-> -				clock-names =3D "fspi_en", "fspi";
-> -				assigned-clocks =3D <&clk IMX93_CLK_FLEXSPI1>;
-> -				assigned-clock-parents =3D <&clk IMX93_CLK_SYS_PLL_PFD1>;
-> -				status =3D "disabled";
-> -			};
-> -
-> -			sai2: sai@42650000 {
-> -				compatible =3D "fsl,imx93-sai";
-> -				reg =3D <0x42650000 0x10000>;
-> -				interrupts =3D <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_SAI2_IPG>, <&clk IMX93_CLK_DUMMY>,
-> -					 <&clk IMX93_CLK_SAI2_GATE>, <&clk IMX93_CLK_DUMMY>,
-> -					 <&clk IMX93_CLK_DUMMY>;
-> -				clock-names =3D "bus", "mclk0", "mclk1", "mclk2", "mclk3";
-> -				dmas =3D <&edma2 59 0 FSL_EDMA_RX>, <&edma2 58 0 0>;
-> -				dma-names =3D "rx", "tx";
-> -				#sound-dai-cells =3D <0>;
-> -				status =3D "disabled";
-> -			};
-> -
-> -			sai3: sai@42660000 {
-> -				compatible =3D "fsl,imx93-sai";
-> -				reg =3D <0x42660000 0x10000>;
-> -				interrupts =3D <GIC_SPI 171 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_SAI3_IPG>, <&clk IMX93_CLK_DUMMY>,
-> -					 <&clk IMX93_CLK_SAI3_GATE>, <&clk IMX93_CLK_DUMMY>,
-> -					 <&clk IMX93_CLK_DUMMY>;
-> -				clock-names =3D "bus", "mclk0", "mclk1", "mclk2", "mclk3";
-> -				dmas =3D <&edma2 61 0 FSL_EDMA_RX>, <&edma2 60 0 0>;
-> -				dma-names =3D "rx", "tx";
-> -				#sound-dai-cells =3D <0>;
-> -				status =3D "disabled";
-> -			};
-> -
-> -			xcvr: xcvr@42680000 {
-> -				compatible =3D "fsl,imx93-xcvr";
-> -				reg =3D <0x42680000 0x800>,
-> -				      <0x42680800 0x400>,
-> -				      <0x42680c00 0x080>,
-> -				      <0x42680e00 0x080>;
-> -				reg-names =3D "ram", "regs", "rxfifo", "txfifo";
-> -				interrupts =3D <GIC_SPI 203 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 204 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_SPDIF_IPG>,
-> -					 <&clk IMX93_CLK_SPDIF_GATE>,
-> -					 <&clk IMX93_CLK_DUMMY>,
-> -					 <&clk IMX93_CLK_AUD_XCVR_GATE>;
-> -				clock-names =3D "ipg", "phy", "spba", "pll_ipg";
-> -				dmas =3D <&edma2 65 0 FSL_EDMA_RX>, <&edma2 66 0 0>;
-> -				dma-names =3D "rx", "tx";
-> -				#sound-dai-cells =3D <0>;
-> -				status =3D "disabled";
-> -			};
-> -
-> -			lpuart7: serial@42690000 {
-> -				compatible =3D "fsl,imx93-lpuart", "fsl,imx8ulp-lpuart", "fsl,imx7ul=
-p-lpuart";
-> -				reg =3D <0x42690000 0x1000>;
-> -				interrupts =3D <GIC_SPI 210 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_LPUART7_GATE>;
-> -				clock-names =3D "ipg";
-> -				dmas =3D <&edma2 88 0 FSL_EDMA_RX>, <&edma2 87 0 0>;
-> -				dma-names =3D "rx", "tx";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			lpuart8: serial@426a0000 {
-> -				compatible =3D "fsl,imx93-lpuart", "fsl,imx8ulp-lpuart", "fsl,imx7ul=
-p-lpuart";
-> -				reg =3D <0x426a0000 0x1000>;
-> -				interrupts =3D <GIC_SPI 211 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_LPUART8_GATE>;
-> -				clock-names =3D "ipg";
-> -				dmas =3D <&edma2 90 0 FSL_EDMA_RX>, <&edma2 89 0 0>;
-> -				dma-names =3D "rx", "tx";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			lpi2c5: i2c@426b0000 {
-> -				compatible =3D "fsl,imx93-lpi2c", "fsl,imx7ulp-lpi2c";
-> -				reg =3D <0x426b0000 0x10000>;
-> -				#address-cells =3D <1>;
-> -				#size-cells =3D <0>;
-> -				interrupts =3D <GIC_SPI 195 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_LPI2C5_GATE>,
-> -					 <&clk IMX93_CLK_BUS_WAKEUP>;
-> -				clock-names =3D "per", "ipg";
-> -				dmas =3D <&edma2 71 0 0>, <&edma2 72 0 FSL_EDMA_RX>;
-> -				dma-names =3D "tx", "rx";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			lpi2c6: i2c@426c0000 {
-> -				compatible =3D "fsl,imx93-lpi2c", "fsl,imx7ulp-lpi2c";
-> -				reg =3D <0x426c0000 0x10000>;
-> -				#address-cells =3D <1>;
-> -				#size-cells =3D <0>;
-> -				interrupts =3D <GIC_SPI 196 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_LPI2C6_GATE>,
-> -					 <&clk IMX93_CLK_BUS_WAKEUP>;
-> -				clock-names =3D "per", "ipg";
-> -				dmas =3D <&edma2 73 0 0>, <&edma2 74 0 FSL_EDMA_RX>;
-> -				dma-names =3D "tx", "rx";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			lpi2c7: i2c@426d0000 {
-> -				compatible =3D "fsl,imx93-lpi2c", "fsl,imx7ulp-lpi2c";
-> -				reg =3D <0x426d0000 0x10000>;
-> -				#address-cells =3D <1>;
-> -				#size-cells =3D <0>;
-> -				interrupts =3D <GIC_SPI 197 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_LPI2C7_GATE>,
-> -					 <&clk IMX93_CLK_BUS_WAKEUP>;
-> -				clock-names =3D "per", "ipg";
-> -				dmas =3D <&edma2 75 0 0>, <&edma2 76 0 FSL_EDMA_RX>;
-> -				dma-names =3D "tx", "rx";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			lpi2c8: i2c@426e0000 {
-> -				compatible =3D "fsl,imx93-lpi2c", "fsl,imx7ulp-lpi2c";
-> -				reg =3D <0x426e0000 0x10000>;
-> -				#address-cells =3D <1>;
-> -				#size-cells =3D <0>;
-> -				interrupts =3D <GIC_SPI 198 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_LPI2C8_GATE>,
-> -					 <&clk IMX93_CLK_BUS_WAKEUP>;
-> -				clock-names =3D "per", "ipg";
-> -				dmas =3D <&edma2 77 0 0>, <&edma2 78 0 FSL_EDMA_RX>;
-> -				dma-names =3D "tx", "rx";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			lpspi5: spi@426f0000 {
-> -				#address-cells =3D <1>;
-> -				#size-cells =3D <0>;
-> -				compatible =3D "fsl,imx93-spi", "fsl,imx7ulp-spi";
-> -				reg =3D <0x426f0000 0x10000>;
-> -				interrupts =3D <GIC_SPI 191 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_LPSPI5_GATE>,
-> -					 <&clk IMX93_CLK_BUS_WAKEUP>;
-> -				clock-names =3D "per", "ipg";
-> -				dmas =3D <&edma2 79 0 0>, <&edma2 80 0 FSL_EDMA_RX>;
-> -				dma-names =3D "tx", "rx";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			lpspi6: spi@42700000 {
-> -				#address-cells =3D <1>;
-> -				#size-cells =3D <0>;
-> -				compatible =3D "fsl,imx93-spi", "fsl,imx7ulp-spi";
-> -				reg =3D <0x42700000 0x10000>;
-> -				interrupts =3D <GIC_SPI 192 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_LPSPI6_GATE>,
-> -					 <&clk IMX93_CLK_BUS_WAKEUP>;
-> -				clock-names =3D "per", "ipg";
-> -				dmas =3D <&edma2 81 0 0>, <&edma2 82 0 FSL_EDMA_RX>;
-> -				dma-names =3D "tx", "rx";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			lpspi7: spi@42710000 {
-> -				#address-cells =3D <1>;
-> -				#size-cells =3D <0>;
-> -				compatible =3D "fsl,imx93-spi", "fsl,imx7ulp-spi";
-> -				reg =3D <0x42710000 0x10000>;
-> -				interrupts =3D <GIC_SPI 193 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_LPSPI7_GATE>,
-> -					 <&clk IMX93_CLK_BUS_WAKEUP>;
-> -				clock-names =3D "per", "ipg";
-> -				dmas =3D <&edma2 83 0 0>, <&edma2 84 0 FSL_EDMA_RX>;
-> -				dma-names =3D "tx", "rx";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			lpspi8: spi@42720000 {
-> -				#address-cells =3D <1>;
-> -				#size-cells =3D <0>;
-> -				compatible =3D "fsl,imx93-spi", "fsl,imx7ulp-spi";
-> -				reg =3D <0x42720000 0x10000>;
-> -				interrupts =3D <GIC_SPI 194 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_LPSPI8_GATE>,
-> -					 <&clk IMX93_CLK_BUS_WAKEUP>;
-> -				clock-names =3D "per", "ipg";
-> -				dmas =3D <&edma2 85 0 0>, <&edma2 86 0 FSL_EDMA_RX>;
-> -				dma-names =3D "tx", "rx";
-> -				status =3D "disabled";
-> -			};
-> -
-> -		};
-> -
-> -		aips3: bus@42800000 {
-> -			compatible =3D "fsl,aips-bus", "simple-bus";
-> -			reg =3D <0x42800000 0x800000>;
-> -			#address-cells =3D <1>;
-> -			#size-cells =3D <1>;
-> -			ranges;
-> -
-> -			usdhc1: mmc@42850000 {
-> -				compatible =3D "fsl,imx93-usdhc", "fsl,imx8mm-usdhc";
-> -				reg =3D <0x42850000 0x10000>;
-> -				interrupts =3D <GIC_SPI 86 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_BUS_WAKEUP>,
-> -					 <&clk IMX93_CLK_WAKEUP_AXI>,
-> -					 <&clk IMX93_CLK_USDHC1_GATE>;
-> -				clock-names =3D "ipg", "ahb", "per";
-> -				assigned-clocks =3D <&clk IMX93_CLK_USDHC1>;
-> -				assigned-clock-parents =3D <&clk IMX93_CLK_SYS_PLL_PFD1>;
-> -				assigned-clock-rates =3D <400000000>;
-> -				bus-width =3D <8>;
-> -				fsl,tuning-start-tap =3D <1>;
-> -				fsl,tuning-step =3D <2>;
-> -				status =3D "disabled";
-> -			};
-> -
-> -			usdhc2: mmc@42860000 {
-> -				compatible =3D "fsl,imx93-usdhc", "fsl,imx8mm-usdhc";
-> -				reg =3D <0x42860000 0x10000>;
-> -				interrupts =3D <GIC_SPI 87 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_BUS_WAKEUP>,
-> -					 <&clk IMX93_CLK_WAKEUP_AXI>,
-> -					 <&clk IMX93_CLK_USDHC2_GATE>;
-> -				clock-names =3D "ipg", "ahb", "per";
-> -				assigned-clocks =3D <&clk IMX93_CLK_USDHC2>;
-> -				assigned-clock-parents =3D <&clk IMX93_CLK_SYS_PLL_PFD1>;
-> -				assigned-clock-rates =3D <400000000>;
-> -				bus-width =3D <4>;
-> -				fsl,tuning-start-tap =3D <1>;
-> -				fsl,tuning-step =3D <2>;
-> -				status =3D "disabled";
-> -			};
-> -
-> -			fec: ethernet@42890000 {
-> -				compatible =3D "fsl,imx93-fec", "fsl,imx8mq-fec", "fsl,imx6sx-fec";
-> -				reg =3D <0x42890000 0x10000>;
-> -				interrupts =3D <GIC_SPI 179 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 180 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 181 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 182 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_ENET1_GATE>,
-> -					 <&clk IMX93_CLK_ENET1_GATE>,
-> -					 <&clk IMX93_CLK_ENET_TIMER1>,
-> -					 <&clk IMX93_CLK_ENET_REF>,
-> -					 <&clk IMX93_CLK_ENET_REF_PHY>;
-> -				clock-names =3D "ipg", "ahb", "ptp",
-> -					      "enet_clk_ref", "enet_out";
-> -				assigned-clocks =3D <&clk IMX93_CLK_ENET_TIMER1>,
-> -						  <&clk IMX93_CLK_ENET_REF>,
-> -						  <&clk IMX93_CLK_ENET_REF_PHY>;
-> -				assigned-clock-parents =3D <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>,
-> -							 <&clk IMX93_CLK_SYS_PLL_PFD0_DIV2>,
-> -							 <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
-> -				assigned-clock-rates =3D <100000000>, <250000000>, <50000000>;
-> -				fsl,num-tx-queues =3D <3>;
-> -				fsl,num-rx-queues =3D <3>;
-> -				fsl,stop-mode =3D <&wakeupmix_gpr 0x0c 1>;
-> -				nvmem-cells =3D <&eth_mac1>;
-> -				nvmem-cell-names =3D "mac-address";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			eqos: ethernet@428a0000 {
-> -				compatible =3D "nxp,imx93-dwmac-eqos", "snps,dwmac-5.10a";
-> -				reg =3D <0x428a0000 0x10000>;
-> -				interrupts =3D <GIC_SPI 184 IRQ_TYPE_LEVEL_HIGH>,
-> -					     <GIC_SPI 183 IRQ_TYPE_LEVEL_HIGH>;
-> -				interrupt-names =3D "macirq", "eth_wake_irq";
-> -				clocks =3D <&clk IMX93_CLK_ENET_QOS_GATE>,
-> -					 <&clk IMX93_CLK_ENET_QOS_GATE>,
-> -					 <&clk IMX93_CLK_ENET_TIMER2>,
-> -					 <&clk IMX93_CLK_ENET>,
-> -					 <&clk IMX93_CLK_ENET_QOS_GATE>;
-> -				clock-names =3D "stmmaceth", "pclk", "ptp_ref", "tx", "mem";
-> -				assigned-clocks =3D <&clk IMX93_CLK_ENET_TIMER2>,
-> -						  <&clk IMX93_CLK_ENET>;
-> -				assigned-clock-parents =3D <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>,
-> -							 <&clk IMX93_CLK_SYS_PLL_PFD0_DIV2>;
-> -				assigned-clock-rates =3D <100000000>, <250000000>;
-> -				intf_mode =3D <&wakeupmix_gpr 0x28>;
-> -				snps,clk-csr =3D <6>;
-> -				nvmem-cells =3D <&eth_mac2>;
-> -				nvmem-cell-names =3D "mac-address";
-> -				status =3D "disabled";
-> -			};
-> -
-> -			usdhc3: mmc@428b0000 {
-> -				compatible =3D "fsl,imx93-usdhc", "fsl,imx8mm-usdhc";
-> -				reg =3D <0x428b0000 0x10000>;
-> -				interrupts =3D <GIC_SPI 205 IRQ_TYPE_LEVEL_HIGH>;
-> -				clocks =3D <&clk IMX93_CLK_BUS_WAKEUP>,
-> -					 <&clk IMX93_CLK_WAKEUP_AXI>,
-> -					 <&clk IMX93_CLK_USDHC3_GATE>;
-> -				clock-names =3D "ipg", "ahb", "per";
-> -				assigned-clocks =3D <&clk IMX93_CLK_USDHC3>;
-> -				assigned-clock-parents =3D <&clk IMX93_CLK_SYS_PLL_PFD1>;
-> -				assigned-clock-rates =3D <400000000>;
-> -				bus-width =3D <4>;
-> -				fsl,tuning-start-tap =3D <1>;
-> -				fsl,tuning-step =3D <2>;
-> -				status =3D "disabled";
-> -			};
-> -		};
-> -
-> -		gpio2: gpio@43810000 {
-> -			compatible =3D "fsl,imx93-gpio", "fsl,imx8ulp-gpio";
-> -			reg =3D <0x43810000 0x1000>;
-> -			gpio-controller;
-> -			#gpio-cells =3D <2>;
-> -			interrupts =3D <GIC_SPI 57 IRQ_TYPE_LEVEL_HIGH>,
-> -				     <GIC_SPI 58 IRQ_TYPE_LEVEL_HIGH>;
-> -			interrupt-controller;
-> -			#interrupt-cells =3D <2>;
-> -			clocks =3D <&clk IMX93_CLK_GPIO2_GATE>,
-> -				 <&clk IMX93_CLK_GPIO2_GATE>;
-> -			clock-names =3D "gpio", "port";
-> -			gpio-ranges =3D <&iomuxc 0 4 30>;
-> -			ngpios =3D <30>;
-> -		};
-> -
-> -		gpio3: gpio@43820000 {
-> -			compatible =3D "fsl,imx93-gpio", "fsl,imx8ulp-gpio";
-> -			reg =3D <0x43820000 0x1000>;
-> -			gpio-controller;
-> -			#gpio-cells =3D <2>;
-> -			interrupts =3D <GIC_SPI 59 IRQ_TYPE_LEVEL_HIGH>,
-> -				     <GIC_SPI 60 IRQ_TYPE_LEVEL_HIGH>;
-> -			interrupt-controller;
-> -			#interrupt-cells =3D <2>;
-> -			clocks =3D <&clk IMX93_CLK_GPIO3_GATE>,
-> -				 <&clk IMX93_CLK_GPIO3_GATE>;
-> -			clock-names =3D "gpio", "port";
-> -			gpio-ranges =3D <&iomuxc 0 84 8>, <&iomuxc 8 66 18>,
-> -				      <&iomuxc 26 34 2>, <&iomuxc 28 0 4>;
-> -			ngpios =3D <32>;
-> -		};
-> -
-> -		gpio4: gpio@43830000 {
-> -			compatible =3D "fsl,imx93-gpio", "fsl,imx8ulp-gpio";
-> -			reg =3D <0x43830000 0x1000>;
-> -			gpio-controller;
-> -			#gpio-cells =3D <2>;
-> -			interrupts =3D <GIC_SPI 189 IRQ_TYPE_LEVEL_HIGH>,
-> -				     <GIC_SPI 190 IRQ_TYPE_LEVEL_HIGH>;
-> -			interrupt-controller;
-> -			#interrupt-cells =3D <2>;
-> -			clocks =3D <&clk IMX93_CLK_GPIO4_GATE>,
-> -				 <&clk IMX93_CLK_GPIO4_GATE>;
-> -			clock-names =3D "gpio", "port";
-> -			gpio-ranges =3D <&iomuxc 0 38 28>, <&iomuxc 28 36 2>;
-> -			ngpios =3D <30>;
-> -		};
-> -
-> -		gpio1: gpio@47400000 {
-> -			compatible =3D "fsl,imx93-gpio", "fsl,imx8ulp-gpio";
-> -			reg =3D <0x47400000 0x1000>;
-> -			gpio-controller;
-> -			#gpio-cells =3D <2>;
-> -			interrupts =3D <GIC_SPI 10 IRQ_TYPE_LEVEL_HIGH>,
-> -				     <GIC_SPI 11 IRQ_TYPE_LEVEL_HIGH>;
-> -			interrupt-controller;
-> -			#interrupt-cells =3D <2>;
-> -			clocks =3D <&clk IMX93_CLK_GPIO1_GATE>,
-> -				 <&clk IMX93_CLK_GPIO1_GATE>;
-> -			clock-names =3D "gpio", "port";
-> -			gpio-ranges =3D <&iomuxc 0 92 16>;
-> -			ngpios =3D <16>;
-> -		};
-> -
-> -		ocotp: efuse@47510000 {
-> -			compatible =3D "fsl,imx93-ocotp", "syscon";
-> -			reg =3D <0x47510000 0x10000>;
-> -			#address-cells =3D <1>;
-> -			#size-cells =3D <1>;
-> -
-> -			eth_mac1: mac-address@4ec {
-> -				reg =3D <0x4ec 0x6>;
-> -			};
-> -
-> -			eth_mac2: mac-address@4f2 {
-> -				reg =3D <0x4f2 0x6>;
-> -			};
-> -
-> -		};
-> -
-> -		s4muap: mailbox@47520000 {
-> -			compatible =3D "fsl,imx93-mu-s4";
-> -			reg =3D <0x47520000 0x10000>;
-> -			interrupts =3D <GIC_SPI 31 IRQ_TYPE_LEVEL_HIGH>,
-> -				     <GIC_SPI 30 IRQ_TYPE_LEVEL_HIGH>;
-> -			interrupt-names =3D "tx", "rx";
-> -			#mbox-cells =3D <2>;
-> -		};
-> -
-> -		media_blk_ctrl: system-controller@4ac10000 {
-> -			compatible =3D "fsl,imx93-media-blk-ctrl", "syscon";
-> -			reg =3D <0x4ac10000 0x10000>;
-> -			power-domains =3D <&mediamix>;
-> -			clocks =3D <&clk IMX93_CLK_MEDIA_APB>,
-> -				 <&clk IMX93_CLK_MEDIA_AXI>,
-> -				 <&clk IMX93_CLK_NIC_MEDIA_GATE>,
-> -				 <&clk IMX93_CLK_MEDIA_DISP_PIX>,
-> -				 <&clk IMX93_CLK_CAM_PIX>,
-> -				 <&clk IMX93_CLK_PXP_GATE>,
-> -				 <&clk IMX93_CLK_LCDIF_GATE>,
-> -				 <&clk IMX93_CLK_ISI_GATE>,
-> -				 <&clk IMX93_CLK_MIPI_CSI_GATE>,
-> -				 <&clk IMX93_CLK_MIPI_DSI_GATE>;
-> -			clock-names =3D "apb", "axi", "nic", "disp", "cam",
-> -				      "pxp", "lcdif", "isi", "csi", "dsi";
-> -			#power-domain-cells =3D <1>;
-> -			status =3D "disabled";
-> -		};
-> -
-> -		usbotg1: usb@4c100000 {
-> -			compatible =3D "fsl,imx93-usb", "fsl,imx7d-usb", "fsl,imx27-usb";
-> -			reg =3D <0x4c100000 0x200>;
-> -			interrupts =3D <GIC_SPI 187 IRQ_TYPE_LEVEL_HIGH>;
-> -			clocks =3D <&clk IMX93_CLK_USB_CONTROLLER_GATE>,
-> -				 <&clk IMX93_CLK_HSIO_32K_GATE>;
-> -			clock-names =3D "usb_ctrl_root", "usb_wakeup";
-> -			assigned-clocks =3D <&clk IMX93_CLK_HSIO>;
-> -			assigned-clock-parents =3D <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
-> -			assigned-clock-rates =3D <133000000>;
-> -			phys =3D <&usbphynop1>;
-> -			fsl,usbmisc =3D <&usbmisc1 0>;
-> -			status =3D "disabled";
-> -		};
-> -
-> -		usbmisc1: usbmisc@4c100200 {
-> -			compatible =3D "fsl,imx8mm-usbmisc", "fsl,imx7d-usbmisc",
-> -				     "fsl,imx6q-usbmisc";
-> -			reg =3D <0x4c100200 0x200>;
-> -			#index-cells =3D <1>;
-> -		};
-> -
-> -		usbotg2: usb@4c200000 {
-> -			compatible =3D "fsl,imx93-usb", "fsl,imx7d-usb", "fsl,imx27-usb";
-> -			reg =3D <0x4c200000 0x200>;
-> -			interrupts =3D <GIC_SPI 188 IRQ_TYPE_LEVEL_HIGH>;
-> -			clocks =3D <&clk IMX93_CLK_USB_CONTROLLER_GATE>,
-> -				 <&clk IMX93_CLK_HSIO_32K_GATE>;
-> -			clock-names =3D "usb_ctrl_root", "usb_wakeup";
-> -			assigned-clocks =3D <&clk IMX93_CLK_HSIO>;
-> -			assigned-clock-parents =3D <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
-> -			assigned-clock-rates =3D <133000000>;
-> -			phys =3D <&usbphynop2>;
-> -			fsl,usbmisc =3D <&usbmisc2 0>;
-> -			status =3D "disabled";
-> -		};
-> -
-> -		usbmisc2: usbmisc@4c200200 {
-> -			compatible =3D "fsl,imx8mm-usbmisc", "fsl,imx7d-usbmisc",
-> -				     "fsl,imx6q-usbmisc";
-> -			reg =3D <0x4c200200 0x200>;
-> -			#index-cells =3D <1>;
-> -		};
-> -
-> -		memory-controller@4e300000 {
-> -			compatible =3D "nxp,imx9-memory-controller";
-> -			reg =3D <0x4e300000 0x800>, <0x4e301000 0x1000>;
-> -			reg-names =3D "ctrl", "inject";
-> -			interrupts =3D <GIC_SPI 91 IRQ_TYPE_LEVEL_HIGH>;
-> -			little-endian;
-> -		};
-> -
-> -		ddr-pmu@4e300dc0 {
-> -			compatible =3D "fsl,imx93-ddr-pmu";
-> -			reg =3D <0x4e300dc0 0x200>;
-> -			interrupts =3D <GIC_SPI 90 IRQ_TYPE_LEVEL_HIGH>;
-> -		};
-> -	};
-> -};
-> +// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
-> +/*
-> + * Copyright 2022,2025 NXP
-> + */
-> +
-> +#include "imx91_93_common.dtsi"
-> +
-> +/{
-> +	cm33: remoteproc-cm33 {
-> +		compatible =3D "fsl,imx93-cm33";
-> +		clocks =3D <&clk IMX93_CLK_CM33_GATE>;
-> +		status =3D "disabled";
-> +	};
-> +
-> +	thermal-zones {
-> +		cpu-thermal {
-> +			polling-delay-passive =3D <250>;
-> +			polling-delay =3D <2000>;
-> +
-> +			thermal-sensors =3D <&tmu 0>;
-> +
-> +			trips {
-> +				cpu_alert: cpu-alert {
-> +					temperature =3D <80000>;
-> +					hysteresis =3D <2000>;
-> +					type =3D "passive";
-> +				};
-> +
-> +				cpu_crit: cpu-crit {
-> +					temperature =3D <90000>;
-> +					hysteresis =3D <2000>;
-> +					type =3D "critical";
-> +				};
-> +			};
-> +
-> +			cooling-maps {
-> +				map0 {
-> +					trip =3D <&cpu_alert>;
-> +					cooling-device =3D
-> +						<&A55_0 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
-> +						<&A55_1 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
-> +				};
-> +			};
-> +		};
-> +	};
-> +};
-> +
-> +&aips1 {
-> +	mu1: mailbox@44230000 {
-> +		compatible =3D "fsl,imx93-mu", "fsl,imx8ulp-mu";
-> +		reg =3D <0x44230000 0x10000>;
-> +		interrupts =3D <GIC_SPI 22 IRQ_TYPE_LEVEL_HIGH>;
-> +		clocks =3D <&clk IMX93_CLK_MU1_B_GATE>;
-> +		#mbox-cells =3D <2>;
-> +		status =3D "disabled";
-> +	};
-> +
-> +	tmu: tmu@44482000 {
-> +		compatible =3D "fsl,qoriq-tmu";
-> +		reg =3D <0x44482000 0x1000>;
-> +		interrupts =3D <GIC_SPI 83 IRQ_TYPE_LEVEL_HIGH>;
-> +		clocks =3D <&clk IMX93_CLK_TMC_GATE>;
-> +		#thermal-sensor-cells =3D <1>;
-> +		little-endian;
-> +		fsl,tmu-range =3D <0x800000da 0x800000e9
-> +				 0x80000102 0x8000012a
-> +				 0x80000166 0x800001a7
-> +				 0x800001b6>;
-> +		fsl,tmu-calibration =3D <0x00000000 0x0000000e
-> +				       0x00000001 0x00000029
-> +				       0x00000002 0x00000056
-> +				       0x00000003 0x000000a2
-> +				       0x00000004 0x00000116
-> +				       0x00000005 0x00000195
-> +				       0x00000006 0x000001b2>;
-> +	};
-> +};
-> +
-> +&aips2 {
-> +	mu2: mailbox@42440000 {
-> +		compatible =3D "fsl,imx93-mu", "fsl,imx8ulp-mu";
-> +		reg =3D <0x42440000 0x10000>;
-> +		interrupts =3D <GIC_SPI 24 IRQ_TYPE_LEVEL_HIGH>;
-> +		clocks =3D <&clk IMX93_CLK_MU2_B_GATE>;
-> +		#mbox-cells =3D <2>;
-> +		status =3D "disabled";
-> +	};
-> +};
-> +
-> +&cpus {
-> +	A55_0: cpu@0 {
-> +		device_type =3D "cpu";
-> +		compatible =3D "arm,cortex-a55";
-> +		reg =3D <0x0>;
-> +		enable-method =3D "psci";
-> +		#cooling-cells =3D <2>;
-> +		cpu-idle-states =3D <&cpu_pd_wait>;
-> +		i-cache-size =3D <32768>;
-> +		i-cache-line-size =3D <64>;
-> +		i-cache-sets =3D <128>;
-> +		d-cache-size =3D <32768>;
-> +		d-cache-line-size =3D <64>;
-> +		d-cache-sets =3D <128>;
-> +		next-level-cache =3D <&l2_cache_l0>;
-> +	};
-> +
-> +	A55_1: cpu@100 {
-> +		device_type =3D "cpu";
-> +		compatible =3D "arm,cortex-a55";
-> +		reg =3D <0x100>;
-> +		enable-method =3D "psci";
-> +		#cooling-cells =3D <2>;
-> +		cpu-idle-states =3D <&cpu_pd_wait>;
-> +		i-cache-size =3D <32768>;
-> +		i-cache-line-size =3D <64>;
-> +		i-cache-sets =3D <128>;
-> +		d-cache-size =3D <32768>;
-> +		d-cache-line-size =3D <64>;
-> +		d-cache-sets =3D <128>;
-> +		next-level-cache =3D <&l2_cache_l1>;
-> +	};
-> +
-> +	l2_cache_l0: l2-cache-l0 {
-> +		compatible =3D "cache";
-> +		cache-size =3D <65536>;
-> +		cache-line-size =3D <64>;
-> +		cache-sets =3D <256>;
-> +		cache-level =3D <2>;
-> +		cache-unified;
-> +		next-level-cache =3D <&l3_cache>;
-> +	};
-> +
-> +	l2_cache_l1: l2-cache-l1 {
-> +		compatible =3D "cache";
-> +		cache-size =3D <65536>;
-> +		cache-line-size =3D <64>;
-> +		cache-sets =3D <256>;
-> +		cache-level =3D <2>;
-> +		cache-unified;
-> +		next-level-cache =3D <&l3_cache>;
-> +	};
-> +
-> +	l3_cache: l3-cache {
-> +		compatible =3D "cache";
-> +		cache-size =3D <262144>;
-> +		cache-line-size =3D <64>;
-> +		cache-sets =3D <256>;
-> +		cache-level =3D <3>;
-> +		cache-unified;
-> +	};
-> +};
-> +
-> +&src {
-> +	mlmix: power-domain@44461800 {
-> +		compatible =3D "fsl,imx93-src-slice";
-> +		reg =3D <0x44461800 0x400>, <0x44464800 0x400>;
-> +		clocks =3D <&clk IMX93_CLK_ML_APB>,
-> +			 <&clk IMX93_CLK_ML>;
-> +		#power-domain-cells =3D <0>;
-> +	};
-> +};
->=20
-
-
-=2D-=20
-TQ-Systems GmbH | M=FChlstra=DFe 2, Gut Delling | 82229 Seefeld, Germany
-Amtsgericht M=FCnchen, HRB 105018
-Gesch=E4ftsf=FChrer: Detlef Schneider, R=FCdiger Stahl, Stefan Schneider
-http://www.tq-group.com/
-
-
+Alexander Wilhelm
 
