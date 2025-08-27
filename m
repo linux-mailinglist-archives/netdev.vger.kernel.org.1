@@ -1,115 +1,110 @@
-Return-Path: <netdev+bounces-217434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 980B7B38A8B
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 21:55:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A76EEB38AAF
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 22:11:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C25901BA6050
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 19:56:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E36616DA20
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 20:11:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31B2D2ECE98;
-	Wed, 27 Aug 2025 19:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89C5A2E3AFE;
+	Wed, 27 Aug 2025 20:11:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="EI7ZHGlx"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="jM8ehaLw";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="sZiERzK7"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A5F92857C7;
-	Wed, 27 Aug 2025 19:55:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2A9627E1D5;
+	Wed, 27 Aug 2025 20:11:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756324550; cv=none; b=nV4cKjojU3ThTUpeRxYhTdhjh81z4qn7kLp9oHXOLaX8uzG8P98Y0mEW4Lz13815qWDPPk6F85Jsv+sLfVOIMvi+KT8XING9miwo7cWwSG4M6udqRYj72juZt0D5E+mQrZO12hEUoglpxpMhPMbPMDFUOv0cZAqE7aAP0RB4AJ0=
+	t=1756325470; cv=none; b=SzaQ1AQwYj0K18I9yADwyxMyNvxEZEubjwTrwlDK/je05RkOci5LiShbFHzIWPI9hIpIDDfcX1sqiZ9aGo6HbvMEzJhgnWwvktGA88X3surknzzMTCIVru/nR4zkfy0XHAOsVw58pRZITDRAtPzP2YPELR2V43S1ajK7sjHE1mk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756324550; c=relaxed/simple;
-	bh=jZYku9dzOnZGIeSCCzwUX7FVfwR/MF3JExsR22TgIqQ=;
+	s=arc-20240116; t=1756325470; c=relaxed/simple;
+	bh=LZ45DdtI2GHR/bNHTXO18pT+29HkQdFkJCBPK2VwrL8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ubpq2vY8we8gFQzfyJeacbYXd/jVOmO6yA7HxhlWRkI0+AGlDa+YgeDd3SAYEY+qVC1rANfavxUOpzVgrVDNkN/ff6Elj0skjQNYaSHNC0+8T97fxKYAZqKdaVj7oUsXuTeI4CK26NFuCstPtxJYv1+yS50kaLbhagFdtBw5/6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=EI7ZHGlx; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Mmudr4OJjkExk9DTyzyKRxQKXUDtpB3EvNfDUHRnlWQ=; b=EI7ZHGlxAwUF4BXOzx9lpiVKZd
-	nOUfT0RCacsr+V166UjVeUOtBVX5aEqo983uEoxymqP5cfsz+PgFXEWe+cTcDQsD/TNUU/HvSM1oI
-	B2YRW11cLwO2NfvRelECReSomt1JIdGJ9j3v5W6q2uX9YQmM9XRJPknigHOLNU2lib+E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1urMEU-006FrZ-IO; Wed, 27 Aug 2025 21:54:58 +0200
-Date: Wed, 27 Aug 2025 21:54:58 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yibo Dong <dong100@mucse.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
-	gur.stavi@huawei.com, maddy@linux.ibm.com, mpe@ellerman.id.au,
-	danishanwar@ti.com, lee@trager.us, gongfan1@huawei.com,
-	lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org,
-	gustavoars@kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH net-next v7 4/5] net: rnpgbe: Add basic mbx_fw support
-Message-ID: <a61b6cdb-0f20-480c-877a-68c920e76ae2@lunn.ch>
-References: <20250822023453.1910972-1-dong100@mucse.com>
- <20250822023453.1910972-5-dong100@mucse.com>
- <316f57e3-5953-4db6-84aa-df9278461d30@linux.dev>
- <82E3BE49DB4195F0+20250826013113.GA6582@nic-Precision-5820-Tower>
- <bbdabd48-61c0-46f9-bf33-c49d6d27ffb0@linux.dev>
- <8C1007761115185D+20250826110539.GA461663@nic-Precision-5820-Tower>
- <bd1d77b2-c218-4dce-bbf6-1cbdecabb30b@lunn.ch>
- <05B2D818DB1348E6+20250827014211.GA469112@nic-Precision-5820-Tower>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qFLSqsIn2E3RC79l77ZeSu0Yv2+RNV7zv1PX+8/cs557JVdkoqZGAEOiGI1EsRDd3hqX3EtfEgIzcaRnLFgOJ6iPbab///sdc98CljcgGr0BD8boyo05DPg0CgryQpYYom+2gww+GoKohufTqRkd714+iKg/Mz2pvSKh+W4fx6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=jM8ehaLw; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=sZiERzK7; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Wed, 27 Aug 2025 22:10:59 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1756325460;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SGw07ZG7T2lSedYqSiQO/eFdzWtQmXmqUlGnClBZxG0=;
+	b=jM8ehaLw6Wa/LdnI2CgQe9JfaXaaMY25WsG9Ni/RzhSvKJ2vTqcmuDz5+eYx7eUlveAgoV
+	GxXIaQf1eGZaFalJAYSyYXbEuljf8oezq7BjWrE2GDiL9q5Qjc4T+qYl1ovwW5Rko6Z7lV
+	kfk4QEwf15bHdsG42rH4ZljzrO2KESN0Kk8u1YYwe5MVHgMKHB3AgZOqyoKVai9k2jGBOJ
+	sHZnvP8Cmzo0AhqSrEBYEoRCqgzrbwlmP2UJWmHJcCmKD0i3kjJoh0XFYqkCbNVX+GicgW
+	vJjHZuP8tHaj4kUieQInSzDpmNnMwkdTY86o1WLRM+OsMFRCwhbnfrQEAgUlDw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1756325460;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SGw07ZG7T2lSedYqSiQO/eFdzWtQmXmqUlGnClBZxG0=;
+	b=sZiERzK7/t0hkZtKQOC6p5Ol/Pm0iO22GMkhgTxsdx+KTyQmYNWrAyS2DnGKpcgO/cCDXv
+	7kxXgEzT4yAiKnBQ==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/3] vhost_task: Fix a bug where KVM wakes an exited
+ task
+Message-ID: <20250827201059.EmmdDFB_@linutronix.de>
+References: <20250827194107.4142164-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <05B2D818DB1348E6+20250827014211.GA469112@nic-Precision-5820-Tower>
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20250827194107.4142164-1-seanjc@google.com>
 
-> I try to explain the it:
-> 
-> driver-->fw, we has two types request:
-> 1. without response, such as mucse_mbx_ifinsmod
-> 2. with response, such as mucse_fw_get_macaddr
-> 
-> fw --> driver, we has one types request:
-> 1. link status (link speed, duplex, pause status...)
+On 2025-08-27 12:41:04 [-0700], Sean Christopherson wrote:
+> Michael,
 
-Is the firmware multi threaded? By that, i mean can there be two
-request/responses going on at once?
+Sean,
 
-I'm assuming not.
+would the bellow work by chance? It is a quick shot but it looks
+symmetrical=E2=80=A6
 
-So there appears to be four use cases:
+diff --git a/kernel/vhost_task.c b/kernel/vhost_task.c
+index bc738fa90c1d6..27107dcc1cbfe 100644
+--- a/kernel/vhost_task.c
++++ b/kernel/vhost_task.c
+@@ -100,6 +100,7 @@ void vhost_task_stop(struct vhost_task *vtsk)
+ 	 * freeing it below.
+ 	 */
+ 	wait_for_completion(&vtsk->exited);
++	put_task_struct(vtsk->task);
+ 	kfree(vtsk);
+ }
+ EXPORT_SYMBOL_GPL(vhost_task_stop);
+@@ -148,7 +149,7 @@ struct vhost_task *vhost_task_create(bool (*fn)(void *),
+ 		return ERR_CAST(tsk);
+ 	}
+=20
+-	vtsk->task =3D tsk;
++	vtsk->task =3D get_task_struct(tsk);
+ 	return vtsk;
+ }
+ EXPORT_SYMBOL_GPL(vhost_task_create);
 
-1) Fire and forget, request without response.
-2) Request with a response
-3) Link state change from the firmware
-4) Race condition: Request/response and link state change at the same time.
-
-Again, assuming the firmware is single threaded, there must be a big
-mutex around the message box so there can only be one thread doing any
-sort of interaction with the firmware.
-
-Since there can only be one thread waiting for the response, the
-struct completion can be a member of the message box. The thread
-waiting for a response uses wait_for_completion(mbx->completion).
-
-The interrupt handler can look at the type of message it got from the
-firmware. If it is a link state, process it, and exit. If it is
-anything else, complete(mbx->completion) and exit.
-
-I don't see the need for any sort of cookie.
-
-  Andrew
+Sebastian
 
