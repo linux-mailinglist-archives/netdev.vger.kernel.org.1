@@ -1,105 +1,131 @@
-Return-Path: <netdev+bounces-217213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82203B37C4D
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 09:55:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1333BB37C89
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 09:57:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 261E41791BA
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 07:55:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C6CE1BA00F4
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 07:58:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB73031DD97;
-	Wed, 27 Aug 2025 07:55:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B3B53218B0;
+	Wed, 27 Aug 2025 07:57:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b="ETZTkoEo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.35])
+Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 021ED2F617A;
-	Wed, 27 Aug 2025 07:55:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.30.148.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28EBD2BE7DF;
+	Wed, 27 Aug 2025 07:57:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.11.138.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756281356; cv=none; b=ntR0hDVMOoUcaJM0g90AqUnocW02hI/ngLRVfknxty9PrY3neeRseREijXcoDY7Nu5SaIzGhwwibD0D8j4xECzzn0hNKy8kUyw9C6xLyUVp6d2o66VIZy++fHSfd2l8flyPr3SeqbGkOpOtCBncNDTs/PdRO+USt4Mm1OoH1HRg=
+	t=1756281461; cv=none; b=fIHpFjMfbTiYVrNP9CfvzTY3k9WUITj8yq4XJt9xpOImkzEmLaBTgRRUIZRNvQh7NhNAFs2R1wy0tuy5M0JnueWVIdRNgdQnfaOwD7zWlhCy02CKrEVy80qDqDLhLwegO0enmUq1jCC4qDRGFhtwfFuzdoPBdL4GI9Zo7/TJrFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756281356; c=relaxed/simple;
-	bh=V/k3PlEhOV5Q5JNh16qCP66g14IOSN3k+JYedNywBUs=;
-	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=E6/lz7pxWJyl7AaDf0gquYVdP52zyAgiFXba9Cr/4qAMmBwrT60OM1dK7K6GxiAELxK4G0sy2mlNKXET978gHVw66P/cY9tOUQZ90xsxu6FzyIgyMSFglDuy6SjKoX09yjFT55Idqu6wDzmG/kGEkknn19r+gorukX97K7OoDw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=160.30.148.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4cBcKH0Nfgz8Xs6v;
-	Wed, 27 Aug 2025 15:55:47 +0800 (CST)
-Received: from xaxapp05.zte.com.cn ([10.99.98.109])
-	by mse-fl2.zte.com.cn with SMTP id 57R7srfU085184;
-	Wed, 27 Aug 2025 15:54:53 +0800 (+08)
-	(envelope-from zhang.enpei@zte.com.cn)
-Received: from mapi (xaxapp01[null])
-	by mapi (Zmail) with MAPI id mid32;
-	Wed, 27 Aug 2025 15:54:55 +0800 (CST)
-Date: Wed, 27 Aug 2025 15:54:55 +0800 (CST)
-X-Zmail-TransId: 2af968aeb9cf00e-edb33
-X-Mailer: Zmail v1.0
-Message-ID: <20250827155455583-PdvmDYA9SD3J37_XRza5@zte.com.cn>
+	s=arc-20240116; t=1756281461; c=relaxed/simple;
+	bh=0MK1dUMIBWuj72rwewkqEVH0cn/LnA/1R+TUGxOlw7A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mlOqgHAwDwrLDc0v0peUBcMCR5JyiGWyJYva7Q76UYTQ02AwsyvXa7yd5qdVuHurMyhVyQ9t5s4xZX/mv3onJCCJKhzF/F/dyE+KbhbRUpnHcLWu/DWzumjaseYPN9uhmuO1LGYQVQCR4trisOgSljiKr1pv6kes61mpFijNkFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sntech.de; spf=pass smtp.mailfrom=sntech.de; dkim=pass (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b=ETZTkoEo; arc=none smtp.client-ip=185.11.138.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sntech.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sntech.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=sntech.de;
+	s=gloria202408; h=Content-Type:Content-Transfer-Encoding:MIME-Version:
+	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Reply-To;
+	bh=0MK1dUMIBWuj72rwewkqEVH0cn/LnA/1R+TUGxOlw7A=; b=ETZTkoEoOwtznU7PtnZeQFX4Fe
+	vM6Gg/U5rsSJj/WUqqtUEJV3BceYz2JVc61zNRNRjL4DFqp104N1wUclJpSswXx5sqCln7OWyunG6
+	1BXLLRpOWOQKi7IxecmWks9WndogbL1isYzy85Po6NTAI5iUKT6cVGycUUx1+G9Sdk6QBfX5Nab2O
+	AoHyUEffPqw/BIjMBTDsou/G4FI5gXNkiAM7XHNVs95bP9wM5OxBgaN/F8O7uh73Jt61EZ5SREvoE
+	VRfAa8DcHOrlfJ+EZjWxzMMZ6lcGDOSdP3RHulTQGePkNCSjMsKPIAnaT2QKSPEuFVcPwPFvGnA9V
+	jTWs2Wcg==;
+Received: from [213.244.170.152] (helo=phil.localnet)
+	by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <heiko@sntech.de>)
+	id 1urB1d-0002Lk-PM; Wed, 27 Aug 2025 09:56:57 +0200
+From: Heiko Stuebner <heiko@sntech.de>
+To: Yury Norov <yury.norov@gmail.com>,
+ Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+ Jaehoon Chung <jh80.chung@samsung.com>, Ulf Hansson <ulf.hansson@linaro.org>,
+ Shreeya Patel <shreeya.patel@collabora.com>,
+ Mauro Carvalho Chehab <mchehab@kernel.org>, Sandy Huang <hjc@rock-chips.com>,
+ Andy Yan <andy.yan@rock-chips.com>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>,
+ Nicolas Frattaroli <frattaroli.nicolas@gmail.com>,
+ Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Shawn Lin <shawn.lin@rock-chips.com>,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ Krzysztof =?UTF-8?B?V2lsY3p5xYRza2k=?= <kwilczynski@kernel.org>,
+ Manivannan Sadhasivam <mani@kernel.org>, Rob Herring <robh@kernel.org>,
+ Bjorn Helgaas <bhelgaas@google.com>, Chanwoo Choi <cw00.choi@samsung.com>,
+ MyungJoo Ham <myungjoo.ham@samsung.com>,
+ Kyungmin Park <kyungmin.park@samsung.com>, Qin Jian <qinjian@cqplus1.com>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>,
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+Cc: kernel@collabora.com, linux-kernel@vger.kernel.org,
+ linux-mmc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-rockchip@lists.infradead.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-phy@lists.infradead.org,
+ linux-sound@vger.kernel.org, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com, linux-pci@vger.kernel.org,
+ linux-pm@vger.kernel.org, linux-clk@vger.kernel.org, llvm@lists.linux.dev,
+ Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+Subject: Re: [PATCH v3 16/20] PCI: rockchip: Switch to FIELD_PREP_WM16* macros
+Date: Wed, 27 Aug 2025 09:56:55 +0200
+Message-ID: <7681880.cEBGB3zze1@phil>
+In-Reply-To: <20250825-byeword-update-v3-16-947b841cdb29@collabora.com>
+References:
+ <20250825-byeword-update-v3-0-947b841cdb29@collabora.com>
+ <20250825-byeword-update-v3-16-947b841cdb29@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <zhang.enpei@zte.com.cn>
-To: <chessman@tux.org>
-Cc: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: =?UTF-8?B?W1BBVENIIHYzXSBldGhlcm5ldDogdGxhbjogQ29udmVydCB0byB1c2UgamlmZmllcyBtYWNybw==?=
-Content-Type: text/plain;
-	charset="UTF-8"
-X-MAIL:mse-fl2.zte.com.cn 57R7srfU085184
-X-TLS: YES
-X-SPF-DOMAIN: zte.com.cn
-X-ENVELOPE-SENDER: zhang.enpei@zte.com.cn
-X-SPF: None
-X-SOURCE-IP: 10.5.228.133 unknown Wed, 27 Aug 2025 15:55:47 +0800
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 68AEBA03.001/4cBcKH0Nfgz8Xs6v
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
 
-From: Zhang Enpei <zhang.enpei@zte.com.cn>
+Am Montag, 25. August 2025, 10:28:36 Mitteleurop=C3=A4ische Sommerzeit schr=
+ieb Nicolas Frattaroli:
+> The era of hand-rolled HIWORD_UPDATE macros is over, at least for those
+> drivers that use constant masks.
+>=20
+> The Rockchip PCI driver, like many other Rockchip drivers, has its very
+> own definition of HIWORD_UPDATE.
+>=20
+> Remove it, and replace its usage with either FIELD_PREP_WM16, or two new
+> header local macros for setting/clearing a bit with the high mask, which
+> use FIELD_PREP_WM16_CONST internally. In the process, ENCODE_LANES
+> needed to be adjusted, as FIELD_PREP_WM16* shifts the value for us.
+>=20
+> That this is equivalent was verified by first making all FIELD_PREP_WM16
+> instances FIELD_PREP_WM16_CONST, then doing a static_assert() comparing
+> it to the old macro (and for those with parameters, static_asserting for
+> the full range of possible values with the old encode macro).
+>=20
+> What we get out of this is compile time error checking to make sure the
+> value actually fits in the mask, and that the mask fits in the register,
+> and also generally less icky code that writes shifted values when it
+> actually just meant to set and clear a handful of bits.
+>=20
+> Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+> Signed-off-by: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
 
-Use time_is_before_eq_jiffies macro instead of using jiffies directly to
-handle wraparound.
+Reviewed-by: Heiko Stuebner <heiko@sntech.de>
 
-Signed-off-by: Zhang Enpei <zhang.enpei@zte.com.cn>
----
- drivers/net/ethernet/ti/tlan.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/ti/tlan.c b/drivers/net/ethernet/ti/tlan.c
-index a55b0f951181..7c5e51284942 100644
---- a/drivers/net/ethernet/ti/tlan.c
-+++ b/drivers/net/ethernet/ti/tlan.c
-@@ -1817,7 +1817,6 @@ static void tlan_timer(struct timer_list *t)
- {
- 	struct tlan_priv	*priv = timer_container_of(priv, t, timer);
- 	struct net_device	*dev = priv->dev;
--	u32		elapsed;
- 	unsigned long	flags = 0;
-
- 	priv->timer.function = NULL;
-@@ -1844,8 +1843,7 @@ static void tlan_timer(struct timer_list *t)
- 	case TLAN_TIMER_ACTIVITY:
- 		spin_lock_irqsave(&priv->lock, flags);
- 		if (priv->timer.function == NULL) {
--			elapsed = jiffies - priv->timer_set_at;
--			if (elapsed >= TLAN_TIMER_ACT_DELAY) {
-+			if (time_is_before_eq_jiffies(priv->timer_set_at + TLAN_TIMER_ACT_DELAY)) {
- 				tlan_dio_write8(dev->base_addr,
- 						TLAN_LED_REG, TLAN_LED_LINK);
- 			} else  {
--- 
-2.25.1
 
