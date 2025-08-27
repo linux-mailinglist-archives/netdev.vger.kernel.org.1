@@ -1,206 +1,219 @@
-Return-Path: <netdev+bounces-217190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78C3BB37B22
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 09:01:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F516B37A6D
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 08:34:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52AC53B73F3
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 07:00:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1ED0A1B23D4E
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 06:34:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B7A6322541;
-	Wed, 27 Aug 2025 06:56:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="KAjg+rtr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCE86275B0E;
+	Wed, 27 Aug 2025 06:34:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011018.outbound.protection.outlook.com [52.101.70.18])
+Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D78E3218B2;
-	Wed, 27 Aug 2025 06:56:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756277804; cv=fail; b=KzliTbEHie/EKhaBdHFBGMagS12Q4Sjqsda5LqCmluGpkh+xYwQIthavJYwENrQ/DmNc/oRlA5FMTRQ6ojhIagG/iSLbBdcaOZrx6358Wm+awJW0f2Lq/uwiMpiaG+w46Bh//wHd6J9xsWd0HwYyqRI4WpQRpftwFXBdIH2KTk0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756277804; c=relaxed/simple;
-	bh=cYS0HXE3B4wJQStICvzXd5lCHjpfNL+pjnnjmMYPBQU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=r/erYT5h9+7IZbRz9NjBkjHkFYdZw2KZ66+hCP/h+m7bdL+H0djuiQ/bLhWh1j45+cIKVTgq6YkLgIsMocjj/mgnOOYjK6tD9gmWblMPiV6XAPzQFyr2EWyxXFlT1AsXOkm052S2xqq1fQZmd0olRvp7UYATT9DKzFizCVojSr8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=KAjg+rtr; arc=fail smtp.client-ip=52.101.70.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=lJOqbBMSGVDhr8+2wjvUg3lUYbPKR3FeTk9yM0XdIw+yoncgebh66RLiHgV/kHAAzJSfApCc1mVlw2ICeeWOi4QnRgM0cDmsueDbSk1mIxsU6o99fHbCXB38IfJVM0ZNfnx2z2oKjPevT72aGZbBbTJPAZEOvFjWB4ljb8f+w4qPlKSCkEuRx7pOofMkGhsZtWSGgXuWDOdAK6YTKLJjNfemnnpurjPyIBMu8ctzYIGFat1DZTs0MzRiLfkzCDHKeV3sM7ls0vxgfjFprFI4JPKvwaN8BhKWwKev/gwaLJs2A2pF7DXK+FA6d/EWwOup+ZPGvqP8aHb0rzdvhQU6aQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OUbNOOoRgkXrJ9IQbAo5aU7HeAXkeG4yXtSm9rmzo7I=;
- b=qHC9idxKsgQBwvu67xqcvU8FzD1Fijq8Dan6/zHLyPHlQ0yYT1NqndCtGJggxU/4XGTuu6fAdWFu2vION5s5gR610I/7Y7sVvJE8GIa1iMNSQt41m59ra5hG5uBFAd7t9Z4jSJPWeItWKrK//RoRVRjM61UEVOJSZzOOM8FIoo5KTNyxSSnbL08f/dCAVWe0ZtnPBDWLlf29enIaqgjUmBDKpodk+0suhjGH4eX/wxOgvFlBwW/XpiXJSHXcjkJ1Vl7gKgr4cTxVDf2gqJlfoJCfXNYDynbGbwdCGdN0b9pC38IDClXksrDwacU4xw1cKH2ECYtwXW0UqJgIdt2LoA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OUbNOOoRgkXrJ9IQbAo5aU7HeAXkeG4yXtSm9rmzo7I=;
- b=KAjg+rtr2E1TXqM0PjgfJcrUyD4nXxtsYhlu4kCHz5znIyFYnlnVgQq8rL/vEGGBXDJZuj2yWZv7eZx04vnS7VUIWIVTvhb9usrSWecdfMUJcAFgtD1VT+JrD/ZNZ9m79/r2VnQ3mdN6bCYnt7cE+6gYiNRLnV0sDBY6Njl6kRc3xmfLkzGPQnQ9mFOsDiIe9mXHlRhJ0bchI4H4ZOvG4NT3tkm0LVGAgSyZcWXm5Y4gRfYz14i4k3Mx84/Z7dcye5dQMPkc35AqE/+EHuGVEJOJwGQIJFwRIgfqSLV1BXIsUZeMMstw8PtnFqAYmpeqJH3xdbygyj+fo2hLM9UxUw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by AS8PR04MB8481.eurprd04.prod.outlook.com (2603:10a6:20b:349::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.12; Wed, 27 Aug
- 2025 06:56:39 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%5]) with mapi id 15.20.9073.010; Wed, 27 Aug 2025
- 06:56:39 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	richardcochran@gmail.com,
-	claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com,
-	xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	vadim.fedorenko@linux.dev,
-	Frank.Li@nxp.com,
-	shawnguo@kernel.org
-Cc: fushi.peng@nxp.com,
-	devicetree@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev
-Subject: [PATCH v6 17/17] arm64: dts: imx95: add standard PCI device compatible string to NETC Timer
-Date: Wed, 27 Aug 2025 14:33:32 +0800
-Message-Id: <20250827063332.1217664-18-wei.fang@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250827063332.1217664-1-wei.fang@nxp.com>
-References: <20250827063332.1217664-1-wei.fang@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SG2PR02CA0111.apcprd02.prod.outlook.com
- (2603:1096:4:92::27) To PAXPR04MB8510.eurprd04.prod.outlook.com
- (2603:10a6:102:211::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94AF61EEF9;
+	Wed, 27 Aug 2025 06:34:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756276456; cv=none; b=p+Brz3ewcVSJIggBUT5OKFH0/2Ag8FzezdwrfDcFRurq2nd8JLwzRXzBiMgzS/3yZAd1tbEd1rhe8KwMtYHnEdZzZu0wLr7CSr4QGiOCtfbVqxPvBmrkr4IIdUNsBvwz/vQcEETyy5teiNctF8TNDITRW3bp8DgNwRZu4ssPIRs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756276456; c=relaxed/simple;
+	bh=08Bdfu7Abb5AyaLDYLBrHXSveiS/oZksGtOGJHCmkk8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mrGRfuhoKo4vJLF0FmwHwJO+knwalCR7XF23flEIkRL6i0RLFX9aVtvNcd17ycmYhL+pWc/mQD5bqv6Mcneece8OMg516TO9bHcW80HL3vK0kO1jYimhxuqZNGGtQSIjsOHyWq8/jB2HCRBRHxfiEu0eenKZ0xatPs0mz3TnCr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.206.16.166
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: zesmtpgz3t1756276443te96eac14
+X-QQ-Originating-IP: z93O1aUXQO9wJtNI9JgSSX/YEPfi2+9tuQMK75xB46U=
+Received: from localhost ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 27 Aug 2025 14:34:01 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 17250008978444675294
+Date: Wed, 27 Aug 2025 14:34:01 +0800
+From: Yibo Dong <dong100@mucse.com>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
+	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
+	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org,
+	gustavoars@kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH net-next v8 4/5] net: rnpgbe: Add basic mbx_fw support
+Message-ID: <4E0FB703028E42A8+20250827063401.GA504899@nic-Precision-5820-Tower>
+References: <20250827034509.501980-1-dong100@mucse.com>
+ <20250827034509.501980-5-dong100@mucse.com>
+ <4b6eb676-10f5-4438-9457-6aeda0ee7fb0@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|AS8PR04MB8481:EE_
-X-MS-Office365-Filtering-Correlation-Id: 00313ca3-ceff-411c-08bb-08dde536debe
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|52116014|376014|7416014|366016|19092799006|921020|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?hf2OPzbpAX8ZGPjdtI0UpMATDMT7gED/UcdXlQTlxZqX5vcGOvLy1HiJdKlO?=
- =?us-ascii?Q?x4vAnGGqrzyjJ6j/5/Lw1lKjnJmLeVIyr/F3S1kUGUoDGT2ZGLWLVF9tLPab?=
- =?us-ascii?Q?4u1kt82sHX5OKYJOVv7MFLh0ZspvJrLRsarncHkpn4t4sQCaAOlHGs2LEO61?=
- =?us-ascii?Q?XrMI45QTZb94Cn0Z8tiCzxMW6qWGvpmliOo5zgT61gCMeLIKH2LzHBHrptq+?=
- =?us-ascii?Q?ZXXppwtMi6p/oO/m1jFPmQt6BWkDaANB8WdATUZ3TgD7sIHoVWHTCQbChr13?=
- =?us-ascii?Q?cBmySWkVB04fR7+vWexHxlHEgc0TzzpcoTsFBOt8g19OQxMVGMtdTjboN7s+?=
- =?us-ascii?Q?SvOQ4c2w7Sv6MiCSdyAPi1moTGmVwSF4GUtJhMNrjDBMOPi0ChfV5/yvfTwx?=
- =?us-ascii?Q?obvG+7hFZT4X2mh3yMFNTWGdhwkm5wxLaAV7ioGw8WLu/0zKvk+U95QphZNh?=
- =?us-ascii?Q?/h+kxvWymCTaofSQBCZshj0Obp1rJgUhCqx8jQPVNw2iEXEhxDhsUcs/OLSU?=
- =?us-ascii?Q?O6uBnYXTozoCaMiivgC659wvd/NzalYRYNnUJ9KoB/w4kNx6485pFEoCAkE1?=
- =?us-ascii?Q?e7bGKCOvVMF4YSeG/U0zISVlRp+yF0wYglAXkoRgN8A6z8htC6K9zj7kjUO6?=
- =?us-ascii?Q?wtm+tleq/QUvReUpoAfa+2Wj9d3heX7oRj8li/zhi4DhtPeNb9P5sKHh0Q31?=
- =?us-ascii?Q?lpXcxJWr9Xnhz36jQD+PYoPEbW5A90K3G98uTqchP1QWFU5pfB2XvOrR8N2c?=
- =?us-ascii?Q?kHqMaHgcRznzj6rlKYIKO9cF5yXmEuLafwLaK8EUjSloBDrryzSjFlF8BECU?=
- =?us-ascii?Q?2hD/GlNhNBuYwaOkqLC0Td9Rdn7ezmModBkXjAfur5wz0L29PBf0XR2Ko2v9?=
- =?us-ascii?Q?9TOwz2ZE7W82P+voveVxX9I5rCBRVU/HyvtY1nAQFnzrVpbNATC/B9GL8TX5?=
- =?us-ascii?Q?uf3x9dFD+bAh901DZ3MdHZ83KSXqRbNLJxg5HywrwRF21ZMbmJf1ndEJdvm8?=
- =?us-ascii?Q?2puqNotjNiqrD0cmPpyYCury10uo6sdn3NB6txsYDJZvrxONZph+0ao+Tz63?=
- =?us-ascii?Q?khaGca89KGeNaOYrVvmbX0+ZZycC691M56OEErKIGll3WfyfYbPRkC5enkWv?=
- =?us-ascii?Q?JH1gwed1LoKnQpKsp6JlQhyxJykgxxYssJhms7XhDi15w+lvE7r7Cr3s3vIV?=
- =?us-ascii?Q?N5QC9mTFwT0V0SHfTBq/QNBasmzeAlIYD0TdawpRKlfsw8qs4ylGb7jgw8d/?=
- =?us-ascii?Q?Kl6Qfh/CwSBnegXFw6n5aUs/3KjGAajVxsHugrN+UyyW0nti1f9KlA8PlZDp?=
- =?us-ascii?Q?KKVtfsm3C/Pg333otQU5QeNP8EpkQHYPGuc1XiAM5FtjRcn8RXG5B9kK5CGD?=
- =?us-ascii?Q?4K9U6rBipCfy7MW2auFrQfcQQQQol1yzqOroFxV9e5a7lp2DHZLDOwd7sQ2c?=
- =?us-ascii?Q?TyV5br7pkOTnzZKwr7IOuGf0R8yhlk1vyAiIgdhszxdTKJq0ug3u85Tr066T?=
- =?us-ascii?Q?00Wz1OozNMY/ilY=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(52116014)(376014)(7416014)(366016)(19092799006)(921020)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?BwoyJqpnrahNrqCh+F+X8XQa7NSpHdoAJKQ1mNJup5X0IvogpShbACQsDFSS?=
- =?us-ascii?Q?LpYG7o44pFKEAteCccziodU+HTee12rrpHHPtYijNSuu/J+LG02IGOEgzxUh?=
- =?us-ascii?Q?J2l/FXcdyPzvzKV1QHPsM8qrYvW2T6HM/5cG63aot4+m+h0VuuHtGLWSgO0r?=
- =?us-ascii?Q?bFbjie/K6ppKgBGLAhqazLI9EMPaqYdKcgnNZJj3kvPL/b3z0Xxg3k6YB/s2?=
- =?us-ascii?Q?MzLduw6SFIb/nAinvuJ6rmPs4+XOoU1IQ6pkkNMfolPEfyxARbvozNqHICBt?=
- =?us-ascii?Q?tgqE73HQljyR3lbZOjODfhwXJMAwjSsSgwZ7pIy5zFSN5RrwvtCz5IYM9sGr?=
- =?us-ascii?Q?LCHn4vy0yRTmzX/H6WV+LxgHLm5AkUTJzzzKR09MZWAo9Ik3wjoeoUTZ1m5c?=
- =?us-ascii?Q?bTCD30026Aii2/UTM3zUtHBSUMRAKv5np2LCjDdg2vg8lV2ZR5WgIOb+7Ows?=
- =?us-ascii?Q?Ic2AyZpGx81ZkuX3MpUlPZ2L7wXS8eeu9s0a5N0iKY8Caf1UmgIjo29+OH79?=
- =?us-ascii?Q?Kp83D/T7/JSFV6esye5fZ1ut0aqZBC4Qpu6Dcjx6+/831JwItFjgwJDxAC+f?=
- =?us-ascii?Q?jVqma1oFAQN5C2UANrErEGEApQTshsOJvT2zm/ibJwULuqdwv++owEDO8aKE?=
- =?us-ascii?Q?PNYhKu+4g+YiKtwMjcgdfbbr2Z5pF76DGZ/LbcO/tZJeDwIBygQ7gveR6wpi?=
- =?us-ascii?Q?SSx3R5/1nvLpucpn9eB+c9zyIMXK8S0r4Vw38UY+siPTk8OCsErtaJdIf8Dj?=
- =?us-ascii?Q?RxpVW3J5/uHILG3XwberSRB/qgwtogjVjV/R03yQNqkaHIr9k2xIfrzA4J2c?=
- =?us-ascii?Q?z6Vp9cMtKhoR/C9+1/YWVeeLdBgZycSKYUuH32342ZgmCYix3fsqAZDzHCO3?=
- =?us-ascii?Q?hViFbr38HrdWDDnWTc5NAGHcC44PodkvPts6bkL6uvs0Z1QZO5gTh8k5EpV8?=
- =?us-ascii?Q?2nnyJHkM73/WxfGqGK1swoC/EPd/Ra0NBb/9AcTFm/leGfC0EyNsAYToT1AK?=
- =?us-ascii?Q?7s+vsthlI/7/IfrhNjz5WfmYTjuvrsDvjLLaTa7/Q7xo2Tv2K5LXSwDrrWUg?=
- =?us-ascii?Q?+f+DJQcBSonBRzUd1ZsmijksKkDVBbDTCieKMV80OCqcFuYn6xqUftTBBGPP?=
- =?us-ascii?Q?yLAOjVRkpLZuj2cpvDnp8hebH9KLCGN8DiKPvz4qRAJrOo5p0E0cvmVUbuBs?=
- =?us-ascii?Q?0qf4t/W1V5Hyr93woSUa2PYiRnTdCbnKY8bfKJEPgMXUrSfjHd0me/zbGBBW?=
- =?us-ascii?Q?pCJSAEsa+1C7FGrQebQ1l/mqXOzZg51eCeb3oPK3TqW6BN862VcbzE4iY562?=
- =?us-ascii?Q?VenZc5xBb3KlF7h1da3eiDhwGOoQ9W7lnMA9h9y9JtIXXqU83ph6YdC2uuYM?=
- =?us-ascii?Q?DrfTYUn40V4Qkjj2uBpbxg7mbwAglWKMPIrh1kRObTg741huIvyOwvFwerc6?=
- =?us-ascii?Q?QUblKcBocYWFaY5wtCfdqU60B8nWWG+SQaWyecjdYD2co8mivXZgD4eFDVTd?=
- =?us-ascii?Q?bA61T6sU6G32t8zg9wx+7bqZ/t0iRuXpe/ve7WqLvDU/MPZX/cpEU/6AGPTN?=
- =?us-ascii?Q?1/SiAKeh+asMy8LnMgDIhBv3hCW9ZNPMm/9lBmIP?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 00313ca3-ceff-411c-08bb-08dde536debe
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Aug 2025 06:56:39.1142
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CXGYd6H30BEHSPtZ72NuVBV8Zi11V3YG82A39kDlJLrJMdbeRI2X4zEf7RSc0JySCT3+hNu47vJ7WV6Lm6/i8Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8481
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4b6eb676-10f5-4438-9457-6aeda0ee7fb0@infradead.org>
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: ORqNQdnYjakC0GymvZaT7wSRhIi1hzcMqJ3OYYj+gj4GsX77VOLGWp48
+	dGRpeSGHKgEK5z9Hy5HXCY58NBa74URD4BN5x6/gse3Rb7ADjevC+kCKIAodB4cRSmpmPqK
+	2Rtsbt3n98XeM3WNuCZSIaxwJuupE7081p7XRlh55KlaOiERDDtxwJqGtGiFt1LAy1UvF/v
+	nm6eCYKXAdlROy4GhlVswM2AxLO22wGXwhitGONrgEq1NRydAWJJKkmSKg1jEEG08bn/oIS
+	zFVgXw+xhAYd9COuZ+oRUtioe9RqXAuYhzcHZvMq/Z9yFGj5d0PlIQjsJqStfdOwMMgsNZX
+	K86NhzhAE5g71hLCWthslSz9A5Vt37B+/++F/xmNzfwgGeSzy9f1vHgYJYIx5VieRZkwQ9Y
+	paSr4//YXp45OtyBGFMWZ9l86KAI++9LqpUGSSSBUysBfVbvuZLnqD8Bsgc8pX1bFi2NtY6
+	x8MoXHdRay/jZOCzlDRosyka2akuyu8DvRCuFb+KoozvEgkPJRiDTopSQuw2l6aZdHCFYSF
+	BP9M2niaMeFuUq3bnacaI6l8HAc6UpRAnaiVXKDnXdz+zNcwLOj1kd09iz/mPUR/FkiCTfp
+	eFdcPpJ+71vnsjgzM7F2MoSXurU8HOGra4M6Ne3EKQECTh9DqL3Pn93/E7VTmj2ENDg/pSM
+	lvOpJcMt3bAc2xGXkDyUGmBE5K2jiSb7kql9gCQT/pg1s8mgy8BhPQHot6bWIQrsoXu+ZCP
+	4/uBApBfSAtPuyyGVtggY8S3Zo3ESvvBqbQF3uThdWWN96DyDr+url2H0gRmqou/34EahIv
+	vDCCyMjFqt4E5HxfSU2yYkIqMUC8KM3/lzI8Q4LnaZfb+4cJ/ivDXh+x3zarxjW3v6FZWn0
+	RqTa6Ut5kXA+Ex+eL5/+pXiK7hignroVPCJqa9BKcSkksaUKFITlP6cbmq3GXAafGPGPuDc
+	3v/dnOWz0ehS00gV/OMo02PW8XvREtiNTD6dxjQMAKWoRxH8bKI/ArCkitGqq0BOJzVK3VX
+	Z8kgfcmw==
+X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
+X-QQ-RECHKSPAM: 0
 
-PCI devices should have a compatible string based on the vendor and
-device IDs. So add this compatible string to NETC Timer.
+On Tue, Aug 26, 2025 at 10:26:38PM -0700, Randy Dunlap wrote:
+> On 8/26/25 8:45 PM, Dong Yibo wrote:
+> > Initialize basic mbx_fw ops, such as get_capability, reset phy
+> > and so on.
+> > 
+> > Signed-off-by: Dong Yibo <dong100@mucse.com>
+> > ---
+> >  drivers/net/ethernet/mucse/rnpgbe/Makefile    |   3 +-
+> >  drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |   1 +
+> >  .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c | 253 ++++++++++++++++++
+> >  .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h | 126 +++++++++
+> >  4 files changed, 382 insertions(+), 1 deletion(-)
+> >  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
+> >  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
+> > 
+> 
+> 
+> > diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
+> > new file mode 100644
+> > index 000000000000..d3b323760708
+> > --- /dev/null
+> > +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
+> > @@ -0,0 +1,253 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/* Copyright(c) 2020 - 2025 Mucse Corporation. */
+> > +
+> > +#include <linux/pci.h>
+> > +#include <linux/if_ether.h>
+> > +
+> > +#include "rnpgbe.h"
+> > +#include "rnpgbe_hw.h"
+> > +#include "rnpgbe_mbx.h"
+> > +#include "rnpgbe_mbx_fw.h"
+> > +
+> > +/**
+> > + * mucse_fw_send_cmd_wait - Send cmd req and wait for response
+> > + * @hw: pointer to the HW structure
+> > + * @req: pointer to the cmd req structure
+> > + * @reply: pointer to the fw reply structure
+> > + *
+> > + * mucse_fw_send_cmd_wait sends req to pf-fw mailbox and wait
+> > + * reply from fw.
+> > + *
+> > + * @return: 0 on success, negative on failure
+> 
+> Use of @return: is not a documented feature although kernel-doc does accept it.
+> I prefer that people don't use it, but I can't insist since it does work.
+> 
+> 
 
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
-Reviewed-by: Frank Li <Frank.Li@nxp.com>
+Maybe change it like this?
+Return: 0 on success, negative errno on failure
 
----
-v2 changes:
-new patch
-v3 changes:
-Since the commit 02b7adb791e1 ("arm64: dts: imx95-19x19-evk: add adc0
-flexcan[1,2] i2c[2,3] uart5 spi3 and tpm3") has enabled NETC Timer, so
-rebase this patch and change the title and commit message.
----
- arch/arm64/boot/dts/freescale/imx95.dtsi | 1 +
- 1 file changed, 1 insertion(+)
+> > + **/
+> > +static int mucse_fw_send_cmd_wait(struct mucse_hw *hw,
+> > +				  struct mbx_fw_cmd_req *req,
+> > +				  struct mbx_fw_cmd_reply *reply)
+> > +{
+> > +	int len = le16_to_cpu(req->datalen);
+> > +	int retry_cnt = 3;
+> > +	int err;
+> > +
+> > +	err = mutex_lock_interruptible(&hw->mbx.lock);
+> > +	if (err)
+> > +		return err;
+> > +	err = mucse_write_posted_mbx(hw, (u32 *)req, len);
+> > +	if (err)
+> > +		goto out;
+> > +	do {
+> > +		err = mucse_read_posted_mbx(hw, (u32 *)reply,
+> > +					    sizeof(*reply));
+> > +		if (err)
+> > +			goto out;
+> > +		/* mucse_write_posted_mbx return 0 means fw has
+> > +		 * received request, wait for the expect opcode
+> > +		 * reply with 'retry_cnt' times.
+> > +		 */
+> > +	} while (--retry_cnt >= 0 && reply->opcode != req->opcode);
+> > +out:
+> > +	mutex_unlock(&hw->mbx.lock);
+> > +	if (!err && retry_cnt < 0)
+> > +		return -ETIMEDOUT;
+> > +	if (!err && reply->error_code)
+> > +		return -EIO;
+> > +	return err;
+> > +}
+> 
+> 
+> [snip]
+> 
+> > +
+> > +/**
+> > + * mucse_fw_get_capability - Get hw abilities from fw
+> > + * @hw: pointer to the HW structure
+> > + * @abil: pointer to the hw_abilities structure
+> > + *
+> > + * mucse_fw_get_capability tries to get hw abilities from
+> > + * hw.
+> > + *
+> > + * @return: 0 on success, negative on failure
+> 
+> negative errno or just some negative number?
+> 
 
-diff --git a/arch/arm64/boot/dts/freescale/imx95.dtsi b/arch/arm64/boot/dts/freescale/imx95.dtsi
-index 4ca6a7ea586e..605f14d8fa25 100644
---- a/arch/arm64/boot/dts/freescale/imx95.dtsi
-+++ b/arch/arm64/boot/dts/freescale/imx95.dtsi
-@@ -1948,6 +1948,7 @@ enetc_port2: ethernet@10,0 {
- 				};
- 
- 				netc_timer: ethernet@18,0 {
-+					compatible = "pci1131,ee02";
- 					reg = <0x00c000 0 0 0 0>;
- 					status = "disabled";
- 				};
--- 
-2.34.1
+errno, -EINTR, -EIO, -ETIMEDOUT
+Maybe update it like this?
+
+Return: 0 on success, negative errno on failure
+
+> > + **/
+> > +static int mucse_fw_get_capability(struct mucse_hw *hw,
+> > +				   struct hw_abilities *abil)
+> > +{
+> > +	struct mbx_fw_cmd_reply reply = {};
+> > +	struct mbx_fw_cmd_req req = {};
+> > +	int err;
+> > +
+> > +	build_phy_abilities_req(&req);
+> > +	err = mucse_fw_send_cmd_wait(hw, &req, &reply);
+> > +	if (!err)
+> > +		memcpy(abil, &reply.hw_abilities, sizeof(*abil));
+> > +	return err;
+> > +}
+> 
+> -- 
+> ~Randy
+> 
+> 
+
+Thanks for your feedback.
 
 
