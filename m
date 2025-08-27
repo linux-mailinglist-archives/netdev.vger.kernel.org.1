@@ -1,290 +1,249 @@
-Return-Path: <netdev+bounces-217417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55AE4B389C8
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 20:41:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61251B389CD
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 20:43:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40D6C7C504F
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 18:40:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2579B461B70
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 18:43:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 171142ED858;
-	Wed, 27 Aug 2025 18:39:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91EA02E174C;
+	Wed, 27 Aug 2025 18:43:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="LhcrqYEV"
+	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="AHs9yi/7";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="LIgzQPTB"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2060.outbound.protection.outlook.com [40.107.96.60])
+Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF4BD301498
-	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 18:39:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.60
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756319981; cv=fail; b=C1fBx200XAHM17L6N1ucxrN4JgkmlVFgAOa+Wzo9qmktZsWlOi4QGlZFn/qps4GeraKtqY5ZrCfVy8qVJY3/1Bi9ujUVnxIZmtVS+smSYDoejYOAVZB0BKXD9zQfkTLj8VJOZ5NbfErc8VP26mrSUbUtDpf8YhWB/HKRi+i2/Ww=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756319981; c=relaxed/simple;
-	bh=4lIgSt/i7TV+M0Mo93ApN1MrBo3OzDL75ocf0WwemPs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EPMaRIuO5yVIEQ4HriAAjnexmERouR0wwkozwPExtyfsHC8bGfIdiMlAkCEcsFCwbNDnFMDmp/IgVX+huwYAbIxlNhLz9Fd+lXuxKTfcrIWXUgSCXb3W6x1XsNp6ADy927tEeeZ0LP3evPg7uosaSYcqVq6r1Kxa9fD+LVpoV9c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=LhcrqYEV; arc=fail smtp.client-ip=40.107.96.60
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ilMSZ8/p54nK/qneD9yqAPXgrVRcq47taQ4ljS442qxvx4oYcI4vRm+ATrS7dh685d+TarHmNA0yACPXulwbkNKyCDM6s/QRYXTTUNbUCTOzHWOm/+/Spq2UvYN7g1ec+PB7dYckZ4AnW5x7jsxDH5YyTlFuGpfTyisyriXSoom4HPNGW2fpN1W1b9CtZ7DaWonniu97tM5y6WF9LgEEudFMPdGh8zZF06K5ULIrdHSn7rVBZAO0Uj4EQRSRyNhmDHiLsSEgD1H2zdgzH5778uNsllAQWTX9H+gE1BDSonH+G8POGU7oO+qzUEPaJH24vS/NB1bB3w2J3E/Wkom0QA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kxL/h8UxNKLfgSxl4AGYYQpId2xWmROF+4avtZRpbA8=;
- b=P9yt8vBsbRfyOY8HFKHkRuxHYhEUpD7bN2WpvkALGKdEgjIPdAqFF4esNOS52zOGw91h9yFq2YTp9zRpUY5Z0XcatZ52buIUXyWChNFbGKIqY1vcyO0BPAPXFwobSOB7YUL7CYgznMIHpBWpiqlcMhmZ81ofKk/3KkIgHcXG1y0l8tOr2vWAbiumoBsS3CC49jD+PpcfcaaFrTTu2Hk19wGpERNwpJTzxBqDNpebhxWvAljylL8VTVLsjGYn7cyJXFvypQl92Mm/mwhv1AXn4m/W/EgVgtpLY5CvPnihlrydWkvoqqlBz8REzJ4hqXwS8xE3+upHrC+PRug9TxpBjg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kxL/h8UxNKLfgSxl4AGYYQpId2xWmROF+4avtZRpbA8=;
- b=LhcrqYEV6MGl2zz3RfWI5mUwRRkjdL5Rm1ZE0oah8C41yzmLu7uuInnEDXf2PXwjkZnv1UuO3R2r+toe75HeUTHVllDbBusucTE0urFRFKz3j4pDBGzg6WMezdbvvNrx3VfT8vP14mni5Yi183ZADqedinnXr32O6fwGgorhMwOdpO4qacoCv1VY21wSb5rtnrMp5g51cXFCL16/jzJP+3j4/2X7e2IrIxEQnWNBKLj1lU5olN+zOdgvsL9l74SPKAbK4noVMBgI/eqAt3vaazy3K80+H9T1GKZTiAeIsD4n12d6OdoqoO/yfpzpf2MIRy9zjE1dMyi9hexQ2Nw06w==
-Received: from MN2PR04CA0008.namprd04.prod.outlook.com (2603:10b6:208:d4::21)
- by SA3PR12MB8803.namprd12.prod.outlook.com (2603:10b6:806:317::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.20; Wed, 27 Aug
- 2025 18:39:34 +0000
-Received: from BN1PEPF0000468C.namprd05.prod.outlook.com
- (2603:10b6:208:d4:cafe::b2) by MN2PR04CA0008.outlook.office365.com
- (2603:10b6:208:d4::21) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9052.21 via Frontend Transport; Wed,
- 27 Aug 2025 18:39:34 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- BN1PEPF0000468C.mail.protection.outlook.com (10.167.243.137) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9073.11 via Frontend Transport; Wed, 27 Aug 2025 18:39:34 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 27 Aug
- 2025 11:39:15 -0700
-Received: from drhqmail201.nvidia.com (10.126.190.180) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Wed, 27 Aug 2025 11:39:14 -0700
-Received: from vdi.nvidia.com (10.127.8.14) by mail.nvidia.com
- (10.126.190.180) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
- Transport; Wed, 27 Aug 2025 11:39:13 -0700
-From: Daniel Jurgens <danielj@nvidia.com>
-To: <netdev@vger.kernel.org>, <mst@redhat.com>, <jasowang@redhat.com>,
-	<alex.williamson@redhat.com>, <virtualization@lists.linux.dev>,
-	<pabeni@redhat.com>
-CC: <parav@nvidia.com>, <shshitrit@nvidia.com>, <yohadt@nvidia.com>, "Daniel
- Jurgens" <danielj@nvidia.com>
-Subject: [PATCH net-next 11/11] virtio_net: Add get ethtool flow rules ops
-Date: Wed, 27 Aug 2025 13:38:52 -0500
-Message-ID: <20250827183852.2471-12-danielj@nvidia.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250827183852.2471-1-danielj@nvidia.com>
-References: <20250827183852.2471-1-danielj@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC13A278143;
+	Wed, 27 Aug 2025 18:43:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756320206; cv=none; b=fp0wZDn9YwE0H1unFb6oF7uz4C7xr+XUBtQQWb41hqbDD0AU/66W7xe9ONh2OOKOZBVgsVtJ66xa9gvuTGnhTa5EkaajV/RWx0ncjPyMoyMYliFBMeE8MPGCnahJR9JpY7fKUDGDoqu7WxHJpk9KULZSxuTQIZtwz5HO74ynTNk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756320206; c=relaxed/simple;
+	bh=h8R3EcV+NTP5wjjJ9QQ4JoR9KQy94BQW0jO4jadhGIc=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=GPQTzXHNlUBQ9YwvHplmVI7EOf3bwcIrqXjWsj3P3Grwo1UUS+AWL8EU51zZ1AeFsgviaAbhACNLmg5mBFyuiTO5DeOepSUpinG/kDGTNeJ1G3T884psSG2cv8sxitX0NEtHfIVqoe8zob8Lhq0SOaGkdcgldUs47Av3AfQXTzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=AHs9yi/7; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=LIgzQPTB; arc=none smtp.client-ip=202.12.124.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
+Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 2E6327A0155;
+	Wed, 27 Aug 2025 14:43:22 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-12.internal (MEProxy); Wed, 27 Aug 2025 14:43:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-id:content-transfer-encoding:content-type
+	:content-type:date:date:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to; s=fm2; t=1756320202; x=1756406602; bh=120xnupGH9jAY3geWFsvU
+	BOMtx3MkVkNw/aGxou3pYQ=; b=AHs9yi/7DPpE9MJswFzP5r5pI/Qh9c9RhOD1R
+	gnMwsnIin1rY6cRAyk9EUhJuwGRCZARzNvmUCnJ9NGGqmNoT++grx+pwNin91Lh2
+	qgeuvxgOibq0hDjPxQ3Y6ISpmTlb0VIB0sdxyKfYpKkhay8hXNIStaf4+41oMr1Z
+	EIWOqpBDO4YghRlh12siWa4J/pnzOnMXSPy69kWA9H3Tynj2oySigxqWzbxD/ILq
+	fC5cWG+vWm82dDgWqGwJRgChazf/pSRa9/d8MtfcgzrrpatQHVMTLYkp0y8MpCH3
+	BdLlsJ1ZK8gjFubW7fZiib0UXzKcGfbudyJ/0hNqvl/wRg4HA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-id
+	:content-transfer-encoding:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1756320202; x=1756406602; bh=120xnupGH9jAY3geWFsvUBOMtx3MkVkNw/a
+	Gxou3pYQ=; b=LIgzQPTBzsYf1g/3Hdr2XToOQ22Jg6Akl6WTsL9UXRv4Pgu9a9f
+	NyWlTewvH/jVeHv7/Ny+qgIFEYw6cLwBuMXw/QovPY2yYhEOx1YiFGZ68qbYtkNY
+	p0IpcgBHDm0oH9FvUaS9l1FkYs3Tvz96avjgJdpyp1CkTjOQFmbhcYugzu7AE0OT
+	n8V1WWaJ+5dlg20ItMqBM/DVdOs5RMuPnpQK3+IhbZXkrtx9xPk8I6FbNsXpwt3w
+	PcqzR7INvDxnXnSExzxgh+HISFa6Q1zXNqVJGk65D7X67j5rH7KDzFkbpVgqmSyw
+	Knrj06tIv3PUNoWqwyCzr0VVeGkrcrDoQfA==
+X-ME-Sender: <xms:yVGvaBsdrtExvt8Bucl-ysKFPAUexVzZUv73IcWQ2iiXVTH8MVZ6DA>
+    <xme:yVGvaBCw0glzd8mQJTtOpIstKqNfNIZxmffJMbzNF5eqWqtksBf_ILXrskZIflMUQ
+    kVTBDqcnYooLVhXGRI>
+X-ME-Received: <xmr:yVGvaGe0hrz_NhishCEg0woqIJLoBYCbYbBkEyyKRHi8gDuU9coBQ_WW7QwCfMDHQN3naA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddujeekledtucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhephffvvefujghfofggtgfgfffksehtqhertdertddvnecuhfhrohhmpeflrgihucgg
+    ohhssghurhhghhcuoehjvhesjhhvohhssghurhhghhdrnhgvtheqnecuggftrfgrthhtvg
+    hrnhepieefvdelfeeljeevtefhfeeiudeuiedvfeeiveelffduvdevfedtheffffetfeff
+    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepjhhvse
+    hjvhhoshgsuhhrghhhrdhnvghtpdhnsggprhgtphhtthhopeduledpmhhouggvpehsmhht
+    phhouhhtpdhrtghpthhtoheprhgriihorhessghlrggtkhifrghllhdrohhrghdprhgtph
+    htthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepughsrghh
+    vghrnhesghhmrghilhdrtghomhdprhgtphhtthhopehjohhnrghsrdhgohhrshhkihesgh
+    hmrghilhdrtghomhdprhgtphhtthhopehlihhuhhgrnhhgsghinhesghhmrghilhdrtgho
+    mhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtoh
+    ephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgv
+    lhdrohhrghdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:yVGvaBqsUp4uHoPzNp24AtplX1Xgfw5K9hRwNsPCFxsbmN4uOQBaDA>
+    <xmx:yVGvaC7bgAhofa95Mbw2CeIcOeNt7lt8dmfaa-h5E1CwnIG46o6cJw>
+    <xmx:yVGvaBCbj3DAnO4mUXMcLPtBd_x1b56D81fP4n7cFcJ8rBwUvUTvfw>
+    <xmx:yVGvaEY9B0IzyeF4VOX8rLwV3jhRL8ZQhQOq09jiajpPF-0K2dwvqg>
+    <xmx:ylGvaOZIOXJvNZUX2PBLK2vnZKPx_W-FdoxGrhKlJNBpkxw6pFMR8t-G>
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 27 Aug 2025 14:43:20 -0400 (EDT)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id DE7F39FCA0; Wed, 27 Aug 2025 11:43:19 -0700 (PDT)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id DD5279FB9F;
+	Wed, 27 Aug 2025 11:43:19 -0700 (PDT)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: Hangbin Liu <liuhangbin@gmail.com>
+cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>,
+    Nikolay Aleksandrov <razor@blackwall.org>,
+    Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+    Jonathan Corbet <corbet@lwn.net>, Petr Machata <petrm@nvidia.com>,
+    Amit Cohen <amcohen@nvidia.com>,
+    Vladimir Oltean <vladimir.oltean@nxp.com>,
+    Stephen Hemminger <stephen@networkplumber.org>,
+    David Ahern <dsahern@gmail.com>,
+    Jonas Gorski <jonas.gorski@gmail.com>, linux-doc@vger.kernel.org,
+    linux-kselftest@vger.kernel.org
+Subject: Re: [PATCHv4 iproute2-next] iplink: bond_slave: add support for
+ actor_port_prio
+In-reply-to: <20250825070528.421434-1-liuhangbin@gmail.com>
+References: <20250825070528.421434-1-liuhangbin@gmail.com>
+Comments: In-reply-to Hangbin Liu <liuhangbin@gmail.com>
+   message dated "Mon, 25 Aug 2025 07:05:28 -0000."
+X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN1PEPF0000468C:EE_|SA3PR12MB8803:EE_
-X-MS-Office365-Filtering-Correlation-Id: 425db479-4d8c-4c9e-f93f-08dde59911b2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|36860700013|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?iUKUzmdLjJvCQmH6UEkLNUHldWgNWbiOlk6mLm3WARILXjlnkZHGpaRcflDG?=
- =?us-ascii?Q?Va7naez28Xaoypy6NMy+8vaI1dBjMcu1Q5MTt3C/a6+YgeETg3XxuKfUUN3U?=
- =?us-ascii?Q?C3zIkCWKfR2rSPH485tNCdCxBkFJskSYaQymfq1+HWoIrbks3NRLbVyNdtse?=
- =?us-ascii?Q?EeS+N1rXnpdSZHRHQOIxJ063j2UVnHWlfcsQ2mNEF/EVGWbZwcSTFtsNR2nn?=
- =?us-ascii?Q?Nt+AhtY99dcrKE173gqw3wyQFxHDczluIVs3NhK/E244JjQu0FBOTBjMpZOb?=
- =?us-ascii?Q?YgBnsSFrqgb1JfucgOevw7Mi46SFOu4lc8Al7QXLh8Y5qU2svfybscn7QzGM?=
- =?us-ascii?Q?7QtNbey50iu/5SY6zyrc0NM//uxgfnF+9J8qiimlXC1a4gC2IGtF9DVmpqpY?=
- =?us-ascii?Q?SNEBH2Y/M6c8WeBi+3p6bSWTYZlli4C8NvyKOpvcKIoyQq0eSnDeBilX7M3S?=
- =?us-ascii?Q?bWwnbfWp1uwrnofifhMmWpVASzo/cZxaUow0/H23zrmyijGLVtZyCjLCCGwr?=
- =?us-ascii?Q?hLB8Mc1sGEwBP4gh1Af8hLbUJ9EUgJ+SyTQVAm4acHX+ETZEKc4cIeIGR/mc?=
- =?us-ascii?Q?t8EaqatIQezPoBvf5qPeuCmz6xbCMzGGK7Z7VTAklDn6KiIPr0TzCOKjTxDE?=
- =?us-ascii?Q?sMhhqjJwbXIZTrcB5n9d3xp1oTijWAdTaL9OyH0tOqlFq9a8tlB8CQJujg76?=
- =?us-ascii?Q?+IUXUNRdlFKoEh/o1BMkPPfB46QbLH+duJElFUowFtRL2rzPNKR+7iGHwIVk?=
- =?us-ascii?Q?XV9rP/pcDUZzTSva5Q9dhgIFlY7vHNOv03UbsH2+KtoLSDSecaFa+ydznYP9?=
- =?us-ascii?Q?OUWqt59/7Kf9GOTNRJQjooP3JKUu1aibJT1Rwt/InigGl5/SwQriPsZgn0Ms?=
- =?us-ascii?Q?DNXPIgZf88DQffG69GlpZlGsOS/03URKYEBe9UrO0aIMDZ64ySv83WtVO605?=
- =?us-ascii?Q?1pOeYV2hvy097voox5+h91PVMa94aN18eiurYlZcdMcoYJuek76XMtaqiYST?=
- =?us-ascii?Q?pJPYjVDujZt9lVkOGkod3D/AT/wb9IswDgTibuYMwG/kqCue7JvZ9/ceeUep?=
- =?us-ascii?Q?ezyYd1YCQ5v+76PbAmxTHx3jgJrOhPXDX5agjQkea0tqDePqtnNmhYWTg22s?=
- =?us-ascii?Q?BHs+h2TBCjUeXqxtJ8I2lxDhx7mzYDY/bmeRMbhmJv6TV7OCrK0V2qk12Vx1?=
- =?us-ascii?Q?DG2669OWffr6FIXIl+OvJ3Ct00kJPyu5gjHz870apK1ilCvIAO65Mfp/Zp+2?=
- =?us-ascii?Q?bzxphxXboD+dI3teQbcZCaeK4YaIz0f2iuUFgRuLGaymJMHgGPZD4JoJ8RGf?=
- =?us-ascii?Q?EFc8t5VmKAkUzjZVWrIzja0h375Y2qkP4px0WKRPY41LnIORO+4oH5pbRKAp?=
- =?us-ascii?Q?iFAD8djXJBG8wLB1yGfPqmSqUuwwpZXCh4QkWCEX6tNTimyatCp/6p1Uor3L?=
- =?us-ascii?Q?YztcTVK28JvjLD32Vpyy870zXgAKRUMrAxFQmToO19QWlRTTVqw59PrGgUNp?=
- =?us-ascii?Q?QcasF4H6hwgPI9xwhaLml6ilBxJT6zH8mEfS?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Aug 2025 18:39:34.4371
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 425db479-4d8c-4c9e-f93f-08dde59911b2
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN1PEPF0000468C.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB8803
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1859261.1756320199.1@famine>
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 27 Aug 2025 11:43:19 -0700
+Message-ID: <1859262.1756320199@famine>
 
-- Get total number of rules. There's no user interface for this. It is
-  used to allocate an appropriately sized buffer for getting all the
-  rules.
+Hangbin Liu <liuhangbin@gmail.com> wrote:
 
-- Get specific rule
-$ ethtool -u ens9 rule 0
-	Filter: 0
-		Rule Type: UDP over IPv4
-		Src IP addr: 0.0.0.0 mask: 255.255.255.255
-		Dest IP addr: 192.168.5.2 mask: 0.0.0.0
-		TOS: 0x0 mask: 0xff
-		Src port: 0 mask: 0xffff
-		Dest port: 4321 mask: 0x0
-		Action: Direct to queue 16
+>Add support for the actor_port_prio option for bond slaves.
+>This per-port priority can be used by the bonding driver in ad_select to
+>choose the higher-priority aggregator during failover.
+>
+>Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+>---
+>v4: no update
+>v3: rename ad_actor_port_prio to actor_port_prio
+>v2: no update
+>---
+> ip/iplink_bond.c       |  1 +
+> ip/iplink_bond_slave.c | 18 ++++++++++++++++--
+> man/man8/ip-link.8.in  |  6 ++++++
+> 3 files changed, 23 insertions(+), 2 deletions(-)
+>
+>diff --git a/ip/iplink_bond.c b/ip/iplink_bond.c
+>index d6960f6d9b03..1a2c1b3042a0 100644
+>--- a/ip/iplink_bond.c
+>+++ b/ip/iplink_bond.c
+>@@ -91,6 +91,7 @@ static const char *ad_select_tbl[] =3D {
+> 	"stable",
+> 	"bandwidth",
+> 	"count",
+>+	"prio",
 
-- Get all rules:
-$ ethtool -u ens9
-31 RX rings available
-Total 2 rules
+	Should this be actor_port_prio?
 
-Filter: 0
-        Rule Type: UDP over IPv4
-        Src IP addr: 0.0.0.0 mask: 255.255.255.255
-        Dest IP addr: 192.168.5.2 mask: 0.0.0.0
-...
+	-J
 
-Filter: 1
-        Flow Type: Raw Ethernet
-        Src MAC addr: 00:00:00:00:00:00 mask: FF:FF:FF:FF:FF:FF
-        Dest MAC addr: 08:11:22:33:44:54 mask: 00:00:00:00:00:00
+> 	NULL,
+> };
+> =
 
-Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
-Reviewed-by: Parav Pandit <parav@nvidia.com>
-Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
+>diff --git a/ip/iplink_bond_slave.c b/ip/iplink_bond_slave.c
+>index ad6875006950..c88100e248dd 100644
+>--- a/ip/iplink_bond_slave.c
+>+++ b/ip/iplink_bond_slave.c
+>@@ -15,7 +15,9 @@
+> =
+
+> static void print_explain(FILE *f)
+> {
+>-	fprintf(f, "Usage: ... bond_slave [ queue_id ID ] [ prio PRIORITY ]\n")=
+;
+>+	fprintf(f, "Usage: ... bond_slave [ queue_id ID ] [ prio PRIORITY ]\n"
+>+		   "                      [ actor_port_prio PRIORITY ]\n"
+>+	);
+> }
+> =
+
+> static void explain(void)
+>@@ -145,12 +147,18 @@ static void bond_slave_print_opt(struct link_util *=
+lu, FILE *f, struct rtattr *t
+> 			  state);
+> 		print_slave_oper_state(f, "ad_partner_oper_port_state_str", state);
+> 	}
+>+
+>+	if (tb[IFLA_BOND_SLAVE_ACTOR_PORT_PRIO])
+>+		print_int(PRINT_ANY,
+>+			  "actor_port_prio",
+>+			  "actor_port_prio %d ",
+>+			  rta_getattr_u16(tb[IFLA_BOND_SLAVE_ACTOR_PORT_PRIO]));
+> }
+> =
+
+> static int bond_slave_parse_opt(struct link_util *lu, int argc, char **a=
+rgv,
+> 				struct nlmsghdr *n)
+> {
+>-	__u16 queue_id;
+>+	__u16 queue_id, actor_port_prio;
+> 	int prio;
+> =
+
+> 	while (argc > 0) {
+>@@ -164,6 +172,12 @@ static int bond_slave_parse_opt(struct link_util *lu=
+, int argc, char **argv,
+> 			if (get_s32(&prio, *argv, 0))
+> 				invarg("prio is invalid", *argv);
+> 			addattr32(n, 1024, IFLA_BOND_SLAVE_PRIO, prio);
+>+		} else if (strcmp(*argv, "actor_port_prio") =3D=3D 0) {
+>+			NEXT_ARG();
+>+			if (get_u16(&actor_port_prio, *argv, 0))
+>+				invarg("actor prio is invalid", *argv);
+>+			addattr16(n, 1024, IFLA_BOND_SLAVE_ACTOR_PORT_PRIO,
+>+				  actor_port_prio);
+> 		} else {
+> 			if (matches(*argv, "help") !=3D 0)
+> 				fprintf(stderr,
+>diff --git a/man/man8/ip-link.8.in b/man/man8/ip-link.8.in
+>index e3297c577152..7995943ab11f 100644
+>--- a/man/man8/ip-link.8.in
+>+++ b/man/man8/ip-link.8.in
+>@@ -2846,6 +2846,12 @@ the following additional arguments are supported:
+> (a 32bit signed value). This option only valid for active-backup(1),
+> balance-tlb (5) and balance-alb (6) mode.
+> =
+
+>+.sp
+>+.BI actor_port_prio " PRIORITY"
+>+- set the slave's ad actor port priority for 802.3ad aggregation selecti=
+on
+>+logic during failover (a 16bit unsigned value). This option only valid f=
+or
+>+802.3ad (4) mode.
+>+
+> .in -8
+> =
+
+> .TP
+>-- =
+
+>2.50.1
+>
+
 ---
- drivers/net/virtio_net/virtio_net_ff.c   | 48 ++++++++++++++++++++++++
- drivers/net/virtio_net/virtio_net_ff.h   |  6 +++
- drivers/net/virtio_net/virtio_net_main.c |  9 +++++
- 3 files changed, 63 insertions(+)
-
-diff --git a/drivers/net/virtio_net/virtio_net_ff.c b/drivers/net/virtio_net/virtio_net_ff.c
-index a1f5c913bf08..2a76de5f7f32 100644
---- a/drivers/net/virtio_net/virtio_net_ff.c
-+++ b/drivers/net/virtio_net/virtio_net_ff.c
-@@ -807,6 +807,54 @@ int virtnet_ethtool_flow_remove(struct virtnet_ff *ff, int location)
- 	return err;
- }
- 
-+int virtnet_ethtool_get_flow_count(struct virtnet_ff *ff,
-+				   struct ethtool_rxnfc *info)
-+{
-+	if (!ff->ff_supported)
-+		return -EOPNOTSUPP;
-+
-+	info->rule_cnt = ff->ethtool.num_rules;
-+	info->data = le32_to_cpu(ff->ff_caps->rules_limit) | RX_CLS_LOC_SPECIAL;
-+
-+	return 0;
-+}
-+
-+int virtnet_ethtool_get_flow(struct virtnet_ff *ff,
-+			     struct ethtool_rxnfc *info)
-+{
-+	struct virtnet_ethtool_rule *eth_rule;
-+
-+	if (!ff->ff_supported)
-+		return -EOPNOTSUPP;
-+
-+	eth_rule = xa_load(&ff->ethtool.rules, info->fs.location);
-+	if (!eth_rule)
-+		return -ENOENT;
-+
-+	info->fs = eth_rule->flow_spec;
-+
-+	return 0;
-+}
-+
-+int
-+virtnet_ethtool_get_all_flows(struct virtnet_ff *ff,
-+			      struct ethtool_rxnfc *info, u32 *rule_locs)
-+{
-+	struct virtnet_ethtool_rule *eth_rule;
-+	unsigned long i = 0;
-+	int idx = 0;
-+
-+	if (!ff->ff_supported)
-+		return -EOPNOTSUPP;
-+
-+	xa_for_each(&ff->ethtool.rules, i, eth_rule)
-+		rule_locs[idx++] = i;
-+
-+	info->data = le32_to_cpu(ff->ff_caps->rules_limit);
-+
-+	return 0;
-+}
-+
- static size_t get_mask_size(u16 type)
- {
- 	switch (type) {
-diff --git a/drivers/net/virtio_net/virtio_net_ff.h b/drivers/net/virtio_net/virtio_net_ff.h
-index 94b575fbd9ed..4bb41e64cc59 100644
---- a/drivers/net/virtio_net/virtio_net_ff.h
-+++ b/drivers/net/virtio_net/virtio_net_ff.h
-@@ -28,6 +28,12 @@ void virtnet_ff_init(struct virtnet_ff *ff, struct virtio_device *vdev);
- 
- void virtnet_ff_cleanup(struct virtnet_ff *ff);
- 
-+int virtnet_ethtool_get_flow_count(struct virtnet_ff *ff,
-+				   struct ethtool_rxnfc *info);
-+int virtnet_ethtool_get_all_flows(struct virtnet_ff *ff,
-+				  struct ethtool_rxnfc *info, u32 *rule_locs);
-+int virtnet_ethtool_get_flow(struct virtnet_ff *ff,
-+			     struct ethtool_rxnfc *info);
- int virtnet_ethtool_flow_insert(struct virtnet_ff *ff,
- 				struct ethtool_rx_flow_spec *fs,
- 				u16 curr_queue_pairs);
-diff --git a/drivers/net/virtio_net/virtio_net_main.c b/drivers/net/virtio_net/virtio_net_main.c
-index 14ee26fc9ef3..63bf5fdc084f 100644
---- a/drivers/net/virtio_net/virtio_net_main.c
-+++ b/drivers/net/virtio_net/virtio_net_main.c
-@@ -5619,6 +5619,15 @@ static int virtnet_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info,
- 	int rc = 0;
- 
- 	switch (info->cmd) {
-+	case ETHTOOL_GRXCLSRLCNT:
-+		rc = virtnet_ethtool_get_flow_count(&vi->ff, info);
-+		break;
-+	case ETHTOOL_GRXCLSRULE:
-+		rc = virtnet_ethtool_get_flow(&vi->ff, info);
-+		break;
-+	case ETHTOOL_GRXCLSRLALL:
-+		rc = virtnet_ethtool_get_all_flows(&vi->ff, info, rule_locs);
-+		break;
- 	case ETHTOOL_GRXRINGS:
- 		info->data = vi->curr_queue_pairs;
- 		break;
--- 
-2.50.1
-
+	-Jay Vosburgh, jv@jvosburgh.net
 
