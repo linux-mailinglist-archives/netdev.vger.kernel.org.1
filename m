@@ -1,205 +1,160 @@
-Return-Path: <netdev+bounces-217287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F589B38394
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 15:18:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F6FBB383A7
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 15:27:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33D3F3AE3D1
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 13:18:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D70DB7A4853
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 13:25:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82ACB28504D;
-	Wed, 27 Aug 2025 13:18:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2AC7346A1D;
+	Wed, 27 Aug 2025 13:27:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="aUmw3tX9"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F5D1BCA07;
-	Wed, 27 Aug 2025 13:18:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2767C298CC7
+	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 13:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756300692; cv=none; b=jtyDOedFcaIunrfPEke4QCGaoRcnNdLtNJGbP35gYR1fH3iuSGMCKPCmEzBge10CTh2rp5XmxWnFjddn2jrYcFmsKqbhQMHWMx2f2Ned9fJpW83clxCnDmrb1PQrsCDKuFqYtkRsv3zktPZavBrHmjTg4pa8oe1KrqzaIrvPm6g=
+	t=1756301245; cv=none; b=pbe7aykpUfrieIbiZhU+8g+8WWA4PL3ZdvSEYjhzjCeweilQR6SoeSBcb9KA3ce12dzk8vMxeJqta5TLyaXLoatKoJspFznJWH/aJ+SA6JjZJN0rc0PUGO2TzINwHwXw65aLWnrlILnHctruy2THKTy41ODbB8B+nhcuZx9XQa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756300692; c=relaxed/simple;
-	bh=cheHazgTGDhKXw7vq6atCi2XUFv5oxx6gGI7RH7+KeA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FMWjyWXrFa4WuslZ41F73cmhEN++VtFGDP87y3f80QqrQo+13nBX5A2xBHHNJHEmZ/ZHU25vMns0mwS8ASObNhY9mqs6HKa692065Qv0G0O0dkZdfIl8nrvAc3h63L+wq/YQCGeCaXrD1piLb7+gojXKM+Slu8vYjQIiFuJWUPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from [192.168.0.102] (unknown [114.241.87.235])
-	by APP-05 (Coremail) with SMTP id zQCowAC3SFljBa9oUlCJDw--.28806S2;
-	Wed, 27 Aug 2025 21:17:24 +0800 (CST)
-Message-ID: <9b83e78a-0456-4b43-9380-0e2b83933246@iscas.ac.cn>
-Date: Wed, 27 Aug 2025 21:17:23 +0800
+	s=arc-20240116; t=1756301245; c=relaxed/simple;
+	bh=3lKOrjefgxkmUKwLi1C9rB33yAcCifL0LQZhPHbPOOA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ki/Nu4FfDJu2rirMdpjHhFvFGkLFxn1PEvysYi0X11ECdiZhCVkxAOpip0/ckQQOzs+3oRI14uTZkcaR9qWhszRMHQMr3xrBvJtFbXZWN88ID2sEibtSTKoWualeawpJGvO1hajG1brvpHr+7kfjWyePTOJXlhUajpzO8kEW0ME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=aUmw3tX9; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57R6kGuJ008283
+	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 13:27:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	SJVYYjYdxfF4p3sCNzv7moDWVy1fEvP4+O85me4AGX8=; b=aUmw3tX98ouaWrNP
+	c7cRcUvLJ/uaKbTmFly+SR6LyDANGw9appliTsxXUvGCHlOQLAmRjGciqGnHrfIU
+	/AsQZ7IOZRFww/JQQtS26oTU4t9ZYR/tYgOBGVCeGsNPYDU2JMWsmgM+jnEaMAl/
+	4v9bKwvSSSzFEbsoGH6oi9OAEhgB1Rxzw8sOUI2VRQYVBY+iTGeFqfWJRJ0r53TA
+	fiZvhbhhg7JB4UENGWF5SVB/7UvNUPW44T7+GSpy7QX4RlSJIaf70FH9owwjicGr
+	CvVJLLLpFt2jXzbOsEbkfNY/icvceTtYqWgzxaLKwIRw/LpYfeF8VXTOYikXmu9b
+	ZBMjOQ==
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48sh8ajyth-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 13:27:23 +0000 (GMT)
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3ec58544f79so95897175ab.1
+        for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 06:27:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756301242; x=1756906042;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SJVYYjYdxfF4p3sCNzv7moDWVy1fEvP4+O85me4AGX8=;
+        b=YyWzpiC5GASroxzXJFFdwuNDm+piX236LORyIswmLJM+3n8vqKlh6lTi3BfFyLExJv
+         V4Pa4MYtky7DMyIJOe85mLyQpNAr2IJQatjU3mriHOt6jkqi8cP9Ti2jKhGfwu7f7sHM
+         84K1h8WSHZ3QgRoXUDhtC7P6SKnd0IllwgTEXPkiCfa8liU819rCqDBEVh2lD+d7Py5g
+         vunjZWFLx4JZfybeHnUE6Skc5VVU5awnkFRWM7mVTNBjUJO2tpjLssvgzK2JRZhLxqnt
+         ss6LtUjoy1R2ZBM/iYHnfXGF8ZJ2FlHjWeUiqTXxtv5NDakSusKUQ3MzuL6GrJjFMbnf
+         UFew==
+X-Forwarded-Encrypted: i=1; AJvYcCUyGb39+7ONad2N8pn/zI9DG6RWLNjyajnmRLsNm29bd9FCj0Mb55l/H2cUlv03bDjLJUMXYKE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxgqpAftU1uACsBhQHxDtlirlzuC2h0hT/1q4cwJzxiVgh3ehy
+	go7tMsIuoGzmhm6N5OIKWra8gWyJ0sLMEOQ8LZnQxHYwj0AXwktgvblhX74VKyG4yxSvT2iYrDn
+	wBfc1l6N8uyHCKZ2y+n+G1ReC1T96/K3gbQm0yTQt4K+gNYfrqld6plr7CA6in261Cpv6hlw6OC
+	FRXcIcF48ph4nvpahUaatGkAa7uDM3VvhB+Q==
+X-Gm-Gg: ASbGncvpvPHhmmB9695p21gE8jx+ajrNfSPtYLzpzdL+Vp+vjroSYTwKuWx8Qo2HooF
+	TNKXNs6c1GOPsm/S4V7kQQXKLDWsZq/7PJfXajN9iObiOerCDFl7tZnAr7KNm//XQAawA3J0na8
+	oohuKx38QT++oeBUDe4GkhJQ==
+X-Received: by 2002:a92:c24c:0:b0:3ee:931d:8272 with SMTP id e9e14a558f8ab-3ee931d85d9mr86187875ab.27.1756301242106;
+        Wed, 27 Aug 2025 06:27:22 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHXGPWw2hCMcJeQwiV5IoCHGM6jK6hrlxrHOgdWVoa9qCoqe01JmjR/TC3MdI8BwFgEeEyrV49mBsxLH9bfitc=
+X-Received: by 2002:a92:c24c:0:b0:3ee:931d:8272 with SMTP id
+ e9e14a558f8ab-3ee931d85d9mr86187435ab.27.1756301241703; Wed, 27 Aug 2025
+ 06:27:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 2/5] net: spacemit: Add K1 Ethernet MAC
-To: Philipp Zabel <p.zabel@pengutronix.de>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexandre Ghiti <alex@ghiti.fr>
-Cc: Vivian Wang <uwu@dram.page>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Junhui Liu <junhui.liu@pigmoral.tech>, Simon Horman <horms@kernel.org>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-riscv@lists.infradead.org,
- spacemit@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20250826-net-k1-emac-v7-0-5bc158d086ae@iscas.ac.cn>
- <20250826-net-k1-emac-v7-2-5bc158d086ae@iscas.ac.cn>
- <eb127fd167cfbd885099a7c4c962eb1135a5a8a0.camel@pengutronix.de>
-Content-Language: en-US
-From: Vivian Wang <wangruikang@iscas.ac.cn>
-In-Reply-To: <eb127fd167cfbd885099a7c4c962eb1135a5a8a0.camel@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8
+References: <20250826135021.510767-1-rongqianfeng@vivo.com>
+In-Reply-To: <20250826135021.510767-1-rongqianfeng@vivo.com>
+From: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Date: Wed, 27 Aug 2025 15:27:09 +0200
+X-Gm-Features: Ac12FXzb8MeF3YNH5KT8aiAXaNlyGCJ0i6W5AAkJ9v519Ak-1GpAJyjOi3X6R4k
+Message-ID: <CAFEp6-0J8e1rQbAwEE-E=LzhLyV5x10bhQE6EDwSvL=gz5S9JA@mail.gmail.com>
+Subject: Re: [PATCH] net: wwan: iosm: use int type to store negative error codes
+To: Qianfeng Rong <rongqianfeng@vivo.com>
+Cc: Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-CM-TRANSID:zQCowAC3SFljBa9oUlCJDw--.28806S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxXrWUZF43Jw1kKr4rArWrZrb_yoWrJFy8pa
-	ykJF9IkF4xAr17Kws3Xr4UAF93Xw4IyFyUCrySyw4rXwnFyr1fGry8KrWYkw1vyrZ8CryY
-	va1UZa4I9Fs8u3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvqb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I2
-	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
-	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xII
-	jxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4
-	A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IE
-	w4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMc
-	vjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY
-	1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8Jw
-	C20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAF
-	wI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjx
-	v20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2
-	jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0x
-	ZFpf9x07bIBTOUUUUU=
-X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
+X-Authority-Analysis: v=2.4 cv=cLDgskeN c=1 sm=1 tr=0 ts=68af07bb cx=c_pps
+ a=knIvlqb+BQeIC/0qDTJ88A==:117 a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10
+ a=1WtWmnkvAAAA:8 a=EUspDBNiAAAA:8 a=_vuNJv8LpkyJlonoWToA:9 a=QEXdDO2ut3YA:10
+ a=8vIIu0IPYQVSORyX1RVL:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODI2MDE1MyBTYWx0ZWRfX46DZUdFD8Koa
+ zOYwNnztrHlALVIrnpHtUFC2cjO15JYJAOAmIJ8vMQsHJvJ8xlNQlBexH+D/zUyQF/xvYiUpDBU
+ YjeKHGStMNZiQxUdzBzcrIXf7tbGfdYpzEdQW/WXliiR9T/SZNMNRt26WCa3czIiyVIC0gdgkBK
+ lcN/yoiTQOt0hJtjHL4eHwQlIrhRzCYhOM/Y5PTx4m0Das7KL8ATx2z8pN+p5V8ua4FsjKREIHJ
+ SGCNWTL/xutEyMavmkbmh6fkImGN36SsMYUNwE1cJxX8nx1Q9ZNp1jl+t7yEH8xoOWocWWnzuov
+ VVahT1IP9kP9TZdk+YEdA8FWpgEo6yK/0XGTDzmBFpXiwvRsfneHTov43NrmARShcCXhqy7zoXC
+ TNPtrdOJ
+X-Proofpoint-GUID: exiH1Nq45SEmfR5Awge0LiVy-OubvrAe
+X-Proofpoint-ORIG-GUID: exiH1Nq45SEmfR5Awge0LiVy-OubvrAe
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-27_03,2025-08-26_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 clxscore=1015 malwarescore=0 spamscore=0 adultscore=0
+ impostorscore=0 suspectscore=0 priorityscore=1501 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508260153
 
-Hi=C2=A0Philipp,
-
-Thanks for your review.
-
-On 8/26/25 16:54, Philipp Zabel wrote:
-> On Di, 2025-08-26 at 14:23 +0800, Vivian Wang wrote:
->> The Ethernet MACs found on SpacemiT K1 appears to be a custom design
->> that only superficially resembles some other embedded MACs. SpacemiT
->> refers to them as "EMAC", so let's just call the driver "k1_emac".
->>
->> Supports RGMII and RMII interfaces. Includes support for MAC hardware
->> statistics counters. PTP support is not implemented.
->>
->> Tested-by: Junhui Liu <junhui.liu@pigmoral.tech>
->> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
->> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
->> Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
->> ---
->>  drivers/net/ethernet/Kconfig            |    1 +
->>  drivers/net/ethernet/Makefile           |    1 +
->>  drivers/net/ethernet/spacemit/Kconfig   |   29 +
->>  drivers/net/ethernet/spacemit/Makefile  |    6 +
->>  drivers/net/ethernet/spacemit/k1_emac.c | 2193 ++++++++++++++++++++++=
-+++++++++
->>  drivers/net/ethernet/spacemit/k1_emac.h |  426 ++++++
->>  6 files changed, 2656 insertions(+)
->>
-> [...]
->> diff --git a/drivers/net/ethernet/spacemit/k1_emac.c b/drivers/net/eth=
-ernet/spacemit/k1_emac.c
->> new file mode 100644
->> index 0000000000000000000000000000000000000000..9e558d5893cfbbda0baa7a=
-d21a7209dadda9487e
->> --- /dev/null
->> +++ b/drivers/net/ethernet/spacemit/k1_emac.c
->> @@ -0,0 +1,2193 @@
-> [...]
->> +static int emac_probe(struct platform_device *pdev)
->> +{
->> +	struct device *dev =3D &pdev->dev;
->> +	struct reset_control *reset;
->> +	struct net_device *ndev;
->> +	struct emac_priv *priv;
->> +	int ret;
->> +
->> +	ndev =3D devm_alloc_etherdev(dev, sizeof(struct emac_priv));
->> +	if (!ndev)
->> +		return -ENOMEM;
->> +
->> +	ndev->hw_features =3D NETIF_F_SG;
->> +	ndev->features |=3D ndev->hw_features;
->> +
->> +	ndev->max_mtu =3D EMAC_RX_BUF_4K - (ETH_HLEN + ETH_FCS_LEN);
->> +
->> +	priv =3D netdev_priv(ndev);
->> +	priv->ndev =3D ndev;
->> +	priv->pdev =3D pdev;
->> +	platform_set_drvdata(pdev, priv);
->> +
->> +	ret =3D emac_config_dt(pdev, priv);
->> +	if (ret < 0) {
->> +		dev_err_probe(dev, ret, "Configuration failed\n");
->> +		goto err;
-> I'd just
-> 		return dev_err_probe(...);
-> here.
+On Tue, Aug 26, 2025 at 3:50=E2=80=AFPM Qianfeng Rong <rongqianfeng@vivo.co=
+m> wrote:
 >
->> +	}
->> +
->> +	ndev->watchdog_timeo =3D 5 * HZ;
->> +	ndev->base_addr =3D (unsigned long)priv->iobase;
->> +	ndev->irq =3D priv->irq;
->> +
->> +	ndev->ethtool_ops =3D &emac_ethtool_ops;
->> +	ndev->netdev_ops =3D &emac_netdev_ops;
->> +
->> +	devm_pm_runtime_enable(&pdev->dev);
->> +
->> +	priv->bus_clk =3D devm_clk_get_enabled(&pdev->dev, NULL);
->> +	if (IS_ERR(priv->bus_clk)) {
->> +		ret =3D dev_err_probe(dev, PTR_ERR(priv->bus_clk),
->> +				    "Failed to get clock\n");
->> +		goto err;
-> Same here.
+> The 'ret' variable in ipc_pcie_resources_request() either stores '-EBUSY'
+> directly or holds returns from pci_request_regions() and ipc_acquire_irq(=
+).
+> Storing negative error codes in u32 causes no runtime issues but is
+> stylistically inconsistent and very ugly.  Change 'ret' from u32 to int
+> type - this has no runtime impact.
 >
->> +	}
->> +
->> +	reset =3D devm_reset_control_get_optional_exclusive_deasserted(&pdev=
-->dev,
->> +								     NULL);
->> +	if (IS_ERR(reset)) {
->> +		ret =3D dev_err_probe(dev, PTR_ERR(reset),
->> +				    "Failed to get reset\n");
->> +		goto err;
-> And here.
+> Signed-off-by: Qianfeng Rong <rongqianfeng@vivo.com>
+
+Reviewed-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+
+>  drivers/net/wwan/iosm/iosm_ipc_pcie.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
->> +	}
->> +
->> +	emac_sw_init(priv);
->> +
->> +	if (of_phy_is_fixed_link(dev->of_node)) {
->> +		ret =3D of_phy_register_fixed_link(dev->of_node);
->> +		if (ret) {
->> +			dev_err_probe(dev, ret,
->> +				      "Failed to register fixed-link");
->> +			goto err_timer_delete;
-> If you can move this section before emac_sw_init(), this could also
-> just return.
-I'll take a look on these and clean up in next version, thanks.
->> +		}
-> Then here a function calling of_phy_deregister_fixed_link() could be
-> registered with devm_add_action_or_reset(), to avoid duplicated cleanup=
-
-> in the error path and in emac_remove().
-
-I'll deal with this. This should be fine, as it's probe-time only.
-
-Thanks,
-Vivian "dramforever" Wang
-
+> diff --git a/drivers/net/wwan/iosm/iosm_ipc_pcie.c b/drivers/net/wwan/ios=
+m/iosm_ipc_pcie.c
+> index a066977af0be..08ff0d6ccfab 100644
+> --- a/drivers/net/wwan/iosm/iosm_ipc_pcie.c
+> +++ b/drivers/net/wwan/iosm/iosm_ipc_pcie.c
+> @@ -69,7 +69,7 @@ static int ipc_pcie_resources_request(struct iosm_pcie =
+*ipc_pcie)
+>  {
+>         struct pci_dev *pci =3D ipc_pcie->pci;
+>         u32 cap =3D 0;
+> -       u32 ret;
+> +       int ret;
+>
+>         /* Reserved PCI I/O and memory resources.
+>          * Mark all PCI regions associated with PCI device pci as
+> --
+> 2.34.1
+>
 
