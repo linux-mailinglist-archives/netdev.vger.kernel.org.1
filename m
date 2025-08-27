@@ -1,104 +1,93 @@
-Return-Path: <netdev+bounces-217368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A54D6B3875F
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 18:08:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D11F5B38777
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 18:10:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 666C817DF28
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 16:08:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8599E1C20BF8
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 16:10:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C1B030FC1E;
-	Wed, 27 Aug 2025 16:08:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39D6D343D9B;
+	Wed, 27 Aug 2025 16:09:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lrkvv4e7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vRhf9J3i"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FC9530100E;
-	Wed, 27 Aug 2025 16:08:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 013D432BF3D;
+	Wed, 27 Aug 2025 16:09:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756310903; cv=none; b=le7bxZOGaBQu7CV9SOURMwWo4xDIfaGRQp/UTHl12+6PCxe8TkPp1k6e7lzE5SwroQQY3Iv+AzG2zVAYBGYTjzzqjmvMNmpZNp7EQgiy2cEZgzk+FlcoEc1g9d6yGHVNnMyhtnWDjdjOoetKlFLdz8RtVraTpatKmtxOKsFC51I=
+	t=1756310990; cv=none; b=bjdM/CkMqEIqyDL7LlHspl36xrsfw8B5nD+6Ys0qWXbTjaDDJUAgCi/ezSv+T3cAgwqAMNpO84UTXdya7F2qY0H9LP436JaVTMVX+pD+b9DZ+S43+jQ/a7SNGWgpoN9hD6Tan9r54XgR+fvw17aeekhkW4HNXwdiGCVwdFKJ73o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756310903; c=relaxed/simple;
-	bh=SxfV7g3bJ3UTbiAX8JrQoOzoxVhuSn7Pvqg2XycEaKM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dhsrg3LxhOg4DQ/eW7VzIRubgfKPhOmUkNwwNctSQ0GhGvx5zFUmKhT9JJrhOWGTLYrGFAjmpde7eeOUZrOf2gOp5uqWiE5QtcQS2A3PqGmKdbGSjAMcLuIiJlTsSp4/9yJ3pVUYakdSm/bSkanBGN91dX3/H03kCtQz+/0WUmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lrkvv4e7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D4E8C4CEEB;
-	Wed, 27 Aug 2025 16:08:21 +0000 (UTC)
+	s=arc-20240116; t=1756310990; c=relaxed/simple;
+	bh=QD3kLgq34CY++IsN8XVnnQSyo5Jh98WQg23u1O6HVYs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qwedIZfQfNgFj3jgQKgXq1TWp8szWEp7vhnYC4zSciPfIXa0hMTLVs/zXRUhCVd5q0CCUsWvJ3w+7DcNCwmLwL9i6FgblDsuoZmyBN1iTgdcEw5gSf0zyfeppnnhslgY8u4v75L+6ykOXuGEVGqUmUO4iIf+alcxoMD/VnvmUek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vRhf9J3i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B187C4CEEB;
+	Wed, 27 Aug 2025 16:09:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756310902;
-	bh=SxfV7g3bJ3UTbiAX8JrQoOzoxVhuSn7Pvqg2XycEaKM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lrkvv4e7eJQy4Zz5yfvpinu/QMxwq/F8HNUwdmLBYgqHcq+FrQRwdSjHI/2hfYUXh
-	 bqPW0Ugqtkbytgn+i8GsSDSGSLvyBmdQkZXfr2cEyjJrrcVRqcfyyaoGjuN2cIPssx
-	 J0TY/n+tPQusZrDU3Dxo3AYCDWo5Ami7+Rih3hT6ZYAL+n+50F3vVm0riyeIGJMicK
-	 KG9aS6zxE6emkOMe1JIxRy5YlI98UClzkWAFzf0KPxH4GeJ3r3gqXHZVj4rShTTFpK
-	 6gRK8WpLbR1w1AxwE6e4UtZKFJqO81EjSl2tb3z2tUhwfA5UfnkEjHmpBOV/12Vc+J
-	 iixZ9MZ9UQG7g==
-Date: Wed, 27 Aug 2025 09:08:20 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Parvathi Pudi <parvathi@couthit.com>
-Cc: danishanwar@ti.com, rogerq@kernel.org, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- ssantosh@kernel.org, richardcochran@gmail.com, m-malladi@ti.com,
- s.hauer@pengutronix.de, afd@ti.com, jacob.e.keller@intel.com,
- horms@kernel.org, johan@kernel.org, m-karicheri2@ti.com, s-anna@ti.com,
- glaroque@baylibre.com, saikrishnag@marvell.com, kory.maincent@bootlin.com,
- diogo.ivo@siemens.com, javier.carrasco.cruz@gmail.com,
- basharath@couthit.com, linux-arm-kernel@lists.infradead.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, vadim.fedorenko@linux.dev,
- alok.a.tiwari@oracle.com, bastien.curutchet@bootlin.com, pratheesh@ti.com,
- prajith@ti.com, vigneshr@ti.com, praneeth@ti.com, srk@ti.com,
- rogerq@ti.com, krishna@couthit.com, pmohan@couthit.com, mohan@couthit.com
-Subject: Re: [PATCH net-next v14 4/5] net: ti: icssm-prueth: Adds link
- detection, RX and TX support.
-Message-ID: <20250827090820.12a58d22@kernel.org>
-In-Reply-To: <20250822144023.2772544-5-parvathi@couthit.com>
-References: <20250822132758.2771308-1-parvathi@couthit.com>
-	<20250822144023.2772544-5-parvathi@couthit.com>
+	s=k20201202; t=1756310989;
+	bh=QD3kLgq34CY++IsN8XVnnQSyo5Jh98WQg23u1O6HVYs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=vRhf9J3iQXrjKVnr3uDRMstK2OgzhWUA4lHyIWgFgUgI872SVisQWDx7qfGXJ0mqr
+	 pDTSLFOsj1Y2Nv7B0GrumPIbHEmrVn4y/xESSi0vnQBoK8eDfqUbBY5w+oG8nXsnkC
+	 clZiRGBbgyWRmU5+IMSuo1kYfPwHrfnD3LoMhbwhJqZ9hNUkYXSgRTtS2YEzBO8xYa
+	 LM7YGmcRRbv1xC6az6NAz3QqBXHx2tPnoCYyJM/LVWqdxhn7EBnJaQ+Hyge0Q9jePu
+	 uNcYmj2qUmLAHLrXdGbGXvqa0LabETbhqyF1iEeBUd20+Oq5r2UHeXMaf60ToPqFb7
+	 hf6hFPFivHUWw==
+Message-ID: <a42b28d5-e81e-4131-8c00-8925b097070a@kernel.org>
+Date: Wed, 27 Aug 2025 10:09:48 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3 1/2] net: ipv4: fix regression in local-broadcast
+ routes
+Content-Language: en-US
+To: Oscar Maes <oscmaes92@gmail.com>, netdev@vger.kernel.org,
+ bacs@librecast.net, brett@librecast.net, kuba@kernel.org
+Cc: davem@davemloft.net, regressions@lists.linux.dev, stable@vger.kernel.org
+References: <20250827062322.4807-1-oscmaes92@gmail.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20250827062322.4807-1-oscmaes92@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Fri, 22 Aug 2025 20:09:16 +0530 Parvathi Pudi wrote:
-> +	struct net_device_stats *ndevstats;
+On 8/27/25 12:23 AM, Oscar Maes wrote:
+> Commit 9e30ecf23b1b ("net: ipv4: fix incorrect MTU in broadcast routes")
+> introduced a regression where local-broadcast packets would have their
+> gateway set in __mkroute_output, which was caused by fi = NULL being
+> removed.
+> 
+> Fix this by resetting the fib_info for local-broadcast packets. This
+> preserves the intended changes for directed-broadcast packets.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: 9e30ecf23b1b ("net: ipv4: fix incorrect MTU in broadcast routes")
+> Reported-by: Brett A C Sheffield <bacs@librecast.net>
+> Closes: https://lore.kernel.org/regressions/20250822165231.4353-4-bacs@librecast.net
+> Signed-off-by: Oscar Maes <oscmaes92@gmail.com>
+> ---
+> Link to discussion:
+> https://lore.kernel.org/netdev/20250822165231.4353-4-bacs@librecast.net/
+> 
+> Thanks to Brett Sheffield for finding the regression and writing
+> the initial fix!
+> 
+>  net/ipv4/route.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
+> 
 
-> +	ndevstats = &emac->ndev->stats;
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-Please don't use netdev stats, quoting the header:
 
-	struct net_device_stats	stats; /* not used by modern drivers */
-
-Store the counters you need in driver's private struct and implement
-.ndo_get_stats64
-
-> +	if (!pkt_info->sv_frame) {
-
-sv_frame seems to always be false at this stage?
-Maybe delete this diff if that's the case, otherwise it feels like
-the skb_free below should be accompanied by some stat increment.
-
-> +		skb_put(skb, actual_pkt_len);
-> +
-> +		/* send packet up the stack */
-> +		skb->protocol = eth_type_trans(skb, ndev);
-> +		netif_receive_skb(skb);
-> +	} else {
-> +		dev_kfree_skb_any(skb);
-> +	}
-
-The rest LGTM.
 
