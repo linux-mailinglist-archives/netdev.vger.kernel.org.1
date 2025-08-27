@@ -1,141 +1,151 @@
-Return-Path: <netdev+bounces-217251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 851A2B380A5
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 13:15:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D060FB3808A
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 13:07:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55F26208585
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 11:15:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A04346097A
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 11:07:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BA2634DCCA;
-	Wed, 27 Aug 2025 11:15:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3681C34AB0D;
+	Wed, 27 Aug 2025 11:07:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="cBQYT/CT"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="7wv4BqlE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9B4F2D191C;
-	Wed, 27 Aug 2025 11:15:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA571FA178;
+	Wed, 27 Aug 2025 11:07:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756293335; cv=none; b=l9aThq1kkMYTGWy6aeLEIZuo764h4jqjIOWDbAoX4gx+C+t2ChLJFDEJ6H4ac5CcyOMwZB+z/z0UKXEmBYEhruxl4iyIgjgY5MKXWrtF/qnoYFxM3FMdeZZiKloA1W29vfiyV7ZuOoPXEdcaSge4XEmg/GjW4qzk9HcrmlS1yDI=
+	t=1756292865; cv=none; b=FfMNHD23J+dx7joA/sroxqCa31TwhCSrsU4f72zV33Ru79RECBneZlfYKXiSyHvMTBxsOE7ShOYsAiJ8aqK486N6sn7eJmTO0iPNojHIgpWwHd/hUUTfICQTdU61XHtdNVLNiCT3sljKJ1D2KPBseZPAgqYlRfHfLqUc1uPDoN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756293335; c=relaxed/simple;
-	bh=xQI+uKh/GRE9NhzV9gVXj5hBRX5dYil8ROQ6NK5LHy0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DWgaupIE6AFqg8JGNcMgZwHJWcoNRES7J1d7meJjjAz00mhTcFWckhlPIQgUV0oahCFLhdQyFwkS9poTChL80VaCOcqpF0aOUu0dGGXesR1reE1UrqEE8Qayn6pKIx40XEcDM1ymttIVO/YlCRxPR0NMk2jGH3/P3Sn8VizCAxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=cBQYT/CT; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57QNKQXI014951;
-	Wed, 27 Aug 2025 03:57:54 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=af/p3RaP/vSahE1FXHlsLYbW2
-	oFoctkUwNzanHkCnaQ=; b=cBQYT/CT/4rzegZX9P3W0dfI+1/GqxMNjoGEymUbx
-	HufBeIzlllwV8um4eLQwyePm8TtYlk8SxzjJoggJ3vW+2hn/yMPZcrDqZ+xN4bLG
-	ZRNjkpdJMpaY+MQnDxNxUwsgn2CcWbEPNpFZFM+/aa5g3x4TErmZpNTQI6IpxhwD
-	BvzaekgBa3NuacPNYv4ELwBg30VzBh1gMlx+jatdM6HqaLISMq8JPJd0/SxYIpsU
-	7Q0dr3OQbm22cjJ+P2GhYotrNJI7TGKGL5LeYgoIVKyYjmy5WjdeICw72xQuLty+
-	r0RsAB7Aa85zQ+0cPpZLNdx53Px6cItQ1lwFfzAKvE64g==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 48spgv98x0-1
+	s=arc-20240116; t=1756292865; c=relaxed/simple;
+	bh=E8razsN2CaYngWDYKNr7kDo+Q9Mhr1B4Q82JBBWUqSM=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=seZSZDaBERHvRJSmgPoV4dwUiH+oQ7VByx5nn5WJXem5tEVnQVxsNUv6GUuiBdyru36m8T6Rs0rMT/6Fjlf9nY80uVRK9i6xWtzihJ+ge2qLbH//GIBttpzv87j4XLIGEKhEd4nfnfVq+Zl7tNZnX4/EsTF8fixOF+PlYD3pn74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=7wv4BqlE; arc=none smtp.client-ip=185.132.182.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57RA4cGb026189;
+	Wed, 27 Aug 2025 13:07:13 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=selector1; bh=gChpukKe/Co4j4eyT56FMO
+	0lc9aier7sQ6umEpqMPig=; b=7wv4BqlEGcf8Adj3Tl5KlzJClyjpur32grL9Cr
+	AufZtlaYRTrNopWfDqw9lduzT5fSc3+wkQ6aTTbcKdDCqGXP2IHAVZsvH0dOvWfz
+	N2dyRJ7Ese0M053XZd1OpbmPA1a0FCprP5SWvKrV+ivHCd1stclQjcZZ8Fkg8y96
+	ASGvBgVT98r0xXebyHJXXrlH/xzgz6yX88XJ9w+h9eRMzUJa1B1UjcmDw76Phw32
+	a++WzuI1j085Lw8pZbCjzq5FG3h7PEx13wKqVTrGLm7PhB59GkzVtMN71IzBdi3M
+	UAVNE+rm1gbXHiqLZaieOlUTBo+etozvD0ePR/HcILy57gDQ==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 48qq745m9a-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 27 Aug 2025 03:57:54 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 27 Aug 2025 03:57:58 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Wed, 27 Aug 2025 03:57:58 -0700
-Received: from opensource (unknown [10.29.8.22])
-	by maili.marvell.com (Postfix) with SMTP id AF2B33F706B;
-	Wed, 27 Aug 2025 03:57:50 -0700 (PDT)
-Date: Wed, 27 Aug 2025 10:57:49 +0000
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: Liao Yuanhong <liaoyuanhong@vivo.com>
-CC: Sunil Goutham <sgoutham@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "moderated
- list:ARM/CAVIUM THUNDER NETWORK DRIVER"
-	<linux-arm-kernel@lists.infradead.org>,
-        "open list:NETWORKING DRIVERS"
-	<netdev@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] net: thunderx: Remove redundant ternary operators
-Message-ID: <aK7krVpLMXzt_xWU@opensource>
-References: <20250827101607.444580-1-liaoyuanhong@vivo.com>
+	Wed, 27 Aug 2025 13:07:13 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 4594240047;
+	Wed, 27 Aug 2025 13:05:58 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 8A10A546F2C;
+	Wed, 27 Aug 2025 13:05:02 +0200 (CEST)
+Received: from localhost (10.252.21.245) by SHFDAG1NODE1.st.com (10.75.129.69)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.57; Wed, 27 Aug
+ 2025 13:05:02 +0200
+From: Gatien Chevallier <gatien.chevallier@foss.st.com>
+Subject: [PATCH net-next v3 0/2] net: stmmac: allow generation of flexible
+ PPS relative to MAC time
+Date: Wed, 27 Aug 2025 13:04:57 +0200
+Message-ID: <20250827-relative_flex_pps-v3-0-673e77978ba2@foss.st.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250827101607.444580-1-liaoyuanhong@vivo.com>
-X-Authority-Analysis: v=2.4 cv=E5bNpbdl c=1 sm=1 tr=0 ts=68aee4b2 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=kj9zAlcOel0A:10 a=2OwXVqhp2XgA:10 a=1WtWmnkvAAAA:8 a=30FXI7qiAAAA:8 a=ExQkp8-qdG5FzR3rXfMA:9 a=CjuIK1q_8ugA:10
- a=Z3-ukm4F-8FzIVecr7dh:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODI2MDIwNSBTYWx0ZWRfX515N0BPggWRr hZO3IPq5ipoQoZvK1sYw8Tpf1nMeViWlaO8kgK6M4M4WtfHkiXn276c9P5vSgjQyCtuMSXgbLdt q5R+1vSL6sGg5kYp7K5NVfx8EL+FxJw3ucCGCkZqYqnTPGkK+pkJh4VDZC3i92lhnRI/kGUgBhN
- 6ZVzmgcVVobEGgBH4Mf1FZb/D7PolD1F/YAgzNE9vNVvcKycQpLXTlR4iwwty1L5OAKDDSsqLA6 Hnr8OJAczgSHXeFl7K85yOpU4x6LsTsgiXg/48vFSabWahLNwgiVC70EiOOI+tq3GMvwFbCt085 129URzg3v32OOJl+31KLAluSkCpZ7KoVx4CjdnyGx33RxwGXFQoWPngKo1h5hiYbpUf6/uD252e D4PjRqxb
-X-Proofpoint-GUID: -rKVUCWCR-3T-Za0PehwUcB6Xq9hxD5w
-X-Proofpoint-ORIG-GUID: -rKVUCWCR-3T-Za0PehwUcB6Xq9hxD5w
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAFnmrmgC/23N0QrCIBgF4FcZXudwOmfrqveIGGa/TVg6VGQx9
+ u6ZdFGwy8PhfGdFAbyBgE7VijwkE4yzObBDhdQo7QOwueeMKKGcCMqwh0lGk2DQEyzDPAespaT
+ 6pqQ+Mo7ybvagzVLMC7IQsYUlomtuRhOi869ylprSf912x00NJpgJJTsuBGNdf9YuhDrEWrln8
+ RL9Nfo9g34M4JowTrlq+b+xbdsb3n2FJQIBAAA=
+X-Change-ID: 20250723-relative_flex_pps-faa2fbcaf835
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>,
+        Gatien Chevallier
+	<gatien.chevallier@foss.st.com>
+X-Mailer: b4 0.14.2
+X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-08-27_02,2025-08-26_01,2025-03-28_01
 
-On 2025-08-27 at 10:16:07, Liao Yuanhong (liaoyuanhong@vivo.com) wrote:
-> For ternary operators in the form of "a ? true : false", if 'a' itself
-> returns a boolean result, the ternary operator can be omitted. Remove
-> redundant ternary operators to clean up the code.
-> 
-> Signed-off-by: Liao Yuanhong <liaoyuanhong@vivo.com>
-Reviewed-by: Subbaraya Sundeep <sbhatta@marell.com>
+When doing some testing on stm32mp2x platforms(MACv5), I noticed that
+the command previously used with a MACv4 for genering a PPS signal:
+echo "0 0 0 1 1" > /sys/class/ptp/ptp0/period
+did not work.
 
-Looks good to me but a minor comment - include net-next in the subject
-Thanks,
-Sundeep
+This is because the arguments passed through this command must contain
+the start time at which the PPS should be generated, relative to the
+MAC system time. For some reason, a time set in the past seems to work
+with a MACv4.
 
-> ---
->  drivers/net/ethernet/cavium/thunder/nic_main.c    | 2 +-
->  drivers/net/ethernet/cavium/thunder/thunder_bgx.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/cavium/thunder/nic_main.c b/drivers/net/ethernet/cavium/thunder/nic_main.c
-> index 0ec65ec634df..b7cf4ba89b7c 100644
-> --- a/drivers/net/ethernet/cavium/thunder/nic_main.c
-> +++ b/drivers/net/ethernet/cavium/thunder/nic_main.c
-> @@ -174,7 +174,7 @@ static void nic_mbx_send_ready(struct nicpf *nic, int vf)
->  		if (mac)
->  			ether_addr_copy((u8 *)&mbx.nic_cfg.mac_addr, mac);
->  	}
-> -	mbx.nic_cfg.sqs_mode = (vf >= nic->num_vf_en) ? true : false;
-> +	mbx.nic_cfg.sqs_mode = vf >= nic->num_vf_en;
->  	mbx.nic_cfg.node_id = nic->node;
->  
->  	mbx.nic_cfg.loopback_supported = vf < nic->num_vf_en;
-> diff --git a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
-> index 21495b5dce25..10d501ee7b32 100644
-> --- a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
-> +++ b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
-> @@ -959,7 +959,7 @@ static void bgx_poll_for_sgmii_link(struct lmac *lmac)
->  		goto next_poll;
->  	}
->  
-> -	lmac->link_up = ((pcs_link & PCS_MRX_STATUS_LINK) != 0) ? true : false;
-> +	lmac->link_up = (pcs_link & PCS_MRX_STATUS_LINK) != 0;
->  	an_result = bgx_reg_read(lmac->bgx, lmac->lmacid,
->  				 BGX_GMP_PCS_ANX_AN_RESULTS);
->  
-> -- 
-> 2.34.1
-> 
+Because passing such an argument is tedious, consider that any time
+set in the past is an offset regarding the MAC system time. This way,
+this does not impact existing scripts and the past time use case is
+handled. Edit: But maybe that's not important and we can just change
+the default behavior to this.
+
+Example to generate a flexible PPS signal that has a 1s period 3s
+relative to when the command was entered:
+
+echo "0 3 0 1 1" > /sys/class/ptp/ptp0/period
+
+Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+---
+Changes in v3:
+- Fix warning on braces for the switch case.
+- Link to v2: https://lore.kernel.org/r/20250729-relative_flex_pps-v2-0-3e5f03525c45@foss.st.com
+
+Changes in v2:
+- Drop STMMAC_RELATIVE_FLEX_PPS config switch
+- Add PTP reference clock in stm32mp13x SoCs
+- Link to v1: https://lore.kernel.org/r/20250724-relative_flex_pps-v1-0-37ca65773369@foss.st.com
+
+---
+Gatien Chevallier (2):
+      drivers: net: stmmac: handle start time set in the past for flexible PPS
+      ARM: dts: stm32: add missing PTP reference clocks on stm32mp13x SoCs
+
+ arch/arm/boot/dts/st/stm32mp131.dtsi             |  2 ++
+ arch/arm/boot/dts/st/stm32mp133.dtsi             |  2 ++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c | 35 +++++++++++++++++++++++-
+ 3 files changed, 38 insertions(+), 1 deletion(-)
+---
+base-commit: 242041164339594ca019481d54b4f68a7aaff64e
+change-id: 20250723-relative_flex_pps-faa2fbcaf835
+
+Best regards,
+-- 
+Gatien Chevallier <gatien.chevallier@foss.st.com>
+
 
