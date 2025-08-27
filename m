@@ -1,151 +1,292 @@
-Return-Path: <netdev+bounces-217391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 165A5B3882A
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 19:00:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23F62B38843
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 19:09:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DDBC67ACD3E
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 16:59:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03DC37AB6CC
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 17:08:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 964562EE61A;
-	Wed, 27 Aug 2025 17:00:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BA6C2F60B4;
+	Wed, 27 Aug 2025 17:09:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k1bDLmD0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA34E2EFDBD
-	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 17:00:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 532B3227BA4
+	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 17:09:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756314039; cv=none; b=pwIm550ZlCc+oIwvJOkTvQd2qEqTLRwVhnWm6pIn/HGVEateOx9aTrFCc2HVAn2zQtZiFsAbm/W4Y3CEVm3An+Ioq+XzEhsj/4E89oaA5wJfQMwN8b7Ls4HzxhDnBuDuLXp76+vja6X7dvUoRMJHyqM8Y2x2miwx/Kz3mkwldKA=
+	t=1756314581; cv=none; b=CZJBAi43qYIJZIW3Rhraj/CfbOc1xKTJW058OHqGtAKBLrPZd/5B0xB3EnA2wuchvYALc4G+C1eR+/+4s9lQ0dcqLFxdT8QrBTQA4segGYsszMnXkO4iyzuFe2dbsZit7FXAKykLOK3w+sLG5xRwZ6/ZHlPbm3QqJu9Wv6vVoIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756314039; c=relaxed/simple;
-	bh=ecbNrh3gAkHhs0nqu+5SPQJJyt95NCljejpX4+7MoQQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=J7WNfSQGo4fEEqGR90tlBhP7MpDrKmAcJKsAXtqB1TNIIf/QGQL9fOfQscPhnbuskpfD0mxXskjsAsm/41EhDj/iNdCb2d9tDiGJuPQgDOLcmcrMYJDn9LbY2oY3Z2abjQ1NXAUKJ1DpJ7ojyF/uu4ssYrVg6dx+fDaeyzLnfA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3eee0110eb5so209465ab.2
-        for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 10:00:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756314037; x=1756918837;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ybv4LIIvMAT3Eoq2aTEAvOM1ieIsoRgZnCI/tNEIGZ8=;
-        b=dE0T+l+hO9TIQ3VQ+h2/LAVkyUHmmPsyw+6TYHVgzGsdumdSvaJNIqrcSg4RLDlDue
-         1s/viIiFNmIkb4SoMLBmxNefEIB/8uG8MfOye95mmq/Bn5T8Is5OClodOT9brBCgraUH
-         vMo0+6aHKQtESOsUkpx8zcn4eOrGmSrvW/YPEFRPlqtVtxfd7SBGP9GvoDul+Al0T7dt
-         xmRRNMiQnIXgCNh0FWvmMIB5LVMbq85Z1qBThcCfpYB6kTyf53FgJpDiZNdBhDmyxk4C
-         +tmCkXTEOTtu8HnKIH0wAdVVVUb7WUtUnGPcSEhOJUuFrKgzOnN7ilQJlEHvg+dmvTCZ
-         9fvw==
-X-Forwarded-Encrypted: i=1; AJvYcCXZ3EfmsT6d+WsGqAiDlGDgYyxDw2hfpM7xIUMkyOBQh6LyVxpWbE73/+KTsFGggLCv6UtdTRg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUckFyzz+dMcqUD9uJ3fI0iN9PF2lBSzQ38GgZ1285opMRWW/o
-	fuY+KPqLYl0Df6GElYRA5cnQnscNTSqBH9cBD0CS1TzaXlmr6lubopbWmbsfkYBX5INd2MBXuOr
-	nXz5jC/NEscqyg0n7YRuanQcLb1FW98xaG0D3o0sKsEsXOURGhPJGejnzZX0=
-X-Google-Smtp-Source: AGHT+IFTaM5B1uw90IYiFhY0ljaYzaOpTyCWJM1NuXIMJUat2baLWHnMrfLCCBb9RyBrFEjcFv5sBCvdXLNx++WR308rFmyDrKXU
+	s=arc-20240116; t=1756314581; c=relaxed/simple;
+	bh=A9AomUIKs59ti1CXS8VU41SHgT03cDP59EObbJz83N4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=E3rtYh8xU+gZAy/Rtc+GoeIrkXz9DP6zCPap7gb1aWmexVi5ID8dlm2+HIDDqIb67pz88Mv4GC0fVHJfeKMC2jsDpXwoLz0OcHiysPYdmAVoXoAeWWhXkKl4jrnsoZ1T70RCLPpew/P/WxtWtexXcPg4tuJkwCKWIvn7DHiVYYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=k1bDLmD0; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756314579; x=1787850579;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=A9AomUIKs59ti1CXS8VU41SHgT03cDP59EObbJz83N4=;
+  b=k1bDLmD068Uc0hcRIY+ltzwsnU/4PRJzLsH04WUsnck2Y4ruHtsuMJbu
+   uKCM+69t7SCpGhw+uYpkg1Z/TwxDcpDlABpTP/v/XxPJeijQtwl0CXAzO
+   RHg700CZAcfEIrt5T24fJPIQJQ+tYR8CZpj7yvA/QGuBX63FqIh6n0MBW
+   V083kVueQdHLBbxku8Nhm2VMnoUcdj4He5bCer4mmXI6EsS9e+lXYONfz
+   T7a0XdPsfxjzGhSFS9eCq7ScHwFEWo1iN9XIqBHdAP/FBJMVLD06chPEn
+   vb/7z64ElKwOBEj/UiV7KiExJnSC9m+cM6qvg/xTqn1YhDRcA8BIJFMPH
+   g==;
+X-CSE-ConnectionGUID: 8vFaxesHTPuGebdZPEFLGw==
+X-CSE-MsgGUID: UHYJ667cSNmPQnxSkXu8sQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="58515374"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="58515374"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2025 10:09:38 -0700
+X-CSE-ConnectionGUID: GU3iTpwuQ++Q6BqN3cwUCQ==
+X-CSE-MsgGUID: E3oI8Il5T5q0XfT8rz/Sqg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,217,1751266800"; 
+   d="scan'208";a="174055092"
+Received: from unknown (HELO localhost.jf.intel.com) ([10.166.80.55])
+  by orviesa003.jf.intel.com with ESMTP; 27 Aug 2025 10:09:38 -0700
+From: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: madhu.chittim@intel.com,
+	netdev@vger.kernel.org,
+	Pavan Kumar Linga <pavan.kumar.linga@intel.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>
+Subject: [PATCH net-next v2] idpf: add support for IDPF PCI programming interface
+Date: Wed, 27 Aug 2025 10:09:19 -0700
+Message-ID: <20250827170919.51563-1-pavan.kumar.linga@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2141:b0:3e5:4b2e:3afd with SMTP id
- e9e14a558f8ab-3e9201fcc4amr275163535ab.8.1756314030129; Wed, 27 Aug 2025
- 10:00:30 -0700 (PDT)
-Date: Wed, 27 Aug 2025 10:00:30 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68af39ae.a70a0220.3cafd4.002c.GAE@google.com>
-Subject: [syzbot] [net?] [bpf?] WARNING: ODEBUG bug in handle_softirqs
-From: syzbot <syzbot+60db000b8468baeddbb1@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	peterz@infradead.org, syzkaller-bugs@googlegroups.com, tglx@linutronix.de
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+At present IDPF supports only 0x1452 and 0x145C as PF and VF device IDs
+on our current generation hardware. Future hardware exposes a new set of
+device IDs for each generation. To avoid adding a new device ID for each
+generation and to make the driver forward and backward compatible,
+make use of the IDPF PCI programming interface to load the driver.
 
-syzbot found the following issue on:
+Write and read the VF_ARQBAL mailbox register to find if the current
+device is a PF or a VF.
 
-HEAD commit:    4774cfe3543a Merge tag 'scsi-fixes' of git://git.kernel.or..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=140f4e82580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3a936e3316f9e2dc
-dashboard link: https://syzkaller.appspot.com/bug?extid=60db000b8468baeddbb1
-compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
+PCI SIG allocated a new programming interface for the IDPF compliant
+ethernet network controller devices. It can be found at:
+https://members.pcisig.com/wg/PCI-SIG/document/20113
+with the document titled as 'PCI Code and ID Assignment Revision 1.16'
+or any latest revisions.
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/202021f78569/disk-4774cfe3.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/694d0f540b2c/vmlinux-4774cfe3.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/c3c1a8d42953/bzImage-4774cfe3.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+60db000b8468baeddbb1@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-ODEBUG: free active (active state 0) object: ffff888055e82a78 object type: timer_list hint: br_ip6_multicast_port_query_expired+0x0/0x20 net/bridge/br_multicast.c:1682
-WARNING: CPU: 0 PID: 15 at lib/debugobjects.c:615 debug_print_object+0x16b/0x1e0 lib/debugobjects.c:612
-Modules linked in:
-CPU: 0 UID: 0 PID: 15 Comm: ksoftirqd/0 Not tainted 6.16.0-rc1-syzkaller-00203-g4774cfe3543a #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-RIP: 0010:debug_print_object+0x16b/0x1e0 lib/debugobjects.c:612
-Code: 4c 89 ff e8 17 37 5c fd 4d 8b 0f 48 c7 c7 a0 90 e2 8b 48 8b 34 24 4c 89 ea 89 e9 4d 89 f0 41 54 e8 4a 6a bc fc 48 83 c4 08 90 <0f> 0b 90 90 ff 05 77 9d d9 0a 48 83 c4 08 5b 41 5c 41 5d 41 5e 41
-RSP: 0000:ffffc90000147758 EFLAGS: 00010282
-RAX: bfb6a7e7ba7ad600 RBX: dffffc0000000000 RCX: ffff88801cef3c00
-RDX: 0000000000000100 RSI: 0000000000000000 RDI: 0000000000000002
-RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000000000004
-R10: dffffc0000000000 R11: fffffbfff1bfa9e4 R12: ffffffff8a423ca0
-R13: ffffffff8be29220 R14: ffff888055e82a78 R15: ffffffff8b8ce020
-FS:  0000000000000000(0000) GS:ffff888125c52000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f8371b71d60 CR3: 000000005b468000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- __debug_check_no_obj_freed lib/debugobjects.c:1099 [inline]
- debug_check_no_obj_freed+0x3a2/0x470 lib/debugobjects.c:1129
- slab_free_hook mm/slub.c:2312 [inline]
- slab_free mm/slub.c:4643 [inline]
- kfree+0x112/0x440 mm/slub.c:4842
- kobject_cleanup lib/kobject.c:689 [inline]
- kobject_release lib/kobject.c:720 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x22b/0x480 lib/kobject.c:737
- rcu_do_batch kernel/rcu/tree.c:2576 [inline]
- rcu_core+0xca5/0x1710 kernel/rcu/tree.c:2832
- handle_softirqs+0x286/0x870 kernel/softirq.c:579
- run_ksoftirqd+0x9b/0x100 kernel/softirq.c:968
- smpboot_thread_fn+0x53f/0xa60 kernel/smpboot.c:164
- kthread+0x70e/0x8a0 kernel/kthread.c:464
- ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-
+Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
+Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
+Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
 
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+v2:
+- replace *u8 with *bool in idpf_is_vf_device function parameter
+- use ~0 instead of 0xffffff in PCI_DEVICE_CLASS parameter
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+---
+ drivers/net/ethernet/intel/idpf/idpf.h        |  1 +
+ drivers/net/ethernet/intel/idpf/idpf_main.c   | 73 ++++++++++++++-----
+ drivers/net/ethernet/intel/idpf/idpf_vf_dev.c | 37 ++++++++++
+ 3 files changed, 94 insertions(+), 17 deletions(-)
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
+index 19a248d5b124..a1c5253e1df2 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf.h
++++ b/drivers/net/ethernet/intel/idpf/idpf.h
+@@ -983,6 +983,7 @@ void idpf_mbx_task(struct work_struct *work);
+ void idpf_vc_event_task(struct work_struct *work);
+ void idpf_dev_ops_init(struct idpf_adapter *adapter);
+ void idpf_vf_dev_ops_init(struct idpf_adapter *adapter);
++int idpf_is_vf_device(struct pci_dev *pdev, bool *is_vf);
+ int idpf_intr_req(struct idpf_adapter *adapter);
+ void idpf_intr_rel(struct idpf_adapter *adapter);
+ u16 idpf_get_max_tx_hdr_size(struct idpf_adapter *adapter);
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
+index 8c46481d2e1f..a69e66cecfbd 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_main.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
+@@ -7,11 +7,57 @@
+ 
+ #define DRV_SUMMARY	"Intel(R) Infrastructure Data Path Function Linux Driver"
+ 
++#define IDPF_NETWORK_ETHERNET_PROGIF				0x01
++#define IDPF_CLASS_NETWORK_ETHERNET_PROGIF			\
++	(PCI_CLASS_NETWORK_ETHERNET << 8 | IDPF_NETWORK_ETHERNET_PROGIF)
++
+ MODULE_DESCRIPTION(DRV_SUMMARY);
+ MODULE_IMPORT_NS("LIBETH");
+ MODULE_IMPORT_NS("LIBETH_XDP");
+ MODULE_LICENSE("GPL");
+ 
++/**
++ * idpf_dev_init - Initialize device specific parameters
++ * @adapter: adapter to initialize
++ * @ent: entry in idpf_pci_tbl
++ *
++ * Return: %0 on success, -%errno on failure.
++ */
++static int idpf_dev_init(struct idpf_adapter *adapter,
++			 const struct pci_device_id *ent)
++{
++	bool is_vf = false;
++	int err;
++
++	switch (ent->device) {
++	case IDPF_DEV_ID_PF:
++		goto dev_ops_init;
++	case IDPF_DEV_ID_VF:
++		is_vf = true;
++		goto dev_ops_init;
++	default:
++		if (ent->class == IDPF_CLASS_NETWORK_ETHERNET_PROGIF)
++			goto check_vf;
++
++		return -ENODEV;
++	}
++
++check_vf:
++	err = idpf_is_vf_device(adapter->pdev, &is_vf);
++	if (err)
++		return err;
++
++dev_ops_init:
++	if (is_vf) {
++		idpf_vf_dev_ops_init(adapter);
++		adapter->crc_enable = true;
++	} else {
++		idpf_dev_ops_init(adapter);
++	}
++
++	return 0;
++}
++
+ /**
+  * idpf_remove - Device removal routine
+  * @pdev: PCI device information struct
+@@ -165,21 +211,6 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	adapter->req_tx_splitq = true;
+ 	adapter->req_rx_splitq = true;
+ 
+-	switch (ent->device) {
+-	case IDPF_DEV_ID_PF:
+-		idpf_dev_ops_init(adapter);
+-		break;
+-	case IDPF_DEV_ID_VF:
+-		idpf_vf_dev_ops_init(adapter);
+-		adapter->crc_enable = true;
+-		break;
+-	default:
+-		err = -ENODEV;
+-		dev_err(&pdev->dev, "Unexpected dev ID 0x%x in idpf probe\n",
+-			ent->device);
+-		goto err_free;
+-	}
+-
+ 	adapter->pdev = pdev;
+ 	err = pcim_enable_device(pdev);
+ 	if (err)
+@@ -259,11 +290,18 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	/* setup msglvl */
+ 	adapter->msg_enable = netif_msg_init(-1, IDPF_AVAIL_NETIF_M);
+ 
++	err = idpf_dev_init(adapter, ent);
++	if (err) {
++		dev_err(&pdev->dev, "Unexpected dev ID 0x%x in idpf probe\n",
++			ent->device);
++		goto destroy_vc_event_wq;
++	}
++
+ 	err = idpf_cfg_hw(adapter);
+ 	if (err) {
+ 		dev_err(dev, "Failed to configure HW structure for adapter: %d\n",
+ 			err);
+-		goto err_cfg_hw;
++		goto destroy_vc_event_wq;
+ 	}
+ 
+ 	mutex_init(&adapter->vport_ctrl_lock);
+@@ -284,7 +322,7 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 
+ 	return 0;
+ 
+-err_cfg_hw:
++destroy_vc_event_wq:
+ 	destroy_workqueue(adapter->vc_event_wq);
+ err_vc_event_wq_alloc:
+ 	destroy_workqueue(adapter->stats_wq);
+@@ -304,6 +342,7 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ static const struct pci_device_id idpf_pci_tbl[] = {
+ 	{ PCI_VDEVICE(INTEL, IDPF_DEV_ID_PF)},
+ 	{ PCI_VDEVICE(INTEL, IDPF_DEV_ID_VF)},
++	{ PCI_DEVICE_CLASS(IDPF_CLASS_NETWORK_ETHERNET_PROGIF, ~0)},
+ 	{ /* Sentinel */ }
+ };
+ MODULE_DEVICE_TABLE(pci, idpf_pci_tbl);
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
+index 4cc58c83688c..d5b09996caa8 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
+@@ -7,6 +7,43 @@
+ 
+ #define IDPF_VF_ITR_IDX_SPACING		0x40
+ 
++#define IDPF_VF_TEST_VAL		0xFEED0000
++
++/**
++ * idpf_is_vf_device - Helper to find if it is a VF device
++ * @pdev: PCI device information struct
++ * @is_vf: used to update VF device status
++ *
++ * Return: %0 on success, -%errno on failure.
++ */
++int idpf_is_vf_device(struct pci_dev *pdev, bool *is_vf)
++{
++	struct resource mbx_region;
++	resource_size_t mbx_start;
++	void __iomem *mbx_addr;
++	long len;
++
++	resource_set_range(&mbx_region,	VF_BASE, IDPF_VF_MBX_REGION_SZ);
++
++	mbx_start = pci_resource_start(pdev, 0) + mbx_region.start;
++	len = resource_size(&mbx_region);
++
++	mbx_addr = ioremap(mbx_start, len);
++	if (!mbx_addr)
++		return -EIO;
++
++	writel(IDPF_VF_TEST_VAL, mbx_addr + VF_ARQBAL - VF_BASE);
++
++	/* Force memory write to complete before reading it back */
++	wmb();
++
++	*is_vf = readl(mbx_addr + VF_ARQBAL - VF_BASE) == IDPF_VF_TEST_VAL;
++
++	iounmap(mbx_addr);
++
++	return 0;
++}
++
+ /**
+  * idpf_vf_ctlq_reg_init - initialize default mailbox registers
+  * @adapter: adapter structure
+-- 
+2.43.0
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
