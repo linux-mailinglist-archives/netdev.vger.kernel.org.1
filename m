@@ -1,52 +1,60 @@
-Return-Path: <netdev+bounces-217134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 825D3B378A1
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 05:40:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9030B37934
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 06:45:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C75E81B64A7E
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 03:40:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4D2668511C
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 04:45:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CABE2192E3;
-	Wed, 27 Aug 2025 03:39:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D7661F560B;
+	Wed, 27 Aug 2025 04:45:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WeDruA/K"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59880366;
-	Wed, 27 Aug 2025 03:39:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4782E25557
+	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 04:45:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756265999; cv=none; b=jzgtWnOYzK3v6CVbfKxueCQbELYem11sVTwjuEg63Ic0+ci9QhSWEnT2FJV2MRrdGGecILr9DDNzAFJnkXnNOBCf1nhCllOPVAoxc7oWCvMDM28xaj8wznlH06f2oLQREF3u75c7xKg7PjUT0pafLGcsTjWqfJSexPmR60ldKuc=
+	t=1756269927; cv=none; b=WqppiyioPAWfhVcLzGlNI90UlQ/EyCHLdlOLvdnVq5RvxsUi5UluTvQtGzh914qJ6Prw+f9Y2bubCiIzoOn5C5RpCcik1LLOBYnohnHaVwut3OLFJVPWyk5XI4y9TF8npB+zoOcq0Lh6a8Z8KedNAAdQb+M5wH0k04TpA5ea+EQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756265999; c=relaxed/simple;
-	bh=kIZz56o+BRvkcYy+7q+hWQW13ZtVMi2D9iQFL5rmnag=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kQsc2I4DpXRD9cOS8B3+lEyghn5V1yow8ey11mylYe+W/t+rNMjH6Fa/4nXBukpttcTOaMVDs+zHA8Qf2LxRcDHHQuDBvFv2WOehJKaW74khWAo/qgbpjMJYn4Lf7h7UiN7xfyH+n9Zk8U7uWBrZRaDI/3/ZqxO6eOdkBKzvg1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4cBVZV0Trmz1R95m;
-	Wed, 27 Aug 2025 11:36:50 +0800 (CST)
-Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
-	by mail.maildlp.com (Postfix) with ESMTPS id 318231A016C;
-	Wed, 27 Aug 2025 11:39:46 +0800 (CST)
-Received: from huawei.com (10.50.159.234) by dggpemf500002.china.huawei.com
- (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 27 Aug
- 2025 11:39:45 +0800
-From: Yue Haibing <yuehaibing@huawei.com>
-To: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<yuehaibing@huawei.com>
-Subject: [PATCH net-next] ipv6: sit: Add ipip6_tunnel_dst_find() for cleanup
-Date: Wed, 27 Aug 2025 12:00:27 +0800
-Message-ID: <20250827040027.1013335-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1756269927; c=relaxed/simple;
+	bh=DVKE5txmBRxRC438YchfOWX93hU/m1WNzh3VxAHL19E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ANUVRcujJyY+VoGUjJ/QGq72L4Eu+tnxQ9dTwoILue8z9V1YuTg9hxoZnP7+e8O2m+uB13SOLsKQWquTywUwk2ktLtqRp+BADQvWmDkMfpsdXYk4jpiN3OutM5SYGobHLhAXnTZfKLgCpqlU2i6IV0xXCvANGEBmDM9XPy0ewQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WeDruA/K; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4FD2C4CEEB;
+	Wed, 27 Aug 2025 04:45:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756269926;
+	bh=DVKE5txmBRxRC438YchfOWX93hU/m1WNzh3VxAHL19E=;
+	h=From:To:Cc:Subject:Date:From;
+	b=WeDruA/KWQ+bsNx0ONbPArjUDXKjSOcUZCIjcXkTc7S16co/LPskgOrBrSGarNiOb
+	 UtpHV1bNDT1QI7LrPs3GHV8JhCV9NutNV5fFktq8DF75RTM0FwWd155M1+jWNfsD1L
+	 C2pdmHQ0UVJn8qfbbGGK6jNUSdSXH4uo310l1b6q77bDWO8L+4VXT03OGmsn77suF2
+	 cAkrlZtGL8tmRyR9dbcuyvuJOsq975ZmZcC6iwpW3GC//+AeAbNReaxpu7ymbWlFMF
+	 Ib9QAoQZRW0Va40HC4SUuHCdMChIbpkgkN0qvxYStDCom5GPJTsf9x/aQ3rWXZUBFU
+	 8yNHDaMsq3RRA==
+From: Saeed Mahameed <saeed@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>,
+	netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	mbloch@nvidia.com
+Subject: [PATCH net-next V2 0/7] E-Switch vport sharing & delegation
+Date: Tue, 26 Aug 2025 21:45:09 -0700
+Message-ID: <20250827044516.275267-1-saeed@kernel.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,146 +62,66 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- dggpemf500002.china.huawei.com (7.185.36.57)
 
-Extract the dst lookup logic from ipip6_tunnel_xmit() into new helper
-ipip6_tunnel_dst_find() to reduce code duplication and enhance readability.
+From: Saeed Mahameed <saeedm@nvidia.com>
 
-No functional change intended.
+v1->v2:
+ - rename goto labels after targets. Jakub.
 
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
----
- net/ipv6/sit.c | 93 +++++++++++++++++++++++---------------------------
- 1 file changed, 43 insertions(+), 50 deletions(-)
+An mlx5 E-Switch FDB table can manage vports belonging to other sibling
+physical functions, such as ECPF (ARM embedded cores) and Host PF (x86).
+This enables a single source of truth for SDN software to manage network
+pipelines from one host. While such functionality already exists in mlx5,
+it is currently limited by static vport allocation,
+meaning the number of vports shared between multi-host functions
+must be known pre-boot.
 
-diff --git a/net/ipv6/sit.c b/net/ipv6/sit.c
-index 12496ba1b7d4..bcd261ff985b 100644
---- a/net/ipv6/sit.c
-+++ b/net/ipv6/sit.c
-@@ -848,6 +848,47 @@ static inline __be32 try_6rd(struct ip_tunnel *tunnel,
- 	return dst;
- }
- 
-+static bool ipip6_tunnel_dst_find(struct sk_buff *skb, __be32 *dst,
-+				  bool is_isatap)
-+{
-+	const struct ipv6hdr *iph6 = ipv6_hdr(skb);
-+	struct neighbour *neigh = NULL;
-+	const struct in6_addr *addr6;
-+	bool found = false;
-+	int addr_type;
-+
-+	if (skb_dst(skb))
-+		neigh = dst_neigh_lookup(skb_dst(skb), &iph6->daddr);
-+
-+	if (!neigh) {
-+		net_dbg_ratelimited("nexthop == NULL\n");
-+		return found;
-+	}
-+
-+	addr6 = (const struct in6_addr *)&neigh->primary_key;
-+	addr_type = ipv6_addr_type(addr6);
-+
-+	if (is_isatap) {
-+		if ((addr_type & IPV6_ADDR_UNICAST) &&
-+		    ipv6_addr_is_isatap(addr6)) {
-+			*dst = addr6->s6_addr32[3];
-+			found = true;
-+		}
-+	} else {
-+		if (addr_type == IPV6_ADDR_ANY) {
-+			addr6 = &ipv6_hdr(skb)->daddr;
-+			addr_type = ipv6_addr_type(addr6);
-+		}
-+
-+		if ((addr_type & IPV6_ADDR_COMPATv4) != 0) {
-+			*dst = addr6->s6_addr32[3];
-+			found = true;
-+		}
-+	}
-+	neigh_release(neigh);
-+	return found;
-+}
-+
- /*
-  *	This function assumes it is being called from dev_queue_xmit()
-  *	and that skb is filled properly by that function.
-@@ -867,8 +908,6 @@ static netdev_tx_t ipip6_tunnel_xmit(struct sk_buff *skb,
- 	__be32 dst = tiph->daddr;
- 	struct flowi4 fl4;
- 	int    mtu;
--	const struct in6_addr *addr6;
--	int addr_type;
- 	u8 ttl;
- 	u8 protocol = IPPROTO_IPV6;
- 	int t_hlen = tunnel->hlen + sizeof(struct iphdr);
-@@ -878,28 +917,7 @@ static netdev_tx_t ipip6_tunnel_xmit(struct sk_buff *skb,
- 
- 	/* ISATAP (RFC4214) - must come before 6to4 */
- 	if (dev->priv_flags & IFF_ISATAP) {
--		struct neighbour *neigh = NULL;
--		bool do_tx_error = false;
--
--		if (skb_dst(skb))
--			neigh = dst_neigh_lookup(skb_dst(skb), &iph6->daddr);
--
--		if (!neigh) {
--			net_dbg_ratelimited("nexthop == NULL\n");
--			goto tx_error;
--		}
--
--		addr6 = (const struct in6_addr *)&neigh->primary_key;
--		addr_type = ipv6_addr_type(addr6);
--
--		if ((addr_type & IPV6_ADDR_UNICAST) &&
--		     ipv6_addr_is_isatap(addr6))
--			dst = addr6->s6_addr32[3];
--		else
--			do_tx_error = true;
--
--		neigh_release(neigh);
--		if (do_tx_error)
-+		if (!ipip6_tunnel_dst_find(skb, &dst, true))
- 			goto tx_error;
- 	}
- 
-@@ -907,32 +925,7 @@ static netdev_tx_t ipip6_tunnel_xmit(struct sk_buff *skb,
- 		dst = try_6rd(tunnel, &iph6->daddr);
- 
- 	if (!dst) {
--		struct neighbour *neigh = NULL;
--		bool do_tx_error = false;
--
--		if (skb_dst(skb))
--			neigh = dst_neigh_lookup(skb_dst(skb), &iph6->daddr);
--
--		if (!neigh) {
--			net_dbg_ratelimited("nexthop == NULL\n");
--			goto tx_error;
--		}
--
--		addr6 = (const struct in6_addr *)&neigh->primary_key;
--		addr_type = ipv6_addr_type(addr6);
--
--		if (addr_type == IPV6_ADDR_ANY) {
--			addr6 = &ipv6_hdr(skb)->daddr;
--			addr_type = ipv6_addr_type(addr6);
--		}
--
--		if ((addr_type & IPV6_ADDR_COMPATv4) != 0)
--			dst = addr6->s6_addr32[3];
--		else
--			do_tx_error = true;
--
--		neigh_release(neigh);
--		if (do_tx_error)
-+		if (!ipip6_tunnel_dst_find(skb, &dst, false))
- 			goto tx_error;
- 	}
- 
+This patchset enables delegated/external vports to be discovered
+dynamically when switchdev mode is enabled, leveraging new firmware
+capabilities for dynamic vport creation.
+
+Adjacent functions that delegate their SR-IOV VFs to sibling PFs, can be
+dynamically discovered on the sibling PF's switchdev mode enabling,
+after sriov was enabled on the originating PF, allowing for more
+flexible and scalable management in multi-host and ECPF-to-host
+scenarios.
+
+The patchset consists of the following changes:
+
+- Refactoring of ACL root namespace handling: The storage of vport ACL root
+  namespaces is converted from a linear array to an xarray, allowing dynamic
+  creation of ACLs per individual vport.
+- Improvements for vhca_id to vport mapping.
+- Dynamic querying and creation of delegated functions/vports.
+
+
+Adithya Jayachandran (2):
+  net/mlx5: E-Switch, Add support for adjacent functions vports
+    discovery
+  net/mlx5: E-switch, Set representor attributes for adjacent VFs
+
+Saeed Mahameed (5):
+  net/mlx5: FS, Convert vport acls root namespaces to xarray
+  net/mlx5: E-Switch, Move vport acls root namespaces creation to
+    eswitch
+  net/mlx5: E-Switch, Create acls root namespace for adjacent vports
+  net/mlx5: E-Switch, Register representors for adjacent vports
+  net/mlx5: {DR,HWS}, Use the cached vhca_id for this device
+
+ .../net/ethernet/mellanox/mlx5/core/Makefile  |   2 +-
+ .../mellanox/mlx5/core/esw/adj_vport.c        | 209 ++++++++++++++++++
+ .../mellanox/mlx5/core/esw/devlink_port.c     |  11 +-
+ .../net/ethernet/mellanox/mlx5/core/eswitch.c | 131 ++++++++++-
+ .../net/ethernet/mellanox/mlx5/core/eswitch.h |  17 ++
+ .../mellanox/mlx5/core/eswitch_offloads.c     |  37 +++-
+ .../net/ethernet/mellanox/mlx5/core/fs_core.c | 183 ++++++++-------
+ .../net/ethernet/mellanox/mlx5/core/fs_core.h |  18 +-
+ .../mellanox/mlx5/core/steering/hws/cmd.c     |  34 +--
+ .../mellanox/mlx5/core/steering/sws/dr_cmd.c  |  34 +--
+ 10 files changed, 500 insertions(+), 176 deletions(-)
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/esw/adj_vport.c
+
 -- 
-2.34.1
+2.50.1
 
 
