@@ -1,138 +1,139 @@
-Return-Path: <netdev+bounces-217289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62870B383AD
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 15:28:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D81B6B383B5
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 15:29:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 881E31B67BC6
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 13:28:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFDEE462F50
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 13:29:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E1B334DCCA;
-	Wed, 27 Aug 2025 13:28:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B97E321446;
+	Wed, 27 Aug 2025 13:29:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="GSh6z4TW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WnjaGJ00"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B533A350835
-	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 13:27:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E69161D6188;
+	Wed, 27 Aug 2025 13:29:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756301282; cv=none; b=clh4QDtpQTAL4vBiWElFLWDOpiYHPpQrA5w+HHRv05XFCQUM3wzaue1L7WUgRK5zi437du1ePwnT2tUZkP2UQ7MtWZShWkroxEB9jXgd82QxSw3HKd9xF8IcqBzxHGMUNOl+RNBLhoxB7SyKWPUHREW3ZxVS+IsdDVfaaHIyLG4=
+	t=1756301369; cv=none; b=CtzWVweCk4c+zN1HlSwUhcreZ5Rjx7G31eCnWi0fkogtWUnmL91hAzGWdS1fbMKGTEFuQTSoltRg7ueoH7QplvkxeaEvilA6LwYFOhlAq9T9wfE4wVmblS/rCzcVG9qpXw4wfd6EmMJzEg/8ABPut7COfYepVd9VqT2WkAVm/Iw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756301282; c=relaxed/simple;
-	bh=0l9cb71QMXKlOx0TqRGLt1ptRCTlOyuIpRfnKBk1IhQ=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=P0JhJjwhZIo2U3y+aIU4kHUunkpTZ2yrHf/19woiwC4AHdSwi8+JpWMaUT2oBe1zO/vtv4YwFOV4Sp+/qclyTenQjdbJ6Fcf9n42g+r7ZHvpPUCTFYSBSjP1cHNPEnx+RiXXcvYtta/CnAsHJPPXK4kUKcgO4Kpd4NLcuKU4sNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=GSh6z4TW; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=bVD8KDKEsQ4zdVl4LrGJ70ulwhHWfhhuvgyYMvpeM10=; b=GSh6z4TW7Nt+CEY/rDh0GgW8B9
-	cuauYVIjct/VP6WLiQXy/LQz7rDa1rvTtSPQd3/PRJYMAkajyZtNs7zUGpy4VsWDeHsa1K75pWQ3l
-	iPU41l3yVDMqMOMaXduRI8l8g5lha+rttrhGoVfTe+NwmsY0aZzYVFkjcNLpR4saAUQHSlTBvG/Ii
-	TlYTIXzwDXLiAdkKi/CXx5D/LApZGu6DXylip/0gaBzJ8or5bItcjnQB6/LrExoQkVEEKGcVxHS1a
-	oaN//f3aH1NEGUDCne7iKaXAhrluuznMazMa9c9ZBW0jQZ0ydDmg9HEFfPw+QhselGQTv1EEmzgl6
-	DMed0ASA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:54398 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1urGBo-000000000UR-2jbe;
-	Wed, 27 Aug 2025 14:27:48 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1urGBn-00000000DCH-3swS;
-	Wed, 27 Aug 2025 14:27:47 +0100
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next] net: stmmac: mdio: clean up c22/c45 accessor split
+	s=arc-20240116; t=1756301369; c=relaxed/simple;
+	bh=a5zjFIQrJ0WaFVKM9aiCIkrSF8hIneD9jRSp6VPEgmM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lfUAeDomNfbrkBTCdcuW7LVNucVamm+F+IMkl3TRtcj2bujjJswDnOHx3zxkdfghJohkmlYnFm9V+368/x89Deo6PKXmJbfTmJSPIG8UanHzgV7aB/vwG00Y7eDio3YuB7KgghOHbdm8lG9EIwVrpjXr6Rg3tduC2ojUZWHTD8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WnjaGJ00; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B85FFC4CEEB;
+	Wed, 27 Aug 2025 13:29:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756301368;
+	bh=a5zjFIQrJ0WaFVKM9aiCIkrSF8hIneD9jRSp6VPEgmM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=WnjaGJ00o1Ex35lQmVfhPCqByCShRrVAurqGmGJb5fefbahIB8Lw2433CzYhmHwne
+	 mlFiTB3Tlq59NSPmdH0/hpeMxh2LUVzy1qPrHMmqZGkSlU7K9qh8AsRpVx7CzskgeA
+	 UIE24qVh03atu6C7VMRKx2vfbMNFOCZoGFVzBFDk66RNkhWZ8Cey8aePKk6kzdOyuJ
+	 E6dr/dVcO9/dG7TSJeZD/j38hVbmebQsH0WH9WkrjXmqmhuVsrELGynrubziQs5kK0
+	 MJ+A6tqLLLmrMKzSm2mcZePFSI1n2GQjNTJa14OH9MaIh5J+MkXY9hJpixZe5ZrSSR
+	 TeMT8J1zTDcuA==
+Message-ID: <c0c14ec0-f582-4e26-bc7e-35a26a7ff1ce@kernel.org>
+Date: Wed, 27 Aug 2025 15:29:23 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] net: nfc: nci: Turn data timeout into a
+ module parameter and increase the default
+To: =?UTF-8?Q?Juraj_=C5=A0arinay?= <juraj@sarinay.com>, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, mingo@kernel.org, horms@kernel.org,
+ tglx@linutronix.de
+References: <20250825234354.855755-1-juraj@sarinay.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20250825234354.855755-1-juraj@sarinay.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1urGBn-00000000DCH-3swS@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 27 Aug 2025 14:27:47 +0100
 
-The C45 accessors were setting the GR (register number) field twice,
-once with the 16-bit register address truncated to five bits, and
-then overwritten with the C45 devad. This is harmless since the field
-was being cleared prior to being updated with the C45 devad, except
-for the extra work.
+On 26/08/2025 01:43, Juraj Šarinay wrote:
+> An exchange with a NFC target must complete within NCI_DATA_TIMEOUT.
+> A delay of 700 ms is not sufficient for cryptographic operations on smart
+> cards. CardOS 6.0 may need up to 1.3 seconds to perform 256-bit ECDH
 
-Remove the redundant code.
+CardOS is the software running on the NFC card, right? If so, why would
+this be Linux kernel module param? Kernel runtime setup is really
+independent of what NFC card people will use.
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
-Untested, as I don't have my Jetson Xavier NX platform with me (and
-probably won't do for a few weeks.)
+I think this should be unconditionally raised or at least bring argument
+why this should be a module param.
 
-While this patch has been prepared on top of "net: stmmac: mdio: use
-netdev_priv() directly" it shouldn't conflict if that patch is not
-applied before this one.
+> or 3072-bit RSA. To prevent brute-force attacks, passports and similar
+> documents introduce even longer delays into access control protocols
+> (BAC/PACE).
+> 
+> The timeout should be higher, but not too much. The expiration allows
+> us to detect that a NFC target has disappeared.
+> 
+> Expose data_timeout as a parameter of nci.ko. Keep the value in uint
+> nci_data_timeout, set the default to 3 seconds. Point NCI_DATA_TIMEOUT
+> to the new variable.
+> 
+> Signed-off-by: Juraj Šarinay <juraj@sarinay.com>
 
- drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c | 4 ----
- 1 file changed, 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-index 86021e6b67b2..da4542be756a 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-@@ -311,12 +311,10 @@ static int stmmac_mdio_read_c45(struct mii_bus *bus, int phyaddr, int devad,
- 
- 	value |= (phyaddr << priv->hw->mii.addr_shift)
- 		& priv->hw->mii.addr_mask;
--	value |= (phyreg << priv->hw->mii.reg_shift) & priv->hw->mii.reg_mask;
- 	value |= (priv->clk_csr << priv->hw->mii.clk_csr_shift)
- 		& priv->hw->mii.clk_csr_mask;
- 	value |= MII_GMAC4_READ;
- 	value |= MII_GMAC4_C45E;
--	value &= ~priv->hw->mii.reg_mask;
- 	value |= (devad << priv->hw->mii.reg_shift) & priv->hw->mii.reg_mask;
- 
- 	data |= phyreg << MII_GMAC4_REG_ADDR_SHIFT;
-@@ -409,14 +407,12 @@ static int stmmac_mdio_write_c45(struct mii_bus *bus, int phyaddr,
- 
- 	value |= (phyaddr << priv->hw->mii.addr_shift)
- 		& priv->hw->mii.addr_mask;
--	value |= (phyreg << priv->hw->mii.reg_shift) & priv->hw->mii.reg_mask;
- 
- 	value |= (priv->clk_csr << priv->hw->mii.clk_csr_shift)
- 		& priv->hw->mii.clk_csr_mask;
- 
- 	value |= MII_GMAC4_WRITE;
- 	value |= MII_GMAC4_C45E;
--	value &= ~priv->hw->mii.reg_mask;
- 	value |= (devad << priv->hw->mii.reg_shift) & priv->hw->mii.reg_mask;
- 
- 	data |= phyreg << MII_GMAC4_REG_ADDR_SHIFT;
--- 
-2.47.2
 
+
+Best regards,
+Krzysztof
 
