@@ -1,179 +1,205 @@
-Return-Path: <netdev+bounces-217286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81D97B38315
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 14:58:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F589B38394
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 15:18:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18834685BDF
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 12:58:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33D3F3AE3D1
+	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 13:18:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 965CD34F463;
-	Wed, 27 Aug 2025 12:57:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="cYBYpS5Z";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="AHOjvoa1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82ACB28504D;
+	Wed, 27 Aug 2025 13:18:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D4A350D53
-	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 12:57:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F5D1BCA07;
+	Wed, 27 Aug 2025 13:18:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756299462; cv=none; b=mV7cW68tV0O8xsz7CIBVAt2e4tyaKFMuHP5hJ5zXjWuy+ftvFLivV3iD79b4GdOVILolJs2xk+9Ei2uaU59V8s155b/HlFU6OcaOgrzQ9mYDnAAYnG+jH9k9L/CzoYgv0ZzUPkMshqe0ohCFSc9JKLyhuo9BaN/tNl/iBKxoWYI=
+	t=1756300692; cv=none; b=jtyDOedFcaIunrfPEke4QCGaoRcnNdLtNJGbP35gYR1fH3iuSGMCKPCmEzBge10CTh2rp5XmxWnFjddn2jrYcFmsKqbhQMHWMx2f2Ned9fJpW83clxCnDmrb1PQrsCDKuFqYtkRsv3zktPZavBrHmjTg4pa8oe1KrqzaIrvPm6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756299462; c=relaxed/simple;
-	bh=ygxOk/LkhqL6HuDXdX9Yy9ooczBaUoJL77YHePSVVv4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=lj+swn/icaC6KPQZYkTSWGYMSiBUsaZBwFO1PiTTBedHRV9OxWvc/6uI5+GyzS076M3Agm3Bxc2YfoMjm68y32CvN46PpudVQmQ94tPC0i84yuiz4xu5d4cFJv0ZHaNw90ghcdXlUc8E0olylImUsHnowYY0QTW4rVSr2ZV1sNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=cYBYpS5Z; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=AHOjvoa1; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1756299457;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lV5YY2KxYAYcMrdQAvjAnPLYR/NFDUczGvU03DTrv/I=;
-	b=cYBYpS5ZxYCk3mIG9ubOSXUfqCVpqX/4k+pWHMqYK1jzVwF8WeW4BeE8CHUj9Y7RqlRNhB
-	2+dHhvFQ9z7xorK05g0NxgRBQhbBP9ZvYCP/cfMC186R4DR4In+X92Vooa+G8SL60DrTkp
-	NM2mjJoOt3BApEJskjeckAabU9MZJAn7G8IDaaQJ6lowzbcvQmZGkydmqDinif4EvdgafO
-	pynEJ3tCGAjVnic/NOCrOerA4B6CEaB+FWnvmRHwSrq/3xx5WC6Q1lMxMgWquAUOsDBVsq
-	4zvWQxedvFVM5xI6LvraW9nr8Y/15kvNt0OFoPtUi+yVQ8MCizGrj1Vj8REo1A==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1756299457;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lV5YY2KxYAYcMrdQAvjAnPLYR/NFDUczGvU03DTrv/I=;
-	b=AHOjvoa10tLSvMo2jnKhGgp6pngYPLAqQyt6Xe6h+jonmBKlnk2fr0t3w4pfYX58JeRntY
-	G+T0KYbHT9lchpCA==
-To: Jacob Keller <jacob.e.keller@intel.com>, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
- Vinicius Costa Gomes <vinicius.gomes@intel.com>, Paul Menzel
- <pmenzel@molgen.mpg.de>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Miroslav Lichvar <mlichvar@redhat.com>, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org
-Subject: Re: [PATCH iwl-next v2] igb: Convert Tx timestamping to PTP aux worker
-In-Reply-To: <e656a4ee-281c-4205-9183-bc3c7dbc9173@intel.com>
-References: <20250822-igb_irq_ts-v2-1-1ac37078a7a4@linutronix.de>
- <20250822075200.L8_GUnk_@linutronix.de> <87ldna7axr.fsf@jax.kurt.home>
- <02d40de4-5447-45bf-b839-f22a8f062388@intel.com>
- <20250826125912.q0OhVCZJ@linutronix.de>
- <e656a4ee-281c-4205-9183-bc3c7dbc9173@intel.com>
-Date: Wed, 27 Aug 2025 14:57:36 +0200
-Message-ID: <87ecswq5vj.fsf@jax.kurt.home>
+	s=arc-20240116; t=1756300692; c=relaxed/simple;
+	bh=cheHazgTGDhKXw7vq6atCi2XUFv5oxx6gGI7RH7+KeA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FMWjyWXrFa4WuslZ41F73cmhEN++VtFGDP87y3f80QqrQo+13nBX5A2xBHHNJHEmZ/ZHU25vMns0mwS8ASObNhY9mqs6HKa692065Qv0G0O0dkZdfIl8nrvAc3h63L+wq/YQCGeCaXrD1piLb7+gojXKM+Slu8vYjQIiFuJWUPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from [192.168.0.102] (unknown [114.241.87.235])
+	by APP-05 (Coremail) with SMTP id zQCowAC3SFljBa9oUlCJDw--.28806S2;
+	Wed, 27 Aug 2025 21:17:24 +0800 (CST)
+Message-ID: <9b83e78a-0456-4b43-9380-0e2b83933246@iscas.ac.cn>
+Date: Wed, 27 Aug 2025 21:17:23 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
-
---=-=-=
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 2/5] net: spacemit: Add K1 Ethernet MAC
+To: Philipp Zabel <p.zabel@pengutronix.de>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexandre Ghiti <alex@ghiti.fr>
+Cc: Vivian Wang <uwu@dram.page>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Junhui Liu <junhui.liu@pigmoral.tech>, Simon Horman <horms@kernel.org>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-riscv@lists.infradead.org,
+ spacemit@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20250826-net-k1-emac-v7-0-5bc158d086ae@iscas.ac.cn>
+ <20250826-net-k1-emac-v7-2-5bc158d086ae@iscas.ac.cn>
+ <eb127fd167cfbd885099a7c4c962eb1135a5a8a0.camel@pengutronix.de>
+Content-Language: en-US
+From: Vivian Wang <wangruikang@iscas.ac.cn>
+In-Reply-To: <eb127fd167cfbd885099a7c4c962eb1135a5a8a0.camel@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-CM-TRANSID:zQCowAC3SFljBa9oUlCJDw--.28806S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxXrWUZF43Jw1kKr4rArWrZrb_yoWrJFy8pa
+	ykJF9IkF4xAr17Kws3Xr4UAF93Xw4IyFyUCrySyw4rXwnFyr1fGry8KrWYkw1vyrZ8CryY
+	va1UZa4I9Fs8u3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvqb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I2
+	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xII
+	jxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4
+	A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IE
+	w4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMc
+	vjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY
+	1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8Jw
+	C20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAF
+	wI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjx
+	v20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2
+	jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0x
+	ZFpf9x07bIBTOUUUUU=
+X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 
-On Tue Aug 26 2025, Jacob Keller wrote:
-> On 8/26/2025 5:59 AM, Sebastian Andrzej Siewior wrote:
->> On 2025-08-25 16:28:38 [-0700], Jacob Keller wrote:
->>> Ya, I don't think we fully understand either. Miroslav said he tested on
->>> I350 which is a different MAC from the I210, so it could be something
->>> there. Theoretically we could handle just I210 directly in the interrupt
->>> and leave the other variants to the kworker.. but I don't know how much
->>> benefit we get from that. The data sheet for the I350 appears to have
->>> more or less the same logic for Tx timestamps. It is significantly
->>> different for Rx timestamps though.
->>=20
->> From logical point of view it makes sense to retrieve the HW timestamp
->> immediately when it becomes available and feed it to the stack. I can't
->> imagine how delaying it to yet another thread improves the situation.
->> The benchmark is about > 1k packets/ second while in reality you have
->> less than 20 packets a second. With multiple applications you usually
->> need a "second timestamp register" or you may lose packets.
->>=20
->> Delaying it to the AUX worker makes sense for hardware which can't fire
->> an interrupt and polling is the only option left. This is sane in this
->> case but I don't like this solution as some kind compromise for
->> everyone. Simply because it adds overhead and requires additional
->> configuration.
->>=20
->
-> I agree. Its just frustrating that doing so appears to cause a
-> regression in at least one test setup on hardware which uses this method.
->
->>>> Also I couldn't really see a performance degradation with ntpperf. In =
-my
->>>> tests the IRQ variant reached an equal or higher rate. But sometimes I
->>>> get 'Could not send requests at rate X'. No idea what that means.
->>>>
->>>> Anyway, this patch is basically a compromise. It works for Miroslav and
->>>> my use case.
->>>>
->>>>> This is also what the igc does and the performance improved
->>>>> 	afa141583d827 ("igc: Retrieve TX timestamp during interrupt handling=
-")
->>>>>
->>>
->>> igc supports several hardware variations which are all a lot similar to
->>> i210 than i350 is to i210 in igb. I could see this working fine for i210
->>> if it works fine in igb.. I honestly am at a loss currently why i350 is
->>> much worse.
->>>
->>>>> and here it causes the opposite?
->>>>
->>>> As said above, I'm out of ideas here.
->>>>
->>>
->>> Same. It may be one of those things where the effort to dig up precisely
->>> what has gone wrong is so large that it becomes not feasible relative to
->>> the gain :(
->>=20
->> Could we please use the direct retrieval/ submission for HW which
->> supports it and fallback to the AUX worker (instead of the kworker) for
->> HW which does not have an interrupt for it?
->>=20
->
-> I have no objection. Perhaps we could assume the high end of the ntpperf
-> benchmark is not reflective of normal use case? We *are* limited to only
-> one timestamp register, which the igb driver does protect by bitlock.
+Hi=C2=A0Philipp,
 
-Does that mean we're going back to v1 + the AUX worker for 82576? Let me
-prepare v3 then.
+Thanks for your review.
+
+On 8/26/25 16:54, Philipp Zabel wrote:
+> On Di, 2025-08-26 at 14:23 +0800, Vivian Wang wrote:
+>> The Ethernet MACs found on SpacemiT K1 appears to be a custom design
+>> that only superficially resembles some other embedded MACs. SpacemiT
+>> refers to them as "EMAC", so let's just call the driver "k1_emac".
+>>
+>> Supports RGMII and RMII interfaces. Includes support for MAC hardware
+>> statistics counters. PTP support is not implemented.
+>>
+>> Tested-by: Junhui Liu <junhui.liu@pigmoral.tech>
+>> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
+>> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+>> Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+>> ---
+>>  drivers/net/ethernet/Kconfig            |    1 +
+>>  drivers/net/ethernet/Makefile           |    1 +
+>>  drivers/net/ethernet/spacemit/Kconfig   |   29 +
+>>  drivers/net/ethernet/spacemit/Makefile  |    6 +
+>>  drivers/net/ethernet/spacemit/k1_emac.c | 2193 ++++++++++++++++++++++=
++++++++++
+>>  drivers/net/ethernet/spacemit/k1_emac.h |  426 ++++++
+>>  6 files changed, 2656 insertions(+)
+>>
+> [...]
+>> diff --git a/drivers/net/ethernet/spacemit/k1_emac.c b/drivers/net/eth=
+ernet/spacemit/k1_emac.c
+>> new file mode 100644
+>> index 0000000000000000000000000000000000000000..9e558d5893cfbbda0baa7a=
+d21a7209dadda9487e
+>> --- /dev/null
+>> +++ b/drivers/net/ethernet/spacemit/k1_emac.c
+>> @@ -0,0 +1,2193 @@
+> [...]
+>> +static int emac_probe(struct platform_device *pdev)
+>> +{
+>> +	struct device *dev =3D &pdev->dev;
+>> +	struct reset_control *reset;
+>> +	struct net_device *ndev;
+>> +	struct emac_priv *priv;
+>> +	int ret;
+>> +
+>> +	ndev =3D devm_alloc_etherdev(dev, sizeof(struct emac_priv));
+>> +	if (!ndev)
+>> +		return -ENOMEM;
+>> +
+>> +	ndev->hw_features =3D NETIF_F_SG;
+>> +	ndev->features |=3D ndev->hw_features;
+>> +
+>> +	ndev->max_mtu =3D EMAC_RX_BUF_4K - (ETH_HLEN + ETH_FCS_LEN);
+>> +
+>> +	priv =3D netdev_priv(ndev);
+>> +	priv->ndev =3D ndev;
+>> +	priv->pdev =3D pdev;
+>> +	platform_set_drvdata(pdev, priv);
+>> +
+>> +	ret =3D emac_config_dt(pdev, priv);
+>> +	if (ret < 0) {
+>> +		dev_err_probe(dev, ret, "Configuration failed\n");
+>> +		goto err;
+> I'd just
+> 		return dev_err_probe(...);
+> here.
+>
+>> +	}
+>> +
+>> +	ndev->watchdog_timeo =3D 5 * HZ;
+>> +	ndev->base_addr =3D (unsigned long)priv->iobase;
+>> +	ndev->irq =3D priv->irq;
+>> +
+>> +	ndev->ethtool_ops =3D &emac_ethtool_ops;
+>> +	ndev->netdev_ops =3D &emac_netdev_ops;
+>> +
+>> +	devm_pm_runtime_enable(&pdev->dev);
+>> +
+>> +	priv->bus_clk =3D devm_clk_get_enabled(&pdev->dev, NULL);
+>> +	if (IS_ERR(priv->bus_clk)) {
+>> +		ret =3D dev_err_probe(dev, PTR_ERR(priv->bus_clk),
+>> +				    "Failed to get clock\n");
+>> +		goto err;
+> Same here.
+>
+>> +	}
+>> +
+>> +	reset =3D devm_reset_control_get_optional_exclusive_deasserted(&pdev=
+->dev,
+>> +								     NULL);
+>> +	if (IS_ERR(reset)) {
+>> +		ret =3D dev_err_probe(dev, PTR_ERR(reset),
+>> +				    "Failed to get reset\n");
+>> +		goto err;
+> And here.
+>
+>> +	}
+>> +
+>> +	emac_sw_init(priv);
+>> +
+>> +	if (of_phy_is_fixed_link(dev->of_node)) {
+>> +		ret =3D of_phy_register_fixed_link(dev->of_node);
+>> +		if (ret) {
+>> +			dev_err_probe(dev, ret,
+>> +				      "Failed to register fixed-link");
+>> +			goto err_timer_delete;
+> If you can move this section before emac_sw_init(), this could also
+> just return.
+I'll take a look on these and clean up in next version, thanks.
+>> +		}
+> Then here a function calling of_phy_deregister_fixed_link() could be
+> registered with devm_add_action_or_reset(), to avoid duplicated cleanup=
+
+> in the error path and in emac_remove().
+
+I'll deal with this. This should be fine, as it's probe-time only.
 
 Thanks,
-Kurt
+Vivian "dramforever" Wang
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmivAMATHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgn09EACundGRrW9W+DW5FnYEnEYmdeuhJ/Su
-bZqDYZo6QCYGY1/M7hPGPcBM1USaiwdNDv/MnzhkWqdZmBNcIeQDL7PHJr+5MIMi
-gFvQxpGAq6o95sTcMWXtOjfEHIRVb0BYC4badCIHsdAx5kP7n/389D1jYUxXM1dz
-Ssj5mgAb1lYzsj4TdNKIFo/iHWCvSgSwKqrs51g6UUCLKi3x1ne4KQQiJVwoShD9
-g8u4vuz3MS8d2Yga1q7OPIITHIL5nAgE8/4q2pbfKsaoMklickhtS5OWI8NpHjSe
-GSFAeYh2svBI7DOPbaPUD8USTfW22he3DGdBERr6x+QJ6GyNSIAzQPLRJ2ySuU3z
-8iKyR3U50wvC/Ak4hLzkj5/XsauNNdxKG3NhDcz+boj7blHM0KwUcJcAo5ogvFd+
-qXY8dckvCp41yvieHCPlaZ2zs0xRzA3t66syt4oi1AGAJGBczfb0rLtsfGZWtUK4
-6KfLutlEzkJYk83VekNxrDFW71VZ49EAGXC52cUmQFX/DhYR2BKZLOoor/wYUzf+
-munnmDUXcH7d9BPlJ7FO19UdD4LAYs0FYhSjjgMY6msm29lYcCuexwFPJ3PJ0wbh
-kPhta3ViNj49dD6D4AtCgwKeILaBGhPO7kBA899ZxjyhsboGhoemiW8k2zY/uNf4
-SiFdfVM5vPlP4A==
-=51tg
------END PGP SIGNATURE-----
---=-=-=--
 
