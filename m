@@ -1,116 +1,181 @@
-Return-Path: <netdev+bounces-217616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70F20B3947C
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 09:02:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C27DB394BC
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 09:10:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BA861796E9
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 07:02:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 688133A4EF5
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 07:10:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F5192877E2;
-	Thu, 28 Aug 2025 07:01:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD1192D6418;
+	Thu, 28 Aug 2025 07:08:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p3WexPG/"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="WRrEeBUO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACC432A1AA
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 07:01:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A66882D0612;
+	Thu, 28 Aug 2025 07:08:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756364518; cv=none; b=g6RsExeHbwydGU7h6l+JlCg9yeEL29T+L3UmQ4LTu3KJkfdCSkP2O1Zlg2yonNPo/bGWOG1gl4LgrYKODJeyH7svzlV366xevNFQN3Zhhb2DglL67C9b9XeU4wsoJC3H5PeL9O9nLgC2eSGOmr2JtJ9PHbKaRE6TMD3qqfOwbSY=
+	t=1756364884; cv=none; b=ZVzPNkHx2ifxR/X8QaopFJ4oF/Z057cHXUVZauDE1Cxt5xzY6kScGuMxARRGhrkun3wwOmzO7kJyR2gSE487vLopZzLE9TaozXMVSva0Xdyxl+Jmdv28jIRUBLJO+HNAJacIP9xOZGAxmLAshcM2zWjAmBweI9eywn4Oiwba3ks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756364518; c=relaxed/simple;
-	bh=x8bkbcL8+tGdys6jSOuE1Hg0Fct7/lC8B1m1J0kB+9Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EkZe4KmgwjtHSbM/A6JrT0ZixMLB/NPO0Tg/hnWTzRSL9Nztg0YS4lSMwQcReYoDRl26pyJwXVn7YcV1tQdAS8ijewV6Ggv5gPIceAbvXzS8fTG7aSDl+u2tTwmGfnic68fbxZEC1LR7V6brvHkRDGTOBQS424ElM8YsXwyk5vg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p3WexPG/; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4b109c4af9eso5106681cf.3
-        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 00:01:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756364515; x=1756969315; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UM7DhkEHuk4qSj2m07G7Dl4USkQpCM4utkZ1N2+QBlk=;
-        b=p3WexPG/Q8gaSfPUix1wAcrd3kH4zTMhhvIIq/TEZ2Tf9xE2PC6a+4XXxMSQMG+pCe
-         WTJrKz/C2z7EYaSh8XpCf9SVYfYeVRjPQuRVsJ6b8wlf8myfv0CDGll1F5K+JtM6wmtn
-         iT6jkyxL+ku6ZPHMo2IO6DiNcZ2njPxEZoH7DTqBohvZZhsHEtJKJuadJRwJOQuzXu+u
-         T3WvaSxsE/LHVZ3sBWJodRqZAlCwTM6iE05Mq8nkELQ6WcCEoDv1I2HXPqSGmp8pzXyh
-         2/sC++uhKx1aVRO7iCmHVsCZJ6RqayJxmVk+CGbrlO12ijdP68qJ2OzpOPgbTmBF57Za
-         JL7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756364515; x=1756969315;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UM7DhkEHuk4qSj2m07G7Dl4USkQpCM4utkZ1N2+QBlk=;
-        b=KGqJ4YsJNqHfzAhRe0+4TfhT+Uv0BhT7uQSksp848GB2PRKhk07EkE84Brj8Qfdqn8
-         nZDAScyrl6Qo+pk7vEUULfFXckItxzWCN3WYXp5t2oNf2QJfZbvxVZ9/M5S86URXAezs
-         govLWSf4+hhHQsJr6GtoFfbqI1D33xwARYlmpCZBqkQZepOTuUwmMdw1xYFjTMdehnPe
-         Gf6yPlaC1lIUwNllmaiIJEq10eV1hxkX2UIh+CjD+q42/vHQy5hPFuw9P/1kN6iv1qBJ
-         w6S03YNmpRWU+PTKAAvPaS4xM4Mdu4/6WEcK0EaQYKeQLy4viU0+IXEMUD+Pfsqs++o8
-         eQ1A==
-X-Forwarded-Encrypted: i=1; AJvYcCXHUWVpKvoOfBX3k2/E7KrGfw11XkqeTb/xDK+fj0MZfHVqnfT5OJ3bHqEXvUTZOpGYCCXfW1k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYGOPwTi7D4/1iyeFCffiQlD2C8DgW1nECS3k5By44dWnMR5nU
-	JBHL4rbgRRCd29j5h8k9CkhWfgEqLV5qiWM4K7zf+CmAIghUo1GmcjLiSuGV/SQlTNf/rUiM2Cj
-	neCw8llSopafhI8OLVoaxW+IrMpc3cVS4zW1IcdEF
-X-Gm-Gg: ASbGncuIKFyPeEDFEW1oOZwAY9uqXHXm4wNTU6FlmF505t5MwdrUQ3RGH9Di/3f0y0a
-	h3dl1k22KjLuz0v5hllHsdiJqhVVuGgjKKsavbgJ5u7S0LDKbLWl5/OgcejFRdGoAIedVuPsjPG
-	jd7WDEB/GpA7RHhoNAHTMaflmkHbYstHvYuv2JH2u0nDYnV8H7ju7Fg4hgExwjnHUCmT1IHdDZV
-	X+g4tFtd78=
-X-Google-Smtp-Source: AGHT+IHBVxWxWSHO+aK5wpbDFa+mZB5wQcUM810HgKp52eoaZy7vbiDehRSg8/y4lSbH1rCe1G5yO/bjvIOteA5XlAE=
-X-Received: by 2002:a05:622a:995:b0:4b1:4fd:2752 with SMTP id
- d75a77b69052e-4b2aab44efdmr304122441cf.58.1756364515219; Thu, 28 Aug 2025
- 00:01:55 -0700 (PDT)
+	s=arc-20240116; t=1756364884; c=relaxed/simple;
+	bh=JrMEMAIN72PQSLuM09hZkye0UtP7yWfTIz0Vd16Rgc0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=IrUvcanBCtazAQN28oMg5328ucbmMZaaZqVOp2Yds2BtiJjrW5paJHrf3N4LNExMGU6+F//mL8Qc8ICZJVmL8F2aSYR/+Cx0lm2ha5qoKiDymsEaxekGmUTwKjpT1l8UNmflsokTY4I58vRlIioetiUd1pTO9wVwOFH773FT/NI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=WRrEeBUO; arc=none smtp.client-ip=198.47.19.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllvem-sh03.itg.ti.com ([10.64.41.86])
+	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTP id 57S77LrX1926333;
+	Thu, 28 Aug 2025 02:07:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1756364841;
+	bh=4jNlY0U4kVd90go0mP1NgI2AJgnZ0N8e4hHUy/MOZEg=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=WRrEeBUOqqYzIYufYa2h80gdOjGilk4M/qXtYLRADYiK4KW8MhwJhICLJGRwnaC7R
+	 lSQ4EcdKbABGa2vMs8xWNKa2HN+4JUhgZKJuGtBIxIAzAcgyoT9TXrY7SGemH2i8nh
+	 CWkIRE1uIDUX4TaNR8dwUUqH/u7qKScWpZ9LQd0s=
+Received: from DFLE103.ent.ti.com (dfle103.ent.ti.com [10.64.6.24])
+	by fllvem-sh03.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 57S77Ldh3049105
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
+	Thu, 28 Aug 2025 02:07:21 -0500
+Received: from DFLE112.ent.ti.com (10.64.6.33) by DFLE103.ent.ti.com
+ (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Thu, 28
+ Aug 2025 02:07:20 -0500
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE112.ent.ti.com
+ (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
+ Frontend Transport; Thu, 28 Aug 2025 02:07:20 -0500
+Received: from [172.24.231.152] (danish-tpc.dhcp.ti.com [172.24.231.152])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 57S77Etn4120830;
+	Thu, 28 Aug 2025 02:07:15 -0500
+Message-ID: <dab8033d-e7d7-4522-b832-eaf58efaad68@ti.com>
+Date: Thu, 28 Aug 2025 12:37:14 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250828012018.15922-1-dqfext@gmail.com>
-In-Reply-To: <20250828012018.15922-1-dqfext@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 28 Aug 2025 00:01:44 -0700
-X-Gm-Features: Ac12FXyrxU3v8TM23-pL8tHyMIrcYye69o8X_1GZcfqchraqv_my8wEdCPDPvGI
-Message-ID: <CANn89i+WjMR7kcGkaQvF5YaCiZxa6txMyQvvVQf8rcU7_u9_JA@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 1/2] pppoe: remove rwlock usage
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: Michal Ostrowski <mostrows@earthlink.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/5] net: rpmsg-eth: Add basic rpmsg skeleton
+To: "Anwar, Md Danish" <a0501179@ti.com>,
+        Krzysztof Kozlowski
+	<krzk@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Jonathan Corbet
+	<corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+        Mengyuan Lou
+	<mengyuanlou@net-swift.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Madhavan
+ Srinivasan <maddy@linux.ibm.com>,
+        Fan Gong <gongfan1@huawei.com>, Lee Trager
+	<lee@trager.us>,
+        Lorenzo Bianconi <lorenzo@kernel.org>,
+        Geert Uytterhoeven
+	<geert+renesas@glider.be>,
+        Lukas Bulwahn <lukas.bulwahn@redhat.com>,
+        Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+CC: <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20250723080322.3047826-1-danishanwar@ti.com>
+ <20250723080322.3047826-3-danishanwar@ti.com>
+ <296d6846-6a28-4e53-9e62-3439ac57d9c1@kernel.org>
+ <5f4e1f99-ff71-443f-ba34-39396946e5b4@ti.com>
+ <cabacd59-7cbf-403a-938f-371026980cc7@kernel.org>
+ <66377d5d-b967-451f-99d9-8aea5f8875d3@ti.com>
+ <bc30805a-d785-432f-be0f-97cea35abd51@kernel.org>
+ <4bb1339a-ead6-4a33-b2bf-c55874bab352@ti.com>
+ <0e85bda4-9ac2-4587-b8bb-550bea1728dc@kernel.org>
+ <fab2a856-e3b0-4d25-9ce4-72f1f57e3115@ti.com>
+Content-Language: en-US
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <fab2a856-e3b0-4d25-9ce4-72f1f57e3115@ti.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On Wed, Aug 27, 2025 at 6:20=E2=80=AFPM Qingfang Deng <dqfext@gmail.com> wr=
-ote:
->
-> Like ppp_generic.c, convert the PPPoE socket hash table to use RCU for
-> lookups and a spinlock for updates. This removes rwlock usage and allows
-> lockless readers on the fast path.
->
-> - Mark hash table and list pointers as __rcu.
-> - Use spin_lock() to protect writers.
-> - Readers use rcu_dereference() under rcu_read_lock(). All known callers
->   of get_item() already hold the RCU read lock, so no additional locking
->   is needed.
-> - get_item() now uses refcount_inc_not_zero() instead of sock_hold() to
->   safely take a reference. This prevents crashes if a socket is already
->   in the process of being freed (sk_refcnt =3D=3D 0).
-> - Set SOCK_RCU_FREE to defer socket freeing until after an RCU grace
->   period.
-> - Move skb_queue_purge() into sk_destruct callback to ensure purge
->   happens after an RCU grace period.
->
-> Signed-off-by: Qingfang Deng <dqfext@gmail.com>
-> ---
+Hi Krzysztof, Andrew,
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+On 30/07/25 8:41 pm, Anwar, Md Danish wrote:
+> 
+> 
+> On 7/30/2025 11:43 AM, Krzysztof Kozlowski wrote:
+>> On 30/07/2025 08:01, MD Danish Anwar wrote:
+>>>>
+>>>>> `reserved-memory`. I am not creating a completely new undocumented node.
+>>>>> Instead I am creating a new node under reserved-memory as the shared
+>>>>> memory used by rpmsg-eth driver needs to be reserved first. This memory
+>>>>> is reserved by the ti_k3_r5_remoteproc driver by k3_reserved_mem_init().
+>>>>>
+>>>>> It's just that I am naming this node as "virtual-eth-shm@a0400000" and
+>>>>> then using the same name in driver to get the base_address and size
+>>>>> mentioned in this node.
+>>>>
+>>>> And how your driver will work with:
+>>>>
+>>>> s/virtual-eth-shm@a0400000/whatever@a0400000/
+>>>>
+>>>
+>>>
+>>> It won't. The driver imposes a restriction with the node name. The node
+>>> name should always be "virtual-eth-shm"
+>>
+>> Drivers cannot impose the restriction. I don't think you understand the
+>> problem. What stops me from renaming the node? Nothing.
+>>
+>> You keep explaining this broken code, but sorry, this is a no-go. Shall
+>> I NAK it to make it obvious?
+>>
+> 
+> Krzysztof, I understand this can't be accepted. This wasn't my first
+> approach. The first approach was that the firmware running on the
+> remotecore will share the base-address using rpmsg. But that was
+> discouraged by Andrew.
+> 
+> So I came up with this DT approach to read the base-address from linux only.
+> 
+> Andrew, Since rpmsg-eth is a virtual device and we can't have DT node
+> for it. Using the reserved memory node and then search the same using
+> node name in the driver is also not acceptable as per Krzysztof. What do
+> you suggest should be done here?
+> 
+> Can we revisit the first approach (firmware sharing the address)? Can we
+> use module params to pass the base-address? or Do you have any other
+> ideas on how to handle this?
+> 
+> Please let me know.
+> 
+
+This is what I came up with after few discussions offline with Andrew. I
+will post v2 soon with the below changes
+
+1. Similar to qcom,glink-edge.yaml and google,cros-ec.yaml - I will
+create a new binding named ti,rpmsg-eth.yaml this binding will describe
+the rpmsg eth node. This node will have a memory region.
+2. The rpmsg-eth node will be a child node of the rproc device. In this
+case `r5f@78000000`. I will modify the rproc binding
+`ti,k3-r5f-rproc.yaml` to describe the same.
+3. Other vendors who wish to use RPMSG_ETH, can create a rpmsg-eth node
+as a child of their rproc device.
+
+This approach is very similar to what's done by qcom,glink-edge.yaml
+/google,cros-ec.yaml and their users.
+
+-- 
+Thanks and Regards,
+Danish
+
 
