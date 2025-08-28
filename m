@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-217710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32950B399E0
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 12:30:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68402B399E1
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 12:30:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA2A5560BF2
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 10:29:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71ED93A29A5
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 10:29:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0D0930F53A;
-	Thu, 28 Aug 2025 10:27:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B9130EF98;
+	Thu, 28 Aug 2025 10:27:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3ep1gVsh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mZHEHBJJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37C3430F530
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 10:27:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0EA30EF8E
+	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 10:27:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756376866; cv=none; b=CTt5E9MFzzqbY1XvwKp+5jFasuuu3lJ4NqQSAKNxtRQ695jwdOo/d0A5lOkYpbE6wIuOnxodY1oZnvzWVyKrtNhAsurRvZdwN1oehirttS3arzsc3+6KutS6sAhSW57e91pNG3BMx2VRivdijrXj0zqapBnQuUj1ydIh/v9Ft5M=
+	t=1756376868; cv=none; b=eUfVBratQITeZe7O0R7YuQaciRuZYOMoFdy148t+lamABSPKgbaOO0JaAv4/6QM1IGYBs9C8FG4g87P+/KCdSa15x7+1KiGiRzsy4tB2YO8FjvHDRNtcZVHzTg/A3V0+nK8JfZatUICBDjdNR3IuEoJ4D+hEbyVzcJjgJaneF7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756376866; c=relaxed/simple;
-	bh=bXlzDvpeDlMUI9VLXEebXVFEgxPcZnWsVc+GW0c9Uv8=;
+	s=arc-20240116; t=1756376868; c=relaxed/simple;
+	bh=HYDTh6CxSafDXLczpGQaC0CryZWgAsUSXB3MHN1mnGI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MSGZUKy6VWbStevYvqEJrnw1QjNzCDjmPB8trZKbcWKzEr6OnAK0OAiifzhUja+bUe58vXSEYivtnOezS0OopXMFCbRjAIEsvkcXVSwDXNo1PzV7PbA5INLk0OrHJEYDth1PZt2TFnA5dksb+iruH7KMJllNINYurF2tygmSjIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3ep1gVsh; arc=none smtp.client-ip=209.85.222.202
+	 To:Cc:Content-Type; b=Dg3TIR84QiYeKSMEpzFgjuJxdjH+q54c4I6svq9pxZpYMSTdCFwWjOOtus5Q89P9+ShWaW18ADGuBGpDetex/2quhPsivk4/++LtrmR7nRr7AYroIpkuiLw9+XrD2lHnsdMZY2/ow3ytsAeVkO6htlvBL/LsksESXxpo2pNBuSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mZHEHBJJ; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7fa717ff667so86428785a.3
-        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 03:27:44 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-71e781fd54aso8669747b3.1
+        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 03:27:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756376864; x=1756981664; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1756376866; x=1756981666; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=R0XsmoVrDdx3iw823cv1D2YPWe5y6KMq7UTgP8JgcE0=;
-        b=3ep1gVshF3Yq7/0dQiypXtUbbEFJlOgDyb5q8ra+S8SHIvxqW4mdj4ijFpTdZS2wYc
-         /iBId0VOjdxEMakVSucbZqUF8AyrumZ8DnGYxhmIrQyzVnTKwu4vKeWX3lLzpKNYdIwh
-         FR/Ha/B0aZ0hCg8VoN3IiFh11EdSxOsWGgnbocYRcrD1tLKeKqYhvzGV/oKbE04YVpDA
-         PdRHabnuY5BgGf/NbqvvxD2KpNXgixMuICQqVk6Vb8Zwm510JC2g6mtuRGU4WznAqh9W
-         rf3A29b42iddAnU8pvsrz3TnED51LKgTuiPFlj43CY9USgwEd3TyK2uZtSDhs0p4+1x3
-         /qHg==
+        bh=P5z3qlnTQP+pgZWlrNEdDDW/8svPLWRLVjKVknevqz8=;
+        b=mZHEHBJJAXt+0ZVcOgFLN5xwjI7Gi7RVHOv4W3of+oL/qVDyUw5pstP7BUKima05w0
+         iiZCh+95+9RQt2nS2co8YqYmCIPlt2RhfYkQDzeFkePyKdE7IYPCWMAOKbm+1VGSoyhH
+         Ue+PNpvcOJj5P8O1OKQVNHGotIlIBPgh/ggvGM8LamXjmoiFF5m19tn+IieEMeF36ajX
+         vG1KMN4cry1nOg51ZGf4690lLXe7j9YbMcbgWI3WH+hfKRlhEjGxZ9O1my6Sxslyro67
+         1ON912viCVnJwtkflvarNC3LoSKO73YKuIka9BAZzDKC9aqze9/UOnRj8Gc+JjumaumH
+         Y6HQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756376864; x=1756981664;
+        d=1e100.net; s=20230601; t=1756376866; x=1756981666;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=R0XsmoVrDdx3iw823cv1D2YPWe5y6KMq7UTgP8JgcE0=;
-        b=b4No/nphwF1HlvoRO61IM3LKkOjeLR3C8a/4S9Xteemctz8zTt/yjps74101B7MTRh
-         5LU9AHUG/5C0N+p6xZOxPNkzbsNuCQayBGQlDS7vL3vWggC7SGV/Ki2142zheEHaGphL
-         MS49P9XVtQyTYGVSPjExygqdptJhFS7a/YApwR+bE4Dqqk3fxO+sC2ksRueWpwNyzPRz
-         +KTULjVXnQX/V17ldMO7kzy4UcnJvuXSS/vtK3+Z/gc0iEHupMzXzWHJWE5HEqeIZ6FT
-         zBqYCx3dC8wyHBPKGTKEQVM4yEJZ4YEI5Ez1qv2PBJqHms6uy6XLlDitYgG9g9jUWJV6
-         y4/A==
-X-Forwarded-Encrypted: i=1; AJvYcCW9E11ZWTKuJZQtJAtyuy4VzIpcbR8fm9vOO5OZe1OER7crelfYpAzDz5SjXejgGFPny2WwFh4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyihS0w/oxg2uPXiZ9iakX7JAxqFLoUhSk81qj1qKFkb74vW8e3
-	I0CP6ojL/zDYkCGsqdNCEfDOfcEGjgWG3pDbMHZdVNg/v7Wx3KbZrrcKvPBQaUBXq9s32NO8v0r
-	YSYKWm8C5mHO5SQ==
-X-Google-Smtp-Source: AGHT+IHu83rT5Prm1LNLzE8bwEOBps+XumGiIIfQAYx/cozdpCVtr4oZ+rE2vP94TS8yIzt8ieLWx0jojNOCkw==
-X-Received: from qkntz8.prod.google.com ([2002:a05:620a:6908:b0:7e6:2365:6c9c])
+        bh=P5z3qlnTQP+pgZWlrNEdDDW/8svPLWRLVjKVknevqz8=;
+        b=DSf8RHZJwDl6bCJ0tC2Iugz6TNAZ4iMoop/uTG5XznE2f2Yk/uK6TEd2O4Ik7adPm0
+         cNqyixRsRzetLB0ad0z0iNTk6imEWX5zfs4dqF5v1luf2gTJiRTghdi1QTwJFFMrQWMM
+         7sZ6NjSz7Klwy7lH9k8heLdIOYZo/59wrFETMCsxJnJmOtdSWVYQCulI4QXMT3xdl/4i
+         lhI8nnMidRuLW0HM5atw4Tv9g2CCZ64eBxsfmWosz1c0AyM1xPFFC4HQ0a/zKoBuOTRl
+         qHtxostZ+fW7nMCwnLYY6EpFffkeihSVtxrlCdIq7HIAFCaAj+WPMJa1d01qDEV91d0c
+         8uOA==
+X-Forwarded-Encrypted: i=1; AJvYcCUYFv0TXW7GqLDBjdbAiFy0M1U4gqEYZ7BZKVjT4Mcr5ZSPxzl86yD/9tuthKgOMi0P4aThV8o=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywa0xkJDqS86lkRFNYsxIahwmKjK0VB1QQDKOA7LH6QYAch5AOQ
+	fkcgAgfEBtuNPpirRMIgFBhi9hpiGmYt54URgZvsVDKbVatsqiykeh9hzvb0Z0LTwPECH+tCgOF
+	FApAA+Ws8NJEZlw==
+X-Google-Smtp-Source: AGHT+IHh6jXDH+vW1Tfdt4kTWe+JhRiwJ6ACosd7KRXroFc3bJi29U0oedKvk9/grXBR+WqwF/3B867BbQKt6Q==
+X-Received: from ywbcp27.prod.google.com ([2002:a05:690c:e1b:b0:720:288:71ae])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:700c:b0:7f9:44b0:8072 with SMTP id af79cd13be357-7f944b08764mr400064485a.4.1756376864014;
- Thu, 28 Aug 2025 03:27:44 -0700 (PDT)
-Date: Thu, 28 Aug 2025 10:27:35 +0000
+ 2002:a05:690c:7286:b0:71a:f22:28fa with SMTP id 00721157ae682-71fdc41d88dmr247636057b3.39.1756376865874;
+ Thu, 28 Aug 2025 03:27:45 -0700 (PDT)
+Date: Thu, 28 Aug 2025 10:27:36 +0000
 In-Reply-To: <20250828102738.2065992-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250828102738.2065992-1-edumazet@google.com>
 X-Mailer: git-send-email 2.51.0.268.g9569e192d0-goog
-Message-ID: <20250828102738.2065992-3-edumazet@google.com>
-Subject: [PATCH net-next 2/5] tcp: annotate data-races in tcp_req_diag_fill()
+Message-ID: <20250828102738.2065992-4-edumazet@google.com>
+Subject: [PATCH net-next 3/5] inet_diag: annotate data-races in inet_diag_bc_sk()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
@@ -84,49 +84,52 @@ Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-req->num_retrans and rsk_timer.expires are read locklessly,
-and can be changed from tcp_rtx_synack().
-
-Add READ_ONCE()/WRITE_ONCE() annotations.
+inet_diag_bc_sk() runs with an unlocked socket,
+annotate potential races with READ_ONCE().
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/ipv4/tcp_diag.c   | 4 ++--
- net/ipv4/tcp_output.c | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ net/ipv4/inet_diag.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/net/ipv4/tcp_diag.c b/net/ipv4/tcp_diag.c
-index 2f3a779ce7a2da7d59c6a471c155c3e6d1563acd..4ed6b93527f4ad00f34cc732639c0c82d0feff08 100644
---- a/net/ipv4/tcp_diag.c
-+++ b/net/ipv4/tcp_diag.c
-@@ -248,12 +248,12 @@ static int tcp_req_diag_fill(struct sock *sk, struct sk_buff *skb,
- 	inet_diag_msg_common_fill(r, sk);
- 	r->idiag_state = TCP_SYN_RECV;
- 	r->idiag_timer = 1;
--	r->idiag_retrans = reqsk->num_retrans;
-+	r->idiag_retrans = READ_ONCE(reqsk->num_retrans);
+diff --git a/net/ipv4/inet_diag.c b/net/ipv4/inet_diag.c
+index 7a9c347bc66fe35fa9771649db2f205af30e2a44..3827e9979d4f9a4b33665e08ce69eb803fe4f948 100644
+--- a/net/ipv4/inet_diag.c
++++ b/net/ipv4/inet_diag.c
+@@ -580,7 +580,7 @@ static void entry_fill_addrs(struct inet_diag_entry *entry,
+ 			     const struct sock *sk)
+ {
+ #if IS_ENABLED(CONFIG_IPV6)
+-	if (sk->sk_family == AF_INET6) {
++	if (entry->family == AF_INET6) {
+ 		entry->saddr = sk->sk_v6_rcv_saddr.s6_addr32;
+ 		entry->daddr = sk->sk_v6_daddr.s6_addr32;
+ 	} else
+@@ -593,18 +593,18 @@ static void entry_fill_addrs(struct inet_diag_entry *entry,
  
- 	BUILD_BUG_ON(offsetof(struct inet_request_sock, ir_cookie) !=
- 		     offsetof(struct sock, sk_cookie));
+ int inet_diag_bc_sk(const struct nlattr *bc, struct sock *sk)
+ {
+-	struct inet_sock *inet = inet_sk(sk);
++	const struct inet_sock *inet = inet_sk(sk);
+ 	struct inet_diag_entry entry;
  
--	tmo = inet_reqsk(sk)->rsk_timer.expires - jiffies;
-+	tmo = READ_ONCE(inet_reqsk(sk)->rsk_timer.expires) - jiffies;
- 	r->idiag_expires = jiffies_delta_to_msecs(tmo);
- 	r->idiag_rqueue	= 0;
- 	r->idiag_wqueue	= 0;
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 06b26a6efd628e85f97bdb7253c344565b0ed56d..e180364b8ddad4baa9978418ffd9c8b871342cb9 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -4438,7 +4438,7 @@ int tcp_rtx_synack(const struct sock *sk, struct request_sock *req)
- 			tcp_sk_rw(sk)->total_retrans++;
- 		}
- 		trace_tcp_retransmit_synack(sk, req);
--		req->num_retrans++;
-+		WRITE_ONCE(req->num_retrans, req->num_retrans + 1);
- 	}
- 	return res;
- }
+ 	if (!bc)
+ 		return 1;
+ 
+-	entry.family = sk->sk_family;
++	entry.family = READ_ONCE(sk->sk_family);
+ 	entry_fill_addrs(&entry, sk);
+-	entry.sport = inet->inet_num;
+-	entry.dport = ntohs(inet->inet_dport);
+-	entry.ifindex = sk->sk_bound_dev_if;
+-	entry.userlocks = sk_fullsock(sk) ? sk->sk_userlocks : 0;
++	entry.sport = READ_ONCE(inet->inet_num);
++	entry.dport = ntohs(READ_ONCE(inet->inet_dport));
++	entry.ifindex = READ_ONCE(sk->sk_bound_dev_if);
++	entry.userlocks = sk_fullsock(sk) ? READ_ONCE(sk->sk_userlocks) : 0;
+ 	if (sk_fullsock(sk))
+ 		entry.mark = READ_ONCE(sk->sk_mark);
+ 	else if (sk->sk_state == TCP_NEW_SYN_RECV)
 -- 
 2.51.0.268.g9569e192d0-goog
 
