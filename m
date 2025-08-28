@@ -1,150 +1,132 @@
-Return-Path: <netdev+bounces-217722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BA62B39A0A
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 12:34:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AAB1B39A0C
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 12:34:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73D115622FA
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 10:33:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB2CB1890CEC
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 10:33:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBFC430AD0B;
-	Thu, 28 Aug 2025 10:33:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6694301030;
+	Thu, 28 Aug 2025 10:33:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X9Qm4I6o"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xe0HND/Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5F04301030
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 10:33:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88886187346;
+	Thu, 28 Aug 2025 10:33:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756377202; cv=none; b=tTazEDEVH8MoOalfdwjajvlfo2QbEUeo9QJr0n/psn0emXa2k6jiS7ojysMZk0SibXI4Fn2skPR397dNbeIil9S4if+yKTxQtMhxIzUZ50pOQmzhK3UCn4qU8cRkstv0hoCChzjKVVCpRqSwKA+Bxp7+iJ8W58duzjCY9q6aCJ4=
+	t=1756377186; cv=none; b=aImH5sHBoQGn+RDYvxUkmaqapURQJifmJ41u5LrtNZXf06hIVn9FJA1atGWmyxwgJcm3+yfSwYmY6SNK86IxdvJ0gI0PWcg19dVzWENSvMDiK9LUabxwN7pybIAR4bfTLC4vi49vLf2zJwwY0IQvpFTTzQU8KcUTy0N9UgdvZbg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756377202; c=relaxed/simple;
-	bh=dIUVxVMzmwpa1a2rCoWXW2RPF3FWP0eRAv58vpf/V0k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZrpH484yJQqzpzHAmvJUh6UFxwAnEX2mvb2DRHvCCDNTQrtSmWiP13F/SQSRcj1wbsWqxmAJQ/pRhK+DWn39XHIFcKkdly+hBWpYUkqrnNuERtlTrWq9FIA5IlOn8JKUpPqzkPJglNjzt1BCQqE3bXO1iiqKmxaBoU9vww9Aluk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X9Qm4I6o; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756377198;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=VtzDgvYgWjaoaH4GyXIIcrtS3Xq5vrAA6ErTxI6Q5oA=;
-	b=X9Qm4I6oAQDMkg60GSK5PiEIS5zzTx89Zzt8eNxWYtHYdofyBkX4xkLsLgJ6IpkgJI93J8
-	3m4rYFBfGZ8/UtnQ462ftBBThos4DXNx8EErqV7o5Fd0kVnj7Fu55fls144/LqwSYz00R4
-	ajNViCU5ZIe44X9uYE1bgXMFNE2A8Lc=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-173-iwu4oLdnPk--TnBjyKk0Og-1; Thu,
- 28 Aug 2025 06:33:12 -0400
-X-MC-Unique: iwu4oLdnPk--TnBjyKk0Og-1
-X-Mimecast-MFC-AGG-ID: iwu4oLdnPk--TnBjyKk0Og_1756377191
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9958419560B6;
-	Thu, 28 Aug 2025 10:33:11 +0000 (UTC)
-Received: from queeg (unknown [10.43.135.229])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 914D1300019F;
-	Thu, 28 Aug 2025 10:33:09 +0000 (UTC)
-From: Miroslav Lichvar <mlichvar@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Miroslav Lichvar <mlichvar@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	John Stultz <jstultz@google.com>,
-	Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v2 net-next] ptp: Limit time setting of PTP clocks
-Date: Thu, 28 Aug 2025 12:32:53 +0200
-Message-ID: <20250828103300.1387025-1-mlichvar@redhat.com>
+	s=arc-20240116; t=1756377186; c=relaxed/simple;
+	bh=ApaRwpJeqb99ibXDe3dtLn8mCDS3zrygAvunHsREGr4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ynf6dIIho+/5tf4Mxrxv+O5c8FwAHBMmk1EmfEPVOvCtb8GoKV78MlTzcbHjW8OtpVPqWd+EOXQJQm9rLNksbWNy+35WU0fJ+lnJsxYbhGjgttW0uMg0Ln2UIiyRGXKaL82/j1aVgqveZi91VEA/gv5B5MVUJUnDFbAMR08/48I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xe0HND/Q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BD44C4CEEB;
+	Thu, 28 Aug 2025 10:33:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756377186;
+	bh=ApaRwpJeqb99ibXDe3dtLn8mCDS3zrygAvunHsREGr4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Xe0HND/Qwks2jszGWekVHOQjyj8NWBMyOky2BTPU21LUfvhuQf48DAs4FhKGtQRkt
+	 StQhX62q5huazo0L39Z43I2isj3Pi+k8l9lf2mKFVBvSC922kotnryEubQ9KnZOMxN
+	 SJBuiSYG+iCYrtfzChQcq/5FPzzjf4/P57S6ogPCoWYeOJo9bP+08kevOZdWaex212
+	 oO59BInnittt8Uv6j9Ct5xUy9oCgappCgd43OdKMuZW/WgPu3r6IpU4yLSWfTcY+Z+
+	 5VJGKslNTyQBWSUfUayq+5mEwqtWm+2e+cxcBRTFAqVUvajQY+E6xWaOGH+yAp894k
+	 frPFamw6H8Awg==
+Date: Thu, 28 Aug 2025 11:33:02 +0100
+From: Simon Horman <horms@kernel.org>
+To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: Re: [PATCH iwl-next v1] ice: add support for unmanaged dpll on E830
+ NIC
+Message-ID: <20250828103302.GZ10519@horms.kernel.org>
+References: <20250826153118.2129807-1-arkadiusz.kubalewski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250826153118.2129807-1-arkadiusz.kubalewski@intel.com>
 
-Networking drivers implementing PTP clocks and kernel socket code
-handling hardware timestamps use the 64-bit signed ktime_t type counting
-nanoseconds. When a PTP clock reaches the maximum value in year 2262,
-the timestamps returned to applications will overflow into year 1667.
-The same thing happens when injecting a large offset with
-clock_adjtime(ADJ_SETOFFSET).
+On Tue, Aug 26, 2025 at 05:31:18PM +0200, Arkadiusz Kubalewski wrote:
 
-The commit 7a8e61f84786 ("timekeeping: Force upper bound for setting
-CLOCK_REALTIME") limited the maximum accepted value setting the system
-clock to 30 years before the maximum representable value (i.e. year
-2232) to avoid the overflow, assuming the system will not run for more
-than 30 years.
+...
 
-Enforce the same limit for PTP clocks. Don't allow negative values and
-values closer than 30 years to the maximum value. Drivers may implement
-an even lower limit if the hardware registers cannot represent the whole
-interval between years 1970 and 2262 in the required resolution.
+> diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
 
-Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
-Cc: Richard Cochran <richardcochran@gmail.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: John Stultz <jstultz@google.com>
-Cc: Arnd Bergmann <arnd@arndb.de>
----
+...
 
-Notes:
-    v2:
-    - leave tv_nsec validation separate (Jakub)
+> +/**
+> + * ice_dpll_init_info_unmanaged - init dpll information for unmanaged dpll
+> + * @pf: board private structure
+> + *
+> + * Acquire (from HW) and set basic dpll information (on pf->dplls struct).
+> + * For unmanaged dpll mode.
+> + *
+> + * Return:
+> + * * 0 - success
+> + * * negative - init failure reason
+> + */
+> +static int ice_dpll_init_info_unmanaged(struct ice_pf *pf)
+> +{
+> +	struct ice_dplls *d = &pf->dplls;
+> +	struct ice_dpll *de = &d->eec;
+> +	int ret = 0;
+> +
+> +	d->clock_id = ice_generate_clock_id(pf);
+> +	d->num_inputs = ice_cgu_get_pin_num(&pf->hw, true);
+> +	d->num_outputs = ice_cgu_get_pin_num(&pf->hw, false);
+> +	ice_dpll_lock_state_init_unmanaged(pf);
+> +
+> +	d->inputs = kcalloc(d->num_inputs, sizeof(*d->inputs), GFP_KERNEL);
+> +	if (!d->inputs)
+> +		return -ENOMEM;
+> +
+> +	ret = ice_dpll_init_pins_info(pf, ICE_DPLL_PIN_TYPE_INPUT);
+> +	if (ret)
+> +		goto deinit_info;
+> +
+> +	d->outputs = kcalloc(d->num_outputs, sizeof(*d->outputs), GFP_KERNEL);
+> +	if (!d->outputs)
 
- drivers/ptp/ptp_clock.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+Hi Arkadiusz,
 
-diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-index 1cc06b7cb17e..3e0726c6f55b 100644
---- a/drivers/ptp/ptp_clock.c
-+++ b/drivers/ptp/ptp_clock.c
-@@ -100,6 +100,9 @@ static int ptp_clock_settime(struct posix_clock *pc, const struct timespec64 *tp
- 		return -EBUSY;
- 	}
- 
-+	if (!timespec64_valid_settod(tp))
-+		return -EINVAL;
-+
- 	return  ptp->info->settime64(ptp->info, tp);
- }
- 
-@@ -130,7 +133,7 @@ static int ptp_clock_adjtime(struct posix_clock *pc, struct __kernel_timex *tx)
- 	ops = ptp->info;
- 
- 	if (tx->modes & ADJ_SETOFFSET) {
--		struct timespec64 ts;
-+		struct timespec64 ts, ts2;
- 		ktime_t kt;
- 		s64 delta;
- 
-@@ -143,6 +146,14 @@ static int ptp_clock_adjtime(struct posix_clock *pc, struct __kernel_timex *tx)
- 		if ((unsigned long) ts.tv_nsec >= NSEC_PER_SEC)
- 			return -EINVAL;
- 
-+		/* Make sure the offset is valid */
-+		err = ptp_clock_gettime(pc, &ts2);
-+		if (err)
-+			return err;
-+		ts2 = timespec64_add(ts2, ts);
-+		if (!timespec64_valid_settod(&ts2))
-+			return -EINVAL;
-+
- 		kt = timespec64_to_ktime(ts);
- 		delta = ktime_to_ns(kt);
- 		err = ops->adjtime(ops, delta);
--- 
-2.51.0
+I think the following is needed here:
 
+		err = -ENOMEM;
+
+Flagged by Smatch.
+
+> +		goto deinit_info;
+> +
+> +	ret = ice_dpll_init_pins_info(pf, ICE_DPLL_PIN_TYPE_OUTPUT);
+> +	if (ret)
+> +		goto deinit_info;
+> +
+> +	de->mode = DPLL_MODE_AUTOMATIC;
+> +	dev_dbg(ice_pf_to_dev(pf), "%s - success, inputs:%u, outputs:%u\n",
+> +		__func__, d->num_inputs, d->num_outputs);
+> +	return 0;
+> +deinit_info:
+> +	dev_err(ice_pf_to_dev(pf), "%s - fail: d->inputs:%p, d->outputs:%p\n",
+> +		__func__, d->inputs, d->outputs);
+> +	ice_dpll_deinit_info(pf);
+> +	return ret;
+> +}
+
+...
 
