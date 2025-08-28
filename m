@@ -1,190 +1,140 @@
-Return-Path: <netdev+bounces-217937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EDECB3A72C
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 18:59:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1D3CB3A741
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 19:03:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 208C51C81F1E
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 16:59:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 807F7168046
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 17:03:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A76F23314AA;
-	Thu, 28 Aug 2025 16:59:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C0F93314DE;
+	Thu, 28 Aug 2025 17:03:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="BNTapcJX";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="MTtRoiGN"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="K88uUqBi"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFECD3314B3;
-	Thu, 28 Aug 2025 16:59:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ADA83314CE
+	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 17:03:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756400366; cv=none; b=NxWpTEw5SK1Z8xZNORNvCtLRIbR6rP7naa1gfs3Jje/X3LU4YAF2IVqBWkHIkKfaeokAzOOu8w7OyqgKij/smfxZYl9mlhodhPJ2LaVKbbG9VlTWrzEUv1fJQgbqjqw6NMwDiefqxYZSe/TrGKAdYkAlhFF7+rt0CoAvEcOGhG0=
+	t=1756400586; cv=none; b=K/c+iQQ6RBWbwgUFMDkxgAfrkNIxULRNKmxFn2Nlz56Dvkk5WhkBNFaymfuseYXL4lh9gEtYjgzgxCYXnN4slecijFQ/HMWA3qIJtYmMLfp2XAA1gzup0YXAKCOG6aF48V6zmmEAGc7hZArm/JjJDXJ3YRWTwyvjDYRZNkXeecI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756400366; c=relaxed/simple;
-	bh=kYfylJecqyv+6vnymFsdtqLi9AgdgemVenjyBUyVBK8=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=dH1aBWKPZ4vV1EKqcZgV6CO4AXG0hqeq3uXU5qknJyxMmjE8mcX57vJJI3gSc6yWijaJyeIH11g77Y7tv1pfeUkyGNh3UrcnVX4+x7JO4oSpsbHx/WEpXRoXGodYBscmZGcyG35IRMiGcR+egx/VbQN4v7P0iGWtmx2vo9WQAF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=BNTapcJX; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=MTtRoiGN; arc=none smtp.client-ip=202.12.124.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 8466D7A0198;
-	Thu, 28 Aug 2025 12:59:22 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-10.internal (MEProxy); Thu, 28 Aug 2025 12:59:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-id:content-type:content-type:date:date:from
-	:from:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1756400362; x=
-	1756486762; bh=WjgDdX5WvSEXp8OZHfzER7hnYaOdtStf4MrinPrBgwo=; b=B
-	NTapcJXizy+DV9xdGrxlv9f3W2suBvFOB2We0AkP4v3szAvJR9qTOaP/8EfNX/xt
-	MA6frokrgs6sxFU7nMC7D0b+RlEAleub6ys1+eREvj9IZ8XYT6o/dxZRW6WuRFiA
-	Ka2vLXlxDvmp6SfdCNol0znPoGFX2QwcCums2scwWfGeOfOWi1ESdbJIY22bs3Ua
-	i6jUPUm9NHsGepNetpcLMqC3LWRaYxPaj+6PsaZFOASBbjW9OU1cX+cXi8BOtnx3
-	F4MHWRsZr22svYV3KwmVepRkj6FR8J2S5+o0Te8w76s3Yu0fhMH8+26BJvop8UTh
-	RpwO1WEZkDuoaSY8dJbZw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-id:content-type
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm1; t=1756400362; x=1756486762; bh=W
-	jgDdX5WvSEXp8OZHfzER7hnYaOdtStf4MrinPrBgwo=; b=MTtRoiGNL+tDZmTXQ
-	5AylfAVZuT/G9agZbPgmErTgmcSJ8l2dh9QPtTGBj+IK0BLH4u/kMA97SiTKipW8
-	mNRUkeAyJ0eR8Vu1sNnWZiSTFzqKJTiJ1cjnTpKzo2a/O6ZzPoftJReO73vk3fYM
-	u2h8MexOZ8/oVzAcrGgO/fd1RVj06kRRQycbr8OmuvHALhTugu4xDkQViCmDVQt6
-	GYYSWdjo+Xj53x92XCEfkcl5GQODUKrPkH20KBkf41BQ9eSe0b6JRCwGHMHhXgbF
-	hDsew9KWLcttHFLJjV882gPFytdBU5Ss1cHaalp/mn/lPQFIBAyHZeDvZGMu1d7C
-	8cDTA==
-X-ME-Sender: <xms:6YqwaCle6lfhsLU9TMofEypoFj-4KHxYl_UrdtlsFLHzynsVd0GF9Q>
-    <xme:6YqwaAb31HDF24PluNtHeG_lqcPpkCOQWTVZa9bdAe6uQggW_gd4y6fcTg4YNDAdL
-    aCHojs58wcPSVSQ2I0>
-X-ME-Received: <xmr:6YqwaCXvB2MT2mrQ1nTkfhfc0kxM8ZnRVb3LEF7aijegbVe2-GGmHYpXOU3w53WuSUFh_A>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddukeduheegucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhephffvvefujghfofggtgffkfesthdtredtredtvdenucfhrhhomheplfgrhicuggho
-    shgsuhhrghhhuceojhhvsehjvhhoshgsuhhrghhhrdhnvghtqeenucggtffrrghtthgvrh
-    hnpeejvdfghfetvedvudefvdejgeelteevkeevgedthfdukeevieejueehkeegffejuden
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjvhesjh
-    hvohhssghurhhghhdrnhgvthdpnhgspghrtghpthhtohepudelpdhmohguvgepshhmthhp
-    ohhuthdprhgtphhtthhopehrrgiiohhrsegslhgrtghkfigrlhhlrdhorhhgpdhrtghpth
-    htohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegushgrhhgv
-    rhhnsehgmhgrihhlrdgtohhmpdhrtghpthhtohepjhhonhgrshdrghhorhhskhhisehgmh
-    grihhlrdgtohhmpdhrtghpthhtoheplhhiuhhhrghnghgsihhnsehgmhgrihhlrdgtohhm
-    pdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhope
-    hhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghl
-    rdhorhhgpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:6YqwaABjR4kPKLbPBJfXpJ4-Rk0PHUlf9GaekkJNYNXwwSTrx9WDsQ>
-    <xmx:6YqwaBxfDf8Z-9VEXWCAkEbFBjviDxUVcnm5F9XM-fARyPBliArJUA>
-    <xmx:6YqwaGabU6xHrrm4_dUUpDJ9ZGxSltR4B4VLW3-kZpjeJUMxqXiIIQ>
-    <xmx:6YqwaOSlELAxs0a_097SCu3nTe6pvgs0GA4_CtYSXRHMEXfYNhvP2w>
-    <xmx:6oqwaPzPEKhgCr0S-MhzZZBBnQErT0FPz4OyhLv048ErE5RNxuMGn-Zo>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 28 Aug 2025 12:59:21 -0400 (EDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id 33CB39FCA0; Thu, 28 Aug 2025 09:59:20 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id 306E29FB65;
-	Thu, 28 Aug 2025 09:59:20 -0700 (PDT)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: Hangbin Liu <liuhangbin@gmail.com>
-cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>,
-    Nikolay Aleksandrov <razor@blackwall.org>,
-    Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
-    Jonathan Corbet <corbet@lwn.net>, Petr Machata <petrm@nvidia.com>,
-    Amit Cohen <amcohen@nvidia.com>,
-    Vladimir Oltean <vladimir.oltean@nxp.com>,
-    Stephen Hemminger <stephen@networkplumber.org>,
-    David Ahern <dsahern@gmail.com>,
-    Jonas Gorski <jonas.gorski@gmail.com>, linux-doc@vger.kernel.org,
-    linux-kselftest@vger.kernel.org
-Subject: Re: [PATCHv4 iproute2-next] iplink: bond_slave: add support for
- actor_port_prio
-In-reply-to: <aK_MB7ikY0hUhGqn@fedora>
-References: <20250825070528.421434-1-liuhangbin@gmail.com>
- <1859262.1756320199@famine> <aK_MB7ikY0hUhGqn@fedora>
-Comments: In-reply-to Hangbin Liu <liuhangbin@gmail.com>
-   message dated "Thu, 28 Aug 2025 03:24:55 -0000."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1756400586; c=relaxed/simple;
+	bh=lc4yQLlGQ1ALDQQJS7QLyBBBdQD7Q9TQBdMpceMI9hk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nvcb8cBt/zj0ZulNVq+30sqo6Y63/UkaoVz9n1j9WlDNF2SG9eUY49cNMmfC3On0JfTbJNaHkinmYa0mMlBaFhVySm2wEnqeD5kCk5TPXqirWAyw3g+jd7oUvI64vaCI+6oiCOEd7GWpFYDxklxNTGdVzToi2WKX2IXxiC9HBBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=K88uUqBi; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id DA5A31A0E42;
+	Thu, 28 Aug 2025 17:03:01 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id AA3DF60303;
+	Thu, 28 Aug 2025 17:03:01 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 21CAF1C22DD92;
+	Thu, 28 Aug 2025 19:02:46 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1756400580; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=4Vex+Mkvb0GemWYHmwN2TZzE127JKaTead6sfS0g/BY=;
+	b=K88uUqBiCBmZYOXjE7eaX15VQS5Y/Ibuox7+bHeNP1PTVBAlgYC+/JcBeCy6VcGGzpV4pj
+	5No3PKiewSUFyztDWjZSg+SYBIXI2j0TZhjP3cxfVJ88Mx+1bo5P2g9YaAF61MGTFZZkxo
+	D2ihndxTq0UfY28cIyiTH2qPn9Dq1nbuknrDK7XN/4dT/MWkC/sxPuZtqKHDnhflmMF3pn
+	yTMwbfDlvSzkX1GmcMlpSQ1ooW/TrcLB+VoyYLFDB6P4uBwurHDppwCnHU9e7cVR/409Wg
+	JE73AvIf6jwNIVWuXKZmfeRuk+M/VLeO/ev5PyXFvCOiExR3xWCLmP/Cwl9+kQ==
+Date: Thu, 28 Aug 2025 19:02:43 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc: "Message-ID :" <cover.1752076293.git.mchehab+huawei@kernel.org>, Linux
+ Doc Mailing List <linux-doc@vger.kernel.org>, "Akira Yokosawa"
+ <akiyks@gmail.com>, "Breno Leitao" <leitao@debian.org>, "David S. Miller"
+ <davem@davemloft.net>, "Donald Hunter" <donald.hunter@gmail.com>, "Eric
+ Dumazet" <edumazet@google.com>, "Ignacio Encinas Rubio"
+ <ignacio@iencinas.com>, "Jakub Kicinski" <kuba@kernel.org>, "Jan Stancek"
+ <jstancek@redhat.com>, "Jonathan Corbet" <corbet@lwn.net>, "Marco Elver"
+ <elver@google.com>, "Paolo Abeni" <pabeni@redhat.com>, "Randy Dunlap"
+ <rdunlap@infradead.org>, "Ruben Wauters" <rubenru09@aol.com>, "Shuah Khan"
+ <skhan@linuxfoundation.org>, "Simon Horman" <horms@kernel.org>,
+ joel@joelfernandes.org, linux-kernel-mentees@lists.linux.dev,
+ linux-kernel@vger.kernel.org, lkmm@lists.linux.dev, netdev@vger.kernel.org,
+ peterz@infradead.org, stern@rowland.harvard.edu
+Subject: Re: [PATCH v10 06/14] docs: use parser_yaml extension to handle
+ Netlink specs
+Message-ID: <20250828190243.0d3f74f6@kmaincent-XPS-13-7390>
+In-Reply-To: <20250828185037.07873d04@kmaincent-XPS-13-7390>
+References: <cover.1753718185.git.mchehab+huawei@kernel.org>
+	<4c97889f0674b69f584dedc543a879d227ef5de0.1753718185.git.mchehab+huawei@kernel.org>
+	<20250828185037.07873d04@kmaincent-XPS-13-7390>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1918693.1756400360.1@famine>
-Date: Thu, 28 Aug 2025 09:59:20 -0700
-Message-ID: <1918694.1756400360@famine>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-Hangbin Liu <liuhangbin@gmail.com> wrote:
+Le Thu, 28 Aug 2025 18:50:37 +0200,
+Kory Maincent <kory.maincent@bootlin.com> a =C3=A9crit :
 
->On Wed, Aug 27, 2025 at 11:43:19AM -0700, Jay Vosburgh wrote:
->> Hangbin Liu <liuhangbin@gmail.com> wrote:
->> 
->> >Add support for the actor_port_prio option for bond slaves.
->> >This per-port priority can be used by the bonding driver in ad_select to
->> >choose the higher-priority aggregator during failover.
->> >
->> >Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
->> >---
->> >v4: no update
->> >v3: rename ad_actor_port_prio to actor_port_prio
->> >v2: no update
->> >---
->> > ip/iplink_bond.c       |  1 +
->> > ip/iplink_bond_slave.c | 18 ++++++++++++++++--
->> > man/man8/ip-link.8.in  |  6 ++++++
->> > 3 files changed, 23 insertions(+), 2 deletions(-)
->> >
->> >diff --git a/ip/iplink_bond.c b/ip/iplink_bond.c
->> >index d6960f6d9b03..1a2c1b3042a0 100644
->> >--- a/ip/iplink_bond.c
->> >+++ b/ip/iplink_bond.c
->> >@@ -91,6 +91,7 @@ static const char *ad_select_tbl[] = {
->> > 	"stable",
->> > 	"bandwidth",
->> > 	"count",
->> >+	"prio",
->> 
->> 	Should this be actor_port_prio?
->
->hmm, actor_port_prio correspond to the ip link option name, which is also
->acceptable.
+> Le Mon, 28 Jul 2025 18:01:59 +0200,
+> Mauro Carvalho Chehab <mchehab+huawei@kernel.org> a =C3=A9crit :
+>=20
+> > Instead of manually calling ynl_gen_rst.py, use a Sphinx extension.
+> > This way, no .rst files would be written to the Kernel source
+> > directories.
+> >=20
+> > We are using here a toctree with :glob: property. This way, there
+> > is no need to touch the netlink/specs/index.rst file every time
+> > a new Netlink spec is added/renamed/removed. =20
+>=20
+> ...
+>=20
+> > diff --git a/Documentation/networking/index.rst
+> > b/Documentation/networking/index.rst index ac90b82f3ce9..b7a4969e9bc9 1=
+00644
+> > --- a/Documentation/networking/index.rst
+> > +++ b/Documentation/networking/index.rst
+> > @@ -57,7 +57,7 @@ Contents:
+> >     filter
+> >     generic-hdlc
+> >     generic_netlink
+> > -   netlink_spec/index
+> > +   ../netlink/specs/index =20
+>=20
+> Faced a doc build warning that say netlink_spec/index.rst is not used.
+>=20
+> $ git grep netlink_spec
+> Documentation/networking/mptcp.rst:netlink_spec/mptcp_pm.rst.
+> Documentation/translations/zh_CN/networking/index.rst:*   netlink_spec/in=
+dex
+>=20
+> I think we can remove the whole directory and change these, right?
 
-	Isn't this the text of the ip link option name right here (in
-the sense of what goes on the "ip link" command line)?
+Oops just saw that is was some local leftover. This first warning get remov=
+ed
+with a clean tree.
+=20
+> Also got a doc build warning that says netlink/specs/index is not existing
+> even if it exists. Maybe a sphinx parsing issue ?!
 
->While in kernel, we defined the select policy as
->
->        { "stable",    BOND_AD_STABLE,    BOND_VALFLAG_DEFAULT},
->        { "bandwidth", BOND_AD_BANDWIDTH, 0},
->        { "count",     BOND_AD_COUNT,     0},
->+       { "prio",      BOND_AD_PRIO,      0},
 
-	Maybe my memory is starting to go, but I thought in a prior
-discussion we'd agreed to change this as well for consistency.
+>=20
+> Regards,
 
->So I think the prio here should also be OK.
->
->You can decide which one to use.
 
-	I would prefer that the two options have discrete names, or,
-really, that we not repeat "prio" as it's already used elsewhere.  Plus,
-who knows, maybe in the future we'll have another priority option.
 
-	-J
-
----
-	-Jay Vosburgh, jv@jvosburgh.net
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
