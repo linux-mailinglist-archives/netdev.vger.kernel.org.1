@@ -1,424 +1,373 @@
-Return-Path: <netdev+bounces-217903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217904-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 671F2B3A63F
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 18:28:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E98FB3A642
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 18:30:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E95C984F76
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 16:28:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 396773A4B9F
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 16:30:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7395B322A38;
-	Thu, 28 Aug 2025 16:28:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 401FF29A9FE;
+	Thu, 28 Aug 2025 16:29:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FVxKFNL2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jfxPwkRT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54B652236F0;
-	Thu, 28 Aug 2025 16:28:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756398520; cv=fail; b=BG0uD4tVWGGiAi4urXcm+UaGaTBXl2Xn5bH1A6R4d4ap8OOThhQfO4w/v8LePwcR6ltlqFSVQr4/i+o7Vzi/2uQXEzOcm4GwTnnUVxw0AbTuDi3u45kUgcYQ3AGOdjt2mM8n5WIyDJT1lH2SHTd/4691F98W4Otd/p84G2cJJp4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756398520; c=relaxed/simple;
-	bh=7WYeOP5ntnihjVMEe9xniwvqn0A2hifnKzG1a3rSCWo=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=DCxZPevPxEUy/EdursQa9YkCZtZ8SkgTJMSg12XjFqi48edpZfvTvwCHJdeAuehrk+JHXykGEccp8P4ssaAT2RAtNTVdki/wnRdVQP0pX12nD3aB6CgYDc+tePTZz+9MKsxl4VZJ5bvqBk5k2emmF3oIvDnFpqoV6U5y5EqxxdI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FVxKFNL2; arc=fail smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756398518; x=1787934518;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=7WYeOP5ntnihjVMEe9xniwvqn0A2hifnKzG1a3rSCWo=;
-  b=FVxKFNL2n1/og6Ft7ohiQ53MXkwTghee02we3RLOAzTu7IkRA4h8e3kS
-   h0w8UwMjCokA8VG5XfbLSKdHoAbL8pYZHZ6TjuguXoWanPHN5xv6MyOsf
-   apn2994GvoQFoJwjlN2jayApaGorUFHTJTEtJgrtAqkn7xRZxTgSEStfJ
-   MeXXQuO6Sl7+5+ohJeFj5juJDiiMZwiWG+HjxSWKcTVERZOEswe8tsIE7
-   SavfPvITB5IvzlhBQ7YR8lsQFFIjfYiEkNPktxG4fAYYqnzQP1pqUffIY
-   iUpVO/gy2D1PCx8E0VxsI9BgERucG4CLv8eq2l8gpnviU1rV6cD4eGlNk
-   g==;
-X-CSE-ConnectionGUID: M7ZvW2JpR0u1Bh4Lzjr5dQ==
-X-CSE-MsgGUID: rV3uK/ngT4CYaS5dhRArRQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11536"; a="68950043"
-X-IronPort-AV: E=Sophos;i="6.18,220,1751266800"; 
-   d="scan'208";a="68950043"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2025 09:28:35 -0700
-X-CSE-ConnectionGUID: YMU4u7VtRU6pgI6BHC48Zg==
-X-CSE-MsgGUID: nCD6ECwyT1uQo5lnv0XVmw==
-X-ExtLoop1: 1
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2025 09:28:34 -0700
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Thu, 28 Aug 2025 09:28:34 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Thu, 28 Aug 2025 09:28:33 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (40.107.236.84)
- by edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Thu, 28 Aug 2025 09:28:33 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=d6D3TblZzWZmV2+nBDyWG59Q7tAFlh8ISWIKKvXixlJj3OPoXUAmhULICKjmArfIJ3XHUcVdifGGZxYfLbs6ovOcBnL0NzH0NVb9lMGgepgmunVO16xrU/vCdsLhEPOdxEF+J27aQb51nJe1YqEcLUhQeGDouzO4VtELz9Oy/UTmurpwPjrCwU/nWmPz4Ht1e4b4Ar3pvoQHdybnqGlergay55YYuXJFlaAJPTH3Djmrhwt+IQ+auXcUc5m4hh2CDfBWbnown1tsxqpLp9GaCmI4unTxQvjwRUbXz9lBNrcErtnzv0kAOx9sng0L0u3M12zSct3RHQK7bWItYsQSwQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7kZqMRehLm0ZnyjEqa6ahvHHnwvSrV0vWaQxnud6CeY=;
- b=SDiTOhyBde2IZRa3ec5QgLJqVfqW24ZqG/L5zB/pUXBfdgEJxBwGks8YeIiJGaB8eDmxyVhUnzIZJYWaq2b7pWHKXLWUVtZyBnf+jW4UcQWTtkyeDduXoewPc7X9RLTQU+ez1fkEoSvkPVehWQNVDaRuKgspab2Js7FsM7zHUwTse5FLekLm9a8dG9YdcuRN2JGZshk3Af/pmzUVGDsHSYlgQU4GVSnvebDZyc/yD/eVaGkLpLLAoZGK4Z/wzC50zPAqXMaunjxyHdo/E9u/11iX499pGSi1vwiQW6PR1V4Dq/sCRCvNUeRCZahd7ljt/iTy78xK+c+dYQuoP4+TEQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by SA2PR11MB4985.namprd11.prod.outlook.com (2603:10b6:806:111::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.16; Thu, 28 Aug
- 2025 16:28:27 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.9073.017; Thu, 28 Aug 2025
- 16:28:27 +0000
-Message-ID: <c3d549db-bc7d-4b89-bc30-7fd4ec6f20e1@intel.com>
-Date: Thu, 28 Aug 2025 18:28:22 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3] amd-xgbe: Add PPS periodic output support
-To: Raju Rangoju <Raju.Rangoju@amd.com>
-CC: <netdev@vger.kernel.org>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<richardcochran@gmail.com>, <linux-kernel@vger.kernel.org>,
-	<Shyam-sundar.S-k@amd.com>
-References: <20250828092900.365990-1-Raju.Rangoju@amd.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <20250828092900.365990-1-Raju.Rangoju@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: VE1PR03CA0017.eurprd03.prod.outlook.com
- (2603:10a6:802:a0::29) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48447221545
+	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 16:29:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756398598; cv=none; b=D5JmXCIRSTOxRrxiHtVPRgft/izqnxh31jIwYuqFQdEP8qaAhbxTcfAAakA0byDR96tNuXQ+ssV0LOETlL8pNEVH476cQZhed+cAcq2lgl8R0HHPlhtxJQZRf1asU9awZLD+OleV1N6wE5WiAK3lr2+BYgPVjd4HfCel7WgWXXY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756398598; c=relaxed/simple;
+	bh=0X0iMTiKu9PG4+RDwVnX/uMhijsZVlnbAbrwyoGuQk0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J7h8LZM7M8BA+nfZPojefHi0X/o35CButj95xhfUn+zyUkTG/YCpCc2eqr5eu2jfEu5rvVdx9iOOX+ZGgN/cNIfZErXAxwoO6owTegKIqZnOmSSVIU0Emetmh6/hmq2fK04cL3O1oNQn5L8ZgXoNsKQv/7b5Jcx5j87/ShBwh5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jfxPwkRT; arc=none smtp.client-ip=209.85.219.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-e970b511046so549686276.0
+        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 09:29:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756398595; x=1757003395; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=tXjM940qQ60FoXXm/lXrBhLn1fhkrthBuSSNYQn+6tA=;
+        b=jfxPwkRTgqhxuMT+HKPjtLlRiZRdA0ptVvM9QEDeCY8wN4gkBROendbi6bejZmifQV
+         DxIUaXU1Qzormx6+5GjN5JO/jROT8Avftsgurjgn2FPQJdJ/fa3ary8Y0NdwLTRLsL/N
+         qkca4YCDKnBb2eLnuRYXMVn05tXIUaDq2UnT5xIUOujg1EyTKygyDUbel7nZTPyqWa9k
+         OivuaHutz4K3bgUSzlzLFls1QsmoJJwcNdg3Kfbetmv8b8RnNpYkN3ZxjPlgcoNOTU9z
+         vJA8tyomATTwH9tMzIls2WrW5tvL7ygTue2WlFsILKh9hDe5DSL/kRWbYLYuqMgnJChz
+         BPTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756398595; x=1757003395;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tXjM940qQ60FoXXm/lXrBhLn1fhkrthBuSSNYQn+6tA=;
+        b=Ob3gBqneZqcYn+zhgnV1gaw54OSSgHowpX77awXEhcRInQ5cOiv5PXFQhHBEtt4mAH
+         J5fXZWmrzEeWApIJi7u7U0LZWNHFHMlOjr5udNf3nei5C3VyUZjCz9psqwOLBC16Oa4C
+         dBxNBwseGrNIaO/YXJzEvCr4kNs5KgE56/jD839VLEXVxLr6ksXLRFfjRm1vmZNQKEGG
+         ltQosRxspLHJLwDzKq5mIGNFJUWpm7GCP8KMS3m1BuuoJs5pkyfzOX76DX6nnCIhP9rP
+         SlWkFw+GB7V7pxDXgXD3HfbYcO9BYiNqv2qWUc+TzkhtRVIMnHwmtssDNT0pXqSaXhUH
+         f9LA==
+X-Forwarded-Encrypted: i=1; AJvYcCX2pkQHnSDN9ACE+gwyJcicAeIasQN1NxylJGQ0DJ7GQ1Nx+rOzBTaI8y9fEjxk1M+C7h8B/kI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+a8oUfhGCr8ElxruUOtxF5T85J8cK6E6O0iM4SCjPPLuVfxbg
+	nUIGB6XH+tkgMQmRyK32Ig9SitGSpxAOslAPg/rDCsqonLSXMsyj6X9D
+X-Gm-Gg: ASbGncuEmVQ7kri2pXfF9Fo7YgPIQtqdcfrz319kpS6kkeuU8PAQWw2t3cQsefOfrrh
+	ZY5PYTMv1waMomR4lQJulCvk4lozy/hLuIe7NLClua3nfc5ieR6MIddV9soaUuWrbt7LDKastwU
+	aliV2EYVlfN7xZ6zDu5fsqCW6Zco1rZocDbQoTwxDsnHNhUxpVKNVhGJ7YjuHPlPUGuMtFqMcy+
+	EU1jspRtFcetAG9WS+in59IuU1217RSnBGUbc1w0anK6xJgjAWkBncuHtLdpkV1zvsOBhVRe1Zs
+	Nl9JSrgGTFONSns9NZevtnV/MtKv3A0LGbbCIqoNV8MXlnx3LZq799TtVjXicEtcd0p5TosZ/wD
+	gDV8bJelsZ7mZv5K2CFzobHUKu5hQjjs=
+X-Google-Smtp-Source: AGHT+IFZTaDscCrhvaIRez7eewCHD7DIHEAyy2jWCpA1Z8z75IaoP1BwKVAz0x7iJt5sqJgGMmwk3Q==
+X-Received: by 2002:a05:6902:c05:b0:e97:316:b941 with SMTP id 3f1490d57ef6-e970316be51mr3328670276.39.1756398594815;
+        Thu, 28 Aug 2025 09:29:54 -0700 (PDT)
+Received: from localhost ([2a03:2880:25ff:44::])
+        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e952c25df8esm5081708276.7.2025.08.28.09.29.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Aug 2025 09:29:54 -0700 (PDT)
+From: Daniel Zahka <daniel.zahka@gmail.com>
+To: Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Boris Pismenny <borisp@nvidia.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Neal Cardwell <ncardwell@google.com>,
+	Patrisious Haddad <phaddad@nvidia.com>,
+	Raed Salem <raeds@nvidia.com>,
+	Jianbo Liu <jianbol@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Kiran Kella <kiran.kella@broadcom.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next v10 00/19] add basic PSP encryption for TCP connections
+Date: Thu, 28 Aug 2025 09:29:26 -0700
+Message-ID: <20250828162953.2707727-1-daniel.zahka@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|SA2PR11MB4985:EE_
-X-MS-Office365-Filtering-Correlation-Id: ba13b344-9509-4801-33e8-08dde64feaec
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?RWJMTFM5UzBKS2JTbEp5bzFtbXRKYU5oT0ZQYmNycUM1dTlGZTRISFlPS0pJ?=
- =?utf-8?B?Y0NsY24xcklmUFJzNG5KNENRZDhDaTlaSEtlZEgxY2RZUEhYRTJ1UERoR2tx?=
- =?utf-8?B?aXpmNXZtOHhqMGZKU1FwaW1UZjdNZExoVE5tN0dLNTYyVFRlQmdKSGF6WUVK?=
- =?utf-8?B?RDhvWGhmTjVMTXRpb1Znc1FyTE5ZeHc2ZGV4TlpIMFIxMkkxWTZ4VldLMkc5?=
- =?utf-8?B?NTV2RlBMUXgxc2ZkaTNIbjBuVkJGR3p2WkJnRHdjT291V0ZDb3U4ZnJqeVQ3?=
- =?utf-8?B?bWRpZDRFeUFsMW0zNHAxY3hpc3poWFRXSXlrazFIK3pjZ1c3cHZyWWkzR0ZQ?=
- =?utf-8?B?ZEc5enIraXNOcnRpNzNuNUxNMjB5VW1vNTNGeTBiamczaG5KSmdVdnMwVjhC?=
- =?utf-8?B?SjFzUmsyRXVrQ2Vqdzc0OE5Palc0bVgxZ2EvSFQ3Uk43dWdEbGEzWUlONXIv?=
- =?utf-8?B?MGNGNWNpQXNDV1MzUlNaVW1FTy9vbjdNMnp1d1dDS3BTSlFKV21RNWR2RFdr?=
- =?utf-8?B?VHo1b3N4S3dvYUZLek5JNzBHektJSWpXa2NkejZJa3JLOE91V3JyOFdKc1Rs?=
- =?utf-8?B?cnNFTS9xcXZXRkF3THR0NlNSNkhoZ1k2aGtPK21yMkNKeDhIRWFFNWd1REp2?=
- =?utf-8?B?akRwLzZ2ODZDRjV5aC92eldjaUttTERZQko5TWJleURrRmV2K3F0Y1BvMzh2?=
- =?utf-8?B?Yi9HakFjSmowUGFhTWxwVG5zZ2RFNEQrVUk2TVFLeU1vM3BpbHJOdG1oRk8x?=
- =?utf-8?B?Z3NhZk9LZ1FLbWNienZldWFNNjRVQWV6OE5sSTFTOTMvSFhkTUhuT0Exdkwx?=
- =?utf-8?B?a3QrYzlENC92T0dQVC9qbS92YkFZSHdPQW5WemNYWnM0QnBPUGdsRzA0YWZy?=
- =?utf-8?B?T2Rhb1hFRVRGTDZDZ08rcGxYNllqV3podDFjcUhzaWo3ZGRRZ1FxQTlnRVU1?=
- =?utf-8?B?YWVWeFI5dzlxcE8yNU53QXVrN1RaUUd4Uk15QW0wcEQrZTZ5VVZ2YnBEZFN2?=
- =?utf-8?B?R2dHbnRUV3BiUkdvcVlqTWpNWUtwQ3RIOWtNMDg2dnlaUFdYZlpWVjNJR1Z1?=
- =?utf-8?B?WTBZUDU5VlBPMkhOTm1VOXZmaHNST2kwem1Ra21XWFVXUHlPK3Z5bkJYWURB?=
- =?utf-8?B?VkhNM1NacnoyWVRJdnlKV1BObGprZ2hid3dXWHYxNXF1NU02Wmp1OG01c1Y2?=
- =?utf-8?B?T0VVWkJIZ0RKRWNWaThUU003SW1OZC9yK3FUSms4ekU4MXgyT0JiZTRvcUMw?=
- =?utf-8?B?OW11NmR1bk1pRGcvTXdjN2srV1hVMzJ3S3RmelBOOEVNZ2MwN0tCQW93aGww?=
- =?utf-8?B?WXQzdHpSOVI3cmdTRlpMUlhUTGxRRWkzS2w4N01yZDJKbEkwcXNLdVdtZVJ2?=
- =?utf-8?B?YzczU0xaVHBDdExRZGs5ZDNtUFVqNklZVnkrR2ZRQmR6NjVRcjRHdUQ5R3BR?=
- =?utf-8?B?QXFrcSs2eVk3TDc5YnJLdWpaSG1TOU43WUNFck94bkQ1Wi80WEJoR0dTajhs?=
- =?utf-8?B?V1FkNlQ5bTBXYld2STBvOHZzL3k0Y2Z1d0U5eDJJSWd1ck9jK1lUS1ExdWZU?=
- =?utf-8?B?TEVKbys4Vm8zdE5aeC9WUHJGaFFHa3hGZXcwWHduRmdYUGcxaGo4UG9KMGRG?=
- =?utf-8?B?Q3I1YVJ3Q3hvcnMwQUUyS2RWSDB5UmtEaUc5SmJtTTdua05GWTljNjJXdmhC?=
- =?utf-8?B?eWJzR0QzOW9lazhSS0pUWXNMcFBOUTQ4ZjNqRlcxZWZHL3krVyswRTk4L3pV?=
- =?utf-8?B?ZTROWGNGb0VudkNmMk5PUnRKeXIxUVkvSGZDWU43eWE3cUVhVWhCNHR4elIw?=
- =?utf-8?B?ZGxmbXoxcG90NmN1YmdETGlHN1RIRTZlamErd0Q4SDZzeDhWalZQamZBMHho?=
- =?utf-8?B?UGFxQkJGQWh1aUlnVVQ1MWNuR3cvenBuYUlKaG1yaG9vRVVnSis1ODhKT1JF?=
- =?utf-8?Q?olsTo+26de0=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?R21sdm9oa2ZWenMrdG5ycE1iMkJvdnFSaTlwclFnOWlmR3lDLzJhajkzTnZP?=
- =?utf-8?B?QU9xaGpXeUE5ek1sTzZzeGJKU0E3RUhxUTF5Vk95UHV6aWUwV3dsWWVVR1ZU?=
- =?utf-8?B?cE03ZlRra1hocVF0OHkraDlwZkMzdWV4QTY2bW53UEh4Zjh1VitJYldVVkp5?=
- =?utf-8?B?b3FnSVBsTHl5Q1huRVYrNkw1S0lseHpvTVF0M21XNkZHaElwbS9BV1phU1Fy?=
- =?utf-8?B?Q3o1NG5hMjFsZm92QXNXZE0zZ0hGdFRNZTZadSsyM0x2SmxjMlMxekhKS1J0?=
- =?utf-8?B?SzhhNWY1UkVnZk9hWmJxMTJ2cnhRb1FGME9xUlZKMkRFWVh6QXQ5MTNFSUpz?=
- =?utf-8?B?Y2JMSkJ6MnJYWEVhWS90Z2s2TGYrMXhaRVp0U3l3WEMwenFYbHRzWnBnclNx?=
- =?utf-8?B?VllOT2V6QTlVUjBJRVRBeVNEU1VOYjNNZjJCa2JtTkMvb1R4NkY0anZHelpV?=
- =?utf-8?B?RmJmTDZEU0hVaHZ0M0p5UGlUcjJkekFqeFZWcy9nS1lJUlQ4c1VNbGRPbVJt?=
- =?utf-8?B?MURZM01Ma1h6UVhBRlZ0Tm9aT1Y0c1ViaTROc3p4ZUhjZGtkUjVXdERxOTR5?=
- =?utf-8?B?YkhDL3pqaUNDRU9EMmJoQVd6THZPVUZ3bENCT2EyZHE5WEkrTElRR0pJY0tK?=
- =?utf-8?B?dGd4R3ppS0pBVmN3Q3UwMlFkd1hqL00rNXRIUFlGWGRHcFdtandBR0RHWTI4?=
- =?utf-8?B?YjdTcmVSU2g5NkpycVQ0MmlzRWJQWDhvN2hUYmZncFZTYWtMS0QybC9qaCts?=
- =?utf-8?B?T1F0L05sSW5YbHNHUTlhYmhHNHdaQktlN1c2d25qOHBqYzEzaFBxY0x0M0hZ?=
- =?utf-8?B?ZzNQaGkycGpTUFI0bkVKQTNwdmVJblhYdnBEMVlmZ3RlM2dDSUdCbGtnMTJF?=
- =?utf-8?B?eG5aczBtdWV5dHpUZU9nU2MxT01pWVlkRHpYN3pVWkpQUFVuL3VjaG1BZ0xp?=
- =?utf-8?B?NmwyTld1dFNhM0hOb2FsUlgrVFhjZTdLdEtodm9lQ09kTjVSUU9pd05IZHBJ?=
- =?utf-8?B?Q3hVWGhjWjRLOGhoUTRYeE5hY1RBR1FSeUtTRjNvWGtHK3ZOUkM3aTBRTnlm?=
- =?utf-8?B?NGVsa3ZhSkR6citKTGFhNXB3akdqY1IxbXlNL1E5bFhkM2Nsdkpwd3dwRFVs?=
- =?utf-8?B?Uml0MlVGZFhaSzRaMlJQYWJEdDJpK29IaGhwNTJRQTdNL0dWUUlma2M1QzAx?=
- =?utf-8?B?UkxyVXJKcWtIdkNCN1pQdk9Bb2RzNmNQK1g0K0R2WkdJN0xQNjFCellza0E5?=
- =?utf-8?B?WG91dDBFSjN4VHYzRlc2UW50VkR5aVcyUGdzeVJNODlsOFd2RFBpWHpGYTgy?=
- =?utf-8?B?Q2ZMb0F6MXpFUXdtSFZrdlNKNTZRcDVZWkNiaUdYemJOQzFTaHp3aWRzejAr?=
- =?utf-8?B?M09lYndhekNwSHZzbGM1Tms0QzdNR3E3cEF3ZFozY0tRSUpVbmF3djhHNkF1?=
- =?utf-8?B?UVEycGhYNTd4Mk9JbVFnaE1LUExKRTBhVzRpRDZRdEduMU9sNUxZVzVJVE8y?=
- =?utf-8?B?TDVhYnZiOEJyK3c0QW5mNmI1SXgvR0pxbzZWZmFlY2k2MzYzeXFmQ05lc2Fl?=
- =?utf-8?B?NHU4SHloaWpRckxGZndvZmErQTU2c3NjZitjYkowc043OHBrZHFOallFclhx?=
- =?utf-8?B?blB4SkIrcmZ2OWxBVFN5Kzdia3VzRXJWdTN2eklCSUlPcTMvZEpIN0hjMnl0?=
- =?utf-8?B?Z0RleDV6T1V4ODdlTDRVZWpEZjk1cHBtTEZDa01FS1F5blJxYnBoeDBuOVQz?=
- =?utf-8?B?YWdoVDk5V3lvcW9GTUZiSFNrVWFSaFVqN1JkTVZRdmE0dnU3Z1ZJRDd1NVVB?=
- =?utf-8?B?RzF1QW5HdmZBNnkwOUt0Q3Y4SXIva09XUFc5RWNmbitsS3oxZ1E4WVgrNHFm?=
- =?utf-8?B?SEhDTGRVbEpxeXpkTzYxMXo0S1JYOEhZZ2M2dm5Pd0R4Y2MrOFV2QXp4K0Fq?=
- =?utf-8?B?RUYwQW5ESG9GdEQ5VStsdFNBdzJkNjlMQ2RWaDZQOEd3RWUzbitnU1hqM21C?=
- =?utf-8?B?SjFKZkw3RTJJcHZPeWFwSXlibVFQWk9pZ1pMMEpGRGpYZmRzT3RvSmZ5S0x3?=
- =?utf-8?B?eGJ6ekxhYUJydmdLQXhpZlBIS1BRNFNvQjNPbDhyL00yT0wrbHJnMmwrdmIx?=
- =?utf-8?B?akhYbDVHZGI2MmRXaVZaRTBEL1VtcmpweHY4MzJONHpIbThIYWNHVk5oMXdF?=
- =?utf-8?B?Mmc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: ba13b344-9509-4801-33e8-08dde64feaec
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Aug 2025 16:28:27.7728
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2xa3Nixf3ER+dJRxb917+5rzgSJaSMld5oVdEqvcqGU/qAal5TUQ7uo67cWCacw+LXMJoHzjREusvFFbl3k66ts521p7lvuw+QVv1rYfYZ8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4985
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
-From: Raju Rangoju <Raju.Rangoju@amd.com>
-Date: Thu, 28 Aug 2025 14:59:00 +0530
+This is v10 of the PSP RFC [1] posted by Jakub Kicinski one year
+ago. General developments since v1 include a fork of packetdrill [2]
+with support for PSP added, as well as some test cases, and an
+implementation of PSP key exchange and connection upgrade [3]
+integrated into the fbthrift RPC library. Both [2] and [3] have been
+tested on server platforms with PSP-capable CX7 NICs. Below is the
+cover letter from the original RFC:
 
-> Add support for hardware PPS (Pulse Per Second) output to the
-> AMD XGBE driver. The implementation enables flexible periodic
-> output mode, exposing it via the PTP per_out interface.
-> 
-> The driver supports configuring PPS output using the standard
-> PTP subsystem, allowing precise periodic signal generation for
-> time synchronization applications.
-> 
-> The feature has been verified using the testptp tool and
-> oscilloscope.
-> 
-> Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
-> ---
-> Changes since v2:
->  - avoid redundant checks in xgbe_enable()
->  - simplify the mask calculation
-> 
-> Changes since v1:
->  - add sanity check to prevent pps_out_num and aux_snap_num exceeding the limit
-> 
->  drivers/net/ethernet/amd/xgbe/Makefile      |  2 +-
->  drivers/net/ethernet/amd/xgbe/xgbe-common.h | 46 ++++++++++++-
->  drivers/net/ethernet/amd/xgbe/xgbe-drv.c    | 15 +++++
->  drivers/net/ethernet/amd/xgbe/xgbe-pps.c    | 73 +++++++++++++++++++++
->  drivers/net/ethernet/amd/xgbe/xgbe-ptp.c    | 26 +++++++-
->  drivers/net/ethernet/amd/xgbe/xgbe.h        | 16 +++++
->  6 files changed, 173 insertions(+), 5 deletions(-)
->  create mode 100644 drivers/net/ethernet/amd/xgbe/xgbe-pps.c
+Add support for PSP encryption of TCP connections.
 
-[...]
+PSP is a protocol out of Google:
+https://github.com/google/psp/blob/main/doc/PSP_Arch_Spec.pdf
+which shares some similarities with IPsec. I added some more info
+in the first patch so I'll keep it short here.
 
-> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
-> index 2e9b95a94f89..f0989aa01855 100644
-> --- a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
-> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
-> @@ -691,6 +691,21 @@ void xgbe_get_all_hw_features(struct xgbe_prv_data *pdata)
->  	hw_feat->pps_out_num  = XGMAC_GET_BITS(mac_hfr2, MAC_HWF2R, PPSOUTNUM);
->  	hw_feat->aux_snap_num = XGMAC_GET_BITS(mac_hfr2, MAC_HWF2R, AUXSNAPNUM);
->  
-> +	/* Sanity check and warn if hardware reports more than supported */
-> +	if (hw_feat->pps_out_num > XGBE_MAX_PPS_OUT) {
-> +		dev_warn(pdata->dev,
+The protocol can work in multiple modes including tunneling.
+But I'm mostly interested in using it as TLS replacement because
+of its superior offload characteristics. So this patch does three
+things:
 
-1. How often can this function be called? Don't you need the _ratelimit
-   version here?
-2. netdev_ variant instead of dev_?
+ - it adds "core" PSP code
+   PSP is offload-centric, and requires some additional care and
+   feeding, so first chunk of the code exposes device info.
+   This part can be reused by PSP implementations in xfrm, tunneling etc.
 
-> +			 "Hardware reports %u PPS outputs, limiting to %u\n",
-> +			 hw_feat->pps_out_num, XGBE_MAX_PPS_OUT);
-> +		hw_feat->pps_out_num = XGBE_MAX_PPS_OUT;
-> +	}
-> +
-> +	if (hw_feat->aux_snap_num > XGBE_MAX_AUX_SNAP) {
-> +		dev_warn(pdata->dev,
+ - TCP integration TLS style
+   Reuse some of the existing concepts from TLS offload, such as
+   attaching crypto state to a socket, marking skbs as "decrypted",
+   egress validation. PSP does not prescribe key exchange protocols.
+   To use PSP as a more efficient TLS offload we intend to perform
+   a TLS handshake ("inline" in the same TCP connection) and negotiate
+   switching to PSP based on capabilities of both endpoints.
+   This is also why I'm not including a software implementation.
+   Nobody would use it in production, software TLS is faster,
+   it has larger crypto records.
 
-(same)
+ - mlx5 implementation
+   That's mostly other people's work, not 100% sure those folks
+   consider it ready hence the RFC in the title. But it works :)
 
-> +			 "Hardware reports %u aux snapshot inputs, limiting to %u\n",
-> +			 hw_feat->aux_snap_num, XGBE_MAX_AUX_SNAP);
+Not posted, queued a branch [4] are follow up pieces:
+ - standard stats
+ - netdevsim implementation and tests
 
-BTW, these messages are not very meaningful, maybe you should print both
-min and max and say that the actual HW output is out of range?
+[1] https://lore.kernel.org/netdev/20240510030435.120935-1-kuba@kernel.org/ 
+[2] https://github.com/danieldzahka/packetdrill
+[3] https://github.com/danieldzahka/fbthrift/tree/dzahka/psp
+[4] https://github.com/kuba-moo/linux/tree/psp
 
-> +		hw_feat->aux_snap_num = XGBE_MAX_AUX_SNAP;
-> +	}
-> +
->  	/* Translate the Hash Table size into actual number */
->  	switch (hw_feat->hash_table_size) {
->  	case 0:
-> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-pps.c b/drivers/net/ethernet/amd/xgbe/xgbe-pps.c
-> new file mode 100644
-> index 000000000000..b5704fbbc5be
-> --- /dev/null
-> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-pps.c
-> @@ -0,0 +1,73 @@
-> +// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
-> +/*
-> + * Copyright (c) 2014-2025, Advanced Micro Devices, Inc.
-> + * Copyright (c) 2014, Synopsys, Inc.
-> + * All rights reserved
-> + *
-> + * Author: Raju Rangoju <Raju.Rangoju@amd.com>
-> + */
-> +
-> +#include "xgbe.h"
-> +#include "xgbe-common.h"
-> +
-> +static inline u32 PPSx_MASK(unsigned int x)
-> +{
-> +	return GENMASK(PPS_MAXIDX(x), PPS_MINIDX(x));
-> +}
-> +
-> +static inline u32 PPSCMDx(unsigned int x, u32 val)
-> +{
-> +	return ((val & GENMASK(3, 0)) << PPS_MINIDX(x));
+Comments we intend to defer to future series:
+   - we prefer to keep the version field in the tx-assoc netlink
+     request, because it makes parsing keys require less state early
+     on, but we are willing to change in the next version of this
+     series.
+   - using a static branch to wrap psp_enqueue_set_decrypted() and
+     other functions called from tcp.
+   - using INDIRECT_CALL for tls/psp in sk_validate_xmit_skb(). We
+     prefer to address this in a dedicated patch series, so that this
+     series does not need to modify the way tls_validate_xmit_skb() is
+     declared and stubbed out.
 
-Redundant outer ()s.
+CHANGES:
+v10:
+    - rebase series
+v9: https://lore.kernel.org/netdev/20250827155340.2738246-1-daniel.zahka@gmail.com/
+    - rebase series
+v8: https://lore.kernel.org/netdev/20250825200112.1750547-1-daniel.zahka@gmail.com/
+    - rebase series
+v7: https://lore.kernel.org/netdev/20250820113120.992829-1-daniel.zahka@gmail.com/
+    - use flexible array declaration instead of 0-length array declaration
+      in struct mlx5_ifc_psp_gen_spi_out_bits
+    - check that 31 LSBs of the SPI are non-zero in psp_nl_parse_key()
+    - add details about GRO and TCP coalescing in commit message of
+      fourth patch.
+    - add comment explaining use of xa_store()/xa_erase() in
+      psp_dev_unregister()/psp_dev_destroy().
+v6: https://lore.kernel.org/netdev/20250812003009.2455540-1-daniel.zahka@gmail.com/
+    - make psp_sk_overhead() add 40B of encapsulation overhead.
+    - use PSP_CMD_KEY_ROTATE_NTF instead of PSP_CMD_KEY_ROTATE as arg to
+      genl_info_init_ntf()
+    - fix errors reported by static analysis
+v5: https://lore.kernel.org/netdev/20250723203454.519540-1-daniel.zahka@gmail.com/
+    - rebase series
+v4: https://lore.kernel.org/netdev/20250716144551.3646755-1-daniel.zahka@gmail.com/
+    - rename psp_rcv() to psp_dev_rcv()
+    - add strip_icv param psp_dev_rcv() to make trailer stripping optional
+    - replace memcpy in mlx5e_psp_set_state()
+    - rename psp_encapsulate() to psp_dev_encapsulate()
+    - delete unused struct mlx5e_psp_sa_entry declaration
+    - use psp_key_size() instead of pas->key_sz in mlx5e_psp_assoc_add()
+    - remove unneeded psp.c/psp.h files in mlx5
+    - remove unneeded struct psp_key_spi usage in mlx5
+    - fix EXPORT_IPV6_MOD_GPL(psp_reply_set_decrypted) semicolon
+    - remove version from netlink rx-assoc reply
+    - remove key_sz field from struct psp_assoc
+    - rename psd_get_for_sock() to psp_dev_get_for_sock()
+    - use sk_is_tcp() to check sock in psp_assoc_device_get_locked()
+    - add comment to tcp_timewait_state_process() explaining TCP_TW_SYN
+      case.
+    - psp_twsk_init() accepts const pointer, so caller does not need to
+      cast const away.
+    - add missing psp_twsk_rx_policy_check() to TCP_TW_SYN case of
+      do_timewait in tcp_v4_rcv().
+    - remove unused PSP_KEY_V0/PSP_KEY_V1 defines
 
-> +}
-> +
-> +static inline u32 TRGTMODSELx(unsigned int x, u32 val)
-> +{
-> +	return ((val & GENMASK(1, 0)) << (PPS_MAXIDX(x) - 2));
+v3: https://lore.kernel.org/netdev/20250702171326.3265825-1-daniel.zahka@gmail.com/
+    - move psp_rcv() and psp_encapsulate() driver helpers into
+      psp_main.c
+    - lift pse/pas comparison code into new function:
+      psp_pse_matches_pas()
+    - explicitly mark rcu critical section psp_reply_set_decrypted()
+    - use rcu_dereference_proteced() instead of rcu_read_lock() in
+      psp_sk_assoc_free() and psp_twsk_assoc_free()
+    - rename psp_is_nondata() to psp_is_allowed_nondata()
+    - psp_reply_set_decrypted() should not call psp_sk_assoc(). Call
+      psp_sk_get_assoc_rcu() instead.
+    - lift common code from timewait and regular socks into new
+      function psp_sk_get_assoc_rcu()
+    - export symbols in psp_sock.c with EXPORT_IPV6_MOD_GPL()
+    - check for sk_is_inet() before casting to inet_twsk() in
+      sk_validate_xmit() and in psp_get_assoc_rcu()
+    - psp_reply_set_decrypted() does not use stuct sock* arg. Drop it.
+    - reword driver requirement about double rotating keys when the device
+      supports requesting arbitrary spi key pairs.
+    
+v2: https://lore.kernel.org/netdev/20250625135210.2975231-1-daniel.zahka@gmail.com/
+    - add pas->dev_id == pse->dev_id to policy checks
+    - __psp_sk_rx_policy_check() now allows pure ACKs, FINs, and RSTs to
+      be non-psp authenticated before "PSP Full" state.
+    - assign tw_validate_skb funtion during psp_twsk_init()
+    - psp_skb_get_rcu() also checks if sk is a tcp timewait sock when
+      looking for psp assocs.
+    - scan ofo queue non-psp data during psp_sock_recv_queue_check()
+    - add tcp_write_collapse_fence() to psp_sock_assoc_set_tx()
+    - Add psp_reply_set_decrypted() to encapsulate ACKs, FINs, and RSTs
+      sent from control socks on behalf of full or timewait socks with PSP
+      state.
+    - Add dev_id field to psp_skb_ext
+    - Move psp_assoc from struct tcp_timewait_sock to struct
+      inet_timewait_sock
+    - Move psp_sk_assoc_free() from sk_common_release() to
+      inet_sock_destruct()
+    - add documentation about MITM deletion attack, and expectation
+      from userspace
+    - add information about accepting clear text ACKs, RSTs, and FINs
+      to `Securing Connections` section.
 
-Same here.
+v1: https://lore.kernel.org/netdev/20240510030435.120935-1-kuba@kernel.org/
 
-> +}
+Daniel Zahka (2):
+  net: move sk_validate_xmit_skb() to net/core/dev.c
+  net: tcp: allow tcp_timewait_sock to validate skbs before handing to
+    device
 
-I believe you shouldn't name these functions that way, also pls no
-inlines in .c files.
-Either give them proper names and remove `inline` or make macros from them.
+Jakub Kicinski (8):
+  psp: add documentation
+  psp: base PSP device support
+  net: modify core data structures for PSP datapath support
+  tcp: add datapath logic for PSP with inline key exchange
+  psp: add op for rotation of device key
+  net: psp: add socket security association code
+  net: psp: update the TCP MSS to reflect PSP packet overhead
+  psp: track generations of device key
 
-> +
-> +int xgbe_pps_config(struct xgbe_prv_data *pdata,
-> +		    struct xgbe_pps_config *cfg, int index, int on)
+Raed Salem (9):
+  net/mlx5e: Support PSP offload functionality
+  net/mlx5e: Implement PSP operations .assoc_add and .assoc_del
+  psp: provide encapsulation helper for drivers
+  net/mlx5e: Implement PSP Tx data path
+  net/mlx5e: Add PSP steering in local NIC RX
+  net/mlx5e: Configure PSP Rx flow steering rules
+  psp: provide decapsulation and receive helper for drivers
+  net/mlx5e: Add Rx data path offload
+  net/mlx5e: Implement PSP key_rotate operation
 
-@on can be bool?
+ Documentation/netlink/specs/psp.yaml          | 187 +++++
+ Documentation/networking/index.rst            |   1 +
+ Documentation/networking/psp.rst              | 183 +++++
+ .../net/ethernet/mellanox/mlx5/core/Kconfig   |  11 +
+ .../net/ethernet/mellanox/mlx5/core/Makefile  |   3 +
+ drivers/net/ethernet/mellanox/mlx5/core/en.h  |   6 +-
+ .../net/ethernet/mellanox/mlx5/core/en/fs.h   |   2 +-
+ .../ethernet/mellanox/mlx5/core/en/params.c   |   4 +-
+ .../mellanox/mlx5/core/en_accel/en_accel.h    |  50 +-
+ .../mellanox/mlx5/core/en_accel/ipsec_rxtx.h  |   2 +-
+ .../mellanox/mlx5/core/en_accel/psp.c         | 195 +++++
+ .../mellanox/mlx5/core/en_accel/psp.h         |  49 ++
+ .../mellanox/mlx5/core/en_accel/psp_fs.c      | 736 ++++++++++++++++++
+ .../mellanox/mlx5/core/en_accel/psp_fs.h      |  30 +
+ .../mellanox/mlx5/core/en_accel/psp_offload.c |  44 ++
+ .../mellanox/mlx5/core/en_accel/psp_rxtx.c    | 200 +++++
+ .../mellanox/mlx5/core/en_accel/psp_rxtx.h    | 121 +++
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |   9 +
+ .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  49 +-
+ .../net/ethernet/mellanox/mlx5/core/en_tx.c   |  10 +-
+ drivers/net/ethernet/mellanox/mlx5/core/fw.c  |   6 +
+ .../ethernet/mellanox/mlx5/core/lib/crypto.h  |   1 +
+ .../net/ethernet/mellanox/mlx5/core/main.c    |   1 +
+ .../mellanox/mlx5/core/steering/hws/definer.c |   2 +-
+ include/linux/mlx5/device.h                   |   4 +
+ include/linux/mlx5/mlx5_ifc.h                 |  95 ++-
+ include/linux/netdevice.h                     |   4 +
+ include/linux/skbuff.h                        |   3 +
+ include/net/dropreason-core.h                 |   6 +
+ include/net/inet_timewait_sock.h              |   8 +
+ include/net/psp.h                             |  12 +
+ include/net/psp/functions.h                   | 206 +++++
+ include/net/psp/types.h                       | 184 +++++
+ include/net/sock.h                            |  26 +-
+ include/uapi/linux/psp.h                      |  66 ++
+ net/Kconfig                                   |   1 +
+ net/Makefile                                  |   1 +
+ net/core/dev.c                                |  32 +
+ net/core/gro.c                                |   2 +
+ net/core/skbuff.c                             |   4 +
+ net/ipv4/af_inet.c                            |   2 +
+ net/ipv4/inet_timewait_sock.c                 |   5 +
+ net/ipv4/ip_output.c                          |   5 +-
+ net/ipv4/tcp.c                                |   2 +
+ net/ipv4/tcp_ipv4.c                           |  18 +-
+ net/ipv4/tcp_minisocks.c                      |  20 +
+ net/ipv4/tcp_output.c                         |  17 +-
+ net/ipv6/ipv6_sockglue.c                      |   6 +-
+ net/ipv6/tcp_ipv6.c                           |  17 +-
+ net/psp/Kconfig                               |  15 +
+ net/psp/Makefile                              |   5 +
+ net/psp/psp-nl-gen.c                          | 119 +++
+ net/psp/psp-nl-gen.h                          |  39 +
+ net/psp/psp.h                                 |  54 ++
+ net/psp/psp_main.c                            | 278 +++++++
+ net/psp/psp_nl.c                              | 505 ++++++++++++
+ net/psp/psp_sock.c                            | 302 +++++++
+ tools/net/ynl/Makefile.deps                   |   1 +
+ 58 files changed, 3905 insertions(+), 61 deletions(-)
+ create mode 100644 Documentation/netlink/specs/psp.yaml
+ create mode 100644 Documentation/networking/psp.rst
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_fs.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_fs.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_offload.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_rxtx.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_rxtx.h
+ create mode 100644 include/net/psp.h
+ create mode 100644 include/net/psp/functions.h
+ create mode 100644 include/net/psp/types.h
+ create mode 100644 include/uapi/linux/psp.h
+ create mode 100644 net/psp/Kconfig
+ create mode 100644 net/psp/Makefile
+ create mode 100644 net/psp/psp-nl-gen.c
+ create mode 100644 net/psp/psp-nl-gen.h
+ create mode 100644 net/psp/psp.h
+ create mode 100644 net/psp/psp_main.c
+ create mode 100644 net/psp/psp_nl.c
+ create mode 100644 net/psp/psp_sock.c
 
-> +{
-> +	unsigned int value = 0;
-> +	unsigned int tnsec;
-> +	u64 period;
-> +
-> +	tnsec = XGMAC_IOREAD(pdata, MAC_PPSx_TTNSR(index));
-> +	if (XGMAC_GET_BITS(tnsec, MAC_PPSx_TTNSR, TRGTBUSY0))
-> +		return -EBUSY;
-> +
-> +	value = XGMAC_IOREAD(pdata, MAC_PPSCR);
-> +
-> +	value &= ~PPSx_MASK(index);
+-- 
+2.47.3
 
-I'd remove that NL between these two or even squash them into 1 line if
-it fits into 80 chars.
-
-> +
-> +	if (!on) {
-> +		value |= PPSCMDx(index, 0x5);
-> +		value |= PPSEN0;
-> +		XGMAC_IOWRITE(pdata, MAC_PPSCR, value);
-> +		return 0;
-
-Newline before the return.
-
-> +	}
-> +
-> +	XGMAC_IOWRITE(pdata, MAC_PPSx_TTSR(index), cfg->start.tv_sec);
-> +	XGMAC_IOWRITE(pdata, MAC_PPSx_TTNSR(index), cfg->start.tv_nsec);
-> +
-> +	period = cfg->period.tv_sec * NSEC_PER_SEC;
-> +	period += cfg->period.tv_nsec;
-> +	do_div(period, XGBE_V2_TSTAMP_SSINC);
-> +
-> +	if (period <= 1)
-> +		return -EINVAL;
-> +
-> +	XGMAC_IOWRITE(pdata, MAC_PPSx_INTERVAL(index), period - 1);
-> +	period >>= 1;
-> +	if (period <= 1)
-> +		return -EINVAL;
-> +
-> +	XGMAC_IOWRITE(pdata, MAC_PPSx_WIDTH(index), period - 1);
-> +
-> +	value |= PPSCMDx(index, 0x2);
-> +	value |= TRGTMODSELx(index, 0x2);
-> +	value |= PPSEN0;
-> +
-> +	XGMAC_IOWRITE(pdata, MAC_PPSCR, value);
-> +	return 0;
-
-Same here.
-
-> +}
-> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-ptp.c b/drivers/net/ethernet/amd/xgbe/xgbe-ptp.c
-> index 3658afc7801d..0e0b8ec3b504 100644
-> --- a/drivers/net/ethernet/amd/xgbe/xgbe-ptp.c
-> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-ptp.c
-> @@ -106,7 +106,29 @@ static int xgbe_settime(struct ptp_clock_info *info,
->  static int xgbe_enable(struct ptp_clock_info *info,
->  		       struct ptp_clock_request *request, int on)
->  {
-> -	return -EOPNOTSUPP;
-> +	struct xgbe_prv_data *pdata = container_of(info, struct xgbe_prv_data,
-> +						   ptp_clock_info);
-> +	struct xgbe_pps_config *pps_cfg;
-> +	unsigned long flags;
-> +	int ret;
-> +
-> +	dev_dbg(pdata->dev, "rq->type %d on %d\n", request->type, on);
-> +
-> +	if (request->type != PTP_CLK_REQ_PEROUT)
-> +		return -EOPNOTSUPP;
-> +
-> +	pps_cfg = &pdata->pps[request->perout.index];
-> +
-> +	pps_cfg->start.tv_sec = request->perout.start.sec;
-> +	pps_cfg->start.tv_nsec = request->perout.start.nsec;
-> +	pps_cfg->period.tv_sec = request->perout.period.sec;
-> +	pps_cfg->period.tv_nsec = request->perout.period.nsec;
-> +
-> +	spin_lock_irqsave(&pdata->tstamp_lock, flags);
-> +	ret = xgbe_pps_config(pdata, pps_cfg, request->perout.index, on);
-> +	spin_unlock_irqrestore(&pdata->tstamp_lock, flags);
-
-Are you sure you need to protect the whole xgbe_pps_config() from
-interrupts? It's quite large and I don't think you need that lock
-(and IRQ protection) for its entire runtime.
-
-> +
-> +	return ret;
->  }
->  
->  void xgbe_ptp_register(struct xgbe_prv_data *pdata)
-
-Thanks,
-Olek
 
