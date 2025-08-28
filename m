@@ -1,78 +1,82 @@
-Return-Path: <netdev+bounces-217927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E24F9B3A6AF
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 18:42:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 773D0B3A6A7
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 18:42:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBF751883A3D
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 16:42:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9289C17B25F
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 16:42:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65C85322752;
-	Thu, 28 Aug 2025 16:41:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3520E322DB9;
+	Thu, 28 Aug 2025 16:41:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ld9Czs50"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CE4KQd3O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6AE722FDE8
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 16:41:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F9D323C4E9
+	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 16:41:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756399313; cv=none; b=BNTN/1MEnWsoYOpYpcPJ41iHqR4kjJP3YCQ7ubLJNKM0vqZlqAzshY5ZfRRUniAzY205Pf0xpGQwqYcBpxDtjmkX5Ut3m2DXxgOeKknbo5nO9jQT0V6zmAALPdATnwxkNPpuXMwNfhxEx98uPQ8wZo7MkwBo2yn+43dMf9Ir24I=
+	t=1756399315; cv=none; b=GrOGfdl5Y32kMZv4NQSRJIQ50y/X5Szu+s6QP4gByK4QG/zqL6zziDTmRN3mkpfzeBwfiZmcPkjvhDboqL6bDgwz0ZFyvfi4Nb5T5EHxUHodcs9ScBO1AP9eF4+8IZ/vRip1BySz4qVrbwtdy6yFJLuBkp7hZG8veUgriuALsRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756399313; c=relaxed/simple;
-	bh=so1A3mDCuncqlKYv7XbSoIYlY2n2IfjQwSz9iLa5+bE=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=cKDhi1/5Gw5nywvy1Is/cXck6MihgUPJCoj2F+y2xjiVhH4TrdGIZe3zM3QLN3F8h3kpBJS04l8H/nQVf7LhHyAfeu6UEQUtfjizjR71RpQ9HMXuEQ9R+oROVLGkCei4+3ViCFIsWvxnsd60R3+j4+FWaEKefbqHHvhMItnbnq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ld9Czs50; arc=none smtp.client-ip=209.85.128.202
+	s=arc-20240116; t=1756399315; c=relaxed/simple;
+	bh=NiObFChBzNH8hy4VZgPAFeOWxgrizW4gXQkjdcUmPIs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=GeBxs/BH1QBfFloEBL/PzVCQYdKci36WtuW1J2OXu7uNth4J+JfR2uXth3Gm1eucx2//1nadN8L+Ur+P7ZZ5OJNuqm7pjX1nltW207QxrZre8M7/nqcWmjcvl/LZ1c+pVahhAdhQx1RS+QG7luN6qGGW06Y+jfE5UIbPAflNeZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CE4KQd3O; arc=none smtp.client-ip=209.85.222.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-71fb88c78afso8698477b3.0
-        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 09:41:51 -0700 (PDT)
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-7fa717ff667so164673185a.3
+        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 09:41:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756399311; x=1757004111; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=EJFHXAt0fmpEY7DZVLq1Rn3e8L5MH6nfI7/TBpOH8q8=;
-        b=Ld9Czs50ZYwxckvomF/4d3MKKc8riGFEr0ROO4nmL0ZmW8YeSm7Npymc5/lnXQ6SMD
-         XQhoXD9UMc1TZEV6++cikmxEM1QIbl0EZzPwM6m1TShv95BHH071gs7SlSYsJtBrN64O
-         TdoI+rYswJE9UndRtGx3PxPD8ByyLzt0T2iWkrgQ5MluO8E/q4FIcFMnOCmfKAIvb12T
-         FSl+eoIrS3m3xbwzGhbAspqW+I/GW08s8huhS/HaZnjdBEiiNiT+OhgZ2MTbuxPumdh/
-         LrAyXgGgGN6nU/SD4Bo7V+K+4Ho0UcZ1AgvW0M+5nomnyODT7GGNYAeHN4Vpgdh4JHmd
-         1oRA==
+        d=google.com; s=20230601; t=1756399312; x=1757004112; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ly8rj2FIoW7lun3ggt9Mn2K5wFocwyOeO/y4aMpxAu4=;
+        b=CE4KQd3OV6SHm9wvm2wl1klwQ+QC/CuBQ0hpqcdFsgH09fMHxX43Lpdb7NT/7e8g9x
+         uNDpGmNyKSjwlprf1Lu2j5UC1Uv9+fvgBFd+zdWHkgODhPqtH3eg22IKJbkmeExKkexG
+         pY59P0FK+TxJ9aSewREf7olCf1kS4XW0l0nUbjKlnlRuRf/J3YYFmzrnJxsAPw8dbxx0
+         y3gQjLI+dr1Cg6aVN3+G+M7wajCOP9kM3XWNlA9qC/yjeiqeDojsdSTj1skH6+xWK5xA
+         wTB30OpDh6J2iJNUc8XQP2RuBjzQQYvOHIar/9qAMXqKKgyAQBiY/VB+tON6Gs91g4sw
+         /+Eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756399311; x=1757004111;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EJFHXAt0fmpEY7DZVLq1Rn3e8L5MH6nfI7/TBpOH8q8=;
-        b=b7Tvkh2rhwh5QS/WhypsNd99e0Y3795vPAri3sZ08JNU6lo+xR7/H1nfY5hlDXt/46
-         H8HE0CEnLPklTWB3xwDBavst4EF1Q8MXmDcO4++ueSJK+KDhGxgu1HfizXNrF/366th/
-         So6TG/VLy8zB6Gpe2dJY/Y+85CvQ8W46lszDpR1dH2tefWBuiGFLOh6IYLZeoGT/Z6jm
-         SoBF+cqmLBs5dSZCYPFrv0mJY43SnMKxYB07r41Ap7nWkrrVh4vBSJWgDJS6TJ1+bFks
-         3wbLyguxQEfKEIfI0kOR9fTSx6RJgg7gNvoKm8e+aGuOHdGzHWEG22K/eu0SKmVZaQNB
-         aZ0A==
-X-Forwarded-Encrypted: i=1; AJvYcCUCGg3aNsqViDML+uK1citkZIXhe9rK8H1PgBFq5EgpzxYAwS2y26R8Pnq+tFDnNv2XTuYhf2M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyjk+vT4VYcjTKoqZwTQHfFWeSlu8DcG4OJ3MfNgWE3GKPuVufm
-	dl6+Z+iTEXZ1YTVmhj2IkBhTSiEelwEsoc/Pp1rFlemEaJZw1rWmTiZ6fzzV1Vg1eEdtSNnND+j
-	fmow/cqmhWQssbQ==
-X-Google-Smtp-Source: AGHT+IH8mTeInFcLF9b0yz21xflS4dQlFWg7tEaMg3TRPjxD1uiIIHpjar30iXdwc4zu2n+MwRsRbqGt82WcYA==
-X-Received: from ywbfq3.prod.google.com ([2002:a05:690c:3503:b0:71f:ea49:b54f])
+        d=1e100.net; s=20230601; t=1756399312; x=1757004112;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ly8rj2FIoW7lun3ggt9Mn2K5wFocwyOeO/y4aMpxAu4=;
+        b=Gn96YJ3aSgiMybNJEWi2NT3f0xyrA0UyHNoLMTpoAUBhsvBXVWd06R1mQD59o7RmMg
+         w3Ntn1SY4WeR2hhYLfQN55uljZg8HBHo0oqv3XPfXrpRkqdGl2MikDk9jXc2HERuB/+z
+         qKApAXXfE98b29WZy1iood/sqz5gkbl676qXiIKt8W+inw1m23fI3woBvjEJnkigwKW2
+         1fokvbP03jMQbiOvOSmRrbg/KuGopQHS71Ndc5WI5eZkxFVMiTLg5Zz7qZdEP8BDvcBD
+         48IMa9LkuW/e4JUPWK+p+iJ21d3RtOTEHwmbKivkbSAydEO2gk0BsS+VFKJ7UebvWCkR
+         V8UA==
+X-Forwarded-Encrypted: i=1; AJvYcCXJaJhConS3pdns8YNCvnC9CkhxFxmvcUmEZPxnnNedD9GT64t8Czlz2Ys0Qh0moYYwUB6IOZI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzasrgj/O3t6BRBtvUVeEVT3DySSnaRNfihyxFBwSzYVWqqg+rt
+	iPN6tp7RLZKxKFrWeH4x9MpSpdipMF8XdLepxsucZUeRKDPoVFW63FmenRG+op7Tr6L/KuyCJh1
+	AoQEfYpGYlFtdUA==
+X-Google-Smtp-Source: AGHT+IHYZfao7y1LU5IvlBHNt3HpXnUD2TF9S3aCfcrgDhwlFRJNt0uyl8UyHH0Up2nqtq+hdL5CnCrrkTMNpQ==
+X-Received: from qkpb25.prod.google.com ([2002:a05:620a:2719:b0:7e8:8e32:dc64])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:690c:250a:b0:721:369e:44f3 with SMTP id 00721157ae682-721369e654amr118504247b3.47.1756399310851;
- Thu, 28 Aug 2025 09:41:50 -0700 (PDT)
-Date: Thu, 28 Aug 2025 16:41:46 +0000
+ 2002:a05:620a:2551:b0:7e8:2322:24b5 with SMTP id af79cd13be357-7ea10f87274mr2790154885a.3.1756399312297;
+ Thu, 28 Aug 2025 09:41:52 -0700 (PDT)
+Date: Thu, 28 Aug 2025 16:41:47 +0000
+In-Reply-To: <20250828164149.3304323-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250828164149.3304323-1-edumazet@google.com>
 X-Mailer: git-send-email 2.51.0.268.g9569e192d0-goog
-Message-ID: <20250828164149.3304323-1-edumazet@google.com>
-Subject: [PATCH v2 net-next 0/3] inet: ping: misc changes
+Message-ID: <20250828164149.3304323-2-edumazet@google.com>
+Subject: [PATCH v2 net-next 1/3] inet: ping: check sock_net() in
+ ping_get_port() and ping_lookup()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -80,20 +84,76 @@ Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, netdev@vg
 	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-First and third patches improve security a bit.
+We need to check socket netns before considering them in ping_get_port().
+Otherwise, one malicious netns could 'consume' all ports.
 
-Second patch (ping_hash removal) is a cleanup.
+Add corresponding check in ping_lookup().
 
-Eric Dumazet (3):
-  inet: ping: check sock_net() in ping_get_port() and ping_lookup()
-  inet: ping: remove ping_hash()
-  inet: ping: make ping_port_rover per netns
+Fixes: c319b4d76b9e ("net: ipv4: add IPPROTO_ICMP socket kind")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: David Ahern <dsahern@kernel.org>
+---
+v2: added change to ping_lookup().
+v1: https://lore.kernel.org/netdev/CANn89iKF+DFQQyNJoYA2U-wf4QDPOUG2yNOd8fSu45hQ+TxJ5Q@mail.gmail.com/T/#u
 
- include/net/netns/ipv4.h |  1 +
- net/ipv4/ping.c          | 34 +++++++++++++++-------------------
- net/ipv6/ping.c          |  1 -
- 3 files changed, 16 insertions(+), 20 deletions(-)
+ net/ipv4/ping.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
+diff --git a/net/ipv4/ping.c b/net/ipv4/ping.c
+index f119da68fc301be00719213ad33615b6754e6272..74a0beddfcc41d8ba17792a11a9d027c9d590bac 100644
+--- a/net/ipv4/ping.c
++++ b/net/ipv4/ping.c
+@@ -77,6 +77,7 @@ static inline struct hlist_head *ping_hashslot(struct ping_table *table,
+ 
+ int ping_get_port(struct sock *sk, unsigned short ident)
+ {
++	struct net *net = sock_net(sk);
+ 	struct inet_sock *isk, *isk2;
+ 	struct hlist_head *hlist;
+ 	struct sock *sk2 = NULL;
+@@ -90,9 +91,10 @@ int ping_get_port(struct sock *sk, unsigned short ident)
+ 		for (i = 0; i < (1L << 16); i++, result++) {
+ 			if (!result)
+ 				result++; /* avoid zero */
+-			hlist = ping_hashslot(&ping_table, sock_net(sk),
+-					    result);
++			hlist = ping_hashslot(&ping_table, net, result);
+ 			sk_for_each(sk2, hlist) {
++				if (!net_eq(sock_net(sk2), net))
++					continue;
+ 				isk2 = inet_sk(sk2);
+ 
+ 				if (isk2->inet_num == result)
+@@ -108,8 +110,10 @@ int ping_get_port(struct sock *sk, unsigned short ident)
+ 		if (i >= (1L << 16))
+ 			goto fail;
+ 	} else {
+-		hlist = ping_hashslot(&ping_table, sock_net(sk), ident);
++		hlist = ping_hashslot(&ping_table, net, ident);
+ 		sk_for_each(sk2, hlist) {
++			if (!net_eq(sock_net(sk2), net))
++				continue;
+ 			isk2 = inet_sk(sk2);
+ 
+ 			/* BUG? Why is this reuse and not reuseaddr? ping.c
+@@ -129,7 +133,7 @@ int ping_get_port(struct sock *sk, unsigned short ident)
+ 		pr_debug("was not hashed\n");
+ 		sk_add_node_rcu(sk, hlist);
+ 		sock_set_flag(sk, SOCK_RCU_FREE);
+-		sock_prot_inuse_add(sock_net(sk), sk->sk_prot, 1);
++		sock_prot_inuse_add(net, sk->sk_prot, 1);
+ 	}
+ 	spin_unlock(&ping_table.lock);
+ 	return 0;
+@@ -188,6 +192,8 @@ static struct sock *ping_lookup(struct net *net, struct sk_buff *skb, u16 ident)
+ 	}
+ 
+ 	sk_for_each_rcu(sk, hslot) {
++		if (!net_eq(sock_net(sk), net))
++			continue;
+ 		isk = inet_sk(sk);
+ 
+ 		pr_debug("iterate\n");
 -- 
 2.51.0.268.g9569e192d0-goog
 
