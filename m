@@ -1,83 +1,112 @@
-Return-Path: <netdev+bounces-217902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABBE5B3A630
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 18:24:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 671F2B3A63F
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 18:28:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0649158339E
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 16:23:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E95C984F76
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 16:28:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B5532253D;
-	Thu, 28 Aug 2025 16:23:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7395B322A38;
+	Thu, 28 Aug 2025 16:28:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="cj7J8bPq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FVxKFNL2"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2056.outbound.protection.outlook.com [40.107.220.56])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 585EC321F53;
-	Thu, 28 Aug 2025 16:23:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54B652236F0;
+	Thu, 28 Aug 2025 16:28:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756398213; cv=fail; b=bKYjY6OEt+6/gNK5VYG5v3uKoq8p+LC8QrZmS3z9A43C4xAf5q2vlsLEF6XFHZAkDsJbbrcC0eileC9+pguaMi1j0bz5H5Uuny7a3dQlXwgJuLHdoJOyzMzxiD58VwatlnhZTmEaCEKSxFOz/gkCjgHYZq7t/5R0KeGXCvR1PdQ=
+	t=1756398520; cv=fail; b=BG0uD4tVWGGiAi4urXcm+UaGaTBXl2Xn5bH1A6R4d4ap8OOThhQfO4w/v8LePwcR6ltlqFSVQr4/i+o7Vzi/2uQXEzOcm4GwTnnUVxw0AbTuDi3u45kUgcYQ3AGOdjt2mM8n5WIyDJT1lH2SHTd/4691F98W4Otd/p84G2cJJp4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756398213; c=relaxed/simple;
-	bh=3X5FZBh0uHB/7jerCUDLWwj/ZCfZ7aYSLR1fbNpTvEc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=sVwVdhCQ9n+3LI7o6TxeI32rBBnxiq/7i0fhJiUaNLdnKmQtKegzH0erl8lqDniRnfD7iCU3AKxrctR3lLra1xAEJ+4c98NM+w1pHHvU17wZEU1oIuz9+5nbHqQvudFxqdUNgQicCtS7PJjv2ZLbeiwpb2aiz2GZXenF6EeH1cs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=cj7J8bPq; arc=fail smtp.client-ip=40.107.220.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1756398520; c=relaxed/simple;
+	bh=7WYeOP5ntnihjVMEe9xniwvqn0A2hifnKzG1a3rSCWo=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=DCxZPevPxEUy/EdursQa9YkCZtZ8SkgTJMSg12XjFqi48edpZfvTvwCHJdeAuehrk+JHXykGEccp8P4ssaAT2RAtNTVdki/wnRdVQP0pX12nD3aB6CgYDc+tePTZz+9MKsxl4VZJ5bvqBk5k2emmF3oIvDnFpqoV6U5y5EqxxdI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FVxKFNL2; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756398518; x=1787934518;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=7WYeOP5ntnihjVMEe9xniwvqn0A2hifnKzG1a3rSCWo=;
+  b=FVxKFNL2n1/og6Ft7ohiQ53MXkwTghee02we3RLOAzTu7IkRA4h8e3kS
+   h0w8UwMjCokA8VG5XfbLSKdHoAbL8pYZHZ6TjuguXoWanPHN5xv6MyOsf
+   apn2994GvoQFoJwjlN2jayApaGorUFHTJTEtJgrtAqkn7xRZxTgSEStfJ
+   MeXXQuO6Sl7+5+ohJeFj5juJDiiMZwiWG+HjxSWKcTVERZOEswe8tsIE7
+   SavfPvITB5IvzlhBQ7YR8lsQFFIjfYiEkNPktxG4fAYYqnzQP1pqUffIY
+   iUpVO/gy2D1PCx8E0VxsI9BgERucG4CLv8eq2l8gpnviU1rV6cD4eGlNk
+   g==;
+X-CSE-ConnectionGUID: M7ZvW2JpR0u1Bh4Lzjr5dQ==
+X-CSE-MsgGUID: rV3uK/ngT4CYaS5dhRArRQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11536"; a="68950043"
+X-IronPort-AV: E=Sophos;i="6.18,220,1751266800"; 
+   d="scan'208";a="68950043"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2025 09:28:35 -0700
+X-CSE-ConnectionGUID: YMU4u7VtRU6pgI6BHC48Zg==
+X-CSE-MsgGUID: nCD6ECwyT1uQo5lnv0XVmw==
+X-ExtLoop1: 1
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2025 09:28:34 -0700
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Thu, 28 Aug 2025 09:28:34 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Thu, 28 Aug 2025 09:28:33 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (40.107.236.84)
+ by edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Thu, 28 Aug 2025 09:28:33 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UWAug2cFzWq4WkeRizQE+r7VcIrgec3769cTtbQcpJQvMFeNlI8H5MJVeB20CRYFxRdsJYCDka9o6TP8iFF2GY3dTZrJCjyuJlzDjiugcrJzrHcIXWtoVrG69Jr9jYcP56lMA8Jt+Y2zP6FjUO+N4Nm0oko8GvzM958qs49K/Hy2xwwY229RnSBElEuw0izEgJANvu5OuNBGXs9QPHjXXOiCkwxzcKj65EL04Xu6MO5+J67kp8b9hB38luq0LVaRJxRjIkMmy4jClMffX3p/HQCtQNeqvQn3e+a2C181XlTcdOmR5xP0KGGooQM9pBhRnIdJBn9kH6bzZEB8Q2tKrQ==
+ b=d6D3TblZzWZmV2+nBDyWG59Q7tAFlh8ISWIKKvXixlJj3OPoXUAmhULICKjmArfIJ3XHUcVdifGGZxYfLbs6ovOcBnL0NzH0NVb9lMGgepgmunVO16xrU/vCdsLhEPOdxEF+J27aQb51nJe1YqEcLUhQeGDouzO4VtELz9Oy/UTmurpwPjrCwU/nWmPz4Ht1e4b4Ar3pvoQHdybnqGlergay55YYuXJFlaAJPTH3Djmrhwt+IQ+auXcUc5m4hh2CDfBWbnown1tsxqpLp9GaCmI4unTxQvjwRUbXz9lBNrcErtnzv0kAOx9sng0L0u3M12zSct3RHQK7bWItYsQSwQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=H46lwVXa0VRK3OrFeWZh0RWV/fh5RCCz/WV6NQLoObg=;
- b=Ikoyo5jDtS5K018gSma5F0S0xGVYlCtyYG9EelBkTLHy3uTaL8FhbUyNVBNPUvAybAiqr5AbV0wL+kNpeLJH67B42kCwXXmC81RyWbYpbrXiYgXS3XLw/V/9ODpYWxPLEZiamqY7ilavnSPJGbLjZd1h/7odCXLI2B+U7nrzSh2iDUVYg/TksPEuQDri6Wbh1BPnWAYREq0nlfDHI8JxnBvMuNbND7WaINHxvjH5l1U4GkoetvqnU6MlX3YL5k8hbO+9ejlhcTkxcDkS4MjzU34R8G9vdFVouc8BW91DcQpYD64lZwqIrNUC8gZrwQyUVBsCEePZ4V5CQJ4hSQeK2A==
+ bh=7kZqMRehLm0ZnyjEqa6ahvHHnwvSrV0vWaQxnud6CeY=;
+ b=SDiTOhyBde2IZRa3ec5QgLJqVfqW24ZqG/L5zB/pUXBfdgEJxBwGks8YeIiJGaB8eDmxyVhUnzIZJYWaq2b7pWHKXLWUVtZyBnf+jW4UcQWTtkyeDduXoewPc7X9RLTQU+ez1fkEoSvkPVehWQNVDaRuKgspab2Js7FsM7zHUwTse5FLekLm9a8dG9YdcuRN2JGZshk3Af/pmzUVGDsHSYlgQU4GVSnvebDZyc/yD/eVaGkLpLLAoZGK4Z/wzC50zPAqXMaunjxyHdo/E9u/11iX499pGSi1vwiQW6PR1V4Dq/sCRCvNUeRCZahd7ljt/iTy78xK+c+dYQuoP4+TEQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=H46lwVXa0VRK3OrFeWZh0RWV/fh5RCCz/WV6NQLoObg=;
- b=cj7J8bPq2dg9KRWXjXCbkg6PTPStGHiKDjVQop5vr6hI4CQGZXQtiTfI8Q706GKPXp1Dyx7moHBuCEepI0xdXNl64wcYgNXxiNhMeUPW9q2s4CWt0NpUOjNRFQ56XfqwqFK43hybDckOZ4jW/SCiYsqiZHf792lkw9eq9zTrarTI3v3E2xFtTa5K/gjCA2ft+LLAOya9N1d9TTrkcnM03qJSHpW6SsHPXoU0WW62oR7NRqgWbThMng8OXV1kzlPfXaUlcLFtZiSRfGgpRZsGlbuOnZEtH6xOXT+i4zfOaStVtqUB9vI7wfsiB8fagojm+AyeXUvkgLdTWtszocnAIw==
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from IA1PR12MB9031.namprd12.prod.outlook.com (2603:10b6:208:3f9::19)
- by CY5PR12MB6407.namprd12.prod.outlook.com (2603:10b6:930:3c::16) with
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by SA2PR11MB4985.namprd11.prod.outlook.com (2603:10b6:806:111::8) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.16; Thu, 28 Aug
- 2025 16:23:24 +0000
-Received: from IA1PR12MB9031.namprd12.prod.outlook.com
- ([fe80::1fb7:5076:77b5:559c]) by IA1PR12MB9031.namprd12.prod.outlook.com
- ([fe80::1fb7:5076:77b5:559c%6]) with mapi id 15.20.9073.010; Thu, 28 Aug 2025
- 16:23:22 +0000
-Date: Thu, 28 Aug 2025 16:23:09 +0000
-From: Dragos Tatulea <dtatulea@nvidia.com>
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	alexei.starovoitov@gmail.com, andrii@kernel.org, daniel@iogearbox.net, kuba@kernel.org, 
-	martin.lau@kernel.org, mohsin.bashr@gmail.com, saeedm@nvidia.com, tariqt@nvidia.com, 
-	mbloch@nvidia.com, maciej.fijalkowski@intel.com, kernel-team@meta.com, 
-	noren@nvidia.com
-Subject: Re: [RFC bpf-next v1 1/7] net/mlx5e: Fix generating skb from
- nonlinear xdp_buff
-Message-ID: <aniua473ljbet6w6ov24z6yzwlzzsbvd2d5dud2gep6kp6j5fg@fngzextb6w46>
-References: <20250825193918.3445531-1-ameryhung@gmail.com>
- <20250825193918.3445531-2-ameryhung@gmail.com>
- <76vmglojxf3yqysn5iwthctiacjy6xqcvrzzny74524djwhcf3@ejctdcty3cdz>
- <CAMB2axOLCakHEGnPcRTd1-ZdcGT6+wximWDOSMY1r9PGerfF0g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMB2axOLCakHEGnPcRTd1-ZdcGT6+wximWDOSMY1r9PGerfF0g@mail.gmail.com>
-X-ClientProxiedBy: TL2P290CA0013.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:2::7)
- To IA1PR12MB9031.namprd12.prod.outlook.com (2603:10b6:208:3f9::19)
+ 2025 16:28:27 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.9073.017; Thu, 28 Aug 2025
+ 16:28:27 +0000
+Message-ID: <c3d549db-bc7d-4b89-bc30-7fd4ec6f20e1@intel.com>
+Date: Thu, 28 Aug 2025 18:28:22 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3] amd-xgbe: Add PPS periodic output support
+To: Raju Rangoju <Raju.Rangoju@amd.com>
+CC: <netdev@vger.kernel.org>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, <linux-kernel@vger.kernel.org>,
+	<Shyam-sundar.S-k@amd.com>
+References: <20250828092900.365990-1-Raju.Rangoju@amd.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Content-Language: en-US
+In-Reply-To: <20250828092900.365990-1-Raju.Rangoju@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VE1PR03CA0017.eurprd03.prod.outlook.com
+ (2603:10a6:802:a0::29) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,249 +114,311 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA1PR12MB9031:EE_|CY5PR12MB6407:EE_
-X-MS-Office365-Filtering-Correlation-Id: 71d41d11-6aa4-4317-d526-08dde64f351b
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|SA2PR11MB4985:EE_
+X-MS-Office365-Filtering-Correlation-Id: ba13b344-9509-4801-33e8-08dde64feaec
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?VGFnSFBESjdYcjBBNDgwL3l1a0I5bG9udnREdWowb3NSMURYWGZ2TkcyTk9B?=
- =?utf-8?B?UXF0U1dzSFFzckRVd2tYZm04b1p4clhGVHM3cTAxZ0I3TXZWSHlacUpONFZB?=
- =?utf-8?B?aHcyMDJQN0JpT2Znc1d6VW9aL1d3QkdZOGp1WE13NHJMVE1saEpPcW9pSWIv?=
- =?utf-8?B?b3liTlRGK2ZKc2NVbWNHSzB2SXE2T1RVbjMyM3dKNjNwYlpKV2dTR3VOdk90?=
- =?utf-8?B?MWFaUU1oQk5wNHJBa1JJYlJpVERVZEVwc1UvMnd3Ukk3N2psRnhBbXZKMW00?=
- =?utf-8?B?cCt0cWszaGUvY2ZIN1NBTXpveTc1Q3lha0pwQnEwbjBZSXdNUW5BMXNaVXRk?=
- =?utf-8?B?dXZZQmlZUXRrZHU3Zlk1Y3J1QWRjWS9ua2sxSHZ2dysvNWxRYktMRnVKY1R3?=
- =?utf-8?B?SzB5WUxKRGlkNjVTYVlFYmNjNEcyTGdBYkErTWxlOSt0bmhJSm1rNHNlY1BJ?=
- =?utf-8?B?c3NQM0J1K2V1U2sxWmFNc0prcW8rRFpPZ05uRm80elVrQ2FoeG5aeWVmQ0pH?=
- =?utf-8?B?ZXBzZW1DTURPY1ZSaFZ3OWU0eFU4WGVuTlpPWW90dndKNVVDWHNPSXNPL0E3?=
- =?utf-8?B?YXB5YWNrNjR6RWlMcC9RanJoNFNhVDd5dnNZa1ZkQ1ZtbnRySU1hSG9UOWJs?=
- =?utf-8?B?RGpkTVF2STBaUTk2SS80ZXZoU1BpbnF3R1ROMWVIR1NzNVMvVlZtYUdQQVQ3?=
- =?utf-8?B?TUhRYmUzTkNPUGJUckFKbC93MHlYR295YTBxd3A2UDVuajVHaWdxbENYelVt?=
- =?utf-8?B?bmFwaEk3aTVMUHUxeGVQUllQTUlUd0JURUp2VnI0QzVrNVZGOFVKS2RuVitE?=
- =?utf-8?B?aU44NXBoUzFQNG1GMkx4QkN2Z3hoQjBodEg3SXdhWDB4aGd4ZTBmeFloMVYv?=
- =?utf-8?B?dlVHb3dUMU43Z3hVTW1UeStnRnRpSkVSb2VXaU1iOWFPMG9UcmNkMDZ4Y01G?=
- =?utf-8?B?RjM0WXR2bkw0UUMraVlKV0FjOFgxN1libkVKcitidUNVYUpFblExUm9JcVpE?=
- =?utf-8?B?bVZGakpvdDZKMEVGQ3VDeHV3NysxSVRONEdnVXFiVWNFK0p5NFN0cmZkamZi?=
- =?utf-8?B?dHlaQUdzN0ttVjdzY3Urb0srNFNDelVDL21NZ1RXTVFrdjBBWGZaU015OG9P?=
- =?utf-8?B?QzJHeWVUcVE0UWI4ZjVEaUdzMFByMDdMM0U4Y0F5S21FRmNDR1N6U2dmUkIz?=
- =?utf-8?B?RHJyMVlHenVvcXcrWHZoUmhVTnVseXlGVXdiTVBKcW1yK0xwdkdqdEhlZ2R0?=
- =?utf-8?B?S2R5WkJySWR4UXdudzNwOHo4VERvRmxiTDVHaFU5ZHh3M1ZZK0VmSXg1ZmQr?=
- =?utf-8?B?NG5aaG5ibXRBeHRMdWtWQkU0UzRCUzFBZ3BiZHN1RkRCUSsvOWtOQVpEbHd2?=
- =?utf-8?B?ZFFVZ3pCYSsrMkVJYVhwNXRLTi9STTFKSVBKV0wvc1NIQ01lcjBOWW1wUXRV?=
- =?utf-8?B?SDg1MVltMGJJY04vL2l0UTZwRXRyYzdkenVWWXBSKzFscmdvemp3dVZidjVu?=
- =?utf-8?B?VUZVc1NGT0pybkphRWhjek9OWFpQdms0WXowVjhQK1ZTTUlDNnFvWWc4ZDMr?=
- =?utf-8?B?Rm51b1ZsVmVDYkx6dFNlampOSTR4NXB3T2RUQ2tmVzVlSGxYblcrazF3bzBu?=
- =?utf-8?B?NXZwU3Y4RWs0V01HUjdEeVJGaWIvVEw0dEgwcmd5VjFJUkdHdmRFZ3pRNG5S?=
- =?utf-8?B?dTZYOFNaRzFVWGlEK2crTWJHbStZSWVlK2YyaHMxTFl5RG5HTHFQQmNpSEdh?=
- =?utf-8?B?cStHSnA4cW9BQXoxOEVZTVJHYWRtSk8wRUhLWGdMYmJNZ2g5MUthenZmbWZ3?=
- =?utf-8?B?VHo0M1MweThqbVFMQXB3ODdBN3JXREdGemErQ0ZSTHZHUHdlZS9RMWE0YTR1?=
- =?utf-8?B?ai9iTEhGeDBMZjBXYXRJSmNLdUF1WlFWQmFJeDhoS0dhN2xhNFVjUkQ1ZVhM?=
- =?utf-8?Q?/QkTpCjFlfo=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB9031.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?RWJMTFM5UzBKS2JTbEp5bzFtbXRKYU5oT0ZQYmNycUM1dTlGZTRISFlPS0pJ?=
+ =?utf-8?B?Y0NsY24xcklmUFJzNG5KNENRZDhDaTlaSEtlZEgxY2RZUEhYRTJ1UERoR2tx?=
+ =?utf-8?B?aXpmNXZtOHhqMGZKU1FwaW1UZjdNZExoVE5tN0dLNTYyVFRlQmdKSGF6WUVK?=
+ =?utf-8?B?RDhvWGhmTjVMTXRpb1Znc1FyTE5ZeHc2ZGV4TlpIMFIxMkkxWTZ4VldLMkc5?=
+ =?utf-8?B?NTV2RlBMUXgxc2ZkaTNIbjBuVkJGR3p2WkJnRHdjT291V0ZDb3U4ZnJqeVQ3?=
+ =?utf-8?B?bWRpZDRFeUFsMW0zNHAxY3hpc3poWFRXSXlrazFIK3pjZ1c3cHZyWWkzR0ZQ?=
+ =?utf-8?B?ZEc5enIraXNOcnRpNzNuNUxNMjB5VW1vNTNGeTBiamczaG5KSmdVdnMwVjhC?=
+ =?utf-8?B?SjFzUmsyRXVrQ2Vqdzc0OE5Palc0bVgxZ2EvSFQ3Uk43dWdEbGEzWUlONXIv?=
+ =?utf-8?B?MGNGNWNpQXNDV1MzUlNaVW1FTy9vbjdNMnp1d1dDS3BTSlFKV21RNWR2RFdr?=
+ =?utf-8?B?VHo1b3N4S3dvYUZLek5JNzBHektJSWpXa2NkejZJa3JLOE91V3JyOFdKc1Rs?=
+ =?utf-8?B?cnNFTS9xcXZXRkF3THR0NlNSNkhoZ1k2aGtPK21yMkNKeDhIRWFFNWd1REp2?=
+ =?utf-8?B?akRwLzZ2ODZDRjV5aC92eldjaUttTERZQko5TWJleURrRmV2K3F0Y1BvMzh2?=
+ =?utf-8?B?Yi9HakFjSmowUGFhTWxwVG5zZ2RFNEQrVUk2TVFLeU1vM3BpbHJOdG1oRk8x?=
+ =?utf-8?B?Z3NhZk9LZ1FLbWNienZldWFNNjRVQWV6OE5sSTFTOTMvSFhkTUhuT0Exdkwx?=
+ =?utf-8?B?a3QrYzlENC92T0dQVC9qbS92YkFZSHdPQW5WemNYWnM0QnBPUGdsRzA0YWZy?=
+ =?utf-8?B?T2Rhb1hFRVRGTDZDZ08rcGxYNllqV3podDFjcUhzaWo3ZGRRZ1FxQTlnRVU1?=
+ =?utf-8?B?YWVWeFI5dzlxcE8yNU53QXVrN1RaUUd4Uk15QW0wcEQrZTZ5VVZ2YnBEZFN2?=
+ =?utf-8?B?R2dHbnRUV3BiUkdvcVlqTWpNWUtwQ3RIOWtNMDg2dnlaUFdYZlpWVjNJR1Z1?=
+ =?utf-8?B?WTBZUDU5VlBPMkhOTm1VOXZmaHNST2kwem1Ra21XWFVXUHlPK3Z5bkJYWURB?=
+ =?utf-8?B?VkhNM1NacnoyWVRJdnlKV1BObGprZ2hid3dXWHYxNXF1NU02Wmp1OG01c1Y2?=
+ =?utf-8?B?T0VVWkJIZ0RKRWNWaThUU003SW1OZC9yK3FUSms4ekU4MXgyT0JiZTRvcUMw?=
+ =?utf-8?B?OW11NmR1bk1pRGcvTXdjN2srV1hVMzJ3S3RmelBOOEVNZ2MwN0tCQW93aGww?=
+ =?utf-8?B?WXQzdHpSOVI3cmdTRlpMUlhUTGxRRWkzS2w4N01yZDJKbEkwcXNLdVdtZVJ2?=
+ =?utf-8?B?YzczU0xaVHBDdExRZGs5ZDNtUFVqNklZVnkrR2ZRQmR6NjVRcjRHdUQ5R3BR?=
+ =?utf-8?B?QXFrcSs2eVk3TDc5YnJLdWpaSG1TOU43WUNFck94bkQ1Wi80WEJoR0dTajhs?=
+ =?utf-8?B?V1FkNlQ5bTBXYld2STBvOHZzL3k0Y2Z1d0U5eDJJSWd1ck9jK1lUS1ExdWZU?=
+ =?utf-8?B?TEVKbys4Vm8zdE5aeC9WUHJGaFFHa3hGZXcwWHduRmdYUGcxaGo4UG9KMGRG?=
+ =?utf-8?B?Q3I1YVJ3Q3hvcnMwQUUyS2RWSDB5UmtEaUc5SmJtTTdua05GWTljNjJXdmhC?=
+ =?utf-8?B?eWJzR0QzOW9lazhSS0pUWXNMcFBOUTQ4ZjNqRlcxZWZHL3krVyswRTk4L3pV?=
+ =?utf-8?B?ZTROWGNGb0VudkNmMk5PUnRKeXIxUVkvSGZDWU43eWE3cUVhVWhCNHR4elIw?=
+ =?utf-8?B?ZGxmbXoxcG90NmN1YmdETGlHN1RIRTZlamErd0Q4SDZzeDhWalZQamZBMHho?=
+ =?utf-8?B?UGFxQkJGQWh1aUlnVVQ1MWNuR3cvenBuYUlKaG1yaG9vRVVnSis1ODhKT1JF?=
+ =?utf-8?Q?olsTo+26de0=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?T2ZhUzhIbWJubzNob3p1U2pXZUVyd0h4eUdOalFxK1lVWmhmQlU1dUVDTW02?=
- =?utf-8?B?eDM4dVlwUU5zV0Y5c2ZFekZWYmsvSG8yNDFDZENmd21POGFXeDNIS00xdkk5?=
- =?utf-8?B?U3A3K0JVcHkxcThkWDlidEFUM21JVTJvVzdLV2ZYU2ZPdTNRellJazZnenI5?=
- =?utf-8?B?Qmt6UVg4SXgxalVoenYzSTNKL25hcS9wN0RUUE12YXRaKzYrMkdWdDBidGc3?=
- =?utf-8?B?SFFsSFZEZy9kOWtqajdqeUowd0w1L3F5eW5McVk3WHZvR1hVTzJqb1lGRU54?=
- =?utf-8?B?clB5L1ovM3M5TmFZOWRMMTlQaVFlZ2tEUk1waTRWdjE2TXFRc1lMVVA2alFa?=
- =?utf-8?B?bGQ1QU84Wmw0czNIbitGY0pibWRtdWZucHgxNGFXQWZBUHNJTHZHOHNWYzBs?=
- =?utf-8?B?ZnJJQnVwK0ZRTWRGcXUrMk5KdUV0VmE0dk5sRXR2YVU1d2YxaWxyY084TklP?=
- =?utf-8?B?aW90c1lDSFdBQmd6a0VJMnkxRUVjaGhxOEFlYldUYldQYVd0UDZ3ejhFWDdr?=
- =?utf-8?B?SmRpNWhCeUdqdk1vTTVhbDVxL2lWQi8xckVwditwUDc0WERZdGxIUUNnUXZu?=
- =?utf-8?B?LzBJR1lmVE1ob0h4T1RYRmxvbHhYSTB3LytuaW84SGxjNzN6ZnhKTHM1bXFo?=
- =?utf-8?B?QVRuTW1rdXJaYkVpYXpodit5YjhvR0FBVXp2ZnNMUUhtMkdaUnV1WHJJVkNX?=
- =?utf-8?B?UVA4dkhhOFJINmhPLzRWdTB6clRZaDBNdzZMbUR2bDcxWkt4cXBmVFU5NS9v?=
- =?utf-8?B?RjZLK2pvNXUwT2x3aDJlbk1iVW1kaC9Dc0hlMW5ndzRqNHBsQ3VRR2hYcnJG?=
- =?utf-8?B?M2Y5bHFqK200K0dZNnUzV0krTk42ZVFiTGQ3ajAxT1MrQjJQOFlmTzlNS2Fj?=
- =?utf-8?B?WnI5cGFubjVUN1BZV1lnYUF3K0NmcHN3cjN2Z1dOU2JUOG95UGFoaFVZRjZY?=
- =?utf-8?B?QTl0Vy9kenVibm5WbFowdjVIZ0JEVGYrbUt2SWNvQkcyTGROdHYzVjNjY0FK?=
- =?utf-8?B?T0tCYkxQT1dqdlRhajJhTG1jeTNpRWhmWVJmVm9DdjF0aHRlUHZ3c3VTeExP?=
- =?utf-8?B?aGJ6NzJoMVU2dzQvSkc5SHN6eitmMW1jZEZibTQvV2pRdVB4M1ZxU1AvaUNE?=
- =?utf-8?B?T1IyK0lmdVNxcGFtUEdWZnlheGVsTCtMMDZFS2dMMUN5OExaTHQ5MmQ2RHMy?=
- =?utf-8?B?Q0ViemVYQkJpQTNKUCtEbWxQTlZlMy9lOGwrODEzdmRKdDlFa1YvTjhON3pD?=
- =?utf-8?B?ZWY2aGVkclRtV3lEa2pTaGZFMzdTcmZmTEFMTzZJQ3hDNDhab2Z5dkYvSExK?=
- =?utf-8?B?UlFiMXpNZm10TzRWQlhvNnNRTi8xWXRrTXZXWjl2a2dKaGZoZ3JLNXJrbzEx?=
- =?utf-8?B?U3pHY0piK1J2RmYyYUpjcFB6aEpEbTg5SlU0Q0ZPUlN6Y3U0YUt6R3dIUUlC?=
- =?utf-8?B?U2ZjTkN2RGVJbVA4bTlISUcxWHVuY2RPdkplUE9DQlBUNnQ0bjNjT0FORFpj?=
- =?utf-8?B?SDE0clFOK3g1eTZKQWNVbWQybjRpTUQ4TlpJM0xMbmF6azh4TkhFKzZ3WEd0?=
- =?utf-8?B?NHRyYzRXZDF2em9DVCtWNkhidkgxRURGeldhblVXcFVrU1RyaHJBVWxjVGVQ?=
- =?utf-8?B?SHRnVzl6U01hcTJZbHR5NjVSSlpVUkFtdmxKZ3NMYWJ5Y3RzTU5XYU1NREh3?=
- =?utf-8?B?bTJmS0l4YVJ5b0QzU0VFNWV0MDg2OXJUZWJPdXRVZEo5L3Q4ZlJzTkpETHRX?=
- =?utf-8?B?WjNvZWlIRytJQ3YvMmgwMDlDTWJOS3NwSWpDc094Y0dsU01NdkViVzBUTkxr?=
- =?utf-8?B?Vm9wZmFRcW1RM0wyc3VKaDdIQzFSMkx3UmdzWG16amJqemJOYkNOcGhhMVZJ?=
- =?utf-8?B?TnZJdE9BTldUeVI0VTROR2FoMGliNlVuM0NEQ1djTXMxT0JpWVdJWWhPTzk1?=
- =?utf-8?B?RGJDVFQyYlNjcDZRTDg0SkEvdlVneGtsdFdNVTRGQXA1OG04eUJnSzMxRDNz?=
- =?utf-8?B?TTh3ZUpQZlRKcXBQeWRlTUptbUlXcjAvMytVOFlwWFZ2bmZ3UTNmM2EyTjY3?=
- =?utf-8?B?NlFmZS9qWnY3anpaOEpxUUZETjJpNHVUMVFIQk8ySG1yNkNvT0txYXVzUzhh?=
- =?utf-8?Q?41InpszQinT8/slvFQw1AqwZu?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 71d41d11-6aa4-4317-d526-08dde64f351b
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB9031.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?R21sdm9oa2ZWenMrdG5ycE1iMkJvdnFSaTlwclFnOWlmR3lDLzJhajkzTnZP?=
+ =?utf-8?B?QU9xaGpXeUE5ek1sTzZzeGJKU0E3RUhxUTF5Vk95UHV6aWUwV3dsWWVVR1ZU?=
+ =?utf-8?B?cE03ZlRra1hocVF0OHkraDlwZkMzdWV4QTY2bW53UEh4Zjh1VitJYldVVkp5?=
+ =?utf-8?B?b3FnSVBsTHl5Q1huRVYrNkw1S0lseHpvTVF0M21XNkZHaElwbS9BV1phU1Fy?=
+ =?utf-8?B?Q3o1NG5hMjFsZm92QXNXZE0zZ0hGdFRNZTZadSsyM0x2SmxjMlMxekhKS1J0?=
+ =?utf-8?B?SzhhNWY1UkVnZk9hWmJxMTJ2cnhRb1FGME9xUlZKMkRFWVh6QXQ5MTNFSUpz?=
+ =?utf-8?B?Y2JMSkJ6MnJYWEVhWS90Z2s2TGYrMXhaRVp0U3l3WEMwenFYbHRzWnBnclNx?=
+ =?utf-8?B?VllOT2V6QTlVUjBJRVRBeVNEU1VOYjNNZjJCa2JtTkMvb1R4NkY0anZHelpV?=
+ =?utf-8?B?RmJmTDZEU0hVaHZ0M0p5UGlUcjJkekFqeFZWcy9nS1lJUlQ4c1VNbGRPbVJt?=
+ =?utf-8?B?MURZM01Ma1h6UVhBRlZ0Tm9aT1Y0c1ViaTROc3p4ZUhjZGtkUjVXdERxOTR5?=
+ =?utf-8?B?YkhDL3pqaUNDRU9EMmJoQVd6THZPVUZ3bENCT2EyZHE5WEkrTElRR0pJY0tK?=
+ =?utf-8?B?dGd4R3ppS0pBVmN3Q3UwMlFkd1hqL00rNXRIUFlGWGRHcFdtandBR0RHWTI4?=
+ =?utf-8?B?YjdTcmVSU2g5NkpycVQ0MmlzRWJQWDhvN2hUYmZncFZTYWtMS0QybC9qaCts?=
+ =?utf-8?B?T1F0L05sSW5YbHNHUTlhYmhHNHdaQktlN1c2d25qOHBqYzEzaFBxY0x0M0hZ?=
+ =?utf-8?B?ZzNQaGkycGpTUFI0bkVKQTNwdmVJblhYdnBEMVlmZ3RlM2dDSUdCbGtnMTJF?=
+ =?utf-8?B?eG5aczBtdWV5dHpUZU9nU2MxT01pWVlkRHpYN3pVWkpQUFVuL3VjaG1BZ0xp?=
+ =?utf-8?B?NmwyTld1dFNhM0hOb2FsUlgrVFhjZTdLdEtodm9lQ09kTjVSUU9pd05IZHBJ?=
+ =?utf-8?B?Q3hVWGhjWjRLOGhoUTRYeE5hY1RBR1FSeUtTRjNvWGtHK3ZOUkM3aTBRTnlm?=
+ =?utf-8?B?NGVsa3ZhSkR6citKTGFhNXB3akdqY1IxbXlNL1E5bFhkM2Nsdkpwd3dwRFVs?=
+ =?utf-8?B?Uml0MlVGZFhaSzRaMlJQYWJEdDJpK29IaGhwNTJRQTdNL0dWUUlma2M1QzAx?=
+ =?utf-8?B?UkxyVXJKcWtIdkNCN1pQdk9Bb2RzNmNQK1g0K0R2WkdJN0xQNjFCellza0E5?=
+ =?utf-8?B?WG91dDBFSjN4VHYzRlc2UW50VkR5aVcyUGdzeVJNODlsOFd2RFBpWHpGYTgy?=
+ =?utf-8?B?Q2ZMb0F6MXpFUXdtSFZrdlNKNTZRcDVZWkNiaUdYemJOQzFTaHp3aWRzejAr?=
+ =?utf-8?B?M09lYndhekNwSHZzbGM1Tms0QzdNR3E3cEF3ZFozY0tRSUpVbmF3djhHNkF1?=
+ =?utf-8?B?UVEycGhYNTd4Mk9JbVFnaE1LUExKRTBhVzRpRDZRdEduMU9sNUxZVzVJVE8y?=
+ =?utf-8?B?TDVhYnZiOEJyK3c0QW5mNmI1SXgvR0pxbzZWZmFlY2k2MzYzeXFmQ05lc2Fl?=
+ =?utf-8?B?NHU4SHloaWpRckxGZndvZmErQTU2c3NjZitjYkowc043OHBrZHFOallFclhx?=
+ =?utf-8?B?blB4SkIrcmZ2OWxBVFN5Kzdia3VzRXJWdTN2eklCSUlPcTMvZEpIN0hjMnl0?=
+ =?utf-8?B?Z0RleDV6T1V4ODdlTDRVZWpEZjk1cHBtTEZDa01FS1F5blJxYnBoeDBuOVQz?=
+ =?utf-8?B?YWdoVDk5V3lvcW9GTUZiSFNrVWFSaFVqN1JkTVZRdmE0dnU3Z1ZJRDd1NVVB?=
+ =?utf-8?B?RzF1QW5HdmZBNnkwOUt0Q3Y4SXIva09XUFc5RWNmbitsS3oxZ1E4WVgrNHFm?=
+ =?utf-8?B?SEhDTGRVbEpxeXpkTzYxMXo0S1JYOEhZZ2M2dm5Pd0R4Y2MrOFV2QXp4K0Fq?=
+ =?utf-8?B?RUYwQW5ESG9GdEQ5VStsdFNBdzJkNjlMQ2RWaDZQOEd3RWUzbitnU1hqM21C?=
+ =?utf-8?B?SjFKZkw3RTJJcHZPeWFwSXlibVFQWk9pZ1pMMEpGRGpYZmRzT3RvSmZ5S0x3?=
+ =?utf-8?B?eGJ6ekxhYUJydmdLQXhpZlBIS1BRNFNvQjNPbDhyL00yT0wrbHJnMmwrdmIx?=
+ =?utf-8?B?akhYbDVHZGI2MmRXaVZaRTBEL1VtcmpweHY4MzJONHpIbThIYWNHVk5oMXdF?=
+ =?utf-8?B?Mmc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: ba13b344-9509-4801-33e8-08dde64feaec
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Aug 2025 16:23:22.6153
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Aug 2025 16:28:27.7728
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +8OOOpRww2Tgdpd/ENL7FmdqojwDuNXC64Qw/mdw6yTDgRey3TPk6orDfOqTxaArDdsJmejyvfxcopeqVwp06A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6407
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2xa3Nixf3ER+dJRxb917+5rzgSJaSMld5oVdEqvcqGU/qAal5TUQ7uo67cWCacw+LXMJoHzjREusvFFbl3k66ts521p7lvuw+QVv1rYfYZ8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4985
+X-OriginatorOrg: intel.com
 
-On Wed, Aug 27, 2025 at 08:44:24PM -0700, Amery Hung wrote:
-> On Wed, Aug 27, 2025 at 6:45 AM Dragos Tatulea <dtatulea@nvidia.com> wrote:
-> >
-> > On Mon, Aug 25, 2025 at 12:39:12PM -0700, Amery Hung wrote:
-> > > [...]
-> > > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> > > index b8c609d91d11..c5173f1ccb4e 100644
-> > > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> > > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> > > @@ -1725,16 +1725,17 @@ mlx5e_skb_from_cqe_nonlinear(struct mlx5e_rq *rq, struct mlx5e_wqe_frag_info *wi
-> > >                            struct mlx5_cqe64 *cqe, u32 cqe_bcnt)
-> > >  {
-> > >       struct mlx5e_rq_frag_info *frag_info = &rq->wqe.info.arr[0];
-> > > +     struct mlx5e_wqe_frag_info *pwi, *head_wi = wi;
-> > >       struct mlx5e_xdp_buff *mxbuf = &rq->mxbuf;
-> > > -     struct mlx5e_wqe_frag_info *head_wi = wi;
-> > >       u16 rx_headroom = rq->buff.headroom;
-> > >       struct mlx5e_frag_page *frag_page;
-> > >       struct skb_shared_info *sinfo;
-> > > -     u32 frag_consumed_bytes;
-> > > +     u32 frag_consumed_bytes, i;
-> > >       struct bpf_prog *prog;
-> > >       struct sk_buff *skb;
-> > >       dma_addr_t addr;
-> > >       u32 truesize;
-> > > +     u8 nr_frags;
-> > >       void *va;
-> > >
-> > >       frag_page = wi->frag_page;
-> > > @@ -1775,14 +1776,26 @@ mlx5e_skb_from_cqe_nonlinear(struct mlx5e_rq *rq, struct mlx5e_wqe_frag_info *wi
-> > >       prog = rcu_dereference(rq->xdp_prog);
-> > >       if (prog && mlx5e_xdp_handle(rq, prog, mxbuf)) {
-> > >               if (__test_and_clear_bit(MLX5E_RQ_FLAG_XDP_XMIT, rq->flags)) {
-> > > -                     struct mlx5e_wqe_frag_info *pwi;
-> > > +                     pwi = head_wi;
-> > > +                     while (pwi->frag_page->netmem != sinfo->frags[0].netmem && pwi < wi)
-> > > +                             pwi++;
-> > >
-> > Is this trying to skip counting the frags for the linear part? If yes,
-> > don't understand the reasoning. If not, I don't follow the code.
-> >
-> > AFAIU frags have to be counted for the linear part + sinfo->nr_frags.
-> > Frags could be less after xdp program execution, but the linear part is
-> > still there.
-> >
+From: Raju Rangoju <Raju.Rangoju@amd.com>
+Date: Thu, 28 Aug 2025 14:59:00 +0530
+
+> Add support for hardware PPS (Pulse Per Second) output to the
+> AMD XGBE driver. The implementation enables flexible periodic
+> output mode, exposing it via the PTP per_out interface.
 > 
-> This is to search the first frag after xdp runs because I thought it
-> is possible that the first frag (head_wi+1) might be released by
-> bpf_xdp_pull_data() and then the frag will start from head_wi+2.
+> The driver supports configuring PPS output using the standard
+> PTP subsystem, allowing precise periodic signal generation for
+> time synchronization applications.
 > 
-> After sleeping on it a bit, it seems it is not possible as there is
-> not enough room in the linear to completely pull PAGE_SIZE byte of
-> data from the first frag to the linear area. Is this correct?
+> The feature has been verified using the testptp tool and
+> oscilloscope.
 > 
-Right. AFAIU the usable linear part is smaller due to headroom and
-tailroom.
+> Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
+> ---
+> Changes since v2:
+>  - avoid redundant checks in xgbe_enable()
+>  - simplify the mask calculation
+> 
+> Changes since v1:
+>  - add sanity check to prevent pps_out_num and aux_snap_num exceeding the limit
+> 
+>  drivers/net/ethernet/amd/xgbe/Makefile      |  2 +-
+>  drivers/net/ethernet/amd/xgbe/xgbe-common.h | 46 ++++++++++++-
+>  drivers/net/ethernet/amd/xgbe/xgbe-drv.c    | 15 +++++
+>  drivers/net/ethernet/amd/xgbe/xgbe-pps.c    | 73 +++++++++++++++++++++
+>  drivers/net/ethernet/amd/xgbe/xgbe-ptp.c    | 26 +++++++-
+>  drivers/net/ethernet/amd/xgbe/xgbe.h        | 16 +++++
+>  6 files changed, 173 insertions(+), 5 deletions(-)
+>  create mode 100644 drivers/net/ethernet/amd/xgbe/xgbe-pps.c
 
 [...]
-> > >               if (unlikely(!skb)) {
-> > >                       mlx5e_page_release_fragmented(rq->page_pool,
-> > > @@ -2102,20 +2124,25 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_rq *rq, struct mlx5e_mpw_info *w
-> > >               mlx5e_page_release_fragmented(rq->page_pool, &wi->linear_page);
-> > >
-> > >               if (xdp_buff_has_frags(&mxbuf->xdp)) {
-> > > -                     struct mlx5e_frag_page *pagep;
-> > > +                     struct mlx5e_frag_page *pagep = head_page;
-> > > +
-> > > +                     truesize = nr_frags * PAGE_SIZE;
-> > I am not sure that this is accurate. The last fragment might be smaller
-> > than page size. It should be aligned to BIT(rq->mpwqe.log_stride_sz).
-> >
-> 
-> According to the truesize calculation in
-> mlx5e_skb_from_cqe_mpwrq_nonlinear() just before mlx5e_xdp_handle().
-> After the first frag, the frag_offset is always 0 and
-> pg_consumed_bytes will be PAGE_SIZE. Therefore the last page also
-> consumes a page, no?
->
-My understanding is that the last pg_consumed_bytes will be a byte_cnt
-that is smaller than PAGE_SIZE as there is a min operation.
 
-> If the last page has variable size, I wonder how can
-> bpf_xdp_adjust_tail() handle a dynamic tailroom. 
-That is a good point. So this can stay as is I guess.
+> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
+> index 2e9b95a94f89..f0989aa01855 100644
+> --- a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
+> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
+> @@ -691,6 +691,21 @@ void xgbe_get_all_hw_features(struct xgbe_prv_data *pdata)
+>  	hw_feat->pps_out_num  = XGMAC_GET_BITS(mac_hfr2, MAC_HWF2R, PPSOUTNUM);
+>  	hw_feat->aux_snap_num = XGMAC_GET_BITS(mac_hfr2, MAC_HWF2R, AUXSNAPNUM);
+>  
+> +	/* Sanity check and warn if hardware reports more than supported */
+> +	if (hw_feat->pps_out_num > XGBE_MAX_PPS_OUT) {
+> +		dev_warn(pdata->dev,
 
-> bpf_xdp_adjust_tail()
-> requires a driver to specify a static frag size (the maximum size a
-> frag can grow) when calling __xdp_rxq_info_reg(), which seem to be a
-> page in mlx5.
->
-This is an issue raised by Nimrod as well. Currently striding rq sets
-rxq->frag_size to 0. It is set to PAGE_SIZE only in legacy rq mode.
+1. How often can this function be called? Don't you need the _ratelimit
+   version here?
+2. netdev_ variant instead of dev_?
 
-> 
-> > >
-> > >                       /* sinfo->nr_frags is reset by build_skb, calculate again. */
-> > > -                     xdp_update_skb_shared_info(skb, frag_page - head_page,
-> > > +                     xdp_update_skb_shared_info(skb, nr_frags,
-> > >                                                  sinfo->xdp_frags_size, truesize,
-> > >                                                  xdp_buff_is_frag_pfmemalloc(
-> > >                                                       &mxbuf->xdp));
-> > >
-> > > -                     pagep = head_page;
-> > > -                     do
-> > > +                     while (pagep->netmem != sinfo->frags[0].netmem && pagep < frag_page)
-> > > +                             pagep++;
-> > > +
-> > > +                     for (i = 0; i < nr_frags; i++, pagep++)
-> > >                               pagep->frags++;
-> > > -                     while (++pagep < frag_page);
-> > > +
-> > > +                     headlen = min_t(u16, MLX5E_RX_MAX_HEAD - len, sinfo->xdp_frags_size);
-> > > +                     __pskb_pull_tail(skb, headlen);
-> > >               }
-> > > -             __pskb_pull_tail(skb, headlen);
-> > What happens when there are no more frags? (bpf_xdp_frags_shrink_tail()
-> > shrinked them out). Is that at all possible?
-> 
-> It is possible for bpf_xdp_frags_shrink_tail() to release all frags.
-> There is no limit of how much they can shrink. If there is linear
-> data, the kfunc allows shrinking data_end until ETH_HLEN. Before this
-> patchset, it could trigger a BUG_ON in __pskb_pull_tail(). After this
-> set, the driver will pass a empty skb to the upper layer.
-> 
-I see what you mean.
+> +			 "Hardware reports %u PPS outputs, limiting to %u\n",
+> +			 hw_feat->pps_out_num, XGBE_MAX_PPS_OUT);
+> +		hw_feat->pps_out_num = XGBE_MAX_PPS_OUT;
+> +	}
+> +
+> +	if (hw_feat->aux_snap_num > XGBE_MAX_AUX_SNAP) {
+> +		dev_warn(pdata->dev,
 
-> For bpf_xdp_pull_data(), in the case of mlx5, I think it is only
-> possible to release all frags when the first and only frag contains
-> less than 256 bytes, which is the free space in the linear page.
->
-Why would only 256 bytes be free in the linear area? My understanding
-is that we have PAGE_SIZE - headroom - tailroom which should be more?
+(same)
 
-> >
-> > In general, I think the code would be nicer if it would do a rewind of
-> > the end pointer based on the diff between the old and new nr_frags.
-> >
-> 
-> Not sure if I get this. Do you mean calling __pskb_pull_tail() some
-> how based on the difference between sinfo->nr_frags and nr_frags?
-> 
-> Thanks for reviewing the patch!
->
-I was suggesting an approach for the whole patch that might be cleaner.
+> +			 "Hardware reports %u aux snapshot inputs, limiting to %u\n",
+> +			 hw_feat->aux_snap_num, XGBE_MAX_AUX_SNAP);
 
-Roll back frag_page to the last used fragment after program execution:
+BTW, these messages are not very meaningful, maybe you should print both
+min and max and say that the actual HW output is out of range?
 
-	frag_page -= old_nr_frags - new_nr_frags;
+> +		hw_feat->aux_snap_num = XGBE_MAX_AUX_SNAP;
+> +	}
+> +
+>  	/* Translate the Hash Table size into actual number */
+>  	switch (hw_feat->hash_table_size) {
+>  	case 0:
+> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-pps.c b/drivers/net/ethernet/amd/xgbe/xgbe-pps.c
+> new file mode 100644
+> index 000000000000..b5704fbbc5be
+> --- /dev/null
+> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-pps.c
+> @@ -0,0 +1,73 @@
+> +// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
+> +/*
+> + * Copyright (c) 2014-2025, Advanced Micro Devices, Inc.
+> + * Copyright (c) 2014, Synopsys, Inc.
+> + * All rights reserved
+> + *
+> + * Author: Raju Rangoju <Raju.Rangoju@amd.com>
+> + */
+> +
+> +#include "xgbe.h"
+> +#include "xgbe-common.h"
+> +
+> +static inline u32 PPSx_MASK(unsigned int x)
+> +{
+> +	return GENMASK(PPS_MAXIDX(x), PPS_MINIDX(x));
+> +}
+> +
+> +static inline u32 PPSCMDx(unsigned int x, u32 val)
+> +{
+> +	return ((val & GENMASK(3, 0)) << PPS_MINIDX(x));
 
-... and after that you won't need to touch the frag counting loops
-and the xdp_update_skb_shared_info().
+Redundant outer ()s.
+
+> +}
+> +
+> +static inline u32 TRGTMODSELx(unsigned int x, u32 val)
+> +{
+> +	return ((val & GENMASK(1, 0)) << (PPS_MAXIDX(x) - 2));
+
+Same here.
+
+> +}
+
+I believe you shouldn't name these functions that way, also pls no
+inlines in .c files.
+Either give them proper names and remove `inline` or make macros from them.
+
+> +
+> +int xgbe_pps_config(struct xgbe_prv_data *pdata,
+> +		    struct xgbe_pps_config *cfg, int index, int on)
+
+@on can be bool?
+
+> +{
+> +	unsigned int value = 0;
+> +	unsigned int tnsec;
+> +	u64 period;
+> +
+> +	tnsec = XGMAC_IOREAD(pdata, MAC_PPSx_TTNSR(index));
+> +	if (XGMAC_GET_BITS(tnsec, MAC_PPSx_TTNSR, TRGTBUSY0))
+> +		return -EBUSY;
+> +
+> +	value = XGMAC_IOREAD(pdata, MAC_PPSCR);
+> +
+> +	value &= ~PPSx_MASK(index);
+
+I'd remove that NL between these two or even squash them into 1 line if
+it fits into 80 chars.
+
+> +
+> +	if (!on) {
+> +		value |= PPSCMDx(index, 0x5);
+> +		value |= PPSEN0;
+> +		XGMAC_IOWRITE(pdata, MAC_PPSCR, value);
+> +		return 0;
+
+Newline before the return.
+
+> +	}
+> +
+> +	XGMAC_IOWRITE(pdata, MAC_PPSx_TTSR(index), cfg->start.tv_sec);
+> +	XGMAC_IOWRITE(pdata, MAC_PPSx_TTNSR(index), cfg->start.tv_nsec);
+> +
+> +	period = cfg->period.tv_sec * NSEC_PER_SEC;
+> +	period += cfg->period.tv_nsec;
+> +	do_div(period, XGBE_V2_TSTAMP_SSINC);
+> +
+> +	if (period <= 1)
+> +		return -EINVAL;
+> +
+> +	XGMAC_IOWRITE(pdata, MAC_PPSx_INTERVAL(index), period - 1);
+> +	period >>= 1;
+> +	if (period <= 1)
+> +		return -EINVAL;
+> +
+> +	XGMAC_IOWRITE(pdata, MAC_PPSx_WIDTH(index), period - 1);
+> +
+> +	value |= PPSCMDx(index, 0x2);
+> +	value |= TRGTMODSELx(index, 0x2);
+> +	value |= PPSEN0;
+> +
+> +	XGMAC_IOWRITE(pdata, MAC_PPSCR, value);
+> +	return 0;
+
+Same here.
+
+> +}
+> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-ptp.c b/drivers/net/ethernet/amd/xgbe/xgbe-ptp.c
+> index 3658afc7801d..0e0b8ec3b504 100644
+> --- a/drivers/net/ethernet/amd/xgbe/xgbe-ptp.c
+> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-ptp.c
+> @@ -106,7 +106,29 @@ static int xgbe_settime(struct ptp_clock_info *info,
+>  static int xgbe_enable(struct ptp_clock_info *info,
+>  		       struct ptp_clock_request *request, int on)
+>  {
+> -	return -EOPNOTSUPP;
+> +	struct xgbe_prv_data *pdata = container_of(info, struct xgbe_prv_data,
+> +						   ptp_clock_info);
+> +	struct xgbe_pps_config *pps_cfg;
+> +	unsigned long flags;
+> +	int ret;
+> +
+> +	dev_dbg(pdata->dev, "rq->type %d on %d\n", request->type, on);
+> +
+> +	if (request->type != PTP_CLK_REQ_PEROUT)
+> +		return -EOPNOTSUPP;
+> +
+> +	pps_cfg = &pdata->pps[request->perout.index];
+> +
+> +	pps_cfg->start.tv_sec = request->perout.start.sec;
+> +	pps_cfg->start.tv_nsec = request->perout.start.nsec;
+> +	pps_cfg->period.tv_sec = request->perout.period.sec;
+> +	pps_cfg->period.tv_nsec = request->perout.period.nsec;
+> +
+> +	spin_lock_irqsave(&pdata->tstamp_lock, flags);
+> +	ret = xgbe_pps_config(pdata, pps_cfg, request->perout.index, on);
+> +	spin_unlock_irqrestore(&pdata->tstamp_lock, flags);
+
+Are you sure you need to protect the whole xgbe_pps_config() from
+interrupts? It's quite large and I don't think you need that lock
+(and IRQ protection) for its entire runtime.
+
+> +
+> +	return ret;
+>  }
+>  
+>  void xgbe_ptp_register(struct xgbe_prv_data *pdata)
 
 Thanks,
-Dragos
+Olek
 
