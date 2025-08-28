@@ -1,140 +1,182 @@
-Return-Path: <netdev+bounces-217750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B546AB39B8B
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 13:29:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE417B39BA3
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 13:34:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 753B43B8396
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 11:29:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78983467873
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 11:34:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3DBA30DD29;
-	Thu, 28 Aug 2025 11:29:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E096C2EA170;
+	Thu, 28 Aug 2025 11:34:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="oOdUFrwu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GanswKx5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF2AE4A23;
-	Thu, 28 Aug 2025 11:29:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC31B30CD9D
+	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 11:34:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756380581; cv=none; b=Pw9W3rlsC09kwkiq9gRMko+QK41Lv0grHbwjCLTbI3y1EcDpdixu+VttTIWSFWZCimVTMhWgOSuOlxhAuRoKyc0vrUN4j2ADabLzTqhPFL3kg+hCHOwiPbvRSPa4JxEdInsnAPRf3N2NjWqkG4YBvnUGzajMQcmHREuxiyB5/Fs=
+	t=1756380862; cv=none; b=eCaPi0BFDWe9n/zkrJSM9zoamPR3zQK+DB3AG9SrvRyl71UvAE9Ql2nX+h1uw/0Mq7WAhnNHqgVLRzROGv7HEjENhlzUxhfEw72RNPpLQtlM8LqYl51XrigMoIeM7tKXItEZuTJo7jhTUdb8TuaDE00yAUuG2NmRiSvCUjPTQZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756380581; c=relaxed/simple;
-	bh=Pv4VUj2wCBMAgw+seqfZfk8iWIB5devyBITIfTLkAGA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=diIPYVn81f0LkKvVJ08P+H20MlV5iKRAKBBujGeFFHtsMKYGFXI5Z3gtSoiCNkwGhOsHiTzQkeug2wQC9Rvy/wLHhPeT31xQqsXbqjj+73VQ0MzSUHja3LvlsNi6TBv2TTAR4Aw1YFRLfkc6CvPhNS+fPTdNcExllhZHxXTvA9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=oOdUFrwu; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 7E020C6B397;
-	Thu, 28 Aug 2025 11:29:21 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id C0FB160303;
-	Thu, 28 Aug 2025 11:29:35 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5EACF1C22D47B;
-	Thu, 28 Aug 2025 13:29:11 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1756380575; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=xIuFPPUPrhl7PDL7/YYcz0kAtKYrnGmWBaCnz+SNmuA=;
-	b=oOdUFrwu0m0fCoJ78R0uL1f7cVi72EWzN/otA12gto72L1Or2uvDZd6YMYUlPKMEbeKYf/
-	0r94bWFMUVGRDAiEzP21WGc1rnpQJZilv9fIHZ5Mj2Wo+1MhYhIx0eZexgM6IAwOYv1Cwm
-	bQ5LvYA6umVggCh0CJtPcd7tLLSRYDyYgD4HNCQctv0a+GDs89ho4xmKaZL7DxlWaj/jt0
-	a8r98lV4tXu1yDFkVH5LAwZ6UA21760MQ/9MZ71liSktcHVHaH4patR6sDUyus7aHKhQds
-	FfWkInat1anW/sEDKNaz5KTPfmBQY6Ub33C5OWO021zIYQHG1IcB7zqxR0jaAg==
-Date: Thu, 28 Aug 2025 13:29:01 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, kernel@pengutronix.de, Dent Project
- <dentproject@linuxfoundation.org>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Kyle Swenson <kyle.swenson@est.tech>
-Subject: Re: [PATCH net-next 2/2] net: pse-pd: pd692x0: Add sysfs interface
- for configuration save/reset
-Message-ID: <20250828132901.76e00334@kmaincent-XPS-13-7390>
-In-Reply-To: <20250825151422.4cd1ea72@kernel.org>
-References: <20250822-feature_poe_permanent_conf-v1-0-dcd41290254d@bootlin.com>
-	<20250822-feature_poe_permanent_conf-v1-2-dcd41290254d@bootlin.com>
-	<d4bc2c95-7e25-4d76-994f-b68f1ead8119@lunn.ch>
-	<20250825104721.28f127a2@kmaincent-XPS-13-7390>
-	<aKwpW-c-nZidEBe0@pengutronix.de>
-	<6317ad1e-7507-4a61-92d0-865c52736b1a@lunn.ch>
-	<20250825151422.4cd1ea72@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1756380862; c=relaxed/simple;
+	bh=jX4WE57wwaL2SAlbrArIxPo6UIRjjAolboJfhOPr3JU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q8NesxUk4SJRwke1z5upWHmewzng1gPP5/jtOPKx+XS0cBwLgF+8vnm4WRxC066B3uyLLRrOJIYja/b2bwhRIdST9ltvKyZtPaVnB19+zjj/DXUPeNNgEIoQbQyIIkzIK+IL01KaUIPWs+k1Bn5oXu0/1YraiScwQVwguWJLPfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GanswKx5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08B4FC4CEEB;
+	Thu, 28 Aug 2025 11:34:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756380862;
+	bh=jX4WE57wwaL2SAlbrArIxPo6UIRjjAolboJfhOPr3JU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GanswKx5+PhAaCdhXmFXbU1ReowfnjJIImdtC/vrglA/xVGd2MJaQJevCnLZTFmuC
+	 6aYEs2oY8w/QTLGWVCLIbqSw2eYbi6H1viZLnHXFvx4T3IsMm4oJo8fGKy9YFwVLZj
+	 QYdw99kQhpmWNpH46rcn72jmE55vDSlJCc4zmJAllJRVdEMioSjCPO6C8E9NTzNoF0
+	 tssO+pqeiE9CFQZUFxcXtA2pANKO9dipagxytPSGGZemU6JQAp/i9tp+tAijmvxqO9
+	 UZOLikTJ9kTZqyq0Z8dtCXHNqoDChGLOxXKhJicnDWRxPAeLC2Tie2uke572l7eclf
+	 mr5wBKMl0BlnQ==
+Date: Thu, 28 Aug 2025 12:34:17 +0100
+From: Simon Horman <horms@kernel.org>
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, mbloch@nvidia.com,
+	Adithya Jayachandran <ajayachandra@nvidia.com>
+Subject: Re: [PATCH net-next V2 3/7] net/mlx5: E-Switch, Add support for
+ adjacent functions vports discovery
+Message-ID: <20250828113417.GB10519@horms.kernel.org>
+References: <20250827044516.275267-1-saeed@kernel.org>
+ <20250827044516.275267-4-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250827044516.275267-4-saeed@kernel.org>
 
-Le Mon, 25 Aug 2025 15:14:22 -0700,
-Jakub Kicinski <kuba@kernel.org> a =C3=A9crit :
+On Tue, Aug 26, 2025 at 09:45:12PM -0700, Saeed Mahameed wrote:
+> From: Adithya Jayachandran <ajayachandra@nvidia.com>
+> 
+> Adding driver support to query adjacent functions vports, AKA
+> delegated vports.
+> 
+> Adjacent functions can delegate their sriov vfs to other sibling PF in
+> the system, to be managed by the eswitch capable sibling PF.
+> E.g, ECPF to Host PF, multi host PF between each other, etc.
+> 
+> Only supported in switchdev mode.
+> 
+> Signed-off-by: Adithya Jayachandran <ajayachandra@nvidia.com>
+> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 
-> On Mon, 25 Aug 2025 14:18:25 +0200 Andrew Lunn wrote:
-> > On Mon, Aug 25, 2025 at 11:14:03AM +0200, Oleksij Rempel wrote: =20
-> > > On Mon, Aug 25, 2025 at 10:47:21AM +0200, Kory Maincent wrote:   =20
->  [...] =20
->  [...] =20
-> > >=20
-> > > My personal preference would be to use devlink (netlink based)
-> > > interface.   =20
-> >=20
-> > Yes, devlink also crossed my mind, probably devlink params. Although
-> > saving the current configuration to non-volatile memory is more a meta
-> > parameter. =20
->=20
-> This is a bit of a perennial topic. Most datacenter NIC vendors have=20
-> a way to save link settings and alike to flash. None bothered with
-> adding upstream APIs tho. If the configs are fully within ethtool
-> I think we should be able to add an ethtool header flag that says=20
-> "this config request is to be written to flash". And vice versa=20
-> (get should read from flash)?
+...
 
-In fact there is the managers power budget parameter taken from the devicet=
-ree
-which is not in ethtool config. It could be reconfigured after each reboot =
-or
-conf reset but it is an example of non ethtool configuration and more could
-appear in the future. Talking about perennial, ethtool is then maybe not a =
-good
-idea because we still will need a way to save these new global configuratio=
-ns
-saved to the non-volatile mem.
-I am not really familiar with devlink but indeed after a quick look devlink
-seems more suitable for the PSE global configurations.
-I don't really know if we should use devlink param and devlink reload or on=
-ly
-devlink param or a new devlink conf.
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
 
-Or we could save the configuration on every change but it will bring 70ms (=
-I2C
-read/write + store waiting time) latency for every command.
+...
 
-> Resetting would work either via devlink reload, or ethtool --reset,
-> don't think we even need any API addition there.
+> +static int
+> +mlx5_eswitch_load_adj_vf_vports(struct mlx5_eswitch *esw,
+> +				enum mlx5_eswitch_vport_event enabled_events)
+> +{
+> +	struct mlx5_vport *vport;
+> +	unsigned long i;
+> +	int err;
+> +
+> +	mlx5_esw_for_each_vf_vport(esw, i, vport, U16_MAX) {
+> +		if (!vport->adjacent)
+> +			continue;
+> +		err = mlx5_eswitch_load_pf_vf_vport(esw, vport->vport,
+> +						    enabled_events);
+> +		if (err)
+> +			goto unload_adj_vf_vport;
+> +	}
+> +
+> +	return 0;
+> +
+> +unload_adj_vf_vport:
+> +	mlx5_eswitch_unload_adj_vf_vports(esw);
+> +	return err;
+> +}
+> +
+>  int mlx5_eswitch_load_vf_vports(struct mlx5_eswitch *esw, u16 num_vfs,
+>  				enum mlx5_eswitch_vport_event enabled_events)
+>  {
+> @@ -1345,7 +1382,15 @@ mlx5_eswitch_enable_pf_vf_vports(struct mlx5_eswitch *esw,
+>  					  enabled_events);
+>  	if (ret)
+>  		goto vf_err;
+> +
+> +	/* Enable adjacent VF vports */
+> +	ret = mlx5_eswitch_load_adj_vf_vports(esw, enabled_events);
+> +	if (ret)
+> +		goto unload_adj_vf_vports;
+> +
+>  	return 0;
+> +unload_adj_vf_vports:
+> +	mlx5_eswitch_unload_adj_vf_vports(esw);
+>  
 
-Is there no way for NIC to reset their configuration except through ethtool
-reload?
+Hi Adithya and Saeed,
 
-PS: got a client mail issue so you might have receive two mails. Sorry for =
-that.
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+mlx5_eswitch_load_adj_vf_vports() already unwinds on error,
+calling mlx5_eswitch_unload_adj_vf_vports().
+
+While resources allocated by the preceding call to
+mlx5_eswitch_load_vf_vports() (just before this hunk) seem to be leaked.
+
+So I wonder if the above two lines should be:
+
+unload_vf_vports:
+	mlx5_eswitch_unload_vf_vports(esw, num_vfs);
+
+>  vf_err:
+>  	if (mlx5_core_ec_sriov_enabled(esw->dev))
+
+...
+
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+> index cfd6b1b8c6f4..9f8bb397eae5 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+> @@ -216,6 +216,7 @@ struct mlx5_vport {
+>  	u32                     metadata;
+>  	int                     vhca_id;
+>  
+> +	bool adjacent; /* delegated vhca from adjacent function */
+>  	struct mlx5_vport_info  info;
+>  
+>  	/* Protected with the E-Switch qos domain lock. The Vport QoS can
+> @@ -384,6 +385,7 @@ struct mlx5_eswitch {
+>  
+>  	struct mlx5_esw_bridge_offloads *br_offloads;
+>  	struct mlx5_esw_offload offloads;
+> +	u32 last_vport_idx; /* ++ every time a vport is created */
+
+The comment above documents one operation that can occur
+on this field. But the code also performs others: decrement and set.
+
+So perhaps this is more appropriate?
+
+	u32 last_vport_idx; /* Number of vports created */
+
+Or dropping the comment entirely: it seems obvious enough.
+
+>  	int                     mode;
+>  	u16                     manager_vport;
+>  	u16                     first_host_vport;
+
+...
 
