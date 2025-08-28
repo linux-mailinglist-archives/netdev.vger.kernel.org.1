@@ -1,122 +1,89 @@
-Return-Path: <netdev+bounces-218011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E8DFB3AD41
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 00:06:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96F83B3AD4B
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 00:12:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 569D1567CB5
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 22:06:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 595E0201A63
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 22:12:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A2FA29A322;
-	Thu, 28 Aug 2025 22:06:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 699122BF000;
+	Thu, 28 Aug 2025 22:12:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TMFMYgSt"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADB42225D6;
-	Thu, 28 Aug 2025 22:06:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 440141EEF9
+	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 22:12:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756418768; cv=none; b=JBgT2wuKjKqN0hNp7P1zxJC4a/ABblTTYTMLHDysb2dI7aC3AcQA4GxgQjG1g/68VaGBOFULYBNc6nWtgTR980usGxN7Yt6UV4KOE0r5/ONgHn1bZ/cXkMRk/c+e2t+gy82dnROdTGC2rJzFMB/TUYVN+vhsD84VJp9YFzpxx28=
+	t=1756419137; cv=none; b=WFXBWuArU0s+q78dGwT51UWBA/vaX+cNFjqFjCXWEMOmFGPXSZrlY+wN0gtyokoJ7e7TrybQOMPVakWLO4kIluNWQ1II86PNKbkLM9+xbf/Ye/1YIbL4UVFwjS70geletF0epKyvWdivStp6/hs5vRv5lXE1yxXp3WYPyMubgYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756418768; c=relaxed/simple;
-	bh=+Xi43H4MwC3aeLVDBN5VJFnF02t9rq3K0zINzz0nmkg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GmrDCtT9QNiyUUhs99zqe92yT5tFPNnyCNoudzBOsfHSjdSz5t09MpzP+9jBJAmmtgR/R46R6Av9W0maaTfa3Fipwi70fopNm2eDXwZCEwokXaVgGUMvRGjnjKIfItgG197I7whtO1WaCoDPEFBQOBlOLCUg7m4AkamnBuXaWDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1urkkr-000000006It-1lWt;
-	Thu, 28 Aug 2025 22:06:01 +0000
-Date: Thu, 28 Aug 2025 23:05:57 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Hauke Mehrtens <hauke@hauke-m.de>
-Cc: Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Andreas Schirm <andreas.schirm@siemens.com>,
-	Lukas Stockmann <lukas.stockmann@siemens.com>,
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Peter Christen <peter.christen@siemens.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net-next v2 1/6] net: dsa: lantiq_gswip: move to
- dedicated folder
-Message-ID: <aLDSxXgfYCTYujKz@pidgin.makrotopia.org>
-References: <cover.1756228750.git.daniel@makrotopia.org>
- <ceb75451afb48ee791a2585463d718772b2cf357.1756228750.git.daniel@makrotopia.org>
- <20250828203346.eqe5bzk52pcizqt5@skbuf>
- <3eecb73c-7c6c-4813-af0d-244156e358af@hauke-m.de>
+	s=arc-20240116; t=1756419137; c=relaxed/simple;
+	bh=WmL1d29O8AcDy47oe74uDZce4Y/iihIsCVl+G1jYo8c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GuQ39Ueyp0T6oOjOeJtewaSCpjCYbEvc0uMEmjP/Srb1Xnifk+KD0dAvwjA3iWEPPn52uY8l5hpyadBlWPrvDoYKXpemimCOma89QXiq/pHY9vcB/0qFTHKVeIpMshgKgSbwfq4sBaJumqK65tUWwSo4aQSPAzkPZPYsGewM1Y4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TMFMYgSt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 658B1C4CEEB;
+	Thu, 28 Aug 2025 22:12:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756419136;
+	bh=WmL1d29O8AcDy47oe74uDZce4Y/iihIsCVl+G1jYo8c=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=TMFMYgStBPZaU4VMQE5X2nkj6DOcmAMGgd1gCtYGCSSFvIzhT3khY7cqQm5aB266z
+	 p37i6Mz+teuhygTV4oS9u3x0YCexEjg0+Zg6vy9cL5lrTm+QjO/LSPw6M6vUosw2GN
+	 rZ1gQTfjSx6TGVMsDbxX+6fcP2vGsxNnLmrmkE3zeV3uKl/MYkb0/cMydXhl59/WWf
+	 ssQiHlBxEt5lhJixnfs0F7tX7j7eiBUUcue+FGLf+AEctclw5k7tELcj7vnJMF658U
+	 KyVU8QvgfDUucG/FmLan1WGuTfCl1qHoGceA4nl4O3+7FBgAf+B2EacuhjTxudxRH+
+	 aKxjdrAacnTKg==
+Message-ID: <5b7aabf0-0bed-43bb-9fc8-164f3638a7d1@kernel.org>
+Date: Thu, 28 Aug 2025 16:12:15 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3eecb73c-7c6c-4813-af0d-244156e358af@hauke-m.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 5/8] net: use dst_dev_rcu() in sk_setup_caps()
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20250828195823.3958522-1-edumazet@google.com>
+ <20250828195823.3958522-6-edumazet@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20250828195823.3958522-6-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 28, 2025 at 10:49:18PM +0200, Hauke Mehrtens wrote:
-> On 8/28/25 22:33, Vladimir Oltean wrote:
-> > On Wed, Aug 27, 2025 at 12:05:28AM +0100, Daniel Golle wrote:
-> > > Move the lantiq_gswip driver to its own folder and update
-> > > MAINTAINERS file accordingly.
-> > > This is done ahead of extending the driver to support the MaxLinear
-> > > GSW1xx series of standalone switch ICs, which includes adding a bunch
-> > > of files.
-> > > 
-> > > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> > > ---
-> > > v2: move driver to its own folder
-> > > 
-> > >   MAINTAINERS                                 | 3 +--
-> > >   drivers/net/dsa/Kconfig                     | 8 +-------
-> > >   drivers/net/dsa/Makefile                    | 2 +-
-> > >   drivers/net/dsa/lantiq/Kconfig              | 7 +++++++
-> > >   drivers/net/dsa/lantiq/Makefile             | 1 +
-> > >   drivers/net/dsa/{ => lantiq}/lantiq_gswip.c | 0
-> > >   drivers/net/dsa/{ => lantiq}/lantiq_gswip.h | 0
-> > >   drivers/net/dsa/{ => lantiq}/lantiq_pce.h   | 0
-> > >   8 files changed, 11 insertions(+), 10 deletions(-)
-> > >   create mode 100644 drivers/net/dsa/lantiq/Kconfig
-> > >   create mode 100644 drivers/net/dsa/lantiq/Makefile
-> > >   rename drivers/net/dsa/{ => lantiq}/lantiq_gswip.c (100%)
-> > >   rename drivers/net/dsa/{ => lantiq}/lantiq_gswip.h (100%)
-> > >   rename drivers/net/dsa/{ => lantiq}/lantiq_pce.h (100%)
-> > 
-> > I don't have a problem with this patch per se, but it will make it
-> > harder to avoid conflicts for the known and unsubmitted bug fixes, like:
-> > https://github.com/dangowrt/linux/commit/c7445039b965e1a6aad1a4435e7efd4b7cb30f5b
-> > https://github.com/dangowrt/linux/commit/48d5cac46fc95a826b5eb49434a3a68b75a8ae1a
-> > which I haven't found the time to submit (sorry). Are we okay with that?
+On 8/28/25 1:58 PM, Eric Dumazet wrote:
+> Use RCU to protect accesses to dst->dev from sk_setup_caps()
+> and sk_dst_gso_max_size().
 > 
-> I think git cherry-pick will still work.
+> Also use dst_dev_rcu() in ip6_dst_mtu_maybe_forward(),
+> and ip_dst_mtu_maybe_forward().
 > 
-> I would like to have these fixes also in the stable kernel, if cherry pick
-> does not work you can also send modified version to linux stable.
+> ip4_dst_hoplimit() can use dst_dev_net_rcu().
+> 
+> Fixes: 4a6ce2b6f2ec ("net: introduce a new function dst_dev_put()")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  include/net/ip.h        |  6 ++++--
+>  include/net/ip6_route.h |  2 +-
+>  include/net/route.h     |  2 +-
+>  net/core/sock.c         | 16 ++++++++++------
+>  4 files changed, 16 insertions(+), 10 deletions(-)
+> 
 
-Cherry-pick anyway already won't work any more because of
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=6e8e6baf16ce7d2310959ae81d0194a56874e0d2
-
-However, I've already rebased the series with Vladimir's fixes on top of
-that and this pending series, see
-
-https://github.com/dangowrt/linux/commits/1be5db5457b6956e606af37b03fb1dc86aadd392/
 
 
