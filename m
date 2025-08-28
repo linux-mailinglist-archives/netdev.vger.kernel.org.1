@@ -1,252 +1,127 @@
-Return-Path: <netdev+bounces-217975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43950B3AB0A
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 21:43:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 191C7B3AB15
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 21:49:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED6063ADE84
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 19:43:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5042A1B230F0
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 19:49:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A87ED279DBC;
-	Thu, 28 Aug 2025 19:43:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD56822538F;
+	Thu, 28 Aug 2025 19:49:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V4F2xMoQ"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="VNas6Vxg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE58E2797A4
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 19:43:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2913713AD38
+	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 19:49:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756410230; cv=none; b=NT71BDcYIXIRulFbgT+FH+oI4qF3WAyWndp362cmEoIA8jsVDeIilJLckC3sAzKBZEmlCaPmm48Fow6ZY9MArGlUHNepzMmso5OeQsSlGiayFm3vJ97vCHPlehSyuSub1Vxglv1JgFurFnzakhfdhStbZIpiBzGoB42xsfDoQSE=
+	t=1756410556; cv=none; b=p8lg+umYUnpLTGCmTXoaxEwIp50C4OJetL5M2QcND0uLPIbFnq5yiR+3rtVnZmMDNT+DxgEh1wDJlwcNKLrS79g1qoBfwkPHfuAn5nytpadhPJIdobDD3k33IcBhyeB0xgFLLYqGfvzgwkBTBMAe+KMiVrnlCjuOeLd1EcC7otc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756410230; c=relaxed/simple;
-	bh=TnMTKIT2RLMSunGpSoNftY6dzd5Bjjd45dNhptClb9o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rc4zSK4bIW2tY7N30tWa8RxArVtiNHd2/jMMclMdx/11q5VKX9CUz6XdiEBiFojJdYwV/vzlLd8kB/g25a9D+EcGvM4msk464zIa4IF5vrN07d82eaagaRuF45/G5SaW8SV84SYBXIVon3iVGDmRE9DM/0dt6OMP6JiTx65TuoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V4F2xMoQ; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4b28184a8b3so15733091cf.1
-        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 12:43:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756410228; x=1757015028; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LvWP1EIagvNp91g+RgveNhCCrgjH/IPh927YjhaOu4c=;
-        b=V4F2xMoQ6I0s/KGuhe45bcPTloJdW0zPEs3vpzcWwbLiHUVx9Mginec2Os6XcdfC7b
-         xXAbvLQt4p0ixB0akGEuVZQKH4RiGaWWmGixqAZxwFeAThdvmmx0JGK+bSp5+dD68oMs
-         CQO3y2CYVd2ZX3rIjYUmQQ3mE1MiSfRApO5xhCKsjmJeLBZPCj0HWd+Zx4bK286NJTSR
-         S98GS2udBvZUbgQ/pY5XqHrGsby1Axo90Y9o2NKOd+g17NSUiX2benh7ijXRcHgMBFmy
-         EFkglSAVLS7hpdDNlFqD27EpV87BXtUBxkp97eZ52ZC+WNfyA+Bc6GgHkYZLFA6KvmAl
-         NMHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756410228; x=1757015028;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LvWP1EIagvNp91g+RgveNhCCrgjH/IPh927YjhaOu4c=;
-        b=IK/grDlk8oH+1T/PIKFn5U1Zzf03F8o3vLDVfZcpkoCGYOdGtVAUEovMHwCoFyx0MU
-         vKCOCxAC/UfmnhbeTVVncMPxSnlnZpLreRYwWcHguRXNyA7n3wCpdTgcqJqZCdaqPsFB
-         vUKUrbkF7wrH2IrOImtphWrVglTZUW+5lcSMBrEBCzNPZrEUR0eaGEcCOXMkuP4udi0A
-         nun1bY+YW+qsq/wUV6QIv9KPV/1JpALtSY2PYSaZxBgf2zBQ4PYxwxL2p0g4P0N5KdOw
-         X7KyBHdY8Kv77t+Ox3gW9VH0NC/+DRa+5TlQdOLow9uD6sN2xaOdhMMXbO2ltRp+i8/N
-         O9/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX/WGLBLu1FLZcKJbgRwRC/n6vLGakALoN4IVcpjrrT961tMVrJXOpFSvqNnfT+Mg7TVywwipE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4N1SPNZcqjPF6GqvsDE9V8LZkmhwyj1ZYUITkr4NZHbdXaVZM
-	wyu5FYRQ2JmVikZ1MxbfBm+wSFDT4kE/HE3WOSPdqyozV+60xrVKLaXWFk/ckpDR4JgYd3xopiH
-	9E0HNnEjKQPKBjtChEDY1qOphT31dR7nmbCnWRgiH
-X-Gm-Gg: ASbGncv0wO2AmFxxiZrbDp8ht4M16MV21KbTy8XmqQMG0fsa9EJo3Lu02Hphqflf4Q3
-	KHQ27AhHpY1+VIOaGDNDwJoTEwYdyEKSHDJDX4pjxFEkLcNGYl4m/gc0+W5GNv61ZQV0R27k0wq
-	uvgzw4naI2R3Zmz208kZMONYam4Oun270YqMIcukTC3pPKMzwr88jUeD7qUqe7TxOHPEL5a7DRI
-	mLq6RBjDOBYGA==
-X-Google-Smtp-Source: AGHT+IG3jqv6msRFu+wEOd5ve7eXnVNwLNaZG7weV85QwzfVsC478io88x5SFE5xNO0tXiiGPcYr0WhENxml0Xs4ZBA=
-X-Received: by 2002:a05:622a:5597:b0:4b2:8ac4:ef84 with SMTP id
- d75a77b69052e-4b2aab4d13fmr298360151cf.83.1756410227277; Thu, 28 Aug 2025
- 12:43:47 -0700 (PDT)
+	s=arc-20240116; t=1756410556; c=relaxed/simple;
+	bh=fGJsitskjNuG5mGhWP63zK1qFjXgMDleamWsdzwKh1Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JxzS9gLO2QMtgNxS0PIK1STmIdcn2O85BGgGHhNVRhIZWJWxSHllE3btRcK1qpCKiB/6bX4njTHYIh60+5g1fkfWBfcFEw4B+XFq/13HJdxhXulTnfprimwuPzRfZ9vWo+Kc6GFsYUNR3Wo76lVFfAOk3UroGPJuyLQId14RDlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=VNas6Vxg; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57SHNYIm006264;
+	Thu, 28 Aug 2025 19:49:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=53uAywPxLjpWIyV07QsPsbQgGQ36O
+	/ziTCSQUGiifIc=; b=VNas6VxgWppJu+TP36I40ih42UN5TTuvklwZg1uFMC+qy
+	nT0VpQGcnFKZVcz3tbH2ZtBzCtb2wuLOedbM7HY7MGGZyZQ+ThM1CtJ0T+nZB+lS
+	115UPLkUG2VzF8keXKNWilGEUJkvJDoAYrWioD+WLFdj1Ko8Q8JXAvZAIDjfihed
+	oPBe5BF4rG0Cift85Rnu9L7oZK8Who82apDksj+WEaWHoetkbVPCf4HzW9YQrejv
+	CjZG9q4gmTPq0hcKtEO76Nu0Konmq0d1XNOjphmkfPCXO66HAQqz3zwFU3azAmou
+	/ScqFc0FOUw6eRjCtks4XTkebhTdqT8HpqIEXdjWw==
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48q67919vj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 28 Aug 2025 19:49:02 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 57SIctgb005002;
+	Thu, 28 Aug 2025 19:48:59 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 48q43cf8v2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 28 Aug 2025 19:48:59 +0000
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 57SJmx1B005371;
+	Thu, 28 Aug 2025 19:48:59 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 48q43cf8up-1;
+	Thu, 28 Aug 2025 19:48:59 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+        netdev@vger.kernel.org
+Cc: alok.a.tiwari@oracle.com
+Subject: [PATCH net-next] bnxt_en: fix incorrect page count in RX aggr ring log
+Date: Thu, 28 Aug 2025 12:48:54 -0700
+Message-ID: <20250828194856.720112-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250828-b4-tcp-ao-md5-rst-finwait2-v2-0-653099bea5c1@arista.com> <20250828-b4-tcp-ao-md5-rst-finwait2-v2-1-653099bea5c1@arista.com>
-In-Reply-To: <20250828-b4-tcp-ao-md5-rst-finwait2-v2-1-653099bea5c1@arista.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 28 Aug 2025 12:43:36 -0700
-X-Gm-Features: Ac12FXyimLdPLId8dmfUxJvcMZz-eM27JZ-f2qMJtzFIaoF1YxDltULDxGWjeeo
-Message-ID: <CANn89iKVQ=c8zxm0MqR7ycR1RFbKqObEPEJrpWCfxH4MdVf3Og@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 1/2] tcp: Destroy TCP-AO, TCP-MD5 keys in .sk_destruct()
-To: dima@arista.com
-Cc: Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Bob Gilligan <gilligan@arista.com>, Salam Noureddine <noureddine@arista.com>, 
-	Dmitry Safonov <0x7f454c46@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-28_04,2025-08-28_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 bulkscore=0
+ mlxlogscore=999 spamscore=0 suspectscore=0 malwarescore=0 mlxscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2508110000 definitions=main-2508280166
+X-Proofpoint-GUID: Hzdx6Suj1VyZUIcHgA9g0MRkgr6KEh1e
+X-Proofpoint-ORIG-GUID: Hzdx6Suj1VyZUIcHgA9g0MRkgr6KEh1e
+X-Authority-Analysis: v=2.4 cv=NrLRc9dJ c=1 sm=1 tr=0 ts=68b0b2ae b=1 cx=c_pps
+ a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17
+ a=2OwXVqhp2XgA:10 a=yPCof4ZbAAAA:8 a=ngdfp8rUJ6vPqw3KiKAA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODIzMDAzNSBTYWx0ZWRfXzd7TQyfUhlO2
+ t7IwzlRqVy/iiFtwibWBfAVnL9XivmVleL7a3Rc5gdDbLKpCRcA+nE9kHrXA8sDzvD7//5TDw39
+ cUyTpyEt4Rgad0zQiIg5QyanEYqVA8sOraRqnjYpLXDcaG2u7spidYqbG0ogmpe82EqQlkQjv1k
+ sEYi5hFZoVAXhIjHd9IFwNZ9qYqQVb6zqgPSc3F3eKE0F5erj1ToXI0zR8IaO9kbnQ9iz3zCZ98
+ 6Xz+PCOMfRLvFl4dBSCxA1XIKsikonwchO9EnEMRUUt9ao6hDNvGHVn7588eJIqLNJllngXs5Hu
+ 4HKGlTllDBryYeedLb2Lj3GcC3ATPCduHXEnwkaAN7Y3P0FfEfgxh3Q9zrIpYcWu5nplKCg5uat
+ 2YF8jh0F
 
-On Thu, Aug 28, 2025 at 1:15=E2=80=AFAM Dmitry Safonov via B4 Relay
-<devnull+dima.arista.com@kernel.org> wrote:
->
-> From: Dmitry Safonov <dima@arista.com>
->
-> Currently there are a couple of minor issues with destroying the keys
-> tcp_v4_destroy_sock():
->
-> 1. The socket is yet in TCP bind buckets, making it reachable for
->    incoming segments [on another CPU core], potentially available to send
->    late FIN/ACK/RST replies.
->
-> 2. There is at least one code path, where tcp_done() is called before
->    sending RST [kudos to Bob for investigation]. This is a case of
->    a server, that finished sending its data and just called close().
->
->    The socket is in TCP_FIN_WAIT2 and has RCV_SHUTDOWN (set by
->    __tcp_close())
->
->    tcp_v4_do_rcv()/tcp_v6_do_rcv()
->      tcp_rcv_state_process()            /* LINUX_MIB_TCPABORTONDATA */
->        tcp_reset()
->          tcp_done_with_error()
->            tcp_done()
->              inet_csk_destroy_sock()    /* Destroys AO/MD5 keys */
->      /* tcp_rcv_state_process() returns SKB_DROP_REASON_TCP_ABORT_ON_DATA=
- */
->    tcp_v4_send_reset()                  /* Sends an unsigned RST segment =
-*/
->
->    tcpdump:
-> > 22:53:15.399377 00:00:b2:1f:00:00 > 00:00:01:01:00:00, ethertype IPv4 (=
-0x0800), length 74: (tos 0x0, ttl 64, id 33929, offset 0, flags [DF], proto=
- TCP (6), length 60)
-> >     1.0.0.1.34567 > 1.0.0.2.49848: Flags [F.], seq 2185658590, ack 3969=
-644355, win 502, options [nop,nop,md5 valid], length 0
-> > 22:53:15.399396 00:00:01:01:00:00 > 00:00:b2:1f:00:00, ethertype IPv4 (=
-0x0800), length 86: (tos 0x0, ttl 64, id 51951, offset 0, flags [DF], proto=
- TCP (6), length 72)
-> >     1.0.0.2.49848 > 1.0.0.1.34567: Flags [.], seq 3969644375, ack 21856=
-58591, win 128, options [nop,nop,md5 valid,nop,nop,sack 1 {2185658590:21856=
-58591}], length 0
-> > 22:53:16.429588 00:00:b2:1f:00:00 > 00:00:01:01:00:00, ethertype IPv4 (=
-0x0800), length 60: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP=
- (6), length 40)
-> >     1.0.0.1.34567 > 1.0.0.2.49848: Flags [R], seq 2185658590, win 0, le=
-ngth 0
-> > 22:53:16.664725 00:00:b2:1f:00:00 > 00:00:01:01:00:00, ethertype IPv4 (=
-0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP=
- (6), length 60)
-> >     1.0.0.1.34567 > 1.0.0.2.49848: Flags [R], seq 2185658591, win 0, op=
-tions [nop,nop,md5 valid], length 0
-> > 22:53:17.289832 00:00:b2:1f:00:00 > 00:00:01:01:00:00, ethertype IPv4 (=
-0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP=
- (6), length 60)
-> >     1.0.0.1.34567 > 1.0.0.2.49848: Flags [R], seq 2185658591, win 0, op=
-tions [nop,nop,md5 valid], length 0
->
->   Note the signed RSTs later in the dump - those are sent by the server
->   when the fin-wait socket gets removed from hash buckets, by
->   the listener socket.
->
-> Instead of destroying AO/MD5 info and their keys in inet_csk_destroy_sock=
-(),
-> slightly delay it until the actual socket .sk_destruct(). As shutdown'ed
-> socket can yet send non-data replies, they should be signed in order for
-> the peer to process them. Now it also matches how AO/MD5 gets destructed
-> for TIME-WAIT sockets (in tcp_twsk_destructor()).
->
-> This seems optimal for TCP-MD5, while for TCP-AO it seems to have an
-> open problem: once RST get sent and socket gets actually destructed,
-> there is no information on the initial sequence numbers. So, in case
-> this last RST gets lost in the network, the server's listener socket
-> won't be able to properly sign another RST. Nothing in RFC 1122
-> prescribes keeping any local state after non-graceful reset.
-> Luckily, BGP are known to use keep alive(s).
->
-> While the issue is quite minor/cosmetic, these days monitoring network
-> counters is a common practice and getting invalid signed segments from
-> a trusted BGP peer can get customers worried.
->
-> Investigated-by: Bob Gilligan <gilligan@arista.com>
-> Signed-off-by: Dmitry Safonov <dima@arista.com>
-> ---
->  include/net/tcp.h   |  4 ++++
->  net/ipv4/tcp.c      | 27 +++++++++++++++++++++++++++
->  net/ipv4/tcp_ipv4.c | 33 ++++++++-------------------------
->  net/ipv6/tcp_ipv6.c |  8 ++++++++
->  4 files changed, 47 insertions(+), 25 deletions(-)
->
-> diff --git a/include/net/tcp.h b/include/net/tcp.h
-> index 2936b8175950faa777f81f3c6b7230bcc375d772..0009c26241964b54aa93bc1b8=
-6158050d96c2c98 100644
-> --- a/include/net/tcp.h
-> +++ b/include/net/tcp.h
-> @@ -1931,6 +1931,7 @@ tcp_md5_do_lookup_any_l3index(const struct sock *sk=
-,
->  }
->
->  #define tcp_twsk_md5_key(twsk) ((twsk)->tw_md5_key)
-> +void tcp_md5_destruct_sock(struct sock *sk);
->  #else
->  static inline struct tcp_md5sig_key *
->  tcp_md5_do_lookup(const struct sock *sk, int l3index,
-> @@ -1947,6 +1948,9 @@ tcp_md5_do_lookup_any_l3index(const struct sock *sk=
-,
->  }
->
->  #define tcp_twsk_md5_key(twsk) NULL
-> +static inline void tcp_md5_destruct_sock(struct sock *sk)
-> +{
-> +}
->  #endif
->
->  int tcp_md5_alloc_sigpool(void);
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index 9bc8317e92b7952871f07ae11a9c2eaa7d3a9e65..927233ee7500e0568782ae4a3=
-860af56d1476acd 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -412,6 +412,33 @@ static u64 tcp_compute_delivery_rate(const struct tc=
-p_sock *tp)
->         return rate64;
->  }
->
-> +#ifdef CONFIG_TCP_MD5SIG
-> +static void tcp_md5sig_info_free_rcu(struct rcu_head *head)
-> +{
-> +       struct tcp_md5sig_info *md5sig;
-> +
-> +       md5sig =3D container_of(head, struct tcp_md5sig_info, rcu);
-> +       kfree(md5sig);
-> +       static_branch_slow_dec_deferred(&tcp_md5_needed);
-> +       tcp_md5_release_sigpool();
-> +}
-> +
-> +void tcp_md5_destruct_sock(struct sock *sk)
-> +{
-> +       struct tcp_sock *tp =3D tcp_sk(sk);
-> +
-> +       if (tp->md5sig_info) {
-> +               struct tcp_md5sig_info *md5sig;
-> +
-> +               md5sig =3D rcu_dereference_protected(tp->md5sig_info, 1);
-> +               tcp_clear_md5_list(sk);
-> +               call_rcu(&md5sig->rcu, tcp_md5sig_info_free_rcu);
-> +               rcu_assign_pointer(tp->md5sig_info, NULL);
+The warning in bnxt_alloc_one_rx_ring_netmem() reports the number
+of pages allocated for the RX aggregation ring. However, it
+mistakenly used bp->rx_ring_size instead of bp->rx_agg_ring_size,
+leading to confusing or misleading log output.
 
-I would move this line before call_rcu(&md5sig->rcu, tcp_md5sig_info_free_r=
-cu),
-otherwise the free could happen before the clear, and an UAF could occur.
+Use the correct bp->rx_agg_ring_size value to fix this.
 
-It is not absolutely clear if this function runs under rcu_read_lock(),
-and even if it is currently safe, this could change in the future.
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Other than that :
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 207a8bb36ae5..0d30abadf06c 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -4397,7 +4397,7 @@ static void bnxt_alloc_one_rx_ring_netmem(struct bnxt *bp,
+ 	for (i = 0; i < bp->rx_agg_ring_size; i++) {
+ 		if (bnxt_alloc_rx_netmem(bp, rxr, prod, GFP_KERNEL)) {
+ 			netdev_warn(bp->dev, "init'ed rx ring %d with %d/%d pages only\n",
+-				    ring_nr, i, bp->rx_ring_size);
++				    ring_nr, i, bp->rx_agg_ring_size);
+ 			break;
+ 		}
+ 		prod = NEXT_RX_AGG(prod);
+-- 
+2.50.1
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
 
