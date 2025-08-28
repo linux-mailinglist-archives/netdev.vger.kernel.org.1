@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-217574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2B43B3915A
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 04:00:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 68B44B3915B
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 04:00:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EFA4463144
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 02:00:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FAB7464FFE
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 02:00:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BEC8195FE8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C38771FF603;
 	Thu, 28 Aug 2025 02:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R/1UpK6C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TvlrhiHR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37DA06FC5
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 02:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FF681CD215
+	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 02:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756346428; cv=none; b=R6VHU2qdTUyyhKU7aFoRykdFeJZnASH1rL8QqrHLuNKrqi+EH5cA0W/3nYuZ/4QJctvz2tJlFNkNdvMqba6tEElIeKr9kZjVjkG/P9FulqM0+nfIfDP2xsfz0fVvRC3d2sPK6r/ZAX/1t46T0tycudg3OU+H4AJMkqYEIbM9yqw=
+	t=1756346428; cv=none; b=KeALSFZKgcGZ6ai424KvwXh134Q0LWDN85X6LHCmG2iopA4bNiRNxcupqWbIzHPNFl+wWD+kOz3gpKo64jVJMk/QDRcTWG+nHnujSeskIYpTYqoWBpBCqp+J9rWshV4Ld+ANeKnfvn0FCBXfgUAEM+otI9+gnUegXATZKqYLp1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1756346428; c=relaxed/simple;
-	bh=OjUKhWm3emWUWV1s0qO3smtGIPjNwvCVkpcps0SM9XM=;
+	bh=R4ElHzzIQAcVHSTK92vjmTdqAsOi5LZdoMCEciWgWQs=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=OWhCou2X9H84JxsxAYVOwa3gV+H1loDcbtbslD9UwKSSKyPvhtZNlnQ/euGzlKYI5ERc0ZA0qXiPwZG2XTFkxQmAv7PZx+ZVNMhS83cIEIKt06gS9ELbNwV55cA5WYqwP6u/F24LZVrbJMcDmLQdVICBu0FymSkQdi9vqj+QLrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R/1UpK6C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3CF9C4CEEB;
-	Thu, 28 Aug 2025 02:00:26 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=PK6L00ogDlgGhBRRLxjhWHQym4M0qRAI1k78VJMptqFYu0bSQ6R1yqm8/YjajimpIihLyi8EL3zPgzHv/4EMR5QV6T4L4Ak6UJCSmcfGP0sMWL04DbV1SZvJwW3d2vXm0PBngLj4qFmccTvjWQZ/HqkgdWFIJ+syl3Muk7mNLbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TvlrhiHR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30E43C4CEF0;
+	Thu, 28 Aug 2025 02:00:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756346426;
-	bh=OjUKhWm3emWUWV1s0qO3smtGIPjNwvCVkpcps0SM9XM=;
+	s=k20201202; t=1756346428;
+	bh=R4ElHzzIQAcVHSTK92vjmTdqAsOi5LZdoMCEciWgWQs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=R/1UpK6Cax1PyRZjliBGApYejylMOMAZKyvNKk9aRUYCWFAOPgvSO83lH+GV4r5hN
-	 Phts+sLX97mAsHGjJ5BOWT3GPhviauJUED4IcbycdB8NSFQnGnFHq9UFinZOC1HxWS
-	 2WN4ynSoQQexBBLfRGq7ZvUmgk43WgRy3EvWdvJN34AQuVtgtJRMAE7r1yq1Fo0cgP
-	 IUz1AaKDz9MeMkKpTPJC03oZlyZoVHuyhz1X6trg/123X5hR4WphTHKwkm0x78HmD5
-	 og42hUARoronDtV8jJ8he5bjpHjOpkl1uW07vk/KsWHOibcrlGzxDd9xxcO7k1LiK3
-	 5IAJsh6lhDZRQ==
+	b=TvlrhiHRWbi3usfKahofSdxdXAoxhztbUOkvr4UnvfjUJgQMqkWoUQH/pRJ0nw3EM
+	 AGQDbXbhwUUtYx/TT4b/qDJjOnIgpy11a92J8G7H2hdMo38P40NJhe4z4xP5SOYKPe
+	 y6dUCYBqJlGzG9KwEnQvEbai/MDWQWjZtOdU/4eYcW589Nh02CKQ1OaatyfqzqAyGO
+	 wP6N7zcxc1LNDBzmvKXKNAMyz6V3fKl9qmefkMI6odPh4x0Gj8Ci9Ev9NpFoC6s43X
+	 GkpXR7iMW5kJ1AmBfeEWAmXXBXSAYvfp9A3YFvXxcgOfn3ZIwagskDi2JmSU3x0n1u
+	 b4GHlFS6Wk4Mw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33BF4383BF76;
-	Thu, 28 Aug 2025 02:00:35 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADB31383BF76;
+	Thu, 28 Aug 2025 02:00:36 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,62 +52,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 00/13] macsec: replace custom netlink
- attribute
- checks with policy-level checks
+Subject: Re: [PATCH net-next v2 0/6] eth: fbnic: Extend hw stats support
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175634643374.908900.8830557654640227942.git-patchwork-notify@kernel.org>
-Date: Thu, 28 Aug 2025 02:00:33 +0000
-References: <cover.1756202772.git.sd@queasysnail.net>
-In-Reply-To: <cover.1756202772.git.sd@queasysnail.net>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org
+ <175634643523.908900.2000854189315078878.git-patchwork-notify@kernel.org>
+Date: Thu, 28 Aug 2025 02:00:35 +0000
+References: <20250825200206.2357713-1-kuba@kernel.org>
+In-Reply-To: <20250825200206.2357713-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ mohsin.bashr@gmail.com, vadim.fedorenko@linux.dev, jacob.e.keller@intel.com
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 26 Aug 2025 15:16:18 +0200 you wrote:
-> We can simplify attribute validation a lot by describing the accepted
-> ranges more precisely in the policies, using NLA_POLICY_MAX etc.
+On Mon, 25 Aug 2025 13:02:00 -0700 you wrote:
+> Mohsin says:
 > 
-> Some of the checks still need to be done later on, because the
-> attribute length and acceptable range can vary based on values that
-> can't be known when the policy is validated (cipher suite determines
-> the key length and valid ICV length, presence of XPN changes the PN
-> length, detection of duplicate SCIs or ANs, etc).
+> Extend hardware stats support for fbnic by adding the ability to reset
+> hardware stats when the device experience a reset due to a PCI error and
+> include MAC stats in the hardware stats reset. Additionally, expand
+> hardware stats coverage to include FEC, PHY, and Pause stats.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,01/13] macsec: replace custom checks on MACSEC_SA_ATTR_AN with NLA_POLICY_MAX
-    https://git.kernel.org/netdev/net-next/c/d5e0a8cec12c
-  - [net-next,v2,02/13] macsec: replace custom checks on MACSEC_*_ATTR_ACTIVE with NLA_POLICY_MAX
-    https://git.kernel.org/netdev/net-next/c/ae6a8f5abed1
-  - [net-next,v2,03/13] macsec: replace custom checks on MACSEC_SA_ATTR_SALT with NLA_POLICY_EXACT_LEN
-    https://git.kernel.org/netdev/net-next/c/8cf22afc152c
-  - [net-next,v2,04/13] macsec: replace custom checks on MACSEC_SA_ATTR_KEYID with NLA_POLICY_EXACT_LEN
-    https://git.kernel.org/netdev/net-next/c/d29ae0d7753a
-  - [net-next,v2,05/13] macsec: use NLA_POLICY_MAX_LEN for MACSEC_SA_ATTR_KEY
-    https://git.kernel.org/netdev/net-next/c/15a700a8429e
-  - [net-next,v2,06/13] macsec: use NLA_UINT for MACSEC_SA_ATTR_PN
-    https://git.kernel.org/netdev/net-next/c/82f3116132fc
-  - [net-next,v2,07/13] macsec: remove validate_add_rxsc
-    https://git.kernel.org/netdev/net-next/c/80810c89d39c
-  - [net-next,v2,08/13] macsec: add NLA_POLICY_MAX for MACSEC_OFFLOAD_ATTR_TYPE and IFLA_MACSEC_OFFLOAD
-    https://git.kernel.org/netdev/net-next/c/35a35279e8ff
-  - [net-next,v2,09/13] macsec: replace custom checks on IFLA_MACSEC_ICV_LEN with NLA_POLICY_RANGE
-    https://git.kernel.org/netdev/net-next/c/17882d23a6c6
-  - [net-next,v2,10/13] macsec: use NLA_POLICY_VALIDATE_FN to validate IFLA_MACSEC_CIPHER_SUITE
-    https://git.kernel.org/netdev/net-next/c/4d844cb1ea1f
-  - [net-next,v2,11/13] macsec: validate IFLA_MACSEC_VALIDATION with NLA_POLICY_MAX
-    https://git.kernel.org/netdev/net-next/c/b81d1e958867
-  - [net-next,v2,12/13] macsec: replace custom checks for IFLA_MACSEC_* flags with NLA_POLICY_MAX
-    https://git.kernel.org/netdev/net-next/c/b46f5ddb40c8
-  - [net-next,v2,13/13] macsec: replace custom check on IFLA_MACSEC_ENCODING_SA with NLA_POLICY_MAX
-    https://git.kernel.org/netdev/net-next/c/db9dfc4d30dd
+  - [net-next,v2,1/6] eth: fbnic: Move hw_stats_lock out of fbnic_dev
+    https://git.kernel.org/netdev/net-next/c/2ee5c8c0c28e
+  - [net-next,v2,2/6] eth: fbnic: Reset hw stats upon PCI error
+    https://git.kernel.org/netdev/net-next/c/b1161b1863c5
+  - [net-next,v2,3/6] eth: fbnic: Reset MAC stats
+    https://git.kernel.org/netdev/net-next/c/bcf54e5d7cd0
+  - [net-next,v2,4/6] eth: fbnic: Fetch PHY stats from device
+    https://git.kernel.org/netdev/net-next/c/df4c5d9a290e
+  - [net-next,v2,5/6] eth: fbnic: Read PHY stats via the ethtool API
+    https://git.kernel.org/netdev/net-next/c/33c493791bc0
+  - [net-next,v2,6/6] eth: fbnic: Add pause stats support
+    https://git.kernel.org/netdev/net-next/c/e9faf4db5f26
 
 You are awesome, thank you!
 -- 
