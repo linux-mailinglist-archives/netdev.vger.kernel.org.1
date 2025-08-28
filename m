@@ -1,76 +1,66 @@
-Return-Path: <netdev+bounces-217786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32A1EB39D5D
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 14:33:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 085EFB39D6D
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 14:37:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BBE51C27E10
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 12:33:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C6CE1C23F91
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 12:37:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0146630F533;
-	Thu, 28 Aug 2025 12:33:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EAF530F550;
+	Thu, 28 Aug 2025 12:37:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="HV/mEyaQ";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="M1vLYh6p"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="R0qGFq7C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D0030C605;
-	Thu, 28 Aug 2025 12:33:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DA0D222575;
+	Thu, 28 Aug 2025 12:36:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756384410; cv=none; b=W2BsodVRac/wODIVRWvPwVXiQ8OZt8Gr/mVAzZUB52+N7Gc/bwDpbeG25EM7Tt14fJqGcLPD+Wzc04DoNZDLya4zwiRWMCXs6NxBktPax6qaLgDBG/tOiH6pd5MvjVtsqZ3FMBbd4drAe6rY7ssP/s0qubKQYLguPwMr2jbVcEI=
+	t=1756384620; cv=none; b=I7cby60iDY1fQD04DiVmEZ81TUuT4J/Ml2WWPaooztwsoFbJig0WLZe6kCsKF6S4BjzvB7Rj9eDWKpYiHT2OXcNwubnuoOSFfsa6DlqyvEQijB/vCsxP6hZcRYXXNpswLv8XtWa3fxCviIURjK1QtY9A1hTk991uxxMrJj7Ofm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756384410; c=relaxed/simple;
-	bh=ewmH9xcyPl+paA/pkAXt2p+G0NnKbaPnTZQwPIAMbjM=;
+	s=arc-20240116; t=1756384620; c=relaxed/simple;
+	bh=blUJciJSSLxwF/RY3sOrPdO4YO3qAfCiZkydDBkm1wI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kj1KsuUcfAKxxikmB89sbFc17o6SE8TobJWIdZuxFVUUMxilumMsvyA0bTfGMPsRf1/x7Y6ooteLMmGxPAxN0la0W/njvZswbf9pZs1MFpF7LrBB5QqfVFFnOAAUTA805OihMki4dee/DfRR6IOlEEIiiamBFjb861PkXt/MX6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=HV/mEyaQ; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=M1vLYh6p; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id A625860642; Thu, 28 Aug 2025 14:33:26 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1756384406;
-	bh=GzFAeyreM3Oxmb7oa93qBzx78opS9F1JOE4cszPO2Ro=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HV/mEyaQoP3ch4+0UMlBRa5Tuwi0ZXq6jJEBULkUNAOJsHG93+rYTCk2cyC8eaNh4
-	 gVYSiB7bVmd27ezkr2P4YyA0My8jeMHnsG4k/ATuDV0fBWjxTRf+MRoTI5wynV29KG
-	 MW3wZVsmV5DA7wsBzTC1Dbo94S7fX+PKje6r1vkyg/C81zXFEgZKv79gs4YHSlTYIG
-	 puhd04dZXMWUy5dDlWEOHea/dmEePO5J8cyz5izq0MSd4PGiUFzUVrK+HBoqbFyIHY
-	 4PPCZYJ+Bmfeen6LKFnHPmW3OsZllvlzXk0UO4wcZMd/ZH2LDajRxIo6eaP/JltWo8
-	 +kkXHLbjJq6iA==
-X-Spam-Level: 
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id 74C5F60634;
-	Thu, 28 Aug 2025 14:33:25 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1756384405;
-	bh=GzFAeyreM3Oxmb7oa93qBzx78opS9F1JOE4cszPO2Ro=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=M1vLYh6p5CusOyPyATE5C3pgK9c0SWkdsfE6TqTEn5E2jWSFngEDCVr/UQXO0esAO
-	 kG1GBE41TiIx+l3Sn9q+EhsPyfBwViMtTotZUYp5fT4/dXwM9E3jplbjB2BxQYFH4d
-	 LrUwwdVNaC0TddMdh59wGIHstlBs/Z/+LO92//xHgTvSp2Ifu+FZbhrqrcqzwwX4XQ
-	 DOMVgP8PoaOwVIwWv6DxtzL1deDR9s7+j9BAYA6PJM7MPgk9c9HpRQOYwPLOhvbGV5
-	 3eXpNihPiAPgdLtKgi0oY/g+HWFxJtNE8reASM6bnRTb12g6g0klGVG/PwXOC6Y2lJ
-	 TayeJy/EQLywA==
-Date: Thu, 28 Aug 2025 14:33:22 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: Fabian =?utf-8?B?QmzDpHNl?= <fabian@blaese.de>, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH v3] icmp: fix icmp_ndo_send address translation for reply
- direction
-Message-ID: <aLBMktniIkqsfWQY@calendula>
-References: <20250825203826.3231093-1-fabian@blaese.de>
- <20250828091435.161962-1-fabian@blaese.de>
- <aLBE2Ee7pUBzUupH@calendula>
- <aLBIeS4_x7dbrL-j@strlen.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=JBuv4ewM3iKe+G3Kn5VlpU2YnV4KiYBRItQ5OJs+B26zSvZ6sAMLWL63oiJOc269iFF/ZHZM4/bdNxX1OFDFi5aW2XqsZhnoGcF2yNjF6j4PqdDr+D23iZNnZFElvHNxhk2QQsV21yCXGcfHL8sYCxtGx/qXtO+2qFNXQpPE9L0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=R0qGFq7C; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=RDpyjCF+yhv6g6MHMLBvkxezcise4ZtJujs03AREeDA=; b=R0
+	qGFq7CWq98tW9sry+u6pT6Foho8TWfKqoqyHNhrpAkI/Pwp85zE4I6RDDn6DMplLtYoK/y4vDQd0B
+	KXME/F5qUx9LPQv0gRDtwa95XbWtpCR6xC7EJErfGOlaEeju6zNIPFei+hoJ0g3if5DW7XGXfxQCT
+	N6BX82HBtchHKqw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1urbrs-006LYk-8J; Thu, 28 Aug 2025 14:36:40 +0200
+Date: Thu, 28 Aug 2025 14:36:40 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: mysteryli <m13940358460@163.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	Mina Almasry <almasrymina@google.com>,
+	Jason Xing <kerneljasonxing@gmail.com>,
+	Michal Luczaj <mhal@rbox.co>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Eric Biggers <ebiggers@google.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	=?utf-8?B?4oCcbXlzdGVyeeKAnQ==?= <929916200@qq.com>
+Subject: Re: [PATCH] net/core: Replace offensive comment in skbuff.c
+Message-ID: <39356464-0b83-46f5-bf13-4f38c3ba2b53@lunn.ch>
+References: <20250828084253.1719646-1-m13940358460@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,52 +70,38 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <aLBIeS4_x7dbrL-j@strlen.de>
+In-Reply-To: <20250828084253.1719646-1-m13940358460@163.com>
 
-On Thu, Aug 28, 2025 at 02:15:53PM +0200, Florian Westphal wrote:
-> Pablo Neira Ayuso <pablo@netfilter.org> wrote:
-> > On Thu, Aug 28, 2025 at 11:14:35AM +0200, Fabian Bläse wrote:
-> > > The icmp_ndo_send function was originally introduced to ensure proper
-> > > rate limiting when icmp_send is called by a network device driver,
-> > > where the packet's source address may have already been transformed
-> > > by SNAT.
-> > > 
-> > > However, the original implementation only considers the
-> > > IP_CT_DIR_ORIGINAL direction for SNAT and always replaced the packet's
-> > > source address with that of the original-direction tuple. This causes
-> > > two problems:
-> > > 
-> > > 1. For SNAT:
-> > >    Reply-direction packets were incorrectly translated using the source
-> > >    address of the CT original direction, even though no translation is
-> > >    required.
-> > > 
-> > > 2. For DNAT:
-> > >    Reply-direction packets were not handled at all. In DNAT, the original
-> > >    direction's destination is translated. Therefore, in the reply
-> > >    direction the source address must be set to the reply-direction
-> > >    source, so rate limiting works as intended.
-> > > 
-> > > Fix this by using the connection direction to select the correct tuple
-> > > for source address translation, and adjust the pre-checks to handle
-> > > reply-direction packets in case of DNAT.
-> > > 
-> > > Additionally, wrap the `ct->status` access in READ_ONCE(). This avoids
-> > > possible KCSAN reports about concurrent updates to `ct->status`.
-> > 
-> > I think such concurrent update cannot not happen, NAT bits are only
-> > set for the first packet of a connection, which sets up the nat
-> > configuration, so READ_ONCE() can go away.
+On Thu, Aug 28, 2025 at 04:42:53PM +0800, mysteryli wrote:
+> From: “mystery” <929916200@qq.com>
 > 
-> Yes, the NAT bits stay in place but not other flags in ->status, e.g.
-> DYING, ASSURED, etc.
+> The original comment contained profanity to express the frustration of
+> dealing with a complex and resource-constrained code path. While the
+> sentiment is understandable, the language is unprofessional and
+> unnecessary.
+> Replace it with a more neutral and descriptive comment that maintains
+> the original technical context and conveys the difficulty of the
+> situation without the use of offensive language.
 > 
-> So I believe its needed, concurrent update of ->status is possible and
-> KCSAN would warn.  Other spots either use READ_ONCE or use test_bit().
+> Signed-off-by: “mystery” <929916200@qq.com>
 
-There are a more checks for ct->status & NAT_MASK in the tree that I
-can see, if you are correct, then maybe a new helper function to check
-for NAT_MASK is needed.
+Sorry, but this signed-off is not valid:
 
-Anyway, as for this patch, READ_ONCE should not harm.
+https://docs.kernel.org/process/submitting-patches.html
+
+says:
+
+Signed-off-by: Random J Developer <random@developer.example.org>
+
+using a known identity (sorry, no anonymous contributions.)
+
+Please resubmit using a real identity. Please also take a read of:
+
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+
+
+    Andrew
+
+---
+pw-bot: cr
 
