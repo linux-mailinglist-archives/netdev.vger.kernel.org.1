@@ -1,96 +1,196 @@
-Return-Path: <netdev+bounces-217777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A451B39CE4
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 14:20:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15C6EB39CCC
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 14:19:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48B65563927
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 12:18:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 792351C82B84
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 12:19:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27B44311597;
-	Thu, 28 Aug 2025 12:15:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3559930FF27;
+	Thu, 28 Aug 2025 12:16:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from bregans-0.gladserv.net (bregans-0.gladserv.net [185.128.210.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E85A30F527;
-	Thu, 28 Aug 2025 12:15:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB5C126A0B1;
+	Thu, 28 Aug 2025 12:16:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.128.210.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756383358; cv=none; b=itPrQ98yXxi3krymqpqbIA6nIu5yuLHFGhhq79ERnJVrEMYLNzRi7p/V/nozNCWUO3nljADMH7M5aq66tSRAKOud18FDEI8accuS3Z3Y0vTByMTlF3zNtmkLiP+J2NlA3LPjqRS14vCnae8+ApP6VewRle90LFKIYBXpEerON+c=
+	t=1756383378; cv=none; b=EFjB5MdfYKmSHEhPuhK6kj+uS1lmyUbkw3oag6nbJON/mzeAk+RQDDtDIN0fY+5bJRnLRV+peWuvWTmKsRXikn5jtKsKJHU+aP/wL+SuY/Zfff4ijadWU83jhvsfTnPIY3v3O3EtJfVaNsqbf0UJZu/OXmJYaLg70Bkw917gOqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756383358; c=relaxed/simple;
-	bh=Ui9DJi2qLpZzhifbDFhq8XTnW5CLrUk4Ncat0wJVw00=;
+	s=arc-20240116; t=1756383378; c=relaxed/simple;
+	bh=NRr4p5UmjJ61u49YVbocEKwjrCogbDuH0kk3m6hJTFA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fHqwbnau6Z4RV/FU0a4LvE05oP7lIxGbUFvI5Nd6rWdfsW7uOtNnVnFFVe4g60O1jtJRbsd7x/krBFjcahd3bXzi16UPhYJLc2MssfH8ngBFOBvC7iXSBebzvGppDOuytPl12ORe7jVWwnBYzdiOskR6Sr2qjXzA46gt02+zYgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 8A36460298; Thu, 28 Aug 2025 14:15:53 +0200 (CEST)
-Date: Thu, 28 Aug 2025 14:15:53 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Fabian =?iso-8859-1?Q?Bl=E4se?= <fabian@blaese.de>,
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH v3] icmp: fix icmp_ndo_send address translation for reply
- direction
-Message-ID: <aLBIeS4_x7dbrL-j@strlen.de>
-References: <20250825203826.3231093-1-fabian@blaese.de>
- <20250828091435.161962-1-fabian@blaese.de>
- <aLBE2Ee7pUBzUupH@calendula>
+	 Content-Type:Content-Disposition:In-Reply-To; b=RaGUjD/KbBIXtp35u+pnluzmKl26A8qu0nRxvuIxUcCWDsMyf57oiUSxQVzayJD2UB7H6dw4d38OHTezJfZBS9PgwUOHslPsOS1RTp1q2+SQt0KSyk8hVJSEMpvzRwdEhHwBrTBQHE84iuHZSX3dWODd5tZwrl6eAor85P+r7RY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=librecast.net; spf=pass smtp.mailfrom=librecast.net; arc=none smtp.client-ip=185.128.210.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=librecast.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=librecast.net
+Date: Thu, 28 Aug 2025 12:16:07 +0000
+From: Brett A C Sheffield <bacs@librecast.net>
+To: Oscar Maes <oscmaes92@gmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+	davem@davemloft.net, dsahern@kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net v4] selftests: net: add test for destination in
+ broadcast packets
+Message-ID: <aLBIh9HvqtXnUdQz@auntie>
+References: <20250828114242.6433-1-oscmaes92@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aLBE2Ee7pUBzUupH@calendula>
+In-Reply-To: <20250828114242.6433-1-oscmaes92@gmail.com>
 
-Pablo Neira Ayuso <pablo@netfilter.org> wrote:
-> On Thu, Aug 28, 2025 at 11:14:35AM +0200, Fabian Bläse wrote:
-> > The icmp_ndo_send function was originally introduced to ensure proper
-> > rate limiting when icmp_send is called by a network device driver,
-> > where the packet's source address may have already been transformed
-> > by SNAT.
-> > 
-> > However, the original implementation only considers the
-> > IP_CT_DIR_ORIGINAL direction for SNAT and always replaced the packet's
-> > source address with that of the original-direction tuple. This causes
-> > two problems:
-> > 
-> > 1. For SNAT:
-> >    Reply-direction packets were incorrectly translated using the source
-> >    address of the CT original direction, even though no translation is
-> >    required.
-> > 
-> > 2. For DNAT:
-> >    Reply-direction packets were not handled at all. In DNAT, the original
-> >    direction's destination is translated. Therefore, in the reply
-> >    direction the source address must be set to the reply-direction
-> >    source, so rate limiting works as intended.
-> > 
-> > Fix this by using the connection direction to select the correct tuple
-> > for source address translation, and adjust the pre-checks to handle
-> > reply-direction packets in case of DNAT.
-> > 
-> > Additionally, wrap the `ct->status` access in READ_ONCE(). This avoids
-> > possible KCSAN reports about concurrent updates to `ct->status`.
+On 2025-08-28 13:42, Oscar Maes wrote:
+> Add test to check the broadcast ethernet destination field is set
+> correctly.
 > 
-> I think such concurrent update cannot not happen, NAT bits are only
-> set for the first packet of a connection, which sets up the nat
-> configuration, so READ_ONCE() can go away.
+> This test sends a broadcast ping, captures it using tcpdump and
+> ensures that all bits of the 6 octet ethernet destination address
+> are correctly set by examining the output capture file.
+> 
+> Signed-off-by: Oscar Maes <oscmaes92@gmail.com>
+> Co-authored-by: Brett A C Sheffield <bacs@librecast.net>
+> ---
+> v3 -> v4:
+>  - Added Brett as co-author
+>  - Wait for tcpdump to bind using slowwait
 
-Yes, the NAT bits stay in place but not other flags in ->status, e.g.
-DYING, ASSURED, etc.
+Thanks Oscar.
 
-So I believe its needed, concurrent update of ->status is possible and
-KCSAN would warn.  Other spots either use READ_ONCE or use test_bit().
+I've tested the v4 selftest on a kernel with the regression and one without and
+it looks good.
+
+6.17.0-rc3
+Testing ethernet broadcast destination
+[FAIL] expected dst ether addr to be ff:ff:ff:ff:ff:ff, got 00:11:22:33:44:55
+
+6.17.0-rc3-00002-g329af5eb13d7 (with v3 patch applied)
+Testing ethernet broadcast destination
+[ OK ]
+
+> Links:
+>  - Discussion: https://lore.kernel.org/netdev/20250822165231.4353-4-bacs@librecast.net/
+>  - Previous version: https://lore.kernel.org/netdev/20250827062322.4807-2-oscmaes92@gmail.com/
+> 
+> Thanks to Brett Sheffield for writing the initial version of this
+> selftest!
+> 
+>  tools/testing/selftests/net/Makefile          |  1 +
+>  .../selftests/net/broadcast_ether_dst.sh      | 83 +++++++++++++++++++
+>  2 files changed, 84 insertions(+)
+>  create mode 100755 tools/testing/selftests/net/broadcast_ether_dst.sh
+> 
+> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+> index b31a71f2b372..56ad10ea6628 100644
+> --- a/tools/testing/selftests/net/Makefile
+> +++ b/tools/testing/selftests/net/Makefile
+> @@ -115,6 +115,7 @@ TEST_PROGS += skf_net_off.sh
+>  TEST_GEN_FILES += skf_net_off
+>  TEST_GEN_FILES += tfo
+>  TEST_PROGS += tfo_passive.sh
+> +TEST_PROGS += broadcast_ether_dst.sh
+>  TEST_PROGS += broadcast_pmtu.sh
+>  TEST_PROGS += ipv6_force_forwarding.sh
+>  
+> diff --git a/tools/testing/selftests/net/broadcast_ether_dst.sh b/tools/testing/selftests/net/broadcast_ether_dst.sh
+> new file mode 100755
+> index 000000000000..334a7eca8a80
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/broadcast_ether_dst.sh
+> @@ -0,0 +1,83 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0
+> +#
+> +# Author: Brett A C Sheffield <bacs@librecast.net>
+> +# Author: Oscar Maes <oscmaes92@gmail.com>
+> +#
+> +# Ensure destination ethernet field is correctly set for
+> +# broadcast packets
+> +
+> +source lib.sh
+> +
+> +CLIENT_IP4="192.168.0.1"
+> +GW_IP4="192.168.0.2"
+> +
+> +setup() {
+> +	setup_ns CLIENT_NS SERVER_NS
+> +
+> +	ip -net "${SERVER_NS}" link add link1 type veth \
+> +		peer name link0 netns "${CLIENT_NS}"
+> +
+> +	ip -net "${CLIENT_NS}" link set link0 up
+> +	ip -net "${CLIENT_NS}" addr add "${CLIENT_IP4}"/24 dev link0
+> +
+> +	ip -net "${SERVER_NS}" link set link1 up
+> +
+> +	ip -net "${CLIENT_NS}" route add default via "${GW_IP4}"
+> +	ip netns exec "${CLIENT_NS}" arp -s "${GW_IP4}" 00:11:22:33:44:55
+> +}
+> +
+> +cleanup() {
+> +	rm -f "${CAPFILE}" "${OUTPUT}"
+> +	ip -net "${SERVER_NS}" link del link1
+> +	cleanup_ns "${CLIENT_NS}" "${SERVER_NS}"
+> +}
+> +
+> +test_broadcast_ether_dst() {
+> +	local rc=0
+> +	CAPFILE=$(mktemp -u cap.XXXXXXXXXX)
+> +	OUTPUT=$(mktemp -u out.XXXXXXXXXX)
+> +
+> +	echo "Testing ethernet broadcast destination"
+> +
+> +	# start tcpdump listening for icmp
+> +	# tcpdump will exit after receiving a single packet
+> +	# timeout will kill tcpdump if it is still running after 2s
+> +	timeout 2s ip netns exec "${CLIENT_NS}" \
+> +		tcpdump -i link0 -c 1 -w "${CAPFILE}" icmp &> "${OUTPUT}" &
+> +	pid=$!
+> +	slowwait 1 grep -qs "listening" "${OUTPUT}"
+> +
+> +	# send broadcast ping
+> +	ip netns exec "${CLIENT_NS}" \
+> +		ping -W0.01 -c1 -b 255.255.255.255 &> /dev/null
+> +
+> +	# wait for tcpdump for exit after receiving packet
+> +	wait "${pid}"
+> +
+> +	# compare ethernet destination field to ff:ff:ff:ff:ff:ff
+> +	ether_dst=$(tcpdump -r "${CAPFILE}" -tnne 2>/dev/null | \
+> +			awk '{sub(/,/,"",$3); print $3}')
+> +	if [[ "${ether_dst}" == "ff:ff:ff:ff:ff:ff" ]]; then
+> +		echo "[ OK ]"
+> +		rc="${ksft_pass}"
+> +	else
+> +		echo "[FAIL] expected dst ether addr to be ff:ff:ff:ff:ff:ff," \
+> +			"got ${ether_dst}"
+> +		rc="${ksft_fail}"
+> +	fi
+> +
+> +	return "${rc}"
+> +}
+> +
+> +if [ ! -x "$(command -v tcpdump)" ]; then
+> +	echo "SKIP: Could not run test without tcpdump tool"
+> +	exit "${ksft_skip}"
+> +fi
+> +
+> +trap cleanup EXIT
+> +
+> +setup
+> +test_broadcast_ether_dst
+> +
+> +exit $?
+> -- 
+> 2.39.5
+> 
+> 
 
