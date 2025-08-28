@@ -1,119 +1,79 @@
-Return-Path: <netdev+bounces-217745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 833DCB39AFD
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 13:05:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52CDDB39B04
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 13:07:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D61513BEA91
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 11:05:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87A9D1C26E57
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 11:07:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B1C130C624;
-	Thu, 28 Aug 2025 11:05:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D9zThiN5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69FCC30C61B;
+	Thu, 28 Aug 2025 11:07:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A05030DD1A
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 11:05:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D3931F4CAF
+	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 11:07:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756379124; cv=none; b=BBOIy/b049tA5O+3GoYzaJrQtYRzv51kmyZXGoFXZOzDjpEtDXzGdwqiewGhQOVlxojBsJuTzAJr2Msflz6/+/3VsHaWtq3TuwwxfStMq506wwACZ7JENUZiQSix9Mm/TI9ik+cmH/TfOdRFrSbSiOo3IlTOqo7+JkkRQJeG+m4=
+	t=1756379244; cv=none; b=qxg5qSdo2ZZZB4wI8NIujYZyEfAskSRqs03F9lDc7TASDPGfLCWk9E2VrpKP0xChlYoAdXy2kOr2PUi2x3boKsqofBwYhO/wpphizSszWBheglnG+0Qj+9gfBlRx1WHjOGjqaLAR5f24Fjuvfe8YeFDG4hlt6+ZDdn5clt1v14s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756379124; c=relaxed/simple;
-	bh=TAUsH9qx5Xo7HZQWurliwAGX0byykFNGH5/xaDPAnAg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZSbUGlBIwaGuN+zxe6xnnkUPy9v7/V/Gi6KnDNAMLK2OAeRzp7YDmWl+4onEBMM+yEpwzWzOUpAXF0EiZykd3nR0LgzZ7VgCFix5ZVkPAFX3CZ3FpEgu1pXreKeC0eRWS4pH+ubIDh4me9fcC6E9beNNBOpnxckQQK74jQBy76A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D9zThiN5; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-33679c4bd19so6654691fa.1
-        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 04:05:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756379121; x=1756983921; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=TAUsH9qx5Xo7HZQWurliwAGX0byykFNGH5/xaDPAnAg=;
-        b=D9zThiN5CvyWhSOAXkTsNLbjvHgBmaYN2VOm2aotEJ5v9KaHiO79PizfuAoaFr5i3q
-         wgGAAt6itCrxtlVWHTpuoLaCKgxYrk0hFPnr061X8YyXx1Ma7yteboceDByDPNW4hnOI
-         lY95iXFrfpYrUrrVcFKvhl+x9MQsQZ8My9oK54/cyAcW29/Lw1i8Q+kugZkeuk9nCyMV
-         260qQzfkVL6Bs489EIx/kj2aiJNaI6mrUYg8R3onYuHZOqZfnDl4HBy+b7w9G/GDh8Nd
-         70/0RHwwworlBfGAok6w9ZH6JROeJxuwTMRxlVvoIxO8J/mtabP7wK20Vp80jJVmIuxO
-         IMtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756379121; x=1756983921;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TAUsH9qx5Xo7HZQWurliwAGX0byykFNGH5/xaDPAnAg=;
-        b=BcBeK0uGLbdkjRk0qtp1QlfhBfblxFG9qYevzOVIFCnQpUoLv/X22Z7cFw3Xzwglcr
-         rB1zStf4TxQhgQPDh5ADrR8ZPEwbzD/f87vnaslirmlVwKf46Qb2hQCSna4LcsdaaLEm
-         5JSNkzVG+pnL5xg5T08/zlg12+x6HYMCmCVcM+WPR/2WYEqqfH2ue95kHPGhhezSCLZA
-         M6qHb4daCR950uyAQpDw/diYq0uVkio1znToieIF8Nkb7xB/iwk24JpQYehcD+r6FMyP
-         GOsywDLQMx2iWsi7O0RieHDOgty9w6X8GNVyP72Hk3pHwsgLj0eFfIagnQGpPQonExbG
-         TC9A==
-X-Forwarded-Encrypted: i=1; AJvYcCXFZRDHNJrn//wLnLVTujIy/uQd3Keb6oYQ9D0wCbbunzDpQhYxGcWgIc+tNUftWjHmCAKGI+c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwdxbfOwMlqwvPxE19spoLF0uDiG2qUVxFg+Teh81HaiwqpAbOZ
-	fLM2GiXEMSWclUBlXTv2nvpR9jV9e798ELrfOJ+loYAvIc4ae3JP6b3GDgO0+QCEdYQFUJhlBo0
-	OKvVYv1IpgPPYYvSavkj4tWwf/D3dVLSKpJcSbqdx
-X-Gm-Gg: ASbGncsJoDcFev8ingbCux98PQGo6LG61HEzXlCrUXGQy2ibnE0mANKDmXZGpSBVMZC
-	kxwuLoNZEsoLS6YuzJ1Rsq8qalYZsFQ147GNbVO3dAnQVVpT+p6oBwAroukQb5TSrZtFGHmc/hG
-	n5uT3YRldIkdbLXP7KkTFbUnhG302cU9U1nqTepIVHmMzcd7rqOygqXW6kdux8B116PKsWm1ZWl
-	DtK78sPIjc2WSBXn4xR1435+ocgpnVrHvU9GsecYLg7z61Yp0fk/F0=
-X-Google-Smtp-Source: AGHT+IH2xqkT7Gm8Y8VPKOFZe2CwX6AJnHBKkNuQ1kWl9XzOyZn3Ty6HeFlWouXcagu0nm0WrDp9EEtaTGEu1op7fA0=
-X-Received: by 2002:a05:651c:2359:20b0:336:9adb:75f3 with SMTP id
- 38308e7fff4ca-3369adb788amr8793491fa.38.1756379120964; Thu, 28 Aug 2025
- 04:05:20 -0700 (PDT)
+	s=arc-20240116; t=1756379244; c=relaxed/simple;
+	bh=Nas3Yc0d+xnRKeHP94h5sYkVeRl3KlV0gfHSlr8sc74=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ohhol95OBeW2TjQVuOOfr+htYlYAmrYFk9dOVzf16fEKrGGDiB3kBLfGBoA7rF+27fYqBDPhpjZEsy0AVuzrtcyoqVQYrgO8l3THuJQCPIytuspyqbtdeE2GE6oMf3kv7kwX8qx6NgwEMAiTTl5iVUbQCrarWyNIpyRgx7BClug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 57SB6TST092890;
+	Thu, 28 Aug 2025 20:06:29 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 57SB6TbS092886
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Thu, 28 Aug 2025 20:06:29 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <2a58b0b4-1c67-46d2-9c2a-fce3d26fc846@I-love.SAKURA.ne.jp>
+Date: Thu, 28 Aug 2025 20:06:29 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CANypQFbECe10JE9MKzdU3X7kehVDoHr0kGnQpK1CVMJrg+qJwA@mail.gmail.com>
-In-Reply-To: <CANypQFbECe10JE9MKzdU3X7kehVDoHr0kGnQpK1CVMJrg+qJwA@mail.gmail.com>
-From: Dmitry Vyukov <dvyukov@google.com>
-Date: Thu, 28 Aug 2025 13:05:07 +0200
-X-Gm-Features: Ac12FXwwRNf_fseKBhowipW4TPj-BQ0S2f9JAeNpAbDYk4E0hs940usVGesVMUU
-Message-ID: <CACT4Y+YLTF0bG6yJABOXg7zZt+1nV6ajHLJxSWzazSk2sH=tfA@mail.gmail.com>
-Subject: Re: [Linux Kernle Bug] INFO: rcu detected stall in e1000_watchdog
-To: Jiaming Zhang <r772577952@gmail.com>
-Cc: "anthony.l.nguyen@intel.com" <anthony.l.nguyen@intel.com>, davem@davemloft.net, 
-	intel-wired-lan@lists.osuosl.org, jesse.brandeburg@intel.com, kuba@kernel.org, 
-	netdev@vger.kernel.org, security@kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [syzbot] [net?] WARNING in xfrm_state_fini (3)
+To: Sabrina Dubroca <sd@queasysnail.net>,
+        Steffen Klassert <steffen.klassert@secunet.com>
+Cc: syzbot <syzbot+6641a61fe0e2e89ae8c5@syzkaller.appspotmail.com>,
+        davem@davemloft.net, edumazet@google.com, herbert@gondor.apana.org.au,
+        horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, pabeni@redhat.com,
+        syzkaller-bugs@googlegroups.com
+References: <6888736f.a00a0220.b12ec.00ca.GAE@google.com>
+ <aIiqAjZzjl7uNeSb@gauss3.secunet.de> <aIisBdRAM2vZ_VCW@krikkit>
+Content-Language: en-US
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <aIisBdRAM2vZ_VCW@krikkit>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav405.rs.sakura.ne.jp
+X-Virus-Status: clean
 
-On Thu, 28 Aug 2025 at 12:40, Jiaming Zhang <r772577952@gmail.com> wrote:
->
-> Dear Linux kernel developers and maintainers:
->
-> We are writing to report a kernel bug discovered with our modified
-> version of syzkaller.
->
-> The bug was initially found in Linux kernel v5.15.189 (commit
-> c79648372d02944bf4a54d87e3901db05d0ac82e). We have attached the
-> .config file and symbolized crash report for your reference.
->
-> Unfortunately, we do not have a reliable reproducer at this time. We
-> are actively analyzing the root cause and working to create a
-> consistent reproducer, which we will share as soon as it is available.
->
-> Please let us know if you need any further information.
->
-> Best regards,
-> Jiaming Zhang
+syzbot is still hitting this problem. Please check.
 
-Hi Jiaming,
-
-This is likely to be a false positive. We found the default kernel
-timeouts are not really suitable for fuzzing. Consider using the
-official syzkaller-recommended configs with proper tuning for fuzzing.
-
-Additionally, v5.15 is extremely old. Check out:
-https://github.com/google/syzkaller/blob/master/docs/linux/reporting_kernel_bugs.md
+On 2025/07/29 20:09, Sabrina Dubroca wrote:
+>> Hi Sabrina, your recent ipcomp patches seem to trigger this issue.
+>> At least reverting them make it go away. Can you please look
+>> into this?
+> 
+> I haven't looked at the other reports yet, but this one seems to be a
+> stupid mistake in my revert patch. With these changes, the syzbot
+> repro stops splatting here:
 
