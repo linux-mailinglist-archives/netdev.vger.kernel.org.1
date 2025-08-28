@@ -1,183 +1,116 @@
-Return-Path: <netdev+bounces-217619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E698B394C6
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 09:11:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B7FAB394C4
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 09:11:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55F506855A3
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 07:11:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 063775E4F53
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 07:11:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D94D52EB85E;
-	Thu, 28 Aug 2025 07:09:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39E812E9EAD;
+	Thu, 28 Aug 2025 07:09:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="vrC87pxx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="f1Z4dyhz"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C95E32ED141;
-	Thu, 28 Aug 2025 07:09:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96F732E3709
+	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 07:09:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756364984; cv=none; b=r4l/HkptwptWXeBBsOfnRX/e4P5f3+66YjoNbUx5qYfZpsaOkZO9Vam+piNqohhjT5pWN34a0FQR3S5yklhHnvaoouF/QZZDwuBr8wt9uwqStYtw1vrNxGRchWC44WV28uHv+4eGmxPHTAKqM8U+Yj/0uHkSKnmHf+1zzL0O300=
+	t=1756364979; cv=none; b=CGE9QLigdmlkerNQYmcaBWlKuTRw7T0UmNO7WVRbiftZmSRzXwLSd8yNHhiclPxEJEPsOlNbjh6v4ksDkmh2fi3hoDAoeOylB8Gnp3wWO2MWfPNlyQBRkVVmaav48CrBDchF/oQkPZmAH0tA42sN/eJMoUq5prxvGEgA2rXxSDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756364984; c=relaxed/simple;
-	bh=SPpp1RH7FHS64BgwJSfDV6et5//09GHoAwf6X9+I1DE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Abz8pDUG0x7mzoN1Y83+ugiZPmTn5PcOAT0Yw0kH1TfyufHNNJxzOTC/NccwNdM2nyCup6MZnrzwmZz8/K9nzx5x7n7eezadUSVvgzsNhxUj4a2wZKeNo4LGLJYdPtXpBh5oAD6x79SfinmKrUpPP9cNriL7CPbW0E7QJVKhOUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=vrC87pxx; arc=none smtp.client-ip=198.47.23.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelvem-sh01.itg.ti.com ([10.180.77.71])
-	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTP id 57S78ocR1469076;
-	Thu, 28 Aug 2025 02:08:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1756364930;
-	bh=ihg1BqVIXwVeX9/5XhJYutDohKn1RcCO31Zmkb28TWc=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=vrC87pxxwnmX9RRUWlyB+u8ioWabgUci7PEOqwdSoGj0irRa8c/0JtiI+yVNgUh0/
-	 YGX8K+ShW9zZVi0OUwNGG9g9F97Ihp5HHxTjRXl020k7MwXfY3/7F8uxDmb7IjyIf6
-	 aXsl/3I7QOJ973cI8RD2HXZXzxo/Z+X6/B9++OAI=
-Received: from DLEE105.ent.ti.com (dlee105.ent.ti.com [157.170.170.35])
-	by lelvem-sh01.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 57S78od32715100
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Thu, 28 Aug 2025 02:08:50 -0500
-Received: from DLEE111.ent.ti.com (157.170.170.22) by DLEE105.ent.ti.com
- (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Thu, 28
- Aug 2025 02:08:50 -0500
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE111.ent.ti.com
- (157.170.170.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
- Frontend Transport; Thu, 28 Aug 2025 02:08:50 -0500
-Received: from [172.24.231.152] (danish-tpc.dhcp.ti.com [172.24.231.152])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 57S78hLu209555;
-	Thu, 28 Aug 2025 02:08:44 -0500
-Message-ID: <da2a0a37-8334-477a-8468-c4baebadf6df@ti.com>
-Date: Thu, 28 Aug 2025 12:38:43 +0530
+	s=arc-20240116; t=1756364979; c=relaxed/simple;
+	bh=lURPkYJzF21xY2QquL/oWnteDlCb4vfGHfOnzqSwApQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EOoMM6VY0o3ZVX4bxOvwZP/2vnor1CniDRCTJXocvjVENAh16PLIYsjVHZzB/qW0Mg9Jn8sguY24w6WBnBNPA5K2yitHJ998AF8JdtfKZiswyoDe3cpj1U4duZO6tyf5yez1yfILQUC79norXmy0urijJyfjFTuUKZk1/tO8WQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=f1Z4dyhz; arc=none smtp.client-ip=209.85.222.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7f77c66f13bso70669185a.0
+        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 00:09:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756364976; x=1756969776; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Jvs5njM1wOnHzJ4hzbLuwCvVNmJOa7dYI9qPuTJeAVg=;
+        b=f1Z4dyhzXv5ADmSboyQ7Wn+9L+xknDiw6NrUHNrkgDKKxereJq9Muvz0qnM+gJQq76
+         0DaXprhdL/kruFypknzsyO9mbeL2jFhrhQfdqAzzZJgQvc5nah9e2LZRXpYeevQZJCb2
+         QiU0jclssmi4nlrMb9umZUJrv/k3WNPvNfvvLCfRC4P3GdZ6AiTV3YYSjzqcaDnccUvN
+         CGV8BP1git/TrFlAgUF1a1HUbCNGL8OcYXvlJ7LZ4T1jXraKQcTnshZLz2tZJ8/4RU5R
+         k9uljz/G/qCAkWcZnXhdJvgV9GEl8M+YY9HAD4gcGHfKsSA+WIwc3iNg8KJlhPS4AAUe
+         MwDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756364976; x=1756969776;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Jvs5njM1wOnHzJ4hzbLuwCvVNmJOa7dYI9qPuTJeAVg=;
+        b=TFUTMhxkLtZ/ydAtyAEPZK0cOMHyO2X+qzLtEoVAoIHkTmiAXEhioIXCW2/Tdc1GWG
+         7I6QSq+c3DhCRPCZg156FHd3DfbYjM4qZc9LzI6uTZ6pfzSJC/cKEWQFb2p6w0m+VsLF
+         Ql1SfLX4mOxqmey9p4fNgRULrA+R5Qh9/9jf9TYrkrEMmburPbkN8/k/1VX8uIfQnSpd
+         aZylhop4QY7A9xmTJhrxy8+M8F2I/rh8Yb1ELNlz8+RqZiBYpd1ZgSZxSawhJ2mZmGXx
+         vFr9Fx+urIBhpFiOamrsMz3eKknT0UaB/f8caHKIVVJZBx1+dafDI7OkHhhk88HFLVhR
+         ZZcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWHCbqLE97HhRbrS7gQA/Z1kFMJBHYi9Z7QMj58TqeXptl3J7Re7yfkhnix2hS6wMV9fUWFBfU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZ7DWVymLDQcljBRXzhp0EzAkvuINCQfC9voCAYuhbNMAd23vm
+	gDmWFJRiYDMYO3L83M9r3+AMPyG1Z/gxIQ5CnL4tmCZtoP7TF2MJAqkCM6aeyUZVg1sHpbPKq33
+	vvJyZBnpy9R/el1RdnEAcCsviNIQ3mBc35ipzAlBH
+X-Gm-Gg: ASbGncsG2x4T0378CfCzZLGYOUbtf1V6D5Hva5AmiMqVjZRMA040/Qwj1uHKldCiySc
+	y2AB5fwRkgCyoEDsIS0AMc45GX+m2ScC8jxj256AtbjP+Mjr5i4ywJga7/XVgP0oznhWtAoAYfG
+	bCEdX0pBUb8Q/5pag8FaelsOOILQWcu0s8v1/JCjhwpN95tby58mOPeRLlBte9VwC7PuEZFenhE
+	D6/csrapEBHx/5RsmqwHg==
+X-Google-Smtp-Source: AGHT+IHxSqNH/ftHbBJ+fPHtJwYAGqsLTp8xOivDx1VKWMe0sNYk7sTPD/n4Agil+b9tyPi+N2/KpIicDTDhJp0h0hI=
+X-Received: by 2002:a05:620a:1a27:b0:7d2:1953:a410 with SMTP id
+ af79cd13be357-7ea10fa1344mr2611829885a.17.1756364976094; Thu, 28 Aug 2025
+ 00:09:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/5] net: rpmsg-eth: Add Documentation for
- RPMSG-ETH Driver
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Jonathan Corbet
-	<corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
-        Mengyuan Lou
-	<mengyuanlou@net-swift.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Madhavan
- Srinivasan <maddy@linux.ibm.com>,
-        Fan Gong <gongfan1@huawei.com>, Lee Trager
-	<lee@trager.us>,
-        Lorenzo Bianconi <lorenzo@kernel.org>,
-        Geert Uytterhoeven
-	<geert+renesas@glider.be>,
-        Lukas Bulwahn <lukas.bulwahn@redhat.com>,
-        Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
-        <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20250723080322.3047826-1-danishanwar@ti.com>
- <20250723080322.3047826-2-danishanwar@ti.com>
- <81273487-a450-4b28-abcc-c97273ca7b32@lunn.ch>
- <b61181e5-0872-402c-b91b-3626302deaeb@ti.com>
- <0a002a5b-9f1a-4972-8e1c-fa9244cec180@lunn.ch>
-Content-Language: en-US
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <0a002a5b-9f1a-4972-8e1c-fa9244cec180@lunn.ch>
+References: <20250828012018.15922-1-dqfext@gmail.com> <20250828012018.15922-2-dqfext@gmail.com>
+In-Reply-To: <20250828012018.15922-2-dqfext@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 28 Aug 2025 00:09:24 -0700
+X-Gm-Features: Ac12FXzCOHbY-0cZG_DPV4Isb0S8nmhFOKMxM0fnoaIGHxRJ38be9HGtCcgGyWA
+Message-ID: <CANn89iJ7DDA4gM2vDAwhOyc5KGXPmOBGATMQfXD8FHUAFbVDvQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 2/2] pppoe: drop sock reference counting on
+ fast path
+To: Qingfang Deng <dqfext@gmail.com>
+Cc: Michal Ostrowski <mostrows@earthlink.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Aug 27, 2025 at 6:20=E2=80=AFPM Qingfang Deng <dqfext@gmail.com> wr=
+ote:
+>
+> Now that PPPoE sockets are freed via RCU (SOCK_RCU_FREE), it is no longer
+> necessary to take a reference count when looking up sockets on the receiv=
+e
+> path. Readers are protected by RCU, so the socket memory remains valid
+> until after a grace period.
+>
+> Convert fast-path lookups to avoid refcounting:
+>  - Replace get_item() and sk_receive_skb() in pppoe_rcv() with
+>    __get_item() and __sk_receive_skb().
+>  - Rework get_item_by_addr() into __get_item_by_addr() (no refcount and
+>    move RCU lock into pppoe_ioctl)
+>  - Remove unnecessary sock_put() calls.
+>
+> This avoids cacheline bouncing from atomic reference counting and improve=
+s
+> performance on the receive fast path.
+>
+> Signed-off-by: Qingfang Deng <dqfext@gmail.com>
 
-
-On 24/07/25 10:07 pm, Andrew Lunn wrote:
->> Linux first send a rpmsg request with msg type = RPMSG_ETH_REQ_SHM_INFO
->> i.e. requesting for the shared memory info.
->>
->> Once firmware recieves this request it sends response with below fields,
->>
->> 	num_pkt_bufs, buff_slot_size, base_addr, tx_offset, rx_offset
->>
->> In the device tree, while reserving the shared memory for rpmsg_eth
->> driver, the base address and the size of the shared memory block is
->> mentioned. I have mentioned that in the documentation as well
-> 
-> If it is in device tree, why should Linux ask for the base address and
-> length? That just seems like a source of errors, and added complexity.
-> 
-> In general, we just trust DT. It is a source of truth. So i would
-> delete all this backwards and forwards and just use the values from
-> DT. Just check the magic numbers are in place.
-> 
-
-Sure. I will make this change in v2.
-
->> The same `base_addr` is used by firmware for the shared memory. During
->> the rpmsg callback, firmware shares this `base_addr` and during
->> rpmsg_eth_validate_handshake() driver checks if the base_addr shared by
->> firmware is same as the one described in DT or not. Driver only proceeds
->> if it's same.
-> 
-> So there is a big assumption here. That both are sharing the same MMU,
-> or maybe IOMMU. Or both CPUs have configured their MMU/IOMMU so that
-> the pages appear at the same physical address. I think this is a
-> problem, and the design should avoid anything which makes this
-> assumptions. The data structures within the share memory should only
-> refer to offsets from the base of the shared memory, not absolute
-> values. Or an index into the table of buffers, 0..N.
-> 
->>>> +2. **HEAD Pointer**:
->>>> +
->>>> +   - Tracks the start of the buffer for packet transmission or reception.
->>>> +   - Updated by the producer (host or remote processor) after writing a packet.
->>>
->>> Is this a pointer, or an offset from the base address? Pointers get
->>> messy when you have multiple address spaces involved. An offset is
->>> simpler to work with. Given that the buffers are fixed size, it could
->>> even be an index.
->>>
->>
->> Below are the structure definitions.
->>
->> struct rpmsg_eth_shared_mem {
->> 	struct rpmsg_eth_shm_index *head;
->> 	struct rpmsg_eth_shm_buf *buf;
->> 	struct rpmsg_eth_shm_index *tail;
->> } __packed;
->>
->> struct rpmsg_eth_shm_index {
->> 	u32 magic_num;
->> 	u32 index;
->> }  __packed;
-> 
-> So index is the index into the array of fixed size buffers. That is
-> fine, it is not a pointer, so you don't need to worry about address
-> spaces. However, head and tail are pointers, so for those you do need
-> to worry about address spaces. But why do you even need them? Just put
-> the indexes directly into rpmsg_eth_shared_mem. The four index values
-> can be in the first few words of the shared memory, fixed offset from
-> the beginning, KISS.
-> 
-
-I will drop all these pointers and use a offset based approach in v2.
-
-Thanks for the feedback.
-
--- 
-Thanks and Regards,
-Danish
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
