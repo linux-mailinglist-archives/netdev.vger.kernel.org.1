@@ -1,80 +1,86 @@
-Return-Path: <netdev+bounces-218014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 982D5B3AD53
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 00:14:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC692B3AD55
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 00:16:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60228169D54
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 22:14:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1414F1C86AF3
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 22:16:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 665BC225D6;
-	Thu, 28 Aug 2025 22:14:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11C641E1DF2;
+	Thu, 28 Aug 2025 22:15:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O1D0pW2D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uArQ2skT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 423DA13FEE
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 22:14:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0581865FA;
+	Thu, 28 Aug 2025 22:15:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756419254; cv=none; b=UD5lemKlfTghxABI5uSqrlWRYUW0xU+6Bk/Fwk8XM0GJzt7eNPV7N2PO3OYl5/y/XkARq4OXCk4pc+E7oHm3DdPg6lU2i3zRKI80FivJTWw6Pe/yNYGcydTpLaCroX0Q2BNsJ9wQPGaBdAcHoIwFVpwQhxskd611QVSxNvMdVBE=
+	t=1756419357; cv=none; b=exnjWJcLN61rlDB3xoF2BbCbpcuAHYYLFdNYbZanIUcps8yAXuomeckZhQCVkdktjbdlhz2L0EtLQiATzccJNaExB56O7XW4MlMhhPX8lrVsTtTJwIObt/8vbf/6F2QWeYsqDwSf+jBw8VvEZdL3iY112DbhPktI1LGlmamLhgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756419254; c=relaxed/simple;
-	bh=XhGPQ1zR3OXLANmY/FYbv/frm65hs7wHjfXyuvSQqSM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZKDZ+s0faSY36mmrbn2j9h4vuFEuGVOuYY9LMBhHnM7CLVIu2rQOLfw0SluqY+0dhcuWbPsvMaNiF1zHgV6L3HLBYVBefK7Qoc1ZOLATwdfNjrA/+UXYuSMosujTnxyKN6hR80laeJZNqY1gLKW1nlpdKQWP7lNzYHdSd/Ks2bo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O1D0pW2D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 572BEC4CEEB;
-	Thu, 28 Aug 2025 22:14:12 +0000 (UTC)
+	s=arc-20240116; t=1756419357; c=relaxed/simple;
+	bh=WpjLgVnsW84gTkX+v9HgvEo3Xva+iZRMWjbkkTzhEe0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WJDonPGJ4HROuaUpFF42mdhZPBFZhDdW8Ih0fxiPWR7ZM7D9VL+09zYFhf2P4YZE22rcAdTRZMIPOE7/jTW71XYyQiwkccDLgTZb7AxR5QSTRG9fNBHVHhRd/p54r2hYORYx29vANpeOrMcVAokLKZRFCzhQu7T94ga2d418DV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uArQ2skT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAF4AC4CEEB;
+	Thu, 28 Aug 2025 22:15:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756419252;
-	bh=XhGPQ1zR3OXLANmY/FYbv/frm65hs7wHjfXyuvSQqSM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=O1D0pW2DF7dgNquxu8uRIA8m4dOwruiunWbZy/YRn3Yo+vdieHNqcD+Fur3Iqg4F9
-	 13Ga/ZU2F1A2OZXmKHNCc5FtKNDRwHyio/cTYyH+FaZBuKPcUr8PeTl2usAXV25ead
-	 odIxb25Pb1tYzON2RetP5rMUcCeUSBK1bgZHGPOOOnjFGpKlBwycf+iyki05pbTGqh
-	 yuFqBvh7tFMT4BXc+5xLnbjTD3zIqkqoj0ydp/YmQJJ2oAOAXhVn6prpcxhx8pC7iW
-	 OhRLNU7UcuICu3Y4eK+sIIul5WQqLhC1CJWYdMyaabrCsN2qmtt86xxpZ75DzrgHzN
-	 owVmpHdPOutVg==
-Message-ID: <3f2444f2-c339-4542-8be8-fc1d09051265@kernel.org>
-Date: Thu, 28 Aug 2025 16:14:11 -0600
+	s=k20201202; t=1756419356;
+	bh=WpjLgVnsW84gTkX+v9HgvEo3Xva+iZRMWjbkkTzhEe0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uArQ2skTkRGixjydGSnYvA6T0Q4xxXLOVGitNzRJBAcdq5Cg3HUevLJW35+g19o3Y
+	 0QXPuoOOCo3MzBkqdbDBg9xZsl3o1rIr8DfDuX61nyyer2wCMx3zSGMHDyFZV90XEw
+	 o+FeorayiX7OcQzoKPIkomJ4HxKGgkbTCGbz6CKMWYCxDgSc8FwNu1Hi8WixMfp1mT
+	 7hQGF3t//GTEcmFisDRiziZLDiUrErBaLIt4l2ClwVGskz5odHwXP0+JSErQTWB+F3
+	 9AF1l/HiNXUP0f4qO+plAiTcWGFQEy1zzk3hRoGAQeXZCl9eAFjYQr6q8zVv9ejJa1
+	 E/1BJgWKzmiDQ==
+Date: Thu, 28 Aug 2025 15:15:54 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, kernel@pengutronix.de, Dent Project
+ <dentproject@linuxfoundation.org>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Kyle Swenson <kyle.swenson@est.tech>
+Subject: Re: [PATCH net-next 2/2] net: pse-pd: pd692x0: Add sysfs interface
+ for configuration save/reset
+Message-ID: <20250828151554.7be363a7@kernel.org>
+In-Reply-To: <20250828132901.76e00334@kmaincent-XPS-13-7390>
+References: <20250822-feature_poe_permanent_conf-v1-0-dcd41290254d@bootlin.com>
+	<20250822-feature_poe_permanent_conf-v1-2-dcd41290254d@bootlin.com>
+	<d4bc2c95-7e25-4d76-994f-b68f1ead8119@lunn.ch>
+	<20250825104721.28f127a2@kmaincent-XPS-13-7390>
+	<aKwpW-c-nZidEBe0@pengutronix.de>
+	<6317ad1e-7507-4a61-92d0-865c52736b1a@lunn.ch>
+	<20250825151422.4cd1ea72@kernel.org>
+	<20250828132901.76e00334@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 6/8] tcp_metrics: use dst_dev_net_rcu()
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
-References: <20250828195823.3958522-1-edumazet@google.com>
- <20250828195823.3958522-7-edumazet@google.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20250828195823.3958522-7-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 8/28/25 1:58 PM, Eric Dumazet wrote:
-> Replace three dst_dev() with a lockdep enabled helper.
+On Thu, 28 Aug 2025 13:29:01 +0200 Kory Maincent wrote:
+> > Resetting would work either via devlink reload, or ethtool --reset,
+> > don't think we even need any API addition there.  
 > 
-> Fixes: 4a6ce2b6f2ec ("net: introduce a new function dst_dev_put()")
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
->  net/ipv4/tcp_metrics.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
+> Is there no way for NIC to reset their configuration except through ethtool
+> reload?
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
-
-
+Hm, on second thought I'm actually no longer sure if even ethtool or
+devlink are right. I think the expectation may be that ethtool resets
+the underlying HW but doesn't actually lose the configuration.
 
