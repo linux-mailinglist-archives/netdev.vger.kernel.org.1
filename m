@@ -1,505 +1,210 @@
-Return-Path: <netdev+bounces-217636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0D2AB39605
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 09:55:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1D38B39607
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 09:55:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD64C188ED05
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 07:56:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22E71365751
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 07:55:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 647102C2365;
-	Thu, 28 Aug 2025 07:55:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54CA62D7394;
+	Thu, 28 Aug 2025 07:55:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="LrSwYwe0";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="b+JJBEoE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TYhqFu3Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5432773D5;
-	Thu, 28 Aug 2025 07:55:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B112279DC9
+	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 07:55:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756367743; cv=none; b=IRTzw+SZy9/7lFl+xAKfh8Xo7amPch2Nfm4oGEsiGeAlw4MicmkathdYjBMDh8D63/uPUf8HNM3eINzoxdcVn3KTqnG1DlESywHSzeUeNm5Xu8Ju6+RsiHh7ws/juYcwjTPcXzA/Et2gncOQ4ecwAioJlCq8D2YtxEF3IkZr2tQ=
+	t=1756367744; cv=none; b=hclXKyeiGUtHb93A2GnYskfLQ5xjT5LtBHVEXXO4OQVXP0dbv4JLkMSLjZtsKH5DOJTH9Qt9nusiJB5+BDMk82oI57YAgVDFfJgcDFzBFRm2B6Yteq/bg3FqdD726JqPPnLgpzO95Zzdlvu5L0KnBHuAaPpUcUHzzInc2uJQri0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756367743; c=relaxed/simple;
-	bh=dB21VovnO+BqnjAuPsDy6yMgRCa5sL1/EBBYFLHvMBY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aHqvkRiHFpUoTc6sbiC7ZYltaaE47EtatrVW4CWxss4XxfWMgQUMudCdOFVL0H0HGNW2CnqHYdXC0gMI5iMCvfIxBy+nnd0sCjP7mxVxI/CppJFqk2qow+YXAr7iSKwJDK+fesEQeGmgyVuzJqlaB1FB7vH7iNwlANviWlG6q0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=LrSwYwe0; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=b+JJBEoE reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1756367739; x=1787903739;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=5HwiAk4UaJ/0RnREoKOoLiBWJI8eHPDmXvmgOzLgPWo=;
-  b=LrSwYwe0yL6FYd9XaX81GXaL8eA/88ukxXxQxbWzyg812ZcISsoOd/v7
-   FrlLp+2S6skVVUgIqIguOtojNKQUAczMokOS1Qyz0moqYkbrF7nbJtudj
-   1FlxYH7DsBTMN8IZUDsyq0DWKvdQ+0xL1hAbVu3k/pARWAPW911fzAKHb
-   DDyBwAVmygjWnQmxibbW7kxxuTX9VzPSJhPylL4H1meiMBoDoVjtmXiTz
-   4nccTcFLOJCIsmD6qyXsUiYbr3qhz63u9n+9yDpzNzw6lkzqs4b+pUf77
-   ybBf4Sjfhx2GXXNmtmtWeLSeN/wkpxrKIdZxNcB39MIwQTWmOKJjoxIIq
-   Q==;
-X-CSE-ConnectionGUID: DT7/qzjVS322pF82mqZonQ==
-X-CSE-MsgGUID: Nme356ZFScCFBcwqXo/rFQ==
-X-IronPort-AV: E=Sophos;i="6.18,217,1751234400"; 
-   d="scan'208";a="45949455"
-Received: from vmailcow01.tq-net.de ([10.150.86.48])
-  by mx1.tq-group.com with ESMTP; 28 Aug 2025 09:55:28 +0200
-X-CheckPoint: {68B00B70-28-820F521C-C7779E56}
-X-MAIL-CPID: F4DDEA0D02B3B61D9A99DB4722F13A30_4
-X-Control-Analysis: str=0001.0A002109.68B00B0B.0011,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 565541609FD;
-	Thu, 28 Aug 2025 09:55:20 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
-	s=dkim; t=1756367724;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=5HwiAk4UaJ/0RnREoKOoLiBWJI8eHPDmXvmgOzLgPWo=;
-	b=b+JJBEoE5ceAFZwdG8+H/uZU0uJwXkaIxAEoC/nSuaJ+H2jKgPXXwb/8HWJ9tYpaBZdvvZ
-	NV7i4LwG/avXFqtYV6NYxfsbzz18M3kdGrSK9KV3j2pPqyJWzKWcFMgYFJ6SKuLCVQ6Q73
-	00t2CwkBomDcZR0xlOC5UueJobU2N+66yVFdZUqLM0Sr02kk3whP3+woc9laFeKQmcGVGM
-	/YPLcWHyOIhn5sN9SMwsUU8fLFCDXSWbo4JdUYa2IPBWaVmh27QJy95gjhIqxVVPbkLpu5
-	u7d57S7O+Ts6eKFwkvmQPiqs/nt/RxCi49vvt80PQX4oL1nBCHNXdaYE0S9Mvg==
-From: Alexander Stein <alexander.stein@ew.tq-group.com>
-To: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- shawnguo@kernel.org, s.hauer@pengutronix.de, kernel@pengutronix.de,
- festevam@gmail.com, richardcochran@gmail.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
- frieder.schrempf@kontron.de, primoz.fiser@norik.com, othacehe@gnu.org,
- Markus.Niebel@ew.tq-group.com, linux-arm-kernel@lists.infradead.org
-Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux@ew.tq-group.com, netdev@vger.kernel.org, linux-pm@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com, Frank.Li@nxp.com,
- Joy Zou <joy.zou@nxp.com>
-Subject:
- Re: [PATCH v9 1/6] arm64: dts: freescale: move aliases from imx93.dtsi to
- board dts
-Date: Thu, 28 Aug 2025 09:55:18 +0200
-Message-ID: <7849995.EvYhyI6sBW@steina-w>
-Organization: TQ-Systems GmbH
-In-Reply-To: <20250825091223.1378137-2-joy.zou@nxp.com>
-References:
- <20250825091223.1378137-1-joy.zou@nxp.com>
- <20250825091223.1378137-2-joy.zou@nxp.com>
+	s=arc-20240116; t=1756367744; c=relaxed/simple;
+	bh=Pzrdy410GYFzoQ88f4luzAXVOOYmLHKQjra0s06wRzo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CfFfvbdi425u+htdYWiPSMmftMxBXNWuytq+RTEVKwinwa6XvJZmqVMzbR1E8F1LbjYhAb1Q1QfHR7rizV1BzQJm0BGG20JY739uIlSZ0VG3Qbq1Jo2wv+4mh/tIC1rAA4U7n+1IT+IVmv65+KvwBsSykj/tETnP8W/kQEQtIkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TYhqFu3Q; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756367741;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1fkcSVdA9XBsCs2P62KbDoUXMcDrW2XFQyZkew4B5Qo=;
+	b=TYhqFu3QsBkD0Bd3jRmJJFdBayRZJvxO9HHof54C9L3/HIIYgtg9y2cNDVrq3D0TBdlMjR
+	975AKTXsYHM0o5ds6QmWwUaQ/82aThpey5yf15i3o/2lcc5TmxY//vp61ILIAefQ/0WfYH
+	ryvRUPJFMZCy0pHkauh2seh+OzL32cA=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-265-LVq47Y8kMYmF9lrzuiieOQ-1; Thu, 28 Aug 2025 03:55:38 -0400
+X-MC-Unique: LVq47Y8kMYmF9lrzuiieOQ-1
+X-Mimecast-MFC-AGG-ID: LVq47Y8kMYmF9lrzuiieOQ_1756367738
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-70d9a65c170so15182846d6.2
+        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 00:55:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756367738; x=1756972538;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1fkcSVdA9XBsCs2P62KbDoUXMcDrW2XFQyZkew4B5Qo=;
+        b=u6OtRFeEWk4GYbO5g7u4YjsYfRU7FQnQqfZoEvpJRQ35CuH8IBF06V4pQkLZhz+VSk
+         8J43QsxLDHu1O+0w1mOPe2lkxPxzSf5Jo7joMoF4Olvdfotv/LBHr965e5v4AYXWksrQ
+         Yw61ETUzKQgMN0cqWygyOOM/4VQgvgx6bvdDjQnTp1TbuOBddJLsQ2r1PJXCLoKG8AYf
+         Rsms9BgEoMfo/2xZE9mqZcvKf9Lao+eOFKOgKPzcWFE9eR3IhthD4Cwy+KrjeB9CHi7H
+         QT3VbKuo++hf59QnROQlI7UXpjjSNSTgePxedBN5qsegF1hPxeLz8vqUgNEj8Bpl7Fu0
+         PUHw==
+X-Gm-Message-State: AOJu0YydS86uHF4r+n7ZrvrghRjrDCz3/upGFCq0d1qN29bd9YGUIwwc
+	uSYK7qte8wi0W+f3scPCa2SnJ9YzvsS1lgdbz37Vw+CptBR/M0XQE3/WRB4LO/vkRdGblWMmg5c
+	wsHdwsBGvATaYHNs8s7colnbzTp5BZYaMXBWkCJczEiUB+StrqBXEr/XHlg==
+X-Gm-Gg: ASbGnctLn32rtGXa+zBGBMyzUEFOTbRxvLQUn0ROifFbpZvIpbN0Y4uSkd9+b0dmTng
+	/VU5MfNtGBdofkiGsgLyLy4NgVVQ3xZJG5Rzhcy7aPHIDXvdcXdLUawCMUF22smHvp+cyOtvmq5
+	sSnnuVhzE1Eo//kS5c8nIH6hjiS1Twf5u8JfLdYlayeQfe958TI2AwCE06IGtQh6Sw76CvLOKDK
+	plUlqH17uRWcxlfvbKLknODLTBec6oFzIAHUWR7mAlp61lYTi6RtXOzH96fCpJM25rXgZMzTCHT
+	M9yBqSSKiBT65wyEHZFnw4hsMVZRQpWUGE0ohHbQmWpJsu+87ot7KudLwUmlWIpRzC2fb5PmjXL
+	J89icxbywhSA=
+X-Received: by 2002:a05:6214:ac5:b0:70d:e9af:95ae with SMTP id 6a1803df08f44-70de9af9974mr50182396d6.31.1756367738328;
+        Thu, 28 Aug 2025 00:55:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEfKy5hXx/jY25tTPr/gyo7+HDQNAY7R5HQK9VLODuVgUt09GXhGiw1DqeyVmS8ZmvuipbSnQ==
+X-Received: by 2002:a05:6214:ac5:b0:70d:e9af:95ae with SMTP id 6a1803df08f44-70de9af9974mr50182196d6.31.1756367737922;
+        Thu, 28 Aug 2025 00:55:37 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70da6f96ca7sm100941916d6.0.2025.08.28.00.55.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Aug 2025 00:55:37 -0700 (PDT)
+Message-ID: <1d3ba6ba-5c1e-4d3f-980a-8ad75101f04d@redhat.com>
+Date: Thu, 28 Aug 2025 09:55:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
-X-Last-TLS-Session-Version: TLSv1.3
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] net/cls_cgroup: Fix task_get_classid() during qdisc
+ run
+To: Yafang Shao <laoar.shao@gmail.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, horms@kernel.org,
+ daniel@iogearbox.net, bigeasy@linutronix.de, tgraf@suug.ch,
+ paulmck@kernel.org
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org
+References: <20250822064200.38149-1-laoar.shao@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250822064200.38149-1-laoar.shao@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi,
-
-Am Montag, 25. August 2025, 11:12:18 CEST schrieb Joy Zou:
-> The aliases is board level property rather than soc property, so move
-> these to each boards.
->=20
-> Reviewed-by: Frank Li <Frank.Li@nxp.com>
-> Signed-off-by: Joy Zou <joy.zou@nxp.com>
-
-Reviewed-by: Alexander Stein <alexander.stein@ew.tq-group.com> # imx93-tqma=
-9352
-
+On 8/22/25 8:42 AM, Yafang Shao wrote:
+> During recent testing with the netem qdisc to inject delays into TCP
+> traffic, we observed that our CLS BPF program failed to function correctly
+> due to incorrect classid retrieval from task_get_classid(). The issue
+> manifests in the following call stack:
+> 
+>         bpf_get_cgroup_classid+5
+>         cls_bpf_classify+507
+>         __tcf_classify+90
+>         tcf_classify+217
+>         __dev_queue_xmit+798
+>         bond_dev_queue_xmit+43
+>         __bond_start_xmit+211
+>         bond_start_xmit+70
+>         dev_hard_start_xmit+142
+>         sch_direct_xmit+161
+>         __qdisc_run+102             <<<<< Issue location
+>         __dev_xmit_skb+1015
+>         __dev_queue_xmit+637
+>         neigh_hh_output+159
+>         ip_finish_output2+461
+>         __ip_finish_output+183
+>         ip_finish_output+41
+>         ip_output+120
+>         ip_local_out+94
+>         __ip_queue_xmit+394
+>         ip_queue_xmit+21
+>         __tcp_transmit_skb+2169
+>         tcp_write_xmit+959
+>         __tcp_push_pending_frames+55
+>         tcp_push+264
+>         tcp_sendmsg_locked+661
+>         tcp_sendmsg+45
+>         inet_sendmsg+67
+>         sock_sendmsg+98
+>         sock_write_iter+147
+>         vfs_write+786
+>         ksys_write+181
+>         __x64_sys_write+25
+>         do_syscall_64+56
+>         entry_SYSCALL_64_after_hwframe+100
+> 
+> The problem occurs when multiple tasks share a single qdisc. In such cases,
+> __qdisc_run() may transmit skbs created by different tasks. Consequently,
+> task_get_classid() retrieves an incorrect classid since it references the
+> current task's context rather than the skb's originating task.
+> 
+> Given that dev_queue_xmit() always executes with bh disabled, we can safely
+> use in_softirq() instead of in_serving_softirq() to properly identify the
+> softirq context and obtain the correct classid.
+> 
+> The simple steps to reproduce this issue:
+> 1. Add network delay to the network interface:
+>   such as: tc qdisc add dev bond0 root netem delay 1.5ms
+> 2. Create two distinct net_cls cgroups, each running a network-intensive task
+> 3. Initiate parallel TCP streams from both tasks to external servers.
+> 
+> Under this specific condition, the issue reliably occurs. The kernel
+> eventually dequeues an SKB that originated from Task-A while executing in
+> the context of Task-B.
+> 
+> Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
+> Cc: Daniel Borkmann <daniel@iogearbox.net>
+> Cc: Thomas Graf <tgraf@suug.ch>
+> Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> 
 > ---
-> Changes for v7:
-> 1. Add new patch that move aliases from imx93.dtsi to board dts.
-> 2. The aliases is board level property rather than soc property.
->    These changes come from comments:
->    https://lore.kernel.org/imx/4e8f2426-92a1-4c7e-b860-0e10e8dd886c@kerne=
-l.org/
-> 3. Only add aliases using to imx93 board dts.
+> 
+> v1->v2: use softirq_count() instead of in_softirq()
 > ---
->  .../boot/dts/freescale/imx93-11x11-evk.dts    | 19 +++++++++++
->  .../boot/dts/freescale/imx93-14x14-evk.dts    | 15 ++++++++
->  .../boot/dts/freescale/imx93-9x9-qsb.dts      | 18 ++++++++++
->  .../dts/freescale/imx93-kontron-bl-osm-s.dts  | 21 ++++++++++++
->  .../dts/freescale/imx93-phyboard-nash.dts     | 21 ++++++++++++
->  .../dts/freescale/imx93-phyboard-segin.dts    |  9 +++++
->  .../freescale/imx93-tqma9352-mba91xxca.dts    | 11 ++++++
->  .../freescale/imx93-tqma9352-mba93xxca.dts    | 25 ++++++++++++++
->  .../freescale/imx93-tqma9352-mba93xxla.dts    | 25 ++++++++++++++
->  .../dts/freescale/imx93-var-som-symphony.dts  | 17 ++++++++++
->  arch/arm64/boot/dts/freescale/imx93.dtsi      | 34 -------------------
->  11 files changed, 181 insertions(+), 34 deletions(-)
->=20
-> diff --git a/arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts b/arch/arm=
-64/boot/dts/freescale/imx93-11x11-evk.dts
-> index e24e12f04526..44566e03be65 100644
-> --- a/arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts
-> +++ b/arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts
-> @@ -12,6 +12,25 @@ / {
->  	model =3D "NXP i.MX93 11X11 EVK board";
->  	compatible =3D "fsl,imx93-11x11-evk", "fsl,imx93";
-> =20
-> +	aliases {
-> +		ethernet0 =3D &fec;
-> +		ethernet1 =3D &eqos;
-> +		gpio0 =3D &gpio1;
-> +		gpio1 =3D &gpio2;
-> +		gpio2 =3D &gpio3;
-> +		i2c0 =3D &lpi2c1;
-> +		i2c1 =3D &lpi2c2;
-> +		i2c2 =3D &lpi2c3;
-> +		mmc0 =3D &usdhc1;
-> +		mmc1 =3D &usdhc2;
-> +		rtc0 =3D &bbnsm_rtc;
-> +		serial0 =3D &lpuart1;
-> +		serial1 =3D &lpuart2;
-> +		serial2 =3D &lpuart3;
-> +		serial3 =3D &lpuart4;
-> +		serial4 =3D &lpuart5;
-> +	};
-> +
->  	chosen {
->  		stdout-path =3D &lpuart1;
->  	};
-> diff --git a/arch/arm64/boot/dts/freescale/imx93-14x14-evk.dts b/arch/arm=
-64/boot/dts/freescale/imx93-14x14-evk.dts
-> index c5d86b54ad33..da252b7c06cb 100644
-> --- a/arch/arm64/boot/dts/freescale/imx93-14x14-evk.dts
-> +++ b/arch/arm64/boot/dts/freescale/imx93-14x14-evk.dts
-> @@ -12,6 +12,21 @@ / {
->  	model =3D "NXP i.MX93 14X14 EVK board";
->  	compatible =3D "fsl,imx93-14x14-evk", "fsl,imx93";
-> =20
-> +	aliases {
-> +		ethernet0 =3D &fec;
-> +		ethernet1 =3D &eqos;
-> +		gpio0 =3D &gpio1;
-> +		gpio1 =3D &gpio2;
-> +		gpio2 =3D &gpio3;
-> +		i2c0 =3D &lpi2c1;
-> +		i2c1 =3D &lpi2c2;
-> +		i2c2 =3D &lpi2c3;
-> +		mmc0 =3D &usdhc1;
-> +		mmc1 =3D &usdhc2;
-> +		rtc0 =3D &bbnsm_rtc;
-> +		serial0 =3D &lpuart1;
-> +	};
-> +
->  	chosen {
->  		stdout-path =3D &lpuart1;
->  	};
-> diff --git a/arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts b/arch/arm64=
-/boot/dts/freescale/imx93-9x9-qsb.dts
-> index f6f8d105b737..0852067eab2c 100644
-> --- a/arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts
-> +++ b/arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts
-> @@ -17,6 +17,24 @@ bt_sco_codec: bt-sco-codec {
->  		compatible =3D "linux,bt-sco";
->  	};
-> =20
-> +	aliases {
-> +		ethernet0 =3D &fec;
-> +		ethernet1 =3D &eqos;
-> +		gpio0 =3D &gpio1;
-> +		gpio1 =3D &gpio2;
-> +		gpio2 =3D &gpio3;
-> +		i2c0 =3D &lpi2c1;
-> +		i2c1 =3D &lpi2c2;
-> +		mmc0 =3D &usdhc1;
-> +		mmc1 =3D &usdhc2;
-> +		rtc0 =3D &bbnsm_rtc;
-> +		serial0 =3D &lpuart1;
-> +		serial1 =3D &lpuart2;
-> +		serial2 =3D &lpuart3;
-> +		serial3 =3D &lpuart4;
-> +		serial4 =3D &lpuart5;
-> +	};
-> +
->  	chosen {
->  		stdout-path =3D &lpuart1;
->  	};
-> diff --git a/arch/arm64/boot/dts/freescale/imx93-kontron-bl-osm-s.dts b/a=
-rch/arm64/boot/dts/freescale/imx93-kontron-bl-osm-s.dts
-> index 89e97c604bd3..11dd23044722 100644
-> --- a/arch/arm64/boot/dts/freescale/imx93-kontron-bl-osm-s.dts
-> +++ b/arch/arm64/boot/dts/freescale/imx93-kontron-bl-osm-s.dts
-> @@ -14,6 +14,27 @@ / {
->  	aliases {
->  		ethernet0 =3D &fec;
->  		ethernet1 =3D &eqos;
-> +		gpio0 =3D &gpio1;
-> +		gpio1 =3D &gpio2;
-> +		i2c0 =3D &lpi2c1;
-> +		i2c1 =3D &lpi2c2;
-> +		mmc0 =3D &usdhc1;
-> +		mmc1 =3D &usdhc2;
-> +		serial0 =3D &lpuart1;
-> +		serial1 =3D &lpuart2;
-> +		serial2 =3D &lpuart3;
-> +		serial3 =3D &lpuart4;
-> +		serial4 =3D &lpuart5;
-> +		serial5 =3D &lpuart6;
-> +		serial6 =3D &lpuart7;
-> +		spi0 =3D &lpspi1;
-> +		spi1 =3D &lpspi2;
-> +		spi2 =3D &lpspi3;
-> +		spi3 =3D &lpspi4;
-> +		spi4 =3D &lpspi5;
-> +		spi5 =3D &lpspi6;
-> +		spi6 =3D &lpspi7;
-> +		spi7 =3D &lpspi8;
->  	};
-> =20
->  	leds {
-> diff --git a/arch/arm64/boot/dts/freescale/imx93-phyboard-nash.dts b/arch=
-/arm64/boot/dts/freescale/imx93-phyboard-nash.dts
-> index 475913cf0cb9..fa5d83dee0a7 100644
-> --- a/arch/arm64/boot/dts/freescale/imx93-phyboard-nash.dts
-> +++ b/arch/arm64/boot/dts/freescale/imx93-phyboard-nash.dts
-> @@ -19,8 +19,29 @@ / {
-> =20
->  	aliases {
->  		ethernet1 =3D &eqos;
-> +		gpio0 =3D &gpio1;
-> +		gpio1 =3D &gpio2;
-> +		gpio2 =3D &gpio3;
-> +		gpio3 =3D &gpio4;
-> +		i2c0 =3D &lpi2c1;
-> +		i2c1 =3D &lpi2c2;
-> +		mmc0 =3D &usdhc1;
-> +		mmc1 =3D &usdhc2;
->  		rtc0 =3D &i2c_rtc;
->  		rtc1 =3D &bbnsm_rtc;
-> +		serial0 =3D &lpuart1;
-> +		serial1 =3D &lpuart2;
-> +		serial2 =3D &lpuart3;
-> +		serial3 =3D &lpuart4;
-> +		serial4 =3D &lpuart5;
-> +		serial5 =3D &lpuart6;
-> +		serial6 =3D &lpuart7;
-> +		spi0 =3D &lpspi1;
-> +		spi1 =3D &lpspi2;
-> +		spi2 =3D &lpspi3;
-> +		spi3 =3D &lpspi4;
-> +		spi4 =3D &lpspi5;
-> +		spi5 =3D &lpspi6;
->  	};
-> =20
->  	chosen {
-> diff --git a/arch/arm64/boot/dts/freescale/imx93-phyboard-segin.dts b/arc=
-h/arm64/boot/dts/freescale/imx93-phyboard-segin.dts
-> index 6f1374f5757f..802d96b19e4c 100644
-> --- a/arch/arm64/boot/dts/freescale/imx93-phyboard-segin.dts
-> +++ b/arch/arm64/boot/dts/freescale/imx93-phyboard-segin.dts
-> @@ -19,8 +19,17 @@ /{
-> =20
->  	aliases {
->  		ethernet1 =3D &eqos;
-> +		gpio0 =3D &gpio1;
-> +		gpio1 =3D &gpio2;
-> +		gpio2 =3D &gpio3;
-> +		gpio3 =3D &gpio4;
-> +		i2c0 =3D &lpi2c1;
-> +		i2c1 =3D &lpi2c2;
-> +		mmc0 =3D &usdhc1;
-> +		mmc1 =3D &usdhc2;
->  		rtc0 =3D &i2c_rtc;
->  		rtc1 =3D &bbnsm_rtc;
-> +		serial0 =3D &lpuart1;
->  	};
-> =20
->  	chosen {
-> diff --git a/arch/arm64/boot/dts/freescale/imx93-tqma9352-mba91xxca.dts b=
-/arch/arm64/boot/dts/freescale/imx93-tqma9352-mba91xxca.dts
-> index 9dbf41cf394b..2673d9dccbf4 100644
-> --- a/arch/arm64/boot/dts/freescale/imx93-tqma9352-mba91xxca.dts
-> +++ b/arch/arm64/boot/dts/freescale/imx93-tqma9352-mba91xxca.dts
-> @@ -27,8 +27,19 @@ aliases {
->  		eeprom0 =3D &eeprom0;
->  		ethernet0 =3D &eqos;
->  		ethernet1 =3D &fec;
-> +		gpio0 =3D &gpio1;
-> +		gpio1 =3D &gpio2;
-> +		gpio2 =3D &gpio3;
-> +		gpio3 =3D &gpio4;
-> +		i2c0 =3D &lpi2c1;
-> +		i2c1 =3D &lpi2c2;
-> +		i2c2 =3D &lpi2c3;
-> +		mmc0 =3D &usdhc1;
-> +		mmc1 =3D &usdhc2;
->  		rtc0 =3D &pcf85063;
->  		rtc1 =3D &bbnsm_rtc;
-> +		serial0 =3D &lpuart1;
-> +		serial1 =3D &lpuart2;
->  	};
-> =20
->  	backlight: backlight {
-> diff --git a/arch/arm64/boot/dts/freescale/imx93-tqma9352-mba93xxca.dts b=
-/arch/arm64/boot/dts/freescale/imx93-tqma9352-mba93xxca.dts
-> index 137b8ed242a2..4760d07ea24b 100644
-> --- a/arch/arm64/boot/dts/freescale/imx93-tqma9352-mba93xxca.dts
-> +++ b/arch/arm64/boot/dts/freescale/imx93-tqma9352-mba93xxca.dts
-> @@ -28,8 +28,33 @@ aliases {
->  		eeprom0 =3D &eeprom0;
->  		ethernet0 =3D &eqos;
->  		ethernet1 =3D &fec;
-> +		gpio0 =3D &gpio1;
-> +		gpio1 =3D &gpio2;
-> +		gpio2 =3D &gpio3;
-> +		gpio3 =3D &gpio4;
-> +		i2c0 =3D &lpi2c1;
-> +		i2c1 =3D &lpi2c2;
-> +		i2c2 =3D &lpi2c3;
-> +		i2c3 =3D &lpi2c4;
-> +		i2c4 =3D &lpi2c5;
-> +		mmc0 =3D &usdhc1;
-> +		mmc1 =3D &usdhc2;
->  		rtc0 =3D &pcf85063;
->  		rtc1 =3D &bbnsm_rtc;
-> +		serial0 =3D &lpuart1;
-> +		serial1 =3D &lpuart2;
-> +		serial2 =3D &lpuart3;
-> +		serial3 =3D &lpuart4;
-> +		serial4 =3D &lpuart5;
-> +		serial5 =3D &lpuart6;
-> +		serial6 =3D &lpuart7;
-> +		serial7 =3D &lpuart8;
-> +		spi0 =3D &lpspi1;
-> +		spi1 =3D &lpspi2;
-> +		spi2 =3D &lpspi3;
-> +		spi3 =3D &lpspi4;
-> +		spi4 =3D &lpspi5;
-> +		spi5 =3D &lpspi6;
->  	};
-> =20
->  	backlight_lvds: backlight {
-> diff --git a/arch/arm64/boot/dts/freescale/imx93-tqma9352-mba93xxla.dts b=
-/arch/arm64/boot/dts/freescale/imx93-tqma9352-mba93xxla.dts
-> index 219f49a4f87f..8a88c98ac05a 100644
-> --- a/arch/arm64/boot/dts/freescale/imx93-tqma9352-mba93xxla.dts
-> +++ b/arch/arm64/boot/dts/freescale/imx93-tqma9352-mba93xxla.dts
-> @@ -28,8 +28,33 @@ aliases {
->  		eeprom0 =3D &eeprom0;
->  		ethernet0 =3D &eqos;
->  		ethernet1 =3D &fec;
-> +		gpio0 =3D &gpio1;
-> +		gpio1 =3D &gpio2;
-> +		gpio2 =3D &gpio3;
-> +		gpio3 =3D &gpio4;
-> +		i2c0 =3D &lpi2c1;
-> +		i2c1 =3D &lpi2c2;
-> +		i2c2 =3D &lpi2c3;
-> +		i2c3 =3D &lpi2c4;
-> +		i2c4 =3D &lpi2c5;
-> +		mmc0 =3D &usdhc1;
-> +		mmc1 =3D &usdhc2;
->  		rtc0 =3D &pcf85063;
->  		rtc1 =3D &bbnsm_rtc;
-> +		serial0 =3D &lpuart1;
-> +		serial1 =3D &lpuart2;
-> +		serial2 =3D &lpuart3;
-> +		serial3 =3D &lpuart4;
-> +		serial4 =3D &lpuart5;
-> +		serial5 =3D &lpuart6;
-> +		serial6 =3D &lpuart7;
-> +		serial7 =3D &lpuart8;
-> +		spi0 =3D &lpspi1;
-> +		spi1 =3D &lpspi2;
-> +		spi2 =3D &lpspi3;
-> +		spi3 =3D &lpspi4;
-> +		spi4 =3D &lpspi5;
-> +		spi5 =3D &lpspi6;
->  	};
-> =20
->  	backlight_lvds: backlight {
-> diff --git a/arch/arm64/boot/dts/freescale/imx93-var-som-symphony.dts b/a=
-rch/arm64/boot/dts/freescale/imx93-var-som-symphony.dts
-> index 576d6982a4a0..c789c1f24bdc 100644
-> --- a/arch/arm64/boot/dts/freescale/imx93-var-som-symphony.dts
-> +++ b/arch/arm64/boot/dts/freescale/imx93-var-som-symphony.dts
-> @@ -17,8 +17,25 @@ /{
->  	aliases {
->  		ethernet0 =3D &eqos;
->  		ethernet1 =3D &fec;
-> +		gpio0 =3D &gpio1;
-> +		gpio1 =3D &gpio2;
-> +		gpio2 =3D &gpio3;
-> +		i2c0 =3D &lpi2c1;
-> +		i2c1 =3D &lpi2c2;
-> +		i2c2 =3D &lpi2c3;
-> +		i2c3 =3D &lpi2c4;
-> +		i2c4 =3D &lpi2c5;
-> +		mmc0 =3D &usdhc1;
-> +		mmc1 =3D &usdhc2;
-> +		serial0 =3D &lpuart1;
-> +		serial1 =3D &lpuart2;
-> +		serial2 =3D &lpuart3;
-> +		serial3 =3D &lpuart4;
-> +		serial4 =3D &lpuart5;
-> +		serial5 =3D &lpuart6;
->  	};
-> =20
-> +
->  	chosen {
->  		stdout-path =3D &lpuart1;
->  	};
-> diff --git a/arch/arm64/boot/dts/freescale/imx93.dtsi b/arch/arm64/boot/d=
-ts/freescale/imx93.dtsi
-> index 8a7f1cd76c76..d505f9dfd8ee 100644
-> --- a/arch/arm64/boot/dts/freescale/imx93.dtsi
-> +++ b/arch/arm64/boot/dts/freescale/imx93.dtsi
-> @@ -18,40 +18,6 @@ / {
->  	#address-cells =3D <2>;
->  	#size-cells =3D <2>;
-> =20
-> -	aliases {
-> -		gpio0 =3D &gpio1;
-> -		gpio1 =3D &gpio2;
-> -		gpio2 =3D &gpio3;
-> -		gpio3 =3D &gpio4;
-> -		i2c0 =3D &lpi2c1;
-> -		i2c1 =3D &lpi2c2;
-> -		i2c2 =3D &lpi2c3;
-> -		i2c3 =3D &lpi2c4;
-> -		i2c4 =3D &lpi2c5;
-> -		i2c5 =3D &lpi2c6;
-> -		i2c6 =3D &lpi2c7;
-> -		i2c7 =3D &lpi2c8;
-> -		mmc0 =3D &usdhc1;
-> -		mmc1 =3D &usdhc2;
-> -		mmc2 =3D &usdhc3;
-> -		serial0 =3D &lpuart1;
-> -		serial1 =3D &lpuart2;
-> -		serial2 =3D &lpuart3;
-> -		serial3 =3D &lpuart4;
-> -		serial4 =3D &lpuart5;
-> -		serial5 =3D &lpuart6;
-> -		serial6 =3D &lpuart7;
-> -		serial7 =3D &lpuart8;
-> -		spi0 =3D &lpspi1;
-> -		spi1 =3D &lpspi2;
-> -		spi2 =3D &lpspi3;
-> -		spi3 =3D &lpspi4;
-> -		spi4 =3D &lpspi5;
-> -		spi5 =3D &lpspi6;
-> -		spi6 =3D &lpspi7;
-> -		spi7 =3D &lpspi8;
-> -	};
-> -
->  	cpus {
->  		#address-cells =3D <1>;
->  		#size-cells =3D <0>;
->=20
+>  include/net/cls_cgroup.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/include/net/cls_cgroup.h b/include/net/cls_cgroup.h
+> index 7e78e7d6f015..668aeee9b3f6 100644
+> --- a/include/net/cls_cgroup.h
+> +++ b/include/net/cls_cgroup.h
+> @@ -63,7 +63,7 @@ static inline u32 task_get_classid(const struct sk_buff *skb)
+>  	 * calls by looking at the number of nested bh disable calls because
+>  	 * softirqs always disables bh.
+>  	 */
+> -	if (in_serving_softirq()) {
+> +	if (softirq_count()) {
+>  		struct sock *sk = skb_to_full_sk(skb);
+>  
+>  		/* If there is an sock_cgroup_classid we'll use that. */
 
+AFAICS the above changes the established behavior for a slightly
+different scenario:
 
-=2D-=20
-TQ-Systems GmbH | M=FChlstra=DFe 2, Gut Delling | 82229 Seefeld, Germany
-Amtsgericht M=FCnchen, HRB 105018
-Gesch=E4ftsf=FChrer: Detlef Schneider, R=FCdiger Stahl, Stefan Schneider
-http://www.tq-group.com/
+<sock S is created by task A>
+<class ID for task A is changed>
+<skb is created by sock S xmit and classified>
 
+prior to this patch the skb will be classified with the 'new' task A
+classid, now with the old/original one.
+
+I'm unsure if such behavior change is acceptable; I think at very least
+it should be mentioned in the changelog and likely this change should
+target net-next.
+
+Thanks,
+
+Paolo
 
 
