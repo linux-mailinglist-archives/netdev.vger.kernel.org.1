@@ -1,76 +1,78 @@
-Return-Path: <netdev+bounces-217904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E98FB3A642
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 18:30:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AC1CB3A644
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 18:30:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 396773A4B9F
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 16:30:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E322169397
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 16:30:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 401FF29A9FE;
-	Thu, 28 Aug 2025 16:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08F19322C8A;
+	Thu, 28 Aug 2025 16:29:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jfxPwkRT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KmlzfChV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
+Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48447221545
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A080275869
 	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 16:29:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756398598; cv=none; b=D5JmXCIRSTOxRrxiHtVPRgft/izqnxh31jIwYuqFQdEP8qaAhbxTcfAAakA0byDR96tNuXQ+ssV0LOETlL8pNEVH476cQZhed+cAcq2lgl8R0HHPlhtxJQZRf1asU9awZLD+OleV1N6wE5WiAK3lr2+BYgPVjd4HfCel7WgWXXY=
+	t=1756398598; cv=none; b=bqk8H4s6rxiJ/pjmj6hVQmU+Bz37CskqlVLoPohUgkdzx9hxK7/gqUV/lfTwTi0z7bj6PGJRL3o+lPS/dwBasH0G9lnFGfOfQIzCLYpmTEUglT/+us1XB5oNhb1GbckNB/20cmlnYyPV8UQMWVbqFRngvPlRdHhAZly9ACYu7vE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1756398598; c=relaxed/simple;
-	bh=0X0iMTiKu9PG4+RDwVnX/uMhijsZVlnbAbrwyoGuQk0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J7h8LZM7M8BA+nfZPojefHi0X/o35CButj95xhfUn+zyUkTG/YCpCc2eqr5eu2jfEu5rvVdx9iOOX+ZGgN/cNIfZErXAxwoO6owTegKIqZnOmSSVIU0Emetmh6/hmq2fK04cL3O1oNQn5L8ZgXoNsKQv/7b5Jcx5j87/ShBwh5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jfxPwkRT; arc=none smtp.client-ip=209.85.219.174
+	bh=7OHamNe80vMy1JfT5X5HsbgZ0A1AzwbxRhldJWA8UW0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=MQf31Jv90Y/TM2mZdVB5bwbRMk2AzWWsG6TbZag1+a5e1Fh2vJGcx7Gpe2BPuX4RIAtKJzLA2FO2GsHftsDIe+e3U7B8sXMbVMaRDYx7Br/Qna83xsmEQor6So/iOuYASq5RQt3h5J6C17vQ1AYrZxz6HTOoNsuLx43fW7+4j2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KmlzfChV; arc=none smtp.client-ip=209.85.219.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-e970b511046so549686276.0
+Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-e97021a3695so673443276.3
         for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 09:29:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756398595; x=1757003395; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tXjM940qQ60FoXXm/lXrBhLn1fhkrthBuSSNYQn+6tA=;
-        b=jfxPwkRTgqhxuMT+HKPjtLlRiZRdA0ptVvM9QEDeCY8wN4gkBROendbi6bejZmifQV
-         DxIUaXU1Qzormx6+5GjN5JO/jROT8Avftsgurjgn2FPQJdJ/fa3ary8Y0NdwLTRLsL/N
-         qkca4YCDKnBb2eLnuRYXMVn05tXIUaDq2UnT5xIUOujg1EyTKygyDUbel7nZTPyqWa9k
-         OivuaHutz4K3bgUSzlzLFls1QsmoJJwcNdg3Kfbetmv8b8RnNpYkN3ZxjPlgcoNOTU9z
-         vJA8tyomATTwH9tMzIls2WrW5tvL7ygTue2WlFsILKh9hDe5DSL/kRWbYLYuqMgnJChz
-         BPTA==
+        d=gmail.com; s=20230601; t=1756398596; x=1757003396; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DIBNm5paeiAnQo3yS59NcdyWincUwPqnjjEngtvb/fE=;
+        b=KmlzfChVWGmcQXU9YRdtPSq8WoxL9bRbk9Elggg8FSdpo9AlMLB+05oCqZaBuEB6m1
+         JB8rn2zTGMGRjFLCAZIaOV5vjDH2s4+PM9llU//VeTM1ccfjN70JHA/ymSrL8YqV9Hs0
+         OuqvedCkrGi7hIda8hpI88zyd2KJTL1uZxBzTELpOfTEpf9vJa14bv5p5pD5yCwLDZCm
+         nPGVnIR8QP6GI5KShxAquI4z21nbxo2MCXkHKVDyx1fxmC3etJyG2Q1ya9LD5ka7su6n
+         NXMqI2gaIblXpm0cudV0J8E/QTQqmNKfikRbfjcZh+2AMtMLd/eisCCsbaubKh7fHnR4
+         flpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756398595; x=1757003395;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tXjM940qQ60FoXXm/lXrBhLn1fhkrthBuSSNYQn+6tA=;
-        b=Ob3gBqneZqcYn+zhgnV1gaw54OSSgHowpX77awXEhcRInQ5cOiv5PXFQhHBEtt4mAH
-         J5fXZWmrzEeWApIJi7u7U0LZWNHFHMlOjr5udNf3nei5C3VyUZjCz9psqwOLBC16Oa4C
-         dBxNBwseGrNIaO/YXJzEvCr4kNs5KgE56/jD839VLEXVxLr6ksXLRFfjRm1vmZNQKEGG
-         ltQosRxspLHJLwDzKq5mIGNFJUWpm7GCP8KMS3m1BuuoJs5pkyfzOX76DX6nnCIhP9rP
-         SlWkFw+GB7V7pxDXgXD3HfbYcO9BYiNqv2qWUc+TzkhtRVIMnHwmtssDNT0pXqSaXhUH
-         f9LA==
-X-Forwarded-Encrypted: i=1; AJvYcCX2pkQHnSDN9ACE+gwyJcicAeIasQN1NxylJGQ0DJ7GQ1Nx+rOzBTaI8y9fEjxk1M+C7h8B/kI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+a8oUfhGCr8ElxruUOtxF5T85J8cK6E6O0iM4SCjPPLuVfxbg
-	nUIGB6XH+tkgMQmRyK32Ig9SitGSpxAOslAPg/rDCsqonLSXMsyj6X9D
-X-Gm-Gg: ASbGncuEmVQ7kri2pXfF9Fo7YgPIQtqdcfrz319kpS6kkeuU8PAQWw2t3cQsefOfrrh
-	ZY5PYTMv1waMomR4lQJulCvk4lozy/hLuIe7NLClua3nfc5ieR6MIddV9soaUuWrbt7LDKastwU
-	aliV2EYVlfN7xZ6zDu5fsqCW6Zco1rZocDbQoTwxDsnHNhUxpVKNVhGJ7YjuHPlPUGuMtFqMcy+
-	EU1jspRtFcetAG9WS+in59IuU1217RSnBGUbc1w0anK6xJgjAWkBncuHtLdpkV1zvsOBhVRe1Zs
-	Nl9JSrgGTFONSns9NZevtnV/MtKv3A0LGbbCIqoNV8MXlnx3LZq799TtVjXicEtcd0p5TosZ/wD
-	gDV8bJelsZ7mZv5K2CFzobHUKu5hQjjs=
-X-Google-Smtp-Source: AGHT+IFZTaDscCrhvaIRez7eewCHD7DIHEAyy2jWCpA1Z8z75IaoP1BwKVAz0x7iJt5sqJgGMmwk3Q==
-X-Received: by 2002:a05:6902:c05:b0:e97:316:b941 with SMTP id 3f1490d57ef6-e970316be51mr3328670276.39.1756398594815;
-        Thu, 28 Aug 2025 09:29:54 -0700 (PDT)
-Received: from localhost ([2a03:2880:25ff:44::])
-        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e952c25df8esm5081708276.7.2025.08.28.09.29.53
+        d=1e100.net; s=20230601; t=1756398596; x=1757003396;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DIBNm5paeiAnQo3yS59NcdyWincUwPqnjjEngtvb/fE=;
+        b=cR8hSvA29GLNCvO3RVfSxJ9o7IyHZkvq+PPtfKSP2YL7HQhWrtPhqdGLRCsXzljC0/
+         Z8Rp3fGUYpfe843sNnS+Uw5S/yL88S12dczMlK2cDn05LlIM/tYo9EBqJtQTlgM9pG4X
+         Ey+TX4sHjU3SDw8JB7EiUrOxH+GYmIqBbZl6qKF/1HtjjD5F7CDNxyj/91fJQvxTiWmq
+         in1X4JhOV7gStYVzrE/aNA3lopFT+/7dH9UCOLC1kGTCdjoYaBzI1Lc93cWe8u5vHdgj
+         n0Xr8QhkCXzxtHPYN1DYj2wNijdcDBUlEqgYx5eZ1jp+RRaCUsj7G5cz7YNc2ZgCBu+3
+         YTFg==
+X-Forwarded-Encrypted: i=1; AJvYcCU9fwtHD+GgkBSM2SC1fQ33+NGEjXCBaiPiPCUon/IRNvWwvsYxwRABw8a1hvY4oroJ60dEp5s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzc0lcAkmeoYYXKvWHKwsgYz0Vydz+PSiZj8ai7yi20ITEyL/Xt
+	tlTllxGfRcCopWuHrE0uk5J14NPlXQo5qj2BAcMr17+aiGbao7SvNyWZ
+X-Gm-Gg: ASbGncsIpcSrcuNo2BBAJc95inZdTOlR3DxpRKuzkvT0B4OQg0QRd+BCT4F8esuOY8h
+	Z6BpnMOxeV0atQ48qYtZFJitJx8JpGC9GXrp/H41eu83qRJ326sGuhNlbsB+F02FZH+gx7v7h2R
+	2YIPbVmB38Pl2XVWCDUODOo1LWTmY4RWHaxjUB7lhspLEGJnDHKl+uDYNUHBdRS4X9htID6qtP6
+	COGFUxMF8j/STl4HH8OhvM4XlbJtgw6e/LRpvG28/L3tBz5MwAY7MQlysP3NbDNcy62JCugqZqv
+	qKdnKiE7H2v4sVsAdwdou0gJ04GOI5ILdTnJ5F8vxg2PR78/4vgOZSl6E5cemnK1bYKNwYorrDS
+	oEGGQBi9qtrISACq98h4d+4Jh4rlaHg==
+X-Google-Smtp-Source: AGHT+IEFo7UDwzAk4wRP/qxCR+CZH9usdLoC2+DWu/RruwwM8CFT4+upOuP4vgfCzwYweGtnDOQ7hg==
+X-Received: by 2002:a05:6902:2b92:b0:e96:fbfd:1508 with SMTP id 3f1490d57ef6-e96fbfd1d33mr5522528276.34.1756398595790;
+        Thu, 28 Aug 2025 09:29:55 -0700 (PDT)
+Received: from localhost ([2a03:2880:25ff:9::])
+        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e952c2591ddsm5129190276.5.2025.08.28.09.29.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Aug 2025 09:29:54 -0700 (PDT)
+        Thu, 28 Aug 2025 09:29:55 -0700 (PDT)
 From: Daniel Zahka <daniel.zahka@gmail.com>
 To: Donald Hunter <donald.hunter@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -99,10 +101,12 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Kiran Kella <kiran.kella@broadcom.com>,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next v10 00/19] add basic PSP encryption for TCP connections
-Date: Thu, 28 Aug 2025 09:29:26 -0700
-Message-ID: <20250828162953.2707727-1-daniel.zahka@gmail.com>
+Subject: [PATCH net-next v10 01/19] psp: add documentation
+Date: Thu, 28 Aug 2025 09:29:27 -0700
+Message-ID: <20250828162953.2707727-2-daniel.zahka@gmail.com>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20250828162953.2707727-1-daniel.zahka@gmail.com>
+References: <20250828162953.2707727-1-daniel.zahka@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -111,262 +115,233 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is v10 of the PSP RFC [1] posted by Jakub Kicinski one year
-ago. General developments since v1 include a fork of packetdrill [2]
-with support for PSP added, as well as some test cases, and an
-implementation of PSP key exchange and connection upgrade [3]
-integrated into the fbthrift RPC library. Both [2] and [3] have been
-tested on server platforms with PSP-capable CX7 NICs. Below is the
-cover letter from the original RFC:
+From: Jakub Kicinski <kuba@kernel.org>
 
-Add support for PSP encryption of TCP connections.
+Add documentation of things which belong in the docs rather
+than commit messages.
 
-PSP is a protocol out of Google:
-https://github.com/google/psp/blob/main/doc/PSP_Arch_Spec.pdf
-which shares some similarities with IPsec. I added some more info
-in the first patch so I'll keep it short here.
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
+---
 
-The protocol can work in multiple modes including tunneling.
-But I'm mostly interested in using it as TLS replacement because
-of its superior offload characteristics. So this patch does three
-things:
-
- - it adds "core" PSP code
-   PSP is offload-centric, and requires some additional care and
-   feeding, so first chunk of the code exposes device info.
-   This part can be reused by PSP implementations in xfrm, tunneling etc.
-
- - TCP integration TLS style
-   Reuse some of the existing concepts from TLS offload, such as
-   attaching crypto state to a socket, marking skbs as "decrypted",
-   egress validation. PSP does not prescribe key exchange protocols.
-   To use PSP as a more efficient TLS offload we intend to perform
-   a TLS handshake ("inline" in the same TCP connection) and negotiate
-   switching to PSP based on capabilities of both endpoints.
-   This is also why I'm not including a software implementation.
-   Nobody would use it in production, software TLS is faster,
-   it has larger crypto records.
-
- - mlx5 implementation
-   That's mostly other people's work, not 100% sure those folks
-   consider it ready hence the RFC in the title. But it works :)
-
-Not posted, queued a branch [4] are follow up pieces:
- - standard stats
- - netdevsim implementation and tests
-
-[1] https://lore.kernel.org/netdev/20240510030435.120935-1-kuba@kernel.org/ 
-[2] https://github.com/danieldzahka/packetdrill
-[3] https://github.com/danieldzahka/fbthrift/tree/dzahka/psp
-[4] https://github.com/kuba-moo/linux/tree/psp
-
-Comments we intend to defer to future series:
-   - we prefer to keep the version field in the tx-assoc netlink
-     request, because it makes parsing keys require less state early
-     on, but we are willing to change in the next version of this
-     series.
-   - using a static branch to wrap psp_enqueue_set_decrypted() and
-     other functions called from tcp.
-   - using INDIRECT_CALL for tls/psp in sk_validate_xmit_skb(). We
-     prefer to address this in a dedicated patch series, so that this
-     series does not need to modify the way tls_validate_xmit_skb() is
-     declared and stubbed out.
-
-CHANGES:
-v10:
-    - rebase series
-v9: https://lore.kernel.org/netdev/20250827155340.2738246-1-daniel.zahka@gmail.com/
-    - rebase series
-v8: https://lore.kernel.org/netdev/20250825200112.1750547-1-daniel.zahka@gmail.com/
-    - rebase series
-v7: https://lore.kernel.org/netdev/20250820113120.992829-1-daniel.zahka@gmail.com/
-    - use flexible array declaration instead of 0-length array declaration
-      in struct mlx5_ifc_psp_gen_spi_out_bits
-    - check that 31 LSBs of the SPI are non-zero in psp_nl_parse_key()
-    - add details about GRO and TCP coalescing in commit message of
-      fourth patch.
-    - add comment explaining use of xa_store()/xa_erase() in
-      psp_dev_unregister()/psp_dev_destroy().
-v6: https://lore.kernel.org/netdev/20250812003009.2455540-1-daniel.zahka@gmail.com/
-    - make psp_sk_overhead() add 40B of encapsulation overhead.
-    - use PSP_CMD_KEY_ROTATE_NTF instead of PSP_CMD_KEY_ROTATE as arg to
-      genl_info_init_ntf()
-    - fix errors reported by static analysis
-v5: https://lore.kernel.org/netdev/20250723203454.519540-1-daniel.zahka@gmail.com/
-    - rebase series
-v4: https://lore.kernel.org/netdev/20250716144551.3646755-1-daniel.zahka@gmail.com/
-    - rename psp_rcv() to psp_dev_rcv()
-    - add strip_icv param psp_dev_rcv() to make trailer stripping optional
-    - replace memcpy in mlx5e_psp_set_state()
-    - rename psp_encapsulate() to psp_dev_encapsulate()
-    - delete unused struct mlx5e_psp_sa_entry declaration
-    - use psp_key_size() instead of pas->key_sz in mlx5e_psp_assoc_add()
-    - remove unneeded psp.c/psp.h files in mlx5
-    - remove unneeded struct psp_key_spi usage in mlx5
-    - fix EXPORT_IPV6_MOD_GPL(psp_reply_set_decrypted) semicolon
-    - remove version from netlink rx-assoc reply
-    - remove key_sz field from struct psp_assoc
-    - rename psd_get_for_sock() to psp_dev_get_for_sock()
-    - use sk_is_tcp() to check sock in psp_assoc_device_get_locked()
-    - add comment to tcp_timewait_state_process() explaining TCP_TW_SYN
-      case.
-    - psp_twsk_init() accepts const pointer, so caller does not need to
-      cast const away.
-    - add missing psp_twsk_rx_policy_check() to TCP_TW_SYN case of
-      do_timewait in tcp_v4_rcv().
-    - remove unused PSP_KEY_V0/PSP_KEY_V1 defines
-
-v3: https://lore.kernel.org/netdev/20250702171326.3265825-1-daniel.zahka@gmail.com/
-    - move psp_rcv() and psp_encapsulate() driver helpers into
-      psp_main.c
-    - lift pse/pas comparison code into new function:
-      psp_pse_matches_pas()
-    - explicitly mark rcu critical section psp_reply_set_decrypted()
-    - use rcu_dereference_proteced() instead of rcu_read_lock() in
-      psp_sk_assoc_free() and psp_twsk_assoc_free()
-    - rename psp_is_nondata() to psp_is_allowed_nondata()
-    - psp_reply_set_decrypted() should not call psp_sk_assoc(). Call
-      psp_sk_get_assoc_rcu() instead.
-    - lift common code from timewait and regular socks into new
-      function psp_sk_get_assoc_rcu()
-    - export symbols in psp_sock.c with EXPORT_IPV6_MOD_GPL()
-    - check for sk_is_inet() before casting to inet_twsk() in
-      sk_validate_xmit() and in psp_get_assoc_rcu()
-    - psp_reply_set_decrypted() does not use stuct sock* arg. Drop it.
+Notes:
+    v3:
     - reword driver requirement about double rotating keys when the device
       supports requesting arbitrary spi key pairs.
-    
-v2: https://lore.kernel.org/netdev/20250625135210.2975231-1-daniel.zahka@gmail.com/
-    - add pas->dev_id == pse->dev_id to policy checks
-    - __psp_sk_rx_policy_check() now allows pure ACKs, FINs, and RSTs to
-      be non-psp authenticated before "PSP Full" state.
-    - assign tw_validate_skb funtion during psp_twsk_init()
-    - psp_skb_get_rcu() also checks if sk is a tcp timewait sock when
-      looking for psp assocs.
-    - scan ofo queue non-psp data during psp_sock_recv_queue_check()
-    - add tcp_write_collapse_fence() to psp_sock_assoc_set_tx()
-    - Add psp_reply_set_decrypted() to encapsulate ACKs, FINs, and RSTs
-      sent from control socks on behalf of full or timewait socks with PSP
-      state.
-    - Add dev_id field to psp_skb_ext
-    - Move psp_assoc from struct tcp_timewait_sock to struct
-      inet_timewait_sock
-    - Move psp_sk_assoc_free() from sk_common_release() to
-      inet_sock_destruct()
-    - add documentation about MITM deletion attack, and expectation
-      from userspace
-    - add information about accepting clear text ACKs, RSTs, and FINs
-      to `Securing Connections` section.
+    v2:
+    - add note about MITM deletion attack, and expectation from userspace
+    - add information about accepting clear text ACKs, RSTs, and FINs to
+      `Securing Connections` section.
+    v1:
+    - https://lore.kernel.org/netdev/20240510030435.120935-2-kuba@kernel.org/
 
-v1: https://lore.kernel.org/netdev/20240510030435.120935-1-kuba@kernel.org/
-
-Daniel Zahka (2):
-  net: move sk_validate_xmit_skb() to net/core/dev.c
-  net: tcp: allow tcp_timewait_sock to validate skbs before handing to
-    device
-
-Jakub Kicinski (8):
-  psp: add documentation
-  psp: base PSP device support
-  net: modify core data structures for PSP datapath support
-  tcp: add datapath logic for PSP with inline key exchange
-  psp: add op for rotation of device key
-  net: psp: add socket security association code
-  net: psp: update the TCP MSS to reflect PSP packet overhead
-  psp: track generations of device key
-
-Raed Salem (9):
-  net/mlx5e: Support PSP offload functionality
-  net/mlx5e: Implement PSP operations .assoc_add and .assoc_del
-  psp: provide encapsulation helper for drivers
-  net/mlx5e: Implement PSP Tx data path
-  net/mlx5e: Add PSP steering in local NIC RX
-  net/mlx5e: Configure PSP Rx flow steering rules
-  psp: provide decapsulation and receive helper for drivers
-  net/mlx5e: Add Rx data path offload
-  net/mlx5e: Implement PSP key_rotate operation
-
- Documentation/netlink/specs/psp.yaml          | 187 +++++
- Documentation/networking/index.rst            |   1 +
- Documentation/networking/psp.rst              | 183 +++++
- .../net/ethernet/mellanox/mlx5/core/Kconfig   |  11 +
- .../net/ethernet/mellanox/mlx5/core/Makefile  |   3 +
- drivers/net/ethernet/mellanox/mlx5/core/en.h  |   6 +-
- .../net/ethernet/mellanox/mlx5/core/en/fs.h   |   2 +-
- .../ethernet/mellanox/mlx5/core/en/params.c   |   4 +-
- .../mellanox/mlx5/core/en_accel/en_accel.h    |  50 +-
- .../mellanox/mlx5/core/en_accel/ipsec_rxtx.h  |   2 +-
- .../mellanox/mlx5/core/en_accel/psp.c         | 195 +++++
- .../mellanox/mlx5/core/en_accel/psp.h         |  49 ++
- .../mellanox/mlx5/core/en_accel/psp_fs.c      | 736 ++++++++++++++++++
- .../mellanox/mlx5/core/en_accel/psp_fs.h      |  30 +
- .../mellanox/mlx5/core/en_accel/psp_offload.c |  44 ++
- .../mellanox/mlx5/core/en_accel/psp_rxtx.c    | 200 +++++
- .../mellanox/mlx5/core/en_accel/psp_rxtx.h    | 121 +++
- .../net/ethernet/mellanox/mlx5/core/en_main.c |   9 +
- .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  49 +-
- .../net/ethernet/mellanox/mlx5/core/en_tx.c   |  10 +-
- drivers/net/ethernet/mellanox/mlx5/core/fw.c  |   6 +
- .../ethernet/mellanox/mlx5/core/lib/crypto.h  |   1 +
- .../net/ethernet/mellanox/mlx5/core/main.c    |   1 +
- .../mellanox/mlx5/core/steering/hws/definer.c |   2 +-
- include/linux/mlx5/device.h                   |   4 +
- include/linux/mlx5/mlx5_ifc.h                 |  95 ++-
- include/linux/netdevice.h                     |   4 +
- include/linux/skbuff.h                        |   3 +
- include/net/dropreason-core.h                 |   6 +
- include/net/inet_timewait_sock.h              |   8 +
- include/net/psp.h                             |  12 +
- include/net/psp/functions.h                   | 206 +++++
- include/net/psp/types.h                       | 184 +++++
- include/net/sock.h                            |  26 +-
- include/uapi/linux/psp.h                      |  66 ++
- net/Kconfig                                   |   1 +
- net/Makefile                                  |   1 +
- net/core/dev.c                                |  32 +
- net/core/gro.c                                |   2 +
- net/core/skbuff.c                             |   4 +
- net/ipv4/af_inet.c                            |   2 +
- net/ipv4/inet_timewait_sock.c                 |   5 +
- net/ipv4/ip_output.c                          |   5 +-
- net/ipv4/tcp.c                                |   2 +
- net/ipv4/tcp_ipv4.c                           |  18 +-
- net/ipv4/tcp_minisocks.c                      |  20 +
- net/ipv4/tcp_output.c                         |  17 +-
- net/ipv6/ipv6_sockglue.c                      |   6 +-
- net/ipv6/tcp_ipv6.c                           |  17 +-
- net/psp/Kconfig                               |  15 +
- net/psp/Makefile                              |   5 +
- net/psp/psp-nl-gen.c                          | 119 +++
- net/psp/psp-nl-gen.h                          |  39 +
- net/psp/psp.h                                 |  54 ++
- net/psp/psp_main.c                            | 278 +++++++
- net/psp/psp_nl.c                              | 505 ++++++++++++
- net/psp/psp_sock.c                            | 302 +++++++
- tools/net/ynl/Makefile.deps                   |   1 +
- 58 files changed, 3905 insertions(+), 61 deletions(-)
- create mode 100644 Documentation/netlink/specs/psp.yaml
+ Documentation/networking/index.rst |   1 +
+ Documentation/networking/psp.rst   | 183 +++++++++++++++++++++++++++++
+ 2 files changed, 184 insertions(+)
  create mode 100644 Documentation/networking/psp.rst
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.c
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp.h
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_fs.c
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_fs.h
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_offload.c
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_rxtx.c
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/psp_rxtx.h
- create mode 100644 include/net/psp.h
- create mode 100644 include/net/psp/functions.h
- create mode 100644 include/net/psp/types.h
- create mode 100644 include/uapi/linux/psp.h
- create mode 100644 net/psp/Kconfig
- create mode 100644 net/psp/Makefile
- create mode 100644 net/psp/psp-nl-gen.c
- create mode 100644 net/psp/psp-nl-gen.h
- create mode 100644 net/psp/psp.h
- create mode 100644 net/psp/psp_main.c
- create mode 100644 net/psp/psp_nl.c
- create mode 100644 net/psp/psp_sock.c
 
+diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
+index b7a4969e9bc9..c775cababc8c 100644
+--- a/Documentation/networking/index.rst
++++ b/Documentation/networking/index.rst
+@@ -101,6 +101,7 @@ Contents:
+    ppp_generic
+    proc_net_tcp
+    pse-pd/index
++   psp
+    radiotap-headers
+    rds
+    regulatory
+diff --git a/Documentation/networking/psp.rst b/Documentation/networking/psp.rst
+new file mode 100644
+index 000000000000..4ac09e64e95a
+--- /dev/null
++++ b/Documentation/networking/psp.rst
+@@ -0,0 +1,183 @@
++.. SPDX-License-Identifier: GPL-2.0-only
++
++=====================
++PSP Security Protocol
++=====================
++
++Protocol
++========
++
++PSP Security Protocol (PSP) was defined at Google and published in:
++
++https://raw.githubusercontent.com/google/psp/main/doc/PSP_Arch_Spec.pdf
++
++This section briefly covers protocol aspects crucial for understanding
++the kernel API. Refer to the protocol specification for further details.
++
++Note that the kernel implementation and documentation uses the term
++"device key" in place of "master key", it is both less confusing
++to an average developer and is less likely to run afoul any naming
++guidelines.
++
++Derived Rx keys
++---------------
++
++PSP borrows some terms and mechanisms from IPsec. PSP was designed
++with HW offloads in mind. The key feature of PSP is that Rx keys for every
++connection do not have to be stored by the receiver but can be derived
++from device key and information present in packet headers.
++This makes it possible to implement receivers which require a constant
++amount of memory regardless of the number of connections (``O(1)`` scaling).
++
++Tx keys have to be stored like with any other protocol, but Tx is much
++less latency sensitive than Rx, and delays in fetching keys from slow
++memory is less likely to cause packet drops. Preferably, the Tx keys
++should be provided with the packet (e.g. as part of the descriptors).
++
++Key rotation
++------------
++
++The device key known only to the receiver is fundamental to the design.
++Per specification this state cannot be directly accessible (it must be
++impossible to read it out of the hardware of the receiver NIC).
++Moreover, it has to be "rotated" periodically (usually daily). Rotation
++means that new device key gets generated (by a random number generator
++of the device), and used for all new connections. To avoid disrupting
++old connections the old device key remains in the NIC. A phase bit
++carried in the packet headers indicates which generation of device key
++the packet has been encrypted with.
++
++User facing API
++===============
++
++PSP is designed primarily for hardware offloads. There is currently
++no software fallback for systems which do not have PSP capable NICs.
++There is also no standard (or otherwise defined) way of establishing
++a PSP-secured connection or exchanging the symmetric keys.
++
++The expectation is that higher layer protocols will take care of
++protocol and key negotiation. For example one may use TLS key exchange,
++announce the PSP capability, and switch to PSP if both endpoints
++are PSP-capable.
++
++All configuration of PSP is performed via the PSP netlink family.
++
++Device discovery
++----------------
++
++The PSP netlink family defines operations to retrieve information
++about the PSP devices available on the system, configure them and
++access PSP related statistics.
++
++Securing a connection
++---------------------
++
++PSP encryption is currently only supported for TCP connections.
++Rx and Tx keys are allocated separately. First the ``rx-assoc``
++Netlink command needs to be issued, specifying a target TCP socket.
++Kernel will allocate a new PSP Rx key from the NIC and associate it
++with given socket. At this stage socket will accept both PSP-secured
++and plain text TCP packets.
++
++Tx keys are installed using the ``tx-assoc`` Netlink command.
++Once the Tx keys are installed, all data read from the socket will
++be PSP-secured. In other words act of installing Tx keys has a secondary
++effect on the Rx direction.
++
++There is an intermediate period after ``tx-assoc`` successfully
++returns and before the TCP socket encounters it's first PSP
++authenticated packet, where the TCP stack will allow certain nondata
++packets, i.e. ACKs, FINs, and RSTs, to enter TCP receive processing
++even if not PSP authenticated. During the ``tx-assoc`` call, the TCP
++socket's ``rcv_nxt`` field is recorded. At this point, ACKs and RSTs
++will be accepted with any sequence number, while FINs will only be
++accepted at the latched value of ``rcv_nxt``. Once the TCP stack
++encounters the first TCP packet containing PSP authenticated data, the
++other end of the connection must have executed the ``tx-assoc``
++command, so any TCP packet, including those without data, will be
++dropped before receive processing if it is not successfully
++authenticated. This is summarized in the table below. The
++aforementioned state of rejecting all non-PSP packets is labeled "PSP
++Full".
++
+++----------------+------------+------------+-------------+-------------+
++| Event          | Normal TCP | Rx PSP     | Tx PSP      | PSP Full    |
+++================+============+============+=============+=============+
++| Rx plain       | accept     | accept     | drop        | drop        |
++| (data)         |            |            |             |             |
+++----------------+------------+------------+-------------+-------------+
++| Rx plain       | accept     | accept     | accept      | drop        |
++| (ACK|FIN|RST)  |            |            |             |             |
+++----------------+------------+------------+-------------+-------------+
++| Rx PSP (good)  | drop       | accept     | accept      | accept      |
+++----------------+------------+------------+-------------+-------------+
++| Rx PSP (bad    | drop       | drop       | drop        | drop        |
++| crypt, !=SPI)  |            |            |             |             |
+++----------------+------------+------------+-------------+-------------+
++| Tx             | plain text | plain text | encrypted   | encrypted   |
++|                |            |            | (excl. rtx) | (excl. rtx) |
+++----------------+------------+------------+-------------+-------------+
++
++To ensure that any data read from the socket after the ``tx-assoc``
++call returns success has been authenticated, the kernel will scan the
++receive and ofo queues of the socket at ``tx-assoc`` time. If any
++enqueued packet was received in clear text, the Tx association will
++fail, and the application should retry installing the Tx key after
++draining the socket (this should not be necessary if both endpoints
++are well behaved).
++
++Because TCP sequence numbers are not integrity protected prior to
++upgrading to PSP, it is possible that a MITM could offset sequence
++numbers in a way that deletes a prefix of the PSP protected part of
++the TCP stream. If userspace cares to mitigate this type of attack, a
++special "start of PSP" message should be exchanged after ``tx-assoc``.
++
++Rotation notifications
++----------------------
++
++The rotations of device key happen asynchronously and are usually
++performed by management daemons, not under application control.
++The PSP netlink family will generate a notification whenever keys
++are rotated. The applications are expected to re-establish connections
++before keys are rotated again.
++
++Kernel implementation
++=====================
++
++Driver notes
++------------
++
++Drivers are expected to start with no PSP enabled (``psp-versions-ena``
++in ``dev-get`` set to ``0``) whenever possible. The user space should
++not depend on this behavior, as future extension may necessitate creation
++of devices with PSP already enabled, nonetheless drivers should not enable
++PSP by default. Enabling PSP should be the responsibility of the system
++component which also takes care of key rotation.
++
++Note that ``psp-versions-ena`` is expected to be used only for enabling
++receive processing. The device is not expected to reject transmit requests
++after ``psp-versions-ena`` has been disabled. User may also disable
++``psp-versions-ena`` while there are active associations, which will
++break all PSP Rx processing.
++
++Drivers are expected to ensure that a device key is usable and secure
++upon init, without explicit key rotation by the user space. It must be
++possible to allocate working keys, and that no duplicate keys must be
++generated. If the device allows the host to request the key for an
++arbitrary SPI - driver should discard both device keys (rotate the
++device key twice), to avoid potentially using a SPI+key which previous
++OS instance already had access to.
++
++Drivers must use ``psp_skb_get_assoc_rcu()`` to check if PSP Tx offload
++was requested for given skb. On Rx drivers should allocate and populate
++the ``SKB_EXT_PSP`` skb extension, and set the skb->decrypted bit to 1.
++
++Kernel implementation notes
++---------------------------
++
++PSP implementation follows the TLS offload more closely than the IPsec
++offload, with per-socket state, and the use of skb->decrypted to prevent
++clear text leaks.
++
++PSP device is separate from netdev, to make it possible to "delegate"
++PSP offload capabilities to software devices (e.g. ``veth``).
 -- 
 2.47.3
 
