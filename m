@@ -1,93 +1,426 @@
-Return-Path: <netdev+bounces-218004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC23DB3ACED
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 23:46:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CA00BB3ACF9
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 23:49:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A30E1890275
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 21:46:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECD2C1C85AB1
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 21:49:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3F5022B5AD;
-	Thu, 28 Aug 2025 21:46:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WTptxzYy"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DB16279DD6;
+	Thu, 28 Aug 2025 21:49:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F5292264C0
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 21:46:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB20266576;
+	Thu, 28 Aug 2025 21:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756417567; cv=none; b=tDYMGytjHGi35rKF8wNUNTwzZTFhuAzEv3AwYgAvlyxXF9zCqBVas21n1CfG91m8oJL5qqhYKWHW1PLhVblfDEPPYpoZB6k/ImQ29hVawPJIC8XPT5cGsuL1Swvgxz0QKzsLiWFbLpeMQYwLwKKyJZBOhp43Z0XmiDZV9Qjc4bk=
+	t=1756417773; cv=none; b=gXoNhbmFLiHERKqbJYRk0hvGbQk+nEfCIjqKPjBxu4OsUHsnJHDzZVVoV9Avs1CaMrJpuvDe3YjMNM8zT/tlwMYnO3loSnctNK++W/WTEFRD5BWSdfaJeAYwQo9+rjXyOkNqjQGjtsqO92+2WWazskpLK9DyOWneaJ66K86IeYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756417567; c=relaxed/simple;
-	bh=b1vCVyxVyhgcLvyKDAZGxLkbXI+ZmAk3/5zUhhet/ag=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cgGUvywq0wmHbO3s1pri3kpM4mbdQU0+8MLrLDooIhuwVmwsZsWVn6LFnkq/xl2r9HlVCK072oYUGwX6CaqBeHfVLF0qF8dS192EnjFNZvAq1FNfzo2/B3HJ/GXp60wzP3ej+VsxXlsJ+iVmNamGe4DwZunlA499QsOPkk7cS5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WTptxzYy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9106C4CEEB;
-	Thu, 28 Aug 2025 21:46:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756417567;
-	bh=b1vCVyxVyhgcLvyKDAZGxLkbXI+ZmAk3/5zUhhet/ag=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=WTptxzYyYrIbye/vZCrsvCZs583/PDeIw8YupPMZr/mbBZXztqH8HKt+qhT6l13Im
-	 jWR11WAJwGFZRPcTU/DfcHk8zau6/TqheNcaVkEs72hFrCO3+YVrJw8Jg3FJH3bHYO
-	 kp3ixAjVPtHfBunDyhrj7AaYuSahcuYha84g0ERJzM/W3Yx1yFdiUKt2ac33VmpFOs
-	 zakkL1Bpt20/fK6E04NzT44dxAyJHiNsRq+YmVCNfE5y/MgaxUygaAmbLB2YuWATiz
-	 5gTEhLbHAic0+YbTgarjAaB2zFJdUrRf+brI89FDtPHPeQc8BDofaAyyJZaK4TDIkk
-	 i5BeT4gX776vA==
-Message-ID: <326b8a8c-fe86-4751-a81b-b5bef50e5867@kernel.org>
-Date: Thu, 28 Aug 2025 15:46:05 -0600
+	s=arc-20240116; t=1756417773; c=relaxed/simple;
+	bh=8hjsQ8htHClZpSnB3BpL7DiLoXfUZ5gAVNsVubSYy40=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IBE7Aq76A7CXfqqNvVDmNtd4aoO/n7QDN5Pwqqz1bnRKSMEnPei29jR+eM2a6D6qnKr+71Cp2cNfSUSTeezeyGhS/cUXQp7tptrNcKU6JyboxcMBpgZrZmcG8TFeOVT6DH8bAGxqznjHkJPV5+8tFrueh7KTlhFA9JfsZwQQ1CQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id C14EB605F7; Thu, 28 Aug 2025 23:49:22 +0200 (CEST)
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	<netfilter-devel@vger.kernel.org>,
+	pablo@netfilter.org
+Subject: [PATCH net] netfilter: nft_flowtable.sh: re-run with random mtu sizes
+Date: Thu, 28 Aug 2025 23:49:18 +0200
+Message-ID: <20250828214918.3385-1-fw@strlen.de>
+X-Mailer: git-send-email 2.49.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/8] ipv6: start using dst_dev_rcu()
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
-References: <20250828195823.3958522-1-edumazet@google.com>
- <20250828195823.3958522-3-edumazet@google.com>
-Content-Language: en-US
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20250828195823.3958522-3-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 8/28/25 1:58 PM, Eric Dumazet wrote:
-> Refactor icmpv6_xrlim_allow() and ip6_dst_hoplimit()
-> so that we acquire rcu_read_lock() a bit longer
-> to be able to use dst_dev_rcu() instead of dst_dev().
-> 
-> __ip6_rt_update_pmtu() and rt6_do_redirect can directly
-> use dst_dev_rcu() in sections already holding rcu_read_lock().
-> 
-> Small changes to use dst_dev_net_rcu() in
-> ip6_default_advmss(), ipv6_sock_ac_join(),
-> ip6_mc_find_dev() and ndisc_send_skb().
-> 
-> Fixes: 4a6ce2b6f2ec ("net: introduce a new function dst_dev_put()")
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
->  net/ipv6/anycast.c     | 2 +-
->  net/ipv6/icmp.c        | 6 +++---
->  net/ipv6/mcast.c       | 2 +-
->  net/ipv6/ndisc.c       | 2 +-
->  net/ipv6/output_core.c | 8 +++++---
->  net/ipv6/route.c       | 7 +++----
->  6 files changed, 14 insertions(+), 13 deletions(-)
-> 
+Jakub says:
+ nft_flowtable.sh is one of the most flake-atious test for netdev CI currently :(
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+The root cause is two-fold:
+1. the failing part of the test is supposed to make sure that ip
+   fragments are forwarded for offloaded flows.
+   (flowtable has to pass them to classic forward path).
+   path mtu discovery for these subtests is disabled.
+
+2. nft_flowtable.sh has two passes.  One with fixed mtus/file size and
+  one where link mtus and file sizes are random.
+
+The CI failures all have same pattern:
+  re-run with random mtus and file size: -o 27663 -l 4117 -r 10089 -s 54384840
+  [..]
+  PASS: dscp_egress: dscp packet counters match
+  FAIL: file mismatch for ns1 -> ns2
+
+In some cases this error triggers a bit ealier, sometimes in a later
+subtest:
+  re-run with random mtus and file size: -o 20201 -l 4555 -r 12657 -s 9405856
+  [..]
+  PASS: dscp_egress: dscp packet counters match
+  PASS: dscp_fwd: dscp packet counters match
+  2025/08/17 20:37:52 socat[18954] E write(7, 0x560716b96000, 8192): Broken pipe
+  FAIL: file mismatch for ns1 -> ns2
+  -rw------- 1 root root 9405856 Aug 17 20:36 /tmp/tmp.2n63vlTrQe
+
+But all logs I saw show same scenario:
+1. Failing tests have pmtu discovery off (i.e., ip fragmentation)
+2. The test file is much larger than first-pass default (2M Byte)
+3. peers have much larger MTUs compared to the 'network'.
+
+These errors are very reproducible when re-running the test with
+the same commandline arguments.
+
+The timeout became much more prominent with
+1d2fbaad7cd8 ("tcp: stronger sk_rcvbuf checks"): reassembled packets
+typically have a skb->truesize more than double the skb length.
+
+As that commit is intentional and pmtud-off with
+large-tcp-packets-as-fragments is not normal adjust the test to use a
+smaller file for the pmtu-off subtests.
+
+While at it, add more information to pass/fail messages and
+also run the dscp alteration subtest with pmtu discovery enabled.
+
+Link: https://netdev.bots.linux.dev/contest.html?test=nft-flowtable-sh
+Fixes: f84ab634904c ("selftests: netfilter: nft_flowtable.sh: re-run with random mtu sizes")
+Reported-by:  Jakub Kicinski <kuba@kernel.org>
+Closes: https://lore.kernel.org/netdev/20250822071330.4168f0db@kernel.org/
+Signed-off-by: Florian Westphal <fw@strlen.de>
+---
+ .../selftests/net/netfilter/nft_flowtable.sh  | 113 ++++++++++++------
+ 1 file changed, 76 insertions(+), 37 deletions(-)
+
+diff --git a/tools/testing/selftests/net/netfilter/nft_flowtable.sh b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
+index a4ee5496f2a1..45832df98295 100755
+--- a/tools/testing/selftests/net/netfilter/nft_flowtable.sh
++++ b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
+@@ -20,6 +20,7 @@ ret=0
+ SOCAT_TIMEOUT=60
+ 
+ nsin=""
++nsin_small=""
+ ns1out=""
+ ns2out=""
+ 
+@@ -36,7 +37,7 @@ cleanup() {
+ 
+ 	cleanup_all_ns
+ 
+-	rm -f "$nsin" "$ns1out" "$ns2out"
++	rm -f "$nsin" "$nsin_small" "$ns1out" "$ns2out"
+ 
+ 	[ "$log_netns" -eq 0 ] && sysctl -q net.netfilter.nf_log_all_netns="$log_netns"
+ }
+@@ -72,6 +73,7 @@ lmtu=1500
+ rmtu=2000
+ 
+ filesize=$((2 * 1024 * 1024))
++filesize_small=$((filesize / 16))
+ 
+ usage(){
+ 	echo "nft_flowtable.sh [OPTIONS]"
+@@ -89,7 +91,10 @@ do
+ 		o) omtu=$OPTARG;;
+ 		l) lmtu=$OPTARG;;
+ 		r) rmtu=$OPTARG;;
+-		s) filesize=$OPTARG;;
++		s)
++			filesize=$OPTARG
++			filesize_small=$((OPTARG / 16))
++		;;
+ 		*) usage;;
+ 	esac
+ done
+@@ -215,6 +220,7 @@ if ! ip netns exec "$ns2" ping -c 1 -q 10.0.1.99 > /dev/null; then
+ fi
+ 
+ nsin=$(mktemp)
++nsin_small=$(mktemp)
+ ns1out=$(mktemp)
+ ns2out=$(mktemp)
+ 
+@@ -265,6 +271,7 @@ check_counters()
+ check_dscp()
+ {
+ 	local what=$1
++	local pmtud="$2"
+ 	local ok=1
+ 
+ 	local counter
+@@ -277,37 +284,39 @@ check_dscp()
+ 	local pc4z=${counter%*bytes*}
+ 	local pc4z=${pc4z#*packets}
+ 
++	local failmsg="FAIL: pmtu $pmtu: $what counters do not match, expected"
++
+ 	case "$what" in
+ 	"dscp_none")
+ 		if [ "$pc4" -gt 0 ] || [ "$pc4z" -eq 0 ]; then
+-			echo "FAIL: dscp counters do not match, expected dscp3 == 0, dscp0 > 0, but got $pc4,$pc4z" 1>&2
++			echo "$failmsg dscp3 == 0, dscp0 > 0, but got $pc4,$pc4z" 1>&2
+ 			ret=1
+ 			ok=0
+ 		fi
+ 		;;
+ 	"dscp_fwd")
+ 		if [ "$pc4" -eq 0 ] || [ "$pc4z" -eq 0 ]; then
+-			echo "FAIL: dscp counters do not match, expected dscp3 and dscp0 > 0 but got $pc4,$pc4z" 1>&2
++			echo "$failmsg dscp3 and dscp0 > 0 but got $pc4,$pc4z" 1>&2
+ 			ret=1
+ 			ok=0
+ 		fi
+ 		;;
+ 	"dscp_ingress")
+ 		if [ "$pc4" -eq 0 ] || [ "$pc4z" -gt 0 ]; then
+-			echo "FAIL: dscp counters do not match, expected dscp3 > 0, dscp0 == 0 but got $pc4,$pc4z" 1>&2
++			echo "$failmsg dscp3 > 0, dscp0 == 0 but got $pc4,$pc4z" 1>&2
+ 			ret=1
+ 			ok=0
+ 		fi
+ 		;;
+ 	"dscp_egress")
+ 		if [ "$pc4" -eq 0 ] || [ "$pc4z" -gt 0 ]; then
+-			echo "FAIL: dscp counters do not match, expected dscp3 > 0, dscp0 == 0 but got $pc4,$pc4z" 1>&2
++			echo "$failmsg dscp3 > 0, dscp0 == 0 but got $pc4,$pc4z" 1>&2
+ 			ret=1
+ 			ok=0
+ 		fi
+ 		;;
+ 	*)
+-		echo "FAIL: Unknown DSCP check" 1>&2
++		echo "$failmsg: Unknown DSCP check" 1>&2
+ 		ret=1
+ 		ok=0
+ 	esac
+@@ -319,9 +328,9 @@ check_dscp()
+ 
+ check_transfer()
+ {
+-	in=$1
+-	out=$2
+-	what=$3
++	local in=$1
++	local out=$2
++	local what=$3
+ 
+ 	if ! cmp "$in" "$out" > /dev/null 2>&1; then
+ 		echo "FAIL: file mismatch for $what" 1>&2
+@@ -342,25 +351,39 @@ test_tcp_forwarding_ip()
+ {
+ 	local nsa=$1
+ 	local nsb=$2
+-	local dstip=$3
+-	local dstport=$4
++	local pmtu=$3
++	local dstip=$4
++	local dstport=$5
+ 	local lret=0
++	local socatc
++	local socatl
++	local infile="$nsin"
++
++	if [ $pmtu -eq 0 ]; then
++		infile="$nsin_small"
++	fi
+ 
+-	timeout "$SOCAT_TIMEOUT" ip netns exec "$nsb" socat -4 TCP-LISTEN:12345,reuseaddr STDIO < "$nsin" > "$ns2out" &
++	timeout "$SOCAT_TIMEOUT" ip netns exec "$nsb" socat -4 TCP-LISTEN:12345,reuseaddr STDIO < "$infile" > "$ns2out" &
+ 	lpid=$!
+ 
+ 	busywait 1000 listener_ready
+ 
+-	timeout "$SOCAT_TIMEOUT" ip netns exec "$nsa" socat -4 TCP:"$dstip":"$dstport" STDIO < "$nsin" > "$ns1out"
++	timeout "$SOCAT_TIMEOUT" ip netns exec "$nsa" socat -4 TCP:"$dstip":"$dstport" STDIO < "$infile" > "$ns1out"
++	socatc=$?
+ 
+ 	wait $lpid
++	socatl=$?
+ 
+-	if ! check_transfer "$nsin" "$ns2out" "ns1 -> ns2"; then
++	if [ $socatl -ne 0 ] || [ $socatc -ne 0 ];then
++		rc=1
++	fi
++
++	if ! check_transfer "$infile" "$ns2out" "ns1 -> ns2"; then
+ 		lret=1
+ 		ret=1
+ 	fi
+ 
+-	if ! check_transfer "$nsin" "$ns1out" "ns1 <- ns2"; then
++	if ! check_transfer "$infile" "$ns1out" "ns1 <- ns2"; then
+ 		lret=1
+ 		ret=1
+ 	fi
+@@ -370,14 +393,16 @@ test_tcp_forwarding_ip()
+ 
+ test_tcp_forwarding()
+ {
+-	test_tcp_forwarding_ip "$1" "$2" 10.0.2.99 12345
++	local pmtu="$3"
++
++	test_tcp_forwarding_ip "$1" "$2" "$pmtu" 10.0.2.99 12345
+ 
+ 	return $?
+ }
+ 
+ test_tcp_forwarding_set_dscp()
+ {
+-	check_dscp "dscp_none"
++	local pmtu="$3"
+ 
+ ip netns exec "$nsr1" nft -f - <<EOF
+ table netdev dscpmangle {
+@@ -388,8 +413,8 @@ table netdev dscpmangle {
+ }
+ EOF
+ if [ $? -eq 0 ]; then
+-	test_tcp_forwarding_ip "$1" "$2"  10.0.2.99 12345
+-	check_dscp "dscp_ingress"
++	test_tcp_forwarding_ip "$1" "$2" "$3" 10.0.2.99 12345
++	check_dscp "dscp_ingress" "$pmtu"
+ 
+ 	ip netns exec "$nsr1" nft delete table netdev dscpmangle
+ else
+@@ -405,10 +430,10 @@ table netdev dscpmangle {
+ }
+ EOF
+ if [ $? -eq 0 ]; then
+-	test_tcp_forwarding_ip "$1" "$2"  10.0.2.99 12345
+-	check_dscp "dscp_egress"
++	test_tcp_forwarding_ip "$1" "$2" "$pmtu"  10.0.2.99 12345
++	check_dscp "dscp_egress" "$pmtu"
+ 
+-	ip netns exec "$nsr1" nft flush table netdev dscpmangle
++	ip netns exec "$nsr1" nft delete table netdev dscpmangle
+ else
+ 	echo "SKIP: Could not load netdev:egress for veth1"
+ fi
+@@ -416,48 +441,53 @@ fi
+ 	# partial.  If flowtable really works, then both dscp-is-0 and dscp-is-cs3
+ 	# counters should have seen packets (before and after ft offload kicks in).
+ 	ip netns exec "$nsr1" nft -a insert rule inet filter forward ip dscp set cs3
+-	test_tcp_forwarding_ip "$1" "$2"  10.0.2.99 12345
+-	check_dscp "dscp_fwd"
++	test_tcp_forwarding_ip "$1" "$2" "$pmtu"  10.0.2.99 12345
++	check_dscp "dscp_fwd" "$pmtu"
+ }
+ 
+ test_tcp_forwarding_nat()
+ {
++	local nsa="$1"
++	local nsb="$2"
++	local pmtu="$3"
++	local what="$4"
+ 	local lret
+-	local pmtu
+ 
+-	test_tcp_forwarding_ip "$1" "$2" 10.0.2.99 12345
+-	lret=$?
++	[ "$pmtu" -eq 0 ] && what="$what (pmtu disabled)"
+ 
+-	pmtu=$3
+-	what=$4
++	test_tcp_forwarding_ip "$nsa" "$nsb" "$pmtu" 10.0.2.99 12345
++	lret=$?
+ 
+ 	if [ "$lret" -eq 0 ] ; then
+ 		if [ "$pmtu" -eq 1 ] ;then
+-			check_counters "flow offload for ns1/ns2 with masquerade and pmtu discovery $what"
++			check_counters "flow offload for ns1/ns2 with masquerade $what"
+ 		else
+ 			echo "PASS: flow offload for ns1/ns2 with masquerade $what"
+ 		fi
+ 
+-		test_tcp_forwarding_ip "$1" "$2" 10.6.6.6 1666
++		test_tcp_forwarding_ip "$1" "$2" "$pmtu" 10.6.6.6 1666
+ 		lret=$?
+ 		if [ "$pmtu" -eq 1 ] ;then
+-			check_counters "flow offload for ns1/ns2 with dnat and pmtu discovery $what"
++			check_counters "flow offload for ns1/ns2 with dnat $what"
+ 		elif [ "$lret" -eq 0 ] ; then
+ 			echo "PASS: flow offload for ns1/ns2 with dnat $what"
+ 		fi
++	else
++		echo "FAIL: flow offload for ns1/ns2 with dnat $what"
+ 	fi
+ 
+ 	return $lret
+ }
+ 
+ make_file "$nsin" "$filesize"
++make_file "$nsin_small" "$filesize_small"
+ 
+ # First test:
+ # No PMTU discovery, nsr1 is expected to fragment packets from ns1 to ns2 as needed.
+ # Due to MTU mismatch in both directions, all packets (except small packets like pure
+ # acks) have to be handled by normal forwarding path.  Therefore, packet counters
+ # are not checked.
+-if test_tcp_forwarding "$ns1" "$ns2"; then
++if test_tcp_forwarding "$ns1" "$ns2" 0; then
+ 	echo "PASS: flow offloaded for ns1/ns2"
+ else
+ 	echo "FAIL: flow offload for ns1/ns2:" 1>&2
+@@ -489,8 +519,9 @@ table ip nat {
+ }
+ EOF
+ 
++check_dscp "dscp_none" "0"
+ if ! test_tcp_forwarding_set_dscp "$ns1" "$ns2" 0 ""; then
+-	echo "FAIL: flow offload for ns1/ns2 with dscp update" 1>&2
++	echo "FAIL: flow offload for ns1/ns2 with dscp update and no pmtu discovery" 1>&2
+ 	exit 0
+ fi
+ 
+@@ -512,6 +543,14 @@ ip netns exec "$ns2" sysctl net.ipv4.ip_no_pmtu_disc=0 > /dev/null
+ # are lower than file size and packets were forwarded via flowtable layer.
+ # For earlier tests (large mtus), packets cannot be handled via flowtable
+ # (except pure acks and other small packets).
++ip netns exec "$nsr1" nft reset counters table inet filter >/dev/null
++ip netns exec "$ns2"  nft reset counters table inet filter >/dev/null
++
++if ! test_tcp_forwarding_set_dscp "$ns1" "$ns2" 1 ""; then
++	echo "FAIL: flow offload for ns1/ns2 with dscp update and pmtu discovery" 1>&2
++	exit 0
++fi
++
+ ip netns exec "$nsr1" nft reset counters table inet filter >/dev/null
+ 
+ if ! test_tcp_forwarding_nat "$ns1" "$ns2" 1 ""; then
+@@ -644,7 +683,7 @@ ip -net "$ns2" route del 192.168.10.1 via 10.0.2.1
+ ip -net "$ns2" route add default via 10.0.2.1
+ ip -net "$ns2" route add default via dead:2::1
+ 
+-if test_tcp_forwarding "$ns1" "$ns2"; then
++if test_tcp_forwarding "$ns1" "$ns2" 1; then
+ 	check_counters "ipsec tunnel mode for ns1/ns2"
+ else
+ 	echo "FAIL: ipsec tunnel mode for ns1/ns2"
+@@ -668,7 +707,7 @@ if [ "$1" = "" ]; then
+ 	fi
+ 
+ 	echo "re-run with random mtus and file size: -o $o -l $l -r $r -s $filesize"
+-	$0 -o "$o" -l "$l" -r "$r" -s "$filesize"
++	$0 -o "$o" -l "$l" -r "$r" -s "$filesize" || ret=1
+ fi
+ 
+ exit $ret
+-- 
+2.49.1
 
 
