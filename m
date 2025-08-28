@@ -1,182 +1,105 @@
-Return-Path: <netdev+bounces-217751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE417B39BA3
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 13:34:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEEF6B39BA5
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 13:35:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78983467873
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 11:34:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABA2F467873
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 11:35:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E096C2EA170;
-	Thu, 28 Aug 2025 11:34:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18C5C30DD04;
+	Thu, 28 Aug 2025 11:35:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GanswKx5"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jLcgiJry"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC31B30CD9D
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 11:34:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E543265298;
+	Thu, 28 Aug 2025 11:35:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756380862; cv=none; b=eCaPi0BFDWe9n/zkrJSM9zoamPR3zQK+DB3AG9SrvRyl71UvAE9Ql2nX+h1uw/0Mq7WAhnNHqgVLRzROGv7HEjENhlzUxhfEw72RNPpLQtlM8LqYl51XrigMoIeM7tKXItEZuTJo7jhTUdb8TuaDE00yAUuG2NmRiSvCUjPTQZo=
+	t=1756380925; cv=none; b=X3DPVzmGTYInqb3FN9OKlq02Pl5qgUs0MBDx/i5KM6NN0GQ/tWtTnx7anDUg0gcNSuWhPn+flTz6JBxkWP2A/lx9AgD5r4RVeIh/fIA21WvQFsT8kAUBq3SWNcuzipUJgTD0VM7OHeBzzbL8337vdSqCqtJtYXjmMBnoZf/tl8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756380862; c=relaxed/simple;
-	bh=jX4WE57wwaL2SAlbrArIxPo6UIRjjAolboJfhOPr3JU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q8NesxUk4SJRwke1z5upWHmewzng1gPP5/jtOPKx+XS0cBwLgF+8vnm4WRxC066B3uyLLRrOJIYja/b2bwhRIdST9ltvKyZtPaVnB19+zjj/DXUPeNNgEIoQbQyIIkzIK+IL01KaUIPWs+k1Bn5oXu0/1YraiScwQVwguWJLPfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GanswKx5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08B4FC4CEEB;
-	Thu, 28 Aug 2025 11:34:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756380862;
-	bh=jX4WE57wwaL2SAlbrArIxPo6UIRjjAolboJfhOPr3JU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GanswKx5+PhAaCdhXmFXbU1ReowfnjJIImdtC/vrglA/xVGd2MJaQJevCnLZTFmuC
-	 6aYEs2oY8w/QTLGWVCLIbqSw2eYbi6H1viZLnHXFvx4T3IsMm4oJo8fGKy9YFwVLZj
-	 QYdw99kQhpmWNpH46rcn72jmE55vDSlJCc4zmJAllJRVdEMioSjCPO6C8E9NTzNoF0
-	 tssO+pqeiE9CFQZUFxcXtA2pANKO9dipagxytPSGGZemU6JQAp/i9tp+tAijmvxqO9
-	 UZOLikTJ9kTZqyq0Z8dtCXHNqoDChGLOxXKhJicnDWRxPAeLC2Tie2uke572l7eclf
-	 mr5wBKMl0BlnQ==
-Date: Thu, 28 Aug 2025 12:34:17 +0100
-From: Simon Horman <horms@kernel.org>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>, mbloch@nvidia.com,
-	Adithya Jayachandran <ajayachandra@nvidia.com>
-Subject: Re: [PATCH net-next V2 3/7] net/mlx5: E-Switch, Add support for
- adjacent functions vports discovery
-Message-ID: <20250828113417.GB10519@horms.kernel.org>
-References: <20250827044516.275267-1-saeed@kernel.org>
- <20250827044516.275267-4-saeed@kernel.org>
+	s=arc-20240116; t=1756380925; c=relaxed/simple;
+	bh=EutqmllJa5MrsJcHizOYbfflLsXSe5J90Zg6yyrLEbg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cQFFECKL0xZTwSKmorsuqKQq9T6G5MCDF65Zd0Frq7iPGj4BJNLs/qVJkBiWG/o2hKJd+g83lA7tmTkwb5ib5FJ6rsAloJYRA+eM+Z52u98QLp1pfrkM03IkqyctzP0X9LPZp7gk9GohS3aX89KdR+x/v0L9S4EWsuPPCIsmn7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=jLcgiJry; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 55395C6B397;
+	Thu, 28 Aug 2025 11:35:05 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id A39BB60303;
+	Thu, 28 Aug 2025 11:35:19 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 59CBF1C22D2C9;
+	Thu, 28 Aug 2025 13:35:13 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1756380918; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=EutqmllJa5MrsJcHizOYbfflLsXSe5J90Zg6yyrLEbg=;
+	b=jLcgiJrykap+ru207xJFh2urzLO1xQe2+/GPo4Qabl32Z4hKdD+HaMvMTahlp7aeZnDtiz
+	xMaE0EBJ5IK5ACn+2oFXKKJCu9DR8tqB9zP1If0FmwuaOfQSH0L+03nl40g4V5hkLTVxVQ
+	W8Spy7wsHlDYGo5nwsZQiYHi3S+4b8sHsT/EzTipCSyfjPTYNvQctS6rgETJgBVPwBTRKu
+	qeNTvci61b0YoMIfszj0ZYw+beboq6sokM9KW31Hb+1MZ3p7YQS8FKwVkjD7IrE93U1Y/l
+	3qD0U3gQAwCc9d7+NFEpXBG5vmgCDSsiZ6HhPYhe/nHEFSgZLW3I2b9ssfx5eQ==
+Date: Thu, 28 Aug 2025 13:35:11 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Piotr Kubik <piotr.kubik@adtran.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v7 2/2] net: pse-pd: Add Si3474 PSE controller
+ driver
+Message-ID: <20250828133511.315176a9@kmaincent-XPS-13-7390>
+In-Reply-To: <9b72c8cd-c8d3-4053-9c80-671b9481d166@adtran.com>
+References: <6af537dc-8a52-4710-8a18-dcfbb911cf23@adtran.com>
+	<9b72c8cd-c8d3-4053-9c80-671b9481d166@adtran.com>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250827044516.275267-4-saeed@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Tue, Aug 26, 2025 at 09:45:12PM -0700, Saeed Mahameed wrote:
-> From: Adithya Jayachandran <ajayachandra@nvidia.com>
-> 
-> Adding driver support to query adjacent functions vports, AKA
-> delegated vports.
-> 
-> Adjacent functions can delegate their sriov vfs to other sibling PF in
-> the system, to be managed by the eswitch capable sibling PF.
-> E.g, ECPF to Host PF, multi host PF between each other, etc.
-> 
-> Only supported in switchdev mode.
-> 
-> Signed-off-by: Adithya Jayachandran <ajayachandra@nvidia.com>
-> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+Le Tue, 26 Aug 2025 14:41:58 +0000,
+Piotr Kubik <piotr.kubik@adtran.com> a =C3=A9crit :
 
-...
+> From: Piotr Kubik <piotr.kubik@adtran.com>
+>=20
+> Add a driver for the Skyworks Si3474 I2C Power Sourcing Equipment
+> controller.
+>=20
+> Driver supports basic features of Si3474 IC:
+> - get port status,
+> - get port power,
+> - get port voltage,
+> - enable/disable port power.
+>=20
+> Only 4p configurations are supported at this moment.
+>=20
+> Signed-off-by: Piotr Kubik <piotr.kubik@adtran.com>
 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
+Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
 
-...
-
-> +static int
-> +mlx5_eswitch_load_adj_vf_vports(struct mlx5_eswitch *esw,
-> +				enum mlx5_eswitch_vport_event enabled_events)
-> +{
-> +	struct mlx5_vport *vport;
-> +	unsigned long i;
-> +	int err;
-> +
-> +	mlx5_esw_for_each_vf_vport(esw, i, vport, U16_MAX) {
-> +		if (!vport->adjacent)
-> +			continue;
-> +		err = mlx5_eswitch_load_pf_vf_vport(esw, vport->vport,
-> +						    enabled_events);
-> +		if (err)
-> +			goto unload_adj_vf_vport;
-> +	}
-> +
-> +	return 0;
-> +
-> +unload_adj_vf_vport:
-> +	mlx5_eswitch_unload_adj_vf_vports(esw);
-> +	return err;
-> +}
-> +
->  int mlx5_eswitch_load_vf_vports(struct mlx5_eswitch *esw, u16 num_vfs,
->  				enum mlx5_eswitch_vport_event enabled_events)
->  {
-> @@ -1345,7 +1382,15 @@ mlx5_eswitch_enable_pf_vf_vports(struct mlx5_eswitch *esw,
->  					  enabled_events);
->  	if (ret)
->  		goto vf_err;
-> +
-> +	/* Enable adjacent VF vports */
-> +	ret = mlx5_eswitch_load_adj_vf_vports(esw, enabled_events);
-> +	if (ret)
-> +		goto unload_adj_vf_vports;
-> +
->  	return 0;
-> +unload_adj_vf_vports:
-> +	mlx5_eswitch_unload_adj_vf_vports(esw);
->  
-
-Hi Adithya and Saeed,
-
-mlx5_eswitch_load_adj_vf_vports() already unwinds on error,
-calling mlx5_eswitch_unload_adj_vf_vports().
-
-While resources allocated by the preceding call to
-mlx5_eswitch_load_vf_vports() (just before this hunk) seem to be leaked.
-
-So I wonder if the above two lines should be:
-
-unload_vf_vports:
-	mlx5_eswitch_unload_vf_vports(esw, num_vfs);
-
->  vf_err:
->  	if (mlx5_core_ec_sriov_enabled(esw->dev))
-
-...
-
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-> index cfd6b1b8c6f4..9f8bb397eae5 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-> @@ -216,6 +216,7 @@ struct mlx5_vport {
->  	u32                     metadata;
->  	int                     vhca_id;
->  
-> +	bool adjacent; /* delegated vhca from adjacent function */
->  	struct mlx5_vport_info  info;
->  
->  	/* Protected with the E-Switch qos domain lock. The Vport QoS can
-> @@ -384,6 +385,7 @@ struct mlx5_eswitch {
->  
->  	struct mlx5_esw_bridge_offloads *br_offloads;
->  	struct mlx5_esw_offload offloads;
-> +	u32 last_vport_idx; /* ++ every time a vport is created */
-
-The comment above documents one operation that can occur
-on this field. But the code also performs others: decrement and set.
-
-So perhaps this is more appropriate?
-
-	u32 last_vport_idx; /* Number of vports created */
-
-Or dropping the comment entirely: it seems obvious enough.
-
->  	int                     mode;
->  	u16                     manager_vport;
->  	u16                     first_host_vport;
-
-...
+Thank you!
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
