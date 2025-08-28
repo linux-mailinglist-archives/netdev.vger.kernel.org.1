@@ -1,88 +1,69 @@
-Return-Path: <netdev+bounces-217858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D93AFB3A2BB
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 16:53:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FD61B3A2CA
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 16:55:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36B547ABB74
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 14:51:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 425713BB390
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 14:53:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CB493126C7;
-	Thu, 28 Aug 2025 14:53:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E3C0313520;
+	Thu, 28 Aug 2025 14:53:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IOrGq3OT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gdcwNHFe"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1155F2C181
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 14:52:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667793128B7;
+	Thu, 28 Aug 2025 14:53:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756392782; cv=none; b=H6d/va4pbiBLh+rELjdeTonEbEiCBI+ItKoBNGKzz8NGlC09ALTIfQysUqKjZVNB1HoQglf66ZqT4oJsGNXrn3S8UqaM8bnmKiCUDJjjbHrzYh7zDwiG0tRr0Z9iP0B0weiJ91bFOZvUyzLMS4HjyJuvOt2bBKDYG0+k5weaFQ0=
+	t=1756392787; cv=none; b=BgEBjcWtFgcwIbIugeS9B7vq8eLtvQLiy2vFkZDvSvPJN6GddTQYyF6RTbyTbb/wSXtSALf2lLlN1XU1ZW5v8rp4ftfjxR1lHTQ3gqCX6k6coGhw5dZN1aGtH3hk1o6HIU/meFe2VdRLFUtIfS6YRPrlu8bbPLmOAT8ZIyjBAgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756392782; c=relaxed/simple;
-	bh=W+KeX730MTropvxIW4LMg7/l9u2KbC7Dy1gYqaG7oJQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=N2RYfsKxUWX7Vndld4gA2uxDv04smBc6Gmxh+sYxwGAcygvhK4HYQKbmPqDwv8+U4NtwmcVkAiLI7gKMH2dzFtiu3NVV3xqM1O6647YFNJfTHnMohIaugHpIotXokSg5zokVd+GhluU8/7jHL/LLrE4y7OORFVMdwY+N373DNGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IOrGq3OT; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <9d940081-1b0a-4738-8d3a-307098c8b0eb@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1756392767;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AqCSeRv1rBAdMX1vVAqaATGQ1oyV8tIerAIu9VU1O4I=;
-	b=IOrGq3OTjxLD6CYrpq2WPEerGjFUt0HsbJepW4/H/QCebnx9V2SmuQwG1ow+U+yoYwZZa8
-	GUK8CSlCWH5bXHJ7zVChUg2Ml7Iq187nXaIgnRBsOplQEW+Vmi3fPY2mXn9ClnzZvs3l5M
-	qIcMZ6Vla/s8aApKDjx1P/jJlpzZrm4=
-Date: Thu, 28 Aug 2025 15:52:41 +0100
+	s=arc-20240116; t=1756392787; c=relaxed/simple;
+	bh=tkhL9L53Smx9cDaCOVD3UH+JCscUxXQ2KufEgyoREOY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TEeqCVWu07Wt+6GHZ7r60QAKY8GKosxGvFeaXbfqlN716V0GJC3HBgUptLyXJQ3H4hBtSdVYh08zX9ICkkoWKySDnLVkh2ylBdTGtVSPJvFeixDIVYDs/QHjtZvCjEfj+K0O5AkPqLji2AlNCh/dXWHKABhcUvXnLN70C6hS0A8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gdcwNHFe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACB0BC4CEEB;
+	Thu, 28 Aug 2025 14:53:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756392786;
+	bh=tkhL9L53Smx9cDaCOVD3UH+JCscUxXQ2KufEgyoREOY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gdcwNHFeDr0hZ817wBNdkFDJGo3U0mr6CsBQ47gS4GYMzDZPiq3YrvKkq2CGLXe/s
+	 /KxOhF+YwLMC+G6MiGTZJpTcsVbvtA2hFEiP0XBQe7v6sTNDhcrIN4Xg4VITNhTKIw
+	 9bfDElwfPByEzN11/uUgYvaehp0IfmoSgoHPR0jLymu3nrbog3M0NZPk2PIGDlcZUW
+	 GLvOoL/ZGtcUKrxTD958lX2bmW7Qpmxed05XitXUypcZ1p+kGZO0qZnXwkHUoXeXQ6
+	 iCzFd4DUk5T3l2lJAzuH6n1XnZYZbJ9gJcZX7rGusHYTPWqHLn0REQLV9Smsls8/qG
+	 CYxk/hGo6OFgA==
+Date: Thu, 28 Aug 2025 07:53:05 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+Subject: Re: [GIT PULL] wireless-2025-08-28
+Message-ID: <20250828075305.46c22eb5@kernel.org>
+In-Reply-To: <20250828122654.1167754-8-johannes@sipsolutions.net>
+References: <20250828122654.1167754-8-johannes@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v02 06/14] hinic3: Nic_io initialization
-To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
- Bjorn Helgaas <helgaas@kernel.org>, luosifu <luosifu@huawei.com>,
- Xin Guo <guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>,
- Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
- Shi Jing <shijing34@huawei.com>, Meny Yossefi <meny.yossefi@huawei.com>,
- Gur Stavi <gur.stavi@huawei.com>, Lee Trager <lee@trager.us>,
- Michael Ellerman <mpe@ellerman.id.au>, Suman Ghosh <sumang@marvell.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-References: <cover.1756378721.git.zhuyikai1@h-partners.com>
- <a27347d567faf603a478eba7dc5dffe87a7cf73e.1756378721.git.zhuyikai1@h-partners.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <a27347d567faf603a478eba7dc5dffe87a7cf73e.1756378721.git.zhuyikai1@h-partners.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 28/08/2025 13:10, Fan Gong wrote:
-> Add nic_io initialization to enable NIC service, initialize function table
-> and negotiate activation of NIC features.
-> 
-> Co-developed-by: Xin Guo <guoxin09@huawei.com>
-> Signed-off-by: Xin Guo <guoxin09@huawei.com>
-> Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
-> Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
-> Signed-off-by: Fan Gong <gongfan1@huawei.com>
+On Thu, 28 Aug 2025 14:25:58 +0200 Johannes Berg wrote:
+> Back from vacation, and a bunch of things accumulated
+> for everyone. Nothing really stands out much though,
+> except perhaps the various iwlwifi regressions for old
+> devices, which were all my fault...
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+This missed today's PR. Would you like me to pull before
+merging back to net-next? Or no preference?
 
