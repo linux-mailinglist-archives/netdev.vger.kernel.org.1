@@ -1,78 +1,61 @@
-Return-Path: <netdev+bounces-217678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5903B39842
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 11:29:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 768E3B3984B
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 11:29:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DBE017DD9F
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 09:29:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB7B55E88AB
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 09:29:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 585832F39A7;
-	Thu, 28 Aug 2025 09:27:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D5DB2E1C6B;
+	Thu, 28 Aug 2025 09:28:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="rECEJydg"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="itR4/JIf"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3584B2E3360;
-	Thu, 28 Aug 2025 09:27:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24AE12E0910;
+	Thu, 28 Aug 2025 09:28:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756373261; cv=none; b=qScfTsRwqTjJ0uzuLLKk4QwEDWunidVK/e9uSnsfs3KU+VD2yPXXhs/SN3xOCrEDpf7HTdrFKny9WSTWDT3NXgoOI6lwXZXLD084PV7M69AZRlGNjZ/AH5nbRaOy6GKhQDSNd9GJENlQeXMqAPdZ+UrEafX4Im1TocnkMpXzCls=
+	t=1756373330; cv=none; b=uH2NABUODJ67GcX4RtO8wttbjw3cKb3h+6PYle+iAJIj44uSurm9hN7F3j19q4KKBMNF65VJfybNPZN2RnXKlBgC2EI9Z1zbuGa9ZqHjhBtbndiZ8jxO22umPIiBpBQapVaOgZjayb9Fbjh+pf+014kkaA3ZeL20rOs83c3j/+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756373261; c=relaxed/simple;
-	bh=cW2jLd7ZnHN+UbDtCuz+s3w29KXPm3Vezgp/eS6LoJQ=;
+	s=arc-20240116; t=1756373330; c=relaxed/simple;
+	bh=y8YnwcnSxBOTmOyoA65L96B1RKvSEtcKZ0A6OCYbckQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IqAcXEcCneMhLq4l2ju6qcsyfpRZ56bwXOiTtdhryB9pJ/WjF9CvFPd8qd5AEN9rLtcsaK9KGWLqME1jVtYRwb2FHywVOjPvkvMeik2uT934OujtIGXu4wY4COnXJNwvr9oEGuxL4jEkTEAXRtQX2o4taJjR8uzMlQQUVMD/98s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=rECEJydg; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=PgOiY/8TM3TVUl6GJF7nL449nJQfKgvLd+3cCT8JD6o=; b=rECEJydgc7m8D9fDVfaSoNnCtY
-	Cvzwrz1a+X+uHqcgSXiGPBIr/ddNcuBSy8iW0m3ERG6Nwim6qN2to5wuTZcM7KH9W2fvjxl5dZK5q
-	pfNr70KoQQmHgAGweJd3ElGoczV94jzic3rfWFZkcUQHrZO8o3mlGqblzzBxx+6De/AbzRG+k/LM4
-	fxgM38u5ynrl2HQTDNifVxJECo1H1CBgMhfj6FoxcvQ24klFM63xabIQagT17IUb4938lM3ZIhEEX
-	EXmixQ/gPXiCsWXjlOwSi9bNPN5HrCdlU0vYdejEJln892uQKeEJCtbzlOq2HCh8K3saB0Pon/Y4/
-	kmSAU+HQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42286)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1urYub-000000001Pu-1HpH;
-	Thu, 28 Aug 2025 10:27:17 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1urYuW-0000000031q-1yMo;
-	Thu, 28 Aug 2025 10:27:12 +0100
-Date: Thu, 28 Aug 2025 10:27:12 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Joy Zou <joy.zou@nxp.com>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	shawnguo@kernel.org, s.hauer@pengutronix.de, kernel@pengutronix.de,
-	festevam@gmail.com, richardcochran@gmail.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com, frieder.schrempf@kontron.de,
-	primoz.fiser@norik.com, othacehe@gnu.org,
-	Markus.Niebel@ew.tq-group.com, alexander.stein@ew.tq-group.com,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux@ew.tq-group.com, netdev@vger.kernel.org,
-	linux-pm@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	Frank.Li@nxp.com
-Subject: Re: [PATCH v9 6/6] net: stmmac: imx: add i.MX91 support
-Message-ID: <aLAg8Lds-O_36aaN@shell.armlinux.org.uk>
-References: <20250825091223.1378137-1-joy.zou@nxp.com>
- <20250825091223.1378137-7-joy.zou@nxp.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=F2bQNJICioUFpB/QaTvlYy+A0LdOq0Udry2iR/9niFgaKBene3cZr8vwna2cyDN27f4k7hVRkDQZjeJduk8r6E5ba6UUcih7AXkXrUq7ouF9CalnVOWsb+ENX2nwh6vLUWvkFpeNlXLo9bY6wOcIbfJYbRSwMAsJpKDHs+l5PBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=itR4/JIf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2ECBFC4CEEB;
+	Thu, 28 Aug 2025 09:28:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1756373329;
+	bh=y8YnwcnSxBOTmOyoA65L96B1RKvSEtcKZ0A6OCYbckQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=itR4/JIfDU7uqrAWwxeNh0s9mmdmkznvYT3uyvfBV2KPNdM5qTCqjObIv4dnUZHac
+	 ZskNQxAdVWivgltri9cqI6IEyqXIpIkELFktXg78wPFx8NGA3kZvImaLzRvKzqvIKY
+	 zSOkrreyzUtIt5zvnHkmae0jVUd8BvQbwn1JJaV4=
+Date: Thu, 28 Aug 2025 11:28:46 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Miaoqian Lin <linmq006@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Grygorii Strashko <grygorii.strashko@ti.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH] net: ethernet: ti: Prevent divide-by-zero in
+ cpts_calc_mult_shift()
+Message-ID: <2025082830-bobbing-confusing-14fc@gregkh>
+References: <20250828092224.46761-1-linmq006@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,22 +64,71 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250825091223.1378137-7-joy.zou@nxp.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250828092224.46761-1-linmq006@gmail.com>
 
-On Mon, Aug 25, 2025 at 05:12:23PM +0800, Joy Zou wrote:
-> @@ -310,6 +311,7 @@ imx_dwmac_parse_dt(struct imx_priv_data *dwmac, struct device *dev)
->  	}
+On Thu, Aug 28, 2025 at 05:22:23PM +0800, Miaoqian Lin wrote:
+> cpts_calc_mult_shift() has a potential divide-by-zero in this line:
+> 
+>         do_div(maxsec, freq);
+> 
+> due to the fact that clk_get_rate() can return zero in certain error
+> conditions.
+> Add an explicit check to fix this.
+> 
+> Fixes: 88f0f0b0bebf ("net: ethernet: ti: cpts: calc mult and shift from refclk freq")
+> Signed-off-by: Miaoqian Lin <linmq006@gmail.com>
+> ---
+> This follows the same pattern as the fix in commit 7ca59947b5fc
+> ("pwm: mediatek: Prevent divide-by-zero in pwm_mediatek_config()").
+> ---
+>  drivers/net/ethernet/ti/cpts.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/ti/cpts.c b/drivers/net/ethernet/ti/cpts.c
+> index 2ba4c8795d60..e4e3409e7648 100644
+> --- a/drivers/net/ethernet/ti/cpts.c
+> +++ b/drivers/net/ethernet/ti/cpts.c
+> @@ -607,6 +607,8 @@ static void cpts_calc_mult_shift(struct cpts *cpts)
+>  	u32 freq;
 >  
->  	if (of_machine_is_compatible("fsl,imx8mp") ||
-> +	    of_machine_is_compatible("fsl,imx91") ||
->  	    of_machine_is_compatible("fsl,imx93")) {
->  		/* Binding doc describes the propety:
->  		 * is required by i.MX8MP, i.MX93.
+>  	freq = clk_get_rate(cpts->refclk);
+> +	if (!freq)
+> +		return;
+>  
+>  	/* Calc the maximum number of seconds which we can run before
+>  	 * wrapping around.
+> -- 
+> 2.39.5 (Apple Git-154)
+> 
 
-Doesn't this comment need updating?
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Hi,
+
+This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
+a patch that has triggered this response.  He used to manually respond
+to these common problems, but in order to save his sanity (he kept
+writing the same thing over and over, yet to different people), I was
+created.  Hopefully you will not take offence and will fix the problem
+in your patch and resubmit it so that it can be accepted into the Linux
+kernel tree.
+
+You are receiving this message because of the following common error(s)
+as indicated below:
+
+- You have marked a patch with a "Fixes:" tag for a commit that is in an
+  older released kernel, yet you do not have a cc: stable line in the
+  signed-off-by area at all, which means that the patch will not be
+  applied to any older kernel releases.  To properly fix this, please
+  follow the documented rules in the
+  Documentation/process/stable-kernel-rules.rst file for how to resolve
+  this.
+
+If you wish to discuss this problem further, or you have questions about
+how to resolve this issue, please feel free to respond to this email and
+Greg will reply once he has dug out from the pending patches received
+from other developers.
+
+thanks,
+
+greg k-h's patch email bot
 
