@@ -1,180 +1,207 @@
-Return-Path: <netdev+bounces-217620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9597DB394D5
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 09:16:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 260EEB394E8
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 09:19:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E128163148
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 07:16:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1DBB3B9C60
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 07:19:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1BD676025;
-	Thu, 28 Aug 2025 07:16:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 994C62DFA3B;
+	Thu, 28 Aug 2025 07:18:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="cAajJqN8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Joedf28s"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87AFF30CD89
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 07:16:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E3E42DCF4D;
+	Thu, 28 Aug 2025 07:18:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756365375; cv=none; b=ju9w2yta8IEaMBgESwDsdWRb/LcC/kquT79EcExWBz7mainhRR9NNeMgpOjLzTonFmGVjd8JuAR7Vf5uPAkLfM5RHh3PexBv4zNbOSctuct4KEqIy0PguCEXIYIzJH/Rm6F9pjmhMwmeXjcGmeDzXjRlh2Rtuy+tYYo8RatMsds=
+	t=1756365535; cv=none; b=uLfLQZwW0bNd2Zw90eRt+5RGUAQzPfGSZVjn2RkQINEYbsEdtbUudbPFOpQ6tkr9nhvf6s48r8lbaBXOb8JzK/OvmEY2bcttouWteeRd78Ht3OIBo7Aympz1bnFpAUpbanpJL9L+ngOVufHTn38okqPSiTtlGlhIag8eqRWHr1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756365375; c=relaxed/simple;
-	bh=EP5LAkVGPHYBWFNWQT51n48XaZ8vkDl7dsaHJY9cEpw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XgTvKYsJVIVcfDVb2CoNstjCoUNqmaHFULs3+bsiuXVFvDBCxdcojRZYpdQrd0fedD/R0KaTBlLdECv487yLq44p2iT996niTY44jgxax5BWOEUtOnS0Q5d+K6UfjUMH+DgCP/hq3LmFOuhI1nEbGNItemAuIY62Gf62F+kQRy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=cAajJqN8; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id A155B3F7BB
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 07:16:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1756365364;
-	bh=EP5LAkVGPHYBWFNWQT51n48XaZ8vkDl7dsaHJY9cEpw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type;
-	b=cAajJqN8qt566q2SGECHt7e9WfVAfUSpYtPpHn+uPrNB43h/5WG+S2yBQcAU4t89M
-	 XQS59NVayZN0+ecAnNPNe4gTePWYTfZTyY8bN+o6Yupfkmj8wiVzWidUs0nTo20Ok7
-	 sgVLyg7glqxW21HiaJd2B0pjKWF2oDkuWDMT+3lItF0zToHA7TehZXefrdgpNb7GYc
-	 CvcYSnqbsJ/SxMqon+z9snsaSMHpGknnoa4iRBgLAjV/If+fsiDdbFQPOZk5d7Hue8
-	 XSi4TfLnm8daPyIxbxjA5JzMIqrxStcXawboUq+wVwmW6W0q/8UDihZkI70Un9Ar8g
-	 kig4vQ3QctqBQ==
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-45a1b0cc989so4612665e9.3
-        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 00:16:04 -0700 (PDT)
+	s=arc-20240116; t=1756365535; c=relaxed/simple;
+	bh=RLiNIIZsDGQt0B7qhXbwVc0kC0z981GdJgTavaVVo+U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pPMCurDfcsANH35QmR6eeVJnkKCFzdmBmMnE6i1xTIOtEnQLxIYSu7Ph+m3lWbbkA6lbi94SHiXyJvKrf70Eo7RmCss9VGeuVKhvK0dj3QScxxGb6UP4ew2TZTqhblYDF+TdA8aPdRecYFM+rGXNIEydYhwrcH7q1otgwI9boG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Joedf28s; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-afe9f6caf9eso87484066b.3;
+        Thu, 28 Aug 2025 00:18:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756365532; x=1756970332; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ACPidqQG6DQZNVxh12NaJPKP3Jkf06hyqyPjQ1p5F2E=;
+        b=Joedf28s79TmVflu0u9ETaRtcuAFlF1Q+cRkj0AoHTEbZRc9ov+0LbwWVeBAOSwM5F
+         9se5m/hnaH2x9U9mqdgE1yd5LsJv+u+CbNQ1vyDpUOv4Sxm9oBRTEhDgF7ojkoYgmqJI
+         Y+SYq6V0dueE4LmZ6hHjIMNaKrWG5O8L9dHNl5Abc9vZo3kIWwP1KgyG3SwielmoovyI
+         04xgZFJ3k7phq4cCj4+/Bh/1W9xQExRwrMWhGVQQ4Y3kzygOA3KtT/uESQQs997Dil2z
+         b1DUNkXQZ6WUjeRA6av4rhkRQhoIfBHuMVhVo2zPjT/ORNlCvwABaWjy6/Iedzdn4eJh
+         AJHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756365364; x=1756970164;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EP5LAkVGPHYBWFNWQT51n48XaZ8vkDl7dsaHJY9cEpw=;
-        b=okyg0xpTzYdDhnl7CQX+QsdC+eTNw8+JXXeOHSAgXH0V3FcAmPaIvpjjtikbOuiyM3
-         JI3oZOC6ArwCGo1dkLJepCk7X7yZ2GcZV+PQu5w9ahX+K+xYU4977Z7uZN8qPp3BFQRB
-         GuvUrsYL8zF1jHCZjbGlgv44yqs6cqOTHvJcZVevjvp5DRRly1Ip+thk96zrZU14WUqm
-         3S/WdbBMRDo3JpAVilSdSu8GR0Fpak0j/v0g67jzlDgEojai/K7MnLt7aTKJOWjmN2Nd
-         0uxFvq/dDhHMv/0vKaGj1Asj8XBS43Eiz1CFm5Iet84CAaFT9HMPWq+g5muhNzPXq5bx
-         rFxA==
-X-Forwarded-Encrypted: i=1; AJvYcCXxAE1fZDQg7L7TtOffeoCZyGy34gugNZk5UFMoNG/ulYvBGDQ6AQCHb/zajvOkhjFUTHz6ocY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTBO2Qtm61vlkus0kG8pSTIek/0957giODa6XRSjCUqNeeieIq
-	an2rohE3EpZD3lo31fMhzKB/X8i9BUN8/LJj9Q9WRkDgo7gvFsAC0QrLSUhFGvmwIA5GnxqfqWD
-	UjSkrm8j3Tcarhoby5Wm8oNoHn10lSR4AiutcoxLEzGfzy46ZljY7EjDMzixgYCVDi2EJh4c1Mm
-	WKUktu3ek+Rk3aoEpg2jiTvAur2VUQ6PMWKnCZdO2FVh2EL4Ds
-X-Gm-Gg: ASbGncuJ7uehdN8ngAPKQpT9cDulM09MlHAOsy+2+wus64oXf+MxMV5/xp69DidgXIN
-	fgM+GY6NGI4dFM0nic+hUwn+b5fyilnv9pgfeqX+eVgMM+k0ecVxS5E1oR8Zr8GvoHiOTSYjfws
-	1/Z8LdR2ssJQ1eBhdc00HBTA==
-X-Received: by 2002:a05:6000:2281:b0:3cd:4ff9:c487 with SMTP id ffacd0b85a97d-3cd4ff9c926mr2620668f8f.45.1756365363829;
-        Thu, 28 Aug 2025 00:16:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHfuC2ElMmFlTZiiutii9/xomw0gubj1uQZfa6woHQEtKq8aJkUR/KAMbs3OKEPrupW13u7FOwjSrGKvNtXbv4=
-X-Received: by 2002:a05:6000:2281:b0:3cd:4ff9:c487 with SMTP id
- ffacd0b85a97d-3cd4ff9c926mr2620642f8f.45.1756365363423; Thu, 28 Aug 2025
- 00:16:03 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1756365532; x=1756970332;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :reply-to:message-id:subject:cc:to:from:date:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ACPidqQG6DQZNVxh12NaJPKP3Jkf06hyqyPjQ1p5F2E=;
+        b=h7nRzuuMPqBM56Qor/d+U1MMwfU5rv2tNgKuU9BK3rrxOlM5k2dabPmNeeMyegNLXD
+         nOQl6Z6SghPGx9aibPNrqLQmcMNbs6B1vFUsVYLpoXhYwTqar3co2m0dZRu2mSY5ZJhn
+         datmC1JW7ctj+YfFezmbdMkrpNneqVI8bMbCo90t7qa25lGqFxw2YCbQu109y+ydKxP5
+         9oY4/cdVDDp+A34vqW3ddUkMwQKlZKbBfSXw8fBsrQnMSxciEwbnlqNDsORLjeWbrNGc
+         dIyNuxvTeCn5PC2zO2wsZMywBgr5qIuVePxVvBhYw+bp6WttNkOu4mAqzOaJEPLjm3PG
+         NbDw==
+X-Forwarded-Encrypted: i=1; AJvYcCUFLN461B7xX+aGitmy9WuYcSo7gPHYEzT2DSG5gglyYOoornH5S9jAsfDLGEfxq3qw2+r3FIozvAzV@vger.kernel.org, AJvYcCUdbarWq6z1eY1kJQIoM5C1kQSDv/wb0uM58WBskTOg06IFI+8J/aFXU7l3nbGo2i7UMS5E/+9UjqQH9g==@vger.kernel.org, AJvYcCV1abVnSk19u44tjzQ71TeWBmJWURclSiy/bflMR5w7t05I9fdxgKxMhMAC+90qH4owxtay@vger.kernel.org, AJvYcCVx+GXCKhwSoRFUJ4IJmArkRt4jegWeCNwvynGvLXD4/O2WhsW9GYLVGc4CvhqvDvSXIehBBC3G3A==@vger.kernel.org, AJvYcCW3xnuW0hj/5HKEs9PIkTmRIuW/vRZFT7hfhQO9Nv92f0BbFQnAYs4R41IMiTfRmGNk7/tA4NkXQqPfvQ==@vger.kernel.org, AJvYcCW91AEe/r8hDSUDTfmZBb1y3+17At/zKPFo/16Rj5EYcce6zZSkf/qlPtgP8afOuoJH1WzJ+U5SmL8P642z@vger.kernel.org, AJvYcCWRvh/RpFcSW4JMJ0y+aVIPjL22p5Jru5cgB84sewQV7SE9m/LPzjVntn07+gDDpyCFRycqbo5Y@vger.kernel.org, AJvYcCX+DNv7A5c4yvLXTsQsHhsrzwqhFvfHO5R4pEpqnjdcqCp1rKDj6EEyw/dqLmNykfObkJdasZFkM5L3mA==@vger.kernel.org, AJvYcCXiFjJCEUpPrjBN6ZReHRdoDObDbhKMzVMNpbqhu+d6eEfCk4zr8Vc36gyOka4DwhyHsAzCGXFUcJAJNVzJWNmO@vger.kernel.org, AJvYcCXjJPPIj10LXuqzOAvGWKQ86mQMCWuiJ/q2
+ IXdTYYuXFtYzlaUPvsWbD5ez4MpKVA/U3VYUAdyhbRlA@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2F96dDb9eVMlmDVaQA5HMcDPai70QF1BoTLh8OJ6kR96Fy2/I
+	x26FUYqT5HOOD1MUZkx6z/v9eGljUAVxV0S25pntRAKPxNQVqfelRtZz
+X-Gm-Gg: ASbGncuC4y3Zz4kTEt0Yv820rsqQxg96Tjaz12Ob+EaBF0HrYNOZke8/q8ToDkekLlm
+	LSGO1vBUGpOv/8YMgwG4OQ18cKdTLWYflSwH3UBCoxfACmIo9iraP+6EL8pxaLF21ybYRzH44XA
+	bLifwbx9AEofNbbYu4+KqGmJDUTh+mhRPhZWPxYvjR8iV/YwsZmwED8O9GVwZ/sELvA5YyoX8B3
+	kofM37I/JO8oZPRhGLL6+F4h6yCoJXRTXgJkvUNwwarOau1A4KNLoYR+KKU2YA7dsDf+5264WLY
+	fMCCyMAXdkatmAHw8tyBge03VNz/kkgCX2EfqynqrRgvOGBWJ8iYB6rLQoh1ksrE0TZNylrhfRl
+	g9pYjVvHTnaNZ/Ub9EGnb1T58H5Uav+42lWR1
+X-Google-Smtp-Source: AGHT+IEf18QCG44U8jBJ4evHstdtd0oL4Hr6BpN08BPT0cHmsLXVki3gbBRZpXohq9eRx3IUTA8+0Q==
+X-Received: by 2002:a17:907:d2a:b0:afe:dbfb:b10e with SMTP id a640c23a62f3a-afedbfbb935mr140730666b.47.1756365531421;
+        Thu, 28 Aug 2025 00:18:51 -0700 (PDT)
+Received: from localhost ([185.92.221.13])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-afe98ade972sm616427066b.50.2025.08.28.00.18.50
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 28 Aug 2025 00:18:50 -0700 (PDT)
+Date: Thu, 28 Aug 2025 07:18:50 +0000
+From: Wei Yang <richard.weiyang@gmail.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Zi Yan <ziy@nvidia.com>,
+	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
+	SeongJae Park <sj@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andreas Larsson <andreas@gaisler.com>,
+	Alexander Potapenko <glider@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Brendan Jackman <jackmanb@google.com>,
+	Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>,
+	Dmitry Vyukov <dvyukov@google.com>, dri-devel@lists.freedesktop.org,
+	intel-gfx@lists.freedesktop.org, iommu@lists.linux.dev,
+	io-uring@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	John Hubbard <jhubbard@nvidia.com>, kasan-dev@googlegroups.com,
+	kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-arm-kernel@axis.com, linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Marco Elver <elver@google.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
+	Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
+	Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
+	virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
+	wireguard@lists.zx2c4.com, x86@kernel.org
+Subject: Re: [PATCH v1 01/36] mm: stop making SPARSEMEM_VMEMMAP
+ user-selectable
+Message-ID: <20250828071850.kl7clyh6e75horlk@master>
+Reply-To: Wei Yang <richard.weiyang@gmail.com>
+References: <20250827220141.262669-1-david@redhat.com>
+ <20250827220141.262669-2-david@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250710092455.1742136-1-vitaly.lifshits@intel.com>
- <20250714165505.GR721198@horms.kernel.org> <CO1PR11MB5089BDD57F90FE7BEBE824F5D654A@CO1PR11MB5089.namprd11.prod.outlook.com>
- <b7265975-d28c-4081-811c-bf7316954192@intel.com> <f44bfb41-d3bd-471c-916e-53fd66b04f27@intel.com>
- <20250730152848.GJ1877762@horms.kernel.org> <20250730134213.36f1f625@kernel.org>
- <55570ac6-8cd7-4a00-804e-7164f374f8ae@intel.com> <20250730170641.208bbce5@kernel.org>
- <e04d3835-6870-4b82-a9a5-cb2e0b8342f5@intel.com> <20250731071900.5513e432@kernel.org>
- <f27620c4-479b-4028-8055-448855991e6a@intel.com> <a9794885-5801-401b-b892-f1fed4157a4f@intel.com>
-In-Reply-To: <a9794885-5801-401b-b892-f1fed4157a4f@intel.com>
-From: En-Wei WU <en-wei.wu@canonical.com>
-Date: Thu, 28 Aug 2025 15:15:52 +0800
-X-Gm-Features: Ac12FXwi4D0akiHpvcavQrToyonQCdZbd76txj77rnkAuclerfTJUE2K51gEfxs
-Message-ID: <CAMqyJG2Kv90bzJNu10mPrmHQrfi5FL1eQPCufD3n=CNcDNMYkA@mail.gmail.com>
-Subject: Re: [RFC net-next v1 1/1] e1000e: Introduce private flag and module
- param to disable K1
-To: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
-Cc: Jacob Keller <jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"Ruinskiy, Dima" <dima.ruinskiy@intel.com>, Simon Horman <horms@kernel.org>, 
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>, 
-	"edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250827220141.262669-2-david@redhat.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 
-> Regarding the SKUs: the issues we've encountered aren't tied to specific =
-SKUs
+On Thu, Aug 28, 2025 at 12:01:05AM +0200, David Hildenbrand wrote:
+>In an ideal world, we wouldn't have to deal with SPARSEMEM without
+>SPARSEMEM_VMEMMAP, but in particular for 32bit SPARSEMEM_VMEMMAP is
+>considered too costly and consequently not supported.
+>
+>However, if an architecture does support SPARSEMEM with
+>SPARSEMEM_VMEMMAP, let's forbid the user to disable VMEMMAP: just
+>like we already do for arm64, s390 and x86.
+>
+>So if SPARSEMEM_VMEMMAP is supported, don't allow to use SPARSEMEM without
+>SPARSEMEM_VMEMMAP.
+>
+>This implies that the option to not use SPARSEMEM_VMEMMAP will now be
+>gone for loongarch, powerpc, riscv and sparc. All architectures only
+>enable SPARSEMEM_VMEMMAP with 64bit support, so there should not really
+>be a big downside to using the VMEMMAP (quite the contrary).
+>
+>This is a preparation for not supporting
+>
+>(1) folio sizes that exceed a single memory section
+>(2) CMA allocations of non-contiguous page ranges
+>
+>in SPARSEMEM without SPARSEMEM_VMEMMAP configs, whereby we
+>want to limit possible impact as much as possible (e.g., gigantic hugetlb
+>page allocations suddenly fails).
+>
+>Acked-by: Zi Yan <ziy@nvidia.com>
+>Acked-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
+>Acked-by: SeongJae Park <sj@kernel.org>
+>Cc: Huacai Chen <chenhuacai@kernel.org>
+>Cc: WANG Xuerui <kernel@xen0n.name>
+>Cc: Madhavan Srinivasan <maddy@linux.ibm.com>
+>Cc: Michael Ellerman <mpe@ellerman.id.au>
+>Cc: Nicholas Piggin <npiggin@gmail.com>
+>Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
+>Cc: Paul Walmsley <paul.walmsley@sifive.com>
+>Cc: Palmer Dabbelt <palmer@dabbelt.com>
+>Cc: Albert Ou <aou@eecs.berkeley.edu>
+>Cc: Alexandre Ghiti <alex@ghiti.fr>
+>Cc: "David S. Miller" <davem@davemloft.net>
+>Cc: Andreas Larsson <andreas@gaisler.com>
+>Signed-off-by: David Hildenbrand <david@redhat.com>
 
-From our side, the issue is only specific to an SKU. If that's also
-the case from other sides, I'm wondering if it's possible to add a
-quirk table for enabling/disabling K1 configuration.
-The upside would be:
-1. There is no need for a user to bother giving the module parameter
-2. Let the kernel problem leave in the kernel
+Reviewed-by: Wei Yang <richard.weiyang@gmail.com>
 
-Thanks for your time. Please let me know your concern.
+>---
+> mm/Kconfig | 3 +--
+> 1 file changed, 1 insertion(+), 2 deletions(-)
+>
+>diff --git a/mm/Kconfig b/mm/Kconfig
+>index 4108bcd967848..330d0e698ef96 100644
+>--- a/mm/Kconfig
+>+++ b/mm/Kconfig
+>@@ -439,9 +439,8 @@ config SPARSEMEM_VMEMMAP_ENABLE
+> 	bool
+> 
+> config SPARSEMEM_VMEMMAP
+>-	bool "Sparse Memory virtual memmap"
+>+	def_bool y
+> 	depends on SPARSEMEM && SPARSEMEM_VMEMMAP_ENABLE
+>-	default y
+> 	help
+> 	  SPARSEMEM_VMEMMAP uses a virtually mapped memmap to optimise
+> 	  pfn_to_page and page_to_pfn operations.  This is the most
+>-- 
+>2.50.1
+>
 
-On Sun, 3 Aug 2025 at 20:39, Lifshits, Vitaly <vitaly.lifshits@intel.com> w=
-rote:
->
->
->
-> On 7/31/2025 6:51 PM, Jacob Keller wrote:
-> >
-> >
-> > On 7/31/2025 7:19 AM, Jakub Kicinski wrote:
-> >> On Thu, 31 Jul 2025 10:00:44 +0300 Ruinskiy, Dima wrote:
-> >>> My concern here is not as much as how to set the private flag
-> >>> automatically at each boot (I leave this to the system administrator)=
-.
-> >>>
-> >>> The concern is whether it can be set early enough during probe() to b=
-e
-> >>> effective. There is a good deal of HW access that happens during
-> >>> probe(). If it takes place before the flag is set, the HW can enter a
-> >>> bad state and changing K1 behavior later on does not always recover i=
-t.
-> >>>
-> >>> With the module parameter, adapter->flags2 |=3D FLAG2_DISABLE_K1 gets=
- set
-> >>> inside e1000e_check_options(), which is before any HW access takes
-> >>> place. If the private flag method can give similar guarantees, then i=
-t
-> >>> would be sufficient.
->
-> This was precisely the intention behind introducing the module parameter
-> initially. The private flag isn't a comprehensive solution=E2=80=94it's m=
-ore of
-> a mechanism to allow configuration changes without unloading the e1000e
-> module.
->
-> >>
-> >> Presumably you are going to detect all the bad SKUs in the driver to
-> >> the best of your ability. So we're talking about a workaround that let=
-s
-> >> the user tweak things until a relevant patch reaches stable..
->
-> Regarding the SKUs: the issues we've encountered aren't tied to specific
-> SKUs. Instead, they stem from broader environmental configurations that
-> the driver cannot address directly. For instance, misconfigurations in
-> the BIOS can only be resolved by the BIOS vendor, assuming they choose
-> to do so. Until such fixes are available to end users, the module
-> parameter provides a practical workaround for these system firmware issue=
-s.
-> >>
-> >
-> > I think you could just default to K1 disabled, and have the parameter
-> > for turning it on/off available. Ideally you'd default to disabled only
-> > on known SKUs that are problematic?
->
-> As mentioned earlier, defaulting to K1 disabled isn't ideal. While it
-> might help avoid certain issues on specific units, it would negatively
-> impact the device's power consumption across all systems, the
-> overwhelming majority of which would never experience any problem.
-> Therefore, it's preferable to keep K1 enabled by default and allow users
-> to disable it only when necessary.
->
+-- 
+Wei Yang
+Help you, Help me
 
