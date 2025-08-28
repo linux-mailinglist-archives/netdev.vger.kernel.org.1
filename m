@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-217711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68402B399E1
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 12:30:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74727B399E2
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 12:30:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71ED93A29A5
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 10:29:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F210560E53
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 10:30:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B9130EF98;
-	Thu, 28 Aug 2025 10:27:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1B6F30F556;
+	Thu, 28 Aug 2025 10:27:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mZHEHBJJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PI3L1M5D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0EA30EF8E
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 10:27:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB25030F549
+	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 10:27:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756376868; cv=none; b=eUfVBratQITeZe7O0R7YuQaciRuZYOMoFdy148t+lamABSPKgbaOO0JaAv4/6QM1IGYBs9C8FG4g87P+/KCdSa15x7+1KiGiRzsy4tB2YO8FjvHDRNtcZVHzTg/A3V0+nK8JfZatUICBDjdNR3IuEoJ4D+hEbyVzcJjgJaneF7s=
+	t=1756376870; cv=none; b=bTLKzUxtChsUs3AbwyGVWiPEuWQSVkKVzrdSwTOCK1c0UJBzJN9r4mNL8A1GZZelySB5FUeVHf42yzQX5jRLBEovzINIpDxvlh2fr/z2EsorDqWcuwxuDYHlFABOSydBxcbJrvFSs8yYM8jT7QAdPEpvJ1VCCDNLJ5YqbEdgLro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756376868; c=relaxed/simple;
-	bh=HYDTh6CxSafDXLczpGQaC0CryZWgAsUSXB3MHN1mnGI=;
+	s=arc-20240116; t=1756376870; c=relaxed/simple;
+	bh=hPEsCgbioqGpD0e7UuWHVNPQ1YXVDWQRz5koqZhRIaA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Dg3TIR84QiYeKSMEpzFgjuJxdjH+q54c4I6svq9pxZpYMSTdCFwWjOOtus5Q89P9+ShWaW18ADGuBGpDetex/2quhPsivk4/++LtrmR7nRr7AYroIpkuiLw9+XrD2lHnsdMZY2/ow3ytsAeVkO6htlvBL/LsksESXxpo2pNBuSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mZHEHBJJ; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=HLirw+3cXt5vrbjVQkShljK8lpNyEzXRoGls47PWwe/J+AI2cgq5NNIfuiIGzTRrSRAzY8lw/1GlKAEhTnnRZnU67jH998H3XTK/K4J/9DzB7M+ZesC3+BcnbK7iel+KeLf7JIm+Xgm9coL9vjM+MqPgVEKead9KfZ3m22yFgbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PI3L1M5D; arc=none smtp.client-ip=209.85.222.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-71e781fd54aso8669747b3.1
-        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 03:27:46 -0700 (PDT)
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7e8704d540cso109504785a.1
+        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 03:27:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756376866; x=1756981666; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1756376868; x=1756981668; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=P5z3qlnTQP+pgZWlrNEdDDW/8svPLWRLVjKVknevqz8=;
-        b=mZHEHBJJAXt+0ZVcOgFLN5xwjI7Gi7RVHOv4W3of+oL/qVDyUw5pstP7BUKima05w0
-         iiZCh+95+9RQt2nS2co8YqYmCIPlt2RhfYkQDzeFkePyKdE7IYPCWMAOKbm+1VGSoyhH
-         Ue+PNpvcOJj5P8O1OKQVNHGotIlIBPgh/ggvGM8LamXjmoiFF5m19tn+IieEMeF36ajX
-         vG1KMN4cry1nOg51ZGf4690lLXe7j9YbMcbgWI3WH+hfKRlhEjGxZ9O1my6Sxslyro67
-         1ON912viCVnJwtkflvarNC3LoSKO73YKuIka9BAZzDKC9aqze9/UOnRj8Gc+JjumaumH
-         Y6HQ==
+        bh=L7CXYjvzxmasflm/xLB1qFtWwZ46Lw5TPd7tJBVvGGM=;
+        b=PI3L1M5DSj0ZF/+nHmn70H9STXYzkZx6sexeUm5ucI0bC8NKsPqWCmRp7rDJuXxcvQ
+         58tnlY3zXYkem/HfVeqmzQ0rHf9f3df+ekN/j/ZqUQuq5DSY4qku0atUXFdC+KuivxzN
+         c8No5QXRnAbUYy6XQ2TH7HTrGa7ms/kViRLBBYf/FyCQGl95Zkt9sFJhOdvIkdm3DFpK
+         8un3r6i+4MhuFHvr4iKJ5k3rc4q5JnwOXrVOESaaN/Fxl55+eiWK5qQqQ+nLJ70aMkwj
+         gp+EwofQoAylRWqQ01bHReawUknANuJD+IMCVmmnFARtqYIuT+z+d5uhlJiJ2ij85O6/
+         NHwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756376866; x=1756981666;
+        d=1e100.net; s=20230601; t=1756376868; x=1756981668;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P5z3qlnTQP+pgZWlrNEdDDW/8svPLWRLVjKVknevqz8=;
-        b=DSf8RHZJwDl6bCJ0tC2Iugz6TNAZ4iMoop/uTG5XznE2f2Yk/uK6TEd2O4Ik7adPm0
-         cNqyixRsRzetLB0ad0z0iNTk6imEWX5zfs4dqF5v1luf2gTJiRTghdi1QTwJFFMrQWMM
-         7sZ6NjSz7Klwy7lH9k8heLdIOYZo/59wrFETMCsxJnJmOtdSWVYQCulI4QXMT3xdl/4i
-         lhI8nnMidRuLW0HM5atw4Tv9g2CCZ64eBxsfmWosz1c0AyM1xPFFC4HQ0a/zKoBuOTRl
-         qHtxostZ+fW7nMCwnLYY6EpFffkeihSVtxrlCdIq7HIAFCaAj+WPMJa1d01qDEV91d0c
-         8uOA==
-X-Forwarded-Encrypted: i=1; AJvYcCUYFv0TXW7GqLDBjdbAiFy0M1U4gqEYZ7BZKVjT4Mcr5ZSPxzl86yD/9tuthKgOMi0P4aThV8o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywa0xkJDqS86lkRFNYsxIahwmKjK0VB1QQDKOA7LH6QYAch5AOQ
-	fkcgAgfEBtuNPpirRMIgFBhi9hpiGmYt54URgZvsVDKbVatsqiykeh9hzvb0Z0LTwPECH+tCgOF
-	FApAA+Ws8NJEZlw==
-X-Google-Smtp-Source: AGHT+IHh6jXDH+vW1Tfdt4kTWe+JhRiwJ6ACosd7KRXroFc3bJi29U0oedKvk9/grXBR+WqwF/3B867BbQKt6Q==
-X-Received: from ywbcp27.prod.google.com ([2002:a05:690c:e1b:b0:720:288:71ae])
+        bh=L7CXYjvzxmasflm/xLB1qFtWwZ46Lw5TPd7tJBVvGGM=;
+        b=tNzxaJx6YPsVwiB2yjPui06WugheahqB4v27OFIifNj2350ZsWBqA9jwi04v3Oj3qq
+         ml3xzadHkBsQYBDXxtH3+DGBQZHJyZj7Q5CZxNF/KFZK7eWsp1Dp7HPYG2vVNGV+L3cy
+         8AzfgpzSHbpP4S97QgJxRE/5MvkFJHTtkAXPqx/2n35O1nZwaGT/68wG3sLEAGcfr25c
+         +qk6c4cZm3ST9pC4A0c/IiXMnRpQYcqsuBavcbG8OediYnq83SnGkSGtZ+C5hbYhAlzY
+         TY9+QIoWFyQfDJMZFB/jALWqo7YMWWJkCei/cDTeinHzQWUiq9+H9sqJdGqv/j843Blk
+         uaVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX4Q4sVK5l9EJ5qk/CXUXjXMEBH137oYwf4cnXzPMUn4fNrQ8Vob9PkNwjV1jgbgTqD2S6TpPI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfZo/jevjXQuaF4X0Y6gbzVnyzdmDlkiTEa9OqQtXuzQV+UQph
+	p0+IP2l/+BGROpdiZDYBAJK8/cGIlJCBatOIBZu2IqfBd3nBXjeCGYfjVfFM6FsMvRIlrzwFQvb
+	gztUFy56KCZkQsQ==
+X-Google-Smtp-Source: AGHT+IEAAQ/+X9IQgL5XY7MtsFXfyveei191l0ftuVIZ+h609FEp1MVYI9QSoMUeRh5z2vuNgseSGymJ56oEzQ==
+X-Received: from qknpq5.prod.google.com ([2002:a05:620a:84c5:b0:7e2:e9ed:1448])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:690c:7286:b0:71a:f22:28fa with SMTP id 00721157ae682-71fdc41d88dmr247636057b3.39.1756376865874;
- Thu, 28 Aug 2025 03:27:45 -0700 (PDT)
-Date: Thu, 28 Aug 2025 10:27:36 +0000
+ 2002:a05:620a:a81c:b0:7e9:f81f:ceae with SMTP id af79cd13be357-7ea110766b9mr2693750285a.72.1756376867817;
+ Thu, 28 Aug 2025 03:27:47 -0700 (PDT)
+Date: Thu, 28 Aug 2025 10:27:37 +0000
 In-Reply-To: <20250828102738.2065992-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250828102738.2065992-1-edumazet@google.com>
 X-Mailer: git-send-email 2.51.0.268.g9569e192d0-goog
-Message-ID: <20250828102738.2065992-4-edumazet@google.com>
-Subject: [PATCH net-next 3/5] inet_diag: annotate data-races in inet_diag_bc_sk()
+Message-ID: <20250828102738.2065992-5-edumazet@google.com>
+Subject: [PATCH net-next 4/5] inet_diag: change inet_diag_bc_sk() first argument
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
@@ -84,52 +84,233 @@ Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-inet_diag_bc_sk() runs with an unlocked socket,
-annotate potential races with READ_ONCE().
+We want to have access to the inet_diag_dump_data structure
+in the following patch.
+
+This patch removes duplication in callers.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/ipv4/inet_diag.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ include/linux/inet_diag.h |  2 +-
+ net/ipv4/inet_diag.c      |  3 ++-
+ net/ipv4/raw_diag.c       | 10 +++-------
+ net/ipv4/tcp_diag.c       |  8 +++-----
+ net/ipv4/udp_diag.c       | 10 +++-------
+ net/mptcp/mptcp_diag.c    | 15 ++++-----------
+ 6 files changed, 16 insertions(+), 32 deletions(-)
 
+diff --git a/include/linux/inet_diag.h b/include/linux/inet_diag.h
+index 30bf8f7ea62b6b34dbf45d061fb8870a91be0944..86a0641ec36e1bf25483a8e6c3412073b9893d36 100644
+--- a/include/linux/inet_diag.h
++++ b/include/linux/inet_diag.h
+@@ -46,7 +46,7 @@ int inet_sk_diag_fill(struct sock *sk, struct inet_connection_sock *icsk,
+ 		      const struct inet_diag_req_v2 *req,
+ 		      u16 nlmsg_flags, bool net_admin);
+ 
+-int inet_diag_bc_sk(const struct nlattr *_bc, struct sock *sk);
++int inet_diag_bc_sk(const struct inet_diag_dump_data *cb_data, struct sock *sk);
+ 
+ void inet_diag_msg_common_fill(struct inet_diag_msg *r, struct sock *sk);
+ 
 diff --git a/net/ipv4/inet_diag.c b/net/ipv4/inet_diag.c
-index 7a9c347bc66fe35fa9771649db2f205af30e2a44..3827e9979d4f9a4b33665e08ce69eb803fe4f948 100644
+index 3827e9979d4f9a4b33665e08ce69eb803fe4f948..11710304268781581b3559aca770d50dc0090ef3 100644
 --- a/net/ipv4/inet_diag.c
 +++ b/net/ipv4/inet_diag.c
-@@ -580,7 +580,7 @@ static void entry_fill_addrs(struct inet_diag_entry *entry,
- 			     const struct sock *sk)
- {
- #if IS_ENABLED(CONFIG_IPV6)
--	if (sk->sk_family == AF_INET6) {
-+	if (entry->family == AF_INET6) {
- 		entry->saddr = sk->sk_v6_rcv_saddr.s6_addr32;
- 		entry->daddr = sk->sk_v6_daddr.s6_addr32;
- 	} else
-@@ -593,18 +593,18 @@ static void entry_fill_addrs(struct inet_diag_entry *entry,
+@@ -591,8 +591,9 @@ static void entry_fill_addrs(struct inet_diag_entry *entry,
+ 	}
+ }
  
- int inet_diag_bc_sk(const struct nlattr *bc, struct sock *sk)
+-int inet_diag_bc_sk(const struct nlattr *bc, struct sock *sk)
++int inet_diag_bc_sk(const struct inet_diag_dump_data *cb_data, struct sock *sk)
  {
--	struct inet_sock *inet = inet_sk(sk);
-+	const struct inet_sock *inet = inet_sk(sk);
++	const struct nlattr *bc = cb_data->inet_diag_nla_bc;
+ 	const struct inet_sock *inet = inet_sk(sk);
  	struct inet_diag_entry entry;
  
- 	if (!bc)
- 		return 1;
+diff --git a/net/ipv4/raw_diag.c b/net/ipv4/raw_diag.c
+index cc793bd8de258c3a12f11e95cec81c5ae4b9a7f6..943e5998e0ad5e23d0f3c4d364139bcb07ac5e0c 100644
+--- a/net/ipv4/raw_diag.c
++++ b/net/ipv4/raw_diag.c
+@@ -126,9 +126,9 @@ static int raw_diag_dump_one(struct netlink_callback *cb,
+ static int sk_diag_dump(struct sock *sk, struct sk_buff *skb,
+ 			struct netlink_callback *cb,
+ 			const struct inet_diag_req_v2 *r,
+-			struct nlattr *bc, bool net_admin)
++			bool net_admin)
+ {
+-	if (!inet_diag_bc_sk(bc, sk))
++	if (!inet_diag_bc_sk(cb->data, sk))
+ 		return 0;
  
--	entry.family = sk->sk_family;
-+	entry.family = READ_ONCE(sk->sk_family);
- 	entry_fill_addrs(&entry, sk);
--	entry.sport = inet->inet_num;
--	entry.dport = ntohs(inet->inet_dport);
--	entry.ifindex = sk->sk_bound_dev_if;
--	entry.userlocks = sk_fullsock(sk) ? sk->sk_userlocks : 0;
-+	entry.sport = READ_ONCE(inet->inet_num);
-+	entry.dport = ntohs(READ_ONCE(inet->inet_dport));
-+	entry.ifindex = READ_ONCE(sk->sk_bound_dev_if);
-+	entry.userlocks = sk_fullsock(sk) ? READ_ONCE(sk->sk_userlocks) : 0;
- 	if (sk_fullsock(sk))
- 		entry.mark = READ_ONCE(sk->sk_mark);
- 	else if (sk->sk_state == TCP_NEW_SYN_RECV)
+ 	return inet_sk_diag_fill(sk, NULL, skb, cb, r, NLM_F_MULTI, net_admin);
+@@ -140,17 +140,13 @@ static void raw_diag_dump(struct sk_buff *skb, struct netlink_callback *cb,
+ 	bool net_admin = netlink_net_capable(cb->skb, CAP_NET_ADMIN);
+ 	struct raw_hashinfo *hashinfo = raw_get_hashinfo(r);
+ 	struct net *net = sock_net(skb->sk);
+-	struct inet_diag_dump_data *cb_data;
+ 	int num, s_num, slot, s_slot;
+ 	struct hlist_head *hlist;
+ 	struct sock *sk = NULL;
+-	struct nlattr *bc;
+ 
+ 	if (IS_ERR(hashinfo))
+ 		return;
+ 
+-	cb_data = cb->data;
+-	bc = cb_data->inet_diag_nla_bc;
+ 	s_slot = cb->args[0];
+ 	num = s_num = cb->args[1];
+ 
+@@ -174,7 +170,7 @@ static void raw_diag_dump(struct sk_buff *skb, struct netlink_callback *cb,
+ 			if (r->id.idiag_dport != inet->inet_dport &&
+ 			    r->id.idiag_dport)
+ 				goto next;
+-			if (sk_diag_dump(sk, skb, cb, r, bc, net_admin) < 0)
++			if (sk_diag_dump(sk, skb, cb, r, net_admin) < 0)
+ 				goto out_unlock;
+ next:
+ 			num++;
+diff --git a/net/ipv4/tcp_diag.c b/net/ipv4/tcp_diag.c
+index 4ed6b93527f4ad00f34cc732639c0c82d0feff08..d83efd91f461c8ad0157faeebae051b32cb07bf4 100644
+--- a/net/ipv4/tcp_diag.c
++++ b/net/ipv4/tcp_diag.c
+@@ -320,11 +320,9 @@ static void tcp_diag_dump(struct sk_buff *skb, struct netlink_callback *cb,
+ 	u32 idiag_states = r->idiag_states;
+ 	struct inet_hashinfo *hashinfo;
+ 	int i, num, s_i, s_num;
+-	struct nlattr *bc;
+ 	struct sock *sk;
+ 
+ 	hashinfo = net->ipv4.tcp_death_row.hashinfo;
+-	bc = cb_data->inet_diag_nla_bc;
+ 	if (idiag_states & TCPF_SYN_RECV)
+ 		idiag_states |= TCPF_NEW_SYN_RECV;
+ 	s_i = cb->args[1];
+@@ -365,7 +363,7 @@ static void tcp_diag_dump(struct sk_buff *skb, struct netlink_callback *cb,
+ 				    r->id.idiag_sport)
+ 					goto next_listen;
+ 
+-				if (!inet_diag_bc_sk(bc, sk))
++				if (!inet_diag_bc_sk(cb_data, sk))
+ 					goto next_listen;
+ 
+ 				if (inet_sk_diag_fill(sk, inet_csk(sk), skb,
+@@ -432,7 +430,7 @@ static void tcp_diag_dump(struct sk_buff *skb, struct netlink_callback *cb,
+ 					    r->sdiag_family != sk->sk_family)
+ 						goto next_bind;
+ 
+-					if (!inet_diag_bc_sk(bc, sk))
++					if (!inet_diag_bc_sk(cb_data, sk))
+ 						goto next_bind;
+ 
+ 					sock_hold(sk);
+@@ -519,7 +517,7 @@ static void tcp_diag_dump(struct sk_buff *skb, struct netlink_callback *cb,
+ 				goto next_normal;
+ 			twsk_build_assert();
+ 
+-			if (!inet_diag_bc_sk(bc, sk))
++			if (!inet_diag_bc_sk(cb_data, sk))
+ 				goto next_normal;
+ 
+ 			if (!refcount_inc_not_zero(&sk->sk_refcnt))
+diff --git a/net/ipv4/udp_diag.c b/net/ipv4/udp_diag.c
+index 38cb3a28e4ed6d54f7078afa2700e71db9ce4b85..6e491c720c9075bcef9d5daf9bc852fab3412231 100644
+--- a/net/ipv4/udp_diag.c
++++ b/net/ipv4/udp_diag.c
+@@ -16,9 +16,9 @@
+ static int sk_diag_dump(struct sock *sk, struct sk_buff *skb,
+ 			struct netlink_callback *cb,
+ 			const struct inet_diag_req_v2 *req,
+-			struct nlattr *bc, bool net_admin)
++			bool net_admin)
+ {
+-	if (!inet_diag_bc_sk(bc, sk))
++	if (!inet_diag_bc_sk(cb->data, sk))
+ 		return 0;
+ 
+ 	return inet_sk_diag_fill(sk, NULL, skb, cb, req, NLM_F_MULTI,
+@@ -92,12 +92,8 @@ static void udp_dump(struct udp_table *table, struct sk_buff *skb,
+ {
+ 	bool net_admin = netlink_net_capable(cb->skb, CAP_NET_ADMIN);
+ 	struct net *net = sock_net(skb->sk);
+-	struct inet_diag_dump_data *cb_data;
+ 	int num, s_num, slot, s_slot;
+-	struct nlattr *bc;
+ 
+-	cb_data = cb->data;
+-	bc = cb_data->inet_diag_nla_bc;
+ 	s_slot = cb->args[0];
+ 	num = s_num = cb->args[1];
+ 
+@@ -130,7 +126,7 @@ static void udp_dump(struct udp_table *table, struct sk_buff *skb,
+ 			    r->id.idiag_dport)
+ 				goto next;
+ 
+-			if (sk_diag_dump(sk, skb, cb, r, bc, net_admin) < 0) {
++			if (sk_diag_dump(sk, skb, cb, r, net_admin) < 0) {
+ 				spin_unlock_bh(&hslot->lock);
+ 				goto done;
+ 			}
+diff --git a/net/mptcp/mptcp_diag.c b/net/mptcp/mptcp_diag.c
+index 0566dd793810a58055d33548bcb5e511116eed61..ac974299de71cdf85cba7d848d14a241f5ff4dc8 100644
+--- a/net/mptcp/mptcp_diag.c
++++ b/net/mptcp/mptcp_diag.c
+@@ -15,9 +15,9 @@
+ static int sk_diag_dump(struct sock *sk, struct sk_buff *skb,
+ 			struct netlink_callback *cb,
+ 			const struct inet_diag_req_v2 *req,
+-			struct nlattr *bc, bool net_admin)
++			bool net_admin)
+ {
+-	if (!inet_diag_bc_sk(bc, sk))
++	if (!inet_diag_bc_sk(cb->data, sk))
+ 		return 0;
+ 
+ 	return inet_sk_diag_fill(sk, inet_csk(sk), skb, cb, req, NLM_F_MULTI,
+@@ -76,9 +76,7 @@ static void mptcp_diag_dump_listeners(struct sk_buff *skb, struct netlink_callba
+ 				      const struct inet_diag_req_v2 *r,
+ 				      bool net_admin)
+ {
+-	struct inet_diag_dump_data *cb_data = cb->data;
+ 	struct mptcp_diag_ctx *diag_ctx = (void *)cb->ctx;
+-	struct nlattr *bc = cb_data->inet_diag_nla_bc;
+ 	struct net *net = sock_net(skb->sk);
+ 	struct inet_hashinfo *hinfo;
+ 	int i;
+@@ -121,7 +119,7 @@ static void mptcp_diag_dump_listeners(struct sk_buff *skb, struct netlink_callba
+ 			if (!refcount_inc_not_zero(&sk->sk_refcnt))
+ 				goto next_listen;
+ 
+-			ret = sk_diag_dump(sk, skb, cb, r, bc, net_admin);
++			ret = sk_diag_dump(sk, skb, cb, r, net_admin);
+ 
+ 			sock_put(sk);
+ 
+@@ -154,15 +152,10 @@ static void mptcp_diag_dump(struct sk_buff *skb, struct netlink_callback *cb,
+ 	bool net_admin = netlink_net_capable(cb->skb, CAP_NET_ADMIN);
+ 	struct mptcp_diag_ctx *diag_ctx = (void *)cb->ctx;
+ 	struct net *net = sock_net(skb->sk);
+-	struct inet_diag_dump_data *cb_data;
+ 	struct mptcp_sock *msk;
+-	struct nlattr *bc;
+ 
+ 	BUILD_BUG_ON(sizeof(cb->ctx) < sizeof(*diag_ctx));
+ 
+-	cb_data = cb->data;
+-	bc = cb_data->inet_diag_nla_bc;
+-
+ 	while ((msk = mptcp_token_iter_next(net, &diag_ctx->s_slot,
+ 					    &diag_ctx->s_num)) != NULL) {
+ 		struct inet_sock *inet = (struct inet_sock *)msk;
+@@ -181,7 +174,7 @@ static void mptcp_diag_dump(struct sk_buff *skb, struct netlink_callback *cb,
+ 		    r->id.idiag_dport)
+ 			goto next;
+ 
+-		ret = sk_diag_dump(sk, skb, cb, r, bc, net_admin);
++		ret = sk_diag_dump(sk, skb, cb, r, net_admin);
+ next:
+ 		sock_put(sk);
+ 		if (ret < 0) {
 -- 
 2.51.0.268.g9569e192d0-goog
 
