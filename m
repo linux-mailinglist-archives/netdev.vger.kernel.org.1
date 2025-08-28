@@ -1,289 +1,175 @@
-Return-Path: <netdev+bounces-217702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0384DB39982
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 12:20:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A020CB399EE
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 12:31:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE22E3B2361
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 10:20:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62382189A34A
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 10:30:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 679583090F5;
-	Thu, 28 Aug 2025 10:19:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P6cLkHDU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB16630C354;
+	Thu, 28 Aug 2025 10:28:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 959483093C6
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 10:19:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C67B30AD1B;
+	Thu, 28 Aug 2025 10:28:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756376391; cv=none; b=jiFfonF1kYf3H93ktL5tChVEvqosJEpn0IQdoIyGZNqLGkL1bK68oVj4JrywkDu4q+YnGk763JtMWMfVYXIyRQ4UbJpip2XmVtnpQPDseEB6L2y1Qz2bJqitvdcfN/WUW9Atzd4Td4ZUaBk8Z9FFIhxLJgwOZOGFe2OqNAEvzqA=
+	t=1756376916; cv=none; b=ev+W2ifJ+fxI87mNUOM95JPbDRRhxTREIF7lpp3Tsb2dllbJzM+gBWBFMzZ2/5ou+fDQwL2ms76shBjLeF88Q67kYza2WOmolL0oZnmNemwKrhGWDzk9JfaTNaHKccbO7C2sJY8ZMpxirQXw3GyEUyJGePAG9fMmT3NO3mhRIg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756376391; c=relaxed/simple;
-	bh=jM2/WkKEJxUG2rB7/Qc1u6FwrBpxhbFqW37SnEuE49Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kUBaTi1neB+1rrl2I/ueuBxqJfEONlGfQ1uabTrs5E35FmHg8XAXkCdk+d993KuIEoEc03tfsGTsQlsW/S5Xl+PhOBcHgoxuqyAtz5kb9YKPS+lOq3IxLa26wx3wj5yS/bYgYCvnxZgETYwU4FG7x085JR3GwDhtrQ6mI211HaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P6cLkHDU; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756376388;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hG2R1Bkv9qVosRscKm612j4UuXS2eUujrOM+V+p/8pg=;
-	b=P6cLkHDUG2D73EIrQbcJ61ipAS3b87if7iLwwRGF0Uk2nIFzLP9y8DVIQ0tyoP2mIa8im3
-	eGqIeD4iuCP2EpSF1O/rDN7WeDIX+8YFjOsc2VLrFnVlsnZzOvnQxKMROYbLk//qEtcxDa
-	WkNEfXvTj9n/dP+7uWq0gG0tAet3I0M=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-618-7W6FSm4ZMf6byaITjFSN9g-1; Thu, 28 Aug 2025 06:19:44 -0400
-X-MC-Unique: 7W6FSm4ZMf6byaITjFSN9g-1
-X-Mimecast-MFC-AGG-ID: 7W6FSm4ZMf6byaITjFSN9g_1756376383
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3c6ae25997cso484111f8f.0
-        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 03:19:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756376383; x=1756981183;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hG2R1Bkv9qVosRscKm612j4UuXS2eUujrOM+V+p/8pg=;
-        b=R3Bng0qLk5HPwOwtlXPyp2o52X9q9VDZYCU4JF8RnjH7zIaQXC8zQOX3NosE8y4K4x
-         0zdncjFBet4sAFB3jL8fKNtLsMHaj5dhGdIlIU9C6Roc+1fS5+DWQq5/SJJBDoM/Au6N
-         /u+28Wb23JMiHP0vW78XzQ6pgB+zrU88vGK5rWIQJlq15Ot/dPee6pyHrHEY6Wdh7rQV
-         umgchyXMdxvMXfMkrSbEoz9RBF+bGmOQvoqaVenQxmSBHVfhmVns8+ofjZ8Z+KrXdigD
-         /JXO+MsWrG4cINxFM9CIQLbHyLDHIkUlbwHeHNjQ+A6O0Sv/AJi4so0wVo5cEsXDJoT4
-         WnXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXKvgf8cyZgZyF8lCyTusOKbMggXqNe3IpPtyKi2DAR9V387+pcXOPN7yM4s5yDblLi5oxySZE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw08wh35yXX5vcfGTYmWzeiUyU8xQCFog35glhZHgU1uQgnpBkM
-	K4KVRNDMAkzlvnSguXj6+GLj+b+lbF514tQWeHLgB2syGcsLQH/qOqzX4WPfEDu0t2KCTwJ24eH
-	fW7NWmAIBUigmUeHkslfIWSbe09vPNAGLIBEgqiTojWDHQSVzhMnqZNV6lw==
-X-Gm-Gg: ASbGncs8FJELWFgx8hli/7nE/XUAA8iuUXjCv43DOgzpZ6jk1dDUA74RypIynLKzPPD
-	lyWvuyweiZ7YWudcc632xex8CDfNX2pTk4oSy0kuhkBYMiB/j1BKIhuGr0tB3aQkzCFP10aoHvo
-	ELtkEY0xc9hIsU0qBeJWPQ2pb1tKFaXjp+Znz8HyhvG74CCJbal5P2TM+JYGxfhG7v2cmDpKm2r
-	l6a0MURd0ycuRwtfmnAJusw1TW6IRTW6oEkZexMX19+iNYWSa1VUhUzUGucW+Da//bEkXRC+A1b
-	TF1XgGzGDUakI0L/yosQTaunFGDxGLhxBu3R1dikHNE=
-X-Received: by 2002:a05:6000:2404:b0:3c0:5db6:aed with SMTP id ffacd0b85a97d-3c5dcefd13fmr20040155f8f.54.1756376382563;
-        Thu, 28 Aug 2025 03:19:42 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEUf9+VMVyT64li5grrkXarbkMEhZPAVzNfHJOMsvP5ckUlCR6vIpiQ2+ofJ4hBc+vAMdF9dA==
-X-Received: by 2002:a05:6000:2404:b0:3c0:5db6:aed with SMTP id ffacd0b85a97d-3c5dcefd13fmr20040133f8f.54.1756376382106;
-        Thu, 28 Aug 2025 03:19:42 -0700 (PDT)
-Received: from [192.168.68.125] ([147.235.216.242])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3ca8f2811d9sm13194551f8f.20.2025.08.28.03.19.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Aug 2025 03:19:41 -0700 (PDT)
-Message-ID: <31709a8a-f314-4522-830d-ec81b9435f10@redhat.com>
-Date: Thu, 28 Aug 2025 13:19:39 +0300
+	s=arc-20240116; t=1756376916; c=relaxed/simple;
+	bh=q1Klpjwv/WnXJATJN/W7Z/cWbQNEimJhGYE1d/lZ/Qk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=d/uOUBgkPU6/Y2tQKfrN5cR5hc5kHk3Jtpk92FRpPKUgHokGU4Gl/+i7eEHlqsBcSo8kfsbX6qnxgfg1Zvd3Z7Xl77jlnUtvT9LUp63mQrSrhIiPSLvxR6y54A4Lfm2CuaSc+j3M2xOtN6ecvg8gfx4Yc46BJ0KCUF/ucoeFljo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; arc=none smtp.client-ip=210.160.252.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=renesas.com
+X-CSE-ConnectionGUID: WPSssH9bSzu9vfYLfgaPPg==
+X-CSE-MsgGUID: emr7/kHSTwGdJnRrpRCXoQ==
+Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
+  by relmlie5.idc.renesas.com with ESMTP; 28 Aug 2025 19:23:24 +0900
+Received: from [127.0.1.1] (unknown [10.226.78.19])
+	by relmlir6.idc.renesas.com (Postfix) with ESMTP id 3C7ED417D5AC;
+	Thu, 28 Aug 2025 19:23:20 +0900 (JST)
+From: Michael Dege <michael.dege@renesas.com>
+Subject: [net-next PATCH v4 0/4] net: renesas: rswitch: R-Car S4 add HW
+ offloading for layer 2 switching
+Date: Thu, 28 Aug 2025 12:23:11 +0200
+Message-Id: <20250828-add_l2_switching-v4-0-89d7108c8592@renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] i40e: add devlink param to control VF MAC address
- limit
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, intel-wired-lan@lists.osuosl.org
-Cc: przemyslawx.patynowski@intel.com, jiri@resnulli.us,
- netdev@vger.kernel.org, horms@kernel.org, jacob.e.keller@intel.com,
- aleksandr.loktionov@intel.com, przemyslaw.kitszel@intel.com
-References: <20250823094952.182181-1-mheib@redhat.com>
- <fe840844-4fcd-49bf-a613-c5a99934a347@intel.com>
-Content-Language: en-US
-From: mohammad heib <mheib@redhat.com>
-In-Reply-To: <fe840844-4fcd-49bf-a613-c5a99934a347@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAA8usGgC/23NQQ6CMBCF4auQrq3pTClUV97DGFLaAk0UTEtQQ
+ 7i7BTcYWP4vmW9GEqx3NpBzMhJvBxdc18ZIDwnRjWprS52JTZChYBlkVBlT3LEIL9frxrU15ak
+ AyIEJwwyJZ09vK/deyOstduNC3/nP8mGAef1hOUu32ACU0aqSEpXSJQp58ba1QYWj7h5k5gZcE
+ 3KHwJk4QSWEyDLI1ZbgKwLYDsEjoZniKDnmZcr/iWmavlpGxGo4AQAA
+X-Change-ID: 20250616-add_l2_switching-345117105d0d
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, 
+ =?utf-8?q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>, 
+ Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Michael Dege <michael.dege@renesas.com>, 
+ Nikita Yushchenko <nikita.yoush@cogentembedded.com>, 
+ Andrew Lunn <andrew@lunn.ch>, 
+ =?utf-8?q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1756376599; l=3855;
+ i=michael.dege@renesas.com; s=20250523; h=from:subject:message-id;
+ bh=q1Klpjwv/WnXJATJN/W7Z/cWbQNEimJhGYE1d/lZ/Qk=;
+ b=Ukyt9Am6bv1y1r6saelj5rEnny8d+QkgPg3Jdx3B04brn3XkeU5xyAnjA/xvQ3V7mKigofY9J
+ h3IIRAPN4IrAY33Kq+VRafswAQNJY1gBveHF7wUHMEWrWrwvjEG28bm
+X-Developer-Key: i=michael.dege@renesas.com; a=ed25519;
+ pk=+gYTlVQ3/MlOju88OuKnXA7MlapP4lYqJn1F81HZGSo=
 
-Hi Tony,
+Hello!
 
+The current R-Car S4 rswitch driver only supports port based fowarding.
+This patch set adds HW offloading for L2 switching/bridgeing. The driver
+hooks into switchdev.
 
-On 8/28/25 12:14 AM, Tony Nguyen wrote:
->
->
-> On 8/23/2025 2:49 AM, mheib@redhat.com wrote:
->> From: Mohammad Heib <mheib@redhat.com>
->>
->> This patch introduces a new devlink runtime parameter that controls
->> the maximum number of MAC filters allowed per VF.
->>
->> The parameter is an integer value. If set to a non-zero number, it is
->> used as a strict per-VF cap. If left at zero, the driver falls back to
->> the default limit calculated from the number of allocated VFs and
->> ports.
->>
->> This makes the limit policy explicit and configurable by user space,
->> instead of being only driver internal logic.
->>
->> Example command to enable per-vf mac limit:
->>   - devlink dev param set pci/0000:3b:00.0 name max_mac_per_vf \
->>     value 12 \
->>     cmode runtime
->>
->> - Previous discussion about this change:
->> https://lore.kernel.org/netdev/20250805134042.2604897-1-dhill@redhat.com
->>
->> Fixes: cfb1d572c986 ("i40e: Add ensurance of MacVlan resources for 
->> every trusted VF")
->> Signed-off-by: Mohammad Heib <mheib@redhat.com>
->> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
->> ---
->>   Documentation/networking/devlink/i40e.rst     | 22 ++++++++
->>   drivers/net/ethernet/intel/i40e/i40e.h        |  4 ++
->>   .../net/ethernet/intel/i40e/i40e_devlink.c    | 56 ++++++++++++++++++-
->>   .../ethernet/intel/i40e/i40e_virtchnl_pf.c    | 25 +++++----
->>   4 files changed, 95 insertions(+), 12 deletions(-)
->>
->> diff --git a/Documentation/networking/devlink/i40e.rst 
->> b/Documentation/networking/devlink/i40e.rst
->> index d3cb5bb5197e..f8d5b00bb51d 100644
->> --- a/Documentation/networking/devlink/i40e.rst
->> +++ b/Documentation/networking/devlink/i40e.rst
->> @@ -7,6 +7,28 @@ i40e devlink support
->>   This document describes the devlink features implemented by the 
->> ``i40e``
->>   device driver.
->>   +Parameters
->> +==========
->> +
->> +.. list-table:: Driver specific parameters implemented
->> +    :widths: 5 5 90
->> +
->> +    * - Name
->> +      - Mode
->> +      - Description
->> +    * - ``max_mac_per_vf``
->> +      - runtime
->> +      - Controls the maximum number of MAC addresses a VF can use on 
->> i40e devices.
->
-> Are you intending for this to be for all VFs or only trusted? The 
-> changes look to be only for trusted VFs, but it's not clear to me from 
-> the documentation/comments.
->
->> +        By default (``0``), the driver enforces its internally 
->> calculated per-VF
->> +        MAC filter limit, which is based on the number of allocated 
->> VFS.
->> +
->> +        If set to a non-zero value, this parameter acts as a strict 
->> cap:
->> +        the driver enforces the maximum of the user-provided value 
->> and ignore
->> +        internally calculated limit.
->
-> The filters are a shared resource. This will allow over-subscription; 
-> other VFs could be starved
-> of filters due to this. Since the user/PF is controlling, this is 
-> probably ok but should be documented. Also, since these are shared, 
-> this value acts as a theoretical max value, the hardware will start 
-> returning errors when its limit are reached.
->
->> +        The default value is ``0``.
->> +
->>   Info versions
->>   =============
->>   diff --git a/drivers/net/ethernet/intel/i40e/i40e.h 
->> b/drivers/net/ethernet/intel/i40e/i40e.h
->> index 801a57a925da..d2d03db2acec 100644
->> --- a/drivers/net/ethernet/intel/i40e/i40e.h
->> +++ b/drivers/net/ethernet/intel/i40e/i40e.h
->> @@ -574,6 +574,10 @@ struct i40e_pf {
->>       struct i40e_vf *vf;
->>       int num_alloc_vfs;    /* actual number of VFs allocated */
->>       u32 vf_aq_requests;
->> +    /* If set to non-zero, the device uses this value
->> +     * as maximum number of MAC filters per VF.
->> +     */
->> +    u32 max_mac_per_vf;
->>       u32 arq_overflows;    /* Not fatal, possibly indicative of 
->> problems */
->>       struct ratelimit_state mdd_message_rate_limit;
->>       /* DCBx/DCBNL capability for PF that indicates
->> diff --git a/drivers/net/ethernet/intel/i40e/i40e_devlink.c 
->> b/drivers/net/ethernet/intel/i40e/i40e_devlink.c
->> index cc4e9e2addb7..8532e40b5c7d 100644
->> --- a/drivers/net/ethernet/intel/i40e/i40e_devlink.c
->> +++ b/drivers/net/ethernet/intel/i40e/i40e_devlink.c
->> @@ -5,6 +5,42 @@
->>   #include "i40e.h"
->>   #include "i40e_devlink.h"
->>   +static int i40e_max_mac_per_vf_set(struct devlink *devlink,
->> +                   u32 id,
->> +                   struct devlink_param_gset_ctx *ctx,
->> +                   struct netlink_ext_ack *extack)
->> +{
->> +    struct i40e_pf *pf = devlink_priv(devlink);
->> +
->> +    pf->max_mac_per_vf = ctx->val.vu32;
->> +    return 0;
->> +}
->> +
->> +static int i40e_max_mac_per_vf_get(struct devlink *devlink,
->> +                   u32 id,
->> +                   struct devlink_param_gset_ctx *ctx)
->> +{
->> +    struct i40e_pf *pf = devlink_priv(devlink);
->> +
->> +    ctx->val.vu32 = pf->max_mac_per_vf;
->> +    return 0;
->> +}
->> +
->> +enum i40e_dl_param_id {
->> +    I40E_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
->> +    I40E_DEVLINK_PARAM_ID_MAX_MAC_PER_VF,
->> +};
->> +
->> +static const struct devlink_param i40e_dl_params[] = {
->> +    DEVLINK_PARAM_DRIVER(I40E_DEVLINK_PARAM_ID_MAX_MAC_PER_VF,
->> +                 "max_mac_per_vf",
->> +                 DEVLINK_PARAM_TYPE_U32,
->> +                 BIT(DEVLINK_PARAM_CMODE_RUNTIME),
->> +                 i40e_max_mac_per_vf_get,
->> +                 i40e_max_mac_per_vf_set,
->> +                 NULL),
->> +};
->> +
->>   static void i40e_info_get_dsn(struct i40e_pf *pf, char *buf, size_t 
->> len)
->>   {
->>       u8 dsn[8];
->> @@ -165,7 +201,19 @@ void i40e_free_pf(struct i40e_pf *pf)
->>    **/
->>   void i40e_devlink_register(struct i40e_pf *pf)
->>   {
->> -    devlink_register(priv_to_devlink(pf));
->> +    int err;
->
-> RCT; declarations should order from longest to shortest.
->
->> +    struct devlink *dl = priv_to_devlink(pf);
->> +    struct device *dev = &pf->pdev->dev;
->> +
->> +    err = devlink_params_register(dl, i40e_dl_params,
->> +                      ARRAY_SIZE(i40e_dl_params));
->> +    if (err) {
->> +        dev_err(dev,
->> +            "devlink params register failed with error %d", err);
->> +    }
->
-> Braces not needed here.
->
-> Thanks,
-> Tony
->
+1. Rename the base driver file to keep the driver name (rswitch.ko)
 
-Thank you for your review.
-yes agree this need to be more documented i updated the devlink param 
-documentation to include your comment.
-and fixed the minor code issue all in v3.
-thanks.
+2. Add setting of default MAC ageing time in hardware.
+
+3. Add the L2 driver extension in a separate file. The HW offloading
+is automatically configured when a port is added to the bridge device.
+
+Usage example:
+ip link add name br0 type bridge
+ip link set dev tsn0 master br0
+ip link set dev tsn1 master br0
+ip link set dev br0 up
+ip link set dev tsn0 up
+ip link set dev tsn1 up
+
+Layer 2 traffic is now fowarded by HW from port TSN0 to port TSN1.
+
+4. Provides the functionality to set the MAC table ageing time in the
+Rswitch.
+
+Usage example:
+ip link change dev br0 type bridge ageing 100
+
+Changes in v4:
+- Added target tree to subject prefix.
+- refactored rswitch_update_l2_hw_learning() and
+  rswitch_update_l2_hw_forwarding() to remove duplicate code. 
+- In function rswitch_update_offload_brdev() removed unused
+  force_update_l2_offload parameter.
+- Link to v3: https://lore.kernel.org/r/20250710-add_l2_switching-v3-0-c0a328327b43@renesas.com
+
+Changes in v3:
+- Split void rswitch_update_l2_offload(struct rswitch_private *priv) 
+  into two functions to reduce the complexity.
+- In rswitch_switchdev_blocking_event() returning -EOPNOTSUPP directly
+  for unsupported events intead of calling function which returned
+  -EOPNOTSUPP.
+- Retuning result from rswitch_reg_wait() directly instead of using
+  local variable at end of function.
+- Restructured rswitch_update_offload_brdev() to fix smatch
+  false-positive report.  
+- Fixed reviewed-by tags in [1/4]
+- Fixed oder of signed-off-by tags in [2/4]
+- Removed magic number in [2/4]
+- Link to v2: https://lore.kernel.org/r/20250708-add_l2_switching-v2-0-f91f5556617a@renesas.com
+
+Changes in v2:
+- Pulled default ageing setting into separate patch.
+- Changed logging priority from info to dbg.
+- Updated usage examples.
+- Fixed passing of ageing parameter. Parameter is already in seconds
+  no need to convert. Parameter checking improved.
+- Updated commit message of [3/4] to point out that the switch hardware
+  only supports the offloading of one bridge device. 
+- Link to v1: https://lore.kernel.org/r/20250704-add_l2_switching-v1-0-ff882aacb258@renesas.com
+
+Thanks,
+
+Michael
+
+Signed-off-by: Michael Dege <michael.dege@renesas.com>
+Signed-off-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+---
+To: Niklas Söderlund <niklas.soderlund@ragnatech.se>
+To: Paul Barker <paul@pbarker.dev>
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>
+To: David S. Miller <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org
+Cc: linux-renesas-soc@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+
+---
+Michael Dege (4):
+      net: renesas: rswitch: rename rswitch.c to rswitch_main.c
+      net: renesas: rswitch: configure default ageing time
+      net: renesas: rswitch: add offloading for L2 switching
+      net: renesas: rswitch: add modifiable ageing time
+
+ drivers/net/ethernet/renesas/Makefile              |   1 +
+ drivers/net/ethernet/renesas/rswitch.h             |  43 ++-
+ drivers/net/ethernet/renesas/rswitch_l2.c          | 317 +++++++++++++++++++++
+ drivers/net/ethernet/renesas/rswitch_l2.h          |  15 +
+ .../ethernet/renesas/{rswitch.c => rswitch_main.c} |  86 +++++-
+ 5 files changed, 456 insertions(+), 6 deletions(-)
+---
+base-commit: 19272b37aa4f83ca52bdf9c16d5d81bdd1354494
+change-id: 20250616-add_l2_switching-345117105d0d
+
+Best regards,
+-- 
+Michael Dege <michael.dege@renesas.com>
 
 
