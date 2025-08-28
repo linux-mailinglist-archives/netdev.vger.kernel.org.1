@@ -1,249 +1,147 @@
-Return-Path: <netdev+bounces-217630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66564B395AD
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 09:43:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AD4DB3956B
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 09:38:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F8921C27609
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 07:42:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 12B557A25B7
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 07:37:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6CE12FC880;
-	Thu, 28 Aug 2025 07:39:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD0103019A9;
+	Thu, 28 Aug 2025 07:35:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="1uGFeWcG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NKG78Lv9"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F02442E62DA;
-	Thu, 28 Aug 2025 07:39:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A0E2301025;
+	Thu, 28 Aug 2025 07:35:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756366784; cv=none; b=n9FFIUVcINUqLFDZ+b1gtj1uvKhBskRu0VVYqJ0B+/b4ybek3gDhVwA/pSFYOel4cLA7WeBFgKbc1+mT/nwKfE42q8u8DMHry4Q7yXxuce9+0ezBPauhAYDC52+CmQeySJLKmFBRoDZQ//dlBzzU/7snse5zQ9t/0FfhoqxmNwc=
+	t=1756366532; cv=none; b=oAOi4zP9cAgRgzuhEGwIJY6OgjS9aozlLIC0WeZM095F8osWRZnRbbMEufc9+ClLF3NfGeb1EY6ux2LWf7xR30QgkmIrHDX0rUx4UL9Ci3eJp+jlVtsY9BYHVlBEnMAtyULaU5T1g9L4j3Z8D+nGovxWID8K/W/e5la6mUtWs8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756366784; c=relaxed/simple;
-	bh=n9TZULwgxYPQd7I3SRycARL3DwMkupaaF1dU4hxh/hw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eKi4W4fKhwf31DXpnUXB0v9acVk9pOXaRAGktEpTFOBUp8mXwzdMWP/E+KizQuOm8UGeEgEtNh/M9JLwRsK6BYfdwHDERQuH+XQaNHwRSacP3mlEegcD1WYX06H2o62ui4RV/HUagcnvLhX+k8crNbssOpNFAauuD3zN48CJwRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=1uGFeWcG; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1756366783; x=1787902783;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=n9TZULwgxYPQd7I3SRycARL3DwMkupaaF1dU4hxh/hw=;
-  b=1uGFeWcGjVg1NQaf4hEpmokqeGylRLp+P5GE9mMJIWxFW1AHGFypVaAp
-   tYS1JyJPIuubZV8C8M5PfgnXitoCvBrrcicZaEGhGxhKVVaX+SDVezfOw
-   1a1cuMeyoEfZzEOgc7nJXnxLmzdCU50BCHUXRzlpGgdFKhy73vFjKGkmt
-   /ta5b3N8b6t0rjRU3JqnffR0SSM0ILUXBu9ltW59zqFbBqGKTmaSEejrN
-   pNwnfNU4NdLbDyZn9tKf3xA5yhmFP5lE07OaY6+6Pn+P/NqqEFwWjCJcZ
-   0wrsjEAtwXkHKkdoZyF8tNT7mCaKEHXb/ScbuWubS5treoU96WmtBh6ZK
-   w==;
-X-CSE-ConnectionGUID: vZ6Q4hMfQseYYiGgngORMg==
-X-CSE-MsgGUID: iVodR+4mSF+Bam2/rJY58A==
-X-IronPort-AV: E=Sophos;i="6.18,217,1751266800"; 
-   d="scan'208";a="277141623"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 28 Aug 2025 00:39:42 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Thu, 28 Aug 2025 00:39:01 -0700
-Received: from DEN-DL-M31836.microchip.com (10.10.85.11) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.44 via Frontend Transport; Thu, 28 Aug 2025 00:38:59 -0700
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <richardcochran@gmail.com>,
-	<Parthiban.Veerasooran@microchip.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>
-Subject: [PATCH net-next v4 2/2] net: phy: micrel: Add PTP support for lan8842
-Date: Thu, 28 Aug 2025 09:34:25 +0200
-Message-ID: <20250828073425.3999528-3-horatiu.vultur@microchip.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250828073425.3999528-1-horatiu.vultur@microchip.com>
-References: <20250828073425.3999528-1-horatiu.vultur@microchip.com>
+	s=arc-20240116; t=1756366532; c=relaxed/simple;
+	bh=HM+OHjGmq2TcnjkHfcjXG9OSRqGR45uKHnDS4eTuII4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OJUmIFIUioNJS/07y5791+SD3BxaLJxVBpYHWb1GJ36H2MDXjtV2tWwqhKoF7H0UEdOelRL80jnMoy/MH9tbFngQynFFNgSdPLOBH//GOugsqdIAqpHa+lw3/s9hW/6ucAeoGKV05J0fubfGKhtem0+KWSTOKmoxG7owBIPBIxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NKG78Lv9; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-afcb78f5df4so96774166b.1;
+        Thu, 28 Aug 2025 00:35:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756366529; x=1756971329; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7wdLKdu3gRydbgkaOExgCyxr/LuNr8ANanTK9VurXYA=;
+        b=NKG78Lv9T4m5PcTC24GbPa+4bVp73ubrKX87gf8VuaKTKFrCPWCgUHAMwwjT00pn9x
+         UAXM7QCRNGguHDKjoxoGvoiOXijBhEqjaNQMfRDtl4W/aKagdSjfjLer/kNip+9GC0hA
+         Xqk2cNJSuzJqJ+KHmoAD9gVGeMtKoaSvoSeHdhca4Ku0wvXqX1iwYVp8KNgwqtAJoLAC
+         S7nT4c56E4W3t5qO555WX8BUxK+FuAsv3trCiUJrLnxWY7H0nyU5CyPIkLg0ZH5utALD
+         QxSaOfWp3gggzg9WvV/CWVrPK1da9X3JvZjThYn1jopOQR685EBMTwpfc9SkDC2STadO
+         0Gsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756366529; x=1756971329;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :reply-to:message-id:subject:cc:to:from:date:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=7wdLKdu3gRydbgkaOExgCyxr/LuNr8ANanTK9VurXYA=;
+        b=IhBA8dtYsYHmTK0TZdDRi5dPOUtD7gAAvBr3tCIy2OaFMpkLlfeK2/5ujVbCJtC0Jx
+         TGMXIMRgVl9pmn5yP75jZpuf94+zzSMez5o4pgJe+u4qUIZt2xHJ0+rFfGpG0ju/+jEv
+         bSQY8TIphgEu/L1rqdg/9vBXYA1d8o5j7+uQUhBPtKatPqBHndAVnlQ3xC/GKM+AXz+t
+         S5agX4lHh45UGVa+ImeGM0lPlAPJUN7h+mnYUVln0q/ViMCZWpn+iLQthe5TmFwi3nYa
+         EpId+jX8hXSh6HE8mc9jeoMU+X8YvHVXaHoVUi5A/XWmimAwtW8tihRqgc8kasc7T78w
+         Ymqg==
+X-Forwarded-Encrypted: i=1; AJvYcCU1PZuSF9BF4PD54UDJY8xNf/IyG1NRf0NkysP2m8tduDGcKmEIRY9lcR8q9Wjv8ysMd2nMeyPmrqF4WQ==@vger.kernel.org, AJvYcCUfE6X9j2MkIbGmtc0fxM5taAx0HYqHlTd+caHBEFlGWaPh/G2Dfx3Rmjn8o+wz0VHcY9HnSngJqmOBKA==@vger.kernel.org, AJvYcCV4ZOUCCZd1NIReXGOEsNQ+v7SGqfFuOUgl4uMZ3FxwsE4gduY4OT2Y6i6ZPg5oX1nil1Vd9NZXWM7Hwn2d@vger.kernel.org, AJvYcCVeRanI2iaLVfIjjpTaWJ2Tdzio6oEtVQLkPMOkQUjbbdhBw1lf1MxKMC2NEZGJXW/jzu+TM/HYuw==@vger.kernel.org, AJvYcCW0+FJnoXzA7//3uXKtiJQIZf7ybkz5FmVoNZQb8OYxQ23Nt4+YgMZKG3rE/zcmmJKnICdg8/cJeKsBqA==@vger.kernel.org, AJvYcCW0mduTnHCP5xKutK3qRY7nVsw0nYTK/X6GXkjsia59PxIvibm901d0dLm4qA9EAYdn7GSX2W9o@vger.kernel.org, AJvYcCW1wr6IATcS6XDuULYwL+1g6k0q7uxPWwrKHFdEGtKkskOXhz1IU0NrB9yzl/8E9Z0AevORw66jFHHy@vger.kernel.org, AJvYcCW9Ovk1HATYwvvnoB89dzjMQqnwGNzVCRl1AgBjT5wIzu6Mo/RDtDtbOuuKY6HKGGpml7VH@vger.kernel.org, AJvYcCWI4ZSRFheXd6lYIl9mrx6oDQU/SHkVYLJlFMU5dvDE3Ubam0JHv/rOCeuMfc5npmWE1BF+XA1nWSIC1R+r6kjJ@vger.kernel.org, AJvYcCXtoULGx8jf0fjXC4jbOR2ePrx218T8EfPx
+ x69NlLFolz9ZyioV/mrU7CKbsg/p5jUMyIwLqxTPUQ6D@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNRNbPqxOhZC2V540LuwVGZSKWHeGGfBXS4LFrbcxu4TZrncoY
+	GofB3Ghs3OVt0zkiQC4Zc+oX1pL7LBH0Pauv0q4trEQsAt7cnLF9G3gD
+X-Gm-Gg: ASbGncuIR12Le1SK0/wgJsDA8m6snKYemdyL+kNXqUhl33ZhhYGQaKJ308eoMHUXr35
+	LZwR5nUBSY3g2qUFkYyZggMgQKBoGsK7ut3PAk7IjYzUJRf5f/PBbS/C75l2Tqfq7t5WOWxWJUs
+	o3KRvdYv4jWnErclVtFSfnPJIhn7epar22STEt/27ErOcEDsmFSOH0AcOYeecsGGaW+y3QaY1m0
+	qMo10DErornqARX+ZQotDAdWVSgMKWg8+eFzoXB73qdJ6Z5qPHVrJvTdM/jT9neU5S6y8qcF9GZ
+	MNtdDBM/375n7MiBUiumsbYo8N5nSgqua4n2EGawpwtKghLrIVU4hzsxN4ONsZaLh0jThTwBTW1
+	/vCEfQ+ikdkUdBOANmsFbtSc2rw==
+X-Google-Smtp-Source: AGHT+IH+/HdQFSXw/W0bPc1NEIz4PAWk+piUx/7dt/vdSor64JcoeKILsFtoJ4Brv3+pRvjO+XdeaA==
+X-Received: by 2002:a17:907:3f0a:b0:afe:d590:b6af with SMTP id a640c23a62f3a-afed590c109mr310258266b.20.1756366529084;
+        Thu, 28 Aug 2025 00:35:29 -0700 (PDT)
+Received: from localhost ([185.92.221.13])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-afe77c2b758sm886311466b.84.2025.08.28.00.35.27
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 28 Aug 2025 00:35:28 -0700 (PDT)
+Date: Thu, 28 Aug 2025 07:35:27 +0000
+From: Wei Yang <richard.weiyang@gmail.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org,
+	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
+	Alexander Potapenko <glider@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Brendan Jackman <jackmanb@google.com>,
+	Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>,
+	Dmitry Vyukov <dvyukov@google.com>, dri-devel@lists.freedesktop.org,
+	intel-gfx@lists.freedesktop.org, iommu@lists.linux.dev,
+	io-uring@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	John Hubbard <jhubbard@nvidia.com>, kasan-dev@googlegroups.com,
+	kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-arm-kernel@axis.com, linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Marco Elver <elver@google.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
+	Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
+	Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
+	virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
+	wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
+Subject: Re: [PATCH v1 09/36] mm/mm_init: make memmap_init_compound() look
+ more like prep_compound_page()
+Message-ID: <20250828073527.u4k47fohaquzf3pg@master>
+Reply-To: Wei Yang <richard.weiyang@gmail.com>
+References: <20250827220141.262669-1-david@redhat.com>
+ <20250827220141.262669-10-david@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250827220141.262669-10-david@redhat.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 
-It has the same PTP IP block as lan8814, only the number of GPIOs is
-different, all the other functionality is the same. So reuse the same
-functions as lan8814 for lan8842.
-There is a revision of lan8842 called lan8832 which doesn't have the PTP
-IP block. So make sure in that case the PTP is not initialized.
+On Thu, Aug 28, 2025 at 12:01:13AM +0200, David Hildenbrand wrote:
+>Grepping for "prep_compound_page" leaves on clueless how devdax gets its
+>compound pages initialized.
+>
+>Let's add a comment that might help finding this open-coded
+>prep_compound_page() initialization more easily.
+>
+>Further, let's be less smart about the ordering of initialization and just
+>perform the prep_compound_head() call after all tail pages were
+>initialized: just like prep_compound_page() does.
+>
+>No need for a comment to describe the initialization order: again,
+>just like prep_compound_page().
+>
+>Reviewed-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
+>Signed-off-by: David Hildenbrand <david@redhat.com>
 
-Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
----
- drivers/net/phy/micrel.c | 97 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 97 insertions(+)
+Reviewed-by: Wei Yang <richard.weiyang@gmail.com>
 
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index 9a90818481320..95ba1a2859a9a 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -457,6 +457,9 @@ struct lan8842_phy_stats {
- 
- struct lan8842_priv {
- 	struct lan8842_phy_stats phy_stats;
-+	int rev;
-+	struct phy_device *phydev;
-+	struct kszphy_ptp_priv ptp_priv;
- };
- 
- static const struct kszphy_type lan8814_type = {
-@@ -5786,6 +5789,17 @@ static int ksz9131_resume(struct phy_device *phydev)
- 	return kszphy_resume(phydev);
- }
- 
-+#define LAN8842_PTP_GPIO_NUM 16
-+
-+static int lan8842_ptp_probe_once(struct phy_device *phydev)
-+{
-+	return __lan8814_ptp_probe_once(phydev, "lan8842_ptp_pin",
-+					LAN8842_PTP_GPIO_NUM);
-+}
-+
-+#define LAN8842_STRAP_REG			0 /* 0x0 */
-+#define LAN8842_STRAP_REG_PHYADDR_MASK		GENMASK(4, 0)
-+#define LAN8842_SKU_REG				11 /* 0x0b */
- #define LAN8842_SELF_TEST			14 /* 0x0e */
- #define LAN8842_SELF_TEST_RX_CNT_ENA		BIT(8)
- #define LAN8842_SELF_TEST_TX_CNT_ENA		BIT(4)
-@@ -5793,6 +5807,7 @@ static int ksz9131_resume(struct phy_device *phydev)
- static int lan8842_probe(struct phy_device *phydev)
- {
- 	struct lan8842_priv *priv;
-+	int addr;
- 	int ret;
- 
- 	priv = devm_kzalloc(&phydev->mdio.dev, sizeof(*priv), GFP_KERNEL);
-@@ -5800,6 +5815,7 @@ static int lan8842_probe(struct phy_device *phydev)
- 		return -ENOMEM;
- 
- 	phydev->priv = priv;
-+	priv->phydev = phydev;
- 
- 	/* Similar to lan8814 this PHY has a pin which needs to be pulled down
- 	 * to enable to pass any traffic through it. Therefore use the same
-@@ -5817,6 +5833,41 @@ static int lan8842_probe(struct phy_device *phydev)
- 	if (ret < 0)
- 		return ret;
- 
-+	/* Revision lan8832 doesn't have support for PTP, therefore don't add
-+	 * any PTP clocks
-+	 */
-+	priv->rev = lanphy_read_page_reg(phydev, LAN8814_PAGE_COMMON_REGS,
-+					 LAN8842_SKU_REG);
-+	if (priv->rev < 0)
-+		return priv->rev;
-+	if (priv->rev == 0x8832)
-+		return 0;
-+
-+	/* As the lan8814 and lan8842 has the same IP for the PTP block, the
-+	 * only difference is the number of the GPIOs, then make sure that the
-+	 * lan8842 initialized also the shared data pointer as this is used in
-+	 * all the PTP functions for lan8814. The lan8842 doesn't have multiple
-+	 * PHYs in the same package.
-+	 */
-+	addr = lanphy_read_page_reg(phydev, LAN8814_PAGE_COMMON_REGS,
-+				    LAN8842_STRAP_REG);
-+	if (addr < 0)
-+		return addr;
-+	addr &= LAN8842_STRAP_REG_PHYADDR_MASK;
-+
-+	ret = devm_phy_package_join(&phydev->mdio.dev, phydev, addr,
-+				    sizeof(struct lan8814_shared_priv));
-+	if (ret)
-+		return ret;
-+
-+	if (phy_package_init_once(phydev)) {
-+		ret = lan8842_ptp_probe_once(phydev);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	lan8814_ptp_init(phydev);
-+
- 	return 0;
- }
- 
-@@ -5896,8 +5947,34 @@ static int lan8842_config_inband(struct phy_device *phydev, unsigned int modes)
- 				      enable ? LAN8814_QSGMII_PCS1G_ANEG_CONFIG_ANEG_ENA : 0);
- }
- 
-+static void lan8842_handle_ptp_interrupt(struct phy_device *phydev, u16 status)
-+{
-+	struct kszphy_ptp_priv *ptp_priv;
-+	struct lan8842_priv *priv;
-+
-+	priv = phydev->priv;
-+	ptp_priv = &priv->ptp_priv;
-+
-+	if (status & PTP_TSU_INT_STS_PTP_TX_TS_EN_)
-+		lan8814_get_tx_ts(ptp_priv);
-+
-+	if (status & PTP_TSU_INT_STS_PTP_RX_TS_EN_)
-+		lan8814_get_rx_ts(ptp_priv);
-+
-+	if (status & PTP_TSU_INT_STS_PTP_TX_TS_OVRFL_INT_) {
-+		lan8814_flush_fifo(phydev, true);
-+		skb_queue_purge(&ptp_priv->tx_queue);
-+	}
-+
-+	if (status & PTP_TSU_INT_STS_PTP_RX_TS_OVRFL_INT_) {
-+		lan8814_flush_fifo(phydev, false);
-+		skb_queue_purge(&ptp_priv->rx_queue);
-+	}
-+}
-+
- static irqreturn_t lan8842_handle_interrupt(struct phy_device *phydev)
- {
-+	struct lan8842_priv *priv = phydev->priv;
- 	int ret = IRQ_NONE;
- 	int irq_status;
- 
-@@ -5912,6 +5989,26 @@ static irqreturn_t lan8842_handle_interrupt(struct phy_device *phydev)
- 		ret = IRQ_HANDLED;
- 	}
- 
-+	/* Phy revision lan8832 doesn't have support for PTP threrefore there is
-+	 * not need to check the PTP and GPIO interrupts
-+	 */
-+	if (priv->rev == 0x8832)
-+		goto out;
-+
-+	while (true) {
-+		irq_status = lanphy_read_page_reg(phydev, LAN8814_PAGE_PORT_REGS,
-+						  PTP_TSU_INT_STS);
-+		if (!irq_status)
-+			break;
-+
-+		lan8842_handle_ptp_interrupt(phydev, irq_status);
-+		ret = IRQ_HANDLED;
-+	}
-+
-+	if (!lan8814_handle_gpio_interrupt(phydev, irq_status))
-+		ret = IRQ_HANDLED;
-+
-+out:
- 	return ret;
- }
- 
 -- 
-2.34.1
-
+Wei Yang
+Help you, Help me
 
