@@ -1,98 +1,105 @@
-Return-Path: <netdev+bounces-217549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDADCB3903A
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 02:50:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5A84B39049
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 02:57:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A69583641DE
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 00:50:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 179291C21728
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 00:58:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC9ED19ADBA;
-	Thu, 28 Aug 2025 00:49:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98A801A0B0E;
+	Thu, 28 Aug 2025 00:57:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bBDH3p+P"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1zV19BfO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A4C13EFF3;
-	Thu, 28 Aug 2025 00:49:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C343FC2;
+	Thu, 28 Aug 2025 00:57:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756342199; cv=none; b=sysCplvEC0jXoZodJ4IcQtgxmkNwB/a3YgttjhdfQr6qO24PJZz47F3RrpkQF8Krs9QLqJxq5Qp2GVyzuazdCyrN2Vj8QHSAt8XhEMFw/LFYVc6kGLjelGqo+Yl+ac0LSgjHF+y+378TeQS8WQ2MtUkjD5cUrkZ/61Um7gBGQQU=
+	t=1756342656; cv=none; b=gX5Kr5+q4FL2gnp8HJDaAWXDG1uqzekPA3ZoddJnn+j/1vYKdTfkNk37wCWmfKh7n8i3wObaDltnkVaPqCHt4Bd6OFR3MKa1CWRb99bOympY7XkDFmiSdkdfalS8lBomckpU6Q/1R//h07OUE/faos7+9O78FRuspHRLuOLoRTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756342199; c=relaxed/simple;
-	bh=qOJT2O/P45y1TMQ19RbfaBGaSVM7euzDXVZ+E+zezvU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dJY2y3BYjj49p6Hpd3K/4GD+lAoCZewNy5nNuXvvAQTkXhsFdC84AE0dYTHGUv6equ3U8+6MnzusHAGKN43IiO7srh+vv0uyPyZ2K40k+6HXp3C3PVYjP+UmftYQw8uQFp6cTLgWP6PidJHAAr+caHx0L+Pay/6UA79YIzf+92Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bBDH3p+P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35693C4CEEB;
-	Thu, 28 Aug 2025 00:49:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756342199;
-	bh=qOJT2O/P45y1TMQ19RbfaBGaSVM7euzDXVZ+E+zezvU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bBDH3p+P2+FEn+Axe0gXs9DyscQRI25EcxY6ZamYBueHYgiipm+bu40cS4vHRJVbF
-	 pwURqylxH5UeYXNkrsEhUXq7+2OtEL2//QQaA64bwX0ZVIzJh7vW3KsayshGZvy6qD
-	 ChOn5xOdeid2fYzrkzxeCds/qt6MIz9h8GH0CSnoE0IeLniZ4d9kDJfyE0u4Om9DjO
-	 2cf6HnuyQIJAuhzqlL2AlY+7n+tBwMMOwa0qSME8WPXAQpp3jZJv762qFcb64QKpQ0
-	 doEEKsUtArrp87qIiocyiVnkttzQixC79vQT9/I2xegnqQwdv5thNMn67b14qr3OUc
-	 mhex8l5fOce/g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE08383BF76;
-	Thu, 28 Aug 2025 00:50:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1756342656; c=relaxed/simple;
+	bh=6mPLtQoKqpOktd+ClKqgL4/6I3IOdOTZcc8W80n9kKY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BnXMzbwT0K2HBJnPyYrhfUOVMl0XFuSa4lyK0gz///sRqQoZxhr0DEXu6qxLys19HrTOPb8WAYg0iXT5tSAmTXiuups9yl9SNP+5kVepdgDKLhMr7oS5pvvisxp9JCb+sgqcn5uQpctJ7r/0v48+qfsGcNfPiiJA8V5kz3g/iq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1zV19BfO; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Xzfvef7gPGFK4oJUVn+kGo0LXzZrJBEOwMpzo6EihUg=; b=1zV19BfOKEJmRvOVrOCbRXSH60
+	o5rIulOlUj8qKpWEmx7g5iVg97SeWAdShHA7V7WMyE00+YQ9JL0yIVBYh2RX9kZaNiR3CcuyYWzwt
+	ETmVULq2Xw2Bt9ruezkN276RV/LfpGKZ3BybDqE5CBkR0+ojry40imGYBY8MXFwAhyJY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1urQx5-006HaH-1f; Thu, 28 Aug 2025 02:57:19 +0200
+Date: Thu, 28 Aug 2025 02:57:19 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Petko Manolov <petkan@nucleusys.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	syzbot+b4d5d8faea6996fd55e3@syzkaller.appspotmail.com
+Subject: Re: [PATCH v1 net] net: usb: rtl8150: Fix uninit-value access in
+ set_carrier().
+Message-ID: <87ace089-0d1b-474b-aa9d-aed1e83062bc@lunn.ch>
+References: <20250827233108.3768855-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: stmmac: sun8i: drop unneeded default syscon
- value
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175634220652.891202.7808539694253002110.git-patchwork-notify@kernel.org>
-Date: Thu, 28 Aug 2025 00:50:06 +0000
-References: <20250825172055.19794-1-andre.przywara@arm.com>
-In-Reply-To: <20250825172055.19794-1-andre.przywara@arm.com>
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
- alexandre.torgue@foss.st.com, wens@csie.org, samuel@sholland.org,
- jernej.skrabec@gmail.com, clabbe.montjoie@gmail.com, paulk@sys-base.io,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-sunxi@lists.linux.dev
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250827233108.3768855-1-kuniyu@google.com>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 25 Aug 2025 18:20:55 +0100 you wrote:
-> For some odd reason we were very jealous about the value of the EMAC
-> clock register from the syscon block, insisting on a reset value and
-> only doing read-modify-write operations on that register, even though we
-> pretty much know the register layout.
-> This already led to a basically redundant entry for the H6, which only
-> differs by that value. We seem to have the same situation with the new
-> A523 SoC, which again is compatible to the A64, but has a different
-> syscon reset value.
+On Wed, Aug 27, 2025 at 11:31:02PM +0000, Kuniyuki Iwashima wrote:
+> syzbot reported set_carrier() accesses an uninitialised local var. [0]
 > 
-> [...]
+> get_registers() is a wrapper of usb_control_msg_recv(), which copies
+> data to the passed buffer only when it returns 0.
+> 
+> Let's check the retval before accessing tmp in set_carrier().
 
-Here is the summary with links:
-  - [net-next] net: stmmac: sun8i: drop unneeded default syscon value
-    https://git.kernel.org/netdev/net-next/c/330355191a2d
+	do {
+		get_registers(dev, PHYCNT, 1, data);
+	} while ((data[0] & PHY_GO) && (i++ < MII_TIMEOUT));
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+	if (i <= MII_TIMEOUT) {
+		get_registers(dev, PHYDAT, 2, data);
+		*reg = data[0] | (data[1] << 8);
 
 
+
+	/* Get the CR contents. */
+	get_registers(dev, CR, 1, &cr);
+	/* Set the WEPROM bit (eeprom write enable). */
+	cr |= 0x20;
+	set_registers(dev, CR, 1, &cr);
+
+
+	do {
+		get_registers(dev, CR, 1, &data);
+	} while ((data & 0x10) && --i);
+
+Don't these also have the same problem?
+
+    Andrew
+
+---
+pw-bot: cr
 
