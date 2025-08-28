@@ -1,167 +1,146 @@
-Return-Path: <netdev+bounces-217855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D546BB3A289
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 16:48:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA8EAB3A293
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 16:49:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 307BE3B69D6
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 14:45:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D23F61C8356A
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 14:48:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C85331E0E0;
-	Thu, 28 Aug 2025 14:41:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FFA2314A93;
+	Thu, 28 Aug 2025 14:46:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YWS6Hd9a"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qtRzuUk6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 465DD31DD9B;
-	Thu, 28 Aug 2025 14:41:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E44D314B66
+	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 14:46:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756392090; cv=none; b=PBkUKCaXX9HnWoZsdWuHCpZ9MJZFQM6OcU9u+EmPQSbHszOFcmcmOTBylskIgi3q52Kbjc7IR4fWotMiPbANqVajUBtnvtVEzo3tgpGD9zK5S6pm56gdX1xLrFzfmMTaboir6i8X6Z6T58qk9xebQ2mTQB0fsHprxIDz2MMKTec=
+	t=1756392396; cv=none; b=I7gQ36c5dzAr42e+rFFJtDIKe4hMnuUzbZ7bRhHrmYH4HQ3Lhn2zHH1w/Lw2Xhi8K+0Vx9SNfRIQBCjXmltbnRa+KSozLGziyTelJgq9freEcXAEvG2Xa32AOVQiqsLzwrGD8FC24sx+BMNiAhbQ72TtBuymxUxuHMgJFmcmXEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756392090; c=relaxed/simple;
-	bh=jzrymZop5dhCQXUJp9duw8ynZq28kq5moo1G3LEpFJ8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LkJDGTqxLqJVPeu2UvBeEqpyBg4dekEZZnr3lNf7rV6vRNfKO2g+W45f+gtNXZM0MYACv06UMyMu1/ikrbTAlGmfX14DLlOItsMzMf3RK39TzDqTnOZdUb2HvgVJQ0RQR3sWjUs3OkmwK2dd68ii71cS2PV+MnnET41n/bGuqQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YWS6Hd9a; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756392089; x=1787928089;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=jzrymZop5dhCQXUJp9duw8ynZq28kq5moo1G3LEpFJ8=;
-  b=YWS6Hd9a1Gi6LlBYFLi9t9R7b8MJF+bTVdA/xSU3k7Zm+uzEZMNSaOkL
-   b+Oo90e2aSRZ1GbzvnHhSr28yHQ5C4qEjhSszgOAJBnqMFAg6CLAi7arH
-   Uuiu/aceLaw8VZvTHTW332k0fsZTARKnFJyDcUbmaufCpKhth7D5zj8od
-   kQh12vgouPKDuvtDLGmhDoRsrtsIAg42qtywWWRwrseElCOYP/nDyveFi
-   yMX6dRt0tBKm1je6GWewUyo+TEEvq2sbkCDEI71T3eov9he4VoGA2KA2B
-   fcM0NTP2KWyZbspy6QC3XS2KaRC/ZpXlGnFCJP67PVO3txv1rSv+8rVf0
-   A==;
-X-CSE-ConnectionGUID: cuEeN80PSPCZ3JD/MEwuXA==
-X-CSE-MsgGUID: +IAZE0kjSneIHouGLE4OFw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11536"; a="58515410"
-X-IronPort-AV: E=Sophos;i="6.18,217,1751266800"; 
-   d="scan'208";a="58515410"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2025 07:41:28 -0700
-X-CSE-ConnectionGUID: QJlq1e/NTMaawHVw0fMRYQ==
-X-CSE-MsgGUID: qd2A5lylSKyHiyZEW3L2xg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,217,1751266800"; 
-   d="scan'208";a="207276104"
-Received: from gklab-kleszczy-dev.igk.intel.com ([10.102.25.215])
-  by orviesa001.jf.intel.com with ESMTP; 28 Aug 2025 07:41:24 -0700
-From: Konrad Leszczynski <konrad.leszczynski@intel.com>
-To: davem@davemloft.net,
-	andrew+netdev@lunn.ch,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	cezary.rojewski@intel.com,
-	sebastian.basierski@intel.com,
-	Karol Jurczenia <karol.jurczenia@intel.com>,
-	Konrad Leszczynski <konrad.leszczynski@intel.com>
-Subject: [PATCH net-next 4/4] net: stmmac: add TC flower filter support for IP EtherType
-Date: Thu, 28 Aug 2025 16:45:58 +0200
-Message-Id: <20250828144558.304304-5-konrad.leszczynski@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250828144558.304304-1-konrad.leszczynski@intel.com>
-References: <20250828144558.304304-1-konrad.leszczynski@intel.com>
+	s=arc-20240116; t=1756392396; c=relaxed/simple;
+	bh=hHLO5dzMz3yvQHsv4K9Ci/hM3LzU39IIq7dBZIID1ds=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GI4AM1IEjtRRHUsRlf1q9v4DPnOOFbQG6yRIchtC9G7LKeuZsgAaaKJPBLVdWPiKbiSBteF1BnDjs2Sxi3sNQ9aOCi1801kWgfmLt/M5AEDFDbQYeY71exC59HjNWaUXOJ/PcAKqsNtA7M/345BCWfqYTr+YEmCpS3jTIqUrF6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qtRzuUk6; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <02dcf1f8-3ba4-4f79-897c-bf5a5007cc70@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1756392379;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=b8PthrC++MOSlrv7bkdtiRB5JHjJXN0lEZacyQBasz0=;
+	b=qtRzuUk6IhZLglDYu/vReodTya+HHtrLBt3MnGXtLYy1EU8REo8m0ixf0vQA8eYYvWNEav
+	IOROEaFmgntmIWYUN1BjoN29pKWVvA8xDo7p+J8wj0ZEJTGZUieYJKZpiEdUw5fMZVjH0K
+	1F3KIB4Elw/VkLAdAqfOKgs19cMxLYY=
+Date: Thu, 28 Aug 2025 15:46:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v02 01/14] hinic3: HW initialization
+To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+ Bjorn Helgaas <helgaas@kernel.org>, luosifu <luosifu@huawei.com>,
+ Xin Guo <guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>,
+ Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
+ Shi Jing <shijing34@huawei.com>, Meny Yossefi <meny.yossefi@huawei.com>,
+ Gur Stavi <gur.stavi@huawei.com>, Lee Trager <lee@trager.us>,
+ Michael Ellerman <mpe@ellerman.id.au>, Suman Ghosh <sumang@marvell.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Joe Damato <jdamato@fastly.com>,
+ Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+References: <cover.1756378721.git.zhuyikai1@h-partners.com>
+ <301829ef1f10086b0407164b4fe04adc9d05da04.1756378721.git.zhuyikai1@h-partners.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <301829ef1f10086b0407164b4fe04adc9d05da04.1756378721.git.zhuyikai1@h-partners.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-From: Karol Jurczenia <karol.jurczenia@intel.com>
+On 28/08/2025 13:10, Fan Gong wrote:
+> Add the hardware resource data structures, functions for HW initialization,
+> configuration and releasement.
+> 
+> Co-developed-by: Xin Guo <guoxin09@huawei.com>
+> Signed-off-by: Xin Guo <guoxin09@huawei.com>
+> Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
+> Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
+> Signed-off-by: Fan Gong <gongfan1@huawei.com>
+> ---
+>   .../net/ethernet/huawei/hinic3/hinic3_hwdev.c |  53 +++-
+>   .../net/ethernet/huawei/hinic3/hinic3_hwif.c  | 227 ++++++++++++++++++
+>   .../net/ethernet/huawei/hinic3/hinic3_hwif.h  |  13 +
+>   .../net/ethernet/huawei/hinic3/hinic3_lld.c   |   3 +-
+>   .../huawei/hinic3/hinic3_pci_id_tbl.h         |   9 +
+>   5 files changed, 301 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.c b/drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.c
+> index 6e8788a64925..5bd5745f4b96 100644
+> --- a/drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.c
+> +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.c
 
-Add missing Traffic Control (TC) offload for flower filters matching the
-IP EtherType (ETH_P_IP).
+[...]
 
-Reviewed-by: Sebastian Basierski <sebastian.basierski@intel.com>
-Reviewed-by: Cezary Rojewski <cezary.rojewski@intel.com>
-Signed-off-by: Karol Jurczenia <karol.jurczenia@intel.com>
-Signed-off-by: Konrad Leszczynski <konrad.leszczynski@intel.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  1 +
- .../net/ethernet/stmicro/stmmac/stmmac_tc.c   | 19 ++++++++++++++++++-
- 2 files changed, 19 insertions(+), 1 deletion(-)
+> +/* Init attr struct from HW attr values. */
+> +static void init_hwif_attr(struct hinic3_func_attr *attr, u32 attr0, u32 attr1,
+> +			   u32 attr2, u32 attr3, u32 attr6)
+> +{
+> +	attr->func_global_idx = HINIC3_AF0_GET(attr0, FUNC_GLOBAL_IDX);
+> +	attr->port_to_port_idx = HINIC3_AF0_GET(attr0, P2P_IDX);
+> +	attr->pci_intf_idx = HINIC3_AF0_GET(attr0, PCI_INTF_IDX);
+> +	attr->func_type = HINIC3_AF0_GET(attr0, FUNC_TYPE);
+> +
+> +	attr->num_aeqs = BIT(HINIC3_AF1_GET(attr1, AEQS_PER_FUNC));
+> +	attr->num_ceqs = HINIC3_AF2_GET(attr2, CEQS_PER_FUNC);
+> +	attr->num_irqs = HINIC3_AF2_GET(attr2, IRQS_PER_FUNC);
+> +	if (attr->num_irqs > HINIC3_MAX_MSIX_ENTRY)
+> +		attr->num_irqs = HINIC3_MAX_MSIX_ENTRY;
+> +
+> +	attr->num_sq = HINIC3_AF6_GET(attr6, FUNC_MAX_SQ);
+> +	attr->msix_flex_en = HINIC3_AF6_GET(attr6, MSIX_FLEX_EN);
+> +}
+> +
+> +/* Get device attributes from HW. */
+> +static int get_hwif_attr(struct hinic3_hwdev *hwdev)
+> +{
+> +	u32 attr0, attr1, attr2, attr3, attr6;
+> +	struct hinic3_hwif *hwif;
+> +
+> +	hwif = hwdev->hwif;
+> +	attr0  = hinic3_hwif_read_reg(hwif, HINIC3_CSR_FUNC_ATTR0_ADDR);
+> +	attr1  = hinic3_hwif_read_reg(hwif, HINIC3_CSR_FUNC_ATTR1_ADDR);
+> +	attr2  = hinic3_hwif_read_reg(hwif, HINIC3_CSR_FUNC_ATTR2_ADDR);
+> +	attr3  = hinic3_hwif_read_reg(hwif, HINIC3_CSR_FUNC_ATTR3_ADDR);
+> +	attr6  = hinic3_hwif_read_reg(hwif, HINIC3_CSR_FUNC_ATTR6_ADDR);
+> +	init_hwif_attr(&hwif->attr, attr0, attr1, attr2, attr3, attr6);
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-index 78d6b3737a26..77f900a328aa 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-@@ -206,6 +206,7 @@ enum stmmac_rfs_type {
- 	STMMAC_RFS_T_VLAN,
- 	STMMAC_RFS_T_LLDP,
- 	STMMAC_RFS_T_1588,
-+	STMMAC_RFS_T_IP,
- 	STMMAC_RFS_T_MAX,
- };
- 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-index 694d6ee14381..c5577652d6ed 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-@@ -239,6 +239,7 @@ static int tc_rfs_init(struct stmmac_priv *priv)
- 	priv->rfs_entries_max[STMMAC_RFS_T_VLAN] = 8;
- 	priv->rfs_entries_max[STMMAC_RFS_T_LLDP] = 1;
- 	priv->rfs_entries_max[STMMAC_RFS_T_1588] = 1;
-+	priv->rfs_entries_max[STMMAC_RFS_T_IP] = 32;
- 
- 	for (i = 0; i < STMMAC_RFS_T_MAX; i++)
- 		priv->rfs_entries_total += priv->rfs_entries_max[i];
-@@ -777,6 +778,17 @@ static int tc_add_ethtype_flow(struct stmmac_priv *priv,
- 			stmmac_rx_queue_routing(priv, priv->hw,
- 						PACKET_PTPQ, tc);
- 			break;
-+		case ETH_P_IP:
-+			if (priv->rfs_entries_cnt[STMMAC_RFS_T_IP] >=
-+			    priv->rfs_entries_max[STMMAC_RFS_T_IP])
-+				return -ENOENT;
-+
-+			entry->type = STMMAC_RFS_T_IP;
-+			priv->rfs_entries_cnt[STMMAC_RFS_T_IP]++;
-+
-+			stmmac_rx_queue_routing(priv, priv->hw,
-+						PACKET_UPQ, tc);
-+			break;
- 		default:
- 			netdev_err(priv->dev, "EthType(0x%x) is not supported", etype);
- 			return -EINVAL;
-@@ -800,7 +812,7 @@ static int tc_del_ethtype_flow(struct stmmac_priv *priv,
- 
- 	if (!entry || !entry->in_use ||
- 	    entry->type < STMMAC_RFS_T_LLDP ||
--	    entry->type > STMMAC_RFS_T_1588)
-+	    entry->type > STMMAC_RFS_T_IP)
- 		return -ENOENT;
- 
- 	switch (entry->etype) {
-@@ -814,6 +826,11 @@ static int tc_del_ethtype_flow(struct stmmac_priv *priv,
- 					PACKET_PTPQ, 0);
- 		priv->rfs_entries_cnt[STMMAC_RFS_T_1588]--;
- 		break;
-+	case ETH_P_IP:
-+		stmmac_rx_queue_routing(priv, priv->hw,
-+					PACKET_UPQ, 0);
-+		priv->rfs_entries_cnt[STMMAC_RFS_T_IP]--;
-+		break;
- 	default:
- 		netdev_err(priv->dev, "EthType(0x%x) is not supported",
- 			   entry->etype);
--- 
-2.34.1
+well, get_hwif_attr() name is misleading here, as the function doesn't
+only read values, it also sets some of them. if there is no other users
+of init function, it might be better to merge them.
+
+> +
+> +	return 0;
+
+there is no way the function can return error - what's the reason to
+have return value?
+
 
 
