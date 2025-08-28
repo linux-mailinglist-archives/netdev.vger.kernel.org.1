@@ -1,128 +1,102 @@
-Return-Path: <netdev+bounces-217597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4B97B39264
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 06:04:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2357FB3928C
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 06:27:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9096C7C0316
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 04:04:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D062D68817B
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 04:27:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E80791F4162;
-	Thu, 28 Aug 2025 04:04:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BACA264A97;
+	Thu, 28 Aug 2025 04:27:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EudWopbJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MDOpy7Q7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75AA92144D7
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 04:04:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A6830CD97;
+	Thu, 28 Aug 2025 04:27:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756353867; cv=none; b=XtTtir78Q8nNEgXJT00gj4VePCj4/UXxjznGo5RDbDK9wTjobHTniGJjJSelE1SMKst/oG2FnF9sbvouvCVUl+wuL5edmGzKut2KqTBvQwZCiHKLrrgC7OLZg9ZpoHo2ekQj6vWUAuygXYDbMOt0O9UH3ddrULYpYY42Ucd5OfE=
+	t=1756355265; cv=none; b=r2UIBl3fzj8XOTo2LGZrcrtlQ5xoTTX7n40oXyt42m/Zre12gLcN2OxXDNg11r+Y0obdizIwa7c9u9+4SQ9FXexUpr9XRdZGx6WpdXThBMzhcHJv4LFnIDAfueEeW2sR3hJT+KYvNGuP4KzVUqnWV0n2HJtFT86pabw6Aq8El+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756353867; c=relaxed/simple;
-	bh=gtOgAdp0yT+NL1OViY+er+sH/YrclLDXbWh7hTyG1Qo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TvcPodGTRN11mFcxfubGjZIjDmxo69ZHcoED0qg+eDFydME5L+d9AMVybrtGOmulewWlvtJn6bB8jammNBFgKRnw5kMLKj6ceuFQLcVb9LbYceTefg/bm+HhXIXZcDdomxGerrp9Fm8ZhEkB2H27Mtf461qtZmiXBMZa5cDisK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EudWopbJ; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-24456ce0b96so6325215ad.0
-        for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 21:04:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756353866; x=1756958666; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=0DvYBS4p/VobAI0awl0GcVuGCpHvaVuv7N+lckUpnd4=;
-        b=EudWopbJRxD/g+zwpUfBkeMx1ff/q4gaClK6QKJr8SF3UR7g3SoHFdDHOgxW7q0HTl
-         QyYX/i2ddzZ0qcG2zV4T2SKHGIpcxEoXLXoNiMULsh0Kk3EKBN8ROSEzXntxxVtEyt87
-         3dN0hxPrKNU4yhhv/FNBkPCSHA1YT7aWtg8u5JB6dRcy/fk+2JUZyJGmoBE2LdNz5YCv
-         1JUdypWIKfwzUL+6pPrxFxFFJNjx6J8q5EVo837IF54EQslHs3+RhFcC95mFoKDDnpLV
-         TVVNLF2e3dS2uCldkKvUrLHRZZ/m5HW4VzPq1T/Hqn11Ke48jGm0vimoc8I/ZiWpww+9
-         lr9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756353866; x=1756958666;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0DvYBS4p/VobAI0awl0GcVuGCpHvaVuv7N+lckUpnd4=;
-        b=I7E1QfYABHl01fU6hZI7+OMJ3UIvt6lpAPQ80b0rGAlKdq9jT/2vcVcpOdnuVq+aNy
-         nHVkYaxXHIGAj3ctR7JZuE9v6hpneSMqjLjjxK8l/Mcz5ggU/sSAk2AwuoywdbtrK4YQ
-         2aPLh9AlVxQK6EgkS1eaChC1Nf5ieGzMatzMsTONes0eOSwK7VRCfTj0ycyy8k5xRcNK
-         uEWw6vO6SqqqFCOtRqrHI+CYzLzkd8sdFEW9z604c62ameE7kSzt6WReemX2GGLE9fDx
-         iafYybW6QgFDSy/D3IrLCO/PxDQoYn8O2N+lXoUHxmVLOSNgoOgzsJ2KnJGYKCdma8Xq
-         3BqQ==
-X-Gm-Message-State: AOJu0YyYLy8dVJGWMDMtvrel6iv+JZ8TYeLp8c2kbL55Rxuv6dUQFLIi
-	hH/rHQlhmMibrvSuLJYcI35Z1VL+cbOPXAfcICeeWpXCEL4gy2oAFmD6
-X-Gm-Gg: ASbGnctwQVQ8Q/FNv5MBsTA1gkVXMCP4xjdZXE09SBl0rmUMF1ExTnYlCjpyFZSvR77
-	jFgiwyvmJaeHfnUGkxrJjtOUA9z09zhYA+GgUssopf6656DOx7Rba57wW4emnD3pwJ3WOD8+Qe/
-	K6xRE0+tWrCWS65FKXU+qNgo7EC8yN8UEeUga66KJ1BYPMw8zVIAoXwEteRSMzaJZTs3iiE5u8S
-	P96d81nyR6xpBgP3ygcN/vWaH/S6R946Gd1l+sCa28BbyXMnR0UMqiREi+OrKgVkm4IdWyESCvR
-	4e7BfIDMmUleiDcCi66xOD3jixkQBiDWEELtMSAjfxnTPtCpBg9ciT4IkN2mgSwndJ98UHGkkal
-	1yCy6B8rOUeP03E9PY9jHFr6CyzA=
-X-Google-Smtp-Source: AGHT+IGQOieiq4fUCAfS2uAVZvm0Kinwp15cpfGmFA4O/G/4ecvY36rgkPxFOIIP4S+/FtoLUV++rg==
-X-Received: by 2002:a17:902:c947:b0:246:50c0:ae8b with SMTP id d9443c01a7336-248753a2457mr103163125ad.0.1756353865710;
-        Wed, 27 Aug 2025 21:04:25 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3279b4b279asm761787a91.6.2025.08.27.21.04.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Aug 2025 21:04:25 -0700 (PDT)
-Date: Thu, 28 Aug 2025 04:04:18 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jakub Acs <acsjakub@amazon.de>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Fernando Fernandez Mancera <ffmancera@riseup.net>,
-	Taehee Yoo <ap420073@gmail.com>
-Subject: Re: [PATCH net] hsr: use netdev_master_upper_dev_link() when linking
- lower ports
-Message-ID: <aK_VQurV1-eQ0UJ9@fedora>
-References: <20250826013352.425997-1-liuhangbin@gmail.com>
- <20250827180603.001b85b3@kernel.org>
+	s=arc-20240116; t=1756355265; c=relaxed/simple;
+	bh=hUnNfjGCPEWmiNNGGLZKDOsScYWj511icwVWbnrMbSE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gE86G8YGZBmkIG9k7GPXf1bScrcjGn4WEPmcPw/M1D9uGUWwf3Ghr3OEmcgTmCtyC0BhnkTHq05Wiou0SvFFyZLlbkdajwARCMNLB9eqW+I76kO7xduMb1y64kHuctDWVi/bnJ63PN+jjUz85QjUFYtwE37hqwKAmHR8nU0AS4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MDOpy7Q7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33984C4CEEB;
+	Thu, 28 Aug 2025 04:27:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756355264;
+	bh=hUnNfjGCPEWmiNNGGLZKDOsScYWj511icwVWbnrMbSE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=MDOpy7Q7+PtjV9ZnI/+71mkZCJrWQwTtFvdW0afXONz8h7wR9ImGTrV4WCC7mXn2B
+	 7EbOn3HGpIWLqjjSjwF8rGcKZhPtc4Gfky+zbxOUAt8Kl+cAXdXSfuUaya8Zvy1ya1
+	 F1mYHsgG9WcnDg0zKq2bACZzcl/UPORrd7FsCsy3qdsnuRy8wAbqlzxL98joSNwLF6
+	 w9WMn87Hpnp8f8IF6pk5vnsO7wQiX+Ib8XV+pManWrp62VQ4CdQPenZjvMUQSDERoQ
+	 eOJ33fQuGDSZ49Qcix6/vKNOIhOhF/f6epJTEq5OJkbiyKYIE1xM/FteX3oGbk+Ymp
+	 Up7jZQPpsB0CA==
+Message-ID: <c39104cf-f066-45d8-a13c-cad558312b6e@kernel.org>
+Date: Thu, 28 Aug 2025 13:24:45 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250827180603.001b85b3@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 24/36] ata: libata-eh: drop nth_page() usage within SG
+ entry
+To: David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org
+Cc: Niklas Cassel <cassel@kernel.org>, Alexander Potapenko
+ <glider@google.com>, Andrew Morton <akpm@linux-foundation.org>,
+ Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
+ Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+ iommu@lists.linux.dev, io-uring@vger.kernel.org,
+ Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
+ Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
+ kasan-dev@googlegroups.com, kvm@vger.kernel.org,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
+ linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Marco Elver <elver@google.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
+ Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
+ Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
+ Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
+ Robin Murphy <robin.murphy@arm.com>, Suren Baghdasaryan <surenb@google.com>,
+ Tejun Heo <tj@kernel.org>, virtualization@lists.linux.dev,
+ Vlastimil Babka <vbabka@suse.cz>, wireguard@lists.zx2c4.com, x86@kernel.org,
+ Zi Yan <ziy@nvidia.com>
+References: <20250827220141.262669-1-david@redhat.com>
+ <20250827220141.262669-25-david@redhat.com>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <20250827220141.262669-25-david@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Aug 27, 2025 at 06:06:03PM -0700, Jakub Kicinski wrote:
-> On Tue, 26 Aug 2025 01:33:52 +0000 Hangbin Liu wrote:
-> > Unlike VLAN devices, HSR changes the lower device’s rx_handler, which
-> > prevents the lower device from being attached to another master.
-> > Switch to using netdev_master_upper_dev_link() when setting up the lower
-> > device.
-> > 
-> > This also improves user experience, since ip link will now display the
->        ^^^^
+On 8/28/25 7:01 AM, David Hildenbrand wrote:
+> It's no longer required to use nth_page() when iterating pages within a
+> single SG entry, so let's drop the nth_page() usage.
 > 
-> Why this "also" here? You haven't mentioned any benefit of this change
-> up to this point. AFAIK having the master link is the only one?
+> Cc: Damien Le Moal <dlemoal@kernel.org>
+> Cc: Niklas Cassel <cassel@kernel.org>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-Apart from the "fix"(I thought), we can "also" benefit of the ip link output.
+Acked-by: Damien Le Moal <dlemoal@kernel.org>
 
-> 
-> > HSR device as the master for its ports.
-> > 
-> > Fixes: e0a4b99773d3 ("hsr: use upper/lower device infrastructure")
-> 
-> The current behavior is 5 years old, AFAICT. We need a reason to treat
-> this as a fix, right now this looks like net-next material..
-
-If you think this is not a fix. Sure I can remove the "also" word and post to
-net-next :)
-
-Thanks
-Hangbin
+-- 
+Damien Le Moal
+Western Digital Research
 
