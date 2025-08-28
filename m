@@ -1,110 +1,96 @@
-Return-Path: <netdev+bounces-217827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2F79B39ED2
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 15:27:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96964B39ED4
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 15:27:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C9335E26ED
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 13:26:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B61B685FEA
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 13:26:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60F92312830;
-	Thu, 28 Aug 2025 13:26:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23A8D311C1D;
+	Thu, 28 Aug 2025 13:26:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tYY4mWUE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I9O30dWO"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94FD5313524
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 13:26:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC72D311972;
+	Thu, 28 Aug 2025 13:26:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756387564; cv=none; b=VmyQd5DdhotzHOJK4pQC6qBsR872+lepOJl0WnPY7yKuOO9yQ3MG1zrdWzKHYjN2UqhwUyOurKZKGCc0JkTFTeqrbDvENPqv6pAs9cBy8lXuTmerpWAxRJyealXOFcdanlSK6Jfj1AOQ55l1vsTo11J3bz+8kdRl1kurvHPhdyk=
+	t=1756387571; cv=none; b=opaVmolvhfTZ0ia/9+FHofZCUAJ81MFVw88ZRb0eYYBsxYCrvKnkI0ghb4uaR7QLQeyqi1dW0Pckg/6z0pJLfBYgIthusjOiGAJSRF0MqYTefQRreLmXEo2mj9d/ib5J+wPkY/JaIbRiuzO8SI1eUldPC5hXFYOZ274lC7WKR24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756387564; c=relaxed/simple;
-	bh=4R1o8OnRO95zAYNa32y4YQirY4N/kppGRq2Q9m5npAo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=HfWhuXMMq4jnooNvwHwz7XY325/zC/Oq4rqBuLxWAoE/oI9vjBSzd8u8DC1Nc5C5OsohVAe94rLLwfxPiYhx9u4CXJhGf+rQKDaJHIl9ulAnN5DA+qQ6MYnXQ9p7Ws+GiaBIUWzmo9rUfT6YT2Sozo9vjEdmDbhHf/b5aCsVFhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tYY4mWUE; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <04da72a3-d219-4dbd-bb9a-b3bf26a57f5f@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1756387550;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zFoSS4PZpPrRGUUkLCK1RHwD6lWbjJyYY8TTiLpbu7M=;
-	b=tYY4mWUEVkmHj+EjoP/f+vfQiARCeIeMmfCmzo/DQL35OjmkX5YseIR32bniO1OEYjlCKl
-	9HOzTZFySIGVd/SIrmQmEU0y2qbsKQzq4GvgocgVvVDNPjlNdHsiNceCGf7Scsa7TBKwnp
-	6MG4KC9aNnj8TFlYQtfnY05IPlGSTLQ=
-Date: Thu, 28 Aug 2025 14:25:48 +0100
+	s=arc-20240116; t=1756387571; c=relaxed/simple;
+	bh=i+5Oim/HXTglyokFAvo3qzr+eTdcCWXR7N4SxzM53Xk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rf88lIl9CQCa39NuOR/XcyrDnvCsHx56Uodfpy9qHFLWQjcYHD2H2n+qHvTxQ3HcIB4Xd+MtZdYjPF7YFZWs5IIXI+Wf83lgaqYkgyAFzgSEUC1p5+VVF0Ur4+n9YE2S1nlsVr1Lsx9BEIStQr6o5lu19tYay0VzkjlBx/NmcA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I9O30dWO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74829C4CEEB;
+	Thu, 28 Aug 2025 13:26:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756387570;
+	bh=i+5Oim/HXTglyokFAvo3qzr+eTdcCWXR7N4SxzM53Xk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=I9O30dWOUUevxK2fiLQpLX/weKtJM7lgQCSaSvqZKLvY4WCME85SyqPM8/RBScTi8
+	 gCkvck458Ydx3B8xBv+prNU0JZHT6ZHiAO1cg6YrBrnN1+rqntGeqJFLYWpHW+kpGR
+	 b7Pl/KVmJ/n3957C8+9KexfmdApoa01CdWyyBuNNZ9WLiTI71pTWiqzWNMZhHH/XCV
+	 hk8KKTZIZeHD9EopC5B45VDA+XpDJ8pghmFzDdCOD/cRK6rOO+s24fK0nA1gYwNQR3
+	 byRb8Yd9bbDjCfaRseFHnzzdIyxxEl/YMfLruTEsXH7DzeQsd/cRA3HHTTDnkxDyIy
+	 zM1xYIzbPXAZg==
+Date: Thu, 28 Aug 2025 14:26:06 +0100
+From: Simon Horman <horms@kernel.org>
+To: Liao Yuanhong <liaoyuanhong@vivo.com>
+Cc: Sudarsana Kalluru <skalluru@marvell.com>,
+	Manish Chopra <manishc@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"open list:BROADCOM BNX2X 10 GIGABIT ETHERNET DRIVER" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] bnx2x: Remove redundant ternary operators
+Message-ID: <20250828132606.GK10519@horms.kernel.org>
+References: <20250827101514.444273-1-liaoyuanhong@vivo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3] eth: mlx4: Fix IS_ERR() vs NULL check bug in
- mlx4_en_create_rx_ring
-To: Miaoqian Lin <linmq006@gmail.com>, Tariq Toukan <tariqt@nvidia.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250828121858.67639-1-linmq006@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250828121858.67639-1-linmq006@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250827101514.444273-1-liaoyuanhong@vivo.com>
 
-On 28/08/2025 13:18, Miaoqian Lin wrote:
-> Replace NULL check with IS_ERR() check after calling page_pool_create()
-> since this function returns error pointers (ERR_PTR).
-> Using NULL check could lead to invalid pointer dereference.
+On Wed, Aug 27, 2025 at 06:15:14PM +0800, Liao Yuanhong wrote:
+> For ternary operators in the form of "a ? true : false", if 'a' itself
+> returns a boolean result, the ternary operator can be omitted. Remove
+> redundant ternary operators to clean up the code.
 > 
-> Fixes: 8533b14b3d65 ("eth: mlx4: create a page pool for Rx")
-> Signed-off-by: Miaoqian Lin <linmq006@gmail.com>
-> ----
-> Changes in v3:
-> - fix IS_ERR
-> Changes in v2:
-> - use err = PTR_ERR(ring->pp);
-> v1 link: https://lore.kernel.org/all/20250805025057.3659898-1-linmq006@gmail.com
-> v2 link: https://lore.kernel.org/all/20250828065050.21954-1-linmq006@gmail.com
-> ---
->   drivers/net/ethernet/mellanox/mlx4/en_rx.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx4/en_rx.c b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
-> index 92a16ddb7d86..13666d50b90f 100644
-> --- a/drivers/net/ethernet/mellanox/mlx4/en_rx.c
-> +++ b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
-> @@ -267,8 +267,10 @@ int mlx4_en_create_rx_ring(struct mlx4_en_priv *priv,
->   	pp.dma_dir = priv->dma_dir;
->   
->   	ring->pp = page_pool_create(&pp);
-> -	if (!ring->pp)
-> +	if (IS_ERR(ring->pp)) {
-> +		err = PTR_ERR(ring->pp);
->   		goto err_ring;
-> +	}
->   
->   	if (xdp_rxq_info_reg(&ring->xdp_rxq, priv->dev, queue_index, 0) < 0)
->   		goto err_pp;
+> Signed-off-by: Liao Yuanhong <liaoyuanhong@vivo.com>
 
-You should wait for 24h before submission of the next version. That's a 
-general rule for netdev.
+Quoting documentation:
 
-But given that this change is quite small...
+  Clean-up patches
+  ~~~~~~~~~~~~~~~~
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+  Netdev discourages patches which perform simple clean-ups, which are not in
+  the context of other work. For example:
+
+  * Addressing ``checkpatch.pl`` warnings
+  * Addressing :ref:`Local variable ordering<rcs>` issues
+  * Conversions to device-managed APIs (``devm_`` helpers)
+
+  This is because it is felt that the churn that such changes produce comes
+  at a greater cost than the value of such clean-ups.
+
+  Conversely, spelling and grammar fixes are not discouraged.
+
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#clean-up-patches
+--
+pw-bot: cr
+
 
