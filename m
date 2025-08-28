@@ -1,182 +1,505 @@
-Return-Path: <netdev+bounces-217635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 016D8B395D9
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 09:46:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0D2AB39605
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 09:55:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE73420646F
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 07:46:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD64C188ED05
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 07:56:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 125531A3166;
-	Thu, 28 Aug 2025 07:46:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 647102C2365;
+	Thu, 28 Aug 2025 07:55:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eHAsVJf/"
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="LrSwYwe0";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="b+JJBEoE"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 409B31F8AC5
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 07:46:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5432773D5;
+	Thu, 28 Aug 2025 07:55:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756367194; cv=none; b=ZbYAEFKvn5kXB2VoYmxEMq/5aEAsl/YqVTdDOHco0J6lQLQXxlogk/ZzBRml+lvhtDUmJBoLKIBqrGh3fQBw1MftdY0NQ0o0gw2HR4nRLLboP5WGA897xFAL5KyEBYoDYtDW2r8wOInuu7g2OJfgNAiUghf/baFSfTnVdDPMJPU=
+	t=1756367743; cv=none; b=IRTzw+SZy9/7lFl+xAKfh8Xo7amPch2Nfm4oGEsiGeAlw4MicmkathdYjBMDh8D63/uPUf8HNM3eINzoxdcVn3KTqnG1DlESywHSzeUeNm5Xu8Ju6+RsiHh7ws/juYcwjTPcXzA/Et2gncOQ4ecwAioJlCq8D2YtxEF3IkZr2tQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756367194; c=relaxed/simple;
-	bh=7Ac5/fFlxMMYJm2RX8zz5xHU7l2zHTYVR8+KP5LKWNI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W6Va9DPgjHYeXhxDIE4cb7M9cZOLchNL95jgsCG8ZtucawRt3d1fiumpecCkj4SISL22i2ycBGE6RYkZYBQ0VNvUOWkQawVr3CaOPZ7cGOov2pyaDS0bt55A47+df9N2W6SBb440OvEkRyUAp3RJGXPo99EIE3lO/BI5VjzGv6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eHAsVJf/; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756367192;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=QIPVhNdDqwyEUU2mMSzlYSdtbuVp92JbzlpYQuyYJ0w=;
-	b=eHAsVJf/8JCIXyxJzzeRIBtueAyFwQ1Ln8zGGPP7Jn/ZqFZej9yBqXBPuqJpeIKUrYLrqg
-	1xoHS2SlYmj4WK2OKvOJUZcPn9ftNSqwF/WrEnBwV2qsdHR1BtStfOTUb2awfAYEiGC494
-	H8EctAe9BeyA52f6x+PPZHaN8DHbnJM=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-20-baZxHCfRObCxK-MNu5_1Ew-1; Thu, 28 Aug 2025 03:46:30 -0400
-X-MC-Unique: baZxHCfRObCxK-MNu5_1Ew-1
-X-Mimecast-MFC-AGG-ID: baZxHCfRObCxK-MNu5_1Ew_1756367190
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3c6ae25997cso394592f8f.0
-        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 00:46:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756367189; x=1756971989;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QIPVhNdDqwyEUU2mMSzlYSdtbuVp92JbzlpYQuyYJ0w=;
-        b=oc1RXCnrDcbFR49TWphUpBahcYmXE2thSKVb99LRBn4SdqScK2ZhPrNJlJ3sxVtzgy
-         lz0uo8NyJN1BNiCkLey+JtQNaiktFu0sy3d8jPI1DQR6BEB61w/tgRnL2AzvJy9TgTbe
-         SgL/glbJZdurycdrw1VmFmFhLIVMThPWnwyrFSuJk1jLapRYG62cl2AiFjgP9e2RkDxg
-         43LEGlp6hZSPqADrEc6jR2XM8TEu8vsz3Jv8bkmjff33O4YI5SfKDvIW1ViWoYLfw+v9
-         vm7Zwb60iaEy+GoaMYlHNcqrCPpFCOoq5IpLHZD+jf5Fe9gAhvGJAOk/TA8WxaiWP2FS
-         vkFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWQcnKgN+FFup7sYVFVQ1nGYLx9uP/W3S7fwtVlwNyPA+/I4+ToClqfEoLwUGdt1iJAJmjlJmY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwD5+jHWmMkUpDUT4jsNlHFXJ6I/teEUG1XBni9hKQ+4AfG1tP4
-	ZZ6fiFAqB2fm0fIwN7LwdZbMH2EuweDCMJkDDW9bBZLJE3UERfbWkoq/LQBGWp7nX1c4J2GJKYU
-	Lg2t+V55zCeEq3q76ZyWJtMAhYzr/5YSe1VMFyjXXi32Bt7vcr3WB2Tlc9Q==
-X-Gm-Gg: ASbGncsYlwf41PtlQNBxB3S5/uq5rUy1bFTvkeyjZblayWT8hxhPQbIIf/rCZ8rKw9g
-	tV3SHWq46T5Cg+RYZHyigPE7RBE9ykIsPsMtSmqqaACWyfj3z/V+8TCsvTsxgq+E0l9UqZOCEkP
-	Q2mHcurnKGO6E+DPHAGsFRXoPJdgA/WL9VvgWLJCrINJymOliswOIzPhxngm85Ah/oRiKKrdJD+
-	0l7F40S0aiiaLWpnKRpvHJphWQbaRFulNm2fcP5m+2ZLZkrPGNX2TdNhPMsaKR5nl5UJNxAgXH3
-	nYy8caqcY54lMTMGKogXHLPJ6b+DIQj8HSVy14b48HWxfeTonykEEhNWsHJ+aPgWTeAI6PCr/fn
-	RemGPEXiNi+la/Y7DyZp3qyRro2/Ti3hpMTxABH1Wk70hCPfVOnwAlSFIglOYeCIJak8=
-X-Received: by 2002:a05:6000:18ad:b0:3b7:948a:1361 with SMTP id ffacd0b85a97d-3c5da741330mr15989071f8f.6.1756367189593;
-        Thu, 28 Aug 2025 00:46:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHbZS9TwQor8utX8Cftd7hubod4ESO9oJ14F94do36paGGmjXBbrC+y7X5MmcQWQ6JKGQD26w==
-X-Received: by 2002:a05:6000:18ad:b0:3b7:948a:1361 with SMTP id ffacd0b85a97d-3c5da741330mr15989008f8f.6.1756367189132;
-        Thu, 28 Aug 2025 00:46:29 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f28:c100:2225:10aa:f247:7b85? (p200300d82f28c100222510aaf2477b85.dip0.t-ipconnect.de. [2003:d8:2f28:c100:2225:10aa:f247:7b85])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b6b1cdf05sm35411485e9.1.2025.08.28.00.46.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Aug 2025 00:46:28 -0700 (PDT)
-Message-ID: <0e1c0fe1-4dd1-46dc-8ce8-a6bf6e4c3e80@redhat.com>
-Date: Thu, 28 Aug 2025 09:46:25 +0200
+	s=arc-20240116; t=1756367743; c=relaxed/simple;
+	bh=dB21VovnO+BqnjAuPsDy6yMgRCa5sL1/EBBYFLHvMBY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aHqvkRiHFpUoTc6sbiC7ZYltaaE47EtatrVW4CWxss4XxfWMgQUMudCdOFVL0H0HGNW2CnqHYdXC0gMI5iMCvfIxBy+nnd0sCjP7mxVxI/CppJFqk2qow+YXAr7iSKwJDK+fesEQeGmgyVuzJqlaB1FB7vH7iNwlANviWlG6q0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=LrSwYwe0; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=b+JJBEoE reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1756367739; x=1787903739;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=5HwiAk4UaJ/0RnREoKOoLiBWJI8eHPDmXvmgOzLgPWo=;
+  b=LrSwYwe0yL6FYd9XaX81GXaL8eA/88ukxXxQxbWzyg812ZcISsoOd/v7
+   FrlLp+2S6skVVUgIqIguOtojNKQUAczMokOS1Qyz0moqYkbrF7nbJtudj
+   1FlxYH7DsBTMN8IZUDsyq0DWKvdQ+0xL1hAbVu3k/pARWAPW911fzAKHb
+   DDyBwAVmygjWnQmxibbW7kxxuTX9VzPSJhPylL4H1meiMBoDoVjtmXiTz
+   4nccTcFLOJCIsmD6qyXsUiYbr3qhz63u9n+9yDpzNzw6lkzqs4b+pUf77
+   ybBf4Sjfhx2GXXNmtmtWeLSeN/wkpxrKIdZxNcB39MIwQTWmOKJjoxIIq
+   Q==;
+X-CSE-ConnectionGUID: DT7/qzjVS322pF82mqZonQ==
+X-CSE-MsgGUID: Nme356ZFScCFBcwqXo/rFQ==
+X-IronPort-AV: E=Sophos;i="6.18,217,1751234400"; 
+   d="scan'208";a="45949455"
+Received: from vmailcow01.tq-net.de ([10.150.86.48])
+  by mx1.tq-group.com with ESMTP; 28 Aug 2025 09:55:28 +0200
+X-CheckPoint: {68B00B70-28-820F521C-C7779E56}
+X-MAIL-CPID: F4DDEA0D02B3B61D9A99DB4722F13A30_4
+X-Control-Analysis: str=0001.0A002109.68B00B0B.0011,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 565541609FD;
+	Thu, 28 Aug 2025 09:55:20 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
+	s=dkim; t=1756367724;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=5HwiAk4UaJ/0RnREoKOoLiBWJI8eHPDmXvmgOzLgPWo=;
+	b=b+JJBEoE5ceAFZwdG8+H/uZU0uJwXkaIxAEoC/nSuaJ+H2jKgPXXwb/8HWJ9tYpaBZdvvZ
+	NV7i4LwG/avXFqtYV6NYxfsbzz18M3kdGrSK9KV3j2pPqyJWzKWcFMgYFJ6SKuLCVQ6Q73
+	00t2CwkBomDcZR0xlOC5UueJobU2N+66yVFdZUqLM0Sr02kk3whP3+woc9laFeKQmcGVGM
+	/YPLcWHyOIhn5sN9SMwsUU8fLFCDXSWbo4JdUYa2IPBWaVmh27QJy95gjhIqxVVPbkLpu5
+	u7d57S7O+Ts6eKFwkvmQPiqs/nt/RxCi49vvt80PQX4oL1nBCHNXdaYE0S9Mvg==
+From: Alexander Stein <alexander.stein@ew.tq-group.com>
+To: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ shawnguo@kernel.org, s.hauer@pengutronix.de, kernel@pengutronix.de,
+ festevam@gmail.com, richardcochran@gmail.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+ frieder.schrempf@kontron.de, primoz.fiser@norik.com, othacehe@gnu.org,
+ Markus.Niebel@ew.tq-group.com, linux-arm-kernel@lists.infradead.org
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux@ew.tq-group.com, netdev@vger.kernel.org, linux-pm@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com, Frank.Li@nxp.com,
+ Joy Zou <joy.zou@nxp.com>
+Subject:
+ Re: [PATCH v9 1/6] arm64: dts: freescale: move aliases from imx93.dtsi to
+ board dts
+Date: Thu, 28 Aug 2025 09:55:18 +0200
+Message-ID: <7849995.EvYhyI6sBW@steina-w>
+Organization: TQ-Systems GmbH
+In-Reply-To: <20250825091223.1378137-2-joy.zou@nxp.com>
+References:
+ <20250825091223.1378137-1-joy.zou@nxp.com>
+ <20250825091223.1378137-2-joy.zou@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 12/36] mm: simplify folio_page() and folio_page_idx()
-To: Wei Yang <richard.weiyang@gmail.com>
-Cc: linux-kernel@vger.kernel.org, Zi Yan <ziy@nvidia.com>,
- Alexander Potapenko <glider@google.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
- Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- iommu@lists.linux.dev, io-uring@vger.kernel.org,
- Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
- Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
- kasan-dev@googlegroups.com, kvm@vger.kernel.org,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- Marco Elver <elver@google.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
- Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
- Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
- Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
- Robin Murphy <robin.murphy@arm.com>, Suren Baghdasaryan <surenb@google.com>,
- Tejun Heo <tj@kernel.org>, virtualization@lists.linux.dev,
- Vlastimil Babka <vbabka@suse.cz>, wireguard@lists.zx2c4.com, x86@kernel.org
-References: <20250827220141.262669-1-david@redhat.com>
- <20250827220141.262669-13-david@redhat.com>
- <20250828074356.3xiuqugokg36yuxw@master>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- qIws/H2t
-In-Reply-To: <20250828074356.3xiuqugokg36yuxw@master>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
+X-Last-TLS-Session-Version: TLSv1.3
 
-> 
-> Curious about why it is in page-flags.h. It seems not related to page-flags.
+Hi,
 
-Likely because we have the page_folio() in there as well.
+Am Montag, 25. August 2025, 11:12:18 CEST schrieb Joy Zou:
+> The aliases is board level property rather than soc property, so move
+> these to each boards.
+>=20
+> Reviewed-by: Frank Li <Frank.Li@nxp.com>
+> Signed-off-by: Joy Zou <joy.zou@nxp.com>
 
--- 
-Cheers
+Reviewed-by: Alexander Stein <alexander.stein@ew.tq-group.com> # imx93-tqma=
+9352
 
-David / dhildenb
+> ---
+> Changes for v7:
+> 1. Add new patch that move aliases from imx93.dtsi to board dts.
+> 2. The aliases is board level property rather than soc property.
+>    These changes come from comments:
+>    https://lore.kernel.org/imx/4e8f2426-92a1-4c7e-b860-0e10e8dd886c@kerne=
+l.org/
+> 3. Only add aliases using to imx93 board dts.
+> ---
+>  .../boot/dts/freescale/imx93-11x11-evk.dts    | 19 +++++++++++
+>  .../boot/dts/freescale/imx93-14x14-evk.dts    | 15 ++++++++
+>  .../boot/dts/freescale/imx93-9x9-qsb.dts      | 18 ++++++++++
+>  .../dts/freescale/imx93-kontron-bl-osm-s.dts  | 21 ++++++++++++
+>  .../dts/freescale/imx93-phyboard-nash.dts     | 21 ++++++++++++
+>  .../dts/freescale/imx93-phyboard-segin.dts    |  9 +++++
+>  .../freescale/imx93-tqma9352-mba91xxca.dts    | 11 ++++++
+>  .../freescale/imx93-tqma9352-mba93xxca.dts    | 25 ++++++++++++++
+>  .../freescale/imx93-tqma9352-mba93xxla.dts    | 25 ++++++++++++++
+>  .../dts/freescale/imx93-var-som-symphony.dts  | 17 ++++++++++
+>  arch/arm64/boot/dts/freescale/imx93.dtsi      | 34 -------------------
+>  11 files changed, 181 insertions(+), 34 deletions(-)
+>=20
+> diff --git a/arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts b/arch/arm=
+64/boot/dts/freescale/imx93-11x11-evk.dts
+> index e24e12f04526..44566e03be65 100644
+> --- a/arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts
+> +++ b/arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts
+> @@ -12,6 +12,25 @@ / {
+>  	model =3D "NXP i.MX93 11X11 EVK board";
+>  	compatible =3D "fsl,imx93-11x11-evk", "fsl,imx93";
+> =20
+> +	aliases {
+> +		ethernet0 =3D &fec;
+> +		ethernet1 =3D &eqos;
+> +		gpio0 =3D &gpio1;
+> +		gpio1 =3D &gpio2;
+> +		gpio2 =3D &gpio3;
+> +		i2c0 =3D &lpi2c1;
+> +		i2c1 =3D &lpi2c2;
+> +		i2c2 =3D &lpi2c3;
+> +		mmc0 =3D &usdhc1;
+> +		mmc1 =3D &usdhc2;
+> +		rtc0 =3D &bbnsm_rtc;
+> +		serial0 =3D &lpuart1;
+> +		serial1 =3D &lpuart2;
+> +		serial2 =3D &lpuart3;
+> +		serial3 =3D &lpuart4;
+> +		serial4 =3D &lpuart5;
+> +	};
+> +
+>  	chosen {
+>  		stdout-path =3D &lpuart1;
+>  	};
+> diff --git a/arch/arm64/boot/dts/freescale/imx93-14x14-evk.dts b/arch/arm=
+64/boot/dts/freescale/imx93-14x14-evk.dts
+> index c5d86b54ad33..da252b7c06cb 100644
+> --- a/arch/arm64/boot/dts/freescale/imx93-14x14-evk.dts
+> +++ b/arch/arm64/boot/dts/freescale/imx93-14x14-evk.dts
+> @@ -12,6 +12,21 @@ / {
+>  	model =3D "NXP i.MX93 14X14 EVK board";
+>  	compatible =3D "fsl,imx93-14x14-evk", "fsl,imx93";
+> =20
+> +	aliases {
+> +		ethernet0 =3D &fec;
+> +		ethernet1 =3D &eqos;
+> +		gpio0 =3D &gpio1;
+> +		gpio1 =3D &gpio2;
+> +		gpio2 =3D &gpio3;
+> +		i2c0 =3D &lpi2c1;
+> +		i2c1 =3D &lpi2c2;
+> +		i2c2 =3D &lpi2c3;
+> +		mmc0 =3D &usdhc1;
+> +		mmc1 =3D &usdhc2;
+> +		rtc0 =3D &bbnsm_rtc;
+> +		serial0 =3D &lpuart1;
+> +	};
+> +
+>  	chosen {
+>  		stdout-path =3D &lpuart1;
+>  	};
+> diff --git a/arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts b/arch/arm64=
+/boot/dts/freescale/imx93-9x9-qsb.dts
+> index f6f8d105b737..0852067eab2c 100644
+> --- a/arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts
+> +++ b/arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts
+> @@ -17,6 +17,24 @@ bt_sco_codec: bt-sco-codec {
+>  		compatible =3D "linux,bt-sco";
+>  	};
+> =20
+> +	aliases {
+> +		ethernet0 =3D &fec;
+> +		ethernet1 =3D &eqos;
+> +		gpio0 =3D &gpio1;
+> +		gpio1 =3D &gpio2;
+> +		gpio2 =3D &gpio3;
+> +		i2c0 =3D &lpi2c1;
+> +		i2c1 =3D &lpi2c2;
+> +		mmc0 =3D &usdhc1;
+> +		mmc1 =3D &usdhc2;
+> +		rtc0 =3D &bbnsm_rtc;
+> +		serial0 =3D &lpuart1;
+> +		serial1 =3D &lpuart2;
+> +		serial2 =3D &lpuart3;
+> +		serial3 =3D &lpuart4;
+> +		serial4 =3D &lpuart5;
+> +	};
+> +
+>  	chosen {
+>  		stdout-path =3D &lpuart1;
+>  	};
+> diff --git a/arch/arm64/boot/dts/freescale/imx93-kontron-bl-osm-s.dts b/a=
+rch/arm64/boot/dts/freescale/imx93-kontron-bl-osm-s.dts
+> index 89e97c604bd3..11dd23044722 100644
+> --- a/arch/arm64/boot/dts/freescale/imx93-kontron-bl-osm-s.dts
+> +++ b/arch/arm64/boot/dts/freescale/imx93-kontron-bl-osm-s.dts
+> @@ -14,6 +14,27 @@ / {
+>  	aliases {
+>  		ethernet0 =3D &fec;
+>  		ethernet1 =3D &eqos;
+> +		gpio0 =3D &gpio1;
+> +		gpio1 =3D &gpio2;
+> +		i2c0 =3D &lpi2c1;
+> +		i2c1 =3D &lpi2c2;
+> +		mmc0 =3D &usdhc1;
+> +		mmc1 =3D &usdhc2;
+> +		serial0 =3D &lpuart1;
+> +		serial1 =3D &lpuart2;
+> +		serial2 =3D &lpuart3;
+> +		serial3 =3D &lpuart4;
+> +		serial4 =3D &lpuart5;
+> +		serial5 =3D &lpuart6;
+> +		serial6 =3D &lpuart7;
+> +		spi0 =3D &lpspi1;
+> +		spi1 =3D &lpspi2;
+> +		spi2 =3D &lpspi3;
+> +		spi3 =3D &lpspi4;
+> +		spi4 =3D &lpspi5;
+> +		spi5 =3D &lpspi6;
+> +		spi6 =3D &lpspi7;
+> +		spi7 =3D &lpspi8;
+>  	};
+> =20
+>  	leds {
+> diff --git a/arch/arm64/boot/dts/freescale/imx93-phyboard-nash.dts b/arch=
+/arm64/boot/dts/freescale/imx93-phyboard-nash.dts
+> index 475913cf0cb9..fa5d83dee0a7 100644
+> --- a/arch/arm64/boot/dts/freescale/imx93-phyboard-nash.dts
+> +++ b/arch/arm64/boot/dts/freescale/imx93-phyboard-nash.dts
+> @@ -19,8 +19,29 @@ / {
+> =20
+>  	aliases {
+>  		ethernet1 =3D &eqos;
+> +		gpio0 =3D &gpio1;
+> +		gpio1 =3D &gpio2;
+> +		gpio2 =3D &gpio3;
+> +		gpio3 =3D &gpio4;
+> +		i2c0 =3D &lpi2c1;
+> +		i2c1 =3D &lpi2c2;
+> +		mmc0 =3D &usdhc1;
+> +		mmc1 =3D &usdhc2;
+>  		rtc0 =3D &i2c_rtc;
+>  		rtc1 =3D &bbnsm_rtc;
+> +		serial0 =3D &lpuart1;
+> +		serial1 =3D &lpuart2;
+> +		serial2 =3D &lpuart3;
+> +		serial3 =3D &lpuart4;
+> +		serial4 =3D &lpuart5;
+> +		serial5 =3D &lpuart6;
+> +		serial6 =3D &lpuart7;
+> +		spi0 =3D &lpspi1;
+> +		spi1 =3D &lpspi2;
+> +		spi2 =3D &lpspi3;
+> +		spi3 =3D &lpspi4;
+> +		spi4 =3D &lpspi5;
+> +		spi5 =3D &lpspi6;
+>  	};
+> =20
+>  	chosen {
+> diff --git a/arch/arm64/boot/dts/freescale/imx93-phyboard-segin.dts b/arc=
+h/arm64/boot/dts/freescale/imx93-phyboard-segin.dts
+> index 6f1374f5757f..802d96b19e4c 100644
+> --- a/arch/arm64/boot/dts/freescale/imx93-phyboard-segin.dts
+> +++ b/arch/arm64/boot/dts/freescale/imx93-phyboard-segin.dts
+> @@ -19,8 +19,17 @@ /{
+> =20
+>  	aliases {
+>  		ethernet1 =3D &eqos;
+> +		gpio0 =3D &gpio1;
+> +		gpio1 =3D &gpio2;
+> +		gpio2 =3D &gpio3;
+> +		gpio3 =3D &gpio4;
+> +		i2c0 =3D &lpi2c1;
+> +		i2c1 =3D &lpi2c2;
+> +		mmc0 =3D &usdhc1;
+> +		mmc1 =3D &usdhc2;
+>  		rtc0 =3D &i2c_rtc;
+>  		rtc1 =3D &bbnsm_rtc;
+> +		serial0 =3D &lpuart1;
+>  	};
+> =20
+>  	chosen {
+> diff --git a/arch/arm64/boot/dts/freescale/imx93-tqma9352-mba91xxca.dts b=
+/arch/arm64/boot/dts/freescale/imx93-tqma9352-mba91xxca.dts
+> index 9dbf41cf394b..2673d9dccbf4 100644
+> --- a/arch/arm64/boot/dts/freescale/imx93-tqma9352-mba91xxca.dts
+> +++ b/arch/arm64/boot/dts/freescale/imx93-tqma9352-mba91xxca.dts
+> @@ -27,8 +27,19 @@ aliases {
+>  		eeprom0 =3D &eeprom0;
+>  		ethernet0 =3D &eqos;
+>  		ethernet1 =3D &fec;
+> +		gpio0 =3D &gpio1;
+> +		gpio1 =3D &gpio2;
+> +		gpio2 =3D &gpio3;
+> +		gpio3 =3D &gpio4;
+> +		i2c0 =3D &lpi2c1;
+> +		i2c1 =3D &lpi2c2;
+> +		i2c2 =3D &lpi2c3;
+> +		mmc0 =3D &usdhc1;
+> +		mmc1 =3D &usdhc2;
+>  		rtc0 =3D &pcf85063;
+>  		rtc1 =3D &bbnsm_rtc;
+> +		serial0 =3D &lpuart1;
+> +		serial1 =3D &lpuart2;
+>  	};
+> =20
+>  	backlight: backlight {
+> diff --git a/arch/arm64/boot/dts/freescale/imx93-tqma9352-mba93xxca.dts b=
+/arch/arm64/boot/dts/freescale/imx93-tqma9352-mba93xxca.dts
+> index 137b8ed242a2..4760d07ea24b 100644
+> --- a/arch/arm64/boot/dts/freescale/imx93-tqma9352-mba93xxca.dts
+> +++ b/arch/arm64/boot/dts/freescale/imx93-tqma9352-mba93xxca.dts
+> @@ -28,8 +28,33 @@ aliases {
+>  		eeprom0 =3D &eeprom0;
+>  		ethernet0 =3D &eqos;
+>  		ethernet1 =3D &fec;
+> +		gpio0 =3D &gpio1;
+> +		gpio1 =3D &gpio2;
+> +		gpio2 =3D &gpio3;
+> +		gpio3 =3D &gpio4;
+> +		i2c0 =3D &lpi2c1;
+> +		i2c1 =3D &lpi2c2;
+> +		i2c2 =3D &lpi2c3;
+> +		i2c3 =3D &lpi2c4;
+> +		i2c4 =3D &lpi2c5;
+> +		mmc0 =3D &usdhc1;
+> +		mmc1 =3D &usdhc2;
+>  		rtc0 =3D &pcf85063;
+>  		rtc1 =3D &bbnsm_rtc;
+> +		serial0 =3D &lpuart1;
+> +		serial1 =3D &lpuart2;
+> +		serial2 =3D &lpuart3;
+> +		serial3 =3D &lpuart4;
+> +		serial4 =3D &lpuart5;
+> +		serial5 =3D &lpuart6;
+> +		serial6 =3D &lpuart7;
+> +		serial7 =3D &lpuart8;
+> +		spi0 =3D &lpspi1;
+> +		spi1 =3D &lpspi2;
+> +		spi2 =3D &lpspi3;
+> +		spi3 =3D &lpspi4;
+> +		spi4 =3D &lpspi5;
+> +		spi5 =3D &lpspi6;
+>  	};
+> =20
+>  	backlight_lvds: backlight {
+> diff --git a/arch/arm64/boot/dts/freescale/imx93-tqma9352-mba93xxla.dts b=
+/arch/arm64/boot/dts/freescale/imx93-tqma9352-mba93xxla.dts
+> index 219f49a4f87f..8a88c98ac05a 100644
+> --- a/arch/arm64/boot/dts/freescale/imx93-tqma9352-mba93xxla.dts
+> +++ b/arch/arm64/boot/dts/freescale/imx93-tqma9352-mba93xxla.dts
+> @@ -28,8 +28,33 @@ aliases {
+>  		eeprom0 =3D &eeprom0;
+>  		ethernet0 =3D &eqos;
+>  		ethernet1 =3D &fec;
+> +		gpio0 =3D &gpio1;
+> +		gpio1 =3D &gpio2;
+> +		gpio2 =3D &gpio3;
+> +		gpio3 =3D &gpio4;
+> +		i2c0 =3D &lpi2c1;
+> +		i2c1 =3D &lpi2c2;
+> +		i2c2 =3D &lpi2c3;
+> +		i2c3 =3D &lpi2c4;
+> +		i2c4 =3D &lpi2c5;
+> +		mmc0 =3D &usdhc1;
+> +		mmc1 =3D &usdhc2;
+>  		rtc0 =3D &pcf85063;
+>  		rtc1 =3D &bbnsm_rtc;
+> +		serial0 =3D &lpuart1;
+> +		serial1 =3D &lpuart2;
+> +		serial2 =3D &lpuart3;
+> +		serial3 =3D &lpuart4;
+> +		serial4 =3D &lpuart5;
+> +		serial5 =3D &lpuart6;
+> +		serial6 =3D &lpuart7;
+> +		serial7 =3D &lpuart8;
+> +		spi0 =3D &lpspi1;
+> +		spi1 =3D &lpspi2;
+> +		spi2 =3D &lpspi3;
+> +		spi3 =3D &lpspi4;
+> +		spi4 =3D &lpspi5;
+> +		spi5 =3D &lpspi6;
+>  	};
+> =20
+>  	backlight_lvds: backlight {
+> diff --git a/arch/arm64/boot/dts/freescale/imx93-var-som-symphony.dts b/a=
+rch/arm64/boot/dts/freescale/imx93-var-som-symphony.dts
+> index 576d6982a4a0..c789c1f24bdc 100644
+> --- a/arch/arm64/boot/dts/freescale/imx93-var-som-symphony.dts
+> +++ b/arch/arm64/boot/dts/freescale/imx93-var-som-symphony.dts
+> @@ -17,8 +17,25 @@ /{
+>  	aliases {
+>  		ethernet0 =3D &eqos;
+>  		ethernet1 =3D &fec;
+> +		gpio0 =3D &gpio1;
+> +		gpio1 =3D &gpio2;
+> +		gpio2 =3D &gpio3;
+> +		i2c0 =3D &lpi2c1;
+> +		i2c1 =3D &lpi2c2;
+> +		i2c2 =3D &lpi2c3;
+> +		i2c3 =3D &lpi2c4;
+> +		i2c4 =3D &lpi2c5;
+> +		mmc0 =3D &usdhc1;
+> +		mmc1 =3D &usdhc2;
+> +		serial0 =3D &lpuart1;
+> +		serial1 =3D &lpuart2;
+> +		serial2 =3D &lpuart3;
+> +		serial3 =3D &lpuart4;
+> +		serial4 =3D &lpuart5;
+> +		serial5 =3D &lpuart6;
+>  	};
+> =20
+> +
+>  	chosen {
+>  		stdout-path =3D &lpuart1;
+>  	};
+> diff --git a/arch/arm64/boot/dts/freescale/imx93.dtsi b/arch/arm64/boot/d=
+ts/freescale/imx93.dtsi
+> index 8a7f1cd76c76..d505f9dfd8ee 100644
+> --- a/arch/arm64/boot/dts/freescale/imx93.dtsi
+> +++ b/arch/arm64/boot/dts/freescale/imx93.dtsi
+> @@ -18,40 +18,6 @@ / {
+>  	#address-cells =3D <2>;
+>  	#size-cells =3D <2>;
+> =20
+> -	aliases {
+> -		gpio0 =3D &gpio1;
+> -		gpio1 =3D &gpio2;
+> -		gpio2 =3D &gpio3;
+> -		gpio3 =3D &gpio4;
+> -		i2c0 =3D &lpi2c1;
+> -		i2c1 =3D &lpi2c2;
+> -		i2c2 =3D &lpi2c3;
+> -		i2c3 =3D &lpi2c4;
+> -		i2c4 =3D &lpi2c5;
+> -		i2c5 =3D &lpi2c6;
+> -		i2c6 =3D &lpi2c7;
+> -		i2c7 =3D &lpi2c8;
+> -		mmc0 =3D &usdhc1;
+> -		mmc1 =3D &usdhc2;
+> -		mmc2 =3D &usdhc3;
+> -		serial0 =3D &lpuart1;
+> -		serial1 =3D &lpuart2;
+> -		serial2 =3D &lpuart3;
+> -		serial3 =3D &lpuart4;
+> -		serial4 =3D &lpuart5;
+> -		serial5 =3D &lpuart6;
+> -		serial6 =3D &lpuart7;
+> -		serial7 =3D &lpuart8;
+> -		spi0 =3D &lpspi1;
+> -		spi1 =3D &lpspi2;
+> -		spi2 =3D &lpspi3;
+> -		spi3 =3D &lpspi4;
+> -		spi4 =3D &lpspi5;
+> -		spi5 =3D &lpspi6;
+> -		spi6 =3D &lpspi7;
+> -		spi7 =3D &lpspi8;
+> -	};
+> -
+>  	cpus {
+>  		#address-cells =3D <1>;
+>  		#size-cells =3D <0>;
+>=20
+
+
+=2D-=20
+TQ-Systems GmbH | M=FChlstra=DFe 2, Gut Delling | 82229 Seefeld, Germany
+Amtsgericht M=FCnchen, HRB 105018
+Gesch=E4ftsf=FChrer: Detlef Schneider, R=FCdiger Stahl, Stefan Schneider
+http://www.tq-group.com/
+
 
 
