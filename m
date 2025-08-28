@@ -1,217 +1,134 @@
-Return-Path: <netdev+bounces-217646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B32CB39699
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 10:16:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0208FB39691
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 10:15:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 731A13A42C4
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 08:15:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 342BB1886598
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 08:15:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C27E2D97A6;
-	Thu, 28 Aug 2025 08:15:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A7212D97A6;
+	Thu, 28 Aug 2025 08:15:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Eb/ioFAt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hnwr0CcC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5314F200C2;
-	Thu, 28 Aug 2025 08:15:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDD4F29ACD1;
+	Thu, 28 Aug 2025 08:15:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756368919; cv=none; b=n2rAC15Uf3c6xX0/iOXbsmPob6TV18uV5a4MPbwOQkBA2fo7uFfbWSZdl7ESu1XlRt6zgXAoP++wKsa96VYaCcUcunEbgCdv6pfvkUV1BS0wEjBmFl5H3FeMsro0+0L0xv31miTqAQEw23Fz+4FqLizqAVVCFGoeBKh80hoQ8Kk=
+	t=1756368908; cv=none; b=gUqzuB4O2pv3XidDz4bAPWfJpbw1JdNovKMWiIWs6QQsglOnB62rHLiD/j7lETPsXp8IwLQdL4oBh+/8F7ZIVe9x+TdyrSeamX9O8SgWS+9ZpTlWbk1ZxqX1aDJGmmQ0nMeR0jKzNnXQybXybKwGlnjK/I812np4ZGMNnNSQ5Kg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756368919; c=relaxed/simple;
-	bh=DyguhpqTEoNfELL8h7heq4xt+2JqWBMyIHL/jBZmP+s=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=F+JkJPUIuOQ9SNdmUb6ulYzzABSu4/dCJGbgtqerlP4pJqFojuOw0fSXlQnpNF1Uus4eZxdhXVzamxFzGfCWKNferI88aYC73Vb502kqlJ5v+wgeCTBugXJhMJOZDB8AbKhp4PEQUghP7ZG6PqUM9xD3UntZM380kAcZMVDeLXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Eb/ioFAt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0743EC4CEF6;
-	Thu, 28 Aug 2025 08:15:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756368919;
-	bh=DyguhpqTEoNfELL8h7heq4xt+2JqWBMyIHL/jBZmP+s=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=Eb/ioFAt+8mELco+M9+DMqlCgzJQZpQMkbNWd+8BDGOmIpqHVLKA6QR93HJ+GkqIO
-	 Y772OWJHlNXdDSI6Jt5E048IIb935xfCKVG+bMMaf6TBHNXIELAQ/SxYf7SYf7YkE1
-	 T01dWm46Z/7aOep7UCuHrlQQjORFee0LqdrOY19UiadYn70+9upabZ67k2YRIWp/dx
-	 tVto7JNhxEuf4Ik2/9PcUJXJZlNhY/3qa+9BnGNMPGim5KD/u0Xo42Jm8cEefn4WRt
-	 pCZ2NbyD2a8n4jKJ/N9nBG7Qy+//l43O0jcuO5vKHuqOuLqajLWdsJST3+CaDuv21d
-	 7D/FSinWp8xlw==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC2C3CA0EED;
-	Thu, 28 Aug 2025 08:15:18 +0000 (UTC)
-From: Dmitry Safonov via B4 Relay <devnull+dima.arista.com@kernel.org>
-Date: Thu, 28 Aug 2025 09:14:56 +0100
-Subject: [PATCH net-next v2 2/2] tcp: Free TCP-AO/TCP-MD5 info/keys without
- RCU
+	s=arc-20240116; t=1756368908; c=relaxed/simple;
+	bh=ftxvw7nkrouhuxNLXWlJ5iqNXxZaopoYAL6tujyJOYU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HUTRDNgUa5wB+8KKOuXUGjtVrd0SiPWYGULTnz/1ohr+WozFITCJz2WL6N9HDDJ19nucyR/8DaKCKrEk7c8qclhm1/6unL2YzATOcRSWMJ470EX6N2uae+V/u4ANP+JPe+8z80Dbh54FM3qdeLK6Iruaymd9jrFwF6IGKnZknbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hnwr0CcC; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-771eecebb09so987532b3a.3;
+        Thu, 28 Aug 2025 01:15:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756368906; x=1756973706; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ia5R0sYryNlESVObLXR0gMWB492r2avec7eAXa6fF2Y=;
+        b=hnwr0CcCFx0OyWaiT/ACEPnz7+GKtDQRZ8FFeKzU/jHeNyjBBdyX02u3QAMzHHzdVW
+         wLD2XDWIefk+LF0SR+Dvu7VU7XvwECiIO4KkqO+02QSfBRilBENmNpiMjD2dq7nHqJP2
+         77QXSIOyXCAmyI6D8HIeQeVn1hwVLZXpsoxEyL5L6dFRPM9rL9qLkaq4+ZVwCvnh6JdC
+         ppZa9/gsGmyAmPDs2yR7Vnc3dFAN6cjh6uaHpu0CUObdGB/ucSfIhDwiIZAGCYLXPHZH
+         TemNSkFlX8yggiwQURjtTDbfTnoCXbvKXKFqzIcnKflcQ5Tu6ZJBStfgkJX7ifWeQr6m
+         lz2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756368906; x=1756973706;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ia5R0sYryNlESVObLXR0gMWB492r2avec7eAXa6fF2Y=;
+        b=B56U2QAOrytAewrfswpd32zI8agr3fTfzQWgCJHnklcIiNmxvR5BkfCuGGRXC9baoc
+         jJERNDmddYf85KR51Qs0HY2zLcSPXeHKhIOK9n7asR9XYgxldNreb0Slan6sRXxH8OAm
+         tSkGJnJLL9flG+sF/nTlX53GUOk5CrxHYZXw2rg6KP4gkBoqMvcznyqr6m6G6xHRW735
+         SiknSMXrtWvu+3yMec6TgzWE17Y9vzqultvvKuxqfj4TCTLI3sIsC+GnTiRAMz0OAZYW
+         Pwjo22qJkkyaBi+x3sCQ+YHnwDrG4ZNlyCDtLCRdFAhS6y1I6AExX4oDEXZDcyh642oH
+         aqhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWH4wPPMJQi7+zW71tU/ReQarDjikWf9eMYda3EIR7zqs7mtebTN/gZZqtorClqxDXPKmhpKJmr@vger.kernel.org, AJvYcCWf5fcl/NlD3NNysVn3kytwPLHBT08WhY0Z1e+8oBPOlRsEx1GauhABpleZOW7J58djHDzrGoJvCvOJrAs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5r85MHxwTwmbwwfKpj0Zaaju9535SpiSWaol9fH9KIzMvBhKV
+	OY6GiHBQx1rKLuFyUq6s0LzdDHL7fqUVehiu/Bv2jbrraw2wv+Q4XPDJZPfsOZMQxpU=
+X-Gm-Gg: ASbGncudtAOR8Apv4Tb6z+gKxDU0TVzqJoPI+dEvFJwSDxnIQItQGtrpiU1BbWLngbu
+	fEg57jzwKH1axas13Qt70cId38zUNwhVJct1edR9Y9x3wSjEr+DuFcKJ++o3nbbKJsOGeShkfpJ
+	5ktYWoetmsrGV8f+CLFVYnmR4P9cNREhzAmD87e01U026U2FZEYLhOZ/UsMyJwEaFM15NjRNI0S
+	xEHkRoQqZa1aknJ0uX9YA72fgooYpVHiIVwPBrBS5paYqQWb4TAFCjJQ3HnkanZBbR6kHTuOuVG
+	2pJMZCfqv1rTvlCR1X1plHnhgGiKC4Zy9TAhtys7D3Tba7+fjCLQVh3qP+wrjJyCSyfgkQR1D+b
+	3LAov4igd1Luuz06m0Gw2LlNx6d5NPB56V1N9JDFJ8f1k5TipK3LoMW18eFM1fqztY6rxvuMsT7
+	pCOWR3XqJ39PE=
+X-Google-Smtp-Source: AGHT+IEJbUNzADncN9xMb+Wu278ojcMnqcWdgYtjUsEoXle0Hm2TpMNvN9/nvDN5+Orv6CWHu3BjDA==
+X-Received: by 2002:a05:6a21:6d86:b0:240:8d5:6271 with SMTP id adf61e73a8af0-24340e1a51cmr32947085637.39.1756368906129;
+        Thu, 28 Aug 2025 01:15:06 -0700 (PDT)
+Received: from localhost.localdomain ([112.97.57.188])
+        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-b49cb8b4b98sm13376672a12.19.2025.08.28.01.15.02
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 28 Aug 2025 01:15:05 -0700 (PDT)
+From: Miaoqian Lin <linmq006@gmail.com>
+To: Karsten Keil <isdn@linux-pingi.de>,
+	Laura Abbott <labbott@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: linmq006@gmail.com
+Subject: [PATCH] mISDN: Fix memory leak in dsp_hwec_enable()
+Date: Thu, 28 Aug 2025 16:14:57 +0800
+Message-Id: <20250828081457.36061-1-linmq006@gmail.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250828-b4-tcp-ao-md5-rst-finwait2-v2-2-653099bea5c1@arista.com>
-References: <20250828-b4-tcp-ao-md5-rst-finwait2-v2-0-653099bea5c1@arista.com>
-In-Reply-To: <20250828-b4-tcp-ao-md5-rst-finwait2-v2-0-653099bea5c1@arista.com>
-To: Eric Dumazet <edumazet@google.com>, 
- Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: Bob Gilligan <gilligan@arista.com>, 
- Salam Noureddine <noureddine@arista.com>, 
- Dmitry Safonov <0x7f454c46@gmail.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Dmitry Safonov <dima@arista.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1756368907; l=4256;
- i=dima@arista.com; s=20250521; h=from:subject:message-id;
- bh=CzsGKUUYtvozrW4B83Kh8LAgvpUKqIeMhEr8KygJN4g=;
- b=231pajobheLxkJ66pa29ldYL5cL7sTYWrLim+4TCrl856XgUbJkyFIPPrwQBT7YNdt2o1mE9o
- S9fiVlYeRzvBHstEtqF6RapAPFfBs1/tt0lQOZLZOxRU+tt9UUtHl0H
-X-Developer-Key: i=dima@arista.com; a=ed25519;
- pk=/z94x2T59rICwjRqYvDsBe0MkpbkkdYrSW2J1G2gIcU=
-X-Endpoint-Received: by B4 Relay for dima@arista.com/20250521 with
- auth_id=405
-X-Original-From: Dmitry Safonov <dima@arista.com>
-Reply-To: dima@arista.com
+Content-Transfer-Encoding: 8bit
 
-From: Dmitry Safonov <dima@arista.com>
+dsp_hwec_enable() allocates dup pointer by kstrdup(arg),
+but then it updates dup variable by strsep(&dup, ",").
+As a result when it calls kfree(dup), the dup variable may be
+a modified pointer that no longer points to the original allocated
+memory, causing a memory leak.
 
-Now that the destruction of info/keys is delayed until the socket
-destructor, it's safe to use kfree() without an RCU callback.
-As either socket was yet in TCP_CLOSE state or the socket refcounter is
-zero and no one can discover it anymore, it's safe to release memory
-straight away.
-Similar thing was possible for twsk already.
+The issue is the same pattern as fixed in commit c6a502c22999
+("mISDN: Fix memory leak in dsp_pipeline_build()").
 
-Signed-off-by: Dmitry Safonov <dima@arista.com>
+Fixes: 9a4381618262 ("mISDN: Remove VLAs")
+Signed-off-by: Miaoqian Lin <linmq006@gmail.com>
 ---
- net/ipv4/tcp.c           | 17 +++--------------
- net/ipv4/tcp_ao.c        |  5 ++---
- net/ipv4/tcp_ipv4.c      |  4 ++--
- net/ipv4/tcp_minisocks.c | 19 +++++--------------
- 4 files changed, 12 insertions(+), 33 deletions(-)
+ drivers/isdn/mISDN/dsp_hwec.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 927233ee7500e0568782ae4a3860af56d1476acd..254ca95d0c3c5c44029be0e84120c5e9fb9d4514 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -413,27 +413,16 @@ static u64 tcp_compute_delivery_rate(const struct tcp_sock *tp)
- }
+diff --git a/drivers/isdn/mISDN/dsp_hwec.c b/drivers/isdn/mISDN/dsp_hwec.c
+index 0b3f29195330..0cd216e28f00 100644
+--- a/drivers/isdn/mISDN/dsp_hwec.c
++++ b/drivers/isdn/mISDN/dsp_hwec.c
+@@ -51,14 +51,14 @@ void dsp_hwec_enable(struct dsp *dsp, const char *arg)
+ 		goto _do;
  
- #ifdef CONFIG_TCP_MD5SIG
--static void tcp_md5sig_info_free_rcu(struct rcu_head *head)
--{
--	struct tcp_md5sig_info *md5sig;
--
--	md5sig = container_of(head, struct tcp_md5sig_info, rcu);
--	kfree(md5sig);
--	static_branch_slow_dec_deferred(&tcp_md5_needed);
--	tcp_md5_release_sigpool();
--}
--
- void tcp_md5_destruct_sock(struct sock *sk)
- {
- 	struct tcp_sock *tp = tcp_sk(sk);
+ 	{
+-		char *dup, *tok, *name, *val;
++		char *dup, *next, *tok, *name, *val;
+ 		int tmp;
  
- 	if (tp->md5sig_info) {
--		struct tcp_md5sig_info *md5sig;
+-		dup = kstrdup(arg, GFP_ATOMIC);
++		dup = next = kstrdup(arg, GFP_ATOMIC);
+ 		if (!dup)
+ 			return;
  
--		md5sig = rcu_dereference_protected(tp->md5sig_info, 1);
- 		tcp_clear_md5_list(sk);
--		call_rcu(&md5sig->rcu, tcp_md5sig_info_free_rcu);
--		rcu_assign_pointer(tp->md5sig_info, NULL);
-+		kfree(rcu_replace_pointer(tp->md5sig_info, NULL, 1));
-+		static_branch_slow_dec_deferred(&tcp_md5_needed);
-+		tcp_md5_release_sigpool();
- 	}
- }
- EXPORT_SYMBOL_GPL(tcp_md5_destruct_sock);
-diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-index bbb8d5f0eae7d3d8887da3fa4d68e248af9060ad..31302be78bc4450b56fa23a390b6d03b2262741d 100644
---- a/net/ipv4/tcp_ao.c
-+++ b/net/ipv4/tcp_ao.c
-@@ -268,9 +268,8 @@ static void tcp_ao_key_free_rcu(struct rcu_head *head)
- 	kfree_sensitive(key);
- }
- 
--static void tcp_ao_info_free_rcu(struct rcu_head *head)
-+static void tcp_ao_info_free(struct tcp_ao_info *ao)
- {
--	struct tcp_ao_info *ao = container_of(head, struct tcp_ao_info, rcu);
- 	struct tcp_ao_key *key;
- 	struct hlist_node *n;
- 
-@@ -310,7 +309,7 @@ void tcp_ao_destroy_sock(struct sock *sk, bool twsk)
- 
- 	if (!twsk)
- 		tcp_ao_sk_omem_free(sk, ao);
--	call_rcu(&ao->rcu, tcp_ao_info_free_rcu);
-+	tcp_ao_info_free(ao);
- }
- 
- void tcp_ao_time_wait(struct tcp_timewait_sock *tcptw, struct tcp_sock *tp)
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 158b366a55bfd198ffeba13a426d993c3b02528e..ba8b6090df2a1f5c415faa37941292d76346f9b8 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -1503,9 +1503,9 @@ void tcp_clear_md5_list(struct sock *sk)
- 	md5sig = rcu_dereference_protected(tp->md5sig_info, 1);
- 
- 	hlist_for_each_entry_safe(key, n, &md5sig->head, node) {
--		hlist_del_rcu(&key->node);
-+		hlist_del(&key->node);
- 		atomic_sub(sizeof(*key), &sk->sk_omem_alloc);
--		kfree_rcu(key, rcu);
-+		kfree(key);
- 	}
- }
- 
-diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-index d1c9e40886463ca308f9f3682c4039f491e7555f..7c2ae07d8d5d2a18d6ce3210cc09ee5d9850ea29 100644
---- a/net/ipv4/tcp_minisocks.c
-+++ b/net/ipv4/tcp_minisocks.c
-@@ -377,26 +377,17 @@ void tcp_time_wait(struct sock *sk, int state, int timeo)
- }
- EXPORT_SYMBOL(tcp_time_wait);
- 
--#ifdef CONFIG_TCP_MD5SIG
--static void tcp_md5_twsk_free_rcu(struct rcu_head *head)
--{
--	struct tcp_md5sig_key *key;
--
--	key = container_of(head, struct tcp_md5sig_key, rcu);
--	kfree(key);
--	static_branch_slow_dec_deferred(&tcp_md5_needed);
--	tcp_md5_release_sigpool();
--}
--#endif
--
- void tcp_twsk_destructor(struct sock *sk)
- {
- #ifdef CONFIG_TCP_MD5SIG
- 	if (static_branch_unlikely(&tcp_md5_needed.key)) {
- 		struct tcp_timewait_sock *twsk = tcp_twsk(sk);
- 
--		if (twsk->tw_md5_key)
--			call_rcu(&twsk->tw_md5_key->rcu, tcp_md5_twsk_free_rcu);
-+		if (twsk->tw_md5_key) {
-+			kfree(twsk->tw_md5_key);
-+			static_branch_slow_dec_deferred(&tcp_md5_needed);
-+			tcp_md5_release_sigpool();
-+		}
- 	}
- #endif
- 	tcp_ao_destroy_sock(sk, true);
-
+-		while ((tok = strsep(&dup, ","))) {
++		while ((tok = strsep(&next, ","))) {
+ 			if (!strlen(tok))
+ 				continue;
+ 			name = strsep(&tok, "=");
 -- 
-2.42.2
-
+2.39.5 (Apple Git-154)
 
 
