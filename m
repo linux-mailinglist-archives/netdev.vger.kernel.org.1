@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-217978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9F9CB3AB27
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 21:58:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E5DEB3AB28
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 21:58:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E11C41BA75FF
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 19:59:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DABC0987405
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 19:58:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0801284889;
-	Thu, 28 Aug 2025 19:58:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EAE427CCC7;
+	Thu, 28 Aug 2025 19:58:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dSSEAbbo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WkesVheT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 223FC27FD75
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 19:58:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 854F627C84F
+	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 19:58:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756411110; cv=none; b=oAeXx5kMtg32QIBbUzz4rW9XM0efJvEW38VyTta3YJh6K5jrrdIM7R5sNG/8+K0+t0OYQpClL87DVIhGKb5ILT11aX4/e4j/Vgc6GrRPK0wAhtmqzn6tpj21JRbQ3UBZdCJJsfzhANzyBLW2IOJ10c/ijOFDhCh5u843oUb4voM=
+	t=1756411115; cv=none; b=MXGebB1h3fbNUAYehtt6SLKHRkge4k9eG2cXHxunITUDiuji/mrh9BK/Sr5hAqunUtK2wfKIMConI02XRUkDoaKLHJn1ZpfhSI6HTNSD8l7K6nWzQLgW5rbB7n8iQALpG/IC4fARrEfO6rkcqxBR2PK7ndOsfWXVJeTTCHP1lw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756411110; c=relaxed/simple;
-	bh=mOzmTBZcdN1M7aMfnHw3xXPDbzmHR6usLwfXmfOxdBs=;
+	s=arc-20240116; t=1756411115; c=relaxed/simple;
+	bh=R/hE/99Hben+Hoi5AXnAWbn+rYYVhEm5qlLZTYhTqok=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=FEiSE+CXiR9tBSO2E2lddz27HkElkpjl5Qrc4rusX8bU6ylJURuO8jaJsvpUrSlqjJEiHRSRtGkiyRo9yk4IJHa+NuZtrP4X9dt/0oDZeoYlaI4L540aPZtJAf/8oR7VxIfKAOjsw+wBcYIJDH0CaetZDVdNwTUJOHnwVdqecwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dSSEAbbo; arc=none smtp.client-ip=209.85.219.74
+	 To:Cc:Content-Type; b=eSlw5X3e3Zr+3dQ72WKcRfk23mDEFl0Z4KhMhXa2L6pse2Nb7EXBx9NoMSU+/o/RodykBNYPUcGRlobwNdRF6FStAvlq8UquOiglIFa03eun0BTrZ96+5ZNqqRLTvAXi6wWhvZxHmhf3kO0FP0jI/u/qzZh2xO3qjJNv8+vSOh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WkesVheT; arc=none smtp.client-ip=209.85.222.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-70d903d04dbso30212846d6.0
-        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 12:58:28 -0700 (PDT)
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-7e87069063aso483000185a.3
+        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 12:58:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756411108; x=1757015908; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1756411111; x=1757015911; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0YqWhbujUJRkZSQTpVJJcgPL8LGB8qAC+LlAjvP7eyg=;
-        b=dSSEAbbovA4uAYY81g5X9MY5KemxJ/2reiW9MYFD3HzbMS/yOj9KdU8W6xqgrmm5Vt
-         poNvQ749QEWrSF0qVlFo689x6WF95Pyo/iy8uKEeelNl40v1iHDofBvjVd820D3BT+5f
-         s7hQIBPrPNcR5tijAC2H3oleHTIgld1T200hNB++qvsqdGl+bJ+jAJjABaHtQiLlI2w0
-         J6xnzMlxhq3T8xz77Rqh+0VHP6mXKSaCwtqcwJ5sK7bTnqEuUQnaGxvSnn99lwOdRUdq
-         f7/M2+tcvlT0lD9ZLrS7YSZjwpbWOQw/Fj2wnFnaqb6MnLqM0wPjRy3XO345nvwVM2uE
-         8NFQ==
+        bh=xFdpni9SxVUl9cAmDEi4j0CqrDLnOpJSoJGeC2AmzvY=;
+        b=WkesVheTFPi5uqdTEyI4Cg7vA32zSRl/zLjwi6xGVhmR9iQPXHht5FMJ4UdW+InJPi
+         E/BRR7G9npwEnUchxbj3z4/UjnLlHjWtFK140Ijzw+7j6V+8okFd/j5rS/CmdXvSR7TO
+         BcfJyYLkSPsprLfghuYjLA7Ti6Z+3NNhHgez70RtbkeUvCESBWwXHlXKx7LtFz0Te6zD
+         bbhycTKRGb5HY0K4dDpEVAxokz4NHoc7T273rA1jFzcVWUhb5ih/CnzAK1NPQXoVT4rm
+         1FE33h0GKd7Xq4JC8LtGSHJlMR6U7fuZWBEjD13l7QtJBucvVZc5NiTLhIQyCyErjYTh
+         rwAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756411108; x=1757015908;
+        d=1e100.net; s=20230601; t=1756411111; x=1757015911;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0YqWhbujUJRkZSQTpVJJcgPL8LGB8qAC+LlAjvP7eyg=;
-        b=W2W0k+8on8bVmUalfHz/K8WW5rgct/qbV4buF/APNvsdr9JYVYGBr+cJLzUde9+zcP
-         GyoPitqHNrj15PlynDjvx2gIZg+IxRnpZYW8p6DiJgLdaDBkv/SsFaABGiMwhwTStJP9
-         38ZETVO1nepaRyrtNcMx4Kvc24qM83TlagcmaHuY6dDB0CIApeZMNZGs46QWX340vkCK
-         SC7Dy/wa4wys/jOeH6tFsBiqmQa6vYzw63MaLFUtKH43uvhhIogENjVYLBRPtxssgAeh
-         AadStX1lxawv32kkj4hTJCiPW2tVrwv5n4f362ME5tFLa7rEsWjnzMBnuMu0NBucroEN
-         wMNg==
-X-Forwarded-Encrypted: i=1; AJvYcCVpY+WTgAaQlnZsV2eKHLEO0wevaVLWlR+XsnwBoba4+Cvxg0hGSJqevMUHzW/bfq8oJEBIpoI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyv3uNymQGz2CRGYYRbwUPDHKyxwow7/flvE0K0AnmqFeQEgFk7
-	UH5VT3VPB5/w9Y04cjaFN2NzUU7edmqhSO4QCyXxQUWlbpk0W9W7W4dc0qn5Je2A6uS9g3gh+tH
-	HO9Q52w/J3qKh9Q==
-X-Google-Smtp-Source: AGHT+IFdq2BjNfrss7XXZ+jQWc9hFRJRm+/6JY9nDKnRORSauAf/IAXW+WjWgZ1nyS92bqN29Ku/t8yzyqGDmA==
-X-Received: from qkoz2.prod.google.com ([2002:a05:620a:2602:b0:7e8:8ec5:f60f])
+        bh=xFdpni9SxVUl9cAmDEi4j0CqrDLnOpJSoJGeC2AmzvY=;
+        b=jrc8SxFwaOgxMvDqpco0OTojMYMtxKUaQJlk3uyIcuRxSH7FWpAVcMDbVls7HJjDES
+         iwCuz2kIL036bp6c7vEB5UJTaBqmb+jGjZcogMvWqilBhUyLhSyeeonTOM1FQt6I5jpJ
+         zNQzttCz7I9dIDfzF1bffddbHCfaOdfti4TU9RtmZztQqY1qAdj3Gf4wZNeYpF34fcFF
+         M1NVhORHmT1HpTU5eeR9ofTBoTFIJxqdX/OnrvB9tFwkcA/Nmn12El4aWHUDWaKQfBVP
+         HLkUpsZ2+4JwUjsZuiYgnsVVPvAzCywtLceYlQiJNAMnLNueg78v/+SP0ZsB4zz9i5lY
+         iTSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVkcn9ou5ceXuTqqHj0dVHSXR3DVnw78rdtXKaSKcYWmgPWMqRw4Dj+m+/ChYiTbXveMwlO4zg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGqdzTC2HkEcVlNAL/46/pANAAg/uv/2lm3aPoIRP2LCShDxA8
+	l89dX5mPwzLHxttbk0aKSS8vvvwOIoNh9kmyduH95nBgRE1VTjd+wfm5DdlvXF9DJQOYgaOWdcO
+	e7t81B7nYmJBcuw==
+X-Google-Smtp-Source: AGHT+IH0jiWbkbGmSfMfqgCf4gApauygih8ZIrefDBbxjT7ZIbPDOPMFAEujimNAuEQaiHBcpnIiGSG1uPVagw==
+X-Received: from qknpz15.prod.google.com ([2002:a05:620a:640f:b0:7fb:687c:11d2])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6214:4103:b0:70d:f76c:b218 with SMTP id 6a1803df08f44-70df76cefecmr37586756d6.31.1756411107911;
- Thu, 28 Aug 2025 12:58:27 -0700 (PDT)
-Date: Thu, 28 Aug 2025 19:58:16 +0000
+ 2002:a05:620a:1aa7:b0:7e8:4675:1f98 with SMTP id af79cd13be357-7ea10f53dafmr2980256285a.1.1756411111420;
+ Thu, 28 Aug 2025 12:58:31 -0700 (PDT)
+Date: Thu, 28 Aug 2025 19:58:17 +0000
 In-Reply-To: <20250828195823.3958522-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250828195823.3958522-1-edumazet@google.com>
 X-Mailer: git-send-email 2.51.0.318.gd7df087d1a-goog
-Message-ID: <20250828195823.3958522-2-edumazet@google.com>
-Subject: [PATCH net-next 1/8] net: dst: introduce dst->dev_rcu
+Message-ID: <20250828195823.3958522-3-edumazet@google.com>
+Subject: [PATCH net-next 2/8] ipv6: start using dst_dev_rcu()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
@@ -84,100 +84,161 @@ Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Followup of commit 88fe14253e18 ("net: dst: add four helpers
-to annotate data-races around dst->dev").
+Refactor icmpv6_xrlim_allow() and ip6_dst_hoplimit()
+so that we acquire rcu_read_lock() a bit longer
+to be able to use dst_dev_rcu() instead of dst_dev().
 
-We want to gradually add explicit RCU protection to dst->dev,
-including lockdep support.
+__ip6_rt_update_pmtu() and rt6_do_redirect can directly
+use dst_dev_rcu() in sections already holding rcu_read_lock().
 
-Add an union to alias dst->dev_rcu and dst->dev.
-
-Add dst_dev_net_rcu() helper.
+Small changes to use dst_dev_net_rcu() in
+ip6_default_advmss(), ipv6_sock_ac_join(),
+ip6_mc_find_dev() and ndisc_send_skb().
 
 Fixes: 4a6ce2b6f2ec ("net: introduce a new function dst_dev_put()")
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/dst.h | 16 +++++++++++-----
- net/core/dst.c    |  2 +-
- net/ipv4/route.c  |  4 ++--
- 3 files changed, 14 insertions(+), 8 deletions(-)
+ net/ipv6/anycast.c     | 2 +-
+ net/ipv6/icmp.c        | 6 +++---
+ net/ipv6/mcast.c       | 2 +-
+ net/ipv6/ndisc.c       | 2 +-
+ net/ipv6/output_core.c | 8 +++++---
+ net/ipv6/route.c       | 7 +++----
+ 6 files changed, 14 insertions(+), 13 deletions(-)
 
-diff --git a/include/net/dst.h b/include/net/dst.h
-index bab01363bb975dc20ea0e1485a515c1872537ab9..f8aa1239b4db639bd6b63f4ddb4ec4d7ee459ac0 100644
---- a/include/net/dst.h
-+++ b/include/net/dst.h
-@@ -24,7 +24,10 @@
- struct sk_buff;
+diff --git a/net/ipv6/anycast.c b/net/ipv6/anycast.c
+index f8a8e46286b8ee6e39d2d4c2e4149d528d7aef18..52599584422bf4168e37ea48b575c058b1309c7c 100644
+--- a/net/ipv6/anycast.c
++++ b/net/ipv6/anycast.c
+@@ -104,7 +104,7 @@ int ipv6_sock_ac_join(struct sock *sk, int ifindex, const struct in6_addr *addr)
+ 		rcu_read_lock();
+ 		rt = rt6_lookup(net, addr, NULL, 0, NULL, 0);
+ 		if (rt) {
+-			dev = dst_dev(&rt->dst);
++			dev = dst_dev_rcu(&rt->dst);
+ 			netdev_hold(dev, &dev_tracker, GFP_ATOMIC);
+ 			ip6_rt_put(rt);
+ 		} else if (ishost) {
+diff --git a/net/ipv6/icmp.c b/net/ipv6/icmp.c
+index 44550957fd4e360d78e6cb411c33d6bbf2359e1f..95cdd4cacb004fd4f2e569136a313afef3b25c58 100644
+--- a/net/ipv6/icmp.c
++++ b/net/ipv6/icmp.c
+@@ -209,7 +209,8 @@ static bool icmpv6_xrlim_allow(struct sock *sk, u8 type,
+ 	 * this lookup should be more aggressive (not longer than timeout).
+ 	 */
+ 	dst = ip6_route_output(net, sk, fl6);
+-	dev = dst_dev(dst);
++	rcu_read_lock();
++	dev = dst_dev_rcu(dst);
+ 	if (dst->error) {
+ 		IP6_INC_STATS(net, ip6_dst_idev(dst),
+ 			      IPSTATS_MIB_OUTNOROUTES);
+@@ -224,11 +225,10 @@ static bool icmpv6_xrlim_allow(struct sock *sk, u8 type,
+ 		if (rt->rt6i_dst.plen < 128)
+ 			tmo >>= ((128 - rt->rt6i_dst.plen)>>5);
  
- struct dst_entry {
--	struct net_device       *dev;
-+	union {
-+		struct net_device       *dev;
-+		struct net_device __rcu *dev_rcu;
-+	};
- 	struct  dst_ops	        *ops;
- 	unsigned long		_metrics;
- 	unsigned long           expires;
-@@ -570,9 +573,12 @@ static inline struct net_device *dst_dev(const struct dst_entry *dst)
+-		rcu_read_lock();
+ 		peer = inet_getpeer_v6(net->ipv6.peers, &fl6->daddr);
+ 		res = inet_peer_xrlim_allow(peer, tmo);
+-		rcu_read_unlock();
+ 	}
++	rcu_read_unlock();
+ 	if (!res)
+ 		__ICMP6_INC_STATS(net, ip6_dst_idev(dst),
+ 				  ICMP6_MIB_RATELIMITHOST);
+diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
+index 55c49dc14b1bd9815128bbd07c80837adc19e7ec..016b572e7d6f0289657bda2a51a70153e98ed4fe 100644
+--- a/net/ipv6/mcast.c
++++ b/net/ipv6/mcast.c
+@@ -180,7 +180,7 @@ static struct net_device *ip6_mc_find_dev(struct net *net,
+ 		rcu_read_lock();
+ 		rt = rt6_lookup(net, group, NULL, 0, NULL, 0);
+ 		if (rt) {
+-			dev = dst_dev(&rt->dst);
++			dev = dst_dev_rcu(&rt->dst);
+ 			dev_hold(dev);
+ 			ip6_rt_put(rt);
+ 		}
+diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
+index 57aaa7ae8ac3109d808dd46e8cfe54b57e48b214..f427e41e9c49bf342869bea4444f308a5ac03a26 100644
+--- a/net/ipv6/ndisc.c
++++ b/net/ipv6/ndisc.c
+@@ -505,7 +505,7 @@ void ndisc_send_skb(struct sk_buff *skb, const struct in6_addr *daddr,
  
- static inline struct net_device *dst_dev_rcu(const struct dst_entry *dst)
+ 	ip6_nd_hdr(skb, saddr, daddr, READ_ONCE(inet6_sk(sk)->hop_limit), skb->len);
+ 
+-	dev = dst_dev(dst);
++	dev = dst_dev_rcu(dst);
+ 	idev = __in6_dev_get(dev);
+ 	IP6_INC_STATS(net, idev, IPSTATS_MIB_OUTREQUESTS);
+ 
+diff --git a/net/ipv6/output_core.c b/net/ipv6/output_core.c
+index d21fe27fe21e344b694e0378214fbad04c4844d2..1c9b283a4132dc4b3a8241b9e9255b407e03fe49 100644
+--- a/net/ipv6/output_core.c
++++ b/net/ipv6/output_core.c
+@@ -104,18 +104,20 @@ EXPORT_SYMBOL(ip6_find_1stfragopt);
+ int ip6_dst_hoplimit(struct dst_entry *dst)
  {
--	/* In the future, use rcu_dereference(dst->dev) */
--	WARN_ON_ONCE(!rcu_read_lock_held());
--	return READ_ONCE(dst->dev);
-+	return rcu_dereference(dst->dev_rcu);
-+}
+ 	int hoplimit = dst_metric_raw(dst, RTAX_HOPLIMIT);
 +
-+static inline struct net *dst_dev_net_rcu(const struct dst_entry *dst)
-+{
-+	return dev_net_rcu(dst_dev_rcu(dst));
++	rcu_read_lock();
+ 	if (hoplimit == 0) {
+-		struct net_device *dev = dst_dev(dst);
++		struct net_device *dev = dst_dev_rcu(dst);
+ 		struct inet6_dev *idev;
+ 
+-		rcu_read_lock();
+ 		idev = __in6_dev_get(dev);
+ 		if (idev)
+ 			hoplimit = READ_ONCE(idev->cnf.hop_limit);
+ 		else
+ 			hoplimit = READ_ONCE(dev_net(dev)->ipv6.devconf_all->hop_limit);
+-		rcu_read_unlock();
+ 	}
++	rcu_read_unlock();
++
+ 	return hoplimit;
  }
+ EXPORT_SYMBOL(ip6_dst_hoplimit);
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index 3299cfa12e21c96ecb5c4dea5f305d5f7ce16084..3371f16b7a3e615bbb41ee0d1a7c9187a761fc0c 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -2943,7 +2943,7 @@ static void __ip6_rt_update_pmtu(struct dst_entry *dst, const struct sock *sk,
  
- static inline struct net_device *skb_dst_dev(const struct sk_buff *skb)
-@@ -592,7 +598,7 @@ static inline struct net *skb_dst_dev_net(const struct sk_buff *skb)
+ 		if (res.f6i->nh) {
+ 			struct fib6_nh_match_arg arg = {
+-				.dev = dst_dev(dst),
++				.dev = dst_dev_rcu(dst),
+ 				.gw = &rt6->rt6i_gateway,
+ 			};
  
- static inline struct net *skb_dst_dev_net_rcu(const struct sk_buff *skb)
+@@ -3238,7 +3238,6 @@ EXPORT_SYMBOL_GPL(ip6_sk_redirect);
+ 
+ static unsigned int ip6_default_advmss(const struct dst_entry *dst)
  {
--	return dev_net_rcu(skb_dst_dev(skb));
-+	return dev_net_rcu(skb_dst_dev_rcu(skb));
- }
- 
- struct dst_entry *dst_blackhole_check(struct dst_entry *dst, u32 cookie);
-diff --git a/net/core/dst.c b/net/core/dst.c
-index e2de8b68c41d3fa6f8a94b61b88f531a2d79d3b4..e9d35f49c9e7800d7397b643c70931dd516a6265 100644
---- a/net/core/dst.c
-+++ b/net/core/dst.c
-@@ -150,7 +150,7 @@ void dst_dev_put(struct dst_entry *dst)
- 		dst->ops->ifdown(dst, dev);
- 	WRITE_ONCE(dst->input, dst_discard);
- 	WRITE_ONCE(dst->output, dst_discard_out);
--	WRITE_ONCE(dst->dev, blackhole_netdev);
-+	rcu_assign_pointer(dst->dev_rcu, blackhole_netdev);
- 	netdev_ref_replace(dev, blackhole_netdev, &dst->dev_tracker,
- 			   GFP_ATOMIC);
- }
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index 771f6986ed05882ebaeb1117ac33d68edf5db699..c63feef55d5193aadd11f9d5b45c8f5482e06be5 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -1027,7 +1027,7 @@ static void __ip_rt_update_pmtu(struct rtable *rt, struct flowi4 *fl4, u32 mtu)
- 		return;
- 
- 	rcu_read_lock();
--	net = dev_net_rcu(dst_dev(dst));
-+	net = dst_dev_net_rcu(dst);
- 	if (mtu < net->ipv4.ip_rt_min_pmtu) {
- 		lock = true;
- 		mtu = min(old_mtu, net->ipv4.ip_rt_min_pmtu);
-@@ -1327,7 +1327,7 @@ static unsigned int ipv4_default_advmss(const struct dst_entry *dst)
+-	struct net_device *dev = dst_dev(dst);
+ 	unsigned int mtu = dst_mtu(dst);
  	struct net *net;
  
+@@ -3246,7 +3245,7 @@ static unsigned int ip6_default_advmss(const struct dst_entry *dst)
+ 
  	rcu_read_lock();
--	net = dev_net_rcu(dst_dev(dst));
+ 
+-	net = dev_net_rcu(dev);
 +	net = dst_dev_net_rcu(dst);
- 	advmss = max_t(unsigned int, ipv4_mtu(dst) - header_size,
- 				   net->ipv4.ip_rt_min_advmss);
- 	rcu_read_unlock();
+ 	if (mtu < net->ipv6.sysctl.ip6_rt_min_advmss)
+ 		mtu = net->ipv6.sysctl.ip6_rt_min_advmss;
+ 
+@@ -4301,7 +4300,7 @@ static void rt6_do_redirect(struct dst_entry *dst, struct sock *sk, struct sk_bu
+ 
+ 	if (res.f6i->nh) {
+ 		struct fib6_nh_match_arg arg = {
+-			.dev = dst_dev(dst),
++			.dev = dst_dev_rcu(dst),
+ 			.gw = &rt->rt6i_gateway,
+ 		};
+ 
 -- 
 2.51.0.318.gd7df087d1a-goog
 
