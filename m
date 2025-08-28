@@ -1,268 +1,275 @@
-Return-Path: <netdev+bounces-217885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27B98B3A468
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 17:29:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C443B3A46F
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 17:30:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9C6D3B333E
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 15:29:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 385E5987B96
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 15:30:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42CAE231C91;
-	Thu, 28 Aug 2025 15:29:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39DBF2397BF;
+	Thu, 28 Aug 2025 15:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EccnUhJn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q5MP45w6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A804E221FC4;
-	Thu, 28 Aug 2025 15:29:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756394949; cv=fail; b=pNGZnADqHB2Prkj0S6DRPP1W/nAm6d8We+m5GQkDZrPOWrA+wCXzMEMD1SnzeucwKlMRrPaG6t6qMLPedDrFuPGnfyKwGzJU4SphGzo4YPIvavHfQLypL8la2DDJvQxcmCf0d+kB17L36g91ideOMCRrRhAKi+tMXti3Cg6W5h8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756394949; c=relaxed/simple;
-	bh=7wmnx66VyWvI99TKp4wd0iy9xsxGV83TvdxFXDSiMNM=;
-	h=Message-ID:Date:From:Subject:To:CC:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=vE88PHEvcSeT4vwoMXUp3dHGdYwsUws/i5LdYNg/2IsSTHKHzvAU+uaEjny3DcVb1YfE+Ff9ikB9BcEvFiwp1VZrQps6Y41VDl4UqdyEQrM5JfpSQwBEI1dEyJkSLJq9ovV61G2+XZwJUZC/1Aaeq29m2GINHfcxh/n6CQ4oz6M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EccnUhJn; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756394948; x=1787930948;
-  h=message-id:date:from:subject:to:cc:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=7wmnx66VyWvI99TKp4wd0iy9xsxGV83TvdxFXDSiMNM=;
-  b=EccnUhJnkHzwEIRIcdYgAG3v/QpdGGsLg7yVujyTCw0jJbKSOaaqZ4CU
-   jVaY+O+Lh/n4UFini6rHI4d3XqAIANMnomUBDG1j5q/pKbf02yW7S8AFT
-   gImMcdX2DLH8xEE4oJWjjCaMbpvvIAXWUO+xJCzn5A43P+2qjEVs/7jjU
-   8dSIcfzNw1K7uAq/Nc2mMuFXW3Udgy9c6zf/yoAz2pbSAJuwrblxhdnhT
-   odxpqaC3MmkJ4fX5lbFvkw740yAGJznMsvURSkgk0dfPmAOtyIhrPiVQn
-   TOYghj5/NgkkHz1XH/bKSJSOGcYH24AD8AK3lNAkjmdk2kxSO47zIjaaf
-   g==;
-X-CSE-ConnectionGUID: F8OdTh+WRn2A/YB1jVZRGw==
-X-CSE-MsgGUID: uSmOjld2Q2OcdqvjTucxvg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11536"; a="76269106"
-X-IronPort-AV: E=Sophos;i="6.18,217,1751266800"; 
-   d="scan'208";a="76269106"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2025 08:29:07 -0700
-X-CSE-ConnectionGUID: 0HlISSprSEOGhJeQxDK1Nw==
-X-CSE-MsgGUID: zUVM3fqMRBqs0YtZsUSikg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,217,1751266800"; 
-   d="scan'208";a="170317318"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2025 08:29:06 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Thu, 28 Aug 2025 08:29:06 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Thu, 28 Aug 2025 08:29:06 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (40.107.94.76) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Thu, 28 Aug 2025 08:29:05 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=EP4N5zCGjUa/MJMHeYvcA9qdLJ1YcCEkFqpJMBJdOjhJuKrpUPZA/PnIw4r4JCZMtoq3pfnVSMm/+1Bi1OTodLmwh51slmslD2COXeBe/wL90kF+OTXx0czCWTMtfCYTtXGOO10iv9UGrwA70H4Zm5RjdfxNA9jMhXlj3yTA2vnpjK1dHUQCvzxx9qRP/+jX0yVt/tDoa125prdznbCR9rw4NggYSDg/qwWUdC8pUEdQ63/5AVFOpUVjlc00rjGFxDIAPdhfpsvWgdvLeR9nbvNFDOzsWrqwiR7ALgTXBUw0TSESsuOHHjEw1ewXSVMK3zscdpaHxOJMaJRKJTw6Kg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Nc7kqHwtpRm4zr5p/XcpKWi+oKWgJhBsfF/p5UQpm4g=;
- b=VnMQkUH1EhubKRhPsl3G9JKMeU7zdovwKieGN7ca6WwfxLEddLHQS1DG8tjD8V9HIKHXiZM/1aNuQNE3nD9p2bkoaVvpO2XlLNOnONFycdp6qblUe/hLQP+tqQ5aA+VVd1xWl2M/mU3qgHKdge8rRnd+C5ZTqnQUXh8dzyoTHxIJte5dUDLw2ShlHy8U03E/zUmzeRCx9s0jo2Il1T8WGmnbwwrSfAwRbzeTZSjYMKxrYhqtmJS5tXmivuqV0gmI+D8R+nh2jOMDc6hY9orhqvZuMgtkoKGt1F0ex62O7Ar4ivkL7+ssWHBxQmqgo9Yhq5KRU+xdxHTnPXAiX4a9/A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by MN0PR11MB6159.namprd11.prod.outlook.com (2603:10b6:208:3c9::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.17; Thu, 28 Aug
- 2025 15:29:00 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.9073.017; Thu, 28 Aug 2025
- 15:29:00 +0000
-Message-ID: <f0c0a512-900b-4d12-9e59-5fbcd35ed495@intel.com>
-Date: Thu, 28 Aug 2025 17:28:53 +0200
-User-Agent: Mozilla Thunderbird
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Subject: Re: [PATCH net-next v2 5/9] xsk: add xsk_alloc_batch_skb() to build
- skbs in batch
-To: Jason Xing <kerneljasonxing@gmail.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <bjorn@kernel.org>, <magnus.karlsson@intel.com>,
-	<maciej.fijalkowski@intel.com>, <jonathan.lemon@gmail.com>,
-	<sdf@fomichev.me>, <ast@kernel.org>, <daniel@iogearbox.net>,
-	<hawk@kernel.org>, <john.fastabend@gmail.com>, <horms@kernel.org>,
-	<andrew+netdev@lunn.ch>, <bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
-	Jason Xing <kernelxing@tencent.com>
-References: <20250825135342.53110-1-kerneljasonxing@gmail.com>
- <20250825135342.53110-6-kerneljasonxing@gmail.com>
- <951bc347-0c33-4359-8d15-0e5e054b951c@intel.com>
- <CAL+tcoCBTS0T-DNRjC0k2pH+qveM6=OHQ98eatp7nG5g1DA=bA@mail.gmail.com>
-Content-Language: en-US
-In-Reply-To: <CAL+tcoCBTS0T-DNRjC0k2pH+qveM6=OHQ98eatp7nG5g1DA=bA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: WA2P291CA0006.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:1e::18) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3383123817E;
+	Thu, 28 Aug 2025 15:30:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756395011; cv=none; b=Tze1c2fluyqpL+Eg/alsRAIjIqai6hmbdiXlIEAq4vg9z480dycMIFcXYtQgmyPb4lqkkfCR3PtzME5jFmNuIH06/VXHbcHG/q1PfVdMikSLNNNTrjtccOfjazOrNhnrs46uT6KGetnjblzaf59I/Ds3VpXIHaEBRJv2aNEvGJk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756395011; c=relaxed/simple;
+	bh=LAjHcbnNbm+VyQgdiBTbZgI7j+nIqmKuZksO/PduWXk=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=MP0p/BH4wvB5coMI6pZTiO/dRt782Xn1bleJOnCrUrvfoG1VHyDZz7fkN546EDOnDU7m4CIHdmKnmdUv6K8H/R4lUzlbppnn8cuOoHZbV2I0vdyxLNVsBpUQk4qXHkehq36y79wEOS+pRIpzmeQm4Qtvc7c7/wIOCRth8sBkCIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q5MP45w6; arc=none smtp.client-ip=209.85.221.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-54393096381so756062e0c.2;
+        Thu, 28 Aug 2025 08:30:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756395008; x=1756999808; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sbCW5ruVZKbISbmbZ8Vx2LKcE5+fXG2+P8+u/w4w0/M=;
+        b=Q5MP45w6mkzDtS2Tg7tkf7+jI+emZ/29uHl3wPfnztktHxCbNBS0xm0r/hhTdG7XPZ
+         E348KJ7szG3KBryJteWKYvGFE6bHE6FC0qrD8BKW2pqNnqWb+VLjjF9sQdX4LeuXWxld
+         F9IxwC6WBcFgwFxCeryKnp5QH+2JsstARkFFE4pODLsjN0JI0+WmmLbyjyvgA0oGkewg
+         3Yv2sGCLfZlcab2tVr70GLJkHpwlGrJUzoEh4+EIFG6prHpoc4CIDEByj7C5mVLM1KHz
+         +ecRGbPLV4f4FByuGASEHfA31Qdlkd8hkRZtOWQuVN28UsxJzURYAffFiBaH+vxLDGM4
+         Ow4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756395008; x=1756999808;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=sbCW5ruVZKbISbmbZ8Vx2LKcE5+fXG2+P8+u/w4w0/M=;
+        b=ofIJJFKUmFIx9DEye55aMFiHx7mV+gxjv5le442rqt0IPqrj8HGb2ANB/VgX4vxp7x
+         UXsWFTn1yzNnrQBIKvsYiK6zZlMkpCEbm+0NUu3ET3irIeyXlS7ETLOM92zzuqWOr1IM
+         ETdXhsZ8cVnWowH0q23lc95aKpb/uplFOCfRGVco+kH2A+byqJa6R/wF70OMQ8+BXvsI
+         s/TZoi3fBDQ0O1MKrBIQBP9I2c801Dgc89slBHLp/vz6CCpazZZgs3/bhvJBVo9PFOsK
+         3CTFKVEmHxveyu5AJM6kPD3ZMrvLNhbYTvXE1YN13NClAuH5SZYH4Azr1dlgNkG3eQCl
+         WU/g==
+X-Forwarded-Encrypted: i=1; AJvYcCWdwy1rgr0Ux5T6PgJ+05W2+ucfOY1RoiTcLMBKnxoJ/+C5Nzp7psKnRYQw5suC2YSVy2kjzoXy@vger.kernel.org, AJvYcCWi3oiUAEBTfGXrFnL+abUXa3vCwarexZwF0UcAeK6C3tp4W/KaWjwMbOKPshM3ixCY9hxFxgMVn3ZdUac=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTf5TXwPM1MWIMiWsSwcq6np+TkNomFWAhvzo6zWoV/sOrUPjZ
+	dfumjixLqBQTIFEKR7rv8DGbSREY2n/OMTvHhudVOcg84ddb5S2YAdmi
+X-Gm-Gg: ASbGnctKyMdTYpvGkbexq/jWgDrdsXoRfXbvO8SR8yvg8wBZOyz4+jL5Xkb1W90z0OP
+	2U3JFAgbFM3nRVKkiXF/9E2NkCqJuulcFBzmbR7fA17+fXHQa8TBpAUSY2DSVWveFkjQ88i0JQq
+	hYJdlutv4s4TfWUqQp7BbdfgvR637VkDNDeMQKzW/YksBPh1bZ8hrYCF3NuTxgJRSd6uRSJvsOF
+	nBZnEDNA6rzY25VCLiVfm10+fqu1BouGfFMucjvGENchMpVRKBqOZUyC2iiv/KloG11K/LGdGxs
+	w8cLO7FuB7sYHEGwlieKXhWbauAF5KL3+zkQl/TcGvr5uDwiSIs2C6/xceb4MBD/mXFQySw9QP4
+	Ut/X7ztVXaOBH/cfAJ5xWROTAurXDnVUQW+Mte5yEvHXnH2VGO3iiL7ydAo/iX6Rhi+VOXL3hnQ
+	9WMQ==
+X-Google-Smtp-Source: AGHT+IFqoFd5R0Ton8hfUU3hj2OJqhdRo2zKwH5ZrwE8TG2YxFbcJl35+M01rS+V6cMuhWZAaOgv3A==
+X-Received: by 2002:a05:6122:8707:b0:542:59a2:731a with SMTP id 71dfb90a1353d-54259a279demr5358509e0c.16.1756395007798;
+        Thu, 28 Aug 2025 08:30:07 -0700 (PDT)
+Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id 71dfb90a1353d-5448cff511fsm767e0c.21.2025.08.28.08.30.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Aug 2025 08:30:07 -0700 (PDT)
+Date: Thu, 28 Aug 2025 11:30:06 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Xin Zhao <jackzxcui1989@163.com>, 
+ willemdebruijn.kernel@gmail.com, 
+ edumazet@google.com, 
+ ferenc@fejes.dev
+Cc: davem@davemloft.net, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ horms@kernel.org, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+Message-ID: <willemdebruijn.kernel.33a7282981e76@gmail.com>
+In-Reply-To: <20250828063140.2747329-1-jackzxcui1989@163.com>
+References: <20250828063140.2747329-1-jackzxcui1989@163.com>
+Subject: Re: [PATCH net-next v8] net: af_packet: Use hrtimer to do the retire
+ operation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|MN0PR11MB6159:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6a7e5376-a2ee-4b7e-6674-08dde6479c73
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|366016|376014|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?N1lLR0t2SGlHVGRCK01EaUdQSm14ZEM2ZTZ1N0ZWTFlmN2J5OGdPWElDbmNr?=
- =?utf-8?B?MUhpbUNvRlFIcnZRZS9xaldhT05QR0JJR1BNYnViMSt2MExYOGFWdmJ4UDYr?=
- =?utf-8?B?bHc4SUpBeDJoM2xjN2FzSVJVVis3NG1zalJvQXlUMUFHZnpqMEN4ZTh5ejdq?=
- =?utf-8?B?K0VGVnFnRXMvZjRzS0dHSzN5MXg0bm9TWmo5U3BBbjFPSGo2ZEtZbHFPZnhy?=
- =?utf-8?B?YjdRK215M3hrRkVZbEFncENjSG5hQ0thL0ZIaFlBUzFwZWN3bFlmYWpGSDlO?=
- =?utf-8?B?RmRsNWREZXNkTEZZMExnLzZYQW95aEhMZUw3V2hqU0lBeks2V3NPRjAzSXlF?=
- =?utf-8?B?UkJKbEJEQ21na20xZ29SVmRiNi9uc2t2LzNsMDMyTmVheFdjdmZKRlJlWlpl?=
- =?utf-8?B?RXNnT0dJajNmNENXb20rNVRlb0hTRExuQlVhWUgyT2NOSEpRZUhRbUdlVnVk?=
- =?utf-8?B?ZFpYTnVjck5LelI4eHhKSyt3T1B4blNhcGlUMG01Tm5YalY3R0N2M0h3UTZ0?=
- =?utf-8?B?eHd2L2RiVnJvU29JdERPTzluM2pZbkFXT29meHV2bmE3YnplRFNuQ1UxSXJH?=
- =?utf-8?B?NzZhd1prS2dKNVlldEhCd1owRTYyQi9XYVlCaFZveWJQNXFEaXMyZ0hMNmVm?=
- =?utf-8?B?TXdwby9pNzNueDd6VmxRRXIzNjR5bmFKcUcvcWoxRk5kOU9xMHdHTGNNajdQ?=
- =?utf-8?B?cElUSWVYYTZzdFMxZ0Z1WExIc09YQXA2TExvcVpEV1lqWGlqTDdVU2ZlUkNO?=
- =?utf-8?B?ai9ma1ozNEcyS1lrTGVianNMRHZIeUFiOWVoVzB0U2QxNDJ3UWRKU3Z5Vm1P?=
- =?utf-8?B?MFBFRkdPMGN0VXgrL2dVaTEzVnhnT21NVk5ISUhaY3kzRkorZEM5bUJTd2R5?=
- =?utf-8?B?bU8wSUM5Smk0K29zSjRSUDIyLzM1RWZLUnRMeGM1bzMzZENBWk5Pb05scnEz?=
- =?utf-8?B?NHBiSDRLZEdma2VxNjJqWmFVQjlmUGI4TUhGWjJRZjBMZ0xrd3l2aGMvOHFa?=
- =?utf-8?B?em5pYmdFTzBBMXROZkQxaEloUG0rYjJId2xlcDRLbm9abHdPeWdoRGZSbi9J?=
- =?utf-8?B?R2tPSHNTUE8xcnlXaytNQms2aTd0ZCsxdjJ0ZVM0aGUra0ZQUGIxeDBmU2FQ?=
- =?utf-8?B?ZkxIc1ZUZGdMV1dRMWhtWHB6TVUxUVZNSWNtcFFjUEhMYVNSZzlyckVxbVUy?=
- =?utf-8?B?SVdmTklTZUxQTnV6UlhLeERNRjBoN0hFVWhvMHJuRExtZUpjWjM1Yis3elJR?=
- =?utf-8?B?aDE0bTNndm5JTHQzVzZ1MWNnTWd3S3NLa1NEeXl5TXArMzNTUThVTjg5MzZY?=
- =?utf-8?B?Smw3TjM1a21MMDRmVlVFUm5Jekx4TkhVVndBSk5EQ3d1UUkrM3Y2NzlHb1hG?=
- =?utf-8?B?aEJHWUFVYzhZakhOVnVhWWs0NE05VFl6OHhGc3ZBN3FsY0luTUVPWTBId3dE?=
- =?utf-8?B?cjdDZGRBNWtHUlI2Um1pa3J6bnlhaytqMlV4NnQzalE3V3luME9HR3hVNVZX?=
- =?utf-8?B?Tlh1UzFuOEh3RVBVdGtnMjJvdUlwNDBtV2Y4UjZXTVUyUC82ejZXMnZySWVN?=
- =?utf-8?B?QWJ3RnZEVlpJazI3VXlPOVJ6Z29rSW0xTXMwSDNFOUZCUDlrQ1Z2a01WR2NS?=
- =?utf-8?B?SUFTbk11U04yaHJzQWFsTXhtZzJwSXFRem9wNnJxUzJTQm5EQm91RExwYkF0?=
- =?utf-8?B?SE41QWthNmJtaWdLakphS1pGdkxhY1hld3VZcjhRSmF5VFlmVEQwakNDaG0r?=
- =?utf-8?B?Z2Z4WHVnOTZiRkRYRlArd1NYdW9rdGRHWU54a05tbERBa1krSzhMc0w1V3l5?=
- =?utf-8?B?aUloTld1TmZCanNBeUZDYWNiTHY1VnVCWXFSRmNyU0JKU3p3RTdIRy9UK2Vj?=
- =?utf-8?B?K0NvV2IzWkZvUkRvNzhlaVNzRkFsdEZMZGs4T3JhdnpnOS9Wd3hBVWZtdmds?=
- =?utf-8?Q?5j3j9Ht76S8=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(366016)(376014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?K2hzMVNuUVRieUdtZEU5S2hOMVVla0plQjRDZ2JJVitzU2xZNndmR2FHR1ZF?=
- =?utf-8?B?TUVxYTZGZUxydS9YTGwxODk3Z3FJMWx6VUhNb2pJb3JQRmI4UmVKUmszaW1W?=
- =?utf-8?B?dE9teUd5MTY0WCsrdzFvK3kzYitUUWJmNEtUbUVvNTVGc3ZtdFF5L3NXUVIz?=
- =?utf-8?B?WDRBT3piMkRjajVxQkJCMWViaTUvc3JYK0hvUG5hS0h1SEJEQXNWWHBKd0Q4?=
- =?utf-8?B?dndNREhwVS9hVC83TzV0eFRSbDJHbE1IL2ovaFRDM0ZWS2p5UmFXZDNuLzNk?=
- =?utf-8?B?SWdaSlNpdndmcys2QU5DK2p1WkhsWEl6alRoU0ptaXpMczhFZExZNHdxR01Q?=
- =?utf-8?B?USt3cEk3bW9OWkJibk5ua1UvWkQrRmRBZkF3M3pVYnJqQ3VGLy8vUEUva05Q?=
- =?utf-8?B?aWYvRDQvZnlxYmc3WGp4a3hlYTlud0lrakxYMmJ3amMxdEFzUnVIU0dIWm03?=
- =?utf-8?B?Z0phK00zVkw0d0JVM21tSnN4S0o2UFE3OHovYkQvQ2llYkExV3dBUUZIOWx0?=
- =?utf-8?B?YWp3MEFadkhNUFhKaXJpZlJrQnRzNUc2cjQ1alkwaEFmMjR5WWxWUURJMTJh?=
- =?utf-8?B?SHZoSVFoN1E0bkIwRncxUUQzelN2ZnpoUXJEaWtCbXV6U1RIQTJJMExGM1VB?=
- =?utf-8?B?U0dEbno0WTZOeU90c0pWVmZGRTJOK3lsYUJTK0c3eFBDQlp4bTBkZHU3d3RF?=
- =?utf-8?B?NlMyQklkQk56SVhScXcrRTZWUFhJNFQzMVlDWFFrOG1oQ1J6MWYrQk8zVStP?=
- =?utf-8?B?cTlHeE8rRDRaelQwWjJIQlhLMWNoNjJ2S3FoV0RNZ1hKdTRkYk83MnEwMzli?=
- =?utf-8?B?aS9qcERjaDV0TkdOdkxMK3d3ejd0SXJuZFVRMUhKVVRKUFZaN2d1KzlnMDhH?=
- =?utf-8?B?MFF2K2Q4dnV4aU5GMmFQc2NRVkN1dE1jU0lBV1BtWlVDSGg3VkxpditDbDdx?=
- =?utf-8?B?M0FrOEJFV0JXb2N6S0YwSGoydm9ybCtpL0JNMkNKQ0xaTHVUWGlOMlp4US9x?=
- =?utf-8?B?MjdCK0xTenhDL2pOcXBzRi8xSzlkOUZZS1AxUVpFeWFpUTgvbzVSaHNWamFE?=
- =?utf-8?B?WkhBbERuR2swbjFnVGRZcnNaV0llK1Iyclp5OWlLRjlTeVZPZSs0eFVHdm5W?=
- =?utf-8?B?cmdXMHd4UmEzV09YbXlna3NiQ2RDMlZnbEhRU2M4bjU3OXJ5QlRyeUZjaGhG?=
- =?utf-8?B?SHg3L1BqOHFSdVp2dmh0NVl1b09obnM4SFAyM2pySWFFeFRIMHlLQ1RRTkN4?=
- =?utf-8?B?TW1VSnoxODhpMWxiQ1dFWWdOTHZ5S0pkekhhaWRrSnVQY3I1VE1vWWZlSXB2?=
- =?utf-8?B?SzZEUmljSVloWUtoVDl0Yy96YVdxVHN6ZzhaMGdsdnl1dXV3Um5JVUFiZGZr?=
- =?utf-8?B?OUxBSmdKMmE1SWxLc295N0VWOUl5NEM0L0lKNThqemJsanFBczFGSTZMTWg1?=
- =?utf-8?B?MjJ6OHJVOHVWSk91MVhoc0FGSHBpRDRseldMQWhkc1BnN3lpU29kZlZLNnpz?=
- =?utf-8?B?MFA4SDBNOThGUTdiK2J3eUJKMWlYMldCVSszaENmK2wya1pkcjJFSkY0d2FB?=
- =?utf-8?B?WHAwSm1GeEJlVHB3K05SMEpqblRDUmYxSnF0MW5pWmRxcitWd0NpOGJMenc3?=
- =?utf-8?B?UnRDWDdUZElDcUF6cUpUTjlUNVcrVW12dUhOVzZzVThIdjl2VGRIaitranZn?=
- =?utf-8?B?cmpqT1hOaExlZ2RhaFZzRVlIbWJwMHdiVGhFa1cxRlpRU011dURLNXg4SEtV?=
- =?utf-8?B?ZW1jMlRhakRpcmpjay9lOFp2YzE5eSthdS80WDFrZXlMYUhPOE1JbXhNQUxT?=
- =?utf-8?B?R2FoZVJQbXVIbllqUmpxL0FneWxvZ005WnFWWkVQS0RzTW1KMmxsemJQNWJM?=
- =?utf-8?B?eXRLZ0xXZE1Icmg0ZGtMbnpDVkFRbnpYWkNyMUZObWZSYVlIaG5jN3kwcFU3?=
- =?utf-8?B?YnBwakdIaHFJOWJ2RHNvQktSRHJJWkNxYmJRQVJoNzkrMDFYcWRqdDlVT3Q4?=
- =?utf-8?B?RCtzaFVUT2hvcFFtK3h5eWpUVlhVTzh1bzJYSWV5UVRyU2ZubmprS204SWVQ?=
- =?utf-8?B?RDdHRXNmbWJENmpsQ3o4ck9NQ0ZGZDIvenhYR1gwRURwZUpPbkR0eEM1a2lJ?=
- =?utf-8?B?UHc4MXR1eDQ4S0ltT092Mnp0WUp4d3hKaGNlbVZOOExYQ1RDRDk4WkN6Z0dP?=
- =?utf-8?B?dmc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6a7e5376-a2ee-4b7e-6674-08dde6479c73
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Aug 2025 15:29:00.1062
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6HmIzT0AKKkL3tcvbiRUry4wCt5mMs/N2F68/xHKEAFNLCiWvOnOvncMWn0QADVtI3GypZDTFiCmA1B0MMto3B5y8TgagR+2phZJOCgN1zA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR11MB6159
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 28 Aug 2025 08:38:42 +0800
-
-> On Wed, Aug 27, 2025 at 10:33 PM Alexander Lobakin
-> <aleksander.lobakin@intel.com> wrote:
->>
->> From: Jason Xing <kerneljasonxing@gmail.com>
->> Date: Mon, 25 Aug 2025 21:53:38 +0800
->>
->>> From: Jason Xing <kernelxing@tencent.com>
->>>
->>> Support allocating and building skbs in batch.
->>
->> [...]
->>
->>> +     base_len = max(NET_SKB_PAD, L1_CACHE_ALIGN(dev->needed_headroom));
->>> +     if (!(dev->priv_flags & IFF_TX_SKB_NO_LINEAR))
->>> +             base_len += dev->needed_tailroom;
->>> +
->>> +     if (xs->skb_count >= nb_pkts)
->>> +             goto build;
->>> +
->>> +     if (xs->skb) {
->>> +             i = 1;
->>> +             xs->skb_count++;
->>> +     }
->>> +
->>> +     xs->skb_count += kmem_cache_alloc_bulk(net_hotdata.skbuff_cache,
->>> +                                            gfp_mask, nb_pkts - xs->skb_count,
->>> +                                            (void **)&skbs[xs->skb_count]);
->>
->> Have you tried napi_skb_cache_get_bulk()? Depending on the workload, it
->> may give better perf numbers.
+Xin Zhao wrote:
+> On Thu, 2025-08-28 at 5:53 +0800, Willem wrote:
 > 
-> Sure, my initial try is using this interface. But later I want to see
-> a standalone cache belonging to xsk. The whole xsk_alloc_batch_skb
-> function I added is quite similar to napi_skb_cache_get_bulk(), to
-> some extent.
+> > > Changes in v8:
+> > > - Delete delete_blk_timer field, as suggested by Willem de Bruijn,
+> > >   hrtimer_cancel will check and wait until the timer callback return and ensure
+> > >   enter enter callback again;
+> > > - Simplify the logic related to setting timeout, as suggestd by Willem de Bruijn.
+> > >   Currently timer callback just restarts itself unconditionally, so delete the
+> > >  'out:' label, do not forward hrtimer in prb_open_block, call hrtimer_forward_now
+> > >   directly and always return HRTIMER_RESTART. The only special case is when
+> > >   prb_open_block is called from tpacket_rcv. That would set the timeout further
+> > >   into the future than the already queued timer. An earlier timeout is not
+> > >   problematic. No need to add complexity to avoid that.
+> > 
+> > This simplifies the timer logic tremendously. I like this direction a lot.
 > 
-> And if using napi_xxx(), we need a lock to avoid the race between this
-> context and softirq context on the same core.
-
-Are you saying this particular function is not run in the softirq
-context? I thought all Tx is done in BH.
-If it's not BH, then ignore my suggestion -- napi_skb_cache_get_bulk()
-requires BH, that's true.
-
+> Thanks. :)
 > 
-> Thanks,
-> Jason
+> > 
+> > >  static void prb_setup_retire_blk_timer(struct packet_sock *po)
+> > > @@ -603,9 +592,10 @@ static void prb_setup_retire_blk_timer(struct packet_sock *po)
+> > >  	struct tpacket_kbdq_core *pkc;
+> > > 
+> > >  	pkc = GET_PBDQC_FROM_RB(&po->rx_ring);
+> > > -	timer_setup(&pkc->retire_blk_timer, prb_retire_rx_blk_timer_expired,
+> > > -		    0);
+> > > -	pkc->retire_blk_timer.expires = jiffies;
+> > > +	hrtimer_setup(&pkc->retire_blk_timer, prb_retire_rx_blk_timer_expired,
+> > > +		      CLOCK_MONOTONIC, HRTIMER_MODE_REL_SOFT);
+> > > +	hrtimer_start(&pkc->retire_blk_timer, pkc->interval_ktime,
+> > > +		      HRTIMER_MODE_REL_SOFT);
+> > 
+> > Since this is only called from init_prb_bdqc, we can further remove
+> > this whole function and move the two hrtimer calls to the parent.
+> 
+> Okay, I will move hrtimer_setup and hrtimer_start into init_prb_bdqc in PATCH v9.
+> 
+> I do not move the prb_shutdown_retire_blk_timer into packet_set_ring either, because
+> in packet_set_ring, there is no existing pointer for tpacket_kbdq_core. If move the
+> logic of prb_shutdown_retire_blk_timer into packet_set_ring, we need to add the
+> tpacket_kbdq_core pointer conversion logic in packet_set_ring, I think it is not
+> necessary.
 
-Thanks,
-Olek
+Agreed.
+> 
+> > >  }
+> > > 
+> > >  static int prb_calc_retire_blk_tmo(struct packet_sock *po,
+> > > @@ -672,11 +662,10 @@ static void init_prb_bdqc(struct packet_sock *po,
+> > >  	p1->last_kactive_blk_num = 0;
+> > >  	po->stats.stats3.tp_freeze_q_cnt = 0;
+> > >  	if (req_u->req3.tp_retire_blk_tov)
+> > > -		p1->retire_blk_tov = req_u->req3.tp_retire_blk_tov;
+> > > +		p1->interval_ktime = ms_to_ktime(req_u->req3.tp_retire_blk_tov);
+> > >  	else
+> > > -		p1->retire_blk_tov = prb_calc_retire_blk_tmo(po,
+> > > -						req_u->req3.tp_block_size);
+> > > -	p1->tov_in_jiffies = msecs_to_jiffies(p1->retire_blk_tov);
+> > > +		p1->interval_ktime = ms_to_ktime(prb_calc_retire_blk_tmo(po,
+> > > +						req_u->req3.tp_block_size));
+> > >  	p1->blk_sizeof_priv = req_u->req3.tp_sizeof_priv;
+> > >  	rwlock_init(&p1->blk_fill_in_prog_lock);
+> > > 
+> > > @@ -686,16 +675,6 @@ static void init_prb_bdqc(struct packet_sock *po,
+> > >  	prb_open_block(p1, pbd);
+> > >  }
+> > > 
+> > > -/*  Do NOT update the last_blk_num first.
+> > > - *  Assumes sk_buff_head lock is held.
+> > > - */
+> > > -static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core *pkc)
+> > > -{
+> > > -	mod_timer(&pkc->retire_blk_timer,
+> > > -			jiffies + pkc->tov_in_jiffies);
+> > > -	pkc->last_kactive_blk_num = pkc->kactive_blk_num;
+> > 
+> > last_kactive_blk_num is now only updated on prb_open_block. It still
+> > needs to be updated on each timer callback? To see whether the active
+> > block did not change since the last callback.
+> 
+> Since prb_open_block is executed once during the initialization, after initialization,
+> both last_kactive_blk_num and kactive_blk_num have the same value, which is 0. After
+> initialization, if the value of kactive_blk_num remains unchanged, it is meaningless
+> to assign the value of kactive_blk_num to last_kactive_blk_num. I searched through
+> all the places in the code that can modify kactive_blk_num, and found that there is
+> only one place, which is in prb_close_block. This means that after executing
+> prb_close_block, we need to update last_kactive_blk_num at the corresponding places
+> where it should be updated. Since I did not modify this logic under the tpacket_rcv
+> scenario, I only need to check the logic in the hrtimer callback.
+> 
+> Upon inspection, I did find an issue. When tpacket_rcv calls __packet_lookup_frame_in_block,
+> it subsequently calls prb_retire_current_block, which in turn calls prb_close_block,
+> resulting in an update to kactive_blk_num. After executing prb_retire_current_block,
+> function __packet_lookup_frame_in_block calls prb_dispatch_next_block, it may not
+> execute prb_open_block. If prb_open_block is not executed, this will lead to an
+> inconsistency between last_kactive_blk_num and kactive_blk_num. At this point, the
+> hrtimer callback will check whether pkc->last_kactive_blk_num == pkc->kactive_blk_num,
+> which will evaluate to false, thus causing the current logic to differ from the original
+> logic. However, at this time, it is still necessary to update last_kactive_blk_num.
+> 
+> On the other hand, I also carefully checked the original implementation of
+> prb_retire_rx_blk_timer_expired and found that in the original hrtimer callback,
+> last_kactive_blk_num is updated in all cases. Therefore, I need to perform this update
+> before exiting the sk_receive_queue lock.
+> 
+> In addition, in PATCH v9, I will also remove the refresh_timer label and change the only
+> instance where goto is used, to an if-else implementation, so that the 'refresh_timer:'
+> label is no longer needed.
+> 
+> The new implementation of prb_retire_rx_blk_timer_expired:
+> 
+> static enum hrtimer_restart prb_retire_rx_blk_timer_expired(struct hrtimer *t)
+> {
+> 	struct packet_sock *po =
+> 		timer_container_of(po, t, rx_ring.prb_bdqc.retire_blk_timer);
+> 	struct tpacket_kbdq_core *pkc = GET_PBDQC_FROM_RB(&po->rx_ring);
+> 	unsigned int frozen;
+> 	struct tpacket_block_desc *pbd;
+> 
+> 	spin_lock(&po->sk.sk_receive_queue.lock);
+> 
+> 	frozen = prb_queue_frozen(pkc);
+> 	pbd = GET_CURR_PBLOCK_DESC_FROM_CORE(pkc);
+> 
+> 	/* We only need to plug the race when the block is partially filled.
+> 	 * tpacket_rcv:
+> 	 *		lock(); increment BLOCK_NUM_PKTS; unlock()
+> 	 *		copy_bits() is in progress ...
+> 	 *		timer fires on other cpu:
+> 	 *		we can't retire the current block because copy_bits
+> 	 *		is in progress.
+> 	 *
+> 	 */
+> 	if (BLOCK_NUM_PKTS(pbd)) {
+> 		/* Waiting for skb_copy_bits to finish... */
+> 		write_lock(&pkc->blk_fill_in_prog_lock);
+> 		write_unlock(&pkc->blk_fill_in_prog_lock);
+> 	}
+> 
+> 	if (pkc->last_kactive_blk_num == pkc->kactive_blk_num) {
+> 		if (!frozen) {
+> 			if (BLOCK_NUM_PKTS(pbd)) {
+> 				/* Not an empty block. Need retire the block. */
+> 				prb_retire_current_block(pkc, po, TP_STATUS_BLK_TMO);
+> 				prb_dispatch_next_block(pkc, po);
+> 			}
+> 		} else {
+> 			/* Case 1. Queue was frozen because user-space was
+> 			 *	   lagging behind.
+> 			 */
+> 			if (!prb_curr_blk_in_use(pbd)) {
+> 			       /* Case 2. queue was frozen,user-space caught up,
+> 				* now the link went idle && the timer fired.
+> 				* We don't have a block to close.So we open this
+> 				* block and restart the timer.
+> 				* opening a block thaws the queue,restarts timer
+> 				* Thawing/timer-refresh is a side effect.
+> 				*/
+> 				prb_open_block(pkc, pbd);
+> 			}
+> 		}
+> 	}
+> 
+> 	pkc->last_kactive_blk_num = pkc->kactive_blk_num;
+> 	hrtimer_forward_now(&pkc->retire_blk_timer, pkc->interval_ktime);
+> 	spin_unlock(&po->sk.sk_receive_queue.lock);
+> 	return HRTIMER_RESTART;
+> }
+
+Ack.
 
