@@ -1,92 +1,119 @@
-Return-Path: <netdev+bounces-217522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84AC1B38FA0
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 02:14:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 878D7B38FA7
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 02:15:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2EE71B2323D
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 00:14:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EB98460632
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 00:15:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1312F18E3F;
-	Thu, 28 Aug 2025 00:14:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D8CC2E63C;
+	Thu, 28 Aug 2025 00:15:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hJvFvBW5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OMlbIePx"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50F2623CB
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 00:14:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC1330CDA0
+	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 00:15:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756340058; cv=none; b=SrMqGFN1Jki9Hm9lnVEqo4kwVqbfhqIPFV5XVhismBZKQhccwtixPFiCdbLg7JD76Jv6WHE+XyFj0VWKqLzQ1lYHZcUJUKjGxo6bJJJ2CGr5QqXXdf9eQbyg7//ls4+j8wXUC55DRUQoBvBslD1fnM7ZVP7imWuyFOqik+2Mp3U=
+	t=1756340144; cv=none; b=Pkh5XtvRYPfGeTgrtrKhSb12+rF/TU9s7y4uj9IkM2kE92sLyMqN7Sp8huwKl1nALKsHeockfWcdOc1CIRvCH+7HiGgPiIO0UJox2lnbIf3RheoPT9OyYBtbknFo17oly0uKTQvblg+j3KXGWzQtEOTBOZuQS0TNexMUocSrJNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756340058; c=relaxed/simple;
-	bh=wwxJdyzi/OPxE3jLAJgSAI7KEudj/m+iNjD472rVvLA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cd4w2zvQk4sbH+KmBmWIuUCjhx5r3X1L9yw2l8h2WgJ2ad9nmQq02Vw+s7ozxsjh/EY3xvGbBez/cE4LBBFccAEq/vhAmTSa9WT0BGk3FHFuNVq9KVsMemXlwjWtD/E5Qwmqcq1JRmjncZQpb5O0t46mXbUthSOc2p61srV5jbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hJvFvBW5; arc=none smtp.client-ip=95.215.58.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <ab07a893-d27d-447e-931a-6014f55132d2@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1756340044;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1Nioa5Xk16+HQdcRt9MGwBFxVkEF38M/TDMpMffC87Q=;
-	b=hJvFvBW55g5b6OCq3J2rTOLvZVHKbP1Vx7g8GPR53S3wuLoPiwEig8mw+nNlGNm6LQgG7D
-	dy/WLXmMFERNduUHu2OdXRi0BFlGbWZyX9dbJOjNcbLrLj7A1joH1LLJplEqv7hY9K8FMu
-	leEnGshUT0zN0MJ60KPFgBiBdRQNre0=
-Date: Wed, 27 Aug 2025 17:13:57 -0700
+	s=arc-20240116; t=1756340144; c=relaxed/simple;
+	bh=X15jxw1bjDxbXh3rtpDUG6dcAg8RmRvouUgXO1Lx1nc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=seu/nt4DBRvGnpbf6xztRtpXZsxbFvacog2CvdwZVxJB1Ck+98nFz3iUST0h/2OOi0czzy3LhVWhz9nKg8MZoUk44+hT5p3QToqSZxvB6DSmOaWdCcyv4PNbI11ltw/Wt3dqLJdjKJY+8daYFhyc8E9XMv6qiHunDG9IaJWMfMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OMlbIePx; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756340142; x=1787876142;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=X15jxw1bjDxbXh3rtpDUG6dcAg8RmRvouUgXO1Lx1nc=;
+  b=OMlbIePx0ytDAHe/PdZqJNfCYZVVcA5DHV6evliF5287JJ1/zmUD7rvk
+   PLT3gCKozNJA89Fq5YxrerFLok8SvgA47UczneWC3zodgngrEWL9Kz56P
+   cV2G8Vus+aTys+z03nZI/yjJeev71n3+weluOXMG7lntu14QmMaxLfSho
+   Hm7aOTAGmBYxvXRHarh/SFVtQg0k6XCGu9fvd0AtV7aT4zK3ub5Ep/jde
+   zfv7VWVuOCCDseA+/ebjAztaFp4aczeAXYB8vFeiI+yWwNFNdf6AajOAO
+   HIOxPvVK2iFBIDNthiAHAUMXsdnmo2nnqBaW/mANe1zmJh4vREXwG25un
+   g==;
+X-CSE-ConnectionGUID: s0Pq+V4mS7+sW7hZ0ArCSQ==
+X-CSE-MsgGUID: MlO12tU8RTuDqSmCEwiBRg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="58666236"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="58666236"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2025 17:15:42 -0700
+X-CSE-ConnectionGUID: iXetU8geRCSmxvhjry4N3g==
+X-CSE-MsgGUID: muBJXXgoTNaRGb7JiqWu9A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,217,1751266800"; 
+   d="scan'208";a="170360066"
+Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
+  by fmviesa008.fm.intel.com with ESMTP; 27 Aug 2025 17:15:39 -0700
+Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1urQIi-000TIN-2k;
+	Thu, 28 Aug 2025 00:15:36 +0000
+Date: Thu, 28 Aug 2025 08:15:14 +0800
+From: kernel test robot <lkp@intel.com>
+To: Daniel Jurgens <danielj@nvidia.com>, netdev@vger.kernel.org,
+	mst@redhat.com, jasowang@redhat.com, alex.williamson@redhat.com,
+	virtualization@lists.linux.dev, pabeni@redhat.com
+Cc: oe-kbuild-all@lists.linux.dev, parav@nvidia.com, shshitrit@nvidia.com,
+	yohadt@nvidia.com, Daniel Jurgens <danielj@nvidia.com>
+Subject: Re: [PATCH net-next 04/11] virtio_net: Query and set flow filter caps
+Message-ID: <202508280749.JlXoz9Mz-lkp@intel.com>
+References: <20250827183852.2471-5-danielj@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3 bpf-next/net 5/5] selftest: bpf: Add test for
- SK_BPF_MEMCG_SOCK_ISOLATED.
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Johannes Weiner <hannes@cmpxchg.org>,
- Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>,
- Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima
- <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20250826183940.3310118-1-kuniyu@google.com>
- <20250826183940.3310118-6-kuniyu@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <20250826183940.3310118-6-kuniyu@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250827183852.2471-5-danielj@nvidia.com>
 
-On 8/26/25 11:38 AM, Kuniyuki Iwashima wrote:
-> The test does the following for IPv4/IPv6 x TCP/UDP sockets
-> with/without BPF prog.
-> 
->    1. Create socket pairs
->    2. Send a bunch of data that require more than 1000 pages
->    3. Read memory_allocated from the 3rd column in /proc/net/protocols
->    4. Check if unread data is charged to memory_allocated
-> 
-> If BPF prog is attached, memory_allocated should not be changed,
-> but we allow a small error (up to 10 pages) in case the test is ran
-> concurrently with other tests using TCP/UDP sockets.
+Hi Daniel,
 
-hmm... there is a "./test_progs -j" that multiple tests can run in parallel. 
-Will it be reliable enough or it needs the "serial_" prefix in the test 
-function? Beside, the test took ~20s in my qemu. Is it feasible to shorten the test?
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Jurgens/virtio-pci-Expose-generic-device-capability-operations/20250828-024128
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250827183852.2471-5-danielj%40nvidia.com
+patch subject: [PATCH net-next 04/11] virtio_net: Query and set flow filter caps
+config: i386-buildonly-randconfig-002-20250828 (https://download.01.org/0day-ci/archive/20250828/202508280749.JlXoz9Mz-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250828/202508280749.JlXoz9Mz-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202508280749.JlXoz9Mz-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> error: include/uapi/linux/virtio_net_ff.h: missing "WITH Linux-syscall-note" for SPDX-License-Identifier
+   make[3]: *** [scripts/Makefile.headersinst:63: usr/include/linux/virtio_net_ff.h] Error 1 shuffle=2238678394
+   make[3]: Target '__headers' not remade because of errors.
+   make[2]: *** [Makefile:1380: headers] Error 2 shuffle=2238678394
+   make[2]: Target 'prepare' not remade because of errors.
+   make[1]: *** [Makefile:248: __sub-make] Error 2 shuffle=2238678394
+   make[1]: Target 'prepare' not remade because of errors.
+   make: *** [Makefile:248: __sub-make] Error 2 shuffle=2238678394
+   make: Target 'prepare' not remade because of errors.
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
