@@ -1,75 +1,78 @@
-Return-Path: <netdev+bounces-217562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E07CDB39105
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 03:20:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04A5DB39107
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 03:20:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6CD81B21C96
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 01:20:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3C264614EF
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 01:20:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1F5E1E51F6;
-	Thu, 28 Aug 2025 01:20:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE2F51E832E;
+	Thu, 28 Aug 2025 01:20:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kNHyIatq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lriOJ2gn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E23FE523A;
-	Thu, 28 Aug 2025 01:20:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5063F20A5F5;
+	Thu, 28 Aug 2025 01:20:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756344034; cv=none; b=PdAAxjvhvkIpz2Afwqg+CfQTGzCkPNZbesztUSWEd597AtQgoKUCQXGvS5/CV8vss2+xWjIr/l+YIoCRTahYsReHCEm1UNYPqzKV9YEtHudnyVS/fy8BlPw5f97laJ2/846PufVZX06pBWVA6tvokO7TIPI8BxCRg60WapnyPdY=
+	t=1756344040; cv=none; b=KP59VCZ/joe988wipSRMe6mpCbbyecKEWH9Om6giXUpNZJwUcsaLqBmDUG9MF/wo9UBams6H7qdNYVA6npAiXuJi0DEc3lP5nhHi8oh8/iJVRgQdHPOHaknrh9n9f3B4tf0RpbP1pvrhSNhHDaz7Kz//X+yaJO7ERBirR7/f2YE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756344034; c=relaxed/simple;
-	bh=KVQ9jhSuIGwlWzl1T2A5LzckWKt6aeTzj7RhzSOBQzk=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=dpod4OiUvqDqc6SsDd4cMZWB6gs7lBVrWUYPgCDuDtTKXG8kDJs3ybsjZV6C3b2VWIyJ8j7Oxe9QllFpcESRqESclhCqvMXm561QbFCoE7VtFBktXT6gH39wBQakBfr9JR4czq3ItL7riEIgwpvz2NlFW4iNblOKFz6PICo+QJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kNHyIatq; arc=none smtp.client-ip=209.85.210.178
+	s=arc-20240116; t=1756344040; c=relaxed/simple;
+	bh=vqkPcdJQod0m5BVWyGwAjDrraADDRXWEMm73dgX+FNc=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=KYw8t2xYr+frA6uB1IirE85UAOukrwuuHDNSrNnEumogdyoLcLkkogqE65pQyt2FUbv2Q6dsMR7orxrOvaABE4mTafa4RQhaZIVLtIO6O3No/+4W84Lgn9UM0a+KeaNHk0X4Iu1XuBhIv8XX6E7St+fdfB76wrj6o5wLmYvVH2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lriOJ2gn; arc=none smtp.client-ip=209.85.216.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7720f23123dso442419b3a.2;
-        Wed, 27 Aug 2025 18:20:32 -0700 (PDT)
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-32326e5f058so380446a91.3;
+        Wed, 27 Aug 2025 18:20:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756344032; x=1756948832; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bD6RGeZjK9NgE8HepDzM77xqMEuOk7DRuN9l+Ring9k=;
-        b=kNHyIatqrHY4yrw5pJNAc7YcaKl2W9nBKI0CK08q8gxAt0L2eiogz1RTzMl1FfAqsu
-         DQ+sbHzrLTQYbhHkw816UyqexLfXasN59cPxEsPSKfRjse+BklWh/7K37dtZ53bspM1s
-         3Ve6I7coUR6lfGaTd6sPTklW0dmbcjFF7z8/1H+dj19rPc0lK5cPmJV0a15hfsG8lBXC
-         Efa+BtQ+TbkpRHptb/LdSS6zge4nlsTWyUAZdr3X6Gfr5f6hJZCW1+AU7VoVlkzhJP5l
-         Axia730/4YVdKSypnr06tyA8epQGw1R8ZlYSsX/rk0om4rJ8gdlEbf8s4bxdjDf/nWan
-         gp8g==
+        d=gmail.com; s=20230601; t=1756344039; x=1756948839; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xaeoFshHMtgvD9F87e7oNCFPK7Xi319mzcoG27oQgjo=;
+        b=lriOJ2gn3YS6d9rJfDb30f/GNSyhEw6713fl3QouL3Q5plsdttg7aYgCaBB8xM4CqS
+         NdVVUXNttcjX+1VrIjGwBZNTsrd85vyQEC96b8b61xRpTNfB4qHpBgx+D4z3x5kqplx3
+         XLxMJo/P0qqGsrTBT7f9sX4ZfW2MxdZnF7yw+BpQOF55lgWO/IkuYyFoCDAx00rmIHac
+         Y5DfCclKvkIkTZWkhRD7nYdeT0VbhvLjQddV3Y/0N1XxC/xO/umwZBMxYQbl4DIgtHKE
+         jDw2xNpBfFW3uAqZNlbNOEATTJUnXORDDmOMyePAVIH1Es89eounBjUDLOgn2AcwHD3x
+         ZHgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756344032; x=1756948832;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bD6RGeZjK9NgE8HepDzM77xqMEuOk7DRuN9l+Ring9k=;
-        b=CY7CdSWGK4tBGHccxfaF6nGTTohbkXzr9cpDLjkLuCa5Nj7ATmaf5W6XrlOkQMAkd+
-         RDy6eFeuMT9r7Ulaml3flNgulJdGzfINL9tzWzb1+f7DhD9QpTUVBeXPvJsyupSt1MA6
-         7D8SI7/O1I2WX050cfnG6kL2il6MqXbB5ApKVROIK6aaOIRLmkm1eZJQ5R2a4ZZ8Eehv
-         65wbxcd+xh3DnfLxzNdaaRVhadWBvumQGxwJGzfernZFLWL74s8GfMK2nHjpz5OZp+l2
-         p51hSzGC8gHVepo0f66Y7SJLISnuWfMo+D4u+a1ycsRLrnJijUoeepoG58mETBxy648a
-         tiYA==
-X-Forwarded-Encrypted: i=1; AJvYcCVDiauCr4PUu9vfqbSUXuAglGMqb3XOBgL2lUfo58E1Sy+uI3MDTQUGyfPE1vLHIbHtvWJjea0Xn6y3XIE=@vger.kernel.org, AJvYcCVseMVDrSI42IKEVMRar7pjTC4QQul5BUj1rubZ7z3R8vVaXz90efFlbi95wHjqwu6zV0Qdn+tE@vger.kernel.org
-X-Gm-Message-State: AOJu0YyadfzGWNjZCtQ0BKqenhfW1NOleUIJf+gQeRSIipibj6zLMeEB
-	7b2rctQP4thcckhf75124+iCeO3czptzG/wXvDdqbeAUMdpCL2w1uuZLfUl3cxWcGk0=
-X-Gm-Gg: ASbGncvp68dzsRUvwiRF7jPcN2Q1uKL0Y1YahKkfiyE8B1DPzmXMm4RPqaZVaA7tPIi
-	b6jSXa2GPQzNR6TqPbed6QkTOZhQTPR9k+V5lfVNFM/mScQko58x55ibfIBf96cMvip/Phv+0yO
-	I8DP+mE/lP5l65BNekEk9yTF6IRoGCVHgVmtwjmKN2xCMSiRXMXIG4BSp/fAJQ8aoQep6TlI4Sd
-	7UNbliCtVMsiU7BHW6BwgVOUYQrpZbURMYgFofD8YuxuCeLwZx4KJ85wpr2kl+viQZBJJWfzIBu
-	Vlk5TOOQ1T5sINo1Z2juGfr8JEESWf8pGC/PFg4cYkroZ24b1g0pHq9RDrXg/bM2Cabyb1jXVoN
-	OSwFjCFX51zLpMCE=
-X-Google-Smtp-Source: AGHT+IGHbEbdc80JHLt22SbiQ2XiiJXYxLgzqh5cDMa3fJsrwZ7G+RbV29Dpo04JmDsWXoL4XspXVw==
-X-Received: by 2002:a05:6a20:a106:b0:21a:eabb:ab93 with SMTP id adf61e73a8af0-24340bce27dmr32170801637.6.1756344032030;
-        Wed, 27 Aug 2025 18:20:32 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1756344039; x=1756948839;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xaeoFshHMtgvD9F87e7oNCFPK7Xi319mzcoG27oQgjo=;
+        b=frv6Y1rRKubZGcM2sq5ZfUZpjB6vZAAIZrdZKaATulpfIkP5sXFHDCLdCE8uhJjETR
+         1UeUq/YA25+NnZHyNDBNhHbo8QwP0O+L7azAFGTzZoF4qMBSaPO2bFs/zLknNAiLI/3Q
+         8k2dMT1Gym/C1dCkF5k3fD6IDu2RKsdp32nUNJcuHGjPK+tBYy+g66luHrTvy4mys/2/
+         UqeyaHuON8PgXb3auLjltYEGcC37k5LPkHjQo79YpxkMNlHk+Et9697AMLk9AFER6F/5
+         W8g7qiBaLdy6TkEHl1X4IZYxK4zerl6gL5k11/w5lCnDWXoCQUrqzdQI9eu1DBpxguKk
+         VdBw==
+X-Forwarded-Encrypted: i=1; AJvYcCVMC8gTAGeHzXkKqnlXEd/sjf+bjxJhXuiyQx4i73INz6RgKiHEvKNfKUt+agA703fKUCLdQ5yvzexbxtg=@vger.kernel.org, AJvYcCXNK49Kzj454WMfbksz5brhO3rLKv3uNQKBCnJDfbxRRielL8RYp3INV/wGm9SIUyQSwmDSGh+S@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAqTreQpq6tueXl9RbtnlN7rZFlbeMLjRmHx3LjoSawyy2CJwm
+	G1P9oK8/M6/2tomiU4ZkfVhDQn4hrj5yaK76FZ+e9wdRlqo/aucalIoA
+X-Gm-Gg: ASbGncvQPhwZkJGCudxlTECa2Y8Km9Ponh+aXx0CN6ozrS6TVdfg+s5BxCYATleDDS8
+	zvaUswZs8buvhBOpOB8KBKJPa1pTKqOm4nVBugzcIgPbFmcFvsqtNok+bQsCmsVCYYeMZPXwEqQ
+	6pF2FitAbPbGHzlRmfMkXEVlXxyFl3E3B87c/fsn6wsvsi+MhjO/GXMaY0EPhnghHbbsRj2X3VT
+	QL3M7gb/xb5hzXuMffXu5qrWPPo0NNKXUpvgxY9/w5Y9+15BXgKJdOjPmeB1SHi3yOTwE66a1rt
+	pgOeuCJHABKiB61v01d2zvorKca7NY2dj6d7wrYLTaNdS1K1rOWU+TeHiEP0Blo27O+J9aTaLTY
+	9C6wi/T27IU9Q6E1GpZKthPSpNw==
+X-Google-Smtp-Source: AGHT+IExVbmlhW+BfudU/4v29yLAXek2Eo2isnF5716D6BIHSp8I8nYhhwEadqaS4T4vkpWQ6KvdBg==
+X-Received: by 2002:a17:90b:1d4f:b0:324:eb2d:7537 with SMTP id 98e67ed59e1d1-32515ea1b2dmr28118613a91.20.1756344038550;
+        Wed, 27 Aug 2025 18:20:38 -0700 (PDT)
 Received: from gmail.com ([223.166.86.185])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b4a8b7b301csm9122626a12.35.2025.08.27.18.20.25
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b4a8b7b301csm9122626a12.35.2025.08.27.18.20.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Aug 2025 18:20:31 -0700 (PDT)
+        Wed, 27 Aug 2025 18:20:38 -0700 (PDT)
 From: Qingfang Deng <dqfext@gmail.com>
 To: Michal Ostrowski <mostrows@earthlink.net>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -79,10 +82,12 @@ To: Michal Ostrowski <mostrows@earthlink.net>,
 	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 1/2] pppoe: remove rwlock usage
-Date: Thu, 28 Aug 2025 09:20:16 +0800
-Message-ID: <20250828012018.15922-1-dqfext@gmail.com>
+Subject: [PATCH net-next v3 2/2] pppoe: drop sock reference counting on fast path
+Date: Thu, 28 Aug 2025 09:20:17 +0800
+Message-ID: <20250828012018.15922-2-dqfext@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20250828012018.15922-1-dqfext@gmail.com>
+References: <20250828012018.15922-1-dqfext@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,331 +96,131 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Like ppp_generic.c, convert the PPPoE socket hash table to use RCU for
-lookups and a spinlock for updates. This removes rwlock usage and allows
-lockless readers on the fast path.
+Now that PPPoE sockets are freed via RCU (SOCK_RCU_FREE), it is no longer
+necessary to take a reference count when looking up sockets on the receive
+path. Readers are protected by RCU, so the socket memory remains valid
+until after a grace period.
 
-- Mark hash table and list pointers as __rcu.
-- Use spin_lock() to protect writers.
-- Readers use rcu_dereference() under rcu_read_lock(). All known callers
-  of get_item() already hold the RCU read lock, so no additional locking
-  is needed.
-- get_item() now uses refcount_inc_not_zero() instead of sock_hold() to
-  safely take a reference. This prevents crashes if a socket is already
-  in the process of being freed (sk_refcnt == 0).
-- Set SOCK_RCU_FREE to defer socket freeing until after an RCU grace
-  period.
-- Move skb_queue_purge() into sk_destruct callback to ensure purge
-  happens after an RCU grace period.
+Convert fast-path lookups to avoid refcounting:
+ - Replace get_item() and sk_receive_skb() in pppoe_rcv() with
+   __get_item() and __sk_receive_skb().
+ - Rework get_item_by_addr() into __get_item_by_addr() (no refcount and
+   move RCU lock into pppoe_ioctl)
+ - Remove unnecessary sock_put() calls.
+
+This avoids cacheline bouncing from atomic reference counting and improves
+performance on the receive fast path.
 
 Signed-off-by: Qingfang Deng <dqfext@gmail.com>
 ---
 v3:
- Move skb_queue_purge() into sk_destruct callback.
- Link to v2: https://lore.kernel.org/netdev/20250827023045.25002-1-dqfext@gmail.com/
+ No new changes.
+ Link to v2: https://lore.kernel.org/netdev/20250827023045.25002-2-dqfext@gmail.com/
 v2:
- Use refcount_inc_not_zero() in get_item() to avoid taking a reference of
- a zero refcount socket.
- Link to v1: https://lore.kernel.org/netdev/20250826023346.26046-1-dqfext@gmail.com/
+ let pppoe_ioctl() call __get_item_by_addr() under rcu_read_lock().
+ Link to v1: https://lore.kernel.org/netdev/20250826023346.26046-2-dqfext@gmail.com/
 
- drivers/net/ppp/pppoe.c  | 94 ++++++++++++++++++++++------------------
- include/linux/if_pppox.h |  2 +-
- 2 files changed, 54 insertions(+), 42 deletions(-)
+ drivers/net/ppp/pppoe.c | 35 +++++++++++++----------------------
+ 1 file changed, 13 insertions(+), 22 deletions(-)
 
 diff --git a/drivers/net/ppp/pppoe.c b/drivers/net/ppp/pppoe.c
-index 410effa42ade..54522b26b728 100644
+index 54522b26b728..4ac6afce267b 100644
 --- a/drivers/net/ppp/pppoe.c
 +++ b/drivers/net/ppp/pppoe.c
-@@ -100,8 +100,8 @@ struct pppoe_net {
- 	 * as well, moreover in case of SMP less locking
- 	 * controversy here
- 	 */
--	struct pppox_sock *hash_table[PPPOE_HASH_SIZE];
--	rwlock_t hash_lock;
-+	struct pppox_sock __rcu *hash_table[PPPOE_HASH_SIZE];
-+	spinlock_t hash_lock;
- };
- 
- /*
-@@ -162,13 +162,13 @@ static struct pppox_sock *__get_item(struct pppoe_net *pn, __be16 sid,
- 	int hash = hash_item(sid, addr);
- 	struct pppox_sock *ret;
- 
--	ret = pn->hash_table[hash];
-+	ret = rcu_dereference(pn->hash_table[hash]);
- 	while (ret) {
- 		if (cmp_addr(&ret->pppoe_pa, sid, addr) &&
- 		    ret->pppoe_ifindex == ifindex)
- 			return ret;
- 
--		ret = ret->next;
-+		ret = rcu_dereference(ret->next);
- 	}
- 
- 	return NULL;
-@@ -177,19 +177,20 @@ static struct pppox_sock *__get_item(struct pppoe_net *pn, __be16 sid,
- static int __set_item(struct pppoe_net *pn, struct pppox_sock *po)
- {
- 	int hash = hash_item(po->pppoe_pa.sid, po->pppoe_pa.remote);
--	struct pppox_sock *ret;
-+	struct pppox_sock *ret, *first;
- 
--	ret = pn->hash_table[hash];
-+	first = rcu_dereference_protected(pn->hash_table[hash], lockdep_is_held(&pn->hash_lock));
-+	ret = first;
- 	while (ret) {
- 		if (cmp_2_addr(&ret->pppoe_pa, &po->pppoe_pa) &&
- 		    ret->pppoe_ifindex == po->pppoe_ifindex)
- 			return -EALREADY;
- 
--		ret = ret->next;
-+		ret = rcu_dereference_protected(ret->next, lockdep_is_held(&pn->hash_lock));
- 	}
- 
--	po->next = pn->hash_table[hash];
--	pn->hash_table[hash] = po;
-+	RCU_INIT_POINTER(po->next, first);
-+	rcu_assign_pointer(pn->hash_table[hash], po);
- 
- 	return 0;
- }
-@@ -198,20 +199,24 @@ static void __delete_item(struct pppoe_net *pn, __be16 sid,
- 					char *addr, int ifindex)
- {
- 	int hash = hash_item(sid, addr);
--	struct pppox_sock *ret, **src;
-+	struct pppox_sock *ret, __rcu **src;
- 
--	ret = pn->hash_table[hash];
-+	ret = rcu_dereference_protected(pn->hash_table[hash], lockdep_is_held(&pn->hash_lock));
- 	src = &pn->hash_table[hash];
- 
- 	while (ret) {
- 		if (cmp_addr(&ret->pppoe_pa, sid, addr) &&
- 		    ret->pppoe_ifindex == ifindex) {
--			*src = ret->next;
-+			struct pppox_sock *next;
-+
-+			next = rcu_dereference_protected(ret->next,
-+							 lockdep_is_held(&pn->hash_lock));
-+			rcu_assign_pointer(*src, next);
- 			break;
- 		}
- 
- 		src = &ret->next;
--		ret = ret->next;
-+		ret = rcu_dereference_protected(ret->next, lockdep_is_held(&pn->hash_lock));
- 	}
- }
- 
-@@ -225,11 +230,9 @@ static inline struct pppox_sock *get_item(struct pppoe_net *pn, __be16 sid,
- {
- 	struct pppox_sock *po;
- 
--	read_lock_bh(&pn->hash_lock);
- 	po = __get_item(pn, sid, addr, ifindex);
--	if (po)
--		sock_hold(sk_pppox(po));
--	read_unlock_bh(&pn->hash_lock);
-+	if (po && !refcount_inc_not_zero(&sk_pppox(po)->sk_refcnt))
-+		po = NULL;
- 
+@@ -237,8 +237,8 @@ static inline struct pppox_sock *get_item(struct pppoe_net *pn, __be16 sid,
  	return po;
  }
-@@ -258,9 +261,9 @@ static inline struct pppox_sock *get_item_by_addr(struct net *net,
- static inline void delete_item(struct pppoe_net *pn, __be16 sid,
- 					char *addr, int ifindex)
+ 
+-static inline struct pppox_sock *get_item_by_addr(struct net *net,
+-						struct sockaddr_pppox *sp)
++static inline struct pppox_sock *__get_item_by_addr(struct net *net,
++						    struct sockaddr_pppox *sp)
  {
--	write_lock_bh(&pn->hash_lock);
-+	spin_lock(&pn->hash_lock);
- 	__delete_item(pn, sid, addr, ifindex);
--	write_unlock_bh(&pn->hash_lock);
-+	spin_unlock(&pn->hash_lock);
+ 	struct net_device *dev;
+ 	struct pppoe_net *pn;
+@@ -246,15 +246,13 @@ static inline struct pppox_sock *get_item_by_addr(struct net *net,
+ 
+ 	int ifindex;
+ 
+-	rcu_read_lock();
+ 	dev = dev_get_by_name_rcu(net, sp->sa_addr.pppoe.dev);
+ 	if (dev) {
+ 		ifindex = dev->ifindex;
+ 		pn = pppoe_pernet(net);
+-		pppox_sock = get_item(pn, sp->sa_addr.pppoe.sid,
+-				sp->sa_addr.pppoe.remote, ifindex);
++		pppox_sock = __get_item(pn, sp->sa_addr.pppoe.sid,
++					sp->sa_addr.pppoe.remote, ifindex);
+ 	}
+-	rcu_read_unlock();
+ 	return pppox_sock;
  }
  
- /***************************************************************************
-@@ -276,14 +279,16 @@ static void pppoe_flush_dev(struct net_device *dev)
- 	int i;
+@@ -381,18 +379,16 @@ static int pppoe_rcv_core(struct sock *sk, struct sk_buff *skb)
+ 	if (sk->sk_state & PPPOX_BOUND) {
+ 		ppp_input(&po->chan, skb);
+ 	} else if (sk->sk_state & PPPOX_RELAY) {
+-		relay_po = get_item_by_addr(sock_net(sk),
+-					    &po->pppoe_relay);
++		relay_po = __get_item_by_addr(sock_net(sk),
++					      &po->pppoe_relay);
+ 		if (relay_po == NULL)
+ 			goto abort_kfree;
  
+ 		if ((sk_pppox(relay_po)->sk_state & PPPOX_CONNECTED) == 0)
+-			goto abort_put;
++			goto abort_kfree;
+ 
+ 		if (!__pppoe_xmit(sk_pppox(relay_po), skb))
+-			goto abort_put;
+-
+-		sock_put(sk_pppox(relay_po));
++			goto abort_kfree;
+ 	} else {
+ 		if (sock_queue_rcv_skb(sk, skb))
+ 			goto abort_kfree;
+@@ -400,9 +396,6 @@ static int pppoe_rcv_core(struct sock *sk, struct sk_buff *skb)
+ 
+ 	return NET_RX_SUCCESS;
+ 
+-abort_put:
+-	sock_put(sk_pppox(relay_po));
+-
+ abort_kfree:
+ 	kfree_skb(skb);
+ 	return NET_RX_DROP;
+@@ -447,14 +440,11 @@ static int pppoe_rcv(struct sk_buff *skb, struct net_device *dev,
+ 	ph = pppoe_hdr(skb);
  	pn = pppoe_pernet(dev_net(dev));
--	write_lock_bh(&pn->hash_lock);
-+	spin_lock(&pn->hash_lock);
- 	for (i = 0; i < PPPOE_HASH_SIZE; i++) {
--		struct pppox_sock *po = pn->hash_table[i];
-+		struct pppox_sock *po = rcu_dereference_protected(pn->hash_table[i],
-+								  lockdep_is_held(&pn->hash_lock));
- 		struct sock *sk;
  
- 		while (po) {
- 			while (po && po->pppoe_dev != dev) {
--				po = po->next;
-+				po = rcu_dereference_protected(po->next,
-+							       lockdep_is_held(&pn->hash_lock));
- 			}
+-	/* Note that get_item does a sock_hold(), so sk_pppox(po)
+-	 * is known to be safe.
+-	 */
+-	po = get_item(pn, ph->sid, eth_hdr(skb)->h_source, dev->ifindex);
++	po = __get_item(pn, ph->sid, eth_hdr(skb)->h_source, dev->ifindex);
+ 	if (!po)
+ 		goto drop;
  
- 			if (!po)
-@@ -300,7 +305,7 @@ static void pppoe_flush_dev(struct net_device *dev)
- 			 */
+-	return sk_receive_skb(sk_pppox(po), skb, 0);
++	return __sk_receive_skb(sk_pppox(po), skb, 0, 1, false);
  
- 			sock_hold(sk);
--			write_unlock_bh(&pn->hash_lock);
-+			spin_unlock(&pn->hash_lock);
- 			lock_sock(sk);
+ drop:
+ 	kfree_skb(skb);
+@@ -820,11 +810,12 @@ static int pppoe_ioctl(struct socket *sock, unsigned int cmd,
  
- 			if (po->pppoe_dev == dev &&
-@@ -320,11 +325,12 @@ static void pppoe_flush_dev(struct net_device *dev)
- 			 */
+ 		/* Check that the socket referenced by the address
+ 		   actually exists. */
+-		relay_po = get_item_by_addr(sock_net(sk), &po->pppoe_relay);
++		rcu_read_lock();
++		relay_po = __get_item_by_addr(sock_net(sk), &po->pppoe_relay);
++		rcu_read_unlock();
+ 		if (!relay_po)
+ 			break;
  
- 			BUG_ON(pppoe_pernet(dev_net(dev)) == NULL);
--			write_lock_bh(&pn->hash_lock);
--			po = pn->hash_table[i];
-+			spin_lock(&pn->hash_lock);
-+			po = rcu_dereference_protected(pn->hash_table[i],
-+						       lockdep_is_held(&pn->hash_lock));
- 		}
- 	}
--	write_unlock_bh(&pn->hash_lock);
-+	spin_unlock(&pn->hash_lock);
- }
- 
- static int pppoe_device_event(struct notifier_block *this,
-@@ -528,6 +534,11 @@ static struct proto pppoe_sk_proto __read_mostly = {
- 	.obj_size = sizeof(struct pppox_sock),
- };
- 
-+static void pppoe_destruct(struct sock *sk)
-+{
-+	skb_queue_purge(&sk->sk_receive_queue);
-+}
-+
- /***********************************************************************
-  *
-  * Initialize a new struct sock.
-@@ -542,11 +553,13 @@ static int pppoe_create(struct net *net, struct socket *sock, int kern)
- 		return -ENOMEM;
- 
- 	sock_init_data(sock, sk);
-+	sock_set_flag(sk, SOCK_RCU_FREE);
- 
- 	sock->state	= SS_UNCONNECTED;
- 	sock->ops	= &pppoe_ops;
- 
- 	sk->sk_backlog_rcv	= pppoe_rcv_core;
-+	sk->sk_destruct		= pppoe_destruct;
- 	sk->sk_state		= PPPOX_NONE;
- 	sk->sk_type		= SOCK_STREAM;
- 	sk->sk_family		= PF_PPPOX;
-@@ -599,7 +612,6 @@ static int pppoe_release(struct socket *sock)
- 	sock_orphan(sk);
- 	sock->sk = NULL;
- 
--	skb_queue_purge(&sk->sk_receive_queue);
- 	release_sock(sk);
- 	sock_put(sk);
- 
-@@ -681,9 +693,9 @@ static int pppoe_connect(struct socket *sock, struct sockaddr *uservaddr,
- 		       &sp->sa_addr.pppoe,
- 		       sizeof(struct pppoe_addr));
- 
--		write_lock_bh(&pn->hash_lock);
-+		spin_lock(&pn->hash_lock);
- 		error = __set_item(pn, po);
--		write_unlock_bh(&pn->hash_lock);
-+		spin_unlock(&pn->hash_lock);
- 		if (error < 0)
- 			goto err_put;
- 
-@@ -1052,11 +1064,11 @@ static inline struct pppox_sock *pppoe_get_idx(struct pppoe_net *pn, loff_t pos)
- 	int i;
- 
- 	for (i = 0; i < PPPOE_HASH_SIZE; i++) {
--		po = pn->hash_table[i];
-+		po = rcu_dereference(pn->hash_table[i]);
- 		while (po) {
- 			if (!pos--)
- 				goto out;
--			po = po->next;
-+			po = rcu_dereference(po->next);
- 		}
- 	}
- 
-@@ -1065,19 +1077,19 @@ static inline struct pppox_sock *pppoe_get_idx(struct pppoe_net *pn, loff_t pos)
- }
- 
- static void *pppoe_seq_start(struct seq_file *seq, loff_t *pos)
--	__acquires(pn->hash_lock)
-+	__acquires(RCU)
- {
- 	struct pppoe_net *pn = pppoe_pernet(seq_file_net(seq));
- 	loff_t l = *pos;
- 
--	read_lock_bh(&pn->hash_lock);
-+	rcu_read_lock();
- 	return l ? pppoe_get_idx(pn, --l) : SEQ_START_TOKEN;
- }
- 
- static void *pppoe_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- {
- 	struct pppoe_net *pn = pppoe_pernet(seq_file_net(seq));
--	struct pppox_sock *po;
-+	struct pppox_sock *po, *next;
- 
- 	++*pos;
- 	if (v == SEQ_START_TOKEN) {
-@@ -1085,14 +1097,15 @@ static void *pppoe_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- 		goto out;
- 	}
- 	po = v;
--	if (po->next)
--		po = po->next;
-+	next = rcu_dereference(po->next);
-+	if (next)
-+		po = next;
- 	else {
- 		int hash = hash_item(po->pppoe_pa.sid, po->pppoe_pa.remote);
- 
- 		po = NULL;
- 		while (++hash < PPPOE_HASH_SIZE) {
--			po = pn->hash_table[hash];
-+			po = rcu_dereference(pn->hash_table[hash]);
- 			if (po)
- 				break;
- 		}
-@@ -1103,10 +1116,9 @@ static void *pppoe_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- }
- 
- static void pppoe_seq_stop(struct seq_file *seq, void *v)
--	__releases(pn->hash_lock)
-+	__releases(RCU)
- {
--	struct pppoe_net *pn = pppoe_pernet(seq_file_net(seq));
--	read_unlock_bh(&pn->hash_lock);
-+	rcu_read_unlock();
- }
- 
- static const struct seq_operations pppoe_seq_ops = {
-@@ -1149,7 +1161,7 @@ static __net_init int pppoe_init_net(struct net *net)
- 	struct pppoe_net *pn = pppoe_pernet(net);
- 	struct proc_dir_entry *pde;
- 
--	rwlock_init(&pn->hash_lock);
-+	spin_lock_init(&pn->hash_lock);
- 
- 	pde = proc_create_net("pppoe", 0444, net->proc_net,
- 			&pppoe_seq_ops, sizeof(struct seq_net_private));
-diff --git a/include/linux/if_pppox.h b/include/linux/if_pppox.h
-index ff3beda1312c..db45d6f1c4f4 100644
---- a/include/linux/if_pppox.h
-+++ b/include/linux/if_pppox.h
-@@ -43,7 +43,7 @@ struct pppox_sock {
- 	/* struct sock must be the first member of pppox_sock */
- 	struct sock sk;
- 	struct ppp_channel chan;
--	struct pppox_sock	*next;	  /* for hash table */
-+	struct pppox_sock __rcu	*next;	  /* for hash table */
- 	union {
- 		struct pppoe_opt pppoe;
- 		struct pptp_opt  pptp;
+-		sock_put(sk_pppox(relay_po));
+ 		sk->sk_state |= PPPOX_RELAY;
+ 		err = 0;
+ 		break;
 -- 
 2.43.0
 
