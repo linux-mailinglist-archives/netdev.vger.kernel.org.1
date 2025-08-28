@@ -1,93 +1,87 @@
-Return-Path: <netdev+bounces-217520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87A03B38F96
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 02:07:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E3C5B38F9D
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 02:12:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 477067C1D49
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 00:07:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B4AE686E1C
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 00:12:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F30EFCA4E;
-	Thu, 28 Aug 2025 00:06:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E62E17996;
+	Thu, 28 Aug 2025 00:12:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="v9ZDs7zk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xb7L0Oo6"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E5CB665
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 00:06:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E16512B73;
+	Thu, 28 Aug 2025 00:12:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756339618; cv=none; b=lb8QDsvJFRdo3OIfSzDtRAwHfNk5U/0yms94rAR0tsjdyND/DXy7Y6J+uLVk961AWS8ijGwMaoEm8RuDPspLzPdTWOGDY2WP/fyr+dOJ++ENhaymeoGVrvfLDj2LmeZSAMXdzoJxG+iBFs9ZAlcEO4iICjGbMR7lSNx/TuPdnPU=
+	t=1756339966; cv=none; b=U7tvsXbjAY93AbJn86MfypbxAsgQzUu1aJqfmDx+jKiEyuiRlXrVxtsRP1jdZcIX2xaJzZKepsrC3SjBRs5eouMfxCxRvmN1epDxLbfGH+ewuEkG26oRnwRHD08UU9JA52+pm0GE7vmr3othXjHisF8S1RgFYSRJrjLO6QaxoHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756339618; c=relaxed/simple;
-	bh=/BH+2LaqqrXTlr6Er7h9zOFOcR6chXoGcn1omObe0Zs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fZH+7bYiYUyXAdJ0TQAowsPP0/vwgxYux+NSznLAmcO9EIwo+00/sMR3VRRb/VDS+FFIHjj8NruE+0s5igSebcU6/mempXD0FbAwm8BskZsmLvEYMkajCMIIoycC8s6CK7+ffYi3vVQdY6dwnSrxPA3OnvgmBZ3rmQ4+w/gb2XE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=v9ZDs7zk; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <e1ec7d14-ec50-45a1-b67b-f63ba75699a6@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1756339605;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UqJPbr5uTMudwBOyBnBf81tu086UZwu8xK2Zx9ec5IQ=;
-	b=v9ZDs7zkqx2zjHhRyZQM+rowHDQHVhS2x+WrvS7sdxbibcF+OMOlvMzHQH5T776w+N1GPl
-	2WsbJyoy54vPwQXHL/zulP9dxCeNlpJRe8ja2zaxf4HKVDYqNtuVwpq1kiMG0VIkA9g/fW
-	GuMDOhki4/NWUPx6XAOVXLhA+qauUFc=
-Date: Wed, 27 Aug 2025 17:06:36 -0700
+	s=arc-20240116; t=1756339966; c=relaxed/simple;
+	bh=xCDAwDY5Vrgtw4wfBdOE2Yu4K+viAWMY83889gyo8lI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=s0D/VqqH81Xqxh1CglG8B/0yaQzhRUCZo1Y7EpVI67OcxT0SX68oQtJe6LS9I6NPjn27G+mS4GVvdO2PKDIkhCvVkNOTjl2YxhCcwa5LASeJIBB/7sDiKGTCnC5QqrLR1ZOdlqL5lFVopyEp6oV5P2zcnAELpUWSYZd0shHj1rI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xb7L0Oo6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EC62C4CEEB;
+	Thu, 28 Aug 2025 00:12:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756339965;
+	bh=xCDAwDY5Vrgtw4wfBdOE2Yu4K+viAWMY83889gyo8lI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Xb7L0Oo6KqZdkBkm26fYqus/ec8UyE5F3n7+0gVYYsDhxvTYsUXhC1WlG0Xc3EHQM
+	 xaVe+5KxdMnUAXqadhQJL7lmhwKfdnmWJyVFhqktEhghafQcQQ40WGBKeF9z+TAr7J
+	 013IZQ7qOTs3WWnsgd/7HGyhHJY0zlTPhy6OV50cqwpjsxibqqqdQrPyKHV9xpK6wA
+	 3b9a7lzQ0Uze7MDQacJXuNJm4bkuetPCDX1COmdXasyHv/Bz9hklPQ3mgoeIau+2Ox
+	 8xANcA8Su5ROv7iMeO0MZju3tRC3wwRl/TQk2oAQNTWoD/VAfDHSrZ3qYqf5LQ6mKC
+	 3i60ZOYjfjSbA==
+Date: Wed, 27 Aug 2025 17:12:44 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Nikolay
+ Aleksandrov <razor@blackwall.org>, Simon Horman <horms@kernel.org>, Shuah
+ Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Petr Machata
+ <petrm@nvidia.com>, Amit Cohen <amcohen@nvidia.com>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>, Stephen Hemminger <stephen@networkplumber.org>,
+ David Ahern <dsahern@gmail.com>, Jonas Gorski <jonas.gorski@gmail.com>,
+ linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCHv4 net-next 3/3] selftests: bonding: add test for LACP
+ actor port priority
+Message-ID: <20250827171244.61d3ecb3@kernel.org>
+In-Reply-To: <20250827064638.6fc32630@kernel.org>
+References: <20250825064516.421275-1-liuhangbin@gmail.com>
+	<20250825064516.421275-4-liuhangbin@gmail.com>
+	<20250827064638.6fc32630@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3 bpf-next/net 2/5] bpf: Support bpf_setsockopt() for
- BPF_CGROUP_INET_SOCK_CREATE.
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Johannes Weiner <hannes@cmpxchg.org>,
- Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>,
- Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima
- <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20250826183940.3310118-1-kuniyu@google.com>
- <20250826183940.3310118-3-kuniyu@google.com>
- <aaf5eeb5-2336-4a20-9b8f-0cdd3c274ff0@linux.dev>
- <CAAVpQUCpoN4mA52g_DushJT--Fpi5b8GaB0EVgt1Eu3O+6GUrw@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <CAAVpQUCpoN4mA52g_DushJT--Fpi5b8GaB0EVgt1Eu3O+6GUrw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 8/27/25 3:49 PM, Kuniyuki Iwashima wrote:
-> BTW, I'm thinking I should inherit flags from the listener
-> in sk_clone_lock() and disallow other bpf hooks.
-
-Agree and I think in general this flag should be inherited to the child. It is 
-less surprising to the user.
-
+On Wed, 27 Aug 2025 06:46:38 -0700 Jakub Kicinski wrote:
+> On Mon, 25 Aug 2025 06:45:16 +0000 Hangbin Liu wrote:
+> > Here is the result output
+> >   # ./bond_lacp_prio.sh
+> >   TEST: bond 802.3ad (ad_actor_port_prio setting)                  [ OK ]
+> >   TEST: bond 802.3ad (ad_actor_port_prio select)                   [ OK ]
+> >   TEST: bond 802.3ad (ad_actor_port_prio switch)                   [ OK ]  
 > 
-> Given the listener's flag and bpf hooks come from the
-> same cgroup, there is no point having other hooks.
-iiuc, this will narrow down the use case to the create hook only? Sure, it can 
-start with the create hook if there is no use case for sock_ops. sock_ops can do 
-setsockopt differently based on the ip/port but I don't have a use case for now.
+> The last case failed twice since posted:
+> 
+> https://netdev-3.bots.linux.dev/vmksft-bonding/results/271601/8-bond-lacp-prio-sh/stdout
+> https://netdev-3.bots.linux.dev/vmksft-bonding/results/271601/8-bond-lacp-prio-sh-retry/stdout
 
-
+Looks like it may have been a one-off.
+Let's see if it happens again while we wait for reviews.
 
