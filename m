@@ -1,170 +1,81 @@
-Return-Path: <netdev+bounces-217518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1924B38F68
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 01:56:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2C5EB38F72
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 02:00:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92ED97AB22A
-	for <lists+netdev@lfdr.de>; Wed, 27 Aug 2025 23:55:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EBAE4636C7
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 00:00:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0709F30DEC0;
-	Wed, 27 Aug 2025 23:56:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2B2C1553AA;
+	Thu, 28 Aug 2025 00:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fVbPPPWz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4287F2D0C64
-	for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 23:56:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE722288D2;
+	Thu, 28 Aug 2025 00:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756338989; cv=none; b=JwfEvPQjVXBryt0UbegX7HkoGaZMIcR5rPjy8LRTM4lCPVCXYD0rCwmxGxh03BX5VcGrg92ehMebO4ZXG+M978uYC4kA0mIGPljOU6NnF+Hg8iKTWP5XgFsL/xruu7XICiAa8UnaK0idAOasrR0XuaniVDiaLSk4yDio/7Ry0V0=
+	t=1756339219; cv=none; b=oAQImOBXa1hEHZOgoW5JTXsNyom6ervjZfHe1exvkhwtA52AQoYX1DTbzM/rGemoVFlDAnwyzN38RDVgtIZVlLJG54Dk9w/v9UHNqeNU2fsqy2p3xX8m5ZrI+gCU5ziIeAOx7QJ72G0sZlgCH39RQTALGjD6WvFtSZN/KN9aRX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756338989; c=relaxed/simple;
-	bh=hzHwndWEpS0xTFzEybcfdp9UUiSixkUsYAWoAuFCkvw=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=LXqQ9BaAi0Y71L0Wm6pB3p4vQt4FVb+HKXyC7cFK6od9+egkKrr87LUFS0w/iOV/hSuK6zquSmrVVTy92FZsWdzNYU6Q2+BlTLd3Gc09wzo7L7On8wehCIPdvk4I/f9t5OUGk16Njt1dk9Yes7XmcRXp4hGedVjrKqRoj0kfbgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3ed0f07fca2so5043035ab.0
-        for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 16:56:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756338987; x=1756943787;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XhWQ9iGoM04g6lfAV7PCS2cBnF3cJ7MMLrdxlmgfU58=;
-        b=ixQFAHIa31J3MGQtMw07SFvhxS0B9+cR02BLC8Ds+3NrL6iCO8OUy422/INQyWrJYR
-         cqXmd5sz0rFh7DQNgO5qniCSxZx+GvMHieqckTzQbrPFoSFM6ObRB0Qbe4fbBvAc3BoS
-         jf0JCmyxdAIlnvbRWwGDAmCa9Jy0qd4Jjj1Ywgrtilk6ju3IZzTruWjRyzDAzo/Yb0a8
-         70cZRGd7Q2KKjdhUJo1RywadXDjz/ElzmJvHheS2cQ6YA183H9/SFGKhaUX/Zh+h4hME
-         5DCL2iZS5+CngLudns5KFYSVpNkCacCt7LiAlSXaQuggQgQw890WYkGAuHCPcGLeTvlg
-         NSMw==
-X-Forwarded-Encrypted: i=1; AJvYcCVwPTyQ3G1WOTAbZJ3J8jgUpioqZuSi4p5AyGC/4yad0d1WIxOTxQtEgdJdrJaq2iRtM3oh5mo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJ0wHMLMZIVxflZdFfX7iIqrB1fc0fx2ketYayz878ZhNLeuTd
-	rTwYM9B+GuYZ/RdMnWjjUwhwn9nyFeKfWsGLhD9IdDYoaC8I+d4ktdrPCnLNoDAXV4CweLO4CoR
-	XRdutxP3tLdz8jUKddyP18uBFosxkfKyGP2sClGHd5/WQj01Re8o/wypU2rQ=
-X-Google-Smtp-Source: AGHT+IHYTpCmTA9elqP3yQfROErw/tzlU6n6h5Za5qE+Y2KuAVEcc+6LONSRIgaB18ds0rawccpxgaGQwtGeymsNR5DgDbYgYjeS
+	s=arc-20240116; t=1756339219; c=relaxed/simple;
+	bh=KSww82SZBA+lEYAy6bmPkw4csTCsIM3F9qv0kkKQK84=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tZJR04clt8elypUmDoGi7/YSAYWhRgpqDf3sGTuf6prG8PMIeKNsBJP807AUikVVtoL8as5pJ6MVsEqYU1a7FTKfnGkgU2jAO65g2D8XyKn3UnY1H/bQaML+RAqdM19NwTvepBUhZCBuQ+hs/0GrJFllrq28StkhvoNFUlwX3Xg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fVbPPPWz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A793C4CEEB;
+	Thu, 28 Aug 2025 00:00:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756339219;
+	bh=KSww82SZBA+lEYAy6bmPkw4csTCsIM3F9qv0kkKQK84=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fVbPPPWzHDKnPghCUXUn0VKieFz/ONW3b0f25VxRoxeyJx9IE7stuZi/fPRb9EuHM
+	 2IEdJE3yWjJ5BZdD0Dmd/sY+4zdtKxwBXzdFUPm0BV/C+RwF2ImnJMw6C5w7rSjjQG
+	 Xl0oYWTYx9mo1Ratb1EVI5LGG3Wm5NndLU5AeUNJBfpLhe9p5s76LuRMuEBLae1t8Z
+	 zO2M93ks3ocYQuuEWswtLbI50myu6JnS1q2fs0gizGMHWClFjfsTT1EHP4HN+kIwKv
+	 lU/tvr+QMjM0DK16vYJMDp5vDfzHwBM1hdBwKnOzmvScIolPWN1agOOvVyxx1EWYUO
+	 t1DJw8mdalmfg==
+Date: Wed, 27 Aug 2025 17:00:17 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ richardcochran@gmail.com, claudiu.manoil@nxp.com, vladimir.oltean@nxp.com,
+ xiaoning.wang@nxp.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, vadim.fedorenko@linux.dev,
+ Frank.Li@nxp.com, shawnguo@kernel.org, fushi.peng@nxp.com,
+ devicetree@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, imx@lists.linux.dev
+Subject: Re: [PATCH v6 net-next 04/17] ptp: add debugfs interfaces to loop
+ back the periodic output signal
+Message-ID: <20250827170017.455aa59f@kernel.org>
+In-Reply-To: <20250827063332.1217664-5-wei.fang@nxp.com>
+References: <20250827063332.1217664-1-wei.fang@nxp.com>
+	<20250827063332.1217664-5-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3e02:b0:3ec:2275:244c with SMTP id
- e9e14a558f8ab-3ec22752632mr192176585ab.0.1756338987431; Wed, 27 Aug 2025
- 16:56:27 -0700 (PDT)
-Date: Wed, 27 Aug 2025 16:56:27 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68af9b2b.a00a0220.2929dc.0008.GAE@google.com>
-Subject: [syzbot] [bpf?] [net?] BUG: sleeping function called from invalid
- context in sock_map_delete_elem
-From: syzbot <syzbot+1f1fbecb9413cdbfbef8@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
-	edumazet@google.com, haoluo@google.com, horms@kernel.org, 
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
-	netdev@vger.kernel.org, pabeni@redhat.com, sdf@fomichev.me, song@kernel.org, 
-	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On Wed, 27 Aug 2025 14:33:19 +0800 Wei Fang wrote:
+> ---
+> v6 changes:
+> 1. New patch
+> ---
 
-syzbot found the following issue on:
-
-HEAD commit:    8d245acc1e88 Merge tag 'char-misc-6.17-rc3' of git://git.k..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11513062580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e1e1566c7726877e
-dashboard link: https://syzkaller.appspot.com/bug?extid=1f1fbecb9413cdbfbef8
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=109d7062580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=126bea34580000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/096739d8f0ec/disk-8d245acc.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/83a21aa9b978/vmlinux-8d245acc.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/7e7f165a3b29/bzImage-8d245acc.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+1f1fbecb9413cdbfbef8@syzkaller.appspotmail.com
-
-BUG: sleeping function called from invalid context at kernel/locking/spinlock_rt.c:48
-in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 6107, name: syz.0.17
-preempt_count: 1, expected: 0
-RCU nest depth: 1, expected: 1
-3 locks held by syz.0.17/6107:
- #0: ffffffff8d9a8b80 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
- #0: ffffffff8d9a8b80 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
- #0: ffffffff8d9a8b80 (rcu_read_lock){....}-{1:3}, at: bpf_test_timer_enter+0x1a/0x140 net/bpf/test_run.c:40
- #1: ffffffff8d84a760 (local_bh){.+.+}-{1:3}, at: __local_bh_disable_ip+0xa1/0x400 kernel/softirq.c:163
- #2: ffff888032e15a98 (&stab->lock){+...}-{3:3}, at: spin_lock_bh include/linux/spinlock_rt.h:88 [inline]
- #2: ffff888032e15a98 (&stab->lock){+...}-{3:3}, at: __sock_map_delete net/core/sock_map.c:421 [inline]
- #2: ffff888032e15a98 (&stab->lock){+...}-{3:3}, at: sock_map_delete_elem+0xb7/0x170 net/core/sock_map.c:452
-Preemption disabled at:
-[<ffffffff891fce58>] bpf_test_timer_enter+0xf8/0x140 net/bpf/test_run.c:42
-CPU: 0 UID: 0 PID: 6107 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- __might_resched+0x44b/0x5d0 kernel/sched/core.c:8957
- __rt_spin_lock kernel/locking/spinlock_rt.c:48 [inline]
- rt_spin_lock+0xc7/0x2c0 kernel/locking/spinlock_rt.c:57
- spin_lock_bh include/linux/spinlock_rt.h:88 [inline]
- __sock_map_delete net/core/sock_map.c:421 [inline]
- sock_map_delete_elem+0xb7/0x170 net/core/sock_map.c:452
- bpf_prog_2c29ac5cdc6b1842+0x43/0x4b
- bpf_dispatcher_nop_func include/linux/bpf.h:1332 [inline]
- __bpf_prog_run include/linux/filter.h:718 [inline]
- bpf_prog_run include/linux/filter.h:725 [inline]
- bpf_prog_run_pin_on_cpu include/linux/filter.h:742 [inline]
- bpf_flow_dissect+0x132/0x400 net/core/flow_dissector.c:1024
- bpf_prog_test_run_flow_dissector+0x37c/0x5c0 net/bpf/test_run.c:1416
- bpf_prog_test_run+0x2ca/0x340 kernel/bpf/syscall.c:4590
- __sys_bpf+0x581/0x870 kernel/bpf/syscall.c:6047
- __do_sys_bpf kernel/bpf/syscall.c:6139 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:6137 [inline]
- __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6137
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f637004ebe9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fffc4e2e8a8 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 00007f6370275fa0 RCX: 00007f637004ebe9
-RDX: 0000000000000050 RSI: 0000200000000180 RDI: 000000000000000a
-RBP: 00007f63700d1e19 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f6370275fa0 R14: 00007f6370275fa0 R15: 0000000000000003
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Please drop this patch and patch 17 from the series.
+This one because it's controversial, and 17 because it's not for
+net-next. This way you'll be under the limit of 15, per:
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
+-- 
+pw-bot: cr
 
