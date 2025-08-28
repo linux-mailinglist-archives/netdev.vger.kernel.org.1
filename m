@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-217547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 670DCB39033
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 02:47:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 556A8B39038
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 02:49:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8474B1C230A5
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 00:47:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2420F363F87
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 00:49:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 396A52EAE3;
-	Thu, 28 Aug 2025 00:47:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D30614EC73;
+	Thu, 28 Aug 2025 00:49:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MzNajhel"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WMz2tHhi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D9321CA81;
-	Thu, 28 Aug 2025 00:47:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B1279F5;
+	Thu, 28 Aug 2025 00:49:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756342042; cv=none; b=paGWfriJj7lveyocp813WT4iy6fhXGaptDnKZNKKfC6kY+MkXy0/Qp359angETlmIunW0GFEV2QSLmRXXraU6MQJAQPZNU+OT6MmrCDXIQu6k6z7+S8HgdTWasOqrfQynKNujdcMbhL58kqAHvpOUmaLG0qBs4N6xg8Pn2sx6ko=
+	t=1756342177; cv=none; b=YpbnpVE1OOjmO+WOh+Z3X5/Z4f8PvMc63pjqjm8bUxHyt8ntbBe3d/WG5WoLhjMt0MXN2Q1ggzYu/GyyL1GbTo8NfEYoy7SqDKtixw7oeUXZlIeu8WGdcLB2ZFFnsh2JGISoEt2DD79A+SCaQ0ZoFs++/UVYysy9IwmsdwTLMKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756342042; c=relaxed/simple;
-	bh=q1z3RZuqEJxK9EDCy/Zsitit/jOg5xqwARkTq6Uc31A=;
+	s=arc-20240116; t=1756342177; c=relaxed/simple;
+	bh=zs5/sgXbC3IH5sN0BBYSEmkniXy5eckrLdJygv/pRn0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D7NNuq/h94EnKE05po2ySKQDvxKTJFgrk0rk6ylsPvK0QltnjrIpQBMpW3EJnrrgYQ7bdLnimdNgJvWKYqATvtxgiJTVgpBuirJEx/mKb8RhWeqtYesENd/Nos2n6dlffh3x9ZsSISatO5pmG9qMUdeUXOIL9gMV1d5X2vfOQxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MzNajhel; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27D77C4CEEB;
-	Thu, 28 Aug 2025 00:47:21 +0000 (UTC)
+	 MIME-Version:Content-Type; b=MsGv3sFl6fxGLRoAb4nGln0Xqnx7c2fVd8fdRfttuJ8Oq+TPOg7HZWaLA4qsNBquZSN4kAVJ4XEMkMlwt/SPegoEaWyvSjsUY9GVQpvWuo5L5lwBh5rvo4bg07xm0v9eaUxuzeyJg32v42YbqAhXXHrCYDQpusFajv/XaFuvplQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WMz2tHhi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8773FC4CEEB;
+	Thu, 28 Aug 2025 00:49:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756342041;
-	bh=q1z3RZuqEJxK9EDCy/Zsitit/jOg5xqwARkTq6Uc31A=;
+	s=k20201202; t=1756342176;
+	bh=zs5/sgXbC3IH5sN0BBYSEmkniXy5eckrLdJygv/pRn0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MzNajhelfqS/dm7DcvHPm2F/fO14AudOOWphhCt6kcXPNwZmgpE3XPV+6I5DJL+yS
-	 l1W2l754D2RKJEMTa/+NiKyPleVQY/KbE4RZNb4GCFoMniZLiwRYU/e01NlSHy5JuD
-	 yRiNZXS7Y4w56pOxHHzGoW+Yb7OsQljttf5JKXx9wQ9CfnKipxGd4inWVpkRQDwaix
-	 XAK+Af84kR3gxbpIYbQUqFAmmE7ir85vtoQoZDLOWyCvrWvnq1jY0BBSPXnqT132P5
-	 VbZSElCjEZ6hAe71X0b8jWRdh0Z119HcsTKrnpkB20JNqerCBBwQAigGf8ukORjXmC
-	 qB0SEJlb3m0SQ==
-Date: Wed, 27 Aug 2025 17:47:20 -0700
+	b=WMz2tHhiPdnmP6UMzBdMxr3P48XV/5d5HMUnQCE0ab+UeDU5gazsjmmYZlQhSwT8c
+	 TqMLGnDTB7okDQUnXrsj/wPWK1yq4pyArsI+I1D5tRCUNBOGkGlwvshoJF2oyjWU1j
+	 lupJyW6C5NnyubnTbbkvqr4VSaqeK0E96cKGNVvEU+qWMVJyct0nFXIIUXMOh0oaXC
+	 r6hNS7QB5TE3EmHn/pgGFGDBIjPWqTviFKoxhTZmsbVU7jdAMRCvEH3m90SlD4qfgv
+	 85Y1eoMcAuTaCz+wGNS0APzFpQF00nl2KSWrYca+CErf/Hg6LZCQb1ObEkkVW1lIYd
+	 8uBXdrS2CThZA==
+Date: Wed, 27 Aug 2025 17:49:35 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Horatiu Vultur <horatiu.vultur@microchip.com>
 Cc: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
  <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
  <richardcochran@gmail.com>, <Parthiban.Veerasooran@microchip.com>,
  <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v3 2/2] net: phy: micrel: Add PTP support for
- lan8842
-Message-ID: <20250827174720.7b6406a1@kernel.org>
-In-Reply-To: <20250826071100.334375-3-horatiu.vultur@microchip.com>
+Subject: Re: [PATCH net-next v3 1/2] net: phy: micrel: Introduce function
+ __lan8814_ptp_probe_once
+Message-ID: <20250827174935.042bb768@kernel.org>
+In-Reply-To: <20250826071100.334375-2-horatiu.vultur@microchip.com>
 References: <20250826071100.334375-1-horatiu.vultur@microchip.com>
-	<20250826071100.334375-3-horatiu.vultur@microchip.com>
+	<20250826071100.334375-2-horatiu.vultur@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,14 +63,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 26 Aug 2025 09:11:00 +0200 Horatiu Vultur wrote:
-> +#define LAN8842_STRAP_REG_PHYADDR_MASK		GENMASK(4, 0)
+On Tue, 26 Aug 2025 09:10:59 +0200 Horatiu Vultur wrote:
+> -static int lan8814_ptp_probe_once(struct phy_device *phydev)
+> +static int __lan8814_ptp_probe_once(struct phy_device *phydev, char *pin_name,
+> +				    size_t gpios)
 
-> +	addr = lanphy_read_page_reg(phydev, LAN8814_PAGE_COMMON_REGS,
-> +				    LAN8842_STRAP_REG);
-> +	addr &= LAN8842_STRAP_REG_PHYADDR_MASK;
-> +	if (addr < 0)
-> +		return addr;
-
-Did you mean to mask the value after the check if it's negative?
+nit: size_t for gpios seems excessive, n_pins is an int. I'm guessing
+you chose it based on kmalloc_array() arg type but, yeah, not sure it
+makes sense within this context..
 
