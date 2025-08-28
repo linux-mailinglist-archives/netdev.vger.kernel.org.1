@@ -1,136 +1,139 @@
-Return-Path: <netdev+bounces-217734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58B25B39A3F
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 12:38:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD4D5B39A5D
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 12:40:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49EE37B77CA
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 10:36:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 620EF188F348
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 10:38:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A4462E7F30;
-	Thu, 28 Aug 2025 10:35:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A661E30DD14;
+	Thu, 28 Aug 2025 10:36:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bYgngK8p"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EI7KTp8P"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B073830C61A
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 10:35:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC4830C624;
+	Thu, 28 Aug 2025 10:36:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756377326; cv=none; b=pPbGbQTvlyXD9eUXUZW5OScCmHNPn/N9eJ0l44hhUgzwejghi1aJ9mtG17VB2vFZTWTTKqQFDEIKGmjvxayNAfNN6yxyFvkVSDspV7Cci5973S7Oi0YwvsP7yoomP0CG9VlDLba5Opq4/4ejUCKMNs+Fm7zoC421eUIUIgtiDuk=
+	t=1756377376; cv=none; b=GYthD3XFuJQmHG7EBQ1zGTpB2M5osfNprwX1EsE16wwlemr6pkZpir74O+MpHIanTiPVgk4kYpdo+A8bGST7wGFVTZZkYJamp+32esO8KP2F9S6qFwERI5cSJ3Kfd58CK1pFjBw98ftdk9o8CR6YvYH3bnGlLx9TALCLWnak8lc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756377326; c=relaxed/simple;
-	bh=YBqvM7XD9rhPf/QZIHMHzzRfeAeDBLeryJu/pKtxx0Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A4gzpi6lejRX303gP73HP482z1b1Vc2yby8qFFkC0xKk344DNrdgqFkAnNqZrq2fOa5WeLIFYEL+cTMN/Iq9qz0Shaam/Jx8RaZD/Z+Y3oZ/f9Tmp2SqulqwCm7BfBVPOwcTbKUNH7cmgP/lZbdweJhD8h4LwmFXH9BpoyN7WVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bYgngK8p; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756377323;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=C02piPLI6v0W2skD1ryvCSQgX2iEqThf0fPi4OBy2HY=;
-	b=bYgngK8p1RSv9x7c5ZJe5KgbttInzEhPraMsJeKnwzi2X+JnU/GNrmUOcdlbbMeBlb7xQ+
-	Vu30Op2+at5YFdl8HZ4bKWioJfw98TEze5PO63/KzRqp8JCRJGC//KJ1/vqF4E4IwgLoRD
-	l9trL9jCZm9Ly/1YZmrM0jJZNxVoSaw=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-401-wz-5YLAwMx2DHpTvnFcs4Q-1; Thu, 28 Aug 2025 06:35:22 -0400
-X-MC-Unique: wz-5YLAwMx2DHpTvnFcs4Q-1
-X-Mimecast-MFC-AGG-ID: wz-5YLAwMx2DHpTvnFcs4Q_1756377321
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-4b2d2cbbf9cso23019291cf.0
-        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 03:35:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756377321; x=1756982121;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C02piPLI6v0W2skD1ryvCSQgX2iEqThf0fPi4OBy2HY=;
-        b=l7JlSPsBjNiRQEalvlznWX22Rbb+31LjLKbWRajqbJUYS+8pEdcN3gBsWwjFwvEkMy
-         M35fLnt78XrDOZxnlaNdODPgA3U0jujmUDBAAcoghrOpCTAQNr7DiVcv5CHl63j/iZOA
-         1gH0dHIp6Hj0U7q32n/p/7YFgq7XuGiPA48D9PTiMvD2LnvC45lZZhqfPf11CzMjnNCR
-         /YgKYfhfTtHp9cGKU5FUWcrDKc8vPaBfbYvVGemwwDWxaiiZhLI19XD0os79EPBu363L
-         VBInmWD56kbDKV0+0P6NFx3n0ZtfrEJjdYozZpIGxHr8KHOmpuKjy0ZeQbAR+ypDAvbk
-         DbKA==
-X-Forwarded-Encrypted: i=1; AJvYcCWdBhNTm3dMiyPuLvAGxUSehtfbmPGuwTTKsUMTwibmRcSPowNNeBnDbBgIliKEt6oU6R6k7SI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YywEPEU+03DAyTvI32WucJKbCldath7fRzX3wazl5nvSg96ILhV
-	JHcYHErprSGc62GspgbuArYdyYFERieH8/I3/Ql+K/+B18P1M6WyXMf224nFGxreZ94eHkqhADX
-	lvno9zN3C+z3PnLFo+huvjey5xz0VuTTYLtLWV4B2eActbk2DFKW6Y5BUEQ==
-X-Gm-Gg: ASbGncvRSxbjbVHLqiUw24x88z5KyWM5Uk13TFY71FtT8rUXtiExHHwVeNNsasCQ6g0
-	mFAZtMJ2MwfaZse+/H/GFirGLoTMNwh6PnjH4YguAMQA+uc2GN4eGKyKp+BfOAHmAsDEHDancIm
-	a7Q+S6c5SWmkl+SEzw2+2Y05TbOe2dpWw6sctXVO2uvDTyGoJODanHT8bovwtO7l4Hn6P7ktfHO
-	ptcF/0nsum9ybPtTn+Exn7x5ksimE8fC0ZS6BoLjsIalI20Bcwo/trYXQYwFWTldrby7pK1bYkM
-	mC7OY01IDcxl040gVOuaUXJKtm9O4AHG0NzPeUcDscuHb8HrTVWGU3c0JW29kxFHxyF2xYbbwpT
-	khRmtdjtQc/Y=
-X-Received: by 2002:a05:622a:550f:b0:4b0:7cb2:cec3 with SMTP id d75a77b69052e-4b2aab47d61mr372948851cf.38.1756377321372;
-        Thu, 28 Aug 2025 03:35:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHsh4vekrR3evrfrykNJt1W3/7S1JncvhmesTGIkRdX8pXGCxyUdMsfB9JJjtB2UfPg8BKFAw==
-X-Received: by 2002:a05:622a:550f:b0:4b0:7cb2:cec3 with SMTP id d75a77b69052e-4b2aab47d61mr372948281cf.38.1756377320714;
-        Thu, 28 Aug 2025 03:35:20 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b2f52f650asm27706631cf.28.2025.08.28.03.35.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Aug 2025 03:35:20 -0700 (PDT)
-Message-ID: <7090d5ae-c598-4db5-a051-b31720a27746@redhat.com>
-Date: Thu, 28 Aug 2025 12:35:17 +0200
+	s=arc-20240116; t=1756377376; c=relaxed/simple;
+	bh=Q++vDmJGmmqheRrUrP0W8dSS7fcanjr4UJG7gMXFg6o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E7DDjoJPCp8LD1C60kAwgxpCgiay8rN3pnCh2v47+bHZ+M129APzGpuKgIoUrei4PQLe+fYhYxjdjZAuuQ9MNNasBCUTMoX7HMRtSy7JLRc4UZNBrEehT3jmT+sSDBm5hLm2VMEcyGht5odhEWAD+BfmCJx4383Vl6PZoodAGCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EI7KTp8P; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756377375; x=1787913375;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Q++vDmJGmmqheRrUrP0W8dSS7fcanjr4UJG7gMXFg6o=;
+  b=EI7KTp8Pkv/KuGNq6iMaeNGcX7oZqe/zW0XobJEVyWN6WEk4vnqBfXxZ
+   iR20JrwF36o2mPO7G/MpIAHjbxliRSqsbdufmH34IGVbtRN7ZNnmQnMrH
+   Bmc1hq9BtGcCgdqArDgwKAfiUyPDLb0ZTKSiCLbeDRcTk7G4QYTpOK4cB
+   5PhY8Y2wsjCNyzZ3FO0PHyELe5DM2RFeVNLhA3pwoxKpsAnwAgxiByMF0
+   6Lm1GGW2hF502wVVSTkez5qADgmkrdekkt+yKjbcZb6+gTdCnJlIXWVwZ
+   TtAKFU5P4QyV3V68l4Su9p5PYjQh9DfLDyQd0/eI3Xv0qMiUivx0vYr5i
+   g==;
+X-CSE-ConnectionGUID: J+9phYcOT5ihtlS0WasbOg==
+X-CSE-MsgGUID: 8TSymqXeTmC3pFCMFRhIJg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11535"; a="62465683"
+X-IronPort-AV: E=Sophos;i="6.18,217,1751266800"; 
+   d="scan'208";a="62465683"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2025 03:36:14 -0700
+X-CSE-ConnectionGUID: 0KXzwk6SSTqEhED/Xo7AIg==
+X-CSE-MsgGUID: uo1IoHNKR1Gi41sgQk9IWg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,217,1751266800"; 
+   d="scan'208";a="200992693"
+Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
+  by fmviesa001.fm.intel.com with ESMTP; 28 Aug 2025 03:36:08 -0700
+Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1urZzC-000TeJ-18;
+	Thu, 28 Aug 2025 10:36:06 +0000
+Date: Thu, 28 Aug 2025 18:35:21 +0800
+From: kernel test robot <lkp@intel.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	Bobby Eshleman <bobbyeshleman@gmail.com>, berrange@redhat.com
+Subject: Re: [PATCH net-next v5 4/9] vsock/loopback: add netns support
+Message-ID: <202508281824.3XZiIgxs-lkp@intel.com>
+References: <20250827-vsock-vmtest-v5-4-0ba580bede5b@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [REGRESSION][BISECTED][PATCH] net: ipv4: fix regression in
- broadcast routes
-To: kernel test robot <oliver.sang@intel.com>,
- Brett A C Sheffield <bacs@librecast.net>
-Cc: oe-lkp@lists.linux.dev, lkp@intel.com, netdev@vger.kernel.org,
- regressions@lists.linux.dev, stable@vger.kernel.org, davem@davemloft.net,
- dsahern@kernel.org, oscmaes92@gmail.com, kuba@kernel.org
-References: <202508281637.f1c00f73-lkp@intel.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <202508281637.f1c00f73-lkp@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250827-vsock-vmtest-v5-4-0ba580bede5b@meta.com>
 
-On 8/28/25 10:17 AM, kernel test robot wrote:
-> commit: a1b445e1dcd6ee9682d77347faf3545b53354d71 ("[REGRESSION][BISECTED][PATCH] net: ipv4: fix regression in broadcast routes")
-> url: https://github.com/intel-lab-lkp/linux/commits/Brett-A-C-Sheffield/net-ipv4-fix-regression-in-broadcast-routes/20250825-181407
-> patch link: https://lore.kernel.org/all/20250822165231.4353-4-bacs@librecast.net/
-> patch subject: [REGRESSION][BISECTED][PATCH] net: ipv4: fix regression in broadcast routes
-> 
-> in testcase: trinity
-> version: trinity-x86_64-ba2360ed-1_20241228
-> with following parameters:
-> 
-> 	runtime: 300s
-> 	group: group-04
-> 	nr_groups: 5
-> 
-> 
-> 
-> config: x86_64-randconfig-104-20250826
-> compiler: clang-20
-> test machine: qemu-system-x86_64 -enable-kvm -cpu SandyBridge -smp 2 -m 16G
-> 
-> (please refer to attached dmesg/kmsg for entire log/backtrace)
+Hi Bobby,
 
-Since I just merged v3 of the mentioned patch and I'm wrapping the PR
-for Linus, the above scared me more than a bit.
+kernel test robot noticed the following build warnings:
 
-AFAICS the issue reported here is the  unconditional 'fi' dereference
-spotted and fixed during code review, so no real problem after all.
+[auto build test WARNING on 242041164339594ca019481d54b4f68a7aaff64e]
 
-/P
+url:    https://github.com/intel-lab-lkp/linux/commits/Bobby-Eshleman/vsock-a-per-net-vsock-NS-mode-state/20250828-083629
+base:   242041164339594ca019481d54b4f68a7aaff64e
+patch link:    https://lore.kernel.org/r/20250827-vsock-vmtest-v5-4-0ba580bede5b%40meta.com
+patch subject: [PATCH net-next v5 4/9] vsock/loopback: add netns support
+config: nios2-randconfig-001-20250828 (https://download.01.org/0day-ci/archive/20250828/202508281824.3XZiIgxs-lkp@intel.com/config)
+compiler: nios2-linux-gcc (GCC) 8.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250828/202508281824.3XZiIgxs-lkp@intel.com/reproduce)
 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202508281824.3XZiIgxs-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> net/vmw_vsock/af_vsock.c:137:35: warning: 'vsock_net_callbacks' defined but not used [-Wunused-variable]
+    static struct vsock_net_callbacks vsock_net_callbacks;
+                                      ^~~~~~~~~~~~~~~~~~~
+
+
+vim +/vsock_net_callbacks +137 net/vmw_vsock/af_vsock.c
+
+   136	
+ > 137	static struct vsock_net_callbacks vsock_net_callbacks;
+   138	static DEFINE_MUTEX(vsock_net_callbacks_lock);
+   139	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
