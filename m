@@ -1,109 +1,60 @@
-Return-Path: <netdev+bounces-217782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4D93B39D29
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 14:23:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9818DB39D3A
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 14:26:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5A8C7B363E
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 12:22:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4B564607FE
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 12:25:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 656C930F80A;
-	Thu, 28 Aug 2025 12:23:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29F6830F958;
+	Thu, 28 Aug 2025 12:25:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="lEqh6r5k"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SlmLv/AV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1FCA30F547
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 12:23:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5E7230F539;
+	Thu, 28 Aug 2025 12:25:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756383814; cv=none; b=bmAwmMnFYGR07bSGc+Q/Cls+mkvibriKsVcprTPdecfBZWBKoM3fr4wbXKADE0AClGmLcvGX7NHXSPyvpgk2gZjJuri1UaaFmU8B/AdsW7YyNFurQxyG0WQwnULMmNZrBnCDR4ZXBF0a2jmacx4FuRHPXhqXmNjlUAwpyXfDI5I=
+	t=1756383941; cv=none; b=fptpePVFO+MSB+4TdkBfuNd3zjgj6QOMXDAfFKar193hYaRRXcN2Py8GSiZSvieNJIMpOh5wMQeu18UXo4FOeNMqgVWm3hF/GuKQCKlIvGCKkJZVNipY9/f4Wapu7IYC6CXv0NCDV0kkk77U9ExsbK6NNWThfZ7b6iMGB21wFKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756383814; c=relaxed/simple;
-	bh=5rst5fLTWaEIat1RpzokmV/+HPWeZg8AWqo4Gx9BXE0=;
+	s=arc-20240116; t=1756383941; c=relaxed/simple;
+	bh=55pOfAEwdUFshkttiSg6HMTkC44P6HWHjEh17urY36Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UfrYC6yxI2Kku5xWfJwfpOS6vSwfr89oW+xrXkkyH0KJKvdf+TBfWZFs59PR1vxR/0FzpmxZ2NvfaiKAi04alGkbU0TqLLKI5B6WD7JL6gOvDQHKUdYkxE+8yJqidMouOn1y1mxg3Zkz4qHlbukhEXaNw0np5+cIUEd46DutlaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=lEqh6r5k; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57S64xol031161
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 12:23:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=EZu3KAVGHFsCh5fcuvT4HNuU
-	yEv0CABTxKzQNvPe8HE=; b=lEqh6r5kDbGIOqdjj/UUeO1VQnWeHw6ZOHqUXe8S
-	xdjs+71XDJ9AeneQUq0QqbEJKTLgms/37VK433Wo0+s213skyBBJ4PwSscu1dx1M
-	C0FWdSIq/oftTYPJ/Zkz33+B/vWd2PCmxurYCE2IRVRq//CLL8Kem5AYPudQeLcp
-	tMMdpogw5W2kzSb6UKOFNx291VMf2JLdVhFGgxO2wOgxToDbIwIyeb43cfw6Detg
-	4F6Fic7QqlAEshq+5nGutOLD4AoH9aqH4OWKduT4c5B+EY3mI7FB6LTHF5bOU7CU
-	ML3/8Gr+dxcQheO2M6W1+4+wZjoHkCr45bOeOPtJ2ltOWQ==
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48q615r37y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 12:23:30 +0000 (GMT)
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-24458345f5dso10789585ad.3
-        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 05:23:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756383809; x=1756988609;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EZu3KAVGHFsCh5fcuvT4HNuUyEv0CABTxKzQNvPe8HE=;
-        b=IKPh8buqIN4DOrhihurSgO/ah/hKxC+JvS3yU4v8HWS6Eo8c0jF8IqlpQj0BeRe3rU
-         BSF+Fj2GDwn1H+vVB2C8pDsJAkCWMqw5gZXd5SDy03GJhvYKuwQ1/Nx3o4Gks+AVFBkh
-         BYCStdBwD7Q7XEfTUFSFMR0RhJXe0P6umfoxhtt8Ci9LyXbpQVsvpJxn0W77XtwRxRC3
-         Vv8Rnvnn1XCY2R1RZAdibI97yFz5VNBAsKLHJ6Ggfr9p26ca21DcGIZydA50zbcaul7m
-         +YvSOYAWYHfqWsxuqF+cTRRv9F+KFWlUmovbdHfx0H7WMbkIPXZRLyKkHXyR7JShWGDh
-         UXIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWhxmo4/napbhPrMqcm89QzrMdHZfHzrqfhvhGvuRJPEEpQCFm48nHikyAPx1FH0FIdcM/4AJA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwsiFARfYREqOHzwUjvpEWiNag0xtLlS8XW4Y2w1051W+TlIM6n
-	fpDrhMumHTk/22ulz3DsXS1mzrLi3z/l5yzGSREPQa+9geQOZ3Ei/ok4XLqQDZdfg1kaQojWzQ6
-	VaWgYYEvmzphkXLOvv3qy0/Rp/RGkzYx563F9uE/UEViF7ex7vdSvBXxIn2Q=
-X-Gm-Gg: ASbGnct3oFRNuEH0Ng/F3BkxCeD7Vk1rv5TXYof9JpB6yMjyWaQy2qZL8vn6sJsWAle
-	ezvgStVpQWk+qtmaIzVbxCBNsoxAr26j8yCGLkY0bUe0B+n9BvbHZSLNsbWENFd8nZHjB7fqXX3
-	F7UIJpcQvf/tlVyOjh7e3qOQibRJk3Xn8traVxC6STt769Vl5y8uXwOb7NSp4PT1fo+KpBw5ho+
-	/UAiCsZ1niSNxg6+Hcno2uQYpxDZQco9nOIoHtuZJImjKNlf4qbaIuJ1S0XEBoQn7Jf0gEmNC7s
-	VjnxyRJwXuIav97XMzKtIGsAC7tPWe4E5EBtQsXuorHSV/JKY6pg0q7eMpIwggt3OJ4X
-X-Received: by 2002:a17:902:ef0f:b0:244:214f:13b7 with SMTP id d9443c01a7336-2462efb04c7mr311698165ad.53.1756383808742;
-        Thu, 28 Aug 2025 05:23:28 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFlXTQuslcdRCvIsbREyFEnJ6/4MjqDDqTAmmAr9yqeBhBNxc3DV53rEdm/A47zsJg9ygUrMg==
-X-Received: by 2002:a17:902:ef0f:b0:244:214f:13b7 with SMTP id d9443c01a7336-2462efb04c7mr311697655ad.53.1756383808215;
-        Thu, 28 Aug 2025 05:23:28 -0700 (PDT)
-Received: from hu-wasimn-hyd.qualcomm.com ([202.46.22.19])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2466885ed72sm149774835ad.92.2025.08.28.05.23.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Aug 2025 05:23:27 -0700 (PDT)
-Date: Thu, 28 Aug 2025 17:53:20 +0530
-From: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
-To: Bjorn Andersson <andersson@kernel.org>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>, kernel@oss.qualcomm.com,
-        linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        netdev@vger.kernel.org,
-        Viken Dadhaniya <viken.dadhaniya@oss.qualcomm.com>,
-        Sushrut Shree Trivedi <quic_sushruts@quicinc.com>,
-        Nirmesh Kumar Singh <quic_nkumarsi@quicinc.com>,
-        Krishna Kurapati <krishna.kurapati@oss.qualcomm.com>,
-        Mohd Ayaan Anwar <quic_mohdayaa@quicinc.com>,
-        Dikshita Agarwal <quic_dikshita@quicinc.com>,
-        Monish Chunara <quic_mchunara@quicinc.com>,
-        Vishal Kumar Pal <quic_vispal@quicinc.com>
-Subject: Re: [PATCH 3/5] arm64: dts: qcom: lemans-evk: Extend peripheral and
- subsystem support
-Message-ID: <aLBKOH2nSkiNppwQ@hu-wasimn-hyd.qualcomm.com>
-References: <20250826-lemans-evk-bu-v1-0-08016e0d3ce5@oss.qualcomm.com>
- <20250826-lemans-evk-bu-v1-3-08016e0d3ce5@oss.qualcomm.com>
- <uvdrqzpqc5vki6sh5f7phktuk47egtmfuw3jjvoakrbyhqxwvt@obao75mbrtti>
+	 Content-Type:Content-Disposition:In-Reply-To; b=EP/f+WC9+wYYo3wDfg+zRVf2HE++fsQf3k6AaZ6jpvltO6n/3Ox2/mYz6csoi+fKNhKoaZHaBu2B52Ok0Sjk8AAXwG75puA7jjJamhsYmkOG02dH1bwNwzL5Y0fXTLi/PONld/95/dNMnT4mGHo/VG20ud/p9gL/zeIkWuu4pHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=SlmLv/AV; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=YJDph0fXZVk4m3ieOM7hmiCyKRXpxhXzgl8fdbR1bTI=; b=SlmLv/AV1LP/FS2SqD7LO7GGjN
+	dn2NeprwgVsDrSNR2Ocxi7ij+yGusWyE3BfqOle/SFz/+XxVzyP7c4sMEbOQXki77wk2cIfH+WfTF
+	guErJNOY9UEx0uRg+D1g0hOKEnknp7tsg4OlOlMCcjCYLJQQyeUtXK3k4OGQey0kuFW0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1urbgt-006LSS-LX; Thu, 28 Aug 2025 14:25:19 +0200
+Date: Thu, 28 Aug 2025 14:25:19 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Konrad Leszczynski <konrad.leszczynski@intel.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, davem@davemloft.net,
+	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, cezary.rojewski@intel.com,
+	sebastian.basierski@intel.com
+Subject: Re: [PATCH net-next 0/7] net: stmmac: fixes and new features
+Message-ID: <f77cb80c-d4b2-4742-96cb-db01fbd96e0e@lunn.ch>
+References: <20250826113247.3481273-1-konrad.leszczynski@intel.com>
+ <e4cb25cb-2016-4bab-9cc2-333ea9ae9d3a@linux.dev>
+ <9e86a642-629d-42e9-9b70-33ea5e04343a@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -112,96 +63,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <uvdrqzpqc5vki6sh5f7phktuk47egtmfuw3jjvoakrbyhqxwvt@obao75mbrtti>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODIzMDAzNCBTYWx0ZWRfXxqOONNvv6WPz
- Yk+tGT+opnSjzmlSJSAVK7HBcaQU+RfEmnqDWIXzrKQShHilBbzS5p3Yk1ePoQDkh5eSyJ9EEA7
- BlSdPLjE8ZPwMbkmxc3Isd/e35VzmXe4arSdSz9DWXEny76mY9VYm1zrtjzTTwYusMjcsSKbEss
- rdC5kC7Tcir1id4EPvi0KriASn8x9+4txrFTK0ArpM6ChpuH9azYqPPqZhEHE7gF7qIulqDvJqH
- 3GCZ2BtPq7XznuFftEBeam0Rh0SNPDJX7bkMztVLSvrePFfTpgjouJg4txkC36vFy5nqf+rbZQ2
- zFlKhnkbAc1zxnznYs4xfATqJ0lKhBGI418Ew7JWbf/n4m7eBzlxa/sRFRKJBbTVC38KD4AxThI
- 2TO1xJOx
-X-Proofpoint-GUID: YdgCriC7UZhlzD0t6Sy7xfaltnXZiL3-
-X-Authority-Analysis: v=2.4 cv=K+AiHzWI c=1 sm=1 tr=0 ts=68b04a42 cx=c_pps
- a=IZJwPbhc+fLeJZngyXXI0A==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
- a=kj9zAlcOel0A:10 a=2OwXVqhp2XgA:10 a=EUspDBNiAAAA:8 a=COk6AnOGAAAA:8
- a=cJrhKfuPXHnoPuS3F2EA:9 a=CjuIK1q_8ugA:10 a=uG9DUKGECoFWVXl0Dc02:22
- a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-ORIG-GUID: YdgCriC7UZhlzD0t6Sy7xfaltnXZiL3-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-28_03,2025-08-28_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 suspectscore=0 bulkscore=0 clxscore=1015 adultscore=0
- impostorscore=0 priorityscore=1501 phishscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508230034
+In-Reply-To: <9e86a642-629d-42e9-9b70-33ea5e04343a@intel.com>
 
-On Wed, Aug 27, 2025 at 06:06:04PM -0500, Bjorn Andersson wrote:
-> On Tue, Aug 26, 2025 at 11:51:02PM +0530, Wasim Nazir wrote:
-> > Enhance the Qualcomm Lemans EVK board file to support essential
-> > peripherals and improve overall hardware capabilities, as
-> > outlined below:
-> >   - Enable GPI (Generic Peripheral Interface) DMA-0/1/2 and QUPv3-0/2
-> >     controllers to facilitate DMA and peripheral communication.
-> >   - Add support for PCIe-0/1, including required regulators and PHYs,
-> >     to enable high-speed external device connectivity.
-> >   - Integrate the TCA9534 I/O expander via I2C to provide 8 additional
-> >     GPIO lines for extended I/O functionality.
-> >   - Enable the USB0 controller in device mode to support USB peripheral
-> >     operations.
-> >   - Activate remoteproc subsystems for supported DSPs such as Audio DSP,
-> >     Compute DSP-0/1 and Generic DSP-0/1, along with their corresponding
-> >     firmware.
-> >   - Configure nvmem-layout on the I2C EEPROM to store data for Ethernet
-> >     and other consumers.
-> >   - Enable the QCA8081 2.5G Ethernet PHY on port-0 and expose the
-> >     Ethernet MAC address via nvmem for network configuration.
-> >     It depends on CONFIG_QCA808X_PHY to use QCA8081 PHY.
-> >   - Add support for the Iris video decoder, including the required
-> >     firmware, to enable video decoding capabilities.
-> >   - Enable SD-card slot on SDHC.
+On Thu, Aug 28, 2025 at 08:47:02AM +0200, Konrad Leszczynski wrote:
 > 
-> I know I asked for you to lump things together in the initial
-> contribution to provide as much features as possible in that initial
-> patch, but now that is in place and this patch really is a bunch of
-> independent logical changes and this commit message reads much more like
-> a cover letter...
-> 
+> On 26-Aug-25 19:29, Vadim Fedorenko wrote:
+> > On 26/08/2025 12:32, Konrad Leszczynski wrote:
+> > > This series starts with three fixes addressing KASAN panic on ethtool
+> > > usage, Enhanced Descriptor printing and flow stop on TC block setup when
+> > > interface down.
+> > > Everything that follows adds new features such as ARP Offload support,
+> > > VLAN protocol detection and TC flower filter support.
 > > 
-> > Co-developed-by: Viken Dadhaniya <viken.dadhaniya@oss.qualcomm.com>
-> > Signed-off-by: Viken Dadhaniya <viken.dadhaniya@oss.qualcomm.com>
-> > Co-developed-by: Sushrut Shree Trivedi <quic_sushruts@quicinc.com>
-> > Signed-off-by: Sushrut Shree Trivedi <quic_sushruts@quicinc.com>
-> > Co-developed-by: Nirmesh Kumar Singh <quic_nkumarsi@quicinc.com>
-> > Signed-off-by: Nirmesh Kumar Singh <quic_nkumarsi@quicinc.com>
-> > Co-developed-by: Krishna Kurapati <krishna.kurapati@oss.qualcomm.com>
-> > Signed-off-by: Krishna Kurapati <krishna.kurapati@oss.qualcomm.com>
-> > Co-developed-by: Mohd Ayaan Anwar <quic_mohdayaa@quicinc.com>
-> > Signed-off-by: Mohd Ayaan Anwar <quic_mohdayaa@quicinc.com>
-> > Co-developed-by: Dikshita Agarwal <quic_dikshita@quicinc.com>
-> > Signed-off-by: Dikshita Agarwal <quic_dikshita@quicinc.com>
-> > Co-developed-by: Monish Chunara <quic_mchunara@quicinc.com>
-> > Signed-off-by: Monish Chunara <quic_mchunara@quicinc.com>
-> > Co-developed-by: Vishal Kumar Pal <quic_vispal@quicinc.com>
-> > Signed-off-by: Vishal Kumar Pal <quic_vispal@quicinc.com>
-> > Signed-off-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
+> > Well, mixing fixes and features in one patchset is not a great idea.
+> > Fixes patches should have Fixes: tags and go to -net tree while features
+> > should go to net-next. It's better to split series into 2 and provide
+> > proper tags for the "fixes" part
 > 
-> And I don't think you all wrote this patch, you probably all wrote
-> individual pieces and then one of you created the actual patch?
+> Hi Vadim,
 > 
-> The important part is that we don't want 9 different patch series
-> floating around with unmet dependencies and relying on me to try to
-> stitch them together.
-> 
-> But if you could do what you did for patch 2, 4, and 5 for logical
-> chunks of this change, that would be excellent (i.e. you collect the
-> individual patches, you add your signed-off-by, and you send them all
-> together).
+> Thanks for the review. I've specifically placed the fixes first and the
+> features afterwards to not intertwine the patches. I can split them into two
+> patchsets if you think that's the best way to go.
 
-Sure Bjorn, I will split it in next version of the same series.
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
 
+You probably need to wait a week between the fixes and new features in
+order that net and net-next are synced.
 
--- 
-Regards,
-Wasim
+    Andrew
+
+---
+pw-bot: cr
+	
 
