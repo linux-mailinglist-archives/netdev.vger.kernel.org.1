@@ -1,136 +1,152 @@
-Return-Path: <netdev+bounces-217592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF081B39222
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 05:16:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E614B3922F
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 05:25:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6DA2167361
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 03:16:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E19F464BF0
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 03:25:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29BF613957E;
-	Thu, 28 Aug 2025 03:16:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 240D824729A;
+	Thu, 28 Aug 2025 03:25:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GTQs7YIi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SYcNbLkR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DECC30CD94
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 03:16:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0E9821CC47;
+	Thu, 28 Aug 2025 03:25:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756350973; cv=none; b=Rr8gwKzQVQ7XJJE/9cFTzHsSHHpkGv5rk/XTAoEkZSistUFIeDYulHShCXNF5ow1ChIbv1BVi+/V5y8Yc0lX2QuWK84FGwBkgJGdUTl+8/GZIZ6rFxtRdmJFlZnOFmHiJD7qVdpKmEWVT5Hi2rUfeALg7JXG+fwL31C6A+qxo94=
+	t=1756351507; cv=none; b=WQvRh4qbTNrX3h3GWGP+gk7+7GYwW42R2ZiQ+dfuwkJghqkatUKQjx+P54g8idM7GWwohfxSg3+KuoJc20ita25Q6I0UxWJuhNjQ7Z286b2zDuQMxUnuJjT/LZqumZzAe/PCpAFHZZTz0NLVdBMHSO775Exeh8PduH+38eRyCbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756350973; c=relaxed/simple;
-	bh=oRXQYKOz9nqKFjkx6A8LVNPu+/dLXmMO/MocSUnjrz8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=I+GSxvKuvbadtNUCkYyGomhIWJBWSwwHzPvYDP5X1Vc+xwnP9OvJZv1ejvgi831MzBXW5/jhDqRJ+8z901+9W/qY+WBVEkA/7x/uocRwDO89XUkrp/7wQ3u14AT4vU80QCb3CHUHmsgZqWsi5m6l6M1d5NwUKQWPON3aVA0FrGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GTQs7YIi; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4b1099192b0so9509721cf.0
-        for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 20:16:11 -0700 (PDT)
+	s=arc-20240116; t=1756351507; c=relaxed/simple;
+	bh=VYK52dIq5ithVBRXhtSUMCwCpkoQVxauo174v6CEHKY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sn2GH281IfapQtdE3ygZSHwzSy0q3CwGKnEAk6U/ZGCyNxghQaj2/J2WPU47pD3iJcMUvXPMR0e0U5rCCNBYohZzbXuRDgDgL0LbaQ1/oQSMcO+9HvghhHk/QQIKK0M/luX57aPi1EIAoWuASldFURdF62PeWEGEdJErDIMu7jU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SYcNbLkR; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-76e1fc69f86so1309029b3a.0;
+        Wed, 27 Aug 2025 20:25:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756350970; x=1756955770; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oRXQYKOz9nqKFjkx6A8LVNPu+/dLXmMO/MocSUnjrz8=;
-        b=GTQs7YIiExQGe3ONjw8AHabOGpEJeJpWAuU/KSSxfUJAg3TaXAYNCAtQOPtPHYU5cs
-         zk1aXrma3mwSLH4S9O6DGVOtB1fQ5IDsXHYPgFygFeu+KkB2wbThtBER+9om1enYnBcZ
-         5Twle3cqqfdPRKoK9Xyv2Y/M8Y6Gl+pHqXlTfF+TvPzZhmOYQgy7hOxJReKQFhBi3zvi
-         cLtHyrHvcYb99tYcSM6YXx1zOMaENW4yMCdj5fYIQuRsQvPzFTeWnqiZr8qvE7BnEeND
-         7s7j+j7Gap0kh2rQD11kAL6qdW1LT+et781eDqYwfubJOkCwD2+mSBtzh3GPh0gKLiC7
-         hKcQ==
+        d=gmail.com; s=20230601; t=1756351505; x=1756956305; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MLyx6ML0KJAS+1NvI+nDMGvNH+1iNlA/o7NMKd8ru7Q=;
+        b=SYcNbLkRbAJn25uZCBV9t+3Xd+f96Z/fSpL69Cqt1iKqHZiF+F5Tda6WVCLAmKuNSx
+         O8mVpPL3dNnjgqPnUAEDA9Fvwjoc16BIPaY8t7oA7Uba19xvX2JLy/bwTl616+uZIQaC
+         z7kjbqaNOgz6nddTUs/4oZPkhfvgDLiCiav41Jhd1xVxl88ju1eyYaXcZZ85GhB12TlG
+         s080UrjW7BQanig4SCA2EVe5N99f/pNWo6+suEiFTCquWJ/GRPV6PpldRI8p3DpiGRb4
+         sCpbw/yYLTXaaOzMQYq75xNAeFu/okHJas97XBlbXT0hJBhFQVSNszblpcWBk6uaCB9n
+         nvXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756350970; x=1756955770;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oRXQYKOz9nqKFjkx6A8LVNPu+/dLXmMO/MocSUnjrz8=;
-        b=tTllnbJHFQ0iwtsvgWajp2BzIzwG7615ONCxaP6HRhDgQ+Uao8Q8Ftf1Q1752RDyiV
-         gYk0hGx0rvHZhD/uEU16/yaphaaQRZZsFUTn7LZok4VKQyJ6IC9yoplrKCWDlnCR+hk5
-         A+oKNnTwd3HQFWa/tyP/yjNlHdp2wmfd3z6fWvsvkNuABEPsWHSAbxvV4GMCzLlWqWkp
-         dTAYLK2G8O1+8Xpn+C8m0wVvn3n7vU4SLZrIShspbpQ9n4Iy5cpUc812BB7gt+RtpSIi
-         2tLJZLF1yq2q0mDjMqoYFwWak6bY3fpgg2TUGJb9IXgxbYyQTSUYZJeGtd01KBjKS2Cu
-         86cA==
-X-Gm-Message-State: AOJu0Yy0t6kfvLh4q42i+8TI52T2jHjF67dq/IntFi8DLmqj6nK5Jpjn
-	FzwSR7JEEHI/n3Vu4suvDlupeyAOuXvBoaWe9RlPL5oR3kDSuf90XD5kROxkVQqecMVmCR/Qzb3
-	3sMak21rG2zeq1dRB9K6C2tbb1xPpJjkMJzrRxnwB
-X-Gm-Gg: ASbGncuNyJWA8+pgGmLVgB0hnsT4I7RBKBsWC7HH/muStNepc/01HWJ6iuGl+ckgC4p
-	eniMih6JY/3A+pX5N2YCTxClX8W5wprrJF2G2CAnmFPeLCfqifwV6nFok/rgVtndKPF91ks6vcz
-	9XLXmzFKj66x7zZob4GidlEVxBBaT+XGSjGQ+fdX7QDXsVQA1Q3iAEkDzhJzPiADjUyaT7JCPxL
-	pzzxphzRZOZM5Ux/6lIDg==
-X-Google-Smtp-Source: AGHT+IHwQa/ppt6xLE/qP3WHHS2SKWlyv/2GZolNQ9dkZ9z4fK6hLvSk5PzJLy602g7YUl7kwE0VYbUiUooOTnwmbTM=
-X-Received: by 2002:ac8:7f47:0:b0:4b2:fa4b:e097 with SMTP id
- d75a77b69052e-4b2fa4be31cmr39605921cf.78.1756350970097; Wed, 27 Aug 2025
- 20:16:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1756351505; x=1756956305;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MLyx6ML0KJAS+1NvI+nDMGvNH+1iNlA/o7NMKd8ru7Q=;
+        b=ZfawNw+LAeeRd1DS0XA54IlyAPPUoCk67N1SsD/GJBTLVju4cyhnfN89Q6tZMcf1VQ
+         hGqpjzeCUTAh6Ihw85BXX5HKpdHoyXzEEUoAQsCGntEDT9tHjAfm++/F7hvLthwbYkhf
+         FYwRuQIl6c8yi2ADBe4aQwRt1+F6qR/gRHNvVsdyu2vhKbZD0LJRpcJfQo+HX4qoSkop
+         8Ki0szp8ui4iWqzq2g/zqVuuw+syR41PC66WuNLb5RAVQgh7p+yT4ZBbSvYWKPgTXnGn
+         Hcqw0EEweHYIeKKQrvliQzEf5xDK6aozU0rpYrz9nCLlD0YJWGjaNJytgK/1oA9zDQKb
+         pnjA==
+X-Forwarded-Encrypted: i=1; AJvYcCUSiVCMh5pKieGs1Gs7jCKx6ipBPn+12EXPI6RhM7EMFBeLTtPehIW2EEd9JlnjlRGSEeK+z3g2TUE=@vger.kernel.org, AJvYcCXHg20lZ+S1/YoN87wFnP+QOBvSNhNO9qrPqaC6xsmiRQL0XBdZaqmEERbnb1R1u5xLJgowyJe4tsvKPjgGcdJJ@vger.kernel.org
+X-Gm-Message-State: AOJu0YxcdHa8q/u/FBPQs0SxQoHbEZ6St7cg4sMU2FE8wk0RTV5rT2BN
+	bY/zhwGlSVFI3SAexEiODTUVkOmpbKGbsTzEcKqcLyLZYkN3Oo2raXKe
+X-Gm-Gg: ASbGnctw5fMSxRARwA0kJQM6WkJiQnm85HpbfmIuzlS72pGF5MJF94zvYx3yLYZkPMD
+	UYlZJy5o9G9re+LGQ0wMIGbKAEafTQilYm7exEokvdi02CAmqSPPaDOUALpTQn6MYoE82L3EwU/
+	KDCpre2dUnxhxDDuwtxz+IX4BtGmJ7vja8QJQpJFpfGDcGhyAKpnAZZ35HMWYx0lpI7/brs52Ge
+	i1Tzuux3tKwJcAj4LrLRrHD8QvwzswzAsDOZqH5bFUz7f2vFCA0joKVF56lN/JT7ZEV0FuY8tR5
+	GC7v/VOf5PS3PnJ99SIs4AVQ4WDyDQq9eDpuDWRI7DfX6v7JYjMdmSqULAhbQn7Mf580lctUQfD
+	5/qW9QbtK864qJScAeQEd8Ew+7yo=
+X-Google-Smtp-Source: AGHT+IHspYn3n01oCVanCisayOBpzEX9n1l0rBErbk+dYTSa259uJbdyVIwQ/0yywctKmGk8IZVleQ==
+X-Received: by 2002:a17:902:cecc:b0:237:f757:9ad8 with SMTP id d9443c01a7336-248753ada89mr94764985ad.1.1756351504807;
+        Wed, 27 Aug 2025 20:25:04 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2467de528fesm127471915ad.97.2025.08.27.20.24.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Aug 2025 20:25:04 -0700 (PDT)
+Date: Thu, 28 Aug 2025 03:24:55 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jay Vosburgh <jv@jvosburgh.net>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>, Petr Machata <petrm@nvidia.com>,
+	Amit Cohen <amcohen@nvidia.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	David Ahern <dsahern@gmail.com>,
+	Jonas Gorski <jonas.gorski@gmail.com>, linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCHv4 iproute2-next] iplink: bond_slave: add support for
+ actor_port_prio
+Message-ID: <aK_MB7ikY0hUhGqn@fedora>
+References: <20250825070528.421434-1-liuhangbin@gmail.com>
+ <1859262.1756320199@famine>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <DS0PR11MB77685D8DB5CEACC52391D4E6FD3BA@DS0PR11MB7768.namprd11.prod.outlook.com>
-In-Reply-To: <DS0PR11MB77685D8DB5CEACC52391D4E6FD3BA@DS0PR11MB7768.namprd11.prod.outlook.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 27 Aug 2025 20:15:59 -0700
-X-Gm-Features: Ac12FXz3sWqf2vQe4xAJC4c5TkYVBWA7crbYou1dAMI7CjMFjatVcUBZlKn54lI
-Message-ID: <CANn89iJJkpSPMeK7PFH6Hrs=0Hw3Np1haR-+6GOhPwmvsq9x5Q@mail.gmail.com>
-Subject: Re: [BUG] TCP: Duplicate ACK storm after reordering with delayed
- packet (BBR RTO triggered)
-To: "Ahmed, Shehab Sarar" <shehaba2@illinois.edu>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "ncardwell@google.com" <ncardwell@google.com>, 
-	"kuniyu@google.com" <kuniyu@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1859262.1756320199@famine>
 
-On Wed, Aug 27, 2025 at 6:12=E2=80=AFPM Ahmed, Shehab Sarar
-<shehaba2@illinois.edu> wrote:
->
-> Hello,
->
-> I am a PhD student doing research on adversarial testing of different TCP=
- protocols. Recently, I found an interesting behavior of TCP that I am desc=
-ribing below:
->
-> The network RTT was high for about a second before it was abruptly reduce=
-d. Some packets sent during the high RTT phase experienced long delays in r=
-eaching the destination, while later packets, benefiting from the lower RTT=
-, arrived earlier. This out-of-order arrival triggered the receiver to gene=
-rate duplicate acknowledgments (dup ACKs). Due to the low RTT, these dup AC=
-Ks quickly reached the sender. Upon receiving three dup ACKs, the sender in=
-itiated a fast retransmission for an earlier packet that was not lost but w=
-as simply taking longer to arrive. Interestingly, despite the fast-retransm=
-itted packet experienced a lower RTT, the original delayed packet still arr=
-ived first. When the receiver received this packet, it sent an ACK for the =
-next packet in sequence. However, upon later receiving the fast-retransmitt=
-ed packet, an issue arose in its logic for updating the acknowledgment numb=
-er. As a result, even after the next expected packet was received, the ackn=
-owledgment number was not updated correctly. The receiver continued sending=
- dup ACKs, ultimately forcing the congestion control protocol into the retr=
-ansmission timeout (RTO) phase.
->
-> I experienced this behavior in linux kernel 5.4.230 version and was wonde=
-ring if the same issue persists in the recent-most kernel. Do you know of a=
-ny commit that addressed this issue? If not, I am highly enthusiastic to in=
-vestigate further. My suspicion is that the problem lies in tcp_input.c. I =
-will be eagerly waiting for your reply.
+On Wed, Aug 27, 2025 at 11:43:19AM -0700, Jay Vosburgh wrote:
+> Hangbin Liu <liuhangbin@gmail.com> wrote:
+> 
+> >Add support for the actor_port_prio option for bond slaves.
+> >This per-port priority can be used by the bonding driver in ad_select to
+> >choose the higher-priority aggregator during failover.
+> >
+> >Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> >---
+> >v4: no update
+> >v3: rename ad_actor_port_prio to actor_port_prio
+> >v2: no update
+> >---
+> > ip/iplink_bond.c       |  1 +
+> > ip/iplink_bond_slave.c | 18 ++++++++++++++++--
+> > man/man8/ip-link.8.in  |  6 ++++++
+> > 3 files changed, 23 insertions(+), 2 deletions(-)
+> >
+> >diff --git a/ip/iplink_bond.c b/ip/iplink_bond.c
+> >index d6960f6d9b03..1a2c1b3042a0 100644
+> >--- a/ip/iplink_bond.c
+> >+++ b/ip/iplink_bond.c
+> >@@ -91,6 +91,7 @@ static const char *ad_select_tbl[] = {
+> > 	"stable",
+> > 	"bandwidth",
+> > 	"count",
+> >+	"prio",
+> 
+> 	Should this be actor_port_prio?
 
-I really wonder why anyone would do any research on v5.4.230, a more
-than 2 years old kernel, clearly unsupported.
+hmm, actor_port_prio correspond to the ip link option name, which is also
+acceptable.
 
-I suggest you write a packetdrill test to exhibit the issue, then run
-a reverse bisection to find the commit fixing it (assuming recent
-kernels are fixed).
+While in kernel, we defined the select policy as
 
-There are about 8200 patches between v5.4.230 and v5.4.296, a
-bisection should be fast.
+        { "stable",    BOND_AD_STABLE,    BOND_VALFLAG_DEFAULT},
+        { "bandwidth", BOND_AD_BANDWIDTH, 0},
+        { "count",     BOND_AD_COUNT,     0},
++       { "prio",      BOND_AD_PRIO,      0},
 
->
-> Thanks
-> Shehab
+So I think the prio here should also be OK.
+
+You can decide which one to use.
+
+Thanks
+Hangbin
 
