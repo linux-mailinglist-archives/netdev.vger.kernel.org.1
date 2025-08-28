@@ -1,65 +1,61 @@
-Return-Path: <netdev+bounces-217812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B80AB39E3C
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 15:10:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5985B39E80
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 15:18:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7DE5A7A5F64
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 13:09:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D4EC3A8103
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 13:18:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 410A53112B6;
-	Thu, 28 Aug 2025 13:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19E1631062E;
+	Thu, 28 Aug 2025 13:17:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vWlr/4qF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IHkST33g"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B94B252287;
-	Thu, 28 Aug 2025 13:10:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E326D30DEB2;
+	Thu, 28 Aug 2025 13:17:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756386629; cv=none; b=m3M9URriVnmLDe9WA7TkiIsXwFgUPtBxET100L5RfOELCTlp4uwXfY8D1/1U15F9JBsxqqn0Ka+gWKsndo1OMPKAW3KoQWVvzoxuExQzbRQsN2Pr1U+HhFjvVZQOocLsdiADQz4IXWnriMXk6riP3BvWN+1+Kn520aqtG2lMnnQ=
+	t=1756387078; cv=none; b=dWBbkDyJjvUwqLWsmfc4Ro4gHcOUcX8rpnmfkPYjBHrHMiu0FqTl0O6mf0SeL6qnEdyRvkLHVYCG7jtErTlgMTF9aaEfUtn6m2r+q718W3975rgcVIT2l/w1rwyfqK+qWf8a7ni/+FbagqiNzm+f9P7HXRTLIomPefvepHCATT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756386629; c=relaxed/simple;
-	bh=RP4hhlUZFqr/PXbvOj7ki0OGQu3tUUaRE+88SHWZvUM=;
+	s=arc-20240116; t=1756387078; c=relaxed/simple;
+	bh=svudxpdnzKQ88XtfGZXPB3AYpLG5ShGj0Z/VL0y74a0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sjBm0fkzFrxlXqi6P3Qbp8/+D2CaOkS4CQ4c6++fmI5OwKEYpxUD7ih8Gn/KyhiFPTH7omstD33ORNguW8WJXVm7mM7L6B3DkGE+hnhoCdST6pCKn5DoHKERFsb5tPMz9U6SIYGvrJpCsvHWZ5FuOi5mhrwSej2FuShJmePlf8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vWlr/4qF; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ZgHJyH1Thn6hr9eqb7wen/YTFYfIZYXGE3JFBASoTCE=; b=vWlr/4qFD4maCDFmryyaHbSKNc
-	vDBk4VOuRvM2LOgooLxRXI7G9yDjtoPY2wAdLKwLBp7yhhiT7Vg9c0UF41LYoNjhFoYjKK4jYNYA+
-	CB4Cgtcs2Ulp/cyrjKmIHwGoMSKdTZjQFdOvOU+NUcVEn/075PHygR7YhyBAENoJZCqg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1urcNz-006LtL-IA; Thu, 28 Aug 2025 15:09:51 +0200
-Date: Thu, 28 Aug 2025 15:09:51 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Dong Yibo <dong100@mucse.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
-	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org,
-	gustavoars@kernel.org, rdunlap@infradead.org,
-	vadim.fedorenko@linux.dev, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH net-next v9 4/5] net: rnpgbe: Add basic mbx_fw support
-Message-ID: <d61dd41c-5700-483f-847a-a92000b8a925@lunn.ch>
-References: <20250828025547.568563-1-dong100@mucse.com>
- <20250828025547.568563-5-dong100@mucse.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pnf7sc9oYFp3158zGT3V8HR7sxa+Of39DUGnstn40W2c+Q1R4z8l0Hct2fEpWY42jdN8/M2Zd6DzBLAeAuLLCDaEULi+WD9SQVSqzpDafpzff3Qa3GoSqsbfbBd6SyvOOxmuMyexL2PuBZaT+iBME4qfGu4Mdlz3VPFvDmBFQr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IHkST33g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59B08C4CEEB;
+	Thu, 28 Aug 2025 13:17:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756387077;
+	bh=svudxpdnzKQ88XtfGZXPB3AYpLG5ShGj0Z/VL0y74a0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IHkST33gX7K7oytJfnvebKr9Ugh302nI548TLn4926Kic23UpICiZmaGaVf/IGEih
+	 rbtPB2NNay8YqdkKnti/ISgvbsJnAgmo/4piJeCXX9qIUTfyr1CCOepyystcvjrxAP
+	 46h8FaULfCelrEA9WwtUWgLZGwvSuOknjmsygausX1gJjS3VhhLDSR3+VDIUh2LTqy
+	 KK3RGxjI+tmN2PY2U7fIvgsxn/e9wrtVSQX49TMw6m6w4q6BoIhyuqekQthTLSYFu4
+	 /amHEVDK9IDOqWTuEgPV8sbMC+RlR3mKB5zUJzgCHUBfe/lKR4U5wdLDxC1I5Oyy9j
+	 GCuCDhWLWeZ5A==
+Date: Thu, 28 Aug 2025 14:17:53 +0100
+From: Simon Horman <horms@kernel.org>
+To: Liao Yuanhong <liaoyuanhong@vivo.com>
+Cc: Rasesh Mody <rmody@marvell.com>,
+	Sudarsana Kalluru <skalluru@marvell.com>,
+	"maintainer:BROCADE BNA 10 GIGABIT ETHERNET DRIVER" <GR-Linux-NIC-Dev@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"open list:BROCADE BNA 10 GIGABIT ETHERNET DRIVER" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] bna: Remove redundant ternary operators
+Message-ID: <20250828131753.GJ10519@horms.kernel.org>
+References: <20250827101403.443522-1-liaoyuanhong@vivo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,74 +64,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250828025547.568563-5-dong100@mucse.com>
+In-Reply-To: <20250827101403.443522-1-liaoyuanhong@vivo.com>
 
-> +/**
-> + * mucse_mbx_get_capability - Get hw abilities from fw
-> + * @hw: pointer to the HW structure
-> + *
-> + * mucse_mbx_get_capability tries to get capabities from
-> + * hw. Many retrys will do if it is failed.
-> + *
-> + * Return: 0 on success, negative errno on failure
-> + **/
-> +int mucse_mbx_get_capability(struct mucse_hw *hw)
-> +{
-> +	struct hw_abilities ability = {};
-> +	int try_cnt = 3;
-> +	int err;
-> +	/* It is called once in probe, if failed nothing
-> +	 * (register network) todo. Try more times to get driver
-> +	 * and firmware in sync.
-> +	 */
-> +	do {
-> +		err = mucse_fw_get_capability(hw, &ability);
-> +		if (err)
-> +			continue;
-> +		break;
-> +	} while (try_cnt--);
-> +
-> +	if (!err)
-> +		hw->pfvfnum = le16_to_cpu(ability.pfnum) & GENMASK_U16(7, 0);
-> +	return err;
-> +}
+On Wed, Aug 27, 2025 at 06:14:03PM +0800, Liao Yuanhong wrote:
+> For ternary operators in the form of "a ? true : false", if 'a' itself
+> returns a boolean result, the ternary operator can be omitted. Remove
+> redundant ternary operators to clean up the code.
+> 
+> Signed-off-by: Liao Yuanhong <liaoyuanhong@vivo.com>
 
-I still think this should be a dedicated function to get the MAC
-driver and firmware in sync, using a NOP or version request to the
-firmware. The name mucse_mbx_get_capability() does not indicate this
-function is special in any way, which is it.
+Quoting documentation:
 
-> +/**
-> + * build_ifinsmod - build req with insmod opcode
-> + * @req: pointer to the cmd req structure
-> + * @is_insmod: true for insmod, false for rmmod
-> + **/
-> +static void build_ifinsmod(struct mbx_fw_cmd_req *req,
-> +			   bool is_insmod)
-> +{
-> +	req->flags = 0;
-> +	req->opcode = cpu_to_le16(DRIVER_INSMOD);
-> +	req->datalen = cpu_to_le16(sizeof(req->ifinsmod) +
-> +				   MBX_REQ_HDR_LEN);
-> +	req->reply_lo = 0;
-> +	req->reply_hi = 0;
-> +#define FIXED_VERSION 0xFFFFFFFF
-> +	req->ifinsmod.version = cpu_to_le32(FIXED_VERSION);
-> +	if (is_insmod)
-> +		req->ifinsmod.status = cpu_to_le32(1);
-> +	else
-> +		req->ifinsmod.status = cpu_to_le32(0);
-> +}
+  Clean-up patches
+  ~~~~~~~~~~~~~~~~
 
-Why does the firmware care? What does the firmware do when there is no
-kernel driver? How does it behaviour change when the driver loads?
+  Netdev discourages patches which perform simple clean-ups, which are not in
+  the context of other work. For example:
 
-Please try to ensure comment say why you are doing something, not what
-you are doing.
+  * Addressing ``checkpatch.pl`` warnings
+  * Addressing :ref:`Local variable ordering<rcs>` issues
+  * Conversions to device-managed APIs (``devm_`` helpers)
 
+  This is because it is felt that the churn that such changes produce comes
+  at a greater cost than the value of such clean-ups.
 
-    Andrew
+  Conversely, spelling and grammar fixes are not discouraged.
 
----
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#clean-up-patches
+--
 pw-bot: cr
 
