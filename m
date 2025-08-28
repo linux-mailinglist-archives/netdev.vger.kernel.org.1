@@ -1,102 +1,123 @@
-Return-Path: <netdev+bounces-217807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37F7EB39DFC
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 15:01:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FD9BB39E0D
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 15:04:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6816816F8AE
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 13:01:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D31D16C16A
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 13:04:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B12EB30F55F;
-	Thu, 28 Aug 2025 13:01:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADCE030CDAD;
+	Thu, 28 Aug 2025 13:04:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ra8FPJf0"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="NdiOrjfM"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0CEF262FFC
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 13:01:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72C3313C9C4;
+	Thu, 28 Aug 2025 13:04:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756386101; cv=none; b=EsnKftAg4yDq/uOZlYsivJB1jClDWNtZCMQWwWt1/LWNJt8mEuVCh65K0ddpe7MvGrjNVLiaMie3LfMLQMi3WFQnQBumWe4GIcrDun3Cs7rXdZbikEx/47tKvSWFQ7HghmZFrUU3hayltVaDxl997AZyBYSTbG1S6tTHFTkaGAc=
+	t=1756386249; cv=none; b=jqzrhFlpmIaKBAxZv36qSUfGimclMPl+ozKBCPu1QN+VjS3T1zwArseqXycYMXFFmhkJzseJGtpE0q7LWzeqSw2dWkJjQTn5leWi0pYwDScdMN2BZIwXwggQkj+//onuF+xzmrWQNVtsk6pUt9fd09nu4YYqc7gcybyIYEu8Hhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756386101; c=relaxed/simple;
-	bh=YR/qZ84vLiQKuz+/Sxg5SyMSGAAAoTDdsnFm77awHyE=;
+	s=arc-20240116; t=1756386249; c=relaxed/simple;
+	bh=87R04Ox+ehTuM5qn/vfSbAZfNCAWzfGxR1PC7L0e8jI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CUsz16MqZS+dd6TLtrUf0ud6MBKHVwynvmyD27yAKW2kdr4Fi0N8MfH8/LE+XTY3Y0FCfBg6bqcTYaDYeU8Cmgk9zt7QIDcBezZlJCuq1Lz3Gi93PjX0/d+bCkBppuZHgl35CTRNdA2PaLj+eigMnHa2z41tLManV/Ig7uV2N8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ra8FPJf0; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <e177027d-9286-4a30-9656-e0395094b2c1@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1756386087;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=P7v68eUbMhdBb1FN26U9K+vJv5tGLAeNVJMhgqgmwlM=;
-	b=ra8FPJf02ezT/Z6Od+0hGN4l4CJBp5cRRQwc7kivX348XlYc76qHJiTCY2Zbr6BzuhziWV
-	vtp6ovLknz+EW3nWC8g/Y5koIGMS61GWL+j18xx61d5DIBaIiGVrOdIF2zednYc5wZw2gS
-	Hu5qlNzC2MneYgUfwtN/+OFL0BuZwcQ=
-Date: Thu, 28 Aug 2025 14:01:23 +0100
+	 In-Reply-To:Content-Type; b=fuOa9beAwOOgOxHA9aelSq/a8Go9wQ/FXSspzBNH0UT4jj2ZBIPQiODensJcT3hrPlMR2UQJjSG3OsUmlhIDreBT0QbEsWBLgrOyBnFXj2iVgSt6J+tsI8y/xGK/NpOzO/ubamJIIo6+P+xpApQFcC6b0jmZkmQRc04W0iwCB0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=NdiOrjfM; arc=none smtp.client-ip=115.124.30.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1756386242; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=C1ejW/71ETj9A3bcLkx0oDuGH2F9c7HT+2BpATISzr4=;
+	b=NdiOrjfM5LMPhTXFvYPUnTmA/DYXZa9J3oojkvB86LBeEFeD/Doqi8o+2PIjuyaz8+8+7PnjQBt3opFq/hG4OVD9MqSJ27rZYspItI6CqGK4bYf4ze7fNEC2mYbIN9h8fMw7H+GBWblboBn8SEPB+jOWIVkgHLo8ESSRHx7e58I=
+Received: from 30.221.116.45(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0WmnCu3f_1756386240 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 28 Aug 2025 21:04:01 +0800
+Message-ID: <e32aa255-6ee7-421a-a7d2-8425627eabc1@linux.alibaba.com>
+Date: Thu, 28 Aug 2025 21:04:00 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] net: ethernet: ti: Prevent divide-by-zero in
- cpts_calc_mult_shift()
-To: =?UTF-8?B?5p6X5aaZ5YCp?= <linmq006@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Thomas Gleixner <tglx@linutronix.de>,
- Grygorii Strashko <grygorii.strashko@ti.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20250828092224.46761-1-linmq006@gmail.com>
- <11d46e56-b8d9-4776-9969-d3767d8cda41@linux.dev>
- <CAH-r-ZH+0rsji1f9eEaVDtG3XcMCD_EnAHAMwr8DuqO4D4Ps=w@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <CAH-r-ZH+0rsji1f9eEaVDtG3XcMCD_EnAHAMwr8DuqO4D4Ps=w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] net/smc: fix one NULL pointer dereference in
+ smc_ib_is_sg_need_sync()
+To: Liu Jian <liujian56@huawei.com>, alibuda@linux.alibaba.com,
+ dust.li@linux.alibaba.com, sidraya@linux.ibm.com, wenjia@linux.ibm.com,
+ mjambigi@linux.ibm.com, tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org
+Cc: linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20250828124117.2622624-1-liujian56@huawei.com>
+From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+In-Reply-To: <20250828124117.2622624-1-liujian56@huawei.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-On 28/08/2025 13:38, æå¦å© wrote:
-> Hi, Vadim
+
+
+在 2025/8/28 20:41, Liu Jian 写道:
+> BUG: kernel NULL pointer dereference, address: 00000000000002ec
+> PGD 0 P4D 0
+> Oops: Oops: 0000 [#1] SMP PTI
+> CPU: 28 UID: 0 PID: 343 Comm: kworker/28:1 Kdump: loaded Tainted: G        OE       6.17.0-rc2+ #9 NONE
+> Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
+> Workqueue: smc_hs_wq smc_listen_work [smc]
+> RIP: 0010:smc_ib_is_sg_need_sync+0x9e/0xd0 [smc]
+> ...
+> Call Trace:
+>  <TASK>
+>  smcr_buf_map_link+0x211/0x2a0 [smc]
+>  __smc_buf_create+0x522/0x970 [smc]
+>  smc_buf_create+0x3a/0x110 [smc]
+>  smc_find_rdma_v2_device_serv+0x18f/0x240 [smc]
+>  ? smc_vlan_by_tcpsk+0x7e/0xe0 [smc]
+>  smc_listen_find_device+0x1dd/0x2b0 [smc]
+>  smc_listen_work+0x30f/0x580 [smc]
+>  process_one_work+0x18c/0x340
+>  worker_thread+0x242/0x360
+>  kthread+0xe7/0x220
+>  ret_from_fork+0x13a/0x160
+>  ret_from_fork_asm+0x1a/0x30
+>  </TASK>
 > 
-> Vadim Fedorenko <vadim.fedorenko@linux.dev> 于2025年8月28日周四 20:06写道：
->>
->> On 28/08/2025 10:22, Miaoqian Lin wrote:
->>> cpts_calc_mult_shift() has a potential divide-by-zero in this line:
->>>
->>>           do_div(maxsec, freq);
->>>
->>> due to the fact that clk_get_rate() can return zero in certain error
->>> conditions.
->>
->> Have you seen this happening in the real environment, or is it just
->> analysis of the code? I don't see a reason for these "certain error
->> conditions" to happen...
+> If the software RoCE device is used, ibdev->dma_device is a null pointer.
+> As a result, the problem occurs. Null pointer detection is added to
+> prevent problems.
 > 
-> This is from code analysis, not from real environment.
-> The !CONFIG_HAVE_CLK version of clk_get_rate() returns zero.
-> With CONFIG_COMPILE_TEST && !CONFIG_HAVE_CLK could have the problem.
-> This may be theoretical.
+> Fixes: 0ef69e788411c ("net/smc: optimize for smc_sndbuf_sync_sg_for_device and smc_rmb_sync_sg_for_cpu")
+> Signed-off-by: Liu Jian <liujian56@huawei.com>
+> ---
+> v1->v2:
+> move the check outside of loop.
+>  net/smc/smc_ib.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
+> index 53828833a3f7..a42ef3f77b96 100644
+> --- a/net/smc/smc_ib.c
+> +++ b/net/smc/smc_ib.c
+> @@ -742,6 +742,9 @@ bool smc_ib_is_sg_need_sync(struct smc_link *lnk,
+>  	unsigned int i;
+>  	bool ret = false;
+>  
+> +	if (!lnk->smcibdev->ibdev->dma_device)
+> +		return ret;
+> +
+>  	/* for now there is just one DMA address */
+>  	for_each_sg(buf_slot->sgt[lnk->link_idx].sgl, sg,
+>  		    buf_slot->sgt[lnk->link_idx].nents, i) {
 
-!CONFIG_HAVE_CLK will have cpts_create() doing nothing as defined in
-cpts.h and it means the patch fixes impossible scenario.
-
-NAck
-
+LGTM.
+Reviewed-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
 
