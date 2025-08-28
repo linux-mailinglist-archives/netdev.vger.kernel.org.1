@@ -1,89 +1,107 @@
-Return-Path: <netdev+bounces-217805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F414AB39DE7
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 14:58:04 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EDE4B39DF1
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 15:00:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 397E11BA1B1B
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 12:58:25 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1AA0E4E43CB
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 13:00:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6860230FC14;
-	Thu, 28 Aug 2025 12:58:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7141930FC1B;
+	Thu, 28 Aug 2025 13:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="RFsB/18d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BwQFIwhM"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76B61494C2;
-	Thu, 28 Aug 2025 12:57:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 478853101AA
+	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 13:00:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756385880; cv=none; b=EKaunK1hmdV3Prn9dV8r2T6XWIFPkR/rF9fmq9DDL4vUPDx7iG+ASgKq85TLB6LJ+0vg7Y0OFfNTaQCA3G7Fb73trZxgnQkuvn8CsP6N8bSNSkRNt+dtiJHyv7s6Ms4FlCnRhYXQ4uasRCEig80HjnUhIZSYaASnYvs/rXAZ6kI=
+	t=1756386005; cv=none; b=nj+L9f3J/kuRnDr0kkD1alrj0g4ZMNFdPl5cXF0H6S7lI5YCUq637ASl4DL61dkeMLu5MgSEKS1pQwCAOzZTd+np9VWWVQdIy99XDuTYyo5MDLkypHX4aWdQvP8lSTW7ZgAvuo6H1kWiRYZmHdEael3iI/MT7Dqe4ri6GEVciyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756385880; c=relaxed/simple;
-	bh=34sSFaKnddndMDSeSYtHKxGqObxUARxAn761ZJYmWNU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a/TjIpCneGEkKlGhAEqLYnYNNTTps8lKNEaCIbYU7MEiVoA2gXsW97C6yIDjnt5jmI2t9bkqjnSsZK9n2/gyhHWpv+egjJO4SjHpqMhWsdMHz6JccIRAadJiNDSOO6o4eqlU6XbHimzXmTJ6s7KN5EG/DsdExHorkBjSYCvPso8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RFsB/18d; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=h+f4SwpD3k3csxTNLN2b+o/ZZ3kpeA0OeD7CGKxQtO8=; b=RFsB/18dZMjGBETEYy7w9yQWAd
-	yGHRsBOzjI+LNRESt6fE6YxCQ/NEI81hFhMDA1HPmLVtG/P3dLdzs02Vkxeq4cNDsBLAKEX9+LcUI
-	vJXEzolFKeaYgV+ce5fk/i8fXb1RrojHXM9KedC+lDE7Z2iLOa0wLBUefbKxNsB00PV4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1urcBw-006Lnb-Qz; Thu, 28 Aug 2025 14:57:24 +0200
-Date: Thu, 28 Aug 2025 14:57:24 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yibo Dong <dong100@mucse.com>
-Cc: MD Danish Anwar <danishanwar@ti.com>, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
-	gur.stavi@huawei.com, maddy@linux.ibm.com, mpe@ellerman.id.au,
-	lee@trager.us, gongfan1@huawei.com, lorenzo@kernel.org,
-	geert+renesas@glider.be, Parthiban.Veerasooran@microchip.com,
-	lukas.bulwahn@redhat.com, alexanderduyck@fb.com,
-	richardcochran@gmail.com, kees@kernel.org, gustavoars@kernel.org,
-	rdunlap@infradead.org, vadim.fedorenko@linux.dev,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH net-next v9 0/5] Add driver for 1Gbe network chips from
- MUCSE
-Message-ID: <cc11ce2c-04f2-4f1d-8d40-53206e6bf171@lunn.ch>
-References: <20250828025547.568563-1-dong100@mucse.com>
- <0651d5a9-dd02-4936-94b8-834bd777003c@ti.com>
- <BC262E8E0C675110+20250828053659.GA645649@nic-Precision-5820-Tower>
+	s=arc-20240116; t=1756386005; c=relaxed/simple;
+	bh=sa1+GG1jBs5TivfXE7eJltjYH+0b25KPdnhHc7zeZuE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=un3Pd2r6z7KfCLJofGeU+C0IZ/AHw2Qtjp+Q4y1mvJjOwB94HSZaI2JJldblJ7V4O6a5P0VZ9VU8cs5WzY5LyS1zOCMKNco9ksa7l//YfyuoGbpe4mvaPL6z4Wu8TONFArF/VlGTOh5belUM1wx9QIj63pTs2OUKDM8O4lmlv/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BwQFIwhM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC710C4CEEB;
+	Thu, 28 Aug 2025 13:00:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756386004;
+	bh=sa1+GG1jBs5TivfXE7eJltjYH+0b25KPdnhHc7zeZuE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=BwQFIwhMvQeGo2hIE1zDMLsxKBoWgBu2Gj5i0v1gXuct7iQ/ZW1FnugT9hNxpa1P0
+	 CSFRs0St9YlmNorYbBPAaPCI/peMdCD4sEJnQR627wyN3QGkpSKNLcf6WUUQxsvBJZ
+	 y1KvHwHbL8zmun/v/8yFYJIo4zoo3fqWgetnF33cTdx5ltWlO9L+7iyctxY6bdIPk8
+	 Ys0F+1ZuDxP5klLB/DCZnVh8enLQha8eG+KTRCD2rtwZIuY/Bf8HJXBTGWzGmR2fnX
+	 R0CeAR5oM6rnkCLRxEP5v3egWgnVgZhh8p7tdwUPuv9u4pq5xpHe0OW2GljtNvey2A
+	 xNcmRE91VnHEA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33FAE383BF63;
+	Thu, 28 Aug 2025 13:00:13 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BC262E8E0C675110+20250828053659.GA645649@nic-Precision-5820-Tower>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [net-next PATCH 0/4] fbnic: Synchronize address handling with BMC
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175638601201.1445956.12249410120174725676.git-patchwork-notify@kernel.org>
+Date: Thu, 28 Aug 2025 13:00:12 +0000
+References: 
+ <175623715978.2246365.7798520806218461199.stgit@ahduyck-xeon-server.home.arpa>
+In-Reply-To: 
+ <175623715978.2246365.7798520806218461199.stgit@ahduyck-xeon-server.home.arpa>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, kernel-team@meta.com,
+ andrew+netdev@lunn.ch, pabeni@redhat.com, davem@davemloft.net
 
-> Got it, I found the v8 pathes state in websit:
-> https://patchwork.kernel.org/project/netdevbpf/list/
-> It is 'Changes Requested'. 
-> I mistakenly thought that a new version needed to be sent. I will wait
-> more time in the next time.
+Hello:
 
-We try to review patches within 3 working days. Depending on reviewer
-work load, you might get comments really fast, or it might take 3
-days. The 24 hour requirement between new spins is a compromise.  But
-you should also listen to your audience. If there have been active
-reviews and they have not commented yet, maybe wait the full three
-days.
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-	Andrew
+On Tue, 26 Aug 2025 12:44:41 -0700 you wrote:
+> The fbnic driver needs to communicate with the BMC if it is operating on
+> the RMII-based transport (RBT) of the same port the host is on. To enable
+> this we need to add rules that will route BMC traffic to the RBT/BMC and
+> the BMC and firmware need to configure rules on the RBT side of the
+> interface to route traffic from the BMC to the host instead of the MAC.
+> 
+> To enable that this patch set addresses two issues. First it will cause the
+> TCAM to be reconfigured in the event that the BMC was not previously
+> present when the driver was loaded, but the FW sends a notification that
+> the FW capabilities have changed and a BMC w/ various MAC addresses is now
+> present. Second it adds support for sending a message to the firmware so
+> that if the host adds additional MAC addresses the FW can be made aware and
+> route traffic for those addresses from the RBT to the host instead of the
+> MAC.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,1/4] fbnic: Move promisc_sync out of netdev code and into RPC path
+    https://git.kernel.org/netdev/net-next/c/cf79bd449511
+  - [net-next,2/4] fbnic: Pass fbnic_dev instead of netdev to __fbnic_set/clear_rx_mode
+    https://git.kernel.org/netdev/net-next/c/284a67d59f39
+  - [net-next,3/4] fbnic: Add logic to repopulate RPC TCAM if BMC enables channel
+    https://git.kernel.org/netdev/net-next/c/04a230b27d8f
+  - [net-next,4/4] fbnic: Push local unicast MAC addresses to FW to populate TCAMs
+    https://git.kernel.org/netdev/net-next/c/cee8d21d8091
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
