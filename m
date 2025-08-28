@@ -1,125 +1,190 @@
-Return-Path: <netdev+bounces-217935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64FD2B3A71E
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 18:58:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EDECB3A72C
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 18:59:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B88E03ACABD
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 16:58:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 208C51C81F1E
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 16:59:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF1B332C326;
-	Thu, 28 Aug 2025 16:57:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A76F23314AA;
+	Thu, 28 Aug 2025 16:59:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Jqsx+q2z"
+	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="BNTapcJX";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="MTtRoiGN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E77BE32C30F
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 16:57:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFECD3314B3;
+	Thu, 28 Aug 2025 16:59:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756400273; cv=none; b=NlhbmBM71nF91wvpIufUvUeZLNaweBNCJaWWbnyATylPIIV+35U1Pe/zUNc7FE8qJhm2hhj37zT93fhoDM06DC8Tfwm77+HHP+y2JqtA3bNq+BUEw8eZQgGr3/JUKMmgB/Ka4q0fHyvxPCtXs05hGWVkPhqVTQ7DvV0EbyLvr7s=
+	t=1756400366; cv=none; b=NxWpTEw5SK1Z8xZNORNvCtLRIbR6rP7naa1gfs3Jje/X3LU4YAF2IVqBWkHIkKfaeokAzOOu8w7OyqgKij/smfxZYl9mlhodhPJ2LaVKbbG9VlTWrzEUv1fJQgbqjqw6NMwDiefqxYZSe/TrGKAdYkAlhFF7+rt0CoAvEcOGhG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756400273; c=relaxed/simple;
-	bh=nCg2nwi14+lPzAfgGbrrAYpMMC6kupWYt2gn0gu1knw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TvDWKJR9dovDKf+HnghjPAvqxAF6rRofYFRB1jl4MoYEPHsTF2bGHof+lWf3XwoB3OWEnQ1MfCw0eHPYuwQDIfQ5k8M2ON/HXnjwdWueInp5rKmTVGids1DMblLT7R9kYPfQ2wAbs8U3L3G6nIjnhTwFdd5pK2JKJF3EIaMN8hI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Jqsx+q2z; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-55f4468326aso184e87.1
-        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 09:57:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756400270; x=1757005070; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hUlxTvNnxWvVbwi4g/Jm8/uE0pr83dkev1JUOpqywAU=;
-        b=Jqsx+q2z1/wIo0bt8Hi4q8xHj4xjEYWVOF2t+wyeqz7ErYYHJg19vNwwpy6kAJjelr
-         aE4QUfYK3E69mZ1AbBxrvvfVQdHidgMz2wHN8eLerkmksqPXm0FSDhSkTGH70Mp+widb
-         CAerc56TozjwD3M/DRaD5V3ZUW+m/ftaTK8/qjGb/m0Dbe6YYmJci9tD3AjXTIgElU+0
-         7yKTxFzhcPCh/7Is4k0Gg65yuWSsL25gvVceU4zQNeZq4Zm0QIev2LULfxyAOqWfPJ19
-         6JDo0dE70Yd6f51nGO7sfuWTsgzie7uwh+7htqHB2WDXwObBd+i1br8/AsVjnjkm+bzr
-         /wYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756400270; x=1757005070;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hUlxTvNnxWvVbwi4g/Jm8/uE0pr83dkev1JUOpqywAU=;
-        b=Ub2GIjwywym1pwNA6ikSLef2loDKt9TlQAiOrVrh4IBqcNus62AKhfEVSzf3GpJOe3
-         YsvQs+MNW/P/Dn4YMD86sKkozM/IybaRR49ndFcYAiFAaZhvHAHlD8dQpoEd7RA8+Mn6
-         B6RSjvSUmXqmLWh3+ejNZCdqfWqL6TgtCPr/b30m4dS/WKkYpf8heIGbqcl2TfIN7kMl
-         xob1mY7lklDZIcOFaNhMnVzI8kiNItjJbAk213nymbVZ9YZGBOEVXJygHdZHKiST7Fcc
-         kBBuPcoB+9Pu6HOU8fFfyZ2ErbtLZIhUdkhYzi0s72g09BxPry73Pe93DmtyYXP0q9nk
-         e4WA==
-X-Forwarded-Encrypted: i=1; AJvYcCXljmLxPcjkIiXhdaQN0LTDU8yzIp4BjmBUuPO/6N3klD05FJ+8zj1bYpuffsVybkZv/smnpLw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YymZt7oQDEu2XveuLoMWBxJjCmj2ae0bhSrPIuwRaMfRuKlEYQG
-	fQA+aT9kJ8H2ryX0zPlTD+u2+J790vcJCY/6XO/cayrBUbdJfKWg6cs2DFvbYafuB1NK0jYrxt7
-	5VcPMahQMUZL79tc77601mPGEuaoUoMXrvQgabVBy
-X-Gm-Gg: ASbGnctF0SSzkz/U3uEYu2MmX0CTY+4w0sBAFSkoiKJQnLGBO2IUQ5ygzUZ14jaxdHW
-	PK1w6f6WzHVU97xF0a9OnMDxSJkDJ6Gw2TviqcJFmBNnFjYAUK1UR0bvApmEx/JGhl5SfwyOn26
-	XL83wnSdymNmeHaZ6AV81/Fd6ZpzcBbQmkGDQCAYaXA7EtZ+iPBZ5+gKhuxch+QbEnoICig47TW
-	m2HbFVZTxGL5MJIViET53gmjA==
-X-Google-Smtp-Source: AGHT+IEA+x+JHJGxAKqi3gf39h+cXrxl4F1cPaRjmHzOLyzmMNWf5vB8Aw2K6CCK2muVk+ohncKOBj10rKhlESV29Zs=
-X-Received: by 2002:a05:6512:609b:b0:55b:7c73:c5f0 with SMTP id
- 2adb3069b0e04-55f4d3263a2mr1010554e87.2.1756400269844; Thu, 28 Aug 2025
- 09:57:49 -0700 (PDT)
+	s=arc-20240116; t=1756400366; c=relaxed/simple;
+	bh=kYfylJecqyv+6vnymFsdtqLi9AgdgemVenjyBUyVBK8=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=dH1aBWKPZ4vV1EKqcZgV6CO4AXG0hqeq3uXU5qknJyxMmjE8mcX57vJJI3gSc6yWijaJyeIH11g77Y7tv1pfeUkyGNh3UrcnVX4+x7JO4oSpsbHx/WEpXRoXGodYBscmZGcyG35IRMiGcR+egx/VbQN4v7P0iGWtmx2vo9WQAF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=BNTapcJX; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=MTtRoiGN; arc=none smtp.client-ip=202.12.124.155
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 8466D7A0198;
+	Thu, 28 Aug 2025 12:59:22 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-10.internal (MEProxy); Thu, 28 Aug 2025 12:59:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-id:content-type:content-type:date:date:from
+	:from:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1756400362; x=
+	1756486762; bh=WjgDdX5WvSEXp8OZHfzER7hnYaOdtStf4MrinPrBgwo=; b=B
+	NTapcJXizy+DV9xdGrxlv9f3W2suBvFOB2We0AkP4v3szAvJR9qTOaP/8EfNX/xt
+	MA6frokrgs6sxFU7nMC7D0b+RlEAleub6ys1+eREvj9IZ8XYT6o/dxZRW6WuRFiA
+	Ka2vLXlxDvmp6SfdCNol0znPoGFX2QwcCums2scwWfGeOfOWi1ESdbJIY22bs3Ua
+	i6jUPUm9NHsGepNetpcLMqC3LWRaYxPaj+6PsaZFOASBbjW9OU1cX+cXi8BOtnx3
+	F4MHWRsZr22svYV3KwmVepRkj6FR8J2S5+o0Te8w76s3Yu0fhMH8+26BJvop8UTh
+	RpwO1WEZkDuoaSY8dJbZw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-id:content-type
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
+	:x-me-sender:x-sasl-enc; s=fm1; t=1756400362; x=1756486762; bh=W
+	jgDdX5WvSEXp8OZHfzER7hnYaOdtStf4MrinPrBgwo=; b=MTtRoiGNL+tDZmTXQ
+	5AylfAVZuT/G9agZbPgmErTgmcSJ8l2dh9QPtTGBj+IK0BLH4u/kMA97SiTKipW8
+	mNRUkeAyJ0eR8Vu1sNnWZiSTFzqKJTiJ1cjnTpKzo2a/O6ZzPoftJReO73vk3fYM
+	u2h8MexOZ8/oVzAcrGgO/fd1RVj06kRRQycbr8OmuvHALhTugu4xDkQViCmDVQt6
+	GYYSWdjo+Xj53x92XCEfkcl5GQODUKrPkH20KBkf41BQ9eSe0b6JRCwGHMHhXgbF
+	hDsew9KWLcttHFLJjV882gPFytdBU5Ss1cHaalp/mn/lPQFIBAyHZeDvZGMu1d7C
+	8cDTA==
+X-ME-Sender: <xms:6YqwaCle6lfhsLU9TMofEypoFj-4KHxYl_UrdtlsFLHzynsVd0GF9Q>
+    <xme:6YqwaAb31HDF24PluNtHeG_lqcPpkCOQWTVZa9bdAe6uQggW_gd4y6fcTg4YNDAdL
+    aCHojs58wcPSVSQ2I0>
+X-ME-Received: <xmr:6YqwaCXvB2MT2mrQ1nTkfhfc0kxM8ZnRVb3LEF7aijegbVe2-GGmHYpXOU3w53WuSUFh_A>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddukeduheegucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhephffvvefujghfofggtgffkfesthdtredtredtvdenucfhrhhomheplfgrhicuggho
+    shgsuhhrghhhuceojhhvsehjvhhoshgsuhhrghhhrdhnvghtqeenucggtffrrghtthgvrh
+    hnpeejvdfghfetvedvudefvdejgeelteevkeevgedthfdukeevieejueehkeegffejuden
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjvhesjh
+    hvohhssghurhhghhdrnhgvthdpnhgspghrtghpthhtohepudelpdhmohguvgepshhmthhp
+    ohhuthdprhgtphhtthhopehrrgiiohhrsegslhgrtghkfigrlhhlrdhorhhgpdhrtghpth
+    htohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegushgrhhgv
+    rhhnsehgmhgrihhlrdgtohhmpdhrtghpthhtohepjhhonhgrshdrghhorhhskhhisehgmh
+    grihhlrdgtohhmpdhrtghpthhtoheplhhiuhhhrghnghgsihhnsehgmhgrihhlrdgtohhm
+    pdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhope
+    hhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghl
+    rdhorhhgpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:6YqwaABjR4kPKLbPBJfXpJ4-Rk0PHUlf9GaekkJNYNXwwSTrx9WDsQ>
+    <xmx:6YqwaBxfDf8Z-9VEXWCAkEbFBjviDxUVcnm5F9XM-fARyPBliArJUA>
+    <xmx:6YqwaGabU6xHrrm4_dUUpDJ9ZGxSltR4B4VLW3-kZpjeJUMxqXiIIQ>
+    <xmx:6YqwaOSlELAxs0a_097SCu3nTe6pvgs0GA4_CtYSXRHMEXfYNhvP2w>
+    <xmx:6oqwaPzPEKhgCr0S-MhzZZBBnQErT0FPz4OyhLv048ErE5RNxuMGn-Zo>
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 28 Aug 2025 12:59:21 -0400 (EDT)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id 33CB39FCA0; Thu, 28 Aug 2025 09:59:20 -0700 (PDT)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id 306E29FB65;
+	Thu, 28 Aug 2025 09:59:20 -0700 (PDT)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: Hangbin Liu <liuhangbin@gmail.com>
+cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>,
+    Nikolay Aleksandrov <razor@blackwall.org>,
+    Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+    Jonathan Corbet <corbet@lwn.net>, Petr Machata <petrm@nvidia.com>,
+    Amit Cohen <amcohen@nvidia.com>,
+    Vladimir Oltean <vladimir.oltean@nxp.com>,
+    Stephen Hemminger <stephen@networkplumber.org>,
+    David Ahern <dsahern@gmail.com>,
+    Jonas Gorski <jonas.gorski@gmail.com>, linux-doc@vger.kernel.org,
+    linux-kselftest@vger.kernel.org
+Subject: Re: [PATCHv4 iproute2-next] iplink: bond_slave: add support for
+ actor_port_prio
+In-reply-to: <aK_MB7ikY0hUhGqn@fedora>
+References: <20250825070528.421434-1-liuhangbin@gmail.com>
+ <1859262.1756320199@famine> <aK_MB7ikY0hUhGqn@fedora>
+Comments: In-reply-to Hangbin Liu <liuhangbin@gmail.com>
+   message dated "Thu, 28 Aug 2025 03:24:55 -0000."
+X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250828164345.116097-1-arkadiusz.kubalewski@intel.com>
-In-Reply-To: <20250828164345.116097-1-arkadiusz.kubalewski@intel.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 28 Aug 2025 09:57:37 -0700
-X-Gm-Features: Ac12FXyD8odEoc9_-KKAReVcf86GdG5H51-cMjxY6Bgpf4RvXSnT7vL1DpsIvFs
-Message-ID: <CAHS8izPU7beTCQ+nKAU=P=i1nF--DcYMcH0wM1OygpvAYi5MiA@mail.gmail.com>
-Subject: Re: [RFC PATCH v2] net: add net-device TX clock source selection framework
-To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, sdf@fomichev.me, 
-	asml.silence@gmail.com, leitao@debian.org, kuniyu@google.com, 
-	jiri@resnulli.us, aleksandr.loktionov@intel.com, ivecera@redhat.com, 
-	linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1918693.1756400360.1@famine>
+Date: Thu, 28 Aug 2025 09:59:20 -0700
+Message-ID: <1918694.1756400360@famine>
 
-On Thu, Aug 28, 2025 at 9:50=E2=80=AFAM Arkadiusz Kubalewski
-<arkadiusz.kubalewski@intel.com> wrote:
-> ---
->  Documentation/netlink/specs/netdev.yaml     |  61 +++++
->  drivers/net/ethernet/intel/ice/Makefile     |   1 +
->  drivers/net/ethernet/intel/ice/ice.h        |   5 +
->  drivers/net/ethernet/intel/ice/ice_lib.c    |   6 +
->  drivers/net/ethernet/intel/ice/ice_main.c   |   6 +
->  drivers/net/ethernet/intel/ice/ice_tx_clk.c | 100 +++++++
->  drivers/net/ethernet/intel/ice/ice_tx_clk.h |  17 ++
->  include/linux/netdev_tx_clk.h               |  92 +++++++
->  include/linux/netdevice.h                   |   4 +
->  include/uapi/linux/netdev.h                 |  18 ++
->  net/Kconfig                                 |  21 ++
->  net/core/Makefile                           |   1 +
->  net/core/netdev-genl-gen.c                  |  37 +++
->  net/core/netdev-genl-gen.h                  |   4 +
->  net/core/netdev-genl.c                      | 287 ++++++++++++++++++++
->  net/core/tx_clk.c                           | 218 +++++++++++++++
->  net/core/tx_clk.h                           |  36 +++
->  tools/include/uapi/linux/netdev.h           |  18 ++
->  18 files changed, 932 insertions(+)
+Hangbin Liu <liuhangbin@gmail.com> wrote:
 
-Consider breaking up a change of this size in a patch series to make
-it a bit easier for reviewers, if it makes sense to you.
+>On Wed, Aug 27, 2025 at 11:43:19AM -0700, Jay Vosburgh wrote:
+>> Hangbin Liu <liuhangbin@gmail.com> wrote:
+>> 
+>> >Add support for the actor_port_prio option for bond slaves.
+>> >This per-port priority can be used by the bonding driver in ad_select to
+>> >choose the higher-priority aggregator during failover.
+>> >
+>> >Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+>> >---
+>> >v4: no update
+>> >v3: rename ad_actor_port_prio to actor_port_prio
+>> >v2: no update
+>> >---
+>> > ip/iplink_bond.c       |  1 +
+>> > ip/iplink_bond_slave.c | 18 ++++++++++++++++--
+>> > man/man8/ip-link.8.in  |  6 ++++++
+>> > 3 files changed, 23 insertions(+), 2 deletions(-)
+>> >
+>> >diff --git a/ip/iplink_bond.c b/ip/iplink_bond.c
+>> >index d6960f6d9b03..1a2c1b3042a0 100644
+>> >--- a/ip/iplink_bond.c
+>> >+++ b/ip/iplink_bond.c
+>> >@@ -91,6 +91,7 @@ static const char *ad_select_tbl[] = {
+>> > 	"stable",
+>> > 	"bandwidth",
+>> > 	"count",
+>> >+	"prio",
+>> 
+>> 	Should this be actor_port_prio?
+>
+>hmm, actor_port_prio correspond to the ip link option name, which is also
+>acceptable.
 
---=20
-Thanks,
-Mina
+	Isn't this the text of the ip link option name right here (in
+the sense of what goes on the "ip link" command line)?
+
+>While in kernel, we defined the select policy as
+>
+>        { "stable",    BOND_AD_STABLE,    BOND_VALFLAG_DEFAULT},
+>        { "bandwidth", BOND_AD_BANDWIDTH, 0},
+>        { "count",     BOND_AD_COUNT,     0},
+>+       { "prio",      BOND_AD_PRIO,      0},
+
+	Maybe my memory is starting to go, but I thought in a prior
+discussion we'd agreed to change this as well for consistency.
+
+>So I think the prio here should also be OK.
+>
+>You can decide which one to use.
+
+	I would prefer that the two options have discrete names, or,
+really, that we not repeat "prio" as it's already used elsewhere.  Plus,
+who knows, maybe in the future we'll have another priority option.
+
+	-J
+
+---
+	-Jay Vosburgh, jv@jvosburgh.net
 
