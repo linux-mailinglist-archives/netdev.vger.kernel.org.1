@@ -1,157 +1,181 @@
-Return-Path: <netdev+bounces-217737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F12AFB39A74
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 12:42:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 41CFAB39A76
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 12:42:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B3403A38EF
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 10:40:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E74193A3FE1
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 10:40:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A10BE30BF7E;
-	Thu, 28 Aug 2025 10:40:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAA7D30BF6C;
+	Thu, 28 Aug 2025 10:40:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b/MrN/V9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LcY6C1ng"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C8AB30ACE8
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 10:40:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DD45301030
+	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 10:40:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756377640; cv=none; b=FD6avwZb11xPQo78v4otj+54QduHqL+iaLZA1M+jwaHoBy4rliavU2a12Td8cojuDadk94oLi0kjg6BNkiNRWaybhdA3K+jwQtffrf0H1QRCctkZJeqfVmQk2wdO2dkZC+aiLtiUkE1buZU6OCbF0jarbREnTlM2uJTLeJumL98=
+	t=1756377645; cv=none; b=PT+li7zCKuX1vPdKScGjA202tP5Noy9EafeQvYjfPiSUjzANF00mzDTg60/PZuwCW1Td0ZsJXQbY7pIZiKz0Id0fKXLtHotJu9weH+rN0pc43jZhsEEN9kJKZvmZ4l27IPOEWl5xt7pagXBqRR1865JjGvtRa6q2wWN5RzDFhxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756377640; c=relaxed/simple;
-	bh=NwR50ZpM6+Ymc6dkl0+mc9OsZhEF6EybCCscmIk+Dzo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i9FZKzZyaLIBIC7WxL3lo9qS0Ic3yumJ10LyJan4o4k0kxivseRqIC2a57jFUcr+4BaO4tJQy0j9OxrlUngrN08GmQfGEbNwBlaq8M47/q9iWB0o0gSgSKXc41uSxkeE8uYAGySJNo+F3zxBTL58NVDaucUANyak/DRjIJh4WJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b/MrN/V9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C80CAC4CEEB;
-	Thu, 28 Aug 2025 10:40:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756377640;
-	bh=NwR50ZpM6+Ymc6dkl0+mc9OsZhEF6EybCCscmIk+Dzo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=b/MrN/V9C+XQmfWdIPZiTK9ah1S1Zvix6O9zkq3Qk26i/Wna/kqG9XOV+7+c7Wc9n
-	 JOaIkR3bmfJ0nePmMaaodHhqeCe+bzLayOWcV/yN7bzttvT2ekqaA8euLSU9xVRBpg
-	 ASE0RGmdG/2Lw7YAcyeunohVxv0bsNNnWqgIodTSFLiCWvgeNYOaT9lijWiI9wGljk
-	 JDP+cO/0LiLRW/NOm3mYHeUoRyxWxK7wEC8DINQU5qmiOMB4gXijI7bPNt6wLLx05d
-	 SzfiX/U+JRiEeHGtjhwB4asa3qE+5NnfTBuTbC8YkeTvtEc1sXzExl8u6cKszlWGmR
-	 9fwoNM83X5gdw==
-Date: Thu, 28 Aug 2025 11:40:36 +0100
-From: Simon Horman <horms@kernel.org>
-To: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, madhu.chittim@intel.com,
-	netdev@vger.kernel.org,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>
-Subject: Re: [PATCH net-next v1] idpf: add support for IDPF PCI programming
- interface
-Message-ID: <20250828104036.GA10519@horms.kernel.org>
-References: <20250826172845.265142-1-pavan.kumar.linga@intel.com>
+	s=arc-20240116; t=1756377645; c=relaxed/simple;
+	bh=vh7fMEWd0Jq1p7Y+60fhxSr9ILPF78euaHc5OtTjgQ8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bOI6+CR3g7KBWx449xgz6EY7SJFhp//mwRhI8/JPUxPJyNoZKrB4X19g+mAM8I2lLkpjqgvby2P81dTECzmi6eokaFmb7NriQ3yRTEXH13+PesKBHYuIjbHHuFwyX7ZozPkMzPL3a7LWLlwrqjR/wO4RzQPc1ggAIdaozlIdrFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LcY6C1ng; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756377642;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Cu7avEmKr1UKr5IvTbnHZf4VMpiPVvy6lyYGguLMfRg=;
+	b=LcY6C1ngg/fYhn8wdPuFF0GuN+xNi6WAsaZZRgia4u9HmNYunZejOwmLvyok6Jq1kuqHwc
+	Zsgy41oRWIoL1ASHqgg6/oodCTmAhXwZMPrYxefUvB3lMsePH+w2uqogZ0JNeZ/wC1T0XO
+	lCJ/6EUJCVj07Qo/Zr7ZCanoq54Y2N0=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-75-fWQEavqmNbC-AppYAhEEVA-1; Thu, 28 Aug 2025 06:40:41 -0400
+X-MC-Unique: fWQEavqmNbC-AppYAhEEVA-1
+X-Mimecast-MFC-AGG-ID: fWQEavqmNbC-AppYAhEEVA_1756377641
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7fae3dffdd5so59126185a.0
+        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 03:40:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756377641; x=1756982441;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Cu7avEmKr1UKr5IvTbnHZf4VMpiPVvy6lyYGguLMfRg=;
+        b=u3pm/Eiow0En/2GGgcYkbOI2ptuz4MOtawcVQAw27kcm80bC1oF9jTuMY0jsIcwGKE
+         V1jPTyNaGJcUAj2oES77yG85SZMNyb06M71rDKiKJFVMdCEvz3QuKLuTifUYSMUxCERI
+         y35pkrNUThNBicZDMjHQM0v6CBOtrd1Y9tUcK4wC4F4EFGQhwAJI7ezaekn6gJztF1y3
+         /8v4jZZ4zf+jUNmfKlo0VuC1RdCF9y7pgsEB78lXuxR1gIwWTF+/iS+JACzS+fFezbiT
+         29QuntBvbiwPoZKPe7uc7U9TAXVTotAeDWl9FfK1+lbqgBqKyM+uV2/1I84elMe2alWq
+         mJOg==
+X-Gm-Message-State: AOJu0Yx/H7IfzBhZio8dHpuuJqrBxR5/kJmMV5JcEkp60b+p7VIvG5HC
+	ToDdRPfkrmAlAJ8iDjCoFwfvrtr2pPr8UUqnwi+YUUFJDpxMesgYTa+9YysKB25pu8RzDzlGEJF
+	xdIHUbjZ+/Q+5jEJOBm/kyMKIQqvTrfzQ3ViEez1SRYravTABgsf140xDdg==
+X-Gm-Gg: ASbGncu7lJldfd7P2KAFMPE174h+UcMygacSsWGSzvfEyZMU1VHBlyWAW/y62OaMrNo
+	z8oUE7fXNtK2rptwi+nyD8JHwxR9t3RbNOpGeZsE5kUI/UVdko+u/wDuGSZs/fOAfEhUphycNgu
+	9OWb1cWuP2Ia8Ux5UUSmZwb4dHRhtTjwYkf21fd5palcv73WQPLeJNBT8Iph2uoUNqTAB49XNy9
+	9I1HSj0OJ/LkGB3HslzEsAkoowJK8kCvSasbnGEAXomrlMbx7rzADuZ2hmzf3KyHfKHtbTprm6t
+	5kWxMD/EBv4nlHVRCsLWOsO/p1FUJ7UrORZENG9YsxPd/M4KxiEZybnfTbD9jwslpe7+svKMLFx
+	0oxrfx3YDNZs=
+X-Received: by 2002:a05:620a:1a16:b0:7e6:5f0b:3264 with SMTP id af79cd13be357-7ea1108dfedmr2469697185a.64.1756377641147;
+        Thu, 28 Aug 2025 03:40:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHUFwMuno0DqsbvQgSM9tyaDqePXxP1jHq7h7GG+mM0Y/SoQ6Sp7Nz/JepfglKGzNWSm99vFg==
+X-Received: by 2002:a05:620a:1a16:b0:7e6:5f0b:3264 with SMTP id af79cd13be357-7ea1108dfedmr2469694885a.64.1756377640692;
+        Thu, 28 Aug 2025 03:40:40 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7ebf35f00a1sm1054472185a.53.2025.08.28.03.40.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Aug 2025 03:40:40 -0700 (PDT)
+Message-ID: <9be8e52c-cb92-4969-b324-febaffeab563@redhat.com>
+Date: Thu, 28 Aug 2025 12:40:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250826172845.265142-1-pavan.kumar.linga@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv2 net] hsr: use proper locking when iterating over ports
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, MD Danish Anwar <danishanwar@ti.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Jaakko Karrenpalo <jkarrenpalo@gmail.com>,
+ Fernando Fernandez Mancera <ffmancera@riseup.net>,
+ Murali Karicheri <m-karicheri2@ti.com>, WingMan Kwok <w-kwok2@ti.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Xiao Liang <shaw.leon@gmail.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>,
+ Johannes Berg <johannes.berg@intel.com>
+References: <20250827093323.432414-1-liuhangbin@gmail.com>
+ <147f016f-bf5e-4cb6-80a7-192db0ff62c4@redhat.com> <aLAm8Fka8E19JOay@fedora>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <aLAm8Fka8E19JOay@fedora>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 26, 2025 at 10:28:45AM -0700, Pavan Kumar Linga wrote:
-> At present IDPF supports only 0x1452 and 0x145C as PF and VF device IDs
-> on our current generation hardware. Future hardware exposes a new set of
-> device IDs for each generation. To avoid adding a new device ID for each
-> generation and to make the driver forward and backward compatible,
-> make use of the IDPF PCI programming interface to load the driver.
+On 8/28/25 11:52 AM, Hangbin Liu wrote:
+> On Thu, Aug 28, 2025 at 11:19:11AM +0200, Paolo Abeni wrote:
+>> On 8/27/25 11:33 AM, Hangbin Liu wrote:
+>>> diff --git a/net/hsr/hsr_main.c b/net/hsr/hsr_main.c
+>>> index 192893c3f2ec..eec6e20a8494 100644
+>>> --- a/net/hsr/hsr_main.c
+>>> +++ b/net/hsr/hsr_main.c
+>>> @@ -22,9 +22,13 @@ static bool hsr_slave_empty(struct hsr_priv *hsr)
+>>>  {
+>>>  	struct hsr_port *port;
+>>>  
+>>> +	rcu_read_lock();
+>>>  	hsr_for_each_port(hsr, port)
+>>> -		if (port->type != HSR_PT_MASTER)
+>>> +		if (port->type != HSR_PT_MASTER) {
+>>> +			rcu_read_unlock();
+>>>  			return false;
+>>> +		}
+>>> +	rcu_read_unlock();
+>>>  	return true;
+>>>  }
+>>
+>> AFAICS the only caller of this helper is under the RTNL lock
 > 
-> Write and read the VF_ARQBAL mailbox register to find if the current
-> device is a PF or a VF.
+> Thanks, sometimes I not very sure if the caller is under RTNL lock or not.
+> Is there a good way to check this?
+
+I'm not aware of any formal way to do this check. I relay on code
+inspection.
+
+>>> @@ -134,9 +138,13 @@ struct hsr_port *hsr_port_get_hsr(struct hsr_priv *hsr, enum hsr_port_type pt)
+>>>  {
+>>>  	struct hsr_port *port;
+>>>  
+>>> +	rcu_read_lock();
+>>>  	hsr_for_each_port(hsr, port)
+>>> -		if (port->type == pt)
+>>> +		if (port->type == pt) {
+>>> +			rcu_read_unlock();
+>>>  			return port;
+>>
+>> The above is not enough.
+>>
+>> AFAICS some/most caller are already either under the RTNL lock or the
+>> rcu lock.
+>>
+>> I think it would be better rename the hsr_for_each_port_rtnl() helper to
+>> hsr_for_each_port_rcu(), retaining the current semantic, use it here,
+>> and fix the caller as needed.
 > 
-> PCI SIG allocated a new programming interface for the IDPF compliant
-> ethernet network controller devices. It can be found at:
-> https://members.pcisig.com/wg/PCI-SIG/document/20113
-> with the document titled as 'PCI Code and ID Assignment Revision 1.16'
-> or any latest revisions.
+> Do you mean to modify like
 > 
-> Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
-> Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-> Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+>  #define hsr_for_each_port(hsr, port) \
+>         list_for_each_entry_rcu((port), &(hsr)->ports, port_list)
+> 
+> +#define hsr_for_each_port_rcu(hsr, port) \
+> +       list_for_each_entry_rcu((port), &(hsr)->ports, port_list, lockdep_rtnl_is_held())
+> 
+> 
+> I'm not sure if the naming is clear. e.g. rcu_dereference_rtnl() also use rtnl
+> suffix to check if rtnl is held.
 
-...
+My naming suggestions are usually not that good, feel free to opt for a
+better name. The more substantial feedback here is to properly address
+the relevant callers.
 
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
-> index 8c46481d2e1f..b161715e1168 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_main.c
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
-> @@ -7,11 +7,57 @@
->  
->  #define DRV_SUMMARY	"Intel(R) Infrastructure Data Path Function Linux Driver"
->  
-> +#define IDPF_NETWORK_ETHERNET_PROGIF				0x01
-> +#define IDPF_CLASS_NETWORK_ETHERNET_PROGIF			\
-> +	(PCI_CLASS_NETWORK_ETHERNET << 8 | IDPF_NETWORK_ETHERNET_PROGIF)
-> +
->  MODULE_DESCRIPTION(DRV_SUMMARY);
->  MODULE_IMPORT_NS("LIBETH");
->  MODULE_IMPORT_NS("LIBETH_XDP");
->  MODULE_LICENSE("GPL");
->  
-> +/**
-> + * idpf_dev_init - Initialize device specific parameters
-> + * @adapter: adapter to initialize
-> + * @ent: entry in idpf_pci_tbl
-> + *
-> + * Return: %0 on success, -%errno on failure.
-> + */
-> +static int idpf_dev_init(struct idpf_adapter *adapter,
-> +			 const struct pci_device_id *ent)
-> +{
-> +	u8 is_vf = 0;
-> +	int err;
-> +
-> +	switch (ent->device) {
-> +	case IDPF_DEV_ID_PF:
-> +		goto dev_ops_init;
-> +	case IDPF_DEV_ID_VF:
-> +		is_vf = 1;
-> +		goto dev_ops_init;
-> +	default:
-> +		if (ent->class == IDPF_CLASS_NETWORK_ETHERNET_PROGIF)
-> +			goto check_vf;
-> +
-> +		return -ENODEV;
-> +	}
-> +
-> +check_vf:
-> +	err = idpf_is_vf_device(adapter->pdev, &is_vf);
-> +	if (err)
-> +		return err;
-> +
-> +dev_ops_init:
-> +	if (is_vf) {
-> +		idpf_vf_dev_ops_init(adapter);
-> +		adapter->crc_enable = true;
-> +	} else {
-> +		idpf_dev_ops_init(adapter);
-> +	}
-> +
-> +	return 0;
-> +}
+Thanks,
 
-Hi Pavan,
+Paolo
 
-I think that in Kernel Networking code the usual use cases
-of goto labels are: for error handling; and, optimisation,
-f.e. in the datapath.
-
-I don't think this code falls into either category.
-So I suggest implementing it without gotos.
-
-Thanks!
-
-...
 
