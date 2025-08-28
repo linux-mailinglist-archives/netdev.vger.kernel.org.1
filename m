@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-217556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DA58B390CF
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 03:10:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0C4AB390D0
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 03:10:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52ED03A79E9
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 01:10:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C680E189EAD3
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 01:10:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BBD61CD215;
-	Thu, 28 Aug 2025 01:10:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28D791DF258;
+	Thu, 28 Aug 2025 01:10:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BXSLP4a9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ghKuZKVm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39FC13FEE
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 01:10:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F37991DED40;
+	Thu, 28 Aug 2025 01:10:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756343402; cv=none; b=J2P5RxKnEsHZU+nieqLFOr1LEsnqzGCm91oDI/yCp1Ng68BARZtXWVJKcxmJMKKoMaKG1k6g/wrmgVKdEujnQFP/BtTL41kQwE5P+FekhMJWWxxrpc9Nil0QGg5k2LxhNT8+FIVvXiUDuzd+9wDKMP7uvjBoNm6TmwkFkEybS2w=
+	t=1756343404; cv=none; b=WRLEjyGfytbD9dugWj/qotnrVhr8tAnuPWxji/S44nc5GPO0MyWf4p/29DT3aXlTh5vvBmoaV7SfEc1xBcYY5XMT9tZ7Hpa/3/Y5yDApu+PAuo8UHSPBXMnmSuTJ8JmZ+mFgtnKztdbVp/QgnoyQpliui7yehHvfwIDtkgAW4KY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756343402; c=relaxed/simple;
-	bh=Nr8wdygm5ZHasgbTWbKwSJrNjuVQXo8eMAOnPf9F85E=;
+	s=arc-20240116; t=1756343404; c=relaxed/simple;
+	bh=9epErMzKwEF73B1z1uZQqR7IOWewVgK6nclV/VwLCFI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bQ8u4Qjn9mhbjBzTrKcdEB3geJZfmhqBO6mwH7Oe/pbzEz6/RktzIBxDazC1D8HWJeVa1cHZYIdjuIakR6lsO7Rz3UUpK1n4pCz8+mxY7vfz0RW1kuBglAY2XUtqfAy+PaRxlKPou/nyGq6tLLCcLsAVYVb3NB+AbXk60ZwKYGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BXSLP4a9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74A79C4CEEB;
-	Thu, 28 Aug 2025 01:09:59 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=VIcXqrw9SUGpRmd+K74Sy6DI/2HkiuZkBJmbiEMTE1MHK3hiAvZfcL7WdKad/tk3GIMTSh8T1tjZ3Nv6RbkE27VIqzfvrBmQ9f+WwcGslddjfKY2g4wji/Xpu3wSUJOhUdv2YhW4Xeu3no7EX8Jojd8lo4nNluL+kUen0Ri1ElA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ghKuZKVm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C290C4CEF9;
+	Thu, 28 Aug 2025 01:10:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756343400;
-	bh=Nr8wdygm5ZHasgbTWbKwSJrNjuVQXo8eMAOnPf9F85E=;
+	s=k20201202; t=1756343403;
+	bh=9epErMzKwEF73B1z1uZQqR7IOWewVgK6nclV/VwLCFI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=BXSLP4a9AmfbERLs3ClyzOKoY06KJIBm5PbsgqU/0v3r3BjQPtge8XnqgPQiBVqpN
-	 D8WNfI/3+JRyFoadlzsfwvaBgzCKDLX6bxNfHqRifBt1TfDaPVTWqW1eCrzEn0Q281
-	 i3lvgr4J3R4Ry78pepRupQV0gqXeFo7VAmR1QRyYSzk7yjZIZwfwIXzoUFZ9CxobwV
-	 gUFnQmAKp6BVXNBsGW0RH2iqff/yhp62NpQhx8ptxaw26pPV8+ht6B4uszelHQ6OYe
-	 k3TaSZJKVB9hadnqQyq624eD+9ChOrHoCjcjj9TbHHLFjrP2Y5bJwVTNyQkzlBmTP/
-	 TAZeYW0dKMAug==
+	b=ghKuZKVmA0U7YggCEOOsk05ZzrFAIuXRHH5nsZqvUDwLBYJUZalyLvsU7goP3Zw1l
+	 siY2/wYGtd5vJZ/cBOFL3rj34TbPSy98XtR5aGA1iEC7f0lOMKEbNCzEWM6vwzkUYt
+	 SPOANcU9iKoOmkHbqw3WPZnOyZzT/PA6f/d/NiX08c6NFbNKjkRnCpqjXwj0YwDH/n
+	 lSORYyoCg76RsWZLK0CvRfoAUvGgFe1k05Z4bGz6TTVONDfW/2EHc72NUoMQc1RyYs
+	 WyMiUPebc3ilr6X8ETrOHeoykfI6wr1vj2A0cBQ+eT6gMPWk69i1clAW1tYm66f+23
+	 a/jDkW0wpY4LA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF4C383BF76;
-	Thu, 28 Aug 2025 01:10:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD79383BF77;
+	Thu, 28 Aug 2025 01:10:11 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,48 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: rose: fix a typo in rose_clear_routes()
+Subject: Re: [PATCH] amd-xgbe: Use int type to store negative error codes
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175634340672.896460.17520772255929782483.git-patchwork-notify@kernel.org>
-Date: Thu, 28 Aug 2025 01:10:06 +0000
-References: <20250827172149.5359-1-edumazet@google.com>
-In-Reply-To: <20250827172149.5359-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- netdev@vger.kernel.org, eric.dumazet@gmail.com,
- syzbot+2eb8d1719f7cfcfa6840@syzkaller.appspotmail.com, takamitz@amazon.co.jp,
- kuniyu@google.com
+ <175634341072.896460.8805791812563148479.git-patchwork-notify@kernel.org>
+Date: Thu, 28 Aug 2025 01:10:10 +0000
+References: <20250826142159.525059-1-rongqianfeng@vivo.com>
+In-Reply-To: <20250826142159.525059-1-rongqianfeng@vivo.com>
+To: Qianfeng Rong <rongqianfeng@vivo.com>
+Cc: Shyam-sundar.S-k@amd.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 27 Aug 2025 17:21:49 +0000 you wrote:
-> syzbot crashed in rose_clear_routes(), after a recent patch typo.
+On Tue, 26 Aug 2025 22:21:59 +0800 you wrote:
+> Use int instead of unsigned int for the 'ret' variable to store return
+> values from functions that either return zero on success or negative error
+> codes on failure.  Storing negative error codes in an unsigned int causes
+> no runtime issues, but it's ugly as pants,  Change 'ret' from unsigned int
+> to int type - this change has no runtime impact.
 > 
-> KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
-> CPU: 0 UID: 0 PID: 10591 Comm: syz.3.1856 Not tainted syzkaller #0 PREEMPT(full)
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
->  RIP: 0010:rose_clear_routes net/rose/rose_route.c:565 [inline]
->  RIP: 0010:rose_rt_ioctl+0x162/0x1250 net/rose/rose_route.c:760
->  <TASK>
->   rose_ioctl+0x3ce/0x8b0 net/rose/af_rose.c:1381
->   sock_do_ioctl+0xd9/0x300 net/socket.c:1238
->   sock_ioctl+0x576/0x790 net/socket.c:1359
->   vfs_ioctl fs/ioctl.c:51 [inline]
->   __do_sys_ioctl fs/ioctl.c:598 [inline]
->   __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:584
->   do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->   do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> Signed-off-by: Qianfeng Rong <rongqianfeng@vivo.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: rose: fix a typo in rose_clear_routes()
-    https://git.kernel.org/netdev/net/c/1cc8a5b534e5
+  - amd-xgbe: Use int type to store negative error codes
+    https://git.kernel.org/netdev/net-next/c/a6bac1822931
 
 You are awesome, thank you!
 -- 
