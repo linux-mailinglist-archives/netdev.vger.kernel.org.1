@@ -1,188 +1,100 @@
-Return-Path: <netdev+bounces-217784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07B06B39D3F
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 14:27:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 350E7B39D50
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 14:30:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B239E3A7892
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 12:27:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9299E7A7A84
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 12:28:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EBEE2BE7B6;
-	Thu, 28 Aug 2025 12:27:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11DAE30F7ED;
+	Thu, 28 Aug 2025 12:30:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="KvQuquVg"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mY8/R/zy"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FF723597A;
-	Thu, 28 Aug 2025 12:27:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77AD71B0F1E;
+	Thu, 28 Aug 2025 12:30:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756384022; cv=none; b=FbVHzmUJYsblVC9kg/tPS69D52s8HYmrHAAZynvG+FMy+fIEH98M89b/Y8X5+7mClAv1mNuyDBaJ/cD8fpKDK0mRXE8n1FMU6SowY4/yhNxaWwTzL+60SbPWtV4jzpprBzHrQQjj7Pq7jLQ2EBejAxw5CDGbWwExXj7PmIjSJMQ=
+	t=1756384220; cv=none; b=NNBExxx3kIlqh69zInZyDVuDqocd+hGOmel0IqgYUbzuaXBpYy2uiAxKksYdNxYacurZd5eB9asVdKsOFwfQKc8MXijQMAdUfQBfWI8L5p87vyG8oC8Hb4c5H9sZs8hO9ZEOhB1CsRQ6Aeaj70QR5dgNJbmFWdoq8pZPx79MdxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756384022; c=relaxed/simple;
-	bh=G0Ya/rkZOqFLIubv7JSwNnANgiW3TGI9H3KLop0bf94=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YECZdcLQ5DrtXBtifZrsOsODqsg0NeNuMt2EsOelOWj2dGVCRyyLPIeDjN+wZ0PoFukFw3Vma0WchTcJ44nMod1uJmmmYbO++JbPYmqjh32gS97kffGZWn1rJX6UD6HxTByAMve5nkVKBcZUINObQn64hKWFd/uD4wEWa/4KWEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=KvQuquVg; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
-	Resent-Message-ID:In-Reply-To:References;
-	bh=8DIgSq5j3BwhjRCYiSPt1y0uheSYrcaJJ9gV/K/2uSc=; t=1756384020; x=1757593620; 
-	b=KvQuquVgmoiJDbzxiKIEghQLh8n0YEHclHJYPds62zkgGVpGofuSRlqdo4qaSZw10NCLxtkqVWM
-	YLDgULSB9/0z9/foCf3+m4MJd6SexJxV1WwipHmOU/OGwiZ2Gm+JOL8M5Tf9ECCCeiXMf+W3YQmZM
-	or1eEIJD+Y5KvrI/z+2DsS/bKNHxRm01z/CqZzUNxzb8gevTUTXzmmbzbhq1bku28LukrHtvN1fpa
-	J7+XSNf0f3iC1ToUuAOP581bzd2mfQZ1ZVZp6szUseM2sJa0Bg+v8c06sp8omDR/XOTpdduAdGrNA
-	ClELtvtBqHKsWzFVrAZ60kU/0/Gc2mIHDEsg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1urbiT-00000007XpG-3evY;
-	Thu, 28 Aug 2025 14:26:58 +0200
-From: Johannes Berg <johannes@sipsolutions.net>
-To: netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Subject: [GIT PULL] wireless-2025-08-28
-Date: Thu, 28 Aug 2025 14:25:58 +0200
-Message-ID: <20250828122654.1167754-8-johannes@sipsolutions.net>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1756384220; c=relaxed/simple;
+	bh=uaVJpAMdPWrV9NtuD8VA/dcwu9Kie80TwIuBdrhSujE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DktvSIqlxi+KQJaFu4/KtrHdty3rbsGZ/hC3o006KGAnKsHs/+CyjeMjwBlds7ObCRqV7R7BCCb1FBpQg6okPloIo+vOUjMl9VmIyTxm+bj5AdJlx6PLfJ92YPyBlMu65YruxdF/ZsFr9IlG0mhxcH/q3PXyler/MQqO6MpAnxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mY8/R/zy; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=gKv9reSnTFal7lXW3j+/yEjJ6IbCvDAdZ9nuha3XXs0=; b=mY8/R/zy6i0Kh4sWhO7Di3jfhe
+	O1fXCoavC+3xOR1GDmIBwvtHBmXI6uVfOS3xgp3smq4SaVR5AqwjFaeGah/392dLciS56KV4Gd2Nn
+	PlnfiS5M3FZfnoHd71YVXyepEf4+dQv4LBgbqlxmzAHIIOflkl7Jd6d+jZW8tY/TcUIs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1urbl7-006LUg-DP; Thu, 28 Aug 2025 14:29:41 +0200
+Date: Thu, 28 Aug 2025 14:29:41 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Troy Mitchell <troy.mitchell@linux.spacemit.com>
+Cc: Vivian Wang <wangruikang@iscas.ac.cn>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Vivian Wang <uwu@dram.page>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Junhui Liu <junhui.liu@pigmoral.tech>,
+	Simon Horman <horms@kernel.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v7 2/5] net: spacemit: Add K1 Ethernet MAC
+Message-ID: <ecd74582-6d65-42eb-999d-05dbfc898370@lunn.ch>
+References: <20250826-net-k1-emac-v7-0-5bc158d086ae@iscas.ac.cn>
+ <20250826-net-k1-emac-v7-2-5bc158d086ae@iscas.ac.cn>
+ <193454B6B44560D1+aK-x9J2EIB5aA9yr@LT-Guozexi>
+ <6c221dcf-4310-4e31-b3e8-a8a3b68c3734@iscas.ac.cn>
+ <D1B3E8CA05947AC1+aLAT40m4VCtlL2Yk@LT-Guozexi>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <D1B3E8CA05947AC1+aLAT40m4VCtlL2Yk@LT-Guozexi>
 
-Hi,
+> > You tricked me! There's one more review comment below :P
+> Haha, You are so cute, Vivian.
+> I'm surprised you were able to find it, because I went back to check after
+> writing the last comment. So I wasn't able to find the final one myself.
+> 
+>                 - Troy
+> 
+> (This really is the final one this time.)
 
-Back from vacation, and a bunch of things accumulated
-for everyone. Nothing really stands out much though,
-except perhaps the various iwlwifi regressions for old
-devices, which were all my fault...
+A nice illustration of why trimming replies to just the needed context
+is a good idea.
 
-Please pull and let us know if there's any problem.
+Andrew
 
-Thanks,
-johannes
-
-
-
-The following changes since commit 6439a0e64c355d2e375bd094f365d56ce81faba3:
-
-  Merge tag 'net-6.17-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-08-21 13:51:15 -0400)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2025-08-28
-
-for you to fetch changes up to 2c72c8d356db40178be558bbbd43a1d0b5bd0c27:
-
-  Merge tag 'iwlwifi-fixes-2025-08-28' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next (2025-08-28 14:03:32 +0200)
-
-----------------------------------------------------------------
-Some fixes for the current cycle:
- - mt76: MLO regressions, offchannel handling, list corruption
- - mac80211: scan allocation size, no 40 MHz EHT, signed type
- - rt2x00: (randconfig) build
- - cfg80211: use-after-free
- - iwlwifi: config/old devices, BIOS compatibility
- - mwifiex: vmalloc content leak
-
-----------------------------------------------------------------
-Arnd Bergmann (2):
-      wifi: rt2800: select CONFIG_RT2X00_LIB as needed
-      wifi: rt2x00: fix CRC_CCITT dependency
-
-Benjamin Berg (1):
-      wifi: mac80211: do not permit 40 MHz EHT operation on 5/6 GHz
-
-Chad Monroe (1):
-      wifi: mt76: mt7996: use the correct vif link for scanning/roc
-
-Dmitry Antipov (1):
-      wifi: cfg80211: fix use-after-free in cmp_bss()
-
-Duoming Zhou (1):
-      wifi: brcmfmac: fix use-after-free when rescheduling brcmf_btcoex_info work
-
-Emmanuel Grumbach (1):
-      wifi: iwlwifi: if scratch is ~0U, consider it a failure
-
-Felix Fietkau (8):
-      wifi: mt76: prevent non-offchannel mgmt tx during scan/roc
-      wifi: mt76: mt7996: disable beacons when going offchannel
-      wifi: mt76: mt7996: fix crash on some tx status reports
-      wifi: mt76: do not add non-sta wcid entries to the poll list
-      wifi: mt76: mt7996: add missing check for rx wcid entries
-      wifi: mt76: mt7915: fix list corruption after hardware restart
-      wifi: mt76: free pending offchannel tx frames on wcid cleanup
-      wifi: mt76: fix linked list corruption
-
-Harshit Mogalapalli (1):
-      wifi: mt76: mt7925: fix locking in mt7925_change_vif_links()
-
-Janusz Dziedzic (1):
-      wifi: mt76: mt7921: don't disconnect when CSA to DFS chan
-
-Johannes Berg (7):
-      wifi: iwlwifi: acpi: check DSM func validity
-      wifi: iwlwifi: uefi: check DSM item validity
-      Merge tag 'mt76-fixes-2025-08-27' of https://github.com/nbd168/wireless
-      wifi: iwlwifi: cfg: restore some 1000 series configs
-      wifi: iwlwifi: fix byte count table for old devices
-      wifi: iwlwifi: cfg: add back more lost PCI IDs
-      Merge tag 'iwlwifi-fixes-2025-08-28' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next
-
-Lachlan Hodges (1):
-      wifi: mac80211: increase scan_ies_len for S1G
-
-Liao Yuanhong (1):
-      wifi: mac80211: fix incorrect type for ret
-
-Ming Yen Hsieh (3):
-      wifi: mt76: mt7925: fix the wrong bss cleanup for SAP
-      wifi: mt76: mt7925u: use connac3 tx aggr check in tx complete
-      wifi: mt76: mt7925: skip EHT MLD TLV on non-MLD and pass conn_state for sta_cmd
-
-Nathan Chancellor (1):
-      wifi: mt76: mt7996: Initialize hdr before passing to skb_put_data()
-
-Qianfeng Rong (1):
-      wifi: mwifiex: Initialize the chan_stats array to zero
-
- .../wireless/broadcom/brcm80211/brcmfmac/btcoex.c  |  6 +--
- drivers/net/wireless/intel/iwlwifi/fw/acpi.c       | 25 ++++++++-
- drivers/net/wireless/intel/iwlwifi/fw/runtime.h    |  8 +++
- drivers/net/wireless/intel/iwlwifi/fw/uefi.c       |  6 +++
- drivers/net/wireless/intel/iwlwifi/pcie/drv.c      | 22 ++++++--
- .../net/wireless/intel/iwlwifi/pcie/gen1_2/tx.c    |  3 +-
- drivers/net/wireless/marvell/mwifiex/cfg80211.c    |  5 +-
- drivers/net/wireless/marvell/mwifiex/main.c        |  4 +-
- drivers/net/wireless/mediatek/mt76/mac80211.c      | 43 +++++++++++++++-
- drivers/net/wireless/mediatek/mt76/mt76.h          |  1 +
- drivers/net/wireless/mediatek/mt76/mt7915/mac.c    | 12 ++---
- drivers/net/wireless/mediatek/mt76/mt7921/main.c   |  5 +-
- drivers/net/wireless/mediatek/mt76/mt7925/mac.c    |  2 +-
- drivers/net/wireless/mediatek/mt76/mt7925/main.c   |  7 ++-
- drivers/net/wireless/mediatek/mt76/mt7925/mcu.c    | 12 +++--
- drivers/net/wireless/mediatek/mt76/mt7996/mac.c    | 60 ++++++++++++++--------
- drivers/net/wireless/mediatek/mt76/mt7996/main.c   |  5 ++
- drivers/net/wireless/mediatek/mt76/mt7996/mcu.c    | 15 ++++--
- drivers/net/wireless/mediatek/mt76/mt7996/mt7996.h |  1 +
- drivers/net/wireless/mediatek/mt76/tx.c            | 12 ++---
- drivers/net/wireless/ralink/rt2x00/Kconfig         |  4 +-
- net/mac80211/driver-ops.h                          |  2 +-
- net/mac80211/main.c                                |  7 ++-
- net/mac80211/mlme.c                                |  8 +++
- net/mac80211/tests/chan-mode.c                     | 30 +++++++++--
- net/wireless/scan.c                                |  3 +-
- 26 files changed, 232 insertions(+), 76 deletions(-)
+---
+pw-bot: cr
 
