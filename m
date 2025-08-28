@@ -1,167 +1,120 @@
-Return-Path: <netdev+bounces-217775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42A68B39CC2
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 14:18:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 92775B39CD9
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 14:19:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E561B203721
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 12:17:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EDEA204493
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 12:18:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98E4331CA49;
-	Thu, 28 Aug 2025 12:11:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAB3A2FE56E;
+	Thu, 28 Aug 2025 12:15:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="MdvUZhgB";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Pcv7lhaP"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from fhigh-b1-smtp.messagingengine.com (fhigh-b1-smtp.messagingengine.com [202.12.124.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F708314B6D;
-	Thu, 28 Aug 2025 12:11:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 546BA30F818
+	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 12:15:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756383066; cv=none; b=n11RKXLcGHRHLuPIQNhLli2I/fPHnrOtNtFeXMoXbs4nfAWRCkwex5Afo/Npm1oACjseMtGIhXw6InQkwbzCUYOUzVaJxSH4xhIbDzZnW6/wrNEbZ+kjJKbZKQ1dWfHIYdOg11gDTiP+uLzQPtvfWTUaCCIRLLejNJlH/woyaPA=
+	t=1756383318; cv=none; b=ZfwN2UyhN9u7T6vFBRre/BUYskGGtVbxgAfRPfiKZXScqY81L1IMjr9pvWZDGG41WTS5gK2OfuL+oJJV3pJr2jxA9eNGz0CgBJSUhJ3PY3tvpkTuxa5s9mvpCMl9+Y2rMwvz0vWmJZyzqyk1nH7SwDRF5fw4R495kosgo8VNhcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756383066; c=relaxed/simple;
-	bh=9gPhIC0jDpWXohbffyiAu2Q16GprIW3MokPQ1OBOe00=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=msj7urzcoGCsZXjDP6r0Tdr01E/oJuiX+javMz3AaHYFJSliEtIrkeXOJK5lbIjsel5GH/jd2b2IovfbxFwWldPNuC+huUjpgv08eU/sfjJt9avDuL5oErKDi6lIiqxp8Txo7JZ5kTWi4CFLWesd2xJT1i2rpDh2v5EfT3IR+wU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4cCKrC2r6CzdcHL;
-	Thu, 28 Aug 2025 20:06:35 +0800 (CST)
-Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
-	by mail.maildlp.com (Postfix) with ESMTPS id 04CA6140123;
-	Thu, 28 Aug 2025 20:11:02 +0800 (CST)
-Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.189.55) by
- kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 28 Aug 2025 20:11:00 +0800
-From: Fan Gong <gongfan1@huawei.com>
-To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	<linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Bjorn Helgaas
-	<helgaas@kernel.org>, luosifu <luosifu@huawei.com>, Xin Guo
-	<guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>, Zhou
- Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
-	<shijing34@huawei.com>, Meny Yossefi <meny.yossefi@huawei.com>, Gur Stavi
-	<gur.stavi@huawei.com>, Lee Trager <lee@trager.us>, Michael Ellerman
-	<mpe@ellerman.id.au>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, Suman
- Ghosh <sumang@marvell.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Joe Damato <jdamato@fastly.com>, Christophe JAILLET
-	<christophe.jaillet@wanadoo.fr>
-Subject: [PATCH net-next v02 14/14] hinic3: Fix code style (Missing a blank line before return)
-Date: Thu, 28 Aug 2025 20:10:20 +0800
-Message-ID: <7ede06e5314dd62037c078f0bd50a4c49e3cf9ab.1756378721.git.zhuyikai1@h-partners.com>
-X-Mailer: git-send-email 2.51.0.windows.1
-In-Reply-To: <cover.1756378721.git.zhuyikai1@h-partners.com>
-References: <cover.1756378721.git.zhuyikai1@h-partners.com>
+	s=arc-20240116; t=1756383318; c=relaxed/simple;
+	bh=sPJgXka8mDRlEQO4nkTEm86oQu2D6kz2XhsgKNay7o8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fzbpFW3cYXU9YRnH4pEqr32dY1rrC/C8kJuSdZGafKoQOjouKeriQ7SAxHSTMUTDDaXJe1ENTrNA3OODaeSDBM5SumKR409VQcdE6k2UpvMA28QUkKN4UGjXLt1vwQugvHm8FZ9CwLVSkSZ/+h/BRIuep4xhpvyGRFEPYKHPGZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=MdvUZhgB; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Pcv7lhaP; arc=none smtp.client-ip=202.12.124.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-07.internal (phl-compute-07.internal [10.202.2.47])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 414EF7A01B3;
+	Thu, 28 Aug 2025 08:15:15 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-07.internal (MEProxy); Thu, 28 Aug 2025 08:15:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1756383315; x=
+	1756469715; bh=BfMtW0vrr0L4+Y3jUnjihQ6A0zOcpfGLYjhPgPZ9vww=; b=M
+	dvUZhgB1zQC52XLm40I+IqGDkz7uSbERUoXRCRVBN1VM18OCuVSjWabT21WEK/Yh
+	bCU4qYryvhc3WgzyRtCD6vB3DRXz3rvr7hMbQi2ONdpoPOLmS1+XRNtKc1xAocVv
+	AlVb/EgUEE/Qqdm+DsuxzGZBNzyQxam+qnA9OEoFa+ifiM9zVu+LMQNAYQONpQyv
+	/ZGkoCV7y6RKZWA41juz3D5+CyJCYrBcdv3GHBGTQ/3S/Gw6vq9LXLC1DLnQiDm5
+	3lS65ICnGuJOhQ+X84q0g45dNNQ73mKSseJkPZxPK+HFJEnfrwBv23XnvGpezscn
+	EkSJId8422wu67eRiwMgQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1756383315; x=1756469715; bh=BfMtW0vrr0L4+Y3jUnjihQ6A0zOcpfGLYjh
+	PgPZ9vww=; b=Pcv7lhaPsUNIiR4CQNtmKKCq4cy/0WChuplRD8kOC6+eb5+u9VF
+	NSkb2pxA70A+v+zmPpJhNgA585d8YkuwuxIsdWberR1m1t7GjvfkSdLJgRm1+rK2
+	Wzr1YB7wQKHEnKCRXkKeB51XgKtaee2jD5DQNthEfZGkLsb9dNbwaIVRHFt5d7+s
+	1VgqGL8k/L1x7XWfoZH7F58bl7m7beiuUIddP/vNthd+kq6pFryI7vhC3SoyHYPm
+	ef4KQkhHmR1S2sq+fn3sIlx3r2QH7Hye7pud17qnwGJsqzDjZzJEHQLBYYRhXXNp
+	boTBT9hXly1r3rRoxxUhjDbtilt9jAX8b0Q==
+X-ME-Sender: <xms:UkiwaIPdYbZz-_h6m5uAKIsdFv1zmi6TCqMxmTo7gFXtqWOGi4sWLw>
+    <xme:UkiwaPL4u5cg0m66RvO2885SLnIwiZ7NAVmtzWLPF7i7BN8yN_nqePh3lRCm-WAGG
+    2CgUHcPHCpQ4ikehuk>
+X-ME-Received: <xmr:UkiwaBG0pP9N-rP96PCE1ZRdL8ADa_6ezU3j5JdVL54AgsbClgmvmKklJ16o>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddukedutdduucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfhfgggtuggjsehttdertd
+    dttdejnecuhfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghs
+    hihsnhgrihhlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuieduge
+    dtfefhkeegteehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedt
+    necurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvth
+    dpnhgspghrtghpthhtohepvddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepkhhu
+    sggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvg
+    hrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:UkiwaPRuWnrwbQr9zJj6HwqARpNx7pZDUqFiGXskND4tV_cePtweEA>
+    <xmx:UkiwaFFhuNa-WwK4sKjJp212ueHK_lMVZ1X3OTUdROVD22dQy1Dl8A>
+    <xmx:UkiwaD_oMOQXqCCniit7TbY6U6nJ5pnzSFFIfOomkub3L1R0G233bA>
+    <xmx:UkiwaHJ0YYda-PYA5-Kt8f_oQlpxgjGQmfjvPTNd02l8LDjD9uAhkA>
+    <xmx:U0iwaHQD-jqW1mbyhnBWxp9JlQYT2SyT0dKrZhvW-ybMeKMbW34x2fEx>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 28 Aug 2025 08:15:14 -0400 (EDT)
+Date: Thu, 28 Aug 2025 14:15:12 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 08/13] macsec: add NLA_POLICY_MAX for
+ MACSEC_OFFLOAD_ATTR_TYPE and IFLA_MACSEC_OFFLOAD
+Message-ID: <aLBIUPQP_R972YXs@krikkit>
+References: <cover.1756202772.git.sd@queasysnail.net>
+ <37e1f1716f1d1d46d3d06c52317564b393fe60e6.1756202772.git.sd@queasysnail.net>
+ <20250827185149.48b45add@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- kwepemf100013.china.huawei.com (7.202.181.12)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250827185149.48b45add@kernel.org>
 
-Fix code style of missing a blank line before return.
+2025-08-27, 18:51:49 -0700, Jakub Kicinski wrote:
+> On Tue, 26 Aug 2025 15:16:26 +0200 Sabrina Dubroca wrote:
+> > This is equivalent to the existing checks allowing either
+> > MACSEC_OFFLOAD_OFF or calling macsec_check_offload.
+> 
+> AFAICT "equivalent" is a bit misleading as we didn't have validation.
+> But seems low risk.
 
-Co-developed-by: Xin Guo <guoxin09@huawei.com>
-Signed-off-by: Xin Guo <guoxin09@huawei.com>
-Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
-Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
-Signed-off-by: Fan Gong <gongfan1@huawei.com>
----
- drivers/net/ethernet/huawei/hinic3/hinic3_lld.c     | 5 +++++
- drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c | 1 +
- drivers/net/ethernet/huawei/hinic3/hinic3_tx.c      | 2 ++
- 3 files changed, 8 insertions(+)
+We didn't have validation, but macsec_check_offload would return false
+if offload was not one of {MACSEC_OFFLOAD_PHY,MACSEC_OFFLOAD_MAC}.
+So I don't think this is adding any constraints compared to what we
+already did.
 
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_lld.c b/drivers/net/ethernet/huawei/hinic3/hinic3_lld.c
-index 10477fb9cc34..3db8241a3b0c 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_lld.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_lld.c
-@@ -122,6 +122,7 @@ static int hinic3_attach_aux_devices(struct hinic3_hwdev *hwdev)
- 			goto err_del_adevs;
- 	}
- 	mutex_unlock(&pci_adapter->pdev_mutex);
-+
- 	return 0;
- 
- err_del_adevs:
-@@ -133,6 +134,7 @@ static int hinic3_attach_aux_devices(struct hinic3_hwdev *hwdev)
- 		}
- 	}
- 	mutex_unlock(&pci_adapter->pdev_mutex);
-+
- 	return -ENOMEM;
- }
- 
-@@ -154,6 +156,7 @@ struct hinic3_hwdev *hinic3_adev_get_hwdev(struct auxiliary_device *adev)
- 	struct hinic3_adev *hadev;
- 
- 	hadev = container_of(adev, struct hinic3_adev, adev);
-+
- 	return hadev->hwdev;
- }
- 
-@@ -335,6 +338,7 @@ static int hinic3_probe_func(struct hinic3_pcidev *pci_adapter)
- 
- err_out:
- 	dev_err(&pdev->dev, "PCIe device probe function failed\n");
-+
- 	return err;
- }
- 
-@@ -367,6 +371,7 @@ static int hinic3_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 
- err_out:
- 	dev_err(&pdev->dev, "PCIe device probe failed\n");
-+
- 	return err;
- }
- 
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
-index 9349b8a314ae..979f47ca77f9 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
-@@ -112,6 +112,7 @@ int hinic3_set_port_mtu(struct net_device *netdev, u16 new_mtu)
- 	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
- 
- 	func_tbl_cfg.mtu = new_mtu;
-+
- 	return hinic3_set_function_table(hwdev, BIT(L2NIC_FUNC_TBL_CFG_MTU),
- 					 &func_tbl_cfg);
- }
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c b/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
-index dea882260b11..92c43c05e3f2 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
-@@ -116,6 +116,7 @@ static int hinic3_tx_map_skb(struct net_device *netdev, struct sk_buff *skb,
- 	}
- 	dma_unmap_single(&pdev->dev, dma_info[0].dma, dma_info[0].len,
- 			 DMA_TO_DEVICE);
-+
- 	return err;
- }
- 
-@@ -601,6 +602,7 @@ netdev_tx_t hinic3_xmit_frame(struct sk_buff *skb, struct net_device *netdev)
- 
- err_drop_pkt:
- 	dev_kfree_skb_any(skb);
-+
- 	return NETDEV_TX_OK;
- }
- 
 -- 
-2.43.0
-
+Sabrina
 
