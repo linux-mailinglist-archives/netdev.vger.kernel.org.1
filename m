@@ -1,201 +1,133 @@
-Return-Path: <netdev+bounces-217986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC915B3AB45
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 22:06:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4DB6B3AB33
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 22:01:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEEAE189846B
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 20:07:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C95B9A00AE3
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 20:01:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A67324DD11;
-	Thu, 28 Aug 2025 20:06:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24E4E273D8B;
+	Thu, 28 Aug 2025 20:00:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dgbltHwj"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="cMAPOK/I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f202.google.com (mail-oi1-f202.google.com [209.85.167.202])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6722356D2
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 20:06:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0391862A
+	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 20:00:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756411598; cv=none; b=KM4Il/gabKIHgwqynPyhHLZR+gYi68N8sHahs6Cex/OXz2D+i7G2yFW6EOwmKTWw9b0/n2AjUJrWPwUb6t3nDphPSsDjCy2Bxcr4+NHz+OR5+aEEPN8B9C0rLPPbCR8B1YjxFWLFi52pkWim44LinYkUyPzEVUgHy4/qxJquyoo=
+	t=1756411256; cv=none; b=UwROUzWzHzME13VveuWipZUOfwZGj0ItxKMScxxsu01fBDC/QCBCoG739iAbdCgRYDGX0vJia8xPfA4NPuJzVbjOZrXKQ8VkEQ/hX/iPoe3b8ZVYnGDyDxLf45y9WQO3r+fvMPFSce7vwqI9AiOkqcRDvGy5JaTxlN5MP1RyL5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756411598; c=relaxed/simple;
-	bh=gxMEMG1w57T64iCUqeK7zokelZA0NrodviIV0mpFLSw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kz6TDflDx2lDYTOjJWwAZ1rDqz0OFwNn3nz+84aYhFBX9vjqv7PXXCRe5z26JiyIl7H/vMdn4A35Nu5Ckw+iGlaQ9n53dsp+a7w8/vvgmay660awuRejhZCeKrEccfPdCZTg7W+JOLuoo2S4HEnC54JLZFBdU6hKuxgOV4tD6FA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dgbltHwj; arc=none smtp.client-ip=209.85.167.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-oi1-f202.google.com with SMTP id 5614622812f47-435de7cd311so1635396b6e.2
-        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 13:06:36 -0700 (PDT)
+	s=arc-20240116; t=1756411256; c=relaxed/simple;
+	bh=Vr9F3xqCHEdFR93OX9lFs+rhkiKZsACDOAD+/wgW20g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bvzPQxbHyKXkNuAwFpN3vrZ3l78+Gy2SjunWS/9Xjf8Z6rFamGiEjw2a7ykq74X/6bT3DFLxS4P+G49wPUtqp0PL0tbisgv+klBG63kZINJ3s7GMvRrOsfcMx/lcHrlVeeKZrPbyIPXBogoZrxB5oZ//raboSkdbukduUmGykK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=cMAPOK/I; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-324fb2bb058so1286210a91.3
+        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 13:00:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756411595; x=1757016395; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vh8cyXr/01iLsvzF0RTNAys2N0pMPHL3fwYq6MQDtXQ=;
-        b=dgbltHwjyiSfX5W/CAsXLz6tNRXHnRUyGwNYWR0etmme4kUGJ3Dmqp7B88hU5TCRXJ
-         BVJQkHC5r8YHbTQIGbdjXznPawE9n6mCGCzOCWwQieHC+SsTBz3nZm23lYUXrCBbwD4a
-         pj5MvmJVMzLHVhMfG07KHWawiA+hPR+Z6rLqVpzDjjyPlbPto56drW8R4+OXsX6gkaZr
-         fgkJt0GydA5W8sKJYS/o9G6zoLn9UCmfOlLKOwUVX3TTU1N6iAy8AAAC4VwGKHZ+6z7U
-         /nzaWIF+83zatnewVVM1YZ4rbCY3mDzJWcqothmnANkokwRfHiCOpLA1ihpgdrEWfQb2
-         fK1A==
+        d=arista.com; s=google; t=1756411253; x=1757016053; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IiCLpZsdgV8UTOXIWEcrK95LvhsGCYsAuVwLPkl0qrs=;
+        b=cMAPOK/Iobps4VDptf4DIbqyG+850F8LA0aG6buS+mVbbzHKwwbEwmDVa3C0pdtffh
+         upJQP9x0HNCQgaR6NNKA0aHuAojgT7mdUnRIWeo6Vd65+oh8FRid1xrj3h5biKkLMK/Q
+         D/KBdGYxzDekR2AzDnvfJ4JLj8Ja3K+lKw7Wx9BG/zPISdY92TREs+dCjA1TdKMa98YA
+         HPhX0yPQJg1YFQ1WeP12qbL9R6GdGzgM6TPwf2g7F2cyQuiMLtVoxwADW7FnP0JEpM2b
+         tA2H3g1/eto37CMxyDtPjnkhzzIPWGV2KoqsVR2A2T7aH9MbHMgv/xfl34RW1LjAYj97
+         3z5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756411595; x=1757016395;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vh8cyXr/01iLsvzF0RTNAys2N0pMPHL3fwYq6MQDtXQ=;
-        b=UdAeZXoICgMwD3BuuepNrZc2ImqCl6cLv2Qd2fq0U+w+u94kEox0ChdPPJxNU6AYyw
-         3wDurNwSVU50LkrkMLkd1i0ZeBVUGmGP7d1xN+3mXLxE9wX0Wwz32ax75Vn9Oxe0eqCU
-         LRklQnCKWqea9/V2L4LHmCEtA4zrtJSW1FE7wv4Lt7aUkS6KDy9vVk//5CfLJutRBH2Z
-         DF2XBbkp9aJ1OP7DmDSMjswvYdEs3QNw8sm/mSk5m4u2muZ6+EX3Ufj85i0NdJ/eJia8
-         v8osNSSNHbQu6GupsiLu7edsNwMHmOWOep0zgE1qaIPP3cFhxKMWI6mxl/Kz0nSvCBkV
-         GXzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVhk4CbYK+xae6sAY0y63u3E/X2EQrh52DsdNUEExM2zPp0IwLojoxEyJu7ecQ/B0ss3lnuDF4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZnR8mex9YJEJxziz+4apIl1OeQg1TKH4QHBIEe1VSRC1sTUOH
-	wD7VJQf7bstS953cRCOjOE+iVvzQ16QU5B8oVuFWHdAk+ZT7SexMttagIYTcE8MwDf9ic3+/EFs
-	kLbGK56gRCMSnfw==
-X-Google-Smtp-Source: AGHT+IGO8VXIoqtd4SOu8WrTXJFoIAh8BbpeO+GHQf7EusDY3JHE1Eeq2+WfYF3P/pGg2reh2oOWgJV1EYEEEQ==
-X-Received: from ybji11.prod.google.com ([2002:a25:b20b:0:b0:e96:e0e4:71a3])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6902:2388:b0:e96:d936:252b with SMTP id 3f1490d57ef6-e96d93625f1mr13935447276.41.1756411129295;
- Thu, 28 Aug 2025 12:58:49 -0700 (PDT)
-Date: Thu, 28 Aug 2025 19:58:23 +0000
-In-Reply-To: <20250828195823.3958522-1-edumazet@google.com>
+        d=1e100.net; s=20230601; t=1756411253; x=1757016053;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IiCLpZsdgV8UTOXIWEcrK95LvhsGCYsAuVwLPkl0qrs=;
+        b=aAxr/vnm1SxdvQjBePgHwPuU1b0VtMZ4QMTSAqyyfP9s5gfdzEAYu7MDsHQiFrYqrk
+         fDk7VrAY3X43Axpx57gU4MOLqO7VMogxbOYKFm/uzMKyShnzoH0C9q8EVBunU1LGg78d
+         R6unu4zUj05LrXF4DvsNYj97Ln7D41DxcBo7c+4Lrk6x8xrODjS+uf7RZ8JQHb7rDnyC
+         fJkXzjrmetaA95p38TFXEBidJA84xneyKmreocA+UmxstZ3+yIVH0fE1X/PVVofijgio
+         WNkYzy0j7n7245IivjYVdCXx448nROVFmDNcUMA8zqlwe47lZ4Dj5jrw6Cgnn+4aceKy
+         pHEA==
+X-Forwarded-Encrypted: i=1; AJvYcCVrEFT1qQXZEc9umvVthsBb/4o6Y4mk3i8AmXteFwcUjpAMkZnsJUTeExRbCvKp0qX6QqW+jDY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAXdvZoeZl58FvXNuL7fWlJhfz03rCBsWbXjuqP/EVQl6g1BPM
+	RZe5OgPgrMT6b2nNEoEVBrbZdjArksUseNhpNkHxi7uxJHhtubWyXNX/TjFrB187YMT10noA+IA
+	4YhbVpfVlZF0tBU/JR1MS/+P7z+rFwu2gzdqH+1/X
+X-Gm-Gg: ASbGncshwgZ4XMeLJmTc6xbkDvtkEZtenchHOW85D+tFSqvPRjZ+yRMJyGED3liEGFh
+	3+Xes2OB1ajrEkuuZ72TC1wAEhMnQlXr4P/mbUOezz182Nc6rYvDmFmkNnNQtizpEvWT2azYn/o
+	jqAvRg2Vjin9jDD2jc2N4VGtPg2kvPe7k4JuvcPSJ2gFdwnwD7XNTgzWPNHHs3mZuxe6xx+xzfH
+	Idr9gKloiHhdNlDghoj1RwyD6Hk6wMLj/adSBfBhZEeKaTPVqT/DkzcVH8LrY/rPgr03NcV6wWa
+	mn6Xw3MxsczNjZJu6gBrHmZHUDAdTGs=
+X-Google-Smtp-Source: AGHT+IHKuBy4ggyOLAexkSTeg9GziXa5fhPjZLTY3qpGn4B960J4ESwZLGqV9YNSE2NT1zhvnzleI02bA+lsJkuWC4s=
+X-Received: by 2002:a17:90b:510c:b0:327:9373:efa0 with SMTP id
+ 98e67ed59e1d1-3279373f3bbmr8060389a91.20.1756411253161; Thu, 28 Aug 2025
+ 13:00:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250828195823.3958522-1-edumazet@google.com>
-X-Mailer: git-send-email 2.51.0.318.gd7df087d1a-goog
-Message-ID: <20250828195823.3958522-9-edumazet@google.com>
-Subject: [PATCH net-next 8/8] ipv4: start using dst_dev_rcu()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
+MIME-Version: 1.0
+References: <20250828-b4-tcp-ao-md5-rst-finwait2-v2-0-653099bea5c1@arista.com>
+ <20250828-b4-tcp-ao-md5-rst-finwait2-v2-1-653099bea5c1@arista.com> <CANn89iKVQ=c8zxm0MqR7ycR1RFbKqObEPEJrpWCfxH4MdVf3Og@mail.gmail.com>
+In-Reply-To: <CANn89iKVQ=c8zxm0MqR7ycR1RFbKqObEPEJrpWCfxH4MdVf3Og@mail.gmail.com>
+From: Dmitry Safonov <dima@arista.com>
+Date: Thu, 28 Aug 2025 21:00:40 +0100
+X-Gm-Features: Ac12FXxSJ8PV1qCATI4uR3CcwYQR9VTD3hYNVBiW7TY295QuzPGQNawDD8es3iE
+Message-ID: <CAGrbwDT7TfgQsPJh=5TE-4tuxUsn3ft52zninaRnZct+OaoAvQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 1/2] tcp: Destroy TCP-AO, TCP-MD5 keys in .sk_destruct()
+To: Eric Dumazet <edumazet@google.com>
+Cc: Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Bob Gilligan <gilligan@arista.com>, Salam Noureddine <noureddine@arista.com>, 
+	Dmitry Safonov <0x7f454c46@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Change icmpv4_xrlim_allow(), ip_defrag() to prevent possible UAF.
+Hi Eric,
 
-Change ipmr_prepare_xmit(), ipmr_queue_fwd_xmit(), ip_mr_output(),
-ipv4_neigh_lookup() to use lockdep enabled dst_dev_rcu().
+On Thu, Aug 28, 2025 at 8:43=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Thu, Aug 28, 2025 at 1:15=E2=80=AFAM Dmitry Safonov via B4 Relay
+> <devnull+dima.arista.com@kernel.org> wrote:
+...
+> > +void tcp_md5_destruct_sock(struct sock *sk)
+> > +{
+> > +       struct tcp_sock *tp =3D tcp_sk(sk);
+> > +
+> > +       if (tp->md5sig_info) {
+> > +               struct tcp_md5sig_info *md5sig;
+> > +
+> > +               md5sig =3D rcu_dereference_protected(tp->md5sig_info, 1=
+);
+> > +               tcp_clear_md5_list(sk);
+> > +               call_rcu(&md5sig->rcu, tcp_md5sig_info_free_rcu);
+> > +               rcu_assign_pointer(tp->md5sig_info, NULL);
+>
+> I would move this line before call_rcu(&md5sig->rcu, tcp_md5sig_info_free=
+_rcu),
+> otherwise the free could happen before the clear, and an UAF could occur.
 
-Fixes: 4a6ce2b6f2ec ("net: introduce a new function dst_dev_put()")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv4/icmp.c        | 6 +++---
- net/ipv4/ip_fragment.c | 6 ++++--
- net/ipv4/ipmr.c        | 6 +++---
- net/ipv4/route.c       | 4 ++--
- 4 files changed, 12 insertions(+), 10 deletions(-)
+Good catch! I'll reorder these in v3 just in case the next patch 2/2
+would have to be reverted for any reason.
 
-diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-index 7248c15cbd7592268dce883482727c994110dae8..823c70e34de835e78f58a7322e502324c795df86 100644
---- a/net/ipv4/icmp.c
-+++ b/net/ipv4/icmp.c
-@@ -319,17 +319,17 @@ static bool icmpv4_xrlim_allow(struct net *net, struct rtable *rt,
- 		return true;
- 
- 	/* No rate limit on loopback */
--	dev = dst_dev(dst);
-+	rcu_read_lock();
-+	dev = dst_dev_rcu(dst);
- 	if (dev && (dev->flags & IFF_LOOPBACK))
- 		goto out;
- 
--	rcu_read_lock();
- 	peer = inet_getpeer_v4(net->ipv4.peers, fl4->daddr,
- 			       l3mdev_master_ifindex_rcu(dev));
- 	rc = inet_peer_xrlim_allow(peer,
- 				   READ_ONCE(net->ipv4.sysctl_icmp_ratelimit));
--	rcu_read_unlock();
- out:
-+	rcu_read_unlock();
- 	if (!rc)
- 		__ICMP_INC_STATS(net, ICMP_MIB_RATELIMITHOST);
- 	else
-diff --git a/net/ipv4/ip_fragment.c b/net/ipv4/ip_fragment.c
-index b2584cce90ae1c14550396de486131b700d4afd7..f7012479713ba68db7c1c3fcee07a86141de31d3 100644
---- a/net/ipv4/ip_fragment.c
-+++ b/net/ipv4/ip_fragment.c
-@@ -476,14 +476,16 @@ static int ip_frag_reasm(struct ipq *qp, struct sk_buff *skb,
- /* Process an incoming IP datagram fragment. */
- int ip_defrag(struct net *net, struct sk_buff *skb, u32 user)
- {
--	struct net_device *dev = skb->dev ? : skb_dst_dev(skb);
--	int vif = l3mdev_master_ifindex_rcu(dev);
-+	struct net_device *dev;
- 	struct ipq *qp;
-+	int vif;
- 
- 	__IP_INC_STATS(net, IPSTATS_MIB_REASMREQDS);
- 
- 	/* Lookup (or create) queue header */
- 	rcu_read_lock();
-+	dev = skb->dev ? : skb_dst_dev_rcu(skb);
-+	vif = l3mdev_master_ifindex_rcu(dev);
- 	qp = ip_find(net, ip_hdr(skb), user, vif);
- 	if (qp) {
- 		int ret, refs = 0;
-diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
-index 345e5faac63471249540fa77cb11fb2de50fd323..ca9eaee4c2ef5f5cdc03608291ad1a0dc187d657 100644
---- a/net/ipv4/ipmr.c
-+++ b/net/ipv4/ipmr.c
-@@ -1905,7 +1905,7 @@ static int ipmr_prepare_xmit(struct net *net, struct mr_table *mrt,
- 		return -1;
- 	}
- 
--	encap += LL_RESERVED_SPACE(rt->dst.dev) + rt->dst.header_len;
-+	encap += LL_RESERVED_SPACE(dst_dev_rcu(&rt->dst)) + rt->dst.header_len;
- 
- 	if (skb_cow(skb, encap)) {
- 		ip_rt_put(rt);
-@@ -1958,7 +1958,7 @@ static void ipmr_queue_fwd_xmit(struct net *net, struct mr_table *mrt,
- 	 * result in receiving multiple packets.
- 	 */
- 	NF_HOOK(NFPROTO_IPV4, NF_INET_FORWARD,
--		net, NULL, skb, skb->dev, rt->dst.dev,
-+		net, NULL, skb, skb->dev, dst_dev_rcu(&rt->dst),
- 		ipmr_forward_finish);
- 	return;
- 
-@@ -2302,7 +2302,7 @@ int ip_mr_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- 
- 	guard(rcu)();
- 
--	dev = rt->dst.dev;
-+	dev = dst_dev_rcu(&rt->dst);
- 
- 	if (IPCB(skb)->flags & IPSKB_FORWARDED)
- 		goto mc_output;
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index c63feef55d5193aadd11f9d5b45c8f5482e06be5..42f49187d3760330d0e0ca9e2c5fff778899f5fd 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -414,11 +414,11 @@ static struct neighbour *ipv4_neigh_lookup(const struct dst_entry *dst,
- 					   const void *daddr)
- {
- 	const struct rtable *rt = container_of(dst, struct rtable, dst);
--	struct net_device *dev = dst_dev(dst);
-+	struct net_device *dev;
- 	struct neighbour *n;
- 
- 	rcu_read_lock();
--
-+	dev = dst_dev_rcu(dst);
- 	if (likely(rt->rt_gw_family == AF_INET)) {
- 		n = ip_neigh_gw4(dev, rt->rt_gw4);
- 	} else if (rt->rt_gw_family == AF_INET6) {
--- 
-2.51.0.318.gd7df087d1a-goog
+> It is not absolutely clear if this function runs under rcu_read_lock(),
+> and even if it is currently safe, this could change in the future.
+>
+> Other than that :
+>
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
 
+Thanks,
+            Dmitry
 
