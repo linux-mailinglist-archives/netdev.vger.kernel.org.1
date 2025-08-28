@@ -1,105 +1,193 @@
-Return-Path: <netdev+bounces-217659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18919B3974E
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 10:43:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 97A1BB3975A
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 10:44:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAD203AC960
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 08:43:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5179B3AE867
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 08:44:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ECF22E2DDA;
-	Thu, 28 Aug 2025 08:43:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 739E32EDD63;
+	Thu, 28 Aug 2025 08:43:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="OrrvAfUO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p29dZu8R"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D8BD2D29B7;
-	Thu, 28 Aug 2025 08:43:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E678B2E371F
+	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 08:43:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756370630; cv=none; b=MIb+UzM3SQxXHFKhtDcn9EImquZpNUeBEOmwzoPVPms1daHbJSuVEE7KSCeE6UQrh5HyuRA1hiYVPU0SWE7UwMfFLG+m99h8f2Up7ByRYMaXqlZFsUzEegAb02iekUTI8MP/JjIc+PXN7OdE0t2zNvsgBgpvaOfl4/UwzWnHCXU=
+	t=1756370637; cv=none; b=ZqMZidE9PnoebhQAnzNkb5fgDFbmUqqNLxjUtyqhUgGEb0Y9enMX479RCZrZ1Zkh0/oYgvK/KqhCtyxcgMGPX+mTLaCUtoWjEHhwUFoYolvmmGyasa+t3/cJ/ykD1eXDZz6MlbBDuTRODr8MqCUFpXxDhOKS1Gkam7gmYlKdRjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756370630; c=relaxed/simple;
-	bh=X22tP2xrHHQH3BgnvnFMMAmrnrQd+pu9zV0D74s9PQQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=bVu4CBEvsvwsOyMoGj8xx9J1xFojOpFY6nDUbgtuQaKLuE3JKtczJLv/cMAJe8T/98ac9ySfcaTM+myDC6mvPVN83/vvpRPMEsHN90RbBPf/lrao8tIBvxIyFpH+a6iY8zhiWZai4uxKoF3yL5C68hn7VilMYCtFEjQg/yCO+E0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=OrrvAfUO; arc=none smtp.client-ip=117.135.210.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version:
-	Content-Type; bh=5QUT1rRrDEqaGKjsjtG+yKi8H+rE0/kJmqm+8X6M2jc=;
-	b=OrrvAfUObnucCGZ0eMIZmxQ41wivUjTqo8HlfFN18dqVXEuO/ZbkMPTkLmEL+l
-	DCBN0hygKpi3kGkPh2s/NhLogfnWc3N+rLR5u3pfrU5TYUFByPUqIfI65bw+1T7D
-	gMV+rPtr+jIFmpUSE9vKtL1A/kY9W3uQsouT/hPtgN6Jc=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-0 (Coremail) with SMTP id _____wCHmLKQFrBommakEw--.52130S2;
-	Thu, 28 Aug 2025 16:42:59 +0800 (CST)
-From: mysteryli <m13940358460@163.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
-	Willem de Bruijn <willemb@google.com>,
-	Mina Almasry <almasrymina@google.com>,
-	Jason Xing <kerneljasonxing@gmail.com>,
-	Michal Luczaj <mhal@rbox.co>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Eric Biggers <ebiggers@google.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	=?UTF-8?q?=E2=80=9Cmystery=E2=80=9D?= <929916200@qq.com>
-Subject: [PATCH] net/core: Replace offensive comment in skbuff.c
-Date: Thu, 28 Aug 2025 16:42:53 +0800
-Message-Id: <20250828084253.1719646-1-m13940358460@163.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1756370637; c=relaxed/simple;
+	bh=dtF3GY0txqUlnrqvH6O65DtDqS/OwB3kNXWzpcWqR1E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IbDal5KV4PpHf4M1L8eq7eAKsAHmY71nDYaBVClFbFH+MJjrXxLFcCO0EXtkKqkNMAixejj3r3eoYay4fZgzf+MVBeGPkrPIZwjNEsLiPgyTvgrnLA0maW3zLZo6FwwNuGJsgbgEqe2UrtKzTuefhgZU1siuHZBvh9wIGyLz5iY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p29dZu8R; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-24456ce0b96so8419505ad.0
+        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 01:43:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756370633; x=1756975433; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=jLT2osl3N94HJBBJWKPAk2avCo16Lo88yw1WJjz/wsM=;
+        b=p29dZu8RbOb7kdgd3ZtBE+clhKPFI9QwXvom3vRpu7v7a1BNfOf04PU5L6eIb+0FBr
+         ZJ7mWZfZ2mcXw1UHzo0Vs9d33gwzevLkpSu0YJr2E2fKiWCrzULRqrXnPXb5kSTJ3ER1
+         lekjoGVJMRclMo/7IcBNF97sqSiEiVAty0uAbdjvDiroutPRgdOc+q//92w7WV45D9pi
+         e1UtjxHBW+qEvW8peS4A2hkdOiciAuwA9wtJGZwCluOTwVwjbKgf5e+TmJfJSwogxt8I
+         /2BnHGYkw7OpFqwTxwo1VxGML77arPgfw3R+ucnsXcN4AJBKvuEX402Rpp+gQpculFrr
+         AiKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756370633; x=1756975433;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jLT2osl3N94HJBBJWKPAk2avCo16Lo88yw1WJjz/wsM=;
+        b=RlXnR7L7I1p30a9TN/zHkfGu0h9SpIbM/HLVRKSXfGycQsgltv3u5YpVKAPX7JlUHB
+         Cbe6LjryW0td0fHHz9Fqz+4mXBfuiBjLH/FDU22NXTjHF4XCs+aBanLrYhWMZE42jHG9
+         H2xr8iSh62hpA4Yujto4wKcrua/QUzOLXaB9mduDNjtPOa3dz+zC+l22SAwFIJrs9/5J
+         jTX73IpBq4umxUtabintD2Mr0WhRd6qqgQngVlvMWOk9/jL2rfgrG94QVHRabaTEnGGo
+         Do03V7TTSNJE9K5pL3NG7jzVAZLLdNPl+Ebpec+eZXdqwAaWY8GaP6ubDSJOYZ/Tq4vY
+         o1qg==
+X-Forwarded-Encrypted: i=1; AJvYcCXB9iuGSfl035ZbftZmNdYWCB5jFSs1zfZ1sDLqE7mw9LPBX7WMRD+WSciSWVHT13TWTZWrvds=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXN2Smh1blCAUhLV3Bv75Vh5qEGbTvjH1FuN0N8ABKDBywICIG
+	jV6AmNlkk3U2RCW67wHuyxJjCliDcIHo8P1/MmLNr1PSSBp5nwYA1dkfAe/EgbLmCIVAkvOTqfz
+	9Z0EbbW9TJSK8cHUxqSEmHL1rFS0KGsXT896jOvvs
+X-Gm-Gg: ASbGncuUWCGA7UI716ivfTEnKuTnEbAunFvgrCYmSkRWjahC31me/11re+//xgYpe+0
+	+SCQUMfAgN1stQUQRFgmumGwnTSXPT9uo4gI+R396AdHZ1jfv/r1AYGn84C/rtoCUUV9FlAeogw
+	NKfdaCRPlvRY0su3Fk+nHAX4QVg+v3iP/3k9F/9AiIunR2rnHaNTPeSuoVsuGa4JmhEwZWeMkfx
+	a+zxt42NtKz8KOWPx1WsLw2Fsg=
+X-Google-Smtp-Source: AGHT+IGJmjz+YHPyNxr90AMhiQNNDQu9deq8PWwNfyq+zFWi/YcgUyPYkmS3VX3aACMgtkUmoKeOvBcyBRDmMb3NDeE=
+X-Received: by 2002:a17:903:3d06:b0:248:8063:a8b4 with SMTP id
+ d9443c01a7336-2488063abcbmr89508125ad.22.1756370632768; Thu, 28 Aug 2025
+ 01:43:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wCHmLKQFrBommakEw--.52130S2
-X-Coremail-Antispam: 1Uf129KBjvdXoW7Jw1DCF4xXrWxGr1rZF17GFg_yoWDKFc_Za
-	y0vFWxCw4xJFy2kw43Aws3GrZ0v3y8ur1vkayvqrWUta4kJan5Ca4kAFy3ur93WFyUtwn8
-	WasIgrykurnI9jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU0jLvtUUUUU==
-X-CM-SenderInfo: jprtmkaqtvmkiwq6il2tof0z/1tbiXxi3OmiwFKM4uAAAsl
+References: <20250827220141.262669-1-david@redhat.com> <20250827220141.262669-35-david@redhat.com>
+In-Reply-To: <20250827220141.262669-35-david@redhat.com>
+From: Marco Elver <elver@google.com>
+Date: Thu, 28 Aug 2025 10:43:16 +0200
+X-Gm-Features: Ac12FXwMzUnIHp_v7uH0kV3Hu6ram9vqgPmCMZ3TyuNNAlhDfe6K8rTgx1FpO8k
+Message-ID: <CANpmjNP8-dM-cizCfsVOUNDS2jBaY6d=0Wx8OGen5RbXgaqcfQ@mail.gmail.com>
+Subject: Re: [PATCH v1 34/36] kfence: drop nth_page() usage
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>, 
+	Dmitry Vyukov <dvyukov@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>, 
+	dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, 
+	iommu@lists.linux.dev, io-uring@vger.kernel.org, 
+	Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>, 
+	John Hubbard <jhubbard@nvidia.com>, kasan-dev@googlegroups.com, kvm@vger.kernel.org, 
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>, Linus Torvalds <torvalds@linux-foundation.org>, 
+	linux-arm-kernel@axis.com, linux-arm-kernel@lists.infradead.org, 
+	linux-crypto@vger.kernel.org, linux-ide@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org, 
+	linux-mmc@vger.kernel.org, linux-mm@kvack.org, 
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
+	linux-scsi@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
+	Marek Szyprowski <m.szyprowski@samsung.com>, Michal Hocko <mhocko@suse.com>, 
+	Mike Rapoport <rppt@kernel.org>, Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org, 
+	Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>, 
+	Robin Murphy <robin.murphy@arm.com>, Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>, 
+	virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>, wireguard@lists.zx2c4.com, 
+	x86@kernel.org, Zi Yan <ziy@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: “mystery” <929916200@qq.com>
+On Thu, 28 Aug 2025 at 00:11, 'David Hildenbrand' via kasan-dev
+<kasan-dev@googlegroups.com> wrote:
+>
+> We want to get rid of nth_page(), and kfence init code is the last user.
+>
+> Unfortunately, we might actually walk a PFN range where the pages are
+> not contiguous, because we might be allocating an area from memblock
+> that could span memory sections in problematic kernel configs (SPARSEMEM
+> without SPARSEMEM_VMEMMAP).
+>
+> We could check whether the page range is contiguous
+> using page_range_contiguous() and failing kfence init, or making kfence
+> incompatible these problemtic kernel configs.
+>
+> Let's keep it simple and simply use pfn_to_page() by iterating PFNs.
+>
+> Cc: Alexander Potapenko <glider@google.com>
+> Cc: Marco Elver <elver@google.com>
+> Cc: Dmitry Vyukov <dvyukov@google.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-The original comment contained profanity to express the frustration of
-dealing with a complex and resource-constrained code path. While the
-sentiment is understandable, the language is unprofessional and
-unnecessary.
-Replace it with a more neutral and descriptive comment that maintains
-the original technical context and conveys the difficulty of the
-situation without the use of offensive language.
+Reviewed-by: Marco Elver <elver@google.com>
 
-Signed-off-by: “mystery” <929916200@qq.com>
----
- net/core/skbuff.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks.
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index ee0274417948..202c25a01f22 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -5333,7 +5333,7 @@ int skb_cow_data(struct sk_buff *skb, int tailbits, struct sk_buff **trailer)
- 		    skb_has_frag_list(skb1)) {
- 			struct sk_buff *skb2;
- 
--			/* Fuck, we are miserable poor guys... */
-+			/* This is a painfully difficult situation with limited resources... */
- 			if (ntail == 0)
- 				skb2 = skb_copy(skb1, GFP_ATOMIC);
- 			else
--- 
-2.25.1
-
+> ---
+>  mm/kfence/core.c | 12 +++++++-----
+>  1 file changed, 7 insertions(+), 5 deletions(-)
+>
+> diff --git a/mm/kfence/core.c b/mm/kfence/core.c
+> index 0ed3be100963a..727c20c94ac59 100644
+> --- a/mm/kfence/core.c
+> +++ b/mm/kfence/core.c
+> @@ -594,15 +594,14 @@ static void rcu_guarded_free(struct rcu_head *h)
+>   */
+>  static unsigned long kfence_init_pool(void)
+>  {
+> -       unsigned long addr;
+> -       struct page *pages;
+> +       unsigned long addr, start_pfn;
+>         int i;
+>
+>         if (!arch_kfence_init_pool())
+>                 return (unsigned long)__kfence_pool;
+>
+>         addr = (unsigned long)__kfence_pool;
+> -       pages = virt_to_page(__kfence_pool);
+> +       start_pfn = PHYS_PFN(virt_to_phys(__kfence_pool));
+>
+>         /*
+>          * Set up object pages: they must have PGTY_slab set to avoid freeing
+> @@ -613,11 +612,12 @@ static unsigned long kfence_init_pool(void)
+>          * enters __slab_free() slow-path.
+>          */
+>         for (i = 0; i < KFENCE_POOL_SIZE / PAGE_SIZE; i++) {
+> -               struct slab *slab = page_slab(nth_page(pages, i));
+> +               struct slab *slab;
+>
+>                 if (!i || (i % 2))
+>                         continue;
+>
+> +               slab = page_slab(pfn_to_page(start_pfn + i));
+>                 __folio_set_slab(slab_folio(slab));
+>  #ifdef CONFIG_MEMCG
+>                 slab->obj_exts = (unsigned long)&kfence_metadata_init[i / 2 - 1].obj_exts |
+> @@ -665,10 +665,12 @@ static unsigned long kfence_init_pool(void)
+>
+>  reset_slab:
+>         for (i = 0; i < KFENCE_POOL_SIZE / PAGE_SIZE; i++) {
+> -               struct slab *slab = page_slab(nth_page(pages, i));
+> +               struct slab *slab;
+>
+>                 if (!i || (i % 2))
+>                         continue;
+> +
+> +               slab = page_slab(pfn_to_page(start_pfn + i));
+>  #ifdef CONFIG_MEMCG
+>                 slab->obj_exts = 0;
+>  #endif
+> --
+> 2.50.1
+>
+> --
+> You received this message because you are subscribed to the Google Groups "kasan-dev" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to kasan-dev+unsubscribe@googlegroups.com.
+> To view this discussion visit https://groups.google.com/d/msgid/kasan-dev/20250827220141.262669-35-david%40redhat.com.
 
