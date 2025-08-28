@@ -1,141 +1,97 @@
-Return-Path: <netdev+bounces-217583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63DF4B391CE
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 04:43:35 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A7C8B391D5
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 04:47:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55FC37A1D0D
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 02:41:59 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3A3864E18A8
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 02:47:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D527325BF1B;
-	Thu, 28 Aug 2025 02:43:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD64A266F00;
+	Thu, 28 Aug 2025 02:47:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RT41DvCK"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="peYwDduM"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 373C723F40C
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 02:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7C11244677
+	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 02:47:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756349009; cv=none; b=Udmtdm7KrtUCjtfeGVrdMeFpqBWlaqE2ckZiJocCOc+hEuwVLOBE9npc/NCaYfypTipdJ7tYp+ClbZkxUMeZlDWbTELT7Qj8ypFQVqP9yLp7GrG2xt90ZtWj6UgznUzGGv4wlWFztQ8BVVcAdiZrGMwvOAfErf8wXW9qzmrro8Q=
+	t=1756349230; cv=none; b=l00rF/IWc9mWUDe+46mAze3emEwCKiNBgmLMFHq8gunrcSrU3jowidn6gjqSIJNiE4IUk1eafLurExW+b678KV2xooB/CDkELO+21Z0YADuEoYGrXl9WyVJUqU8A4kczG4otklbzz4JG63m3CQdeN8GJD/giOjLNTUIgxyTPz5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756349009; c=relaxed/simple;
-	bh=FtEPTa4Dy2lq8qJWWzsiBzS0C8SD7cKdkopMOEifno0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g/Zzhf5XdG+Vpi37DGv7GO1DbSjT0OIjVW5yx6XKXtccB+aBkikxAxMI1kqqZBavK2Pqf09bQuHe28DGIwDrI1UQIUQupD8Ufio4fIm0VjCCqQa+87CpzFcjxQyXXwiO6wqNFfiiVZdLToXnq+afEpBP4E/IvmYG9kCrA8nhjU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RT41DvCK; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756349007;
+	s=arc-20240116; t=1756349230; c=relaxed/simple;
+	bh=R5yzaulN+F7O8ACEE6XDwApit0JGc1W2RHdS2L87GE0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=DgRlp5815PHqdKF9da4VJAkHR9v61gp6Mqtr1r/bJkzWBr0QfXyN3ET/awW81v6SLhhZmapvmiFxBxIMlRoy7wQYhasVVwrPqWiy3PAwbhF7aWp/4vPTaNrM/GP/3sIwYAtdOJFPkGFBYxthurD1cJ4cj2FEj5KQDXSYSyUzm7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=peYwDduM; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <5b197403-4f7c-4d59-a2b0-79027ae26a5e@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1756349217;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ZVzFqi3qYGzTZymoMc9gsg7jQyopRP+VJ4wN1OXKbW0=;
-	b=RT41DvCKVJ+5aj2CbX7npWxG5/ImZulpmQjulIfvC7NCsnYm7Wmrmu/oaKrtWy+tcF0+Rm
-	TgpCFlMVgR5ca0XMzk2Qoo4cZEQ0hBtpHhKyES7sU9ZV9lpTGpYkZfZqFAMhlbcRy2l+09
-	IWZ32jU8btXzWNTAh7YY4OHo4ZRR33A=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-528-XVXP22SxPX65DMsg6zZTfQ-1; Wed, 27 Aug 2025 22:43:25 -0400
-X-MC-Unique: XVXP22SxPX65DMsg6zZTfQ-1
-X-Mimecast-MFC-AGG-ID: XVXP22SxPX65DMsg6zZTfQ_1756349004
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-61cc801ac1cso305453a12.2
-        for <netdev@vger.kernel.org>; Wed, 27 Aug 2025 19:43:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756349004; x=1756953804;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZVzFqi3qYGzTZymoMc9gsg7jQyopRP+VJ4wN1OXKbW0=;
-        b=fA5ppyD1qdtOCsC1445CXpluFcxJNvFlEzfBtWSfeTD+4RKX0Huw4VQU1alV+ca/8D
-         70bFkfADojUjdK+Zj3vQafjE0jdyu9QNY+yHNRVYZPfz/P/lhqZZ0CTlsMcaea9ZeRyx
-         ifcdqGbKe3NSCdpgoSb/dWb5Wvp61tAbV6H3PWkvsMmViBzwI+JAwM+WalKwrtJnhwos
-         bihmpewLZRrkFQ6p+DJOOupgRog2KCBjg/AydvnBB2r8U9t8kKugQQuilh3qEqESBFrK
-         ecFbAX4NZKstrWT8I+YAkgjoBF4nzyWeeQwewSYXaUPF79hrkGAzFjnP1gIH7Ak/ot2i
-         oCNg==
-X-Forwarded-Encrypted: i=1; AJvYcCURbALSWudacrBXjjtlmHXWyBUZtT3VcE1ouPzyNSNLIp4pCEPjC9jqN+Fy0Msg+f6KMr7pmhw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6lwE7V7Aj0CTwPVZ0XdDroQRg5SANmgG3KYAASw6Z1plR//IQ
-	fybgOJsdZFj/WkrfjBH47zX+CxrixWjuWo5QKs/IPrJHzLncMPGAoaYWwLp37u/nw4LIdRl/eXJ
-	59T7etbQK03Jm3tUjvrwJ+78a7wpw523ZqXBTqfiL7GbZTd7rmJnwjVHE4H7ciA4u88TFV7z/Va
-	TWwtNyGCay7BWM2zedgzbAn0K4TSnPith6
-X-Gm-Gg: ASbGnctiuqRrzhZqlIjSvIGVdBj6s2Xz5oxFq3Yc69fs+5SmaQP457pX2dSEXyo7HSr
-	G02Atms+RUYWYXzmILF/4akQrEIxQyQDYbBbVcYJdnO274usq5+4eY34cJa/rargyBbBxbZo+ej
-	zQn5g7tRdVcfwfV2QHPsZrdw==
-X-Received: by 2002:a05:6402:280c:b0:618:4a41:80b2 with SMTP id 4fb4d7f45d1cf-61c1b70a459mr17263470a12.33.1756349004191;
-        Wed, 27 Aug 2025 19:43:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGLJP7RVQ7XggHy4wLklb0+/anyb2o4/+NcZbJ0ac7BY7NdvZ8eKkWZUKb7OLDIF0YQ0f0iZv5O0U1kANohzIg=
-X-Received: by 2002:a05:6402:280c:b0:618:4a41:80b2 with SMTP id
- 4fb4d7f45d1cf-61c1b70a459mr17263447a12.33.1756349003785; Wed, 27 Aug 2025
- 19:43:23 -0700 (PDT)
+	bh=cFY+u5oJVJUNGk86fO8X+WKbtH6SUno0sQHgRZyxGYA=;
+	b=peYwDduMcRXioSdBNFTdiVEMxoSWUycok7UJWfcFMxb3P9AVU8p4QxWE+LqNHwqvPLaDJg
+	v39XMOWWqhHjB6LA6aqm5DiwttEHIgiicRM14sNYRS3yorMncGNuDuId7BAT5ifbMS6u0s
+	6ZkqU3PaOhKDGmh+71/LGR04Sk/L9x8=
+Date: Wed, 27 Aug 2025 19:46:39 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250827194107.4142164-1-seanjc@google.com> <20250827201059.EmmdDFB_@linutronix.de>
-In-Reply-To: <20250827201059.EmmdDFB_@linutronix.de>
-From: Lei Yang <leiyang@redhat.com>
-Date: Thu, 28 Aug 2025 10:42:47 +0800
-X-Gm-Features: Ac12FXxm1PYVDZmD5Ru0N_nQlupVeshkDMt_GvrRtBisXzJaavMi349lmdLEkns
-Message-ID: <CAPpAL=weN2kjgz4n8JtAPytHQi+828v2xUTHJ4Tr7GdTchk24w@mail.gmail.com>
-Subject: Re: [PATCH v2 0/3] vhost_task: Fix a bug where KVM wakes an exited task
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next] net/mlx4: Remove redundant ternary operators
+To: Liao Yuanhong <liaoyuanhong@vivo.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "open list:MELLANOX MLX4 core VPI driver" <netdev@vger.kernel.org>,
+ "open list:MELLANOX MLX4 core VPI driver" <linux-rdma@vger.kernel.org>,
+ open list <linux-kernel@vger.kernel.org>
+References: <20250827121503.497138-1-liaoyuanhong@vivo.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <20250827121503.497138-1-liaoyuanhong@vivo.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Tested this series of patches's v2 again with vhost-net regression
-tests, everything works fine.
+在 2025/8/27 5:15, Liao Yuanhong 写道:
+> For ternary operators in the form of "a ? true : false", if 'a' itself
+> returns a boolean result, the ternary operator can be omitted. Remove
+> redundant ternary operators to clean up the code.
+> 
+> Signed-off-by: Liao Yuanhong <liaoyuanhong@vivo.com>
+> ---
+>   drivers/net/ethernet/mellanox/mlx4/port.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx4/port.c b/drivers/net/ethernet/mellanox/mlx4/port.c
+> index e3d0b13c1610..5abdb1363ccc 100644
+> --- a/drivers/net/ethernet/mellanox/mlx4/port.c
+> +++ b/drivers/net/ethernet/mellanox/mlx4/port.c
+> @@ -156,7 +156,7 @@ static bool mlx4_need_mf_bond(struct mlx4_dev *dev)
+>   	mlx4_foreach_port(i, dev, MLX4_PORT_TYPE_ETH)
+>   		++num_eth_ports;
+>   
+> -	return (num_eth_ports ==  2) ? true : false;
+> +	return num_eth_ports == 2;
 
-Tested-by: Lei Yang <leiyang@redhat.com>
+Reviewed-by: Zhu Yanjun <yanjun.zhu@linux.dev>
 
-On Thu, Aug 28, 2025 at 4:11=E2=80=AFAM Sebastian Andrzej Siewior
-<bigeasy@linutronix.de> wrote:
->
-> On 2025-08-27 12:41:04 [-0700], Sean Christopherson wrote:
-> > Michael,
->
-> Sean,
->
-> would the bellow work by chance? It is a quick shot but it looks
-> symmetrical=E2=80=A6
->
-> diff --git a/kernel/vhost_task.c b/kernel/vhost_task.c
-> index bc738fa90c1d6..27107dcc1cbfe 100644
-> --- a/kernel/vhost_task.c
-> +++ b/kernel/vhost_task.c
-> @@ -100,6 +100,7 @@ void vhost_task_stop(struct vhost_task *vtsk)
->          * freeing it below.
->          */
->         wait_for_completion(&vtsk->exited);
-> +       put_task_struct(vtsk->task);
->         kfree(vtsk);
->  }
->  EXPORT_SYMBOL_GPL(vhost_task_stop);
-> @@ -148,7 +149,7 @@ struct vhost_task *vhost_task_create(bool (*fn)(void =
-*),
->                 return ERR_CAST(tsk);
->         }
->
-> -       vtsk->task =3D tsk;
-> +       vtsk->task =3D get_task_struct(tsk);
->         return vtsk;
->  }
->  EXPORT_SYMBOL_GPL(vhost_task_create);
->
-> Sebastian
->
+Zhu Yanjun
+
+>   }
+>   
+>   int __mlx4_register_mac(struct mlx4_dev *dev, u8 port, u64 mac)
 
 
