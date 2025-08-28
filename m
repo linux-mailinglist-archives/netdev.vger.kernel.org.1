@@ -1,280 +1,122 @@
-Return-Path: <netdev+bounces-217655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4340FB39706
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 10:31:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24D74B39729
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 10:38:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57DA418908AD
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 08:32:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59B9A1B22C94
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 08:38:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C79292DE1FE;
-	Thu, 28 Aug 2025 08:31:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7235A2E1EE2;
+	Thu, 28 Aug 2025 08:37:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.spacemit.com header.i=@linux.spacemit.com header.b="CMRJJUQ3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u4Kv9tb0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92FDC27A927;
-	Thu, 28 Aug 2025 08:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1495932C8B;
+	Thu, 28 Aug 2025 08:37:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756369908; cv=none; b=p98QCBRYbOAIubvWgEV5Mi75Mw4MoSf+GtCTSC3Z+QbdP6A8+bLgt7aGfnCzZ76jDKfKLFFJuTocB9TagRmmJKUCemaZT5Vgu7wCgZ9GjvNjaGQKwj0bWtvRssT2v2kxhxjyzh7cZPoM4DrxN5qCsmrlcg4VRLK5PfvbXKxt5yE=
+	t=1756370276; cv=none; b=aZBoSA26ZnvVFWuLeaaaFt6oUnDVLu4DiMF16DnvF8UWPndOZY7MJgGAPTqBIiutd03TSNGkNOBRr3E6Ol1r/wzgvBV3avuMER+C6R5cE6NKtJ9/m4hadrhrVrcpP2/D9XDPPjGVGp1GDmpQy0mvQJtxpRSZzAL1z2gUack4Izo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756369908; c=relaxed/simple;
-	bh=OH+tiuZhRc7zBGjnfTEQrtm5HNLz2ea/O1IUH/tbp4g=;
+	s=arc-20240116; t=1756370276; c=relaxed/simple;
+	bh=IVLnXXvrcuUFj2BZziSgUB2XoLuFxUupzbzqW/5G2yk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hjFufEbfDh2ZwTPoaaMUSdPhNaETeZGqMVrn9P/ButxzEF1IXlJ7pR+53QdRAjUlbLtKyS9JcCww/ajQnZkgVsDlvgvjkeJf4LSfoHaWF2VZbOO0TgQ31wyvQLTIPff4xR8/TVCgjkJD+VuPd2cUDZpBamfVHDVtH8IxppdvWR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.spacemit.com; spf=none smtp.mailfrom=linux.spacemit.com; dkim=pass (1024-bit key) header.d=linux.spacemit.com header.i=@linux.spacemit.com header.b=CMRJJUQ3; arc=none smtp.client-ip=54.206.16.166
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.spacemit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.spacemit.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.spacemit.com;
-	s=mxsw2412; t=1756369896;
-	bh=31kdvkUcjKbhPvlFzt+kjJ6mau02w/DFORYHNaO+fTQ=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version;
-	b=CMRJJUQ3dN4GSfAF0FsiEkYszHcNgQGbL3yqPY0/auNs3YpBFqn2qaoX1cZnpNEgs
-	 CGZzy0qVCEPQo1oNDg4chqymbIjZGabGoTva7YkkGCIm7wSicXUCJtXQ/hndgCVRIH
-	 H/7mC9ugGjgJGk2h4UequIJQzLOkdscyDqhtubjM=
-X-QQ-mid: zesmtpsz3t1756369894taa63037f
-X-QQ-Originating-IP: 74a9wFgC2VtntaDe04tPl510lmwJye9e6Dxfwjn/SmU=
-Received: from = ( [14.123.253.129])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 28 Aug 2025 16:31:32 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 16767505359158184548
-EX-QQ-RecipientCnt: 26
-Date: Thu, 28 Aug 2025 16:31:31 +0800
-From: Troy Mitchell <troy.mitchell@linux.spacemit.com>
-To: Vivian Wang <wangruikang@iscas.ac.cn>,
-	Troy Mitchell <troy.mitchell@linux.spacemit.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>
-Cc: Vivian Wang <uwu@dram.page>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Junhui Liu <junhui.liu@pigmoral.tech>,
-	Simon Horman <horms@kernel.org>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v7 2/5] net: spacemit: Add K1 Ethernet MAC
-Message-ID: <D1B3E8CA05947AC1+aLAT40m4VCtlL2Yk@LT-Guozexi>
-References: <20250826-net-k1-emac-v7-0-5bc158d086ae@iscas.ac.cn>
- <20250826-net-k1-emac-v7-2-5bc158d086ae@iscas.ac.cn>
- <193454B6B44560D1+aK-x9J2EIB5aA9yr@LT-Guozexi>
- <6c221dcf-4310-4e31-b3e8-a8a3b68c3734@iscas.ac.cn>
+	 Content-Type:Content-Disposition:In-Reply-To; b=XGfnvOEEqst6YcHT1pHB5CyjAny1uHUH1J9nxlujBRLWi/FreBaTl9JgkSlm8yvr81cgrsxxQ32h/XxvuLBMtBZpC6futVIIFCnkV8m33UAzfzKSQvzxbGUVjJfo9U9Y+kEowcB90/JAQIPYDxTIcqXWexDwzh9zgm8R9mbLj4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u4Kv9tb0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 836CFC4CEEB;
+	Thu, 28 Aug 2025 08:37:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756370275;
+	bh=IVLnXXvrcuUFj2BZziSgUB2XoLuFxUupzbzqW/5G2yk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=u4Kv9tb0W5HJY1z7Kha4RAxr/UDU+cy25InJtGEnO3JiyN+nbkHyw+9MpLitEOa5G
+	 0pSV+hVfSXm9giRO4saHh0FNbPWIN8sA2oA/bVZ8ebErMJIoJf5LF4hfU+XC82WOgd
+	 o5Dgh+w2lF46YEB0ubeKLXGmDFSIt276UaYMpIYsyodQH72bNpUaPHECThHiReLcwu
+	 lbXv5EztKdkS391yu76bPtHOGB6uXK2NxrE3bcXs03h3uWTI0l2Znk0+rahaBHO1Pt
+	 hHaVxoPeO8aKdT7uTaRf2Ck2cSXP3LlsqOYOEOuwJLFl7J5jwbm5nIR+gc/gZJcMeT
+	 tq+aaMu2hoX5A==
+Date: Thu, 28 Aug 2025 11:37:37 +0300
+From: Mike Rapoport <rppt@kernel.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Brendan Jackman <jackmanb@google.com>,
+	Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>,
+	Dmitry Vyukov <dvyukov@google.com>, dri-devel@lists.freedesktop.org,
+	intel-gfx@lists.freedesktop.org, iommu@lists.linux.dev,
+	io-uring@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	John Hubbard <jhubbard@nvidia.com>, kasan-dev@googlegroups.com,
+	kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-arm-kernel@axis.com, linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Marco Elver <elver@google.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
+	Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
+	Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
+	virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
+	wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
+Subject: Re: [PATCH v1 13/36] mm/hugetlb: cleanup
+ hugetlb_folio_init_tail_vmemmap()
+Message-ID: <aLAVUePBQuz9D89T@kernel.org>
+References: <20250827220141.262669-1-david@redhat.com>
+ <20250827220141.262669-14-david@redhat.com>
+ <aLADXP89cp6hAq0q@kernel.org>
+ <377449bd-3c06-4a09-8647-e41354e64b30@redhat.com>
+ <aLAN7xS4WQsN6Hpm@kernel.org>
+ <6880f125-803d-4eea-88ac-b67fdcc5995d@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <6c221dcf-4310-4e31-b3e8-a8a3b68c3734@iscas.ac.cn>
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpsz:linux.spacemit.com:qybglogicsvrsz:qybglogicsvrsz3a-0
-X-QQ-XMAILINFO: MExkIg7Bfu69z7AfItWMTNu1jYT6WkMpE/y15+NVNxHnru1+wpOx879x
-	4m0FKPPDyALE7dSqsVMGepCmiZUY1aELXFky+XWFh2keLBV0aQCLLrWbz4LQdfibB9LOM13
-	Qtb1c8D4p9j45/wlKkLbnP+upD/jQyiDTHggXxSKR0Tw7ObdgvJpmURaHKlLLAE7FT8fMwc
-	lcg03Po6AyHtOcQqANBnGIYLNJ79N6TK9ohUdNF597FmZM53QsO8zcXEp+nSDfS5gvkR6yf
-	u9Awxyp+9RH69nri6GT7JK90tipaJVadwAbPlZaYeHwI+rh/V6swNMNt/GS25XDcuRisKjF
-	g6HqfMRZC/Td5WaeeZlFLGupVjJc/gyQGPFAVlOais6lPvFgE/MyUalBXAy0AitQBxfXCX/
-	N0c23KrkRaPL6aqBJoVOHlL25TT5q9ezC+qQVJlU/nVxmlssxqua4D5gODocfGt6vQJ+Bxu
-	sjySJ+LH3fJw9LEMMc4RwcX5lddyfdJvwSoG8ZtDGgRvf3s1IPYAYlzPw+QWY5kQDeOOE2C
-	xSSRrJa1/7RKXIaidVjchXxcAMtVVLXlsTZ+CPIVroZKYMhqzN3BngZ4xBH8lUyslNiKvFY
-	2uTswIahFlKoatI5Rm/0BNkPQKbXkGDWJCcnVoIPPBoBIXu2vzHIcn7r22m3/HJmrBSG7Ck
-	lpYS7l5zDiPni/kBIj/sLdOjD695SFvrkdT562Sx/+z0jIAHDWeIzHLotcThMbTtKq3JQEy
-	U2VmJcIW1YkwPbh4IwkFnLVd6EFYH2AjuRcjpYuoCnzK+Sr5xjV7CRlO/3rGkdKbohi7HVv
-	OEpzzMRyIsefEYfcu3b3h6zR3l7RX51IcbpMZ3xicNb4fEmIIsWatB7sOAaOPdNy0BNiO4r
-	cpoVXzeKvY/VCkuSWQAnIfHrfx9seLmxL3m2aUtMFE83mmpBVBLVRwmaNZyzVYnmfZdpjnq
-	bsxrnYp6ls9jngqejQTlEjOlnB92wjXzBK+Rsfk85uWU0eHR1cSmSXu0B8w8PHzg9QMR6aA
-	m+o6EzwKmNoYwVBKv70pi6mFBxx4J4YS/yKs04B2ASC0oVaSAoD4zu5fQ/mPpIeieA0fzhC
-	tTjgUYrqQcziXcHV/7BwaV+bGW80NooEBYvtvyzmr3D
-X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
-X-QQ-RECHKSPAM: 0
+In-Reply-To: <6880f125-803d-4eea-88ac-b67fdcc5995d@redhat.com>
 
-On Thu, Aug 28, 2025 at 04:06:58PM +0800, Vivian Wang wrote:
-> Hi Troy,
+On Thu, Aug 28, 2025 at 10:18:23AM +0200, David Hildenbrand wrote:
+> On 28.08.25 10:06, Mike Rapoport wrote:
+> > On Thu, Aug 28, 2025 at 09:44:27AM +0200, David Hildenbrand wrote:
+> > > On 28.08.25 09:21, Mike Rapoport wrote:
+> > > > On Thu, Aug 28, 2025 at 12:01:17AM +0200, David Hildenbrand wrote:
+> > > > > +	/*
+> > > > > +	 * We mark all tail pages with memblock_reserved_mark_noinit(),
+> > > > > +	 * so these pages are completely uninitialized.
+> > > > 
+> > > >                                ^ not? ;-)
+> > > 
+> > > Can you elaborate?
+> > 
+> > Oh, sorry, I misread "uninitialized".
+> > Still, I'd phrase it as
+> > 
+> > 	/*
+> > 	 * We marked all tail pages with memblock_reserved_mark_noinit(),
+> > 	 * so we must initialize them here.
+> > 	 */
 > 
-> On 8/28/25 09:33, Troy Mitchell wrote:
-> > On Tue, Aug 26, 2025 at 02:23:47PM +0800, Vivian Wang wrote:
-> >> The Ethernet MACs found on SpacemiT K1 appears to be a custom design
-> >> that only superficially resembles some other embedded MACs. SpacemiT
-> >> refers to them as "EMAC", so let's just call the driver "k1_emac".
-> >>
-> >> Supports RGMII and RMII interfaces. Includes support for MAC hardware
-> >> statistics counters. PTP support is not implemented.
-> >>
-> >> Tested-by: Junhui Liu <junhui.liu@pigmoral.tech>
-> >> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
-> >> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> >> Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> >> ---
-> > Hi Vivian,
-> > I have tested your patch on MUSE-PI.
-> > So here:
-> >
-> > Tested-by: Troy Mitchell <troy.mitchell@linux.spacemit.com>
-> >
-> > But I still have a minor style comment on the code.
-> Thanks for your Tested-by and review.
-> >>  drivers/net/ethernet/Kconfig            |    1 +
-> >>  drivers/net/ethernet/Makefile           |    1 +
-> >>  drivers/net/ethernet/spacemit/Kconfig   |   29 +
-> >>  drivers/net/ethernet/spacemit/Makefile  |    6 +
-> >>  drivers/net/ethernet/spacemit/k1_emac.c | 2193 +++++++++++++++++++++++++++++++
-> >>  drivers/net/ethernet/spacemit/k1_emac.h |  426 ++++++
-> >>  6 files changed, 2656 insertions(+)
-> >>
-> >> diff --git a/drivers/net/ethernet/spacemit/k1_emac.c b/drivers/net/ethernet/spacemit/k1_emac.c
-> >> new file mode 100644
-> >> index 0000000000000000000000000000000000000000..9e558d5893cfbbda0baa7ad21a7209dadda9487e
-> >> --- /dev/null
-> >> +++ b/drivers/net/ethernet/spacemit/k1_emac.c
-> >> @@ -0,0 +1,2193 @@
-> >> +// SPDX-License-Identifier: GPL-2.0
-> >> +/*
-> >> + * SpacemiT K1 Ethernet driver
-> >> + *
-> >> + * Copyright (C) 2023-2025 SpacemiT (Hangzhou) Technology Co. Ltd
-> >> + * Copyright (C) 2025 Vivian Wang <wangruikang@iscas.ac.cn>
-> >> + */
-> >> +
-> > [...]
-> >> +
-> >> +static void emac_wr(struct emac_priv *priv, u32 reg, u32 val)
-> >> +{
-> >> +	writel(val, priv->iobase + reg);
-> >> +}
-> > basically short and obvious code like this:
-> >
-> > writel(val, priv->iobase + reg)
-> >
-> > you replace:
-> >
-> > emac_wr(priv, reg, val)
-> >
-> > It's not helpful..You could just use writel/readl directly
-> >> +
-> >> +static int emac_rd(struct emac_priv *priv, u32 reg)
-> >> +{
-> >> +	return readl(priv->iobase + reg);
-> >> +}
-> > ditto.
-> 
-> I have decided against inlining these wrappers.
-> 
-> Firstly, the wrappers being mostly trivial is not it being "not
-> helpful". In long blocks of register access code, especially, having
-> just emac_rd(priv,...) or emac_wr(priv,...) repeated is easier to
-> recognize and harder to mess up (e.g. precedence of "priv->iomem + ...").
-> 
-> Secondly, they serve as documentation that a normal register access for
-> this driver is a 32-bit read or write. This is despite the fact that the
-> registers all "look like" they each only have the low 16 bits.
-Alright, you’ve convinced me.
-I did wrap it like this before, but it was opposed—I guess it really depends on
-whether the maintainer likes it.
+> I prefer what I currently have, but thanks for the review.
 
-[...]
-> >> +static void emac_free_tx_buf(struct emac_priv *priv, int i)
-> >> +{
-> >> +	struct emac_tx_desc_buffer *tx_buf;
-> >> +	struct emac_desc_ring *tx_ring;
-> >> +	struct desc_buf *buf;
-> >> +	int j;
-> >> +
-> >> +	tx_ring = &priv->tx_ring;
-> >> +	tx_buf = &tx_ring->tx_desc_buf[i];
-> >> +
-> >> +	for (j = 0; j < 2; j++) {
-> >> +		buf = &tx_buf->buf[j];
-> >> +		if (buf->dma_addr) {
-> >> +			if (buf->map_as_page)
-> >> +				dma_unmap_page(&priv->pdev->dev, buf->dma_addr,
-> >> +					       buf->dma_len, DMA_TO_DEVICE);
-> >> +			else
-> >> +				dma_unmap_single(&priv->pdev->dev,
-> >> +						 buf->dma_addr, buf->dma_len,
-> >> +						 DMA_TO_DEVICE);
-> >> +
-> >> +			buf->dma_addr = 0;
-> >> +			buf->map_as_page = false;
-> >> +			buf->buff_addr = NULL;
-> >> +		}
-> > if (!buf->dma_addr)
-> >   continue;
-> >
-> > Best regards,
-> > Troy
-> You tricked me! There's one more review comment below :P
-Haha, You are so cute, Vivian.
-I'm surprised you were able to find it, because I went back to check after
-writing the last comment. So I wasn't able to find the final one myself.
+No strong feelings, feel free to add
 
-                - Troy
+Reviewed-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
 
-(This really is the final one this time.)
-> >> +	}
-> >> +
-> >> +	if (tx_buf->skb) {
-> >> +		dev_kfree_skb_any(tx_buf->skb);
-> >> +		tx_buf->skb = NULL;
-> >> +	}
-> >> +}
-> >> +
-> >> +static void emac_clean_tx_desc_ring(struct emac_priv *priv)
-> >> +{
-> >> +	struct emac_desc_ring *tx_ring = &priv->tx_ring;
-> >> +	u32 i;
-> >> +
-> >> +	/* Free all the TX ring skbs */
-> >> +	for (i = 0; i < tx_ring->total_cnt; i++)
-> >> +		emac_free_tx_buf(priv, i);
-> >> +
-> >> +	tx_ring->head = 0;
-> >> +	tx_ring->tail = 0;
-> >> +}
-> >> +
-> >> +static void emac_clean_rx_desc_ring(struct emac_priv *priv)
-> >> +{
-> >> +	struct emac_rx_desc_buffer *rx_buf;
-> >> +	struct emac_desc_ring *rx_ring;
-> >> +	u32 i;
-> >> +
-> >> +	rx_ring = &priv->rx_ring;
-> >> +
-> >> +	/* Free all the RX ring skbs */
-> >> +	for (i = 0; i < rx_ring->total_cnt; i++) {
-> >> +		rx_buf = &rx_ring->rx_desc_buf[i];
-> >> +		if (rx_buf->skb) {
-> >> +			dma_unmap_single(&priv->pdev->dev, rx_buf->dma_addr,
-> >> +					 rx_buf->dma_len, DMA_FROM_DEVICE);
-> >> +
-> >> +			dev_kfree_skb(rx_buf->skb);
-> >> +			rx_buf->skb = NULL;
-> >> +		}
-> > if (!rx_buf->skb)
-> >   continue;
-> 
-> I will change both of these to "if (...) continue;" in the next version.
-> 
-> Thanks,
-> Vivian "dramforever" Wang
-> 
-> 
+-- 
+Sincerely yours,
+Mike.
 
