@@ -1,436 +1,252 @@
-Return-Path: <netdev+bounces-217974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 851CBB3AAF8
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 21:35:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43950B3AB0A
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 21:43:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 032573A74A3
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 19:35:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED6063ADE84
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 19:43:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C164D25D1E9;
-	Thu, 28 Aug 2025 19:34:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A87ED279DBC;
+	Thu, 28 Aug 2025 19:43:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NnFtPxgn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V4F2xMoQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C23A2356B9
-	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 19:34:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756409697; cv=fail; b=R+AaWt2jkqtdlgFOrXrTszKpntszXUl2KqTumX7ALU3wuCkXvcB4i2hsCBo7eHLQL68lZKI6cTSuZg2/6yP3aXoaMDp+hX7jpMo7ahDwk0+R7T2EE/c8RWSRYlGeAADYRNSBj95AKRRi8SlnbSG6vFl6P7B1sgbicbNeEqWYdUA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756409697; c=relaxed/simple;
-	bh=Mlyr2ggPxYLor3DityWjIIBb8H+sOYkkWqDiXCIy0fM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=D8TP4TgsJE8QosDNyuHRDQpJaRLH0tNCUugYUHM+z/h7wkI5M7JLfM7R4jMzWruOcRLQIRPYg6KC1GJw0jkzBsLyQr8+kaUqBc8PtKnA2AQ/JZOrv0dfBTHyJ9Pu7AzeKraDl1CN4wIOPhDlrMhz4qel0iFipr/+jgbqyzX5MRw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NnFtPxgn; arc=fail smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756409696; x=1787945696;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Mlyr2ggPxYLor3DityWjIIBb8H+sOYkkWqDiXCIy0fM=;
-  b=NnFtPxgnuk7bgK1Vhz4foAUywZKvWHuDHk1s3Trw9VfByLx0isjU5c6W
-   iulOov52oqGEeLjK4gJ04suszu8Q36KZnXfkIvtpaZnFlL4v+xbgb8X6I
-   VkDnbOGy50eaMNjOAIpmQjEa7ncgxB6d86VQ/QDouiuqcVWQfmkBp+obN
-   nySUKPaTZdnmnG9RJ9J70tKA+ugyKLHqTmLJyA8AfgMLbJLw0uL2oxtQn
-   rPU/gQUZRfl5jH32OINb0lBUJInfEVknpY63sa7AT8aL6o7hfV70jYVzR
-   HodgQNfwHYQ5oWhQRODVi8Y/gZKj7d5w3KDwvsGCbEiMS3w2KmrnCQAZb
-   w==;
-X-CSE-ConnectionGUID: cryVnR+wScepSRpNSEBTkw==
-X-CSE-MsgGUID: 8X7VLDDkRcSok9GwrMwqxQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="81284373"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="81284373"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2025 12:34:54 -0700
-X-CSE-ConnectionGUID: 0R2+HLh9QtGj8c9QAuTedA==
-X-CSE-MsgGUID: 7cHJc8zDQC6JuFMWydHDig==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,221,1751266800"; 
-   d="scan'208";a="201115606"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2025 12:34:51 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Thu, 28 Aug 2025 12:34:50 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Thu, 28 Aug 2025 12:34:50 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (40.107.243.84)
- by edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Thu, 28 Aug 2025 12:34:50 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QhpC9M/YWigZ6eZYtrZDOEhCfOisXaC23akl+lZHYcr24xkjPslx7jwcUGZUQxXlr64KrlkYFIyzwuB0tQMMN3j+vEv2aparledGKqOZf5wwcPZAcW79ieFvrhtHiVS2aesJrSwwfAU54k9NYDG19X3QfARnIxG93xj2sh/CLmy/EdLT6tTj6UugwFnlhQ8pxARdEKtou6COZBl0q3kzDAOyFr7OuXPpkS9+86I1MU2XvCNGoAmmPXb5iZg3sTvnGuDui44J/Rq7PBaBNgd77ubp/TqP9UHjCeScazP/xQHx12rQhwzk+hCj8M5JZzg1ARCskN2XzmLVyo+wuREAyQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4cAqPGCSse6C60WarSYN0hgQDg82Og8vOqdy3kpRtoc=;
- b=pdPs4LE0ON3hAYK/5uttzmmjz18FAp96NfD0e5mvSo8AAv+juVo5tlixzbZuE8f5CdeRDHIK9DtIP/0SLJCLwZlmVmkHETI/4gq4PEV6EOiL/cMbswVuo9mQ6fCVHNTGGbac4rA/X5zJdQdHgVSLmGN60aSJWVA/XYww9uv+Szd+FOp9qJElUXYW2U4zfqp6QjHUwkIGbablEdxVhtPotkoDlMldaMbZUC5kXkk7xnpjluD2T1TvcBEbOa5eKBGYKOy2j3m2OsjUNnkJR3qUM297/RoUOseG/EArFzeXl54dUOfynDVT29s9lcxkdnQEq14ap95n72+kWPcmGi7zgg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
- by CYXPR11MB8732.namprd11.prod.outlook.com (2603:10b6:930:d6::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.15; Thu, 28 Aug
- 2025 19:34:41 +0000
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::395e:7a7f:e74c:5408%4]) with mapi id 15.20.9052.019; Thu, 28 Aug 2025
- 19:34:41 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: Kohei Enju <enjuk@amazon.com>
-CC: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"kohei.enju@gmail.com" <kohei.enju@gmail.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v2] ixgbe: preserve RSS
- indirection table across admin down/up
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v2] ixgbe: preserve RSS
- indirection table across admin down/up
-Thread-Index: AQHcGDUhWrvEhMLqP0iDW+Fkb2NtCLR4Qv6AgAASj4CAAB7nAA==
-Date: Thu, 28 Aug 2025 19:34:41 +0000
-Message-ID: <IA3PR11MB8986220F78939C9A26D6D40CE53BA@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <IA3PR11MB8986E8200AD587B4292B3F22E53BA@IA3PR11MB8986.namprd11.prod.outlook.com>
- <20250828174326.20978-1-enjuk@amazon.com>
-In-Reply-To: <20250828174326.20978-1-enjuk@amazon.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|CYXPR11MB8732:EE_
-x-ms-office365-filtering-correlation-id: 8dcdda2b-6b79-4d8d-cf6c-08dde669eef9
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|7053199007|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?4aTCp5R8gKMz+zOB7J1JRkZYV0R/jEUFKi4lxtOZLLrQmrWXECUN3ImeDn2q?=
- =?us-ascii?Q?BUANAoK6xnqYO5HU8NLfpm7NflAmWKt8ti9SKfs2SeUNtdfFDybgUYgTUI1j?=
- =?us-ascii?Q?/pyuhIrKseQtM7DmyDCuFs6UETToi2QgPd4IbFMGz24Tli23SyjoTzmJzPWc?=
- =?us-ascii?Q?ytgj+9Pv86mBuOQOOTsm40xJb6fgILd5DIzLtKPch0H8A3c2FiuHSkm9xjb+?=
- =?us-ascii?Q?PKx03PXD/K6VDM3jbUMi3xtJexB9ZlDngLaYbBRRA0g1PMCJ2RTw8IvmPGQF?=
- =?us-ascii?Q?xYl0K3HnB6c7y2jITOX8xIcljqTyGBmo+WcQ/gymMyIy6na+UqlZYwUbpFFQ?=
- =?us-ascii?Q?5d0yIK+a55V88cRZq/waCj5R2iL3pAMPO85T96gXqnWL4k0y8ie3Wg2pSXVv?=
- =?us-ascii?Q?8q9FlmhhIyfyOJucd8zoOHTZVUREJcQwq3u6eGTvsOSpFzZ6LW3qnGf7I1mt?=
- =?us-ascii?Q?fb2IQfxP7V1xAHtJZk8De3FGr8tUd3VbZgqv/sKujAD57kf27r9/NZqBvT0X?=
- =?us-ascii?Q?/u7h58SK5xxM33K1Zhpfgdsw1sljUxIObtUQvEI/j3Iuexbkqia9aVxz2NP0?=
- =?us-ascii?Q?N9mffEZgOblMydFJa01tBAaoFmQmZv6wSY2A7KNSAuFxBq3B8wkaU0IV31IU?=
- =?us-ascii?Q?2fyvZuOitcv4nEWZlYeQZbAWzqKIWGmffM/2Kbl8pPiMOgj1CbopxNSDtfHb?=
- =?us-ascii?Q?hqbiHo2zeskHCKxPpJcb2BCGncdbry0mqrm8GClRCIqyUxkI/epWFttpxO2Q?=
- =?us-ascii?Q?EPmo9kXy0aqwIFKFF3UAZ9vnT+l7dINWexMRk/ynmYrpm1ZPrGg5qx93A9PK?=
- =?us-ascii?Q?HoyPxUeC/5tieKAxhkjIrpyWTvx/mJiImfx342qhXS8b3g4/Dk/iy6WjTUiT?=
- =?us-ascii?Q?roAlkjvsQ75qKceHfO+cA+ifrvfFbnB6DBJul38V73prsi705tAPKdoLzY/Z?=
- =?us-ascii?Q?r4Bd0A3RflsEHgFt0Nom+90x2Ewdwh0SOK61qmSjuYG8zKUzJxV8f4q5H+jc?=
- =?us-ascii?Q?k2OSsOPkc70iBSW8i9Cn4VMQcTEVdA36R4s8Yjvwt8pGXHSyyA04q2Bx3IZA?=
- =?us-ascii?Q?tE9X7aKyrN2N5xFyjfvGoHRw+PHXk3AB5ofMv9wVfXMt7shcPizl2hQwpEkC?=
- =?us-ascii?Q?aa/+hj1R59RZAlh0N9Fu8D0ue10vJfTbyVrzmP7EGnJH8NpApqD2GWIqyOV8?=
- =?us-ascii?Q?pDOBUY6LbkAbwva+WATzgX1cPUjO35DphjP9a7xr8KZ+UjV5HZgW+lzTpl8H?=
- =?us-ascii?Q?ZkFBmEo+Ww7BIHDJ7AvL7JKVGlouQI2P8KTTb2vSFHxVVFgLUG0NtlTGpH/m?=
- =?us-ascii?Q?QrTau6QVxI2pe+0aBC4IrwnFO0SYkEmjP8RXRoQkcgcNh3zHQ5fNjFVuHozS?=
- =?us-ascii?Q?SpbLT8gmosCe5WAYn2IAyuSDc1PBpRl4plhKWzCrRAegm+1316oD2FxstxG8?=
- =?us-ascii?Q?Iy64tDJnTqRuH4364BR7WeTKcoP8fBnQMqrk/wxKWrQ8jOdGoODjcJDth3Gm?=
- =?us-ascii?Q?WRz2qqwpds4Iy7A=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7053199007)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?FZhRG0cRDbso2ERtQHNW6sZGXFLbQCuD3zjz/J4Ya6K9b3CBvsj53binMzoQ?=
- =?us-ascii?Q?crkEG91JvkPoKrT6oAfhwzVyOpcuPQBgAMa2nDnztby00V7iq8mVVASY4TEx?=
- =?us-ascii?Q?/XQM47hBLBkp9SoY5wbPNc3CPcoUtfrr63HenE52Ovdllfaoj+6zMZtcBVxe?=
- =?us-ascii?Q?+6/ekfnUGNDXarLjdnLb7egdVXKvEqhXAKhofubG7mnflJ6XBt7XmFtC5Dn4?=
- =?us-ascii?Q?XOADwk8jcIfoUD7423fO1zHTTnQkClh8UO7OUUClzGbpDKF0d0flWfgP0prg?=
- =?us-ascii?Q?rzpDcFL4I86Rcxs2lFTS/9Xcllzhwe2KqVsyq1zLzpRhCUJnmzPXwmY1OywQ?=
- =?us-ascii?Q?OB+5D11HefSUrwgoyUbFkupQ8s+Ypn0EFcdlHK4CtOL6Q5hNEqKvRZRJKR/T?=
- =?us-ascii?Q?u7OgLR84VA3K77yHyasRTA8OWZf9pf96GXOleIjK68MF9VfRDUVfPFgqDWL0?=
- =?us-ascii?Q?oc8YSVtiftA0ebkCen+w+ybUBJC7NXLEFgvp3bUWQcOtjFOiC+oR2W5sgccD?=
- =?us-ascii?Q?ssQbKQL31xkpKp5wQ2B/mGa6LoGbadFMsdvwwzFTu72Krwdh3DE4gV/ltn/P?=
- =?us-ascii?Q?Bj1a10EzGTqQIvx4L7izJ6uDqRTmlctTZiLTvHfaFjIaflLQVEwQ02EvE6LY?=
- =?us-ascii?Q?7Y6BkmXGputvrvuQcplclZmj1r/gAeJEzhGPv6VAx0wSPz1p0sSMIsI0+yDL?=
- =?us-ascii?Q?aOguCWchv6hNMc51/iLT90VC2zVa1ZBQyjFzDy+K7UoiUWoGciN5p6PvXwph?=
- =?us-ascii?Q?qptzQijlI4lCFPuEEJI80TjYefqgDMFHekPH1h/L2uB3I+M+21ykote4qOb8?=
- =?us-ascii?Q?8COYvA2ENM92tVKdc0QxjY7aJxqla4aWwWqq1KknOCrj8LG1//D3+Spji6xU?=
- =?us-ascii?Q?F9h0T3QiDv3ptaiRIvD6pkSni8dxDxpP50CniAxo9y/oMyRYj+w4Dy+r/jIG?=
- =?us-ascii?Q?+ixWOGyYWzVXnMOSDRAAGY7DYWchjWWhWmZBaWUjFIe/9nFhvAZens8OqaH6?=
- =?us-ascii?Q?0GQMo150YoewkNUmG7XdM486v0MgOO7g5rqkODLw7rvfcP2KXPeqiHoBWP5n?=
- =?us-ascii?Q?FYJUzqkSi6yoaiSCibTIE7aLaeQl/amTTWu7yp6DIOhkPoQBRcSbfB791nTv?=
- =?us-ascii?Q?GcffoEV+YRMLbjvt3Buqg4twhxvGvctqIbsA5A99Oq+f4EUMTUCPAWY1sEcM?=
- =?us-ascii?Q?LpNvk10kuIaWv44PDiPDJNm/jcqOWDvTi4JUK6IVsOmlegD1jfQd7shqtGwa?=
- =?us-ascii?Q?Z6j2lgQ5YhgHjttj0q2usd334FImH6FyLsPzDmQt2YDXnw842FNnGXegT9OL?=
- =?us-ascii?Q?2kE5wjdi/SN1vl+19QDvOlIvsykBCAehc7rUtNjTpaEAHKJKW0ZqedM0u5Lx?=
- =?us-ascii?Q?PgAtPz+gX7hGZ1IuM0v6MwuYwd0rYmVQZrkDU0TTZ6ngnKx7FPjDDy9saXz9?=
- =?us-ascii?Q?TD9NZUO49DNfrTbtEEdkxTDHdmnjwJpHCYqxMh/rjQHMye1gUcmSaBsNZKVe?=
- =?us-ascii?Q?mIKVK4vBpQljICBHZvLgMDFLHSzCotegzPfodvKN6jc0nl4lL/bslXILWkkE?=
- =?us-ascii?Q?5kkljiRRlIy2h1jiqGTL3xYvyOLVk3g7TmXDnvVCQMb8IBkFa+SzhTcClYsy?=
- =?us-ascii?Q?6w=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE58E2797A4
+	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 19:43:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756410230; cv=none; b=NT71BDcYIXIRulFbgT+FH+oI4qF3WAyWndp362cmEoIA8jsVDeIilJLckC3sAzKBZEmlCaPmm48Fow6ZY9MArGlUHNepzMmso5OeQsSlGiayFm3vJ97vCHPlehSyuSub1Vxglv1JgFurFnzakhfdhStbZIpiBzGoB42xsfDoQSE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756410230; c=relaxed/simple;
+	bh=TnMTKIT2RLMSunGpSoNftY6dzd5Bjjd45dNhptClb9o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rc4zSK4bIW2tY7N30tWa8RxArVtiNHd2/jMMclMdx/11q5VKX9CUz6XdiEBiFojJdYwV/vzlLd8kB/g25a9D+EcGvM4msk464zIa4IF5vrN07d82eaagaRuF45/G5SaW8SV84SYBXIVon3iVGDmRE9DM/0dt6OMP6JiTx65TuoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V4F2xMoQ; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4b28184a8b3so15733091cf.1
+        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 12:43:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756410228; x=1757015028; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LvWP1EIagvNp91g+RgveNhCCrgjH/IPh927YjhaOu4c=;
+        b=V4F2xMoQ6I0s/KGuhe45bcPTloJdW0zPEs3vpzcWwbLiHUVx9Mginec2Os6XcdfC7b
+         xXAbvLQt4p0ixB0akGEuVZQKH4RiGaWWmGixqAZxwFeAThdvmmx0JGK+bSp5+dD68oMs
+         CQO3y2CYVd2ZX3rIjYUmQQ3mE1MiSfRApO5xhCKsjmJeLBZPCj0HWd+Zx4bK286NJTSR
+         S98GS2udBvZUbgQ/pY5XqHrGsby1Axo90Y9o2NKOd+g17NSUiX2benh7ijXRcHgMBFmy
+         EFkglSAVLS7hpdDNlFqD27EpV87BXtUBxkp97eZ52ZC+WNfyA+Bc6GgHkYZLFA6KvmAl
+         NMHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756410228; x=1757015028;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LvWP1EIagvNp91g+RgveNhCCrgjH/IPh927YjhaOu4c=;
+        b=IK/grDlk8oH+1T/PIKFn5U1Zzf03F8o3vLDVfZcpkoCGYOdGtVAUEovMHwCoFyx0MU
+         vKCOCxAC/UfmnhbeTVVncMPxSnlnZpLreRYwWcHguRXNyA7n3wCpdTgcqJqZCdaqPsFB
+         vUKUrbkF7wrH2IrOImtphWrVglTZUW+5lcSMBrEBCzNPZrEUR0eaGEcCOXMkuP4udi0A
+         nun1bY+YW+qsq/wUV6QIv9KPV/1JpALtSY2PYSaZxBgf2zBQ4PYxwxL2p0g4P0N5KdOw
+         X7KyBHdY8Kv77t+Ox3gW9VH0NC/+DRa+5TlQdOLow9uD6sN2xaOdhMMXbO2ltRp+i8/N
+         O9/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX/WGLBLu1FLZcKJbgRwRC/n6vLGakALoN4IVcpjrrT961tMVrJXOpFSvqNnfT+Mg7TVywwipE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4N1SPNZcqjPF6GqvsDE9V8LZkmhwyj1ZYUITkr4NZHbdXaVZM
+	wyu5FYRQ2JmVikZ1MxbfBm+wSFDT4kE/HE3WOSPdqyozV+60xrVKLaXWFk/ckpDR4JgYd3xopiH
+	9E0HNnEjKQPKBjtChEDY1qOphT31dR7nmbCnWRgiH
+X-Gm-Gg: ASbGncv0wO2AmFxxiZrbDp8ht4M16MV21KbTy8XmqQMG0fsa9EJo3Lu02Hphqflf4Q3
+	KHQ27AhHpY1+VIOaGDNDwJoTEwYdyEKSHDJDX4pjxFEkLcNGYl4m/gc0+W5GNv61ZQV0R27k0wq
+	uvgzw4naI2R3Zmz208kZMONYam4Oun270YqMIcukTC3pPKMzwr88jUeD7qUqe7TxOHPEL5a7DRI
+	mLq6RBjDOBYGA==
+X-Google-Smtp-Source: AGHT+IG3jqv6msRFu+wEOd5ve7eXnVNwLNaZG7weV85QwzfVsC478io88x5SFE5xNO0tXiiGPcYr0WhENxml0Xs4ZBA=
+X-Received: by 2002:a05:622a:5597:b0:4b2:8ac4:ef84 with SMTP id
+ d75a77b69052e-4b2aab4d13fmr298360151cf.83.1756410227277; Thu, 28 Aug 2025
+ 12:43:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8dcdda2b-6b79-4d8d-cf6c-08dde669eef9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Aug 2025 19:34:41.1436
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Lnv9QiL61EPxLb8NWw0ha0D1Iu3DPHEe8hYD32rhb1th4G3jfk7vsap+YNWUG5gOpuqKC1FRURJ/s1ZSkr4ScmQhmJPVZRJLly7VCqilLUQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR11MB8732
-X-OriginatorOrg: intel.com
+References: <20250828-b4-tcp-ao-md5-rst-finwait2-v2-0-653099bea5c1@arista.com> <20250828-b4-tcp-ao-md5-rst-finwait2-v2-1-653099bea5c1@arista.com>
+In-Reply-To: <20250828-b4-tcp-ao-md5-rst-finwait2-v2-1-653099bea5c1@arista.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 28 Aug 2025 12:43:36 -0700
+X-Gm-Features: Ac12FXyimLdPLId8dmfUxJvcMZz-eM27JZ-f2qMJtzFIaoF1YxDltULDxGWjeeo
+Message-ID: <CANn89iKVQ=c8zxm0MqR7ycR1RFbKqObEPEJrpWCfxH4MdVf3Og@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 1/2] tcp: Destroy TCP-AO, TCP-MD5 keys in .sk_destruct()
+To: dima@arista.com
+Cc: Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Bob Gilligan <gilligan@arista.com>, Salam Noureddine <noureddine@arista.com>, 
+	Dmitry Safonov <0x7f454c46@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Aug 28, 2025 at 1:15=E2=80=AFAM Dmitry Safonov via B4 Relay
+<devnull+dima.arista.com@kernel.org> wrote:
+>
+> From: Dmitry Safonov <dima@arista.com>
+>
+> Currently there are a couple of minor issues with destroying the keys
+> tcp_v4_destroy_sock():
+>
+> 1. The socket is yet in TCP bind buckets, making it reachable for
+>    incoming segments [on another CPU core], potentially available to send
+>    late FIN/ACK/RST replies.
+>
+> 2. There is at least one code path, where tcp_done() is called before
+>    sending RST [kudos to Bob for investigation]. This is a case of
+>    a server, that finished sending its data and just called close().
+>
+>    The socket is in TCP_FIN_WAIT2 and has RCV_SHUTDOWN (set by
+>    __tcp_close())
+>
+>    tcp_v4_do_rcv()/tcp_v6_do_rcv()
+>      tcp_rcv_state_process()            /* LINUX_MIB_TCPABORTONDATA */
+>        tcp_reset()
+>          tcp_done_with_error()
+>            tcp_done()
+>              inet_csk_destroy_sock()    /* Destroys AO/MD5 keys */
+>      /* tcp_rcv_state_process() returns SKB_DROP_REASON_TCP_ABORT_ON_DATA=
+ */
+>    tcp_v4_send_reset()                  /* Sends an unsigned RST segment =
+*/
+>
+>    tcpdump:
+> > 22:53:15.399377 00:00:b2:1f:00:00 > 00:00:01:01:00:00, ethertype IPv4 (=
+0x0800), length 74: (tos 0x0, ttl 64, id 33929, offset 0, flags [DF], proto=
+ TCP (6), length 60)
+> >     1.0.0.1.34567 > 1.0.0.2.49848: Flags [F.], seq 2185658590, ack 3969=
+644355, win 502, options [nop,nop,md5 valid], length 0
+> > 22:53:15.399396 00:00:01:01:00:00 > 00:00:b2:1f:00:00, ethertype IPv4 (=
+0x0800), length 86: (tos 0x0, ttl 64, id 51951, offset 0, flags [DF], proto=
+ TCP (6), length 72)
+> >     1.0.0.2.49848 > 1.0.0.1.34567: Flags [.], seq 3969644375, ack 21856=
+58591, win 128, options [nop,nop,md5 valid,nop,nop,sack 1 {2185658590:21856=
+58591}], length 0
+> > 22:53:16.429588 00:00:b2:1f:00:00 > 00:00:01:01:00:00, ethertype IPv4 (=
+0x0800), length 60: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP=
+ (6), length 40)
+> >     1.0.0.1.34567 > 1.0.0.2.49848: Flags [R], seq 2185658590, win 0, le=
+ngth 0
+> > 22:53:16.664725 00:00:b2:1f:00:00 > 00:00:01:01:00:00, ethertype IPv4 (=
+0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP=
+ (6), length 60)
+> >     1.0.0.1.34567 > 1.0.0.2.49848: Flags [R], seq 2185658591, win 0, op=
+tions [nop,nop,md5 valid], length 0
+> > 22:53:17.289832 00:00:b2:1f:00:00 > 00:00:01:01:00:00, ethertype IPv4 (=
+0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP=
+ (6), length 60)
+> >     1.0.0.1.34567 > 1.0.0.2.49848: Flags [R], seq 2185658591, win 0, op=
+tions [nop,nop,md5 valid], length 0
+>
+>   Note the signed RSTs later in the dump - those are sent by the server
+>   when the fin-wait socket gets removed from hash buckets, by
+>   the listener socket.
+>
+> Instead of destroying AO/MD5 info and their keys in inet_csk_destroy_sock=
+(),
+> slightly delay it until the actual socket .sk_destruct(). As shutdown'ed
+> socket can yet send non-data replies, they should be signed in order for
+> the peer to process them. Now it also matches how AO/MD5 gets destructed
+> for TIME-WAIT sockets (in tcp_twsk_destructor()).
+>
+> This seems optimal for TCP-MD5, while for TCP-AO it seems to have an
+> open problem: once RST get sent and socket gets actually destructed,
+> there is no information on the initial sequence numbers. So, in case
+> this last RST gets lost in the network, the server's listener socket
+> won't be able to properly sign another RST. Nothing in RFC 1122
+> prescribes keeping any local state after non-graceful reset.
+> Luckily, BGP are known to use keep alive(s).
+>
+> While the issue is quite minor/cosmetic, these days monitoring network
+> counters is a common practice and getting invalid signed segments from
+> a trusted BGP peer can get customers worried.
+>
+> Investigated-by: Bob Gilligan <gilligan@arista.com>
+> Signed-off-by: Dmitry Safonov <dima@arista.com>
+> ---
+>  include/net/tcp.h   |  4 ++++
+>  net/ipv4/tcp.c      | 27 +++++++++++++++++++++++++++
+>  net/ipv4/tcp_ipv4.c | 33 ++++++++-------------------------
+>  net/ipv6/tcp_ipv6.c |  8 ++++++++
+>  4 files changed, 47 insertions(+), 25 deletions(-)
+>
+> diff --git a/include/net/tcp.h b/include/net/tcp.h
+> index 2936b8175950faa777f81f3c6b7230bcc375d772..0009c26241964b54aa93bc1b8=
+6158050d96c2c98 100644
+> --- a/include/net/tcp.h
+> +++ b/include/net/tcp.h
+> @@ -1931,6 +1931,7 @@ tcp_md5_do_lookup_any_l3index(const struct sock *sk=
+,
+>  }
+>
+>  #define tcp_twsk_md5_key(twsk) ((twsk)->tw_md5_key)
+> +void tcp_md5_destruct_sock(struct sock *sk);
+>  #else
+>  static inline struct tcp_md5sig_key *
+>  tcp_md5_do_lookup(const struct sock *sk, int l3index,
+> @@ -1947,6 +1948,9 @@ tcp_md5_do_lookup_any_l3index(const struct sock *sk=
+,
+>  }
+>
+>  #define tcp_twsk_md5_key(twsk) NULL
+> +static inline void tcp_md5_destruct_sock(struct sock *sk)
+> +{
+> +}
+>  #endif
+>
+>  int tcp_md5_alloc_sigpool(void);
+> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> index 9bc8317e92b7952871f07ae11a9c2eaa7d3a9e65..927233ee7500e0568782ae4a3=
+860af56d1476acd 100644
+> --- a/net/ipv4/tcp.c
+> +++ b/net/ipv4/tcp.c
+> @@ -412,6 +412,33 @@ static u64 tcp_compute_delivery_rate(const struct tc=
+p_sock *tp)
+>         return rate64;
+>  }
+>
+> +#ifdef CONFIG_TCP_MD5SIG
+> +static void tcp_md5sig_info_free_rcu(struct rcu_head *head)
+> +{
+> +       struct tcp_md5sig_info *md5sig;
+> +
+> +       md5sig =3D container_of(head, struct tcp_md5sig_info, rcu);
+> +       kfree(md5sig);
+> +       static_branch_slow_dec_deferred(&tcp_md5_needed);
+> +       tcp_md5_release_sigpool();
+> +}
+> +
+> +void tcp_md5_destruct_sock(struct sock *sk)
+> +{
+> +       struct tcp_sock *tp =3D tcp_sk(sk);
+> +
+> +       if (tp->md5sig_info) {
+> +               struct tcp_md5sig_info *md5sig;
+> +
+> +               md5sig =3D rcu_dereference_protected(tp->md5sig_info, 1);
+> +               tcp_clear_md5_list(sk);
+> +               call_rcu(&md5sig->rcu, tcp_md5sig_info_free_rcu);
+> +               rcu_assign_pointer(tp->md5sig_info, NULL);
 
+I would move this line before call_rcu(&md5sig->rcu, tcp_md5sig_info_free_r=
+cu),
+otherwise the free could happen before the clear, and an UAF could occur.
 
-> -----Original Message-----
-> From: Kohei Enju <enjuk@amazon.com>
-> Sent: Thursday, August 28, 2025 7:41 PM
-> To: Loktionov, Aleksandr <aleksandr.loktionov@intel.com>
-> Cc: andrew+netdev@lunn.ch; Nguyen, Anthony L
-> <anthony.l.nguyen@intel.com>; davem@davemloft.net;
-> edumazet@google.com; enjuk@amazon.com; intel-wired-
-> lan@lists.osuosl.org; kohei.enju@gmail.com; kuba@kernel.org;
-> netdev@vger.kernel.org; pabeni@redhat.com; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>
-> Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2] ixgbe: preserve
-> RSS indirection table across admin down/up
->=20
-> On Thu, 28 Aug 2025 16:42:31 +0000, Loktionov, Aleksandr wrote:
->=20
-> >
-> >
-> > > -----Original Message-----
-> > > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On
-> Behalf
-> > > Of Kohei Enju
-> > > Sent: Thursday, August 28, 2025 6:01 PM
-> > > To: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org
-> > > Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel,
-> > > Przemyslaw <przemyslaw.kitszel@intel.com>; Andrew Lunn
-> > > <andrew+netdev@lunn.ch>; David S. Miller <davem@davemloft.net>;
-> Eric
-> > > Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>;
-> > > Paolo Abeni <pabeni@redhat.com>; kohei.enju@gmail.com; Kohei
-> Enju
-> > > <enjuk@amazon.com>
-> > > Subject: [Intel-wired-lan] [PATCH iwl-next v2] ixgbe: preserve
-> RSS
-> > > indirection table across admin down/up
-> > >
-> > > Currently, the RSS indirection table configured by user via
-> ethtool
-> > > is reinitialized to default values during interface resets
-> (e.g.,
-> > > admin down/up, MTU change). As for RSS hash key, commit
-> 3dfbfc7ebb95
-> > > ("ixgbe:
-> > > Check for RSS key before setting value") made it persistent
-> across
-> > > interface resets.
-> > >
-> > > Adopt the same approach used in igc and igb drivers which
-> > > reinitializes the RSS indirection table only when the queue
-> count
-> > > changes. Since the number of RETA entries can also change in
-> ixgbe,
-> > > let's make user configuration persistent as long as both queue
-> count
-> > > and the number of RETA entries remain unchanged.
-> > >
-> > > Tested on Intel Corporation 82599ES 10-Gigabit SFI/SFP+ Network
-> > > Connection.
-> > >
-> > > Test:
-> > > Set custom indirection table and check the value after interface
-> > > down/up
-> > >
-> > >   # ethtool --set-rxfh-indir ens5 equal 2
-> > >   # ethtool --show-rxfh-indir ens5 | head -5
-> > >
-> > >   RX flow hash indirection table for ens5 with 12 RX ring(s):
-> > >       0:      0     1     0     1     0     1     0     1
-> > >       8:      0     1     0     1     0     1     0     1
-> > >      16:      0     1     0     1     0     1     0     1
-> > >   # ip link set dev ens5 down && ip link set dev ens5 up
-> > >
-> > > Without patch:
-> > >   # ethtool --show-rxfh-indir ens5 | head -5
-> > >
-> > >   RX flow hash indirection table for ens5 with 12 RX ring(s):
-> > >       0:      0     1     2     3     4     5     6     7
-> > >       8:      8     9    10    11     0     1     2     3
-> > >      16:      4     5     6     7     8     9    10    11
-> > >
-> > > With patch:
-> > >   # ethtool --show-rxfh-indir ens5 | head -5
-> > >
-> > >   RX flow hash indirection table for ens5 with 12 RX ring(s):
-> > >       0:      0     1     0     1     0     1     0     1
-> > >       8:      0     1     0     1     0     1     0     1
-> > >      16:      0     1     0     1     0     1     0     1
-> > >
-> > > Signed-off-by: Kohei Enju <enjuk@amazon.com>
-> > > ---
-> > > Changes:
-> > >   v1->v2:
-> > >     - add check for reta_entries in addition to rss_i
-> > >     - update the commit message to reflect the additional check
-> > >   v1: https://lore.kernel.org/intel-wired-
-> lan/20250824112037.32692-
-> > > 1-enjuk@amazon.com/
-> > > ---
-> > >  drivers/net/ethernet/intel/ixgbe/ixgbe.h      |  2 +
-> > >  drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 41
-> +++++++++++++---
-> > > ---
-> > >  2 files changed, 31 insertions(+), 12 deletions(-)
-> > >
-> > > diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-> > > b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-> > > index 14d275270123..da3b23bdcce1 100644
-> > > --- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-> > > +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-> > > @@ -838,6 +838,8 @@ struct ixgbe_adapter {
-> > >   */
-> > >  #define IXGBE_MAX_RETA_ENTRIES 512
-> > >  	u8 rss_indir_tbl[IXGBE_MAX_RETA_ENTRIES];
-> > > +	u32 last_reta_entries;
-> > > +	u16 last_rss_i;
-> > last_rss_i is cryptic; please, consider last_rss_indices (or
-> similar)
->=20
-> Sure, I'll rename it to last_rss_indices for clarity.
->=20
-> >
-> > >
-> > >  #define IXGBE_RSS_KEY_SIZE     40  /* size of RSS Hash Key in
-> bytes
-> > > */
-> > >  	u32 *rss_key;
-> > > diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> > > b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> > > index 27040076f068..05dfb06173d4 100644
-> > > --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> > > +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> > > @@ -4323,14 +4323,21 @@ static void ixgbe_setup_reta(struct
-> > > ixgbe_adapter *adapter)
-> > >  	/* Fill out hash function seeds */
-> > >  	ixgbe_store_key(adapter);
-> > >
-> > > -	/* Fill out redirection table */
-> > > -	memset(adapter->rss_indir_tbl, 0, sizeof(adapter-
-> > > >rss_indir_tbl));
-> > > +	/* Update redirection table in memory on first init, queue
-> > > count change,
-> > > +	 * or reta entries change, otherwise preserve user
-> > > configurations. Then
-> > > +	 * always write to hardware.
-> > > +	 */
-> > > +	if (adapter->last_rss_i !=3D rss_i ||
-> > > +	    adapter->last_reta_entries !=3D reta_entries) {
-> > > +		for (i =3D 0, j =3D 0; i < reta_entries; i++, j++) {
-> > You can avoid the top-of-loop equality test by using modulo, which
-> reads easier, like:
-> > for (i =3D 0, j =3D 0; i < reta_entries; i++, j++)
-> >     adapter->rss_indir_tbl[i] =3D j % rss_i;
->=20
-> I got it. I'll use modulo and then j can be removed like:
->     for (i =3D 0; i < reta_entries; i++)
->            adapter->rss_indir_tbl[i] =3D i % rss_i;
->=20
-> >
-> > > +			if (j =3D=3D rss_i)
-> > > +				j =3D 0;
-> > >
-> > > -	for (i =3D 0, j =3D 0; i < reta_entries; i++, j++) {
-> > > -		if (j =3D=3D rss_i)
-> > > -			j =3D 0;
-> > > +			adapter->rss_indir_tbl[i] =3D j;
-> > > +		}
-> > >
-> > > -		adapter->rss_indir_tbl[i] =3D j;
-> > > +		adapter->last_rss_i =3D rss_i;
-> > > +		adapter->last_reta_entries =3D reta_entries;
-> > >  	}
-> > >
-> > >  	ixgbe_store_reta(adapter);
-> > > @@ -4338,8 +4345,9 @@ static void ixgbe_setup_reta(struct
-> > > ixgbe_adapter *adapter)
-> > >
-> > >  static void ixgbe_setup_vfreta(struct ixgbe_adapter *adapter)
-> {
-> > > -	struct ixgbe_hw *hw =3D &adapter->hw;
-> > >  	u16 rss_i =3D adapter->ring_feature[RING_F_RSS].indices;
-> > > +	struct ixgbe_hw *hw =3D &adapter->hw;
-> > > +	u32 reta_entries =3D 64;
-> > Magic number. Can you #define IXGBE_VFRETA_ENTRIES 64 ?
->=20
-> You're right about the magic number.
-> I see it was introduced in commit 0f9b232b176d ("ixgbe: add support
-> for
-> X550 extended RSS support").
->=20
-> I'm considering using ixgbe_rss_indir_tbl_entries() instead of
-> #define to avoid the magic number, since ixgbe_store_vfreta()
-> already uses it.
-> This would ensure consistency between the two functions. Would that
-> be acceptable, or would you prefer a #define?
->=20
-Good catch!
-ixgbe_rss_indir_tbl_entries() is proper solution ,because it's h/w and conf=
-iguration dependent.
+It is not absolutely clear if this function runs under rcu_read_lock(),
+and even if it is currently safe, this could change in the future.
 
-> >
-> > >  	int i, j;
-> > >
-> > >  	/* Fill out hash function seeds */ @@ -4352,12 +4360,21 @@
-> static
-> > > void ixgbe_setup_vfreta(struct ixgbe_adapter *adapter)
-> > >  					*(adapter->rss_key + i));
-> > >  	}
-> > >
-> > > -	/* Fill out the redirection table */
-> > > -	for (i =3D 0, j =3D 0; i < 64; i++, j++) {
-> > > -		if (j =3D=3D rss_i)
-> > > -			j =3D 0;
-> > > +	/* Update redirection table in memory on first init, queue
-> > > count change,
-> > > +	 * or reta entries change, otherwise preserve user
-> > > configurations. Then
-> > > +	 * always write to hardware.
-> > > +	 */
-> > > +	if (adapter->last_rss_i !=3D rss_i ||
-> > > +	    adapter->last_reta_entries !=3D reta_entries) {
-> > > +		for (i =3D 0, j =3D 0; i < reta_entries; i++, j++) {
-> > > +			if (j =3D=3D rss_i)
-> > > +				j =3D 0;
-> > > +
-> > > +			adapter->rss_indir_tbl[i] =3D j;
-> > > +		}
-> > >
-> > > -		adapter->rss_indir_tbl[i] =3D j;
-> > > +		adapter->last_rss_i =3D rss_i;
-> > > +		adapter->last_reta_entries =3D reta_entries;
-> > >  	}
-> > >
-> > >  	ixgbe_store_vfreta(adapter);
-> > > --
-> > > 2.51.0
+Other than that :
+
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
