@@ -1,177 +1,182 @@
-Return-Path: <netdev+bounces-217674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-217675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAED2B397E1
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 11:15:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 193FCB39804
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 11:19:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FAFC1746F0
-	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 09:15:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C31116802A7
+	for <lists+netdev@lfdr.de>; Thu, 28 Aug 2025 09:19:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A04E2BEFF6;
-	Thu, 28 Aug 2025 09:15:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5AD922F74D;
+	Thu, 28 Aug 2025 09:19:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blaese.de header.i=@blaese.de header.b="NM/4unBo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X19UdC62"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.sgstbr.de (mail.sgstbr.de [94.130.16.203])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B11002857C7;
-	Thu, 28 Aug 2025 09:14:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.130.16.203
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A0531DF996
+	for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 09:19:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756372504; cv=none; b=cwCFpnACg0R5LQyx478O9uQDNU9rS6un2y9ACaFdLNF0JbAOuvZ7Ksdz7yj4eAloJaPho7ubFrtl+2I2N6xiJmdUGMbsMG1uB2uEZiqmodiYbYBP2vK2Y+YLg33sZ58oFz5EABOc5omTkK8gnKcfd5ix/yFrXVKWje4zN7xhQ7o=
+	t=1756372760; cv=none; b=AuYRXAHaeovIR8dYaMqukbopzHktZcFX3+HhAOpQlvFUHWSmyJkI2pxFR7D23trupBRoL0F8TaX4Xyx4uIgkiLnVrXNUPRSz8FODWb1xDY9U+QkXQzEo8oRZDCwdhQeVNzIlJtml75jwE7xxVuJjjAoApsWUuAf3Nq2hFnBJzDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756372504; c=relaxed/simple;
-	bh=HfDp8pemVhL2e98OM41X5YIIAlADWE9c/iuT1s3U+7I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pM0PyzigE5SPwkmVKBmkLfWC0KfSBNIW7k9EPWmeC62wG/oFDDsFVJr6S+hS+abCIwxMnkwTvSRpMnK+EVhJvEUXwVC0ijroePOeUStvJRo10S5fxThxuN0AO3GY+8ZHzA9lbXy38xSJS9soe45Je3iMjYvjbO/X9gq3a0CVQEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=blaese.de; spf=pass smtp.mailfrom=blaese.de; dkim=pass (2048-bit key) header.d=blaese.de header.i=@blaese.de header.b=NM/4unBo; arc=none smtp.client-ip=94.130.16.203
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=blaese.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blaese.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=blaese.de; s=201803;
-	t=1756372494; bh=QdtsQcVAzSiyr0oE0PVsZcrhGnq8QS7YuFJSnptOUAY=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=NM/4unBoW/HFmZY0eWNw+4l7S/0x2OdG0lvr5E+RN+6JIWSdOQtneBPZYoKuTVRUu
-	 1bg0Wjv0bz+nE5tVWvP3LWK3Wq89Odlu1AW/OHVS2UxIySY3/PM+/3bnqsSAHwQocB
-	 K/n6aMg4Gr9agNOgHdt4L8NfvrUM3jLevXy4z7IVqwqC6lVreZrkX4ICthBG1QnifL
-	 rtsXscywUoXyplV2tRTIO2/GhL5QBNfTkxKzgUyTnKpPWXUImRMtVns26sxrkza8rf
-	 K2fSvwCLAgwiYDBgO4CxhbggBohMGApfUBdSuG4QVhXSqwZt8zh6flL4GQbGB5hV1Q
-	 NMGaSj4P8Z8Og==
-Received: from fbl-xps (unknown [IPv6:2a00:20:c00c:f708:c5a:4e33:bb77:1735])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fabian@blaese.de)
-	by mail.sgstbr.de (Postfix) with ESMTPSA id 7081C24B485;
-	Thu, 28 Aug 2025 11:14:54 +0200 (CEST)
-From: =?UTF-8?q?Fabian=20Bl=C3=A4se?= <fabian@blaese.de>
-To: netdev@vger.kernel.org
-Cc: netfilter-devel@vger.kernel.org,
-	=?UTF-8?q?Fabian=20Bl=C3=A4se?= <fabian@blaese.de>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Florian Westphal <fw@strlen.de>
-Subject: [PATCH v3] icmp: fix icmp_ndo_send address translation for reply direction
-Date: Thu, 28 Aug 2025 11:14:35 +0200
-Message-ID: <20250828091435.161962-1-fabian@blaese.de>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250825203826.3231093-1-fabian@blaese.de>
-References: <20250825203826.3231093-1-fabian@blaese.de>
+	s=arc-20240116; t=1756372760; c=relaxed/simple;
+	bh=FfoXFGeGmnpKxzS/K/q3q81DIcoMsb+Pu2BTo37S4DA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=c2wSmlYjfIkiEx2lxuS02JqTOZk6FSDaO6J1uMiz2eJsaIIegLwjWsct1AEHLTGzGaq80u5og+VALKQIjSn9oU8QYQWeFJNsb9HFbTpiR8CG77W/nlPExRgv+WuyQ8vlcjZWOOl75TVa3GeT1n9zbx67zC+xQ88hy9rg5JWYao8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X19UdC62; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756372758;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9Bp45yh3Te0X9QhLiIqLtMGTynS3AxXPNJIWRzKQFuY=;
+	b=X19UdC6216VrRUCYeg3SfgdSUh/ANcjzIgSFqJb5Wfl/pykjqxLrRQ6NT52vSBw1lnWwlf
+	ogn5VlL7h0CX/UiClo7hvKVQiYcJCKwkSb4HXgX5zOWSflZk0Xw/Ar+gSKyq/zpuBjbE3R
+	4WKrNU/wM5ew6wssrfCgf8UHZjDqKtM=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-7-vx1a2UUgPbuj1kOuezv44w-1; Thu, 28 Aug 2025 05:19:16 -0400
+X-MC-Unique: vx1a2UUgPbuj1kOuezv44w-1
+X-Mimecast-MFC-AGG-ID: vx1a2UUgPbuj1kOuezv44w_1756372756
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7e86f8f27e1so197151785a.0
+        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 02:19:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756372756; x=1756977556;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9Bp45yh3Te0X9QhLiIqLtMGTynS3AxXPNJIWRzKQFuY=;
+        b=fnJkQFDSjBTmpKzbHiSQNAvJxx8JPd6K0UzBP2WmQTATBT5iPPKIFfkiRC+2C/5poj
+         CJB/ZJSUWWBf4wuuR+W7EJwJ+V59tDc7SzTRAk0S9NV/iOXoM1Hs914QylMPwY6RG0e+
+         KxPwjdVJvg8uuEE2ifbdzbwkeRTlkq2WK++NTMPy+Ma7HIqsCwtnx614RNSGluSIvWeQ
+         iDwq3zDQOFKupN06XgF/bQEaQ5Ir76upXSv9vcrudMFQbMPfTxscAeYYDTFWOMVSdHci
+         fH0mqVgIpKwsE0iPHJLBuYjymJZWur6Zbcgeu1pfjEVntwgz9aArBIO6qtVo6Th+o2hO
+         jxAw==
+X-Forwarded-Encrypted: i=1; AJvYcCXMMZEhHo0mO84xioC9wA7dIHsmWUaInj7DVq2qIZ6BHWVCZY/LREtxqdH14AGvLDeQSRgTirY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEqGyRuWoNA79i+qv8ZEp1/EaMhxMHoscjZ6FYDjtD7VjCmiON
+	D+S2vSS9DuRJ6PyI3hIiQp8gEqLGEOPnnLe9rG6g0o/IwcegyoM39S2UNkvR8fnur8u9DHHn8iL
+	xezkBgkvMdXwt5U/1FpLqpqgqkT8sSW+438PVCn1HCjKTUADNfK2/Xbcc4g==
+X-Gm-Gg: ASbGncsQ23XODNQTFmueTCmP6ozM5vv0VbUuqZVKagdzxRwdzQ0AxKDDjoY3XVyLA5H
+	vaVD7XHoMqohgowMNeobl0Om3XMr08Balu/6ymYME5MQMNY9SYBmOsLSE6UFEd/jqhnn2gJO+E7
+	lzGX4x+Igg7v3mYwn7wvlAVSRzaE55rGJs4M9BJnL3tHdLsBctTelAQZn30Em0um6QnTISUug9c
+	snG7gfZwNJx6X95RGCA5izeJCIZ9SBW8BCQJIufaQBVKln+A5HLSwypsBdK/aUl4zq9hiOkV4bV
+	CIr7+iRzktwJBAcwYYtzAcRfSDMzsW+0axjXZ/A6FdDrwPc34CPGJLVDToMFseCp49WQqKPzNTL
+	r9JfZPZnSUyc=
+X-Received: by 2002:a05:620a:7013:b0:7e8:7a7b:5723 with SMTP id af79cd13be357-7f58d942121mr778015685a.22.1756372756141;
+        Thu, 28 Aug 2025 02:19:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHi9aA2lip4GhP2MqXoLgeWU1mVLS0aUtyXoB0MHe+cWNBrCSQkgSBeTYDleWgs/vjgtimwMg==
+X-Received: by 2002:a05:620a:7013:b0:7e8:7a7b:5723 with SMTP id af79cd13be357-7f58d942121mr778013985a.22.1756372755714;
+        Thu, 28 Aug 2025 02:19:15 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7ebf3da460fsm1040835785a.62.2025.08.28.02.19.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Aug 2025 02:19:15 -0700 (PDT)
+Message-ID: <147f016f-bf5e-4cb6-80a7-192db0ff62c4@redhat.com>
+Date: Thu, 28 Aug 2025 11:19:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv2 net] hsr: use proper locking when iterating over ports
+To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, MD Danish Anwar <danishanwar@ti.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Jaakko Karrenpalo <jkarrenpalo@gmail.com>,
+ Fernando Fernandez Mancera <ffmancera@riseup.net>,
+ Murali Karicheri <m-karicheri2@ti.com>, WingMan Kwok <w-kwok2@ti.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Xiao Liang <shaw.leon@gmail.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>,
+ Johannes Berg <johannes.berg@intel.com>
+References: <20250827093323.432414-1-liuhangbin@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250827093323.432414-1-liuhangbin@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-The icmp_ndo_send function was originally introduced to ensure proper
-rate limiting when icmp_send is called by a network device driver,
-where the packet's source address may have already been transformed
-by SNAT.
+On 8/27/25 11:33 AM, Hangbin Liu wrote:
+> @@ -672,9 +672,13 @@ struct net_device *hsr_get_port_ndev(struct net_device *ndev,
+>  	struct hsr_priv *hsr = netdev_priv(ndev);
+>  	struct hsr_port *port;
+>  
+> +	rcu_read_lock();
+>  	hsr_for_each_port(hsr, port)
+> -		if (port->type == pt)
+> +		if (port->type == pt) {
+> +			rcu_read_unlock();
+>  			return port->dev;
 
-However, the original implementation only considers the
-IP_CT_DIR_ORIGINAL direction for SNAT and always replaced the packet's
-source address with that of the original-direction tuple. This causes
-two problems:
+This is not good enough. At this point accessing `port` could still
+cause UaF;
 
-1. For SNAT:
-   Reply-direction packets were incorrectly translated using the source
-   address of the CT original direction, even though no translation is
-   required.
+The only callers, in icssg_prueth_hsr_{add,del}_mcast(), can be either
+under the RTNL lock or not. A safer option would be acquiring a
+reference on dev before releasing the rcu lock and let the caller drop
+such reference
 
-2. For DNAT:
-   Reply-direction packets were not handled at all. In DNAT, the original
-   direction's destination is translated. Therefore, in the reply
-   direction the source address must be set to the reply-direction
-   source, so rate limiting works as intended.
+> +		}
+> +	rcu_read_unlock();
+>  	return NULL;
+>  }
+>  EXPORT_SYMBOL(hsr_get_port_ndev);
+> diff --git a/net/hsr/hsr_main.c b/net/hsr/hsr_main.c
+> index 192893c3f2ec..eec6e20a8494 100644
+> --- a/net/hsr/hsr_main.c
+> +++ b/net/hsr/hsr_main.c
+> @@ -22,9 +22,13 @@ static bool hsr_slave_empty(struct hsr_priv *hsr)
+>  {
+>  	struct hsr_port *port;
+>  
+> +	rcu_read_lock();
+>  	hsr_for_each_port(hsr, port)
+> -		if (port->type != HSR_PT_MASTER)
+> +		if (port->type != HSR_PT_MASTER) {
+> +			rcu_read_unlock();
+>  			return false;
+> +		}
+> +	rcu_read_unlock();
+>  	return true;
+>  }
 
-Fix this by using the connection direction to select the correct tuple
-for source address translation, and adjust the pre-checks to handle
-reply-direction packets in case of DNAT.
+AFAICS the only caller of this helper is under the RTNL lock
 
-Additionally, wrap the `ct->status` access in READ_ONCE(). This avoids
-possible KCSAN reports about concurrent updates to `ct->status`.
+> @@ -134,9 +138,13 @@ struct hsr_port *hsr_port_get_hsr(struct hsr_priv *hsr, enum hsr_port_type pt)
+>  {
+>  	struct hsr_port *port;
+>  
+> +	rcu_read_lock();
+>  	hsr_for_each_port(hsr, port)
+> -		if (port->type == pt)
+> +		if (port->type == pt) {
+> +			rcu_read_unlock();
+>  			return port;
 
-Fixes: 0b41713b6066 ("icmp: introduce helper for nat'd source address in network device context")
+The above is not enough.
 
-Signed-off-by: Fabian Bläse <fabian@blaese.de>
-Cc: Jason A. Donenfeld <Jason@zx2c4.com>
-Cc: Florian Westphal <fw@strlen.de>
----
-Changes v1->v2:
-- Implement fix for ICMPv6 as well
+AFAICS some/most caller are already either under the RTNL lock or the
+rcu lock.
 
-Changes v2->v3:
-- Collapse conditional tuple selection into a single direction lookup [Florian]
-- Always apply source address translation if IPS_NAT_MASK is set [Florian]
-- Wrap ct->status in READ_ONCE()
-- Add a clearer explanation of the behaviour change for DNAT
----
- net/ipv4/icmp.c     | 6 ++++--
- net/ipv6/ip6_icmp.c | 6 ++++--
- 2 files changed, 8 insertions(+), 4 deletions(-)
+I think it would be better rename the hsr_for_each_port_rtnl() helper to
+hsr_for_each_port_rcu(), retaining the current semantic, use it here,
+and fix the caller as needed.
 
-diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-index 2ffe73ea644f..c48c572f024d 100644
---- a/net/ipv4/icmp.c
-+++ b/net/ipv4/icmp.c
-@@ -799,11 +799,12 @@ void icmp_ndo_send(struct sk_buff *skb_in, int type, int code, __be32 info)
- 	struct sk_buff *cloned_skb = NULL;
- 	struct ip_options opts = { 0 };
- 	enum ip_conntrack_info ctinfo;
-+	enum ip_conntrack_dir dir;
- 	struct nf_conn *ct;
- 	__be32 orig_ip;
- 
- 	ct = nf_ct_get(skb_in, &ctinfo);
--	if (!ct || !(ct->status & IPS_SRC_NAT)) {
-+	if (!ct || !(READ_ONCE(ct->status) & IPS_NAT_MASK)) {
- 		__icmp_send(skb_in, type, code, info, &opts);
- 		return;
- 	}
-@@ -818,7 +819,8 @@ void icmp_ndo_send(struct sk_buff *skb_in, int type, int code, __be32 info)
- 		goto out;
- 
- 	orig_ip = ip_hdr(skb_in)->saddr;
--	ip_hdr(skb_in)->saddr = ct->tuplehash[0].tuple.src.u3.ip;
-+	dir = CTINFO2DIR(ctinfo);
-+	ip_hdr(skb_in)->saddr = ct->tuplehash[dir].tuple.src.u3.ip;
- 	__icmp_send(skb_in, type, code, info, &opts);
- 	ip_hdr(skb_in)->saddr = orig_ip;
- out:
-diff --git a/net/ipv6/ip6_icmp.c b/net/ipv6/ip6_icmp.c
-index 9e3574880cb0..233914b63bdb 100644
---- a/net/ipv6/ip6_icmp.c
-+++ b/net/ipv6/ip6_icmp.c
-@@ -54,11 +54,12 @@ void icmpv6_ndo_send(struct sk_buff *skb_in, u8 type, u8 code, __u32 info)
- 	struct inet6_skb_parm parm = { 0 };
- 	struct sk_buff *cloned_skb = NULL;
- 	enum ip_conntrack_info ctinfo;
-+	enum ip_conntrack_dir dir;
- 	struct in6_addr orig_ip;
- 	struct nf_conn *ct;
- 
- 	ct = nf_ct_get(skb_in, &ctinfo);
--	if (!ct || !(ct->status & IPS_SRC_NAT)) {
-+	if (!ct || !(READ_ONCE(ct->status) & IPS_NAT_MASK)) {
- 		__icmpv6_send(skb_in, type, code, info, &parm);
- 		return;
- 	}
-@@ -73,7 +74,8 @@ void icmpv6_ndo_send(struct sk_buff *skb_in, u8 type, u8 code, __u32 info)
- 		goto out;
- 
- 	orig_ip = ipv6_hdr(skb_in)->saddr;
--	ipv6_hdr(skb_in)->saddr = ct->tuplehash[0].tuple.src.u3.in6;
-+	dir = CTINFO2DIR(ctinfo);
-+	ipv6_hdr(skb_in)->saddr = ct->tuplehash[dir].tuple.src.u3.in6;
- 	__icmpv6_send(skb_in, type, code, info, &parm);
- 	ipv6_hdr(skb_in)->saddr = orig_ip;
- out:
--- 
-2.51.0
+It will be useful to somehow split the patch in a series, as it's
+already quite big and will increase even more.
+
+/P
 
 
