@@ -1,58 +1,64 @@
-Return-Path: <netdev+bounces-218273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1397EB3BBDD
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 15:02:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A66DFB3BBE0
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 15:03:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 601191CC0D17
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 13:02:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67D04A2409C
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 13:03:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D44031AF25;
-	Fri, 29 Aug 2025 13:02:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AhtRTQBK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A42431A06E;
+	Fri, 29 Aug 2025 13:02:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 482211AA1D2;
-	Fri, 29 Aug 2025 13:01:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 915891D61BB;
+	Fri, 29 Aug 2025 13:02:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756472520; cv=none; b=rrdxZM8Irspjl/VcK0pOZYdMolsAhWccjb6hkbsYXmPCWOGO1/YE2KrmDrO2eFaxHTcGz8sJmLVCg7jktg3GStmqtvaHCEOzjPeFPfDGxHYS/Yk3F3LXI7AB56jIPkpYlmAafQWyPpjUw/OWt+NeK87ZZ1cssMmRpNBEo2gSk2c=
+	t=1756472532; cv=none; b=rQvRXRifwC/muByov//NCWOOIkgMKXDH3HAyaA28LClS6mSL5WgEeupZZB+eLGpmvVViUG70W8W66GeO3jO2iMj97tFs1VEBAIwL4oPpXs48lAMMv3JwSl7jK7P59gpAYvBywIuEHkCjT3Ka/cBb4RtbCvDB7nJAr5mei6Z+67k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756472520; c=relaxed/simple;
-	bh=ases17tLv74igGgvIHHpXvVVktOQs8stMw7rFcVzXxo=;
+	s=arc-20240116; t=1756472532; c=relaxed/simple;
+	bh=3exr+R0hiXsx+XjCb6ENdO5HQJKlO9q31XLHKtJ7S2A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=spH6+3V8HKeNM3BKS1p36QHQxjIvm46TOCYd04+fKUTSkkGwz1FQ5uME1m29n1m84UtC2UqwddBg9eGskiJZFqr1vFdHwfiz4DK5z89EPsU67UVBWJf+GuUADToOy+AbUDP/FpmsGMawFD64lY0x6P4ZBYe/3y+SUJviH/jyYHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AhtRTQBK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2067C4CEF0;
-	Fri, 29 Aug 2025 13:01:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756472519;
-	bh=ases17tLv74igGgvIHHpXvVVktOQs8stMw7rFcVzXxo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AhtRTQBK8GUJDTMZU6bdVKfE9UQPIln9PR3DMIXKAOfxXAh6NeX7AYB/8F/9eF2Mp
-	 1vX85ywJu/uV8YbSL1NYScF+iT58MDA/s+Tx2v6OI5j8G4Nv7NlCAy0GPR0izIzhEg
-	 r0zocJhvUck6VWmQWJTTDkzUQkYjcpXtgr0l5cLdgvDN/p5ZYc2hnk4I7qZJemM7kK
-	 ZNXNf44XLPd/EADTYvODUyIBVCAbE/QGSyLytx7nOSaZYX+ZNmg0ubb+X0BF/Eq0/m
-	 b+aiCBTZpuZ8XK6cMkwPL/mWdAqBktImVxSfhJmQdG15NgWJOz6pJ1JyoexxRcNZdo
-	 sLdIwfFb+RDmw==
-Date: Fri, 29 Aug 2025 14:01:54 +0100
-From: Simon Horman <horms@kernel.org>
-To: Praveen Balakrishnan <praveen.balakrishnan@magd.ox.ac.uk>
-Cc: aconole@redhat.com, echaudro@redhat.com, i.maximets@ovn.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
-	dev@openvswitch.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
-	linux-kernel-mentees@lists.linux.dev
-Subject: Re: [PATCH] selftests: net: fix spelling and grammar mistakes
-Message-ID: <20250829130154.GJ31759@horms.kernel.org>
-References: <20250828211100.51019-1-praveen.balakrishnan@magd.ox.ac.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=J7m1CTyxsEDCJgo2vFN9KeY9reH9dtAI3AjzQalncpNNqQYIYRE/BVSIO/uXS0NzcqHvpRgC3Iv5pUg3u3ICSp6hvOV7XDGQOx87gq/hLBCMBfGtHgqAwZya4jDRngU0uQeY6Hcc0vGQGaztBVjqp5iAbumn1J/9af/maK4jLOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1uryk1-000000002AD-3JeU;
+	Fri, 29 Aug 2025 13:02:05 +0000
+Date: Fri, 29 Aug 2025 14:02:02 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Hauke Mehrtens <hauke@hauke-m.de>,
+	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Andreas Schirm <andreas.schirm@siemens.com>,
+	Lukas Stockmann <lukas.stockmann@siemens.com>,
+	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Peter Christen <peter.christen@siemens.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
+	Juraj Povazanec <jpovazanec@maxlinear.com>,
+	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	"Livia M. Rosu" <lrosu@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: [PATCH v3 3/6] net: dsa: lantiq_gswip: ignore SerDes modes in
+ phylink_mac_config()
+Message-ID: <294ece00d008a97af17d9019d158d314d13c0695.1756472076.git.daniel@makrotopia.org>
+References: <cover.1756472076.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,17 +67,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250828211100.51019-1-praveen.balakrishnan@magd.ox.ac.uk>
+In-Reply-To: <cover.1756472076.git.daniel@makrotopia.org>
 
-On Thu, Aug 28, 2025 at 10:11:00PM +0100, Praveen Balakrishnan wrote:
-> Fix several spelling and grammatical mistakes in output messages from
-> the net selftests to improve readability.
-> 
-> Only the message strings for the test output have been modified. No
-> changes to the functional logic of the tests have been made.
-> 
-> Signed-off-by: Praveen Balakrishnan <praveen.balakrishnan@magd.ox.ac.uk>
+We can safely ignore SerDes interface modes 1000Base-X, 2500Base-X and
+SGMII in phylink_mac_config() as they are being taken care of by the PCS
+and the SGMII port anyway doesn't have MII_CFG and MII_PCDU registers
+and hence gswip_phylink_mac_config() is already a no-op apart from
+outputing a misleading error message.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Return early in case of SerDes interface modes to avoid printing that
+error message.
 
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Reviewed-by: Hauke Mehrtens <hauke@hauke-m.de>
+---
+v3: improve commit message
+v2: no changes
+ drivers/net/dsa/lantiq/lantiq_gswip.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.c b/drivers/net/dsa/lantiq/lantiq_gswip.c
+index acb6996356e9..3e2a54569828 100644
+--- a/drivers/net/dsa/lantiq/lantiq_gswip.c
++++ b/drivers/net/dsa/lantiq/lantiq_gswip.c
+@@ -1444,6 +1444,10 @@ static void gswip_phylink_mac_config(struct phylink_config *config,
+ 	miicfg |= GSWIP_MII_CFG_LDCLKDIS;
+ 
+ 	switch (state->interface) {
++	case PHY_INTERFACE_MODE_SGMII:
++	case PHY_INTERFACE_MODE_1000BASEX:
++	case PHY_INTERFACE_MODE_2500BASEX:
++		return;
+ 	case PHY_INTERFACE_MODE_MII:
+ 	case PHY_INTERFACE_MODE_INTERNAL:
+ 		miicfg |= GSWIP_MII_CFG_MODE_MIIM;
+-- 
+2.51.0
 
