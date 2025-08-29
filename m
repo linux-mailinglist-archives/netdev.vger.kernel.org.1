@@ -1,178 +1,132 @@
-Return-Path: <netdev+bounces-218364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE864B3C313
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 21:34:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BA28B3C34A
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 21:49:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EE2F56500E
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 19:34:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E2DD5A18A5
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 19:49:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F9B2246BB0;
-	Fri, 29 Aug 2025 19:33:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5FA0226CF7;
+	Fri, 29 Aug 2025 19:49:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="NmUET5/X"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uIWoXMqy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79617242D70
-	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 19:33:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC05C2566;
+	Fri, 29 Aug 2025 19:49:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756496039; cv=none; b=FTretGTdPmw/SiEDRz0Gag9bcMbxI0QolN+eTmPxgv0m9pe0assb0TfRNzdu093G/j0L8FI9lm48J4iOUf6ONVemyI6A3tKf3FRK3lQFVK1n9Mrv1+m+9LF97qKGRLGVliXWxSwI2RlU5dI6aA6MY5n6o9qDjTpiRj3Hvlwokf8=
+	t=1756496952; cv=none; b=mmr3og+nkT61H7gt1oUBxAhzVYoFxS827BT4ojYEzV0aLJF/uPfmS/vTuBBN7z8i8KLssgvkx4Gdy8y7zFBUegmeYspbqcnyfKLX5fioj0YyxmLTj4ri6NXxm7xDS/U/Nz0TSETrh78faCtrhTdvz1G1GJC6m+jLO2yEC64cfGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756496039; c=relaxed/simple;
-	bh=OArcrcPJKctf7kyzhyu5N9o4Z5m1mtDS835/OiICaDA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=CNS+Pfe5KZu0OtD7BFztwV0qFSyu3WjMPm1kyUIlqTCMl8400KsYqc4o+Z3WOQnPB4+9Q+zMUoIiglok9Lh1FSIHFRe8scvuPBztFu3HuJbCxR5aixzkp8Ru6zCvOTVlUAJkZyFeTLmjife7fikysiHrIFD/gvy4DZGDjP/fjxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=NmUET5/X; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3d0b6008a8bso486441f8f.0
-        for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 12:33:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1756496035; x=1757100835; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=10aYLv6x+nousnJCn+LNWW0LkPPpH+PRdELXD4FgtcI=;
-        b=NmUET5/X3U8sj2gncXKyFCnU5CVXnxTD2YGhtvVi8DHQg6+yBIW+pbrP9bCZaDtY9T
-         CnRAMaYFNBKYoa1T6b+uRj+omG/LIAvoPUMk1NU3eni5IiBhv0ZbvJCKeLCi5+QQwf1F
-         PCF8ayZgHuxI4dE7FRFuNLDvNy6OV2n4mYejFLNVg+p4Cdzj/chxFTxcZ4BPWSVN/Jck
-         V1hMFJeTQcHGflCsvCfxLv07pjCWX9p0qZU9MnmFiJ0Ove++lVsi6WW1qf6aGsK9uit/
-         zfeqHBfG5PzYsvEefpsBCsCDj/YoZ8omUh0ArMSz0SLlNp2SB97cKo6B1EraCdW5regL
-         F0oA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756496035; x=1757100835;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=10aYLv6x+nousnJCn+LNWW0LkPPpH+PRdELXD4FgtcI=;
-        b=dDLQLGSV6t4nSfPMx8MTPEfJ38IaBkeByhdL1tyzV3vwOpCJxX5DnUkmA45DJRdr9C
-         dJ5cxklJh3iWcOKwG1v3QcihJNSz/VDLNfyRQL8DFSN2bh3NsKhNA9RXDZ8h4uFsPgfU
-         0bGHMRKWRW/U5zgH90yuvq+ETBtGC8WrL+3SHt3FdTyvNubCW09l7kqqVRdSfh+0pjSC
-         jKWFXuNvN++K0b/Xqg6vbH90WUMCn+maxKxPhaxVTXnZnPhkerGBa6GnQBrDyf5w4c/d
-         6HIqCjpow0T+E6R1wVGHcUl6zb3QR5cRhRlOsfm8KhuSTdZo/8Qo5jII/9RCHEDpE3gl
-         7MRQ==
-X-Gm-Message-State: AOJu0YzIxvwxyLfbIC3SVTBNfZoHvblLFTXmfhjxDVjn6xUqq/Dq3eFj
-	rIPE51SlXE+ImC3VXaunjBQRbsyBiXX0ZnkB6lo3e4pHE2Swmrk6+RtvASXIWWHN02A=
-X-Gm-Gg: ASbGncvS++AsqMJDtCARB6reavfs7SKIwnkvqnpSD0JCLHGIPtxV76Swa9YkIY07bzV
-	TmOfkJCC9qMMkHiJgPcN6ylOK18SJ5PdvewhBaxcP92Tghw+SbPSWMWxWYebO86GGJ4NrSHXOvC
-	E+MMx55GQ35YhGNRG79jR/i0wyidDyyjtqA1Z2u6stHtz9QYhi/yKPBOdsrIyxWI0LmUeuYNswD
-	/zS1jrPvxW01ImUGbYT7A0s70CHriv0dE2+2fhnCUs6DYyFNXaYWhAxDNygZaB45F7VIHSWrUR1
-	3dNIIM8IoN7tjiV5TAMOw663Fp2YgjZLqHz5EUZdeR1wMQYr3AkE8UXMBcl2WdGI4xnfb8/58FG
-	6ys4yswihQg==
-X-Google-Smtp-Source: AGHT+IGd9CKACvtLyrQHHdrX6nttBshhd3uTSHt7m/xqpIEz2JTGn2U407DsxW/ZcIqykVDLTwW6Yg==
-X-Received: by 2002:a05:6000:250e:b0:3b7:8268:8335 with SMTP id ffacd0b85a97d-3c5dcc0dd86mr22855026f8f.42.1756496034796;
-        Fri, 29 Aug 2025 12:33:54 -0700 (PDT)
-Received: from localhost ([177.94.120.255])
-        by smtp.gmail.com with UTF8SMTPSA id 3f1490d57ef6-e9847da0a06sm981166276.18.2025.08.29.12.33.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Aug 2025 12:33:54 -0700 (PDT)
-From: =?utf-8?B?UmljYXJkbyBCLiBNYXJsacOocmU=?= <rbm@suse.com>
-Date: Fri, 29 Aug 2025 16:33:49 -0300
-Subject: [PATCH] selftests/bpf: Fix count write in
- testapp_xdp_metadata_copy()
+	s=arc-20240116; t=1756496952; c=relaxed/simple;
+	bh=LLVcrIi/cyWo0LjJCEYkZmzJpxi7u/TFm+fW6emCsds=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dgpi13wT21EcuKAQOIKzgNYXvCmunHGkYhNL80XU+uuob5Knq96hE0v1EtCZ9m5LgDrjH77x2d84dAUnvx6CfqadwDIXxns65wQ8viqRV1gtSWaL35Tt8adLQ0ICnmn9sSd4yWBjU99on2TAaUvVbgyMY0TUeLLRJFdoGRTlTso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=uIWoXMqy; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Ro188kEhUKQPnNng/X944mHUrpfeDnYN6haIPs2ALlU=; b=uIWoXMqyXks7k78f4aKMtdvSfw
+	GTKLj6b+kWAY8I5Jv1Wl280VovqT8EMA+ErXadFbpF1j2BG4khowgYRu4/i+5xklVMtzkNEE+I1Rz
+	Raqs37mmA21IdmMRxWlW3FlC2i+RwsH96oUgzz0/X1SwIHjETTUdYKT0g/KcNWtP9Vsc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1us552-006WFX-Ve; Fri, 29 Aug 2025 21:48:12 +0200
+Date: Fri, 29 Aug 2025 21:48:12 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Yibo Dong <dong100@mucse.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
+	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
+	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org,
+	gustavoars@kernel.org, rdunlap@infradead.org,
+	vadim.fedorenko@linux.dev, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH net-next v9 4/5] net: rnpgbe: Add basic mbx_fw support
+Message-ID: <8a76222e-8da7-4499-981f-64660e377e1c@lunn.ch>
+References: <20250828025547.568563-1-dong100@mucse.com>
+ <20250828025547.568563-5-dong100@mucse.com>
+ <d61dd41c-5700-483f-847a-a92000b8a925@lunn.ch>
+ <DB12A33105BC0233+20250829021254.GA904254@nic-Precision-5820-Tower>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20250829-selftests-bpf-xsk_regression_fix-v1-1-5f5acdb9fe6b@suse.com>
-X-B4-Tracking: v=1; b=H4sIAJwAsmgC/x2N2wqDMBBEf0X2uQEberO/UkpIdKKhJcpuKAHx3
- 7v6sswZmLMrCThB6NmsxPglSXNWOJ8a6iefR5g0KJNt7bV92M4IvrFAipiwRFPl4xgjQ/ahi6m
- a2/0y2M5CryfVLAytjxevt3LwAhPY537axbsloxYXZz4CbdsfmUQplpYAAAA=
-X-Change-ID: 20250829-selftests-bpf-xsk_regression_fix-674d292e4d2a
-To: =?utf-8?q?Bj=C3=B6rn_T=C3=B6pel?= <bjorn@kernel.org>, 
- Magnus Karlsson <magnus.karlsson@intel.com>, 
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
- Jonathan Lemon <jonathan.lemon@gmail.com>, 
- Stanislav Fomichev <sdf@fomichev.me>, Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
- Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- Tushar Vyavahare <tushar.vyavahare@intel.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
- =?utf-8?q?Ricardo_B=2E_Marli=C3=A8re?= <rbm@suse.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2049; i=rbm@suse.com;
- h=from:subject:message-id; bh=OArcrcPJKctf7kyzhyu5N9o4Z5m1mtDS835/OiICaDA=;
- b=owEBiQJ2/ZANAwAIAckLinxjhlimAcsmYgBosgCeMkw0JmQH1sVx8Ie24sG2wxN+m6s3zrnNT
- QJL2G/SuGiJAk8EAAEIADkWIQQDCo6eQk7jwGVXh+HJC4p8Y4ZYpgUCaLIAnhsUgAAAAAAEAA5t
- YW51MiwyLjUrMS4xMSwyLDIACgkQyQuKfGOGWKbbOg//aeQgH/RaZl6hnKGr9Y4sJQ8C7y5Ef9L
- pKIgXrcSFWHne+BBmxu20oK8ZUuAD25iR5lKX3D/11k5ybUB4SlP0+QLrSfdHIOv0chE+ughqDs
- gw3jWuyAeA9v8soWdvIyH626+aeT1rE401v1cfeO6C6Hs+CRHYoevxGB6vDeQ2BAWC2hGJ7ZT7A
- 7PoiE5qzR7WeKuECK5A+lSTk0dpt2Pa+tOwAmed4Vs/spWNEhVk/qV3o2cRzZ7p/5i9T7JHQCBT
- 89EzHrHG9UlfryoKgUh5e0PZqSblqEdtMg1dK0+hX2HgDUGkt3Z0TkcA8/kwwBjEQC0zGiOuI8h
- Rdf7qbl7f1h+K/xChY0/T6ovJArR+UCT3RVlglJwvBkiNze5emFqIvSHZNpL/kknbCnNAir/lVe
- y2VA17wsd8OgDpQDLtkLNVYxXr4FBA8EDHSDOp/rKHJnUyLOLUOEEp2U7oyGLSltha9L2T1qKyY
- jQ0QShWjWnRfcWTz/1XFLaHiWUOVnAWZ2g8N3WP6VfUenbAq42bS4CGtzTOj3xJpULNOhBWISjU
- gd4B+yycWRArtnKg9wcdiDCaIhW+aU5+PAQyX3kdZnSLdfzrmaq+PV0p2esjLFZpqFjxV44Fn/B
- Wb9CB7BGcbz0m96feLJdcU6jjQVeWByWzq1G7Jm9M8vJ7zg1q4zE=
-X-Developer-Key: i=rbm@suse.com; a=openpgp;
- fpr=030A8E9E424EE3C0655787E1C90B8A7C638658A6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DB12A33105BC0233+20250829021254.GA904254@nic-Precision-5820-Tower>
 
-Commit 4b302092553c ("selftests/xsk: Add tail adjustment tests and support
-check") added a new global to xsk_xdp_progs.c, but left out the access in
-the testapp_xdp_metadata_copy() function. Since bpf_map_update_elem() will
-write to the whole bss section, it gets truncated. Fix by writing to
-skel_rx->bss->count directly.
+> Maybe I should rename it like this?
+> 
+> /**
+>  * mucse_mbx_sync_fw_by_get_capability - Try to sync driver and fw
+>  * @hw: pointer to the HW structure
+>  *
+>  * mucse_mbx_sync_fw_by_get_capability tries to sync driver and fw
+>  * by get capabitiy mbx cmd. Many retrys will do if it is failed.
+>  *
+>  * Return: 0 on success, negative errno on failure
+>  **/
+> int mucse_mbx_sync_fw_by_get_capability(struct mucse_hw *hw)
+> {
+> 	struct hw_abilities ability = {};
+> 	int try_cnt = 3;
+> 	int err;
+> 	/* It is called once in probe, if failed nothing
+> 	 * (register network) todo. Try more times to get driver
+> 	 * and firmware in sync.
+> 	 */
+> 	do {
+> 		err = mucse_fw_get_capability(hw, &ability);
+> 		if (err)
+> 			continue;
+> 		break;
+> 	} while (try_cnt--);
+> 
+> 	if (!err)
+> 		hw->pfvfnum = le16_to_cpu(ability.pfnum) & GENMASK_U16(7, 0);
+> 	return err;
+> }
 
-Fixes: 4b302092553c ("selftests/xsk: Add tail adjustment tests and support check")
-Signed-off-by: Ricardo B. Marlière <rbm@suse.com>
----
- tools/testing/selftests/bpf/xskxceiver.c | 14 +-------------
- 1 file changed, 1 insertion(+), 13 deletions(-)
+Why so much resistance to a NOP or firmware version, something which
+is not that important? Why do you want to combine getting sync and
+getting the capabilities?
 
-diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/selftests/bpf/xskxceiver.c
-index a29de0713f19f05ef49a52e3824bb58a30565e87..352adc8df2d1cd777c823c5a89f1720ee043f342 100644
---- a/tools/testing/selftests/bpf/xskxceiver.c
-+++ b/tools/testing/selftests/bpf/xskxceiver.c
-@@ -2276,25 +2276,13 @@ static int testapp_xdp_metadata_copy(struct test_spec *test)
- {
- 	struct xsk_xdp_progs *skel_rx = test->ifobj_rx->xdp_progs;
- 	struct xsk_xdp_progs *skel_tx = test->ifobj_tx->xdp_progs;
--	struct bpf_map *data_map;
--	int count = 0;
--	int key = 0;
- 
- 	test_spec_set_xdp_prog(test, skel_rx->progs.xsk_xdp_populate_metadata,
- 			       skel_tx->progs.xsk_xdp_populate_metadata,
- 			       skel_rx->maps.xsk, skel_tx->maps.xsk);
- 	test->ifobj_rx->use_metadata = true;
- 
--	data_map = bpf_object__find_map_by_name(skel_rx->obj, "xsk_xdp_.bss");
--	if (!data_map || !bpf_map__is_internal(data_map)) {
--		ksft_print_msg("Error: could not find bss section of XDP program\n");
--		return TEST_FAILURE;
--	}
--
--	if (bpf_map_update_elem(bpf_map__fd(data_map), &key, &count, BPF_ANY)) {
--		ksft_print_msg("Error: could not update count element\n");
--		return TEST_FAILURE;
--	}
-+	skel_rx->bss->count = 0;
- 
- 	return testapp_validate_traffic(test);
- }
+> fw reduce working frequency to save power if no driver is probed to this
+> chip. And fw change frequency to normal after recieve insmod mbx cmd.
 
----
-base-commit: 5b6d6fe1ca7b712c74f78426bb23c465fd34b322
-change-id: 20250829-selftests-bpf-xsk_regression_fix-674d292e4d2a
+So why is this called ifinsmod? Why not power save? If you had called
+this power save, i would not of questioned what this does, it is
+pretty obvious, and other drivers probably have something
+similar. Some drivers probably have something like open/close, which
+do similar things. Again, i would not of asked. By not following what
+other drivers are doing, you just cause problems for everybody.
 
-Best regards,
--- 
-Ricardo B. Marlière <rbm@suse.com>
+So please give this a new name. Not just the function, but also the
+name of the firmware op and everything else to do with this. The
+firmware does not care what the driver calls it, all it sees is a
+binary message format, no names.
 
+Please also go through your driver and look at all the other names. Do
+they match what other drivers use. If not, you might want to rename
+them, in order to get your code merged with a lot less back and forth
+with reviewers.
+
+	Andrew
 
