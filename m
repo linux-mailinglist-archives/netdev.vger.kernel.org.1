@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-218324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92626B3BF3B
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 17:31:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F68DB3BF3C
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 17:31:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CB02A056D0
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 15:31:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 937B8A05B66
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 15:31:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50442322C7A;
-	Fri, 29 Aug 2025 15:31:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22EC3322DC9;
+	Fri, 29 Aug 2025 15:31:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vqT9hs0B"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XgozbrYa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEC2A3218A1
-	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 15:31:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DFD5322C9C
+	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 15:31:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756481464; cv=none; b=fzRnPJFNz1IcHUUfsNbIxmYHhurm2KGM4yM19FiyhvaPlspD5Zksz8gK0lH+S344rjgZFQSW/MZDiGiCceTc9G7u7LJCXnu8S0pWXzv2ogrmm1icslWV33+b9dq+6Cki9b0dSbVNZTwi/RKYmsHCWOjgCLweACDPkUrvp7suiRo=
+	t=1756481466; cv=none; b=OgT3d1JE9A11GjGBNd+86N3mwDpFBY0EsJZBPxbqEdbFqRnEvn0YvZrLz+YsZb35Pz/h93Mlggmw1JHxfj3u6T/yEES6SGbMTMZNzVkRvn9sBy6wH1DZZLA+YnLcGi8qJOvngBLi+JE0aE50xYPTCwg8MIGll3wm1i2Z+kHzcvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756481464; c=relaxed/simple;
-	bh=4n6LkmO+jclHMePIII5eq+Xr8tu394jP7nMu7+fMh7Y=;
+	s=arc-20240116; t=1756481466; c=relaxed/simple;
+	bh=wDY64SrfxPxDKlc5GvBpA8vnc20pgo3GCKCJCrCOPJM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MGnozPo6F/VVUGH2B0Fj3c7RNsKv5zdtvLp2SRSBlaDuJt6LhjfJXts8WEHIkSH4O6V8/qzBH0nkNTz5Sy1Hgv6Ar3C97yowDaSMwzv0HHBnxkwopEYV5kocSVVxnBcMomuoPSo+uSg9K1iRBsM37jA1kaGKJ5ZQA9kjyyGFwGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vqT9hs0B; arc=none smtp.client-ip=209.85.160.202
+	 To:Cc:Content-Type; b=SQ1b9j99p/RANy4Bc8Iw/gnK2La1W/wckYwQrYPBmDiyXRWL+IbN933DqFBkqwrSF5cdRmSG7Crs+h3ix82R5lrvsSbSWZ6WZF8PFXpCQRJKJTN37zi9PUV/pVJgKJ9zI2DT4RXLcyWrw2Oh5dobs9d9eAGbVdXsetOYSNg0/cg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XgozbrYa; arc=none smtp.client-ip=209.85.222.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4b109be41a1so83434281cf.2
-        for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 08:31:02 -0700 (PDT)
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-7f737071bebso509062985a.2
+        for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 08:31:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756481461; x=1757086261; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1756481463; x=1757086263; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dwApvEmS3DhNHhaRp4CwJfSXR39k2dMo6qBGnSKOCbI=;
-        b=vqT9hs0BOuQZfQtporKXYlxMTwSloaw47caoRVBMBrYYVj3InJYHDR9otbSyYN+An2
-         xSA0KwnDCLkxLpwcCYXNmJTJTrH+gVy1fEnNoBE0rhGtuaStPiK2ijbB4w8nc2ZiEaNL
-         NfAVx9ePNZHVm7B8GP26X+eS/JwBcbRgPVVTyEP1X3UvnCeAFnaxKZk04jK35ETl8MKa
-         zZh4QA3/VJ+Sp1J/C18cLkJbOzL11W16DC6dTYwyQGn8+qguN+DOCzZ4+fVzQMQRCar0
-         FHMwpyfmv4O8NNgbgAZZ1M9HdHjolGB9hfBJpzXAVhmhPlx+g3XMbV2ajYIdJ+uVAGbN
-         Vt7A==
+        bh=bqXmoWtQw7mn+k2f005VEom0bCQqQnA/De2EKzKykHg=;
+        b=XgozbrYa5d94sGxiIVGR6FB+msjshIBn6CpFU34MtO+slrRCQQ7a1co35pIz02ifaa
+         gakEG4VF3cccgUmYfhnXGivjEt7dUYOZETeTZ1QXj9IxswtPtQZFb8bUk1BoXr1ATz+g
+         AHvZTq5/oKsqLpeU9QTOtULL7sm01ZoB5fBwvYKOLFFYASAN3vLxVQCBRdTjnkwS8mBu
+         NA34SYvzh3D+acAMljyJM3ipoKc4m47U5c7VtTHqFc/ULza9nKPAQCmxIxdlBmi0eg1g
+         etTWCuK7f6s5nm5z+TaGRM+/ZI5wEkLHqKCl+1qgk+CrwELkqky7PGqSAnaNroqzlrqd
+         2bZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756481461; x=1757086261;
+        d=1e100.net; s=20230601; t=1756481463; x=1757086263;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dwApvEmS3DhNHhaRp4CwJfSXR39k2dMo6qBGnSKOCbI=;
-        b=FMOBavEiXKUcyxrfeY74xUztjaeB0KzDyVfomuhTUrscf/ez4E6V7eA4r4Bz25wwMn
-         cFZqY8O2WYkGiG/VfKS26jKZ5PIvpz8VmYLgUEpkKFSuScFvB28wv8QE56p5LMBRuO08
-         d6kZifrLiELeePAQCYtnTatneaq2oGqqpzKJpCMgccvnnK/RU9ct9ZTkjRL/Mjt2ete8
-         3s3hQGK3t9xc23ioCXHnZqBzUwHMeo8YmPVM/zPmeDcsPEY0zus0QL+bK+eBRYUVQUXB
-         o6avtf6gz4Hp2VJRaVzUu95MiXcQUz3hUuOPQGOU3JECGYSx9nAwiJGEbsqstMgCCN4m
-         pE5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWoD70Q/Oth0ElWH7fcc42+3Hm51+MV1GQk8mepZYGFdqBJCDXZRfnY1DyWDnRBejHYBsAHows=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKfF3fYnwMtzhZ5R3gdqIudIGItIvtXHpiGIDHVYwLEt4kYtxM
-	uR8QP4JFuAAk0WZEM60pVDnzbOYP9o+erimCOtAVDNSsQPfnIi6kWtLs7YY9aQgPkOv1TD+moQK
-	Fm4E1FDHSqwwb7A==
-X-Google-Smtp-Source: AGHT+IGLMRFd7uTla2k79rYUBl5sfyJyegA4kI79U/H7+O7a/Ze5Ds/8O0BwElPdvRi06o/lIszkFvnkJq3reA==
-X-Received: from qknpb11.prod.google.com ([2002:a05:620a:838b:b0:7e6:5fba:1a9c])
+        bh=bqXmoWtQw7mn+k2f005VEom0bCQqQnA/De2EKzKykHg=;
+        b=WYUwqpS5UqgLg7LRXk0Nqj5iPPv2TKxWZAMrv/RyCwwjWGNEyHId6sukWJSB0df5Rp
+         Byj4B8jIo6sT9Q8XTMB8tX9FxXCIzEKPcy90yZ53PLTeCCzAc4xv5DH95iyW5g0PUWbS
+         1NESSH1BzW6XWEvrwrqaRC8uU+FkhB2TIyeJMOWAkcyYWAvvw0f6cgaMOXunJT66DYqW
+         uHQNuphONL8/Bx+DdfzquHHZJRXn+P2E+hn1Xi/bG1nBJLthmz+AehqwHTK9De8rfCxx
+         zzSCBDuNgKQUt4g1+mYQNFqdyTxyxWUfqm0XRDVVLfFT1NonhgQy0BvzD/oFQTFmtiQC
+         q7vg==
+X-Forwarded-Encrypted: i=1; AJvYcCVOHKs8RTB7/iue2xSLPOxpknSlmfYXUNsBFlD4P15sANFZhSDz+7TwMUTS0YAH0IoyRpoWlgM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yys7grwVjLkMb1rshIo2w5wGpvQGaiYdIk910xjwWnTb4rnSeqg
+	sKMVSXjUEqeLbbui0UKHaTlmbxWMbU5NiomELyn4YhqAm21N3TIOn6UEDFjLRoNhdyRzNtI8RI4
+	FzMIB4pKLlck2Xg==
+X-Google-Smtp-Source: AGHT+IH5NXZgmSWKZLBP5zdgGB4msHx+zBUDHHTVWiaEql26twEfFVy21LKaxhMXIBa/ki2z5hdqN1Bqh6v7MQ==
+X-Received: from qkpb39.prod.google.com ([2002:a05:620a:2727:b0:7f9:cb2e:4d0])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:1149:b0:4b2:8e4c:71ca with SMTP id d75a77b69052e-4b2aaa196cbmr380755501cf.12.1756481461498;
- Fri, 29 Aug 2025 08:31:01 -0700 (PDT)
-Date: Fri, 29 Aug 2025 15:30:52 +0000
+ 2002:a05:620a:f05:b0:7e6:99e5:f54b with SMTP id af79cd13be357-7ea10f90321mr3151406985a.19.1756481463079;
+ Fri, 29 Aug 2025 08:31:03 -0700 (PDT)
+Date: Fri, 29 Aug 2025 15:30:53 +0000
 In-Reply-To: <20250829153054.474201-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250829153054.474201-1-edumazet@google.com>
 X-Mailer: git-send-email 2.51.0.318.gd7df087d1a-goog
-Message-ID: <20250829153054.474201-3-edumazet@google.com>
-Subject: [PATCH v3 net-next 2/4] inet: ping: remove ping_hash()
+Message-ID: <20250829153054.474201-4-edumazet@google.com>
+Subject: [PATCH v3 net-next 3/4] inet: ping: make ping_port_rover per netns
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -83,78 +83,75 @@ Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, netdev@vg
 	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-There is no point in keeping ping_hash().
+Provide isolation between netns for ping idents.
+
+Randomize initial ping_port_rover value at netns creation.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 Reviewed-by: David Ahern <dsahern@kernel.org>
 ---
-v3: Yue Haibing feedback (remove ping_hash() declaration in include/net/ping.h)
-v2: https://lore.kernel.org/netdev/20250828164149.3304323-1-edumazet@google.com/T/#md0f7cce22b5a0ce71c366b75be20db3a528e8e03
+ include/net/netns/ipv4.h |  1 +
+ net/ipv4/ping.c          | 10 +++++-----
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
- include/net/ping.h |  1 -
- net/ipv4/ping.c    | 10 ----------
- net/ipv6/ping.c    |  1 -
- 3 files changed, 12 deletions(-)
-
-diff --git a/include/net/ping.h b/include/net/ping.h
-index bc7779262e60350e2748c74731a5d6d71f1b9455..9634b8800814dae4568e86fdf917bbe41d429b4b 100644
---- a/include/net/ping.h
-+++ b/include/net/ping.h
-@@ -54,7 +54,6 @@ struct pingfakehdr {
- };
+diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
+index 6373e3f17da84ebc5c11058763932e595f0fd205..54a7d187f62a2e995076e85f1e6b2fd70f84b2c1 100644
+--- a/include/net/netns/ipv4.h
++++ b/include/net/netns/ipv4.h
+@@ -251,6 +251,7 @@ struct netns_ipv4 {
+ 	int sysctl_igmp_qrv;
  
- int  ping_get_port(struct sock *sk, unsigned short ident);
--int ping_hash(struct sock *sk);
- void ping_unhash(struct sock *sk);
+ 	struct ping_group_range ping_group_range;
++	u16			ping_port_rover;
  
- int  ping_init_sock(struct sock *sk);
+ 	atomic_t dev_addr_genid;
+ 
 diff --git a/net/ipv4/ping.c b/net/ipv4/ping.c
-index 74a0beddfcc41d8ba17792a11a9d027c9d590bac..75e1b0f5c697653e79166fde5f312f46b471344a 100644
+index 75e1b0f5c697653e79166fde5f312f46b471344a..98ccd4f9ed657d2bb9c013932d0c678f2b38a746 100644
 --- a/net/ipv4/ping.c
 +++ b/net/ipv4/ping.c
-@@ -67,7 +67,6 @@ static inline u32 ping_hashfn(const struct net *net, u32 num, u32 mask)
- 	pr_debug("hash(%u) = %u\n", num, res);
- 	return res;
- }
--EXPORT_SYMBOL_GPL(ping_hash);
+@@ -58,8 +58,6 @@ static struct ping_table ping_table;
+ struct pingv6_ops pingv6_ops;
+ EXPORT_SYMBOL_GPL(pingv6_ops);
  
- static inline struct hlist_head *ping_hashslot(struct ping_table *table,
- 					       struct net *net, unsigned int num)
-@@ -144,14 +143,6 @@ int ping_get_port(struct sock *sk, unsigned short ident)
- }
- EXPORT_SYMBOL_GPL(ping_get_port);
- 
--int ping_hash(struct sock *sk)
--{
--	pr_debug("ping_hash(sk->port=%u)\n", inet_sk(sk)->inet_num);
--	BUG(); /* "Please do not press this button again." */
+-static u16 ping_port_rover;
 -
--	return 0;
--}
--
- void ping_unhash(struct sock *sk)
+ static inline u32 ping_hashfn(const struct net *net, u32 num, u32 mask)
  {
- 	struct inet_sock *isk = inet_sk(sk);
-@@ -1008,7 +999,6 @@ struct proto ping_prot = {
- 	.bind =		ping_bind,
- 	.backlog_rcv =	ping_queue_rcv_skb,
- 	.release_cb =	ip4_datagram_release_cb,
--	.hash =		ping_hash,
- 	.unhash =	ping_unhash,
- 	.get_port =	ping_get_port,
- 	.put_port =	ping_unhash,
-diff --git a/net/ipv6/ping.c b/net/ipv6/ping.c
-index 82b0492923d458213ac7a6f9316158af2191e30f..d7a2cdaa26312b44f1fe502d3d40f3e27f961fa8 100644
---- a/net/ipv6/ping.c
-+++ b/net/ipv6/ping.c
-@@ -208,7 +208,6 @@ struct proto pingv6_prot = {
- 	.recvmsg =	ping_recvmsg,
- 	.bind =		ping_bind,
- 	.backlog_rcv =	ping_queue_rcv_skb,
--	.hash =		ping_hash,
- 	.unhash =	ping_unhash,
- 	.get_port =	ping_get_port,
- 	.put_port =	ping_unhash,
+ 	u32 res = (num + net_hash_mix(net)) & mask;
+@@ -84,12 +82,12 @@ int ping_get_port(struct sock *sk, unsigned short ident)
+ 	isk = inet_sk(sk);
+ 	spin_lock(&ping_table.lock);
+ 	if (ident == 0) {
++		u16 result = net->ipv4.ping_port_rover + 1;
+ 		u32 i;
+-		u16 result = ping_port_rover + 1;
+ 
+ 		for (i = 0; i < (1L << 16); i++, result++) {
+ 			if (!result)
+-				result++; /* avoid zero */
++				continue; /* avoid zero */
+ 			hlist = ping_hashslot(&ping_table, net, result);
+ 			sk_for_each(sk2, hlist) {
+ 				if (!net_eq(sock_net(sk2), net))
+@@ -101,7 +99,7 @@ int ping_get_port(struct sock *sk, unsigned short ident)
+ 			}
+ 
+ 			/* found */
+-			ping_port_rover = ident = result;
++			net->ipv4.ping_port_rover = ident = result;
+ 			break;
+ next_port:
+ 			;
+@@ -1146,6 +1144,8 @@ static int __net_init ping_v4_proc_init_net(struct net *net)
+ 	if (!proc_create_net("icmp", 0444, net->proc_net, &ping_v4_seq_ops,
+ 			sizeof(struct ping_iter_state)))
+ 		return -ENOMEM;
++
++	net->ipv4.ping_port_rover = get_random_u16();
+ 	return 0;
+ }
+ 
 -- 
 2.51.0.318.gd7df087d1a-goog
 
