@@ -1,175 +1,134 @@
-Return-Path: <netdev+bounces-218328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2679B3BF8E
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 17:40:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80A1DB3BFA6
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 17:44:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45C36565F8E
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 15:40:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49D9E1CC4646
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 15:42:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D8603314CC;
-	Fri, 29 Aug 2025 15:37:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D60B233CEBC;
+	Fri, 29 Aug 2025 15:38:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hxRjy6JU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xv4STqYZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B8BC3314B5;
-	Fri, 29 Aug 2025 15:37:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 571E133CEAF
+	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 15:38:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756481821; cv=none; b=HFQK+i1BkoweWh+BDSVEZDu5TZac3GMoZgJUDHT/q+ExtXvmNvUuPT8nPjxV1gPgbwPFPTvhtYCA3LT5IbcgMPbCsSOhhWBsjK/MfCuqCajso5dwh0qgknDOYgNhZudyKj1TcQ05S6CauQXrCqSllT6u++ajsn1jo538d2o5DLk=
+	t=1756481883; cv=none; b=JS9X7dhrCPp6xn51AG5anY6iqDaD5spaEIqp6g6EjVfDYF8Zu7Ldq0DZbg5LmZnfUN4mCqRL8YodiBOuYUR+gUdcU01O06yA138kinSZ2XVu2Hzv5ePnrAQxsNinOoqyK9nes1LfQoecybO5MtfuYaut5cL6Vd2CfM+QN/nbCpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756481821; c=relaxed/simple;
-	bh=Z0Bv7WaDdOXi4UMDM6ZgBS7CKcxMZ6kvuSO3nqYq5X8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tsIfPZa7mQzdBEr0SQkeuIybGgclalZa2TMbE3XaXUV70tsaXAjZZ0QnaymCyqt0KvlDCCwP/TShTmqFVpEeBu8C7VkMRbnFocgkvDBUWaB2fRNyHScrjbOxuMhy62lbhebt3XO5L19lEbhC7fg8CfBo0laeTWqUN5obMTgFhMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hxRjy6JU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61569C4CEFC;
-	Fri, 29 Aug 2025 15:37:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756481820;
-	bh=Z0Bv7WaDdOXi4UMDM6ZgBS7CKcxMZ6kvuSO3nqYq5X8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hxRjy6JU/oDw6RINsxcmGRsTVGeDOVIb4ykJmLCqUX+QQzeylWuLrDXAGu73hmOa8
-	 cXkBsFfxubx34foFYG+QHJojJeqb3QzXsHL83AkHDPdn/Qv4/IIR3e2qaYlaHVj7X8
-	 /ujZy8fCtuvOl+p3ABN9mW0y/L62IEPa3LIB45zqcEIJiII+iaRRjvCxcFZVIe4UIP
-	 kaEKsYFY6b00ExIR7mNyizMsT0mnem6gSXppPc1I0E+Yiwnl2Whyv7VtVp7zbfroC1
-	 buwbPy49vW/4gXiHEGPpC1YTGlyYCgxjAJ+Hb56S4jwabvggJ+9rHuCjN6QDMZMzu7
-	 EVcfRMiw+6syA==
-From: SeongJae Park <sj@kernel.org>
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: SeongJae Park <sj@kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Documentation <linux-doc@vger.kernel.org>,
-	Linux DAMON <damon@lists.linux.dev>,
-	Linux Memory Management List <linux-mm@kvack.org>,
-	Linux Power Management <linux-pm@vger.kernel.org>,
-	Linux Block Devices <linux-block@vger.kernel.org>,
-	Linux BPF <bpf@vger.kernel.org>,
-	Linux Kernel Workflows <workflows@vger.kernel.org>,
-	Linux KASAN <kasan-dev@googlegroups.com>,
-	Linux Devicetree <devicetree@vger.kernel.org>,
-	Linux fsverity <fsverity@lists.linux.dev>,
-	Linux MTD <linux-mtd@lists.infradead.org>,
-	Linux DRI Development <dri-devel@lists.freedesktop.org>,
-	Linux Kernel Build System <linux-lbuild@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Linux Sound <linux-sound@vger.kernel.org>,
-	Borislav Petkov <bp@alien8.de>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	David Hildenbrand <david@redhat.com>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Mike Rapoport <rppt@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Michal Hocko <mhocko@suse.com>,
-	Huang Rui <ray.huang@amd.com>,
-	"Gautham R. Shenoy" <gautham.shenoy@amd.com>,
-	Mario Limonciello <mario.limonciello@amd.com>,
-	Perry Yuan <perry.yuan@amd.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Dwaipayan Ray <dwaipayanray1@gmail.com>,
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-	Joe Perches <joe@perches.com>,
-	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
-	Alexander Potapenko <glider@google.com>,
-	Andrey Konovalov <andreyknvl@gmail.com>,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Vincenzo Frascino <vincenzo.frascino@arm.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	tytso@mit.edu,
-	Richard Weinberger <richard@nod.at>,
-	Zhihao Cheng <chengzhihao1@huawei.com>,
-	David Airlie <airlied@gmail.com>,
-	Simona Vetter <simona@ffwll.ch>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas.schier@linux.dev>,
-	Ingo Molnar <mingo@redhat.com>,
-	Will Deacon <will@kernel.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Waiman Long <longman@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shay Agroskin <shayagr@amazon.com>,
-	Arthur Kiyanovski <akiyano@amazon.com>,
-	David Arinzon <darinzon@amazon.com>,
-	Saeed Bishara <saeedb@amazon.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	Alexandru Ciobotaru <alcioa@amazon.com>,
-	The AWS Nitro Enclaves Team <aws-nitro-enclaves-devel@amazon.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-	Steve French <stfrench@microsoft.com>,
-	Meetakshi Setiya <msetiya@microsoft.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>,
-	Masahiro Yamada <masahiroy@kernel.org>
-Subject: Re: [PATCH 02/14] Documentation: damon: reclaim: Convert "Free Page Reporting" citation link
-Date: Fri, 29 Aug 2025 08:36:58 -0700
-Message-Id: <20250829153658.69466-1-sj@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250829075524.45635-3-bagasdotme@gmail.com>
-References: 
+	s=arc-20240116; t=1756481883; c=relaxed/simple;
+	bh=dTqTTGZlJ4chGLvICslwE1y0ojIOPXnMp1K+HNp1epI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tQ41tWd3ILGaOSrf+LOFWjL69S0wiuAGSVFO9vKX+KrG3Q2jY5CghGammFICTmCqabfz1Ql2S3UzelQ4AA/jzf16P0o6frjdgkXJLE9+GSoCYtpWMOD8VS1d/NkwPcpSa1ovWK8rH3JbQhsrvy48GxrafobmOsWmebAMz30Z3Hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xv4STqYZ; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-248e07d2a0eso191085ad.0
+        for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 08:38:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756481881; x=1757086681; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RBf7SqSAMiJDLG40aDWJGII9dJmHgmKSvxJ5vBdynMw=;
+        b=Xv4STqYZhdgB2G8RbmGohMgF7TwqhITRuYaWBEUnTsPI1hoVf+EBtwrXOaOehaQ5en
+         7JmNJq8tzCgL/2UfS0Fe9d4Lyq/1kURVMygcdRjF4Liyi8EOIZtTaKiODhX9WdhEhatj
+         j5MYZqQUQ/40kTx9YZBH440BFBiB2MaaCjqCBIDYLgIeuwg/MlimUAYs8H9XhADG9XBO
+         fPaWInbFERSbjQ9gKhrb2wneh1aFbEKdJRR/8NQfkSnf5eCgWe1UnnNyGOZnYQSey1Ev
+         FMnruH+I7i2TjIZD5tyk0k0xzMKHO+wrl8dkdau1LcS/+U5Iz12StZ2g175iwN66Baqt
+         h7/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756481881; x=1757086681;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RBf7SqSAMiJDLG40aDWJGII9dJmHgmKSvxJ5vBdynMw=;
+        b=BFlYsQhe741S7Dexe+Jn5Qx3LuPegjiHX7RTQkqhtehMkx9BqzRPcA2oh0i6ABKxEk
+         UigufrmLcz67S/PMjDScZWXBWG+xqRMvX515hInMlMdwOaANuVmKXEt7IVjxfMRtmdZG
+         xNp+CQNaAbnl69ExRoWk7A6FlqD5ZRnR5QAA+cOKxons+9Vt6wqvjAVvGGEqHWE5AVT3
+         v25n7y5pRBi6Bp9BTbYFRlfrj3UHbzM1TWqmwnu/zb45j+5gyUqR1v29DhrKqdvwlGvu
+         wg/dNbYUo+0mrSWq2YPdEoUukGxOLjzmv70Vz6V5hTNwGSyX38u9j57kNc4bged6NMLU
+         Xxuw==
+X-Gm-Message-State: AOJu0Yyks/Rd2m/6EUpDnVZNxZOvRxViM1PNwsrNSOdX4YwvGHXqd7jq
+	+SHF8WQsmqMsODB7gJcOltzsEZvXh+Yt5X90ckpcMG04goxyBAvTxR9w9uKacx6y2ke0TCXgdbT
+	eMFCysIvwHGc27w6mj9diQet4VXaQau+x0TsaZtL4BqhDlH7Xu1C5P6n56l0=
+X-Gm-Gg: ASbGncuPU8Uw9KVCXMu/OdCIPDM9Z5vJNZCFyVIg8M+M84juubYZ2Ko/ztewDOIDtJA
+	a7PFfzzKM866mNSH+hb+PWLsCItQeoyQ1eyIp7IJLHx/Q4niDJRFsYKrI/aslUMtPJVy2m2b9F8
+	nGjFpXTJD72I3AU91dNtLnGoXwQNGJDzqxpUr1sWAmBKSbculUnPXop1F4V2ppAAkgLTf9Pc2Fc
+	TfbeQhBVt8zdJmQh0/UQJpQ7GDeTBjgvRReWSM+gAGkiK0=
+X-Google-Smtp-Source: AGHT+IGHvmLAKAqp+h6+xnNpvp5enqs0Nws580nvnSfEmJmHq7YmiK6/BK/XP+hcXSHZelrbBA+KbrK4+ArPIvGDx3k=
+X-Received: by 2002:a17:902:e84b:b0:231:d0ef:e8ff with SMTP id
+ d9443c01a7336-2485ba39492mr21568965ad.8.1756481880357; Fri, 29 Aug 2025
+ 08:38:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250829064857.51503-1-enjuk@amazon.com>
+In-Reply-To: <20250829064857.51503-1-enjuk@amazon.com>
+From: Samiullah Khawaja <skhawaja@google.com>
+Date: Fri, 29 Aug 2025 08:37:48 -0700
+X-Gm-Features: Ac12FXz5DCE7rZjZ7YALpNhkeMz6vVHFgx151bfCTOA8incUou3mzWHzQxbS_ZE
+Message-ID: <CAAywjhSDz3F1uieMEuaFAtE2AKYXcv+5FjcDv3d4+T5ddWhy6Q@mail.gmail.com>
+Subject: Re: [PATCH v1 net-next] docs: remove obsolete description about
+ threaded NAPI
+To: Kohei Enju <enjuk@amazon.com>
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 29 Aug 2025 14:55:12 +0700 Bagas Sanjaya <bagasdotme@gmail.com> wrote:
+On Thu, Aug 28, 2025 at 11:49=E2=80=AFPM Kohei Enju <enjuk@amazon.com> wrot=
+e:
+>
+> Commit 2677010e7793 ("Add support to set NAPI threaded for individual
+> NAPI") introduced threaded NAPI configuration per individual NAPI
+> instance, however obsolete description that threaded NAPI is per device
+> has remained.
+>
+> Remove the old description and clarify that only NAPI instances running
+> in threaded mode spawn kernel threads by changing "Each NAPI instance"
+> to "Each threaded NAPI instance".
+>
+> Cc: Samiullah Khawaja <skhawaja@google.com>
+> Signed-off-by: Kohei Enju <enjuk@amazon.com>
+> ---
+>  Documentation/networking/napi.rst | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+>
+> diff --git a/Documentation/networking/napi.rst b/Documentation/networking=
+/napi.rst
+> index a15754adb041..7dd60366f4ff 100644
+> --- a/Documentation/networking/napi.rst
+> +++ b/Documentation/networking/napi.rst
+> @@ -433,9 +433,8 @@ Threaded NAPI
+>
+>  Threaded NAPI is an operating mode that uses dedicated kernel
+>  threads rather than software IRQ context for NAPI processing.
+> -The configuration is per netdevice and will affect all
+> -NAPI instances of that device. Each NAPI instance will spawn a separate
+> -thread (called ``napi/${ifc-name}-${napi-id}``).
+> +Each threaded NAPI instance will spawn a separate thread
+> +(called ``napi/${ifc-name}-${napi-id}``).
+>
+>  It is recommended to pin each kernel thread to a single CPU, the same
+>  CPU as the CPU which services the interrupt. Note that the mapping
+> --
+> 2.48.1
+>
+>
 
-> Use internal cross-reference for the citation link to Free Page
-> Reporting docs.
-
-Thank you for fixing this!
-
-> 
-> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
-
-Reviewed-by: SeongJae Park <sj@kernel.org>
-
-
-Thanks,
-SJ
-
-[...]
+Reviewed-by: Samiullah Khawaja <skhawaja@google.com>
 
