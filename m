@@ -1,148 +1,139 @@
-Return-Path: <netdev+bounces-218169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79EAEB3B678
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 10:54:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B781EB3B690
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 10:59:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 35429163B01
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 08:54:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 329DC1CC092B
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 08:59:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24AAC261B7F;
-	Fri, 29 Aug 2025 08:54:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7B412D8DD9;
+	Fri, 29 Aug 2025 08:57:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="ODniFYy0";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Yjqt+mTU"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="fIcqONeh";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="oFDvY5gE"
 X-Original-To: netdev@vger.kernel.org
 Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12CB3481B1
-	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 08:54:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EEE62D3750;
+	Fri, 29 Aug 2025 08:57:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756457665; cv=none; b=r47Ic387XMo79sUtnopTs1/NLXoUcrOPg97FWGehYJg+LkOJOhPwnoe+1ujaTkymShLOUvIaUEV0vlgwSy6GsLm+sdgA9lSZtzVIKktQC9BzJ6erZ3FXLmbovNXLfYhAKT2qePUcTl19fX4TZrLbxTkjnCT4E0xurTCl6RwxkYQ=
+	t=1756457874; cv=none; b=bCNJq0cOix12C3BcDj+ZCHvPwHy/22jYS6mNtIwEEZqkkkxRyzkhx+a+eJLVMUbhRlm7Lrtg8e5CA1Ms7Wu0Au8JW0RDSTipWEy5SzeKC9ZSgu5Xm+rTEwLpW4Ugcj/cE32+jyJaI7EPbu6l+z8syP3NSxymu7lAEHKccl2lZn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756457665; c=relaxed/simple;
-	bh=cqOwbgAuXb1EOsmLS936CP2X0rouiYYncs8Ww/vvBoc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=n03WJNlLQRi7kzs6A6ymJvROJMGAyzUonUjN/YoMf762hTG7S2LmjUNI8XyWynRpqyJJ/uBRXx7Q5BkhC5O5vyD9kv/dZfEG3HfSLEvRkAkVHoGQ/aTWS63uK47aAIUqhAAd/2U2XPelkjPlYoRHSSwQEi/TAGRmEkw0MfC46CY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=ODniFYy0; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Yjqt+mTU; arc=none smtp.client-ip=103.168.172.146
+	s=arc-20240116; t=1756457874; c=relaxed/simple;
+	bh=9P/H92Zq3tWc/nK67QqBbF5rswRjgtYk8nJz1Bo1mrg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y/fByHnb2aE+gxWcSWi6Xs0lc1cZVfd6hiEOzgIx6Ijj1ZnSkmBOvdfDphm3eIBziSPW+O4x3fQ3tpz/6sZhkMVsyYSFRQlu8fLk+IcXIW7tfDW2TKAv4lN2PTN6dc+pSF5wZA8Di2uPjFcl61wCIfI5bW5GWFJXANKjoDcgBf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=fIcqONeh; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=oFDvY5gE; arc=none smtp.client-ip=103.168.172.146
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
-	by mailfout.phl.internal (Postfix) with ESMTP id ECFC5EC03FC;
-	Fri, 29 Aug 2025 04:54:19 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-09.internal (MEProxy); Fri, 29 Aug 2025 04:54:19 -0400
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfout.phl.internal (Postfix) with ESMTP id 0B406EC0070;
+	Fri, 29 Aug 2025 04:57:51 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Fri, 29 Aug 2025 04:57:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
-	:from:in-reply-to:message-id:mime-version:reply-to:subject
-	:subject:to:to; s=fm2; t=1756457659; x=1756544059; bh=TSeUSyP2U1
-	Et//0EvYsrVE8ycBGP9Bzla05xuoKdpOY=; b=ODniFYy0GubyVgH6CYU8zEtJYb
-	wScgLiDxVWmljL+aTjnDtXv4cA6/7SjGZ826rN30lPqojr0cYgDtnwnjkKxxWSfx
-	Psv1WS/S7qCJkapKAKHKhPdaTgavh3QQpgObIDcjh0k9uMLaTgBXqa8B+9r9hE7e
-	xVXjBCXWEB/wJYgy66VFE3S4UZn8zlpOZJNswE8cNmCX/Z2b/2qHgVwb7CPxLItJ
-	drE9KiKK98pV/Ad0+Kf3w+e1sxiS2S96Sv98tQy+V6PCzPSfmaPE5dmTWzb10E/X
-	ceVSNlqxsun+uQIFaIJsrJAowEn7Br+7x/fu7MReCGU0PYjtzCaBiU4RMMIw==
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1756457871; x=
+	1756544271; bh=AeyJNnmTbCnIfTacHepLOWEs8+Q2zlQFEe2naiEqz/Y=; b=f
+	IcqONehxL+o5jfLDQ2OLhc9h8xnlCQo6xwXoPu8w0IPPesbCvV9loo8W+wH61Gq1
+	ASA6jGVf1AwaokYpI/LShx6VtbvthBi6JgMO7IhYCkXHWNbA648JdEZQysj12fQr
+	sPnoiq39BJlk333DIr8FZRXN/mJpgHwiQfKTmMumvdXFZPIljom8FhMNcpCK5Rca
+	t/EW6uMrwLFWl5gaUaqbse1lL4cMAE3kT1kTUBiGIKp5pd5UfzinllvIDnDhbO99
+	+T8+x/CPcUYnu8kJFpqByMafvOl86vMUdV09R09+BlNK+cOPxvCEDTPyAgeCA8UZ
+	KDiJJetkYmDIl1kipD++Q==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
 	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1756457659; x=1756544059; bh=TSeUSyP2U1Et//0EvYsrVE8ycBGP9Bzla05
-	xuoKdpOY=; b=Yjqt+mTUFfea8imuHbYFOyPWezICtStLvok9sbL3c3xkWtRHb5S
-	wxYyTEhOgNl0c7y1FkQKNhkw84wfNKye+ffALK47VlBGvGYwnlttR05UVDldxvTG
-	FQUxKTrJt/89Yo6/FUR+jb+UxZQQr5veSmXrdEPkvu4q11JyIoiQxl8693gUc9H2
-	vee9dLfVA8gN72UE50R/sJXrTHDQgn47Z1OfMvCy2bxPhsSnZi7MMsS6j9CHdkOr
-	7C7nzAgof4Rf4Up75YQ4TmTW6pfHVOFwvrwLyYYLoEgwqPvK8yhGmQS0X8miAJE6
-	G9Hgovgno8alngG9XYpFYzGkbmH3aH/PESQ==
-X-ME-Sender: <xms:umqxaLcXcUieVqgLVvTpScEDQfI24CA4ZuURd1w4uqzX8cknJgu_gA>
-    <xme:umqxaOxebe1w-30cq7F9rlMub9scrJeVbt6FbGruiOpXx8jS4szVLu_Zz6U5A6PEp
-    lqi8Wqrq5aUclw9mkk>
-X-ME-Received: <xmr:umqxaK_gGBOjjIVt9KQipLOyQiA8kmLr4GWiRLlcotw6TidJd0O_7nT4TKAn>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddukeefgeehucetufdoteggodetrf
+	1756457871; x=1756544271; bh=AeyJNnmTbCnIfTacHepLOWEs8+Q2zlQFEe2
+	naiEqz/Y=; b=oFDvY5gEiOnL9czrxuM7BoSTz6sqYWV7BwWIeSSq1bK6P8ERILh
+	UTpX9XvAwrS8M/0TpSDbJGkupwynjs2Gica0Gko0/Pf/dHmi6NWVYePoAbvUJ33R
+	XwToJAOOKbDn4zCu0t+LmojGBHumCxpB7xpko/FXRp4mXJ24lGW8bFpyKle7NO76
+	Y9JLxln76F3xiza4URLQzB5tUdcni0Se71pRKN2Fw2N2tUAjWNSd5t+tVS1FZPSV
+	JOqFVEshrxa0477p7OXZ2ZLXpgtfEMXMRWBVOXb03xWAalYzr1Q+hKSf64wpu78E
+	+hEwb/2vC3DePo6IkHWqHUr53kWkNlNTyYQ==
+X-ME-Sender: <xms:jmuxaL3YZnMMG2ZKp5aCev0xNQK6VGLPzmpbIHgSxzI69lb48xcS7A>
+    <xme:jmuxaBVkNwUwbgu2at8z_SRGSy-PK9JrLV5888ZaA4bwuxcas89BRdM3LmZntfEqY
+    7_zfEsuy1LBrzXuS-8>
+X-ME-Received: <xmr:jmuxaGzCXKa3pkDaxYNvHS2uwHMNnZ2Rq7k2-MefA56DovRhK0m3mSIXAtwy>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddukeefgeeiucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepufgrsghrihhnrgcu
-    ffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrfgrth
-    htvghrnheptefhieejudeileehvefhjefhudduheekleelvedvkeffieevjedvgfeljefh
-    udefnecuffhomhgrihhnpehshiiikhgrlhhlvghrrdgrphhpshhpohhtrdgtohhmnecuve
-    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepshgusehquhgv
-    rghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeeipdhmohguvgepshhmthhpoh
-    huthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgt
-    phhtthhopehsugesqhhuvggrshihshhnrghilhdrnhgvthdprhgtphhtthhopehsrggrkh
-    grshhhkhhumhgrrhesmhgrrhhvvghllhdrtghomhdprhgtphhtthhopehsthgvfhhfvghn
-    rdhklhgrshhsvghrthesshgvtghunhgvthdrtghomhdprhgtphhtthhopehhvghrsggvrh
-    htsehgohhnughorhdrrghprghnrgdrohhrghdrrghupdhrtghpthhtohepshihiigsohht
-    odgrvdehvggvleguvddtugefudgvgeekfegsrgejsgesshihiihkrghllhgvrhdrrghpph
-    hsphhothhmrghilhdrtghomh
-X-ME-Proxy: <xmx:umqxaOi4fabDJCP2bmBBVNjnQsIx_AAfzljXMNLpl-I20KLKK2cV_g>
-    <xmx:umqxaJGK1c9-GTrMirUAGw7eAjHHzmrcTHRz-EHFbM_Y67pOEcS4zQ>
-    <xmx:umqxaF-h8EfXpU6bmIVc2YP0OTI77xXUf5Qnpv6YzoHflP1JT_9QKA>
-    <xmx:umqxaIwKbYaDFqFv8Br_UFZ5cEFM6tkHKVRnwZjbyMd9jjZ-hvnFkA>
-    <xmx:u2qxaHFWCgePXJ6w09ouzMDYvL1gWAuCsT_vDQHZ_RyO-LuPZjXlLaai>
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeduvddpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtohepphgvnhhguhhinhdqkhgvrhhnvghlsehiqd
+    hlohhvvgdrshgrkhhurhgrrdhnvgdrjhhppdhrtghpthhtohepshhtvghffhgvnhdrkhhl
+    rghsshgvrhhtsehsvggtuhhnvghtrdgtohhmpdhrtghpthhtohepshihiigsohhtodeiie
+    egudgriedufhgvtdgvvdgvkeelrggvkegtheesshihiihkrghllhgvrhdrrghpphhsphho
+    thhmrghilhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvg
+    htpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthho
+    pehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdrohhrghdrrghupdhrtghpthhtoh
+    ephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgv
+    lhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnh
+    gvlhdrohhrgh
+X-ME-Proxy: <xmx:jmuxaAxYJi-muA_0Dbq9EYhWvBQzwgFHAW_U55o5iY_8nLCeRIs20g>
+    <xmx:jmuxaD2EnLfb7PvjwEu5rzIsmCSYe8RKArpbEmxnJvqsE30Avo1X7g>
+    <xmx:jmuxaGqvKn2C5w-AWYC4tDD-eE0H0yGe7gc0-YPkvlNBZew57ilL_w>
+    <xmx:jmuxaBBsXoeltXd9YBAxuZAD0k1WO2x_mugnWMoxQQvLsksKDLMr2A>
+    <xmx:j2uxaKRjrGqWpLlSnpCKpA2W8d0k97yi8cHOVECbR3VH8NXepw1oD9g6>
 Feedback-ID: i934648bf:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 29 Aug 2025 04:54:17 -0400 (EDT)
+ 29 Aug 2025 04:57:49 -0400 (EDT)
+Date: Fri, 29 Aug 2025 10:57:48 +0200
 From: Sabrina Dubroca <sd@queasysnail.net>
-To: netdev@vger.kernel.org
-Cc: Sabrina Dubroca <sd@queasysnail.net>,
-	Aakash Kumar S <saakashkumar@marvell.com>,
-	steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au,
-	syzbot+a25ee9d20d31e483ba7b@syzkaller.appspotmail.com
-Subject: [PATCH ipsec] xfrm: xfrm_alloc_spi shouldn't use 0 as SPI
-Date: Fri, 29 Aug 2025 10:54:15 +0200
-Message-ID: <b7a2832406b97f48fbfdffc93f00b7a3fd83fee1.1756457310.git.sd@queasysnail.net>
-X-Mailer: git-send-email 2.51.0
+To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	syzbot <syzbot+6641a61fe0e2e89ae8c5@syzkaller.appspotmail.com>,
+	davem@davemloft.net, edumazet@google.com,
+	herbert@gondor.apana.org.au, horms@kernel.org, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] WARNING in xfrm_state_fini (3)
+Message-ID: <aLFrjEYwiEhaO5hK@krikkit>
+References: <6888736f.a00a0220.b12ec.00ca.GAE@google.com>
+ <aIiqAjZzjl7uNeSb@gauss3.secunet.de>
+ <aIisBdRAM2vZ_VCW@krikkit>
+ <2a58b0b4-1c67-46d2-9c2a-fce3d26fc846@I-love.SAKURA.ne.jp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2a58b0b4-1c67-46d2-9c2a-fce3d26fc846@I-love.SAKURA.ne.jp>
 
-x->id.spi == 0 means "no SPI assigned", but since commit
-94f39804d891 ("xfrm: Duplicate SPI Handling"), we now create states
-and add them to the byspi list with this value.
+2025-08-28, 20:06:29 +0900, Tetsuo Handa wrote:
+> syzbot is still hitting this problem. Please check.
 
-__xfrm_state_delete doesn't remove those states from the byspi list,
-since they shouldn't be there, and this shows up as a UAF the next
-time we go through the byspi list.
+Thanks for the ping.
 
-Reported-by: syzbot+a25ee9d20d31e483ba7b@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=a25ee9d20d31e483ba7b
-Fixes: 94f39804d891 ("xfrm: Duplicate SPI Handling")
-Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
----
- net/xfrm/xfrm_state.c | 3 +++
- 1 file changed, 3 insertions(+)
+syzbot has found 2 different bugs that need separate fixes (but with
+the same symptoms, hitting that WARNING, and coming from the same
+patch series). I fixed one (syzbot confirmed the fix), I'm working on
+the other one now.
 
-diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 78fcbb89cf32..d213ca3653a8 100644
---- a/net/xfrm/xfrm_state.c
-+++ b/net/xfrm/xfrm_state.c
-@@ -2583,6 +2583,8 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
- 
- 	for (h = 0; h < range; h++) {
- 		u32 spi = (low == high) ? low : get_random_u32_inclusive(low, high);
-+		if (spi == 0)
-+			goto next;
- 		newspi = htonl(spi);
- 
- 		spin_lock_bh(&net->xfrm.xfrm_state_lock);
-@@ -2598,6 +2600,7 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
- 		xfrm_state_put(x0);
- 		spin_unlock_bh(&net->xfrm.xfrm_state_lock);
- 
-+next:
- 		if (signal_pending(current)) {
- 			err = -ERESTARTSYS;
- 			goto unlock;
+> On 2025/07/29 20:09, Sabrina Dubroca wrote:
+> >> Hi Sabrina, your recent ipcomp patches seem to trigger this issue.
+> >> At least reverting them make it go away. Can you please look
+> >> into this?
+> > 
+> > I haven't looked at the other reports yet, but this one seems to be a
+> > stupid mistake in my revert patch. With these changes, the syzbot
+> > repro stops splatting here:
+
 -- 
-2.51.0
-
+Sabrina
 
