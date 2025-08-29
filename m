@@ -1,110 +1,126 @@
-Return-Path: <netdev+bounces-218391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F182B3C46A
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 23:57:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F2FAB3C489
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 00:00:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0497D565558
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 21:57:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3D387C33E3
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 22:00:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E1D4266B72;
-	Fri, 29 Aug 2025 21:57:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01B102741B0;
+	Fri, 29 Aug 2025 22:00:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xf89aXU7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oLEJO8rP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BD641C5F39
-	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 21:57:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8983C264A77
+	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 22:00:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756504650; cv=none; b=b7s9drLRI8CNez189PtNLkfR4HRqOEo6sQByMS9TCNXlhXW6GKrYlZXv3nS29Vdx09anLFLZ9ZvAiIyM8j+jAaw1PwzTHa0EbjsKlfebB7x9VV9WI/T43yFs3GiY9YUKQcRFWXbwb/ym4DIA2g1OZ2rDcNoMKgr/CAg1u+k6+q8=
+	t=1756504815; cv=none; b=bLeoEER9lbkInjHfZkDsUU5HVIOZtHwUIM88KwxKw53Q69Pk8csZbVvStVhkqIreAkR6Oc62RRH68Mwoq7UeBSnOeEpqw78EgQNideIUUDyPRXcqkEEPsGgC4s69stDGoSmGYJpk5jGSG3mfJnjNBUQVhWKNxwXwJlRMYIwMunY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756504650; c=relaxed/simple;
-	bh=Z2XUfDI9VlUUgvuoH5C7vNxFCTABucAPevIMu68XIjs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ummVNbs202pqJ1dCurayKWibtKCdn/RXYrvOI1RRH8PcPI/r/GlTCPk0kWgdpSo/XDxdsvRTuJmZlEBQ5G7u36K7SaWgOXlLy0xfM8Vj+6aCYeGWVeS5810hVFYfvFOOrQrJX5kbxiCbuuZqViXv2McS1XMvmiAQQtoJ9WCN834=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xf89aXU7; arc=none smtp.client-ip=209.85.167.48
+	s=arc-20240116; t=1756504815; c=relaxed/simple;
+	bh=/P6RowOz1b0vyseyrjEnqHcevhbD5nENbQPjjjlmckA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=IWqGFjVgsQ9lHDjTG17WPRzDcU+qjg2xPK9UyAr+OaVEXSCygy7Ow7G29vFNxQgJ266erKYpYeYw/ClbDcdUZl2PohEnVVoy33wYr+3TcoddZXEWhADoNEO8R1+AQ8jPJUJ7Twa+noZQhBV68d7FedWWLEgzyJNTdtYh9f/A8Vk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oLEJO8rP; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-55f61de53a9so2653e87.0
-        for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 14:57:29 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-24458264c5aso23495525ad.3
+        for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 15:00:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756504647; x=1757109447; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Z2XUfDI9VlUUgvuoH5C7vNxFCTABucAPevIMu68XIjs=;
-        b=Xf89aXU7YsE98KPa68tKMaxf/665Wte87Ysdt4i6aRMlX4AzBaWCJKHMzrj2yzor/v
-         AbWHpT3XiMKHG8JfrDdwCBOG3hmF9fzc15ESpl+GZjPnR2MRATwbxr4xNVwmIP5IKu2g
-         rxAHhqKkjV14XMg0q38rEu7DgVhFzStAJuLcLGp9Wlftn+w9XUtxGeo8eCRwYP99iBX7
-         vwBz0ArGEQUO9X+a6xk+zvTq6QOh9gl0+rCTijKefMBNTjhdeA9XaMTRLvYUXDIUxyb6
-         Mr6DA4yta4rSLkUuuh2+1v3a8hnZ+PSNW9vRk6vkQW+4FrTJ/hxCrbwcurXEbtvcxgId
-         Cw6w==
+        d=google.com; s=20230601; t=1756504814; x=1757109614; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=GAzCvl0ldkRzudSduBa+UTTFBtOSyy1B+vOLHTPWCIE=;
+        b=oLEJO8rP9QaUywYTyQHCghCVwjUTufKjhnpVM581XZbxaMr8JjhpmOSrs/KKVshxiI
+         So9RNBnU4Wuk8qc/9LXEh7Kv63sNGcquGjD2B/tpav8Q+LjqOWZTSkx2Rre+Sk+ApMKu
+         giITA551Z11F3/sWdrLeyH6PzlZwX2gO/tehgz+pXK3qX1I2CcgwAAL1ZPk79LiW8S25
+         nL3aDNqRNobwu4P+1MHYNyPDmo3es6arp0VxXVHvqk6Ij4Mko+LQWVe6LwhRhhJt3fsY
+         nZMQbaVz5LKdxA+yh6F/29yhv4cv/gWrt6PQRaujn0HnYIp75kV2lKC5GtwTI2YSqbaP
+         RZsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756504647; x=1757109447;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Z2XUfDI9VlUUgvuoH5C7vNxFCTABucAPevIMu68XIjs=;
-        b=VSiD8RBvKBrYC2ZLCsIh2WtmfjhJni667E8mwtjyTlC/dgs9OSYb8jbqjfUbM/96oq
-         v7P8C6DNsV0Xd4LhD8Bv7s7drrHrGoMBZOIhGH4sSv/5SWvI5C+7pMRKIvGPL/DHEUn4
-         AbUUt0Ac+pSQiH5DS4uUP9UQ9GbjcuZ+8zGJZXRCVimgtIZrnKI5/i+rREwFGw9S3nT4
-         ZE7HlP2ZT4s3YVgx+sZn4DvfdJBl8RoY7eR3fLlxOUucqb0TyOxxwrbsSmanIGvL3ha5
-         hi0BzovvpDVhO2JAl0bRVGYJ0L6Df0GPDx/BILYFaf2VfJZ+oIHTIudVPtLxjjYEo7gS
-         Cs+w==
-X-Forwarded-Encrypted: i=1; AJvYcCVdJ1zsWWPufQjMoWLr9KU26hHLZct76zKJinDl9sqCKWW40lM9rBOKI/aIwojxOBpN6t2fPio=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzkk0R3vSh/SBGVM+xz3OrUXVGfmDwNyIMCQb5PAQlEIx2axAlf
-	h/qeSGs3+4gg0Opqr5i1Zr1g8sITHQkQ7OSs+ym5akAWPvnofIZjPXZXKEXKXWJXMKJFAlSBLQf
-	6RyYG71/bEGX32PQGNP9G6fnFxjCpLdtp8XOe/kBD
-X-Gm-Gg: ASbGncvOt7dCbzbJx1pmle/H98lkokAtDjDnGr4nXoR9gnZjPjPFRQvg22oEw3XDqO6
-	yXpvZBjf72wsfHk9mGKhAbNV+px2rayyOubXNKOKMp/3RHExSO8xF7wxt9JjIJdNZCduYxbmKjO
-	2uWd8K52iBf5jajuloCGJbSebXpjizmNcwPN3aMWjCgNtlWZ+OdjmUnjJY/D+4jEEcFvfIdkq7Z
-	DvMYiXrSFOCmruUaNoXX+D1HZjGbQ96pdYIeRcECCto
-X-Google-Smtp-Source: AGHT+IEfbc2Zxwzi1GfEz6ew9yL4Efpexul3klRQqzXkM8MVE9K6KCS7KLXZUWTrMyqQbkg52RokMCN3/rGwOF5Bl14=
-X-Received: by 2002:a05:6512:3ca9:b0:55f:6762:c35d with SMTP id
- 2adb3069b0e04-55f6f512b5dmr106398e87.6.1756504647152; Fri, 29 Aug 2025
- 14:57:27 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1756504814; x=1757109614;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GAzCvl0ldkRzudSduBa+UTTFBtOSyy1B+vOLHTPWCIE=;
+        b=eaUZHQow4B8UatmSDO41Iyij0qcUQko90VceQ2+ZAfU+CJKPVbpgSg8igm3RSoTsNW
+         /IbV7DWnIuxrflBFEhk/bLB93VkiDjEoLcaO4PSHJMOX9dFPECyM211ljkGl30o5ykEq
+         xp9+rNkl6cJf7krN1d/CZh5pRd2EjF8WLk5W9TYU6waryxn7VNZwF9NrRPJNC89eownt
+         /+GFFpLUYfpZgzgCqPmCUJ6lnTFMtDkvcQ4FaijiW2dzyXSYCHS/YyHRJJVUBPSTtCYn
+         fuesr8DrCzpi7+5N7tyVl7zXnwZAfSGiOVOjSbh8AVb61g76OerQJlF+OZrTfeDVdkDZ
+         b1JA==
+X-Gm-Message-State: AOJu0YzMSDcxdYR8/kylljavVbobSBtobjDj60LGeBSbX0QOLlZYF5Oj
+	3ACz/1sS+Xx/rgyey11VrRJRVqJScEbksb+xoeBDpiInb4cHtNqWZE0L0mYalvhGL1axDtFliLM
+	//20ZKZsH4vbnRMEcmvnL1J4S/BFrrjfIlOYR66FBe7dvrWMu5AZrNhfU0UniP5RLxcqsFbUf0O
+	EhfMTT6d9p0ukD8fLhEK0hvMLkOdpbv7CQOxHUsYqNmaOOX/1SVwGnH4LnMYNqgR4=
+X-Google-Smtp-Source: AGHT+IEKrhZ3OKLQxYoEKQKZHhOayEYySIWPtx97dJ8GVIzQwF9KvqViD5qC8rCJdQxii7XJlUjw1LorWZiSeDav0A==
+X-Received: from plcs9.prod.google.com ([2002:a17:903:30c9:b0:23f:df55:cf6f])
+ (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:903:120a:b0:240:99e6:6bc3 with SMTP id d9443c01a7336-249448e65c6mr1874055ad.20.1756504813488;
+ Fri, 29 Aug 2025 15:00:13 -0700 (PDT)
+Date: Fri, 29 Aug 2025 21:59:38 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250829012304.4146195-1-kuba@kernel.org> <20250829012304.4146195-13-kuba@kernel.org>
-In-Reply-To: <20250829012304.4146195-13-kuba@kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.318.gd7df087d1a-goog
+Message-ID: <20250829220003.3310242-1-almasrymina@google.com>
+Subject: [PATCH net-next v1] net: devmem: NULL check netdev_nl_get_dma_dev
+ return value
 From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 29 Aug 2025 14:57:15 -0700
-X-Gm-Features: Ac12FXyV6niJxKruYU1CUX8aMg8h6zpdn03nfN2GgoA6U946ENXumcSOWBvq5wE
-Message-ID: <CAHS8izPgBw++BGnfJsR3eAsnOvp=N8sov3hPsYgcsdGdo+0vcw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 12/14] eth: fbnic: defer page pool recycling
- activation to queue start
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, tariqt@nvidia.com, 
-	dtatulea@nvidia.com, hawk@kernel.org, ilias.apalodimas@linaro.org, 
-	alexanderduyck@fb.com, sdf@fomichev.me
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Joe Damato <jdamato@fastly.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 28, 2025 at 6:23=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> We need to be more careful about when direct page pool recycling
-> is enabled in preparation for queue ops support. Don't set the
-> NAPI pointer, call page_pool_enable_direct_recycling() from
-> the function that activates the queue (once the config can
-> no longer fail).
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+netdev_nl_get_dma_dev can return NULL. This happens in the unlikely
+scenario that netdev->dev.parent is NULL, or all the calls to the
+ndo_queue_get_dma_dev return NULL from the driver.
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
+Current code doesn't NULL check the return value, so it may be passed to
+net_devmem_bind_dmabuf, which AFAICT will eventually hit
+WARN_ON(!dmabuf || !dev) in dma_buf_dynamic_attach and do a kernel
+splat. Avoid this scenario by using IS_ERR_OR_NULL in place of IS_ERR.
 
---=20
-Thanks,
-Mina
+Found by code inspection.
+
+Note that this was a problem even before the fixes patch, since we
+passed netdev->dev.parent to net_devmem_bind_dmabuf before NULL checking
+it anyway :( But that code got removed in the fixes patch (and retained
+the bug).
+
+Fixes: b8aab4bb9585 ("net: devmem: allow binding on rx queues with same DMA devices")
+Signed-off-by: Mina Almasry <almasrymina@google.com>
+
+---
+ net/core/netdev-genl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+index 470fabbeacd9..779bcdb5653d 100644
+--- a/net/core/netdev-genl.c
++++ b/net/core/netdev-genl.c
+@@ -1098,7 +1098,7 @@ int netdev_nl_bind_tx_doit(struct sk_buff *skb, struct genl_info *info)
+ 	dma_dev = netdev_queue_get_dma_dev(netdev, 0);
+ 	binding = net_devmem_bind_dmabuf(netdev, dma_dev, DMA_TO_DEVICE,
+ 					 dmabuf_fd, priv, info->extack);
+-	if (IS_ERR(binding)) {
++	if (IS_ERR_OR_NULL(binding)) {
+ 		err = PTR_ERR(binding);
+ 		goto err_unlock_netdev;
+ 	}
+
+base-commit: 4f54dff818d7b5b1d84becd5d90bc46e6233c0d7
+-- 
+2.51.0.318.gd7df087d1a-goog
+
 
