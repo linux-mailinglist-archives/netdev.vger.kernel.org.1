@@ -1,124 +1,229 @@
-Return-Path: <netdev+bounces-218285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 471DFB3BC5F
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 15:20:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C43F1B3BED2
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 17:05:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6E9C5A11B9
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 13:19:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3363189A453
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 15:05:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D61B031A061;
-	Fri, 29 Aug 2025 13:18:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06035321F36;
+	Fri, 29 Aug 2025 15:05:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sjuR/3H0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UL0L+xjl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B12362EFD9C
-	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 13:18:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D69C320CD5;
+	Fri, 29 Aug 2025 15:05:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756473534; cv=none; b=cGi6hrs0z29MCBiviCgu4ZDlHKh17UM4AisHp+gpGCRAodmj6R1v+3375kjzOYk+5XsTbQTton2fFaqqPN2xk5siDiKEoD6TKJ2Uy1ZwBm63xMEOWAeovlKDTMb+tRTsFoLb+VKOcapq0Y2tha1iDHsYysopSkpuyvPf6t57mlw=
+	t=1756479902; cv=none; b=cY3yQWEjBOJBOWkWhfx54R6akL7F/8ZBJV5ZYbYQx7XBk2NEzTyOavYQqsq+0iWG1v8jjSM5PvUPLlNnaBbPReVesBvDIu6FWfFMKj0b6lq1l686ksUwTJs9eQF/4N/Sc01hE3QczxlJeUTp+ZShxUtV3OJU4BeXJ0wXbJaLXj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756473534; c=relaxed/simple;
-	bh=Bb8YwPlRN1UInK6yeqpatm1g0DdWJwczBh73E9SO8JI=;
+	s=arc-20240116; t=1756479902; c=relaxed/simple;
+	bh=xtU8o3RRKlATt1ZkDZoqGZInz4LA3xlvTSiKt6WYT3E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V850SG4vumGKUTO6fnQZaxXtkb/yjzYhQcRCQ3k2I3qHfZs5Hepl+i2lvZzJ1VxUeveyTwdwfgLmtu6VD30WfJ/hfNcdRL+jKrYcClii/DbQG52po8vzr7ZpvwzN4OJ2pzeKSKOy9xNNjE1RcihWuNwZJ5CwFkmyA4wigkPO8IM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sjuR/3H0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82AC9C4CEF0;
-	Fri, 29 Aug 2025 13:18:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756473534;
-	bh=Bb8YwPlRN1UInK6yeqpatm1g0DdWJwczBh73E9SO8JI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sjuR/3H0yEDUDWCpdMm8DaqRPBy/j2HiAXw5M9Jgy6xXK+nSKYuWgGpdtEsGIPTsi
-	 PftGPvbGTA0jdVTmt5UfyAs6BFEUtlRohVL7fkG69ar8midztAYMPjwxJ2W/Y+n8xB
-	 fq2PBR6FA8CCpRIlzGapTlyjXQE55gNoUSg3T3vrozvGSAFzRdA1FUgaJzAZBK1EFe
-	 OY8lrgmr0plFE9QY+NS9gxqqDQalwU5KOWPnEWKbIeyKvGnxntTJpDRYqnSil1WYSw
-	 RLyGaX5qBBzkqkvaMsEz1AfZiXV5nHKdi4r+tEBwa2FAhS8cXVON/vmaCcVh09tUbq
-	 MDeIe8YIduDtg==
-Date: Fri, 29 Aug 2025 14:18:50 +0100
-From: Simon Horman <horms@kernel.org>
-To: David Wilder <wilder@us.ibm.com>
-Cc: netdev@vger.kernel.org, jv@jvosburgh.net, pradeeps@linux.vnet.ibm.com,
-	pradeep@us.ibm.com, i.maximets@ovn.org, amorenoz@redhat.com,
-	haliu@redhat.com, stephen@networkplumber.org
-Subject: Re: [PATCH net-next v8 4/7] bonding: Processing extended
- arp_ip_target from user space.
-Message-ID: <20250829131850.GK31759@horms.kernel.org>
-References: <20250828221859.2712197-1-wilder@us.ibm.com>
- <20250828221859.2712197-5-wilder@us.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=hod53G5QAZS6i7DqYCUYgwplRhXBJPXHxxu8sci3MnKcZVihPvnVlAZWJY2+sfC+X7qvzrtaYz8KP+9C4igIItO78DCfCDw4bXS+HaOZ+3iztfEZg3fZcfBhrlo96L7E/BhM0/xYjxd4kRjlsvCq+cmqgzbNMA9V4/ITRVfaQxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UL0L+xjl; arc=none smtp.client-ip=209.85.210.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-74526ca7d64so1825829a34.2;
+        Fri, 29 Aug 2025 08:05:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756479900; x=1757084700; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xtU8o3RRKlATt1ZkDZoqGZInz4LA3xlvTSiKt6WYT3E=;
+        b=UL0L+xjlcYxqac//yMFsSf2xAtZdfsYphdBxn58T6Q33LeyXlDUYPPTRHsxLDKK82M
+         Gx20Y246DcEGHik30/Vglq1syNcfv+f5DbpU6PRT9Xn+Xoa+LjFIniUUEZWDu8aAWpTN
+         Lwhew2gxTBWpylX9FMlJHI7KoQMMGtAQ8rStgsxF/XNx2/8UVtlVuY6cVN+hMzasO0px
+         a4d6kx9BEQ8lSKgxqRXG3df+04c3Wmy6H55P7ZhjORoVDd0t88BHFmGZuTv/aCqkfKAa
+         5W6Oo6FgTkpoS2SgpT7HUx9IQR2ovJ6g6v9oPlg8YASMzwYT+EybHssh8qPCNGo+x27i
+         Z2vA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756479900; x=1757084700;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xtU8o3RRKlATt1ZkDZoqGZInz4LA3xlvTSiKt6WYT3E=;
+        b=nCWMb4Q4o84yc7pVZXkiExnSAKUDwWaDqjzXZ/qK8NYn7r5ZGwuN3CAsE+PmN+YoE4
+         UQmogKg8r6nmyFbQrAXiiwBbq32xHCgxcW026f9roI8gOsrUx7+y49JKPU9KFkI0p3Y9
+         WDif0uwALU7xxhPa41KPbgNRKBb8i5X8szzk4e07PX7r/t5I2h4fG6kXOM5vpeAiYlEP
+         DKGUSllVU0GtMErEQQsCLYqIvvUHAMss3u0eg+gkl9MUZBCZmFCjwSGu9dQe4WcuzuJz
+         AZ4CG9d77tvsNGhc+MHhV98W6rAPl4coqfFD7863WaxgU1zmTEpGci3NbfVnT8sVjl8a
+         u/Tg==
+X-Forwarded-Encrypted: i=1; AJvYcCUKo5zTR9R6oV2U4bh9PWXKT875MPmf1b9taBKfvjVA4ILvUVYcX7CakR9b76OYazgN3QO+OZrwXYwv+edI@vger.kernel.org, AJvYcCUgEdEPAqMgO1KyQJLAunak7kLd2HwOvsB4eTL2OFTdGYPvJOu4sivv2nvoZaZxJPqBL9I=@vger.kernel.org, AJvYcCUr6UvJbQmJTjbdyCTSDnNiUng1sdsVSOcOrIszZeL9y3iQfZUAeSlBnNra9WCXMpENucBPhSpl+3s=@vger.kernel.org, AJvYcCV1EuCkugrRpVHAU7DfxH2J4BkkeG7ApGj0mA8c1zRsXFpd+4kEjqaTC+Cbvz8d89PVpeHKuTfXY+2ulh8=@vger.kernel.org, AJvYcCVG0tPGbuhr7OCgkCqZYlj8t99OvdkGTY2ubKVe5fxwOWtTYddJqN281naJfbJN5V/mGn7qX1uIBcJP@vger.kernel.org, AJvYcCVeYk0FHzJwE8qw9LDBaHcRik1aKym9gI5zq6gNYraMauY/JMRuMeJEd71dEBEq1rLs8ShAQrJTDD5snF0=@vger.kernel.org, AJvYcCVkpFNkW03sxni6lEhP5PHYtDvNKXAKUW5WPXZovQQ0IWOiGZO3UYdsiTpTx78pVGR+TsqA06TSOiPi@vger.kernel.org, AJvYcCVo14Anf+DPJAVcz9EUWGl2noH2gemSiIQwHMHyDyXeBTq7dwoOUyYN+btrihRjOgqHcmcTBhle@vger.kernel.org, AJvYcCW4jAYBwOxzxrAgnPgJtteSycpdIc3s0Ue+ENFMNLCBNeGm2jvJItT1l69vCU58xujt2uglgbTl2GY6TvdH@vger.kernel.org, AJvYcCW9O9bdlN+zvqzvV4eJjBzPB1vmgFymzT38M02iEAhC
+ uumUff3cyWssmKFZ/dhVL9GYUOKfetPEhnzM4g==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxqnowe6BG0Kiv/NHSCns6GtIE6qUF3R82LKWKO4gRlnIW3Fult
+	YIQ/HBOmsYEu1029ZwZgCXHzVg0zyFbDUE0EcBLHtZzZEEapOlMHm/YH
+X-Gm-Gg: ASbGncv71ccvPHCEKErgy9F+LnM8h1WER9+6qTZZDUvVEl+zN7j64nGscXe7p5QhNtV
+	HsKXhvVolwSXf1+/OouULynDMSsOre3HGGQsTH2vGY2+E4QN+0mjhXVzHDsc6JGJR59ODzLyYOu
+	bR8v9Q9DUqyBMKTvUthBgTPtLIPtWeYfBFqs/BnmDOBiNjiGqxNDjy+DZxRT5LTKGjQFAuOEa/B
+	yy2lNKj9Sgpi5leu1zFtsqun3c1F9/lAdRrxqIH4J6C954aQ4sBsxt3pgrPlHUPZpALH7skCUbe
+	Q2cfEeyeWwf1R7rh5Ysmip9yqpLC9vJ2GyKIAHvI85tlXsJD1ItvN1BLWA73qNJ6x/qwZeZKlF/
+	ZiYcxJZBeDxHBUCh0dk8LSOplDg==
+X-Google-Smtp-Source: AGHT+IHoYRW1dTyT65+rU4V7sdHQy1ZAWCnUhYSUduVJT7h6pncITh0MMXOlALcxWQkuMLP36zurpg==
+X-Received: by 2002:a05:6a21:339e:b0:243:9b4e:281b with SMTP id adf61e73a8af0-2439b4e296dmr15525181637.49.1756473541271;
+        Fri, 29 Aug 2025 06:19:01 -0700 (PDT)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7722a4bac60sm2408193b3a.63.2025.08.29.06.19.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Aug 2025 06:19:00 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id 51DA0409D7C0; Fri, 29 Aug 2025 20:18:56 +0700 (WIB)
+Date: Fri, 29 Aug 2025 20:18:55 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Jani Nikula <jani.nikula@intel.com>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux DAMON <damon@lists.linux.dev>,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	Linux Power Management <linux-pm@vger.kernel.org>,
+	Linux Block Devices <linux-block@vger.kernel.org>,
+	Linux BPF <bpf@vger.kernel.org>,
+	Linux Kernel Workflows <workflows@vger.kernel.org>,
+	Linux KASAN <kasan-dev@googlegroups.com>,
+	Linux Devicetree <devicetree@vger.kernel.org>,
+	Linux fsverity <fsverity@lists.linux.dev>,
+	Linux MTD <linux-mtd@lists.infradead.org>,
+	Linux DRI Development <dri-devel@lists.freedesktop.org>,
+	Linux Kernel Build System <linux-lbuild@vger.kernel.org>,
+	Linux Networking <netdev@vger.kernel.org>,
+	Linux Sound <linux-sound@vger.kernel.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	Jonathan Corbet <corbet@lwn.net>, SeongJae Park <sj@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	David Hildenbrand <david@redhat.com>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>, Huang Rui <ray.huang@amd.com>,
+	"Gautham R. Shenoy" <gautham.shenoy@amd.com>,
+	Mario Limonciello <mario.limonciello@amd.com>,
+	Perry Yuan <perry.yuan@amd.com>, Jens Axboe <axboe@kernel.dk>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Dwaipayan Ray <dwaipayanray1@gmail.com>,
+	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+	Joe Perches <joe@perches.com>,
+	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+	Alexander Potapenko <glider@google.com>,
+	Andrey Konovalov <andreyknvl@gmail.com>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Vincenzo Frascino <vincenzo.frascino@arm.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Eric Biggers <ebiggers@kernel.org>, tytso@mit.edu,
+	Richard Weinberger <richard@nod.at>,
+	Zhihao Cheng <chengzhihao1@huawei.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+	Boqun Feng <boqun.feng@gmail.com>, Waiman Long <longman@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Shay Agroskin <shayagr@amazon.com>,
+	Arthur Kiyanovski <akiyano@amazon.com>,
+	David Arinzon <darinzon@amazon.com>,
+	Saeed Bishara <saeedb@amazon.com>, Andrew Lunn <andrew@lunn.ch>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>,
+	Alexandru Ciobotaru <alcioa@amazon.com>,
+	The AWS Nitro Enclaves Team <aws-nitro-enclaves-devel@amazon.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+	Steve French <stfrench@microsoft.com>,
+	Meetakshi Setiya <msetiya@microsoft.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+	Masahiro Yamada <masahiroy@kernel.org>
+Subject: Re: [PATCH 00/14] Internalize www.kernel.org/doc cross-reference
+Message-ID: <aLGovx7OpL_85YTf@archie.me>
+References: <20250829075524.45635-1-bagasdotme@gmail.com>
+ <437912a24e94673c2355a2b7b50c3c4b6f68fcc6@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="v+QeNeXg1wIV/8Z8"
 Content-Disposition: inline
-In-Reply-To: <20250828221859.2712197-5-wilder@us.ibm.com>
+In-Reply-To: <437912a24e94673c2355a2b7b50c3c4b6f68fcc6@intel.com>
 
-On Thu, Aug 28, 2025 at 03:18:06PM -0700, David Wilder wrote:
-> Changes to bond_netlink and bond_options to process extended
-> format arp_ip_target option sent from user space via the ip
-> command.
-> 
-> The extended format adds a list of vlan tags to the ip target address.
-> 
-> Signed-off-by: David Wilder <wilder@us.ibm.com>
 
-...
+--v+QeNeXg1wIV/8Z8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
+On Fri, Aug 29, 2025 at 03:18:20PM +0300, Jani Nikula wrote:
+> FWIW, I'd much prefer using :ref: on rst anchors (that automatically
+> pick the link text from the target heading) instead of manually adding
+> link texts and file references.
+>=20
+> i.e.
+>=20
+> .. _some_target:
+>=20
+> Heading After Some Target
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+>=20
+> See :ref:`some_target`.
+>=20
+> Will generate "See Heading After Some Target".
 
-...
+I did that in patch [14/14], but I had to write out explicit anchor text
+considering people reading rst source. When they encounter checkpatch warni=
+ng
+and they'd like to learn about solution by following See: links, they shoul=
+d be
+able to locate the actual docs and section mentioned without leaving the
+terminal. Before this series, however, they need to click the https link
+provided, which leads to relevant docs in docs.kernel.org that its source is
+already in Documentation/.
 
-> +/**
-> + * bond_validate_tags - validate an array of bond_vlan_tag.
-> + * @tags: the array to validate
-> + * @len: the length in bytes of @tags
-> + *
-> + * Validate that @tags points to a valid array of struct bond_vlan_tag.
-> + * Returns the length of the validated bytes in the array or -1 if no
-> + * valid list is found.
-> + */
-> +static int bond_validate_tags(struct bond_vlan_tag *tags, size_t len)
-> +{
-> +	size_t i, ntags = 0;
-> +
-> +	if (len == 0 || !tags)
-> +		return 0;
-> +
-> +	for (i = 0; i <= len; i = i + sizeof(struct bond_vlan_tag)) {
-> +		if (ntags > BOND_MAX_VLAN_TAGS)
-> +			break;
+Thanks.
 
-Hi David,
+--=20
+An old man doll... just what I always wanted! - Clara
 
-BOND_MAX_VLAN_TAGS is used here but it isn't defined until a subsequent
-patch in this series. Which breaks bisection.
+--v+QeNeXg1wIV/8Z8
+Content-Type: application/pgp-signature; name=signature.asc
 
-I didn't check, but probably this can be addressed by moving
-the definition of BOND_MAX_VLAN_TAGS to this patch.
+-----BEGIN PGP SIGNATURE-----
 
-> +
-> +		if (tags->vlan_proto == BOND_VLAN_PROTO_NONE)
-> +			return i + sizeof(struct bond_vlan_tag);
-> +
-> +		if (tags->vlan_id > 4094)
-> +			break;
-> +		tags++;
-> +		ntags++;
-> +	}
-> +	return -1;
->  }
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaLGougAKCRD2uYlJVVFO
+oyLxAP95mJgSRTOQ+hTC3+7/hjakAGgQRjyWnfFgZF9dKlXeHgD/bJRCDtPLAnbQ
+JLSf5TwAGdo1LgUd0wgEgetqhpMKwQI=
+=82dj
+-----END PGP SIGNATURE-----
 
-...
-
--- 
-pw-bot: changes-requested
+--v+QeNeXg1wIV/8Z8--
 
