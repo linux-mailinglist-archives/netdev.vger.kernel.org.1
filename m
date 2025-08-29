@@ -1,65 +1,80 @@
-Return-Path: <netdev+bounces-218238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50566B3B94F
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 12:54:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86096B3B99B
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 13:04:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F9E416B88E
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 10:54:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7FB37AB86D
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 11:02:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40E1330FF21;
-	Fri, 29 Aug 2025 10:54:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F5F0311C22;
+	Fri, 29 Aug 2025 11:04:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="I9PG/Tts"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Fo8KVRxS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75B513093D2;
-	Fri, 29 Aug 2025 10:54:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C72723054C3
+	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 11:03:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756464854; cv=none; b=MawZo9S7FnftC+1A0T112scmxDv6uA+6I+tgzxuL9ZzNCfcr+1JwZishSvW4mP05Nk1LHYT9yb/Uj2lfVqg/9t3X/NguIl4nS9NwOaPaaYfsB77rySoBBAImKYjXidvHoyf5iAochdhJN9/PgHAKNM36wWqR6/92O/MtgXGt8gc=
+	t=1756465442; cv=none; b=N470ERY3SHJ9SAuQThHgPrDjnhRXkUs6UtxUWPNSDYm8roBYOtHeuHv/vjD9aEAYDEdguk1dBP4lwKInPTrAj2u70wvMO36Xd2muGWxm0YHZXGRss/iLWaSHfS0U0vFmrwSSfjxzBQexWmVMXLooBJHvkHWBtqe4FHAt1McdV6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756464854; c=relaxed/simple;
-	bh=H7e5O8hFLj7cfALyJeFiJ/ilsTsRPlbygRn4FoQsbAk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=dNitK9SUrOhOOkNGqzPEyjJGh3OAwBQufaiaHdyuBvVnG+o3wFx1WyiQ6IanPvYGOcSaPye9MBnmeOjOu+oO7xb6kXmvm5PPaIgbq3xiScFwhVB30pDen/9tVEhOlrdQxVVZ86BbPMqBXDX9bc7GWoz1FF55+q6ZYSF26xg0Uwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=I9PG/Tts; arc=none smtp.client-ip=185.132.182.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0288072.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57TAmX4E017538;
-	Fri, 29 Aug 2025 12:53:50 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	4xaeXPbiHj1WXGO3LyY/YVYaZRplgC67AGgIQ0JaCzQ=; b=I9PG/Tts+8+sWE0v
-	iB/btJghfuyYmvscjR0cyoH4rHTCxk3tjAXGOQmMIqZCIHS9vQkpuo0jjDoO/W6h
-	REgP/7WCuTQT3ACMTJzhKXt91r0VOP7Bt7dbQljGhUR0IVxGAU13DL4VGKx9mpnY
-	cwQI1tRdhGuOddgHKvR4/WluY3ueD6PExzDb2G50G/D3rK8VORpDh74IMAzVKT3Q
-	1dmuf2mEwKN7qHtn8M4GYwz9NO75zx0EvPpWBUaK99s6m1l+MS6PBS6bt5g4AEv0
-	NTfAyBYvbmTAAwmOjlKz3OiN8AtGn2OUoT+lxxdMJAiWuNHbsVq8r/rLBOahuP2T
-	wcQukw==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 48q5v0h561-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 Aug 2025 12:53:50 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 6D07E40045;
-	Fri, 29 Aug 2025 12:52:38 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id CFFBA78F630;
-	Fri, 29 Aug 2025 12:51:45 +0200 (CEST)
-Received: from [10.48.87.141] (10.48.87.141) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.57; Fri, 29 Aug
- 2025 12:51:45 +0200
-Message-ID: <57196414-5ab5-41b7-b2e3-ff6831589811@foss.st.com>
-Date: Fri, 29 Aug 2025 12:51:40 +0200
+	s=arc-20240116; t=1756465442; c=relaxed/simple;
+	bh=YuYDNgvmByukeEjHw0NdzkrN0QNksChG2e5fXtNTVOM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nsEB8z9W7gAKBtJb+kb76pCVx38yWHrVdCXaJ/v7jIt/Mo84iNXnQX4PdRLcc+6f94yz4W91enc594Y5fk/1y0D7DblcpEaMpMQwbYjH4mkriBIbZopTk5wTzvKTklgEdWXhzAhn3SequmI2KfwE0qL+TTPDhSSHEKx4/MU4oEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Fo8KVRxS; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-244580523a0so20412385ad.1
+        for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 04:03:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1756465438; x=1757070238; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IIaSrq6Dx+kKyeLRsgFivteR1euTnImW9J7nYHhbSJY=;
+        b=Fo8KVRxScIwX+4IqOcKVSQHK1GhgE8u2mNSZg4G9BHU7ACOZqWvF8NBWtYa15l4mW5
+         GH17rSSfyQ4f5ng1MU8iTh8sFBPWNC5errVy18VTnFoL7V283SRbuHEizeSji9nXXu5N
+         mF45k8F4KgGYl5AaBugVTZv0C+/X9WkUCy8NR1aiDEGDAUZr8iEo5++XWT7dQoBKOGtq
+         fjVKeKI9Z0SV3NmtU6bsDC0yal2pv3n71guX7emGh11zbIJCHM6RkPcIpBzQ226OHCiy
+         lDs/SDCxlDviy3P892hOlrolmZg7J/lCmDWdZDEDgD//CEIJsOwlMqLyUDdvB4saV2Jh
+         imfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756465438; x=1757070238;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IIaSrq6Dx+kKyeLRsgFivteR1euTnImW9J7nYHhbSJY=;
+        b=rBYM6mqP4UuntNyD9No+djGHMPvdLF96B7tByT17jmYv/5EM8mVn2KUPDUR1HNN6gP
+         1jGH87tZSimCOlnVA4x2TjFoJSsBHMTJERe6DSD2tWkbZjgTvVbliJ2WqVnonCGo7n7v
+         Fc/tY2p9g73F4Ixde1/wLQYuHJXudNeSJvYGT477s187ta+DvT7MoDHzp/Q8KYvaEM/K
+         2/22padeo8yLP7rv+NYhPU4QHFSscb1FNkBlrxs+Bhh7cp+qxT+0xDZYEp7akkGqbt0g
+         eL3A7lsFzNeLeIDtplqj1phTpW0LKHAwctuQ0nDBKsIj0kT7qrmvIRNoV49jOk0rA/yI
+         Q59Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUTCy5swNT9kF1GVgKaXq5quU2+VaHan0OFip+158SWwp2iIbWjNl7I/DcuURXElAY/6kmuuG4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrWXZsl5s0wJ+MrTXPv/SoOx3s7tPXa+NHN0CuGw40tlX77LKG
+	jaMAuL/l9z/TDgu0ibyVMVFjGmJ6KYofT8jLeH3oNG6pka683d/a56N2ElR7Ooj+/xM=
+X-Gm-Gg: ASbGncsV0HghrQzWfM1MkMNk7qOcbk3r1X+u7Z92Ru8A/BGcIyPikRBmr7Fbau1Ah7u
+	V0bbgxUW0ycCZpTqF2THLw37btaUXTal/Q7gURK92hqnjGoead8u8mzF5Na3zaxHA1seRk4XBvh
+	r7RrBrYzG4yx6C/d/+f2EHd0aDs2U1NBS0U8CeZFAeokOs0oe1qR1IsJ4HxShySggLO4mDEFInh
+	Bh0EADi7hXr4HgAD0NJV7HH8fQuExlvFly4t4HXvaV/GrV47wKMZsKmsxo5FPoQ8uIFhphnhs+8
+	dQPFJhFmbM5XQvRhSw7RNWbaJJnVryhFy8xYI8q+H3Yjg9ZuoLwisoJLcxfpbbGwvdSFpi7kGdc
+	TxlBogGwPIP38Swt1Dj0/
+X-Google-Smtp-Source: AGHT+IEzZ/p9as3nrF9ljeFhdkvVqD0Z2ro3p43Bl/n630t9nzydCZuiImxupdC2b+91pZmC3AWS0g==
+X-Received: by 2002:a17:903:38cf:b0:248:aa0d:bb25 with SMTP id d9443c01a7336-248aa0dc43amr125044695ad.14.1756465437860;
+        Fri, 29 Aug 2025 04:03:57 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3276f5925adsm7949756a91.10.2025.08.29.04.03.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 29 Aug 2025 04:03:57 -0700 (PDT)
+Message-ID: <6c85f96a-f012-48e9-a2fa-f1c7650d8533@kernel.dk>
+Date: Fri, 29 Aug 2025 05:03:55 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,62 +82,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 1/2] drivers: net: stmmac: handle start time
- set in the past for flexible PPS
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Paolo Abeni
-	<pabeni@redhat.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        "Alexandre
- Torgue" <alexandre.torgue@foss.st.com>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Rob Herring <robh@kernel.org>,
-        "Krzysztof
- Kozlowski" <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>, <netdev@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>
-References: <20250827-relative_flex_pps-v3-0-673e77978ba2@foss.st.com>
- <20250827-relative_flex_pps-v3-1-673e77978ba2@foss.st.com>
- <20250827193105.47aaa17b@kernel.org>
+Subject: Re: [PATCH] Add RWF_NOSIGNAL flag for pwritev2
+To: Lauri Vasama <git@vasama.org>, Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemb@google.com>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+Cc: Jan Kara <jack@suse.cz>, Simon Horman <horms@kernel.org>,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20250827133901.1820771-1-git@vasama.org>
 Content-Language: en-US
-From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <20250827193105.47aaa17b@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20250827133901.1820771-1-git@vasama.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-29_03,2025-08-28_01,2025-03-28_01
 
-
-
-On 8/28/25 04:31, Jakub Kicinski wrote:
-> On Wed, 27 Aug 2025 13:04:58 +0200 Gatien Chevallier wrote:
->> +		curr_time = ns_to_timespec64(ns);
->> +		if (target_ns < ns + PTP_SAFE_TIME_OFFSET_NS) {
->> +			cfg->start = timespec64_add_safe(cfg->start, curr_time);
+On 8/27/25 7:39 AM, Lauri Vasama wrote:
+> For a user mode library to avoid generating SIGPIPE signals (e.g.
+> because this behaviour is not portable across operating systems) is
+> cumbersome. It is generally bad form to change the process-wide signal
+> mask in a library, so a local solution is needed instead.
 > 
-> Is there a strong reason to use timespec64_add_safe()?
-> It's not exported to modules:
-> ERROR: modpost: "timespec64_add_safe" [drivers/net/ethernet/stmicro/stmmac/stmmac.ko] undefined!
+> For I/O performed directly using system calls (synchronous or readiness
+> based asynchronous) this currently involves applying a thread-specific
+> signal mask before the operation and reverting it afterwards. This can be
+> avoided when it is known that the file descriptor refers to neither a
+> pipe nor a socket, but a conservative implementation must always apply
+> the mask. This incurs the cost of two additional system calls. In the
+> case of sockets, the existing MSG_NOSIGNAL flag can be used with send.
+> 
+> For asynchronous I/O performed using io_uring, currently the only option
+> (apart from MSG_NOSIGNAL for sockets), is to mask SIGPIPE entirely in the
+> call to io_uring_enter. Thankfully io_uring_enter takes a signal mask, so
+> only a single syscall is needed. However, copying the signal mask on
+> every call incurs a non-zero performance penalty. Furthermore, this mask
+> applies to all completions, meaning that if the non-signaling behaviour
+> is desired only for some subset of operations, the desired signals must
+> be raised manually from user-mode depending on the completed operation.
+> 
+> Add RWF_NOSIGNAL flag for pwritev2. This flag prevents the SIGPIPE signal
+> from being raised when writing on disconnected pipes or sockets. The flag
+> is handled directly by the pipe filesystem and converted to the existing
+> MSG_NOSIGNAL flag for sockets.
 
-Hello Jakub,
+LGTM, only curiosity is why this hasn't been added before.
 
-you're absolutely right. I don't know how I did not encounter the build
-error while performing some tests, that I'm getting now as well.
+Reviewed-by: Jens Axboe <axboe@kernel.dk>
 
-The handling of overflows is already done in that function. Either
-I can make a patch to export the symbol or handle the computation in the
-driver. What do you think is best?
-
-Cheers,
-Gatien
-
+-- 
+Jens Axboe
 
