@@ -1,64 +1,88 @@
-Return-Path: <netdev+bounces-218289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F728B3BC85
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 15:29:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3127B3BCA0
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 15:41:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9F4D3B4327
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 13:29:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E014F1C879A3
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 13:42:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6230431A57B;
-	Fri, 29 Aug 2025 13:29:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C908531CA4C;
+	Fri, 29 Aug 2025 13:41:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AKv9Q4ft"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f98+42k7"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B47772F069C
-	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 13:29:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4488531B11F
+	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 13:41:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756474171; cv=none; b=FWeDRDu7apltSwSsNflaihYEfoYsu6+4UWnq0X+ByCBvX0ByVBH12dw6WXLwGwLvdnE3J8IGMuMpIx+Em9doKKiYGcYYz87aDpX51Z95T/A3aSvBSc8ekncWcsBkz+BEitwh3mc4Mknx31FjhiNiGOm35p1IudGtJZ+cst2gGu8=
+	t=1756474909; cv=none; b=AfbmkSLMwclvWxHcBfq/G1X5+qgt3yOpt61iFzhVpbUR7cLR/gRiQi5KfZTMEXBIm+7OmilQ1kpkgbgu8yVj5C4v01Vkner85D5XoepVgSNPQjkkhjC3mkkom5WJLbkEI4tBcsMh4ucJs/BFzC/q8/z0rfpqp22kpDzbhvtSatY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756474171; c=relaxed/simple;
-	bh=knOkve9KJ6aDZa9cI8V8ayiO/Btg8paML35UfEGiBTs=;
+	s=arc-20240116; t=1756474909; c=relaxed/simple;
+	bh=TFMPXTSMXOnp4cKbN5frFtGSjPHSL2+uxw+05tDbuDQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bi6tdh2uUK+2FhVNhnBlu4fU1IM/0lOQOiZmjPMUMCY7a+J6jJIPXUspiDplCqwld0orDqyKih05VxOHNOZaearwvpgNu+jvvA+0yIntepB3VWKcqUYQmFLx+gZ19i9r4OxZ9RzSFOrEQWevvqKG8TFhRZO7enyYeYRlipmqynw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AKv9Q4ft; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=ua3CikgeG5sCypcA/5N/zm1ZiwNe5IQziImBI0o7maTDBCUOvm7Ygrk0mYizirJTxtgax/R7R93XRVMb6npZi7YYydWt3d0SII7RsbtQRNCgIWjS9SL3tsyKnCj6ajRvFnry69AM4uR1D4LzP4FKp6ew2N/8izSSjfjU5w5z52U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f98+42k7; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756474168;
+	s=mimecast20190719; t=1756474906;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y5xCVHj/t6FV37rBGnYXOrcnRWfi0Bqvu58jEXvy/kk=;
-	b=AKv9Q4fti/MxQ/3w7FfoZZey/vc2cxaxgdF/UfDncNZZ54IBtXcQBBUHewD2DuMXSgDiDa
-	aRHC/0A99Lqp8fPhAjErsgv5F6ke0qPFBPmpym+TT08SW6j+TBJ23v2hx4R7k09eeEipBg
-	nCbmYaFLc/IZ6aOjmQpjoveM2pLTkUg=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-604-bwUiLHz3NvykS1iWwDEgDg-1; Fri,
- 29 Aug 2025 09:29:23 -0400
-X-MC-Unique: bwUiLHz3NvykS1iWwDEgDg-1
-X-Mimecast-MFC-AGG-ID: bwUiLHz3NvykS1iWwDEgDg_1756474161
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1CCA11956089;
-	Fri, 29 Aug 2025 13:29:21 +0000 (UTC)
-Received: from [10.45.224.190] (unknown [10.45.224.190])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 02E7C19560B4;
-	Fri, 29 Aug 2025 13:29:16 +0000 (UTC)
-Message-ID: <5e38e1b7-9589-49a9-8f26-3b186f54c7d5@redhat.com>
-Date: Fri, 29 Aug 2025 15:29:15 +0200
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=7ZezTDYPV9FY1vYbYIlP1Z79qo+TmLw98Vo74TFiYNA=;
+	b=f98+42k7426a6CzPQitG4DnS9zPuRNCj/2cp6rT985RCqcYo/vnpZO6T/x/SB7t5eP5Tsj
+	HVYVCVdLegLykUVu5kQakqp49TeNtQzmzkc4lUi1lNYjUYkDaoD9LecAW8SFGQAJDDcJ26
+	YgrLct+RrB7vq1xlQoGiX5+chGe/iGY=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-683-QqVbdF72NUWM-hrqYKKEyw-1; Fri, 29 Aug 2025 09:41:45 -0400
+X-MC-Unique: QqVbdF72NUWM-hrqYKKEyw-1
+X-Mimecast-MFC-AGG-ID: QqVbdF72NUWM-hrqYKKEyw_1756474904
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-45a1ad21752so12836635e9.1
+        for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 06:41:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756474904; x=1757079704;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7ZezTDYPV9FY1vYbYIlP1Z79qo+TmLw98Vo74TFiYNA=;
+        b=iBFJlvMpmbw/TCLulZMfm93vvpfRN+ZwNWN6kdTQcnNW/nULH5MmrJu4cjoJJX87YI
+         kFGpTPtbldlBnjvP51TsozGYey/SS6Kugky8goM8gYX5sWV2WGPHsm31Dfh4g2iJtbfG
+         LLNzVRvie29gJ2zAnINLdWU7nvLThlcwJiYRuqMix7RhV2mqG0N5XsUvcG8mK3aXF9an
+         UJJ3uEmE0bV/c7of/zS/g9adNOh+Abdse5rJ9It7qdvD6s3na8/N179mWTCcO06JcfD7
+         a3G9CYfOCv8yE+JMdKhg73dQ8X9x8VcA7/zEAq6Jwr52yvQWYHC8BY1fKv5zw3IY9zIG
+         8NOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWPaSGKqIexMzHeYXnv7Y3Is+lriid4KOyd25pdgar28NWvM3+vg63fnZeI8We7wQdRyWVAuc4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZ6Xj30Ix6lnEPrAU7GC880zZ/B895um5umM80j7GSiERrO3W7
+	N5qXzpRBbpC3XO94ZEht8u/RYcZ0lAXzNITbwaJRKkRgkFOyrMAHVaYB8kOdjs2v0NRdNy/E5xW
+	8i9jvz9HthQTFhICk/ev8G9MUtRcnkqVrzzbkr/9aCptHksn56vKBwmyLng==
+X-Gm-Gg: ASbGncv63m1nWrPZh2clW37BlOWKxq4jL2hbOuYJjwlmr9CRGTdb/6hkOlqGOc54K38
+	7s7xlUiAuw+fihUCjK2zLKOMfqiH5l4jMPy+brQwNAA0kHG4MlNZoYOVxtiSXUR56KvI3RqGKPo
+	SxYuVR8C1SeV/EwP9GYnQCoIAEXSt9qJnYICYfUf3mFA7jXQxcZtPnNuYCjZV7fn1Fc6CCiLWv7
+	X1tocNcgFTGR3zUu4xGPu3DkFAdCltDDcI1mUldzLw04jI9Gzx074XSdi69eAVkUnPtoAzNxsfy
+	0sjNF9YvZiw8ugHpaXrv+qlP1s6HG4IV8sHoR3Dd1BFCsVOripdO93hnl4O8BCB9YaaWvO6JvCI
+	gPBq9S2/D951qCGvWvuFHZw9YBKO/9Hz1MehLhqRvzxGOKPeYxpmmThz9oX/dhGke
+X-Received: by 2002:a05:600c:8b0a:b0:45b:733b:1feb with SMTP id 5b1f17b1804b1-45b733b214dmr83370515e9.10.1756474903629;
+        Fri, 29 Aug 2025 06:41:43 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHWe5EWQVl5iPDqqeubvc9kL/5oN1fdgiPPYoM9Zstyja975cqp15HWRaThC/EH89lpSzwt8Q==
+X-Received: by 2002:a05:600c:8b0a:b0:45b:733b:1feb with SMTP id 5b1f17b1804b1-45b733b214dmr83370155e9.10.1756474903176;
+        Fri, 29 Aug 2025 06:41:43 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f1d:100:4f8e:bb13:c3c7:f854? (p200300d82f1d01004f8ebb13c3c7f854.dip0.t-ipconnect.de. [2003:d8:2f1d:100:4f8e:bb13:c3c7:f854])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3cf3458a67esm3469559f8f.62.2025.08.29.06.41.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 29 Aug 2025 06:41:42 -0700 (PDT)
+Message-ID: <632fea32-28aa-4993-9eff-99fc291c64f2@redhat.com>
+Date: Fri, 29 Aug 2025 15:41:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,187 +90,211 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next] dt-bindings: dpll: Add per-channel Ethernet
- reference property
-To: Rob Herring <robh@kernel.org>
-Cc: netdev@vger.kernel.org, mschmidt@redhat.com, poros@redhat.com,
- Andrew Lunn <andrew@lunn.ch>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Prathosh Satish <Prathosh.Satish@microchip.com>,
- "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
- <devicetree@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-References: <20250815144736.1438060-1-ivecera@redhat.com>
- <20250820211350.GA1072343-robh@kernel.org>
+Subject: Re: [PATCH v1 18/36] mm/gup: drop nth_page() usage within folio when
+ recording subpages
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
+ Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+ iommu@lists.linux.dev, io-uring@vger.kernel.org,
+ Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
+ Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
+ kasan-dev@googlegroups.com, kvm@vger.kernel.org,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
+ linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, Marco Elver <elver@google.com>,
+ Marek Szyprowski <m.szyprowski@samsung.com>, Michal Hocko <mhocko@suse.com>,
+ Mike Rapoport <rppt@kernel.org>, Muchun Song <muchun.song@linux.dev>,
+ netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
+ Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
+ Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
+ virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
+ wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
+References: <20250827220141.262669-1-david@redhat.com>
+ <20250827220141.262669-19-david@redhat.com>
+ <c0dadc4f-6415-4818-a319-e3e15ff47a24@lucifer.local>
+From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <20250820211350.GA1072343-robh@kernel.org>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <c0dadc4f-6415-4818-a319-e3e15ff47a24@lucifer.local>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Hi Rob,
-
-On 20. 08. 25 11:13 odp., Rob Herring wrote:
-> On Fri, Aug 15, 2025 at 04:47:35PM +0200, Ivan Vecera wrote:
->> In case of SyncE scenario a DPLL channels generates a clean frequency
->> synchronous Ethernet clock (SyncE) and feeds it into the NIC transmit
->> path. The DPLL channel can be locked either to the recovered clock
->> from the NIC's PHY (Loop timing scenario) or to some external signal
->> source (e.g. GNSS) (Externally timed scenario).
+On 28.08.25 18:37, Lorenzo Stoakes wrote:
+> On Thu, Aug 28, 2025 at 12:01:22AM +0200, David Hildenbrand wrote:
+>> nth_page() is no longer required when iterating over pages within a
+>> single folio, so let's just drop it when recording subpages.
 >>
->> The example shows both situations. NIC1 recovers the input SyncE signal
->> that is used as an input reference for DPLL channel 1. The channel locks
->> to this signal, filters jitter/wander and provides holdover. On output
->> the channel feeds a stable, phase-aligned clock back into the NIC1.
->> In the 2nd case the DPLL channel 2 locks to a master clock from GNSS and
->> feeds a clean SyncE signal into the NIC2.
->>
->> 		   +-----------+
->> 		+--|   NIC 1   |<-+
->> 		|  +-----------+  |
->> 		|                 |
->> 		| RxCLK     TxCLK |
->> 		|                 |
->> 		|  +-----------+  |
->> 		+->| channel 1 |--+
->> +------+	   |-- DPLL ---|
->> | GNSS |---------->| channel 2 |--+
->> +------+  RefCLK   +-----------+  |
->> 				  |
->> 			    TxCLK |
->> 				  |
->> 		   +-----------+  |
->> 		   |   NIC 2   |<-+
->> 		   +-----------+
->>
->> In the situations above the DPLL channels should be registered into
->> the DPLL sub-system with the same Clock Identity as PHCs present
->> in the NICs (for the example above DPLL channel 1 uses the same
->> Clock ID as NIC1's PHC and the channel 2 as NIC2's PHC).
->>
->> Because a NIC PHC's Clock ID is derived from the NIC's MAC address,
->> add a per-channel property 'ethernet-handle' that specifies a reference
->> to a node representing an Ethernet device that uses this channel
->> to synchronize its hardware clock. Additionally convert existing
->> 'dpll-types' list property to 'dpll-type' per-channel property.
->>
->> Suggested-by: Andrew Lunn <andrew@lunn.ch>
->> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+> 
+> This looks correct to me, so notwithtsanding suggestion below, LGTM and:
+> 
+> Reviewed-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+> 
 >> ---
->>   .../devicetree/bindings/dpll/dpll-device.yaml | 40 ++++++++++++++++---
->>   .../bindings/dpll/microchip,zl30731.yaml      | 29 +++++++++++++-
->>   2 files changed, 62 insertions(+), 7 deletions(-)
+>>   mm/gup.c | 7 +++----
+>>   1 file changed, 3 insertions(+), 4 deletions(-)
 >>
->> diff --git a/Documentation/devicetree/bindings/dpll/dpll-device.yaml b/Documentation/devicetree/bindings/dpll/dpll-device.yaml
->> index fb8d7a9a3693f..798c5484657cf 100644
->> --- a/Documentation/devicetree/bindings/dpll/dpll-device.yaml
->> +++ b/Documentation/devicetree/bindings/dpll/dpll-device.yaml
->> @@ -27,11 +27,41 @@ properties:
->>     "#size-cells":
->>       const: 0
->>   
->> -  dpll-types:
->> -    description: List of DPLL channel types, one per DPLL instance.
->> -    $ref: /schemas/types.yaml#/definitions/non-unique-string-array
->> -    items:
->> -      enum: [pps, eec]
+>> diff --git a/mm/gup.c b/mm/gup.c
+>> index b2a78f0291273..89ca0813791ab 100644
+>> --- a/mm/gup.c
+>> +++ b/mm/gup.c
+>> @@ -488,12 +488,11 @@ static int record_subpages(struct page *page, unsigned long sz,
+>>   			   unsigned long addr, unsigned long end,
+>>   			   struct page **pages)
+>>   {
+>> -	struct page *start_page;
+>>   	int nr;
+>>
+>> -	start_page = nth_page(page, (addr & (sz - 1)) >> PAGE_SHIFT);
+>> +	page += (addr & (sz - 1)) >> PAGE_SHIFT;
+>>   	for (nr = 0; addr != end; nr++, addr += PAGE_SIZE)
+>> -		pages[nr] = nth_page(start_page, nr);
+>> +		pages[nr] = page++;
 > 
-> Dropping this is an ABI change. You can't do that unless you are
-> confident there are no users both in existing DTs and OSs.
-
-Get it, will keep.
-
->> +  channels:
->> +    type: object
->> +    description: DPLL channels
->> +    unevaluatedProperties: false
->> +
->> +    properties:
->> +      "#address-cells":
->> +        const: 1
->> +      "#size-cells":
->> +        const: 0
->> +
->> +    patternProperties:
->> +      "^channel@[0-9a-f]+$":
->> +        type: object
->> +        description: DPLL channel
->> +        unevaluatedProperties: false
->> +
->> +        properties:
->> +          reg:
->> +            description: Hardware index of the DPLL channel
->> +            maxItems: 1
->> +
->> +          dpll-type:
->> +            description: DPLL channel type
->> +            $ref: /schemas/types.yaml#/definitions/string
->> +            enum: [pps, eec]
->> +
->> +          ethernet-handle:
->> +            description:
->> +              Specifies a reference to a node representing an Ethernet device
->> +              that uses this channel to synchronize its hardware clock.
->> +            $ref: /schemas/types.yaml#/definitions/phandle
 > 
-> Seems a bit odd to me that the ethernet controller doesn't have a link
-> to this node instead.
+> This is really nice, but I wonder if (while we're here) we can't be even
+> more clear as to what's going on here, e.g.:
+> 
+> static int record_subpages(struct page *page, unsigned long sz,
+> 			   unsigned long addr, unsigned long end,
+> 			   struct page **pages)
+> {
+> 	size_t offset_in_folio = (addr & (sz - 1)) >> PAGE_SHIFT;
+> 	struct page *subpage = page + offset_in_folio;
+> 
+> 	for (; addr != end; addr += PAGE_SIZE)
+> 		*pages++ = subpage++;
+> 
+> 	return nr;
+> }
+> 
+> Or some variant of that with the masking stuff self-documented.
 
-Do you mean to add a property (e.g. dpll-channel or dpll-device) into
-net/network-class.yaml ? If so, yes, it would be possible, and the way
-I look at it now, it would probably be better. The DPLL driver can
-enumerate all devices across the system that has this specific property
-and check its value.
+What about the following cleanup on top:
 
-See the proposal below...
 
-Thanks,
-Ivan
+diff --git a/mm/gup.c b/mm/gup.c
+index 89ca0813791ab..5a72a135ec70b 100644
+--- a/mm/gup.c
++++ b/mm/gup.c
+@@ -484,19 +484,6 @@ static inline void mm_set_has_pinned_flag(struct mm_struct *mm)
+  #ifdef CONFIG_MMU
+  
+  #ifdef CONFIG_HAVE_GUP_FAST
+-static int record_subpages(struct page *page, unsigned long sz,
+-                          unsigned long addr, unsigned long end,
+-                          struct page **pages)
+-{
+-       int nr;
+-
+-       page += (addr & (sz - 1)) >> PAGE_SHIFT;
+-       for (nr = 0; addr != end; nr++, addr += PAGE_SIZE)
+-               pages[nr] = page++;
+-
+-       return nr;
+-}
+-
+  /**
+   * try_grab_folio_fast() - Attempt to get or pin a folio in fast path.
+   * @page:  pointer to page to be grabbed
+@@ -2963,8 +2950,8 @@ static int gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
+         if (pmd_special(orig))
+                 return 0;
+  
+-       page = pmd_page(orig);
+-       refs = record_subpages(page, PMD_SIZE, addr, end, pages + *nr);
++       refs = (end - addr) >> PAGE_SHIFT;
++       page = pmd_page(orig) + ((addr & ~PMD_MASK) >> PAGE_SHIFT);
+  
+         folio = try_grab_folio_fast(page, refs, flags);
+         if (!folio)
+@@ -2985,6 +2972,8 @@ static int gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
+         }
+  
+         *nr += refs;
++       for (; refs; refs--)
++               *(pages++) = page++;
+         folio_set_referenced(folio);
+         return 1;
+  }
+@@ -3003,8 +2992,8 @@ static int gup_fast_pud_leaf(pud_t orig, pud_t *pudp, unsigned long addr,
+         if (pud_special(orig))
+                 return 0;
+  
+-       page = pud_page(orig);
+-       refs = record_subpages(page, PUD_SIZE, addr, end, pages + *nr);
++       refs = (end - addr) >> PAGE_SHIFT;
++       page = pud_page(orig) + ((addr & ~PUD_MASK) >> PAGE_SHIFT);
+  
+         folio = try_grab_folio_fast(page, refs, flags);
+         if (!folio)
+@@ -3026,6 +3015,8 @@ static int gup_fast_pud_leaf(pud_t orig, pud_t *pudp, unsigned long addr,
+         }
+  
+         *nr += refs;
++       for (; refs; refs--)
++               *(pages++) = page++;
+         folio_set_referenced(folio);
+         return 1;
+  }
 
----
-  Documentation/devicetree/bindings/dpll/dpll-device.yaml  | 6 ++++++
-  Documentation/devicetree/bindings/net/network-class.yaml | 7 +++++++
-  2 files changed, 13 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/dpll/dpll-device.yaml 
-b/Documentation/devicetree/bindings/dpll/dpll-device.yaml
-index fb8d7a9a3693f..560351df1bec3 100644
---- a/Documentation/devicetree/bindings/dpll/dpll-device.yaml
-+++ b/Documentation/devicetree/bindings/dpll/dpll-device.yaml
-@@ -27,6 +27,12 @@ properties:
-    "#size-cells":
-      const: 0
+The nice thing is that we only record pages in the array if they actually passed our tests.
 
-+  "#dpll-cells":
-+    description: |
-+      Number of cells in a dpll specifier. The cell specifies the index
-+      of the channel within the DPLL device.
-+    const: 1
-+
-    dpll-types:
-      description: List of DPLL channel types, one per DPLL instance.
-      $ref: /schemas/types.yaml#/definitions/non-unique-string-array
-diff --git a/Documentation/devicetree/bindings/net/network-class.yaml 
-b/Documentation/devicetree/bindings/net/network-class.yaml
-index 06461fb92eb84..144badb3b7ff1 100644
---- a/Documentation/devicetree/bindings/net/network-class.yaml
-+++ b/Documentation/devicetree/bindings/net/network-class.yaml
-@@ -17,6 +17,13 @@ properties:
-      default: 48
-      const: 48
 
-+  dpll:
-+    description:
-+      Specifies DPLL device phandle and index of the DPLL channel within
-+      this device used by this network device to synchronize its hardware
-+      clock.
-+    $ref: /schemas/types.yaml#/definitions/phandle
-+
-    local-mac-address:
-      description:
-        Specifies MAC address that was assigned to the network device 
-described by
+-- 
+Cheers
+
+David / dhildenb
 
 
