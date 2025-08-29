@@ -1,116 +1,113 @@
-Return-Path: <netdev+bounces-218042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3893BB3AEF7
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 02:11:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B602B3AF11
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 02:25:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 790F81C87091
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 00:12:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69B363BEB55
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 00:25:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DF4A53A7;
-	Fri, 29 Aug 2025 00:10:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DE8414E2E2;
+	Fri, 29 Aug 2025 00:25:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="agrvXAPJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u/oWKLrG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5879BB652
-	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 00:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14AADEACD;
+	Fri, 29 Aug 2025 00:25:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756426217; cv=none; b=BbYRzsyMNObfwEXON7FFCRyzlU6yGzogkbUBxUJ5KvVlmlR9+xts/81dI1RLBRgGb0d5NWwsajnwMA/86rnAfE+3pkfIWVgG7RIMq5wPKduZhfDRiV6dg9+VAoR9I07z8yHz/FBlVWfD9CQRp8Qi2m3PJLrnI8AgRiSscVSqdRQ=
+	t=1756427133; cv=none; b=Y3OidowYLlk2UhQr4G3JgTclFGT2Uy/c7KsgdrIKNNctU8F1o8owmoPRKlswwhiPpu3qh4Y9Zf+468RWcRxH/zZ93srcEbcwIhyqGX84MEnOAAFcGpYQYU9XTao/NUx5Q/7oO9ozYg+hbr5xLMk3U8dRPZjxGs8G65AuyfSnXi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756426217; c=relaxed/simple;
-	bh=hONIgUn90JXmtJ/LcCcjDjmw9IerACNZrgqP7w+2R6A=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZPpQcBZ2FSkmPiXCAcVGK4dG/XVwKb/KjKFfBTCABe2GyQ5+c/0aiAAqupgvg7zRCqRFtAm7Nk414mAZHK7R2ouFMjGw9PcElOvkL9hMNY6Vr5pJa97I4aDU2JOn2sYegdi6kDfVBwvEJJL+ll68hpsUfdjN500AAtAtxjcNTwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=agrvXAPJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD45AC4CEF4;
-	Fri, 29 Aug 2025 00:10:14 +0000 (UTC)
+	s=arc-20240116; t=1756427133; c=relaxed/simple;
+	bh=mcyLCjBm9bl4ZY6mSMuRJ2uZCphNIYGX7Xvto/pbXbA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=C+FPksBdPDa7bFW3G9Qpj3IFIleRxE6UbFgngfVNN+KLFaiiRp3uL2NdJt0xRx7Mch7YuN7Kw2TCBvlGMs8j26+fY2OY2ITh2cPCgOl3TkAfYvba/XU40a0LwIQ/N2xiHNOr8edHTTwbCiWE58yDq7wcTrb+GlSc+OhR/vSHVaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u/oWKLrG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12DD3C4CEEB;
+	Fri, 29 Aug 2025 00:25:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756426214;
-	bh=hONIgUn90JXmtJ/LcCcjDjmw9IerACNZrgqP7w+2R6A=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=agrvXAPJpDuYO79Ew3dDuzbJ/UVmBofwsUOyugDhdXn98gG6h0n3FmF1K6etyjEOm
-	 mWhg7BIqN72uZ0e39n0Cl3nwIBsF7051Zs+2+mq9UjRPTvS3bHT0Veqwa/ajVi9gsd
-	 sndGV+QXIyS8+t6NQTHANwIM9iuCtESNuBcCf1iW68cAPsisiHXSqNHt/pNC5QVIoN
-	 +YbhFB8aqfe/D3PgaW3nuzGJ82ebsGd4f/Mt/GmMpgmUym5/Fj+V/pLSu7jDBWlOcm
-	 ZPHuBpzbP2qCYmS1uoc0LCcvEFch8ifEGJu8ev4meVotePVGvDjPbmc+ICjfzinmak
-	 7MD/U0ZmRwzBQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADE5383BF75;
-	Fri, 29 Aug 2025 00:10:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1756427131;
+	bh=mcyLCjBm9bl4ZY6mSMuRJ2uZCphNIYGX7Xvto/pbXbA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=u/oWKLrG9w8tVTD1fZ8iHMCTnvOpAvWDeHA6QKVbOxI5z3EsWkKOYpx+/EqygyXxT
+	 JfsI9TgIRVHKumF8STASk0xFgWojfw7Ae2CzWwD/2Q2uuHXJXzQ2WP0cdMy2yD417H
+	 CsBjZQp1WYO2XyxCtl17k56mMmCMHv9CfhW9EaopZS9VGhmJpwlMecnpjR6PhtJ/fj
+	 GrN7kYbeVhnoRdeSLtAXW1b3kHoiS9DAKmAaknHskX5SZxQCo9ZS9tNyBpYomI4Vyl
+	 stc7Srggmoj/YULxsLdMf7tTageVur4W6TC/Wx9ff7SP+zxWQrvIoTZdLNEPK/uv1q
+	 9GQe8IoL25fMw==
+Message-ID: <423566a0-5967-488d-a62a-4f825ae6f227@kernel.org>
+Date: Fri, 29 Aug 2025 09:22:30 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/12][pull request] ice: split ice_virtchnl.c
- git-blame friendly way
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175642622175.1655896.9938957913462315548.git-patchwork-notify@kernel.org>
-Date: Fri, 29 Aug 2025 00:10:21 +0000
-References: <20250827224641.415806-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20250827224641.415806-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
- przemyslaw.kitszel@intel.com, gregkh@linuxfoundation.org, sashal@kernel.org,
- kuniyu@google.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 24/36] ata: libata-eh: drop nth_page() usage within SG
+ entry
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Niklas Cassel <cassel@kernel.org>,
+ Alexander Potapenko <glider@google.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
+ Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+ iommu@lists.linux.dev, io-uring@vger.kernel.org,
+ Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
+ Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
+ kasan-dev@googlegroups.com, kvm@vger.kernel.org,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
+ linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, Marco Elver <elver@google.com>,
+ Marek Szyprowski <m.szyprowski@samsung.com>, Michal Hocko <mhocko@suse.com>,
+ Mike Rapoport <rppt@kernel.org>, Muchun Song <muchun.song@linux.dev>,
+ netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
+ Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
+ Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
+ virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
+ wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
+References: <20250827220141.262669-1-david@redhat.com>
+ <20250827220141.262669-25-david@redhat.com>
+ <7612fdc2-97ff-4b89-a532-90c5de56acdc@lucifer.local>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <7612fdc2-97ff-4b89-a532-90c5de56acdc@lucifer.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Przemek Kitszel <przemyslaw.kitszel@intel.com>:
-
-On Wed, 27 Aug 2025 15:46:15 -0700 you wrote:
-> Przemek Kitszel says:
+On 8/29/25 2:53 AM, Lorenzo Stoakes wrote:
+> On Thu, Aug 28, 2025 at 12:01:28AM +0200, David Hildenbrand wrote:
+>> It's no longer required to use nth_page() when iterating pages within a
+>> single SG entry, so let's drop the nth_page() usage.
+>>
+>> Cc: Damien Le Moal <dlemoal@kernel.org>
+>> Cc: Niklas Cassel <cassel@kernel.org>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
 > 
-> Split ice_virtchnl.c into two more files (+headers), in a way
-> that git-blame works better.
-> Then move virtchnl files into a new subdir.
-> No logic changes.
+> LGTM, so:
 > 
-> [...]
+> Reviewed-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
 
-Here is the summary with links:
-  - [net-next,01/12] ice: add virt/ and move ice_virtchnl* files there
-    https://git.kernel.org/netdev/net-next/c/5de6c855e23e
-  - [net-next,02/12] ice: split queue stuff out of virtchnl.c - tmp rename
-    https://git.kernel.org/netdev/net-next/c/1948b867c1cc
-  - [net-next,03/12] ice: split queue stuff out of virtchnl.c - copy back
-    https://git.kernel.org/netdev/net-next/c/879753f3954f
-  - [net-next,04/12] ice: extract virt/queues.c: cleanup - p1
-    https://git.kernel.org/netdev/net-next/c/ce5c0fd759c6
-  - [net-next,05/12] ice: extract virt/queues.c: cleanup - p2
-    https://git.kernel.org/netdev/net-next/c/3061d214eead
-  - [net-next,06/12] ice: extract virt/queues.c: cleanup - p3
-    https://git.kernel.org/netdev/net-next/c/cfee454ca111
-  - [net-next,07/12] ice: finish virtchnl.c split into queues.c
-    https://git.kernel.org/netdev/net-next/c/c762b0a537ac
-  - [net-next,08/12] ice: split RSS stuff out of virtchnl.c - tmp rename
-    https://git.kernel.org/netdev/net-next/c/f4e667eb2ab8
-  - [net-next,09/12] ice: split RSS stuff out of virtchnl.c - copy back
-    https://git.kernel.org/netdev/net-next/c/2802bb558e08
-  - [net-next,10/12] ice: extract virt/rss.c: cleanup - p1
-    https://git.kernel.org/netdev/net-next/c/4c2ce64efd0d
-  - [net-next,11/12] ice: extract virt/rss.c: cleanup - p2
-    https://git.kernel.org/netdev/net-next/c/270251b946a9
-  - [net-next,12/12] ice: finish virtchnl.c split into rss.c
-    https://git.kernel.org/netdev/net-next/c/e0d2795ab48f
+Just noticed this:
 
-You are awesome, thank you!
+s/libata-eh/libata-sff
+
+in the commit title please.
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Damien Le Moal
+Western Digital Research
 
