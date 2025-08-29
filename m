@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-218278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13382B3BBE8
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 15:04:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 240FCB3BBE9
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 15:04:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBB3E1CC1D40
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 13:04:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3315587918
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 13:04:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19F3A30BB8E;
-	Fri, 29 Aug 2025 13:02:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB66F305E2E;
+	Fri, 29 Aug 2025 13:03:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C08131B108;
-	Fri, 29 Aug 2025 13:02:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BDA91D61BB;
+	Fri, 29 Aug 2025 13:03:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756472566; cv=none; b=TuwhFHw5Wn1DpmcSjNJ4F6egZq2+ODrR0yCvYNmpcNxuQvq43uHKYNPlAqENbzqg+u9SplUEDbFGfAXB/T7Y/OORxYt3KWHg2zLqz/Hml9pNXHELFjvD1TStPUw5MffNp+pj2mB2gTEr4y5Xnx4q5No6Ttr64gY17x+dS3o4RkI=
+	t=1756472633; cv=none; b=IrlbAv4UIA6CUPwJXWJPwlnLesOySB+8PqJkw7hrQIgUxypthboH2AAxqp+OYifOrOzMIrvrFnrd3HdC4T1iSgtrZ9NFhtkHMANq73hnHq7kLwkoUJje3ThJBMNTwHgjBTdWrxpZ3s2pp8kY0+GatSr8XBmuBrFENPdq3MyoqL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756472566; c=relaxed/simple;
-	bh=18YuY03S+fhSAbPALzeKvscVxFN+oz/sYwJRuflcIaM=;
+	s=arc-20240116; t=1756472633; c=relaxed/simple;
+	bh=+0nKPb5sGlb5K3Y7fpssRwaLfF6xDFh17CMAcNt4u3I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DQjvsrDu+oJcLijOgDu/+7iICsTPZ/9nGAz9fD4z3rlHb+mgOHGal2uyymTJHoF04NWUkLunBZ9ZCGywQB/XNhR5zDYP47LEK12huZR3ShniJJDkHfE6vNOn0U7GeYGiAoFf3q+x+UnsJO2ZtLtEPNCXFeTjqNbIqgT0jG+fDNs=
+	 Content-Type:Content-Disposition:In-Reply-To; b=dO/qaPGeXydbbVHywg5cjQdAmaSgw/z4leA5ui9R0WkuOGqzw0h7B0ny/IxhXpDwOeySSl2WLUUCnRni4EMdA99ALOLBaP58QX6wzkAx6AgTnjSKdADMbTh3/6p5u8xXBk/oja5a3jfxViWj1AmLGFP+/HrSkMhD3RwABWbaAeM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,9 +33,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1urykZ-000000002BH-47PR;
-	Fri, 29 Aug 2025 13:02:40 +0000
-Date: Fri, 29 Aug 2025 14:02:36 +0100
+	id 1urylg-000000002Bv-0S5Q;
+	Fri, 29 Aug 2025 13:03:48 +0000
+Date: Fri, 29 Aug 2025 14:03:44 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -55,9 +55,9 @@ Cc: Andreas Schirm <andreas.schirm@siemens.com>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: [PATCH v3 6/6] net: dsa: lantiq_gswip: move MDIO bus registration to
- .setup()
-Message-ID: <634e645dc44c6e56fd5d8ff2e3b5e1c3fae02704.1756472076.git.daniel@makrotopia.org>
+Subject: Re: [PATCH v3 0/6] net: dsa: lantiq_gswip: prepare for supporting
+ MaxLinear GSW1xx
+Message-ID: <aLGlMJcEe7ZAfPFy@pidgin.makrotopia.org>
 References: <cover.1756472076.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -69,52 +69,35 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1756472076.git.daniel@makrotopia.org>
 
-Instead of registering the switch MDIO bus in the probe() function, move
-the call to gswip_mdio() into the .setup() DSA switch op, so it can be
-reused independently of the probe() function.
+On Fri, Aug 29, 2025 at 02:01:36PM +0100, Daniel Golle wrote:
+> Continue to prepare for supporting the newer standalone MaxLinear GSW1xx
+> switch family by extending the existing lantiq_gswip driver to allow it
+> to support MII interfaces and MDIO bus of the GSW1xx.
+> 
+> This series has been preceded by an RFC series which covers everything
+> needed to support the MaxLinear GSW1xx family of switches. Andrew Lunn
+> had suggested to split it into a couple of smaller series and start
+> with the changes which don't yet make actual functional changes or
+> support new features.
+> 
+> Everything has been compile and runtime tested on AVM Fritz!Box 7490
+> (GSWIP version 2.1, VR9 v1.2)
+> 
+> Link: https://lore.kernel.org/netdev/aKDhFCNwjDDwRKsI@pidgin.makrotopia.org/
+> 
+> v3: explicitly initialize mii_port_reg_offset to 0
+> v2: move lantiq_gswip driver to its own folder
+> 
+> Daniel Golle (6):
+>   net: dsa: lantiq_gswip: move to dedicated folder
+>   net: dsa: lantiq_gswip: support model-specific mac_select_pcs()
+>   net: dsa: lantiq_gswip: ignore SerDes modes in phylink_mac_config()
+>   net: dsa: lantiq_gswip: support offset of MII registers
+>   net: dsa: lantiq_gswip: support standard MDIO node name
+>   net: dsa: lantiq_gswip: move MDIO bus registration to .setup()
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Reviewed-by: Hauke Mehrtens <hauke@hauke-m.de>
----
-v3: no changes
-v2: no changes
+The whole series is intended for net-next, I messed up putting that into
+the subject line. Let me know if I should resend another time for that or
+if it is fine to go into net-next like that.
 
- drivers/net/dsa/lantiq/lantiq_gswip.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.c b/drivers/net/dsa/lantiq/lantiq_gswip.c
-index 2124ee061d05..1d9b9689ef9f 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip.c
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip.c
-@@ -627,6 +627,13 @@ static int gswip_setup(struct dsa_switch *ds)
- 	/* Configure the MDIO Clock 2.5 MHz */
- 	gswip_mdio_mask(priv, 0xff, 0x09, GSWIP_MDIO_MDC_CFG1);
- 
-+	/* bring up the mdio bus */
-+	err = gswip_mdio(priv);
-+	if (err) {
-+		dev_err(priv->dev, "mdio bus setup failed\n");
-+		return err;
-+	}
-+
- 	/* Disable the xMII interface and clear it's isolation bit */
- 	for (i = 0; i < priv->hw_info->max_ports; i++)
- 		gswip_mii_mask_cfg(priv,
-@@ -1973,13 +1980,6 @@ static int gswip_probe(struct platform_device *pdev)
- 					     "gphy fw probe failed\n");
- 	}
- 
--	/* bring up the mdio bus */
--	err = gswip_mdio(priv);
--	if (err) {
--		dev_err_probe(dev, err, "mdio probe failed\n");
--		goto gphy_fw_remove;
--	}
--
- 	err = dsa_register_switch(priv->ds);
- 	if (err) {
- 		dev_err_probe(dev, err, "dsa switch registration failed\n");
--- 
-2.51.0
 
