@@ -1,243 +1,179 @@
-Return-Path: <netdev+bounces-218326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75701B3BF3E
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 17:31:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30B25B3BF3F
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 17:31:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8AB87AA1CC
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 15:29:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F7EE1CC0C88
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 15:31:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC3331DFD8F;
-	Fri, 29 Aug 2025 15:31:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B04F12222A9;
+	Fri, 29 Aug 2025 15:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gpj+FF+1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BPH0PtLl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF2B3218A1
-	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 15:31:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09CC71FFC46;
+	Fri, 29 Aug 2025 15:31:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756481467; cv=none; b=YNChPyfN+XEp9hjHJH8Y3V8KmZInKtlx8Fq5aWHO5CP8J8Sx9LxhT0adg+PuPQ8pGaavDKbmilVJPegXE/4wrO/rFXaKChG/PQY0mtBVEiWhYG/+zeDpCDtPkr66T7DAMn6fVR6Fibo8wESYncrRVBtBkrT5T8/0fVBiIgpDt2c=
+	t=1756481472; cv=none; b=TZJOu1jSRQtZYfo1KNPUYulOqJ+K4qRs3SWFi6bdDuogyjQGDoLC//Pv6nRnEeMf19oIfOvrnibDV8Msgvx7DbKCwQ2M+hg38NWXp3huOnj4jZbkHi0PDjCq0TT/NL2eC3qt6l2GJvBEgDDA5QZiqkuVoZFF7gymPNByylrBQvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756481467; c=relaxed/simple;
-	bh=1hcRPk1i6D4WXWV1QXI13yPoQdLUktytM4rgtVd8uHU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ZLe60iS1MF9VjEKCqiHfy6ooQ3NTjA07VWG74prQYj8ZinHFaHnceMV0/DQYwlnZAV6yCgwr8Y+90NinniI0EkrqzVP9b+2r6/IxKBskkr1NW4e0PBKDfVT3kokrBAfuESI//y3xUkc93SL0jGZRvXWISXtS52uJLS03smrLTho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gpj+FF+1; arc=none smtp.client-ip=209.85.160.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-4b30fadc974so15032141cf.3
-        for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 08:31:05 -0700 (PDT)
+	s=arc-20240116; t=1756481472; c=relaxed/simple;
+	bh=cNuhgCQH45pDFYK27TItButjs7WXUbjpdGFncEFNkGc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=piUuzxvIWt2cGUKQll3Z5kLW7IKdbq7tJzSXUMhFH36wrWttwPzDw3pRC+2iwlZaq3wl0UGMMH2UYcxSX0NW/pbmgBDYhYZfWeNlWTgnKzuqdwVfM0cnk90jgSqQJAsWfNL3nGVIO5rh42hcMA7Ne3z70On4310j5Rux6gcv4fM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BPH0PtLl; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-71d603cebd9so21348357b3.1;
+        Fri, 29 Aug 2025 08:31:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756481465; x=1757086265; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Lr31YsQoaumMO8piNS8KLxamhAFr8Dc/oO7xxuADh0A=;
-        b=gpj+FF+16E4X34ZrrXFnbNuLki2vrRQCgdE4drQCL9XLlCmJUxU9PDXjxWSCBp9PUY
-         KWP6Cuh2svBo64WauVL05hDMEUAKFB4I07CU7Hcuu+mAghSa7wJn2KFEnbIfEhEeq579
-         HWECiAQX3C9/2K8fZg9b0Ks6ExuWnlx+uOaXzMHPL3Bps2XKXwdFMIJtFGuIpMF7LiBp
-         qyqg3wzTO7XL3gInw/bkdo4qx8B/40tRHnWWaDgq74KGw/hde20hUP9aSKhie204hp9X
-         gcUwRe+UtQfIAl1NowIjV9pJNYI0oylKHv7aw5GJ7TJq9mRvqAZuSROEshY9EXIo127H
-         hg6g==
+        d=gmail.com; s=20230601; t=1756481470; x=1757086270; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cNuhgCQH45pDFYK27TItButjs7WXUbjpdGFncEFNkGc=;
+        b=BPH0PtLlmlWikup4C6E/bqfBrWkHb8fO209MqG/ME2HiS+LpaExttuRtAQ04gMlSvw
+         zjev90rnJB6YTJ1Re+VyR2WR2m4PGXfJKKMJqYXvZ8u+t5VFJqT3Kj/sUp9DJE02gJeY
+         9f0baZsehBJKsG3/iburqCqWUJZbT7yxpA/rnTqDg2rpGyHZoh3oJ6tJNi7Zfi0Fkiuk
+         PGxd6HsoW93NwqfbrfOwxuyTatxKVuDdX97c3Whw22rDb1jglyj7Q1I/cHAIaN6hEXeo
+         J1ZQY1jIt/gUdB05LYjE0r38uk7Id+5MonWVrCHa0YFZyBF2LcnQ90xiF4VagYuMBtEa
+         C+1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756481465; x=1757086265;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Lr31YsQoaumMO8piNS8KLxamhAFr8Dc/oO7xxuADh0A=;
-        b=nXoMqfPToRDrG+4immgI14C7lKbJCQJCRkIDKIt18JJ5ZYHFz2yOaYrpTf0tmiIHOy
-         SQWbSMbsUGHWkOZsJ5jXsADauB+iB/gtNbY/7PJnEYModnS5B3h9axNroPuzWqh/j3TR
-         fIJN7R+ubvtMDGVTG4Qyz0+6x1IyBG+POJRyDpreaMU84Gk+i/tVrhypOQvZ+VcaAgTd
-         evp976OnruhvGcI83fzPKQLjtQuZ1pmPw6AISiXi/6ambK2R9uropouRIHkuupuhCqKM
-         fHAv1pHrozHqI396mlWYOFYPZsTulmQ8EzsiEqZtSplfesdIXMjzDyD9qnxOMhgUhZAW
-         rn7A==
-X-Forwarded-Encrypted: i=1; AJvYcCVWxgJN9QUkc7aVc2KzgzmARcr8G5nOUr61RT9xx0l1WN1WCe32hEpJ5ouK3PqwQrg/tefkHys=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEf5eK+XB64KNovxke2D6E7rtrj1JflzRK3yDAAHTD4b9P7K+g
-	eT1CfgyxA0UFMsdvIV5SAatV3ig6pMOY4KQabEkqRSg8zYQ0ieAjzLTFCJEdj9xTyWvo31vr0G0
-	uT6A//bh6Pdejcw==
-X-Google-Smtp-Source: AGHT+IH6aq5mYLx2r9g58eFe2P6onGPcZxRYo6YYYqR7HLUBZ9Qv0bNP+N6ISGtG+j9fi0c38WVwXmMELA896g==
-X-Received: from qknqf10.prod.google.com ([2002:a05:620a:660a:b0:7fa:c1b0:4f8])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:4c14:b0:4b3:138b:a3c6 with SMTP id d75a77b69052e-4b3138bacd0mr20083501cf.11.1756481464850;
- Fri, 29 Aug 2025 08:31:04 -0700 (PDT)
-Date: Fri, 29 Aug 2025 15:30:54 +0000
-In-Reply-To: <20250829153054.474201-1-edumazet@google.com>
+        d=1e100.net; s=20230601; t=1756481470; x=1757086270;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cNuhgCQH45pDFYK27TItButjs7WXUbjpdGFncEFNkGc=;
+        b=EmJFKto5ciE/Xb4NXuBpFfirVAe1bXxZIUpxD5HF2zVxTM9iXjGMBdRJmTXb3vUxy9
+         PdSn7UQdGfW+90DJuGmul0jaRTTKcR9dGQ0WkXLBsx6dclqr01B8sQYYP+ynx4NU8SnF
+         /6XtgNVo+tihNTvLHtD0vaKL6H8G3jtIPQa7TpIbz1QcLBWcB8wacbp70RSlZGdTsuQ9
+         3ZWlmbp32zgnWWfJPDjDB4TbXnQaRPmu62ZD1JApBTPbKCQQOdtMX5uueZe1Osuox9Hd
+         Opj//Aa2PgV3Why6FmvzV4TxzLQfpXCVLZNI9tlIPGOnGEUrEK75cGXmYymqeXDhcPSq
+         wOAg==
+X-Forwarded-Encrypted: i=1; AJvYcCU8nzAYLxxxP9dEeY4XzxdOuYli3wpw9YpOYfFCyGdyx6tmrrTfRP9f6M6A6Yj5pgYbYncNpM5WCl9oQ8Y=@vger.kernel.org, AJvYcCV3VXEforguEEOGpF4w8GOB0iSfJbBLLX/ZjoXFys601hqlHqmYMkM7zKY4TBxwMTrdZXNEqCI8Wgeg@vger.kernel.org, AJvYcCVvH6bxl3axNbUIQjeu5pux2FYy6ePgIGR82nAFZbQGpOSmrnIaCp6GOC3gl8uT/7ZF0awFjptb@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8YNx6d+veB0LmRxI48UUq2GxVftwLB5de81KXnW98qNA1t/dV
+	hwspwnYBFaDILE2ljvG0p5mTEzfImWZaUAWQBGL69KcjgJYkBwijRUcgZCbS6B0l/8G5hOGfFrA
+	wJR3gYhmFqKuDjuV4mombcXw2rmyjjU0=
+X-Gm-Gg: ASbGnctghsJMcmFgJU3EC9Qfhtauu3omWFFvGLq0963ORRIFiB7X6pdgqSvls4LV+im
+	IGfZULhh/YKGRRelch0h3OCipQs/Gae5+p0l22QICAsmeYrYtTgrgK5WgQMyUjmhgem9DNGpM7Q
+	EBSgbWNPw/olvJ+2FxeDMeMmcc1UlN2OioTFKk3oU+xx8exS0hBrSPR/oCL1d+OiJNiXAZ1dOz9
+	5B6Zts+eyPOS/9SJXwEqscSTSYcTIIQbxtqGnyQKKZGbrLJsA==
+X-Google-Smtp-Source: AGHT+IHIxVY8ixW3N77AaSLxKCp74/xP+r4ANXHCz2RBpL+6X2caBUkQ/hXqYMB2k0RZrwev7hIP+1Nsfezz9z244vY=
+X-Received: by 2002:a05:690c:250a:b0:721:369e:44f3 with SMTP id
+ 00721157ae682-721369e654amr162298947b3.47.1756481469830; Fri, 29 Aug 2025
+ 08:31:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250829153054.474201-1-edumazet@google.com>
-X-Mailer: git-send-email 2.51.0.318.gd7df087d1a-goog
-Message-ID: <20250829153054.474201-5-edumazet@google.com>
-Subject: [PATCH v3 net-next 4/4] inet: ping: use EXPORT_IPV6_MOD[_GPL]()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+MIME-Version: 1.0
+References: <CAPB3MF5apjd502qpepf8YnFhJuQoFy414u8p=K1yKxr3_FJsOg@mail.gmail.com>
+In-Reply-To: <CAPB3MF5apjd502qpepf8YnFhJuQoFy414u8p=K1yKxr3_FJsOg@mail.gmail.com>
+From: Qingfang Deng <dqfext@gmail.com>
+Date: Fri, 29 Aug 2025 23:30:57 +0800
+X-Gm-Features: Ac12FXx1IP5Bh0MdTYiC7LoDxPPojbznDNEZSfwmjdq_CYepOlXZWFtKcN7X1SE
+Message-ID: <CALW65jY4MBCwt=XdzObMQBzN5FgtWjd=XrMBGDHQi9uuknK-og@mail.gmail.com>
+Subject: Re: [Regression Bug] Re: [PATCH net v3 2/2] ppp: fix race conditions
+ in ppp_fill_forward_path
+To: cam enih <nanericwang@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, kuniyu@google.com, linux-kernel@vger.kernel.org, 
+	linux-ppp@vger.kernel.org, nbd@nbd.name, netdev@vger.kernel.org, 
+	pabeni@redhat.com, pablo@netfilter.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-There is no neeed to export ping symbols when CONFIG_IPV6=y
+Hi Eric,
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv4/ping.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+On Fri, Aug 29, 2025 at 9:05=E2=80=AFPM cam enih <nanericwang@gmail.com> wr=
+ote:
+>
+> Hi all,
+> Having upgraded from 6.12.43 to 6.12.44, my kernel crashed at early boot.=
+ The root cause is most likely related to the commit 94731cc551e29511d85aa8=
+dec61a6c071b1f2430 (Fixes: f6efc675c9dd ("net: ppp: resolve forwarding path=
+ for bridge pppoe devices")). Please confirm, thanks.
 
-diff --git a/net/ipv4/ping.c b/net/ipv4/ping.c
-index 98ccd4f9ed657d2bb9c013932d0c678f2b38a746..5321c5801c64dd2c20ba94fdcb5a677da4be02d7 100644
---- a/net/ipv4/ping.c
-+++ b/net/ipv4/ping.c
-@@ -56,7 +56,7 @@ struct ping_table {
- 
- static struct ping_table ping_table;
- struct pingv6_ops pingv6_ops;
--EXPORT_SYMBOL_GPL(pingv6_ops);
-+EXPORT_IPV6_MOD_GPL(pingv6_ops);
- 
- static inline u32 ping_hashfn(const struct net *net, u32 num, u32 mask)
- {
-@@ -139,7 +139,7 @@ int ping_get_port(struct sock *sk, unsigned short ident)
- 	spin_unlock(&ping_table.lock);
- 	return -EADDRINUSE;
- }
--EXPORT_SYMBOL_GPL(ping_get_port);
-+EXPORT_IPV6_MOD_GPL(ping_get_port);
- 
- void ping_unhash(struct sock *sk)
- {
-@@ -154,7 +154,7 @@ void ping_unhash(struct sock *sk)
- 	}
- 	spin_unlock(&ping_table.lock);
- }
--EXPORT_SYMBOL_GPL(ping_unhash);
-+EXPORT_IPV6_MOD_GPL(ping_unhash);
- 
- /* Called under rcu_read_lock() */
- static struct sock *ping_lookup(struct net *net, struct sk_buff *skb, u16 ident)
-@@ -274,7 +274,7 @@ int ping_init_sock(struct sock *sk)
- 	put_group_info(group_info);
- 	return ret;
- }
--EXPORT_SYMBOL_GPL(ping_init_sock);
-+EXPORT_IPV6_MOD_GPL(ping_init_sock);
- 
- void ping_close(struct sock *sk, long timeout)
- {
-@@ -284,7 +284,7 @@ void ping_close(struct sock *sk, long timeout)
- 
- 	sk_common_release(sk);
- }
--EXPORT_SYMBOL_GPL(ping_close);
-+EXPORT_IPV6_MOD_GPL(ping_close);
- 
- static int ping_pre_connect(struct sock *sk, struct sockaddr *uaddr,
- 			    int addr_len)
-@@ -462,7 +462,7 @@ int ping_bind(struct sock *sk, struct sockaddr *uaddr, int addr_len)
- 	pr_debug("ping_v4_bind -> %d\n", err);
- 	return err;
- }
--EXPORT_SYMBOL_GPL(ping_bind);
-+EXPORT_IPV6_MOD_GPL(ping_bind);
- 
- /*
-  * Is this a supported type of ICMP message?
-@@ -595,7 +595,7 @@ void ping_err(struct sk_buff *skb, int offset, u32 info)
- out:
- 	return;
- }
--EXPORT_SYMBOL_GPL(ping_err);
-+EXPORT_IPV6_MOD_GPL(ping_err);
- 
- /*
-  *	Copy and checksum an ICMP Echo packet from user space into a buffer
-@@ -625,7 +625,7 @@ int ping_getfrag(void *from, char *to,
- 
- 	return 0;
- }
--EXPORT_SYMBOL_GPL(ping_getfrag);
-+EXPORT_IPV6_MOD_GPL(ping_getfrag);
- 
- static int ping_v4_push_pending_frames(struct sock *sk, struct pingfakehdr *pfh,
- 				       struct flowi4 *fl4)
-@@ -686,7 +686,7 @@ int ping_common_sendmsg(int family, struct msghdr *msg, size_t len,
- 
- 	return 0;
- }
--EXPORT_SYMBOL_GPL(ping_common_sendmsg);
-+EXPORT_IPV6_MOD_GPL(ping_common_sendmsg);
- 
- static int ping_v4_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- {
-@@ -931,7 +931,7 @@ int ping_recvmsg(struct sock *sk, struct msghdr *msg, size_t len, int flags,
- 	pr_debug("ping_recvmsg -> %d\n", err);
- 	return err;
- }
--EXPORT_SYMBOL_GPL(ping_recvmsg);
-+EXPORT_IPV6_MOD_GPL(ping_recvmsg);
- 
- static enum skb_drop_reason __ping_queue_rcv_skb(struct sock *sk,
- 						 struct sk_buff *skb)
-@@ -952,7 +952,7 @@ int ping_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
- {
- 	return __ping_queue_rcv_skb(sk, skb) ? -1 : 0;
- }
--EXPORT_SYMBOL_GPL(ping_queue_rcv_skb);
-+EXPORT_IPV6_MOD_GPL(ping_queue_rcv_skb);
- 
- 
- /*
-@@ -980,7 +980,7 @@ enum skb_drop_reason ping_rcv(struct sk_buff *skb)
- 	kfree_skb_reason(skb, SKB_DROP_REASON_NO_SOCKET);
- 	return SKB_DROP_REASON_NO_SOCKET;
- }
--EXPORT_SYMBOL_GPL(ping_rcv);
-+EXPORT_IPV6_MOD_GPL(ping_rcv);
- 
- struct proto ping_prot = {
- 	.name =		"PING",
-@@ -1002,7 +1002,7 @@ struct proto ping_prot = {
- 	.put_port =	ping_unhash,
- 	.obj_size =	sizeof(struct inet_sock),
- };
--EXPORT_SYMBOL(ping_prot);
-+EXPORT_IPV6_MOD(ping_prot);
- 
- #ifdef CONFIG_PROC_FS
- 
-@@ -1067,7 +1067,7 @@ void *ping_seq_start(struct seq_file *seq, loff_t *pos, sa_family_t family)
- 
- 	return *pos ? ping_get_idx(seq, *pos-1) : SEQ_START_TOKEN;
- }
--EXPORT_SYMBOL_GPL(ping_seq_start);
-+EXPORT_IPV6_MOD_GPL(ping_seq_start);
- 
- static void *ping_v4_seq_start(struct seq_file *seq, loff_t *pos)
- {
-@@ -1086,14 +1086,14 @@ void *ping_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- 	++*pos;
- 	return sk;
- }
--EXPORT_SYMBOL_GPL(ping_seq_next);
-+EXPORT_IPV6_MOD_GPL(ping_seq_next);
- 
- void ping_seq_stop(struct seq_file *seq, void *v)
- 	__releases(ping_table.lock)
- {
- 	spin_unlock(&ping_table.lock);
- }
--EXPORT_SYMBOL_GPL(ping_seq_stop);
-+EXPORT_IPV6_MOD_GPL(ping_seq_stop);
- 
- static void ping_v4_format_sock(struct sock *sp, struct seq_file *f,
- 		int bucket)
--- 
-2.51.0.318.gd7df087d1a-goog
+Does this happen only if you set up a PPPoE connection?
 
+>
+> -Eric
+>
+> ```
+> Aug 29 20:36:16 localhost kernel: NET: Registered PF_PPPOX protocol famil=
+y
+> Aug 29 20:36:17 localhost systemd-networkd[266]: Failed to parse hostname=
+, ignoring: Invalid argument
+> Aug 29 20:36:17 localhost systemd-networkd[266]: br0: DHCPv4 server: DISC=
+OVER (0xebeec00c)
+> Aug 29 20:36:17 localhost kernel: BUG: kernel NULL pointer dereference, a=
+ddress: 0000000000000058
+> Aug 29 20:36:17 localhost kernel: #PF: supervisor read access in kernel m=
+ode
+> Aug 29 20:36:17 localhost kernel: #PF: error_code(0x0000) - not-present p=
+age
+> Aug 29 20:36:17 localhost kernel: PGD 0 P4D 0
+> Aug 29 20:36:17 localhost kernel: Oops: Oops: 0000 [#1] PREEMPT_RT SMP
+> Aug 29 20:36:17 localhost kernel: CPU: 1 UID: 981 PID: 266 Comm: systemd-=
+network Not tainted 6.12.44-xanmod1-1-lts #1
+
+Looks like it's a downstream fork:
+https://gitlab.com/xanmod/linux/-/releases/6.12.44-xanmod1
+Have you reported to them too?
+
+> Aug 29 20:36:17 localhost kernel: Hardware name: Default string Default s=
+tring/Default string, BIOS 5.19 03/30/2021
+> Aug 29 20:36:17 localhost kernel: RIP: 0010:0xffffffffb32b2f6c
+> Aug 29 20:36:17 localhost kernel: Code: 85 8e 01 00 00 48 8b 44 24 08 48 =
+8b 40 30 65 48 03 05 48 26 d6 4c e9 f0 fd ff ff e8 5e 9c c1 ff e9 ca fc ff =
+ff 49 8b 44 24 18 <48> 8b 40 58 48 3d 00 e3 65 b3 0f 84 0f 01 00 00 48 89 c=
+2 48 8d 78
+> Aug 29 20:36:17 localhost kernel: RSP: 0018:ffff9bd080c778d8 EFLAGS: 0001=
+0246
+> Aug 29 20:36:17 localhost kernel: RAX: 0000000000000000 RBX: ffff9bd080c7=
+7a00 RCX: 0000000000000001
+> Aug 29 20:36:17 localhost kernel: RDX: 0000000000000000 RSI: 000000000002=
+a424 RDI: ffffffffb38b6040
+> Aug 29 20:36:17 localhost kernel: RBP: ffff999345ad1000 R08: 000000000000=
+0003 R09: 0000000000000000
+> Aug 29 20:36:17 localhost kernel: R10: ffff999342eb7900 R11: 000000000000=
+0000 R12: ffff9bd080c77948
+> Aug 29 20:36:17 localhost kernel: R13: 0000000000000008 R14: 000000000000=
+0000 R15: 0000000090000000
+> Aug 29 20:36:17 localhost kernel: FS: 00007fc0bab148c0(0000) GS:ffff9994b=
+7d00000(0000) knlGS:0000000000000000
+> Aug 29 20:36:17 localhost kernel: CS: 0010 DS: 0000 ES: 0000 CR0: 0000000=
+080050033
+> Aug 29 20:36:17 localhost kernel: CR2: 0000000000000058 CR3: 000000010b43=
+8006 CR4: 0000000000b70ef0
+> Aug 29 20:36:17 localhost kernel: Call Trace:
+> Aug 29 20:36:17 localhost kernel: <TASK>
+> Aug 29 20:36:17 localhost kernel: ? 0xffffffffb321d725
+> Aug 29 20:36:17 localhost kernel: 0xffffffffb32b4197
+> Aug 29 20:36:17 localhost kernel: 0xffffffffb32f5d6c
+> Aug 29 20:36:17 localhost kernel: ? 0xffffffffb32b8c40
+> Aug 29 20:36:17 localhost kernel: ? 0xffffffffb3212da5
+> Aug 29 20:36:17 localhost kernel: 0xffffffffb3212da5
+> Aug 29 20:36:17 localhost kernel: 0xffffffffb32131ea
+> Aug 29 20:36:17 localhost kernel: 0xffffffffb32152ea
+> Aug 29 20:36:17 localhost kernel: 0xffffffffb3364479
+> Aug 29 20:36:17 localhost kernel: ? 0xffffffffb3364485
+> Aug 29 20:36:17 localhost kernel: ? 0xffffffffb3215617
+> Aug 29 20:36:17 localhost kernel: ? 0xffffffffb2f2cd31
+> Aug 29 20:36:17 localhost kernel: ? 0xffffffffb33684f7
+> Aug 29 20:36:17 localhost kernel: 0xffffffffb34000b0
+
+Do they have a debug kernel image with KALLSYMS, so I won't be looking
+at some random hex?
+
+Thanks
+- Qingfang
 
