@@ -1,131 +1,252 @@
-Return-Path: <netdev+bounces-218288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 636F9B3BC77
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 15:23:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F728B3BC85
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 15:29:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B52A188B7CF
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 13:23:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9F4D3B4327
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 13:29:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3993631A07F;
-	Fri, 29 Aug 2025 13:22:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6230431A57B;
+	Fri, 29 Aug 2025 13:29:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AKv9Q4ft"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87E572EE26D
-	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 13:22:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B47772F069C
+	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 13:29:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756473753; cv=none; b=p+jdGpW+mfJyQRJVM4XdQ6iA9Jr+B5qi1YIywB0t4sCmJr3M3XHyxH3VmN19G6PjDGzmaTmthjNN1ykaUFvjtAV39fqO+55NJ5eMyCcRT6wCJuxeSgn0Pr4xyfOJA2pIS6MN4MWSLVvlQCNIwlGqvO1qJe2sFF+EM0Or3oJPerU=
+	t=1756474171; cv=none; b=FWeDRDu7apltSwSsNflaihYEfoYsu6+4UWnq0X+ByCBvX0ByVBH12dw6WXLwGwLvdnE3J8IGMuMpIx+Em9doKKiYGcYYz87aDpX51Z95T/A3aSvBSc8ekncWcsBkz+BEitwh3mc4Mknx31FjhiNiGOm35p1IudGtJZ+cst2gGu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756473753; c=relaxed/simple;
-	bh=dF8o7y6dl4+JnyO9dE1Udt1otgaXHZOQv0HSPVpJmEw=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=YXSMGM4P7ciWqwfq0tY7lLKE6WGvtTF5IxhIw2yVovqEbvHa7jODvaNBWBCC2uGAtA46PXjmUR46ha8JrsdRnYhQW1HlDT4HiD1S0lFBmGElcfHEUwuCjkRvYFih2irNj0CoQRXf5hy3pBoN+XDob+vlj8uPIn0b7+8yw0MkKT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-8870314a3afso193249539f.1
-        for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 06:22:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756473750; x=1757078550;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aDAZdlJt3qT79STyvS1hlaICocSeAh5xbgbdDljA5ks=;
-        b=IWHSZTTMO5OA2DEAaMPfikXHhrHQQIH2EsDjLGSXrxsXmiUdTDS38TKTfXB2bdyjwo
-         0LAnZKkwgV99trQUIxvFxgIuG9S5+4RiUlZve7A6xqfghFgxhtPIf7xwI9J+1b9uwsF1
-         a+LxEU25wuSUeScK7nZhZJKmNdrakufRAVKmjR8Hbq1xw5sc3T+EcY4InE35fp3NaUzn
-         xvqnL3T8Xgh/jcNzKU9QrivVJInzdD1JFOTyogIYwmrTuLVDtntuAmIr+JhtCtHg84j5
-         R/+BhaEggzEcJgotU+8+TWLWN9ZGnlKVLSV3gMHYnCGFPPlIP3UO93D8hCRDC+MY6vGR
-         GQ8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXhK0UWYamKfnY973RSIIXiRsUnA/AmHj9bTghx6uWKaIgkxwg5qLMj4+PlCRGZk8rwjpVRnf8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzIDg0k26MenEl76Y5MPPf2P0FjuMgNe44lGrzPIbKVNAmpMJ5E
-	22S30cqm8ZZDhgO20OnYIIzFNAnk4xi7wBy0uWWBRqPk6Ia/YLqOb9Npx6X84e/xXSTHYHlREc2
-	ejh8llO3Fp9FqZeZFDUOy130zDXSpAmyPgHE46fNEFtnRzsPReIrzTSPzcjI=
-X-Google-Smtp-Source: AGHT+IHqmTnM8uXeRk/Ah/oFyiW5/RhN5JM4sYIaIubGwHhZSFgk0akvubyrQZiCzZawkWAUt58OpVXHNswCj/gG12fjE8jp8Qy5
+	s=arc-20240116; t=1756474171; c=relaxed/simple;
+	bh=knOkve9KJ6aDZa9cI8V8ayiO/Btg8paML35UfEGiBTs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bi6tdh2uUK+2FhVNhnBlu4fU1IM/0lOQOiZmjPMUMCY7a+J6jJIPXUspiDplCqwld0orDqyKih05VxOHNOZaearwvpgNu+jvvA+0yIntepB3VWKcqUYQmFLx+gZ19i9r4OxZ9RzSFOrEQWevvqKG8TFhRZO7enyYeYRlipmqynw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AKv9Q4ft; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756474168;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Y5xCVHj/t6FV37rBGnYXOrcnRWfi0Bqvu58jEXvy/kk=;
+	b=AKv9Q4fti/MxQ/3w7FfoZZey/vc2cxaxgdF/UfDncNZZ54IBtXcQBBUHewD2DuMXSgDiDa
+	aRHC/0A99Lqp8fPhAjErsgv5F6ke0qPFBPmpym+TT08SW6j+TBJ23v2hx4R7k09eeEipBg
+	nCbmYaFLc/IZ6aOjmQpjoveM2pLTkUg=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-604-bwUiLHz3NvykS1iWwDEgDg-1; Fri,
+ 29 Aug 2025 09:29:23 -0400
+X-MC-Unique: bwUiLHz3NvykS1iWwDEgDg-1
+X-Mimecast-MFC-AGG-ID: bwUiLHz3NvykS1iWwDEgDg_1756474161
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1CCA11956089;
+	Fri, 29 Aug 2025 13:29:21 +0000 (UTC)
+Received: from [10.45.224.190] (unknown [10.45.224.190])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 02E7C19560B4;
+	Fri, 29 Aug 2025 13:29:16 +0000 (UTC)
+Message-ID: <5e38e1b7-9589-49a9-8f26-3b186f54c7d5@redhat.com>
+Date: Fri, 29 Aug 2025 15:29:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a0f:b0:3eb:8e5a:8fd7 with SMTP id
- e9e14a558f8ab-3eb8e5a9145mr297977055ab.11.1756473750663; Fri, 29 Aug 2025
- 06:22:30 -0700 (PDT)
-Date: Fri, 29 Aug 2025 06:22:30 -0700
-In-Reply-To: <68adf6fa.a70a0220.3cafd4.0000.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68b1a996.a70a0220.f8cc2.00ee.GAE@google.com>
-Subject: Re: [syzbot] [net?] WARNING in est_timer
-From: syzbot <syzbot+72db9ee39db57c3fecc5@syzkaller.appspotmail.com>
-To: bigeasy@linutronix.de, davem@davemloft.net, edumazet@google.com, 
-	eric.dumazet@gmail.com, horms@kernel.org, jhs@mojatatu.com, jiri@resnulli.us, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, xiyou.wangcong@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next] dt-bindings: dpll: Add per-channel Ethernet
+ reference property
+To: Rob Herring <robh@kernel.org>
+Cc: netdev@vger.kernel.org, mschmidt@redhat.com, poros@redhat.com,
+ Andrew Lunn <andrew@lunn.ch>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>,
+ "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+ <devicetree@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+References: <20250815144736.1438060-1-ivecera@redhat.com>
+ <20250820211350.GA1072343-robh@kernel.org>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <20250820211350.GA1072343-robh@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-syzbot has found a reproducer for the following issue on:
+Hi Rob,
 
-HEAD commit:    07d9df80082b Merge tag 'perf-tools-fixes-for-v6.17-2025-08..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=13d67262580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e1e1566c7726877e
-dashboard link: https://syzkaller.appspot.com/bug?extid=72db9ee39db57c3fecc5
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1141c262580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13f69262580000
+On 20. 08. 25 11:13 odp., Rob Herring wrote:
+> On Fri, Aug 15, 2025 at 04:47:35PM +0200, Ivan Vecera wrote:
+>> In case of SyncE scenario a DPLL channels generates a clean frequency
+>> synchronous Ethernet clock (SyncE) and feeds it into the NIC transmit
+>> path. The DPLL channel can be locked either to the recovered clock
+>> from the NIC's PHY (Loop timing scenario) or to some external signal
+>> source (e.g. GNSS) (Externally timed scenario).
+>>
+>> The example shows both situations. NIC1 recovers the input SyncE signal
+>> that is used as an input reference for DPLL channel 1. The channel locks
+>> to this signal, filters jitter/wander and provides holdover. On output
+>> the channel feeds a stable, phase-aligned clock back into the NIC1.
+>> In the 2nd case the DPLL channel 2 locks to a master clock from GNSS and
+>> feeds a clean SyncE signal into the NIC2.
+>>
+>> 		   +-----------+
+>> 		+--|   NIC 1   |<-+
+>> 		|  +-----------+  |
+>> 		|                 |
+>> 		| RxCLK     TxCLK |
+>> 		|                 |
+>> 		|  +-----------+  |
+>> 		+->| channel 1 |--+
+>> +------+	   |-- DPLL ---|
+>> | GNSS |---------->| channel 2 |--+
+>> +------+  RefCLK   +-----------+  |
+>> 				  |
+>> 			    TxCLK |
+>> 				  |
+>> 		   +-----------+  |
+>> 		   |   NIC 2   |<-+
+>> 		   +-----------+
+>>
+>> In the situations above the DPLL channels should be registered into
+>> the DPLL sub-system with the same Clock Identity as PHCs present
+>> in the NICs (for the example above DPLL channel 1 uses the same
+>> Clock ID as NIC1's PHC and the channel 2 as NIC2's PHC).
+>>
+>> Because a NIC PHC's Clock ID is derived from the NIC's MAC address,
+>> add a per-channel property 'ethernet-handle' that specifies a reference
+>> to a node representing an Ethernet device that uses this channel
+>> to synchronize its hardware clock. Additionally convert existing
+>> 'dpll-types' list property to 'dpll-type' per-channel property.
+>>
+>> Suggested-by: Andrew Lunn <andrew@lunn.ch>
+>> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+>> ---
+>>   .../devicetree/bindings/dpll/dpll-device.yaml | 40 ++++++++++++++++---
+>>   .../bindings/dpll/microchip,zl30731.yaml      | 29 +++++++++++++-
+>>   2 files changed, 62 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/Documentation/devicetree/bindings/dpll/dpll-device.yaml b/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+>> index fb8d7a9a3693f..798c5484657cf 100644
+>> --- a/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+>> +++ b/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+>> @@ -27,11 +27,41 @@ properties:
+>>     "#size-cells":
+>>       const: 0
+>>   
+>> -  dpll-types:
+>> -    description: List of DPLL channel types, one per DPLL instance.
+>> -    $ref: /schemas/types.yaml#/definitions/non-unique-string-array
+>> -    items:
+>> -      enum: [pps, eec]
+> 
+> Dropping this is an ABI change. You can't do that unless you are
+> confident there are no users both in existing DTs and OSs.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/cdf0bbb7922b/disk-07d9df80.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d1975bf771ed/vmlinux-07d9df80.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/942416e1bedd/bzImage-07d9df80.xz
+Get it, will keep.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+72db9ee39db57c3fecc5@syzkaller.appspotmail.com
+>> +  channels:
+>> +    type: object
+>> +    description: DPLL channels
+>> +    unevaluatedProperties: false
+>> +
+>> +    properties:
+>> +      "#address-cells":
+>> +        const: 1
+>> +      "#size-cells":
+>> +        const: 0
+>> +
+>> +    patternProperties:
+>> +      "^channel@[0-9a-f]+$":
+>> +        type: object
+>> +        description: DPLL channel
+>> +        unevaluatedProperties: false
+>> +
+>> +        properties:
+>> +          reg:
+>> +            description: Hardware index of the DPLL channel
+>> +            maxItems: 1
+>> +
+>> +          dpll-type:
+>> +            description: DPLL channel type
+>> +            $ref: /schemas/types.yaml#/definitions/string
+>> +            enum: [pps, eec]
+>> +
+>> +          ethernet-handle:
+>> +            description:
+>> +              Specifies a reference to a node representing an Ethernet device
+>> +              that uses this channel to synchronize its hardware clock.
+>> +            $ref: /schemas/types.yaml#/definitions/phandle
+> 
+> Seems a bit odd to me that the ethernet controller doesn't have a link
+> to this node instead.
 
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 16 at ./include/linux/seqlock.h:221 __seqprop_assert include/linux/seqlock.h:221 [inline]
-WARNING: CPU: 0 PID: 16 at ./include/linux/seqlock.h:221 est_timer+0x6dc/0x9f0 net/core/gen_estimator.c:93
-Modules linked in:
-CPU: 0 UID: 0 PID: 16 Comm: ktimers/0 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-RIP: 0010:__seqprop_assert include/linux/seqlock.h:221 [inline]
-RIP: 0010:est_timer+0x6dc/0x9f0 net/core/gen_estimator.c:93
-Code: ff c7 42 80 3c 23 00 74 08 4c 89 f7 e8 7d 35 41 f9 4d 89 3e 42 80 3c 23 00 0f 85 54 ff ff ff e9 57 ff ff ff e8 95 fd e1 f8 90 <0f> 0b 90 e9 63 fd ff ff 44 89 e1 80 e1 07 38 c1 0f 8c 65 fa ff ff
-RSP: 0018:ffffc900001577a0 EFLAGS: 00010246
-RAX: ffffffff88dc5ebb RBX: 0000000000000001 RCX: ffff88801ae85940
-RDX: 0000000000000100 RSI: 0000000000000000 RDI: 0000000000000100
-RBP: ffffc900001578b0 R08: 0000000000000000 R09: 0000000000000100
-R10: dffffc0000000000 R11: fffff5200002af0a R12: 0000000000000002
-R13: 0000000000000000 R14: 0000000000000000 R15: ffff888027ab4e68
-FS:  0000000000000000(0000) GS:ffff8881268c2000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000200000005840 CR3: 000000003732e000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- call_timer_fn+0x17b/0x5f0 kernel/time/timer.c:1747
- expire_timers kernel/time/timer.c:1798 [inline]
- __run_timers kernel/time/timer.c:2372 [inline]
- __run_timer_base+0x648/0x970 kernel/time/timer.c:2384
- run_timer_base kernel/time/timer.c:2393 [inline]
- run_timer_softirq+0xb7/0x180 kernel/time/timer.c:2403
- handle_softirqs+0x22c/0x710 kernel/softirq.c:579
- __do_softirq kernel/softirq.c:613 [inline]
- run_ktimerd+0xcf/0x190 kernel/softirq.c:1043
- smpboot_thread_fn+0x542/0xa60 kernel/smpboot.c:160
- kthread+0x711/0x8a0 kernel/kthread.c:463
- ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
+Do you mean to add a property (e.g. dpll-channel or dpll-device) into
+net/network-class.yaml ? If so, yes, it would be possible, and the way
+I look at it now, it would probably be better. The DPLL driver can
+enumerate all devices across the system that has this specific property
+and check its value.
 
+See the proposal below...
+
+Thanks,
+Ivan
 
 ---
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+  Documentation/devicetree/bindings/dpll/dpll-device.yaml  | 6 ++++++
+  Documentation/devicetree/bindings/net/network-class.yaml | 7 +++++++
+  2 files changed, 13 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/dpll/dpll-device.yaml 
+b/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+index fb8d7a9a3693f..560351df1bec3 100644
+--- a/Documentation/devicetree/bindings/dpll/dpll-device.yaml
++++ b/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+@@ -27,6 +27,12 @@ properties:
+    "#size-cells":
+      const: 0
+
++  "#dpll-cells":
++    description: |
++      Number of cells in a dpll specifier. The cell specifies the index
++      of the channel within the DPLL device.
++    const: 1
++
+    dpll-types:
+      description: List of DPLL channel types, one per DPLL instance.
+      $ref: /schemas/types.yaml#/definitions/non-unique-string-array
+diff --git a/Documentation/devicetree/bindings/net/network-class.yaml 
+b/Documentation/devicetree/bindings/net/network-class.yaml
+index 06461fb92eb84..144badb3b7ff1 100644
+--- a/Documentation/devicetree/bindings/net/network-class.yaml
++++ b/Documentation/devicetree/bindings/net/network-class.yaml
+@@ -17,6 +17,13 @@ properties:
+      default: 48
+      const: 48
+
++  dpll:
++    description:
++      Specifies DPLL device phandle and index of the DPLL channel within
++      this device used by this network device to synchronize its hardware
++      clock.
++    $ref: /schemas/types.yaml#/definitions/phandle
++
+    local-mac-address:
+      description:
+        Specifies MAC address that was assigned to the network device 
+described by
+
 
