@@ -1,146 +1,94 @@
-Return-Path: <netdev+bounces-218282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6629B3BC0E
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 15:11:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5D6FB3BC4B
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 15:18:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 878D57C6D4E
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 13:11:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 69F391CC2A73
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 13:17:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40BFD2E7BDA;
-	Fri, 29 Aug 2025 13:11:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87CF0320392;
+	Fri, 29 Aug 2025 13:14:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qeddB7eT"
 X-Original-To: netdev@vger.kernel.org
-Received: from bregans-0.gladserv.net (bregans-0.gladserv.net [185.128.210.58])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F8BB2F83B7;
-	Fri, 29 Aug 2025 13:11:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.128.210.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF142EB869;
+	Fri, 29 Aug 2025 13:14:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756473098; cv=none; b=ZHyp1RWVaXXm8cbvTmZpr9xbdxfNMcRym3qrcgcc7PaHkJ4w2r8CWIMDdVMRMix4AJ/emQsi+FOqWSq4n5aaXxk5ywWkgavqWL0PpyZsFLZln1BHRcm6VBijz/cv1ogFxK3zVzj/F4VlfVvSzbK530hqB7Ahm0ltC2yRUfNLbrs=
+	t=1756473253; cv=none; b=oCcQNGe5yOMxzmuRGqCvyLda7Uez3ItpZDoPg1Yfbjcu5KW8g1ma1ug2UH2ea3igdEUTdChd1Np3TlzTNK8/PrUTo+p2YdqaA5uTPNIy8F5KkPj6APLDnzfodLhrBflte6zQEuaHVMpTc7UPMTAWeL+ak6RH1qdoI0aAi2EE2ow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756473098; c=relaxed/simple;
-	bh=IMyL2zJYuRhL+iIq44TIHd1FCwhV/8/85EwF6zC5KiI=;
+	s=arc-20240116; t=1756473253; c=relaxed/simple;
+	bh=vn78dxpS7nVM7YM+o/8hcv7e2zoL/2MljBn9gVbIGcM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=miHQkra5N5+PBQUBtoUgNZ0PxU3IO0oB0U6No7klzIA2c/KyqvEdGHgXnC4wMEanBs8KE7A8aUXk6cForJoPCwi4uYqgjNY4nivH/xQZbbjbP14App0E36lebBI2jcGaRdDU1CJSRzWSx+7JPB+kW7jJG8Nyd0IGAjLl82D+hBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=librecast.net; spf=pass smtp.mailfrom=librecast.net; arc=none smtp.client-ip=185.128.210.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=librecast.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=librecast.net
-Date: Fri, 29 Aug 2025 15:11:20 +0200
-From: Brett Sheffield <bacs@librecast.net>
-To: Simon Horman <horms@kernel.org>
-Cc: Oscar Maes <oscmaes92@gmail.com>, netdev@vger.kernel.org,
-	kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	dsahern@kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net v4] selftests: net: add test for destination in
- broadcast packets
-Message-ID: <aLGm-G1JFxKH-jw5@karahi.gladserv.com>
-References: <20250828114242.6433-1-oscmaes92@gmail.com>
- <20250829111921.GI31759@horms.kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=fEk8/Z4Fjewnc/v047asHbFniHBj9qTAriqMkQAsXcoe45eUPBndST+KYqpL1Rehb4LKZDXmS+amuEISpqTiKSIBF75z/maK846Cvz5xbj/shUc6XBayaAmZTXFZxKMFSq/afI2Tq+s/+3A6cpebC3CrFgLIqsr4hoGf7zYjZ4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qeddB7eT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BA93C4CEF0;
+	Fri, 29 Aug 2025 13:14:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756473252;
+	bh=vn78dxpS7nVM7YM+o/8hcv7e2zoL/2MljBn9gVbIGcM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qeddB7eTmQvUdrE1gFfrOaqqAIZwpxPutGLGTTDOuFKWPLDWMNYfGIxps/PyEJPZs
+	 hd4j4NByzzsoqWPBzIYU4VXd6qX3W4FiY4fpv4SZlsqgmXGekFN9LTrnI4B0ZbC5Tn
+	 q7xkanwGfk6bb1jflUBERCelUzElGQFLDYvG5rBrUAMxXiRbNKrPeQ7Ds9WV49mbKb
+	 3IjzFT1pxaHdNxCnFk+7TFTKii7VNEvTg2D6dLKOya6v9A30TcSwWZR5CTAt7Kh/sN
+	 ezCf3EYxefmOfI57pfFbi1JXWoR09JZIUSf6p80d3Hp/09zvj961/tyzbHvE2FtcLu
+	 rxCCCChc7y6og==
+Date: Fri, 29 Aug 2025 14:14:07 +0100
+From: Simon Horman <horms@kernel.org>
+To: Madhur Kumar <madhurkumar004@gmail.com>, dev@openvswitch.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	i.maximets@ovn.org, edumazet@google.com,
+	linux-kselftest@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+	shuah@kernel.org, davem@davemloft.net
+Cc: Aaron Conole <aconole@redhat.com>,
+	Praveen Balakrishnan <praveen.balakrishnan@magd.ox.ac.uk>
+Subject: Re: [ovs-dev] [PATCH] selftests/net: openvswitch: Fix spelling error
+ in print message
+Message-ID: <20250829131407.GA56092@horms.kernel.org>
+References: <20250814180007.406941-1-madhurkumar004@gmail.com>
+ <20250826173415.GM5892@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250829111921.GI31759@horms.kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250826173415.GM5892@horms.kernel.org>
 
-On 2025-08-29 12:19, Simon Horman wrote:
-> On Thu, Aug 28, 2025 at 01:42:42PM +0200, Oscar Maes wrote:
-> > Add test to check the broadcast ethernet destination field is set
-> > correctly.
-> > 
-> > This test sends a broadcast ping, captures it using tcpdump and
-> > ensures that all bits of the 6 octet ethernet destination address
-> > are correctly set by examining the output capture file.
-> > 
-> > Signed-off-by: Oscar Maes <oscmaes92@gmail.com>
-> > Co-authored-by: Brett A C Sheffield <bacs@librecast.net>
++ Aaron Conole, Praveen Balakrishnan
+
+On Tue, Aug 26, 2025 at 06:34:15PM +0100, Simon Horman via dev wrote:
+> On Thu, Aug 14, 2025 at 11:30:01PM +0530, Madhur Kumar wrote:
+> > Fix a typo in a print statement in ovs-dpctl.py:
+> > "Unkonwn" → "Unknown".
 > 
-> ...
+> Hi Madhur,
 > 
-> > +test_broadcast_ether_dst() {
-> > +	local rc=0
-> > +	CAPFILE=$(mktemp -u cap.XXXXXXXXXX)
-> > +	OUTPUT=$(mktemp -u out.XXXXXXXXXX)
-> > +
-> > +	echo "Testing ethernet broadcast destination"
-> > +
-> > +	# start tcpdump listening for icmp
-> > +	# tcpdump will exit after receiving a single packet
-> > +	# timeout will kill tcpdump if it is still running after 2s
-> > +	timeout 2s ip netns exec "${CLIENT_NS}" \
-> > +		tcpdump -i link0 -c 1 -w "${CAPFILE}" icmp &> "${OUTPUT}" &
-> > +	pid=$!
-> > +	slowwait 1 grep -qs "listening" "${OUTPUT}"
-> > +
-> > +	# send broadcast ping
-> > +	ip netns exec "${CLIENT_NS}" \
-> > +		ping -W0.01 -c1 -b 255.255.255.255 &> /dev/null
-> > +
-> > +	# wait for tcpdump for exit after receiving packet
-> > +	wait "${pid}"
+> You need to include a Signed-off-by line here.
 > 
-> Hi Oscar and Brett,
+> Please see [1] and [2].
 > 
-> I am concerned that if something goes wrong this may block forever.
-> Also, I'm wondering if this test could make use of the tcpdump helpers
-> provided in tools/testing/selftests/net/forwarding/lib.sh
+> [1] https://docs.kernel.org/process/submitting-patches.html#developer-s-certificate-of-origin-1-1
+> [2] https://docs.kernel.org/process/maintainer-netdev.html#changes-requested
 
-Thanks for the review Simon.  Further to previous email after some more thought
-and poking at lib.sh
+Hi again,
 
-We're starting tcpdump with -c1 so that it exits immediately when the packet is
-received, and we catch this with the wait() so that, in the best case, we
-continue immediately, and in the worse case the `timeout 2s` kills tcpdump and
-we move on to cleanup. I *think* this is pretty safe.
+Aaron (CCed) brought to my attention that a superset of this patch has been
+posted by Praveen Balakrishnan.
 
-Taking a look at the forwarding/lib.sh it looks like we could use
-tcpdump_start() and pass in $TCPDUMP_EXTRA_FLAGS but I don't think this buys us
-much here, as we'd still need to wait() or a sleep() or otherwise detect that
-tcpdump is finished so we can continue. I don't see anything in lib.sh to aid us
-with that?
+- [PATCH] selftests: net: fix spelling and grammar mistakes
+  https://lore.kernel.org/netdev/20250828211100.51019-1-praveen.balakrishnan@magd.ox.ac.uk/
 
-That said, it might be good to use the helper function anyway and keep the
-wait() for consistency. There don't seem to be many tests using the tcpdump
-helper functions yet, but it's probably the right way to move.
-
-What do you think, Oscar?  It looks like lib.sh tcpdump_start() takes all the
-arguments, including for your namespaces.  Up to you if you want to call that
-instead.
-
-Now I know it's there, I'll try to use that for future tests.
-
-I don't *think* there's anything here that needs a v4, unless the timeout() call
-is thought to be insufficient to kill tcpdump.  There's a -k switch if we want
-to SIGKILL it :-)
-
-> > +
-> > +	# compare ethernet destination field to ff:ff:ff:ff:ff:ff
-> > +	ether_dst=$(tcpdump -r "${CAPFILE}" -tnne 2>/dev/null | \
-> > +			awk '{sub(/,/,"",$3); print $3}')
-> > +	if [[ "${ether_dst}" == "ff:ff:ff:ff:ff:ff" ]]; then
-> > +		echo "[ OK ]"
-> > +		rc="${ksft_pass}"
-> > +	else
-> > +		echo "[FAIL] expected dst ether addr to be ff:ff:ff:ff:ff:ff," \
-> > +			"got ${ether_dst}"
-> > +		rc="${ksft_fail}"
-> > +	fi
-> > +
-> > +	return "${rc}"
-> > +}
-> 
-> ...
-
--- 
-Brett Sheffield (he/him)
-Librecast - Decentralising the Internet with Multicast
-https://librecast.net/
-https://blog.brettsheffield.com/
+I'd like to suggest that we keep things simple and go with that patch.
 
