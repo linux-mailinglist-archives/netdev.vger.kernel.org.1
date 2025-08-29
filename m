@@ -1,156 +1,113 @@
-Return-Path: <netdev+bounces-218185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F9F3B3B6F7
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 11:19:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38C0FB3B6F9
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 11:19:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4676A047B5
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 09:18:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B565984D70
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 09:19:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 698C22EFD96;
-	Fri, 29 Aug 2025 09:18:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cFBtV8z0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5D5B302CCA;
+	Fri, 29 Aug 2025 09:19:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D5A42F0680;
-	Fri, 29 Aug 2025 09:18:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61C862F3C0E
+	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 09:19:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.59.177.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756459116; cv=none; b=Dc7JIqxr4AOr4x1dv3V8HBMOG56D76RgUUx51M6PTCgtveXyRxIYMDO5q/QRRmdDj8hPh2w3z+m+Pzkn7OSGs5VKfQ1y2FO/B9H4uuA0Xmpx3sIH4pc6VYDIm910xzbEehA24Xf9bM9aPU8KnMJGwsjkIkod+fvE1mt+vtygcYg=
+	t=1756459169; cv=none; b=R6hRuPcVEIKBk4aVu0yLCSYHXa3EDd8KaCEfXbmxLtkPIv9wAD0cf1vXqMSXGN1MmifC61IFXijVIhz/hglDhMuPq3h0aDlwzNJn1le3qUzuMbP9yKeid+XmaP78IJtG3KwAi7x4bC+GbEBuEpjufSed/jns+NrbgQ3Ngtdazp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756459116; c=relaxed/simple;
-	bh=NBlAl/fkZniarUxoV8DY/7IVwSEbyoIoJhWl8W7043o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OpA5aCQ18vKBPBTRckFalcWlB8I7Lp66oseF9WKgc4T1Vs+MYs2faSy8pJJaQ+qrs8KdaKS7eSP+i/QwwfgavuVitrCIgF8WoCMZlLsORg+FON9bVrO7kNcYINvMaWMckhe6W+JH/cZDwR9b1/GzxkAYTtOlYgzM0J58GJADQBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cFBtV8z0; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756459115; x=1787995115;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=NBlAl/fkZniarUxoV8DY/7IVwSEbyoIoJhWl8W7043o=;
-  b=cFBtV8z0O+qjR+OprRl3c29hcYq8gn0dYeVRw+4rSKnnS8oFETPRAWA0
-   M+/gn8fUrfxcSovd2XltKdBDX2oL1mMG9BybkgW4I3BVLI0Cpzo7ADzFY
-   /SleNcaQGTRv3YdJhLodREDa+RepLwQOOlPSjo7zGg04k9tmuXjIvLHZj
-   fEedFRv+p5ohuG9Kp4wA/VxumStq4A4VMPsw66uClnCLox1NLy5w6Q0mW
-   0PFe788h1g1/ztMtYaUTle9sQqeGTK28JLQ8eHaRQcQDqIu+9a6HpVcJt
-   1vBvhpjn4zTu/WrvMEXvQJp+zCwOFe0sPsxWU8Q8qkw4/v/9JO9aPkxFV
-   w==;
-X-CSE-ConnectionGUID: eYfcQHd5SFGa2+I2XsEVxQ==
-X-CSE-MsgGUID: jPECHWV7R5i9ZnbpjLgLkw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="58684631"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="58684631"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2025 02:18:34 -0700
-X-CSE-ConnectionGUID: 5WNrupYfRqyf4qHQhFjQGg==
-X-CSE-MsgGUID: KVYl1vhwQPG5QC7t1wwYzw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,221,1751266800"; 
-   d="scan'208";a="175623668"
-Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
-  by fmviesa004.fm.intel.com with ESMTP; 29 Aug 2025 02:18:30 -0700
-Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1urvF5-000Ual-2t;
-	Fri, 29 Aug 2025 09:18:06 +0000
-Date: Fri, 29 Aug 2025 17:17:41 +0800
-From: kernel test robot <lkp@intel.com>
-To: admiyo@os.amperecomputing.com, Jeremy Kerr <jk@codeconstruct.com.au>,
-	Matt Johnston <matt@codeconstruct.com.au>,
+	s=arc-20240116; t=1756459169; c=relaxed/simple;
+	bh=jFIiii550M4PW96EW7IlJlQ5MVN9j5pijVtKyFcM/Zo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cHjf+EMwxMZTtMtfARqlLHaVK1jjztk/oU6t/bUm+oKPYb7qhWiiiv02+7Fjdy+dHtAQ3Lo1T5YFsI67X3v8CaL+QRqwg+czhB/HZxWRoMxawkXCyq4EdHiCw2oVi9Q76IJh2knB9ONOqBC/4GvU8XCcJlItW/JpwPARSrHjCDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=52.59.177.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: zesmtpsz2t1756459086tdd814e95
+X-QQ-Originating-IP: 9Xi5bkLwZO0UtmTGGNZ0jVZyqtfQupOWTd9I4wexJ7I=
+Received: from lap-jiawenwu.trustnetic.com ( [60.188.194.79])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 29 Aug 2025 17:18:04 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 13793811014313054338
+EX-QQ-RecipientCnt: 10
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: netdev@vger.kernel.org,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Sudeep Holla <sudeep.holla@arm.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Huisong Li <lihuisong@huawei.com>
-Subject: Re: [PATCH net-next v25 1/1] mctp pcc: Implement MCTP over PCC
- Transport
-Message-ID: <202508291628.CPVGma07-lkp@intel.com>
-References: <20250827044810.152775-2-admiyo@os.amperecomputing.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v2 0/2] net: wangxun: support to configure RSS
+Date: Fri, 29 Aug 2025 17:17:50 +0800
+Message-Id: <20250829091752.24436-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250827044810.152775-2-admiyo@os.amperecomputing.com>
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: M0/UNHhZ6hMGdsWmT09WVHImLgFTPcDhzpzgpTQwAobrNcuyzVB3BXig
+	HbBKYT+7O/bmqk1Dz+UoNI+2Yf7Pnr64ZhuCzlO2DBGI6XyPYpHX3gHFMmd4j5DKRwTA0aj
+	YEDei7AZ4HCvko2pM0TdNOPSYqFq8NJads+tR1M15e6PD+cpq9oPbrWC+5JJN1Zhadpsbp6
+	avEDlcrkR/lH8DCFv+XRe5N9IMgJ++WruM1DKuhVecfHJWWKj/8roFgTNhQYFweNt2E4qWN
+	/cs8GLxV3WszxOAD94Rj5INSelXRrko19cgvu7gVPr/v46EoSWAh4j1EvpPihCn0NN5Zpld
+	n3bbo0HmYb9Xg4gvEakO39Vb8+UfG700udQXk2DDhNCIhF5wWCVi4weqt+oglrXfj0rno4l
+	zYvyCvzj1daEq0AhoIDdhSx0KrTkPa4w/fW308M22d22hqA3WrvjJPHOJkeg3X1MnZtCP4O
+	HOD43u9kv+Fhb7oG1/924hjkPGr9TNznd+UmqKtzlom7+wxtyRH5RhRgag5Xz5GX1F7yd6m
+	E0eqSI8FMOhCY0vuml6XessSwfeDBYwBCYcY3ugzetmRna6wWHbvhn8OakJUVMAYL5GlU0h
+	hw2WVGBD4ZETw4aNUvqhyef5mhw5rNSe/quLBzcUU4Z4rwvHdgB3at2UlTaAz6ZbKcDpCJC
+	CPrLZhfdyIzZYai6It2nR1P0apZMWvwy8M7mzJvloP/aJYaCSsj4qrBNCBPjdPOzEdzEhEM
+	fja1EXj6OjIKZVOg4IeiOe7rwRcaGlB8s8tR8W1WJRoNe80CyWqu8Y6u2fuadwNqjsKcatr
+	UrK1XFXxDie2YvZUL4k2YoXE5n4zqFa7Fy5tuqhLrITSaE6S1NqEUx5YTuprSVpw5pB8l13
+	ua0wFXgZ8+bMQbZJ1mMGb9ynU6SdNHoK9wTdyWJu18l8iNDCyBcTgeaJ6wIgha1Z6N3VCgB
+	ZaFaUlSB8rlK6q+PxaibJWCmRFzF7vr1aTMTUggvTYrm+fwTb4fSTVIFAifpYtywqWpKCsl
+	XxWcjPOLztF3gtBm4EjKco4HgHXmLZWz35qRWsBnix14SfmdhJ
+X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
+X-QQ-RECHKSPAM: 0
 
-Hi,
+Implement ethtool ops for RSS configuration, and support multiple RSS
+for multiple pools.
 
-kernel test robot noticed the following build errors:
+---
+v2:
+- embed iterator declarations inside the loop declarations
+- replace int with u32 for the number of queues
+- add space before '}'
+- replace the offset with FIELD_PREP()
 
-[auto build test ERROR on net-next/main]
+v1: https://lore.kernel.org/all/20250827064634.18436-1-jiawenwu@trustnetic.com/
+---
 
-url:    https://github.com/intel-lab-lkp/linux/commits/admiyo-os-amperecomputing-com/mctp-pcc-Implement-MCTP-over-PCC-Transport/20250827-124953
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250827044810.152775-2-admiyo%40os.amperecomputing.com
-patch subject: [PATCH net-next v25 1/1] mctp pcc: Implement MCTP over PCC Transport
-config: i386-randconfig-015-20250829 (https://download.01.org/0day-ci/archive/20250829/202508291628.CPVGma07-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250829/202508291628.CPVGma07-lkp@intel.com/reproduce)
+Jiawen Wu (2):
+  net: libwx: support multiple RSS for every pool
+  net: wangxun: add RSS reta and rxfh fields support
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202508291628.CPVGma07-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   ld: drivers/net/mctp/mctp-pcc.o: in function `mctp_pcc_tx':
->> drivers/net/mctp/mctp-pcc.c:153: undefined reference to `mbox_send_message'
-
-
-vim +153 drivers/net/mctp/mctp-pcc.c
-
-   130	
-   131	static netdev_tx_t mctp_pcc_tx(struct sk_buff *skb, struct net_device *ndev)
-   132	{
-   133		struct mctp_pcc_ndev *mpnd = netdev_priv(ndev);
-   134		struct pcc_header *pcc_header;
-   135		int len = skb->len;
-   136		int rc;
-   137	
-   138		rc = skb_cow_head(skb, sizeof(*pcc_header));
-   139		if (rc) {
-   140			dev_dstats_tx_dropped(ndev);
-   141			kfree_skb(skb);
-   142			return NETDEV_TX_OK;
-   143		}
-   144	
-   145		pcc_header = skb_push(skb, sizeof(*pcc_header));
-   146		pcc_header->signature = PCC_SIGNATURE | mpnd->outbox.index;
-   147		pcc_header->flags = PCC_CMD_COMPLETION_NOTIFY;
-   148		memcpy(&pcc_header->command, MCTP_SIGNATURE, MCTP_SIGNATURE_LENGTH);
-   149		pcc_header->length = len + MCTP_SIGNATURE_LENGTH;
-   150	
-   151		skb_queue_head(&mpnd->outbox.packets, skb);
-   152	
- > 153		rc = mbox_send_message(mpnd->outbox.chan->mchan, skb->data);
-   154	
-   155		if (rc < 0) {
-   156			skb_unlink(skb, &mpnd->outbox.packets);
-   157			return NETDEV_TX_BUSY;
-   158		}
-   159	
-   160		dev_dstats_tx_add(ndev, len);
-   161		return NETDEV_TX_OK;
-   162	}
-   163	
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 149 ++++++++++++++++++
+ .../net/ethernet/wangxun/libwx/wx_ethtool.h   |  12 ++
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    | 111 ++++++++++---
+ drivers/net/ethernet/wangxun/libwx/wx_hw.h    |   5 +
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   |  10 +-
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |  23 +++
+ .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  |   6 +
+ .../ethernet/wangxun/txgbe/txgbe_ethtool.c    |   6 +
+ 8 files changed, 291 insertions(+), 31 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.48.1
+
 
