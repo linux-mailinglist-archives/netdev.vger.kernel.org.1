@@ -1,79 +1,57 @@
-Return-Path: <netdev+bounces-218286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4302B3BC5D
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 15:20:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 471DFB3BC5F
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 15:20:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D93BB1CC3300
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 13:19:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6E9C5A11B9
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 13:19:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7017531AF39;
-	Fri, 29 Aug 2025 13:19:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D61B031A061;
+	Fri, 29 Aug 2025 13:18:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b="aPkz+K97"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sjuR/3H0"
 X-Original-To: netdev@vger.kernel.org
-Received: from orbyte.nwl.cc (orbyte.nwl.cc [151.80.46.58])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBA8231A57A;
-	Fri, 29 Aug 2025 13:18:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=151.80.46.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B12362EFD9C
+	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 13:18:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756473540; cv=none; b=s80QojXcDUzE+Z4zOO9Fj2TQ3iQgy5BakmsFxo9n0dUyhnDfZBUnylKoaht+lKwTqmXDhmAAzXoD7rGod3dkgZShtLTO77hFjg7UWTmMcuVEvXO9RrFN0K5QjNVR7cE0h4ono/hm/6oBSHv1yAMm20oQ0chDwb18wmjLHsxkXmg=
+	t=1756473534; cv=none; b=cGi6hrs0z29MCBiviCgu4ZDlHKh17UM4AisHp+gpGCRAodmj6R1v+3375kjzOYk+5XsTbQTton2fFaqqPN2xk5siDiKEoD6TKJ2Uy1ZwBm63xMEOWAeovlKDTMb+tRTsFoLb+VKOcapq0Y2tha1iDHsYysopSkpuyvPf6t57mlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756473540; c=relaxed/simple;
-	bh=ecnb4FXWwJy0BSupbXD/ijXUW/vPp+1DsNwsGnyzIYI=;
+	s=arc-20240116; t=1756473534; c=relaxed/simple;
+	bh=Bb8YwPlRN1UInK6yeqpatm1g0DdWJwczBh73E9SO8JI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r+h3+p3OwAh3RZjluJ93GwG6s/ryq/GycAVw9ns6LRjpXiXa+wzrqAhpxX5BiQehPJJQ6C3NYN/ygZgurt9Y1N9bHbZdWQwIMTcnMMzCS1sS4E5U0BO8n2dQH3RgzmJ83+jkuLgi4HhWrc9z6vUFQIy4xmQkTM4onaviV1K6zbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc; spf=pass smtp.mailfrom=nwl.cc; dkim=pass (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b=aPkz+K97; arc=none smtp.client-ip=151.80.46.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nwl.cc
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nwl.cc;
-	s=mail2022; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=k4lpNv2+01AGP9coY/f4uasfH/RuIkvIDmKe6FHuBbU=; b=aPkz+K978XNpOVgmLycdy9VMyU
-	JQbGiYtWdCqzfCCKH3He7S4elAn6DB8Hb23ZfgFcnFGY5FlpBQ6MOmiAnINCAWJY/bI/b+yfN7Gyl
-	OvUwDWii6Lsro5j+b4sjPWuQGhilOzbR2ycb3Lb48N6uBzgW5M5rDFqOJ0UFCoC1JJmdLHgIyFmXy
-	Yzl50PTnedNp0PKy4vDFwhEJliYksUKAYNnZkf237UH/lFEs3xn5aShywm2eqt4thXXZGHw06QwqS
-	kmUg5ND4W8y4nkegHD7KwW9gSYzNv6NKHV7kLzibiSefKKkHG6sokmqnxDsJZRa8MYItoKbUtJzFU
-	Dis6GpBA==;
-Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.97.1)
-	(envelope-from <phil@nwl.cc>)
-	id 1urz03-000000000eS-0FW0;
-	Fri, 29 Aug 2025 15:18:39 +0200
-Date: Fri, 29 Aug 2025 15:18:38 +0200
-From: Phil Sutter <phil@nwl.cc>
-To: Miaoqian Lin <linmq006@gmail.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Joshua Hunt <johunt@akamai.com>,
-	Vishwanath Pai <vpai@akamai.com>, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] netfilter: xt_hashlimit: fix inconsistent return type in
- hashlimit_mt_*
-Message-ID: <aLGorl9XCTlla880@orbyte.nwl.cc>
-Mail-Followup-To: Phil Sutter <phil@nwl.cc>,
-	Miaoqian Lin <linmq006@gmail.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Joshua Hunt <johunt@akamai.com>,
-	Vishwanath Pai <vpai@akamai.com>, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-References: <20250829125132.2026448-1-linmq006@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=V850SG4vumGKUTO6fnQZaxXtkb/yjzYhQcRCQ3k2I3qHfZs5Hepl+i2lvZzJ1VxUeveyTwdwfgLmtu6VD30WfJ/hfNcdRL+jKrYcClii/DbQG52po8vzr7ZpvwzN4OJ2pzeKSKOy9xNNjE1RcihWuNwZJ5CwFkmyA4wigkPO8IM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sjuR/3H0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82AC9C4CEF0;
+	Fri, 29 Aug 2025 13:18:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756473534;
+	bh=Bb8YwPlRN1UInK6yeqpatm1g0DdWJwczBh73E9SO8JI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sjuR/3H0yEDUDWCpdMm8DaqRPBy/j2HiAXw5M9Jgy6xXK+nSKYuWgGpdtEsGIPTsi
+	 PftGPvbGTA0jdVTmt5UfyAs6BFEUtlRohVL7fkG69ar8midztAYMPjwxJ2W/Y+n8xB
+	 fq2PBR6FA8CCpRIlzGapTlyjXQE55gNoUSg3T3vrozvGSAFzRdA1FUgaJzAZBK1EFe
+	 OY8lrgmr0plFE9QY+NS9gxqqDQalwU5KOWPnEWKbIeyKvGnxntTJpDRYqnSil1WYSw
+	 RLyGaX5qBBzkqkvaMsEz1AfZiXV5nHKdi4r+tEBwa2FAhS8cXVON/vmaCcVh09tUbq
+	 MDeIe8YIduDtg==
+Date: Fri, 29 Aug 2025 14:18:50 +0100
+From: Simon Horman <horms@kernel.org>
+To: David Wilder <wilder@us.ibm.com>
+Cc: netdev@vger.kernel.org, jv@jvosburgh.net, pradeeps@linux.vnet.ibm.com,
+	pradeep@us.ibm.com, i.maximets@ovn.org, amorenoz@redhat.com,
+	haliu@redhat.com, stephen@networkplumber.org
+Subject: Re: [PATCH net-next v8 4/7] bonding: Processing extended
+ arp_ip_target from user space.
+Message-ID: <20250829131850.GK31759@horms.kernel.org>
+References: <20250828221859.2712197-1-wilder@us.ibm.com>
+ <20250828221859.2712197-5-wilder@us.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,17 +60,65 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250829125132.2026448-1-linmq006@gmail.com>
+In-Reply-To: <20250828221859.2712197-5-wilder@us.ibm.com>
 
-On Fri, Aug 29, 2025 at 08:51:31PM +0800, Miaoqian Lin wrote:
-> The hashlimit_mt_v1() and hashlimit_mt_v2() functions return the
-> cfg_copy() error code (-EINVAL) instead of false when configuration
-> copying fails. Since these functions are declared to return bool,
-> -EINVAL is interpreted as true, which is misleading.
+On Thu, Aug 28, 2025 at 03:18:06PM -0700, David Wilder wrote:
+> Changes to bond_netlink and bond_options to process extended
+> format arp_ip_target option sent from user space via the ip
+> command.
 > 
-> Fixes: 11d5f15723c9 ("netfilter: xt_hashlimit: Create revision 2 to support higher pps rates")
-> Fixes: bea74641e378 ("netfilter: xt_hashlimit: add rate match mode")
-> Signed-off-by: Miaoqian Lin <linmq006@gmail.com>
+> The extended format adds a list of vlan tags to the ip target address.
+> 
+> Signed-off-by: David Wilder <wilder@us.ibm.com>
 
-Reviewed-by: Phil Sutter <phil@nwl.cc>
+...
+
+> diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
+
+...
+
+> +/**
+> + * bond_validate_tags - validate an array of bond_vlan_tag.
+> + * @tags: the array to validate
+> + * @len: the length in bytes of @tags
+> + *
+> + * Validate that @tags points to a valid array of struct bond_vlan_tag.
+> + * Returns the length of the validated bytes in the array or -1 if no
+> + * valid list is found.
+> + */
+> +static int bond_validate_tags(struct bond_vlan_tag *tags, size_t len)
+> +{
+> +	size_t i, ntags = 0;
+> +
+> +	if (len == 0 || !tags)
+> +		return 0;
+> +
+> +	for (i = 0; i <= len; i = i + sizeof(struct bond_vlan_tag)) {
+> +		if (ntags > BOND_MAX_VLAN_TAGS)
+> +			break;
+
+Hi David,
+
+BOND_MAX_VLAN_TAGS is used here but it isn't defined until a subsequent
+patch in this series. Which breaks bisection.
+
+I didn't check, but probably this can be addressed by moving
+the definition of BOND_MAX_VLAN_TAGS to this patch.
+
+> +
+> +		if (tags->vlan_proto == BOND_VLAN_PROTO_NONE)
+> +			return i + sizeof(struct bond_vlan_tag);
+> +
+> +		if (tags->vlan_id > 4094)
+> +			break;
+> +		tags++;
+> +		ntags++;
+> +	}
+> +	return -1;
+>  }
+
+...
+
+-- 
+pw-bot: changes-requested
 
