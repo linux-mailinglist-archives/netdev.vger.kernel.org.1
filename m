@@ -1,332 +1,285 @@
-Return-Path: <netdev+bounces-218377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93A4BB3C3FE
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 22:59:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8D26B3C408
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 23:02:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E1165A5284
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 20:59:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C8D73AAE60
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 21:02:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 064D1346A15;
-	Fri, 29 Aug 2025 20:59:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 405EB235063;
+	Fri, 29 Aug 2025 21:02:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="dESvnRAv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cgPO0dnl"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0950122B594;
-	Fri, 29 Aug 2025 20:59:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756501180; cv=none; b=isIZRD5OoIYWWQzC5Fyqlx/SqXLuQZjUF6VYg4w0jhRkyk/d/ohBTbkyO+NPyLYnn8/z60l8LZBZzSE0kR/s9Dbb0KsoZj0V2ohVYlcAa3r5u66dx71xL2IhtWCj44PRe6fQTB+OKkU89HvhzIsuDmss687fxkFdgH22RQSv7m8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756501180; c=relaxed/simple;
-	bh=+2BW0UEG49SU/o/955BEv69wInYx4DfrQgnHNrBDmdc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tt7rTCT6H0/q5rEPXyru7MC5eFsIjG/bz7YGFum1277tNWrf3tT0fTYLKc3XvF/VJbk5EXCp/PF/PIOPCg259Sjl/albHlHrqn/RGTQkk8OgjXArJ5x6GeBdQGCCCSKBYDAqgRegSOASZYQhsQ7irnHf8T0kSPBZq4XT+zsK5WI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=dESvnRAv; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from [192.168.0.88] (192-184-212-33.fiber.dynamic.sonic.net [192.184.212.33])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 4CA79211627B;
-	Fri, 29 Aug 2025 13:59:36 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 4CA79211627B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1756501177;
-	bh=JFWDwi8WW+5cmq8k1iafkjchsEZ4XvNd8Q16Wo9KAu8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=dESvnRAvmpVLr0VYBZnRRYhqqZR3B639/FohGqaKD2D5bP/9Yrve21Irvr3nS9rb6
-	 oV0XKAIHOKvPIy3mqCdHpdb+o4CglUZTuulng4cFfFX5xmNa+/8oCUYPlxUGlvaNbr
-	 67e3J3ZlD0dwqiTzzvQCWTMikVloz4heqlFWTFCA=
-Message-ID: <0b9ea4e8-3751-0286-4bd9-fe09035dd22d@linux.microsoft.com>
-Date: Fri, 29 Aug 2025 13:59:35 -0700
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 352E620B7F4
+	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 21:02:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756501333; cv=fail; b=m20LZ0C0fnzCWp2z2t7qG5aCeVM3jDqI8YdCH3h+SH7pg4JspeMSeUawkH6mmLEmampiIZPf/pPjdRS8fzMb8qc4DcISAb0rHF4LQnbs+SgurjJn70EOrlkUp4uwD9KfJJQniO2NRRQ9wr1UnGMd09bZazZ+StYLvIT4UmU7BpE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756501333; c=relaxed/simple;
+	bh=zRAiLChTJOmuS21Yz6zVx/a++PDym/Iqs2aFK3lo2f4=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=CgsyTeg94MkfJZFbxN2uW9gWMbqvBzWw9dYIf6qZZu9+HSwXI8NtAnORI2F4++68pDlvq6AhvrMKum9SF4JZYV3PrYYz+jBf5s2lV6/kt68Ak8CnJOV7wGEUnYTOHO/Fp1G9uuYs6FbfkuQ3HJjtBnmsdfxHITtip4mHdQiUoiE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cgPO0dnl; arc=fail smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756501331; x=1788037331;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:mime-version;
+  bh=zRAiLChTJOmuS21Yz6zVx/a++PDym/Iqs2aFK3lo2f4=;
+  b=cgPO0dnlTk1g9ZREgvbmJWU3qyvGONdkIE9Htd4X8rynSl4JZYXXktNw
+   qsQ6orn7RQPA6n2l1obd98SMjbQrmofgxQDOq/EBC8cIuMsofQ/RFEgFw
+   YABLg25RBpQCF9BBzV5Q350YQxmwbVFIlCVh45k4kVJMgBtQKE9c9g+sd
+   OTG74UX/AigorFV2eJbCqPXYwfMP+iyw1v/Hms96lqE/0gI/w/SnQUIkR
+   AywlXq4cMbKBY3c6pCiHRmZFVS5kCazYkDrNoE8cc+OwcPax7yA56kg/W
+   ae4J3BpVBpeytNsRT3EtoCs+kCYMHzX/OprOwcfUoe5UwrNz54V8SYUf2
+   w==;
+X-CSE-ConnectionGUID: K6hSDI6FRXmBcpzN/EZpcw==
+X-CSE-MsgGUID: FMNYNfgDRMiltCIrCXgmZQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11537"; a="62613328"
+X-IronPort-AV: E=Sophos;i="6.18,221,1751266800"; 
+   d="asc'?scan'208";a="62613328"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2025 14:02:10 -0700
+X-CSE-ConnectionGUID: Y5xJ3xqOTO6TnJ+GFP8tLg==
+X-CSE-MsgGUID: LK+mzRrFT8iOYPo2tCoOOQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,221,1751266800"; 
+   d="asc'?scan'208";a="170038935"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2025 14:02:10 -0700
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Fri, 29 Aug 2025 14:02:09 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Fri, 29 Aug 2025 14:02:09 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (40.107.243.56)
+ by edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Fri, 29 Aug 2025 14:02:06 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=osQ3ye2g64lcfwiHS7x7RhO9WFqx2cpkIhf3+yNUdQikOhdmo3epzmuM92Odf5PyQQc766xQ+JSVMOpQSOyHXFAYm5ooZWpoJIs72LR+n9HvGGTVPzrn/1F19QEK5Y6vXjWRfWBcgWD8kVJbzCIi/NZReh3Hm41FSh9euwavCQEw3mVS+fg8mKV/aO/zOAtn7Ha2LCWVLOKRxLd+SWhc9Hj4K0RJcB6F5+a9j7UrVAW/7coI66GrGwl0QjfKhLGRUNUwrxFl62UkdBpfNSM2hK88Uqy99r+e7JY555xJslY5UDos8+C7dSV0oGqVI6p7CC/rhPueSMTb2TcYdl2JrA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=n1XH6L+anj81hOardWHdR9wS4EA48+oXYXFEGhm5IxU=;
+ b=NFAglom/Bzj0WbW1L1uxoBNmc1OS3Y2hNFiuOe3rCqNcvjyW7jW/DDy7DHztD70G4pU3gr+muVemzZwubzs2mTewV+i+wqwS0lxfGvUHrT0QLxhmHaFGCRtlhA7prcAs2zgyaPn6IP1loRFzO+rMX5nzanXSFIn9h2tmQDpHD8nwiL6yxYW5liO2nrA20ZAwRuRSMUAAUQz6WAOpgAgZCtbiceufYXsWL4FKb7BtaFBlqeQFK+qmV8ybDI8WmjapFMPcHbSSHamFYhUuZKmcujXOsRO135427ARoJKNR+gfU4V7RMRTizFuGWaE2p2oQPDCbhRvsppkZHR4gxpS8RA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by IA4PR11MB9280.namprd11.prod.outlook.com (2603:10b6:208:56f::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.19; Fri, 29 Aug
+ 2025 21:01:58 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3%5]) with mapi id 15.20.9052.019; Fri, 29 Aug 2025
+ 21:01:58 +0000
+Message-ID: <22d92b44-887f-4aca-b281-aa5f813d3c3b@intel.com>
+Date: Fri, 29 Aug 2025 14:01:57 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3] idpf: add HW timestamping
+ statistics
+To: Anton Nadezhdin <anton.nadezhdin@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>
+CC: <netdev@vger.kernel.org>, <anthony.l.nguyen@intel.com>,
+	<richardcochran@gmail.com>, Milena Olech <milena.olech@intel.com>, "Aleksandr
+ Loktionov" <aleksandr.loktionov@intel.com>
+References: <20250829175734.175963-1-anton.nadezhdin@intel.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+Autocrypt: addr=jacob.e.keller@intel.com; keydata=
+ xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
+ J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
+ qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
+ CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
+ UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
+ MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
+ apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
+ cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
+In-Reply-To: <20250829175734.175963-1-anton.nadezhdin@intel.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="------------SrA6YsmM42cEIP0o0b1I2gke"
+X-ClientProxiedBy: MW4PR03CA0251.namprd03.prod.outlook.com
+ (2603:10b6:303:b4::16) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.1
-Subject: Re: [PATCH V0 1/2] hyper-v: Add CONFIG_HYPERV_VMBUS option
-Content-Language: en-US
-To: Nuno Das Neves <nunodasneves@linux.microsoft.com>,
- dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
- linux-input@vger.kernel.org, linux-hyperv@vger.kernel.org,
- netdev@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org,
- linux-arch@vger.kernel.org, virtualization@lists.linux.dev
-Cc: maarten.lankhorst@linux.intel.com, mripard@kernel.org,
- tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch, jikos@kernel.org,
- bentiss@kernel.org, kys@microsoft.com, haiyangz@microsoft.com,
- wei.liu@kernel.org, decui@microsoft.com, dmitry.torokhov@gmail.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, bhelgaas@google.com,
- James.Bottomley@HansenPartnership.com, martin.petersen@oracle.com,
- gregkh@linuxfoundation.org, deller@gmx.de, arnd@arndb.de,
- sgarzare@redhat.com, horms@kernel.org
-References: <20250828005952.884343-1-mrathor@linux.microsoft.com>
- <20250828005952.884343-2-mrathor@linux.microsoft.com>
- <5003d5e8-a025-4827-b8a0-6fe11877421b@linux.microsoft.com>
-From: Mukesh R <mrathor@linux.microsoft.com>
-In-Reply-To: <5003d5e8-a025-4827-b8a0-6fe11877421b@linux.microsoft.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|IA4PR11MB9280:EE_
+X-MS-Office365-Filtering-Correlation-Id: a9fb7869-31cd-4f86-03ad-08dde73f4b0f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?YS9BeUlOVWswTTN5cGo0MWtRaThCdTM5ZXBQOWg0UTRUWk5yYzdiazVTdlhD?=
+ =?utf-8?B?Q3VuWnhHY3ZCWTZpS2lsTllteVI4N1o3N0xvcHVTT1dzdnVlb2xYTm1OVG9z?=
+ =?utf-8?B?d3cwZUNDL1A2KzB6TG1aK0pqN01JN21UTndMK1lQa2xpYTB2SGRuYzRBSFJp?=
+ =?utf-8?B?SU8wUkY4K2tYOHhqTzE0dGE5Mm9wK2FqNGFvb2N3STBFSnl5K042bUFpVk9s?=
+ =?utf-8?B?eXRDWXhyQUpWWFd1YmR0VkRvOHd6eTNhaktlQmZjaHBBN3ZWaUhUbVg0VWxk?=
+ =?utf-8?B?Wks0TUF5TjI0a3VGUmFiWURVWUdEUmFRdlJ3ZXJSdVpoTTV1RHh0UTJPU241?=
+ =?utf-8?B?MkJNS2lUaTVqK3Fuc0piRTByU3pqNmlPTU5VVE43VUJ3azd3aEZ1NzNsb2ZF?=
+ =?utf-8?B?ZFliRUUxNXl2a0xvY01JMEF6Q3BwNzV6bDVmNG9udnVWMEplM00xRlRBS2tZ?=
+ =?utf-8?B?SlNPcXhDazN3RmlDSDArdk1UUytHWDBqNWdoOS8rcEpST3FoYlhMVlc3aWVq?=
+ =?utf-8?B?YU1TQmVIQnozTkxIbmlwakx4MmtlOVF1Y2tMZGFZdEpzd3pFV0I4UWw2TTlX?=
+ =?utf-8?B?b2tETjVEN3RhY3h3NS95SWRRa3IrbDgrZzBBZkIrczJUVUFJZndsSjNEWCtY?=
+ =?utf-8?B?V2JzY09wZEZQTVpQQXFVR3gvYXlzY3phT2Q1c3p4dzNiR3VwNmFCYVMrczJo?=
+ =?utf-8?B?eEJPdDNXRVhNUmU5TXUxamZ3andVVVU3QzRUczF0YkttRTJuYk1IQ01vWlhE?=
+ =?utf-8?B?bUp3bmhrS1IvMlFLM3VPMFpsV1Fhd29QOWozSWlkajJ6djRJaUVtZEFvQ3VP?=
+ =?utf-8?B?UitOUVpvckNVYmxURS9OWDN0bURnb0JmRFR0V0NvWEcvcm91Z0JTRjdBUE1J?=
+ =?utf-8?B?Q3laTDY3ZVZWMFNzRTRzMzVJSys5NXdScU5nMVI2aWRxelYzM3QzSnpkTzB1?=
+ =?utf-8?B?SE0ydFhjaGIxY3JvQVozVm1USnJwSS9sWDFEbDZkek12OE9pVWkrcm95bm51?=
+ =?utf-8?B?b283djBiVGMxMGlYcURQYzYrSUJUR0ZOTzlLMnBjdHBYQUx3bGRZcmlDVkpY?=
+ =?utf-8?B?Ui82bVlqalZPVTVSWmdSQzlXcjAySllLTUNEMlo1U0Q4VG9IMW9GUkVLSVF5?=
+ =?utf-8?B?VjZQZ0FjRTJvUG9WR05HUUFRVEZDOGRreW9MVTVSQ3U3R3JkRWxNTk9ERGxh?=
+ =?utf-8?B?MXdabkJyN0lpY0VQS1lzdkx4dTNUS0RsK3A1SFVUTE5TakVFcVN4WjUzWjBx?=
+ =?utf-8?B?elhOVHRhNHpMclNGYVNqMHMzUVM5SEZYS2ZhemtCRm54UVY2emIvdEZCZFJX?=
+ =?utf-8?B?V1NKQ3JVMGJ2Si83eTB6Vklmam1ScEF6TmZ5T1ZtUWJoUVJBUWVkQjFqWi9a?=
+ =?utf-8?B?Uk9HWFN5dSs1azJaTExjMGhJVVhmTVFHTThvc2hERXowcm1iQVlOck93c1N3?=
+ =?utf-8?B?RUhNdlNOY2hzcURUWjZaY3dzU2RFMzhOL3NhSmhVdWtXeG1IM25tTWp6dFB4?=
+ =?utf-8?B?dEY2TVZ5RjdOYXVTdXA5T1FCZERxalg2WW5lYkxDYjB0bnBkT3JQYnExcDBi?=
+ =?utf-8?B?aE1VQ056TC9uQ25WeTI3Nll2NG01TnRFS2VERGp3dVlMdXJZby9hdnFVVHdS?=
+ =?utf-8?B?YTR2T2U3MmtvOFFWZ254YlJwSkFVZ3NZb3Q1ZHcvVXdQZUk1MHJvdTZmTkh2?=
+ =?utf-8?B?ZUxOdzNHZmhsT0pEcUNyYlovWTAwRUJYdVRTRjFVQjZKMDEvQm15WHVuNkJ2?=
+ =?utf-8?B?WXZ3ay9iSURiZjdsSnVtKzlDRXBVRVRXRHdlUnp1aHNacnhDN21SQ1FVQ0Ft?=
+ =?utf-8?B?MXRqR3daazEvK29oYlFGTnkzS1RJYkdDcDF0NEZZOWRnWWYycklEUnZaSk1S?=
+ =?utf-8?B?a1ZGWG1jbEwxZlczdDFLVkppaE51b0hWdlN4dDNBZDR2TGc9PQ==?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZWRrRGlVRTJTaGpnaTA3SFpwQXJ6SXhEYlBvWGlGWEFGZ0kzOW81WVVFb0xL?=
+ =?utf-8?B?cDlnckk3cDlRcjNDbStaY2JVUDhLYkZRbUNERUwzVEtqMnMwK0I4NEJCMW03?=
+ =?utf-8?B?dUFhd0xBWEZQQXhzdzJiVFY3aXFMN1lGL3lqb0pkY3M4S3M3c1Y3WDJUb3Zq?=
+ =?utf-8?B?NDhJTU1vTWxxazJqTkRzK1pkM0xnVDFTRm1tbE5OdlJNNWVqL0VXdjM3YVor?=
+ =?utf-8?B?ayswN0lBeU9aZ0FQaWFhbmkwWFVHaGVGREhVNFZoSzZhUjlpT0wxbzJwbTg3?=
+ =?utf-8?B?dlc3VDZ2OTJVa0xpZTdCQ1hhUVF1ZUl4SDVHa05kcHpDSXcvTTB4NEpWQi9H?=
+ =?utf-8?B?M2tnRE9IVkV3K0ViaWVkRHJzN0xJZnVqQ3A3R3RubXM3R1VFendxcTZ5a2tG?=
+ =?utf-8?B?NkpUWGpKZmplb0dOME9VMzJybjBrSDlzb2ljWVVVTmNUYVROUGRXRTBSazNW?=
+ =?utf-8?B?VkNWTHhUTzRxT1B6NXJabE83aW9rWmRZUjlaRkNqdndFblQvNlRTMXVhYUxw?=
+ =?utf-8?B?MWxodmlHZzMwN0ZUQnZMMm1sbzF6emVuZWdTWVB3bDRSN3J0aXFTTm1ETE5k?=
+ =?utf-8?B?SThaK0ZBOUJwcDdEM3FWdHE4aWN4a3M4U2N6UnR2RG9JTzlWd0NqcENjYWZG?=
+ =?utf-8?B?Tzl0THhNdXhVbmdnd2xLVjBMeHJPNFRQcXJJTVJPcWJyYzcyMWxWTmZ1bnFE?=
+ =?utf-8?B?VVd5TGF3M2RUWWZvaCs5bUEyS2JqQUlZeXpQcjE3bzlJOFlVajc4eS9FYml3?=
+ =?utf-8?B?ZmZHUnJKM05RSU13bUFtRDdMWjAvZS82a09Wci83RXBRV1BHQ0NCeGErZW9I?=
+ =?utf-8?B?VEVqY0F0MnBJVFNoTXdFNVVHSlZNZkUzam1oL0pHQ0hGaXhuOVRic0MwMm1Z?=
+ =?utf-8?B?cnMwMzQzeVIrWnFBSit1aE9ic21KVHgzV3g5ODRqOElNNEIrRC93MWJ5Q0FZ?=
+ =?utf-8?B?MFFrclhOb08rT3J0ZDFyRGZaN2RpOHZ3ZU9aMU1RUkdEazd5MlY1b0hhaW1Z?=
+ =?utf-8?B?NTBKMG41MEp6Vkx0Z1l3ZHJoVEVrZVVXRXhESk5NVTJhb2FPRjlBZ2xEbFl1?=
+ =?utf-8?B?S1MrYndHUU5FdStyalBPVHZBTkhtRWlwem51MU5hcjdBTUJMbGQxR2RnUEk4?=
+ =?utf-8?B?dy9HZ0c2K1RRakJ5UGl0WVlZaDBXR0Jja1ZucDk4Nkp5YVRYeDFwaCtDYkRB?=
+ =?utf-8?B?MTQzU2RQV2xHQ0lWT1Vidms1OHlqNExhY2pOMVlVdmJYYW1DSXhYV1lCSjZn?=
+ =?utf-8?B?MFVxMlZHbDh3OWVLYjdCQURyY0J3OGU1YkxIRTQxREJoVXlEcWl1ZVJUM2tx?=
+ =?utf-8?B?RlpYbG9MK0JGNVdhSlM1bGJmTzFsSzZSMTk1bGR3aGhrbmxEbUdhQ05LTWdF?=
+ =?utf-8?B?S2ZWV0dsblpQL1VkaTcrNVlFYTVqWlFsc2JCRmsxK0taVk44YnBYUDlEOTVu?=
+ =?utf-8?B?eDllM21PQmxlR01ESlFlSHN5TE9lK3c5Y1ZjT3RsdkxyMUZsdHdINENqNTlZ?=
+ =?utf-8?B?TzBKdUFDellQRWREdHRCb3lNYkxuNE94bWUzRkIzOFRXNVltQTd5eGowd0JP?=
+ =?utf-8?B?U1BCOEYrNi90TkY0SzZlZEdOMEI1QlBxK244UCtSbXdZTjBQUGpzT0xYamNn?=
+ =?utf-8?B?Y2VZL1NmL3YrMkFieUJXUDJjbVVMclc1cldzQlhUdmFLYjliazk3MGJvbmhv?=
+ =?utf-8?B?Skl5T1VibWVCaUEySFZZSkJhNElJalZVU3dERkdHUG0yd08vcmZUOTZFdmlo?=
+ =?utf-8?B?dmVFRythSGgzNXpqY0tHYkJia0xlREorUTdCak5Ic2QvNjYxQjlTVlZFbjVJ?=
+ =?utf-8?B?MmF2bHY0Q2JBY1NoUWYyT20vZTJlSGxSNXZYTEdkcnZJUDE2SFhncFZhQTVW?=
+ =?utf-8?B?czJWUU8yWHEyd3hKMVE5R2xFQXNPcWtpZWhoSW9tUzFyYTNDbGtKNFZHeENt?=
+ =?utf-8?B?WEJOS0FMTXlLcisva09LU005YzNhQ1NFWWJ5dTY5VTRsZGFpYjQ5Z2Jvdlhq?=
+ =?utf-8?B?U0QrWTVzRUNvR2lhamUyaTBhUDRuV05rZHFpVnIwd1hKZ242bWxraTlGbnkr?=
+ =?utf-8?B?c05mMEFlTTl5Mks4RHNnbTc4aWRxNGc1R3pRaC83UkVXakFQOXZhbktaR1FK?=
+ =?utf-8?B?RGd1UWlMS1FmZ3lYWkxpL0tPZEVEb1N5bk1wcWEwQlZ6UGQyTkxzR3VOdllC?=
+ =?utf-8?B?ckE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: a9fb7869-31cd-4f86-03ad-08dde73f4b0f
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Aug 2025 21:01:58.6321
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IP5kdIUchQ9kg4XzF9bPTtrllhdRd7vh/WwgLN9OJ65AWdNbHDrj13SINv+SKHHYbxEyLTzaMcpV3HDAamWt24fwUFbFV+MTZOB9iXqufNE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA4PR11MB9280
+X-OriginatorOrg: intel.com
+
+--------------SrA6YsmM42cEIP0o0b1I2gke
+Content-Type: multipart/mixed; boundary="------------yjTHFhvj3G70A6ulWFFACFWy";
+ protected-headers="v1"
+From: Jacob Keller <jacob.e.keller@intel.com>
+To: Anton Nadezhdin <anton.nadezhdin@intel.com>,
+ intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org, anthony.l.nguyen@intel.com,
+ richardcochran@gmail.com, Milena Olech <milena.olech@intel.com>,
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Message-ID: <22d92b44-887f-4aca-b281-aa5f813d3c3b@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3] idpf: add HW timestamping
+ statistics
+References: <20250829175734.175963-1-anton.nadezhdin@intel.com>
+In-Reply-To: <20250829175734.175963-1-anton.nadezhdin@intel.com>
+
+--------------yjTHFhvj3G70A6ulWFFACFWy
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-
-On 8/28/25 17:29, Nuno Das Neves wrote:
-> On 8/27/2025 5:59 PM, Mukesh Rathor wrote:
->> Somehow vmbus driver is hinged on CONFIG_HYPERV. It appears this is initial
->> code that did not get addressed when the scope of CONFIG_HYPERV went beyond
->> vmbus. This commit creates a fine grained HYPERV_VMBUS option and updates
->> drivers that depend on VMBUS.
->>
-> 
-> The commit message can be improved. The docs are helpful here:
-> https://docs.kernel.org/process/submitting-patches.html#describe-your-changes
-> 
-> In particular, some clearer reasons for the change.
-> e.g.
-> - CONFIG_HYPERV encompasses too much right now. It's not always clear what
->   depends on builtin hyperv code and what depends on vmbus.
-> 
-> - Since there is so much builtin hyperv code, building CONFIG_HYPERV as a
->   module doesn't make intuitive sense. Building vmbus support as a module does.
-> 
-> - There are actually some real scenarios someone may want to compile with
->   CONFIG_HYPERV but without vmbus, like baremetal root partition.
-> 
-> FWIW I think it's a good idea, interested to hear what others think.
-
-Sorry, you had mentioned it and I expanded the cover letter and forgot the
-commit message here. You said it better than I could above, so I can just use
-that in V1 next week if no other comments.
-
-Thanks,
--Mukesh
+Content-Transfer-Encoding: quoted-printable
 
 
-> Nuno
-> 
->> Signed-off-by: Mukesh Rathor <mrathor@linux.microsoft.com>
->> ---
->>  drivers/gpu/drm/Kconfig        |  2 +-
->>  drivers/hid/Kconfig            |  2 +-
->>  drivers/hv/Kconfig             | 12 +++++++++---
->>  drivers/hv/Makefile            |  2 +-
->>  drivers/input/serio/Kconfig    |  4 ++--
->>  drivers/net/hyperv/Kconfig     |  2 +-
->>  drivers/pci/Kconfig            |  2 +-
->>  drivers/scsi/Kconfig           |  2 +-
->>  drivers/uio/Kconfig            |  2 +-
->>  drivers/video/fbdev/Kconfig    |  2 +-
->>  include/asm-generic/mshyperv.h |  8 +++++---
->>  net/vmw_vsock/Kconfig          |  2 +-
->>  12 files changed, 25 insertions(+), 17 deletions(-)
->>
->> diff --git a/drivers/gpu/drm/Kconfig b/drivers/gpu/drm/Kconfig
->> index f7ea8e895c0c..58f34da061c6 100644
->> --- a/drivers/gpu/drm/Kconfig
->> +++ b/drivers/gpu/drm/Kconfig
->> @@ -398,7 +398,7 @@ source "drivers/gpu/drm/imagination/Kconfig"
->>  
->>  config DRM_HYPERV
->>  	tristate "DRM Support for Hyper-V synthetic video device"
->> -	depends on DRM && PCI && HYPERV
->> +	depends on DRM && PCI && HYPERV_VMBUS
->>  	select DRM_CLIENT_SELECTION
->>  	select DRM_KMS_HELPER
->>  	select DRM_GEM_SHMEM_HELPER
->> diff --git a/drivers/hid/Kconfig b/drivers/hid/Kconfig
->> index a57901203aeb..fe3dc8c0db99 100644
->> --- a/drivers/hid/Kconfig
->> +++ b/drivers/hid/Kconfig
->> @@ -1162,7 +1162,7 @@ config GREENASIA_FF
->>  
->>  config HID_HYPERV_MOUSE
->>  	tristate "Microsoft Hyper-V mouse driver"
->> -	depends on HYPERV
->> +	depends on HYPERV_VMBUS
->>  	help
->>  	Select this option to enable the Hyper-V mouse driver.
->>  
->> diff --git a/drivers/hv/Kconfig b/drivers/hv/Kconfig
->> index 2e8df09db599..08c4ed005137 100644
->> --- a/drivers/hv/Kconfig
->> +++ b/drivers/hv/Kconfig
->> @@ -44,18 +44,24 @@ config HYPERV_TIMER
->>  
->>  config HYPERV_UTILS
->>  	tristate "Microsoft Hyper-V Utilities driver"
->> -	depends on HYPERV && CONNECTOR && NLS
->> +	depends on HYPERV_VMBUS && CONNECTOR && NLS
->>  	depends on PTP_1588_CLOCK_OPTIONAL
->>  	help
->>  	  Select this option to enable the Hyper-V Utilities.
->>  
->>  config HYPERV_BALLOON
->>  	tristate "Microsoft Hyper-V Balloon driver"
->> -	depends on HYPERV
->> +	depends on HYPERV_VMBUS
->>  	select PAGE_REPORTING
->>  	help
->>  	  Select this option to enable Hyper-V Balloon driver.
->>  
->> +config HYPERV_VMBUS
->> +	tristate "Microsoft Hyper-V Vmbus driver"
->> +	depends on HYPERV
->> +	help
->> +	  Select this option to enable Hyper-V Vmbus driver.
->> +
->>  config MSHV_ROOT
->>  	tristate "Microsoft Hyper-V root partition support"
->>  	depends on HYPERV && (X86_64 || ARM64)
->> @@ -75,7 +81,7 @@ config MSHV_ROOT
->>  
->>  config MSHV_VTL
->>  	tristate "Microsoft Hyper-V VTL driver"
->> -	depends on X86_64 && HYPERV_VTL_MODE
->> +	depends on X86_64 && HYPERV_VTL_MODE && HYPERV_VMBUS
->>  	# Mapping VTL0 memory to a userspace process in VTL2 is supported in OpenHCL.
->>  	# VTL2 for OpenHCL makes use of Huge Pages to improve performance on VMs,
->>  	# specially with large memory requirements.
->> diff --git a/drivers/hv/Makefile b/drivers/hv/Makefile
->> index c53a0df746b7..050517756a82 100644
->> --- a/drivers/hv/Makefile
->> +++ b/drivers/hv/Makefile
->> @@ -1,5 +1,5 @@
->>  # SPDX-License-Identifier: GPL-2.0
->> -obj-$(CONFIG_HYPERV)		+= hv_vmbus.o
->> +obj-$(CONFIG_HYPERV_VMBUS)	+= hv_vmbus.o
->>  obj-$(CONFIG_HYPERV_UTILS)	+= hv_utils.o
->>  obj-$(CONFIG_HYPERV_BALLOON)	+= hv_balloon.o
->>  obj-$(CONFIG_MSHV_ROOT)		+= mshv_root.o
->> diff --git a/drivers/input/serio/Kconfig b/drivers/input/serio/Kconfig
->> index 17edc1597446..c7ef347a4dff 100644
->> --- a/drivers/input/serio/Kconfig
->> +++ b/drivers/input/serio/Kconfig
->> @@ -276,8 +276,8 @@ config SERIO_OLPC_APSP
->>  
->>  config HYPERV_KEYBOARD
->>  	tristate "Microsoft Synthetic Keyboard driver"
->> -	depends on HYPERV
->> -	default HYPERV
->> +	depends on HYPERV_VMBUS
->> +	default HYPERV_VMBUS
->>  	help
->>  	  Select this option to enable the Hyper-V Keyboard driver.
->>  
->> diff --git a/drivers/net/hyperv/Kconfig b/drivers/net/hyperv/Kconfig
->> index c8cbd85adcf9..982964c1a9fb 100644
->> --- a/drivers/net/hyperv/Kconfig
->> +++ b/drivers/net/hyperv/Kconfig
->> @@ -1,7 +1,7 @@
->>  # SPDX-License-Identifier: GPL-2.0-only
->>  config HYPERV_NET
->>  	tristate "Microsoft Hyper-V virtual network driver"
->> -	depends on HYPERV
->> +	depends on HYPERV_VMBUS
->>  	select UCS2_STRING
->>  	select NLS
->>  	help
->> diff --git a/drivers/pci/Kconfig b/drivers/pci/Kconfig
->> index 9a249c65aedc..7065a8e5f9b1 100644
->> --- a/drivers/pci/Kconfig
->> +++ b/drivers/pci/Kconfig
->> @@ -221,7 +221,7 @@ config PCI_LABEL
->>  
->>  config PCI_HYPERV
->>  	tristate "Hyper-V PCI Frontend"
->> -	depends on ((X86 && X86_64) || ARM64) && HYPERV && PCI_MSI && SYSFS
->> +	depends on ((X86 && X86_64) || ARM64) && HYPERV_VMBUS && PCI_MSI && SYSFS
->>  	select PCI_HYPERV_INTERFACE
->>  	select IRQ_MSI_LIB
->>  	help
->> diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
->> index 5522310bab8d..19d0884479a2 100644
->> --- a/drivers/scsi/Kconfig
->> +++ b/drivers/scsi/Kconfig
->> @@ -589,7 +589,7 @@ config XEN_SCSI_FRONTEND
->>  
->>  config HYPERV_STORAGE
->>  	tristate "Microsoft Hyper-V virtual storage driver"
->> -	depends on SCSI && HYPERV
->> +	depends on SCSI && HYPERV_VMBUS
->>  	depends on m || SCSI_FC_ATTRS != m
->>  	default HYPERV
->>  	help
->> diff --git a/drivers/uio/Kconfig b/drivers/uio/Kconfig
->> index b060dcd7c635..6f86a61231e6 100644
->> --- a/drivers/uio/Kconfig
->> +++ b/drivers/uio/Kconfig
->> @@ -140,7 +140,7 @@ config UIO_MF624
->>  
->>  config UIO_HV_GENERIC
->>  	tristate "Generic driver for Hyper-V VMBus"
->> -	depends on HYPERV
->> +	depends on HYPERV_VMBUS
->>  	help
->>  	  Generic driver that you can bind, dynamically, to any
->>  	  Hyper-V VMBus device. It is useful to provide direct access
->> diff --git a/drivers/video/fbdev/Kconfig b/drivers/video/fbdev/Kconfig
->> index c21484d15f0c..72c63eaeb983 100644
->> --- a/drivers/video/fbdev/Kconfig
->> +++ b/drivers/video/fbdev/Kconfig
->> @@ -1774,7 +1774,7 @@ config FB_BROADSHEET
->>  
->>  config FB_HYPERV
->>  	tristate "Microsoft Hyper-V Synthetic Video support"
->> -	depends on FB && HYPERV
->> +	depends on FB && HYPERV_VMBUS
->>  	select DMA_CMA if HAVE_DMA_CONTIGUOUS && CMA
->>  	select FB_IOMEM_HELPERS_DEFERRED
->>  	help
->> diff --git a/include/asm-generic/mshyperv.h b/include/asm-generic/mshyperv.h
->> index 1d2ad1304ad4..66c58c91b530 100644
->> --- a/include/asm-generic/mshyperv.h
->> +++ b/include/asm-generic/mshyperv.h
->> @@ -165,6 +165,7 @@ static inline u64 hv_generate_guest_id(u64 kernel_version)
->>  
->>  void __init hv_mark_resources(void);
->>  
->> +#if IS_ENABLED(CONFIG_HYPERV_VMBUS)
->>  /* Free the message slot and signal end-of-message if required */
->>  static inline void vmbus_signal_eom(struct hv_message *msg, u32 old_msg_type)
->>  {
->> @@ -200,6 +201,10 @@ static inline void vmbus_signal_eom(struct hv_message *msg, u32 old_msg_type)
->>  	}
->>  }
->>  
->> +extern int vmbus_interrupt;
->> +extern int vmbus_irq;
->> +#endif /* CONFIG_HYPERV_VMBUS */
->> +
->>  int hv_get_hypervisor_version(union hv_hypervisor_version_info *info);
->>  
->>  void hv_setup_vmbus_handler(void (*handler)(void));
->> @@ -213,9 +218,6 @@ void hv_setup_crash_handler(void (*handler)(struct pt_regs *regs));
->>  void hv_remove_crash_handler(void);
->>  void hv_setup_mshv_handler(void (*handler)(void));
->>  
->> -extern int vmbus_interrupt;
->> -extern int vmbus_irq;
->> -
->>  #if IS_ENABLED(CONFIG_HYPERV)
->>  /*
->>   * Hypervisor's notion of virtual processor ID is different from
->> diff --git a/net/vmw_vsock/Kconfig b/net/vmw_vsock/Kconfig
->> index 56356d2980c8..8e803c4828c4 100644
->> --- a/net/vmw_vsock/Kconfig
->> +++ b/net/vmw_vsock/Kconfig
->> @@ -72,7 +72,7 @@ config VIRTIO_VSOCKETS_COMMON
->>  
->>  config HYPERV_VSOCKETS
->>  	tristate "Hyper-V transport for Virtual Sockets"
->> -	depends on VSOCKETS && HYPERV
->> +	depends on VSOCKETS && HYPERV_VMBUS
->>  	help
->>  	  This module implements a Hyper-V transport for Virtual Sockets.
->>  
 
+On 8/29/2025 10:57 AM, Anton Nadezhdin wrote:
+> From: Milena Olech <milena.olech@intel.com>
+>=20
+> Add HW timestamping statistics support - through implementing get_ts_st=
+ats.
+> Timestamp statistics include correctly timestamped packets, discarded,
+> skipped and flushed during PTP release.
+>=20
+> Most of the stats are collected per vport, only requests skipped due to=
+
+> lack of free latch index are collected per Tx queue.
+>=20
+> Statistics can be obtained using kernel ethtool since version 6.10
+> with:
+> ethtool -I -T <interface>
+>=20
+> The output will include:
+> Statistics:
+>   tx_pkts: 15
+>   tx_lost: 0
+>   tx_err: 0
+>=20
+> Signed-off-by: Milena Olech <milena.olech@intel.com>
+> Co-developed-by: Anton Nadezhdin <anton.nadezhdin@intel.com>
+> Signed-off-by: Anton Nadezhdin <anton.nadezhdin@intel.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> ---
+
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+
+--------------yjTHFhvj3G70A6ulWFFACFWy--
+
+--------------SrA6YsmM42cEIP0o0b1I2gke
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wnsEABYIACMWIQQgQFSp1zOQVirsQx5qll0+bw8o6AUCaLIVRQUDAAAAAAAKCRBqll0+bw8o6Hy8
+AQCOFroUVzLcohbA4zbJZSQyu48DNd5Mk0hThj2UXCjKkAD/TBj91lxJ8DSXNw5XgkcNaH9GWC8H
+7vp5Rd5n4JsdPwk=
+=7R8N
+-----END PGP SIGNATURE-----
+
+--------------SrA6YsmM42cEIP0o0b1I2gke--
 
