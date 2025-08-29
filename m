@@ -1,101 +1,130 @@
-Return-Path: <netdev+bounces-218137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB170B3B403
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 09:13:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40633B3B42A
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 09:20:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8595C3AC4BC
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 07:13:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAFDE1C843DF
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 07:20:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C3112253EE;
-	Fri, 29 Aug 2025 07:13:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E33265CC8;
+	Fri, 29 Aug 2025 07:20:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fTX13nuT"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01F5823F40C
-	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 07:13:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A54F854279
+	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 07:20:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756451614; cv=none; b=HpvCAw4D+/Wd9qjGU9Ak3oMxf41PDTMnS2TyXd5XDbEM30SC7d3G7gBDbfnIE/Kbrkjmk9U52wX+EKdQyVv8A6RonDI7cQZdbwcmRJg8AE8De3ont+lYOufALhK1F5w9gBjVHn4VqGcY0y2UVZuV0RLPBv+2p5yzYWBCnwlfGPw=
+	t=1756452004; cv=none; b=J6/jxm19BDC6V78dM0ouKJKj5Zx3qO/XZZ8RpPR3qE3byvJmWjHPM7hR+XdVeismmZ+X/XvJbHrLX6veirCUiAqNtF6THn44kIp8MX4Ke1mvZlzdGgkHjuKhOg2KPwPEOooJ9eqSKOqQn5agWmslHJXfyCsyrlNj0x53CugyREE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756451614; c=relaxed/simple;
-	bh=cx/p7+6edwHOtFOqMWTLNF24wlA995ty4dPrzYhYrQY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=XxJ+xfAS1Dhh9jBgOarmugMFnIS82SPXgzmp7ta1jDkt1XldKiZScwZ5pGv2c20nibnb6wMIz256usI2iQpIfvMcaSvy+yWkKmUAKwyieCzijPLNxaqpacPS6W4ua8CMGkKo3mQOqFz0KNel8XAfYH2w9x8ecGpXOJZA0rFa4Xw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4cCqGM0NX7ztTPS;
-	Fri, 29 Aug 2025 15:12:27 +0800 (CST)
-Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5A66E18006C;
-	Fri, 29 Aug 2025 15:13:24 +0800 (CST)
-Received: from [10.174.179.113] (10.174.179.113) by
- dggpemf500002.china.huawei.com (7.185.36.57) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 29 Aug 2025 15:13:23 +0800
-Message-ID: <e0d352b7-ee11-4a3d-9e76-289cf90fa6c5@huawei.com>
-Date: Fri, 29 Aug 2025 15:13:22 +0800
+	s=arc-20240116; t=1756452004; c=relaxed/simple;
+	bh=8v8f0d88ljhLJbAQzYIc+XOWg4MAyXlZkHVrhNJjDwQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HHGR5OJqAMYA4XswSTUcj/iAtnkDxPiNx39+2cqHz06CCNiLbUF09L4EnfzMYUyWQVSugrY3tTE5pmbAbuun6mecABHb5nUpJiMIPlhzTuN73pQuz89u/xS3RLhOeondItK/0+e5o32M1hxMnVXP5nXfiZ8l+JMS/e1Ny9Y4720=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fTX13nuT; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4b2979628f9so18542971cf.2
+        for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 00:20:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756452001; x=1757056801; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=s4WmWnlQJPKm6CVBo2ioC99XH+9OEvYsN0cOhGbcCvw=;
+        b=fTX13nuT5n6fuYUqx4h+psj5mSujckJ7STNMRLuFKmMzFBZpR7vLeN/FGZT81ZQEqq
+         hxd2jGi6f1cmKLxGSQyUZp1n9Zbuw+WxIFKh1fNXD5QONi0uP4jIMyOGAT2LUNkby9dU
+         2B7vBNPmIHhPXDflp6ylAM++i/PVc4SLH979t+i02PGrWjK6p675v4T4GLnDZLG7MKqL
+         OuUG/DPIzCAmRm/ULIQNfgT7Q56tnzwrXB/kRtVfUEZCYtivRT3WWxijyVU0/oxRPjBk
+         YHgxgXwpPEpyUse0NeY3eMxw23aZua5DH0S0G6Ge6CZg/l6bTHdshcObgsn9uwMcUWqZ
+         crEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756452001; x=1757056801;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=s4WmWnlQJPKm6CVBo2ioC99XH+9OEvYsN0cOhGbcCvw=;
+        b=xDqZu+rSiSHq5LsJ0oGnWr1aBDkSuY40UD4tb7t/WVergusKWoTALSgUdr0lm0nDb9
+         OKROeZZCr6AeKfvAhTEy95kvLsFID/ngGLCY1KPlWWHdIBIcKweyeS/+X5tYLL00aldK
+         lkVprpM6o+ic2mPeTrQ/H13szJ85Ia8ZJlDj+U/VU+K8r9B4RCrsgyMo5uNEHuE1yCef
+         eXF2RfQZvvVE8yTu4N7rRBsORTIFplOsA6rDU2sMM39eyXOryH5dJMhdV8dys/EVuLPA
+         DwWQb3V1x4zrc0T018p458khlpw8/8M4lbDw5fg9bcT0I4PLdF5tAUAvET80xZCWrDlk
+         k4Yg==
+X-Forwarded-Encrypted: i=1; AJvYcCUgklre/bo1+dZ/P5Fu0KP82C5a2LaYcJMHXkmLi+aqU2QfUECXXnKouN0mXXgCHCQutEp8jBA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvBtgRzsMBc5fcVucDdhIR4ateBxShsFJTdCKgyfZG53T1wGo2
+	SKq0KyjnOiHgCik33xXVeARCYR4yMP0UmIy0TgfPYyzPl1qH/WKgLA++ehY8F91M0ZGjNNWvJ8Q
+	2t2PHLqV8nbquBp1zT4jqP2UMvC6HCU/km+HxkDZw
+X-Gm-Gg: ASbGncvFSaPOveS9hm+Z3RVTCyEtiZ1iYhJ6j9IPaPHfCzoTKrG9YpGjWckcf93tzlk
+	ypvKEwfAD+t5renvC4ki7YwRfU6Ln93QEP2PtJc9tH/NcHWrqL7/f0X9NHnhCDRpuAKd31fcR54
+	x6mE0xZBJTunSYTIHuBdyiax7GG5089QdSPUEz3G+tKKCt/HyrQXeO5+n0IPUbuJ6X9EQuDH+5G
+	j72x9Idllsk8ge+ZIp3Djg=
+X-Google-Smtp-Source: AGHT+IFKRgNnYQo5SKXeCq+aR4b8daUlYumRT0vN594Ss4sWZrwFrQUvkCvgu5KcpC1yPZeMRtXCZsENUgGOxtnC6Ag=
+X-Received: by 2002:a05:622a:1f15:b0:4ab:37bd:5aa9 with SMTP id
+ d75a77b69052e-4b2aaa561edmr285260951cf.17.1756452000894; Fri, 29 Aug 2025
+ 00:20:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next 2/3] inet: ping: remove ping_hash()
-To: Eric Dumazet <edumazet@google.com>
-CC: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, David Ahern <dsahern@kernel.org>,
-	<netdev@vger.kernel.org>, <eric.dumazet@gmail.com>
-References: <20250828164149.3304323-1-edumazet@google.com>
- <20250828164149.3304323-3-edumazet@google.com>
- <df07de96-5b35-4e64-ae9d-41fcdb73d484@huawei.com>
- <CANn89iJvMWSuuPmYG2GojejXcx6uaHEGH5hq3TKRP0QUhK_OZA@mail.gmail.com>
-Content-Language: en-US
-From: Yue Haibing <yuehaibing@huawei.com>
-In-Reply-To: <CANn89iJvMWSuuPmYG2GojejXcx6uaHEGH5hq3TKRP0QUhK_OZA@mail.gmail.com>
+References: <20250827125349.3505302-1-edumazet@google.com> <20250827125349.3505302-2-edumazet@google.com>
+ <CAM0EoMmhq66EtVqDEuNik8MVFZqkgxFbMu=fJtbNoYD7YXg4bA@mail.gmail.com> <CAM0EoMnk8KB780U=qpv+aqvvJuQX_yWgdx4ESJ64vzuQRwvmLw@mail.gmail.com>
+In-Reply-To: <CAM0EoMnk8KB780U=qpv+aqvvJuQX_yWgdx4ESJ64vzuQRwvmLw@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 29 Aug 2025 00:19:49 -0700
+X-Gm-Features: Ac12FXzWRAQM0EEHa76KEudTNjmkTtWGSKgfhYsP_k53scQmYqSWajgh04eqAXg
+Message-ID: <CANn89i+-Qz9QQxBt4s2HFMo-DavOnki-UqSRRGuT8K1mw1T5yg@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/4] net_sched: remove BH blocking in eight actions
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- dggpemf500002.china.huawei.com (7.185.36.57)
+Content-Transfer-Encoding: quoted-printable
 
-On 2025/8/29 14:57, Eric Dumazet wrote:
-> On Thu, Aug 28, 2025 at 11:47 PM Yue Haibing <yuehaibing@huawei.com> wrote:
->>
->> On 2025/8/29 0:41, Eric Dumazet wrote:
->>> There is no point in keeping ping_hash().
->>>
->>> Signed-off-by: Eric Dumazet <edumazet@google.com>
->>> Reviewed-by: David Ahern <dsahern@kernel.org>
->>> ---
->>>  net/ipv4/ping.c | 10 ----------
->>>  net/ipv6/ping.c |  1 -
->>>  2 files changed, 11 deletions(-)
->>>
->>> diff --git a/net/ipv4/ping.c b/net/ipv4/ping.c
->>> index 74a0beddfcc41d8ba17792a11a9d027c9d590bac..75e1b0f5c697653e79166fde5f312f46b471344a 100644
->>> --- a/net/ipv4/ping.c
->>> +++ b/net/ipv4/ping.c
->>> @@ -67,7 +67,6 @@ static inline u32 ping_hashfn(const struct net *net, u32 num, u32 mask)
->>>       pr_debug("hash(%u) = %u\n", num, res);
->>>       return res;
->>>  }
->>> -EXPORT_SYMBOL_GPL(ping_hash);
->>
->> The declaration should also be removed
->>
->> include/net/ping.h:58:void ping_unhash(struct sock *sk);
-> 
-> Right, but you probably meant
+On Thu, Aug 28, 2025 at 8:29=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
+>
+> On Thu, Aug 28, 2025 at 11:26=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.c=
+om> wrote:
+> >
+> > On Wed, Aug 27, 2025 at 8:53=E2=80=AFAM Eric Dumazet <edumazet@google.c=
+om> wrote:
+> > >
+> > > Followup of f45b45cbfae3 ("Merge branch
+> > > 'net_sched-act-extend-rcu-use-in-dump-methods'")
+> > >
+> > > We never grab tcf_lock from BH context in these modules:
+> > >
+> > >  act_connmark
+> > >  act_csum
+> > >  act_ct
+> > >  act_ctinfo
+> > >  act_mpls
+> > >  act_nat
+> > >  act_pedit
+> > >  act_skbedit
+> > >
+> > > No longer block BH when acquiring tcf_lock from init functions.
+> > >
+> >
+> > Brief glance: isnt  the lock still held in BH context for some actions
+> > like pedit and nat (albeit in corner cases)? Both actions call
+> > tcf_action_update_bstats in their act callbacks.
+> > i.e if the action instance was not created with percpu stats,
+> > tcf_action_update_bstats will grab the lock.
+> >
+>
+> Testing with lockdep should illustrate this..
 
-Sure，I have a copy_paste mistake.
-> 
-> include/net/ping.h:57:int ping_hash(struct sock *sk);
+Thanks, I will take a look shortly !
 
