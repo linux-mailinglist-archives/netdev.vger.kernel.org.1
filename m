@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-218267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F92DB3BBA1
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 14:49:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75DDAB3BBA2
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 14:49:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4BE931CC061C
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 12:49:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F01C1A223AD
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 12:49:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA28631282F;
-	Fri, 29 Aug 2025 12:49:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57F0631A055;
+	Fri, 29 Aug 2025 12:49:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=maxlinear.com header.i=@maxlinear.com header.b="NmYRV5vQ"
+	dkim=pass (2048-bit key) header.d=maxlinear.com header.i=@maxlinear.com header.b="3Zn/eAjj"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2059.outbound.protection.outlook.com [40.107.223.59])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2085.outbound.protection.outlook.com [40.107.223.85])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FAF9317715;
-	Fri, 29 Aug 2025 12:49:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.59
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FD1C1D61BB;
+	Fri, 29 Aug 2025 12:49:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.85
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756471747; cv=fail; b=ZpGrNqSiuf2gpLiHZ+s8w+R2SyKVyXMdQu7nZJuoVrPYKGEZ6t5RSFMLS081ChuO/bju964CPsVtLVOUC82Rj6OjipNJY2nPSnGHupva71ACzC7jsVSaY9va/XFguVPGfhCuJUKnFpa8p/2rANNlQRIDZrNPQZ+G3UwzolgVg9c=
+	t=1756471764; cv=fail; b=ssfjNk9ATOgkSiALgWQuaigT1e9Uv7epw5h96WB7r8o6ilXSgAROo+6fU5y2XPEI3M88owZhzMslqzcd9K6AQTDlXiMIBD8H/dQQyEx/esvDE194I+2qRMlWA+WIqSMKTLNor0ZPB9d9Re1uNkAUTbLdIDzhBppxj8VQXP03KIA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756471747; c=relaxed/simple;
-	bh=DvmAfgdc7KfUQFfAHbiPm5O17mz7kbA8LQz582pdzXs=;
+	s=arc-20240116; t=1756471764; c=relaxed/simple;
+	bh=dH/aH+GTykPiHX1JrWawjOz3PN1SJsWGDNWu+ae6kQc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bSAbnCvVdrLrMfvUc6LK7zmUmZD8KNveBVNS4BYwgKsvGWVBvdgWob/do9hg5AD2Opp1v6eOrdJMPAKGVlKyCfN/w4PSnRRKQA1lQFjT2dTzUL6Fg9mwDbTDuzzWkhP03wCFCbzMhHLnwVzyOYbZ9vo/v3yEPAbEqAkwA8AIIFs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=maxlinear.com; spf=pass smtp.mailfrom=maxlinear.com; dkim=pass (2048-bit key) header.d=maxlinear.com header.i=@maxlinear.com header.b=NmYRV5vQ; arc=fail smtp.client-ip=40.107.223.59
+	 MIME-Version:Content-Type; b=sPDCxKWtSWGyS6nN1UylT1/JfNZI2QY3JNAMX3sK8g6x9BMiRe82IbNxFPUeED/EJxD1UP1z8YnLw3pleAMgJxgTpAIBJZWT7xvju4CzKd9MP+aU1ze2vN3WA+P/+SKjVhgjq4azFZVsMpNV22us1ImjLvlv7AVP36Y1tmfwhrc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=maxlinear.com; spf=pass smtp.mailfrom=maxlinear.com; dkim=pass (2048-bit key) header.d=maxlinear.com header.i=@maxlinear.com header.b=3Zn/eAjj; arc=fail smtp.client-ip=40.107.223.85
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=maxlinear.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=maxlinear.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=TsCBkeoSelJp1QXkf504JzjKQZDjNnoaciDES625wgN3naiaFSg2a98wq2gOfmZEtl5lfXK/oEqqcNiVYYscHSINxEATZCbQ8Hp2FMRhDzLjz9aISlQKGxyCMpc5jhFB0SoCAyevpuAQgRobAocl1hM65aVArsB/ev0SR5eg8D/KvUTnXly6eDHbtc1xQxw9PmSZ3sUcwQdU7PMOJ0vNqjGy3+tt9koPv9xuXeUXassrphZieY+EVUTpfEpB/xZyf5bU95Inckxy4svBSzMTcdjVeMOdDN/xNvtIU8RoLY3DOsSXASfXD/FOAEbzKEHjxhyGCExLL1NIUHczyEg8SA==
+ b=GNY2/4lyGm0QQjXx95SOhHSNg+Z4dNqqq5syZsIc3nvTMpeD8a/w+M+ElFxlOQzSVI8LQz5SWswybsdUS8hoiN/DKNSlL5YXerV8r4vQlF1xmnf8fI6lizxNCUzBL11ze7t/wI1OvNsQ4QDZA8py+4zl2vAAVIqRPvO5cNY7LtLMxSfNqK0UysNsB3xzvvdMKuanGJa+17E6vQkqqHcV8X8QKg6cYkOMGSqUhrkh0SEUK/bPA3Ug3pANPLvqqE8j1HC15ik5AFHJBNw9RoDXf10xxN9L6CXmirrpcXrxccizI2EJMSgj1HIYRBz0qG7soQNVm+LfhrR6/VczIX0GAA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dqPlkrMpCCCWizw4J2xwvDYatSHwkvIAW+P3GvPSugQ=;
- b=HZ5n1Jr2gXjyTGLtXbGb45x6/PXucqvgw6fOtRVmKUbAhELAqMCplBOpDvlafw+mxrp2erp0594AY38xP621HQn0vkeg+udhQWup2Piwy8zZEj7HaDin7n2SojkB9Fulj4K+lZqI+7RuqikfWRGGkvjHKVgXCe5Lp9yX19OgHKiASjXjtGLjuTFu0wvSoO19KZrX2Hn03374bUgvDksv9Mxq/ReOlEMQNXBI1F4d/4EgPlsz8zO+gFuAgeP4xgA0YCmIJMt+q3LteHNbF5C7Ftw8qCbh2wnQz7uFfQinFnjDEKBVc99XR+b33qkFNMxhk4Me9UO/nSDgKsZTWnpFfQ==
+ bh=1LEXzeH6T/ypsw3Vct8KhVQDb4RmsP3Mp4nxGAJiIVY=;
+ b=zHwE3kDX+mocznSYtXtT6/dQ9eTilUU6tEHINMoyvnPhM++I+J5DDieLeg76Jnjf+45izFqtJlU3VhwNtPMsJI9NiKnwXaqylk5ObG97NHaZln+Yq+0/W+qPLC27ZwTCRETyXwhDDDX32gQdAB8S6Dfo2tNDTRXXO3whOICKg6c1sNUqN/m/uTQShd8/LpKV8XPK0iCyybNLT+IBNi/d4w3auMhQu7CBF7+9nLz6TBHQBS1pDBRQpgqfZVQah0pXCL6J/vhY+GEY1i0v8WycNGNnXrluqACk+P8zmnDNhyX3bz5FCiUFORH1VTQI6we1OAnTQxxb3FgCYpJ30FH7YA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  174.47.1.92) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=maxlinear.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none
@@ -45,18 +45,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=maxlinear.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dqPlkrMpCCCWizw4J2xwvDYatSHwkvIAW+P3GvPSugQ=;
- b=NmYRV5vQkbwFwiXJU+/vq5W14rEPmzX5s0X0xTqS8JxdZqlq0p+Nvj5OhvJ+xxTUy+UltLmFOcpqjYkg7Dkc3KBzpRrHfE3iHk51VxK6GH2KOeFFyPOASJIPepQA+v/h6fp/I5svFstlYl//cCOtSWHkuz+D8CkszCuD2kGEVG3k5v1rHCx699xdjorQPeaVmO2kKJsoHZsDOuDwJqYfExzW27/x7rQhBf+E3nzXliSmxr2hylZHWylHaox0yXhaMXcfv77QeX+OZSVthdFV+e3OY6mlT6C+hP5oLLOfvAPjzbl6MCi+wfogY0+CdsaaljYp1VF5xis/p8xaIFpDIw==
-Received: from MW2PR2101CA0029.namprd21.prod.outlook.com (2603:10b6:302:1::42)
- by MW3PR19MB4300.namprd19.prod.outlook.com (2603:10b6:303:49::10) with
+ bh=1LEXzeH6T/ypsw3Vct8KhVQDb4RmsP3Mp4nxGAJiIVY=;
+ b=3Zn/eAjj/tY2ed8vVXcXIQrMAoJolJdJvhhGIxKJu6zYlN+NNycgp5biV+c2mKXflGoTdntbM5EIvlLmXPdwyRgYjBwgBAFgQaQtl+/uXVibWmvLe2xGD/hpi6nzsu3uaC/QNPN+xKWqv5pjzoazbtRhoGQqaeToJoEQ4D8te/FLkS+uu+DqhZsmihya4yw5tZ2z/CwrD/YxhCtoY4NdBkli2xcYEWp55LwcjMds6DoApovKuelVfAmLTHR+KlsAcacnisIFha0rjS5PUnEyl6Yeqvc5kDfaDTegCEic5Z1ulu4kxnshD9+w5GcAsp5UCKt5KtDjTG2if2shdHbU9g==
+Received: from BY1P220CA0011.NAMP220.PROD.OUTLOOK.COM (2603:10b6:a03:59d::11)
+ by BLAPR19MB4563.namprd19.prod.outlook.com (2603:10b6:208:293::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.13; Fri, 29 Aug
- 2025 12:49:02 +0000
-Received: from CY4PEPF0000EE3D.namprd03.prod.outlook.com
- (2603:10b6:302:1:cafe::fb) by MW2PR2101CA0029.outlook.office365.com
- (2603:10b6:302:1::42) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9094.10 via Frontend Transport; Fri,
- 29 Aug 2025 12:49:02 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.17; Fri, 29 Aug
+ 2025 12:49:09 +0000
+Received: from CY4PEPF0000EE38.namprd03.prod.outlook.com
+ (2603:10b6:a03:59d:cafe::78) by BY1P220CA0011.outlook.office365.com
+ (2603:10b6:a03:59d::11) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9073.20 via Frontend Transport; Fri,
+ 29 Aug 2025 12:49:09 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 174.47.1.92)
  smtp.mailfrom=maxlinear.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=maxlinear.com;
@@ -64,21 +64,21 @@ Received-SPF: Pass (protection.outlook.com: domain of maxlinear.com designates
  174.47.1.92 as permitted sender) receiver=protection.outlook.com;
  client-ip=174.47.1.92; helo=usmxlcas.maxlinear.com; pr=C
 Received: from usmxlcas.maxlinear.com (174.47.1.92) by
- CY4PEPF0000EE3D.mail.protection.outlook.com (10.167.242.15) with Microsoft
+ CY4PEPF0000EE38.mail.protection.outlook.com (10.167.242.10) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9073.11 via Frontend Transport; Fri, 29 Aug 2025 12:49:02 +0000
+ 15.20.9073.11 via Frontend Transport; Fri, 29 Aug 2025 12:49:08 +0000
 Received: from sgb016.sgsw.maxlinear.com (10.23.238.16) by mail.maxlinear.com
  (10.23.38.31) with Microsoft SMTP Server id 15.2.1544.25; Fri, 29 Aug 2025
- 05:48:58 -0700
+ 05:49:03 -0700
 From: Jack Ping CHNG <jchng@maxlinear.com>
 To: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>
 CC: <davem@davemloft.net>, <andrew+netdev@lunn.ch>, <edumazet@google.com>,
 	<kuba@kernel.org>, <pabeni@redhat.com>, <robh@kernel.org>,
 	<krzk+dt@kernel.org>, <conor+dt@kernel.org>, <yzhu@maxlinear.com>,
 	<sureshnagaraj@maxlinear.com>, Jack Ping CHNG <jchng@maxlinear.com>
-Subject: [PATCH net-next v3 1/2] dt-bindings: net: mxl: Add MxL LGM Network Processor SoC
-Date: Fri, 29 Aug 2025 20:48:42 +0800
-Message-ID: <20250829124843.881786-2-jchng@maxlinear.com>
+Subject: [PATCH net-next v3 2/2] net: maxlinear: Add support for MxL LGM SoC
+Date: Fri, 29 Aug 2025 20:48:43 +0800
+Message-ID: <20250829124843.881786-3-jchng@maxlinear.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250829124843.881786-1-jchng@maxlinear.com>
 References: <20250829124843.881786-1-jchng@maxlinear.com>
@@ -92,186 +92,425 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3D:EE_|MW3PR19MB4300:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2290c1f1-a5cc-4117-4d9b-08dde6fa6e51
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE38:EE_|BLAPR19MB4563:EE_
+X-MS-Office365-Filtering-Correlation-Id: a56c7c54-4601-4988-5800-08dde6fa7208
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|7416014|376014|1800799024|36860700013;
+	BCL:0;ARA:13230040|36860700013|1800799024|7416014|376014|82310400026|13003099007;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?4LK6a+/fEqWxLuWmcMAR77N+mdpvpVaB3hLumBbAX6SR5wI6xXsGw/xr7CbO?=
- =?us-ascii?Q?BV1JrAMRoMWSV/sYLbBCMqfx30rNpO3u043OS6D9K/bIK9uN4pBJlvOytzk7?=
- =?us-ascii?Q?/+ehrpldcCmdvwmEOPla9MthdTZ1Aq183lwJGxLrZFcmOi+H89YhhEDske1T?=
- =?us-ascii?Q?fNeXzUnk+tHufgRAF3zi9WhXHZSiv6IkaxkOQCHuGXk3I5l/pN4vS+eWP/Tr?=
- =?us-ascii?Q?hCR1uctXwfPUUQ5JdUeO+UXpITpkzzzl7gzZIgBQuOZdl8jhUbyAvJ455HQs?=
- =?us-ascii?Q?JAEzhEsVLMtrnn6FIgIRdJk4YaCRe2O7P25hXz/EgjP2qlBs5fYi4+KRUU4J?=
- =?us-ascii?Q?tWlPjfkzQ4MnMiUIa38JXPe3GBeelfG8b7JH4f3FehIAZQ50tDoakNl9+Dl4?=
- =?us-ascii?Q?P0ldmgrmKzJqEm5fMvjyeIZRwDOPlyVBckSj3pCjiGCvRmpfjJf+/K6/SG8W?=
- =?us-ascii?Q?lJEuDe9H8pCBgBgH15CMm7o25gub1uoZsEHqgpe8ggJ1Oy2s/VmjRQ4SqJ6h?=
- =?us-ascii?Q?1HWJEGbQEBYa/XvnPCZ9Pa7MryPo4OIo6ol5B3/JR9w+SfFyH+sYRYMpXnCq?=
- =?us-ascii?Q?Lu3bnIPI/K/MujtyzZ4BpeYOrTJa7LGTDyv3vXIoHLXIy1s5GRVimS8ujbr6?=
- =?us-ascii?Q?oJuFra2LErXNjTWvxOCT9AskLSnO5hGumOOhjqQuNE4f56tUGJ9qevy9IQH7?=
- =?us-ascii?Q?TVdTLqnbooof/1cQJukUZ8G/oRCMju96htrrcbp+Wnh65VAjUP+g0gucpDTV?=
- =?us-ascii?Q?HNVsrlnDJOQojsqmAas3GJezdT7HxeEdiMdYN0m8pjKK6OZeliqcEWaE9Gjm?=
- =?us-ascii?Q?hcq10JmJmCAcWs5TD4d5DUmkQz+GFp4UUrwOakbmZmj+ie1+X0GnFkGCCG6v?=
- =?us-ascii?Q?kMNaoJbYlKpjuoDAUQ3VIyZ+Za8urhxaDtMJr9y/UAQUDoTByfwHnDDJt6W4?=
- =?us-ascii?Q?hH8VBj/LhIzSmYD0+hUUlhWPAck5lexwTd28Phgp1XBVeS+r2n7JoDcVEIMp?=
- =?us-ascii?Q?YhPqA5M2pVCHmgHOCDk0SqXoeMsWHwQamtfrGi9fF8isgu30t6O4a+nEW2KW?=
- =?us-ascii?Q?ceOcEvUEr5ESCbc1E2xmzgAmHfw/h/xVtkn5qo9g2WLST4arWJlOlsoRStnR?=
- =?us-ascii?Q?7t4qlVZ1od1pAnsn9NgktXFe8eLVxzvn4u+LKDVHEfLZmqEt+kgzXTf2ZB3y?=
- =?us-ascii?Q?lIqxdUFOAoQDtRt2oTUajYJrgR2jInrUj5lRiWpO9acZgI0b6ly4ZXycvjXI?=
- =?us-ascii?Q?DF+X0IxjQ21i0nOCbWhphbqmEYJ3X3zPWVo077etmXztgY0y53tMeKlyQoGD?=
- =?us-ascii?Q?lN9p6QA38LjHESUoDyfr1STk8Am0HoUNuopnQpW9LBAs9wCW3x5+eg5AF9pQ?=
- =?us-ascii?Q?srhagMVLSmNEdbYp2LirEdaTeciGZQb7zfVt0WRySFrgp75CX8hF9SLZ+nY6?=
- =?us-ascii?Q?808042+fFr6XmbSpkkB2waHZLD4yJJfLbDxjG5GRoUEmPbUR6aj8gw=3D=3D?=
+	=?us-ascii?Q?uwblW/i5vn/lxTl1Ojte6T3DG9FbLfGHCygA29Sx7C5YriLUSH7d+mO1S4JY?=
+ =?us-ascii?Q?AISb0yKJILJp+mBfk1uDvTTEba2391kXglFawd6z3+7ST5kTYc3YMs3cYGvi?=
+ =?us-ascii?Q?FRcXiGLt2Y9ugMAZI+lPwlwMuXm8J1/0ati/5JLIVv4AhdwMMAT0wp3onamo?=
+ =?us-ascii?Q?rj7VLJ3XAm3ZcStuTFlTL6feamIE5k+fxVx6Je5euSB3+c5XGaHIk/VVla0w?=
+ =?us-ascii?Q?DY41ZSTP+r7Ekpn82SdMX6LglPD76IBsCNxDBbUpiepUdAASqxjxA7VByZOy?=
+ =?us-ascii?Q?uMLvtq/QF65N80mql8BI4FnHcWxXFylyJooQfZtdl+/Dow7eg9JmFlnHJdxX?=
+ =?us-ascii?Q?L9ivJKhVbrKYzE7RgC8geJe9G9Jv22Fkuhm9FRVSq4kgt9WApwEAesFLgbXg?=
+ =?us-ascii?Q?Dsw7ns8+KUg7utGfhos556HHpkkjwhQikYpNpznS2te+l6WASQPYkrEzqsgU?=
+ =?us-ascii?Q?ukGVm0o25bYB955gpHx5DFmI6i8vpiKGLmP++xH3psDhT11lqaIq9DUsthxn?=
+ =?us-ascii?Q?SGHtj83CMTlBQk+he86gTzfbveMp6BvHWO+/yGoWB9RTRNLaYWrg3m8R7id0?=
+ =?us-ascii?Q?uTZnDnx/Ly7M7A88/ACatGcrkWrFtHiSgAwivt02dRlKXYC/0rLHrAqh7xtI?=
+ =?us-ascii?Q?J5gJEVjSzmvSkVe3MztlK43euySMeZbSByZDNDlRp38axP2Q7eWsYwH/oZ3a?=
+ =?us-ascii?Q?STTJG0vMYg/4P4ytwcy2qxc16TMKuwVLaNNFknYrDnBPl4n0b1QJuUGLK8aY?=
+ =?us-ascii?Q?0rfb9aa00njmbmn5HFicFalUr7tqShHb3/hf0qP35fkEdupAgeOrmBUWPd5V?=
+ =?us-ascii?Q?nP8WUesoAM/3O6y88+gvfJZFxN9/98QdPaPGPvDZSksXCYOXhcMS/1lC9Iau?=
+ =?us-ascii?Q?aJIZvssaBhhrKaG+p+/LpN7T1LdKim2Fr64jSi4Dvc3FAKUjtJ56fQl7Rg73?=
+ =?us-ascii?Q?VevNJNRMyF1TOKuKS2fN6KeFBkVfCS2j1EsDvON3tI/QTua1Zxc2RX/H7bF4?=
+ =?us-ascii?Q?B6UJBao+TpgSeEpKv26SXLyip1ENDidWoYY0uPrFdmdfufX+e7/bapail0yK?=
+ =?us-ascii?Q?DgGjNBwxkYiy+2CbR7qjuDha/NR6YgoWWWQqrPy9gHMY72S2yk5Dft9Mnlpr?=
+ =?us-ascii?Q?RerTe32w89MAxM+PelNZDT4LRQRrLb5DTKLpsabC6q2uykI3SZ0uTrVxE8GH?=
+ =?us-ascii?Q?NnurzNhI4nT+w1FGxrxOg0GnDTmPcboMubRqxcx3WMc401Bmauvepv7thRk1?=
+ =?us-ascii?Q?1p2wNvkjMwzjMGsevqWA8y5AzLyOaPDsbIJF4lJPTAPjMQc8s8u01/rbtllt?=
+ =?us-ascii?Q?j2xTfzgIoWXpkCMStD1uDIOU2yrww7I/4pan1W79AjTnLBlAdNFRHuX0SS2s?=
+ =?us-ascii?Q?sgEEA1uZvyK2CGPnblUsYd/y4dVrPabO7b/CyEtDH0v3oSj4crG/HF0bD7hA?=
+ =?us-ascii?Q?TmPHOlMbSg5eprsg2Ca5OEw/tuqTlMcAq0y8lk2FqgKiZ/MNr4+Fdg=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:174.47.1.92;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:usmxlcas.maxlinear.com;PTR:174-47-1-92.static.ctl.one;CAT:NONE;SFS:(13230040)(82310400026)(7416014)(376014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+	CIP:174.47.1.92;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:usmxlcas.maxlinear.com;PTR:174-47-1-92.static.ctl.one;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(7416014)(376014)(82310400026)(13003099007);DIR:OUT;SFP:1101;
 X-OriginatorOrg: maxlinear.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Aug 2025 12:49:02.2748
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Aug 2025 12:49:08.5042
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2290c1f1-a5cc-4117-4d9b-08dde6fa6e51
+X-MS-Exchange-CrossTenant-Network-Message-Id: a56c7c54-4601-4988-5800-08dde6fa7208
 X-MS-Exchange-CrossTenant-Id: dac28005-13e0-41b8-8280-7663835f2b1d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=dac28005-13e0-41b8-8280-7663835f2b1d;Ip=[174.47.1.92];Helo=[usmxlcas.maxlinear.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE3D.namprd03.prod.outlook.com
+	CY4PEPF0000EE38.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR19MB4300
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BLAPR19MB4563
 
-Add devicetree binding documentation for the MaxLinear LGM SoC
-Ethernet controller.
+Add mxl_eth driver to introduce the initial implementation of ethernet
+support for Maxlinear LGM SoC.
+LGM SoC has a multi port MAC controller to interface with the PHY. It also
+has a master MDIO interface to control the external MDIO configured
+devices.
 
 Signed-off-by: Jack Ping CHNG <jchng@maxlinear.com>
 ---
- .../bindings/net/maxlinear,lgm-eth.yaml       | 119 ++++++++++++++++++
- 1 file changed, 119 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/maxlinear,lgm-eth.yaml
+ .../device_drivers/ethernet/index.rst         |   1 +
+ .../device_drivers/ethernet/maxlinear/mxl.rst |  49 +++++
+ MAINTAINERS                                   |   8 +
+ drivers/net/ethernet/Kconfig                  |   1 +
+ drivers/net/ethernet/Makefile                 |   1 +
+ drivers/net/ethernet/maxlinear/Kconfig        |  15 ++
+ drivers/net/ethernet/maxlinear/Makefile       |   6 +
+ drivers/net/ethernet/maxlinear/mxl_eth.c      | 202 ++++++++++++++++++
+ 8 files changed, 283 insertions(+)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/maxlinear/mxl.rst
+ create mode 100644 drivers/net/ethernet/maxlinear/Kconfig
+ create mode 100644 drivers/net/ethernet/maxlinear/Makefile
+ create mode 100644 drivers/net/ethernet/maxlinear/mxl_eth.c
 
-diff --git a/Documentation/devicetree/bindings/net/maxlinear,lgm-eth.yaml b/Documentation/devicetree/bindings/net/maxlinear,lgm-eth.yaml
+diff --git a/Documentation/networking/device_drivers/ethernet/index.rst b/Documentation/networking/device_drivers/ethernet/index.rst
+index 40ac552641a3..13d3cbc96e87 100644
+--- a/Documentation/networking/device_drivers/ethernet/index.rst
++++ b/Documentation/networking/device_drivers/ethernet/index.rst
+@@ -44,6 +44,7 @@ Contents:
+    marvell/octeontx2
+    marvell/octeon_ep
+    marvell/octeon_ep_vf
++   maxlinear/mxl
+    mellanox/mlx5/index
+    meta/fbnic
+    microsoft/netvsc
+diff --git a/Documentation/networking/device_drivers/ethernet/maxlinear/mxl.rst b/Documentation/networking/device_drivers/ethernet/maxlinear/mxl.rst
 new file mode 100644
-index 000000000000..d613f4e535f2
+index 000000000000..cb25b9da2579
 --- /dev/null
-+++ b/Documentation/devicetree/bindings/net/maxlinear,lgm-eth.yaml
-@@ -0,0 +1,119 @@
-+# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/maxlinear,lgm-eth.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
++++ b/Documentation/networking/device_drivers/ethernet/maxlinear/mxl.rst
+@@ -0,0 +1,49 @@
++.. SPDX-License-Identifier: GPL-2.0
 +
-+title: MaxLinear LGM Ethernet Controller
++===============================================
++MaxLinear Multi-MAC Network Processor (NP)
++===============================================
 +
-+maintainers:
-+  - Jack Ping Chng <jchng@maxlinear.com>
++Copyright(c) 2025 MaxLinear, Inc.
 +
-+description:
-+  Binding for MaxLinear LGM Ethernet controller
++Overview
++========
 +
-+properties:
-+  compatible:
-+    enum:
-+      - maxlinear,lgm-eth
++This document describes the Linux driver for the MaxLinear Network Processor
++(NP), a high-performance controller supporting multiple MACs and
++advanced packet processing capabilities.
 +
-+  reg:
-+    maxItems: 2
++The MaxLinear Network processor integrates programmable hardware accelerators
++for tasks such as Layer 2, 3, 4 forwarding, flow steering, and traffic shaping.
++It is designed to operate in high-throughput applications.
 +
-+  reg-names:
-+    items:
-+      - const: port
-+      - const: ctrl
++Key Features
++============
 +
-+  clocks:
-+    maxItems: 1
++- Support for up to 4 independent 10 Gbit/s MAC interfaces
++- Full-duplex 10G operation
++- Multiqueue support for parallel RX/TX paths (per MAC)
 +
-+  clock-names:
-+    items:
-+      - const: ethif
++Supported Devices
++=================
 +
-+  resets:
-+    maxItems: 1
++The driver supports the following MaxLinear NPU family devices:
++- MaxLinear LGM
 +
-+  ethernet-ports:
-+    type: object
-+    additionalProperties: false
++Each device supports multiple MACs and high-performance data pipelines managed
++through internal firmware and programmable engines.
 +
-+    properties:
-+      "#address-cells":
-+        const: 1
++Kernel Configuration
++====================
 +
-+      "#size-cells":
-+        const: 0
++The driver is located in the menu structure at:
 +
-+    patternProperties:
-+      "^port@[0-3]$":
-+        type: object
-+        $ref: ethernet-controller.yaml#
-+        additionalProperties: false
++  -> Device Drivers
++    -> Network device support
++      -> Ethernet driver support
++        -> MaxLinear NPU Ethernet driver
 +
-+        properties:
-+          reg:
-+            description: port id
-+            maxItems: 1
++Or set in your kernel config:
++  CONFIG_NET_VENDOR_MAXLINEAR=y
++  CONFIG_MAXLINEAR_ETH=y
 +
-+          phy-handle:
-+            maxItems: 1
+diff --git a/MAINTAINERS b/MAINTAINERS
+index fe168477caa4..d1475db89d86 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -15102,6 +15102,14 @@ W:	https://linuxtv.org
+ T:	git git://linuxtv.org/media.git
+ F:	drivers/media/radio/radio-maxiradio*
+ 
++MAXLINEAR ETHERNET DRIVER
++M:	Jack Ping Chng <jchng@maxlinear.com>
++L:	netdev@vger.kernel.org
++S:	Maintained
++F:	Documentation/devicetree/bindings/net/maxlinear,lgm-eth.yaml
++F:	Documentation/networking/device_drivers/ethernet/maxlinear/mxl.rst
++F:	drivers/net/ethernet/maxlinear/
 +
-+        required:
-+          - reg
-+          - phy-handle
+ MAXLINEAR ETHERNET PHY DRIVER
+ M:	Xu Liang <lxu@maxlinear.com>
+ L:	netdev@vger.kernel.org
+diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
+index f86d4557d8d7..3e94ff7922c8 100644
+--- a/drivers/net/ethernet/Kconfig
++++ b/drivers/net/ethernet/Kconfig
+@@ -121,6 +121,7 @@ config LANTIQ_XRX200
+ source "drivers/net/ethernet/adi/Kconfig"
+ source "drivers/net/ethernet/litex/Kconfig"
+ source "drivers/net/ethernet/marvell/Kconfig"
++source "drivers/net/ethernet/maxlinear/Kconfig"
+ source "drivers/net/ethernet/mediatek/Kconfig"
+ source "drivers/net/ethernet/mellanox/Kconfig"
+ source "drivers/net/ethernet/meta/Kconfig"
+diff --git a/drivers/net/ethernet/Makefile b/drivers/net/ethernet/Makefile
+index 67182339469a..760d598df197 100644
+--- a/drivers/net/ethernet/Makefile
++++ b/drivers/net/ethernet/Makefile
+@@ -58,6 +58,7 @@ obj-$(CONFIG_LANTIQ_ETOP) += lantiq_etop.o
+ obj-$(CONFIG_LANTIQ_XRX200) += lantiq_xrx200.o
+ obj-$(CONFIG_NET_VENDOR_LITEX) += litex/
+ obj-$(CONFIG_NET_VENDOR_MARVELL) += marvell/
++obj-$(CONFIG_NET_VENDOR_MAXLINEAR) += maxlinear/
+ obj-$(CONFIG_NET_VENDOR_MEDIATEK) += mediatek/
+ obj-$(CONFIG_NET_VENDOR_MELLANOX) += mellanox/
+ obj-$(CONFIG_NET_VENDOR_META) += meta/
+diff --git a/drivers/net/ethernet/maxlinear/Kconfig b/drivers/net/ethernet/maxlinear/Kconfig
+new file mode 100644
+index 000000000000..b88cdd9675fb
+--- /dev/null
++++ b/drivers/net/ethernet/maxlinear/Kconfig
+@@ -0,0 +1,15 @@
++# SPDX-License-Identifier: GPL-2.0-only
++config NET_VENDOR_MAXLINEAR
++	bool "MaxLinear devices"
++	help
++	  If you have a MaxLinear SoC with ethernet, say Y.
 +
-+  mdio:
-+    $ref: mdio.yaml#
-+    unevaluatedProperties: false
++if NET_VENDOR_MAXLINEAR
 +
-+additionalProperties: false
++config MXL_NPU
++	tristate "MaxLinear NPU Ethernet driver"
++	help
++	  This driver supports the MaxLinear NPU Ethernet.
 +
-+required:
-+  - compatible
-+  - reg
-+  - reg-names
-+  - clocks
-+  - clock-names
-+  - resets
-+  - mdio
++endif #NET_VENDOR_MAXLINEAR
 +
-+examples:
-+  - |
-+    ethernet@e7140000 {
-+        compatible = "maxlinear,lgm-eth";
-+        reg = <0xe7140000 0x1200>,<0xe7150000 0x4000>;
-+        reg-names = "port", "ctrl";
-+        clocks = <&cgu0 32>;
-+        clock-names = "ethif";
-+        resets = <&rcu0 0x70 8>;
+diff --git a/drivers/net/ethernet/maxlinear/Makefile b/drivers/net/ethernet/maxlinear/Makefile
+new file mode 100644
+index 000000000000..0577b325494c
+--- /dev/null
++++ b/drivers/net/ethernet/maxlinear/Makefile
+@@ -0,0 +1,6 @@
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# Makefile for the MaxLinear network device drivers.
++#
 +
-+        ethernet-ports {
-+            #address-cells = <1>;
-+            #size-cells = <0>;
++obj-$(CONFIG_MXL_NPU) += mxl_eth.o
+diff --git a/drivers/net/ethernet/maxlinear/mxl_eth.c b/drivers/net/ethernet/maxlinear/mxl_eth.c
+new file mode 100644
+index 000000000000..036a800efe18
+--- /dev/null
++++ b/drivers/net/ethernet/maxlinear/mxl_eth.c
+@@ -0,0 +1,202 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2025  MaxLinear, Inc.
++ */
++#include <linux/clk.h>
++#include <linux/etherdevice.h>
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/netdevice.h>
++#include <linux/of.h>
++#include <linux/platform_device.h>
++#include <linux/reset.h>
 +
-+            port@0 {
-+                reg = <0>;
-+                phy-handle = <&eth_phy0>;
-+            };
++#define ETH_TX_TIMEOUT		(10 * HZ)
++#define MXL_NUM_TX_RING		8
++#define MXL_NUM_RX_RING		8
++#define MXL_NUM_PORT		4
 +
-+            port@1 {
-+                reg = <1>;
-+                phy-handle = <&eth_phy1>;
-+            };
-+        };
++struct mxl_eth_drvdata {
++	struct net_device *ndevs[MXL_NUM_PORT];
++	void __iomem *port_base;
++	void __iomem *ctrl_base;
++	struct clk *clks;
++};
 +
-+        mdio {
-+            #address-cells = <1>;
-+            #size-cells = <0>;
++struct eth_priv {
++	struct platform_device *pdev;
++	struct device_node *np;
++	int port_id;
++};
 +
-+            eth_phy0: ethernet-phy@0 {
-+                reg = <0>;
-+            };
++static int mxl_eth_open(struct net_device *ndev)
++{
++	netif_carrier_on(ndev);
++	netif_start_queue(ndev);
++	return 0;
++}
 +
-+            eth_phy1: ethernet-phy@1 {
-+                reg = <1>;
-+            };
-+        };
-+    };
++static int mxl_eth_stop(struct net_device *ndev)
++{
++	netif_stop_queue(ndev);
++	netif_carrier_off(ndev);
++	return 0;
++}
++
++static int mxl_eth_start_xmit(struct sk_buff *skb, struct net_device *ndev)
++{
++	dev_kfree_skb(skb);
++	return NETDEV_TX_OK;
++}
++
++static const struct net_device_ops mxl_eth_netdev_ops = {
++	.ndo_open       = mxl_eth_open,
++	.ndo_stop       = mxl_eth_stop,
++	.ndo_start_xmit = mxl_eth_start_xmit,
++};
++
++static int mxl_eth_create_ndev(struct platform_device *pdev,
++			       struct device_node *np,
++			       struct net_device **ndev_out)
++{
++	struct net_device *ndev;
++	struct eth_priv *priv;
++	int ret;
++
++	ndev = devm_alloc_etherdev_mqs(&pdev->dev, sizeof(struct eth_priv),
++				       MXL_NUM_TX_RING, MXL_NUM_RX_RING);
++	if (!ndev) {
++		dev_err(&pdev->dev, "alloc_etherdev_mq failed\n");
++		return -ENOMEM;
++	}
++
++	ndev->netdev_ops = &mxl_eth_netdev_ops;
++	ndev->watchdog_timeo = ETH_TX_TIMEOUT;
++	ndev->max_mtu = ETH_FRAME_LEN;
++	ndev->min_mtu = ETH_MIN_MTU;
++	SET_NETDEV_DEV(ndev, &pdev->dev);
++
++	priv = netdev_priv(ndev);
++	priv->pdev = pdev;
++	priv->np = np;
++
++	if (of_property_read_u32(np, "reg", &priv->port_id) < 0) {
++		dev_err(&pdev->dev, "failed to get port id\n");
++		return -EINVAL;
++	}
++
++	ret = register_netdev(ndev);
++	if (ret) {
++		dev_err(&pdev->dev, "failed to register net device\n");
++		return ret;
++	}
++
++	*ndev_out = ndev;
++	return 0;
++}
++
++static void mxl_eth_cleanup(struct mxl_eth_drvdata *drvdata)
++{
++	int i;
++
++	for (i = 0; i < MXL_NUM_PORT && drvdata->ndevs[i]; i++) {
++		unregister_netdev(drvdata->ndevs[i]);
++		drvdata->ndevs[i] = NULL;
++	}
++}
++
++static int mxl_eth_probe(struct platform_device *pdev)
++{
++	struct mxl_eth_drvdata *drvdata;
++	struct device_node *eth_np, *np;
++	struct reset_control *rst;
++	int ret, i = 0;
++
++	drvdata = devm_kzalloc(&pdev->dev, sizeof(*drvdata), GFP_KERNEL);
++	if (!drvdata)
++		return -ENOMEM;
++
++	drvdata->port_base =
++		devm_platform_ioremap_resource_byname(pdev, "port");
++	if (IS_ERR(drvdata->port_base))
++		return PTR_ERR(drvdata->port_base);
++
++	drvdata->ctrl_base =
++		devm_platform_ioremap_resource_byname(pdev, "ctrl");
++	if (IS_ERR(drvdata->ctrl_base))
++		return PTR_ERR(drvdata->ctrl_base);
++
++	drvdata->clks = devm_clk_get_enabled(&pdev->dev, "ethif");
++	if (IS_ERR(drvdata->clks))
++		return dev_err_probe(&pdev->dev, PTR_ERR(drvdata->clks),
++				     "failed to get/enable clock\n");
++
++	rst = devm_reset_control_get(&pdev->dev, NULL);
++	if (IS_ERR(rst))
++		return dev_err_probe(&pdev->dev, PTR_ERR(rst),
++				     "failed to get reset control\n");
++
++	reset_control_assert(rst);
++	udelay(1);
++	reset_control_deassert(rst);
++
++	platform_set_drvdata(pdev, drvdata);
++
++	eth_np = of_get_child_by_name(pdev->dev.of_node, "ethernet-ports");
++	if (!eth_np)
++		return dev_err_probe(&pdev->dev, -ENODEV,
++				     "no ethernet-ports node found!\n");
++
++	for_each_available_child_of_node(eth_np, np) {
++		ret = mxl_eth_create_ndev(pdev, np, &drvdata->ndevs[i++]);
++		if (ret) {
++			of_node_put(np);
++			goto err_cleanup;
++		}
++
++		if (i >= MXL_NUM_PORT) {
++			of_node_put(np);
++			break;
++		}
++	}
++
++	if (!i)
++		return dev_err_probe(&pdev->dev, -ENODEV,
++				     "no valid ethernet port\n");
++
++	return 0;
++
++err_cleanup:
++	mxl_eth_cleanup(drvdata);
++	return ret;
++}
++
++static void mxl_eth_remove(struct platform_device *pdev)
++{
++	struct mxl_eth_drvdata *drvdata = platform_get_drvdata(pdev);
++
++	mxl_eth_cleanup(drvdata);
++}
++
++/* Device Tree match table */
++static const struct of_device_id mxl_eth_of_match[] = {
++	{ .compatible = "maxlinear,lgm-eth" },
++	{ /* sentinel */ }
++};
++MODULE_DEVICE_TABLE(of, mxl_eth_of_match);
++
++/* Platform driver struct */
++static struct platform_driver mxl_eth_drv = {
++	.probe    = mxl_eth_probe,
++	.remove   = mxl_eth_remove,
++	.driver = {
++		.name = KBUILD_MODNAME,
++		.of_match_table = mxl_eth_of_match,
++	},
++};
++
++module_platform_driver(mxl_eth_drv);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("Ethernet driver for MxL SoC");
 -- 
 2.34.1
 
