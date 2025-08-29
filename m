@@ -1,324 +1,119 @@
-Return-Path: <netdev+bounces-218085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A2B9B3B06F
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 03:24:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FAF1B3B089
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 03:33:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9304A01820
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 01:24:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04DF01670EC
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 01:33:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 168BD23D2AB;
-	Fri, 29 Aug 2025 01:23:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C9401990A7;
+	Fri, 29 Aug 2025 01:33:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qBE0Gz4+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FWBg3Lrf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4CF5233735
-	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 01:23:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E351DFF7
+	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 01:33:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756430603; cv=none; b=Q9yBKTM65wL5vgxYxkhhVNrWHT4+FI8BUyzue1m7uq9vYuNLDCyiSVpFHBUzM+kNrX56bs4Kj/RTJ0wSHLNQ/2QR+auUxInbHa+YgdDz6+01e8Ve+ToTwjz9MVUaWq6un2Mmx5OPK0Uf+FQx9FVcPA3LSQt6C8ju3qGgXdVCPXA=
+	t=1756431232; cv=none; b=ifyKUUqpZ6RKfcu5SJKNSCMIzxrAQp80L5RU6BYHenVLEBOB6EEZ7yykPsnGYwgGXptQ/DsE4CF963hVKAUp+OOxHwLjwHKpOWNvzd0HAbqGbGJ5/PSUWAusT88+AbsdP9Stmd4kcQGL4yhEhaQlcUGOTzKkDvmAaN6NE5/WSdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756430603; c=relaxed/simple;
-	bh=rn+EdkkunGL652qk0Ea+YGnPg0x2AofgmDGvhKvkqPo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KB/TLec3xfjdxKvGuyQO2G2dssOhpRR+5C6ZPexSMsjHNf/MaL3nFnSLg2osMvQM1G1zjU4LTaKQkCr0ohxlevj8x54P/NbeII5dehzltcczRc8+F8HHIWoVkZuuDa+M/N2WhbEXBQR1x/ecbzSIq1y7VHjWHe//49FsEJp3gWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qBE0Gz4+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D6EFC113D0;
-	Fri, 29 Aug 2025 01:23:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756430602;
-	bh=rn+EdkkunGL652qk0Ea+YGnPg0x2AofgmDGvhKvkqPo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qBE0Gz4+vk35bOHyVxiUb7y4YwwaGOMpugUuLE2j3JEbc93WAxLyZz7wdS4298upN
-	 DVaBye0L8iF2GK8UofS+rWYnAGMil7jvI/RYLwMgN0CwBRGOiC3QmJM7JVjgAORLts
-	 3FbUfsEECEJWOnd1tEz70C5JUYhMTOziT/s0oLYyWbF9p2Blji3jvPUkjmYGCITH7X
-	 I+okC7sqoAed0ckOqB06gT1EHBP+1E98URxCnI87eNcl+bw5ZmLgrFs7FYw9PDiMRg
-	 +HEO4mPrhtB72YC7XleTkr94sOAvV7etgEMVKxcfIdZxUXGVyRfHc9Jemc78bvtpz6
-	 CWkxc48jv2Btg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	almasrymina@google.com,
-	tariqt@nvidia.com,
-	dtatulea@nvidia.com,
-	hawk@kernel.org,
-	ilias.apalodimas@linaro.org,
-	alexanderduyck@fb.com,
-	sdf@fomichev.me,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 14/14] eth: fbnic: support queue ops / zero-copy Rx
-Date: Thu, 28 Aug 2025 18:23:04 -0700
-Message-ID: <20250829012304.4146195-15-kuba@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250829012304.4146195-1-kuba@kernel.org>
-References: <20250829012304.4146195-1-kuba@kernel.org>
+	s=arc-20240116; t=1756431232; c=relaxed/simple;
+	bh=DPh7cT5+mSJIgSo5SrL13D9bfkqnE+2Fq1ol2kgxtCY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=f17qfh9j+GieE+d2scSYWD6Ug8/+9cPFsDj+LXBJm5QcTh161EMSrvi0dEFgbUyLazfRP8PuclvUU0VUpChwkvp42AsB9xUTjG9IYJFiuMuMB87Mkz3vmS8WLmQm8XiMgvxkNap+SzjCYqNXhklRJtG0CDNC6u+noguqKLxoK+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FWBg3Lrf; arc=none smtp.client-ip=209.85.215.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-b4c645aaa58so1032216a12.2
+        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 18:33:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756431230; x=1757036030; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uoJ0d/w6UnUNtl7ys0E4IAYSwymS8wk+0JNV0D2OiCs=;
+        b=FWBg3LrfIPXM/p05GBIxOai5xhI6yb8PxzoYSibeuiyp0cnNFtJrRcZk/toYe8asXG
+         KAQK6NzqWQCrQH3LJ6Fm7G45Fi5FCbPaVhCC11rI7WTpa2pkIl+MgToQZ1iWZycbQAGb
+         ARwiRifi01wHoaj5A8ctJwbypsIlue9cPPMbzimnUgjNSwoKxiuqHLJqiAO1vc7+oesX
+         5sNRbmWceKGuMdMSmJFaHeOiYnXboVM+WSPjua3/m9pTmYAK8ESGoZ/HwQxmgj0X5cU3
+         +rQHnEilMq5YLhgX5Om7yuFWx5BaQKqPdMvqSrHwlCjlBgQRqzfEno5qf0ZzqznQkxSX
+         b9mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756431230; x=1757036030;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uoJ0d/w6UnUNtl7ys0E4IAYSwymS8wk+0JNV0D2OiCs=;
+        b=krtHK9+MiOxBdb1H0p9IdjePdxxYVNEWmLXmAG2KnBZaCeKP0yrLfF2rplRgwEllTO
+         3E0S3IoFpVSkBcUlgOmpRw6UEeADbhwldPUpTow/8nn/zoQnDXL45sVAGsvhiKYzxwON
+         tHVfOBGDQN83tnOlMY3sF38rR5IvSbcDcTSKAc3EGCkpnmbl2amBy37OVqOc9v1tsVwA
+         9tOEoIXjtPX/F8kKctXRKZXtyg5IKy9j9APHsFYZ+kdOdUDD70KRqZ4CxWGQ+sRrdHlt
+         8H5oZDcEtDWsfWQSWOzU1Ej05CfoYr6/qFKHNOU7Mq+ShzWRgDkxJUhSX9iGqhd2lZL0
+         VxaA==
+X-Forwarded-Encrypted: i=1; AJvYcCW2w3OvQz/7zbIhATGKjz/H27KBemIHwYer1Nn60YgIq6grVOsHZ/WamaWXU7RfZryyHlJX5uo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvJD1OLgpE4+e7VJCc3Ocro/duYhrBtVOrhvlmSUK3v+RqjM4J
+	2urJlFghEnm1Fi0KymcyzoAaGsymOXCDhLsSLITetucy8/JuGaS8J0nIa5FyRIdulCB1J2tYuIV
+	dpbHzS+9qdwKLSiqMNMDW+AoC8NRmkjDBD7ctXGYa
+X-Gm-Gg: ASbGncvw3LZC8wlQ88eV5CarXpG/EJVQiAOSQTaRI/MhGMG1NamU/V7a0mIGnhtTRmG
+	iOWNwyUdmfPGFSmfa2W5MckatSLvQz7fw0R8aluvgkaiNVbVoPQoBNmmo+xIqI5iXlv/QMY75vG
+	6X0h2ylYkcfhvicuXlrUTNpOmSWugwFXYsXPFYxDL1rYoRezWuPpt/02hAX1AYK0U0t6wTTDJ+G
+	46EJKjpP1VaBzD5F/FGnkir9/bpqAWHnaePoVdVtnK8nnti5hasiD3aEY9JNJVrb0hKgRDCkTp7
+	eNk=
+X-Google-Smtp-Source: AGHT+IGzJ7zluIdgfpcR9NREs72zU4TaZpGyrCNDXuLPLWxusMxFDic4R0/yxQzOh/LTnc4pBxJwS2R3jBcIXWDHIS4=
+X-Received: by 2002:a17:903:3885:b0:240:6aad:1c43 with SMTP id
+ d9443c01a7336-2462ef70541mr296230635ad.48.1756431230289; Thu, 28 Aug 2025
+ 18:33:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250828102738.2065992-1-edumazet@google.com> <20250828102738.2065992-6-edumazet@google.com>
+In-Reply-To: <20250828102738.2065992-6-edumazet@google.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Thu, 28 Aug 2025 18:33:39 -0700
+X-Gm-Features: Ac12FXynCaGPSINlb6hgSgmkryYO_9tSnbZj_ufma4NCG2USyN7HOYpGcVQyFVQ
+Message-ID: <CAAVpQUDkRWs8D-PY-pGDC=Wyz1FLd9UKZTFM=msOjdG1FEb9-A@mail.gmail.com>
+Subject: Re: [PATCH net-next 5/5] inet_diag: avoid cache line misses in inet_diag_bc_sk()
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, 
+	Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Support queue ops. fbnic doesn't shut down the entire device
-just to restart a single queue.
+On Thu, Aug 28, 2025 at 3:27=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> inet_diag_bc_sk() pulls five cache lines per socket,
+> while most filters only need the two first ones.
+>
+> Add three booleans to struct inet_diag_dump_data,
+> that are selectively set if a filter needs specific socket fields.
+>
+> - mark_needed       /* INET_DIAG_BC_MARK_COND present. */
+> - cgroup_needed     /* INET_DIAG_BC_CGROUP_COND present. */
+> - userlocks_needed  /* INET_DIAG_BC_AUTO present. */
+>
+> This removes millions of cache lines misses per ss invocation
+> when simple filters are specified on busy servers.
+>
+> offsetof(struct sock, sk_userlocks) =3D 0xf3
+> offsetof(struct sock, sk_mark) =3D 0x20c
+> offsetof(struct sock, sk_cgrp_data) =3D 0x298
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-  ./tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-  TAP version 13
-  1..3
-  ok 1 iou-zcrx.test_zcrx
-  ok 2 iou-zcrx.test_zcrx_oneshot
-  ok 3 iou-zcrx.test_zcrx_rss
-  # Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.h  |   2 +
- .../net/ethernet/meta/fbnic/fbnic_netdev.c    |   3 +-
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.c  | 171 ++++++++++++++++++
- 3 files changed, 174 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-index 58ae7f9c8f54..31fac0ba0902 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-@@ -156,6 +156,8 @@ struct fbnic_napi_vector {
- 	struct fbnic_q_triad qt[];
- };
- 
-+extern const struct netdev_queue_mgmt_ops fbnic_queue_mgmt_ops;
-+
- netdev_tx_t fbnic_xmit_frame(struct sk_buff *skb, struct net_device *dev);
- netdev_features_t
- fbnic_features_check(struct sk_buff *skb, struct net_device *dev,
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-index 1d9d175e8f8c..024007830635 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-@@ -707,11 +707,10 @@ struct net_device *fbnic_netdev_alloc(struct fbnic_dev *fbd)
- 
- 	netdev->netdev_ops = &fbnic_netdev_ops;
- 	netdev->stat_ops = &fbnic_stat_ops;
-+	netdev->queue_mgmt_ops = &fbnic_queue_mgmt_ops;
- 
- 	fbnic_set_ethtool_ops(netdev);
- 
--	netdev->request_ops_lock = true;
--
- 	fbn = netdev_priv(netdev);
- 
- 	fbn->netdev = netdev;
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-index 2e8ea3e01eba..493f7f4df013 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-@@ -2212,6 +2212,13 @@ static void __fbnic_nv_disable(struct fbnic_napi_vector *nv)
- 	}
- }
- 
-+static void
-+fbnic_nv_disable(struct fbnic_net *fbn, struct fbnic_napi_vector *nv)
-+{
-+	__fbnic_nv_disable(nv);
-+	fbnic_wrfl(fbn->fbd);
-+}
-+
- void fbnic_disable(struct fbnic_net *fbn)
- {
- 	struct fbnic_dev *fbd = fbn->fbd;
-@@ -2307,6 +2314,44 @@ int fbnic_wait_all_queues_idle(struct fbnic_dev *fbd, bool may_fail)
- 	return err;
- }
- 
-+static int
-+fbnic_wait_queue_idle(struct fbnic_net *fbn, bool rx, unsigned int idx)
-+{
-+	static const unsigned int tx_regs[] = {
-+		FBNIC_QM_TWQ_IDLE(0), FBNIC_QM_TQS_IDLE(0),
-+		FBNIC_QM_TDE_IDLE(0), FBNIC_QM_TCQ_IDLE(0),
-+	}, rx_regs[] = {
-+		FBNIC_QM_HPQ_IDLE(0), FBNIC_QM_PPQ_IDLE(0),
-+		FBNIC_QM_RCQ_IDLE(0),
-+	};
-+	struct fbnic_dev *fbd = fbn->fbd;
-+	unsigned int val, mask, off;
-+	const unsigned int *regs;
-+	unsigned int reg_cnt;
-+	int i, err;
-+
-+	regs = rx ? rx_regs : tx_regs;
-+	reg_cnt = rx ? ARRAY_SIZE(rx_regs) : ARRAY_SIZE(tx_regs);
-+
-+	off = idx / 32;
-+	mask = BIT(idx % 32);
-+
-+	for (i = 0; i < reg_cnt; i++) {
-+		err = read_poll_timeout_atomic(fbnic_rd32, val, val & mask,
-+					       2, 500000, false,
-+					       fbd, regs[i] + off);
-+		if (err) {
-+			netdev_err(fbd->netdev,
-+				   "wait for queue %s%d idle failed 0x%04x(%d): %08x (mask: %08x)\n",
-+				   rx ? "Rx" : "Tx", idx, regs[i] + off, i,
-+				   val, mask);
-+			return err;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- static void fbnic_nv_flush(struct fbnic_napi_vector *nv)
- {
- 	int j, t;
-@@ -2625,6 +2670,12 @@ static void __fbnic_nv_enable(struct fbnic_napi_vector *nv)
- 	}
- }
- 
-+static void fbnic_nv_enable(struct fbnic_net *fbn, struct fbnic_napi_vector *nv)
-+{
-+	__fbnic_nv_enable(nv);
-+	fbnic_wrfl(fbn->fbd);
-+}
-+
- void fbnic_enable(struct fbnic_net *fbn)
- {
- 	struct fbnic_dev *fbd = fbn->fbd;
-@@ -2703,3 +2754,123 @@ void fbnic_napi_depletion_check(struct net_device *netdev)
- 
- 	fbnic_wrfl(fbd);
- }
-+
-+static int fbnic_queue_mem_alloc(struct net_device *dev, void *qmem, int idx)
-+{
-+	struct fbnic_net *fbn = netdev_priv(dev);
-+	const struct fbnic_q_triad *real;
-+	struct fbnic_q_triad *qt = qmem;
-+	struct fbnic_napi_vector *nv;
-+
-+	if (!netif_running(dev))
-+		return fbnic_alloc_qt_page_pools(fbn, qt, idx);
-+
-+	real = container_of(fbn->rx[idx], struct fbnic_q_triad, cmpl);
-+	nv = fbn->napi[idx % fbn->num_napi];
-+
-+	fbnic_ring_init(&qt->sub0, real->sub0.doorbell, real->sub0.q_idx,
-+			real->sub0.flags);
-+	fbnic_ring_init(&qt->sub1, real->sub1.doorbell, real->sub1.q_idx,
-+			real->sub1.flags);
-+	fbnic_ring_init(&qt->cmpl, real->cmpl.doorbell, real->cmpl.q_idx,
-+			real->cmpl.flags);
-+
-+	return fbnic_alloc_rx_qt_resources(fbn, nv, qt);
-+}
-+
-+static void fbnic_queue_mem_free(struct net_device *dev, void *qmem)
-+{
-+	struct fbnic_net *fbn = netdev_priv(dev);
-+	struct fbnic_q_triad *qt = qmem;
-+
-+	if (!netif_running(dev))
-+		fbnic_free_qt_page_pools(qt);
-+	else
-+		fbnic_free_qt_resources(fbn, qt);
-+}
-+
-+static void __fbnic_nv_restart(struct fbnic_net *fbn,
-+			       struct fbnic_napi_vector *nv)
-+{
-+	struct fbnic_dev *fbd = fbn->fbd;
-+	int i;
-+
-+	fbnic_nv_enable(fbn, nv);
-+	fbnic_nv_fill(nv);
-+
-+	napi_enable_locked(&nv->napi);
-+	fbnic_nv_irq_enable(nv);
-+	fbnic_wr32(fbd, FBNIC_INTR_SET(nv->v_idx / 32), BIT(nv->v_idx % 32));
-+	fbnic_wrfl(fbd);
-+
-+	for (i = 0; i < nv->txt_count; i++)
-+		netif_wake_subqueue(fbn->netdev, nv->qt[i].sub0.q_idx);
-+}
-+
-+static int fbnic_queue_start(struct net_device *dev, void *qmem, int idx)
-+{
-+	struct fbnic_net *fbn = netdev_priv(dev);
-+	struct fbnic_napi_vector *nv;
-+	struct fbnic_q_triad *real;
-+
-+	real = container_of(fbn->rx[idx], struct fbnic_q_triad, cmpl);
-+	nv = fbn->napi[idx % fbn->num_napi];
-+
-+	fbnic_aggregate_ring_rx_counters(fbn, &real->sub0);
-+	fbnic_aggregate_ring_rx_counters(fbn, &real->sub1);
-+	fbnic_aggregate_ring_rx_counters(fbn, &real->cmpl);
-+
-+	memcpy(real, qmem, sizeof(*real));
-+
-+	__fbnic_nv_restart(fbn, nv);
-+
-+	return 0;
-+}
-+
-+static int fbnic_queue_stop(struct net_device *dev, void *qmem, int idx)
-+{
-+	struct fbnic_net *fbn = netdev_priv(dev);
-+	const struct fbnic_q_triad *real;
-+	struct fbnic_napi_vector *nv;
-+	int i, t;
-+	int err;
-+
-+	real = container_of(fbn->rx[idx], struct fbnic_q_triad, cmpl);
-+	nv = fbn->napi[idx % fbn->num_napi];
-+
-+	napi_disable_locked(&nv->napi);
-+	fbnic_nv_irq_disable(nv);
-+
-+	for (i = 0; i < nv->txt_count; i++)
-+		netif_stop_subqueue(dev, nv->qt[i].sub0.q_idx);
-+	fbnic_nv_disable(fbn, nv);
-+
-+	for (t = 0; t < nv->txt_count + nv->rxt_count; t++) {
-+		err = fbnic_wait_queue_idle(fbn, t >= nv->txt_count,
-+					    nv->qt[t].sub0.q_idx);
-+		if (err)
-+			goto err_restart;
-+	}
-+
-+	fbnic_synchronize_irq(fbn->fbd, nv->v_idx);
-+	fbnic_nv_flush(nv);
-+
-+	page_pool_disable_direct_recycling(real->sub0.page_pool);
-+	page_pool_disable_direct_recycling(real->sub1.page_pool);
-+
-+	memcpy(qmem, real, sizeof(*real));
-+
-+	return 0;
-+
-+err_restart:
-+	__fbnic_nv_restart(fbn, nv);
-+	return err;
-+}
-+
-+const struct netdev_queue_mgmt_ops fbnic_queue_mgmt_ops = {
-+	.ndo_queue_mem_size	= sizeof(struct fbnic_q_triad),
-+	.ndo_queue_mem_alloc	= fbnic_queue_mem_alloc,
-+	.ndo_queue_mem_free	= fbnic_queue_mem_free,
-+	.ndo_queue_start	= fbnic_queue_start,
-+	.ndo_queue_stop		= fbnic_queue_stop,
-+};
--- 
-2.51.0
-
+Thanks!
 
