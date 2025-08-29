@@ -1,36 +1,36 @@
-Return-Path: <netdev+bounces-218170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88555B3B680
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 10:57:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0078B3B683
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 10:58:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D762981F96
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 08:57:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0B88466F7B
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 08:57:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9158B2C08BB;
-	Fri, 29 Aug 2025 08:57:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 784C32BF010;
+	Fri, 29 Aug 2025 08:57:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.aperture-lab.de (mail.aperture-lab.de [116.203.183.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06A6C2701D1;
-	Fri, 29 Aug 2025 08:57:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 984941EEA40;
+	Fri, 29 Aug 2025 08:57:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.183.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756457868; cv=none; b=LHy/KifY+C32evGy3wwLcDd2qAGAXExQGLDXpdym941hn377Npks0QYntuUScZY1FGeuxA9YPXuU7OdOfcgtj2Ua1svvLimQBg1Jri/w7PsFO7J5MPWwUBjbcEKMyRBtw26fp/y2Ki4q+VyxPqN/rheXI/zD0MgKyNp3Ssnn91c=
+	t=1756457869; cv=none; b=ewAVqvYA+JrlydjjMLrPi/a22+LgdzGR34BSfBivWTg5/iUMHTjV2hhy5qHgYzSkKtNyTNjvSeh7xpBdrV9DNjFIPudoO4AavhlM8yjGqzFxzI3/U/RZVH0OQVYM5FejyzXLMOgKwb5v3fLTaAk+jIQ9nq7M/WH/Dv5Q/uSnJpc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756457868; c=relaxed/simple;
-	bh=5k0gEYVhfBeLd8xxoqdFRX8s4nSQjtv+QkQ6CPrvUAA=;
+	s=arc-20240116; t=1756457869; c=relaxed/simple;
+	bh=hIcmWdt6oCUpiVjncW8Q9KsvVg1CUjk/pioAO7KtjR4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=vAHrfKnv658SBRlNubgeIm9kmn/Ap7LGpPdpN3NxIKM0QfVKdLRGVm11DCmhi0d7VJB76EXzKs4DdQXD/KDV3jtNMZ3sqlt8KK9s7yAVspt/nhthBNGPSSI/zLMB41RXoVTy5OirVJzotSFLSaL7bfMDty0EJ0YvJyBjEPjZoq4=
+	 MIME-Version:Content-Type; b=K2aJgM1F65IxHx9YZ7LxGJzP3+Cm4YynXO3CArz9q1M7avH2hYCsD2N0iMYahmm+hw+xg8xCx2K+eYokKkNBSQZMTVOVNaKiijprwXf9VOsymC+7uudLM4OKAy0xVaBvTpE2Y7w3tcZs2AI/GEke4mtmlmVd+wWONiDxyaar9qA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c0d3.blue; spf=pass smtp.mailfrom=c0d3.blue; arc=none smtp.client-ip=116.203.183.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c0d3.blue
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=c0d3.blue
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A5D6A54F6C2;
-	Fri, 29 Aug 2025 10:57:42 +0200 (CEST)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id EC37A54F6CA;
+	Fri, 29 Aug 2025 10:57:43 +0200 (CEST)
 From: =?UTF-8?q?Linus=20L=C3=BCssing?= <linus.luessing@c0d3.blue>
 To: bridge@lists.linux.dev
 Cc: netdev@vger.kernel.org,
@@ -47,9 +47,9 @@ Cc: netdev@vger.kernel.org,
 	Stanislav Fomichev <sdf@fomichev.me>,
 	Xiao Liang <shaw.leon@gmail.com>,
 	=?UTF-8?q?Linus=20L=C3=BCssing?= <linus.luessing@c0d3.blue>
-Subject: [PATCH 6/9] net: bridge: mcast: use combined active state in fast/data path
-Date: Fri, 29 Aug 2025 10:53:47 +0200
-Message-ID: <20250829085724.24230-7-linus.luessing@c0d3.blue>
+Subject: [PATCH 7/9] net: bridge: mcast: active state, if snooping is enabled
+Date: Fri, 29 Aug 2025 10:53:48 +0200
+Message-ID: <20250829085724.24230-8-linus.luessing@c0d3.blue>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250829085724.24230-1-linus.luessing@c0d3.blue>
 References: <20250829085724.24230-1-linus.luessing@c0d3.blue>
@@ -63,182 +63,115 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Last-TLS-Session-Version: TLSv1.3
 
-As the multicast active state variable is now always up to date and
-functionally equivalent to our manual, extensive checks in fast path
-we can just use this state variable in fast path, too. This allows to
-save some CPU cycles for every multicast packet in the fast/data path.
+To be able to use the upcoming SWITCHDEV_ATTR_ID_BRIDGE_MC_ACTIVE
+as a potential replacement for SWITCHDEV_ATTR_ID_BRIDGE_MC_DISABLED
+also check and toggle the active state if multicast snooping is enabled
+or disabled. So that MC_ACTIVE not only checks the querier state, but
+also if multicast snooping is enabled in general.
 
-Next to using brmctx->ip4_active / brmctx->ip6_active in fast path this
-mostly just moves some code around to not expose it via br_private.h
-anymore. While at it now also passing the ethernet protocol number
-directly, instead of a pointer into the ethernet header.
+No functional change for the fast/data path yet.
 
 Signed-off-by: Linus Lüssing <linus.luessing@c0d3.blue>
 ---
- net/bridge/br_device.c    |  2 +-
- net/bridge/br_input.c     |  2 +-
- net/bridge/br_multicast.c | 40 ++++++++++++++++++++++++++++++++++-----
- net/bridge/br_private.h   | 38 ++++++++-----------------------------
- 4 files changed, 45 insertions(+), 37 deletions(-)
+ include/uapi/linux/if_link.h |  6 ++++--
+ net/bridge/br_multicast.c    | 21 +++++++++++++++++++--
+ 2 files changed, 23 insertions(+), 4 deletions(-)
 
-diff --git a/net/bridge/br_device.c b/net/bridge/br_device.c
-index a818fdc22da9..3cdf1c17108b 100644
---- a/net/bridge/br_device.c
-+++ b/net/bridge/br_device.c
-@@ -102,7 +102,7 @@ netdev_tx_t br_dev_xmit(struct sk_buff *skb, struct net_device *dev)
- 
- 		mdst = br_mdb_entry_skb_get(brmctx, skb, vid);
- 		if ((mdst || BR_INPUT_SKB_CB_MROUTERS_ONLY(skb)) &&
--		    br_multicast_querier_exists(brmctx, eth_hdr(skb), mdst))
-+		    br_multicast_snooping_active(brmctx, eth_hdr(skb)->h_proto, mdst))
- 			br_multicast_flood(mdst, skb, brmctx, false, true);
- 		else
- 			br_flood(br, skb, BR_PKT_MULTICAST, false, true, vid);
-diff --git a/net/bridge/br_input.c b/net/bridge/br_input.c
-index 5f6ac9bf1527..dfd49b309683 100644
---- a/net/bridge/br_input.c
-+++ b/net/bridge/br_input.c
-@@ -187,7 +187,7 @@ int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff *skb
- 	case BR_PKT_MULTICAST:
- 		mdst = br_mdb_entry_skb_get(brmctx, skb, vid);
- 		if ((mdst || BR_INPUT_SKB_CB_MROUTERS_ONLY(skb)) &&
--		    br_multicast_querier_exists(brmctx, eth_hdr(skb), mdst)) {
-+		    br_multicast_snooping_active(brmctx, eth_hdr(skb)->h_proto, mdst)) {
- 			if ((mdst && mdst->host_joined) ||
- 			    br_multicast_is_router(brmctx, skb) ||
- 			    br->dev->flags & IFF_ALLMULTI) {
+diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
+index fcf2c42aa6c4..ef686ea17afe 100644
+--- a/include/uapi/linux/if_link.h
++++ b/include/uapi/linux/if_link.h
+@@ -746,12 +746,14 @@ enum in6_addr_gen_mode {
+  * @IFLA_BR_MCAST_ACTIVE_V4
+  *   Bridge IPv4 mcast active state, read only.
+  *
+- *   1 if an IGMP querier is present, 0 otherwise.
++ *   1 if *IFLA_BR_MCAST_SNOOPING* is enabled and an IGMP querier is present,
++ *   0 otherwise.
+  *
+  * @IFLA_BR_MCAST_ACTIVE_V6
+  *   Bridge IPv6 mcast active state, read only.
+  *
+- *   1 if an MLD querier is present, 0 otherwise.
++ *   1 if *IFLA_BR_MCAST_SNOOPING* is enabled and an MLD querier is present,
++ *   0 otherwise.
+  */
+ enum {
+ 	IFLA_BR_UNSPEC,
 diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
-index 13840f8f2e5f..54163c74b9a9 100644
+index 54163c74b9a9..53720337a1e3 100644
 --- a/net/bridge/br_multicast.c
 +++ b/net/bridge/br_multicast.c
-@@ -1069,6 +1069,26 @@ static struct sk_buff *br_ip4_multicast_alloc_query(struct net_bridge_mcast *brm
- 	return skb;
+@@ -1145,6 +1145,7 @@ static void br_ip6_multicast_update_active(struct net_bridge_mcast *brmctx,
+  *
+  * The multicast active state is set, per protocol family, if:
+  *
++ * - multicast snooping is enabled
+  * - an IGMP/MLD querier is present
+  * - for own IPv6 MLD querier: an IPv6 address is configured on the bridge
+  *
+@@ -1159,6 +1160,13 @@ static void br_multicast_update_active(struct net_bridge_mcast *brmctx)
+ 
+ 	lockdep_assert_held_once(&brmctx->br->multicast_lock);
+ 
++	if (!br_opt_get(brmctx->br, BROPT_MULTICAST_ENABLED))
++		force_inactive = true;
++
++	if (br_opt_get(brmctx->br, BROPT_MCAST_VLAN_SNOOPING_ENABLED) &&
++	    br_multicast_ctx_vlan_disabled(brmctx))
++		force_inactive = true;
++
+ 	br_ip4_multicast_update_active(brmctx, force_inactive);
+ 	br_ip6_multicast_update_active(brmctx, force_inactive);
+ }
+@@ -1371,6 +1379,12 @@ static struct sk_buff *br_multicast_alloc_query(struct net_bridge_mcast *brmctx,
+ 	return NULL;
  }
  
-+static bool
-+__br_multicast_querier_exists(struct net_bridge_mcast *brmctx,
-+			      struct bridge_mcast_other_query *querier,
-+			      bool is_ipv6)
++static void br_multicast_toggle_enabled(struct net_bridge *br, bool on)
 +{
-+	bool own_querier_enabled;
-+
-+	if (brmctx->multicast_querier) {
-+		if (is_ipv6 && !br_opt_get(brmctx->br, BROPT_HAS_IPV6_ADDR))
-+			own_querier_enabled = false;
-+		else
-+			own_querier_enabled = true;
-+	} else {
-+		own_querier_enabled = false;
-+	}
-+
-+	return !timer_pending(&querier->delay_timer) &&
-+	       (own_querier_enabled || timer_pending(&querier->timer));
++	br_opt_toggle(br, BROPT_MULTICAST_ENABLED, on);
++	br_multicast_update_active(&br->multicast_ctx);
 +}
 +
- static bool br_ip4_multicast_querier_exists(struct net_bridge_mcast *brmctx)
+ struct net_bridge_mdb_entry *br_multicast_new_group(struct net_bridge *br,
+ 						    struct br_ip *group)
  {
- 	return __br_multicast_querier_exists(brmctx, &brmctx->ip4_other_query, false);
-@@ -1081,6 +1101,20 @@ static bool br_ip6_multicast_querier_exists(struct net_bridge_mcast *brmctx)
- }
- #endif
+@@ -1384,7 +1398,7 @@ struct net_bridge_mdb_entry *br_multicast_new_group(struct net_bridge *br,
+ 	if (atomic_read(&br->mdb_hash_tbl.nelems) >= br->hash_max) {
+ 		trace_br_mdb_full(br->dev, group);
+ 		br_mc_disabled_update(br->dev, false, NULL);
+-		br_opt_toggle(br, BROPT_MULTICAST_ENABLED, false);
++		br_multicast_toggle_enabled(br, false);
+ 		return ERR_PTR(-E2BIG);
+ 	}
  
-+static bool br_multicast_querier_exists(struct net_bridge_mcast *brmctx, int proto)
-+{
-+	switch (proto) {
-+	case (ETH_P_IP):
-+		return br_ip4_multicast_querier_exists(brmctx);
-+#if IS_ENABLED(CONFIG_IPV6)
-+	case (ETH_P_IPV6):
-+		return br_ip6_multicast_querier_exists(brmctx);
-+#endif
-+	default:
-+		return false;
-+	}
-+}
+@@ -4452,6 +4466,7 @@ void br_multicast_toggle_one_vlan(struct net_bridge_vlan *vlan, bool on)
+ 
+ 		spin_lock_bh(&br->multicast_lock);
+ 		vlan->priv_flags ^= BR_VLFLAG_MCAST_ENABLED;
++		br_multicast_update_active(&vlan->br_mcast_ctx);
+ 		spin_unlock_bh(&br->multicast_lock);
+ 
+ 		if (on)
+@@ -4472,6 +4487,7 @@ void br_multicast_toggle_one_vlan(struct net_bridge_vlan *vlan, bool on)
+ 			__br_multicast_enable_port_ctx(&vlan->port_mcast_ctx);
+ 		else
+ 			__br_multicast_disable_port_ctx(&vlan->port_mcast_ctx);
++		br_multicast_update_active(brmctx);
+ 		spin_unlock_bh(&br->multicast_lock);
+ 	}
+ }
+@@ -4792,7 +4808,8 @@ int br_multicast_toggle(struct net_bridge *br, unsigned long val,
+ 	if (err)
+ 		goto unlock;
+ 
+-	br_opt_toggle(br, BROPT_MULTICAST_ENABLED, !!val);
++	br_multicast_toggle_enabled(br, !!val);
 +
- static void br_ip4_multicast_update_active(struct net_bridge_mcast *brmctx,
- 					   bool force_inactive)
- {
-@@ -5013,7 +5047,6 @@ bool br_multicast_has_querier_anywhere(struct net_device *dev, int proto)
- {
- 	struct net_bridge *br;
- 	struct net_bridge_port *port;
--	struct ethhdr eth;
- 	bool ret = false;
- 
- 	rcu_read_lock();
-@@ -5026,10 +5059,7 @@ bool br_multicast_has_querier_anywhere(struct net_device *dev, int proto)
- 
- 	br = port->br;
- 
--	memset(&eth, 0, sizeof(eth));
--	eth.h_proto = htons(proto);
--
--	ret = br_multicast_querier_exists(&br->multicast_ctx, &eth, NULL);
-+	ret = br_multicast_querier_exists(&br->multicast_ctx, proto);
- 
- unlock:
- 	rcu_read_unlock();
-diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
-index f83c24def595..05650af596ab 100644
---- a/net/bridge/br_private.h
-+++ b/net/bridge/br_private.h
-@@ -1154,37 +1154,15 @@ br_multicast_is_router(struct net_bridge_mcast *brmctx, struct sk_buff *skb)
- }
- 
- static inline bool
--__br_multicast_querier_exists(struct net_bridge_mcast *brmctx,
--			      struct bridge_mcast_other_query *querier,
--			      const bool is_ipv6)
-+br_multicast_snooping_active(struct net_bridge_mcast *brmctx, __be16 eth_proto,
-+			     const struct net_bridge_mdb_entry *mdb)
- {
--	bool own_querier_enabled;
--
--	if (brmctx->multicast_querier) {
--		if (is_ipv6 && !br_opt_get(brmctx->br, BROPT_HAS_IPV6_ADDR))
--			own_querier_enabled = false;
--		else
--			own_querier_enabled = true;
--	} else {
--		own_querier_enabled = false;
--	}
--
--	return !timer_pending(&querier->delay_timer) &&
--	       (own_querier_enabled || timer_pending(&querier->timer));
--}
--
--static inline bool br_multicast_querier_exists(struct net_bridge_mcast *brmctx,
--					       struct ethhdr *eth,
--					       const struct net_bridge_mdb_entry *mdb)
--{
--	switch (eth->h_proto) {
-+	switch (eth_proto) {
- 	case (htons(ETH_P_IP)):
--		return __br_multicast_querier_exists(brmctx,
--			&brmctx->ip4_other_query, false);
-+		return brmctx->ip4_active;
- #if IS_ENABLED(CONFIG_IPV6)
- 	case (htons(ETH_P_IPV6)):
--		return __br_multicast_querier_exists(brmctx,
--			&brmctx->ip6_other_query, true);
-+		return brmctx->ip6_active;
- #endif
- 	default:
- 		return !!mdb && br_group_is_l2(&mdb->addr);
-@@ -1439,9 +1417,9 @@ static inline bool br_multicast_is_router(struct net_bridge_mcast *brmctx,
- 	return false;
- }
- 
--static inline bool br_multicast_querier_exists(struct net_bridge_mcast *brmctx,
--					       struct ethhdr *eth,
--					       const struct net_bridge_mdb_entry *mdb)
-+static inline bool
-+br_multicast_snooping_active(struct net_bridge_mcast *brmctx, __be16 eth_proto,
-+			     const struct net_bridge_mdb_entry *mdb)
- {
- 	return false;
- }
+ 	if (!br_opt_get(br, BROPT_MULTICAST_ENABLED)) {
+ 		change_snoopers = true;
+ 		goto unlock;
 -- 
 2.50.1
 
