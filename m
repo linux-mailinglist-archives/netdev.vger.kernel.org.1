@@ -1,78 +1,82 @@
-Return-Path: <netdev+bounces-218068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D420FB3B04F
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 03:16:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 23F07B3B050
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 03:16:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B2B05E1AA6
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 01:16:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57C447C4354
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 01:16:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A09411A5B8F;
-	Fri, 29 Aug 2025 01:16:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C63351DED77;
+	Fri, 29 Aug 2025 01:16:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dgbDCEpt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rRJB3Dql"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6011D1E50E
-	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 01:16:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E490613EFF3
+	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 01:16:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756430171; cv=none; b=jWLsX7eOmt3QimBMwk9ivxTe4H2GiAHjTxk07218cqmtFJTYAM/6sT6wOVF3sYKp1+lT6xCgs7Z1jB2DionkjqANuOBEgXOwWTe+Jg9lkvwHIDy90jPQKoE/FIhWeRX5ZI/QI94GIrYH1ne8InPRbVnis68tTZVetSd3Pj6r5tQ=
+	t=1756430172; cv=none; b=dDNEAFXh0tCnwQoC0nQYXy5NJ19QfyTuvtfdkhOl2z8tWwQMs1mIdys0CMYxR7ycul+Pp8fAmpaXXfXPNTqhGtukeN2ppQs9q9YASlTL6M2vA8bD4T8ZvfHATaXGRvGB/d6PL8RjLylZfViYXcV2E1ecPEInHjrmhe87njAR3jw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756430171; c=relaxed/simple;
-	bh=F7rnGkd6c/R4meScnIdD4qb5B/O/brTXwzV8g/fJm98=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=NzyzJdyjururod4/QSK7nL08Ne0rlt274OP3j/gv2B4P73UhZVOWV/7lIxelAoo2AFPzGgLSyHYmS/IMzjwPAnymJTxieuB1OKMqG8aWhzPxXuGrOtJ3AsGV8T81v2V5gvP3apNY7UZHechBPP04qCqVbRC8paBaITJqtq5kqNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dgbDCEpt; arc=none smtp.client-ip=209.85.215.202
+	s=arc-20240116; t=1756430172; c=relaxed/simple;
+	bh=ZBuiThPov7tpGRs9EsN2a/tjJiCF3skRKCUjuHD5Diw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=k2AjddcfqWpKdX3nJgq80wD53XhG9FJRmq2R0OQBjQ17gugB0C+QBd2pTGtry5UGDXnDI0JERCwr31is23LxpA0eBr/Cl8wWEc/LmVMT7yljFvidE9XXdFk6lOcgsQjbpE+MCBe4R/eSyrodLrzSds82+qOJnbsScT0Ho/Chkug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rRJB3Dql; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b4c20148c54so1250102a12.2
-        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 18:16:09 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-771ff6f1020so2936609b3a.3
+        for <netdev@vger.kernel.org>; Thu, 28 Aug 2025 18:16:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756430169; x=1757034969; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=wmgRNFm+xyDy8SyBXlXvXf3BPczQuZM7T4fzMOkn4J0=;
-        b=dgbDCEptRNYvIJTj6FCQCtZsJFyero1Qgv5IchCI5jNEatO8EOqOcJ0RyXm20RAyjf
-         x/ps+IZPwB3otKjq/I+W/Nsqz0M/O0ciwO2zvtW91qIrTK128MmgZx3WGsz9I3RLxdvs
-         WxCV4bi1tpEvL/y2CCh4t1CvypZQwgQIHMNK/Ewc7/aATeKFPWj8TJ0TUN9qP2LfYze+
-         kcUG1lS2yUXz5DvzZBiehUbMCVNmPh5Yb+FYsZ/g6Z1g2PKzv274wj6jkpgqL+S0diUB
-         Sz0DkBwb4xxAaWiZmm+oY2eok0ym09q/9ifzF+nuahULjwst+W2k0ei36vf4zbh9o1UK
-         MmUw==
+        d=google.com; s=20230601; t=1756430170; x=1757034970; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LhX8zTKpfIyWjy9VbI0192ydyYGCRSBK2h+czCGGSiM=;
+        b=rRJB3DqlvsE07U7LG6uz0SkJfzT3szNTDytSY92TRtw/Mceys+e/Sc/WsgSvjyzBEv
+         L9Q1Yq9lerV2PEyY8sU37S3JbxkpdsyvjP/qoE8XDnwwNsyCZfO+ImxYUOO4ERQ0aFA+
+         q0+UrVewjLNVl/4AOlUqGcTBRY30aRf/yR+/8pMRkHNHB3SE78fV0M7hCadqoyluB4VY
+         UcfV+EdfWEqAjCKApGLzp6+xM2P4u4FU2GtDefby8jIDIjSj/hCryFoc5aHaQeHMrlNm
+         tv0NvJLXSnUfEcAs/HBN2v4RY0KOiPWVjpBFmCr7HxJPndjmqJLhHvYiEx5IXlThxYw6
+         SwNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756430169; x=1757034969;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wmgRNFm+xyDy8SyBXlXvXf3BPczQuZM7T4fzMOkn4J0=;
-        b=NGy3q9aFoqfoCkNT4j9Dxf4y/wkIzhKC5GMYmV6/goX2BuRW9AeVct2gAFuJKIlh4n
-         1R/gfh/Ic800k86ubi9rIcQWuTshfC17AZU97WdmIr6RrDUzDsqhh/zWoY3vcR8z9QPP
-         VvFYb9qk/ef27ZC/ZgfeXsXADinHvPYCRPMtKW9rey9o/B4Bq+XYTaAqO6CuPJz+25b4
-         JjPUOCdqEjHo89hNVS2DTzxs6ngVyn5fX69aWzV/tnwMZF+cR7oLnZMk2D0F6Im8hHK8
-         lLDVg0ZwAff3vqIRIQnZznIpL4UoE/vVcQVmwsJyNxeEtsA0njCcdj4YtVwVS1720DlY
-         Sbhg==
-X-Forwarded-Encrypted: i=1; AJvYcCUQQBfrCG9j3qydosocvcLaLOXEgKBme8crVN4jfp1ORlFaM67YryRKxaEWmG0T30mI5w5QMk8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyqZITz4fpE6pxelRo+dxTHOde48NyuMOh7vSnjQiVV8EG/cBFO
-	kaXhXUV04DSEareou65dbOEfXGmq4ZounA30Zt87aL+6at28SM3BTb9gY6ezlSD4hhERj302xVR
-	Q2cyGqfSOIVyyPg==
-X-Google-Smtp-Source: AGHT+IHfxwOKl14i7P3WNrbBMsl8X4+xlJHVDewesV0MdhEn0ELLXvaLE0dEfiom8V6mhFPWyozY5rD+LIW3Ig==
-X-Received: from pfhg22.prod.google.com ([2002:a62:e316:0:b0:76c:6ec8:ac2d])
+        d=1e100.net; s=20230601; t=1756430170; x=1757034970;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LhX8zTKpfIyWjy9VbI0192ydyYGCRSBK2h+czCGGSiM=;
+        b=XglNhhn0ip5QbWxZcmcktDOnTMMoBYDHp0VIv3Q+I3ZHoP2mCCnLqPHNZv9QI2FgUT
+         5qbeulwd9imX0BTvYmzMf7IOm9nPFq07pNT4zSRQ78OlyNnR7yI0Ro6Y64s33bjeiHOR
+         9m13elpe2Y0Sp/2+4ayo2/8Aila1a6SKn6Y2FT3Ff+IFgsDVTA6zDgJj5aQzoJ6ABoiF
+         L9IHrjnvXe7Gjph0iS/xmDrP/JtlzotqSlZT9BM5itQ0hJLJStLQjG3aFolH82DgXPYJ
+         /uKPl4O7hNyo2jtSOAE7D/xdTSkEQR/w7O2iLcjJic+AeyrYDKUUaT8xVb7LwAqhqM7P
+         Aauw==
+X-Forwarded-Encrypted: i=1; AJvYcCXqNsobXyLyblbBCwwk7dLGvtX77BRMKeuzRUL7Q4C2iGBC+pWEnrAXA4Bq3mklAvzMz9NK3AU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiyXWXxxBJ/c3Rk1+v+njgqqx8tIRDaDuAWY+3m/Wki+QtoGZr
+	kezpR4zar2N0hDS7c4DePPg7ozdp33/sytcqWf1mAPSfeRcHkb2ubky2zLQuQdhKhxiXpVEUX/O
+	9F99s44eS5v4DkA==
+X-Google-Smtp-Source: AGHT+IGscoBoUZCNwliXCa3kahwf35lk6r7dTy1vRqlT+ss0RV5TnF4D/+c4bVoNBt7cFJCMZwM9RNr9LFFJFA==
+X-Received: from pfug9.prod.google.com ([2002:a05:6a00:789:b0:770:5736:1b9c])
  (user=skhawaja job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a20:258d:b0:243:c171:4774 with SMTP id adf61e73a8af0-243c1714c99mr1552990637.33.1756430168478;
- Thu, 28 Aug 2025 18:16:08 -0700 (PDT)
-Date: Fri, 29 Aug 2025 01:16:04 +0000
+ 2002:a05:6a00:9161:b0:772:270f:58ab with SMTP id d2e1a72fcca58-772270f6052mr3149948b3a.15.1756430170235;
+ Thu, 28 Aug 2025 18:16:10 -0700 (PDT)
+Date: Fri, 29 Aug 2025 01:16:05 +0000
+In-Reply-To: <20250829011607.396650-1-skhawaja@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250829011607.396650-1-skhawaja@google.com>
 X-Mailer: git-send-email 2.51.0.338.gd7d06c2dae-goog
-Message-ID: <20250829011607.396650-1-skhawaja@google.com>
-Subject: [PATCH net-next v8 0/2] Add support to do threaded napi busy poll
+Message-ID: <20250829011607.396650-2-skhawaja@google.com>
+Subject: [PATCH net-next v8 1/2] Extend napi threaded polling to allow kthread
+ based busy polling
 From: Samiullah Khawaja <skhawaja@google.com>
 To: Jakub Kicinski <kuba@kernel.org>, "David S . Miller " <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, 
@@ -80,357 +84,385 @@ To: Jakub Kicinski <kuba@kernel.org>, "David S . Miller " <davem@davemloft.net>,
 Cc: Joe Damato <joe@dama.to>, netdev@vger.kernel.org, skhawaja@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Extend the already existing support of threaded napi poll to do continuous
-busy polling.
+Add a new state to napi state enum:
 
-This is used for doing continuous polling of napi to fetch descriptors
-from backing RX/TX queues for low latency applications. Allow enabling
-of threaded busypoll using netlink so this can be enabled on a set of
-dedicated napis for low latency applications.
+- NAPI_STATE_THREADED_BUSY_POLL
+  Threaded busy poll is enabled/running for this napi.
 
-Once enabled user can fetch the PID of the kthread doing NAPI polling
-and set affinity, priority and scheduler for it depending on the
-low-latency requirements.
+Following changes are introduced in the napi scheduling and state logic:
 
-Extend the netlink interface to allow enabling/disabling threaded
-busypolling at individual napi level.
+- When threaded busy poll is enabled through netlink it also enables
+  NAPI_STATE_THREADED so a kthread is created per napi. It also sets
+  NAPI_STATE_THREADED_BUSY_POLL bit on each napi to indicate that it is
+  going to busy poll the napi.
 
-We use this for our AF_XDP based hard low-latency usecase with usecs
-level latency requirement. For our usecase we want low jitter and stable
-latency at P99.
+- When napi is scheduled with NAPI_STATE_SCHED_THREADED and associated
+  kthread is woken up, the kthread owns the context. If
+  NAPI_STATE_THREADED_BUSY_POLL and NAPI_STATE_SCHED_THREADED both are
+  set then it means that kthread can busy poll.
 
-Following is an analysis and comparison of available (and compatible)
-busy poll interfaces for a low latency usecase with stable P99. This can
-be suitable for applications that want very low latency at the expense
-of cpu usage and efficiency.
+- To keep busy polling and to avoid scheduling of the interrupts, the
+  napi_complete_done returns false when both NAPI_STATE_SCHED_THREADED
+  and NAPI_STATE_THREADED_BUSY_POLL flags are set. Also
+  napi_complete_done returns early to avoid the
+  NAPI_STATE_SCHED_THREADED being unset.
 
-Already existing APIs (SO_BUSYPOLL and epoll) allow busy polling a NAPI
-backing a socket, but the missing piece is a mechanism to busy poll a
-NAPI instance in a dedicated thread while ignoring available events or
-packets, regardless of the userspace API. Most existing mechanisms are
-designed to work in a pattern where you poll until new packets or events
-are received, after which userspace is expected to handle them.
+- If at any point NAPI_STATE_THREADED_BUSY_POLL is unset, the
+  napi_complete_done will run and unset the NAPI_STATE_SCHED_THREADED
+  bit also. This will make the associated kthread go to sleep as per
+  existing logic.
 
-As a result, one has to hack together a solution using a mechanism
-intended to receive packets or events, not to simply NAPI poll. NAPI
-threaded busy polling, on the other hand, provides this capability
-natively, independent of any userspace API. This makes it really easy to
-setup and manage.
+Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
 
-For analysis we use an AF_XDP based benchmarking tool `xsk_rr`. The
-description of the tool and how it tries to simulate the real workload
-is following,
+---
+ Documentation/netlink/specs/netdev.yaml |  5 +-
+ Documentation/networking/napi.rst       | 62 ++++++++++++++++++++++-
+ include/linux/netdevice.h               | 11 ++++-
+ include/uapi/linux/netdev.h             |  1 +
+ net/core/dev.c                          | 66 +++++++++++++++++++++----
+ net/core/dev.h                          |  3 ++
+ net/core/netdev-genl-gen.c              |  2 +-
+ tools/include/uapi/linux/netdev.h       |  1 +
+ 8 files changed, 138 insertions(+), 13 deletions(-)
 
-- It sends UDP packets between 2 machines.
-- The client machine sends packets at a fixed frequency. To maintain the
-  frequency of the packet being sent, we use open-loop sampling. That is
-  the packets are sent in a separate thread.
-- The server replies to the packet inline by reading the pkt from the
-  recv ring and replies using the tx ring.
-- To simulate the application processing time, we use a configurable
-  delay in usecs on the client side after a reply is received from the
-  server.
-
-The xsk_rr tool is posted separately as an RFC for tools/testing/selftest.
-
-We use this tool with following napi polling configurations,
-
-- Interrupts only
-- SO_BUSYPOLL (inline in the same thread where the client receives the
-  packet).
-- SO_BUSYPOLL (separate thread and separate core)
-- Threaded NAPI busypoll
-
-System is configured using following script in all 4 cases,
-
-```
-echo 0 | sudo tee /sys/class/net/eth0/threaded
-echo 0 | sudo tee /proc/sys/kernel/timer_migration
-echo off | sudo tee  /sys/devices/system/cpu/smt/control
-
-sudo ethtool -L eth0 rx 1 tx 1
-sudo ethtool -G eth0 rx 1024
-
-echo 0 | sudo tee /proc/sys/net/core/rps_sock_flow_entries
-echo 0 | sudo tee /sys/class/net/eth0/queues/rx-0/rps_cpus
-
- # pin IRQs on CPU 2
-IRQS="$(gawk '/eth0-(TxRx-)?1/ {match($1, /([0-9]+)/, arr); \
-				print arr[0]}' < /proc/interrupts)"
-for irq in "${IRQS}"; \
-	do echo 2 | sudo tee /proc/irq/$irq/smp_affinity_list; done
-
-echo -1 | sudo tee /proc/sys/kernel/sched_rt_runtime_us
-
-for i in /sys/devices/virtual/workqueue/*/cpumask; \
-			do echo $i; echo 1,2,3,4,5,6 > $i; done
-
-if [[ -z "$1" ]]; then
-  echo 400 | sudo tee /proc/sys/net/core/busy_read
-  echo 100 | sudo tee /sys/class/net/eth0/napi_defer_hard_irqs
-  echo 15000   | sudo tee /sys/class/net/eth0/gro_flush_timeout
-fi
-
-sudo ethtool -C eth0 adaptive-rx off adaptive-tx off rx-usecs 0 tx-usecs 0
-
-if [[ "$1" == "enable_threaded" ]]; then
-  echo 0 | sudo tee /proc/sys/net/core/busy_poll
-  echo 0 | sudo tee /proc/sys/net/core/busy_read
-  echo 100 | sudo tee /sys/class/net/eth0/napi_defer_hard_irqs
-  echo 15000 | sudo tee /sys/class/net/eth0/gro_flush_timeout
-  echo 2 | sudo tee /sys/class/net/eth0/threaded
-  NAPI_T=$(ps -ef | grep napi | grep -v grep | awk '{ print $2 }')
-  sudo chrt -f  -p 50 $NAPI_T
-
-  # pin threaded poll thread to CPU 2
-  sudo taskset -pc 2 $NAPI_T
-fi
-
-if [[ "$1" == "enable_interrupt" ]]; then
-  echo 0 | sudo tee /proc/sys/net/core/busy_read
-  echo 0 | sudo tee /sys/class/net/eth0/napi_defer_hard_irqs
-  echo 15000 | sudo tee /sys/class/net/eth0/gro_flush_timeout
-fi
-```
-
-To enable various configurations, script can be run as following,
-
-- Interrupt Only
-  ```
-  <script> enable_interrupt
-  ```
-
-- SO_BUSYPOLL (no arguments to script)
-  ```
-  <script>
-  ```
-
-- NAPI threaded busypoll
-  ```
-  <script> enable_threaded
-  ```
-
-If using idpf, the script needs to be run again after launching the
-workload just to make sure that the configurations are not reverted. As
-idpf reverts some configurations on software reset when AF_XDP program
-is attached.
-
-Once configured, the workload is run with various configurations using
-following commands. Set period (1/frequency) and delay in usecs to
-produce results for packet frequency and application processing delay.
-
- ## Interrupt Only and SO_BUSYPOLL (inline)
-
-- Server
-```
-sudo chrt -f 50 taskset -c 3-5 ./xsk_rr -o 0 -B 400 -i eth0 -4 \
-	-D <IP-dest> -S <IP-src> -M <MAC-dst> -m <MAC-src> -p 54321 -h -v
-```
-
-- Client
-```
-sudo chrt -f 50 taskset -c 3-5 ./xsk_rr -o 0 -B 400 -i eth0 -4 \
-	-S <IP-src> -D <IP-dest> -m <MAC-src> -M <MAC-dst> -p 54321 \
-	-P <Period-usecs> -d <Delay-usecs>  -T -l 1 -v
-```
-
- ## SO_BUSYPOLL(done in separate core using recvfrom)
-
-Argument -t spawns a seprate thread and continuously calls recvfrom.
-
-- Server
-```
-sudo chrt -f 50 taskset -c 3-5 ./xsk_rr -o 0 -B 400 -i eth0 -4 \
-	-D <IP-dest> -S <IP-src> -M <MAC-dst> -m <MAC-src> -p 54321 \
-	-h -v -t
-```
-
-- Client
-```
-sudo chrt -f 50 taskset -c 3-5 ./xsk_rr -o 0 -B 400 -i eth0 -4 \
-	-S <IP-src> -D <IP-dest> -m <MAC-src> -M <MAC-dst> -p 54321 \
-	-P <Period-usecs> -d <Delay-usecs>  -T -l 1 -v -t
-```
-
- ## NAPI Threaded Busy Poll
-
-Argument -n skips the recvfrom call as there is no recv kick needed.
-
-- Server
-```
-sudo chrt -f 50 taskset -c 3-5 ./xsk_rr -o 0 -B 400 -i eth0 -4 \
-	-D <IP-dest> -S <IP-src> -M <MAC-dst> -m <MAC-src> -p 54321 \
-	-h -v -n
-```
-
-- Client
-```
-sudo chrt -f 50 taskset -c 3-5 ./xsk_rr -o 0 -B 400 -i eth0 -4 \
-	-S <IP-src> -D <IP-dest> -m <MAC-src> -M <MAC-dst> -p 54321 \
-	-P <Period-usecs> -d <Delay-usecs>  -T -l 1 -v -n
-```
-
-| Experiment | interrupts | SO_BUSYPOLL | SO_BUSYPOLL(separate) | NAPI threaded |
-|---|---|---|---|---|
-| 12 Kpkt/s + 0us delay | | | | |
-|  | p5: 12700 | p5: 12900 | p5: 13300 | p5: 12800 |
-|  | p50: 13100 | p50: 13600 | p50: 14100 | p50: 13000 |
-|  | p95: 13200 | p95: 13800 | p95: 14400 | p95: 13000 |
-|  | p99: 13200 | p99: 13800 | p99: 14400 | p99: 13000 |
-| 32 Kpkt/s + 30us delay | | | | |
-|  | p5: 19900 | p5: 16600 | p5: 13100 | p5: 12800 |
-|  | p50: 21100 | p50: 17000 | p50: 13700 | p50: 13000 |
-|  | p95: 21200 | p95: 17100 | p95: 14000 | p95: 13000 |
-|  | p99: 21200 | p99: 17100 | p99: 14000 | p99: 13000 |
-| 125 Kpkt/s + 6us delay | | | | |
-|  | p5: 14600 | p5: 17100 | p5: 13300 | p5: 12900 |
-|  | p50: 15400 | p50: 17400 | p50: 13800 | p50: 13100 |
-|  | p95: 15600 | p95: 17600 | p95: 14000 | p95: 13100 |
-|  | p99: 15600 | p99: 17600 | p99: 14000 | p99: 13100 |
-| 12 Kpkt/s + 78us delay | | | | |
-|  | p5: 14100 | p5: 16700 | p5: 13200 | p5: 12600 |
-|  | p50: 14300 | p50: 17100 | p50: 13900 | p50: 12800 |
-|  | p95: 14300 | p95: 17200 | p95: 14200 | p95: 12800 |
-|  | p99: 14300 | p99: 17200 | p99: 14200 | p99: 12800 |
-| 25 Kpkt/s + 38us delay | | | | |
-|  | p5: 19900 | p5: 16600 | p5: 13000 | p5: 12700 |
-|  | p50: 21000 | p50: 17100 | p50: 13800 | p50: 12900 |
-|  | p95: 21100 | p95: 17100 | p95: 14100 | p95: 12900 |
-|  | p99: 21100 | p99: 17100 | p99: 14100 | p99: 12900 |
-
- ## Observations
-
-- Here without application processing all the approaches give the same
-  latency within 1usecs range and NAPI threaded gives minimum latency.
-- With application processing the latency increases by 3-4usecs when
-  doing inline polling.
-- Using a dedicated core to drive napi polling keeps the latency same
-  even with application processing. This is observed both in userspace
-  and threaded napi (in kernel).
-- Using napi threaded polling in kernel gives lower latency by
-  1-2usecs as compared to userspace driven polling in separate core.
-- Even on a dedicated core, SO_BUSYPOLL adds around 1-2usecs of latency.
-  This is because it doesn't continuously busy poll until events are
-  ready. Instead, it returns after polling only once, requiring the
-  process to re-invoke the syscall for each poll, which requires a new
-  enter/leave kernel cycle and the setup/teardown of the busy poll for
-  every single poll attempt.
-- With application processing userspace will get the packet from recv
-  ring and spend some time doing application processing and then do napi
-  polling. While application processing is happening a dedicated core
-  doing napi polling can pull the packet of the NAPI RX queue and
-  populate the AF_XDP recv ring. This means that when the application
-  thread is done with application processing it has new packets ready to
-  recv and process in recv ring.
-- Napi threaded busy polling in the kernel with a dedicated core gives
-  the consistent P5-P99 latency.
-
-Following histogram is generated to measure the time spent in recvfrom
-while using inline thread with SO_BUSYPOLL. The histogram is generated
-using the following bpftrace command. In this experiment there are 32K
-packets per second and the application processing delay is 30usecs. This
-is to measure whether there is significant time spent pulling packets
-from the descriptor queue that it will affect the overall latency if
-done inline.
-
-```
-bpftrace -e '
-        kprobe:xsk_recvmsg {
-                @start[tid] = nsecs;
-        }
-        kretprobe:xsk_recvmsg {
-                if (@start[tid]) {
-                        $sample = (nsecs - @start[tid]);
-                        @xsk_recvfrom_hist = hist($sample);
-                        delete(@start[tid]);
-                }
-        }
-        END { clear(@start);}'
-```
-
-Here in case of inline busypolling around 35 percent of calls are taking
-1-2usecs and around 50 percent are taking 0.5-2usecs.
-
-@xsk_recvfrom_hist:
-[128, 256)         24073 |@@@@@@@@@@@@@@@@@@@@@@                              |
-[256, 512)         55633 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-[512, 1K)          20974 |@@@@@@@@@@@@@@@@@@@                                 |
-[1K, 2K)           34234 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                     |
-[2K, 4K)            3266 |@@@                                                 |
-[4K, 8K)              19 |                                                    |
-
-v8:
- - Fixed selftest build error.
- - Removed support of enabling napi busy poll at device level.
- - Updated documentation to reflect removal of busy poll at device
-   level.
- - Added paragraph in the cover letter mentioning that napi threaded
-   busy polling allows busy polling a NAPI natively independent of API.
- - Added paragraph in the cover letter explaining why SO_BUSYPOLL is
-   still not enough when run in a dedicated core.
-
-v7:
- - Rebased.
-
-v6:
- - Moved threaded in struct netdevice up to fill the cacheline hole.
- - Changed dev_set_threaded to dev_set_threaded_hint and removed the
-   second argument that was always set to true by all the drivers.
-   Exported only dev_set_threaded_hint and made dev_set_threaded core
-   only function. This change is done in a separate commit.
- - Updated documentation comment for threaded in struct netdevice.
- - gro_flush_helper renamed to gro_flush_normal and moved to gro.h. Also
-   used it in kernel/bpf/cpumap.c
- - Updated documentation to explicitly state that the NAPI threaded busy
-   polling would keep the CPU core busy at 100% usage.
- - Updated documentation and commit messages.
-
-v5:
- - Updated experiment data with 'SO_PREFER_BUSY_POLL' usage as
-   suggested.
- - Sent 'Add support to set napi threaded for individual napi'
-   separately. This series depends on top of that patch.
-   https://lore.kernel.org/netdev/20250423201413.1564527-1-skhawaja@google.com/
- - Added a separate patch to use enum for napi threaded state. Updated
-   the nl_netdev python test.
- - Using "write all" semantics when napi settings set at device level.
-   This aligns with already existing behaviour for other settings.
- - Fix comments to make them kdoc compatible.
- - Updated Documentation/networking/net_cachelines/net_device.rst
- - Updated the missed gro_flush modification in napi_complete_done
-
-v4:
- - Using AF_XDP based benchmark for experiments.
- - Re-enable dev level napi threaded busypoll after soft reset.
-
-v3:
- - Fixed calls to dev_set_threaded in drivers
-
-v2:
- - Add documentation in napi.rst.
- - Provide experiment data and usecase details.
- - Update busy_poller selftest to include napi threaded poll testcase.
- - Define threaded mode enum in netlink interface.
- - Included NAPI threaded state in napi config to save/restore.
-
-Samiullah Khawaja (2):
-  Extend napi threaded polling to allow kthread based busy polling
-  selftests: Add napi threaded busy poll test in `busy_poller`
-
- Documentation/netlink/specs/netdev.yaml       |  5 +-
- Documentation/networking/napi.rst             | 62 ++++++++++++++++-
- include/linux/netdevice.h                     | 11 +++-
- include/uapi/linux/netdev.h                   |  1 +
- net/core/dev.c                                | 66 ++++++++++++++++---
- net/core/dev.h                                |  3 +
- net/core/netdev-genl-gen.c                    |  2 +-
- tools/include/uapi/linux/netdev.h             |  1 +
- tools/testing/selftests/net/busy_poll_test.sh | 25 ++++++-
- tools/testing/selftests/net/busy_poller.c     | 14 +++-
- 10 files changed, 173 insertions(+), 17 deletions(-)
-
-
-base-commit: c3199adbe4ffffc7b6536715e0290d1919a45cd9
+diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
+index c035dc0f64fd..ee2cfb121dbb 100644
+--- a/Documentation/netlink/specs/netdev.yaml
++++ b/Documentation/netlink/specs/netdev.yaml
+@@ -88,7 +88,7 @@ definitions:
+   -
+     name: napi-threaded
+     type: enum
+-    entries: [disabled, enabled]
++    entries: [disabled, enabled, busy-poll-enabled]
+ 
+ attribute-sets:
+   -
+@@ -292,6 +292,9 @@ attribute-sets:
+         doc: Whether the NAPI is configured to operate in threaded polling
+              mode. If this is set to enabled then the NAPI context operates
+              in threaded polling mode.
++             mode. If this is set to enabled then the NAPI context operates
++             in threaded polling mode. If this is set to busy-poll-enabled
++             then the NAPI kthread also does busypolling.
+         type: u32
+         enum: napi-threaded
+   -
+diff --git a/Documentation/networking/napi.rst b/Documentation/networking/napi.rst
+index a15754adb041..b252b6e16262 100644
+--- a/Documentation/networking/napi.rst
++++ b/Documentation/networking/napi.rst
+@@ -263,7 +263,9 @@ are not well known).
+ Busy polling is enabled by either setting ``SO_BUSY_POLL`` on
+ selected sockets or using the global ``net.core.busy_poll`` and
+ ``net.core.busy_read`` sysctls. An io_uring API for NAPI busy polling
+-also exists.
++also exists. Threaded polling of NAPI also has a mode to busy poll for
++packets (:ref:`threaded busy polling<threaded_busy_poll>`) using the same
++thread that is used for NAPI processing.
+ 
+ epoll-based busy polling
+ ------------------------
+@@ -426,6 +428,64 @@ Therefore, setting ``gro_flush_timeout`` and ``napi_defer_hard_irqs`` is
+ the recommended usage, because otherwise setting ``irq-suspend-timeout``
+ might not have any discernible effect.
+ 
++.. _threaded_busy_poll:
++
++Threaded NAPI busy polling
++--------------------------
++
++Threaded NAPI allows processing of packets from each NAPI in a kthread in
++kernel. Threaded NAPI busy polling extends this and adds support to do
++continuous busy polling of this NAPI. This can be used to enable busy polling
++independent of userspace application or the API (epoll, io_uring, raw sockets)
++being used in userspace to process the packets.
++
++It can be enabled for each NAPI using netlink interface.
++
++For example, using following script:
++
++.. code-block:: bash
++
++  $ ynl --family netdev --do napi-set \
++            --json='{"id": 66, "threaded": "busy-poll-enabled"}'
++
++
++Enabling it for each NAPI allows finer control to enable busy pollling for
++only a set of NIC queues which will get traffic with low latency requirements.
++
++Depending on application requirement, user might want to set affinity of the
++kthread that is busy polling each NAPI. User might also want to set priority
++and the scheduler of the thread depending on the latency requirements.
++
++For a hard low-latency application, user might want to dedicate the full core
++for the NAPI polling so the NIC queue descriptors are picked up from the queue
++as soon as they appear. Once enabled, the NAPI thread will poll the NIC queues
++continuously without sleeping. This will keep the CPU core busy with 100%
++usage.  For more relaxed low-latency requirement, user might want to share the
++core with other threads by setting thread affinity and priority.
++
++Once threaded busy polling is enabled for a NAPI, PID of the kthread can be
++fetched using netlink interface so the affinity, priority and scheduler
++configuration can be done.
++
++For example, following script can be used to fetch the pid:
++
++.. code-block:: bash
++
++  $ ynl --family netdev --do napi-get --json='{"id": 66}'
++
++This will output something like following, the pid `258` is the PID of the
++kthread that is polling this NAPI.
++
++.. code-block:: bash
++
++  $ {'defer-hard-irqs': 0,
++     'gro-flush-timeout': 0,
++     'id': 66,
++     'ifindex': 2,
++     'irq-suspend-timeout': 0,
++     'pid': 258,
++     'threaded': 'busy-poll-enabled'}
++
+ .. _threaded:
+ 
+ Threaded NAPI
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index f3a3b761abfb..a88f6596aef7 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -427,6 +427,8 @@ enum {
+ 	NAPI_STATE_THREADED,		/* The poll is performed inside its own thread*/
+ 	NAPI_STATE_SCHED_THREADED,	/* Napi is currently scheduled in threaded mode */
+ 	NAPI_STATE_HAS_NOTIFIER,	/* Napi has an IRQ notifier */
++	NAPI_STATE_THREADED_BUSY_POLL,	/* The threaded napi poller will busy poll */
++	NAPI_STATE_SCHED_THREADED_BUSY_POLL,  /* The threaded napi poller is busy polling */
+ };
+ 
+ enum {
+@@ -441,8 +443,14 @@ enum {
+ 	NAPIF_STATE_THREADED		= BIT(NAPI_STATE_THREADED),
+ 	NAPIF_STATE_SCHED_THREADED	= BIT(NAPI_STATE_SCHED_THREADED),
+ 	NAPIF_STATE_HAS_NOTIFIER	= BIT(NAPI_STATE_HAS_NOTIFIER),
++	NAPIF_STATE_THREADED_BUSY_POLL	= BIT(NAPI_STATE_THREADED_BUSY_POLL),
++	NAPIF_STATE_SCHED_THREADED_BUSY_POLL  =
++			BIT(NAPI_STATE_SCHED_THREADED_BUSY_POLL),
+ };
+ 
++#define NAPIF_STATE_THREADED_BUSY_POLL_MASK \
++	(NAPIF_STATE_THREADED | NAPIF_STATE_THREADED_BUSY_POLL)
++
+ enum gro_result {
+ 	GRO_MERGED,
+ 	GRO_MERGED_FREE,
+@@ -1873,7 +1881,8 @@ enum netdev_reg_state {
+  * 	@addr_len:		Hardware address length
+  *	@upper_level:		Maximum depth level of upper devices.
+  *	@lower_level:		Maximum depth level of lower devices.
+- *	@threaded:		napi threaded state.
++ *	@threaded:		napi threaded mode is disabled, enabled or
++ *				enabled with busy polling.
+  *	@neigh_priv_len:	Used in neigh_alloc()
+  * 	@dev_id:		Used to differentiate devices that share
+  * 				the same link layer address
+diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
+index 48eb49aa03d4..8163afb15377 100644
+--- a/include/uapi/linux/netdev.h
++++ b/include/uapi/linux/netdev.h
+@@ -80,6 +80,7 @@ enum netdev_qstats_scope {
+ enum netdev_napi_threaded {
+ 	NETDEV_NAPI_THREADED_DISABLED,
+ 	NETDEV_NAPI_THREADED_ENABLED,
++	NETDEV_NAPI_THREADED_BUSY_POLL_ENABLED,
+ };
+ 
+ enum {
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 5a3c0f40a93f..07ef77fed447 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -78,6 +78,7 @@
+ #include <linux/slab.h>
+ #include <linux/sched.h>
+ #include <linux/sched/isolation.h>
++#include <linux/sched/types.h>
+ #include <linux/sched/mm.h>
+ #include <linux/smpboot.h>
+ #include <linux/mutex.h>
+@@ -6558,7 +6559,8 @@ bool napi_complete_done(struct napi_struct *n, int work_done)
+ 	 *    the guarantee we will be called later.
+ 	 */
+ 	if (unlikely(n->state & (NAPIF_STATE_NPSVC |
+-				 NAPIF_STATE_IN_BUSY_POLL)))
++				 NAPIF_STATE_IN_BUSY_POLL |
++				 NAPIF_STATE_SCHED_THREADED_BUSY_POLL)))
+ 		return false;
+ 
+ 	if (work_done) {
+@@ -6963,6 +6965,19 @@ static void napi_stop_kthread(struct napi_struct *napi)
+ 	napi->thread = NULL;
+ }
+ 
++static void napi_set_threaded_state(struct napi_struct *napi,
++				    enum netdev_napi_threaded threaded)
++{
++	unsigned long val;
++
++	val = 0;
++	if (threaded == NETDEV_NAPI_THREADED_BUSY_POLL_ENABLED)
++		val |= NAPIF_STATE_THREADED_BUSY_POLL;
++	if (threaded)
++		val |= NAPIF_STATE_THREADED;
++	set_mask_bits(&napi->state, NAPIF_STATE_THREADED_BUSY_POLL_MASK, val);
++}
++
+ int napi_set_threaded(struct napi_struct *napi,
+ 		      enum netdev_napi_threaded threaded)
+ {
+@@ -6989,7 +7004,7 @@ int napi_set_threaded(struct napi_struct *napi,
+ 	} else {
+ 		/* Make sure kthread is created before THREADED bit is set. */
+ 		smp_mb__before_atomic();
+-		assign_bit(NAPI_STATE_THREADED, &napi->state, threaded);
++		napi_set_threaded_state(napi, threaded);
+ 	}
+ 
+ 	return 0;
+@@ -7381,7 +7396,9 @@ void napi_disable_locked(struct napi_struct *n)
+ 		}
+ 
+ 		new = val | NAPIF_STATE_SCHED | NAPIF_STATE_NPSVC;
+-		new &= ~(NAPIF_STATE_THREADED | NAPIF_STATE_PREFER_BUSY_POLL);
++		new &= ~(NAPIF_STATE_THREADED
++			 | NAPIF_STATE_THREADED_BUSY_POLL
++			 | NAPIF_STATE_PREFER_BUSY_POLL);
+ 	} while (!try_cmpxchg(&n->state, &val, new));
+ 
+ 	hrtimer_cancel(&n->timer);
+@@ -7425,7 +7442,7 @@ void napi_enable_locked(struct napi_struct *n)
+ 
+ 		new = val & ~(NAPIF_STATE_SCHED | NAPIF_STATE_NPSVC);
+ 		if (n->dev->threaded && n->thread)
+-			new |= NAPIF_STATE_THREADED;
++			napi_set_threaded_state(n, n->dev->threaded);
+ 	} while (!try_cmpxchg(&n->state, &val, new));
+ }
+ EXPORT_SYMBOL(napi_enable_locked);
+@@ -7593,7 +7610,7 @@ static int napi_thread_wait(struct napi_struct *napi)
+ 	return -1;
+ }
+ 
+-static void napi_threaded_poll_loop(struct napi_struct *napi)
++static void napi_threaded_poll_loop(struct napi_struct *napi, bool busy_poll)
+ {
+ 	struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
+ 	struct softnet_data *sd;
+@@ -7622,22 +7639,53 @@ static void napi_threaded_poll_loop(struct napi_struct *napi)
+ 		}
+ 		skb_defer_free_flush(sd);
+ 		bpf_net_ctx_clear(bpf_net_ctx);
++
++		/* Flush too old packets. If HZ < 1000, flush all packets */
++		if (busy_poll)
++			gro_flush_normal(&napi->gro, HZ >= 1000);
+ 		local_bh_enable();
+ 
+-		if (!repoll)
++		/* If busy polling then do not break here because we need to
++		 * call cond_resched and rcu_softirq_qs_periodic to prevent
++		 * watchdog warnings.
++		 */
++		if (!repoll && !busy_poll)
+ 			break;
+ 
+ 		rcu_softirq_qs_periodic(last_qs);
+ 		cond_resched();
++
++		if (!repoll)
++			break;
+ 	}
+ }
+ 
+ static int napi_threaded_poll(void *data)
+ {
+ 	struct napi_struct *napi = data;
++	bool busy_poll_sched;
++	unsigned long val;
++	bool busy_poll;
++
++	while (!napi_thread_wait(napi)) {
++		/* Once woken up, this means that we are scheduled as threaded
++		 * napi and this thread owns the napi context, if busy poll
++		 * state is set then busy poll this napi.
++		 */
++		val = READ_ONCE(napi->state);
++		busy_poll = val & NAPIF_STATE_THREADED_BUSY_POLL;
++		busy_poll_sched = val & NAPIF_STATE_SCHED_THREADED_BUSY_POLL;
+ 
+-	while (!napi_thread_wait(napi))
+-		napi_threaded_poll_loop(napi);
++		/* Do not busy poll if napi is disabled. */
++		if (unlikely(val & NAPIF_STATE_DISABLE))
++			busy_poll = false;
++
++		if (busy_poll != busy_poll_sched)
++			assign_bit(NAPI_STATE_SCHED_THREADED_BUSY_POLL,
++				   &napi->state, busy_poll);
++
++		napi_threaded_poll_loop(napi, busy_poll);
++	}
+ 
+ 	return 0;
+ }
+@@ -12829,7 +12877,7 @@ static void run_backlog_napi(unsigned int cpu)
+ {
+ 	struct softnet_data *sd = per_cpu_ptr(&softnet_data, cpu);
+ 
+-	napi_threaded_poll_loop(&sd->backlog);
++	napi_threaded_poll_loop(&sd->backlog, false);
+ }
+ 
+ static void backlog_napi_setup(unsigned int cpu)
+diff --git a/net/core/dev.h b/net/core/dev.h
+index d6b08d435479..d6cfe7105903 100644
+--- a/net/core/dev.h
++++ b/net/core/dev.h
+@@ -317,6 +317,9 @@ static inline void napi_set_irq_suspend_timeout(struct napi_struct *n,
+ 
+ static inline enum netdev_napi_threaded napi_get_threaded(struct napi_struct *n)
+ {
++	if (test_bit(NAPI_STATE_THREADED_BUSY_POLL, &n->state))
++		return NETDEV_NAPI_THREADED_BUSY_POLL_ENABLED;
++
+ 	if (test_bit(NAPI_STATE_THREADED, &n->state))
+ 		return NETDEV_NAPI_THREADED_ENABLED;
+ 
+diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
+index e9a2a6f26cb7..ff20435c45d2 100644
+--- a/net/core/netdev-genl-gen.c
++++ b/net/core/netdev-genl-gen.c
+@@ -97,7 +97,7 @@ static const struct nla_policy netdev_napi_set_nl_policy[NETDEV_A_NAPI_THREADED
+ 	[NETDEV_A_NAPI_DEFER_HARD_IRQS] = NLA_POLICY_FULL_RANGE(NLA_U32, &netdev_a_napi_defer_hard_irqs_range),
+ 	[NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT] = { .type = NLA_UINT, },
+ 	[NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT] = { .type = NLA_UINT, },
+-	[NETDEV_A_NAPI_THREADED] = NLA_POLICY_MAX(NLA_U32, 1),
++	[NETDEV_A_NAPI_THREADED] = NLA_POLICY_MAX(NLA_U32, 2),
+ };
+ 
+ /* NETDEV_CMD_BIND_TX - do */
+diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
+index 48eb49aa03d4..8163afb15377 100644
+--- a/tools/include/uapi/linux/netdev.h
++++ b/tools/include/uapi/linux/netdev.h
+@@ -80,6 +80,7 @@ enum netdev_qstats_scope {
+ enum netdev_napi_threaded {
+ 	NETDEV_NAPI_THREADED_DISABLED,
+ 	NETDEV_NAPI_THREADED_ENABLED,
++	NETDEV_NAPI_THREADED_BUSY_POLL_ENABLED,
+ };
+ 
+ enum {
 -- 
 2.51.0.338.gd7d06c2dae-goog
 
