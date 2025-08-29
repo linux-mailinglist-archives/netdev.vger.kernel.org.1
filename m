@@ -1,375 +1,135 @@
-Return-Path: <netdev+bounces-218216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C22BAB3B76D
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 11:29:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E017AB3B7C8
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 11:54:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 801A5561D44
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 09:28:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A750F7B76B0
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 09:53:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBB1F31E0FD;
-	Fri, 29 Aug 2025 09:21:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B967305066;
+	Fri, 29 Aug 2025 09:54:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="E8V/wcUK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L5/AoNF5"
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2362B31A071;
-	Fri, 29 Aug 2025 09:21:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C24DA270EBC;
+	Fri, 29 Aug 2025 09:54:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756459290; cv=none; b=lKqY0kZnGyxu/7y1NSe6G1ntY8pjRcGIE0Niw0yLXLYPs4IbQlPBptwcecNQI3ECXfQa9yWiSTY3iL16iRXjjyq/6j4HxJqtbC2S22zV/Ey1OmY3CWaLKJ2n5AkWpP90jgsSvkLTjnYuQZhozzFFCltViiY09VWBgzKhVXtEbe0=
+	t=1756461285; cv=none; b=GKH9PCjbGaotML7l3ITrn+kAfqito2BvpGpuKyQ3ZQKorgLSpv7oK8CsqfJFXV71vs7lr+KeiLTiWM9JUB1QmWoVA0RvYMIWL2THB6BxgYxySQFpollAJQ539R5oSEBCCHQrchgRTpdjn2PzbJdV7HGV738a5CkVlIHtdw0n/fs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756459290; c=relaxed/simple;
-	bh=QBXnSmgBbqFHODyDh1LLzf0OUKFPjQHInbtAHK7mlQA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LJCtWzBLKrW0/KSZ+9PWum9MCwS/J4ty6KX8s1jd2ROynomxFIdW8Bi+c7hY3gUiinU20lWGFceRIV28oY8SRTS+J1tNRZvIL1px227X63F808OK4sqeHodu1iVVm0ZnU/Bntlmjk4lM6QLv/qCMXtMITM149ZslSZ94sfy4BkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=E8V/wcUK; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1756459286;
-	bh=QBXnSmgBbqFHODyDh1LLzf0OUKFPjQHInbtAHK7mlQA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=E8V/wcUKQKi26z4oLSamKNWQUxZCc1UcqbrLcDpzIV0XfAg9dFvyyCa3GcPSvEH/1
-	 zvcFNwX3SinzHIIkfzPqPBH3HFGVZbPYFIcDfH+RVY31WEL7u3oFck8ux0DpSxkR5q
-	 qaCOBpfXL7+AuCyUaTDcN5fDHfa35xQqHDkeRylpw3iHm/y/3Wv7Ndg7tnlwY5OZrh
-	 4z8AvQe/WrdRMWjree0hlK9jy6jzjTrwIBH/bHin6+C4VIT5qIoqz5X4odua7KdL7e
-	 m83pMaoDDEXeGbRUbGrZOT9/24jDonPKRha8WvutnBOil8AsHaBRqeFmEJFNgmC7i+
-	 UiH6aBpAmEQFA==
-Received: from laura.lan (unknown [IPv6:2001:b07:646b:e2:f5b1:db54:a11a:c333])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: laura.nao)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 5282D17E1301;
-	Fri, 29 Aug 2025 11:21:25 +0200 (CEST)
-From: Laura Nao <laura.nao@collabora.com>
-To: mturquette@baylibre.com,
-	sboyd@kernel.org,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	matthias.bgg@gmail.com,
-	angelogioacchino.delregno@collabora.com,
-	p.zabel@pengutronix.de,
-	richardcochran@gmail.com
-Cc: guangjie.song@mediatek.com,
-	wenst@chromium.org,
-	linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	netdev@vger.kernel.org,
-	kernel@collabora.com,
-	Laura Nao <laura.nao@collabora.com>,
-	=?UTF-8?q?N=C3=ADcolas=20F=20=2E=20R=20=2E=20A=20=2E=20Prado?= <nfraprado@collabora.com>
-Subject: [PATCH v5 27/27] clk: mediatek: Add MT8196 vencsys clock support
-Date: Fri, 29 Aug 2025 11:19:13 +0200
-Message-Id: <20250829091913.131528-28-laura.nao@collabora.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250829091913.131528-1-laura.nao@collabora.com>
-References: <20250829091913.131528-1-laura.nao@collabora.com>
+	s=arc-20240116; t=1756461285; c=relaxed/simple;
+	bh=bgh1fzFvQFuUXkGTaWOtXdt8WEKPCTaLk/N19SRXgA0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Zx+xhlKtCny4JZ8pTma08ppq+qJ9JKKZM/dEhwaUMjGNj/amOAwQM9lyhPTj9M32VZa80F/y5qDWe6NFHM4BBS47nrXv+KXEhQYGFk9VyuIMfzS6Ob3AZQsbIri3/kEa+bYlaFRsJDuh4wPK18wVCuwQhu8NCEHsLjPjCelxpf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L5/AoNF5; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-323267b98a4so1580397a91.1;
+        Fri, 29 Aug 2025 02:54:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756461283; x=1757066083; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=v80YyVMFDbV3jWpWkWNkuwYjTqzPpq5yZ0PoHTDS4og=;
+        b=L5/AoNF5y1TAfBZ2XlELWRqXT/WW8yE3gKJ5JNEA3Bc/nND/xGjIBHk7yZOiE/Dmqa
+         b6jmcBVZYCOUR/gcaf/XcZXY2RUbbPRZAb6iomqkQ5h0p1DVXBGAP1w+wZ16DRTqO6bR
+         t3tPTyTKm2SfJPIKgrDVwbmSg6ggoLkt8F/Bql3GyHEcIQTQNaOJ69+72CY9ug9WGsxl
+         LBoKT6V0M76r+RNDWeA6JUR9GqFZnAHHKeCOwzbIWHgzZNe1vYXD1yYbrzzZXneO7kxt
+         K4odJsO1LuR6kLhBxLTsvbmXUbwD2j2aLF9hcMpwTKr+hbJuk1LWP+3PFUf3Rj+xEESV
+         Z7XQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756461283; x=1757066083;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=v80YyVMFDbV3jWpWkWNkuwYjTqzPpq5yZ0PoHTDS4og=;
+        b=NeDl1yVKuXIFouWECjaALDtauKMgLHN0uXviMgTD06UidJkPedyDh7xfEg2ED1ZDFu
+         PhwDECDnybCnGKNHfVgO1D/jAsEt2J+mI9hSEPDiTFD3E+1GOFCZRnLOZeGT8uxENvrd
+         0IepijoYSCTZZHJutlsgw2spvL0z+njF2iucOXAhcCon3+AZyZeGEXtWJPu6VLY2ryW6
+         /YHY7vQc08AHkzd2blH2h9jrkHCMF35BJebTX9E+HCIYuSkFuBVmE7Xgy7J+7ae7rKDp
+         yj/d9ZWZTNJVYlATs5colgrO5GQ6J9oIbk6DXxByHDI9smiGkfOlD6fwsomIFxvGclOk
+         p0ng==
+X-Forwarded-Encrypted: i=1; AJvYcCWCw2rBJV9kbi4xRqHtQ0w/QBJKhKQTFuwHvolKMJC6UzTArXWnTJwT/p2VHTqcH2EcHjui9S2cD67Jqa1/ZNM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDO5bBfh2+WWXkkf0asrwuspIKsnqlaRNzgb9M0oyOhsVRfw6O
+	XoiJo/XTsD16kD6cNeESAhmfjBkZgzNThgYmPt9zJUqVUaTLkalByLQ+jrgy7x/vm8Y=
+X-Gm-Gg: ASbGncuthCh/nBuytqjfwQhzJU7anPR/jJalGsqvO6U/BEMdQf+XvOZgoP6DG+1wdPJ
+	O/MJ+Vj0K+xPZMLrl3yRxkRkymNNYk44ZfhuwYpPFUsy5p6TDHysYrxUlS52sjgwrY9kbY8ctCy
+	/455zGDzj8b5cYRtMdCf/ejhXjNWjKrnbvHO0uGlwhZ4+tnFVd3qVA5VCbZURxYyenQzIEB76aM
+	QQ3IEFRBqj3CtFDBN9KGMlYvoRmFxmw1LkxPAnHx9VkNqrzHIjOOM4FoPmRAUaFeNh7O7KBV1q3
+	PtAGyyKy9al0hT7ZG9njlWUTYafGf0BLXJFQjj87EA9fdK3UMxnzcVBIorJvixzgv7PIgmSBkvZ
+	BDGTHCw1S8fjSRwPvJY5hKmEaEvH0TrBsKanvDTy40tlyCLVvO3ei
+X-Google-Smtp-Source: AGHT+IG76pnCoDXhKAMPqyxKq/qZ6RUOF7vchrK3Wz4WO1MA0dj3LEo47BFWemGqy9Y/5U94MnUqmg==
+X-Received: by 2002:a17:90b:4ccd:b0:327:f21b:7734 with SMTP id 98e67ed59e1d1-327f21b794fmr1329447a91.21.1756461282723;
+        Fri, 29 Aug 2025 02:54:42 -0700 (PDT)
+Received: from fedora.redhat.com ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b4cd347db1fsm1751528a12.47.2025.08.29.02.54.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Aug 2025 02:54:42 -0700 (PDT)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sabrina Dubroca <sdubroca@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Simon Horman <horms@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	bridge@lists.linux.dev,
+	linux-kselftest@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCH net-next 0/5] net: common feature compute for upper interface
+Date: Fri, 29 Aug 2025 09:54:25 +0000
+Message-ID: <20250829095430.443891-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Add support for the MT8196 vencsys clock controller, which provides
-clock gate control for the video encoder.
+Some high-level virtual drivers need to compute features from their
+lower devices, but each currently has its own implementation and may
+miss some feature computations. This patch set introduces a common function
+to compute features for such devices.
 
-Reviewed-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
-Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Signed-off-by: Laura Nao <laura.nao@collabora.com>
----
- drivers/clk/mediatek/Kconfig           |   7 +
- drivers/clk/mediatek/Makefile          |   1 +
- drivers/clk/mediatek/clk-mt8196-venc.c | 236 +++++++++++++++++++++++++
- 3 files changed, 244 insertions(+)
- create mode 100644 drivers/clk/mediatek/clk-mt8196-venc.c
+Currently, bonding, team, and bridge have been updated to use the new
+helper.
 
-diff --git a/drivers/clk/mediatek/Kconfig b/drivers/clk/mediatek/Kconfig
-index 939d7d27c0c8..0e8dd82aa84e 100644
---- a/drivers/clk/mediatek/Kconfig
-+++ b/drivers/clk/mediatek/Kconfig
-@@ -1066,6 +1066,13 @@ config COMMON_CLK_MT8196_VDECSYS
- 	help
- 	  This driver supports MediaTek MT8196 vdecsys clocks.
- 
-+config COMMON_CLK_MT8196_VENCSYS
-+	tristate "Clock driver for MediaTek MT8196 vencsys"
-+	depends on COMMON_CLK_MT8196
-+	default m
-+	help
-+	  This driver supports MediaTek MT8196 vencsys clocks.
-+
- config COMMON_CLK_MT8365
- 	tristate "Clock driver for MediaTek MT8365"
- 	depends on ARCH_MEDIATEK || COMPILE_TEST
-diff --git a/drivers/clk/mediatek/Makefile b/drivers/clk/mediatek/Makefile
-index 131582b12783..d8736a060dbd 100644
---- a/drivers/clk/mediatek/Makefile
-+++ b/drivers/clk/mediatek/Makefile
-@@ -162,6 +162,7 @@ obj-$(CONFIG_COMMON_CLK_MT8196_MMSYS) += clk-mt8196-disp0.o clk-mt8196-disp1.o c
- obj-$(CONFIG_COMMON_CLK_MT8196_PEXTPSYS) += clk-mt8196-pextp.o
- obj-$(CONFIG_COMMON_CLK_MT8196_UFSSYS) += clk-mt8196-ufs_ao.o
- obj-$(CONFIG_COMMON_CLK_MT8196_VDECSYS) += clk-mt8196-vdec.o
-+obj-$(CONFIG_COMMON_CLK_MT8196_VENCSYS) += clk-mt8196-venc.o
- obj-$(CONFIG_COMMON_CLK_MT8365) += clk-mt8365-apmixedsys.o clk-mt8365.o
- obj-$(CONFIG_COMMON_CLK_MT8365_APU) += clk-mt8365-apu.o
- obj-$(CONFIG_COMMON_CLK_MT8365_CAM) += clk-mt8365-cam.o
-diff --git a/drivers/clk/mediatek/clk-mt8196-venc.c b/drivers/clk/mediatek/clk-mt8196-venc.c
-new file mode 100644
-index 000000000000..13e2e36e945f
---- /dev/null
-+++ b/drivers/clk/mediatek/clk-mt8196-venc.c
-@@ -0,0 +1,236 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (c) 2025 MediaTek Inc.
-+ *                    Guangjie Song <guangjie.song@mediatek.com>
-+ * Copyright (c) 2025 Collabora Ltd.
-+ *                    Laura Nao <laura.nao@collabora.com>
-+ */
-+#include <dt-bindings/clock/mediatek,mt8196-clock.h>
-+
-+#include <linux/clk-provider.h>
-+#include <linux/module.h>
-+#include <linux/of_device.h>
-+#include <linux/platform_device.h>
-+
-+#include "clk-gate.h"
-+#include "clk-mtk.h"
-+
-+static const struct mtk_gate_regs ven10_cg_regs = {
-+	.set_ofs = 0x4,
-+	.clr_ofs = 0x8,
-+	.sta_ofs = 0x0,
-+};
-+
-+static const struct mtk_gate_regs ven10_hwv_regs = {
-+	.set_ofs = 0x00b8,
-+	.clr_ofs = 0x00bc,
-+	.sta_ofs = 0x2c5c,
-+};
-+
-+static const struct mtk_gate_regs ven11_cg_regs = {
-+	.set_ofs = 0x10,
-+	.clr_ofs = 0x14,
-+	.sta_ofs = 0x10,
-+};
-+
-+static const struct mtk_gate_regs ven11_hwv_regs = {
-+	.set_ofs = 0x00c0,
-+	.clr_ofs = 0x00c4,
-+	.sta_ofs = 0x2c60,
-+};
-+
-+#define GATE_VEN10(_id, _name, _parent, _shift) {	\
-+		.id = _id,				\
-+		.name = _name,				\
-+		.parent_name = _parent,			\
-+		.regs = &ven10_cg_regs,			\
-+		.shift = _shift,			\
-+		.flags = CLK_OPS_PARENT_ENABLE,		\
-+		.ops = &mtk_clk_gate_ops_setclr_inv,	\
-+	}
-+
-+#define GATE_HWV_VEN10_FLAGS(_id, _name, _parent, _shift, _flags) {	\
-+		.id = _id,						\
-+		.name = _name,						\
-+		.parent_name = _parent,					\
-+		.regs = &ven10_cg_regs,					\
-+		.hwv_regs = &ven10_hwv_regs,				\
-+		.shift = _shift,					\
-+		.ops = &mtk_clk_gate_hwv_ops_setclr_inv,		\
-+		.flags = (_flags) |					\
-+			 CLK_OPS_PARENT_ENABLE,				\
-+	}
-+
-+#define GATE_HWV_VEN10(_id, _name, _parent, _shift)	\
-+	GATE_HWV_VEN10_FLAGS(_id, _name, _parent, _shift, 0)
-+
-+#define GATE_HWV_VEN11(_id, _name, _parent, _shift) {	\
-+		.id = _id,				\
-+		.name = _name,				\
-+		.parent_name = _parent,			\
-+		.regs = &ven11_cg_regs,			\
-+		.hwv_regs = &ven11_hwv_regs,		\
-+		.shift = _shift,			\
-+		.ops = &mtk_clk_gate_hwv_ops_setclr_inv,\
-+		.flags = CLK_OPS_PARENT_ENABLE		\
-+	}
-+
-+static const struct mtk_gate ven1_clks[] = {
-+	/* VEN10 */
-+	GATE_HWV_VEN10(CLK_VEN1_CKE0_LARB, "ven1_larb", "venc", 0),
-+	GATE_HWV_VEN10(CLK_VEN1_CKE1_VENC, "ven1_venc", "venc", 4),
-+	GATE_VEN10(CLK_VEN1_CKE2_JPGENC, "ven1_jpgenc", "venc", 8),
-+	GATE_VEN10(CLK_VEN1_CKE3_JPGDEC, "ven1_jpgdec", "venc", 12),
-+	GATE_VEN10(CLK_VEN1_CKE4_JPGDEC_C1, "ven1_jpgdec_c1", "venc", 16),
-+	GATE_HWV_VEN10(CLK_VEN1_CKE5_GALS, "ven1_gals", "venc", 28),
-+	GATE_HWV_VEN10(CLK_VEN1_CKE29_VENC_ADAB_CTRL, "ven1_venc_adab_ctrl",
-+			"venc", 29),
-+	GATE_HWV_VEN10_FLAGS(CLK_VEN1_CKE29_VENC_XPC_CTRL,
-+			      "ven1_venc_xpc_ctrl", "venc", 30,
-+			      CLK_IGNORE_UNUSED),
-+	GATE_HWV_VEN10(CLK_VEN1_CKE6_GALS_SRAM, "ven1_gals_sram", "venc", 31),
-+	/* VEN11 */
-+	GATE_HWV_VEN11(CLK_VEN1_RES_FLAT, "ven1_res_flat", "venc", 0),
-+};
-+
-+static const struct mtk_clk_desc ven1_mcd = {
-+	.clks = ven1_clks,
-+	.num_clks = ARRAY_SIZE(ven1_clks),
-+	.need_runtime_pm = true,
-+};
-+
-+static const struct mtk_gate_regs ven20_hwv_regs = {
-+	.set_ofs = 0x00c8,
-+	.clr_ofs = 0x00cc,
-+	.sta_ofs = 0x2c64,
-+};
-+
-+static const struct mtk_gate_regs ven21_hwv_regs = {
-+	.set_ofs = 0x00d0,
-+	.clr_ofs = 0x00d4,
-+	.sta_ofs = 0x2c68,
-+};
-+
-+#define GATE_VEN20(_id, _name, _parent, _shift) {	\
-+		.id = _id,				\
-+		.name = _name,				\
-+		.parent_name = _parent,			\
-+		.regs = &ven10_cg_regs,			\
-+		.shift = _shift,			\
-+		.flags = CLK_OPS_PARENT_ENABLE,		\
-+		.ops = &mtk_clk_gate_ops_setclr_inv,	\
-+	}
-+
-+#define GATE_HWV_VEN20(_id, _name, _parent, _shift) {	\
-+		.id = _id,				\
-+		.name = _name,				\
-+		.parent_name = _parent,			\
-+		.regs = &ven10_cg_regs,			\
-+		.hwv_regs = &ven20_hwv_regs,		\
-+		.shift = _shift,			\
-+		.ops = &mtk_clk_gate_hwv_ops_setclr_inv,\
-+		.flags = CLK_OPS_PARENT_ENABLE,		\
-+	}
-+
-+#define GATE_HWV_VEN21(_id, _name, _parent, _shift) {	\
-+		.id = _id,				\
-+		.name = _name,				\
-+		.parent_name = _parent,			\
-+		.regs = &ven11_cg_regs,			\
-+		.hwv_regs = &ven21_hwv_regs,		\
-+		.shift = _shift,			\
-+		.ops = &mtk_clk_gate_hwv_ops_setclr,	\
-+		.flags = CLK_OPS_PARENT_ENABLE		\
-+	}
-+
-+static const struct mtk_gate ven2_clks[] = {
-+	/* VEN20 */
-+	GATE_HWV_VEN20(CLK_VEN2_CKE0_LARB, "ven2_larb", "venc", 0),
-+	GATE_HWV_VEN20(CLK_VEN2_CKE1_VENC, "ven2_venc", "venc", 4),
-+	GATE_VEN20(CLK_VEN2_CKE2_JPGENC, "ven2_jpgenc", "venc", 8),
-+	GATE_VEN20(CLK_VEN2_CKE3_JPGDEC, "ven2_jpgdec", "venc", 12),
-+	GATE_HWV_VEN20(CLK_VEN2_CKE5_GALS, "ven2_gals", "venc", 28),
-+	GATE_HWV_VEN20(CLK_VEN2_CKE29_VENC_XPC_CTRL, "ven2_venc_xpc_ctrl", "venc", 30),
-+	GATE_HWV_VEN20(CLK_VEN2_CKE6_GALS_SRAM, "ven2_gals_sram", "venc", 31),
-+	/* VEN21 */
-+	GATE_HWV_VEN21(CLK_VEN2_RES_FLAT, "ven2_res_flat", "venc", 0),
-+};
-+
-+static const struct mtk_clk_desc ven2_mcd = {
-+	.clks = ven2_clks,
-+	.num_clks = ARRAY_SIZE(ven2_clks),
-+	.need_runtime_pm = true,
-+};
-+
-+static const struct mtk_gate_regs ven_c20_hwv_regs = {
-+	.set_ofs = 0x00d8,
-+	.clr_ofs = 0x00dc,
-+	.sta_ofs = 0x2c6c,
-+};
-+
-+static const struct mtk_gate_regs ven_c21_hwv_regs = {
-+	.set_ofs = 0x00e0,
-+	.clr_ofs = 0x00e4,
-+	.sta_ofs = 0x2c70,
-+};
-+
-+#define GATE_HWV_VEN_C20(_id, _name, _parent, _shift) {\
-+		.id = _id,				\
-+		.name = _name,				\
-+		.parent_name = _parent,			\
-+		.regs = &ven10_cg_regs,		\
-+		.hwv_regs = &ven_c20_hwv_regs,		\
-+		.shift = _shift,			\
-+		.ops = &mtk_clk_gate_hwv_ops_setclr_inv,\
-+		.flags = CLK_OPS_PARENT_ENABLE,		\
-+	}
-+
-+#define GATE_HWV_VEN_C21(_id, _name, _parent, _shift) {\
-+		.id = _id,				\
-+		.name = _name,				\
-+		.parent_name = _parent,			\
-+		.regs = &ven11_cg_regs,		\
-+		.hwv_regs = &ven_c21_hwv_regs,		\
-+		.shift = _shift,			\
-+		.ops = &mtk_clk_gate_hwv_ops_setclr,	\
-+		.flags = CLK_OPS_PARENT_ENABLE,		\
-+	}
-+
-+static const struct mtk_gate ven_c2_clks[] = {
-+	/* VEN_C20 */
-+	GATE_HWV_VEN_C20(CLK_VEN_C2_CKE0_LARB, "ven_c2_larb", "venc", 0),
-+	GATE_HWV_VEN_C20(CLK_VEN_C2_CKE1_VENC, "ven_c2_venc", "venc", 4),
-+	GATE_HWV_VEN_C20(CLK_VEN_C2_CKE5_GALS, "ven_c2_gals", "venc", 28),
-+	GATE_HWV_VEN_C20(CLK_VEN_C2_CKE29_VENC_XPC_CTRL, "ven_c2_venc_xpc_ctrl",
-+			  "venc", 30),
-+	GATE_HWV_VEN_C20(CLK_VEN_C2_CKE6_GALS_SRAM, "ven_c2_gals_sram", "venc", 31),
-+	/* VEN_C21 */
-+	GATE_HWV_VEN_C21(CLK_VEN_C2_RES_FLAT, "ven_c2_res_flat", "venc", 0),
-+};
-+
-+static const struct mtk_clk_desc ven_c2_mcd = {
-+	.clks = ven_c2_clks,
-+	.num_clks = ARRAY_SIZE(ven_c2_clks),
-+	.need_runtime_pm = true,
-+};
-+
-+static const struct of_device_id of_match_clk_mt8196_venc[] = {
-+	{ .compatible = "mediatek,mt8196-vencsys", .data = &ven1_mcd },
-+	{ .compatible = "mediatek,mt8196-vencsys-c1", .data = &ven2_mcd },
-+	{ .compatible = "mediatek,mt8196-vencsys-c2", .data = &ven_c2_mcd },
-+	{ /* sentinel */ }
-+};
-+MODULE_DEVICE_TABLE(of, of_match_clk_mt8196_venc);
-+
-+static struct platform_driver clk_mt8196_venc_drv = {
-+	.probe = mtk_clk_simple_probe,
-+	.remove = mtk_clk_simple_remove,
-+	.driver = {
-+		.name = "clk-mt8196-venc",
-+		.of_match_table = of_match_clk_mt8196_venc,
-+	},
-+};
-+module_platform_driver(clk_mt8196_venc_drv);
-+
-+MODULE_DESCRIPTION("MediaTek MT8196 Video Encoders clocks driver");
-+MODULE_LICENSE("GPL");
+Hangbin Liu (5):
+  net: add a common function to compute features from lowers devices
+  bonding: use common function to compute the features
+  team: use common function to compute the features
+  net: bridge: use common function to compute the features
+  selftests/net: add offload checking test for virtual interface
+
+ drivers/net/bonding/bond_main.c             |  99 +----------
+ drivers/net/team/team_core.c                |  73 +-------
+ include/linux/netdevice.h                   |  19 +++
+ net/bridge/br_if.c                          |  22 +--
+ net/core/dev.c                              |  79 +++++++++
+ tools/testing/selftests/net/config          |   2 +
+ tools/testing/selftests/net/vdev_offload.sh | 174 ++++++++++++++++++++
+ 7 files changed, 285 insertions(+), 183 deletions(-)
+ create mode 100755 tools/testing/selftests/net/vdev_offload.sh
+
 -- 
-2.39.5
+2.50.1
 
 
