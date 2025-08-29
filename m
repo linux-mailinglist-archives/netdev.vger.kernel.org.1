@@ -1,233 +1,194 @@
-Return-Path: <netdev+bounces-218145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68E84B3B4B4
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 09:50:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EC30B3B538
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 10:01:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 238793B1D01
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 07:50:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8ADB9A04545
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 08:00:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A12D284B4C;
-	Fri, 29 Aug 2025 07:49:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 602732BD5BD;
+	Fri, 29 Aug 2025 07:57:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oI0Ppz/r"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="n3IyQOUI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D32E27B34D;
-	Fri, 29 Aug 2025 07:49:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756453798; cv=fail; b=aTTKwOiYsaJAn4rEwm/rhxisJ1A9TlbiPpEzazTWf3R9DoiqnxPtXcJCFmLWLJiY7+BLW2ngBpbec4xk0TGnCRgIJMXyGWIpJzZ2qP4xQe1dso65heT/A0cGAiZKUhYaE0SRw5r99m8/O6vxJ83z2OjDsHxeH/8QIQB4gHP1ucA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756453798; c=relaxed/simple;
-	bh=yDMkVhO5/hqCKljVuZyegATgmJ7yOX8/hg4n11z8z7M=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=JUAADDWqVFmx8dD8mmEh5+OQl9im7haD1AifH8KFBc2ld8ucPL4egmq1qAsKXzKc7YwEh+pGBtAMfOvF/QmZJduhRltyzIMjeYRSvWo31Oqgc6zfSG5h53Yd87RL8uAOzSESeeXMGpfQb0FhGn8THa6W+HldER46DKDBygrmbWs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oI0Ppz/r; arc=fail smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A4102BEC32;
+	Fri, 29 Aug 2025 07:57:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756454265; cv=none; b=tdjVVXzK0xTpdES/AigLzO2B+zLXK+gUgFe5juUwizsEfH81qntllQj7kUm/QMDI+D5+nAIZRGzAthb5oS/1xTszfOKdqASWnaaZF9P2uFztk8+zix4THU/s/jXn1mA1wIyTEpw40dcEYD+9PEGsnFZVcx30vJPu3p95eLhZa3c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756454265; c=relaxed/simple;
+	bh=SjQQL7M+fnCTuiR4j1x063LYMCgkGU/f9QXVhvCVaTE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nMzBpQ6j0PB3+/h4y+1d9H4ZAUNiOCrc0IZyz5dAjOk1Q2eyCzqFTyzmd1RS8E8K/gJfj/pc+vJZMa8s8JhPfTTMfT9kVYmGG/jAZBuPGwdB+oYq6IlhFBj+UNd15OSjgJBQO10O3RlvJguKlqQkDSZr+ZYJIOs4yVmdpO18vO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=n3IyQOUI; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756453798; x=1787989798;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=yDMkVhO5/hqCKljVuZyegATgmJ7yOX8/hg4n11z8z7M=;
-  b=oI0Ppz/rlAGLUF98G9g9NOEZ4KS1QVZ9x5+DXkZkFvisYok4bgHi0MSx
-   cvWxs6/4oo3dZ+nWD8cuKMowdkCLCbIGF6RDxO2+jsvtksRjdix22g0SE
-   NM9q0H7wcowiYVBtNw6N20IjwnRSGsJbZeBpp7Ni39lfWkocDsi71/eHy
-   oxr4MNSJAIh+492WeMVBFR7hhkM0BsdIBCZi1HYffMCp9Cq88b4dHV4sl
-   GVWbeWXhpSsjk9j87XzRG27OTGzzax8ZObNPXgYUrwzWGWiF31Mduose+
-   a1GB3bv4sgk/hvb1gJQV+HiXaKq3K9L8kYkpUsuYP6n1rmsuaf5+S6XBL
-   g==;
-X-CSE-ConnectionGUID: VjBG2aAvQKiu0dizsymrBw==
-X-CSE-MsgGUID: nM0FnIuITd2Qv5D9lcbHYA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11536"; a="58587130"
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1756454264; x=1787990264;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=SjQQL7M+fnCTuiR4j1x063LYMCgkGU/f9QXVhvCVaTE=;
+  b=n3IyQOUIfN9EYniKMT+/uycF3LkCVbCrZ4OO7ZaJH+nncwMrR4XNNOmv
+   REyxnpXChiOJrYOJ5Z6ALJP9zeZTP2VtaVqFOefnk3idLjA5Z76TL1LBk
+   xFRr+XEVrw83vdIjcZ7d2bK72byIYoODcTSKpeiz3sXMbGsayloeDYSYP
+   tDlRNRW9HFTr3UtJNwTwPtR5tDysrg3b8lsH8BfG4Pw0qrrtRPP6wOdrd
+   tbM8+ryp6/1GWlw8Xuh8LJpfn8oKabl5hO0ywMcHqbqaI4ziNBX3qakjP
+   x4gpYc3E0si9uYQQKWY0wbaFsDBqPK4sAPMdiDfg7bEaMFMJF4zuvcvjE
+   w==;
+X-CSE-ConnectionGUID: +ONr1VLDQ0ik60pDu2SRtg==
+X-CSE-MsgGUID: KlnBwLBgT1WFbXYxMPur2A==
 X-IronPort-AV: E=Sophos;i="6.18,221,1751266800"; 
-   d="scan'208";a="58587130"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2025 00:49:55 -0700
-X-CSE-ConnectionGUID: +A8ZjNfKRyy/r7vYT1f8Og==
-X-CSE-MsgGUID: P/uNKlmNQdmVugbgXFJbZA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,221,1751266800"; 
-   d="scan'208";a="175618502"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2025 00:49:55 -0700
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Fri, 29 Aug 2025 00:49:54 -0700
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Fri, 29 Aug 2025 00:49:54 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (40.107.223.88)
- by edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Fri, 29 Aug 2025 00:49:53 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=eY5NSdN2QUDUPuvo7uEPIBLvLWjNXhqdFe/BJ9LfJNHq9du3wnokejpVBORHsalFeSNPzGpzqwnhlngRKY5+45hGDqnS1XbcUvg0YfUcEyUwzFtOL9ZhqshSi4deTI9QOIB3+RCEE2T+ji+zwAT+RxLYDJRweL9Td/xv7sQz9V9ig/pgh9pGHFZ0PdPBLAy2N9YmA15huPum8iPaqg0oGrrFsdr8aZHz6j7lspm9yl3MHfCsellhhHg+Gn9M+BsFxooLUgy0+1NXySX7JZzPb3jDTXXvoTMOqQNDUOhGOTxH8Ib7sPh6kJhx88VQJ4kZnAcBps8Fmy1xHY6GizNYBw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yDMkVhO5/hqCKljVuZyegATgmJ7yOX8/hg4n11z8z7M=;
- b=c8aRrtTw5Fdn74ceX7Oo68tY18b2G1k892sC/cCqVmGHXzdxcntj0cHKkMgqxL31eQax0kKB6nw4j0ajamTM9wweDbI1tcH0Sek8mQtBc5dj8rR5hxmId7zPbreQIVK+pfJcz07LAcbCgCXL8rVjCH+3zeR6SlXiy3gZshaywKXtYjujwzA51GbTLR7qtaHJJwm13WJskdBNIJaPXWQMlZwI2eWGXZNzTbW7nkTPjp4O9JHavv84hEvI4ujwhlIEGbXYWFW2u7ztBy1HsY+5mqV/iF0mrFm0EneOfbNrGMxmNg50IQ28SxCF85r43Ked2oXTkYxJTJkQZfENxp54+g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SJ2PR11MB8452.namprd11.prod.outlook.com (2603:10b6:a03:574::22)
- by CH2PR11MB8777.namprd11.prod.outlook.com (2603:10b6:610:283::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.20; Fri, 29 Aug
- 2025 07:49:46 +0000
-Received: from SJ2PR11MB8452.namprd11.prod.outlook.com
- ([fe80::d200:bfac:918a:1a38]) by SJ2PR11MB8452.namprd11.prod.outlook.com
- ([fe80::d200:bfac:918a:1a38%4]) with mapi id 15.20.9073.016; Fri, 29 Aug 2025
- 07:49:46 +0000
-From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
-	<pabeni@redhat.com>, "horms@kernel.org" <horms@kernel.org>, "sdf@fomichev.me"
-	<sdf@fomichev.me>, "almasrymina@google.com" <almasrymina@google.com>,
-	"asml.silence@gmail.com" <asml.silence@gmail.com>, "leitao@debian.org"
-	<leitao@debian.org>, "kuniyu@google.com" <kuniyu@google.com>,
-	"jiri@resnulli.us" <jiri@resnulli.us>, "Loktionov, Aleksandr"
-	<aleksandr.loktionov@intel.com>, "Vecera, Ivan" <ivecera@redhat.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [RFC PATCH v2] net: add net-device TX clock source selection
- framework
-Thread-Topic: [RFC PATCH v2] net: add net-device TX clock source selection
- framework
-Thread-Index: AQHcGDvl/LMwp05JjkKtLLSsBfpR/LR4pqiAgACPnCA=
-Date: Fri, 29 Aug 2025 07:49:46 +0000
-Message-ID: <SJ2PR11MB8452311927652BEDDAFDE8659B3AA@SJ2PR11MB8452.namprd11.prod.outlook.com>
-References: <20250828164345.116097-1-arkadiusz.kubalewski@intel.com>
- <20250828153157.6b0a975f@kernel.org>
-In-Reply-To: <20250828153157.6b0a975f@kernel.org>
-Accept-Language: pl-PL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ2PR11MB8452:EE_|CH2PR11MB8777:EE_
-x-ms-office365-filtering-correlation-id: 7153b270-4df5-49cb-2d5c-08dde6d09fef
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?HLlkHit5n7sUBTloB9XvJXB6GilXTfnMsJUxDcQMO3/po7Un4/YHgB18v5st?=
- =?us-ascii?Q?8w8SphLHvbEPSnFT5VTcI59+VmN66c/cRRvcNowE6X8bLIWCUGGgLMQsarEK?=
- =?us-ascii?Q?biShQEUD155g7GjpQZWGRbs/ltP+ws9XVlxIDFczrTN4Fg+yxlSGcdxxKMFK?=
- =?us-ascii?Q?iVr41YKR09Kp7BZ9mg8adTOLh8Run2C2Yz0eKr73G/xC3J9YR2dqIkfLGKmg?=
- =?us-ascii?Q?VC+7uLItPxSsucxnP/K2BYwlQgT4sIy2t+SEGw4LYUtsObQd4r0ijfncvVD4?=
- =?us-ascii?Q?XZJFlTGxzt6Kddmb5j8pzux0XhWGn2sty9vanCkkg54TsxSFnOPxwFn7Mbwz?=
- =?us-ascii?Q?57VMgM3qdXf0sKZcJdq0R8KsjWGYO0OfAef0LftRBSx5LK0PNUYzic1htoYJ?=
- =?us-ascii?Q?4QUPx+2+zNcNQ0RxBJF8YElmfM3QuGHREmMokAissiaseXj2yZLVqF2Rgw97?=
- =?us-ascii?Q?i1Gj84D1eiZq3nu/rinwCxFHsxoqJCkC8x8Y39ZLXLItrKeeC/ySvbGO0llV?=
- =?us-ascii?Q?VhGKg+Q8W2EGfAEC1tq/rpLynXvHOvby11qTYxubBVwKob6JWA7+2ePWqlzZ?=
- =?us-ascii?Q?MxKkSHcKCOeckKlkB7pBsKwnrXQtAzuSb6sxWPDm+SjpM/YIzMboAHqqN6S4?=
- =?us-ascii?Q?u6lKo6jEvPlzWOqdJDmqJSGATcnsa94c70sJbzhn1dv+Whhemh0C610AWP7P?=
- =?us-ascii?Q?3rqt6haRiupuXiko1Of2AaWGVezz0DcPQqPMITOECho5CNd16tH47lfEOPZg?=
- =?us-ascii?Q?5DetgO1dV0a8trTMfkT1T5EDrn9z7mGvZJkJ+xwjzlPsNdXcqb6yJuk7MEMD?=
- =?us-ascii?Q?dc8X8wEO82p9cSbcKQ1Trvx/Zvc1M4gk6V9zH1JBmzErUypfd0woDre+86ya?=
- =?us-ascii?Q?DUon9JDPHGyVIiLIPIhbWWdghTzKCXb7QO3P8FJLrvZxrrKMaV3EpXV2CH+m?=
- =?us-ascii?Q?fSpOowa0N5eXFujVSzIeOIvg6BblWGaL7CBLoTetpeNGLth6cew/AIUEHg2u?=
- =?us-ascii?Q?kx6y56u8hVtT9ND3r3/anJQgwDTew+y0z6ufF3cFRLzLLQVGB9VCSIUsnf/A?=
- =?us-ascii?Q?wrlAL8NyUXIDoDzJeTvo+pYbbxIKRfVQf2YBCYOuOV0sSsoJAMKGX/FamPqv?=
- =?us-ascii?Q?fRWK4Hl97w09+vbd2noayZKsePUFnPW4pXQOU8toULEoOs6uCuH1cJ3pwv/0?=
- =?us-ascii?Q?XN/29jCsp2ju4aE9iWw43jBylxzX33nyNGCaRbPJ6YuFJmttgiH4CoiFoBI/?=
- =?us-ascii?Q?M64BQazCDiXQkowJg+ubwtx0bInr0MIfPJ6lvn7uU1MxlNjWvRQHENMpUC2N?=
- =?us-ascii?Q?qJxpPxsf+gvh2j1vA1CTxtEREVO9Z5bymc1fvCgsjN4wdVqsXNmbyWZgwPFi?=
- =?us-ascii?Q?KaRmuZ1LzLt84Reprla1J1S7poukUfXHDkJODM9me+h/7kGQA+EE0ui8OmHw?=
- =?us-ascii?Q?Uc4d/LoieCZjIotMKOYbzkB8w9mPJMfqhcayMyBGIfKLj2tTl7n3Kg=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR11MB8452.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?PuW9NC4Ot4/vLdHyLhAU5VwGgpZMA5+G0SW5yFAc5LP1vFWwiEpKtUMOGH0a?=
- =?us-ascii?Q?SeM8FInZewZv/vqD3uDzbZxGznG+XflAcYW7aYe+K4Lnq+gESm47oyB0zopS?=
- =?us-ascii?Q?zMOAUoQth6G4ii9ln6cwKR8dMpTxzBez7lSkHsJ5GIqPkfQvygBq2KMYhK1c?=
- =?us-ascii?Q?H4nqNzvRm2LILNTGn8jHnoW13fAnQA10zECPdQM8VlSKf3HeF9temuQ33vJW?=
- =?us-ascii?Q?js/2XpHgw2biLhjYcE1fmEyH/Nhsib2HrE2E+fg8bZYEF4Ywazmpp4lP8F3Y?=
- =?us-ascii?Q?afLyCUcIES0xiAKj9tPoVtv7KP5RVtyA1RtC0ZQaCeEZ05CXw4pQM0xMHRuV?=
- =?us-ascii?Q?Nu+rhlb4H0L8vr3p1cBuQhmRRTVcyI/tDKgicNpAI2O2lhiHfz3w6/+PbehK?=
- =?us-ascii?Q?st64DjrBCYVMqMW2vN2LEtuth19kg/IIBjm8yK07P/fM9hMAA7zlU0JcEqXJ?=
- =?us-ascii?Q?gjV6wKTo1KbwhjwoPgsmVW4IxwV8IJfHfjWqI/Iy+5FypRx33uNRhhQ1ggNl?=
- =?us-ascii?Q?DSuP0jDVB6XbypTC9orYpVZ1YDO+uT6kYEE0R+KhHNktujj234iCMf8YAD/F?=
- =?us-ascii?Q?E+/eUK0G2cH62h0My9Ii0ht/nBJxe31fA7pjQQgi3is5UR3rFCiAFNBd/dXE?=
- =?us-ascii?Q?Q8uflWwyVNmzuWMC0sSGhDbEDUqt61/cULkdWALi/ffk70BiTytvQHAKhRbr?=
- =?us-ascii?Q?xo8LpB7DHQQVru7XIKLO4/m4w46m9o+aACELAdENV4UbScDtAKNggaFKDga9?=
- =?us-ascii?Q?n9a+O7uJHpeLvsAXC4rohod7if/5SkVermkI2RTctbUkhi5S3rHG0Y6uUDNK?=
- =?us-ascii?Q?vwSZ+wOO40AqK4AKElWURQYB3DDu/t91A+BMC06R1jcgUK0SoX9oG0ayntn0?=
- =?us-ascii?Q?om2XrWECnCjivPOndeaZCTawwOohjM2oIwLt8NOhl30VThJv1htjZyemUzZV?=
- =?us-ascii?Q?eagteAY9s3mShAy3gsMtaI4o7jc0t4Ia5EA6ZtHtky4EaWVdtnxIv973zoG2?=
- =?us-ascii?Q?TWixDwOrHZa8+PRQX4QlzLiOGVeyzED2g3TKIdxL+7DmE4aeI3qglX2R6UOb?=
- =?us-ascii?Q?pZrVaSutGsDbBQLTEDCcYe+i/DeoRREmrU575FeUJz7NttzZvwmNsrYqZbYy?=
- =?us-ascii?Q?lAJDKVKn08j0UAI8JMjHXAwFcrjKR2AxoM6Zkbjms/70xLeAAG+M7pVnYyse?=
- =?us-ascii?Q?oDmUxlvrnlSbLFEXcXmXYvgWQ+286JuFmzC4/1ZuHrnjrxYPEiI6aaLReehk?=
- =?us-ascii?Q?nqNwfSQ9ZkGNenpWFXRVkrQ/rnSR9M7J+KpsCge4jJGW1MlxtVp9ntE523Ud?=
- =?us-ascii?Q?gZTtCe39tsbhw8sbxQBGV7bWYB4NkJY20pDyVYhXqA1d0hzhcRQmDAAMrpMy?=
- =?us-ascii?Q?dpmNNdRugb711FntKX0tW7khyGw1as3KISoLhNOC13tgGCnhxWf6prgrMfg9?=
- =?us-ascii?Q?Z38fwVnGyZR75GGgJeGPhwLgT16PbFiCPUjtIjTQiijxJscr2lHcShtnaBXU?=
- =?us-ascii?Q?s/EXuT7U0BZvFViwUTY5z9CYMK/2qXJZ3YmbtGQVGrRXzPlOCgfGmGEFM6B1?=
- =?us-ascii?Q?Y5VSRIIBwyZ+W/1mCpSoT+wPVCjog61Ox6CGKcrmhp9r5Dnp1EgTw7ThNs1g?=
- =?us-ascii?Q?sg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+   d="scan'208";a="45800780"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Aug 2025 00:57:43 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Fri, 29 Aug 2025 00:57:11 -0700
+Received: from DEN-DL-M31836.microchip.com (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.44 via Frontend Transport; Fri, 29 Aug 2025 00:57:09 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <richardcochran@gmail.com>, <vadim.fedorenko@linux.dev>,
+	<viro@zeniv.linux.org.uk>, <atenart@kernel.org>, <quentin.schulz@bootlin.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>
+Subject: [PATCH net] phy: mscc: Stop taking ts_lock for tx_queue and use its own lock
+Date: Fri, 29 Aug 2025 09:50:07 +0200
+Message-ID: <20250829075007.214431-1-horatiu.vultur@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ2PR11MB8452.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7153b270-4df5-49cb-2d5c-08dde6d09fef
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Aug 2025 07:49:46.7028
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: DBci1nPETLo87rgBbZSpRdJ23tu8aT8ptV3Age2qN1f2Ubh4aKtMaP8MlDIJMCPT9191738noq2b5sOUhWoVD9Ou8L6i4MHFfgRmr0k7Zj0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR11MB8777
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
->From: Jakub Kicinski <kuba@kernel.org>
->Sent: Friday, August 29, 2025 12:32 AM
->
->On Thu, 28 Aug 2025 18:43:45 +0200 Arkadiusz Kubalewski wrote:
->> Add support for user-space control over network device transmit clock
->> sources through a new extended netdevice netlink interface.
->> A network device may support multiple TX clock sources (OCXO, SyncE
->> reference, external reference clocks) which are critical for
->> time-sensitive networking applications and synchronization protocols.
->
->how does this relate to the dpll pin in rtnetlink then?
+When transmitting a PTP frame which is timestamp using 2 step, the
+following warning appears if CONFIG_PROVE_LOCKING is enabled:
+=============================
+[ BUG: Invalid wait context ]
+6.17.0-rc1-00326-ge6160462704e #427 Not tainted
+-----------------------------
+ptp4l/119 is trying to lock:
+c2a44ed4 (&vsc8531->ts_lock){+.+.}-{3:3}, at: vsc85xx_txtstamp+0x50/0xac
+other info that might help us debug this:
+context-{4:4}
+4 locks held by ptp4l/119:
+ #0: c145f068 (rcu_read_lock_bh){....}-{1:2}, at: __dev_queue_xmit+0x58/0x1440
+ #1: c29df974 (dev->qdisc_tx_busylock ?: &qdisc_tx_busylock){+...}-{2:2}, at: __dev_queue_xmit+0x5c4/0x1440
+ #2: c2aaaad0 (_xmit_ETHER#2){+.-.}-{2:2}, at: sch_direct_xmit+0x108/0x350
+ #3: c2aac170 (&lan966x->tx_lock){+.-.}-{2:2}, at: lan966x_port_xmit+0xd0/0x350
+stack backtrace:
+CPU: 0 UID: 0 PID: 119 Comm: ptp4l Not tainted 6.17.0-rc1-00326-ge6160462704e #427 NONE
+Hardware name: Generic DT based system
+Call trace:
+ unwind_backtrace from show_stack+0x10/0x14
+ show_stack from dump_stack_lvl+0x7c/0xac
+ dump_stack_lvl from __lock_acquire+0x8e8/0x29dc
+ __lock_acquire from lock_acquire+0x108/0x38c
+ lock_acquire from __mutex_lock+0xb0/0xe78
+ __mutex_lock from mutex_lock_nested+0x1c/0x24
+ mutex_lock_nested from vsc85xx_txtstamp+0x50/0xac
+ vsc85xx_txtstamp from lan966x_fdma_xmit+0xd8/0x3a8
+ lan966x_fdma_xmit from lan966x_port_xmit+0x1bc/0x350
+ lan966x_port_xmit from dev_hard_start_xmit+0xc8/0x2c0
+ dev_hard_start_xmit from sch_direct_xmit+0x8c/0x350
+ sch_direct_xmit from __dev_queue_xmit+0x680/0x1440
+ __dev_queue_xmit from packet_sendmsg+0xfa4/0x1568
+ packet_sendmsg from __sys_sendto+0x110/0x19c
+ __sys_sendto from sys_send+0x18/0x20
+ sys_send from ret_fast_syscall+0x0/0x1c
+Exception stack(0xf0b05fa8 to 0xf0b05ff0)
+5fa0:                   00000001 0000000e 0000000e 0004b47a 0000003a 00000000
+5fc0: 00000001 0000000e 00000000 00000121 0004af58 00044874 00000000 00000000
+5fe0: 00000001 bee9d420 00025a10 b6e75c7c
 
-In general it doesn't directly. However we could see indirect relation
-due to possible DPLL existence in the equation.
+So, instead of using the ts_lock for tx_queue, use the spinlock that
+skb_buff_head has.
 
-The rtnetlink pin was related to feeding the dpll with the signal,
-here is the other way around, by feeding the phy TX of given interface
-with user selected clock source signal.
+Fixes: 7d272e63e0979d ("net: phy: mscc: timestamping and PHC support")
+Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+---
+ drivers/net/phy/mscc/mscc_ptp.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-Previously if our E810 EEC products with DPLL, all the ports had their
-phy TX fed with the clock signal generated by DPLL.
-For E830 the user is able to select if the signal is provided from: the
-EEC DPLL(SyncE), provided externally(ext_ref), or OCXO.
+diff --git a/drivers/net/phy/mscc/mscc_ptp.c b/drivers/net/phy/mscc/mscc_ptp.c
+index 72847320cb652..d2277b3393fad 100644
+--- a/drivers/net/phy/mscc/mscc_ptp.c
++++ b/drivers/net/phy/mscc/mscc_ptp.c
+@@ -461,7 +461,7 @@ static void vsc85xx_dequeue_skb(struct vsc85xx_ptp *ptp)
+ 		return;
+ 
+ 	while (len--) {
+-		skb = __skb_dequeue(&ptp->tx_queue);
++		skb = skb_dequeue(&ptp->tx_queue);
+ 		if (!skb)
+ 			return;
+ 
+@@ -486,7 +486,7 @@ static void vsc85xx_dequeue_skb(struct vsc85xx_ptp *ptp)
+ 		 * packet in the FIFO right now, reschedule it for later
+ 		 * packets.
+ 		 */
+-		__skb_queue_tail(&ptp->tx_queue, skb);
++		skb_queue_tail(&ptp->tx_queue, skb);
+ 	}
+ }
+ 
+@@ -1059,6 +1059,7 @@ static int vsc85xx_hwtstamp(struct mii_timestamper *mii_ts,
+ 		container_of(mii_ts, struct vsc8531_private, mii_ts);
+ 	struct phy_device *phydev = vsc8531->ptp->phydev;
+ 	bool one_step = false;
++	unsigned long flags;
+ 	u32 val;
+ 
+ 	switch (cfg->tx_type) {
+@@ -1092,8 +1093,11 @@ static int vsc85xx_hwtstamp(struct mii_timestamper *mii_ts,
+ 
+ 	mutex_lock(&vsc8531->ts_lock);
+ 
++	spin_lock_init(&vsc8531->ptp->tx_queue.lock);
++	spin_lock_irqsave(&vsc8531->ptp->tx_queue.lock, flags);
+ 	__skb_queue_purge(&vsc8531->ptp->tx_queue);
+ 	__skb_queue_head_init(&vsc8531->ptp->tx_queue);
++	spin_unlock_irqrestore(&vsc8531->ptp->tx_queue.lock, flags);
+ 
+ 	/* Disable predictor while configuring the 1588 block */
+ 	val = vsc85xx_ts_read_csr(phydev, PROCESSOR,
+@@ -1180,9 +1184,7 @@ static void vsc85xx_txtstamp(struct mii_timestamper *mii_ts,
+ 
+ 	skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
+ 
+-	mutex_lock(&vsc8531->ts_lock);
+-	__skb_queue_tail(&vsc8531->ptp->tx_queue, skb);
+-	mutex_unlock(&vsc8531->ts_lock);
++	skb_queue_tail(&vsc8531->ptp->tx_queue, skb);
+ 	return;
+ 
+ out:
+@@ -1571,7 +1573,7 @@ irqreturn_t vsc8584_handle_ts_interrupt(struct phy_device *phydev)
+ 	if (rc & VSC85XX_1588_INT_FIFO_ADD) {
+ 		vsc85xx_get_tx_ts(priv->ptp);
+ 	} else if (rc & VSC85XX_1588_INT_FIFO_OVERFLOW) {
+-		__skb_queue_purge(&priv->ptp->tx_queue);
++		skb_queue_purge(&priv->ptp->tx_queue);
+ 		vsc85xx_ts_reset_fifo(phydev);
+ 	}
+ 
+-- 
+2.34.1
 
-I assume your suggestion to extend rtnetlink instead of netdev-netlink?
-
-Thank you!
-Arkadiusz
 
