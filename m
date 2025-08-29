@@ -1,190 +1,326 @@
-Return-Path: <netdev+bounces-218309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46EB3B3BE6A
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 16:47:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9657B3BE64
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 16:47:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E9AAB61E98
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 14:44:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 411DC583284
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 14:47:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9043334395;
-	Fri, 29 Aug 2025 14:42:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56C0F322DAB;
+	Fri, 29 Aug 2025 14:44:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ggmBBqWE"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="fPOCBJaM"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87B0322A02
-	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 14:42:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA9841C84DE
+	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 14:44:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756478559; cv=none; b=Ynrt0Z1iAzlDUV5lABzM/pPaKPg8fsyJeg3jYC7ov2IO4Xk/LfO1nvTIzDpQ0Auj0HBPjzvDn8Al/n65myaReGU0O8azyv+T4JmTyaq5joEj+6HioStEATYHSdPiioVbJYhQekI7na4TByW9QC1poE/nhDVHRkrxn1vx4NzczAQ=
+	t=1756478663; cv=none; b=FLnp70SOnqS6r8XKHqBnvt3UFbLNkirjnqQInucSxq59X85437RD5NHDwhEWW3jdwUSqLYs149YhCVPzklWLtgmfNo2+Cpzofm1WSmD/W8bye+VGDFxRrJOfKUrywugl4tVMFJziZ87yEvbY7AYJnEUT9sH5+eMiGEAvrcD2AD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756478559; c=relaxed/simple;
-	bh=iK+mTeelSq4+0PIo31sNfLt0VEevDDd2df1MJsi73l0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iCo2UNc4atcrBuT2eE7FQxEaak6RG9pJ9Kz4H0L5HBLXqPxgyNFS07uph2UXYYIeO3FoVbZePUymS/0/cBN+HF5W3b8IYZd1BnFeF+PNxDdseLHDhzGoZCcQ/yuuWs2EzuFeqkG4bMI8dL/jzpXp0CFCELCBwZkscLfcOMSUy6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ggmBBqWE; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756478556;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=ReHesm1JzI77Ttn1crqpxEHfJBy9ITN9OqG2sWgOwWM=;
-	b=ggmBBqWE/YuVjG+H4tfBTt6+W0or6V/23DDrOchhzu76Q8pIMJAis5Oke4Qx6pIABAn5ya
-	5sT7heW0ebxuIYfVlppvVqJ4XQVsjHEtpuTl4VHx1IyelpL/XDLPT1M/XjhX+I9+zjcNwA
-	zAGqaMveTKqWnJxY8rGNWtMdTeZkH2c=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-227-APHcbyI7Na6kZ-3BkBPbmA-1; Fri, 29 Aug 2025 10:42:34 -0400
-X-MC-Unique: APHcbyI7Na6kZ-3BkBPbmA-1
-X-Mimecast-MFC-AGG-ID: APHcbyI7Na6kZ-3BkBPbmA_1756478554
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45b7f0d1449so5191295e9.0
-        for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 07:42:34 -0700 (PDT)
+	s=arc-20240116; t=1756478663; c=relaxed/simple;
+	bh=XXdBiwS1w/UD3DRFrMusqh76Mi9ZkCR0omws2+NUKdg=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=RK9PrBP7egkCPlQCYflEDnv22gdcp3X8WL59zLQC+r6GV9RkwOraspLRN9KLjLL+2LNQDsUUr3QP+wTwV0v7isy6exCLtHlxKmyrHuCOygfK83HyvGVXtaxdWF3i7b+EtXYPjNyugcJ6Ku/KH9yaUONTlWbiXnrGunFgWKbdUWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=fPOCBJaM; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4b297962b24so22536991cf.2
+        for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 07:44:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1756478659; x=1757083459; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=c3FvKFoRx7HI/pYwAnOq73IUezTtrhH1QBQ1FIjT0Ew=;
+        b=fPOCBJaMiDS3GTyMRQISAFmBYurt6830QjRnnO8S/rfprM5i9cpZCHtrnao+G6RATH
+         bFnsI5pbN/vEhuuovfN9oqK0M0e9bHHuJwQUpWqjvas4UOYH2xGFqfhukWrQcHGjC+iB
+         xDJ6VWLZWeSQuNxD/b4lYzEyfHQ4ULW3jCcjjrcQt7w5yR+iWGhmG/uJpebem6l80sYB
+         4rVnhCR2AFMzzSlenvQx7Q/rd4+XUkyftZ6OiyFgSN5dck3LDu1ZmcQ4hXB4QOxdBxio
+         Q+cTuk78UvQQzRTiCbT6PaTo5PQnGNOKxPcyp1n4KzBzgURtiCFoB6sbcTbOX7OA/vgZ
+         gRzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756478553; x=1757083353;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ReHesm1JzI77Ttn1crqpxEHfJBy9ITN9OqG2sWgOwWM=;
-        b=jlaho1QSRhNud+4LSxddSuCgpo1QwIwB0RQtZGszEcsWG2QnSsSYKTv/Q4eJ2Z1UEs
-         qZWcjPfBYxMY0zuqKqWcm6ojVxw3BV82yVLuRjAcXDRJanS5qIuquFJWQ2Ah64iTD+d4
-         /ayEwKcDbXyye7fNewIAUWzZic2T6iE/rQDyHPL+sNLwJiWIKzBmy0fzOp3gph1naNW1
-         ybCKM8iUNJJScsmJN0VcwwFDHJ9iLMHcs8QWc5clVYJ5DWZz1JrIvnc3iNMevWK+7vtR
-         TbxfAccbegUNOsB3gdOnPob23UJ0DQmkbbwz7RBViy1AoKgNrXqCGIDIOmRdUBAD4eAh
-         PWxA==
-X-Forwarded-Encrypted: i=1; AJvYcCUEc9M1zL49h0KxHb9NCvJCpK2u7bIDUfRYpDA7ywN/bWh2Ya3GSJSGbKQjEJWuwUEhVMEsEgQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxx1vLFtYjp/wi5FiSUxxVXRL1ubR+WxOGNdDdvVKXp2iZ6MkUF
-	XQQ0l77FiP4iC3KWZr173CmQqY5+ToegJRt8w1dNur+TIR5fKwI+b59O928mfAgKoqxB1y/kAw1
-	z5aXEL5WU9BcqP4IKD9hbGH+5Y4uUzZQJLf1b6ujc9keReOfVUrnfnqhtSQ==
-X-Gm-Gg: ASbGncsWJLP6K3kQoHEAYTgnbFlgKwodziU+TB7TcpNXGWeLEq8AdUVSODB29rqERaQ
-	khQiCfD96Sjp/kzunFVBZuh0dstcnYLDUS4NAdNsnn+cII1NNXDuiZHvjmr27MIbbqv93wcqOFf
-	tax32oqqP2e8RRchemSqQMODaaR8VwPipI82+gxRH1xbkpmqotJ60tMMsgCG3ighQcqE+1AttrF
-	qhzlD46OXM1fg5BkFoylAyDH7rJBouERw3tVqlKQ5Dsvk+H2nHOi6etkH8CqHkoBjk5IuiydPDy
-	6A0qAVqV6Jo4PH0lZ9+5n/W539p9APPOdpJ900KVOggbXnBgTrlRwtY/KRfwWzNgqa8hBHN6yaV
-	CWGG8FWVyvhV/YB1LwDgh8FeJY6p3kGwtemSKRLUSjw6gkpsyKJk4QTjWlaigfOik
-X-Received: by 2002:a05:600c:a47:b0:456:1824:4808 with SMTP id 5b1f17b1804b1-45b517cfe66mr203888055e9.32.1756478553457;
-        Fri, 29 Aug 2025 07:42:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGqWe4aldLOwoA0lSJmYOAtk/gyCTKTz2xhXTH3fTqBq+gNs3GiB4PdE3KR16CB5LbW/sn45Q==
-X-Received: by 2002:a05:600c:a47:b0:456:1824:4808 with SMTP id 5b1f17b1804b1-45b517cfe66mr203887385e9.32.1756478552938;
-        Fri, 29 Aug 2025 07:42:32 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f1d:100:4f8e:bb13:c3c7:f854? (p200300d82f1d01004f8ebb13c3c7f854.dip0.t-ipconnect.de. [2003:d8:2f1d:100:4f8e:bb13:c3c7:f854])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b7e89920dsm46578795e9.16.2025.08.29.07.42.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 Aug 2025 07:42:32 -0700 (PDT)
-Message-ID: <7cd5f8c9-9bd3-40ed-a3df-a359dcfe1567@redhat.com>
-Date: Fri, 29 Aug 2025 16:42:30 +0200
+        d=1e100.net; s=20230601; t=1756478659; x=1757083459;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=c3FvKFoRx7HI/pYwAnOq73IUezTtrhH1QBQ1FIjT0Ew=;
+        b=F22sYGs143/wos2XQEweR+wcUXFtwYg07plLfXHSeqwZPzIBI2nvN4zoqBKFABU/yi
+         nG5+uCepYhdHnCrMhgSlokhY1Nfyojdc64DCLkuvirQ2DcjZKvTTMeaIjRTo3+HPZvuX
+         ibRC79ov5SwttkyIBFjZtv4SS2Z0fYyvAUfedeqHOnr260EJw/FTBC6gCoqA5p96ipMw
+         qijtpRIeqzSBsLqU6gR99/9vRYkgVlKiYtmMAhDozdQPm2s/XcK0h06+yB9Y4yz6EXrR
+         ueEkey4NWYW1yDLyA1o6K27chrzIDe1oYKQOAp3acZ+RxDHduhpttO9sHbZOo950qcgm
+         /qZg==
+X-Gm-Message-State: AOJu0YznoKAoRZBS3TyK072iT76qBhTibYJl3QkL3LkVR/+uuAph6rFf
+	20+6N+sUCX5V3gQVXWmf6WQlwnr36z1KVxSqV7YVOZ4gKAdGvMmUlN3HuDD36c+dD69wfdO6Fy3
+	mMwMX
+X-Gm-Gg: ASbGncvCXUfl+ktpT+69szdj6LY9VijbZtXIeDcGzrK9u3FkRHtZp5oAafmMe4bCDVW
+	D8FlVZo8SAAKeVgHXWDZikPzrVKey0w0Tr51gKZomXooADteYNAbt9HFM3KA2iSVYx8QvGb0Ih/
+	W7u6J9NL+TB82z+0SY5skvWp2XpbJOGeFJP6E0MgLZY1Rvx5+zE0jCTwKj2NeuWxkZillBl2Sv1
+	Qp1xOXQoXPD9zZld1DTD8e7LKHSBqwxA7LCOXTmXDHXrjTNe6NdUwR5P998aOKw4nGIMxZrv+sF
+	t6hHxXf9b5pVwEQL3QtTxn/LrInBRwhcPhiWs29FXVk7ipBPY1QzimfVX22VOam+q9+RuF8nv16
+	+Aia5is6253dAYrNf0udBv1lwsZGfJTF/mT4k5pM73gGbdMOFQjFmktYAvKqNQ0E1SxTO4nW5cO
+	yaNtv2I427xA==
+X-Google-Smtp-Source: AGHT+IEExxWsKrXzT25xqvoE6KnOwxpH87/DSINSS76dshV5gQ6Dm9qmcP+51HyCHKeJir9UCECXOg==
+X-Received: by 2002:a05:622a:1a1a:b0:4b0:edba:5a47 with SMTP id d75a77b69052e-4b2aab050e7mr327009811cf.53.1756478658520;
+        Fri, 29 Aug 2025 07:44:18 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b30b679105sm16050611cf.27.2025.08.29.07.44.17
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Aug 2025 07:44:18 -0700 (PDT)
+Date: Fri, 29 Aug 2025 07:44:15 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Subject: Fw: [Bug 220513] New: [6.12.44 regression] kernel NULL pointer
+ dereference on `pppoe` (or `bridge`)
+Message-ID: <20250829074415.06723b1d@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 36/36] mm: remove nth_page()
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
- Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- iommu@lists.linux.dev, io-uring@vger.kernel.org,
- Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
- Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
- kasan-dev@googlegroups.com, kvm@vger.kernel.org,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, Marco Elver <elver@google.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>, Michal Hocko <mhocko@suse.com>,
- Mike Rapoport <rppt@kernel.org>, Muchun Song <muchun.song@linux.dev>,
- netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
- Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
- Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
- virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
- wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
-References: <20250827220141.262669-1-david@redhat.com>
- <20250827220141.262669-37-david@redhat.com>
- <18c6a175-507f-464c-b776-67d346863ddf@lucifer.local>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- qIws/H2t
-In-Reply-To: <18c6a175-507f-464c-b776-67d346863ddf@lucifer.local>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 28.08.25 20:25, Lorenzo Stoakes wrote:
-> On Thu, Aug 28, 2025 at 12:01:40AM +0200, David Hildenbrand wrote:
->> Now that all users are gone, let's remove it.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
-> 
-> HAPPY DAYYS!!!!
-> 
-> Happy to have reached this bit, great work! :)
 
-I was just as happy when I made it to the end of this series :)
 
-Thanks for all the review!!
+Begin forwarded message:
+
+Date: Fri, 29 Aug 2025 13:20:21 +0000
+From: bugzilla-daemon@kernel.org
+To: stephen@networkplumber.org
+Subject: [Bug 220513] New: [6.12.44 regression] kernel NULL pointer dereference on `pppoe` (or `bridge`)
+
+
+https://bugzilla.kernel.org/show_bug.cgi?id=220513
+
+            Bug ID: 220513
+           Summary: [6.12.44 regression] kernel NULL pointer dereference
+                    on `pppoe` (or `bridge`)
+           Product: Networking
+           Version: 2.5
+          Hardware: All
+                OS: Linux
+            Status: NEW
+          Severity: high
+          Priority: P3
+         Component: IPV4
+          Assignee: stephen@networkplumber.org
+          Reporter: nanericwang@gmail.com
+        Regression: No
+
+Having upgraded from 6.12.43 to 6.12.44, my kernel crashed at early boot. The
+root cause is most likely related to the commit
+94731cc551e29511d85aa8dec61a6c071b1f2430 (Fixes: f6efc675c9dd ("net: ppp:
+resolve forwarding path for bridge pppoe devices")). 
+
+```
+Aug 29 20:36:16 localhost kernel: NET: Registered PF_PPPOX protocol family
+Aug 29 20:36:17 localhost systemd-networkd[266]: Failed to parse hostname,
+ignoring: Invalid argument
+Aug 29 20:36:17 localhost systemd-networkd[266]: br0: DHCPv4 server: DISCOVER
+(0xebeec00c)
+Aug 29 20:36:17 localhost kernel: BUG: kernel NULL pointer dereference,
+address: 0000000000000058
+Aug 29 20:36:17 localhost kernel: #PF: supervisor read access in kernel mode
+Aug 29 20:36:17 localhost kernel: #PF: error_code(0x0000) - not-present page
+Aug 29 20:36:17 localhost kernel: PGD 0 P4D 0 
+Aug 29 20:36:17 localhost kernel: Oops: Oops: 0000 [#1] PREEMPT_RT SMP
+Aug 29 20:36:17 localhost kernel: CPU: 1 UID: 981 PID: 266 Comm:
+systemd-network Not tainted 6.12.44-xanmod1-1-lts #1
+Aug 29 20:36:17 localhost kernel: Hardware name: Default string Default
+string/Default string, BIOS 5.19 03/30/2021
+Aug 29 20:36:17 localhost kernel: RIP: 0010:0xffffffffb32b2f6c
+Aug 29 20:36:17 localhost kernel: Code: 85 8e 01 00 00 48 8b 44 24 08 48 8b 40
+30 65 48 03 05 48 26 d6 4c e9 f0 fd ff ff e8 5e 9c c1 ff e9 ca fc ff ff 49 8b
+44 24 18 <48> 8b 40 58 48 3d 00 e3 65 b3 0f 84 0f 01 00 00 48 89 c2 48 8d 78
+Aug 29 20:36:17 localhost kernel: RSP: 0018:ffff9bd080c778d8 EFLAGS: 00010246
+Aug 29 20:36:17 localhost kernel: RAX: 0000000000000000 RBX: ffff9bd080c77a00
+RCX: 0000000000000001
+Aug 29 20:36:17 localhost kernel: RDX: 0000000000000000 RSI: 000000000002a424
+RDI: ffffffffb38b6040
+Aug 29 20:36:17 localhost kernel: RBP: ffff999345ad1000 R08: 0000000000000003
+R09: 0000000000000000
+Aug 29 20:36:17 localhost kernel: R10: ffff999342eb7900 R11: 0000000000000000
+R12: ffff9bd080c77948
+Aug 29 20:36:17 localhost kernel: R13: 0000000000000008 R14: 0000000000000000
+R15: 0000000090000000
+Aug 29 20:36:17 localhost kernel: FS:  00007fc0bab148c0(0000)
+GS:ffff9994b7d00000(0000) knlGS:0000000000000000
+Aug 29 20:36:17 localhost kernel: CS:  0010 DS: 0000 ES: 0000 CR0:
+0000000080050033
+Aug 29 20:36:17 localhost kernel: CR2: 0000000000000058 CR3: 000000010b438006
+CR4: 0000000000b70ef0
+Aug 29 20:36:17 localhost kernel: Call Trace:
+Aug 29 20:36:17 localhost kernel:  <TASK>
+Aug 29 20:36:17 localhost kernel:  ? 0xffffffffb321d725
+Aug 29 20:36:17 localhost kernel:  0xffffffffb32b4197
+Aug 29 20:36:17 localhost kernel:  0xffffffffb32f5d6c
+Aug 29 20:36:17 localhost kernel:  ? 0xffffffffb32b8c40
+Aug 29 20:36:17 localhost kernel:  ? 0xffffffffb3212da5
+Aug 29 20:36:17 localhost kernel:  0xffffffffb3212da5
+Aug 29 20:36:17 localhost kernel:  0xffffffffb32131ea
+Aug 29 20:36:17 localhost kernel:  0xffffffffb32152ea
+Aug 29 20:36:17 localhost kernel:  0xffffffffb3364479
+Aug 29 20:36:17 localhost kernel:  ? 0xffffffffb3364485
+Aug 29 20:36:17 localhost kernel:  ? 0xffffffffb3215617
+Aug 29 20:36:17 localhost kernel:  ? 0xffffffffb2f2cd31
+Aug 29 20:36:17 localhost kernel:  ? 0xffffffffb33684f7
+Aug 29 20:36:17 localhost kernel:  0xffffffffb34000b0
+Aug 29 20:36:17 localhost kernel: RIP: 0033:0x00007fc0bb35e1ce
+Aug 29 20:36:17 localhost kernel: Code: 4d 89 d8 e8 64 be 00 00 4c 8b 5d f8 41
+8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 11 c9 c3 0f 1f 80 00 00 00 00 48 8b 45
+10 0f 05 <c9> c3 83 e2 39 83 fa 08 75 e7 e8 13 ff ff ff 0f 1f 00 f3 0f 1e fa
+Aug 29 20:36:17 localhost kernel: RSP: 002b:00007ffe7f2ef730 EFLAGS: 00000202
+ORIG_RAX: 000000000000002e
+Aug 29 20:36:17 localhost kernel: RAX: ffffffffffffffda RBX: 000005b3d81d1b00
+RCX: 00007fc0bb35e1ce
+Aug 29 20:36:17 localhost kernel: RDX: 0000000000000000 RSI: 00007ffe7f2ef7a0
+RDI: 0000000000000017
+Aug 29 20:36:17 localhost kernel: RBP: 00007ffe7f2ef740 R08: 0000000000000000
+R09: 0000000000000000
+Aug 29 20:36:17 localhost kernel: R10: 0000000000000000 R11: 0000000000000202
+R12: 000005b3d81d1b00
+Aug 29 20:36:17 localhost kernel: R13: 000005b3d81d0480 R14: 000005b3d8034800
+R15: 000005b3d803481c
+Aug 29 20:36:17 localhost kernel:  </TASK>
+Aug 29 20:36:17 localhost kernel: Modules linked in: pppoe pppox af_packet
+sch_cake bridge stp llc xt_DSCP xt_set xt_TCPMSS xt_tcpudp iptable_mangle
+xt_connlimit nf_conncount xt_conntrack iptable_filter xt_MASQUERADE iptable_nat
+nf_nat msr ip_set_hash_net ip_set nls_ascii nls_cp437 vfat fat intel_rapl_msr
+hid_generic evdev coretemp intel_tcc_cooling x86_pkg_temp_thermal
+intel_powerclamp rapl intel_cstate intel_uncore
+processor_thermal_device_pci_legacy intel_soc_dts_iosf processor_thermal_device
+processor_thermal_wt_hint processor_thermal_rfim processor_thermal_rapl igb
+spi_intel_pci usbhid intel_rapl_common spi_intel ptp iosf_mbi pps_core i2c_i801
+hid i2c_smbus i2c_algo_bit processor_thermal_wt_req fan hwmon
+processor_thermal_power_floor processor_thermal_mbox i2c_core thermal
+int340x_thermal_zone acpi_pad button ppp_generic slhc nf_conntrack
+nf_defrag_ipv6 nf_defrag_ipv4 nfnetlink ip_tables x_tables ipv6 xhci_pci
+xhci_hcd usbcore usb_common btrfs sha256_ssse3 sha256_generic libsha256
+zstd_compress raid6_pq zlib_deflate lzo_decompress
+Aug 29 20:36:17 localhost kernel:  lzo_compress zlib_inflate xor libcrc32c
+crc32c_generic
+Aug 29 20:36:17 localhost kernel: CR2: 0000000000000058
+Aug 29 20:36:17 localhost kernel: ---[ end trace 0000000000000000 ]---
+Aug 29 20:36:17 localhost kernel: RIP: 0010:0xffffffffb32b2f6c
+Aug 29 20:36:17 localhost kernel: Code: 85 8e 01 00 00 48 8b 44 24 08 48 8b 40
+30 65 48 03 05 48 26 d6 4c e9 f0 fd ff ff e8 5e 9c c1 ff e9 ca fc ff ff 49 8b
+44 24 18 <48> 8b 40 58 48 3d 00 e3 65 b3 0f 84 0f 01 00 00 48 89 c2 48 8d 78
+Aug 29 20:36:17 localhost kernel: RSP: 0018:ffff9bd080c778d8 EFLAGS: 00010246
+Aug 29 20:36:17 localhost kernel: RAX: 0000000000000000 RBX: ffff9bd080c77a00
+RCX: 0000000000000001
+Aug 29 20:36:17 localhost kernel: RDX: 0000000000000000 RSI: 000000000002a424
+RDI: ffffffffb38b6040
+Aug 29 20:36:17 localhost kernel: RBP: ffff999345ad1000 R08: 0000000000000003
+R09: 0000000000000000
+Aug 29 20:36:17 localhost kernel: R10: ffff999342eb7900 R11: 0000000000000000
+R12: ffff9bd080c77948
+Aug 29 20:36:17 localhost kernel: R13: 0000000000000008 R14: 0000000000000000
+R15: 0000000090000000
+Aug 29 20:36:17 localhost kernel: FS:  00007fc0bab148c0(0000)
+GS:ffff9994b7d00000(0000) knlGS:0000000000000000
+Aug 29 20:36:17 localhost kernel: CS:  0010 DS: 0000 ES: 0000 CR0:
+0000000080050033
+Aug 29 20:36:17 localhost kernel: CR2: 0000000000000058 CR3: 000000010b438006
+CR4: 0000000000b70ef0
+Aug 29 20:36:17 localhost kernel: note: systemd-network[266] exited with irqs
+disabled
+Aug 29 20:36:17 localhost kernel: ------------[ cut here ]------------
+Aug 29 20:36:17 localhost kernel: Voluntary context switch within RCU read-side
+critical section!
+Aug 29 20:36:17 localhost kernel: WARNING: CPU: 1 PID: 266 at
+0xffffffffb2ed1cc7
+Aug 29 20:36:17 localhost kernel: Modules linked in: pppoe pppox af_packet
+sch_cake bridge stp llc xt_DSCP xt_set xt_TCPMSS xt_tcpudp iptable_mangle
+xt_connlimit nf_conncount xt_conntrack iptable_filter xt_MASQUERADE iptable_nat
+nf_nat msr ip_set_hash_net ip_set nls_ascii nls_cp437 vfat fat intel_rapl_msr
+hid_generic evdev coretemp intel_tcc_cooling x86_pkg_temp_thermal
+intel_powerclamp rapl intel_cstate intel_uncore
+processor_thermal_device_pci_legacy intel_soc_dts_iosf processor_thermal_device
+processor_thermal_wt_hint processor_thermal_rfim processor_thermal_rapl igb
+spi_intel_pci usbhid intel_rapl_common spi_intel ptp iosf_mbi pps_core i2c_i801
+hid i2c_smbus i2c_algo_bit processor_thermal_wt_req fan hwmon
+processor_thermal_power_floor processor_thermal_mbox i2c_core thermal
+int340x_thermal_zone acpi_pad button ppp_generic slhc nf_conntrack
+nf_defrag_ipv6 nf_defrag_ipv4 nfnetlink ip_tables x_tables ipv6 xhci_pci
+xhci_hcd usbcore usb_common btrfs sha256_ssse3 sha256_generic libsha256
+zstd_compress raid6_pq zlib_deflate lzo_decompress
+Aug 29 20:36:17 localhost kernel:  lzo_compress zlib_inflate xor libcrc32c
+crc32c_generic
+Aug 29 20:36:17 localhost kernel: CPU: 1 UID: 981 PID: 266 Comm:
+systemd-network Tainted: G      D            6.12.44-xanmod1-1-lts #1
+Aug 29 20:36:17 localhost kernel: Tainted: [D]=DIE
+Aug 29 20:36:17 localhost kernel: Hardware name: Default string Default
+string/Default string, BIOS 5.19 03/30/2021
+Aug 29 20:36:17 localhost kernel: RIP: 0010:0xffffffffb2ed1cc7
+Aug 29 20:36:17 localhost kernel: Code: ff ff 45 85 c9 0f 84 17 fd ff ff 48 89
+b9 a8 00 00 00 e9 0b fd ff ff 48 c7 c7 28 4d 6a b3 c6 05 7c a5 9e 00 01 e8 b9
+5a f8 ff <0f> 0b e9 61 fc ff ff 44 89 4c 24 14 44 89 44 24 10 48 89 4c 24 08
+Aug 29 20:36:17 localhost kernel: RSP: 0018:ffff9bd080c77bf8 EFLAGS: 00010046
+Aug 29 20:36:17 localhost kernel: RAX: 0000000000000000 RBX: ffff9994b7d258c0
+RCX: 0000000000000027
+Aug 29 20:36:17 localhost kernel: RDX: ffff9994b7d1c748 RSI: 0000000000000001
+RDI: ffff9994b7d1c740
+Aug 29 20:36:17 localhost kernel: RBP: ffff99934a2ca900 R08: 0000000000000e28
+R09: ffffffffb36a4d66
+Aug 29 20:36:17 localhost kernel: R10: ffffffffb36a4d67 R11: 00000000ffffe4b8
+R12: ffff9994b7d24b80
+Aug 29 20:36:17 localhost kernel: R13: 0000000000000000 R14: ffff99934a2ca900
+R15: ffff9bd080c77cf8
+Aug 29 20:36:17 localhost kernel: FS:  0000000000000000(0000)
+GS:ffff9994b7d00000(0000) knlGS:0000000000000000
+Aug 29 20:36:17 localhost kernel: CS:  0010 DS: 0000 ES: 0000 CR0:
+0000000080050033
+Aug 29 20:36:17 localhost kernel: CR2: 0000000000000058 CR3: 000000023ae18001
+CR4: 0000000000b70ef0
+Aug 29 20:36:17 localhost kernel: Call Trace:
+Aug 29 20:36:17 localhost kernel:  <TASK>
+Aug 29 20:36:17 localhost kernel:  0xffffffffb336b943
+Aug 29 20:36:17 localhost kernel:  0xffffffffb336c012
+Aug 29 20:36:17 localhost kernel:  0xffffffffb337492f
+Aug 29 20:36:17 localhost kernel:  0xffffffffb336d874
+Aug 29 20:36:17 localhost kernel:  0xffffffffb2ec39d1
+Aug 29 20:36:17 localhost kernel:  0xffffffffb2ec787b
+Aug 29 20:36:17 localhost kernel:  ? 0xffffffffb2ecfe50
+Aug 29 20:36:17 localhost kernel:  ? 0xffffffffb2ec38a0
+Aug 29 20:36:17 localhost kernel:  0xffffffffb2ecb196
+Aug 29 20:36:17 localhost kernel:  0xffffffffb2ecbfa7
+Aug 29 20:36:17 localhost kernel:  ? 0xffffffffb2fd71aa
+Aug 29 20:36:17 localhost kernel:  ? 0xffffffffb2fe77f1
+Aug 29 20:36:17 localhost kernel:  0xffffffffb2fd77f1
+Aug 29 20:36:17 localhost kernel:  0xffffffffb2fddd87
+Aug 29 20:36:17 localhost kernel:  0xffffffffb2e7f9b6
+Aug 29 20:36:17 localhost kernel:  0xffffffffb2e5bfc6
+Aug 29 20:36:17 localhost kernel:  0xffffffffb2e5c7b4
+Aug 29 20:36:17 localhost kernel:  0xffffffffb2e01a86
+Aug 29 20:36:17 localhost kernel: RIP: 0033:0x00007fc0bb35e1ce
+Aug 29 20:36:17 localhost kernel: Code: Unable to access opcode bytes at
+0x7fc0bb35e1a4.
+Aug 29 20:36:17 localhost kernel: RSP: 002b:00007ffe7f2ef730 EFLAGS: 00000202
+ORIG_RAX: 000000000000002e
+Aug 29 20:36:17 localhost kernel: RAX: ffffffffffffffda RBX: 000005b3d81d1b00
+RCX: 00007fc0bb35e1ce
+Aug 29 20:36:17 localhost kernel: RDX: 0000000000000000 RSI: 00007ffe7f2ef7a0
+RDI: 0000000000000017
+Aug 29 20:36:17 localhost kernel: RBP: 00007ffe7f2ef740 R08: 0000000000000000
+R09: 0000000000000000
+Aug 29 20:36:17 localhost kernel: R10: 0000000000000000 R11: 0000000000000202
+R12: 000005b3d81d1b00
+Aug 29 20:36:17 localhost kernel: R13: 000005b3d81d0480 R14: 000005b3d8034800
+R15: 000005b3d803481c
+Aug 29 20:36:17 localhost kernel:  </TASK>
+Aug 29 20:36:17 localhost kernel: ---[ end trace 0000000000000000 ]---
+```
 
 -- 
-Cheers
+You may reply to this email to add a comment.
 
-David / dhildenb
-
+You are receiving this mail because:
+You are the assignee for the bug.
 
