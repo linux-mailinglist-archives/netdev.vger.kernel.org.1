@@ -1,126 +1,185 @@
-Return-Path: <netdev+bounces-218393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F2FAB3C489
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 00:00:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 843DBB3C479
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 00:00:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3D387C33E3
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 22:00:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 158ED3B0535
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 22:00:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01B102741B0;
-	Fri, 29 Aug 2025 22:00:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2770A27603C;
+	Fri, 29 Aug 2025 22:00:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oLEJO8rP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rOXdmBCP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8983C264A77
-	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 22:00:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 012E1276030
+	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 21:59:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756504815; cv=none; b=bLeoEER9lbkInjHfZkDsUU5HVIOZtHwUIM88KwxKw53Q69Pk8csZbVvStVhkqIreAkR6Oc62RRH68Mwoq7UeBSnOeEpqw78EgQNideIUUDyPRXcqkEEPsGgC4s69stDGoSmGYJpk5jGSG3mfJnjNBUQVhWKNxwXwJlRMYIwMunY=
+	t=1756504800; cv=none; b=OLkrCSS4tWkjHAUolpSpee/pMHi6X401qNHAPRJ9sEn6vms8genzCFL7s+rmMUzFZI2u9oUBa4+zub4Yej+UmtVVHeO2J3VY7CCpgQEXOrE1ZjvldGrAn9wP69EKJV1a8S2qkt2jCND+LdyyQhIt3W2sinYXYGNz2RXoWlSaYoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756504815; c=relaxed/simple;
-	bh=/P6RowOz1b0vyseyrjEnqHcevhbD5nENbQPjjjlmckA=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=IWqGFjVgsQ9lHDjTG17WPRzDcU+qjg2xPK9UyAr+OaVEXSCygy7Ow7G29vFNxQgJ266erKYpYeYw/ClbDcdUZl2PohEnVVoy33wYr+3TcoddZXEWhADoNEO8R1+AQ8jPJUJ7Twa+noZQhBV68d7FedWWLEgzyJNTdtYh9f/A8Vk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oLEJO8rP; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-24458264c5aso23495525ad.3
-        for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 15:00:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756504814; x=1757109614; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=GAzCvl0ldkRzudSduBa+UTTFBtOSyy1B+vOLHTPWCIE=;
-        b=oLEJO8rP9QaUywYTyQHCghCVwjUTufKjhnpVM581XZbxaMr8JjhpmOSrs/KKVshxiI
-         So9RNBnU4Wuk8qc/9LXEh7Kv63sNGcquGjD2B/tpav8Q+LjqOWZTSkx2Rre+Sk+ApMKu
-         giITA551Z11F3/sWdrLeyH6PzlZwX2gO/tehgz+pXK3qX1I2CcgwAAL1ZPk79LiW8S25
-         nL3aDNqRNobwu4P+1MHYNyPDmo3es6arp0VxXVHvqk6Ij4Mko+LQWVe6LwhRhhJt3fsY
-         nZMQbaVz5LKdxA+yh6F/29yhv4cv/gWrt6PQRaujn0HnYIp75kV2lKC5GtwTI2YSqbaP
-         RZsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756504814; x=1757109614;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GAzCvl0ldkRzudSduBa+UTTFBtOSyy1B+vOLHTPWCIE=;
-        b=eaUZHQow4B8UatmSDO41Iyij0qcUQko90VceQ2+ZAfU+CJKPVbpgSg8igm3RSoTsNW
-         /IbV7DWnIuxrflBFEhk/bLB93VkiDjEoLcaO4PSHJMOX9dFPECyM211ljkGl30o5ykEq
-         xp9+rNkl6cJf7krN1d/CZh5pRd2EjF8WLk5W9TYU6waryxn7VNZwF9NrRPJNC89eownt
-         /+GFFpLUYfpZgzgCqPmCUJ6lnTFMtDkvcQ4FaijiW2dzyXSYCHS/YyHRJJVUBPSTtCYn
-         fuesr8DrCzpi7+5N7tyVl7zXnwZAfSGiOVOjSbh8AVb61g76OerQJlF+OZrTfeDVdkDZ
-         b1JA==
-X-Gm-Message-State: AOJu0YzMSDcxdYR8/kylljavVbobSBtobjDj60LGeBSbX0QOLlZYF5Oj
-	3ACz/1sS+Xx/rgyey11VrRJRVqJScEbksb+xoeBDpiInb4cHtNqWZE0L0mYalvhGL1axDtFliLM
-	//20ZKZsH4vbnRMEcmvnL1J4S/BFrrjfIlOYR66FBe7dvrWMu5AZrNhfU0UniP5RLxcqsFbUf0O
-	EhfMTT6d9p0ukD8fLhEK0hvMLkOdpbv7CQOxHUsYqNmaOOX/1SVwGnH4LnMYNqgR4=
-X-Google-Smtp-Source: AGHT+IEKrhZ3OKLQxYoEKQKZHhOayEYySIWPtx97dJ8GVIzQwF9KvqViD5qC8rCJdQxii7XJlUjw1LorWZiSeDav0A==
-X-Received: from plcs9.prod.google.com ([2002:a17:903:30c9:b0:23f:df55:cf6f])
- (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:120a:b0:240:99e6:6bc3 with SMTP id d9443c01a7336-249448e65c6mr1874055ad.20.1756504813488;
- Fri, 29 Aug 2025 15:00:13 -0700 (PDT)
-Date: Fri, 29 Aug 2025 21:59:38 +0000
+	s=arc-20240116; t=1756504800; c=relaxed/simple;
+	bh=ddg/AuK2hE8P8Wmd7l+DCNAk55W3qQCpgP+MK/HfjRA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F+fmCYYTganQtQRMWF6OXM3Ol41LNL/3lXzOBCrfenvWW8tN9c2KJjB5Hqkci9S1yTyLFZSU+g5gqygMMVbNY+4ciF6++aDr3EohlEHFPHOlg2aHERGErHj6DyxeKHOdrB3fRHlCro6MdSN5PM3a0tMAnf89FyBu+Z9gyUzuTXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rOXdmBCP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 901A4C4CEF0;
+	Fri, 29 Aug 2025 21:59:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756504799;
+	bh=ddg/AuK2hE8P8Wmd7l+DCNAk55W3qQCpgP+MK/HfjRA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rOXdmBCPoc4a1DJStqgHtGNyHwJo0KYJ3V3of4DiKFItt0GeqOYO0OA0zzPlkkN13
+	 t6VTfPaj+izCgEhJ/5ObfrTdQ46N/II0c4yP5VZQk/XMTkHgEtjcIn7RikFD+EO7Su
+	 rrfzX5fE/cG1nWsztPITBb1uVINnhu0RVK5FdwCCIkDXaHyoMbjAPsRtlx3XsNQice
+	 QZpCcPmb3tzADfqZ1ARHvjq4sBXK5oRlFfutbGJj5CyDUSyCULBK3g62WUkHySZNhr
+	 0Fos5l0AJtScgmzWXdE2qaon98DcWwfAJ/uzaD/HrPbtsGOGWkMqBf+mEFpnxxiXwr
+	 pFE8KOQXbm3qw==
+Date: Fri, 29 Aug 2025 14:59:57 -0700
+From: Saeed Mahameed <saeed@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, mbloch@nvidia.com,
+	Adithya Jayachandran <ajayachandra@nvidia.com>
+Subject: Re: [PATCH net-next V2 3/7] net/mlx5: E-Switch, Add support for
+ adjacent functions vports discovery
+Message-ID: <aLIi3ToMmFXNO0V5@x130>
+References: <20250827044516.275267-1-saeed@kernel.org>
+ <20250827044516.275267-4-saeed@kernel.org>
+ <20250828113417.GB10519@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0.318.gd7df087d1a-goog
-Message-ID: <20250829220003.3310242-1-almasrymina@google.com>
-Subject: [PATCH net-next v1] net: devmem: NULL check netdev_nl_get_dma_dev
- return value
-From: Mina Almasry <almasrymina@google.com>
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Joe Damato <jdamato@fastly.com>, 
-	Stanislav Fomichev <sdf@fomichev.me>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250828113417.GB10519@horms.kernel.org>
 
-netdev_nl_get_dma_dev can return NULL. This happens in the unlikely
-scenario that netdev->dev.parent is NULL, or all the calls to the
-ndo_queue_get_dma_dev return NULL from the driver.
+On 28 Aug 12:34, Simon Horman wrote:
+>On Tue, Aug 26, 2025 at 09:45:12PM -0700, Saeed Mahameed wrote:
+>> From: Adithya Jayachandran <ajayachandra@nvidia.com>
+>>
+>> Adding driver support to query adjacent functions vports, AKA
+>> delegated vports.
+>>
+>> Adjacent functions can delegate their sriov vfs to other sibling PF in
+>> the system, to be managed by the eswitch capable sibling PF.
+>> E.g, ECPF to Host PF, multi host PF between each other, etc.
+>>
+>> Only supported in switchdev mode.
+>>
+>> Signed-off-by: Adithya Jayachandran <ajayachandra@nvidia.com>
+>> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+>
+>...
+>
+>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
+>
+>...
+>
+>> +static int
+>> +mlx5_eswitch_load_adj_vf_vports(struct mlx5_eswitch *esw,
+>> +				enum mlx5_eswitch_vport_event enabled_events)
+>> +{
+>> +	struct mlx5_vport *vport;
+>> +	unsigned long i;
+>> +	int err;
+>> +
+>> +	mlx5_esw_for_each_vf_vport(esw, i, vport, U16_MAX) {
+>> +		if (!vport->adjacent)
+>> +			continue;
+>> +		err = mlx5_eswitch_load_pf_vf_vport(esw, vport->vport,
+>> +						    enabled_events);
+>> +		if (err)
+>> +			goto unload_adj_vf_vport;
+>> +	}
+>> +
+>> +	return 0;
+>> +
+>> +unload_adj_vf_vport:
+>> +	mlx5_eswitch_unload_adj_vf_vports(esw);
+>> +	return err;
+>> +}
+>> +
+>>  int mlx5_eswitch_load_vf_vports(struct mlx5_eswitch *esw, u16 num_vfs,
+>>  				enum mlx5_eswitch_vport_event enabled_events)
+>>  {
+>> @@ -1345,7 +1382,15 @@ mlx5_eswitch_enable_pf_vf_vports(struct mlx5_eswitch *esw,
+>>  					  enabled_events);
+>>  	if (ret)
+>>  		goto vf_err;
+>> +
+>> +	/* Enable adjacent VF vports */
+>> +	ret = mlx5_eswitch_load_adj_vf_vports(esw, enabled_events);
+>> +	if (ret)
+>> +		goto unload_adj_vf_vports;
+>> +
+>>  	return 0;
+>> +unload_adj_vf_vports:
+>> +	mlx5_eswitch_unload_adj_vf_vports(esw);
+>>
+>
+>Hi Adithya and Saeed,
+>
+>mlx5_eswitch_load_adj_vf_vports() already unwinds on error,
+>calling mlx5_eswitch_unload_adj_vf_vports().
+>
+>While resources allocated by the preceding call to
+>mlx5_eswitch_load_vf_vports() (just before this hunk) seem to be leaked.
+>
+>So I wonder if the above two lines should be:
+>
+>unload_vf_vports:
+>	mlx5_eswitch_unload_vf_vports(esw, num_vfs);
+>
 
-Current code doesn't NULL check the return value, so it may be passed to
-net_devmem_bind_dmabuf, which AFAICT will eventually hit
-WARN_ON(!dmabuf || !dev) in dma_buf_dynamic_attach and do a kernel
-splat. Avoid this scenario by using IS_ERR_OR_NULL in place of IS_ERR.
+Yep, looks incorrect, let me double check and submit v3.
 
-Found by code inspection.
+>>  vf_err:
+>>  	if (mlx5_core_ec_sriov_enabled(esw->dev))
+>
+>...
+>
+>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+>> index cfd6b1b8c6f4..9f8bb397eae5 100644
+>> --- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+>> @@ -216,6 +216,7 @@ struct mlx5_vport {
+>>  	u32                     metadata;
+>>  	int                     vhca_id;
+>>
+>> +	bool adjacent; /* delegated vhca from adjacent function */
+>>  	struct mlx5_vport_info  info;
+>>
+>>  	/* Protected with the E-Switch qos domain lock. The Vport QoS can
+>> @@ -384,6 +385,7 @@ struct mlx5_eswitch {
+>>
+>>  	struct mlx5_esw_bridge_offloads *br_offloads;
+>>  	struct mlx5_esw_offload offloads;
+>> +	u32 last_vport_idx; /* ++ every time a vport is created */
+>
+>The comment above documents one operation that can occur
+>on this field. But the code also performs others: decrement and set.
+>
+>So perhaps this is more appropriate?
+>
+>	u32 last_vport_idx; /* Number of vports created */
+>
+>Or dropping the comment entirely: it seems obvious enough.
+>
 
-Note that this was a problem even before the fixes patch, since we
-passed netdev->dev.parent to net_devmem_bind_dmabuf before NULL checking
-it anyway :( But that code got removed in the fixes patch (and retained
-the bug).
-
-Fixes: b8aab4bb9585 ("net: devmem: allow binding on rx queues with same DMA devices")
-Signed-off-by: Mina Almasry <almasrymina@google.com>
-
----
- net/core/netdev-genl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index 470fabbeacd9..779bcdb5653d 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -1098,7 +1098,7 @@ int netdev_nl_bind_tx_doit(struct sk_buff *skb, struct genl_info *info)
- 	dma_dev = netdev_queue_get_dma_dev(netdev, 0);
- 	binding = net_devmem_bind_dmabuf(netdev, dma_dev, DMA_TO_DEVICE,
- 					 dmabuf_fd, priv, info->extack);
--	if (IS_ERR(binding)) {
-+	if (IS_ERR_OR_NULL(binding)) {
- 		err = PTR_ERR(binding);
- 		goto err_unlock_netdev;
- 	}
-
-base-commit: 4f54dff818d7b5b1d84becd5d90bc46e6233c0d7
--- 
-2.51.0.318.gd7df087d1a-goog
+Agreed, will drop.
 
 
