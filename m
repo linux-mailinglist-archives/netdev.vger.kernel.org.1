@@ -1,244 +1,229 @@
-Return-Path: <netdev+bounces-218165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13451B3B5CC
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 10:18:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2181DB3B5E2
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 10:21:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BF461C87B0C
-	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 08:18:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCE1E172CFF
+	for <lists+netdev@lfdr.de>; Fri, 29 Aug 2025 08:21:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8BE42BE634;
-	Fri, 29 Aug 2025 08:14:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 336EC2BE636;
+	Fri, 29 Aug 2025 08:21:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="ey2I/2V7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Yb+v3BIX"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 315EF296BB3;
-	Fri, 29 Aug 2025 08:14:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756455268; cv=none; b=Rg+UpqC+9/dFyiupbj8lcp7XB7C7kdrvkgWfTfglAglOsYhYTfvCfTpYN8c99cYEvbozU8sqDF+8DPVThMDVJq+sAz/oCC3BHICq1c/YdLO2qqdqvh4IEw2PSMH3NPx/PoXQDNGEN1blx/9cRgCib7GrvirQRvMjZEe2kduTmEk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756455268; c=relaxed/simple;
-	bh=+ZdTRFxuDhTf9uWA31xbLCkEzI9NqcQmBiyU6qfZfTc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KFWJOSDt9zo24pKWKSu6rLgwS6iuyysoHxg4HrmoOVosgpImqKaJ9i/NAgSJpASh2EAwa2sId8nuCBanff+vZktQX9oSw3yzMESUxsTNsNfW9q54NOSQgvhkbTeDR8dOVLJFn5mD6kNn/VC6z+qGebzwPilYxJ/Glnb36JQlMXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=ey2I/2V7; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=KMtG8ofuNmtfm661TEIC5f1H8ncu2MEQYNCvo3zmC/0=; b=ey2I/2V7tqpysZo0T2mbAmzibz
-	IMCOUNQUi1FK1ufsRLKqm3ntQ69TBUZddJcs8KPBb1KN2F28b9UTrONZTXLia6bxO7NQ6kF7JrdL+
-	oTx2MzLX7xNjmoaRFbZfFVuqXKUbLNgA/UkHczZAs9h7a6xDo1K7AtuzpGxP50TuE3r14UTEhoA65
-	t2BlMOKPRmJcFUdKEugPIg9DtO4Jz6Bo7VQI6BPb2bKCh7RWcSxe5dgXt6ABsAW4Ieh9BppgaujAg
-	oT6AUhco2LZyhsj9zl3OrKlceeqHS2pCU48jaOIeKfdzuZmUdtLk8zaHRdKvEbrs7930wEHZgyCIQ
-	dUyH+V3g==;
-Received: from sslproxy05.your-server.de ([78.46.172.2])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1uruFT-000Ah7-1f;
-	Fri, 29 Aug 2025 10:14:15 +0200
-Received: from localhost ([127.0.0.1])
-	by sslproxy05.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1uruFS-0000xo-1n;
-	Fri, 29 Aug 2025 10:14:14 +0200
-Message-ID: <96158e58-da9a-4661-a47b-e7b85856ac90@iogearbox.net>
-Date: Fri, 29 Aug 2025 10:14:13 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB3D5273811
+	for <netdev@vger.kernel.org>; Fri, 29 Aug 2025 08:21:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756455669; cv=fail; b=KSaD9nvjD/96zWw7r8O80juCyGVgoACjfWtoWiPG9OABIV/2F/vq/s+kVG893CvkzTbu0X0GRuDcHgC6QsZK49avDOkY46ygSHiovP18DGGuI71ziqdS7IWCYppDWdw+3qEiqvLqelOWPZLRj3vueQFgG5CL3/xn1Ks5JwPE+7c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756455669; c=relaxed/simple;
+	bh=gG1zIp89ObT8Zhr8SzRNwDr7p+0yFQrrMpA/M4Gd9lI=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=mKIAibuGkFztej7yvtodEqggs47iU+1kH95IymAbOEntqtFwOvyZKhksuS/ga4ttihRlnTyCC5WKLpO0+Q8cbBeLiS8WV8rbRaBcuQZyU5vFhDqOvPA2tf1fEm7gho0pFJ4Xy6h/OuVh1jqMBMCrtryyggDnLd0VldCd2p3wCc4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Yb+v3BIX; arc=fail smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756455667; x=1787991667;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=gG1zIp89ObT8Zhr8SzRNwDr7p+0yFQrrMpA/M4Gd9lI=;
+  b=Yb+v3BIXsZ7pgjXApo0umHyXFko3BUa7WlwZONlSpb2I+YxkP5c85p/I
+   GaIwzaTKu/mZmM197olXRaWh+ekcTsFQXV3axwAa9CkGkUwAPJ2NduIlj
+   qQUFeHyYO5+cAKO1jJUNyxrfRO2MIp5fHxF/6IIpW2vVd+z/9brkooFmN
+   4gT06N1oiw4JFPxuxHyhbSb6xHkMbva/hUF8CcLpTwQ7Ivw7hFHAj0gip
+   TfTUTVyMhwC+bgmiPdSgap/H+cbhD0rHfEohT1RndTAJ9x2p5OtCRwRq8
+   CzUsP/R1ikyyfyCXuy1ronU7NdDjZUumqvbHcBv4tqByd0oTLB3/8e8Q4
+   w==;
+X-CSE-ConnectionGUID: M6vZCh1fRL2DvKTI/LQzSw==
+X-CSE-MsgGUID: VcQHfYzZQdqNA1+5bsiFCg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="58661908"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="58661908"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2025 01:21:06 -0700
+X-CSE-ConnectionGUID: 6f6/QBDHS8GQaa+zp0yNfw==
+X-CSE-MsgGUID: mqUhMc7WRGafJi7Kp5IztQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,221,1751266800"; 
+   d="scan'208";a="170232528"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2025 01:21:05 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Fri, 29 Aug 2025 01:21:04 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Fri, 29 Aug 2025 01:21:04 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (40.107.236.43)
+ by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Fri, 29 Aug 2025 01:21:02 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xGK0B3LCuOCNk5XY+nkSh27qvwJqvDQwc9fvX8hwKa4sZ7URuF72HM4jLq/C63l5pp4b3M5vehvcQ2FASy77bNoiOEk/ArPF3zjEcjLA9TY7n1kRw30fcuT0ouXfJKHqpR9hrXX7cknI/BbknUry7XgBxvjjQ/5uWFqLjbfMuEaY/ruQzLZw3AO1K0qtIg8U9eYtoVxscV6nw3brRwTF7k6IBqa6Su/uPSVyUxpHmS4SzlGdV6lMqxkDhamqdccTgpdfipqAaGKSfqCVRr6RyhmlrSSw5GIE+0ysTYtgABdMxRJgCO7lb4BSraCcZYvBwk1nWXmikVgHFBra5baTSw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gG1zIp89ObT8Zhr8SzRNwDr7p+0yFQrrMpA/M4Gd9lI=;
+ b=vOnDI3IgxCJ5Ti8c8GPDNPawsAdaCyk/AEmajg3AsyTb9pO+kVxV18tg8SKBakPjXQ8S0pa0Oc/XWL7vCgmuALDiRP+w09F4yIwykCKc9vsl1tCBr3GOyIxvZYA2gZAWoqWq33q4ccskD7ykyFaRZ4zb/tbIbrk2dwyEqGybmp/smCzCC88wXSYSqw7OaaZMgv12wZ9ksnLFhekxpVCxIM6WGPmaxVBhlodIFAuk4GZ2G5uXbyuFikSYUPZsx82qeMAGqOt92QYw0UR0rZUJcUDeku9jxAeVUB0rHYIH/urgA0YnzTzt3J11dKNXkIy2epL88NO6RAGKsF+GWUkKgw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com (2603:10b6:208:3e9::5)
+ by SA1PR11MB5898.namprd11.prod.outlook.com (2603:10b6:806:229::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.17; Fri, 29 Aug
+ 2025 08:20:56 +0000
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::7ac8:884c:5d56:9919]) by IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::7ac8:884c:5d56:9919%4]) with mapi id 15.20.9052.019; Fri, 29 Aug 2025
+ 08:20:56 +0000
+From: "Rinitha, SX" <sx.rinitha@intel.com>
+To: Alok Tiwari <alok.a.tiwari@oracle.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"horms@kernel.org" <horms@kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+Subject: RE: [Intel-wired-lan] [PATCH net] ixgbe: fix incorrect map used in
+ eee linkmode
+Thread-Topic: [Intel-wired-lan] [PATCH net] ixgbe: fix incorrect map used in
+ eee linkmode
+Thread-Index: AQHcCjTvt77YAnmmX0mALY9/lxDU27R5TGMw
+Date: Fri, 29 Aug 2025 08:20:55 +0000
+Message-ID: <IA1PR11MB6241E04285C0E51C5455CFA78B3AA@IA1PR11MB6241.namprd11.prod.outlook.com>
+References: <20250810170118.1967090-1-alok.a.tiwari@oracle.com>
+In-Reply-To: <20250810170118.1967090-1-alok.a.tiwari@oracle.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR11MB6241:EE_|SA1PR11MB5898:EE_
+x-ms-office365-filtering-correlation-id: e1acfb64-c32f-4710-37fe-08dde6d4fa17
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700018|7053199007|921020;
+x-microsoft-antispam-message-info: =?us-ascii?Q?WL3hgg+BOQ4QNLsbILdHls6wL3DfmH6pKkpsRIfH42qeNURPoEj+LyCfNpYa?=
+ =?us-ascii?Q?ApfZR4sRzYQ6+PF2lGJZUtYB3RQsKNujUbCU1BUi6lqU2MV1nju0v1gR1/u4?=
+ =?us-ascii?Q?Baxfmfk+z/Gi3dE90AGEoIFpbkfI5qirMAIPfoZUVrfNjOHlWQvtaeoNLIsZ?=
+ =?us-ascii?Q?ogl8/rfzGQjnoQOodcms95fRfQERAzaZ/uTpQ0h5rrCppFTTP9KQABZYmgGd?=
+ =?us-ascii?Q?BcjYHcsa/eiPCHgT0c336enTtXVEPiZ5rzAN2rwdpfbusvlqfb7IjRI0jz9w?=
+ =?us-ascii?Q?xtXTxt+8oFDCZ4cXQTFmYyLKVPA30QobXfcyhMwOQz0Bm0LdyrR/DcDhM6sy?=
+ =?us-ascii?Q?0Z4VWFZpqQQzfEgC3w5u9IBTJ5PWFTtxVp6OgixgIBj/+GhcIUvBRw6cp3Gx?=
+ =?us-ascii?Q?gm58eOalqBB4y0g7lRsKl+LdeSW5LB21Q5IvlmFHCSzoCoVzKZHjT9jBfMHZ?=
+ =?us-ascii?Q?8ZJz53P+MhpLybfkYMpeelu9/CVR1RNiaTtMF7d7MMevOd2GXUmWfjDU7i0D?=
+ =?us-ascii?Q?fBfAz/DCyrebk4qNEEJQOrF2nLiPoAuXwy+0jGSNMivxwNo2Pr2ekBhh6rsf?=
+ =?us-ascii?Q?m1qdMF6YZtu3MifnRfLauuV6fmXvcnl5CRFPF5L31hAcUppDAKDp9xU0v+jR?=
+ =?us-ascii?Q?Y0ex3DM+mmYfTk5STWY1w2Jhc8+N91SztmRuBv8fQ87538qZ2t65IgO714GM?=
+ =?us-ascii?Q?cvX0ixJo3c1IMwlMdnYQhZVqCCoYP3stfZvDKZqsCav6COfwUzw5Xp1HZ+j3?=
+ =?us-ascii?Q?PtaOD3bFnZqqEyK+1wDf5m+lwD9Z4OADHZOFDAOy3vkiZm2+J5aUiRPFyiNz?=
+ =?us-ascii?Q?XzoP0c5upMVOAkhyXodGkp/nf8nRZaF56FVlSLwIIAJcVcwp+SuXJ9Xnh9L2?=
+ =?us-ascii?Q?662A95orsHhD4cHZg60AOMdgwUSqqQ30xdlQ1eAPaTEPDU4DEKMv8vksH0aq?=
+ =?us-ascii?Q?EvFNAvBTdftQD+Judet2PexJ72XVJT8YL9KLvvIug4ynIVO21S1uQ+B3elJj?=
+ =?us-ascii?Q?abxO/MKTGnH2dv1t31esVXwVBq0ffIVFJa7+BuCTz0XQ8tYlV/Kgc8lvT64j?=
+ =?us-ascii?Q?wFIaR4XYicl5pt8LpYWdDBhdW52lGAVDKpWfgGoJevEmOdGegMtUbupm5q41?=
+ =?us-ascii?Q?uy82Rw2OMBc/wuFebrPR4/XyaAeBhbDyElDfxM+3RPJXYIw2OsceZldYSQoY?=
+ =?us-ascii?Q?skXfMUNCNocE+1YlRkhF6PyI0eyzID0ElPJnx6F27fKY7oAxqy55H7bUvaW9?=
+ =?us-ascii?Q?/gjufONZsi28k9YuNiljZyRckWId19slVbKuoUc6w/pgfrec/rEWZxHX+fQK?=
+ =?us-ascii?Q?knF1Auoz1vcwucOFc1m/iwbP+YiYi3MWA4k/gjxyyWLi2coKeZDELLu2xwYi?=
+ =?us-ascii?Q?Y8rZoGIc0BTr7jAMYGcGWspk0kOVvbWIRLmBwh50ufLN3TNQsHHNHD9BYxSR?=
+ =?us-ascii?Q?bbZBZJyIuv6KtIIriuK1e1a/W4QPShv+VEuCmbOSFAC/+Mu07PsDn7vWlfC/?=
+ =?us-ascii?Q?nKFkYCb+xzIo7qw=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700018)(7053199007)(921020);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?GoTCMog3hYkOX00kTuZ6H0k1I7pHakUfYgy9VydomPMhcdIHuv2ZlyuDlfKG?=
+ =?us-ascii?Q?FDFXalNV+/7rrj0rF6W+Rsfs9ppIZxk5k6aPB+ojWLWeI/IHnVsjwFBOB5ML?=
+ =?us-ascii?Q?GT3osJSqIkwAuRyHS6NRb9VV3NBUGCi4x2E6B5g48hAqjkgIvYkRbMPegIm7?=
+ =?us-ascii?Q?t4uRvFoWDD5oXYly8kwJA4S+1ICdQ6o4it6EJECF+g5TKo56PFlB/z4QFleQ?=
+ =?us-ascii?Q?dnxfOPOIs3kyej3uh9QDHGHjS5ZjAROgqnXVCcl42HAk50qa7c5wwgJzjWxv?=
+ =?us-ascii?Q?oTloZ3r937ive2FlzP8nQK1DW4wbmJJdG6O1HScA91itTPMlQWIRQol1dbIs?=
+ =?us-ascii?Q?vwbAwFgFMaHTeV5OGWJ+HMxejFfHroZzu4aNAPamCu64HYXu8BjZDQkEyCCz?=
+ =?us-ascii?Q?Qt3LbpQ9Dlv/1CP7RVggokLzIxC9CDNNXMm37gWnMIE+EXvYXnUDjPCPgEeA?=
+ =?us-ascii?Q?aBxk3hdr4g2H6+fOe3xnulfT7PuduS8+4HE2tlvodJujmMvugwDF1spczS1X?=
+ =?us-ascii?Q?Pb7TblVhO8dym5jqGa/mNZ/zl23nvBiUcg1V18ePtCvHRq9LaSdSmMIIdlRh?=
+ =?us-ascii?Q?aMzyE/ekHyL6PrF7E+ahSd4PJNRDBbmltZwdZUyJZqY6HMmn7/FkRnw7CfPj?=
+ =?us-ascii?Q?GEIRtkpZBzYyAkb71ZIfkBFEHr/HAdSPhvOYqsqwPyp/Q4IkEjcwJ3NqhKof?=
+ =?us-ascii?Q?efh5+yIbEe3UHA3K1V3Kir5QL8IkF7t+c8x7UxCILx399Lghu03r6iGk80Uf?=
+ =?us-ascii?Q?StoSglGlOP9LjmBqsL0f2Fxo6dFQNoTPS7mCTzpdDMzy8uxpwoI+M6DycBmS?=
+ =?us-ascii?Q?K6Bv3SSJzjuj8mK6z6g85brap98ch1HDmJylvamzgfUun/FcCgsH1KTGaUCI?=
+ =?us-ascii?Q?wbYFoXVSU84VHQvzp95cC/5dVK3xDct1NUnMbPxymA5JjF8m78wTAARQ6wIT?=
+ =?us-ascii?Q?bFFjgi+K/HuV/4PLmwoKEuDIcpWSn1nLcoogsDPQkUtD2ZAw7TGar3Yeejry?=
+ =?us-ascii?Q?ZcXeKIsJ5aN9+IoNA1pqjZk84nmwL3+z0R2zzRl+H86/YExiuynpcrExI10x?=
+ =?us-ascii?Q?HrbIHmccwX+NfnBcFwGsT+QK/Llnn/NGFFu+Pet9HoFuWYq9DbF2rlCKisx0?=
+ =?us-ascii?Q?Uj0YBCRXL3RZ6ocvIue/hPXq7VG45WVLthroTvUbWTQrMw4XXrXnqWw5CHD3?=
+ =?us-ascii?Q?F7w7pfO0h7nUwXfUcWMc81NpeB/VMtge/Ps5xDgzUnIloEVzrZLCLsshgCIy?=
+ =?us-ascii?Q?OUkOBdKoJ61suNBW19g3o6S74GZov5tK7vj24hxuwfl0EuGuMJ2h+CXCO9Iu?=
+ =?us-ascii?Q?IRvdYX9z9z4rg5DudYZmiJEpcebVZlszbefREHGQsBt8ZW8wqhFYkqYR2pHx?=
+ =?us-ascii?Q?i5bHamoOo9j86rpAm8dU8AQt7wT0+Q4JQDZ4vnqsu0NYiffEvPwBLvKi0kSd?=
+ =?us-ascii?Q?GGLR4nwyp0nT/qZYRfykLICR17BXV6Iy81BzAxwV8vK0p86wCIpVHNLLq3Kd?=
+ =?us-ascii?Q?5yY/qA2Q2mdJDKPjuNI3bs/4gOgs/sCQd8MwtvGeiwKfmH14+o87mR1xs9Z+?=
+ =?us-ascii?Q?gyWF9GmbMhFBUXImd98P5ZAUuqcG3Mo8l3eusXD3?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net/cls_cgroup: Fix task_get_classid() during qdisc
- run
-To: Yafang Shao <laoar.shao@gmail.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- horms@kernel.org, bigeasy@linutronix.de, tgraf@suug.ch, paulmck@kernel.org,
- netdev@vger.kernel.org, bpf@vger.kernel.org,
- Martin KaFai Lau <martin.lau@linux.dev>
-References: <20250822064200.38149-1-laoar.shao@gmail.com>
- <1d3ba6ba-5c1e-4d3f-980a-8ad75101f04d@redhat.com>
- <CALOAHbBdiPZ_YVhBJeV517Xqz8=cuGo6jhhta_QXy5-eQ6EN4g@mail.gmail.com>
-Content-Language: en-US
-From: Daniel Borkmann <daniel@iogearbox.net>
-Autocrypt: addr=daniel@iogearbox.net; keydata=
- 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
-In-Reply-To: <CALOAHbBdiPZ_YVhBJeV517Xqz8=cuGo6jhhta_QXy5-eQ6EN4g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: Clear (ClamAV 1.0.7/27746/Thu Aug 28 10:27:00 2025)
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6241.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e1acfb64-c32f-4710-37fe-08dde6d4fa17
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Aug 2025 08:20:55.9274
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 2DeHVs/xuPCPVjmgMDGExNAvDs50xgluOOBSEEiZrw5PYYyz/L9Tymvi/YLLSAWM9dsnc1MzN7B1kyvuVgKnrw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB5898
+X-OriginatorOrg: intel.com
 
-On 8/29/25 5:23 AM, Yafang Shao wrote:
-> On Thu, Aug 28, 2025 at 3:55 PM Paolo Abeni <pabeni@redhat.com> wrote:
->> On 8/22/25 8:42 AM, Yafang Shao wrote:
->>> During recent testing with the netem qdisc to inject delays into TCP
->>> traffic, we observed that our CLS BPF program failed to function correctly
->>> due to incorrect classid retrieval from task_get_classid(). The issue
->>> manifests in the following call stack:
->>>
->>>          bpf_get_cgroup_classid+5
->>>          cls_bpf_classify+507
->>>          __tcf_classify+90
->>>          tcf_classify+217
->>>          __dev_queue_xmit+798
->>>          bond_dev_queue_xmit+43
->>>          __bond_start_xmit+211
->>>          bond_start_xmit+70
->>>          dev_hard_start_xmit+142
->>>          sch_direct_xmit+161
->>>          __qdisc_run+102             <<<<< Issue location
->>>          __dev_xmit_skb+1015
->>>          __dev_queue_xmit+637
->>>          neigh_hh_output+159
->>>          ip_finish_output2+461
->>>          __ip_finish_output+183
->>>          ip_finish_output+41
->>>          ip_output+120
->>>          ip_local_out+94
->>>          __ip_queue_xmit+394
->>>          ip_queue_xmit+21
->>>          __tcp_transmit_skb+2169
->>>          tcp_write_xmit+959
->>>          __tcp_push_pending_frames+55
->>>          tcp_push+264
->>>          tcp_sendmsg_locked+661
->>>          tcp_sendmsg+45
->>>          inet_sendmsg+67
->>>          sock_sendmsg+98
->>>          sock_write_iter+147
->>>          vfs_write+786
->>>          ksys_write+181
->>>          __x64_sys_write+25
->>>          do_syscall_64+56
->>>          entry_SYSCALL_64_after_hwframe+100
->>>
->>> The problem occurs when multiple tasks share a single qdisc. In such cases,
->>> __qdisc_run() may transmit skbs created by different tasks. Consequently,
->>> task_get_classid() retrieves an incorrect classid since it references the
->>> current task's context rather than the skb's originating task.
->>>
->>> Given that dev_queue_xmit() always executes with bh disabled, we can safely
->>> use in_softirq() instead of in_serving_softirq() to properly identify the
->>> softirq context and obtain the correct classid.
->>>
->>> The simple steps to reproduce this issue:
->>> 1. Add network delay to the network interface:
->>>    such as: tc qdisc add dev bond0 root netem delay 1.5ms
->>> 2. Create two distinct net_cls cgroups, each running a network-intensive task
->>> 3. Initiate parallel TCP streams from both tasks to external servers.
->>>
->>> Under this specific condition, the issue reliably occurs. The kernel
->>> eventually dequeues an SKB that originated from Task-A while executing in
->>> the context of Task-B.
->>>
->>> Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
->>> Cc: Daniel Borkmann <daniel@iogearbox.net>
->>> Cc: Thomas Graf <tgraf@suug.ch>
->>> Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
->>>
->>> v1->v2: use softirq_count() instead of in_softirq()
->>> ---
->>>   include/net/cls_cgroup.h | 2 +-
->>>   1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/include/net/cls_cgroup.h b/include/net/cls_cgroup.h
->>> index 7e78e7d6f015..668aeee9b3f6 100644
->>> --- a/include/net/cls_cgroup.h
->>> +++ b/include/net/cls_cgroup.h
->>> @@ -63,7 +63,7 @@ static inline u32 task_get_classid(const struct sk_buff *skb)
->>>         * calls by looking at the number of nested bh disable calls because
->>>         * softirqs always disables bh.
->>>         */
->>> -     if (in_serving_softirq()) {
->>> +     if (softirq_count()) {
->>>                struct sock *sk = skb_to_full_sk(skb);
->>>
->>>                /* If there is an sock_cgroup_classid we'll use that. */
->>
->> AFAICS the above changes the established behavior for a slightly
->> different scenario:
-> 
-> right.
-> 
->> <sock S is created by task A>
->> <class ID for task A is changed>
->> <skb is created by sock S xmit and classified>
->>
->> prior to this patch the skb will be classified with the 'new' task A
->> classid, now with the old/original one.
->>
->> I'm unsure if such behavior change is acceptable;
-> 
-> The classid of a skb is only meaningful within its original network
-> context, not from a random task.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of A=
+lok Tiwari
+> Sent: 10 August 2025 22:31
+> To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw <=
+przemyslaw.kitszel@intel.com>; andrew+netdev@lunn.ch; davem@davemloft.net; =
+edumazet@google.com; kuba@kernel.org; pabeni@redhat.com; horms@kernel.org; =
+netdev@vger.kernel.org
+> Cc: alok.a.tiwari@oracle.com; intel-wired-lan@lists.osuosl.org
+> Subject: [Intel-wired-lan] [PATCH net] ixgbe: fix incorrect map used in e=
+ee linkmode
+>
+> incorrectly used ixgbe_lp_map in loops intended to populate the supported=
+ and advertised EEE linkmode bitmaps based on ixgbe_ls_map.
+> This results in incorrect bit setting and potential out-of-bounds access,=
+ since ixgbe_lp_map and ixgbe_ls_map have different sizes and purposes.
+>
+> ixgbe_lp_map[i] -> ixgbe_ls_map[i]
+>
+> Use ixgbe_ls_map for supported and advertised linkmodes, and keep ixgbe_l=
+p_map usage only for link partner (lp_advertised) mapping.
+>
+> Fixes: 9356b6db9d05 ("net: ethernet: ixgbe: Convert EEE to use linkmodes"=
+)
+> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+> ---
+> drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c | 4 ++--
+> 1 file changed, 2 insertions(+), 2 deletions(-)
+>
 
-Do you mean by original network context original netns? We also have
-bpf_skb_cgroup_classid() as well as bpf_get_cgroup_classid_curr(), both
-exposed to tcx, which kind of detangles what task_get_classid() is doing.
-I guess if you have apps in its own netns and the skb->sk is retained all
-the way to phys dev in hostns then bpf_skb_cgroup_classid() might be a
-better choice (assuming classid stays constant from container orchestrator
-PoV).
-
->> I think at very least
->> it should be mentioned in the changelog and likely this change should
->> target net-next.
-> 
-> Will add this to the commit log and tag it for net-next in the next version.
-
+Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 
