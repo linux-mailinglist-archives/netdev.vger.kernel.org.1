@@ -1,115 +1,114 @@
-Return-Path: <netdev+bounces-218515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2103CB3CF30
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 21:58:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71178B3CF37
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 22:05:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3EB37C479A
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 19:58:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B614201AA8
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 20:05:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBCDF2DF704;
-	Sat, 30 Aug 2025 19:58:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2F8A246BD7;
+	Sat, 30 Aug 2025 20:05:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FFgr4St/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rfbLVRPU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF801531F9;
-	Sat, 30 Aug 2025 19:58:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861E84CB5B
+	for <netdev@vger.kernel.org>; Sat, 30 Aug 2025 20:05:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756583896; cv=none; b=e7/8hU2PRUCIhOCn4bypwN2bw+w+1tamarGHRFJ4afhzw7piMBcUmWthj4fFtp3FC6v8WcNi3QTrpS7KjPM4TUPvsRYDmKM1utELykBshJU8tFS+DueLSDe1DYt5OQ0bz1rxhuRzfrSU4cW00eE+GyEjP5fm51CrIeS5etXzy3s=
+	t=1756584313; cv=none; b=T/SLaup0T0XqpDDg1l7D0mA+4LO+/YITqkyns/IuuTriOXF628ht7APN8QgaDvhO4R5vfkB+5g0Io41/6XsL5CQQbOVV5KyIk5lGlfLkAIROFobLPnKi/pIW8rwfkuFdk8VdG3vFfRw8OcCgNFGcQ4sMz6Cfp97fKDz4YrAkpd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756583896; c=relaxed/simple;
-	bh=cy+cMy4+V1RZ3Vu6sBAb3KExdlMUcbMF6Odud+rh0vc=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=SFT0u2cGxbALdkN6k0Pn6yYWqv+xhtpw1zHhpgr/WZddcpz4emApakgTNOWTlhYEbb4XibeFzG34Ucf4XpKr6StbnIGeZULFBzRfb+TGS+FJuPffFqhf6tFFWj8yTWMFvNO3gavE96MM6s+V1rnZiFCVCBuhn64QoVuHihjZcpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FFgr4St/; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4b2f0660a7bso30695231cf.1;
-        Sat, 30 Aug 2025 12:58:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756583894; x=1757188694; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nmbVWYQAikYUcSmksG/9wMzMH6i0gW0SnhOEIlnn07Y=;
-        b=FFgr4St/LfWxuqOahLYBMm/oPka5YnSATvzLLnVm4Yk9RFIeCBD/QgxxnQZMnve6yN
-         tFfny6/J3OlRARrqXYHG/zmRaiXNXUsFNnTh4Di8bmi9c8EWCsFxr8tATxpsC0q3MFyR
-         duA7d5B7r7H0KZdHHIWAWHxS+aD/BalbgVmG+VeZ2HTUKw4XRDPqfRNEov3KVvNVTt4+
-         hTQjGx0RyzS11n7UepkPjymLXqaRfUAgJubMJq8b+3gYO+YlOrUbTYwhU4ENpZ16Mlkr
-         n5JqCEHCAIOsM2PmbpGKeoHrJ5N84HYZlzVjfDiB91phDv5amzk8WXEey5tWWxKPVdze
-         gU/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756583894; x=1757188694;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=nmbVWYQAikYUcSmksG/9wMzMH6i0gW0SnhOEIlnn07Y=;
-        b=rE38fWJw1FFPRPfQDEITR8tHStwwT2wN24S+8+Gm+1AFhnTEoabpwJdHBBjNNFvIvI
-         VrXlIlm5XJ6zWfSVQzeQryGk0wciQ3Ih4zpTO627nYn60WmV2KXBuHuLix3YzlAeT5YN
-         J82RuC+q+Xi0nOt4uPgRFDxSFR4+LAJ6/+S0W8ZkwrWfFMkV3kC9YanmM/jTnLKVfbsK
-         c3mIqnElvzxSGGk7xYbI28xeP+zZAPALxaIFs9uLMptZhJPZF9to9VD90JNnFZSFm1LM
-         qTt904Kqtv/cDboMsbGO6V1VxYLSlwZVhdzhbYi+d/CFKuo7smFMp7LlhFDc9fwLzbzs
-         miXA==
-X-Forwarded-Encrypted: i=1; AJvYcCVneghl9QGUn9PzU94OGgg5bxC1XzOjDihSLl6nn9IJ334Iw5ZYa43GV1JDMbkcCT3qXvHy3pYYvsV3nyC2sGY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0AXkNXqfO9jn97aO6A0/YW0kvtRzwNFyWrCXJVofA3aQ0le7P
-	Zu4nowqaLiZyWR57Wktsb79brlu3/xOKmllPEs/ReJ7WXT2RQpgvApSi
-X-Gm-Gg: ASbGnctR/jjjAog0VDuCXBr+hlUxECf4kEFgyzA8QxoiDR+ut/eT35Uo7ZB/3z+td3H
-	boDiUjL3ewA7Z36VLhj8pPfleN85H0nlC7FmTPuKNzjB6glusNG5YpQx44JXr5P0oQXIOqnkmmx
-	WcRhJij2Up3uW8jOhIkt10F1wDTW19KCH5086fL3A6B816nQd6hn4GSROQOfv3xfMLNZr3cH7hX
-	Xl5cjmvQL+m/cgFiabmxwN2KNq7+g7AiSp50yrVeLYTve3Z6wJbnRa4N2rixNfgfj6VBJLPFkYv
-	hBH/UFqe4AALX+acM76KFFeI9fIFuMNqfWcuOnfdVNuBhThDjjpo+qivweA3kfqmyp6js1fh5B3
-	lNuPFi3epvH9hQTFbQep1A1+2/FFkxvv0hLr2LId2hM+pcuPGwqbF732zb4/Mvh+sTEsWBL40jY
-	wM1Q==
-X-Google-Smtp-Source: AGHT+IHjxbJVnBPslWiZCZrDMB4ZrV5z+Q1oLaha3Q8DUPg9Uvh64nWIqJ6oHcVxpx6tdb8z95aaBA==
-X-Received: by 2002:a05:622a:4c0e:b0:4b3:19b1:99d4 with SMTP id d75a77b69052e-4b31dd773bdmr41974511cf.80.1756583893990;
-        Sat, 30 Aug 2025 12:58:13 -0700 (PDT)
-Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7fc153de18asm383916785a.54.2025.08.30.12.58.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 30 Aug 2025 12:58:12 -0700 (PDT)
-Date: Sat, 30 Aug 2025 15:58:11 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- davem@davemloft.net
-Cc: netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- andrew+netdev@lunn.ch, 
- horms@kernel.org, 
- shuah@kernel.org, 
- willemb@google.com, 
- linux-kselftest@vger.kernel.org, 
- Jakub Kicinski <kuba@kernel.org>, 
- petrm@nvidia.com
-Message-ID: <willemdebruijn.kernel.287d82b2988fe@gmail.com>
-In-Reply-To: <20250830183842.688935-1-kuba@kernel.org>
-References: <20250830183842.688935-1-kuba@kernel.org>
-Subject: Re: [PATCH net] selftests: drv-net: csum: fix interface name for
- remote host
+	s=arc-20240116; t=1756584313; c=relaxed/simple;
+	bh=79Y4ahkSAtl6Z32MARWEKQUJHx1SGK5iD0Bl0JMCAyU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H91gmZF6Jft+bFdbHu3+lk1exdXi/EEBtrZxTaDEFL90cUVqgjiPCLhIb77YX6dlVOi1xLt++dItOt94e54+AqU9XkhacU+5/aZ84qj1GpRdwEVWiu16aieqBrqeGviKTHlu549HQ2YxqMJg5o8JR9QKDH3TCq/Q8Kw15036ykw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rfbLVRPU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF45EC4CEEB;
+	Sat, 30 Aug 2025 20:05:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756584313;
+	bh=79Y4ahkSAtl6Z32MARWEKQUJHx1SGK5iD0Bl0JMCAyU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=rfbLVRPURCUGb00iUB1r28Vk6EXSbHRQ+nzDChq+LmBhlR8Th95FLRKb9CHe0DURJ
+	 CKQA73VL7POzenNSSGLlnYDmRsEZsAZ/CQ3F1hfXuu+oLHZtT9YoRzN0wGyzqVRbUy
+	 PZ/6QHGyvuGVa2PHjceEhtm5HmZzEshgkvgB5E1t+RdO7kGjkGwxGwUoztx0fBjEaI
+	 pM5FuFnbOFBDFirGwiyZuXnjQgQio4Utdgz7YehurCdqgm8FvWRhrwZfWEJ2szXozU
+	 fNw03Ham16e8KMar6DX/C7fdZlvGTXYNsu+/yuzMA1dihIPb2mBDeNXVh2ZUEFE2Pi
+	 vk3pf/RXeJaLg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: mkubecek@suse.cz
+Cc: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH ethtool-next] rxfh: IPv6 Flow Label hash support
+Date: Sat, 30 Aug 2025 13:05:08 -0700
+Message-ID: <20250830200508.739431-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Jakub Kicinski wrote:
-> Use cfg.remote_ifname for arguments of remote command.
-> Without this UDP tests fail in NIPA where local interface
-> is called enp1s0 and remote enp0s4.
-> 
-> Fixes: 1d0dc857b5d8 ("selftests: drv-net: add checksum tests")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Add support for configuring Rx hashing on the flow label.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ ethtool.8.in | 1 +
+ ethtool.c    | 7 ++++++-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/ethtool.8.in b/ethtool.8.in
+index 29b8a8c085f1..8efd1f4ef6bc 100644
+--- a/ethtool.8.in
++++ b/ethtool.8.in
+@@ -1121,6 +1121,7 @@ s	Hash on the IP source address of the rx packet.
+ d	Hash on the IP destination address of the rx packet.
+ f	Hash on bytes 0 and 1 of the Layer 4 header of the rx packet.
+ n	Hash on bytes 2 and 3 of the Layer 4 header of the rx packet.
++l	Hash on IPv6 Flow Label of the rx packet.
+ r	T{
+ Discard all packets of this flow type. When this option is set, all
+ other options are ignored.
+diff --git a/ethtool.c b/ethtool.c
+index 215f5663546d..c391e5332461 100644
+--- a/ethtool.c
++++ b/ethtool.c
+@@ -1106,6 +1106,9 @@ static int parse_rxfhashopts(char *optstr, u32 *data)
+ 		case 'e':
+ 			*data |= RXH_GTP_TEID;
+ 			break;
++		case 'l':
++			*data |= RXH_IP6_FL;
++			break;
+ 		case 'r':
+ 			*data |= RXH_DISCARD;
+ 			break;
+@@ -1140,6 +1143,8 @@ static char *unparse_rxfhashopts(u64 opts)
+ 			strcat(buf, "L4 bytes 2 & 3 [TCP/UDP dst port]\n");
+ 		if (opts & RXH_GTP_TEID)
+ 			strcat(buf, "GTP TEID\n");
++		if (opts & RXH_IP6_FL)
++			strcat(buf, "IPv6 Flow Label\n");
+ 	} else {
+ 		sprintf(buf, "None");
+ 	}
+@@ -6023,7 +6028,7 @@ static const struct option args[] = {
+ 		.help	= "Configure Rx network flow classification options or rules",
+ 		.xhelp	= "		rx-flow-hash tcp4|udp4|ah4|esp4|sctp4|"
+ 			  "gtpc4|gtpc4t|gtpu4|gtpu4e|gtpu4u|gtpu4d|tcp6|udp6|ah6|esp6|sctp6"
+-			  "|gtpc6|gtpc6t|gtpu6|gtpu6e|gtpu6u|gtpu6d m|v|t|s|d|f|n|r|e... [context %d] |\n"
++			  "|gtpc6|gtpc6t|gtpu6|gtpu6e|gtpu6u|gtpu6d m|v|t|s|d|f|n|r|e|l... [context %d] |\n"
+ 			  "		flow-type ether|ip4|tcp4|udp4|sctp4|ah4|esp4|"
+ 			  "ip6|tcp6|udp6|ah6|esp6|sctp6\n"
+ 			  "			[ src %x:%x:%x:%x:%x:%x [m %x:%x:%x:%x:%x:%x] ]\n"
+-- 
+2.51.0
+
 
