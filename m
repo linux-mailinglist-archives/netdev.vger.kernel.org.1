@@ -1,66 +1,93 @@
-Return-Path: <netdev+bounces-218476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B340B3C930
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 10:13:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0F86B3C938
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 10:15:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6A5117520F
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 08:12:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E29A5A260B5
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 08:13:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B6A32D9EE6;
-	Sat, 30 Aug 2025 08:09:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B87427C854;
+	Sat, 30 Aug 2025 08:11:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="buHY4L8/"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46EC52DC357;
-	Sat, 30 Aug 2025 08:09:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01599286408;
+	Sat, 30 Aug 2025 08:11:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756541397; cv=none; b=ABWktjuEmdEAOx3nqzxuGOyAExzUBF5Y+VvWfkgjDCuuUtoG9y9b7R/aC7clHmhiWLcXlunJpW/GvGdbId/NyOi2VgcPy6C9uscP5UzHWpmXxc0d+6144VQlPpuFE7jku9XC00EHoIbaMeEofEfHhKXKGXkTlF/E+iFTi/izuS4=
+	t=1756541501; cv=none; b=q13PO9KWr/WBkyQofQCS7CkgedLI7pMx3RBYSHDIIvMuLifJl3wtmO7huAdvxwAI9DoKSYAWfuGLUAjJrywDtIHqvyQMz9+rSHtP0Hhp+9Gxy/E6k7gsAMQpF7UoCRFDbDDTGpZyiww1VZ4Ma4G+ZwyX0nGKwPIRTL6Dg2az8rA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756541397; c=relaxed/simple;
-	bh=QlgKCsIb4bzrS2g1w/LsSxzpucpoKT/5IJ00UNfb+qo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AlE0autN0gSD0gUTvFxUANZut5TkpOK7h+5O0UCIJA9bebucTBxryU0EXj4z7HRbHl7Wx+0sFaEvu/HYDkcHQ3o80Gd8rZMqM4cQDQvJM4flqK3+LBOqTgK6aNBh9S1hpvDiZefctyh9nttbgUETRg93OxnLPkwcgTUgigg7yCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4cDSQg2zQSz2VRLn;
-	Sat, 30 Aug 2025 16:06:51 +0800 (CST)
-Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
-	by mail.maildlp.com (Postfix) with ESMTPS id 32D25140155;
-	Sat, 30 Aug 2025 16:09:53 +0800 (CST)
-Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.189.55) by
- kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 30 Aug 2025 16:09:51 +0800
-From: Fan Gong <gongfan1@huawei.com>
-To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	<linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Bjorn Helgaas
-	<helgaas@kernel.org>, luosifu <luosifu@huawei.com>, Xin Guo
-	<guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>, Zhou
- Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
-	<shijing34@huawei.com>, Meny Yossefi <meny.yossefi@huawei.com>, Gur Stavi
-	<gur.stavi@huawei.com>, Lee Trager <lee@trager.us>, Michael Ellerman
-	<mpe@ellerman.id.au>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, Suman
- Ghosh <sumang@marvell.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Joe Damato <jdamato@fastly.com>, Christophe JAILLET
-	<christophe.jaillet@wanadoo.fr>
-Subject: [PATCH net-next v03 14/14] hinic3: Fix code style (Missing a blank line before return)
-Date: Sat, 30 Aug 2025 16:08:53 +0800
-Message-ID: <da33874438bf52b966bc8ef58e94d62f47435592.1756524443.git.zhuyikai1@h-partners.com>
-X-Mailer: git-send-email 2.51.0.windows.1
-In-Reply-To: <cover.1756524443.git.zhuyikai1@h-partners.com>
-References: <cover.1756524443.git.zhuyikai1@h-partners.com>
+	s=arc-20240116; t=1756541501; c=relaxed/simple;
+	bh=J+rY2UboZD7E6wDodZ1SRiN73S814aOqGEfpl4u3V5w=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dFHk2OkQCEC4dh1aKsJY/df4jYkRpJemrnWcxACeRwEiVohLr9/Tvsy5znRDFjE2kEN1uZVfD/bHbAnCDOYy/NckETZb3cgItkXt0z/b1wkTCU/+W4vnpOYCqEKVTqirxuuFRgaJL3Lo7smfF11HqjMRcZpXra9EBGAYNbMOa6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=buHY4L8/; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-771e15ce64eso2453602b3a.0;
+        Sat, 30 Aug 2025 01:11:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756541499; x=1757146299; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=oT5A1s8d/9uFDdMEkAgLQygc76cfTIR6QTfaUTMow7U=;
+        b=buHY4L8/xEYNWWRGFEKBFlzWACzB7w/W31s1nZ0DRScuUGCfbBIE9mZL196RPTw8Lb
+         8NNU4B1JFKpRRObhTQCBs8G6S/Eet4ZfBek1NeQtnTvd4s22JzMICQ0ZBiVi/wsjkdcL
+         kuHgaCwC9HlHX/Cied4U8zPKo9lkDk2Fjz6Kpy6j8CNV+mMBJ9zfHjkwE+IdLHCCYVDU
+         Lq+86zBTLbm3FnzyYKhIg7EhhNX+nq8UtYDFAwKRz/IzAyQpCwfbzjB9cqA2Z27O34rn
+         MVK4qVaNiSJ+9CiemzJBjo2GJ10XJ4sENz++9kq+cDZchDdC+dexJiIHneCnQAuVySOV
+         D4Fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756541499; x=1757146299;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oT5A1s8d/9uFDdMEkAgLQygc76cfTIR6QTfaUTMow7U=;
+        b=Eb/TPy9Ch+XfgLPTrmOzod+Xlt1tcPl0FuhTRq7RIShTCgXVy6PV2Ebsm1xSpcHYqi
+         tga3tbMJQx5Pj4T9HW6cLXrP/r0gXyvvoUCVimqUDYWc2PjTzUlDsxWOYdjiTSXJ4+R3
+         /RfEr/O6NZnV/vgBeq3VHIZ7EXp2yA1o0sYYzbztXihb38+lDr4Z9kx9fChmXypQH+Jl
+         pPEsvBjeTVcibhXaUke/vLyve+PGMWsZjZqsL2UVzrXwyX0sQbbHsj1K02Id/yEtnHFd
+         3g90ceC3UA2zKgQAn1GHoZAXdGvRFPpAQ4kG9RDL4VzF0S388XpSzSyDDhXvFomV4PbR
+         YWyw==
+X-Forwarded-Encrypted: i=1; AJvYcCVeOHdfAxEHD0wroHoqkPMxbabH1y0cfmjrzSS3Ti6B1qRl1DoG8oR2UCzM92c29SzNB1JZsC7m@vger.kernel.org, AJvYcCVvqchf+TvZHxZtYQPAPO1IfT4U3NP7LBKjGQwzZ1S6rorhs/U/S2nd2noWcGNtxN94zrvvdCapSqB16qs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaH5ZkUVX18UBFSpEekWPPn2/ygAuBmLlsouOGIWw0VKqY/z5S
+	qyaJod8SuK2PYZj2gHMEt2yFRBRdKUDgpfIgsNt/i/bjuc3Vuy/2O6vY
+X-Gm-Gg: ASbGnctbxEWiBguj1Ozc4bXsxABCMM5JmnQ33g3p4P4vOc+KGDeUqL9DsMpsRCfhHXY
+	Knlq/QGDThM7IG3BT7q+Z0hNAOEI5cBfk9pHq5jTufJfQUrFVq/psY8LjDi7kipcuH07wx9gw5w
+	aD9Rptzrl2+kBIclC5DNZkmwRsKObxUbuyPEg9ElI9S/YZ0GQK4fkG2I7C0rpZKQ35bxbFymv/9
+	613yre88QP8OHQzkcBTxHHgIyAIXJLgK2NMCCDoWVPIRIOK2w+KBhAgypD1laFsAKNHyUGvKbJF
+	4VmKedHeR+CyrmIIM+9bmW6TviIJd7w3sgms/3CGisYk1KIrGESBL4WaydRTkKiJLsm+2xrOKGc
+	6o+iwzpPULCU/jL+Tkw8p3841Yef5ggKiPQYh2L5+tHFvn5l79j/oU5J/IMjVwS2boo6nY43yia
+	sIwD94Y8kMQV4=
+X-Google-Smtp-Source: AGHT+IFB4uDxoXq45bKbL5csJQVtej0QBcMYJl7vXPhSGsuz/P+i0x/v5qnk/mzfPcbHDS/kI8QFJQ==
+X-Received: by 2002:a05:6a00:cc4:b0:771:ec91:4b92 with SMTP id d2e1a72fcca58-7723e369d6amr2304013b3a.18.1756541499113;
+        Sat, 30 Aug 2025 01:11:39 -0700 (PDT)
+Received: from localhost.localdomain ([112.97.61.188])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-7722a2b7d10sm4564100b3a.33.2025.08.30.01.11.31
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sat, 30 Aug 2025 01:11:38 -0700 (PDT)
+From: Miaoqian Lin <linmq006@gmail.com>
+To: Ido Schimmel <idosch@nvidia.com>,
+	Petr Machata <petrm@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vadim Pasternak <vadimp@nvidia.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: linmq006@gmail.com
+Subject: [PATCH] mlxsw: core_env: Fix stack info leak in mlxsw_env_linecard_modules_power_mode_apply
+Date: Sat, 30 Aug 2025 16:11:22 +0800
+Message-Id: <20250830081123.31033-1-linmq006@gmail.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,101 +95,31 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemf100013.china.huawei.com (7.202.181.12)
 
-Fix code style of missing a blank line before return.
+The extack was declared on the stack without initialization.
+If mlxsw_env_set_module_power_mode_apply() fails to set extack,
+accessing extack._msg could leak information.
 
-Co-developed-by: Xin Guo <guoxin09@huawei.com>
-Signed-off-by: Xin Guo <guoxin09@huawei.com>
-Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
-Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
-Signed-off-by: Fan Gong <gongfan1@huawei.com>
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Fixes: 06a0fc43bb10 ("mlxsw: core_env: Add interfaces for line card initialization and de-initialization")
+Signed-off-by: Miaoqian Lin <linmq006@gmail.com>
 ---
- drivers/net/ethernet/huawei/hinic3/hinic3_lld.c     | 5 +++++
- drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c | 1 +
- drivers/net/ethernet/huawei/hinic3/hinic3_tx.c      | 2 ++
- 3 files changed, 8 insertions(+)
+ drivers/net/ethernet/mellanox/mlxsw/core_env.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_lld.c b/drivers/net/ethernet/huawei/hinic3/hinic3_lld.c
-index 10477fb9cc34..3db8241a3b0c 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_lld.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_lld.c
-@@ -122,6 +122,7 @@ static int hinic3_attach_aux_devices(struct hinic3_hwdev *hwdev)
- 			goto err_del_adevs;
- 	}
- 	mutex_unlock(&pci_adapter->pdev_mutex);
-+
- 	return 0;
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/core_env.c b/drivers/net/ethernet/mellanox/mlxsw/core_env.c
+index 294e758f1067..38941c1c35d3 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/core_env.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/core_env.c
+@@ -1332,7 +1332,7 @@ mlxsw_env_linecard_modules_power_mode_apply(struct mlxsw_core *mlxsw_core,
+ 	for (i = 0; i < env->line_cards[slot_index]->module_count; i++) {
+ 		enum ethtool_module_power_mode_policy policy;
+ 		struct mlxsw_env_module_info *module_info;
+-		struct netlink_ext_ack extack;
++		struct netlink_ext_ack extack = {};
+ 		int err;
  
- err_del_adevs:
-@@ -133,6 +134,7 @@ static int hinic3_attach_aux_devices(struct hinic3_hwdev *hwdev)
- 		}
- 	}
- 	mutex_unlock(&pci_adapter->pdev_mutex);
-+
- 	return -ENOMEM;
- }
- 
-@@ -154,6 +156,7 @@ struct hinic3_hwdev *hinic3_adev_get_hwdev(struct auxiliary_device *adev)
- 	struct hinic3_adev *hadev;
- 
- 	hadev = container_of(adev, struct hinic3_adev, adev);
-+
- 	return hadev->hwdev;
- }
- 
-@@ -335,6 +338,7 @@ static int hinic3_probe_func(struct hinic3_pcidev *pci_adapter)
- 
- err_out:
- 	dev_err(&pdev->dev, "PCIe device probe function failed\n");
-+
- 	return err;
- }
- 
-@@ -367,6 +371,7 @@ static int hinic3_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 
- err_out:
- 	dev_err(&pdev->dev, "PCIe device probe failed\n");
-+
- 	return err;
- }
- 
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
-index 9349b8a314ae..979f47ca77f9 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
-@@ -112,6 +112,7 @@ int hinic3_set_port_mtu(struct net_device *netdev, u16 new_mtu)
- 	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
- 
- 	func_tbl_cfg.mtu = new_mtu;
-+
- 	return hinic3_set_function_table(hwdev, BIT(L2NIC_FUNC_TBL_CFG_MTU),
- 					 &func_tbl_cfg);
- }
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c b/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
-index dea882260b11..92c43c05e3f2 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
-@@ -116,6 +116,7 @@ static int hinic3_tx_map_skb(struct net_device *netdev, struct sk_buff *skb,
- 	}
- 	dma_unmap_single(&pdev->dev, dma_info[0].dma, dma_info[0].len,
- 			 DMA_TO_DEVICE);
-+
- 	return err;
- }
- 
-@@ -601,6 +602,7 @@ netdev_tx_t hinic3_xmit_frame(struct sk_buff *skb, struct net_device *netdev)
- 
- err_drop_pkt:
- 	dev_kfree_skb_any(skb);
-+
- 	return NETDEV_TX_OK;
- }
- 
+ 		module_info = &env->line_cards[slot_index]->module_info[i];
 -- 
-2.43.0
+2.39.5 (Apple Git-154)
 
 
