@@ -1,217 +1,139 @@
-Return-Path: <netdev+bounces-218456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA412B3C7E7
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 06:32:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53D30B3C87B
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 08:24:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0EE4F7B257F
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 04:30:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA3E41BA78C9
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 06:24:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58142275B12;
-	Sat, 30 Aug 2025 04:32:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEA622153ED;
+	Sat, 30 Aug 2025 06:23:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OYXdSlZr"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ojstmGQc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB9442049;
-	Sat, 30 Aug 2025 04:32:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050291E47A5
+	for <netdev@vger.kernel.org>; Sat, 30 Aug 2025 06:23:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756528325; cv=none; b=pT1hkEJEcfyTQHJjxzRiLfJCjuzgEMMdbb1nvgLwvs37RcBJAsAkNYExCkMtsX3w59fhhEN1MSfT0W+bWzuzNP3eYIhv1iTUiU2g31MiPdLFjisCeI7RBK3f+DiZPde9omGDAzdO0hCvfKeWi8uPxytZOZK8s+8kYTr8EFdSZ3E=
+	t=1756535037; cv=none; b=uIr5chIaY9bNR3Kk193aGeBN97oQhUtwGlDtLydpthtzzjQ+HfUign41yCYBkaCSXeMnrASLwvs9xAYMQcEmqYvNxw2csjY+/5o0jxxBCGY4QP93JoakPND/Er1U7MzXIapSHqZiqVtaJpUZtBnrRb7dH4hV7YyYr7XxGWKDUJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756528325; c=relaxed/simple;
-	bh=/m9qjhVFmxWX9LFYgkaUXe4e3QlluqJzCAUEzdyXVz0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=pKzTRWkjgI0ckTj5kREoWfuDag8QuAUhrvcwdIjWo7dlwj5lXocSkqBVZyV2PxOUgloNjf7X7TzzzI0+7x6JmfhveKCqZefl6y96HmKPklQPL4SNMHNODUaKWF6ANKBvbywTGbDf1uxAUihXxyKzb8k5DDP81rHtge/hcF2XoGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OYXdSlZr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C6699C4CEF7;
-	Sat, 30 Aug 2025 04:32:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756528324;
-	bh=/m9qjhVFmxWX9LFYgkaUXe4e3QlluqJzCAUEzdyXVz0=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=OYXdSlZroLp95bzTnwT86vTPF3uubCV96eoWrKpzoPF2o396w4vDrg5FQ8xejtbmx
-	 5UywhcZvx7nGZHxU8Q0xZGR4CrV7Mc0yjiW/3MmmKYRIWLn2ZqV/tul28nYw/pf5dy
-	 8F7PyWXl4ztC1KDFhO3lzrULJ6/wpccQOU4DyJjwYje2N446+4ABqJ6ZaRfKEb0JFE
-	 Bt0CeuCeXTME9Ub/vuUJFpB1estoP6TfJzaiA2L9ht9xiN6LtrfQBwu5PognHSU+mC
-	 1y6mP17EW2REoHEsU9iPPCaFSfcwWC3A4wfQgfTJWMaUtOhadSX4d5mZLTONol0c3V
-	 ztnKkD3uCpEuw==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B702DCA1000;
-	Sat, 30 Aug 2025 04:32:04 +0000 (UTC)
-From: Dmitry Safonov via B4 Relay <devnull+dima.arista.com@kernel.org>
-Date: Sat, 30 Aug 2025 05:31:47 +0100
-Subject: [PATCH net-next v3 2/2] tcp: Free TCP-AO/TCP-MD5 info/keys without
- RCU
+	s=arc-20240116; t=1756535037; c=relaxed/simple;
+	bh=pbSp8Q2+97lrsXqDPYWYOToPrimi/u8UGLEzZsq9/j4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AgCgOXKnayUNo27ZrwYRdHZjJwyZ5Mw7VnLD2Kuij9XLgO0jmWqHk0FPFXvOw0fVOaH6alfn8g/yAil4Y7pggfjrgN9FwpNHosUFukz/etEmTIIVCb1wsaTsI5HiLlERdH3BBWLdIydW9DXl1zyl7Ckw2wDQ2xOFy+QXhfr4Vfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=ojstmGQc; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57U4EE5j018212;
+	Sat, 30 Aug 2025 06:23:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=XNxhhV+4LB41xWI4lgiZZwEqzj/nz
+	4eVYclJ9doZt4M=; b=ojstmGQccVUIhx3y5V552H06/DBaxIWnetjRysOIkRnFc
+	Ey+XUAW4dBaGg/SPdbbxoe4Uf4/mzicUciYE2+AtBeLFxezF66BA5o2WvQeZT6E/
+	Adt7aUWaAeH3LJqlfqI8knQB31bXY6K4Kxv2iB0Rq2XyPNdllspcpjUVMk2AU0w7
+	A+8Y+zcrpbdB5rhz2YMUhqUKYY4GjRmgDxIUR9YuDHHzpCkzNgoTMXDU1KN9kpPH
+	VrOoz+nB5sJ1lA49cwgQx/K80U+F4Z+FYCEor+d57CTGXMemYra06ATiUGWJuufF
+	qv0H02q6BdTd8M1iOG3VsGDf4LF6Y/Q0+5Mstyizg==
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48usmn82g5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 30 Aug 2025 06:23:35 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 57U3hlBQ004192;
+	Sat, 30 Aug 2025 06:23:35 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 48uqr6ma5v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 30 Aug 2025 06:23:34 +0000
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 57U6NYB9030452;
+	Sat, 30 Aug 2025 06:23:34 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 48uqr6ma5s-1;
+	Sat, 30 Aug 2025 06:23:34 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: michael.chan@broadcom.com, jacob.e.keller@intel.com,
+        somnath.kotur@broadcom.com, pavan.chebbi@broadcom.com,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+        netdev@vger.kernel.org
+Cc: alok.a.tiwari@oracle.com
+Subject: [PATCH v2 net] bnxt_en: fix incorrect page count in RX aggr ring log
+Date: Fri, 29 Aug 2025 23:23:27 -0700
+Message-ID: <20250830062331.783783-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250830-b4-tcp-ao-md5-rst-finwait2-v3-2-9002fec37444@arista.com>
-References: <20250830-b4-tcp-ao-md5-rst-finwait2-v3-0-9002fec37444@arista.com>
-In-Reply-To: <20250830-b4-tcp-ao-md5-rst-finwait2-v3-0-9002fec37444@arista.com>
-To: Eric Dumazet <edumazet@google.com>, 
- Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: Bob Gilligan <gilligan@arista.com>, 
- Salam Noureddine <noureddine@arista.com>, 
- Dmitry Safonov <0x7f454c46@gmail.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Dmitry Safonov <dima@arista.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1756528313; l=4256;
- i=dima@arista.com; s=20250521; h=from:subject:message-id;
- bh=P64RHNAbzWoxqf+XTtQCld5UZ9RLOa3lgy1PDQwJoH4=;
- b=6ZJTPwTyoWZ2UO2BjROhGlxUBaYN/EKB+w6UlcoVXBIzi7poz4freVfZQo7IOf8OVRtbY62PZ
- tniskatGh21ADZxDVmoDnuPLubgXt5T+TnLLfDBSDMDUuiUs45EQjWC
-X-Developer-Key: i=dima@arista.com; a=ed25519;
- pk=/z94x2T59rICwjRqYvDsBe0MkpbkkdYrSW2J1G2gIcU=
-X-Endpoint-Received: by B4 Relay for dima@arista.com/20250521 with
- auth_id=405
-X-Original-From: Dmitry Safonov <dima@arista.com>
-Reply-To: dima@arista.com
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-30_02,2025-08-28_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 adultscore=0
+ suspectscore=0 mlxlogscore=999 spamscore=0 bulkscore=0 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2508110000 definitions=main-2508300057
+X-Authority-Analysis: v=2.4 cv=D8xHKuRj c=1 sm=1 tr=0 ts=68b298e7 b=1 cx=c_pps
+ a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17
+ a=2OwXVqhp2XgA:10 a=yPCof4ZbAAAA:8 a=QyXUC8HyAAAA:8 a=Q-fNiiVtAAAA:8
+ a=ngdfp8rUJ6vPqw3KiKAA:9
+X-Proofpoint-GUID: yffYu-BryOO5KsL6al7hKoufV_sq1nWI
+X-Proofpoint-ORIG-GUID: yffYu-BryOO5KsL6al7hKoufV_sq1nWI
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODMwMDAzMiBTYWx0ZWRfX81ZieP4ksQva
+ o1xMrg92wTS7qo4MJdqj1tMVyGwmQEyt7PSCQwu+ricfpGJSuFJdNtA5mNyem4NWPPDkUWJ8o0w
+ NkYoa1MQanMYwn23VI2r3X5NjIrIajzT06F1gov0QL6Yt2WuO3ag9H7wMFJOLKtNZdxyzUwfenF
+ gu64onqGaT9asu/pOLk+oIRJVH1TEN684b2mPOxi3dOdWAMAM0ROc2xXIXinROTcsk+parndb8V
+ 6jOOds130d/Rsn+8Soehim3neGCSn0DrKyDcf8urilEvIllCT7Xfn9C3sCW42Pe7kPnU/qhwui6
+ raqHN90X2Hha4LpUoKJtv0hojMxvQIvj+gIUOGEro979uB1ckv1SlXDqnfWbU2DwWjrnLxSJwd9
+ Gml34dAi
 
-From: Dmitry Safonov <dima@arista.com>
+The warning in bnxt_alloc_one_rx_ring_netmem() reports the number
+of pages allocated for the RX aggregation ring. However, it
+mistakenly used bp->rx_ring_size instead of bp->rx_agg_ring_size,
+leading to confusing or misleading log output.
 
-Now that the destruction of info/keys is delayed until the socket
-destructor, it's safe to use kfree() without an RCU callback.
-As either socket was yet in TCP_CLOSE state or the socket refcounter is
-zero and no one can discover it anymore, it's safe to release memory
-straight away.
-Similar thing was possible for twsk already.
+Use the correct bp->rx_agg_ring_size value to fix this.
 
-Signed-off-by: Dmitry Safonov <dima@arista.com>
+Fixes: c0c050c58d84 ("bnxt_en: New Broadcom ethernet driver.")
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
+Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
 ---
- net/ipv4/tcp.c           | 17 +++--------------
- net/ipv4/tcp_ao.c        |  5 ++---
- net/ipv4/tcp_ipv4.c      |  4 ++--
- net/ipv4/tcp_minisocks.c | 19 +++++--------------
- 4 files changed, 12 insertions(+), 33 deletions(-)
+v1 -> v2
+Added Reviewed-by Jacob, Michael, Somnath
+Added Fixes tag
+Changed subject line
+- Target tree switched: net-next -> next
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index e2ec4ee0ff4a640e9e5501a0d93fc0ed312d488d..254ca95d0c3c5c44029be0e84120c5e9fb9d4514 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -413,27 +413,16 @@ static u64 tcp_compute_delivery_rate(const struct tcp_sock *tp)
- }
- 
- #ifdef CONFIG_TCP_MD5SIG
--static void tcp_md5sig_info_free_rcu(struct rcu_head *head)
--{
--	struct tcp_md5sig_info *md5sig;
--
--	md5sig = container_of(head, struct tcp_md5sig_info, rcu);
--	kfree(md5sig);
--	static_branch_slow_dec_deferred(&tcp_md5_needed);
--	tcp_md5_release_sigpool();
--}
--
- void tcp_md5_destruct_sock(struct sock *sk)
- {
- 	struct tcp_sock *tp = tcp_sk(sk);
- 
- 	if (tp->md5sig_info) {
--		struct tcp_md5sig_info *md5sig;
- 
--		md5sig = rcu_dereference_protected(tp->md5sig_info, 1);
- 		tcp_clear_md5_list(sk);
--		rcu_assign_pointer(tp->md5sig_info, NULL);
--		call_rcu(&md5sig->rcu, tcp_md5sig_info_free_rcu);
-+		kfree(rcu_replace_pointer(tp->md5sig_info, NULL, 1));
-+		static_branch_slow_dec_deferred(&tcp_md5_needed);
-+		tcp_md5_release_sigpool();
- 	}
- }
- EXPORT_SYMBOL_GPL(tcp_md5_destruct_sock);
-diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-index bbb8d5f0eae7d3d8887da3fa4d68e248af9060ad..31302be78bc4450b56fa23a390b6d03b2262741d 100644
---- a/net/ipv4/tcp_ao.c
-+++ b/net/ipv4/tcp_ao.c
-@@ -268,9 +268,8 @@ static void tcp_ao_key_free_rcu(struct rcu_head *head)
- 	kfree_sensitive(key);
- }
- 
--static void tcp_ao_info_free_rcu(struct rcu_head *head)
-+static void tcp_ao_info_free(struct tcp_ao_info *ao)
- {
--	struct tcp_ao_info *ao = container_of(head, struct tcp_ao_info, rcu);
- 	struct tcp_ao_key *key;
- 	struct hlist_node *n;
- 
-@@ -310,7 +309,7 @@ void tcp_ao_destroy_sock(struct sock *sk, bool twsk)
- 
- 	if (!twsk)
- 		tcp_ao_sk_omem_free(sk, ao);
--	call_rcu(&ao->rcu, tcp_ao_info_free_rcu);
-+	tcp_ao_info_free(ao);
- }
- 
- void tcp_ao_time_wait(struct tcp_timewait_sock *tcptw, struct tcp_sock *tp)
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 68bb75bd419cdbfce17048252919996d764ddc1a..f914bda25d8f5170395157b707d3bd2ef04267a1 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -1503,9 +1503,9 @@ void tcp_clear_md5_list(struct sock *sk)
- 	md5sig = rcu_dereference_protected(tp->md5sig_info, 1);
- 
- 	hlist_for_each_entry_safe(key, n, &md5sig->head, node) {
--		hlist_del_rcu(&key->node);
-+		hlist_del(&key->node);
- 		atomic_sub(sizeof(*key), &sk->sk_omem_alloc);
--		kfree_rcu(key, rcu);
-+		kfree(key);
- 	}
- }
- 
-diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-index d1c9e40886463ca308f9f3682c4039f491e7555f..7c2ae07d8d5d2a18d6ce3210cc09ee5d9850ea29 100644
---- a/net/ipv4/tcp_minisocks.c
-+++ b/net/ipv4/tcp_minisocks.c
-@@ -377,26 +377,17 @@ void tcp_time_wait(struct sock *sk, int state, int timeo)
- }
- EXPORT_SYMBOL(tcp_time_wait);
- 
--#ifdef CONFIG_TCP_MD5SIG
--static void tcp_md5_twsk_free_rcu(struct rcu_head *head)
--{
--	struct tcp_md5sig_key *key;
--
--	key = container_of(head, struct tcp_md5sig_key, rcu);
--	kfree(key);
--	static_branch_slow_dec_deferred(&tcp_md5_needed);
--	tcp_md5_release_sigpool();
--}
--#endif
--
- void tcp_twsk_destructor(struct sock *sk)
- {
- #ifdef CONFIG_TCP_MD5SIG
- 	if (static_branch_unlikely(&tcp_md5_needed.key)) {
- 		struct tcp_timewait_sock *twsk = tcp_twsk(sk);
- 
--		if (twsk->tw_md5_key)
--			call_rcu(&twsk->tw_md5_key->rcu, tcp_md5_twsk_free_rcu);
-+		if (twsk->tw_md5_key) {
-+			kfree(twsk->tw_md5_key);
-+			static_branch_slow_dec_deferred(&tcp_md5_needed);
-+			tcp_md5_release_sigpool();
-+		}
- 	}
- #endif
- 	tcp_ao_destroy_sock(sk, true);
-
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 207a8bb36ae5..0d30abadf06c 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -4397,7 +4397,7 @@ static void bnxt_alloc_one_rx_ring_netmem(struct bnxt *bp,
+ 	for (i = 0; i < bp->rx_agg_ring_size; i++) {
+ 		if (bnxt_alloc_rx_netmem(bp, rxr, prod, GFP_KERNEL)) {
+ 			netdev_warn(bp->dev, "init'ed rx ring %d with %d/%d pages only\n",
+-				    ring_nr, i, bp->rx_ring_size);
++				    ring_nr, i, bp->rx_agg_ring_size);
+ 			break;
+ 		}
+ 		prod = NEXT_RX_AGG(prod);
 -- 
-2.42.2
-
+2.50.1
 
 
