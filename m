@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-218486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06AEEB3CA27
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 12:28:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9671FB3CA2F
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 12:28:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3929A1B22860
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 10:28:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52E727C610B
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 10:28:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 354D6275114;
-	Sat, 30 Aug 2025 10:28:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41C1A27586C;
+	Sat, 30 Aug 2025 10:28:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bvEn2Oub"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B8UKIG8u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7761E520C;
-	Sat, 30 Aug 2025 10:27:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7777125BF15;
+	Sat, 30 Aug 2025 10:28:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756549681; cv=none; b=MMGrEbMyTh9x7ZN82fgqA1EaYgtoDqzP6ugsUukUENDIiNg7yBu6pvxf7WcWsDiPljLe/3kfgspcrW5h+LspmDv/7vFIfsPe7qvWJkHv08qWm/Mdb1Rd2H8AAa+c1sgUDVYJMU5S4xfqxp2mRPT+Qei+HiqA2SIuDpRcaCyKtgM=
+	t=1756549734; cv=none; b=N7RnpaMJnAa4Z+pIsd/LIlrm0LPkv4nhnk6za42H5cT24K38ZfuvZlJ7ym3ksx+sc8vMrETcu+bY1xknVIAwi1kgFVQ/6zb4+1XKx08gadvZkp6/7qlGycIla/QJnGOxLUnIk/31o69W4T3GLcUITBH5yRrTM8Y1FRJs9VzYmJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756549681; c=relaxed/simple;
-	bh=QL26qbYwjJ86fBGWjkwODZpkeBJTXfcZ6fSupKbXgFE=;
+	s=arc-20240116; t=1756549734; c=relaxed/simple;
+	bh=+DwoslA7/kfwqHfljxKUTzfBmEeaGG9DKg+W8ghJOwM=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=gHD3sjLA1ApBf+uWbvxiKpLph13eelQkT7e9v+QaXk6j94ITRKFr1/ifxSQs4IkGJhGe+0j6Y041y2kJYWNOuq2lkK+HTVn0WIFHqypVOL/nAQw/YD/cpPNwPlogLaImL2Kvrh1siJIhD3ZNryQ7bYWEiZlK8ERaKjiGjUlAH1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bvEn2Oub; arc=none smtp.client-ip=209.85.128.52
+	 In-Reply-To:Content-Type; b=CwzcdqZIQqTmz3JTnnbFUsNSM9HkQsfC2Zx0FfZDRRtF+Z9Pg8ggjGlE/okoDg3Eovd019xsKT83M7uLJJVpaQDGp/KUt1UDl5JUN0HiIddhgt3pgjFerqUPi/oqffoJAsLrf3SeJ41M1dm14mYCNzLDwyiKbamV6XBETvvPmPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B8UKIG8u; arc=none smtp.client-ip=209.85.221.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-45b629c8035so17432395e9.3;
-        Sat, 30 Aug 2025 03:27:59 -0700 (PDT)
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3d118d8fa91so275205f8f.1;
+        Sat, 30 Aug 2025 03:28:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756549678; x=1757154478; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1756549730; x=1757154530; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=eja/Sr2qjuVkf9pl7iOKbeZKj1qoBUOEtTGkXbe6Dbk=;
-        b=bvEn2Oub132AFSxNPwsqubZEgWEGdSbijE7imyAn25FMsqNo6PzQCPMFowGKEGzBYd
-         xXuJaurIYXk6nPyl7RpyONo+0N+2qwwza0iwR0EukWzCaFeTuVykE2v0N2h0s191oKej
-         HbwQqvlZmNFrXXja5UtgKDcR3POoGyX/uheS2mbaVIOklStHovid9faG5aV1RDPEXxNB
-         WBsGjgqTbXA8FVBplA5wm1JsQ9VkEXZBIL9TW+dgO2vc3PSSGZmP2PlDQ5Qa5v1J4Ll5
-         xnQCvqP2EEApKwyPuLbp/WQE9OwACKFqPM6FxgU84EfEKE+xX8YH49CWqB22fCbKNmQ1
-         /nzA==
+        bh=WHgH8oy5n+l+ZwlFEabPRf0dx6W3J1c630BijBzFt9g=;
+        b=B8UKIG8uD3IKrd0XPxZ/k99Jc6eeltI3qoy/3uE7yTpOVetIt8pZCC/WpsLIAfeaFE
+         sj6+dbNPnMrnaUt+IVc4ahoQVwdSXT79huBF8HCcd7do49Xib6VbCXgKkFBVsjiwl1fU
+         NWexTH4F1+kgysGNS9G40LKHv82q0OqS/syTSqliWdgKih474Fn2Wf86SpjnO13rd2Gb
+         1R1TGcIWOKcospdokEgvHpwzJKCEF5r5SAsczGrMqDlXGPLaMRasc/jIPW7NZPJ6Las0
+         GxuqxXTOTiyep7tRLJHGjnxAMYWEXacjTlsndb6+1CnhcCLuK17QY36jTev9e3+7bmkL
+         LK3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756549678; x=1757154478;
+        d=1e100.net; s=20230601; t=1756549730; x=1757154530;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=eja/Sr2qjuVkf9pl7iOKbeZKj1qoBUOEtTGkXbe6Dbk=;
-        b=A7Bb2jjjY/BD9cpxRXHooQbtSu1g+yXlBSfKVnNFAjzrJjHwT4Ii6h1/xnb+JMVFO5
-         vKS39h1BMuvQHV4C6CS6JHSHdpP5fwG6e/KIlfTKLtSlgagOD+OlvTAQ04h+c92dmXvQ
-         +HdhRDJChleDkNm8TklAaTzDoDFBgo/fw/VxwQS5pUW10lkESD/USd8ripp6S65ORpc5
-         O9YidoERsE+Am5Ouyq5z5lzIbmuc1A5PsH2oVvEgn/m9K7PpDM73+M1IF5vI3GyheQGk
-         FTZEDYPAkCxBFjJ7Rb3mnacEVulrsXvRRDE5gCzVU/oVpcPtPWd+APVqnk5lLLd+UHrg
-         tTEg==
-X-Forwarded-Encrypted: i=1; AJvYcCUmBB8h6yDbvbhNaIXU782RCsfClcjYAxZlTLE/Tu8B0fRRiA4wyW+ALTy4pEWd9DYkF29l4g9a1tas@vger.kernel.org, AJvYcCXUSMgS3imkLDTbzVJUATcY2AsKfXY7stG7dP1qhi4OCwrHcJ/6L341nz68Rp98wZGpzFJC5peV@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoGobeimE9udP3G8FmD1wz1PYb5yQdeDji7XzbhbWJUiXepGxU
-	Y/Zo49ybOsEn62NnQ0/OlBcipl9ExCfYRQORIyeM8XxPTg0BUGBtDjwD
-X-Gm-Gg: ASbGncuazRJpMcLC2igNjkyASszg+3HlyNPO34FCtDf0/nGX9MHkoKYnVOggC8+6OnS
-	cX7AM5bxKYu51eVx6SZkmri+AcjMv0a3S0VyubZ9phMwyKgsUzfofx8kqvRJEM9iP9831waTLwp
-	Po82EMBR+06M91YL7il1Lwvr9pLmLSJhR+8W/5FLn+rLl9kSsSx6+B4f2IdMkjzNjt/wLUjQWkQ
-	1foG6+dEnm2fQOJLh0MIeftSo7qazTVoL5OCLOw3HDDcAOivMG7t9QZmsM5/izO6Egh4YhATCqc
-	88f+qoaaXF9epiUBNtI4L4Ssesizmde4poLHzzTM267XhXBS9oRMJSWdtT/0m3qygtaaK3rKUnQ
-	HFX+V1P5C0OySB0iPa2AD4WTvzkY6exRjCa/JdQDLKc0oHv6zM3koER7YOoX+stBkI9ta9ma4TD
-	+9a5HuUuOxwKn4M6sfE9Y0/849Pnpth48IqHvoJm9TLVCYsKAWd64QCPDa+BtKSxm52Bc=
-X-Google-Smtp-Source: AGHT+IEbinJMv0Q50yWLcSQLB4WIKLpbG3dkEZKOAzvtHVjw3gGu6LpEKbKaKP2RsWcyI8GyeNhlCw==
-X-Received: by 2002:a05:600c:1f08:b0:45b:7bba:c7b5 with SMTP id 5b1f17b1804b1-45b8557c880mr10933925e9.28.1756549677730;
-        Sat, 30 Aug 2025 03:27:57 -0700 (PDT)
+        bh=WHgH8oy5n+l+ZwlFEabPRf0dx6W3J1c630BijBzFt9g=;
+        b=YlkrIECoq1mtmnRCKQfavpwGU0n415k5XdQq0BVuq1xI9e6FPbuc+QmuRc7G4ZUay/
+         neZeRkCwPSPAsuaHvNeKCr5mLD/jJrrVdm8ZY/dEoj4kT6YXrTtgME8FFsLHEsc95gMW
+         0KJCfRiquuz5llJOAjoXRsdgH4zeLlSgjavlrw7qMaa3JyYMHFKNL5cyzsEjNKTmjJo4
+         ew6WGcv+qLPRXVRAdsAaKbre1r5/HCWNcbAx6dy2QRWQo++TT1Z0+nztTo2ICGW+3fst
+         tF7/0/Nbyl13nJB4D7I6Jiewvmvs/usPtp6YqEnbCEC3lRpLzgxo5Ala9ltF0r9Pc8/+
+         OGHA==
+X-Forwarded-Encrypted: i=1; AJvYcCV44Z9hrO+eDs9GgZ7ZCIRXYZDL5cDtUkHD2hNxvvvxHX8ul+Fuqk7u0W3M3BR3rmoUkhxZsj3u@vger.kernel.org, AJvYcCVpNX7tFP6iezYXPBsMpnJwGwA0xONxbPRov/xKapav/xD5GjYbFNMMJNCZk3Bnk2Tdufq8RQxtdlUg@vger.kernel.org
+X-Gm-Message-State: AOJu0YynGoEb59PrS0CWyErID+cgFPGzfb5ng600eaKErNqWiJLWu2eE
+	4YIxfVSL/qPdSQJ7EKj1kZ5W+/vtMmQjdO/yrr/nLAN/zhZJxBOjCviV
+X-Gm-Gg: ASbGncu8gird0ej0xmFYF+LIHPECq9eAHpKaBdl8wZHfKamI5uIApSOTWxQru15DrLb
+	unRBPhxGS0BFLnrac5ZJ9SCU3Tp2LZCc7R3K1pjSu5S0DjbVlotpqtmJrV0io0Z7oH4Cu6anN0r
+	yrAXWmfR6QEIkvzDFBvjfNhjaL61Wr0Haa1qBgwGXbftBny4zMXsM7zdKZ/lw5MkIoEIULsZLzV
+	Bo6huqbW3kX975A9fdUGYukTboXX8AhDbmJR/njNPhPuqTR36JFXyw3UBGXYjOA8TGqpw7Z94yH
+	/Zq3OFyvPTxnpoyESEkT+lv6I7mlt8bFDxxF2Vc7xc6JBe4xEKBMkpL/ukc/xOIqmIkOOwUsFib
+	fISAo9TxGDaackb1uAJEUMJQJYqpbnMjNmmdimJeEm3eUeiKHXG9OaYAcpSWu31NXR7Lt1OqPN3
+	T+Sc4D1FPDp9S6IpgGEKnSnG5Kvre3uJxnaW0r1iJMCMvTZiKrgnCYX4c0MvBYNqiOpxI=
+X-Google-Smtp-Source: AGHT+IHVJCd/+HdJVP9uB4pTqlOmy229F5d8tyap6dwLZFq0cuUVPwza6+iNT3KkXtyV+TvLcVITKQ==
+X-Received: by 2002:a05:6000:250a:b0:3ce:7673:bb30 with SMTP id ffacd0b85a97d-3d1b16f01e5mr1648635f8f.14.1756549729740;
+        Sat, 30 Aug 2025 03:28:49 -0700 (PDT)
 Received: from ?IPV6:2003:ea:8f2f:9b00:80c:a2fc:7bcf:3a2? (p200300ea8f2f9b00080ca2fc7bcf03a2.dip0.t-ipconnect.de. [2003:ea:8f2f:9b00:80c:a2fc:7bcf:3a2])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-45b8525a94bsm23354035e9.15.2025.08.30.03.27.56
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3cf276cc915sm6584706f8f.21.2025.08.30.03.28.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 30 Aug 2025 03:27:57 -0700 (PDT)
-Message-ID: <7427825b-7d2f-4edb-a357-fa5eabb6d7d7@gmail.com>
-Date: Sat, 30 Aug 2025 12:28:07 +0200
+        Sat, 30 Aug 2025 03:28:49 -0700 (PDT)
+Message-ID: <e5fec041-14b8-46ba-9302-25c34a30241f@gmail.com>
+Date: Sat, 30 Aug 2025 12:28:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,8 +84,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 2/5] ARM: dts: ls1021a: switch to new fixed-link
- binding
+Subject: [PATCH net-next 3/5] ARM: dts: st: switch to new fixed-link binding
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Shawn Guo <shawnguo@kernel.org>, Rob Herring <robh@kernel.org>,
  Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
@@ -152,25 +151,42 @@ for more than 10 yrs. Switch to the new binding.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- arch/arm/boot/dts/nxp/ls/ls1021a-iot.dts | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ arch/arm/boot/dts/st/stih418-b2199.dts  | 5 ++++-
+ arch/arm/boot/dts/st/stihxxx-b2120.dtsi | 5 ++++-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/boot/dts/nxp/ls/ls1021a-iot.dts b/arch/arm/boot/dts/nxp/ls/ls1021a-iot.dts
-index e13ccae62..8d2438498 100644
---- a/arch/arm/boot/dts/nxp/ls/ls1021a-iot.dts
-+++ b/arch/arm/boot/dts/nxp/ls/ls1021a-iot.dts
-@@ -120,7 +120,10 @@ &enet1 {
+diff --git a/arch/arm/boot/dts/st/stih418-b2199.dts b/arch/arm/boot/dts/st/stih418-b2199.dts
+index 53ac6c2b7..5231222b7 100644
+--- a/arch/arm/boot/dts/st/stih418-b2199.dts
++++ b/arch/arm/boot/dts/st/stih418-b2199.dts
+@@ -103,7 +103,10 @@ ethernet0: dwmac@9630000 {
+ 			st,tx-retime-src = "clkgen";
+ 			status = "okay";
+ 			phy-mode = "rgmii";
+-			fixed-link = <0 1 1000 0 0>;
++			fixed-link {
++				speed = <1000>;
++				full-duplex;
++			};
+ 		};
+ 	};
  };
+diff --git a/arch/arm/boot/dts/st/stihxxx-b2120.dtsi b/arch/arm/boot/dts/st/stihxxx-b2120.dtsi
+index 8d9a2dfa7..f45c65544 100644
+--- a/arch/arm/boot/dts/st/stihxxx-b2120.dtsi
++++ b/arch/arm/boot/dts/st/stihxxx-b2120.dtsi
+@@ -147,7 +147,10 @@ ethernet0: dwmac@9630000 {
+ 			st,tx-retime-src = "clkgen";
+ 			status = "okay";
+ 			phy-mode = "rgmii";
+-			fixed-link = <0 1 1000 0 0>;
++			fixed-link {
++				speed = <1000>;
++				full-duplex;
++			};
+ 		};
  
- &enet2 {
--	fixed-link = <0 1 1000 0 0>;
-+	fixed-link {
-+		speed = <1000>;
-+		full-duplex;
-+	};
- 	phy-connection-type = "rgmii-id";
- 	status = "okay";
- };
+ 		demux@8a20000 {
 -- 
 2.51.0
 
