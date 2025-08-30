@@ -1,205 +1,145 @@
-Return-Path: <netdev+bounces-218490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DF77B3CA35
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 12:31:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3C1FB3CA36
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 12:33:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7DE8189F602
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 10:31:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1C7016EDFD
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 10:33:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CE0A2773EC;
-	Sat, 30 Aug 2025 10:31:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89D8B2773EE;
+	Sat, 30 Aug 2025 10:33:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uy0vTwSe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CQ4gneww"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 702A3207A0B;
-	Sat, 30 Aug 2025 10:31:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CE39218580;
+	Sat, 30 Aug 2025 10:33:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756549877; cv=none; b=OA7yfiBvlTxNNd09ZInZqiWmHWjBC1srYSsxeiRja4Geno01ERGPEbbq598wVt3dwOgaKjrKDB/XYnGRbCINAae2tL5r3YSoLJbQs6YM9AvsDbzwhEz4FzJAwt0sjQrE2VeB2UtGSEe4z7C4LWCQ5uwgKMsZZiCYXLJ2i7iDuho=
+	t=1756549991; cv=none; b=ObN47Xk5MU8AaE29Un7aFYlt7c4rk+UC1hatsbfXA3atgCn/xmdQo2rm8vwDupJzjhU5LjybnNzI1TQIwI1M9liH6PyULW9w6vCECaRiuOXymsFRuV8oBX5A32RExychupFcLa69C83Y9bt8NTVVxyUjR8bKn9wIPbSXFgeosjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756549877; c=relaxed/simple;
-	bh=MEmPf9JBt95ENutQWTEOP4yncyxyPSoWjYQQocrVTC8=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=RJc0ns1DHankVPYVmBCtiuWyBDu7xgBWsiFX59zkxuCKXR+C5mXLKzn0qj1TQ0CesYnjU/SVrxAiQ7DneUZJIE17cVvqLDrDc+s4zKzzo3ktwF4HShnt1MJpkfS5Zngvozyb5IA4qLTm6M0CjY5Sm4MUAiFrTSrls2Le4TtS/9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Uy0vTwSe; arc=none smtp.client-ip=209.85.218.45
+	s=arc-20240116; t=1756549991; c=relaxed/simple;
+	bh=9+DAISydCmSU/nfnrQmoF3sog1KqXDCTPbYq7Di/xKM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FfDxENyFrG0T3/MzINuQ77O3vM0m7LPfGlwk0zRTFMWIohBAWkv+AKD9zzSXnsFKfoZM782gXFt1B6oRrJCihyH3Jy6S66Lhjkt4mQupd1HvWtRbxRiAR5q7wWmtTMWiuwsCyNj6AfBTZfuGSbFDtmYegIv019UBC7Cj56sDvvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CQ4gneww; arc=none smtp.client-ip=209.85.166.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b03fa5c5a89so34358366b.2;
-        Sat, 30 Aug 2025 03:31:15 -0700 (PDT)
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3ea8b3a6454so16305545ab.1;
+        Sat, 30 Aug 2025 03:33:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756549874; x=1757154674; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=VHENl3vhXJdefcBx8Eb74+JpAMuYZm+3iaoopdaiCnc=;
-        b=Uy0vTwSelOgA8R/2nE6+E+xYJAeqNGuYTvSJ28ACojxe6633sB+W9LTjMcM2bcJRJY
-         AdrhtNrWHHB2o0TkiUBGA7Khzv7PNuDwgZnvUYc9CHN8z1z/2KDIezk4twGDK48NHdZ+
-         4kuen3pr84FnmyiCHzCkBADyVRCJEua03Xfk1QsjGZlC9/Qvju4vrYW/K8BvpbrDXJaU
-         CN2A+bdZAH1Fi+wnea1oTeAHpoueGxhuREa3uJ0ajQ37Bq+O5JuO8YZq7LvzO1TaV9MY
-         kBzW+StPVyQMBkrko1+zBQVr9mHiho9Q9WAnF7exaSM8iDdmJF2ds4qYhWLKwVn/Ca88
-         4ZzA==
+        d=gmail.com; s=20230601; t=1756549989; x=1757154789; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1AMw6pEARHVxLMZpBFfs/K2/1kAMgVkOBI8bUDSNkEE=;
+        b=CQ4gnewwD7tUKti0ZpyLBXMlaAgJKE616PK6NUIZ6JQ3nas2pjBzYMJxQpb10ns4jh
+         +oP0d7bG5swi9tBF8Ie8kaIfc1kcLXjXfo7BwOAcpcEOG94p5o3m3NArctxGlyg0LgF+
+         5CrJkqsbrXCRh+72WAGY7lDEFe+j/FgDfNv6a6OS1U5DXiBCSQKqp5vLCorhjDwOr9Dq
+         zTnykGJExbOaeaVGhjg+rmxrUJDHxIDOG/26r6LUdWuk+dIZWsInnWL5llL85lBxwgxP
+         nc59UTtRd6jjO43H+voSvLphwIkc5Ba15eJq3hboF7t5j9bD2p/jg1r0IeB0vAYknzSR
+         3rbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756549874; x=1757154674;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VHENl3vhXJdefcBx8Eb74+JpAMuYZm+3iaoopdaiCnc=;
-        b=ehVw6gK0UWmvrWhtSQxOHOn/FYgzak0mYglYZSYHBL5kSGlr6wRG3K+bQefGBEYj+i
-         Ps8Q9umjHKJLzYq5Z/nqLNeuzOB6rjomlh7ccNzZL0lN2fTTmu3O/3irhv3A4EXMUJim
-         gUVu/4DTlX9kxXdXybNFkksi+NGUa2mlWpS98KL4orU+Sw1OfrDZAwKXU5s+s/AnMcs9
-         5YhZmkxdE8W2XduNxzZU/TpnlP4lMDRw9YJgPoBQKK0ZOdM2KIXEgkMisC6ijrubCo2F
-         wM0XfQkoP7a9Og5OYi4EOn+QeAQV9H7+mLW9nlnX5P2k96baMLJhfM90BHnXZXfCNsXp
-         cS5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCV320QkY017x+cnSm8m1xX7rFuT1XR6mV45nkXy2ndA1BTK1du1SRuw81QVEJcznfMx1S+5yrVxToEx@vger.kernel.org, AJvYcCV4Qz/6ToQcT17OqNqjOwaaYF/RVFRVFRw4VSK9termWggcCdxe1CKEPAStckc79oC95It/YnvY@vger.kernel.org
-X-Gm-Message-State: AOJu0Yync+M79AKacrGuafuligL2xfphAyQKAo+cd0W0dEADZfKRuCwR
-	3PzhLGy0CPLN/gC/qPmdioJwW1X0MruMuV40ueTBGuf2tb/N6o6Tn9Jx
-X-Gm-Gg: ASbGnct1cCG6lub0pThqrrN1FGecphWCzflm32mPhKpW0jhAOZ2lnN37ovjDXP1hLyl
-	l1tBPlnz+T7s6lCQCbLT6f0fKUPrCBdHfi6A1HBPtSck9PKLWTG/sg91Ln2YUXmg6cFbANu8bUe
-	NRYQmlb16WJ/M+AJhMzqwaKxW/3UOGVzNIQrElk0o64mQnuMURTHHW7gLxv8FnY2GihgHJ9ZC9Q
-	WuHaEJREZTn1nCcZqH4YnCJCfdaS6/8z6jWhR+FFcnc3qPSwEGAUbYWIy0FxxIcCLiFCwEJYMpl
-	aApuVic85+sD5SsKQQ7H3qxm0kJZDOpawrEe4tUESatT6KCWX0ENKVr8aQ015mvgaG5JR32ftlJ
-	RBdNphbm1uqFLybBdSGE940+tuzL9VtcVLPhLU3Zjtq0OhCkSPGbHL1cqzZAndpWq/zNEG5obkh
-	UbRrhGDk6XZgJU54ZrXqzQlBCNKI1f7AnUqvMsYli25I+XTDNU9ERzC25h
-X-Google-Smtp-Source: AGHT+IG8ZDCC2V3+EonpNeqqDHEWdVKRo5hKxw3mm3OIcIvvZGu3whG8VR1DHL+/mPpMHOJAVfIpog==
-X-Received: by 2002:a17:907:7ba1:b0:afc:bcfc:b3b7 with SMTP id a640c23a62f3a-b01d973e909mr149125566b.38.1756549873319;
-        Sat, 30 Aug 2025 03:31:13 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f2f:9b00:80c:a2fc:7bcf:3a2? (p200300ea8f2f9b00080ca2fc7bcf03a2.dip0.t-ipconnect.de. [2003:ea:8f2f:9b00:80c:a2fc:7bcf:3a2])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-b0307435422sm94050066b.78.2025.08.30.03.31.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 30 Aug 2025 03:31:12 -0700 (PDT)
-Message-ID: <c8820f9f-796d-4d1a-9ce0-be3788e814b1@gmail.com>
-Date: Sat, 30 Aug 2025 12:31:22 +0200
+        d=1e100.net; s=20230601; t=1756549989; x=1757154789;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1AMw6pEARHVxLMZpBFfs/K2/1kAMgVkOBI8bUDSNkEE=;
+        b=efk4+kgiXnJdLA8WLpLcXzqvsXGqDPfbyaNdz+wyzNiRN0F8UDUNewHfnAmecwC343
+         ULExg08nrTusJrmv2z6iGFAKg4NsKu3wiuSM1ohQJaGQPVsMS4STsbfkd4xlzL2Smkw2
+         8QDTBKXby5c0FNCRNthWypvIIVFQRFYWBL7Qi9oODYmM78MUld3qVw87jk8sfwiygeNS
+         heo4nUx2Snvl0U3r+zLfnoWjFzlPSz6XnoItneu6q1q2h5t4wg68CBrxms7huOIkv7Gd
+         Xkmywcf1dcKwWbasQtZ/MWTNGOjzTgs+MTtASHcu0PVb9zM+YwjwPMXuC3MrmNYWX9Xj
+         W0WA==
+X-Forwarded-Encrypted: i=1; AJvYcCW/KuM+MPkgI+QTZ3k1DCQpCETZniiN0/3oJxFTcKIxtbIgVOMfHfTwog9mf+zWyYOEhinGfziW@vger.kernel.org, AJvYcCWqLYVpZcoxvHep388JOB6aeu5USK1TpLABL2N1X9ypdU7xTDmiwGncMZTozvq38oc/7Pw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXAgWkWVaL3ZhbMIZeAMkGHK4e1Inm48DZYHwM/Iq6ta8ZJ3sW
+	jKyhJfmB+7GF+SfYDXuOq0cMAuMWEmJE33PEZaCMV2RaZbOhtkrl3eHsHegTwv7KTa34MRvfA94
+	T3AJns7hrbHQs6SbxfFZMZLVKz/EtqT8=
+X-Gm-Gg: ASbGncuzJlKBoe+OKJ3mdFRBHG998DjPVx9+9zYLe7BBoxAyJPu5Y8VRv30zrpI0R3k
+	kg6OZWfWliVk+rtQd6uIKyPx0q/Bh3OCd1EHROKhjkRaqn81lstg0YfZqJ8zniPL2OYCu6jAmrB
+	Q72WrM3Tb1yb1ApGqHQEtmz04rza0Rp2wRcAWcK9hBdQEQb4t4074TbolpGw4VDVo/pkW9BfiGD
+	s8Q7A==
+X-Google-Smtp-Source: AGHT+IFWsAxGn/NYIrw/M+ETRxOSzmi58TDOAVBYhpYICXDz3ds/TMLrHt1q2TBuexoFdV7JbNQrfc+tdDa308nAxyo=
+X-Received: by 2002:a05:6e02:1aa4:b0:3e8:b0f1:6b02 with SMTP id
+ e9e14a558f8ab-3f3ffda307amr34366655ab.2.1756549988846; Sat, 30 Aug 2025
+ 03:33:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 5/5] net: phy: phylink: remove support for deprecated
- fixed-link binding
-From: Heiner Kallweit <hkallweit1@gmail.com>
-To: Shawn Guo <shawnguo@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Patrice Chotard <patrice.chotard@foss.st.com>,
- Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>
-Cc: "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <a3c2f8d3-36e6-4411-9526-78abbc60e1da@gmail.com>
-Content-Language: en-US
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <a3c2f8d3-36e6-4411-9526-78abbc60e1da@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250820154416.2248012-1-maciej.fijalkowski@intel.com>
+ <aK1sz42QLX42u6Eo@stanley.mountain> <089fa206-1511-4fd9-bc12-f73ab8a08bb6@iogearbox.net>
+ <aLHR4qMphDdG43l2@boxer>
+In-Reply-To: <aLHR4qMphDdG43l2@boxer>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sat, 30 Aug 2025 18:32:32 +0800
+X-Gm-Features: Ac12FXx8tr7aiwoApMgfby28_0kDY9_tPzQFu6hVUOReUb3jhOdjyGQhFx1NPlA
+Message-ID: <CAL+tcoD1t4a5wEUYKJbhFHC2Cf8smY983JzWgLhjpcHd7-fwGg@mail.gmail.com>
+Subject: Re: [PATCH v6 bpf] xsk: fix immature cq descriptor production
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, Dan Carpenter <dan.carpenter@linaro.org>, bpf@vger.kernel.org, 
+	ast@kernel.org, andrii@kernel.org, netdev@vger.kernel.org, 
+	magnus.karlsson@intel.com, stfomichev@gmail.com, aleksander.lobakin@intel.com, 
+	Eryk Kubanski <e.kubanski@partner.samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The old array-type fixed-link binding has been deprecated
-for more than 10 yrs. So remove support for it.
+On Sat, Aug 30, 2025 at 12:15=E2=80=AFAM Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
+>
+> On Tue, Aug 26, 2025 at 02:23:34PM +0200, Daniel Borkmann wrote:
+> > On 8/26/25 10:14 AM, Dan Carpenter wrote:
+> > > On Wed, Aug 20, 2025 at 05:44:16PM +0200, Maciej Fijalkowski wrote:
+> > > >                           return ERR_PTR(err);
+> > > >                   skb_reserve(skb, hr);
+> > > > +
+> > > > +         addrs =3D kmem_cache_zalloc(xsk_tx_generic_cache, GFP_KER=
+NEL);
+> > > > +         if (!addrs) {
+> > > > +                 kfree(skb);
+> > >
+> > > This needs to be kfree_skb(skb);
+> >
+> > Oh well, good catch! Maciej, given this commit did not land yet in Linu=
+s' tree,
+> > I can toss the commit from bpf tree assuming you send a v7?
+> >
+> > Also, looking at xsk_build_skb(), do we similarly need to free that all=
+ocated
+> > skb when we hit the ERR_PTR(-EOVERFLOW) ? Mentioned function has the fo=
+llowing
+> > in the free_err path:
+> >
+> >         if (first_frag && skb)
+> >                 kfree_skb(skb);
+> >
+> > Pls double check.
+>
+> for EOVERFLOW we drop skb and then we continue with consuming next
+> descriptors from XSK Tx queue. Every other errno causes this loop
+> processing to stop and give the control back to application side. skb
+> pointer is kept within xdp_sock and on next syscall we will retry with
+> sending it.
+>
+>         if (err =3D=3D -EOVERFLOW) {
+>                 xsk_drop_skb(xs->skb);
+>                 -> xsk_consume_skb(skb);
+>                    -> consume_skb(skb);
+>
+> since it's a drop, i wonder if we should have a kfree_skb() with proper
+> drop reason for XSK subsystem, but that's for a different discussion.
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/phy/phylink.c | 25 +------------------------
- 1 file changed, 1 insertion(+), 24 deletions(-)
+I agree on this point. A few days ago, I scanned the code over and
+over again and stumbled on this. Sure, we can add reasons into it.
 
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index c7f867b36..e3e22e013 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -690,29 +690,6 @@ static int phylink_parse_fixedlink(struct phylink *pl,
- 
- 		if (ret)
- 			return ret;
--	} else {
--		u32 prop[5];
--
--		ret = fwnode_property_read_u32_array(fwnode, "fixed-link",
--						     NULL, 0);
--		if (ret != ARRAY_SIZE(prop)) {
--			phylink_err(pl, "broken fixed-link?\n");
--			return -EINVAL;
--		}
--
--		ret = fwnode_property_read_u32_array(fwnode, "fixed-link",
--						     prop, ARRAY_SIZE(prop));
--		if (!ret) {
--			pl->link_config.duplex = prop[1] ?
--						DUPLEX_FULL : DUPLEX_HALF;
--			pl->link_config.speed = prop[2];
--			if (prop[3])
--				__set_bit(ETHTOOL_LINK_MODE_Pause_BIT,
--					  pl->link_config.lp_advertising);
--			if (prop[4])
--				__set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT,
--					  pl->link_config.lp_advertising);
--		}
- 	}
- 
- 	if (pl->link_config.speed > SPEED_1000 &&
-@@ -768,7 +745,7 @@ static int phylink_parse_mode(struct phylink *pl,
- 		pl->cfg_link_an_mode = MLO_AN_INBAND;
- 
- 	dn = fwnode_get_named_child_node(fwnode, "fixed-link");
--	if (dn || fwnode_property_present(fwnode, "fixed-link"))
-+	if (dn)
- 		pl->cfg_link_an_mode = MLO_AN_FIXED;
- 	fwnode_handle_put(dn);
- 
--- 
-2.51.0
-
-
+Thanks,
+Jason
 
