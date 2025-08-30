@@ -1,215 +1,220 @@
-Return-Path: <netdev+bounces-218524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8130EB3D021
-	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 00:55:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 30CECB3D02C
+	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 01:11:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33C9D17F952
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 22:55:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9121A176684
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 23:11:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84EB925B2F4;
-	Sat, 30 Aug 2025 22:55:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8875D264630;
+	Sat, 30 Aug 2025 23:11:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OAGEgEco"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TIVg8xKD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ED501EDA0E
-	for <netdev@vger.kernel.org>; Sat, 30 Aug 2025 22:55:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA95A25A65B;
+	Sat, 30 Aug 2025 23:11:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756594547; cv=none; b=Fbe2k+1qLb4A4n5ly/fuNNOL2uc9l1WWlJX1fDus3cfRg8BFJoOGyfQ6jpTKo0NoMBZz+kk60stB7dxWztN9scb/KnYYvLo6Gf2CX5j5ja0dOGB7ZCnQnX2KCj1D6K6wQVqpjav1iyhgadd4ZUBymp6e9ht1V6kpwYnUcZXKkSY=
+	t=1756595495; cv=none; b=EVq/n4WtDGjBOz4JT6VdBGmszQwhY8aBKs0/Eqynd9ew+OBjIYZtDi84sP7ljDazyswaMfGZY26tUFdNO3GaFwh8GV8rutmwaB0GD8mOpr1Nzsss8cS2nmSmoLP6HxGgHJDJWc4L3xW1ZDhqnJy4t6DVMMbGzwzg5rTf2dvZiVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756594547; c=relaxed/simple;
-	bh=fOM9Wb83Asj9nd/xyoaWDHEfPGyHm34FIgXXnEsIIMw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=gP6yQNXjACd2rnuMsn9jFaE40uXPVECmvhYeDNtvbUrIVB4Z9Dc09F5iiMpLeWkiHoJ7dJfPypYTS+pBH0e+MuWPWG28jFPO+27KjW+zzMc3TWaJgPeOjM7MqwrM9DHxkphYFSQK/lKu44inA3qy0YypRvzh1bG0HfJjgAUb44Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OAGEgEco; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C608BC4CEEB;
-	Sat, 30 Aug 2025 22:55:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756594546;
-	bh=fOM9Wb83Asj9nd/xyoaWDHEfPGyHm34FIgXXnEsIIMw=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=OAGEgEcoEIsh0IJNS4SMeALuct1aTNCN9TAfzf/6VbN+1w0/9N6LRVO4/rDQHfKZO
-	 lFCh8dpkIJwvTKb8tHmAkbbypLrrRKlRBiPSnpz50I52p/EhXLaU33wlaLbMdh1BIP
-	 2Dbj4LBzgon2Jt0+qLNSTkXroZCMqwlkcGOjvf0t96VNSnu6IrT22NXryks7KH1UHt
-	 5AaNU3IYlqVUXiBTc+d3hu+2xFOY0HdvuIXe+QdnOThIAuxsMG9LQKLSjkHVsniuyF
-	 FpiYJ67y+o7EyUru3dTFVL7m08ZfHk9HyQquBaDNlazOAidGUDi64ysgCOYKJW6M7/
-	 vVLl52lwckyGg==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5AF1CA0FFE;
-	Sat, 30 Aug 2025 22:55:46 +0000 (UTC)
-From: Christoph Paasch via B4 Relay <devnull+cpaasch.openai.com@kernel.org>
-Date: Sat, 30 Aug 2025 15:55:38 -0700
-Subject: [PATCH net] net/tcp: Fix socket memory leak in TCP-AO failure
- handling for IPv6
+	s=arc-20240116; t=1756595495; c=relaxed/simple;
+	bh=pKJR3d1y6/pE646jp/qQ2LVHmuXD7qWjBS7Rpy0QVAg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t913QYLO23eQtM7qxBDzlf11RFzSFT7d9dYj8hDzGEvuAsOdvmtWG2KQ/XipqugD+AxmcTBLaiRPN0w8u6+Dm9gwswYjSdApx0LBHBMgO5C10NgxHdkQ3SyDBOeJC6ILHHmhAL3n5ARFjItIevfLGmtbHrDL/ufT/0UgZHRu2F4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TIVg8xKD; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b4f1ee2e250so218252a12.2;
+        Sat, 30 Aug 2025 16:11:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756595493; x=1757200293; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pKJR3d1y6/pE646jp/qQ2LVHmuXD7qWjBS7Rpy0QVAg=;
+        b=TIVg8xKDK8jOd6uAUjWKvjYMF0o3z9qT2kTioFTpikXbNdl8/U32G3LsyTrnVa9q71
+         28HtSsFm1Kj35XAgD+pyJ7d69a78HT0ccO+A4pp2W+an/UJsBws7ntMQs7siDyINTtYp
+         ONkchYQ+dIkHDhnbsD1yXmuYmsgjhCuB+Crm2du1ZtScalWSqYDuo1/teSqVj0ThWBZ+
+         kO52RyQ2FghkncBplB8yixYbgEblHVAWEdjMknp794codTxh3Q/bzjT3oR9ep9sqhVy8
+         yuZXgHcBln+TVkLR1+XdoB1HMAPguEMwMXhwaDsDY6/wgJjIhyuSOn507LH1BTND7a0F
+         uJfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756595493; x=1757200293;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pKJR3d1y6/pE646jp/qQ2LVHmuXD7qWjBS7Rpy0QVAg=;
+        b=F1UxlTncWX1CSiQyQWD8gZ02Y5cCHqcUEHaKhzb4ggry4qYYQsWkeNznApZFHN7iV1
+         ygjL7HqYNJ20OFU0zvVGJWAg5riXTnXWqxQdcpU8Cn4DMdWx6hgPMx34QVGUuksGK8E/
+         5vDRS/L+rAYDPshQJ71VGrUo0b0DuScVSwnbC/npHOFclT390Ar9eoTY9rsn0lVfDtZG
+         Qk6vQQwNoJ31U6zd8dJmaqLGrnFrY1IIYdRTlv8lmEKmhRdhcFCsA67KhQGa8xaLFZo/
+         j4fZLK+g1egP3bKnuGwau8Ch/1Dkdh84j7NEB2LD4G/O8PZaUBnkcP9Pg2TUVS5URsOG
+         E9jw==
+X-Forwarded-Encrypted: i=1; AJvYcCUGOu/NjOZ63m7hu5Wv6Bq5b5kSwMz0VEwKvexcvgDVNsdeQA3wd34y+IHK/lBgJiSSh7u0VXv2il0=@vger.kernel.org, AJvYcCUN6IF3MeXJKOL5eMazf40cg7WhcGyGi5Ugbnc14vWvOlxqjfUGlGC46P/LzAksKrBrMRVq/kb7gJRD@vger.kernel.org, AJvYcCV/AaLl1ghNppibbhke1457I5FzR9UN+GF5Sc3HpO4Er8+O1iEhvxX9WdWDAUMMEsOgPeQRTk+fLRsKncU=@vger.kernel.org, AJvYcCW4c/F+fA53F9wE/Cc7S25/gdHLgs/Z3jNzXKZmj/H4quK6ZOosC8oWLB70jhAKO3rvd82bOVUykmGF+A==@vger.kernel.org, AJvYcCWdXQOnK2F7zc0Jnkfoijlj/F0n/F72Zcrz27Jxv9vHAPL++wtSEOZJ8dQ6WO4hDcO9Vtk=@vger.kernel.org, AJvYcCXQcHsHBv0/wPZAsFuceLMUaHpGeiA+kWQBEHbMRbES86PgBTxP4+zn/tBGz8buMTz8pjYNUp6J@vger.kernel.org, AJvYcCXWyj7sAxlYMyJFEQimOcFxoCoQyb5MHg1D7KLAqaOpqS72OFwR9uZJuuv+zXdoKe2U7Iy5LRqDqCVk@vger.kernel.org, AJvYcCXeX1INGpb9EBaEecPmJghKHp5IKEECq5fPupBu4trVfzjJzDWpe36cj/s26fOf8P0fzVQdnXwaa9PO9J0=@vger.kernel.org, AJvYcCXyfOsv1rreXY7umSmcxqqTcqigImyczGxYO0KfyH3Jy710uZejaOrbs1tkRynaaZP2+Rw0v/ndZ76udJKI@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJMExlmz96Bolgxw6xWS+Z5j3sJDhYdb1dXOBCrHUIsTaL6zFS
+	RvHE2JJ8naVRUZmK7JU1fyD3iikbbrJy6I4ApkFXsmEYrcL0qg1/n9dw
+X-Gm-Gg: ASbGncsfAKYjgNdWwNg7xXqJNSQuLnN/PSrLnCGKOf2FFKHu9V4VsvY3AzSq8NenHpy
+	xePsgoiHPUuwIlHaPW2FgcE7s5Mi55wmwH23KCdG5I5mKQbo79Uvf1nJv0NIKcm3giYObUYwnbF
+	Wvidmhwe1mTgmP26baCmqMdOsK1oEXJWKbXjrt9lrwvWlxUdF8K/rhLV2bL/MOysifIiGY0p+WS
+	ifyP5RZS8K0P68xX/DxjgIctf9ouElhgNLwUH8WnErEp9A/5X2A3/HWcbrKNIVRAO9KOIkwWW85
+	eeOt5GFJTQIJKoVV4WQTbTpItF2W/Iuqtjo2kblXzHfoofZPRT+NtHZTB/333jUz4v6KK/Q4U3H
+	Xbjefj/OwH6pMWCb/OBOZzfpHiYJbCCG3mb0I
+X-Google-Smtp-Source: AGHT+IH09TdLkBTBS46a9KkDQcsPHCKV5BjcOl3BN1JIlX/axUWBHc8jxps5fYfmQWtY+6vT/lzr2w==
+X-Received: by 2002:a17:902:c952:b0:248:cd4c:d6e with SMTP id d9443c01a7336-2494488a679mr39782015ad.9.1756595492940;
+        Sat, 30 Aug 2025 16:11:32 -0700 (PDT)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24906395aa0sm61840295ad.100.2025.08.30.16.11.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 30 Aug 2025 16:11:31 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id 3F63E4222987; Sun, 31 Aug 2025 06:11:28 +0700 (WIB)
+Date: Sun, 31 Aug 2025 06:11:28 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux DAMON <damon@lists.linux.dev>,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	Linux Power Management <linux-pm@vger.kernel.org>,
+	Linux Block Devices <linux-block@vger.kernel.org>,
+	Linux BPF <bpf@vger.kernel.org>,
+	Linux Kernel Workflows <workflows@vger.kernel.org>,
+	Linux KASAN <kasan-dev@googlegroups.com>,
+	Linux Devicetree <devicetree@vger.kernel.org>,
+	Linux fsverity <fsverity@lists.linux.dev>,
+	Linux MTD <linux-mtd@lists.infradead.org>,
+	Linux DRI Development <dri-devel@lists.freedesktop.org>,
+	Linux Kernel Build System <linux-lbuild@vger.kernel.org>,
+	Linux Networking <netdev@vger.kernel.org>,
+	Linux Sound <linux-sound@vger.kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Borislav Petkov <bp@alien8.de>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	Jonathan Corbet <corbet@lwn.net>, SeongJae Park <sj@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	David Hildenbrand <david@redhat.com>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>, Huang Rui <ray.huang@amd.com>,
+	"Gautham R. Shenoy" <gautham.shenoy@amd.com>,
+	Mario Limonciello <mario.limonciello@amd.com>,
+	Perry Yuan <perry.yuan@amd.com>, Jens Axboe <axboe@kernel.dk>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Dwaipayan Ray <dwaipayanray1@gmail.com>,
+	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+	Joe Perches <joe@perches.com>,
+	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+	Alexander Potapenko <glider@google.com>,
+	Andrey Konovalov <andreyknvl@gmail.com>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Vincenzo Frascino <vincenzo.frascino@arm.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Eric Biggers <ebiggers@kernel.org>, tytso@mit.edu,
+	Richard Weinberger <richard@nod.at>,
+	Zhihao Cheng <chengzhihao1@huawei.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+	Boqun Feng <boqun.feng@gmail.com>, Waiman Long <longman@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Shay Agroskin <shayagr@amazon.com>,
+	Arthur Kiyanovski <akiyano@amazon.com>,
+	David Arinzon <darinzon@amazon.com>,
+	Saeed Bishara <saeedb@amazon.com>, Andrew Lunn <andrew@lunn.ch>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>,
+	Alexandru Ciobotaru <alcioa@amazon.com>,
+	The AWS Nitro Enclaves Team <aws-nitro-enclaves-devel@amazon.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+	Steve French <stfrench@microsoft.com>,
+	Meetakshi Setiya <msetiya@microsoft.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+	Masahiro Yamada <masahiroy@kernel.org>
+Subject: Re: [PATCH 12/14] ASoC: doc: Internally link to Writing an ALSA
+ Driver docs
+Message-ID: <aLOFIEknbxQZ6FM2@archie.me>
+References: <20250829075524.45635-1-bagasdotme@gmail.com>
+ <20250829075524.45635-13-bagasdotme@gmail.com>
+ <20250830224614.6a124f82@foz.lan>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250830-tcpao_leak-v1-1-e5878c2c3173@openai.com>
-X-B4-Tracking: v=1; b=H4sIAGmBs2gC/x3MSwqAIBRG4a3EHSdoD6i2EhFmv3UpLFQiiPaeN
- PwG5zwU4BmBuuwhj4sDHy5B5RmZVbsFgudkKmRRy6aUIppTH+MOvQlbKhjUrZ5QUQpOD8v3P+v
- JIdLwvh8q01JOYQAAAA==
-X-Change-ID: 20250830-tcpao_leak-f31ece59abe4
-To: Eric Dumazet <edumazet@google.com>, 
- Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Dmitry Safonov <0x7f454c46@gmail.com>, 
- Salam Noureddine <noureddine@arista.com>, 
- Francesco Ruggeri <fruggeri@arista.com>
-Cc: netdev@vger.kernel.org, Christoph Paasch <cpaasch@openai.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1756594546; l=4109;
- i=cpaasch@openai.com; s=20250712; h=from:subject:message-id;
- bh=bs8zLk+wSSc+das9LF5n3Y0ftafMIM0Nr9MLDmbxX6g=;
- b=qmFN1mCdYzoSk7RZE1YVj0U+s+kndOFpMCbtY9CzgESdjhV8M7uZKqlECkBvdP2+d70EkGfQy
- ekj8kiyRCokCxcAwWurCCjPvCLnqKc7HxIg5hZeVOAk5LJsGlYgCiaR
-X-Developer-Key: i=cpaasch@openai.com; a=ed25519;
- pk=1HRHZlVUZPziMZvsAQFvP7n5+uEosTDAjXmNXykdxdg=
-X-Endpoint-Received: by B4 Relay for cpaasch@openai.com/20250712 with
- auth_id=459
-X-Original-From: Christoph Paasch <cpaasch@openai.com>
-Reply-To: cpaasch@openai.com
-
-From: Christoph Paasch <cpaasch@openai.com>
-
-When tcp_ao_copy_all_matching() fails in tcp_v6_syn_recv_sock() it just
-exits the function. This ends up causing a memory-leak:
-
-unreferenced object 0xffff0000281a8200 (size 2496):
-  comm "softirq", pid 0, jiffies 4295174684
-  hex dump (first 32 bytes):
-    7f 00 00 06 7f 00 00 06 00 00 00 00 cb a8 88 13  ................
-    0a 00 03 61 00 00 00 00 00 00 00 00 00 00 00 00  ...a............
-  backtrace (crc 5ebdbe15):
-    kmemleak_alloc+0x44/0xe0
-    kmem_cache_alloc_noprof+0x248/0x470
-    sk_prot_alloc+0x48/0x120
-    sk_clone_lock+0x38/0x3b0
-    inet_csk_clone_lock+0x34/0x150
-    tcp_create_openreq_child+0x3c/0x4a8
-    tcp_v6_syn_recv_sock+0x1c0/0x620
-    tcp_check_req+0x588/0x790
-    tcp_v6_rcv+0x5d0/0xc18
-    ip6_protocol_deliver_rcu+0x2d8/0x4c0
-    ip6_input_finish+0x74/0x148
-    ip6_input+0x50/0x118
-    ip6_sublist_rcv+0x2fc/0x3b0
-    ipv6_list_rcv+0x114/0x170
-    __netif_receive_skb_list_core+0x16c/0x200
-    netif_receive_skb_list_internal+0x1f0/0x2d0
-
-This is because in tcp_v6_syn_recv_sock (and the IPv4 counterpart), when
-exiting upon error, inet_csk_prepare_forced_close() and tcp_done() need
-to be called. They make sure the newsk will end up being correctly
-free'd.
-
-tcp_v4_syn_recv_sock() makes this very clear by having the put_and_exit
-label that takes care of things. So, this patch here makes sure
-tcp_v4_syn_recv_sock and tcp_v6_syn_recv_sock have similar
-error-handling and thus fixes the leak for TCP-AO.
-
-Fixes: 06b22ef29591 ("net/tcp: Wire TCP-AO to request sockets")
-Signed-off-by: Christoph Paasch <cpaasch@openai.com>
----
- net/ipv6/tcp_ipv6.c | 32 +++++++++++++++-----------------
- 1 file changed, 15 insertions(+), 17 deletions(-)
-
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 7577e7eb2c97b821826f633a11dd5567dde7b7cb..e885629312a4a7a98df00222b420b646a351868f 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -1431,17 +1431,17 @@ static struct sock *tcp_v6_syn_recv_sock(const struct sock *sk, struct sk_buff *
- 	ireq = inet_rsk(req);
- 
- 	if (sk_acceptq_is_full(sk))
--		goto out_overflow;
-+		goto exit_overflow;
- 
- 	if (!dst) {
- 		dst = inet6_csk_route_req(sk, &fl6, req, IPPROTO_TCP);
- 		if (!dst)
--			goto out;
-+			goto exit;
- 	}
- 
- 	newsk = tcp_create_openreq_child(sk, req, skb);
- 	if (!newsk)
--		goto out_nonewsk;
-+		goto exit_nonewsk;
- 
- 	/*
- 	 * No need to charge this sock to the relevant IPv6 refcnt debug socks
-@@ -1525,25 +1525,19 @@ static struct sock *tcp_v6_syn_recv_sock(const struct sock *sk, struct sk_buff *
- 			const union tcp_md5_addr *addr;
- 
- 			addr = (union tcp_md5_addr *)&newsk->sk_v6_daddr;
--			if (tcp_md5_key_copy(newsk, addr, AF_INET6, 128, l3index, key)) {
--				inet_csk_prepare_forced_close(newsk);
--				tcp_done(newsk);
--				goto out;
--			}
-+			if (tcp_md5_key_copy(newsk, addr, AF_INET6, 128, l3index, key))
-+				goto put_and_exit;
- 		}
- 	}
- #endif
- #ifdef CONFIG_TCP_AO
- 	/* Copy over tcp_ao_info if any */
- 	if (tcp_ao_copy_all_matching(sk, newsk, req, skb, AF_INET6))
--		goto out; /* OOM */
-+		goto put_and_exit; /* OOM */
- #endif
- 
--	if (__inet_inherit_port(sk, newsk) < 0) {
--		inet_csk_prepare_forced_close(newsk);
--		tcp_done(newsk);
--		goto out;
--	}
-+	if (__inet_inherit_port(sk, newsk) < 0)
-+		goto put_and_exit;
- 	*own_req = inet_ehash_nolisten(newsk, req_to_sk(req_unhash),
- 				       &found_dup_sk);
- 	if (*own_req) {
-@@ -1570,13 +1564,17 @@ static struct sock *tcp_v6_syn_recv_sock(const struct sock *sk, struct sk_buff *
- 
- 	return newsk;
- 
--out_overflow:
-+exit_overflow:
- 	__NET_INC_STATS(sock_net(sk), LINUX_MIB_LISTENOVERFLOWS);
--out_nonewsk:
-+exit_nonewsk:
- 	dst_release(dst);
--out:
-+exit:
- 	tcp_listendrop(sk);
- 	return NULL;
-+put_and_exit:
-+	inet_csk_prepare_forced_close(newsk);
-+	tcp_done(newsk);
-+	goto exit;
- }
- 
- INDIRECT_CALLABLE_DECLARE(struct dst_entry *ipv4_dst_check(struct dst_entry *,
-
----
-base-commit: 788bc43d8330511af433bf282021a8fecb6b9009
-change-id: 20250830-tcpao_leak-f31ece59abe4
-
-Best regards,
--- 
-Christoph Paasch <cpaasch@openai.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="q50L9+H94gXo88jD"
+Content-Disposition: inline
+In-Reply-To: <20250830224614.6a124f82@foz.lan>
 
 
+--q50L9+H94gXo88jD
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Sat, Aug 30, 2025 at 10:46:22PM +0200, Mauro Carvalho Chehab wrote:
+> Em Fri, 29 Aug 2025 14:55:22 +0700
+> Bagas Sanjaya <bagasdotme@gmail.com> escreveu:
+> > -Please refer to the ALSA driver documentation for details of audio DMA.
+> > -https://www.kernel.org/doc/html/latest/sound/kernel-api/writing-an-als=
+a-driver.html
+> > +Please refer to the :doc:`ALSA driver documentation
+> > +<../kernel-api/writing-an-alsa-driver>` for details of audio DMA.
+>=20
+> Don't use relative paths for :doc:. They don't work well, specially
+> when one uses SPHINXDIRS.
+>=20
+> The best is o use Documentation/kernel-api/writing-an-alsa-driver.rst
+> and let automarkup figure it out. As we have a checker, broken
+> references generate warnings at build time.
+
+Thanks for the tip!
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--q50L9+H94gXo88jD
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaLOFGwAKCRD2uYlJVVFO
+o9MMAPwIm+r4BZdTF0jZV4Naj+z2WrUBji4gRFJQ4f97vYNhfgEAwX/UGgC71a9U
+lMJHF+utPAWnldcv9PoyPOBgO71EEAA=
+=C7rV
+-----END PGP SIGNATURE-----
+
+--q50L9+H94gXo88jD--
 
