@@ -1,124 +1,158 @@
-Return-Path: <netdev+bounces-218505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEC8DB3CEC1
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 20:44:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38404B3CEE3
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 21:03:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF41A7C41DA
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 18:43:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E88BD5E6212
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 19:03:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA2832DAFDE;
-	Sat, 30 Aug 2025 18:43:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EA4E2D879D;
+	Sat, 30 Aug 2025 19:03:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PBzU1Ts9"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="OzSy2vZw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFB342DAFC5;
-	Sat, 30 Aug 2025 18:43:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D7592DCF43;
+	Sat, 30 Aug 2025 19:03:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756579401; cv=none; b=LyRoAxRCd34uz/LxhdiNRgYPRUO8YgLULCRU4EwitoJy7Ta/8sUURFxrgikTXLoWvvzyaP2W6USzM3VZLzqWw5E88SPiRrlW35lskqSq5GwFLVbOkV6yTu2V3VEK7XC9EY5pwrxaOXDPqcjccVHJAfKzWkvy9sI0y0XhIzpYGGU=
+	t=1756580601; cv=none; b=clMcUWCsaKGxi+ht0HuXih+eV/G9MMSdxMALPVuRAMLtjjSPP9IlJJCEbGeJkUV5cXAwPwaqVwbd9qcqWubG+FqOjDyCuOlTEKRtXqs/B1Es6iIOm4/+rcSZblgAz+uTHmeUQ0aIvpiTOVg88dmazW4fDE0CIzv68CsJE60p2a0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756579401; c=relaxed/simple;
-	bh=c9xqtmLf/Uv9cBZ4HCVvZ/CLHcFtriX2GWiu52jCUC0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MLQAJjHdxWVmEFzX4XphG+X3eQHSdSlpeYVYjACSmOgwRwpn1C+MbPCf7t7O9R7+5CBgiGUw/15OpedIW4V1g7/aI18J1GGCW0JjdyqIqBo3lcAJS//H+s9K2S2RcyXvzWCbOhlU3NJaX9FnETQoloj7D3VOdQJENQMG9Zp3c8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PBzU1Ts9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EEF9C4CEF6;
-	Sat, 30 Aug 2025 18:43:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756579401;
-	bh=c9xqtmLf/Uv9cBZ4HCVvZ/CLHcFtriX2GWiu52jCUC0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PBzU1Ts9N6LqtM82PE0laXEuBe2fgFDv5+vQnLZHk0gFz8UBVnbm5/9whoOG+ATPM
-	 tCz0c9Wou4HbcltN2DEh3ljDztsc+8nZWSNtvWI57ajx33asewTPKkj9arbnSxXyzn
-	 A3lJJWnnpwyMGf6obA/aBydIBQoU9MOQgDHWeRqYqV6zATlSSu9ny5ISxJLBvD1S8g
-	 LZX2JNMl8ieFILsAwKrgNFv7PqAXFe0MX4zEnae3onSnSYizOHGfu3M1NcCm0M3CWL
-	 r1ILf4weiYTAxZx/FbwKDFpgMK5yUOyznpNV56JaJxN+iYMjJCaRtq4+Vy2njaSPrz
-	 mKpfI97GjHqqg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	joe@dama.to,
-	leitao@debian.org,
-	sdf@fomichev.me,
-	linux-kselftest@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 2/2] selftests: net: py: don't default to shell=True
-Date: Sat, 30 Aug 2025 11:43:17 -0700
-Message-ID: <20250830184317.696121-2-kuba@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250830184317.696121-1-kuba@kernel.org>
-References: <20250830184317.696121-1-kuba@kernel.org>
+	s=arc-20240116; t=1756580601; c=relaxed/simple;
+	bh=VIWxAub9v9Nc15TVtanbA94IbdHFmist+z2EzFE2cR0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nsQaV2jY1OYIwPjeCeBW2UFgENLtJ0Fr6a1XKPnDsMMkS2cStKCJre3F47FGx2y8k//ym3zzqYCRZJFHb00xMdHbW/sEaBhyGYyYUXIoSfoSBxL9IvFHC8npslNa1oU4+UTxlikcoQFbWYKTXJIp7AuGMRyXMmswV/ti970gleY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=OzSy2vZw; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=2zEd97eD2ST6z8QE5V+sbWWx834UK4nRASIGlcRaKT4=; b=OzSy2vZwcRjSz3EGgWN0bKaGEX
+	iEFlOxiyyqSCr9dXuigwYYK6xHuBmRZ/2kEV0aT2l3hiutPjbcs3iPxgMplsb353tascvVME9BbYD
+	21d/OA0gyGKQhzAucWVP5mFXLtjf31KMmpQ4sCcH84jxe3lK70aOsqkTcO2AVumVDXsu6xq2xu/Dk
+	8YaJcFjXNGwE4qahpWBFL/tpk9JB5tN/oTZOctWW5YruufJmdADvMERFvxU7zFWRJRZuJcuKEemez
+	0wmJZzqENEZEXaFyT/VCyzMpVsAl1ViM5qUBvOA+qBP7lrko20+IPExyS494Z4K2C2y2uK3DAC7wV
+	C6HdrysA==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <carnil@debian.org>)
+	id 1usQqs-00H2TD-9s; Sat, 30 Aug 2025 19:03:02 +0000
+Received: by eldamar.lan (Postfix, from userid 1000)
+	id 2D2FDBE2EE7; Sat, 30 Aug 2025 21:03:01 +0200 (CEST)
+Date: Sat, 30 Aug 2025 21:03:01 +0200
+From: Salvatore Bonaccorso <carnil@debian.org>
+To: Aaron Conole <aconole@redhat.com>, 1108860@bugs.debian.org,
+	Charles Bordet <rough.rock3059@datachamp.fr>
+Cc: Guillaume Nault <gnault@redhat.com>,
+	Stefano Brivio <sbrivio@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Charles Bordet <rough.rock3059@datachamp.fr>,
+	linux-kernel@vger.kernel.org, regressions@lists.linux.dev,
+	stable@vger.kernel.org
+Subject: Re: Bug#1108860: [regression] Wireguard fragmentation fails with
+ VXLAN since 8930424777e4 ("tunnels: Accept PACKET_HOST
+ skb_tunnel_check_pmtu().") causing network timeouts
+Message-ID: <aLNK5WOmkgzNrh8P@eldamar.lan>
+References: <aHVhQLPJIhq-SYPM@eldamar.lan>
+ <aHYiwvElalXstQVa@debian>
+ <e585ae4c.AMcAAHLjGYQAAAAAAAAABAFNqZcAAYCsWIwAAAAAAA3mswBoanLG@mailjet.com>
+ <f7tjz485mpk.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f7tjz485mpk.fsf@redhat.com>
+X-Debian-User: carnil
 
-Overhead of using shell=True is quite significant.
-Micro-benchmark of running ethtool --help shows that
-non-shell run is 2x faster.
+Hi,
 
-Runtime of the XDP tests also shows improvement:
-this patch: 2m34s 2m21s 2m18s 2m18s
-    before:     2m54s 2m36s 2m34s
+On Wed, Jul 16, 2025 at 08:44:55AM -0400, Aaron Conole wrote:
+> Guillaume Nault <gnault@redhat.com> writes:
+> 
+> > On Mon, Jul 14, 2025 at 09:57:52PM +0200, Salvatore Bonaccorso wrote:
+> >> Hi,
+> >> 
+> >> Charles Bordet reported the following issue (full context in
+> >> https://bugs.debian.org/1108860)
+> >> 
+> >> > Dear Maintainer,
+> >> > 
+> >> > What led up to the situation?
+> >> > We run a production environment using Debian 12 VMs, with a network
+> >> > topology involving VXLAN tunnels encapsulated inside Wireguard
+> >> > interfaces. This setup has worked reliably for over a year, with MTU set
+> >> > to 1500 on all interfaces except the Wireguard interface (set to 1420).
+> >> > Wireguard kernel fragmentation allowed this configuration to function
+> >> > without issues, even though the effective path MTU is lower than 1500.
+> >> > 
+> >> > What exactly did you do (or not do) that was effective (or ineffective)?
+> >> > We performed a routine system upgrade, updating all packages include the
+> >> > kernel. After the upgrade, we observed severe network issues (timeouts,
+> >> > very slow HTTP/HTTPS, and apt update failures) on all VMs behind the
+> >> > router. SSH and small-packet traffic continued to work.
+> >> > 
+> >> > To diagnose, we:
+> >> > 
+> >> > * Restored a backup (with the previous kernel): the problem disappeared.
+> >> > * Repeated the upgrade, confirming the issue reappeared.
+> >> > * Systematically tested each kernel version from 6.1.124-1 up to
+> >> > 6.1.140-1. The problem first appears with kernel 6.1.135-1; all earlier
+> >> > versions work as expected.
+> >> > * Kernel version from the backports (6.12.32-1) did not resolve the
+> >> > problem.
+> >> > 
+> >> > What was the outcome of this action?
+> >> > 
+> >> > * With kernel 6.1.135-1 or later, network timeouts occur for
+> >> > large-packet protocols (HTTP, apt, etc.), while SSH and small-packet
+> >> > protocols work.
+> >> > * With kernel 6.1.133-1 or earlier, everything works as expected.
+> >> > 
+> >> > What outcome did you expect instead?
+> >> > We expected the network to function as before, with Wireguard handling
+> >> > fragmentation transparently and no application-level timeouts,
+> >> > regardless of the kernel version.
+> >> 
+> >> While triaging the issue we found that the commit 8930424777e4
+> >> ("tunnels: Accept PACKET_HOST in skb_tunnel_check_pmtu()." introduces
+> >> the issue and Charles confirmed that the issue was present as well in
+> >> 6.12.35 and 6.15.4 (other version up could potentially still be
+> >> affected, but we wanted to check it is not a 6.1.y specific
+> >> regression).
+> >> 
+> >> Reverthing the commit fixes Charles' issue.
+> >> 
+> >> Does that ring a bell?
+> >
+> > It doesn't ring a bell. Do you have more details on the setup that has
+> > the problem? Or, ideally, a self-contained reproducer?
+> 
+> +1 - I tested this patch with an OVS setup using vxlan and geneve
+> tunnels.  A reproducer or more details would help.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- tools/testing/selftests/net/lib/py/utils.py | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+Charles, any news here, did you found a way to provide a
+self-contained reproducer for your issue?
 
-diff --git a/tools/testing/selftests/net/lib/py/utils.py b/tools/testing/selftests/net/lib/py/utils.py
-index b188cac49738..e7155b6db9a3 100644
---- a/tools/testing/selftests/net/lib/py/utils.py
-+++ b/tools/testing/selftests/net/lib/py/utils.py
-@@ -29,9 +29,12 @@ import time
-     """
-     Execute a command on local or remote host.
- 
-+    @shell defaults to false, and class will try to split @comm into a list
-+    if it's a string with spaces.
-+
-     Use bkg() instead to run a command in the background.
-     """
--    def __init__(self, comm, shell=True, fail=True, ns=None, background=False,
-+    def __init__(self, comm, shell=None, fail=True, ns=None, background=False,
-                  host=None, timeout=5, ksft_wait=None):
-         if ns:
-             comm = f'ip netns exec {ns} ' + comm
-@@ -45,6 +48,10 @@ import time
-         if host:
-             self.proc = host.cmd(comm)
-         else:
-+            # If user doesn't explicitly request shell try to avoid it.
-+            if shell is None and isinstance(comm, str) and ' ' in comm:
-+                comm = comm.split()
-+
-             # ksft_wait lets us wait for the background process to fully start,
-             # we pass an FD to the child process, and wait for it to write back.
-             # Similarly term_fd tells child it's time to exit.
-@@ -111,7 +118,7 @@ import time
- 
-         with bkg("my_binary", ksft_wait=5):
-     """
--    def __init__(self, comm, shell=True, fail=None, ns=None, host=None,
-+    def __init__(self, comm, shell=None, fail=None, ns=None, host=None,
-                  exit_wait=False, ksft_wait=None):
-         super().__init__(comm, background=True,
-                          shell=shell, fail=fail, ns=ns, host=host,
--- 
-2.51.0
+Does the issue still reproeduce for you on the most current version of
+each of the affected dstable series?
 
+Regards,
+Salvatore
 
