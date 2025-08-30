@@ -1,116 +1,158 @@
-Return-Path: <netdev+bounces-218481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E74FB3C970
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 10:52:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 442F5B3C988
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 10:55:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5023816DDF4
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 08:52:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CEF71BA6131
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 08:55:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38DAE24A054;
-	Sat, 30 Aug 2025 08:52:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCD3A238D42;
+	Sat, 30 Aug 2025 08:55:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="GuMcrSCS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cQZDp433"
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E39415BAF0;
-	Sat, 30 Aug 2025 08:51:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 446951DDA18;
+	Sat, 30 Aug 2025 08:55:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756543922; cv=none; b=HM6Orj4ke3D60a+EbFudE0smErQr7lrxuB/yRJH0l7Ia6eduuHoqvB3TAqyDYWqj+MzL9iYxw1eqcCEcjyHZCaT3aMsl5H6cm5vc2ZZUN7VjjVxAoSJ2DE9YIAYw8NIsKhxzjToxJOKkAJaQtYi4o1MeT+GsDy4G7HP6/O7spRI=
+	t=1756544118; cv=none; b=dCtLFO5QJVUHnZxuTXwexIkS3WXCZwE54lzsTzWfj4ySbzaI4+KSDB+iJ7jjyopAa89MYAxfp8I3otJmdBFEUPQ/wCaWhD4ABp6eLBl9mJhkL/tLyOf24IfYn0jSD2zxLn6aOp9tECnaURMxL8sE/K2OZOUvzCbW8SxIB1TFLzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756543922; c=relaxed/simple;
-	bh=LdU1RMECgRUSivnWM7MCoW1DKEMHMJgOPQkH0K6OPpM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PROcAue8buIucJ+NZsUK6REyOHTWyQB6IyjFc2s9pr0LrNaDA9cTuTzeZUMdaxmF5gM+p56l5szK3cfKfliIKlOqJK5YS1VayVBSvu2ULgBnO81TTAibF95FYpmQ6qvjcrQm6PFXanlnzqbsWwNTTKY8dwZqfcUosaJInEHfEnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=GuMcrSCS; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=XvJAs0oWctTv+IZjXYqOb/DT/digU3gWo9ZFZvSPVF4=; b=GuMcrSCSc2h6K85gbh7d/Dq9GZ
-	qdyNHDeRuMDOrQKt7Bo9CsxZu4fhi8uxonjr50DYybHV+WdJ7DHOoy71QzTrH5fU3B4gS3MrLLeJZ
-	1yb0tB9r6ZBYeK/9cTotchZKYSs9UNaevFwWoiFaYrA1kDvZB73V07IEjWM7icXmel06ejOyu5tRM
-	WEVmUV2x3M+JWaNqJjuInd5prsC/KbA4Dm0FGrf3ZmC4vszTKkk+/5RVJ8rZbwzjF/v6sclO9TSJ8
-	zA89ssT/UNPKwDgfBFykggaqbG5N2LfCnIeOoYXu2AZxIIqU3jrjVfeakPWp8OpxRJWoq6dq/+xUB
-	J8hgQp0Q==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1usH32-0017AV-0k;
-	Sat, 30 Aug 2025 16:50:53 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 30 Aug 2025 16:50:52 +0800
-Date: Sat, 30 Aug 2025 16:50:52 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Alexander Potapenko <glider@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Brendan Jackman <jackmanb@google.com>,
-	Christoph Lameter <cl@gentwo.org>, Dennis Zhou <dennis@kernel.org>,
-	Dmitry Vyukov <dvyukov@google.com>, dri-devel@lists.freedesktop.org,
-	intel-gfx@lists.freedesktop.org, iommu@lists.linux.dev,
-	io-uring@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	John Hubbard <jhubbard@nvidia.com>, kasan-dev@googlegroups.com,
-	kvm@vger.kernel.org, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	linux-arm-kernel@axis.com, linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org, linux-ide@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-mmc@vger.kernel.org, linux-mm@kvack.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Marco Elver <elver@google.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Michal Hocko <mhocko@suse.com>, Mike Rapoport <rppt@kernel.org>,
-	Muchun Song <muchun.song@linux.dev>, netdev@vger.kernel.org,
-	Oscar Salvador <osalvador@suse.de>, Peter Xu <peterx@redhat.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
-	virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
-	wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
-Subject: Re: [PATCH v1 32/36] crypto: remove nth_page() usage within SG entry
-Message-ID: <aLK7bP285OO83efR@gondor.apana.org.au>
-References: <20250827220141.262669-1-david@redhat.com>
- <20250827220141.262669-33-david@redhat.com>
+	s=arc-20240116; t=1756544118; c=relaxed/simple;
+	bh=i/mN1sgpxt2Dt6aoQYRdO4ESSsvQ5P9r2eVyi3rcGqI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XWCF75w+jENf3lZShL0RxFkpxh7OYEZuoNEU/+9pCHHUv7iehZzKfjR5VUjFMtcu4yYTQHTY0oR6wkfi1D2nFTQ5oKhzyWXXKJIoeDO9DpeqT9VmvFpyWB49tzIAwNakGh5PhFkqq+rx6xHD28UGA9dbPOtf+6MUhg5HHkVz9e8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cQZDp433; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7704799d798so2381529b3a.3;
+        Sat, 30 Aug 2025 01:55:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756544115; x=1757148915; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/g/9jlkjpAHQDAZ+36D2vqfG5gOdTRj2+Yr8N1lRDG4=;
+        b=cQZDp4330nHzVo9Y8zsIsyVABWViMsxek5eFQDydmWLewigJsEBLhzb88D0+GEpxGv
+         nHXh34BcyJ+e+RKbqLrgtD4p7u4wNA+oFdFxHcEESlsHs1gYmg1iDsvAXRtMd5b4METD
+         YZKg8FmJ2FWfLWEKswN8NmtugUfxFgE+7JvenXNgX8/vrmR1LhRI041tGJltZp1VehLf
+         UdLEnShPCfjS0EluLs7Rgtv89NDrodi7DpVkmQXEYU7ukbzXnMgTzib+VSquss7SE5Xw
+         kMvMeiZXXPsikcBfTkoeEn+F0VVbilxwngbOCqu0up+kNS17kOP2GUpV9s6Z+o7N1bgY
+         AwPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756544115; x=1757148915;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/g/9jlkjpAHQDAZ+36D2vqfG5gOdTRj2+Yr8N1lRDG4=;
+        b=wdgdwagNPdDBvTZsCZGeT+lZNLxYy43+Seb7VugnyUEY15P4csG1JuiB/4SmC7g0bS
+         1OoBsk52HPFTtnStssai07gfu5Mj0o+Fc0EbmB8eue0evZjsPc+45Ho7PvF2aWU/6BFl
+         hAaVf2RjsrHnGZr1BvABLE4HsBJNcDweGId26SarXG0tGCJaC09sziaZPXGpB9AdILiK
+         5tlAQNVTHdCZMBZe41sIUYXPmsiUqGsxUw32v66JjNgGwSFKO3iwVtpRd8sqd1ZQcPVx
+         RlaxNQyqq7Jxfix1H1oL20V+RAMP57dWYWyBhRYKYkzjMdSmWKX22I3EWL5i5+KThl0A
+         lEcg==
+X-Forwarded-Encrypted: i=1; AJvYcCVMVPFk41kRVbGNqWFInBNPddHtNLPe3E7pouO+w1miJba/Tsu2f6uhiqgy8rSHyQ0UkbTofurvZcLFIno=@vger.kernel.org, AJvYcCVQPRxKzo53AjW2WD94oWoLIhIn/pO3KuIBR4fXLPx+JGFuqjsUJGaFRXLoPwg6DkSI2URWjkIp@vger.kernel.org, AJvYcCWvHv53Io55YEg5mWStrz+kIOFJbEAM0c0KWfk/yvg+i7peW8266EaENt9wOxw3+LGZ6aST5qXa@vger.kernel.org
+X-Gm-Message-State: AOJu0YxI44j9tLPlYVK3cLl5b7J7+xIcwsLBN3zFxcceYFLHZcwKtrcU
+	jlmAXUWrIoSPM+EATEpY3X+bHmIkrs2mceqPlppRdCoXESNQlt9BIB4S
+X-Gm-Gg: ASbGnctej1H5bfxwftI9un3F3pdBJ1Bzoth4lrkH4ooHo8UBnO2JJfMxVGKHffI+6W5
+	d5FcwvP923j3DATdcAa9g0k1yECIfcUo9VWxgrH/ghwfCKQNAeGqA3X3r4z2lNpvANz4v0y0EkZ
+	CVDs12mafjxo92jTbFQYlxreTLTKClmqEQaja/h5MjR0ZNMJfQZiucJOvHkAlJt9O3SUfX2TNWj
+	ggfxiguzknbMoWHoHWTPXW6szoEJ6yHjgVZUueUHVUja0SP0p8983P48BOLWyZSNaZO4PkOT6F/
+	TP3vY2Fd7JRQoP4DAEkr+1btKsOVfh58q3i90RBnVDvD8gE3MVkfq0CVn1yJufFoX8mSz53FCB4
+	hOTMBXd4Az6O3vMu61nyBmsTVt5ELMEMjx8vl1eIhDIoY/A194yJ+RvIt/GwGeN19qBZ+H34TBr
+	CxltybnCKIdkMf/u8ftpLoGN8pkq8+vph0S72h/SMOeyPsfNleJM4BVwg=
+X-Google-Smtp-Source: AGHT+IFufVgDFn3jScqiTqDiEv4K379j2VpA4sl2gvYUjCnALZlR4vQ/abr6HCgG/Oy8R9lh6f5tZg==
+X-Received: by 2002:a05:6a00:4b56:b0:772:2c15:230e with SMTP id d2e1a72fcca58-7723e21e99fmr2115295b3a.6.1756544115367;
+        Sat, 30 Aug 2025 01:55:15 -0700 (PDT)
+Received: from vickymqlin-1vvu545oca.codev-2.svc.cluster.local ([14.22.11.163])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-7723d79fed2sm1426111b3a.9.2025.08.30.01.55.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 30 Aug 2025 01:55:14 -0700 (PDT)
+From: Miaoqian Lin <linmq006@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: linmq006@gmail.com,
+	stable@vger.kernel.org
+Subject: [PATCH] net: dsa: mv88e6xxx: Fix fwnode reference leaks in mv88e6xxx_port_setup_leds
+Date: Sat, 30 Aug 2025 16:55:08 +0800
+Message-Id: <20250830085508.2107507-1-linmq006@gmail.com>
+X-Mailer: git-send-email 2.35.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250827220141.262669-33-david@redhat.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Aug 28, 2025 at 12:01:36AM +0200, David Hildenbrand wrote:
-> It's no longer required to use nth_page() when iterating pages within a
-> single SG entry, so let's drop the nth_page() usage.
-> 
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  crypto/ahash.c               | 4 ++--
->  crypto/scompress.c           | 8 ++++----
->  include/crypto/scatterwalk.h | 4 ++--
->  3 files changed, 8 insertions(+), 8 deletions(-)
+Fix multiple fwnode reference leaks:
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+1. The function calls fwnode_get_named_child_node() to get the "leds" node,
+   but never calls fwnode_handle_put(leds) to release this reference.
 
-Thanks,
+2. Within the fwnode_for_each_child_node() loop, the early return
+   paths that don't properly release the "led" fwnode reference.
+
+This fix follows the same pattern as commit d029edefed39
+("net dsa: qca8k: fix usages of device_get_named_child_node()")
+
+Fixes: 94a2a84f5e9e ("net: dsa: mv88e6xxx: Support LED control")
+Cc: stable@vger.kernel.org
+Signed-off-by: Miaoqian Lin <linmq006@gmail.com>
+---
+ drivers/net/dsa/mv88e6xxx/leds.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/dsa/mv88e6xxx/leds.c b/drivers/net/dsa/mv88e6xxx/leds.c
+index 1c88bfaea46b..dcc765066f9c 100644
+--- a/drivers/net/dsa/mv88e6xxx/leds.c
++++ b/drivers/net/dsa/mv88e6xxx/leds.c
+@@ -779,6 +779,8 @@ int mv88e6xxx_port_setup_leds(struct mv88e6xxx_chip *chip, int port)
+ 			continue;
+ 		if (led_num > 1) {
+ 			dev_err(dev, "invalid LED specified port %d\n", port);
++			fwnode_handle_put(led);
++			fwnode_handle_put(leds);
+ 			return -EINVAL;
+ 		}
+ 
+@@ -823,17 +825,23 @@ int mv88e6xxx_port_setup_leds(struct mv88e6xxx_chip *chip, int port)
+ 		init_data.devname_mandatory = true;
+ 		init_data.devicename = kasprintf(GFP_KERNEL, "%s:0%d:0%d", chip->info->name,
+ 						 port, led_num);
+-		if (!init_data.devicename)
++		if (!init_data.devicename) {
++			fwnode_handle_put(led);
++			fwnode_handle_put(leds);
+ 			return -ENOMEM;
++		}
+ 
+ 		ret = devm_led_classdev_register_ext(dev, l, &init_data);
+ 		kfree(init_data.devicename);
+ 
+ 		if (ret) {
+ 			dev_err(dev, "Failed to init LED %d for port %d", led_num, port);
++			fwnode_handle_put(led);
++			fwnode_handle_put(leds);
+ 			return ret;
+ 		}
+ 	}
+ 
++	fwnode_handle_put(leds);
+ 	return 0;
+ }
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.35.1
+
 
