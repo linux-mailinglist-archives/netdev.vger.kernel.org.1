@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-218448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9A99B3C774
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 04:34:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50159B3C776
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 04:34:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 946833B382A
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 02:34:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 848AC1C87478
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 02:35:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B9CE255222;
-	Sat, 30 Aug 2025 02:34:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E9CE2571D8;
+	Sat, 30 Aug 2025 02:34:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C655B246BB4;
-	Sat, 30 Aug 2025 02:34:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0F7A255F2D;
+	Sat, 30 Aug 2025 02:34:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756521263; cv=none; b=khTbRNaQvuBgnLm7BvMJJoc0Z6VYG7ZhkmbQI0W5yvk+2s3xoXApUFkx0rQkQshJopjIUwVUWAAZhQSIw9QWT0hJKCQ0rhIvsbXKULlTQBCMZxMGiWCtDxfa5QiQ0QT94nmCkJI3IRDXpB/J729s0zaSGHWOyjbsYoYQIZL4pCA=
+	t=1756521273; cv=none; b=fUvGTT7MN0NwCrEez6fo7ci59z1YeZRJKZ77+/Tds07vcbbGF5f+zEOSR1+kc7FyiIHgXGTek0MhzeG5fzrR2JvPKZa658/3wLc++1crmsHpPHgTp4JEApr5+diymoIIZOmOIGwG8S0oNkaQ92A4oFoGq5wQX48fj1SGeEuh2tM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756521263; c=relaxed/simple;
-	bh=deyKaqoIbDYPp+TcOkRTM7HEptnmgyJYvqNyWoPEjOI=;
+	s=arc-20240116; t=1756521273; c=relaxed/simple;
+	bh=zZrzbEYXKnp9RaABqFj03QqtBzNpyYiXOKv5g9N5GY8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nWLHtDOV5nXyrlaAptRuOZY9PjqRCLUz6M5NVP9ScsgNEqwri/Cz5kw4KG83X12vb+Ydi8QaULbg41Chjr0POMgkEpk2tvSTz7gsJ1BCtHi2uyOS4Z0IrFOP+DzRtzpyezXcCa71lNs1kN1B8GHSZVGdXcQNDlul2K3ciSspthk=
+	 Content-Type:Content-Disposition:In-Reply-To; b=oBqgs31hOTYIkO5YgUFYD/oDXaEtwODQu3krW+veJGtqncOZ0eBaAn0lH2jP7ai4ypH0S7EwNPIA3vXp5GXOUXGIyrzCx0Mlp9yLA55eI2R0k8wn1j6OUf4cUnKMzocEMTvXOgk6ciigmxDrTaR208+f3L93f9MtrCZyQTb8CzI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,9 +33,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1usBQ1-000000005wr-0gj1;
-	Sat, 30 Aug 2025 02:34:17 +0000
-Date: Sat, 30 Aug 2025 03:34:13 +0100
+	id 1usBQB-000000005x5-1fiO;
+	Sat, 30 Aug 2025 02:34:27 +0000
+Date: Sat, 30 Aug 2025 03:34:23 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -55,9 +55,9 @@ Cc: Andreas Schirm <andreas.schirm@siemens.com>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next v4 4/6] net: dsa: lantiq_gswip: support offset of
- MII registers
-Message-ID: <88145164c1f948e4ae9b04706f408359cf54223c.1756520811.git.daniel@makrotopia.org>
+Subject: [PATCH net-next v4 5/6] net: dsa: lantiq_gswip: support standard
+ MDIO node name
+Message-ID: <5a9a3d659ef0d8b7eca37fb69ec87ff5a3192820.1756520811.git.daniel@makrotopia.org>
 References: <cover.1756520811.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -70,85 +70,36 @@ Content-Disposition: inline
 In-Reply-To: <cover.1756520811.git.daniel@makrotopia.org>
 
 
-The MaxLinear GSW1xx family got a single (R)(G)MII port at index 5 but
-the registers MII_PCDU and MII_CFG are those of port 0.
-Allow applying an offset for the port index to access those registers.
+Instead of matching against the child node's compatible string also
+support locating the node of the device tree node of the MDIO bus
+in the standard way by referencing the node name ("mdio").
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Reviewed-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
 Reviewed-by: Hauke Mehrtens <hauke@hauke-m.de>
 ---
-v4: fix syntax error introduced in v3
-v3: explicitely initialize mii_port_reg_offset to 0
+v4: no changes
+v3: no changes
 v2: no changes
 
- drivers/net/dsa/lantiq/lantiq_gswip.c | 14 ++++++++++++--
- drivers/net/dsa/lantiq/lantiq_gswip.h |  1 +
- 2 files changed, 13 insertions(+), 2 deletions(-)
+ drivers/net/dsa/lantiq/lantiq_gswip.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.c b/drivers/net/dsa/lantiq/lantiq_gswip.c
-index 3e2a54569828..4d7c7d933c92 100644
+index 4d7c7d933c92..43f83c0736d1 100644
 --- a/drivers/net/dsa/lantiq/lantiq_gswip.c
 +++ b/drivers/net/dsa/lantiq/lantiq_gswip.c
-@@ -183,21 +183,29 @@ static void gswip_mii_mask(struct gswip_priv *priv, u32 clear, u32 set,
- static void gswip_mii_mask_cfg(struct gswip_priv *priv, u32 clear, u32 set,
- 			       int port)
- {
-+	int reg_port;
-+
- 	/* MII_CFG register only exists for MII ports */
- 	if (!(priv->hw_info->mii_ports & BIT(port)))
- 		return;
+@@ -286,6 +286,9 @@ static int gswip_mdio(struct gswip_priv *priv)
+ 	int err = 0;
  
--	gswip_mii_mask(priv, clear, set, GSWIP_MII_CFGp(port));
-+	reg_port = port + priv->hw_info->mii_port_reg_offset;
+ 	mdio_np = of_get_compatible_child(switch_np, "lantiq,xrx200-mdio");
++	if (!mdio_np)
++		mdio_np = of_get_child_by_name(switch_np, "mdio");
 +
-+	gswip_mii_mask(priv, clear, set, GSWIP_MII_CFGp(reg_port));
- }
+ 	if (!of_device_is_available(mdio_np))
+ 		goto out_put_node;
  
- static void gswip_mii_mask_pcdu(struct gswip_priv *priv, u32 clear, u32 set,
- 				int port)
- {
-+	int reg_port;
-+
- 	/* MII_PCDU register only exists for MII ports */
- 	if (!(priv->hw_info->mii_ports & BIT(port)))
- 		return;
- 
--	switch (port) {
-+	reg_port = port + priv->hw_info->mii_port_reg_offset;
-+
-+	switch (reg_port) {
- 	case 0:
- 		gswip_mii_mask(priv, clear, set, GSWIP_MII_PCDU0);
- 		break;
-@@ -2027,6 +2035,7 @@ static const struct gswip_hw_info gswip_xrx200 = {
- 	.max_ports = 7,
- 	.allowed_cpu_ports = BIT(6),
- 	.mii_ports = BIT(0) | BIT(1) | BIT(5),
-+	.mii_port_reg_offset = 0,
- 	.phylink_get_caps = gswip_xrx200_phylink_get_caps,
- 	.pce_microcode = &gswip_pce_microcode,
- 	.pce_microcode_size = ARRAY_SIZE(gswip_pce_microcode),
-@@ -2037,6 +2046,7 @@ static const struct gswip_hw_info gswip_xrx300 = {
- 	.max_ports = 7,
- 	.allowed_cpu_ports = BIT(6),
- 	.mii_ports = BIT(0) | BIT(5),
-+	.mii_port_reg_offset = 0,
- 	.phylink_get_caps = gswip_xrx300_phylink_get_caps,
- 	.pce_microcode = &gswip_pce_microcode,
- 	.pce_microcode_size = ARRAY_SIZE(gswip_pce_microcode),
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.h b/drivers/net/dsa/lantiq/lantiq_gswip.h
-index 19bbe6fddf04..2df9c8e8cfd0 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip.h
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip.h
-@@ -233,6 +233,7 @@ struct gswip_hw_info {
- 	int max_ports;
- 	unsigned int allowed_cpu_ports;
- 	unsigned int mii_ports;
-+	int mii_port_reg_offset;
- 	const struct gswip_pce_microcode (*pce_microcode)[];
- 	size_t pce_microcode_size;
- 	enum dsa_tag_protocol tag_protocol;
 -- 
 2.51.0
 
