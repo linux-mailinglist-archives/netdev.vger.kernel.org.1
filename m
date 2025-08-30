@@ -1,171 +1,99 @@
-Return-Path: <netdev+bounces-218519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33BAAB3CF63
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 22:47:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32B7AB3CF87
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 23:27:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FF291B275EA
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 20:48:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFC2D20586E
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 21:27:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C3F82E7194;
-	Sat, 30 Aug 2025 20:46:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2B73275B1A;
+	Sat, 30 Aug 2025 21:27:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i7heKHiF"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="e+CtcqMH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52DA22E3E9;
-	Sat, 30 Aug 2025 20:46:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF9B7205E25;
+	Sat, 30 Aug 2025 21:27:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756586805; cv=none; b=u2aU5xddVY7qKtNoDRnDl9XtGKNb2k0UrUrEp6N461eNqxH1DrJVuEA16IdEBDwHyIKmrbG70+N1j9QjC5yq4yv/JRKE9s4dOReplvjW6/YDb2/Ac3Yb9E/aq4w3/wOwchsMdCcOnVS8l0wVB56z5HjGdAzzRpYkZjcAAoySAAg=
+	t=1756589258; cv=none; b=Z+XRIX1R3kFbPoXqc9maUijUrXJh5Lq8FtBpo7n6Qr99ArANGGTSZmVxf3wNSjCeNWExUDebmoBcwp4gM9knLL20ysI6UX3xSC9H3ezYtGHxWpl51naoADg69VlwTk3qWMqKr4HeDN2GscHFP0pkhNljoIPkkAtF5k78iwEFoNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756586805; c=relaxed/simple;
-	bh=N1RyWuUPncwemkQz+wtBxmmLRK1pbPwPhqaSXQEgACo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UFZJUH58/MwRGd5MuLNP1W83tWgg4a5s6LEjzihIZPVXco+98n3ImjxiBmopBZk8LHQ6bCJrTWMgG2jP6sprmNg0lnQrROK5GHuitwEaTBFOzO+B/ps+kO0Aqs7we1+DndvTPCqPwC+GpofZn/GYdd0eB89Q6jI5NusIKdlu7yQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i7heKHiF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF130C4CEEB;
-	Sat, 30 Aug 2025 20:46:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756586804;
-	bh=N1RyWuUPncwemkQz+wtBxmmLRK1pbPwPhqaSXQEgACo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=i7heKHiF1WEcWegbUMD1XKbmetMnNnCnljRU/sfGxpB5c3sZchsdHRdnTVLky717F
-	 dDeCNXpev8o9LRk1S9eXnS8o8kWvMacaFziEO6OdWtswKvTxZQ5pU4eCd2WUx5BQCO
-	 14bLFP5QVji02AMa5CJyqW/en6PTbHSnZ78vGj75ZZT/RVMFCiYHRoYXRol8qlqKgn
-	 3lrkJ1IYbZBkwoMZse44FP62uqEzr0WjQEZOzoSJLrIrlje9NRgPYVERWMHuVkMn2k
-	 2QurVWFt7IIr5AR3ahUSN1uV7FUBrHkmiXJe15aj9LzSrsbpHevBdir8lYlUv2SDdP
-	 83zxdoGwMwcyQ==
-Date: Sat, 30 Aug 2025 22:46:22 +0200
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux
- Documentation <linux-doc@vger.kernel.org>, Linux DAMON
- <damon@lists.linux.dev>, Linux Memory Management List <linux-mm@kvack.org>,
- Linux Power Management <linux-pm@vger.kernel.org>, Linux Block Devices
- <linux-block@vger.kernel.org>, Linux BPF <bpf@vger.kernel.org>, Linux
- Kernel Workflows <workflows@vger.kernel.org>, Linux KASAN
- <kasan-dev@googlegroups.com>, Linux Devicetree
- <devicetree@vger.kernel.org>, Linux fsverity <fsverity@lists.linux.dev>,
- Linux MTD <linux-mtd@lists.infradead.org>, Linux DRI Development
- <dri-devel@lists.freedesktop.org>, Linux Kernel Build System
- <linux-lbuild@vger.kernel.org>, Linux Networking <netdev@vger.kernel.org>,
- Linux Sound <linux-sound@vger.kernel.org>, Thomas Gleixner
- <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra
- <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@kernel.org>, Pawan Gupta
- <pawan.kumar.gupta@linux.intel.com>, Jonathan Corbet <corbet@lwn.net>,
- SeongJae Park <sj@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
- David Hildenbrand <david@redhat.com>, Lorenzo Stoakes
- <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>, Suren
- Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Huang Rui
- <ray.huang@amd.com>, "Gautham R. Shenoy" <gautham.shenoy@amd.com>, Mario
- Limonciello <mario.limonciello@amd.com>, Perry Yuan <perry.yuan@amd.com>,
- Jens Axboe <axboe@kernel.dk>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
- <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, KP
- Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo
- <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Dwaipayan Ray
- <dwaipayanray1@gmail.com>, Lukas Bulwahn <lukas.bulwahn@gmail.com>, Joe
- Perches <joe@perches.com>, Andrey Ryabinin <ryabinin.a.a@gmail.com>,
- Alexander Potapenko <glider@google.com>, Andrey Konovalov
- <andreyknvl@gmail.com>, Dmitry Vyukov <dvyukov@google.com>, Vincenzo
- Frascino <vincenzo.frascino@arm.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Eric Biggers <ebiggers@kernel.org>, tytso@mit.edu,
- Richard Weinberger <richard@nod.at>, Zhihao Cheng
- <chengzhihao1@huawei.com>, David Airlie <airlied@gmail.com>, Simona Vetter
- <simona@ffwll.ch>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann
- <tzimmermann@suse.de>, Nathan Chancellor <nathan@kernel.org>, Nicolas
- Schier <nicolas.schier@linux.dev>, Ingo Molnar <mingo@redhat.com>, Will
- Deacon <will@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, Waiman Long
- <longman@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Shay Agroskin
- <shayagr@amazon.com>, Arthur Kiyanovski <akiyano@amazon.com>, David Arinzon
- <darinzon@amazon.com>, Saeed Bishara <saeedb@amazon.com>, Andrew Lunn
- <andrew@lunn.ch>, Liam Girdwood <lgirdwood@gmail.com>, Mark Brown
- <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai
- <tiwai@suse.com>, Alexandru Ciobotaru <alcioa@amazon.com>, The AWS Nitro
- Enclaves Team <aws-nitro-enclaves-devel@amazon.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
- Steve French <stfrench@microsoft.com>, Meetakshi Setiya
- <msetiya@microsoft.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Martin K. Petersen" <martin.petersen@oracle.com>, Bart Van Assche
- <bvanassche@acm.org>, Thomas =?UTF-8?B?V2Vpw59zY2h1aA==?=
- <linux@weissschuh.net>, Masahiro Yamada <masahiroy@kernel.org>
-Subject: Re: [PATCH 12/14] ASoC: doc: Internally link to Writing an ALSA
- Driver docs
-Message-ID: <20250830224614.6a124f82@foz.lan>
-In-Reply-To: <20250829075524.45635-13-bagasdotme@gmail.com>
-References: <20250829075524.45635-1-bagasdotme@gmail.com>
-	<20250829075524.45635-13-bagasdotme@gmail.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1756589258; c=relaxed/simple;
+	bh=gOgiF7X0ZGiw78EqDu1KHpEzwtvNyU+rjXBNKACNj6g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=adEE34LdrudjNIkKF+1gayD291cQ+tzSIMRmzRtJprvtyM4wVKqTVNJ8atjIDoX1xMyjuvn2VxgdfQ98PAOhM57FhMhdC8UmB4ulTxAhDGg9pEwU8TaP3YuEPE6tY/4gqqeO5yXtwQ/WVeQGwMwBKpsBntSWX1plP+gEchSfC7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=e+CtcqMH; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=VLdSQW7+O0R1hhE3XjC/Wy7ssjU7PWHhYOnONnoYdgU=; b=e+CtcqMH5Dkqg+YMIEoQ+WwPOa
+	2FUxf10H6EbrNyJZgT3G1kwTA0R8GqFIQP4DLIU/ihIKnspRpa96TGG6U0ZcL+xgtdCPIgomfwBtd
+	i61RVfTXXxMzg006FakL++46JHX5D8Kxnh8+99gTOHamgwqm9Mr5EHhLlA1Y4ZP9SXd0fw8X8ICEa
+	WkdN9B3Ow7yhXn6YNoq8hBxtLGQ3mFqotIC1YEkiewqKH3j9oepeaiV3DnwhgtVHKleGVxZynBKKL
+	f+ZviAtD1mbJb8IfAsF+rhuoSOh/sOH/FeIOgH4fT4WQoO9yBBipj5s8Am259n4lYLEZkmCksCLWA
+	fjknDKYQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42508)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1usT6Y-000000004Sw-2Maq;
+	Sat, 30 Aug 2025 22:27:22 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1usT6V-000000005PN-1BOn;
+	Sat, 30 Aug 2025 22:27:19 +0100
+Date: Sat, 30 Aug 2025 22:27:19 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Shawn Guo <shawnguo@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Patrice Chotard <patrice.chotard@foss.st.com>,
+	Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	David Miller <davem@davemloft.net>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next 1/5] arm64: dts: ls1043a-qds: switch to new
+ fixed-link binding
+Message-ID: <aLNst1V_OSlvpC3t@shell.armlinux.org.uk>
+References: <a3c2f8d3-36e6-4411-9526-78abbc60e1da@gmail.com>
+ <fe4c021d-c188-4fc2-8b2f-9c3c269056eb@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fe4c021d-c188-4fc2-8b2f-9c3c269056eb@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Em Fri, 29 Aug 2025 14:55:22 +0700
-Bagas Sanjaya <bagasdotme@gmail.com> escreveu:
+On Sat, Aug 30, 2025 at 12:27:23PM +0200, Heiner Kallweit wrote:
+> The old array-type fixed-link binding has been deprecated
+> for more than 10 yrs. Switch to the new binding.
 
-> ASoC codec and platform driver docs contain reference to writing ALSA
-> driver docs, as an external link. Use :doc: directive for the job
-> instead.
-> 
-> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
-> ---
->  Documentation/sound/soc/codec.rst    | 4 ++--
->  Documentation/sound/soc/platform.rst | 4 ++--
->  2 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/Documentation/sound/soc/codec.rst b/Documentation/sound/soc/codec.rst
-> index af973c4cac9309..b9d87a4f929b5d 100644
-> --- a/Documentation/sound/soc/codec.rst
-> +++ b/Documentation/sound/soc/codec.rst
-> @@ -131,8 +131,8 @@ The codec driver also supports the following ALSA PCM operations:-
->  	int (*prepare)(struct snd_pcm_substream *);
->    };
->  
-> -Please refer to the ALSA driver PCM documentation for details.
-> -https://www.kernel.org/doc/html/latest/sound/kernel-api/writing-an-alsa-driver.html
-> +Please refer to the :doc:`ALSA driver PCM documentation
-> +<../kernel-api/writing-an-alsa-driver>` for details.
->  
->  
->  DAPM description
-> diff --git a/Documentation/sound/soc/platform.rst b/Documentation/sound/soc/platform.rst
-> index 7036630eaf016c..bd21d0a4dd9b0b 100644
-> --- a/Documentation/sound/soc/platform.rst
-> +++ b/Documentation/sound/soc/platform.rst
-> @@ -45,8 +45,8 @@ snd_soc_component_driver:-
->  	...
->    };
->  
-> -Please refer to the ALSA driver documentation for details of audio DMA.
-> -https://www.kernel.org/doc/html/latest/sound/kernel-api/writing-an-alsa-driver.html
-> +Please refer to the :doc:`ALSA driver documentation
-> +<../kernel-api/writing-an-alsa-driver>` for details of audio DMA.
+... and the fact we have device trees that use it today means that we
+can't remove support for it from the kernel.
 
-Don't use relative paths for :doc:. They don't work well, specially
-when one uses SPHINXDIRS.
+I think it would make sense to update the dts files, and add a noisy
+warning when we detect that it's being used to prevent future usage.
 
-The best is o use Documentation/kernel-api/writing-an-alsa-driver.rst
-and let automarkup figure it out. As we have a checker, broken
-references generate warnings at build time.
-
-Regards,
-Mauro
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
