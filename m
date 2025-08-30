@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-218458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2C58B3C7E6
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 06:32:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA412B3C7E7
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 06:32:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3263FA021EE
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 04:32:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0EE4F7B257F
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 04:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AAA7276050;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58142275B12;
 	Sat, 30 Aug 2025 04:32:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uihdNdqV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OYXdSlZr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EC642441B8;
-	Sat, 30 Aug 2025 04:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB9442049;
+	Sat, 30 Aug 2025 04:32:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756528325; cv=none; b=hDbE5eDCDU3KY27/RvqHiE1oyQfYRuznc9yK+OY+QwFAbkwduA1mwmrZH4YSdPk7SLuuzJCIllgX4Js0qLihFWTfUdFKAJA7qX6OBe0RAlb6CWHcFJ1yonk7iQKN3+C5H/2VtJ+rCrxbpV8sa6sIEgoIkkWWLy/TNbcBZO/wipA=
+	t=1756528325; cv=none; b=pT1hkEJEcfyTQHJjxzRiLfJCjuzgEMMdbb1nvgLwvs37RcBJAsAkNYExCkMtsX3w59fhhEN1MSfT0W+bWzuzNP3eYIhv1iTUiU2g31MiPdLFjisCeI7RBK3f+DiZPde9omGDAzdO0hCvfKeWi8uPxytZOZK8s+8kYTr8EFdSZ3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1756528325; c=relaxed/simple;
-	bh=gNLNZ+X3Iy+sc9bRa6aG1/3al1lMuyIusd2LE1dTVYY=;
+	bh=/m9qjhVFmxWX9LFYgkaUXe4e3QlluqJzCAUEzdyXVz0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=BeEBQ6lNQQJEuOKaV6jP3XhXiGTwzvS6ILht+W4vRAozjR1bFwR5yn1qr/dHiFPRxck3iRksGxjJZtt0qz0uPSMVn6qpH8H1RcIU/qZNvPdM4WvUapqc3y5UcZOfqibhWjKs2Rufqvm/BSO+G9Bi0Asu9ydeDu1xFpF6GNJnE0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uihdNdqV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B3DA2C4CEF4;
+	 In-Reply-To:To:Cc; b=pKzTRWkjgI0ckTj5kREoWfuDag8QuAUhrvcwdIjWo7dlwj5lXocSkqBVZyV2PxOUgloNjf7X7TzzzI0+7x6JmfhveKCqZefl6y96HmKPklQPL4SNMHNODUaKWF6ANKBvbywTGbDf1uxAUihXxyKzb8k5DDP81rHtge/hcF2XoGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OYXdSlZr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C6699C4CEF7;
 	Sat, 30 Aug 2025 04:32:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1756528324;
-	bh=gNLNZ+X3Iy+sc9bRa6aG1/3al1lMuyIusd2LE1dTVYY=;
+	bh=/m9qjhVFmxWX9LFYgkaUXe4e3QlluqJzCAUEzdyXVz0=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=uihdNdqVjKsS9WCnxKJQNMBW3xInu2q8m/0jtv3Dt7THbEMOuujN1zzJW1kjPA/Wx
-	 z6bzNL/8AEJG+B14289ykk4rB07gZpvkrF+v6Y5juw4vzSNz/LIBjXMDdQ9tZZt1Gq
-	 dbxQ4twG4npgm/Z5+lPzORq5D2NTVHtnDD/1Mr04DTbtetFzQrVx/aP3dJLV21yxoY
-	 RLguxdvzAw+SJWsjFrEscHyJRsfVxAb9QZEhV1FqqwbE4bfztqODaJkXbKuw1qqlwK
-	 9OhcZHWjoY7VkgWIr0zjW/gxpL0LhmA3ZxVXWa8n614var1bG24kKVLqqoFuyGR+0j
-	 Jeh/P1e0ErmsA==
+	b=OYXdSlZroLp95bzTnwT86vTPF3uubCV96eoWrKpzoPF2o396w4vDrg5FQ8xejtbmx
+	 5UywhcZvx7nGZHxU8Q0xZGR4CrV7Mc0yjiW/3MmmKYRIWLn2ZqV/tul28nYw/pf5dy
+	 8F7PyWXl4ztC1KDFhO3lzrULJ6/wpccQOU4DyJjwYje2N446+4ABqJ6ZaRfKEb0JFE
+	 Bt0CeuCeXTME9Ub/vuUJFpB1estoP6TfJzaiA2L9ht9xiN6LtrfQBwu5PognHSU+mC
+	 1y6mP17EW2REoHEsU9iPPCaFSfcwWC3A4wfQgfTJWMaUtOhadSX4d5mZLTONol0c3V
+	 ztnKkD3uCpEuw==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5214CA0EFF;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B702DCA1000;
 	Sat, 30 Aug 2025 04:32:04 +0000 (UTC)
 From: Dmitry Safonov via B4 Relay <devnull+dima.arista.com@kernel.org>
-Date: Sat, 30 Aug 2025 05:31:46 +0100
-Subject: [PATCH net-next v3 1/2] tcp: Destroy TCP-AO, TCP-MD5 keys in
- .sk_destruct()
+Date: Sat, 30 Aug 2025 05:31:47 +0100
+Subject: [PATCH net-next v3 2/2] tcp: Free TCP-AO/TCP-MD5 info/keys without
+ RCU
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,7 +56,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250830-b4-tcp-ao-md5-rst-finwait2-v3-1-9002fec37444@arista.com>
+Message-Id: <20250830-b4-tcp-ao-md5-rst-finwait2-v3-2-9002fec37444@arista.com>
 References: <20250830-b4-tcp-ao-md5-rst-finwait2-v3-0-9002fec37444@arista.com>
 In-Reply-To: <20250830-b4-tcp-ao-md5-rst-finwait2-v3-0-9002fec37444@arista.com>
 To: Eric Dumazet <edumazet@google.com>, 
@@ -69,11 +69,11 @@ Cc: Bob Gilligan <gilligan@arista.com>,
  Dmitry Safonov <0x7f454c46@gmail.com>, netdev@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Dmitry Safonov <dima@arista.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1756528313; l=8584;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1756528313; l=4256;
  i=dima@arista.com; s=20250521; h=from:subject:message-id;
- bh=yNKX38x/Qbn0Wg4mR8iN668dHZY0nJtnq65D+belwnE=;
- b=yYkniW1QGoh+sD7FqXt+Ynujg5VriEpSZIWi9wi5qX11EPhs/NNwAv4KJoVSkopKcG1zQCLl5
- 8/DDigNaa42C3PxDAsmCgb0ROTjPdYLoZxu7165LtJJrDDM34WIuZ2Q
+ bh=P64RHNAbzWoxqf+XTtQCld5UZ9RLOa3lgy1PDQwJoH4=;
+ b=6ZJTPwTyoWZ2UO2BjROhGlxUBaYN/EKB+w6UlcoVXBIzi7poz4freVfZQo7IOf8OVRtbY62PZ
+ tniskatGh21ADZxDVmoDnuPLubgXt5T+TnLLfDBSDMDUuiUs45EQjWC
 X-Developer-Key: i=dima@arista.com; a=ed25519;
  pk=/z94x2T59rICwjRqYvDsBe0MkpbkkdYrSW2J1G2gIcU=
 X-Endpoint-Received: by B4 Relay for dima@arista.com/20250521 with
@@ -83,162 +83,29 @@ Reply-To: dima@arista.com
 
 From: Dmitry Safonov <dima@arista.com>
 
-Currently there are a couple of minor issues with destroying the keys
-tcp_v4_destroy_sock():
+Now that the destruction of info/keys is delayed until the socket
+destructor, it's safe to use kfree() without an RCU callback.
+As either socket was yet in TCP_CLOSE state or the socket refcounter is
+zero and no one can discover it anymore, it's safe to release memory
+straight away.
+Similar thing was possible for twsk already.
 
-1. The socket is yet in TCP bind buckets, making it reachable for
-   incoming segments [on another CPU core], potentially available to send
-   late FIN/ACK/RST replies.
-
-2. There is at least one code path, where tcp_done() is called before
-   sending RST [kudos to Bob for investigation]. This is a case of
-   a server, that finished sending its data and just called close().
-
-   The socket is in TCP_FIN_WAIT2 and has RCV_SHUTDOWN (set by
-   __tcp_close())
-
-   tcp_v4_do_rcv()/tcp_v6_do_rcv()
-     tcp_rcv_state_process()            /* LINUX_MIB_TCPABORTONDATA */
-       tcp_reset()
-         tcp_done_with_error()
-           tcp_done()
-             inet_csk_destroy_sock()    /* Destroys AO/MD5 keys */
-     /* tcp_rcv_state_process() returns SKB_DROP_REASON_TCP_ABORT_ON_DATA */
-   tcp_v4_send_reset()                  /* Sends an unsigned RST segment */
-
-   tcpdump:
-> 22:53:15.399377 00:00:b2:1f:00:00 > 00:00:01:01:00:00, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 33929, offset 0, flags [DF], proto TCP (6), length 60)
->     1.0.0.1.34567 > 1.0.0.2.49848: Flags [F.], seq 2185658590, ack 3969644355, win 502, options [nop,nop,md5 valid], length 0
-> 22:53:15.399396 00:00:01:01:00:00 > 00:00:b2:1f:00:00, ethertype IPv4 (0x0800), length 86: (tos 0x0, ttl 64, id 51951, offset 0, flags [DF], proto TCP (6), length 72)
->     1.0.0.2.49848 > 1.0.0.1.34567: Flags [.], seq 3969644375, ack 2185658591, win 128, options [nop,nop,md5 valid,nop,nop,sack 1 {2185658590:2185658591}], length 0
-> 22:53:16.429588 00:00:b2:1f:00:00 > 00:00:01:01:00:00, ethertype IPv4 (0x0800), length 60: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
->     1.0.0.1.34567 > 1.0.0.2.49848: Flags [R], seq 2185658590, win 0, length 0
-> 22:53:16.664725 00:00:b2:1f:00:00 > 00:00:01:01:00:00, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
->     1.0.0.1.34567 > 1.0.0.2.49848: Flags [R], seq 2185658591, win 0, options [nop,nop,md5 valid], length 0
-> 22:53:17.289832 00:00:b2:1f:00:00 > 00:00:01:01:00:00, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
->     1.0.0.1.34567 > 1.0.0.2.49848: Flags [R], seq 2185658591, win 0, options [nop,nop,md5 valid], length 0
-
-  Note the signed RSTs later in the dump - those are sent by the server
-  when the fin-wait socket gets removed from hash buckets, by
-  the listener socket.
-
-Instead of destroying AO/MD5 info and their keys in inet_csk_destroy_sock(),
-slightly delay it until the actual socket .sk_destruct(). As shutdown'ed
-socket can yet send non-data replies, they should be signed in order for
-the peer to process them. Now it also matches how AO/MD5 gets destructed
-for TIME-WAIT sockets (in tcp_twsk_destructor()).
-
-This seems optimal for TCP-MD5, while for TCP-AO it seems to have an
-open problem: once RST get sent and socket gets actually destructed,
-there is no information on the initial sequence numbers. So, in case
-this last RST gets lost in the network, the server's listener socket
-won't be able to properly sign another RST. Nothing in RFC 1122
-prescribes keeping any local state after non-graceful reset.
-Luckily, BGP are known to use keep alive(s).
-
-While the issue is quite minor/cosmetic, these days monitoring network
-counters is a common practice and getting invalid signed segments from
-a trusted BGP peer can get customers worried.
-
-Investigated-by: Bob Gilligan <gilligan@arista.com>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
 Signed-off-by: Dmitry Safonov <dima@arista.com>
 ---
- include/net/tcp.h   |  4 ++++
- net/ipv4/tcp.c      | 27 +++++++++++++++++++++++++++
- net/ipv4/tcp_ipv4.c | 33 ++++++++-------------------------
- net/ipv6/tcp_ipv6.c |  8 ++++++++
- 4 files changed, 47 insertions(+), 25 deletions(-)
+ net/ipv4/tcp.c           | 17 +++--------------
+ net/ipv4/tcp_ao.c        |  5 ++---
+ net/ipv4/tcp_ipv4.c      |  4 ++--
+ net/ipv4/tcp_minisocks.c | 19 +++++--------------
+ 4 files changed, 12 insertions(+), 33 deletions(-)
 
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 16dc9cebb9d25832eac7a6ad590a9e9e47e85142..2141f0eab53452764c6eb04f924f9cc61aa8a30e 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -1931,6 +1931,7 @@ tcp_md5_do_lookup_any_l3index(const struct sock *sk,
- }
- 
- #define tcp_twsk_md5_key(twsk)	((twsk)->tw_md5_key)
-+void tcp_md5_destruct_sock(struct sock *sk);
- #else
- static inline struct tcp_md5sig_key *
- tcp_md5_do_lookup(const struct sock *sk, int l3index,
-@@ -1947,6 +1948,9 @@ tcp_md5_do_lookup_any_l3index(const struct sock *sk,
- }
- 
- #define tcp_twsk_md5_key(twsk)	NULL
-+static inline void tcp_md5_destruct_sock(struct sock *sk)
-+{
-+}
- #endif
- 
- int tcp_md5_alloc_sigpool(void);
 diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 9bc8317e92b7952871f07ae11a9c2eaa7d3a9e65..e2ec4ee0ff4a640e9e5501a0d93fc0ed312d488d 100644
+index e2ec4ee0ff4a640e9e5501a0d93fc0ed312d488d..254ca95d0c3c5c44029be0e84120c5e9fb9d4514 100644
 --- a/net/ipv4/tcp.c
 +++ b/net/ipv4/tcp.c
-@@ -412,6 +412,33 @@ static u64 tcp_compute_delivery_rate(const struct tcp_sock *tp)
- 	return rate64;
+@@ -413,27 +413,16 @@ static u64 tcp_compute_delivery_rate(const struct tcp_sock *tp)
  }
  
-+#ifdef CONFIG_TCP_MD5SIG
-+static void tcp_md5sig_info_free_rcu(struct rcu_head *head)
-+{
-+	struct tcp_md5sig_info *md5sig;
-+
-+	md5sig = container_of(head, struct tcp_md5sig_info, rcu);
-+	kfree(md5sig);
-+	static_branch_slow_dec_deferred(&tcp_md5_needed);
-+	tcp_md5_release_sigpool();
-+}
-+
-+void tcp_md5_destruct_sock(struct sock *sk)
-+{
-+	struct tcp_sock *tp = tcp_sk(sk);
-+
-+	if (tp->md5sig_info) {
-+		struct tcp_md5sig_info *md5sig;
-+
-+		md5sig = rcu_dereference_protected(tp->md5sig_info, 1);
-+		tcp_clear_md5_list(sk);
-+		rcu_assign_pointer(tp->md5sig_info, NULL);
-+		call_rcu(&md5sig->rcu, tcp_md5sig_info_free_rcu);
-+	}
-+}
-+EXPORT_SYMBOL_GPL(tcp_md5_destruct_sock);
-+#endif
-+
- /* Address-family independent initialization for a tcp_sock.
-  *
-  * NOTE: A lot of things set to zero explicitly by call to
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 7c1d612afca18b424b32ee5e97b99a68062d8436..68bb75bd419cdbfce17048252919996d764ddc1a 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -2494,6 +2494,13 @@ static const struct tcp_sock_af_ops tcp_sock_ipv4_specific = {
- 	.ao_calc_key_sk		= tcp_v4_ao_calc_key_sk,
- #endif
- };
-+
-+static void tcp4_destruct_sock(struct sock *sk)
-+{
-+	tcp_md5_destruct_sock(sk);
-+	tcp_ao_destroy_sock(sk, false);
-+	inet_sock_destruct(sk);
-+}
- #endif
- 
- /* NOTE: A lot of things set to zero explicitly by call to
-@@ -2509,23 +2516,12 @@ static int tcp_v4_init_sock(struct sock *sk)
- 
- #if defined(CONFIG_TCP_MD5SIG) || defined(CONFIG_TCP_AO)
- 	tcp_sk(sk)->af_specific = &tcp_sock_ipv4_specific;
-+	sk->sk_destruct = tcp4_destruct_sock;
- #endif
- 
- 	return 0;
- }
- 
--#ifdef CONFIG_TCP_MD5SIG
+ #ifdef CONFIG_TCP_MD5SIG
 -static void tcp_md5sig_info_free_rcu(struct rcu_head *head)
 -{
 -	struct tcp_md5sig_info *md5sig;
@@ -248,57 +115,100 @@ index 7c1d612afca18b424b32ee5e97b99a68062d8436..68bb75bd419cdbfce17048252919996d
 -	static_branch_slow_dec_deferred(&tcp_md5_needed);
 -	tcp_md5_release_sigpool();
 -}
--#endif
 -
- static void tcp_release_user_frags(struct sock *sk)
+ void tcp_md5_destruct_sock(struct sock *sk)
  {
- #ifdef CONFIG_PAGE_POOL
-@@ -2562,19 +2558,6 @@ void tcp_v4_destroy_sock(struct sock *sk)
- 	/* Cleans up our, hopefully empty, out_of_order_queue. */
- 	skb_rbtree_purge(&tp->out_of_order_queue);
+ 	struct tcp_sock *tp = tcp_sk(sk);
+ 
+ 	if (tp->md5sig_info) {
+-		struct tcp_md5sig_info *md5sig;
+ 
+-		md5sig = rcu_dereference_protected(tp->md5sig_info, 1);
+ 		tcp_clear_md5_list(sk);
+-		rcu_assign_pointer(tp->md5sig_info, NULL);
+-		call_rcu(&md5sig->rcu, tcp_md5sig_info_free_rcu);
++		kfree(rcu_replace_pointer(tp->md5sig_info, NULL, 1));
++		static_branch_slow_dec_deferred(&tcp_md5_needed);
++		tcp_md5_release_sigpool();
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(tcp_md5_destruct_sock);
+diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
+index bbb8d5f0eae7d3d8887da3fa4d68e248af9060ad..31302be78bc4450b56fa23a390b6d03b2262741d 100644
+--- a/net/ipv4/tcp_ao.c
++++ b/net/ipv4/tcp_ao.c
+@@ -268,9 +268,8 @@ static void tcp_ao_key_free_rcu(struct rcu_head *head)
+ 	kfree_sensitive(key);
+ }
+ 
+-static void tcp_ao_info_free_rcu(struct rcu_head *head)
++static void tcp_ao_info_free(struct tcp_ao_info *ao)
+ {
+-	struct tcp_ao_info *ao = container_of(head, struct tcp_ao_info, rcu);
+ 	struct tcp_ao_key *key;
+ 	struct hlist_node *n;
+ 
+@@ -310,7 +309,7 @@ void tcp_ao_destroy_sock(struct sock *sk, bool twsk)
+ 
+ 	if (!twsk)
+ 		tcp_ao_sk_omem_free(sk, ao);
+-	call_rcu(&ao->rcu, tcp_ao_info_free_rcu);
++	tcp_ao_info_free(ao);
+ }
+ 
+ void tcp_ao_time_wait(struct tcp_timewait_sock *tcptw, struct tcp_sock *tp)
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index 68bb75bd419cdbfce17048252919996d764ddc1a..f914bda25d8f5170395157b707d3bd2ef04267a1 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -1503,9 +1503,9 @@ void tcp_clear_md5_list(struct sock *sk)
+ 	md5sig = rcu_dereference_protected(tp->md5sig_info, 1);
+ 
+ 	hlist_for_each_entry_safe(key, n, &md5sig->head, node) {
+-		hlist_del_rcu(&key->node);
++		hlist_del(&key->node);
+ 		atomic_sub(sizeof(*key), &sk->sk_omem_alloc);
+-		kfree_rcu(key, rcu);
++		kfree(key);
+ 	}
+ }
+ 
+diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+index d1c9e40886463ca308f9f3682c4039f491e7555f..7c2ae07d8d5d2a18d6ce3210cc09ee5d9850ea29 100644
+--- a/net/ipv4/tcp_minisocks.c
++++ b/net/ipv4/tcp_minisocks.c
+@@ -377,26 +377,17 @@ void tcp_time_wait(struct sock *sk, int state, int timeo)
+ }
+ EXPORT_SYMBOL(tcp_time_wait);
  
 -#ifdef CONFIG_TCP_MD5SIG
--	/* Clean up the MD5 key list, if any */
--	if (tp->md5sig_info) {
--		struct tcp_md5sig_info *md5sig;
+-static void tcp_md5_twsk_free_rcu(struct rcu_head *head)
+-{
+-	struct tcp_md5sig_key *key;
 -
--		md5sig = rcu_dereference_protected(tp->md5sig_info, 1);
--		tcp_clear_md5_list(sk);
--		call_rcu(&md5sig->rcu, tcp_md5sig_info_free_rcu);
--		rcu_assign_pointer(tp->md5sig_info, NULL);
--	}
+-	key = container_of(head, struct tcp_md5sig_key, rcu);
+-	kfree(key);
+-	static_branch_slow_dec_deferred(&tcp_md5_needed);
+-	tcp_md5_release_sigpool();
+-}
 -#endif
--	tcp_ao_destroy_sock(sk, false);
 -
- 	/* Clean up a referenced TCP bind bucket. */
- 	if (inet_csk(sk)->icsk_bind_hash)
- 		inet_put_port(sk);
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index b4e56b8772730579cb85f10b147a15acce03f8e4..838171bb3212c1e8bbf809a2e10ea25a275518ff 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -2112,6 +2112,13 @@ static const struct tcp_sock_af_ops tcp_sock_ipv6_mapped_specific = {
- 	.ao_calc_key_sk	=	tcp_v4_ao_calc_key_sk,
- #endif
- };
-+
-+static void tcp6_destruct_sock(struct sock *sk)
-+{
-+	tcp_md5_destruct_sock(sk);
-+	tcp_ao_destroy_sock(sk, false);
-+	inet6_sock_destruct(sk);
-+}
- #endif
+ void tcp_twsk_destructor(struct sock *sk)
+ {
+ #ifdef CONFIG_TCP_MD5SIG
+ 	if (static_branch_unlikely(&tcp_md5_needed.key)) {
+ 		struct tcp_timewait_sock *twsk = tcp_twsk(sk);
  
- /* NOTE: A lot of things set to zero explicitly by call to
-@@ -2127,6 +2134,7 @@ static int tcp_v6_init_sock(struct sock *sk)
- 
- #if defined(CONFIG_TCP_MD5SIG) || defined(CONFIG_TCP_AO)
- 	tcp_sk(sk)->af_specific = &tcp_sock_ipv6_specific;
-+	sk->sk_destruct = tcp6_destruct_sock;
+-		if (twsk->tw_md5_key)
+-			call_rcu(&twsk->tw_md5_key->rcu, tcp_md5_twsk_free_rcu);
++		if (twsk->tw_md5_key) {
++			kfree(twsk->tw_md5_key);
++			static_branch_slow_dec_deferred(&tcp_md5_needed);
++			tcp_md5_release_sigpool();
++		}
+ 	}
  #endif
- 
- 	return 0;
+ 	tcp_ao_destroy_sock(sk, true);
 
 -- 
 2.42.2
