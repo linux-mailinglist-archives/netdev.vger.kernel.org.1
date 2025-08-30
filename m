@@ -1,78 +1,69 @@
-Return-Path: <netdev+bounces-218501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44374B3CDCA
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 19:07:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 636C1B3CE10
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 19:23:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABC6F1BA2323
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 17:07:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA9283B35DE
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 17:23:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF68B253359;
-	Sat, 30 Aug 2025 17:07:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 203CA27A460;
+	Sat, 30 Aug 2025 17:23:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="OXR6x/+x"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="oDY/fJIp"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-015.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-015.esa.us-west-2.outbound.mail-perimeter.amazon.com [50.112.246.219])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.smtpout.orange.fr (smtp-81.smtpout.orange.fr [80.12.242.81])
+	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FA9E10F2
-	for <netdev@vger.kernel.org>; Sat, 30 Aug 2025 17:07:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=50.112.246.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F0030CD85;
+	Sat, 30 Aug 2025 17:23:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756573634; cv=none; b=feFyRbZ9vEUuryckwayBMpLQhnFkJKl6RrU4qTgU7121poRBZRcykvKg+i8+Fy/7E9b1olhzpjVrI6ZDU2gTzkKKLdaFWYFuAsgHfiw0RnoZfT738JF8I/92/WNyZV8Kbx5nYTB/0f6gbHBYZ39tgx8GMKy+6q1Giqh/dXmluB4=
+	t=1756574589; cv=none; b=PdF65bxVPTFAOj0iQ8QClOFg6JkstWFAHzpTnlEPcStKphCSVWle03de/mhuKXFk5qBjDhFfNc1KhvCQtodCpGYmSuylFYpdczD3an8R+oha0NXlSWFb5UVBTNqw62BAU1BuZrmPddl3PLOag5wnFe5A2xPJqMEXi9PX/S74BJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756573634; c=relaxed/simple;
-	bh=N9tJRz5XsXgh7My06wwbviJr15zF1p3ehWyVNFEYpP0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uJ/PDzXzrubdplmIdHjanl7BDqtr/n2rcO1yGo443IX7vFe6paMs+O+fh3gbIL8qaEUciLbLBB9uAusSGzq3uSV+IQYVfOXm59nV2/XXrUnOVbBT4N3oyj194eGG6czPC4oenCWQ4/OjRpAr1yGIKz79qDOQ9oAGk+74DGme39A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=OXR6x/+x; arc=none smtp.client-ip=50.112.246.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1756573633; x=1788109633;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=vtoHwbnjMYaKkuefkVMlJvs69QCPincUUUT1mwg3QrU=;
-  b=OXR6x/+xc7aEuouicjdl7B378R3zm0phESHOpYJzhjhBWrazUCH6+oWZ
-   MuE+hwhp097ikCYc2pOqPh44gQpjGZvgwcXL5rT2t/nkuwlCPziyTr08H
-   LPl5r2WI4Jddd9eZFXIwHPKX0XFbSSr9KR+yNfU1+ZpBIFSxavj2ibJHq
-   e4imuo8CeK90TMXvKDvwiEsFFeLmp2u/aWNXEJDoIPoQ73vtnVh0tneVB
-   QoOJIYUc9ysKq9YrJrq20WwOXrGQdusb16YzVa5woTuDM0VmtI7sKV8Vq
-   xCbFLUJhC00FBIuAfIFlu0NxrjxDsTpPLl2P6ReKSvOUxO98WWuq2Qp8m
-   A==;
-X-CSE-ConnectionGUID: bAQNkEFQSbyErR0aiQQYcg==
-X-CSE-MsgGUID: YnHDzTZTRXWeWZSoEZ8kmA==
-X-IronPort-AV: E=Sophos;i="6.18,225,1751241600"; 
-   d="scan'208";a="1976103"
-Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
-  by internal-pdx-out-015.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2025 17:07:11 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:61962]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.28.142:2525] with esmtp (Farcaster)
- id 702d1bac-376b-4f8e-b9ff-04c77493302d; Sat, 30 Aug 2025 17:07:11 +0000 (UTC)
-X-Farcaster-Flow-ID: 702d1bac-376b-4f8e-b9ff-04c77493302d
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
- Sat, 30 Aug 2025 17:07:10 +0000
-Received: from b0be8375a521.amazon.com (10.37.245.7) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Sat, 30 Aug 2025 17:07:08 +0000
-From: Kohei Enju <enjuk@amazon.com>
-To: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
-CC: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
-	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Vitaly Lifshits
-	<vitaly.lifshits@intel.com>, <kohei.enju@gmail.com>, Kohei Enju
-	<enjuk@amazon.com>
-Subject: [PATCH v1 iwl-net] igc: power up PHY before link test
-Date: Sun, 31 Aug 2025 02:06:19 +0900
-Message-ID: <20250830170656.61496-1-enjuk@amazon.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1756574589; c=relaxed/simple;
+	bh=GDEf6P2LWJYMs+ydV4s3fgoSHiHRStGgW5xBJ9BGZ7s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h/ZyUH7B3cm9a76nxi3Fekqg9Y3y4L7bdQHsc7AZed2kJzrCeAetBskZ1gZ8PzN49a6RePTeoHUl6mWvjlgPFzDVt9JGEbxj9VsZAycKsHschkbSe7YKiKNHVfJYNiNCmbwaIesP1yIii/J6DfLTL/VK5wR4wXbh2EbO9m1mk+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=oDY/fJIp; arc=none smtp.client-ip=80.12.242.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from fedora.home ([IPv6:2a01:cb10:785:b00:8347:f260:7456:7662])
+	by smtp.orange.fr with ESMTPA
+	id sP9RuuBTkbhcosP9Ru4q4A; Sat, 30 Aug 2025 19:14:08 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1756574048;
+	bh=7b05OJImVDGdpWr2qdSSpne58sS8juqAprc2DtZui0A=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=oDY/fJIpH3H1fsFHgYEOCEcbhd9w9SXmZbYvUmwERSxAqL0b9AucBKeVrOdkobTmU
+	 MneZF9jVctqBYJig2w6ks8z2aFmyaeM3wgwM+XDlQWrmEeM+eLHpWi2/u0Np7/kmJn
+	 +TGBhuf73RtGuVhCj228GmYEWHtB5CBQVVoGemScz2y5NhUrhsIAHRyUs9/p36tAAn
+	 NPrN2U94bsyYnALZyqusyGY0aiMGSZTgtmuWEuqW4fVWNTx7ir6WIw37L0I095aBSE
+	 EjqezbITzby1Z7b4HjGXhKO5tbN2ch0f33k/DbtPDFEkLCDem7G11bS1SIDKErze3N
+	 1FYplBiaLsQHA==
+X-ME-Helo: fedora.home
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Sat, 30 Aug 2025 19:14:08 +0200
+X-ME-IP: 2a01:cb10:785:b00:8347:f260:7456:7662
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Helmut Buchsbaum <helmut.buchsbaum@gmail.com>
+Cc: linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	netdev@vger.kernel.org
+Subject: [PATCH net] net: dsa: ks8995: Fix some error handling path in ks8995_probe()
+Date: Sat, 30 Aug 2025 19:13:59 +0200
+Message-ID: <95be5a0c504611263952d850124f053fd6204e94.1756573982.git.christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,73 +71,64 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWC001.ant.amazon.com (10.13.139.241) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-The current implementation of igc driver doesn't power up PHY before
-link test in igc_ethtool_diag_test(), causing the link test to always
-report FAIL when admin state is down and PHY is consequently powered
-down.
+If an error occurs after calling gpiod_set_value_cansleep(..., 0), it must
+be undone by a corresponding gpiod_set_value_cansleep(..., 1) call as
+already done in the remove function.
 
-To test the link state regardless of admin state, let's power up PHY in
-case of PHY down before link test.
+In order to easily do the needed clean-up in the probe, add a new
+devm_add_action_or_reset() call and simplify the remove function
+accordingly.
 
-Tested on Intel Corporation Ethernet Controller I226-V (rev 04) with
-cable connected and link available.
-
-Set device down and do ethtool test.
-  # ip link set dev enp0s5 down
-
-Without patch:
-  # ethtool --test enp0s5
-  The test result is FAIL
-  The test extra info:
-  Register test  (offline)         0
-  Eeprom test    (offline)         0
-  Interrupt test (offline)         0
-  Loopback test  (offline)         0
-  Link test   (on/offline)         1
-
-With patch:
-  # ethtool --test enp0s5
-  The test result is PASS
-  The test extra info:
-  Register test  (offline)         0
-  Eeprom test    (offline)         0
-  Interrupt test (offline)         0
-  Loopback test  (offline)         0
-  Link test   (on/offline)         0
-
-Fixes: f026d8ca2904 ("igc: add support to eeprom, registers and link self-tests")
-Signed-off-by: Kohei Enju <enjuk@amazon.com>
+Fixes: cd6f288cbaab ("net: phy: spi_ks8995: add support for resetting switch using GPIO")
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 ---
-This patch uses igc_power_up_phy_copper() instead of igc_power_up_link()
-to avoid PHY reset. The function only clears MII_CR_POWER_DOWN bit
-without performing PHY reset, so it should not cause the autoneg
-interference issue explained in the following comment:
-    /* Link test performed before hardware reset so autoneg doesn't
-     * interfere with test result
-     */
+Compile tested only
 ---
- drivers/net/ethernet/intel/igc/igc_ethtool.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/net/dsa/ks8995.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-index f3e7218ba6f3..ca93629b1d3a 100644
---- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-@@ -2094,6 +2094,9 @@ static void igc_ethtool_diag_test(struct net_device *netdev,
- 		netdev_info(adapter->netdev, "Offline testing starting");
- 		set_bit(__IGC_TESTING, &adapter->state);
+diff --git a/drivers/net/dsa/ks8995.c b/drivers/net/dsa/ks8995.c
+index 5c4c83e00477..debb2cd7ab61 100644
+--- a/drivers/net/dsa/ks8995.c
++++ b/drivers/net/dsa/ks8995.c
+@@ -742,6 +742,14 @@ static const struct dsa_switch_ops ks8995_ds_ops = {
+ 	.phylink_get_caps = ks8995_phylink_get_caps,
+ };
  
-+		/* power up PHY for link test */
-+		igc_power_up_phy_copper(&adapter->hw);
++static void devm_reset_assert(void *data)
++{
++	struct ks8995_switch *ks = data;
 +
- 		/* Link test performed before hardware reset so autoneg doesn't
- 		 * interfere with test result
++	/* assert reset */
++	gpiod_set_value_cansleep(ks->reset_gpio, 1);
++}
++
+ /* ------------------------------------------------------------------------ */
+ static int ks8995_probe(struct spi_device *spi)
+ {
+@@ -784,6 +792,11 @@ static int ks8995_probe(struct spi_device *spi)
  		 */
+ 		gpiod_set_value_cansleep(ks->reset_gpio, 0);
+ 		udelay(100);
++
++		err = devm_add_action_or_reset(&spi->dev,
++					       devm_reset_assert, ks);
++		if (err)
++			return err;
+ 	}
+ 
+ 	spi_set_drvdata(spi, ks);
+@@ -834,8 +847,6 @@ static void ks8995_remove(struct spi_device *spi)
+ 	struct ks8995_switch *ks = spi_get_drvdata(spi);
+ 
+ 	dsa_unregister_switch(ks->ds);
+-	/* assert reset */
+-	gpiod_set_value_cansleep(ks->reset_gpio, 1);
+ }
+ 
+ /* ------------------------------------------------------------------------ */
 -- 
-2.48.1
+2.51.0
 
 
