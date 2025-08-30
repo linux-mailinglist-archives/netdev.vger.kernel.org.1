@@ -1,92 +1,91 @@
-Return-Path: <netdev+bounces-218482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218483-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 442F5B3C988
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 10:55:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1A42B3C9BB
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 11:19:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CEF71BA6131
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 08:55:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10B4E1BA6289
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 09:19:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCD3A238D42;
-	Sat, 30 Aug 2025 08:55:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 605D525A33E;
+	Sat, 30 Aug 2025 09:19:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cQZDp433"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aPwM9+0s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 446951DDA18;
-	Sat, 30 Aug 2025 08:55:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E73CA2580E2;
+	Sat, 30 Aug 2025 09:19:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756544118; cv=none; b=dCtLFO5QJVUHnZxuTXwexIkS3WXCZwE54lzsTzWfj4ySbzaI4+KSDB+iJ7jjyopAa89MYAxfp8I3otJmdBFEUPQ/wCaWhD4ABp6eLBl9mJhkL/tLyOf24IfYn0jSD2zxLn6aOp9tECnaURMxL8sE/K2OZOUvzCbW8SxIB1TFLzU=
+	t=1756545546; cv=none; b=dZT/GKg3wKGBVSqHuiBsZC2r7Gc0Bx4E2xKiCxaIO0CScMxB7GvPg7hABKzWNjW+PVX9j35mpzHgLJ2P5LlAzoeDpPvJooWkHTjG2jOn6FP81mFZl+EskO8QZqWCM5gQ3864LzMIvfcFtfRgPuQmF/GK8Rr+xb9YwiK69zO9jPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756544118; c=relaxed/simple;
-	bh=i/mN1sgpxt2Dt6aoQYRdO4ESSsvQ5P9r2eVyi3rcGqI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XWCF75w+jENf3lZShL0RxFkpxh7OYEZuoNEU/+9pCHHUv7iehZzKfjR5VUjFMtcu4yYTQHTY0oR6wkfi1D2nFTQ5oKhzyWXXKJIoeDO9DpeqT9VmvFpyWB49tzIAwNakGh5PhFkqq+rx6xHD28UGA9dbPOtf+6MUhg5HHkVz9e8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cQZDp433; arc=none smtp.client-ip=209.85.210.175
+	s=arc-20240116; t=1756545546; c=relaxed/simple;
+	bh=wjQj2NN723j/SAiLZdQVT4vv0CxVrRicn94T4FBYcMY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FeejSKSJ5DvRJS3Kq22MvZW7SnFNr03efEWmIMgdRyp6O0nDn8RGO7v7DBeo3uz6k0mOmKNYFb3t6kfluJF9AH/0XGfGw09MzrASMmB3KB1o6Rq8u3czxSMrpY+dsGdjuephmF7LkMlpMr+daO81MEPtEU1IWE+RtvOW5UG3SKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aPwM9+0s; arc=none smtp.client-ip=209.85.214.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7704799d798so2381529b3a.3;
-        Sat, 30 Aug 2025 01:55:15 -0700 (PDT)
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-24879ed7c17so21652165ad.1;
+        Sat, 30 Aug 2025 02:19:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756544115; x=1757148915; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1756545544; x=1757150344; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/g/9jlkjpAHQDAZ+36D2vqfG5gOdTRj2+Yr8N1lRDG4=;
-        b=cQZDp4330nHzVo9Y8zsIsyVABWViMsxek5eFQDydmWLewigJsEBLhzb88D0+GEpxGv
-         nHXh34BcyJ+e+RKbqLrgtD4p7u4wNA+oFdFxHcEESlsHs1gYmg1iDsvAXRtMd5b4METD
-         YZKg8FmJ2FWfLWEKswN8NmtugUfxFgE+7JvenXNgX8/vrmR1LhRI041tGJltZp1VehLf
-         UdLEnShPCfjS0EluLs7Rgtv89NDrodi7DpVkmQXEYU7ukbzXnMgTzib+VSquss7SE5Xw
-         kMvMeiZXXPsikcBfTkoeEn+F0VVbilxwngbOCqu0up+kNS17kOP2GUpV9s6Z+o7N1bgY
-         AwPw==
+        bh=swuwTOihjSF334nInAXr6n8SBY2/7NVKEbQuAYBhpKU=;
+        b=aPwM9+0soMkycw9lSE0c4wf6dAoMucyerGYp5Bt/yxWPd1oCtdYWGQrTZzYLkZUIne
+         6JZzADY57lkMBVU1Oft/HFEEyQ1JSUMThiV90ZknK+F+MzlW2x7JFs7Tr/Shw5ryg+Fb
+         SAEku2VVsu4xWKUqGg1Ivpkx8vhVSnhLk3xxeJ40aqMDNVKlCYOGVu5H6lmih2ovmd1S
+         MNDW5kyZKS3/wz3DxUWVl8NuBL5lwk8d/zm1UxlUpgN7W5Bk0XY6lmlA25EV+YAOn87n
+         va6pmvXbxk9ejysLsQ2iCfVERRZn2nN9daTBityJbWSNc5qiY1V++vY3VhdI8tfwmh5n
+         6SFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756544115; x=1757148915;
+        d=1e100.net; s=20230601; t=1756545544; x=1757150344;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=/g/9jlkjpAHQDAZ+36D2vqfG5gOdTRj2+Yr8N1lRDG4=;
-        b=wdgdwagNPdDBvTZsCZGeT+lZNLxYy43+Seb7VugnyUEY15P4csG1JuiB/4SmC7g0bS
-         1OoBsk52HPFTtnStssai07gfu5Mj0o+Fc0EbmB8eue0evZjsPc+45Ho7PvF2aWU/6BFl
-         hAaVf2RjsrHnGZr1BvABLE4HsBJNcDweGId26SarXG0tGCJaC09sziaZPXGpB9AdILiK
-         5tlAQNVTHdCZMBZe41sIUYXPmsiUqGsxUw32v66JjNgGwSFKO3iwVtpRd8sqd1ZQcPVx
-         RlaxNQyqq7Jxfix1H1oL20V+RAMP57dWYWyBhRYKYkzjMdSmWKX22I3EWL5i5+KThl0A
-         lEcg==
-X-Forwarded-Encrypted: i=1; AJvYcCVMVPFk41kRVbGNqWFInBNPddHtNLPe3E7pouO+w1miJba/Tsu2f6uhiqgy8rSHyQ0UkbTofurvZcLFIno=@vger.kernel.org, AJvYcCVQPRxKzo53AjW2WD94oWoLIhIn/pO3KuIBR4fXLPx+JGFuqjsUJGaFRXLoPwg6DkSI2URWjkIp@vger.kernel.org, AJvYcCWvHv53Io55YEg5mWStrz+kIOFJbEAM0c0KWfk/yvg+i7peW8266EaENt9wOxw3+LGZ6aST5qXa@vger.kernel.org
-X-Gm-Message-State: AOJu0YxI44j9tLPlYVK3cLl5b7J7+xIcwsLBN3zFxcceYFLHZcwKtrcU
-	jlmAXUWrIoSPM+EATEpY3X+bHmIkrs2mceqPlppRdCoXESNQlt9BIB4S
-X-Gm-Gg: ASbGnctej1H5bfxwftI9un3F3pdBJ1Bzoth4lrkH4ooHo8UBnO2JJfMxVGKHffI+6W5
-	d5FcwvP923j3DATdcAa9g0k1yECIfcUo9VWxgrH/ghwfCKQNAeGqA3X3r4z2lNpvANz4v0y0EkZ
-	CVDs12mafjxo92jTbFQYlxreTLTKClmqEQaja/h5MjR0ZNMJfQZiucJOvHkAlJt9O3SUfX2TNWj
-	ggfxiguzknbMoWHoHWTPXW6szoEJ6yHjgVZUueUHVUja0SP0p8983P48BOLWyZSNaZO4PkOT6F/
-	TP3vY2Fd7JRQoP4DAEkr+1btKsOVfh58q3i90RBnVDvD8gE3MVkfq0CVn1yJufFoX8mSz53FCB4
-	hOTMBXd4Az6O3vMu61nyBmsTVt5ELMEMjx8vl1eIhDIoY/A194yJ+RvIt/GwGeN19qBZ+H34TBr
-	CxltybnCKIdkMf/u8ftpLoGN8pkq8+vph0S72h/SMOeyPsfNleJM4BVwg=
-X-Google-Smtp-Source: AGHT+IFufVgDFn3jScqiTqDiEv4K379j2VpA4sl2gvYUjCnALZlR4vQ/abr6HCgG/Oy8R9lh6f5tZg==
-X-Received: by 2002:a05:6a00:4b56:b0:772:2c15:230e with SMTP id d2e1a72fcca58-7723e21e99fmr2115295b3a.6.1756544115367;
-        Sat, 30 Aug 2025 01:55:15 -0700 (PDT)
-Received: from vickymqlin-1vvu545oca.codev-2.svc.cluster.local ([14.22.11.163])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-7723d79fed2sm1426111b3a.9.2025.08.30.01.55.12
+        bh=swuwTOihjSF334nInAXr6n8SBY2/7NVKEbQuAYBhpKU=;
+        b=YwRiZjP7r626YW4hfx96GFURXUlN8s+cILUmO7SoOQbyqu7w25SgwUiqI9fGhXGCqb
+         QMLC26t3opZbDDoLrflgJkmwJjNnCN+QcXsSHez6RsmmFvQceUHQStFzxdptT5wBtYdp
+         ORxP6f78BLqjqZlxoo5CXlDwx95lE+ZUXdfJRp9Fncz5w0xUaolp5g0xQ8bNfdWMfFk6
+         pEeCkVrQfyDYelyEY8AmnVeVpvHmuNQPaBV4BqXfnSJ5ANi9BP9Qbk88ZDgFcRwGt6nE
+         9sAQnBHbErC6ydpJ3vmKWWfMX+sIQY8yx5ogAL2VG4Njg+khZfil5cfPaNVuTvjzIZij
+         bGxw==
+X-Forwarded-Encrypted: i=1; AJvYcCVgG+owAC9Q+yvrwCVSn6nq6pAjqhOTPkeS0umh24WDmGz9bUUpYWuQsJA03cVQwloaq220MI77PYJz0YI=@vger.kernel.org, AJvYcCWi3YD1jds+hqVyf+g8BRolH0d5yYQVROx+eqBPaoW7vS6R8x11b7PD4BfslM8Ky/aVfQV9Mcth@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBwJVGfYoX6fX/n88u7TyueLp42Zud/jGGl/mfp6xsKTRtFMyf
+	A+H8ScL0AVIQgJYKIeEt2bmReZIxqlaoATI1+r3xuVI7onVbMl1Hc713
+X-Gm-Gg: ASbGncuO2sM+/8Azmfk8NeQ8m75wItnHJSFniKuwIpxNZsB0ELqpHQPOEhvsIYQdZ7m
+	NEB5rPfdTX4O63w53LxX7Ivfy6U9HhzwZtBgpXfClRnPy/LJnf9KwUWSh2bCSYcylJnQkYjtyVE
+	wi0ZqYiGR29wbReVFzz3WKLmTN6d1Jj7xmyGcHVc/MfmOLK3K8Psej7Wy0RmVJiNvEaWOgJJ7j+
+	zrhhIfRl/6gCdT1LvdhgnYNwIyBhmIHazwy9ZRuKpcOTF7OGZ1//nPKQEbaRg2z6eTGscrlGSHB
+	y+jggf/Vhp3WhMGaC6s57qF6TgcicIEbWCvo1nJMPk2lXeco78nRq8shtAsYDUFAIBgowsnZidG
+	NMGZeSaW33WNH2J36ZxPYIdyNfqK3eLUeTvFHd2RxrjPTonnXM8kJnIuNrye7UvqJ/U7MG2DjWm
+	HXNK4Pmyd9pXVchmYD9UKe+3EQsFgIWU/7Ix2edwuaP3rCOOZx7knxJF8=
+X-Google-Smtp-Source: AGHT+IHVFhMFKNWmGcs+78QWdioehssK2kGmk59gfKYn3K0XRhTFqEdm6P/MAWoZT+AMqqLbj+C10Q==
+X-Received: by 2002:a17:902:f612:b0:249:2360:6af2 with SMTP id d9443c01a7336-249448db16bmr19943185ad.16.1756545544271;
+        Sat, 30 Aug 2025 02:19:04 -0700 (PDT)
+Received: from vickymqlin-1vvu545oca.codev-2.svc.cluster.local ([14.22.11.164])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-24903726d20sm46606905ad.36.2025.08.30.02.18.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 30 Aug 2025 01:55:14 -0700 (PDT)
+        Sat, 30 Aug 2025 02:19:03 -0700 (PDT)
 From: Miaoqian Lin <linmq006@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
+To: Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Cc: linmq006@gmail.com,
-	stable@vger.kernel.org
-Subject: [PATCH] net: dsa: mv88e6xxx: Fix fwnode reference leaks in mv88e6xxx_port_setup_leds
-Date: Sat, 30 Aug 2025 16:55:08 +0800
-Message-Id: <20250830085508.2107507-1-linmq006@gmail.com>
+Cc: linmq006@gmail.com
+Subject: [PATCH] net: mvpp2: Fix refcount leak in mvpp2_use_acpi_compat_mode
+Date: Sat, 30 Aug 2025 17:18:54 +0800
+Message-Id: <20250830091854.2111062-1-linmq006@gmail.com>
 X-Mailer: git-send-email 2.35.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -96,62 +95,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Fix multiple fwnode reference leaks:
+The function calls fwnode_get_named_child_node()
+to check for a "fixed-link" child.
+It did not release the reference if present, causing a refcount leak.
 
-1. The function calls fwnode_get_named_child_node() to get the "leds" node,
-   but never calls fwnode_handle_put(leds) to release this reference.
-
-2. Within the fwnode_for_each_child_node() loop, the early return
-   paths that don't properly release the "led" fwnode reference.
-
-This fix follows the same pattern as commit d029edefed39
-("net dsa: qca8k: fix usages of device_get_named_child_node()")
-
-Fixes: 94a2a84f5e9e ("net: dsa: mv88e6xxx: Support LED control")
-Cc: stable@vger.kernel.org
+Fixes: dfce1bab8fdc ("net: mvpp2: enable using phylink with ACPI")
 Signed-off-by: Miaoqian Lin <linmq006@gmail.com>
 ---
- drivers/net/dsa/mv88e6xxx/leds.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/dsa/mv88e6xxx/leds.c b/drivers/net/dsa/mv88e6xxx/leds.c
-index 1c88bfaea46b..dcc765066f9c 100644
---- a/drivers/net/dsa/mv88e6xxx/leds.c
-+++ b/drivers/net/dsa/mv88e6xxx/leds.c
-@@ -779,6 +779,8 @@ int mv88e6xxx_port_setup_leds(struct mv88e6xxx_chip *chip, int port)
- 			continue;
- 		if (led_num > 1) {
- 			dev_err(dev, "invalid LED specified port %d\n", port);
-+			fwnode_handle_put(led);
-+			fwnode_handle_put(leds);
- 			return -EINVAL;
- 		}
+diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+index 8ebb985d2573..1faed2ec3f4f 100644
+--- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
++++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+@@ -6801,12 +6801,22 @@ static void mvpp2_acpi_start(struct mvpp2_port *port)
+  */
+ static bool mvpp2_use_acpi_compat_mode(struct fwnode_handle *port_fwnode)
+ {
++	struct fwnode_handle *fixed_link;
++
+ 	if (!is_acpi_node(port_fwnode))
+ 		return false;
  
-@@ -823,17 +825,23 @@ int mv88e6xxx_port_setup_leds(struct mv88e6xxx_chip *chip, int port)
- 		init_data.devname_mandatory = true;
- 		init_data.devicename = kasprintf(GFP_KERNEL, "%s:0%d:0%d", chip->info->name,
- 						 port, led_num);
--		if (!init_data.devicename)
-+		if (!init_data.devicename) {
-+			fwnode_handle_put(led);
-+			fwnode_handle_put(leds);
- 			return -ENOMEM;
-+		}
- 
- 		ret = devm_led_classdev_register_ext(dev, l, &init_data);
- 		kfree(init_data.devicename);
- 
- 		if (ret) {
- 			dev_err(dev, "Failed to init LED %d for port %d", led_num, port);
-+			fwnode_handle_put(led);
-+			fwnode_handle_put(leds);
- 			return ret;
- 		}
- 	}
- 
-+	fwnode_handle_put(leds);
- 	return 0;
+-	return (!fwnode_property_present(port_fwnode, "phy-handle") &&
+-		!fwnode_property_present(port_fwnode, "managed") &&
+-		!fwnode_get_named_child_node(port_fwnode, "fixed-link"));
++	if (fwnode_property_present(port_fwnode, "phy-handle") ||
++	    fwnode_property_present(port_fwnode, "managed"))
++		return false;
++
++	fixed_link = fwnode_get_named_child_node(port_fwnode, "fixed-link");
++	if (fixed_link) {
++		fwnode_handle_put(fixed_link);
++		return false;
++	}
++
++	return true;
  }
+ 
+ /* Ports initialization */
 -- 
 2.35.1
 
