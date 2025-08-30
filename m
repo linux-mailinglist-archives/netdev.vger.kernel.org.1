@@ -1,133 +1,93 @@
-Return-Path: <netdev+bounces-218443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45AD1B3C768
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 04:30:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B3D5B3C766
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 04:30:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A82601C25B7A
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 02:30:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BEA5E207E5C
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 02:30:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A535B253B40;
-	Sat, 30 Aug 2025 02:30:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6EF253B40;
+	Sat, 30 Aug 2025 02:29:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fNDU22+y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZzpZCQ7W"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7D023ED5E;
-	Sat, 30 Aug 2025 02:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A339649620;
+	Sat, 30 Aug 2025 02:29:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756521015; cv=none; b=UQAnEbQvF2mXt8N8hFljbiYYuEpyuXeq2hkofQ1okwpzrhfUmhxXpoNtSaCiFSfWSIwv2O08lSGTJtSGmP0RZPswN1vEVVib1P1a0z7Cnra56YXdoaTQZtCJLpoRx8URIgYx6bvH0rqdJj1d5ri0cImqhlYkV2rN+4yc2vyJ058=
+	t=1756520999; cv=none; b=b4e5ldiA99fVgqEV3+BZklHK19Ki6q20DawpkDehzE1uspru1Uk7/vBDh6/3ZXTpAtJ47bQx9G418tZRJCWxGvSWjVj9Oj/uEed9kg2mHRyw81TSZWNwSRORSyKHjYSg+dTI0CeNadOJBJASGhdxQnS0ChfSiWXe+I0PyDVRZH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756521015; c=relaxed/simple;
-	bh=D5gt15k78aHffTEzhKrTPz95Mjin89dpWbHlnRGerss=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CvlQR0oe8FRldlFfgJ4Yx0YANaak18aXfxKDzmMseNaOhebqtR8+R8dl8MZtXU+Ngqafh0oaOOV9ifiLb1AMiKY+qIk5vWPvD6suihiroacFOPK2gqi7vp0fknMyp14k3vZ9GblFDQakEOOJH8eTminM7aDM0nnDGi6Sf0vfne8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fNDU22+y; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=OnwhoC0SsZmmVunPqr+tDslY/DJMsLPr1yvnJgJ3Mek=; b=fN
-	DU22+yNhWuKk2c9vEZuWSKSiuGLMVYg4FNYgaxd/8q2ZcayCrTEymITZh1BMfDvXvkoAVB8cPPXcK
-	8tEAGx4O3Xfy0x+qwG81Q2LJBnckaj8YBWqYiBKFHAhW65WRQ3iBvbyrWJS6NbilCBPIlqd2q6P7e
-	wVZ+JNOAVP+sVhA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1usBLl-006XyV-K0; Sat, 30 Aug 2025 04:29:53 +0200
-Date: Sat, 30 Aug 2025 04:29:53 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: mohammad Hosseini <moahmmad.hosseinii@gmail.com>
-Cc: nic_swsd@realtek.com, hkallweit1@gmail.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/1] r8169: hardening and stability improvements
-Message-ID: <02d0999c-af6b-4bc1-846a-7da7f88e3f6a@lunn.ch>
-References: <CAG_zHVWVqe-TXXB8XJQrJiim5uWinzuTQysVnJ8EC5UopktWkg@mail.gmail.com>
+	s=arc-20240116; t=1756520999; c=relaxed/simple;
+	bh=iO8i4jS+Hrnhhh2IGAjFkAK9JIpwWrYBnh/MvEx9im8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=JkydYraSutfPvD2UaZ2tjpPsJ4pBDMHIgMzhaqN8Qlt5JlbkqCWPTHHZLkAmDqEs4KnVFMSiHq7Loj8HPGF62AXdLN3xBeP0kq9ymQQDeJTUUYOnYXKjD6ENzD2d/S+lQLRqXtTbLczkeUEWi/GH6eFNtuQ+3fBKvZZ9gB/zp8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZzpZCQ7W; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A98EC4CEF0;
+	Sat, 30 Aug 2025 02:29:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756520999;
+	bh=iO8i4jS+Hrnhhh2IGAjFkAK9JIpwWrYBnh/MvEx9im8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ZzpZCQ7WGOiReFKppX7V5wPpQCV1xPxIKRKXjJ9zf7q1UIXSd8KEiKBEwVxaZO/CW
+	 b99YD8gwjJU5pzCX54liEJ5Z2d4f06pzoBGkaazxHzyl5vlbXeZv0sGij4L43CJ6FU
+	 SsF/Tdpmfr32diA7LFKzMWq8s+xZG0SYHlW0p/V39iWf9/5TBtSXy6ozMc0OyBR/DC
+	 3p2Y+CYZIIohQY8M/dugSRYZWEOcA/MMNRUTXoPcC2M6YD+LF8zC57dmG7W+L97MqE
+	 4QcYuywebj3BGmJp+Ym0EQCcXvkgrJlpxysdzP8ABCXJPEe0XHEpWlHlncvqJlH1RG
+	 yso45XXx8EDow==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAC91383BF75;
+	Sat, 30 Aug 2025 02:30:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAG_zHVWVqe-TXXB8XJQrJiim5uWinzuTQysVnJ8EC5UopktWkg@mail.gmail.com>
+Subject: Re: [PATCH] mISDN: Fix memory leak in dsp_hwec_enable()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175652100575.2399666.16495764980082221988.git-patchwork-notify@kernel.org>
+Date: Sat, 30 Aug 2025 02:30:05 +0000
+References: <20250828081457.36061-1-linmq006@gmail.com>
+In-Reply-To: <20250828081457.36061-1-linmq006@gmail.com>
+To: Miaoqian Lin <linmq006@gmail.com>
+Cc: isdn@linux-pingi.de, labbott@redhat.com, davem@davemloft.net,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Sat, Aug 30, 2025 at 02:21:18AM +0330, mohammad Hosseini wrote:
-> From 40b549f1f955a177729374b73b58ec89d40f37a7 Mon Sep 17 00:00:00 2001
-> From: mohammad amin hosseini <moahmmad.hosseinii@gmail.com>
-> Date: Fri, 29 Aug 2025 21:18:21 +0000
-> Subject: [PATCH 1/1] r8169: hardening and stability improvements
-> 
-> This patch improves robustness and reliability of the r8169 driver. The
-> changes cover buffer management, interrupt handling, parameter validation,
-> and resource cleanup.
-> 
-> While the updates touch multiple areas, they are interdependent parts of a
-> cohesive hardening effort. Splitting them would leave intermediate states
-> with incomplete validation.
-> 
-> Key changes:
-> - Buffer handling: add packet length checks, NUMA-aware fallback allocation,
->   descriptor zero-initialization, and memory barriers.
-> - Interrupt handling: fix return codes, selective NAPI scheduling, and
->   improved SYSErr handling for RTL_GIGA_MAC_VER_52.
-> - Parameter validation: stricter RX/TX bounds checking and consistent
->   error codes.
-> - Resource management: safer workqueue shutdown, proper clock lifecycle,
->   WARN_ON for unexpected device states.
-> - Logging: use severity-appropriate levels, add rate limiting, and extend
->   statistics tracking.
-> 
-> Testing:
-> - Kernel builds and module loads without warnings.
-> - Runtime tested in QEMU (rtl8139 emulation).
-> - Hardware validation requested from community due to lack of local device.
-> 
-> Signed-off-by: Mohammad Amin Hosseini <moahmmad.hosseinii@gmail.com>
-> ---
->  drivers/net/ethernet/realtek/r8169_main.c | 150 ++++++++++++++++++----
->  1 file changed, 123 insertions(+), 27 deletions(-)
-> 
-> rtl8169_private *tp,
->   int node = dev_to_node(d);
->   dma_addr_t mapping;
->   struct page *data;
-> + gfp_t gfp_flags = GFP_KERNEL;
->  
-> - data = alloc_pages_node(node, GFP_KERNEL, get_order(R8169_RX_BUF_SIZE));
-> - if (!data)
-> - return NULL;
-> + /* Use atomic allocation in interrupt/atomic context */
-> + if (in_atomic() || irqs_disabled())
-> + gfp_flags = GFP_ATOMIC;
-> +
-> + data = alloc_pages_node(node, gfp_flags, get_order(R8169_RX_BUF_SIZE));
-> + if (unlikely(!data)) {
-> + /* Try fallback allocation on any node if local node fails */
-> + data = alloc_pages(gfp_flags | __GFP_NOWARN, get_order(R8169_RX_BUF_SIZE));
-> + if (unlikely(!data)) {
-> + if (net_ratelimit())
-> + netdev_err(tp->dev, "Failed to allocate RX buffer\n");
-> + return NULL;
-> + }
+Hello:
 
-As you can see, your patch is whitespace damaged. Please try to use
-"get send-email", or "b4 send" to avoid these issues.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-    Andrew
+On Thu, 28 Aug 2025 16:14:57 +0800 you wrote:
+> dsp_hwec_enable() allocates dup pointer by kstrdup(arg),
+> but then it updates dup variable by strsep(&dup, ",").
+> As a result when it calls kfree(dup), the dup variable may be
+> a modified pointer that no longer points to the original allocated
+> memory, causing a memory leak.
+> 
+> The issue is the same pattern as fixed in commit c6a502c22999
+> ("mISDN: Fix memory leak in dsp_pipeline_build()").
+> 
+> [...]
 
----
-pw-bot: cr
+Here is the summary with links:
+  - mISDN: Fix memory leak in dsp_hwec_enable()
+    https://git.kernel.org/netdev/net/c/0704a3da7ce5
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
