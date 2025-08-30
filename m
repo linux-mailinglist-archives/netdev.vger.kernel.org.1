@@ -1,76 +1,63 @@
-Return-Path: <netdev+bounces-218461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CB28B3C8F2
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 09:55:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EA8AAB3C908
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 10:09:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42ED53B4FAC
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 07:55:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A46607C5CEC
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 08:09:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A99E2820A4;
-	Sat, 30 Aug 2025 07:55:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="dct/rQSw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A536F28488A;
+	Sat, 30 Aug 2025 08:09:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-57-49.mail.qq.com (out162-62-57-49.mail.qq.com [162.62.57.49])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 953F61863E;
-	Sat, 30 Aug 2025 07:55:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C154D5BAF0;
+	Sat, 30 Aug 2025 08:09:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756540519; cv=none; b=YJ32JgF47CHyX+VaEWTzdabIoHpao4HVhqPcb/FMM38W0DWEQQBnfGHxS5gfN7izNamdPlR6iwdMc7UdsNavVsRBptsSo2Yezlom+7PFLt7V7peimmuqToUqGg9Nc7upwau0LDAQk5bRsEdt5o7613w1wDIDe1h/adbFPImyqF4=
+	t=1756541347; cv=none; b=p2SXVrLySeV0JibfU310fojjB/IZoLg9LHxDDos7P6SBn7rrmFU8sDNVOMnYUs2Fvz7AwfgmZO6yt68JDR7UpNWms6to5NC6Q+FOCOHFO2hWQeXARysQDhNzzltA/BztuY/81nYUOGIBmWWDyDBWd7w8lCAmboVsu6LW5//b14U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756540519; c=relaxed/simple;
-	bh=T8ihf112g9u2f1A9yPNf17Zec+yVLlF4arukt8xeoQs=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=CYijnCqx8InDvGhy8g/+Fk438/TaYk+0kZNYWIX+dYSdx599NxX019tVJ9ziDNMjDT/Kv1PAB8lfneZx0wed1elcgDNCmuQQ8/RjrpIwsIKsi3gJkEGW2ZW8Bn3/5ZFmtif9CJVqQdRh53pjMaQbEmtyekv6UltLc2nOQoziUfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=dct/rQSw; arc=none smtp.client-ip=162.62.57.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1756540205;
-	bh=yaTeFtLRO5tvXwPuK3rKpMfJKgvbP8eLKfJv8XhYE/E=;
-	h=From:To:Cc:Subject:Date;
-	b=dct/rQSwlt79RFPAMIP52jgvAGu7jjpYGGxPv8iR5+/sT9io8wdEWpN2TaXrYWv3Q
-	 1E3E4WHmXw2f9IUn77RMsoVofn9RtDAPLLMx2z4kyxgDv+KlnR5uvGrx6lDpePS7tN
-	 feWrlfdCuY55wQBJsp23ad+jawqEFXh2nudJ9GuA=
-Received: from localhost.localdomain ([112.94.77.11])
-	by newxmesmtplogicsvrszc43-0.qq.com (NewEsmtp) with SMTP
-	id C8218037; Sat, 30 Aug 2025 15:50:02 +0800
-X-QQ-mid: xmsmtpt1756540202trj8vozal
-Message-ID: <tencent_C4014DA405A96C2E1E7FEFCC050BA56D5B08@qq.com>
-X-QQ-XMAILINFO: OTdDBJCpIhk9YryqmrHQtsEp+/lwYhUS9DFHYK/IsJuP7YXgWWHRrpoAOKMZIm
-	 yxUQWHU3sc+dLmQ1g+hxGaYVmbwe6UPze307lhPbC7iQQm3JbrcVjmGxsSObXmCcvdnURNVxFEgp
-	 5G7JRNEDaGjXYJw8dlfLip3AFBBNvDS+17czoeX5u/eK3In2ae/eYV8G50N35SOknKUI4sEvHvYE
-	 y3HXAQ8fxqj4gnhRoeDgzAq/tlHdWWD4CN5B2X66KdOEsLCEWUB2PyXawpOiA21Ex4f4m8Yd01Eu
-	 MrD6hpq4xvEbqh4vdMSCn5V4X9t6ClFo3NCgW++GjdkCJn49IUe7XGhhGFhD2rfE9sSjlb5i8rQi
-	 EH0IIbeXpAluFzaFOdvO4spbXdS4KWxXYADOuTYQnDURp4qzqBVNywgLv6Kq3WlRXsA0qXGPnuoB
-	 6eP8FQhvjNq8v+v5sMv7vlGGXgKF0S3WmlUPkXUcKyVLS2bc/vQS3KASTooeeOtNwbsPf2yKcSHI
-	 H71GXsIPkEjP0KaRfYqhpLHnCKPYu4sTO7K/O3Bc1oXdCuxVDQhADNvqOf1HcguvjN4ZL0JB5HoV
-	 c+sLW+SToDy5zBA3VBRbziQpb09FQdplg7ReC6lrr0apO0yBZ/n/2vUPXlnu1rHRC9tI66GuFHFs
-	 3azBMM5LENOgA8R9OzFbkN9OO8s5SfKoZrwKb4G4EJUQJRmoiWB8/0OROnPzMpLPNfHfpjtQJRdo
-	 0MJlARI6QP2d/HoUJznZ6H2kg6twkyKHRXbuSAEyApPZ72I8vr3OHJqOGDmC1fvMH0xO/+vj9HW0
-	 9kdadXktzkpT+GtlCb5fWmQCcsBjJdyUkWKVAG6TRkWx3PRarIQmUrCvrFQkTIX1tHpVZLAUwscg
-	 LBBzULMczLxBOrsTQU8Z9BWvG0KSRd/izEPPfrx5iUCzrd55FWJQyTKVz85k/fNJYPFHRFnEp/Qn
-	 Abvrw4L2twZZgpT2oHF6n0c9W+Ms5W7RgQrPS9mommQJEUCGPhdBN/7FVO7K0uamndjs8g/Y+kjr
-	 yG320g2HdvsamQiwOvz09Ij6Gtk7jy76sd8rMc0ESpSg4p0u0L0QUQ51wnGmc=
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
-From: Conley Lee <conleylee@foxmail.com>
-To: kuba@kernel.org,
-	davem@davemloft.net,
-	wens@csie.org,
-	mripard@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Conley Lee <conleylee@foxmail.com>
-Subject: [PATCH 2/2] net: ethernet: sun4i-emac: enable dma rx in sun4i
-Date: Sat, 30 Aug 2025 15:50:00 +0800
-X-OQ-MSGID: <20250830075000.2665991-1-conleylee@foxmail.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1756541347; c=relaxed/simple;
+	bh=ls65F/Hknrwv3SVQwAnPoHC5dLqTgZUBtyTQdcAyacs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SUb7vrE1LafAEttyc90pdsx4txDXJyU81BVH3f40J5R7wt294mYzfNPB0CLq4UWlAMYnO1R9io4mlIwLAS8WCttswwNHVddQCg2gOcYe8sPBIFlnVaMvG1b2posv4HVyliLVusCuwmo+ygS37sRVEgy4zhepcmm91HOoGbyCs5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4cDSPf2ZjMz24hsn;
+	Sat, 30 Aug 2025 16:05:58 +0800 (CST)
+Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
+	by mail.maildlp.com (Postfix) with ESMTPS id A7711140155;
+	Sat, 30 Aug 2025 16:08:59 +0800 (CST)
+Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.189.55) by
+ kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sat, 30 Aug 2025 16:08:58 +0800
+From: Fan Gong <gongfan1@huawei.com>
+To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	<linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Bjorn Helgaas
+	<helgaas@kernel.org>, luosifu <luosifu@huawei.com>, Xin Guo
+	<guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>, Zhou
+ Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
+	<shijing34@huawei.com>, Meny Yossefi <meny.yossefi@huawei.com>, Gur Stavi
+	<gur.stavi@huawei.com>, Lee Trager <lee@trager.us>, Michael Ellerman
+	<mpe@ellerman.id.au>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, Suman
+ Ghosh <sumang@marvell.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Joe Damato <jdamato@fastly.com>, Christophe JAILLET
+	<christophe.jaillet@wanadoo.fr>
+Subject: [PATCH net-next v03 00/14] net: hinic3: Add a driver for Huawei 3rd gen NIC - sw and hw initialization
+Date: Sat, 30 Aug 2025 16:08:39 +0800
+Message-ID: <cover.1756524443.git.zhuyikai1@h-partners.com>
+X-Mailer: git-send-email 2.51.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,31 +65,95 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemf100013.china.huawei.com (7.202.181.12)
 
-The current sun4i-emac driver supports receiving data packets using DMA,
-but this feature is not enabled in the device tree (dts) configuration.
-This patch enables the DMA receive option in the dts file.
+This is [3/3] part of hinic3 Ethernet driver initial submission.
+With this patch hinic3 becomes a functional Ethernet driver.
 
-Signed-off-by: Conley Lee <conleylee@foxmail.com>
----
- arch/arm/boot/dts/allwinner/sun4i-a10.dtsi | 2 ++
- 1 file changed, 2 insertions(+)
+The driver parts contained in this patch:
+Memory allocation and initialization of the driver structures.
+Management interfaces initialization.
+HW capabilities probing, initialization and setup using management
+interfaces.
+Net device open/stop implementation and data queues initialization.
+Register VID:DID in PCI id_table.
+Fix netif_queue_set_napi usage.
 
-diff --git a/arch/arm/boot/dts/allwinner/sun4i-a10.dtsi b/arch/arm/boot/dts/allwinner/sun4i-a10.dtsi
-index 51a6464aa..b20ef5841 100644
---- a/arch/arm/boot/dts/allwinner/sun4i-a10.dtsi
-+++ b/arch/arm/boot/dts/allwinner/sun4i-a10.dtsi
-@@ -317,6 +317,8 @@ emac: ethernet@1c0b000 {
- 			allwinner,sram = <&emac_sram 1>;
- 			pinctrl-names = "default";
- 			pinctrl-0 = <&emac_pins>;
-+			dmas = <&dma SUN4I_DMA_DEDICATED 7>;
-+			dma-names = "rx";
- 			status = "disabled";
- 		};
- 
+Changes:
+
+PATCH 03 V01: https://lore.kernel.org/netdev/cover.1756195078.git.zhuyikai1@h-partners.com
+* Remove extra memset 0 after kzalloc (Vadim Fedorenko)
+* Remove another init function in hinic3_init_hwdev/hwif/nic_io (Vadim Fedorenko)
+* Create a new separate patch of fixing code style (Vadim Fedorenko)
+* Use bitmap_free instead of kfree (ALOK TIWARI)
+* Add prefix "hinic3" to non-static functions and parse_* functions (Vadim Fedorenko)
+* Init func_tbl_cfg to {} (Vadim Fedorenko)
+* Move endinass-improvements to a separate patch (Vadim Fedorenko)
+* Use kmalloc_array before overwrite rss_hkey on the very next line (Vadim Fedorenko)
+* Remove extra key copy about hinic3_rss_set_hash_key (Vadim Fedorenko)
+* Use netdev_rss_key_fill instead of static rss hash key for safety (Eric Dumazet)
+
+PATCH 03 V02: https://lore.kernel.org/netdev/cover.1756378721.git.zhuyikai1@h-partners.com
+* Modify get_hwif_attr function for improving readability (Vadim Fedorenko)
+* Add HINIC3_PCIE_LINK_DOWN errorcode to init_hwif_attr error handling (Vadim Fedorenko)
+
+PATCH 03 V03:
+
+Fan Gong (14):
+  hinic3: HW initialization
+  hinic3: HW management interfaces
+  hinic3: HW common function initialization
+  hinic3: HW capability initialization
+  hinic3: Command Queue flush interfaces
+  hinic3: Nic_io initialization
+  hinic3: Queue pair endianness improvements
+  hinic3: Queue pair resource initialization
+  hinic3: Queue pair context initialization
+  hinic3: Tx & Rx configuration
+  hinic3: Add Rss function
+  hinic3: Add port management
+  hinic3: Fix missing napi->dev in netif_queue_set_napi
+  hinic3: Fix code style (Missing a blank line before return)
+
+ drivers/net/ethernet/huawei/hinic3/Makefile   |   2 +
+ .../ethernet/huawei/hinic3/hinic3_hw_cfg.c    | 195 ++++
+ .../ethernet/huawei/hinic3/hinic3_hw_cfg.h    |   4 +
+ .../ethernet/huawei/hinic3/hinic3_hw_comm.c   | 364 ++++++++
+ .../ethernet/huawei/hinic3/hinic3_hw_comm.h   |  21 +
+ .../ethernet/huawei/hinic3/hinic3_hw_intf.h   | 121 +++
+ .../net/ethernet/huawei/hinic3/hinic3_hwdev.c | 547 ++++++++++-
+ .../net/ethernet/huawei/hinic3/hinic3_hwif.c  | 269 ++++++
+ .../net/ethernet/huawei/hinic3/hinic3_hwif.h  |  16 +
+ .../net/ethernet/huawei/hinic3/hinic3_irq.c   |   2 +-
+ .../net/ethernet/huawei/hinic3/hinic3_lld.c   |   9 +-
+ .../net/ethernet/huawei/hinic3/hinic3_main.c  |   9 +-
+ .../net/ethernet/huawei/hinic3/hinic3_mgmt.c  |  21 +
+ .../net/ethernet/huawei/hinic3/hinic3_mgmt.h  |   2 +
+ .../huawei/hinic3/hinic3_mgmt_interface.h     | 119 +++
+ .../huawei/hinic3/hinic3_netdev_ops.c         | 432 ++++++++-
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.c   | 152 +++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.h   |  20 +
+ .../ethernet/huawei/hinic3/hinic3_nic_dev.h   |   5 +
+ .../ethernet/huawei/hinic3/hinic3_nic_io.c    | 874 +++++++++++++++++-
+ .../ethernet/huawei/hinic3/hinic3_nic_io.h    |  39 +-
+ .../huawei/hinic3/hinic3_pci_id_tbl.h         |   9 +
+ .../net/ethernet/huawei/hinic3/hinic3_rss.c   | 352 +++++++
+ .../net/ethernet/huawei/hinic3/hinic3_rss.h   |  14 +
+ .../net/ethernet/huawei/hinic3/hinic3_rx.c    | 232 ++++-
+ .../net/ethernet/huawei/hinic3/hinic3_rx.h    |  38 +-
+ .../net/ethernet/huawei/hinic3/hinic3_tx.c    | 184 +++-
+ .../net/ethernet/huawei/hinic3/hinic3_tx.h    |  30 +-
+ 28 files changed, 3996 insertions(+), 86 deletions(-)
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_mgmt.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_pci_id_tbl.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_rss.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_rss.h
+
+
+base-commit: b1c92cdf5af3198e8fbc1345a80e2a1dff386c02
 -- 
-2.25.1
-
+2.43.0
 
 
