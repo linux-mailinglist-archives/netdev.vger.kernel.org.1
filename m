@@ -1,131 +1,171 @@
-Return-Path: <netdev+bounces-218517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 824F1B3CF3F
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 22:16:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33BAAB3CF63
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 22:47:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41AE13BC562
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 20:16:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FF291B275EA
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 20:48:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46D992DAFA6;
-	Sat, 30 Aug 2025 20:16:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C3F82E7194;
+	Sat, 30 Aug 2025 20:46:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="Wo6oe1nx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i7heKHiF"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.162.73.231])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAF6C2D6E58
-	for <netdev@vger.kernel.org>; Sat, 30 Aug 2025 20:16:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.162.73.231
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52DA22E3E9;
+	Sat, 30 Aug 2025 20:46:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756584964; cv=none; b=LifGD70DJfxwKaFXHRURFffrP1PxAdaRTVJk90lBNPV+3wfjsz41Ycpaahxp1jVAleG6lnjJ/GWherNM0zS5SEX6CovebARnaDPzhbRPMXdnd4kAFsteFkSf2nA2gYy/BtRUx9gH3hw783Qt0KU4B32DE49DFW7hFLmJ57K4ZpU=
+	t=1756586805; cv=none; b=u2aU5xddVY7qKtNoDRnDl9XtGKNb2k0UrUrEp6N461eNqxH1DrJVuEA16IdEBDwHyIKmrbG70+N1j9QjC5yq4yv/JRKE9s4dOReplvjW6/YDb2/Ac3Yb9E/aq4w3/wOwchsMdCcOnVS8l0wVB56z5HjGdAzzRpYkZjcAAoySAAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756584964; c=relaxed/simple;
-	bh=dc1s8kUdUOkzL4FNfFiAzs+7MvakJKbZsTvrdVR9Nwo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LlKvP51/ZPtIR1ZMNGhVMie2eMAQJ4DUkV3rh4aGSIvAnsUO/gzJ21W1KTklTZLqK8PlbY2SH9ZkcE8wkLAUcMy9ldKA2y9Fp5o/b9QYaNcJCY+WyUw5aHtYSTcCB0C2Et2535vdzhrPRy1RPR4DBKP9c0i8kS6ifHBdHbzr8AA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=Wo6oe1nx; arc=none smtp.client-ip=35.162.73.231
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1756584961; x=1788120961;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=8Afy9xvrfmePMFwDjUWP+2SP1X18TaC8FvGhXgpVdCU=;
-  b=Wo6oe1nxlHV1bfR/GHpJPfSzmaV1pWoOyxwOzfikfi+Ub/lNaLjSEmH/
-   aooWqUrOrKzsm0687D9G5P/feDxW+gpd3YZrC1GsFrNh9LHQwYVWkm2tN
-   +JXa+8sJVcq3rcdX/z77/6f4vxdA1DlqovUN2o4o+xkQAfQwq9SMnoPmO
-   PTkXdgtBv7oB1L5/B7skRrFxjroPPio6jGcZtbZ7F1cJjZ/GHmZlnIMCx
-   vRTjCQN5uR4/ZuYLmW+1DwfJz8QLHdVssLRIf8Dhm5aonRis1hoT9E6S0
-   sYkoHywpdACOc6hj48nn94kc8a6qmgptM+2emoi4xJb4nkk2ZSwYtEuTH
-   Q==;
-X-CSE-ConnectionGUID: nV4y56/qRhuExNPqGRSvGA==
-X-CSE-MsgGUID: EfWgYBh4TjqDXay2cXPgUQ==
-X-IronPort-AV: E=Sophos;i="6.18,225,1751241600"; 
-   d="scan'208";a="1987828"
-Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
-  by internal-pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2025 20:15:59 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:57912]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.51.7:2525] with esmtp (Farcaster)
- id f7940bc6-4159-43ef-b4e1-28c436aa528d; Sat, 30 Aug 2025 20:15:59 +0000 (UTC)
-X-Farcaster-Flow-ID: f7940bc6-4159-43ef-b4e1-28c436aa528d
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
- Sat, 30 Aug 2025 20:15:59 +0000
-Received: from b0be8375a521.amazon.com (10.37.245.8) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Sat, 30 Aug 2025 20:15:57 +0000
-From: Kohei Enju <enjuk@amazon.com>
-To: <andrew@lunn.ch>
-CC: <andrew+netdev@lunn.ch>, <anthony.l.nguyen@intel.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <enjuk@amazon.com>,
-	<intel-wired-lan@lists.osuosl.org>, <kohei.enju@gmail.com>,
-	<kuba@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<przemyslaw.kitszel@intel.com>, <vitaly.lifshits@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH v1 iwl-net] igc: power up PHY before link test
-Date: Sun, 31 Aug 2025 05:14:41 +0900
-Message-ID: <20250830201549.16083-1-enjuk@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <7607d394-9659-4bb0-af14-8a3633cfc89c@lunn.ch>
-References: <7607d394-9659-4bb0-af14-8a3633cfc89c@lunn.ch>
+	s=arc-20240116; t=1756586805; c=relaxed/simple;
+	bh=N1RyWuUPncwemkQz+wtBxmmLRK1pbPwPhqaSXQEgACo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UFZJUH58/MwRGd5MuLNP1W83tWgg4a5s6LEjzihIZPVXco+98n3ImjxiBmopBZk8LHQ6bCJrTWMgG2jP6sprmNg0lnQrROK5GHuitwEaTBFOzO+B/ps+kO0Aqs7we1+DndvTPCqPwC+GpofZn/GYdd0eB89Q6jI5NusIKdlu7yQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i7heKHiF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF130C4CEEB;
+	Sat, 30 Aug 2025 20:46:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756586804;
+	bh=N1RyWuUPncwemkQz+wtBxmmLRK1pbPwPhqaSXQEgACo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=i7heKHiF1WEcWegbUMD1XKbmetMnNnCnljRU/sfGxpB5c3sZchsdHRdnTVLky717F
+	 dDeCNXpev8o9LRk1S9eXnS8o8kWvMacaFziEO6OdWtswKvTxZQ5pU4eCd2WUx5BQCO
+	 14bLFP5QVji02AMa5CJyqW/en6PTbHSnZ78vGj75ZZT/RVMFCiYHRoYXRol8qlqKgn
+	 3lrkJ1IYbZBkwoMZse44FP62uqEzr0WjQEZOzoSJLrIrlje9NRgPYVERWMHuVkMn2k
+	 2QurVWFt7IIr5AR3ahUSN1uV7FUBrHkmiXJe15aj9LzSrsbpHevBdir8lYlUv2SDdP
+	 83zxdoGwMwcyQ==
+Date: Sat, 30 Aug 2025 22:46:22 +0200
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux
+ Documentation <linux-doc@vger.kernel.org>, Linux DAMON
+ <damon@lists.linux.dev>, Linux Memory Management List <linux-mm@kvack.org>,
+ Linux Power Management <linux-pm@vger.kernel.org>, Linux Block Devices
+ <linux-block@vger.kernel.org>, Linux BPF <bpf@vger.kernel.org>, Linux
+ Kernel Workflows <workflows@vger.kernel.org>, Linux KASAN
+ <kasan-dev@googlegroups.com>, Linux Devicetree
+ <devicetree@vger.kernel.org>, Linux fsverity <fsverity@lists.linux.dev>,
+ Linux MTD <linux-mtd@lists.infradead.org>, Linux DRI Development
+ <dri-devel@lists.freedesktop.org>, Linux Kernel Build System
+ <linux-lbuild@vger.kernel.org>, Linux Networking <netdev@vger.kernel.org>,
+ Linux Sound <linux-sound@vger.kernel.org>, Thomas Gleixner
+ <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra
+ <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@kernel.org>, Pawan Gupta
+ <pawan.kumar.gupta@linux.intel.com>, Jonathan Corbet <corbet@lwn.net>,
+ SeongJae Park <sj@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
+ David Hildenbrand <david@redhat.com>, Lorenzo Stoakes
+ <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>, Suren
+ Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Huang Rui
+ <ray.huang@amd.com>, "Gautham R. Shenoy" <gautham.shenoy@amd.com>, Mario
+ Limonciello <mario.limonciello@amd.com>, Perry Yuan <perry.yuan@amd.com>,
+ Jens Axboe <axboe@kernel.dk>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
+ <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, KP
+ Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Dwaipayan Ray
+ <dwaipayanray1@gmail.com>, Lukas Bulwahn <lukas.bulwahn@gmail.com>, Joe
+ Perches <joe@perches.com>, Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+ Alexander Potapenko <glider@google.com>, Andrey Konovalov
+ <andreyknvl@gmail.com>, Dmitry Vyukov <dvyukov@google.com>, Vincenzo
+ Frascino <vincenzo.frascino@arm.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Eric Biggers <ebiggers@kernel.org>, tytso@mit.edu,
+ Richard Weinberger <richard@nod.at>, Zhihao Cheng
+ <chengzhihao1@huawei.com>, David Airlie <airlied@gmail.com>, Simona Vetter
+ <simona@ffwll.ch>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann
+ <tzimmermann@suse.de>, Nathan Chancellor <nathan@kernel.org>, Nicolas
+ Schier <nicolas.schier@linux.dev>, Ingo Molnar <mingo@redhat.com>, Will
+ Deacon <will@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, Waiman Long
+ <longman@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Shay Agroskin
+ <shayagr@amazon.com>, Arthur Kiyanovski <akiyano@amazon.com>, David Arinzon
+ <darinzon@amazon.com>, Saeed Bishara <saeedb@amazon.com>, Andrew Lunn
+ <andrew@lunn.ch>, Liam Girdwood <lgirdwood@gmail.com>, Mark Brown
+ <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai
+ <tiwai@suse.com>, Alexandru Ciobotaru <alcioa@amazon.com>, The AWS Nitro
+ Enclaves Team <aws-nitro-enclaves-devel@amazon.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+ Steve French <stfrench@microsoft.com>, Meetakshi Setiya
+ <msetiya@microsoft.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>, Bart Van Assche
+ <bvanassche@acm.org>, Thomas =?UTF-8?B?V2Vpw59zY2h1aA==?=
+ <linux@weissschuh.net>, Masahiro Yamada <masahiroy@kernel.org>
+Subject: Re: [PATCH 12/14] ASoC: doc: Internally link to Writing an ALSA
+ Driver docs
+Message-ID: <20250830224614.6a124f82@foz.lan>
+In-Reply-To: <20250829075524.45635-13-bagasdotme@gmail.com>
+References: <20250829075524.45635-1-bagasdotme@gmail.com>
+	<20250829075524.45635-13-bagasdotme@gmail.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWC002.ant.amazon.com (10.13.139.242) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sat, 30 Aug 2025 21:27:33 +0200, Andrew Lunn wrote:
+Em Fri, 29 Aug 2025 14:55:22 +0700
+Bagas Sanjaya <bagasdotme@gmail.com> escreveu:
 
->On Sun, Aug 31, 2025 at 02:06:19AM +0900, Kohei Enju wrote:
->> The current implementation of igc driver doesn't power up PHY before
->> link test in igc_ethtool_diag_test(), causing the link test to always
->> report FAIL when admin state is down and PHY is consequently powered
->> down.
->> 
->> To test the link state regardless of admin state, let's power up PHY in
->> case of PHY down before link test.
->
->Maybe you should power the PHY down again after the test?
+> ASoC codec and platform driver docs contain reference to writing ALSA
+> driver docs, as an external link. Use :doc: directive for the job
+> instead.
+> 
+> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+> ---
+>  Documentation/sound/soc/codec.rst    | 4 ++--
+>  Documentation/sound/soc/platform.rst | 4 ++--
+>  2 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/Documentation/sound/soc/codec.rst b/Documentation/sound/soc/codec.rst
+> index af973c4cac9309..b9d87a4f929b5d 100644
+> --- a/Documentation/sound/soc/codec.rst
+> +++ b/Documentation/sound/soc/codec.rst
+> @@ -131,8 +131,8 @@ The codec driver also supports the following ALSA PCM operations:-
+>  	int (*prepare)(struct snd_pcm_substream *);
+>    };
+>  
+> -Please refer to the ALSA driver PCM documentation for details.
+> -https://www.kernel.org/doc/html/latest/sound/kernel-api/writing-an-alsa-driver.html
+> +Please refer to the :doc:`ALSA driver PCM documentation
+> +<../kernel-api/writing-an-alsa-driver>` for details.
+>  
+>  
+>  DAPM description
+> diff --git a/Documentation/sound/soc/platform.rst b/Documentation/sound/soc/platform.rst
+> index 7036630eaf016c..bd21d0a4dd9b0b 100644
+> --- a/Documentation/sound/soc/platform.rst
+> +++ b/Documentation/sound/soc/platform.rst
+> @@ -45,8 +45,8 @@ snd_soc_component_driver:-
+>  	...
+>    };
+>  
+> -Please refer to the ALSA driver documentation for details of audio DMA.
+> -https://www.kernel.org/doc/html/latest/sound/kernel-api/writing-an-alsa-driver.html
+> +Please refer to the :doc:`ALSA driver documentation
+> +<../kernel-api/writing-an-alsa-driver>` for details of audio DMA.
 
-You're right about the concern, but it's already handled by the existing 
-code flow:
-    /* power up PHY for link test */
-	igc_power_up_phy_copper(&adapter->hw);
+Don't use relative paths for :doc:. They don't work well, specially
+when one uses SPHINXDIRS.
 
-    /* doing link test */
+The best is o use Documentation/kernel-api/writing-an-alsa-driver.rst
+and let automarkup figure it out. As we have a checker, broken
+references generate warnings at build time.
 
-    if (if_running)
-        igc_close(netdev);
-    else
-        igc_reset(adapter);
-        
-    /* other tests */
-    igc_reset(adapter);
-
-igc_reset() calls igc_power_down_phy_copper_base() when !netif_running(), 
-so the PHY is properly powered down again.
-
->
->Alternatively, just return -ENOTDOWN is the network is admin down.
-
-That would be simpler indeed. Since the callback returns void, we'd set 
-the test result to indicate skip/fail.
-However, I think checking actual physical connectivity even when admin 
-down is valuable, which other Intel ethernet drivers (e.g., i40e, ixgbe, 
-igb) also do.
-
->
->	Andrew
+Regards,
+Mauro
 
