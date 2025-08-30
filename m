@@ -1,75 +1,62 @@
-Return-Path: <netdev+bounces-218506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38404B3CEE3
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 21:03:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 875C6B3CEF9
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 21:24:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E88BD5E6212
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 19:03:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 304E07C4143
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 19:24:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EA4E2D879D;
-	Sat, 30 Aug 2025 19:03:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F6732DCF7C;
+	Sat, 30 Aug 2025 19:24:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="OzSy2vZw"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vmPOc3nP"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D7592DCF43;
-	Sat, 30 Aug 2025 19:03:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCCC322A4F8;
+	Sat, 30 Aug 2025 19:24:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756580601; cv=none; b=clMcUWCsaKGxi+ht0HuXih+eV/G9MMSdxMALPVuRAMLtjjSPP9IlJJCEbGeJkUV5cXAwPwaqVwbd9qcqWubG+FqOjDyCuOlTEKRtXqs/B1Es6iIOm4/+rcSZblgAz+uTHmeUQ0aIvpiTOVg88dmazW4fDE0CIzv68CsJE60p2a0=
+	t=1756581863; cv=none; b=rWNPR7TY60hdkzlRM2zLuxv97aqFGZmz2QsZNl4++8gLWVYyMsQ9LzcdoLq/8hGfSwcI4fDKRwd9LjN9/5D1TAOVCKhgiIZF4Sf2C4ma0mQAIs2ow7gjfaI1gwShoJ0XJ89Kh0yRDWMy5p0784SqR+WO0Q5S2Rdc6ARaaWdz344=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756580601; c=relaxed/simple;
-	bh=VIWxAub9v9Nc15TVtanbA94IbdHFmist+z2EzFE2cR0=;
+	s=arc-20240116; t=1756581863; c=relaxed/simple;
+	bh=KhCrgPypb7PZD7jnU+GsG7IH2u0c8W5XLWTpzPcJeh0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nsQaV2jY1OYIwPjeCeBW2UFgENLtJ0Fr6a1XKPnDsMMkS2cStKCJre3F47FGx2y8k//ym3zzqYCRZJFHb00xMdHbW/sEaBhyGYyYUXIoSfoSBxL9IvFHC8npslNa1oU4+UTxlikcoQFbWYKTXJIp7AuGMRyXMmswV/ti970gleY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=OzSy2vZw; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=2zEd97eD2ST6z8QE5V+sbWWx834UK4nRASIGlcRaKT4=; b=OzSy2vZwcRjSz3EGgWN0bKaGEX
-	iEFlOxiyyqSCr9dXuigwYYK6xHuBmRZ/2kEV0aT2l3hiutPjbcs3iPxgMplsb353tascvVME9BbYD
-	21d/OA0gyGKQhzAucWVP5mFXLtjf31KMmpQ4sCcH84jxe3lK70aOsqkTcO2AVumVDXsu6xq2xu/Dk
-	8YaJcFjXNGwE4qahpWBFL/tpk9JB5tN/oTZOctWW5YruufJmdADvMERFvxU7zFWRJRZuJcuKEemez
-	0wmJZzqENEZEXaFyT/VCyzMpVsAl1ViM5qUBvOA+qBP7lrko20+IPExyS494Z4K2C2y2uK3DAC7wV
-	C6HdrysA==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.94.2)
-	(envelope-from <carnil@debian.org>)
-	id 1usQqs-00H2TD-9s; Sat, 30 Aug 2025 19:03:02 +0000
-Received: by eldamar.lan (Postfix, from userid 1000)
-	id 2D2FDBE2EE7; Sat, 30 Aug 2025 21:03:01 +0200 (CEST)
-Date: Sat, 30 Aug 2025 21:03:01 +0200
-From: Salvatore Bonaccorso <carnil@debian.org>
-To: Aaron Conole <aconole@redhat.com>, 1108860@bugs.debian.org,
-	Charles Bordet <rough.rock3059@datachamp.fr>
-Cc: Guillaume Nault <gnault@redhat.com>,
-	Stefano Brivio <sbrivio@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=mMmBL1AEcYEAkfyJAZV61Os1nPEKvmkAuxAFMKwLhN7Zft4S21TgfENFApy8kfhW0fBQMx2r/YJHSg/bFmIr2lp+Qb9M6xv3gdoluHFvfwr6D0To5ZAM3nPJUBGPgaKBa4d33j6wDe9jyxY4gYoGT9lrqTczy8u0RQE5z+QNT+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vmPOc3nP; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=+jog82d+9IMz6V10XlVgAfkryK/4rWv5Ffo0C6q9pYU=; b=vmPOc3nPB6vZolLrsJTZjeys3g
+	zc+wYUV+mUPAa854+zJf0/MgBEcgCuxI7tWKpBDNTAwRserbOzbVaxEfQV1QhQU1CmYgKK7FF+i4n
+	g716VgJui3rvYMXdR6lPvAWNKoJWCsA3tpkM+S/JZ4m/7XM+Wi9ffB8RGd70brobQYVw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1usRBD-006bEM-L0; Sat, 30 Aug 2025 21:24:03 +0200
+Date: Sat, 30 Aug 2025 21:24:03 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	Charles Bordet <rough.rock3059@datachamp.fr>,
-	linux-kernel@vger.kernel.org, regressions@lists.linux.dev,
-	stable@vger.kernel.org
-Subject: Re: Bug#1108860: [regression] Wireguard fragmentation fails with
- VXLAN since 8930424777e4 ("tunnels: Accept PACKET_HOST
- skb_tunnel_check_pmtu().") causing network timeouts
-Message-ID: <aLNK5WOmkgzNrh8P@eldamar.lan>
-References: <aHVhQLPJIhq-SYPM@eldamar.lan>
- <aHYiwvElalXstQVa@debian>
- <e585ae4c.AMcAAHLjGYQAAAAAAAAABAFNqZcAAYCsWIwAAAAAAA3mswBoanLG@mailjet.com>
- <f7tjz485mpk.fsf@redhat.com>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Helmut Buchsbaum <helmut.buchsbaum@gmail.com>,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: dsa: ks8995: Fix some error handling path in
+ ks8995_probe()
+Message-ID: <9c7b0cc7-2bac-474b-a0ee-d24c7954d815@lunn.ch>
+References: <95be5a0c504611263952d850124f053fd6204e94.1756573982.git.christophe.jaillet@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,81 +65,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f7tjz485mpk.fsf@redhat.com>
-X-Debian-User: carnil
+In-Reply-To: <95be5a0c504611263952d850124f053fd6204e94.1756573982.git.christophe.jaillet@wanadoo.fr>
 
-Hi,
-
-On Wed, Jul 16, 2025 at 08:44:55AM -0400, Aaron Conole wrote:
-> Guillaume Nault <gnault@redhat.com> writes:
+On Sat, Aug 30, 2025 at 07:13:59PM +0200, Christophe JAILLET wrote:
+> If an error occurs after calling gpiod_set_value_cansleep(..., 0), it must
+> be undone by a corresponding gpiod_set_value_cansleep(..., 1) call as
+> already done in the remove function.
 > 
-> > On Mon, Jul 14, 2025 at 09:57:52PM +0200, Salvatore Bonaccorso wrote:
-> >> Hi,
-> >> 
-> >> Charles Bordet reported the following issue (full context in
-> >> https://bugs.debian.org/1108860)
-> >> 
-> >> > Dear Maintainer,
-> >> > 
-> >> > What led up to the situation?
-> >> > We run a production environment using Debian 12 VMs, with a network
-> >> > topology involving VXLAN tunnels encapsulated inside Wireguard
-> >> > interfaces. This setup has worked reliably for over a year, with MTU set
-> >> > to 1500 on all interfaces except the Wireguard interface (set to 1420).
-> >> > Wireguard kernel fragmentation allowed this configuration to function
-> >> > without issues, even though the effective path MTU is lower than 1500.
-> >> > 
-> >> > What exactly did you do (or not do) that was effective (or ineffective)?
-> >> > We performed a routine system upgrade, updating all packages include the
-> >> > kernel. After the upgrade, we observed severe network issues (timeouts,
-> >> > very slow HTTP/HTTPS, and apt update failures) on all VMs behind the
-> >> > router. SSH and small-packet traffic continued to work.
-> >> > 
-> >> > To diagnose, we:
-> >> > 
-> >> > * Restored a backup (with the previous kernel): the problem disappeared.
-> >> > * Repeated the upgrade, confirming the issue reappeared.
-> >> > * Systematically tested each kernel version from 6.1.124-1 up to
-> >> > 6.1.140-1. The problem first appears with kernel 6.1.135-1; all earlier
-> >> > versions work as expected.
-> >> > * Kernel version from the backports (6.12.32-1) did not resolve the
-> >> > problem.
-> >> > 
-> >> > What was the outcome of this action?
-> >> > 
-> >> > * With kernel 6.1.135-1 or later, network timeouts occur for
-> >> > large-packet protocols (HTTP, apt, etc.), while SSH and small-packet
-> >> > protocols work.
-> >> > * With kernel 6.1.133-1 or earlier, everything works as expected.
-> >> > 
-> >> > What outcome did you expect instead?
-> >> > We expected the network to function as before, with Wireguard handling
-> >> > fragmentation transparently and no application-level timeouts,
-> >> > regardless of the kernel version.
-> >> 
-> >> While triaging the issue we found that the commit 8930424777e4
-> >> ("tunnels: Accept PACKET_HOST in skb_tunnel_check_pmtu()." introduces
-> >> the issue and Charles confirmed that the issue was present as well in
-> >> 6.12.35 and 6.15.4 (other version up could potentially still be
-> >> affected, but we wanted to check it is not a 6.1.y specific
-> >> regression).
-> >> 
-> >> Reverthing the commit fixes Charles' issue.
-> >> 
-> >> Does that ring a bell?
-> >
-> > It doesn't ring a bell. Do you have more details on the setup that has
-> > the problem? Or, ideally, a self-contained reproducer?
+> In order to easily do the needed clean-up in the probe, add a new
+> devm_add_action_or_reset() call and simplify the remove function
+> accordingly.
 > 
-> +1 - I tested this patch with an OVS setup using vxlan and geneve
-> tunnels.  A reproducer or more details would help.
+> Fixes: cd6f288cbaab ("net: phy: spi_ks8995: add support for resetting switch using GPIO")
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 
-Charles, any news here, did you found a way to provide a
-self-contained reproducer for your issue?
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Does the issue still reproeduce for you on the most current version of
-each of the affected dstable series?
-
-Regards,
-Salvatore
+    Andrew
 
