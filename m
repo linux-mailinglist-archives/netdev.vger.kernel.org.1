@@ -1,93 +1,114 @@
-Return-Path: <netdev+bounces-218442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B3D5B3C766
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 04:30:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B2AEB3C76C
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 04:32:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BEA5E207E5C
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 02:30:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77FA01BA16B5
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 02:32:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6EF253B40;
-	Sat, 30 Aug 2025 02:29:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZzpZCQ7W"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CC1C2472A2;
+	Sat, 30 Aug 2025 02:32:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A339649620;
-	Sat, 30 Aug 2025 02:29:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1528547F4A;
+	Sat, 30 Aug 2025 02:32:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756520999; cv=none; b=b4e5ldiA99fVgqEV3+BZklHK19Ki6q20DawpkDehzE1uspru1Uk7/vBDh6/3ZXTpAtJ47bQx9G418tZRJCWxGvSWjVj9Oj/uEed9kg2mHRyw81TSZWNwSRORSyKHjYSg+dTI0CeNadOJBJASGhdxQnS0ChfSiWXe+I0PyDVRZH8=
+	t=1756521150; cv=none; b=b8h9BGBn/VhvnkcHjY5upsN7bSS+n3asd7635CbmrrOF35bxzQ71+/XKK1OHDA5bvxQew/cLdxv4FPDwIrZBFnD/9+JhxtNxSA/pcS951KlVvsX3u+PoJ+N0mbjXomiqlhgwcXaBADXotTGVBCU+6HhrajsP5N4yFu7kIKIniZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756520999; c=relaxed/simple;
-	bh=iO8i4jS+Hrnhhh2IGAjFkAK9JIpwWrYBnh/MvEx9im8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JkydYraSutfPvD2UaZ2tjpPsJ4pBDMHIgMzhaqN8Qlt5JlbkqCWPTHHZLkAmDqEs4KnVFMSiHq7Loj8HPGF62AXdLN3xBeP0kq9ymQQDeJTUUYOnYXKjD6ENzD2d/S+lQLRqXtTbLczkeUEWi/GH6eFNtuQ+3fBKvZZ9gB/zp8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZzpZCQ7W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A98EC4CEF0;
-	Sat, 30 Aug 2025 02:29:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756520999;
-	bh=iO8i4jS+Hrnhhh2IGAjFkAK9JIpwWrYBnh/MvEx9im8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZzpZCQ7WGOiReFKppX7V5wPpQCV1xPxIKRKXjJ9zf7q1UIXSd8KEiKBEwVxaZO/CW
-	 b99YD8gwjJU5pzCX54liEJ5Z2d4f06pzoBGkaazxHzyl5vlbXeZv0sGij4L43CJ6FU
-	 SsF/Tdpmfr32diA7LFKzMWq8s+xZG0SYHlW0p/V39iWf9/5TBtSXy6ozMc0OyBR/DC
-	 3p2Y+CYZIIohQY8M/dugSRYZWEOcA/MMNRUTXoPcC2M6YD+LF8zC57dmG7W+L97MqE
-	 4QcYuywebj3BGmJp+Ym0EQCcXvkgrJlpxysdzP8ABCXJPEe0XHEpWlHlncvqJlH1RG
-	 yso45XXx8EDow==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAC91383BF75;
-	Sat, 30 Aug 2025 02:30:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1756521150; c=relaxed/simple;
+	bh=is9IEKpIaITjTCAHFls/RTPC03IfKxoVzptUDCFAHtU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=u2mwZuHH7/UJsrAgwJHCq+2VoMGwH9bdy4S486YAnK2znu3Nc/Qiw7m/fiUkN+GgwsQQJEGC+V8p4xJL4A2eaD9oS5bgfRo/6yeNsZGQYExAWBcCzUEWKiSzH56l1y6zH+pOSpdaYHHxrKJT434CbsMiSqp+Wva5XorRajuPYIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1usBNy-000000005ug-2ZYU;
+	Sat, 30 Aug 2025 02:32:10 +0000
+Date: Sat, 30 Aug 2025 03:32:06 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Hauke Mehrtens <hauke@hauke-m.de>,
+	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Andreas Schirm <andreas.schirm@siemens.com>,
+	Lukas Stockmann <lukas.stockmann@siemens.com>,
+	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Peter Christen <peter.christen@siemens.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
+	Juraj Povazanec <jpovazanec@maxlinear.com>,
+	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	"Livia M. Rosu" <lrosu@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: [PATCH net-next v4 0/6] net: dsa: lantiq_gswip: prepare for
+ supporting MaxLinear GSW1xx
+Message-ID: <cover.1756520811.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] mISDN: Fix memory leak in dsp_hwec_enable()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175652100575.2399666.16495764980082221988.git-patchwork-notify@kernel.org>
-Date: Sat, 30 Aug 2025 02:30:05 +0000
-References: <20250828081457.36061-1-linmq006@gmail.com>
-In-Reply-To: <20250828081457.36061-1-linmq006@gmail.com>
-To: Miaoqian Lin <linmq006@gmail.com>
-Cc: isdn@linux-pingi.de, labbott@redhat.com, davem@davemloft.net,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hello:
+Continue to prepare for supporting the newer standalone MaxLinear GSW1xx
+switch family by extending the existing lantiq_gswip driver to allow it
+to support MII interfaces and MDIO bus of the GSW1xx.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This series has been preceded by an RFC series which covers everything
+needed to support the MaxLinear GSW1xx family of switches. Andrew Lunn
+had suggested to split it into a couple of smaller series and start
+with the changes which don't yet make actual functional changes or
+support new features.
 
-On Thu, 28 Aug 2025 16:14:57 +0800 you wrote:
-> dsp_hwec_enable() allocates dup pointer by kstrdup(arg),
-> but then it updates dup variable by strsep(&dup, ",").
-> As a result when it calls kfree(dup), the dup variable may be
-> a modified pointer that no longer points to the original allocated
-> memory, causing a memory leak.
-> 
-> The issue is the same pattern as fixed in commit c6a502c22999
-> ("mISDN: Fix memory leak in dsp_pipeline_build()").
-> 
-> [...]
+Everything has been compile and runtime tested on AVM Fritz!Box 7490
+(GSWIP version 2.1, VR9 v1.2)
 
-Here is the summary with links:
-  - mISDN: Fix memory leak in dsp_hwec_enable()
-    https://git.kernel.org/netdev/net/c/0704a3da7ce5
+Link: https://lore.kernel.org/netdev/aKDhFCNwjDDwRKsI@pidgin.makrotopia.org/
 
-You are awesome, thank you!
+v4: fix newly introduced syntax error in struct initializer
+v3: explicitly initialize mii_port_reg_offset to 0
+v2: move lantiq_gswip driver to its own folder
+
+Daniel Golle (6):
+  net: dsa: lantiq_gswip: move to dedicated folder
+  net: dsa: lantiq_gswip: support model-specific mac_select_pcs()
+  net: dsa: lantiq_gswip: ignore SerDes modes in phylink_mac_config()
+  net: dsa: lantiq_gswip: support offset of MII registers
+  net: dsa: lantiq_gswip: support standard MDIO node name
+  net: dsa: lantiq_gswip: move MDIO bus registration to .setup()
+
+ MAINTAINERS                                 |  3 +-
+ drivers/net/dsa/Kconfig                     |  8 +--
+ drivers/net/dsa/Makefile                    |  2 +-
+ drivers/net/dsa/lantiq/Kconfig              |  7 +++
+ drivers/net/dsa/lantiq/Makefile             |  1 +
+ drivers/net/dsa/{ => lantiq}/lantiq_gswip.c | 54 ++++++++++++++++-----
+ drivers/net/dsa/{ => lantiq}/lantiq_gswip.h |  4 ++
+ drivers/net/dsa/{ => lantiq}/lantiq_pce.h   |  0
+ 8 files changed, 57 insertions(+), 22 deletions(-)
+ create mode 100644 drivers/net/dsa/lantiq/Kconfig
+ create mode 100644 drivers/net/dsa/lantiq/Makefile
+ rename drivers/net/dsa/{ => lantiq}/lantiq_gswip.c (98%)
+ rename drivers/net/dsa/{ => lantiq}/lantiq_gswip.h (98%)
+ rename drivers/net/dsa/{ => lantiq}/lantiq_pce.h (100%)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+2.51.0
 
