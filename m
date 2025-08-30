@@ -1,80 +1,82 @@
-Return-Path: <netdev+bounces-218509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 990E9B3CF08
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 21:28:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 013C0B3CF0A
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 21:29:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCD151B27344
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 19:29:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0FC7560199
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 19:29:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43B3E2DE6F1;
-	Sat, 30 Aug 2025 19:28:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D04672DE1E5;
+	Sat, 30 Aug 2025 19:29:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YK28+oTG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YA06a0ge"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8846D2DE1FC;
-	Sat, 30 Aug 2025 19:28:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF1F2DCF41;
+	Sat, 30 Aug 2025 19:29:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756582132; cv=none; b=ZuTGugw2eck5oN0tA2s4vLlj5iqNdoU7qCWY4dmtfLJRRXKig6CrVchw7U2+9RgKJ1N5H6SMnTjUughylz6OKXuA4MYZCRewY8orK76oM+L4KFlaBX7mMFSU2FL1/lLvhXs2CPwGFmfuqkAYg+wcDn3ux6GniX75crecgnBQB6Q=
+	t=1756582183; cv=none; b=BZXn/sZLKISo3iPckXq7NX2hdMhhbNPMBN1kN66TmgSETJyjmout4yTOhZzz45M35niCtOTblUJMn4pAhszPujPbcCrryw/zxRVx8XohivcpGOd9WUistrgN5unokt6vytyT9oLHDlLQBgtFC+gsqQflQj+JwKjy1ObX1Htpki0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756582132; c=relaxed/simple;
-	bh=mj6BBkXtTp5OEVoAmwshIMCFa6xmRm5kYv2DqZLbl1s=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=iTI7wBsKxkTSgghKB3IMsp9eWU8UrK8fJT1epys4qXxPfVY35jGwWpiO4oMFcpG2u+idv3y2mouvCGAXnVJ2C9DxZ+THKnj02rVVqOyj+bKTnwIjpJGgvGrV5VP/nNqfbjZVH+e6YSw3Qg4C8jFVH1gPsZRzxXaueTTHJGd5EP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YK28+oTG; arc=none smtp.client-ip=209.85.218.53
+	s=arc-20240116; t=1756582183; c=relaxed/simple;
+	bh=K0th4fdNOHQOorf+otPOZvX7LS6gLt2Pt8QKob9MTfY=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=F4yYF1BLNEJJJQo+UHV3q90S1cJc2HZcI4+i3m69zhCmgTZN+gIBldtIb2dQ6YH6MWzueSUcszEGuVbiLQeicW7G6pg0MIuyOc2wBa/w8jFBMIbG5JeoiPO8m2/vAkkjIrQbawbicELM7UExcu0AnBew6RN8tNFEeHhhCfT6y8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YA06a0ge; arc=none smtp.client-ip=209.85.208.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-affc2eb83c5so156272966b.2;
-        Sat, 30 Aug 2025 12:28:50 -0700 (PDT)
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-61cf8280f02so3003705a12.0;
+        Sat, 30 Aug 2025 12:29:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756582129; x=1757186929; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:autocrypt:subject:from
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=g9Ms4hIwxfuw6SwTL5RIgMEksEmD8lz0uMx7wT1GeCU=;
-        b=YK28+oTGpSJ5wz/HcwNCa6bQ6p2dW1+mn6IbVdeGQ72zYSkShElnwcR1DZBdknKg0R
-         ugVxUI1YI/l51YDj6f8bIWn9dI0jL1iZgjIwhhC7e2QPEHD8B0QgjOs60gQxF8ouEmE/
-         5gg0177JzwFZw+/GFPVZ1Bi2E9tosEBjNsc7KXJt6pVtDzc16m1DsMBOIW2d8nkg2DBu
-         k2Lr3IKZaWRY8/h9fDqPlkkPM6478saLGGodXvuVNZcNx0k2CyCmX0FU8ZA3eW9OoVEy
-         uIJvsMqkdRatud3pyE3qGWpTLh0tL2OrTVVyk8tQvKeirgr4k55rgsSf/BjIjlpMApFV
-         dVfg==
+        d=gmail.com; s=20230601; t=1756582180; x=1757186980; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=3rLLJhgYHhQvYp9/eSoMbwWQ9QTJU3+YaixBARoYFc4=;
+        b=YA06a0gemPwvjLM58l1SR5WXh9I02fUlcKYYyMlgsIs5yxaLFxfwhb2cHTTS+x/c+C
+         GCQ/9ulORB/xknkcotnPpoBTfq3IJTWKA54+6REL96yAOx4LlUo/53fZw34uROfdy6nW
+         8krSLPETkiHA0VT7YlWix501eo8GLJjhpAPYs/zs0pe8Kk10uqc8+o3cPHNf+DOA3vlD
+         a/rDCpJHqHbzwQI1hxKBwPiVLAXl5KnBi4DLwWUzDBUdqWE97tNnnFwk9B4hjMVpCCzy
+         vFwH6aVTTwtW8E3FvzyU6Y3xo/UCE1NFqQgB6fUaw3oioInT4T1m3TOiyFUo6bZTb3A7
+         vh4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756582129; x=1757186929;
-        h=content-transfer-encoding:cc:to:autocrypt:subject:from
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=g9Ms4hIwxfuw6SwTL5RIgMEksEmD8lz0uMx7wT1GeCU=;
-        b=B4+3cpB7Iqxn4hWDxfjobjwPd4pSQhbWhSEj1osVYLHi3G/tG1TDVabbpS7RUetSWv
-         4vnPiT0wA7hCcY/gv399k0cKY6e2273KZTN/Ld6Okc+t4Xk2wXj+bZ9oTZrhJo6vWbiK
-         1IR+mPTEFK01XTbb/gP2zH2uVvOthLZ4YNdb/CpDuSt6jWxVOTDlW2NAG6rEO7Yh4oAn
-         DFl+/YhX1Pb7AE+m1WW9QwBscph1hMilgsv4hu1EMaMgIzPDZsjpJ9QxH0tCXmNgUqE1
-         fFOATMwO2j7LiRSusUj3UlNT72GFo7uTxGu+cNYPvveWV84Vkki8YdvU6E5FvOUy6Mgo
-         rm2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVCDjIitb5HjbolEBLmNxXQ+53SbxsxgyZ+1CUS2MDPg+d1/Fj1S9yyzLOep7EWM6CSPkFkWCjFb5Qq@vger.kernel.org, AJvYcCVonhhcQy3jzVQ0zLZcrCC931djga9Hje8+c/pXH4LQ3PZFJofSXEoHs6+2uObfGE4yXyqpg0Pz@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRxzPYgqLwIVrqyiVf3/3SqM6dBt/vkmvBSBeuE8Q6V61ykyd2
-	R2KtrtR5TkaztJcSlo7gbyznsoxdEt+PyNBJVTKHbkktiAEcmhSi2wD6
-X-Gm-Gg: ASbGncs/Nthhpjlb0lM60rZ/2YKZiNFOcx53j2LHwsP7CqFGT0mATajukNSdK1ukIuy
-	hYsackA2RPgjWVlyCfp2MTMB7Csjg8jxaRzs5OwpWGIPHoW4r6UxMCq1Q1SdyzrygZoKbSL3YCa
-	OGL5orwgPG+aXQNh6zbDkrFs1Mfs/zZE8OP8F0zNtoqAxcot47g+8IMdvQvUVLAEOOHtFpOr7yc
-	4x+qsZgN8q9/Dn6o8TxmfIIeF0ElotGhNvBEMbXtMjaKEDk3JlHzOWejk0gvuDisJkQD1xKTNGF
-	QMcI8QC3jEMo/JUYnvllDCUHKYH8aABFFxDKIfJXfzPfA/nqRLAG+JqylIxXazAUrS74c325r/v
-	4pUCihPTP7d1YyN5Zjnm/eXCIowiyCFqI1kK21gnqWTUobG/JXmeDNm8GY9i8u586Xkq+fveZZN
-	hdGk38BVvhhNr/F0L16fujExg7z9AS8xEv3zLgLOr+/cHFTDHidT0MGL2obwrIFG0CXOw=
-X-Google-Smtp-Source: AGHT+IEJ/Gu/lFJ1aMzBBgxaQ2ogVr5hZIfka5fOlEdx/5pq6/tFR1Jp2zQyF/pR0Gl4mhVXUM6YEA==
-X-Received: by 2002:a17:907:9453:b0:afe:7d3b:846b with SMTP id a640c23a62f3a-b01d8a32453mr167748966b.7.1756582128633;
-        Sat, 30 Aug 2025 12:28:48 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1756582180; x=1757186980;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3rLLJhgYHhQvYp9/eSoMbwWQ9QTJU3+YaixBARoYFc4=;
+        b=FQCZRoGhamhY0Ib+7Fgne3byyoHtAXMy1UokPjavYFpfhTabXSYJ2RlDMkM3w7gpTy
+         uYxRoI/xWQzLhYarrP5VLE6pyFo7UWklt/01SSKYPo6bqlS7RjYIrVnheXQ9Ho6qSb2P
+         BV9zHYY82oWAuAzhagD+H9q2wt1wI4CcNbLi3raByPAi/9h4Qn1wU5R4e3y8FHkkt26Q
+         ngF1oKCtVGHg5RONRPP+Esg8hVWcK66XVZa/CgBuSFMGvfvE+9RCNR7+n2avEvgPA3lJ
+         +pOY4y5b691Dc5WxLoxfTrvbCp1IqsF9ABJ4YB7cWyM377LgXNJ5bBHeboiLno7nJ7q/
+         eAHg==
+X-Forwarded-Encrypted: i=1; AJvYcCVQpjSSDSsrqgv/2CSfTjiz5LeKLPiaJcA+20BLIvPz5T2Y+DYaA97rCU3v2xaZRDX0WZuAFOkW@vger.kernel.org, AJvYcCXQ8s4CTX7c0gzh1HrgO+SH2H/lIvMXtPoc2tBYSun6V8a6GkuDpBLo9Q/Z0aTbajk97V7hvSDaKfHD@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzix6oVB9lTD6XV34QVemJowQepY+31cJsunrcV5PYGlM6jCjG4
+	tS0u996K6uUdue6OKJpg2rNUfPOzU773ekWBErAdRepcyVl/7wiFckKV
+X-Gm-Gg: ASbGncttoPcPccoBoiEzjgs42fgSU+u6bs3/1nEK4Nf7EwDjvhO4VN2SwofOBDEXp2c
+	PWJ0281HHJSLgpF4ddECDlZBczXyMfW5urXMpGrFyiESNiSFhas/Zex7WZVMFxuT9ZxL4jO9YLw
+	yagex87hI0vYK6ESMoT8fYusy2sCON0D/aZ1SjLdu1+Rxi80PSB8gbiS5VCitl3oQAt5JlrTnBp
+	rKJ5wDLeres1bv9wNprSeBgUFsQV+QghGzJ6lZ4fh3yKjXtgsCukjYWtR8v6ps5YFUkY229sQDJ
+	knmcBx2sBcOQ5GeBxI3nwHrT5vTaOw/BSvzB8IwGL5wib67uwaDu6MMtG1i/W/4vqYGYX9rmKj+
+	BI4ZqiHtVqCZD/vQdPJntIZtgNaxvVSNRFS8KzUhrfJmCGgfTw/GfqRRrnfoNmLjt4Y1iRB/MJG
+	RTLoEr8YAElo3KUoNuDHb/EMgigPSnbU6yITWS+BFyowberidp+ZitQUMKoNaLz5sCJ5s=
+X-Google-Smtp-Source: AGHT+IHgTaCK0S/XYssZtoOOtOK1Z6TGrDrOyTFbgg7Y/LQnnD+HImLfy3f8OoJe0VxTa+zTeAf8jA==
+X-Received: by 2002:a05:6402:84e:b0:61a:9385:c78b with SMTP id 4fb4d7f45d1cf-61d26ecf561mr2268262a12.38.1756582180303;
+        Sat, 30 Aug 2025 12:29:40 -0700 (PDT)
 Received: from ?IPV6:2003:ea:8f2f:9b00:d113:449:b8c4:341? (p200300ea8f2f9b00d1130449b8c40341.dip0.t-ipconnect.de. [2003:ea:8f2f:9b00:d113:449:b8c4:341])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-afefca08b41sm465104766b.25.2025.08.30.12.28.47
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-61cfc4bbca5sm3994735a12.31.2025.08.30.12.29.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 30 Aug 2025 12:28:48 -0700 (PDT)
-Message-ID: <cd55d7fb-6600-49e5-a772-18b39811b0d2@gmail.com>
-Date: Sat, 30 Aug 2025 21:28:46 +0200
+        Sat, 30 Aug 2025 12:29:39 -0700 (PDT)
+Message-ID: <2211c0aa-c343-4930-9f7d-5d8058017d7c@gmail.com>
+Date: Sat, 30 Aug 2025 21:29:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,10 +84,22 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Content-Language: en-US
+Subject: [PATCH v2 net-next 1/5] arm64: dts: ls1043a-qds: switch to new
+ fixed-link binding
 From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH v2 net-next 0/5] net: phy: remove support for deprecated
- array-style fixed-link binding
+To: Shawn Guo <shawnguo@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Patrice Chotard <patrice.chotard@foss.st.com>,
+ Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>
+Cc: "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <cd55d7fb-6600-49e5-a772-18b39811b0d2@gmail.com>
+Content-Language: en-US
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
  xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
  sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
@@ -129,46 +143,40 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
  H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
  lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
  OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
-To: Shawn Guo <shawnguo@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Patrice Chotard <patrice.chotard@foss.st.com>,
- Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>
-Cc: "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+In-Reply-To: <cd55d7fb-6600-49e5-a772-18b39811b0d2@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-The array-style fixed-link binding has been marked deprecated for more
-than 10 yrs. See e.g. 91c1d980d601 ("Documentation: devicetree: add old
-and deprecated 'fixed-link'") from 2014.
+The old array-type fixed-link binding has been deprecated
+for more than 10 yrs. Switch to the new binding.
 
-So migrate the remaining few in-kernel users of the old binding,
-and remove for it.
-
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
 v2:
-- fix "Properties must precede subnodes" error in patches 1 and 2
+- fix "Properties must precede subnodes" error
+---
+ arch/arm64/boot/dts/freescale/fsl-ls1043a-qds.dts | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Heiner Kallweit (5):
-  arm64: dts: ls1043a-qds: switch to new fixed-link binding
-  ARM: dts: ls1021a: switch to new fixed-link binding
-  ARM: dts: st: switch to new fixed-link binding
-  net: mdio: remove support for old fixed-link binding
-  net: phy: phylink: remove support for deprecated fixed-link binding
-
- arch/arm/boot/dts/nxp/ls/ls1021a-iot.dts      |  5 +++-
- arch/arm/boot/dts/st/stih418-b2199.dts        |  5 +++-
- arch/arm/boot/dts/st/stihxxx-b2120.dtsi       |  5 +++-
- .../boot/dts/freescale/fsl-ls1043a-qds.dts    |  5 +++-
- drivers/net/mdio/of_mdio.c                    | 26 -------------------
- drivers/net/phy/phylink.c                     | 25 +-----------------
- 6 files changed, 17 insertions(+), 54 deletions(-)
-
+diff --git a/arch/arm64/boot/dts/freescale/fsl-ls1043a-qds.dts b/arch/arm64/boot/dts/freescale/fsl-ls1043a-qds.dts
+index e850551b1..645588911 100644
+--- a/arch/arm64/boot/dts/freescale/fsl-ls1043a-qds.dts
++++ b/arch/arm64/boot/dts/freescale/fsl-ls1043a-qds.dts
+@@ -205,8 +205,11 @@ ethernet@ea000 {
+ 	};
+ 
+ 	ethernet@f0000 { /* DTSEC9/10GEC1 */
+-		fixed-link = <1 1 10000 0 0>;
+ 		phy-connection-type = "xgmii";
++		fixed-link {
++			speed = <10000>;
++			full-duplex;
++		};
+ 	};
+ };
+ 
 -- 
 2.51.0
+
 
 
