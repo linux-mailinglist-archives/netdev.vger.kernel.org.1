@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-218445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCE47B3C76E
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 04:32:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6064B3C770
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 04:33:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94EF25A2962
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 02:32:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14FDF1BA2B83
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 02:33:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83A30255222;
-	Sat, 30 Aug 2025 02:32:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08FA224DCF6;
+	Sat, 30 Aug 2025 02:33:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5EA5253958;
-	Sat, 30 Aug 2025 02:32:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E39B6A33B;
+	Sat, 30 Aug 2025 02:33:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756521172; cv=none; b=nrqMllY5njIxmOwmj22AjYLVeUbBaGG45kaa6k6ajvNQiPOfq/H0G187dUaM8xelOTFWNh9RUJRjuLEGcSZ6PNiyqhB+uGQceDVFSrLh1hwm4Au32JK+lzNTT5X5XdtWj24RiewSADbkbzQlYlL4N1dSK5ilYgI21F5D+jYN8mk=
+	t=1756521189; cv=none; b=XJtEtaTPqpv9qUozWEAFxQdNs9XoCOwh+2BnytfYQTK2EAwU2Om1+JNtgMYvH4UDwmHb5kukZ6R03QzfR7lq0XQsbOnbceElHBa453l6vxFYXiz8MF4lbzEjB9+Vd97nN1LZVQEwfgE/EZ5DErQkFR4oobX3HP0W26+vgi+hskE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756521172; c=relaxed/simple;
-	bh=iEz7Vc2XCirHyftWHmLWnI9sQAeNWjQtdYaPpZyOH4A=;
+	s=arc-20240116; t=1756521189; c=relaxed/simple;
+	bh=Aiix0wd3aN1HL1lzKifMGpHRS7aRk9w71FF05DOlACY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NvtsQNUN+1VqA8+pucPdhUEpC5qFrPXviE/B6WoJyCTur2IqD6ygwNquUod87r9fR3QYxMiI2C+q7pENgrfCHCgIex2WlA9AMh02UGxsW5hKNuibk+NwZDxE2ahWWwbxbhuo9X3cfHs127xq0FlATzdCIE3E+53mFexZku+7Wis=
+	 Content-Type:Content-Disposition:In-Reply-To; b=sEtlLkGFN4FaRw9oALVaJOX1DRr4AQ0cmzkBSxjTl6CXg0Tgu12IhqfzzLYNG13+otNzcWnudhe5iw1/Nbi0PDZM8Lq7KjCcb8UPOI2uOKCmKmFjkIl0+XXGBiq1+MeDxwOTfUPtU/WVp24Gxzl7hd/no2r5n8oa1jqkWHaEF2E=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,9 +33,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1usBOX-000000005vA-44Bz;
-	Sat, 30 Aug 2025 02:32:46 +0000
-Date: Sat, 30 Aug 2025 03:32:42 +0100
+	id 1usBOp-000000005va-2UPJ;
+	Sat, 30 Aug 2025 02:33:03 +0000
+Date: Sat, 30 Aug 2025 03:33:00 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -55,9 +55,9 @@ Cc: Andreas Schirm <andreas.schirm@siemens.com>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next v4 1/6] net: dsa: lantiq_gswip: move to dedicated
- folder
-Message-ID: <a5923dee9a174501b284dc473bdec9dd89c68de1.1756520811.git.daniel@makrotopia.org>
+Subject: [PATCH net-next v4 2/6] net: dsa: lantiq_gswip: support
+ model-specific mac_select_pcs()
+Message-ID: <7668666aa51e43e7f2a6cbcf36eb5a0a3020998f.1756520811.git.daniel@makrotopia.org>
 References: <cover.1756520811.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -69,119 +69,76 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1756520811.git.daniel@makrotopia.org>
 
-Move the lantiq_gswip driver to its own folder and update
-MAINTAINERS file accordingly.
-This is done ahead of extending the driver to support the MaxLinear
-GSW1xx series of standalone switch ICs, which includes adding a bunch
-of files.
+Call mac_select_pcs() function if provided in struct gswip_hwinfo.
+The MaxLinear GSW1xx series got one port wired to a SerDes PCS and
+PHY which can do 1000Base-X, 2500Base-X and SGMII. Support for the
+SerDes port will be provided using phylink_pcs, so provide a
+convenient way for mac_select_pcs() to differ based on the hardware
+model.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 Reviewed-by: Hauke Mehrtens <hauke@hauke-m.de>
 ---
-v4: no changes
 v3: no changes
-v2: move driver to its own folder
+v2: fix accidental change from 'static const struct' to 'const struct'
+    reported by the kbuild bot
 
- MAINTAINERS                                 | 3 +--
- drivers/net/dsa/Kconfig                     | 8 +-------
- drivers/net/dsa/Makefile                    | 2 +-
- drivers/net/dsa/lantiq/Kconfig              | 7 +++++++
- drivers/net/dsa/lantiq/Makefile             | 1 +
- drivers/net/dsa/{ => lantiq}/lantiq_gswip.c | 0
- drivers/net/dsa/{ => lantiq}/lantiq_gswip.h | 0
- drivers/net/dsa/{ => lantiq}/lantiq_pce.h   | 0
- 8 files changed, 11 insertions(+), 10 deletions(-)
- create mode 100644 drivers/net/dsa/lantiq/Kconfig
- create mode 100644 drivers/net/dsa/lantiq/Makefile
- rename drivers/net/dsa/{ => lantiq}/lantiq_gswip.c (100%)
- rename drivers/net/dsa/{ => lantiq}/lantiq_gswip.h (100%)
- rename drivers/net/dsa/{ => lantiq}/lantiq_pce.h (100%)
+ drivers/net/dsa/lantiq/lantiq_gswip.c | 19 ++++++++++++++++---
+ drivers/net/dsa/lantiq/lantiq_gswip.h |  3 +++
+ 2 files changed, 19 insertions(+), 3 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index bce96dd254b8..e86bdad15919 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -13801,8 +13801,7 @@ M:	Hauke Mehrtens <hauke@hauke-m.de>
- L:	netdev@vger.kernel.org
- S:	Maintained
- F:	Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
--F:	drivers/net/dsa/lantiq_gswip.c
--F:	drivers/net/dsa/lantiq_pce.h
-+F:	drivers/net/dsa/lantiq/*
- F:	drivers/net/ethernet/lantiq_xrx200.c
- F:	net/dsa/tag_gswip.c
+diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.c b/drivers/net/dsa/lantiq/lantiq_gswip.c
+index 67919c3935e4..acb6996356e9 100644
+--- a/drivers/net/dsa/lantiq/lantiq_gswip.c
++++ b/drivers/net/dsa/lantiq/lantiq_gswip.c
+@@ -1592,10 +1592,23 @@ static int gswip_get_sset_count(struct dsa_switch *ds, int port, int sset)
+ 	return ARRAY_SIZE(gswip_rmon_cnt);
+ }
  
-diff --git a/drivers/net/dsa/Kconfig b/drivers/net/dsa/Kconfig
-index 202a35d8d061..4d9af691b989 100644
---- a/drivers/net/dsa/Kconfig
-+++ b/drivers/net/dsa/Kconfig
-@@ -26,13 +26,7 @@ config NET_DSA_LOOP
++static struct phylink_pcs *gswip_phylink_mac_select_pcs(struct phylink_config *config,
++							phy_interface_t interface)
++{
++	struct dsa_port *dp = dsa_phylink_to_port(config);
++	struct gswip_priv *priv = dp->ds->priv;
++
++	if (priv->hw_info->mac_select_pcs)
++		return priv->hw_info->mac_select_pcs(config, interface);
++
++	return NULL;
++}
++
+ static const struct phylink_mac_ops gswip_phylink_mac_ops = {
+-	.mac_config	= gswip_phylink_mac_config,
+-	.mac_link_down	= gswip_phylink_mac_link_down,
+-	.mac_link_up	= gswip_phylink_mac_link_up,
++	.mac_config		= gswip_phylink_mac_config,
++	.mac_link_down		= gswip_phylink_mac_link_down,
++	.mac_link_up		= gswip_phylink_mac_link_up,
++	.mac_select_pcs		= gswip_phylink_mac_select_pcs,
+ };
  
- source "drivers/net/dsa/hirschmann/Kconfig"
+ static const struct dsa_switch_ops gswip_switch_ops = {
+diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.h b/drivers/net/dsa/lantiq/lantiq_gswip.h
+index 620c2d560cbe..19bbe6fddf04 100644
+--- a/drivers/net/dsa/lantiq/lantiq_gswip.h
++++ b/drivers/net/dsa/lantiq/lantiq_gswip.h
+@@ -4,6 +4,7 @@
  
--config NET_DSA_LANTIQ_GSWIP
--	tristate "Lantiq / Intel GSWIP"
--	depends on HAS_IOMEM
--	select NET_DSA_TAG_GSWIP
--	help
--	  This enables support for the Lantiq / Intel GSWIP 2.1 found in
--	  the xrx200 / VR9 SoC.
-+source "drivers/net/dsa/lantiq/Kconfig"
+ #include <linux/clk.h>
+ #include <linux/mutex.h>
++#include <linux/phylink.h>
+ #include <linux/platform_device.h>
+ #include <linux/regmap.h>
+ #include <linux/reset.h>
+@@ -237,6 +238,8 @@ struct gswip_hw_info {
+ 	enum dsa_tag_protocol tag_protocol;
+ 	void (*phylink_get_caps)(struct dsa_switch *ds, int port,
+ 				 struct phylink_config *config);
++	struct phylink_pcs *(*mac_select_pcs)(struct phylink_config *config,
++					      phy_interface_t interface);
+ };
  
- config NET_DSA_MT7530
- 	tristate "MediaTek MT7530 and MT7531 Ethernet switch support"
-diff --git a/drivers/net/dsa/Makefile b/drivers/net/dsa/Makefile
-index 23dbdf1a36a8..c0a534fe6eaf 100644
---- a/drivers/net/dsa/Makefile
-+++ b/drivers/net/dsa/Makefile
-@@ -6,7 +6,6 @@ ifdef CONFIG_NET_DSA_LOOP
- obj-$(CONFIG_FIXED_PHY)		+= dsa_loop_bdinfo.o
- endif
- obj-$(CONFIG_NET_DSA_KS8995) 	+= ks8995.o
--obj-$(CONFIG_NET_DSA_LANTIQ_GSWIP) += lantiq_gswip.o
- obj-$(CONFIG_NET_DSA_MT7530)	+= mt7530.o
- obj-$(CONFIG_NET_DSA_MT7530_MDIO) += mt7530-mdio.o
- obj-$(CONFIG_NET_DSA_MT7530_MMIO) += mt7530-mmio.o
-@@ -20,6 +19,7 @@ obj-$(CONFIG_NET_DSA_VITESSE_VSC73XX_PLATFORM) += vitesse-vsc73xx-platform.o
- obj-$(CONFIG_NET_DSA_VITESSE_VSC73XX_SPI) += vitesse-vsc73xx-spi.o
- obj-y				+= b53/
- obj-y				+= hirschmann/
-+obj-y				+= lantiq/
- obj-y				+= microchip/
- obj-y				+= mv88e6xxx/
- obj-y				+= ocelot/
-diff --git a/drivers/net/dsa/lantiq/Kconfig b/drivers/net/dsa/lantiq/Kconfig
-new file mode 100644
-index 000000000000..1cb053c823f7
---- /dev/null
-+++ b/drivers/net/dsa/lantiq/Kconfig
-@@ -0,0 +1,7 @@
-+config NET_DSA_LANTIQ_GSWIP
-+	tristate "Lantiq / Intel GSWIP"
-+	depends on HAS_IOMEM
-+	select NET_DSA_TAG_GSWIP
-+	help
-+	  This enables support for the Lantiq / Intel GSWIP 2.1 found in
-+	  the xrx200 / VR9 SoC.
-diff --git a/drivers/net/dsa/lantiq/Makefile b/drivers/net/dsa/lantiq/Makefile
-new file mode 100644
-index 000000000000..849f85ebebd6
---- /dev/null
-+++ b/drivers/net/dsa/lantiq/Makefile
-@@ -0,0 +1 @@
-+obj-$(CONFIG_NET_DSA_LANTIQ_GSWIP) += lantiq_gswip.o
-diff --git a/drivers/net/dsa/lantiq_gswip.c b/drivers/net/dsa/lantiq/lantiq_gswip.c
-similarity index 100%
-rename from drivers/net/dsa/lantiq_gswip.c
-rename to drivers/net/dsa/lantiq/lantiq_gswip.c
-diff --git a/drivers/net/dsa/lantiq_gswip.h b/drivers/net/dsa/lantiq/lantiq_gswip.h
-similarity index 100%
-rename from drivers/net/dsa/lantiq_gswip.h
-rename to drivers/net/dsa/lantiq/lantiq_gswip.h
-diff --git a/drivers/net/dsa/lantiq_pce.h b/drivers/net/dsa/lantiq/lantiq_pce.h
-similarity index 100%
-rename from drivers/net/dsa/lantiq_pce.h
-rename to drivers/net/dsa/lantiq/lantiq_pce.h
+ struct gswip_gphy_fw {
 -- 
 2.51.0
 
