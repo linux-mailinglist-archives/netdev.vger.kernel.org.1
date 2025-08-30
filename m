@@ -1,97 +1,90 @@
-Return-Path: <netdev+bounces-218434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97B36B3C74C
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 04:10:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF9F1B3C74F
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 04:15:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 564E83B5BC9
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 02:10:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 075081C832F9
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 02:16:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2003324678A;
-	Sat, 30 Aug 2025 02:10:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A25C49620;
+	Sat, 30 Aug 2025 02:15:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XQ4ONx+N"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iXsTuSWh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECE6B19E7F7;
-	Sat, 30 Aug 2025 02:10:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5962F30CDA5;
+	Sat, 30 Aug 2025 02:15:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756519804; cv=none; b=XA40UgSrDZXsi1uYEi83sCM6IOD/ksMUmTpenynb4P38PoMDmZv4IEMfeCFRUDp3A1msgtjw7Dy2VZdGJW3P+t/sjzbr/AWfnw3g2ZdDCPnBQ+/RpZXpiAsB9p8p3oNibuaWF0mFPq0IyrBCr4QSX2XWu3F/CfmJxsq0Q9ISbro=
+	t=1756520139; cv=none; b=WDKEVY2VMCO3KYj+uGX2ezHt+cVnpdLjllcbOJo6LoHUXfot/0Mx7vNGzXFhL4T2/8AMEy4aWbGPUpHB39M4X/0n/9YkrISfnM3GoV3Yxg22I/7239C5hco0P6/kFmk1UKdRpL9ZQihdrpSc+z9U4FvNF4wFhbu8+VHSRj8+VcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756519804; c=relaxed/simple;
-	bh=Fs53JZEDfA/JmT11uACI+B8/Fr8Vhu81kw6rlTcmkA4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YYxpmShBJErdUu1KcbvS+FymddCadjFv2fe7jSPI1H+EGZgu9TSNzJJ2cm8656dKIPalyjY3MvbhqDumMChMvlPJGBR7lWg4RcsFN0jiCSLFL0t38KrSL0W0esddDoK11mk5CFzOfLKgJwIfwsj6/Uj3UIMXzLGTxe8BV2VTaeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XQ4ONx+N; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B693C4CEF0;
-	Sat, 30 Aug 2025 02:10:01 +0000 (UTC)
+	s=arc-20240116; t=1756520139; c=relaxed/simple;
+	bh=egVW/Xn9FX2VMJ6DuixGgONttWD8hugyDmiBb588KzM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OktRbSBiUv8+DDHMNdIBIvOWDRj49u+jdHQP9gPX6YgMeWafXIPSZtgQZHImAQMo5y/Avpf5tAi317OkMnRd8T8O2l1zcepEguJ4W7U2G3TbM9PeVYOs8XzfZUXncB0jmKo59ziImNSW7QrCF+oKgkz1WC9KG11kcfGXmteqCAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iXsTuSWh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62902C4CEF0;
+	Sat, 30 Aug 2025 02:15:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756519801;
-	bh=Fs53JZEDfA/JmT11uACI+B8/Fr8Vhu81kw6rlTcmkA4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XQ4ONx+N3aYEf6qeXvOA3Yge2+775F9MWChNk03TEif3jokP0e5vZzuQkUmXCnhP5
-	 QbVoCUrumBT0ak8cYLg5x2q0wB52UrbtJVlwKFLiQZ3VDWnX2CpeoUED3xa0W8DpnC
-	 lDI306l3dGQLrRrFeraNYoqpWq/m1pjvpb1lylxOoNOXln9XF5x6Z3YH/SyiZlclkU
-	 0VFMmtl+PBGm43SFTf0bQqvU50lR/yhsBkMCqb9mJPg7QNEj/wxTl9GML9kFvLvjBU
-	 hkXWBpUIaZAmUotiwvYZ1Lf7X7KZAGOzCYv1ExztsOIRyqowWMjbeCjehtS7h35O3A
-	 kV5G3H+aY+PPw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3408B383BF75;
-	Sat, 30 Aug 2025 02:10:09 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1756520138;
+	bh=egVW/Xn9FX2VMJ6DuixGgONttWD8hugyDmiBb588KzM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=iXsTuSWhiF7BGP5YNzL7jsDOjj8dflanLWs86vPfNcBqnbBYmC8zQVZgXVIGKggdY
+	 Me5d42dLhWHwjLZToVVhp4VmXWeocSQ9cgkxGKOcUE2uT1d+qxn2RkkkU6Pm7iae4/
+	 dRsK9Fc+7NedDSXU7y2mvVw0LO8aXQtYT2Da/NcohFBiikEcCMBvqTdviMEiJaoOw9
+	 tf4EOqdk0sevsO+cpzwrULSENSM7S2b1QtN80EO0fyAFW+8W5wM/m0Usg7+QSZUVU/
+	 7mozxZN9Ts70HEHt9FT9bfqRo/BPpYEZhYadTVz+iRtiqQEH5RhUcGgE718QaJywjL
+	 D6uMwhhiJWxTQ==
+Date: Fri, 29 Aug 2025 19:15:37 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Zongmin Zhou <min_halo@163.com>
+Cc: horms@kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, shuah@kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, Zongmin Zhou
+ <zhouzongmin@kylinos.cn>
+Subject: Re: [PATCH v2] selftests: net: avoid memory leak
+Message-ID: <20250829191537.4618f815@kernel.org>
+In-Reply-To: <20250828020210.25475-1-min_halo@163.com>
+References: <20250827161230.GB10519@horms.kernel.org>
+	<20250828020210.25475-1-min_halo@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/2] netfilter: br_netfilter: do not check confirmed
- bit
- in br_nf_local_in() after confirm
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175651980801.2396653.1420643484668912116.git-patchwork-notify@kernel.org>
-Date: Sat, 30 Aug 2025 02:10:08 +0000
-References: <20250827133900.16552-2-fw@strlen.de>
-In-Reply-To: <20250827133900.16552-2-fw@strlen.de>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
- pablo@netfilter.org, wangliang74@huawei.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 28 Aug 2025 10:02:10 +0800 Zongmin Zhou wrote:
+> @@ -501,7 +502,8 @@ int main(int argc, char *argv[])
+>  	if (fd < 0) {
+>  		fprintf(stderr, "Can't open socket: %s\n", strerror(errno));
+>  		freeaddrinfo(ai);
 
-This series was applied to netdev/net.git (main)
-by Florian Westphal <fw@strlen.de>:
+Since you added the gotos now perhaps it'd be even better to remove
+this freeaddrinfo() call here, and instead jump to a separate label...
 
-On Wed, 27 Aug 2025 15:38:59 +0200 you wrote:
-> From: Wang Liang <wangliang74@huawei.com>
-> 
-> When send a broadcast packet to a tap device, which was added to a bridge,
-> br_nf_local_in() is called to confirm the conntrack. If another conntrack
-> with the same hash value is added to the hash table, which can be
-> triggered by a normal packet to a non-bridge device, the below warning
-> may happen.
-> 
-> [...]
+> -		return ERN_RESOLVE;
+> +		err = ERN_RESOLVE;
+> +		goto err_free_buff;
+>  	}
+>  
+>  	if (opt.sock.proto == IPPROTO_ICMP) {
+> @@ -575,5 +577,7 @@ int main(int argc, char *argv[])
+>  err_out:
+>  	close(fd);
 
-Here is the summary with links:
-  - [net,1/2] netfilter: br_netfilter: do not check confirmed bit in br_nf_local_in() after confirm
-    https://git.kernel.org/netdev/net/c/479a54ab9208
-  - [net,2/2] netfilter: conntrack: helper: Replace -EEXIST by -EBUSY
-    https://git.kernel.org/netdev/net/c/54416fd76770
+... added right here?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+>  	freeaddrinfo(ai);
+> +err_free_buff:
+> +	free(buf);
+>  	return err;
 
