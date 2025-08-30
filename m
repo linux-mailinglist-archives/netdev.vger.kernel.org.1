@@ -1,176 +1,106 @@
-Return-Path: <netdev+bounces-218522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AD17B3CF91
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 23:42:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB8D4B3CF94
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 23:44:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 890D31B24724
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 21:42:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B3307A38F1
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 21:43:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE13025783D;
-	Sat, 30 Aug 2025 21:42:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C931F2586C9;
+	Sat, 30 Aug 2025 21:44:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CkHdUhN9"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ble5xxoL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4128730CD85;
-	Sat, 30 Aug 2025 21:42:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DBA920E6F3;
+	Sat, 30 Aug 2025 21:44:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756590141; cv=none; b=QakKDHVHYevV8PbfMJobiQcV6M2VBDE2Nmk2n2tGhkCf2a11NUaKnlTd8VxKffMmKwaEuh12cnZTTKD7TD0saIJivsG5vewDxMprU+xtwZaoVL6CxuSnCYz1JDwuO6HUpA11unA6jqpanTrprhBLiwqILgKIwU3Oh1Tcp56OKik=
+	t=1756590278; cv=none; b=j2wMFEW6Q9+LpSMaZCcVHYfrplVGp3trq8TbgkQepmAyz43VFeCrefXpHXUzlppXAa3R4rmgzwgHLsUoowpGL/TlutG5mm38l3pOQcGFPI7qbGushds1UPD2RcEfrl8uvC9rRFmABTwG4OyyXbQjC52ghG2m+7wVbgq67itMiUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756590141; c=relaxed/simple;
-	bh=BJYDBiQ4amhJaGjub/U5j328zDVwJa4YHQ6Slw4ZyaE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TLKcVoQWvIcugyk38NUgKFO6xUvFlWSxJIFjdxgd8vq1eUXe7+BWV2pjfhsyI2dfngSXyOpof2ll/x1+45yW+vL4BiGY6f9guifFaEPctxNwyKrrvj9TOoV93rPZ5hnxFUprspLV+g5W2kqGVOmQ6JYTJ5VPrYS9e0k124hjApE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CkHdUhN9; arc=none smtp.client-ip=209.85.215.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-b4c3d8bd21eso2053140a12.2;
-        Sat, 30 Aug 2025 14:42:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756590139; x=1757194939; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rY/JPOchmMvWF/419gMe9g7EplINNEPxkeuggdXANUs=;
-        b=CkHdUhN9mhtWlbr7xiJbKFJAIZa6WUpKahOLNl+LGdgmtXNqI6/5QVPVsdtXsdm7J4
-         GF7jl7w+ew425gvsTFfZdxU8Wxu3s0KKBAnmvqHzVL+TReepX7zJQWE9qNIg7sykijVH
-         B+zl4xRLzZbOyOIJd0I2OEHBf1Hj9OwDc/u8+KReWG7hSBfQ03QUw7ilwiU4MtSF6lAf
-         uY4Sif3VaS4hZn5EoMG4v5WPcq3bJWG/YIkLV9d2jcwEht8kzWiROIkL/IFrmTMMZMKa
-         LMqv/UlRfaIp0jf4WgyE3CL/uA9elm5hrmiNV4hYtvec4KneCmrVdpcyQwOwjCigiLVy
-         7xUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756590139; x=1757194939;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rY/JPOchmMvWF/419gMe9g7EplINNEPxkeuggdXANUs=;
-        b=VEtl+nmfwJ1INjBi2iGrpQyGhA4JVdPtOSUAFg38whtkH71BgvuBErkaBZeUa0oy0Z
-         3xKDOIYkYL7AxfiwQibCjVuIvUxRxIwh/C+4tDaH1PJty5e59bDbwyHTtiHOUT7JjSHr
-         gEACHPzO/g2KXLZYcWLAD83dWUCc3gciYorCCF28uWjcdnDA/U7+yN8uByNLebI6X5AK
-         u7smibWYUR07sDufQHcWn/1fVDDE+WBl68IfimQdiR/oFnGb7Bw/bBMcUEHp8kiMgvgz
-         OMkMWQ4ahVrkYA12YThHAfXAOs0KVAg4lU3daJo2TIDUNkHax1piuRxek819E4z++ExT
-         JOcA==
-X-Forwarded-Encrypted: i=1; AJvYcCVYOouEUKMmNZg42E1F5+dKGn6/ajcy04cyx/CuSJU+irPnipKP5hXdnI67G9f4cluuiEG22olfp/Z21xA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxSv9rK+IGX+VnYm2hgX5lqZDOaIQ6eKcwaACEygiQsuQWljDp
-	VlZwZhfjW2LOhYwOdZR1++zjIJxWnFFtEmFxsNLiXHVeYlUzjLSLirKMeWX8/A==
-X-Gm-Gg: ASbGncvCQtMHggkVJ3xgZ2hsbUzhORBJAgxpBV7hnCYw4V37afqUg6Qe0uzjZToCq+B
-	zmMpHkjwdJGwRjhGqdBVLD1vw8X8DBqVv8GuFLjjqstfqt0VVaCcUi3es1Nc1CngRpU3BWdK3Q6
-	X4Hbfv+lnk76LjYVRkyiBJL01vRp35MspWXkn131V4rbShF5OyS2s+wmBbpvl3oDiuuWJz1CzGb
-	fyLiYrc/exOEgCKtLiwgfarBmENn2pq1zdbH5PyyYJIeq8w5dF5K+ijHRVh5J+YlWj/UsQ4Iowm
-	rcAxDtnXqke1wqrMwhr8BQlKNwSlSOi9AfpPIqqkc7zqoXsRFdaKN9sh9A4D+I8dimVKQUo6n4o
-	SSQIJHOKupGgJiiMNYHOpQGtZGN3iFkTGnLi9pR+8HezLvqfaS5Iz6AL3+cDD/t3lhA==
-X-Google-Smtp-Source: AGHT+IHYPQqDFERxJIFwA2J1mhv1++eW9+/JHW6fdC9Qqbwf7Tr3rlueFCxnKmqLcI/MrNfBQSmW/w==
-X-Received: by 2002:a17:902:e751:b0:248:a054:e1c4 with SMTP id d9443c01a7336-249448f8ad8mr39874385ad.23.1756590139262;
-        Sat, 30 Aug 2025 14:42:19 -0700 (PDT)
-Received: from archlinux.lan ([2601:644:8200:acc7::1f6])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24903758b89sm60807735ad.59.2025.08.30.14.42.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 30 Aug 2025 14:42:18 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Sunil Goutham <sgoutham@marvell.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1756590278; c=relaxed/simple;
+	bh=MsvKBCLCV+6KSSnIJPzayYM8MUkHtE7TV3nETYrXeiQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EFCcDEZyaHXChUXEoJeW3gGp9Cll8kmlRcA82D63U9s4Px6kXIT7uLVE39trb8niD9x5ghDw9vbNXRMTO99VCChCe12vhnGOxmvxdTcZyNdrprGdiOxb9BYW/SJFJfGwDBwrg0cjbfNGNjQSZHgF3rSKBF/OIKM1fOferJ3Yc64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ble5xxoL; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=lGPDXnyGYW0XoDW4eruhlRzw1Pka3lDz/kJqkb3Hz1k=; b=ble5xxoLGxUvv/PLnLcgzkto+N
+	QjyWij/EswwddxjEC0pKfxn9Mp72yHI9nXr4naY+HhD6S/DRkrHLFRfBtG5OCWL4c8W63HD89DLsl
+	IQxx7brRWJM65yvz1Iim0TqugnYM/xtgAt1N6zAy+43B/iU5gxR54LLDFm51izL0RaeOmocWZyJzP
+	gCrtgUvbpJIt3TN6q3o0ujHpVSKOeyqQjsODhYmKdMXX2qx5BkdJZ1A7SSco9Yv7jfsAsCR2lA+00
+	sluqE9cvgiHyK/S5wN/acApHVPY8cmkQr91/PyW1T5iK39KyefqMzJV4GIkgdG5lqvZg4S7WwNZ2m
+	+QZlyZqQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58744)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1usTN4-000000004U3-2172;
+	Sat, 30 Aug 2025 22:44:26 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1usTN2-000000005QQ-1VSx;
+	Sat, 30 Aug 2025 22:44:24 +0100
+Date: Sat, 30 Aug 2025 22:44:24 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Shawn Guo <shawnguo@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Patrice Chotard <patrice.chotard@foss.st.com>,
+	Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org (moderated list:ARM/CAVIUM THUNDER NETWORK DRIVER),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] net: thunder_bgx: use OF loop instead of fwnode
-Date: Sat, 30 Aug 2025 14:42:17 -0700
-Message-ID: <20250830214217.74801-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	David Miller <davem@davemloft.net>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next 1/5] arm64: dts: ls1043a-qds: switch to new
+ fixed-link binding
+Message-ID: <aLNwuEqSqrUM3dW6@shell.armlinux.org.uk>
+References: <a3c2f8d3-36e6-4411-9526-78abbc60e1da@gmail.com>
+ <fe4c021d-c188-4fc2-8b2f-9c3c269056eb@gmail.com>
+ <aLNst1V_OSlvpC3t@shell.armlinux.org.uk>
+ <d2012185-0403-4bad-ad4a-e0468e11928d@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d2012185-0403-4bad-ad4a-e0468e11928d@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-The loop ends up converting fwnode to device_node anyway.
+On Sat, Aug 30, 2025 at 11:39:58PM +0200, Heiner Kallweit wrote:
+> On 8/30/2025 11:27 PM, Russell King (Oracle) wrote:
+> > On Sat, Aug 30, 2025 at 12:27:23PM +0200, Heiner Kallweit wrote:
+> >> The old array-type fixed-link binding has been deprecated
+> >> for more than 10 yrs. Switch to the new binding.
+> > 
+> > ... and the fact we have device trees that use it today means that we
+> > can't remove support for it from the kernel.
+> > 
+> After this series there is no in-tree user of the old binding any longer.
 
-While at it, handle return value of of_get_mac_address in case of NVMEM.
+Doesn't matter. Please read Documentation/devicetree/bindings/ABI.rst
+particularly the but about "newer kernel will not break on an older
+device tree".
 
-Simplify while loop iteration.
-
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- .../net/ethernet/cavium/thunder/thunder_bgx.c | 27 ++++++++-----------
- 1 file changed, 11 insertions(+), 16 deletions(-)
-
-diff --git a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
-index 21495b5dce25..eb5525c1482e 100644
---- a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
-+++ b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
-@@ -1468,27 +1468,23 @@ static int bgx_init_acpi_phy(struct bgx *bgx)
- 
- static int bgx_init_of_phy(struct bgx *bgx)
- {
--	struct fwnode_handle *fwn;
--	struct device_node *node = NULL;
-+	struct device_node *node = bgx->pdev->dev.of_node;
-+	struct device_node *child;
- 	u8 lmac = 0;
- 
--	device_for_each_child_node(&bgx->pdev->dev, fwn) {
-+	for_each_child_of_node(node, child) {
- 		struct phy_device *pd;
- 		struct device_node *phy_np;
-+		int err;
- 
--		/* Should always be an OF node.  But if it is not, we
--		 * cannot handle it, so exit the loop.
--		 */
--		node = to_of_node(fwn);
--		if (!node)
--			break;
--
--		of_get_mac_address(node, bgx->lmac[lmac].mac);
-+		err = of_get_mac_address(child, bgx->lmac[lmac].mac);
-+		if (err == -EPROBE_DEFER)
-+			goto defer;
- 
- 		SET_NETDEV_DEV(bgx->lmac[lmac].netdev, &bgx->pdev->dev);
- 		bgx->lmac[lmac].lmacid = lmac;
- 
--		phy_np = of_parse_phandle(node, "phy-handle", 0);
-+		phy_np = of_parse_phandle(child, "phy-handle", 0);
- 		/* If there is no phy or defective firmware presents
- 		 * this cortina phy, for which there is no driver
- 		 * support, ignore it.
-@@ -1504,7 +1500,7 @@ static int bgx_init_of_phy(struct bgx *bgx)
- 
- 		lmac++;
- 		if (lmac == bgx->max_lmac) {
--			of_node_put(node);
-+			of_node_put(child);
- 			break;
- 		}
- 	}
-@@ -1514,14 +1510,13 @@ static int bgx_init_of_phy(struct bgx *bgx)
- 	/* We are bailing out, try not to leak device reference counts
- 	 * for phy devices we may have already found.
- 	 */
--	while (lmac) {
-+	while (lmac--) {
- 		if (bgx->lmac[lmac].phydev) {
- 			put_device(&bgx->lmac[lmac].phydev->mdio.dev);
- 			bgx->lmac[lmac].phydev = NULL;
- 		}
--		lmac--;
- 	}
--	of_node_put(node);
-+	of_node_put(child);
- 	return -EPROBE_DEFER;
- }
- 
 -- 
-2.51.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
