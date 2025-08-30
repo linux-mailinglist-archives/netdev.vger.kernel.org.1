@@ -1,121 +1,102 @@
-Return-Path: <netdev+bounces-218450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB903B3C778
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 04:35:03 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81B54B3C77D
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 04:40:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 52AFE7ACDAE
-	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 02:33:27 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4C5D24E0300
+	for <lists+netdev@lfdr.de>; Sat, 30 Aug 2025 02:40:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 652C3257AF3;
-	Sat, 30 Aug 2025 02:34:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F269125F7A4;
+	Sat, 30 Aug 2025 02:40:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A/RESoA8"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB77D257829;
-	Sat, 30 Aug 2025 02:34:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB0C257845
+	for <netdev@vger.kernel.org>; Sat, 30 Aug 2025 02:40:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756521297; cv=none; b=H77c2qQu737GVbrJkgZZ+9agkBSNS0Y/0+InRT+MUQXPeM2IBcjn6GaXoRY1VwTXF53xce6Ax2VYBROZk2Zk3X/zMbPrn6JUixWOQMe4uN7iP4q6P6+hBHRE7BDu+3KAn7xl4MuaJM2+Ao1sYUYlZbyL7kxGj9AeHwkYx/AvI3A=
+	t=1756521605; cv=none; b=gy0I32FZRZEE9CVNIOH9vv21q0Gti7HZGguaBBKfSEOG7+h3Q/MdCEf877sKtCeGtH5XOUcgWSD5BhfFhdsjMQOzne7Yo3M3PpGfJMPNywWerFQJGxhSr34rZeTBKDfQLNjvqKCVFyfGDg6LpDybHNm6fE3Ftx0nSHVjr7t4soc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756521297; c=relaxed/simple;
-	bh=/lgXHRubUP/8cxoFx2QUkE7QqbJ/z4M/g68O76DkIVg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kfhS3FiIb8P70jzP27IDG3VWPFz6RURAbmcrVIwppGl0pwIonPb3vW8fDGrYoszAVAP6KKitJukl0b0afrtLG9Ms8IQHiLkxXz5oEY8SdFFxDLtm8dLT57bGZlByw6rOcq6qP3rmOSMOvo0AzMEeaKguMlyoPpbn5pFhlQXAn9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1usBQZ-000000005xi-1Pyf;
-	Sat, 30 Aug 2025 02:34:51 +0000
-Date: Sat, 30 Aug 2025 03:34:48 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Hauke Mehrtens <hauke@hauke-m.de>,
-	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Andreas Schirm <andreas.schirm@siemens.com>,
-	Lukas Stockmann <lukas.stockmann@siemens.com>,
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Peter Christen <peter.christen@siemens.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next v4 6/6] net: dsa: lantiq_gswip: move MDIO bus
- registration to .setup()
-Message-ID: <2650602042c0bfdc5664b88d59071ed4dca96c26.1756520811.git.daniel@makrotopia.org>
-References: <cover.1756520811.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1756521605; c=relaxed/simple;
+	bh=xvYcfHJ3W1k4NY8OgUVKhWUE4oXm032ZG56vbnS1PJ0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=sILv72P2W/gIMbrG7vBblqNkmZTqC+FdTQosW/LfJHjHoA+cj6UJQK8EGnrcrSEpGnf9RfDeSWInNm6CVbkHmxhPouilq0ZQIeOmRWNrFvSst36oCcwAlZz82Ket08ZQcHwU+ub5MDnEc+/hLhIhgHAegwgj6U47kHtXtFUuojk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A/RESoA8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BA50C4CEF0;
+	Sat, 30 Aug 2025 02:40:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756521605;
+	bh=xvYcfHJ3W1k4NY8OgUVKhWUE4oXm032ZG56vbnS1PJ0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=A/RESoA8bCU8wU26xqFo3pNIG8puQlrEcEtYpJ78KezjxyArE1VdTYVi+szLdD6GG
+	 iadOkxu65+6kbYy864YksecGBTqyISYZVsm98W8DgzLAQsYuVmla5mCN9YcX/cgL2D
+	 ey6m0DZZrW8HicshbbHPyTNVxm6JYfH83CbYRPYcfsbYfUWC8Vegh9nNmasLEgByLr
+	 UY6xt9QiCN4A/44D7HMPh0mfC9QsT9pRGOm50wB8PCOYyGw/VxDJehTfZlibDLrxWl
+	 N3CSGxv26+Wi5j7PM/SqLw7eySfNLuBgONjnlAszoGfZorhsHh9yctvZ8+fTSyJyRi
+	 HZqC69Hlg32yA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33AA7383BF75;
+	Sat, 30 Aug 2025 02:40:13 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1756520811.git.daniel@makrotopia.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/5] inet_diag: make dumps faster with simple
+ filters
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175652161200.2401181.4619730593741623159.git-patchwork-notify@kernel.org>
+Date: Sat, 30 Aug 2025 02:40:12 +0000
+References: <20250828102738.2065992-1-edumazet@google.com>
+In-Reply-To: <20250828102738.2065992-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ ncardwell@google.com, horms@kernel.org, kuniyu@google.com,
+ willemb@google.com, netdev@vger.kernel.org, eric.dumazet@gmail.com
 
-Instead of registering the switch MDIO bus in the probe() function, move
-the call to gswip_mdio() into the .setup() DSA switch op, so it can be
-reused independently of the probe() function.
+Hello:
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Reviewed-by: Hauke Mehrtens <hauke@hauke-m.de>
----
-v4: no changes
-v3: no changes
-v2: no changes
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
- drivers/net/dsa/lantiq/lantiq_gswip.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+On Thu, 28 Aug 2025 10:27:33 +0000 you wrote:
+> inet_diag_bc_sk() pulls five cache lines per socket,
+> while most filters only need the two first ones.
+> 
+> We can change it to only pull needed cache lines,
+> to make things like "ss -temoi src :21456" much faster.
+> 
+> First patches (1-3) are annotating data-races as a first step.
+> 
+> [...]
 
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.c b/drivers/net/dsa/lantiq/lantiq_gswip.c
-index 43f83c0736d1..1e991d7bca0b 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip.c
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip.c
-@@ -627,6 +627,13 @@ static int gswip_setup(struct dsa_switch *ds)
- 	/* Configure the MDIO Clock 2.5 MHz */
- 	gswip_mdio_mask(priv, 0xff, 0x09, GSWIP_MDIO_MDC_CFG1);
- 
-+	/* bring up the mdio bus */
-+	err = gswip_mdio(priv);
-+	if (err) {
-+		dev_err(priv->dev, "mdio bus setup failed\n");
-+		return err;
-+	}
-+
- 	/* Disable the xMII interface and clear it's isolation bit */
- 	for (i = 0; i < priv->hw_info->max_ports; i++)
- 		gswip_mii_mask_cfg(priv,
-@@ -1973,13 +1980,6 @@ static int gswip_probe(struct platform_device *pdev)
- 					     "gphy fw probe failed\n");
- 	}
- 
--	/* bring up the mdio bus */
--	err = gswip_mdio(priv);
--	if (err) {
--		dev_err_probe(dev, err, "mdio probe failed\n");
--		goto gphy_fw_remove;
--	}
--
- 	err = dsa_register_switch(priv->ds);
- 	if (err) {
- 		dev_err_probe(dev, err, "dsa switch registration failed\n");
+Here is the summary with links:
+  - [net-next,1/5] inet_diag: annotate data-races in inet_diag_msg_common_fill()
+    https://git.kernel.org/netdev/net-next/c/9a574257b968
+  - [net-next,2/5] tcp: annotate data-races in tcp_req_diag_fill()
+    https://git.kernel.org/netdev/net-next/c/8e60447f0831
+  - [net-next,3/5] inet_diag: annotate data-races in inet_diag_bc_sk()
+    https://git.kernel.org/netdev/net-next/c/4fd84a0aaf2b
+  - [net-next,4/5] inet_diag: change inet_diag_bc_sk() first argument
+    https://git.kernel.org/netdev/net-next/c/9529320ad64e
+  - [net-next,5/5] inet_diag: avoid cache line misses in inet_diag_bc_sk()
+    https://git.kernel.org/netdev/net-next/c/95fa78830e5b
+
+You are awesome, thank you!
 -- 
-2.51.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
