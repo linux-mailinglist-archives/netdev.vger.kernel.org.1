@@ -1,193 +1,230 @@
-Return-Path: <netdev+bounces-218532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58BF4B3D0C4
-	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 04:21:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82AB8B3D0D5
+	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 05:21:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EFDB1A820CC
-	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 02:21:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7F31189E646
+	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 03:21:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B91431DDC2B;
-	Sun, 31 Aug 2025 02:21:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6105620DD48;
+	Sun, 31 Aug 2025 03:21:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lJn4ceJS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05B992566
-	for <netdev@vger.kernel.org>; Sun, 31 Aug 2025 02:21:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 932D27E792;
+	Sun, 31 Aug 2025 03:21:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756606894; cv=none; b=LnsFbH5uykOKb0ZwUutlVbb5yZHzN0lJ5eXs9an+mbiQujq0LTDoE7Y7Q9MyWQJ1+SRJdxv3gxrL55/r81LN2BohJuSEEj+ZD2w9QjjdHqCaCsZpSubyzf+fBicy6A+jpfTjLxIza+3WoYeQUZ5ORV/hG0eeIAMXtUpUVI1c5Bo=
+	t=1756610481; cv=none; b=OrQi0LE7A+eXIaHhxxLnPLKqeYV2hqyMMuSB1tlfMOdPd2cre2prnSSnPFACzRwyfhhpOzrFcoAeG+gEGpkvkaS7V1yTCq8uMD1koZEYX1uFrVJ1PEB+tAwPxYHkqy+2ai1KcNNqgM0B4QY23d1yasrPlNpAInli0NscP6a6sP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756606894; c=relaxed/simple;
-	bh=Imc/yaT1bwXvOai6Vk+5b+aubdlF0s89Kor4e2hKFN8=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=MK50xDx4vvMhR8vvEh7mOBDbvGSwmsV2geWtN+UMRxSgbHWlNbxDysfKS/YAXkd/R1XCkMgdw/gdNX7/ByxKGwXK46GpuKH5BKPIFZYuGB2agbsDyYRVopuoFLFYjfwB0rQ7KB0LYtYITJKu3kZP8DIrJSWfJVCuTU/rRehVROU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3f12be6bc4aso44020745ab.1
-        for <netdev@vger.kernel.org>; Sat, 30 Aug 2025 19:21:32 -0700 (PDT)
+	s=arc-20240116; t=1756610481; c=relaxed/simple;
+	bh=DvsrS5yV4f8tnEjy4K5dpNZ63UE+ZLKpyPJ0V7szXSE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=p+0fbhndYlaQindrwLHu673iKKWXzOKJUq6ksupc3iWy61wlqBXkg8Z9aV3xNqVnc741viHumZ1yrWYrDE4b96Eu0+CHvCKIQCEtGMUTzaHLzF0gB3cW8tMnKnXRiL93Qy0CS3qMRiWCt1fJfk6Q4kyFmHTYjS6+SOl/VECWnII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lJn4ceJS; arc=none smtp.client-ip=209.85.219.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-70fa0e941a9so15903656d6.0;
+        Sat, 30 Aug 2025 20:21:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756610478; x=1757215278; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QmkA2GEtVBpE1rfMwgGSnld1GOA1shoo7sxcZ5Vcnw8=;
+        b=lJn4ceJSJp7M4NuRs8br5n0QcgMWeoJrw++fLPHSrKIgSMp4iGhadhkF/VY4X+pBub
+         BMs4xYnhqWaLj6HNTe8ZYLEO8sjzq0UGpNE2wj3jL7SZx/7Dk1A+YL/XnNFOmhyJXJHG
+         JlP+gUgDpfIXPEGNCmF1hnY1eV6ck0AtN15f2rE99gG2mu+f5Y4LnCYC9o7u0R+I+LSO
+         Y/qxN0IBGStWxql5QuRZ1DZvo/L2+H/XS9/obrkI8OMtOa4h6L4Pp7KkybWTfjjRfYln
+         NUrd1cjXkx0q3jN9+55UKS87+tBElhbaoqNAgfOUHpf1alKw+Tju3sAAmqaffMVcvwNJ
+         /dhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756606892; x=1757211692;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ptI15CI03nyPbHDiAUmDlsUqdee/Ga3KVCdRZtkWHXI=;
-        b=nvLZCrAl1L+0bkcJXv6GFzZmx+Ebk80W8Xv6zi0daUg1gt84gpLa8mhRjA+U2dzJ53
-         B8kyZVOxPLwazyshCTzYd4iWIQUoeM8wvNRyoNUnyVgs2bGdCPibVgf0UxIqHeHQ80WR
-         dyyUwpXHUkwnOCHluju+CMmHmUM1Bk+VicGgtWmxweAudYxI95cpnbYF9YwM17kODTz6
-         Eu+6aAhgJwW8Gxam4lP642KjTzUiMtutwx0V7N9tdoMCNBGVaZdTy41HTeuXjA56adlo
-         wFmIZLa18Rt8nq1XAPJDdOaJSTcbfxLdfsZgW8VApTLb4q/+q90vaUtECM3DUxkbHLCP
-         5C8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXtlYXKAWs2+qfDk+x1F4WHiDNskMqMLAjvMx7ioY40M9Y0OpMflTbS+/1d+JcQFgNnHyf18Xs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7UcsjEi+8cD9IFcF8eeMI2d0zUW5lh3w8OYiRDrkj0xuR/DiG
-	GwUzpRpsvdqAVFc+eQDqm6Epc3LfMTvx9js72eRC9tIFtqSmIQMqNhUXOD9T5fcu9Rt6YAlj8Ou
-	ZX15iha0TYn3xINqjBRu4eZCPyvBTNfgimFldyaSQYeGaoGYv00qotrVx3R0=
-X-Google-Smtp-Source: AGHT+IGemkqHrGBH1w7NAZA8hHIdcUNasSPYTIdUsWaqiHcJYWvw9V4eXxitGPhOs+Hw+GEBPfc+Ggey0zBHKIuIRK2JmiSR68Ol
+        d=1e100.net; s=20230601; t=1756610478; x=1757215278;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QmkA2GEtVBpE1rfMwgGSnld1GOA1shoo7sxcZ5Vcnw8=;
+        b=j0RRgGFwbNmLuXcg+sRHMl2zu/uv2xjj19TX1EFvpjIZHxBk0gMv/L5ZkYmMq/WJ69
+         SCZtrZVb7WVjKlbSWF5Kakb7eQ6GdC4u1Z2DFLgEa7yJwtCovU95IQmOBzQreS7Tzb5S
+         9cHoyEN+WTtDTQVyjoxj9eTwnemeAWK7pOkBJwuROm6YpXfVDBnaPHkcV8jmAoqkopkL
+         Uoqe4pgsxSVnXWIuT9DKFCO1MlirV9LPNnmYRBuryMOURNBUsGEHu2wEp11KDuqtIRa4
+         EpSvYtLJ0NCjNG1F/cdl/GhCrIXnwE8+8+Mr+AXllPfB71pG1mN7JgQuLkRxTKqXCIjW
+         F6Qg==
+X-Forwarded-Encrypted: i=1; AJvYcCWG+jhFIDo2wOPDlTxI8BOh7eDldoitSLEXPxiZ+kcmNg7BrjnscciRyS4zf5DgkWvQz1w=@vger.kernel.org, AJvYcCWhRGnN3tpIN7k+F+EfNN0wa6ydKXUIzuC2Rl3g/DncKUdPO8GaKeIt5CWL4jIe42o9UuMu5yKD@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzb2vlbIBaNI76DolngEaelENn1HMKjR5n+DMfoGjPXbta1lkMt
+	3cb38cpDMoi0HVqhGQRC4Q9BhROavEbtXJdoVpmSbLSqG0HZ5i1TiMhBhZDyxHp8dHJDR14NB0g
+	/SATcY2s3SAJYV+D4ffslki0IlRqOX7U=
+X-Gm-Gg: ASbGncsCcGmb/8QKuHwndLwQVnw5H17vYJpKVIKVSx5E24eAHmlWsRmp4KcNKjFtAPe
+	wJHjLBrZQfPMAm3dayqj16l5LS6mYIWRyRWcmJx5eDLkq8tYZuesdewX6mVUAeNGKWaJrlYbOWJ
+	vQ26AbIJVgeRCphbpzlaGRBmRogWH6Ispvibxf89CDfBcqUbvEe0KEGr7EArxIbiQDN2aeD9ilZ
+	qQj0/Cs3gZyn4j/vHtyzqZpSkL3sg9RjZiSvhJG
+X-Google-Smtp-Source: AGHT+IFhcvL+85PJicyFvcYlpqfO5G7Jf9qUBEDmdUJQ9rfiz+3OG/iZpLHOb4Vi9O5eBLN1MJ1tLqo29CIkblyMpPk=
+X-Received: by 2002:ad4:576d:0:b0:70d:c3ac:2bb5 with SMTP id
+ 6a1803df08f44-70fac97d6f4mr44981526d6.34.1756610478389; Sat, 30 Aug 2025
+ 20:21:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1c21:b0:3f3:82da:29f2 with SMTP id
- e9e14a558f8ab-3f4021c249bmr68947395ab.24.1756606892189; Sat, 30 Aug 2025
- 19:21:32 -0700 (PDT)
-Date: Sat, 30 Aug 2025 19:21:32 -0700
-In-Reply-To: <00000000000074ff7b06199efd7b@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68b3b1ac.a70a0220.1c57d1.028b.GAE@google.com>
-Subject: Re: [syzbot] [net] [virt] INFO: task hung in __vhost_worker_flush
-From: syzbot <syzbot+7f3bbe59e8dd2328a990@syzkaller.appspotmail.com>
-To: anna-maria@linutronix.de, brauner@kernel.org, ebiederm@xmission.com, 
-	eperezma@redhat.com, frederic@kernel.org, jasowang@redhat.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	michael.christie@oracle.com, mst@redhat.com, netdev@vger.kernel.org, 
-	oleg@redhat.com, seanjc@google.com, sgarzare@redhat.com, stefanha@redhat.com, 
-	syzkaller-bugs@googlegroups.com, tglx@linutronix.de, 
-	virtualization@lists.linux.dev
+References: <20250822064200.38149-1-laoar.shao@gmail.com> <1d3ba6ba-5c1e-4d3f-980a-8ad75101f04d@redhat.com>
+ <CALOAHbBdiPZ_YVhBJeV517Xqz8=cuGo6jhhta_QXy5-eQ6EN4g@mail.gmail.com> <96158e58-da9a-4661-a47b-e7b85856ac90@iogearbox.net>
+In-Reply-To: <96158e58-da9a-4661-a47b-e7b85856ac90@iogearbox.net>
+From: Yafang Shao <laoar.shao@gmail.com>
+Date: Sun, 31 Aug 2025 11:20:42 +0800
+X-Gm-Features: Ac12FXw19OqNKsxFEFxE8wzcjjHwmEp4kancSM8hftsH5GarRDGyjKlO_tPF4t0
+Message-ID: <CALOAHbBq0+zNGx_yYCFVsacOZREs=8OBhGdiOBCK75k0YoPKOQ@mail.gmail.com>
+Subject: Re: [PATCH v2] net/cls_cgroup: Fix task_get_classid() during qdisc run
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, horms@kernel.org, bigeasy@linutronix.de, tgraf@suug.ch, 
+	paulmck@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	Martin KaFai Lau <martin.lau@linux.dev>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-syzbot has found a reproducer for the following issue on:
+On Fri, Aug 29, 2025 at 4:14=E2=80=AFPM Daniel Borkmann <daniel@iogearbox.n=
+et> wrote:
+>
+> On 8/29/25 5:23 AM, Yafang Shao wrote:
+> > On Thu, Aug 28, 2025 at 3:55=E2=80=AFPM Paolo Abeni <pabeni@redhat.com>=
+ wrote:
+> >> On 8/22/25 8:42 AM, Yafang Shao wrote:
+> >>> During recent testing with the netem qdisc to inject delays into TCP
+> >>> traffic, we observed that our CLS BPF program failed to function corr=
+ectly
+> >>> due to incorrect classid retrieval from task_get_classid(). The issue
+> >>> manifests in the following call stack:
+> >>>
+> >>>          bpf_get_cgroup_classid+5
+> >>>          cls_bpf_classify+507
+> >>>          __tcf_classify+90
+> >>>          tcf_classify+217
+> >>>          __dev_queue_xmit+798
+> >>>          bond_dev_queue_xmit+43
+> >>>          __bond_start_xmit+211
+> >>>          bond_start_xmit+70
+> >>>          dev_hard_start_xmit+142
+> >>>          sch_direct_xmit+161
+> >>>          __qdisc_run+102             <<<<< Issue location
+> >>>          __dev_xmit_skb+1015
+> >>>          __dev_queue_xmit+637
+> >>>          neigh_hh_output+159
+> >>>          ip_finish_output2+461
+> >>>          __ip_finish_output+183
+> >>>          ip_finish_output+41
+> >>>          ip_output+120
+> >>>          ip_local_out+94
+> >>>          __ip_queue_xmit+394
+> >>>          ip_queue_xmit+21
+> >>>          __tcp_transmit_skb+2169
+> >>>          tcp_write_xmit+959
+> >>>          __tcp_push_pending_frames+55
+> >>>          tcp_push+264
+> >>>          tcp_sendmsg_locked+661
+> >>>          tcp_sendmsg+45
+> >>>          inet_sendmsg+67
+> >>>          sock_sendmsg+98
+> >>>          sock_write_iter+147
+> >>>          vfs_write+786
+> >>>          ksys_write+181
+> >>>          __x64_sys_write+25
+> >>>          do_syscall_64+56
+> >>>          entry_SYSCALL_64_after_hwframe+100
+> >>>
+> >>> The problem occurs when multiple tasks share a single qdisc. In such =
+cases,
+> >>> __qdisc_run() may transmit skbs created by different tasks. Consequen=
+tly,
+> >>> task_get_classid() retrieves an incorrect classid since it references=
+ the
+> >>> current task's context rather than the skb's originating task.
+> >>>
+> >>> Given that dev_queue_xmit() always executes with bh disabled, we can =
+safely
+> >>> use in_softirq() instead of in_serving_softirq() to properly identify=
+ the
+> >>> softirq context and obtain the correct classid.
+> >>>
+> >>> The simple steps to reproduce this issue:
+> >>> 1. Add network delay to the network interface:
+> >>>    such as: tc qdisc add dev bond0 root netem delay 1.5ms
+> >>> 2. Create two distinct net_cls cgroups, each running a network-intens=
+ive task
+> >>> 3. Initiate parallel TCP streams from both tasks to external servers.
+> >>>
+> >>> Under this specific condition, the issue reliably occurs. The kernel
+> >>> eventually dequeues an SKB that originated from Task-A while executin=
+g in
+> >>> the context of Task-B.
+> >>>
+> >>> Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
+> >>> Cc: Daniel Borkmann <daniel@iogearbox.net>
+> >>> Cc: Thomas Graf <tgraf@suug.ch>
+> >>> Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> >>>
+> >>> v1->v2: use softirq_count() instead of in_softirq()
+> >>> ---
+> >>>   include/net/cls_cgroup.h | 2 +-
+> >>>   1 file changed, 1 insertion(+), 1 deletion(-)
+> >>>
+> >>> diff --git a/include/net/cls_cgroup.h b/include/net/cls_cgroup.h
+> >>> index 7e78e7d6f015..668aeee9b3f6 100644
+> >>> --- a/include/net/cls_cgroup.h
+> >>> +++ b/include/net/cls_cgroup.h
+> >>> @@ -63,7 +63,7 @@ static inline u32 task_get_classid(const struct sk_=
+buff *skb)
+> >>>         * calls by looking at the number of nested bh disable calls b=
+ecause
+> >>>         * softirqs always disables bh.
+> >>>         */
+> >>> -     if (in_serving_softirq()) {
+> >>> +     if (softirq_count()) {
+> >>>                struct sock *sk =3D skb_to_full_sk(skb);
+> >>>
+> >>>                /* If there is an sock_cgroup_classid we'll use that. =
+*/
+> >>
+> >> AFAICS the above changes the established behavior for a slightly
+> >> different scenario:
+> >
+> > right.
+> >
+> >> <sock S is created by task A>
+> >> <class ID for task A is changed>
+> >> <skb is created by sock S xmit and classified>
+> >>
+> >> prior to this patch the skb will be classified with the 'new' task A
+> >> classid, now with the old/original one.
+> >>
+> >> I'm unsure if such behavior change is acceptable;
+> >
+> > The classid of a skb is only meaningful within its original network
+> > context, not from a random task.
+>
+> Do you mean by original network context original netns? We also have
+> bpf_skb_cgroup_classid() as well as bpf_get_cgroup_classid_curr(), both
+> exposed to tcx, which kind of detangles what task_get_classid() is doing.
+> I guess if you have apps in its own netns and the skb->sk is retained all
+> the way to phys dev in hostns then bpf_skb_cgroup_classid() might be a
+> better choice (assuming classid stays constant from container orchestrato=
+r
+> PoV).
 
-HEAD commit:    11e7861d680c Merge tag 'for-linus' of git://git.kernel.org..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17c5c242580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d4703ac89d9e185a
-dashboard link: https://syzkaller.appspot.com/bug?extid=7f3bbe59e8dd2328a990
-compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1671ba62580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1685aa62580000
+Right. We have replaced bpf_get_cgroup_classid() with
+bpf_skb_cgroup_classid() to handle this case. Nonetheless, I believe
+we still need to fix bpf_get_cgroup_classid(), since this function can
+easily mislead users.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/aa8c34462d5d/disk-11e7861d.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f90079573556/vmlinux-11e7861d.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/8571495e4fea/bzImage-11e7861d.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+7f3bbe59e8dd2328a990@syzkaller.appspotmail.com
-
-INFO: task syz.0.17:6038 blocked for more than 143 seconds.
-      Not tainted syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz.0.17        state:D stack:27224 pid:6038  tgid:6038  ppid:5979   task_flags:0x400040 flags:0x00004004
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5357 [inline]
- __schedule+0x1190/0x5de0 kernel/sched/core.c:6961
- __schedule_loop kernel/sched/core.c:7043 [inline]
- schedule+0xe7/0x3a0 kernel/sched/core.c:7058
- schedule_timeout+0x257/0x290 kernel/time/sleep_timeout.c:75
- do_wait_for_common kernel/sched/completion.c:100 [inline]
- __wait_for_common+0x2fc/0x4e0 kernel/sched/completion.c:121
- __vhost_worker_flush+0x1a8/0x1d0 drivers/vhost/vhost.c:296
- vhost_worker_flush drivers/vhost/vhost.c:303 [inline]
- vhost_dev_flush+0xac/0x110 drivers/vhost/vhost.c:313
- vhost_vsock_flush drivers/vhost/vsock.c:698 [inline]
- vhost_vsock_dev_release+0x19f/0x400 drivers/vhost/vsock.c:750
- __fput+0x402/0xb70 fs/file_table.c:468
- task_work_run+0x14d/0x240 kernel/task_work.c:227
- resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
- exit_to_user_mode_loop+0xeb/0x110 kernel/entry/common.c:43
- exit_to_user_mode_prepare include/linux/irq-entry-common.h:225 [inline]
- syscall_exit_to_user_mode_work include/linux/entry-common.h:175 [inline]
- syscall_exit_to_user_mode include/linux/entry-common.h:210 [inline]
- do_syscall_64+0x3f6/0x4c0 arch/x86/entry/syscall_64.c:100
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f1fdc78ebe9
-RSP: 002b:00007ffcf43dcf28 EFLAGS: 00000246 ORIG_RAX: 00000000000001b4
-RAX: 0000000000000000 RBX: 00007f1fdc9c7da0 RCX: 00007f1fdc78ebe9
-RDX: 0000000000000000 RSI: 000000000000001e RDI: 0000000000000003
-RBP: 00007f1fdc9c7da0 R08: 0000000000000000 R09: 00000008f43dd21f
-R10: 00007f1fdc9c7cb0 R11: 0000000000000246 R12: 00000000000248b9
-R13: 00007ffcf43dd020 R14: ffffffffffffffff R15: 00007ffcf43dd040
- </TASK>
-
-Showing all locks held in the system:
-1 lock held by khungtaskd/31:
- #0: ffffffff8e5c1220 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
- #0: ffffffff8e5c1220 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
- #0: ffffffff8e5c1220 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks+0x36/0x1c0 kernel/locking/lockdep.c:6775
-3 locks held by kworker/u9:1/5174:
- #0: ffff8880605ef148 ((wq_completion)hci2){+.+.}-{0:0}, at: process_one_work+0x12a2/0x1b70 kernel/workqueue.c:3211
- #1: ffffc9000f89fd10 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_one_work+0x929/0x1b70 kernel/workqueue.c:3212
- #2: ffff8880256d4dc0 (&hdev->req_lock){+.+.}-{4:4}, at: hci_cmd_sync_work+0x175/0x430 net/bluetooth/hci_sync.c:331
-2 locks held by getty/5615:
- #0: ffff88814d35e0a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x24/0x80 drivers/tty/tty_ldisc.c:243
- #1: ffffc9000332b2f0 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x41b/0x14f0 drivers/tty/n_tty.c:2222
-
-=============================================
-
-NMI backtrace for cpu 0
-CPU: 0 UID: 0 PID: 31 Comm: khungtaskd Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- nmi_cpu_backtrace+0x27b/0x390 lib/nmi_backtrace.c:113
- nmi_trigger_cpumask_backtrace+0x29c/0x300 lib/nmi_backtrace.c:62
- trigger_all_cpu_backtrace include/linux/nmi.h:160 [inline]
- check_hung_uninterruptible_tasks kernel/hung_task.c:328 [inline]
- watchdog+0xf0e/0x1260 kernel/hung_task.c:491
- kthread+0x3c5/0x780 kernel/kthread.c:463
- ret_from_fork+0x5d4/0x6f0 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-Sending NMI from CPU 0 to CPUs 1:
-NMI backtrace for cpu 1
-CPU: 1 UID: 0 PID: 0 Comm: swapper/1 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-RIP: 0010:pv_native_safe_halt+0xf/0x20 arch/x86/kernel/paravirt.c:82
-Code: 0c 62 02 c3 cc cc cc cc 0f 1f 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 66 90 0f 00 2d d3 12 16 00 fb f4 <e9> 4c 09 03 00 66 2e 0f 1f 84 00 00 00 00 00 66 90 90 90 90 90 90
-RSP: 0018:ffffc90000197df8 EFLAGS: 000002c2
-RAX: 000000000015fae9 RBX: 0000000000000001 RCX: ffffffff8b93fc29
-RDX: 0000000000000000 RSI: ffffffff8de50a38 RDI: ffffffff8c162980
-RBP: ffffed1003c5d488 R08: 0000000000000001 R09: ffffed10170a6655
-R10: ffff8880b85332ab R11: 0000000000000000 R12: 0000000000000001
-R13: ffff88801e2ea440 R14: ffffffff90ab5290 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8881247b8000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000555d26767660 CR3: 000000000e380000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- arch_safe_halt arch/x86/include/asm/paravirt.h:107 [inline]
- default_idle+0x13/0x20 arch/x86/kernel/process.c:757
- default_idle_call+0x6d/0xb0 kernel/sched/idle.c:122
- cpuidle_idle_call kernel/sched/idle.c:190 [inline]
- do_idle+0x391/0x510 kernel/sched/idle.c:330
- cpu_startup_entry+0x4f/0x60 kernel/sched/idle.c:428
- start_secondary+0x21d/0x2b0 arch/x86/kernel/smpboot.c:315
- common_startup_64+0x13e/0x148
- </TASK>
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+--=20
+Regards
+Yafang
 
