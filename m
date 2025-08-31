@@ -1,73 +1,80 @@
-Return-Path: <netdev+bounces-218572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79FDBB3D4CD
-	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 21:03:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39AAFB3D529
+	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 22:33:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CE2E3BC6FA
-	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 19:03:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAE8C3B6AAB
+	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 20:33:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22286223707;
-	Sun, 31 Aug 2025 19:03:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 983621DED63;
+	Sun, 31 Aug 2025 20:33:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="W6I5EgF6"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="UAWgazX1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.12.53.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C47C21CC51
-	for <netdev@vger.kernel.org>; Sun, 31 Aug 2025 19:03:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDAFD101DE
+	for <netdev@vger.kernel.org>; Sun, 31 Aug 2025 20:33:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.12.53.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756667025; cv=none; b=sw8YIEhjI4VT/YOW9wMKScWecKFpwjbdxgKJHBjFgUZ9EHPEFuZbQlBQxEEc8t70qO5rIoiwnqpUxJXXFnuLc+nicMf7ll4BwvjDOWpChtfXTKznNgtnc2cWPKOQFrdP7DGMB5PCtZT6bgjgqOMnNwqZ7f7OuPZvJWKzq/Nc6QU=
+	t=1756672423; cv=none; b=TN+azfrgCq7jWenxIMwkn+4/w45FTgXYe+rhZ0pzSCe4s6O74MJkq0O4XdH70D4/QEEjqFwjF66YUIjhaSoS50EDWAtpfulX0ZkUGm7FajGlHzFHAzjKvxBsYJDCgnQE9EakQP9kutqBs9Kwqs03abuNOGtJT1UMGIZ18FIGWuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756667025; c=relaxed/simple;
-	bh=/bprT3ZJPfqFkvJLb5ZCTjFC0zQk1dxq+a8rqM+yspc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Gu8lhQEMAg60fTXsuE32v9PvChIWlHs285voTC4O6erVv0zg8QvjFjedpQy9Nb+uT9usgZGDtXU/7WmcpOiUjEE0hir5j+GAMP3eTiHAnEk2pjw8s0wdUrcRHUVvQRgUTBwZz/UfRqeRmqm7iig9PSp5j0+K6Dxao5exRwLgqDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=W6I5EgF6; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57VIMHwZ000877;
-	Sun, 31 Aug 2025 19:03:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=cvh5ye7IwuufqJITe0zGF6/f7Yraj
-	2GtQXSPMK2RV0w=; b=W6I5EgF6m5r8WR9SRhdL6Ioy9MRU2iAcJb03k1HF1+b7j
-	ME7VaW0MsY64KYqYmB239lcwYLKr2AB9ZI/j1KwmVttqLPWFfn6NMOuBXW24SSRC
-	bc/imYEYXP5M3lqWrUzMNnGd5dalemQZYfydKEIkHbH8fn50Y9qjguBbk+765SOC
-	kBq/N+etkkP2ggRsp7TpwEVNTZNvxLnqYwUe8Pl5y3eI1hSo0s/fJYK/LESgcUPd
-	C+/FLoT7cDlyox4zsH0Nzz6BnZzHaVHE3PlQJ4Dy6C6bTQLg+Q08joKL8E0tFyKv
-	yYN0ewUI/LCihUk+cBMD7bsb8qTTK0UbEjymnNV2A==
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 48ushvs8gj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 31 Aug 2025 19:03:22 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 57VHN5v7004189;
-	Sun, 31 Aug 2025 19:03:22 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 48uqr7eqy6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 31 Aug 2025 19:03:21 +0000
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 57VJ0TTk037252;
-	Sun, 31 Aug 2025 19:03:21 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 48uqr7eqxu-1;
-	Sun, 31 Aug 2025 19:03:21 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: jiri@nvidia.com, stanislaw.gruszka@linux.intel.com, andrew+netdev@lunn.ch,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org
-Cc: alok.a.tiwari@oracle.com
-Subject: [PATCH net] genetlink: fix genl_bind() invoking bind() after -EPERM
-Date: Sun, 31 Aug 2025 12:03:13 -0700
-Message-ID: <20250831190315.1280502-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1756672423; c=relaxed/simple;
+	bh=XrKUmP65ziijmVvWRPpGYMW/IXFFS7DpCNbpmna4ZYQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=C8/2jz/mxSN79XPBZYLhPgrK3GVHMjn4jkzo2llvRKOwtrJwXqkgoH+HzfS3XCLHIUXi7gnn4emXJKMg0bMwIYXYqY5NxfR17O32geC1D5K6EL5K9R8m9MfYWSUkHV8sJEYpGnziNFyFKDT0rBgrUlKtLTQ4HIp0KWj8HuSy4iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=UAWgazX1; arc=none smtp.client-ip=52.12.53.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1756672421; x=1788208421;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=9lXtsj+zOMk9a4ftfSw7UIbPSQIDGEcXmVpc9bndFeA=;
+  b=UAWgazX15M3usBT+y3igsfd8WjjolS8f3LMuRxDZvun2Kn46g0gpXYgX
+   JG9AcUaIzdstHWwddMGO+pr8yu4ymfFF0JiMCMgCSjSyGSDpcc+eSrOB8
+   g9/lc2W6e7YssR3mvj7/M15moojKsOE6UqranUl5N2WiwqxNb6ICczksL
+   KKuHj/ZKav6cjgwgw0XuIMuAWBpOZ8cpUpfA1Zp5+ib/vSb3hRCMv8OGq
+   Br5DtZwRWa/CL9b3PErJJQThkzodu7NjnAho8dm9iASd19Kn1OzzCaImV
+   196nDNbZBeUGpqoiabiqgej90MYNprYBqD5Vo3BLw8My7++DUr2NlR1F9
+   w==;
+X-CSE-ConnectionGUID: bTAjT5F5QgmVRp6kA0JgtQ==
+X-CSE-MsgGUID: JN40oS72Sba1r503Cr5t+A==
+X-IronPort-AV: E=Sophos;i="6.18,225,1751241600"; 
+   d="scan'208";a="2009676"
+Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
+  by internal-pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2025 20:33:39 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:9664]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.12.13:2525] with esmtp (Farcaster)
+ id 29d4a506-946c-4d77-88c8-5830e4a2e0af; Sun, 31 Aug 2025 20:33:39 +0000 (UTC)
+X-Farcaster-Flow-ID: 29d4a506-946c-4d77-88c8-5830e4a2e0af
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
+ Sun, 31 Aug 2025 20:33:39 +0000
+Received: from b0be8375a521.amazon.com (10.37.245.7) by
+ EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
+ Sun, 31 Aug 2025 20:33:37 +0000
+From: Kohei Enju <enjuk@amazon.com>
+To: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
+CC: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Stefan Wegrzyn
+	<stefan.wegrzyn@intel.com>, Mateusz Polchlopek
+	<mateusz.polchlopek@intel.com>, Jedrzej Jagielski
+	<jedrzej.jagielski@intel.com>, <kohei.enju@gmail.com>, Kohei Enju
+	<enjuk@amazon.com>, Koichiro Den <den@valinux.co.jp>
+Subject: [PATCH iwl-net v1] ixgbe: fix memory leak and use-after-free in ixgbe_recovery_probe()
+Date: Mon, 1 Sep 2025 05:33:11 +0900
+Message-ID: <20250831203327.53155-1-enjuk@amazon.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,58 +82,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-31_08,2025-08-28_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 adultscore=0
- suspectscore=0 mlxlogscore=999 spamscore=0 bulkscore=0 mlxscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2508110000 definitions=main-2508310200
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODMwMDAzMiBTYWx0ZWRfX3MgPJItI1TTJ
- 6Q5HohfMFyLSxnE2BLMeFfD8q4I9LZBVbNcTmUvFFSvKQloBJHNwnizMzqnaya6tAMVxng2zHG8
- 6I8dIlpiYHRoLQEWbkZ2ZjSg4bTm3xsJGGM3muWhhJDrdI2zQFBBv3wLg8WExuH0tWJ8r5KQViA
- vD1i7aIFo9X0Pbt3iZcEOJeNfvrefrVFwwqQworD9ZN8LC6NqXw7r45MwL9ZPdIdS+qpC+ids82
- jom055HhEfuIYdo9jQSvkOodWoBAKP1PBXLiTklRJIcummZwTr4idJl24XAvZYZpcbUBI2cyLYx
- rMeIA9gDoXrXBTIjnrb7/X+Q2M9kEMK/CfrFDKQxLjOaokiYaKZcG+HOYGSIi32YFAchD39i68R
- IJeCjeoh
-X-Authority-Analysis: v=2.4 cv=fZaty1QF c=1 sm=1 tr=0 ts=68b49c7b b=1 cx=c_pps
- a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17
- a=2OwXVqhp2XgA:10 a=yPCof4ZbAAAA:8 a=IQN_B5fLJMZ4uxNOhSQA:9
-X-Proofpoint-ORIG-GUID: HXjN6zLJaJo-4Mo6Gf_CNJUPmFynhkLJ
-X-Proofpoint-GUID: HXjN6zLJaJo-4Mo6Gf_CNJUPmFynhkLJ
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D041UWA004.ant.amazon.com (10.13.139.9) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-Per family bind/unbind callbacks were introduced to allow families
-to track multicast group consumer presence, e.g. to start or stop
-producing events depending on listeners.
+The error path of ixgbe_recovery_probe() has two memory bugs.
 
-However, in genl_bind() the bind() callback was invoked even if
-capability checks failed and ret was set to -EPERM. This means that
-callbacks could run on behalf of unauthorized callers while the
-syscall still returned failure to user space.
+For non-E610 adapters, the function jumps to clean_up_probe without
+calling devlink_free(), leaking the devlink instance and its embedded
+adapter structure.
 
-Fix this by only invoking bind() if (!ret && family->bind)
-i.e. after permission checks have succeeded.
+For E610 adapters, devlink_free() is called at shutdown_aci, but
+clean_up_probe then accesses adapter->state, sometimes triggering
+use-after-free because adapter is embedded in devlink. This UAF is
+similar to the one recently reported in ixgbe_remove(). (Link)
 
-Fixes: 3de21a8990d3 ("genetlink: Add per family bind/unbind callbacks")
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+Fix both issues by moving devlink_free() after adapter->state access,
+aligning with the cleanup order in ixgbe_probe().
+
+Link: https://lore.kernel.org/intel-wired-lan/20250828020558.1450422-1-den@valinux.co.jp/
+Fixes: 29cb3b8d95c7 ("ixgbe: add E610 implementation of FW recovery mode")
+Signed-off-by: Kohei Enju <enjuk@amazon.com>
 ---
- net/netlink/genetlink.c | 2 +-
+Cc: Koichiro Den <den@valinux.co.jp>
+---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/netlink/genetlink.c b/net/netlink/genetlink.c
-index 104732d34543..3b51fbd068ac 100644
---- a/net/netlink/genetlink.c
-+++ b/net/netlink/genetlink.c
-@@ -1836,7 +1836,7 @@ static int genl_bind(struct net *net, int group)
- 		    !ns_capable(net->user_ns, CAP_SYS_ADMIN))
- 			ret = -EPERM;
- 
--		if (family->bind)
-+		if (!ret && family->bind)
- 			family->bind(i);
- 
- 		break;
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+index ff6e8ebda5ba..08368e2717c2 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+@@ -11510,10 +11510,10 @@ static int ixgbe_recovery_probe(struct ixgbe_adapter *adapter)
+ shutdown_aci:
+ 	mutex_destroy(&adapter->hw.aci.lock);
+ 	ixgbe_release_hw_control(adapter);
+-	devlink_free(adapter->devlink);
+ clean_up_probe:
+ 	disable_dev = !test_and_set_bit(__IXGBE_DISABLED, &adapter->state);
+ 	free_netdev(netdev);
++	devlink_free(adapter->devlink);
+ 	pci_release_mem_regions(pdev);
+ 	if (disable_dev)
+ 		pci_disable_device(pdev);
 -- 
-2.50.1
+2.51.0
 
 
