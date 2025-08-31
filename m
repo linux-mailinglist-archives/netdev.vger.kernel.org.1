@@ -1,121 +1,193 @@
-Return-Path: <netdev+bounces-218553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3621B3D215
-	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 12:19:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47A5FB3D248
+	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 12:54:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9ED4B4422A1
-	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 10:19:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A3E017E4B8
+	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 10:54:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8167B246BA7;
-	Sun, 31 Aug 2025 10:19:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F8EC254AFF;
+	Sun, 31 Aug 2025 10:53:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="QSg+JfOd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2085.outbound.protection.outlook.com [40.107.93.85])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFD5F155C82
-	for <netdev@vger.kernel.org>; Sun, 31 Aug 2025 10:19:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756635544; cv=none; b=NxaMpMOC8l1438+nzl4IURj+4cSxgenhSB7HKxGF1gy42Pa+6DrvimBZHrrxNd8fG1TF3fVViR82XnHoiiJBtKN5DMWa6UKMbZQ+exxvbvc7NE8Ic6/07/2Hz0S4a/1V8xtYdwFHdmJ+Sgm3VHdh77LlT0POmek8t5QyLOU98No=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756635544; c=relaxed/simple;
-	bh=RwQHnRYjV/1vKZ1PuwPUfN2604MKwMBwks15ba2icVE=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=BFiaZH9y0cukICMf5Sq4yEPn0YetEKKuVfj7h1r6c76gYrkUX5UAXC9yP0p4Z29c5bFCogtPtOkD+ZD66GnvTMn9MSw9q6WhgL665fsskGJ82rtLvGvBpB29fuBgTMv5Nk4TOEJ7FCGPlCmNUYXas3AUt9j3THIyLXQUcxKgQkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3ed0ba44c8fso43092825ab.0
-        for <netdev@vger.kernel.org>; Sun, 31 Aug 2025 03:19:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756635542; x=1757240342;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5wUanWJ9TFUpM54ILEtXgfjoYDPHC9UXWO0NyRChwpE=;
-        b=KXWksCo5WNCjlPiMZdNP9zVBzI1T4mHBEWcOZMjgijUj4SEaZ2Qr+TFWmNSgqDYc02
-         OzPwU3Oc/ISVqeoYMe1bUCnpIH6tcqXJ6zMTXEMUeqElmqPj+rEVoLcv3gOk4eqPWQCf
-         HeoVZZbl/ON6xDfEeL7U9k4FMDh4U8T357DpVZv5xaE5gfG3TlFzu/d0uss4POLOgj7P
-         +s40XWb58xKPk9XDV466Xlve/xIbIjeIL3k17mM8h4n0AnkUwIKjF/Ctmi8+hDynuj/l
-         q41pjFU2BXylXYyQda9x9MvP8AFir/UoiopIDz0kO4TnFoY3x2HJoXKozSjL2SP4N3Ug
-         1K5g==
-X-Forwarded-Encrypted: i=1; AJvYcCVBnYtnz4E62EbO993aJTAtq/egluQT/UFE3buVMsngBXFkIbKDAqw8bxwciysYMVB3LI+GUYM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5d9NS2t3rjNCVfOzRd6K/fjq2yosiE8hSa1ogVA4bLFiqTQKo
-	QW/lY9ksSuhYmSt9vuTQOFOiqjoUt/vkH8iCCEasIQdnq034fJI3msaZ659qdxkpMZtG6ivxiAT
-	+4riwOEBxsYjQCjQQiHMvTAzJvkA3qe8wTxdx7HowdwsDzvZTeVhMCh41f/g=
-X-Google-Smtp-Source: AGHT+IGlSESnK/xm1j4DJ0slXKrny4chuiUI7BV8fgeneqMMUxjfgz2lGWrCoGYpAMuCBzA+5PNrTUDu+7WhgNc9Bq6d/287EMK/
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 917FB190685;
+	Sun, 31 Aug 2025 10:53:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.85
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756637637; cv=fail; b=HksnL8Pl0cl6KZ01jCNTy0KK0uhdvvohm9MOvpwUc5BqmxgXYVQCz8woqPsFs2xnwCSXh0SclCNjVkYYiEVYCX6b/52tgTGrML3aHUTcMntM+CnUJWRYT18T0R5dZZRkkJtP63d5Cnx81qa7s++SIAUBCgCmKG9T2Zi46sxIC9Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756637637; c=relaxed/simple;
+	bh=atQ3+uhUlD3+A+r33gG6NcmOuzgUeFRgmR0D3FlQs1U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=EBD5qlJwaKUt9QAT6tX8G+dmvfevn6iA/QxG/ImiEZwcTpJbzzqB1G0C6vbCFRu7E1d39nqUzzj9gmvY8KK4SfQdXcIWQIjTu27G5mEL1Njbx1O+NrowTa4OLD8xlzp5MhlkNRa4kC50A6ttrmag7PZTaVwxGblbMSpkVyLvCf4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=QSg+JfOd; arc=fail smtp.client-ip=40.107.93.85
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=NrA/QH+vKIpd79T+6i36bFoWhTwoa5Co3ZK+QBKa2tW81j/6Y42MX30jIIHHpfEUAdNpSUR+th815cmOmiTFlLdaCqoy8I8jHlG1A4EHeC5moINNEcG8vJz3A4Bizs77G2oMIR3ezorq+Gv42/tk4xoSHTGiKjanIje29hxfJuYpK8OIN/THSmKbfO0/QF+3lNKAFzXzaFNeOzi/UAytejMLMIWYdSGSiMHtwR6O9DGWZQfU2amqWV1kE2eCup1U0D0EItG0jjvOIa9nkX7mFXBZ639aA5qvV6/zWTePA9QnpYGf1IU0dyi/V2Gaa78ajTKHg8lGurgz9Pt1K8/2EQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HuzFlr6zuFkBHV+EDo126vMTKuuHOUyg0zLkX3hK7mI=;
+ b=fkJryhjmLSCJWNRxdOnCgVpVy1GTMXKrkPhpDVXRu4pddq6OC3QVX2PodtalU+kcttPHkJ6Z23QIqiV5q4NkM41elq2nPSnnh2Scp5+rwfNMPbHOca45FEBaXlctgFYW0v7FOx/PgkkMk3UxQygcwoBxxjLVI6ZSDhACavnwvZeLDzziO0X3kQgIpB49E8Rx79onOzXxOwpIsMW8Cpm7A7QzT3NPQndg/c5r86r3QEFn6rorkCZRAXiQJ3t8onSCj4/U1JSYCm6nlKRCVdE50cs3E7DakbdqBIs9PFHkmIGf/xpEnJWtj8ijKqhO+82nJX1zmVhuigkxfqqSdTBRjw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HuzFlr6zuFkBHV+EDo126vMTKuuHOUyg0zLkX3hK7mI=;
+ b=QSg+JfOdYc5pEXSChBCtKjdxL9yphXeBL5OCIlsUVf0MW7AGRiJeiwQJu0qunTt5b8jocsV0PxHa6YsDm8w096lgA4nwvo6gUQSBfV4mOG1Ebp43Xxv2lWF2go5ui4ofsgAieCSygvprweHNNnjU4sfCJ5ryIPugrRDt4cCXulM+bGYKFzd4URePiYuPDMNXk6NGhuxNhPNuC7G1C3fhMJFrLi9ajj+DOf8lTY55HYvfjbRUCvonZ/tUZDMscd1Cfb5In3rp74szkh5btYzQC5BrRD+1f3zdGXo45Vyk84W54XySMLtzFczQk40ue1CDTOP5ZDynb0dYIi/bdRevIA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by MW5PR12MB5650.namprd12.prod.outlook.com (2603:10b6:303:19e::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.21; Sun, 31 Aug
+ 2025 10:53:51 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::66fc:f8a2:1bfb:6de8]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::66fc:f8a2:1bfb:6de8%6]) with mapi id 15.20.9073.021; Sun, 31 Aug 2025
+ 10:53:51 +0000
+Date: Sun, 31 Aug 2025 13:53:39 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Miaoqian Lin <linmq006@gmail.com>
+Cc: Petr Machata <petrm@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vadim Pasternak <vadimp@nvidia.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] mlxsw: core_env: Fix stack info leak in
+ mlxsw_env_linecard_modules_power_mode_apply
+Message-ID: <aLQps4-Fq21R7N4c@shredder>
+References: <20250830081123.31033-1-linmq006@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250830081123.31033-1-linmq006@gmail.com>
+X-ClientProxiedBy: TL2P290CA0001.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:2::19) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:cd8e:0:b0:3f2:9344:6f9e with SMTP id
- e9e14a558f8ab-3f400284ceemr104024655ab.13.1756635541987; Sun, 31 Aug 2025
- 03:19:01 -0700 (PDT)
-Date: Sun, 31 Aug 2025 03:19:01 -0700
-In-Reply-To: <20250831095915.6269-1-hdanton@sina.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68b42195.a00a0220.1337b0.0034.GAE@google.com>
-Subject: Re: [syzbot] [net?] [nfc?] WARNING in nfc_rfkill_set_block
-From: syzbot <syzbot+535bbe83dfc3ae8d4be3@syzkaller.appspotmail.com>
-To: hdanton@sina.com, krzk@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com, ysk@kzalloc.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|MW5PR12MB5650:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5ff2aa49-fd9c-480b-443a-08dde87cabbc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?96VDg2oTvoDin0lCOAPjzLTbwMdDsoiNLXsNBp3whbx8+1aVo2gvm6l1ptjs?=
+ =?us-ascii?Q?b/82pBGyYlKdcJzx5+I+Q9sd3Oendx0tonnA1rL/xFQ2nff564qTYNNy7ESw?=
+ =?us-ascii?Q?v2KWQ9pV02kIqydT+66BCZbjreYnCoB4JNKj2QBD9Gwu7BFfYdHQ6dlInXG7?=
+ =?us-ascii?Q?uZoC5CvqUapxymWAGe0gAWZfvCBem6UaFQqjezGWP5lAVK1hVg2hFumpIPZH?=
+ =?us-ascii?Q?8z+IIGNlxzabTBPsG3KgrLk/ld4ygFcduVFQukFW6WWSva0533jWg6sx8AKU?=
+ =?us-ascii?Q?OOmErFRSD6OCBH4jvBL6RGFBOVZU6z8cTEwggXXFhG1hG3Z+Uwt/iNndioDX?=
+ =?us-ascii?Q?uX6hnrJ5KpwIZEW/27kpdnQfiD0G7KuMRwqynmUTzZLW4xXJDBroCN9VIJ8k?=
+ =?us-ascii?Q?naxooJTmmQOIO+GR66f0pLl/JrBqjeMQX81B/eu7q68KRUucHpPDh9XOiEJl?=
+ =?us-ascii?Q?/+GOrOOuntBR6Qs2aNJq9N9QPy777mBMB8jdO4hnPz5cwHnIEJgQXbE43j3i?=
+ =?us-ascii?Q?DukRcbc2Pp5XUth6EWQ4npbfF3/IzL2fkG0ZzQTvaK2WPrl9/xeFrelwqTub?=
+ =?us-ascii?Q?g/DoYzAMhmXjt+h4czRv4pFDRC61/28neHKs3AOUT4diX/sAkprluYn0V/pd?=
+ =?us-ascii?Q?+l3AX1digQLrDltg9Zc+CYN9eVIuYYZYCb1qnUWvU5G7Z7IMVbTxzqHweipk?=
+ =?us-ascii?Q?bSw7FRz1IsFqnWW6HsXvkNFve9wR8IvF4k0Wwbu2AEZJlikQpD36Spc7ElFE?=
+ =?us-ascii?Q?psQrMPdiekHZALqDvs664RuxKwIYGXrazgau746lvJYfithhCqI8HG6V373A?=
+ =?us-ascii?Q?hPdaqFIhcdd68WE5d9iUUst9bK3h3cijiiqpDkray5fAx862eRxoPITsgPtx?=
+ =?us-ascii?Q?KZg5/Fk7jNoJyrUm+c1/WwLi5RPuHEeSRvYwddEelYSjs3STsjFjSjN5km99?=
+ =?us-ascii?Q?KhylgMpJ+IRkgSg9fj+/NyilE0+VuVp4zMwcHfvSWqf9vFcYBLjvvlSZe1ff?=
+ =?us-ascii?Q?rxZb3fwhNmmHJCRiCKcI8RBH4XjUfZCd/GG9U5AYzg1oNVeBiZt1OFGxi2AC?=
+ =?us-ascii?Q?sUAqS2dUQ49aYRB1M95MBnd+QDwqJkoFQ36ALhlSh4vd8xc/ilHQfFK2AKl/?=
+ =?us-ascii?Q?v52qm9N8mqRkOCWMYhg+ywfJCQ5GlYyvmt3f4qujYAbt3S5W/vHwZeyTPS3T?=
+ =?us-ascii?Q?USYsrrtKMP/cGb7fCeFwlJPn2lwsgTK+3II6yT7eFT5dbSAnP/3wsp/JpNJz?=
+ =?us-ascii?Q?z/Dz8EvCOP5XCw8AK9awXpHmQPjnNirL7e15nvbDP1n7rX2MvD16RxmsRevh?=
+ =?us-ascii?Q?m4+wTfAYEpdKSq3RDAyCcc09OeZHPmU22x9XxqsbbMNKUAV9YGTDsnYA7MhQ?=
+ =?us-ascii?Q?k2J4XJ4/72dKIZdcKSPaCVJUk/s+5K2EDxmuBhJWtfowmnv9DnuPaYPCIjah?=
+ =?us-ascii?Q?n14FvFOCtI0=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?NY4dTJbzAZnr9+kRwqeoIrgFiMmGPLuK5PP0OHULBhtqyhuRGA5TKhtbdwe1?=
+ =?us-ascii?Q?K/l/KD3FFSEoK31VlC7pL6MpzwfZpq+3ZV1xg8kXLoRJRbbKGZxX1C9fH98b?=
+ =?us-ascii?Q?dIsqE8QeMnPxcBxAjDy+JcgFgg0zEXjM49frP7xn/hUaktfSSDsrk/v0Sut2?=
+ =?us-ascii?Q?dm2XLe6VqjymXYGkdBsDuh37MyiCbUWPpjouEqHStoGiG9MxtdntkVcIoIPU?=
+ =?us-ascii?Q?gnS8/cN39Jzjg3EhwTEY8VdFu6w52PVJiElnDAyq8HSlFOyrC4C8RGP32htc?=
+ =?us-ascii?Q?fKo07skoC8qdUpzvoIYqbr/eEy3jINxAoyXqlCCtYsGRwdi6n+omTAN4kB4I?=
+ =?us-ascii?Q?ZjDYkMcHnn6B9zrcs7IkTOZ9ecsX5z/zgnd7ZEdoTX3MwEHrdJJozn+O7Uut?=
+ =?us-ascii?Q?NP8AycN3OQZrIaMvqCGgm7DrAMKg1pCkIFabkqtkpI40vhFbCLuInVEge5HJ?=
+ =?us-ascii?Q?F/jzO9yvbvbZFrjeHXqhtIURiMwft3LubPZ9K2zunrdxQpX5azsp9XgaqdpF?=
+ =?us-ascii?Q?3VdoDhmP1mCwxfBhU960Dqzu7ipMffSKxY0GhslU/biIAqSV89FxhN4zV7Yu?=
+ =?us-ascii?Q?346TKxnE6jypGZxmgccuZO/OF8YDZhMDt0W7okqdqldkyXUN2A2Ek24kFMg9?=
+ =?us-ascii?Q?SjhzTUlnKXtPlGywRT6yxeuIstS3aYgbQtypHHnUC8qJwMVns50xPoNdb8oP?=
+ =?us-ascii?Q?tOqj77b/7xF4H+9D9uT4n+8XJS/nXfNKff31kFRtzNdUJE0YAqnmkEyf+ilC?=
+ =?us-ascii?Q?dytOZeiKGHqZpfGqYcOQ4NzbVFDJgpvUfS0k4OmrqFO65oRwiKC8QqaB7pbj?=
+ =?us-ascii?Q?JeKgX4XCMR0EpKxPDgC7k4zUwLp+gx7Noin+HHer3hHKJgCBrbRR/2pO2ijn?=
+ =?us-ascii?Q?AiTaGwfG7c7uoBKN5RNIQWS0oc3+p6SS5YRyS45GZ7EvYss+iiNGaGFRj4s7?=
+ =?us-ascii?Q?hFRZqlsjLJfMsz4TQnFlh6vlsZlUFRcjhUpdSKvMZ1UWSXlQJdWdtgB+hNfo?=
+ =?us-ascii?Q?2teQio4IROL1Vl4mZT6lCa/BkTcgN2J/k0sgEGjzRhI8iqYaFLFC5S1ScCwR?=
+ =?us-ascii?Q?rKTHcEExsOrDoWgxXSeW9sQMjJNh9izqic0S1caR/61rTJSYagVOyxeTVxp8?=
+ =?us-ascii?Q?6Yehhb4gaasSVwb2TVJMy1WRzY+ldcOL8JYBlQcIyClgKU1Kv0sIMMhmMBSw?=
+ =?us-ascii?Q?iPBrpsn4mOrNqoa/Gwz1lVD1khyKa/v5AsejoUXZOXA0ok2oZ30L7AF4aCq7?=
+ =?us-ascii?Q?emEgoVK2oXD1c3R4GPrABvvjEmsFq+sE05I8+E3u5wTz1M2I02IE3iy2aptJ?=
+ =?us-ascii?Q?QtiQ0eCTyWQDIQZH5hTk7NCE1hEUxusn59PWvdmQ4CEm+4OEdSKBfEO8ynZu?=
+ =?us-ascii?Q?sAN/POidhYDRk5IZmmt96ZcZD6gjwWpL2IM0pxUTAAolMKH7eToXGVP0ixrb?=
+ =?us-ascii?Q?cPUPMwweZgWFpKYrj7qjKUMggaHpLG8qraV3mHyc8bo9kotzWUxgdUP18UAv?=
+ =?us-ascii?Q?83rlCGYEqvS2GAOBPiZkFuosjaJTCwsxY2p3es/nqnQwAX0PS8kj6RgVpkEJ?=
+ =?us-ascii?Q?MmZEMB70ntoZE/dDlFRDfjH1LcHu8/2MUI5Jqk7N?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5ff2aa49-fd9c-480b-443a-08dde87cabbc
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Aug 2025 10:53:51.2781
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zTx7tw3KEyLwl9RddLz1jji03csOyGMoGoCuuQqtQSU8n/tQBSBtU0aERRIcB2aUvjTMOCmIsfOQdMVmux8Ifw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR12MB5650
 
-Hello,
+On Sat, Aug 30, 2025 at 04:11:22PM +0800, Miaoqian Lin wrote:
+> The extack was declared on the stack without initialization.
+> If mlxsw_env_set_module_power_mode_apply() fails to set extack,
+> accessing extack._msg could leak information.
 
-syzbot has tested the proposed patch but the reproducer is still triggering an issue:
-BUG: MAX_LOCKDEP_KEYS too low!
+Unless I'm missing something, I don't see a case where
+mlxsw_env_set_module_power_mode_apply() returns an error without setting
+extack. IOW, I don't see how this info leak can happen with existing
+code.
 
-BUG: MAX_LOCKDEP_KEYS too low!
-turning off the locking correctness validator.
-CPU: 0 UID: 0 PID: 25225 Comm: syz.0.3616 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- register_lock_class+0x2e8/0x320 kernel/locking/lockdep.c:1332
- __lock_acquire+0x99/0xd20 kernel/locking/lockdep.c:5112
- lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
- touch_wq_lockdep_map+0xcb/0x180 kernel/workqueue.c:3907
- __flush_workqueue+0x121/0x14b0 kernel/workqueue.c:3949
- drain_workqueue+0xd3/0x390 kernel/workqueue.c:4113
- destroy_workqueue+0xbb/0xc70 kernel/workqueue.c:5869
- nci_unregister_device+0xb1/0x240 net/nfc/nci/core.c:1316
- virtual_ncidev_close+0x59/0x90 drivers/nfc/virtual_ncidev.c:172
- __fput+0x45b/0xa80 fs/file_table.c:468
- task_work_run+0x1d4/0x260 kernel/task_work.c:227
- resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
- exit_to_user_mode_loop+0xec/0x110 kernel/entry/common.c:43
- exit_to_user_mode_prepare include/linux/irq-entry-common.h:225 [inline]
- syscall_exit_to_user_mode_work include/linux/entry-common.h:175 [inline]
- syscall_exit_to_user_mode include/linux/entry-common.h:210 [inline]
- do_syscall_64+0x2bd/0x3b0 arch/x86/entry/syscall_64.c:100
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f9bb98aebe9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fffc624e4c8 EFLAGS: 00000246 ORIG_RAX: 00000000000001b4
-RAX: 0000000000000000 RBX: 0000000000063d39 RCX: 00007f9bb98aebe9
-RDX: 0000000000000000 RSI: 000000000000001e RDI: 0000000000000003
-RBP: 00007f9bb9ae7da0 R08: 0000000000000001 R09: 00000003c624e7bf
-R10: 0000001b2c520000 R11: 0000000000000246 R12: 00007f9bb9ae5fac
-R13: 00007f9bb9ae5fa0 R14: ffffffffffffffff R15: 00007fffc624e5e0
- </TASK>
-
-
-Tested on:
-
-commit:         c8bc81a5 Merge tag 'arm64-fixes' of git://git.kernel.o..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1226c1f0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=bd9738e00c1bbfb4
-dashboard link: https://syzkaller.appspot.com/bug?extid=535bbe83dfc3ae8d4be3
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=12dac1f0580000
-
+> 
+> Fixes: 06a0fc43bb10 ("mlxsw: core_env: Add interfaces for line card initialization and de-initialization")
+> Signed-off-by: Miaoqian Lin <linmq006@gmail.com>
+> ---
+>  drivers/net/ethernet/mellanox/mlxsw/core_env.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlxsw/core_env.c b/drivers/net/ethernet/mellanox/mlxsw/core_env.c
+> index 294e758f1067..38941c1c35d3 100644
+> --- a/drivers/net/ethernet/mellanox/mlxsw/core_env.c
+> +++ b/drivers/net/ethernet/mellanox/mlxsw/core_env.c
+> @@ -1332,7 +1332,7 @@ mlxsw_env_linecard_modules_power_mode_apply(struct mlxsw_core *mlxsw_core,
+>  	for (i = 0; i < env->line_cards[slot_index]->module_count; i++) {
+>  		enum ethtool_module_power_mode_policy policy;
+>  		struct mlxsw_env_module_info *module_info;
+> -		struct netlink_ext_ack extack;
+> +		struct netlink_ext_ack extack = {};
+>  		int err;
+>  
+>  		module_info = &env->line_cards[slot_index]->module_info[i];
+> -- 
+> 2.39.5 (Apple Git-154)
+> 
 
