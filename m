@@ -1,66 +1,57 @@
-Return-Path: <netdev+bounces-218547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE237B3D1C3
-	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 11:59:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A65EB3D1FE
+	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 12:09:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00C671887ACA
-	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 10:00:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2AC307A183C
+	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 10:07:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC92B248F51;
-	Sun, 31 Aug 2025 09:59:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCE22243954;
+	Sun, 31 Aug 2025 10:09:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="pczittn8"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="YacJJrAo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail3-163.sinamail.sina.com.cn (mail3-163.sinamail.sina.com.cn [202.108.3.163])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 695C31A9FBA
-	for <netdev@vger.kernel.org>; Sun, 31 Aug 2025 09:59:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.163
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83C073595D;
+	Sun, 31 Aug 2025 10:09:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756634381; cv=none; b=uOa1yqf8b6A+8cB/6ZuQ9DB4sZLoI7kPvMynr9Z7z97vpKVFU6ha7hIJtyjcg+1yYtRxalxkAzljrWg84lYUJ7U72Zdko3+x8IvaHXdmy9o2j2g2djiW6f+XePqdqZ62elYoszWP3ERgLQw4Myia9uVlxEno9Q6feTqNWcZD7Do=
+	t=1756634950; cv=none; b=DD8IPEgBQxHxi88NV2rfUlI4j0NqB+hxyey0/KD7DYvd3a4szrt7NbLO9E1tpI32kLVwcd/uKlA+f6TBXbjBlB2Aa1g8eWuvkNRRUyL5Q29TWYl8Lhu6GG+XN5WSsspXkoFLXIPZ3GhbUNGCKEZ/J9eeq0Qwj/g60Van3lHz+Zg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756634381; c=relaxed/simple;
-	bh=0KkjeJy5JVJeESV08AjM2dcetdJEMfhjNI6FtNSH/3I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DsUrdjZiauBykf50v5pFPDL0lxGhSD5mUCHC6bLmTkrmrLDobUC4RqE5BsRaufHptOeNz3Dxl4X/gZ6SLyLA/9/Voy2lNzpCe1dzoVN2mnm+avEAXRdo4w/5ka6qXMInxNkf1Mkja0I+/7Y6cmWS9VryemDpcPpfJIQHmFqFa0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=pczittn8; arc=none smtp.client-ip=202.108.3.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1756634376;
-	bh=Loz27QVYNzLeCVfjJCj4j3wpQlM+hqvyO/PA6Ks0kqQ=;
-	h=From:Subject:Date:Message-ID;
-	b=pczittn8x0tMgW3FVfYCZyNrvAuUl+W2UIEy6kaHkqESO3SuUzOjPK+4Ll9uX44oA
-	 o7kZdLjh4Dg28f30migt4NJWes9yJIpi0FJMcMQnE3iSJ1gFKWZwiqsLTq0gM5YyDx
-	 d4krA/NRXKET0z9QqyB2im+L9DKsTs6mmVV3Q0ZE=
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([114.249.58.236])
-	by sina.com (10.54.253.34) with ESMTP
-	id 68B41CFD00007605; Sun, 31 Aug 2025 17:59:27 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 244656291923
-X-SMAIL-UIID: 9199A7AECE71468597CE2A563C8960A6-20250831-175927-1
-From: Hillf Danton <hdanton@sina.com>
-To: syzbot <syzbot+535bbe83dfc3ae8d4be3@syzkaller.appspotmail.com>
-Cc: linux-kernel@vger.kernel.org,
+	s=arc-20240116; t=1756634950; c=relaxed/simple;
+	bh=s6BufQ2PzEmyzcCo/e23hOkM8M39ehtZlsnksGH7A8Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ue0M9uoxmhwE3YuhPzx7BflXOx5VACrz1Bwg4Rfxa5GIiYIBjlcFfO9/mquofz1lG3aF1JAc1sAv9eWERLD7lEfeMANhzNlSLSqVl5zzQtlfUEmJKX9iHUqafIlxAcJrNOrwGUttSkOLR6lQMRMLEHVtIrJqP8e0Sn2PG1F5+hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=YacJJrAo; arc=none smtp.client-ip=220.197.31.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=4p
+	W6aNGncwjkw+VVYdOymSEh2vYav2mKCXkFAQDDoo4=; b=YacJJrAoKqt6uplWFb
+	/GjX3eg8SruawW5wkl5vqBOOtGMeQIexqeFdNelvZRDaSpkXofwvcSd11nolWnXX
+	TvFnwKXzPP556/u76rLkrpcqFIRGanF7NBpPvwl9kkYpFc/fztdw9CYrYUaHXtpC
+	926RAg5NSwBhrxKm1CEoFShvA=
+Received: from zhaoxin-MS-7E12.. (unknown [])
+	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wBH7U4YH7RoR1JrFA--.61212S2;
+	Sun, 31 Aug 2025 18:08:25 +0800 (CST)
+From: Xin Zhao <jackzxcui1989@163.com>
+To: willemdebruijn.kernel@gmail.com,
+	edumazet@google.com,
+	ferenc@fejes.dev
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
 	netdev@vger.kernel.org,
-	Yunseong Kim <ysk@kzalloc.com>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] [nfc?] WARNING in nfc_rfkill_set_block
-Date: Sun, 31 Aug 2025 17:59:14 +0800
-Message-ID: <20250831095915.6269-1-hdanton@sina.com>
-In-Reply-To: <68b3f389.a00a0220.1337b0.002e.GAE@google.com>
-References: 
+	linux-kernel@vger.kernel.org,
+	Xin Zhao <jackzxcui1989@163.com>
+Subject: [PATCH net-next v10 0/2] net: af_packet: optimize retire operation
+Date: Sun, 31 Aug 2025 18:08:20 +0800
+Message-Id: <20250831100822.1238795-1-jackzxcui1989@163.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,71 +59,163 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wBH7U4YH7RoR1JrFA--.61212S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxKw43ZFy3Kr1UXw4DGF4DJwb_yoW3Kr43pa
+	yUu34xGw1DZ342gw4xZan7ZF15Zw43Jr1UGrs3J34Fyan8CFy8AFW293ySqFZ7tFZ5Kwn7
+	Zr18XF13A3Z8AFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pig18dUUUUU=
+X-CM-SenderInfo: pmdfy650fxxiqzyzqiywtou0bp/1tbioxC6Cmi0EKHMlQAAs3
 
-> Date: Sun, 31 Aug 2025 00:02:33 -0700
-> syzbot has found a reproducer for the following issue on:
-> 
-> HEAD commit:    c8bc81a52d5a Merge tag 'arm64-fixes' of git://git.kernel.o..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=1508ce34580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=bd9738e00c1bbfb4
-> dashboard link: https://syzkaller.appspot.com/bug?extid=535bbe83dfc3ae8d4be3
-> compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11019a62580000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1308ce34580000
+In a system with high real-time requirements, the timeout mechanism of
+ordinary timers with jiffies granularity is insufficient to meet the
+demands for real-time performance. Meanwhile, the optimization of CPU
+usage with af_packet is quite significant. Use hrtimer instead of timer
+to help compensate for the shortcomings in real-time performance.
+In HZ=100 or HZ=250 system, the update of TP_STATUS_USER is not real-time
+enough, with fluctuations reaching over 8ms (on a system with HZ=250).
+This is unacceptable in some high real-time systems that require timely
+processing of network packets. By replacing it with hrtimer, if a timeout
+of 2ms is set, the update of TP_STATUS_USER can be stabilized to within
+3 ms.
 
-Test Kim's patch.
+---
+Changes in v10:
+- kactive_blk_num (K) is incremented on block close. last_kactive_blk_num (L)
+  is set to match K on block open and each timer. So the only time that they
+  differ is if a block is closed in tpacket_rcv and no new block could be
+  opened. So the origin check L==K in timer callback only skip the case 'no
+  new block to open'. If we remove L==K check, it will make prb_curr_blk_in_use
+  check earlier, which will not cause any side effect
+  as suggested by Willem de Bruijn.
+- Submit a precursor patch that removes last_kactive_blk_num
+  as suggested by Willem de Bruijn.
 
-#syz test
+Changes in v9:
+- Remove the function prb_setup_retire_blk_timer and move hrtimer setup and start
+  logic into function init_prb_bdqc
+  as suggested by Willem de Bruijn.
+- Always update last_kactive_blk_num before hrtimer callback return as the origin
+  logic does, as suggested by Willem de Bruijn.
+  In tpacket_rcv, it may call prb_close_block but do not call prb_open_block in
+  prb_dispatch_next_block, leading to inconsistency between last_kactive_blk_num
+  and kactive_blk_num. In hrtimer callback, we should update last_kactive_blk_num
+  in this case.
+- Remove 'refresh_timer:' label which is not needed while I change goto logic to
+  if-else implementation.
+- Link to v9: https://lore.kernel.org/netdev/20250828155127.3076551-1-jackzxcui1989@163.com/
 
---- a/net/nfc/core.c
-+++ b/net/nfc/core.c
-@@ -1154,6 +1154,7 @@ EXPORT_SYMBOL(nfc_register_device);
- void nfc_unregister_device(struct nfc_dev *dev)
- {
- 	int rc;
-+	struct rfkill *rfk = NULL;
- 
- 	pr_debug("dev_name=%s\n", dev_name(&dev->dev));
- 
-@@ -1163,14 +1164,18 @@ void nfc_unregister_device(struct nfc_dev *dev)
- 			 "was removed\n", dev_name(&dev->dev));
- 
- 	device_lock(&dev->dev);
-+	dev->shutting_down = true;
- 	if (dev->rfkill) {
--		rfkill_unregister(dev->rfkill);
--		rfkill_destroy(dev->rfkill);
-+		rfk = dev->rfkill;
- 		dev->rfkill = NULL;
- 	}
--	dev->shutting_down = true;
- 	device_unlock(&dev->dev);
- 
-+	if (rfk) {
-+		rfkill_unregister(rfk);
-+		rfkill_destroy(rfk);
-+	}
-+
- 	if (dev->ops->check_presence) {
- 		timer_delete_sync(&dev->check_pres_timer);
- 		cancel_work_sync(&dev->check_pres_work);
---- x/net/bluetooth/hci_core.c
-+++ y/net/bluetooth/hci_core.c
-@@ -1476,8 +1476,14 @@ static void hci_cmd_timeout(struct work_
- 	if (hdev->reset)
- 		hdev->reset(hdev);
- 
-+	rcu_read_lock();
-+	if (hci_dev_test_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE)) {
-+		rcu_read_unlock();
-+		return;
-+	}
- 	atomic_set(&hdev->cmd_cnt, 1);
- 	queue_work(hdev->workqueue, &hdev->cmd_work);
-+	rcu_read_unlock();
- }
- 
- /* HCI ncmd timer function */
---
+Changes in v8:
+- Delete delete_blk_timer field, as suggested by Willem de Bruijn,
+  hrtimer_cancel will check and wait until the timer callback return and ensure
+  enter enter callback again;
+- Simplify the logic related to setting timeout, as suggestd by Willem de Bruijn.
+  Currently timer callback just restarts itself unconditionally, so delete the
+ 'out:' label, do not forward hrtimer in prb_open_block, call hrtimer_forward_now
+  directly and always return HRTIMER_RESTART. The only special case is when
+  prb_open_block is called from tpacket_rcv. That would set the timeout further
+  into the future than the already queued timer. An earlier timeout is not
+  problematic. No need to add complexity to avoid that.
+- Link to v8: https://lore.kernel.org/all/20250827150131.2193485-1-jackzxcui1989@163.com/
+
+Changes in v7:
+- Only update the hrtimer expire time within the hrtimer callback.
+  When the callback return, without sk_buff_head lock protection, __run_hrtimer will
+  enqueue the timer if return HRTIMER_RESTART. Setting the hrtimer expires while
+  enqueuing a timer may cause chaos in the hrtimer red-black tree.
+  The setting expire time is monotonic, so if we do not update the expire time to the
+  retire_blk_timer when it is not in callback, it will not cause problem if we skip
+  the timeout event and update it when find out that expire_ktime is bigger than the
+  expire time of retire_blk_timer.
+- Use hrtimer_set_expires instead of hrtimer_forward_now.
+  The end time for retiring each block is not fixed because when network packets are
+  received quickly, blocks are retired rapidly, and the new block retire time needs
+  to be recalculated. However, hrtimer_forward_now increments the previous timeout
+  by an interval, which is not correct.
+- The expire time is monotonic, so if we do not update the expire time to the
+  retire_blk_timer when it is not in callback, it will not cause problem if we skip
+  the timeout event and update it when find out that expire_ktime is bigger than the
+  expire time of retire_blk_timer.
+- Adding the 'bool callback' parameter back is intended to more accurately determine
+  whether we are inside the hrtimer callback when executing
+  _prb_refresh_rx_retire_blk_timer. This ensures that we only update the hrtimer's
+  timeout value within the hrtimer callback.
+- Link to v7: https://lore.kernel.org/all/20250822132051.266787-1-jackzxcui1989@163.com/
+
+Changes in v6:
+- Use hrtimer_is_queued instead to check whether it is within the callback function.
+  So do not need to add 'bool callback' parameter to _prb_refresh_rx_retire_blk_timer
+  as suggested by Willem de Bruijn;
+- Do not need local_irq_save and local_irq_restore to protect the race of the timer
+  callback running in softirq context or the open_block from tpacket_rcv in process
+  context
+  as suggested by Willem de Bruijn;
+- Link to v6: https://lore.kernel.org/all/20250820092925.2115372-1-jackzxcui1989@163.com/
+
+Changes in v5:
+- Remove the unnecessary comments at the top of the _prb_refresh_rx_retire_blk_timer,
+  branch is self-explanatory enough
+  as suggested by Willem de Bruijn;
+- Indentation of _prb_refresh_rx_retire_blk_timer, align with first argument on
+  previous line
+  as suggested by Willem de Bruijn;
+- Do not call hrtimer_start within the hrtimer callback
+  as suggested by Willem de Bruijn
+  So add 'bool callback' parameter to _prb_refresh_rx_retire_blk_timer to indicate
+  whether it is within the callback function. Use hrtimer_forward_now instead of
+  hrtimer_start when it is in the callback function and is doing prb_open_block.
+- Link to v5: https://lore.kernel.org/all/20250819091447.1199980-1-jackzxcui1989@163.com/
+
+Changes in v4:
+- Add 'bool start' to distinguish whether the call to _prb_refresh_rx_retire_blk_timer
+  is for prb_open_block. When it is for prb_open_block, execute hrtimer_start to
+  (re)start the hrtimer; otherwise, use hrtimer_forward_now to set the expiration
+  time as it is more commonly used compared to hrtimer_set_expires.
+  as suggested by Willem de Bruijn;
+- Delete the comments to explain why hrtimer_set_expires(not hrtimer_forward_now)
+  is used, as we do not use hrtimer_set_expires any more;
+- Link to v4: https://lore.kernel.org/all/20250818050233.155344-1-jackzxcui1989@163.com/
+
+Changes in v3:
+- return HRTIMER_NORESTART when pkc->delete_blk_timer is true
+  as suggested by Willem de Bruijn;
+- Drop the retire_blk_tov field of tpacket_kbdq_core, add interval_ktime instead
+  as suggested by Willem de Bruijn;
+- Add comments to explain why hrtimer_set_expires(not hrtimer_forward_now) is used in
+  _prb_refresh_rx_retire_blk_timer
+  as suggested by Willem de Bruijn;
+- Link to v3: https://lore.kernel.org/all/20250816170130.3969354-1-jackzxcui1989@163.com/
+
+Changes in v2:
+- Drop the tov_in_msecs field of tpacket_kbdq_core added by the patch
+  as suggested by Willem de Bruijn;
+- Link to v2: https://lore.kernel.org/all/20250815044141.1374446-1-jackzxcui1989@163.com/
+
+Changes in v1:
+- Do not add another config for the current changes
+  as suggested by Eric Dumazet;
+- Mention the beneficial cases 'HZ=100 or HZ=250' in the changelog
+  as suggested by Eric Dumazet;
+- Add some performance details to the changelog
+  as suggested by Ferenc Fejes;
+- Delete the 'pkc->tov_in_msecs == 0' bounds check which is not necessary
+  as suggested by Willem de Bruijn;
+- Use hrtimer_set_expires instead of hrtimer_start_range_ns when retire timer needs update
+  as suggested by Willem de Bruijn. Start the hrtimer in prb_setup_retire_blk_timer;
+- Just return HRTIMER_RESTART directly as all cases return the same value
+  as suggested by Willem de Bruijn;
+- Link to v1: https://lore.kernel.org/all/20250813165201.1492779-1-jackzxcui1989@163.com/
+- Link to v0: https://lore.kernel.org/all/20250806055210.1530081-1-jackzxcui1989@163.com/
+
+Xin Zhao (2):
+  net: af_packet: remove last_kactive_blk_num field
+  net: af_packet: Use hrtimer to do the retire operation
+
+ net/packet/af_packet.c | 107 +++++++++++------------------------------
+ net/packet/diag.c      |   2 +-
+ net/packet/internal.h  |  12 +----
+ 3 files changed, 32 insertions(+), 89 deletions(-)
+
+-- 
+2.34.1
+
 
