@@ -1,158 +1,151 @@
-Return-Path: <netdev+bounces-218548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51F94B3D1FD
-	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 12:08:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AFE4B3D20E
+	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 12:18:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC4AC7A149C
-	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 10:07:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABACA17DDC6
+	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 10:18:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE0F22A4DA;
-	Sun, 31 Aug 2025 10:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC0B5246BA7;
+	Sun, 31 Aug 2025 10:18:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="s+aUE1IA"
+	dkim=pass (2048-bit key) header.d=fastmail.com header.i=@fastmail.com header.b="EB9G+bU0";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="XogKtSbF"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from fhigh-b3-smtp.messagingengine.com (fhigh-b3-smtp.messagingengine.com [202.12.124.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7B491E3DC8
-	for <netdev@vger.kernel.org>; Sun, 31 Aug 2025 10:08:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F3BC1DDC2B;
+	Sun, 31 Aug 2025 10:18:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756634932; cv=none; b=FmlYI9pFty/iUJhm/8ejs0sslCXGZYueOr/Z/wtvbnh7wJk0jxBLNtWlzpVTVn9Ikz0nnwMW+vZFy5/om6qJFDQ5jBumSQQdjYuHKVgbqzUKsnMKhqe4E6UL1qONS4kcKzU5FSv2gaLjn50d8R7hXiyEPeEDkN4olia1ziD237o=
+	t=1756635485; cv=none; b=D8VxA8h92xhXaUaeDxf8mnzJKYBAAZvW0VRL/qXfTCOEJKeP5BnFXa4KYC8fhCo7F/th01iMvVsI1bhbIK9P6X9ArtrcwZ2lrH0antYFiBtYsc8cWJUNb86OvL8E34xvj69x1mW/oMhLqxQQgir+PmiLT37L+j341hgbn3NfNPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756634932; c=relaxed/simple;
-	bh=jd01UooJkWZMmXC+19yDRLdonl6SC/V4bqQpVZXgQGw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u4CV0FWnxc29Ihah+ix3Vj1od5g0uUHkuHGp7zuoH78NeekzRDkBLdF5QrNpWDqykFptNA3A3Whl6DdSd3sabgINM1ClG17efMWJmBGDCBS+Vj8EWifB+tM16yFaDs/bAzPDEx4e2PMJVyGfTslSdJ/wvYOvbj/qO+DL1iwsRsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=s+aUE1IA; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=1J2NCpThMNdOFpRgxZE0V/aCFXipAMunh3VihrLCjfQ=; b=s+aUE1IAL6ERvH+l85sIJJ7+L7
-	1y8FLWzz1GoxR0118jQgQXr3CpnrWrMuQiAFmb7DrpFDrD9Orfs3nsT6pMu8vu+yuUYiLws9MDXP3
-	KP72aaEKXoosIKmDAYhYMyCddBCBb5Knt5nst2d/UASe7BqXMzhEZ3g7VzlC0tOMdx0NO3kBu9qIZ
-	Lo31M8BU8mZvSwTN+hhP6pzJ7C0QgxWC3ox1pOGmgmRLGayAwR9+rhlDZMFXJHgnqGbT34yvOh42F
-	ame7+mJwxGxk7HvHQEazHYZwo++vH6NGKRuIt9NfQTyNuNIYtnGBG/JV4DvB4IbJcT5i/IOQ5gOMI
-	0xWEzSyQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41774)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1usez9-000000004on-0Du0;
-	Sun, 31 Aug 2025 11:08:32 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1usez4-000000005xr-1IfH;
-	Sun, 31 Aug 2025 11:08:26 +0100
-Date: Sun, 31 Aug 2025 11:08:26 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: markus.stockhausen@gmx.de
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, jan@3e8.eu,
-	'Chris Packham' <chris.packham@alliedtelesis.co.nz>
-Subject: Re: C22/C45 decision in phy_restart_aneg()
-Message-ID: <aLQfGgYfTdcCFHtC@shell.armlinux.org.uk>
-References: <009a01dc1a4b$45452120$cfcf6360$@gmx.de>
+	s=arc-20240116; t=1756635485; c=relaxed/simple;
+	bh=IjTYrbBQSPkwxsasV3ZlplpdpKXrOFp0IayCgXtPes0=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=Ehit2rwNuRMCi56l6ifmfQZUIsg0TyJe98MsNw8U2r3wtNtB3TAxY1IO2jwL1oxbTlhPBIrjXQq1Xh6JmVuFA6yiOIGcqSJWIHc8ETcIpInG5lemVVMt6cloIvf6fSg+enVgOnQtOL2HjOtUyhUUVfUOq0OlJV3sH1Ir8Kb3MR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.com; spf=pass smtp.mailfrom=fastmail.com; dkim=pass (2048-bit key) header.d=fastmail.com header.i=@fastmail.com header.b=EB9G+bU0; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=XogKtSbF; arc=none smtp.client-ip=202.12.124.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.com
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 549CB7A006D;
+	Sun, 31 Aug 2025 06:18:02 -0400 (EDT)
+Received: from phl-imap-15 ([10.202.2.104])
+  by phl-compute-06.internal (MEProxy); Sun, 31 Aug 2025 06:18:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1756635482;
+	 x=1756721882; bh=cBqMVR6uqZHT5hLteGW5CLt4CXa6io3Ge5VLQmeY+u8=; b=
+	EB9G+bU0aZue6wB8MyHS9YXRsGUbpXMTlon/5WAEFj0g5Wrt/WhOx3xohoT6jPo8
+	KT6fC1xsOhLddjjs5Ag2BMPLLHAI8VNwlMGIhhg05LRtyruFeDq098VMgWagGkj5
+	THrtJL4KLpizjYmBujoFqqnNv+MH80rIoEwdBqRgZKwA2YQUmY1SrPh36Vfm4tiE
+	Euvm+6mllOSRF0u6myIkqj4mogYhA6IZGXp6sWmsqi/92UYIGHiLREbR5VNSXseE
+	JDks9PCyrS72VpCRVnhfCXaDn781KrXWV2UVXr+YVLnORL1LZ9bnpSvfpPLvGbK0
+	mCaYOKn7aZO36zfk8rPyXA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1756635482; x=
+	1756721882; bh=cBqMVR6uqZHT5hLteGW5CLt4CXa6io3Ge5VLQmeY+u8=; b=X
+	ogKtSbFudSgjAPdHjAn2kLy5FMwAk7AzNzZvVnm07lZvRWQqFfFV5JDxVm+Bznpg
+	tdKk+sZ1Yzj2mxrW6H8M5gdyxM6vsTnQYh+5ETddmU5xqynQOa2baNkm1B+LbNeG
+	Bf2poVDlNiCLxVqZ7DcR59CRttBUOanhZRHSfX51aPChrp9JCrPOCL3mX1VEKO/r
+	KRSALavb4zPs0ulqOT13fzVBOIonfhkkAX/qZV16/HvTCXjswa/4Nxae3Lbfh5kV
+	rxE1FO10KbkWxVnPDA+XP8RnX0ApGWxgZAE4uXmLuPHwHKEMzsVL45CfZvqKZsOt
+	0hFxzpDRdRu72EPO1HOsw==
+X-ME-Sender: <xms:WCG0aGN_fcKVIQyvjYDeeFl1yGAUG6V99bblBc93iuCTvcLzLCY0dA>
+    <xme:WCG0aE9LHCHNPVN1LuZIU_5eCQSYIyecm66Pjwq67b4uS7WBmZ1Owjrg7_4WqYQsS
+    bO6RlPmM-n3NwpphOI>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddukeeltdduucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpeflrghmvghs
+    uceosgholhgurdiiohhnvgdvfeejfeesfhgrshhtmhgrihhlrdgtohhmqeenucggtffrrg
+    htthgvrhhnpeffleeuffekgfefhfejudetheevgfduudefffeifeetveekteefhefffffg
+    heejhfenucffohhmrghinhepthgvshhtvggurdhnvghtnecuvehluhhsthgvrhfuihiivg
+    eptdenucfrrghrrghmpehmrghilhhfrhhomhepsgholhgurdiiohhnvgdvfeejfeesfhgr
+    shhtmhgrihhlrdgtohhmpdhnsggprhgtphhtthhopedukedpmhhouggvpehsmhhtphhouh
+    htpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthho
+    pegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohephhhorhhmsheskh
+    gvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgt
+    phhtthhopegrlhhisghuuggrsehlihhnuhigrdgrlhhisggrsggrrdgtohhmpdhrtghpth
+    htohepughushhtrdhliheslhhinhhugidrrghlihgsrggsrgdrtghomhdprhgtphhtthho
+    pehguhifvghnsehlihhnuhigrdgrlhhisggrsggrrdgtohhmpdhrtghpthhtohepthhonh
+    ihlhhusehlihhnuhigrdgrlhhisggrsggrrdgtohhmpdhrtghpthhtohepmhhjrghmsghi
+    ghhisehlihhnuhigrdhisghmrdgtohhm
+X-ME-Proxy: <xmx:WCG0aOLkjOXqN6rJoVKA1UQ0LIwRZDTHjPwShOCxSeA9E7iwqUaNPw>
+    <xmx:WCG0aO-Nss1w1J_AnXJrQk6RCw1sUI85vFgf0Zb6j2wX-GDsxzsgxw>
+    <xmx:WCG0aADasLgMO_F620l24tlGg7ikE1K8906AILzr9hWBoWsyfqeAXg>
+    <xmx:WCG0aIrWVxpToHIWq8VYCSqG1GC5zn8FTP5-QR-6Moff--9cSXntkg>
+    <xmx:WiG0aIp52qlhtzLh-iwA4EcGo62o8__piBmuviB6sp2AE6X5t_SiEgE_>
+Feedback-ID: ibd7e4881:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id C1F277840CC; Sun, 31 Aug 2025 06:18:00 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <009a01dc1a4b$45452120$cfcf6360$@gmx.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-ThreadId: AJv3-LmMGI5N
+Date: Sun, 31 Aug 2025 03:17:40 -0700
+From: James <bold.zone2373@fastmail.com>
+To: alibuda@linux.alibaba.com, dust.li@linux.alibaba.com,
+ sidraya@linux.ibm.com, wenjia@linux.ibm.com, mjambigi@linux.ibm.com,
+ tonylu@linux.alibaba.com, guwen@linux.alibaba.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ "Shuah Khan" <skhan@linuxfoundation.org>
+Cc: linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kernel-mentees@lists.linux.dev
+Message-Id: <4919e89e-cf4c-4ef1-af9a-0a94e92614ac@app.fastmail.com>
+In-Reply-To: <20250831095535.176554-1-bold.zone2373@fastmail.com>
+References: <20250831095535.176554-1-bold.zone2373@fastmail.com>
+Subject: Re: [PATCH] net/smc: Replace use of strncpy on NUL-terminated string with
+ strscpy
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Sun, Aug 31, 2025 at 09:45:46AM +0200, markus.stockhausen@gmx.de wrote:
-> @Russell: Sorry for the inconvenience of my first mail. After a lengthy
-> analysis session, I focused too much on the initial C45 enhancement 
-> of the below function that you wrote. I sent it off too hastily.
 
-It's important to send messages to the right people for a proper
-discussion. Andrew may have some input on this - maybe as a result
-of my ideas below.
 
-> So, once again, here is some interesting finding regarding the 
-> limitations of the Realtek MDIO driver. Remember that it can only run 
-> in either C22 or C45. This time it is about autonegotiation restart.
+On Sun, Aug 31, 2025, at 2:49 AM, James Flowers wrote:
+> strncpy is deprecated for use on NUL-terminated strings, as indicated in
+> Documentation/process/deprecated.rst. strncpy NUL-pads the destination
+> buffer and doesn't guarantee the destination buffer will be NUL
+> terminated.
+>
+> Signed-off-by: James Flowers <bold.zone2373@fastmail.com>
+> ---
+> Note: this has only been compile tested.
+>
+>  net/smc/smc_pnet.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
+> index 76ad29e31d60..5cfde2b9cad8 100644
+> --- a/net/smc/smc_pnet.c
+> +++ b/net/smc/smc_pnet.c
+> @@ -450,7 +450,7 @@ static int smc_pnet_add_ib(struct smc_pnettable 
+> *pnettable, char *ib_name,
+>  		return -ENOMEM;
+>  	new_pe->type = SMC_PNET_IB;
+>  	memcpy(new_pe->pnet_name, pnet_name, SMC_MAX_PNETID_LEN);
+> -	strncpy(new_pe->ib_name, ib_name, IB_DEVICE_NAME_MAX);
+> +	strscpy(new_pe->ib_name, ib_name, IB_DEVICE_NAME_MAX);
+>  	new_pe->ib_port = ib_port;
 > 
-> int phy_restart_aneg(struct phy_device *phydev) {
->   int ret;
-> 
->   if (phydev->is_c45 && !(phydev->c45_ids.devices_in_package & BIT(0))
->     ret = genphy_c45_restart_aneg(phydev);
->   else
->     ret = genphy_restart_aneg(phydev);
-> 
->   return ret;
-> }
-> 
-> I assume that BIT(0) means MDIO_DEVS_C22_PRESENT. As I understand it,
-> this basically uses C22 commands for C45 PHYs if C22 support is detected.
-> Currently, I have no reasonable explanation for this additional check.
+>  	new_ibdev = true;
+> -- 
+> 2.50.1
 
-There was discussion and delving into the spec when this was added.
-See https://lore.kernel.org/all/20170601102327.GF27796@n2100.armlinux.org.uk/
-
-(side note: google is now useless for finding that, searching for "hook
-up clause 45 autonegotiation restart" returns very few results, none of
-them with the full history. I've had to search my mailboxes for it, find
-the message ID, and then look it up on lore. We now have various web
-high-bandwidth crawlers that do not respect robots.txt to thank for this
-as sites have ended up blocking all crawlers using stuff like Anubis
-proof of work.)
-
-It's been a long time, and so I've forgotten the details now, so all
-there is to go on are the above emails.
-
-You may notice that the initial version I submitted just used
-phydev->is_c45.
-
-> In our case, this function fails for C45 PHYs because the bus and PHY are 
-> locked down to this single mode. It's stupid, of course, but that's how 
-> it is. I see two options for fixing the issue:
-> 
-> 1) Mask the C22 presence in the bus for all PHYs when running in C45.
-> 2) Drop the C22 condition check in the above function.
-
-I guess we also need to make these kinds of tests conditional on
-whether the bus supports C45 or not.
-
-static bool mdiobus_supports_c22(struct mii_bus *bus)
-{
-	return bus->read && bus->write;
-}
-
-static bool mdiobus_supports_c45(struct mii_bus *bus)
-{
-	return bus->read_c45 && bus->write_c45;
-}
-
-This should be fine, because we already require MII bus drivers to only
-populate these methods only when they're supported (see commit
-fbfe97597c77 ("net: phy: Decide on C45 capabilities based on presence
-of method").
-
-	if (phydev->is_c45 && !(phydev->c45_ids.devices_in_package & BIT(0))
-
-can then become:
-
-	if (phydev->is_c45 &&
-	    !(mdiobus_supports_c22(phydev->mdio.bus) &&
-	      phydev->c45_ids.devices_in_package & MDIO_DEVS_C22PRESENT))
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Please disregard. Sorry, just noticed I should have used the two argument version of strscpy. I will send a V2. 
 
