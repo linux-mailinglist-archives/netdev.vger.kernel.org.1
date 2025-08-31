@@ -1,97 +1,66 @@
-Return-Path: <netdev+bounces-218540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2928B3D155
-	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 10:08:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EBE8B3D15E
+	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 10:20:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51BD716FAA2
-	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 08:08:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9C59189E35C
+	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 08:20:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5547424DFF4;
-	Sun, 31 Aug 2025 08:07:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B15B8219E8C;
+	Sun, 31 Aug 2025 08:19:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Pcnnpoa1"
+	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="aj/p2ZrI"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2086.outbound.protection.outlook.com [40.107.92.86])
+Received: from r3-20.sinamail.sina.com.cn (r3-20.sinamail.sina.com.cn [202.108.3.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B727E248880;
-	Sun, 31 Aug 2025 08:07:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.86
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756627679; cv=fail; b=KwBiRggwaqumbDrxUFeKLAtcLan+nNCmbq5vXifRpaFe+V6pBh1iWpwDg9qvECzrSoCt4P8wzI5W5JIqRHXShKpT/xLwR02/8eqFcDQpaClAgNnFszCJihOeXFTlCH3XHkeTTuqZl2QXvcQ1dY5cPWjA/XBUXOGpXv/TwuPPQSE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756627679; c=relaxed/simple;
-	bh=zEJ3JHhdcxuQShcGuyV3o0r2tRO1/JYD1+NnlwHRhlc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VGW3VaGAWoPYTdrG9y+5Alk2heI9zJR7FNUIUjqsVSJwEwTZ6xNsJfkMi2N2tu4pyFsldrFdLJzkV/23kPgSBoDagVPlqisGWUoOjD1n39bBOZNVaGERCXseA7XbWOAxgFEooNSt5bFcdh7i9aGMMVKhX9bRV8cYMkOR7nMSxOA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Pcnnpoa1; arc=fail smtp.client-ip=40.107.92.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=PlGc2QAN9HHthzTahHkFbfKeYAXuEE1fH3akin5KTAvyPJybAdfTo5uOX4vNqYwO0kn5jRqq2eUoTwMDP8G1RwOBWtoVzzo9LycNbJn1bpHAj8rM2BTmckviw2rVNoRV5sjOCyfyeZ5gFaMygvBVzRvNSD3RTvAWd96YlC1aOPjaQXxeIgDmkrthzqPYR1af9s4k6hOtqkEnT8eKp6J6j4tykViAdT9QOI4bWa4CspCdz6YcJyUbE28I5xZ6ALQUoxXbGj7Ev6uYiX4KaSqDtj1yjEbPztfoGNZdpPnkrGwh4o0Q9z8f5CZ6nUcwEYY1vtBPZtk2AlwkPXsnLUwIKA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1swz+pzGnE/jiOIg4m/DnGcNreJD88amwOC2eX85r5c=;
- b=OJR27ywebi+1ilZ9np6ATtIMm6Q5slatApxoWBgmux+xVZm646Kst2+0vDqMwvJDX3S+Bzc0B1oS4pmgclQH9YopHJ44JrSKkiDCcg7ArDCFiCN3rSBNCb05lBuYqNVDO9FxySEHXWs90134lc8cP8vwEvStJNr9sbw8624AGgmCog+egNzR40SUh4uB2ut1KvFrsBb4Iqx7kYdbjX5kyD2NFIoqNaw08y8yjJJz/201RTBnzrn/bkRWBcBMqiBut4Q0ll5W+XCp4ZEA24LepJ0SknhSTgpArpMibdi6AqX/XxFxLXKha6OcTaPOH59GDiNsGW9DAjNJr6lRdoR+iA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1swz+pzGnE/jiOIg4m/DnGcNreJD88amwOC2eX85r5c=;
- b=Pcnnpoa12Zoud7JBmch9MjrzNI4iWOzaNARTviLzW81ktgO3wPotMp0EgJWnSXD8z3f+/4nkpfUFWLv7Od5q55VgJN4jrUwEVWWxWgmj3Qws0ao21YZQiNMP5GyXpvtng6geMCQAWqkhijfPikqNWCYpcREOFvGzXkH9dZDqUXW6Ws6E0E117MyVX0bx2Durh6NJRbxG9w3aAOWcqCew4wf5QyoGtTyyRIG/3UuSiJhZS4r0BpnP6wnM6AWUf9KSm5N1RnYaRnqSKTkQRUCyHdgw76495ch1wfhv4IIPguVIahaeymhRYOHqiz93Hqmj5SchaNuBEQdO/Lt1mYLLkQ==
-Received: from BN0PR02CA0048.namprd02.prod.outlook.com (2603:10b6:408:e5::23)
- by DS7PR12MB5816.namprd12.prod.outlook.com (2603:10b6:8:78::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.15; Sun, 31 Aug
- 2025 08:07:51 +0000
-Received: from BN1PEPF00004687.namprd05.prod.outlook.com
- (2603:10b6:408:e5:cafe::91) by BN0PR02CA0048.outlook.office365.com
- (2603:10b6:408:e5::23) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9052.27 via Frontend Transport; Sun,
- 31 Aug 2025 08:07:51 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BN1PEPF00004687.mail.protection.outlook.com (10.167.243.132) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9094.14 via Frontend Transport; Sun, 31 Aug 2025 08:07:50 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Sun, 31 Aug
- 2025 01:07:35 -0700
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Sun, 31 Aug
- 2025 01:07:21 -0700
-Received: from fedora.mtl.labs.mlnx (10.127.8.11) by mail.nvidia.com
- (10.129.68.9) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
- Transport; Sun, 31 Aug 2025 01:07:17 -0700
-From: Carolina Jubran <cjubran@nvidia.com>
-To: Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: Gal Pressman <gal@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, "Cosmin
- Ratiu" <cratiu@nvidia.com>, Nimrod Oren <noren@nvidia.com>, Mark Bloch
-	<mbloch@nvidia.com>, <linux-kernel@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <netdev@vger.kernel.org>
-Subject: [PATCH 3/3] selftests: drv-net: Relax total BW check in devlink_rate_tc_bw.py
-Date: Sun, 31 Aug 2025 11:06:41 +0300
-Message-ID: <20250831080641.1828455-4-cjubran@nvidia.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20250831080641.1828455-1-cjubran@nvidia.com>
-References: <20250831080641.1828455-1-cjubran@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B01AF21FF44
+	for <netdev@vger.kernel.org>; Sun, 31 Aug 2025 08:19:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.20
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756628399; cv=none; b=OhPqfoHVpXnc27qmu0xsVsKMxO3qd0e2T2e3SuuYpgj0+baC1lks/0LI+qlBXXz4NyRcWOo97jTNsj5ZwE56zfXX7vIoECpq4xJCxX4tjKP/IYZ/kmhhicmJJ1hN+2S9C8uIXCr7/OWU4GG5aedP8QdYETLDXbCdMMTCpDpOZyA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756628399; c=relaxed/simple;
+	bh=v+ka/MBoOac/NV1cNaNzOfu6MYrHkazh4B88sWRKH+I=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=SsmlYOz5Ix39XJ5b+s8UGliwCn2ySPZ/yeUszzE2H/EYid05jaOxY64TcPsMHJfl7uZudDuFw+AFtpnZy9/UtX2BEeC80X1LQbT3tvnaguSkgcKTd/IqUm5tkDP75TS/zzoySH40Ll/hQfAoKl0N/aKDxUUXLV1gTTPzbbPKg/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=aj/p2ZrI; arc=none smtp.client-ip=202.108.3.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1756628394;
+	bh=kQMYHqbv/O4f5Ayov6cmuzEMugP3k+GFB6cSptEPIP0=;
+	h=From:Subject:Date:Message-ID;
+	b=aj/p2ZrI+/1TYoNBfiOP/RbQQHp7wKBUivGu613suXFkS31cWQaz2YqkUhtNUqoik
+	 r8ENopkJji9hdTY1HUF7ZY6D7/C0KYUNjadRh/98YhI5H0TWwSTCJ2aimuMguaN69X
+	 GsV7RcusDfggcAmpy4/vK+2/s2co3BHi6muR1DQg=
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([114.249.58.236])
+	by sina.com (10.54.253.32) with ESMTP
+	id 68B4059F000009F4; Sun, 31 Aug 2025 16:19:44 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 7032544456623
+X-SMAIL-UIID: C3D4DE28560E4CB980BF1411F7191665-20250831-161944-1
+From: Hillf Danton <hdanton@sina.com>
+To: syzbot <syzbot+535bbe83dfc3ae8d4be3@syzkaller.appspotmail.com>
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Yunseong Kim <ysk@kzalloc.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] [nfc?] WARNING in nfc_rfkill_set_block
+Date: Sun, 31 Aug 2025 16:19:32 +0800
+Message-ID: <20250831081933.6215-1-hdanton@sina.com>
+In-Reply-To: <68b3f389.a00a0220.1337b0.002e.GAE@google.com>
+References: 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,107 +68,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN1PEPF00004687:EE_|DS7PR12MB5816:EE_
-X-MS-Office365-Filtering-Correlation-Id: e3465e6a-06a1-4c3c-9966-08dde8657b18
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?5VxCpqCB15mtcAzGGCGEnkdR0jcRAoEsLk3clYEupHHynBMrb+E7PfTQzTJf?=
- =?us-ascii?Q?4M/XUQ76qL2bJ8As3pgome9AkYhHHCt21Q0BwL9wB+dWSS1bNeNAe4aL/bjZ?=
- =?us-ascii?Q?8GZtZoMHu0kMF4wopj3H3UtAjLQZtXLDYCcWervkEqn0NkG86xQR8X3ejHPN?=
- =?us-ascii?Q?XD5bBgAW17Nrv3pTc0dxotSWOnCEVcBjCTcWFP7tTHw9/mqBIGdC9ns24V8+?=
- =?us-ascii?Q?XwB3X7+TIDwwJKPEVllMSRMdhxOjBpEGk+jIWyeQs0sE7qH4wMi+7bfFbT16?=
- =?us-ascii?Q?DenS7wSJ9P/Hd/Urhf0MYXPZJfbLW/xa0cT+W9r1CfR3ndn+k24ds6gpHVv6?=
- =?us-ascii?Q?Z4/wx8lJ16ob8JqJXu16UEl5gDioSibyTXnYeztrVIzj1VEPE2VdKMUFE3qO?=
- =?us-ascii?Q?xOGWduARFgjszAwX2oQDpz6Ka7Qgu4UGnZcF9C0N2wUyOoTDih42RUVtxiIR?=
- =?us-ascii?Q?jDE+v5KVSDo1uI4wT7e4BBgBIivRO53NrD+/4brvpb2hi249zR1xFbx6WxVD?=
- =?us-ascii?Q?Ak7ZOr9aB2rFwejTG0bM8SLFROSUgyb8DduAAVRQsaMhJYflt6fWCmcLcy7k?=
- =?us-ascii?Q?8taOezZFkbCUIVQceu/ykHzjnmF4OmioPZhkbbQI3DVGOUlQ0FOJDxKp7MTO?=
- =?us-ascii?Q?HFtBNlze+G8uEc74dcL1NEPBYiz4Cn595VfyqcgDyqYE9xtTRngbnDdRicva?=
- =?us-ascii?Q?YPK1HDOPe67f7HATVJNhm0tjEzdCn0GUHYaXJhiNpPp1d2cZb+SbBfQdFfKV?=
- =?us-ascii?Q?FC75peAG04AljXwJy0R4GFi9xjojjuvE9/1PcaemYrZQvAhtpS5e49AjmnZy?=
- =?us-ascii?Q?TtCuJ8A+lkprEZeDMQfmHA8wKOKOIIZM7a/wJJLXGGfhhb0E1wUQQlGsBdaq?=
- =?us-ascii?Q?snaM6tYUmGhIRfHUesSYXdnRqbP+szO+hrdv6Ab0S4x3PWAeQyW8CAZ8VGPo?=
- =?us-ascii?Q?Uc1sNK7LUNsP4OV5VAv2m2St3RobNsURdT0N3NPEQrZdoQIA8GWJ42xuaB30?=
- =?us-ascii?Q?kaIn+WlyMNRvU/hFeTfnEyw5LBe61Q+xFiOJKyNGvXC9Wc/WWeloF/q8euyE?=
- =?us-ascii?Q?7arsRc/DeyQqu4nwSUBaod2LnjbDtVT9Zvjnq986RCFVNdQjB9vwu6ukV3LH?=
- =?us-ascii?Q?xXBP6zI0MTwKN3NGZ/sI2Ktcw3lXqgYalVTFhSutGNForzzq5KxoB6umQXik?=
- =?us-ascii?Q?7xCuitKyunUDgGQe4hETIRl2eDRwZvpVTMam0mtC715zFy1VQWoyuvCF4j/1?=
- =?us-ascii?Q?bZk84yPpuW+ey1XnCTn7zgSOru/qTXlDmnmQ9C3SLmdtQtZ8B7cHWDqLdyeZ?=
- =?us-ascii?Q?jW0WcuFb0bO7FXiZTe6amlvbrxoTKO+Zhi3tp3jYXlbd10dzCuaC8BpaIPSA?=
- =?us-ascii?Q?y4SiSptkziarssd5Iw6GtTpHnEYlFdgYHXdPA8/zMtvfDSmlTvTOC+FuUfVF?=
- =?us-ascii?Q?Ux0oMaSAQTduR3y1CrPXk/k/vG46KCH7LnTgnC3uTSfeiOYS4PLVKkyA8RKJ?=
- =?us-ascii?Q?+G9JhNXT1rbNeYiKjCD5P98FhTYGfxqFKSPs?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Aug 2025 08:07:50.7219
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e3465e6a-06a1-4c3c-9966-08dde8657b18
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN1PEPF00004687.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5816
 
-This test is meant to check TC bandwidth distribution, not the tx_max
-of the VF. The total bandwidth check is only there to make sure that FW
-tokens limit traffic, because the per-TC share is only meaningful when
-the link is fully saturated.
+> Date: Sun, 31 Aug 2025 00:02:33 -0700
+> syzbot has found a reproducer for the following issue on:
+> 
+> HEAD commit:    c8bc81a52d5a Merge tag 'arm64-fixes' of git://git.kernel.o..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=1508ce34580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=bd9738e00c1bbfb4
+> dashboard link: https://syzkaller.appspot.com/bug?extid=535bbe83dfc3ae8d4be3
+> compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11019a62580000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1308ce34580000
 
-Because the measured total is the sum of two iperf3 streams that do not
-always start or stop at the same time, using a strict 1 Gbps target
-caused random failures. This change adds a tolerance parameter to
-BandwidthValidator, keeps per-TC checks tight at +-12%, and relaxes the
-total bandwidth check to +-25% around 1 Gbps.
+Test Kim's patch.
 
-This avoids false failures while still confirming that the TC share
-validation is meaningful.
+#syz test
 
-Fixes: 23ca32e4ead4 ("selftests: drv-net: Add test for devlink-rate traffic class bandwidth distribution")
-Tested-by: Carolina Jubran <cjubran@nvidia.com>
-Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
-Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
-Reviewed-by: Nimrod Oren <noren@nvidia.com>
----
- .../selftests/drivers/net/hw/devlink_rate_tc_bw.py        | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/tools/testing/selftests/drivers/net/hw/devlink_rate_tc_bw.py b/tools/testing/selftests/drivers/net/hw/devlink_rate_tc_bw.py
-index abc20bc4a34a..1713ca11f845 100755
---- a/tools/testing/selftests/drivers/net/hw/devlink_rate_tc_bw.py
-+++ b/tools/testing/selftests/drivers/net/hw/devlink_rate_tc_bw.py
-@@ -72,8 +72,8 @@ class BandwidthValidator:
-     relative to the overall total.
-     """
+--- a/net/nfc/core.c
++++ b/net/nfc/core.c
+@@ -1154,6 +1154,7 @@ EXPORT_SYMBOL(nfc_register_device);
+ void nfc_unregister_device(struct nfc_dev *dev)
+ {
+ 	int rc;
++	struct rfkill *rfk = NULL;
  
--    def __init__(self, shares):
--        self.tolerance_percent = 12
-+    def __init__(self, shares, tolerance):
-+        self.tolerance_percent = tolerance
-         self.expected_total = sum(shares.values())
-         self.bounds = {}
+ 	pr_debug("dev_name=%s\n", dev_name(&dev->dev));
  
-@@ -438,8 +438,8 @@ def main() -> None:
-             raise KsftSkipEx("Could not get PCI address of the interface")
-         cfg.require_cmd("iperf3", local=True, remote=True)
+@@ -1163,14 +1164,18 @@ void nfc_unregister_device(struct nfc_dev *dev)
+ 			 "was removed\n", dev_name(&dev->dev));
  
--        cfg.traffic_bw_validator = BandwidthValidator({"total": 1})
--        cfg.tc_bw_validator = BandwidthValidator({"tc3": 20, "tc4": 80})
-+        cfg.traffic_bw_validator = BandwidthValidator({"total": 1}, 25)
-+        cfg.tc_bw_validator = BandwidthValidator({"tc3": 20, "tc4": 80}, 12)
+ 	device_lock(&dev->dev);
++	dev->shutting_down = true;
+ 	if (dev->rfkill) {
+-		rfkill_unregister(dev->rfkill);
+-		rfkill_destroy(dev->rfkill);
++		rfk = dev->rfkill;
+ 		dev->rfkill = NULL;
+ 	}
+-	dev->shutting_down = true;
+ 	device_unlock(&dev->dev);
  
-         cases = [test_no_tc_mapping_bandwidth, test_tc_mapping_bandwidth]
- 
--- 
-2.38.1
-
++	if (rfk) {
++		rfkill_unregister(rfk);
++		rfkill_destroy(rfk);
++	}
++
+ 	if (dev->ops->check_presence) {
+ 		timer_delete_sync(&dev->check_pres_timer);
+ 		cancel_work_sync(&dev->check_pres_work);
+--
 
