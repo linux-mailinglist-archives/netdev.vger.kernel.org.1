@@ -1,333 +1,121 @@
-Return-Path: <netdev+bounces-218554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1710B3D21D
-	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 12:30:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E3621B3D215
+	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 12:19:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A42B53A6689
-	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 10:29:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9ED4B4422A1
+	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 10:19:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8217824DCF9;
-	Sun, 31 Aug 2025 10:29:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8167B246BA7;
+	Sun, 31 Aug 2025 10:19:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from bregans-1.gladserv.net (bregans-1.gladserv.net [185.128.211.58])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EDF942065;
-	Sun, 31 Aug 2025 10:29:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.128.211.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFD5F155C82
+	for <netdev@vger.kernel.org>; Sun, 31 Aug 2025 10:19:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756636196; cv=none; b=K7Lac2rwOGo3mjvYSTEixmor88imB7lPOmiVFw/haENVUVnIVvhaEqeuCsORhu5AL8ThgDGosXWu/FGVHkwgei+Hg6AymJ3qaHN+URQxRzB4Lhu0fFhQBZd/1NoQJep21B3RIh94koSbxubbFFHXVwn9RUC6D3XOPWYbWYxB76w=
+	t=1756635544; cv=none; b=NxaMpMOC8l1438+nzl4IURj+4cSxgenhSB7HKxGF1gy42Pa+6DrvimBZHrrxNd8fG1TF3fVViR82XnHoiiJBtKN5DMWa6UKMbZQ+exxvbvc7NE8Ic6/07/2Hz0S4a/1V8xtYdwFHdmJ+Sgm3VHdh77LlT0POmek8t5QyLOU98No=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756636196; c=relaxed/simple;
-	bh=2EsMqCtVHrXT7IjY5w8NhPLpj46DcUqkEIp0+bOlwXk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UamtXrf0l6IbofjPvaXn3ePpLZByXYOwVIwFNZu3GkwWLKSHaBQSBhF6p8OjQoKvzTwbclpkehErTmM34h34XC1HGN7JxbPRw9MvO4BE/r3v2W35CyyZs/+kAaW/wYwXrdKbDc0EN13PNUE2LF7LbDAPSZDiLcNh7qml/qQ51rA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=librecast.net; spf=pass smtp.mailfrom=librecast.net; arc=none smtp.client-ip=185.128.211.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=librecast.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=librecast.net
-From: Brett A C Sheffield <bacs@librecast.net>
-To: willemdebruijn.kernel@gmail.com
-Cc: bacs@librecast.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	gregkh@linuxfoundation.org,
-	horms@kernel.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	willemb@google.com
-Subject: [PATCH net-next v2] selftests: net: add test for ipv6 fragmentation
-Date: Sun, 31 Aug 2025 10:18:34 +0000
-Message-ID: <20250831102908.14655-1-bacs@librecast.net>
-X-Mailer: git-send-email 2.49.1
-In-Reply-To: <willemdebruijn.kernel.143e90d593cff@gmail.com>
-References: <willemdebruijn.kernel.143e90d593cff@gmail.com>
+	s=arc-20240116; t=1756635544; c=relaxed/simple;
+	bh=RwQHnRYjV/1vKZ1PuwPUfN2604MKwMBwks15ba2icVE=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=BFiaZH9y0cukICMf5Sq4yEPn0YetEKKuVfj7h1r6c76gYrkUX5UAXC9yP0p4Z29c5bFCogtPtOkD+ZD66GnvTMn9MSw9q6WhgL665fsskGJ82rtLvGvBpB29fuBgTMv5Nk4TOEJ7FCGPlCmNUYXas3AUt9j3THIyLXQUcxKgQkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3ed0ba44c8fso43092825ab.0
+        for <netdev@vger.kernel.org>; Sun, 31 Aug 2025 03:19:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756635542; x=1757240342;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5wUanWJ9TFUpM54ILEtXgfjoYDPHC9UXWO0NyRChwpE=;
+        b=KXWksCo5WNCjlPiMZdNP9zVBzI1T4mHBEWcOZMjgijUj4SEaZ2Qr+TFWmNSgqDYc02
+         OzPwU3Oc/ISVqeoYMe1bUCnpIH6tcqXJ6zMTXEMUeqElmqPj+rEVoLcv3gOk4eqPWQCf
+         HeoVZZbl/ON6xDfEeL7U9k4FMDh4U8T357DpVZv5xaE5gfG3TlFzu/d0uss4POLOgj7P
+         +s40XWb58xKPk9XDV466Xlve/xIbIjeIL3k17mM8h4n0AnkUwIKjF/Ctmi8+hDynuj/l
+         q41pjFU2BXylXYyQda9x9MvP8AFir/UoiopIDz0kO4TnFoY3x2HJoXKozSjL2SP4N3Ug
+         1K5g==
+X-Forwarded-Encrypted: i=1; AJvYcCVBnYtnz4E62EbO993aJTAtq/egluQT/UFE3buVMsngBXFkIbKDAqw8bxwciysYMVB3LI+GUYM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5d9NS2t3rjNCVfOzRd6K/fjq2yosiE8hSa1ogVA4bLFiqTQKo
+	QW/lY9ksSuhYmSt9vuTQOFOiqjoUt/vkH8iCCEasIQdnq034fJI3msaZ659qdxkpMZtG6ivxiAT
+	+4riwOEBxsYjQCjQQiHMvTAzJvkA3qe8wTxdx7HowdwsDzvZTeVhMCh41f/g=
+X-Google-Smtp-Source: AGHT+IGlSESnK/xm1j4DJ0slXKrny4chuiUI7BV8fgeneqMMUxjfgz2lGWrCoGYpAMuCBzA+5PNrTUDu+7WhgNc9Bq6d/287EMK/
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a92:cd8e:0:b0:3f2:9344:6f9e with SMTP id
+ e9e14a558f8ab-3f400284ceemr104024655ab.13.1756635541987; Sun, 31 Aug 2025
+ 03:19:01 -0700 (PDT)
+Date: Sun, 31 Aug 2025 03:19:01 -0700
+In-Reply-To: <20250831095915.6269-1-hdanton@sina.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68b42195.a00a0220.1337b0.0034.GAE@google.com>
+Subject: Re: [syzbot] [net?] [nfc?] WARNING in nfc_rfkill_set_block
+From: syzbot <syzbot+535bbe83dfc3ae8d4be3@syzkaller.appspotmail.com>
+To: hdanton@sina.com, krzk@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com, ysk@kzalloc.com
+Content-Type: text/plain; charset="UTF-8"
 
-Add selftest for the IPv6 fragmentation regression which affected
-several stable kernels.
+Hello,
 
-Commit a18dfa9925b9 ("ipv6: save dontfrag in cork") was backported to
-stable without some prerequisite commits.  This caused a regression when
-sending IPv6 UDP packets by preventing fragmentation and instead
-returning -1 (EMSGSIZE).
+syzbot has tested the proposed patch but the reproducer is still triggering an issue:
+BUG: MAX_LOCKDEP_KEYS too low!
 
-Add selftest to check for this issue by attempting to send a packet
-larger than the interface MTU. The packet will be fragmented on a
-working kernel, with sendmsg(2) correctly returning the expected number
-of bytes sent.  When the regression is present, sendmsg returns -1 and
-sets errno to EMSGSIZE.
+BUG: MAX_LOCKDEP_KEYS too low!
+turning off the locking correctness validator.
+CPU: 0 UID: 0 PID: 25225 Comm: syz.0.3616 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ register_lock_class+0x2e8/0x320 kernel/locking/lockdep.c:1332
+ __lock_acquire+0x99/0xd20 kernel/locking/lockdep.c:5112
+ lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
+ touch_wq_lockdep_map+0xcb/0x180 kernel/workqueue.c:3907
+ __flush_workqueue+0x121/0x14b0 kernel/workqueue.c:3949
+ drain_workqueue+0xd3/0x390 kernel/workqueue.c:4113
+ destroy_workqueue+0xbb/0xc70 kernel/workqueue.c:5869
+ nci_unregister_device+0xb1/0x240 net/nfc/nci/core.c:1316
+ virtual_ncidev_close+0x59/0x90 drivers/nfc/virtual_ncidev.c:172
+ __fput+0x45b/0xa80 fs/file_table.c:468
+ task_work_run+0x1d4/0x260 kernel/task_work.c:227
+ resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
+ exit_to_user_mode_loop+0xec/0x110 kernel/entry/common.c:43
+ exit_to_user_mode_prepare include/linux/irq-entry-common.h:225 [inline]
+ syscall_exit_to_user_mode_work include/linux/entry-common.h:175 [inline]
+ syscall_exit_to_user_mode include/linux/entry-common.h:210 [inline]
+ do_syscall_64+0x2bd/0x3b0 arch/x86/entry/syscall_64.c:100
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f9bb98aebe9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fffc624e4c8 EFLAGS: 00000246 ORIG_RAX: 00000000000001b4
+RAX: 0000000000000000 RBX: 0000000000063d39 RCX: 00007f9bb98aebe9
+RDX: 0000000000000000 RSI: 000000000000001e RDI: 0000000000000003
+RBP: 00007f9bb9ae7da0 R08: 0000000000000001 R09: 00000003c624e7bf
+R10: 0000001b2c520000 R11: 0000000000000246 R12: 00007f9bb9ae5fac
+R13: 00007f9bb9ae5fa0 R14: ffffffffffffffff R15: 00007fffc624e5e0
+ </TASK>
 
-Link: https://lore.kernel.org/stable/aElivdUXqd1OqgMY@karahi.gladserv.com
-Signed-off-by: Brett A C Sheffield <bacs@librecast.net>
----
-Willem: Thanks for the suggestion to check /sys/class/net/$DEV/operstate
 
-I did try this but, if I call unshare() and THEN create a TAP interface in the
-new namespace, operstate no longer seems to be visible to the process?
+Tested on:
 
-The process can still read operstate for interfaces in the shared namespace, but
-not ones created in the unshare()d namespace.
-
-I'm sure I'm doing something wrong there, but after trying a few different
-things including reading operstate from netlink it suddenly occurred to me that
-a simpler and more reliable way to check whether an interface is ready to send
-is to, er, send, and then handle the error for the (unlikely) failure case and
-retry.
-
-I've incorporated your other review suggestions in this v2. Many thanks.
-
-v2 changes:
- - remove superfluous namespace calls - unshare(2) suffices
- - remove usleep(). Don't wait for the interface to be ready, just send, and
-   handle the (less likely) error case by retrying.
- - set destination address only once
- - document our use of the IPv6 link-local source address
- - send to port 9 (DISCARD) instead of 4242 (DONT PANIC)
- - ensure sockets are closed on failure paths
- - use KSFT exit codes for clarity
-
-v1: https://lore.kernel.org/netdev/20250825092548.4436-3-bacs@librecast.net
-
- tools/testing/selftests/net/.gitignore        |   1 +
- tools/testing/selftests/net/Makefile          |   1 +
- .../selftests/net/ipv6_fragmentation.c        | 189 ++++++++++++++++++
- 3 files changed, 191 insertions(+)
- create mode 100644 tools/testing/selftests/net/ipv6_fragmentation.c
-
-diff --git a/tools/testing/selftests/net/.gitignore b/tools/testing/selftests/net/.gitignore
-index 47c293c2962f..3d4b4a53dfda 100644
---- a/tools/testing/selftests/net/.gitignore
-+++ b/tools/testing/selftests/net/.gitignore
-@@ -16,6 +16,7 @@ ip_local_port_range
- ipsec
- ipv6_flowlabel
- ipv6_flowlabel_mgr
-+ipv6_fragmentation
- log.txt
- msg_oob
- msg_zerocopy
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index eef0b8f8a7b0..276e0481d996 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -117,6 +117,7 @@ TEST_GEN_FILES += tfo
- TEST_PROGS += tfo_passive.sh
- TEST_PROGS += broadcast_pmtu.sh
- TEST_PROGS += ipv6_force_forwarding.sh
-+TEST_GEN_PROGS += ipv6_fragmentation
- TEST_PROGS += route_hint.sh
- 
- # YNL files, must be before "include ..lib.mk"
-diff --git a/tools/testing/selftests/net/ipv6_fragmentation.c b/tools/testing/selftests/net/ipv6_fragmentation.c
-new file mode 100644
-index 000000000000..4ba16bf56a32
---- /dev/null
-+++ b/tools/testing/selftests/net/ipv6_fragmentation.c
-@@ -0,0 +1,189 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Author: Brett A C Sheffield <bacs@librecast.net>
-+ *
-+ * Kernel selftest for the IPv6 fragmentation regression which affected stable
-+ * kernels:
-+ *
-+ *   https://lore.kernel.org/stable/aElivdUXqd1OqgMY@karahi.gladserv.com
-+ *
-+ * Commit: a18dfa9925b9 ("ipv6: save dontfrag in cork") was backported to stable
-+ * without some prerequisite commits.
-+ *
-+ * This caused a regression when sending IPv6 UDP packets by preventing
-+ * fragmentation and instead returning -1 (EMSGSIZE).
-+ *
-+ * This selftest demonstrates the issue by sending an IPv6 UDP packet from
-+ * the autoconfigured link-local address to an arbritrary multicast group.
-+ *
-+ * sendmsg(2) returns bytes sent correctly on a working kernel, and returns -1
-+ * (EMSGSIZE) when the regression is present.
-+ *
-+ * The regression was not present in the mainline kernel, but add this test to
-+ * catch similar breakage in future.
-+ */
-+
-+#define _GNU_SOURCE
-+
-+#include <fcntl.h>
-+#include <linux/if_tun.h>
-+#include <net/if.h>
-+#include <netinet/in.h>
-+#include <sched.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+#include <sys/socket.h>
-+#include <unistd.h>
-+#include "../kselftest.h"
-+
-+#define MTU 1500
-+#define LARGER_THAN_MTU 8192
-+
-+/* ensure MTU is smaller than what we plan to send */
-+static int set_mtu(int ctl, struct ifreq *ifr)
-+{
-+	ifr->ifr_mtu = MTU;
-+	return ioctl(ctl, SIOCSIFMTU, ifr);
-+}
-+
-+/* bring up interface */
-+static int interface_up(int ctl, struct ifreq *ifr)
-+{
-+	if (ioctl(ctl, SIOCGIFFLAGS, ifr) == -1) {
-+		perror("ioctl SIOCGIFFLAGS");
-+		return -1;
-+	}
-+	ifr->ifr_flags = ifr->ifr_flags | IFF_UP;
-+	return ioctl(ctl, SIOCSIFFLAGS, ifr);
-+}
-+
-+/* no need to wait for DAD in our namespace */
-+static int disable_dad(char *ifname)
-+{
-+	char sysvar[] = "/proc/sys/net/ipv6/conf/%s/accept_dad";
-+	char fname[IFNAMSIZ + sizeof(sysvar)];
-+	int fd;
-+
-+	snprintf(fname, sizeof(fname), sysvar, ifname);
-+	fd = open(fname, O_WRONLY);
-+	if (fd == -1) {
-+		perror("open accept_dad");
-+		return -1;
-+	}
-+	if (write(fd, "0", 1) != 1) {
-+		perror("write");
-+		return -1;
-+	}
-+	return close(fd);
-+}
-+
-+/* create TAP interface that will be deleted when this process exits */
-+static int create_interface(char *ifname, struct ifreq *ifr)
-+{
-+	int fd;
-+
-+	fd = open("/dev/net/tun", O_RDWR);
-+	if (fd == -1) {
-+		perror("open tun");
-+		return -1;
-+	}
-+
-+	ifr->ifr_flags = IFF_TAP | IFF_NO_PI;
-+	if (ioctl(fd, TUNSETIFF, (void *)ifr) == -1) {
-+		close(fd);
-+		perror("ioctl: TUNSETIFF");
-+		return -1;
-+	}
-+	strcpy(ifname, ifr->ifr_name);
-+
-+	return fd;
-+}
-+
-+static int setup(void)
-+{
-+	struct ifreq ifr = {0};
-+	char ifname[IFNAMSIZ];
-+	int fd = -1;
-+	int ctl;
-+
-+	/* we need to set MTU, so do this in a namespace to play nicely */
-+	if (unshare(CLONE_NEWNET) == -1)
-+		return -1;
-+
-+	ctl = socket(AF_LOCAL, SOCK_STREAM, 0);
-+	if (ctl == -1)
-+		return -1;
-+
-+	memset(ifname, 0, sizeof(ifname));
-+	fd = create_interface(ifname, &ifr);
-+	if (fd == -1)
-+		goto err_close_ctl;
-+	if (disable_dad(ifname) == -1)
-+		goto err_close_fd;
-+	if (interface_up(ctl, &ifr) == -1)
-+		goto err_close_fd;
-+	if (set_mtu(ctl, &ifr) == -1)
-+		goto err_close_fd;
-+	goto err_close_ctl;
-+err_close_fd:
-+	close(fd);
-+	fd = -1;
-+err_close_ctl:
-+	close(ctl);
-+	return fd;
-+}
-+
-+int main(void)
-+{
-+	/* destination doesn't matter, use an IPv6 link-local multicast group */
-+	struct in6_addr addr = {
-+		.s6_addr[0] = 0xff, /* multicast */
-+		.s6_addr[1] = 0x12, /* set flags (T, link-local) */
-+	};
-+	struct sockaddr_in6 sa = {
-+		.sin6_family = AF_INET6,
-+		.sin6_addr = addr,
-+		.sin6_port = 9      /* port 9/udp (DISCARD) */
-+	};
-+	char buf[LARGER_THAN_MTU] = {0};
-+	struct iovec iov = { .iov_base = buf, .iov_len = sizeof(buf)};
-+	struct msghdr msg = {
-+		.msg_iov = &iov,
-+		.msg_iovlen = 1,
-+		.msg_name = (struct sockaddr *)&sa,
-+		.msg_namelen = sizeof(sa),
-+	};
-+	ssize_t rc;
-+	int ns_fd;
-+	int err = KSFT_FAIL;
-+	int s;
-+
-+	printf("Testing IPv6 fragmentation\n");
-+	ns_fd = setup();
-+	if (ns_fd == -1) {
-+		printf("[FAIL] test setup failed\n");
-+		return KSFT_FAIL;
-+	}
-+	s = socket(AF_INET6, SOCK_DGRAM, 0);
-+send_again:
-+	rc = sendmsg(s, &msg, 0);
-+	if (rc == -1) {
-+		/* if interface wasn't ready, try again */
-+		if (errno == EADDRNOTAVAIL)
-+			goto send_again;
-+		printf("[FAIL] sendmsg: %s\n", strerror(errno));
-+		goto err_close_socket;
-+	} else if (rc != LARGER_THAN_MTU) {
-+		printf("[FAIL] sendmsg() returned %zi\n", rc);
-+		goto err_close_socket;
-+	}
-+	printf("[PASS] sendmsg() returned %zi\n", rc);
-+	err = KSFT_PASS;
-+
-+err_close_socket:
-+	close(s);
-+	close(ns_fd);
-+	return err;
-+}
--- 
-2.49.1
+commit:         c8bc81a5 Merge tag 'arm64-fixes' of git://git.kernel.o..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1226c1f0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=bd9738e00c1bbfb4
+dashboard link: https://syzkaller.appspot.com/bug?extid=535bbe83dfc3ae8d4be3
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=12dac1f0580000
 
 
