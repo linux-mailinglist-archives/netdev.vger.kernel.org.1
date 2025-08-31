@@ -1,169 +1,172 @@
-Return-Path: <netdev+bounces-218558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01BF6B3D372
-	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 14:56:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC16CB3D3D4
+	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 16:11:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E470189D889
-	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 12:56:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95C3D164FA6
+	for <lists+netdev@lfdr.de>; Sun, 31 Aug 2025 14:11:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B28D125A2C3;
-	Sun, 31 Aug 2025 12:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBF5C265298;
+	Sun, 31 Aug 2025 14:11:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nJbvMsBZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1924745029;
-	Sun, 31 Aug 2025 12:56:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3AFA263F43;
+	Sun, 31 Aug 2025 14:11:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756644992; cv=none; b=JuhX1fK8iu7TuW/6AaJQymzKQFqY2sbiaq2640lw4SbvvnwAkvn21wCtcxIb83vL55g9JKToHscLlsbiJ7MNGK4w7AAXzfLzZpioPxVAHwJ/yFS5YbRkbT/+rk/4k+x13xOi71MMoGM2LA2GDQvL6PzqXo9IW7CR13zO9VoSdek=
+	t=1756649478; cv=none; b=aDfBOqeGaEFD05NhCO132jyrTGoQ+RV62XwnYmt929ZPra94wC+JYnolmG8As+X2uBmC9NRsOWGOmmVHAYfEnkz61HMOk/piRJ1VTjoSnfJCWXfFRZf+lsEbUq+BVbGGqT40Ojf3++4AU0ZWajGbv9JfCC9BspUSsnO0uqsomqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756644992; c=relaxed/simple;
-	bh=PHb1PQ4tlF+ZkPoai1rMMZRI0SFk0v+RCWPE6rcN9G0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CdUcN5bOsbo5/cQ0PuGdCk3loamshnXqjGuEGDSc2VPi5SKD/w6DvBb0oj627jnlquVHmlY0WOWojJm3MsZet8sL0UlBVUUkrIqVg3lMgg28uKpvdR13zngWfw/5p2yEQY49D8aVpwV3lwGedSE80QsvvYz0pSnGva4Q8UrOP1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kzalloc.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kzalloc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2489d5251f0so6563415ad.0;
-        Sun, 31 Aug 2025 05:56:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756644990; x=1757249790;
-        h=content-transfer-encoding:in-reply-to:organization:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0VOnG7Zg4hyxcpABPfvTOTnGC7dLIkPViFyHOxvZPfQ=;
-        b=QmJ5Vl+HUJFXSh386Z+0jIuC8GqRR1IGTwltnr1Js/st7qDEzsKs0yKnhKfkIoDmVL
-         qo9FtTkbP7rHdEXevTNDw02dLmLtarbzW0f6IPbDCqn2CrBT8JaAXdyLX0Ujzhh6z6gf
-         Yx6E1up1OjaD8h0Wr3Q2RZmk2qeiJr8R1Wt5OcqXouhFvNFaSJJQKUb7IXvlqSDIuPcJ
-         2+YjKkNaqsffIhh+Ta+L4QYlTS4gJRXQdm1wdI66I8CXYOtsCHDA7YyQfruu9MglD9HC
-         ynABkoRvcBYsaqc1YwtyHiDaltNx5bZWd0UIDglSxsWSwc+84r/fg6ErbpSCbVplnb8d
-         /hkg==
-X-Forwarded-Encrypted: i=1; AJvYcCV2oHxTe1cPAq67Nu1m7Dhg8pGNOlVFhU7ojOvls9ibeVKTD4ZwpKY1nablZ8BYOaQS2W7RJ5M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoTpR5rlPFfsZMxpqNEv5Nup4FFZDZbE+7VTEA91kLqVCUivwN
-	r2sGMw3mAtiWpvxMaE9T5Hj4h3E3vsMaEXcpQW6NbnwEc4bqFDwYvV50
-X-Gm-Gg: ASbGnctV0a3Elnw83Sy2fiPNepvkaUXiGt6t5RgmdLGoSLbEB5FJN2tSdG9i7bFXOK+
-	lKXl8RSlN+wzDJ460kVDDbf/7Q7qOxTNQW6pU3aCn31j10M0UfhOuK/OuU3A/KH4dpobsj7bL90
-	Sa82Sj6YkmahDve08Gurb4KgIuYtMLQuqpigoCU5F1RJP4pGpawRhWHD+WkbW9a+mqatIdOZ584
-	dgLybFwYlwyBYbjnQypRGePIh/SN4e23LgeR3nMbsoc1m+TLgWisZe/FPCUESpMpCAUJH3UmOUm
-	8CC6Hd8/uZJcGrEJA2Hb8E06s9bVfwT2CLWmfEc6QfnSRYelI+lNwLgTt7gvTS2yRes3uis7CGM
-	j3RMDj0bYzHuJrV7gSujnSWs2zcYgNRtQpEtVr6PZoTSFpPh7KX2U/LPNNxL4P7hlPZqX39Rckd
-	Dth7/MXkvUkZt8oKvsow==
-X-Google-Smtp-Source: AGHT+IGw3re/1F5YuH9z9F3XYz0qQLECMO0rpRpL5Fv1Vazq8EdEloFiVgW1aN1EQAGRnq6n+kwlVQ==
-X-Received: by 2002:a17:903:41cf:b0:248:b43a:3ff with SMTP id d9443c01a7336-2491f246be0mr43496895ad.8.1756644990252;
-        Sun, 31 Aug 2025 05:56:30 -0700 (PDT)
-Received: from [192.168.50.136] ([118.32.98.101])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7722a4e1ca7sm7654095b3a.71.2025.08.31.05.56.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 31 Aug 2025 05:56:29 -0700 (PDT)
-Message-ID: <1df5a745-902a-4a57-8abd-6b48cf54fc87@kzalloc.com>
-Date: Sun, 31 Aug 2025 21:56:26 +0900
+	s=arc-20240116; t=1756649478; c=relaxed/simple;
+	bh=RHLB6SbhJ6NwlIcJN+U0qOt1DNSxNE6wDis/g760GdA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N5XV+BOTsyKbl/97QRHJiEE/p/D/TmUyJsNjnOe2AsUb9ZnUP4EgkU1ME36AJRK2lT7INxNg52mRRYuAWWgW3tDYdliwoGl19bJ7PQU8DAydL8j2tmveTwKSQNg6SWo1euCfdG0eIqaKaozTrnEIvOQZTTIK7GIDBlbbIutcI/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nJbvMsBZ; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756649477; x=1788185477;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=RHLB6SbhJ6NwlIcJN+U0qOt1DNSxNE6wDis/g760GdA=;
+  b=nJbvMsBZK7UOBiLDYtJ3Xy05ANtu1AX6vdF0ml4gZNv711Nhjk45MNPz
+   HoMqiaUkeVKENeMu9PYnRI/eJtn+VB11OU3C1Sx4oWEbgEOQsNDFT6aaY
+   S2MKowCRrsnYAJ2rfETInivY4hljGji9yi7rfY+maUOHkET7uBXutDnLN
+   esn9pB1ZF2t7PNqqx7SIIDg5Mlx6xHlG0Y/8PRvAEBVgzxPa0iG0QqGkF
+   LZI9KeLjwczcayBaHpBzSoZDuameGGa6YDnfZep6u9p2SqW5Lrv1Ofp/E
+   wjgWtP8kbVBYXNnHShmCiZ5coADi0X2M3fI+Eha6uYrDZ2p9Vlj5d6EPC
+   Q==;
+X-CSE-ConnectionGUID: Ygcx7cj0RHmOFVssA62CQA==
+X-CSE-MsgGUID: AI7p4XqlSZuPHh41194BGA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="62706092"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="62706092"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2025 07:11:16 -0700
+X-CSE-ConnectionGUID: 5+1nmxwsQNKT8tp6ZRSkXg==
+X-CSE-MsgGUID: eV10036mSVWJ8jR5YWddlQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,225,1751266800"; 
+   d="scan'208";a="201676250"
+Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
+  by fmviesa001.fm.intel.com with ESMTP; 31 Aug 2025 07:11:13 -0700
+Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1usilz-000W9n-1S;
+	Sun, 31 Aug 2025 14:11:11 +0000
+Date: Sun, 31 Aug 2025 22:11:05 +0800
+From: kernel test robot <lkp@intel.com>
+To: Alex Tran <alex.t.tran@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: oe-kbuild-all@lists.linux.dev, "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Alex Tran <alex.t.tran@gmail.com>
+Subject: Re: [PATCH net v1] Fixes: xircom auto-negoation timer
+Message-ID: <202508312115.rbF0CO44-lkp@intel.com>
+References: <20250825012821.492355-1-alex.t.tran@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [syzbot] [net?] [nfc?] WARNING in nfc_rfkill_set_block
-To: Hillf Danton <hdanton@sina.com>,
- syzbot <syzbot+535bbe83dfc3ae8d4be3@syzkaller.appspotmail.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- Krzysztof Kozlowski <krzk@kernel.org>, syzkaller-bugs@googlegroups.com
-References: <20250831095915.6269-1-hdanton@sina.com>
-Content-Language: en-US
-From: Yunseong Kim <ysk@kzalloc.com>
-Organization: kzalloc
-In-Reply-To: <20250831095915.6269-1-hdanton@sina.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250825012821.492355-1-alex.t.tran@gmail.com>
 
-Oh, thank you Hillf, for your help!
+Hi Alex,
 
-On 8/31/25 6:59 PM, Hillf Danton wrote:
->> Date: Sun, 31 Aug 2025 00:02:33 -0700
->> syzbot has found a reproducer for the following issue on:
->>
->> HEAD commit:    c8bc81a52d5a Merge tag 'arm64-fixes' of git://git.kernel.o..
->> git tree:       upstream
->> console output: https://syzkaller.appspot.com/x/log.txt?x=1508ce34580000
->> kernel config:  https://syzkaller.appspot.com/x/.config?x=bd9738e00c1bbfb4
->> dashboard link: https://syzkaller.appspot.com/bug?extid=535bbe83dfc3ae8d4be3
->> compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
->> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11019a62580000
->> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1308ce34580000
-> 
-> Test Kim's patch.
-> 
-> #syz test
-> 
-> --- a/net/nfc/core.c
-> +++ b/net/nfc/core.c
-> @@ -1154,6 +1154,7 @@ EXPORT_SYMBOL(nfc_register_device);
->  void nfc_unregister_device(struct nfc_dev *dev)
->  {
->  	int rc;
-> +	struct rfkill *rfk = NULL;
->  
->  	pr_debug("dev_name=%s\n", dev_name(&dev->dev));
->  
-> @@ -1163,14 +1164,18 @@ void nfc_unregister_device(struct nfc_dev *dev)
->  			 "was removed\n", dev_name(&dev->dev));
->  
->  	device_lock(&dev->dev);
-> +	dev->shutting_down = true;
->  	if (dev->rfkill) {
-> -		rfkill_unregister(dev->rfkill);
-> -		rfkill_destroy(dev->rfkill);
-> +		rfk = dev->rfkill;
->  		dev->rfkill = NULL;
->  	}
-> -	dev->shutting_down = true;
->  	device_unlock(&dev->dev);
->  
-> +	if (rfk) {
-> +		rfkill_unregister(rfk);
-> +		rfkill_destroy(rfk);
-> +	}
-> +
->  	if (dev->ops->check_presence) {
->  		timer_delete_sync(&dev->check_pres_timer);
->  		cancel_work_sync(&dev->check_pres_work);
-> --- x/net/bluetooth/hci_core.c
-> +++ y/net/bluetooth/hci_core.c
-> @@ -1476,8 +1476,14 @@ static void hci_cmd_timeout(struct work_
->  	if (hdev->reset)
->  		hdev->reset(hdev);
->  
-> +	rcu_read_lock();
-> +	if (hci_dev_test_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE)) {
-> +		rcu_read_unlock();
-> +		return;
-> +	}
->  	atomic_set(&hdev->cmd_cnt, 1);
->  	queue_work(hdev->workqueue, &hdev->cmd_work);
-> +	rcu_read_unlock();
->  }
->  
->  /* HCI ncmd timer function */
-> --
+kernel test robot noticed the following build warnings:
 
-Last time, as Krzysztof guided, I wanted to try fixing the bugs reported
-by syzbot, but since it was my first time following this process, I needed
-to look up the steps. Including the bug I’m seeing now, is there anything
-else I should do to address these issues?
+[auto build test WARNING on net/main]
 
-My plan was to look up the procedure and then revise the patch description
-before submitting a v2 patch.
+url:    https://github.com/intel-lab-lkp/linux/commits/Alex-Tran/Fixes-xircom-auto-negoation-timer/20250825-093026
+base:   net/main
+patch link:    https://lore.kernel.org/r/20250825012821.492355-1-alex.t.tran%40gmail.com
+patch subject: [PATCH net v1] Fixes: xircom auto-negoation timer
+config: i386-randconfig-r073-20250831 (https://download.01.org/0day-ci/archive/20250831/202508312115.rbF0CO44-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
 
-Thank you!
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202508312115.rbF0CO44-lkp@intel.com/
 
-Best regards,
-Yunseong Kim (金潤成)
+New smatch warnings:
+drivers/net/ethernet/xircom/xirc2ps_cs.c:1643 init_mii() warn: inconsistent indenting
 
+Old smatch warnings:
+drivers/net/ethernet/xircom/xirc2ps_cs.c:1208 xirc2ps_tx_timeout_task() warn: inconsistent indenting
+drivers/net/ethernet/xircom/xirc2ps_cs.c:1685 init_mii() warn: inconsistent indenting
+
+vim +1643 drivers/net/ethernet/xircom/xirc2ps_cs.c
+
+  1633	
+  1634	/****************
+  1635	 * Initialize the Media-Independent-Interface
+  1636	 * Returns: True if we have a good MII
+  1637	 */
+  1638	static int
+  1639	init_mii(struct net_device *dev)
+  1640	{
+  1641	    struct local_info *local = netdev_priv(dev);
+  1642	    unsigned int ioaddr = dev->base_addr;
+> 1643		unsigned int control, status;
+  1644	
+  1645	    if (if_port == 4 || if_port == 1) { /* force 100BaseT or 10BaseT */
+  1646		dev->if_port = if_port;
+  1647		local->probe_port = 0;
+  1648		return 1;
+  1649	    }
+  1650	
+  1651	    status = mii_rd(ioaddr,  0, 1);
+  1652	    if ((status & 0xff00) != 0x7800)
+  1653		return 0; /* No MII */
+  1654	
+  1655	    local->new_mii = (mii_rd(ioaddr, 0, 2) != 0xffff);
+  1656	    
+  1657	    if (local->probe_port)
+  1658		control = 0x1000; /* auto neg */
+  1659	    else if (dev->if_port == 4)
+  1660		control = 0x2000; /* no auto neg, 100mbs mode */
+  1661	    else
+  1662		control = 0x0000; /* no auto neg, 10mbs mode */
+  1663	    mii_wr(ioaddr,  0, 0, control, 16);
+  1664	    udelay(100);
+  1665	    control = mii_rd(ioaddr, 0, 0);
+  1666	
+  1667	    if (control & 0x0400) {
+  1668		netdev_notice(dev, "can't take PHY out of isolation mode\n");
+  1669		local->probe_port = 0;
+  1670		return 0;
+  1671	    }
+  1672	
+  1673	    if (local->probe_port) {
+  1674		/* according to the DP83840A specs the auto negotiation process
+  1675		 * may take up to 3.5 sec, so we use this also for our ML6692
+  1676		 */
+  1677		local->dev = dev;
+  1678		local->autoneg_attempts = 0;
+  1679		init_completion(&local->autoneg_done);
+  1680		timer_setup(&local->timer, autoneg_timer, 0);
+  1681		local->timer.expires = RUN_AT(AUTONEG_TIMEOUT); /* 100msec intervals*/
+  1682		add_timer(&local->timer);
+  1683		}
+  1684	
+  1685		return 1;
+  1686	}
+  1687	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
