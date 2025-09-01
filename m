@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-218592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AE7BB3D68A
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 04:08:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C739B3D69A
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 04:19:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35F033B9C26
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 02:08:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C61177A3E54
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 02:17:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D721B2080C0;
-	Mon,  1 Sep 2025 02:08:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00F181482F2;
+	Mon,  1 Sep 2025 02:18:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
+Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A96F1B0F19;
-	Mon,  1 Sep 2025 02:08:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67B2A323E;
+	Mon,  1 Sep 2025 02:18:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756692527; cv=none; b=aUKywGhSwRWNmSHhDWmMLZsw5ZnI672LeDQk+Q6HIf4sXB8tdKyfbKxe+2aUq4fO3LZtLfLXVJ1zmiigvR8STYkutMDqWLrGF21qnt6hGJRrhMhZfj00qOdrGcR3Pn4D8+knqVvLpwKyVUgsRpEe/aOTNfe/E/GHe52o7CZ5Uzs=
+	t=1756693137; cv=none; b=F/9gG/HCXjIYbeIN7yVxCLO00sYueHO30SOcIiyMl+3/2iNL+7TSBc7b0zveuWDRiCMbi1sjzbJNFZ133ypXvS9RZT3ebP5RxJpKKaH9cEJBZSTZKGJQGpmzplvM4y3mTSVrawbbq22ufVHBPt+YbMdZPmcamqk4HfSyRVimkk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756692527; c=relaxed/simple;
-	bh=Vm/kZN9c7s81CxsjYSlovb7fQlggwebCdtC5M962/Ds=;
+	s=arc-20240116; t=1756693137; c=relaxed/simple;
+	bh=l3G0qHAM4WT8AXO5JVFutlptffSlEQXTIdxKQUT1hhU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rhhUVqpd8AvRTok1mQBrW1Kn0f4LspOaStDR9Akh8mrQJJ26a0uTNNYQkiAD15ApwQuZPlDCrrn6nmOAQFK/ze/vHgWKukXzqQGBZQh+1M5tQ5NyyhjbfqqL3G9Qf43mEyQJ99bU0xZKSRC299paVj4RnmwRc7Qz8zasDsepfWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.92.39.34
+	 Content-Type:Content-Disposition:In-Reply-To; b=JF0RTsfMpNV7SYGoU3fA26M3RR6+qrqZ8xY7gy2YWR3aBf3wZsoxgAnn/HZG6YJx2adzRVCVroZBZIKWIHsAnHsWJBvpnIqUmzdfli0/Kfep6Iw2BRyzPhCr+l2nuW75WkVFm/rXheeVPobGkE3xCEphVkorZ6+pPznT7DYOQNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.204.34.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: zesmtpgz9t1756692493t00716bf8
-X-QQ-Originating-IP: 4hWyaNGsfTG/p5ecPAf++Im/XolX69MjIDgC8Pm9QiU=
+X-QQ-mid: zesmtpsz6t1756693105t63f78bb9
+X-QQ-Originating-IP: AlFXuqCpeK5FT3bIkgeoOb8S+ZD0AByeYpc3IJFsmYY=
 Received: from localhost ( [203.174.112.180])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 01 Sep 2025 10:08:11 +0800 (CST)
+	id ; Mon, 01 Sep 2025 10:18:22 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 17451087102426230808
-Date: Mon, 1 Sep 2025 10:08:11 +0800
+X-BIZMAIL-ID: 3786511421050913974
+Date: Mon, 1 Sep 2025 10:18:22 +0800
 From: Yibo Dong <dong100@mucse.com>
 To: Andrew Lunn <andrew@lunn.ch>
 Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
@@ -51,116 +51,74 @@ Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
 	vadim.fedorenko@linux.dev, netdev@vger.kernel.org,
 	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH net-next v9 4/5] net: rnpgbe: Add basic mbx_fw support
-Message-ID: <384738E266C55C1A+20250901020811.GA21078@nic-Precision-5820-Tower>
+Subject: Re: [PATCH net-next v9 5/5] net: rnpgbe: Add register_netdev
+Message-ID: <5A57083856F7D3CC+20250901021822.GB21078@nic-Precision-5820-Tower>
 References: <20250828025547.568563-1-dong100@mucse.com>
- <20250828025547.568563-5-dong100@mucse.com>
- <d61dd41c-5700-483f-847a-a92000b8a925@lunn.ch>
- <DB12A33105BC0233+20250829021254.GA904254@nic-Precision-5820-Tower>
- <8a76222e-8da7-4499-981f-64660e377e1c@lunn.ch>
+ <20250828025547.568563-6-dong100@mucse.com>
+ <e0f71a7d-1288-4971-804d-123e3e8a153f@lunn.ch>
+ <A5B215AE5EB4FE9D+20250829023648.GB904254@nic-Precision-5820-Tower>
+ <6768f943-e226-4d57-b3a8-692aff4cc430@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <8a76222e-8da7-4499-981f-64660e377e1c@lunn.ch>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6768f943-e226-4d57-b3a8-692aff4cc430@lunn.ch>
 X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: NkLA2q2LD229wshJrtN9PYJ1yPuxDSKIY4fbApA8Kr64XeR+MrKuCA8i
-	APafXAyKbnp8x/DwZXUgYDSCXsQPlf3kWJfVXWf/6mizZE5ui37ddNb1tqUrXrUVQiQ3yUu
-	98zcZ+Xf+71Aocf/hrUtCX0zMN8aTLRLxaxy1sA6taS4PfHEl1TY0pMISft/c4DAeHQcUBz
-	MQGisJWRrzpXPotfOTeVyr40VIeXQoKT6NsCmhyHxQUShOQQaSm8DtjiogaJnhpWBOAZFWh
-	IaMaeDehiTPVwzRffvrMvBcnwn2WdsuK5KvLZPu9Xxhvpf+bmLpgvPqicl1WhM8mzGt1Crd
-	E8BveBLvAQ+zJmXyUPtKCFgyOXVnhXy697xe4AXM2c/cqpEEzRkIZT3rT/0lprRSJZ3hGMP
-	+GoXFkI+0PMhSIhZzKJ+SWTJ7GEN+H/xxm0RoTrJPh9hQlHXuk3xA3leA/fI3897qVDNuym
-	3JAwFIK2sbo80t6GmOiXavi2ISnbLcQU0OkOuTYGkKnJOewC5XGyXyNiOVk9nQeVTfDejfi
-	+2EDr3WJrj/k1BccH2KKeT/eMp7YOO4WoPhKzPMiVErPFByt8LEbW2i/t+89qAfuOZ7EtnE
-	jcR3sbSDboUhvilQleS/LkNteBCg8sT86aowHzOi2kdPMBQlxszT4ueRiv1hB3f69K3Md62
-	TJwVc78voN0ykCq44L/sAz8XlA7qrhChkgwaar+MVzQ7hOueVJNUgoA0MqWivF/QkEJ2Tor
-	zEUTI6fHr5eGsbq1xXlTnpvmGxpvLIH1E0P7bH+qqjzq77WeohkUsmXTbUzd1XkTwxgxBXA
-	CVQ9xE2+Hvh1v/oparjaItivnAiYiil3zq9/zrwZQdBxwBnRJshUoDvtLccglULCI81G/4A
-	GkK0dM5/r3fqf7Xuz4G6tw58Nxx9/beCSTMyR/9idQx3P/qBNelZMDOVWVFWoRYpz5SbWyL
-	7GOabwhtB3jRyAPvAKPGn6/EcVB7D0BIRPohaHZEGNjfCa3+j2ZwT5VrzBt/b9sO6HHqUH+
-	ZLhUbYWBEZXeEjAQaWU3LybNPQY6o=
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
+Feedback-ID: zesmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: OKpEC/bXOl3K4aIDlsEieN2HqZ+6UhYrCxWNhtjbWXx75Xs7yXJVFK1M
+	FqBwDXrv4zlv9R8VoJ+qK6PA0VX1r8WSfkm3fzwf8dlaN3+eV0agA07G3bDFm65rhrseKk0
+	HX/RtIV9pW+w3cMPw3xtbr0+DAtek8r0hqoxnQ6be+mTNrCPPgOBqzTg0puNFH9RLM+wkSY
+	iE6z8S67VKalizRUcOmiOwe8Tx6lBzYdRvJHy5C+jWoZgAn7/k+f0+kyNS4w/qHsX2a7gJT
+	2U84pAxNGeBmAlNdjNqLnibpnukhlfEiVD1RlP8Oy6DKmLDmVjgrCidglmppcLH215no7SK
+	n2ToBvbfNkEqu39e/Yl71qkHONHc84s9AaA/POaz2O75J2mz//ymF5ibL7yLMdfrXYmBnq5
+	++kS5XahKD/1bT4SKHGj9CMleWo7IW3GTVFdlz3eMzxoVCgHKIVcSmr+2YjSIhX9qOwsoA/
+	sPgdrF57gvwnDzxD2iDNwEAlVAobq289C8pBGsdPMHP/t5uSmJi8NBPQLJocH1xkDfOeBcx
+	i4P8s9ytBF5ApcqtmROZjsgn9wzOILHh4XwUl5EIRX2X7tkS8htMLJyR2vSylJK6/fJC+Ff
+	CuziqdR/GXTlx3N11HqfXoM9X74UCfaATcCyPzA/wVuePs50dkRpZEk7znJkNmT8x3Wo2T9
+	d6P1cBmPpBBbU/99mjOBLtThHoArJ5pSFw2IPYZVx3SrFpASackTXp3h7wJItSxulQX8WAI
+	ughAtT246qWV/6AzbTt5bQC48axwcgf1DExwCCy5JvM255x9lFBICXxsaxmiYP/hJI67voR
+	DyL4KzQftPZvxRLei2mJcEWBQIhFIBfzVszW/WVSYCpDndb0Lap3nlYeqOvi4jsY+4r/QUK
+	41u4mPxVCLXj7lj6o3F2WmfMBNHfHvUak528Kl2v1NHak5MPTwHAbYnNKo0hijw6dnXDRI9
+	QG+OLklXpmQJOQj/mJxpD7sFnU3APpxxS/kzlhqInrwUq9gXdrHElrSs0+BJxDKAA+q/1D+
+	BJVgmPvx+eAVj+R6PHmkjWPTzF0+Eh4zXhnzEs7epDcsErkYUW
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
 X-QQ-RECHKSPAM: 0
 
-On Fri, Aug 29, 2025 at 09:48:12PM +0200, Andrew Lunn wrote:
-> > Maybe I should rename it like this?
+On Fri, Aug 29, 2025 at 09:51:57PM +0200, Andrew Lunn wrote:
+> > > Back to the ^C handling. This could be interrupted before the firmware
+> > > is told the driver is loaded. That EINTR is thrown away here, so the
+> > > driver thinks everything is O.K, but the firmware still thinks there
+> > > is no MAC driver. What happens then?
+> > > 
 > > 
-> > /**
-> >  * mucse_mbx_sync_fw_by_get_capability - Try to sync driver and fw
-> >  * @hw: pointer to the HW structure
-> >  *
-> >  * mucse_mbx_sync_fw_by_get_capability tries to sync driver and fw
-> >  * by get capabitiy mbx cmd. Many retrys will do if it is failed.
-> >  *
-> >  * Return: 0 on success, negative errno on failure
-> >  **/
-> > int mucse_mbx_sync_fw_by_get_capability(struct mucse_hw *hw)
-> > {
-> > 	struct hw_abilities ability = {};
-> > 	int try_cnt = 3;
-> > 	int err;
-> > 	/* It is called once in probe, if failed nothing
-> > 	 * (register network) todo. Try more times to get driver
-> > 	 * and firmware in sync.
-> > 	 */
-> > 	do {
-> > 		err = mucse_fw_get_capability(hw, &ability);
-> > 		if (err)
-> > 			continue;
-> > 		break;
-> > 	} while (try_cnt--);
+> > The performance will be very poor since low working frequency,
+> > that is not we want.
 > > 
-> > 	if (!err)
-> > 		hw->pfvfnum = le16_to_cpu(ability.pfnum) & GENMASK_U16(7, 0);
-> > 	return err;
-> > }
+> > > And this is the same problem i pointed out before, you ignore EINTR in
+> > > a void function. Rather than fix one instance, you should of reviewed
+> > > the whole driver and fixed them all. You cannot expect the Reviewers
+> > > to do this for you.
+> > 
+> > I see, I will change 'void' to 'int' in order to handle err, and try to check
+> > other functions.
 > 
-> Why so much resistance to a NOP or firmware version, something which
-> is not that important? Why do you want to combine getting sync and
-> getting the capabilities?
+> Also, consider, do you really want ^C handling? How many other drivers
+> do this? How much time and effort is it going to take you to fix up
+> all the calls which might return -EINTR and your code is currently
+> broken?
 > 
-
-But firmware not offer a NOP command.
-(https://lore.kernel.org/netdev/8989E7A85A9468B0+20250825013053.GA2006401@nic-Precision-5820-Tower/) 
-
-I will rename it like 'mucse_mbx_sync_fw', and rename opcode
-'GET_PHY_ABILITY = 0x0601' to 'SYNC_FW = 0x0601'.
-
-> > fw reduce working frequency to save power if no driver is probed to this
-> > chip. And fw change frequency to normal after recieve insmod mbx cmd.
-> 
-> So why is this called ifinsmod? Why not power save? If you had called
-> this power save, i would not of questioned what this does, it is
-> pretty obvious, and other drivers probably have something
-> similar. Some drivers probably have something like open/close, which
-> do similar things. Again, i would not of asked. By not following what
-> other drivers are doing, you just cause problems for everybody.
-
-Sorry for it.
-
-> 
-> So please give this a new name. Not just the function, but also the
-> name of the firmware op and everything else to do with this. The
-> firmware does not care what the driver calls it, all it sees is a
-> binary message format, no names.
-> 
-> Please also go through your driver and look at all the other names. Do
-> they match what other drivers use. If not, you might want to rename
-> them, in order to get your code merged with a lot less back and forth
-> with reviewers.
-> 
-
-I see, I will check all names.
-
 > 	Andrew
 > 
 
-Thanks for you feedback.
+Originally ^C is designed to handle '/sys/xxx’, and as you said before,
+'It is pretty unusual for ethernet drivers to export data in /sys'.
+I should use 'metex_lock', not 'mutex_lock_interruptible'.
+
+Thanks for your feedback.
 
 
