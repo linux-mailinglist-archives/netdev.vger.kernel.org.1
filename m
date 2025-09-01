@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-218830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31B96B3EB7B
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 17:52:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69876B3EB9C
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 17:56:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F36AF1B26AA4
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 15:47:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E8F33A3CB4
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 15:55:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EA2D2D5927;
-	Mon,  1 Sep 2025 15:46:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DB6E2D594D;
+	Mon,  1 Sep 2025 15:55:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tu76J7gR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tlrI4CBq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 419E426D4EB;
-	Mon,  1 Sep 2025 15:46:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED4AE2D594A
+	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 15:55:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756741577; cv=none; b=jaJOkm+dIQs8QM/Z1hv1OlNH+1RN/sfcgDNGs0fHqbKxrwU9ACpLrKu2putyd5RwAeHl6pXgu6c5gDSl5SMVmo2W/UITVUpG2wWHFzZUYaE3w4jpQ1qxDmMbkTvqOH2kgb9gNQvlg4aT2KhOPMiMcatLDeSz3xq3hmjReWrFNpQ=
+	t=1756742105; cv=none; b=Q+5x/HyMS8o/DbtssgNvc6dSHNumUOfmZxWsndAp9CVJgn4ImI22ESO+4ITEIAYJvRqEZjnxD4NWBwZgeR4HiHpx3NopaJcjazuaMafmO/3XQSGbAEm+k5aunAKtQrXPioXK20Hn5fVpe+HmXtONcIqkfkWEynvZ9m+62nf84as=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756741577; c=relaxed/simple;
-	bh=uGpQLSmEJyi6CiXowuvVwuKCocaJtrwfT6XZ7F7fc6E=;
+	s=arc-20240116; t=1756742105; c=relaxed/simple;
+	bh=zfMy4L8Y4bkgqkt5WUUFvLAnVkXewiemnAZWXsimGjE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Us/BMufgC/FtuOlhloYc4w0FlXd5RmLb+aBiqiTwPnaq080xQx6k1ECNsTZ6IEZnbHGCJo9YUObcH8arPipThJszz8M9sl42tQMlaykjXMqy6zQ8GLbDOeARlVsclDVjkfCS6xggY9FXmDlB2h/gw3bwGAR9Kn81uDO50XO3mJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tu76J7gR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E89ECC4CEF0;
-	Mon,  1 Sep 2025 15:46:11 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=dOh47QAADvbSBPdh382X04kJ10k1OXuCush8+YIRh0g637bcEUtR+1W74hWwSSsz4hQSLYyQK+1fNO/Zvj1wUlp7YFVt1wEv9DXy9E0VhM5ncJuC1zGMxBxWlskpJbtZvo08nIq92GOrYKD52JvmMVuqigekGpll8sesdQhsqSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tlrI4CBq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCF66C4CEF0;
+	Mon,  1 Sep 2025 15:55:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756741574;
-	bh=uGpQLSmEJyi6CiXowuvVwuKCocaJtrwfT6XZ7F7fc6E=;
+	s=k20201202; t=1756742104;
+	bh=zfMy4L8Y4bkgqkt5WUUFvLAnVkXewiemnAZWXsimGjE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Tu76J7gRauacf/POp9Z2tEaNpYShDULpxOhS4zY5WG0SLrS/nzI0PRPd0k/GHmYRI
-	 J9f9TiCcDYPA6fWDHv+qfrPmzcHIrJYb6NPLg2EIhnp7IzidFiu6Y8cMnmIqZwBJsc
-	 mlcglvaI5HhOhOw9XIsOIJ0pDtG3SJS3DDDmzXuPfHc9WnJLdjnmqq/BBsG/Mottcw
-	 +r9nKHV3dYFEvS54gFnYXVOXOmJuSxb7vgcieG29sFKgy50zD+WKahNv9AllMMept/
-	 ZwiKGvaKqbekmSg8lkq8d9aUiJaKLbnefintwb/rhHR/zHXYyGyzTetfpWIKcKUuWq
-	 NoM0iePS9zUhQ==
-Date: Mon, 1 Sep 2025 16:46:09 +0100
+	b=tlrI4CBqajyi9YeFcjxMUn/6gI2z4AJVjeTgP8YnF1sb/jekhXnl0nXcSuCFJLWEL
+	 6BQkBjQr9IZWww5sqdjdrm304HhCh6R3f2hrUYxK/H2K7fNpOw3b+Nw3mAjggZZ1Rl
+	 UglkPhGt0q/hQ2ySBEY6C+tanTq98WCv4dGyVOfliiB2IXKBKz0Bd2O/jv8254pbfy
+	 zCfjwaIkk5KqAv+GwmfNYMQhv/Efgg/Znor10eeNkK5mlym9FjjKvpDytKwaWUCqGX
+	 0JEiYLFvsee1PVR72umIANAgUzKSoIPxJluhu/VpgBFBVyM7/oQvxIji8sDJ2h/o7/
+	 dO2I8/WdB16Lw==
+Date: Mon, 1 Sep 2025 16:54:59 +0100
 From: Simon Horman <horms@kernel.org>
-To: Carolina Jubran <cjubran@nvidia.com>
-Cc: Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
+To: Felix Fietkau <nbd@nbd.name>
+Cc: netdev@vger.kernel.org, hacks@slashdirt.org,
+	Sean Wang <sean.wang@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Gal Pressman <gal@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
-	Cosmin Ratiu <cratiu@nvidia.com>, Nimrod Oren <noren@nvidia.com>,
-	Mark Bloch <mbloch@nvidia.com>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 3/3] selftests: drv-net: Relax total BW check in
- devlink_rate_tc_bw.py
-Message-ID: <20250901154609.GJ15473@horms.kernel.org>
-References: <20250831080641.1828455-1-cjubran@nvidia.com>
- <20250831080641.1828455-4-cjubran@nvidia.com>
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Michael Lee <igvtee@gmail.com>, John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net] net: ethernet: mtk_eth_soc: fix tx vlan tag for llc
+ packets
+Message-ID: <20250901155459.GK15473@horms.kernel.org>
+References: <20250831182007.51619-1-nbd@nbd.name>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,28 +66,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250831080641.1828455-4-cjubran@nvidia.com>
+In-Reply-To: <20250831182007.51619-1-nbd@nbd.name>
 
-On Sun, Aug 31, 2025 at 11:06:41AM +0300, Carolina Jubran wrote:
-> This test is meant to check TC bandwidth distribution, not the tx_max
-> of the VF. The total bandwidth check is only there to make sure that FW
-> tokens limit traffic, because the per-TC share is only meaningful when
-> the link is fully saturated.
+On Sun, Aug 31, 2025 at 08:20:07PM +0200, Felix Fietkau wrote:
+> When sending llc packets with vlan tx offload, the hardware fails to
+> actually add the tag. Deal with this by fixing it up in software.
 > 
-> Because the measured total is the sum of two iperf3 streams that do not
-> always start or stop at the same time, using a strict 1 Gbps target
-> caused random failures. This change adds a tolerance parameter to
-> BandwidthValidator, keeps per-TC checks tight at +-12%, and relaxes the
-> total bandwidth check to +-25% around 1 Gbps.
-> 
-> This avoids false failures while still confirming that the TC share
-> validation is meaningful.
-> 
-> Fixes: 23ca32e4ead4 ("selftests: drv-net: Add test for devlink-rate traffic class bandwidth distribution")
-> Tested-by: Carolina Jubran <cjubran@nvidia.com>
-> Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
-> Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
-> Reviewed-by: Nimrod Oren <noren@nvidia.com>
+> Fixes: 656e705243fd ("net-next: mediatek: add support for MT7623 ethernet")
+> Reported-by: Thibaut VARENE <hacks@slashdirt.org>
+> Signed-off-by: Felix Fietkau <nbd@nbd.name>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
