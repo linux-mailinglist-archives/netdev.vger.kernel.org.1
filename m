@@ -1,190 +1,101 @@
-Return-Path: <netdev+bounces-218679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31BFFB3DE9D
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 11:33:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C7E83B3DEA7
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 11:34:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6C19168570
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 09:31:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EA41163217
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 09:34:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E8BA1DE8BB;
-	Mon,  1 Sep 2025 09:31:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Jf6/0GAI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9CC830C34D;
+	Mon,  1 Sep 2025 09:34:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9DA7248F66
-	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 09:31:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 305E630BF60;
+	Mon,  1 Sep 2025 09:34:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756719105; cv=none; b=lp2aPsB4NC1lDNrcDk/oMn5tbCyPGPP8CUDmqfjLf0IXtkkEdhvGcoAAn0J6USxdhIzoNnS1O7Amyud9gIj415t5HrT4cu/p8lcWekIv8TMuZ2Xorun50ODpwVXmMPgO2Bzr/tGn1CItf5eBeNKH3E5G7PprQ07RiuMd5vqNi+4=
+	t=1756719252; cv=none; b=U1pIilyNoSj5/v5GhZSlSFozcRaE+NcmKyYfF0moAFeQQL+cX9xxoptFVFkRDbKXP2WTiZM55cFtAOneLsKYSI+ZgVNFGr+dOacUyfrYHG6vYuX6zdhaGiev6nCeVbvGJKpbKzUBorlTfdnddw2SURtaDKiqldGjqdO0pZHR6ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756719105; c=relaxed/simple;
-	bh=bxcbQCnQXh03o1/FieMCgPburpKueLLWlAPBELmu400=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=hQPelMF2bCraDwxMxyHMKtvZcvYVrivJb+ec8wLjT+6XBjJAairgLQHICR5jJ7gimJaqAAaVTt6lrk51/Fjg2av/tC/5a3rMvS8MEvnSQcArLDjBS+7jxXxS0AdN5ALFUGDwJjNUOYuZHdK1q98/vljQNO8K5Mob57WUCc/deH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Jf6/0GAI; arc=none smtp.client-ip=209.85.222.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-80593bfe0a2so5973885a.3
-        for <netdev@vger.kernel.org>; Mon, 01 Sep 2025 02:31:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756719102; x=1757323902; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ZAamiYb10AnWbs9ZOo2nG5eTK7QhHxPH56kRc5DdxEw=;
-        b=Jf6/0GAIgp1N07rONATv8mTn+Ii8lRmBBu4Dkp7q3JUpd7zcA/t9KS+M3/DZ2CRzFW
-         AQEwqLs/w+/4TuHXBIME1Sidt98jWKgOqvtOwpzzhHhJKAm+NI74Cx7VZmDoJZQO5dXw
-         zGuyp1tu6XZBt+t0/ADgtzrZLcSSzNeGBXznBwI5TflvXzVrsyzaAuSa/QDd4Sne1ziC
-         En4C3teFh3oaglNW6gx7fU8r2t9X7hwmB5kUkTlgkRR8j6xhD1U4hxP+1C82urBYDbk2
-         pEXFrDXUWpKNtuyvTE0KQGcFQDFOEwwxLnykacCGSZU3l6HgrO4cL4TNpyeoO8MbuS16
-         U8GA==
+	s=arc-20240116; t=1756719252; c=relaxed/simple;
+	bh=WbqxiFHCxmv+1TEW2LU18yc8nc+qUvmPIvWqJNM3IY8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HwlX8WGad8m7GM40LcK8du/j472jaXiDkOfLk0gcyBW1lf5kYbCf1TIND8GFrmn3Uxyk1GMOZ6oV06PV29y9dNdUUDnpa806dAkjLk5yaPeEg33bCTy9dGeJjW0u/qzj9ZzNBrZf2nBKFF/s7M91TlA0M3MmOl28KMG2d/iTdPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-61e3b74672cso1942550a12.0;
+        Mon, 01 Sep 2025 02:34:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756719102; x=1757323902;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZAamiYb10AnWbs9ZOo2nG5eTK7QhHxPH56kRc5DdxEw=;
-        b=WWTNNYRhz7mcl6mcNRycxguCjTEhtF3qKg/rSBKQX3pBLknErgmlaQHIeNW88pbmkP
-         2TGTIbeSayC7WtSH1uYvzvMBUxe5lWaxBJA/HhDMPhnjOlxlzk2X8IW48kPWJm0cHDKq
-         gKWi3DqXuXQG8xiqXqyj9SDNDuQ319WmOsca65DJmaWQ30gPq6TohmP5nC/FAVnyXqAc
-         A4YXYZRz/6ZSAeRCPow9DlQVgPx1LrgTKWwRxtQUhp7Fw6g7lg4FHgCarqOIkfi2m6Ce
-         zu1IwkL80ke/kgZVjVv2Fx6sVBDEUuUprJfJ6nDbcaI8OUgcPRtRdTVMxC1093epGIa/
-         jypQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV4IX8xuK9gXlPPe0WmPiD18KkwuLUl08bl610GtdtQfw2p50V40AAkapzsVBVWWgyeB7hXQpg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnEm0RYhiPzeqcvcaIaxO9H2ofjWFyLvty5zItHF0/6XJ6juL2
-	gAexTM7qv80Ci16aOt39eNdCh3eFqsSl8OPmuvYFQTINdpJGbg1h0i4v12LH8tOz47IwSzPEIdF
-	nUdOW8pXCXKK+qA==
-X-Google-Smtp-Source: AGHT+IGN0iWCSYrcFXOci1dWCHSlyo5xo5/GKZe++yoP2GT05lAw150Ai/h+g9J2hMKaOTqv1BfG2J0lvplJkQ==
-X-Received: from qkbee20.prod.google.com ([2002:a05:620a:8014:b0:7f9:7d5a:c1e1])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:3906:b0:7e8:69bc:3446 with SMTP id af79cd13be357-7ff2b0d7812mr736962185a.43.1756719102622;
- Mon, 01 Sep 2025 02:31:42 -0700 (PDT)
-Date: Mon,  1 Sep 2025 09:31:41 +0000
+        d=1e100.net; s=20230601; t=1756719248; x=1757324048;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NlA9cuj151JAIiFxWe6cpardQLhaD6SM9myw3V7mMQ4=;
+        b=rK2AOXM8s4aKsAF5kn1IUxbzqI0ETHAvyNe118Ef/r78rT6/0QJS8Lq1q9qjAiDzVO
+         wdDUMI75wOlFe4eerm2/sY16o4jkWo1rGhxv0C6leSc4GCNIVNvy+GCI6Y9xz8jQYadB
+         oUIX55JCYDMWK6XAYiBjapyV0SpKeqjWQpTY6Dr3YBvs1e12d8inShgIond1juLqnD0v
+         legxkMJpNDrjZR5w7kDWDjpJyDhxG5Ee4FQ9MiffYRRhYaM7VeL8Dvm+9HqXZ7OOTpOJ
+         ViE46vfixrsiNrYcTyfPGlp0V/KWoUuYJQAVpgoB2eWDdxoNukApizDC0nOfTWyCYPZc
+         Qt9w==
+X-Forwarded-Encrypted: i=1; AJvYcCUGXZ1xuW9aQgm1ORNCR2BTJngE991Te8lcWTPZgnscp1rA/6UxXen2i9Ke0C0pDMFfKj55uHkN@vger.kernel.org, AJvYcCWxoQ6e3HVq88+XpctVk3wnEvVEn13KIa4Xc5QNZRI2YnCq3mRHHyu6FtlpqjrI9XLdgbJ51QKwNV4MQhNW9eM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRbYWLObkNyel6o4cnKtjHaVzb8pOhSMSvEu8j4hbyMEFSs2yF
+	Ffm7OiJcdgO6be2isbW30JJazHpY4brIr8dMNDLY5GhTR1M+5Vdvx7Qc
+X-Gm-Gg: ASbGncvx4RaljT73jitACrzziEcpFBTlra2SzSbv4oZsic0TGLXNyW0qGLrM/LYTe1P
+	1QtEN6T4lDKWSsSN9ZmWV/CrJzRvn4LdK2H8h7Qhey9L5FF+165waCJh08vNE79GdAbKkLZatT1
+	1VGCIjRHf1J62CFRxlHX4PXNpfUPmnb7TgBvdA82H3i7H4gsmMjLeCpcXAuY+7njv69Eptbl+NL
+	unoEVH26KUjsq16P8Z8OneYrhvLBqS1xe4VpVsEgrRfqmr/YREUYXiNINIyGxyXWxoyv48nnaHG
+	dfkPEtz40bvMQgtzhjiuf2zqFrmOkqnbKpfbx58RfyHjcVAA535Y2nIgCYauqIVpFNwpDBquWMq
+	vQ9yCEZpIE7tgRw==
+X-Google-Smtp-Source: AGHT+IGd3sku2p9xh1a3YxEGe7t3cwa24VOvn/OQfxB9g1GYI4HSlTIZrOhiAqiX9HPakg6rGRNcFQ==
+X-Received: by 2002:a50:cd17:0:b0:61c:4222:4856 with SMTP id 4fb4d7f45d1cf-61d22dc77eemr5006499a12.3.1756719248372;
+        Mon, 01 Sep 2025 02:34:08 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:71::])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-61cfc5575dcsm6867632a12.49.2025.09.01.02.34.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Sep 2025 02:34:07 -0700 (PDT)
+Date: Mon, 1 Sep 2025 02:34:05 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, joe@dama.to, 
+	sdf@fomichev.me, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 2/2] selftests: net: py: don't default to
+ shell=True
+Message-ID: <va6ympcdo4jxfcqnr6uels4hg62sxgzeabdxjkdr7nkufjktk7@4fishek5fpgo>
+References: <20250830184317.696121-1-kuba@kernel.org>
+ <20250830184317.696121-2-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0.318.gd7df087d1a-goog
-Message-ID: <20250901093141.2093176-1-edumazet@google.com>
-Subject: [PATCH net-next] net_sched: act: remove tcfa_qstats
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250830184317.696121-2-kuba@kernel.org>
 
-tcfa_qstats is currently only used to hold drops and overlimits counters.
+On Sat, Aug 30, 2025 at 11:43:17AM -0700, Jakub Kicinski wrote:
+> @@ -45,6 +48,10 @@ import time
+>          if host:
+>              self.proc = host.cmd(comm)
+>          else:
+> +            # If user doesn't explicitly request shell try to avoid it.
+> +            if shell is None and isinstance(comm, str) and ' ' in comm:
+> +                comm = comm.split()
 
-tcf_action_inc_drop_qstats() and tcf_action_inc_overlimit_qstats()
-currently acquire a->tcfa_lock to increment these counters.
+I am wondering if you can always split the string, independently if
+shell is True or now. Passing comm as a list is usually recommend, even
+when shell is enabled. Also, if there is no space, split() will return
+the same string.
 
-Switch to two atomic_t to get lock-free accounting.
+What about something as?
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/net/act_api.h | 14 ++++++--------
- net/sched/act_api.c   | 12 ++++++++----
- 2 files changed, 14 insertions(+), 12 deletions(-)
-
-diff --git a/include/net/act_api.h b/include/net/act_api.h
-index 2894cfff2da3..91a24b5e0b93 100644
---- a/include/net/act_api.h
-+++ b/include/net/act_api.h
-@@ -33,7 +33,10 @@ struct tc_action {
- 	struct tcf_t			tcfa_tm;
- 	struct gnet_stats_basic_sync	tcfa_bstats;
- 	struct gnet_stats_basic_sync	tcfa_bstats_hw;
--	struct gnet_stats_queue		tcfa_qstats;
-+
-+	atomic_t			tcfa_drops;
-+	atomic_t			tcfa_overlimits;
-+
- 	struct net_rate_estimator __rcu *tcfa_rate_est;
- 	spinlock_t			tcfa_lock;
- 	struct gnet_stats_basic_sync __percpu *cpu_bstats;
-@@ -53,7 +56,6 @@ struct tc_action {
- #define tcf_action	common.tcfa_action
- #define tcf_tm		common.tcfa_tm
- #define tcf_bstats	common.tcfa_bstats
--#define tcf_qstats	common.tcfa_qstats
- #define tcf_rate_est	common.tcfa_rate_est
- #define tcf_lock	common.tcfa_lock
- 
-@@ -241,9 +243,7 @@ static inline void tcf_action_inc_drop_qstats(struct tc_action *a)
- 		qstats_drop_inc(this_cpu_ptr(a->cpu_qstats));
- 		return;
- 	}
--	spin_lock(&a->tcfa_lock);
--	qstats_drop_inc(&a->tcfa_qstats);
--	spin_unlock(&a->tcfa_lock);
-+	atomic_inc(&a->tcfa_drops);
- }
- 
- static inline void tcf_action_inc_overlimit_qstats(struct tc_action *a)
-@@ -252,9 +252,7 @@ static inline void tcf_action_inc_overlimit_qstats(struct tc_action *a)
- 		qstats_overlimit_inc(this_cpu_ptr(a->cpu_qstats));
- 		return;
- 	}
--	spin_lock(&a->tcfa_lock);
--	qstats_overlimit_inc(&a->tcfa_qstats);
--	spin_unlock(&a->tcfa_lock);
-+	atomic_inc(&a->tcfa_overlimits);
- }
- 
- void tcf_action_update_stats(struct tc_action *a, u64 bytes, u64 packets,
-diff --git a/net/sched/act_api.c b/net/sched/act_api.c
-index 9e468e463467..ff6be5cfe2b0 100644
---- a/net/sched/act_api.c
-+++ b/net/sched/act_api.c
-@@ -1585,7 +1585,7 @@ void tcf_action_update_stats(struct tc_action *a, u64 bytes, u64 packets,
- 	}
- 
- 	_bstats_update(&a->tcfa_bstats, bytes, packets);
--	a->tcfa_qstats.drops += drops;
-+	atomic_add(drops, &a->tcfa_drops);
- 	if (hw)
- 		_bstats_update(&a->tcfa_bstats_hw, bytes, packets);
- }
-@@ -1594,8 +1594,9 @@ EXPORT_SYMBOL(tcf_action_update_stats);
- int tcf_action_copy_stats(struct sk_buff *skb, struct tc_action *p,
- 			  int compat_mode)
- {
--	int err = 0;
-+	struct gnet_stats_queue qstats = {0};
- 	struct gnet_dump d;
-+	int err = 0;
- 
- 	if (p == NULL)
- 		goto errout;
-@@ -1619,14 +1620,17 @@ int tcf_action_copy_stats(struct sk_buff *skb, struct tc_action *p,
- 	if (err < 0)
- 		goto errout;
- 
-+	qstats.drops = atomic_read(&p->tcfa_drops);
-+	qstats.overlimits = atomic_read(&p->tcfa_overlimits);
-+
- 	if (gnet_stats_copy_basic(&d, p->cpu_bstats,
- 				  &p->tcfa_bstats, false) < 0 ||
- 	    gnet_stats_copy_basic_hw(&d, p->cpu_bstats_hw,
- 				     &p->tcfa_bstats_hw, false) < 0 ||
- 	    gnet_stats_copy_rate_est(&d, &p->tcfa_rate_est) < 0 ||
- 	    gnet_stats_copy_queue(&d, p->cpu_qstats,
--				  &p->tcfa_qstats,
--				  p->tcfa_qstats.qlen) < 0)
-+				  &qstats,
-+				  qstats.qlen) < 0)
- 		goto errout;
- 
- 	if (gnet_stats_finish_copy(&d) < 0)
--- 
-2.51.0.318.gd7df087d1a-goog
-
+	if isinstance(comm, str):
+		comm = comm.split()
 
