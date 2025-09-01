@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-218919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A27CFB3F05C
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 23:12:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10C74B3F05D
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 23:13:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 789402C0DF1
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 21:12:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 533291A8842C
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 21:13:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F1632773F3;
-	Mon,  1 Sep 2025 21:12:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B8B3277814;
+	Mon,  1 Sep 2025 21:12:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kWE8PePt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CDKXqKDL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BB202773E9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2628D27701E
 	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 21:12:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756761142; cv=none; b=ZUsvsy78Aot/ns/llq4gFdg2KzxpKm71ywEMbcF75sgWzIa8o94nC/rINu4hyEsp3QA/RTTnUS3c6NJyNO8vEDh6/9saime5s3AYZ48KtWxKxvKuJHcM/hmHYh2O7JuDSL06o75+7fwIJXZ5CSAtttssQTtUD1Qlp+Ma/SKPCsc=
+	t=1756761143; cv=none; b=tlRXSE+kZ330lCQAE5uB6KuN5FULDWigqmquurkMyNR+cNLQp1O941Uupl7qUy0x33SmLr/aWj2fWPKbZYZb+ebqK7umYke11Vv2qNbjV/UTV57Ud2CRFReJnur5+8p2u6BvuY46rRllspVd6ip7zwCU/NIQ7lEgcjeVGGBe7e4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756761142; c=relaxed/simple;
-	bh=99MljO3wALEyR1+PuxKTzvSi/oPtgMqQvzBUaERC0Sc=;
+	s=arc-20240116; t=1756761143; c=relaxed/simple;
+	bh=uScYteY3Zpk5HiegczHeMM6HS/wy8g6Ky340cF/mfpo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nNKfGIsaeLclSS7PcgxkT3Lo0APxgpE5vhmun/iFyg4JtLrK7EEYJHSTIqgQiq8pvDFoc2lz/i0Rrk3tgIyxvxrZmtNWBvdg/rWKy/nY93493wzS4FnSRs2IdR9eZ23lQCg0+6fCMYFFu7Q06I01utbg2t5Pn6wswQtSAIZpLTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kWE8PePt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58935C4CEF5;
-	Mon,  1 Sep 2025 21:12:21 +0000 (UTC)
+	 MIME-Version; b=nTPEl6NQSaTUVBFAWt4pBq5Hso8aA4LMTlyO/7vVWCWPtoBRU/VemfMEFDsthl4sj0OXVFHcUQCoaZAAj7v8KsBOzyFykURWgJ/pTCT0Y26Fvmi4+RTnY/23svwAqbSQRc52rQopLirIgSs0izRWBY4ATkY0rpnrYo6/z/3vgkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CDKXqKDL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20EC3C4CEFA;
+	Mon,  1 Sep 2025 21:12:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1756761142;
-	bh=99MljO3wALEyR1+PuxKTzvSi/oPtgMqQvzBUaERC0Sc=;
+	bh=uScYteY3Zpk5HiegczHeMM6HS/wy8g6Ky340cF/mfpo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kWE8PePtUfDssvXB7IJI+8IEK2Zh9yGfU8o+ZPjTli/8Bp8b0Ve2qPw2pxMYb/vPu
-	 7OjqNDHKPWMfxgz6aKd3c/t4ZY6tN4bjx8M1X3/PBieDnA9uAXEs1Wug+Uh4HeQPEm
-	 Tp2yTF3rpTagtdohSSLcn72fXsa/c49/rXSpbqdbQP380HXmJwvxlukPebvYISl43K
-	 XPEtF8pcwXrQCvwdWYz1XNaJjKopQmDNvIS2r8mz2g+C4p6UGTUdwa5E+/festVoPU
-	 j0DBdG+yHoz7rQ7atqlE2hlRy7opTTIZQwZt0GRKBwJij5QfBTs1yQI4BFdkK/jdl4
-	 R4HMkpuMM/6JQ==
+	b=CDKXqKDLwiJ4XCbKTM5z4i0k2nL9asa1iNntEPgv2frj2c8vv/DFHMzydKktskqr0
+	 a/M8SOd7FKNyQzZ1c+5mo7dj82cQI3hWjShm2jgRNVtnHpo9LNEe713s4tGf3al8Dn
+	 3k1fgbKPSGkw35vigq9hs9yGaitOwBoO8olBHcs5SsqUmt2VGx+b5cSZhhQu0bF+/J
+	 yffmlzvWU3Z84o/p2tFQO11Bn5ql5vgYUac8UB/T4SCIcngpDcGEbbOUkBTq+m50Y4
+	 d/7fMURV+tTvkshtCltIxpcpM/I3VjnXh7yQgUBOwFZ5SLrchZvGNCTnryM7CRZ7+V
+	 ZPXtaHbCBwWRA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -56,9 +56,9 @@ Cc: netdev@vger.kernel.org,
 	alexanderduyck@fb.com,
 	sdf@fomichev.me,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v3 06/14] eth: fbnic: split fbnic_disable()
-Date: Mon,  1 Sep 2025 14:12:06 -0700
-Message-ID: <20250901211214.1027927-7-kuba@kernel.org>
+Subject: [PATCH net-next v3 07/14] eth: fbnic: split fbnic_flush()
+Date: Mon,  1 Sep 2025 14:12:07 -0700
+Message-ID: <20250901211214.1027927-8-kuba@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20250901211214.1027927-1-kuba@kernel.org>
 References: <20250901211214.1027927-1-kuba@kernel.org>
@@ -70,78 +70,116 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Factor out handling a single nv from fbnic_disable() to make
-it reusable for queue ops. Use a __ prefix for the factored
-out code. The real fbnic_nv_disable() which will include
-fbnic_wrfl() will be added with the qops, to avoid unused
-function warnings.
+Factor out handling a single nv from fbnic_flush() to make
+it reusable for queue ops.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.c | 46 +++++++++++---------
- 1 file changed, 25 insertions(+), 21 deletions(-)
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.c | 87 ++++++++++----------
+ 1 file changed, 45 insertions(+), 42 deletions(-)
 
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-index dc0735b20739..7d6bf35acfd4 100644
+index 7d6bf35acfd4..8384e73b4492 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-@@ -2180,31 +2180,35 @@ void fbnic_napi_disable(struct fbnic_net *fbn)
- 	}
+@@ -2297,52 +2297,55 @@ int fbnic_wait_all_queues_idle(struct fbnic_dev *fbd, bool may_fail)
+ 	return err;
  }
  
-+static void __fbnic_nv_disable(struct fbnic_napi_vector *nv)
++static void fbnic_nv_flush(struct fbnic_napi_vector *nv)
 +{
-+	int i, t;
++	int j, t;
 +
-+	/* Disable Tx queue triads */
++	/* Flush any processed Tx Queue Triads and drop the rest */
 +	for (t = 0; t < nv->txt_count; t++) {
 +		struct fbnic_q_triad *qt = &nv->qt[t];
++		struct netdev_queue *tx_queue;
 +
-+		fbnic_disable_twq0(&qt->sub0);
-+		fbnic_disable_twq1(&qt->sub1);
-+		fbnic_disable_tcq(&qt->cmpl);
++		/* Clean the work queues of unprocessed work */
++		fbnic_clean_twq0(nv, 0, &qt->sub0, true, qt->sub0.tail);
++		fbnic_clean_twq1(nv, false, &qt->sub1, true,
++				 qt->sub1.tail);
++
++		/* Reset completion queue descriptor ring */
++		memset(qt->cmpl.desc, 0, qt->cmpl.size);
++
++		/* Nothing else to do if Tx queue is disabled */
++		if (qt->sub0.flags & FBNIC_RING_F_DISABLED)
++			continue;
++
++		/* Reset BQL associated with Tx queue */
++		tx_queue = netdev_get_tx_queue(nv->napi.dev,
++					       qt->sub0.q_idx);
++		netdev_tx_reset_queue(tx_queue);
 +	}
 +
-+	/* Disable Rx queue triads */
-+	for (i = 0; i < nv->rxt_count; i++, t++) {
++	/* Flush any processed Rx Queue Triads and drop the rest */
++	for (j = 0; j < nv->rxt_count; j++, t++) {
 +		struct fbnic_q_triad *qt = &nv->qt[t];
 +
-+		fbnic_disable_bdq(&qt->sub0, &qt->sub1);
-+		fbnic_disable_rcq(&qt->cmpl);
++		/* Clean the work queues of unprocessed work */
++		fbnic_clean_bdq(&qt->sub0, qt->sub0.tail, 0);
++		fbnic_clean_bdq(&qt->sub1, qt->sub1.tail, 0);
++
++		/* Reset completion queue descriptor ring */
++		memset(qt->cmpl.desc, 0, qt->cmpl.size);
++
++		fbnic_put_pkt_buff(qt, qt->cmpl.pkt, 0);
++		memset(qt->cmpl.pkt, 0, sizeof(struct fbnic_pkt_buff));
 +	}
 +}
 +
- void fbnic_disable(struct fbnic_net *fbn)
+ void fbnic_flush(struct fbnic_net *fbn)
  {
- 	struct fbnic_dev *fbd = fbn->fbd;
--	int i, j, t;
-+	int i;
+ 	int i;
  
 -	for (i = 0; i < fbn->num_napi; i++) {
 -		struct fbnic_napi_vector *nv = fbn->napi[i];
+-		int j, t;
 -
--		/* Disable Tx queue triads */
+-		/* Flush any processed Tx Queue Triads and drop the rest */
 -		for (t = 0; t < nv->txt_count; t++) {
 -			struct fbnic_q_triad *qt = &nv->qt[t];
+-			struct netdev_queue *tx_queue;
 -
--			fbnic_disable_twq0(&qt->sub0);
--			fbnic_disable_twq1(&qt->sub1);
--			fbnic_disable_tcq(&qt->cmpl);
+-			/* Clean the work queues of unprocessed work */
+-			fbnic_clean_twq0(nv, 0, &qt->sub0, true, qt->sub0.tail);
+-			fbnic_clean_twq1(nv, false, &qt->sub1, true,
+-					 qt->sub1.tail);
+-
+-			/* Reset completion queue descriptor ring */
+-			memset(qt->cmpl.desc, 0, qt->cmpl.size);
+-
+-			/* Nothing else to do if Tx queue is disabled */
+-			if (qt->sub0.flags & FBNIC_RING_F_DISABLED)
+-				continue;
+-
+-			/* Reset BQL associated with Tx queue */
+-			tx_queue = netdev_get_tx_queue(nv->napi.dev,
+-						       qt->sub0.q_idx);
+-			netdev_tx_reset_queue(tx_queue);
 -		}
 -
--		/* Disable Rx queue triads */
+-		/* Flush any processed Rx Queue Triads and drop the rest */
 -		for (j = 0; j < nv->rxt_count; j++, t++) {
 -			struct fbnic_q_triad *qt = &nv->qt[t];
 -
--			fbnic_disable_bdq(&qt->sub0, &qt->sub1);
--			fbnic_disable_rcq(&qt->cmpl);
+-			/* Clean the work queues of unprocessed work */
+-			fbnic_clean_bdq(&qt->sub0, qt->sub0.tail, 0);
+-			fbnic_clean_bdq(&qt->sub1, qt->sub1.tail, 0);
+-
+-			/* Reset completion queue descriptor ring */
+-			memset(qt->cmpl.desc, 0, qt->cmpl.size);
+-
+-			fbnic_put_pkt_buff(qt, qt->cmpl.pkt, 0);
+-			memset(qt->cmpl.pkt, 0, sizeof(struct fbnic_pkt_buff));
 -		}
 -	}
 +	for (i = 0; i < fbn->num_napi; i++)
-+		__fbnic_nv_disable(fbn->napi[i]);
- 
- 	fbnic_wrfl(fbd);
++		fbnic_nv_flush(fbn->napi[i]);
  }
+ 
+ void fbnic_fill(struct fbnic_net *fbn)
 -- 
 2.51.0
 
