@@ -1,226 +1,226 @@
-Return-Path: <netdev+bounces-218767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 906FEB3E5B6
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 15:42:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8509BB3E5E2
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 15:45:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6CA157ADB84
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 13:41:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED8AA3A30D5
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 13:45:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D5E9335BDB;
-	Mon,  1 Sep 2025 13:42:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2BD92F3632;
+	Mon,  1 Sep 2025 13:45:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hhAgv3jy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ffU6S9bo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85AB3314AF;
-	Mon,  1 Sep 2025 13:42:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F18D518C031;
+	Mon,  1 Sep 2025 13:45:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756734150; cv=none; b=DYas221/X1bAddgSEaYU8/k8qrblF7jscaYmWMFQHdq3dIM2/rQlurwB0C12Vu492E2NwegD+LkRXeI6b67iVI+chUWUbSXd/+Mnj9UHhWaIgXUgPQXu57pxXSh/D2fLKx74ChxMqDq1MiYJZef5pKHZq1GCGvEKuzDqSGdFPiM=
+	t=1756734340; cv=none; b=WGVudnKHJCppcav2wcOqyxO2wdI4sS+HyIIWuGxYaNTC7SlNmWBwUEMssbvwp1wJD9QbeClbG25+Orwvubv3rjuuLGRRKao7HSSQxajWGThbZ7nIo4P2Lplsbqad5uz9F1VzDGl/Ue8NmPQ2oXss3rm4OzPAUQJXwYVvqLKoe5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756734150; c=relaxed/simple;
-	bh=Vh7XUBI8fbBk4XZ8pKOtZH1UfNJDpJTXo419bu2F3VE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bDO2ywGxr+myDt44IttuWWaGde5FVLguVudDlizVW4/3nCEcyVmJ1d+D1+Z7ooT+QXBWE1cXFzLxFEDxZ/Sm/IEUYP7aFCxtE1NhgDHJ86S87D/YlD5WIzP/nB4bT5PKyi/glcqOCBwyempKGfEVjtBOCcJeIbHi17L5mrdEYo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hhAgv3jy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA2A3C4CEF0;
-	Mon,  1 Sep 2025 13:42:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756734149;
-	bh=Vh7XUBI8fbBk4XZ8pKOtZH1UfNJDpJTXo419bu2F3VE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hhAgv3jysX69gBwri906yWypXEK80NcNcU75ZV9/QeXQCy7l2f36k4byfNVTER6IP
-	 gOpTcCFplnwo778jgs8p6iIv5w82lNMr1NdsMRGJMrKmcMxP4YY2DKw+dekKbGSucF
-	 fH1UC9E5PgUSkFcL53l8SZJBBuh5k12ZnrsQltX79STLRHqZnRwbCiiL2r1trnqoDx
-	 puTp0teu7LJmcMXEaHizKLVFBrc6SbxJk1xEnU8p4L+3jrFGOH2GOvXFX8s+j/Uzcc
-	 iESOxfINPv0beoEDy4YTocStDSjRMNPUi5KjJ3O7gh5nCTPwxK3fbka9qE414MrABB
-	 Q6ziiIx0FS2KA==
-From: Christian Brauner <brauner@kernel.org>
-To: Simon Schuster <schuster.simon@siemens-energy.com>
-Cc: Christian Brauner <brauner@kernel.org>,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	linux-csky@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-perf-users@vger.kernel.org,
-	apparmor@lists.ubuntu.com,
-	selinux@vger.kernel.org,
-	linux-alpha@vger.kernel.org,
-	linux-snps-arc@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-hexagon@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	linux-m68k@lists.linux-m68k.org,
-	linux-mips@vger.kernel.org,
-	linux-openrisc@vger.kernel.org,
-	linux-parisc@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-s390@vger.kernel.org,
-	linux-sh@vger.kernel.org,
-	sparclinux@vger.kernel.org,
-	linux-um@lists.infradead.org,
-	stable@vger.kernel.org,
-	Dinh Nguyen <dinguyen@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	David Hildenbrand <david@redhat.com>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Mike Rapoport <rppt@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Michal Hocko <mhocko@suse.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ben Segall <bsegall@google.com>,
-	Mel Gorman <mgorman@suse.de>,
-	Valentin Schneider <vschneid@redhat.com>,
-	Kees Cook <kees@kernel.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	Guo Ren <guoren@kernel.org>,
-	Oleg Nesterov <oleg@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	=?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
-	Paul Moore <paul@paul-moore.com>,
-	Serge Hallyn <sergeh@kernel.org>,
-	James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	John Johansen <john.johansen@canonical.com>,
-	Stephen Smalley <stephen.smalley.work@gmail.com>,
-	Ondrej Mosnacek <omosnace@redhat.com>,
-	Kentaro Takeda <takedakn@nttdata.co.jp>,
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Matt Turner <mattst88@gmail.com>,
-	Vineet Gupta <vgupta@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Brian Cain <bcain@kernel.org>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Michal Simek <monstr@monstr.eu>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Jonas Bonn <jonas@southpole.se>,
-	Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
-	Stafford Horne <shorne@gmail.com>,
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-	Helge Deller <deller@gmx.de>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Yoshinori Sato <ysato@users.sourceforge.jp>,
-	Rich Felker <dalias@libc.org>,
-	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-	Andreas Larsson <andreas@gaisler.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Chris Zankel <chris@zankel.net>,
-	Max Filippov <jcmvbkbc@gmail.com>
-Subject: Re: [PATCH v2 0/4] nios2: Add architecture support for clone3
-Date: Mon,  1 Sep 2025 15:41:21 +0200
-Message-ID: <20250901-sauer-stunk-49def0170f7d@brauner>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250901-nios2-implement-clone3-v2-0-53fcf5577d57@siemens-energy.com>
-References: <20250901-nios2-implement-clone3-v2-0-53fcf5577d57@siemens-energy.com>
+	s=arc-20240116; t=1756734340; c=relaxed/simple;
+	bh=zUhb2Jpfmjjf8knvzp6hvnkIyqENIRiPfN7gIkKA9dI=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Qg3Cw80AlbjI6FhzGDwHu2Hpf2F9wnZWOKXU399Nws0LVf4i8BpWiAIIXwWfgGsinefzu97mr/ONeJ7trY42MEwSs2zTLvYmv4qevc0uGsPzf4pf/+XnDqL5Yj8rZM7PNvSXdfM6BZPYKRqds6inqDQRpvarhrlwOyhhN5TzpVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ffU6S9bo; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4b109c6b9fcso43245291cf.3;
+        Mon, 01 Sep 2025 06:45:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756734338; x=1757339138; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rnTbdSPn2NkfEUUrX/KyL5G6w1/N0r+8MK+VhlrrUMU=;
+        b=ffU6S9bo8tO1nRvPbiySlPBSrRKqzkdZ4SFMSg+uzuGeGBDs0i7UIKRlILOSVxBFRF
+         w7I6WA/1RONrg+77nTn8KR1419wkQL3u5Lzv8E/y9cEIXejHkfIDW4BtuUgN5VC/I3bj
+         xTb0dYAaQ9gvRDJyduWHMi+SbmW7kfP+eEmMPt8QubxuKZHGF9PUDcQnm//kZ0aYJC5U
+         KBKXURaHGSVo3tLE0fcFLUqQtponKCFnkByuf7m9OYpuZRSRcQsVae4ttHu/oM+j4ma0
+         h7uzjwxU/6JiaE3hwMOBCzgOF2MO8iz80b75+0sxp7LASb3A2haYqaGFZ/LnYv/cEejt
+         TQyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756734338; x=1757339138;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=rnTbdSPn2NkfEUUrX/KyL5G6w1/N0r+8MK+VhlrrUMU=;
+        b=JNeNLwFL0UJiDPaEga0kK/hLA83rr59CCU5dCDmKS7OQuRvg6YwG+nUshv59HST2cK
+         +DjxUdYQwHfE3kUXMcx2Yx+WWRqB4wWBF7RAJY97+xARU2qPaWwNmhySagieORMmD5UF
+         7tVpxm1cR4puPxwJ4T8NXP0QtioJPiRTTR3l0e4Rd3Q5AHXDVP1I0UaIhKuUeimXW38y
+         3PUuGoTilDxry4Tm7jGS3baJTCsjvCFK4nitBNGzsVSxnx7ZanBoy9RI3znU7t8FHYfY
+         hzIHxe7ApuANhj1+0x1fB7raECXLzx0dlOegReYnvPHf06xhY2g6XOar5afpFiq7aIVb
+         +/jA==
+X-Forwarded-Encrypted: i=1; AJvYcCVZf8LGH7iExY1yLGNLbKN8KqReukxHApSMBYn2p8O98KkwEaxDLRT3pmNj5H4Q830rs4oPEcQX@vger.kernel.org, AJvYcCW65MzZnXtfSyCs97chspd9rEPELx9tPuX7CNEFqaeGV9ArgGUk9Rl7sYV2vNqCLbduXOUuU3ynrJ95snI=@vger.kernel.org, AJvYcCXjc6Ty1FZ0hhVVNaSEjsuir7eXNgPzp/TXTAotSpmVRSllwBm/brElkyAu776ItRCaT1f863lap7aaALeW9UEM@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhKaLOE1L2qKEQ12Qw2h1H2fPiAxqnI9P4HEDPCXGiyAR0xzF/
+	GZXJvb5SOJVvHi0SEeGPvTvBNJl7BWghnQYwMTMu0ffd10ww008/t3QJ
+X-Gm-Gg: ASbGncveAQgX6FvBe3ILcQ0oKwFcu5/JS3NLzZreZCp7ffRJc4TFq/GtzvpiOxGjeO0
+	IeJt6S2JFDVQiI3mCPJ7y+KO7dkU3F5izp50pQW3F0jiGREuOu+lb8cv5fEueoFZTpbEmMRN+kT
+	Gy/OJqrdl5wn879EOy/nwy3hhdvrEJjgRk9quXwZfetq5dwyL4EXL9BfGw6gUen4AKOwauDspau
+	iGS8zx0nhWWPYvUfHjIsT6ODH/Nn31qWzzva5PPlH7N94MkgT4tR+Mf2IrKwRL1X4kfRHFPHrAX
+	5QkJwEbcjgN7wIiBWaa4uDqyt9b+JEON1eTx3mN9bAHm2dXXBjeSayO5xn5Lpmkpy5b8KYwtKb8
+	iFBAXdf/m8t04bfepPCZrk0zjjxQVFiJO8E+cfB6FkSksNEYLRbEEVA6qO1evYXzV7CiomxxajK
+	XaMg==
+X-Google-Smtp-Source: AGHT+IH8M9rH4vv23ATVd61t3Zi6RxFtLvxmp2lXF8X5fC1CN4BhB6ApLNK/rW1SxQaTjNebzoYudw==
+X-Received: by 2002:a05:622a:394:b0:4b2:9b56:84c5 with SMTP id d75a77b69052e-4b31d9e45a9mr90841861cf.26.1756734337774;
+        Mon, 01 Sep 2025 06:45:37 -0700 (PDT)
+Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id d75a77b69052e-4b30b54d06csm60055641cf.13.2025.09.01.06.45.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Sep 2025 06:45:37 -0700 (PDT)
+Date: Mon, 01 Sep 2025 09:45:36 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Brett A C Sheffield <bacs@librecast.net>, 
+ willemdebruijn.kernel@gmail.com
+Cc: bacs@librecast.net, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ gregkh@linuxfoundation.org, 
+ horms@kernel.org, 
+ kuba@kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ pabeni@redhat.com, 
+ shuah@kernel.org, 
+ willemb@google.com
+Message-ID: <willemdebruijn.kernel.2e347bb16a45e@gmail.com>
+In-Reply-To: <20250901123757.13112-1-bacs@librecast.net>
+References: <20250901123757.13112-1-bacs@librecast.net>
+Subject: Re: [PATCH net-next v4] selftests: net: add test for ipv6
+ fragmentation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1648; i=brauner@kernel.org; h=from:subject:message-id; bh=Vh7XUBI8fbBk4XZ8pKOtZH1UfNJDpJTXo419bu2F3VE=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWRsXbQgjNu70HTe/oL9c9q1am5UpWv3Rf4/axBS2d225 DLTetc9HaUsDGJcDLJiiiwO7Sbhcst5KjYbZWrAzGFlAhnCwMUpABNJDGb4796daOqUVCMcef3h SZ6HDAFLrq8xmcSxzTOQKT+CvTO3n+G/d83ztvwDXH+ZHPU+vLlcvOafQ5/X9C+bSnabHoy/7bC TBwA=
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, 01 Sep 2025 15:09:49 +0200, Simon Schuster wrote:
-> This series adds support for the clone3 system call to the nios2
-> architecture. This addresses the build-time warning "warning: clone3()
-> entry point is missing, please fix" introduced in 505d66d1abfb9
-> ("clone3: drop __ARCH_WANT_SYS_CLONE3 macro"). The implementation passes
-> the relevant clone3 tests of kselftest when applied on top of
-> next-20250815:
+Brett A C Sheffield wrote:
+> Add selftest for the IPv6 fragmentation regression which affected
+> several stable kernels.
 > 
-> [...]
+> Commit a18dfa9925b9 ("ipv6: save dontfrag in cork") was backported to
+> stable without some prerequisite commits.  This caused a regression when
+> sending IPv6 UDP packets by preventing fragmentation and instead
+> returning -1 (EMSGSIZE).
+> 
+> Add selftest to check for this issue by attempting to send a packet
+> larger than the interface MTU. The packet will be fragmented on a
+> working kernel, with sendmsg(2) correctly returning the expected number
+> of bytes sent.  When the regression is present, sendmsg returns -1 and
+> sets errno to EMSGSIZE.
+> 
+> Link: https://lore.kernel.org/stable/aElivdUXqd1OqgMY@karahi.gladserv.com
+> Signed-off-by: Brett A C Sheffield <bacs@librecast.net>
 
-Seems fine to me. Thanks for fixing this.
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
----
+> ---
+> v4 changes:
+>  - fix "else should follow close brace" (checkpatch ERROR)
 
-Applied to the kernel-6.18.clone3 branch of the vfs/vfs.git tree.
-Patches in the kernel-6.18.clone3 branch should appear in linux-next soon.
+Reminder to send only only iteration to netdev per 24 hrs.
+ 
+> v3 changes:
+>  - add usleep instead of busy polling on sendmsg
+>  - simplify error handling by using error() and leaving cleanup to O/S
+>  - use loopback interface - don't bother creating TAP
+>  - send to localhost (::1)
+ 
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
+> +/* no need to wait for DAD in our namespace */
+> +static int disable_dad(char *ifname)
+> +{
+> +	char sysvar[] = "/proc/sys/net/ipv6/conf/%s/accept_dad";
+> +	char fname[IFNAMSIZ + sizeof(sysvar)];
+> +	int fd;
+> +
+> +	snprintf(fname, sizeof(fname), sysvar, ifname);
+> +	fd = open(fname, O_WRONLY);
+> +	if (fd == -1)
+> +		error(KSFT_FAIL, errno, "open accept_dad");
+> +	if (write(fd, "0", 1) != 1)
+> +		error(KSFT_FAIL, errno, "write accept_dad");
+> +
+> +	return close(fd);
+> +}
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
+Is this needed with loopback?
 
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
+> +int main(void)
+> +{
+> +	struct in6_addr addr = {
+> +		.s6_addr[15] = 0x01, /* ::1 */
+> +	};
+> +	struct sockaddr_in6 sa = {
+> +		.sin6_family = AF_INET6,
+> +		.sin6_addr = addr,
+> +		.sin6_port = 9      /* port 9/udp (DISCARD) */
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: kernel-6.18.clone3
+htons
 
-[1/4] copy_sighand: Handle architectures where sizeof(unsigned long) < sizeof(u64)
-      https://git.kernel.org/vfs/vfs/c/04ff48239f46
-[2/4] copy_process: pass clone_flags as u64 across calltree
-      https://git.kernel.org/vfs/vfs/c/5b38576cb8d3
-[3/4] arch: copy_thread: pass clone_flags as u64
-      https://git.kernel.org/vfs/vfs/c/04e760acd97f
-[4/4] nios2: implement architecture-specific portion of sys_clone3
-      https://git.kernel.org/vfs/vfs/c/d7109d2a2358
+> +	};
+> +	char buf[LARGER_THAN_MTU] = {0};
+
+That's a large stack allocation. static char?
+
+> +	ns_fd = setup();
+> +	s = socket(AF_INET6, SOCK_DGRAM, 0);
+> +send_again:
+> +	rc = sendmsg(s, &msg, 0);
+> +	if (rc == -1) {
+> +		/* if interface wasn't ready, try again */
+> +		if (errno == EADDRNOTAVAIL) {
+> +			usleep(1000);
+> +			goto send_again;
+> +		}
+> +		printf("[FAIL] sendmsg: %s\n", strerror(errno));
+> +	} else if (rc != LARGER_THAN_MTU) {
+> +		printf("[FAIL] sendmsg() returned %zi, expected %i\n", rc, LARGER_THAN_MTU);
+> +	} else {
+> +		printf("[PASS] sendmsg() returned %zi\n", rc);
+> +		err = KSFT_PASS;
+
+slight preference to just fail with error() in the two error cases and
+let the expected common path be linear and succeed:
+
+    if (rc == -1) {
+            if (..)
+                    goto send_again;
+            error(KSFT_FAIL, ..);
+    }
+    if (rc != LARGER_THAN_MTU) {
+            error(KSFT_FAIL, ..);
+    }
+
+    printf(..)
+    return KSFT_PASS;
+
+> +	}
+> +	close(s);
+> +	close(ns_fd);
+
+ns_fd is always -1. Check all system calls return values. Now that
+setup internally can fail with error() no need for return values at
+all.
+
+> +	return err;
+> +}
+> 
+> base-commit: 864ecc4a6dade82d3f70eab43dad0e277aa6fc78
+> -- 
+> 2.49.1
+> 
+
+
 
