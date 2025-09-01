@@ -1,114 +1,182 @@
-Return-Path: <netdev+bounces-218651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B62E8B3DC55
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 10:27:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4587DB3DC6C
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 10:32:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66705174220
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 08:27:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98CCD189D18A
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 08:33:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF8172F39BC;
-	Mon,  1 Sep 2025 08:27:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 371FE2F5485;
+	Mon,  1 Sep 2025 08:32:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="jRM9AHAH"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="IM3tWFGQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from gallant-hafgan.relay-egress.a.mail.umich.edu (relay-egress-host.us-east-2.a.mail.umich.edu [18.219.209.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2041.outbound.protection.outlook.com [40.107.237.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FE7C270553;
-	Mon,  1 Sep 2025 08:27:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.219.209.13
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756715266; cv=none; b=XMSN86H5Jzp9vBxA5rcyMtPbvFTXOAHC/yCL6yn44tp+p4CJBGnVAO29BtLYWSvZ+JqcEH4sV1Tj8gn7y7Lo1t03uMbWO/Ges/y+BSAzOTNf+V/ZzahZz66NzlRcUU8KIlsxa0UPnoIip45YYIrxzex8Z7czCa3NtHBm9I3vLbM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756715266; c=relaxed/simple;
-	bh=9P9+FyI8xq/2ozOIpwXHRDObXjdq2VmTxdKGBYuWN4A=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=PU9b8vZcx8T/SkFQNwlP/O75wfqvvyuuGA/FQ860yr8eQJqT4VJufS3FJz0YO5X4h5h+jnlQX1c6CYs1zNLjRQ2xXAvIthIzeKI3+qq3oXse1FaZQNafelgzvlEhNVlytklHpZGWOMbHWwRxUdNDCno18NCF4asdObEgGf6HaRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu; spf=pass smtp.mailfrom=umich.edu; dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b=jRM9AHAH; arc=none smtp.client-ip=18.219.209.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=umich.edu
-Received: from sizable-crocotta.authn-relay.a.mail.umich.edu (ip-10-0-73-123.us-east-2.compute.internal [10.0.73.123])
-	by gallant-hafgan.relay-egress.a.mail.umich.edu with ESMTPS
-	id 68B55870.24BB71E9.678B814A.35136;
-	Mon, 01 Sep 2025 04:25:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=umich.edu;
-	s=relay-1; t=1756715115;
-	bh=RZ3wqzNBJwv9fBwOlExW+J4uoepVcPqX6Z4vI7NvJiA=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To;
-	b=jRM9AHAH1zG121BBZRMcl32CDkAVErDEUIFFOCP3qjgfgCg5QKQ8kM9y+geuX6Bjt
-	 BqengFOs3GyTV0LdkjqmkwR1wJmshKaF5Q40mmfPeYFBgF6pnyydoTGuP3jbQyWrsB
-	 WRQoLGe7iqwuJhBaxqcNu80lJZYtEOBPZaUvIdekXOgL4Dkbr42bnCy2lEZMQDPdD1
-	 xlL+x9RwpeROp3JJPNle9p4XMZp5S2oYCCzPgzN6o53qVupWT1R6Y++Afjp9IiG35S
-	 JpYq7yc91HikpS1DTV2zUFQblhxWCj+8mB9vV1bAgMDpmLQDq+CcptZKZWWDkY1nv8
-	 PSC/0Tst8UwPg==
-Authentication-Results: sizable-crocotta.authn-relay.a.mail.umich.edu; 
-	iprev=fail policy.iprev=73.110.187.65 (Mismatch);
-	auth=pass smtp.auth=tmgross
-Received: from localhost (Mismatch [73.110.187.65])
-	by sizable-crocotta.authn-relay.a.mail.umich.edu with ESMTPSA
-	id 68B5586A.3089EBF7.6A2A8015.1374137;
-	Mon, 01 Sep 2025 04:25:15 -0400
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26DA2F83CB;
+	Mon,  1 Sep 2025 08:32:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756715568; cv=fail; b=te3WSts3hf1gpsbp33SyK6YlE0gfJMsEQwcTaWAm3PKmrccI20ghwNgKlhnA8DOzg5QsJc4sCmWAo1jQouBa1lG5A4FF4W7gHYavqsIPkWSj8mso5o+JzfrAox9hUFMUF6cxqL/GX0+gdOsQ4y0KUnvVXyA+BrjWjsXiZp4ZjyM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756715568; c=relaxed/simple;
+	bh=ton7y4gntSi0aipfWMlWK+wvbI8AgaYvfiC8E7bivPw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=R8egjbBx43II4bNGxeOkL5nKOc0eg7S93AhiQUMZPSTOj7Cty8IJ56ZhV4jd2zWuMF8JGkWLgdWpESS0Y22p/pSiR2/aRl55qjXrdJnQGBCFckt6dE1uHFaTreCDF8y8575JWcj3MZlG6ppzZ8wVtjQao6+T1dolqhTI6w/Ke4k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=IM3tWFGQ; arc=fail smtp.client-ip=40.107.237.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=zAExVu31DenjYm3O1UY3ayglgl4APQ+mJaa70pkcC89jGqvoyatKyZSmu3PNhlmh2vlqzHfZh9LclwILs0zmPeKJsAPKubZ0B6KG2ZbAg1yPkR2qmImeZSPtbZvZGfutzDLs8DBd9sEPsRMMfky53PW9PLLmAeE4Tj0AS1wSLR+GNjWkwfFygf7jecHPzTRE0eBo6JS7XLDn1qYTJthFrem30aKgKcAjHM97Mun9z3zBhR0IFw3JIsyb6jiH7xfB88SpQYa1TmQVCHT4lzk7/yw0nMYL4PMIeFn5JFs8MbxD3zNpdS5xs84dx9dUfvS1UI4xA3ZQ6LarDsXg7At6mA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Fc6T0wOoNtpvBqTIkqsWD/uLuNaDdJ4h/kJhPq0Q+7Y=;
+ b=zQG0WUN8YZgVd7OYxYcqOQmPXjRLQMpEPp498k8d+VSU1r2q9HSYrhULA2PN0pzWxlBYn41L+NPcO3jlTrnucu52TSUjBEyYtthWvWK2J8Uh2N7++S8F4cMymL/feQhJbSXinxNig4rUoybH1wP0gpsPV4tzMmNf98DkyRhvNEtCSPbHzD3J69cSR6U0dh7PGal2rAlqsrq3U9m5zT7+qZIotknUOXMluKN7tFV9zQ33ypUGpb2ZwyXk/6NsV1F1olvzwqou5i2S/4OVQOvXBMzt20kj6Ud2CdEfud6ACyWas6v9Ah/T3n811D11Rys058yZQYf40goZYlgElk4s6Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Fc6T0wOoNtpvBqTIkqsWD/uLuNaDdJ4h/kJhPq0Q+7Y=;
+ b=IM3tWFGQG6mt0ZBpM7+Lrm2+3kjN5TLyUOcdfU0Q2vD28rj2+jvLya428ihQlYfdYJFmyWRjBkiBGThLfHv4BGQdsTHDG5DsKPtyLVY3Vuqs6C63Y4wDdKlQitqMtHa3vSz/xhsBuqRn1dOGdir4LA/8fFu2kXmGyA2XUdlLVZ7Wgtom7dBiLIp/iq/uO23kDxJbRoaKELPZNjMUzF8I00Kr7IJbEmPAAFiuSS0v3jpU/0nVFOwJ1gtWJlK8re/TwEet6//gWbaL0vueg90jFPzUEv+9+XcJd9Hj2MmtltZm41Z66CrctFniWzd/XlAuoatYDCfWiCMEnThKQqdCqw==
+Received: from CH0P221CA0007.NAMP221.PROD.OUTLOOK.COM (2603:10b6:610:11c::23)
+ by LV8PR12MB9450.namprd12.prod.outlook.com (2603:10b6:408:202::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.21; Mon, 1 Sep
+ 2025 08:32:44 +0000
+Received: from CH1PEPF0000AD80.namprd04.prod.outlook.com
+ (2603:10b6:610:11c:cafe::8f) by CH0P221CA0007.outlook.office365.com
+ (2603:10b6:610:11c::23) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9073.27 via Frontend Transport; Mon,
+ 1 Sep 2025 08:32:43 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CH1PEPF0000AD80.mail.protection.outlook.com (10.167.244.90) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9094.14 via Frontend Transport; Mon, 1 Sep 2025 08:32:43 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Mon, 1 Sep
+ 2025 01:32:25 -0700
+Received: from shredder.nvidia.com (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Mon, 1 Sep
+ 2025 01:32:22 -0700
+From: Ido Schimmel <idosch@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <horms@kernel.org>, <paul@paul-moore.com>,
+	<dsahern@kernel.org>, <petrm@nvidia.com>,
+	<linux-security-module@vger.kernel.org>, Ido Schimmel <idosch@nvidia.com>
+Subject: [PATCH net-next 0/8] ipv4: icmp: Fix source IP derivation in presence of VRFs
+Date: Mon, 1 Sep 2025 11:30:19 +0300
+Message-ID: <20250901083027.183468-1-idosch@nvidia.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 01 Sep 2025 03:25:10 -0500
-Message-Id: <DCHBJ8PJ79FK.B4J91QH6FC7B@umich.edu>
-Cc: <fujita.tomonori@gmail.com>, <tmgross@umich.edu>, <ojeda@kernel.org>,
- <alex.gaynor@gmail.com>, <boqun.feng@gmail.com>, <gary@garyguo.net>,
- <bjorn3_gh@protonmail.com>, <lossin@kernel.org>, <a.hindborg@kernel.org>,
- <aliceryhl@google.com>, <dakr@kernel.org>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] rust: phy: use to_result for error handling
-From: "Trevor Gross" <tmgross@umich.edu>
-To: =?utf-8?q?Onur_=C3=96zkan?= <work@onurozkan.dev>,
- <rust-for-linux@vger.kernel.org>
-X-Mailer: aerc 0.21.0
-References: <20250821091235.800-1-work@onurozkan.dev>
-In-Reply-To: <20250821091235.800-1-work@onurozkan.dev>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD80:EE_|LV8PR12MB9450:EE_
+X-MS-Office365-Filtering-Correlation-Id: 93b1b055-593d-4f41-6745-08dde9321f1c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?/ZrthJ0m54Xdh1PAtEnIcvnrGDms3oAh5FORhgsqolaMpq2icg7m8JyVR/r5?=
+ =?us-ascii?Q?vehycymeGZHZp2OsJXsGL6bNAc/M93kpio3Z7/Wm4IwkD2fscne4eF4Qnas9?=
+ =?us-ascii?Q?Q+hhAp5Y9d1FAzuaLx+wf6c+xN1B3NiOnPKCqySyR86I6nZSyuEPM944hRXG?=
+ =?us-ascii?Q?wSRJQLSmm8G5rpeF5msISQneHx6WCIfuSiqxzh+wKaah87KaqtoI1kTodlYF?=
+ =?us-ascii?Q?ty0RThg3bBr5i0aC14AEpzV3sZSqppQLiZjZVseB296WVNSD186935vUiWAc?=
+ =?us-ascii?Q?z4EUL2JtdRqxiaAOsEE0MLsrDwjVp0YyZqpJcflZCjq2eeTBuwNKZaAg9KMC?=
+ =?us-ascii?Q?vdwCxbrRe+8TH9T+Iy8WKcv1tni8I2euhfso4gA97hYmyad2HT90YQ8qPqoJ?=
+ =?us-ascii?Q?qAdw+3hudJrLxEeKvhud5zDY2ZZ7EFVuTT+3nmpDUErcInYAs7Ra8DHcR+IS?=
+ =?us-ascii?Q?gV5tFG+d9+b2x4dvBactSmCmJ+DcdgWwHlLkdx9kFIR2b/XCRZ960lAIK2SC?=
+ =?us-ascii?Q?8jIj+9nnzfl/O3cKUjZZkNXNjK75JQthjHsITzwpyT5BnNhwhXBS0jxNVYY/?=
+ =?us-ascii?Q?RO6uqiD3rsI+jKvOrU8Gmg1Ho5L1hQuF/faWmZJwx6ICzH/nfngjkmKtHlZ0?=
+ =?us-ascii?Q?8g0Yw7kBClBvdCKdzmMzD99W9hVwMkQaQCvS6JM8FZdJ+AjX1hb/obPMMWyX?=
+ =?us-ascii?Q?wX8seCWw3EmA+NqKu0Xza4779wDWG3qI/SF7S5WfL45QL47kbYL0aDfd+BQs?=
+ =?us-ascii?Q?khWmMN7BtNJjjPPs0utdDlevGTnKOokjQuSSUDwSBCZqFvMfA3rOPyJWKD/9?=
+ =?us-ascii?Q?kV36p6Zsez8SvwwgchQcvm8gByR3DI+XTN03fnAbPivZervy+gKPBgefF9uB?=
+ =?us-ascii?Q?MLECRS4srIvc+wBS4qZ8E173SMO0GHLW2tUXtAOWqkWg+8l0xLvN9buIeRmF?=
+ =?us-ascii?Q?5g94K0sqso0EM0hGZ8dzhxzpESrQjZui4JjW63DaahVBCGlw9xT3XispJW7R?=
+ =?us-ascii?Q?ni1J/Zm4AtfofTYLsbLSc5HQ1POLsE/o17sq5vxp0EldmMtoNJdKABFCrpdy?=
+ =?us-ascii?Q?e/S5aNUJacENmskmeNLskhTxJ/cmnkMtOjS1oA/tdSCEFfOSZqtlppiPaW8j?=
+ =?us-ascii?Q?Lb4LRlwnWEDwGMwWfQMDEhhhA8ZwfPqKRUjnH9rzSKmjjmeMv1IhzUnfy2xr?=
+ =?us-ascii?Q?YxAYrRe0Dzo7CB+13+P5g17wgefChW6LBDHpXrfIkuG8maezNBZHpmeTg37r?=
+ =?us-ascii?Q?LSGryb9wELYD5p7uq83M/pmiYk4xI/HTl8UnuxqpFz5bFtAEzQEG6Wce5eW4?=
+ =?us-ascii?Q?TpphFBZn9RlEZd3VGJmAfgAgZc51MLtenCkdyN4sWI2vUcChvTyK2Jin+L8V?=
+ =?us-ascii?Q?SkLPUJpLTdszHRbf8ZMUppOe8Vss3S/itJCxmOKEebN/XMMoIsRDRRSIIW+N?=
+ =?us-ascii?Q?hdbh1OFWfgozgbh77OL4wy9FrqgVSovsyEWIhJEtLQ7jffLPD78LtkWDV5dU?=
+ =?us-ascii?Q?uy3w3HI8RUMdc+Sftw7T/YAJP6gsKf2ZXfPq?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2025 08:32:43.4451
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 93b1b055-593d-4f41-6745-08dde9321f1c
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH1PEPF0000AD80.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9450
 
-On Thu Aug 21, 2025 at 4:12 AM CDT, Onur =C3=96zkan wrote:
-> Simplifies error handling by replacing the manual check
-> of the return value with the `to_result` helper.
->
-> Signed-off-by: Onur =C3=96zkan <work@onurozkan.dev>
+Align IPv4 with IPv6 and in the presence of VRFs generate ICMP error
+messages with a source IP that is derived from the receiving interface
+and not from its VRF master. This is especially important when the error
+messages are "Time Exceeded" messages as it means that utilities like
+traceroute will show an incorrect packet path.
 
-Reviewed-by: Trevor Gross <tmgross@umich.edu>
+Patches #1-#2 are preparations.
 
-> ---
->  rust/kernel/net/phy.rs | 7 ++-----
->  1 file changed, 2 insertions(+), 5 deletions(-)
->
-> diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
-> index 7de5cc7a0eee..c895582cd624 100644
-> --- a/rust/kernel/net/phy.rs
-> +++ b/rust/kernel/net/phy.rs
-> @@ -196,11 +196,8 @@ pub fn read_paged(&mut self, page: u16, regnum: u16)=
- -> Result<u16> {
->          // SAFETY: `phydev` is pointing to a valid object by the type in=
-variant of `Self`.
->          // So it's just an FFI call.
->          let ret =3D unsafe { bindings::phy_read_paged(phydev, page.into(=
-), regnum.into()) };
-> -        if ret < 0 {
-> -            Err(Error::from_errno(ret))
-> -        } else {
-> -            Ok(ret as u16)
-> -        }
-> +
-> +        to_result(ret).map(|()| ret as u16)
->      }
->
->      /// Resolves the advertisements into PHY settings.
-> --
-> 2.50.0
+Patch #3 is the actual change.
+
+Patches #4-#7 make small improvements in the existing traceroute test.
+
+Patch #8 extends the traceroute test with VRF test cases for both IPv4
+and IPv6.
+
+Ido Schimmel (8):
+  ipv4: cipso: Simplify IP options handling in cipso_v4_error()
+  ipv4: icmp: Pass IPv4 control block structure as an argument to
+    __icmp_send()
+  ipv4: icmp: Fix source IP derivation in presence of VRFs
+  selftests: traceroute: Return correct value on failure
+  selftests: traceroute: Use require_command()
+  selftests: traceroute: Reword comment
+  selftests: traceroute: Test traceroute with different source IPs
+  selftests: traceroute: Add VRF tests
+
+ include/net/icmp.h                        |  10 +-
+ net/ipv4/cipso_ipv4.c                     |  13 +-
+ net/ipv4/icmp.c                           |  15 +-
+ net/ipv4/route.c                          |  10 +-
+ tools/testing/selftests/net/traceroute.sh | 250 ++++++++++++++++++----
+ 5 files changed, 229 insertions(+), 69 deletions(-)
+
+-- 
+2.51.0
 
 
