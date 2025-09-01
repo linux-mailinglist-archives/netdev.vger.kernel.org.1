@@ -1,74 +1,94 @@
-Return-Path: <netdev+bounces-218874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4E00B3EEA7
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 21:47:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37988B3EEE7
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 21:52:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE5594859CC
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 19:47:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11190164A78
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 19:52:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 933CF342C90;
-	Mon,  1 Sep 2025 19:46:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E01852673B7;
+	Mon,  1 Sep 2025 19:50:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NxvEDCAN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M8QW6LJW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66BEE341ACB;
-	Mon,  1 Sep 2025 19:46:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B602C265296;
+	Mon,  1 Sep 2025 19:50:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756755977; cv=none; b=KYbghHtczhzeGzaZ8uRY85GC35AFmtSKh5trtmrzDhtpjsLAFNz5cGhGX5mdqdBOTPFqmJ5PwGlV3zjEG8vEDnz/+mNY2qzm+UD2e5UzNKevDHkPNV/8VlIQE97DC1lixd15okJSNBrwl7k6Zc/7AkFYiHwTgank7u+VRYG4SM4=
+	t=1756756201; cv=none; b=JxxtYNd4YlEWfwWqtlk7iRyW6D8pydX/Cn2a28QwyYpeOB4z9e+YvAvqCkg5vanDNSMEK9n3uKLBQ+PSYPY0O9pLtWsd3+V5UyREXof9IY+Se9BsMFZgesGdal5L4Rvf9xCPJ5i/WYPOCkovYX7gPSPuxujddgrvjvXw1j+DXaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756755977; c=relaxed/simple;
-	bh=ZRakmcIHvH3f1B8RfyE9ZrQBrbqMERiw45E9xr2Ei08=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=n7VqFspuP++1IDD+1Ssg80hvr36L7XMZeeVi528LqTp/1Sd7Vdq3SJjrRitjghlrLuYUfm6Gg+enhDpEyVW8cusshuYt1NMEAhodEPD/BH+uOheQJobz9IXymsA8ZzCSF74Cxsg+RyratNElJsT+4jXVBNHtQaGoavXcdCkgzxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NxvEDCAN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82A71C4CEF0;
-	Mon,  1 Sep 2025 19:46:16 +0000 (UTC)
+	s=arc-20240116; t=1756756201; c=relaxed/simple;
+	bh=PH5C9EiZfSyUfFA7TKYuIcM8KcPn1PtOBL90zzIyN9w=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=kgnrOCjoTJbUwgKbRu0EmYiW0ZyRbBSLYr0BXY1Y6uuUhspN2v6vqeIi2BEf6Cr0G3qLkcFoQR2AeBjD2zgvHXge8iJ5DVGETqzFcyIeEgxLpLKr1fmDZZI2Zx0hjKFimmR/Nchq84qR5Q7malVdcAE6FIXI6BaIPCuU+kBiBHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M8QW6LJW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BC26C4CEF8;
+	Mon,  1 Sep 2025 19:50:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756755977;
-	bh=ZRakmcIHvH3f1B8RfyE9ZrQBrbqMERiw45E9xr2Ei08=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NxvEDCANFCg4HqSlMCXmTgHyHef+ufLbqMwojmG4GVg61BL79pZ2hr/Uc3txc3o25
-	 EJTn1olTO/roupsUd88oHI3D5SwwjZgoFMIO2mcLloKeWMWdd3AI+wQj8Xq0Li6Q5s
-	 pwUq6BFEf1eQoXCnx0awGWsjqdygTLqaygHYkd+6xJf/Htc9dQ0CJ+3YbJtT+BE3IU
-	 gozEuxkChZdv8fOYr99iJJ3fSplcr+xryzKYHYjrkfWy9GA2w8C05MrDGxUMgQGbpH
-	 PITutXYblzBzhcCEUgcz+WupY261tAm5F3h5mQnxql4Uq6zV0S65TjoGJKGDu8ZvWM
-	 LC7CklprNex6Q==
-Date: Mon, 1 Sep 2025 12:46:15 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
- <linux@armlinux.org.uk>, Helmut Buchsbaum <helmut.buchsbaum@gmail.com>,
- linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: dsa: ks8995: Fix some error handling path in
- ks8995_probe()
-Message-ID: <20250901124615.10afb6a0@kernel.org>
-In-Reply-To: <95be5a0c504611263952d850124f053fd6204e94.1756573982.git.christophe.jaillet@wanadoo.fr>
-References: <95be5a0c504611263952d850124f053fd6204e94.1756573982.git.christophe.jaillet@wanadoo.fr>
+	s=k20201202; t=1756756200;
+	bh=PH5C9EiZfSyUfFA7TKYuIcM8KcPn1PtOBL90zzIyN9w=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=M8QW6LJW9LYuEQalpWIfEPkeFYH1wO8QhfKNQ5OeuqKndGsZXGHj8JBNh+RLDeQK8
+	 98ZjkRudFfzr2GhI2xl7MHFA6WgJMlOai+bzzgMKvXk45Scey/e/RwEAB7rM03U8zp
+	 ohZgJH1p2TcThROmklvgpAAIIMS4OSOC2EqbM49uz5JiKmp/yKFFM6amBaR8r227oB
+	 NWL/AvF/hh++yKl/iK0KY1OQDvrOFaoGLdIWHz8yreLIo4pEvioWphWCvhI9kRl11P
+	 PviWs5u+MptUPzo6OYLwTrUlQnuyXOhJmpqezy4Y4oGEIiRg2LPmaTzLluN7n+jJbW
+	 JTZOs6Zpn2MBQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34076383BF4E;
+	Mon,  1 Sep 2025 19:50:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] selftests: drv-net: csum: fix interface name for
+ remote
+ host
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175675620600.3865350.17841786952688569650.git-patchwork-notify@kernel.org>
+Date: Mon, 01 Sep 2025 19:50:06 +0000
+References: <20250830183842.688935-1-kuba@kernel.org>
+In-Reply-To: <20250830183842.688935-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
+ willemb@google.com, linux-kselftest@vger.kernel.org, petrm@nvidia.com
 
-On Sat, 30 Aug 2025 19:13:59 +0200 Christophe JAILLET wrote:
-> drivers/net/dsa/ks8995.c
+Hello:
 
-This file got renamed from drivers/net/phy/spi_ks8995.c in net-next,
-this needs to be regenerated against the real net tree.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sat, 30 Aug 2025 11:38:42 -0700 you wrote:
+> Use cfg.remote_ifname for arguments of remote command.
+> Without this UDP tests fail in NIPA where local interface
+> is called enp1s0 and remote enp0s4.
+> 
+> Fixes: 1d0dc857b5d8 ("selftests: drv-net: add checksum tests")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] selftests: drv-net: csum: fix interface name for remote host
+    https://git.kernel.org/netdev/net/c/49c2502b5946
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
