@@ -1,117 +1,151 @@
-Return-Path: <netdev+bounces-218596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FC02B3D6CB
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 04:47:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 170E0B3D6F2
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 05:05:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 972AA7A9566
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 02:46:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BB341897F34
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 03:05:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8AA91DE3C7;
-	Mon,  1 Sep 2025 02:47:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B0251FBEB9;
+	Mon,  1 Sep 2025 03:05:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bMdx5eRl"
+	dkim=pass (2048-bit key) header.d=fastmail.com header.i=@fastmail.com header.b="gCigEEZJ";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="h/XLzxOS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 460981A0BE0;
-	Mon,  1 Sep 2025 02:47:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B20A1E1E16;
+	Mon,  1 Sep 2025 03:05:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756694865; cv=none; b=vDaSgVzlDbrf+7RAtE3dz1Y++0o+/dnbmv67fnzN+thznlzLjTH/8kTzsEsV/rXgFtqIwXfTKLYtwAemG4uXOsb4vxmDTWS1/VzY1IG+6GjaVtD3PLH5iXGuNDRXMpqJ2b65VpHvocTN/3d1nU4M4+aUDd2hRwpvznQPr1fK3yE=
+	t=1756695925; cv=none; b=qJP2JDcu2UsdJZBk35wS9KyAffgEEMoSq5D8dyti/4fRbBil1PGHQ7DWr1OQwAIl5gVrDb+IjQMqJ4Y52RSlfvX6hGyUvBM6i4FvI14XWzbcL0cA6pYdhjz3ExnI7aV+RQU1TzF6wzppnuTB0nLr1KSOOpPVIRdWk7uT5Xk5pYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756694865; c=relaxed/simple;
-	bh=rxZr/LcE7mUoqfWVuzgUn17kyp83T4elClPnRt0j/t0=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=msjh/xxeawDDUchIpmjZtS/hpJ6hkOZc05quQ9PUFBNO0mYb7DThekMXkdELvqx5oXG6HcnS+CO7OH1Twx4ce3qy67ksLiKGCKHMC72tWeHaUCkOi2XiHCEAkDyD6976IxivvYVVLdpqINn/0W43VXXV/Lr7QrytPjuBFn2f53A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bMdx5eRl; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4b320c1353dso19828851cf.1;
-        Sun, 31 Aug 2025 19:47:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756694863; x=1757299663; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=oZYiCjncPBOCZL5vVyQngckkkRakO4ayJSf8550Lyuw=;
-        b=bMdx5eRl0SgU750dvM5B1N+P8CwEVTPjnmbXjuzWMI+AAU2xLdyRmqRgzklC1Xvm2H
-         hhBlrWbZOY4sGHY8DWxzHb/gP/0bocSpAyCW6NlYAWopQo++QeQPr4XZBwIGLEn8B2An
-         6hreuWdU6d1015S+nc8oZLWTalbI4H+k66gyxeiOo/VoMyK01JjYfraOcbgdvEttHQFd
-         qiUhc8VYWwLIm+CaSLFQInWb6Q/UG6JBazQFxbVDI6V1LMJmHzvgbEScrL4Geb+/78pQ
-         z8acQra/scB3t2NLU7lqOZy2Neyn7ilAiKs1ADXZ057NkSFQ9ZVX5aYF6OghTuBNOPcK
-         IPaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756694863; x=1757299663;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oZYiCjncPBOCZL5vVyQngckkkRakO4ayJSf8550Lyuw=;
-        b=USIqQoBuIBB5zhz0GslmRQsAe5YgQCJAUS8a/NW9vlYmJ7ztfoWmAqngk2RFwsBReP
-         0GJe06gTlrte++d1pQr0L9pm2STy6nHIAauCYyDkLTmP2L3wJOE/dQHgoAJ+sIDhQ/ge
-         C8z1ja2/mCiM+6HSLVCyuHetB2wLPNiey6p6vkroujpruR0XN2cDouC5rrKpoZeVBkm0
-         fYqn51cUm21JZ3F1TRgvpHdwnQD1i4jRMtQkpG6U8ucDHwE/7z+ewsgaj8GqfeuHSLDy
-         5pS939aVuso8b3iIhkWXeUy7hHR4ecy3hQvugEWhRWouX1b+lZKi9oRNyVXXcbSp46iR
-         HUrw==
-X-Forwarded-Encrypted: i=1; AJvYcCVzEPM1L3KlE7RfWEsFkDYf1VHYYvKVHWplrsHEorzDTrulXSfPK7HYx3pU8WRjILtyjMk3fD78J/kvhw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxS0Di9Gc5BWEOuaOsWx89nFE/7567zHVKNumYaCMATdKlzgy10
-	mls7FmZ7RUa6N0jCjItezydT7jtVCwUcokILHBWFZ+hdmJBdF+Aq5Mu7FPfmgumPpwLw0XV45nQ
-	9byYOjQIjY11ZUn2059caly02veuCWvO6PB3f
-X-Gm-Gg: ASbGnctRs5sOwYxQcnIzOTYr/UDVT11aok8YNC+Ancp8r8uIN0GWyimDR8dARp8a6Co
-	n2x3it5Kp2ahy3oHfThNRbpaf5ueDoZu87SuEMS8+lHIj/WQJ+xTJ/VtLP+nzJHxx2QXAqA8oKd
-	GTAcQyIdRU9D50nJgfhNU/9CtDeaKoAoOZ72h2LMWAqfiBi1GtmksW+g6l/73wm9NSwpvaZQ3If
-	ARsXGPaFtT2NOoUrQ==
-X-Google-Smtp-Source: AGHT+IHXzXAlKqknR7kubGUYqfXblADyqMfalPcwqRqHW29E6ncagvwr7bLO51jOlizKaUogiwo9dSOgT9qhm/58z2o=
-X-Received: by 2002:ac8:7d51:0:b0:4b1:dd3:e3a0 with SMTP id
- d75a77b69052e-4b31dd23cf1mr74235981cf.63.1756694862825; Sun, 31 Aug 2025
- 19:47:42 -0700 (PDT)
+	s=arc-20240116; t=1756695925; c=relaxed/simple;
+	bh=6ZqVjz11T6NgHRoxkP0c/fthAyB+tP5UMnSLs6XUddg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VT/vjQ+Mn7X2FMUT4zI//IzAlpQ336Fug/PdrkZF24CQbrxlKN4MMA3AAO9pNIZeSAsA7TlGVjZG52/UDSi5fPKQPXbVy/3a/e8U05CN/EBnYgeU60BSTw2PQuKJF9IyaOa2dOhTh4O7/+K7VKYxCxNXmXKiC5GiM5MOJ/bnNrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.com; spf=pass smtp.mailfrom=fastmail.com; dkim=pass (2048-bit key) header.d=fastmail.com header.i=@fastmail.com header.b=gCigEEZJ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=h/XLzxOS; arc=none smtp.client-ip=103.168.172.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.com
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfout.phl.internal (Postfix) with ESMTP id 32517EC03F0;
+	Sun, 31 Aug 2025 23:05:22 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-10.internal (MEProxy); Sun, 31 Aug 2025 23:05:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm1; t=1756695922; x=1756782322; bh=HCVb74up17CQJGagrHKdC
+	3DaQ/TG9d4iRUnKKTAPwTk=; b=gCigEEZJ9txQmMk1WQ1nPaOM+Kg8gc82UBV6K
+	5wSiiuxhdU5+ZUfgRKqEvh2nRCqMi0ZLshIeBtPFr46VnDJVW3PYFSxsNB3wXFC2
+	oPnrflq0qvAm1kwEsCgCXOsggyYUShta69WgNryjYK2a2x0HhqzCx4Auxu5DoJXX
+	NJc2aPHCbhOcOKzd72j73pjTZA8dGWd8eIab5TbRvnYxUHmZjEAMigyJvjrV8Kz4
+	vZYl7xiWpyCZ2s4WhZI3kd1mKWAFXg/VTxDlak5qSXFithSzNNYSRMjXCmp8sqvD
+	9NcWZUciz9bw/NtAOe/gusspMULuiPWN28UV39aB8pU3d38Iw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1756695922; x=1756782322; bh=HCVb74up17CQJGagrHKdC3DaQ/TG9d4iRUn
+	KKTAPwTk=; b=h/XLzxOSFqwKkhwyEzMp7gF5ruYfgW77ntEx8p9zNNzGbadNYx1
+	ubjVc7dEY0pyjTdAMOLEsWuwTNbMBmW43yfEYR0ged4OdCeFH2lY+rjtcgRmEQXw
+	li3K+0OplHkuNcoqbhiqBx5AzMDMU2+1SiaRpcjyxEFOIjSTWawszrVNrWoyCKjH
+	CVD3D9N72Na4JNitUsYiULBXMtPsWnpXcHSGCHA9LfKl32BbJH15BN1Vj5WPYZe4
+	ON2FDM+B0kNmOEKU6GDjHZ5XGf8FGce+Wrd6OAtrXfxFjxn6NXWcLemI1eMQhnkO
+	aMovwsJk3ppHbkXo+4YcH7+Uf6PN05cwQNQ==
+X-ME-Sender: <xms:cA21aPuNPLkcp0dd3hVdBc7PJlTLFFrbQoKPqw47VtZS1SmI2madEA>
+    <xme:cA21aFeT4Rkj5A4vuPUg50Enab4-AnQqZFftCnsBIivfTKH8eNL4qYhN7pPJUw40Y
+    fL_Oxmvp1cLaL6pnpY>
+X-ME-Received: <xmr:cA21aDqtDBFatsAoZjS9jqhlrQgt5E-LEcqXehoj_gFcoa4pQb3heduG9mR0-GbbF7CKexg0DA9oAgWi4yZCuayvOV4qQMpLOG03DKMYd2baV1vD>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdduledutddvucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucenucfjughrpefhvfevufffkffoggfgsedtkeertdertd
+    dtnecuhfhrohhmpeflrghmvghsucfhlhhofigvrhhsuceosgholhgurdiiohhnvgdvfeej
+    feesfhgrshhtmhgrihhlrdgtohhmqeenucggtffrrghtthgvrhhnpeeitdetffdutdfhve
+    dtvdejkefglefgvdeiveduffdvgfeifeeiveejteeitdegkeenucffohhmrghinhepthgv
+    shhtvggurdhnvghtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilh
+    hfrhhomhepsgholhgurdiiohhnvgdvfeejfeesfhgrshhtmhgrihhlrdgtohhmpdhnsggp
+    rhgtphhtthhopeduledpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghlihgsuh
+    gurgeslhhinhhugidrrghlihgsrggsrgdrtghomhdprhgtphhtthhopeguuhhsthdrlhhi
+    sehlihhnuhigrdgrlhhisggrsggrrdgtohhmpdhrtghpthhtohepshhiughrrgihrgeslh
+    hinhhugidrihgsmhdrtghomhdprhgtphhtthhopeifvghnjhhirgeslhhinhhugidrihgs
+    mhdrtghomhdprhgtphhtthhopehmjhgrmhgsihhgiheslhhinhhugidrihgsmhdrtghomh
+    dprhgtphhtthhopehtohhnhihluheslhhinhhugidrrghlihgsrggsrgdrtghomhdprhgt
+    phhtthhopehguhifvghnsehlihhnuhigrdgrlhhisggrsggrrdgtohhmpdhrtghpthhtoh
+    epuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigv
+    thesghhoohhglhgvrdgtohhm
+X-ME-Proxy: <xmx:cA21aD8hPnjoG5-ONPi5VTbNz5YAY36JtjlRHWUppVnIeqmw551cTA>
+    <xmx:cA21aM4Yn2JTQqvPofaLSy5jgdp0JD2abqnfMvRlj0_QT7ZNV-wfCQ>
+    <xmx:cA21aFgcpmdqKUGtVOfeCS2QpyCWOkGl434aux6_RgDvnT_ZoC45Kg>
+    <xmx:cA21aLooGuZy4BBQM-uUUpdHIB3kvNHAJOCaGY9ulW2scw3_PqYpAw>
+    <xmx:cg21aJ9PVN8FdO1UP3_2CFFk0NH78iUkq8VCIvu3Vw6mdtVCfKSbz3E7>
+Feedback-ID: ibd7e4881:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 31 Aug 2025 23:05:17 -0400 (EDT)
+From: James Flowers <bold.zone2373@fastmail.com>
+To: alibuda@linux.alibaba.com,
+	dust.li@linux.alibaba.com,
+	sidraya@linux.ibm.com,
+	wenjia@linux.ibm.com,
+	mjambigi@linux.ibm.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	skhan@linuxfoundation.org
+Cc: James Flowers <bold.zone2373@fastmail.com>,
+	linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kernel-mentees@lists.linux.dev
+Subject: [PATCH v2] net/smc: Replace use of strncpy on NUL-terminated string with strscpy
+Date: Sun, 31 Aug 2025 20:04:59 -0700
+Message-ID: <20250901030512.80099-1-bold.zone2373@fastmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Vincent Li <vincent.mc.li@gmail.com>
-Date: Sun, 31 Aug 2025 19:47:30 -0700
-X-Gm-Features: Ac12FXxAkBGzgJL6wXci8JirS0KlZnqs7A_RgrHcMn8mLb0FUKeEL18G77Af9kY
-Message-ID: <CAK3+h2wLLoVW_daqow_ygbut=KnDkPbvG_C8rOoyaiyFMnrPLg@mail.gmail.com>
-Subject: [BUG?] driver stmmac reports page_pool_release_retry() stalled pool
- shutdown every minute
-To: netdev@vger.kernel.org, xdp-newbies@vger.kernel.org, 
-	loongarch@lists.linux.dev
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Huacai Chen <chenhuacai@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hi,
+strncpy is deprecated for use on NUL-terminated strings, as indicated in
+Documentation/process/deprecated.rst. strncpy NUL-pads the destination
+buffer and doesn't guarantee the destination buffer will be NUL
+terminated.
 
-I noticed once I attached a XDP program to a dwmac-loongson-pci
-network device on a loongarch PC, the kernel logs stalled pool message
-below every minute, it seems  not to affect network traffic though. it
-does not seem to be architecture dependent, so I decided to report
-this to netdev and XDP mailing list in case there is a bug in stmmac
-related network device with XDP.
+Signed-off-by: James Flowers <bold.zone2373@fastmail.com>
+---
+V1 -> V2: Replaced with two argument version of strscpy
+Note: this has only been compile tested.
 
-xdp-filter load green0
+ net/smc/smc_pnet.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Aug 31 19:19:06 loongfire kernel: [200871.855044] dwmac-loongson-pci
-0000:00:03.0 green0: Register MEM_TYPE_PAGE_POOL RxQ-0
-Aug 31 19:19:07 loongfire kernel: [200872.810587]
-page_pool_release_retry() stalled pool shutdown: id 9, 1 inflight
-200399 sec
-Aug 31 19:20:07 loongfire kernel: [200933.226488]
-page_pool_release_retry() stalled pool shutdown: id 9, 1 inflight
-200460 sec
-Aug 31 19:21:08 loongfire kernel: [200993.642391]
-page_pool_release_retry() stalled pool shutdown: id 9, 1 inflight
-200520 sec
-Aug 31 19:22:08 loongfire kernel: [201054.058292]
-page_pool_release_retry() stalled pool shutdown: id 9, 1 inflight
-200581 sec
+diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
+index 76ad29e31d60..b90337f86e83 100644
+--- a/net/smc/smc_pnet.c
++++ b/net/smc/smc_pnet.c
+@@ -450,7 +450,7 @@ static int smc_pnet_add_ib(struct smc_pnettable *pnettable, char *ib_name,
+ 		return -ENOMEM;
+ 	new_pe->type = SMC_PNET_IB;
+ 	memcpy(new_pe->pnet_name, pnet_name, SMC_MAX_PNETID_LEN);
+-	strncpy(new_pe->ib_name, ib_name, IB_DEVICE_NAME_MAX);
++	strscpy(new_pe->ib_name, ib_name);
+ 	new_pe->ib_port = ib_port;
+ 
+ 	new_ibdev = true;
+-- 
+2.50.1
 
-Thanks!
-
-Vincent
 
