@@ -1,177 +1,107 @@
-Return-Path: <netdev+bounces-218635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D862BB3DB44
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 09:39:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36AA8B3DB5E
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 09:46:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C13C37A2BD7
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 07:38:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5C173A2A60
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 07:46:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DD5526F2AF;
-	Mon,  1 Sep 2025 07:39:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C67D2E7BB4;
+	Mon,  1 Sep 2025 07:46:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zrKRSQKl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7AD626CE22
-	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 07:39:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14F842E763A
+	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 07:46:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756712372; cv=none; b=jo+5BwQA/vyHjdoui6SrUnbOic/kg3dLZsa1ryvV4DhBxRmNm2uBbpghBODFbUOL1q4vDDdZ9N96WKHfXH1yRdhflZNwwSZrljD33bUosqRU1YIw4h8yf0641X+TYKq1lv29M0+KCvu4vGxp6bmhjwix4H36/OhyZNue1hUrBug=
+	t=1756712788; cv=none; b=WktPmidD16Xbx7gAOTWQnZBVNDiL6z7SEJ4N7ZlcDWh0DNaT5rZuumM0T48zxMHjty4jvWKJkXvPtwHbBXmQ41VTH/H3Zi28atW6rcdx4aLtIjbrONiJ+G8vXr3Z/JK7a/ntgO5/Ncr3Y+TrFG5f2g5GgBXRWWgj4+j8PwEBZsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756712372; c=relaxed/simple;
-	bh=FTzIgiP3NWc0dlW9Txm2qr8tfvqG8X7BrIPcMJvgcVU=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=I9qs0q+2PtKi8KechD65HfPRbZh9+IWJqxde3IZHGytsoBadKLS6QZeKNbKMSHceyFFN6GW71fmN9yn+C7o5eEFlDoDfC4UzfdGIQ1OTocQVziIbkIlSyotm+086Tnz1tMXF1R8nCpilUlh2+9NZGg3aPWUBDRGQSUiN7s0BlpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3f2a2b1357cso76811855ab.0
-        for <netdev@vger.kernel.org>; Mon, 01 Sep 2025 00:39:30 -0700 (PDT)
+	s=arc-20240116; t=1756712788; c=relaxed/simple;
+	bh=yVqPrnaKEVvZZucDjrJTxx1dp8L1AOneu664tqAFLSI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=r0k3Y96BiC/vaxA2BDJKWNnXGNpRR5zaE2euJc6d/7I9RI+OWhgnLAF8wMRr3xSh+Acqth74llChRhkaCcPCd2nhmuYuJX+OEP5056alD/wD+9f4rHmAn7NKzYpI9FlRE/JxYVwTeOXOJdfwMrGv1wWErOBnZ7kfNySJdnkI6IQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zrKRSQKl; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7e872c3a0d5so411103585a.2
+        for <netdev@vger.kernel.org>; Mon, 01 Sep 2025 00:46:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1756712786; x=1757317586; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yVqPrnaKEVvZZucDjrJTxx1dp8L1AOneu664tqAFLSI=;
+        b=zrKRSQKlnrhTzQBkqmoKmJwnI9DETjxucdxDpudj3Vi4pIv5XOlPpPD7A374tb9CoH
+         8lGIujbftYNsT1fOTdG/Ws2F8bdsOU+1N1GjWnEA0s61qPYFWv1Bel43kh+Z6gveOH/7
+         K2xx1D5UNIAo90y+cZJh8nR6fL/jGzGHSj91MLtMvOfMhdP288c/wK1NAMEtVBBto0d8
+         FlTlpqu07hd+Qv5HdHwJC2vBdElTzFhCtxBMDLc2+tpQX7TtBy9Qh5kw8BQLixyegTIW
+         1qnL1ggww5yIXx0z0aRzeMA3Yy2+8001UGicLfYzl6gWOMuU7VIx2mSxtjkfK+JwkPOs
+         eVAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756712370; x=1757317170;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7Cb5i58+NzZC4kRXSkAPN+GknIz6siHZM/xyBUa15eg=;
-        b=hvwnr/FvhA7DxYgndx862Ht3RI2S1EipkVRcD1J0G28sxqyfWxBZDDjI4iFnC1iUJL
-         15RE3oCjbC+8+2vnLs36cP0KRXklKras0kXhxorvZBgyPk8i0GwOE3w7HydQL1bemYPo
-         eij8lUxrQPJ6EdbPYaPkTHsUgw6rANE9Prk4dfL6zRhAZcC3ybbNjqWsO+gP6tVGQsc0
-         4m5BvlU4jtByax1KsWBIDJI7op8tHyXlv109XeBnATCykDdteeOHX+ApWgiWJzWmJ8ll
-         wOl7n2JaDNsIyik6MEJL2ZjB2RH3LhwhcXt0euYXF+mT9aYgM0+1wTVcXbYDGA7+4MOK
-         sIyg==
-X-Forwarded-Encrypted: i=1; AJvYcCVc0tTQ+Jxw1QLhPCs5AkIokBJw3RVm2/KZRxZmx7YuYVATq8D2ar+lJJ3NrApoTnrSFDBGQ9I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxm1iDoPSIVWbnot+R7o5xhKgJulZR6r7S++3/iEz+GQhOLP+Qm
-	ML0EJ0opHf/bpy/IIfVaapuuN8DMhs5kCiAsJkqfGVhaPFE4EwECQaa2bF+HM9mcrWdbFWSVpVm
-	DPOoSzrX3VQtbZ6FubAlP3B18d+7t/csJXVJ+4dPQecRrYkHmN85X7C5V3qM=
-X-Google-Smtp-Source: AGHT+IGnwZ7A+54s0AbuKXUkUiusLI4q8Ihz8nytKAlR1VgZCVm4v+B+GP9UQOnsZ556EmINXg3OiivQGOjZ2U+9OYKFT163AB/1
+        d=1e100.net; s=20230601; t=1756712786; x=1757317586;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yVqPrnaKEVvZZucDjrJTxx1dp8L1AOneu664tqAFLSI=;
+        b=O1GeMSD8Macese8IEc9+T8oUJfmF93LmrMhrU5nB+3IChrPIo3xRsTHvvCw9fFrYjW
+         KClynWYqk+1fZ+nyK8Zy19XzZvL8tsY/61KmT7NkOV09cIX/bA/v87nro/FLfugYetCu
+         B09IBFJqNRCnt6dmhiezsWs9eFkv+nO9tuldNtBTTdQ+KPRMP7Pk+euPW1MT3uINEC+W
+         4GRaZ5aFdYS4a2FNxMET7qoRGN8Vb+7ojUKLKqy3UGzRNYGbrAG/3cv4fVe6OTZuvx7u
+         SNZ4rlhGATZHMRjVFKtPcyxtHZmqrIdg/h8VIGCpM+8r3wOPELLSMW0THujqikWvrPow
+         a8Fg==
+X-Forwarded-Encrypted: i=1; AJvYcCXMMKuyjqlftiWlJLyxXwuVX69ZesvvOl67UC6YdjTkL0nht6/uKftW2bhirwxaABwPZpw4ThU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwG5M8RLEI61dAih6kY6f/rX2VlXSfPFkCqP7xA9LMW/qD6AxSC
+	HXsu6Msmw3vdkXXku6nfMxRrP7NpKqjUpKIKI4DM/Enhwm0zPubQuHjh5ZXvrwo0m3HHD5BBxfU
+	WM+aaX355ocK+KlLknFajcokb2HyZCFbBzi4bVLp0atNvMyd0mWqlSoD2
+X-Gm-Gg: ASbGncuX71IVm9pmvwLvO9F3G/XcnpHoRM+U8/g14ZjUyiLb11pmvHBehd7JixWfX9u
+	T4bqmaRucb4BNDs5ujZcwrB8ruFDEVYHP859QxU4XwckrV3DIyA6TzrsqhqTvm4L63Ku0rEs+9r
+	am4kPRfNdCoOH29ta4GyFACr8hI5H1S27XotLScw9dClyOTJZUI1Auo42qzbCuhbOQIDDf4FBc/
+	psb5W6XckauQQ==
+X-Google-Smtp-Source: AGHT+IGZTH19RBjUvvofErMZ9h/jiQ2Ewo/uI7zM8ow9n9zGs186Jgh1xXso0LhtJRIip1oYULbc4ckuQsRYkOaolNs=
+X-Received: by 2002:a05:620a:1724:b0:7e8:123b:e3bd with SMTP id
+ af79cd13be357-7ff27b1f891mr782617585a.18.1756712785561; Mon, 01 Sep 2025
+ 00:46:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3e02:b0:3e9:eec4:9af1 with SMTP id
- e9e14a558f8ab-3f4026c3079mr120619585ab.31.1756712369985; Mon, 01 Sep 2025
- 00:39:29 -0700 (PDT)
-Date: Mon, 01 Sep 2025 00:39:29 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68b54db1.a70a0220.1c57d1.0545.GAE@google.com>
-Subject: [syzbot] [wpan?] WARNING: ODEBUG bug in hwsim_update_pib
-From: syzbot <syzbot+7932fb418f81bda3ad79@syzkaller.appspotmail.com>
-To: alex.aring@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+References: <20250827125349.3505302-1-edumazet@google.com> <20250827125349.3505302-2-edumazet@google.com>
+ <CAM0EoMmhq66EtVqDEuNik8MVFZqkgxFbMu=fJtbNoYD7YXg4bA@mail.gmail.com>
+ <CAM0EoMnk8KB780U=qpv+aqvvJuQX_yWgdx4ESJ64vzuQRwvmLw@mail.gmail.com>
+ <CANn89i+-Qz9QQxBt4s2HFMo-DavOnki-UqSRRGuT8K1mw1T5yg@mail.gmail.com>
+ <CANn89i+nNZx3QftApMcyb2PBopO=v+4rR-gKZZTbUReZjT41Fg@mail.gmail.com> <CAM0EoMknB8MwZ_nPgpjH3N50ahRLsENr4HibKQHdwNGNO5sf9w@mail.gmail.com>
+In-Reply-To: <CAM0EoMknB8MwZ_nPgpjH3N50ahRLsENr4HibKQHdwNGNO5sf9w@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 1 Sep 2025 00:46:14 -0700
+X-Gm-Features: Ac12FXyxjJEmlDcyMinOjf-WHxfWSd15XAqnHIDcph7E4_MWhcs-PNXVBFO-Azs
+Message-ID: <CANn89i+onfYUtje3Nh8tqtdsKvhb+fPjeAnVP70mFrrhSWaUaw@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/4] net_sched: remove BH blocking in eight actions
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Sun, Aug 31, 2025 at 9:45=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
 
-syzbot found the following issue on:
+> action stats dump does start in tcf_action_copy_stats which will grab
+> the lock (in either gnet_stats_start_copy_compat or
+> gnet_stats_start_copy) and releases when it terminates in
+> gnet_stats_finish_copy.
+>
 
-HEAD commit:    bd2902e0bcac Merge branch 'locking-fixes-for-fbnic-driver'
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=117a1fbc580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=292f3bc9f654adeb
-dashboard link: https://syzkaller.appspot.com/bug?extid=7932fb418f81bda3ad79
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/866cb9f09108/disk-bd2902e0.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/05ea2ff5b4f0/vmlinux-bd2902e0.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/6b499ed83474/bzImage-bd2902e0.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+7932fb418f81bda3ad79@syzkaller.appspotmail.com
-
-bond2: left promiscuous mode
-8021q: adding VLAN 0 to HW filter on device bond2
-8021q: adding VLAN 0 to HW filter on device bond3
-8021q: adding VLAN 0 to HW filter on device bond4
-------------[ cut here ]------------
-ODEBUG: activate active (active state 1) object: ffff8880294fa980 object type: rcu_head hint: 0x0
-WARNING: CPU: 1 PID: 13092 at lib/debugobjects.c:615 debug_print_object+0x16b/0x1e0 lib/debugobjects.c:612
-Modules linked in:
-CPU: 1 UID: 0 PID: 13092 Comm: syz.2.2163 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-RIP: 0010:debug_print_object+0x16b/0x1e0 lib/debugobjects.c:612
-Code: 4c 89 ff e8 97 e8 52 fd 4d 8b 0f 48 c7 c7 20 40 e3 8b 48 8b 34 24 4c 89 ea 89 e9 4d 89 f0 41 54 e8 2a 1e b3 fc 48 83 c4 08 90 <0f> 0b 90 90 ff 05 67 8a d3 0a 48 83 c4 08 5b 41 5c 41 5d 41 5e 41
-RSP: 0018:ffffc9000e17e5f0 EFLAGS: 00010296
-RAX: cf70889cbb35c600 RBX: dffffc0000000000 RCX: 0000000000080000
-RDX: ffffc9000c66a000 RSI: 000000000007ffff RDI: 0000000000080000
-RBP: 0000000000000001 R08: 0000000000000003 R09: 0000000000000004
-R10: dffffc0000000000 R11: fffffbfff1bfa1ec R12: 0000000000000000
-R13: ffffffff8be341a0 R14: ffff8880294fa980 R15: ffffffff8b8bd3a0
-FS:  00007fa46bd396c0(0000) GS:ffff888125d1b000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f25865f1f98 CR3: 0000000075ad6000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- debug_object_activate+0x26a/0x420 lib/debugobjects.c:842
- debug_rcu_head_queue kernel/rcu/rcu.h:236 [inline]
- kvfree_call_rcu+0x4f/0x410 mm/slab_common.c:1953
- hwsim_update_pib+0x2d2/0x450 drivers/net/ieee802154/mac802154_hwsim.c:116
- hwsim_set_promiscuous_mode+0x196/0x2e0 drivers/net/ieee802154/mac802154_hwsim.c:323
- drv_set_promiscuous_mode+0x16a/0x2f0 net/mac802154/driver-ops.h:127
- drv_start net/mac802154/driver-ops.h:195 [inline]
- mac802154_slave_open net/mac802154/iface.c:196 [inline]
- mac802154_wpan_open+0x17e7/0x2a40 net/mac802154/iface.c:295
- __dev_open+0x470/0x880 net/core/dev.c:1682
- __dev_change_flags+0x1ea/0x6d0 net/core/dev.c:9549
- netif_change_flags+0x88/0x1a0 net/core/dev.c:9612
- do_setlink+0xc55/0x41c0 net/core/rtnetlink.c:3143
- rtnl_group_changelink net/core/rtnetlink.c:3775 [inline]
- __rtnl_newlink net/core/rtnetlink.c:3929 [inline]
- rtnl_newlink+0x149f/0x1c70 net/core/rtnetlink.c:4057
- rtnetlink_rcv_msg+0x7cc/0xb70 net/core/rtnetlink.c:6946
- netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2552
- netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
- netlink_unicast+0x82c/0x9e0 net/netlink/af_netlink.c:1346
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
- sock_sendmsg_nosec net/socket.c:714 [inline]
- __sock_sendmsg+0x21c/0x270 net/socket.c:729
- ____sys_sendmsg+0x505/0x830 net/socket.c:2614
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
- __sys_sendmsg net/socket.c:2700 [inline]
- __do_sys_sendmsg net/socket.c:2705 [inline]
- __se_sys_sendmsg net/socket.c:2703 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2703
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fa46af8ebe9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fa46bd39038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fa46b1b5fa0 RCX: 00007fa46af8ebe9
-RDX: 0000000000000000 RSI: 0000200000000000 RDI: 0000000000000006
-RBP: 00007fa46b011e19 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fa46b1b6038 R14: 00007fa46b1b5fa0 R15: 00007ffcd9bf4da8
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Right ! I am back to work and will send a fix ASAP, thanks !
 
