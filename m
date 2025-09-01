@@ -1,105 +1,97 @@
-Return-Path: <netdev+bounces-218826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C105B3EAEB
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 17:38:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CB81DB3EB40
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 17:46:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B32F3AA6B6
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 15:33:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27F76487AAE
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 15:39:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5AB12DF140;
-	Mon,  1 Sep 2025 15:23:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E86D2E6CAE;
+	Mon,  1 Sep 2025 15:34:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pnCxcj6h"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cP9OuVZ2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893352DF135;
-	Mon,  1 Sep 2025 15:23:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42AAF2D5930;
+	Mon,  1 Sep 2025 15:34:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756740236; cv=none; b=m0qplDU2KMHGRGyRLe36aBiHB9zmUJt3Z1xPQ8jdPu6296uTL8Eb0PfheEoQYj5Tg5L7uhxTtV8v3bJcl5/IZVs5Y6JiYYlZ12avd6awX3mQ/SQwvmYV1LhBv73kHx74SDp5a2F2DPs8jV2Rzb8O8O/NykIcCDI2KVgtITA328A=
+	t=1756740869; cv=none; b=VmgtaNHpEYi0UwZMkZrj1vrMU3xAR380m0cbG1WivXzWNqG0OFfnn7ETH9gT+jl6kBR3Si7Rau5HdxDbA0CkmYRmiY4rHzkYlq8Xc3ZEIXsr0RdcCIGCYAOvENpmwYQyOC1HaUTFxAJ//FBNAApaw9xekhvoLB2tTpqGQs3ge8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756740236; c=relaxed/simple;
-	bh=Z6Bw+FcjIx5936FqSyasEITeMW7G2tVVJ6eaKgA8l4w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wy+PZh2BrtSPpM1LKTR7VqAQJLR1WralZSIvM3Go4UGVwKfxLUguyvY4Ykz6AbKmwHuDNdpmkLgPHVbOWNMPuKVLFORo+g3zzxyIL5/ldhTb0N+eIZN/qiw536nfvLH2Z+dKv5333jx1/JgS00B8869HDccpAeXmF48P8SMOueY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pnCxcj6h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24263C4CEF0;
-	Mon,  1 Sep 2025 15:23:53 +0000 (UTC)
+	s=arc-20240116; t=1756740869; c=relaxed/simple;
+	bh=zxtkK4szcuhucZHirsMkuZhVjAjva6h2OuGst/leZz4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=K/n+noh9cTSNEcBql47SI62SqkKm5PtAWOk5Z/Z03mSu/ICFzREcyC1jdNTJUONNf5k3VoQkU5tQRHjKoM9hgZCG869/2i+m0Z9SBjgrqzyXLBPzr2DPuXxB9C0lAPWAWaHdczZwdcxYoZoY2ChvLxdME+paFBNerfZ2Ag4WjLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cP9OuVZ2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56C22C4CEF0;
+	Mon,  1 Sep 2025 15:34:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756740236;
-	bh=Z6Bw+FcjIx5936FqSyasEITeMW7G2tVVJ6eaKgA8l4w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pnCxcj6hmR3kyzFGjXyzGmi+Ebjv1J9Oo9OIj93UmdWU9kULjfM4TSPiQHqD86GIg
-	 gaBATn92CB4h6hY0lpJwhGxe0hmQ3bB9d71Ne5FVNdTn8/S/W+hUTtYRtTK1+iOmzm
-	 aO8R9+mTGcbFwDiT2mAQ+KqbaOoIXKDFnxGJFGfcrdH3GU3lxXjNOY2UWRubiJIU0v
-	 8SF3VlxhFs6iZFJdc/0Cbm53TpsPRhc5P2WhSrJrG59oX5sjXC0+Gf9QlPPhEd4UBm
-	 j0gSyZ6ZIUbbAYz6bxqnpJCpQ5pUzHnouZ7L6Q24poIF1Hz5oFeWBoJWGjp/1D4EQ2
-	 uuoluUILDgrSg==
-Date: Mon, 1 Sep 2025 16:23:52 +0100
-From: Simon Horman <horms@kernel.org>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, Sunil Goutham <sgoutham@marvell.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"moderated list:ARM/CAVIUM THUNDER NETWORK DRIVER" <linux-arm-kernel@lists.infradead.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] net: thunder_bgx: use OF loop instead of fwnode
-Message-ID: <20250901152352.GG15473@horms.kernel.org>
-References: <20250830214217.74801-1-rosenp@gmail.com>
+	s=k20201202; t=1756740868;
+	bh=zxtkK4szcuhucZHirsMkuZhVjAjva6h2OuGst/leZz4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=cP9OuVZ23NDBNtDXJFFpVQqErvc4vXBSbezCN2lf0Z+ZFJ4Rlx7tAC1zSjMRusbZL
+	 hHL6gkzW5OioboxgBUXsVy+6iXnoyMqo+7eFw5Cp51FLf1vv8OohRWH2VJBOPAq6SD
+	 Cwtapx3PiTD/nn896L8YnkjjmVEAwuIXj1KMK/g7BGHwNp8JZxDrz+aQYTrjN7ln63
+	 7gG7qZQNojWqtyVe+acFCaI5uxI4JpIbUG1PeNRw1uW1znkcDQUsQWzt8bfpgnvyAp
+	 xm84FnKbTDOflUGEtnVAJ3m9+crArYVNvxC9/ot1HNaITebEj62WIlu4BCy11x2wl/
+	 IExU5oCKTx3GA==
+Date: Mon, 1 Sep 2025 08:34:27 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Brett A C Sheffield <bacs@librecast.net>
+Cc: willemdebruijn.kernel@gmail.com, davem@davemloft.net,
+ edumazet@google.com, gregkh@linuxfoundation.org, horms@kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, shuah@kernel.org,
+ willemb@google.com
+Subject: Re: [PATCH net-next v4] selftests: net: add test for ipv6
+ fragmentation
+Message-ID: <20250901083427.5d9e2a1a@kernel.org>
+In-Reply-To: <20250901123757.13112-1-bacs@librecast.net>
+References: <20250901123757.13112-1-bacs@librecast.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250830214217.74801-1-rosenp@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sat, Aug 30, 2025 at 02:42:17PM -0700, Rosen Penev wrote:
-> The loop ends up converting fwnode to device_node anyway.
-> 
-> While at it, handle return value of of_get_mac_address in case of NVMEM.
+On Mon,  1 Sep 2025 12:37:14 +0000 Brett A C Sheffield wrote:
+> +static int setup(void)
+> +{
+> +	struct ifreq ifr = {
+> +		.ifr_name = "lo"
+> +	};
+> +	int fd = -1;
+> +	int ctl;
+> +
+> +	/* we need to set MTU, so do this in a namespace to play nicely */
+> +	if (unshare(CLONE_NEWNET) == -1)
+> +		error(KSFT_FAIL, errno, "unshare");
+> +
+> +	ctl = socket(AF_LOCAL, SOCK_STREAM, 0);
+> +	if (ctl == -1)
+> +		error(KSFT_FAIL, errno, "socket");
+> +
+> +	/* ensure MTU is smaller than what we plan to send */
+> +	ifr.ifr_mtu = MTU;
+> +	if (ioctl(ctl, SIOCSIFMTU, &ifr) == -1)
+> +		error(KSFT_FAIL, errno, "ioctl: set MTU");
+> +
+> +	disable_dad("lo");
+> +	interface_up(ctl, &ifr);
+> +
+> +	close(ctl);
+> +	return fd;
 
-I think that this part should be a separate patch.
-Possibly targeted at net with a Fixes tag.
-
-> 
-> Simplify while loop iteration.
-> 
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
-
-...
-
-> @@ -1514,14 +1510,13 @@ static int bgx_init_of_phy(struct bgx *bgx)
->  	/* We are bailing out, try not to leak device reference counts
->  	 * for phy devices we may have already found.
->  	 */
-> -	while (lmac) {
-> +	while (lmac--) {
->  		if (bgx->lmac[lmac].phydev) {
->  			put_device(&bgx->lmac[lmac].phydev->mdio.dev);
->  			bgx->lmac[lmac].phydev = NULL;
->  		}
-> -		lmac--;
->  	}
-
-The update to this look looks correct to me, even without the rest of
-the patch separate. If so, I'm wondering if it should also be a separate
-patch. Again, possibly for net with a Fixes tag.
-
-> -	of_node_put(node);
-> +	of_node_put(child);
->  	return -EPROBE_DEFER;
->  }
-
-...
+fd is unused here
+-- 
+pw-bot: cr
 
