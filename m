@@ -1,145 +1,202 @@
-Return-Path: <netdev+bounces-218615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83A05B3D9DB
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 08:25:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74E0CB3D9EF
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 08:27:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 518BB164F7D
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 06:25:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6FE1189A95A
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 06:28:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A28B20E032;
-	Mon,  1 Sep 2025 06:25:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C115F253F03;
+	Mon,  1 Sep 2025 06:27:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="QfaS5yZR"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="tXrh8fE4"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2060.outbound.protection.outlook.com [40.107.94.60])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A4722156A;
-	Mon,  1 Sep 2025 06:25:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756707942; cv=none; b=eXpHhP35+eRZV584Tpvg9gXrDjDQETjAhWTkugUADUvk2pNFB4xXQA2YRvaszIUHdaGtz36n7vcn52+jumnKnqw9O3SeqqImmGLcupIdDDjKIcbi74kT6bgAcbI6mcU38iCPiuF1X/1oa7NXSNtO380/8inoI9kVTd/JuK71UqI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756707942; c=relaxed/simple;
-	bh=7HI3Ro/EE5rzV6n5s5bDuj18Rzg2uhMCG0Mah0c++i0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QHCz8r+FLGCojZA51ncSmh+c4y3smWzu1PvdNGDQxxCQxXKZ8UmV1EeIc9pkDQkr8Esl7IgOL1/2OvbYHxLIA1tmsjQp7lwYnYUnPSljDPL9rnVc6jO1gFMOPLEgzjRp0BN7dI0VT09AdkcTf+3flfCLUabgTLAW3xpU8wHIP2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=QfaS5yZR; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1756707940; x=1788243940;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=7HI3Ro/EE5rzV6n5s5bDuj18Rzg2uhMCG0Mah0c++i0=;
-  b=QfaS5yZR9v+v+bAzrjvPpegMqOFJ4RZyCQKP+Q0CJBM3VSBApUwmWnci
-   deX4klyVrqtjdOYMlLSuTMBlBQOenM18+szgH7aE0IjhNTz+fiot+wGmB
-   rTI9TM1ui+u7IQ8CyjvgryVs/xgV33RgBGsZJhtuGc+R6HVGrbWrsgDwc
-   OK1zvUVTOMROLQPHE2FE3poMb3abFN9ZNhwul1jAT5Bap73Bd+lIKWebK
-   sRTWTgnLepvSAQrVjohKNm83ggKcGwVG7zsFpbfRdHf5ui0gXDHYWj1EM
-   PwOlpS5w3x7NUjctTQpINLeAPoKkBkctG0yb2roI+UID7Sk31yi+AeRsj
-   A==;
-X-CSE-ConnectionGUID: P1DTPltMS2ie8GsA4XUqfg==
-X-CSE-MsgGUID: vaIqiNDtRpGipA7cJJ5VXg==
-X-IronPort-AV: E=Sophos;i="6.18,225,1751266800"; 
-   d="scan'208";a="46446076"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 31 Aug 2025 23:25:33 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Sun, 31 Aug 2025 23:25:18 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
- Transport; Sun, 31 Aug 2025 23:25:18 -0700
-Date: Mon, 1 Sep 2025 08:21:40 +0200
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: Kory Maincent <kory.maincent@bootlin.com>
-CC: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <richardcochran@gmail.com>,
-	<Parthiban.Veerasooran@microchip.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v5 2/2] net: phy: micrel: Add PTP support for
- lan8842
-Message-ID: <20250901062140.df6pqpvs7dyv564l@DEN-DL-M31836.microchip.com>
-References: <20250829134836.1024588-1-horatiu.vultur@microchip.com>
- <20250829134836.1024588-3-horatiu.vultur@microchip.com>
- <20250829165310.2b97569b@kmaincent-XPS-13-7390>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E155D1FA272;
+	Mon,  1 Sep 2025 06:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.60
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756708061; cv=fail; b=DkQlbqhemeoquayW/yA2A4zWu++Zn+Rt5OxQwnT2TOP5DYLMk+idHAiNxIpNNZvITRpXsVjwjhQBGxNGQ+HHnmqYD2FsZ8L6qVkJrGQn4uyhe8hlabln6uUpqMg3ccllRq1VjMxe2MhgxpxIT+CBM7n9YMXhf6fQnq/AXwyIAMo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756708061; c=relaxed/simple;
+	bh=wBCXgKh4If/TtqzdUc2L2LBvha3OPXEdAGyNf9ayUDo=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Tgmx3Oac7urCRKZijaXXQ6OEsiplZSbL8fRCdvVSeH4vCSVj73Eb2ps4VhMcTow62Do3qEUuf0z0X0XRIlL+AzmVlSuSEkx2UGLuLTFugP8ICfqj0Czi6LkVxNloBDsrSxc9bJr26n6hmXK43EFIfLBHa0WUrrkr/M3RVaMgSaM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=tXrh8fE4; arc=fail smtp.client-ip=40.107.94.60
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=vYtkEsEWVlHc7nOxxGsRfrY4IEL8YWXI2FGQb3VQI1opoTCCq1S/R2MF0JI5I8wMOjEnG8KpK6DQN8iUtvw92n3RiQ3B1ABiAzdf9xTLiQ1txdS9xGEDeccRtxx/3GdjJkjklB3waV5lkHEvcQk74sL5kNaDnj8YFiL2xBxQIVCynQtzuyS3rTuRGNbFhQUj0hAOzGq7d77xOkZgXTFyJia7exsTxRDrUao5ffRLt/6Zzhvvip0xitOn/iya1/3nArwjeftQ1CZtcI/WzCfyj6Rz+ZeIVSB9zsx8D6X1dq+f5if0bA0PImra4eexHpzm30PaG/hXpOxSAsusParExg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=woLR5gfLmDYgS6WO+yyL3uMad7VFcpQA6bxS0NIpxVE=;
+ b=ZBIG6z2DWh6iL9fHs6igvQe2wz/2ApQB2gUlQWPIMqcAvduEJGC8rB4FNOJ/BwTTQvtRIMbAJkW2t/kqBsgoVM90JjTJhVb+I1dDQxkIB2ZhQc0nNUpnph4D38YpFLXgU38u6ze+EFty8mvOKugUpswE6hg0/pp93ZkUYD9eTelx4pMP7v7JmZvVR5q40b7jHlkTss7sKHPBeoPHTjB3c9ZJxLzdG/lUNg9DOXR4LJafmHPtWDaaPWlzuOlqbuVIrSHi5+5TKZOpIZFALSqOPyiAgzkaUjxNNjRr1/biqByWB15xxfOTvrz3zxqasE4cEWyuFbDykoRpBm2Z4Zd0/g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=woLR5gfLmDYgS6WO+yyL3uMad7VFcpQA6bxS0NIpxVE=;
+ b=tXrh8fE4ACs0kOHfjfEYNJYmF/3C7e4bYeH0u4lCOob+llTcu4zlBDw8emc4PK+ovEsbLntRzOBek88QLaRhpgrtt/3yG8ju5+gXkaHklPvDkMt0p+PMu81X8oCbpRpVPK7DtT89DkF9bVF2bXD9Byxe8r0dsN6aDk9xQbEKQlY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB9066.namprd12.prod.outlook.com (2603:10b6:510:1f6::5)
+ by SA5PPFDC35F96D4.namprd12.prod.outlook.com (2603:10b6:80f:fc04::8e5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.21; Mon, 1 Sep
+ 2025 06:27:37 +0000
+Received: from PH7PR12MB9066.namprd12.prod.outlook.com
+ ([fe80::954d:ca3a:4eac:213f]) by PH7PR12MB9066.namprd12.prod.outlook.com
+ ([fe80::954d:ca3a:4eac:213f%4]) with mapi id 15.20.8989.018; Mon, 1 Sep 2025
+ 06:27:37 +0000
+Message-ID: <d829c4ee-f16c-6cfa-afdc-05f4b981ac02@amd.com>
+Date: Mon, 1 Sep 2025 11:57:21 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH v5 00/14] Introduce AMD Pensando RDMA driver
+Content-Language: en-US
+To: Jason Gunthorpe <jgg@nvidia.com>, kuba@kernel.org
+Cc: brett.creeley@amd.com, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, corbet@lwn.net, leon@kernel.org, andrew+netdev@lunn.ch,
+ sln@onemain.com, allen.hubbe@amd.com, nikhil.agarwal@amd.com,
+ linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250814053900.1452408-1-abhijit.gangurde@amd.com>
+ <20250826155226.GB2134666@nvidia.com>
+From: Abhijit Gangurde <abhijit.gangurde@amd.com>
+In-Reply-To: <20250826155226.GB2134666@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN4PR01CA0012.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:272::15) To PH7PR12MB9066.namprd12.prod.outlook.com
+ (2603:10b6:510:1f6::5)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250829165310.2b97569b@kmaincent-XPS-13-7390>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB9066:EE_|SA5PPFDC35F96D4:EE_
+X-MS-Office365-Filtering-Correlation-Id: 834fca12-5583-4b57-dd1f-08dde920a49b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?N0xON2w5blNUaUFQRDFGNG1CRVJWZzBaR1pxWURZdG4vWHZYMWoxMFM3L2ZU?=
+ =?utf-8?B?TkxjNXZ0SFFhNnpYdTZkeXdEQTJEMFo3Q1FYZjRwVmJtNTFjWmRKUWNKcUcz?=
+ =?utf-8?B?bW9zaXVOMm85T3kycWRhSGRJcUgrOWJkL1NLQW9wazhSemNFbDdEelFBd2lq?=
+ =?utf-8?B?czc4cFpSMDZnYTJ3TmdvaUtrWnUvbnBzSkRvTVFxSm54QlVsOEt5NDRYclov?=
+ =?utf-8?B?NW0veXdoUHRRVzFHaklaaFJDVTNsb05PQjBGcWpUMUVKRFl0YmtwOHphN3FJ?=
+ =?utf-8?B?UEYrbDZHWWdkei91V1J5MEt0SEl4SnZoYzVZcVAxOGNkRWMwb2Q4cTJGd2Vr?=
+ =?utf-8?B?ZWFUQTJhOUFidkZLeHVEL2lmSG5yOVpNTG52RWZiak05KzNPVWFwS2FSOHpa?=
+ =?utf-8?B?UVpqWGdmNkNXRW5GOUpUTkNmblQ1TUxNVnpXeDV3Uk5BK1V0VjM3bXJjUU00?=
+ =?utf-8?B?R0E3aUtLalBmN1gyZWFVQmV3NzNuajlGY3I4bkpQOVliaUE1YVIyWUErS0ly?=
+ =?utf-8?B?eWlreGIvQURJVHU4aDZXZzhId3Z5TW84MWQ0YUNsbklCZHcyTklFUEZWWlZ4?=
+ =?utf-8?B?QjhZcHU1N2w3UHFjRWhpNkdtemlTUWtkZGJiWDFlOU0zWWQxelIzd1Y2ckZN?=
+ =?utf-8?B?dm94c0RCMkFhdTIrTFFTQWZKbC8xQ3Y1UndtMGtmbmtCbWlHMGhvVDNFT0Zn?=
+ =?utf-8?B?MVA3TDkwRzZsZDd5T0VHK2VialRocEdYdFFpYUdoOWhMdlNkejNRc3NsUVov?=
+ =?utf-8?B?TWIrSkZPdHVrRFJEcFpmdFoxWGNNUmtIbEtDcGZmbUEyd0FDd2hRMW1ObzlJ?=
+ =?utf-8?B?UWZpRGU3ZWgwWEgweW1OQW9LQUE3VWJSMU04cndGcU5ZbG51MExqdXkvR2Nn?=
+ =?utf-8?B?aXUxSnBTMUJMaGF1clFsYXZUUUlHa0JONkNvODFkU1FHWm1XRjlsWFRqaUZh?=
+ =?utf-8?B?QUY0QVZZTTdMY01qU3dkUkJORHo4dFMvazd0ZTIxSSs0Zy8vTnA1bkw1djJQ?=
+ =?utf-8?B?bjF3REhteUc4Z05xWHBtTzQ4N3Ryc2hVdEhYRFF0SVkwRXBqSEtpWmxVWmRq?=
+ =?utf-8?B?ekx5Z3FseDdmR3dyZ0R6YkhXc3BtRCtUb0ZOL3I1dDNreXUwcGxyVlJiRkRh?=
+ =?utf-8?B?eGF5dEoxV1dWaFo1cFZZNkdNS1p4b0RjTVJPWEZlbzB0cW1WWnR3S0hSVGpU?=
+ =?utf-8?B?SVFyK1FhbTJmVDU4c0RWempjQkZlS3ZJNnlHWmkrLzNERGdtQzNtdElVbG80?=
+ =?utf-8?B?OEE4UnhUa0x5cmlxc0ovWS80WFZ6UXkzRHRHOHdzRVpFKzNjYjV6MXFPWktY?=
+ =?utf-8?B?S3g1UWJWdStaMHJZNGI4UWFYVWZURC9JazRBYWZnTVBBZmpsclZwZXVZZ01V?=
+ =?utf-8?B?ek5OcERDRXRHdDR4NDBuWmVxRHZlWklsdUk1TllHQkJCWXRHaVNtbk9SZm41?=
+ =?utf-8?B?NHJMR1dhM0l2ejcyTTlpSmRhUk5La09kZ1V3WHBqeUY4OEpmSGhrSVh0Q0Rp?=
+ =?utf-8?B?TjFSSzROM3BBZDQ3aFZ4ZDFZQ0Nhcnc2eEQwaktHclhKeldSdmlPQ0o1eWJn?=
+ =?utf-8?B?d2xTdjN4UzVra2czQTJ1a0ZmMUUrSjU3TUlJVFRiT09OWDZhZUJjSUdOa29j?=
+ =?utf-8?B?aGU3N0lkQjVObUQ2a0UzUzRzeWdZOThoK1dYVXRNeWVHaUhBQkdvZStqM201?=
+ =?utf-8?B?ZVI1d3VKTWx1QW9YSlMwRkx0S2VPbVZrcDJNWTg5MCtFdDhyQ0RzNGRabG9r?=
+ =?utf-8?B?dzVQRmdvUElSMjdsdk51MEw3MldrcUREVFdrUktId1B6aVgwY2tCUVlUcEhh?=
+ =?utf-8?B?Q1VFa3BnZ3lveDdmeGpGNTlSRUkxc2ljMGFlYWwrL1lzNjExUTBrdWNnQXRV?=
+ =?utf-8?B?bGNkZXBTbWNML2gydi92K3JyN2N6bkt5MVgxRGxCaDBBRytyNmNqWVlhenVG?=
+ =?utf-8?Q?VZ63nO7eAwI=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB9066.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?czUrbGdTRmcwY2IwbnVCMllwRlNyb1MyTlhob0o5T1NkVnlkWlV3Wnkybk5q?=
+ =?utf-8?B?b0h3TllOMlpLMnJCL09JbGY2SUkva2pSaEZKbkRmeGFQM045RlltU1NpVCtZ?=
+ =?utf-8?B?d2Nqa2ZZdmJaMWNGcE5ScTVXckc5RDZGWnBjRzU1NXQyOVVqSWFra1E1cExQ?=
+ =?utf-8?B?L0wyem5YVDE4NEE5SlhmWExGVDQzSnpUMWJmeGhoZFlxQThZUlExYjVKRmdy?=
+ =?utf-8?B?empnNmVSUWdoVUwwZWFodC9yUmpGZi92aVkyWWtaanpIQVdFZmpudlZnMkF6?=
+ =?utf-8?B?UTkydXFBVVQ3eFJ2cVI0N2NCM0ZxbUl2Y1p6UkFCazVMVExnWHpXbmFheVlB?=
+ =?utf-8?B?cjlBbVo3TWs1eWJaUFZ0bm9FRG9pOE9uNTExUkpuZWl5TCtZVWdWUmNkdVAy?=
+ =?utf-8?B?OTd5U2ZKT2FGK2lreURhQXd4Um9LQnN5S05qbG5tNlFTYkZVUFVaT1hsZmdr?=
+ =?utf-8?B?VHRycDAxWFdCaDRwb2Rkbkg2K3ZqNzRzNlNvdmh2cmlsYm9hcnJQL2NqTU1j?=
+ =?utf-8?B?SEt0MGZCL3BnalpOVXJHYXc2L1hZaWNSVEh5cVZmVS9ENmlFZlV0YngzajhL?=
+ =?utf-8?B?MkxTcSt0YURVQ2dqd3ZXZHkwUWdxUGE0Wi90aWxMSC8rMnBIUWRRcWVYcGVa?=
+ =?utf-8?B?bHlrdFRkOXZsdlJsemVDNWhyeFhHYUpjZHgxK1VjK2RHYWhBNy82c1l1clkx?=
+ =?utf-8?B?SUsxOCtrMUJZR25JOWNwdDZTSjRFR3Z0L0RHd0hxU05hcm43MHZCRkw1Z0Fk?=
+ =?utf-8?B?MWJWUDhjc09YaDM2Qkg3TnVkcno0b0dTcWk3RkVRMGlCSkRrUThlVElMNVE1?=
+ =?utf-8?B?cGg2VkN1d3U0SW1wK1hqdkhydnRhSGpRUXBZMjNBMU5hQnc0cWVWUWxsdmxO?=
+ =?utf-8?B?Y0VoTWdTWjJiQlhCZUJGZDRhTFpDR1AyZzl1MHE4QmlyRlgwOS90TlJ4WXRt?=
+ =?utf-8?B?SzJqcWx0WTNJMGRQbTNyVUxoNXRmdGtza09MNGZOVmY4Q2p5bDRiendzRXJw?=
+ =?utf-8?B?c0hBb093Y2R5VktGcWdJVHZIT2hmZGs3SFN6ZXBGRUdqdEx3NGxDcDhWZjd1?=
+ =?utf-8?B?bmVVK1hHd2ZQbG1Hdkkzd09qRmI3YnVEMkNaQUhZc3Nna1NDN0M4Wk1rTzYw?=
+ =?utf-8?B?cmlUZmUveEM2VTdxd081alVNNE1tOFR6TkhDRUZpdUNOUTVCUGdndGpmZmZ6?=
+ =?utf-8?B?VDNFaEFYUUo1SkNyK0RKZnFOSzY0OU9NcXR3L3VyQlZieFFTL2lDbGh4TnVV?=
+ =?utf-8?B?SUNkYWxZT3pwS1B2RGlOVklDYlpEK1FCZ3ZWcTRiUVRiczZING9ZVndjSXJ4?=
+ =?utf-8?B?QnJOUE8wZ3JncEpMNDBva1NMcklHRjI3VzhxeCtSS0VCMmhLWWhxZkU5bGF6?=
+ =?utf-8?B?RmF5MG94VHJXcEhsTTkvakx0Mko1V01QcTBYOVVzSzdwQklYdzZxbkx1azZK?=
+ =?utf-8?B?S28vVzliTS9SLzdHMm54OVEva3BIcVl1aUZTL0gxSjdPVnM2aGpVTGYvWlJQ?=
+ =?utf-8?B?Q3VHOWFNdFUzdk5JVDN1UlphT2JyS0tIbEQxdFdnZjRqcXpmVy9oekZSQjVO?=
+ =?utf-8?B?UzlaTjdud2ZNbG5NbTc3QWNQVDFLbnhHSXVZQlhYbXZFK2J0L1NtTVdwV0tB?=
+ =?utf-8?B?YjdPblZFYkxOemVxMy9iR2V6WFNxZmgrTDlGb3ZNeU0yK3NzczYrRG1jVmZo?=
+ =?utf-8?B?cjFySnRzZGF0ekhIN2RPTC9VU25hWjZmcG5DeGFtd2dlckJSa2pybm1rSzJt?=
+ =?utf-8?B?TVU0aVE5akFwVlNJZXRucGpGazVPYW12dWNPNnBoRFJpTHlNV2loRmJTcUlz?=
+ =?utf-8?B?VHErWGx5NStNYzVlM21XeEdhbFhMSDNVa2JGM0d5SWNxOEh0WFF6STJyVHd2?=
+ =?utf-8?B?Snh0c2RoenY1T21aVVFiL3RmQ21mZDB4ejRQQWl5OEI2SVRBVXVTbnlxaHVa?=
+ =?utf-8?B?K1Vxd3FuOGhSZ2Rsa0ZuQS9WUnZ5a1VXRU5tRVR6bUlDTkthbHRzOGpSeWJW?=
+ =?utf-8?B?d1AreEoyaUFwdUpQT3hPNC9DTHRYaTY2dk5BT3VFK1d4NFFBdXBPQ2NlaWpr?=
+ =?utf-8?B?VmtVaHowcXljZ1RTbStmWjRIVzZTYmwrZ1U0a3pUNURpRk9MQk9xTWZtb0JO?=
+ =?utf-8?Q?k4wwvr+PculNMDTrufMo8g6Oz?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 834fca12-5583-4b57-dd1f-08dde920a49b
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB9066.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2025 06:27:37.4300
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7SQpn80+A5dbqj79FOqYto6vpqtzAbWqMT7qED19BdQ32bnGKWbBTQi5hsxjLl21WXjuTf2WeI2tVTsC1fj11g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA5PPFDC35F96D4
 
-The 08/29/2025 16:53, Kory Maincent wrote:
-> 
-> On Fri, 29 Aug 2025 15:48:36 +0200
-> Horatiu Vultur <horatiu.vultur@microchip.com> wrote:
-> 
-> > It has the same PTP IP block as lan8814, only the number of GPIOs is
-> > different, all the other functionality is the same. So reuse the same
-> > functions as lan8814 for lan8842.
-> > There is a revision of lan8842 called lan8832 which doesn't have the PTP
-> > IP block. So make sure in that case the PTP is not initialized.
-> 
-> ...
-> 
-> > @@ -5817,6 +5831,43 @@ static int lan8842_probe(struct phy_device *phydev)
-> >       if (ret < 0)
-> >               return ret;
-> >
-> > +     /* Revision lan8832 doesn't have support for PTP, therefore don't add
-> > +      * any PTP clocks
-> > +      */
-> > +     ret = lanphy_read_page_reg(phydev, LAN8814_PAGE_COMMON_REGS,
-> > +                                LAN8842_SKU_REG);
-> > +     if (ret < 0)
-> > +             return ret;
-> > +
-> > +     priv->rev = ret;
-> > +     if (priv->rev == 0x8832)
-> > +             return 0;
-> 
-> Is the lan8832 PHY ID the same as the lan8842? This would be surprising.
-> If they have different PHY ID, it will never enter the lan8842 probe function as
-> it is not added to mdio_device_id.
-> Also you should add a define instead of using several time 0x8832.
 
-They will have the same PHY ID. And it is the LAN8842_SKU_REG which
-determines which revision of the PHY it is.
-I will add a define for 0x8832.
-> 
-> ...
-> 
-> > @@ -5912,6 +5989,26 @@ static irqreturn_t lan8842_handle_interrupt(struct
-> > phy_device *phydev) ret = IRQ_HANDLED;
-> >       }
-> >
-> > +     /* Phy revision lan8832 doesn't have support for PTP threrefore
-> 
-> nitpick: therefore
+On 8/26/25 21:22, Jason Gunthorpe wrote:
+> On Thu, Aug 14, 2025 at 11:08:46AM +0530, Abhijit Gangurde wrote:
+>> This patchset introduces an RDMA driver for the AMD Pensando adapter.
+>> An AMD Pensando Ethernet device with RDMA capabilities extends its
+>> functionality through an auxiliary device.
+> It looks in pretty good enough shape now, what is your plan for
+> merging this?  Will you do a shared branch or do you just want to have
+> it all go through rdma? Is the netdev side ack'd?
+>
+> Jason
 
-Good catch. I will fix this in the next version.
+I'm happy for the patches to go through the RDMA tree.
 
-> 
-> Regards,
-> --
-> Köry Maincent, Bootlin
-> Embedded Linux and kernel engineering
-> https://bootlin.com
+Jakub, thank you for looking over the Ethernet side 
+earlier(https://lore.kernel.org/linux-rdma/20250625144433.351c7be4@kernel.org/#t). 
+Are you good with them being merged via the RDMA tree? For context, the 
+ethernet patches are getting applied on net-next, and there are no 
+further ethernet patches planned for this release.
 
--- 
-/Horatiu
+Abhijit
+
+
+
 
