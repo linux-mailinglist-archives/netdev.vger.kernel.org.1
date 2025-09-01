@@ -1,308 +1,189 @@
-Return-Path: <netdev+bounces-218675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218676-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7108AB3DE84
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 11:30:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D143B3DE88
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 11:30:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2DA42013EF
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 09:29:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 614061894EE5
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 09:30:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B45D30EF7E;
-	Mon,  1 Sep 2025 09:26:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E13D30BF6F;
+	Mon,  1 Sep 2025 09:27:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vzv03FpF"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="L4Af9Udn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE4A30E0D9
-	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 09:26:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E123101D5
+	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 09:27:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756718773; cv=none; b=nXLIINO4OrCilwJo5mgM5R3maTEo67xoEJasO7sWdRydpGRCK7Vpl5b7MiiimR/s4jWcSaLK+8Ywz2BwLKW+ayrFiIHROGUHsEF4v7DGq260uLp20yEaqz7MurEUnGeNFSDqb93kD51Xv4Heza2sqFLSqZTwDEgSPdw1NH4nEf4=
+	t=1756718874; cv=none; b=Gxb41pRHkLSpkEGNv0bSxP0Wi2VXrOihXZ6AsW3CeHI2XroZAtw74TsmuTuCwmUBia6YBJljhjWI/xh/UwcoAjfBNHP+mImFKO8OUskLy2ygvfYgij6AIaG5qLk8GoCE1ip1j58pzYw3Lzth/VTlHFR6PeXLh8h/uxsFSMPNSl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756718773; c=relaxed/simple;
-	bh=G9PfaWDZdD/GtP3yqiDSk+HOqVC4Z40vbHjTCmLx+V0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jL13MJcgOKodP05BcwXGZXmToSg2+vakMYrUcpjrux92jFavpwKa39keMsEACy5LJ7PNyCmXyb39IezGlrZAUORBuADmTPl1dlIgQqWguYCA9RIiXqteVwOYuChA/mhOBnDq9YperCfkU+9LnMYX6Mywz6eiRpkHRWrCVnvFjp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vzv03FpF; arc=none smtp.client-ip=209.85.160.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-4b32d323297so20953611cf.1
-        for <netdev@vger.kernel.org>; Mon, 01 Sep 2025 02:26:11 -0700 (PDT)
+	s=arc-20240116; t=1756718874; c=relaxed/simple;
+	bh=pxQMSu6dX1cCKNbLSP+l++80EfmSBr72xvrQWh5zGbk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=cCQ1limMukr0wf+hZD+1UTGRCkYi0YcVDqdbsE1GzTcRPWD3cRwHwZG45ZDAe8UyjYlFro3SQNhIyLGdjv3f/CyOGE6h08/Mnv/s1rUOl9FJkiWzykCPKVrVT0RSCzSOOCldxzo74K6PEe8VocmOE5EpZg79tMS1nP7s3kmj3w0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=L4Af9Udn; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-afec56519c8so688374966b.2
+        for <netdev@vger.kernel.org>; Mon, 01 Sep 2025 02:27:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756718770; x=1757323570; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=pJYPoBQUInG6z+9C6LI1Q2eM+QtWM/gk1TicRzuaN2k=;
-        b=vzv03FpFHk/QPz+b6Z5PISdQWbcuE5qBXFxbrnQTozmz09NcC4Apjta60NFL6bsK/k
-         /E4kr76FF4HGi4zgRtkYnQFJz1I5+pKjHKKs3eimjqwEVpGjvdM4BwMvQeQph1lLSANV
-         hSQuo7/l1iuyyfumBQohGxXrZZpOM4vSpym7ZMIA50v92s0aTwYdXJm9K7NQDsyAJLsI
-         bcvmcpcFjzT5voJr8BRZnDqqTy6TCwlKIIAn0RW/XnVlC5dc2gMBuduvLpwyrR5dTT3N
-         5UK6PdhKO6dp+GNqD3gbJ4ePUwjrrNTwaczFfNwF9JLRzx0ISMtEpeIyYFdrjHiKCevB
-         +5vQ==
+        d=cloudflare.com; s=google09082023; t=1756718869; x=1757323669; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=v2bX7K172EAX0v9QdDM45QX7qnW31zLAa+k2k6RxGSg=;
+        b=L4Af9UdnSkB/QeHYdU5JSGORvwf+xFrJ5vgyNi1fgQ8PEupgj1kPBO3OfT2DgEnuOc
+         SGYn4ZP4yL/ktUVkIRfZlD2e/DoMx9D/KgCVLugVKBNEtbjbccHWLqD1I64AxlmwW3xW
+         8kjG8+b/eWG6fylv4EOX2IGd6h6y5XstCWp+gSfmv189pOYpcYaNfk8ZEANDrV2wNXxJ
+         rjiJhMJXkzaw7uzqi5ORFWHrqHmaukhcHmRLH2IAaduSMvnin+4xP2JPsdifbxutCmqY
+         T/f1u1ix1+LPNg0Lr3Z6uQnz/WdrX+XggKmQBbhPsvO1JZvV+kfAlW0WAmABuxqePv3r
+         CjIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756718770; x=1757323570;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pJYPoBQUInG6z+9C6LI1Q2eM+QtWM/gk1TicRzuaN2k=;
-        b=t5SAEMQR48iFWacy7tHn4e4vfcC9tHMvO1N39A9MH/WxPQN81pUhuPrk7KQL4y6Z+7
-         6/RjuWYwR6ZEnFB2IkDylV/gsz6PAbzc4VxNRdiFV9SocQ3Uq2meLO7+Dd2FPO0rn5vd
-         hLLPjZCKA963eZDTEDyrqPXiEpx3QdqDKdMkvMRCXIsF5VjpItQHbTtKrZm+9XMFOlZR
-         7WrJl9Qp1omptwc+zCTHtRDR+ugcchlg5+klGr+Yk0FGXtXEwtX1q6I/mtcF3wk15rFw
-         LYULSlTuKzijNNOiRucVXqYYRhJ01xUI4yRnMb4lJvm74RkG8qD8BdvwD4bxujFM5kaJ
-         81Wg==
-X-Forwarded-Encrypted: i=1; AJvYcCUk18RhODM5DO8mc47lfbZdqEuuDZMWyy22x8xCOSWzwoljp0hgjt/nPO90zO3UDDw6Qzv3hzU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8G9I52UHUgGA7SeHzumLm3R1esa8frDUereEKRzNwmMHwIRee
-	rFXgFRHw+JCRN3C38PQC/dQw24Itfdzzv9Yjmmvsx0seQWjXKICbE/z7Vzuez2ZLsW5xiT00jsg
-	dDOQlV6OpF7+pwA==
-X-Google-Smtp-Source: AGHT+IFnT5mVD3HhsWR8vUlxg4mqlAiLH/rsGcfx3XffnYwBf2EYufIQnlUy5CEdJSVUdVwOf968HsclI+HHdg==
-X-Received: from qtbne14.prod.google.com ([2002:a05:622a:830e:b0:4ab:6375:3dda])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:1812:b0:4b2:94e5:9847 with SMTP id d75a77b69052e-4b31dcac538mr96926221cf.74.1756718770325;
- Mon, 01 Sep 2025 02:26:10 -0700 (PDT)
-Date: Mon,  1 Sep 2025 09:26:07 +0000
+        d=1e100.net; s=20230601; t=1756718869; x=1757323669;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=v2bX7K172EAX0v9QdDM45QX7qnW31zLAa+k2k6RxGSg=;
+        b=u9FIfExT7f4izpLFHVXXy0t3/QIDVnAppO59+wz5Henqsvwiy7K6EKrRhIhcVhxAQs
+         c7McY2jIxix7/pwfqZ0M4j42RW6dHoPzeAd6MTbxTrSztakx0vTInfZfD0GVZ5IeGWOD
+         PIWFe6vm89tTXV/u3B7xZALskAKy2M/3NxQCbsRybpdACn5C9IE3u9dSDjf6L8wqqnLz
+         69aslyaMmpLMsYWNwGPm2JDERtYpiam6HqF/8n8dp+AESuAMA7xvnwyO0K/cOJeHCZcS
+         0ufuZWAoLo3aSYY0HI8toWO0C1nWeZw9MbqVt5UILaKPHkayTStz/knTreqBvB2mEaY3
+         EOZA==
+X-Forwarded-Encrypted: i=1; AJvYcCXTWcN1E7W/5kyX/OTQWHk1W2L3ZmrTO4O2lUbS4AhevK8j66g6qARZ3z8lbkYp6TMA+KxyA0w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8u6gujKhjgXhjttBHvJKLUpJOZtLes5sX1nkRPySacmZxavDk
+	Gnwx9hmDmukGTSR8TPh3mv3ZDRrUQJxQx12vgI/B0ASyI0oSyLmXRBbyiR2iy8Mxfsk=
+X-Gm-Gg: ASbGncvGj5mk80ajuNxNKzvSGWIxHuDPBE3Yi2j+IQFs0jE8+ZI2x3K12BCwMGZdpIo
+	jqT+KeX4cUhXunyI9uKJueVTRqD2zIrXsrOC8YZsyEmoxOIWInrC8iEHAC+Mm8QJE9XIrRUReHT
+	TvFKqVOiQvJiorAzQ45CLrHYAbxX25e6R1koyvd7e1WPHa0lEL2lhAJZqSFsTlUQAXNxeneISjV
+	R/aSR74bRQ/ElYMDoSgoudI6WNscysLxQ+KVfx86sBAT7Nea8lnZHI9S3KL0C9qGDace6PGsE0F
+	IY9pxpKIIoI2p7i3OmZE9iDUmTyUU1X/oUrCjX368nWHR774VBps/RtaEoEe9lV9W7BzuOXyVev
+	Q12N31I5v248XA3REdfkhw+Lj3w==
+X-Google-Smtp-Source: AGHT+IG1Z7XOr1oPLlEpDF1RLiGTEBx087MJzn2tzoiyFYDQPnfivbRGt2IX7Taj3bVJGrG/hGOXqg==
+X-Received: by 2002:a17:907:60d5:b0:afe:ef08:7638 with SMTP id a640c23a62f3a-b01d97544d6mr832308266b.33.1756718869394;
+        Mon, 01 Sep 2025 02:27:49 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:295f::41f:42])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b042dcb9105sm186430166b.2.2025.09.01.02.27.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Sep 2025 02:27:48 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: bpf <bpf@vger.kernel.org>,  Martin KaFai Lau <martin.lau@linux.dev>,
+  Alexei Starovoitov <ast@kernel.org>,  Andrii Nakryiko
+ <andrii@kernel.org>,  Daniel Borkmann <daniel@iogearbox.net>,  kernel-team
+ <kernel-team@cloudflare.com>,  Network Development
+ <netdev@vger.kernel.org>,  kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH bpf-next] bpf: stub out skb metadata dynptr read/write
+ ops when CONFIG_NET=n
+In-Reply-To: <CAADnVQL_8guWC9io1P5jhTgnyD3u=0WvTnHM3DJFVvE_Sy7DBw@mail.gmail.com>
+	(Alexei Starovoitov's message of "Wed, 27 Aug 2025 09:05:06 -0700")
+References: <20250827-dynptr-skb-meta-no-net-v1-1-42695c402b16@cloudflare.com>
+	<CAADnVQL_8guWC9io1P5jhTgnyD3u=0WvTnHM3DJFVvE_Sy7DBw@mail.gmail.com>
+Date: Mon, 01 Sep 2025 11:27:47 +0200
+Message-ID: <87plca5xpo.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0.318.gd7df087d1a-goog
-Message-ID: <20250901092608.2032473-1-edumazet@google.com>
-Subject: [PATCH net-next] net_sched: add back BH safety to tcf_lock
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Jamal reported that we had to use BH safety after all,
-because stats can be updated from BH handler.
+On Wed, Aug 27, 2025 at 09:05 AM -07, Alexei Starovoitov wrote:
+> On Wed, Aug 27, 2025 at 3:48=E2=80=AFAM Jakub Sitnicki <jakub@cloudflare.=
+com> wrote:
+>>
+>> Kernel Test Robot reported a compiler warning - a null pointer may be
+>> passed to memmove in __bpf_dynptr_{read,write} when building without
+>> networking support.
+>>
+>> The warning is correct from a static analysis standpoint, but not actual=
+ly
+>> reachable. Without CONFIG_NET, creating dynptrs to skb metadata is
+>> impossible since the constructor kfunc is missing.
+>>
+>> Fix this the same way as for skb and xdp data dynptrs. Add wrappers for
+>> loading and storing bytes to skb metadata, and stub them out to return an
+>> error when CONFIG_NET=3Dn.
+>>
+>> Fixes: 6877cd392bae ("bpf: Enable read/write access to skb metadata thro=
+ugh a dynptr")
+>> Reported-by: kernel test robot <lkp@intel.com>
+>> Closes: https://lore.kernel.org/oe-kbuild-all/202508212031.ir9b3B6Q-lkp@=
+intel.com/
+>> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+>> ---
+>>  include/linux/filter.h | 26 ++++++++++++++++++++++++++
+>>  kernel/bpf/helpers.c   |  6 ++----
+>>  2 files changed, 28 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/include/linux/filter.h b/include/linux/filter.h
+>> index 9092d8ea95c8..5b0d7c5824ac 100644
+>> --- a/include/linux/filter.h
+>> +++ b/include/linux/filter.h
+>> @@ -1779,6 +1779,20 @@ void *bpf_xdp_pointer(struct xdp_buff *xdp, u32 o=
+ffset, u32 len);
+>>  void bpf_xdp_copy_buf(struct xdp_buff *xdp, unsigned long off,
+>>                       void *buf, unsigned long len, bool flush);
+>>  void *bpf_skb_meta_pointer(struct sk_buff *skb, u32 offset);
+>> +
+>> +static inline int __bpf_skb_meta_load_bytes(struct sk_buff *skb,
+>> +                                           u32 offset, void *to, u32 le=
+n)
+>> +{
+>> +       memmove(to, bpf_skb_meta_pointer(skb, offset), len);
+>> +       return 0;
+>> +}
+>> +
+>> +static inline int __bpf_skb_meta_store_bytes(struct sk_buff *skb, u32 o=
+ffset,
+>> +                                            const void *from, u32 len)
+>> +{
+>> +       memmove(bpf_skb_meta_pointer(skb, offset), from, len);
+>> +       return 0;
+>> +}
+>>  #else /* CONFIG_NET */
+>>  static inline int __bpf_skb_load_bytes(const struct sk_buff *skb, u32 o=
+ffset,
+>>                                        void *to, u32 len)
+>> @@ -1818,6 +1832,18 @@ static inline void *bpf_skb_meta_pointer(struct s=
+k_buff *skb, u32 offset)
+>>  {
+>>         return NULL;
+>>  }
+>> +
+>> +static inline int __bpf_skb_meta_load_bytes(struct sk_buff *skb, u32 of=
+fset,
+>> +                                           void *to, u32 len)
+>> +{
+>> +       return -EOPNOTSUPP;
+>> +}
+>> +
+>> +static inline int __bpf_skb_meta_store_bytes(struct sk_buff *skb, u32 o=
+ffset,
+>> +                                            const void *from, u32 len)
+>> +{
+>> +       return -EOPNOTSUPP;
+>> +}
+>
+> imo that's too much to shut up the warn.
+> Maybe make:
+> static inline void *bpf_skb_meta_pointer(struct sk_buff *skb, u32 offset)
+> {
+>         return NULL;
+> }
+>
+> to return ERR_PTR(-EOPNOTSUPP);
+>
+> instead?
 
-Fixes: 3133d5c15cb5 ("net_sched: remove BH blocking in eight actions")
-Fixes: 53df77e78590 ("net_sched: act_skbmod: use RCU in tcf_skbmod_dump()")
-Fixes: e97ae742972f ("net_sched: act_tunnel_key: use RCU in tunnel_key_dump()")
-Fixes: 48b5e5dbdb23 ("net_sched: act_vlan: use RCU in tcf_vlan_dump()")
-Reported-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Closes: https://lore.kernel.org/netdev/CAM0EoMmhq66EtVqDEuNik8MVFZqkgxFbMu=fJtbNoYD7YXg4bA@mail.gmail.com/
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/sched/act_connmark.c   | 4 ++--
- net/sched/act_csum.c       | 4 ++--
- net/sched/act_ct.c         | 4 ++--
- net/sched/act_ctinfo.c     | 4 ++--
- net/sched/act_mpls.c       | 4 ++--
- net/sched/act_nat.c        | 4 ++--
- net/sched/act_pedit.c      | 4 ++--
- net/sched/act_skbedit.c    | 4 ++--
- net/sched/act_skbmod.c     | 4 ++--
- net/sched/act_tunnel_key.c | 4 ++--
- net/sched/act_vlan.c       | 4 ++--
- 11 files changed, 22 insertions(+), 22 deletions(-)
-
-diff --git a/net/sched/act_connmark.c b/net/sched/act_connmark.c
-index bf2d6b6da042..3e89927d7116 100644
---- a/net/sched/act_connmark.c
-+++ b/net/sched/act_connmark.c
-@@ -169,10 +169,10 @@ static int tcf_connmark_init(struct net *net, struct nlattr *nla,
- 
- 	nparms->action = parm->action;
- 
--	spin_lock(&ci->tcf_lock);
-+	spin_lock_bh(&ci->tcf_lock);
- 	goto_ch = tcf_action_set_ctrlact(*a, parm->action, goto_ch);
- 	oparms = rcu_replace_pointer(ci->parms, nparms, lockdep_is_held(&ci->tcf_lock));
--	spin_unlock(&ci->tcf_lock);
-+	spin_unlock_bh(&ci->tcf_lock);
- 
- 	if (goto_ch)
- 		tcf_chain_put_by_act(goto_ch);
-diff --git a/net/sched/act_csum.c b/net/sched/act_csum.c
-index 8bad91753615..0939e6b2ba4d 100644
---- a/net/sched/act_csum.c
-+++ b/net/sched/act_csum.c
-@@ -101,11 +101,11 @@ static int tcf_csum_init(struct net *net, struct nlattr *nla,
- 	params_new->update_flags = parm->update_flags;
- 	params_new->action = parm->action;
- 
--	spin_lock(&p->tcf_lock);
-+	spin_lock_bh(&p->tcf_lock);
- 	goto_ch = tcf_action_set_ctrlact(*a, parm->action, goto_ch);
- 	params_new = rcu_replace_pointer(p->params, params_new,
- 					 lockdep_is_held(&p->tcf_lock));
--	spin_unlock(&p->tcf_lock);
-+	spin_unlock_bh(&p->tcf_lock);
- 
- 	if (goto_ch)
- 		tcf_chain_put_by_act(goto_ch);
-diff --git a/net/sched/act_ct.c b/net/sched/act_ct.c
-index 6d2355e73b0f..6749a4a9a9cd 100644
---- a/net/sched/act_ct.c
-+++ b/net/sched/act_ct.c
-@@ -1410,11 +1410,11 @@ static int tcf_ct_init(struct net *net, struct nlattr *nla,
- 		goto cleanup;
- 
- 	params->action = parm->action;
--	spin_lock(&c->tcf_lock);
-+	spin_lock_bh(&c->tcf_lock);
- 	goto_ch = tcf_action_set_ctrlact(*a, parm->action, goto_ch);
- 	params = rcu_replace_pointer(c->params, params,
- 				     lockdep_is_held(&c->tcf_lock));
--	spin_unlock(&c->tcf_lock);
-+	spin_unlock_bh(&c->tcf_lock);
- 
- 	if (goto_ch)
- 		tcf_chain_put_by_act(goto_ch);
-diff --git a/net/sched/act_ctinfo.c b/net/sched/act_ctinfo.c
-index 6f79eed9a544..71efe04d00b5 100644
---- a/net/sched/act_ctinfo.c
-+++ b/net/sched/act_ctinfo.c
-@@ -258,11 +258,11 @@ static int tcf_ctinfo_init(struct net *net, struct nlattr *nla,
- 
- 	cp_new->action = actparm->action;
- 
--	spin_lock(&ci->tcf_lock);
-+	spin_lock_bh(&ci->tcf_lock);
- 	goto_ch = tcf_action_set_ctrlact(*a, actparm->action, goto_ch);
- 	cp_new = rcu_replace_pointer(ci->params, cp_new,
- 				     lockdep_is_held(&ci->tcf_lock));
--	spin_unlock(&ci->tcf_lock);
-+	spin_unlock_bh(&ci->tcf_lock);
- 
- 	if (goto_ch)
- 		tcf_chain_put_by_act(goto_ch);
-diff --git a/net/sched/act_mpls.c b/net/sched/act_mpls.c
-index ed7bdaa23f0d..6654011dcd2b 100644
---- a/net/sched/act_mpls.c
-+++ b/net/sched/act_mpls.c
-@@ -296,10 +296,10 @@ static int tcf_mpls_init(struct net *net, struct nlattr *nla,
- 					     htons(ETH_P_MPLS_UC));
- 	p->action = parm->action;
- 
--	spin_lock(&m->tcf_lock);
-+	spin_lock_bh(&m->tcf_lock);
- 	goto_ch = tcf_action_set_ctrlact(*a, parm->action, goto_ch);
- 	p = rcu_replace_pointer(m->mpls_p, p, lockdep_is_held(&m->tcf_lock));
--	spin_unlock(&m->tcf_lock);
-+	spin_unlock_bh(&m->tcf_lock);
- 
- 	if (goto_ch)
- 		tcf_chain_put_by_act(goto_ch);
-diff --git a/net/sched/act_nat.c b/net/sched/act_nat.c
-index 9cc2a1772cf8..26241d80ebe0 100644
---- a/net/sched/act_nat.c
-+++ b/net/sched/act_nat.c
-@@ -95,10 +95,10 @@ static int tcf_nat_init(struct net *net, struct nlattr *nla, struct nlattr *est,
- 
- 	p = to_tcf_nat(*a);
- 
--	spin_lock(&p->tcf_lock);
-+	spin_lock_bh(&p->tcf_lock);
- 	goto_ch = tcf_action_set_ctrlact(*a, parm->action, goto_ch);
- 	oparm = rcu_replace_pointer(p->parms, nparm, lockdep_is_held(&p->tcf_lock));
--	spin_unlock(&p->tcf_lock);
-+	spin_unlock_bh(&p->tcf_lock);
- 
- 	if (goto_ch)
- 		tcf_chain_put_by_act(goto_ch);
-diff --git a/net/sched/act_pedit.c b/net/sched/act_pedit.c
-index 8fc8f577cb7a..4b65901397a8 100644
---- a/net/sched/act_pedit.c
-+++ b/net/sched/act_pedit.c
-@@ -280,10 +280,10 @@ static int tcf_pedit_init(struct net *net, struct nlattr *nla,
- 
- 	p = to_pedit(*a);
- 	nparms->action = parm->action;
--	spin_lock(&p->tcf_lock);
-+	spin_lock_bh(&p->tcf_lock);
- 	goto_ch = tcf_action_set_ctrlact(*a, parm->action, goto_ch);
- 	oparms = rcu_replace_pointer(p->parms, nparms, 1);
--	spin_unlock(&p->tcf_lock);
-+	spin_unlock_bh(&p->tcf_lock);
- 
- 	if (oparms)
- 		call_rcu(&oparms->rcu, tcf_pedit_cleanup_rcu);
-diff --git a/net/sched/act_skbedit.c b/net/sched/act_skbedit.c
-index aa6b1744de21..8c1d1554f657 100644
---- a/net/sched/act_skbedit.c
-+++ b/net/sched/act_skbedit.c
-@@ -261,11 +261,11 @@ static int tcf_skbedit_init(struct net *net, struct nlattr *nla,
- 		params_new->mask = *mask;
- 
- 	params_new->action = parm->action;
--	spin_lock(&d->tcf_lock);
-+	spin_lock_bh(&d->tcf_lock);
- 	goto_ch = tcf_action_set_ctrlact(*a, parm->action, goto_ch);
- 	params_new = rcu_replace_pointer(d->params, params_new,
- 					 lockdep_is_held(&d->tcf_lock));
--	spin_unlock(&d->tcf_lock);
-+	spin_unlock_bh(&d->tcf_lock);
- 	if (params_new)
- 		kfree_rcu(params_new, rcu);
- 	if (goto_ch)
-diff --git a/net/sched/act_skbmod.c b/net/sched/act_skbmod.c
-index fce625eafcb2..a9e0c1326e2a 100644
---- a/net/sched/act_skbmod.c
-+++ b/net/sched/act_skbmod.c
-@@ -194,7 +194,7 @@ static int tcf_skbmod_init(struct net *net, struct nlattr *nla,
- 	p->flags = lflags;
- 	p->action = parm->action;
- 	if (ovr)
--		spin_lock(&d->tcf_lock);
-+		spin_lock_bh(&d->tcf_lock);
- 	/* Protected by tcf_lock if overwriting existing action. */
- 	goto_ch = tcf_action_set_ctrlact(*a, parm->action, goto_ch);
- 	p_old = rcu_dereference_protected(d->skbmod_p, 1);
-@@ -208,7 +208,7 @@ static int tcf_skbmod_init(struct net *net, struct nlattr *nla,
- 
- 	rcu_assign_pointer(d->skbmod_p, p);
- 	if (ovr)
--		spin_unlock(&d->tcf_lock);
-+		spin_unlock_bh(&d->tcf_lock);
- 
- 	if (p_old)
- 		kfree_rcu(p_old, rcu);
-diff --git a/net/sched/act_tunnel_key.c b/net/sched/act_tunnel_key.c
-index e1c8b48c217c..876b30c5709e 100644
---- a/net/sched/act_tunnel_key.c
-+++ b/net/sched/act_tunnel_key.c
-@@ -531,11 +531,11 @@ static int tunnel_key_init(struct net *net, struct nlattr *nla,
- 	params_new->tcft_enc_metadata = metadata;
- 
- 	params_new->action = parm->action;
--	spin_lock(&t->tcf_lock);
-+	spin_lock_bh(&t->tcf_lock);
- 	goto_ch = tcf_action_set_ctrlact(*a, parm->action, goto_ch);
- 	params_new = rcu_replace_pointer(t->params, params_new,
- 					 lockdep_is_held(&t->tcf_lock));
--	spin_unlock(&t->tcf_lock);
-+	spin_unlock_bh(&t->tcf_lock);
- 	tunnel_key_release_params(params_new);
- 	if (goto_ch)
- 		tcf_chain_put_by_act(goto_ch);
-diff --git a/net/sched/act_vlan.c b/net/sched/act_vlan.c
-index b46f980f3b2a..a74621797d69 100644
---- a/net/sched/act_vlan.c
-+++ b/net/sched/act_vlan.c
-@@ -253,10 +253,10 @@ static int tcf_vlan_init(struct net *net, struct nlattr *nla,
- 	}
- 
- 	p->action = parm->action;
--	spin_lock(&v->tcf_lock);
-+	spin_lock_bh(&v->tcf_lock);
- 	goto_ch = tcf_action_set_ctrlact(*a, parm->action, goto_ch);
- 	p = rcu_replace_pointer(v->vlan_p, p, lockdep_is_held(&v->tcf_lock));
--	spin_unlock(&v->tcf_lock);
-+	spin_unlock_bh(&v->tcf_lock);
- 
- 	if (goto_ch)
- 		tcf_chain_put_by_act(goto_ch);
--- 
-2.51.0.318.gd7df087d1a-goog
-
+Much nicer. Thanks for the suggestion.
 
