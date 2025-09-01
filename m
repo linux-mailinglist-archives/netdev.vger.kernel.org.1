@@ -1,89 +1,74 @@
-Return-Path: <netdev+bounces-218870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 656A3B3EE53
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 21:10:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C7B7B3EE52
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 21:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 785C81719AE
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 19:10:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 793867AC94D
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 19:08:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93904324B36;
-	Mon,  1 Sep 2025 19:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD1E325FA3B;
+	Mon,  1 Sep 2025 19:10:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KqNbYips"
 X-Original-To: netdev@vger.kernel.org
-Received: from trinity3.trinnet.net (trinity.trinnet.net [96.78.144.185])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CB7B324B35;
-	Mon,  1 Sep 2025 19:10:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=96.78.144.185
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93D3432F763;
+	Mon,  1 Sep 2025 19:10:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756753829; cv=none; b=GGGa0HMEUBG4//v313ENI/H3GAE2vbJGQnPYUZko4Aklip6Nma+EOj8tY4CDY1pqqGZdQ28GA9YDmCVTD6X4C+Rn3rxrDqkR1QY1RgVGzBxgwieh4I9NzW/oNSRXM9XqlPaANLmLYCFkUWWiKftZQCpd7FB0JvQkwOlRC0hufAU=
+	t=1756753826; cv=none; b=cZ0KzULsqlwwx+gEV3/+Cn7snrmFbGdkXF4mbg5eY9ERc+3B1hSFKoKXBF2lTXoyct+VevaPDbzKul6B6kPN3a00ln0tJ//OjiXaEDB/4Wuy+g5J3uyCf4Gl1zQfuwWDMxNu6ghOn6jDz6JaFqomn1I+CAouVCWlmr6GLpQTgQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756753829; c=relaxed/simple;
-	bh=PcCVpeII7nzMh+1zzSyCR0eY+wobWJjzPdqIMECddIM=;
-	h=Subject:To:References:Cc:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=N9r+O/LPqp9b7o6Te+KbJSz7ZGghMy6VQGYO6NW3Lk6gmFNq4IVP8cqhsNIhT+lRJRMB0RwgPY8hu12leM/rxo1nKRy4PZ5GtWTSfMM9i5z3iiwE4af4j1deSAAQCu1uf4Q7XtsLz1waIhQFmgFDMYtDKPbUQDrKCaU0g38sR7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=trinnet.net; spf=pass smtp.mailfrom=trinnet.net; arc=none smtp.client-ip=96.78.144.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=trinnet.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trinnet.net
-Received: from trinity4.trinnet.net (trinity4.trinnet.net [192.168.0.11])
-	by trinity3.trinnet.net (TrinityOS hardened/TrinityOS Hardened) with ESMTP id 581JA4o8004292;
-	Mon, 1 Sep 2025 12:10:04 -0700
-Subject: Re: [ROSE] [AX25] 6.15.10 long term stable kernel oops
-To: Eric Dumazet <edumazet@google.com>, F6BVP <f6bvp@free.fr>
-References: <11212ddf-bf32-4b11-afee-e234cdee5938@free.fr>
- <4e4c9952-e445-41af-8942-e2f1c24a0586@free.fr>
- <90efee88-b9dc-4f87-86f2-6ab60701c39f@free.fr>
- <6c525868-3e72-4baf-8df4-a1e5982ef783@free.fr>
- <d073ac34a39c02287be6d67622229a1e@vanheusden.com>
- <6a5cf9cf-9984-4e1b-882f-b9b427d3c096@free.fr>
- <aKxZy7XVRhYiHu7c@stanley.mountain>
- <0c694353-2904-40c2-bf65-181fe4841ea0@free.fr>
- <CANn89iJ6QYYXhzuF1Z3nUP=7+u_-GhKmCbBb4yr15q-it4rrUA@mail.gmail.com>
- <4542b595-2398-4219-b643-4eda70a487f3@free.fr> <aK9AuSkhr37VnRQS@strlen.de>
- <eb979954-b43c-4e3d-8830-10ac0952e606@free.fr>
- <1713f383-c538-4918-bc64-13b3288cd542@free.fr>
- <CANn89i+Me3hgy05EK8sSCNkH1Wj5f49rv_UvgFNuFwPf4otu7w@mail.gmail.com>
- <CANn89iLi=ObSPAg69uSPRS+pNwGw9jVSQJfT34ZAp3KtSrx2Gg@mail.gmail.com>
- <cd0461e0-8136-4f90-df7b-64f1e43e78d4@trinnet.net>
- <80dad7a3-3ca1-4f63-9009-ef5ac9186612@free.fr>
- <CANn89iJGdn2J-UwK9ux+m9r8mRhAND_t2kU6mLCs=RszBhCyRA@mail.gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Dan Carpenter
- <dan.carpenter@linaro.org>,
-        linux-hams@vger.kernel.org, netdev <netdev@vger.kernel.org>,
-        Dan Cross <crossd@gmail.com>,
-        Folkert van Heusden <folkert@vanheusden.com>,
-        Florian Westphal <fw@strlen.de>
-From: David Ranch <linux-hams@trinnet.net>
-Message-ID: <c7829cbe-a9b0-3c3b-d7c1-88f62a9fae0b@trinnet.net>
-Date: Mon, 1 Sep 2025 12:10:04 -0700
-User-Agent: Mozilla/5.0 (X11; Linux i686; rv:45.0) Gecko/20100101
- Thunderbird/45.8.0
+	s=arc-20240116; t=1756753826; c=relaxed/simple;
+	bh=COrOi3bBkI3gkuh2mO1J3x+3wZuSk193LOMMXhSmpcI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UM+WszWt79MWDL8HPwGj55yTIyPTxC/OEWo6PwzdyUxYxjWKbD1A3btxigTab7mPGfG1nneFjMkNIBMugQI0nlQVhgpJkZNwcSgsmHKGba96jSARzv6TP+/Y7IenF/ws3EMU/h3IaXJ/rDHK+D7GUhWaLySAosxXuHeBXLwc/Cw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KqNbYips; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B460DC4CEF0;
+	Mon,  1 Sep 2025 19:10:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756753826;
+	bh=COrOi3bBkI3gkuh2mO1J3x+3wZuSk193LOMMXhSmpcI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=KqNbYipsdzhIQTxTx0DLHwLOS36b25/1tbp/m47kATOmq/7RXyfM48lBV1f6JMJf/
+	 lZctWgrZtpxJumF3AuuoRFOhHjjp6ZclJUcWDbVh6NEibtgkWRTk3HvE5Ahr+wiUD6
+	 YptkQ3ManiliLpDMzvfFV0ZkSTjilY4t47tUtasgrnJYulfi9xtruNsQ2y7pgw5e1X
+	 oViBfafm8So4DbC5o9ZHCVhsHpazIdhvzDTswVVEvq9uQ+Lt0EtSnjVQs5hi8IPTSU
+	 6D8Mrb86RNKBcjOSv8I3FS54NlGgyjqe5SeBjBu7qHtGDNitRDBI4jU4F8Jh3kPpdy
+	 7Lh0KEyciCrrQ==
+Date: Mon, 1 Sep 2025 12:10:24 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Siva Reddy Kallam <siva.kallam@broadcom.com>
+Cc: leonro@nvidia.com, jgg@nvidia.com, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org, vikas.gupta@broadcom.com,
+ selvin.xavier@broadcom.com, anand.subramanian@broadcom.com
+Subject: Re: [PATCH 1/8] bng_en: Add RoCE aux device support
+Message-ID: <20250901121024.5553a4b3@kernel.org>
+In-Reply-To: <20250829123042.44459-2-siva.kallam@broadcom.com>
+References: <20250829123042.44459-1-siva.kallam@broadcom.com>
+	<20250829123042.44459-2-siva.kallam@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CANn89iJGdn2J-UwK9ux+m9r8mRhAND_t2kU6mLCs=RszBhCyRA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-3.0 (trinity3.trinnet.net [192.168.0.1]); Mon, 01 Sep 2025 12:10:04 -0700 (PDT)
 
+On Fri, 29 Aug 2025 12:30:35 +0000 Siva Reddy Kallam wrote:
+> Add an auxiliary (aux) device to support RoCE. The base driver is
+> responsible for creating the auxiliary device and allocating the
+> required resources to it, which will be owned by the bnge RoCE
+> driver in future patches.
 
-> Keep calm, I am just saying that the bisection pointed to a fine commit,
-> but it took a _lot_ of time to root-cause the issue.
->
-> And the bug is in ax25, not in Paolo patch.
->
-> Please test the fix, and thank me for actually working on a fix, while
-> I have more urgent work on my plate.
+Acked-by: Jakub Kicinski <kuba@kernel.org>
 
-Much appreciated for your work on this patch but I'm curious, is the 
-core issue here on this other committer's patch or just weaknesses in 
-the original AX.25 stack code?
-
---David
-KI6ZHD
+Tho, I think it's a bit weird to push the RDMA driver before your base
+driver is capable of establishing a connection.
 
