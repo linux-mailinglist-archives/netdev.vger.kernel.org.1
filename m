@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-218882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67DF8B3EF30
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 22:10:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8376DB3EF31
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 22:10:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CD192C07EB
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 20:10:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C8B9485723
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 20:10:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69B05246781;
-	Mon,  1 Sep 2025 20:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FEBF25BEE5;
+	Mon,  1 Sep 2025 20:10:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lWCvUHLA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rIKZscx3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4520D2356C6
-	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 20:10:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56EEC25A2B5;
+	Mon,  1 Sep 2025 20:10:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756757403; cv=none; b=Qb9vs5Z+wdjdPJdtqXWaB5aoUFC1mnoHUn1PE15qEqrVtPZmNlJjNjFa0sXsS5z8YH9YJtmsnLMqWDrYHrXc5FFJUyxcwceA9ZBxOrb8s0lMFeTeXCXkYO8gHDyP9rrEhUMbhYTvxQxdPRbYjSvFwimk+s+J+7rS5CMgHVxlSuI=
+	t=1756757404; cv=none; b=QJ05BFwELuVMjeo8y2GZs576g4yOyoPlGYO7lv2T6So9oyKj8CHB5mGgeYQq/hRa5kdouyK256R4TLWJ0WlFV1+5Qvwy+Fi4IXQm2blF2mvYkFkxSO0P2+mGppUKQJRCQDrnO8ZuIyiWAElmc/rV1INhn0LSEeCKfWNt/egpAZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756757403; c=relaxed/simple;
-	bh=sDbewGhJAb9HegpO4oe5rARufmWn91tP3IjUlfMzMyE=;
+	s=arc-20240116; t=1756757404; c=relaxed/simple;
+	bh=ymT14rwWbD8Y2vD4GrUiNATLT7e39pPldzKr2MaM3EA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ePg81VjelFPzzvUttz3vh2ilKooRCnHe6MNPFj5ibkCl0FElMFE454o6h+gkuVjZCPrYz5nKVZ5GJkNy5z7/8hQ9F9BPa22XxSaMzRQX83DnUL5dWCWcL88LlK4Wh5dyUNdhs/JqZNvDSDApj4U1GSv4YusocwBIjyx3KKykl8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lWCvUHLA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B78D5C4CEF0;
-	Mon,  1 Sep 2025 20:10:02 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=FusIFF41G4b6W1RQYXYgFkafXqlqIKz02eJWzP+1MJgyDSegy3sxy4iHzIgiGE1dylNf7G7+gerMLqQhKPbOktBc+YIuYjrDFMzdVn98+KpY7Vp1VaGk+FuLMJdE/UTIrsDxyuZ4yf1hxZFQW4RT8HcLJKqJZGmAd9IYdr2Y29M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rIKZscx3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF833C4CEF5;
+	Mon,  1 Sep 2025 20:10:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756757402;
-	bh=sDbewGhJAb9HegpO4oe5rARufmWn91tP3IjUlfMzMyE=;
+	s=k20201202; t=1756757404;
+	bh=ymT14rwWbD8Y2vD4GrUiNATLT7e39pPldzKr2MaM3EA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lWCvUHLAdeFa69zJrhoiGyc+VZUkzAEyH85seU2B/hzIMaMIQmg68M47uAmh11t3k
-	 Uz360oNs1OTu3GztUrPoEdO/QokXNKdomje7by1CrVfP+IeljCWV/w2lmsKncCggQx
-	 /BdaSGQJZtXCfAFmY56nPrMMHrGEgUqgX4UXYUmFk/d1/MO9hQZWsaaLHHsRegT60v
-	 LX0thx7GEHiGxXJIJgl6v48mCfUiDxgWZm7rkm9GsS14GVoOGHrrYGpzdDgi5HYDqt
-	 qj9v4q+nzBZf7Q6SUjf9Qq6QqhzhcE186RXdYnK8cnwcfwZ+aNidb0cdRcc1vG+7CZ
-	 K00V94N6VE9Gw==
+	b=rIKZscx3GMTqz0hvIRBMrpVaNBVhcn2KwKTIIZDC6YTBic12pl8ak2fwLtptUnqEP
+	 3Diq9+Dqokz5tJTFH9Lfk5pUS6j7QT5zJfFssUqtnThxaPPJmAVrZAfreDNA7v1lbZ
+	 LgY75M3xfl9tXj0xgbnjo7wzoFMijSqxL3n58ALktpGgitzvaZrSUmZkNHgIX58zln
+	 Tw9k8sqN1DEsJjm0v18E7F21Z80yFAXVB+J9XoB/HHwIsIUt6Nst9675ziE9KTyndz
+	 hp0u7v/VnyUtKRW0OTQPQINu0ZV78J/O2ydNDr0VYa1bF/2Ljm1A93vtoW57BrT0p9
+	 hf/lZXyQa4Tbw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF04383BF4E;
-	Mon,  1 Sep 2025 20:10:09 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF4B383BF4E;
+	Mon,  1 Sep 2025 20:10:10 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1 net-next] tcp: Remove sk->sk_prot->orphan_count.
+Subject: Re: [PATCH] net: ethernet: qualcomm: QCOM_PPE should depend on
+ ARCH_QCOM
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175675740851.3870710.8102289702059309815.git-patchwork-notify@kernel.org>
-Date: Mon, 01 Sep 2025 20:10:08 +0000
-References: <20250829215641.711664-1-kuniyu@google.com>
-In-Reply-To: <20250829215641.711664-1-kuniyu@google.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, ncardwell@google.com, horms@kernel.org,
- ayush.sawal@chelsio.com, kuni1840@gmail.com, netdev@vger.kernel.org
+ <175675740974.3870710.18252773056077128098.git-patchwork-notify@kernel.org>
+Date: Mon, 01 Sep 2025 20:10:09 +0000
+References: 
+ <eb7bd6e6ce27eb6d602a63184d9daa80127e32bd.1756466786.git.geert+renesas@glider.be>
+In-Reply-To: 
+ <eb7bd6e6ce27eb6d602a63184d9daa80127e32bd.1756466786.git.geert+renesas@glider.be>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: quic_luoj@quicinc.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 29 Aug 2025 21:56:38 +0000 you wrote:
-> TCP tracks the number of orphaned (SOCK_DEAD but not yet destructed)
-> sockets in tcp_orphan_count.
+On Fri, 29 Aug 2025 13:27:06 +0200 you wrote:
+> The Qualcomm Technologies, Inc. Packet Process Engine (PPE) is only
+> present on Qualcomm IPQ SoCs.  Hence add a dependency on ARCH_QCOM, to
+> prevent asking the user about this driver when configuring a kernel
+> without Qualcomm platform support,
 > 
-> In some code that was shared with DCCP, tcp_orphan_count is referenced
-> via sk->sk_prot->orphan_count.
-> 
-> Let's reference tcp_orphan_count directly.
+> Fixes: 353a0f1d5b27606b ("net: ethernet: qualcomm: Add PPE driver for IPQ9574 SoC")
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 > 
 > [...]
 
 Here is the summary with links:
-  - [v1,net-next] tcp: Remove sk->sk_prot->orphan_count.
-    https://git.kernel.org/netdev/net-next/c/7051b54fb5aa
+  - net: ethernet: qualcomm: QCOM_PPE should depend on ARCH_QCOM
+    https://git.kernel.org/netdev/net-next/c/35dface61cfe
 
 You are awesome, thank you!
 -- 
