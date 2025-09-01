@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-218922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 884F2B3F05F
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 23:13:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 109E3B3F060
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 23:13:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E42224E0540
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 21:13:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A72914E052A
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 21:13:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97722278161;
-	Mon,  1 Sep 2025 21:12:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BFBE279331;
+	Mon,  1 Sep 2025 21:12:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Aix9YOST"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k281GSNT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 744BE278143
-	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 21:12:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38233279329
+	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 21:12:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756761144; cv=none; b=jX3FC4L5D2APbXR+KJ3HuLL0HWDTfKV00mTqTmx3mVg9m+jIPC0cakk2+uE9fDN1iIqjn/yHPTr/Hrk4B1yVIZf+UrGZzv77yNEzOk10ESNtc/yiuekMW8u36HzaCthUln2ShIq5MoGe5NHesKINAu2wrUcLTBfA7sB3ZLr2n9o=
+	t=1756761145; cv=none; b=Nf8JwAsuMVAJ0OGd6owJXiRyhM+CYafktgl/f+rM7bjKdz62plVZO0vlqLgDL+P/RZQ8+Z9AzJztGiSzHu22gL87RkuNf7tNCiYWXPM5wUWWrhj2PlSktRIGMgZ2nT4zpISoqMA8lOAxnlsaBYDrSY3/jfefwhIZt/cSYPyDmpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756761144; c=relaxed/simple;
-	bh=F2+9yFgrCOgv6XZfurnew0Mcm2Ti3r90QGF6C8el4hY=;
+	s=arc-20240116; t=1756761145; c=relaxed/simple;
+	bh=k0XReyJRIRkulRN2jc1H8DqLYbMu7v2xFhGJXc64trw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rVkDTpuFND7Hrip6N7lrpVAVr/cwRLot8nfvfPEX+pi63JeSnCCiHFqO8c79N2um12BHtKoU6KRhaSytZ9F1Q2F1lbp8zs045YrhZhRpuR6H7Eg5PQNNyvk6UOnTOwSTF1BnBheitTp3eiDDQ/Ju1mQR7uYuEi00DIhFVeBl/X4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Aix9YOST; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAA98C4CEF0;
-	Mon,  1 Sep 2025 21:12:23 +0000 (UTC)
+	 MIME-Version; b=mWmQTn/Rn0vr8KmJDuLP5uQqCmxgrdilhI+g83D9Q1QU3LHvIYEt1eV2ewF+jLVHqCtkorEUnDoN9XN/WQ0QmLzvNhskWBbEvPTB3BEjCGRB4v5DsM0PAzO/auT5L9s7dWPRf2pAIs7tm7/CIRlVYU7iKbECQT/qdB/1RYWGulw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k281GSNT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77DDEC4CEF7;
+	Mon,  1 Sep 2025 21:12:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756761144;
-	bh=F2+9yFgrCOgv6XZfurnew0Mcm2Ti3r90QGF6C8el4hY=;
+	s=k20201202; t=1756761145;
+	bh=k0XReyJRIRkulRN2jc1H8DqLYbMu7v2xFhGJXc64trw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Aix9YOSTX0d5UGXjOXWkStcFQAXpk1jGHLvI1cQ/E64AMWluR9AgkGJRK5yTYjegz
-	 YhdQ7Ka5hpqikDJCNNxpN7siI6Eb45mceS7yhjuhIg5w4Ppha8Hzfal20nXUPWIBcm
-	 jR7u/R5uBUGBsbcvWJH1pjEKVsyAi8hrc8VG28Nr4nip6LLLHuqsZnwjvaQqCvc5Jo
-	 Hz2d1zQb3C24w1jhBF2MYbhgWOWus0rpEu1acgREIhddi33mQlxiogzSzyicfK3Ukb
-	 dYHASNwaXthxunnDIrGbJ6GCfBSFEXy22MMUgVkFQ46/xwDYOMmRyx3H+SGGaggg/r
-	 AHTBvrpW7uBHw==
+	b=k281GSNThs9gkysyFHe6TpLdcoJOi16OPbRknoqW8rYO5g4TSOv4Y0e/g1m9nEcxc
+	 waDtq7UjXj7IrkfARDJLuBI61IfPXH0JzV0NuQbVTm+uUwMGGz9XHQ+u2ry3wyIr7G
+	 TU4YU5eCy1nNyc2rm/RzwqIU/ZIHS+S1NR+3O8D7xeG0OyceEb6UY23+B7pvSouz0L
+	 thfSAZwxu3PPfBkmgeQveF1FppfMR0K7MkM5Dd5bYIM+FvYkt3wkdwuVi3k2iLC9b2
+	 TVpUKSg68M+AKIMD94L1UdC5Gur4meeop3ivTruiafaY7o7TbveSs3UAqZHHY6ojEP
+	 XImwKBhKRFkoA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -56,9 +56,9 @@ Cc: netdev@vger.kernel.org,
 	alexanderduyck@fb.com,
 	sdf@fomichev.me,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v3 09/14] eth: fbnic: split fbnic_fill()
-Date: Mon,  1 Sep 2025 14:12:09 -0700
-Message-ID: <20250901211214.1027927-10-kuba@kernel.org>
+Subject: [PATCH net-next v3 10/14] net: add helper to pre-check if PP for an Rx queue will be unreadable
+Date: Mon,  1 Sep 2025 14:12:10 -0700
+Message-ID: <20250901211214.1027927-11-kuba@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20250901211214.1027927-1-kuba@kernel.org>
 References: <20250901211214.1027927-1-kuba@kernel.org>
@@ -70,62 +70,107 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Factor out handling a single nv from fbnic_fill() to make
-it reusable for queue ops.
+mlx5 pokes into the rxq state to check if the queue has a memory
+provider, and therefore whether it may produce unreadable mem.
+Add a helper for doing this in the page pool API. fbnic will want
+a similar thing (tho, for a slightly different reason).
 
+Reviewed-by: Mina Almasry <almasrymina@google.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.c | 33 +++++++++++---------
- 1 file changed, 18 insertions(+), 15 deletions(-)
+v2:
+ - make the helper an rxq helper rather than PP helper
+v1: https://lore.kernel.org/20250820025704.166248-12-kuba@kernel.org
+---
+ include/net/netdev_queues.h                       |  2 ++
+ include/net/page_pool/helpers.h                   | 12 ++++++++++++
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c |  9 +--------
+ net/core/netdev_rx_queue.c                        |  9 +++++++++
+ 4 files changed, 24 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-index 38dd1afb7005..7694b25ef77d 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-@@ -2348,25 +2348,28 @@ void fbnic_flush(struct fbnic_net *fbn)
- 		fbnic_nv_flush(fbn->napi[i]);
+diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
+index b9d02bc65c97..cd00e0406cf4 100644
+--- a/include/net/netdev_queues.h
++++ b/include/net/netdev_queues.h
+@@ -151,6 +151,8 @@ struct netdev_queue_mgmt_ops {
+ 							 int idx);
+ };
+ 
++bool netif_rxq_has_unreadable_mp(struct net_device *dev, int idx);
++
+ /**
+  * DOC: Lockless queue stopping / waking helpers.
+  *
+diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
+index aa3719f28216..3247026e096a 100644
+--- a/include/net/page_pool/helpers.h
++++ b/include/net/page_pool/helpers.h
+@@ -505,6 +505,18 @@ static inline void page_pool_nid_changed(struct page_pool *pool, int new_nid)
+ 		page_pool_update_nid(pool, new_nid);
  }
  
-+static void fbnic_nv_fill(struct fbnic_napi_vector *nv)
-+{
-+	int j, t;
-+
-+	/* Configure NAPI mapping and populate pages
-+	 * in the BDQ rings to use for Rx
-+	 */
-+	for (j = 0, t = nv->txt_count; j < nv->rxt_count; j++, t++) {
-+		struct fbnic_q_triad *qt = &nv->qt[t];
-+
-+		/* Populate the header and payload BDQs */
-+		fbnic_fill_bdq(&qt->sub0);
-+		fbnic_fill_bdq(&qt->sub1);
-+	}
-+}
-+
- void fbnic_fill(struct fbnic_net *fbn)
++/**
++ * page_pool_is_unreadable() - will allocated buffers be unreadable for the CPU
++ * @pool: queried page pool
++ *
++ * Check if page pool will return buffers which are unreadable to the CPU /
++ * kernel. This will only be the case if user space bound a memory provider (mp)
++ * which returns unreadable memory to the queue served by the page pool.
++ * If %PP_FLAG_ALLOW_UNREADABLE_NETMEM was set but there is no mp bound
++ * this helper will return false. See also netif_rxq_has_unreadable_mp().
++ *
++ * Return: true if memory allocated by the page pool may be unreadable
++ */
+ static inline bool page_pool_is_unreadable(struct page_pool *pool)
  {
- 	int i;
- 
--	for (i = 0; i < fbn->num_napi; i++) {
--		struct fbnic_napi_vector *nv = fbn->napi[i];
--		int j, t;
--
--		/* Configure NAPI mapping and populate pages
--		 * in the BDQ rings to use for Rx
--		 */
--		for (j = 0, t = nv->txt_count; j < nv->rxt_count; j++, t++) {
--			struct fbnic_q_triad *qt = &nv->qt[t];
--
--			/* Populate the header and payload BDQs */
--			fbnic_fill_bdq(&qt->sub0);
--			fbnic_fill_bdq(&qt->sub1);
--		}
--	}
-+	for (i = 0; i < fbn->num_napi; i++)
-+		fbnic_nv_fill(fbn->napi[i]);
+ 	return !!pool->mp_ops;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index 3970d0ddbcdc..714cce595692 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -780,13 +780,6 @@ static void mlx5e_rq_shampo_hd_info_free(struct mlx5e_rq *rq)
+ 	bitmap_free(rq->mpwqe.shampo->bitmap);
  }
  
- static void fbnic_enable_twq0(struct fbnic_ring *twq)
+-static bool mlx5_rq_needs_separate_hd_pool(struct mlx5e_rq *rq)
+-{
+-	struct netdev_rx_queue *rxq = __netif_get_rx_queue(rq->netdev, rq->ix);
+-
+-	return !!rxq->mp_params.mp_ops;
+-}
+-
+ static int mlx5_rq_shampo_alloc(struct mlx5_core_dev *mdev,
+ 				struct mlx5e_params *params,
+ 				struct mlx5e_rq_param *rqp,
+@@ -825,7 +818,7 @@ static int mlx5_rq_shampo_alloc(struct mlx5_core_dev *mdev,
+ 	hd_pool_size = (rq->mpwqe.shampo->hd_per_wqe * wq_size) /
+ 		MLX5E_SHAMPO_WQ_HEADER_PER_PAGE;
+ 
+-	if (mlx5_rq_needs_separate_hd_pool(rq)) {
++	if (netif_rxq_has_unreadable_mp(rq->netdev, rq->ix)) {
+ 		/* Separate page pool for shampo headers */
+ 		struct page_pool_params pp_params = { };
+ 
+diff --git a/net/core/netdev_rx_queue.c b/net/core/netdev_rx_queue.c
+index 3bf1151d8061..c7d9341b7630 100644
+--- a/net/core/netdev_rx_queue.c
++++ b/net/core/netdev_rx_queue.c
+@@ -9,6 +9,15 @@
+ 
+ #include "page_pool_priv.h"
+ 
++/* See also page_pool_is_unreadable() */
++bool netif_rxq_has_unreadable_mp(struct net_device *dev, int idx)
++{
++	struct netdev_rx_queue *rxq = __netif_get_rx_queue(dev, idx);
++
++	return !!rxq->mp_params.mp_ops;
++}
++EXPORT_SYMBOL(netif_rxq_has_unreadable_mp);
++
+ int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq_idx)
+ {
+ 	struct netdev_rx_queue *rxq = __netif_get_rx_queue(dev, rxq_idx);
 -- 
 2.51.0
 
