@@ -1,80 +1,88 @@
-Return-Path: <netdev+bounces-218844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD941B3ECEA
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 19:05:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D83EB3ED13
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 19:09:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B19AF4E31D6
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 17:05:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09E4B17B257
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 17:09:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB85C320A05;
-	Mon,  1 Sep 2025 17:05:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07C4632ED37;
+	Mon,  1 Sep 2025 17:08:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MDs2aYC6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FnQ6Ymvk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B31320A03;
-	Mon,  1 Sep 2025 17:05:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C960C3064BB;
+	Mon,  1 Sep 2025 17:08:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756746339; cv=none; b=AxEVN9lr0w2/3d8MglWCSHXZGm/qFQzBdraMHPIsHRAzY+2feyBBopVXQPAwxo4hdGb1TnOFYshpXJSJawGNU0LSYW1cx6NY5YIxhvIkg2u1pDYzyaCo5K0lvRAROl32Zrbw3Tv+26q1Zhx/XIQjpBBaCUiBNlWVk6GtZnN6++Q=
+	t=1756746498; cv=none; b=hrsmZ2t/DEv/d+lwBPnvhEKa3bKZpYcUQshaowIoq+yJF7G6PBCkSZoMVonKiMTDO3XbQnMak5k7sSp3HI2sjqDah3k5mjBsowar5L+6cKQehQCcLtosahCRTExNFQvKdC718y6zapsd3ZxjyzHggwxMYSMTaDY8xu9Un6vY/Tw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756746339; c=relaxed/simple;
-	bh=3SkoNn/o/FjTxi5s9+HexncXthA3P0meTbPdq9Pqarw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uA2uEI4gTUFuyGCW3JgY3nELJCIPjBp7GBeYlORuC+ToKzQO/dsReONM432pYxkcpXxF89uPY37ZD0iXdSACspe2+Hq+JfYdHgZqKiDblR0abmViXebl7LOtHCR+XE0OtybJbatr/bvqXlJEkb70z1XKInPNNiooi4iMFTPL8EE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MDs2aYC6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79476C4CEF0;
-	Mon,  1 Sep 2025 17:05:38 +0000 (UTC)
+	s=arc-20240116; t=1756746498; c=relaxed/simple;
+	bh=Psu+Ha7+6rvVuekjLBry2gD+q3T4H2+4ZpElYNdlzaY=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=hA2hhM5nkKRhp8DMMBzDPX6s1sGuqxMlcIA3OyqCxa5jaBueaR/jdyapnsitPEII8UqrCDlQiY8qjCj1euRalzdPQPMjESeTa0YfCti+xrIpGW/djqaQ6s/LvOvQQu4kfqg939fL/0JBgoJ5o318piQy9Fz8NBjq1Ael/ohzC3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FnQ6Ymvk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE21EC4CEF0;
+	Mon,  1 Sep 2025 17:08:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756746339;
-	bh=3SkoNn/o/FjTxi5s9+HexncXthA3P0meTbPdq9Pqarw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MDs2aYC6KZMmzTW+rt748f0O+Fe9Ar1WeWycuCJyT5TUnKbYLHsGpkXS0sVhxHJAP
-	 +WSXHdqr9RIDsg8y9IeA4a0IaqZnNHVdf9TLJNL5kZO8zR2l4XK82sFgYqfqi+tDYq
-	 /W1K5Py3J58KvRwLovIq09KPR6wXlpx5uAf3UnCgNL0pcmHzlcVLwYrkirw2Qn3Zds
-	 LAQ3QSbe+hblhdZhY0VJSwM5u7eYQUDxf3nmkF7LrlNjeB1gVkq2jeQvKrogSBOnnU
-	 wU0BXFVlwNA9GGNB9jchHBsyXlFmjK0XYq3IcmToxFdU4i+Px8AayjqWrQ6rM8FQoI
-	 p/KiZo5fx2wFQ==
-Date: Mon, 1 Sep 2025 10:05:37 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, Prathosh Satish <Prathosh.Satish@microchip.com>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Schmidt
- <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH net-next v3 5/5] dpll: zl3073x: Implement devlink flash
- callback
-Message-ID: <20250901100537.23a0903e@kernel.org>
-In-Reply-To: <e6cd77a7-bc18-4e0c-9536-5fb107ec4db4@redhat.com>
-References: <20250813174408.1146717-1-ivecera@redhat.com>
-	<20250813174408.1146717-6-ivecera@redhat.com>
-	<20250818192943.342ad511@kernel.org>
-	<e7a5ee37-993a-4bba-b69e-6c8a7c942af8@redhat.com>
-	<20250829165638.3b50ea2a@kernel.org>
-	<e6cd77a7-bc18-4e0c-9536-5fb107ec4db4@redhat.com>
+	s=k20201202; t=1756746498;
+	bh=Psu+Ha7+6rvVuekjLBry2gD+q3T4H2+4ZpElYNdlzaY=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=FnQ6YmvkM+qxK3POl6Iw+D/ge1mC3CpLAudD5A5iIfqsu/47FZTZuboiRzkVCGdqT
+	 e2h4dDGcIJvltoeVVWErE0qmZhjvscnprvveJItdURwYcee+RC+KlitBe1reT5IGad
+	 uNjD2zZuyqUYWgCv0g4FReQ529CZxP0AYSOgiK9d0CW606W3HdqWZDe4kczVDBOjnL
+	 NMA3WAi98aJKiKzgEF5ZMDuDWxt3dIRYgkaEVMZDDzVmfqQo9R6kXheQ+7VbAt8oaf
+	 aUuhg2Ngyn8rbBtl5PkY5ta6IEbAW8Ai0vjMFB+izJbwSbh0hwEaAfWbZxClTUxN0H
+	 hqssXOUbXSTjw==
+From: Vinod Koul <vkoul@kernel.org>
+To: Ioana Ciornei <ioana.ciornei@nxp.com>, 
+ Kishon Vijay Abraham I <kishon@kernel.org>, 
+ Josua Mayer <josua@solid-run.com>
+Cc: Yazan Shhady <yazan.shhady@solid-run.com>, 
+ Jon Nettleton <jon@solid-run.com>, netdev@vger.kernel.org, 
+ linux-phy@lists.infradead.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20250826-lynx-28g-nullptr-v1-1-e4de0098f822@solid-run.com>
+References: <20250826-lynx-28g-nullptr-v1-1-e4de0098f822@solid-run.com>
+Subject: Re: [PATCH] phy: lynx-28g: check return value when calling
+ lynx_28g_pll_get
+Message-Id: <175674649543.186496.4663580683926892498.b4-ty@kernel.org>
+Date: Mon, 01 Sep 2025 22:38:15 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13.0
 
-On Mon, 1 Sep 2025 18:34:14 +0200 Ivan Vecera wrote:
-> 4. Keep my original approach, fix the ignored error code reported by
->     Jakub and pass "re-start normal operation failure" via devlink
->     notification.
 
-4 is fine, we can revisit when another such device appears (tho I
-believe this is an increasingly common way to implement FW update).
+On Tue, 26 Aug 2025 20:32:03 +0200, Josua Mayer wrote:
+> The lynx_28g_pll_get function may return NULL when called with an
+> unsupported submode argument.
+> 
+> This function is only called from the lynx_28g_lane_set_{10gbaser,sgmii}
+> functions, and lynx_28g_set_mode checks available modes before setting a
+> protocol.
+> 
+> [...]
+
+Applied, thanks!
+
+[1/1] phy: lynx-28g: check return value when calling lynx_28g_pll_get
+      commit: 9bef84d30f1f724191270044a7d045bfc9d6ad97
+
+Best regards,
+-- 
+~Vinod
+
+
 
