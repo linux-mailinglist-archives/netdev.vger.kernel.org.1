@@ -1,179 +1,188 @@
-Return-Path: <netdev+bounces-218775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 587B8B3E705
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 16:26:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 606EAB3E728
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 16:30:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80CB6205FD3
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 14:25:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33ADD18817FA
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 14:30:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8D432F49EE;
-	Mon,  1 Sep 2025 14:25:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="BaE6sPBO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A4D4340D9A;
+	Mon,  1 Sep 2025 14:29:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010035.outbound.protection.outlook.com [52.101.69.35])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 499CD2EDD76
-	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 14:25:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.35
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756736743; cv=fail; b=MAFIe6YCF6lNJ1yq3Mj1FPzJ2t86gx8y5a+VaWgkvry4pHI2O7j7hV9gU5YqayiO7jbp5YH95dM+3n3WFmmHDqxG2WkVO8uR8nimxHgvJuCQu5eHMKSxoT/b8IyvYB2r/UE/IcAwFmUeH3jQsdonq9BhL7/bjrG9qCV04kcV8AU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756736743; c=relaxed/simple;
-	bh=urOZFkiP+uE+GIYr9Ees6aJ1nuMhQHufpJpV037o/sA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Eo2YVpJsPszyu2hlIIAKKDljMeYzAn3kNhBxKtDYX/vBK7751L27d2DAeE0AtEuzJb0aFqCqthS4l7CN1/v1ncbmtwkPPcZoORP0Cuv3bqBOvtOkadwZipBRvQnAazQwzu5jib8vrlSc9t+tHBOYQoOlu8DamH3IuLR5tQX5aoc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=BaE6sPBO; arc=fail smtp.client-ip=52.101.69.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Nx2y5Jbsuv9gZQon/IgDVLwUXPBkS7IZtizwY6qj5YbnkyoWZ3vzrWKbN3hzenF8EkgnppcpuRW1e3IbyKOOeQoBFOzoUuvjE3fp2o5a2QXnQL1szy1LOLuE3xIEMEkK2xGDODLaoi3mrf+S1V0g6zMC0jRLDYn577MYUuOC5sSrPWhKIHddAbxBYACSDrgiH+MpL9IaqGdN9ngjAPtV/B+jswaxmh8pHM02x/8ZsTs1i+NmNCEV/EY3dgEAavrcZxfLvEK5dENDL8QhrfGpTMmxAwDT9bSkqPFK0CfyseDzNm1fzYahrUobRJvoG8Ks4kHG3DzfhSNtzOqfY9RIig==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+tSzdMa1SF9/K/FZj+ghS3pjlENQVoDueIVlXZbAOrc=;
- b=GwAaga0neDylLJQo91MRcfcV0/EEq5o9NOIooAclMowxSPWpXRRAvm64L+Qd132cgjIx2pzOuXUhdJhDLYha5AYZ750GNMlhDZ0RXKUd1U/+kX4FBsBqATUGIZo0aX0WKx9dUnl1ToCx9bheHhG0QQsKa6HbpUlOvJgWYXF1bDtCzuuNc/Q4akS8gsy+zlfzx+UN70UpiNtwXrfk3gIVnzNMuPCve51NA64DlGN08ewy/uDdS9RM4NlayQl8h3ss5Ms0Hj0HEpO4ZxOpBxgesLGJyJlOmPeC9qFiGtZ5rNOFJa24/iSbqM4Csf4+onyiK213C1hFJR7Z68sMossGeQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+tSzdMa1SF9/K/FZj+ghS3pjlENQVoDueIVlXZbAOrc=;
- b=BaE6sPBONu5/i67+lR6c2R0xxEZI6ImCh3xJLSIEpyXus3tbVHoG4U3xj4sd3rxUajyDFJkgD6By78Tj9+fDBQm80zt7hhS4yPkS5kJpM9566aOytchU/98hDl9B16Lxb1UCFghodl3vMHxWml7YEtjYwJb//L9tvy95CP0lEDmZ5JdJiqF1kuoSGAGz9P0CVBbM/sZ9Y/I0re9ghZKUPARPptTs1JA/UWRN8I7QKVxdmjD7Nqeu5d8F3XoNuxsAj9/tmVCt6wqsjPhvfESSCYVZRujXGgdUdyg1t367DtaHKvCnI7zmn1tGuF6zDzP24CkcW3AKWlIQz2L221ryXQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
- by GV1PR04MB10726.eurprd04.prod.outlook.com (2603:10a6:150:20f::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.16; Mon, 1 Sep
- 2025 14:25:36 +0000
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2%7]) with mapi id 15.20.9094.011; Mon, 1 Sep 2025
- 14:25:35 +0000
-Date: Mon, 1 Sep 2025 17:25:33 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net] net: phy: fix phy_uses_state_machine()
-Message-ID: <20250901142533.p6wplnjnsnfz2xrn@skbuf>
-References: <E1usl4F-00000001M0g-1rHO@rmk-PC.armlinux.org.uk>
- <20250901084225.pmkcmn3xa7fngxvp@skbuf>
- <aLVivd71G4P4pU0U@shell.armlinux.org.uk>
- <20250901093530.v5surl2wgpusedph@skbuf>
- <aLVwAn87GhFHMjEE@shell.armlinux.org.uk>
- <20250901103624.hv3vnkhjxvp2ep7r@skbuf>
- <aLWqWeGvMM350dB2@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aLWqWeGvMM350dB2@shell.armlinux.org.uk>
-X-ClientProxiedBy: VI1PR07CA0286.eurprd07.prod.outlook.com
- (2603:10a6:800:130::14) To AM8PR04MB7779.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55EE12F49EE;
+	Mon,  1 Sep 2025 14:29:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756736975; cv=none; b=CRgnOiEwBL0Mdis7mU7QOx5h1+fP3HAtLkEZuKjEVrlQeq8A4dKRao9Qo/RZDz5+qfGnPpIu3SqbgtbvWPYVh1hSrTNHLo/SphN+YT7yZsbSz2OhZewbOhpEaSffNptA6N+58o24TbALjsEs0cNomOma0AJRqePBfuY/BLr2GZE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756736975; c=relaxed/simple;
+	bh=rIc9PaP5Dn/UnXTwF/5gEzVX6ZfvAdPwwxjS/weWLp8=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=VWOSxcS1VtPElXn11VAhj5LEsiFpZH5CSkYVPvSzgVS8VB81mr0RVVPVYNDr9exTBCZ7kg92VFPbdvN/VJ7U/Ku1GaFt4n5ZopW5yNl0n3T50XLUQMTwWlgmXYmO/gbwSJuUq6sjA+EWJRwpvT72gbc07JJet02NIbWouj+fCHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-6188b5b113eso5645641a12.0;
+        Mon, 01 Sep 2025 07:29:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756736971; x=1757341771;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NplgeWcNTOnynvORO+lXqHJFAtHGQ9bpXO8+3KZyIv8=;
+        b=PBMpjxC9zUgiC11DCKHDVqyACQGANG0BS6ltiBwPMml1R0aDSCONVRdV3rShdbNAk6
+         rTRk+Xkk0evHM+zvOMatwPrHbdfDgMe+74L+MR4oK8bvQDum+PbvDpc6BKNfYvyEf2HE
+         b3fjHFoJLvRv/gude2IUkAOChYS9aha3vJxlNGx4TrhvsrvivVhUSsv3nGu3KbdiySmI
+         NsEImrehrU4Q3h8BqN3Jv71Z7/Tn5fOAJLt+h8Uf5ODu+9d0TKZrgHcg64UNpy7+2TGS
+         /sKSpyygZSHJx/FCOwIEjL1BWMLSt9C0myDE5rkNmDEj018s/2kZBHWC9e/IwcutoPxU
+         oJSA==
+X-Forwarded-Encrypted: i=1; AJvYcCVzrFe8sNYlCkvg1pSzXI+VZoalutriNwCTR8ES8wC0GEqOUCDIcfhMDcxGEJLwnOL95Av9k6XA@vger.kernel.org, AJvYcCWDqNd8nPE9EYNfNhI73qcqPvVtFx6Vy2HRd5KeTDB3vOkltimCI3gIKFELnSyKAsmoZsd6qIMZIqr3lYg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyC68O7MZxR/bKwnDC6FX6QpIve90WOavl0XNClNUX9NuWKifSA
+	m9LFX5keSdpuarzeAZT4UguuErVVuEzJyzXnvxeN1MIYTzK42J1u72P3OHmEmg==
+X-Gm-Gg: ASbGncveC9GsZBG+leGty5HZbZp+xh6++WSlJXgCNQDRqYAhYi+oiCtNi0EGwFM0O9e
+	/ZubNyPjMU30mhi8EpToQ+kGwiknZ/cfQQDAV9t8jXe6LU+a9r2UeC0zPyXfcVLgGxWun941NWg
+	TnVS7HnBNHHU3lSkBrujzTlu8kwXWE1FyCsOdvht47YFHJBPvs/qhyjLypULbLYzRAe1XplB5aS
+	T+TTaLKlD7rCmobcJYCaKfuiyC4kZlJzpWGYbA8XfqKuXeJ12oI12CX7ycEF4Yy/cI7EZwdZB6d
+	47BOAf7OpS4RiYxUi7nW8pLBp9whFnPM4S9F1OvEC3c+EjeZTAJrMe0wK5GYDYsZHpNbz+D+5Z8
+	npcGXuKGO9h7fdt+MgoeJI+/E
+X-Google-Smtp-Source: AGHT+IGBIGQeIkdga89sLFjwwgHh8OYnMDrUbIJGCO8aVa3tpGY6JBZWq8dWt/C4qF/ldn1mbHERwg==
+X-Received: by 2002:a05:6402:210c:b0:61e:a5c8:e830 with SMTP id 4fb4d7f45d1cf-61ea5c8e868mr1893659a12.1.1756736971012;
+        Mon, 01 Sep 2025 07:29:31 -0700 (PDT)
+Received: from localhost ([2a03:2880:30ff:73::])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-61cfc1c7a8fsm7275979a12.3.2025.09.01.07.29.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Sep 2025 07:29:30 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+Date: Mon, 01 Sep 2025 07:29:13 -0700
+Subject: [PATCH net] netpoll: fix incorrect refcount handling causing
+ incorrect cleanup
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|GV1PR04MB10726:EE_
-X-MS-Office365-Filtering-Correlation-Id: b7116ff8-ac73-42d3-1bc3-08dde9636ab0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|19092799006|1800799024|10070799003|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?/p+xNeI8heUm9K8UC8eRhGWkv50xJn2guipB4HIRbx7Axz7k3brgoOzoNv2Z?=
- =?us-ascii?Q?GDgau6E+Dpn98Z4QKr8OeTSWQgerjG3zHgFhuOm/TGr9fhve9nRk6HeZEXKo?=
- =?us-ascii?Q?IyMY+p4BrN8U+n6nl/Nd6H7V+VXM9d3UGdeGfbpxquxDZfERp+EW/qvkJzrT?=
- =?us-ascii?Q?/i3WzV/tFSxVGVisTMNrZRey9wNH9KuWyTX/X5fm7qHo5QoY2D6r6HWrfKkm?=
- =?us-ascii?Q?YzQQrPTZBRN0vth6rK/8TlWBay5NEzKfun97OmaKsZ0YtL3nJXabytE1ecT+?=
- =?us-ascii?Q?T6UP/3Y6n1vFWt9mNjYjBBoZdcCvAc5xo7NI6GBKlSaz18nBp+2WXBmFGy5W?=
- =?us-ascii?Q?dZWJH4qaMzfwX+WGw5fyD1xJycYamRAcROHmw41E6XW4VeKLLyiySFJkMw8D?=
- =?us-ascii?Q?as73PEqcoYWGjya6OmYTEy2Rj1vTpCTHsSDJV96ecfZOswauCe3DDbaMQVuK?=
- =?us-ascii?Q?gcRBQKlRxrzpRlOgDNe5tsgSWBP2eOZuuComE+1brrO2Mg/adkNqUyYP+oBt?=
- =?us-ascii?Q?1qEtpSIdKcC/GOr7OoJ2FkzNlBHUKEIbVbeJMh/QGbZ028OEVRmiebvoFdYy?=
- =?us-ascii?Q?3Q8rVwl5rGSXwd2chXG/tnZw78PUzjYFgOZXgnqih660fN1kFepKJCic+VKT?=
- =?us-ascii?Q?367O8eyMyrZ5+KqWoSIeiMdxIVa/NaNsBZSc04TQ075/9k3LXeoUBvKIz7Yb?=
- =?us-ascii?Q?IxFX+vTeC/3nvs68U5eK/3ZypRAY/RFCCrrMBvSF10VhlSC+uOTAC8V35gb6?=
- =?us-ascii?Q?2cI3YCbiPhbFaVyVRfMq0GQwYQFqDhfgNCsldmloZmBqpW6RFfJhtY7Y/5am?=
- =?us-ascii?Q?0TLBIAxzZFysMQwBUa1pzlt8vtUx11O3q17UUbnbP5kRjFuBjnSH/+PdxkFQ?=
- =?us-ascii?Q?ebngjbarZBlikpxe0NL+cxdtETCF4zxQOMp5sYdkfdap9hNGEi2VTBnWSNzO?=
- =?us-ascii?Q?1WefHOMg8cXhyc2/DHDA23xV4jhuY/+PlW/NAYwTt+E9ZycYNPhCEHFjWGZv?=
- =?us-ascii?Q?7upBpYi4VJpN01NKUgG8I2WVSxlWYEJRCM+xN5iytmwkuxoblSVk4wdknAkp?=
- =?us-ascii?Q?2FlLd5K/BaRXoCc5gZmlvibPyRqtCjELM7Z28L/OI4XqnCERJ+sYw+zU1yqY?=
- =?us-ascii?Q?D3c1zysDVFNr1SAy5r6OBzDJMDo+nMQxn0cjBjHSmI4YlahhQwotdoqe1NrZ?=
- =?us-ascii?Q?XXIATHfLMttXCiJONsn+eZ0PhSHlOmYQC0RYxCBr6PbwRd7B9WrqX4MchRj2?=
- =?us-ascii?Q?gS/agfGXQhoMAYoyFBcICO2tW/N6qaxvC+Gb/NgOylblO6710/VNNISbprX7?=
- =?us-ascii?Q?YV2mLx/P7uurYITgoheVG8QxXBgfrhcWuhR5i65Lp+Y1jdz6EUEZZ2TU0yUg?=
- =?us-ascii?Q?Nnh47zvwFU5iatGeFJab5oOV1P+s05Ne4BvB54XW97on/Oig0w=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(1800799024)(10070799003)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Pm4m1EK78KanEcQKkJX4sjgCH4AGBfRVEjNE2TZ7+SavSWQSf3lq+6LBuaJj?=
- =?us-ascii?Q?9YmnPUw9045T0bTJ7NBnd3P6xaEcm57gzqUM40GECrMcW8irHiPeSxCO9IfR?=
- =?us-ascii?Q?ufZNkmEu9rFHFIQHbUNkhcm8GoW9KaUzMprehhF88oMI6sVPJGO6bLIo4I6T?=
- =?us-ascii?Q?/m3uBGLQlUPlbSSRA5ikhY6VHzWVowJVMITKuIjYQEMnMa+4cz8Edcf/IEa8?=
- =?us-ascii?Q?+IgAqFBXKU22cww8dG4/+Hub3qpnNWto5ZvgTRFHazx5usT7P9xBNvMueeEQ?=
- =?us-ascii?Q?115lsZvR0wU8VNvAn1bvgmnXspq9RmuNBkm8CFrOGs4f4857c3GIwxnYUzbp?=
- =?us-ascii?Q?W8pVhQy2pWh97nlWO9KPLly5a8J23wKMvv46teTDQIi791WBCgMSXzmaO508?=
- =?us-ascii?Q?MDYn0nYrRNH9uPsYMS+mHfCItLV96bTE59qrkJDvFJp15Tcsl0JTcUInreCr?=
- =?us-ascii?Q?LHF5XD2djQIx+ogT7Cr3ay1YBn9HHQFzdcaJpMwEiIJJrRIm1ScRFRgfPhTY?=
- =?us-ascii?Q?ugFWErrnfiahw3Y4Obg7Iq7HGrw0/yJ39IsuEKRyfKH/gkiTPhGJTm8HNVrJ?=
- =?us-ascii?Q?bS5MB5M8tLc7+HEoyjWxQlPVuNiK3TARR5emc1sOQPMsl+UIR1+rhB5AJi1i?=
- =?us-ascii?Q?dzgrhwgNG4O7x0FxK80O9sqTQ2aKBp2HXL3EE25xnYdZlnxLQkWYJi23W2BX?=
- =?us-ascii?Q?zNqoXrYvMAbPOEstmSHgmd193lRcn1NQxOtPjgHrtlkLy8XrbVXpljbjS0gA?=
- =?us-ascii?Q?yjMKI+JnQak36BOC98FRozc5MZBibaThzc/dEx4bWrWIl74vmqtxQzrHm8BA?=
- =?us-ascii?Q?L1ROTpCCA4P68qAG4ZSh5YMPvPjrzVOjAKCWo+GvCC97qAPjzVSQoxxoyxky?=
- =?us-ascii?Q?/Z6N0fHexlIHiBFwnSbqA0JuYgvBR8uP6BsrFDcTVPYrPXkCjrdB0kY0aiMj?=
- =?us-ascii?Q?OfNWOcyJZ/9ZeSulV/NdkdWRha5N1Bc4jzVfEGzKtwHU+zk5dIGTbxrQWjI0?=
- =?us-ascii?Q?S1G+DP1dKG5COAzRp5XK5IuwbwTuXLKEsSYARS8y8ZEUtF6tTru6H73/cDWI?=
- =?us-ascii?Q?1Vfl37xNH3kFVUbGmukkjPS3zxD/n/mk0dgMJFnWoEd1mg9rj9yNLZqrPmRm?=
- =?us-ascii?Q?AbPMzTet4WxfL5eQL65SzE3khD0LwPeLXtEpNh2VWZuD+RVKYjMqKIl4BBGM?=
- =?us-ascii?Q?kVvSoq1dGVaMeL7uvbVKNWoniup3cWZPH9F3sprOGys8IzMqgYzyHQ4J4CwQ?=
- =?us-ascii?Q?W1XCQZH3xnJhvpKECmGJcOIV31xUvr5icj2ZEvkNgJp0Y5Yk64d9iWqmUXw1?=
- =?us-ascii?Q?SaWpFm2cKZzV62df4DOQCQ1Wr6mWohGjK5XbPUnoPjIC9x+rDs48go8qQPvD?=
- =?us-ascii?Q?Oi46XEqMOVpb4JUjV5spqapXc5ZbUkdHU4C2vbr01+rW+Yy3CSxXLQg4j/ty?=
- =?us-ascii?Q?oZCXOKkYpJg+c69KqTUrGVGa6O4NM6S6m38j2Dn2iA1L+raLpy+0wwN+EPUU?=
- =?us-ascii?Q?E5GvQuMGGaH4gtQlUc40Esh4IUoLmZX78b/h/tMnh4BkYvN74LHVim9T9PLj?=
- =?us-ascii?Q?MhPSjHgS5EPEiBS0e1St7bNxnARzM9065baxC8VuFCrNhBMqFgwMGQa8Pyjq?=
- =?us-ascii?Q?4GVZmt3sSraT0AelFHmkbWdz4H2qopphYBGvh3AGSbZhoHgKRP4hFR1l60PV?=
- =?us-ascii?Q?AuYQPA=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b7116ff8-ac73-42d3-1bc3-08dde9636ab0
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2025 14:25:35.9175
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: IhxUvoRulbYeAhZSuYou79ykKnQmYoABOomFfIFkEOpkQx8arUE+fOuPxTPxHPWnrSTLQzwFwEvyolWa9vUxrg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR04MB10726
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250901-netpoll_memleak-v1-1-34a181977dfc@debian.org>
+X-B4-Tracking: v=1; b=H4sIALmttWgC/x3MUQrCMBAFwKss77uBbVBKcxURqclTF9O0JEWE0
+ rsLzgFmR2M1NgTZUfmxZktBkL4TxNdUnnSWEARe/VlH7V3hti4532bOmdPbjZo0ne5xGHxEJ1g
+ rH/b9jxcUbrgexw+Et+TnZgAAAA==
+X-Change-ID: 20250901-netpoll_memleak-90d0d4bc772c
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ david decotigny <decot@googlers.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ kernel-team@meta.com, stable@vger.kernel.org, jv@jvosburgh.net, 
+ Breno Leitao <leitao@debian.org>
+X-Mailer: b4 0.15-dev-dd21f
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3035; i=leitao@debian.org;
+ h=from:subject:message-id; bh=rIc9PaP5Dn/UnXTwF/5gEzVX6ZfvAdPwwxjS/weWLp8=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBota3J1vyCtlP6LNUk+o4zFSY8qigmfKO1Spm1y
+ ZSjNgJviTmJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaLWtyQAKCRA1o5Of/Hh3
+ bUnuEACgCkzBAIx2/Shph1NfT03nw5u5yMoAbMncpCQr+7K3gZgqPGwuvZ66Y7sqJ1etfm+J6P7
+ Cm5uE9Hk56rVF8nxbzUmwAfMf7dOy1BCP8r735LTGAA72a/A4OaGeh2t7NhACOLuMn4mIGLcHez
+ wQW8PZkipq5Q0C1kG0sj020pYP8fj05Dbu+em0RdtwkS8ESyFa8KxZQ7NbQ3seXQ1RarNETNRRh
+ MCcDzMfnRCt8GkJFvOgKZJxKo37oi76tO0c57vLdddAqRmHDgdoU9FtLf0zUWPPJr5GcmS0t0FS
+ hfvYDo/N3M6RsJLyw2tNKhwo1l20sFKqM6vdXw1L7pfSiMWUXhgZQjnKuUDkfr+nvD/lIb1gyoh
+ 350dkh+1tpqF7mIGgfDgJYlh+k5ycY1oFBz+iCWxva7dUt/aLIXkO9zRwGzIPAj9OcB5SwE/5va
+ tdfj4+jfE0mdSs7SirfYt6x7euS2RAqSpgfQxzEdH8E6UY2QqfBqy5QrNU5AUkijl7+hP/tXUVR
+ ZayjxIuF8yYxrkiGjAZwxy3OC9jyM1i0F0GryXGLhsDTreZHP8VQ7z0Q8RRCXjC6LJ3OKPav/cO
+ NvwalU6F2i//tsE41EBYZmt30ivZ+aibPwJZuUh/i67t6Fan/jtdUW/W9gD+bNsZrt3AAnKGpfW
+ B/vWc5Yc91SLMPg==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-On Mon, Sep 01, 2025 at 03:14:49PM +0100, Russell King (Oracle) wrote:
-> On Mon, Sep 01, 2025 at 01:36:24PM +0300, Vladimir Oltean wrote:
-> > The new explanation and the placement of the function pointer clearing
-> > make sense, thanks. Maybe add one last sentence at the end: "This covers
-> > both the phylink_bringup_phy() error path, as well as the normal
-> > phylink_disconnect_phy() path."
-> 
-> Is it really necessary to add that level of detail? phy_attach() sets
-> phydev->phy_link_change, so it's natural that phy_detach() should undo
-> that action, especially as phy_detach() is phy_attach()'s complement.
+commit efa95b01da18 ("netpoll: fix use after free") incorrectly
+ignored the refcount and prematurely set dev->npinfo to NULL during
+netpoll cleanup, leading to improper behavior and memory leaks.
 
-Well, it shows for future reference the code paths you've considered
-when establishing the placement of the code. Your call whether you want
-to include this sentence or not - and it looks like you don't want to.
+Scenario causing lack of proper cleanup:
+
+1) A netpoll is associated with a NIC (e.g., eth0) and netdev->npinfo is
+   allocated, and refcnt = 1
+   - Keep in mind that npinfo is shared among all netpoll instances. In
+     this case, there is just one.
+
+2) Another netpoll is also associated with the same NIC and
+   npinfo->refcnt += 1.
+   - Now dev->npinfo->refcnt = 2;
+   - There is just one npinfo associated to the netdev.
+
+3) When the first netpolls goes to clean up:
+   - The first cleanup succeeds and clears np->dev->npinfo, ignoring
+     refcnt.
+     - It basically calls `RCU_INIT_POINTER(np->dev->npinfo, NULL);`
+   - Set dev->npinfo = NULL, without proper cleanup
+   - No ->ndo_netpoll_cleanup() is either called
+
+4) Now the second target tries to clean up
+   - The second cleanup fails because np->dev->npinfo is already NULL.
+     * In this case, ops->ndo_netpoll_cleanup() was never called, and
+       the skb pool is not cleaned as well (for the second netpoll
+       instance)
+  - This leaks npinfo and skbpool skbs, which is clearly reported by
+    kmemleak.
+
+Revert commit efa95b01da18 ("netpoll: fix use after free") and adds
+clarifying comments emphasizing that npinfo cleanup should only happen
+once the refcount reaches zero, ensuring stable and correct netpoll
+behavior.
+
+Cc: stable@vger.kernel.org
+Cc: jv@jvosburgh.net
+Fixes: efa95b01da18 ("netpoll: fix use after free")
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+I have a selftest that shows the memory leak when kmemleak is enabled
+and I will be submitting to net-next.
+
+Also, giving I am reverting commit efa95b01da18 ("netpoll: fix use
+after free"), which was supposed to fix a problem on bonding, I am
+copying Jay.
+---
+ net/core/netpoll.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/net/core/netpoll.c b/net/core/netpoll.c
+index 5f65b62346d4e..19676cd379640 100644
+--- a/net/core/netpoll.c
++++ b/net/core/netpoll.c
+@@ -815,6 +815,10 @@ static void __netpoll_cleanup(struct netpoll *np)
+ 	if (!npinfo)
+ 		return;
+ 
++	/* At this point, there is a single npinfo instance per netdevice, and
++	 * its refcnt tracks how many netpoll structures are linked to it. We
++	 * only perform npinfo cleanup when the refcnt decrements to zero.
++	 */
+ 	if (refcount_dec_and_test(&npinfo->refcnt)) {
+ 		const struct net_device_ops *ops;
+ 
+@@ -824,8 +828,7 @@ static void __netpoll_cleanup(struct netpoll *np)
+ 
+ 		RCU_INIT_POINTER(np->dev->npinfo, NULL);
+ 		call_rcu(&npinfo->rcu, rcu_cleanup_netpoll_info);
+-	} else
+-		RCU_INIT_POINTER(np->dev->npinfo, NULL);
++	}
+ 
+ 	skb_pool_flush(np);
+ }
+
+---
+base-commit: 864ecc4a6dade82d3f70eab43dad0e277aa6fc78
+change-id: 20250901-netpoll_memleak-90d0d4bc772c
+
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
+
 
