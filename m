@@ -1,167 +1,93 @@
-Return-Path: <netdev+bounces-218881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3932B3EF21
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 22:03:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 67DF8B3EF30
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 22:10:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C771202CC6
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 20:03:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CD192C07EB
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 20:10:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AFA41DBB13;
-	Mon,  1 Sep 2025 20:03:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69B05246781;
+	Mon,  1 Sep 2025 20:10:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W7Y3wZ2M"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lWCvUHLA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A381E4409
-	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 20:03:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4520D2356C6
+	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 20:10:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756757028; cv=none; b=U89bB8KNvw/L4WW5ZJhy6fSHzqbZcjuBfJ6pRUt8WXhRXgDmxryyIwKgHQSoVsiXsmpZ3BlGJPrCHAf+ZDlbGO+mjqdjtYi5JUQVqEIeT7xqtYW0v5NQN8d4oUO0dqn93lWve5RqvZZHG68rAvGorNyyuuyES24yKMmGBW2eJgg=
+	t=1756757403; cv=none; b=Qb9vs5Z+wdjdPJdtqXWaB5aoUFC1mnoHUn1PE15qEqrVtPZmNlJjNjFa0sXsS5z8YH9YJtmsnLMqWDrYHrXc5FFJUyxcwceA9ZBxOrb8s0lMFeTeXCXkYO8gHDyP9rrEhUMbhYTvxQxdPRbYjSvFwimk+s+J+7rS5CMgHVxlSuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756757028; c=relaxed/simple;
-	bh=8f8IOxxBefCSvfkh7sTG5DnNj2BraBQghoYWNvhwwSc=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
-	 In-Reply-To:Content-Type; b=oG1JACuOo8qas1A5VlmMCsJpj5yDhH4wbY/GBVoS9OAwrOkkfoCzD/Vw9pJ+nna93kagm0Tgp6BtarU7GwN4gTnmqOrgJcDTgCDjH2sRyngmphW3OTdamQBoec4SG+8YXbtrE9u/oAHGoBr3ztjmSCFTUPvtm/8J7a/vOeDsy7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W7Y3wZ2M; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3d3ff4a4d6fso1372843f8f.0
-        for <netdev@vger.kernel.org>; Mon, 01 Sep 2025 13:03:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756757024; x=1757361824; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:to:from:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3PDXlessEGegy+0tN5VzPwQUDST1ilZWMX0b5zgTx24=;
-        b=W7Y3wZ2MD4g9m5/HKSMWu+VwdqKUeRHPff27b4bEyUh2zlZTAnEEUFkuGdXKJkSXFq
-         hnW+k6Ryg3gpKcMjyeElOxTPeVwIMAHQQmpkVLeT0zlHfHRffYFW255Hske3MeEpuV7X
-         umLqdR3IpyhEO9kfgk1RpEWliqeRufMFic81YAMHrvCjAy5gd0N1vYFgv1vy2Rl/WylV
-         nGn+g/MSr+o0uZmbX2HY7tTZe2lxQ+0VbjS+b2auvVeC5qMXss66lhUKp9D3PcRlcIVT
-         RkHWoV9mKiOQPvLwc8/VfCQdgPdtztsre8blo/RVPK8OR1rjMUOzPy/u0ElIzE/yj3RX
-         bUbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756757025; x=1757361825;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3PDXlessEGegy+0tN5VzPwQUDST1ilZWMX0b5zgTx24=;
-        b=vVUZDG3K5pCfCv7+MO3PjyGV0CSkODm93txFYp5msOrD0dAoKINOe27CaxknZwKD+l
-         +CIrZQbPLjqTxCjlpqXrMqq/17knTBVw0YQDvnavji3WkQG+B25G8ZonmquL6OR++n1Q
-         /HXMwQW8NC3ShU9udDYHo6WrZhwMRBisxox63WiTQrGa/lS1yW2g4l8y260ExVuifRP3
-         X++84LkbL3IQhAvlEgK9hFYtv55vvxXY5+hk375xE8JbkLr1iyDdqiRnSbX0HWWxQ6iX
-         ymOrksuGAYh2GIChyVtkkT+sOGFMOF/nfQmQ4kCyPIDfQ3j19bfjoC1bCqxSbKXdJ6g7
-         6tgw==
-X-Gm-Message-State: AOJu0YyWM/I6nnThj6E11Upp10VeVvGEmmFuCpawMmxXLsPHJvjsz7uP
-	xfnVLfZ76/f8lw16UtGnL/V9gQx9RDvugmXfOA4qKXsW8LZXvq+pry1FpvJJtg==
-X-Gm-Gg: ASbGnct+TbS7XzikXXtlvpPW39krXaggF1RAWqJfhQNnavO2UKxFZBkMYNr8FzUYJ8A
-	3P6ug7nNKADBp+q85He2QXbMNsZSbIqBPlC5fO8duEqKr2bKsS5/KqnMPkrFaYOuDPJmvYk5I/H
-	GZ6THmD22UdxEqi5CwWWLdqYbpphmmQiffFCW4WjkIvTON/mOean8Y74NhLRwEgsGqEmu+bqhgo
-	tAcQOMv4D6BfBnHWpvNnmxWRDZXOWGCUX8rXIXYiP76qwskzZwcdYIpUkigDrtSqwDCtVFS1nTF
-	CO/O88ljN6GxwWbH6oC9b58CSg2+MuILdun6hTRJroJmPnO1Y5J+k+o/rmUlyqysKMNemCn/KeO
-	zLa4qPTOkeQHKGiwioubwnUDdpSFuYMLJSWAaRvEIf4ghJ3uPO1xvyutBcVxE1JjAoXzIDrZ1IQ
-	wbZ9FfuU1Ynccj1R0Lhtt9rpHz2XTST9AT5lF5nWZx05iFkLOhfWaw2ha4Jb4=
-X-Google-Smtp-Source: AGHT+IFFgRsyEMWu0+AeoFySktwlvWWry4SBv1N+Kwc6r4mWdYaDZRPqbMe36nxlU/Ac15KBR1wdLw==
-X-Received: by 2002:a05:6000:2084:b0:3b9:14f2:7eed with SMTP id ffacd0b85a97d-3d1df34f84dmr6616402f8f.56.1756757024470;
-        Mon, 01 Sep 2025 13:03:44 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f36:d00:7965:aa82:4012:7ac0? (p200300ea8f360d007965aa8240127ac0.dip0.t-ipconnect.de. [2003:ea:8f36:d00:7965:aa82:4012:7ac0])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3cf274dde69sm16485212f8f.14.2025.09.01.13.03.43
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Sep 2025 13:03:44 -0700 (PDT)
-Message-ID: <0bb79103-d9e3-4386-b362-e9d5e9931cc7@gmail.com>
-Date: Mon, 1 Sep 2025 22:03:47 +0200
+	s=arc-20240116; t=1756757403; c=relaxed/simple;
+	bh=sDbewGhJAb9HegpO4oe5rARufmWn91tP3IjUlfMzMyE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ePg81VjelFPzzvUttz3vh2ilKooRCnHe6MNPFj5ibkCl0FElMFE454o6h+gkuVjZCPrYz5nKVZ5GJkNy5z7/8hQ9F9BPa22XxSaMzRQX83DnUL5dWCWcL88LlK4Wh5dyUNdhs/JqZNvDSDApj4U1GSv4YusocwBIjyx3KKykl8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lWCvUHLA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B78D5C4CEF0;
+	Mon,  1 Sep 2025 20:10:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756757402;
+	bh=sDbewGhJAb9HegpO4oe5rARufmWn91tP3IjUlfMzMyE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=lWCvUHLAdeFa69zJrhoiGyc+VZUkzAEyH85seU2B/hzIMaMIQmg68M47uAmh11t3k
+	 Uz360oNs1OTu3GztUrPoEdO/QokXNKdomje7by1CrVfP+IeljCWV/w2lmsKncCggQx
+	 /BdaSGQJZtXCfAFmY56nPrMMHrGEgUqgX4UXYUmFk/d1/MO9hQZWsaaLHHsRegT60v
+	 LX0thx7GEHiGxXJIJgl6v48mCfUiDxgWZm7rkm9GsS14GVoOGHrrYGpzdDgi5HYDqt
+	 qj9v4q+nzBZf7Q6SUjf9Qq6QqhzhcE186RXdYnK8cnwcfwZ+aNidb0cdRcc1vG+7CZ
+	 K00V94N6VE9Gw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF04383BF4E;
+	Mon,  1 Sep 2025 20:10:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next 0/5] net: phy: remove support for deprecated
- array-style fixed-link binding
-From: Heiner Kallweit <hkallweit1@gmail.com>
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <cd55d7fb-6600-49e5-a772-18b39811b0d2@gmail.com>
-Content-Language: en-US
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <cd55d7fb-6600-49e5-a772-18b39811b0d2@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1 net-next] tcp: Remove sk->sk_prot->orphan_count.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175675740851.3870710.8102289702059309815.git-patchwork-notify@kernel.org>
+Date: Mon, 01 Sep 2025 20:10:08 +0000
+References: <20250829215641.711664-1-kuniyu@google.com>
+In-Reply-To: <20250829215641.711664-1-kuniyu@google.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, ncardwell@google.com, horms@kernel.org,
+ ayush.sawal@chelsio.com, kuni1840@gmail.com, netdev@vger.kernel.org
 
-On 8/30/2025 9:28 PM, Heiner Kallweit wrote:
-> The array-style fixed-link binding has been marked deprecated for more
-> than 10 yrs. See e.g. 91c1d980d601 ("Documentation: devicetree: add old
-> and deprecated 'fixed-link'") from 2014.
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri, 29 Aug 2025 21:56:38 +0000 you wrote:
+> TCP tracks the number of orphaned (SOCK_DEAD but not yet destructed)
+> sockets in tcp_orphan_count.
 > 
-> So migrate the remaining few in-kernel users of the old binding,
-> and remove for it.
+> In some code that was shared with DCCP, tcp_orphan_count is referenced
+> via sk->sk_prot->orphan_count.
 > 
-> v2:
-> - fix "Properties must precede subnodes" error in patches 1 and 2
+> Let's reference tcp_orphan_count directly.
 > 
-> Heiner Kallweit (5):
->   arm64: dts: ls1043a-qds: switch to new fixed-link binding
->   ARM: dts: ls1021a: switch to new fixed-link binding
->   ARM: dts: st: switch to new fixed-link binding
->   net: mdio: remove support for old fixed-link binding
->   net: phy: phylink: remove support for deprecated fixed-link binding
-> 
->  arch/arm/boot/dts/nxp/ls/ls1021a-iot.dts      |  5 +++-
->  arch/arm/boot/dts/st/stih418-b2199.dts        |  5 +++-
->  arch/arm/boot/dts/st/stihxxx-b2120.dtsi       |  5 +++-
->  .../boot/dts/freescale/fsl-ls1043a-qds.dts    |  5 +++-
->  drivers/net/mdio/of_mdio.c                    | 26 -------------------
->  drivers/net/phy/phylink.c                     | 25 +-----------------
->  6 files changed, 17 insertions(+), 54 deletions(-)
-> 
---
-pw-bot: cr
+> [...]
+
+Here is the summary with links:
+  - [v1,net-next] tcp: Remove sk->sk_prot->orphan_count.
+    https://git.kernel.org/netdev/net-next/c/7051b54fb5aa
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
