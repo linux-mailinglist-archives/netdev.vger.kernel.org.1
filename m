@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-218614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6EB5B3D9C3
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 08:20:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83A05B3D9DB
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 08:25:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B82EC3B763B
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 06:20:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 518BB164F7D
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 06:25:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12129246770;
-	Mon,  1 Sep 2025 06:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A28B20E032;
+	Mon,  1 Sep 2025 06:25:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="eIoyUcYt"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="QfaS5yZR"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8590218EB0;
-	Mon,  1 Sep 2025 06:20:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A4722156A;
+	Mon,  1 Sep 2025 06:25:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756707636; cv=none; b=Jvvay8U2+fmKT3ZNtg3VQl6aWtMZCcR4hBYk+d1h4r+IUlsy+BkVcaMuvox0t1AILC3dqHBM8fjLnnZPpyWNOUIOTgsZt6wZdlUaK4C/mcJ1oykz5jW/xnW6cVdHhkMrS4TCYOu18UO6LfaUaV/K1zPaBOlyiH2My3TmXC0fEt8=
+	t=1756707942; cv=none; b=eXpHhP35+eRZV584Tpvg9gXrDjDQETjAhWTkugUADUvk2pNFB4xXQA2YRvaszIUHdaGtz36n7vcn52+jumnKnqw9O3SeqqImmGLcupIdDDjKIcbi74kT6bgAcbI6mcU38iCPiuF1X/1oa7NXSNtO380/8inoI9kVTd/JuK71UqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756707636; c=relaxed/simple;
-	bh=FYMe2bEyQnHgG7oiRFnq7nlgkYuj3AThOUClM2uvShE=;
+	s=arc-20240116; t=1756707942; c=relaxed/simple;
+	bh=7HI3Ro/EE5rzV6n5s5bDuj18Rzg2uhMCG0Mah0c++i0=;
 	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hfl3h7DXZjPHYhNoUZ0br9MBINNw2A1MXNBVr9zoYj7YFZDpjg41pDPdoeU64t3ltjF4Wqq4LW0bbtvqxSoLFL0GDvKup8iljyuZv5nTI9TfSBQMs03wy5BtIoZESL/ISqSrWav7YTtf8N0Z8jrvJ/9C0qiqRjnmWni8uNnvjRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=eIoyUcYt; arc=none smtp.client-ip=68.232.153.233
+	 Content-Type:Content-Disposition:In-Reply-To; b=QHCz8r+FLGCojZA51ncSmh+c4y3smWzu1PvdNGDQxxCQxXKZ8UmV1EeIc9pkDQkr8Esl7IgOL1/2OvbYHxLIA1tmsjQp7lwYnYUnPSljDPL9rnVc6jO1gFMOPLEgzjRp0BN7dI0VT09AdkcTf+3flfCLUabgTLAW3xpU8wHIP2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=QfaS5yZR; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1756707634; x=1788243634;
+  t=1756707940; x=1788243940;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:content-transfer-encoding:in-reply-to;
-  bh=FYMe2bEyQnHgG7oiRFnq7nlgkYuj3AThOUClM2uvShE=;
-  b=eIoyUcYtF2dUHFbcsbmiAaLBy24/Hl5zemgMm4nJg99bXtl6zt0e2u9A
-   e6ABPo2hTcislw7H1SjIEB1vrCPuX4MAagzOLHFCJwY82DIm9SQqY/A0L
-   jy2nyXqBg5XdVvKo5xtIHMz6tmZdO5hGPsjl+NFDP4rg/WOi+gg39Q93j
-   CUl/AS4CtTmo74Xf0njZFgc3ByeZDjNqPayjDEEnuFIcww6SEdm1arB5r
-   dmS2rY+P4CNP7nyepiHLbsAy2Uns6Iu45ezBEacGVP3rnbEExWGB/hyYm
-   F01cGJsXwlCeZh1xUJHtOFNDUJIf2VfZTwMjmd1slp8g7i2fRlE/6WKAj
-   w==;
-X-CSE-ConnectionGUID: XhbRIGuUQGKz55BN2RxhtQ==
-X-CSE-MsgGUID: M1AGaSGDRY20lkXyt/N5RQ==
+  bh=7HI3Ro/EE5rzV6n5s5bDuj18Rzg2uhMCG0Mah0c++i0=;
+  b=QfaS5yZR9v+v+bAzrjvPpegMqOFJ4RZyCQKP+Q0CJBM3VSBApUwmWnci
+   deX4klyVrqtjdOYMlLSuTMBlBQOenM18+szgH7aE0IjhNTz+fiot+wGmB
+   rTI9TM1ui+u7IQ8CyjvgryVs/xgV33RgBGsZJhtuGc+R6HVGrbWrsgDwc
+   OK1zvUVTOMROLQPHE2FE3poMb3abFN9ZNhwul1jAT5Bap73Bd+lIKWebK
+   sRTWTgnLepvSAQrVjohKNm83ggKcGwVG7zsFpbfRdHf5ui0gXDHYWj1EM
+   PwOlpS5w3x7NUjctTQpINLeAPoKkBkctG0yb2roI+UID7Sk31yi+AeRsj
+   A==;
+X-CSE-ConnectionGUID: P1DTPltMS2ie8GsA4XUqfg==
+X-CSE-MsgGUID: vaIqiNDtRpGipA7cJJ5VXg==
 X-IronPort-AV: E=Sophos;i="6.18,225,1751266800"; 
-   d="scan'208";a="45874794"
+   d="scan'208";a="46446076"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 31 Aug 2025 23:20:27 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 31 Aug 2025 23:25:33 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Sun, 31 Aug 2025 23:20:08 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex04.mchp-main.com
- (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
- Transport; Sun, 31 Aug 2025 23:20:08 -0700
-Date: Mon, 1 Sep 2025 08:16:30 +0200
+ 15.1.2507.44; Sun, 31 Aug 2025 23:25:18 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex03.mchp-main.com
+ (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
+ Transport; Sun, 31 Aug 2025 23:25:18 -0700
+Date: Mon, 1 Sep 2025 08:21:40 +0200
 From: Horatiu Vultur <horatiu.vultur@microchip.com>
 To: Kory Maincent <kory.maincent@bootlin.com>
 CC: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
@@ -66,12 +66,12 @@ CC: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
 	<pabeni@redhat.com>, <richardcochran@gmail.com>,
 	<Parthiban.Veerasooran@microchip.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v5 1/2] net: phy: micrel: Introduce function
- __lan8814_ptp_probe_once
-Message-ID: <20250901061630.rddeuz7yclmxl6w3@DEN-DL-M31836.microchip.com>
+Subject: Re: [PATCH net-next v5 2/2] net: phy: micrel: Add PTP support for
+ lan8842
+Message-ID: <20250901062140.df6pqpvs7dyv564l@DEN-DL-M31836.microchip.com>
 References: <20250829134836.1024588-1-horatiu.vultur@microchip.com>
- <20250829134836.1024588-2-horatiu.vultur@microchip.com>
- <20250829163341.17712e59@kmaincent-XPS-13-7390>
+ <20250829134836.1024588-3-horatiu.vultur@microchip.com>
+ <20250829165310.2b97569b@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,28 +81,60 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250829163341.17712e59@kmaincent-XPS-13-7390>
+In-Reply-To: <20250829165310.2b97569b@kmaincent-XPS-13-7390>
 
-The 08/29/2025 16:33, Kory Maincent wrote:
+The 08/29/2025 16:53, Kory Maincent wrote:
 > 
-> On Fri, 29 Aug 2025 15:48:35 +0200
+> On Fri, 29 Aug 2025 15:48:36 +0200
 > Horatiu Vultur <horatiu.vultur@microchip.com> wrote:
 > 
-> > Introduce the function __lan8814_ptp_probe_once as this function will be
-> > used also by lan8842 driver. This change doesn't have any functional
-> > changes.
+> > It has the same PTP IP block as lan8814, only the number of GPIOs is
+> > different, all the other functionality is the same. So reuse the same
+> > functions as lan8814 for lan8842.
+> > There is a revision of lan8842 called lan8832 which doesn't have the PTP
+> > IP block. So make sure in that case the PTP is not initialized.
 > 
-> It would have been nice to add the fact that the lan8842 has a different number
-> GPIO in the commit message. It would have explained more the why.
+> ...
+> 
+> > @@ -5817,6 +5831,43 @@ static int lan8842_probe(struct phy_device *phydev)
+> >       if (ret < 0)
+> >               return ret;
+> >
+> > +     /* Revision lan8832 doesn't have support for PTP, therefore don't add
+> > +      * any PTP clocks
+> > +      */
+> > +     ret = lanphy_read_page_reg(phydev, LAN8814_PAGE_COMMON_REGS,
+> > +                                LAN8842_SKU_REG);
+> > +     if (ret < 0)
+> > +             return ret;
+> > +
+> > +     priv->rev = ret;
+> > +     if (priv->rev == 0x8832)
+> > +             return 0;
+> 
+> Is the lan8832 PHY ID the same as the lan8842? This would be surprising.
+> If they have different PHY ID, it will never enter the lan8842 probe function as
+> it is not added to mdio_device_id.
+> Also you should add a define instead of using several time 0x8832.
 
-Yes, I will update this in the next version.
-Thanks.
+They will have the same PHY ID. And it is the LAN8842_SKU_REG which
+determines which revision of the PHY it is.
+I will add a define for 0x8832.
+> 
+> ...
+> 
+> > @@ -5912,6 +5989,26 @@ static irqreturn_t lan8842_handle_interrupt(struct
+> > phy_device *phydev) ret = IRQ_HANDLED;
+> >       }
+> >
+> > +     /* Phy revision lan8832 doesn't have support for PTP threrefore
+> 
+> nitpick: therefore
+
+Good catch. I will fix this in the next version.
 
 > 
-> Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
-> 
-> Thank you!
-> 
+> Regards,
 > --
 > Köry Maincent, Bootlin
 > Embedded Linux and kernel engineering
