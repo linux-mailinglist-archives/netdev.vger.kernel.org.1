@@ -1,152 +1,160 @@
-Return-Path: <netdev+bounces-218672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B74DAB3DE06
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 11:21:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57C8AB3DE6D
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 11:28:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D7DD188D1CD
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 09:21:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77B741A80B0E
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 09:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9420E30F552;
-	Mon,  1 Sep 2025 09:19:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D928A30BF5D;
+	Mon,  1 Sep 2025 09:23:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="EaMPdb3l"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r0qS7HuO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6003F30DEDA;
-	Mon,  1 Sep 2025 09:19:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABF5321FF44;
+	Mon,  1 Sep 2025 09:23:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756718378; cv=none; b=p83l5iBa3GJyepNbMo2nOk21LJ7sRz6n9H4J/Tn3319CIK4E493QsWtOZLaE2kVvZN3P6Qsp91tj2FfDrrRhr5EU7Y5QzWSPdaGcsjNusTctQEyOXODvd9cDvbYjEakDvJjAmwKf8g8Lt2ZpF7BH6I4MyOYLdDlpDOzRa+UdI7s=
+	t=1756718589; cv=none; b=nEYkOBMoVYr1v3a3cbw11XsbtLkbmjkgh1sGX28a7gBmIQZB4ETztGSNF+SGZkpNdYTpCFwNtfWGUCHsKLwH4/yHiHO5k9xTbkPEKTkAUec7LxTBmZqA/1dQf1alqfN4QvWB2YZi4sPFfLTDNuA6eeg7Bngj+yc14mZoA1aCPCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756718378; c=relaxed/simple;
-	bh=2BFwwk6Oa0P/ezRqVcFlJunKKCnXQeE1OIsUdA4NEXs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=IT6/XiRnzX9MIDJcBewi6qMj3Dr47hDjMtiwwfoV8qeHnfdDli4brfEMPvErm4/27ecAY5RkVDNKhZRXGSbMOrX/PKqvmqwSZ7NTlEkbS5qAKT/az0/KJzXmvRyaivaHRHT0cyQK6WZRJOZQF4ctoLe6eoVBzZ9ThxTnLq+GIGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=EaMPdb3l; arc=none smtp.client-ip=185.132.182.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0288072.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5819DFH8011686;
-	Mon, 1 Sep 2025 11:19:03 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	x/3NINU/K2c7qUKU5f+2zWn2uCGFvhWDC/0NFKmcgbI=; b=EaMPdb3lCCkKG2UB
-	jSzdf6y2qBntKiC4SSKRveSHleQDcxgb3YN8y4K5M6OYGHtYDGtGLWnhr4QgyamM
-	Et5Gmr1LcT+bGml3+g9ygx0pLWC/dVuWU5fR1hUfvG+ieWTqtjFDS7M4SE/CTLLC
-	jpAYHTZeVqtX2FjPlF4v9p6RIQxBAy+T0C7MGqx7y08RYxrcRJzcZz2NZfF0URPM
-	KyKTDVeLc2hKpW4FlZozHN/fbYazLrTvKciLlUcUE2PMHtwevQGni2xJlozmtO6e
-	dSzA++PldFFbcvVdFLnT9NCxtWv0eQJTaxkrx+kKOppUYdy/v8HTeKMiZGHBZN+l
-	TASunw==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 48upqk6ju4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 01 Sep 2025 11:19:03 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 1CC4140050;
-	Mon,  1 Sep 2025 11:17:44 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id B142976B316;
-	Mon,  1 Sep 2025 11:16:38 +0200 (CEST)
-Received: from localhost (10.48.87.141) by SHFDAG1NODE1.st.com (10.75.129.69)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.57; Mon, 1 Sep
- 2025 11:16:38 +0200
-From: Gatien Chevallier <gatien.chevallier@foss.st.com>
-Date: Mon, 1 Sep 2025 11:16:29 +0200
-Subject: [PATCH net-next v4 3/3] ARM: dts: stm32: add missing PTP reference
- clocks on stm32mp13x SoCs
+	s=arc-20240116; t=1756718589; c=relaxed/simple;
+	bh=mGEYnqeC6PLMYnxSuWbgbyaiJ40DleF+U0xPKXGQyLs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MotJUnRRzwMMaaxiyROkGbG4MbOC/ZTVpQv7ZZXFzTfGRpciZs+AGEn1uWAqcFMW+vmTf7Mn67/fKuLnGHPwXUxDx8n4ptut/OOVWQbOtcOAbSg05tdWvVd5zBII9C8b3duGv+OQNTCcoO5DUNKLWppsomMDzLZ0JosgdIlvWrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r0qS7HuO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C326C4CEF0;
+	Mon,  1 Sep 2025 09:23:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756718589;
+	bh=mGEYnqeC6PLMYnxSuWbgbyaiJ40DleF+U0xPKXGQyLs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=r0qS7HuOXGa3nEKsYdNFWX+nFlbI4YbVKQvmT7VL/q2JNLEZ4CxW90BfTLeJc3zqI
+	 Ull6OwvaT/KK+FFncjEcOQRAdPV1+UdgC06+ougecoqgRhwT4CLrI4yhwNdh4yMM3I
+	 NHkiPEHUxVKUAEe2pMMTq9XxGyumsUZKp9I9pID2mRu2Zz6vva8QajN5e7ELH6O+D1
+	 YJ8qdOSHftDUmkGcDhBZAFwQpT6Zv5IPIq2a4ZRaz22MG1U/9hVcRKGxf7MUv6yGkk
+	 2i4FQsOLniJI+1DxGaDAILDJvwlWBUhE2/W7pNkWtdA69b0/PScN9IAw6ce/iNV4Ky
+	 J9EsdkEPLNFJw==
+Message-ID: <0b697d49-adbb-48d5-bbfa-f90c79fb3a4d@kernel.org>
+Date: Mon, 1 Sep 2025 11:23:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [BUG?] driver stmmac reports page_pool_release_retry() stalled
+ pool shutdown every minute
+To: Vincent Li <vincent.mc.li@gmail.com>, netdev@vger.kernel.org,
+ xdp-newbies@vger.kernel.org, loongarch@lists.linux.dev,
+ Dragos Tatulea <dtatulea@nvidia.com>, Furong Xu <0x1207@gmail.com>
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Huacai Chen <chenhuacai@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ Mina Almasry <almasrymina@google.com>, Philipp Stanner <phasta@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Qunqin Zhao <zhaoqunqin@loongson.cn>, Yanteng Si <si.yanteng@linux.dev>,
+ Andrew Lunn <andrew+netdev@lunn.ch>
+References: <CAK3+h2wLLoVW_daqow_ygbut=KnDkPbvG_C8rOoyaiyFMnrPLg@mail.gmail.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <CAK3+h2wLLoVW_daqow_ygbut=KnDkPbvG_C8rOoyaiyFMnrPLg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-ID: <20250901-relative_flex_pps-v4-3-b874971dfe85@foss.st.com>
-References: <20250901-relative_flex_pps-v4-0-b874971dfe85@foss.st.com>
-In-Reply-To: <20250901-relative_flex_pps-v4-0-b874971dfe85@foss.st.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>, John Stultz <jstultz@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>, Stephen Boyd <sboyd@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>,
-        Gatien Chevallier
-	<gatien.chevallier@foss.st.com>
-X-Mailer: b4 0.14.2
-X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-01_04,2025-08-28_01,2025-03-28_01
 
-ETH1/2 miss their PTP reference clock in the SoC device tree. Add them
-as the fallback is not correctly handled for PPS generation and it seems
-there's no reason to not add them.
+Hi Vincent,
 
-Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
----
- arch/arm/boot/dts/st/stm32mp131.dtsi | 2 ++
- arch/arm/boot/dts/st/stm32mp133.dtsi | 2 ++
- 2 files changed, 4 insertions(+)
+Thanks for reporting.
+Please see my instruction inlined below.
+Will appreciate if you reply inline below to my questions.
 
-diff --git a/arch/arm/boot/dts/st/stm32mp131.dtsi b/arch/arm/boot/dts/st/stm32mp131.dtsi
-index ace9495b9b062e9f96437681cc526fed7f9eac5e..b88953485e597dc89c48ea2e3ffd382d1de5de92 100644
---- a/arch/arm/boot/dts/st/stm32mp131.dtsi
-+++ b/arch/arm/boot/dts/st/stm32mp131.dtsi
-@@ -1602,11 +1602,13 @@ ethernet1: ethernet@5800a000 {
- 					      "mac-clk-tx",
- 					      "mac-clk-rx",
- 					      "ethstp",
-+					      "ptp_ref",
- 					      "eth-ck";
- 				clocks = <&rcc ETH1MAC>,
- 					 <&rcc ETH1TX>,
- 					 <&rcc ETH1RX>,
- 					 <&rcc ETH1STP>,
-+					 <&rcc ETH1PTP_K>,
- 					 <&rcc ETH1CK_K>;
- 				st,syscon = <&syscfg 0x4 0xff0000>;
- 				snps,mixed-burst;
-diff --git a/arch/arm/boot/dts/st/stm32mp133.dtsi b/arch/arm/boot/dts/st/stm32mp133.dtsi
-index 49583137b5972572d1feaa699c0c3a822a1b6f6d..053fc669120513c7d2812a0aabe8186fe1f4fe58 100644
---- a/arch/arm/boot/dts/st/stm32mp133.dtsi
-+++ b/arch/arm/boot/dts/st/stm32mp133.dtsi
-@@ -81,11 +81,13 @@ ethernet2: ethernet@5800e000 {
- 			      "mac-clk-tx",
- 			      "mac-clk-rx",
- 			      "ethstp",
-+			      "ptp_ref",
- 			      "eth-ck";
- 		clocks = <&rcc ETH2MAC>,
- 			 <&rcc ETH2TX>,
- 			 <&rcc ETH2RX>,
- 			 <&rcc ETH2STP>,
-+			 <&rcc ETH2PTP_K>,
- 			 <&rcc ETH2CK_K>;
- 		st,syscon = <&syscfg 0x4 0xff000000>;
- 		snps,mixed-burst;
 
--- 
-2.25.1
+On 01/09/2025 04.47, Vincent Li wrote:
+> Hi,
+> 
+> I noticed once I attached a XDP program to a dwmac-loongson-pci
+> network device on a loongarch PC, the kernel logs stalled pool message
+> below every minute, it seems  not to affect network traffic though. it
+> does not seem to be architecture dependent, so I decided to report
+> this to netdev and XDP mailing list in case there is a bug in stmmac
+> related network device with XDP.
+> 
 
+Dragos (Cc'ed) gave a very detailed talk[1] about debugging page_pool
+leaks, that I highly recommend:
+  [1] 
+https://netdevconf.info/0x19/sessions/tutorial/diagnosing-page-pool-leaks.html
+
+Before doing kernel debugging with drgn, I have some easier steps, I
+want you to perform on your hardware (I cannot reproduce given I don't
+have this hardware).
+
+First step is to check is a socket have unprocessed packets stalled in
+it receive-queue (Recv-Q).  Use command 'netstat -tapenu' and look at
+column "Recv-Q".  If any socket/application have not emptied it's Recv-Q
+try to restart this service and see if the "stalled pool shutdown" goes
+away.
+
+Second step is compiling kernel with CONFIG_DEBUG_VM enabled. This will
+warn us if the driver leaked the a page_pool controlled page, without
+first "releasing" is correctly.  See commit dba1b8a7ab68 ("mm/page_pool:
+catch page_pool memory leaks") for how the warning will look like.
+  (p.s. this CONFIG_DEBUG_VM have surprisingly low-overhead, as long as
+you don't select any sub-options, so we choose to run with this in
+production).
+
+Third step is doing kernel debugging like Dragos did in [1].
+
+What kernel version are you using?
+
+In kernel v6.8 we (Kuba) silenced some of the cases.  See commit
+be0096676e23 ("net: page_pool: mute the periodic warning for visible
+page pools").
+To Jakub/kuba can you remind us how to use the netlink tools that can
+help us inspect the page_pools active on the system?
+
+
+> xdp-filter load green0
+> 
+
+Most drivers change memory model and reset the RX rings, when attaching
+XDP.  So, it makes sense that the existing page_pool instances (per RXq)
+are freed and new allocated.  Revealing any leaked or unprocessed
+page_pool pages.
+
+
+> Aug 31 19:19:06 loongfire kernel: [200871.855044] dwmac-loongson-pci 0000:00:03.0 green0: Register MEM_TYPE_PAGE_POOL RxQ-0
+> Aug 31 19:19:07 loongfire kernel: [200872.810587] page_pool_release_retry() stalled pool shutdown: id 9, 1 inflight 200399 sec
+
+It is very weird that a stall time of 200399 sec is reported. This
+indicate that this have been happening *before* the xdp-filter was
+attached. The uptime "200871.855044" indicate leak happened 472 sec
+after booting this system.
+
+Have you seen these dmesg logs before attaching XDP?
+
+This will help us know if this page_pool became "invisible" according to
+Kuba's change, if you run kernel >= v6.8.
+
+
+> Aug 31 19:20:07 loongfire kernel: [200933.226488] page_pool_release_retry() stalled pool shutdown: id 9, 1 inflight 200460 sec
+> Aug 31 19:21:08 loongfire kernel: [200993.642391]
+> page_pool_release_retry() stalled pool shutdown: id 9, 1 inflight
+> 200520 sec
+> Aug 31 19:22:08 loongfire kernel: [201054.058292]
+> page_pool_release_retry() stalled pool shutdown: id 9, 1 inflight
+> 200581 sec
+> 
+
+Cc'ed some people that might have access to this hardware, can any of
+you reproduce?
+
+--Jesper
 
