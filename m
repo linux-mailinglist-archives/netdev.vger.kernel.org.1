@@ -1,195 +1,97 @@
-Return-Path: <netdev+bounces-218936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F421FB3F0A9
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 23:47:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A44EB3F0D3
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 00:10:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A532C3B0EAA
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 21:47:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A616C1A8599D
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 22:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD73F25A2CD;
-	Mon,  1 Sep 2025 21:47:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LjKElxbJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B00E27C17F;
+	Mon,  1 Sep 2025 22:10:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39FE52367C3;
-	Mon,  1 Sep 2025 21:47:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7DCF1E487
+	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 22:10:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756763225; cv=none; b=Izi3sESpLRNIoq7pD0gtnzPaEOFsw/4mZMyYoa/VV5MDoWP/XL8Sk/jvtBTV+0qFEvaWvGtZc9T4i3KlgulpcuJuJlUHMZVCHOQwlIm1XbFO4Hqg1YADrSUITDfSYcjRJ96gF79Rnxh0W6KM+oQ/iM2zDK3RhZTqOlwECMPRCs4=
+	t=1756764607; cv=none; b=paXPllMjbR8bCZSxcCqSxBfmzA3Vaw0m0iL7TsgbNGWLhaj6OLzAnkaAObutJrsMVQhf20FzDamVLkwBdFGRaHmzgSj2K7FqCw/qxNHr79tYl5BW/uphGuaKuvsh/KT7SQw5hc5VSBINt7FwPUp2vPl0l5dqePlEQZ5RACX1bQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756763225; c=relaxed/simple;
-	bh=+NY02T3EKXc/p3Ldv7PZSvRzUT4MNdBvJAIeMcl80GM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=HxI4oLiNPBa0NOj08S2xIsgAGgpMcb6+lC23vXLcArtFDGnapb1b5Lw5nwt7nVtAL8TAAVAIJhO4dsgM9RLXH7zyxHUXvurEvdw9TLMzfR3j0GKM/KmbNNe+3KwkFqQ2cFxlg8d8fqtwpWPz633msZaA0Sqq1XbqQGYpufQMtII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LjKElxbJ; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-248ff4403b9so33404385ad.0;
-        Mon, 01 Sep 2025 14:47:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756763223; x=1757368023; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=OlsE2WeMOlyP3bzmlKQubQNSIzHK7RKjbs8UIIIjOHk=;
-        b=LjKElxbJStuoA5WmqRK1sFe9pID3nEASrzQdG60C5w//WMeIASC0qYXoYLqBApPmjJ
-         bnLTZH/fHxS7sfQi30CdS8UFYXAChjrRMf0DLt5NOVXIkL/OCNMEy+b+2zmnzMXD/+qU
-         qnzExx3RL0uEna66NMzDuMMZclBeSpjWiiUxd2nbiAGyASmcNOaAFx899CfA4pbDZn2/
-         WPAgfVKAMMxGy7d9hjagTjafxIGhwuA0Olp3jFkkI+tA1vlKIQub+PK+DSE9HP/d1BeS
-         R/z/ATeDNsgbTiKF5LprZ5ak6LB9CDlgH5z8gyYH87Jqu/+ZGCnHCamiB/9lSeI8cIU9
-         clDw==
+	s=arc-20240116; t=1756764607; c=relaxed/simple;
+	bh=p0kMM4y7F6N7P9lmCZgTWs3ZjOeXgQCDCsLCsQtEfe0=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=scxoo9wDQsEcL6mk1BAhgkwF8a9p9FL320q2B+/pu/+nP+Bl7mMx5ikYwRps/c0L7xGHuzuMJ8nnAwrXHuHD0jJ6s1I+Bqz60A5wFZ2ftUJiujntMRJH/gG4XEiKBslqa5kYw/OQ3Oar7KIzg0J2tUCpKd8muq79sgD1hD9TqL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3ed0ba44c87so57900835ab.0
+        for <netdev@vger.kernel.org>; Mon, 01 Sep 2025 15:10:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756763223; x=1757368023;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OlsE2WeMOlyP3bzmlKQubQNSIzHK7RKjbs8UIIIjOHk=;
-        b=PPMvZf5CwYjaO3rjm500AXHHM3T1OyJ1wtZcS19P7uSdWBTY3oBs57/okiy6kQSsL2
-         6sGTtkCVmT/BSHTlAO/GhefsSNuBs4nWn0X5Xx/n1MET2m0LU8S+ag+wN1tdyq8Y9oaZ
-         SgGPdXzsaAvbc1UeYhn48X1MaYv5mUR3m6Jb03/jERQrxZuviSul+KJw1SaHnScNwRC9
-         UQqhI7Zn4PQhWSn3YIPjHKO2DU0dVykPiTo4b6d5jOh2f+KuJb7m2ZzGhzAUb41yJVTw
-         h2y37igcvuJIUheAilu8DXKqLzP8le2qMFjpCfgd2Z7nEqtAU52E2optKhpSN+R5oaBH
-         MHAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVFYGKTWxoxqB8rKVeERILD0phTAX63n2Quityo2zPSVba7Cor2AKLpxR1/JUo1gupIKtpWWPK8@vger.kernel.org, AJvYcCXjMVA4rOcsrxR6uigLT3kt+5CvhciPXjl/mIA2gbVAgkm0HctNEUT8MwEBB5zMSATGM9pAoHxRyJs1kxE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxjl1PlNaduqDRuCafhkp2KoZeBsFvBk5MPgtXxAbRFpQPlV4ou
-	sAl/wLAeY1qASXghBS1amozO5X3YkuQOF1+lqcei3dNI0xPsfNTuOZHx
-X-Gm-Gg: ASbGncs1FdzyBfoKTHoI1KN4nSm9O98sW2Nj3fikm/TiEUd5hCKxT2jRvN/Hgzi0fop
-	4ToHUYhZEGgzuUESQDKXzdsT0Zqwqrj1HuvCKS193GzGMnvbHstj8Iys6ZyNsa8xHeSYmbglrJt
-	RJdsirt2HEvWh2zYnkjOhAQOqVuKF+yxPNIzxfxAQ0NoRNFVMTcyno/XiuGm/3XQwTp9MrDuFuJ
-	kglWEesttTmqrssHH5iWHkE0cpMBx7095wbG9xpgNue5JN4Fcddsoa/pfz/xGoaPbxWdeaCK8Mx
-	T+ypdAuyPnW4+eGLY7xzFHcSpiD0G4if9+55JerL0qTCwigX2aN0P9D5vgnTZlgc9ExVT9Tuw/F
-	I9IbctvSuBKxnHlF8nvDVrOxmDuSRWf4tDpBieczwB5a1lJQ=
-X-Google-Smtp-Source: AGHT+IGJ+VbL+KkwAJkiu3byzjAamHyXWU/kRNAZj/DaRKztP3TxkmdmFFWUola7Qz5AGr90A4KQ/Q==
-X-Received: by 2002:a17:902:f608:b0:24a:ad42:3559 with SMTP id d9443c01a7336-24aad4237ddmr89121605ad.56.1756763223308;
-        Mon, 01 Sep 2025 14:47:03 -0700 (PDT)
-Received: from [192.168.0.69] ([159.196.5.243])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2490373a3a9sm112563485ad.50.2025.09.01.14.46.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Sep 2025 14:47:02 -0700 (PDT)
-Message-ID: <7d71d5d3c708451372d2cd0580951997ccc4b883.camel@gmail.com>
-Subject: Re: [PATCH] net/tls: allow limiting maximum record size
-From: Wilfred Mallawa <wilfred.opensource@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: chuck.lever@oracle.com, kernel-tls-handshake@lists.linux.dev, "David S .
- Miller" <davem@davemloft.net>, donald.hunter@gmail.com,
- edumazet@google.com, hare@kernel.org,  Jakub Kicinski	 <kuba@kernel.org>,
- john.fastabend@gmail.com, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, Hannes Reinecke <hare@suse.de>
-Date: Tue, 02 Sep 2025 07:46:55 +1000
-In-Reply-To: <20250901164355.GM15473@horms.kernel.org>
-References: <20250901053618.103198-2-wilfred.opensource@gmail.com>
-	 <20250901164355.GM15473@horms.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
+        d=1e100.net; s=20230601; t=1756764605; x=1757369405;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rONquuup1tA/FntPWjZbG/timt5LNSvQmqhWL+HMBzU=;
+        b=YVhXiApua6qFHA/8kinxRatGmVarviIZRjD/nR03p0L6p8vpam+V6s/uqvgoMRm2bp
+         3NHD0zuADThf73Kn1XnifZva63nKOZs3G/NvQ/aKjntOTzDXYFyuFHCNtGqTzl9ID6LZ
+         nGHDow9582jbgbjYEx5srnlDkhMf0Kh2LWrdNv2h2iIUt5FgN/Tdzh4BbTpkZWg+rSQq
+         LaPpyRzSsqJhqvoDac7hO7PMbIRABuJa/rW0aGMsgO9+qPOkcV2gInAPJc9F+0q5ezmn
+         lHO8tDzUNxD4aL8fEpxheHrO337zwJ6pXuWlt2Yom+D1twH6dbU5d62QzOCrM72np9Rs
+         wRAA==
+X-Forwarded-Encrypted: i=1; AJvYcCXAzArk7xHeEg1kmV4p0QGBBGFL7niCKZyAyc//F5OO8gEu5c4OuJwcBukNWLZpS2tU6PdPfRg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxtfJmEzuAAeqWCvAz6WF3Lt4EzJYAcfa1zmZWiq39L59WqtUNG
+	/vNYE9ZOu+GJVrVSMyLAn2uW/INEcfQghQHtbefy2uUfqp3qnG4A3y/7E9khJXmYenyrYgDG6jo
+	foV9B00bIiperOwOT8JO8nbHKtlMwkRZPG7vvHSrLVQz8q/kVYe5F6k4kSQY=
+X-Google-Smtp-Source: AGHT+IEwWIM0KR32k0CrIYVm5MqXLqvHyE40n+Jbcb7UVXKXi5zhmdRI/WfQizUkVs9bev2AbFsAxIgzU7Q7sbXwGYhdaNj7lYwg
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:1aa2:b0:3f0:78c3:8fc5 with SMTP id
+ e9e14a558f8ab-3f400097882mr176361265ab.5.1756764604779; Mon, 01 Sep 2025
+ 15:10:04 -0700 (PDT)
+Date: Mon, 01 Sep 2025 15:10:04 -0700
+In-Reply-To: <68ac9fd3.050a0220.37038e.0096.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68b619bc.050a0220.3db4df.01c5.GAE@google.com>
+Subject: Re: [syzbot] [bpf?] possible deadlock in __bpf_ringbuf_reserve (2)
+From: syzbot <syzbot+fa5c2814795b5adca240@syzkaller.appspotmail.com>
+To: alexei.starovoitov@gmail.com, andrii@kernel.org, ast@kernel.org, 
+	bpf@vger.kernel.org, daniel@iogearbox.net, eddyz87@gmail.com, 
+	haoluo@google.com, hffilwlqm@gmail.com, john.fastabend@gmail.com, 
+	jolsa@kernel.org, kpsingh@kernel.org, linux-kernel@vger.kernel.org, 
+	martin.lau@linux.dev, memxor@gmail.com, netdev@vger.kernel.org, 
+	sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com, 
+	yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 2025-09-01 at 17:44 +0100, Simon Horman wrote:
->=20
-[snip]
->=20
-> > diff --git a/Documentation/netlink/specs/handshake.yaml
-> > b/Documentation/netlink/specs/handshake.yaml
-> > index 95c3fade7a8d..0dbe5d0c8507 100644
-> > --- a/Documentation/netlink/specs/handshake.yaml
-> > +++ b/Documentation/netlink/specs/handshake.yaml
-> > @@ -87,6 +87,9 @@ attribute-sets:
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 name: remote-auth
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 type: u32
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 multi-attr: true
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 name: record-si=
-ze-limit
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 type: u32
->=20
-> nit: This indentation is not consistent with the existing spec.
->=20
-> > =C2=A0
-> > =C2=A0operations:
-> > =C2=A0=C2=A0 list:
->=20
-> And I believe you are missing the following hunk:
->=20
-> @@ -126,6 +126,7 @@ operations:
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-- status
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-- sockfd
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-- remote-auth
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - rec=
-ord-size-limit
->=20
-> =C2=A0mcast-groups:
-> =C2=A0=C2=A0 list:
->=20
-> ...
-Ah good catch thanks!
->=20
-> > diff --git a/net/handshake/genl.c b/net/handshake/genl.c
-> > index f55d14d7b726..fb8962ae7131 100644
-> > --- a/net/handshake/genl.c
-> > +++ b/net/handshake/genl.c
-> > @@ -16,10 +16,11 @@ static const struct nla_policy
-> > handshake_accept_nl_policy[HANDSHAKE_A_ACCEPT_HAN
-> > =C2=A0};
-> > =C2=A0
-> > =C2=A0/* HANDSHAKE_CMD_DONE - do */
-> > -static const struct nla_policy
-> > handshake_done_nl_policy[HANDSHAKE_A_DONE_REMOTE_AUTH + 1] =3D {
-> > +static const struct nla_policy
-> > handshake_done_nl_policy[__HANDSHAKE_A_DONE_MAX] =3D {
->=20
-> Although it's necessary to update this file in patches,
-> it is automatically generated using: make -C tools/net/ynl/
->=20
-> Accordingly, although the meaning is the same, the line above should
-> be:
->=20
-> static const struct nla_policy
-> handshake_done_nl_policy[HANDSHAKE_A_DONE_RECORD_SIZE_LIMIT + 1] =3D {
->=20
-> > =C2=A0	[HANDSHAKE_A_DONE_STATUS] =3D { .type =3D NLA_U32, },
-> > =C2=A0	[HANDSHAKE_A_DONE_SOCKFD] =3D { .type =3D NLA_S32, },
-> > =C2=A0	[HANDSHAKE_A_DONE_REMOTE_AUTH] =3D { .type =3D NLA_U32, },
-> > +	[HANDSHAKE_A_DONE_RECORD_SIZE_LIMIT] =3D { .type =3D NLA_U32,
-> > },
-> > =C2=A0};
-> > =C2=A0
-> > =C2=A0/* Ops table for handshake */
-> > @@ -35,7 +36,7 @@ static const struct genl_split_ops
-> > handshake_nl_ops[] =3D {
-> > =C2=A0		.cmd		=3D HANDSHAKE_CMD_DONE,
-> > =C2=A0		.doit		=3D handshake_nl_done_doit,
-> > =C2=A0		.policy		=3D
-> > handshake_done_nl_policy,
-> > -		.maxattr	=3D HANDSHAKE_A_DONE_REMOTE_AUTH,
-> > +		.maxattr	=3D HANDSHAKE_A_DONE_MAX,
->=20
-> And this one should be:
->=20
-> 		.maxattr=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D
-> HANDSHAKE_A_DONE_RECORD_SIZE_LIMIT,
->=20
-> > =C2=A0		.flags		=3D GENL_CMD_CAP_DO,
-> > =C2=A0	},
-> > =C2=A0};
-Okay did not know I could "make -C tools/net/ynl/" to generate this.
-Will use that going forward. Thanks for the feedback!
+syzbot has bisected this issue to:
 
-Regards,
-Wilfred
+commit 27861fc720be2c39b861d8bdfb68287f54de6855
+Author: Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Date:   Thu Aug 21 16:26:00 2025 +0000
 
+    bpf: Drop rqspinlock usage in ringbuf
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=167eee34580000
+start commit:   dd9de524183a xsk: Fix immature cq descriptor production
+git tree:       bpf
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=157eee34580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=117eee34580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c321f33e4545e2a1
+dashboard link: https://syzkaller.appspot.com/bug?extid=fa5c2814795b5adca240
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=142da862580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1588aef0580000
+
+Reported-by: syzbot+fa5c2814795b5adca240@syzkaller.appspotmail.com
+Fixes: 27861fc720be ("bpf: Drop rqspinlock usage in ringbuf")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
