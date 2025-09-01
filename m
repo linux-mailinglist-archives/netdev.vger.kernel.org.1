@@ -1,129 +1,173 @@
-Return-Path: <netdev+bounces-218728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84254B3E1C7
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 13:38:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 376FCB3E1C8
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 13:38:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57F6C16CEC3
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 11:38:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D84A93B5282
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 11:38:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23D4A314A93;
-	Mon,  1 Sep 2025 11:38:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC48231B10F;
+	Mon,  1 Sep 2025 11:38:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="f+/L+v4X"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GlI2V31G"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B477305E27
-	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 11:38:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041B7305E27;
+	Mon,  1 Sep 2025 11:38:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756726726; cv=none; b=RaWDHS5jNPqyvtcKgbgOlPBBvdGojA8mQ56Irj4mAI0jKHDM8391Rn+M46vMTECRkrbckO5D3rAl8RSyiWMvH8zKVQYkHtMlUuTrrg6y11EC2l0nPOBUJXzrJ5eeRnL6c9IsKaVBF8N+Ts5TGOLPPgRZG33Ifyo3Hl52aah/hSs=
+	t=1756726729; cv=none; b=o9kBMSUuvqUlKqrj3il1vrmD3RoJESzacPeDy2rsRAlJoO8bQGBFmnu3N+ColvttbWX6kAgRaqzIaDH8hmX0FSRBAgWMOvADQsUJTACXcfDbu15Yp5F/p6tqCo8br6PHwlhMTBjM6TswIE7qJuGmJMeQ9SXhOVNEUR0Bc6hHCQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756726726; c=relaxed/simple;
-	bh=r7dtHC232Acdyffa/9b0fJREPMEdYDvs3aU0KENBw4U=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IpgI0j5vh10cwFjt9liCBr+J2RTvryNQoQ74JfzAWGI5BZIgtk6AJZuWAe1uhNo9ifumVTVpBYAMMKJWH1HnSxG7Rg53mftIWyX6SoX4bGEwXOR4ae4EbWAWMBWvkHSVyYZzJ4iCyjfGpdlIzHsd4XfbkdK2PIKtBQDz8GYClL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=f+/L+v4X; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1756726724; x=1788262724;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=r7dtHC232Acdyffa/9b0fJREPMEdYDvs3aU0KENBw4U=;
-  b=f+/L+v4XM/sgurf1D+WIcSN8J/NxaWk4V7qkQqU4LToZKmMGy68bgUmT
-   5O9oGhf0eDA0hmGMqAVW2Owzgm4ZjnfxalgzzLwh0w09771AMrGqMwVKO
-   PwH9nAkj+XkCGnJiAUUlMUmK8yaEDqOOgmUBdKbDbAjpBP2pAV850KtNO
-   yiBY32ddqcoxI+k1+emDMCwC/D+h/9sb5f49PAyrYrFCLayEVb28ttd4U
-   oSq4Pei3N5aqXpkubsLqWHWjs5X3wMkKqRqRPBI1PeS+M2rmHPGbbVifV
-   WERQB4VWquK6TjU4AzIgUGr7MQ3Qgz02+GAxl+BhTq7zkhtQ2J/Gw8K/1
-   g==;
-X-CSE-ConnectionGUID: R5lgB5FhQdC2EVVSG2GTjA==
-X-CSE-MsgGUID: yLhaCcoOSaOoKG6R5Ab1Sg==
-X-IronPort-AV: E=Sophos;i="6.18,225,1751266800"; 
-   d="scan'208";a="45884589"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Sep 2025 04:38:44 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Mon, 1 Sep 2025 04:38:15 -0700
-Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex01.mchp-main.com
- (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
- Transport; Mon, 1 Sep 2025 04:38:14 -0700
-Date: Mon, 1 Sep 2025 11:38:14 +0000
-From: Daniel Machon <daniel.machon@microchip.com>
-To: Rosen Penev <rosenp@gmail.com>
-CC: <netdev@vger.kernel.org>, <horatiu.vultur@microchip.com>
-Subject: Re: [PATCH net-next 2/2] net: lan966x: convert fwnode to of
-Message-ID: <20250901113814.xiscq26yefs3t4qr@DEN-DL-M70577>
-References: <20250827215042.79843-1-rosenp@gmail.com>
- <20250827215042.79843-3-rosenp@gmail.com>
- <20250828111216.bruz7lq7dz5e6b6f@DEN-DL-M70577>
- <CAKxU2N-zuZfCwU83UA1SQ4c8JrJc+oGSg0Vu28P316uZsVMgcQ@mail.gmail.com>
+	s=arc-20240116; t=1756726729; c=relaxed/simple;
+	bh=8fxbNDoTQaCp/ZjVodY45oB0/hj2vDiL/ePu7IRIUbQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YINL/1A0FNtbxA4k9vpRom2mTfbygr01r1W49QTjxwS4ZoDuuudiM3KGBsmIOYi6xk8CPoL2cpT7Usp5AlNeKWXQrLjzoF+nyQ4bK7V8gjJjredfUpnVlZeJEdwCVYyA+pWIshT7oqUFA5IGzTWjCqqsHh6208VIMg+n56vYMNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GlI2V31G; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3d87cea889dso266053f8f.1;
+        Mon, 01 Sep 2025 04:38:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756726726; x=1757331526; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lwKVMNa4xxT1GMCVlO+8KMGhzj/ldA3uou/L45smr28=;
+        b=GlI2V31GkZzLScl41fHqARwKtWCMUU9LklRRIrdinSjHz2dc3RXLcgzadrPgdg/GmL
+         sCGMXGu0ojyb8MYBubp0hj1/gWt3OCi7m7RdcAoanCRzqze2JxPhMH6v7pkti4M2MIFt
+         eNYuxAJY3MmdRvmP4PQEUd8+c7cF6M/cOkf/Z6vSITbKTsvpe+z+/+8qL+rV1VB3kb8n
+         WB/GZSo2yYPbM6XZSamSYHqnK7IRRkcsjAu6lqmN+IuGOuFJxhNXA8h6Rlp3q3Ff10oB
+         27dqYmaevyMTDPQ7slUpWbwNQwceAhqJMlZ89Uv7T0fOpQYoQXA5f66O1w0MjIyuzZjK
+         lfoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756726726; x=1757331526;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lwKVMNa4xxT1GMCVlO+8KMGhzj/ldA3uou/L45smr28=;
+        b=jEZMJgOZIBZaaEwiY66ZCz1JJtmbmBOQNzSlXEAsCIK45yuXlC4WWM4JKESxn0Ayn7
+         4iqpGmRoW/eTflVEN0IZRSDBLQgWbAEy5pBQhVbQAC9ayva3T5QVXoCmZTX7zirIABR8
+         enMuN4fVKYP30OyjkxvpKHS+xPLc2nwqXxG6ZOr8ytUAJ8S/o9PJzhuPe1yHKWV9GBQX
+         8maTrBlPf5J05nM8oEoSyZaAD/sivQKkjLG79T0wkZwwuHQTaQvNLMIksZ+q9hqGeLgw
+         MyRiGmqoAZ3m2bSDA4rS5QA1yfb4DP8bDjWBRS6UCp9RF9ez+y+rdMKcDBz6nbHN9GB+
+         QC9g==
+X-Forwarded-Encrypted: i=1; AJvYcCUfL5bw3E8dNKlOdHx1Ebytx3BN1w/3lEV6Wn1KWVDvNg8LXrSGtcairEPCs1gxZHSZbJW32HhUCJZAYAA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywr5/ASkBREoU13AH2hhZFJaoGT1PrV2nin80ghgXXGrydWMG2b
+	SuakRqoZNu3kYcfBjI9JOIRdfyp9yEYHPv4Q+CNNYiEtcWlbPGqyi/r74QiZ5LQJk8E=
+X-Gm-Gg: ASbGncs5Gb9eKkNqJART8G6dv1RD+LoMbEu55f+CFERlI1Yne9PNuZfKrL3DRxdz04r
+	HSbSMhzQZCLb94YA5l/rNDg7ED0Dn1f5eyyo/7/1IJwj7DdHffu/RFMGvSrbSo4umj/LKd+4LKR
+	QL7GHq3X5Z1GDOC6fgtyu0MPQjWb0yFvuOS/b+Krlh5to+8jm28Dc9mnCgVJ0St6kCqD8ORjJAq
+	SFtUIm2zM92mwIyUviWGdepDsuoUn2AxLpwh9yYix5CenbhpFvnLEJhWYrKsN7fMYfqAbl9OeJp
+	cja7+vX/zEfGcNySzreEqkrBwb9bIdyjoFRUgfXXfT14fy8Sg7f0yqyeKlypiSEzd6WaS4PyHj5
+	sivgPs/2uae+Agfdz3xaTI06Sp3L72WV549cRMEO5Kfuxg7ec
+X-Google-Smtp-Source: AGHT+IHhVl/mrkWMRm8XTL3ndPvrEBpc5FLF+TzeHV6ufPs1veC2JztRvsLbgP54Zr1Fa0BiKM91jg==
+X-Received: by 2002:a05:6000:2c0f:b0:3d1:d24:ba4e with SMTP id ffacd0b85a97d-3d1def62c8amr5492973f8f.51.1756726725806;
+        Mon, 01 Sep 2025 04:38:45 -0700 (PDT)
+Received: from localhost ([45.10.155.17])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b69b7529asm143048445e9.0.2025.09.01.04.38.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Sep 2025 04:38:45 -0700 (PDT)
+From: Richard Gobert <richardbgobert@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	corbet@lwn.net,
+	saeedm@nvidia.com,
+	tariqt@nvidia.com,
+	mbloch@nvidia.com,
+	leon@kernel.org,
+	ecree.xilinx@gmail.com,
+	dsahern@kernel.org,
+	ncardwell@google.com,
+	kuniyu@google.com,
+	shuah@kernel.org,
+	sdf@fomichev.me,
+	aleksander.lobakin@intel.com,
+	florian.fainelli@broadcom.com,
+	willemdebruijn.kernel@gmail.com,
+	alexander.duyck@gmail.com,
+	linux-kernel@vger.kernel.org,
+	linux-net-drivers@amd.com,
+	Richard Gobert <richardbgobert@gmail.com>
+Subject: [PATCH net-next v4 0/5] net: gso: restore outer ip ids correctly
+Date: Mon,  1 Sep 2025 13:38:21 +0200
+Message-Id: <20250901113826.6508-1-richardbgobert@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <CAKxU2N-zuZfCwU83UA1SQ4c8JrJc+oGSg0Vu28P316uZsVMgcQ@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
-> > > @@ -1179,7 +1179,7 @@ static int lan966x_probe(struct platform_device *pdev)
-> > >                 }
-> > >         }
-> > >
-> > > -       ports = device_get_named_child_node(&pdev->dev, "ethernet-ports");
-> > > +       ports = of_get_child_by_name(pdev->dev.of_node, "ethernet-ports");
-> > >         if (!ports)
-> > >                 return dev_err_probe(&pdev->dev, -ENODEV,
-> > >                                      "no ethernet-ports child found\n");
-> > > @@ -1191,25 +1191,27 @@ static int lan966x_probe(struct platform_device *pdev)
-> > >         lan966x_stats_init(lan966x);
-> > >
-> > >         /* go over the child nodes */
-> > > -       fwnode_for_each_available_child_node(ports, portnp) {
-> > > +       for_each_available_child_of_node(ports, portnp) {
-> > >                 phy_interface_t phy_mode;
-> > >                 struct phy *serdes;
-> > >                 u32 p;
-> > >
-> > > -               if (fwnode_property_read_u32(portnp, "reg", &p))
-> > > +               if (of_property_read_u32(portnp, "reg", &p))
-> > >                         continue;
-> > >
-> > > -               phy_mode = fwnode_get_phy_mode(portnp);
-> > > -               err = lan966x_probe_port(lan966x, p, phy_mode, portnp);
-> > > +               err = of_get_phy_mode(portnp, &phy_mode);
-> > > +               if (err)
-> > > +                       goto cleanup_ports;
-> > > +
-> > > +               err = lan966x_probe_port(lan966x, p, phy_mode, of_fwnode_handle(portnp));
-> >
-> > As I see it, you could change the signature of lan966x_probe_port() to accept a
-> > struct device_node, and instead pass that.  Then you can convert it to fwnode
-> > for phylink_create, and ditch to_of_node().
-> Will fix.
+GRO currently ignores outer IPv4 header IDs for encapsulated packets
+that have their don't-fragment flag set. GSO, however, always assumes
+that outer IP IDs are incrementing. This results in GSO mangling the
+outer IDs when they aren't incrementing. For example, GSO mangles the
+outer IDs of IPv6 packets that were converted to IPv4, which must
+have an ID of 0 according to RFC 6145, sect. 5.1.
 
-Thanks.
+GRO+GSO is supposed to be entirely transparent by default. GSO already
+correctly restores inner IDs and IDs of non-encapsulated packets. The
+tx-tcp-mangleid-segmentation feature can be enabled to allow the
+mangling of such IDs so that TSO can be used.
 
-> >
-> > Same goes for lan966x_port_parse_delays(), here you can change
-> > fwnode_for_each_available_child_node() to for_each_available_child_of_node()
-> > and fwnode_property_read_u32() to of_property_read_u32().
-> I don't see this lan966x_port_parse_delays function.
+This series fixes outer ID restoration for encapsulated packets when
+tx-tcp-mangleid-segmentation is disabled. It also allows GRO to merge
+packets with fixed IDs that don't have their don't-fragment flag set.
 
-Sorry, I was looking at an internal version that had this function. Disregard
-this. The first comment still applies though.
+v3 -> v4:
+  - Specify that mangleid for outer ids cannot turn incrementing ids to fixed if DF is unset
+  - Update segmentation-offload documentation
+  - Fix setting fixed ids in ef100 TSO
+  - Reformat gro_receive_network_flush again
 
-/Daniel
+v2 -> v3:
+ - Make argument const in fou_gro_ops helper
+ - Rename SKB_GSO_TCP_FIXEDID_OUTER to SKB_GSO_TCP_FIXEDID
+ - Fix formatting in selftest, gro_receive_network_flush and tcp4_gro_complete
+
+v1 -> v2:
+ - Add fou_gro_ops helper
+ - Clarify why sk_family check works
+ - Fix ipip packet generation in selftest
+
+Links:
+ - v1: https://lore.kernel.org/netdev/20250814114030.7683-1-richardbgobert@gmail.com/
+ - v2: https://lore.kernel.org/netdev/20250819063223.5239-1-richardbgobert@gmail.com/
+ - v3: https://lore.kernel.org/netdev/20250821073047.2091-1-richardbgobert@gmail.com/
+
+Richard Gobert (5):
+  net: gro: remove is_ipv6 from napi_gro_cb
+  net: gro: only merge packets with incrementing or fixed outer ids
+  net: gso: restore ids of outer ip headers correctly
+  net: gro: remove unnecessary df checks
+  selftests/net: test ipip packets in gro.sh
+
+ .../networking/segmentation-offloads.rst      |  9 ++-
+ .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  8 ++-
+ drivers/net/ethernet/sfc/ef100_tx.c           | 17 ++++--
+ include/linux/netdevice.h                     |  9 ++-
+ include/linux/skbuff.h                        |  6 +-
+ include/net/gro.h                             | 36 +++++-------
+ net/core/dev.c                                |  4 +-
+ net/ipv4/af_inet.c                            | 10 +---
+ net/ipv4/fou_core.c                           | 32 +++++-----
+ net/ipv4/udp_offload.c                        |  2 -
+ net/ipv6/udp_offload.c                        |  2 -
+ tools/testing/selftests/net/gro.c             | 58 ++++++++++++++-----
+ tools/testing/selftests/net/gro.sh            |  5 +-
+ 13 files changed, 117 insertions(+), 81 deletions(-)
+
+-- 
+2.36.1
+
 
