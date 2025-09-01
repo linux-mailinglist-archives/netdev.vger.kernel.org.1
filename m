@@ -1,139 +1,229 @@
-Return-Path: <netdev+bounces-218756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85679B3E4EF
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 15:28:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53130B3E510
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 15:31:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10A271A8485D
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 13:28:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94CC83AA4E1
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 13:31:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2284030BF7B;
-	Mon,  1 Sep 2025 13:28:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66DAE3314AF;
+	Mon,  1 Sep 2025 13:31:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="OsEF+cf3"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="HJOFeLbK";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="SgrxJdEp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from flow-b2-smtp.messagingengine.com (flow-b2-smtp.messagingengine.com [202.12.124.137])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F29F27467B
-	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 13:28:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E7FE1C84CB;
+	Mon,  1 Sep 2025 13:31:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.137
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756733283; cv=none; b=L8UTa1+9wQHsmoX4gpwOhQiXwvY/9sehg78Llr3FfiPLw3vdlKiCWm8UYygAJ8DufyieqiKObuD0cr1zgTaEEEANBTYHRwHLOducgnQF0J+FgDRAMOr60/MuKRnMGZKRAoaKWNOzxrBMpwuMd5XHdVMIL/lZpWhBU69JzfVkqq4=
+	t=1756733510; cv=none; b=nJM4MKp75pV8uUafCX9/20BLbph7GXFZWzwx0Xky7V7H4mjUFkBLGOe9+HZ6MXmSi3xb6tFQrAjSw1xwNk/EN0Ob8OvTfNdaikQ5CuzH81eQigaoqNKwiVVKCVtuJ9/yGtWwq9jNVkA0SECuf1Ik4/9jaqBmHkablw9w+ma2re4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756733283; c=relaxed/simple;
-	bh=6O9zYzknF1XakScCV4bBbfOhUs+802B4MkwhMeX25CQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=OSyMIYcOH5DFdqwOmUJHv+EcEikH92M38GSRzG20YV60W4njru8kOHdg2nyday8BTfn0SQX0dANFnAggP/tq/y1T8Mzx72C3SZwTyGGxFc16FXPhuVf8TgOSfcrGuh4jMb3bw9I/zeesWEfNHEZZAbLOcgI9/cJLbZF1Tf8FE+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=OsEF+cf3; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-afebb6d4093so724219666b.1
-        for <netdev@vger.kernel.org>; Mon, 01 Sep 2025 06:28:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1756733279; x=1757338079; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SvkpV4Bq+rj+YuFtB7kDJzqT2KzLsgVk2R2l+HFV7nw=;
-        b=OsEF+cf3p0AJ11lNHUNClDHP6nWkirEYx9oIikOVDY4YGzA3MKCWDPWrbV40SJUkKa
-         iiPOttNGWEBdUIVFu0y+7ab8zJ9HFToySbXdcF8YYOvpinQ9vdretF9rQ1+4+onGg9iW
-         SwUKXzC4mShTE88Ry/eEiUGH+zh6sYsNhDb7T3HnKKvnLhCl5xgu2TtLJ+g1jCBhC+zd
-         3apYAQlu3RdYzm3Kn/fV5zWJqx1yZ0zgoUVeA/ALH+or7I4ZgAT+SbnniQQguDtcBkJA
-         ZuZaYXpGlC46S35fp4+QPin5lw+vWHGd4eJMgKN3HirunSnPJSvYw6ADqm2NI8fvc6sZ
-         salw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756733279; x=1757338079;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SvkpV4Bq+rj+YuFtB7kDJzqT2KzLsgVk2R2l+HFV7nw=;
-        b=UazrOGGLY2oXKM2hNXA9HKfG8r53meCw2kvuo/1yEFhu+Ary9GknSx8Hjk7cPpFc9k
-         AE66sX1sW7Uzpu+hD7AXMVyCV+ixUFckHOekuoY3LLU5F17X0O+m+39JfbcKrEsl///G
-         /OdePQa1tPWaOofawMFaSDlPcGJXyEnZee2wTY3hTgpjqE1bQa4iGWW2j4SGDfLtBB+l
-         lwve8CNNrLcDqNBOPkqL4Rh3wYu5FMoyIxK2k9DQszWoQyf/za0xYqlzd1ikyW+CJ35u
-         R6K8Ky0DyMxGVcvtZ3AZPAsHJKrBbc8zOjuucIYk8jex0+LOJB+NSWwAZcqFL3RhZnin
-         IeTw==
-X-Forwarded-Encrypted: i=1; AJvYcCVMBgfsFRAMmyzAuTHv2b2BvBqHab/1MctrOsdtYKPd6RUggBDOhWFsjeWOZNYEVAITzHY2ldc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySTHT9xXPd/JDb4Gf1wWnssgkUsMnL/IePNOpX8uI7GRvpYpfW
-	w12zFOH7XFXD8SJLESBVPWknuonJ4t60tPsCEiz7NApWF4siauzt0Q+nCTBDJdQc8zI=
-X-Gm-Gg: ASbGncsigwzONHzcOtisKY5Cv6uhG8a4d+OumCKUGWmmZfZR2jeQxPGdDpWK8HQqDMg
-	A27nVGeP2dsPQwPK6gzrZ4U8Zl6WIUDXbXGi1MHzzJ06yT7+xL9bQZHx0oSkgRHHUCjmMN3PjYf
-	JsENjY5sgJ1hVzLbRuBt4kCEVQxDFeragNAwkQgnEqVAMerVD5JH/kg0UxAlyRkteeQxK+jr+k+
-	mVpNqOIdzlOf4Ha2n1wYCRF8049TX7WQxCDVMZWQquwUIuhV+VkrquPiIrnXqV+pMs8J9r+kOOM
-	uXxunOMnKGQZ+ABpHSptYeCvXC9rSsfyxVR/jZGKYWj+07bMBVI1GfgGLVzLdB0rss/MsGXmGKJ
-	e/orwAAo9l3Ozl8JYOXHoxbO/qw==
-X-Google-Smtp-Source: AGHT+IEh3AaonZ5QJBkOf1S6UvYDoHMiIZHdv/ST35c9pqz9MF0Ajnr6x/W5jLydJXe0NqvFsZyLHA==
-X-Received: by 2002:a17:906:f5a2:b0:b04:3955:10e2 with SMTP id a640c23a62f3a-b0439551a93mr223405766b.25.1756733279510;
-        Mon, 01 Sep 2025 06:27:59 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5063:295f::41f:42])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-61cfc5315c7sm7074508a12.46.2025.09.01.06.27.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Sep 2025 06:27:58 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Mon, 01 Sep 2025 15:27:43 +0200
-Subject: [PATCH bpf-next v2] bpf: Return an error pointer for skb metadata
- when CONFIG_NET=n
+	s=arc-20240116; t=1756733510; c=relaxed/simple;
+	bh=Eznu89d4Wi9DxarExeHtKpzVjwvcq68i7OTy3S868gA=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=t3k4lSHyllXzWf462pGHVJIwMlt0LFQRFeONbsEASjZ/RAescQsV3kanuYd7A4wsIg7w3dz66mc9v3gQnIbbNrB6FiGjgSy20p4KbYZdlnBBH4HwJPceNe3cQOFyg5RhzgB1mGQ2Ay2f1DsIof4slTi3a9zLMk0G2UVH1rivHyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=HJOFeLbK; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=SgrxJdEp; arc=none smtp.client-ip=202.12.124.137
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailflow.stl.internal (Postfix) with ESMTP id DB5981300C62;
+	Mon,  1 Sep 2025 09:31:46 -0400 (EDT)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-05.internal (MEProxy); Mon, 01 Sep 2025 09:31:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1756733506;
+	 x=1756740706; bh=Eznu89d4Wi9DxarExeHtKpzVjwvcq68i7OTy3S868gA=; b=
+	HJOFeLbKHaYEFcpujtYi0UQgoIXOL1xP4OwwynCD84swzMtLipUsunnbT4hVqPEN
+	wVE41qx2dhs0FBl9u7JPuVJhHifoAxjGT0sJrob25NGhOnKXoveJaBFJqW4nvgog
+	halZU6spZuFP4kbS8kc26sPVBVsv74LttHLcedp085AaoTT4gBVLCmbtd+KXgDRJ
+	eq/kSjKLy3gTJzFeYJ4ziz+zY2pF0DOCuVPDCxmJHTv0zZaXMuetiQ92eXeOcc2F
+	7k+jMiBLq8BEp997KeUtRmTuyEAQWlQImm59MK8krOpJLrkQ/PRATyIs4ZDTjD9d
+	UOMihPRQfY4LUHkKBvJ4fg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1756733506; x=
+	1756740706; bh=Eznu89d4Wi9DxarExeHtKpzVjwvcq68i7OTy3S868gA=; b=S
+	grxJdEpeZNejb8yQpBRVyN+Ths0LzXhKDaDBWou1JQCaPeSjVvWd9/YmPtm77slz
+	0cz2VUn0flJuQpLgACGwCjuYr16Jj88RIj++Q7EJ5BZSfqGZKgr0kLHoehog9vlO
+	L1PVI0bfQGloEyCj/gXxGtq1tskacB4mM9Qdq6CYs7C5l1Owjnxvia7IhF2yYeVD
+	tFHw9NizDJH9T7aNo7YjjudTZwCuL4FTybBDwWInmhz/kF/lFSj0Iuz0s1u5BHRl
+	2/eSCTaJEfU02XDVO5TgHwhPkp6DB8xio2jzb/t45jROB5g0jH8NPrWXN00PJms4
+	BnrmLNG3JYC8werAD4U+Q==
+X-ME-Sender: <xms:PKC1aDMBxgovMWLfWBd4cRlSrb-ybuzfQI0GT1e7b8ntvE5aeaLv1g>
+    <xme:PKC1aN9wXBjEJopf-cXpj02M3MqL0le4fWXfa1yZ3rC1GwCwcVEcUYv4-_AatOfTw
+    x2hty0_mKEbKARcuGs>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdduledvvdekucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrnhgu
+    uceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvg
+    hrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefggfevudegudevledvkefhvdei
+    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnh
+    gusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepvdehpdhmohguvgepshhmthhpohhu
+    thdprhgtphhtthhopehvsggrsghkrgesshhushgvrdgtiidprhgtphhtthhopehmghhorh
+    hmrghnsehsuhhsvgdruggvpdhrtghpthhtohephihsrghtohesuhhsvghrshdrshhouhhr
+    tggvfhhorhhgvgdrjhhppdhrtghpthhtoheptghgrhhouhhpshesvhhgvghrrdhkvghrnh
+    gvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgrlhhphhgrsehvghgvrhdrkhgvrhhn
+    vghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqsghlohgtkhesvhhgvghrrdhkvghrnh
+    gvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgtshhkhiesvhhgvghrrdhkvghrnhgv
+    lhdrohhrghdprhgtphhtthhopehlihhnuhigqdhfshguvghvvghlsehvghgvrhdrkhgvrh
+    hnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqhhgvgigrghhonhesvhhgvghrrdhk
+    vghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:PKC1aHc_SneP4oZaIlm2I0mCWaMkxtDlvTv0V8gC3D_V0OMUyVTyCg>
+    <xmx:PKC1aE8yKA6wsd2k0UEDrRf8yTwVmtAyR9ODXYDtKEh0GQKBOKOvXg>
+    <xmx:PKC1aFjVN15GFN05gLCMPuoMX46HJi2CESG5C-2YIhXrmWCJSxO38A>
+    <xmx:PKC1aA-hZ0ZP3kMXoEQDgMK-syJF8YOFOM8ORPdWBYA4Xa6z8T3pxQ>
+    <xmx:QqC1aMZPlus7-M4xtUxEkoNCXlTlemB034wmHs0FUL7IvjuAIAxHGZ59>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 68A5D700068; Mon,  1 Sep 2025 09:31:40 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+X-ThreadId: A1XJ5FccVF4B
+Date: Mon, 01 Sep 2025 15:30:20 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "schuster.simon@siemens-energy.com" <schuster.simon@siemens-energy.com>,
+ "Dinh Nguyen" <dinguyen@kernel.org>,
+ "Christian Brauner" <brauner@kernel.org>,
+ "Andrew Morton" <akpm@linux-foundation.org>,
+ "David Hildenbrand" <david@redhat.com>,
+ "Lorenzo Stoakes" <lorenzo.stoakes@oracle.com>,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ "Vlastimil Babka" <vbabka@suse.cz>, "Mike Rapoport" <rppt@kernel.org>,
+ "Suren Baghdasaryan" <surenb@google.com>,
+ "Michal Hocko" <mhocko@suse.com>, "Ingo Molnar" <mingo@redhat.com>,
+ "Peter Zijlstra" <peterz@infradead.org>,
+ "Juri Lelli" <juri.lelli@redhat.com>,
+ "Vincent Guittot" <vincent.guittot@linaro.org>,
+ "Dietmar Eggemann" <dietmar.eggemann@arm.com>,
+ "Steven Rostedt" <rostedt@goodmis.org>,
+ "Benjamin Segall" <bsegall@google.com>, "Mel Gorman" <mgorman@suse.de>,
+ "Valentin Schneider" <vschneid@redhat.com>,
+ "Kees Cook" <kees@kernel.org>,
+ "Paul Walmsley" <paul.walmsley@sifive.com>,
+ "Palmer Dabbelt" <palmer@dabbelt.com>,
+ "Albert Ou" <aou@eecs.berkeley.edu>, "Alexandre Ghiti" <alex@ghiti.fr>,
+ guoren <guoren@kernel.org>, "Oleg Nesterov" <oleg@redhat.com>,
+ "Jens Axboe" <axboe@kernel.dk>,
+ "Alexander Viro" <viro@zeniv.linux.org.uk>, "Jan Kara" <jack@suse.cz>,
+ "Tejun Heo" <tj@kernel.org>, "Johannes Weiner" <hannes@cmpxchg.org>,
+ =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
+ "Paul Moore" <paul@paul-moore.com>, "Serge Hallyn" <sergeh@kernel.org>,
+ "James Morris" <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>,
+ "Anna-Maria Gleixner" <anna-maria@linutronix.de>,
+ "Frederic Weisbecker" <frederic@kernel.org>,
+ "Thomas Gleixner" <tglx@linutronix.de>,
+ "Masami Hiramatsu" <mhiramat@kernel.org>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>,
+ "Mathieu Desnoyers" <mathieu.desnoyers@efficios.com>,
+ "Arnaldo Carvalho de Melo" <acme@kernel.org>,
+ "Namhyung Kim" <namhyung@kernel.org>,
+ "Mark Rutland" <mark.rutland@arm.com>,
+ "Alexander Shishkin" <alexander.shishkin@linux.intel.com>,
+ "Jiri Olsa" <jolsa@kernel.org>, "Ian Rogers" <irogers@google.com>,
+ "Adrian Hunter" <adrian.hunter@intel.com>,
+ "John Johansen" <john.johansen@canonical.com>,
+ "Stephen Smalley" <stephen.smalley.work@gmail.com>,
+ "Ondrej Mosnacek" <omosnace@redhat.com>,
+ "Kentaro Takeda" <takedakn@nttdata.co.jp>,
+ "Tetsuo Handa" <penguin-kernel@i-love.sakura.ne.jp>,
+ "Richard Henderson" <richard.henderson@linaro.org>,
+ "Matt Turner" <mattst88@gmail.com>, "Vineet Gupta" <vgupta@kernel.org>,
+ "Russell King" <linux@armlinux.org.uk>,
+ "Catalin Marinas" <catalin.marinas@arm.com>,
+ "Will Deacon" <will@kernel.org>, "Brian Cain" <bcain@kernel.org>,
+ "Huacai Chen" <chenhuacai@kernel.org>, "WANG Xuerui" <kernel@xen0n.name>,
+ "Geert Uytterhoeven" <geert@linux-m68k.org>,
+ "Michal Simek" <monstr@monstr.eu>,
+ "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>,
+ "Jonas Bonn" <jonas@southpole.se>,
+ "Stefan Kristiansson" <stefan.kristiansson@saunalahti.fi>,
+ "Stafford Horne" <shorne@gmail.com>,
+ "James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
+ "Helge Deller" <deller@gmx.de>,
+ "Madhavan Srinivasan" <maddy@linux.ibm.com>,
+ "Michael Ellerman" <mpe@ellerman.id.au>,
+ "Nicholas Piggin" <npiggin@gmail.com>,
+ "Christophe Leroy" <christophe.leroy@csgroup.eu>,
+ "Heiko Carstens" <hca@linux.ibm.com>,
+ "Vasily Gorbik" <gor@linux.ibm.com>,
+ "Alexander Gordeev" <agordeev@linux.ibm.com>,
+ "Christian Borntraeger" <borntraeger@linux.ibm.com>,
+ "Sven Schnelle" <svens@linux.ibm.com>,
+ "Yoshinori Sato" <ysato@users.sourceforge.jp>,
+ "Rich Felker" <dalias@libc.org>,
+ "John Paul Adrian Glaubitz" <glaubitz@physik.fu-berlin.de>,
+ "Andreas Larsson" <andreas@gaisler.com>,
+ "Richard Weinberger" <richard@nod.at>,
+ "Anton Ivanov" <anton.ivanov@cambridgegreys.com>,
+ "Johannes Berg" <johannes@sipsolutions.net>,
+ "Borislav Petkov" <bp@alien8.de>,
+ "Dave Hansen" <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>, "Chris Zankel" <chris@zankel.net>,
+ "Max Filippov" <jcmvbkbc@gmail.com>
+Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+ linux-riscv@lists.infradead.org,
+ "linux-csky@vger.kernel.org" <linux-csky@vger.kernel.org>,
+ linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ cgroups@vger.kernel.org, linux-security-module@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
+ linux-perf-users@vger.kernel.org, apparmor@lists.ubuntu.com,
+ selinux@vger.kernel.org, linux-alpha@vger.kernel.org,
+ linux-snps-arc@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+ linux-hexagon@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
+ "linux-openrisc@vger.kernel.org" <linux-openrisc@vger.kernel.org>,
+ linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-um@lists.infradead.org
+Message-Id: <78ca3a1f-2ed9-4450-95ef-d690cf4aace1@app.fastmail.com>
+In-Reply-To: 
+ <20250901-nios2-implement-clone3-v2-3-53fcf5577d57@siemens-energy.com>
+References: 
+ <20250901-nios2-implement-clone3-v2-0-53fcf5577d57@siemens-energy.com>
+ <20250901-nios2-implement-clone3-v2-3-53fcf5577d57@siemens-energy.com>
+Subject: Re: [PATCH v2 3/4] arch: copy_thread: pass clone_flags as u64
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250901-dynptr-skb-meta-no-net-v2-1-ce607fcb6091@cloudflare.com>
-X-B4-Tracking: v=1; b=H4sIAE6ftWgC/4WNSw6DMAxEr4K8riti8e2q96hYQGJKVEiiJEUgx
- N0bcYEuR2/mzQGBveYAj+wAz6sO2poU6JaBnHrzZtQqZaCcyryhGtVuXPQYPgMuHHs0Fg1HlDV
- JklXTqJYhjZ3nUW+X+AWDG1Npi9AlMukQrd+vx1Vc/J98FSiwoKotZZHTIKqnnO1XjXPv+S7tA
- t15nj93RkZZywAAAA==
-X-Change-ID: 20250827-dynptr-skb-meta-no-net-c72c2c688d9e
-To: bpf@vger.kernel.org, Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Alexei Starovoitov <ast@kernel.org>, 
- Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
- kernel-team@cloudflare.com, netdev@vger.kernel.org, 
- kernel test robot <lkp@intel.com>
-X-Mailer: b4 0.15-dev-07fe9
 
-Kernel Test Robot reported a compiler warning - a null pointer may be
-passed to memmove in __bpf_dynptr_{read,write} when building without
-networking support.
+On Mon, Sep 1, 2025, at 15:09, Simon Schuster via B4 Relay wrote:
+> From: Simon Schuster <schuster.simon@siemens-energy.com>
+>
+> With the introduction of clone3 in commit 7f192e3cd316 ("fork: add
+> clone3") the effective bit width of clone_flags on all architectures was
+> increased from 32-bit to 64-bit, with a new type of u64 for the flags.
+> However, for most consumers of clone_flags the interface was not
+> changed from the previous type of unsigned long.
+>
+> While this works fine as long as none of the new 64-bit flag bits
+> (CLONE_CLEAR_SIGHAND and CLONE_INTO_CGROUP) are evaluated, this is still
+> undesirable in terms of the principle of least surprise.
+>
+> Thus, this commit fixes all relevant interfaces of the copy_thread
+> function that is called from copy_process to consistently pass
+> clone_flags as u64, so that no truncation to 32-bit integers occurs on
+> 32-bit architectures.
+>
+> Signed-off-by: Simon Schuster <schuster.simon@siemens-energy.com>
 
-The warning is correct from a static analysis standpoint, but not actually
-reachable. Without CONFIG_NET, creating dynptrs to skb metadata is
-impossible since the constructor kfunc is missing.
-
-Silence the false-postive diagnostic message by returning an error pointer
-from bpf_skb_meta_pointer stub when CONFIG_NET=n.
-
-Fixes: 6877cd392bae ("bpf: Enable read/write access to skb metadata through a dynptr")
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202508212031.ir9b3B6Q-lkp@intel.com/
-Suggested-by: Alexei Starovoitov <ast@kernel.org>
-Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
----
-Changes in v2:
-- Switch to an error pointer (Alexei)
-- Link to v1: https://lore.kernel.org/r/20250827-dynptr-skb-meta-no-net-v1-1-42695c402b16@cloudflare.com
----
- include/linux/filter.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/include/linux/filter.h b/include/linux/filter.h
-index 9092d8ea95c8..4241a885975f 100644
---- a/include/linux/filter.h
-+++ b/include/linux/filter.h
-@@ -1816,7 +1816,7 @@ static inline void bpf_xdp_copy_buf(struct xdp_buff *xdp, unsigned long off, voi
- 
- static inline void *bpf_skb_meta_pointer(struct sk_buff *skb, u32 offset)
- {
--	return NULL;
-+	return ERR_PTR(-EOPNOTSUPP);
- }
- #endif /* CONFIG_NET */
- 
-
-
-
+Reviewed-by: Arnd Bergmann <arnd@arndb.de>
 
