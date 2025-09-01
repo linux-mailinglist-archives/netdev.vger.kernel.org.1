@@ -1,108 +1,124 @@
-Return-Path: <netdev+bounces-218649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C259B3DC35
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 10:21:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE238B3DC46
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 10:23:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8365818962DB
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 08:21:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CAD3173EB1
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 08:23:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D51A726B769;
-	Mon,  1 Sep 2025 08:21:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09F8E2F0C7F;
+	Mon,  1 Sep 2025 08:23:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Dz8uyAzg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 644B323B632;
-	Mon,  1 Sep 2025 08:21:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2304E26AA93
+	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 08:23:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756714884; cv=none; b=KRpCQeuiN/A8W8FcH6G2xhZkHM2nPzHVPjKyYkfdntBCL6OJlvw3Q6oVaTH0PW2JYr+6mfLQPWVRu953A1ESPbVCRkVw9sLSl2K1SzkybjshciSjnGPR/hqFDduMWpGE9sYjZsEwDLPUeXVQl0WpRupqX43IwQVMDRWqM5n/jMk=
+	t=1756714998; cv=none; b=jkleFBz3ByKAjELKROZXGIx8PpymxCEY6MipkC7C7Q09wvx0QmlxSoK9gale4nd6iiCbYQ+a40aGVaHmbJKz+pVLwmeSjn/srtmQ7tRCD4+kbqJEKOIVn2isYNM2mtC52+JfNnYKQltD4Arj3kCycSjKhP3OjeDwB4mPkJN4u24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756714884; c=relaxed/simple;
-	bh=v9fif//9C7xOO7pC2ese9vUbSP7DolrbV5tCB3F7bCg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hp4heYt9nTRFLmLUcRRsTrxcDR0f9CYwfpjjrOWwdBBcvaNZfHYxgmRE19w07dnk91HVaXOe2se8PvB3qwnc8RMhx1ypDHVJ7u5JH81ZxfqOV5onPxFIV1PPt5FeFkxwd/KwjejOXhbWZbTDBF3541pZo+8BxkTv9hw2pBAtW7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=18.169.211.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: zesmtpgz4t1756714854td02a6ce6
-X-QQ-Originating-IP: OVw0v/uv0qvupYGv9rfV7KCl5TmY2GA9fodwbrC3cXs=
-Received: from localhost ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 01 Sep 2025 16:20:52 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 15377409509470357136
-Date: Mon, 1 Sep 2025 16:20:52 +0800
-From: Yibo Dong <dong100@mucse.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
-	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org,
-	gustavoars@kernel.org, rdunlap@infradead.org,
-	vadim.fedorenko@linux.dev, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH net-next v9 1/5] net: rnpgbe: Add build support for rnpgbe
-Message-ID: <8AD0BD429DAFBD3B+20250901082052.GA49095@nic-Precision-5820-Tower>
-References: <20250828025547.568563-1-dong100@mucse.com>
- <20250828025547.568563-2-dong100@mucse.com>
- <dcfb395d-1582-4531-98e4-8e80add5dea9@lunn.ch>
+	s=arc-20240116; t=1756714998; c=relaxed/simple;
+	bh=1GRc8xrxN9zGX5wz5BhvKOO2j5zrzx4fFnKG/lVnDdA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=f9cXV5aDyP8cPCP1/aTi4S8m8fr9TTVNscm+cJ8Vt6vtycRO970mK6CwWigTybYS05JctOKqoW7MR1uE5LJuP77OmF99ml/g5YoemsKMGA7DK/StfBPw0WddVzrudKHZds22vuTszHUJ8UWdDfezXEua8PyNXQ7Kf7C0T/GhMxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Dz8uyAzg; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-55f7204b6aaso1383064e87.2
+        for <netdev@vger.kernel.org>; Mon, 01 Sep 2025 01:23:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1756714995; x=1757319795; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=K6bOX31TOnXa3mSpUgWZIksoOSQJIo6oigebcMiGpVk=;
+        b=Dz8uyAzgarZvRBDqWWnP+o0U86ka5hRrkwgV0NlTvB1H4KaavPr9OXtifRWGyBpZhd
+         4RTS1Ii3q9rZPzEXv7pjrIuX0WiyIwNmB0j8UYGYKgzC0kYLccqV3fHDCbNXMZDtQjmo
+         gQiwpG28ZWd1RO5BUKErdyIHmeplvRsTKAfX4KMeT2vNdi35UdCczvAp47o6gXIuRrEW
+         4hAH1yjoEa5fO48bu4rAIl6QTIJptC9r251HxtiEPzW5fHQXTJ+LPtnTCykdnAqZLHG/
+         cu9lewA9vJ5uQ6U/VqsrNIjybREuo4VgvovYZorEknE1YhCNECxrNloex32z6/yU791v
+         /f6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756714995; x=1757319795;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=K6bOX31TOnXa3mSpUgWZIksoOSQJIo6oigebcMiGpVk=;
+        b=Phs9TpA97zaKaWAVL/L1f1nm5fttA9MdbQv6W5NNnisGrS/KfvuYPhGMsZiyW0wj84
+         EtzcRjYo4JHNdO7w2zS1JjFO3hKQ7EqJQFe/KmYlyYYfkidXL8AMklRt4SrwVdbmplga
+         63bYJydB6zKVqxjbjyQG4kMcMNUYNo6BGLmE68whhD+pP5RlaUho7OTnXfqzCmrcEpfz
+         7lxw9FVzMDP8+Q2QKGPtazxOFVwKtEygauOu5BJswT2ie0XeNff7Ws/MTPLRKypGR0BY
+         K+MpGtD0+KTXikOllLmROqanGGl3aJh+rpfvZJKijU67LjZ5AaIO3XxEWdycNzD1gocm
+         0E+w==
+X-Forwarded-Encrypted: i=1; AJvYcCVd2/0zkp8valyO7DRQjHzAtbb1LO/lQNbRyQnLOqTfQfXeF+z6ICzykf6u4cBl5P9LKVTg4NU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrxbCTfXIevmG1WMqtp1p2Zi2SNCvp7Zoc+jm3JPosyxQsCH2r
+	QSAXyE8DMPv2xf4lTM7Z9Q52c9LgvTZzoScD7gKRD1K5Y766mghK1mXl6MFHgUQJgj88u5FfgzR
+	ugao+UMQM7BE5WGYdiCENYGlULeUZkDEIC0zq+8loag==
+X-Gm-Gg: ASbGncto0JPFiVIerhU49gtYYkVMNEy70ly+c8Cbx9DJcZfd0mxC4w6ZYsPP61guVru
+	knI/gXApkC/2pALt5q8/GZAnLF1QlGu8JJfiwFULejjV2NrW+NDdsXS4fewky4SZVVp9J+fey/r
+	P8vsjaqlSH2PdVUh95520hGoPTvyQsx167MkCd/7/0WhywjaPv6GvuYbubd4VTlXxYPuZ70bKza
+	CAAMtyDNprH9GohbQ==
+X-Google-Smtp-Source: AGHT+IHVwIASRqXdiBtabwQpeTaLvx/MwfpuhWhcvrvqvY8VLXWEY8BeiyfCJbCTfLb/GJ7BJFbdc5bUK1izSWZcw90=
+X-Received: by 2002:ac2:4c47:0:b0:55f:6186:c161 with SMTP id
+ 2adb3069b0e04-55f70a0081cmr1669470e87.49.1756714995167; Mon, 01 Sep 2025
+ 01:23:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dcfb395d-1582-4531-98e4-8e80add5dea9@lunn.ch>
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: Mf+wQkWJ2TuYoRAc945Q+9sbZ49S6jt/KM5fyBReB+U+2FoPujaarpB8
-	zss4KX1w+2pMKdqIDdd1JEXbl/iDzSB3kS2OfyHoDbCvTdOj6F72wdsHC+0p/OoGP13fFSv
-	h+LqJQ1aEojmkkDaK3COnTTaGOC8QP03drw/KohIZGCGKjod0ScPb/o8/htSCKVSSwXxKbk
-	CO+7ISjmTTRONTd/i9Qyg2xcbwSMpFNmGdgHuiZANWiy1Bmv7tK6wkhSAEDtUlVE0kHkBCS
-	nO+I35axIOZSe4SYKcOQvr7OGX5BnX/KQMb27MHtmX8mS/SpssqR4FrfGknUwscL5a12Iej
-	WEf0Jn+AO+jfjozmqJG07EAmuYu7uIWiO+CjzDXqbVbBifTnstKS2+iiAZzaaNqmLxrpl5w
-	v8XwfmAWqNuyIW985LW135FJWQOThhZXpPt2MJsHmdcR1Pp0LeNLTKmuwrn38VJLTG5vphZ
-	v7auNT5Pam6JCwilXF1P006Qzfqt70AWzRI8HFdn1ah7njQX5Zc0UvCMZvLFBGqumPc0tGD
-	JJz1i5No06PpLEb6iYtvAS6aks3MyBXXVlSRLxe2u+jfDoAD+N58cIgsY/dTmkl0cw2vrE9
-	FarE7E7BNtwSMrixwCbWS24C/5vi/i3/sm0E0PZnfG7tzCF8W7W1MvHk9g3p+aZYyNkwSlL
-	FglY8Xd7Hx8ylDo6d7RQfvISZ2jFoeUvVYKWTtvBtb6+hQ6+Znk+HFQaU5xLR2WMX8ceQJz
-	iNovCG0XMse9LNhhzun3Zcvto5XjrP+kxoPqxnFqQce3PDjzLdpMAlF+73D8z1wQt8fcYRc
-	cDzY2/5I9YGaRBN+xp/p0FKrKtWZEKv2hrsNGZcG9rrx0AOcefw1wXTlEW3xEGERTqiBd/Z
-	JrdVXvkXSl67jZpc8TUuYgO+6yA4iqD6QlOhl73W9fTXqbo607UecT77CKO6OT8j0dpj8FY
-	6NwUFs96OMHTAHfV9lKk6t2s0BkB3SLN2PdaB5R5C8L6UjTinIVonx2jNHI0rAlAHk4dHlo
-	iZ9sLteg==
-X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
-X-QQ-RECHKSPAM: 0
+References: <20250901073224.2273103-1-linmq006@gmail.com>
+In-Reply-To: <20250901073224.2273103-1-linmq006@gmail.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Mon, 1 Sep 2025 10:23:04 +0200
+X-Gm-Features: Ac12FXwOPFvcHfnOB3USWBMbhSfcVlBY0l39KH-IS_467sKxEs3coXt0xb6oRRE
+Message-ID: <CACRpkdYVCU3Pb2u3r_G0BY19mbF8m1je696RNP_49rU7G4PvUw@mail.gmail.com>
+Subject: Re: [PATCH v2] net: dsa: mv88e6xxx: Fix fwnode reference leaks in mv88e6xxx_port_setup_leds
+To: Miaoqian Lin <linmq006@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 28, 2025 at 02:51:07PM +0200, Andrew Lunn wrote:
-> On Thu, Aug 28, 2025 at 10:55:43AM +0800, Dong Yibo wrote:
+On Mon, Sep 1, 2025 at 9:32=E2=80=AFAM Miaoqian Lin <linmq006@gmail.com> wr=
+ote:
 
-Hi, Andrew:
+> Fix multiple fwnode reference leaks:
+>
+> 1. The function calls fwnode_get_named_child_node() to get the "leds" nod=
+e,
+>    but never calls fwnode_handle_put(leds) to release this reference.
+>
+> 2. Within the fwnode_for_each_child_node() loop, the early return
+>    paths that don't properly release the "led" fwnode reference.
+>
+> This fix follows the same pattern as commit d029edefed39
+> ("net dsa: qca8k: fix usages of device_get_named_child_node()")
+>
+> Fixes: 94a2a84f5e9e ("net: dsa: mv88e6xxx: Support LED control")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Miaoqian Lin <linmq006@gmail.com>
+> ---
+> changes in v2:
+> - use goto for cleanup in error paths
+> - v1: https://lore.kernel.org/all/20250830085508.2107507-1-linmq006@gmail=
+.com/
 
-> > Add build options and doc for mucse.
-> > Initialize pci device access for MUCSE devices.
-> > 
-> > Signed-off-by: Dong Yibo <dong100@mucse.com>
-> 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> 
->     Andrew
-> 
+When I coded it I honestly believed fwnode_get_named_child_node()
+also released the children after use but apparently not, my bad :(
 
-Should I add 'Reviewed-by: Andrew Lunn <andrew@lunn.ch>' to commit for
-[PATCH 1/5] in the next version?
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 
-Thanks for your review.
+Yours,
+Linus Walleij
 
