@@ -1,118 +1,167 @@
-Return-Path: <netdev+bounces-218704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53B9EB3DF92
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 12:05:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CEDE0B3DFB9
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 12:08:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7273A189ABC6
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 10:05:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 326FB1A803DA
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 10:08:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 112423126B5;
-	Mon,  1 Sep 2025 10:03:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 688A130E82D;
+	Mon,  1 Sep 2025 10:06:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="nk9KWfMc"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="E6h3BwFP"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46B17310640;
-	Mon,  1 Sep 2025 10:03:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53162E0402
+	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 10:06:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756721012; cv=none; b=hPWuxclcdpF9Ym+dJ0rLXl4xR/w8jLUP11rheXDp/TpIW5Fuz7cNqeXRTk/LahEZhNqBycWRISjn3VVp8xMVNMxUEEybWCTCcwl/tgQ0MAcZLmytFgmSCSEdsNMmb8ThRzNZoHbiLUML68g+lwDJTmQ2ZKU3MjPJQ8nIPZoyuY4=
+	t=1756721166; cv=none; b=rQ6CKbERNmk1R7uw+e9UbzKb6mJBDV9XWo1g8B3tRuO7YF3+YJxpIj7IyvYJUhv/EjWXjmOfMSl92IG8LAXrH+R0VZJnclzkSyjjTrzHniZSbHbCBo5y+L0O25Gef/a3oyDnlcfb85+OpvFxLdNLmWa3MK07gGCrc+UcdOQH35g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756721012; c=relaxed/simple;
-	bh=yrtQan3KNh29em6qPEBh3l99dn4JDYK0uPL5nCqlsZ0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hrWz4dpuuZ1qh18MAMVPvd2BxRBYuYvlYvFEZt4LEbkAcQ20pLDfaxFdrkVwEzJXGn1hEY9n3WmNaX42dFWBTlOk6lV5FjcXoFK+lt0yIJ8iQMhn+piZm/7+0gwVJsTPuMEan9yDLBk6pYaytSbCJuiJ8+2FzHCWwnD/5tU40Y4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=nk9KWfMc; arc=none smtp.client-ip=198.47.23.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllvem-sh03.itg.ti.com ([10.64.41.86])
-	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTP id 581A2oCs2784754;
-	Mon, 1 Sep 2025 05:02:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1756720970;
-	bh=ntOi9ryCAdwqMqj1SOXVPIs/4EOgcjeBjx4xva9890o=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=nk9KWfMcJT59L9FwG28bHQYpBIFz2iV6S6Z3rsKmF6BCbo+2aVZx+H2KTtW+7zzMw
-	 AmK6O8VMW/PJzAk1aCRYNrVwYxwIfkvdVqpOIc+4/yFhh8ykX3G7b56VbDYaGChAFV
-	 5Phs/Tmgf1u+2DP/JpwaYj5RL435sVcBaDuB4EAE=
-Received: from DFLE102.ent.ti.com (dfle102.ent.ti.com [10.64.6.23])
-	by fllvem-sh03.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 581A2oGB1899734
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Mon, 1 Sep 2025 05:02:50 -0500
-Received: from DFLE106.ent.ti.com (10.64.6.27) by DFLE102.ent.ti.com
- (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Mon, 1
- Sep 2025 05:02:49 -0500
-Received: from fllvem-mr07.itg.ti.com (10.64.41.89) by DFLE106.ent.ti.com
- (10.64.6.27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
- Frontend Transport; Mon, 1 Sep 2025 05:02:49 -0500
-Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
-	by fllvem-mr07.itg.ti.com (8.18.1/8.18.1) with ESMTP id 581A2neW159899;
-	Mon, 1 Sep 2025 05:02:49 -0500
-Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
-	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 581A2m0s011203;
-	Mon, 1 Sep 2025 05:02:48 -0500
-From: Meghana Malladi <m-malladi@ti.com>
-To: <namcao@linutronix.de>, <jacob.e.keller@intel.com>, <m-malladi@ti.com>,
-        <christian.koenig@amd.com>, <sumit.semwal@linaro.org>,
-        <sdf@fomichev.me>, <john.fastabend@gmail.com>, <hawk@kernel.org>,
-        <daniel@iogearbox.net>, <ast@kernel.org>, <pabeni@redhat.com>,
-        <kuba@kernel.org>, <edumazet@google.com>, <davem@davemloft.net>,
-        <andrew+netdev@lunn.ch>
-CC: <linaro-mm-sig@lists.linaro.org>, <dri-devel@lists.freedesktop.org>,
-        <linux-media@vger.kernel.org>, <bpf@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
-Subject: [PATCH net-next v2 6/6] net: ti: icssg-prueth: Enable zero copy in XDP features
-Date: Mon, 1 Sep 2025 15:32:27 +0530
-Message-ID: <20250901100227.1150567-7-m-malladi@ti.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250901100227.1150567-1-m-malladi@ti.com>
-References: <20250901100227.1150567-1-m-malladi@ti.com>
+	s=arc-20240116; t=1756721166; c=relaxed/simple;
+	bh=xNtOD3U1Ets//MfQBdDrw8D9/+Y8XKoiAWD3u8Vu+o4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FRuFsRDkx7hmqv34vzPYkRLB2m4E3y9fmbazZ2pgAycb/rinaqS98KJOf7EC24xct5pTaP+AVdBqqhyKnfIawvXgjQNEKwOKVGEjJQLhtTQTt/TmBzifM+ghL8kwpAKpRRJfm6euXogbB+E1aHTKC7gizeaVru1y1/QtSZ8+qiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=E6h3BwFP; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=XX14nK70MLICWN1TU2yynkZ6LntdcPtCl9EB2sloICo=; b=E6h3BwFPRDE/wgThwj1DZK/FpB
+	5//37F4F0XdSDlow5SqYGB/7v+vXfRm3B8xx1xtJxbKOCkp5caRuTI9cNm+9W2F5a5wKR0S9rGh73
+	Pvl35uRsvPwfT2la26ieFTDQWpowR8CC7W56Ju/VObJIGbLeSnUQ8srdGymLqbCsquVerorf8c5GA
+	4pIh7oQVO9A9rU6lUD2LtlBAoSQRV9KLtZ39kDoIlUhbPQWDpX/hUKpxsuLmqK1Sy7SdyOJRIuD3N
+	T5vkvThAHqNh3t+bKttW4p7icoSlpQRCOEWcSvdgVg4+shllpF3rSCOZDStmDnn+qzFp0j+tMlbBQ
+	Zg3A+Rfw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51864)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1ut1QC-000000005zC-1c9K;
+	Mon, 01 Sep 2025 11:05:57 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1ut1QA-000000006vT-2Pet;
+	Mon, 01 Sep 2025 11:05:54 +0100
+Date: Mon, 1 Sep 2025 11:05:54 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net] net: phy: fix phy_uses_state_machine()
+Message-ID: <aLVwAn87GhFHMjEE@shell.armlinux.org.uk>
+References: <E1usl4F-00000001M0g-1rHO@rmk-PC.armlinux.org.uk>
+ <20250901084225.pmkcmn3xa7fngxvp@skbuf>
+ <aLVivd71G4P4pU0U@shell.armlinux.org.uk>
+ <20250901093530.v5surl2wgpusedph@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250901093530.v5surl2wgpusedph@skbuf>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Enable the zero copy feature flag in xdp_set_features_flag()
-for a given ndev to get the AF-XDP zero copy support running
-for both Tx and Rx.
+On Mon, Sep 01, 2025 at 12:35:30PM +0300, Vladimir Oltean wrote:
+> On Mon, Sep 01, 2025 at 10:09:17AM +0100, Russell King (Oracle) wrote:
+> > On Mon, Sep 01, 2025 at 11:42:25AM +0300, Vladimir Oltean wrote:
+> > > On Sun, Aug 31, 2025 at 05:38:11PM +0100, Russell King (Oracle) wrote:
+> > > > phydev->phy_link_change is initialised by phy_attach_direct(), and
+> > > > overridden by phylink. This means that a never-connected PHY will
+> > > > have phydev->phy_link_change set to NULL, which causes
+> > > > phy_uses_state_machine() to return true. This is incorrect.
+> > > 
+> > > Another nitpick regarding phrasing here: the never-connected PHY doesn't
+> > > _cause_ phy_uses_state_machine() to return true. It returns true _in
+> > > spite_ of the PHY never being connected: the non-NULL quality of
+> > > phydev->phy_link_change is not something that phy_uses_state_machine()
+> > > tests for.
+> > 
+> > No. What I'm saying is that if phydev->phy_link_change is set to NULL,
+> > _this_ causes phy_uses_state_machine() to return true and that
+> > behaviour incorrect.
+> > 
+> > The first part is describing _when_ phydev->phy_link_change is set to
+> > NULL.
+> > 
+> > It is not saying that a never-connected PHY directly causes
+> > phy_uses_state_machine() to return true.
+> > 
+> > I think my phrasing of this is totally fine, even re-reading it now.
+> > 
+> > -- 
+> > RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> > FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> 
+> I think the language is sufficiently flexible for us to find a phrasing
+> that avoids all ambiguity. What about:
+> 
+> "It was assumed the only two valid values for phydev->phy_link_change
+> are phy_link_change() and phylink_phy_change(), thus phy_uses_state_machine()
+> was oversimplified to only compare with one of these values. There is a
+> third possible value (NULL), meaning that the PHY is unconnected, and
+> does not use the state machine. This logic misinterprets this case as
+> phy_uses_state_machine() == true, but in reality it should return false."
 
-Signed-off-by: Meghana Malladi <m-malladi@ti.com>
----
- drivers/net/ethernet/ti/icssg/icssg_prueth.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Well, having spent considerable time writing and rewriting the damn
+commit message, this is what I'm now using, which I think covers the
+problem in sufficient detail.
 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index 63a132a435f9..4aa2da6f32b5 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -1550,7 +1550,8 @@ static int prueth_netdev_init(struct prueth *prueth,
- 	xdp_set_features_flag(ndev,
- 			      NETDEV_XDP_ACT_BASIC |
- 			      NETDEV_XDP_ACT_REDIRECT |
--			      NETDEV_XDP_ACT_NDO_XMIT);
-+			      NETDEV_XDP_ACT_NDO_XMIT |
-+			      NETDEV_XDP_ACT_XSK_ZEROCOPY);
- 
- 	netif_napi_add(ndev, &emac->napi_rx, icssg_napi_rx_poll);
- 	hrtimer_setup(&emac->rx_hrtimer, &emac_rx_timer_callback, CLOCK_MONOTONIC,
+>>>>>>
+net: phy: fix phy_uses_state_machine()
+
+The blamed commit changed the conditions which phylib uses to stop
+and start the state machine in the suspend and resume paths, and
+while improving it, has caused two issues.
+
+The original code used this test:
+
+        phydev->attached_dev && phydev->adjust_link
+
+and if true, the paths would handle the PHY state machine. This test
+evaluates true for normal drivers that are using phylib directly
+while the PHY is attached to the network device, but false in all
+other cases, which include the following cases:
+
+- when the PHY has never been attached to a network device.
+- when the PHY has been detached from a network device (as phy_detach()
+   sets phydev->attached_dev to NULL, phy_disconnect() calls
+   phy_detach() and additionally sets phydev->adjust_link NULL.)
+- when phylink is using the driver (as phydev->adjust_link is NULL.)
+
+Only the third case was incorrect, and the blamed commit attempted to
+fix this by changing this test to (simplified for brevity, see
+phy_uses_state_machine()):
+
+        phydev->phy_link_change == phy_link_change ?
+                phydev->attached_dev && phydev->adjust_link : true
+
+However, this also incorrectly evaluates true in the first two cases.
+
+Fix the first case by ensuring that phy_uses_state_machine() returns
+false when phydev->phy_link_change is NULL.
+
+Fix the second case by ensuring that phydev->phy_link_change is set to
+NULL when phy_detach() is called.
+<<<<<<
+
 -- 
-2.43.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
