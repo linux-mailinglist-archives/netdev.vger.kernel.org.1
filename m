@@ -1,278 +1,206 @@
-Return-Path: <netdev+bounces-218726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44608B3E1B1
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 13:35:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5FB0B3E1BB
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 13:36:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31B4F7ADF24
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 11:33:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7DB01A80C31
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 11:36:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F81331AF0A;
-	Mon,  1 Sep 2025 11:35:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C24331AF3F;
+	Mon,  1 Sep 2025 11:35:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Oi4kPtKW"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AauLNwVV"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5458731A048
-	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 11:35:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C6831A56B
+	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 11:35:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756726514; cv=none; b=bWYaS9EjivHSySwdJpm6Pwlm65UCSHZymqS4TA6oEIYsjbMljU63CmtMVqCdW+DuQnCom55Ud5RXQCQBPzl434rJ8FWlIN3tybnMyfKmz1sAqwSOHTw/V2KhIMlvNs50/4wcTCTdDDKPtfQ7ZhcWO6hJ9o5yKzw7jiOgFYxsMpU=
+	t=1756726530; cv=none; b=cpn2gufcyWNWycHTmW0KLYMqh6mSLuflrcclItncyAKBA8JiqE2ypsXlaaNfBc+C5BdjOZCIvoZHNDKMq7vR6eyaWVh5Ecn4MSjW3R0vJ7phd3+R/OD4DL4jvBg262gcT0cc1kiwPvvHV5W2nFrVqQtQGEayIraOAN2F9PlFaWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756726514; c=relaxed/simple;
-	bh=yAPERDIoeRASAaUpYs1LNdA8p7G30Qgz6mkvFlYbF3c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z5L91rbhwA+huRCZLD1LD2dmFRs4kcJOsoOIIQEdoom8C51kmCSta2g7cKyASAJJS6PZe0dnkYeCPc7SsJDa3YOOkQMlOCC8sNI92UMpMtoG37t3TXfa2hOzmYW8lTMU/gsCxC6WbcafkmiYXay8ui59g5lG6U4tZFigDVLEZNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Oi4kPtKW; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756726511;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=89QceRiDVJR9qzpuoMtjZ42nHjE3zxx93/plzyge73k=;
-	b=Oi4kPtKW6msMclc99VeFrwikaUAGGqFo1qJnSWm3pfX32GugEguMEBTt/RA9KGrQE3tb4j
-	YtiYW6OJ1Nf+URcS2bvEOvL21+u3d0ZwUU+NiPfSgFJGlqRVG2YtLvYkpcs3/KyhMvLVUd
-	76BrqD6X7mJLnFX2+Ua8oSR8rNiVpn4=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-278-_BO-Rx6sPKCORuvr8gQ6iQ-1; Mon, 01 Sep 2025 07:35:10 -0400
-X-MC-Unique: _BO-Rx6sPKCORuvr8gQ6iQ-1
-X-Mimecast-MFC-AGG-ID: _BO-Rx6sPKCORuvr8gQ6iQ_1756726509
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3d48b45fad0so881958f8f.0
-        for <netdev@vger.kernel.org>; Mon, 01 Sep 2025 04:35:10 -0700 (PDT)
+	s=arc-20240116; t=1756726530; c=relaxed/simple;
+	bh=5Su5qnMW/hHYdd9KFxk5sM71atdYkx2Dvh08OZmr2no=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=u/QbFbcm5wbApVPFul+DHlTHck8ntOCk2urmrFJ+M/rTC7hRIE6f9j9bWQXwGXJc/tvdtKlhUiu1dYuXN1TY3JVYI1ugIqVDvLXdN2ipO1nP1qm3LdRlHdP+4T6VfTiTs+pmrz0aOr8lvTVDBrUUWvZHkaQMvwRBy/XC+kQz/rY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=AauLNwVV; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-45b86157e18so9552235e9.0
+        for <netdev@vger.kernel.org>; Mon, 01 Sep 2025 04:35:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1756726527; x=1757331327; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=c9cCpZlImVazv64ehQTKhe9f281E06NS/0iMyn5viqg=;
+        b=AauLNwVVIjRn7qYZi6llW4+HY0O4kZT+5PC7vWvJFMmBBoZ1/fptMgNH9Py8hgCCsE
+         zqIz++IxvZrckFyNyluVq8YgqXSl5Rzhy9zhKCAA+WGKJEBDNUPNGY3bOYwcFWcQBDoo
+         2dW/dvJhYZAl6f/doGZXBhl5v4B196KJ8ysAth5QWQkZcZLHzW9k6gkbE9BYw8zp+iBv
+         NKn4B0p7AlUF1+d2RTbtAk9J0JxyNGpEFDzfF2Hg8hQ7acbvp3lla4HLDr2MUPGGbpyl
+         W0VRNmhowvfbuTcvstMcDMLjihqFWquOxrHIuwLmvFwOO5KH40lmvpH9dAbbtmrysBCX
+         dSMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756726509; x=1757331309;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1756726527; x=1757331327;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=89QceRiDVJR9qzpuoMtjZ42nHjE3zxx93/plzyge73k=;
-        b=B0jsSXIptqqQV4zPQfry6fLzHJK2diVOF0clC4lTpefhagrLKqHxuijae17xfpnhbM
-         UwxJRCrV7vx0rvNH+eGr8JL/wmv+pZns9eWtogvK/Bd6/teTBCexJ+ADmK/aG3mugFJX
-         c7FAbijFR0vproKMlyqpRlIARL2qylvSjp0lhjy4Yj0Y9PLCV86ku59l3UQbnMwlNesW
-         oumjHIMumXzRBHsQQ5HAsqreomjbeCTOYc8oSHIE2J1X9bpwNyIa2HbiawhI+LqEnPM8
-         MgfIzTBeHef7F7ZflhL8STBgZZuHFXmArf1Y2rm1ACZ5Eb4z5WTPqU5S7y4qHCSLgEhX
-         NnUA==
-X-Forwarded-Encrypted: i=1; AJvYcCU4aC61OpmogHFjLE0taUTiHz+IdnKp+UQ4NEtS3EuVzq5xLiDGMf1+ehEs+ynhK3YIj3OpOEI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxpm9Nxiye3dtvO/7sKR4J8vElg/pMyyDI6XKtgkXtQCsTvQdqa
-	cuecy83NoAakO71/Kj6gWYLrrsbena3hD0/xdTtuAa7OnelI7k8hOT4nD91eyyrI9Pmg3BW/BKA
-	qzdDy0dIQCGdGQsHxp/gFSUt6hweyM1xWFdXZ/QZkbFjzISLL3tJw9LstVA==
-X-Gm-Gg: ASbGncuPaveTGJK/OfvOKlZCP5O6soZR8JJbb55aq0j/Hgb70CMxJ86h86QjuCJcMoI
-	lAFpDc55P/YFRXhfO65X3+dfBY4ltYz87Mc3WUX5k2KebocWc/xHtZOG4uMswx+mjsdSnER9jPa
-	ZdXZt1MRQli7iMn05dgrBQhzAi7PmDffwucpzD/WBE0ihSCcqi3/xvHMAQ5w5EZOPw/geKIhsT4
-	xoeEeYPTJGtTHwHqDt9LuOPcVLselJs+9fgrXZp3U60HfrnzNLkKC5Fu4acSawdx2DENc121s58
-	cFTErkAYNWSAlRqsholGYgnIopb3fnnTdLvDyfpLWDtjKnv6k97LvQjIpORZ/DPxHVZQQJUSB1q
-	dF8c5Ybru++if8yrioyLW8Ju1fOkuhtFMmpOVTBOgShk8MPmqLpIjRqkbVMPZ2N8ajks=
-X-Received: by 2002:a5d:5f8c:0:b0:3cf:5f17:f350 with SMTP id ffacd0b85a97d-3d1b16f0165mr6056396f8f.18.1756726508812;
-        Mon, 01 Sep 2025 04:35:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE0RKJ8MgbrMGxtF+aataA+fh1iSiigcyDX0AK/3/6NRoLPIE0BwSmxJshAaTyrpOEmePBJCw==
-X-Received: by 2002:a5d:5f8c:0:b0:3cf:5f17:f350 with SMTP id ffacd0b85a97d-3d1b16f0165mr6056350f8f.18.1756726508320;
-        Mon, 01 Sep 2025 04:35:08 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f37:2b00:948c:dd9f:29c8:73f4? (p200300d82f372b00948cdd9f29c873f4.dip0.t-ipconnect.de. [2003:d8:2f37:2b00:948c:dd9f:29c8:73f4])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b6f0c6fe5sm233831875e9.5.2025.09.01.04.35.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Sep 2025 04:35:07 -0700 (PDT)
-Message-ID: <44072455-fc68-430d-ad38-0b9ce6a10b8d@redhat.com>
-Date: Mon, 1 Sep 2025 13:35:05 +0200
+        bh=c9cCpZlImVazv64ehQTKhe9f281E06NS/0iMyn5viqg=;
+        b=jXd1oUO5OsJPwZ/i6gWGIIGKrxPTLnexe55LHXrrLwWwY1lag5XUwpfLd6P0AVeB0+
+         QAy6WQNt/TCbYfo/QZxYrSQudguLCOqHgIdsk4fs07+eHC4f8WiJLD8xdYmF33wgzV1U
+         v71PmduauowVcwyoyvS0Ll1jFIeH5Ggkaq5dtcnoeo+AiBzwD3Lw6a5Y04f2/Q+QVcLu
+         Ct2T8VW7S7sGwi0hAwkRjzE4kRtC4YNxph/U1BPhUGetrwK39JWfJo8abN0ahFya2ohd
+         Ra5Z9IC0XBmmCKCIAYgtSIX1W6cTTHYEJMKEJ2YoDVMfpdVcReWQ4hg/8mRJmQdmDObG
+         aAXA==
+X-Forwarded-Encrypted: i=1; AJvYcCVIB+gcKRZNJ5FqYfuMM+pQDzq2nbns4pQypKkcRHC9E5fxyGtvQuOGjnE5iRUKkt8JAW6AzyQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIEqN6/QK5oItUeo3GsT8BRJmuaEgmfN4AI4k9OlsoafoOqj54
+	e0oaix6Z5uQstwTDVEpwlf4UQ7rOhAxxadBnwqN4wGTKJxZTPtWbtEE5Ni7q2sex/sc=
+X-Gm-Gg: ASbGncsSrixDC2PjYDR8CiczMrRgNEZAEff0qFaXpz0Qa8uvX4FA1zpHtJdX/2elUmN
+	H+7blOmg8ywgjL4+qGJbyxYSokt6trOps1yDRdooDWWVKtoGS1C/bxAzT8ZCIuvyl0Nn13yDAie
+	4x+SsUAibhyv9zwR/uUTqRALQ20kW7n4Uwtyuvpm88JNkHZq9PKj2kqXZLxOdUrEGcSrtjIh2Ed
+	Y0Wc/y54qFymcwahK+8Acqbn2KVJR/SCe15JL36Gi0Enlnk+VwM/gvEHjkUq1VxQpIM+yxvjtt2
+	Y9TCCNbF9MpIwQ6OOWNiJX7DWdecP6Ai89EW93F2MWwPraLBwRLg3C37PefAPIok6t8DIBstchq
+	jnhYUuSQ3bQv4fwEiwD5CN29M3CKQO8iV4B4nVg==
+X-Google-Smtp-Source: AGHT+IEsyjfAmj4sww84+pgQzOLWH82jjfVxE1+yTMurN84goWigwlJr78Akd0Qt+QV+xZ/JTMH/Jw==
+X-Received: by 2002:a05:600c:1c0c:b0:456:fdd:6030 with SMTP id 5b1f17b1804b1-45b85587d3cmr51042365e9.19.1756726527175;
+        Mon, 01 Sep 2025 04:35:27 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-45b7e74b72esm156739695e9.0.2025.09.01.04.35.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Sep 2025 04:35:26 -0700 (PDT)
+Date: Mon, 1 Sep 2025 14:35:23 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: oe-kbuild@lists.linux.dev, Mina Almasry <almasrymina@google.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev,
+	Mina Almasry <almasrymina@google.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Joe Damato <jdamato@fastly.com>,
+	Stanislav Fomichev <sdf@fomichev.me>
+Subject: Re: [PATCH net-next v1] net: devmem: NULL check
+ netdev_nl_get_dma_dev return value
+Message-ID: <202508310205.YQmsa9gY-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 18/36] mm/gup: drop nth_page() usage within folio when
- recording subpages
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: linux-kernel@vger.kernel.org, Alexander Potapenko <glider@google.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
- Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- iommu@lists.linux.dev, io-uring@vger.kernel.org,
- Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
- Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
- kasan-dev@googlegroups.com, kvm@vger.kernel.org,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, Marco Elver <elver@google.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>, Michal Hocko <mhocko@suse.com>,
- Mike Rapoport <rppt@kernel.org>, Muchun Song <muchun.song@linux.dev>,
- netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
- Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
- Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
- virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
- wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
-References: <20250827220141.262669-1-david@redhat.com>
- <20250827220141.262669-19-david@redhat.com>
- <c0dadc4f-6415-4818-a319-e3e15ff47a24@lucifer.local>
- <632fea32-28aa-4993-9eff-99fc291c64f2@redhat.com>
- <8a26ae97-9a78-4db5-be98-9c1f6e4fb403@lucifer.local>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- qIws/H2t
-In-Reply-To: <8a26ae97-9a78-4db5-be98-9c1f6e4fb403@lucifer.local>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250829220003.3310242-1-almasrymina@google.com>
 
->>
->>
->> The nice thing is that we only record pages in the array if they actually passed our tests.
-> 
-> Yeah that's nice actually.
-> 
-> This is fine (not the meme :P)
+Hi Mina,
 
-:D
+kernel test robot noticed the following build warnings:
 
-> 
-> So yes let's do this!
+url:    https://github.com/intel-lab-lkp/linux/commits/Mina-Almasry/net-devmem-NULL-check-netdev_nl_get_dma_dev-return-value/20250830-060251
+base:   4f54dff818d7b5b1d84becd5d90bc46e6233c0d7
+patch link:    https://lore.kernel.org/r/20250829220003.3310242-1-almasrymina%40google.com
+patch subject: [PATCH net-next v1] net: devmem: NULL check netdev_nl_get_dma_dev return value
+config: x86_64-randconfig-161-20250830 (https://download.01.org/0day-ci/archive/20250831/202508310205.YQmsa9gY-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
 
-That leaves us with the following on top of this patch:
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+| Closes: https://lore.kernel.org/r/202508310205.YQmsa9gY-lkp@intel.com/
 
- From 4533c6e3590cab0c53e81045624d5949e0ad9015 Mon Sep 17 00:00:00 2001
-From: David Hildenbrand <david@redhat.com>
-Date: Fri, 29 Aug 2025 15:41:45 +0200
-Subject: [PATCH] mm/gup: remove record_subpages()
+New smatch warnings:
+net/core/netdev-genl.c:1102 netdev_nl_bind_tx_doit() warn: passing zero to 'PTR_ERR'
 
-We can just cleanup the code by calculating the #refs earlier,
-so we can just inline what remains of record_subpages().
+vim +/PTR_ERR +1102 net/core/netdev-genl.c
 
-Calculate the number of references/pages ahead of times, and record them
-only once all our tests passed.
+8802087d20c0e1 Stanislav Fomichev 2025-05-08  1046  int netdev_nl_bind_tx_doit(struct sk_buff *skb, struct genl_info *info)
+8802087d20c0e1 Stanislav Fomichev 2025-05-08  1047  {
+bd61848900bff5 Mina Almasry       2025-05-08  1048  	struct net_devmem_dmabuf_binding *binding;
+bd61848900bff5 Mina Almasry       2025-05-08  1049  	struct netdev_nl_sock *priv;
+bd61848900bff5 Mina Almasry       2025-05-08  1050  	struct net_device *netdev;
+512c88fb0e884c Dragos Tatulea     2025-08-27  1051  	struct device *dma_dev;
+bd61848900bff5 Mina Almasry       2025-05-08  1052  	u32 ifindex, dmabuf_fd;
+bd61848900bff5 Mina Almasry       2025-05-08  1053  	struct sk_buff *rsp;
+bd61848900bff5 Mina Almasry       2025-05-08  1054  	int err = 0;
+bd61848900bff5 Mina Almasry       2025-05-08  1055  	void *hdr;
+bd61848900bff5 Mina Almasry       2025-05-08  1056  
+bd61848900bff5 Mina Almasry       2025-05-08  1057  	if (GENL_REQ_ATTR_CHECK(info, NETDEV_A_DEV_IFINDEX) ||
+bd61848900bff5 Mina Almasry       2025-05-08  1058  	    GENL_REQ_ATTR_CHECK(info, NETDEV_A_DMABUF_FD))
+bd61848900bff5 Mina Almasry       2025-05-08  1059  		return -EINVAL;
+bd61848900bff5 Mina Almasry       2025-05-08  1060  
+bd61848900bff5 Mina Almasry       2025-05-08  1061  	ifindex = nla_get_u32(info->attrs[NETDEV_A_DEV_IFINDEX]);
+bd61848900bff5 Mina Almasry       2025-05-08  1062  	dmabuf_fd = nla_get_u32(info->attrs[NETDEV_A_DMABUF_FD]);
+bd61848900bff5 Mina Almasry       2025-05-08  1063  
+bd61848900bff5 Mina Almasry       2025-05-08  1064  	priv = genl_sk_priv_get(&netdev_nl_family, NETLINK_CB(skb).sk);
+bd61848900bff5 Mina Almasry       2025-05-08  1065  	if (IS_ERR(priv))
+bd61848900bff5 Mina Almasry       2025-05-08  1066  		return PTR_ERR(priv);
+bd61848900bff5 Mina Almasry       2025-05-08  1067  
+bd61848900bff5 Mina Almasry       2025-05-08  1068  	rsp = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
+bd61848900bff5 Mina Almasry       2025-05-08  1069  	if (!rsp)
+bd61848900bff5 Mina Almasry       2025-05-08  1070  		return -ENOMEM;
+bd61848900bff5 Mina Almasry       2025-05-08  1071  
+bd61848900bff5 Mina Almasry       2025-05-08  1072  	hdr = genlmsg_iput(rsp, info);
+bd61848900bff5 Mina Almasry       2025-05-08  1073  	if (!hdr) {
+bd61848900bff5 Mina Almasry       2025-05-08  1074  		err = -EMSGSIZE;
+bd61848900bff5 Mina Almasry       2025-05-08  1075  		goto err_genlmsg_free;
+bd61848900bff5 Mina Almasry       2025-05-08  1076  	}
+bd61848900bff5 Mina Almasry       2025-05-08  1077  
+bd61848900bff5 Mina Almasry       2025-05-08  1078  	mutex_lock(&priv->lock);
+bd61848900bff5 Mina Almasry       2025-05-08  1079  
+bd61848900bff5 Mina Almasry       2025-05-08  1080  	netdev = netdev_get_by_index_lock(genl_info_net(info), ifindex);
+bd61848900bff5 Mina Almasry       2025-05-08  1081  	if (!netdev) {
+bd61848900bff5 Mina Almasry       2025-05-08  1082  		err = -ENODEV;
+bd61848900bff5 Mina Almasry       2025-05-08  1083  		goto err_unlock_sock;
+bd61848900bff5 Mina Almasry       2025-05-08  1084  	}
+bd61848900bff5 Mina Almasry       2025-05-08  1085  
+bd61848900bff5 Mina Almasry       2025-05-08  1086  	if (!netif_device_present(netdev)) {
+bd61848900bff5 Mina Almasry       2025-05-08  1087  		err = -ENODEV;
+bd61848900bff5 Mina Almasry       2025-05-08  1088  		goto err_unlock_netdev;
+bd61848900bff5 Mina Almasry       2025-05-08  1089  	}
+bd61848900bff5 Mina Almasry       2025-05-08  1090  
+ae28cb114727dd Mina Almasry       2025-05-08  1091  	if (!netdev->netmem_tx) {
+ae28cb114727dd Mina Almasry       2025-05-08  1092  		err = -EOPNOTSUPP;
+ae28cb114727dd Mina Almasry       2025-05-08  1093  		NL_SET_ERR_MSG(info->extack,
+ae28cb114727dd Mina Almasry       2025-05-08  1094  			       "Driver does not support netmem TX");
+ae28cb114727dd Mina Almasry       2025-05-08  1095  		goto err_unlock_netdev;
+ae28cb114727dd Mina Almasry       2025-05-08  1096  	}
+ae28cb114727dd Mina Almasry       2025-05-08  1097  
+512c88fb0e884c Dragos Tatulea     2025-08-27  1098  	dma_dev = netdev_queue_get_dma_dev(netdev, 0);
+512c88fb0e884c Dragos Tatulea     2025-08-27  1099  	binding = net_devmem_bind_dmabuf(netdev, dma_dev, DMA_TO_DEVICE,
+512c88fb0e884c Dragos Tatulea     2025-08-27  1100  					 dmabuf_fd, priv, info->extack);
+991dbef67e2c35 Mina Almasry       2025-08-29  1101  	if (IS_ERR_OR_NULL(binding)) {
+bd61848900bff5 Mina Almasry       2025-05-08 @1102  		err = PTR_ERR(binding);
+bd61848900bff5 Mina Almasry       2025-05-08  1103  		goto err_unlock_netdev;
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
-  mm/gup.c | 25 ++++++++-----------------
-  1 file changed, 8 insertions(+), 17 deletions(-)
+net_devmem_bind_dmabuf() can't return NULL.  See my blog for more
+details:
+https://staticthinking.wordpress.com/2022/08/01/mixing-error-pointers-and-null/
 
-diff --git a/mm/gup.c b/mm/gup.c
-index 89ca0813791ab..5a72a135ec70b 100644
---- a/mm/gup.c
-+++ b/mm/gup.c
-@@ -484,19 +484,6 @@ static inline void mm_set_has_pinned_flag(struct mm_struct *mm)
-  #ifdef CONFIG_MMU
-  
-  #ifdef CONFIG_HAVE_GUP_FAST
--static int record_subpages(struct page *page, unsigned long sz,
--			   unsigned long addr, unsigned long end,
--			   struct page **pages)
--{
--	int nr;
--
--	page += (addr & (sz - 1)) >> PAGE_SHIFT;
--	for (nr = 0; addr != end; nr++, addr += PAGE_SIZE)
--		pages[nr] = page++;
--
--	return nr;
--}
--
-  /**
-   * try_grab_folio_fast() - Attempt to get or pin a folio in fast path.
-   * @page:  pointer to page to be grabbed
-@@ -2963,8 +2950,8 @@ static int gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
-  	if (pmd_special(orig))
-  		return 0;
-  
--	page = pmd_page(orig);
--	refs = record_subpages(page, PMD_SIZE, addr, end, pages + *nr);
-+	refs = (end - addr) >> PAGE_SHIFT;
-+	page = pmd_page(orig) + ((addr & ~PMD_MASK) >> PAGE_SHIFT);
-  
-  	folio = try_grab_folio_fast(page, refs, flags);
-  	if (!folio)
-@@ -2985,6 +2972,8 @@ static int gup_fast_pmd_leaf(pmd_t orig, pmd_t *pmdp, unsigned long addr,
-  	}
-  
-  	*nr += refs;
-+	for (; refs; refs--)
-+		*(pages++) = page++;
-  	folio_set_referenced(folio);
-  	return 1;
-  }
-@@ -3003,8 +2992,8 @@ static int gup_fast_pud_leaf(pud_t orig, pud_t *pudp, unsigned long addr,
-  	if (pud_special(orig))
-  		return 0;
-  
--	page = pud_page(orig);
--	refs = record_subpages(page, PUD_SIZE, addr, end, pages + *nr);
-+	refs = (end - addr) >> PAGE_SHIFT;
-+	page = pud_page(orig) + ((addr & ~PUD_MASK) >> PAGE_SHIFT);
-  
-  	folio = try_grab_folio_fast(page, refs, flags);
-  	if (!folio)
-@@ -3026,6 +3015,8 @@ static int gup_fast_pud_leaf(pud_t orig, pud_t *pudp, unsigned long addr,
-  	}
-  
-  	*nr += refs;
-+	for (; refs; refs--)
-+		*(pages++) = page++;
-  	folio_set_referenced(folio);
-  	return 1;
-  }
--- 
-2.50.1
-
+bd61848900bff5 Mina Almasry       2025-05-08  1104  	}
+bd61848900bff5 Mina Almasry       2025-05-08  1105  
+bd61848900bff5 Mina Almasry       2025-05-08  1106  	nla_put_u32(rsp, NETDEV_A_DMABUF_ID, binding->id);
+bd61848900bff5 Mina Almasry       2025-05-08  1107  	genlmsg_end(rsp, hdr);
+bd61848900bff5 Mina Almasry       2025-05-08  1108  
+bd61848900bff5 Mina Almasry       2025-05-08  1109  	netdev_unlock(netdev);
+bd61848900bff5 Mina Almasry       2025-05-08  1110  	mutex_unlock(&priv->lock);
+bd61848900bff5 Mina Almasry       2025-05-08  1111  
+bd61848900bff5 Mina Almasry       2025-05-08  1112  	return genlmsg_reply(rsp, info);
+bd61848900bff5 Mina Almasry       2025-05-08  1113  
+bd61848900bff5 Mina Almasry       2025-05-08  1114  err_unlock_netdev:
+bd61848900bff5 Mina Almasry       2025-05-08  1115  	netdev_unlock(netdev);
+bd61848900bff5 Mina Almasry       2025-05-08  1116  err_unlock_sock:
+bd61848900bff5 Mina Almasry       2025-05-08  1117  	mutex_unlock(&priv->lock);
+bd61848900bff5 Mina Almasry       2025-05-08  1118  err_genlmsg_free:
+bd61848900bff5 Mina Almasry       2025-05-08  1119  	nlmsg_free(rsp);
+bd61848900bff5 Mina Almasry       2025-05-08  1120  	return err;
+8802087d20c0e1 Stanislav Fomichev 2025-05-08  1121  }
 
 -- 
-Cheers
-
-David / dhildenb
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
 
