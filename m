@@ -1,97 +1,83 @@
-Return-Path: <netdev+bounces-218827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB81DB3EB40
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 17:46:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ABB17B3EB76
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 17:51:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27F76487AAE
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 15:39:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E5234861F9
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 15:45:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E86D2E6CAE;
-	Mon,  1 Sep 2025 15:34:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C13CE1FDE31;
+	Mon,  1 Sep 2025 15:45:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cP9OuVZ2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AUjiaBj5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42AAF2D5930;
-	Mon,  1 Sep 2025 15:34:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9568D1DF99C;
+	Mon,  1 Sep 2025 15:45:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756740869; cv=none; b=VmgtaNHpEYi0UwZMkZrj1vrMU3xAR380m0cbG1WivXzWNqG0OFfnn7ETH9gT+jl6kBR3Si7Rau5HdxDbA0CkmYRmiY4rHzkYlq8Xc3ZEIXsr0RdcCIGCYAOvENpmwYQyOC1HaUTFxAJ//FBNAApaw9xekhvoLB2tTpqGQs3ge8I=
+	t=1756741538; cv=none; b=QH9zXK28Bfs4w6992cjxMM3rVE3jMGCbmNrH592UsmkRId9pEBRmM53pC5BE+HCsSdFGM/7d/fh/EH5LKkzWopTgki83FCrdNcm7m1s5aQ/dGedyN8q10TA0rjGx4qcjBNSG0Q5OcnDCWmJhrvptVfzYGngxIbuHLIqHlkHaM1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756740869; c=relaxed/simple;
-	bh=zxtkK4szcuhucZHirsMkuZhVjAjva6h2OuGst/leZz4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K/n+noh9cTSNEcBql47SI62SqkKm5PtAWOk5Z/Z03mSu/ICFzREcyC1jdNTJUONNf5k3VoQkU5tQRHjKoM9hgZCG869/2i+m0Z9SBjgrqzyXLBPzr2DPuXxB9C0lAPWAWaHdczZwdcxYoZoY2ChvLxdME+paFBNerfZ2Ag4WjLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cP9OuVZ2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56C22C4CEF0;
-	Mon,  1 Sep 2025 15:34:28 +0000 (UTC)
+	s=arc-20240116; t=1756741538; c=relaxed/simple;
+	bh=7DReLwRtWvWlXnSp8wrZ4WuZxyJ9hshhoM7p5A6SQKw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BKo2qqBRAWwlqe3fTFa/GerODpapYdkMFtdJ7WXgMs6NO9ceMaBRQVkUvDEwB18285wQBx3K9ugZqZoeK7FZzDtSxv+QaEF8l7UJgRFfpUOeX2xIIovmonw0SRY2D9wDgZFQZo5F2TRiNW5vgTJgOfNr34oHRgxBIGaj3jzMfw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AUjiaBj5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C568C4CEF0;
+	Mon,  1 Sep 2025 15:45:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756740868;
-	bh=zxtkK4szcuhucZHirsMkuZhVjAjva6h2OuGst/leZz4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cP9OuVZ23NDBNtDXJFFpVQqErvc4vXBSbezCN2lf0Z+ZFJ4Rlx7tAC1zSjMRusbZL
-	 hHL6gkzW5OioboxgBUXsVy+6iXnoyMqo+7eFw5Cp51FLf1vv8OohRWH2VJBOPAq6SD
-	 Cwtapx3PiTD/nn896L8YnkjjmVEAwuIXj1KMK/g7BGHwNp8JZxDrz+aQYTrjN7ln63
-	 7gG7qZQNojWqtyVe+acFCaI5uxI4JpIbUG1PeNRw1uW1znkcDQUsQWzt8bfpgnvyAp
-	 xm84FnKbTDOflUGEtnVAJ3m9+crArYVNvxC9/ot1HNaITebEj62WIlu4BCy11x2wl/
-	 IExU5oCKTx3GA==
-Date: Mon, 1 Sep 2025 08:34:27 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Brett A C Sheffield <bacs@librecast.net>
-Cc: willemdebruijn.kernel@gmail.com, davem@davemloft.net,
- edumazet@google.com, gregkh@linuxfoundation.org, horms@kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, shuah@kernel.org,
- willemb@google.com
-Subject: Re: [PATCH net-next v4] selftests: net: add test for ipv6
- fragmentation
-Message-ID: <20250901083427.5d9e2a1a@kernel.org>
-In-Reply-To: <20250901123757.13112-1-bacs@librecast.net>
-References: <20250901123757.13112-1-bacs@librecast.net>
+	s=k20201202; t=1756741538;
+	bh=7DReLwRtWvWlXnSp8wrZ4WuZxyJ9hshhoM7p5A6SQKw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AUjiaBj5Jw38xsC+JT/Xfb3oaENxUMs06rlSXJl6nFRE14Y/BAAlxuJmbvQ9X/BJd
+	 gCcU/fIErJPr7X2bshBWqLDCjl4aCDDIrCLVnL9eYYnGDiIWVdMEAvB6clifYdmCQy
+	 oad7LuDaMIZy4SEqiH20MwNcWddI9+Kg7qCx4WJJDtx4VLNgAytoU/TA18md+9yiou
+	 hOBCXqsLdoVisMqnWnKPjYnl2s8eVPte3Zm6gT4lrEf1q2yP3PlllZ7VtJEq/OYEj/
+	 byqDI20XQlxYgwGhyOOmRd2gJelUG0uOBENcUcXOadZ/iz4gHVJ1PUoxGvfyIC+b8C
+	 M1mud4qsuUxdw==
+Date: Mon, 1 Sep 2025 16:45:33 +0100
+From: Simon Horman <horms@kernel.org>
+To: Carolina Jubran <cjubran@nvidia.com>
+Cc: Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Gal Pressman <gal@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+	Cosmin Ratiu <cratiu@nvidia.com>, Nimrod Oren <noren@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 1/3] selftests: drv-net: Fix and clarify TC bandwidth
+ split in devlink_rate_tc_bw.py
+Message-ID: <20250901154533.GH15473@horms.kernel.org>
+References: <20250831080641.1828455-1-cjubran@nvidia.com>
+ <20250831080641.1828455-2-cjubran@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250831080641.1828455-2-cjubran@nvidia.com>
 
-On Mon,  1 Sep 2025 12:37:14 +0000 Brett A C Sheffield wrote:
-> +static int setup(void)
-> +{
-> +	struct ifreq ifr = {
-> +		.ifr_name = "lo"
-> +	};
-> +	int fd = -1;
-> +	int ctl;
-> +
-> +	/* we need to set MTU, so do this in a namespace to play nicely */
-> +	if (unshare(CLONE_NEWNET) == -1)
-> +		error(KSFT_FAIL, errno, "unshare");
-> +
-> +	ctl = socket(AF_LOCAL, SOCK_STREAM, 0);
-> +	if (ctl == -1)
-> +		error(KSFT_FAIL, errno, "socket");
-> +
-> +	/* ensure MTU is smaller than what we plan to send */
-> +	ifr.ifr_mtu = MTU;
-> +	if (ioctl(ctl, SIOCSIFMTU, &ifr) == -1)
-> +		error(KSFT_FAIL, errno, "ioctl: set MTU");
-> +
-> +	disable_dad("lo");
-> +	interface_up(ctl, &ifr);
-> +
-> +	close(ctl);
-> +	return fd;
+On Sun, Aug 31, 2025 at 11:06:39AM +0300, Carolina Jubran wrote:
+> Correct the documented bandwidth distribution between TC3 and TC4
+> from 80/20 to 20/80. Update test descriptions and printed messages
+> to consistently reflect the intended split.
+> 
+> Fixes: 23ca32e4ead4 ("selftests: drv-net: Add test for devlink-rate traffic class bandwidth distribution")
+> Tested-by: Carolina Jubran <cjubran@nvidia.com>
+> Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
+> Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
+> Reviewed-by: Nimrod Oren <noren@nvidia.com>
 
-fd is unused here
--- 
-pw-bot: cr
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
