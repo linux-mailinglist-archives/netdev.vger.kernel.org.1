@@ -1,412 +1,232 @@
-Return-Path: <netdev+bounces-218622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE118B3DA4C
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 08:53:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63EAEB3DA48
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 08:52:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 444913BA8DD
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 06:53:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92924176635
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 06:52:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A1EB25B1CE;
-	Mon,  1 Sep 2025 06:52:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 490C525A341;
+	Mon,  1 Sep 2025 06:52:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CqJXaK69"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="LefTvYEP"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2071.outbound.protection.outlook.com [40.107.95.71])
+Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013009.outbound.protection.outlook.com [40.107.159.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69951253F03
-	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 06:52:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D3925A2B4;
+	Mon,  1 Sep 2025 06:52:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.9
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756709574; cv=fail; b=CyyHEkcjcVGwLtLh90BXky9ttjzI5+EbsardaTy59P49ZIpOAxtU5oF6OQ4wVHqydpi01vhVr8OEzo/lCxup93aFbJM2N2UGYEVTYWLI8OT0SJc7Eg9lW4zS4PXyVxaEhCTU7XPaYS4n2/j+lhY6e6YHgbsDVSBrx8pnf1NCzn8=
+	t=1756709558; cv=fail; b=jr41VduzZ4oUa73sx2C628tID7Jh28k10EMrdkB0YgsCmgRfap0+7IGzM0qravdPZn3CcISJ/lOyG2jH6twBUmrb/KKhQQ46C98xIDNhye7ebqwZJME6xy0cusIwnZFMM0U7dqEow6168QSnXSYEpBxO58SJjxl4giVGwsmBJuQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756709574; c=relaxed/simple;
-	bh=tPKcT0xhgbGfbzyISl4j7UqNq11RrWCco52dhXfmycI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XOFUKQGjWmeGhvjgtCHKfRQE0J5HmCGvw/8r7dT3yMpOetskkEwSSFDMx5wGWlLyjM39W8nTUf71VmGzKlf9/yJaPzTflw8h5GmH32aw3PWtuTrSTEln3f41hFfPMCjqTwatzHRcdxtXnYxkNv6q9KREQWlAakWF852EqWUzjCU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=CqJXaK69; arc=fail smtp.client-ip=40.107.95.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1756709558; c=relaxed/simple;
+	bh=QetNiMAtg9q1l057AiteiLCJPY/5al+Ly3fPIWDCAOo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=SoEHUvlsj4e4ucLMxSc13V1Kyp1FYTfUMuyLjobfUyUW6FykbvBwxkcPEPxmCz1x4IQ7Zp9LtGeLQE3cZZepVJw2vBbf4nnCGsIn99+0MxHS7Rqc6ii7/S7W311zg2XPxIyX0Y5OZYoULNQOp6EKQdRJxe+1jmFLq5bEAfap0t4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=LefTvYEP; arc=fail smtp.client-ip=40.107.159.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=jFX8vPyta0nBvT/xaksWzTZ26nJcGoWDw15cPDSuKcVVhzA/tPd188aCaiShiG8MBT//6ZyUKyDV9R0EWjR6PAh0OOMfe+IZHiMhp5AV7Tqpr3kG9ONUrRje1Kxo9QXZRUg+PksCMFAmxyrOdY9j1WPNvVs8ng1riP7GoW9eF14Yc9k3gKfzXSp3pSY4AZ7jrHC5Yi7zCqPAyH8KpqVptDwmGGthsJiI2b36pql296M6oOtgrZDvJYYbWaqOqfpsJzBcBv3AYjJdI/zT6RewNNkuGEnrL+Y7WeHJChXiVtVn7YLQhDdPCcPyDli4RfRUZsI4uYqr0v5EIBzUrO0dmw==
+ b=v/iPWeihjl4VaAooUKhin/olXL0cx6p3CKSZ0HE15QWiWIerH3ISqvJbTYmEl0KO0rm51no74UPS1DbSHKUrWNg/pNIcV0HTfzF8eLAlSSMbKSa0f4nyjwr1X3yMgLnjnbzR3OEupIreuaOYL5he4bKsUkyNkCcr1/7s8xZ3aPS/kMjIsKiAFTzVZFq6QurPc3fA8GboNnpQAK7RCHDa0cicP6pmgzT0tCt+jWIwh/9t/NBERnLKEKXsByEAaLEJLnlIMj06sqG/pOtSH7K1qgA9E+WwIFAC2nI4x3d8/y86Xvtbgt+DdmwCL1nzbzfBv61eokruHeeVTcRVuEH55Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YXXyHVQidfTJ+F4+OhxM0vW/0mTnmonY4tU8eND/orI=;
- b=X3BiqSGCJHbtNHmG2khZBjkXM3rWqnZZTYRvEmZTlHhG1CajbEpxvPWoK/Md+vDkjnbCSlse5eWndr3QxBRFvhgF6WkiEhowAMGMdzUZdac8FcLgdtWxtrmSvB7Oh7OEoaDGMocqEXESbG1ITNRS+6dOtxECqT+O2LE2ZikMtJt7YK6DnB6CsULPEx2oWi9kJ5/nPlwn2ilQ8BMrAICtKf2zD5pYj/Dcr0NMMSjDUYghX4kGnLUQdhE3BUCLlJklLqJSJVdJTOmWWGXqRqLJirTlAphdY+USrv4H6qD1YYikyt7PudF4+hkcogWvTWHzogYZoeNWhRUb7J5VR0o86Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=oFpS1m69EZ1TYV43OBH3ZZrXc5fZn0963VQDVK6DvYQ=;
+ b=k1so3BZ9uoNBId9cBERKPpo2PKMSLamidAzoxq2Dph+kE37+/yXfFTczNw58Mm+Po88owWoa2ee+V4Dz2o3AGr30HAVeQsDW+nPx4mytkWcC5WS5tmOBzt1naTXRXaSix2fPAUQvmv/n+SsTfHuN6iVetf3GHFldKZa5SwW+I+XeBkFDi178QGfHnNcMpivqDILNfwVrB0DrzMab+EIz1/e5Lplz/70FYQ0P9Jt8YlDX10blWeRMlTPtM2CENii6v8TztG5RLGIIBh7765lHK80OMXQref8VnxNmqSnYUdBZnrz4aRTAvcHPq54RTqp0EHug5WE5knfesourfTg9+g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YXXyHVQidfTJ+F4+OhxM0vW/0mTnmonY4tU8eND/orI=;
- b=CqJXaK692adJoOq1jUJleZ4o9Pe8Z9J7xPZs5x5BHiRA1NI416b2szjf59EQegz82L9kLH+w36Nj2qgUO2J9uNv93cVcwM4QrUoD0ZnDMBvGU3vU4IjZwliLSeA912sZOicgXiG/HpOXiGqsPyspgagCZ8iB+/lBw9JxxQj8JRHg0tzHkEpoIF7NQbTY9Y+NPVdBom3PS0b58/jCH4fprzKJdavCCzKy5SBkZvEYRxUIAQZgsp7Ts4QWl/jNKzOGLD0XGBlOpRX2aV5pFFXzy+wdxnMaoNjes3DucUGYQHyTNaoQWR4b/xto3ZXsqmdAZdb9cT+DV4KD4SWjj+KQzA==
-Received: from BL1PR13CA0320.namprd13.prod.outlook.com (2603:10b6:208:2c1::25)
- by BL1PR12MB5993.namprd12.prod.outlook.com (2603:10b6:208:399::9) with
+ bh=oFpS1m69EZ1TYV43OBH3ZZrXc5fZn0963VQDVK6DvYQ=;
+ b=LefTvYEPgE4H7BbasXyLEHYT7eHDY21DAnU/h7ctZ6AJJ90rLTv2Lh/UHgxP6F70pE/h0quyRcU7t8WmziFHWwLIPJqHbG/4ChaJcFdaLUHpUQqpeFJmwha+KK241k+ZJhFz/sZ+e0YLiW9cwCeh0fk71E+oFGW8e0u63BGysduL1q7hmPQG0UgxVoRBtDHnHYlsZpB1vmeybOQwRfBF4ONe4fPPbyOX31BvYsoaYYH3l6DuheYM8XO/XF2tglx4ZnC1RbADIY9bXnMTOyrOL8AjyziwJt/jVcpdIWLlAKvijIpZ2680e7itu9094QiEUqcXSkyN2rJEb1i7PcS/RQ==
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by PAXPR04MB8491.eurprd04.prod.outlook.com (2603:10a6:102:1df::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.18; Mon, 1 Sep
- 2025 06:52:45 +0000
-Received: from BN2PEPF000044A4.namprd02.prod.outlook.com
- (2603:10b6:208:2c1:cafe::91) by BL1PR13CA0320.outlook.office365.com
- (2603:10b6:208:2c1::25) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9094.10 via Frontend Transport; Mon,
- 1 Sep 2025 06:52:45 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BN2PEPF000044A4.mail.protection.outlook.com (10.167.243.155) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9094.14 via Frontend Transport; Mon, 1 Sep 2025 06:52:45 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Sun, 31 Aug
- 2025 23:52:24 -0700
-Received: from shredder.nvidia.com (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Sun, 31 Aug
- 2025 23:52:20 -0700
-From: Ido Schimmel <idosch@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
-	<razor@blackwall.org>, <petrm@nvidia.com>, <mcremers@cloudbear.nl>, "Ido
- Schimmel" <idosch@nvidia.com>
-Subject: [PATCH net 3/3] selftests: net: Add a selftest for VXLAN with FDB nexthop groups
-Date: Mon, 1 Sep 2025 09:50:35 +0300
-Message-ID: <20250901065035.159644-4-idosch@nvidia.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250901065035.159644-1-idosch@nvidia.com>
-References: <20250901065035.159644-1-idosch@nvidia.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.16; Mon, 1 Sep
+ 2025 06:52:33 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db%5]) with mapi id 15.20.9094.011; Mon, 1 Sep 2025
+ 06:52:32 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Shenwei Wang <shenwei.wang@nxp.com>
+CC: Clark Wang <xiaoning.wang@nxp.com>, Stanislav Fomichev <sdf@fomichev.me>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, dl-linux-imx <linux-imx@nxp.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>
+Subject: RE: [PATCH v4 net-next 4/5] net: fec: add change_mtu to support
+ dynamic buffer allocation
+Thread-Topic: [PATCH v4 net-next 4/5] net: fec: add change_mtu to support
+ dynamic buffer allocation
+Thread-Index: AQHcGryO+DVqxyerjU+TUjsu8Hl/y7R9k3vw
+Date: Mon, 1 Sep 2025 06:52:32 +0000
+Message-ID:
+ <PAXPR04MB8510EA7CD915DE9340303B0F8807A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <20250831211557.190141-1-shenwei.wang@nxp.com>
+ <20250831211557.190141-5-shenwei.wang@nxp.com>
+In-Reply-To: <20250831211557.190141-5-shenwei.wang@nxp.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|PAXPR04MB8491:EE_
+x-ms-office365-filtering-correlation-id: bcd1c15d-84ae-48d2-b16f-08dde9242070
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|7416014|376014|19092799006|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?Q5EzMFZLISGDuQJ8nlp52c+e/IS7f59enrocbBZdplVOtUXRmHqEIA44+gp9?=
+ =?us-ascii?Q?AjFKF815P6qYqyn8Vs7HFm3MezlQvpcFptv/z/TQZGYGmJfE5xIkSwQzeqLZ?=
+ =?us-ascii?Q?Ahb86HwShG8pArMj4u1lCdCCs6/pPbz3u2Kuf8Tc+fz9fBZ0IyaZZ/r8V1/f?=
+ =?us-ascii?Q?XYtZsdusQXdIRbpuUH0SRk6U3//yGO2GXtNzh3Brg0XlccDOmumCtkbsUOOj?=
+ =?us-ascii?Q?kRJgkMKtHJsEXVUfTyDCX2LPxcF0KBDUpqG+UuwmTlAtPMK2/JTvcf+Pu9CO?=
+ =?us-ascii?Q?cXQad12Jzji7BuHBO5HNaOC9AZPFs8qw205BSxPa/kzt9J/TqxCdrop0TzlD?=
+ =?us-ascii?Q?RaJLy4KYpotUZOcvP/vSPnzOAwqFza7/27XsMCCb/zo4+B45zp2xRGqbn0FY?=
+ =?us-ascii?Q?+4UFa8Ew27snukSbB1EQ8h0bAHBpBTz/iSnVicEUysg7sxhU41dKZNLUUXCR?=
+ =?us-ascii?Q?VS2aJXupdKDakvPakUe73URajx5jm84i9IOgHCq82SbAGbpmYbH7dT9xjdXF?=
+ =?us-ascii?Q?SVPcq67waodRnffrz4c/g+bO/aGS3mgrogQi2svNEAqX8UQ4Wm1tg80AFMAd?=
+ =?us-ascii?Q?s3ffRxmWT3m1pFz7sjrak+km3KxBOrQY2WgTDlnvWVELnAy7VLhGlYGkG0ou?=
+ =?us-ascii?Q?0SP8AyYxuwxLVIuCVTUMDrrCY/argAqjxu/bdPbaU1DuCORhOqE7S+7J50Sw?=
+ =?us-ascii?Q?NuQA3aCAJnx1faJ/owgnRm7PHBAyk4MDjcks4hqXTJh5N2yHD0vVseZ0h+MR?=
+ =?us-ascii?Q?2XoS45okqPrli44PegHqcxyt1+cqBfq9ijuu7nlcJQjUhsj+Hjs7PtInfMhg?=
+ =?us-ascii?Q?yDzDvzvPWq9fmuYy/2KiJsqaPBifc4mdafMfwXusw3LYgS4ioxDMIxkAjM7C?=
+ =?us-ascii?Q?Com7VxU07dk+Q1AFCKrZ8t7s4261fTZ3PP0LczS0KGoZjC3vO43vai05rYV5?=
+ =?us-ascii?Q?n4MSnFZeIfI1e76e1HieV7ffLItiI/1ibyD5JHjq+6Pp4+lzJEQi9ToShtpR?=
+ =?us-ascii?Q?pCpl4e5f67DL/6tMA5sDy5dZeVqt3z2HsDl4KfJqqUuLKhMqyr0E0m1zZkXg?=
+ =?us-ascii?Q?QdeM/i8vU49YPr1D7qcV1OjCfeDdK/t2Xnccqq12xet/kDK5BOeQCivNr3nd?=
+ =?us-ascii?Q?GdSKFy4KKsJXtJnXeA9phTnSsDla0YvpjcmF8ZJ7GFI5j23xSSIdrMLjkZge?=
+ =?us-ascii?Q?TEySuL/d5Qf9pcEWYjo10twkt4yC1YirMyLihr86zcW01+GhbAxiFjdedrVq?=
+ =?us-ascii?Q?x+wNHvCmyLva6yHl7MIrr7KF4cfZRjTLcXfNnS9MtqlSi0Vbk3gEo1rphF5L?=
+ =?us-ascii?Q?6fHWYgy6LxO4o5vcjTTjRC+BM/AKexzVRjZoIiFO3Z1gnR7e9d3yC/rfzrDG?=
+ =?us-ascii?Q?ZvF4WC76lVRxfkad2mHAjz9vScxovUBibx7mE253k21wcuD+y8OL5A+d73ql?=
+ =?us-ascii?Q?IKBk1vI6QyP79UQ0tW0XwFtEXzM5WbAxnKNYOICeziV23oGHMKfxOg=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(19092799006)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?+knZdiGoiD+Ksw1nDTYaZMcdUAgYslRzoBKSEGrq8TwXJkucG9UArsECm0py?=
+ =?us-ascii?Q?Iuyl4QtKDMDMc2Hm47rqQjEppnZeC372xjy7YV0dflSV1VAFPPjR8UZPtNPA?=
+ =?us-ascii?Q?XdlInsHTq+3OkHk6U0FliFeA36B4yJO+9C5aPUBBtv8DRdmcRcVa8eqK8hV8?=
+ =?us-ascii?Q?KBu8FwidDoK+jTN8fBvyCqJ3LzIHE+WCUX/4QN/ev9TJpJgvwON8nR23Zoin?=
+ =?us-ascii?Q?Ys/zLCANoc2VKjLrsmoAkmgv60x4W8Bur5S/YhJjdi/mkfhsriflKKGXGy6A?=
+ =?us-ascii?Q?nYgBS3PL44NjKRyhiO1YTpxlfrCgu3CuTEIOGTGzfr40+/Y1PCIxQD/FXmYG?=
+ =?us-ascii?Q?ubnlSHu1Rkg6JxE/rDLWouCkUsP9msu9aVWue9LSkcFLiJvgVbx3WDwl9rd6?=
+ =?us-ascii?Q?JyjAIUr1dm0XUPWaBALrkGP1iVFC68+q5ItkanLvCjq3ScnnzYV0AtJ1yPz9?=
+ =?us-ascii?Q?3KN4umc011SgoCAZsGU8MWaHlFZ9CdAn9kO3IJ9krw3mqiIm5Z7Sfwn3mcVu?=
+ =?us-ascii?Q?RVbAZlGpvXk8CleDAwSEn+M+A8LeryUvS4A4lCLp8CyfFmaMcItOXPpS3SBm?=
+ =?us-ascii?Q?URb3JBb3Caky6FpgT0+S5L4mz/4Cd95UuhWvJBcJLeFmU4ZB2Sbx9kHYpNdj?=
+ =?us-ascii?Q?+AHcHZH0afy1VZfpDg4V1bVVLfq9bGawnO0/MUHo+7X133fabYgrrybkHxUY?=
+ =?us-ascii?Q?ebyCUKaHKoyn0Hzu/RsShStBLpWlqqv6RVfAE3Wbnbsjb++n62+XNLnQ7n03?=
+ =?us-ascii?Q?cW0N9cpSE5MFZZg5S99vRzbe6u2hpc4oyNM2W8l6yv5nU3uttJAwa+klIlxh?=
+ =?us-ascii?Q?Dg9KpE12z7EWbd6MOrUbWRIC+O6a286KEbxqLkZnIy4U3jkaVtYMU4bbFvpV?=
+ =?us-ascii?Q?Vx6QBFz0MJiMkJBZeXRLZd6UhN/roqz0Q8hHJ/2qyt5asXR1YHcsyblH0fyN?=
+ =?us-ascii?Q?AuuQTLmX/3RTrXGhoc1+Qr6jhKMEsAXfbqIP+m45+jZ+vXz4sg5v9zaaJSjc?=
+ =?us-ascii?Q?zbbt+CfYpnFTyERDgZhalcR3RSiTyBNlunFuisZjhBg7tsBjxof9MtI+JUtJ?=
+ =?us-ascii?Q?gwpxN3ke9oPdHmZ3s1FzD5RO3uSI2D9JILJWCsYnhj/w7Gu1OlL7nFqsKdo5?=
+ =?us-ascii?Q?wOsExx30jpj1bnQHCBaGgxnKmPmPHptUpzDmUm0ocpUNG7l1Tqb+rLT+vhLm?=
+ =?us-ascii?Q?FZwgnjJws1rZFecFVMtKAbUPrvfD7uTh35+//ytNdI46TyJMjTijgfwl+Srh?=
+ =?us-ascii?Q?Jc6Ir53dA6rKDWP18+r+A8C3RrBiBsqvMslYjPV9CpK4EROHOsupBQ0sJXmt?=
+ =?us-ascii?Q?1nRojrxTeNFkNqQVObtt5KwuIBSrIbOZKlzAzzUX23wBPZ9rhSXiPCRgvMvP?=
+ =?us-ascii?Q?FwlXqbRlnVaEB82l2JvUEsSZkZtY3WwOE+7yfWdYYyoX0LOCSDOprgsyrMJ/?=
+ =?us-ascii?Q?57WoxZnxgNDZoxt0D6+tp03/kHljkocODAkOf6dUqeHvZT/fa0JkF48DIcvA?=
+ =?us-ascii?Q?3lGAw6EgIqQmqTRiQ899dzTO9uM6vleTxj4lv779lkyuPFPDgcrXEEVdTAnD?=
+ =?us-ascii?Q?ucJDqPorPQYXw2VZCWA=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN2PEPF000044A4:EE_|BL1PR12MB5993:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8146b330-c244-45e5-7a3a-08dde92427e6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?EaMV0iq6P00Im7hkL9dJKl5dgg5yNE5Ihr/GYserR4Q8r6a8AYICAMq8dYul?=
- =?us-ascii?Q?7VnWwtBz+vXjk2vVpBbuSCrFPbzyOwehWEaacNSr7oEoJmBuNE0bqkrnhWwn?=
- =?us-ascii?Q?2LQnwNGhCJTlu0yXuvfM+bd2ELYfcDmLOSjE1L92Sm5TSUGdhBvZV8gOjDsV?=
- =?us-ascii?Q?Zt76llyY7KF9TxHkZtGns/L1fBkrwhDZcqSJ+jLEbzDPFevh1st+fwFbbkx3?=
- =?us-ascii?Q?cGnm+Qd9IBsqWH2Jn0qaI58zCBVTrkqaHxTVFroobai0SchNwSifWBowR6ev?=
- =?us-ascii?Q?lmRM0fAXTAeC5jXOL6nXfw5UkNGa16KSEhrFNWIfHKbp0Nu5MvErTcPtapa6?=
- =?us-ascii?Q?u2qxWjunATxXigfXIzcj6CYEH4ZfmbjLFA7MIaB6A29HVkpr68nBrYaqxsWT?=
- =?us-ascii?Q?5Fl3zDlwJIE3rKSN8SMjt28e/eFtm+LbmKFA5+kAseg3mOGviCL+hsrnMZ5M?=
- =?us-ascii?Q?OGVch8Bn6u1z3yc1JdYhurdlsK37GrTch7GFPfm9WpFQW0VXikbN9s49wrPA?=
- =?us-ascii?Q?FM5yjYmMoEisQv4q76xS6jH/mbF/9Z9PRCGm5Maw5n2MAtUgGodf/MHLojo5?=
- =?us-ascii?Q?5mjAZerKYlKN5GKXknzyJLEzUwQSX9rrV5GpR/hFxNPkEzxug8jQitffVDVZ?=
- =?us-ascii?Q?l+yoGh6W2Bt5sVOMomlO5fesdm33UnM/0qOvMAXgnv+IL/aBPu1nklXUty0h?=
- =?us-ascii?Q?7IjWSBOPzPGCeAqAog19Sh4/M1Di777mThvQ6Zm7UHoqbmwXlBNpgU0r3ElP?=
- =?us-ascii?Q?kK1h4Eff2duRvXE62o/JnN0FyfYlDEIvNdBt1sAuQrlvWgayG6kI5SbEwy+z?=
- =?us-ascii?Q?n132SvGUngXmNgYvmp/ACtgqzYPoopps7MvViDogOnRCBbF0F84LKTLH62lI?=
- =?us-ascii?Q?LwV67kJRFR82txa7KDJ5TkBhrlZ0e55QPryH4GSdRhN2K+yT0CPzSSUqwe7W?=
- =?us-ascii?Q?U2tWV/53HRJQ7Da9N17O3PwGdxVgM6poxACipXECXrH6w9lH8zWQW2YhAnF3?=
- =?us-ascii?Q?0vfbehdSY5TyCbZ+3tIWH7XWLyBVRCNLqQScw382XQPHdC3JdA12ox7Z0RzY?=
- =?us-ascii?Q?y+Zmy9wg60p3Tg1ZGBCbfKE/Effks6+TegUPdy+al4z8cmDu0nYrVC8WkXgQ?=
- =?us-ascii?Q?+kX4gmm34Anhn5gGZAqw6U1bB+muvaiHN5nfHtmPi8cr7V9MUmR409QcarPf?=
- =?us-ascii?Q?jQJJ4PIYGljz97FJme04UuYRXiAUHwz13bo+O05XK1FG1rXnlyAgeUPTUKVP?=
- =?us-ascii?Q?RouiAdNMler2W0Yfky0zuql28pqMbPNNU25FhdlOrWHvhQexFMPA+n99JCWi?=
- =?us-ascii?Q?kOsEA+JxFMIgcs95NE1HYwzFWh47XWpxFA04AWRyoY4YUDRNmsiuYGVdlVNP?=
- =?us-ascii?Q?bfShPNGgzijoWnyk0NNrF20JBnA2h6FbyD5Hyp0MrECe+dRz4zCtuiyKnv6f?=
- =?us-ascii?Q?ZOKwwO5o1ojl23SCMHCG2vh4Xo2+ljWTI/T6SmqRIkk2o5r5/vtQk+D1nn+x?=
- =?us-ascii?Q?AwSPl1yqo7jD2Q37rrJTPcSg6tRYz+jGtOAh?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2025 06:52:45.2178
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bcd1c15d-84ae-48d2-b16f-08dde9242070
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Sep 2025 06:52:32.8486
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8146b330-c244-45e5-7a3a-08dde92427e6
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN2PEPF000044A4.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5993
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: OT4iQdBgrchb6vUgRwRfQGHCSA70veuAUm8OZw+uH4NeS+jMysa8aS5QbDLr2R5usWoQv6pCz9aroHM48BgEXw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8491
 
-Add test cases for VXLAN with FDB nexthop groups, testing both IPv4 and
-IPv6. Test basic Tx functionality as well as some corner cases.
+>   * 2048 byte skbufs are allocated. However, alignment requirements
+>   * varies between FEC variants. Worst case is 64, so round down by 64.
+>   */
+> +#define FEC_DRV_RESERVE_SPACE \
+> +	(XDP_PACKET_HEADROOM + \
+> +	 SKB_DATA_ALIGN((unsigned int)sizeof(struct skb_shared_info)))
 
-Example output:
+"unsigned int" can be removed. And please move FEC_DRV_RESERVE_SPACE
+to fec.h, FEC_ENET_RX_FRSIZE can be updated to
+(PAGE_SIZE - FEC_DRV_RESERVE_SPACE).
 
- # ./test_vxlan_nh.sh
- TEST: VXLAN FDB nexthop: IPv4 basic Tx                              [ OK ]
- TEST: VXLAN FDB nexthop: IPv6 basic Tx                              [ OK ]
- TEST: VXLAN FDB nexthop: learning                                   [ OK ]
- TEST: VXLAN FDB nexthop: IPv4 proxy                                 [ OK ]
- TEST: VXLAN FDB nexthop: IPv6 proxy                                 [ OK ]
+> +static int fec_change_mtu(struct net_device *ndev, int new_mtu)
+> +{
+> +	struct fec_enet_private *fep =3D netdev_priv(ndev);
+> +	int old_mtu, old_order, old_size, order, done;
+> +	int ret =3D 0;
+> +
+> +	order =3D get_order(new_mtu + ETH_HLEN + ETH_FCS_LEN +
+> FEC_DRV_RESERVE_SPACE);
+> +	old_order =3D fep->pagepool_order;
+> +	old_size =3D fep->rx_frame_size;
+> +	old_mtu =3D READ_ONCE(ndev->mtu);
+> +	fep->pagepool_order =3D order;
+> +	fep->rx_frame_size =3D (PAGE_SIZE << order) - FEC_DRV_RESERVE_SPACE;
+> +
+> +	if (!netif_running(ndev)) {
+> +		WRITE_ONCE(ndev->mtu, new_mtu);
+> +		return 0;
+> +	}
+> +
+> +	/* Stop TX/RX and free the buffers */
+> +	napi_disable(&fep->napi);
+> +	netif_tx_disable(ndev);
+> +	read_poll_timeout(fec_enet_rx_napi, done, (done =3D=3D 0),
+> +			  10, 1000, false, &fep->napi, 10);
+> +	fec_stop(ndev);
+> +
+> +	WRITE_ONCE(ndev->mtu, new_mtu);
+> +
+> +	if (fep->pagepool_order !=3D old_order) {
 
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
----
- tools/testing/selftests/net/Makefile         |   1 +
- tools/testing/selftests/net/test_vxlan_nh.sh | 223 +++++++++++++++++++
- 2 files changed, 224 insertions(+)
- create mode 100755 tools/testing/selftests/net/test_vxlan_nh.sh
+If fep->pagepool_order is not changed, why need to stop TX/RX?
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index b31a71f2b372..c7e03e1d6f63 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -99,6 +99,7 @@ TEST_GEN_PROGS += bind_wildcard
- TEST_GEN_PROGS += bind_timewait
- TEST_PROGS += test_vxlan_mdb.sh
- TEST_PROGS += test_bridge_neigh_suppress.sh
-+TEST_PROGS += test_vxlan_nh.sh
- TEST_PROGS += test_vxlan_nolocalbypass.sh
- TEST_PROGS += test_bridge_backup_port.sh
- TEST_PROGS += test_neigh.sh
-diff --git a/tools/testing/selftests/net/test_vxlan_nh.sh b/tools/testing/selftests/net/test_vxlan_nh.sh
-new file mode 100755
-index 000000000000..20f3369f776b
---- /dev/null
-+++ b/tools/testing/selftests/net/test_vxlan_nh.sh
-@@ -0,0 +1,223 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+source lib.sh
-+TESTS="
-+	basic_tx_ipv4
-+	basic_tx_ipv6
-+	learning
-+	proxy_ipv4
-+	proxy_ipv6
-+"
-+VERBOSE=0
-+
-+################################################################################
-+# Utilities
-+
-+run_cmd()
-+{
-+	local cmd="$1"
-+	local out
-+	local stderr="2>/dev/null"
-+
-+	if [ "$VERBOSE" = "1" ]; then
-+		echo "COMMAND: $cmd"
-+		stderr=
-+	fi
-+
-+	out=$(eval "$cmd" "$stderr")
-+	rc=$?
-+	if [ "$VERBOSE" -eq 1 ] && [ -n "$out" ]; then
-+		echo "    $out"
-+	fi
-+
-+	return $rc
-+}
-+
-+################################################################################
-+# Cleanup
-+
-+exit_cleanup_all()
-+{
-+	cleanup_all_ns
-+	exit "${EXIT_STATUS}"
-+}
-+
-+################################################################################
-+# Tests
-+
-+nh_stats_get()
-+{
-+	ip -n "$ns1" -s -j nexthop show id 10 | jq ".[][\"group_stats\"][][\"packets\"]"
-+}
-+
-+tc_stats_get()
-+{
-+	tc_rule_handle_stats_get "dev dummy1 egress" 101 ".packets" "-n $ns1"
-+}
-+
-+basic_tx_common()
-+{
-+	local af_str=$1; shift
-+	local proto=$1; shift
-+	local local_addr=$1; shift
-+	local plen=$1; shift
-+	local remote_addr=$1; shift
-+
-+	RET=0
-+
-+	# Test basic Tx functionality. Check that stats are incremented on
-+	# both the FDB nexthop group and the egress device.
-+
-+	run_cmd "ip -n $ns1 link add name dummy1 up type dummy"
-+	run_cmd "ip -n $ns1 route add $remote_addr/$plen dev dummy1"
-+	run_cmd "tc -n $ns1 qdisc add dev dummy1 clsact"
-+	run_cmd "tc -n $ns1 filter add dev dummy1 egress proto $proto pref 1 handle 101 flower ip_proto udp dst_ip $remote_addr dst_port 4789 action pass"
-+
-+	run_cmd "ip -n $ns1 address add $local_addr/$plen dev lo"
-+
-+	run_cmd "ip -n $ns1 nexthop add id 1 via $remote_addr fdb"
-+	run_cmd "ip -n $ns1 nexthop add id 10 group 1 fdb"
-+
-+	run_cmd "ip -n $ns1 link add name vx0 up type vxlan id 10010 local $local_addr dstport 4789"
-+	run_cmd "bridge -n $ns1 fdb add 00:11:22:33:44:55 dev vx0 self static nhid 10"
-+
-+	run_cmd "ip netns exec $ns1 mausezahn vx0 -a own -b 00:11:22:33:44:55 -c 1 -q"
-+
-+	busywait "$BUSYWAIT_TIMEOUT" until_counter_is "== 1" nh_stats_get > /dev/null
-+	check_err $? "FDB nexthop group stats did not increase"
-+
-+	busywait "$BUSYWAIT_TIMEOUT" until_counter_is "== 1" tc_stats_get > /dev/null
-+	check_err $? "tc filter stats did not increase"
-+
-+	log_test "VXLAN FDB nexthop: $af_str basic Tx"
-+}
-+
-+basic_tx_ipv4()
-+{
-+	basic_tx_common "IPv4" ipv4 192.0.2.1 32 192.0.2.2
-+}
-+
-+basic_tx_ipv6()
-+{
-+	basic_tx_common "IPv6" ipv6 2001:db8:1::1 128 2001:db8:1::2
-+}
-+
-+learning()
-+{
-+	RET=0
-+
-+	# When learning is enabled on the VXLAN device, an incoming packet
-+	# might try to refresh an FDB entry that points to an FDB nexthop group
-+	# instead of an ordinary remote destination. Check that the kernel does
-+	# not crash in this situation.
-+
-+	run_cmd "ip -n $ns1 address add 192.0.2.1/32 dev lo"
-+	run_cmd "ip -n $ns1 address add 192.0.2.2/32 dev lo"
-+
-+	run_cmd "ip -n $ns1 nexthop add id 1 via 192.0.2.3 fdb"
-+	run_cmd "ip -n $ns1 nexthop add id 10 group 1 fdb"
-+
-+	run_cmd "ip -n $ns1 link add name vx0 up type vxlan id 10010 local 192.0.2.1 dstport 12345 localbypass"
-+	run_cmd "ip -n $ns1 link add name vx1 up type vxlan id 10020 local 192.0.2.2 dstport 54321 learning"
-+
-+	run_cmd "bridge -n $ns1 fdb add 00:11:22:33:44:55 dev vx0 self static dst 192.0.2.2 port 54321 vni 10020"
-+	run_cmd "bridge -n $ns1 fdb add 00:aa:bb:cc:dd:ee dev vx1 self static nhid 10"
-+
-+	run_cmd "ip netns exec $ns1 mausezahn vx0 -a 00:aa:bb:cc:dd:ee -b 00:11:22:33:44:55 -c 1 -q"
-+
-+	log_test "VXLAN FDB nexthop: learning"
-+}
-+
-+proxy_common()
-+{
-+	local af_str=$1; shift
-+	local local_addr=$1; shift
-+	local plen=$1; shift
-+	local remote_addr=$1; shift
-+	local neigh_addr=$1; shift
-+	local ping_cmd=$1; shift
-+
-+	RET=0
-+
-+	# When the "proxy" option is enabled on the VXLAN device, the device
-+	# will suppress ARP requests and IPv6 Neighbor Solicitation messages if
-+	# it is able to reply on behalf of the remote host. That is, if a
-+	# matching and valid neighbor entry is configured on the VXLAN device
-+	# whose MAC address is not behind the "any" remote (0.0.0.0 / ::). The
-+	# FDB entry for the neighbor's MAC address might point to an FDB
-+	# nexthop group instead of an ordinary remote destination. Check that
-+	# the kernel does not crash in this situation.
-+
-+	run_cmd "ip -n $ns1 address add $local_addr/$plen dev lo"
-+
-+	run_cmd "ip -n $ns1 nexthop add id 1 via $remote_addr fdb"
-+	run_cmd "ip -n $ns1 nexthop add id 10 group 1 fdb"
-+
-+	run_cmd "ip -n $ns1 link add name vx0 up type vxlan id 10010 local $local_addr dstport 4789 proxy"
-+
-+	run_cmd "ip -n $ns1 neigh add $neigh_addr lladdr 00:11:22:33:44:55 nud perm dev vx0"
-+
-+	run_cmd "bridge -n $ns1 fdb add 00:11:22:33:44:55 dev vx0 self static nhid 10"
-+
-+	run_cmd "ip netns exec $ns1 $ping_cmd"
-+
-+	log_test "VXLAN FDB nexthop: $af_str proxy"
-+}
-+
-+proxy_ipv4()
-+{
-+	proxy_common "IPv4" 192.0.2.1 32 192.0.2.2 192.0.2.3 \
-+		"arping -b -c 1 -s 192.0.2.1 -I vx0 192.0.2.3"
-+}
-+
-+proxy_ipv6()
-+{
-+	proxy_common "IPv6" 2001:db8:1::1 128 2001:db8:1::2 2001:db8:1::3 \
-+		"ndisc6 -r 1 -s 2001:db8:1::1 -w 1 2001:db8:1::3 vx0"
-+}
-+
-+################################################################################
-+# Usage
-+
-+usage()
-+{
-+	cat <<EOF
-+usage: ${0##*/} OPTS
-+
-+        -t <test>   Test(s) to run (default: all)
-+                    (options: $TESTS)
-+        -p          Pause on fail
-+        -v          Verbose mode (show commands and output)
-+EOF
-+}
-+
-+################################################################################
-+# Main
-+
-+while getopts ":t:pvh" opt; do
-+	case $opt in
-+		t) TESTS=$OPTARG;;
-+		p) PAUSE_ON_FAIL=yes;;
-+		v) VERBOSE=$((VERBOSE + 1));;
-+		h) usage; exit 0;;
-+		*) usage; exit 1;;
-+	esac
-+done
-+
-+require_command mausezahn
-+require_command arping
-+require_command ndisc6
-+require_command jq
-+
-+if ! ip nexthop help 2>&1 | grep -q "stats"; then
-+	echo "SKIP: iproute2 ip too old, missing nexthop stats support"
-+	exit "$ksft_skip"
-+fi
-+
-+trap exit_cleanup_all EXIT
-+
-+for t in $TESTS
-+do
-+	setup_ns ns1; $t; cleanup_all_ns;
-+done
--- 
-2.51.0
+> +		fec_enet_free_buffers(ndev);
+> +
+> +		/* Create the pagepool based on the new mtu.
+> +		 * Revert to the original settings if buffer
+> +		 * allocation fails.
+> +		 */
+> +		if (fec_enet_alloc_buffers(ndev) < 0) {
+> +			fep->pagepool_order =3D old_order;
+> +			fep->rx_frame_size =3D old_size;
+> +			WRITE_ONCE(ndev->mtu, old_mtu);
+> +			fec_enet_alloc_buffers(ndev);
+
+fec_enet_alloc_buffers() may still fail here, the best approach is to add a=
+ helper
+function that allocates new buffers before freeing the old ones. However, t=
+his is
+a complex change, so I think returning an error is sufficient for now, and =
+we can
+consider improving it later.
 
 
