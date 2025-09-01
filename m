@@ -1,75 +1,69 @@
-Return-Path: <netdev+bounces-218680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7E83B3DEA7
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 11:34:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFB9AB3DEA8
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 11:34:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EA41163217
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 09:34:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C7311888E0C
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 09:35:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9CC830C34D;
-	Mon,  1 Sep 2025 09:34:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55A982FB986;
+	Mon,  1 Sep 2025 09:34:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="DYoYTFfX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 305E630BF60;
-	Mon,  1 Sep 2025 09:34:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 679FF248F66
+	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 09:34:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756719252; cv=none; b=U1pIilyNoSj5/v5GhZSlSFozcRaE+NcmKyYfF0moAFeQQL+cX9xxoptFVFkRDbKXP2WTiZM55cFtAOneLsKYSI+ZgVNFGr+dOacUyfrYHG6vYuX6zdhaGiev6nCeVbvGJKpbKzUBorlTfdnddw2SURtaDKiqldGjqdO0pZHR6ko=
+	t=1756719293; cv=none; b=EONOxLw6WI6TdyzUwFhCJ/qhEzcDOvh6VwZgt4xy1DB8Caz72nW1LCMJEvhlIE1MZZPk46pjl05P0067LoX+HM3mHis6amS/MdQAD/0JuaDr2MTgKPeehDEiEzJ10YPDN8rsaJiF1m0O2rrr7LY0WLj36kpyeIoCa4tSzv7numg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756719252; c=relaxed/simple;
-	bh=WbqxiFHCxmv+1TEW2LU18yc8nc+qUvmPIvWqJNM3IY8=;
+	s=arc-20240116; t=1756719293; c=relaxed/simple;
+	bh=6pbX6e3rKlWX+5zTbRIjiiy6v+d3kQi9uRwQtgVRWLU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HwlX8WGad8m7GM40LcK8du/j472jaXiDkOfLk0gcyBW1lf5kYbCf1TIND8GFrmn3Uxyk1GMOZ6oV06PV29y9dNdUUDnpa806dAkjLk5yaPeEg33bCTy9dGeJjW0u/qzj9ZzNBrZf2nBKFF/s7M91TlA0M3MmOl28KMG2d/iTdPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-61e3b74672cso1942550a12.0;
-        Mon, 01 Sep 2025 02:34:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756719248; x=1757324048;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NlA9cuj151JAIiFxWe6cpardQLhaD6SM9myw3V7mMQ4=;
-        b=rK2AOXM8s4aKsAF5kn1IUxbzqI0ETHAvyNe118Ef/r78rT6/0QJS8Lq1q9qjAiDzVO
-         wdDUMI75wOlFe4eerm2/sY16o4jkWo1rGhxv0C6leSc4GCNIVNvy+GCI6Y9xz8jQYadB
-         oUIX55JCYDMWK6XAYiBjapyV0SpKeqjWQpTY6Dr3YBvs1e12d8inShgIond1juLqnD0v
-         legxkMJpNDrjZR5w7kDWDjpJyDhxG5Ee4FQ9MiffYRRhYaM7VeL8Dvm+9HqXZ7OOTpOJ
-         ViE46vfixrsiNrYcTyfPGlp0V/KWoUuYJQAVpgoB2eWDdxoNukApizDC0nOfTWyCYPZc
-         Qt9w==
-X-Forwarded-Encrypted: i=1; AJvYcCUGXZ1xuW9aQgm1ORNCR2BTJngE991Te8lcWTPZgnscp1rA/6UxXen2i9Ke0C0pDMFfKj55uHkN@vger.kernel.org, AJvYcCWxoQ6e3HVq88+XpctVk3wnEvVEn13KIa4Xc5QNZRI2YnCq3mRHHyu6FtlpqjrI9XLdgbJ51QKwNV4MQhNW9eM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRbYWLObkNyel6o4cnKtjHaVzb8pOhSMSvEu8j4hbyMEFSs2yF
-	Ffm7OiJcdgO6be2isbW30JJazHpY4brIr8dMNDLY5GhTR1M+5Vdvx7Qc
-X-Gm-Gg: ASbGncvx4RaljT73jitACrzziEcpFBTlra2SzSbv4oZsic0TGLXNyW0qGLrM/LYTe1P
-	1QtEN6T4lDKWSsSN9ZmWV/CrJzRvn4LdK2H8h7Qhey9L5FF+165waCJh08vNE79GdAbKkLZatT1
-	1VGCIjRHf1J62CFRxlHX4PXNpfUPmnb7TgBvdA82H3i7H4gsmMjLeCpcXAuY+7njv69Eptbl+NL
-	unoEVH26KUjsq16P8Z8OneYrhvLBqS1xe4VpVsEgrRfqmr/YREUYXiNINIyGxyXWxoyv48nnaHG
-	dfkPEtz40bvMQgtzhjiuf2zqFrmOkqnbKpfbx58RfyHjcVAA535Y2nIgCYauqIVpFNwpDBquWMq
-	vQ9yCEZpIE7tgRw==
-X-Google-Smtp-Source: AGHT+IGd3sku2p9xh1a3YxEGe7t3cwa24VOvn/OQfxB9g1GYI4HSlTIZrOhiAqiX9HPakg6rGRNcFQ==
-X-Received: by 2002:a50:cd17:0:b0:61c:4222:4856 with SMTP id 4fb4d7f45d1cf-61d22dc77eemr5006499a12.3.1756719248372;
-        Mon, 01 Sep 2025 02:34:08 -0700 (PDT)
-Received: from gmail.com ([2a03:2880:30ff:71::])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-61cfc5575dcsm6867632a12.49.2025.09.01.02.34.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Sep 2025 02:34:07 -0700 (PDT)
-Date: Mon, 1 Sep 2025 02:34:05 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, joe@dama.to, 
-	sdf@fomichev.me, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next 2/2] selftests: net: py: don't default to
- shell=True
-Message-ID: <va6ympcdo4jxfcqnr6uels4hg62sxgzeabdxjkdr7nkufjktk7@4fishek5fpgo>
-References: <20250830184317.696121-1-kuba@kernel.org>
- <20250830184317.696121-2-kuba@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ePtXqaAOn1WF1bu/Vvevwgt547mbblTOrGphXo8SiFDR9bwJukkI1DrlG7KttMfxW0ZEY7AjzN5URHB8gkVx1L8hCmSN0i7x8M+BcmfIipgzBmH/Lde+lCBzob7ioP7KrRlGPbXohTffS5UHOFoeOAS1toyz8kNzCpJi3WXHuSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=DYoYTFfX; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=qdCoAKETmQcYptl0OnpN//2WvCGwJmvxXbBVPduZW2I=; b=DYoYTFfXPjsIqB6QZAdr04O+CU
+	GN1xCfwlQdOPrkn0DPdiM/ybr189ZXy0f9gvLkMFLg8U0mtN4ops5lqC6Ig3Fq46tZp/gCggoL0ki
+	K6SUOVVYrkGaMFc59VA8ycPFaYE3ahsYkMG8m+ezacrXw9t3WjeD84jT3VSp3Adf/4eg5OvJBkr52
+	FQxb7fhReD+rqKxgWnruk+m20gr7qMVuGqe2hubadQcX9xyBy/ZjB9VCOOqLBcf74XNpnIJOTHmOR
+	8LXYU8PaJoA4vviNaqyv44M547e966tIiVFhWVuS7prEZx2AIFNg4Gc2vXMimG8GCRulKrPGyMn9c
+	gPX70/7A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50762)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1ut0vz-000000005w5-3Lsg;
+	Mon, 01 Sep 2025 10:34:43 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1ut0vy-000000006uQ-0GSE;
+	Mon, 01 Sep 2025 10:34:42 +0100
+Date: Mon, 1 Sep 2025 10:34:41 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>
+Subject: Re: [PATCH net] net: phy: fix phy_uses_state_machine()
+Message-ID: <aLVosUZtXftPC-OY@shell.armlinux.org.uk>
+References: <E1usl4F-00000001M0g-1rHO@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,24 +72,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250830184317.696121-2-kuba@kernel.org>
+In-Reply-To: <E1usl4F-00000001M0g-1rHO@rmk-PC.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Sat, Aug 30, 2025 at 11:43:17AM -0700, Jakub Kicinski wrote:
-> @@ -45,6 +48,10 @@ import time
->          if host:
->              self.proc = host.cmd(comm)
->          else:
-> +            # If user doesn't explicitly request shell try to avoid it.
-> +            if shell is None and isinstance(comm, str) and ' ' in comm:
-> +                comm = comm.split()
+On Sun, Aug 31, 2025 at 05:38:11PM +0100, Russell King (Oracle) wrote:
+> phy_uses_state_machine() is called from the resume path (see
+> mdio_bus_phy_resume()) which will be called for all devices whether
+> they are connected to a network device or not.
+> 
+> phydev->phy_link_change is initialised by phy_attach_direct(), and
+> overridden by phylink. This means that a never-connected PHY will
+> have phydev->phy_link_change set to NULL, which causes
+> phy_uses_state_machine() to return true. This is incorrect.
+> 
+> Fix the case where phydev->phy_link_change is NULL.
+> 
+> Reported-by: Xu Yang <xu.yang_2@nxp.com>
+> Link: https://lore.kernel.org/r/20250806082931.3289134-1-xu.yang_2@nxp.com
+> Fixes: fc75ea20ffb4 ("net: phy: allow MDIO bus PM ops to start/stop state machine for phylink-controlled PHY")
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+> The provided Link: rather than Closes: is because there were two issues
+> identified in that thread, and this patch only addresses one of them.
+> Therefore, it is not correct to mark that issue closed.
+> 
+> Xu Yang reported this fixed the problem for him, and it is an oversight
+> in the phy_uses_state_machine() test.
 
-I am wondering if you can always split the string, independently if
-shell is True or now. Passing comm as a list is usually recommend, even
-when shell is enabled. Also, if there is no space, split() will return
-the same string.
+While looking at this after Vladimir's comments, I've realised that
+phy_uses_state_machine() will also return true when a PHY has been
+attached and detached by phylink - phydev->phy_link_change remains
+set to phylink_phy_change after it has been detached. So, there will
+definitely be a v2 for this.
 
-What about something as?
-
-	if isinstance(comm, str):
-		comm = comm.split()
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
