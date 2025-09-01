@@ -1,128 +1,195 @@
-Return-Path: <netdev+bounces-218935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3B57B3F090
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 23:33:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F421FB3F0A9
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 23:47:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 511911A86FA2
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 21:33:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A532C3B0EAA
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 21:47:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E162927B4E4;
-	Mon,  1 Sep 2025 21:33:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD73F25A2CD;
+	Mon,  1 Sep 2025 21:47:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DzxVe4eH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LjKElxbJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A24B27AC43;
-	Mon,  1 Sep 2025 21:33:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39FE52367C3;
+	Mon,  1 Sep 2025 21:47:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756762405; cv=none; b=cqbwtx1umxpiOyn8eKUHE2m0SWoCRSBtxlpZETnWUIFCfE6+YtIPDTjRJiRK0U9s15XviAotmTN7MP0m5tMp60PDuH3/k7cfTMWRn9PEV4QaoCrkyAzmjKcogqFqjOwwzCuJoe0/NIZ5C+ZQENXUl2bJ8GWVz+sLrLPt7t5hMC0=
+	t=1756763225; cv=none; b=Izi3sESpLRNIoq7pD0gtnzPaEOFsw/4mZMyYoa/VV5MDoWP/XL8Sk/jvtBTV+0qFEvaWvGtZc9T4i3KlgulpcuJuJlUHMZVCHOQwlIm1XbFO4Hqg1YADrSUITDfSYcjRJ96gF79Rnxh0W6KM+oQ/iM2zDK3RhZTqOlwECMPRCs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756762405; c=relaxed/simple;
-	bh=dUu2l823rAKlljI+lh82QZgONcoTyLES36Hf7O+e+ic=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eWxIuMu20A/Egmh5+bnF5tIKhkGh5oaGfJSZAUyyOipTjSXWULA7QlIE+zLCA23UChQRlKfO2L0aEnGuxITRVdvnvJLt4/pxurZN19G9aq89VaSD0zyQX6xkjqOECwHpGcVrCAnsFYqbp+JVe7ujZ8a3QG3PbrBunEAo4XfBOYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DzxVe4eH; arc=none smtp.client-ip=209.85.216.41
+	s=arc-20240116; t=1756763225; c=relaxed/simple;
+	bh=+NY02T3EKXc/p3Ldv7PZSvRzUT4MNdBvJAIeMcl80GM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=HxI4oLiNPBa0NOj08S2xIsgAGgpMcb6+lC23vXLcArtFDGnapb1b5Lw5nwt7nVtAL8TAAVAIJhO4dsgM9RLXH7zyxHUXvurEvdw9TLMzfR3j0GKM/KmbNNe+3KwkFqQ2cFxlg8d8fqtwpWPz633msZaA0Sqq1XbqQGYpufQMtII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LjKElxbJ; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-327d47a0e3eso3156251a91.3;
-        Mon, 01 Sep 2025 14:33:24 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-248ff4403b9so33404385ad.0;
+        Mon, 01 Sep 2025 14:47:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756762403; x=1757367203; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=b06kRf6Nb7vVfuK1gZbo8oyR5EkAU/9kCYKfNJjL8Mc=;
-        b=DzxVe4eH7fwx7mVyzXYF7psZNqiMXpZdRcUmXl5XdqOOZWrvqkuKik3Khg867bjuS6
-         z/WB9/Q8k76hUM7NnLhLWLAkuqYdJq4umamOz0j18ON1MAYraOnnVM8BTiHnTQFST50E
-         aaU9Ci4wiHLfL2OG16BdiFTjGTuM1+WKlN4IzvJ2k6xx1lZwz5oZho+/NiVDrJVkVCs7
-         ztKgltCRCACQSlxk1SURYWJenuxA6LlN2CS8gtz/unksmcGw43OoEY1l0JtAsA6sDsPT
-         nN0yB9YC15C3lXUHWAeg97A2WPFCqRg6Ebqw7H2qyRRtbVRw9mR/HHRrgkacJ9cOwNfa
-         W9mA==
+        d=gmail.com; s=20230601; t=1756763223; x=1757368023; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=OlsE2WeMOlyP3bzmlKQubQNSIzHK7RKjbs8UIIIjOHk=;
+        b=LjKElxbJStuoA5WmqRK1sFe9pID3nEASrzQdG60C5w//WMeIASC0qYXoYLqBApPmjJ
+         bnLTZH/fHxS7sfQi30CdS8UFYXAChjrRMf0DLt5NOVXIkL/OCNMEy+b+2zmnzMXD/+qU
+         qnzExx3RL0uEna66NMzDuMMZclBeSpjWiiUxd2nbiAGyASmcNOaAFx899CfA4pbDZn2/
+         WPAgfVKAMMxGy7d9hjagTjafxIGhwuA0Olp3jFkkI+tA1vlKIQub+PK+DSE9HP/d1BeS
+         R/z/ATeDNsgbTiKF5LprZ5ak6LB9CDlgH5z8gyYH87Jqu/+ZGCnHCamiB/9lSeI8cIU9
+         clDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756762403; x=1757367203;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=b06kRf6Nb7vVfuK1gZbo8oyR5EkAU/9kCYKfNJjL8Mc=;
-        b=wtL7Iqt0HHiYraGxBHRjbYjgsbAOk5+CY7tsJBY1rIv5syZ2FBtZUqbYm1W+eRs23u
-         ZdtTQIBDE8GyAYkuIP/67otDZzY7HOHEwYPtVjUOMP0HGPP/5/DQ+q6rd6zO9gz0SqU1
-         5bdmR74fbxHj55/4343O4pmOxBsY7r+nc3n+fNkqOt4rddSeVvzhU3FjBck0nas8FhVZ
-         0+ISU0HtZRRgu/ZnybvFc9PyEmJfqIya8Pp9UAtYOadxKx/lp27GTGChaB977s4CqkR6
-         YVRaGQxIxDmR+XntD1cOGgz3pp85/5/Fju4EYfeS3yh2nbmyAK6fHDEslYZJOqL119Ie
-         u4/A==
-X-Forwarded-Encrypted: i=1; AJvYcCXoIe3cKQeP097fPEHHcNe8K8RN5HBM5a6j0LjtKthOaT7+gmKJKvZRMsa4FFqyWubFymNbXhICTPJYAq0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwN3gvdQxW7K2/wZX9C4IZIairWBYOYUQQyuvrE3U5sfLrim4kS
-	3/PpsU7KJnUnkH52kE+BFu2OF6DrVpopRcaG49yBbj1aekuKgHHOlBb1JmG+WQ==
-X-Gm-Gg: ASbGnct6kuxqtqBNOSTKREaLyxrAawwuPyyaE2Iuwu2GFfEKJIIXo95psF851DebU6G
-	MSExMQoDhY/AAlAbM9sl0hsL11jwhCZEY+5NWsh1OY4GMHmPSE2bocD7353Mztit38JfvvN3y7b
-	SMyOfi1kYvNp03FKG0AUo72pC+PA8HvtwHdAZx1SgRqaBxqd8UJoM/WciMsfQcMJB1tIXlE2fV6
-	A8LLz1x70/7dkz3A5ofseRsbcP2P3KB8vc5RHvN5z4oCudod17Lkq1imvVWx6xG+RMxGo40sbgN
-	I6O2EktbNWmBDfZ7sfxw4ZdsFP3mF+WGWGaNQzC94QTeScczoIFIrYwmuzgzvXQZMnxRma+IC75
-	dELujcFWQJy1c2QuYtlfklxQsXgWmn/9RTEBWZSvLQLZY1TyOFZvSnErrtXWh5/1fBBioRc/9hY
-	KzvDR2zw==
-X-Google-Smtp-Source: AGHT+IH3NMenXx2Sa9UT22IbeL9ZxTctK80eQ8eKKHcZ6sShO6McF9d3HknM7Q2bDxzaFGV3/FbFbA==
-X-Received: by 2002:a17:902:da88:b0:248:d84a:91de with SMTP id d9443c01a7336-24944a982e4mr126385765ad.38.1756762403450;
-        Mon, 01 Sep 2025 14:33:23 -0700 (PDT)
-Received: from archlinux ([2601:644:8200:acc7::9ec])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-24905da479asm111216905ad.73.2025.09.01.14.33.22
+        d=1e100.net; s=20230601; t=1756763223; x=1757368023;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OlsE2WeMOlyP3bzmlKQubQNSIzHK7RKjbs8UIIIjOHk=;
+        b=PPMvZf5CwYjaO3rjm500AXHHM3T1OyJ1wtZcS19P7uSdWBTY3oBs57/okiy6kQSsL2
+         6sGTtkCVmT/BSHTlAO/GhefsSNuBs4nWn0X5Xx/n1MET2m0LU8S+ag+wN1tdyq8Y9oaZ
+         SgGPdXzsaAvbc1UeYhn48X1MaYv5mUR3m6Jb03/jERQrxZuviSul+KJw1SaHnScNwRC9
+         UQqhI7Zn4PQhWSn3YIPjHKO2DU0dVykPiTo4b6d5jOh2f+KuJb7m2ZzGhzAUb41yJVTw
+         h2y37igcvuJIUheAilu8DXKqLzP8le2qMFjpCfgd2Z7nEqtAU52E2optKhpSN+R5oaBH
+         MHAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVFYGKTWxoxqB8rKVeERILD0phTAX63n2Quityo2zPSVba7Cor2AKLpxR1/JUo1gupIKtpWWPK8@vger.kernel.org, AJvYcCXjMVA4rOcsrxR6uigLT3kt+5CvhciPXjl/mIA2gbVAgkm0HctNEUT8MwEBB5zMSATGM9pAoHxRyJs1kxE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxjl1PlNaduqDRuCafhkp2KoZeBsFvBk5MPgtXxAbRFpQPlV4ou
+	sAl/wLAeY1qASXghBS1amozO5X3YkuQOF1+lqcei3dNI0xPsfNTuOZHx
+X-Gm-Gg: ASbGncs1FdzyBfoKTHoI1KN4nSm9O98sW2Nj3fikm/TiEUd5hCKxT2jRvN/Hgzi0fop
+	4ToHUYhZEGgzuUESQDKXzdsT0Zqwqrj1HuvCKS193GzGMnvbHstj8Iys6ZyNsa8xHeSYmbglrJt
+	RJdsirt2HEvWh2zYnkjOhAQOqVuKF+yxPNIzxfxAQ0NoRNFVMTcyno/XiuGm/3XQwTp9MrDuFuJ
+	kglWEesttTmqrssHH5iWHkE0cpMBx7095wbG9xpgNue5JN4Fcddsoa/pfz/xGoaPbxWdeaCK8Mx
+	T+ypdAuyPnW4+eGLY7xzFHcSpiD0G4if9+55JerL0qTCwigX2aN0P9D5vgnTZlgc9ExVT9Tuw/F
+	I9IbctvSuBKxnHlF8nvDVrOxmDuSRWf4tDpBieczwB5a1lJQ=
+X-Google-Smtp-Source: AGHT+IGJ+VbL+KkwAJkiu3byzjAamHyXWU/kRNAZj/DaRKztP3TxkmdmFFWUola7Qz5AGr90A4KQ/Q==
+X-Received: by 2002:a17:902:f608:b0:24a:ad42:3559 with SMTP id d9443c01a7336-24aad4237ddmr89121605ad.56.1756763223308;
+        Mon, 01 Sep 2025 14:47:03 -0700 (PDT)
+Received: from [192.168.0.69] ([159.196.5.243])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2490373a3a9sm112563485ad.50.2025.09.01.14.46.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Sep 2025 14:33:23 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Sunil Goutham <sgoutham@marvell.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	David Daney <david.daney@cavium.com>,
-	linux-arm-kernel@lists.infradead.org (moderated list:ARM/CAVIUM THUNDER NETWORK DRIVER),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net] net: thunder_bgx: decrement cleanup index before use
-Date: Mon,  1 Sep 2025 14:33:14 -0700
-Message-ID: <20250901213314.48599-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.51.0
+        Mon, 01 Sep 2025 14:47:02 -0700 (PDT)
+Message-ID: <7d71d5d3c708451372d2cd0580951997ccc4b883.camel@gmail.com>
+Subject: Re: [PATCH] net/tls: allow limiting maximum record size
+From: Wilfred Mallawa <wilfred.opensource@gmail.com>
+To: Simon Horman <horms@kernel.org>
+Cc: chuck.lever@oracle.com, kernel-tls-handshake@lists.linux.dev, "David S .
+ Miller" <davem@davemloft.net>, donald.hunter@gmail.com,
+ edumazet@google.com, hare@kernel.org,  Jakub Kicinski	 <kuba@kernel.org>,
+ john.fastabend@gmail.com, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, Hannes Reinecke <hare@suse.de>
+Date: Tue, 02 Sep 2025 07:46:55 +1000
+In-Reply-To: <20250901164355.GM15473@horms.kernel.org>
+References: <20250901053618.103198-2-wilfred.opensource@gmail.com>
+	 <20250901164355.GM15473@horms.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-All paths in probe that call goto defer do so before assigning phydev
-and thus it makes sense to cleanup the prior index. It also fixes a bug
-where index 0 does not get cleaned up.
+On Mon, 2025-09-01 at 17:44 +0100, Simon Horman wrote:
+>=20
+[snip]
+>=20
+> > diff --git a/Documentation/netlink/specs/handshake.yaml
+> > b/Documentation/netlink/specs/handshake.yaml
+> > index 95c3fade7a8d..0dbe5d0c8507 100644
+> > --- a/Documentation/netlink/specs/handshake.yaml
+> > +++ b/Documentation/netlink/specs/handshake.yaml
+> > @@ -87,6 +87,9 @@ attribute-sets:
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 name: remote-auth
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 type: u32
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 multi-attr: true
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 name: record-si=
+ze-limit
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 type: u32
+>=20
+> nit: This indentation is not consistent with the existing spec.
+>=20
+> > =C2=A0
+> > =C2=A0operations:
+> > =C2=A0=C2=A0 list:
+>=20
+> And I believe you are missing the following hunk:
+>=20
+> @@ -126,6 +126,7 @@ operations:
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+- status
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+- sockfd
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+- remote-auth
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - rec=
+ord-size-limit
+>=20
+> =C2=A0mcast-groups:
+> =C2=A0=C2=A0 list:
+>=20
+> ...
+Ah good catch thanks!
+>=20
+> > diff --git a/net/handshake/genl.c b/net/handshake/genl.c
+> > index f55d14d7b726..fb8962ae7131 100644
+> > --- a/net/handshake/genl.c
+> > +++ b/net/handshake/genl.c
+> > @@ -16,10 +16,11 @@ static const struct nla_policy
+> > handshake_accept_nl_policy[HANDSHAKE_A_ACCEPT_HAN
+> > =C2=A0};
+> > =C2=A0
+> > =C2=A0/* HANDSHAKE_CMD_DONE - do */
+> > -static const struct nla_policy
+> > handshake_done_nl_policy[HANDSHAKE_A_DONE_REMOTE_AUTH + 1] =3D {
+> > +static const struct nla_policy
+> > handshake_done_nl_policy[__HANDSHAKE_A_DONE_MAX] =3D {
+>=20
+> Although it's necessary to update this file in patches,
+> it is automatically generated using: make -C tools/net/ynl/
+>=20
+> Accordingly, although the meaning is the same, the line above should
+> be:
+>=20
+> static const struct nla_policy
+> handshake_done_nl_policy[HANDSHAKE_A_DONE_RECORD_SIZE_LIMIT + 1] =3D {
+>=20
+> > =C2=A0	[HANDSHAKE_A_DONE_STATUS] =3D { .type =3D NLA_U32, },
+> > =C2=A0	[HANDSHAKE_A_DONE_SOCKFD] =3D { .type =3D NLA_S32, },
+> > =C2=A0	[HANDSHAKE_A_DONE_REMOTE_AUTH] =3D { .type =3D NLA_U32, },
+> > +	[HANDSHAKE_A_DONE_RECORD_SIZE_LIMIT] =3D { .type =3D NLA_U32,
+> > },
+> > =C2=A0};
+> > =C2=A0
+> > =C2=A0/* Ops table for handshake */
+> > @@ -35,7 +36,7 @@ static const struct genl_split_ops
+> > handshake_nl_ops[] =3D {
+> > =C2=A0		.cmd		=3D HANDSHAKE_CMD_DONE,
+> > =C2=A0		.doit		=3D handshake_nl_done_doit,
+> > =C2=A0		.policy		=3D
+> > handshake_done_nl_policy,
+> > -		.maxattr	=3D HANDSHAKE_A_DONE_REMOTE_AUTH,
+> > +		.maxattr	=3D HANDSHAKE_A_DONE_MAX,
+>=20
+> And this one should be:
+>=20
+> 		.maxattr=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D
+> HANDSHAKE_A_DONE_RECORD_SIZE_LIMIT,
+>=20
+> > =C2=A0		.flags		=3D GENL_CMD_CAP_DO,
+> > =C2=A0	},
+> > =C2=A0};
+Okay did not know I could "make -C tools/net/ynl/" to generate this.
+Will use that going forward. Thanks for the feedback!
 
-Fixes: b7d3e3d3d21a ("net: thunderx: Don't leak phy device references on -EPROBE_DEFER condition.")
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/net/ethernet/cavium/thunder/thunder_bgx.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
-index 21495b5dce25..90c718af06c1 100644
---- a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
-+++ b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
-@@ -1515,11 +1515,11 @@ static int bgx_init_of_phy(struct bgx *bgx)
- 	 * for phy devices we may have already found.
- 	 */
- 	while (lmac) {
-+		lmac--;
- 		if (bgx->lmac[lmac].phydev) {
- 			put_device(&bgx->lmac[lmac].phydev->mdio.dev);
- 			bgx->lmac[lmac].phydev = NULL;
- 		}
--		lmac--;
- 	}
- 	of_node_put(node);
- 	return -EPROBE_DEFER;
--- 
-2.51.0
+Regards,
+Wilfred
 
 
