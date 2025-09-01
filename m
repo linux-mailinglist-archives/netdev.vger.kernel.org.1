@@ -1,159 +1,101 @@
-Return-Path: <netdev+bounces-218632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01F65B3DB36
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 09:38:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6134B3DB3D
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 09:38:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 54AE0189BFF6
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 07:38:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CABD616EB80
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 07:38:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AF5A26F293;
-	Mon,  1 Sep 2025 07:38:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZoIHldoE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 217152701BD;
+	Mon,  1 Sep 2025 07:38:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7B48267AF1
-	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 07:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B47426F2BF
+	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 07:38:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756712285; cv=none; b=P4TCMSmckfqjWL9sDDEzhPsTAvxCSvDNLkU0tbBG2u132dFO92jVk/YD3ZEcsiHQt5//W4zoqtHZM/H/zFX9WR/GiJZezt3SnYHb/L/EVncXAj2xzJAnRamxRN5QAXldcvYufBvF6SphkyIUXZu+PvU1UWfJf5ShkigXeDM5+9U=
+	t=1756712315; cv=none; b=g2HMRdsg8JQWJwVLhZhv6MXTYRdxVsrYLe/PxwuiTuspw4F27PMca5sxGjYwdwfevhEgiMZ4Uzt02Vb5oot9Mc6/2QWpTyVzMGjk7TO9WHmITlPaOYNxE9jqzm/gXAnybhJcHqWoORbppKwCd1lMpWvqeCfdC+jYKUPK1lxosOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756712285; c=relaxed/simple;
-	bh=WzfW40AZj4gPjN0MUg3o+yqK/+B/OT5Q7UpvUVPe8oI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aQNnMWvDclHaNyVEoNbgUJcbdv0EsT05KjvvWngBvEdW07IG6y0DJc256YYpFpPvEbWIt39Es/O0Lss1ZS3FkB5Lbdw+ihWT2BHWv/XuG+TmPyZSKmvgZR3VjdXU1GTT7tPWGIPqyPM3nBFyjAvkTMFPTiERaTg5Rgg6nbNNvr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZoIHldoE; arc=none smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4b2f0660a7bso38499641cf.1
-        for <netdev@vger.kernel.org>; Mon, 01 Sep 2025 00:38:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756712283; x=1757317083; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7q7Kl5djn2WgPJ4cdJmkEnqgC+STRWJseSy7eNtKfiA=;
-        b=ZoIHldoE4OtEwoVNTtDxzFHfePWLl8GYRBZOmq9MVfG5gMXB+/iN6gOv6cb41P4g98
-         FUtpZMQPHZY4tls3HxBDujX6LPerx3SYsA7kN6DUH8AW4BP02Z9nQGJY9DwMq4mgYRTH
-         5S48mS/QSxtUlJJBUspoKXcDCpVTP73WWcZ0b87zVIlAElp4UK3PZE59AV8DXGzORcDh
-         L/v+7kCjfdYhlldxO/Rxez6ONIEH+WhNyYTjFbUZSTdOH/IT9nRgevi1hJTpzVfdfv9L
-         VUx6mf79Ubmb+svzi1lbSbwjWetF0mv11udoChe5tI+y8e1lElYI1VzQ58jmhfMt+vfw
-         elsg==
+	s=arc-20240116; t=1756712315; c=relaxed/simple;
+	bh=H1mxaiAMN3sc2eH/vsvRcfjUz6xIJV97cFrGw0wJMmo=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=nbxf/4O7XmEnxrH0eyUPPgbehR4DoYJ01WTAMnZ7nu3T2ZeL2Do9RDdck0qsD70/PjAWh4FQ1PMJEbjsjv+G6UD2agDrXQhTIS0ekLQsdlT6zEpA3rAgeBrad/H1jSA9hGcogBrb07z3UxSenuwSMPNu4DoXITzzD6TRTUNipsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-88707a84524so873245039f.2
+        for <netdev@vger.kernel.org>; Mon, 01 Sep 2025 00:38:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756712283; x=1757317083;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7q7Kl5djn2WgPJ4cdJmkEnqgC+STRWJseSy7eNtKfiA=;
-        b=G8PnBOEywOjgQqGOoY5uJlE0Hbasf72DiILrtNDAvsy3r/vuFT164Rm45dcDyzTAh3
-         BMGaXck5HhdQd7b2KQ3cIWvWuEC3boSW9CQAjowHzEBP2CT97A760sBuKj/7ISdcgdqD
-         tOMfZFkywmfqCyUt2r7Bf3aOdafhYBs8RUGrXe/o+7XJxpDy1v8U1M2jbR4+Gux3AC3W
-         hZDJZqcxYs1B9jWgpxrr7KnqC9LnijevBz12HjIMOfqhkREO9f/aqvxONGHIuGT3O0gj
-         LKTpBtuBa8GABPHFjJoGwotWQE0eZUbKr6CFcQ4eXeEIL2vNBA2e0K/amupqrl3zTkhe
-         +chw==
-X-Gm-Message-State: AOJu0Yyc4f2L/ORdXGLFPgGrW0VqcIVxcIZPqO8+znpt4WtvcuZ6X946
-	/xE8CkvCj7HRHrJIKNk7BL8gvsfdhhXdtRrs+SFDXy04RSa4BEu6/raGMxE9/mtEOklDJDNy8k9
-	Q+Ay26GzHMsSFYF9FnOMoJDYvdkyPBqv6/IatEaEQ
-X-Gm-Gg: ASbGncsPpOGN4LHl9ZVI4AhGlHvhEyqwUza0O5QRzE6axburUMHYJX7RXPEdwKAePz9
-	bW9ndNkz6qAkho1ePXH4pNpZqLUKNRnD8zmFGSs2F9amR/byAGKEY6hlWGKh7FChoKQSOx5ARgn
-	LtPqABZxY1g8RXiqxQvusH9TIZd5koK7YGjpe46Ijks6Ur4l9cTrrs81j2NKsBdJF0HuVUGKK4Q
-	DBjT6S0q6Bx0w==
-X-Google-Smtp-Source: AGHT+IGzV6ATmp61ewbLzWto0qipug1G5shAQMh1uxcEylMfvmjc0KzUnlWIJKtFhfSJ0DazP+bJFRjB/3sgo7tLmGo=
-X-Received: by 2002:a05:622a:4c0e:b0:4b3:19b1:99d4 with SMTP id
- d75a77b69052e-4b31dd773bdmr95750161cf.80.1756712282420; Mon, 01 Sep 2025
- 00:38:02 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1756712312; x=1757317112;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=obHWzG0ygEaObehtACUvL+DH8pKrrwQ0y+2bONAOBfg=;
+        b=Uud17L8d6Oic/KxfMyw/RdKQrerJS3em74e0PrfP6tWQHopBj2euLs4Hku79RreKuw
+         vtrJUgXk3uYLuvtGlLPOgOSmCHos298R7C1isF9YTTq5dpIs0aKnhkYJJ8cXrWeRvr2t
+         IQnNF664aPlJ5c5Bz4m0BIpcqm9HrMgoCga50zgrjIENKUBE+Ht3Y0ESDAFa6AChEtTT
+         TcGXF9+MCZZQrB01+jMjsJUW+zP49b+0moSFB+V60QsZMcX+8p5dvFhUOkQfyYFgtNj6
+         nwddHjDJM8qflRK3ekljNp89u3OouFroZJZZvnWhgzdNyQcj+4ufsaOrS0sxQeSM5rUz
+         sebA==
+X-Forwarded-Encrypted: i=1; AJvYcCWrHI+kN+q+KKQiFBTLvbBlnkZnWK/PDPL74C63WZ56bhxKsYWu1wXEfmwh+Q9ZAYsllcb6sqE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhrMbxNTTeK/wo8qq3wl+wB8WF99YNURct+yV/w0BNxROSHgat
+	wqtZy9l4GwEcCCoB456FiyvCwQOpC41MM0HA+ZSUGyt2v0Wio7+Wv3xsY7GVqUlpMg/rNZ65tR5
+	tNzwfoD2tp4i7Jv41YirOXlywtuN4IW4HZJ3+kJfiZgj0lohGaNLMl41MOOA=
+X-Google-Smtp-Source: AGHT+IHwJr2Tps5ny4OjP2FS9RRvLgmLjK2SqygClVKfYMS5rNpQPeem48MvZ94Qxz8iif+BgcBOiBp9rZELv0Nu9xUxQ36YmO7f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250827143715.23538-1-disclosure@aisle.com>
-In-Reply-To: <20250827143715.23538-1-disclosure@aisle.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 1 Sep 2025 00:37:48 -0700
-X-Gm-Features: Ac12FXwEBF4lffbGsQAW59JN0B7gOKoWwGphyL_Y5FDSSgXmBtkMqJYMWifcp7Q
-Message-ID: <CANn89iJM3CV-_2jWMMspH52RvfWtep-3srctf47NkYUkTTboSg@mail.gmail.com>
-Subject: Re: [PATCH net] netrom: validate header lengths in nr_rx_frame()
- using pskb_may_pull()
-To: Stanislav Fort <disclosure@aisle.com>
-Cc: netdev@vger.kernel.org, security@kernel.org, kuba@kernel.org, 
-	stable@vger.kernel.org
+X-Received: by 2002:a05:6602:180a:b0:886:f2c1:8ed3 with SMTP id
+ ca18e2360f4ac-8871f51f15emr1016078539f.17.1756712312641; Mon, 01 Sep 2025
+ 00:38:32 -0700 (PDT)
+Date: Mon, 01 Sep 2025 00:38:32 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68b54d78.a70a0220.1c57d1.0543.GAE@google.com>
+Subject: [syzbot] Monthly tipc report (Aug 2025)
+From: syzbot <syzbot+list7f83bd0f801034393a79@syzkaller.appspotmail.com>
+To: jmaloy@redhat.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, tipc-discussion@lists.sourceforge.net
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 27, 2025 at 7:38=E2=80=AFAM Stanislav Fort <disclosure@aisle.co=
-m> wrote:
->
-> NET/ROM nr_rx_frame() dereferences the 5-byte transport header
-> unconditionally. nr_route_frame() currently accepts frames as short as
-> NR_NETWORK_LEN (15 bytes), which can lead to small out-of-bounds reads
-> on short frames.
->
-> Fix by using pskb_may_pull() in nr_rx_frame() to ensure the full
-> NET/ROM network + transport header is present before accessing it, and
-> guard the extra fields used by NR_CONNREQ (window, user address, and the
-> optional BPQ timeout extension) with additional pskb_may_pull() checks.
->
-> This aligns with recent fixes using pskb_may_pull() to validate header
-> availability.
->
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Reported-by: Stanislav Fort <disclosure@aisle.com>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Stanislav Fort <disclosure@aisle.com>
-> ---
->  net/netrom/af_netrom.c | 12 +++++++++++-
->  net/netrom/nr_route.c  |  2 +-
->  2 files changed, 12 insertions(+), 2 deletions(-)
->
-> diff --git a/net/netrom/af_netrom.c b/net/netrom/af_netrom.c
-> index 3331669d8e33..1fbaa161288a 100644
-> --- a/net/netrom/af_netrom.c
-> +++ b/net/netrom/af_netrom.c
-> @@ -885,6 +885,10 @@ int nr_rx_frame(struct sk_buff *skb, struct net_devi=
-ce *dev)
->          *      skb->data points to the netrom frame start
->          */
->
-> +       /* Ensure NET/ROM network + transport header are present */
-> +       if (!pskb_may_pull(skb, NR_NETWORK_LEN + NR_TRANSPORT_LEN))
-> +               return 0;
-> +
->         src  =3D (ax25_address *)(skb->data + 0);
->         dest =3D (ax25_address *)(skb->data + 7);
->
-> @@ -961,6 +965,12 @@ int nr_rx_frame(struct sk_buff *skb, struct net_devi=
-ce *dev)
->                 return 0;
->         }
->
-> +       /* Ensure NR_CONNREQ fields (window + user address) are present *=
-/
-> +       if (!pskb_may_pull(skb, 21 + AX25_ADDR_LEN)) {
+Hello tipc maintainers/developers,
 
-If skb->head is reallocated by this pskb_may_pull(), dest variable
-might point to a freed piece of memory
+This is a 31-day syzbot report for the tipc subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/tipc
 
-(old skb->head)
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 6 issues are still open and 85 have already been fixed.
 
-As far as netrom is concerned, I would force a full linearization of
-the packet very early
+Some of the still happening issues:
 
-It is also unclear if the bug even exists in the first place.
+Ref Crashes Repro Title
+<1> 676     Yes   INFO: rcu detected stall in corrupted (4)
+                  https://syzkaller.appspot.com/bug?extid=aa7d098bd6fa788fae8e
+<2> 86      No    INFO: rcu detected stall in sys_sendmmsg (7)
+                  https://syzkaller.appspot.com/bug?extid=53e660acb94e444b9d63
+<3> 26      Yes   KMSAN: uninit-value in tipc_rcv (2)
+                  https://syzkaller.appspot.com/bug?extid=9a4fbb77c9d4aacd3388
+<4> 2       No    KASAN: user-memory-access Write in tipc_crypto_stop
+                  https://syzkaller.appspot.com/bug?extid=2434dfff4223d77e8e1d
 
-Can you show the stack trace leading to this function being called
-from an arbitrary
-provider (like a packet being fed by malicious user space)
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-For instance nr_rx_frame() can be called from net/netrom/nr_loopback.c
-with non malicious packet.
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
-For the remaining caller (nr_route_frame()), it is unclear to me.
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
