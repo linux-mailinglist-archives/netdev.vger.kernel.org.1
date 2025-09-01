@@ -1,89 +1,89 @@
-Return-Path: <netdev+bounces-218621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25D4AB3DA4B
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 08:53:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE118B3DA4C
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 08:53:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30B233BA704
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 06:53:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 444913BA8DD
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 06:53:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D36524DCF7;
-	Mon,  1 Sep 2025 06:52:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A1EB25B1CE;
+	Mon,  1 Sep 2025 06:52:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="tJ7AAG4p"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CqJXaK69"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2062.outbound.protection.outlook.com [40.107.236.62])
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2071.outbound.protection.outlook.com [40.107.95.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87E57259CA0
-	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 06:52:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69951253F03
+	for <netdev@vger.kernel.org>; Mon,  1 Sep 2025 06:52:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.71
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756709565; cv=fail; b=UvK4OS/LeyjD4SGsUyZlCxSY0RemNtxE7XUroX3tm7mH4k4a+YoqYqAIyrYcm0ODExZPk3wsMR0mEJfhGT2+I3HYbq/NWPzwa9AuYJS4astpw0UodJXcPr6VE2OAzed8gAkUTX+ixfPawFxqNeVwChpdaY1MFnn9pUdWVKxM0Fs=
+	t=1756709574; cv=fail; b=CyyHEkcjcVGwLtLh90BXky9ttjzI5+EbsardaTy59P49ZIpOAxtU5oF6OQ4wVHqydpi01vhVr8OEzo/lCxup93aFbJM2N2UGYEVTYWLI8OT0SJc7Eg9lW4zS4PXyVxaEhCTU7XPaYS4n2/j+lhY6e6YHgbsDVSBrx8pnf1NCzn8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756709565; c=relaxed/simple;
-	bh=DaARqtQZJt9WF/Uv7GKCbD5fs6jIo/TMKn6zr6yQdwU=;
+	s=arc-20240116; t=1756709574; c=relaxed/simple;
+	bh=tPKcT0xhgbGfbzyISl4j7UqNq11RrWCco52dhXfmycI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QLKE7sHTWF6Y5pF8CvC2xqnA/dyBB3JNlNKXcPxCS5MK5rrSIkHMMO4Q2VVh/+7b40rWwUnXCHZiwQPgYJ2H9qfGb4k0qx0INTEMZgIpjLduaVMAOfSULwJwxKYZ+vVzYsJAxXvt2WtD47NW1RjaTRSKqabWsWn/erGbPOVarsc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=tJ7AAG4p; arc=fail smtp.client-ip=40.107.236.62
+	 MIME-Version:Content-Type; b=XOFUKQGjWmeGhvjgtCHKfRQE0J5HmCGvw/8r7dT3yMpOetskkEwSSFDMx5wGWlLyjM39W8nTUf71VmGzKlf9/yJaPzTflw8h5GmH32aw3PWtuTrSTEln3f41hFfPMCjqTwatzHRcdxtXnYxkNv6q9KREQWlAakWF852EqWUzjCU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=CqJXaK69; arc=fail smtp.client-ip=40.107.95.71
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=lBHizvgEo3RRETMZO56uluDomfwYjygOPHDDze7abjbuKR4k3J101tzw2p7SDBeQR3fAoK2uLXrwXsC6mPjW4Apr1NJK4MLSnxj4WxzzAnBg8pXREWyGXjpzPUkNnsYJ/XpOXEs2UlyWxD2jPbit/MD8xBNDv0G+QG/AJncwOFg7+JjckhlehJYeOBTVUvNG2IADGp6W9R3lLhddBgJ5iSEatmIspYEXzwyks0biHM/6br+jjmoQYLtPypsf37NcnjKgA++De2E2BmRtznDtl4LEMfWoLSJ28N5RxsrEStSS3KDITjm3X8P8i4REHOy53/wHYWi/Fqy89ckhQSEEYQ==
+ b=jFX8vPyta0nBvT/xaksWzTZ26nJcGoWDw15cPDSuKcVVhzA/tPd188aCaiShiG8MBT//6ZyUKyDV9R0EWjR6PAh0OOMfe+IZHiMhp5AV7Tqpr3kG9ONUrRje1Kxo9QXZRUg+PksCMFAmxyrOdY9j1WPNvVs8ng1riP7GoW9eF14Yc9k3gKfzXSp3pSY4AZ7jrHC5Yi7zCqPAyH8KpqVptDwmGGthsJiI2b36pql296M6oOtgrZDvJYYbWaqOqfpsJzBcBv3AYjJdI/zT6RewNNkuGEnrL+Y7WeHJChXiVtVn7YLQhDdPCcPyDli4RfRUZsI4uYqr0v5EIBzUrO0dmw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YSkPKDcdVPmGv6S6e8R0Sp2iv9AMgHg5Sqgvo9pjea4=;
- b=wkhqBIRgWXHBqwlte1Rzj64L7hO/WQoSZqu8u4BH+lXsSyiuou/GiS7lIVEc3oMtQqkhhDGHfCJSotPE7loGA6D0ptiz8JGs0wzWGSN+HPoFy/5sD0yTowN62KyLA8UcYD+fS9dQXIhHc4U1gV/cnODNpxgRwp5OrjwEEvUjxpmpb1eZUezisBu6EfLcJbOMseFU9JXFunG/5T1P2HcDG4NgrwuWeUhIIGfoeJnvNto70P5h5sPa7v709p3jZpuA8VALesriVH7c2AsjgRg6XCcww6ws+r7aujSrQximXq6qQIIgkYwq7aeMw35Jewt02uI3H7tnxkqEce/Lml09oA==
+ bh=YXXyHVQidfTJ+F4+OhxM0vW/0mTnmonY4tU8eND/orI=;
+ b=X3BiqSGCJHbtNHmG2khZBjkXM3rWqnZZTYRvEmZTlHhG1CajbEpxvPWoK/Md+vDkjnbCSlse5eWndr3QxBRFvhgF6WkiEhowAMGMdzUZdac8FcLgdtWxtrmSvB7Oh7OEoaDGMocqEXESbG1ITNRS+6dOtxECqT+O2LE2ZikMtJt7YK6DnB6CsULPEx2oWi9kJ5/nPlwn2ilQ8BMrAICtKf2zD5pYj/Dcr0NMMSjDUYghX4kGnLUQdhE3BUCLlJklLqJSJVdJTOmWWGXqRqLJirTlAphdY+USrv4H6qD1YYikyt7PudF4+hkcogWvTWHzogYZoeNWhRUb7J5VR0o86Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YSkPKDcdVPmGv6S6e8R0Sp2iv9AMgHg5Sqgvo9pjea4=;
- b=tJ7AAG4pBcppXY9s6ZHZ4rRNOrDbAJyJ8h+fW9AV5bM/zWvsgwPZINl12qs6ofR62+ossZWz7YljD/7j58+S5AM34KLVYtXaaFwaaD+IuBcWarB2PokHeEJcOawi+ydxp2JMzcS44pC0VWJ9zWIugoHu6k3vbsSFC1cgFinUB3Ec+YivN9mrpZO6Ulg4MP+FswKTR9cvqbtw8PPzbCuE2r/YskgFBPwTu9HQe4uPyEBSESkZBt8anAytjyFnXah9Hiw4eodV1KdFru/qFgwlQNdJzA53EWf8tp4fEvjYZKOqhKMe1Nz482sjvzG0Rw2yodLlhiQtl7NqX+9H8VPLug==
-Received: from DM6PR08CA0051.namprd08.prod.outlook.com (2603:10b6:5:1e0::25)
- by IA0PR12MB8351.namprd12.prod.outlook.com (2603:10b6:208:40e::5) with
+ bh=YXXyHVQidfTJ+F4+OhxM0vW/0mTnmonY4tU8eND/orI=;
+ b=CqJXaK692adJoOq1jUJleZ4o9Pe8Z9J7xPZs5x5BHiRA1NI416b2szjf59EQegz82L9kLH+w36Nj2qgUO2J9uNv93cVcwM4QrUoD0ZnDMBvGU3vU4IjZwliLSeA912sZOicgXiG/HpOXiGqsPyspgagCZ8iB+/lBw9JxxQj8JRHg0tzHkEpoIF7NQbTY9Y+NPVdBom3PS0b58/jCH4fprzKJdavCCzKy5SBkZvEYRxUIAQZgsp7Ts4QWl/jNKzOGLD0XGBlOpRX2aV5pFFXzy+wdxnMaoNjes3DucUGYQHyTNaoQWR4b/xto3ZXsqmdAZdb9cT+DV4KD4SWjj+KQzA==
+Received: from BL1PR13CA0320.namprd13.prod.outlook.com (2603:10b6:208:2c1::25)
+ by BL1PR12MB5993.namprd12.prod.outlook.com (2603:10b6:208:399::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.21; Mon, 1 Sep
- 2025 06:52:38 +0000
-Received: from DS2PEPF00003444.namprd04.prod.outlook.com
- (2603:10b6:5:1e0:cafe::b7) by DM6PR08CA0051.outlook.office365.com
- (2603:10b6:5:1e0::25) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9073.27 via Frontend Transport; Mon,
- 1 Sep 2025 06:52:38 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.18; Mon, 1 Sep
+ 2025 06:52:45 +0000
+Received: from BN2PEPF000044A4.namprd02.prod.outlook.com
+ (2603:10b6:208:2c1:cafe::91) by BL1PR13CA0320.outlook.office365.com
+ (2603:10b6:208:2c1::25) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9094.10 via Frontend Transport; Mon,
+ 1 Sep 2025 06:52:45 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- DS2PEPF00003444.mail.protection.outlook.com (10.167.17.71) with Microsoft
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BN2PEPF000044A4.mail.protection.outlook.com (10.167.243.155) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9094.14 via Frontend Transport; Mon, 1 Sep 2025 06:52:38 +0000
+ 15.20.9094.14 via Frontend Transport; Mon, 1 Sep 2025 06:52:45 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Sun, 31 Aug
- 2025 23:52:20 -0700
+ 2025 23:52:24 -0700
 Received: from shredder.nvidia.com (10.126.231.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Sun, 31 Aug
- 2025 23:52:17 -0700
+ 2025 23:52:20 -0700
 From: Ido Schimmel <idosch@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
 	<edumazet@google.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
 	<razor@blackwall.org>, <petrm@nvidia.com>, <mcremers@cloudbear.nl>, "Ido
  Schimmel" <idosch@nvidia.com>
-Subject: [PATCH net 2/3] vxlan: Fix NPD in {arp,neigh}_reduce() when using nexthop objects
-Date: Mon, 1 Sep 2025 09:50:34 +0300
-Message-ID: <20250901065035.159644-3-idosch@nvidia.com>
+Subject: [PATCH net 3/3] selftests: net: Add a selftest for VXLAN with FDB nexthop groups
+Date: Mon, 1 Sep 2025 09:50:35 +0300
+Message-ID: <20250901065035.159644-4-idosch@nvidia.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20250901065035.159644-1-idosch@nvidia.com>
 References: <20250901065035.159644-1-idosch@nvidia.com>
@@ -99,189 +99,313 @@ X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS2PEPF00003444:EE_|IA0PR12MB8351:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4f3f6b58-beb8-49ea-c85f-08dde92423c6
+X-MS-TrafficTypeDiagnostic: BN2PEPF000044A4:EE_|BL1PR12MB5993:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8146b330-c244-45e5-7a3a-08dde92427e6
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|1800799024|36860700013;
+	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?6Ybh4UXojL2xYE025E2bAQMUr1r7RfcwdgaJM5ZKurvGmiEjH4Q89Um6WT1n?=
- =?us-ascii?Q?liquDINPiA5Df1LB81/JcZsoVOZ+21kYxwF01+f49yh+E78qobLhI5G/xY3L?=
- =?us-ascii?Q?wecHhMKCDntV4hTINJnfHn0NNZADIBLLNiR4lL8bK3G4Aonhxj4HyHyewjEj?=
- =?us-ascii?Q?/u3TzdGfUfl7FZB4/QDZg+XRiH6iY5kyrqeC22Mo0gPVxlZ4KZDhhpw1qM2B?=
- =?us-ascii?Q?kqu8oVl7ilE+Ajj0+v6PhcVqm4c33/LcLy32W8FJYHNcEFINN9UnJNfo8t8+?=
- =?us-ascii?Q?YUqRAY2E+sFLkMk63EoobgpautMHRns4a82w9p7jUGm7y+xAL2h4zwIG2Up4?=
- =?us-ascii?Q?efKGS8y4r4ncVl+0z4BEM8P1mlvf+HzAy3ul1X077yR83C9z5NR33fMPNMD4?=
- =?us-ascii?Q?p/JTQnOMxAnZZffb6Bz3FuGEJzDDZrOKoo6viwF6kepFCJFiP+6IAMUoqITS?=
- =?us-ascii?Q?pqFCxa0vo+WTYTI7CpbJ5JyYXiHc12dNT5h4K+0BkLjQvchMncXrdccubbvW?=
- =?us-ascii?Q?7+semr0oW00kfTM7eL/3/xiubCeflU/nafvYF4WfkgTdxzWXarh5jeh6xB/e?=
- =?us-ascii?Q?XxcQ5q8gfQgky/101+bti7jCkUOjw/vwaNgTBUXZ4dYBqYves9b8MYdVGQv5?=
- =?us-ascii?Q?oQCnLdgeKEWQl78zdm9hZ+50xzR5kJODZsqUMKRolx674Z9d9lP1rKqYTBnJ?=
- =?us-ascii?Q?cZ/dBNCSEKvtEaB/yhORlHMYhMzBf9NRBU4B124/PKWR+LUVdG4ahvamfjG2?=
- =?us-ascii?Q?Tu5pvGaIeU27pLFMnGlaRG0MVvdbLsxZxfNCnDFbQY5B5Hdu8o85CxP8ir54?=
- =?us-ascii?Q?Xi/Gf0zzCAY8o4Ysf9Epe5Ulcf8kCTBeQXOoF/51WvSQKU3GRjpQWYW8rmGe?=
- =?us-ascii?Q?gwcIsXNW/cyW5GQTekFuue8HfDXZygGuW2dFBcfxE4QdxWYJ4dpLSwWpetJl?=
- =?us-ascii?Q?iDhx2yxNA6BMYEVY7GDLpPnFoiXghdokLwi+N1TeGaffIDM6hFKIuUymhwCq?=
- =?us-ascii?Q?kSCWb8rAl7bzp2F7DP9aQ2cJ+jkhPMb6QiB9tfWVAufS7pBNzmiy9VcVMc0J?=
- =?us-ascii?Q?jjAsZwTGGBEiCeiT07kR7uTR/Zir0LunoUskRYqv1fdZsm9LXsogLMajJcb2?=
- =?us-ascii?Q?NLvoPwck6zTM0sZXkV6sDYa3d2J+FIP6ytIZkwAHb3FdKu6HKNyrmJnhjyac?=
- =?us-ascii?Q?u2rr8Z3VPD0//0/gk+Rr5P1RmJ8oNfPSYWeiEXNkZXFguHjB1ELsHgGzyc0b?=
- =?us-ascii?Q?rAj57E3//q0bhFfkyFoQzxOu6bPjzpbZf6AF5+BDbLsUTgBmbrE6qilPhSZD?=
- =?us-ascii?Q?VZrlEJzil3Rg2mw6mEZQ3DyAFnU7u4zsjrH2zuU3tMr2TCH84sJZMkxMM4pq?=
- =?us-ascii?Q?cP9vjjM/ncLhWxsPT9hL17/0Sfw0PZyEvduQKtyDhEaZT4Z4LGZLaGuN3u89?=
- =?us-ascii?Q?Dwnrd/oAaZ7E48bkIz0OqO26FYOHSmbC/Z2tkki4QVTy5jI4xxz/NOaY63IO?=
- =?us-ascii?Q?JAXiW5NBghGCEylHmRPsGjTyr8xnLJ/vApDg?=
+	=?us-ascii?Q?EaMV0iq6P00Im7hkL9dJKl5dgg5yNE5Ihr/GYserR4Q8r6a8AYICAMq8dYul?=
+ =?us-ascii?Q?7VnWwtBz+vXjk2vVpBbuSCrFPbzyOwehWEaacNSr7oEoJmBuNE0bqkrnhWwn?=
+ =?us-ascii?Q?2LQnwNGhCJTlu0yXuvfM+bd2ELYfcDmLOSjE1L92Sm5TSUGdhBvZV8gOjDsV?=
+ =?us-ascii?Q?Zt76llyY7KF9TxHkZtGns/L1fBkrwhDZcqSJ+jLEbzDPFevh1st+fwFbbkx3?=
+ =?us-ascii?Q?cGnm+Qd9IBsqWH2Jn0qaI58zCBVTrkqaHxTVFroobai0SchNwSifWBowR6ev?=
+ =?us-ascii?Q?lmRM0fAXTAeC5jXOL6nXfw5UkNGa16KSEhrFNWIfHKbp0Nu5MvErTcPtapa6?=
+ =?us-ascii?Q?u2qxWjunATxXigfXIzcj6CYEH4ZfmbjLFA7MIaB6A29HVkpr68nBrYaqxsWT?=
+ =?us-ascii?Q?5Fl3zDlwJIE3rKSN8SMjt28e/eFtm+LbmKFA5+kAseg3mOGviCL+hsrnMZ5M?=
+ =?us-ascii?Q?OGVch8Bn6u1z3yc1JdYhurdlsK37GrTch7GFPfm9WpFQW0VXikbN9s49wrPA?=
+ =?us-ascii?Q?FM5yjYmMoEisQv4q76xS6jH/mbF/9Z9PRCGm5Maw5n2MAtUgGodf/MHLojo5?=
+ =?us-ascii?Q?5mjAZerKYlKN5GKXknzyJLEzUwQSX9rrV5GpR/hFxNPkEzxug8jQitffVDVZ?=
+ =?us-ascii?Q?l+yoGh6W2Bt5sVOMomlO5fesdm33UnM/0qOvMAXgnv+IL/aBPu1nklXUty0h?=
+ =?us-ascii?Q?7IjWSBOPzPGCeAqAog19Sh4/M1Di777mThvQ6Zm7UHoqbmwXlBNpgU0r3ElP?=
+ =?us-ascii?Q?kK1h4Eff2duRvXE62o/JnN0FyfYlDEIvNdBt1sAuQrlvWgayG6kI5SbEwy+z?=
+ =?us-ascii?Q?n132SvGUngXmNgYvmp/ACtgqzYPoopps7MvViDogOnRCBbF0F84LKTLH62lI?=
+ =?us-ascii?Q?LwV67kJRFR82txa7KDJ5TkBhrlZ0e55QPryH4GSdRhN2K+yT0CPzSSUqwe7W?=
+ =?us-ascii?Q?U2tWV/53HRJQ7Da9N17O3PwGdxVgM6poxACipXECXrH6w9lH8zWQW2YhAnF3?=
+ =?us-ascii?Q?0vfbehdSY5TyCbZ+3tIWH7XWLyBVRCNLqQScw382XQPHdC3JdA12ox7Z0RzY?=
+ =?us-ascii?Q?y+Zmy9wg60p3Tg1ZGBCbfKE/Effks6+TegUPdy+al4z8cmDu0nYrVC8WkXgQ?=
+ =?us-ascii?Q?+kX4gmm34Anhn5gGZAqw6U1bB+muvaiHN5nfHtmPi8cr7V9MUmR409QcarPf?=
+ =?us-ascii?Q?jQJJ4PIYGljz97FJme04UuYRXiAUHwz13bo+O05XK1FG1rXnlyAgeUPTUKVP?=
+ =?us-ascii?Q?RouiAdNMler2W0Yfky0zuql28pqMbPNNU25FhdlOrWHvhQexFMPA+n99JCWi?=
+ =?us-ascii?Q?kOsEA+JxFMIgcs95NE1HYwzFWh47XWpxFA04AWRyoY4YUDRNmsiuYGVdlVNP?=
+ =?us-ascii?Q?bfShPNGgzijoWnyk0NNrF20JBnA2h6FbyD5Hyp0MrECe+dRz4zCtuiyKnv6f?=
+ =?us-ascii?Q?ZOKwwO5o1ojl23SCMHCG2vh4Xo2+ljWTI/T6SmqRIkk2o5r5/vtQk+D1nn+x?=
+ =?us-ascii?Q?AwSPl1yqo7jD2Q37rrJTPcSg6tRYz+jGtOAh?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2025 06:52:38.3163
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2025 06:52:45.2178
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4f3f6b58-beb8-49ea-c85f-08dde92423c6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8146b330-c244-45e5-7a3a-08dde92427e6
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DS2PEPF00003444.namprd04.prod.outlook.com
+	BN2PEPF000044A4.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8351
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5993
 
-When the "proxy" option is enabled on a VXLAN device, the device will
-suppress ARP requests and IPv6 Neighbor Solicitation messages if it is
-able to reply on behalf of the remote host. That is, if a matching and
-valid neighbor entry is configured on the VXLAN device whose MAC address
-is not behind the "any" remote (0.0.0.0 / ::).
+Add test cases for VXLAN with FDB nexthop groups, testing both IPv4 and
+IPv6. Test basic Tx functionality as well as some corner cases.
 
-The code currently assumes that the FDB entry for the neighbor's MAC
-address points to a valid remote destination, but this is incorrect if
-the entry is associated with an FDB nexthop group. This can result in a
-NPD [1][3] which can be reproduced using [2][4].
+Example output:
 
-Fix by checking that the remote destination exists before dereferencing
-it.
+ # ./test_vxlan_nh.sh
+ TEST: VXLAN FDB nexthop: IPv4 basic Tx                              [ OK ]
+ TEST: VXLAN FDB nexthop: IPv6 basic Tx                              [ OK ]
+ TEST: VXLAN FDB nexthop: learning                                   [ OK ]
+ TEST: VXLAN FDB nexthop: IPv4 proxy                                 [ OK ]
+ TEST: VXLAN FDB nexthop: IPv6 proxy                                 [ OK ]
 
-[1]
-BUG: kernel NULL pointer dereference, address: 0000000000000000
-[...]
-CPU: 4 UID: 0 PID: 365 Comm: arping Not tainted 6.17.0-rc2-virtme-g2a89cb21162c #2 PREEMPT(voluntary)
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-4.fc41 04/01/2014
-RIP: 0010:vxlan_xmit+0xb58/0x15f0
-[...]
-Call Trace:
- <TASK>
- dev_hard_start_xmit+0x5d/0x1c0
- __dev_queue_xmit+0x246/0xfd0
- packet_sendmsg+0x113a/0x1850
- __sock_sendmsg+0x38/0x70
- __sys_sendto+0x126/0x180
- __x64_sys_sendto+0x24/0x30
- do_syscall_64+0xa4/0x260
- entry_SYSCALL_64_after_hwframe+0x4b/0x53
-
-[2]
- #!/bin/bash
-
- ip address add 192.0.2.1/32 dev lo
-
- ip nexthop add id 1 via 192.0.2.2 fdb
- ip nexthop add id 10 group 1 fdb
-
- ip link add name vx0 up type vxlan id 10010 local 192.0.2.1 dstport 4789 proxy
-
- ip neigh add 192.0.2.3 lladdr 00:11:22:33:44:55 nud perm dev vx0
-
- bridge fdb add 00:11:22:33:44:55 dev vx0 self static nhid 10
-
- arping -b -c 1 -s 192.0.2.1 -I vx0 192.0.2.3
-
-[3]
-BUG: kernel NULL pointer dereference, address: 0000000000000000
-[...]
-CPU: 13 UID: 0 PID: 372 Comm: ndisc6 Not tainted 6.17.0-rc2-virtmne-g6ee90cb26014 #3 PREEMPT(voluntary)
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1v996), BIOS 1.17.0-4.fc41 04/01/2x014
-RIP: 0010:vxlan_xmit+0x803/0x1600
-[...]
-Call Trace:
- <TASK>
- dev_hard_start_xmit+0x5d/0x1c0
- __dev_queue_xmit+0x246/0xfd0
- ip6_finish_output2+0x210/0x6c0
- ip6_finish_output+0x1af/0x2b0
- ip6_mr_output+0x92/0x3e0
- ip6_send_skb+0x30/0x90
- rawv6_sendmsg+0xe6e/0x12e0
- __sock_sendmsg+0x38/0x70
- __sys_sendto+0x126/0x180
- __x64_sys_sendto+0x24/0x30
- do_syscall_64+0xa4/0x260
- entry_SYSCALL_64_after_hwframe+0x4b/0x53
-RIP: 0033:0x7f383422ec77
-
-[4]
- #!/bin/bash
-
- ip address add 2001:db8:1::1/128 dev lo
-
- ip nexthop add id 1 via 2001:db8:1::1 fdb
- ip nexthop add id 10 group 1 fdb
-
- ip link add name vx0 up type vxlan id 10010 local 2001:db8:1::1 dstport 4789 proxy
-
- ip neigh add 2001:db8:1::3 lladdr 00:11:22:33:44:55 nud perm dev vx0
-
- bridge fdb add 00:11:22:33:44:55 dev vx0 self static nhid 10
-
- ndisc6 -r 1 -s 2001:db8:1::1 -w 1 2001:db8:1::3 vx0
-
-Fixes: 1274e1cc4226 ("vxlan: ecmp support for mac fdb entries")
-Reviewed-by: Petr Machata <petrm@nvidia.com>
 Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 ---
- drivers/net/vxlan/vxlan_core.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ tools/testing/selftests/net/Makefile         |   1 +
+ tools/testing/selftests/net/test_vxlan_nh.sh | 223 +++++++++++++++++++
+ 2 files changed, 224 insertions(+)
+ create mode 100755 tools/testing/selftests/net/test_vxlan_nh.sh
 
-diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index 0f6a7c89a669..dab864bc733c 100644
---- a/drivers/net/vxlan/vxlan_core.c
-+++ b/drivers/net/vxlan/vxlan_core.c
-@@ -1877,6 +1877,7 @@ static int arp_reduce(struct net_device *dev, struct sk_buff *skb, __be32 vni)
- 	n = neigh_lookup(&arp_tbl, &tip, dev);
- 
- 	if (n) {
-+		struct vxlan_rdst *rdst = NULL;
- 		struct vxlan_fdb *f;
- 		struct sk_buff	*reply;
- 
-@@ -1887,7 +1888,9 @@ static int arp_reduce(struct net_device *dev, struct sk_buff *skb, __be32 vni)
- 
- 		rcu_read_lock();
- 		f = vxlan_find_mac_tx(vxlan, n->ha, vni);
--		if (f && vxlan_addr_any(&(first_remote_rcu(f)->remote_ip))) {
-+		if (f)
-+			rdst = first_remote_rcu(f);
-+		if (rdst && vxlan_addr_any(&rdst->remote_ip)) {
- 			/* bridge-local neighbor */
- 			neigh_release(n);
- 			rcu_read_unlock();
-@@ -2044,6 +2047,7 @@ static int neigh_reduce(struct net_device *dev, struct sk_buff *skb, __be32 vni)
- 	n = neigh_lookup(ipv6_stub->nd_tbl, &msg->target, dev);
- 
- 	if (n) {
-+		struct vxlan_rdst *rdst = NULL;
- 		struct vxlan_fdb *f;
- 		struct sk_buff *reply;
- 
-@@ -2053,7 +2057,9 @@ static int neigh_reduce(struct net_device *dev, struct sk_buff *skb, __be32 vni)
- 		}
- 
- 		f = vxlan_find_mac_tx(vxlan, n->ha, vni);
--		if (f && vxlan_addr_any(&(first_remote_rcu(f)->remote_ip))) {
-+		if (f)
-+			rdst = first_remote_rcu(f);
-+		if (rdst && vxlan_addr_any(&rdst->remote_ip)) {
- 			/* bridge-local neighbor */
- 			neigh_release(n);
- 			goto out;
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index b31a71f2b372..c7e03e1d6f63 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -99,6 +99,7 @@ TEST_GEN_PROGS += bind_wildcard
+ TEST_GEN_PROGS += bind_timewait
+ TEST_PROGS += test_vxlan_mdb.sh
+ TEST_PROGS += test_bridge_neigh_suppress.sh
++TEST_PROGS += test_vxlan_nh.sh
+ TEST_PROGS += test_vxlan_nolocalbypass.sh
+ TEST_PROGS += test_bridge_backup_port.sh
+ TEST_PROGS += test_neigh.sh
+diff --git a/tools/testing/selftests/net/test_vxlan_nh.sh b/tools/testing/selftests/net/test_vxlan_nh.sh
+new file mode 100755
+index 000000000000..20f3369f776b
+--- /dev/null
++++ b/tools/testing/selftests/net/test_vxlan_nh.sh
+@@ -0,0 +1,223 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++
++source lib.sh
++TESTS="
++	basic_tx_ipv4
++	basic_tx_ipv6
++	learning
++	proxy_ipv4
++	proxy_ipv6
++"
++VERBOSE=0
++
++################################################################################
++# Utilities
++
++run_cmd()
++{
++	local cmd="$1"
++	local out
++	local stderr="2>/dev/null"
++
++	if [ "$VERBOSE" = "1" ]; then
++		echo "COMMAND: $cmd"
++		stderr=
++	fi
++
++	out=$(eval "$cmd" "$stderr")
++	rc=$?
++	if [ "$VERBOSE" -eq 1 ] && [ -n "$out" ]; then
++		echo "    $out"
++	fi
++
++	return $rc
++}
++
++################################################################################
++# Cleanup
++
++exit_cleanup_all()
++{
++	cleanup_all_ns
++	exit "${EXIT_STATUS}"
++}
++
++################################################################################
++# Tests
++
++nh_stats_get()
++{
++	ip -n "$ns1" -s -j nexthop show id 10 | jq ".[][\"group_stats\"][][\"packets\"]"
++}
++
++tc_stats_get()
++{
++	tc_rule_handle_stats_get "dev dummy1 egress" 101 ".packets" "-n $ns1"
++}
++
++basic_tx_common()
++{
++	local af_str=$1; shift
++	local proto=$1; shift
++	local local_addr=$1; shift
++	local plen=$1; shift
++	local remote_addr=$1; shift
++
++	RET=0
++
++	# Test basic Tx functionality. Check that stats are incremented on
++	# both the FDB nexthop group and the egress device.
++
++	run_cmd "ip -n $ns1 link add name dummy1 up type dummy"
++	run_cmd "ip -n $ns1 route add $remote_addr/$plen dev dummy1"
++	run_cmd "tc -n $ns1 qdisc add dev dummy1 clsact"
++	run_cmd "tc -n $ns1 filter add dev dummy1 egress proto $proto pref 1 handle 101 flower ip_proto udp dst_ip $remote_addr dst_port 4789 action pass"
++
++	run_cmd "ip -n $ns1 address add $local_addr/$plen dev lo"
++
++	run_cmd "ip -n $ns1 nexthop add id 1 via $remote_addr fdb"
++	run_cmd "ip -n $ns1 nexthop add id 10 group 1 fdb"
++
++	run_cmd "ip -n $ns1 link add name vx0 up type vxlan id 10010 local $local_addr dstport 4789"
++	run_cmd "bridge -n $ns1 fdb add 00:11:22:33:44:55 dev vx0 self static nhid 10"
++
++	run_cmd "ip netns exec $ns1 mausezahn vx0 -a own -b 00:11:22:33:44:55 -c 1 -q"
++
++	busywait "$BUSYWAIT_TIMEOUT" until_counter_is "== 1" nh_stats_get > /dev/null
++	check_err $? "FDB nexthop group stats did not increase"
++
++	busywait "$BUSYWAIT_TIMEOUT" until_counter_is "== 1" tc_stats_get > /dev/null
++	check_err $? "tc filter stats did not increase"
++
++	log_test "VXLAN FDB nexthop: $af_str basic Tx"
++}
++
++basic_tx_ipv4()
++{
++	basic_tx_common "IPv4" ipv4 192.0.2.1 32 192.0.2.2
++}
++
++basic_tx_ipv6()
++{
++	basic_tx_common "IPv6" ipv6 2001:db8:1::1 128 2001:db8:1::2
++}
++
++learning()
++{
++	RET=0
++
++	# When learning is enabled on the VXLAN device, an incoming packet
++	# might try to refresh an FDB entry that points to an FDB nexthop group
++	# instead of an ordinary remote destination. Check that the kernel does
++	# not crash in this situation.
++
++	run_cmd "ip -n $ns1 address add 192.0.2.1/32 dev lo"
++	run_cmd "ip -n $ns1 address add 192.0.2.2/32 dev lo"
++
++	run_cmd "ip -n $ns1 nexthop add id 1 via 192.0.2.3 fdb"
++	run_cmd "ip -n $ns1 nexthop add id 10 group 1 fdb"
++
++	run_cmd "ip -n $ns1 link add name vx0 up type vxlan id 10010 local 192.0.2.1 dstport 12345 localbypass"
++	run_cmd "ip -n $ns1 link add name vx1 up type vxlan id 10020 local 192.0.2.2 dstport 54321 learning"
++
++	run_cmd "bridge -n $ns1 fdb add 00:11:22:33:44:55 dev vx0 self static dst 192.0.2.2 port 54321 vni 10020"
++	run_cmd "bridge -n $ns1 fdb add 00:aa:bb:cc:dd:ee dev vx1 self static nhid 10"
++
++	run_cmd "ip netns exec $ns1 mausezahn vx0 -a 00:aa:bb:cc:dd:ee -b 00:11:22:33:44:55 -c 1 -q"
++
++	log_test "VXLAN FDB nexthop: learning"
++}
++
++proxy_common()
++{
++	local af_str=$1; shift
++	local local_addr=$1; shift
++	local plen=$1; shift
++	local remote_addr=$1; shift
++	local neigh_addr=$1; shift
++	local ping_cmd=$1; shift
++
++	RET=0
++
++	# When the "proxy" option is enabled on the VXLAN device, the device
++	# will suppress ARP requests and IPv6 Neighbor Solicitation messages if
++	# it is able to reply on behalf of the remote host. That is, if a
++	# matching and valid neighbor entry is configured on the VXLAN device
++	# whose MAC address is not behind the "any" remote (0.0.0.0 / ::). The
++	# FDB entry for the neighbor's MAC address might point to an FDB
++	# nexthop group instead of an ordinary remote destination. Check that
++	# the kernel does not crash in this situation.
++
++	run_cmd "ip -n $ns1 address add $local_addr/$plen dev lo"
++
++	run_cmd "ip -n $ns1 nexthop add id 1 via $remote_addr fdb"
++	run_cmd "ip -n $ns1 nexthop add id 10 group 1 fdb"
++
++	run_cmd "ip -n $ns1 link add name vx0 up type vxlan id 10010 local $local_addr dstport 4789 proxy"
++
++	run_cmd "ip -n $ns1 neigh add $neigh_addr lladdr 00:11:22:33:44:55 nud perm dev vx0"
++
++	run_cmd "bridge -n $ns1 fdb add 00:11:22:33:44:55 dev vx0 self static nhid 10"
++
++	run_cmd "ip netns exec $ns1 $ping_cmd"
++
++	log_test "VXLAN FDB nexthop: $af_str proxy"
++}
++
++proxy_ipv4()
++{
++	proxy_common "IPv4" 192.0.2.1 32 192.0.2.2 192.0.2.3 \
++		"arping -b -c 1 -s 192.0.2.1 -I vx0 192.0.2.3"
++}
++
++proxy_ipv6()
++{
++	proxy_common "IPv6" 2001:db8:1::1 128 2001:db8:1::2 2001:db8:1::3 \
++		"ndisc6 -r 1 -s 2001:db8:1::1 -w 1 2001:db8:1::3 vx0"
++}
++
++################################################################################
++# Usage
++
++usage()
++{
++	cat <<EOF
++usage: ${0##*/} OPTS
++
++        -t <test>   Test(s) to run (default: all)
++                    (options: $TESTS)
++        -p          Pause on fail
++        -v          Verbose mode (show commands and output)
++EOF
++}
++
++################################################################################
++# Main
++
++while getopts ":t:pvh" opt; do
++	case $opt in
++		t) TESTS=$OPTARG;;
++		p) PAUSE_ON_FAIL=yes;;
++		v) VERBOSE=$((VERBOSE + 1));;
++		h) usage; exit 0;;
++		*) usage; exit 1;;
++	esac
++done
++
++require_command mausezahn
++require_command arping
++require_command ndisc6
++require_command jq
++
++if ! ip nexthop help 2>&1 | grep -q "stats"; then
++	echo "SKIP: iproute2 ip too old, missing nexthop stats support"
++	exit "$ksft_skip"
++fi
++
++trap exit_cleanup_all EXIT
++
++for t in $TESTS
++do
++	setup_ns ns1; $t; cleanup_all_ns;
++done
 -- 
 2.51.0
 
