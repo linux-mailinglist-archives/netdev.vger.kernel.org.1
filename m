@@ -1,179 +1,113 @@
-Return-Path: <netdev+bounces-218612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AC61B3D9A6
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 08:15:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D6EB5B3D9C3
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 08:20:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 409783A221C
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 06:14:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B82EC3B763B
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 06:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 794FA24DCF7;
-	Mon,  1 Sep 2025 06:13:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12129246770;
+	Mon,  1 Sep 2025 06:20:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fcjr+P7B"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="eIoyUcYt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC4C8248F5C;
-	Mon,  1 Sep 2025 06:13:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8590218EB0;
+	Mon,  1 Sep 2025 06:20:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756707184; cv=none; b=jjggaravbrBiAtxC0op2s0Ayf5KIeJZ+lILUQatsvfyKOWsnJuEHr4ZjRwCmQBTdg7FArP0LWOpu6kY736bygNPToIP6L+yaL4t1wHAR9XQkoyfun9AZ5Z0Oe4W4QLEZI/a0KcWtTvzQWD7BV89NyB/rnfqqRXmFZg2O5ePMWt4=
+	t=1756707636; cv=none; b=Jvvay8U2+fmKT3ZNtg3VQl6aWtMZCcR4hBYk+d1h4r+IUlsy+BkVcaMuvox0t1AILC3dqHBM8fjLnnZPpyWNOUIOTgsZt6wZdlUaK4C/mcJ1oykz5jW/xnW6cVdHhkMrS4TCYOu18UO6LfaUaV/K1zPaBOlyiH2My3TmXC0fEt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756707184; c=relaxed/simple;
-	bh=EyK1bT+mD7QqA4C8Ly35wKowNy38n2wAvW7UnVG7R+o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=elBmOviVoDu/xEwjliOnnRCM7myXcysW+22+5qVG0o4TXPM8LeoKmexGfkNVxHj5SFj0mcl3iIwXs5NLGWnXhq5tPHL5RNguRwt4LE6cMbqIIV/0HtvofodDCtgBY4yWS0N9Mt4SnU8FH220eBB2DhGnjxMx37pjhj/a46Fgqpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fcjr+P7B; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57VHeBXu017937;
-	Mon, 1 Sep 2025 06:12:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=jNIpxH
-	qNy+03Qh0iAc58609OkLAG2uxslj/3KXqMdZ0=; b=fcjr+P7Bb7jM0fkaR3MxDm
-	4OEme6f8DG7I+R3ME0jIago7Mak7QAwr7HbDNyg+zQVQitGyYdzcD5wmIqGJD5dI
-	GX6a+OZyiVKN6qW7XCQidqMTvZTNzn/efWou4QPQ4DYHMhp9O4CD+XZjUItxQoPR
-	QEz5itcxne0mJrEHv+JNFpmkphRYJrgB9cuwAmp8RlnCwZpGyrtGhgpDCb/Fgbpw
-	w2HLgVqa7rqF79hmWgN7Sdjvjo3Jnm+Y+6YD6UUf/nkK+9lrfgcNe7mimzOa9DuR
-	jrm1NJUTH2stCbEk2j0ikQbukXK986b9HX+84IItgYw16ARAJeoT0tP22FxiY8NA
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48usuqq7g0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 01 Sep 2025 06:12:48 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5815ugol028220;
-	Mon, 1 Sep 2025 06:12:48 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48usuqq7fr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 01 Sep 2025 06:12:48 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5815Jw3c021191;
-	Mon, 1 Sep 2025 06:12:46 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 48vcmpch87-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 01 Sep 2025 06:12:46 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5816Cj3E20054598
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 1 Sep 2025 06:12:45 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 499BF5805D;
-	Mon,  1 Sep 2025 06:12:45 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2186558059;
-	Mon,  1 Sep 2025 06:12:40 +0000 (GMT)
-Received: from [9.39.27.54] (unknown [9.39.27.54])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  1 Sep 2025 06:12:39 +0000 (GMT)
-Message-ID: <57c2976e-8b6c-4cee-803f-ca5b0636f30b@linux.ibm.com>
-Date: Mon, 1 Sep 2025 11:42:38 +0530
+	s=arc-20240116; t=1756707636; c=relaxed/simple;
+	bh=FYMe2bEyQnHgG7oiRFnq7nlgkYuj3AThOUClM2uvShE=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hfl3h7DXZjPHYhNoUZ0br9MBINNw2A1MXNBVr9zoYj7YFZDpjg41pDPdoeU64t3ltjF4Wqq4LW0bbtvqxSoLFL0GDvKup8iljyuZv5nTI9TfSBQMs03wy5BtIoZESL/ISqSrWav7YTtf8N0Z8jrvJ/9C0qiqRjnmWni8uNnvjRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=eIoyUcYt; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1756707634; x=1788243634;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=FYMe2bEyQnHgG7oiRFnq7nlgkYuj3AThOUClM2uvShE=;
+  b=eIoyUcYtF2dUHFbcsbmiAaLBy24/Hl5zemgMm4nJg99bXtl6zt0e2u9A
+   e6ABPo2hTcislw7H1SjIEB1vrCPuX4MAagzOLHFCJwY82DIm9SQqY/A0L
+   jy2nyXqBg5XdVvKo5xtIHMz6tmZdO5hGPsjl+NFDP4rg/WOi+gg39Q93j
+   CUl/AS4CtTmo74Xf0njZFgc3ByeZDjNqPayjDEEnuFIcww6SEdm1arB5r
+   dmS2rY+P4CNP7nyepiHLbsAy2Uns6Iu45ezBEacGVP3rnbEExWGB/hyYm
+   F01cGJsXwlCeZh1xUJHtOFNDUJIf2VfZTwMjmd1slp8g7i2fRlE/6WKAj
+   w==;
+X-CSE-ConnectionGUID: XhbRIGuUQGKz55BN2RxhtQ==
+X-CSE-MsgGUID: M1AGaSGDRY20lkXyt/N5RQ==
+X-IronPort-AV: E=Sophos;i="6.18,225,1751266800"; 
+   d="scan'208";a="45874794"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 31 Aug 2025 23:20:27 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Sun, 31 Aug 2025 23:20:08 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex04.mchp-main.com
+ (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
+ Transport; Sun, 31 Aug 2025 23:20:08 -0700
+Date: Mon, 1 Sep 2025 08:16:30 +0200
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: Kory Maincent <kory.maincent@bootlin.com>
+CC: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <richardcochran@gmail.com>,
+	<Parthiban.Veerasooran@microchip.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v5 1/2] net: phy: micrel: Introduce function
+ __lan8814_ptp_probe_once
+Message-ID: <20250901061630.rddeuz7yclmxl6w3@DEN-DL-M31836.microchip.com>
+References: <20250829134836.1024588-1-horatiu.vultur@microchip.com>
+ <20250829134836.1024588-2-horatiu.vultur@microchip.com>
+ <20250829163341.17712e59@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/smc: Remove validation of reserved bits in CLC
- Decline message
-To: dust.li@linux.alibaba.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        alibuda@linux.alibaba.com, sidraya@linux.ibm.com, wenjia@linux.ibm.com
-Cc: pasic@linux.ibm.com, horms@kernel.org, tonylu@linux.alibaba.com,
-        guwen@linux.alibaba.com, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Alexandra Winter <wintera@linux.ibm.com>
-References: <20250829102626.3271637-1-mjambigi@linux.ibm.com>
- <aLHAAy-S_1_Ud7l-@linux.alibaba.com>
-Content-Language: en-US
-From: Mahanta Jambigi <mjambigi@linux.ibm.com>
-In-Reply-To: <aLHAAy-S_1_Ud7l-@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODMwMDAzMCBTYWx0ZWRfXx9SSJ6arYZfv
- ruSP7JB4eBGBRSV3Lia6GzO1GIZvE49Fl9hlkSueGF4mcZ2rBrELD1mzj3y/KpLHcYC6jCoaeeD
- heeTTVEpoDEOrhbg8HAS2SZCg/y7IQjmdiQAklGlU1R+p3+nmekqngO9HipSt2LO+1jhrjzEQsn
- 3873l2jcDU0kN1ZmVUJgggWlisECDEpmsFAIHZG8MmyqqYxzDgRhZsswb82yWbO4/XnQeGM/oYl
- 1ydM4rhO7+lrB0LjUadzJx8pR950FcYpt7dYGGW9dUG4yWlkwEJL50hbAnTBtsJbqZ28eG17xdd
- vSavgMw4vx0SpBRaR6joWgx+O31weaqPcCYFU7aucoQzJGx5ePdYeNwmiO7ZFo5dnTW400Iteqm
- sdsJtBOL
-X-Proofpoint-GUID: 5rFtGuwiZUjpsOH3REx7kx-heydPPQes
-X-Proofpoint-ORIG-GUID: a_8F3YUUV6fYQj9kKPBg5gPUWY6h7mUg
-X-Authority-Analysis: v=2.4 cv=Ao/u3P9P c=1 sm=1 tr=0 ts=68b53960 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=48vgC7mUAAAA:8 a=VnNF1IyMAAAA:8
- a=K1W8qsRnxZmegyINkbYA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-01_03,2025-08-28_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 phishscore=0 impostorscore=0 priorityscore=1501 spamscore=0
- suspectscore=0 bulkscore=0 adultscore=0 malwarescore=0 classifier=typeunknown
- authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2508300030
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250829163341.17712e59@kmaincent-XPS-13-7390>
 
-
-
-On 29/08/25 8:28 pm, Dust Li wrote:
->>
->> Fixes: 8ade200(net/smc: add v2 format of CLC decline message)
->>
->> Signed-off-by: Mahanta Jambigi <mjambigi@linux.ibm.com>
->> Reference-ID: LTC214332
+The 08/29/2025 16:33, Kory Maincent wrote:
 > 
-> I think this is your internal ID ? It's better not to leave that
-> in the upstream patches.
+> On Fri, 29 Aug 2025 15:48:35 +0200
+> Horatiu Vultur <horatiu.vultur@microchip.com> wrote:
+> 
+> > Introduce the function __lan8814_ptp_probe_once as this function will be
+> > used also by lan8842 driver. This change doesn't have any functional
+> > changes.
+> 
+> It would have been nice to add the fact that the lan8842 has a different number
+> GPIO in the commit message. It would have explained more the why.
 
-Oops, I missed to remove it. Sure, I'll remove it.
+Yes, I will update this in the next version.
+Thanks.
 
 > 
->> Reviewed-by: Sidraya Jayagond <sidraya@linux.ibm.com>
->> Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
->>
->> ---
->> net/smc/smc_clc.c | 2 --
->> 1 file changed, 2 deletions(-)
->>
->> diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
->> index 5a4db151fe95..08be56dfb3f2 100644
->> --- a/net/smc/smc_clc.c
->> +++ b/net/smc/smc_clc.c
->> @@ -426,8 +426,6 @@ smc_clc_msg_decl_valid(struct smc_clc_msg_decline *dclc)
->> {
->> 	struct smc_clc_msg_hdr *hdr = &dclc->hdr;
->>
->> -	if (hdr->typev1 != SMC_TYPE_R && hdr->typev1 != SMC_TYPE_D)
->> -		return false;
+> Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
 > 
-> Here it's checking the typev1 in smc_clc_msg_hdr, but your commit message
-> says it's validating the reserved bits:
+> Thank you!
 > 
->    Currently SMC code is validating the reserved bits while parsing the incoming
->    CLC decline message & when this validation fails, its treated as a protocol
->    error.
-> 
-> Did I miss something ?
+> --
+> Köry Maincent, Bootlin
+> Embedded Linux and kernel engineering
+> https://bootlin.com
 
-If you refer to struct *smc_clc_msg_hdr* in smc_clc.h file, typev1 
-member represents bits 4 & 5 at offset 7. If we compare it with the CLC 
-Decline message header, it represents one of the reserved(5-7 bits) at 
-offset 7. You can refer to below link for reserved bits.
-
-https://datatracker.ietf.org/doc/html/rfc7609#page-105
-
-> 
-> Best regards,
-> Dust
-
+-- 
+/Horatiu
 
