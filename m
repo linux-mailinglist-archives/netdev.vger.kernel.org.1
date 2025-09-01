@@ -1,92 +1,74 @@
-Return-Path: <netdev+bounces-218873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FCD9B3EE7E
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 21:40:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4E00B3EEA7
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 21:47:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D72ED1A802B2
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 19:40:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE5594859CC
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 19:47:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21C96324B38;
-	Mon,  1 Sep 2025 19:40:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 933CF342C90;
+	Mon,  1 Sep 2025 19:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JrPCyeYX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NxvEDCAN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE61F324B1D;
-	Mon,  1 Sep 2025 19:40:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66BEE341ACB;
+	Mon,  1 Sep 2025 19:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756755601; cv=none; b=JEJrIax5NgPbUDRFBqciMHGdBVLEskX/Hc8Dy3UkL6GcV4AxMHtdhcSjxCxnL4nmQWGLGOFFhvaxlfxnyHxw0Ajn+TE+16WvAL+52bZjyj72ft+cgacTVlyBd7RKoqmN217be4PJ7FJe2dsDVk9yF19YVxWFiHfgISXslYrui7M=
+	t=1756755977; cv=none; b=KYbghHtczhzeGzaZ8uRY85GC35AFmtSKh5trtmrzDhtpjsLAFNz5cGhGX5mdqdBOTPFqmJ5PwGlV3zjEG8vEDnz/+mNY2qzm+UD2e5UzNKevDHkPNV/8VlIQE97DC1lixd15okJSNBrwl7k6Zc/7AkFYiHwTgank7u+VRYG4SM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756755601; c=relaxed/simple;
-	bh=isTLmJyKWm1rCPiKonv8yb3fcz+NecWR/zDJ56VbTyo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=s+fOg9Lnfxzfkt88wh9oDZVAqVplhxFxyIwEPiJGm5ZqA1KvXuryP7aW16LT+664nZey6MtI0RyBBR0vdFEH4fIYXswk/LMvgUNmdnoU1wJJi0boJOLyhDsqplpRhfYoAzi1m0MR+B48VjNQUGHUGB88YPerl3r2+LpH1Ed4wPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JrPCyeYX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CEABC4CEF0;
-	Mon,  1 Sep 2025 19:40:00 +0000 (UTC)
+	s=arc-20240116; t=1756755977; c=relaxed/simple;
+	bh=ZRakmcIHvH3f1B8RfyE9ZrQBrbqMERiw45E9xr2Ei08=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=n7VqFspuP++1IDD+1Ssg80hvr36L7XMZeeVi528LqTp/1Sd7Vdq3SJjrRitjghlrLuYUfm6Gg+enhDpEyVW8cusshuYt1NMEAhodEPD/BH+uOheQJobz9IXymsA8ZzCSF74Cxsg+RyratNElJsT+4jXVBNHtQaGoavXcdCkgzxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NxvEDCAN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82A71C4CEF0;
+	Mon,  1 Sep 2025 19:46:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756755600;
-	bh=isTLmJyKWm1rCPiKonv8yb3fcz+NecWR/zDJ56VbTyo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=JrPCyeYXa99DqLSIS8q8bl2NnG9LoJrdGlf0K8PgWeaAEz1ilzavuRinUottntB9S
-	 5qlQztrs+EiAyvhJUXr8POpIxxao+R0PW6rLsZQ4bLygqNnvZwPaoxdQIGcI/EcQGD
-	 LUoldtVvsjQFlRXOk3gh5Fz0bd0Chqw0uxnwf0oB1xVmR+qQUjpi6jCPzUGOY1PlwP
-	 VCt75ExxgxU27xVI6j78X5qR09wRz5pZ4j/IjyC6mKnHGTIK7NOEuKFNWRbBONSogX
-	 R+q2/ZKRnsqtlyGpvh3T2Ghao3oa7VThKZj08upzP5DIOPJoMqI45inrWxuK/W0jhj
-	 GCzz/Ojfn03CQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D9D383BF4E;
-	Mon,  1 Sep 2025 19:40:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1756755977;
+	bh=ZRakmcIHvH3f1B8RfyE9ZrQBrbqMERiw45E9xr2Ei08=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=NxvEDCANFCg4HqSlMCXmTgHyHef+ufLbqMwojmG4GVg61BL79pZ2hr/Uc3txc3o25
+	 EJTn1olTO/roupsUd88oHI3D5SwwjZgoFMIO2mcLloKeWMWdd3AI+wQj8Xq0Li6Q5s
+	 pwUq6BFEf1eQoXCnx0awGWsjqdygTLqaygHYkd+6xJf/Htc9dQ0CJ+3YbJtT+BE3IU
+	 gozEuxkChZdv8fOYr99iJJ3fSplcr+xryzKYHYjrkfWy9GA2w8C05MrDGxUMgQGbpH
+	 PITutXYblzBzhcCEUgcz+WupY261tAm5F3h5mQnxql4Uq6zV0S65TjoGJKGDu8ZvWM
+	 LC7CklprNex6Q==
+Date: Mon, 1 Sep 2025 12:46:15 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
+ <linux@armlinux.org.uk>, Helmut Buchsbaum <helmut.buchsbaum@gmail.com>,
+ linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: dsa: ks8995: Fix some error handling path in
+ ks8995_probe()
+Message-ID: <20250901124615.10afb6a0@kernel.org>
+In-Reply-To: <95be5a0c504611263952d850124f053fd6204e94.1756573982.git.christophe.jaillet@wanadoo.fr>
+References: <95be5a0c504611263952d850124f053fd6204e94.1756573982.git.christophe.jaillet@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] bluetooth 2025-08-29
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175675560625.3862603.1620076851732090865.git-patchwork-notify@kernel.org>
-Date: Mon, 01 Sep 2025 19:40:06 +0000
-References: <20250829191210.1982163-1-luiz.dentz@gmail.com>
-In-Reply-To: <20250829191210.1982163-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Sat, 30 Aug 2025 19:13:59 +0200 Christophe JAILLET wrote:
+> drivers/net/dsa/ks8995.c
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri, 29 Aug 2025 15:12:10 -0400 you wrote:
-> The following changes since commit 5189446ba995556eaa3755a6e875bc06675b88bd:
-> 
->   net: ipv4: fix regression in local-broadcast routes (2025-08-28 10:52:30 +0200)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-08-29
-> 
-> [...]
-
-Here is the summary with links:
-  - [GIT,PULL] bluetooth 2025-08-29
-    https://git.kernel.org/netdev/net/c/0dffd938db37
-
-You are awesome, thank you!
+This file got renamed from drivers/net/phy/spi_ks8995.c in net-next,
+this needs to be regenerated against the real net tree.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
