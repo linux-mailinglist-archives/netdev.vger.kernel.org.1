@@ -1,188 +1,171 @@
-Return-Path: <netdev+bounces-218776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 606EAB3E728
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 16:30:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3A11B3E7F7
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 16:54:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33ADD18817FA
-	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 14:30:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 057371A86AFB
+	for <lists+netdev@lfdr.de>; Mon,  1 Sep 2025 14:54:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A4D4340D9A;
-	Mon,  1 Sep 2025 14:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCF97341AC3;
+	Mon,  1 Sep 2025 14:53:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="QTDqVkHu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55EE12F49EE;
-	Mon,  1 Sep 2025 14:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC712F1FFE;
+	Mon,  1 Sep 2025 14:53:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756736975; cv=none; b=CRgnOiEwBL0Mdis7mU7QOx5h1+fP3HAtLkEZuKjEVrlQeq8A4dKRao9Qo/RZDz5+qfGnPpIu3SqbgtbvWPYVh1hSrTNHLo/SphN+YT7yZsbSz2OhZewbOhpEaSffNptA6N+58o24TbALjsEs0cNomOma0AJRqePBfuY/BLr2GZE=
+	t=1756738387; cv=none; b=ThSrH2I0khLkAZwXu5Swu7uX4ruHIdSGYqhgMTPlYMjqkGZQVEOGCCaTdOXwC3tApB3GE4qbA9RVi+6a7deo+W2LFgoTH2363pXYOcMvlNguQKF4yzbazhJrsn6fqYJ6bPMiqnpKcOykwGCMJVKwddP/amZupjaC3BfRPnrKCHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756736975; c=relaxed/simple;
-	bh=rIc9PaP5Dn/UnXTwF/5gEzVX6ZfvAdPwwxjS/weWLp8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=VWOSxcS1VtPElXn11VAhj5LEsiFpZH5CSkYVPvSzgVS8VB81mr0RVVPVYNDr9exTBCZ7kg92VFPbdvN/VJ7U/Ku1GaFt4n5ZopW5yNl0n3T50XLUQMTwWlgmXYmO/gbwSJuUq6sjA+EWJRwpvT72gbc07JJet02NIbWouj+fCHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-6188b5b113eso5645641a12.0;
-        Mon, 01 Sep 2025 07:29:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756736971; x=1757341771;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NplgeWcNTOnynvORO+lXqHJFAtHGQ9bpXO8+3KZyIv8=;
-        b=PBMpjxC9zUgiC11DCKHDVqyACQGANG0BS6ltiBwPMml1R0aDSCONVRdV3rShdbNAk6
-         rTRk+Xkk0evHM+zvOMatwPrHbdfDgMe+74L+MR4oK8bvQDum+PbvDpc6BKNfYvyEf2HE
-         b3fjHFoJLvRv/gude2IUkAOChYS9aha3vJxlNGx4TrhvsrvivVhUSsv3nGu3KbdiySmI
-         NsEImrehrU4Q3h8BqN3Jv71Z7/Tn5fOAJLt+h8Uf5ODu+9d0TKZrgHcg64UNpy7+2TGS
-         /sKSpyygZSHJx/FCOwIEjL1BWMLSt9C0myDE5rkNmDEj018s/2kZBHWC9e/IwcutoPxU
-         oJSA==
-X-Forwarded-Encrypted: i=1; AJvYcCVzrFe8sNYlCkvg1pSzXI+VZoalutriNwCTR8ES8wC0GEqOUCDIcfhMDcxGEJLwnOL95Av9k6XA@vger.kernel.org, AJvYcCWDqNd8nPE9EYNfNhI73qcqPvVtFx6Vy2HRd5KeTDB3vOkltimCI3gIKFELnSyKAsmoZsd6qIMZIqr3lYg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyC68O7MZxR/bKwnDC6FX6QpIve90WOavl0XNClNUX9NuWKifSA
-	m9LFX5keSdpuarzeAZT4UguuErVVuEzJyzXnvxeN1MIYTzK42J1u72P3OHmEmg==
-X-Gm-Gg: ASbGncveC9GsZBG+leGty5HZbZp+xh6++WSlJXgCNQDRqYAhYi+oiCtNi0EGwFM0O9e
-	/ZubNyPjMU30mhi8EpToQ+kGwiknZ/cfQQDAV9t8jXe6LU+a9r2UeC0zPyXfcVLgGxWun941NWg
-	TnVS7HnBNHHU3lSkBrujzTlu8kwXWE1FyCsOdvht47YFHJBPvs/qhyjLypULbLYzRAe1XplB5aS
-	T+TTaLKlD7rCmobcJYCaKfuiyC4kZlJzpWGYbA8XfqKuXeJ12oI12CX7ycEF4Yy/cI7EZwdZB6d
-	47BOAf7OpS4RiYxUi7nW8pLBp9whFnPM4S9F1OvEC3c+EjeZTAJrMe0wK5GYDYsZHpNbz+D+5Z8
-	npcGXuKGO9h7fdt+MgoeJI+/E
-X-Google-Smtp-Source: AGHT+IGBIGQeIkdga89sLFjwwgHh8OYnMDrUbIJGCO8aVa3tpGY6JBZWq8dWt/C4qF/ldn1mbHERwg==
-X-Received: by 2002:a05:6402:210c:b0:61e:a5c8:e830 with SMTP id 4fb4d7f45d1cf-61ea5c8e868mr1893659a12.1.1756736971012;
-        Mon, 01 Sep 2025 07:29:31 -0700 (PDT)
-Received: from localhost ([2a03:2880:30ff:73::])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-61cfc1c7a8fsm7275979a12.3.2025.09.01.07.29.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Sep 2025 07:29:30 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-Date: Mon, 01 Sep 2025 07:29:13 -0700
-Subject: [PATCH net] netpoll: fix incorrect refcount handling causing
- incorrect cleanup
+	s=arc-20240116; t=1756738387; c=relaxed/simple;
+	bh=GN1H6Rljr8Ht7JhqGRwNKCZVozANl7ITPcDEg2A2qhQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=LmPdXhEn2lSlgL4UUqhGEJSAKYjHK58pAbT2t0Ro+QjgvvneGnGSZcvhVU82pDcCVzdZxsS55zl/HeJwk3uWZ1MzUvOoKFdptCZg4HFEa7ShhQzDGd6c+DtLqi01qeYvFIAQHwXY7f7e2cs20qSmFY+xt2xc9inf62iNtl9W++M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=QTDqVkHu; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelvem-sh02.itg.ti.com ([10.180.78.226])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTP id 581En5Ht2389135;
+	Mon, 1 Sep 2025 09:49:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1756738145;
+	bh=BM2bi8XRe0Tu2TIMsONhhCSzDVLZSgA3tXyyfFdHX3Y=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=QTDqVkHuLE5jwYg6dSJ09edO1hNNNA9dWYcbctfJzbJU+MrSLbcIUsBB+c5t3DxY+
+	 m0M6dPQuOBLcSSxTOM0vqMpQpEpWjyfqWGQd8vf/mULIDWLCyhtHAyA7KXOCsgZdKw
+	 X/cSnefthPRuFHZx/h3Aj7sH4M6mA7L70XgG0ZA8=
+Received: from DFLE104.ent.ti.com (dfle104.ent.ti.com [10.64.6.25])
+	by lelvem-sh02.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 581En5ik2171508
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
+	Mon, 1 Sep 2025 09:49:05 -0500
+Received: from DFLE104.ent.ti.com (10.64.6.25) by DFLE104.ent.ti.com
+ (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Mon, 1
+ Sep 2025 09:49:04 -0500
+Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DFLE104.ent.ti.com
+ (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
+ Frontend Transport; Mon, 1 Sep 2025 09:49:04 -0500
+Received: from [10.249.130.61] ([10.249.130.61])
+	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 581EmpLK2668338;
+	Mon, 1 Sep 2025 09:48:52 -0500
+Message-ID: <1b892cde-bcdc-4a4e-83b7-35cc13eef8f4@ti.com>
+Date: Mon, 1 Sep 2025 20:18:50 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250901-netpoll_memleak-v1-1-34a181977dfc@debian.org>
-X-B4-Tracking: v=1; b=H4sIALmttWgC/x3MUQrCMBAFwKss77uBbVBKcxURqclTF9O0JEWE0
- rsLzgFmR2M1NgTZUfmxZktBkL4TxNdUnnSWEARe/VlH7V3hti4532bOmdPbjZo0ne5xGHxEJ1g
- rH/b9jxcUbrgexw+Et+TnZgAAAA==
-X-Change-ID: 20250901-netpoll_memleak-90d0d4bc772c
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- david decotigny <decot@googlers.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- kernel-team@meta.com, stable@vger.kernel.org, jv@jvosburgh.net, 
- Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.15-dev-dd21f
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3035; i=leitao@debian.org;
- h=from:subject:message-id; bh=rIc9PaP5Dn/UnXTwF/5gEzVX6ZfvAdPwwxjS/weWLp8=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBota3J1vyCtlP6LNUk+o4zFSY8qigmfKO1Spm1y
- ZSjNgJviTmJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaLWtyQAKCRA1o5Of/Hh3
- bUnuEACgCkzBAIx2/Shph1NfT03nw5u5yMoAbMncpCQr+7K3gZgqPGwuvZ66Y7sqJ1etfm+J6P7
- Cm5uE9Hk56rVF8nxbzUmwAfMf7dOy1BCP8r735LTGAA72a/A4OaGeh2t7NhACOLuMn4mIGLcHez
- wQW8PZkipq5Q0C1kG0sj020pYP8fj05Dbu+em0RdtwkS8ESyFa8KxZQ7NbQ3seXQ1RarNETNRRh
- MCcDzMfnRCt8GkJFvOgKZJxKo37oi76tO0c57vLdddAqRmHDgdoU9FtLf0zUWPPJr5GcmS0t0FS
- hfvYDo/N3M6RsJLyw2tNKhwo1l20sFKqM6vdXw1L7pfSiMWUXhgZQjnKuUDkfr+nvD/lIb1gyoh
- 350dkh+1tpqF7mIGgfDgJYlh+k5ycY1oFBz+iCWxva7dUt/aLIXkO9zRwGzIPAj9OcB5SwE/5va
- tdfj4+jfE0mdSs7SirfYt6x7euS2RAqSpgfQxzEdH8E6UY2QqfBqy5QrNU5AUkijl7+hP/tXUVR
- ZayjxIuF8yYxrkiGjAZwxy3OC9jyM1i0F0GryXGLhsDTreZHP8VQ7z0Q8RRCXjC6LJ3OKPav/cO
- NvwalU6F2i//tsE41EBYZmt30ivZ+aibPwJZuUh/i67t6Fan/jtdUW/W9gD+bNsZrt3AAnKGpfW
- B/vWc5Yc91SLMPg==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v14 2/5] net: ti: icssm-prueth: Adds ICSSM
+ Ethernet driver
+To: Parvathi Pudi <parvathi@couthit.com>, <danishanwar@ti.com>,
+        <rogerq@kernel.org>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
+        <ssantosh@kernel.org>, <richardcochran@gmail.com>, <m-malladi@ti.com>,
+        <s.hauer@pengutronix.de>, <afd@ti.com>, <jacob.e.keller@intel.com>,
+        <horms@kernel.org>, <johan@kernel.org>, <m-karicheri2@ti.com>,
+        <s-anna@ti.com>, <glaroque@baylibre.com>, <saikrishnag@marvell.com>,
+        <kory.maincent@bootlin.com>, <diogo.ivo@siemens.com>,
+        <javier.carrasco.cruz@gmail.com>, <basharath@couthit.com>
+CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <vadim.fedorenko@linux.dev>, <alok.a.tiwari@oracle.com>,
+        <bastien.curutchet@bootlin.com>, <pratheesh@ti.com>, <prajith@ti.com>,
+        <vigneshr@ti.com>, <praneeth@ti.com>, <srk@ti.com>, <rogerq@ti.com>,
+        <krishna@couthit.com>, <pmohan@couthit.com>, <mohan@couthit.com>
+References: <20250822132758.2771308-1-parvathi@couthit.com>
+ <20250822132758.2771308-3-parvathi@couthit.com>
+Content-Language: en-US
+From: "Anwar, Md Danish" <a0501179@ti.com>
+In-Reply-To: <20250822132758.2771308-3-parvathi@couthit.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-commit efa95b01da18 ("netpoll: fix use after free") incorrectly
-ignored the refcount and prematurely set dev->npinfo to NULL during
-netpoll cleanup, leading to improper behavior and memory leaks.
+Hi Parvathi,
 
-Scenario causing lack of proper cleanup:
+On 8/22/2025 6:55 PM, Parvathi Pudi wrote:
+> From: Roger Quadros <rogerq@ti.com>
+> 
+> Updates Kernel configuration to enable PRUETH driver and its dependencies
+> along with makefile changes to add the new PRUETH driver.
+> 
+> Changes includes init and deinit of ICSSM PRU Ethernet driver including
+> net dev registration and firmware loading for DUAL-MAC mode running on
+> PRU-ICSS2 instance.
+> 
+> Changes also includes link handling, PRU booting, default firmware loading
+> and PRU stopping using existing remoteproc driver APIs.
+> 
+> Signed-off-by: Roger Quadros <rogerq@ti.com>
+> Signed-off-by: Andrew F. Davis <afd@ti.com>
+> Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
+> Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
 
-1) A netpoll is associated with a NIC (e.g., eth0) and netdev->npinfo is
-   allocated, and refcnt = 1
-   - Keep in mind that npinfo is shared among all netpoll instances. In
-     this case, there is just one.
+[ ... ]
 
-2) Another netpoll is also associated with the same NIC and
-   npinfo->refcnt += 1.
-   - Now dev->npinfo->refcnt = 2;
-   - There is just one npinfo associated to the netdev.
+> +	/* get mac address from DT and set private and netdev addr */
+> +	ret = of_get_ethdev_address(eth_node, ndev);
+> +	if (!is_valid_ether_addr(ndev->dev_addr)) {
+> +		eth_hw_addr_random(ndev);
+> +		dev_warn(prueth->dev, "port %d: using random MAC addr: %pM\n",
+> +			 port, ndev->dev_addr);
+> +	}
+> +	ether_addr_copy(emac->mac_addr, ndev->dev_addr);
+> +
+> +	/* connect PHY */
+> +	emac->phydev = of_phy_get_and_connect(ndev, eth_node,
+> +					      icssm_emac_adjust_link);
+> +	if (!emac->phydev) {
+> +		dev_dbg(prueth->dev, "PHY connection failed\n");
+> +		ret = -EPROBE_DEFER;
+> +		goto free;
+> +	}
+> +
 
-3) When the first netpolls goes to clean up:
-   - The first cleanup succeeds and clears np->dev->npinfo, ignoring
-     refcnt.
-     - It basically calls `RCU_INIT_POINTER(np->dev->npinfo, NULL);`
-   - Set dev->npinfo = NULL, without proper cleanup
-   - No ->ndo_netpoll_cleanup() is either called
+Why are you returning EPROBE_DEFER here? If phy connection fails, you
+should just return and fail the probe. That's what ICSSG driver does.
 
-4) Now the second target tries to clean up
-   - The second cleanup fails because np->dev->npinfo is already NULL.
-     * In this case, ops->ndo_netpoll_cleanup() was never called, and
-       the skb pool is not cleaned as well (for the second netpoll
-       instance)
-  - This leaks npinfo and skbpool skbs, which is clearly reported by
-    kmemleak.
+In drivers/net/ethernet/ti/icssg/icssg_prueth.c
 
-Revert commit efa95b01da18 ("netpoll: fix use after free") and adds
-clarifying comments emphasizing that npinfo cleanup should only happen
-once the refcount reaches zero, ensuring stable and correct netpoll
-behavior.
+ 404   │     ndev->phydev = of_phy_connect(emac->ndev, emac->phy_node,
+ 405   │                       &emac_adjust_link, 0,
+ 406   │                       emac->phy_if);
+ 407   │     if (!ndev->phydev) {
+ 408   │         dev_err(prueth->dev, "couldn't connect to phy %s\n",
+ 409   │             emac->phy_node->full_name);
+ 410   │         return -ENODEV;
+ 411   │     }
 
-Cc: stable@vger.kernel.org
-Cc: jv@jvosburgh.net
-Fixes: efa95b01da18 ("netpoll: fix use after free")
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
-I have a selftest that shows the memory leak when kmemleak is enabled
-and I will be submitting to net-next.
 
-Also, giving I am reverting commit efa95b01da18 ("netpoll: fix use
-after free"), which was supposed to fix a problem on bonding, I am
-copying Jay.
----
- net/core/netpoll.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+Before phy connect you do `dev_warn(prueth->dev, "port %d: using random
+MAC addr: %pM\n"`
 
-diff --git a/net/core/netpoll.c b/net/core/netpoll.c
-index 5f65b62346d4e..19676cd379640 100644
---- a/net/core/netpoll.c
-+++ b/net/core/netpoll.c
-@@ -815,6 +815,10 @@ static void __netpoll_cleanup(struct netpoll *np)
- 	if (!npinfo)
- 		return;
- 
-+	/* At this point, there is a single npinfo instance per netdevice, and
-+	 * its refcnt tracks how many netpoll structures are linked to it. We
-+	 * only perform npinfo cleanup when the refcnt decrements to zero.
-+	 */
- 	if (refcount_dec_and_test(&npinfo->refcnt)) {
- 		const struct net_device_ops *ops;
- 
-@@ -824,8 +828,7 @@ static void __netpoll_cleanup(struct netpoll *np)
- 
- 		RCU_INIT_POINTER(np->dev->npinfo, NULL);
- 		call_rcu(&npinfo->rcu, rcu_cleanup_netpoll_info);
--	} else
--		RCU_INIT_POINTER(np->dev->npinfo, NULL);
-+	}
- 
- 	skb_pool_flush(np);
- }
+If device is using random mac address, this will be printed, your phy
+connect fails, you try probe again, print comes again, phy fails again
+and so on ...
 
----
-base-commit: 864ecc4a6dade82d3f70eab43dad0e277aa6fc78
-change-id: 20250901-netpoll_memleak-90d0d4bc772c
+This results in system getting spammed with continuos prints of "using
+random MAC addr"
 
-Best regards,
---  
-Breno Leitao <leitao@debian.org>
+I suggest if phy fails, let the probe fail don't do EPROBE_DEFER.
+
+Saw this issue on few boards which has issue with ICSSG phy.
+
+> +	/* remove unsupported modes */
+> +	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_10baseT_Full_BIT);
+-- 
+Thanks and Regards,
+Md Danish Anwar
 
 
