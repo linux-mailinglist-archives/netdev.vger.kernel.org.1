@@ -1,118 +1,98 @@
-Return-Path: <netdev+bounces-219191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73144B40646
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 16:12:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 02D3CB4064D
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 16:13:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 351C51888A55
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 14:10:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 084BC1886B48
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 14:12:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48E302DFA3E;
-	Tue,  2 Sep 2025 14:09:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AAAA2DFF28;
+	Tue,  2 Sep 2025 14:11:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="TpdNDDon"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PGGOM86H"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 113BF2DAFCA;
-	Tue,  2 Sep 2025 14:09:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF99E226CF1;
+	Tue,  2 Sep 2025 14:11:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756822190; cv=none; b=akNOMvXcV+NC0p3uhnlE96zwBbnGh3D1+5svBFkNabaaRBAA30+hyHJ0RLJ68zmMJ3BrpfAM3NGZl9/XvJqJcoGwSd6RbAw5owkgKVdNeaxzHO2p9JwCPwfF0sa7t4ph0/PL9PoWoYTTqDe6jg+rhVxxazfdurfjdhVIh0XsUzs=
+	t=1756822298; cv=none; b=GHBq8UoOwJaqcZTT5aOxmSEwPIo7vjnKvrPNhOGj4JmlXo79rwbOyuORRYW9lvIoEA98jhU0rVsK1tVs8mH6OJAGRnLyEj0WAD7G4idDNPGVXLsscSYsZ258ty1aFsXNt2kqbG34TcVwFMu+AfGI51zBuGgAHQbf7eKFDwr2mtQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756822190; c=relaxed/simple;
-	bh=H/cW+LTqVrTEbpC/NOjCOk5rT6x774F3B3uh69487BU=;
+	s=arc-20240116; t=1756822298; c=relaxed/simple;
+	bh=T3wyZ6jtecqFDOGjVL1fyOX/b7Gmqgj53Psy+nVhaxE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kWX73/70F+vq9GrTM2juq85nchQfu9RDBlR5YGQ5T9blcERhctT5OI4Fv6yIGQxjVsphsmSkIclZZz1YjTy29KQ+Z9BGW8cUC8K1V/E6Sva2mpv7JyULSBkjxU5O7SRLgzDurZw7j4NEKY61qDzoG7u+7E2ANcRvlzi9tm/nFNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=TpdNDDon; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=b69wlVoTIXKPkRh7Ni7gAalhaMi39nCg5L9jd6Kfgsw=; b=TpdNDDonkbfR9VLsZgsgMoZqf3
-	qURvftBMtae/1UzynUQ1U7XwJYYGeTP385czC7sQ9MYdQuZoiTMmXu72aRIstIOhD65d5Y0UrNTi0
-	mfSslKJvE3E+9bmJmZxA/QHSaNEUG3C3sMdmY5w+Nr82Emo2PnF0/Ntcfosv8cMoHMlEYzVbzMpg0
-	LSVj8Ob9R9oOZl8Eexbi8WbKmx31EGLQzjoBe8u9j/YyU3wFc7La4J1La3pEyLBwKLUVyfiACY/62
-	lTfZkkqsSrHZPvPbfeiGoJpFmPpUld6oegPHnCtw8t7GQduh1g51/ExZrR6oiuoDupZW1IQ0O4Jwy
-	3mijaq+Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53476)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1utRhg-000000007jk-4A9O;
-	Tue, 02 Sep 2025 15:09:45 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1utRhe-0000000082L-3axX;
-	Tue, 02 Sep 2025 15:09:42 +0100
-Date: Tue, 2 Sep 2025 15:09:42 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH net] net: phy: transfer phy_config_inband() locking
- responsibility to phylink
-Message-ID: <aLb6puGVzR29GpPx@shell.armlinux.org.uk>
-References: <20250902134141.2430896-1-vladimir.oltean@nxp.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=TnQ3wrmQCNCZXB0veX2/D6vEWtj3Z83aeSOxoktlA81DmNbPaIySidsD7R5NoOCPcLM6tW9D/xb2xnTI6tYOJtabiBKZbXCpoAPqpep2g+McCD2ZPZYAoetI1h60MI4XdYugNhQipjJPIIQC5/y/iWMIysE2SftZLHNw9oZlV1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PGGOM86H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1832C4CEED;
+	Tue,  2 Sep 2025 14:11:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756822298;
+	bh=T3wyZ6jtecqFDOGjVL1fyOX/b7Gmqgj53Psy+nVhaxE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PGGOM86HcFpJ3YVUjeAOSaRCxRnk6EAQ2f9GFx0xl2YwcXWNHKEAJVJ+lRasFvNEo
+	 z6HTyRa9bLS8/m8dWbDjncohPJhC6GhJL6VWIA762BxoY3L7/CbCnl6RZ9Qhlqu/Yx
+	 64PeucOP6FW6oiDD6kzJMuUaGwETnec1ChpGjbODt0C+85o8nea6e8T7EsbfVgysSY
+	 1Pv5bbO+g9W/E+zOwqsKrf3Lm676SKYj3soWjgdy4EM0a+8vz4wyZynCuTda//V8Rj
+	 qOwRGcwlm9N2cYeMRlvDwk6M8YPJ1zoCmcrFKzMSjLmhLlrdACcj6bz42+tDl08JGl
+	 SziNxYvIE6v7w==
+Date: Tue, 2 Sep 2025 16:11:34 +0200
+From: Maxime Ripard <mripard@kernel.org>
+To: Conley Lee <conleylee@foxmail.com>
+Cc: andrew@lunn.ch, kuba@kernel.org, davem@davemloft.net, wens@csie.org, 
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-sunxi@lists.linux.dev
+Subject: Re: [PATCH] arm: dts: add nand device in
+ sun7i-a20-haoyu-marsboard.dts
+Message-ID: <stdtaaoxpnwbinjk72nutik4dsh77iywfqpoogtgxhebkuxcl3@yhnu5u2wvtsb>
+References: <tencent_57056C4B1E98EF5C0517A5685B2E4D060508@qq.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha384;
+	protocol="application/pgp-signature"; boundary="zip2peffqy3jbkf7"
 Content-Disposition: inline
-In-Reply-To: <20250902134141.2430896-1-vladimir.oltean@nxp.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <tencent_57056C4B1E98EF5C0517A5685B2E4D060508@qq.com>
 
-On Tue, Sep 02, 2025 at 04:41:41PM +0300, Vladimir Oltean wrote:
-> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-> index c7f867b361dd..350905928d46 100644
-> --- a/drivers/net/phy/phylink.c
-> +++ b/drivers/net/phy/phylink.c
-> @@ -1580,10 +1585,13 @@ static void phylink_resolve(struct work_struct *w)
->  {
->  	struct phylink *pl = container_of(w, struct phylink, resolve);
->  	struct phylink_link_state link_state;
-> +	struct phy_device *phy = pl->phydev;
->  	bool mac_config = false;
->  	bool retrigger = false;
->  	bool cur_link_state;
->  
-> +	if (phy)
-> +		mutex_lock(&phy->lock);
 
-I don't think this is safe.
+--zip2peffqy3jbkf7
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH] arm: dts: add nand device in
+ sun7i-a20-haoyu-marsboard.dts
+MIME-Version: 1.0
 
-The addition and removal of PHYs is protected by two locks:
+On Mon, Sep 01, 2025 at 05:05:21PM +0800, Conley Lee wrote:
+> The Haoyu MarsBoard-A20 comes with an 8G Hynix NAND flash,
+> and this commit adds this NAND device in the device tree.
+>=20
+> Signed-off-by: Conley Lee <conleylee@foxmail.com>
 
-1. RTNL, to prevent ethtool operations running concurrently with the
-   addition or removal of PHYs.
+MLC NANDs are very unreliable, we must not enable them by default in the
+current state of UBI / UBIFS.
 
-2. The state_mutex which protects the resolver which doesn't take the
-   RTNL.
+Maxime
 
-Given that the RTNL is not held in this path, dereferencing pl->phydev
-is unsafe as the PHY may go away (through e.g. SFP module removal)
-which means this mutex_lock() may end up operating on free'd memory.
+--zip2peffqy3jbkf7
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I'm not sure we want to be taking the RTNL on this path.
+-----BEGIN PGP SIGNATURE-----
 
-At the moment, I'm not sure what the solution is here.
+iJUEABMJAB0WIQTkHFbLp4ejekA/qfgnX84Zoj2+dgUCaLb7BwAKCRAnX84Zoj2+
+dguyAX9u3yR4AN55O69wO/UyeI+BKx82ca33p0QxRMC9v3A6uvffoiSuhq3FxYFT
+tauF1e0Bf2nxCJpegHoktTqCPgJG1BXoVvCkL7sJHt0f6IDGzK+M5LJLOSLE7qap
+ur39lheVPw==
+=Z7CA
+-----END PGP SIGNATURE-----
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+--zip2peffqy3jbkf7--
 
