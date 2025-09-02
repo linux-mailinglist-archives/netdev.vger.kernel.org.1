@@ -1,475 +1,302 @@
-Return-Path: <netdev+bounces-219258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4175B40CEF
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 20:11:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E6C8B40D12
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 20:22:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A45892083D5
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 18:11:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 203F65E1983
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 18:22:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B0CC34A316;
-	Tue,  2 Sep 2025 18:10:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6211340D82;
+	Tue,  2 Sep 2025 18:22:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RldtQcZG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N8MJklrJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00D26346A0C;
-	Tue,  2 Sep 2025 18:10:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756836646; cv=fail; b=SzyeJIRjZZGoJbH7CR2uEAGHOhkMJL0L72gL+OFFRtzDMTuedlfJD+vnmZXcTO2dlOneDoJBIwdlZMZ8wUNoLWKcqdCHP5zx97wDgsioa7DRaZGJKnxJnxvUKa+BJ80M6IrCDUaL/WCurmx7cEpHdG3wCaBGCV61hXSGEirMP8w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756836646; c=relaxed/simple;
-	bh=RfmDq4ubLPuls51y2A0JV9pThwCFJ5jLXC1o7Pnvvsg=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=MhjaW5rwXKIUPzmj91xHEsxHC6XeCd1pkJq/nY2QL8HwH6NoEa05qdkTcUK4lxEjNvVuyS77RwmVzGiokcHP1N4uCaJDHP1htvt1L1FaPtyBfnTzi0dF/XMjb0XzqbJeBU283LXmQVQ5U+2a7o+RB6T+vkDDgXUQ2u3+s/5F4s8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RldtQcZG; arc=fail smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756836644; x=1788372644;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=RfmDq4ubLPuls51y2A0JV9pThwCFJ5jLXC1o7Pnvvsg=;
-  b=RldtQcZG2sS3Pysi9zKA6Gc4SYA5vMqj5jM5KbM6iiQPp9+HimeZ6ohU
-   nMdI5w62wnJyYYHoObUzMJ+M/SshdQl8OMBVGgf7osadf/2p3Y9wQYvIE
-   6Db7MQFN3g1FTBPkshYQzbvxy99qbzVHaORxpqMVXH3PlBEFctgvBMBnf
-   Ovi/lScEAfYSkBxog6AnWk8W1A3FiVefMTwcGqXJpKUfCYPOcdc08hU2a
-   23SyexinoXnW5fc9wTgavimrHw7po+pzHg9jKbIY42XjOeiDw3rRPQ1pT
-   ieoXhCrz2iJURpxf5+zPjbC2CoMtB5pILKA5ybiNd2xhzoTg8JlLkptnn
-   g==;
-X-CSE-ConnectionGUID: fCR8NJOGSfemEQfhYZ1e/Q==
-X-CSE-MsgGUID: w2ImlUziQi2K0bgT3B0Ulg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11541"; a="58158921"
-X-IronPort-AV: E=Sophos;i="6.18,233,1751266800"; 
-   d="scan'208";a="58158921"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2025 11:10:43 -0700
-X-CSE-ConnectionGUID: jMCtzwJVT9efRe/fg8gwsA==
-X-CSE-MsgGUID: TRhbOyXxT4uuxVEK7SOGug==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.18,233,1751266800"; 
-   d="scan'208";a="175720957"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2025 11:10:43 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Tue, 2 Sep 2025 11:10:42 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Tue, 2 Sep 2025 11:10:42 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (40.107.223.71)
- by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Tue, 2 Sep 2025 11:10:42 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SAuHk/e2ENAEUrznFIEEMlpGYqfP4L7JO1x7EuGFZv//qPh7zWLTltQe9gYBC2vmAOQ4zmmjrESmwvTXgRjHj49HcxKmOua4gpBvFeZN1pwid40kBARkYjTw98uAk07KwkzKNm3sdRmC6QLOC2OwY34TbHEUBodTRSfWv5uQAliJBys7jUgqHWPQVN6dsbxep5bDzc0GHpPPQQoehBbDbS/XN18JgoL1k7qQgAW/YKYzXO95MG8ecl+a/TrE507lpQAtdq93lUNGwbBYPxjZ3Ed3Td115JPKCOhMAi9MRsBKLBmhOMduFnZyMVrp7u2JA39pBe+foxWuKirbOSL5vA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kU0JjHfIH+Ddl4TkUGoBJfGiFFokMHJOpUcemoq6kp0=;
- b=cI5OC9bPbgjxtCAmi9sIScNAAB8ablHTgguOobgK8WKmdUBl3MkRNA1xoXLA2nQaeOWnMrWvZwJ3rWlOlW/VNV5JsEJN6lsLjnRMTZPPVDSujlSqh2dAuebYidNNBUlQZbDIvUqFhBwD85msBjM/WAsLgdvs9mxoTO8+52SjO+c126wvHYdbTYrLsrklUHlm2q8Bz7MZOuxElMW6cNVGmv7yVrqs9kTES6TTQi0GhB4vVLLonq9MUIloBx+Kd0+TPUUes26CY5FfhC/mm/q+0PBhUmmTJYIkTfXI5MJI+bznju43ocg2SYXivRG487gnzDXs2Y2T/vEKXBdA+59hWg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CYYPR11MB8431.namprd11.prod.outlook.com (2603:10b6:930:c7::17)
- by PH3PPFBA2AA2BA3.namprd11.prod.outlook.com (2603:10b6:518:1::d46) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.27; Tue, 2 Sep
- 2025 18:10:40 +0000
-Received: from CYYPR11MB8431.namprd11.prod.outlook.com
- ([fe80::546b:dc38:a70f:1c27]) by CYYPR11MB8431.namprd11.prod.outlook.com
- ([fe80::546b:dc38:a70f:1c27%4]) with mapi id 15.20.9094.016; Tue, 2 Sep 2025
- 18:10:40 +0000
-Message-ID: <74c328b6-efdf-4592-b0af-6eae089f3a83@intel.com>
-Date: Tue, 2 Sep 2025 11:10:38 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net-next v3] idpf: add support for IDPF
- PCI programming interface
-To: Paul Menzel <pmenzel@molgen.mpg.de>, Madhu Chittim
-	<madhu.chittim@intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<horms@kernel.org>, <linux-pci@vger.kernel.org>
-References: <20250829172453.2059973-1-madhu.chittim@intel.com>
- <857bf36b-6bc7-44f8-bb5e-7c9460e4ef1c@molgen.mpg.de>
-Content-Language: en-US
-From: "Linga, Pavan Kumar" <pavan.kumar.linga@intel.com>
-In-Reply-To: <857bf36b-6bc7-44f8-bb5e-7c9460e4ef1c@molgen.mpg.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MW4PR03CA0243.namprd03.prod.outlook.com
- (2603:10b6:303:b4::8) To CYYPR11MB8431.namprd11.prod.outlook.com
- (2603:10b6:930:c7::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F65A32F77E;
+	Tue,  2 Sep 2025 18:22:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756837329; cv=none; b=dy8UhQgkSLguE2EbtWdU34AUHLLF9cfPjF/jIZnqm2LlOm0mZNBtD/2zzDpkc/1tNLnHW4jWxOrtsNzPWvROzwpjN/kmXhudeKngSAM44tW6S4UL4Xr8uCLeDkg9bLdxCJEQziJWE0y3hrOOu88fTc6o88CJzhwQRXyJIRn4tNU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756837329; c=relaxed/simple;
+	bh=09Y+YelbLpY/NYBRRZVlF/i6Xbbbg9GU3IZ9se5ijiM=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=IRQ0FQ6szW1uNuN/Rp5uYBo/m5Y/RTMxYBvPspR6JVOAD3ihmHfOoiLMNdnZOtaxwPHUfkOFRfa8vASNh8Yy0WAlLbMMqIC04JzOlpq5LG0rNQrnOj4LhVw+E7bGnhx0wSid+wu5RrRLnzM4C9aX+8pAxScGK++4f0wrUpMSFJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N8MJklrJ; arc=none smtp.client-ip=209.85.219.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-70ddab8117cso45948186d6.0;
+        Tue, 02 Sep 2025 11:22:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756837327; x=1757442127; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Su3MdH72LTe3eDBMYiwtYP+/SNjyccRO488QAGWI4aQ=;
+        b=N8MJklrJu3A+SNfmxO7XKZtcI1E7HBgGRKHZsI2YozpYyzB1Ex/2rqrXu1KwdEBGTj
+         W76XvkpbZdMPFRCVt6RovgFmzLlEIIHUgrETGah9kfheTmNYBdpMdy9rL4jkcncLAmOz
+         493zKCs/Hc18RcJBnBUaLf4FJYxizr5jPjF0QzveOPPeyUmt8X4c+c4WZ4T8uAmFiw9Q
+         fXV7xYioaNtHW3qy9WQKRbsQWBajcC1/DvePjJLckFoc/ZCL+eI0WsjRuv2NjXjwpVad
+         W3oeIqHz1K7Y5Ud5NeW+LUvaHDTikJYvjf4MRmUyoVX03fFF/thjw98qFHnaUaGPsCxf
+         3z0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756837327; x=1757442127;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Su3MdH72LTe3eDBMYiwtYP+/SNjyccRO488QAGWI4aQ=;
+        b=aj/MXlZQJZrt1BLjsMrPwdY/J768jaBl2stelvOu0BUL3lDCo0cd0zdMuHIilFezJp
+         DCxKfDzB8crfaPHas2FcB6u2zyIctTNJnfG7TfVl4O2WLGe83zOl88Owoj8cDgGvUrtP
+         YUeO9IYffaKh9WdObCsqFCquf0D3JMIJMCbezIM7Sum+8ANghqaHZ2GF8KSjSVRuMXST
+         CxLUFCXFFEk8DZacYjDI8uhb8uQb6x4I0YcWBF33xg/dPdKnXeHuF8C+lgHmmFk/E2CE
+         ro0Qio3bXZHP7PygMx4QErmp0W877j4FWqmpciv/9uoo6Elr3+eXY1NnpNyC0/TIYpbz
+         GnXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVeQCHUg5+8t5NaMzgnLz7CfRw4w++GMB/Gnr6M389Vo59qN9V/GYvMVY3jnb5vgmx2OhVd2nCYUo82WfI=@vger.kernel.org, AJvYcCXlxkbuXEFJV6MCFKwCUBQ7eSqlo48+gUt1nFOiBdmYNFYNKxTASNkR/foTgb3ME82vTVNl/fmH@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBYV8YHr9dEIGRD1BWCzAhAngB+VF2Ka0/6qtT8v1MkBwgMklz
+	i9sCH58UU5veoQiMMg4Mw6NLb4Bu+i5XRA5rAFYgqOMcj6t/KYSw8Zr/
+X-Gm-Gg: ASbGncusYjb2STym3bQ7JK+02wWhUiMgYXzz4J6WOWOPYOLb4LTLamouNgZAlFz6NWi
+	AWlVE6c/2bL+GRwb3POZ2a5nBzEpXnUqMs55Vd1Lf1LmAsMOEGAKXqNXaoKZuUHVGRPg3dLQzLJ
+	CmhwPqW5yrmz0D4BXcrDgi1N3rxq7ju+u5xE0kzniKjN5wZpJ5xIl1gTlYPNPe0GDt9NBtxRq7v
+	5rMFMP3FCzlIm4H67sInAUc2rfe5l3OOGh//pXFhAK4Xzup0qFWUCbqrfnn4duAo7PSZxZ13R9E
+	58UvzreD9au07PiT/IciyPGH1823Y7m1hwckd0wGOHNQ+t/uz9q8WO3GLhHwB/zflEpFo1lhH7S
+	KfXp/QSky2O2vO/PgY3jJ5p996a4fbz3Heivee6FqOt+wm4R58ea4FKqGBnF3o86w4r1ujtThv9
+	KB4dOKzZrUv6en
+X-Google-Smtp-Source: AGHT+IFIvzEBQgnK6eetlN2bpnuSxB8UJE/Yn9qspLPCCF+FJvqURpnC/Qa5bquc7GYU7oLhEsXXJw==
+X-Received: by 2002:a05:6214:529b:b0:71c:53c0:569e with SMTP id 6a1803df08f44-71c53c05b4emr62015486d6.51.1756837326593;
+        Tue, 02 Sep 2025 11:22:06 -0700 (PDT)
+Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-720b46661b9sm15949666d6.47.2025.09.02.11.22.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Sep 2025 11:22:06 -0700 (PDT)
+Date: Tue, 02 Sep 2025 14:22:05 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Richard Gobert <richardbgobert@gmail.com>, 
+ netdev@vger.kernel.org
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ horms@kernel.org, 
+ corbet@lwn.net, 
+ saeedm@nvidia.com, 
+ tariqt@nvidia.com, 
+ mbloch@nvidia.com, 
+ leon@kernel.org, 
+ ecree.xilinx@gmail.com, 
+ dsahern@kernel.org, 
+ ncardwell@google.com, 
+ kuniyu@google.com, 
+ shuah@kernel.org, 
+ sdf@fomichev.me, 
+ aleksander.lobakin@intel.com, 
+ florian.fainelli@broadcom.com, 
+ willemdebruijn.kernel@gmail.com, 
+ alexander.duyck@gmail.com, 
+ linux-kernel@vger.kernel.org, 
+ linux-net-drivers@amd.com, 
+ Richard Gobert <richardbgobert@gmail.com>
+Message-ID: <willemdebruijn.kernel.2f9db40362380@gmail.com>
+In-Reply-To: <20250901113826.6508-4-richardbgobert@gmail.com>
+References: <20250901113826.6508-1-richardbgobert@gmail.com>
+ <20250901113826.6508-4-richardbgobert@gmail.com>
+Subject: Re: [PATCH net-next v4 3/5] net: gso: restore ids of outer ip headers
+ correctly
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CYYPR11MB8431:EE_|PH3PPFBA2AA2BA3:EE_
-X-MS-Office365-Filtering-Correlation-Id: b21d152b-ac62-4bbc-eae6-08ddea4c062b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?MGR6ZW1IRkV0alNBRjhteDE3UkxQQUFQcFBINHJNSmtYMm5kOGNWT3doM0hj?=
- =?utf-8?B?V3U2Vnc0TS9wUGdYTzdDZW9CU1RmZWtJZCtycGloS2ZHbURwSmcyakhQbTBH?=
- =?utf-8?B?OWdPbGtnRnd2cm1NSEN4elpLZlpQT2tndmZZaXdxN3p0dlB2MHl4bUNrTW5r?=
- =?utf-8?B?dGtQaWpHZERGanh0aWtERTdndFpuL0YvSHRsckJOYXBQL2ZtZDJIU2hqZTlC?=
- =?utf-8?B?dDRIVVJPdzZJL045QjRzbEZMSGdjcC9hTmR5ZjZMS3g2eHJWVWVOa3UxSitO?=
- =?utf-8?B?cXl0cjBQU0s0QVA5NGxkZDZBVTBNMjk4UWpISXlpbXNPYW9JUUpOUE1RTm83?=
- =?utf-8?B?dWx3U0VWalgzaW5uNm5rT28xbHRxL0QvNWgxYzFZQU5hNDhHQ0RodWc0eS9Q?=
- =?utf-8?B?OW40T2ZUeS9JaFI4V1A5bjFjcHFnc3kxZmRzSTZjT2FnOXR6ZlROQkpyRUNh?=
- =?utf-8?B?c3dIeG1kRzNXN2szZEx0L3Qwd1BhTzBCTlJFZlFpVHdmelkvS09SQnNMQ0VV?=
- =?utf-8?B?RmxSNGMxbUlCTHV2TTJsemhzclhJSjJ2ek9KZjdwcS81TGNNK0h0TnJiQ2x6?=
- =?utf-8?B?VTdPdFVpc2tOSXdxemVaVzZtSEFhajlqbXU1UzV1WmRPUjhOc2g1ZStudTh6?=
- =?utf-8?B?ZGtLQkdvQTVsMnlHc1pKUUJYYXBLZzUwWkVrS2Q5cGtxMGl1WlhtTWttOE1j?=
- =?utf-8?B?WmJZT1dteEpjOWlGV0UzYzJJWDE1aVRHTmwveWdWOWhadGVwZWVzMzNTakV0?=
- =?utf-8?B?UkRVc2dEVk9FQkI0YkZ2UEZBLzdhUm56ZkFpc1U1SUlsa2drOEZ6eFZlQ1ZG?=
- =?utf-8?B?ODMrcWxRbDd4T2xEU080M3lGUXd5SnFtQUgzcFRIYUpXdkJXMDhoOUR5cHJ1?=
- =?utf-8?B?bnZydThFT0ZsQzNieDQ0U0tMWHY2SjNCSTAxc1hNU0FyL3RtL2NDbStlSXo1?=
- =?utf-8?B?cmJLbytiV0JpVWRhZGZHdGE2R0NzdlBsRFZ5bXNOaWxNWFhSazRLNWJsUTFD?=
- =?utf-8?B?YzJKR1BtUXNqZjJaem9MdzE1MGlvQ3VnbXlpOTd6OWFHbkpjK1ZheUNqdDd0?=
- =?utf-8?B?OVMzYnU3SEQ3dmVnb2hhdGZselNJYWFUZ3JJR2ZpTjllSm4yT1hkUUFjYlNP?=
- =?utf-8?B?bEd1YXRRRG8vaDNtYWI3dkIreFVQN01ETXZtRVpnZENXZFVlTGlMazBJV1NX?=
- =?utf-8?B?bkswL1FKV1B0Ny9CQ05Sa0YxelVabDhMUllzcWZGODUyVkF2ajl6NUhtZ0tY?=
- =?utf-8?B?T1VMczZmT1Z6VjIxMVJGSHRiaDNuMmh0RUN0VG9DcmQzODE0SHc0WFBZTEFj?=
- =?utf-8?B?VEl6b1Vody8rNHhieGRaU084NXFOa0g3L2xnamw0YkdtYTFqTkEvRzN3MmRu?=
- =?utf-8?B?NU9oYzJQS3F3eUNXb0tYODc4bUNHdGtnUjBDRm9XL0pNc0IvdGE3M2djaXNG?=
- =?utf-8?B?TnQ5am00QzVoRDIrbHdLN2hWV256NGpaeDRleHA5c1gvS0pDb29RUGpNNmlU?=
- =?utf-8?B?eG5sWVZ3eFM1UDVrUTZHT2t3TWRUMWxKMFlCbGoxbDdsTlNSSmZuN3NONTlu?=
- =?utf-8?B?SHY1Ni9tQ1NEUFp0aWJLd2UxSzkzNG1PVzJCcGVMUWliekQxZkFLMkpsT3Rn?=
- =?utf-8?B?UE9lV0htZlI3cUJPK2tTTXcrYUo5R2JvNUlFeDlscklDTHl2RFg1TmpnRVJY?=
- =?utf-8?B?MExyeCs1WGl6QkpFUXE4NFBwcVlFSnJVcnZ2ME1XQmRNTTdPVjBLUThoZVIr?=
- =?utf-8?B?VkJ6b3lORGlMbGx2bmY0Y3djQ0FpQUorODg2dE12ZG5qTHJVM3c1SDYxOVFZ?=
- =?utf-8?B?NVRRSFkxTVJoZXdMeE1KSkxuK2EzMGdrTU5VWjE5a2QxVWs3K2QvdmFiN1Zp?=
- =?utf-8?B?UW9QbmNvREw1K0xJeGV5aWNDZDVpYkRyeTE1WjhldEVTYVZaMUFBTXNHREZP?=
- =?utf-8?Q?BzOQSj0+TZg=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR11MB8431.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cE5Nc3VZalk0RTBaZjFpd3F6TzdONkxPdEVoSFpPTFNWTDhNYjEzYVZFYnhR?=
- =?utf-8?B?Kzdsd3lUWjVtejAzeWRWSmovSG83Y1RVcDdyTXRrcE4raVJiY3pLSGhML0hp?=
- =?utf-8?B?Q2d5a0kwOWhPVHV5UnNTUUlseTUvR0EwczRVWkIwZ0hIUk9BajlFV2NvZk5k?=
- =?utf-8?B?c08zeTZHS3E0ZnFpeXpvK0VacHZTK2c4WTB2Sy9GeWxJL1o3dm9vdlZVUitS?=
- =?utf-8?B?YzUrbzNidytHcktvbE1IYnZ2MmxzZ3FzcGVIYXRIWlhIVnJ6eUpyUHU2bjhI?=
- =?utf-8?B?N0VLM3hGNnFMaE5pR1FnQ2Z2SGxUUE43TUVhelRBWmFhYmEyVGdYek9yTzJi?=
- =?utf-8?B?K2ZWYWkrZVZqVWZ2Y0xsZUQveDYzYUFGT0F5Q1RVZmFSVldxVWhCZi8yZE5k?=
- =?utf-8?B?VVdCVVlOQm1iWW9kZkdyUzFaOHZUYXlMeFppR0tqL21Jakc0aU5TTlJwRWpP?=
- =?utf-8?B?Qk1CWTY3QnBybG5GTTNpcFV4OW5Bd3BoSDdEbXduTnA1UjgydWpYU0xSVFdw?=
- =?utf-8?B?TmxpZ2owVXJ1NXc0dERzYzNOZHgzaHRHUU1TM2dwOTNxRzZWdncxWG1ZNEpO?=
- =?utf-8?B?RWlFeEkxSXVhUm1NdUd4VlhjdCtwb3N0OHBaVXV3U0ZHTHRXbmJUV0h4SGhX?=
- =?utf-8?B?VG5kSEFjMUNlQithb093NXpZTFJtdm1zQndvK0RPSHZmbWtMelhRUGZRbU1N?=
- =?utf-8?B?TFk4Q0dqb2FMa2VpNmZFODFuVnFkeWhXTUgzZEk0OTJTV1ZCaUdXYUZ3UU9r?=
- =?utf-8?B?ZjdPZldkZ1p2YXBGbHhNLzdFamh6bDVQM3BhS21EamRCTjh3dUNNeFZrdExn?=
- =?utf-8?B?YVNncytJUHVEbnFMRjJIUFo5UzV4M1FycW1nTGV2d1YzWjVPbGhJRWdyL1po?=
- =?utf-8?B?MkhiVXVJK2ROaXRma0pLaGxveGNRcVUySDRJaWRFd1p1U0JQc0U1TG82VDc4?=
- =?utf-8?B?elJTcWx5dVhUbVFyMjJwR2ZwTTk1ODY0cWlxZmVRcFJmWjFZVXN3SDB1K2JU?=
- =?utf-8?B?WVY0Y2Q3OGttdkZRME1RM0V3QloxQVg4T1pxaG00RlhWK2JWUVRRWTJvbWZI?=
- =?utf-8?B?TS92T2Q2dlZXeTF3V0NkbXZLUDBTVS84RVN2MzdTbVpTUENiSTBrOHRxN0wr?=
- =?utf-8?B?SU1zdHIwUEJobnZSazVzYURGOGN6RkhzTk9zQXRMRmd2d2dpNng5MmtqT3ZW?=
- =?utf-8?B?MDUwbjJwdW1hUzhaVVdRbzRZN3dXNEZKLzJ0elhSZDRoenJ2Rkp4aHZ2N0ZQ?=
- =?utf-8?B?R1I0STJXaVIxZEl3YlFJUlIxZzE0ZGpHVlVuSm81M1ZhN3lKODJYTEcxeGVO?=
- =?utf-8?B?ZTR6R1BZRDNKZHJXOTkzdDN2R2M4b0ZjYTB0UUhKQlRFL05YMzh3NjZaOVht?=
- =?utf-8?B?d0E3UTNrTHlxM0gzdFlsTEd4bDIvSW00enMyRlV5czJnbUlOY3JTRkp6M3gv?=
- =?utf-8?B?UkV2ZmdGeDdDVURRa05UQ3pCWHF1NUkweURQVEtKNDNsLzRQTGluU1NQNTR2?=
- =?utf-8?B?NHJvcE1zaG9QclNJYlA0aUpsN0N5cHQrSjBaNklLRldyZEd0UlUvcWs5QWk5?=
- =?utf-8?B?Tk1uUUFXRDZZOGtkOVFaTkxteC9yRzludXc5UDZHZitIUmVSWklaWDJ3ZWQv?=
- =?utf-8?B?a3hkUDF3V24wemw2b2pJQ3RWMkR2WEJQSmlmN09jMHJhN1N5cE1SbG9VUVBk?=
- =?utf-8?B?YzNjb3BzYzRDNjN5ckI1eW16UkRibzQzRitRMTdxOHdHVTN0aTZ6VDd4OFdK?=
- =?utf-8?B?MEt4L0pIMmRHdC9nZDc3WU5abk9oalVBczY0WWd0Ukg4R3VqaGVSRXpyRlBQ?=
- =?utf-8?B?aExmcDd5eXhuRGpSaW1ndTZEWCtpMFFhUXM3MWNqekhDaHcyVlByc2w4R0kr?=
- =?utf-8?B?WGlMb1JLNS9SdFVFTFcvalZVdE9EaVRzcXlaeGVrQWlNa2IyajdrZ3Vmd09N?=
- =?utf-8?B?NU4wQnljakk5SnByb0VpRnJ2cCs2WWdacng3cW5zT014bE4zdThRMkVlY3lp?=
- =?utf-8?B?K0pnaGJBM2lMUldiRU41MHFMcGoxdm5ESkVDaXZaZld0MXdYa01aVXBmbDNN?=
- =?utf-8?B?TTJPT0gwZGY5Z2FLWFBva1pMNlorR0dzTi9tbUtNSSthMHlBVmtKdXJHR3J0?=
- =?utf-8?B?cDNHQUIwVzhDYlAySnZ2ZUQzV2ZrVks5L1hzeFAvV2dJSUgrVk9zREc5UHRZ?=
- =?utf-8?B?NUE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: b21d152b-ac62-4bbc-eae6-08ddea4c062b
-X-MS-Exchange-CrossTenant-AuthSource: CYYPR11MB8431.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2025 18:10:40.0528
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5fhu+A/jGkd9ryBPxBueyK5XHEXY1wLeClqkUQOAf7EkBy7mHuXVtBLwDb2rcMQseWxUvfS7wzc7OrPuLK/S15sLCFqwAnsgtbRI8dnltZ8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH3PPFBA2AA2BA3
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
+Richard Gobert wrote:
+> Currently, NETIF_F_TSO_MANGLEID indicates that the inner-most ID can
+> be mangled. Outer IDs can always be mangled.
+> 
+> Make GSO preserve outer IDs by default, with NETIF_F_TSO_MANGLEID allowing
+> both inner and outer IDs to be mangled.
+> 
+> This commit also modifies a few drivers that use SKB_GSO_FIXEDID directly.
+> 
+> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
+> ---
+>  .../networking/segmentation-offloads.rst        |  9 ++++-----
+>  drivers/net/ethernet/mellanox/mlx5/core/en_rx.c |  8 ++++++--
+>  drivers/net/ethernet/sfc/ef100_tx.c             | 17 +++++++++++++----
+>  include/linux/netdevice.h                       |  9 +++++++--
+>  include/linux/skbuff.h                          |  6 +++++-
+>  net/core/dev.c                                  |  4 +++-
+>  net/ipv4/af_inet.c                              | 13 ++++++-------
+>  net/ipv4/tcp_offload.c                          |  5 +----
+>  8 files changed, 45 insertions(+), 26 deletions(-)
+> 
+> diff --git a/Documentation/networking/segmentation-offloads.rst b/Documentation/networking/segmentation-offloads.rst
+> index 085e8fab03fd..d5dccfc6b82b 100644
+> --- a/Documentation/networking/segmentation-offloads.rst
+> +++ b/Documentation/networking/segmentation-offloads.rst
+> @@ -46,7 +46,9 @@ GSO type SKB_GSO_TCP_FIXEDID is specified then we will not increment the IP
+>  ID and all segments will use the same IP ID.  If a device has
+>  NETIF_F_TSO_MANGLEID set then the IP ID can be ignored when performing TSO
+>  and we will either increment the IP ID for all frames, or leave it at a
+> -static value based on driver preference.
+> +static value based on driver preference. For outer headers of encapsulated
+> +packets, the device drivers must guarantee that the IPv4 ID field is
+> +incremented in the case that a given header does not have the DF bit set.
 
+Please split this into three paragraphs on FIXEDID, FIXED_INNER and
+MANGLEID.
 
-On 8/29/2025 3:07 PM, Paul Menzel wrote:
-> [Cc: +linux-pci@vger.kernel.org]
-> 
-> Dear Madhu, dear Pavan,
-> 
-> 
-> Thank you for the patch.
-> 
-> 
-> Am 29.08.25 um 19:24 schrieb Madhu Chittim:
->> From: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
->>
->> At present IDPF supports only 0x1452 and 0x145C as PF and VF device IDs
->> on our current generation hardware. Future hardware exposes a new set of
->> device IDs for each generation. To avoid adding a new device ID for each
->> generation and to make the driver forward and backward compatible,
->> make use of the IDPF PCI programming interface to load the driver.
->>
->> Write and read the VF_ARQBAL mailbox register to find if the current
->> device is a PF or a VF.
->>
->> PCI SIG allocated a new programming interface for the IDPF compliant
->> ethernet network controller devices. It can be found at:
->> https://members.pcisig.com/wg/PCI-SIG/document/20113
->> with the document titled as 'PCI Code and ID Assignment Revision 1.16'
->> or any latest revisions.
-> 
-> Could you please add some information, how you tested this?
-> 
+Specifically the use of FIXEDID to mean uncapped or outer should be
+explicitly mentioned (as discussed previously).
 
-Thanks for the review.
+Also, I understood that MANGLEID now means that both inner and outer
+IP ID can be mangled. But this comment appears to say otherwise.
+Maybe it helps to be more explicit also about behavior without DF.
 
-I verified the changes in this patch by loading the driver on the 
-existing hardware which supports the 0x1452 and 0x145C device IDs and 
-new hardware which supports IDPF PCI programming interface.
+>  Partial Generic Segmentation Offload
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> index b8c609d91d11..505c4ce7cef8 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
 
-Sure, I will add this testing info to the commit message.
->> Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
->> Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
->> Signed-off-by: Madhu Chittim <madhu.chittim@intel.com>
->>
->> ---
->> v3:
->> - reworked logic to avoid gotos
->>
->> v2:
->> - replace *u8 with *bool in idpf_is_vf_device function parameter
->> - use ~0 instead of 0xffffff in PCI_DEVICE_CLASS parameter
->>
->> ---
->>
->> Signed-off-by: Madhu Chittim <madhu.chittim@intel.com>
-> 
-> This looks like a stray line, but will probably be ignored, when applied.
-> 
+> diff --git a/drivers/net/ethernet/sfc/ef100_tx.c b/drivers/net/ethernet/sfc/ef100_tx.c
+> index e6b6be549581..24971346df00 100644
+> --- a/drivers/net/ethernet/sfc/ef100_tx.c
+> +++ b/drivers/net/ethernet/sfc/ef100_tx.c
 
-Will fix it.
+Not sure whether these driver changes need to be separate patches.
 
->> ---
->>   drivers/net/ethernet/intel/idpf/idpf.h        |  1 +
->>   drivers/net/ethernet/intel/idpf/idpf_main.c   | 73 ++++++++++++++-----
->>   drivers/net/ethernet/intel/idpf/idpf_vf_dev.c | 37 ++++++++++
->>   3 files changed, 94 insertions(+), 17 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ 
->> ethernet/intel/idpf/idpf.h
->> index c56abf8b4c92..4a16e481faf7 100644
->> --- a/drivers/net/ethernet/intel/idpf/idpf.h
->> +++ b/drivers/net/ethernet/intel/idpf/idpf.h
->> @@ -1041,6 +1041,7 @@ void idpf_mbx_task(struct work_struct *work);
->>   void idpf_vc_event_task(struct work_struct *work);
->>   void idpf_dev_ops_init(struct idpf_adapter *adapter);
->>   void idpf_vf_dev_ops_init(struct idpf_adapter *adapter);
->> +int idpf_is_vf_device(struct pci_dev *pdev, bool *is_vf);
->>   int idpf_intr_req(struct idpf_adapter *adapter);
->>   void idpf_intr_rel(struct idpf_adapter *adapter);
->>   u16 idpf_get_max_tx_hdr_size(struct idpf_adapter *adapter);
->> diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/ 
->> net/ethernet/intel/idpf/idpf_main.c
->> index 8c46481d2e1f..493604d50143 100644
->> --- a/drivers/net/ethernet/intel/idpf/idpf_main.c
->> +++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
->> @@ -7,11 +7,57 @@
->>   #define DRV_SUMMARY    "Intel(R) Infrastructure Data Path Function 
->> Linux Driver"
->> +#define IDPF_NETWORK_ETHERNET_PROGIF                0x01
->> +#define IDPF_CLASS_NETWORK_ETHERNET_PROGIF            \
->> +    (PCI_CLASS_NETWORK_ETHERNET << 8 | IDPF_NETWORK_ETHERNET_PROGIF)
->> +
->>   MODULE_DESCRIPTION(DRV_SUMMARY);
->>   MODULE_IMPORT_NS("LIBETH");
->>   MODULE_IMPORT_NS("LIBETH_XDP");
->>   MODULE_LICENSE("GPL");
->> +/**
->> + * idpf_dev_init - Initialize device specific parameters
->> + * @adapter: adapter to initialize
->> + * @ent: entry in idpf_pci_tbl
->> + *
->> + * Return: %0 on success, -%errno on failure.
->> + */
->> +static int idpf_dev_init(struct idpf_adapter *adapter,
->> +             const struct pci_device_id *ent)
->> +{
->> +    bool is_vf = false;
->> +    int err;
->> +
->> +    if (ent->class == IDPF_CLASS_NETWORK_ETHERNET_PROGIF) {
->> +        err = idpf_is_vf_device(adapter->pdev, &is_vf);
->> +        if (err)
->> +            return err;
->> +        if (is_vf) {
->> +            idpf_vf_dev_ops_init(adapter);
->> +            adapter->crc_enable = true;
->> +        } else {
->> +            idpf_dev_ops_init(adapter);
->> +        }
->> +
->> +        return 0;
->> +    }
->> +
->> +    switch (ent->device) {
->> +    case IDPF_DEV_ID_PF:
->> +        idpf_dev_ops_init(adapter);
->> +        break;
->> +    case IDPF_DEV_ID_VF:
->> +        idpf_vf_dev_ops_init(adapter);
->> +        adapter->crc_enable = true;
->> +        break;
->> +    default:
->> +        return -ENODEV;
->> +    }
->> +
->> +    return 0;
->> +}
->> +
->>   /**
->>    * idpf_remove - Device removal routine
->>    * @pdev: PCI device information struct
->> @@ -165,21 +211,6 @@ static int idpf_probe(struct pci_dev *pdev, const 
->> struct pci_device_id *ent)
->>       adapter->req_tx_splitq = true;
->>       adapter->req_rx_splitq = true;
->> -    switch (ent->device) {
->> -    case IDPF_DEV_ID_PF:
->> -        idpf_dev_ops_init(adapter);
->> -        break;
->> -    case IDPF_DEV_ID_VF:
->> -        idpf_vf_dev_ops_init(adapter);
->> -        adapter->crc_enable = true;
->> -        break;
->> -    default:
->> -        err = -ENODEV;
->> -        dev_err(&pdev->dev, "Unexpected dev ID 0x%x in idpf probe\n",
->> -            ent->device);
->> -        goto err_free;
->> -    }
->> -
->>       adapter->pdev = pdev;
->>       err = pcim_enable_device(pdev);
->>       if (err)
->> @@ -259,11 +290,18 @@ static int idpf_probe(struct pci_dev *pdev, 
->> const struct pci_device_id *ent)
->>       /* setup msglvl */
->>       adapter->msg_enable = netif_msg_init(-1, IDPF_AVAIL_NETIF_M);
->> +    err = idpf_dev_init(adapter, ent);
->> +    if (err) {
->> +        dev_err(&pdev->dev, "Unexpected dev ID 0x%x in idpf probe\n",
->> +            ent->device);
->> +        goto destroy_vc_event_wq;
->> +    }
->> +
->>       err = idpf_cfg_hw(adapter);
->>       if (err) {
->>           dev_err(dev, "Failed to configure HW structure for adapter: 
->> %d\n",
->>               err);
->> -        goto err_cfg_hw;
->> +        goto destroy_vc_event_wq;
->>       }
->>       mutex_init(&adapter->vport_ctrl_lock);
->> @@ -284,7 +322,7 @@ static int idpf_probe(struct pci_dev *pdev, const 
->> struct pci_device_id *ent)
->>       return 0;
->> -err_cfg_hw:
->> +destroy_vc_event_wq:
->>       destroy_workqueue(adapter->vc_event_wq);
->>   err_vc_event_wq_alloc:
->>       destroy_workqueue(adapter->stats_wq);
->> @@ -304,6 +342,7 @@ static int idpf_probe(struct pci_dev *pdev, const 
->> struct pci_device_id *ent)
->>   static const struct pci_device_id idpf_pci_tbl[] = {
->>       { PCI_VDEVICE(INTEL, IDPF_DEV_ID_PF)},
->>       { PCI_VDEVICE(INTEL, IDPF_DEV_ID_VF)},
->> +    { PCI_DEVICE_CLASS(IDPF_CLASS_NETWORK_ETHERNET_PROGIF, ~0)},
->>       { /* Sentinel */ }
->>   };
->>   MODULE_DEVICE_TABLE(pci, idpf_pci_tbl);
->> diff --git a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c b/drivers/ 
->> net/ethernet/intel/idpf/idpf_vf_dev.c
->> index 7527b967e2e7..09cccdf45b50 100644
->> --- a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
->> +++ b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
->> @@ -7,6 +7,43 @@
->>   #define IDPF_VF_ITR_IDX_SPACING        0x40
->> +#define IDPF_VF_TEST_VAL        0xFEED0000
->> +
->> +/**
->> + * idpf_is_vf_device - Helper to find if it is a VF device
->> + * @pdev: PCI device information struct
->> + * @is_vf: used to update VF device status
->> + *
->> + * Return: %0 on success, -%errno on failure.
->> + */
->> +int idpf_is_vf_device(struct pci_dev *pdev, bool *is_vf)
->> +{
->> +    struct resource mbx_region;
->> +    resource_size_t mbx_start;
->> +    void __iomem *mbx_addr;
->> +    long len;
-> 
-> Use size_t?
-> 
->      include/linux/ioport.h:static inline resource_size_t 
-> resource_size(const struct resource *res)
-> 
-> 
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index f3a3b761abfb..3d19c888b839 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -5290,13 +5290,18 @@ void skb_warn_bad_offload(const struct sk_buff *skb);
+>  
+>  static inline bool net_gso_ok(netdev_features_t features, int gso_type)
+>  {
+> -	netdev_features_t feature = (netdev_features_t)gso_type << NETIF_F_GSO_SHIFT;
+> +	netdev_features_t feature;
+> +
+> +	if (gso_type & (SKB_GSO_TCP_FIXEDID | SKB_GSO_TCP_FIXEDID_INNER))
+> +		gso_type |= __SKB_GSO_TCP_FIXEDID;
+> +
+> +	feature = ((netdev_features_t)gso_type << NETIF_F_GSO_SHIFT) & NETIF_F_GSO_MASK;
+>  
+>  	/* check flags correspondence */
+>  	BUILD_BUG_ON(SKB_GSO_TCPV4   != (NETIF_F_TSO >> NETIF_F_GSO_SHIFT));
+>  	BUILD_BUG_ON(SKB_GSO_DODGY   != (NETIF_F_GSO_ROBUST >> NETIF_F_GSO_SHIFT));
+>  	BUILD_BUG_ON(SKB_GSO_TCP_ECN != (NETIF_F_TSO_ECN >> NETIF_F_GSO_SHIFT));
+> -	BUILD_BUG_ON(SKB_GSO_TCP_FIXEDID != (NETIF_F_TSO_MANGLEID >> NETIF_F_GSO_SHIFT));
+> +	BUILD_BUG_ON(__SKB_GSO_TCP_FIXEDID != (NETIF_F_TSO_MANGLEID >> NETIF_F_GSO_SHIFT));
+>  	BUILD_BUG_ON(SKB_GSO_TCPV6   != (NETIF_F_TSO6 >> NETIF_F_GSO_SHIFT));
+>  	BUILD_BUG_ON(SKB_GSO_FCOE    != (NETIF_F_FSO >> NETIF_F_GSO_SHIFT));
+>  	BUILD_BUG_ON(SKB_GSO_GRE     != (NETIF_F_GSO_GRE >> NETIF_F_GSO_SHIFT));
+> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> index ca8be45dd8be..cf95b325f9b4 100644
+> --- a/include/linux/skbuff.h
+> +++ b/include/linux/skbuff.h
+> @@ -674,7 +674,7 @@ enum {
+>  	/* This indicates the tcp segment has CWR set. */
+>  	SKB_GSO_TCP_ECN = 1 << 2,
+>  
+> -	SKB_GSO_TCP_FIXEDID = 1 << 3,
+> +	__SKB_GSO_TCP_FIXEDID = 1 << 3,
+>  
+>  	SKB_GSO_TCPV6 = 1 << 4,
+>  
+> @@ -707,6 +707,10 @@ enum {
+>  	SKB_GSO_FRAGLIST = 1 << 18,
+>  
+>  	SKB_GSO_TCP_ACCECN = 1 << 19,
+> +
+> +	/* These don't correspond with netdev features. */
 
-Will fix it.
->> +
->> +    resource_set_range(&mbx_region,    VF_BASE, IDPF_VF_MBX_REGION_SZ);
->> +
->> +    mbx_start = pci_resource_start(pdev, 0) + mbx_region.start;
->> +    len = resource_size(&mbx_region);
->> +
->> +    mbx_addr = ioremap(mbx_start, len);
->> +    if (!mbx_addr)
->> +        return -EIO;
-> 
-> Should some kind of error be printed with a hint, what the user could do?
-> 
+Can use clarification. Something like
 
-Sure, will add a print here.
+    /* These indirectly together map onto the same netdev feature:
+     * If NETIF_F_TSO_MANGLE is set it may mangle both inner and outer.
+     */
+> +	SKB_GSO_TCP_FIXEDID = 1 << 30,
+> +	SKB_GSO_TCP_FIXEDID_INNER = 1 << 31,
+>  };
+>  
+>  #if BITS_PER_LONG > 32
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 93a25d87b86b..f57c8dbf307f 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -3769,7 +3769,9 @@ static netdev_features_t gso_features_check(const struct sk_buff *skb,
+>  		features &= ~dev->gso_partial_features;
+>  
+>  	/* Make sure to clear the IPv4 ID mangling feature if the
+> -	 * IPv4 header has the potential to be fragmented.
+> +	 * IPv4 header has the potential to be fragmented. For
+> +	 * encapsulated packets, the outer headers are guaranteed to
+> +	 * have incrementing IDs if DF is not set.
 
->> +
->> +    writel(IDPF_VF_TEST_VAL, mbx_addr + VF_ARQBAL - VF_BASE);
->> +
->> +    /* Force memory write to complete before reading it back */
->> +    wmb();
->> +
->> +    *is_vf = readl(mbx_addr + VF_ARQBAL - VF_BASE) == IDPF_VF_TEST_VAL;
->> +
->> +    iounmap(mbx_addr);
->> +
->> +    return 0;
->> +}
->> +
->>   /**
->>    * idpf_vf_ctlq_reg_init - initialize default mailbox registers
->>    * @adapter: adapter structure
-> 
+This is saying that if !DF then both inner and outer must be
+incrementing?
 
-Thanks,
-Pavan
+Maybe the outer headers are [also] garuanteed to have incrementing IDs.
+
+>  	 */
+>  	if (skb_shinfo(skb)->gso_type & SKB_GSO_TCPV4) {
+>  		struct iphdr *iph = skb->encapsulation ?
+> diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+> index 76e38092cd8a..fc7a6955fa0a 100644
+> --- a/net/ipv4/af_inet.c
+> +++ b/net/ipv4/af_inet.c
+> @@ -1393,14 +1393,13 @@ struct sk_buff *inet_gso_segment(struct sk_buff *skb,
+>  
+>  	segs = ERR_PTR(-EPROTONOSUPPORT);
+>  
+> -	if (!skb->encapsulation || encap) {
+> -		udpfrag = !!(skb_shinfo(skb)->gso_type & SKB_GSO_UDP);
+> -		fixedid = !!(skb_shinfo(skb)->gso_type & SKB_GSO_TCP_FIXEDID);
+> +	/* fixed ID is invalid if DF bit is not set */
+> +	fixedid = !!(skb_shinfo(skb)->gso_type & (SKB_GSO_TCP_FIXEDID << encap));
+> +	if (fixedid && !(ip_hdr(skb)->frag_off & htons(IP_DF)))
+> +		goto out;
+>  
+> -		/* fixed ID is invalid if DF bit is not set */
+> -		if (fixedid && !(ip_hdr(skb)->frag_off & htons(IP_DF)))
+> -			goto out;
+> -	}
+> +	if (!skb->encapsulation || encap)
+> +		udpfrag = !!(skb_shinfo(skb)->gso_type & SKB_GSO_UDP);
+>  
+>  	ops = rcu_dereference(inet_offloads[proto]);
+>  	if (likely(ops && ops->callbacks.gso_segment)) {
+> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+> index 1949eede9ec9..e6612bd84d09 100644
+> --- a/net/ipv4/tcp_offload.c
+> +++ b/net/ipv4/tcp_offload.c
+> @@ -471,7 +471,6 @@ INDIRECT_CALLABLE_SCOPE int tcp4_gro_complete(struct sk_buff *skb, int thoff)
+>  	const u16 offset = NAPI_GRO_CB(skb)->network_offsets[skb->encapsulation];
+>  	const struct iphdr *iph = (struct iphdr *)(skb->data + offset);
+>  	struct tcphdr *th = tcp_hdr(skb);
+> -	bool is_fixedid;
+>  
+>  	if (unlikely(NAPI_GRO_CB(skb)->is_flist)) {
+>  		skb_shinfo(skb)->gso_type |= SKB_GSO_FRAGLIST | SKB_GSO_TCPV4;
+> @@ -485,10 +484,8 @@ INDIRECT_CALLABLE_SCOPE int tcp4_gro_complete(struct sk_buff *skb, int thoff)
+>  	th->check = ~tcp_v4_check(skb->len - thoff, iph->saddr,
+>  				  iph->daddr, 0);
+>  
+> -	is_fixedid = (NAPI_GRO_CB(skb)->ip_fixedid >> skb->encapsulation) & 1;
+> -
+>  	skb_shinfo(skb)->gso_type |= SKB_GSO_TCPV4 |
+> -			(is_fixedid * SKB_GSO_TCP_FIXEDID);
+> +			(NAPI_GRO_CB(skb)->ip_fixedid * SKB_GSO_TCP_FIXEDID);
+
+This was only just introduced. And is still needed?
 
 
