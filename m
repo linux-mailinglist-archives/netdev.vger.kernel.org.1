@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-219348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFF5FB41076
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 01:01:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16327B4107C
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 01:01:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7705D560B0D
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:01:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4BDD61B65711
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:01:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B144827FD4A;
-	Tue,  2 Sep 2025 23:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29143281509;
+	Tue,  2 Sep 2025 23:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MxALRath"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CGMAmvIZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 896F427FD43;
-	Tue,  2 Sep 2025 23:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8143281355;
+	Tue,  2 Sep 2025 23:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756854027; cv=none; b=JD8QORQLEVv4YF7SIIVnb3AZ65X8MOT7FjcfNSNkb+1514orhgCGlJxFWmOTLEOG5sHM3gCuaVTcx1MAXb862KArs5puiTvQXs48u+EyNl3uDiDlyDsHYgKJMlQGj8n56POkwOQdo73+YEebaaB7US/aD89qhYYGtfCmiMY2AVM=
+	t=1756854029; cv=none; b=g+g6a2e9a8PmHYUsvAmf+fazEp7GqzO7hbW0g0mUMz+RBX9fh1pNFf0xG4CUiCV0i/43tiTCsbnIK8HaK6mJymymKDN0KMDrP0G735F47SLCN9BIykygsc+aF1f2ja0ya4aEmU5F75lcIJ/9m37sqwsLMRl9x7aDVeBmZ55FBl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756854027; c=relaxed/simple;
-	bh=PMbDPBrZdFBF3Ihh1G6syUjIrq/w8TfmNFEsm1gU2Cs=;
+	s=arc-20240116; t=1756854029; c=relaxed/simple;
+	bh=ldKXHRIdtC8D8CKjW2kgvIiONDfw78+RUUmAdaFbfNw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=O3HyJcHSnvfZqgON+gkf6ft5iqumfcuYqXpe0DMsVnXnSD8VDBS11A1B1EuJEhFRal7G6cXKt+s5j0Qx4mrJRxSoVABqZDHPZ4cjamOQcWNem8ePGowqPSZbTcEB2ZCneYl4GQpQe4Xr5eH9fvh6mCxZjvZLmM5lwmb8KhZlPi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MxALRath; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FF5CC4CEF4;
-	Tue,  2 Sep 2025 23:00:27 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=iTQDTiQH6uK/1dbUpkAvCLeC/qKneyxQkT0wwdzGrSdYj62zrtX4xu1zbf1X6kSaDHcV7JykVjCMjH3WSQzWJBl5dUPPZLvwnzT4n1DChvT5ZbD7A81q2jVhpJYGhiOFsfKN0iNb/xu1YMljpgSzlM5vvSoVAqyLsZyx/o//+GE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CGMAmvIZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88621C4CEED;
+	Tue,  2 Sep 2025 23:00:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756854027;
-	bh=PMbDPBrZdFBF3Ihh1G6syUjIrq/w8TfmNFEsm1gU2Cs=;
+	s=k20201202; t=1756854028;
+	bh=ldKXHRIdtC8D8CKjW2kgvIiONDfw78+RUUmAdaFbfNw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MxALRathGDdhPuinntMxnTrfrvhKvi6jWBzMQBT2FwIALAFINjyscWqFhxkbqDu5a
-	 QkMH4CmpqDKITcENJJED9XS6uoh5ZVErHXmSsNRThCxZ+5wwPC0pNQf0THJG+PS/2D
-	 c3i+Z6zQ09/nfdfVgFBXt/F+pNcsq3pAMrbKfZftcxOuKVLw9GeSwSBCLjR8bbRCj8
-	 aiGvlE14LAOiJqhc/TG4gSS47kUAX7Y6cbu5/i0GxyRJXplaJUKMZdHcxhbbjgAwCF
-	 YIC6eNbvSlKNx2YuuI/h4NwIKdM1aj6eXzRxCJhdTa0P2w64PHCFfQUC1mu7uEoXqR
-	 1mGSJEud1f9TQ==
+	b=CGMAmvIZodvrESv2U1qIkC4+9WI6Sp2gdKtpuTTaXLRV/53Ql5EkActtppPKNDQXW
+	 S9zqzZcUby42omJy6qCOqztqH0rUQqIIRmtztC3mez8u0RVplppEHrfCqpyByvFO50
+	 uMTsCKN2Ippxm5VtOsiy89Ux+uDJpnV0Ozl+yJCWcSoILmHUpW3sdM8TTrKT8oFuc7
+	 KxOME3dpTBjGPTKqYLUNZ2JV0XJ/xrN/fsdiLr7C5pU4p7u5iJy0alvIiiZ3IsCxVK
+	 HGpkIx7HhfqMMfHfmJk2UMEix8ipkf9iv3VOQzu2r0neVM77Q/xrb35CdyqQ/SkrEx
+	 8GbcjEf/+aH3g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF19383BF64;
-	Tue,  2 Sep 2025 23:00:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C42383BF64;
+	Tue,  2 Sep 2025 23:00:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] bonding: Remove support for use_carrier
+Subject: Re: [PATCH net-next] net: selftests: clean up
+ tools/testing/selftests/net/lib/py/utils.py
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175685403232.461360.16040068795389077182.git-patchwork-notify@kernel.org>
-Date: Tue, 02 Sep 2025 23:00:32 +0000
-References: <2029487.1756512517@famine>
-In-Reply-To: <2029487.1756512517@famine>
-To: Jay Vosburgh <jv@jvosburgh.net>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
- andrew+netdev@lunn.ch, linux-doc@vger.kernel.org
+ <175685403374.461360.9565964060103955887.git-patchwork-notify@kernel.org>
+Date: Tue, 02 Sep 2025 23:00:33 +0000
+References: <20250901-fix-v1-1-df0abb67481e@debian.org>
+In-Reply-To: <20250901-fix-v1-1-df0abb67481e@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 29 Aug 2025 17:08:37 -0700 you wrote:
-> Remove the implementation of use_carrier, the link monitoring
-> method that utilizes ethtool or ioctl to determine the link state of an
-> interface in a bond.  Bonding will always behaves as if use_carrier=1,
-> which relies on netif_carrier_ok() to determine the link state of
-> interfaces.
+On Mon, 01 Sep 2025 03:00:07 -0700 you wrote:
+> This patch improves the utils.py module by removing unused imports
+> (errno, random), simplifying the fd_read_timeout() function by
+> eliminating unnecessary else clause, and cleaning up code style in the
+> defer class constructor.
 > 
-> 	To avoid acquiring RTNL many times per second, bonding inspects
-> link state under RCU, but not under RTNL.  However, ethtool
-> implementations in drivers may sleep, and therefore this strategy is
-> unsuitable for use with calls into driver ethtool functions.
+> Additionally, it renames the parameter in rand_port() from 'type' to
+> 'stype' to avoid shadowing the built-in Python name 'type', improving
+> code clarity and preventing potential issues.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] bonding: Remove support for use_carrier
-    https://git.kernel.org/netdev/net-next/c/23a6037ce76c
+  - [net-next] net: selftests: clean up tools/testing/selftests/net/lib/py/utils.py
+    https://git.kernel.org/netdev/net-next/c/23313771c7b9
 
 You are awesome, thank you!
 -- 
