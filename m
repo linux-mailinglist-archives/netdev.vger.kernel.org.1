@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-219128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5EE0B40067
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 14:27:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0839B40033
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 14:22:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E32A354701C
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 12:21:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A84447B5760
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 12:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA92F286429;
-	Tue,  2 Sep 2025 12:19:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F47D2C0266;
+	Tue,  2 Sep 2025 12:21:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f+4Y08xb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XGb78nSj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B711A3165;
-	Tue,  2 Sep 2025 12:19:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A452288C13;
+	Tue,  2 Sep 2025 12:21:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756815552; cv=none; b=obGK5soL65EH4y0s9wmIqPYwztCrCQKEQ/wGUWGZoAdAa/cjyXFRP7xZdJB7ooSk09CFSsX4Haxf9clsIv/MUCjX2Givihwi1fpoP7e+Dj6ujqfQNU0Mjd/Sgxwe8dda629yWCYwmRBCNty5dotlDhdNdTmZlTdE5BOcgGOtHzc=
+	t=1756815705; cv=none; b=C0UM7gIWKTgVmi0qsDTYJ9P8ntQWLC8zYBMMGlYBe4ZY1DYAtxnVQnC+MVZT4kDkODOI0N+m1qLOoAsfgAOkv4Y/hLIfv209tUl8BHx02+MeimpS5+te0WiMfZFB+9Q+euJtOeLr2p7i1ZcWRuOLg3oCt6NKrkNfyGE+AaEDTAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756815552; c=relaxed/simple;
-	bh=4cQJpJiSmH7L4G141bXjSx+04YOuTBt9WhjwQ9ojNAI=;
+	s=arc-20240116; t=1756815705; c=relaxed/simple;
+	bh=Xi9w2U0e+LihW+mNY3AWJK5Jdc9jrdixQXdotyzWyfU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Mn1NPEdP0Scx700zc6UsUU9morK5ClFdW8cae5SlQYIn6uANn5J65Fy4BaqLi9JgWxHa+uPQMWiTteyckY87xg4tGnxDoqHUMOY1eNpuFrIMT9RUUcmiRgVUfMSOlyRucSeSXOMlosUW4Ev6ElSsEgccBBw1EmuSCJhue6kWGEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f+4Y08xb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB1E6C4CEED;
-	Tue,  2 Sep 2025 12:19:09 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=Druf9bHLNux3ja6TM0MNtl76EFj9F1hs8tMLx4wzMSWG7lGEpxYrr+EFIahQ+2EC3nlez0HVpS8OUID6JGpNP5u9oXMjgu1aNrHYwwXteTs26+qvZUS5gLAQ8v2WsrzcFPOhmAayaDpQSCQMB6WKCW2hLAOHwa6iuOCNItPYSP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XGb78nSj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BEFFC4CEED;
+	Tue,  2 Sep 2025 12:21:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756815552;
-	bh=4cQJpJiSmH7L4G141bXjSx+04YOuTBt9WhjwQ9ojNAI=;
+	s=k20201202; t=1756815703;
+	bh=Xi9w2U0e+LihW+mNY3AWJK5Jdc9jrdixQXdotyzWyfU=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=f+4Y08xbkPlDuXd39+vQdmBmZ+o4Xopyp3RoA9DgKYoJn365ffFrI3WtiTaNy1jba
-	 6mZeqgD7YpRN+3qMivtTrNqBUGHfX9T6465LzygPB4btmetLxytSFfRfnBafCT1lZ4
-	 6ikW0SvfhHnTyH9DK7iraakKeX8armz2SQdRbpoZbnM0v4bnazvr9jAOT08BCUOPJv
-	 vM32NJaGNNHeIEjHXDUHTW0u5ScU22ouf2Dq2J/G/ZTX5fX7GEelQEfz56jPXuuqGP
-	 avE3A233hEUU8OylSG7ffLQTdcGlS2+i53jEXRn1R+nBDeOns8llA3XIaKEaTIHl/x
-	 d464JQ7+XUgfA==
-Message-ID: <55c512d6-6be4-41c2-b417-9f803c1c118d@kernel.org>
-Date: Tue, 2 Sep 2025 14:19:07 +0200
+	b=XGb78nSjyqEwWDPtWYjqcuclZAEgum8p0u/VNY8w+i1KpaD0C2eU7R3e3kJDoLmTE
+	 S2YjLdMMJ4xTracw8gkXaLrAVR+TCc7oO4LRXch9bQSZCH4jsuIF7g8bU0ARaxS4Hv
+	 V3ISsocEs9Q1EgNSpeMgwTO54MqHAo8nNpCRm3xjZouc2O/HAeoVeLQx58SHx9oDxB
+	 uFoOgmRFV56FKCQKmhMnmid5CLs86dRvcPDXK2d0S6Qik2HWJoCF1SSFDStWw/WkVe
+	 DIJKf8j7eM4vj0bjLQIWgB7OVTqAb6ILFoq/y+5Rv4C01N+e6UkUe49NFX+tFzpOBS
+	 N/hz2Fqgph2mA==
+Message-ID: <5ec3efce-653c-46c5-977f-5a46391e675f@kernel.org>
+Date: Tue, 2 Sep 2025 14:21:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,13 +50,28 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3] net: nfc: nci: Increase NCI_DATA_TIMEOUT to
- 3000 ms
-To: =?UTF-8?Q?Juraj_=C5=A0arinay?= <juraj@sarinay.com>, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, mingo@kernel.org,
- tglx@linutronix.de
-References: <20250902113630.62393-1-juraj@sarinay.com>
+Subject: Re: [PATCH net-next 01/10] dt-bindings: net: pcs: renesas,rzn1-miic:
+ Document RZ/T2H and RZ/N2H SoCs
+To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Cc: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Philipp Zabel
+ <p.zabel@pengutronix.de>, Geert Uytterhoeven <geert+renesas@glider.be>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ Wolfram Sang <wsa+renesas@sang-engineering.com>,
+ linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Biju Das <biju.das.jz@bp.renesas.com>,
+ Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+ Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+References: <20250901224327.3429099-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250901224327.3429099-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250902-enlightened-hidden-copperhead-4eefdf@kuoka>
+ <CA+V-a8sSiNQ6W-ggmL8PP_G1sFq170DS1LJLFJs_WW0RC+XVEw@mail.gmail.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -102,28 +117,58 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20250902113630.62393-1-juraj@sarinay.com>
+In-Reply-To: <CA+V-a8sSiNQ6W-ggmL8PP_G1sFq170DS1LJLFJs_WW0RC+XVEw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 02/09/2025 13:36, Juraj Šarinay wrote:
-> An exchange with a NFC target must complete within NCI_DATA_TIMEOUT.
-> A delay of 700 ms is not sufficient for cryptographic operations on smart
-> cards. CardOS 6.0 may need up to 1.3 seconds to perform 256-bit ECDH
-> or 3072-bit RSA. To prevent brute-force attacks, passports and similar
-> documents introduce even longer delays into access control protocols
-> (BAC/PACE).
+On 02/09/2025 14:17, Lad, Prabhakar wrote:
+>>>    power-domains:
+>>>      maxItems: 1
+>>> @@ -60,11 +77,11 @@ patternProperties:
+>>>      properties:
+>>>        reg:
+>>>          description: MII Converter port number.
+>>> -        enum: [1, 2, 3, 4, 5]
+>>
+>> Why?
+>>
+> If I keep this here and just adjust the below for RZ/T2H case I do get errors:
 > 
-> The timeout should be higher, but not too much. The expiration allows
-> us to detect that a NFC target has disappeared.
+> reg:
+>   enum: [0, 1, 2, 3]
 > 
-> Signed-off-by: Juraj Šarinay <juraj@sarinay.com>
-> ---
-> v3:
+> 
+> arch/arm64/boot/dts/renesas/r9a09g077m44-rzt2h-evk.dtb: ethss@80110000
+> (renesas,r9a09g077-miic): mii-conv@0:reg:0:0: 0 is not one of [1, 2,
+> 3, 4, 5]
+>     from schema $id:
+> http://devicetree.org/schemas/net/pcs/renesas,rzn1-miic.yaml#
+> 
+> Any pointers on how to handle this case?
 
-Thanks!
+So please grow this with '0' to cover the widest choices, which you then
+narrow in individual if:then:.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+The trouble with your if:then: is that they are huge and they also nest
+patterns and if:then:.
+
+This often is less maintainable, so maybe you should consider having two
+separate binding files? You can have also common-shared properties.
+Anyway, I am fine with current approach of one binding as well, so up to
+you folks.
+
+
+> 
+>>>
+>>>        renesas,miic-input:
+>>>          description: Converter input port configuration. This value should use
+>>> -          one of the values defined in dt-bindings/net/pcs-rzn1-miic.h.
+>>> +          one of the values defined in dt-bindings/net/pcs-rzn1-miic.h for RZ/N1 SoC
+>>> +          and include/dt-bindings/net/pcs-rzt2h-miic.h for RZ/{T2H, N2H} SoCs.
+>>>          $ref: /schemas/types.yaml#/definitions/uint32
+>>>
+
+
 
 Best regards,
 Krzysztof
