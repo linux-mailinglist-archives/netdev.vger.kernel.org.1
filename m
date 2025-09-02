@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-219377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01A2CB410E4
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 01:40:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B666BB410F5
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 01:50:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B93F18917D5
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:40:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 862F2541032
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:50:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FE962E11DC;
-	Tue,  2 Sep 2025 23:40:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 081782EA47F;
+	Tue,  2 Sep 2025 23:50:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W2Su4P4P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mVQVKfbu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E045B2DEA8E
-	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 23:40:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D40F6274B51;
+	Tue,  2 Sep 2025 23:50:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756856409; cv=none; b=XYBRYKZ8/EOyBpPRr3rPjxhSyD7FaZlIeNaFY6K2Snn+XvXG77vbFBQszSpyF/7CRsJqkouTgVZeWjaM8rXBVRegDoQbXc4Znq8B6c8N6euIIYVdefvtjyLRvEIwiR6BQteAi3mdUTx7H+6oveNQ2mNrJmYx/2XMX1LvpZPn0D8=
+	t=1756857003; cv=none; b=FVoNIY09SqN5ld/WxbOTOMEfAzkd7YVXhva8MhtEGXSARC+22jLuo6ZfFilpu/xrKMzj1nZiRBwWwwKEz5bQHHWKdCeM+cYkCRfkjnAl2A/5+5dUKezXqoM8NgKXS5R/zCJoE6OGhTGZPhE2iTec2rqi3G4fK1oMLrN1LlKx2bo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756856409; c=relaxed/simple;
-	bh=xiSbhy6xi8odfOfmGuOvnEhzww7V0vgjvJL+Sda29Q8=;
+	s=arc-20240116; t=1756857003; c=relaxed/simple;
+	bh=9U/Ky3yNBRcz05JV+fG2x+dIoICYXW+AY/iTU6QURg0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JTKEyJYzcQ2EyJPLvA+W7EFV/+qGyX0oHpwMBaMK/MvnXH8WLi3fvC+2s+U7BBrt0e/sxd7EhnQXocnpZdaLI2TZc0KOM8qwOmO6X9K3zbxV/D6HsPqWbIknHcNRYKXboIAIvTreHDGUqUXjNyAI5MBDxDj1Wy2Vp/zs2O6Jvrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W2Su4P4P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58C57C4CEED;
-	Tue,  2 Sep 2025 23:40:06 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=SzZhR7bhRdCbjt9RQ0Q6tETJbpEhQk8gN4TNiiBj09aip/jA6w4FFP9wDZXGk6PrKIXuSa8Q+exy4mv4Mroil4ANrcje8nT2aLa9C/+jHlh/sJazZ3UXLmWLAXCaxKvijSA6KjPeQSaeG1gKb+0y069PO+dKzRDTTmjZhzQZNI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mVQVKfbu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61010C4CEED;
+	Tue,  2 Sep 2025 23:50:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756856406;
-	bh=xiSbhy6xi8odfOfmGuOvnEhzww7V0vgjvJL+Sda29Q8=;
+	s=k20201202; t=1756857003;
+	bh=9U/Ky3yNBRcz05JV+fG2x+dIoICYXW+AY/iTU6QURg0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=W2Su4P4PNpvePqV0vCQq2MIexMLrPsHEMUJ/6on8k7UdnLrBsuAAgtVt7jPZzta2j
-	 y2Uz2b8gwCauv+PmOxmoUHoAkqE2Kj+2zKqVJNT8ib6YWvhwkPBJfBl08OMV4k+DL/
-	 a5Ev8uhnX7GOiumFtEtzXuxskiWhcAUGQy2FlIEPENGYTcE6f1zwR0k+1LJSBu8f2B
-	 MtwmlebegUG9ns3sFr8Qw72/NkmWt3aWUuLCT9d3mt+1U+tbOqKEECd6j+pJbursqm
-	 dPRXk/pq0rxdogYk7qPFTRfOFpuVJKC7TQ6+Zt0qQBp1UfP8mvR0+LHBT4K1p9EV1L
-	 blBUdml9w4ZEA==
+	b=mVQVKfbujn2yIKsWpUWu0HfZK5lXywIRNh41oCjg1j/LwCt2Y7j6iGtIF47b+nlcK
+	 2776UmA/k/OIQ9lAvzFmDvUN1co+SKrLpsJqcOaG2bqWNSZbL9zdP3m+bwgTNjNd+J
+	 n+qiwarDkeYyzcbBkFfyNkHGO8Ax7eLKg++ylQTU1NRxa7GcdJGQW60jjulnw6UQHJ
+	 Vi7ZHg/1ktR08m33ZPq5EVhzMBtI0yAlV7Jf1axhC2aAM4eg70ZkDSzNaXzlxiEMi4
+	 QrHBqmN/ZdntaOtBFy38Y3vld6TWfXyDTxStwZMOKMzIiJpAX0rLdAhxc3uARxK4Ov
+	 6tVAyoK/PxBdQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADE6383BF64;
-	Tue,  2 Sep 2025 23:40:12 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB2C2383BF64;
+	Tue,  2 Sep 2025 23:50:09 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: ethernet: mtk_eth_soc: fix tx vlan tag for llc
- packets
+Subject: Re: [PATCH net-next v2 1/2] selftests: drv-net: rss_ctx: use Netlink
+ for
+ timed reconfig
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175685641149.469813.17773036989909976650.git-patchwork-notify@kernel.org>
-Date: Tue, 02 Sep 2025 23:40:11 +0000
-References: <20250831182007.51619-1-nbd@nbd.name>
-In-Reply-To: <20250831182007.51619-1-nbd@nbd.name>
-To: Felix Fietkau <nbd@nbd.name>
-Cc: netdev@vger.kernel.org, hacks@slashdirt.org, sean.wang@mediatek.com,
- lorenzo@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- igvtee@gmail.com, john@phrozen.org
+ <175685700877.471478.8564578752631875348.git-patchwork-notify@kernel.org>
+Date: Tue, 02 Sep 2025 23:50:08 +0000
+References: <20250901173139.881070-1-kuba@kernel.org>
+In-Reply-To: <20250901173139.881070-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ ecree.xilinx@gmail.com, gal@nvidia.com, joe@dama.to,
+ linux-kselftest@vger.kernel.org, shuah@kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sun, 31 Aug 2025 20:20:07 +0200 you wrote:
-> When sending llc packets with vlan tx offload, the hardware fails to
-> actually add the tag. Deal with this by fixing it up in software.
+On Mon,  1 Sep 2025 10:31:38 -0700 you wrote:
+> The rss_ctx test has gotten pretty flaky after I increased
+> the queue count in NIPA 2->3. Not 100% clear why. We get
+> a lot of failures in the rss_ctx.test_hitless_key_update case.
 > 
-> Fixes: 656e705243fd ("net-next: mediatek: add support for MT7623 ethernet")
-> Reported-by: Thibaut VARENE <hacks@slashdirt.org>
-> Signed-off-by: Felix Fietkau <nbd@nbd.name>
+> Looking closer it appears that the failures are mostly due
+> to startup costs. I measured the following timing for ethtool -X:
+>  - python cmd(shell=True)  : 150-250msec
+>  - python cmd(shell=False) :  50- 70msec
+>  - timed in bash           :  45- 55msec
+>  - YNL Netlink call        :   2-  4msec
+>  - .set_rxfh callback      :   1-  2msec
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: ethernet: mtk_eth_soc: fix tx vlan tag for llc packets
-    https://git.kernel.org/netdev/net/c/d4736737110f
+  - [net-next,v2,1/2] selftests: drv-net: rss_ctx: use Netlink for timed reconfig
+    https://git.kernel.org/netdev/net-next/c/4022f92a2e4e
+  - [net-next,v2,2/2] selftests: drv-net: rss_ctx: make the test pass with few queues
+    https://git.kernel.org/netdev/net-next/c/e2cf2d5baa09
 
 You are awesome, thank you!
 -- 
