@@ -1,105 +1,96 @@
-Return-Path: <netdev+bounces-219175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED826B403A3
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 15:34:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8B11B40427
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 15:39:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 655587B83DF
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 13:33:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E6AD4E7768
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 13:39:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C43C3218BF;
-	Tue,  2 Sep 2025 13:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DD6330F536;
+	Tue,  2 Sep 2025 13:35:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AIkOfZ84"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="SgvyQ2aW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 682C832144F
-	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 13:30:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EACAD18DF80;
+	Tue,  2 Sep 2025 13:35:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756819818; cv=none; b=SZnKwYDw/uwNxC+SZZPvSlPTPd85exOPatag5P+ijIN2sNUQcOXE81+Bg1nQkGgzGqc9e2cpCSbWR6QvP0y8tRMhNjGsfqafO0TciNYA1wOvZLyPRZ2v4rk9+MeB3U/IYljALJgfX0h4iWh76quQLDEZ++14zQ3mC4y7A5rD1mo=
+	t=1756820120; cv=none; b=DRAQYinJAUc5f+2vzgav4juVYm1/9ahGneqBvvOP+uowepRkSNCvHGOGcGz10Pvx9NKvUx/2VNPT4QEqQ13qUZDNJ118+IJmOX1cQsM6+QaqMm5v6F/GToy2vlGe+UElyMU/G42q7BSseKkbXvzvXB3mXwrrIDL2fta1MnTbi6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756819818; c=relaxed/simple;
-	bh=6Cadree29dBYx0msb0fvAe3k28CSS6O9N62KdRcG1JU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SuDNYFksygthd/ArsxaESDK+3UIro2IBv1SA6BX4XRl6l7QNbY8fr7itk7iFbTBqmDhT4df50ecNiomRkHmesb8X68nc6YknfhkLmx+sKO37c0oO1r20MB2E5oMxHHoErEmErBUKIq9V3Vu5j8sGeHuFYc8CdrwULCRs0bjVgZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AIkOfZ84; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0264BC4CEF4;
-	Tue,  2 Sep 2025 13:30:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756819818;
-	bh=6Cadree29dBYx0msb0fvAe3k28CSS6O9N62KdRcG1JU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=AIkOfZ84Bc2JTo2MK0WMchEfg/aiicEijHWduSCuYlXLagzXNFjazINTaGChPXP0T
-	 M+sDFZ+AVt7iNUSLwDfpFHbL55FdMh80SaNvi+3qMlqhf/xHNnVIPSsiHSr7omWo/6
-	 ZLMcYYypDxc5oksSaj9Mqp1B5y6KpWZXmdN2qXqZDL/krLD6tRNeX29UdrjNeINi9P
-	 KPL9i9Wh/gHs/34U0Sb0uLrxMTcYNy+6ZJdiAQGFox8CM19mtTwUjI1nB9wEIylkt0
-	 pdUIKtFEAfw0w4lV3Zdy0N+IM69wXayrkUITKx1ju+keeCcr0vzBM6IDGGZXWDD9Rw
-	 LW2yGaT+ATGDw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE6D7383C250;
-	Tue,  2 Sep 2025 13:30:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1756820120; c=relaxed/simple;
+	bh=xUWKJcdlXzMjs1BmaS6HiN8JM5c6HpQ9mNLZ/eAr/Ls=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ic7ZvF9AQzcmznKnivdGDPjKJoPJJEYiFFB6v7GWhkZxuVjhxEXp+Q4Iu9Rb93Zy/N0TRY4CxQ2zFF50CFRWlfHZpcMsnEjaXJ5pxJnqWOdiSDk8rqFun6q8HEOpFYyH5/pSM5efBv8HHZwHw7Hu40y0Sf5U3itM6l8mr7M02Ws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=SgvyQ2aW; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=yPD0mQHG+NFBjBqbvmLZhMDNtWCPfim9f9WnWnRZZHI=; b=SgvyQ2aWLBPcy9uEM52Mpl8SvY
+	kQseUi+JQze4tsMl9Cg4mNV8K02dOeP7GpLHtXIQhEtaosqhP3CjsvIcedPM/VfybZCuXOmzH/n04
+	7eA5GmwueFp6CZderQWK67IBLFDU9PRPZiU4oTshvxLIyngYIVZm+QOpPuTGQZ+FPXuiZ1LyVDXfS
+	5ojC9NTxfpSX/mCeRm1sPMICnR1WgfX58hpaiyjWyKOl7iCHHa45V/EUwM/4DFxLRGZvClk9uwaqB
+	vpvKMkDMSWK6ZohNTgFq/+MnzEvKUxRREYrP4KWiZtKY7BzO+pLFYOFnzx7qcRYmYm9BrpaSBjJ0+
+	4OX8KLNw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42068)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1utRAG-000000007hR-2se5;
+	Tue, 02 Sep 2025 14:35:12 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1utRAE-00000000817-1Qic;
+	Tue, 02 Sep 2025 14:35:10 +0100
+Date: Tue, 2 Sep 2025 14:35:10 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: rohan.g.thomas@altera.com
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Matthew Gerlach <matthew.gerlach@altera.com>
+Subject: Re: [PATCH net-next] net: phy: marvell: Fix 88e1510 downshift
+ counter errata
+Message-ID: <aLbyju1nKm5LXDDX@shell.armlinux.org.uk>
+References: <20250902-marvell_fix-v1-1-9fba7a6147dd@altera.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next V3 0/7] E-Switch vport sharing & delegation
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175681982321.297907.4047842558919189677.git-patchwork-notify@kernel.org>
-Date: Tue, 02 Sep 2025 13:30:23 +0000
-References: <20250829223722.900629-1-saeed@kernel.org>
-In-Reply-To: <20250829223722.900629-1-saeed@kernel.org>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, saeedm@nvidia.com, netdev@vger.kernel.org,
- tariqt@nvidia.com, gal@nvidia.com, leonro@nvidia.com, mbloch@nvidia.com,
- horms@kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250902-marvell_fix-v1-1-9fba7a6147dd@altera.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 29 Aug 2025 15:37:15 -0700 you wrote:
-> From: Saeed Mahameed <saeedm@nvidia.com>
+On Tue, Sep 02, 2025 at 01:59:57PM +0800, Rohan G Thomas via B4 Relay wrote:
+> From: Rohan G Thomas <rohan.g.thomas@altera.com>
 > 
-> v2->v3:
->  - fix error handling, Simon.
->  - Remove redundant struct field comment, Simon.
->  - Add Reviewed-by: Simon Horman <horms@kernel.org>
-> 
-> [...]
+> The 88e1510 PHY has an erratum where the phy downshift counter is not
+> cleared on a link power down/up. This can cause the gigabit link to
+> intermittently downshift to a lower speed.
 
-Here is the summary with links:
-  - [net-next,V3,1/7] net/mlx5: FS, Convert vport acls root namespaces to xarray
-    https://git.kernel.org/netdev/net-next/c/2e894b99c017
-  - [net-next,V3,2/7] net/mlx5: E-Switch, Move vport acls root namespaces creation to eswitch
-    https://git.kernel.org/netdev/net-next/c/faa6ac53cdaa
-  - [net-next,V3,3/7] net/mlx5: E-Switch, Add support for adjacent functions vports discovery
-    https://git.kernel.org/netdev/net-next/c/17426c5d4b1d
-  - [net-next,V3,4/7] net/mlx5: E-Switch, Create acls root namespace for adjacent vports
-    https://git.kernel.org/netdev/net-next/c/9984ec9f1f50
-  - [net-next,V3,5/7] net/mlx5: E-Switch, Register representors for adjacent vports
-    https://git.kernel.org/netdev/net-next/c/a0a7002b9439
-  - [net-next,V3,6/7] net/mlx5: E-switch, Set representor attributes for adjacent VFs
-    https://git.kernel.org/netdev/net-next/c/5d8ae2c2cfe8
-  - [net-next,V3,7/7] net/mlx5: {DR,HWS}, Use the cached vhca_id for this device
-    https://git.kernel.org/netdev/net-next/c/0c2a02f3c066
+Does this apply to all 88e1510 PHYs or just some revisions?
 
-You are awesome, thank you!
+Also, what is a "link power down/up" ? Are you referring to setting
+BMCR_PDOWN and then clearing it? (please update the commit description
+and repost after 24 hours, thanks.)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
