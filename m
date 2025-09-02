@@ -1,45 +1,84 @@
-Return-Path: <netdev+bounces-219081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B65D1B3FA7A
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 11:33:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C12A1B3FA80
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 11:34:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8225F7A1CF2
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 09:32:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49F15188DD4D
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 09:35:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBDF62EB84D;
-	Tue,  2 Sep 2025 09:33:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 230982EB861;
+	Tue,  2 Sep 2025 09:34:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="FqRiGX+2"
 X-Original-To: netdev@vger.kernel.org
-Received: from bregans-0.gladserv.net (bregans-0.gladserv.net [185.128.210.58])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27DA42EB845;
-	Tue,  2 Sep 2025 09:33:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.128.210.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E68E71D2F42;
+	Tue,  2 Sep 2025 09:34:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756805622; cv=none; b=MF4mG78avpPn9G5XiYhQ7fq4UheOKPz3dEXIPO03GR9uFK4eoPcwx7jCnTJZERF4Q99R6p60Wy7fVnVeyR3i4WsHrmtmvRVkwljtCY7L1gB097EqhhTwgWJGMSDR3H9WI+xgdbyOTjcdlYHFhRI2wCP/0iWsHDdDgIF+ZaaJJBA=
+	t=1756805690; cv=none; b=F8siuzINTUk8Sal0uBf/lD3McnkEKWX3bEzsBswd3SJi2L05Vz/r4K4Q5IQBOoUUKnRHsDpHerT+ttqQBL4zSbwi2MEAkt3mwtJhV++KvZ4GiTEXE8M/jZtA56VGqBNVmDLYF2eQRynUOme/wLYnNxDRRjINFb3/xSFxgVGINqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756805622; c=relaxed/simple;
-	bh=bbIWtaRapTz4x6+Wf9RWlPmzpKW3MH8iyuTakHp1rQ8=;
+	s=arc-20240116; t=1756805690; c=relaxed/simple;
+	bh=uAi427Qs5KRU3DRKNgGQmaELYcEJOUtVuLXg53CQ5rg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NAIdGwcgMVedABNyhFRD7maVUvly5WUF7KxLVhJ6C9yTgcxRUIFffP7WBHZ34IB3FzBhjdf070mbo//yNSl4I7VDkagOQzLb4sjrKIDVM3X1aQItbEXJeuPuBD54uOh5xwTdBnfe9EQpoqxkpYLnkQbv5PqkaAOIK1LDqFizLTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=librecast.net; spf=pass smtp.mailfrom=librecast.net; arc=none smtp.client-ip=185.128.210.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=librecast.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=librecast.net
-Date: Tue, 2 Sep 2025 11:33:22 +0200
-From: Brett Sheffield <bacs@librecast.net>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Oscar Maes <oscmaes92@gmail.com>, netdev@vger.kernel.org,
-	bacs@librecast.net, kuba@kernel.org, davem@davemloft.net,
-	dsahern@kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net v4] selftests: net: add test for destination in
- broadcast packets
-Message-ID: <aLa54kZLIV3zbi2v@karahi.gladserv.com>
-References: <20250828114242.6433-1-oscmaes92@gmail.com>
- <03991134-4007-422b-b25a-003a85c1edb0@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=XYjHMAR7o8bCw/7qgjP18HxMlRdWSnLuBVJBFmbUOG1qRUvC2giQaCKPA0AD1eut1O6UcDJGjGbborQJQn3ftpHz5m2tJzUAo+c4pi3IW8VVak3E9Ed8ZEJcmTVa4kkX0whET/EktFlRvz5DblBZvSHmjoS4JUNc8q55LEc8XmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=FqRiGX+2; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=34Y1yLTep9znhYAIr+QK6BAuH5EBj7CVYSKq7UCZVAg=; b=FqRiGX+2mcHMQezRGa4nCBeXK9
+	FMLkqusifE8FDz5tiLl8OtJQtaS7vKnQvTGtzMv7MBaAJcO6SNq5OtzSGnqsS5ue7cXObHVN9GtU0
+	v9tdsGe/zuAKovBV6VXTklUOEUJAImGXKyHefs2ARy+msK4STGX/WNVDFZazJxhybiEePMG7yWBQ0
+	5tRGD7sJXnCFE1C0hrGVu4Ev+GuKw/9EMjMqMO3bWcoUMRcZBHxsfKfPoQ1tCYwM6tJdtEKa9m2i1
+	myQYJ/Sg59Jq48Z/t1MoZJIlF55BFlbKXJ6Ya99D3DxFHYjFcKFVfDKdxKNNYSJIAbOKg5m/uWvBJ
+	eryGAOsQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43538)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1utNPK-000000007S7-06GK;
+	Tue, 02 Sep 2025 10:34:30 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1utNPF-000000007sF-2o3H;
+	Tue, 02 Sep 2025 10:34:25 +0100
+Date: Tue, 2 Sep 2025 10:34:25 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Prabhakar <prabhakar.csengg@gmail.com>
+Cc: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [PATCH net-next 10/10] net: pcs: rzn1-miic: Add PCS validate
+ callback for RZ/T2H MIIC
+Message-ID: <aLa6IeZsGeESpMKQ@shell.armlinux.org.uk>
+References: <20250901224327.3429099-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250901224327.3429099-11-prabhakar.mahadev-lad.rj@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,34 +87,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <03991134-4007-422b-b25a-003a85c1edb0@redhat.com>
+In-Reply-To: <20250901224327.3429099-11-prabhakar.mahadev-lad.rj@bp.renesas.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 2025-09-02 10:49, Paolo Abeni wrote:
-> On 8/28/25 1:42 PM, Oscar Maes wrote:
-> > Add test to check the broadcast ethernet destination field is set
-> > correctly.
-> > 
-> > This test sends a broadcast ping, captures it using tcpdump and
-> > ensures that all bits of the 6 octet ethernet destination address
-> > are correctly set by examining the output capture file.
-> > 
-> > Signed-off-by: Oscar Maes <oscmaes92@gmail.com>
-> > Co-authored-by: Brett A C Sheffield <bacs@librecast.net>
-> 
-> I'm sorry for nit-picking, but the sob/tag-chain is wrong, please have a
-> look at:
-> 
-> https://elixir.bootlin.com/linux/v6.16.4/source/Documentation/process/submitting-patches.rst#L516
+On Mon, Sep 01, 2025 at 11:43:23PM +0100, Prabhakar wrote:
+> Add a SoC-specific `pcs_ops` pointer in `miic_of_data` to allow
+> custom phylink PCS callbacks. For RZ/T2H MIIC, implement
+> `rzt2h_miic_validate` to restrict valid interfaces to RGMII, RMII,
+> and MII. Assign `rzt2h_miic_phylink_ops` with the new validate
+> callback to the RZ/T2H MIIC SoC data structure, keeping existing
+> PCS support intact for other SoCs.
 
-Thanks Paolo. So, something like:
+This seems completely pointless. Please review commit 508df2de7b3e
+("net: pcs: rzn1-miic: fill in PCS supported_interfaces") to find
+out why.
 
-Co-developed-by: Brett A C Sheffield <bacs@librecast.net>
-Signed-off-by: Brett A C Sheffield <bacs@librecast.net>
-Co-developed-by: Oscar Maes <oscmaes92@gmail.com>
-Signed-off-by: Oscar Maes <oscmaes92@gmail.com>
-
-with the last sign-off by Oscar because he is submitting?
-
-
-Brett
+Thanks.
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
