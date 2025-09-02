@@ -1,81 +1,82 @@
-Return-Path: <netdev+bounces-219322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F6EAB40F80
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:36:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD3B6B40F82
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:36:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C8651B60BF1
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 21:36:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76E775429A5
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 21:36:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F195D35A2AB;
-	Tue,  2 Sep 2025 21:36:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E53735CEA1;
+	Tue,  2 Sep 2025 21:36:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E40Slw9m"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DMLjnBTu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6960DE573;
-	Tue,  2 Sep 2025 21:36:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0706F35A2BA;
+	Tue,  2 Sep 2025 21:36:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756848992; cv=none; b=XY/Mb/C6yHMrxT17/iER2FxagnLgQJTTC4KldmjGpf1/KaT2MNCeNw4DnAyBqIsu4Y6vqGCvxVG51ORgtjAH2ZnHs3iB2Hp6KuvPH5EcissWx8OpuHha4DVMReq7asMCZTBUwp1XTk+eDMLJLhaXDup3mSXt7ODZeuUNXyuZTtA=
+	t=1756848994; cv=none; b=L76VDNSpiZ7Vxz/aPuVvEf7H+xFfECaPbPqrwYBijE1MxYrJZJ5uc2de73hn1TCuYu3kcjrForUC825DfkU/QnIkR5aRu6Ie+O6/kC3fsVTTdGMEg173cIhDGlsBVTk9zBTnxv28cwy3WF2Xp8sNOQGqzcd/PVE/8Flki234GTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756848992; c=relaxed/simple;
-	bh=PFJoxksXvVyv60IuEoymZjKpZJY4cpVTuJ34D3w4n4k=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=qrUZwPCIAmrAUc009Yz9EXC+wZkx5lk8Z4O/Iq+kDhhbqPcXronJRQnFeQGRabQUbCv1zZm/CDQBvdMxoMS+ZxG8HJnoSHEOJtKkAFE8aVsiAkHdhCi5LqQmeHZNKx1xlP8RgaFNebCsQjRzP4Cx2CzfDKfHeWVoz8yItTnrHmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E40Slw9m; arc=none smtp.client-ip=209.85.219.182
+	s=arc-20240116; t=1756848994; c=relaxed/simple;
+	bh=fdrJ2W7mBo4ScK0+ExdwCjhXZ7mjfmL0Ggt7KK74nGg=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=FeQXQFtV2yw4jALUndh4EErUSPUEJ9ju0oLE8fTTKNxVmTtmPPdoCdVgZuQCGSaTh4wHsiRlJcvCi6uKD5zza9hlu9oEvlyNu5MUihleS9DXUSSWAulxbdp0oOA0uPwNwG6KwkHqMKKEFkkLNXUtD5ZrFXmYSAIlDdUyW3pmrqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DMLjnBTu; arc=none smtp.client-ip=209.85.128.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e96c77b8dc1so4302418276.1;
-        Tue, 02 Sep 2025 14:36:31 -0700 (PDT)
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-71d6051afbfso51054047b3.2;
+        Tue, 02 Sep 2025 14:36:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756848989; x=1757453789; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=FAPHCVdbTi45r+VRL9Ex+aqP39iJNroR5Vm08l1W8sg=;
-        b=E40Slw9mjkCeRU4iQvEQk5wF4nj83GCfDhJ7h2VAgGOyvd3LxCllEoPve/6RP8pb4Z
-         8D5tKBTVGW+kD7pPrkEe696EdQ4rZFGMBOSQnCSh1MjIM8Va8kmByJfXD7OoZlieQZOj
-         4wiXaJ8E5HFKXt8pkRXh9XhnY7yWK7pWuR9O5PQhuOG7C6F8rVDoLtZDVt4uziwxZ6wP
-         GtvgtXMKw3KL4qknW2HA5+uD4Rybh9/AypkL689+v7mdTRnvh9qF/ApxvBekx5MTh5ar
-         FGeMKPoiPKoce9FR9AR2bUGh14Z5XrdgKOfL7MpU1v2pXiCLRsjO9AgdEktCx3YqSURL
-         stlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756848989; x=1757453789;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20230601; t=1756848991; x=1757453791; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=FAPHCVdbTi45r+VRL9Ex+aqP39iJNroR5Vm08l1W8sg=;
-        b=OrXAfiR5PEOVs2BpuKqQLdauZOg60iJ60ODtjr9QJ/VOwU9zw8hbsLzCbvbEALtUW6
-         MHTi/6f+vuu7dCZ8Rc4CPK4rnTM6tXIYJQ8+JgwkvduFW+nWyCWERyJDsLrez/fnXM8Q
-         rQpJB3SBp3tHy7ZmR0Iz62PAydr/6KBW10ckF4jqv/HIILLJn/E92Hn0iqmkhMB4HQqh
-         DKKEuw+G2etV6z7cv2syw/93obdAvv6J33imXhQu9edA1ay2BZRgS7q7dv7j7OBl9HVE
-         HUFr5F+ARYaJXJpX9y1FKHN3/Dgx+XXPaOfbaPZp/y85T2ilkuufApPMU07Gb/yHAT9N
-         T/dQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUSRBL4ws0VaAj7p5LztIt/1V7adp5T4cO1M5jEb3Qji10fJgWDGBGsoALBr53M+XtEWz3FhyScclNydO8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBaiGbqn+0yH5OM3QKIn3WOGhul58Fp2P2LNB5q3QYFcIt9g0u
-	td5E9BFYVVkMP2J3C7aQgyj9uxGiJbkzOKjKUGhLpQurC8NA2H90YYlh8vL1oxHiU5vXPw==
-X-Gm-Gg: ASbGncs9elDIoZ7uxvwsgk/537AVz932cFWbivX03T2Nnm2J7YzaGZtwOeU9mmTXqCG
-	6OPmJYqhPFqhIKInfn4UyKEZDi6v1LDhLQC4XTS3DneB+jegDpWnU7XGujEpI+1/cn79HtANuhd
-	3flU5Xpq4SYAg/q2IoxNOHOO4aNE5+oK4jBzmHFBzxfOPqcEmq4c06W0d6LiRO6wtOS1gyYh/yR
-	GB72aJqygxBOLVxLq+L49U4TYiPLCtNDmRdgvUO6up/JIawslgCok6NYxniJuypo/1rlCgpyh1H
-	qiu4oY1VNkpK6tGzoEGLbpjqzh+JACy6XFW2DbbB7ikZpj8wQ4Cn8b2OHbO9ZKDf2+1UZdMNLCQ
-	Vr7Gji37z+l8U8CzNwux2kn94hVe62k0=
-X-Google-Smtp-Source: AGHT+IFrSsduSAWeSsUdzbQ9p+RE/QxtJMCf31/DpYhssGwJOcJ5RimU3aSLChHQyzKBLTSMdUzEjg==
-X-Received: by 2002:a05:6902:72b:b0:e87:b880:7dee with SMTP id 3f1490d57ef6-e98a577e559mr15064554276.12.1756848989281;
-        Tue, 02 Sep 2025 14:36:29 -0700 (PDT)
-Received: from localhost ([2a03:2880:25ff:4::])
-        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e9bbe19decfsm914291276.34.2025.09.02.14.36.28
+        bh=gJXxA4eRg+MQwHOWJI8nle9db3f24EujzoUrSFcpQz8=;
+        b=DMLjnBTu9tTY4bslRwWwVmJ9ytoKaXUhN7Yx8J3ErwR/e+ImlkF5MkjwiS5Hu2spmM
+         RgypImw/Lfzd7JNyc68ym065W1hhS1g8vngE806zrfpDofCUxp1obWxcKuRcgXI56W75
+         KIP2piRB/VaX7qZz6hLrgFHLehNjy34deXtEY+4jLlbgUxms9JhFA3kSScLoWO2qvtAM
+         fty+IzdZDQAn9l8CutT13saRxKws7koXfacnY/8VZK1tQa09+6oQyiOdtURvHthVIGoT
+         s1xFT05SMyBCgi1DbzKr4f8R/3vO4fFF7LwbebSh0/YeDJDoU65XLiJ2hGCrVytkgXAR
+         9tpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756848991; x=1757453791;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gJXxA4eRg+MQwHOWJI8nle9db3f24EujzoUrSFcpQz8=;
+        b=BEywz8CONUgpRE61wrgTpMxxpee59rqSSQIr8YKEQE1NKcdlaqvrtDeSyxqD26UqhQ
+         hngTKw69sfraHJB6suB5PgQN1znC93oG18jUhkw1ZlR3bAiAeZUYtFFswFtcc6nROfz7
+         zR3/il/VE/mMGYU9mEJ/ExyxGel6UQunh+UlcUM+vxsOqdVc+dR/7IW8+VZlSoSiQYQd
+         nYYA7dI5v9IP1XG2C2OiqRMICUxrwi3JdX28geB6HwdzAWF+28ZOZeEBYSSemlaIbVJ5
+         wNwLH1T3qoNqdxxrgz7oT3yOGiwwtIFHbrVKLyCzApEb8eud/BuMxZmfG3KZT98Hk+Xd
+         sO7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV68VYoijIsRzoCd3zsvdMXweiaif29mqv3R6J4okhvuX2MuRAlRjkNfvrEO2f4N6vdfYnt6co7/Q6edi0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhDt6Siufafw1s5n3GZXhG2aYoFCPIOXy+2mBU1/FDpCmvh0Z5
+	iGa0xck1LdSgvdmN2dawcrkOH6g3R5SHS4AWWuTqp4I2o/xvPDrAwzjw8abAtOXb7Y/8DQ==
+X-Gm-Gg: ASbGncvPcBhg8U0SPxMQ2MHYlnTVS58BzFxI4zqYJj9EWoDlhpew7IJ5Qkjyd8HfL3V
+	C69Rev8ejWrhNYGMGDUeth3xlpYQ/Fd7yiCkngNhVJcd0oEtvr2w3+6GmQaXKJycASPSqiLnTLJ
+	0Y9wC06pQJLhIDN9Mfds/oY/oMf8rQPuyNcItGte9zg7/K3Cn55DaIhQUQXUJ2iqiZDifazlj9g
+	0Bjb49Iwe+m2sHQO11GPg9byTQmTTVnxWDw2XHUWjuRHWnGvvl2cB283AY01K4aSYnZwq2Fugnk
+	kysLVjWIxN6j5lkOLS6SCxevnph0q7OxfzVwjwf0hl+oiCSU8HAr5qj64qFGpulwTTmjPH2XLUz
+	dnDZzAlQyoqHZylrz6wdQvB/XGqmhYESi
+X-Google-Smtp-Source: AGHT+IHyJpIlYF9ANPLU+rz2KTwrmDh36UhiTNL/ooNr3MJ/3kVhcKvSodxLu1SJEb5ZcEJwsDoYoA==
+X-Received: by 2002:a05:690c:8d14:b0:723:99e0:8edb with SMTP id 00721157ae682-72399e0c158mr74032667b3.30.1756848991271;
+        Tue, 02 Sep 2025 14:36:31 -0700 (PDT)
+Received: from localhost ([2a03:2880:25ff:51::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-723a831fcc6sm8459897b3.16.2025.09.02.14.36.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Sep 2025 14:36:28 -0700 (PDT)
+        Tue, 02 Sep 2025 14:36:29 -0700 (PDT)
 From: Bobby Eshleman <bobbyeshleman@gmail.com>
-Subject: [PATCH net-next 0/2] net: devmem: improve cpu cost of RX token
- management
-Date: Tue, 02 Sep 2025 14:36:26 -0700
-Message-Id: <20250902-scratch-bobbyeshleman-devmem-tcp-token-upstream-v1-0-d946169b5550@meta.com>
+Date: Tue, 02 Sep 2025 14:36:27 -0700
+Subject: [PATCH net-next 1/2] net: devmem: rename tx_vec to vec in dmabuf
+ binding
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,9 +85,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAFtjt2gC/x3NSwrCMBRG4a2UO/ZCGi1atyIO8vg1QfMgiaVSu
- neDw29yzkYVxaPSddioYPHVp9gxHgYyTsUn2NtukkJO4iJnrqaoZhzrpPUX1b0RVGSLJSBwM5l
- beiHyJ9dWoALLWWqM55OdxJF6NRc8/Po/3iiiccTa6L7vPzZD5iyLAAAA
+Message-Id: <20250902-scratch-bobbyeshleman-devmem-tcp-token-upstream-v1-1-d946169b5550@meta.com>
+References: <20250902-scratch-bobbyeshleman-devmem-tcp-token-upstream-v1-0-d946169b5550@meta.com>
+In-Reply-To: <20250902-scratch-bobbyeshleman-devmem-tcp-token-upstream-v1-0-d946169b5550@meta.com>
 To: "David S. Miller" <davem@davemloft.net>, 
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
  Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
@@ -98,38 +99,110 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  Bobby Eshleman <bobbyeshleman@meta.com>
 X-Mailer: b4 0.13.0
 
-This series improves the CPU cost of RX token management by replacing
-the xarray allocator with a normal array of atomics. Similar to devmem
-TX's page-index lookup scheme for niovs, RX also uses page indices to
-lookup the corresponding atomic in the array.
+From: Bobby Eshleman <bobbyeshleman@meta.com>
 
-Improvement is ~5% per RX user thread.
+Rename the 'tx_vec' field in struct net_devmem_dmabuf_binding to 'vec'.
+This field holds pointers to net_iov structures. The rename prepares for
+reusing 'vec' for both TX and RX directions.
 
-Two other approaches were tested, but with no improvement. Namely, 1)
-using a hashmap for tokens and 2) keeping an xarray of atomic counters
-but using RCU so that the hotpath could be mostly lockless. Neither of
-these approaches proved better than the simple array in terms of CPU.
+No functional change intended.
 
 Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
 ---
-Bobby Eshleman (2):
-      net: devmem: rename tx_vec to vec in dmabuf binding
-      net: devmem: use niov array for token management
+ net/core/devmem.c | 22 +++++++++++-----------
+ net/core/devmem.h |  2 +-
+ 2 files changed, 12 insertions(+), 12 deletions(-)
 
- include/net/sock.h       |   5 ++-
- net/core/devmem.c        |  31 +++++++-------
- net/core/devmem.h        |   4 +-
- net/core/sock.c          |  24 +++++++----
- net/ipv4/tcp.c           | 107 +++++++++++++++--------------------------------
- net/ipv4/tcp_ipv4.c      |  40 +++++++++++++++---
- net/ipv4/tcp_minisocks.c |   2 -
- 7 files changed, 107 insertions(+), 106 deletions(-)
----
-base-commit: cd8a4cfa6bb43a441901e82f5c222dddc75a18a3
-change-id: 20250829-scratch-bobbyeshleman-devmem-tcp-token-upstream-292be174d503
+diff --git a/net/core/devmem.c b/net/core/devmem.c
+index d9de31a6cc7f..b4c570d4f37a 100644
+--- a/net/core/devmem.c
++++ b/net/core/devmem.c
+@@ -74,7 +74,7 @@ void __net_devmem_dmabuf_binding_free(struct work_struct *wq)
+ 	dma_buf_detach(binding->dmabuf, binding->attachment);
+ 	dma_buf_put(binding->dmabuf);
+ 	xa_destroy(&binding->bound_rxqs);
+-	kvfree(binding->tx_vec);
++	kvfree(binding->vec);
+ 	kfree(binding);
+ }
+ 
+@@ -231,10 +231,10 @@ net_devmem_bind_dmabuf(struct net_device *dev,
+ 	}
+ 
+ 	if (direction == DMA_TO_DEVICE) {
+-		binding->tx_vec = kvmalloc_array(dmabuf->size / PAGE_SIZE,
+-						 sizeof(struct net_iov *),
+-						 GFP_KERNEL);
+-		if (!binding->tx_vec) {
++		binding->vec = kvmalloc_array(dmabuf->size / PAGE_SIZE,
++					      sizeof(struct net_iov *),
++					      GFP_KERNEL);
++		if (!binding->vec) {
+ 			err = -ENOMEM;
+ 			goto err_unmap;
+ 		}
+@@ -248,7 +248,7 @@ net_devmem_bind_dmabuf(struct net_device *dev,
+ 					      dev_to_node(&dev->dev));
+ 	if (!binding->chunk_pool) {
+ 		err = -ENOMEM;
+-		goto err_tx_vec;
++		goto err_vec;
+ 	}
+ 
+ 	virtual = 0;
+@@ -294,7 +294,7 @@ net_devmem_bind_dmabuf(struct net_device *dev,
+ 			page_pool_set_dma_addr_netmem(net_iov_to_netmem(niov),
+ 						      net_devmem_get_dma_addr(niov));
+ 			if (direction == DMA_TO_DEVICE)
+-				binding->tx_vec[owner->area.base_virtual / PAGE_SIZE + i] = niov;
++				binding->vec[owner->area.base_virtual / PAGE_SIZE + i] = niov;
+ 		}
+ 
+ 		virtual += len;
+@@ -314,8 +314,8 @@ net_devmem_bind_dmabuf(struct net_device *dev,
+ 	gen_pool_for_each_chunk(binding->chunk_pool,
+ 				net_devmem_dmabuf_free_chunk_owner, NULL);
+ 	gen_pool_destroy(binding->chunk_pool);
+-err_tx_vec:
+-	kvfree(binding->tx_vec);
++err_vec:
++	kvfree(binding->vec);
+ err_unmap:
+ 	dma_buf_unmap_attachment_unlocked(binding->attachment, binding->sgt,
+ 					  direction);
+@@ -361,7 +361,7 @@ struct net_devmem_dmabuf_binding *net_devmem_get_binding(struct sock *sk,
+ 	int err = 0;
+ 
+ 	binding = net_devmem_lookup_dmabuf(dmabuf_id);
+-	if (!binding || !binding->tx_vec) {
++	if (!binding || !binding->vec) {
+ 		err = -EINVAL;
+ 		goto out_err;
+ 	}
+@@ -393,7 +393,7 @@ net_devmem_get_niov_at(struct net_devmem_dmabuf_binding *binding,
+ 	*off = virt_addr % PAGE_SIZE;
+ 	*size = PAGE_SIZE - *off;
+ 
+-	return binding->tx_vec[virt_addr / PAGE_SIZE];
++	return binding->vec[virt_addr / PAGE_SIZE];
+ }
+ 
+ /*** "Dmabuf devmem memory provider" ***/
+diff --git a/net/core/devmem.h b/net/core/devmem.h
+index 101150d761af..2ada54fb63d7 100644
+--- a/net/core/devmem.h
++++ b/net/core/devmem.h
+@@ -63,7 +63,7 @@ struct net_devmem_dmabuf_binding {
+ 	 * address. This array is convenient to map the virtual addresses to
+ 	 * net_iovs in the TX path.
+ 	 */
+-	struct net_iov **tx_vec;
++	struct net_iov **vec;
+ 
+ 	struct work_struct unbind_w;
+ };
 
-Best regards,
 -- 
-Bobby Eshleman <bobbyeshleman@meta.com>
+2.47.3
 
 
