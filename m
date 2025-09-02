@@ -1,294 +1,359 @@
-Return-Path: <netdev+bounces-219318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA118B40F50
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:24:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1501B40F56
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:24:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 467391B25893
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 21:24:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B687A7A96FC
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 21:22:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 535DE2E9EAE;
-	Tue,  2 Sep 2025 21:24:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 518B82EFD82;
+	Tue,  2 Sep 2025 21:24:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jJaE7Kde"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UyAPyapl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 845DC20311
-	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 21:24:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756848258; cv=fail; b=YGLnpqlikFzbefaOl+DviFQhy2RmpyZL649w4bCO2w533zY16dFHZpyeAJIuQXN5yQRIyRjGbxeSCHomOcirw/BvRoaPlzPxj6MiS1F4XO1goOiyK4mz8B4BpBcnmM1G5OrEkAXHtDgnGBnth0x9QOCgvSJuMAfUjAAeK+v08y0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756848258; c=relaxed/simple;
-	bh=umlaNBb8KTwhtDfHxme8fqFHSbTwf+aOYqzLO4Bh/BQ=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=iH+ksBSjnOtufGchlyFYDmfAkEmkC/aY0UIyn/aulGCFRNleWCgbkHnUsuOOo/ItGfV1egiWF3astMhr0T1KmjZXUAJxGdygivDr0I6e4EvsgVlNNfaC45I2rF/Clk1a+Q6nXI0B77Yv9wmTWVPbISiINulimdhJv226gtOb1s0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jJaE7Kde; arc=fail smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7611832254B;
+	Tue,  2 Sep 2025 21:24:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756848269; cv=none; b=i7uYB03AVlgupFMsQGcIGZvGfc+n/En1fvs98uMQDs9px6ErZJW57R1zg+eyz38GmzbnJ9slgyxzCkcw+AEE6xYH8m3IOxKQIJOoWF+LHCxJyvv2OJwds+rU8/AQwS3+bY+p2s70yeOtozVZmey9NU58Xo3YJLFdQCK+2cIG3/8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756848269; c=relaxed/simple;
+	bh=dp4DI3MP3LNfvzq43YKzfAVDtkE62mbd1WIEzYkl+6I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nd/QGrqF1Lc4vo4PZMI8fnO2XGDm+eEAaw720Xgq80ettuHzzKCU2517NGoSZSqN1LhItcOFN2dk8WN9sGIlU05yQV1+WVtHmKmX6z9P/pMtGeB163ZrRPSDipVrcbFlo0yiPqZj8DVgPe2nnBggTb4DCCS4Fi6LQ0D0rnsISSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UyAPyapl; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1756848256; x=1788384256;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:mime-version;
-  bh=umlaNBb8KTwhtDfHxme8fqFHSbTwf+aOYqzLO4Bh/BQ=;
-  b=jJaE7KdeBwF670HYjXNnpLaX7kh5aIHonYMT6fPyOazSbuZXQ8ENKfA3
-   d05w4b8xCxCmKtTQKNyaQVi0RSS3tjbYCylktYivBiUEa4eKPf5GkKqRe
-   yGWugeyA2g2xSZCvCT9PQd/M5zUVZwxzQ1uaMjbQxBzciVxNHcmGYZk2g
-   OJL8ggBJVYmNaChgGT/o1L/GcmmQcHSeThM6hgKzzWWbd1bFCRKttZH6M
-   ZqFL0Xf9k6tjSXqUi3p7PzB3gr2QsBck6QgsMMqPAixi1hxWgn+7GI7eF
-   yV1T2bBnnkdUJjEusnZwSXovWkgDLB2n1IPeCEDpyPZc/U5YqBW7HvsOR
-   Q==;
-X-CSE-ConnectionGUID: KU453pGfRNaNs148pduWGg==
-X-CSE-MsgGUID: uD3HwHb8Q7CRUWMuZb9GWQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11541"; a="76744447"
-X-IronPort-AV: E=Sophos;i="6.18,233,1751266800"; 
-   d="asc'?scan'208";a="76744447"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2025 14:24:14 -0700
-X-CSE-ConnectionGUID: fQjEkqYZQ7GONqHKCqPTZA==
-X-CSE-MsgGUID: B3n2ugHuR/uSIU/D/3X2Aw==
+  t=1756848268; x=1788384268;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=dp4DI3MP3LNfvzq43YKzfAVDtkE62mbd1WIEzYkl+6I=;
+  b=UyAPyaplBVP62ZchmPEKGogdCxfZPgFwOX/AeofoKXND7y9LiFB5F0sS
+   c1+Rrt0tc2iu5YJcivCSLqS0Z+1hOCa3dm2A8GsJ0CVpmsbOaBARwOQbn
+   gvdccZoEnZ62tXRxWWR4xEyzGzblDOEbDnnVm870BBb6OnIgr8clKpfH5
+   a2dEtnGywY0SJHnRsdVhas73+EkIj+6/EYoBKTcG0Cq2ZCzQV/6FT9Rfk
+   o3tJtGSmAn2esM7oatpo6hK3xpzpFx6O0/sVl06QnPnwLQxVNe6NSXboX
+   TVriWfALgSldExz9idPk+VbL3O5bNBm+cMWVu3VFqp+pmfZlRE517NPx5
+   A==;
+X-CSE-ConnectionGUID: 6yiiy2qyQQC682nahG/40w==
+X-CSE-MsgGUID: Rpp5trZnQw22AKARYIofrw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="59214894"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="59214894"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2025 14:24:27 -0700
+X-CSE-ConnectionGUID: P022I5ruQgyEpxSfHXWY7Q==
+X-CSE-MsgGUID: s3IpHuhXRiiKgo0PyvOBQA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.18,233,1751266800"; 
-   d="asc'?scan'208";a="195044481"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2025 14:24:13 -0700
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Tue, 2 Sep 2025 14:24:12 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Tue, 2 Sep 2025 14:24:12 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (40.107.220.85)
- by edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Tue, 2 Sep 2025 14:24:12 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=TjGOLrYYLHowdpMphMfonqNuJ9FaHAJWm3zQjecTJHlBwTlXxdTsbvPelH4e8IpYIJJfbbgk9Pg5IsYTYNCaQYM/oRYKIGC1AL8S942Jjn2CR9hSXAC2S+256lEswwdEkK2sjQBwCc06cg9aWFIX+D1ZCPvEhfQgdCJr+Kg+OPiR9PA4iMrO0l7drUqI1kL25kCg+bvDceejsW6sj1J1w+5f2ZqLnYDrTLhdjke5yQZU+QqlRFtskA+NWh66G/ge1MZOQaT2KmjdnjTfEOd6CHIcWzVSQ1jUuYFjQBfaiulT1Wv/otL7H7FOXRV86ZpyXn3HiPRfLk5tc+ABZEKLqw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+b1ccFyCLoqsrdS+EXl8+6Pt8vxdDKQzeIXF2RFu2UI=;
- b=S7p4A+eibPudPe3cYkKiwsCLrz4Juq1OPm0nBn4dy+MQJVbTOVaQXL8gfGrctl+1cEW9E4eklIaihG3enIwK5shK0j9w59aIXMk6RXUn5pBrLmcBQ99SDr0qqn7dCNL7vN6CS9DI5WVbwQcnKK7E1oyBvMcmg7Z7I8B+XNBHlyCTX2xqHfntrYI92U+qKJ2GsAdTR8nuf0WobJTuCREqwpfhfQw01ODsjDtCls1AwrvqXoM5qByP6OPdFCHMrR1HOWUwGGniUuelynzifEHDchMT6Z28t8hTQK8hp9QrnYLRmXyRW/I+wHbMqG7E+TIAfJrYAFhW4LBqdgYSNtOD2w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by DS0PR11MB7926.namprd11.prod.outlook.com (2603:10b6:8:f9::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.27; Tue, 2 Sep
- 2025 21:24:10 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::81f7:c6c0:ca43:11c3%5]) with mapi id 15.20.9073.026; Tue, 2 Sep 2025
- 21:24:10 +0000
-Message-ID: <5056c692-7478-4f38-8859-7cc7c823bbf5@intel.com>
-Date: Tue, 2 Sep 2025 14:24:07 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next V6 01/13] devlink: Add 'total_vfs' generic device
- param
-To: Saeed Mahameed <saeed@kernel.org>, Jakub Kicinski <kuba@kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	<netdev@vger.kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Gal Pressman
-	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko
-	<jiri@nvidia.com>, Simon Horman <horms@kernel.org>, Vlad Dumitrescu
-	<vdumitrescu@nvidia.com>, Kamal Heib <kheib@redhat.com>
-References: <20250709030456.1290841-1-saeed@kernel.org>
- <20250709030456.1290841-2-saeed@kernel.org>
- <20250709195331.197b1305@kernel.org> <aG9RuB2hJNaOTV3e@x130>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-Autocrypt: addr=jacob.e.keller@intel.com; keydata=
- xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
- J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
- qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
- CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
- UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
- MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
- apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
- cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
-In-Reply-To: <aG9RuB2hJNaOTV3e@x130>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="------------gJTHodK5fGpWOaIkYLsHuk3y"
-X-ClientProxiedBy: MW4PR03CA0325.namprd03.prod.outlook.com
- (2603:10b6:303:dd::30) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+   d="scan'208";a="175534815"
+Received: from lkp-server02.sh.intel.com (HELO 06ba48ef64e9) ([10.239.97.151])
+  by orviesa003.jf.intel.com with ESMTP; 02 Sep 2025 14:24:23 -0700
+Received: from kbuild by 06ba48ef64e9 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1utYUG-00032F-2R;
+	Tue, 02 Sep 2025 21:24:20 +0000
+Date: Wed, 3 Sep 2025 05:24:16 +0800
+From: kernel test robot <lkp@intel.com>
+To: Wilfred Mallawa <wilfred.opensource@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	John Fastabend <john.fastabend@gmail.com>
+Cc: oe-kbuild-all@lists.linux.dev, Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Alistair Francis <alistair.francis@wdc.com>,
+	Damien Le'Moal <dlemoal@kernel.org>,
+	Wilfred Mallawa <wilfred.mallawa@wdc.com>
+Subject: Re: [PATCH v2] net/tls: support maximum record size limit
+Message-ID: <202509030542.ZW9r1S1c-lkp@intel.com>
+References: <20250902033809.177182-2-wilfred.opensource@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|DS0PR11MB7926:EE_
-X-MS-Office365-Filtering-Correlation-Id: faade402-165a-4acc-cf02-08ddea670e32
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|7416014|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?TGFXSmZpN3A0WW85cU1ac3I1Zm1IVFJmT0hUR3lxdW1XVXk1SWVDemlzTXhP?=
- =?utf-8?B?S0ltWlExT1ZOTFczY3RFQktyOTRhaVd3cmI0ei83dnRjUDZTejhpYjgzcWVi?=
- =?utf-8?B?U09OYWxQdHdVYTlneVJQeVpGeDJTNVZHcG5FeUV2bmhtaEVneHBYNXpzZmpq?=
- =?utf-8?B?UGtzaExCRjc4RkpzNit6SWV6M1Q3ZmNVYVQrQUo0OWRTYmduUWtWWFYvZHdu?=
- =?utf-8?B?UWh3SHdFeVBwTFIvbmFFelN0djhOQW9WQWhFekxVR3lhZXZzTmU1TGpwNHJU?=
- =?utf-8?B?bm1CQnJuT0ZmQWczTTR2ZVVpVnAvWHdoRUF5b2V4VE9iaW0wVUxkM1JYS2hK?=
- =?utf-8?B?aTcyamdsSHgwTWF5MkF3UkdkMEVsSmpCRWJtS1dWRlhXZ25jZkp6bHFvWWNY?=
- =?utf-8?B?QzNwWnJvTVVrSWVEcUsydU1Iajc4cTIxODZZa3BKWDdUMnpqOGNWUUhJOEEz?=
- =?utf-8?B?N1FpZGEveWxvM2VLTkRzYXNSTWtuY0VXY0FPM1dBQXVXRVphQ2w5U2lFZHB5?=
- =?utf-8?B?Umo3U3pvVGhYVGljUHN1ZHBZeTEzRHMrM3V4UGVpamViVkcweVRiekFSbTJp?=
- =?utf-8?B?MHo3NlNKTXhnRkRmMnF2b0VGVHc4WUJqdHVKbFh4T0VFMGRvNktlaEpDVHZX?=
- =?utf-8?B?NElVSFdKdmlvOVkwUS9IcGtPNFRXa3BnZ3RLUUprd2FZcHhISytsTlJjbW1D?=
- =?utf-8?B?NkFvNjhZTUxLVGVuVXJUZnFCUlMrOC9NT2VubTVvSE8rcXRpM1Y3LzZQVXdl?=
- =?utf-8?B?OTc1SnFnTklmYk9vSGpXMUgwNVBObUljYTR3OUpyNXFiUmo2bGJyRzc1S0hu?=
- =?utf-8?B?S1h5aHhMaGFZNGtzaEw2MG9keTl0ZTgzb0EyQzRmWUw4S0dKbXE1VEd0TDI1?=
- =?utf-8?B?dU0zYTJ0YndBSjRUS1pCRzhoQXpnNXBFNFZxNGgya0syRUkycmxReUNWcVUw?=
- =?utf-8?B?RHJpRkVvQWFmVERQWFRrU0QxWXBXdTJiVE1DWEhVK0xqeU9JekxaT0h4dSt3?=
- =?utf-8?B?MlBxODZjZ3NzRUZsVjlNRVVaSUo5Z3lLOHBwVytWOEZsczBBbmp1dXJWbDE4?=
- =?utf-8?B?WGNJNUxlM1A5a2plUnVNcWEzdkxTelRWbUprMmlqeFlvejVPakxOUUMvbnVM?=
- =?utf-8?B?QzE0endpK3lRSm80MTltanJMRmRISHlrZGQzekd1VjBrckNDYXhtL0lSQkU4?=
- =?utf-8?B?anM4cVhaWEE5VDUvQWRoOFNkVVpmQ0NtQWJLaEk3alo2Nm1NVjNBZ2EzeC9J?=
- =?utf-8?B?Y0JuNVFCUG5rMFE2bjAxK0ErN1IweVdRSnhVVGE5NlZHTkhUeVpqRkFYOVFI?=
- =?utf-8?B?K09FMVhUbGxsMUNNbEFkRlR6WENNbzhITkdWVDk3ck03M0xKOE1BekhyYUhP?=
- =?utf-8?B?L2QwTC9EeVUvN3NSY01TN2FiVFEzT2pXaWFDblFZZWc5ajdxTXI1THNQVmRD?=
- =?utf-8?B?TVJ4QUVsL3htUGpnSjFlOHdVWmQ1M0lnVlp2MnIwbW5Jd01DZjJxeTRQMVBN?=
- =?utf-8?B?Y1ZlaVE1YmxLOVlLZy9CL20rTWVoQVB1ZmkxeitlYnloazE5MjNmSjR2aUJJ?=
- =?utf-8?B?eTQ3YWdWV1Fub25hUmtsSzJadWhMTDFEMFk4TE50SVZJYWJiR3E1MWR2bGZs?=
- =?utf-8?B?Vm4xUE5RcitnMWxaZ1BLNFIwUmt1TlllbXBKYWhvYWdBK25XQnFyMEk1Vk1L?=
- =?utf-8?B?eE0zUTRTd2VMLzRHVkFGMVFwR0FSVWhXc2xKeW9xaDBRV3NFQ0NsbnJqb1Vt?=
- =?utf-8?B?K1c0akRPQU9hZU5nVWt6MUR4aUpmUUF0Y0RaejRMQWpZUytmUVlQZVZScDYr?=
- =?utf-8?B?bEx4SzZ6SE4zQzdyQ2J1Y0JKT0lDUkxoMkhVRThhbXdpSDB4L01FUEo1dXdJ?=
- =?utf-8?B?TEVSSWUwWnI1VWFnUnFCWnlyY3Z4NDloSmxUQjFKYlNoTFRIWEh4TTZES2k3?=
- =?utf-8?Q?Q3AOX84kI10=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dlpKcnlOQmJQL01wNGYreFB3N1FOazdZNjhWbzN6TjE3WnhEdkNEakhCVE51?=
- =?utf-8?B?T0FxSll6RUNMTjFJLzk3SHoyRnFrVHZJa3dkakhuWWlMRXVURmIwRkQ4VGg0?=
- =?utf-8?B?TVlrbmV0akhldWxsVUFUaUJQbkxxVjh3bHVOcC9kUDJOVkoxbnJqWlN2N0Yx?=
- =?utf-8?B?dnRaY3Z4YndlSmpHVlR1c01GUXd3MHJBZGRNMTF0MUJQNGpjS1NzN2RrVWQ2?=
- =?utf-8?B?UUV5N0s1aFpzbWE1dE04TU5FejRkd2N0RzNiL1Y4MW56VHQ4WmtucXVnYUlp?=
- =?utf-8?B?Q2lUcWhySXZtZ3lJQytwK2lLT1UvdkFYaDhzcXpwbDFydzFwQWZIbmJva05v?=
- =?utf-8?B?dnhoQ0pmTU9uS2dWZnh1MFV1eFBpdjlCb2ltdFNvbU0rcmxVK0Z3Y2FOdjU1?=
- =?utf-8?B?bnBBQksrcEtIaDd3alJKNUdlN3lDWnBqM1dUc0FzSW1GeTR1cGtKa2ZzdG1F?=
- =?utf-8?B?TXQ4VU5KUTNHR3Z1T3hVTlliSU5JU2UxczBuYVg2RWdCdUY4Wk44WkRwVkRZ?=
- =?utf-8?B?Z2lIc0N5amR2V014dGt6THdnYUlyRDRGSXI1SEt6aEFaNnM3b1FKSlRXeG4y?=
- =?utf-8?B?cVFQd2d4ZGRlU2xBOC9KdjR1WnNJYUxFZ09Wd3hWSEJOWm5VV0g0VFpMdDR1?=
- =?utf-8?B?R3N4MlMyNjgyNkxVa210dGYzU3NZRHNBbzRoZ3ZLbkhQRXA2N3JWMC9lS1FS?=
- =?utf-8?B?cXNFd1RsVE9rdjhtTlZEdUJic1ZFckxKSlVpOHZ0Y0tHYUxYb2NNOW9SdTNG?=
- =?utf-8?B?SStpeDRUdzA1dkhYVVdnS05kdkRkUWFIcjNmUDYxK0F1UmVDOFR2YlZLbHhk?=
- =?utf-8?B?NVA3aTVEWVdzSk1Rc2pFa3RnZmJjajdtczN6aU5aTnU0ZHJabHl4TEhZRlNJ?=
- =?utf-8?B?dllTRnZxRjFsS3UrbVFTSkRTcVNMc2dWU21jVFYwZ3FJSzcyTVZmYStKQ1FC?=
- =?utf-8?B?VlQxem9hTzEvOVN3dHJiN2trK1VxN3R2K1FMNFFpSEZhbEkyVjNDRkNZZ2Qv?=
- =?utf-8?B?YVFKT3RLd3o4bE9UaGx3ZVQySnFQQitZUmx2VjdVWGpCOTM5UVdYaWVOdzEw?=
- =?utf-8?B?L3h1UG1DRzNOdGE4YU9tc0ZCc2ltb3NhWmgwUnBqWmdzbXFoKzk5WC8zajZv?=
- =?utf-8?B?RWZ3dFkwZnZXSElxM3owM0o2RyttWlZtY2ljV3NzQUd2cjNzbVE5NlhYSFBE?=
- =?utf-8?B?eXdTWjFwcVNhdDR0VmJyRGlRUDJuQVZ3QUFlTWdRTkRPY0Nvb1FpWmUxV1li?=
- =?utf-8?B?bE1iV2Y2T0d1cDdxUHJWSDVYNUp4Z21nN2xMTkdRdkJMNkxyd3RqQnY4UlNM?=
- =?utf-8?B?K3JQOTN6TS9ZV3hXQmV4Ri9PenVhdEpZcnBWbnNIWGFTcU1DY0QyNUREQ0tE?=
- =?utf-8?B?OEVsS0NicU96WE5oSU51a3lONm82dldkMnp5d1VjT29jZ2xVdFdicGowQjBU?=
- =?utf-8?B?QkJjQ20xYUJ5Yk9iOXlWY1NZY2xqWC9QWWhYNm5NQ2tOSUdlZlFzMXFFMXQ3?=
- =?utf-8?B?T1FsQlpwOVZSUzdUT1Q4QXN3ZDBnWWR2WUhvY2tMWmU0NlJhNzI1WUc2TE5I?=
- =?utf-8?B?dC96L2pUbUpwWnkzekZYaGZ0MXBGTTJzTmZ1ZmVUQmVTZEZEZ3luNTVybzYy?=
- =?utf-8?B?YTdURlhqSkdvV2ZxbWVJbU9EUHF5bisxRzlyd2RQK1N3dnVLV3QzUHJaNE1x?=
- =?utf-8?B?NmxkT29RWXNZZ2ZUVEhhQjA4VEczTFVwOU5ENndPYk9XZG9RYy82ZlBhbDZU?=
- =?utf-8?B?UmpScDZsaDJ4czJQdjVpNE1DeXFKbW5PWXV4N0dLcXFNbWV6VHZLYXg3b2J0?=
- =?utf-8?B?a0FzYWkrdnhRam9XRVBpcE4xVjZLRlhiOHJQUnplYTBRZjNtV3RkVTVNSWd2?=
- =?utf-8?B?VUl2SDdvQVU5QXdqczE0UHI2V0hacGVBcVUxK2ZQNThURzBlRDlXQUI0b1M1?=
- =?utf-8?B?MG5SYkZJeHNSMERoWmNsVE5oVkQ2VXd1MDBPb1pLdVVHaUdod2ZwZFNLdS93?=
- =?utf-8?B?RnRTOFNKMnRRSjA1R3ZBSkx6UWNDMnNDeEJHeExwMVgwY0lwNzVnWkJaemZH?=
- =?utf-8?B?bTFTZDl4ZkdKMytDcEoyMndpTnBocHIrSzFTV1R3Tjd1aCtJS1pCbUp5b2tp?=
- =?utf-8?B?QnUrTHB4NFl6cm5ITGZaellQQ08xZWkvcWQ0MlY1Um5kSTRDcXk1aFF1SURS?=
- =?utf-8?B?WlE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: faade402-165a-4acc-cf02-08ddea670e32
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2025 21:24:09.9965
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lKZPy+ROUs3Y80omOyKwG0GeO0jeUM+5KeJd+7+JfOmQV8MK4L9O89g8PkvMzZt3kxj1QyJAIW9ST8GYwg+lljOVrlZgzkDTAkHtisjX02Q=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7926
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250902033809.177182-2-wilfred.opensource@gmail.com>
 
---------------gJTHodK5fGpWOaIkYLsHuk3y
-Content-Type: multipart/mixed; boundary="------------J1XHtNwYoKry8AORgleNyu43";
- protected-headers="v1"
-From: Jacob Keller <jacob.e.keller@intel.com>
-To: Saeed Mahameed <saeed@kernel.org>, Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>,
- netdev@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>,
- Gal Pressman <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
- Jiri Pirko <jiri@nvidia.com>, Simon Horman <horms@kernel.org>,
- Vlad Dumitrescu <vdumitrescu@nvidia.com>, Kamal Heib <kheib@redhat.com>
-Message-ID: <5056c692-7478-4f38-8859-7cc7c823bbf5@intel.com>
-Subject: Re: [PATCH net-next V6 01/13] devlink: Add 'total_vfs' generic device
- param
-References: <20250709030456.1290841-1-saeed@kernel.org>
- <20250709030456.1290841-2-saeed@kernel.org>
- <20250709195331.197b1305@kernel.org> <aG9RuB2hJNaOTV3e@x130>
-In-Reply-To: <aG9RuB2hJNaOTV3e@x130>
+Hi Wilfred,
 
---------------J1XHtNwYoKry8AORgleNyu43
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on net-next/main]
+[also build test WARNING on net/main linus/master horms-ipvs/master v6.17-rc4 next-20250902]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Wilfred-Mallawa/net-tls-support-maximum-record-size-limit/20250902-114005
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250902033809.177182-2-wilfred.opensource%40gmail.com
+patch subject: [PATCH v2] net/tls: support maximum record size limit
+config: i386-buildonly-randconfig-001-20250903 (https://download.01.org/0day-ci/archive/20250903/202509030542.ZW9r1S1c-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250903/202509030542.ZW9r1S1c-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202509030542.ZW9r1S1c-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   net/tls/tls_sw.c: In function 'tls_sw_sendmsg_locked':
+>> net/tls/tls_sw.c:1036:13: warning: variable 'record_size_limit' set but not used [-Wunused-but-set-variable]
+    1036 |         u16 record_size_limit;
+         |             ^~~~~~~~~~~~~~~~~
 
 
+vim +/record_size_limit +1036 net/tls/tls_sw.c
 
-On 7/9/2025 10:38 PM, Saeed Mahameed wrote:
-> On 09 Jul 19:53, Jakub Kicinski wrote:
->> On Tue,  8 Jul 2025 20:04:43 -0700 Saeed Mahameed wrote:
->>> +   * - ``total_vfs``
->>> +     - u32
->>> +     - The total number of Virtual Functions (VFs) supported by the =
-PF.
->>
->> "supported" is not the right word for a tunable..
->=20
->  From kernel Doc:
->=20
-> int pci_sriov_get_totalvfs(struct pci_dev *dev)
-> get total VFs _supported_ on this device
->=20
-> Anyway:
-> "supported" =3D> "exposed" ?
->=20
->=20
+  1024	
+  1025	static int tls_sw_sendmsg_locked(struct sock *sk, struct msghdr *msg,
+  1026					 size_t size)
+  1027	{
+  1028		long timeo = sock_sndtimeo(sk, msg->msg_flags & MSG_DONTWAIT);
+  1029		struct tls_context *tls_ctx = tls_get_ctx(sk);
+  1030		struct tls_prot_info *prot = &tls_ctx->prot_info;
+  1031		struct tls_sw_context_tx *ctx = tls_sw_ctx_tx(tls_ctx);
+  1032		bool async_capable = ctx->async_capable;
+  1033		unsigned char record_type = TLS_RECORD_TYPE_DATA;
+  1034		bool is_kvec = iov_iter_is_kvec(&msg->msg_iter);
+  1035		bool eor = !(msg->msg_flags & MSG_MORE);
+> 1036		u16 record_size_limit;
+  1037		size_t try_to_copy;
+  1038		ssize_t copied = 0;
+  1039		struct sk_msg *msg_pl, *msg_en;
+  1040		struct tls_rec *rec;
+  1041		int required_size;
+  1042		int num_async = 0;
+  1043		bool full_record;
+  1044		int record_room;
+  1045		int num_zc = 0;
+  1046		int orig_size;
+  1047		int ret = 0;
+  1048	
+  1049		if (!eor && (msg->msg_flags & MSG_EOR))
+  1050			return -EINVAL;
+  1051	
+  1052		if (unlikely(msg->msg_controllen)) {
+  1053			ret = tls_process_cmsg(sk, msg, &record_type);
+  1054			if (ret) {
+  1055				if (ret == -EINPROGRESS)
+  1056					num_async++;
+  1057				else if (ret != -EAGAIN)
+  1058					goto send_end;
+  1059			}
+  1060		}
+  1061	
+  1062		record_size_limit = tls_ctx->record_size_limit ?
+  1063				    tls_ctx->record_size_limit : TLS_MAX_PAYLOAD_SIZE;
+  1064	
+  1065		while (msg_data_left(msg)) {
+  1066			if (sk->sk_err) {
+  1067				ret = -sk->sk_err;
+  1068				goto send_end;
+  1069			}
+  1070	
+  1071			if (ctx->open_rec)
+  1072				rec = ctx->open_rec;
+  1073			else
+  1074				rec = ctx->open_rec = tls_get_rec(sk);
+  1075			if (!rec) {
+  1076				ret = -ENOMEM;
+  1077				goto send_end;
+  1078			}
+  1079	
+  1080			msg_pl = &rec->msg_plaintext;
+  1081			msg_en = &rec->msg_encrypted;
+  1082	
+  1083			orig_size = msg_pl->sg.size;
+  1084			full_record = false;
+  1085			try_to_copy = msg_data_left(msg);
+  1086			record_room = TLS_MAX_PAYLOAD_SIZE - msg_pl->sg.size;
+  1087			if (try_to_copy >= record_room) {
+  1088				try_to_copy = record_room;
+  1089				full_record = true;
+  1090			}
+  1091	
+  1092			required_size = msg_pl->sg.size + try_to_copy +
+  1093					prot->overhead_size;
+  1094	
+  1095			if (!sk_stream_memory_free(sk))
+  1096				goto wait_for_sndbuf;
+  1097	
+  1098	alloc_encrypted:
+  1099			ret = tls_alloc_encrypted_msg(sk, required_size);
+  1100			if (ret) {
+  1101				if (ret != -ENOSPC)
+  1102					goto wait_for_memory;
+  1103	
+  1104				/* Adjust try_to_copy according to the amount that was
+  1105				 * actually allocated. The difference is due
+  1106				 * to max sg elements limit
+  1107				 */
+  1108				try_to_copy -= required_size - msg_en->sg.size;
+  1109				full_record = true;
+  1110			}
+  1111	
+  1112			if (try_to_copy && (msg->msg_flags & MSG_SPLICE_PAGES)) {
+  1113				ret = tls_sw_sendmsg_splice(sk, msg, msg_pl,
+  1114							    try_to_copy, &copied);
+  1115				if (ret < 0)
+  1116					goto send_end;
+  1117				tls_ctx->pending_open_record_frags = true;
+  1118	
+  1119				if (sk_msg_full(msg_pl))
+  1120					full_record = true;
+  1121	
+  1122				if (full_record || eor)
+  1123					goto copied;
+  1124				continue;
+  1125			}
+  1126	
+  1127			if (!is_kvec && (full_record || eor) && !async_capable) {
+  1128				u32 first = msg_pl->sg.end;
+  1129	
+  1130				ret = sk_msg_zerocopy_from_iter(sk, &msg->msg_iter,
+  1131								msg_pl, try_to_copy);
+  1132				if (ret)
+  1133					goto fallback_to_reg_send;
+  1134	
+  1135				num_zc++;
+  1136				copied += try_to_copy;
+  1137	
+  1138				sk_msg_sg_copy_set(msg_pl, first);
+  1139				ret = bpf_exec_tx_verdict(msg_pl, sk, full_record,
+  1140							  record_type, &copied,
+  1141							  msg->msg_flags);
+  1142				if (ret) {
+  1143					if (ret == -EINPROGRESS)
+  1144						num_async++;
+  1145					else if (ret == -ENOMEM)
+  1146						goto wait_for_memory;
+  1147					else if (ctx->open_rec && ret == -ENOSPC) {
+  1148						if (msg_pl->cork_bytes) {
+  1149							ret = 0;
+  1150							goto send_end;
+  1151						}
+  1152						goto rollback_iter;
+  1153					} else if (ret != -EAGAIN)
+  1154						goto send_end;
+  1155				}
+  1156				continue;
+  1157	rollback_iter:
+  1158				copied -= try_to_copy;
+  1159				sk_msg_sg_copy_clear(msg_pl, first);
+  1160				iov_iter_revert(&msg->msg_iter,
+  1161						msg_pl->sg.size - orig_size);
+  1162	fallback_to_reg_send:
+  1163				sk_msg_trim(sk, msg_pl, orig_size);
+  1164			}
+  1165	
+  1166			required_size = msg_pl->sg.size + try_to_copy;
+  1167	
+  1168			ret = tls_clone_plaintext_msg(sk, required_size);
+  1169			if (ret) {
+  1170				if (ret != -ENOSPC)
+  1171					goto send_end;
+  1172	
+  1173				/* Adjust try_to_copy according to the amount that was
+  1174				 * actually allocated. The difference is due
+  1175				 * to max sg elements limit
+  1176				 */
+  1177				try_to_copy -= required_size - msg_pl->sg.size;
+  1178				full_record = true;
+  1179				sk_msg_trim(sk, msg_en,
+  1180					    msg_pl->sg.size + prot->overhead_size);
+  1181			}
+  1182	
+  1183			if (try_to_copy) {
+  1184				ret = sk_msg_memcopy_from_iter(sk, &msg->msg_iter,
+  1185							       msg_pl, try_to_copy);
+  1186				if (ret < 0)
+  1187					goto trim_sgl;
+  1188			}
+  1189	
+  1190			/* Open records defined only if successfully copied, otherwise
+  1191			 * we would trim the sg but not reset the open record frags.
+  1192			 */
+  1193			tls_ctx->pending_open_record_frags = true;
+  1194			copied += try_to_copy;
+  1195	copied:
+  1196			if (full_record || eor) {
+  1197				ret = bpf_exec_tx_verdict(msg_pl, sk, full_record,
+  1198							  record_type, &copied,
+  1199							  msg->msg_flags);
+  1200				if (ret) {
+  1201					if (ret == -EINPROGRESS)
+  1202						num_async++;
+  1203					else if (ret == -ENOMEM)
+  1204						goto wait_for_memory;
+  1205					else if (ret != -EAGAIN) {
+  1206						if (ret == -ENOSPC)
+  1207							ret = 0;
+  1208						goto send_end;
+  1209					}
+  1210				}
+  1211			}
+  1212	
+  1213			continue;
+  1214	
+  1215	wait_for_sndbuf:
+  1216			set_bit(SOCK_NOSPACE, &sk->sk_socket->flags);
+  1217	wait_for_memory:
+  1218			ret = sk_stream_wait_memory(sk, &timeo);
+  1219			if (ret) {
+  1220	trim_sgl:
+  1221				if (ctx->open_rec)
+  1222					tls_trim_both_msgs(sk, orig_size);
+  1223				goto send_end;
+  1224			}
+  1225	
+  1226			if (ctx->open_rec && msg_en->sg.size < required_size)
+  1227				goto alloc_encrypted;
+  1228		}
+  1229	
+  1230		if (!num_async) {
+  1231			goto send_end;
+  1232		} else if (num_zc || eor) {
+  1233			int err;
+  1234	
+  1235			/* Wait for pending encryptions to get completed */
+  1236			err = tls_encrypt_async_wait(ctx);
+  1237			if (err) {
+  1238				ret = err;
+  1239				copied = 0;
+  1240			}
+  1241		}
+  1242	
+  1243		/* Transmit if any encryptions have completed */
+  1244		if (test_and_clear_bit(BIT_TX_SCHEDULED, &ctx->tx_bitmask)) {
+  1245			cancel_delayed_work(&ctx->tx_work.work);
+  1246			tls_tx_records(sk, msg->msg_flags);
+  1247		}
+  1248	
+  1249	send_end:
+  1250		ret = sk_stream_error(sk, msg->msg_flags, ret);
+  1251		return copied > 0 ? copied : ret;
+  1252	}
+  1253	
 
-The parameter relates to the maximum number of VFs you could create. It
-sounds like this hardware by default sets to 0, and you can change that
-in the NVM with external tools. This adds a devlink parameter to allow
-setting to be changed from the kernel tools.
-
-exposed seems reasonable to me. You could also have language that
-explains this is about a maximum, since this changes the value reported
-by pci_sriov_get_totalvfs. You still have the usual means to
-enable/disable VFs via the standard PCI interfaces.
-
---------------J1XHtNwYoKry8AORgleNyu43--
-
---------------gJTHodK5fGpWOaIkYLsHuk3y
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wnsEABYIACMWIQQgQFSp1zOQVirsQx5qll0+bw8o6AUCaLdgdwUDAAAAAAAKCRBqll0+bw8o6H68
-AQDERFBIZT2NQpZnFo6aFPxY3625n4xCRoa7Y2XgbwAgDgD+MHWpyDg5qtDmyYkI0Kx8Lp1Fd9ET
-UGZh88UqbpfHmQM=
-=EOyW
------END PGP SIGNATURE-----
-
---------------gJTHodK5fGpWOaIkYLsHuk3y--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
