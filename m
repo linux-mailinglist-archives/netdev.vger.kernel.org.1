@@ -1,84 +1,78 @@
-Return-Path: <netdev+bounces-219027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFAB6B3F6B0
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 09:27:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF568B3F6CF
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 09:41:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BA09482998
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 07:27:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B6411A83CB7
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 07:42:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C9C82E7198;
-	Tue,  2 Sep 2025 07:27:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF9ED2E613C;
+	Tue,  2 Sep 2025 07:41:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PfvKcXOX"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="q3UoKuHI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D5DF2E7161;
-	Tue,  2 Sep 2025 07:27:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD64A2E2F05
+	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 07:41:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756798022; cv=none; b=f71LKM5H39KLUGFzBY+4tCtksCfz5r5BEKY4Mac3cBFcXDn+cr/E1EPod2AOc4ll4EQ9lrpccG7Cl1gZ0hoGf91tYofZ0QZSVtY5KlWjnAezayV8cP5QEmkydh47BGfb0h8ilKHzYHZmJzMvhF3objof50r+JjrRCoXTt+m0XBQ=
+	t=1756798902; cv=none; b=TZCNO4RDglvWob2iAvsakQ1sSkN5TtETRldfNYeItEdLyEF5/CVt9LhZYpCs8BbiugOx9wdqTiMMPyLTuQrRZBSDoOeUAk+bjzA4EGDeZFoR//zkWgHH63dhmKWLOTYK5t67GBUOCQNw4RrC0t1nnoNI+rVbynQch/tImUSxNaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756798022; c=relaxed/simple;
-	bh=xTq95Uos8ySKCMSvNlHXkMyVUKtFsnmtWhcOg153asY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VnsZB7F5WjP8FU2TwOIHC6NnpKbKv+Dlg82/FlofINAoEHSa9231vVggAEarxEuKscaWV1ktwMrmP3+Y77pRtrSCFrM2vh7v1D9l1zUBPhKEsyvuxNeUbNrHk3jXvvUPku3syclS3Dma5JpLMITfjgNItMUkKf9kPbJNl/bAk6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PfvKcXOX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DED88C4CEED;
-	Tue,  2 Sep 2025 07:26:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756798021;
-	bh=xTq95Uos8ySKCMSvNlHXkMyVUKtFsnmtWhcOg153asY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PfvKcXOXMquLx3HcJowTro6dE0pV6mSjwiwi0IrdoZC8RWs6hRpT71f80/6j97Kh4
-	 5H5b0lJ5DC3Wag//MSAvjXTOmytsEjctUPJX5L+HxuFYm8QJafckYYFLTsEDpYhGkU
-	 PL1ihYeUTtmwhHr7nvtxYw4DullbydALvlo49ga7U8ccrRNiWWy6kycm0WPy3i8Nqo
-	 YW8932O74bJDJS9Rai+BScFZp2xL0SxHNhn9bZnlf5fsJzejg6deLW1FONwAxYZiH9
-	 we389pwN4nXSRcXTWbXsYF35ixPCNzweAYA3QEN3nrMCOJPvoCZTo7wnSFtsuTm0PI
-	 zCxi2ohDnWUcA==
-Date: Tue, 2 Sep 2025 08:26:57 +0100
-From: Simon Horman <horms@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: selftests: clean up
- tools/testing/selftests/net/lib/py/utils.py
-Message-ID: <20250902072657.GP15473@horms.kernel.org>
-References: <20250901-fix-v1-1-df0abb67481e@debian.org>
+	s=arc-20240116; t=1756798902; c=relaxed/simple;
+	bh=QIK209W21FlyFntgm+zs6uQT9kcebOLcZlrG1QTxl1w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qrX/skfSsyvvedX49J7tsPbiGb6rh7V+0eQwZ9uN2OSYTbkeKHC9eK6KXB9VNcFIc31Ch1yIBq1omHeTFc6aSbSPktS4rF3VHC8wYlGniI1wqzCKfmH3e8VuIiBEEoreYzsSnhxp2+8qoXi36QK25lYPyjj4voU5P8t25GOvfHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=q3UoKuHI; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <195a39b6-e4e6-48b0-bb47-3c86d8be20fa@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1756798897;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IeU3paiQ9HhrqVYRKq8jOEDqZ9NfHngwUbp9m30YdWo=;
+	b=q3UoKuHI6ukCKweGSo4WX/fL2NwxsGF2knvkeWskJUIHacuCDJL7uQQJOXeRMc4BHADlMz
+	tSTTwdJ3r0MkXZSzgcpihM1CVtctB4FKpu83Jxg0yqxZ76owrtESOeeGdeB4sbeXMeRkCp
+	99jB3zagFkLf9Gl+8CevvDdXfA724iU=
+Date: Tue, 2 Sep 2025 08:41:23 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250901-fix-v1-1-df0abb67481e@debian.org>
+Subject: Re: [PATCH v2] net: intel: fm10k: Fix parameter idx set but not used
+To: Brahmajit Das <listout@listout.xyz>
+Cc: andrew+netdev@lunn.ch, anthony.l.nguyen@intel.com, davem@davemloft.net,
+ intel-wired-lan@lists.osuosl.org, kuba@kernel.org, netdev@vger.kernel.org,
+ przemyslaw.kitszel@intel.com
+References: <e13abc99-fb35-4bc4-b110-9ddfa8cdb442@linux.dev>
+ <20250902072422.603237-1-listout@listout.xyz>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20250902072422.603237-1-listout@listout.xyz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Sep 01, 2025 at 03:00:07AM -0700, Breno Leitao wrote:
-> This patch improves the utils.py module by removing unused imports
-> (errno, random), simplifying the fd_read_timeout() function by
-> eliminating unnecessary else clause, and cleaning up code style in the
-> defer class constructor.
+On 02/09/2025 08:24, Brahmajit Das wrote:
+> Variable idx is set in the loop, but is never used resulting in dead
+> code. Building with GCC 16, which enables
+> -Werror=unused-but-set-parameter= by default results in build error.
+> This patch removes the idx parameter, since all the callers of the
+> fm10k_unbind_hw_stats_q as 0 as idx anyways.
 > 
-> Additionally, it renames the parameter in rand_port() from 'type' to
-> 'stype' to avoid shadowing the built-in Python name 'type', improving
-> code clarity and preventing potential issues.
-> 
-> These changes enhance code readability and maintainability without
-> affecting functionality.
-> 
-> Signed-off-by: Breno Leitao <leitao@debian.org>
+> Suggested-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> Signed-off-by: Brahmajit Das <listout@listout.xyz>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-
-
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
