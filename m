@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-219376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A01C8B410E2
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 01:40:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01A2CB410E4
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 01:40:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49E09179FE0
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:40:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B93F18917D5
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:40:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8242928750B;
-	Tue,  2 Sep 2025 23:40:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FE962E11DC;
+	Tue,  2 Sep 2025 23:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qg4Mmyix"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W2Su4P4P"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E2D279359;
-	Tue,  2 Sep 2025 23:40:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E045B2DEA8E
+	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 23:40:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756856405; cv=none; b=NIEafi1ElIYapa7gYb44Xm154hPltX9Av/4B1vl4bVGrvERTbcI59YmQu/2h/x+cu1XlJzEMUJPYE0T8lUGRSVxPIWVXAEReZMx8BoBCzyrsxXhLp0/1LuK1BaGe1rih4GD+f7OTYJZVLP0BxvOqoIIBHYrjikyUnDxeJnIc1Mw=
+	t=1756856409; cv=none; b=XYBRYKZ8/EOyBpPRr3rPjxhSyD7FaZlIeNaFY6K2Snn+XvXG77vbFBQszSpyF/7CRsJqkouTgVZeWjaM8rXBVRegDoQbXc4Znq8B6c8N6euIIYVdefvtjyLRvEIwiR6BQteAi3mdUTx7H+6oveNQ2mNrJmYx/2XMX1LvpZPn0D8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756856405; c=relaxed/simple;
-	bh=uDpCbvYpxyXICiyn+K2uvvcRtzBFtDer1dBT3HfmcM8=;
+	s=arc-20240116; t=1756856409; c=relaxed/simple;
+	bh=xiSbhy6xi8odfOfmGuOvnEhzww7V0vgjvJL+Sda29Q8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=fz8Kqffsfw3nvygkw5HpfdCX9bLg41t6BL8niaS3AXrH247u8+MmIUnPr2a7IYxkxmD5iwVOkrXtsD/BvO2rMQohGCTiD4BcZwyZkAushqdG2rGCyULcurzCcBwogC7pL3Q+UBvc3zjDjDLNuv2t2+bmCyjrEsd7Th1DBjZC4U4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qg4Mmyix; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D34EDC4CEED;
-	Tue,  2 Sep 2025 23:40:04 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=JTKEyJYzcQ2EyJPLvA+W7EFV/+qGyX0oHpwMBaMK/MvnXH8WLi3fvC+2s+U7BBrt0e/sxd7EhnQXocnpZdaLI2TZc0KOM8qwOmO6X9K3zbxV/D6HsPqWbIknHcNRYKXboIAIvTreHDGUqUXjNyAI5MBDxDj1Wy2Vp/zs2O6Jvrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W2Su4P4P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58C57C4CEED;
+	Tue,  2 Sep 2025 23:40:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756856404;
-	bh=uDpCbvYpxyXICiyn+K2uvvcRtzBFtDer1dBT3HfmcM8=;
+	s=k20201202; t=1756856406;
+	bh=xiSbhy6xi8odfOfmGuOvnEhzww7V0vgjvJL+Sda29Q8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qg4MmyixaP+Wj8rMI3vy5lF9Qxk/z5NmRRk29GIJ40+5MIg+dQ9or/cXtbYNfYfya
-	 rEEON88NCXjW56NON6zixk3j7C4EzEhEcUxgBoPVRNUsykQQpw53PCcCu6dJI31BVS
-	 v+//cJ6ykyU/IM9nfUPltxm+CY572HqIn9/Ad6KphfjrT+JFUkqjn9/aE9qDjNvzV+
-	 FiGW14I42FxWXc2ctIhD+iZUjnWFDJFTZvejeZMpxiPQCE0OXXeN5/ESm8fMt6zyNE
-	 x/HHN6SxXPztLgScRMLM5qsdj81BRk9pBYHLYq9Q4Kzar4+hXcZXHlIZ/HIh/64LtV
-	 wluZ7351CNO4Q==
+	b=W2Su4P4PNpvePqV0vCQq2MIexMLrPsHEMUJ/6on8k7UdnLrBsuAAgtVt7jPZzta2j
+	 y2Uz2b8gwCauv+PmOxmoUHoAkqE2Kj+2zKqVJNT8ib6YWvhwkPBJfBl08OMV4k+DL/
+	 a5Ev8uhnX7GOiumFtEtzXuxskiWhcAUGQy2FlIEPENGYTcE6f1zwR0k+1LJSBu8f2B
+	 MtwmlebegUG9ns3sFr8Qw72/NkmWt3aWUuLCT9d3mt+1U+tbOqKEECd6j+pJbursqm
+	 dPRXk/pq0rxdogYk7qPFTRfOFpuVJKC7TQ6+Zt0qQBp1UfP8mvR0+LHBT4K1p9EV1L
+	 blBUdml9w4ZEA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70B93383BF64;
-	Tue,  2 Sep 2025 23:40:11 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADE6383BF64;
+	Tue,  2 Sep 2025 23:40:12 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] net: pcs: rzn1-miic: Correct MODCTRL register offset
+Subject: Re: [PATCH net] net: ethernet: mtk_eth_soc: fix tx vlan tag for llc
+ packets
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175685641028.469813.9562190313607514125.git-patchwork-notify@kernel.org>
-Date: Tue, 02 Sep 2025 23:40:10 +0000
-References: <20250901112019.16278-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-In-Reply-To: <20250901112019.16278-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-To: Lad@codeaurora.org, Prabhakar <prabhakar.csengg@gmail.com>
-Cc: clement.leger@bootlin.com, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux-renesas-soc@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- biju.das.jz@bp.renesas.com, fabrizio.castro.jz@renesas.com,
- prabhakar.mahadev-lad.rj@bp.renesas.com, stable@kernel.org,
- wsa+renesas@sang-engineering.com, rmk+kernel@armlinux.org.uk,
- geert+renesas@glider.be
+ <175685641149.469813.17773036989909976650.git-patchwork-notify@kernel.org>
+Date: Tue, 02 Sep 2025 23:40:11 +0000
+References: <20250831182007.51619-1-nbd@nbd.name>
+In-Reply-To: <20250831182007.51619-1-nbd@nbd.name>
+To: Felix Fietkau <nbd@nbd.name>
+Cc: netdev@vger.kernel.org, hacks@slashdirt.org, sean.wang@mediatek.com,
+ lorenzo@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ igvtee@gmail.com, john@phrozen.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  1 Sep 2025 12:20:19 +0100 you wrote:
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+On Sun, 31 Aug 2025 20:20:07 +0200 you wrote:
+> When sending llc packets with vlan tx offload, the hardware fails to
+> actually add the tag. Deal with this by fixing it up in software.
 > 
-> Correct the Mode Control Register (MODCTRL) offset for RZ/N MIIC.
-> According to the R-IN Engine and Ethernet Peripherals Manual (Rev.1.30)
-> [0], Table 10.1 "Ethernet Accessory Register List", MODCTRL is at offset
-> 0x8, not 0x20 as previously defined.
+> Fixes: 656e705243fd ("net-next: mediatek: add support for MT7623 ethernet")
+> Reported-by: Thibaut VARENE <hacks@slashdirt.org>
+> Signed-off-by: Felix Fietkau <nbd@nbd.name>
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3] net: pcs: rzn1-miic: Correct MODCTRL register offset
-    https://git.kernel.org/netdev/net/c/a7195a3d67da
+  - [net] net: ethernet: mtk_eth_soc: fix tx vlan tag for llc packets
+    https://git.kernel.org/netdev/net/c/d4736737110f
 
 You are awesome, thank you!
 -- 
