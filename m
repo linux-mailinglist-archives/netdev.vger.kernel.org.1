@@ -1,122 +1,74 @@
-Return-Path: <netdev+bounces-219325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAE1BB40F8A
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:38:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F1126B40F9F
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:51:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 521F61B60DF3
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 21:39:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65CBF1B62496
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 21:51:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB41135AAB5;
-	Tue,  2 Sep 2025 21:38:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A93BA334716;
+	Tue,  2 Sep 2025 21:51:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t8IPsHmX"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qhNg+vWr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB5935A2BB;
-	Tue,  2 Sep 2025 21:38:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89DA71E51D
+	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 21:51:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756849119; cv=none; b=EzA0NPcj3a++ABhj2xYC2ipA9HKybshEWWsaacYiHacGWg7ae120hglypnOsMkDd/+XYkn5xdr9W5u5hqnNER3zOKdefcYzlUb432NHZeoA7fN8coMsiNCuEBsYx5XZC0ERP+a832aDwk3O1aKt8ghPkSjJycl4xfF3Z0LjEgHk=
+	t=1756849879; cv=none; b=pHwXpTOKlgV98vBF5W3Do+BWbY5AzSVkqJnK4qb8LyFr3TErufiBHlJjm32/1mJdIC47FGoOp9Hur9jvdCFkrOcE8GPSYPcM+QliTNELWMunE/Bbe878BY+KrGRSKGpyeO5iZXxMyCrBmhcwGm38Jk4+V8MnU+KRvyUdKYGw10A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756849119; c=relaxed/simple;
-	bh=RWzLvD4JVoHR9ApAGc3gcO8HvFNJdZzT8+yB+n3MPH8=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=Izh4zclrWQF28AN8tFf1RK9zv/cZw8xvEjR3qTrWa78I2btmLNxW9NEqc97OPCDehWg55Xd4+dNwG8MULLEJ050oiTEoT7sa22X+5vt3hAJuvfhU83KUE2paK9JAL0Bnfwj2HJibZfQguA2BhyE4nIACEoHJJkCTdaXNWqrS3C0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t8IPsHmX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA998C4CEED;
-	Tue,  2 Sep 2025 21:38:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756849119;
-	bh=RWzLvD4JVoHR9ApAGc3gcO8HvFNJdZzT8+yB+n3MPH8=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=t8IPsHmXG6//1qi8MrzggmcAeS6O4MPBqpIvOHmnsr+uAYCDE0lQy5XlqB/BGoCmU
-	 SnpOMsD+c21drqXTZBRxlXjDEWqNAyYSpIYsUo5yF00gYSL0r3pd1YsguBY1RnMw6U
-	 5WYk0J6xQMstx5sqLmFDKuGO61AR4Rex2twtp6VlKjIkgTXikqzWwOjCjhjzRhZ8l6
-	 zDXW6RsalKZBeBt11H5JofT4eAU57EFume07q8xA9RA719Y2ejOobSHKHRx+Q5OJO2
-	 nNN7b4J2opd4VofivTbkMqGlrX+HGVO50+RgrQ2v+r0/jGY4oS1Jr6heEMt9P1cVA6
-	 6/6u6Chm9Y9FA==
-Date: Tue, 2 Sep 2025 23:38:31 +0200 (GMT+02:00)
-From: Matthieu Baerts <matttbe@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, mptcp@lists.linux.dev,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
+	s=arc-20240116; t=1756849879; c=relaxed/simple;
+	bh=BLs6fa6QwJZy0SpnW2oD062jzcHB7ihzGagWwQka0qs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SHL9wnQk00ervk30+DEmP0nXELlcQCk56KtDKi7PG7r+WVFx78EHKEJon2HXhBIFha7B7OFqrmoIcYgHET1hVr8hYgSbMgfOko9Y/9qLcFgotp7zIPtTl0abr+cIzWQJxz4BP1JXOjJI9/LZxZUZZ/n43FZQ6nO6RPBmJVSFEdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qhNg+vWr; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=1Y+XzpUmDAYvYIBvIs8sE+o6JrB7umn+Tcm6jtqGLX4=; b=qhNg+vWrulgoJZ5Ldq4zH17owi
+	yXQrLFFW/AzBjB+TDPwACEPfWhG8EucGEiXGTkOfywjDBGm7xclI8Lsl81fFWcjl70QSxIcLZ4Hzd
+	IrgKMpYdg70Flss9mIjVJts3MwQ1Ltq7EezTj5YQu1iJ2bd/6kMkwjhS1k/l52vx4sDQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1utYu9-006wB3-KK; Tue, 02 Sep 2025 23:51:05 +0200
+Date: Tue, 2 Sep 2025 23:51:05 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>,
-	Christoph Paasch <cpaasch@openai.com>, Gang Yan <yangang@kylinos.cn>
-Message-ID: <739c86b1-5cf5-4525-919f-1ca13683b77f@kernel.org>
-In-Reply-To: <aLdfOrQ4O4rnD5M9@arm.com>
-References: <20250901-net-next-mptcp-misc-feat-6-18-v1-0-80ae80d2b903@kernel.org> <20250902072600.2a9be439@kernel.org> <834238b4-3549-4062-a29b-bf9c5aefa30f@kernel.org> <20250902082759.1e7813b8@kernel.org> <aLc2hyFAH9kxlNEg@arm.com> <d4205818-e283-4862-946d-4e51bf180158@kernel.org> <aLdfOrQ4O4rnD5M9@arm.com>
-Subject: Re: [PATCH net-next 0/6] mptcp: misc. features for v6.18
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Mathew McBride <matt@traverse.com.au>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net 1/3] net: phy: add phy_interface_weight()
+Message-ID: <501b88e3-ff34-4bb4-b499-37f635e1b894@lunn.ch>
+References: <aLSHmddAqiCISeK3@shell.armlinux.org.uk>
+ <E1uslwn-00000001SOx-0a7H@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Correlation-ID: <739c86b1-5cf5-4525-919f-1ca13683b77f@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1uslwn-00000001SOx-0a7H@rmk-PC.armlinux.org.uk>
 
-2 Sept 2025 23:18:56 Catalin Marinas <catalin.marinas@arm.com>:
+On Sun, Aug 31, 2025 at 06:34:33PM +0100, Russell King (Oracle) wrote:
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-> On Tue, Sep 02, 2025 at 08:50:19PM +0200, Matthieu Baerts wrote:
->> Hi Catalin,
->>
->> 2 Sept 2025 20:25:19 Catalin Marinas <catalin.marinas@arm.com>:
->>
->>> On Tue, Sep 02, 2025 at 08:27:59AM -0700, Jakub Kicinski wrote:
->>>> On Tue, 2 Sep 2025 16:51:47 +0200 Matthieu Baerts wrote:
->>>>> It is unclear why a second scan is needed and only the second one caught
->>>>> something. Was it the same with the strange issues you mentioned in
->>>>> driver tests? Do you think I should re-add the second scan + cat?
->>>>
->>>> Not sure, cc: Catalin, from experience it seems like second scan often
->>>> surfaces issues the first scan missed.
->>>
->>> It's some of the kmemleak heuristics to reduce false positives. It does
->>> a checksum of the object during scanning and only reports a leak if the
->>> checksum is the same in two consecutive scans.
->>
->> Thank you for the explanation!
->>
->> Does that mean a scan should be triggered at the end of the tests,
->> then wait 5 second for the grace period, then trigger another scan
->> and check the results?
->>
->> Or wait 5 seconds, then trigger two consecutive scans?
->
-> The 5 seconds is the minimum age of an object before it gets reported as
-> a leak. It's not related to the scanning process. So you could do two
-> scans in succession and wait 5 seconds before checking for leaks.
->
-> However, I'd go with the first option - do a scan, wait 5 seconds and do
-> another. That's mostly because at the end of the scan kmemleak prints if
-> it found new unreferenced objects. It might not print the message if a
-> leaked object is younger than 5 seconds. In practice, though, the scan
-> may take longer, depending on how loaded your system is.
->
-> The second option works as well but waiting between them has a better
-> chance of removing false positives if, say, some objects are moved
-> between lists and two consecutive scans do not detect the list_head
-> change (and update the object's checksum).
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Thank you for this very nice reply, that's very clear!
-
-I will then adapt our CI having CONFIG_DEBUG_KMEMLEAK_DEFAULT_OFF
-to do a manual scan at the very end, wait 5 seconds and do another.
-
-Cheers,
-Matt
-
+    Andrew
 
