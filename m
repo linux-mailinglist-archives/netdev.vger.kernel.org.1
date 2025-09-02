@@ -1,63 +1,87 @@
-Return-Path: <netdev+bounces-219166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 589E6B40202
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 15:08:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2767CB4020F
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 15:09:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3167316D14D
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 13:03:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 535A65E48FF
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 13:04:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0092B2DD5E2;
-	Tue,  2 Sep 2025 13:01:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B1122DCBF3;
+	Tue,  2 Sep 2025 13:03:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="heWvlY09"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RzJWVy2g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758432D47F9;
-	Tue,  2 Sep 2025 13:01:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 713712DC34E
+	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 13:03:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756818105; cv=none; b=OW7KTNhNQEGeH4NE3+m2Zk8w4XFdUNb+VGmOoRehn7FYuoSONkB+PG2yi7peE3QdsHq00vXPvnD4o+RP9pWFp20ohZ9ELi2w9uj3hXv881bJMYGDY1rcAGJaHCjsmOZJTtrHdBcQkgKrz48Inu/qcRwUeuiS5UNoZajKQviurh8=
+	t=1756818196; cv=none; b=IcIk+wQwLMLxrBDpt1GG4BsJbh4JA0P7W6HtXrwritqKWpxI8/fcE9QnVLfHFI4FfqkHbnwSephQNQ8HYcyWub1pZuKsfDajFq0QE5KMCTvMZKPBTbKIdPZ2KNgdOSgM5diNg9lt7OZ4OKS7+CGOfDq2Gl1/pQn0s5gICbIV4NA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756818105; c=relaxed/simple;
-	bh=BY8096YPuK69wizXU6JTN0dL6/NRKYI/+4IoiskxuHs=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
-	 In-Reply-To:Content-Type; b=UrHOzN81Cyd/eW1B/PjXaqMtt26KAmfX1qm3s/ht5pRsf+3SCqtMwFmYa8RJtMgRCz8rEoQIouq1DjNjLpILpm6I4SjRrOJoplMRYLcRSHPr2J7F2EUSdVWlAGJBSN0UsUkEb5royJ8OH1SP+k4RBoM80z9u7MNIOCCAKbAUVXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=heWvlY09; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 582AlBAt020481;
-	Tue, 2 Sep 2025 13:01:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	q/ZMfLGs7bSbR/zLo9REdb0DGA2A9TTnVxIecXKcFpU=; b=heWvlY09TS8Dodcj
-	nDk1axW8WKeKESl3t7YB57gIJl02SHSstPuUElQGK0bO3hNDMPVnWck5iAyy1UZD
-	5P732GpB1+1zQ9B9Dmg4HMFENXcUvWsKJeb5FMR+t6ZHfqUCh0feSR6IaJ50szS2
-	FgslHdsDSqN4AcUcQlYdFNHqOii3RdbDAsOdi8ooPKJ6luBd9rAnJYP1dlZtyNki
-	W83/HBHjei/tUnqmD6InohdanoKKtXReS/rgTf2a8xGtrkgXx+UaXED/e7ciUHk9
-	yxK9ptGLgVM/Wht31Awsp5evF0QG/1uXjBTgvPtnBKxqaB3rQrULLxv8nllKdA0r
-	OUBwqw==
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48ur8ryx05-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 02 Sep 2025 13:01:22 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 582D1JZk032156
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 2 Sep 2025 13:01:19 GMT
-Received: from [10.253.38.125] (10.80.80.8) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.24; Tue, 2 Sep
- 2025 06:01:11 -0700
-Message-ID: <245522c7-f1ee-4e49-a08e-b23580b06939@quicinc.com>
-Date: Tue, 2 Sep 2025 21:01:09 +0800
+	s=arc-20240116; t=1756818196; c=relaxed/simple;
+	bh=uIQOOOowz4CN1rhTTJCbXQVsq6MAI3mbDvWnQhC9OPU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Hnk2SgGprXL/jsRiqhWCgs/PVqDB3i/KXrwo3rsR9QP1Nl298ix9bZ7ly6WUeaxYQx3dTXtGi4VHTrBdXo1WV4Ef0/g64G61R12PiawKD1tohUMxPrgC+jD9KUhdeMbLcFNCceV2AV45C44wY3B5/Ypp5sb3I7b4hKy+LEp7cQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RzJWVy2g; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756818192;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FqKOZ77CDWS20D6kmfLQTPPlNJdRjsyD/W9G47iuzwE=;
+	b=RzJWVy2gx/B/GazSnXeKViJEJ8XNviGkK8v9HLATyJFX/bGySaBy+LtugH2z6PIaQCorsg
+	QtqolTAe3vKl0F1Tjd2HNqSphK768B66KvL47uS9A+iojQD0iSrOBFSLEk3QPJ/zMCuvXM
+	tTwaYNPyVgv/mqedUyAXILJXrkkjD74=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-681-WrGrnI0mOH2vXHNZnf0hyA-1; Tue, 02 Sep 2025 09:03:07 -0400
+X-MC-Unique: WrGrnI0mOH2vXHNZnf0hyA-1
+X-Mimecast-MFC-AGG-ID: WrGrnI0mOH2vXHNZnf0hyA_1756818186
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3cd08f3dfb3so1753205f8f.2
+        for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 06:03:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756818186; x=1757422986;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FqKOZ77CDWS20D6kmfLQTPPlNJdRjsyD/W9G47iuzwE=;
+        b=ZG/5Am8C3TiHGrr55llNfOsU7Rijy5OgsEctT/ckrMKk+l35ny6+rhPPmsC+XosSEd
+         e1nQwANajXd5FqkE+JEi1RDHbPDsmXrCiDS8QJbS4fLO2t8gqKC3mjvtIoF+HTHC/P/+
+         LZZTAi8fTQGd/ImpE9oHONotL8Ml1tGqD7FK2NnDQ21tejoYO2hNGrMQ58K4SGb8J0AO
+         3gfRmpYpsWjv1izuC3EFyHqtogX7QruSvsk9nylY9NaUJq23MIV6YmznbukBYID4UtGC
+         ltF00CxMKNBfMpjQHneuhYfhW2JMtEcjQpK4UHgFCm+vl2nqm7NAAWVudIUTcGTjKQ6t
+         2XwA==
+X-Forwarded-Encrypted: i=1; AJvYcCXuCIj1czA91IMZD6vcSeqWppp5DURPYukN7BoE/hb5CaL46x1B2fnBY/bmzPYkysNeFcOGS8w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0BTNXSaJl6zFTJlauiR6P6luen38yDYvigJncF8BFHpLTUDb0
+	Y/4ef+wv3yUItPrHFgaviFwrpo+7AS18Q5fBsycVR5HcO78WlR+YfKl8eyIuAofMQCpjdfzXYnt
+	k1NWCj8ep+MkpG5MtpGG9ax4IcOhW5avJurpFb84Am+u/lr7z7ug6o+DTBQ==
+X-Gm-Gg: ASbGncsUxLNofd1NNH6Swq/Du3tjBDfs+zEX7B9Fb+dAezHeGwzlpZblQoMgKLOGJyK
+	qrsJkGzgl4iLME4MTHUXwNUH0UYyRZ/rdZoL81O6KFn1/og3FY+ANtQpbk2fo0WLGq8L56DdEi5
+	ExYDaLlz795wdCpstZz5UuJwqHlDn0FNsOkS/cV9q4TXHjoKZF9uhRsSoZE/c/pBuIeE+Hhlo1p
+	CGJP/Q6K+f4xLOoBoxlXyoOkYZmJZ4kbaU1rvtK6G5J4nl5qhV99IWrRte44mS0XleMcL2XwZXD
+	NpAYnCzExk+xjcBhAzG/vprEVZYh0TBvfa8dWFNKe1Pd6eCwZ+L1o/g5AyvrAehfPAhCNa88RUb
+	EYpEVQlzd6jM=
+X-Received: by 2002:a05:6000:1788:b0:3d9:70cc:6dd2 with SMTP id ffacd0b85a97d-3d970cc6fe7mr2689089f8f.40.1756818185703;
+        Tue, 02 Sep 2025 06:03:05 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE0SOySbfKyKJPc+bfs6kR2/ZvH7s2l/8gDpjVSDxCI98orw6qI9d9Ef04CuWtGtZyJJaoVdw==
+X-Received: by 2002:a05:6000:1788:b0:3d9:70cc:6dd2 with SMTP id ffacd0b85a97d-3d970cc6fe7mr2689045f8f.40.1756818184939;
+        Tue, 02 Sep 2025 06:03:04 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e00:6083:48d1:630a:25ae? ([2a0d:3344:2712:7e00:6083:48d1:630a:25ae])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3d66b013b7dsm8838574f8f.28.2025.09.02.06.03.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Sep 2025 06:03:04 -0700 (PDT)
+Message-ID: <e7665da6-5aa3-401f-ba1f-b2905f9821b5@redhat.com>
+Date: Tue, 2 Sep 2025 15:03:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,85 +89,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Luo Jie <quic_luoj@quicinc.com>
-Subject: Re: [PATCH v4 00/10] Add Network Subsystem (NSS) clock controller
- support for IPQ5424 SoC
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-CC: Bjorn Andersson <andersson@kernel.org>,
-        Michael Turquette
-	<mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        "Varadarajan
- Narayanan" <quic_varada@quicinc.com>,
-        Georgi Djakov <djakov@kernel.org>, "Rob
- Herring" <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        "Conor
- Dooley" <conor+dt@kernel.org>,
-        Anusha Rao <quic_anusha@quicinc.com>,
-        "Manikanta Mylavarapu" <quic_mmanikan@quicinc.com>,
-        Devi Priya
-	<quic_devipriy@quicinc.com>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        "Richard
- Cochran" <richardcochran@gmail.com>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <linux-clk@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-pm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <quic_kkumarcs@quicinc.com>, <quic_linchen@quicinc.com>,
-        <quic_leiwei@quicinc.com>, <quic_pavir@quicinc.com>,
-        <quic_suruchia@quicinc.com>,
-        Konrad Dybcio
-	<konrad.dybcio@oss.qualcomm.com>
-References: <20250828-qcom_ipq5424_nsscc-v4-0-cb913b205bcb@quicinc.com>
- <20250829-versed-gazelle-of-tempest-edfbf1@kuoka>
+Subject: Re: [PATCH net-next 5/8] netfilter: nf_tables: Introduce
+ NFTA_DEVICE_PREFIX
+To: Florian Westphal <fw@strlen.de>, Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ netfilter-devel@vger.kernel.org
+References: <20250901080843.1468-1-fw@strlen.de>
+ <20250901080843.1468-6-fw@strlen.de> <20250901134602.53aaef6b@kernel.org>
+ <aLYMWajRCGWVxAHk@calendula> <aLY0hh8aBWJpluMI@strlen.de>
 Content-Language: en-US
-In-Reply-To: <20250829-versed-gazelle-of-tempest-edfbf1@kuoka>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <aLY0hh8aBWJpluMI@strlen.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODMwMDAxOSBTYWx0ZWRfX1SN8rVCyPQ7R
- F3UgAARSuC2l6oJiDKHLASUcXlk4yTM7FtZed1OHGuaZnYy80VpBcCHlsyOUStQwfdcwB7/+084
- iaT9KrBvwvEHhLrxcrnHPJlR2GC9m5oFK8qbY21CyL7ORqMucQTx4qD93dklYmZKLyezMyX1vco
- TVtBQcx+DbH/hongVxkZIqY+OImQsc83SX8/tHee2MYYVkXt/Bh8iJ++wOLsa6PET5/8X4B+MMy
- D0bf6QZk0aLlTK8ua+r3nmijEq0efmKQMfQQMOpvQvEat9IgHussWT7iVtiyOKvWnEKszxDy1H7
- dxlLjIho1kpXpCn823hsow8SerynUyoCY48MvNVcfeY8BqXwpyUbEXgfvoVAsqdOklUCwPJo9EQ
- KhIqWd0w
-X-Proofpoint-GUID: ejD3hXgXCiC0sQfAFAvD2HL84P8N7eIO
-X-Proofpoint-ORIG-GUID: ejD3hXgXCiC0sQfAFAvD2HL84P8N7eIO
-X-Authority-Analysis: v=2.4 cv=PNkP+eqC c=1 sm=1 tr=0 ts=68b6eaa2 cx=c_pps
- a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10
- a=cUcCN6izRAiZHZspSPUA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-09-02_04,2025-08-28_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 bulkscore=0 priorityscore=1501 impostorscore=0 clxscore=1015
- suspectscore=0 adultscore=0 phishscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508300019
 
-
-
-On 8/29/2025 3:34 PM, Krzysztof Kozlowski wrote:
-> On Thu, Aug 28, 2025 at 06:32:13PM +0800, Luo Jie wrote:
->> - Remove the Acked-by tag from the "Add Qualcomm IPQ5424 NSSNOC IDs" patch"
->>    as the new NOC IDs are added.
+On 9/2/25 2:04 AM, Florian Westphal wrote:
+> Pablo Neira Ayuso <pablo@netfilter.org> wrote:
+>> On Mon, Sep 01, 2025 at 01:46:02PM -0700, Jakub Kicinski wrote:
+>>> Why is this not targeting net? The sooner we adjust the uAPI the better.
 > 
-> So let's wait for v6 with acking :/
-
-OK. The next version should be V5.
-
+> I considered it a new feature rather than a bug fix:
 > 
-> Best regards,
-> Krzysztof
+> Userspace can't rely on the existing api because kernels before
+> 6.16 don't special-case the names provided, and nftables doesn't
+> make use of the 6.16 "accident" (the attempt to re-use the existing
+> device name attribute for this).
 > 
+> The corresponding userspace changes (v4 uses the new attribute)
+> haven't been merged yet.
+> 
+> But sure, getting rid of the "accident" faster makes sense,
+> thanks for suggesting this.
+> 
+>> I think there were doubts that was possible at this stage.
+>> But I agree, it is a bit late but better fix it there.
+> 
+> Alright, I'll send a new nf-next PR with this one dropped in a few hours
+> and a separate nf.git PR with this patch included.
+
+I agree that this latter option is preferable.
+
+Thanks,
+
+Paolo
 
 
