@@ -1,141 +1,184 @@
-Return-Path: <netdev+bounces-219011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67D8BB3F606
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 08:56:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43630B3F627
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 09:03:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3207C20610A
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 06:56:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1346E7A1FA2
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 07:01:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 999522E5429;
-	Tue,  2 Sep 2025 06:56:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A68E52E62A6;
+	Tue,  2 Sep 2025 07:02:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fLAXxkOB"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=gaisler.com header.i=@gaisler.com header.b="XV9R3DCg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-out3.simply.com (smtp-out3.simply.com [94.231.106.210])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FCD82AF1B
-	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 06:56:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61C6B2E612B;
+	Tue,  2 Sep 2025 07:02:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.231.106.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756796169; cv=none; b=dMV9fBksf+lX0VM/y6nKvfSkCZ+TJSJaMPdPgBvSprzq5q8XCX9lLk4pXBOv2ZPu8eTEy3mwXJA5/NOoHVxulqLF4oRFsqf2CSjCGOwAXCHLXc/bLZLbPFi3XPsRjFzxG2oDxruHib23K2oAojAdhz3pyeVSl+Y62ptCyIImf3M=
+	t=1756796575; cv=none; b=LY1DnuHFys5wkWVYv73rGWgcGgQuKateyV/RHgHDaacx78LOzp1a78VKol3/I65za/fHlx5Pg4v7lRUeeFVxBIYoUxYOfNyMaDgYkoZNowovVRnONy7uh4E5sfWBDW68912j2yBXrclJPjFn07g6Px84cLNQ62zZQehOacTny9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756796169; c=relaxed/simple;
-	bh=Fdzb+IyLIi/nFKLRErc+Gc4Dltwq7b/0NPoChgAFqq4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=L/VPWrSVPR5CXYePPjy267LHO79CfFaLp4KbnOp+prNl1j5P5hF5g1pEvfZ67a0ax9/mmso7Ac2LZtOs8nwqHc+k1DPMreLNuhHvATl7ECSJCHthdUGze/3QH8hodpPQUQ1onjJWj42sOrz1dzpGwk8pq8LbvqCzRwuhOLY5MqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fLAXxkOB; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-772679eb358so830529b3a.1
-        for <netdev@vger.kernel.org>; Mon, 01 Sep 2025 23:56:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756796167; x=1757400967; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=E58OWx4v1iHaLUWJF1TIEDfgEr4A5zIWuoF7X6q3eWI=;
-        b=fLAXxkOBwutR5SN+iG38HQxPtkshuw6X/rnxCdjdyyjHiiWV1R+PJX0a4RhBQIGKq8
-         /qkL79DjLItp/wVjazDlmllOI1I3E18sUx7XPRyoG4OOO+etpKTz5so3yya1SQgH7pv1
-         VY3NzHowA4oMooESww7a9xAb6aI9jl/0s7MCAKIyAbQEFl97+ELlQVhF22XMBaNB8c7M
-         0GnT1ozXeSYVvvTj6qRBC/tqLloIHm7GY1w2gdU4uY8n6gghG24K0s2ke2rR9Rz59ESu
-         0wTvTvlOLJHsLsRI+FVhNoG3bSTkrNc5NeJI5xYKHJy9VJBJIHaMHHc1JJz8fndHRb7Z
-         R4Sg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756796167; x=1757400967;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=E58OWx4v1iHaLUWJF1TIEDfgEr4A5zIWuoF7X6q3eWI=;
-        b=ijvoCN2bCuNAI8yD+fTXyP2Lb4LE94IuxwNdjBoD3Q6JvDgMifJkYIEqcuLKjNl6m3
-         uoU12JvWpamXXERaRyXND36PA8QAzXuPDUM5oP0b7Pw+2OccJeY33whTnNXp5eGGWANX
-         FRFDkYgMdOGsp9jNGdlJKy+tJ/zLl5RyWCSus6oNCuy0I0sJ54HQ3d3yL2G1jS0PR01R
-         dr80GnxDZOjR9aXcITC8UahRpsTL+yRFauRtVa7QWq/SHxmSYm9nQXtIQHPbgR2qHPEG
-         oIondrbVwK1omyML5Qg0/mcnyG9R9qN7PodzYsx0zp6boaNd/Rp13p0AiTjmYOKOU6qd
-         4WFg==
-X-Gm-Message-State: AOJu0Yxz5HdNWigYYGmIV/Vsexq6Nis8w8Jc4VKXAQ4zczHWlMK2GglG
-	HgDrL2ShyWzpFfs/ppa+K/p4WXvHpJRufMd3eGWZe26NsdV9Kn1rP8aHpEu5NdSZqEg=
-X-Gm-Gg: ASbGncuhNT2WzF2bb8G3jWjNQVJYk8hHinPdjlDwNZxEaDXWWFBWCv40RpTRMgikyn8
-	evqRAAgJKEizFgRx4H4Fp69oeUxax4RRRJSUy0m6sbuh9B3OT0IFKVTWKjEIMql7/cFc8ecSey/
-	K9HFj9PNf1Gb0RKuzQyWYhlV75hqJD2UbQ/9XBLa6w0lMXgzIe2SBlYsOp+9+oAR/evu9SVjIFB
-	+iS/fkOxkU2NFsP+MtLilWDGGSys7i85RvKobKm81Hy4Bx/YingkD/0nEW4NNeFO4VtVlfcFEe8
-	mCXItE6CoVDAsAPkvmCNrxTVR2merl6GhR2CV98LzZhQyjzcv2ej35QekpvPjNDGgbBeewt3yF7
-	cxJdLuS5evTOtEZqoLfdj33XmqhDbKmMT77leKbhrFQ==
-X-Google-Smtp-Source: AGHT+IFmWXFo2co4fEn8s8iD6/IORbb74MwWVApv1Pq4DbWoV7CxqWlux3YUtZ16ymRKleVXuiACsA==
-X-Received: by 2002:a05:6a00:4b11:b0:76b:c09a:ae9 with SMTP id d2e1a72fcca58-7723e24d4bamr11034346b3a.10.1756796167209;
-        Mon, 01 Sep 2025 23:56:07 -0700 (PDT)
-Received: from fedora.redhat.com ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7722a4bf378sm12572957b3a.60.2025.09.01.23.56.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Sep 2025 23:56:06 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jakub Acs <acsjakub@amazon.de>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Fernando Fernandez Mancera <ffmancera@riseup.net>,
-	Taehee Yoo <ap420073@gmail.com>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv2 net-next] hsr: use netdev_master_upper_dev_link() when linking lower ports
-Date: Tue,  2 Sep 2025 06:55:58 +0000
-Message-ID: <20250902065558.360927-1-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1756796575; c=relaxed/simple;
+	bh=6SPdunicingxAcBfsldZqnJI+0vSclBx7oORnENDYxw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=s8RJ+pW+YFtQVqXbI8eiUSzm4Uk3o8I7G5qOEAYla3qiZhZcM976Ru+ZzN25tKh6jo3BeCAS8aT+u5YG5vzPEGS0BmpvrKJqq6B+kU66Rk/pKUkvWlqvx54IbqdP5yIzIMrraqSiEkSJvZ9G7ReNTm17qOsdNTtpoLVX94srTGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gaisler.com; spf=pass smtp.mailfrom=gaisler.com; dkim=fail (0-bit key) header.d=gaisler.com header.i=@gaisler.com header.b=XV9R3DCg reason="key not found in DNS"; arc=none smtp.client-ip=94.231.106.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gaisler.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gaisler.com
+Received: from localhost (localhost [127.0.0.1])
+	by smtp.simply.com (Simply.com) with ESMTP id 4cGGsM5nS0z1DDXQ;
+	Tue,  2 Sep 2025 09:02:47 +0200 (CEST)
+Received: from [192.168.0.25] (h-98-128-223-123.NA.cust.bahnhof.se [98.128.223.123])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by smtp.simply.com (Simply.com) with ESMTPSA id 4cGGsH2GP0z1FXjK;
+	Tue,  2 Sep 2025 09:02:43 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gaisler.com;
+	s=simplycom2; t=1756796567;
+	bh=h7e86hl0UV9Yd9fEU7lHS/lq+4/qNkF5NKsTGqMW0Gs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=XV9R3DCgzqtpsDdLU5B6YmrRSDSwOb/e+RN3Y/eiKzfpmARJpEfk4rM3nFZX0bFUT
+	 Cgk+F60Qfnp/lcw23nKISESK50dxfqXIzcv7lABAQzI+QL2HTB89cK9os+EVA7PGjD
+	 2JhF3WzYfsb9MEQHgbmUEpzjWOe7UaJDN1f3QJPTIjlP5MtBhYOcxRaj/x5aIgyAIx
+	 VylpL5fKm3LmJNVO1eTnB/fXzhohsODH/8iwc5vr/F7Q+FJODNFYRjy3a+H0jjVZXA
+	 zhn5kjjNaRe2tU3x5rK51dkv4aqaegmt92utDpWIUQsQcnBLirXe5OB9CcfJT7NVBK
+	 WwxEwsTBW60LQ==
+Message-ID: <f2371539-cd4e-4d70-9576-4bb1c677104c@gaisler.com>
+Date: Tue, 2 Sep 2025 09:02:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/4] arch: copy_thread: pass clone_flags as u64
+To: schuster.simon@siemens-energy.com, Dinh Nguyen <dinguyen@kernel.org>,
+ Christian Brauner <brauner@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ David Hildenbrand <david@redhat.com>,
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>, Vlastimil Babka
+ <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
+ Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
+ Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+ Juri Lelli <juri.lelli@redhat.com>,
+ Vincent Guittot <vincent.guittot@linaro.org>,
+ Dietmar Eggemann <dietmar.eggemann@arm.com>,
+ Steven Rostedt <rostedt@goodmis.org>, Ben Segall <bsegall@google.com>,
+ Mel Gorman <mgorman@suse.de>, Valentin Schneider <vschneid@redhat.com>,
+ Kees Cook <kees@kernel.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexandre Ghiti <alex@ghiti.fr>, Guo Ren <guoren@kernel.org>,
+ Oleg Nesterov <oleg@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
+ Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
+ =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
+ Paul Moore <paul@paul-moore.com>, Serge Hallyn <sergeh@kernel.org>,
+ James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>,
+ Frederic Weisbecker <frederic@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Masami Hiramatsu
+ <mhiramat@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+ Adrian Hunter <adrian.hunter@intel.com>,
+ John Johansen <john.johansen@canonical.com>,
+ Stephen Smalley <stephen.smalley.work@gmail.com>,
+ Ondrej Mosnacek <omosnace@redhat.com>,
+ Kentaro Takeda <takedakn@nttdata.co.jp>,
+ Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Matt Turner <mattst88@gmail.com>, Vineet Gupta <vgupta@kernel.org>,
+ Russell King <linux@armlinux.org.uk>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Brian Cain <bcain@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+ WANG Xuerui <kernel@xen0n.name>, Geert Uytterhoeven <geert@linux-m68k.org>,
+ Michal Simek <monstr@monstr.eu>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Jonas Bonn <jonas@southpole.se>,
+ Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+ Stafford Horne <shorne@gmail.com>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ Helge Deller <deller@gmx.de>, Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>,
+ John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+ Richard Weinberger <richard@nod.at>,
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+ Johannes Berg <johannes@sipsolutions.net>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>, Chris Zankel <chris@zankel.net>,
+ Max Filippov <jcmvbkbc@gmail.com>
+Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+ linux-riscv@lists.infradead.org, linux-csky@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ cgroups@vger.kernel.org, linux-security-module@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, apparmor@lists.ubuntu.com,
+ selinux@vger.kernel.org, linux-alpha@vger.kernel.org,
+ linux-snps-arc@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+ linux-hexagon@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
+ linux-openrisc@vger.kernel.org, linux-parisc@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+ linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-um@lists.infradead.org
+References: <20250901-nios2-implement-clone3-v2-0-53fcf5577d57@siemens-energy.com>
+ <20250901-nios2-implement-clone3-v2-3-53fcf5577d57@siemens-energy.com>
+Content-Language: en-US
+From: Andreas Larsson <andreas@gaisler.com>
+In-Reply-To: <20250901-nios2-implement-clone3-v2-3-53fcf5577d57@siemens-energy.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Unlike VLAN devices, HSR changes the lower device’s rx_handler, which
-prevents the lower device from being attached to another master.
-Switch to using netdev_master_upper_dev_link() when setting up the lower
-device.
+On 2025-09-01 15:09, Simon Schuster via B4 Relay wrote:
+> From: Simon Schuster <schuster.simon@siemens-energy.com>
+> 
+> With the introduction of clone3 in commit 7f192e3cd316 ("fork: add
+> clone3") the effective bit width of clone_flags on all architectures was
+> increased from 32-bit to 64-bit, with a new type of u64 for the flags.
+> However, for most consumers of clone_flags the interface was not
+> changed from the previous type of unsigned long.
+> 
+> While this works fine as long as none of the new 64-bit flag bits
+> (CLONE_CLEAR_SIGHAND and CLONE_INTO_CGROUP) are evaluated, this is still
+> undesirable in terms of the principle of least surprise.
+> 
+> Thus, this commit fixes all relevant interfaces of the copy_thread
+> function that is called from copy_process to consistently pass
+> clone_flags as u64, so that no truncation to 32-bit integers occurs on
+> 32-bit architectures.
+> 
+> Signed-off-by: Simon Schuster <schuster.simon@siemens-energy.com>
+> ---
 
-This could improves user experience, since ip link will now display the
-HSR device as the master for its ports.
+Thanks for this and for the whole series! Needed foundation for a
+sparc32 clone3 implementation as well.
 
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
+>  arch/sparc/kernel/process_32.c   | 2 +-
+>  arch/sparc/kernel/process_64.c   | 2 +-
 
-v2: no code change, update description, target to net-next (Jakub Kicinski)
+Acked-by: Andreas Larsson <andreas@gaisler.com> # sparc
 
----
- net/hsr/hsr_slave.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/net/hsr/hsr_slave.c b/net/hsr/hsr_slave.c
-index 102eccf5ead7..8177ac6c2d26 100644
---- a/net/hsr/hsr_slave.c
-+++ b/net/hsr/hsr_slave.c
-@@ -143,6 +143,7 @@ static int hsr_portdev_setup(struct hsr_priv *hsr, struct net_device *dev,
- 			     struct netlink_ext_ack *extack)
- 
- {
-+	struct netdev_lag_upper_info lag_upper_info;
- 	struct net_device *hsr_dev;
- 	struct hsr_port *master;
- 	int res;
-@@ -159,7 +160,9 @@ static int hsr_portdev_setup(struct hsr_priv *hsr, struct net_device *dev,
- 	master = hsr_port_get_hsr(hsr, HSR_PT_MASTER);
- 	hsr_dev = master->dev;
- 
--	res = netdev_upper_dev_link(dev, hsr_dev, extack);
-+	lag_upper_info.tx_type = NETDEV_LAG_TX_TYPE_BROADCAST;
-+	lag_upper_info.hash_type = NETDEV_LAG_HASH_UNKNOWN;
-+	res = netdev_master_upper_dev_link(dev, hsr_dev, NULL, &lag_upper_info, extack);
- 	if (res)
- 		goto fail_upper_dev_link;
- 
--- 
-2.50.1
+Cheers,
+Andreas
 
 
