@@ -1,59 +1,62 @@
-Return-Path: <netdev+bounces-219274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 191D2B40D90
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 21:05:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0467B40DA7
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 21:09:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDB901784CB
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 19:05:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EABB3A7AD0
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 19:09:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 490C1350827;
-	Tue,  2 Sep 2025 19:05:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EDD733CEBF;
+	Tue,  2 Sep 2025 19:09:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XLM/TaB6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HgvQZoaO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 183F32D594D;
-	Tue,  2 Sep 2025 19:05:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 260B42DC354;
+	Tue,  2 Sep 2025 19:09:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756839930; cv=none; b=UduL+sTIGVN35GzQBz0dx7+wpCoNUVbRitdNsvrA4EZLPuRcOC29gUfNaL9Zbl986BI7agQ1T97GhzDjOamljOTFX3vm4qzRb2N3kRt/WwlYoX2Vok8tY97RWuN2DY1+Mz/uhNj3fyu7NfqHTV6OhFxT3q5LyJ/2SHmFs8i6NXQ=
+	t=1756840176; cv=none; b=KTNnDHUjCTXgT7FWZi2kCMZ51n5v5v8Th8bKhO2GlKo4V1bFZNmW7PHOAxkH9C5QNTlo4aL+WMb8vmVWj7Dbn+pLyuyejZMZAoSV54vEFTaji0Y4xQsTfxNRfQEH6hbeo/fTjIoqEfCSAxdF+eM3Pt+67aB8QrqfaZutxRSmUC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756839930; c=relaxed/simple;
-	bh=DU0OyUb7I7RTRTwXwyAUJLAhUSJ5805df8bx9kWFgJQ=;
+	s=arc-20240116; t=1756840176; c=relaxed/simple;
+	bh=oG304Ugt3/o47tknnNcGSuFp6YiA53Miofy+wEi1nb0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uo88JX1Pz0/pY8sU+0JJhy6vMAqg8WqNPyKEMs2fHPZiq2Pe29+hNYBRDDx7t//grXeWJvos8fbPpwj7pP9nL6bGUQQVnWZSZXAooQyKcuKuA3HIoz2MLneO0RtVusRvH2pztuCKRqWEdL8DMEfR8SD6hg4lfZdu/2nmoRj//YQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XLM/TaB6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D703C4CEF6;
-	Tue,  2 Sep 2025 19:05:29 +0000 (UTC)
+	 MIME-Version:Content-Type; b=RW0K8gqq+oCd9WAmIDnLYI8xz9EbqpMD369Ha+5SrfNbIeUSMESQ3d8xaGPSElWaqb/WpAmZ445gYephOR425lR7sygHApZGZ0Zu4OhqSJMh4qWReE3IYfXuY96zJP57ZIciO39UGV+teEoY4f2C9ck4kZZfZBsv+mu2AEWPlKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HgvQZoaO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE457C4CEED;
+	Tue,  2 Sep 2025 19:09:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756839929;
-	bh=DU0OyUb7I7RTRTwXwyAUJLAhUSJ5805df8bx9kWFgJQ=;
+	s=k20201202; t=1756840175;
+	bh=oG304Ugt3/o47tknnNcGSuFp6YiA53Miofy+wEi1nb0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XLM/TaB6P2h8OF1AXwClGcBZlGaDOn7NpMrnYHF7dyXtrNVx+k8UXrs+sKeIYyRXG
-	 jPde/bVy/Ch6M5JELAkjkSzOpRnVQqX2ThKCoHgErI/zZx56JYfLrhnSOUOk8WRtd4
-	 tpTYpbkkvn7JbBoHKPxD1EsX3v4rsExN7M7hjlOK8+krgXcRGqk8h+4MkUm2RHrO6S
-	 LbkyrP8nqbj/NkZ+Y2wKL7paI4Z3zPOOHSJVxQHmQGvp8NaPJju5xYsEnpRj4uUmQZ
-	 0TlJnsFCuIX1RvVM0tlwsmM/IVlmBsl01ccG+87u20kKi5Xr3xufI7/yJYWiR4KZti
-	 4N1EZOHx/D5cA==
-Date: Tue, 2 Sep 2025 12:05:28 -0700
+	b=HgvQZoaOijVassugQcZmMJ0bi/JhtHBlGQ9aVei9sDUXySTkfcn8G+/aUaEBhpvNG
+	 lwcZfbv+RTngpzqwXg/fULcdUgvol+QM9RBVzEBWumCSFUJiUJ3AV/Hai8H/q3yI6R
+	 OxudGVxl1VUe3NUYizFQMHfRjl2c9B1vK6Qt3iWexdd6DgLW9lqX4jej9rzppXwlVv
+	 mcNdTyJjSX+qhBkABSCz8rWEIaqKEUgN7+8O1/LCd17oCRCxQz0I30xgEdoFcejsTs
+	 iw202/E/BCTM2TWw0VyrNeKC8U/EtY1OyLi55MJVK1d7nGNpC080dqYq5gY4PkMrbU
+	 lg4XO9+H3BOjg==
+Date: Tue, 2 Sep 2025 12:09:33 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Colin Foster <colin.foster@in-advantage.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Steve Glendinning
- <steve.glendinning@shawell.net>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH v1] smsc911x: add second read of EEPROM mac when
- possible corruption seen
-Message-ID: <20250902120528.5adc9fb7@kernel.org>
-In-Reply-To: <aLbjkQF8mA5HGDfx@colin-ia-desktop>
-References: <20250828214452.11683-1-colin.foster@in-advantage.com>
-	<20250901135712.272f72a9@kernel.org>
-	<aLbjkQF8mA5HGDfx@colin-ia-desktop>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, Geliang
+ Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Shuah Khan
+ <shuah@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, Eric Biggers
+ <ebiggers@kernel.org>, Christoph Paasch <cpaasch@openai.com>, Gang Yan
+ <yangang@kylinos.cn>
+Subject: Re: [PATCH net-next 0/6] mptcp: misc. features for v6.18
+Message-ID: <20250902120933.5dbd61cf@kernel.org>
+In-Reply-To: <d5397026-92eb-4a43-9534-954b43ab9305@kernel.org>
+References: <20250901-net-next-mptcp-misc-feat-6-18-v1-0-80ae80d2b903@kernel.org>
+	<d5397026-92eb-4a43-9534-954b43ab9305@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,27 +66,24 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 2 Sep 2025 07:31:13 -0500 Colin Foster wrote:
-> > > +	 * The first mac_read always returns 0. Re-read it to get the
-> > > +	 * full MAC  
+On Tue, 2 Sep 2025 16:29:33 +0200 Matthieu Baerts wrote:
+> On 01/09/2025 11:39, Matthieu Baerts (NGI0) wrote:
+> > This series contains 4 independent new features:
 > > 
-> > Always? Strange, why did nobody notice until now?  
+> > - Patch 1: use HMAC-SHA256 library instead of open-coded HMAC.
+> > 
+> > - Patches 2-3: make ADD_ADDR retransmission timeout adaptive + simplify
+> >   selftests.  
 > 
-> For me it is 100% reproduceable. The first read is always 0. I've added
-> delays in case timing was the issue. I've swapped ADDRH and ADDRL and
-> the opposite effect happened (where the first four MAC octets were
-> zero). Re-reads always succeed.
+> I just noticed that NIPA reported some issues due to these 2 patches. In
+> short, some packets (MPTCP ADD_ADDR notifications) can now be
+> retransmitted quicker, but some tests check MIB counters and don't
+> expect retransmissions. If the environment is a bit slow, it is possible
+> to have more retransmissions. We should adapt the tests to avoid false
+> positives.
 > 
-> Without the patch, the last two MAC octets are always zero.
-> 
-> We didn't notice it until we started hooking multiple devices on the
-> same network.
-> 
-> If there is anyone else running this hardware, I'd love verification.
-> Its an SMSC9221.
-> 
-> That's a long way of saying "I don't know" unfortunately.
+> Is it possible to drop just these two patches? Or do you prefer to mark
+> the whole series as "Changes requested"?
 
-Right, I think we should avoid saying "always" in the comment then.
-Let's weasel word it a little bit given the uncertainty..
+Your call, we can also apply as is. mptcp-join is ignored, anyway.
 
