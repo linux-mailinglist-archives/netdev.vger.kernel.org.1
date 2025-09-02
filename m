@@ -1,159 +1,145 @@
-Return-Path: <netdev+bounces-219018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 365B6B3F692
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 09:25:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42879B3F694
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 09:25:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F4083A2BC4
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 07:24:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16DE017ADA0
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 07:25:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 575A22E62B4;
-	Tue,  2 Sep 2025 07:24:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=listout.xyz header.i=@listout.xyz header.b="Sgo1G0NG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A3B1FBC92;
+	Tue,  2 Sep 2025 07:25:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0C631A5BB1
-	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 07:24:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81C5332F74D;
+	Tue,  2 Sep 2025 07:25:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756797896; cv=none; b=Wj0oTUA9bdxJ4ZiuRKsGKHYRml0+Yd+IulIPyPOqAwgYaDC6TPV3J7e6rWipybrvt169FxmKcrt8xbiIOw2RhaePizv36oD16vwzGB4MJZ01ksSD4a8XiNLtLG4Bw4VWINVHvWi8BYQ2UzTna5K1w0CpgRVDOsHssIN0Z0msDV0=
+	t=1756797922; cv=none; b=pgzfhWU9HYZ1cUgRroFXDcYpImOSkYYHaZ5olsva1ksDO0K+znKSqJF9C4FZStKPezePC2PC2pImotOIcxBciNgMj5BEv+ev2tT0qad2P++eeTNePNHGcUiiNLz5cPtvAqYfuj5kVmNPTL+RBSvWMwC8fz1MHxEcLxh5Vn5VV7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756797896; c=relaxed/simple;
-	bh=gWp9JiXj7EyWGK7MSpUpe+sMM4qe8tV/zOZS4Heum6g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TNXkxowZ/UXy6E/c/i1AJ13XrDkyxFrD9WFOw0kt+9Vvktr6/hVfjuGBLP+6BuzQfsE/mN9PT5V4/UGJU16GkdSK7e68fiXLRURXrmJ9CCvSkxSy2CUeMzzwH5KU4qG4Oj1pziQWAQ87Lt6cWnBn1tJ3JCJ8VJ2EZFgdT1D41AI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=listout.xyz; spf=pass smtp.mailfrom=listout.xyz; dkim=pass (2048-bit key) header.d=listout.xyz header.i=@listout.xyz header.b=Sgo1G0NG; arc=none smtp.client-ip=80.241.56.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=listout.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=listout.xyz
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	s=arc-20240116; t=1756797922; c=relaxed/simple;
+	bh=Moyj5TcC9RHNgCT+wYqLEVDJYXrnohcgJQodjkzfmKU=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=quTPD5PSIvflxx8N+/3ZficSK9W+XJZA9nwr8orBtFGegC8prAJeRnDo4jCp2DzvA5nJXakTyhVLKx/SyccFc1F/Ro4/aD6lbO3o5jzuHSz27bVCEO+/WclXg3b25rqWjbHPU51oGgjXG7JleooFR8WSH80Bt3yzFDG3K7+LhF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.12.217] (g217.RadioFreeInternet.molgen.mpg.de [141.14.12.217])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4cGHLh5SN2z9spY;
-	Tue,  2 Sep 2025 09:24:44 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=listout.xyz; s=MBO0001;
-	t=1756797884;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FJo80hbPCPbCCJKX0571Juj5yIIkXR1ClDqsjuHHfa0=;
-	b=Sgo1G0NG6jbVsILifTC4DIswvCE0Z0Z6NBRjSx3oWpI6CtS6wS9ywaXAEdDigzESiep1zN
-	5pFKy/h4z35DynMlcZ38fJxcwrcFp8T1HXh+gKeZ/67oiNbZgUm4whs/IGKC+PGDVz4HTe
-	SpRyCD/3iWjxEFSkXwI4YWds+zHntEL/LQcFe8zARUF6Lc26LjGwcO394bjmlywrwCIkGe
-	Jm2DOqTTdt8OsIeZmeFFQOyrxbSO2KQKnF/rfkqU5g47qfMCeTdQMXP15XRg0KCBU1aif2
-	xAYTGR8Z7bsdZQUjhx9U3Vp+RYQDZg2vSxgT0jJhhaT55ujUfx2ktrffi2bndQ==
-From: Brahmajit Das <listout@listout.xyz>
-To: vadim.fedorenko@linux.dev
-Cc: andrew+netdev@lunn.ch,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	intel-wired-lan@lists.osuosl.org,
-	kuba@kernel.org,
-	listout@listout.xyz,
-	netdev@vger.kernel.org,
-	przemyslaw.kitszel@intel.com
-Subject: [PATCH v2] net: intel: fm10k: Fix parameter idx set but not used
-Date: Tue,  2 Sep 2025 12:54:22 +0530
-Message-ID: <20250902072422.603237-1-listout@listout.xyz>
-In-Reply-To: <e13abc99-fb35-4bc4-b110-9ddfa8cdb442@linux.dev>
-References: <e13abc99-fb35-4bc4-b110-9ddfa8cdb442@linux.dev>
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id F1F5360213ADA;
+	Tue, 02 Sep 2025 09:24:49 +0200 (CEST)
+Message-ID: <acf7a445-b58b-49dc-8d2c-1afe86805953@molgen.mpg.de>
+Date: Tue, 2 Sep 2025 09:24:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH v2] ixgbe: fix too early devlink_free()
+ in ixgbe_remove()
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+To: Koichiro Den <den@valinux.co.jp>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+ przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch,
+ jedrzej.jagielski@intel.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250902003941.2561389-1-den@valinux.co.jp>
+ <4f746e98-b81b-4632-a2f8-f14d66c71ced@molgen.mpg.de>
+Content-Language: en-US
+In-Reply-To: <4f746e98-b81b-4632-a2f8-f14d66c71ced@molgen.mpg.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Variable idx is set in the loop, but is never used resulting in dead
-code. Building with GCC 16, which enables
--Werror=unused-but-set-parameter= by default results in build error.
-This patch removes the idx parameter, since all the callers of the
-fm10k_unbind_hw_stats_q as 0 as idx anyways.
+[Cc: Remove mateusz.polchlopek@intel.com (address rejected)]
 
-Suggested-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Signed-off-by: Brahmajit Das <listout@listout.xyz>
----
-changes in v2:
-	- Removed the idx parameter, since all callers of
-	fm10k_unbind_hw_stats_q passes idx as 0 anyways.
----
- drivers/net/ethernet/intel/fm10k/fm10k_common.c | 5 ++---
- drivers/net/ethernet/intel/fm10k/fm10k_common.h | 2 +-
- drivers/net/ethernet/intel/fm10k/fm10k_pf.c     | 2 +-
- drivers/net/ethernet/intel/fm10k/fm10k_vf.c     | 2 +-
- 4 files changed, 5 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/fm10k/fm10k_common.c b/drivers/net/ethernet/intel/fm10k/fm10k_common.c
-index f51a63fca513..1f919a50c765 100644
---- a/drivers/net/ethernet/intel/fm10k/fm10k_common.c
-+++ b/drivers/net/ethernet/intel/fm10k/fm10k_common.c
-@@ -447,17 +447,16 @@ void fm10k_update_hw_stats_q(struct fm10k_hw *hw, struct fm10k_hw_stats_q *q,
- /**
-  *  fm10k_unbind_hw_stats_q - Unbind the queue counters from their queues
-  *  @q: pointer to the ring of hardware statistics queue
-- *  @idx: index pointing to the start of the ring iteration
-  *  @count: number of queues to iterate over
-  *
-  *  Function invalidates the index values for the queues so any updates that
-  *  may have happened are ignored and the base for the queue stats is reset.
-  **/
--void fm10k_unbind_hw_stats_q(struct fm10k_hw_stats_q *q, u32 idx, u32 count)
-+void fm10k_unbind_hw_stats_q(struct fm10k_hw_stats_q *q, u32 count)
- {
- 	u32 i;
- 
--	for (i = 0; i < count; i++, idx++, q++) {
-+	for (i = 0; i < count; i++, q++) {
- 		q->rx_stats_idx = 0;
- 		q->tx_stats_idx = 0;
- 	}
-diff --git a/drivers/net/ethernet/intel/fm10k/fm10k_common.h b/drivers/net/ethernet/intel/fm10k/fm10k_common.h
-index 4c48fb73b3e7..13fca6a91a01 100644
---- a/drivers/net/ethernet/intel/fm10k/fm10k_common.h
-+++ b/drivers/net/ethernet/intel/fm10k/fm10k_common.h
-@@ -43,6 +43,6 @@ u32 fm10k_read_hw_stats_32b(struct fm10k_hw *hw, u32 addr,
- void fm10k_update_hw_stats_q(struct fm10k_hw *hw, struct fm10k_hw_stats_q *q,
- 			     u32 idx, u32 count);
- #define fm10k_unbind_hw_stats_32b(s) ((s)->base_h = 0)
--void fm10k_unbind_hw_stats_q(struct fm10k_hw_stats_q *q, u32 idx, u32 count);
-+void fm10k_unbind_hw_stats_q(struct fm10k_hw_stats_q *q, u32 count);
- s32 fm10k_get_host_state_generic(struct fm10k_hw *hw, bool *host_ready);
- #endif /* _FM10K_COMMON_H_ */
-diff --git a/drivers/net/ethernet/intel/fm10k/fm10k_pf.c b/drivers/net/ethernet/intel/fm10k/fm10k_pf.c
-index b9dd7b719832..3394645a18fe 100644
---- a/drivers/net/ethernet/intel/fm10k/fm10k_pf.c
-+++ b/drivers/net/ethernet/intel/fm10k/fm10k_pf.c
-@@ -1389,7 +1389,7 @@ static void fm10k_rebind_hw_stats_pf(struct fm10k_hw *hw,
- 	fm10k_unbind_hw_stats_32b(&stats->nodesc_drop);
- 
- 	/* Unbind Queue Statistics */
--	fm10k_unbind_hw_stats_q(stats->q, 0, hw->mac.max_queues);
-+	fm10k_unbind_hw_stats_q(stats->q, hw->mac.max_queues);
- 
- 	/* Reinitialize bases for all stats */
- 	fm10k_update_hw_stats_pf(hw, stats);
-diff --git a/drivers/net/ethernet/intel/fm10k/fm10k_vf.c b/drivers/net/ethernet/intel/fm10k/fm10k_vf.c
-index 7fb1961f2921..6861a0bdc14e 100644
---- a/drivers/net/ethernet/intel/fm10k/fm10k_vf.c
-+++ b/drivers/net/ethernet/intel/fm10k/fm10k_vf.c
-@@ -465,7 +465,7 @@ static void fm10k_rebind_hw_stats_vf(struct fm10k_hw *hw,
- 				     struct fm10k_hw_stats *stats)
- {
- 	/* Unbind Queue Statistics */
--	fm10k_unbind_hw_stats_q(stats->q, 0, hw->mac.max_queues);
-+	fm10k_unbind_hw_stats_q(stats->q, hw->mac.max_queues);
- 
- 	/* Reinitialize bases for all stats */
- 	fm10k_update_hw_stats_vf(hw, stats);
--- 
-2.51.0
-
+Am 02.09.25 um 07:08 schrieb Paul Menzel:
+> Dear Koichiro,
+> 
+> 
+> Thank you for your patch.
+> 
+> Am 02.09.25 um 02:39 schrieb Koichiro Den:
+>> Since ixgbe_adapter is embedded in devlink, calling devlink_free()
+>> prematurely in the ixgbe_remove() path can lead to UAF. Move devlink_free()
+>> to the end.
+>>
+>> KASAN report:
+>>
+>>   BUG: KASAN: use-after-free in ixgbe_reset_interrupt_capability+0x140/0x180 [ixgbe]
+>>   Read of size 8 at addr ffff0000adf813e0 by task bash/2095
+>>   CPU: 1 UID: 0 PID: 2095 Comm: bash Tainted: G S  6.17.0-rc2-tnguy.net-queue+ #1 PREEMPT(full)
+>>   [...]
+>>   Call trace:
+>>    show_stack+0x30/0x90 (C)
+>>    dump_stack_lvl+0x9c/0xd0
+>>    print_address_description.constprop.0+0x90/0x310
+>>    print_report+0x104/0x1f0
+>>    kasan_report+0x88/0x180
+>>    __asan_report_load8_noabort+0x20/0x30
+>>    ixgbe_reset_interrupt_capability+0x140/0x180 [ixgbe]
+>>    ixgbe_clear_interrupt_scheme+0xf8/0x130 [ixgbe]
+>>    ixgbe_remove+0x2d0/0x8c0 [ixgbe]
+>>    pci_device_remove+0xa0/0x220
+>>    device_remove+0xb8/0x170
+>>    device_release_driver_internal+0x318/0x490
+>>    device_driver_detach+0x40/0x68
+>>    unbind_store+0xec/0x118
+>>    drv_attr_store+0x64/0xb8
+>>    sysfs_kf_write+0xcc/0x138
+>>    kernfs_fop_write_iter+0x294/0x440
+>>    new_sync_write+0x1fc/0x588
+>>    vfs_write+0x480/0x6a0
+>>    ksys_write+0xf0/0x1e0
+>>    __arm64_sys_write+0x70/0xc0
+>>    invoke_syscall.constprop.0+0xcc/0x280
+>>    el0_svc_common.constprop.0+0xa8/0x248
+>>    do_el0_svc+0x44/0x68
+>>    el0_svc+0x54/0x160
+>>    el0t_64_sync_handler+0xa0/0xe8
+>>    el0t_64_sync+0x1b0/0x1b8
+>>
+>> Fixes: a0285236ab93 ("ixgbe: add initial devlink support")
+>> Signed-off-by: Koichiro Den <den@valinux.co.jp>
+>> ---
+>> Changes in v2:
+>> - Move only devlink_free()
+>> ---
+>>   drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 3 ++-
+>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/ 
+>> net/ethernet/intel/ixgbe/ixgbe_main.c
+>> index 80e6a2ef1350..b3822c229300 100644
+>> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+>> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+>> @@ -12092,7 +12092,6 @@ static void ixgbe_remove(struct pci_dev *pdev)
+>>       devl_port_unregister(&adapter->devlink_port);
+>>       devl_unlock(adapter->devlink);
+>> -    devlink_free(adapter->devlink);
+>>       ixgbe_stop_ipsec_offload(adapter);
+>>       ixgbe_clear_interrupt_scheme(adapter);
+>> @@ -12125,6 +12124,8 @@ static void ixgbe_remove(struct pci_dev *pdev)
+>>       if (disable_dev)
+>>           pci_disable_device(pdev);
+>> +
+>> +    devlink_free(adapter->devlink);
+>>   }
+>>   /**
+> 
+> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+> 
+> 
+> Kind regards,
+> 
+> Paul
 
