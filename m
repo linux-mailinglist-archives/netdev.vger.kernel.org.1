@@ -1,62 +1,56 @@
-Return-Path: <netdev+bounces-219314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4277B40F3D
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:18:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 301A9B40F42
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:19:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4574701F60
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 21:18:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0450D7A788B
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 21:17:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E69A271456;
-	Tue,  2 Sep 2025 21:17:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="i/ktlGsD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1A6C2E8E0C;
+	Tue,  2 Sep 2025 21:18:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00610270EA5;
-	Tue,  2 Sep 2025 21:17:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B689272E45;
+	Tue,  2 Sep 2025 21:18:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756847868; cv=none; b=L1k6RnjudRAxb0lTQidBZbYRrFb0VDf4K1dVSGW/Ofynopp801cneNWQNggkScO7z3uwo+Q2JhfHYh7jQhPXsHTWw6vZm6ABnWC9njgJpX72wdd3EJT1s7oaQYIJwg2BwXAMDtmduANZVVSIKt7rfkrXBdPfC7O6eTKldyHr2KY=
+	t=1756847936; cv=none; b=XTiN5nJtcIjGUTLSqwcjHhfCUuiGKXxLKQDWG4wroTTbwULwXPdTYWJ8ZaJhzpxsMj9Mbdf4/4WPpdxjlkxr+JZELYxq6LU+jfch2xoJXAH34sVphOXgJVBd9Xe3UUAjN2UTfPfPZzJMwaHa5R9jqKgRiqaCVlB5mvQ5N5Qodn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756847868; c=relaxed/simple;
-	bh=LjzOty6mM8/+BGls+KFr4xgrzsuNgY6vQs68b4xpXwg=;
+	s=arc-20240116; t=1756847936; c=relaxed/simple;
+	bh=OVt2KaAIyWn3sQiXT0WUla8IPKhrl9uNUH6oq+DG3ds=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mQaLJUQCacuSxQUUqFxymSB5gZGZ/EsRFb/quo/ch4mfcIQk8mOuGDflppoMmPVb2D1etMg2R9f8Tn2WMFbOKKHBeNYNQEw1GmplhTDjRD8kpWzEigJ9mpBTrsM41YyKkdqM67WrmRLY6K5CiCqn0iT0JjuYyX5BlqhWG8RCEf4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=i/ktlGsD; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=AS7qSYs5FiBWKPP9nMV8J8d+/ZZhjnSHN6ijHP0mkmc=; b=i/ktlGsDgBup0MVxtsaUpYMTcm
-	QOQoca6wAsVWNbWN8M0kTQ5dDTOj1BxQaVP+MZOaagjiwujLti57MdGvnLjd5JJ0sVC+muWXZY+r3
-	Ktosiev3zZACRh5YEZiSV94t44LPpVqEkWH/ZhzN7ctmDhE1Ublk8s6phGFMfk2K8zTo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1utYNi-006vs2-EO; Tue, 02 Sep 2025 23:17:34 +0200
-Date: Tue, 2 Sep 2025 23:17:34 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Joseph Steel <recv.jo@gmail.com>,
-	Konrad Leszczynski <konrad.leszczynski@intel.com>,
-	davem@davemloft.net, andrew+netdev@lunn.ch, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, cezary.rojewski@intel.com,
-	sebastian.basierski@intel.com
-Subject: Re: [PATCH net-next 0/4] net: stmmac: new features
-Message-ID: <68975e58-9018-484d-b8c1-2afcb1ad606a@lunn.ch>
-References: <20250828144558.304304-1-konrad.leszczynski@intel.com>
- <40c3e341-1203-41cd-be3f-ff5cc9b4b89b@intel.com>
- <y45atwebueigfjsbi5d3d4qsf36m3esspgll4ork7fw2su7lrj@26qcv6yvk6mr>
- <26ca1ef9-2587-43cd-9a5c-171cbc8f6080@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LxLX6Dw6hO2ffN94rreaJB+Kvf8mdTHNEgeSsWB8786/txCvhauLC1VaA3ED8rEhAZ5b37UvYd4f8N2Xp+PduAnj2xmoOV5tyh9QRSXYB0NO8C+/NnFAczNEzTLEQ1wrqcM//gb1e3OQl6dezYhNmiIpCbYCjKnFJtak5im9mVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E90FFC4CEED;
+	Tue,  2 Sep 2025 21:18:52 +0000 (UTC)
+Date: Tue, 2 Sep 2025 22:18:50 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, mptcp@lists.linux.dev,
+	Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>,
+	Christoph Paasch <cpaasch@openai.com>,
+	Gang Yan <yangang@kylinos.cn>
+Subject: Re: [PATCH net-next 0/6] mptcp: misc. features for v6.18
+Message-ID: <aLdfOrQ4O4rnD5M9@arm.com>
+References: <20250901-net-next-mptcp-misc-feat-6-18-v1-0-80ae80d2b903@kernel.org>
+ <20250902072600.2a9be439@kernel.org>
+ <834238b4-3549-4062-a29b-bf9c5aefa30f@kernel.org>
+ <20250902082759.1e7813b8@kernel.org>
+ <aLc2hyFAH9kxlNEg@arm.com>
+ <d4205818-e283-4862-946d-4e51bf180158@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,31 +59,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <26ca1ef9-2587-43cd-9a5c-171cbc8f6080@intel.com>
+In-Reply-To: <d4205818-e283-4862-946d-4e51bf180158@kernel.org>
 
-> >> The series looks good to me.
-> >>
-> >> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> > 
-> > Not a single comment? Really? Three Rb and three Sb tags from Intel
-> > staff and nobody found even a tiny problem? Sigh...
-> > 
+On Tue, Sep 02, 2025 at 08:50:19PM +0200, Matthieu Baerts wrote:
+> Hi Catalin,
 > 
-> Not everyone will find every issue. I'm certainly no expert in this
-> driver. This is why it is good to have many reviewers.
+> 2 Sept 2025 20:25:19 Catalin Marinas <catalin.marinas@arm.com>:
+> 
+> > On Tue, Sep 02, 2025 at 08:27:59AM -0700, Jakub Kicinski wrote:
+> >> On Tue, 2 Sep 2025 16:51:47 +0200 Matthieu Baerts wrote:
+> >>> It is unclear why a second scan is needed and only the second one caught
+> >>> something. Was it the same with the strange issues you mentioned in
+> >>> driver tests? Do you think I should re-add the second scan + cat?
+> >>
+> >> Not sure, cc: Catalin, from experience it seems like second scan often
+> >> surfaces issues the first scan missed.
+> >
+> > It's some of the kmemleak heuristics to reduce false positives. It does
+> > a checksum of the object during scanning and only reports a leak if the
+> > checksum is the same in two consecutive scans.
+> 
+> Thank you for the explanation!
+> 
+> Does that mean a scan should be triggered at the end of the tests,
+> then wait 5 second for the grace period, then trigger another scan
+> and check the results?
+> 
+> Or wait 5 seconds, then trigger two consecutive scans?
 
-As a rule of thumb, Maintainers ignore multiple Reviewed-by when then
-call come from the same company. At least if they don't actually point
-out issues.
+The 5 seconds is the minimum age of an object before it gets reported as
+a leak. It's not related to the scanning process. So you could do two
+scans in succession and wait 5 seconds before checking for leaks.
 
-There is a nice quote from a bootlin/free-electrons developer. It is
-something like: In order to get my patches merged faster, i review
-other peoples patches, so freeing up Maintainer time to look at my
-patches.
+However, I'd go with the first option - do a scan, wait 5 seconds and do
+another. That's mostly because at the end of the scan kmemleak prints if
+it found new unreferenced objects. It might not print the message if a
+leaked object is younger than 5 seconds. In practice, though, the scan
+may take longer, depending on how loaded your system is.
 
-Jacob is a good example of that, he looks at patches from many
-developers. Maybe more Intel people can help out reviewing patches,
-particularly other stmmac patches, in order to get their own merged?
+The second option works as well but waiting between them has a better
+chance of removing false positives if, say, some objects are moved
+between lists and two consecutive scans do not detect the list_head
+change (and update the object's checksum).
 
-	Andrew
+-- 
+Catalin
 
