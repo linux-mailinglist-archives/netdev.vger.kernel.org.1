@@ -1,199 +1,235 @@
-Return-Path: <netdev+bounces-218969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218970-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 735FCB3F1E8
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 03:32:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C2A7B3F1F3
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 03:41:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F88448264A
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 01:32:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40C29482A67
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 01:41:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EDAE2DE711;
-	Tue,  2 Sep 2025 01:32:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="SDfo6bmw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58F242DF6F8;
+	Tue,  2 Sep 2025 01:41:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2064.outbound.protection.outlook.com [40.107.236.64])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87CA61A288;
-	Tue,  2 Sep 2025 01:32:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.64
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756776745; cv=fail; b=cqFIusPGEnZVIeWeqtz+7Ih8JOhTWhAghB5Md0IKWk//dVfQrF3V1N3tfbvl9hzibn5UEO6KHL4aoASMFfJxqfoCTiVo2lxXi49S45QANof2hLyz0EY8ym/Cua+wjobWGBc6LnFwSjTwh1L935DscA4zSWlSJvXguxB9GNr2cqA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756776745; c=relaxed/simple;
-	bh=KO9GAkPxXG0vjRh0RpJg6t0gUOqGZRBK+TZh4+Wu+Wc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=k9xZK5W+fI03N2OIGmiSijY6Rw7z9oxDPkuqQGC9CqUheLXFiGiwQnvwuk63oyB+apRbBo13TAhBm7V9/iLoIc4WlpBwQ63l2UOPmp5hiu3INCl24lDnGMVQoT56Ntc845Ps7bS4aI2hTlwvCcsqg3GIwXmbRhWFF3B9l+8FsrM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=SDfo6bmw; arc=fail smtp.client-ip=40.107.236.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XiqGjJICPDKiUAYkW88lsWJXdSFjU2nXvDj/xPjkjo1U+oSCH1T0XGw8BOLBDMaHfSQLNXr9ax/SYtFefmGyRiBN0yxdykJg5RNl+jAJ2x6HaGl2s+3A15qtuAR+9EXpuSgoejV1nEHOaL5VAOrqZQ1bE2hjoTDTpGVUG9IkRekf+SmqNX5NcivDeJwBDKZPIYy1WC7bk3YJ9VtC4NI+TTdxR1vcTB6grpG+VHR+EiKLLtkgqOLtXXuzY/oxsacoRxBDdTmuTfpvd5xAF2e7YMCokLux6tqUdReuRsfrH1vH0xUIRKRjc25E1rHEq3oAIMmyPon8vUI7FVDxUIGG+Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BVVNzRh8T8JLyCNoAZ79IEkQcS/VJTNo8wJjeji3QLI=;
- b=bQqcYbmUV7G4E6Klo0wU+NlupPzQdlAZ6k3iky3cgWJU+5lfpCG6O9TPRabjzvZmmBOU/qkDieRGK4BRdsoGD3jpTDlSlvIbKfnE16cfM3fE7yQdhe4UYlABLQzODRgIgODVl+Ui4JUGNCYL7yRvKh4nH1CKiXjEDFzGq3NVIDCNAkDczJ2czA/6qENwviNtkW+Eg4B6busb7FpApnAx6XHb0yZrbmZOU2LaEUCQLuSZnsnwZNZKawEf3naBAfkFbg/KTL2ux4J2pavzYrKRaYvxGse2EFisDFtW/9q7ShzIrBxgC6ue45SVwgsxD14mgklLuh32+8BxELuMtKzMZQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=lunn.ch smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BVVNzRh8T8JLyCNoAZ79IEkQcS/VJTNo8wJjeji3QLI=;
- b=SDfo6bmwUZsmD7INo1WTQlIT53v+3TFY9oXZfC4na2ubu/RDnRCIyi/cTlM1cb78oI4C/0rPqSKF5R+dOHiBMYHl1vvapeUSGka2DpqZdOZ9/3sC3qaPrd1Y7OWcrdyQ2EP/WIzRxIo5ts2Qn6dH9rEnzRnwe+RfNKjctaN3d3w=
-Received: from SA0PR11CA0117.namprd11.prod.outlook.com (2603:10b6:806:d1::32)
- by DM4PR12MB7598.namprd12.prod.outlook.com (2603:10b6:8:10a::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.25; Tue, 2 Sep
- 2025 01:32:20 +0000
-Received: from SA2PEPF00003F65.namprd04.prod.outlook.com
- (2603:10b6:806:d1:cafe::c8) by SA0PR11CA0117.outlook.office365.com
- (2603:10b6:806:d1::32) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9073.27 via Frontend Transport; Tue,
- 2 Sep 2025 01:32:20 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SA2PEPF00003F65.mail.protection.outlook.com (10.167.248.40) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.9094.14 via Frontend Transport; Tue, 2 Sep 2025 01:32:19 +0000
-Received: from SATLEXMB06.amd.com (10.181.40.147) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 1 Sep
- 2025 20:32:18 -0500
-Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB06.amd.com
- (10.181.40.147) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 1 Sep
- 2025 20:32:17 -0500
-Received: from xhdradheys41.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
- Transport; Mon, 1 Sep 2025 20:32:07 -0500
-From: Abin Joseph <abin.joseph@amd.com>
-To: <radhey.shyam.pandey@amd.com>, <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <michal.simek@amd.com>
-CC: <git@amd.com>, <abin.joseph@amd.com>, <netdev@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<stable@vger.kernel.org>
-Subject: [PATCH net v2] net: xilinx: axienet: Add error handling for RX metadata pointer retrieval
-Date: Tue, 2 Sep 2025 07:02:05 +0530
-Message-ID: <20250902013205.2849707-1-abin.joseph@amd.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1565B26AF3;
+	Tue,  2 Sep 2025 01:41:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756777302; cv=none; b=Km56Sa7DTwzPdxESLDEUrtV5jFvYfNTnmQPrkASkTWQBV3kZZoz+gRQnI+AFq9oaQpULN6fxJanRnyROTgrXbNGgPSJWyXCfPc/IGJ/P5qvg6HN4hb7BGXOxleCdhfXUbNjgg+qujm3500pvCcpywrYtg8JRNxneJW6da890TfU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756777302; c=relaxed/simple;
+	bh=8y6UXf1cJCy0O9hqwY5iin2/oHnrp2C623DlqT0lLAc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=EVxIWJjqk86t9qHcpLr7DzC5msVjp1I8U/oZRWHdfW1BtQqhBfHh3IZd6Q5QWte5KSWFMs76kxvamiFwKQJCtH3dKZR3B8sYiKQXYe7OYpKGhG1OVRRxSj7V26pYo3/bfu9xA4fG8LAimVHEWRO+hkKUcM6iDJc84VPmJ8fqn7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4cG7jg25YdztTSQ;
+	Tue,  2 Sep 2025 09:40:39 +0800 (CST)
+Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
+	by mail.maildlp.com (Postfix) with ESMTPS id E3C24180483;
+	Tue,  2 Sep 2025 09:41:35 +0800 (CST)
+Received: from [10.174.176.70] (10.174.176.70) by
+ dggpemf500016.china.huawei.com (7.185.36.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 2 Sep 2025 09:41:34 +0800
+Message-ID: <4ae3ca7b-dc64-4ab5-b1bf-e357ccc449b4@huawei.com>
+Date: Tue, 2 Sep 2025 09:41:33 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: atm: fix memory leak in atm_register_sysfs when
+ device_register fail
+To: Simon Horman <horms@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <kuniyu@google.com>, <kay.sievers@vrfy.org>,
+	<gregkh@suse.de>, <yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20250901063537.1472221-1-wangliang74@huawei.com>
+ <20250901190140.GO15473@horms.kernel.org>
+From: Wang Liang <wangliang74@huawei.com>
+In-Reply-To: <20250901190140.GO15473@horms.kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00003F65:EE_|DM4PR12MB7598:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0d29c0bb-ae93-4a3f-50e9-08dde9c08ec7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?+rQ+gKSEWeN5D3j20nuT2TmErrBsk7L2u05Pf6uUL4AIG6ygdR81HfvGqT1s?=
- =?us-ascii?Q?VxTeV5KpiXzZkJTIsqX0CqiK75fpgOk5T09QgQQ/HTxdl+9usRE2UBL9OVkZ?=
- =?us-ascii?Q?TgzF/qa5vjUQv8yS+6LWSeSFXtuOx/I0lMNzKbh0Q0UCEiZE44ecxWhuQVLt?=
- =?us-ascii?Q?A4FoMs44RFeGH07z7I61m2v2Bst/YyFBa9h1jbn/qfoLJEbveQ9Fe78udc87?=
- =?us-ascii?Q?4BKCgYzFPAwFJeN3meacylgNvPxQVHmfxp0dR9zh815xdAoE56kD2LCqLwV1?=
- =?us-ascii?Q?zKWmSLdhYEeYYRYsHH1VHs00nsJHg2T4yeCMwz1ElwLRn2QhKt6679T7zTy8?=
- =?us-ascii?Q?L2Yv7BWuKEzcsQM4fhgnLfAxDfh6TsGAzAqkNCvVI9DkZQoCUnkpTxjMcIVI?=
- =?us-ascii?Q?SIj30GeRmiM4DMhxTLRDGsi3BqYHVDT0Vc5ShbPldT8QRJzigwh4sxz/ek9R?=
- =?us-ascii?Q?L+DGLBG4BfDWGJO4zMyTsiZZeDGEKX2fR5rCerPKyQYffByma+i9Qt7atquH?=
- =?us-ascii?Q?0qg7GlJx1SorN0YtHodt2W7yQ7IRaCuAUe4Ay2pXxnUAe3eE1jePXtckm079?=
- =?us-ascii?Q?WrGBkiNOzTiNptLjeqgFCdBq290h3QusiyxwZQS3EBduSwEMcw9rmFHma0ou?=
- =?us-ascii?Q?EJv18HQpUv53UBQNcTLviCEv4LtmmQbCDZxZji/A5owZF0s88Ss4uAEVgo1z?=
- =?us-ascii?Q?o4WK6Z6c+jYtCYqujSwB5l5IbYfJNgPSGs9g2FS/W9aQayfOeTsmTQpnRtXN?=
- =?us-ascii?Q?e4Fzd4Nz70hDRdrEBeEgDxESmytK1L7bRFMsfxaqc8S+1Jjgbrv1nkyOh/UL?=
- =?us-ascii?Q?zUYU1+2bgxkm9MUNXWPn6efbAtoSzLstv4U3hLQJDSShvcgKRYYHUjlOXXpa?=
- =?us-ascii?Q?j+LY2yl+IQC4NxsA1lK2d4GyRcFArtlUbiSarxdo0qTl295fjO1vFu0AqlpH?=
- =?us-ascii?Q?dJN5qCH+nm+ZRnKjVo4gUiT3yUinB6VF9pQidiapBaSBptBEGxipNTb8KWEP?=
- =?us-ascii?Q?ZvkNe/YAqJ+nKfj4ljhJFTddTpDfQ6fjcY0d/xN/iu23yzku7Ey8qphLHTWa?=
- =?us-ascii?Q?QUqs7zr9HljkDhnUzo/jFsDUWL3pPYtSZPPgZSTG0DO/enVGQYckqQHoo/zB?=
- =?us-ascii?Q?vT4+ztLQ78n3xjOcdwPigpR1ZXPsmg00FpOC6Zv+7MPVczVhAMK6aZqd4ZBx?=
- =?us-ascii?Q?Uq7eLZ8eQPpBqUYbvtC2YrzcWwyasklS0fgEm3dXvNkrIyCDzcwWnudcLJKS?=
- =?us-ascii?Q?Am6IDakCURoOzH0ZRk3spoT5ykPPzUykFvO+yXyr45r2cmGbaYL7myHVMUCz?=
- =?us-ascii?Q?r8IkKTKhzCKMDOmpt2Wusu3XAu0oGFPdDidIp3YsgsL+D0FhOMOw2jgQEwYR?=
- =?us-ascii?Q?IQtELYYHgSeBxokqjsL3aUnWlF4CW3tYJWLANBUjIzJ5rjPLWg+9irFN0sm7?=
- =?us-ascii?Q?u/B1J1WEiCf8jkQEZdKEBMsn32t1O87SgXe4qu3BtegcOMrQgwqNfmUCkP8d?=
- =?us-ascii?Q?EpUQlcffVGbneCYW4l7U5wCxbAhuCMhUTCgM?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2025 01:32:19.4221
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0d29c0bb-ae93-4a3f-50e9-08dde9c08ec7
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00003F65.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7598
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ dggpemf500016.china.huawei.com (7.185.36.197)
 
-Add proper error checking for dmaengine_desc_get_metadata_ptr() which
-can return an error pointer and lead to potential crashes or undefined
-behaviour if the pointer retrieval fails.
 
-Properly handle the error by unmapping DMA buffer, freeing the skb and
-returning early to prevent further processing with invalid data.
+在 2025/9/2 3:01, Simon Horman 写道:
+> On Mon, Sep 01, 2025 at 02:35:37PM +0800, Wang Liang wrote:
+>> When device_register() return error in atm_register_sysfs(), which can be
+>> triggered by kzalloc fail in device_private_init() or other reasons,
+>> kmemleak reports the following memory leaks:
+>>
+>> unreferenced object 0xffff88810182fb80 (size 8):
+>>    comm "insmod", pid 504, jiffies 4294852464
+>>    hex dump (first 8 bytes):
+>>      61 64 75 6d 6d 79 30 00                          adummy0.
+>>    backtrace (crc 14dfadaf):
+>>      __kmalloc_node_track_caller_noprof+0x335/0x450
+>>      kvasprintf+0xb3/0x130
+>>      kobject_set_name_vargs+0x45/0x120
+>>      dev_set_name+0xa9/0xe0
+>>      atm_register_sysfs+0xf3/0x220
+>>      atm_dev_register+0x40b/0x780
+>>      0xffffffffa000b089
+>>      do_one_initcall+0x89/0x300
+>>      do_init_module+0x27b/0x7d0
+>>      load_module+0x54cd/0x5ff0
+>>      init_module_from_file+0xe4/0x150
+>>      idempotent_init_module+0x32c/0x610
+>>      __x64_sys_finit_module+0xbd/0x120
+>>      do_syscall_64+0xa8/0x270
+>>      entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>>
+>> When device_create_file() return error in atm_register_sysfs(), the same
+>> issue also can be triggered.
+>>
+>> Function put_device() should be called to release kobj->name memory and
+>> other device resource, instead of kfree().
+>>
+>> Fixes: 1fa5ae857bb1 ("driver core: get rid of struct device's bus_id string array")
+>> Signed-off-by: Wang Liang <wangliang74@huawei.com>
+> Thanks Wang Liang,
+>
+> I agree this is a bug.
+>
+> I think that the guiding principle should be that on error functions
+> unwind any resource allocations they have made, rather than leaving
+> it up to callers to clean things up.
+>
+> So, as the problem you describe seems to be due to atm_register_sysfs()
+> leaking resources if it encounters an error, I think the problem would
+> best be resolved there.
+>
+> Perhaps something like this.
+> (Compile tested only!)
+>
+> diff --git a/net/atm/atm_sysfs.c b/net/atm/atm_sysfs.c
+> index 54e7fb1a4ee5..62f3d520a80a 100644
+> --- a/net/atm/atm_sysfs.c
+> +++ b/net/atm/atm_sysfs.c
+> @@ -148,20 +148,23 @@ int atm_register_sysfs(struct atm_dev *adev, struct device *parent)
+>   	dev_set_name(cdev, "%s%d", adev->type, adev->number);
+>   	err = device_register(cdev);
+>   	if (err < 0)
+> -		return err;
+> +		goto err_put_dev;
+>   
+>   	for (i = 0; atm_attrs[i]; i++) {
+>   		err = device_create_file(cdev, atm_attrs[i]);
+>   		if (err)
+> -			goto err_out;
+> +			goto err_remove_file;
+>   	}
+>   
+>   	return 0;
+>   
+> -err_out:
+> +err_remove_file:
+>   	for (j = 0; j < i; j++)
+>   		device_remove_file(cdev, atm_attrs[j]);
+>   	device_del(cdev);
+> +err_put_dev:
+> +	put_device(cdev);
+> +
+>   	return err;
+>   }
+>   
 
-Fixes: 6a91b846af85 ("net: axienet: Introduce dmaengine support")
-Signed-off-by: Abin Joseph <abin.joseph@amd.com>
----
 
-Changes in v2:
-Update the alias to net
+Thanks for your replies, it is very clear!
 
----
- drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+But the above code may introduce a use-after-free issue. If 
+device_register()
+fails, put_device() call atm_release() to free atm_dev, and
+atm_proc_dev_deregister() will visit it.
 
-diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-index 0d8a05fe541a..83469f7f08d1 100644
---- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-+++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-@@ -1166,8 +1166,18 @@ static void axienet_dma_rx_cb(void *data, const struct dmaengine_result *result)
- 	skb = skbuf_dma->skb;
- 	app_metadata = dmaengine_desc_get_metadata_ptr(skbuf_dma->desc, &meta_len,
- 						       &meta_max_len);
-+
- 	dma_unmap_single(lp->dev, skbuf_dma->dma_address, lp->max_frm_size,
- 			 DMA_FROM_DEVICE);
-+
-+	if (IS_ERR(app_metadata)) {
-+		if (net_ratelimit())
-+			netdev_err(lp->ndev, "Failed to get RX metadata pointer\n");
-+		dev_kfree_skb_any(skb);
-+		lp->ndev->stats.rx_dropped++;
-+		goto rx_submit;
-+	}
-+
- 	/* TODO: Derive app word index programmatically */
- 	rx_len = (app_metadata[LEN_APP] & 0xFFFF);
- 	skb_put(skb, rx_len);
-@@ -1180,6 +1190,7 @@ static void axienet_dma_rx_cb(void *data, const struct dmaengine_result *result)
- 	u64_stats_add(&lp->rx_bytes, rx_len);
- 	u64_stats_update_end(&lp->rx_stat_sync);
- 
-+rx_submit:
- 	for (i = 0; i < CIRC_SPACE(lp->rx_ring_head, lp->rx_ring_tail,
- 				   RX_BUF_NUM_DEFAULT); i++)
- 		axienet_rx_submit_desc(lp->ndev);
--- 
-2.34.1
+And kfree() should be removed in atm_dev_register() to avoid double-free.
 
+>
+>
+> Looking over atm_dev_register, it seems to me that it will deadlock
+> if it calls atm_proc_dev_deregister() if atm_register_sysfs() fails.
+> This is because atm_dev_register() is holding atm_dev_mutex,
+> and atm_proc_dev_deregister() tries to take atm_dev_mutex().
+
+
+I cannot find somewhere tries to take atm_dev_mutex(), can you give some
+hints?
+
+------
+Best regards
+Wang Liang
+
+> If so, I wonder if this can be resolved (in a separate patch to
+> the fix for atm_register_sysfs()) like this.
+> (Also compile tested only!)
+>
+> diff --git a/net/atm/resources.c b/net/atm/resources.c
+> index b19d851e1f44..3002ff5b60f8 100644
+> --- a/net/atm/resources.c
+> +++ b/net/atm/resources.c
+> @@ -112,13 +110,12 @@ struct atm_dev *atm_dev_register(const char *type, struct device *parent,
+>   
+>   	if (atm_proc_dev_register(dev) < 0) {
+>   		pr_err("atm_proc_dev_register failed for dev %s\n", type);
+> -		goto out_fail;
+> +		goto err_free_dev;
+>   	}
+>   
+>   	if (atm_register_sysfs(dev, parent) < 0) {
+>   		pr_err("atm_register_sysfs failed for dev %s\n", type);
+> -		atm_proc_dev_deregister(dev);
+> -		goto out_fail;
+> +		goto err_proc_dev_unregister;
+>   	}
+>   
+>   	list_add_tail(&dev->dev_list, &atm_devs);
+> @@ -127,7 +124,9 @@ struct atm_dev *atm_dev_register(const char *type, struct device *parent,
+>   	mutex_unlock(&atm_dev_mutex);
+>   	return dev;
+>   
+> -out_fail:
+> +err_proc_dev_unregister:
+> +	atm_proc_dev_deregister(dev);
+> +err_free_dev:
+>   	kfree(dev);
+>   	dev = NULL;
+>   	goto out;
+>
+> Lastly, while not a bug and not material for net, it would be nice to
+> follow-up on the above and consolidate the error handling in
+> atm_dev_register().
+>
+> Something like this (compile tested only!):
+>
+> diff --git a/net/atm/resources.c b/net/atm/resources.c
+> index b19d851e1f44..3002ff5b60f8 100644
+> --- a/net/atm/resources.c
+> +++ b/net/atm/resources.c
+> @@ -89,9 +89,7 @@ struct atm_dev *atm_dev_register(const char *type, struct device *parent,
+>   		inuse = __atm_dev_lookup(number);
+>   		if (inuse) {
+>   			atm_dev_put(inuse);
+> -			mutex_unlock(&atm_dev_mutex);
+> -			kfree(dev);
+> -			return NULL;
+> +			goto err_free_dev;
+>   		}
+>   		dev->number = number;
+>   	} else {
+>
+> ...
+>
 
