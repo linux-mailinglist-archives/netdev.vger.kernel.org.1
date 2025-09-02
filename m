@@ -1,211 +1,105 @@
-Return-Path: <netdev+bounces-219272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2314CB40D77
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 20:59:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1E14B40D7C
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 21:02:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 09C164E486A
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 18:59:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD6AE7AEFCE
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 19:00:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DFB4342CA5;
-	Tue,  2 Sep 2025 18:59:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA762312817;
+	Tue,  2 Sep 2025 19:02:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sSUxiyMq"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74C6C340D97;
-	Tue,  2 Sep 2025 18:59:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6C0C2853E0
+	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 19:02:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756839557; cv=none; b=SwUCFy7fg7YPqS7nhPIqLoZSR+40hNVf8238p5uJxjdABTER1nFDxEXl4HN4FNrtZgqydfZ1xQev1Wu3AJE3+/w4TK+cD1fZsKSH1DC/YdwYp47CJdd54cz+TIFrVWMqEhfaQ/74EGNIRc5Q2mEu+4K3GfookVKGcpz6tbLezSE=
+	t=1756839742; cv=none; b=CHR/DE/P8Z6r+9LUTZgxe9OH0ROcCqhw3W3g72IWrVNLNjR2JmFoUJCo/d6kHCoN7dzGhZnhJZUzgEeZOCJmx0krZssSOtuk/We/hRWiNRsNt7JKJj3R5NpLL4AmQWGJM4EBI9wfMCGee7z0JKi5Xd5QP04d0xh2SJeazGDsKxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756839557; c=relaxed/simple;
-	bh=uJQFwJTuvfeIEy4YnJz/3qaOZZLyJo9xvYPfQP+2f2k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R2GskdbRte3D6NuKy3ToX5jxeCr6hAmPfIHSXgBoJt2YNtlAkDQ4YWmx9SkyLEdsgitceHjomv0HS4tfINeX0dDb6xtx+a5Z1qCI93wnu8RNuqpylVYIOh2cVrF+p0DuS+l92PXiBZJJ9gZyVn31p9E0Ig3T8E99aMbJ2EYjWg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 7266A60288; Tue,  2 Sep 2025 20:59:13 +0200 (CEST)
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	<netfilter-devel@vger.kernel.org>,
-	pablo@netfilter.org
-Subject: [PATCH net 2/2] netfilter: nf_tables: Introduce NFTA_DEVICE_PREFIX
-Date: Tue,  2 Sep 2025 20:58:55 +0200
-Message-ID: <20250902185855.25919-3-fw@strlen.de>
-X-Mailer: git-send-email 2.49.1
-In-Reply-To: <20250902185855.25919-1-fw@strlen.de>
-References: <20250902185855.25919-1-fw@strlen.de>
+	s=arc-20240116; t=1756839742; c=relaxed/simple;
+	bh=L62VBLHJLzF3yTlsxR3Y9WihEr42n+OtrGy3bHC1Er4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mya8IBOt0sN8+on4ajMGn1labCkbtI0eq802VMbLqxyQaf3IhAyGRxX88UJrrWls9JJajNz085JRGNTvXERUWBfgr9MV2sOH5Td76mFigSUHtn6vLLDVyTolK9ahf74D9stqlX8rkMTy9Pm0j79+ghaafohu4kuSIuTloC17Cao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sSUxiyMq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F502C4CEED;
+	Tue,  2 Sep 2025 19:02:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756839742;
+	bh=L62VBLHJLzF3yTlsxR3Y9WihEr42n+OtrGy3bHC1Er4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sSUxiyMqGoWErJfbe87wvKOCzDW23+Z+jU7IP+st/V/S9oYmCRUT/7o4Wo522Nl1l
+	 xiYe5oxRtSrwh7wN/yLC3ig79//vXztyyLreryuJqfEomdiXaFVrA9O7+fBfoWZWH2
+	 6jsogBeEtBymChVYbABBInJlrEnmTuUA/3U3+Dbpnkbc+sUQzPK+op1xr+1mCi4YMf
+	 urz6Q0eKLOm3cW2HwjW2eqgNwYcymOvK1+wMNUFMmhE5vsL/UZL4FWKY7fVm+7g+te
+	 nTgE447SesFqYqoex3fzghUFjncYb3GN8CvP/HvhLSoxAtfT9iH2vMVSjSZvD12dSU
+	 beRfBfm7Glv+A==
+Date: Tue, 2 Sep 2025 12:02:21 -0700
+From: Saeed Mahameed <saeed@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net-next V6 09/13] devlink: Add 'keep_link_up' generic
+ devlink device param
+Message-ID: <aLc_PWj1OKkjrZ0e@x130>
+References: <20250709030456.1290841-1-saeed@kernel.org>
+ <20250709030456.1290841-10-saeed@kernel.org>
+ <20250709195801.60b3f4f2@kernel.org>
+ <aG9X13Hrg1_1eBQq@x130>
+ <20250710152421.31901790@kernel.org>
+ <aLC3jlzImChRDeJs@x130>
+ <20250828153845.4928772b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250828153845.4928772b@kernel.org>
 
-From: Phil Sutter <phil@nwl.cc>
+On 28 Aug 15:38, Jakub Kicinski wrote:
+>On Thu, 28 Aug 2025 13:09:50 -0700 Saeed Mahameed wrote:
+>> >> I don't see anything missing in the definition of this parameter
+>> >> 'keep_link_up' it is pretty much self-explanatory, for legacy reasons the
+>> >> netdev controls the underlying physical link state. But this is not
+>> >> true anymore for complex setups (multi-host, DPU, etc..).
+>> >
+>> >The policy can be more complex than "keep_link_up"
+>> >Look around the tree and search the ML archives please.
+>>
+>> Sorry for replying late, had to work on other stuff and was waiting
+>> internally for a question I had to ask about this, only recently got the
+>> answer.
+>>
+>> I get your point, but I am not trying to implement any link policy
+>> or eth link specification tunables. For me and maybe other vendors
+>> this knob makes sense, and Important for the usecase I described.
+>
+>I think I was alluding to making the link stay up dependent on presence
+>of BMC / management engine and or some NIC-internal agents. So to give
+>a trivial example the policy could be:
+> - force down
+> - leave up if BMC present
+> - force up
+>I don't recall prior discussions TBH so doing more research will be
+>necessary..
 
-This new attribute is supposed to be used instead of NFTA_DEVICE_NAME
-for simple wildcard interface specs. It holds a NUL-terminated string
-representing an interface name prefix to match on.
+Sounds good will drop this patch and re-post. Will suggest the policy to
+our Arch people to see if FW can adapt.
 
-While kernel code to distinguish full names from prefixes in
-NFTA_DEVICE_NAME is simpler than this solution, reusing the existing
-attribute with different semantics leads to confusion between different
-versions of kernel and user space though:
-
-* With old kernels, wildcards submitted by user space are accepted yet
-  silently treated as regular names.
-* With old user space, wildcards submitted by kernel may cause crashes
-  since libnftnl expects NUL-termination when there is none.
-
-Using a distinct attribute type sanitizes these situations as the
-receiving part detects and rejects the unexpected attribute nested in
-*_HOOK_DEVS attributes.
-
-Fixes: 6d07a289504a ("netfilter: nf_tables: Support wildcard netdev hook specs")
-Signed-off-by: Phil Sutter <phil@nwl.cc>
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- include/uapi/linux/netfilter/nf_tables.h |  2 ++
- net/netfilter/nf_tables_api.c            | 42 +++++++++++++++++-------
- 2 files changed, 33 insertions(+), 11 deletions(-)
-
-diff --git a/include/uapi/linux/netfilter/nf_tables.h b/include/uapi/linux/netfilter/nf_tables.h
-index 2beb30be2c5f..8e0eb832bc01 100644
---- a/include/uapi/linux/netfilter/nf_tables.h
-+++ b/include/uapi/linux/netfilter/nf_tables.h
-@@ -1784,10 +1784,12 @@ enum nft_synproxy_attributes {
-  * enum nft_device_attributes - nf_tables device netlink attributes
-  *
-  * @NFTA_DEVICE_NAME: name of this device (NLA_STRING)
-+ * @NFTA_DEVICE_PREFIX: device name prefix, a simple wildcard (NLA_STRING)
-  */
- enum nft_devices_attributes {
- 	NFTA_DEVICE_UNSPEC,
- 	NFTA_DEVICE_NAME,
-+	NFTA_DEVICE_PREFIX,
- 	__NFTA_DEVICE_MAX
- };
- #define NFTA_DEVICE_MAX		(__NFTA_DEVICE_MAX - 1)
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index 58c5425d61c2..c1082de09656 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -1959,6 +1959,18 @@ static int nft_dump_stats(struct sk_buff *skb, struct nft_stats __percpu *stats)
- 	return -ENOSPC;
- }
- 
-+static bool hook_is_prefix(struct nft_hook *hook)
-+{
-+	return strlen(hook->ifname) >= hook->ifnamelen;
-+}
-+
-+static int nft_nla_put_hook_dev(struct sk_buff *skb, struct nft_hook *hook)
-+{
-+	int attr = hook_is_prefix(hook) ? NFTA_DEVICE_PREFIX : NFTA_DEVICE_NAME;
-+
-+	return nla_put_string(skb, attr, hook->ifname);
-+}
-+
- static int nft_dump_basechain_hook(struct sk_buff *skb,
- 				   const struct net *net, int family,
- 				   const struct nft_base_chain *basechain,
-@@ -1990,16 +2002,15 @@ static int nft_dump_basechain_hook(struct sk_buff *skb,
- 			if (!first)
- 				first = hook;
- 
--			if (nla_put(skb, NFTA_DEVICE_NAME,
--				    hook->ifnamelen, hook->ifname))
-+			if (nft_nla_put_hook_dev(skb, hook))
- 				goto nla_put_failure;
- 			n++;
- 		}
- 		nla_nest_end(skb, nest_devs);
- 
- 		if (n == 1 &&
--		    nla_put(skb, NFTA_HOOK_DEV,
--			    first->ifnamelen, first->ifname))
-+		    !hook_is_prefix(first) &&
-+		    nla_put_string(skb, NFTA_HOOK_DEV, first->ifname))
- 			goto nla_put_failure;
- 	}
- 	nla_nest_end(skb, nest);
-@@ -2310,7 +2321,8 @@ void nf_tables_chain_destroy(struct nft_chain *chain)
- }
- 
- static struct nft_hook *nft_netdev_hook_alloc(struct net *net,
--					      const struct nlattr *attr)
-+					      const struct nlattr *attr,
-+					      bool prefix)
- {
- 	struct nf_hook_ops *ops;
- 	struct net_device *dev;
-@@ -2327,7 +2339,8 @@ static struct nft_hook *nft_netdev_hook_alloc(struct net *net,
- 	if (err < 0)
- 		goto err_hook_free;
- 
--	hook->ifnamelen = nla_len(attr);
-+	/* include the terminating NUL-char when comparing non-prefixes */
-+	hook->ifnamelen = strlen(hook->ifname) + !prefix;
- 
- 	/* nf_tables_netdev_event() is called under rtnl_mutex, this is
- 	 * indirectly serializing all the other holders of the commit_mutex with
-@@ -2374,14 +2387,22 @@ static int nf_tables_parse_netdev_hooks(struct net *net,
- 	struct nft_hook *hook, *next;
- 	const struct nlattr *tmp;
- 	int rem, n = 0, err;
-+	bool prefix;
- 
- 	nla_for_each_nested(tmp, attr, rem) {
--		if (nla_type(tmp) != NFTA_DEVICE_NAME) {
-+		switch (nla_type(tmp)) {
-+		case NFTA_DEVICE_NAME:
-+			prefix = false;
-+			break;
-+		case NFTA_DEVICE_PREFIX:
-+			prefix = true;
-+			break;
-+		default:
- 			err = -EINVAL;
- 			goto err_hook;
- 		}
- 
--		hook = nft_netdev_hook_alloc(net, tmp);
-+		hook = nft_netdev_hook_alloc(net, tmp, prefix);
- 		if (IS_ERR(hook)) {
- 			NL_SET_BAD_ATTR(extack, tmp);
- 			err = PTR_ERR(hook);
-@@ -2427,7 +2448,7 @@ static int nft_chain_parse_netdev(struct net *net, struct nlattr *tb[],
- 	int err;
- 
- 	if (tb[NFTA_HOOK_DEV]) {
--		hook = nft_netdev_hook_alloc(net, tb[NFTA_HOOK_DEV]);
-+		hook = nft_netdev_hook_alloc(net, tb[NFTA_HOOK_DEV], false);
- 		if (IS_ERR(hook)) {
- 			NL_SET_BAD_ATTR(extack, tb[NFTA_HOOK_DEV]);
- 			return PTR_ERR(hook);
-@@ -9458,8 +9479,7 @@ static int nf_tables_fill_flowtable_info(struct sk_buff *skb, struct net *net,
- 
- 	list_for_each_entry_rcu(hook, hook_list, list,
- 				lockdep_commit_lock_is_held(net)) {
--		if (nla_put(skb, NFTA_DEVICE_NAME,
--			    hook->ifnamelen, hook->ifname))
-+		if (nft_nla_put_hook_dev(skb, hook))
- 			goto nla_put_failure;
- 	}
- 	nla_nest_end(skb, nest_devs);
--- 
-2.49.1
-
+Thanks,
+Saeed.
 
