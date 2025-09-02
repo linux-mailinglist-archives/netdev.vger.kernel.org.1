@@ -1,79 +1,122 @@
-Return-Path: <netdev+bounces-219368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F565B410CB
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 01:35:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45861B410CF
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 01:35:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD3B6168F7F
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:35:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0734A3B8D40
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:35:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51B3627F015;
-	Tue,  2 Sep 2025 23:35:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hs7zH0ev"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35ED81ADC97;
+	Tue,  2 Sep 2025 23:35:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DE6920E00B;
-	Tue,  2 Sep 2025 23:35:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E99327F006;
+	Tue,  2 Sep 2025 23:35:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756856113; cv=none; b=SP/qGWvAFQw9m8QnJBf2Re+6YM5T/K82epvkRFg7MW4zO1COb+FsBSaPoESByRTSIblDCHlQ8FuxRUa4OpqB8xrRDuY+llJW3NtJV3709PfTQp8FZDDkLMp6dqVzVeApMR+QzPjqG+5K9D5BTgrOh6ZtUHZA5NotBelKpNZja+8=
+	t=1756856143; cv=none; b=GFRaZPWrK76Kp4CpO7GNXx6Nrn4jitS1I//+n2KnIWT/Wjtnd0VfRuZTVIRq+b5A34ZnH43Hd/LwmndonEXnUyXbD/Wr77gzfayUuVRxCuN3bc9sQKLELyxPqh0kEuksR/++/Brf9VTbGEupOpaIjjX0Z9Bt4y4vUydLstGH7Bc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756856113; c=relaxed/simple;
-	bh=Yu0jVEodkPTvVFabct2RrrX/7iqVU1qZiWO7k25ZXzc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PkTu8q5XgsBD07ntyO6n6WaSur88Cmrv7R1rUsmigFM9xAFzub9Dh9IHNBR4Y9E6ZpeCVGkXCyJsjyr6RKwoo8cJeGkXsU90K5bNA4tUONe7uXKAv9DAVhrPYtNerp667HUVGKw7geyMmSGdZ7RwizKKkSpAM86/8ZLVmhcmdtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hs7zH0ev; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B78EC4CEED;
-	Tue,  2 Sep 2025 23:35:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756856112;
-	bh=Yu0jVEodkPTvVFabct2RrrX/7iqVU1qZiWO7k25ZXzc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hs7zH0evhqV4ahtzKH6BZbEYbNGN/VLudXIgIXiJ9Rw0IpEURdoT0Bbpkev9sql0O
-	 XaWIhDU8HjBN7jHHvl9/KDIMG46gC8uSkp6m6oDV0Tq0Vvd0B/7IVgNasF1nLfjjMB
-	 KJilnTsZ0mUmpX1PBdJ43LT7hfmVPAJJyuNw20lSjzdwABzPrnnXlKyqinP5frRMwa
-	 qD7+4lo/pE+MDIZ4Chqz3sVhlqzcUs8HXp7fmCEa8H9Tag01SrHWuEJP093NGLwdUJ
-	 6+OVHbWml+V4vO75unL+LMiXztMq96jyJlAzFe10lLJC8fh93kNIIwFHPZMmYLsMQR
-	 VBnuxdjYRWSXA==
-Date: Tue, 2 Sep 2025 16:35:11 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Oleksij Rempel" <linux@rempel-privat.de>
-Cc: Hubert =?UTF-8?B?V2nFm25pZXdza2k=?= <hubert.wisniewski.25632@gmail.com>,
- "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Paolo Abeni"
- <pabeni@redhat.com>, <linux-usb@vger.kernel.org>, <netdev@vger.kernel.org>,
- <regressions@lists.linux.dev>, <linux-kernel@vger.kernel.org>
-Subject: Re: [REGRESSION] net: usb: asix: deadlock on interface setup
-Message-ID: <20250902163511.181fa76a@kernel.org>
-In-Reply-To: <DCGHG5UJT9G3.2K1GHFZ3H87T0@gmail.com>
-References: <DCGHG5UJT9G3.2K1GHFZ3H87T0@gmail.com>
+	s=arc-20240116; t=1756856143; c=relaxed/simple;
+	bh=QB3RSNIy+ncxYBl0Goee+lHvvnxDu9oxlhQwRzFjG5Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ApssvI5bO+oPEYTrm5EUWxMGhLEJ0DcSG5TEkST4KQ7iqJyvIRa1GZ6Hv135cuF0hKnWZJUVcCKZjLsBwq1+a12JqpLbQIFw1A83u68AsZ0h1EtXaatOf6Qqbub7BXxhn1fdKWmaHh3TwAetMJG7hdBYaK1+TmX/d1LrLuyfJTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1utaX5-000000001Gz-3aQO;
+	Tue, 02 Sep 2025 23:35:23 +0000
+Date: Wed, 3 Sep 2025 00:35:16 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Andreas Schirm <andreas.schirm@siemens.com>,
+	Lukas Stockmann <lukas.stockmann@siemens.com>,
+	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Peter Christen <peter.christen@siemens.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
+	Juraj Povazanec <jpovazanec@maxlinear.com>,
+	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	"Livia M. Rosu" <lrosu@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: [RFC PATCH net-next 0/6] net: dsa: lantiq_gswip: convert to use
+ regmap
+Message-ID: <cover.1756855069.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Sun, 31 Aug 2025 10:50:35 +0200 Hubert Wi=C5=9Bniewski wrote:
-> Trying to bring an AX88772B-based USB-Ethernet adapter up results in a
-> deadlock if the adapter was suspended at the time. Most network-related
-> software hangs up indefinitely as a result. This can happen on systems
-> which configure USB power control to 'auto' by default, e.g. laptops
-> running `tlp`.
-=20
-Oleksij, this seems to date back to commit e0bffe3e6894 ("net: asix:
-ax88772: migrate to phylink"). Taking rtnl_lock in runtime resume
-callbacks is known to result in unhappiness :(
+Prepare the lantiq_gswip DSA driver to use transports other than MMIO to
+access the switch registers by using regmap.
 
-Could you check if commit e110bc825897 ("net: usb:
-lan78xx: Convert to PHYLINK for improved PHY and MAC management")
-isn't similarly flawed?
+In order to ease future maintainance and get rid of unneeded indirection
+replace the existing accessor functions in favour of using the regmap
+API directly.
+
+The biggest part of that conversion is done using easy-to-review
+semantic patches (coccinelle), leaving only a few corner cases and some
+optimization to be done manually.
+
+Register writes could be further reduced in future by using
+regmap_update_bits() instead of regmap_write_bits() in cases which allow
+that.
+
+Also note that, just like the current code, there is no error handling
+in case register access fails, however, an error message is printed in
+such cases at least.
+
+This series is meant to be merged after series
+
+"net: dsa: lantiq_gswip: prepare for supporting MaxLinear GSW1xx"[1]
+
+and also after the series with fixes Vladimir Oltean is currently
+preparing; applying a bunch of semantic patches is easy even after code
+changes, while on the other hand applying his code changes after the
+conversion to regmap would require a rework of all his work).
+
+Hence this is posted as RFC to potentially get some feedback before
+both other series mentioned above have been merged.
+
+DSA selftests have been run with this series applied, the results are
+unchanged (ie. the expected result).
+
+[1]: https://patchwork.kernel.org/project/netdevbpf/list/?series=997105
+
+Daniel Golle (6):
+  net: dsa: lantiq_gswip: convert to use regmap
+  net: dsa: lantiq_gswip: convert trivial accessor uses to regmap
+  net: dsa: lantiq_gswip: manually convert remaining uses of read
+    accessors
+  net: dsa: lantiq_gswip: replace *_mask() functions with regmap API
+  net: dsa: lantiq_gswip: optimize regmap_write_bits() statements
+  net: dsa: lantiq_gswip: harmonize gswip_mii_mask_*() parameters
+
+ drivers/net/dsa/lantiq/Kconfig        |   1 +
+ drivers/net/dsa/lantiq/lantiq_gswip.c | 443 +++++++++++++-------------
+ drivers/net/dsa/lantiq/lantiq_gswip.h |   6 +-
+ 3 files changed, 228 insertions(+), 222 deletions(-)
+
+-- 
+2.51.0
 
