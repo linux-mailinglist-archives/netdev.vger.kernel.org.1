@@ -1,161 +1,81 @@
-Return-Path: <netdev+bounces-219078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47CC4B3FA2A
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 11:22:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 323DDB3FA43
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 11:25:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C53B4E173C
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 09:22:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09F4D16A8EE
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 09:25:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 004D82EA481;
-	Tue,  2 Sep 2025 09:22:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE9D613C8FF;
+	Tue,  2 Sep 2025 09:25:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ursulin-net.20230601.gappssmtp.com header.i=@ursulin-net.20230601.gappssmtp.com header.b="BjJ4DkI0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bn3Ofsoq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C9DD2E9ECD
-	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 09:22:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC03221F09
+	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 09:25:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756804935; cv=none; b=g9PTqiA0Tigqzzz7FpzZCu6cQQpQEbBiFcxsIcqQxhxO1nFJyJO51dv9wXOzRKuIKVqRKaXNasf8CIXnWmsjMZxdofnjIDIGFc5iEuZglLexg4s3n2+vUnTsIBH9q33+1hDof/EP/tj4XUUwKOWLYaLWNhlZxCDfZg3WJm+DOf0=
+	t=1756805114; cv=none; b=Wg9D9NeE9Om72SHwpt+Ijcj9uRwqfTU5DgQ4vHFT8L+BLelSO274yIdYoFPIhm/jVAuZCbE6BdLj025+cL34uu4D55lBch/RLkpefZfBELR/w25RLiOZCmDmbOEXoB/btW/AJxbibu43M42AIaLRthF+RDFbk4+6OiAEOecHQ8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756804935; c=relaxed/simple;
-	bh=Pv1NlzKjL0xFo8BfGbhy/7KnNZN8WrItjraHEOkXixw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kzTZP6ZDMNgQfDToWsJCVoQX5vZT3zSvnGxa8OZJkExt6ZA2c5yv+Pu1GN9o9l6rgQL7pt10eVIeIO5QYiEvm6A1JJUYoMMxFmT2yNKAe6dam8p8lFc4jOAYKB47hifww5UAO2l01Qt7klrb/qY4Z/yTi+b901mKfZIvef1mKAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ursulin.net; spf=none smtp.mailfrom=ursulin.net; dkim=pass (2048-bit key) header.d=ursulin-net.20230601.gappssmtp.com header.i=@ursulin-net.20230601.gappssmtp.com header.b=BjJ4DkI0; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ursulin.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ursulin.net
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-45b804ed966so15860065e9.2
-        for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 02:22:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ursulin-net.20230601.gappssmtp.com; s=20230601; t=1756804931; x=1757409731; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0Be300C9M54HN2j6qqn3KzILYOn0Dm/rUn/s4aJntRQ=;
-        b=BjJ4DkI0nOIeBWi829gHdcdGEnRHe1ZnQO1njdb+Jyp0kjPhbqnc/pH3IqlbX/mPRt
-         KImIiC5IOBhDUsCOe+bsijMfqcLKa+dXYa461vlf8W43jDTp2NN/HyQttUmEPfTyMDsa
-         +znjOYbf7zmMPfsw7iujVXgeGLUXtwGXlQ+SY2EucQk11hSB12zyiFkHuuLs1Vp+GMQK
-         znrByajiS5QwRXsCGGX/uEAkboujg3cDsCxXhSDvaaKtpi9xTJYSIPVmQMJW+nANv+26
-         x3bpMDTCAYkVqg6BQ0C/DVGa/O/iwl4l6QGYI8jJHyq5e0aZ7lgtishdDOyJn3yv5f02
-         d/Ew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756804931; x=1757409731;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0Be300C9M54HN2j6qqn3KzILYOn0Dm/rUn/s4aJntRQ=;
-        b=UZ3GI25+XnPWIRw+q/AkIKo5n68dnbnU0JxmmUB8MSlodC7URIu6DUlHcPA6yj3DO3
-         RQ0C3v8NxBLUNw5j8DkNctoULl0vXM+PWEI1TOI8BspnU44lBEWx8AiLym7Xmtuyu/SK
-         /SES1EPI/pytpjVtxWhqEyurmyExrKqUwzR3qQSXji3kxuIE93XX6DOyPklgOk0nyW00
-         8HAdLC6Qry8hdo9DjvnyJ8P77pEtWbODLeh922DljXgujU6lgP3FuIn1tgU26chvRSMP
-         74mfAPNcL0iCQNY7tJAd3JcbyL8LKCofHpaO4vJ0XjQMdoTkv+u558GInpZgwlk1DJ32
-         wY8A==
-X-Forwarded-Encrypted: i=1; AJvYcCU0rwrlzYk6v4+VA0ismXKflpTmVHeN7cTdj0aSoFI6Kf2fYgQdFaHDNIkeDVRea8rr7UFghH4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwB+4v2HJ3G+XzdTSx/P2k/9SY5Zm2ZalmkYrM15cfP4cdVoZ9z
-	PJ7SH0/n+FZSs91tk1dSYR2EZO6UvQFZKuo0CxZ7H9NuNMDCQHJsMJZ5KU6zABpuEh0=
-X-Gm-Gg: ASbGncuMzQ8Ka16Dp32CCME7sJ4lr4htALvr8Sel2ZUXzxq8kcNHjpygnw43T6OnN5k
-	aqhTWI0Lj74i2dYH1TSRstozhV1hpdr81q0tjcGv+KfgGKhtjExwP5RCF0b4vRwTubJx1sLZCE2
-	nMvRqR2lZiA7bfdRLPCy/yX4A0xAPfgAY6MsPIkyuDcLQB+xUxiR+LQbfFGhWV5pn2wsoTqY/yY
-	WilUwuuCC9tXR8aNG+828kY35IY2irha9QwjpZu+TVDJclg0YE9y+upvx/cKWOA7g2aR8OQDYN7
-	AnvaETlfBJyEDH4GEivMHw4obFppPOAJHUnUAJ2u0JgGMj7GuQ63xRYn4jeSviZAEy54eeoD5Od
-	gbtoeGawoCIF3WQcUH8EVWSVy5pe3QO0+iKI=
-X-Google-Smtp-Source: AGHT+IFjGWdM7r4OC2xPYq10JBW42QzIVS9ISDbv655toZnOdc57tKWSkMByc2ni755H7QY3mBnVYA==
-X-Received: by 2002:a05:600c:a04:b0:45b:7d24:beac with SMTP id 5b1f17b1804b1-45b8553335amr94619035e9.10.1756804930815;
-        Tue, 02 Sep 2025 02:22:10 -0700 (PDT)
-Received: from [192.168.0.101] ([84.66.36.92])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3d0b9402299sm17994846f8f.18.2025.09.02.02.22.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Sep 2025 02:22:10 -0700 (PDT)
-Message-ID: <4bbf5590-7591-4dfc-a23e-0bda6cb31a80@ursulin.net>
-Date: Tue, 2 Sep 2025 10:22:09 +0100
+	s=arc-20240116; t=1756805114; c=relaxed/simple;
+	bh=Gir5FL/6U85la2b3A3gYkp7N+HOwiXlJmyqMRnXBoc0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=buM6P287DtIcYJrbIsKcx8u1BxYaVFqnzJFWHoZ8EKOfbytJVmaGNbgzztRaLg4PW7EfmYAbk6nn8inoERB2ts3XGvKUNQlOZJifTkwYSscIJ/1sInFM5tHJTaYZ1etQKeWF7h4XU/Uz0ujyZcVkLWLqe7TYiS190VuWJq3ppU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bn3Ofsoq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD9EAC4CEED;
+	Tue,  2 Sep 2025 09:25:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756805114;
+	bh=Gir5FL/6U85la2b3A3gYkp7N+HOwiXlJmyqMRnXBoc0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bn3OfsoqPmp7vr1XWJezR6FORqG/4/CG8Db+YcPlw9ymTe3X64rfy13plgzJUQtMC
+	 9pjgGH7Btw40tadVQVsuKpxpyeQSfb5WoMtVYh/IOxfpZOkocfTxOneU/inTlccJTy
+	 j7a6HQgxZB7RJ4tZCBp0qdXJMLqGU7mJWDSLmZK7NiutoenNP7/RWgia+npv6+FvU9
+	 xjR7yz+VlTkl5bHtbWd0ZTyJEcfVyV1p3mANC/0KV15MeEO0xgu7GYrkHzmFPZOPnf
+	 s7SoDW1OspQtFcoOlVDYdT+g2fBLyUhDuDWvcKQDMTQikp8D97mHhjGDoWQL60X5vS
+	 +uNeKNxn83Efw==
+Date: Tue, 2 Sep 2025 10:25:10 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, dkirjanov@suse.de
+Subject: Re: [PATCH net 1/2] Revert "eth: remove the DLink/Sundance (ST201)
+ driver"
+Message-ID: <20250902092510.GX15473@horms.kernel.org>
+References: <20250901210818.1025316-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 26/37] drm/i915/gem: drop nth_page() usage within SG
- entry
-To: David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org
-Cc: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- Jani Nikula <jani.nikula@linux.intel.com>,
- Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>, David Airlie <airlied@gmail.com>,
- Simona Vetter <simona@ffwll.ch>, Alexander Potapenko <glider@google.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Brendan Jackman <jackmanb@google.com>, Christoph Lameter <cl@gentwo.org>,
- Dennis Zhou <dennis@kernel.org>, Dmitry Vyukov <dvyukov@google.com>,
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- iommu@lists.linux.dev, io-uring@vger.kernel.org,
- Jason Gunthorpe <jgg@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
- Johannes Weiner <hannes@cmpxchg.org>, John Hubbard <jhubbard@nvidia.com>,
- kasan-dev@googlegroups.com, kvm@vger.kernel.org,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Linus Torvalds <torvalds@linux-foundation.org>, linux-arm-kernel@axis.com,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mm@kvack.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, Marco Elver <elver@google.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>, Michal Hocko <mhocko@suse.com>,
- Mike Rapoport <rppt@kernel.org>, Muchun Song <muchun.song@linux.dev>,
- netdev@vger.kernel.org, Oscar Salvador <osalvador@suse.de>,
- Peter Xu <peterx@redhat.com>, Robin Murphy <robin.murphy@arm.com>,
- Suren Baghdasaryan <surenb@google.com>, Tejun Heo <tj@kernel.org>,
- virtualization@lists.linux.dev, Vlastimil Babka <vbabka@suse.cz>,
- wireguard@lists.zx2c4.com, x86@kernel.org, Zi Yan <ziy@nvidia.com>
-References: <20250901150359.867252-1-david@redhat.com>
- <20250901150359.867252-27-david@redhat.com>
-Content-Language: en-GB
-From: Tvrtko Ursulin <tursulin@ursulin.net>
-In-Reply-To: <20250901150359.867252-27-david@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250901210818.1025316-1-kuba@kernel.org>
 
-
-On 01/09/2025 16:03, David Hildenbrand wrote:
-> It's no longer required to use nth_page() when iterating pages within a
-> single SG entry, so let's drop the nth_page() usage.
+On Mon, Sep 01, 2025 at 02:08:17PM -0700, Jakub Kicinski wrote:
+> This reverts commit 8401a108a63302a5a198c7075d857895ca624851.
 > 
-> Reviewed-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-> Cc: Jani Nikula <jani.nikula@linux.intel.com>
-> Cc: Joonas Lahtinen <joonas.lahtinen@linux.intel.com>
-> Cc: Rodrigo Vivi <rodrigo.vivi@intel.com>
-> Cc: Tvrtko Ursulin <tursulin@ursulin.net>
-> Cc: David Airlie <airlied@gmail.com>
-> Cc: Simona Vetter <simona@ffwll.ch>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->   drivers/gpu/drm/i915/gem/i915_gem_pages.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+> I got a report from an (anonymous) Sundance user:
 > 
-> diff --git a/drivers/gpu/drm/i915/gem/i915_gem_pages.c b/drivers/gpu/drm/i915/gem/i915_gem_pages.c
-> index c16a57160b262..031d7acc16142 100644
-> --- a/drivers/gpu/drm/i915/gem/i915_gem_pages.c
-> +++ b/drivers/gpu/drm/i915/gem/i915_gem_pages.c
-> @@ -779,7 +779,7 @@ __i915_gem_object_get_page(struct drm_i915_gem_object *obj, pgoff_t n)
->   	GEM_BUG_ON(!i915_gem_object_has_struct_page(obj));
->   
->   	sg = i915_gem_object_get_sg(obj, n, &offset);
-> -	return nth_page(sg_page(sg), offset);
-> +	return sg_page(sg) + offset;
->   }
->   
->   /* Like i915_gem_object_get_page(), but mark the returned page dirty */
+>   Ethernet controller: Sundance Technology Inc / IC Plus Corp IC Plus IP100A Integrated 10/100 Ethernet MAC + PHY (rev 31)
+> 
+> Revert the driver back in. Make following changes:
+>  - update Denis's email address in MAINTAINERS
+>  - adjust to timer API renames:
+>    - del_timer_sync() -> timer_delete_sync()
+>    - from_timer() -> timer_container_of()
+> 
+> Fixes: 8401a108a633 ("eth: remove the DLink/Sundance (ST201) driver")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-LGTM. If you want an ack to merge via a tree other than i915 you have 
-it. I suspect it might be easier to coordinate like that.
-
-Regards,
-
-Tvrtko
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
