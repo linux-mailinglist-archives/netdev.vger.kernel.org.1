@@ -1,137 +1,146 @@
-Return-Path: <netdev+bounces-219033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A49C1B3F743
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 09:59:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0B76B3F7D9
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 10:12:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 39BCB4E36AB
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 07:59:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D595170B38
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 08:12:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F5F42E7BC7;
-	Tue,  2 Sep 2025 07:59:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A722B2E8B99;
+	Tue,  2 Sep 2025 08:10:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mSFsEhZL"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="RROp1G00"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5192E7BD9;
-	Tue,  2 Sep 2025 07:59:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D542E2E7BC7;
+	Tue,  2 Sep 2025 08:10:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756799973; cv=none; b=XCV8mth5EHb3vuamkAHHYkrll+NGRgJKlvvn/g3Us7M6dWtKT2Ay9Ot2VS4+JKJf2+7VJUsZXizEPGlzeSXk6dHwYnEIqWayle0MyKnb877h4+P1iS8uD/sB44xNL9474u1MTFB+AKftuOtNwp3uMNZEja+UAEcGO/fvXeUzDUw=
+	t=1756800621; cv=none; b=D+M/3HDC9IHy9biwP2DzwUmCVEm7qsPMc+hR77OiVe/nlx35vVzdS8gBqCKbIXuNcrvOPsVFxkHexWpkB4RuWhEL5P3unseJWKfL5kSk1TI8ZNQML+bZzJVQ2kfzzI/GOwFrqoTwfWEwbxCiaL+s4ZQKK89FmRq3A4f3M2/eYNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756799973; c=relaxed/simple;
-	bh=UetU6Q0k6KRv6T5Ge8HNc+MI7mAoKHwLvsekh+TGmJM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ErKIdLnq3GR7fvMwNBMWz5699bjkfJtiagVAIuBXd+TPozCape0ojJuNhhZRgBOvuZ3iRKAUJxjBwJyeDp8KAT31btusMl8UmSUIUAeQG3IMNoflg+VbL9+w/lRuZGnCxGSy4VfhT9zX6BE1TAjYzc59NVseUcXMKnFb5C5LruU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mSFsEhZL; arc=none smtp.client-ip=209.85.166.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-88432e6700dso40102839f.3;
-        Tue, 02 Sep 2025 00:59:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756799971; x=1757404771; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UetU6Q0k6KRv6T5Ge8HNc+MI7mAoKHwLvsekh+TGmJM=;
-        b=mSFsEhZLgMjim3oiFNWw9y0BVx5Ck2VI0vYaJsmN9AwPBmcyKNVDb+Ml8M0IISNzGQ
-         beqjW+nLlkeYE27nhHzLnrrwo6qcG8uPpTOtzRzm/Wf13wKA3S1F1bQqjh3KaG1IPasy
-         bymTwki7hc5bskXczcSDNkdq/R2ir6g3rYA/us2WY0NoDDtb1XEmmpb1dRVidVz9b4aq
-         vzoN/IXbSFn0Acw5tbFKJKgi11/gf5YgXyLBf9YT70+1G49ex9jU6dE62mUi+vsZbYtm
-         hkinDhtqlyZvKbgbtK71EUY0/dztMaIgp3PH4sg/96j0xof4MNvBXZFiBdV3ZPMzlVvE
-         UWug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756799971; x=1757404771;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UetU6Q0k6KRv6T5Ge8HNc+MI7mAoKHwLvsekh+TGmJM=;
-        b=cVgZBSSsY2A2d5q0rO+L+Ev8/YQpEiKBQahbVCTEUF0Ima64WFq4ICC/vm+McJ23K2
-         ZLMgR1qRkMPyUzkk+MtR4etwLMkt+g+yqyp73RehzjwkJp4kLDABXLXJsyybd3HHHih8
-         6o3zpOissfWlslvMKCiAOWCtP/p7g596HXRmYa39C+N33a62Je0dxh+zmWa/cmOviUsm
-         GEP8TbtlYtKfyZ8+tyMJ5Wer9Bhz3XMhRTu+lvMlPiCwT82f0QWt3kthAB1Uz/Dmu1Dt
-         WAt2QNMAWdDlvXUjFLIejA96ecfoYYgKW8RVkBZAm7jTxvAPbSVDpBmUQ4SINt/i8zOg
-         HfGg==
-X-Forwarded-Encrypted: i=1; AJvYcCUNu+9Sz6OQjpkjGAZCMMKDF/J05J6lxdSyC/R76qeHBJaBK9+vMi4buHeBbJhiGelZbI2D2mJtfR5f2GM=@vger.kernel.org, AJvYcCWRN4a9Rxt/o98n7P9/OVW+nO2vB+uILswW+p8wAXKHmgUWK31s/XH3gpr3BmMTvTzkudjBImv0@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrqyANeHViI/pFeZcB51HWBlXEWGqt9SgvXXate2sqJ8Rg2GKY
-	6eT3MBDN0vlP4DIebNkgahpy+5KhMBXBUZrPJaY5deQR1W/wxBPeCyqXuB27etyJihv8iR+vl9Q
-	q1lffWB3ueje/Z3J260udOp/QfAZT13Q=
-X-Gm-Gg: ASbGncs/Yh88zbjajxRTswvDMWrt1qXvh6BqFsVx6gY81YmCRSrYDj9rY0+M5XeK6u1
-	/7i1xr92A76/f5ylqri3YGYc7w6buJVg3qfmwmJijeTY/fz5qlmCpEABPnCjJhND+z0HhhxbFbc
-	hPocJ/LGUiSB1T4mB36sWHEx/nLOn3OrvTNkiV2Y/iaWl0wtpmPc9mkjKEIB2UQzHIjxH4x4H4L
-	/aDwUtPUWvd5w0uKQ==
-X-Google-Smtp-Source: AGHT+IGEkf8gg7Ow1PMGLkorRV34nEHMquJJIPNm+rQ3E2LGYOSocGgbgKW015adiEbMvaroPzAP/00jQqW5+KXJsGQ=
-X-Received: by 2002:a05:6e02:2165:b0:3e5:51bb:9cd9 with SMTP id
- e9e14a558f8ab-3f400674ac2mr211654925ab.8.1756799970758; Tue, 02 Sep 2025
- 00:59:30 -0700 (PDT)
+	s=arc-20240116; t=1756800621; c=relaxed/simple;
+	bh=cyJKkcqZqbk709afqt1BPhXGf6CjrosVwsdhTAJwy7k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aQ+i9q/mqE6Ym5G2SORMd8Y1WwTRxLd/UCZABY7LyEiBTH4+vpG+DJOIq22Ij4oSZgksrwafDHeMUpPMo8y2TWvGG4k1BNyfz7NZ18SpIIKBNU2bGr1I+/IvZvFeASTUGYtTqY8KzUUD421Z8dm/IWBztyEwEbYgvivXAp+lkAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=RROp1G00; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from simon-Latitude-5450.tu-dortmund.de (rechenknecht2.kn.e-technik.tu-dortmund.de [129.217.186.41])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.1.9/8.18.1.10) with ESMTPSA id 58289x6R004012
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 2 Sep 2025 10:10:06 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1756800607;
+	bh=cyJKkcqZqbk709afqt1BPhXGf6CjrosVwsdhTAJwy7k=;
+	h=From:To:Cc:Subject:Date;
+	b=RROp1G00rTRqLopxLsfYpYJW0yfO4NfbPS3b4C1nyB/PX8DeJA/HqfA2BarlvKtVq
+	 R4CJZnr8iLw068MHXJhdW/TTI1UcZmT3PnDUDr8js3fL3LJh+Dk4TXxKN7tUPcjIJJ
+	 HipDZvSDC2Fv57wREnt0vBmXA8PVZogZbudnlDwI=
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+To: willemdebruijn.kernel@gmail.com, jasowang@redhat.com, mst@redhat.com,
+        eperezma@redhat.com, stephen@networkplumber.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux.dev, kvm@vger.kernel.org
+Cc: Simon Schippers <simon.schippers@tu-dortmund.de>
+Subject: [PATCH net-next v4 0/4] TUN/TAP & vhost_net: netdev queue flow control to avoid ptr_ring tail drop
+Date: Tue,  2 Sep 2025 10:09:53 +0200
+Message-ID: <20250902080957.47265-1-simon.schippers@tu-dortmund.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250902022529.1403405-1-m13940358460@163.com>
-In-Reply-To: <20250902022529.1403405-1-m13940358460@163.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 2 Sep 2025 15:58:53 +0800
-X-Gm-Features: Ac12FXzkrriW9NPsuU0kv6Gzb7sSOm_lvfHS5UbJoKxOsdiMQSxWaqEft8y53B0
-Message-ID: <CAL+tcoDZf2RC7Y+vfmUv73Mi+PJSCgzGAieekpTnz92V4dBfWw@mail.gmail.com>
-Subject: Re: [PATCH v5] net/core: Replace offensive comment in skbuff.c
-To: mysteryli <m13940358460@163.com>
-Cc: willemdebruijn.kernel@gmail.com, aleksander.lobakin@intel.com, 
-	andrew@lunn.ch, kuba@kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Sep 2, 2025 at 10:26=E2=80=AFAM mysteryli <m13940358460@163.com> wr=
-ote:
->
-> From: Mystery <m13940358460@163.com>
->
-> The original comment contained profanity to express the frustration of
-> dealing with a complex and resource-constrained code path. While the
-> sentiment is understandable, the language is unprofessional and
-> unnecessary.
-> Replace it with a more neutral and descriptive comment that maintains
-> the original technical context and conveys the difficulty of the
-> situation without the use of offensive language.
-> Indeed, I do not believe this will offend any particular individual or gr=
-oup.
-> Nonetheless, it is advisable to revise any commit that appears overly emo=
-tional or rude.
->
-> v5:
->
-> - Added this detailed changelog section
->
-> v4:https://lore.kernel.org/netdev/20250901060635.735038-1-m13940358460@16=
-3.com/
-> - Fixed incorrect Signed-off-by format (removed quotes) as requested by A=
-ndrew Lunn
-> - Consolidated multiple versions (v1/v2) into a single version history
->
-> v3:Due to some local reasons in my area, this is a lost version. I'm trul=
-y sorry
->
-> v2:https://lore.kernel.org/netdev/20250901055802.727743-1-m13940358460@16=
-3.com/
-> - Initial version addressing feedback
->
-> v1:https://lore.kernel.org/netdev/20250828084253.1719646-1-m13940358460@1=
-63.com/
-> - First submission
->
-> Signed-off-by: Mystery Li <m13940358460@163.com>
+This patch series deals with TUN/TAP and vhost_net which drop incoming 
+SKBs whenever their internal ptr_ring buffer is full. Instead, with this 
+patch series, the associated netdev queue is stopped before this happens. 
+This allows the connected qdisc to function correctly as reported by [1] 
+and improves application-layer performance, see benchmarks.
 
-IIUC, you've received an explicit NACK from Jakub at the previous link
-https://lore.kernel.org/netdev/20250901114157.5345a56a@kernel.org/.
+This patch series includes TUN, TAP, and vhost_net because they share 
+logic. Adjusting only one of them would break the others. Therefore, the 
+patch series is structured as follows:
+1. New ptr_ring_spare helper to check if the ptr_ring has spare capacity
+2. Netdev queue flow control for TUN: Logic for stopping the queue upon 
+full ptr_ring and waking the queue if ptr_ring has spare capacity
+3. Additions for TAP: Similar logic for waking the queue
+4. Additions for vhost_net: Calling TUN/TAP methods for waking the queue
 
-Thanks,
-Jason
+Benchmarks ([2] & [3]):
+- TUN: TCP throughput over real-world 120ms RTT OpenVPN connection 
+improved by 36% (117Mbit/s vs 185 Mbit/s)
+- TAP: TCP throughput to local qemu VM stays the same (2.2Gbit/s), an 
+improvement by factor 2 at emulated 120ms RTT (98Mbit/s vs 198Mbit/s)
+- TAP+vhost_net: TCP throughput to local qemu VM approx. the same 
+(23.4Gbit/s vs 23.9Gbit/s), same performance at emulated 120ms RTT 
+(200Mbit/s)
+- TUN/TAP/TAP+vhost_net: Reduction of ptr_ring size to ~10 packets 
+possible without losing performance
+
+Possible future work:
+- Introduction of Byte Queue Limits as suggested by Stephen Hemminger
+- Adaption of the netdev queue flow control for ipvtap & macvtap
+
+[1] Link: 
+https://unix.stackexchange.com/questions/762935/traffic-shaping-ineffective-on-tun-device
+[2] Link: 
+https://cni.etit.tu-dortmund.de/storages/cni-etit/r/Research/Publications/2025/Gebauer_2025_VTCFall/Gebauer_VTCFall2025_AuthorsVersion.pdf
+[3] Link: https://github.com/tudo-cni/nodrop
+
+Links to previous versions:
+V3: 
+https://lore.kernel.org/netdev/20250825211832.84901-1-simon.schippers@tu-dortmund.de/T/#u
+V2: 
+https://lore.kernel.org/netdev/20250811220430.14063-1-simon.schippers@tu-dortmund.de/T/#u
+V1: 
+https://lore.kernel.org/netdev/20250808153721.261334-1-simon.schippers@tu-dortmund.de/T/#u
+
+Changelog:
+V3 -> V4:
+- Target net-next instead of net
+- Changed to patch series instead of single patch
+- Changed to new title from old title
+"TUN/TAP: Improving throughput and latency by avoiding SKB drops"
+- Wake netdev queue with new helpers wake_netdev_queue when there is any 
+spare capacity in the ptr_ring instead of waiting for it to be empty
+- Use tun_file instead of tun_struct in tun_ring_recv as a more consistent 
+logic
+- Use smp_wmb() and smp_rmb() barrier pair, which avoids any packet drops 
+that happened rarely before
+- Use safer logic for vhost_net using RCU read locks to access TUN/TAP data
+
+V2 -> V3: Added support for TAP and TAP+vhost_net.
+
+V1 -> V2: Removed NETDEV_TX_BUSY return case in tun_net_xmit and removed 
+unnecessary netif_tx_wake_queue in tun_ring_recv.
+
+
+
+Simon Schippers (4):
+  ptr_ring_spare: Helper to check if spare capacity of size cnt is
+    available
+  netdev queue flow control for TUN
+  netdev queue flow control for TAP
+  netdev queue flow control for vhost_net
+
+ drivers/net/tap.c        | 28 ++++++++++++++++
+ drivers/net/tun.c        | 39 ++++++++++++++++++++--
+ drivers/vhost/net.c      | 34 +++++++++++++++----
+ include/linux/if_tap.h   |  2 ++
+ include/linux/if_tun.h   |  3 ++
+ include/linux/ptr_ring.h | 71 ++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 168 insertions(+), 9 deletions(-)
+
+-- 
+2.43.0
+
 
