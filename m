@@ -1,226 +1,263 @@
-Return-Path: <netdev+bounces-219261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E6D0B40D22
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 20:27:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13737B40D2A
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 20:31:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE8DA3A520E
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 18:27:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 667B63B6B21
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 18:31:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27B1A345723;
-	Tue,  2 Sep 2025 18:27:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XJ8O9yw6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1869834DCC9;
+	Tue,  2 Sep 2025 18:31:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7553FEEC0;
-	Tue,  2 Sep 2025 18:27:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C0C2E0915
+	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 18:31:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756837656; cv=none; b=gw39dipvoYEiGVCYFC2whiXkTbgLxdv3rlHauXnim8TJ8SspcEoN/H70E9quE4kL8zjppnlxgerpCuj/t8JlLGQfUdThfGeCDreF7sOQi6nNwn6LU3lNdQaLMOEE75NDwvsKTgujiFA/oW8mC3fUiVCRuwo642dcMZMc+jWTGAI=
+	t=1756837895; cv=none; b=J3ohueSbrhzW1q7QRk5qXwjbb+9JgYJYsj1A/kFOY2yGCJoA3tnmyXTJLvPPk0SeULvNmXgveEh7gMueqi/L/iJAbtL99TKzxtHGXeFmgJZQFDsF6txHqzQb04lNFFDMWC4WkKmyaS5GsFU0th4E7KjSznQ1MRpFEkyGS9HQCdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756837656; c=relaxed/simple;
-	bh=RniY1QhIS4rNF30XPcvMt38M97cZcDxO5A6QYGetGSA=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=ETIRnZgEmN+dvNlSPOs/0j/WgekO87cdCu7LhA2kCvISmkaPUuMc3iYgnN5y7R4RnDRfaIMydD09DG49hBkYCdoxDRj5lHBn/khdwk/8p+23TiUUctJAL+9eaICMI8e/i3PNbX7+VbhmAf5cN5uanwSrkQbIApjFDdobQke4i6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XJ8O9yw6; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4b109c6b9fcso53972611cf.3;
-        Tue, 02 Sep 2025 11:27:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756837653; x=1757442453; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Crk8jlByEd51IcbbnWMmtW33dK705jGYGpNQa1TEeWI=;
-        b=XJ8O9yw6iA1lTG59ICICAkNsMftlORV5YzMZySWa6oEf81Of8xBfN95Q3XNOvwK5jR
-         UucnHEFGyByW4CjGj4hgPopBA9+QGcRvhDBupRKPMHiyiwbs8SXcHAm/6Kh777n3qsVy
-         wLFfi6PgG7isx2Gi7JnSzcEhxiOEOygC/gx9nD89DRy5nLhNX4AlATtwblUTSXWrm5mq
-         MgpWoGdk7Ja1YG0uknCqs9VRVE+BcuzcZpyyrSuReb/xqxVcdOmz0FtfnKpqz03teQIY
-         fjLbDPAFRURTvdvpHBg4tDBGuqhD385QKx0qkynOKK5+xcSxzCFZpTib7AiC19XPHKEj
-         lsKg==
+	s=arc-20240116; t=1756837895; c=relaxed/simple;
+	bh=/2pxvEOdkohmjbfdvXTkARBrRsVWTRZQkcVOeZ1pJAQ=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=W6dxDVxxXQ8sA0v7Rd+dTQGJL8Ga4RwsB35Lfks5b2+aD/s8G4LkZVCzbXu9CuNFUC2MjCchsa9VaaLRCH0ugpz3invd4cs5vBy4GPT0zgAb5fbV5g9CR1dB9iKhvEoqqWKxVweTYtCtQRJRaE+KIFN7EuqEyUizWDXMZ6Vy9Gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3f12be6bc4aso70115985ab.1
+        for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 11:31:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756837653; x=1757442453;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Crk8jlByEd51IcbbnWMmtW33dK705jGYGpNQa1TEeWI=;
-        b=j+ISJbtC9dQ10CUvPdpANQDyXaCCvmNXd3yQMPRROcJVHls4R/Tmuvrz35FsZOHiah
-         SkeFVulz5BV4EqP6V7o0agxSJy+dzEnpGT12n+By79nerO0WGRHz6k6TsOPtcujuB08m
-         WL+s8WWKTPvjQ4fbNcRktOwK3xtpLUkeBHoj3POTqwFMpNShHYNufMDMgvwjRtqQgx5/
-         HLMCCf7es9R30Ugfdv00ds8wTmDPB9vm/1M3Gacp46uuijCO01aQM4nav+DrIH9+ow+f
-         sp7bUl27XsmwBFZk6AHuv81Rk5bupLmG1CGLeyz3RJRVCCryXk/l71lPLH1/U8X+GRwd
-         o4kA==
-X-Forwarded-Encrypted: i=1; AJvYcCUmSA/pDocQk2FMXiJn4l/qzk1/rAorhXACO9BXX10VWla22XPS9ysuzNSwHxbAUc7bzHgAlhGCoFlOTTU=@vger.kernel.org, AJvYcCWrCIQqKdpU5WsMyJSgpKwA/6b5HA/ckt+LaqvfaHtn5e/9pJqqj10gpw+sW+frzYRpW0fgeIvA@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx64tx86cmUL22UqXoh4ztrAC8ZdcdE6D3Oe5XWq4uoGNq9/zmL
-	41YrxpGeYE/GUpkyOBXEUXV//WNwakU8h8jtbleetQpyGGn9NbqC3eCfIJw8Xw==
-X-Gm-Gg: ASbGncsCpv+dORJGDbO7POYjBhR3HlakxL9IqaTmuQ8lH/DiaLynwONOTSuvIizdpTg
-	ZJajDzgAXAWBrJ/kYqq/4f+YPG8yKUc3q9YEQ0o4aqFLes8gaAQS03/4O9xCnIhzCR03Bz11bHo
-	W9Rs5sO+83PruninD80rR9in+2ohQHSKaDyL63CfxEX2NuD8ZWbLtk3OOLU/Cft3Ey0IWJGpSSq
-	9hxetYmmPQs25rPbIhY+Z6qqmEbHCchTX+UvDhPcjPbBlPhDDqkA5WoSPaAnrNgLXWQVvhag2Jf
-	KXQ7WtlgBsaEjHx+5+Eucinf503QuOF1t7I4ejE7s7UiXgjrAWnmlz2LJyAEep24tcU2nKUKBMS
-	ykoNydzrXsiJA3ANLkJuzbJls5ItousDxi0jVuy3toofVatvY1kFEC9HtiV7IX42sQmFQTv0gsj
-	N+KH60HUQX9by+
-X-Google-Smtp-Source: AGHT+IFMN0bHW8vOo7hHPM7ykqRYyWsKBTHUvKwl0w5Q/ZyXL2LJ0Pg0ukUOuysIU0oaC69/+tIvMA==
-X-Received: by 2002:a05:622a:394:b0:4b2:9b56:84c5 with SMTP id d75a77b69052e-4b31d9e45a9mr148117541cf.26.1756837653272;
-        Tue, 02 Sep 2025 11:27:33 -0700 (PDT)
-Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-720b6c07573sm15904706d6.71.2025.09.02.11.27.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Sep 2025 11:27:32 -0700 (PDT)
-Date: Tue, 02 Sep 2025 14:27:32 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Richard Gobert <richardbgobert@gmail.com>, 
- netdev@vger.kernel.org
-Cc: davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- horms@kernel.org, 
- corbet@lwn.net, 
- saeedm@nvidia.com, 
- tariqt@nvidia.com, 
- mbloch@nvidia.com, 
- leon@kernel.org, 
- ecree.xilinx@gmail.com, 
- dsahern@kernel.org, 
- ncardwell@google.com, 
- kuniyu@google.com, 
- shuah@kernel.org, 
- sdf@fomichev.me, 
- aleksander.lobakin@intel.com, 
- florian.fainelli@broadcom.com, 
- willemdebruijn.kernel@gmail.com, 
- alexander.duyck@gmail.com, 
- linux-kernel@vger.kernel.org, 
- linux-net-drivers@amd.com, 
- Richard Gobert <richardbgobert@gmail.com>
-Message-ID: <willemdebruijn.kernel.868af9542505@gmail.com>
-In-Reply-To: <20250901113826.6508-5-richardbgobert@gmail.com>
-References: <20250901113826.6508-1-richardbgobert@gmail.com>
- <20250901113826.6508-5-richardbgobert@gmail.com>
-Subject: Re: [PATCH net-next v4 4/5] net: gro: remove unnecessary df checks
+        d=1e100.net; s=20230601; t=1756837892; x=1757442692;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=aGeh+7PdN4ZfcRyxnJ180Gy5tl3gFBb+lsQE6RCd7L8=;
+        b=Dl9dIbA4ax+JLlvtFuCLIVavMmp6qolE1mRGGsoMQNlr23/iT/FyD3GBJ9qXyEpzNJ
+         CLHk8mbnK4rvRXXp+KOj2YBT+OR28OcAd34y2Wiaw4HEU3SzBZcAu6OZkNlFffEGUMnZ
+         1FulzkJlZ4ING72ax7GtGjyjU9fxpvEuBFmC9Eo2LkocBkeqgOAYzHoFGPBYK2e3J7hg
+         2es14P4s76qF9ntFXBMVThbmTE9DP1n9JA3GRtKtVXqLD9yLMEss1acnvtLeeVntd6JM
+         YkMU3CyQhp25Dww6k+mEho/XnbOR3NgRDXouHP0RXjYMmhR4d4bOMZZMljIsvRx1onM3
+         OctQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU2OiwpQccEzkZGkSMDT5ctb66t3lq4WM0oz0JkRONujrcn9Fp9AWNi0BSCPqR11GQr+3gW4cA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsApaj3YhSTVotWytWx0WC97nnGYRMr+jIy210mPgnkN0ifLwp
+	rhqgyoS8qw1Cj6r3qxqMhxXLYptVb04wwoCyTxp2ybR88NNJozBTukQmw2hgHD3BVwfMX5HK9B2
+	CVVEQl5moBA/q4tYy6lOMSTtKoc/iIOtN3+gSmC3b9A1O37rIBVq51QrZagE=
+X-Google-Smtp-Source: AGHT+IFqOy39DQx/VKLuQX0edQ2GIjcA8ipB5EnCxLpu6fD2vfMptRbyXW+wA2E85+THSNoA3eP+J5TUJRYR0SwD0AwwaQX2DKIk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:1687:b0:3f6:5e71:1519 with SMTP id
+ e9e14a558f8ab-3f65e711889mr15608745ab.4.1756837892204; Tue, 02 Sep 2025
+ 11:31:32 -0700 (PDT)
+Date: Tue, 02 Sep 2025 11:31:32 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68b73804.050a0220.3db4df.01d8.GAE@google.com>
+Subject: [syzbot] [smc?] possible deadlock in smc_diag_dump_proto
+From: syzbot <syzbot+50603c05bbdf4dfdaffa@syzkaller.appspotmail.com>
+To: alibuda@linux.alibaba.com, davem@davemloft.net, dust.li@linux.alibaba.com, 
+	edumazet@google.com, guwen@linux.alibaba.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-s390@vger.kernel.org, mjambigi@linux.ibm.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, sidraya@linux.ibm.com, syzkaller-bugs@googlegroups.com, 
+	tonylu@linux.alibaba.com, wenjia@linux.ibm.com
+Content-Type: text/plain; charset="UTF-8"
 
-Richard Gobert wrote:
-> Currently, packets with fixed IDs will be merged only if their
-> don't-fragment bit is set. Merged packets are re-split into segments
-> before being fragmented, so the result is the same as if the packets
-> weren't merged to begin with.
+Hello,
 
-This can perhaps be reworded a bit for clarity. Something like "With
-the changes in the earlier patches in this series, the ID state (fixed
-or incrementing) is now recorded for both inner and outer IPv4 headers,
-so the restriction to only coalesce packets with fixed IDs can now be
-lifted."
-> 
-> Remove unnecessary don't-fragment checks.
-> 
-> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
-> ---
->  include/net/gro.h                 | 5 ++---
->  net/ipv4/af_inet.c                | 3 ---
->  tools/testing/selftests/net/gro.c | 9 ++++-----
->  3 files changed, 6 insertions(+), 11 deletions(-)
-> 
-> diff --git a/include/net/gro.h b/include/net/gro.h
-> index 322c5517f508..691f267b3969 100644
-> --- a/include/net/gro.h
-> +++ b/include/net/gro.h
-> @@ -448,17 +448,16 @@ static inline int inet_gro_flush(const struct iphdr *iph, const struct iphdr *ip
->  	const u32 id2 = ntohl(*(__be32 *)&iph2->id);
->  	const u16 ipid_offset = (id >> 16) - (id2 >> 16);
->  	const u16 count = NAPI_GRO_CB(p)->count;
-> -	const u32 df = id & IP_DF;
->  
->  	/* All fields must match except length and checksum. */
-> -	if ((iph->ttl ^ iph2->ttl) | (iph->tos ^ iph2->tos) | (df ^ (id2 & IP_DF)))
-> +	if ((iph->ttl ^ iph2->ttl) | (iph->tos ^ iph2->tos) | ((id ^ id2) & IP_DF))
->  		return true;
+syzbot found the following issue on:
 
-This is just a cleanup?
+HEAD commit:    8d245acc1e88 Merge tag 'char-misc-6.17-rc3' of git://git.k..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=176fa7bc580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e1e1566c7726877e
+dashboard link: https://syzkaller.appspot.com/bug?extid=50603c05bbdf4dfdaffa
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14e42062580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12e42062580000
 
-If so, please make a brief note in the commit message. I end up
-staring whether there is some deeper meaning relevant to the
-functional change.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/096739d8f0ec/disk-8d245acc.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/83a21aa9b978/vmlinux-8d245acc.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/7e7f165a3b29/bzImage-8d245acc.xz
 
->  
->  	/* When we receive our second frame we can make a decision on if we
->  	 * continue this flow as an atomic flow with a fixed ID or if we use
->  	 * an incrementing ID.
->  	 */
-> -	if (count == 1 && df && !ipid_offset)
-> +	if (count == 1 && !ipid_offset)
->  		NAPI_GRO_CB(p)->ip_fixedid |= 1 << inner;
->  
->  	return ipid_offset ^ (count * !(NAPI_GRO_CB(p)->ip_fixedid & (1 << inner)));
-> diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
-> index fc7a6955fa0a..c0542d9187e2 100644
-> --- a/net/ipv4/af_inet.c
-> +++ b/net/ipv4/af_inet.c
-> @@ -1393,10 +1393,7 @@ struct sk_buff *inet_gso_segment(struct sk_buff *skb,
->  
->  	segs = ERR_PTR(-EPROTONOSUPPORT);
->  
-> -	/* fixed ID is invalid if DF bit is not set */
->  	fixedid = !!(skb_shinfo(skb)->gso_type & (SKB_GSO_TCP_FIXEDID << encap));
-> -	if (fixedid && !(ip_hdr(skb)->frag_off & htons(IP_DF)))
-> -		goto out;
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+50603c05bbdf4dfdaffa@syzkaller.appspotmail.com
 
-I understand why the GRO constraint can now be relaxed. But why does
-this also affect GSO?
+======================================================
+WARNING: possible circular locking dependency detected
+syzkaller #0 Not tainted
+------------------------------------------------------
+syz.0.17/6109 is trying to acquire lock:
+ffff8880b8823d90 ((softirq_ctrl.lock)){+.+.}-{3:3}, at: spin_lock include/linux/spinlock_rt.h:44 [inline]
+ffff8880b8823d90 ((softirq_ctrl.lock)){+.+.}-{3:3}, at: __local_bh_disable_ip+0x264/0x400 kernel/softirq.c:168
 
-Fixed ID is invalid on the wire if DF is not set. Is the idea behind
-this change that GRO + GSO is just forwarding existing packets. Even
-if the incoming packets were invalid on this point?
+but task is already holding lock:
+ffffffff8efa6608 (smc_v6_hashinfo.lock){++.+}-{3:3}, at: read_lock include/linux/rwlock_rt.h:37 [inline]
+ffffffff8efa6608 (smc_v6_hashinfo.lock){++.+}-{3:3}, at: smc_diag_dump_proto+0x174/0x1fb0 net/smc/smc_diag.c:207
 
->  
->  	if (!skb->encapsulation || encap)
->  		udpfrag = !!(skb_shinfo(skb)->gso_type & SKB_GSO_UDP);
-> diff --git a/tools/testing/selftests/net/gro.c b/tools/testing/selftests/net/gro.c
-> index d5824eadea10..3d4a82a2607c 100644
-> --- a/tools/testing/selftests/net/gro.c
-> +++ b/tools/testing/selftests/net/gro.c
-> @@ -670,7 +670,7 @@ static void send_flush_id_case(int fd, struct sockaddr_ll *daddr, int tcase)
->  		iph2->id = htons(9);
->  		break;
->  
-> -	case 3: /* DF=0, Fixed - should not coalesce */
-> +	case 3: /* DF=0, Fixed - should coalesce */
->  		iph1->frag_off &= ~htons(IP_DF);
->  		iph1->id = htons(8);
->  
-> @@ -1188,10 +1188,9 @@ static void gro_receiver(void)
->  			correct_payload[0] = PAYLOAD_LEN * 2;
->  			check_recv_pkts(rxfd, correct_payload, 1);
->  
-> -			printf("DF=0, Fixed - should not coalesce: ");
-> -			correct_payload[0] = PAYLOAD_LEN;
-> -			correct_payload[1] = PAYLOAD_LEN;
-> -			check_recv_pkts(rxfd, correct_payload, 2);
-> +			printf("DF=0, Fixed - should coalesce: ");
-> +			correct_payload[0] = PAYLOAD_LEN * 2;
-> +			check_recv_pkts(rxfd, correct_payload, 1);
->  
->  			printf("DF=1, 2 Incrementing and one fixed - should coalesce only first 2 packets: ");
->  			correct_payload[0] = PAYLOAD_LEN * 2;
-> -- 
-> 2.36.1
-> 
+which lock already depends on the new lock.
 
 
+the existing dependency chain (in reverse order) is:
+
+-> #1 (smc_v6_hashinfo.lock){++.+}-{3:3}:
+       lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
+       rt_write_lock+0x6a/0x110 kernel/locking/spinlock_rt.c:242
+       write_lock_bh include/linux/rwlock_rt.h:99 [inline]
+       smc_hash_sk+0x8f/0x2a0 net/smc/af_smc.c:193
+       smc_sk_init+0x5a1/0x7f0 net/smc/af_smc.c:399
+       smc_sock_alloc net/smc/af_smc.c:420 [inline]
+       __smc_create+0x10d/0x280 net/smc/af_smc.c:3382
+       __sock_create+0x4b3/0x9f0 net/socket.c:1589
+       sock_create net/socket.c:1647 [inline]
+       __sys_socket_create net/socket.c:1684 [inline]
+       __sys_socket+0xd7/0x1b0 net/socket.c:1731
+       __do_sys_socket net/socket.c:1745 [inline]
+       __se_sys_socket net/socket.c:1743 [inline]
+       __x64_sys_socket+0x7a/0x90 net/socket.c:1743
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #0 ((softirq_ctrl.lock)){+.+.}-{3:3}:
+       check_prev_add kernel/locking/lockdep.c:3165 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3284 [inline]
+       validate_chain+0xb9b/0x2140 kernel/locking/lockdep.c:3908
+       __lock_acquire+0xab9/0xd20 kernel/locking/lockdep.c:5237
+       reacquire_held_locks+0x127/0x1d0 kernel/locking/lockdep.c:5385
+       __lock_release kernel/locking/lockdep.c:5574 [inline]
+       lock_release+0x1b4/0x3e0 kernel/locking/lockdep.c:5889
+       __local_bh_enable_ip+0x10c/0x270 kernel/softirq.c:228
+       local_bh_enable include/linux/bottom_half.h:33 [inline]
+       sock_i_ino+0xa9/0xc0 net/core/sock.c:2800
+       smc_diag_msg_attrs_fill net/smc/smc_diag.c:68 [inline]
+       __smc_diag_dump net/smc/smc_diag.c:98 [inline]
+       smc_diag_dump_proto+0xa4c/0x1fb0 net/smc/smc_diag.c:217
+       smc_diag_dump+0x59/0xa0 net/smc/smc_diag.c:236
+       netlink_dump+0x6e4/0xe90 net/netlink/af_netlink.c:2327
+       __netlink_dump_start+0x5cb/0x7e0 net/netlink/af_netlink.c:2442
+       netlink_dump_start include/linux/netlink.h:341 [inline]
+       smc_diag_handler_dump+0x178/0x210 net/smc/smc_diag.c:251
+       sock_diag_rcv_msg+0x4c9/0x600 net/core/sock_diag.c:-1
+       netlink_rcv_skb+0x205/0x470 net/netlink/af_netlink.c:2552
+       netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+       netlink_unicast+0x843/0xa10 net/netlink/af_netlink.c:1346
+       netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
+       sock_sendmsg_nosec net/socket.c:714 [inline]
+       __sock_sendmsg+0x219/0x270 net/socket.c:729
+       ____sys_sendmsg+0x508/0x820 net/socket.c:2614
+       ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
+       __sys_sendmsg net/socket.c:2700 [inline]
+       __do_sys_sendmsg net/socket.c:2705 [inline]
+       __se_sys_sendmsg net/socket.c:2703 [inline]
+       __x64_sys_sendmsg+0x1a1/0x260 net/socket.c:2703
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+other info that might help us debug this:
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  rlock(smc_v6_hashinfo.lock);
+                               lock((softirq_ctrl.lock));
+                               lock(smc_v6_hashinfo.lock);
+  lock((softirq_ctrl.lock));
+
+ *** DEADLOCK ***
+
+3 locks held by syz.0.17/6109:
+ #0: ffff888035fbe908 (nlk_cb_mutex-SOCK_DIAG){+.+.}-{4:4}, at: __netlink_dump_start+0xfe/0x7e0 net/netlink/af_netlink.c:2406
+ #1: ffffffff8efa6608 (smc_v6_hashinfo.lock){++.+}-{3:3}, at: read_lock include/linux/rwlock_rt.h:37 [inline]
+ #1: ffffffff8efa6608 (smc_v6_hashinfo.lock){++.+}-{3:3}, at: smc_diag_dump_proto+0x174/0x1fb0 net/smc/smc_diag.c:207
+ #2: ffffffff8d9a8b80 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ #2: ffffffff8d9a8b80 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
+ #2: ffffffff8d9a8b80 (rcu_read_lock){....}-{1:3}, at: rt_read_lock+0x1f8/0x360 kernel/locking/spinlock_rt.c:234
+
+stack backtrace:
+CPU: 0 UID: 0 PID: 6109 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ print_circular_bug+0x2ee/0x310 kernel/locking/lockdep.c:2043
+ check_noncircular+0x134/0x160 kernel/locking/lockdep.c:2175
+ check_prev_add kernel/locking/lockdep.c:3165 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3284 [inline]
+ validate_chain+0xb9b/0x2140 kernel/locking/lockdep.c:3908
+ __lock_acquire+0xab9/0xd20 kernel/locking/lockdep.c:5237
+ reacquire_held_locks+0x127/0x1d0 kernel/locking/lockdep.c:5385
+ __lock_release kernel/locking/lockdep.c:5574 [inline]
+ lock_release+0x1b4/0x3e0 kernel/locking/lockdep.c:5889
+ __local_bh_enable_ip+0x10c/0x270 kernel/softirq.c:228
+ local_bh_enable include/linux/bottom_half.h:33 [inline]
+ sock_i_ino+0xa9/0xc0 net/core/sock.c:2800
+ smc_diag_msg_attrs_fill net/smc/smc_diag.c:68 [inline]
+ __smc_diag_dump net/smc/smc_diag.c:98 [inline]
+ smc_diag_dump_proto+0xa4c/0x1fb0 net/smc/smc_diag.c:217
+ smc_diag_dump+0x59/0xa0 net/smc/smc_diag.c:236
+ netlink_dump+0x6e4/0xe90 net/netlink/af_netlink.c:2327
+ __netlink_dump_start+0x5cb/0x7e0 net/netlink/af_netlink.c:2442
+ netlink_dump_start include/linux/netlink.h:341 [inline]
+ smc_diag_handler_dump+0x178/0x210 net/smc/smc_diag.c:251
+ sock_diag_rcv_msg+0x4c9/0x600 net/core/sock_diag.c:-1
+ netlink_rcv_skb+0x205/0x470 net/netlink/af_netlink.c:2552
+ netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+ netlink_unicast+0x843/0xa10 net/netlink/af_netlink.c:1346
+ netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
+ sock_sendmsg_nosec net/socket.c:714 [inline]
+ __sock_sendmsg+0x219/0x270 net/socket.c:729
+ ____sys_sendmsg+0x508/0x820 net/socket.c:2614
+ ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
+ __sys_sendmsg net/socket.c:2700 [inline]
+ __do_sys_sendmsg net/socket.c:2705 [inline]
+ __se_sys_sendmsg net/socket.c:2703 [inline]
+ __x64_sys_sendmsg+0x1a1/0x260 net/socket.c:2703
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fe07d70ebe9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffe932c2428 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007fe07d935fa0 RCX: 00007fe07d70ebe9
+RDX: 0000000000004000 RSI: 0000200000000140 RDI: 0000000000000004
+RBP: 00007fe07d791e19 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fe07d935fa0 R14: 00007fe07d935fa0 R15: 0000000000000003
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
