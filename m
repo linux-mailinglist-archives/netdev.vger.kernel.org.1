@@ -1,451 +1,256 @@
-Return-Path: <netdev+bounces-219208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C1FEB40760
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 16:46:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E824B4075E
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 16:45:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B0287B3603
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 14:41:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A08561889AC7
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 14:44:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D72B131DDB9;
-	Tue,  2 Sep 2025 14:42:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B8EF3126A4;
+	Tue,  2 Sep 2025 14:42:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="TrfEmPpF"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="MUKVkxOh"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10olkn2067.outbound.protection.outlook.com [40.92.40.67])
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011066.outbound.protection.outlook.com [52.101.65.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 865B33128D7;
-	Tue,  2 Sep 2025 14:42:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.40.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FD84320A2B;
+	Tue,  2 Sep 2025 14:42:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.66
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756824160; cv=fail; b=TtL3ihd16QEwaql1J82NjiRCpEHioj/GrP9S3mquob9B/ueZcqDa/HuEoCsgRAW1gGlfovBdyNmO5GlV5R8g8jaD2rm+7f2OurEHzSbHqxoyU9oyGfwH0KRn3lswrwP9JwDnfNrKs0VPqCrlJNbwlTcUg9SRPAUfU4x7gIWf368=
+	t=1756824170; cv=fail; b=R5XqXoCq0cN5ZIyo10zNfx5QzFRehNG+DughyvRxDOhyWxIF7nw+4LaoZyO3kY2o+AwPzkCFYfIq7Ef9i5R/QHkyBH9E7N0SavupNd1bNQVM3YFrSV4nDFCAf77vcJZtNR7Xh0YHOVU+xAiQgdNCeWP3O6INBEFgV1+0Klh5ZNs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756824160; c=relaxed/simple;
-	bh=OOWI1wkTf7wpND0czrvD4lvgwZM7dug47LQWIo9qtHk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=rvigsVfYhDS9gHhxLO0zCWX5eFkDr3kDUSS07z3R9o1GJ/6nD83nlP2Z+rEHP/0H/it/qJYxfpLFx7UI7yoVWBSSmq+ZXwOMlf6mS7UOo3jZd7KNd26Jjb8Py3imIYV7wI4ZVwtZOiURgysB9RhCXea4uFnVYj/AfucuuY5tgqY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=TrfEmPpF; arc=fail smtp.client-ip=40.92.40.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+	s=arc-20240116; t=1756824170; c=relaxed/simple;
+	bh=b2namDmUWHgrFVeuZKKPr5bICBkbK4mmFN7EE0KFszw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=kArpdVcXKiXEu9vqnuiFJJj98CtRmGzogwWl+GNaEDXsqoEYKGJXgXQ8LKhW5lFvMO4udMzi9LxsszlvP90AuoXQZ+2W4DieXoIyzaEANROzFVZvwVlsbHRDav8jNuuTJgaErelFjcJAs/82NCGxUBNj2o4aeUAi94hqvFf+oCs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=MUKVkxOh; arc=fail smtp.client-ip=52.101.65.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qfyoSknglFpooHcfjR/vTSUsrPcte+drgjuD8gQQaSpxnWMGz1tXBuVJ1aWYV5LXXENsDq/eXczavKTP3M+tZlFbo+/VJRimEgEnxPfzu/sq5NOK9rOIgrnw/qCFfGuQPgnnPqQFJ85f+GcsO7PCk7weEYeY+qTkJ1zRLHs/jg07xzY2UW57hLsyT+lG8HR5DQ52s9evjZVPryUsXg/4Ux2MOidXSQsGFRaQNvdp3JMZPqsOY4BOn+vQGWSvrqxZnv5of72Aprfeh/8rdLZf1EwThAaEJTspU0kswxt+/V4hQphbQHC5Ijg0W6c3igYh1zGJUGn831prB74+yP5GxQ==
+ b=RbZuL3VuH5IvdHCza0pvzNWnlfX8GF3lSurmoJJ4lOgg5BBCHQVg+5n+VXTIeps6QF9345xSB6IvjAooYN3kGRcnsg8DITA1cd5k1JkWPDyg4ynBO6KKsU0BBFXqS6E1OkNYPuZ4Y2g0w1kYV6/nekQ6TiArj36N6SJTJmfL0qYRbrAcZICfaFHrbn2qXDshh+a2hHjFnnKA92dSOt01oKnzVkY8RkXlCCmKTHYdF481yxJC2PLvl9EbiNfC8S1uMxplUU8Q7qAYbiBljEw+qz7f7BHW0yIDCZT4hA4CSJ3Xjtv3KM5jkc5QDCrx+lbYzUeDm01i5fsVggEEhWQmPA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yZBT8cocxBLilZXl8eMUJo55aJ7tPWysJoCfk5ZruXE=;
- b=A5JgCkcEPCLuvdikSgfNDmcAj/bHI2GlalIwgBRXedkH22wz3tQapQbW+jK79f5Iaz8RKA95s3YeZDutP8p6XQkEhYA10rXWTwrNW/8/a702R2VV9et/pKXo662szmL11DVE3fJEGxtS2Bd4vLiugT253/r24b/uy5U7+xU3sy4ewh7RPZ3GZPDphUL5p6CM45jS5VkORkTjeNxo/8q7h4LXOXEi3s60Qc+KI0E9g6IinHPfplNQTvJVY+Y4dbyYWlfmntslCqF0hK2w3a5KzSMtsL3VR0JYU8Kw9za9FW66gebMmXJl13GoVqZLLxNSSYmB5s6+UojDUZImeWRVDg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
+ bh=o9gRbI+Y/7oIcLTySREbWfwm0eQb4ZxZ7lHHy5Gy8z0=;
+ b=Ziz11hSurLG9WgytP8bt1qypIDHn8Bug3F5UThQvxIrxSPMJhdHlqmRkRoDaH4qG3rpnVY9hI9VhHSuhyIclm0dKT3LfInumjOM2mIRPqBE7x1pe2LvaFAkcclggmH/OcuQ93KvkCae/ikZCw6aExzF7UzMIf3T72JXdSq0bVPhob1Lts93l2IRLLQoSbbQ1irSWuxT8kh0LaMnKt4lc9lQmBgaslX/0Y0LoCjTEiOJhaIHJ8KuU2M1wO9j5BsclKXew+r4x4Q5hcHtQt0KvIYA4EGrnYRJPsjvUN+AK6c/5rpC+lf1hdJoYH5tX+mEAnglLxCpx/t+BL8VFBmxJpQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yZBT8cocxBLilZXl8eMUJo55aJ7tPWysJoCfk5ZruXE=;
- b=TrfEmPpF/E7Tcv7+Pk+V2bTe235kBDdboKyGyCQ+BvkR8YPMoAzwXbyaApqnvkLH+9fQ0Kace4ChEi7A7pCjQJ+FjMD3XXjOq1LSYniuh25YPTE03pxWn5+F53vuMP3c1dCr7n9klQGDN4fZeY0L0NP+nJKiHIeLNK93fumYRO2UFfjfHBmQMQ5uDnLMhWkRn+de5MfQL9GG/1HbmgJ42GtFQ9AYxBX+G5AX//OI6jsq+6uV6VFIJ9qFsn97j21IkBJtACNwI5Hj3DzfK8MuhZYry+DT6E4tm9r2v4i/t/XW3Km7WNkbQ71ICWFyU05/hfOZM+CikEQ2NgeO2YdNRQ==
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com (2603:10b6:805:33::23)
- by LV3PR02MB10054.namprd02.prod.outlook.com (2603:10b6:408:19c::16) with
+ bh=o9gRbI+Y/7oIcLTySREbWfwm0eQb4ZxZ7lHHy5Gy8z0=;
+ b=MUKVkxOhZamxtLj7EIdC7hezIWlhWX5oqOmg86LMZkyIiEXgtZxvwliheX+L/slMSbN/IYkMgJCjKmeX7ok70E1EFnRAOHb9C4Ye/uHznH67TCWRqe2EFAm6Boursm+ZYxCXMQ3epoROORwmc1JsM5Ghnh9ImwbNPBXy9Uxq9S7Nl5nl3p5DjuJzYtDVrWoFCke99FKbcXjdNbiRnDmLWJF7eC2skzaAuIISNncpV25A+yb4lcuqv2v66JXA/WOfyTtxFqrizLaN7TIoiavEOws1wHqbqLknYf5zh5MaLyzAvrfbGic3g5UFP+jmXdd6y7OZ3RnC/Mz6Khs/VSOGuQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PA4PR04MB7790.eurprd04.prod.outlook.com (2603:10a6:102:cc::8)
+ by AM7PR04MB7078.eurprd04.prod.outlook.com (2603:10a6:20b:121::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9052.29; Tue, 2 Sep
- 2025 14:42:31 +0000
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::cedd:1e64:8f61:b9df]) by SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::cedd:1e64:8f61:b9df%4]) with mapi id 15.20.9052.027; Tue, 2 Sep 2025
- 14:42:31 +0000
-From: Michael Kelley <mhklinux@outlook.com>
-To: Mukesh Rathor <mrathor@linux.microsoft.com>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-input@vger.kernel.org" <linux-input@vger.kernel.org>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"linux-fbdev@vger.kernel.org" <linux-fbdev@vger.kernel.org>,
-	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>
-CC: "maarten.lankhorst@linux.intel.com" <maarten.lankhorst@linux.intel.com>,
-	"mripard@kernel.org" <mripard@kernel.org>, "tzimmermann@suse.de"
-	<tzimmermann@suse.de>, "airlied@gmail.com" <airlied@gmail.com>,
-	"simona@ffwll.ch" <simona@ffwll.ch>, "jikos@kernel.org" <jikos@kernel.org>,
-	"bentiss@kernel.org" <bentiss@kernel.org>, "kys@microsoft.com"
-	<kys@microsoft.com>, "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>, "decui@microsoft.com"
-	<decui@microsoft.com>, "dmitry.torokhov@gmail.com"
-	<dmitry.torokhov@gmail.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "bhelgaas@google.com"
-	<bhelgaas@google.com>, "James.Bottomley@HansenPartnership.com"
-	<James.Bottomley@HansenPartnership.com>, "martin.petersen@oracle.com"
-	<martin.petersen@oracle.com>, "gregkh@linuxfoundation.org"
-	<gregkh@linuxfoundation.org>, "deller@gmx.de" <deller@gmx.de>,
-	"arnd@arndb.de" <arnd@arndb.de>, "sgarzare@redhat.com" <sgarzare@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>
-Subject: RE: [PATCH V0 1/2] hyper-v: Add CONFIG_HYPERV_VMBUS option
-Thread-Topic: [PATCH V0 1/2] hyper-v: Add CONFIG_HYPERV_VMBUS option
-Thread-Index: AQHcF7dJQkEtmp6mJ0mMZNP9GOtcn7R7VcIQ
-Date: Tue, 2 Sep 2025 14:42:31 +0000
-Message-ID:
- <SN6PR02MB4157CC5B8CEB06D9E2593140D406A@SN6PR02MB4157.namprd02.prod.outlook.com>
-References: <20250828005952.884343-1-mrathor@linux.microsoft.com>
- <20250828005952.884343-2-mrathor@linux.microsoft.com>
-In-Reply-To: <20250828005952.884343-2-mrathor@linux.microsoft.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN6PR02MB4157:EE_|LV3PR02MB10054:EE_
-x-ms-office365-filtering-correlation-id: 2a49f350-fb5a-41ce-9747-08ddea2ef290
-x-ms-exchange-slblob-mailprops:
- WaIXnCbdHrNsJbj7NxvUrpSYkT7K1zyUecqs7v9iMtaeRt6+XtxOHb1mb5btmVH0cX6JyAxqlx84PJTiAckX9CZiSLEEkXBS2eWbvH5qmgeuXJ3nTmSmZ+ZR4Qw5qJD5A0sCqW/R7pwOUnazoAowkCSfEyRpEEvaTnDBz6JmyFaQJ111K4R4DowpmW8K0fra3sEhbShungPyMy/OtYB/fd9SgtOoL+yywFE5NJlWmP2R38PGDiFSOmNEUByliaX0W+dY6sGt0jEjbiU+5xKokavY6vRKU4NtBN0UiFrJ9yFkodO46tpCmZs4m07gf4kOPut2SJFepplGodTYspiQSl25TTNK0fyHqzkmDyp8wy418oSArbwiQ6lz2GNJkLxQ+Xnt4+XDhs/h/RighQytJZkPpN1LpwBxde87rk8xw/d+Z7m9nXdiyqC0U7E8zfGmWD72V/XybvJYMtpkM3KOJQQ7fcgvnLCmMQnuKAGywBFlmx2QRC3KFf6CTzGdRYvbgswwEqG6jLumhuxCRLCsw0qkVvbjvM8evFYtK2S//GMTFutGAdriOT03214HhiNLEe1ZdRPU5DOBDh9TaneWUuXWZlTFWj6HD2sQhNO4TC9Mo0/Bbjsnc5ZPTKkSgMgVxQsEdNuQojoTN3ZHOlFEfkkWbVXFVvrf49a7PZtBYuFOP/z7WSqHsah3p2WVw4nsGBvOr7tfVW0+fkUjyagOJB4FsqbKLsWhjws+HiYasTg3V6Y80B3f1tz6n/gi4oyjGtAvFcJ0GWU=
-x-microsoft-antispam:
- BCL:0;ARA:14566002|41001999006|8062599012|8060799015|19110799012|15080799012|13091999003|461199028|31061999003|440099028|40105399003|3412199025|12091999003|102099032;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?12jEfXASDFa+CQisIJLJ5nlxBljry/sVrT0kWt5JBP3+NsvWgWvpyTdkVkCO?=
- =?us-ascii?Q?7hNSmdF+Tc3ZZ5+/Q83HNANyF2pN7wyls1BsepAe5rPKgd12MRH3Y5lRHafY?=
- =?us-ascii?Q?oyCBgtRCwtXTn1Vtwl5PtYJRzFHaVkeYi8yZ4wwfFvNtpraJBAFw9szMd6df?=
- =?us-ascii?Q?edKTPmIzIt5C4cOoxL9YfCQS+AMpLybMr73V0lZzv5oFBEo2FgGV/WZs5loV?=
- =?us-ascii?Q?2LEoGp4ZHc1KeTzFOkNsMvBNoIyuRSY408qKLombLFOiw+0nPWew1oeDdRLy?=
- =?us-ascii?Q?Wf7KM17a+MRVyvntbNJg8L4+20NuutP93yy0AmFN3mDUiAqlArxcfnEoMBkM?=
- =?us-ascii?Q?cgNBuuaewXCSgQKpNZlnVISg+c/c0V6UVYP/2x63ZWLqRRHfILSn3OlsB4Lq?=
- =?us-ascii?Q?x0Zzf6XTro5B4Ei7/l3LipJYm6zAkCaZThUc2J4ZdDMs93YbzbNkVB7Y9r6q?=
- =?us-ascii?Q?OoTO1B/p7s66stFiSB1kuAoQm7Ov+Te4DuN/ZnvySKAF1Xwv8AS7SH2Gx6a0?=
- =?us-ascii?Q?G2d4RghoNVY2RtI96kuuIUgZG260gtrKx5L92UkVVqvyiANm0rTCTotwlM9u?=
- =?us-ascii?Q?jJNBi2aEdC0TFWzj43QXrY7KNufNWT4RRxWBTpduPQHe8JaYRK2GI/gSGMWd?=
- =?us-ascii?Q?3EHGE83oy8ggWs2SPxdxebRPvt7HWi2Y5eHmJdHuZqQlb6tulqWiQoSWwkWQ?=
- =?us-ascii?Q?9N4bul43S7QnR1iIzTi9a0tQc/NbyQtuns96b3qJ22oHWTtXqHAXdIXFZ8HY?=
- =?us-ascii?Q?IegMu7HWUUFKwiEF2elHKiwF1cYNvKKM2z9eUKCfpF87Rr93Jp+32qvwQvEu?=
- =?us-ascii?Q?1pFSmQXT8DnOtizvvRd5qEl4eUn2I2qTq+pcsOtNH93OaW1sXE/T6QfrAVhF?=
- =?us-ascii?Q?KWoWwiyOJTA8HNiEx+B2Mbw3UieGnrkcIqeMLjAQXNxQi1rPAYGbHerb/KJk?=
- =?us-ascii?Q?BIzCoR5UlvIEEnn3eyilPKSraKa43t/IXzgPV4CKqtY0ne96Ug2zcuUwDhb/?=
- =?us-ascii?Q?R0iHECH930rcjNprKp+bwxDf4qMpTppCK1jrPFX9TJQHbzdp2fSRJEGEXDhR?=
- =?us-ascii?Q?LuIQZUS52NH6LH+UzcwmU2CIvhMFHQfx2KXkq9UzNWw7ew+zmiYdTceKjODI?=
- =?us-ascii?Q?Po9UW8XnEjd2ZZz55+ecf5/Ann/xTsvF1d6zboSjPVseAoHf3AtivjsU3DDl?=
- =?us-ascii?Q?J4lPnWppT+BeIlws7fCSMOQtRhXEc8bMlMISyjpLdVnfhNQvv65tHF0JQGY?=
- =?us-ascii?Q?=3D?=
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?8I9mlUoqNZcfUZ2Drpkz+4nb9hrBUCWEAX8OZ4GaNVnzwax12AFzs3hvS93m?=
- =?us-ascii?Q?EoZknUJJkzS+9EHGvReS62Z/QMr0Lb6lZASkyq0tMY7OKgnnK0eLEfQpjVfh?=
- =?us-ascii?Q?ZIioqXugkZnbes+euDI3BnwMke9C2D+9wSgKKx+HIBXSCLudUgZPW3FHOGQU?=
- =?us-ascii?Q?e+8cKMMrSCuNjVgiI6S0+zDHGqlzAt8L8BCwd5Xde6E/7QqfTTAcHcJdWT/e?=
- =?us-ascii?Q?5FyqhQfFcoOoN8YxMGEOBUsOdACsKDy95pzorIPwqmCxmBWHISKI+5aTGhnL?=
- =?us-ascii?Q?XXgMliTFM101tR6k73yNT43LA+9bMoSTG+LDe/n5GvD88Gpnp6Ojxe56HJwZ?=
- =?us-ascii?Q?cMfP2AFBFAndKY3D6icxELNvh5ADEi7ZURcgZcCSTeozzpKBLCbGZrz20RWI?=
- =?us-ascii?Q?KRN+BiObXcA1uSz3cwO5IYj/xgW4KrWPxsPJD1zqsn4I0qp/WUZKaMkQhtQF?=
- =?us-ascii?Q?UhgwR907IhD/ri7aS6/hm2Q/HkuCxniMOcDvNYpOVyR+Nk8Qk/6+nEMAptRd?=
- =?us-ascii?Q?DE0jyeCHIpU4eIdHMx4puirlogyyEQdc+MwFAymWHGG1UteNqkGFPSk9I/nh?=
- =?us-ascii?Q?biPEwqZ/9kn852UB/BSCrZ4rXWMhFf1nPvlDniJWyem/6HknXxqntqXbUVoB?=
- =?us-ascii?Q?TWw17wa4fQ+vOtbxhie+1dCXtHBxCd3Mt1hTsSPuMC8YVCvFV9ZTZ/X0EJHO?=
- =?us-ascii?Q?V7auBoxyPe5lAEca3I2aQBMPtLtj3APoBWRJos4TpIbkn+WDVA3ScBuQn6hF?=
- =?us-ascii?Q?WugdHhn7bCoI6njmYCYol1z+FwZY5sBqpAHkTk+ZfoN4Ij8zL7B9EEL3WBIN?=
- =?us-ascii?Q?e3OLXmVuUnbWHPc2A+qoTA1AhYbS4O2lWfRf4WjHhlFmlrGYEUdJfl5m/+B7?=
- =?us-ascii?Q?+pyGSAlqG9SRNLOLSgVT+PQYwrZd8O8HWB73WXsgxttWJY3P5fOjsIFWxstr?=
- =?us-ascii?Q?szKGSwJ+ITMjViy+3y9m5FUja1gsFGaYjK7FkaENtbPlsuKxcp/Z2SF09sD1?=
- =?us-ascii?Q?IO1J5JKWUk3oj8S4BzC6JsWIQaTmbJcAXN1fLr4Ug0WaDsS9kn+/imxlR2ex?=
- =?us-ascii?Q?i7d9g/8+HUclDY9S3Zygz35nnhYiz6n61d9Hl39Gn35aPG/Skiu6BlZwt7q5?=
- =?us-ascii?Q?9S1t0ZHRjzVtHZnYwvL7tykbnyqYNwjQmmER5uUEhgrD4ahFf+PVJUVd+kYC?=
- =?us-ascii?Q?b0NqzvpF92yf11x9lOvYI2LPUkoQQtxkCdkUKBE/N6+Lk77YLzrtf9yECHs?=
- =?us-ascii?Q?=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.13; Tue, 2 Sep
+ 2025 14:42:44 +0000
+Received: from PA4PR04MB7790.eurprd04.prod.outlook.com
+ ([fe80::6861:40f7:98b3:c2bc]) by PA4PR04MB7790.eurprd04.prod.outlook.com
+ ([fe80::6861:40f7:98b3:c2bc%4]) with mapi id 15.20.9094.015; Tue, 2 Sep 2025
+ 14:42:44 +0000
+Date: Tue, 2 Sep 2025 17:42:41 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH net] net: phy: transfer phy_config_inband() locking
+ responsibility to phylink
+Message-ID: <20250902144241.avfiqpmqy7xhlwqa@skbuf>
+References: <20250902134141.2430896-1-vladimir.oltean@nxp.com>
+ <aLb6puGVzR29GpPx@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aLb6puGVzR29GpPx@shell.armlinux.org.uk>
+X-ClientProxiedBy: BE1P281CA0282.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:84::6) To PA4PR04MB7790.eurprd04.prod.outlook.com
+ (2603:10a6:102:cc::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PA4PR04MB7790:EE_|AM7PR04MB7078:EE_
+X-MS-Office365-Filtering-Correlation-Id: a73a616a-a9d0-4b49-a1ff-08ddea2efa31
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|19092799006|1800799024|10070799003|366016|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?7fIVu0C2a+VOQSdaCLNuRKy9jOkNrN2gfaM0irIsaNduLCWFE61YvX1mMlyg?=
+ =?us-ascii?Q?n6WJJFG8zTpXAwKA7YLHTQA1iaMjjr5iHWu1jh1xzlonsTmgPhfl7bNXr4Tz?=
+ =?us-ascii?Q?0plzW7Ys73CmItc2RxGpYc7Q+KfCLBjGuuqTBqPVdUuTDD4BghiIfjpyCqQf?=
+ =?us-ascii?Q?Ex+IYjRv/aJkdSs8FHJgJpRk4qBBnFzMrVlkvPkr+3zrjw2fBH3VMM7pu7u7?=
+ =?us-ascii?Q?etMFOiLbul4bQbPcxn9z1ByepTwHNsdtdvJ2O+WeIfYyMLlWpOzjxuXc9+Px?=
+ =?us-ascii?Q?9zpiZNp6KhT3YzlwSTbk9NMEFCxKakEwPoQDm0QI5aMIM6StdfOWKYhhMmHj?=
+ =?us-ascii?Q?lV+2ngjddxVit8ZewevDNDE0NxrKpYU0IYSMOZ5jK03dfwB0Igab3cwpRDeG?=
+ =?us-ascii?Q?Km8wMuidp2ZjoqDuIdkOaZIi5/V+RJTJl0jhdvZSin/wg8NHuUdyaLAQzbFk?=
+ =?us-ascii?Q?q/C3l6xyzDB+kvcJkiqjiaSsE/Uf1q0fviMqxkdh8PzsZiWZDHtcrFStvbgd?=
+ =?us-ascii?Q?rfBGDzI6QQRzFhnPC16sEfvICrAp2L+XwlJkXy3/17Uxg5I0zyQM53Y+bxVg?=
+ =?us-ascii?Q?eLpFdLP4jM4VXVa+J4hk0GsfIfykSn8eTSdKishriYKc8ugwixN82F95X//q?=
+ =?us-ascii?Q?T2F3xAi0H2EK30AHDcOSZ9tuYWy5RzizXcPSC8fstY3BSWnTsOBo3+YFrmhY?=
+ =?us-ascii?Q?9FiwQtt0RMV1Ex46JtUjIcLoZjPvY1TNnq9hMZjg3o+Vbltna96XGMa83kJl?=
+ =?us-ascii?Q?a/FGYHPaLrTnq593i2Z8W76Z6oesrPPqFx2QTezVwq4MMgb8DjvRVSdUujxx?=
+ =?us-ascii?Q?/bPPZXM/dIvHCaKRSvVBzl+A8guEiBAUJjojvya2Q12LiVf0MoJiR/rwKeYR?=
+ =?us-ascii?Q?qm+EVMed4mwyLrliZi1t+1SxdEmt3KwmpmaAFzmNyLTif2kORgxF+DvU72vc?=
+ =?us-ascii?Q?aPZZOQZmxQqegF38pjdtmO9f/4nWl7mKsbtsJYlNpktSfW7yMeGPiIyNuo6b?=
+ =?us-ascii?Q?7pYzZpHf6m8UXN4et3GDZxReAgieMwgFTgP+p0ujqDIAkQX96H4ygh1UFQ9L?=
+ =?us-ascii?Q?Bmr4PwAiMEM0M9Sd1J3//VLEuYgQQQ9Svd0NlKFMW2ZVNdRQXnRXXFUydsoD?=
+ =?us-ascii?Q?APJH1J9uLTF1qq6Q3aG5BqF0ZyZrLoNQ0dpsU8dJYf5sIiFJFLImfuXsvwMV?=
+ =?us-ascii?Q?qeQ0O/NdI9W+0onqL4f0Nhty/pLAjiTceobox53AQY/HU2uXfW5gdrPYblW1?=
+ =?us-ascii?Q?NScesMLFoV6ty1PK3yma0x231Xe2a+9T3n1VaCbTGcLcGj1bI10Kn1D5U40a?=
+ =?us-ascii?Q?TDlYaNDXmGMWdyvHUBkCeIiDdNR0cTFo2Sv8gHMaDoX54t7JtkwRsJInQlS8?=
+ =?us-ascii?Q?R/WM1M52gZwo7JCk+6pRWHCLG/Y41CoAA30EsFDr8mziGB/CNOZCRQxs97+y?=
+ =?us-ascii?Q?y/OM6vTS3vQ=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB7790.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(1800799024)(10070799003)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?p15tyjNOEn3Nf6hxSOwPxq4Ai9YEgEJGd5/ZUxu4gvhYTn9aJiVy35tfEfAX?=
+ =?us-ascii?Q?r+5XdgiTO7uXXFY3xlxNBQwdbx3H3SQl8wsKEKkKl4ng1TQX2sbqC7uta1Iu?=
+ =?us-ascii?Q?4h6SpzCB3cAJve4CrSXh6VtZrzgNgdEof2n6DOOAR3wo3gQFr21K7d4X6oDH?=
+ =?us-ascii?Q?qKqp3r5S8AM/DkJ221K6W8qlK4CvhZMiG9ufvR3BYvGa7DwjzUBPj4JwywF6?=
+ =?us-ascii?Q?6RGMryr0zaL4BnHR5KmYMru4xw7lcwYo3cPdeziZyBCSAAy5uTihCs/bU52T?=
+ =?us-ascii?Q?p6NFDQad+9hVA5Pf61Fw0HkZbLAXqVoI7+sA51JFm7BsIBK910SMCh95dqzM?=
+ =?us-ascii?Q?6AJvDYc6GttYrq5HyvvUV+ZPhXg1li/TVKrHfxn6Dtk/UQikqeXb1GfFC2IE?=
+ =?us-ascii?Q?zDLbFEQdc6S4iHfEm48LzW6l5Nw84gKyl0odO0GrGNfdTFn63+OBVbN8U+3X?=
+ =?us-ascii?Q?M2D5WNOjqcUxwoUw+qeNwtJHSz4dBnACfGDJs9Z14BG2vmYP197T1t58RF4v?=
+ =?us-ascii?Q?u3SqbzGm//OXYnvvensZnKQ5hX0nCDJln8AWT74zZgJPjVvLlR9MaaQnL92E?=
+ =?us-ascii?Q?4FNWc/jYAayqxxxceEP7F+Cwhj9xLnyisuyVmfUmqmUkjPzzFv8EOf/wTw5y?=
+ =?us-ascii?Q?7Jxq//U6Me8cNzR1a2pkis49FzIGWkwwKxCIOrPN7xwdgpyonK111z6JAEky?=
+ =?us-ascii?Q?RDZ27bYkXn4PMahLX+IYURsQrFMMQWB8SWf7d4cv3ICMPSUJLl1bPNZ2hhS5?=
+ =?us-ascii?Q?8hKc9fT3b4/qAzyO2U7h3moxnDaI5DIjpL25/mnl4M0TKBKj/1U/wLcHh24G?=
+ =?us-ascii?Q?aZTYcZKMYUBmiDciXkxfNjRtNwMKzSrKxxZvIPRYgFoucSCbYN4ExA/mXJ76?=
+ =?us-ascii?Q?riVyx4WSqw8eNm8WVDPVuXNbbe9K/0xyTJM23jXk6HP/yOY6sRZZHrwkRUix?=
+ =?us-ascii?Q?VtNnt4zHvgTA0uXKzaMzIn935hU9y/uZbWhC6N+l65WTIK39Xo7ZDM3qlpmo?=
+ =?us-ascii?Q?8yqLroF71Qs5u4Au/xJfg1A3RkVG+68Os1U/1GgTU3wIPv4EjEbtMyM1DF6Q?=
+ =?us-ascii?Q?dhrk5cRIuMUyk5v8XqMPnjIihXSqmVUzaBmKyQJ2BEOa8YUYH5THAHVMVwa4?=
+ =?us-ascii?Q?Wpf8F5cM13iLuW53nc54Q4RMojYs6fQGVxDSA/dLgm2aROO5Cd5/84ai2fwr?=
+ =?us-ascii?Q?rLX7Dylq8cLL0hvIsZesdzQfWGV4qsyFCK9bCubGUGzVHFCH8wxFcr4aLvoe?=
+ =?us-ascii?Q?85sdWlHoVa38CT3JnjwSxwb5kGvOY32niFLFfECGYya50aiTXRnWjnNTdflC?=
+ =?us-ascii?Q?Y9VtkLfibE2mrmcgE5m2fHYhOv4aE7q6whQ08ilPfZH8lVf/WhEoUh/nksf0?=
+ =?us-ascii?Q?FEq3VTXO5vjShr1t7la39n6DYidYuLOyLxCC0RQOOhwi3zGmp01drKr8LpfS?=
+ =?us-ascii?Q?KZKLju3XhgV3I0tWyKN2NWWEvT1ZFWunMIaPUvCpLYJwW9JkhjLTcP23P7+n?=
+ =?us-ascii?Q?AEWpVvQj6wdYzlpiM61c1kGdl+tImy1MjZ/zF/T6Gb4tBUsVGRTQ/vn20tua?=
+ =?us-ascii?Q?ht+OkzeUFFyQzy59Fk1Jv41UWwj3GF8wcU4R+E+1p+mCV9ArSmuXPu1pGRRw?=
+ =?us-ascii?Q?tKhasmTOkvQj1XXxRUPoz1jrAw+g+qbo3MXfvAb/NHcq6Ff6hfykIPinat85?=
+ =?us-ascii?Q?9z+/Gg=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a73a616a-a9d0-4b49-a1ff-08ddea2efa31
+X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB7790.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR02MB4157.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2a49f350-fb5a-41ce-9747-08ddea2ef290
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Sep 2025 14:42:31.5382
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2025 14:42:44.5149
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR02MB10054
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MCLm4le2uJiY6UbWVU/FffZS2nRtqmFkDsG3s7OpyuYl6gCUJ1s17ONAtymLr6lD/AkdBPsjCjzRna6BYfFzYA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR04MB7078
 
-From: Mukesh Rathor <mrathor@linux.microsoft.com> Sent: Wednesday, August 2=
-7, 2025 6:00 PM
->=20
+On Tue, Sep 02, 2025 at 03:09:42PM +0100, Russell King (Oracle) wrote:
+> On Tue, Sep 02, 2025 at 04:41:41PM +0300, Vladimir Oltean wrote:
+> > diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> > index c7f867b361dd..350905928d46 100644
+> > --- a/drivers/net/phy/phylink.c
+> > +++ b/drivers/net/phy/phylink.c
+> > @@ -1580,10 +1585,13 @@ static void phylink_resolve(struct work_struct *w)
+> >  {
+> >  	struct phylink *pl = container_of(w, struct phylink, resolve);
+> >  	struct phylink_link_state link_state;
+> > +	struct phy_device *phy = pl->phydev;
+> >  	bool mac_config = false;
+> >  	bool retrigger = false;
+> >  	bool cur_link_state;
+> >  
+> > +	if (phy)
+> > +		mutex_lock(&phy->lock);
+> 
+> I don't think this is safe.
+> 
+> The addition and removal of PHYs is protected by two locks:
+> 
+> 1. RTNL, to prevent ethtool operations running concurrently with the
+>    addition or removal of PHYs.
+> 
+> 2. The state_mutex which protects the resolver which doesn't take the
+>    RTNL.
+> 
+> Given that the RTNL is not held in this path, dereferencing pl->phydev
+> is unsafe as the PHY may go away (through e.g. SFP module removal)
+> which means this mutex_lock() may end up operating on free'd memory.
+> 
+> I'm not sure we want to be taking the RTNL on this path.
+> 
+> At the moment, I'm not sure what the solution is here.
 
-Even though this patch touches multiple subdirectories under "drivers",
-I'd suggest the patch "Subject:" prefix should be "Drivers: hv:" (not "hype=
-r-v:")
-to be consistent with historical usage.
+Rephrased and slightly expanded: phylink_disconnect_phy(), when called
+from drivers, has the convention that phylink_stop() must have been
+called prior, or phylink_start() must have never been called.
 
-> Somehow vmbus driver is hinged on CONFIG_HYPERV. It appears this is initi=
-al
+However, when called from phylink_sfp_disconnect_phy(),
+phylink_disconnect_phy() does not benefit from the same guarantee that
+phylink_run_resolve_and_disable(pl, PHYLINK_DISABLE_STOPPED) ran.
 
-In text, "vmbus" should be spelled as "VMBus".  This includes patch Subject=
-s,
-commit messages, code comments, kernel messages, and kernel documentation.
-Originally, the spelling was all over the map, but we've tried to be more c=
-onsistent
-lately in matching Microsoft's public documentation on Hyper-V, which uses
-"VMBus". Of course, C language code variable and function names use all low=
-ercase.
+Correct so far?
 
-> code that did not get addressed when the scope of CONFIG_HYPERV went beyo=
-nd
-> vmbus. This commit creates a fine grained HYPERV_VMBUS option and updates
-> drivers that depend on VMBUS.
->=20
-> Signed-off-by: Mukesh Rathor <mrathor@linux.microsoft.com>
-> ---
->  drivers/gpu/drm/Kconfig        |  2 +-
->  drivers/hid/Kconfig            |  2 +-
->  drivers/hv/Kconfig             | 12 +++++++++---
->  drivers/hv/Makefile            |  2 +-
->  drivers/input/serio/Kconfig    |  4 ++--
->  drivers/net/hyperv/Kconfig     |  2 +-
->  drivers/pci/Kconfig            |  2 +-
->  drivers/scsi/Kconfig           |  2 +-
->  drivers/uio/Kconfig            |  2 +-
->  drivers/video/fbdev/Kconfig    |  2 +-
->  include/asm-generic/mshyperv.h |  8 +++++---
->  net/vmw_vsock/Kconfig          |  2 +-
->  12 files changed, 25 insertions(+), 17 deletions(-)
->=20
-> diff --git a/drivers/gpu/drm/Kconfig b/drivers/gpu/drm/Kconfig
-> index f7ea8e895c0c..58f34da061c6 100644
-> --- a/drivers/gpu/drm/Kconfig
-> +++ b/drivers/gpu/drm/Kconfig
-> @@ -398,7 +398,7 @@ source "drivers/gpu/drm/imagination/Kconfig"
->=20
->  config DRM_HYPERV
->  	tristate "DRM Support for Hyper-V synthetic video device"
-> -	depends on DRM && PCI && HYPERV
-> +	depends on DRM && PCI && HYPERV_VMBUS
->  	select DRM_CLIENT_SELECTION
->  	select DRM_KMS_HELPER
->  	select DRM_GEM_SHMEM_HELPER
-> diff --git a/drivers/hid/Kconfig b/drivers/hid/Kconfig
-> index a57901203aeb..fe3dc8c0db99 100644
-> --- a/drivers/hid/Kconfig
-> +++ b/drivers/hid/Kconfig
-> @@ -1162,7 +1162,7 @@ config GREENASIA_FF
->=20
->  config HID_HYPERV_MOUSE
->  	tristate "Microsoft Hyper-V mouse driver"
-> -	depends on HYPERV
-> +	depends on HYPERV_VMBUS
->  	help
->  	Select this option to enable the Hyper-V mouse driver.
->=20
-> diff --git a/drivers/hv/Kconfig b/drivers/hv/Kconfig
-> index 2e8df09db599..08c4ed005137 100644
-> --- a/drivers/hv/Kconfig
-> +++ b/drivers/hv/Kconfig
-> @@ -44,18 +44,24 @@ config HYPERV_TIMER
->=20
->  config HYPERV_UTILS
->  	tristate "Microsoft Hyper-V Utilities driver"
-> -	depends on HYPERV && CONNECTOR && NLS
-> +	depends on HYPERV_VMBUS && CONNECTOR && NLS
->  	depends on PTP_1588_CLOCK_OPTIONAL
->  	help
->  	  Select this option to enable the Hyper-V Utilities.
->=20
->  config HYPERV_BALLOON
->  	tristate "Microsoft Hyper-V Balloon driver"
-> -	depends on HYPERV
-> +	depends on HYPERV_VMBUS
->  	select PAGE_REPORTING
->  	help
->  	  Select this option to enable Hyper-V Balloon driver.
->=20
-> +config HYPERV_VMBUS
-> +	tristate "Microsoft Hyper-V Vmbus driver"
+Can we disable the resolver from phylink_sfp_disconnect_phy(), to offer
+a similar guarantee that phylink_disconnect_phy() never runs with a
+concurrent resolver?
 
-As described above,
-s/Vmbus/VMBus/
+I don't have a local setup at the moment to test what happens when I
+unplug an SFP module with the change I am proposing. I can test in a few
+hours at the earliest. However, there's a chance testing won't reveal
+why we don't stop the resolver during SFP module disconnection, hence
+the reason for this possibly stupid question.
 
-> +	depends on HYPERV
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 350905928d46..a8facc177f1f 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -2313,17 +2313,13 @@ void phylink_disconnect_phy(struct phylink *pl)
 
-Per my comments on the cover letter, could add
-"default HYPERV" here to help ease the transition.
+ 	ASSERT_RTNL();
 
-> +	help
-> +	  Select this option to enable Hyper-V Vmbus driver.
++	WARN_ON(!test_bit(PHYLINK_DISABLE_STOPPED, &pl->phylink_disable_state));
++
+ 	phy = pl->phydev;
+ 	if (phy) {
+-		mutex_lock(&phy->lock);
+-		mutex_lock(&pl->state_mutex);
+ 		pl->phydev = NULL;
+ 		pl->phy_enable_tx_lpi = false;
+ 		pl->mac_tx_clk_stop = false;
+-		mutex_unlock(&pl->state_mutex);
+-		mutex_unlock(&phy->lock);
+-		flush_work(&pl->resolve);
+-
+ 		phy_disconnect(phy);
+ 	}
+ }
+@@ -3809,7 +3805,10 @@ static int phylink_sfp_connect_phy(void *upstream, struct phy_device *phy)
+ static void phylink_sfp_disconnect_phy(void *upstream,
+ 				       struct phy_device *phydev)
+ {
+-	phylink_disconnect_phy(upstream);
++	struct phylink *pl = upstream;
++
++	phylink_run_resolve_and_disable(pl, PHYLINK_DISABLE_STOPPED);
++	phylink_disconnect_phy(pl);
+ }
 
-s/Vmbus/VMBus/
-
-> +
->  config MSHV_ROOT
->  	tristate "Microsoft Hyper-V root partition support"
->  	depends on HYPERV && (X86_64 || ARM64)
-> @@ -75,7 +81,7 @@ config MSHV_ROOT
->=20
->  config MSHV_VTL
->  	tristate "Microsoft Hyper-V VTL driver"
-> -	depends on X86_64 && HYPERV_VTL_MODE
-> +	depends on X86_64 && HYPERV_VTL_MODE && HYPERV_VMBUS
-
-An observation: conceptually I would not expect this driver to
-depend on HYPERV_VMBUS because it is not a VMBus driver. But
-looking at the code, this is a place where VMBus interrupt handling
-bleeds into code that is otherwise just hypervisor functionality. So
-evidently the HYPERV_VMBUS dependency is needed for now.
-Getting better separation and avoiding the dependency could be
-done later.
-
->  	# Mapping VTL0 memory to a userspace process in VTL2 is supported in Op=
-enHCL.
->  	# VTL2 for OpenHCL makes use of Huge Pages to improve performance on VM=
-s,
->  	# specially with large memory requirements.
-> diff --git a/drivers/hv/Makefile b/drivers/hv/Makefile
-> index c53a0df746b7..050517756a82 100644
-> --- a/drivers/hv/Makefile
-> +++ b/drivers/hv/Makefile
-> @@ -1,5 +1,5 @@
->  # SPDX-License-Identifier: GPL-2.0
-> -obj-$(CONFIG_HYPERV)		+=3D hv_vmbus.o
-> +obj-$(CONFIG_HYPERV_VMBUS)	+=3D hv_vmbus.o
->  obj-$(CONFIG_HYPERV_UTILS)	+=3D hv_utils.o
->  obj-$(CONFIG_HYPERV_BALLOON)	+=3D hv_balloon.o
->  obj-$(CONFIG_MSHV_ROOT)		+=3D mshv_root.o
-> diff --git a/drivers/input/serio/Kconfig b/drivers/input/serio/Kconfig
-> index 17edc1597446..c7ef347a4dff 100644
-> --- a/drivers/input/serio/Kconfig
-> +++ b/drivers/input/serio/Kconfig
-> @@ -276,8 +276,8 @@ config SERIO_OLPC_APSP
->=20
->  config HYPERV_KEYBOARD
->  	tristate "Microsoft Synthetic Keyboard driver"
-> -	depends on HYPERV
-> -	default HYPERV
-> +	depends on HYPERV_VMBUS
-> +	default HYPERV_VMBUS
->  	help
->  	  Select this option to enable the Hyper-V Keyboard driver.
->=20
-> diff --git a/drivers/net/hyperv/Kconfig b/drivers/net/hyperv/Kconfig
-> index c8cbd85adcf9..982964c1a9fb 100644
-> --- a/drivers/net/hyperv/Kconfig
-> +++ b/drivers/net/hyperv/Kconfig
-> @@ -1,7 +1,7 @@
->  # SPDX-License-Identifier: GPL-2.0-only
->  config HYPERV_NET
->  	tristate "Microsoft Hyper-V virtual network driver"
-> -	depends on HYPERV
-> +	depends on HYPERV_VMBUS
->  	select UCS2_STRING
->  	select NLS
->  	help
-> diff --git a/drivers/pci/Kconfig b/drivers/pci/Kconfig
-> index 9a249c65aedc..7065a8e5f9b1 100644
-> --- a/drivers/pci/Kconfig
-> +++ b/drivers/pci/Kconfig
-> @@ -221,7 +221,7 @@ config PCI_LABEL
->=20
->  config PCI_HYPERV
->  	tristate "Hyper-V PCI Frontend"
-> -	depends on ((X86 && X86_64) || ARM64) && HYPERV && PCI_MSI && SYSFS
-> +	depends on ((X86 && X86_64) || ARM64) && HYPERV_VMBUS && PCI_MSI
-> && SYSFS
->  	select PCI_HYPERV_INTERFACE
->  	select IRQ_MSI_LIB
->  	help
-> diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
-> index 5522310bab8d..19d0884479a2 100644
-> --- a/drivers/scsi/Kconfig
-> +++ b/drivers/scsi/Kconfig
-> @@ -589,7 +589,7 @@ config XEN_SCSI_FRONTEND
->=20
->  config HYPERV_STORAGE
->  	tristate "Microsoft Hyper-V virtual storage driver"
-> -	depends on SCSI && HYPERV
-> +	depends on SCSI && HYPERV_VMBUS
->  	depends on m || SCSI_FC_ATTRS !=3D m
->  	default HYPERV
->  	help
-> diff --git a/drivers/uio/Kconfig b/drivers/uio/Kconfig
-> index b060dcd7c635..6f86a61231e6 100644
-> --- a/drivers/uio/Kconfig
-> +++ b/drivers/uio/Kconfig
-> @@ -140,7 +140,7 @@ config UIO_MF624
->=20
->  config UIO_HV_GENERIC
->  	tristate "Generic driver for Hyper-V VMBus"
-> -	depends on HYPERV
-> +	depends on HYPERV_VMBUS
->  	help
->  	  Generic driver that you can bind, dynamically, to any
->  	  Hyper-V VMBus device. It is useful to provide direct access
-> diff --git a/drivers/video/fbdev/Kconfig b/drivers/video/fbdev/Kconfig
-> index c21484d15f0c..72c63eaeb983 100644
-> --- a/drivers/video/fbdev/Kconfig
-> +++ b/drivers/video/fbdev/Kconfig
-> @@ -1774,7 +1774,7 @@ config FB_BROADSHEET
->=20
->  config FB_HYPERV
->  	tristate "Microsoft Hyper-V Synthetic Video support"
-> -	depends on FB && HYPERV
-> +	depends on FB && HYPERV_VMBUS
->  	select DMA_CMA if HAVE_DMA_CONTIGUOUS && CMA
->  	select FB_IOMEM_HELPERS_DEFERRED
->  	help
-> diff --git a/include/asm-generic/mshyperv.h b/include/asm-generic/mshyper=
-v.h
-> index 1d2ad1304ad4..66c58c91b530 100644
-> --- a/include/asm-generic/mshyperv.h
-> +++ b/include/asm-generic/mshyperv.h
-> @@ -165,6 +165,7 @@ static inline u64 hv_generate_guest_id(u64 kernel_ver=
-sion)
->=20
->  void __init hv_mark_resources(void);
->=20
-> +#if IS_ENABLED(CONFIG_HYPERV_VMBUS)
->  /* Free the message slot and signal end-of-message if required */
->  static inline void vmbus_signal_eom(struct hv_message *msg, u32 old_msg_=
-type)
->  {
-> @@ -200,6 +201,10 @@ static inline void vmbus_signal_eom(struct hv_messag=
-e *msg, u32 old_msg_type)
->  	}
->  }
->=20
-> +extern int vmbus_interrupt;
-> +extern int vmbus_irq;
-> +#endif /* CONFIG_HYPERV_VMBUS */
-> +
->  int hv_get_hypervisor_version(union hv_hypervisor_version_info *info);
->=20
->  void hv_setup_vmbus_handler(void (*handler)(void));
-> @@ -213,9 +218,6 @@ void hv_setup_crash_handler(void (*handler)(struct pt=
-_regs *regs));
->  void hv_remove_crash_handler(void);
->  void hv_setup_mshv_handler(void (*handler)(void));
->=20
-> -extern int vmbus_interrupt;
-> -extern int vmbus_irq;
-> -
->  #if IS_ENABLED(CONFIG_HYPERV)
->  /*
->   * Hypervisor's notion of virtual processor ID is different from
-> diff --git a/net/vmw_vsock/Kconfig b/net/vmw_vsock/Kconfig
-> index 56356d2980c8..8e803c4828c4 100644
-> --- a/net/vmw_vsock/Kconfig
-> +++ b/net/vmw_vsock/Kconfig
-> @@ -72,7 +72,7 @@ config VIRTIO_VSOCKETS_COMMON
->=20
->  config HYPERV_VSOCKETS
->  	tristate "Hyper-V transport for Virtual Sockets"
-> -	depends on VSOCKETS && HYPERV
-> +	depends on VSOCKETS && HYPERV_VMBUS
->  	help
->  	  This module implements a Hyper-V transport for Virtual Sockets.
->=20
-> --
-> 2.36.1.vfs.0.0
->=20
+ static const struct sfp_upstream_ops sfp_phylink_ops = {
 
 
