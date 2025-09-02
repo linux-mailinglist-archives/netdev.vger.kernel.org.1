@@ -1,92 +1,124 @@
-Return-Path: <netdev+bounces-219049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FD60B3F919
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 10:49:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDCB7B3F91E
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 10:50:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 456DE1885582
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 08:49:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FCCC3A5804
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 08:50:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D0A428643F;
-	Tue,  2 Sep 2025 08:49:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A106D2E5B13;
+	Tue,  2 Sep 2025 08:50:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B4dK+02d"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SXWq0EUy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E338432F742;
-	Tue,  2 Sep 2025 08:49:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEAC42E2F03
+	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 08:49:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756802967; cv=none; b=IGE/zXnnMRfy4KdkdRyReLk49wri1BmfvTtpLJFjCWoCBK72i7NqHmeEm3gIGS8Z+S33Wv4OiB/MxBQmGyFxUmqzc8s3OrcpbZz1DswafG+6DCjPxus+Xx4wzOIqXV6RSvYQkP/idJnPMMKJFm0f2LB2Wph/3g7jnMwhNMLtBRg=
+	t=1756803001; cv=none; b=FA2psfvLUab+lsr8qaJfUZBfBMcUSOYpJIJ1qmQhtYCXMiRdqf7GzS/jDsXv5O44crbyoZsXaIYbUmWrL6T2Ok4t9vgjILZ/GNooykDELSV6GCWXuw6c81MAWh3Mj8DNdqO+iMrFvBKo5bYSpHmtj6zn2RzIsu4OCnsGxgp2wfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756802967; c=relaxed/simple;
-	bh=rEEUhyesr1JfcnPJBOaeHTZak+JujvzT4iPgYVAefgY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DI4f1aUiMWOZahTRoZo3dRSfea4NMbxx43snWcftJwMdkWNfy7EQkcMC3IVUokGofrLLJbq86I8cNibzZDSjPCN0mE+9J5uiY4RegMIHuNDgcXMfyG7iG6hCK9Tv9/oTnKVhBWu2iLBqxc3HrUG40DpE4/dKV05JUQfYUi0BTLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B4dK+02d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6DE7C4CEED;
-	Tue,  2 Sep 2025 08:49:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756802966;
-	bh=rEEUhyesr1JfcnPJBOaeHTZak+JujvzT4iPgYVAefgY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=B4dK+02dMlR8emlHiLWqZYbLOQhyLVddyOOin8epDnyty080NGW2VX2tWBmYFo1zC
-	 1fzMnTtYbdLKl4lyGu3PkXcLMCXqrRJEkzD7o6NfFYDqwJz7xvOU0vtDRfxKfELku8
-	 IqAlKWY1CZaVZCkpF81r/Sx1HKQYpgm7/MnbFMgCLcds8WCOWjZi12/fSsjMWrR8g4
-	 edT7akdZ4A4pNTJJ1OwT9xzJzf5BQCG50jJ3RTJo6KITr44epGr4jzAz9tUDNalccz
-	 c+6SZEwjc4yqdWSNBJhWX+2F1juf2LY9raq7U8W0xe6NlyK+Nbzp8JEGAm4YUvO2C3
-	 b5upV9De/LlVg==
-Date: Tue, 2 Sep 2025 10:49:23 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Prabhakar <prabhakar.csengg@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Russell King <linux@armlinux.org.uk>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, 
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, Biju Das <biju.das.jz@bp.renesas.com>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [PATCH net-next 1/4] dt-bindings: net: dwmac: Increase
- 'maxItems' for 'interrupts' and 'interrupt-names'
-Message-ID: <20250902-spirited-congenial-stingray-f8aff7@kuoka>
-References: <20250902001302.3823418-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250902001302.3823418-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	s=arc-20240116; t=1756803001; c=relaxed/simple;
+	bh=Mhp8jXVEHGh++RDIq3pIwMyTr4EHDwopzBqSg7ZECE0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Whg3HG1XbAYQl1w+wEwW2oZp4iH6ZzHEH5Cu7LIyvTCCGn40KjClKwk9Krs05YsdGleh0Lzmn8L3Z1h8FW5a0N5G5DTGKXTU7SVJ1NFznl6tNlD2hj453HfUeIfc5Ob/LpwAL7RngnlIh2U1OzfsDdMqXycGLO5c5hsi5VC1VKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SXWq0EUy; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756802998;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rh9RBkvVSEWGQuJL+dDVXK1RYGYVIG9XjSg6HK0oJXI=;
+	b=SXWq0EUyXYtgEFyz33YPekVMjatMbvgGlFskmqCL/iwUhZMMK11N7gf4b3smuTFj2Ivxq9
+	n3y6gY8bsWmA9isOLpGzFwMfpOPuQiJsB8ujXgpJQ1DR0EhYKZWZ8hiGLiI/ykNNz65Ppc
+	jxbP7zhftRs/RfuWj62CvK5G515bAHk=
+Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
+ [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-414-yA-eQKxJO3mJcsSBOqCU_Q-1; Tue, 02 Sep 2025 04:49:55 -0400
+X-MC-Unique: yA-eQKxJO3mJcsSBOqCU_Q-1
+X-Mimecast-MFC-AGG-ID: yA-eQKxJO3mJcsSBOqCU_Q_1756802995
+Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-7227bea8b73so32821297b3.0
+        for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 01:49:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756802995; x=1757407795;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rh9RBkvVSEWGQuJL+dDVXK1RYGYVIG9XjSg6HK0oJXI=;
+        b=Rjq0v/ZALgK0BU8S8kwi2FEcAk93R6UCxDiC919CNX8/Zgsg4FnNsxXJ4e0G1H/TCP
+         LwYD0loyOOSLzeo6jjUDGsgnsMq3koajNxel6qVbTAIU4+/5AXLUiCFEH3juUIuopbre
+         I9SbiwFiFzuScgUzNVhkJxFum+O0bKfrAePHmlxIFu6v5jeXXil1uCEGm6I9Tezz2HZV
+         MU/uj+szM4DQsjdZ3pvJBZxk8YCuaCIMp5A+yS3RjIizKVgvlJqbUut0ZdW2mLnoIJAa
+         XeV0BHiwUxNf535vf2KYthAeheubKBjqOoWwZ2Tut3YS8gwp5jtBvUB6aNnB4BvXrES6
+         1Y+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXKB9awXQZA5vNLJfX7As5cw8DI7EBlEtp1UImSwhoFsg0Ip6QY91fbICWqQCN1GM8agAgqonE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjLLvccW0N1aUGNSGYjPMtRPpeEXggG9asgbf2jRpZHcC4KeEQ
+	mFAOOz+XlzciXDN1vjxonkogJ1d6loL1DsT9btdpxgRTYdlnFL9WEDrHt6+ZJhRrdT0MvUESfnQ
+	xhIJ3cL4isV1SdwIA9YfR/0d2pxX662u+/NRSdwWdlTGy9kYcKkeSM+4CKw==
+X-Gm-Gg: ASbGncteV5K2WxnYtxhPLjFY7P1wzWYZH3R5nrMQw5sP5uc4uQn3+SSR9GUAXk+q/Ks
+	QHV5nmG7OhGNa1Z/g9cNPXkL+MVN5dFvHNgnwISaqcE+kyMIGlP4yziDOrLIcsY6/3ch65nfmuK
+	DrlHRmXoUljPF2NYlclQ4inLNcfhwS2nYci2U1yr9IxYlvPDuGMZwAymOY7XH87/ErVcQ68g5mo
+	42aQLdQPNAnUhhYCdxsaXz3hjKvhbh8ClOF5QHHEVAeuevUMvlklsA0h1gzJrIt7H+PVcTMYTNn
+	buHnPqHWANNb669eLOh5H/gVq4Nlry6iQx5xcNqvw8W95nbLvWRVfZP0WGv+XhGGqcmWlRo6rgr
+	gGOlkA8k+dxU=
+X-Received: by 2002:a05:690c:3809:b0:721:28ef:a9b0 with SMTP id 00721157ae682-7227635c856mr112866607b3.9.1756802995130;
+        Tue, 02 Sep 2025 01:49:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFlypMLI8XIGJHMOhhMRO1ynE8DNTCjD9jv/OySdjluZx5qwOhTyzmXtYsCxg0aNhm/A8apVA==
+X-Received: by 2002:a05:690c:3809:b0:721:28ef:a9b0 with SMTP id 00721157ae682-7227635c856mr112866387b3.9.1756802994683;
+        Tue, 02 Sep 2025 01:49:54 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e00:6083:48d1:630a:25ae? ([2a0d:3344:2712:7e00:6083:48d1:630a:25ae])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-723a850288asm3642597b3.44.2025.09.02.01.49.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Sep 2025 01:49:54 -0700 (PDT)
+Message-ID: <03991134-4007-422b-b25a-003a85c1edb0@redhat.com>
+Date: Tue, 2 Sep 2025 10:49:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250902001302.3823418-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v4] selftests: net: add test for destination in
+ broadcast packets
+To: Oscar Maes <oscmaes92@gmail.com>, netdev@vger.kernel.org,
+ bacs@librecast.net, brett@librecast.net, kuba@kernel.org
+Cc: davem@davemloft.net, dsahern@kernel.org, stable@vger.kernel.org
+References: <20250828114242.6433-1-oscmaes92@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250828114242.6433-1-oscmaes92@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 02, 2025 at 01:12:59AM +0100, Prabhakar wrote:
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+On 8/28/25 1:42 PM, Oscar Maes wrote:
+> Add test to check the broadcast ethernet destination field is set
+> correctly.
 > 
-> Increase the `maxItems` value for the `interrupts` and `interrupt-names`
-> properties to 19 to support additional per-channel Tx/Rx completion
-> interrupts on the Renesas RZ/T2H SoC, which features the
-> `snps,dwmac-5.20` IP with 8 Rx queues and 8 Tx queues.
+> This test sends a broadcast ping, captures it using tcpdump and
+> ensures that all bits of the 6 octet ethernet destination address
+> are correctly set by examining the output capture file.
+> 
+> Signed-off-by: Oscar Maes <oscmaes92@gmail.com>
+> Co-authored-by: Brett A C Sheffield <bacs@librecast.net>
 
-This alone makes no sense. Why would we need more interrupts here if
-there is no user of it at all? Squash patches.
+I'm sorry for nit-picking, but the sob/tag-chain is wrong, please have a
+look at:
 
-You also need to constrain other devices, because now one Renesas
-binding gets 19 interrupts without any explanation. Please rethink how
-you split your patches...
+https://elixir.bootlin.com/linux/v6.16.4/source/Documentation/process/submitting-patches.rst#L516
 
-Best regards,
-Krzysztof
+Thanks,
+
+Paolo
 
 
