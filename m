@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-219232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32689B409A9
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 17:49:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B69AB40984
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 17:47:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D55385427EA
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 15:47:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00EFF7B06D9
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 15:45:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E701632ED5F;
-	Tue,  2 Sep 2025 15:47:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3DFE32C336;
+	Tue,  2 Sep 2025 15:47:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="LM6SfkCk"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="ALc4rqaH"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D457324B07;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D2DC31CA71;
 	Tue,  2 Sep 2025 15:47:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756828026; cv=none; b=UVHjbwSUwjsmN61jIss5XrfmIp8xrJqm9jDJA49Opja18EdqCpUWnJIpNgtGqWbRZRSyANDGoTxwLnH+pkSf/vwHF7T589sBYLRDwERG0ZSWGSAerPWS6jqyuzeFTSKiuMswyQNoZL0Muhrie7mfnXAF/g9ia1Uvabl0R3ZK19g=
+	t=1756828025; cv=none; b=XFDRft4TMREv68DNCgKvm/UkzbcGurOFQrETLz6OSDZ95xkWNFc12+CLrF/jGkKzxm0I0w94n6bhTq+AVd4UiTNQOQcscgrA+HSPUV/L5g71SHjGwuA/VG4L6SDXQq9Zr4wyLYloorEwJkRHA29qgCYilSTy9YM3LWjqr5kwLRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756828026; c=relaxed/simple;
-	bh=Gl9gajoVLzxJmnc1ePJC2X6wmSn5VMF8xSjXsX/13sY=;
+	s=arc-20240116; t=1756828025; c=relaxed/simple;
+	bh=TPnFZUBGeSXm8HCq9Hzlib3MMWZuwcxYMJUCusHWaC8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FrmOevqC8vxwg2Cgr3qDhdFYUKHrCG54pmC6JaMQRr2gZuw1pDDbMNn37r1wVVIcVPdfTxbJK2bsP3aiEqrL93I6PYzVJSVjWKc8GI8y01a4WFBJUrH+9P2dzM6loINLBrbfCWLRQBo0/JomZCflHRDC92Jrg050VlB0+7vt2gM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=LM6SfkCk; arc=none smtp.client-ip=193.104.135.124
+	 MIME-Version:Content-Type; b=GrTJB18bzeQebgkjdoYaL6FOFNQ7JO5SsGy50o+bTMZ7AuXJ4dWulN8Mw5pB0IUeWMWiKvZjzSz3bjVd/yZKqcEJjXNx8O0QM7QI7IK2vWgt/tqn6nXcl7YTLVQga653EQpxXV1XiriZJyETNKb+9kaWBMpiZDuuxsLLEcB3gCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=ALc4rqaH; arc=none smtp.client-ip=193.104.135.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
 	s=202008; t=1756828014;
-	bh=Gl9gajoVLzxJmnc1ePJC2X6wmSn5VMF8xSjXsX/13sY=;
+	bh=TPnFZUBGeSXm8HCq9Hzlib3MMWZuwcxYMJUCusHWaC8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LM6SfkCknppZarc359u1pKKMp5FVG/mXGK49GkIr6bOMvk7w9PsJg6y4+l5yPR1kb
-	 pgxz8Q7eW12zv+Kzj6zHFTMqy0BTlESPvCF2PH6h3+KNawzByb4QUd9nwQWcscr+mf
-	 l85SXavvWQ6vvb0aPSha8m6iP2KDllBlIC+rvR7VWvw6GJdzw9MWc7+PKcBFf7Q8PV
-	 I4313zfPaIpsIuFSK4ECG0OUtyK+qPWGv7ZNr9FHQwqJt/gDOlPz4nFWz61w7Phyrl
-	 Prk0p+8JnTkab+3r9ftMe59P2A+BNiaDhTjfse0x0rK2q60yrk3A4tdNDdViQWarkV
-	 CpRsph9HtmTYg==
+	b=ALc4rqaHiJoiZM9QbljX3AgIEKkb8XknReBjOAzaEnEkRwQDFIxVNB7XS4I8S87yS
+	 oBZg+SDdT+IT6yDKYsul7Swa2AFZcRieYsdGeX300gJsBhql/Uzus3+XJj68jCqCCb
+	 B6YUCI2P3l05aWtFixnBqagfcIF4hQgYH4bKf1ZBkbJxBfmU5UxSTzt39Aa2SCsq3L
+	 u+8FjPfhGNkE24bdqXUs/FmDUcC55hPIr6g+dqX8/bjKKy1ntZ/lWDUtzBcEhkKmId
+	 ZU9XXN54sZ5MD2FXTYGIUSwSluhAp5V0Qaqq0/5sKy4+i92yn1dGujmEEd0Y3ohE+D
+	 Wma8mxlkFloog==
 Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 42FC0600C4;
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 452E560128;
 	Tue,  2 Sep 2025 15:46:53 +0000 (UTC)
 Received: by x201s (Postfix, from userid 1000)
-	id E2F0F20226D; Tue, 02 Sep 2025 15:46:42 +0000 (UTC)
+	id 70314202271; Tue, 02 Sep 2025 15:46:43 +0000 (UTC)
 From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -60,9 +60,9 @@ Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
 	Chuck Lever <chuck.lever@oracle.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 1/3] netlink: specs: fou: change local-v6/peer-v6 check
-Date: Tue,  2 Sep 2025 15:46:35 +0000
-Message-ID: <20250902154640.759815-2-ast@fiberby.net>
+Subject: [PATCH net-next v2 2/3] tools: ynl-gen: use macro for binary min-len check
+Date: Tue,  2 Sep 2025 15:46:36 +0000
+Message-ID: <20250902154640.759815-3-ast@fiberby.net>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250902154640.759815-1-ast@fiberby.net>
 References: <20250902154640.759815-1-ast@fiberby.net>
@@ -75,61 +75,34 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-While updating the binary min-len implementation, I noticed that
-the only user, should AFAICT be using exact-len instead.
+This patch changes the generated min-len check for binary
+attributes to use the NLA_POLICY_MIN_LEN() macro, thereby the
+generated code supports strict policy validation.
 
-In net/ipv4/fou_core.c FOU_ATTR_LOCAL_V6 and FOU_ATTR_PEER_V6
-are only used for singular IPv6 addresses, and there are AFAICT
-no known implementations trying to send more, it therefore
-appears safe to change it to an exact-len policy.
+With this change TypeBinary will always generate a NLA_BINARY
+attribute policy.
 
-This patch therefore changes the local-v6/peer-v6 attributes to
-use an exact-len check, instead of a min-len check.
+This doesn't change any currently generated code, as it isn't
+used in any specs currently used for generating code.
 
 Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
 ---
- Documentation/netlink/specs/fou.yaml | 4 ++--
- net/ipv4/fou_nl.c                    | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ tools/net/ynl/pyynl/ynl_gen_c.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/netlink/specs/fou.yaml b/Documentation/netlink/specs/fou.yaml
-index 57735726262ec..8e7974ec453fc 100644
---- a/Documentation/netlink/specs/fou.yaml
-+++ b/Documentation/netlink/specs/fou.yaml
-@@ -52,7 +52,7 @@ attribute-sets:
-         name: local-v6
-         type: binary
-         checks:
--          min-len: 16
-+          exact-len: 16
-       -
-         name: peer-v4
-         type: u32
-@@ -60,7 +60,7 @@ attribute-sets:
-         name: peer-v6
-         type: binary
-         checks:
--          min-len: 16
-+          exact-len: 16
-       -
-         name: peer-port
-         type: u16
-diff --git a/net/ipv4/fou_nl.c b/net/ipv4/fou_nl.c
-index 3d9614609b2d3..506260b4a4dc2 100644
---- a/net/ipv4/fou_nl.c
-+++ b/net/ipv4/fou_nl.c
-@@ -18,9 +18,9 @@ const struct nla_policy fou_nl_policy[FOU_ATTR_IFINDEX + 1] = {
- 	[FOU_ATTR_TYPE] = { .type = NLA_U8, },
- 	[FOU_ATTR_REMCSUM_NOPARTIAL] = { .type = NLA_FLAG, },
- 	[FOU_ATTR_LOCAL_V4] = { .type = NLA_U32, },
--	[FOU_ATTR_LOCAL_V6] = { .len = 16, },
-+	[FOU_ATTR_LOCAL_V6] = NLA_POLICY_EXACT_LEN(16),
- 	[FOU_ATTR_PEER_V4] = { .type = NLA_U32, },
--	[FOU_ATTR_PEER_V6] = { .len = 16, },
-+	[FOU_ATTR_PEER_V6] = NLA_POLICY_EXACT_LEN(16),
- 	[FOU_ATTR_PEER_PORT] = { .type = NLA_BE16, },
- 	[FOU_ATTR_IFINDEX] = { .type = NLA_S32, },
- };
+diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
+index ef032e17fec44..52f955ed84a7f 100755
+--- a/tools/net/ynl/pyynl/ynl_gen_c.py
++++ b/tools/net/ynl/pyynl/ynl_gen_c.py
+@@ -556,7 +556,7 @@ class TypeBinary(Type):
+         elif 'exact-len' in self.checks:
+             mem = 'NLA_POLICY_EXACT_LEN(' + self.get_limit_str('exact-len') + ')'
+         elif 'min-len' in self.checks:
+-            mem = '{ .len = ' + self.get_limit_str('min-len') + ', }'
++            mem = 'NLA_POLICY_MIN_LEN(' + self.get_limit_str('min-len') + ')'
+         elif 'max-len' in self.checks:
+             mem = 'NLA_POLICY_MAX_LEN(' + self.get_limit_str('max-len') + ')'
+ 
 -- 
 2.50.1
 
