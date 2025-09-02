@@ -1,79 +1,82 @@
-Return-Path: <netdev+bounces-219186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96111B4051E
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 15:50:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D2EEB405F2
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 16:03:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0731D3A9D3B
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 13:46:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9FF0188A8D4
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 13:58:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D20E632A834;
-	Tue,  2 Sep 2025 13:42:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70DDA2DAFCA;
+	Tue,  2 Sep 2025 13:56:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="gURyyuQl"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="h2RQdsy1"
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013030.outbound.protection.outlook.com [52.101.72.30])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2047.outbound.protection.outlook.com [40.107.223.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41DDD3074B2;
-	Tue,  2 Sep 2025 13:41:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B687B20B1F5;
+	Tue,  2 Sep 2025 13:56:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.47
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756820521; cv=fail; b=e/ANDpEf9YxVyMVC9cCAJR6MnlbGO31Q3nIE8YR27BX7exR4icwe5DRqCkDvXzkwuj8GJNow+WjEOmchtsPMsEt1v9G5xQ7yxq/1GXL27GttEFuVEgPUvRsT1WRT9rXcFgVEOHy6eaZ+PBPtvGoI9JjuLQs6hLRKA9+UzjsnlFA=
+	t=1756821398; cv=fail; b=hyzdzV3tVsCiH3m68N5XjkbL1bWk5f5pcPqrvfms1D7I4Rak3AzehSalK0nVy5JIoQAHdM7lzQkMhIZvMFh0NUtegMGS066eCDE65XZaOfNuf4Eq6DIbH7vQKo7KaDGxES3/dV+XYFs914gRurRfWtTDSwJSGSn/KUHGqt+Jj3I=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756820521; c=relaxed/simple;
-	bh=KFcrB+wbGKCVIG0SFDGCqWFB3Om5X/u7N9YN5Bj7cTc=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=QV/XPJ1ZkAZqFsK/wHWplGKMXjIyqUuUSVtveuayQmoqXormqVl7h6Nt3+/An6fMwstxcS9GAjNX9utfQS3H912C/+bSJCAc3DgQCHrtwIPD6nuLfB7FpgFv0fdtTskHfArIpVSEx6uSF/r+YUv+UnOABPN+2DiqcWRa+RTHUo0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=gURyyuQl; arc=fail smtp.client-ip=52.101.72.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	s=arc-20240116; t=1756821398; c=relaxed/simple;
+	bh=481xXnogg0xI0PAS/zL/3jWgbEyUdLEpcNYBWqP2Zms=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=AwZJXI8l35bMZXWUCYPYcIsu4m4fb2Qap9gx8NHjPwjCMIdq/v7aj8Xc67e2bwd9fjWrXBhIOQQtJp9BnDsoxSp3EHDMdXnYHO5bFTvRjk3OeeLFbywm49e+PkRJMb0IiSOJ8cROjMUaM5IUtnVEnwvNw87qzj1xbzsWvDvS8ws=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=h2RQdsy1; arc=fail smtp.client-ip=40.107.223.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=p5dmWBE3K27xjaRjLx3B9PuDoajh3s867NJZlMbUHIipPNvVzHyoFEzGziFiTFcOVSVso4ic2tjlyTi0JNDk7LhaLANoeugYYED+PrgI/TePdefWrtKASF1Q1IEYo2IMuaApP5wpxogu7QqaeBtLODpI2aPjJNgJBrxArSpkPcZUcZ7rIDAyEFp6KPV8kKQfp1lWTMEcJQj2k/zdrrVKzrBWtQGSuZU2MR51i4VyDVvZwtNPnHjLGRsOLTVByRAcs8ltiuJs0ioAPJ7yt5ZjsooEOb2nZizzz6hLCP5WD95EhowQ03IDhnKGcKoI3tdAGo5zvFkW9hk+rl7mlpJlZA==
+ b=Z9wkQzKNpKNr7YoCp9//JEqULMOJ7odEhgk2Q3DQpgSd2nuzng1aSAqiUBpjnvdHdSnIov3RJfI3FRYCR/YZOLaC2zih3AhJb5OnSiUFBO9CwtnsWk/R4jtQ9BjpNRFYdAGoQWgF3iqHMHY46dul5VAkRHI2Fz6l5k6dskw/xQR5qfCm1pPoVUMPDXgf/z+IOJ9xAUrcaHTvNvSbeypVEuRLAC/USRXG8jrnYUj3YPKp6naaaXT+CZVJ8H1xeHdlDLa1e4oeKwFN414RXPmBwYWA9FJ6+zEu4Z/2vORzdiudC007FOB0mErqEAP5ZkFh9C/ZSQB8D2n9eIZMfsZlJA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TggqOp0sjyOILkW0zMpPoVRD6oPL8Jih4rOWcfUb71I=;
- b=J0/zSb0wCeLAq0KYMDBPsnbg5K3A8obJIxPhG2QNXKYSWbgzEv0/2MchcEnoZHG0iB5yNAgqYg4uUoEh01z/+9ji5Pm75NMgY6IVX3HkJwRDpZptQNCM8uq1pkN5fr+ylrDEWKhUcOJk1t4YNnhurlgcxk+oLNwSYXch6NjGuKElKgHd5AZsvd1QBzCZGy4amKyPfVMp1Mlz9acbwEI8a9SHlScTizrb0xRQs3BzVcIFoapMD86muF1Z35wqxFRkTYe/vwN7F2KXFUZV6GQI4fA5jYsWJChlPHVrlAOddRy1N7YXs+sjuFoTkSrhrA5BotYiWNiFRNP55hHm4Pg0IA==
+ bh=5+Qow4qRuSHkcAHpAqvc2yW+215D1SRosVDTop+mBdk=;
+ b=qWZBemB2gV3yio0hLJ8w9nO8FxwiIjpcCS8WerE7rtKcZqGk5GfvXwSPl4HKvL1KtgbEaQGVaPWYDGAGO7vZEhsWSBDDskIE7dDju/3dwSB831WMQQcNSIIBA4+QvRj0qsszTF6eQF4v3mKHi6/Ex0o0gz4ycBK62YHnM2zQGtnhHx44MMtoy+FxJnm5tMwAynlftV7GwV4ZU5uPf663/PqbbGNikJu2zhh4b5g1/00SfPiQfAmqc9VjF/Rkven2vNgG21LGrpuVSK1z6l3SndgbnVJTyYMZ0F/2nEMFctEkNm44RIctPlWgKWbY3GD8VVBrTNKPMeOvkcfhxyjizQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TggqOp0sjyOILkW0zMpPoVRD6oPL8Jih4rOWcfUb71I=;
- b=gURyyuQl5vXrXG/H0G7bt/onl9EJzOB9ZVfMqlS1E569wFCL7WFApCsGFmj6w9efx6arlm1eSLXUYi1siktfIbY9D54ZQtgCusNP8j6rNCBZoqPa8zpjydOvxu1J60CBoY8QZYmv1uorr7wqGtno3kmjprWKKbyUJXt6bcGoWcLWIhTPxRv/hspKE9NjfmOXLwXrwtJ3MCiFZaFMOLsTZjReAotqZy6JVzkZvjOdE+UDzqgRFAtOjfdW7r7Ah63/0pddG3EmWZR02EIjCdaXRO/PBezbgem3672G16PqxJzkFwCtzmKPHDCjEy5tGiVQz3++wWhRP9Ezd97jFs50Zw==
+ bh=5+Qow4qRuSHkcAHpAqvc2yW+215D1SRosVDTop+mBdk=;
+ b=h2RQdsy1a/3M8R8fSG9IhMHEpb66qBDbCk1XuW1YTXmV0nG15UDiPtBHwMDBRBRNP1IaqeLY6XPeesMzlxKxrM7ZZDSV0pBG1xX/bCYCoHc8GH8+CKaExn0ARovGZuG6PnohDbSm/aOZihOusSIa2ZDHlw2i9ckV+V6HpjGVaEu9Zoh0r9uyX8mPy4mKA7UrgS3d6gR5EKEZxr/JSRyn13zKBJY2Tg4TgFKByX9c0Cr7CNtQoq+0IPnErW2BQ9RnLG5FoQDbDuBrbYSmYDrenmQe+726XlI9zbp8nNyUXy4zTIHsXMUMoO2oiOMxDkQ3vrwDYQUR8jXIHk9sLb1cZA==
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PA4PR04MB7790.eurprd04.prod.outlook.com (2603:10a6:102:cc::8)
- by AM0PR04MB7170.eurprd04.prod.outlook.com (2603:10a6:208:191::7) with
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by MW4PR12MB5627.namprd12.prod.outlook.com (2603:10b6:303:16a::8) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.16; Tue, 2 Sep
- 2025 13:41:54 +0000
-Received: from PA4PR04MB7790.eurprd04.prod.outlook.com
- ([fe80::6861:40f7:98b3:c2bc]) by PA4PR04MB7790.eurprd04.prod.outlook.com
- ([fe80::6861:40f7:98b3:c2bc%4]) with mapi id 15.20.9094.015; Tue, 2 Sep 2025
- 13:41:54 +0000
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH net] net: phy: transfer phy_config_inband() locking responsibility to phylink
-Date: Tue,  2 Sep 2025 16:41:41 +0300
-Message-Id: <20250902134141.2430896-1-vladimir.oltean@nxp.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM0PR10CA0028.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:208:17c::38) To PA4PR04MB7790.eurprd04.prod.outlook.com
- (2603:10a6:102:cc::8)
+ 2025 13:56:32 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.9073.026; Tue, 2 Sep 2025
+ 13:56:32 +0000
+Date: Tue, 2 Sep 2025 10:56:31 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Abhijit Gangurde <abhijit.gangurde@amd.com>
+Cc: kuba@kernel.org, brett.creeley@amd.com, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, corbet@lwn.net,
+	leon@kernel.org, andrew+netdev@lunn.ch, sln@onemain.com,
+	allen.hubbe@amd.com, nikhil.agarwal@amd.com,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 00/14] Introduce AMD Pensando RDMA driver
+Message-ID: <20250902135631.GO186519@nvidia.com>
+References: <20250814053900.1452408-1-abhijit.gangurde@amd.com>
+ <20250826155226.GB2134666@nvidia.com>
+ <d829c4ee-f16c-6cfa-afdc-05f4b981ac02@amd.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d829c4ee-f16c-6cfa-afdc-05f4b981ac02@amd.com>
+X-ClientProxiedBy: YT3PR01CA0018.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:86::22) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,281 +84,96 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PA4PR04MB7790:EE_|AM0PR04MB7170:EE_
-X-MS-Office365-Filtering-Correlation-Id: 85a76ba1-93ed-463a-fd0b-08ddea267a8a
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|MW4PR12MB5627:EE_
+X-MS-Office365-Filtering-Correlation-Id: 01a9de13-d6bc-4dfb-b4dd-08ddea2885c9
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|19092799006|52116014|376014|1800799024|38350700014;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?fLwOalejslkr1GoB0nSwkekTtZJloxB0xsXLzdPO1T6So570Xwwbno09gboT?=
- =?us-ascii?Q?8rgqrVhprldXsrdxySH3LQ6iVeAuGUwSOLGI8NzRUxahhoPxMSgA9WIiwNHh?=
- =?us-ascii?Q?feOkG8t2MgDtly5nDsjTT9m2tLqS7XTIPskE8SOHrYZmIMrQe1tCkjdY0Yxw?=
- =?us-ascii?Q?eaVCc4otGSdRqsQIlb5YX4TR0OyvUNq0fdxYi2lsppCkAKfh2wDcA0iHlXVk?=
- =?us-ascii?Q?gcYd2QkZMvgQglhoEAbjbl4rQeNWNby6HA4JdH4PuMaYAKaNRkCShqvjwLCc?=
- =?us-ascii?Q?RqLY4E5givaQYrGRD3ljfe5OqRAwj5NHMY1i+TBZFTiFu0zHjeh0HIVonYiM?=
- =?us-ascii?Q?0srWhMxXZpGwQKp4kpF5V1+OMIKhrtw0z17KxI+Cyqnp9BdWDox/smRotJ4r?=
- =?us-ascii?Q?+EjE+kRsW9tT4GK6H+M4NhkbLEJeMWzzhn2Gc5AnxaIsA1F9wkzbeduXpqkR?=
- =?us-ascii?Q?0WKHA13pYljUZfNBEQCSmmTkiv8AJlUolMwjGD8xeq1nmx93DrGPmD7MiTkt?=
- =?us-ascii?Q?Ukhki0cntzDutyhkPVI3ELW5DTnkdwYs3PKZxaNIcYM7uPYpisFPEwAvwa6x?=
- =?us-ascii?Q?jbIsJlT0snRrAc3EeTqUQTZG+tKNrq9cTiNmpRFxGIoizjJmFugOQEtv9Pbz?=
- =?us-ascii?Q?yEMKYth+whcPWWaGsQAOIuyZowqRYjzBKeriJ1pOkPqOp/x5d4jWPrRJ39J3?=
- =?us-ascii?Q?XlWGZ0QKa73RlPY4riYUDJWDv374nDfTMlj/ypkwEH0w80CaqLBL6ZFEJnUB?=
- =?us-ascii?Q?su3zVyXP7830uJmaH72cZVS/RLN4dUiMu0yYPpZgLygjSLGOWcFjdZjtllkh?=
- =?us-ascii?Q?mY+9CBD6slSyR+q9Pv93LKiWtbQegHi/7hrs2Vx7VMyrnv4kEy7LD1cUMP5n?=
- =?us-ascii?Q?l8oFglnmJ7TezEJ293eLA8J10HlxooKnTAktTO/aEzbEq41bFzxMSbxLli+x?=
- =?us-ascii?Q?PvfOofCzshwVOJuNY2L26kqbZrgwOE5AJSG5YEu1w8keUZnkQEfTncByTAQR?=
- =?us-ascii?Q?BHFg9MfnZwUZkI4OcSiOWKNGiQNHp0x441WTjeSuW927czpCsQgQhZ7/ekPZ?=
- =?us-ascii?Q?MI+LU9RJGpJu+k9HbxeI4mqGCYxFCaRQJLpLMt/6hMWqeOmPcBxXQ2Wmgzjn?=
- =?us-ascii?Q?ZMXZKv90r84A2wheP8Tr74yxxBQnVHVKfIJLSfc+GiQDsKadmW+P/QBV9iMJ?=
- =?us-ascii?Q?Aa+Z8ckUcgPmBxUlCwCd3eDEwhObT/okJH2OfwGvSRvyPh/11ABMA08VTh0s?=
- =?us-ascii?Q?V8ntvJJdLB1CmI+bSdFuvH9nAkvrw69C+1YgPczAXvV+5RzRZUeLCZjyHmGL?=
- =?us-ascii?Q?YVc7xR9eF5yrbI+254s3H9aFygxVE9hkBexaGA2lp34LoKM4o3vylgYaQE16?=
- =?us-ascii?Q?nc1zHrFH174QpqDGcMLjFABx4BQp4YReUlKM/wskI/tHlQlni8MV8nC0O6mI?=
- =?us-ascii?Q?jyv+lHyOfy5KpUbkDkIIuztr6o0uo/5R0zNILP6rG6Qu8Zrusczz1Q=3D=3D?=
+	=?us-ascii?Q?eV3hKjKp/Rg30rjUr8mVloj0MYzsc2v+0BegLw3+ff7Uj9r+pYs5rk9Z+6Ph?=
+ =?us-ascii?Q?P/AEEsfNThv3f1/SgYHIp0JLgrZ6TAPrldc9LaVSaG+OBHSuArmQz+s39efK?=
+ =?us-ascii?Q?gd4oqfBknTE9zkCny0MlRxwAYGSw+zJR+HtCzFJ2EBpCugOXLU49CX7o6ODj?=
+ =?us-ascii?Q?JCEUJMB00+ZqSHRaXt6lJTdpbsebg1dy2AdsUR0aP9ZIGdPb9Q9EpfykY9Oj?=
+ =?us-ascii?Q?oiXlxGfSxwPC11RH79zv6btig3ainCi8e4CYlbyPqhmBKDxt02W/tcX6c702?=
+ =?us-ascii?Q?sFnlCr8hre+nrLUMlAOpIbeIASko0qzpkuNFIFg/cc9JD8fCKfO6tW3ZqPcL?=
+ =?us-ascii?Q?QqdohyqakJ7K4WjE7+LKjlp4pIrN4/LWA3+3ATM2dgsyvvrxo5rgBiibqwbo?=
+ =?us-ascii?Q?OkI8lVrdlTDMIZhANives4TF1BEt9BxmvhVFf6N/mSP9yr6DbO9b0DPPbk76?=
+ =?us-ascii?Q?w5IgIZ0UnbEkeF6HjDfvwNtEm2kcWw8WbpitPPULKfqXNUqY8z7qPZbYdLx4?=
+ =?us-ascii?Q?UK2FnAD5PBOYcqPMPZhh/Pb66QwGXQGx2majWkvZ/xBisWcKBxBzBgALw/Jf?=
+ =?us-ascii?Q?BnPGA7m7D7kQn3HsyhFiQRucr7wWZi50b4QUj/y3mP2E6s6HzYTmiI/4lB16?=
+ =?us-ascii?Q?xD2p94Rmlx7DKJhZrSdsvA2GP05oXH9DPNJw+zI8e9RxL53lA5ZKtCXm7xj+?=
+ =?us-ascii?Q?TG/GWw3nRSixnei7F6nqQNkj/jctfiJyz60l/pdei6AlMOb/Urf6K6OLfx/X?=
+ =?us-ascii?Q?2jgcovMz58R/SC2JAlqYfqXWGOtOBwncXydQ2grwgLHBmbxnNKA+7zO0P60I?=
+ =?us-ascii?Q?dgeAIUnCuKr69B+bR6qGXpuweG1YKx3P6DX2LiVMvsIltkR3TJs1aCvqeGUw?=
+ =?us-ascii?Q?tqCLa6rzajYWhWcRsGWV7+QE9FhER06Qt6L/0eYvtspKhGsNA/EBgVNIMlrn?=
+ =?us-ascii?Q?uP0gSMtAQGuUTTtVb8wOtuvZjsT32DcbFm8dfvEeStNX31K/t9vTdgzho1iy?=
+ =?us-ascii?Q?euCDgW5NqImrwXP7bGfvAtdiPMkgPzGZvELJrc/PzXxviXvzl/alkzMC69He?=
+ =?us-ascii?Q?dnlwj0FRP4gYiJxKhNYMtua7EwnJy5WoLX0mp58kzqwPWkJOzFOan3/6L3ga?=
+ =?us-ascii?Q?NJ3mFGsVJm9SCu63dW5GUvKNZW6YsiPAtcHOjxN/Bu3rUKPYJE3SUQnDk+nZ?=
+ =?us-ascii?Q?jCUa7VE6v/QbjD1jKEojiVzAjbl4uHL6kQ9sQeuY0zG9dopW4LHbT4gTBl9/?=
+ =?us-ascii?Q?UIsT2zGDc/rQiouIan+CurghmF/GTaBwYlLQxKHHd3OuQt/S4K7+BBo02TiP?=
+ =?us-ascii?Q?dyz/0ChUDK9SxGAFWXNy2f7qH0QsmAtlspTR7UG9gPsjwYBm2YJQ8WGpHXKT?=
+ =?us-ascii?Q?3cPjXIYRcRYHT/V1A4RAI24ZjQBmwj3UP4enNXLJDiOrLsa40w=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB7790.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(52116014)(376014)(1800799024)(38350700014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ImEusQimPDrb9uLHzcmldxTpbZlwKq79CS1aWNrDGMwVwY85Ydg6lJvs2nzA?=
- =?us-ascii?Q?bDkZIrHSOcitnzAH5uxZEKY4jVzKj0bbgwvJaRYxWoNcN5CXTBmMVdWKzif9?=
- =?us-ascii?Q?p5LvcPFc6RWw1wl0GDp/D7o8ZqzoFby3t90QFIcQsVU3ixrnU6To29YIgO1l?=
- =?us-ascii?Q?ZAx68cy/v5Hnvk5Gp7udULNN/f7kcQLRSJzTpcD7n1ScSVXuztQ8fmPZpGH1?=
- =?us-ascii?Q?tiDJqAn+SsMxBjhlISyUgHSSX5SUjV+B6sanYiLDv+MmRJwCQ+kJ4F6dzjN4?=
- =?us-ascii?Q?n96WAQcrOxqS/udb0etMgRIFWhYCn8SBJ8wDNlMG6uHQ6UVMUGFE8JRnZHn7?=
- =?us-ascii?Q?LO6r4hmTYFoKAkm3mK2IKBYrLvMweTUg2j7sTnamWYslT9MDCm5mfWRp5fAM?=
- =?us-ascii?Q?zDHMhoOZ3JYQUptiJmDNYAyt/37EppAYsPG93o8qACJTnBOOq8tzYyD8pMbh?=
- =?us-ascii?Q?m55fxSVZDOLht/azXs9OrceQEI39Cse5n6W2LdM9yh5yKLF0GV9/tpbtZNG/?=
- =?us-ascii?Q?NfZEXkzif4ubECso906CAUWK6lnhuAEzSkOAM/xHkMT4WGbocdfliPL0iIPY?=
- =?us-ascii?Q?VIMJpSSr/sl4sapDfQr+0TzSeb8go8lhij17YTGsS58qYP6vWZb9Ttbgt8zi?=
- =?us-ascii?Q?54WCZlxE7BlCg4GcXgkwulXOr2M3GS9FQhwEZX9CH2k1dOdD2/tTgcoa4PG4?=
- =?us-ascii?Q?O5Iycx/lW5Rhh9LblolLmxDUB35KSuaoRCx31YGKrzM61k10E7RZNPDCoq5d?=
- =?us-ascii?Q?ko/CN44Vz7qeEISDXv07KaiX+2eMuHkpd3fEs747TX+USCsMXm/ZcXEAu4RN?=
- =?us-ascii?Q?7DWzylHgVrPgXyVPYCa28WLVrmhGJ0ImxVfoA7Ig8l3YCMbD5JB0zT1xtT7H?=
- =?us-ascii?Q?5ZXBBU4MsSMPnoVAPieX9VB8WVfvz8VzLdNTZ6nJDSWBqSEzBAkGsUskj+bi?=
- =?us-ascii?Q?AF7byAHnKVaB2I1cfeGefEnNHeeLmu8TaN/fdzuRm2X7TFS8518G/Q2DXIOk?=
- =?us-ascii?Q?d9VxU8XCfyPpAHHV1v5OTdFYSjdxp67BevDcxQ3oZw/xLVvQKw3zXkMzan1x?=
- =?us-ascii?Q?lLSkK51wHeRqYRy3Dxh6wOKK2RmD6eFRsMU1gy7vwmUhQPP3w4JmyTE/LU2m?=
- =?us-ascii?Q?nZucVbcwD9TSHz/yATUL7l4CFSCPu7o9oLHa3K7QrEA3px2PtvCeTzxJvAn0?=
- =?us-ascii?Q?+iU+82YUDqDNTQ9PwdkWh0T468sWZA7m+2dWD9utFqnDgQ1G4dHFiDQAkUnW?=
- =?us-ascii?Q?Y0WH8DdTGl3FWs8dG0PLQkHb3rV3+q+b/RV1F7MOPnYtB2EY4UR6vn49ZJWw?=
- =?us-ascii?Q?B/MTQd/wlQZXzZ1fkeMs0S9srXiGEXJm0Q5ZsJzYxOCaHthT3zQPkIz9vI2G?=
- =?us-ascii?Q?ncv4SE1VwvhmEAJAYjlgeeIZ+7wFEcKgL4sbwUreWDMCUzNZ7VPWUIRvpyLG?=
- =?us-ascii?Q?UgK9ilQ5iyvIzBAl7VH62N6H7/sMhhtk6D+gd9zLC8ObgAipKVPoQ3XrlGYy?=
- =?us-ascii?Q?u2y0b5Wy9CBwpy9G3WZPzxbcfwsc2ICu2Pzfrrzx3wXSMaVMEX/niyJJ9Tvv?=
- =?us-ascii?Q?VK71JwMFta5qwPi1dnDQlvoQrHkJ8U07tFBSjNIb?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 85a76ba1-93ed-463a-fd0b-08ddea267a8a
-X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB7790.eurprd04.prod.outlook.com
+	=?us-ascii?Q?peUbMq4RiF06Tr0CiPGxw1qCYAZ4JE4Rip2592JVbXisEQIHVUtsZfYY0O3g?=
+ =?us-ascii?Q?Nbi8t1rHXYlFcrzYHAb/+lgqJQdjnz4XSBhfjIcLC7flNvQvJfSGo4LukAUJ?=
+ =?us-ascii?Q?WXXZ8BB3T0KNfz0SJHeqN160YptFmDGx05conyakPRAwI8YiiBH+e0S1RtWp?=
+ =?us-ascii?Q?0YJLBCWvCGQTzY15gYb/0k8vMdiJgC8Chtu3usWLPahgmdNUfj3r5TsW3S7s?=
+ =?us-ascii?Q?TMmi/F9f317qizd6OTNAMLuqXdv4QAr0I1WjrVeVPg8BXuqJLMYSd/k0DKXC?=
+ =?us-ascii?Q?wK6sOvTkLQU3z+SO72z9b6BCcMmWjwzYFyUcah0q2NF9GhX0GzMU/qGFX3Qw?=
+ =?us-ascii?Q?KXrl7XfOlhlNWyjOCLXQWoeTbnuYw+kTbzc/U4JUZLjvjdGx3OkbVyH0o2gd?=
+ =?us-ascii?Q?KeOmY7ioIBkTZIDduU2A4MB8rNCJQsZVZreaXl91w761iUwPiA8bko8ih62F?=
+ =?us-ascii?Q?phPKZbQfmanLr82YeAElwKgqM/MFmtDmYBnYtLQ61BiGuafVJtxX3YRaGmiu?=
+ =?us-ascii?Q?vKu2zXoYur2FTI3EC+JH9OYbpESDqfAxacam/BtUtNXOgXlqOHG6T2AM0aqk?=
+ =?us-ascii?Q?nNwigfR0RVZkQZrLr7wHJ0QBbzhf6BpG0+4XH0rGC5VBVY/vIdGVl8ShtxkZ?=
+ =?us-ascii?Q?Xvn+f0wUgItryCPtH++qGb8Kidkm2UDKT/pFGh/cbF5QPyhlX55kQTao+zJQ?=
+ =?us-ascii?Q?Q40ICKEOo8kFc+uDJdG1ls2XlKP3RZQYoxr5aykhmsc3e9u/HYPcgIPTPhfd?=
+ =?us-ascii?Q?p5v04+9+BIntGqRM5RP+5Ydz4mu6eDP5RV9/tp3+OEgU0/7Bw4vEWW5OgnZ+?=
+ =?us-ascii?Q?NwsHxubrozxqtXSntC+GWhVCr3SnG45Ox46shPaw2qknhIxH/H5uN/Y/shJ1?=
+ =?us-ascii?Q?5rlQUfSnl/1615HHa+j7PE6S+FeKvofTeb2g+SKlsBmtvGh6AQhDJuAbJYid?=
+ =?us-ascii?Q?e1mpDwziwu8gCDtYcuPlF+cFgK0v2WI7j6DK9M4B7f3mRtPjKYkUI/NpPyoP?=
+ =?us-ascii?Q?0TcAe6sOjOMlwBPDBB4FjyqmCS4myaXjCSgU8xCOoULvJdOyZTova61xqxzv?=
+ =?us-ascii?Q?ONPp/bcW/rJCcm2l0ROiYvmE0PyoDeYH2E+iXqGOvqOQ1KlsIbRUHoDVEXAb?=
+ =?us-ascii?Q?25TkUQvcSZ0QzZj4fIUV1npwGCy5ry2+z20M3RbqFxCaBeS3uqFHm4huJ+yR?=
+ =?us-ascii?Q?WN5L7dnYXtdca9TF5L+TSTQnb2qy/DgrxRJrH+PozLXsXdzF2YTVLXwNi1Ia?=
+ =?us-ascii?Q?T132sY3E5B6GVgt0iRzFiZDC7oobBHM2qM6tGcFu877vwUfmxeAci5MyX79J?=
+ =?us-ascii?Q?yrLlpMmtMomskHe59OxzDY+1mDAsKq2l6WLiVLBKMGzLPsZOBTGoBOId7qGO?=
+ =?us-ascii?Q?QkZ6c2cC7N6f3jsS1KS0mqLAjQCV34UIiC5TkmuApDfsMjOJZbaEfk3qAcxB?=
+ =?us-ascii?Q?TpVYUyKqhc9n/cJ6W3poQYILuXJAKPHBzvnpC/hMfXCALWsZrHLp8IKVYikI?=
+ =?us-ascii?Q?jv6jJbNJZ+X2qmm/nZo/vgaltszEMVFtGGYkLWOD74Fm++IHqJ+UMsa1S79A?=
+ =?us-ascii?Q?346HZRtvLgV/CGqLcrw=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 01a9de13-d6bc-4dfb-b4dd-08ddea2885c9
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2025 13:41:54.4667
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2025 13:56:32.2892
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PVUT51Y9qHR5hI50BQSMkcL+/u4lLnBBKho/KVW3UFwcnMuYMrRh4K2u5sjnwLWDyDoVsV1vOBqxzoA3Ytrxqw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB7170
+X-MS-Exchange-CrossTenant-UserPrincipalName: klOm1aGan93SlRl9aKgxg5c6OASPI3rGOU5yAH8eIcyafXPbq9a0oo+W6fIHZTL+
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5627
 
-Problem description
-===================
+On Mon, Sep 01, 2025 at 11:57:21AM +0530, Abhijit Gangurde wrote:
+> 
+> On 8/26/25 21:22, Jason Gunthorpe wrote:
+> > On Thu, Aug 14, 2025 at 11:08:46AM +0530, Abhijit Gangurde wrote:
+> > > This patchset introduces an RDMA driver for the AMD Pensando adapter.
+> > > An AMD Pensando Ethernet device with RDMA capabilities extends its
+> > > functionality through an auxiliary device.
+> > It looks in pretty good enough shape now, what is your plan for
+> > merging this?  Will you do a shared branch or do you just want to have
+> > it all go through rdma? Is the netdev side ack'd?
+> > 
+> > Jason
+> 
+> I'm happy for the patches to go through the RDMA tree.
 
-Lockdep reports a possible circular locking dependency (AB/BA) between
-&pl->state_mutex and &phy->lock, as follows.
+You will respin it with the little changes then?
 
-phylink_resolve() // acquires &pl->state_mutex
--> phylink_major_config()
-   -> phy_config_inband() // acquires &pl->phydev->lock
-
-whereas all the other call sites where &pl->state_mutex and
-&pl->phydev->lock have the locking scheme reversed. Everywhere else,
-&pl->phydev->lock is acquired at the top level, and &pl->state_mutex at
-the lower level. A clear example is phylink_bringup_phy().
-
-The outlier is the newly introduced phy_config_inband() and the existing
-lock order is the correct one. To understand why it cannot be the other
-way around, it is sufficient to consider phylink_phy_change(), phylink's
-callback from the PHY device's phy->phy_link_change() virtual method,
-invoked by the PHY state machine.
-
-phy_link_up() and phy_link_down(), the (indirect) callers of
-phylink_phy_change(), are called with &phydev->lock acquired.
-Then phylink_phy_change() acquires its own &pl->state_mutex, to
-serialize changes made to its pl->phy_state and pl->link_config.
-So all other instances of &pl->state_mutex and &phydev->lock must be
-consistent with this order.
-
-Problem impact
-==============
-
-I think the kernel runs a serious deadlock risk if an existing
-phylink_resolve() thread, which results in a phy_config_inband() call,
-is concurrent with a phy_link_up() or phy_link_down() call, which will
-deadlock on &pl->state_mutex in phylink_phy_change(). Practically
-speaking, the impact may be limited by the slow speed of the medium
-auto-negotiation protocol, which makes it unlikely for the current state
-to still be unresolved when a new one is detected, but I think the
-problem is there. Nonetheless, the problem was discovered using lockdep.
-
-Proposed solution
-=================
-
-Practically speaking, the phy_config_inband() requirement of having
-phydev->lock acquired must transfer to the caller (phylink is the only
-caller). There, it must bubble up until immediately before
-&pl->state_mutex is acquired, for the cases where that takes place.
-
-Solution details, considerations, notes
-=======================================
-
-This is the phy_config_inband() call graph:
-
-                          sfp_upstream_ops :: connect_phy()
-                          |
-                          v
-                          phylink_sfp_connect_phy()
-                          |
-                          v
-                          phylink_sfp_config_phy()
-                          |
-                          |   sfp_upstream_ops :: module_insert()
-                          |   |
-                          |   v
-                          |   phylink_sfp_module_insert()
-                          |   |
-                          |   |   sfp_upstream_ops :: module_start()
-                          |   |   |
-                          |   |   v
-                          |   |   phylink_sfp_module_start()
-                          |   |   |
-                          |   v   v
-                          |   phylink_sfp_config_optical()
- phylink_start()          |   |
-   |   phylink_resume()   v   v
-   |   |  phylink_sfp_set_config()
-   |   |  |
-   v   v  v
- phylink_mac_initial_config()
-   |   phylink_resolve()
-   |   |  phylink_ethtool_ksettings_set()
-   v   v  v
-   phylink_major_config()
-            |
-            v
-    phy_config_inband()
-
-phylink_major_config() caller #1, phylink_mac_initial_config(), does not
-acquire &pl->state_mutex nor do its callers. It must acquire
-&pl->phydev->lock prior to calling phylink_major_config().
-
-phylink_major_config() caller #2, phylink_resolve() acquires
-&pl->state_mutex, thus also needs to acquire &pl->phydev->lock.
-
-phylink_major_config() caller #3, phylink_ethtool_ksettings_set(), is
-completely uninteresting, because it only calls phylink_major_config()
-if pl->phydev is NULL (otherwise it calls phy_ethtool_ksettings_set()).
-We need to change nothing there.
-
-Fixes: 5fd0f1a02e75 ("net: phylink: add negotiation of in-band capabilities")
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
----
- drivers/net/phy/phy.c     | 12 ++++--------
- drivers/net/phy/phylink.c | 14 ++++++++++++--
- 2 files changed, 16 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-index 13df28445f02..c02da57a4da5 100644
---- a/drivers/net/phy/phy.c
-+++ b/drivers/net/phy/phy.c
-@@ -1065,23 +1065,19 @@ EXPORT_SYMBOL_GPL(phy_inband_caps);
-  */
- int phy_config_inband(struct phy_device *phydev, unsigned int modes)
- {
--	int err;
-+	lockdep_assert_held(&phydev->lock);
- 
- 	if (!!(modes & LINK_INBAND_DISABLE) +
- 	    !!(modes & LINK_INBAND_ENABLE) +
- 	    !!(modes & LINK_INBAND_BYPASS) != 1)
- 		return -EINVAL;
- 
--	mutex_lock(&phydev->lock);
- 	if (!phydev->drv)
--		err = -EIO;
-+		return -EIO;
- 	else if (!phydev->drv->config_inband)
--		err = -EOPNOTSUPP;
--	else
--		err = phydev->drv->config_inband(phydev, modes);
--	mutex_unlock(&phydev->lock);
-+		return -EOPNOTSUPP;
- 
--	return err;
-+	return phydev->drv->config_inband(phydev, modes);
- }
- EXPORT_SYMBOL(phy_config_inband);
- 
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index c7f867b361dd..350905928d46 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -1423,6 +1423,7 @@ static void phylink_get_fixed_state(struct phylink *pl,
- static void phylink_mac_initial_config(struct phylink *pl, bool force_restart)
- {
- 	struct phylink_link_state link_state;
-+	struct phy_device *phy = pl->phydev;
- 
- 	switch (pl->req_link_an_mode) {
- 	case MLO_AN_PHY:
-@@ -1446,7 +1447,11 @@ static void phylink_mac_initial_config(struct phylink *pl, bool force_restart)
- 	link_state.link = false;
- 
- 	phylink_apply_manual_flow(pl, &link_state);
-+	if (phy)
-+		mutex_lock(&phy->lock);
- 	phylink_major_config(pl, force_restart, &link_state);
-+	if (phy)
-+		mutex_unlock(&phy->lock);
- }
- 
- static const char *phylink_pause_to_str(int pause)
-@@ -1580,10 +1585,13 @@ static void phylink_resolve(struct work_struct *w)
- {
- 	struct phylink *pl = container_of(w, struct phylink, resolve);
- 	struct phylink_link_state link_state;
-+	struct phy_device *phy = pl->phydev;
- 	bool mac_config = false;
- 	bool retrigger = false;
- 	bool cur_link_state;
- 
-+	if (phy)
-+		mutex_lock(&phy->lock);
- 	mutex_lock(&pl->state_mutex);
- 	cur_link_state = phylink_link_is_up(pl);
- 
-@@ -1617,11 +1625,11 @@ static void phylink_resolve(struct work_struct *w)
- 		/* If we have a phy, the "up" state is the union of both the
- 		 * PHY and the MAC
- 		 */
--		if (pl->phydev)
-+		if (phy)
- 			link_state.link &= pl->phy_state.link;
- 
- 		/* Only update if the PHY link is up */
--		if (pl->phydev && pl->phy_state.link) {
-+		if (phy && pl->phy_state.link) {
- 			/* If the interface has changed, force a link down
- 			 * event if the link isn't already down, and re-resolve.
- 			 */
-@@ -1685,6 +1693,8 @@ static void phylink_resolve(struct work_struct *w)
- 		queue_work(system_power_efficient_wq, &pl->resolve);
- 	}
- 	mutex_unlock(&pl->state_mutex);
-+	if (phy)
-+		mutex_unlock(&phy->lock);
- }
- 
- static void phylink_run_resolve(struct phylink *pl)
--- 
-2.34.1
-
+Thanks,
+Jason
 
