@@ -1,230 +1,173 @@
-Return-Path: <netdev+bounces-219216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B25D6B4085F
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 17:03:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCE09B4085B
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 17:03:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65C373A4238
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 15:03:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F3C73A255D
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 15:03:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04F732E0402;
-	Tue,  2 Sep 2025 15:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D6022E7F1C;
+	Tue,  2 Sep 2025 15:02:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q5t1J8OR"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="DXfEqtmR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012027.outbound.protection.outlook.com [52.101.66.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 258CC1DE2A0;
-	Tue,  2 Sep 2025 15:03:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756825386; cv=none; b=ZHVt0xFGBEmaUBGiJ+8HKOlqj4KnuQlkHJchsYxWXxD5h3c3Wzbg0OFyjsMW8qjYN3J+jpW0xCBq1lvfooRsQxY6je9iLXAEQGmdfD70RsNZasKPPLcf1xkxxJBCRj0jJuourWRKYyf+qZBQU/G0eqHYJSD0WChkJth5YPeiPcA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756825386; c=relaxed/simple;
-	bh=nCJi32g+2XrXf+4mA4uBGNHiEBbBcgVatkU/fgKodc4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=u/XFwX+d69mrHYm5Bgsu6npTYvyhQwmg5g3ZRcC9sxOgKVtLHEwCXnMF5PBnLLP4us/ienyHvI2MKxKxuVxHUUGAoOo2NoBcJadtEpOI+238/zhEwCc0N9XnUSfStgbejNofD05w6BanAFf41WILETU60i9gx50EXibnRjQY92I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q5t1J8OR; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-45b79ec2fbeso37292825e9.3;
-        Tue, 02 Sep 2025 08:03:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756825383; x=1757430183; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+q+6KxQjNGlpDK0FwgWdmK7uwlAylATpqLWZsT8oVn8=;
-        b=Q5t1J8OR+52N94vE+ORBrOOkd5Tgurd+Cy6bHC7koEmNWwzvRE9fJK+LzWZz+hLIqU
-         xgKjcc3mKdKvIkhibxs2e7Nyuhj/SA8ZEBERDSgz3K4A3DXRuXKNoJbjfp7uSl00aTnL
-         Cp0oRBR2bG6Ru3uFVK5ZklQcVr+Lx6igAC++4TgZ1bp5AL9QNJtbwM2m0E3sORkbteVh
-         s7sKfW5NRYVG2FpDUaep4DWnhMKvfWffcnzXmuFYPXTQYhKK6+hwJid/rJKsuPZTFWt/
-         767Tb/yKaW+sJDAfdX0pNJTBWt/Rg7or5XJxecWu82xWB5TxaxIwZDFbYz+2+bKKLxER
-         8SCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756825383; x=1757430183;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+q+6KxQjNGlpDK0FwgWdmK7uwlAylATpqLWZsT8oVn8=;
-        b=d6z7bLrJZyQOQh+NiK8GaagyvgLPYqTtEESx/7YpdlFji/b0qjxqvs90YD8xrS0qKP
-         c2UJJ3Bo8nm/xquEXAWCU3+iQUheYnz5v8pMqNdPhWBNIGs2OcTQSiZZEUPV2LsRHn88
-         1Vxwc6IK+RCSoMzvXGNzGykSu+20wmDtfY/PubkccgCDMVSwZv6NqMHflg4sfiEJmX8N
-         naSDlx9OHivBMTZBsGJD+isGxzz4c8+vnVHOlcfBYhhOiNjRfSXmHSSMcV5+JKgm/eOa
-         tyv7npvBlqik2H4qL0Ct1y+0QratRIUIA1G/GQT/1aWHKDadX04Cz1gJhkkiZLJcjcnp
-         p4Zg==
-X-Forwarded-Encrypted: i=1; AJvYcCXGX4hPCI4E82m1LfUwNT1SysMUbuu6rGEv/sxWzHcx2BkG3j/fDL720FI51xQn5cvkg3VObHs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzk7JEKOm3k+8ZKAe4SDSN1mdTg5I73xn+ZVAM4msxrCbuKQ8/h
-	fSrAyWAJrvv68ri7eEcke8ZkZ7LPSbtjVj1ocwiH6wkWYUcPxo+JEMq9uQRR6/0b
-X-Gm-Gg: ASbGnctMvO3chagpj5DX1ZuVqsgiMT4rtls2Lj6CZtwKF4sop3BDl/0Nz02uh+IYlVI
-	YHfFd+MIWTfs1xM/1PFnJzbb6NoBW2BIkPO3gGdmNEpll1tKA1C7EaohfY7eg0qPNHy0SyIZskw
-	LY4YDaWjycS76I0yHuJe3RgstzRR99b+4wlX2vAhaxMoqIM/EogeiFYXd5LaXI7FZETBtSx5k+Q
-	WG6X7Bpws2Je1udbKgmwnNMuUg/0qEMzhwYK3+zraRsPEf8q+bsEFxHffpIK76W+X9EYGnJq6CD
-	ZtD0wPBtIv14xtCEvj8Zv4PYWa4d0k39kRAd0dRw/CU7DraRrcLhVCFoRJji36rfsdi0QAG9P3h
-	a8l4o7sf+v2eOCFJzSf0LQPsPv3lo2XFvKOE=
-X-Google-Smtp-Source: AGHT+IG6qIR7Mz9ze8kV0dkEjDHFLIMXTiO/mwGxOMslVTSOdM/NzgwnMM7o6oftyrIuL4bODH6MyQ==
-X-Received: by 2002:a05:600c:46c6:b0:45b:84b1:b409 with SMTP id 5b1f17b1804b1-45b855ad0b0mr120431005e9.30.1756825382991;
-        Tue, 02 Sep 2025 08:03:02 -0700 (PDT)
-Received: from oscar-xps.. ([79.127.164.81])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b7a938e75sm134978505e9.4.2025.09.02.08.02.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Sep 2025 08:03:02 -0700 (PDT)
-From: Oscar Maes <oscmaes92@gmail.com>
-To: netdev@vger.kernel.org,
-	bacs@librecast.net,
-	brett@librecast.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	stable@vger.kernel.org,
-	Oscar Maes <oscmaes92@gmail.com>
-Subject: [PATCH net v5] selftests: net: add test for destination in broadcast packets
-Date: Tue,  2 Sep 2025 17:02:40 +0200
-Message-Id: <20250902150240.4272-1-oscmaes92@gmail.com>
-X-Mailer: git-send-email 2.39.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 324ED1DE2A0;
+	Tue,  2 Sep 2025 15:02:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.27
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756825377; cv=fail; b=fEBL6iPcej35dVa4YO+qa6qZThTBz0B/QPlWcC5E757WDpxca2wnsXZuxHU2dwlkLmk6+aPKr3dS1oFwiBCbTMKt7//7mpJCNsKeAtrGmMdN/Cgbk/64oZ8uTKrRw1gCQPOLKxEQF9wiSVupYKmg2FQMcBNMqVU7kt5gEJno1Ts=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756825377; c=relaxed/simple;
+	bh=sE7jMmxYZmTI71P5FEeBiNx4aoz7cjFBhH5Y8UfmhVQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=rWLolwICHryOa41ZWqJiRFK9Ta9C36HNYPpBARpG9xoyFudGgqS5lg1Ako9dxePoIgQ6w7qY3MAe+0rKZhgJ/C5INZgZCSDMtK9bTHQR93omVxabHruMabMJQCYtYQCLr+ju78N1O2UJaO51u6yIZLwc81hGtgSi/R7jp+ivN9U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=DXfEqtmR; arc=fail smtp.client-ip=52.101.66.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=MF1/LNbhgohWvBvLZrgYclAsYoUpfbvOg8u418eaiW/K8hJJWvuGQ1QKiqhR5+ng8ZPK5GSRip3rHwSh6dX2BPkIE9e3Z6O2S7fLw463amjYhZCvBhToinKYa83Ht2vcI4IgiAXSuQMgmudM4/GXufQDeyrWzmmpOsCqnWup9cjJgJutGBtVm8RkfPwvKT3AhqrN5//+j0bPwEdTd75VpCeBB4g7pIj2MpOSXCdB2BDoJI3w1fMdHzalJIqYeW4ov6DBC9S/nTXmQioq+YRgW4hddotxMf8OL9hl92kQ2Sa1Vmya18hc9tYXjSUjUmOpthIwk/OK5QB4TAqXVaAg/g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sE7jMmxYZmTI71P5FEeBiNx4aoz7cjFBhH5Y8UfmhVQ=;
+ b=ZIDFWUyPdWd3knLQvcANtD1Kttuh3mv26PzbI/1cwrbNaBAGP1XEQvAVRpbrR+YwtagI4+tuJrOzJVdC2VXSjZfh5FO1P/GTTJpg/OT10xe2ps3w61TiqPslo2G6qavK9i4UiOnaxmeqm2Tqjp1gjhrGOYSUV96OzVNWvFKopGLStOf4X7pvA4ZiU5VG8MxkfXbUmiOoHNDtXEsrv3hDfbsDy1WCdKEh+WaC4hAcfy516J+YPFKLYvt+bY+0QDoekYB9SiswxXGlRQralqtaI2ivZeFteqweouyhyMP06sOjhOVGYyUgC18LApOnzgBCHbcDtE1AEn9kCGdsZcgQ9g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sE7jMmxYZmTI71P5FEeBiNx4aoz7cjFBhH5Y8UfmhVQ=;
+ b=DXfEqtmReQoaWzoc83Lu5RQ81/QDRR5y7lXCpueo4YbH9mlr5TZk+A7sdr/QFzHY2BpbYZ1X6W279ll4eTra45e88LEPD9o6owf03B4IIsEYZaM4fYLr+56VFbiAmyaXocf5bHqHsJCAskI7QrOloAQ7Gp1AapHoHPXixIVzTXkRISq1PrpFSRr5C7soyMZQlPOVH+NExLowAzfO+ioHRWqRG6ILfSu4KAstqsKcxPLa0EROM0krp7XGg6D2nP8tXzEEpWv/8/GhQW598D3ozV1mxasavXLTRSz+WUWOQIRooMpbMKnIGiIdHvfPa+zU2K/xRWQstWoO/QwyKazSeQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PA4PR04MB7790.eurprd04.prod.outlook.com (2603:10a6:102:cc::8)
+ by PAXPR04MB8256.eurprd04.prod.outlook.com (2603:10a6:102:1c6::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.12; Tue, 2 Sep
+ 2025 15:02:52 +0000
+Received: from PA4PR04MB7790.eurprd04.prod.outlook.com
+ ([fe80::6861:40f7:98b3:c2bc]) by PA4PR04MB7790.eurprd04.prod.outlook.com
+ ([fe80::6861:40f7:98b3:c2bc%4]) with mapi id 15.20.9094.015; Tue, 2 Sep 2025
+ 15:02:52 +0000
+Date: Tue, 2 Sep 2025 18:02:49 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH net] net: phy: transfer phy_config_inband() locking
+ responsibility to phylink
+Message-ID: <20250902150249.sihr23f6w5p37mpr@skbuf>
+References: <20250902134141.2430896-1-vladimir.oltean@nxp.com>
+ <aLb6puGVzR29GpPx@shell.armlinux.org.uk>
+ <20250902144241.avfiqpmqy7xhlwqa@skbuf>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250902144241.avfiqpmqy7xhlwqa@skbuf>
+X-ClientProxiedBy: BE1P281CA0213.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:88::18) To PA4PR04MB7790.eurprd04.prod.outlook.com
+ (2603:10a6:102:cc::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PA4PR04MB7790:EE_|PAXPR04MB8256:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0ff3d54e-2435-4227-f82c-08ddea31ca64
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|10070799003|376014|366016|19092799006;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?ro0pCp9eGcBmDZBLHGLxfw8aPaaHRP8MPFuxwViMcLtizuLCqEuWhf+1s22a?=
+ =?us-ascii?Q?Bf1lt6wbslRLgugGekU980oFMSRZ0MUGjVXWh7JwCBYVW364Upx+exVdheZd?=
+ =?us-ascii?Q?sJSUBrV13HoUDhwRp2NSZX6JTyqRJf0V7d+AlpHi107VppojTiCI4RNEUoeC?=
+ =?us-ascii?Q?Ibt7v1TYmY+FNmd9ba3s3oWi3i0OC6RpTrP7FjZbEebgXEAuo724qi3x2kyZ?=
+ =?us-ascii?Q?06P1mhbuL2BWfcmgq6kExQlO3RvZnAbxxnZHEccTeITyS46XaBnq7J0FLxug?=
+ =?us-ascii?Q?9CKnMaz7LvqNSnltzGKtw91xiBYsPGy9hUiUnMrZij2WtOqYOTjadD7w5wol?=
+ =?us-ascii?Q?SDqbCTvkpNHYslda3p5GyiRpSPaUN1KPgtWubq1Ao9LJ0/Ms4ZVoaPEn9Z8C?=
+ =?us-ascii?Q?7uU5jtrlAPEVEXuL1UFVAeRPvwgVxg8cGjMSE+O8zFqNend80titCk7iZmaf?=
+ =?us-ascii?Q?ZV5UABGDOvvdBpGWPkydBbYQaPcF8wGNprJeXa8ZwlTQHsAyZhY929WW2j8L?=
+ =?us-ascii?Q?c/ILrdogEuSExzs2QJASCN3oDlox90VPRLh6aCNMdLCnaLbQGbmG0KuSvE8Y?=
+ =?us-ascii?Q?pscWUpXGA9ZdNKhTRu0Knrtr864/aCkjmH/uB7VA9jBu1c0ttCKBadgyZvhx?=
+ =?us-ascii?Q?ClUsnXA5bAd7rAmfcCG607wS4dWFXYYg+fenU1VscDydlTYwTLy2mMwFlnCn?=
+ =?us-ascii?Q?9COxKbP8ZfA7559N70rstqlJRWK+vUT+00brjM/Np2marXqzXg286vx3xZCP?=
+ =?us-ascii?Q?Q+g3HS/+K4D2RbMkaREXchM6X7+6pvjCBQyKN/4+hLVQLbTRYzqwYpZdf6Tj?=
+ =?us-ascii?Q?1GTOxf+zZl/KU9VtDMWSrfUdE9W8a3nquLhHWvrRjl42hyb6CgVMNR/NPmJc?=
+ =?us-ascii?Q?8FbcLd02X/gTLju8jUdzkpy294SInlWAsE5td3XrLb2TKk23NODQJtGJZKtQ?=
+ =?us-ascii?Q?5QXOgs11wBUA6aIez/kasNZkplpxCX5MysgCTLP11n1HiwGMckxGhRI+lraW?=
+ =?us-ascii?Q?I+WR1sOGfmwMxR2hY47jC7VfvpHbbveMyAU6Ydr8KNnLPDty9VjGhjzsm+Py?=
+ =?us-ascii?Q?cQv4E2+H4flinTk5/5PD/0zrstDN1OWrEppq4u6IVtoS8KQdS8fED9jgdGGR?=
+ =?us-ascii?Q?w94C8jKgjjzHXdkx0egYkWebYwE8pxvqP8D+/OonqB/py0bj5rM9gbJ9HdQA?=
+ =?us-ascii?Q?mCQoBoueit32bu5W0Qcc6GKd+OTs503SduIFfzZ+WFRETQINY15RKkwxlvF6?=
+ =?us-ascii?Q?N9yFMhI+NHjIU3Pu6awbR9UUNqtb+zvxbdR+daXn7HfcfjaM4p0jfyMc4vqg?=
+ =?us-ascii?Q?lgpxBiCQhke1SaocNKBpSbzGA9ZfJpb2K7tr+DeAjo5JAFjyHB5SEbaZ/TRw?=
+ =?us-ascii?Q?WUYARSVLnaLVOdnVxcR4xPh2ViFl9tzFrNjLpDNje97JsAhVfS3/M5TNv7Td?=
+ =?us-ascii?Q?zOROXUNYw3I=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB7790.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(10070799003)(376014)(366016)(19092799006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?QxSRx3Y2YJ4Amr+rdA6xkvoud3VsohhAv9RI6e7sItVa1lA/XdN5H7rP1IIe?=
+ =?us-ascii?Q?fw8/MmUFj4lql0Otiu5K9P9fjLs4lq/AGFh463Cyw5upR3seSgQQJWweTXlK?=
+ =?us-ascii?Q?RxDJP5noLHSutHMHqtqTbdXAuHy8CWPv0Zy3lmRZOf92YdUC7hpoxR/ISq9J?=
+ =?us-ascii?Q?2ipflhDuyeNJnI4lAaOOLedN+T93qccPXa0y4ErpgHpIhmtj+le+QsA1IEWX?=
+ =?us-ascii?Q?RObFu+SHt021/c3y/WFfgGMVx4bJf0eMQascdHLGdMG4LYW2Bh2sOvbuoQsP?=
+ =?us-ascii?Q?nA6O2bhklHa2G3E2TSQXtwl0HxJ8KCm0W+fo2coYWdhAZ/nBEkJHzHy4Ck/J?=
+ =?us-ascii?Q?eZ57e8qNk6iZ72WQE3CxPhojQEW1tSi46EHGNt+mdhS6oh2IY6eRWk1eD2zL?=
+ =?us-ascii?Q?m16CUoAONUDrIpGPwy3Bw6+O7oYixTwZ687f0ohu/InAZduA/8PoOsYIKf3Z?=
+ =?us-ascii?Q?yN+ZAQ7zdBy0U81SA3HOrEJNSNAv82vqBA9i9DUx0O+rm2fTh436TANKWZMx?=
+ =?us-ascii?Q?F8OcInqxil07qpmkDd+lbUFnIUiY3ze6nrsWZl+Nomh0aPOMm47e7lz6Lg26?=
+ =?us-ascii?Q?gHS25sgHWsQed5xfSie6xIMYxRUiYuQ/dm56rBGSsznWzvoANDUNh5P74+0l?=
+ =?us-ascii?Q?VTCIFJzcQefw3lWwilcqdXoK/KkWC+n+NQkVQxp4+vTZbnMjwDEFqYUPatYr?=
+ =?us-ascii?Q?bVSTnS3IkxXy09gqX2quhg/DIsy58trqIUL3bQ35ITmU1cwJtJlNLbdnuV/s?=
+ =?us-ascii?Q?YKlVXwWO00LKV+bp3pJbqJxZW+3t+JqSlnwOrv6+HcJEPNLngGfHxJpb9XMU?=
+ =?us-ascii?Q?CTTjePKfblMxJs1q8XnwZoBxLshrWm0DMPfr69exQJn724Q2j304BkTUPhNG?=
+ =?us-ascii?Q?TdVbvKhAFreXtV2+lshnblbcENQvQp90SAQqh/6v1lTgU4k0Ig1brrf1eUv0?=
+ =?us-ascii?Q?PBGzTi2rhsUTshlBxeffX8tXP2bUgWxnikFMkjiEUV9Uz5IWEP3Wh2Udtz7R?=
+ =?us-ascii?Q?KnwSfBYIZJLB1J8gZy6eDO8qAcgoCSiH/HC68HiL3bGTr72VnbZA1OTmFVXg?=
+ =?us-ascii?Q?FAPQokoUI82pDxebs+xmo7fzxHAdNtePhUu7gR01Cnwx23ji96SXBvo46LF4?=
+ =?us-ascii?Q?5j4zQVvzvu6p06fdCRVbYV/R4NLrLDhp5x77hJ3WaTgxMHaHoKhh7v9DKrgO?=
+ =?us-ascii?Q?G0Tw8gVNVPr+ivqdqgo9tX78PXMFURpkgsaByy9pqdRYgaGs6R89s/JKAewe?=
+ =?us-ascii?Q?TYr9LSCi80UDIKKedb0EgwJsKUFnApbkA+BO6uvDSersCvG1HkddzyOFy5cB?=
+ =?us-ascii?Q?rJWPNz/u20ZEhxLOANtIxQshm4Q6z6LV4Fp1ZRYOIUgV4nfHu7GSzlV6CaWf?=
+ =?us-ascii?Q?pKf5L78SVg6hYo6/8/p9DAfVp8ZwYnUfmODo3/FodgsKdjZO+HBzSSdBCyH/?=
+ =?us-ascii?Q?OLw5YflIZ2Wen6BydKtdd2EuyayvKvwx+D/PPYBZ4EGCuZEd9boe76+Ebfd6?=
+ =?us-ascii?Q?8WHbegY1mGxqXxtXX9yrINDHhtpUVVpZ/Jc/sPRRUOhWtlwLxeD5dO5ndJgo?=
+ =?us-ascii?Q?lwJngwpmDxcGnx59nwJEBs1jbQUr2ic/ycw+dK8VwiknXNdSzJLKup+q5i6l?=
+ =?us-ascii?Q?x2a6WdxzYxwHcVsGJM6xGC/P25K5Sfha/fTEjFHcSgWNWvkgZGbteOUQ3Zui?=
+ =?us-ascii?Q?sRa7YQ=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0ff3d54e-2435-4227-f82c-08ddea31ca64
+X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB7790.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2025 15:02:52.7920
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Ps42Pyx8Coc7ehpDyr29Bb7SnVtRC5zPi2kB3OmWujPkP3yDJVSlZ7rK046uGbgicEpAVGh7b9oJNymWpYU/Wg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8256
 
-Add test to check the broadcast ethernet destination field is set
-correctly.
+On Tue, Sep 02, 2025 at 05:42:41PM +0300, Vladimir Oltean wrote:
+> Can we disable the resolver from phylink_sfp_disconnect_phy(), to offer
+> a similar guarantee that phylink_disconnect_phy() never runs with a
+> concurrent resolver?
 
-This test sends a broadcast ping, captures it using tcpdump and
-ensures that all bits of the 6 octet ethernet destination address
-are correctly set by examining the output capture file.
-
-Co-developed-by: Brett A C Sheffield <bacs@librecast.net>
-Signed-off-by: Brett A C Sheffield <bacs@librecast.net>
-Signed-off-by: Oscar Maes <oscmaes92@gmail.com>
----
-v4 -> v5:
- - Fixed Signed-off-by chain
-
-v3 -> v4:
- - Added Brett as co-author
- - Wait for tcpdump to bind using slowwait
-
-Links:
- - Discussion: https://lore.kernel.org/netdev/20250822165231.4353-4-bacs@librecast.net/
- - Previous version: https://lore.kernel.org/netdev/20250828114242.6433-1-oscmaes92@gmail.com/
-
-Thanks to Brett Sheffield for co-developing this selftest!
-
- tools/testing/selftests/net/Makefile          |  1 +
- .../selftests/net/broadcast_ether_dst.sh      | 83 +++++++++++++++++++
- 2 files changed, 84 insertions(+)
- create mode 100755 tools/testing/selftests/net/broadcast_ether_dst.sh
-
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index b31a71f2b372..56ad10ea6628 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -115,6 +115,7 @@ TEST_PROGS += skf_net_off.sh
- TEST_GEN_FILES += skf_net_off
- TEST_GEN_FILES += tfo
- TEST_PROGS += tfo_passive.sh
-+TEST_PROGS += broadcast_ether_dst.sh
- TEST_PROGS += broadcast_pmtu.sh
- TEST_PROGS += ipv6_force_forwarding.sh
- 
-diff --git a/tools/testing/selftests/net/broadcast_ether_dst.sh b/tools/testing/selftests/net/broadcast_ether_dst.sh
-new file mode 100755
-index 000000000000..334a7eca8a80
---- /dev/null
-+++ b/tools/testing/selftests/net/broadcast_ether_dst.sh
-@@ -0,0 +1,83 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Author: Brett A C Sheffield <bacs@librecast.net>
-+# Author: Oscar Maes <oscmaes92@gmail.com>
-+#
-+# Ensure destination ethernet field is correctly set for
-+# broadcast packets
-+
-+source lib.sh
-+
-+CLIENT_IP4="192.168.0.1"
-+GW_IP4="192.168.0.2"
-+
-+setup() {
-+	setup_ns CLIENT_NS SERVER_NS
-+
-+	ip -net "${SERVER_NS}" link add link1 type veth \
-+		peer name link0 netns "${CLIENT_NS}"
-+
-+	ip -net "${CLIENT_NS}" link set link0 up
-+	ip -net "${CLIENT_NS}" addr add "${CLIENT_IP4}"/24 dev link0
-+
-+	ip -net "${SERVER_NS}" link set link1 up
-+
-+	ip -net "${CLIENT_NS}" route add default via "${GW_IP4}"
-+	ip netns exec "${CLIENT_NS}" arp -s "${GW_IP4}" 00:11:22:33:44:55
-+}
-+
-+cleanup() {
-+	rm -f "${CAPFILE}" "${OUTPUT}"
-+	ip -net "${SERVER_NS}" link del link1
-+	cleanup_ns "${CLIENT_NS}" "${SERVER_NS}"
-+}
-+
-+test_broadcast_ether_dst() {
-+	local rc=0
-+	CAPFILE=$(mktemp -u cap.XXXXXXXXXX)
-+	OUTPUT=$(mktemp -u out.XXXXXXXXXX)
-+
-+	echo "Testing ethernet broadcast destination"
-+
-+	# start tcpdump listening for icmp
-+	# tcpdump will exit after receiving a single packet
-+	# timeout will kill tcpdump if it is still running after 2s
-+	timeout 2s ip netns exec "${CLIENT_NS}" \
-+		tcpdump -i link0 -c 1 -w "${CAPFILE}" icmp &> "${OUTPUT}" &
-+	pid=$!
-+	slowwait 1 grep -qs "listening" "${OUTPUT}"
-+
-+	# send broadcast ping
-+	ip netns exec "${CLIENT_NS}" \
-+		ping -W0.01 -c1 -b 255.255.255.255 &> /dev/null
-+
-+	# wait for tcpdump for exit after receiving packet
-+	wait "${pid}"
-+
-+	# compare ethernet destination field to ff:ff:ff:ff:ff:ff
-+	ether_dst=$(tcpdump -r "${CAPFILE}" -tnne 2>/dev/null | \
-+			awk '{sub(/,/,"",$3); print $3}')
-+	if [[ "${ether_dst}" == "ff:ff:ff:ff:ff:ff" ]]; then
-+		echo "[ OK ]"
-+		rc="${ksft_pass}"
-+	else
-+		echo "[FAIL] expected dst ether addr to be ff:ff:ff:ff:ff:ff," \
-+			"got ${ether_dst}"
-+		rc="${ksft_fail}"
-+	fi
-+
-+	return "${rc}"
-+}
-+
-+if [ ! -x "$(command -v tcpdump)" ]; then
-+	echo "SKIP: Could not run test without tcpdump tool"
-+	exit "${ksft_skip}"
-+fi
-+
-+trap cleanup EXIT
-+
-+setup
-+test_broadcast_ether_dst
-+
-+exit $?
--- 
-2.39.5
-
+Hmm, I now noticed phylink_sfp_link_down() which does disable the
+resolver already. I need to test/understand whether the SFP state
+machine ever calls sfp_remove_phy() without a prior sfp_link_down(), if
+the link was up.
 
