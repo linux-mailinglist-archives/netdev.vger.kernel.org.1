@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-219332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28F4BB4101B
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 00:41:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19B20B41042
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 00:45:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F7C91B25903
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 22:41:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21E73174F0F
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 22:45:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C057A275B1B;
-	Tue,  2 Sep 2025 22:41:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD1D3278E63;
+	Tue,  2 Sep 2025 22:44:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BugSlYTP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dle3fUTO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36E8F20E00B;
-	Tue,  2 Sep 2025 22:41:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A512773CB;
+	Tue,  2 Sep 2025 22:44:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756852879; cv=none; b=fr/4dHEMa+yu5ONKmQZqEnms/D/JyQKrCwo4JxQTkUPafTTbxoK6Pd/Yrx09eUEoCIjTuvT6HmWNC7uSJJoYRxfzXCQpEhxb6/BP7J+ezlJNFFyDTlbtHL4gRwLR80V8OSoW3HZoPkEjaVSmiCy+XmvdJdl1aRCV1jQAD9eGAOI=
+	t=1756853060; cv=none; b=bKLnz6FP/HBjm5XXuU+3phz0LcDHrlP3QfOhy3Zgfw1vUIN7kZNsZ7lDRzLcyE5oPZtvjq6s4tloam0MtVk6n408tteYUDX1OFnxq8j2JSNGgFYkKIbCsLjYvas1CfeoMQ2j7bCGrdxkdYtu6HeC4HfaWMJjLySKx5tQw9ZsKgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756852879; c=relaxed/simple;
-	bh=v4Fil2zNyhzEn8Y/gdgAfMokXDb53dQ2oSj4wy3BVhM=;
+	s=arc-20240116; t=1756853060; c=relaxed/simple;
+	bh=pDElXPlxysNWbmacgYCCIjzT8CBnCZxPfNk0jsnb1do=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=nVBa4cdcOjQEs8tPu7sxKQae3Fh6Ty7CFDxZ+lHHuRqC7ZFsRm6D5yI0cZDFpbtXGOyTz6Ivw5W6006QggNXMNUzjq3SQP1JwRAM7M4zEL/tGxr90+1y4UEmcCXSIZ4YRd/z/JpRIlCgY8xWhT0L9WwVBOCnpxt6bXuLBLNHK+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BugSlYTP; arc=none smtp.client-ip=209.85.217.53
+	 Mime-Version:Content-Type; b=YHHKyR+UADrun4Co+cc7FmbLruMTApeA5+kcrzG/KIRXWdvISlP1p9ncG3T3yFUdKbs8eVjt+1g3F+yyxqPXXLh7DTPkqU+F0jb1ODycwK+KbAX0UA/dK1OhCOwkcgo6+WQ0dlGAB70OGN8yDgsaTLy5av4x7mczkUvLhmcljzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dle3fUTO; arc=none smtp.client-ip=209.85.221.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f53.google.com with SMTP id ada2fe7eead31-52a8b815a8aso1787415137.3;
-        Tue, 02 Sep 2025 15:41:16 -0700 (PDT)
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-544a6597c82so1597632e0c.1;
+        Tue, 02 Sep 2025 15:44:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756852876; x=1757457676; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1756853058; x=1757457858; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5QBseKVhIOD7rddztwEAR/sKg97wfiErirFVx2pC+y8=;
-        b=BugSlYTPPYx8cYryDX2dTbzPUmqhhSeGNx5O09uUnwRU0Di8HYBqqhLgFmZU6sn2Pd
-         nNZzRf1bCgFEXGMm8MJfN3pnVhbM12t+e4jU3cnGP3gDabGYEQ5MCO2ibg56I6nDwadu
-         rkJWgSvd6Y/ulyFmZgN8d0vDHdi4/UE1qALEzNt/mwm8Eg5lL7B85N71s/8pf3OKmgPq
-         qmTx12BsafvVQoJKrnQfTN3RcZl++ClvmMWHvdyE9SNKR9Mr1Ysw1HJ7VuoSwA67jujb
-         Ns34bOOnGa63fjny64aadgtauwZzr1v4GQ5T0ueYE8pQ1meIYucu4pCb3LOEtTc2BUOz
-         YMMg==
+        bh=SSjF4T1Hwo77xpCNosIzPOB627gBX9Y5QCHwTlQLO+c=;
+        b=Dle3fUTOpfUZRLioRPsXjPKlaHgo/EQrCLAhFBYovEe5LiIrlWIp3PjPJH8BdCL/T1
+         Xwy9qopvKHzjXHMwJxJE3JKuAkP9/2Mj9P7fUja8h/fgDMa7QD7r7cJ59KsqX0f6YtBE
+         lvEQ2kgQwt92uITaNaTgyyvgZt2a6Hx83eHtg0wBjTV2dVo1mPxZxeyu6wGQlqfAw00A
+         y8qprpx4l2k8mABHNJEn4X9EXMg3v6LR7QiB+JTUwreZ9e7Jz66UJZDxeapXAz7oSVmL
+         2za1l6LTnJD7+WyPW5mWDBRmC3iLXKts0TbR8lJ8TpG7wfL49ntAdOxoSZX/ydZa7+t6
+         nrVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756852876; x=1757457676;
+        d=1e100.net; s=20230601; t=1756853058; x=1757457858;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=5QBseKVhIOD7rddztwEAR/sKg97wfiErirFVx2pC+y8=;
-        b=GmG9rQlwNbBvupQNMnViRUzesMLHtOOEaSZs7okFqXXWbtrDfT2djmp0O+nenICgx/
-         NcMNA06n+stHaHSs8/JSnST7rpRy2N/hJqo3e3iAPctaoHO449vHRQoitTE4s/XvvNmc
-         5H6z9Z9C+UUFRc5yuyB848keCU9pOfZgN8gZX3xmLmmnN1x8ZU8pflry8BhX1n84yDYF
-         On/ZRTKmBH0BCFSTpF67EYD74AWBU4Hm1tXjQ/0yprioM695wsuJOKd6PTl49c5C3DsS
-         llZCHme1J0x/uQ5m/dc9/GlZtu5/6+fH9HA4OOCRo2S0gCoQLNbC7Wma69SvgXING38R
-         iseA==
-X-Forwarded-Encrypted: i=1; AJvYcCW9YsGdoy3ZnXNPFu/h9ybfj1CEmYl4KTgnTMJ8WXkeqOi2ELHxh8/93p7HHvy+Bg3fWPgT2cMoNNaVuUI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7xvDycURQv4IhKp6p+GoRaCCyts4Fu+W0DgeVciwC82Od7bNj
-	yN4cKzLR5+5ZzQoJNPBPm+wHOyArhgReqMPbOGvfqrTQrQEtsbmkYKIQ
-X-Gm-Gg: ASbGncs+X+Hktm4Q0LVNCg6L3SIk3SrnmAVwkfsrh3hbYfjMqsrBHXqBFH7GjOrIfmL
-	QiFgmRnsHqLpE6XK+pdd1aJIFOTsMjgF/GGSrIxeY6x34LoVOeJfvBDbJcv5SDkmda67xZrA6/U
-	s3TVkf4RSTr02GcjTf4lb+NrqdynOGodEk7AglTGEYw3Hi/m1DYZu8h63zz7jthS6EeBe9NhR2w
-	TL+zYPzO0DuCaKCBzUI9160gy0Xk0fGeWvUteiUnPXjE9xvUSxzTKzUs5pb6stu/wdN+fz0R3Kn
-	LP4u8aJkzJmg5Sg5L2Cu5WyWRl2ZqA07bFqfCqGsaNVQBMlZ5C6sYptzs+sjhRRj1Y5yOCjC7FH
-	jrvWzzAQyLno8UNZWm/q/2RCc75Je5GUbu7nVVvdk18i8gJ2wSpw0LtyvJiNGtS6FbBS7ixNZ5N
-	k4uA==
-X-Google-Smtp-Source: AGHT+IFoVGNaBflNy7LsGWkGUCgZQqNNgejO2tBaLky1MLKy0WgsmHoenbfRtwGQMjxSn6O8Urvjnw==
-X-Received: by 2002:a05:6102:6c2:b0:4fc:eda:abd8 with SMTP id ada2fe7eead31-52b1be31b32mr3580050137.24.1756852876012;
-        Tue, 02 Sep 2025 15:41:16 -0700 (PDT)
+        bh=SSjF4T1Hwo77xpCNosIzPOB627gBX9Y5QCHwTlQLO+c=;
+        b=jqmATZ34ANqSMOW/OB8kTIgS4sGPMKTpg6i93xkNc3CEpjMqr3DNQHRZCvQV+vMjQU
+         63dWifq1Py7ZlXTfHDiASaZAr+6S/nZ4xO1fTurDgDssaQZZgTPWOMRZ42UtXl1xfj31
+         H5t8OcrsDLHuCQ3IJCO1YSLHknze4fh66qgX7IRo5QyyMlkd1XiNh5qvd7HzjcZ4TeRL
+         73o+7QwZYi4HA+FGtpRB6i/mudfYTcvj2LaM0Id2JeyrgBOfI9UAYq+wda5JiwtvAAjV
+         BbbjiIeSmLb0V6FH01UO+/QQO01LUoYTHUdcPiYhIezW5jaq4Yf44xVv0V5pBG6oBT35
+         UMJw==
+X-Forwarded-Encrypted: i=1; AJvYcCVA7c6E4Mt4AEvESXrOYj5jUvTY33PL6aWS/p2War1VI+UCJdjf8LRzWmJtbSgLg38qdjMfPFOEJALX2lc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOH3jlA9QiLdzoODktUIrRWYSubTKkWRg7uJpk5Wvvj0xWDqYI
+	Gywo7tqGWChAACJeBsJEOMhxQtf3un4/MAfYu3rKfvfD2ze/4zts8uPCbOCFMQ==
+X-Gm-Gg: ASbGncu2oZTZYhUP302qk3wHhn2TL8I4W9wIbBwMN0uHOIyDhs3ZtjAa157MNca8oDa
+	XMCg8BjGd5yG8tKkBwH8GvjuPUc+ZOgH77Ed+Ce3qBo+A6aMEbwOpS2K7NExYaY9ncLTlx2IMoG
+	OsFXsRdbuojx5PDHmrGkAI1+/WNi5t6NWiACwcqv9MFzLiiLbiX+B/CksO4A4bSkJYu3qaZfV/E
+	ykXulTNWwzomnwJRHBeCWFjJS6EkzHRwigkZmnaPOHHCG7BlaPq3NB4ZMQFSi+cisXFCInBFgXP
+	In3f3COUbBAF84ZdRV6WRp/s1l7Sw7t43M4ciTQjlE7rEQ3v5klTPKgHGBY0z5g6PL4YpOv4Aw8
+	gkYZ8PvT3gJXWpeuorbi0pdpg9d52Cn/pFlpinWrnpmPAQlLFaGEimu9kyVvTrGSppONB5mmp5t
+	7h4KMOq7NGFvnecLeJEFaCxgY=
+X-Google-Smtp-Source: AGHT+IFBUwYB2UafAJcoVgYvi5smXXO0j3kJPgVySw53HU05l3de4kuy/loqjzhuufm5UUWS2SQATQ==
+X-Received: by 2002:a05:6122:1d8f:b0:531:19f4:ec19 with SMTP id 71dfb90a1353d-544a02a9c02mr4052236e0c.9.1756853058146;
+        Tue, 02 Sep 2025 15:44:18 -0700 (PDT)
 Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id a1e0cc1a2514c-899f14c7752sm762863241.4.2025.09.02.15.41.15
+        by smtp.gmail.com with UTF8SMTPSA id 71dfb90a1353d-54491464b0csm6067110e0c.18.2025.09.02.15.44.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Sep 2025 15:41:15 -0700 (PDT)
-Date: Tue, 02 Sep 2025 18:41:15 -0400
+        Tue, 02 Sep 2025 15:44:17 -0700 (PDT)
+Date: Tue, 02 Sep 2025 18:44:17 -0400
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 To: Breno Leitao <leitao@debian.org>, 
  Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -93,12 +93,11 @@ Cc: netdev@vger.kernel.org,
  efault@gmx.de, 
  calvin@wbinvd.org, 
  Breno Leitao <leitao@debian.org>
-Message-ID: <willemdebruijn.kernel.16c9d77b1d2c@gmail.com>
-In-Reply-To: <20250902-netpoll_untangle_v3-v1-1-51a03d6411be@debian.org>
+Message-ID: <willemdebruijn.kernel.cc9704ca4054@gmail.com>
+In-Reply-To: <20250902-netpoll_untangle_v3-v1-2-51a03d6411be@debian.org>
 References: <20250902-netpoll_untangle_v3-v1-0-51a03d6411be@debian.org>
- <20250902-netpoll_untangle_v3-v1-1-51a03d6411be@debian.org>
-Subject: Re: [PATCH 1/7] netconsole: Split UDP message building and sending
- operations
+ <20250902-netpoll_untangle_v3-v1-2-51a03d6411be@debian.org>
+Subject: Re: [PATCH 2/7] netpoll: move prepare skb functions to netconsole
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -109,33 +108,23 @@ Content-Type: text/plain;
  charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-Remember to label the target branch: [PATCH net-next 1/7]
-
 Breno Leitao wrote:
-> Split the netpoll_send_udp() function into two separate operations:
-> netpoll_prepare_skb() for message preparation and netpoll_send_skb()
-> for transmission.
+> Move the UDP packet preparation logic from netpoll core to netconsole
+> driver, consolidating network console-specific functionality.
 > 
-> This improves separation of concerns. SKB building logic is now isolated
-> from the actual network transmission, improving code modularity and
-> testability.
+> Changes include:
+> - Move netpoll_prepare_skb() from net/core/netpoll.c to netconsole.c
+> - Move all UDP/IP header construction helpers (push_udp, push_ipv4,
+>   push_ipv6, push_eth, netpoll_udp_checksum) to netconsole.c
+> - Add necessary network header includes to netconsole.c
+> - Export find_skb() from netpoll core to allow netconsole access
+>   * This is temporary, given that skb pool management is a netconsole
+>     thing. This will be removed in the upcoming change in this patchset.
 > 
-> Why?
-> 
-> The separation of SKB preparation and transmission operations enables
-> more granular locking strategies. The netconsole buffer requires lock
-> protection during packet construction, but the transmission phase can
-> proceed without holding the same lock.
-> 
-> Also, this makes netpoll only reponsible for handling SKB.
-> 
-> netpoll_prepare_skb() is now exported, but, in the upcoming change, it
-> will be moved to netconsole, and become static.
+> With this in mind, netconsole become another usual netpoll user, by
+> calling it with SKBs instead of msgs and len.
 > 
 > Signed-off-by: Breno Leitao <leitao@debian.org>
 
-aside from the above,
-
 Reviewed-by: Willem de Bruijn <willemb@google.com>
-
 
