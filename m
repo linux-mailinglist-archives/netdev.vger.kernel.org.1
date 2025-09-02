@@ -1,99 +1,103 @@
-Return-Path: <netdev+bounces-219099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2803CB3FCFC
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 12:47:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BCF2B3F978
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 11:02:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC6A316EA3C
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 10:47:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3AA42C21F4
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 09:02:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10C2B283FF1;
-	Tue,  2 Sep 2025 10:47:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EF2A2E9733;
+	Tue,  2 Sep 2025 09:01:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=listout.xyz header.i=@listout.xyz header.b="wXfarb3+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dypgPSQj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3EAF283680
-	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 10:47:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3324A4409
+	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 09:01:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756810047; cv=none; b=qB6dQM8Fr1J4yL7uytHZRgwlDCoPDE3+xZOC0VzquGhoIGAv5NYvtUYFoynvLzKPFoXsTtDSyW+l5RJRgSQ0LIp03rYaCEsFmlFHyC7nBMj3iFqJxsBJPmDSKY/PlAoUzWxa8XNu9slzLgiBcHoiUm0f4OTMtEQ5u+iHhdvi540=
+	t=1756803686; cv=none; b=ob0gNtZP+v7eS0xiyAzOXYZ3jiGpzQ2yY+ZGlvCKyIIfxWw1ZPBjXLKNpEXv6jNWTlWgP9BqlzH2uhjzhk009Icao01eVydYF/7u7j999ghpGAn5DceEYQ2oaekwXzz1oH9j7dpn9tSFg4Xbhp3AAh6r+HIWTNSn1nfowNCHCFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756810047; c=relaxed/simple;
-	bh=LnJizG7XhZQVsn+enC0vl5CQ2axfJ3gHWyHyB/bX++s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rZhF7A0Mf8MBgGSkNurNlOu7yUAr81z58CYwY5MxI9cu6sA1O5M7fJWtLMk3AM92iiSMF3/VD+iifJjzaV9f0Omjeqn/jLdIjCQO0AxSP4idlNQz5F520Vto+ugOxQzgj3zRTeXoUCS4/IWxaxyOAu0sUBU72K+4Jx4ofVo+I08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=listout.xyz; spf=pass smtp.mailfrom=listout.xyz; dkim=pass (2048-bit key) header.d=listout.xyz header.i=@listout.xyz header.b=wXfarb3+; arc=none smtp.client-ip=80.241.56.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=listout.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=listout.xyz
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4cGMrQ21snz9tQ2;
-	Tue,  2 Sep 2025 12:47:18 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=listout.xyz; s=MBO0001;
-	t=1756810038;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lV+l/abgmHpQqmeGSBvsTCuokZnuY1jXVG9xt6N9/rg=;
-	b=wXfarb3+X1eSJg3DUEtiHXAviwGIcCABPRUQHzI9dmwGqo2CStl1aGBJSPFrvUw89ARXUI
-	g/DGvr34anPxAZjGqw62gT/SgdMqSWzJ0sIQq7meyJp36iaS7ReKAjgh90Vq7+sGJcBhs6
-	l4tvIHSCZshf+uCKe6IJAzPyqtGu3wcabMlsAhKum4I+Q/2lBPKBGxNxlQhkC9QgKOk5Yy
-	OBJwXFXFsALybvALsPT1CDtM1Hz/1kM/NVje1g0iM972GY9Rcq1d0VCJB45ZXc9DEc4iHv
-	6+w7g/PvgWmuKoV8tmw57nuoD5NF8w98LptEb6oAVk2xdvLpLSMH2O60MzFHpw==
-Date: Tue, 2 Sep 2025 16:17:11 +0530
-From: Brahmajit Das <listout@listout.xyz>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: andrew+netdev@lunn.ch, anthony.l.nguyen@intel.com, davem@davemloft.net, 
-	intel-wired-lan@lists.osuosl.org, kuba@kernel.org, netdev@vger.kernel.org, 
-	przemyslaw.kitszel@intel.com
-Subject: Re: [PATCH v2] net: intel: fm10k: Fix parameter idx set but not used
-Message-ID: <crnofgnchveaeduom44nzbq26m2zudy4wut3pl7xgf3fwar46n@tzvxk3nwlgmq>
-References: <e13abc99-fb35-4bc4-b110-9ddfa8cdb442@linux.dev>
- <20250902072422.603237-1-listout@listout.xyz>
- <c7005c02-63dc-4316-905c-e02283e398c5@linux.dev>
+	s=arc-20240116; t=1756803686; c=relaxed/simple;
+	bh=2TpnP1AXNCPV0dg1xc5N/Ez8GtG6w45MaCkHZBvSIg4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sqIxmgbZymVMZa4HwPa3u3X22X9w8FraAs4cl8/KnG9mcA/W4soGohbcmaUHImuYDLyRNDjIjG8be3uTyYoA43Viyg6mpPzqpRqtwe1WQmOeLcfS80vKZaRFrwKrpQo0cHenXtIdY6xrw+/O1jTxMIX3jvhvIxlDMkaSehBVuwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dypgPSQj; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756803684; x=1788339684;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=2TpnP1AXNCPV0dg1xc5N/Ez8GtG6w45MaCkHZBvSIg4=;
+  b=dypgPSQjdFyw+Q9MI3qPy3umJuJ6e+mZhL1Dbmn01MIa/P225/qkg47Q
+   i7KyhCSaJWqopc/UNgBTmwkfagbLk90oCIc+FuNJvrnT1xmJ4cjj9YSk1
+   Nc2p0A79QcLuh6oLB3xaWpfL1SVtgYVQ1Hycv3Bk+3YO2mRoroMe3/XfU
+   zs6QdDVLlhDJoi4O6UBHZ/xhe9Ckl7dnwy9hd09+mo6hGuTObPPFeiV/h
+   l3qGqpX8o0ZiVwFbN4JOjtcPpWC4oA/z0amK3PzjonUfEqCLxNH1PHH8b
+   ehIPpNn7Ucx2fhh/X/8GMN6m24uB0N0CofGg+6j4JhZcHChC4vW8uQWHT
+   w==;
+X-CSE-ConnectionGUID: PldiitJMTLiKYA1pY3FomQ==
+X-CSE-MsgGUID: rtdo37+rSQeieNL2gvn61A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11540"; a="76666690"
+X-IronPort-AV: E=Sophos;i="6.18,230,1751266800"; 
+   d="scan'208";a="76666690"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2025 02:01:20 -0700
+X-CSE-ConnectionGUID: NMHMv1t8Tquknduml+jNZA==
+X-CSE-MsgGUID: LEAmQg/iTN2U6OzvcLu+Tg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,230,1751266800"; 
+   d="scan'208";a="176494110"
+Received: from host59.igk.intel.com ([10.123.220.59])
+  by fmviesa004.fm.intel.com with ESMTP; 02 Sep 2025 02:01:18 -0700
+From: Anton Nadezhdin <anton.nadezhdin@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	richardcochran@gmail.com,
+	Anton Nadezhdin <anton.nadezhdin@intel.com>
+Subject: [PATCH iwl-next 0/2] idpf: add direct access for PHC control
+Date: Tue,  2 Sep 2025 06:50:22 -0400
+Message-ID: <20250902105321.5750-1-anton.nadezhdin@intel.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <c7005c02-63dc-4316-905c-e02283e398c5@linux.dev>
+Content-Transfer-Encoding: 8bit
 
-On 02.09.2025 11:34, Vadim Fedorenko wrote:
-> On 02/09/2025 08:24, Brahmajit Das wrote:
-> > Variable idx is set in the loop, but is never used resulting in dead
-> > code. Building with GCC 16, which enables
-> > -Werror=unused-but-set-parameter= by default results in build error.
-> > This patch removes the idx parameter, since all the callers of the
-> > fm10k_unbind_hw_stats_q as 0 as idx anyways.
-> > 
-> > Suggested-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> > Signed-off-by: Brahmajit Das <listout@listout.xyz>
-> > ---
-> > changes in v2:
-> > 	- Removed the idx parameter, since all callers of
-> > 	fm10k_unbind_hw_stats_q passes idx as 0 anyways.
-> Just a reminder that you shouldn't send another version of the patch
-> as a reply to the previous version. And you have to wait for at least
-> 24h before sending next version to let other reviewers look at the code.
-> Current submission looks OK in patchwork, so no action is needed from
-> you right now.
-> 
-> Thanks,
-> Vadim
+IDPF allows to access the clock through virtchnl messages, or directly,
+through PCI BAR registers. Registers offsets are negotiated with the
+Control Plane during driver initialization process.
+This series add support for direct operations to modify the clock as 
+well as to read TX timestamp
 
-Noted, thank you.
+Milena Olech (2):
+  idpf: add direct access to discipline the main timer
+  idpf: add direct method for disciplining Tx timestamping
+
+ drivers/net/ethernet/intel/idpf/idpf_dev.c    |   4 +-
+ drivers/net/ethernet/intel/idpf/idpf_ptp.c    | 295 +++++++++++++++---
+ drivers/net/ethernet/intel/idpf/idpf_ptp.h    | 103 ++++--
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   |  85 +++--
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h   |   4 +
+ .../net/ethernet/intel/idpf/idpf_virtchnl.c   |   3 +-
+ .../ethernet/intel/idpf/idpf_virtchnl_ptp.c   | 139 ++++-----
+ drivers/net/ethernet/intel/idpf/virtchnl2.h   |   6 +-
+ 8 files changed, 451 insertions(+), 188 deletions(-)
+
+
+base-commit: 1235d14de922bc4367c24553bc6b278d56dc3433
 -- 
-Regards,
-listout
+2.42.0
+
 
