@@ -1,122 +1,140 @@
-Return-Path: <netdev+bounces-219240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B026CB40A54
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 18:14:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 13C60B40A5B
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 18:16:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85FED170277
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 16:14:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA15516ECB3
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 16:16:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BCD73375DA;
-	Tue,  2 Sep 2025 16:14:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ADE228725A;
+	Tue,  2 Sep 2025 16:15:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xELmc28H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ctGbvLP9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D59D62FD1CB
-	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 16:14:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 651FC1D432D;
+	Tue,  2 Sep 2025 16:15:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756829664; cv=none; b=AYtTjGTVNO/zZJMPWO1QUYFSB9qEEI3q9ZVTkejTIPP//JqCQ0YoHnogJXPfKqMa/KDm0zQIy8TxEIW0mo/UvC90Gfx1rz/q5dnryMBeXlim/jFeB3t5QBiAB+I/WctaGaJTkSHwANG89pOVI+T9augTkPArSND8Nzaxy3jN1Vs=
+	t=1756829757; cv=none; b=IYmds/uAWGUbsEgiuFyLMKme5kjqDG2MXRQIvXKaAf9qukpCoBmguD9BLDKJoqrGKWCFYcIehM5nXAl88H7AqrLmHUNptE9laTTOuYIUdGQ2g2e1yLrMu+3SwKZkOdGMfZCZghq33t9lCyOT9K4oPkXpyGiWt4t/1WKUUank574=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756829664; c=relaxed/simple;
-	bh=M23v3B4ETS5TnVqJIjRlGEDwj13+wEieeVmUiquYmXw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=p0VgDq2psSf8sk9qZNUA50OW88ofykIKCBwdN/uA3OWwzEtZC2TI9XDuGZI2018O38CaoLK6nnsRUMAWgZyCadeyoT/NK5x82iGEWkHiMX/IBi3OQn8MkN4RPqVivRq/J7405VvNeGEaXRWI/UhGt1nfmHqIvFa+99Id+8TUvl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xELmc28H; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5607a16639aso15988e87.1
-        for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 09:14:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756829661; x=1757434461; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M23v3B4ETS5TnVqJIjRlGEDwj13+wEieeVmUiquYmXw=;
-        b=xELmc28H3oy1stMi3PaRZF7SArZ29ELNuJtPYR4ldOfpZZPU/aN8HJeJpxYXsG/qek
-         WlYkOO/6FvtxWEfOJV58x0VtHTV+pA+uOA8XQO37kOz4H5+rUOk9Bc9sinZzrgIVHOUa
-         D7nP+e7J4/7otP4Zn8FAl7Mvunjv/Xwp1Dt8WOiDaIYTTHo8Q8a0nxtGSD4qkCrBktZ4
-         dRhbzU7VFmHL9GJMwIA0IR/umuj3hagff0AVws6J9jnVPxMbNaJsi81HiikCW1dTcTKi
-         RW7uCF3FZV6cDQz0Z3ppjCMmzMpIw+UTu4G2MFwxWGosquhTNyKV5jSN7uMgUOTZWCQN
-         bGBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756829661; x=1757434461;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=M23v3B4ETS5TnVqJIjRlGEDwj13+wEieeVmUiquYmXw=;
-        b=qZdeCFKBBHuITOeYv1WrhL9FhtPBX7nd+WODstwMpHJk2rqYIAnV1PT85L6nQQGQGx
-         wiIk28L3DeEtxr+i5CRPwF+VkuXZZ4Ww2NFHY5QCe/W2KZHQ4q4mmI5CuJ7z7nm74jsv
-         Yg9mRAs/LwzK0fum2Ls+eaDujqy75JAhTh4oo1/1CDZnhrFD8QJhfBBqcMBJ51/2DZTK
-         qw0R4Iw72eRcGe6KpffnpJtZeOf/fs+wFb7rg4PgyfGFaJrycsVG3Sg7WUZTA4CFlWLt
-         75A4HYVYK+x7nxQq5BpFQjO8OSfZKbNCiouQf5AN+DrVDP9zWZ4CblxnDKBLaYZTr89/
-         9qHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWHMh9L3JzZDbOXnap3cXsgYV7lRjW48EN+LTXCrCCQXaj36RFlTDb39BJ0NKApiyrpcSBya9s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuoQQLAZFnaRuqO+pO4cQIyEymww4K9ijdR8VrU2xYsOWO6pur
-	hEb17YqVwrwiQOIEUjz3KjUH/ETKwvOklnDvJANoaAy7PBcrYw+2s7ETmN2grkdpz/rbVODwIJG
-	FhJs+UX4B3TfH/ZR/iKpVrZtWl2SYHImx2CLlh1RP
-X-Gm-Gg: ASbGncuugZ/3+VSDlUvRQo/FXFQAze+xdiOeQskdfRSRGjiKSDGGazt5tIKNrjY63I8
-	IINkfZVcDqYmegv68sqb+yh/7/CPm087K5y2PIURYSsxB2zcwEkFwpc5t9zcjUFTuvX6bAVO5LI
-	T4C4aK7aSdKnQOZpGv3VNxNoPS2swJFBK9N3UfhUMw8JTQArh2P+Xte+97cQv/TZwoC4i1WpnfG
-	ZgbFUS4UTTTpnVIYBwkevopTpdx145FgBpJ
-X-Google-Smtp-Source: AGHT+IHmVNH7wPjpYsvWB5ZP3rfd0MpHTgi37ddHFFGdCMiTb5F22lPHppg0uXxCGgrlm/MDvnoS9U7m8fLlmHoKjCM=
-X-Received: by 2002:a05:6512:3b0c:b0:55f:6a35:dd47 with SMTP id
- 2adb3069b0e04-55f6f4e88ffmr689274e87.4.1756829660517; Tue, 02 Sep 2025
- 09:14:20 -0700 (PDT)
+	s=arc-20240116; t=1756829757; c=relaxed/simple;
+	bh=/lr/agGyTaU3dozEPsQsbMHTjO/nnKIxlQrS46fsdI0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VkmhRjh0d6HKT7i21F9tkPbGWbf9CH7MEzNNz+8W9EKCJqhB2vBx/ljADYEnUsuCTUf4NBi8w3LpDLkvdR2h7ZxGCXnKrE/Q9Hb5R0/yRsSvwFdTrMH2eihMOyHNsvntJ06IO9NYovbkhUiuihjDlU/+fMSNcBLXsoZyIZJ6h9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ctGbvLP9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C363FC4CEED;
+	Tue,  2 Sep 2025 16:15:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756829756;
+	bh=/lr/agGyTaU3dozEPsQsbMHTjO/nnKIxlQrS46fsdI0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ctGbvLP9T1cohg9SSLGcdfNKlZfAhFk0/JXWuPub4Hmp8K7IQdFzZdHBOevgCPRhT
+	 2DUocehSAVF32wRz6IUt+iZm3GIzv3h6bBqKrqShgzQ/a0K1aiKKjeLGxfSlw/O+fZ
+	 3QZAfxvAgxsWeqfZNDF16wJEyXF1nCPv5ZNVLqDWScmr0N4fAE2MHFTcqBQGUEKX35
+	 ob6QcxZQLC2nsoLGbctacW/IKeLhMtInAjxR8J90QyiNbKpVGDfZWrXIv6PAdE/1qO
+	 T42adSVB9NUSth0vuSdm/TvBNUhyE+3cWyPrQ7OfaP/hPIVhLUsuT8g1Y8LO/nXcHg
+	 HIUvaPJ7Vk47w==
+Date: Tue, 2 Sep 2025 09:15:55 -0700
+From: Saeed Mahameed <saeed@kernel.org>
+To: Christoph Paasch <cpaasch@openai.com>
+Cc: Tariq Toukan <ttoukan.linux@gmail.com>, Gal Pressman <gal@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH net-next v4 0/2] net/mlx5: Avoid payload in skb's linear
+ part for better GRO-processing
+Message-ID: <aLcYO4kWn1nMnEJp@x130>
+References: <20250828-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v4-0-bfcd5033a77c@openai.com>
+ <aLIs_-lDKHCLTrTy@x130>
+ <e0786dbc-4681-4bee-a54a-e58c1b9b7557@gmail.com>
+ <CADg4-L8+c+kHHzJhEaxKoNowbONqfMPVuqyOw7_DqhKFqzzLFw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250829220003.3310242-1-almasrymina@google.com>
- <20250829175222.32d500ca@kernel.org> <aLcTQEN-sAHxASMI@mini-arch>
-In-Reply-To: <aLcTQEN-sAHxASMI@mini-arch>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 2 Sep 2025 09:14:07 -0700
-X-Gm-Features: Ac12FXyRSJwzr0bcBZWnsHSVXpf48qrqBOFx_2zrCXBIIplAxm9Uu_7v8G06n_w
-Message-ID: <CAHS8izNdAdLv9_ExJFrFxJxpXr2VbHSE9-bTkAhQ4NVco9SSnA@mail.gmail.com>
-Subject: Re: [PATCH net-next v1] net: devmem: NULL check netdev_nl_get_dma_dev
- return value
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADg4-L8+c+kHHzJhEaxKoNowbONqfMPVuqyOw7_DqhKFqzzLFw@mail.gmail.com>
 
-On Tue, Sep 2, 2025 at 8:54=E2=80=AFAM Stanislav Fomichev <stfomichev@gmail=
-.com> wrote:
+On 02 Sep 08:51, Christoph Paasch wrote:
+>Hello Tariq,
 >
-> On 08/29, Jakub Kicinski wrote:
-> > On Fri, 29 Aug 2025 21:59:38 +0000 Mina Almasry wrote:
-> > > netdev_nl_get_dma_dev can return NULL. This happens in the unlikely
-> > > scenario that netdev->dev.parent is NULL, or all the calls to the
-> > > ndo_queue_get_dma_dev return NULL from the driver.
-> >
-> > I probably have Friday brain but I don't see what you mean..
-> > In net-next net_devmem_bind_dmabuf() gets a dma_dev and returns
-> > -EOPNOTSUPP PTR if its NULL.
+>On Sun, Aug 31, 2025 at 2:28 AM Tariq Toukan <ttoukan.linux@gmail.com> wrote:
+>>
+>>
+>>
+>> On 30/08/2025 1:43, Saeed Mahameed wrote:
+>> > On 28 Aug 20:36, Christoph Paasch via B4 Relay wrote:
+>> >> When LRO is enabled on the MLX, mlx5e_skb_from_cqe_mpwrq_nonlinear
+>> >> copies parts of the payload to the linear part of the skb.
+>> >>
+>> >> This triggers suboptimal processing in GRO, causing slow throughput,...
+>> >>
+>> >> This patch series addresses this by using eth_get_headlen to compute the
+>> >> size of the protocol headers and only copy those bits. This results in
+>> >> a significant throughput improvement (detailled results in the specific
+>> >> patch).
+>> >>
+>> >> Signed-off-by: Christoph Paasch <cpaasch@openai.com>
+>> >
+>> > LGTM, I would love to take this to net-next-mlx5 and submit it back to
+>> > netdev after regression testing if that's ok? Christoph? Anyway I will
+>> > wait for Jakub to mark this as "awaiting-upstream" or if he
+>> > applies it directly then fine.
+>> >
+>> >
+>> >
+>>
+>> Hi,
+>>
+>> I recall trying out similar approach internally a few years ago.
+>>
+>> eth_get_headlen() function didn't work properly for non-Eth frames
+>> (ipoib). I believe this is still the case.
+>>
+>> Extra care is needed for the ipoib flow, which I assume gets broken here.
 >
-> +1, the description and the fix are confusing.
+>Are you actually sure that ipoib goes through
+>mlx5e_skb_from_cqe_mpwrq_nonlinear() ? Because, as far as I can see,
+>IPoIB disables striding in mlx5i_build_nic_params().
 >
-> Unless I'm missing something, the intent seems to be to avoid hitting
-> a WARN_ON in dma_buf_attach (really dma_buf_dynamic_attach) when the dma_=
-dev
-> is NULL. Mina, can we do this in the callers of netdev_queue_get_dma_dev?
+>It's rather mlx5e_skb_from_cqe_nonlinear() that handles both, ethernet
+>and ipoib.
+>
+correct,
 
-Yes looks like I was the one with the Friday brain. I missed the NULL
-check in net_devmem_bind_dmabuf. I'll check if this issue is on net
-and send a fix there if needed.
+const struct mlx5e_rx_handlers mlx5i_rx_handlers = {
+	.handle_rx_cqe       = mlx5i_handle_rx_cqe,
+	.handle_rx_cqe_mpwqe = NULL, /* Not supported */
+};
 
---=20
+I see that the patches are "awaiting-upstream" so I applied it to our internal
+queue, will let you know if we find any issues, otherwise, will repost as
+part of our upcoming submissions.
+
 Thanks,
-Mina
+Saeed.
+
+
 
