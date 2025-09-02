@@ -1,147 +1,182 @@
-Return-Path: <netdev+bounces-219087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F38BAB3FB8E
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 12:01:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA3F1B3FBD5
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 12:07:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D68C22C36E7
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 10:00:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 390147A3424
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 10:05:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F3AF2F0C7F;
-	Tue,  2 Sep 2025 09:57:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C4D7275860;
+	Tue,  2 Sep 2025 10:07:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B+CUt7cM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LA91XbgT"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 599E02EE26E
-	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 09:57:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 192FA2EDD75;
+	Tue,  2 Sep 2025 10:07:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756807071; cv=none; b=JsWM/pFh6f18FGqdNujyXWLWlFJSwwmJ/Rq6GnUn7OMbJIrwEhWgi3AZk7XdpkLpZWXFtG+0Rcosu4WRWaFT0bmWq27DECsWgz2ZhaWv4bWlG4ji/AlERMlN0wXe3aIqnlpZqp03qDdaTjR8JXPLDwUdBi2vnv5BVNxeXfwYVPU=
+	t=1756807642; cv=none; b=hiJPDZAmFVEYYU0bJjklHPr99qZ9eYT2ncyUy5CIz4gafOIs3XReSp01+SAU+mMSdU2YAW7LrTojydRr0HjZBSIn79Nqj9FmImiKQ78xpaSlw3HifAQ3dwSqVQ1Wrtr6nN0b1f0WCGpCGaUbkQqnG/wsPdG/nL+p+Ooy7wMHkCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756807071; c=relaxed/simple;
-	bh=z8gMwvXA44Wodi+hSnmRdnTeDizAmm+mkq0BLF6OVgI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jd4g4uNd5zA+AIXfk2VXrFL4R44FtvcuY7cUPVOGQ/lHiW3YHsIj6FqITb92oO4ZwyE4vulhWAZ0r3F33O/ltKVcjv7ohVmPL7ELYhAs+UTC6v2JROFpvcEmIU0PHbvFV8uPB26ctTCkhS1NTsxjOX2Play1caO9CHWtomm6078=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B+CUt7cM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756807067;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HZc4GB0/gNL5X2pnt5xZy0Mk61OX021O6i+im+Ocmjs=;
-	b=B+CUt7cMXGpQqV4SQOaohkzFP47F46tf2Ebpe4tNNQknYsEGafcloLJ2N4LUy09hRlZYlE
-	0ezBykE1cGV1vFB5/itmPklPN8deGBA81zwVKtdmin71sylB3IZ5zbR6JOqZjvTxTyBMIi
-	pHjkanh6OpMfrc12lPXBRrZnBr70Be0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-501-skEAl2iuMmSUSsrDDLGsrw-1; Tue, 02 Sep 2025 05:57:46 -0400
-X-MC-Unique: skEAl2iuMmSUSsrDDLGsrw-1
-X-Mimecast-MFC-AGG-ID: skEAl2iuMmSUSsrDDLGsrw_1756807065
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3d226c3a689so1121446f8f.0
-        for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 02:57:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756807065; x=1757411865;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HZc4GB0/gNL5X2pnt5xZy0Mk61OX021O6i+im+Ocmjs=;
-        b=t2KNLor9xbWNmbpBZlzhx3Uo0sH+ly4ZAz5MsEdXGjMjm/ofUVVSs25GnM3KPLBSGe
-         2u1dyPJ7TlH7X0tM2cxPR3HyMh2rHl8yc/9jPKFroeRfBUi0J3x1WiPNEa6zG3nww0FY
-         yPJurQtlOb2dNdFegfymLerEnzi1A/Tl4O2bc5BmcR/00Cxx05iGWqxxn+ZK4CLbOcGl
-         BGg0CUeandgUtSCJ5sjbNaLGdrOss+v3XP6ZkkIzpKC+DeLoz5VQYcyLuPUOsLutjUl7
-         3DP/PHEZ6UzgTs0t/JQ8PYBQrtYFdCpvfbUZB4rDrtGQ6otoMATUmzFgkDzzf17x92ER
-         bTCA==
-X-Forwarded-Encrypted: i=1; AJvYcCXlB7BttGv0wxdkv6+EVTmnERvcyvg5BSEbU0MP5kQixCzRytvL2TYAGq26cwiqo+l3PbVEiuU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMQxDpbzy8/Q46Be085oR/YP3xA2lSXQwKR3WIZzIKPWpzH0t/
-	W2+nOJC+r6zWLG84bUwdQcl8sEJ/BqT94tuQWo24ayfCnkbBi92ToDwXv4EsT1zonj4fUyBt+dw
-	S4mHWUOVwTiiDYOizA3YUBvRPDZ7uY59ApHTz12bxz8nHA6zgMLKqH7n5gQ==
-X-Gm-Gg: ASbGnct9WDl40lkBtDHdrqqpGcXpE5fB8tKw1mNZivx6x/QNs5tx+IYcEH6XIa2D0Xs
-	kkHgiAEgspbkSie2qLsW0MWDeA2XBb5ePtSaWUqsyJP+XkS1Mhpk11GGmMfRFvzJDom7n31OX6s
-	vfE7hrbaQjabBJa1QXhsj2CkzaH0JU0ZfvMjjyRs+oIGUhqSjRZsAUtHwduxb+N2/n4Ww/MTiSu
-	Dw75l9zECiJjEyToP1+wCVttTeUU+SgH9IcWwkkuU+0633zlGuXDr3loELLPCzahJHl73i+YOAn
-	IBTBIGh/V7HytXitXoJmcq8b9qRugcmrdX8BmxXR96HmE4Y5++++Phrzrb8IPLLotLKzrykG3K3
-	2VnNr6SOCmEc=
-X-Received: by 2002:a05:6000:2110:b0:3d2:52e3:9220 with SMTP id ffacd0b85a97d-3d252e39a50mr6205387f8f.5.1756807064877;
-        Tue, 02 Sep 2025 02:57:44 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFBBKawshRRcWgMajhrJGR9pfMn2+8pBgJ1J6VR2pISIYxt4qBpwtVugddscbM7nf2wPfGedA==
-X-Received: by 2002:a05:6000:2110:b0:3d2:52e3:9220 with SMTP id ffacd0b85a97d-3d252e39a50mr6205351f8f.5.1756807064174;
-        Tue, 02 Sep 2025 02:57:44 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e00:6083:48d1:630a:25ae? ([2a0d:3344:2712:7e00:6083:48d1:630a:25ae])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3d21a80c723sm14068985f8f.9.2025.09.02.02.57.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Sep 2025 02:57:43 -0700 (PDT)
-Message-ID: <a46cca6e-5350-4ca4-ba17-bf0f89d812cf@redhat.com>
-Date: Tue, 2 Sep 2025 11:57:42 +0200
+	s=arc-20240116; t=1756807642; c=relaxed/simple;
+	bh=n7Zz7ESKe5II1Hc9wcpMJplkj2h3aSHW/mqP+X4a2OE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tFMDxV3MG/RQzzNLTmUgG4OY6hJ4Pq/B6eIOEdeIbu7aeFmSYYI3fL8UhNpav6dtxd3e3SEPZkEbpIbxPWo88W8qUPopxwwZFMjAJy2/y1Ysqx9Ip2bH2BhQHgzthizGnOaE9bqy2BfAe9UHjRv65XYQd0ZhM27/5D3t0MNGpZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LA91XbgT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36A45C4CEF5;
+	Tue,  2 Sep 2025 10:07:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756807640;
+	bh=n7Zz7ESKe5II1Hc9wcpMJplkj2h3aSHW/mqP+X4a2OE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LA91XbgT4K2NDijDbGqZDA9oYV74S4KF428MgMtzcmWF0Dx8+7OMzNQk9aIeyrBB7
+	 +IhG/ynsQwLIoq+KF5nYJ9Jr5Bw55OKEpFavGXGrTt2++CS8rHpzhXPm941zHMTqa1
+	 skomXzPWgQ3roQukXTvQYUOZmARVKk7ny3cmbR8SaAYg9H8ydgBxRP+1FxO23zUgE/
+	 Hk+ts5DKvo4AWw6T8B77/FPP57iOFrIa2LTp72knO6hlC/ncgbkqOTITZV1jG01F3F
+	 XMU5Dhslw1GlpBxGGtU9d1gWOPBO50bTzHHxKlA1psgjoaN21llaupaubYnFp5cmf1
+	 lEcVLrDCOVunQ==
+Date: Tue, 2 Sep 2025 11:07:16 +0100
+From: Simon Horman <horms@kernel.org>
+To: Wang Liang <wangliang74@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, kuniyu@google.com, kay.sievers@vrfy.org,
+	gregkh@suse.de, yuehaibing@huawei.com, zhangchangzhong@huawei.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: atm: fix memory leak in atm_register_sysfs when
+ device_register fail
+Message-ID: <20250902100716.GB15473@horms.kernel.org>
+References: <20250901063537.1472221-1-wangliang74@huawei.com>
+ <20250901190140.GO15473@horms.kernel.org>
+ <4ae3ca7b-dc64-4ab5-b1bf-e357ccc449b4@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v4] selftests: net: add test for destination in
- broadcast packets
-To: Brett Sheffield <bacs@librecast.net>
-Cc: Oscar Maes <oscmaes92@gmail.com>, netdev@vger.kernel.org,
- kuba@kernel.org, davem@davemloft.net, dsahern@kernel.org,
- stable@vger.kernel.org
-References: <20250828114242.6433-1-oscmaes92@gmail.com>
- <03991134-4007-422b-b25a-003a85c1edb0@redhat.com>
- <aLa54kZLIV3zbi2v@karahi.gladserv.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <aLa54kZLIV3zbi2v@karahi.gladserv.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <4ae3ca7b-dc64-4ab5-b1bf-e357ccc449b4@huawei.com>
 
-
-
-On 9/2/25 11:33 AM, Brett Sheffield wrote:
-> On 2025-09-02 10:49, Paolo Abeni wrote:
->> On 8/28/25 1:42 PM, Oscar Maes wrote:
->>> Add test to check the broadcast ethernet destination field is set
->>> correctly.
->>>
->>> This test sends a broadcast ping, captures it using tcpdump and
->>> ensures that all bits of the 6 octet ethernet destination address
->>> are correctly set by examining the output capture file.
->>>
->>> Signed-off-by: Oscar Maes <oscmaes92@gmail.com>
->>> Co-authored-by: Brett A C Sheffield <bacs@librecast.net>
->>
->> I'm sorry for nit-picking, but the sob/tag-chain is wrong, please have a
->> look at:
->>
->> https://elixir.bootlin.com/linux/v6.16.4/source/Documentation/process/submitting-patches.rst#L516
+On Tue, Sep 02, 2025 at 09:41:33AM +0800, Wang Liang wrote:
 > 
-> Thanks Paolo. So, something like:
+> 在 2025/9/2 3:01, Simon Horman 写道:
+> > On Mon, Sep 01, 2025 at 02:35:37PM +0800, Wang Liang wrote:
+> > > When device_register() return error in atm_register_sysfs(), which can be
+> > > triggered by kzalloc fail in device_private_init() or other reasons,
+> > > kmemleak reports the following memory leaks:
+> > > 
+> > > unreferenced object 0xffff88810182fb80 (size 8):
+> > >    comm "insmod", pid 504, jiffies 4294852464
+> > >    hex dump (first 8 bytes):
+> > >      61 64 75 6d 6d 79 30 00                          adummy0.
+> > >    backtrace (crc 14dfadaf):
+> > >      __kmalloc_node_track_caller_noprof+0x335/0x450
+> > >      kvasprintf+0xb3/0x130
+> > >      kobject_set_name_vargs+0x45/0x120
+> > >      dev_set_name+0xa9/0xe0
+> > >      atm_register_sysfs+0xf3/0x220
+> > >      atm_dev_register+0x40b/0x780
+> > >      0xffffffffa000b089
+> > >      do_one_initcall+0x89/0x300
+> > >      do_init_module+0x27b/0x7d0
+> > >      load_module+0x54cd/0x5ff0
+> > >      init_module_from_file+0xe4/0x150
+> > >      idempotent_init_module+0x32c/0x610
+> > >      __x64_sys_finit_module+0xbd/0x120
+> > >      do_syscall_64+0xa8/0x270
+> > >      entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> > > 
+> > > When device_create_file() return error in atm_register_sysfs(), the same
+> > > issue also can be triggered.
+> > > 
+> > > Function put_device() should be called to release kobj->name memory and
+> > > other device resource, instead of kfree().
+> > > 
+> > > Fixes: 1fa5ae857bb1 ("driver core: get rid of struct device's bus_id string array")
+> > > Signed-off-by: Wang Liang <wangliang74@huawei.com>
+> > Thanks Wang Liang,
+> > 
+> > I agree this is a bug.
+> > 
+> > I think that the guiding principle should be that on error functions
+> > unwind any resource allocations they have made, rather than leaving
+> > it up to callers to clean things up.
+> > 
+> > So, as the problem you describe seems to be due to atm_register_sysfs()
+> > leaking resources if it encounters an error, I think the problem would
+> > best be resolved there.
+> > 
+> > Perhaps something like this.
+> > (Compile tested only!)
+> > 
+> > diff --git a/net/atm/atm_sysfs.c b/net/atm/atm_sysfs.c
+> > index 54e7fb1a4ee5..62f3d520a80a 100644
+> > --- a/net/atm/atm_sysfs.c
+> > +++ b/net/atm/atm_sysfs.c
+> > @@ -148,20 +148,23 @@ int atm_register_sysfs(struct atm_dev *adev, struct device *parent)
+> >   	dev_set_name(cdev, "%s%d", adev->type, adev->number);
+> >   	err = device_register(cdev);
+> >   	if (err < 0)
+> > -		return err;
+> > +		goto err_put_dev;
+> >   	for (i = 0; atm_attrs[i]; i++) {
+> >   		err = device_create_file(cdev, atm_attrs[i]);
+> >   		if (err)
+> > -			goto err_out;
+> > +			goto err_remove_file;
+> >   	}
+> >   	return 0;
+> > -err_out:
+> > +err_remove_file:
+> >   	for (j = 0; j < i; j++)
+> >   		device_remove_file(cdev, atm_attrs[j]);
+> >   	device_del(cdev);
+> > +err_put_dev:
+> > +	put_device(cdev);
+> > +
+> >   	return err;
+> >   }
 > 
-> Co-developed-by: Brett A C Sheffield <bacs@librecast.net>
-> Signed-off-by: Brett A C Sheffield <bacs@librecast.net>
-> Co-developed-by: Oscar Maes <oscmaes92@gmail.com>
-> Signed-off-by: Oscar Maes <oscmaes92@gmail.com>
 > 
-> with the last sign-off by Oscar because he is submitting?
+> Thanks for your replies, it is very clear!
+> 
+> But the above code may introduce a use-after-free issue. If
+> device_register()
+> fails, put_device() call atm_release() to free atm_dev, and
+> atm_proc_dev_deregister() will visit it.
+> 
+> And kfree() should be removed in atm_dev_register() to avoid double-free.
 
-Actually my understanding is:
+Thanks, I see that now.
 
-Co-developed-by: Brett A C Sheffield <bacs@librecast.net>
-Signed-off-by: Brett A C Sheffield <bacs@librecast.net>
-Signed-off-by: Oscar Maes <oscmaes92@gmail.com>
+I do think that it would be nice to untangle the error handling here.
+But, as a but fix I now think your original approach is good.
+Because it addresses the issue in a minimal way.
 
-(if the patch is submitted by Oscar.) Basically the first examples in
-the doc, with the only differences that such examples lists 3 co-developers.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-/P
+> > Looking over atm_dev_register, it seems to me that it will deadlock
+> > if it calls atm_proc_dev_deregister() if atm_register_sysfs() fails.
+> > This is because atm_dev_register() is holding atm_dev_mutex,
+> > and atm_proc_dev_deregister() tries to take atm_dev_mutex().
+> 
+> 
+> I cannot find somewhere tries to take atm_dev_mutex(), can you give some
+> hints?
 
+Sorry, my mistake. I was looking at atm_dev_deregister()
+rather than atm_proc_dev_deregister().
+
+...
+
+-- 
+pw-bot: under-review
 
