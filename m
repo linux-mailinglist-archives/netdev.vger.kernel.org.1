@@ -1,160 +1,271 @@
-Return-Path: <netdev+bounces-219247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEB98B40B32
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 18:54:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CFB8B40BAE
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 19:10:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69BD13AAC57
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 16:54:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E9363B9ADE
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 17:10:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 911782F6594;
-	Tue,  2 Sep 2025 16:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCAA2341AB9;
+	Tue,  2 Sep 2025 17:10:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="daUFPnYt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XvGFNRnR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D58931353B;
-	Tue,  2 Sep 2025 16:54:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CF1023D7C4;
+	Tue,  2 Sep 2025 17:10:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756832076; cv=none; b=QQ373korwxBH44o4Pqw6QkuUUUvpL/vDBAy3pLfW6MwnDXBRlLWA0kekevc46psxn5sYFKrov/hdPY9sIJlTfD9MraDYcdH3TQg2VnTb3uP5+cTie7H2kF8oTDg36cyKUzd5gz5xEmR9Qv4sZNBwXC9tl3X26rK9iTOowCu3ThQ=
+	t=1756833011; cv=none; b=N4ZkfrLFnQ0lKuWwEvZHjtDRmB+IN7wrPfXO/ml+IqxTWM71sHIZXOFRbwArODYVj9IYktDgIBpvo7Wj3fQQqNqNt+EKszpDM+2M48n2Whci0HaWwcbYaRYVPTpBp2RkCrNdG7uKlLEZkqjNmkPN7N+pdgy5yw6p87qb8ddlIoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756832076; c=relaxed/simple;
-	bh=CHG2gt25cLFb4Lh1xBkNyzL4RKXfc6SZYoTnmNprWXo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Fks3vjB2b29ncFxFsCyQv8f72+Rn6/8xfj6titY4XiVSMAhNQYUx9Ke0xnE0XUgFhz3VeC1MnkxMZ4+Z0o9Z7NWYBJYWWcCSMcrM6/vuWNhXgv6f2asz+YtOZaFidltK1KTnIGKU5V6s3zpuxAu88DXyD2TNs4bv1/WLdcgO/wc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=daUFPnYt; arc=none smtp.client-ip=209.85.166.170
+	s=arc-20240116; t=1756833011; c=relaxed/simple;
+	bh=EF6aZqNIoSXa0kptmEVVRLVollrxdh2NWJJq1QCOmQM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YwIGksdHEI/kdu71i2fmMNf4tqyOZeaif4tQduNEME7IQo7BqyLC07Dv+DA2H1TWBtKrpklTfJu7IQeneSdiWqPxHm4S7lw6Cx1NbU/j8fXlKyUdaQ+nff/+r2Gyw8Q9C6esSoxE4/drc41S7+p2NPnXDmEywv0Gh9MaTRg4yJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XvGFNRnR; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-3ea8b3a6454so419455ab.1;
-        Tue, 02 Sep 2025 09:54:34 -0700 (PDT)
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-772750f6b0eso738510b3a.1;
+        Tue, 02 Sep 2025 10:10:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756832074; x=1757436874; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qd7SYjkGLCDXV8sOUNsW1gZmfkcFB2xKeMtakWXaoI4=;
-        b=daUFPnYt+ZsHKIRBE6lFxxiQCKuyisnhPAO1mj6rsZ7D7k0jBoNen8Rr/P5XqILn/6
-         JBhRLbBjL4FrTTAeweQrsePeDD6PTlQf5Xx1tTjl1beyYL5vpj1IxEKbonf8nS7vfyYi
-         cTQY0Emax45PUxJe8MxQRs5Ufh0P7nU1BytULNcDLtk18hVtzL+7x9456uadKBFVxK6y
-         xZeYX64X+jmF8fjES6so2qtVHIRz03v2WgM1mlEU7C9q6tDlvPDv3XHBpDewQt8UD1O9
-         4sDDbpno5nCzpNb1rsb94Y4jyxa1m5XKY4/arb/AD67jpctjVNS6M7kI+U/bgRv3tKaV
-         cuPA==
+        d=gmail.com; s=20230601; t=1756833009; x=1757437809; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ihQjC9yJ1X4I7i2TJOoe7K1INvxzQRyYcVly+4F6YMQ=;
+        b=XvGFNRnRZagP3hjX+6WSklFhFVWd2uJQyFRvv8KIzbT8yRDDm/GHsbSsPzqyyUiCt5
+         +YA12b72b3vJLEXrjFF5dqP7SO54Wb1fVLlyd9DHs1NsLTdm0Dnvern50PE0L5iVpLir
+         qkWxd2zCGaIEM9g6syaAXrLjvtxKOTQCCqNIcblOVnFM0daDMwc+WhtRDNBJEDUCvW6e
+         VZ8pnfXdnBfYpLymIw0IACBIbGLQqn25b8vmwPBGEUZgAdJBuhqEnwBRMDJlIeAk84XN
+         YBlsuIKFzB8tL3yu6SjDUb9C4COtjqhhsX4NnA4C7v/RbAKByRBWgLc5epWj0vGj9zks
+         rqDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756832074; x=1757436874;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qd7SYjkGLCDXV8sOUNsW1gZmfkcFB2xKeMtakWXaoI4=;
-        b=t+QoJASxX1AqFrlq8x5M1Zl51P3FgzAuNOCWmPCEyNw1+KqFc+7VUEkImU9ueDxEXE
-         oc+R7omCbR/XYFo8g9tUDy46mGoKp5cezbQ8rKs1OnDFth2elaMPJYTzDuPFrVFEQg4H
-         O4GLeVa1gLfqsLa1BOStQAL3HOt4DyMXaP5eNmNtBKjSEgL8EyioqZetz5B9DFqQt7pa
-         Hmh362a5PyI7hJi4XH2Jw3PufzcI9nN4cngUuvSoLLHJj8U4x+djhKopa+mbLb7OEXPe
-         mezWYHWGIOrU/ap4O6VF2V6oYEJfzykYEQVgewLZM14YqZq/dXjGvaBiUnRxv42HJfKF
-         WTAA==
-X-Forwarded-Encrypted: i=1; AJvYcCV4pBrKSOSEewKdruEQz2bqVSZQ6dF9Q0sVjrI593n3fwAn1Yo0ZxuL9awhFQu6G6URejs=@vger.kernel.org, AJvYcCXDQeL3AVn7/2foWIgIgPzBQhY4lQ5VEsi2tKQzN0d4QK+G8mXyzFts3Rq/3lHbpDG0IgX+wBRp@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTrcSkYRAcp7vNidB6hGT9133s3ItYBIpFRZcTuT9pAGzFk5nP
-	D94KlPbS6rohhjCgQBhdfcbiDNfqgVZr8J2bmfS+d6wZo3BvJ1w+5kgRIPavO5ZDq62pQKZ1LEc
-	TDrYJGrrxOF85dV3fR99lJlgB7eqR1MpqlOekJb6ACg==
-X-Gm-Gg: ASbGncukBVJcIIxXUV44F+Iszm42x/UGcqoohto9P3yXfvf6+a7ipJc/GZGg3Icc5nA
-	hxKwGqDh2moKIFbZ6kMuBdYsakmMlqbbZOCSzRbOrm1RD1UP3nd3PvmQz8VrRBEwdUNTE1qaIcu
-	XjNbEdw6r0TjBhIA1sdV48nNuQRMDezft8zfC84Xc7G9M6ULy52UNHTprdoOO0GuFJ/OdOMzz4i
-	R9MfvkZ1+ZEqTl68g==
-X-Google-Smtp-Source: AGHT+IFHUDYdDmsqSsp+8hlN5MZJfQiguEWD2ztygF0ULyA6ouJsnC9YN1gma/qlzDQzVRI491v98FiBs2vhCKrxwR8=
-X-Received: by 2002:a05:6e02:4711:b0:3f6:5b66:b5cd with SMTP id
- e9e14a558f8ab-3f65b66c0b8mr27157345ab.6.1756832073878; Tue, 02 Sep 2025
- 09:54:33 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1756833009; x=1757437809;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ihQjC9yJ1X4I7i2TJOoe7K1INvxzQRyYcVly+4F6YMQ=;
+        b=rSMIJmpiY9SEoTxJsVVWYEEs7j5TactwdaxtR0cNMgX/ibVErwWgai2so/nk1rVM0+
+         Q3qYQhzgU91Rgdrw7CCEQmHYIkSMjp3PnCLpGhENCEF5kQexKBE2SrLlABIwQnPYuj6N
+         TKNQeN/YMQYX5qK2Mkv7J+9EE8DUeq/OT5gBgi2rA2NLeaYk3YECBReAoOiWJVHNWV+d
+         WMTCYOS3uuyQGHEbkMJJOtmePRImsRMKeGBCr+Z+jBdm4UQOnl1qVmHYI4np07F3Oitf
+         ohLjzI8IyqfcH/ZFMeM9LJN/OYw4fp0UG2s2oB9QXlvmX/klbaP2z/AEgkZe1QgChZKl
+         kO9w==
+X-Forwarded-Encrypted: i=1; AJvYcCURw1Pz4PatowxBCXe39KI9PGOS6In8qsoFOP/jsXm6zcxQsl3+EsMi4fb54iH5Iywm4pM=@vger.kernel.org, AJvYcCUrMHSCbZr2zu9X2D1Y9YJYIICZ74bxk1fZ8xQnoWl4KDt38ZhWJQ22mUrUiHVjjjcZ9Z4TcElE@vger.kernel.org, AJvYcCUygK8hHVctNanF3NXJoDyW/v7xRJyoGSYsS/FqJoIC9ffFZVbWCuABO5+cb/MUDP/0l+8G1jMjE9lrhRbz@vger.kernel.org, AJvYcCXW2bJmX2tXay9g63GGqPhlV++BvS2nOzy0BViAvfWfH4rI/Yvf+Demh3W9zk0so3m1Xf6iRlH40bXlDhpZ6Y9q@vger.kernel.org, AJvYcCXhP/6trIPrb+6yw2t36Fh8XgmjVu7Uq2Lb+CxUIrljuBYrHbV3qiF/NdGRQzQQavaSQa2GTGFT8FUnBQ0H@vger.kernel.org
+X-Gm-Message-State: AOJu0YyveaIQnBXWueA+xkAre3ygbjEP+PH0b50ewXOiXzaUDBFNcMrL
+	Xyp5zBITYRde0xu181ZRYpD4/rC+EZZcdTMAYrF5RUyrHDKcvy6TtBij
+X-Gm-Gg: ASbGncvF/VJpcZJQwGFHAvbuAqS2TPNPPUVRsLH2lIDU++bioAtOjjctZ/1HnQfSyOt
+	yZqPL9jkMXYY8kS2GFv7S8fm2gNQltPkP/7U9eqymhkI5myRfCR2umyc0tCI8HpkCr7COVCwiKG
+	dALp2VH96W5W1bJC7Bbd/Rt6GdMZa4BI1upqrLfY0i2sV8+I0JS6qdkb24HdpFZ0iKUPS6Yifu/
+	wAth4LvdvEFQy+0aMP+/Gj6j7XQdWOAwSNz71j3SVVMzxj/9EFFlxx6J9Gk11y9XwZRAoDuwAnE
+	cloFAv0PYu6FC7RARqkVn5hp/GiblxcqonUlHT0jxvhvVwth2frxPhy0AchMZvIdUuUJU4Wecdx
+	xJzX29FLntt80wZLZSrKYFS4IQhZEnHQMQQuUFRK26D4=
+X-Google-Smtp-Source: AGHT+IGyUUiPrfchRjHRX3crNHUYbFF9RNjkv+OcfvEakWvZRQN9OH2MzLTdAngcH4AMJjIzQ+3iyg==
+X-Received: by 2002:a05:6a20:1093:b0:244:58:c159 with SMTP id adf61e73a8af0-2440058c3d1mr3642462637.22.1756833009146;
+        Tue, 02 Sep 2025 10:10:09 -0700 (PDT)
+Received: from devvm6216.cco0.facebook.com ([2a03:2880:2ff:2::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7726a0e7cb8sm3845860b3a.58.2025.09.02.10.10.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Sep 2025 10:10:08 -0700 (PDT)
+Date: Tue, 2 Sep 2025 10:10:00 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	berrange@redhat.com, Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v5 3/9] vsock: add netns to vsock core
+Message-ID: <aLck6IIS3AiDJZPg@devvm6216.cco0.facebook.com>
+References: <20250827-vsock-vmtest-v5-0-0ba580bede5b@meta.com>
+ <20250827-vsock-vmtest-v5-3-0ba580bede5b@meta.com>
+ <gncp3ynz3inufzex64sla2ia3stjsen2n3hwhfuykdhmpuuegu@7hk5q2hjfxkv>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250829180950.2305157-1-maciej.fijalkowski@intel.com>
- <CAL+tcoA2MK72wWGXL-RR2Rf+01_tKpSZo7x6VFM+N4DthBK+=w@mail.gmail.com>
- <aLYD2iq+traoJZ7R@boxer> <CAL+tcoAKVRs9nnAHeOA=2kN3Hf_zSS5z64yUSEVmtiS82zz3-Q@mail.gmail.com>
- <aLbNNInuSjkC5qbI@boxer> <CAL+tcoAiY1_OvVAJwWj-YwWY3_9QOWQ_Dwsn5V4vy+wnOQJJog@mail.gmail.com>
- <CAADnVQKOwfFsccUxC1MmtdETkbEw34MaV+YwV=f4vssP=+scVA@mail.gmail.com>
-In-Reply-To: <CAADnVQKOwfFsccUxC1MmtdETkbEw34MaV+YwV=f4vssP=+scVA@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 3 Sep 2025 00:53:57 +0800
-X-Gm-Features: Ac12FXx_CUZdyn221gc2z-fsFixpqKdzobexwvGkkMEomfrJMAFGCzCewEJN73o
-Message-ID: <CAL+tcoDn7HCW1+t0bceDPr2D-Q1EcSqh91eG3HJ+CjiLdX4Nag@mail.gmail.com>
-Subject: Re: [PATCH v7 bpf] xsk: fix immature cq descriptor production
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf <bpf@vger.kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Network Development <netdev@vger.kernel.org>, 
-	"Karlsson, Magnus" <magnus.karlsson@intel.com>, Stanislav Fomichev <stfomichev@gmail.com>, 
-	Eryk Kubanski <e.kubanski@partner.samsung.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <gncp3ynz3inufzex64sla2ia3stjsen2n3hwhfuykdhmpuuegu@7hk5q2hjfxkv>
 
-On Wed, Sep 3, 2025 at 12:22=E2=80=AFAM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> On Tue, Sep 2, 2025 at 6:39=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
-com> wrote:
-> >
-> > > > > >
-> > > > > > > +               list_for_each_entry_safe(pos, tmp, &XSKCB(skb=
-)->addrs_list, addr_node) {
-> > > > > >
-> > > > > > It seems no need to use xxx_safe() since the whole process (fro=
-m
-> > > > > > allocating skb to freeing skb) makes sure each skb can be proce=
-ssed
-> > > > > > atomically?
-> > > > >
-> > > > > We're deleting nodes from linked list so we need the @tmp for fur=
-ther list
-> > > > > traversal, I'm not following your statement about atomicity here?
-> > > >
-> > > > I mean this list is chained around each skb. It's not possible for =
-one
-> > > > skb to do the allocation operation and free operation at the same
-> > > > time, right? That means it's not possible for one list to do the
-> > > > delete operation and add operation at the same time. If so, the
-> > > > xxx_safe() seems unneeded.
-> > >
-> > > _safe() variants are meant to allow you to delete nodes while travers=
-ing
-> > > the list.
-> > > You wouldn't be able to traverse the list when in body of the loop no=
-des
-> > > are deleted as the ->next pointer is poisoned by list_del(). _safe()
-> > > variant utilizes additional 'tmp' parameter to allow you doing this
-> > > operation.
-> >
-> > Sure, this is exactly how _safe() works. My take is we don't need to
-> > use _safe() to keep safety because it's not possible for one reader
-> > traversing the entire addr list while another one is trying to delete
-> > node. If it can happen, then _safe() does make sense.
->
-> Jason,
-> sounds like you're still confused what "_safe" suffix does.
-> "_safe" doesn't help with concurrent access at all.
+On Tue, Sep 02, 2025 at 05:39:10PM +0200, Stefano Garzarella wrote:
+> On Wed, Aug 27, 2025 at 05:31:31PM -0700, Bobby Eshleman wrote:
+> > From: Bobby Eshleman <bobbyeshleman@meta.com>
 
-Hi, Alex.
+...
 
-Quoting Maciej to explain the function of _safe(): _safe() variants
-are meant to allow you to delete nodes while traversing the list.
+> > {
+> > 	enum vsock_net_mode ret;
+> > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> > index 0538948d5fd9..68a8875c8106 100644
+> > --- a/net/vmw_vsock/af_vsock.c
+> > +++ b/net/vmw_vsock/af_vsock.c
+> > @@ -83,6 +83,24 @@
+> >  *   TCP_ESTABLISHED - connected
+> >  *   TCP_CLOSING - disconnecting
+> >  *   TCP_LISTEN - listening
+> > + *
+> > + * - Namespaces in vsock support two different modes configured
+> > + *   through /proc/sys/net/vsock/ns_mode. The modes are "local" and "global".
+> > + *   Each mode defines how the namespace interacts with CIDs.
+> > + *   /proc/sys/net/vsock/ns_mode is write-once, so that it may be configured
+> > + *   and locked down by a namespace manager. The default is "global". The mode
+> > + *   is set per-namespace.
+> > + *
+> > + *   The modes affect the allocation and accessibility of CIDs as follows:
+> > + *   - global - aka fully public
+> > + *      - CID allocation draws from the public pool
+> > + *      - AF_VSOCK sockets may reach any CID allocated from the public pool
+> > + *      - AF_VSOCK sockets may not reach CIDs allocated from private
+> > pools
+> 
+> Should we define what public and private pools are?
+> 
+> What I found difficult to understand was the allocation of CIDs, meaning I
+> had to reread it two or three times to perhaps understand it.
+> 
+> IIUC, netns with mode=global can only allocate public CIDs, while netns with
+> mode=local can only allocate private CIDs, right?
+> 
 
-I meant the _safe is not needed at all as I explained above. The
-af_xdp logic makes sure processes (like reading/adding/deleting) nodes
-of this addr list are serialized. So why add _safe here, I wonder?
-Just remove the _safe suffix then.
+Correct.
 
-The moment you jump into the conversation, I feel I might get stuck
-somehow, but I'm not aware of it... Please correct me if I'm wrong.
+> Perhaps we should first better define how CIDs are allocated and then
+> explain the interaction between them.
+> 
 
-Sure, it's a trivial thing because it has no impact on the whole patch.
+Makes sense, I'll clarify that.
 
-Thanks,
-Jason
+> > + *
+> > + *   - local - aka fully private
+> > + *     - CID allocation draws only from the private pool, does not affect public pool
+> > + *     - AF_VSOCK sockets may only reach CIDs from the private pool
+> > + *     - AF_VSOCK sockets may not reach CIDs allocated from outside the pool
+> 
+> Why using "may" ? I mean, can be cases when this is not true?
+> 
+
+
+Good point, will change to stronger language since it is always true.
+
+[...]
+
+> > 
+> > @@ -2636,6 +2670,137 @@ static struct miscdevice vsock_device = {
+> > 	.fops		= &vsock_device_ops,
+> > };
+> > 
+> > +#define VSOCK_NET_MODE_STRING_MAX 7
+> > +
+> > +static int vsock_net_mode_string(const struct ctl_table *table, int write,
+> > +				 void *buffer, size_t *lenp, loff_t *ppos)
+> > +{
+> > +	char buf[VSOCK_NET_MODE_STRING_MAX] = {0};
+> 
+> Can we change `buf` name?
+> 
+> I find it confusing to have both a `buffer` variable and a `buf` variable in
+> the same function.
+> 
+
+Makes sense, will do.
+
+> > +	enum vsock_net_mode mode;
+> > +	struct ctl_table tmp;
+> > +	struct net *net;
+> > +	const char *p;
+> 
+> Can we move `p` declaration in the `if (!write) {` block?
+> 
+
+yes.
+
+> > +	int ret;
+> > +
+> > +	if (!table->data || !table->maxlen || !*lenp) {
+> > +		*lenp = 0;
+> > +		return 0;
+> > +	}
+> > +
+> > +	net = current->nsproxy->net_ns;
+> > +	tmp = *table;
+> > +	tmp.data = buf;
+> > +
+> > +	if (!write) {
+> > +		mode = vsock_net_mode(net);
+> > +
+> > +		if (mode == VSOCK_NET_MODE_GLOBAL) {
+> > +			p = "global";
+> > +		} else if (mode == VSOCK_NET_MODE_LOCAL) {
+> > +			p = "local";
+> > +		} else {
+> > +			WARN_ONCE(true, "netns has invalid vsock mode");
+> > +			*lenp = 0;
+> > +			return 0;
+> > +		}
+> > +
+> > +		strscpy(buf, p, sizeof(buf));
+> > +		tmp.maxlen = strlen(p);
+> > +	}
+> > +
+> > +	ret = proc_dostring(&tmp, write, buffer, lenp, ppos);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	if (write) {
+> > +		if (!strncmp(buffer, "global", 6))
+> 
+> Are we sure that the `buffer` is at least 6 bytes long and NULL-terminated?
+> 
+> Maybe we can just check that `lenp <= sizeof(buf)`...
+> 
+> Should we add macros for "global" and "local" ?
+> 
+
+That all sounds reasonable. IIRC I tested with some garbage writes, but might
+as well err on the side of caution.
+
+> 
+> > +			mode = VSOCK_NET_MODE_GLOBAL;
+> > +		else if (!strncmp(buffer, "local", 5))
+> > +			mode = VSOCK_NET_MODE_LOCAL;
+> > +		else
+> > +			return -EINVAL;
+> > +
+> > +		if (!vsock_net_write_mode(net, mode))
+> > +			return -EPERM;
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+
+...
+
+
+Thanks for the review!
+
+Best,
+Bobby
 
