@@ -1,286 +1,415 @@
-Return-Path: <netdev+bounces-219245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98F37B40AB7
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 18:33:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CF17B40AE4
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 18:43:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B80F166CD9
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 16:33:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10AA97B4D41
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 16:41:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1A3931CA5F;
-	Tue,  2 Sep 2025 16:33:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE1432BEFE1;
+	Tue,  2 Sep 2025 16:43:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KZvn64uf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F04DF33A005;
-	Tue,  2 Sep 2025 16:33:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A35482877FC;
+	Tue,  2 Sep 2025 16:43:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756830825; cv=none; b=J4BESzw21I+gS5vgg/6JxT5UCl/tyRiGSUNUgMQUaUbfgow5EMEHLIwmhZykfJ9ngJL/9SotaxA4pL9SrX4k9br/OR0ku4Q/e/kd0kJ95OhOIk4+QUEk7gfEqpE56JgyC3rS0GO7lOLJt+XCmThbJanBsbRunClxgdfcrxqr3Tw=
+	t=1756831400; cv=none; b=JCABddLK99QvVL3KHowh3TbXWDrQENNrT2AtbKCU4i2jbmoYh8YA1NVcZk2BX3LAyDbF9Ar/nurzs/WKbz2Ry/2Vgugc41GMYbAc9gNKLiLBogRIFRhwzp+5Zwo8fdYgLpaqUh1DNM0FsiBat7LHXz/qhZ3ab/92nNsBJFFymUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756830825; c=relaxed/simple;
-	bh=RE3FgNsKnWjC4fkSeAW422UDLZsZ8vzhCH9CYtQBqYw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=D6ZH6l83BdUwGQSuMXvwq9U8D0yN1w//7v6FMXJfM3ZzMOzeR/zvgNOqu1s/wsdEQ4EOfjdCQgowNzJtILwMNTpQv8JIJGSQbLNaPJ8ykfW8FEFqsRmqUy7o0ITqRl1IDKSFFoXBFUh+ZBMc6BXOI+6tJugev38d9wDjOUD4UlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1756831400; c=relaxed/simple;
+	bh=pNQF920LCP5sfkJuLl2/bHlmNH0CpwtW8TRO7FNfORw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VybPKP21lGM32zLxUtJF9RH6AMrcZElsXaSi8pVDE6OAvEYApMBcf8O5tc21QSkENQ/giBG25KEC/Ntxxp7QQ9h9O+dEYblftGk0jSnZw1g/WtxCDSIgF+RTTz8X7/Wz8ATZ5sICrll7eHnJ5Pw1agEERVGW6nnnqh9pPjJ2mUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KZvn64uf; arc=none smtp.client-ip=209.85.166.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b043da5a55fso263123866b.0;
-        Tue, 02 Sep 2025 09:33:43 -0700 (PDT)
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-887490f0654so44032639f.0;
+        Tue, 02 Sep 2025 09:43:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756831397; x=1757436197; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f0l/lpFpsMhxQP1BvXo5dY414yVX8MMT3B+6FaO0U0c=;
+        b=KZvn64ufMxRdF+PP/PT8zNokm0yEojvgEVQdu+7RSzjSdZa5zU7qMiU2HTkcG/KBoZ
+         9ws03m4+rEt9H2+EU8ARhnh0ztGLORDRUiXbFKFcboQtg/NuO7bH5Kiye0YwFpY7VSqj
+         GygOZKWzOoSe5Bfe4tlBHvIajldEaeTnlSQejkXgnIVS6+jIIgCiBoBqcknEy/PIY/z0
+         JVfd4EHvwSUTdXNk7tFKC3FznjbOU1QJwF8mCD31VwXcmAjYBG/CvCNEKXXxpeEhfiOo
+         iICuTVBhDG9jWZe5VlUSLCvUZJJVQVYKCPdHmnwVcBxe07qNFTVvQOBkkWf9/VkVp8KA
+         qTZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756830822; x=1757435622;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=R3FeINq1i5ZMPwlr/dYhne9uhmO3iEEG+4qpUcPbP6g=;
-        b=GBUlhJbDxQZiv0moI8NtkCsnKiozQxkzYxpMXf7jgpPD0CW329Cc46QKR2mnEGyZnT
-         QMflQYaE6H1aeNB4fCP/8lXnJMwgIoBryWkEe8qv6C6vK5cj0BSOCNuGO35PiqQqDUDx
-         8AXkxa/M5LWHAt5UrePEcsCqlnJWWHoxnOehnx5J4NZWzvcYZC2uvVr/l2KSqgYyTxfN
-         4ujbze8wA5WTriizTSawUHlfb8NPBMV0o6Hf4Az++cA431Kzkmpiy5VKYgGjmPD/9Xgu
-         wcywqy+rqUYkTIlNIznaUms/e3l1mUUg3ABv/dmbPOqllThAl41+eIewZDFN6V3GTNtr
-         IQ+A==
-X-Forwarded-Encrypted: i=1; AJvYcCVI+DX4hUzVQQAB5bn6hMJcgdLd0xyKck1IlDu74AgYNnrnP3jFKusjfOOAMII5DhtPUmDTtZF9@vger.kernel.org, AJvYcCXDYfbFoyXAnR4HlWRjMwcpw8/b9N6phyNzdhKr7TTou2+YWwRzzDYE7b2X2tZSuqusew/9ZggUVaSa298KDUs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6hSvD8BVTgx20VtTdJ8RD4D2pEjyr0z4v/QY6mclUd8KVDUTb
-	vzSJYRM7hZbMMqwJ6FQsky5MIdEz3mDJZEt4Nz3DOLc7X9kBS0bwJTTJuMClKg==
-X-Gm-Gg: ASbGnctsOvlPv+rT1akO7utRwmMVrwfUGqWz/4lQOuniq3fYCcbmjjRyV6lFpBcisUb
-	WRoLO7S9ejVfXtabL8dAdy66GdLOh2C9pTmg/4JOIf5sisuvLq7NR0lEgU5bC4Oad58FqbWC9We
-	4G7w/X/MyDsFYO0X3gX1hRcWZycaA/uAoE+TpxxqHQR42DvyeLA6v+mCx9XcmLeqL9ysvtFwqu3
-	+LqkbJqxaferDhaQI+2c1B3Hvf3U0uszmoG1oZv1ZJAPOoV1FFwzYYHxEVX1+Vlke5lbdnTnyxI
-	0LH1HS/dWb8grx65qZe9rT66Av57gSrwLKN+zGoZ05+xVh8yfVsepFqeCA5uBUX0k03XqvWeUkN
-	kZBrXJhF3JyGPWoYTTpiwHxEI
-X-Google-Smtp-Source: AGHT+IH5125NR6h4G5qI9OXqQ58KzdMsW/kDSzmVUUhGB0SH7VPyFtpYqivO04qynZX4fGGrjBootg==
-X-Received: by 2002:a17:907:fd15:b0:afe:ef48:ee41 with SMTP id a640c23a62f3a-b01da23e859mr1289920766b.58.1756830821863;
-        Tue, 02 Sep 2025 09:33:41 -0700 (PDT)
-Received: from localhost ([2a03:2880:30ff:73::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b04189de5b5sm679555066b.10.2025.09.02.09.33.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Sep 2025 09:33:41 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-Date: Tue, 02 Sep 2025 09:33:33 -0700
-Subject: [PATCH net-next] selftest: netcons: create a torture test
+        d=1e100.net; s=20230601; t=1756831397; x=1757436197;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f0l/lpFpsMhxQP1BvXo5dY414yVX8MMT3B+6FaO0U0c=;
+        b=IIZ7OsA3bvUzns6e1pkHYzkXZiVD50y4VBAUNk2o4Wo1i9oB9BY17L8gjbDT8jhIPx
+         7/EElGrY1HeuGDKZP2EYgl/Ws7YzwQrk52LCoT+OFAqFkqFKSPQYe5as5pjdiFH+9IQy
+         sctZfJekYEy9xwwAxDavI2j2ickPtxFgWFdHDkE79GkP7e/Ye342cUVmhhXBD2Sg/H08
+         8zegJJEl+UER0wg5V/D3GKrUeuPTfXZNfRNfRADmE0mLLK2VjbLcolEBQC+XdiIYjzGw
+         lg6eOTTcOoYhy535xq768HqIzC7RTr+b0tTdYBPrF/EX8I1gvLAL+O/3KAHpNgJgFvRA
+         4dAw==
+X-Forwarded-Encrypted: i=1; AJvYcCUmoxkhHwi1kt8NlB4nO8uB1pkGc9P/rs7RJBe5c4Wc5DPJqhfEAADmO0fOWtfxcYz0Uo3TGM97ixsQM5Y=@vger.kernel.org, AJvYcCVCM/qaO/jpcuBAMPLQiDwh54UiIsH89Eru2q9nrbiwQmyeqH0eb3RdzZs7ONSGS5RqQiDUBt1B@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6ZcIpcR3OHP0ue8TplvNS5d3fUNzBGRCUkDA/aTf14uKMRy+k
+	CKKP3PXjMmP+tyUQgBXlNlnfiaXE56C/CGV7H5R43dQ8rIsxCMjU6wzxA6BoCAHPh8VISCSIHl6
+	NCu3Ozf0g35vZohCWw65IfmicSmENNlg=
+X-Gm-Gg: ASbGncsm8zyXDZ/PbDlX9Lz0qM2KSXi7F4/Ksy5kKrLvk098FWgI4v7Z1LRB974CePh
+	icbU2bmbJ0mr24k/fOGopsjYpUi4fBYKIurbVDAXPBjgdiDr+5oA9Os6S/euuWROtG6I2we3xCI
+	rdqzrYzfRZttpQi4+si3IitokTLItMOXQi+cT5icW/t2L+EQQmoEDRcmgbw3z7IntbJkNL4LoIt
+	zNjqaQ=
+X-Google-Smtp-Source: AGHT+IFKIPZnrHdY3XIMV3a1mVk429grb81ouaqdswR4E+iGmnFWdewNuJwcO3WbaFkhhSqzpTgjttmTtvSMo8O4RwE=
+X-Received: by 2002:a05:6e02:2147:b0:3f0:71da:c07 with SMTP id
+ e9e14a558f8ab-3f4021c7ae1mr198398625ab.22.1756831397249; Tue, 02 Sep 2025
+ 09:43:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250902-netconsole_torture-v1-1-03c6066598e9@debian.org>
-X-B4-Tracking: v=1; b=H4sIAFwct2gC/x3MUQoCMQwFwKuE972FWhFsryIipaYakFTSKAvL3
- l1wDjAbJpvwRKENxl+ZMhSFDguhPas+OMgdhZBiOsUcU1D2NnSOF998mH+Mw7m3dOyxtpozFsL
- buMv6Ty9Q9qC8Oq77/gMl5Qo8bgAAAA==
-X-Change-ID: 20250902-netconsole_torture-8fc23f0aca99
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Shuah Khan <shuah@kernel.org>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, asantostc@gmail.com, efault@gmx.de, 
- calvin@wbinvd.org, kernel-team@meta.com, Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.15-dev-dd21f
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5546; i=leitao@debian.org;
- h=from:subject:message-id; bh=RE3FgNsKnWjC4fkSeAW422UDLZsZ8vzhCH9CYtQBqYw=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBotxxkeBqgpYB3NSplyoZQBNhlN+/P+i229zDMV
- XCcmANWf3aJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaLccZAAKCRA1o5Of/Hh3
- bfyXD/9LBCxagGihURttDoRGhKnRKDsxl9JuTQQ6BXr3jqz6+yd4u+s3hJNaN52AakUGDabw8lp
- 1Onh1YxD4h8GfFnSmHGsfdqAU4QjCKrwUShNLFollyskOWDkvQ+09CxMD27toD2nXEqMRdnfM9V
- wpdAyZX3Hb9IuUO52hB3yDLvJa+kAVVVB1P8txQgfblFb4U73VV/KeM1Q29Z7GJp5woiF0UYo8q
- 3/0GiCjcSsM2GOMSHEq6CP0TEAM9K2B9P2MnFD+/LgVXJbtadvmlFK62KCdyDynI+PdCjLv59yo
- coZOn+LiSCgepdErw3H8P64IDtWAR5SsCy8Ef8EsVVMTZvDDMn8cmbKwRnWqhQ+oyznXWbrVKnX
- tm+WViyu7Qf5I8m9audzevSPPrpzKw6JP/9LWWCBMvAQcSqNkLuFGE1QTvBfT26Gl4nZ8B66HSp
- TZtNOWbzU5YFZUNXIdK4agac0zAhwaWClXXb2kf+fix/liCobkgN1sYDjJY2sYpaRih1Kjijv7W
- xPU30rP52OiXNZ2vpWesd0NXFoW8x/tsq8qi6l77r7o1adeWFPR1NCtwRNX1b7Ni6wmKgvB039I
- wEF5+DFn1TaYT8qygM7n/1Q2w0r/PvRrVwZJrqhAEFpp73bZTY5XhM7R8crj6vLdZrq/yFdJClz
- IDgr5NE3dlPgcOA==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+References: <20250831100822.1238795-1-jackzxcui1989@163.com>
+ <20250831100822.1238795-3-jackzxcui1989@163.com> <CAL+tcoCAVxt3RuYEsaqcvprCfMWfA0A34O9S3xSexzmmnbwSJQ@mail.gmail.com>
+In-Reply-To: <CAL+tcoCAVxt3RuYEsaqcvprCfMWfA0A34O9S3xSexzmmnbwSJQ@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 3 Sep 2025 00:42:41 +0800
+X-Gm-Features: Ac12FXyKVQ1dS1tKR_JR2tMZEMNL2kKMnljwh3Ao9GDPNUbF8i28ao2WUF22sfs
+Message-ID: <CAL+tcoCp12t_5PRWWkiMi++1MgYX4WXW4dUDXYzHF_tJACw3dg@mail.gmail.com>
+Subject: Re: [PATCH net-next v10 2/2] net: af_packet: Use hrtimer to do the
+ retire operation
+To: Xin Zhao <jackzxcui1989@163.com>
+Cc: willemdebruijn.kernel@gmail.com, edumazet@google.com, ferenc@fejes.dev, 
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Create a netconsole test that puts a lot of pressure on the netconsole
-list manipulation. Do it by creating dynamic targets and deleting
-targets while messages are being sent. Also put interface down while the
-messages are being sent, as creating parallel targets.
+On Tue, Sep 2, 2025 at 11:43=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
+>
+> On Sun, Aug 31, 2025 at 6:09=E2=80=AFPM Xin Zhao <jackzxcui1989@163.com> =
+wrote:
+> >
+> > In a system with high real-time requirements, the timeout mechanism of
+> > ordinary timers with jiffies granularity is insufficient to meet the
+> > demands for real-time performance. Meanwhile, the optimization of CPU
+> > usage with af_packet is quite significant. Use hrtimer instead of timer
+> > to help compensate for the shortcomings in real-time performance.
+> > In HZ=3D100 or HZ=3D250 system, the update of TP_STATUS_USER is not rea=
+l-time
+> > enough, with fluctuations reaching over 8ms (on a system with HZ=3D250)=
+.
+> > This is unacceptable in some high real-time systems that require timely
+> > processing of network packets. By replacing it with hrtimer, if a timeo=
+ut
+> > of 2ms is set, the update of TP_STATUS_USER can be stabilized to within
+> > 3 ms.
+> >
+> > Signed-off-by: Xin Zhao <jackzxcui1989@163.com>
+> > ---
+> > Changes in v8:
+> > - Simplify the logic related to setting timeout.
+> >
+> > Changes in v7:
+> > - Only update the hrtimer expire time within the hrtimer callback.
+> >
+> > Changes in v1:
+> > - Do not add another config for the current changes.
+> >
+> > ---
+> >  net/packet/af_packet.c | 79 +++++++++---------------------------------
+> >  net/packet/diag.c      |  2 +-
+> >  net/packet/internal.h  |  6 ++--
+> >  3 files changed, 20 insertions(+), 67 deletions(-)
+> >
+> > diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+> > index d4eb4a4fe..3e3bb4216 100644
+> > --- a/net/packet/af_packet.c
+> > +++ b/net/packet/af_packet.c
+> > @@ -203,8 +203,7 @@ static void prb_retire_current_block(struct tpacket=
+_kbdq_core *,
+> >  static int prb_queue_frozen(struct tpacket_kbdq_core *);
+> >  static void prb_open_block(struct tpacket_kbdq_core *,
+> >                 struct tpacket_block_desc *);
+> > -static void prb_retire_rx_blk_timer_expired(struct timer_list *);
+> > -static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core =
+*);
+> > +static enum hrtimer_restart prb_retire_rx_blk_timer_expired(struct hrt=
+imer *);
+> >  static void prb_fill_rxhash(struct tpacket_kbdq_core *, struct tpacket=
+3_hdr *);
+> >  static void prb_clear_rxhash(struct tpacket_kbdq_core *,
+> >                 struct tpacket3_hdr *);
+> > @@ -579,33 +578,13 @@ static __be16 vlan_get_protocol_dgram(const struc=
+t sk_buff *skb)
+> >         return proto;
+> >  }
+> >
+> > -static void prb_del_retire_blk_timer(struct tpacket_kbdq_core *pkc)
+> > -{
+> > -       timer_delete_sync(&pkc->retire_blk_timer);
+> > -}
+> > -
+> >  static void prb_shutdown_retire_blk_timer(struct packet_sock *po,
+> >                 struct sk_buff_head *rb_queue)
+> >  {
+> >         struct tpacket_kbdq_core *pkc;
+> >
+> >         pkc =3D GET_PBDQC_FROM_RB(&po->rx_ring);
+> > -
+> > -       spin_lock_bh(&rb_queue->lock);
+> > -       pkc->delete_blk_timer =3D 1;
 
-The code launches three background jobs on distinct schedules:
+One more review from my side is that as to the removal of
+delete_blk_timer, I'm afraid it deserves a clarification in the commit
+message.
 
- * Toggle netcons target every 30 iterations
- * create and delete random_target every 50 iterations
- * toggle iface every 70 iterations
+> > -       spin_unlock_bh(&rb_queue->lock);
+> > -
+> > -       prb_del_retire_blk_timer(pkc);
+> > -}
+> > -
+> > -static void prb_setup_retire_blk_timer(struct packet_sock *po)
+> > -{
+> > -       struct tpacket_kbdq_core *pkc;
+> > -
+> > -       pkc =3D GET_PBDQC_FROM_RB(&po->rx_ring);
+> > -       timer_setup(&pkc->retire_blk_timer, prb_retire_rx_blk_timer_exp=
+ired,
+> > -                   0);
+> > -       pkc->retire_blk_timer.expires =3D jiffies;
+> > +       hrtimer_cancel(&pkc->retire_blk_timer);
+> >  }
+> >
+> >  static int prb_calc_retire_blk_tmo(struct packet_sock *po,
+> > @@ -671,29 +650,22 @@ static void init_prb_bdqc(struct packet_sock *po,
+> >         p1->version =3D po->tp_version;
+> >         po->stats.stats3.tp_freeze_q_cnt =3D 0;
+> >         if (req_u->req3.tp_retire_blk_tov)
+> > -               p1->retire_blk_tov =3D req_u->req3.tp_retire_blk_tov;
+> > +               p1->interval_ktime =3D ms_to_ktime(req_u->req3.tp_retir=
+e_blk_tov);
+> >         else
+> > -               p1->retire_blk_tov =3D prb_calc_retire_blk_tmo(po,
+> > -                                               req_u->req3.tp_block_si=
+ze);
+> > -       p1->tov_in_jiffies =3D msecs_to_jiffies(p1->retire_blk_tov);
+> > +               p1->interval_ktime =3D ms_to_ktime(prb_calc_retire_blk_=
+tmo(po,
+> > +                                               req_u->req3.tp_block_si=
+ze));
+> >         p1->blk_sizeof_priv =3D req_u->req3.tp_sizeof_priv;
+> >         rwlock_init(&p1->blk_fill_in_prog_lock);
+> >
+> >         p1->max_frame_len =3D p1->kblk_size - BLK_PLUS_PRIV(p1->blk_siz=
+eof_priv);
+> >         prb_init_ft_ops(p1, req_u);
+> > -       prb_setup_retire_blk_timer(po);
+> > +       hrtimer_setup(&p1->retire_blk_timer, prb_retire_rx_blk_timer_ex=
+pired,
+> > +                     CLOCK_MONOTONIC, HRTIMER_MODE_REL_SOFT);
+> > +       hrtimer_start(&p1->retire_blk_timer, p1->interval_ktime,
+> > +                     HRTIMER_MODE_REL_SOFT);
+>
+> You expect to see it start at the setsockopt phase? Even if it's far
+> from the real use of recv at the moment.
+>
+> >         prb_open_block(p1, pbd);
+> >  }
+> >
+> > -/*  Do NOT update the last_blk_num first.
+> > - *  Assumes sk_buff_head lock is held.
+> > - */
+> > -static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core =
+*pkc)
+> > -{
+> > -       mod_timer(&pkc->retire_blk_timer,
+> > -                       jiffies + pkc->tov_in_jiffies);
+> > -}
+> > -
+> >  /*
+> >   * Timer logic:
+> >   * 1) We refresh the timer only when we open a block.
+> > @@ -717,7 +689,7 @@ static void _prb_refresh_rx_retire_blk_timer(struct=
+ tpacket_kbdq_core *pkc)
+> >   * prb_calc_retire_blk_tmo() calculates the tmo.
+> >   *
+> >   */
+> > -static void prb_retire_rx_blk_timer_expired(struct timer_list *t)
+> > +static enum hrtimer_restart prb_retire_rx_blk_timer_expired(struct hrt=
+imer *t)
+> >  {
+> >         struct packet_sock *po =3D
+> >                 timer_container_of(po, t, rx_ring.prb_bdqc.retire_blk_t=
+imer);
+> > @@ -730,9 +702,6 @@ static void prb_retire_rx_blk_timer_expired(struct =
+timer_list *t)
+> >         frozen =3D prb_queue_frozen(pkc);
+> >         pbd =3D GET_CURR_PBLOCK_DESC_FROM_CORE(pkc);
+> >
+> > -       if (unlikely(pkc->delete_blk_timer))
+> > -               goto out;
+> > -
+> >         /* We only need to plug the race when the block is partially fi=
+lled.
+> >          * tpacket_rcv:
+> >          *              lock(); increment BLOCK_NUM_PKTS; unlock()
+> > @@ -749,26 +718,16 @@ static void prb_retire_rx_blk_timer_expired(struc=
+t timer_list *t)
+> >         }
+> >
+> >         if (!frozen) {
+> > -               if (!BLOCK_NUM_PKTS(pbd)) {
+> > -                       /* An empty block. Just refresh the timer. */
+> > -                       goto refresh_timer;
+> > +               if (BLOCK_NUM_PKTS(pbd)) {
+> > +                       /* Not an empty block. Need retire the block. *=
+/
+> > +                       prb_retire_current_block(pkc, po, TP_STATUS_BLK=
+_TMO);
+> > +                       prb_dispatch_next_block(pkc, po);
+> >                 }
+> > -               prb_retire_current_block(pkc, po, TP_STATUS_BLK_TMO);
+> > -               if (!prb_dispatch_next_block(pkc, po))
+> > -                       goto refresh_timer;
+> > -               else
+> > -                       goto out;
+> >         } else {
+> >                 /* Case 1. Queue was frozen because user-space was
+> >                  * lagging behind.
+> >                  */
+> > -               if (prb_curr_blk_in_use(pbd)) {
+> > -                       /*
+> > -                        * Ok, user-space is still behind.
+> > -                        * So just refresh the timer.
+> > -                        */
+> > -                       goto refresh_timer;
+> > -               } else {
+> > +               if (!prb_curr_blk_in_use(pbd)) {
+> >                         /* Case 2. queue was frozen,user-space caught u=
+p,
+> >                          * now the link went idle && the timer fired.
+> >                          * We don't have a block to close.So we open th=
+is
+> > @@ -777,15 +736,12 @@ static void prb_retire_rx_blk_timer_expired(struc=
+t timer_list *t)
+> >                          * Thawing/timer-refresh is a side effect.
+> >                          */
+> >                         prb_open_block(pkc, pbd);
+> > -                       goto out;
+> >                 }
+> >         }
+> >
+> > -refresh_timer:
+> > -       _prb_refresh_rx_retire_blk_timer(pkc);
+> > -
+> > -out:
+> > +       hrtimer_forward_now(&pkc->retire_blk_timer, pkc->interval_ktime=
+);
+> >         spin_unlock(&po->sk.sk_receive_queue.lock);
+> > +       return HRTIMER_RESTART;
+> >  }
+> >
+> >  static void prb_flush_block(struct tpacket_kbdq_core *pkc1,
+> > @@ -917,7 +873,6 @@ static void prb_open_block(struct tpacket_kbdq_core=
+ *pkc1,
+> >         pkc1->pkblk_end =3D pkc1->pkblk_start + pkc1->kblk_size;
+> >
+> >         prb_thaw_queue(pkc1);
+> > -       _prb_refresh_rx_retire_blk_timer(pkc1);
+>
+> Could you say more on why you remove this here and only reset/update
+> the expiry time in the timer handler? Probably I missed something
+> appearing in the previous long discussion.
 
-This creates multiple concurrency sources that interact with netconsole
-states. This is good practice to simulate stress, and exercise netpoll
-and netconsole locks.
+I gradually understand your thought behind this modification. You're
+trying to move the timer operation out of prb_open_block() and then
+spread the timer operation into each caller.
 
-This test already found an issue as reported in [1]
+You probably miss the following call trace:
+packet_current_rx_frame() -> __packet_lookup_frame_in_block() ->
+prb_open_block() -> _prb_refresh_rx_retire_blk_timer()
+?
 
-Link: https://lore.kernel.org/all/20250901-netpoll_memleak-v1-1-34a181977dfc@debian.org/ [1]
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- tools/testing/selftests/drivers/net/Makefile       |   1 +
- .../selftests/drivers/net/netcons_torture.sh       | 133 +++++++++++++++++++++
- 2 files changed, 134 insertions(+)
+May I ask why bother introducing so many changes like this instead of
+leaving it as-is?
 
-diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
-index 984ece05f7f92..2b253b1ff4f38 100644
---- a/tools/testing/selftests/drivers/net/Makefile
-+++ b/tools/testing/selftests/drivers/net/Makefile
-@@ -17,6 +17,7 @@ TEST_PROGS := \
- 	netcons_fragmented_msg.sh \
- 	netcons_overflow.sh \
- 	netcons_sysdata.sh \
-+	netcons_torture.sh \
- 	netpoll_basic.py \
- 	ping.py \
- 	queues.py \
-diff --git a/tools/testing/selftests/drivers/net/netcons_torture.sh b/tools/testing/selftests/drivers/net/netcons_torture.sh
-new file mode 100755
-index 0000000000000..d41884c83cab3
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/netcons_torture.sh
-@@ -0,0 +1,133 @@
-+#!/usr/bin/env bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# Repeatedly send kernel messages, toggles netconsole targets on and off,
-+# creates and deletes targets in parallel, and toggles the source interface to
-+# simulate stress conditions.
-+#
-+# This test aims verify the robustness of netconsole under dynamic
-+# configurations and concurrent operations.
-+#
-+# The major goal is to run this test with LOCKDEP, Kmemleak and KASAN to make
-+# sure no issues is reported.
-+#
-+# Author: Breno Leitao <leitao@debian.org>
-+
-+set -euo pipefail
-+
-+SCRIPTDIR=$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")
-+
-+source "${SCRIPTDIR}"/lib/sh/lib_netcons.sh
-+
-+# Number of times the main loop run
-+ITERATIONS=${1:-1000}
-+
-+# Only test extended format
-+FORMAT="extended"
-+# And ipv6 only
-+IP_VERSION="ipv6"
-+
-+# Create, enable and delete some targets.
-+create_and_delete_random_target() {
-+	COUNT=1
-+	RND_PREFIX=$(mktemp -u netcons_rnd_XXXX_)
-+
-+	if [ -d "${NETCONS_CONFIGFS}/${RND_PREFIX}${COUNT}"  ] || \
-+	   [ -d "${NETCONS_CONFIGFS}/${RND_PREFIX}0" ]; then
-+		echo "Function didn't finish yet, skipping it." >&2
-+		return
-+	fi
-+
-+	# enable COUNT targets
-+	for i in $(seq 0 ${COUNT})
-+	do
-+		RND_TARGET="${RND_PREFIX}"${i}
-+		RND_TARGET_PATH="${NETCONS_CONFIGFS}"/"${RND_TARGET}"
-+
-+		# Basic population so the target can come up
-+		mkdir "${RND_TARGET_PATH}"
-+		echo "${DSTIP}" > "${RND_TARGET_PATH}"/remote_ip
-+		echo "${SRCIP}" > "${RND_TARGET_PATH}"/local_ip
-+		echo "${DSTMAC}" > "${RND_TARGET_PATH}"/remote_mac
-+		echo "${SRCIF}" > "${RND_TARGET_PATH}"/dev_name
-+
-+		echo 1 > "${RND_TARGET_PATH}"/enabled
-+	done
-+
-+	echo "netconsole selftest: ${COUNT} additional target was created" > /dev/kmsg
-+	# disable them all
-+	for i in $(seq 0 ${COUNT})
-+	do
-+		RND_TARGET="${RND_PREFIX}"${i}
-+		RND_TARGET_PATH="${NETCONS_CONFIGFS}"/"${RND_TARGET}"
-+		echo 0 > "${RND_TARGET_PATH}"/enabled
-+		rmdir "${RND_TARGET_PATH}"
-+	done
-+}
-+
-+# Disable and enable the target mid-air, while messages
-+# are being transmitted.
-+toggle_netcons_target() {
-+	for i in $(seq 2)
-+	do
-+		if [ ! -d "${NETCONS_PATH}" ]
-+		then
-+			break
-+		fi
-+		echo 0 > "${NETCONS_PATH}"/enabled 2> /dev/null || true
-+		# Try to enable a bit harder, given it might fail to enable
-+		# Write to `enabled` might fail depending on the lock, which is
-+		# highly contentious here
-+		for _ in $(seq 5)
-+		do
-+			echo 1 > "${NETCONS_PATH}"/enabled 2> /dev/null || true
-+		done
-+	done
-+}
-+
-+toggle_iface(){
-+	ip link set "${SRCIF}" down
-+	ip link set "${SRCIF}" up
-+}
-+
-+# Start here
-+
-+modprobe netdevsim 2> /dev/null || true
-+modprobe netconsole 2> /dev/null || true
-+
-+# Check for basic system dependency and exit if not found
-+check_for_dependencies
-+# Set current loglevel to KERN_INFO(6), and default to KERN_NOTICE(5)
-+echo "6 5" > /proc/sys/kernel/printk
-+# Remove the namespace, interfaces and netconsole target on exit
-+trap cleanup EXIT
-+# Create one namespace and two interfaces
-+set_network "${IP_VERSION}"
-+# Create a dynamic target for netconsole
-+create_dynamic_target "${FORMAT}"
-+
-+for i in $(seq "$ITERATIONS")
-+do
-+	for _ in $(seq 10)
-+	do
-+		echo "${MSG}: ${TARGET} ${i}" > /dev/kmsg
-+		wait
-+	done
-+
-+	if (( i % 30 == 0 )); then
-+		toggle_netcons_target &
-+	fi
-+
-+	if (( i % 50 == 0 )); then
-+		# create some targets, enable them, send msg and disable
-+		# all in a parallel thread
-+		create_and_delete_random_target &
-+	fi
-+
-+	if (( i % 70 == 0 )); then
-+		toggle_iface &
-+	fi
-+done
-+wait
-+
-+exit "${ksft_pass}"
+Thanks,
+Jason
 
----
-base-commit: 2fd4161d0d2547650d9559d57fc67b4e0a26a9e3
-change-id: 20250902-netconsole_torture-8fc23f0aca99
-
-Best regards,
---  
-Breno Leitao <leitao@debian.org>
-
+>
+> >
+> >         smp_wmb();
+> >  }
+> > diff --git a/net/packet/diag.c b/net/packet/diag.c
+> > index 6ce1dcc28..c8f43e0c1 100644
+> > --- a/net/packet/diag.c
+> > +++ b/net/packet/diag.c
+> > @@ -83,7 +83,7 @@ static int pdiag_put_ring(struct packet_ring_buffer *=
+ring, int ver, int nl_type,
+> >         pdr.pdr_frame_nr =3D ring->frame_max + 1;
+> >
+> >         if (ver > TPACKET_V2) {
+> > -               pdr.pdr_retire_tmo =3D ring->prb_bdqc.retire_blk_tov;
+> > +               pdr.pdr_retire_tmo =3D ktime_to_ms(ring->prb_bdqc.inter=
+val_ktime);
+> >                 pdr.pdr_sizeof_priv =3D ring->prb_bdqc.blk_sizeof_priv;
+> >                 pdr.pdr_features =3D ring->prb_bdqc.feature_req_word;
+> >         } else {
+> > diff --git a/net/packet/internal.h b/net/packet/internal.h
+> > index d367b9f93..f8cfd9213 100644
+> > --- a/net/packet/internal.h
+> > +++ b/net/packet/internal.h
+> > @@ -20,7 +20,6 @@ struct tpacket_kbdq_core {
+> >         unsigned int    feature_req_word;
+> >         unsigned int    hdrlen;
+> >         unsigned char   reset_pending_on_curr_blk;
+> > -       unsigned char   delete_blk_timer;
+> >         unsigned short  kactive_blk_num;
+> >         unsigned short  blk_sizeof_priv;
+> >
+> > @@ -39,12 +38,11 @@ struct tpacket_kbdq_core {
+> >         /* Default is set to 8ms */
+> >  #define DEFAULT_PRB_RETIRE_TOV (8)
+> >
+> > -       unsigned short  retire_blk_tov;
+> > +       ktime_t         interval_ktime;
+> >         unsigned short  version;
+> > -       unsigned long   tov_in_jiffies;
+> >
+> >         /* timer to retire an outstanding block */
+> > -       struct timer_list retire_blk_timer;
+> > +       struct hrtimer  retire_blk_timer;
+> >  };
+>
+> The whole structure needs a new organization?
+>
+> Before:
+>         /* size: 152, cachelines: 3, members: 22 */
+>         /* sum members: 144, holes: 2, sum holes: 8 */
+>         /* paddings: 1, sum paddings: 4 */
+>         /* last cacheline: 24 bytes */
+> After:
+>         /* size: 176, cachelines: 3, members: 19 */
+>         /* sum members: 163, holes: 4, sum holes: 13 */
+>         /* paddings: 1, sum paddings: 4 */
+>         /* forced alignments: 1, forced holes: 1, sum forced holes: 6 */
+>         /* last cacheline: 48 bytes */
+>
+> Thanks,
+> Jason
+>
+> >
+> >  struct pgv {
+> > --
+> > 2.34.1
+> >
+> >
 
