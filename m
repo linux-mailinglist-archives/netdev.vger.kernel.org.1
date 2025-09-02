@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-219378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B666BB410F5
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 01:50:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7D0BB410F7
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 01:50:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 862F2541032
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:50:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E32A7A6030
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:48:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 081782EA47F;
-	Tue,  2 Sep 2025 23:50:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 398922EA741;
+	Tue,  2 Sep 2025 23:50:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mVQVKfbu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DlefcvvJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D40F6274B51;
-	Tue,  2 Sep 2025 23:50:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 106042EA46F;
+	Tue,  2 Sep 2025 23:50:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756857003; cv=none; b=FVoNIY09SqN5ld/WxbOTOMEfAzkd7YVXhva8MhtEGXSARC+22jLuo6ZfFilpu/xrKMzj1nZiRBwWwwKEz5bQHHWKdCeM+cYkCRfkjnAl2A/5+5dUKezXqoM8NgKXS5R/zCJoE6OGhTGZPhE2iTec2rqi3G4fK1oMLrN1LlKx2bo=
+	t=1756857005; cv=none; b=rlOkgRW/3Kap7oH8af1H2uLX+gmoTitq5/OCKanhJs7ww8cZK6/5wKEoXxOaRaAcGbX75krB1V+rAYZejKwgeCD3tXs3gipKplZOOWDnInAJM8PGW/TLRtuU4wlcIDMjVaYSkjy0ArkLYEZxvG0BfiDPZiizrQMiJA6XUjapDtI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756857003; c=relaxed/simple;
-	bh=9U/Ky3yNBRcz05JV+fG2x+dIoICYXW+AY/iTU6QURg0=;
+	s=arc-20240116; t=1756857005; c=relaxed/simple;
+	bh=B2JNTPVo6Lp/RPUmNM+REI5T/yYpUL1NFFW7x/3DKw4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SzZhR7bhRdCbjt9RQ0Q6tETJbpEhQk8gN4TNiiBj09aip/jA6w4FFP9wDZXGk6PrKIXuSa8Q+exy4mv4Mroil4ANrcje8nT2aLa9C/+jHlh/sJazZ3UXLmWLAXCaxKvijSA6KjPeQSaeG1gKb+0y069PO+dKzRDTTmjZhzQZNI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mVQVKfbu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61010C4CEED;
-	Tue,  2 Sep 2025 23:50:03 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=mGjBZUBgS2KizKX6Q9dVzPuJu96vocK6xuY3y4kMnoF+1cIG51LsGbeKsOZhVu7d0vSlmVs58gDiT0SHqiXDffpbOJAvApwQHPEfmD8gVnImSsjNBwx9c7jrY5+Jnl4SSpX5/XLHNI67AVlz+aopNN6UMyKA3fZ8kzk0Oe+6lCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DlefcvvJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 996FAC4CEED;
+	Tue,  2 Sep 2025 23:50:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756857003;
-	bh=9U/Ky3yNBRcz05JV+fG2x+dIoICYXW+AY/iTU6QURg0=;
+	s=k20201202; t=1756857004;
+	bh=B2JNTPVo6Lp/RPUmNM+REI5T/yYpUL1NFFW7x/3DKw4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=mVQVKfbujn2yIKsWpUWu0HfZK5lXywIRNh41oCjg1j/LwCt2Y7j6iGtIF47b+nlcK
-	 2776UmA/k/OIQ9lAvzFmDvUN1co+SKrLpsJqcOaG2bqWNSZbL9zdP3m+bwgTNjNd+J
-	 n+qiwarDkeYyzcbBkFfyNkHGO8Ax7eLKg++ylQTU1NRxa7GcdJGQW60jjulnw6UQHJ
-	 Vi7ZHg/1ktR08m33ZPq5EVhzMBtI0yAlV7Jf1axhC2aAM4eg70ZkDSzNaXzlxiEMi4
-	 QrHBqmN/ZdntaOtBFy38Y3vld6TWfXyDTxStwZMOKMzIiJpAX0rLdAhxc3uARxK4Ov
-	 6tVAyoK/PxBdQ==
+	b=DlefcvvJxLucv4kf7HCNE5LLGJFuz970kzqTeqxlZ//M4YXjxItwXDiY4cZiXTvPz
+	 116FoPvH2Kf71ORlgjeezyFtWvh8yI8hmMnB8GEifAUac2vT9FIRy8YGm4E2s+htDC
+	 duqBJFjW+H+7tEKgXRg/ujl6T8NFiJ+5jezCTc8mQQlDkIfP/iBxN6tW/tuDq/wsNG
+	 wLqmyuyaGtI4vmx4ceS0Xl6bqE7P8wl3ENcBr+zhfzzkENnPJkLwN2DtOYqDcBL3li
+	 mPPcVDVmykpTDp4IO1DcW7oV6bSO663zomDNFpXDEn6iubp3/01z2RRGRofhYtYnnF
+	 T19x0XiRii9Tg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB2C2383BF64;
-	Tue,  2 Sep 2025 23:50:09 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33F86383BF64;
+	Tue,  2 Sep 2025 23:50:11 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,46 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 1/2] selftests: drv-net: rss_ctx: use Netlink
- for
- timed reconfig
+Subject: Re: [PATCH net-next] net: macb: Validate the value of base_time
+ properly
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175685700877.471478.8564578752631875348.git-patchwork-notify@kernel.org>
-Date: Tue, 02 Sep 2025 23:50:08 +0000
-References: <20250901173139.881070-1-kuba@kernel.org>
-In-Reply-To: <20250901173139.881070-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- ecree.xilinx@gmail.com, gal@nvidia.com, joe@dama.to,
- linux-kselftest@vger.kernel.org, shuah@kernel.org
+ <175685700999.471478.8153319794036429097.git-patchwork-notify@kernel.org>
+Date: Tue, 02 Sep 2025 23:50:09 +0000
+References: <20250901162923.627765-1-chandramohan.explore@gmail.com>
+In-Reply-To: <20250901162923.627765-1-chandramohan.explore@gmail.com>
+To: Chandra Mohan Sundar <chandramohan.explore@gmail.com>
+Cc: nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, shuah@kernel.org,
+ linux-kernel-mentees@lists.linux.dev
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  1 Sep 2025 10:31:38 -0700 you wrote:
-> The rss_ctx test has gotten pretty flaky after I increased
-> the queue count in NIPA 2->3. Not 100% clear why. We get
-> a lot of failures in the rss_ctx.test_hitless_key_update case.
+On Mon,  1 Sep 2025 21:59:19 +0530 you wrote:
+> In macb_taprio_setup_replace(), the value of start_time is being
+> compared against zero which would never be true since start_time
+> is an unsigned value. Due to this there is a chance that an
+> incorrect config base time value can be used for computation.
 > 
-> Looking closer it appears that the failures are mostly due
-> to startup costs. I measured the following timing for ethtool -X:
->  - python cmd(shell=True)  : 150-250msec
->  - python cmd(shell=False) :  50- 70msec
->  - timed in bash           :  45- 55msec
->  - YNL Netlink call        :   2-  4msec
->  - .set_rxfh callback      :   1-  2msec
+> Fix by checking the value of conf->base_time directly.
+> This issue was reported by static coverity analyzer.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,1/2] selftests: drv-net: rss_ctx: use Netlink for timed reconfig
-    https://git.kernel.org/netdev/net-next/c/4022f92a2e4e
-  - [net-next,v2,2/2] selftests: drv-net: rss_ctx: make the test pass with few queues
-    https://git.kernel.org/netdev/net-next/c/e2cf2d5baa09
+  - [net-next] net: macb: Validate the value of base_time properly
+    https://git.kernel.org/netdev/net-next/c/3586018d5c3d
 
 You are awesome, thank you!
 -- 
