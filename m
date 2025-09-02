@@ -1,130 +1,164 @@
-Return-Path: <netdev+bounces-219002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BC09B3F5A4
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 08:36:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3F9FB3F5B1
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 08:40:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1D6E485857
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 06:36:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67DCC205204
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 06:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 539CE2E4278;
-	Tue,  2 Sep 2025 06:36:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B1BB2E540C;
+	Tue,  2 Sep 2025 06:40:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vt3xR57n"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="phmmLiln"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FE322E2EEF
-	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 06:36:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 985472DF15D;
+	Tue,  2 Sep 2025 06:40:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756794975; cv=none; b=naQdAqk747XzUqco/6WsW/EeXTsQ/gD3tOtUTigrswNScxAAhc6YG8hDz2bRXijENM2COFFoQ82cQ30Le420S3y3jqmxuNJHU9ZlUHSXZ/609M8/aRp9rNWHIB/nQmky6KZZvUkFVie8A+nY/s8zlvyIMzUj24Xz3zzRqqJZhgA=
+	t=1756795224; cv=none; b=niEkKyVZKN62yZt+tFkLXDUqezKHh9YFG5AyZ9gdNEyVXDt4I9USfCFQo+FLDh8RPNLSfPWy/kDLvvZGORCN3Tz9ZLhja6YbhWL+FmYp/9qiUi0yF5SqngSm+hZye1xZmHH6+62awktyVeBd/S9vuAOgdPQg9Qa+U2lKF4r48PI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756794975; c=relaxed/simple;
-	bh=6o1HYNN/dUuD+wcTmY+l3ujIlcfH+7+khCxsWHpS13w=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=QRw5A6dMCUjsjKLOlijdgp6r49wLKMlZnATx/KBz9AiSeNkUQNcaHa/mk6FD440f1gb7yJmwwqjkBsq8oXHguadOJ+69AzpgywhRdqoBuyDpvLInpdGXieOWgMqzaWb4aBKGKBaqiyAfVN0pXbLQ7ftwKx5NSKFca/gyRNsy+RU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Vt3xR57n; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-45b9853e630so2941665e9.0
-        for <netdev@vger.kernel.org>; Mon, 01 Sep 2025 23:36:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1756794972; x=1757399772; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=svG16miHK9ueNH/Jqb88BPzrj03vi8MH4xbUoVyAJ8c=;
-        b=Vt3xR57nlKQHoteDwMtZF7eZj6ggB+a4zFFxQ2UZTTAU8cJ5sySmkcjA7wIPxFWZnc
-         XcnuGFferDIEhbAFRyAnJfs3yxVVyrAYTcWaVHPwhUvA8CKDLx7pS6xUy6aeyD65qrDf
-         beLkZzpvELIlo2YEevA/AoJ6+6IzlIsD0f/7v/s4uxyPXKHyepBEjnXfVLBw/7vR+11B
-         SHD4TCXgCZ4+egQ7psSbYSxX/oROH5WEzt1eXwRrJ1VrCHBdQ+96gMBgpvsrJq6/6MZG
-         Av6CSJ99i693H6CREER2dmwkGYfayVZDUpljhHX0r8w/PL3qULWOGabPSiXcf6lpJmCN
-         MUoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756794972; x=1757399772;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=svG16miHK9ueNH/Jqb88BPzrj03vi8MH4xbUoVyAJ8c=;
-        b=FO+bjgE2HGnAHn9EPdrYdzwNKDBCN9ufU4HhuMsUPDS0wzj8XzQ7oiGDEPMzpEhbJF
-         2ScTZcukk3NMV2sVBF3SBisMU7Xa/IVUlTFfCZeNGGamfj1YoMSRxgmN2jjoNI8ZMVkf
-         vpMaKt/NdYObBE4ms1wt2Ac2l7cqF8Rv3IS8Eth4TzHbvCX+APKJ1Qr9RUqZbOUUF7x/
-         Ws/KbYz0AdK1ceGnT/sG07O2fsvD4aNOAKaKqXMskIXIV+CXiPGf+viG+3BrhRPZz+cj
-         ORY709uo5+igmG9S4iL0GP7dQ9DWUDbDa03KcO5Tw6G4RGtsvGJI4IllpQq7/NqtjuHV
-         vqFg==
-X-Forwarded-Encrypted: i=1; AJvYcCUkUoHZQlf6Hyw/LwIOM91zGSDZ1JI51JzWWn/wbEAVU5goPUTMBmcPYU41aLLhr4HPc0mB90w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxwn/TvbB7x2hJrYZ6OX++BMh1UP+09omzJao4kQO+ZatZEvZss
-	+8+IXFPScmL69PhFL3T0QjjuM1AO+Npx7ANes0UqKtp+cZ4IJ2Oo0+CPYrEHE1pmCSk=
-X-Gm-Gg: ASbGncs19/m8cSvVOXi1vZ0rifGBE2Gg/Gg7eQ7LxhjgvkXMnQLUttNZrZmwjV+QQ1y
-	yuOsNirQ8TMVodMZFtUROAP3sSBp1U0XYpP+0zk7A+qWFZAX6eO6xGvzvez+AG1hF8JafaC+uVU
-	suF2yyvgeVYc7kgdYdabLJEsBqlUb+/wirtxOqraEel+lmuM46LNMpcsLZGSO1bBvDHsfzdzB0w
-	zSLPH/9U903tR9Q8EptbVaVt553vuN4gtFUraQ2NCifHDlVeqOceatM5QlpZwGPUGzNdiC3X8Dd
-	+kZ6jxYDt2u6gO82oKxJb1+qzr3bOJ0ZLlaO0JooNa9oWe+vEz5s7WSDnKAP/elX3Chkq+tbEBd
-	6D/GYlXxSkiGI8vi8E3VCeME2PL4=
-X-Google-Smtp-Source: AGHT+IFb9K51S0e+oVxQPokUpc6sM1fljdvNP8zGuh2xzGHBl93SOWb5C24qmpOhtsg6GVrvALfX2Q==
-X-Received: by 2002:a05:600c:4515:b0:45b:7bee:db8f with SMTP id 5b1f17b1804b1-45b855b32b1mr81893475e9.25.1756794971816;
-        Mon, 01 Sep 2025 23:36:11 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-3cf34494776sm18103336f8f.61.2025.09.01.23.36.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Sep 2025 23:36:11 -0700 (PDT)
-Date: Tue, 2 Sep 2025 09:36:08 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Xin Long <lucien.xin@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH net] ipv4: Fix NULL vs error pointer check in
- inet_blackhole_dev_init()
-Message-ID: <aLaQWL9NguWmeM1i@stanley.mountain>
+	s=arc-20240116; t=1756795224; c=relaxed/simple;
+	bh=NAGgal8RBero3MRCvjOxT3Rpb5VFZnYuL8Rb0yFeA3k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=phuRo7usJoNpOwJ4ibhvXDvl5BAYHuoFJktGWGPwpe68XDNuUecMsSA/V3ylnLfaLuiXm0DIHHODVDCTmkoMFO0jZRkTFrh7zOjm6soYaz5ZTO0CzqYF3MuxGT+SfAbeV7POGmgh5uWFH9MjGrHgRug82pJTVYiEdKhk6/SBjMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=phmmLiln; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 581NpLCJ009463;
+	Tue, 2 Sep 2025 06:40:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=smH8Iv
+	Caai28BF62WFWYENlbU2adoO3gGfBik1qn5Jw=; b=phmmLiln2whz5z3tzD0H72
+	bSB6AzJEmmWDInxAmRixRaHp/c4BP3mzyyWZzpzlH3ggjmLy3s6eaNPBT03+sxK5
+	WTbAReYAmAACUNbms2xq7R5dEW67p+T/LgOy8K5UyAbtivX94iyn6VP1PIlV9P+C
+	9FtB8M4pVHcVc3ZBY0Vp5OOKZk/VzW9F65LodEhrZYRTELx/J/WeHDSy6iiW83g3
+	gimxiXX7gaDVfxSasMAo2qvU3F9fZY090DpaWAXLMhPhQPHhJ7AvjEaZRqxyf/gA
+	JxdHlFac90VIZttae9CYkW+VTtlqMA+KAC6BbX5pHNiTfok5Y7/bBJei0Et4SAVA
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48usvfmfda-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 02 Sep 2025 06:40:11 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5826Zmrt029485;
+	Tue, 2 Sep 2025 06:40:10 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48usvfmfd5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 02 Sep 2025 06:40:10 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 58252UsA019390;
+	Tue, 2 Sep 2025 06:40:09 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 48vd4ms60k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 02 Sep 2025 06:40:09 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5826e8sk53739864
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 2 Sep 2025 06:40:08 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6934C58045;
+	Tue,  2 Sep 2025 06:40:08 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 77DB258050;
+	Tue,  2 Sep 2025 06:40:02 +0000 (GMT)
+Received: from [9.109.249.226] (unknown [9.109.249.226])
+	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  2 Sep 2025 06:40:02 +0000 (GMT)
+Message-ID: <7bd60e6d-4b33-4a04-998b-0be163a6fdb0@linux.ibm.com>
+Date: Tue, 2 Sep 2025 12:10:01 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] net/smc: Replace use of strncpy on NUL-terminated
+ string with strscpy
+To: James Flowers <bold.zone2373@fastmail.com>, alibuda@linux.alibaba.com,
+        dust.li@linux.alibaba.com, sidraya@linux.ibm.com, wenjia@linux.ibm.com,
+        tonylu@linux.alibaba.com, guwen@linux.alibaba.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        horms@kernel.org, skhan@linuxfoundation.org
+Cc: linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kernel-mentees@lists.linux.dev
+References: <20250901030512.80099-1-bold.zone2373@fastmail.com>
+Content-Language: en-US
+From: Mahanta Jambigi <mjambigi@linux.ibm.com>
+In-Reply-To: <20250901030512.80099-1-bold.zone2373@fastmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=behrUPPB c=1 sm=1 tr=0 ts=68b6914b cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=ZLGELXoPAAAA:8 a=VnNF1IyMAAAA:8
+ a=sRZyJRDGTCvSbJG7FuwA:9 a=QEXdDO2ut3YA:10 a=CFiPc5v16LZhaT-MVE1c:22
+X-Proofpoint-ORIG-GUID: qFoqQJwTEhWngaDNxFh9_NbK6veFWD-H
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODMwMDAzNCBTYWx0ZWRfX+tpSirvNyrKD
+ U7go02OKOYzuE28ig91Hi4h12iuG5B5vZUli47hI/KPsQltpN1zz4+j8HDML9zbLhZ8QuhtD5o/
+ vz3R1yP/fdaOoPbZR5Hq25yiw6suqG1Y+ukOqGWGe4hsf/7f01poEOHDhAxLax7JZ1bUCTYv1Pi
+ yMmaDhP23+lkUAFGqvDyzPsj43UcheN0R9+X41Ea7TStDzvPqFnBhTVtqIbkPa01cSWBKi/Ab1h
+ DrqbFtkd3SUHs2uB9rk/3UxFzTzpGghsYlGcZuvEYAN3FPC6CQUbEwVsBQUuVAu0WtMbcqxrnpR
+ liEZvHQLHf7oZSvLCEwHPGwIxIijkJDIo5ECy4gjBN3JGNAX25qr6BWSU8nuNitNhXdNL9J/Ta5
+ vy5uIlPI
+X-Proofpoint-GUID: Kod15Y-6MTn7jlVkHQlYp0VZB3uqdvce
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-02_01,2025-08-28_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 impostorscore=0 spamscore=0 clxscore=1011 phishscore=0
+ priorityscore=1501 adultscore=0 bulkscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508300034
 
-The inetdev_init() function never returns NULL.  Check for error
-pointers instead.
 
-Fixes: 22600596b675 ("ipv4: give an IPv4 dev to blackhole_netdev")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- net/ipv4/devinet.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
-index c47d3828d4f6..942a887bf089 100644
---- a/net/ipv4/devinet.c
-+++ b/net/ipv4/devinet.c
-@@ -340,14 +340,13 @@ static void inetdev_destroy(struct in_device *in_dev)
- 
- static int __init inet_blackhole_dev_init(void)
- {
--	int err = 0;
-+	struct in_device *in_dev;
- 
- 	rtnl_lock();
--	if (!inetdev_init(blackhole_netdev))
--		err = -ENOMEM;
-+	in_dev = inetdev_init(blackhole_netdev);
- 	rtnl_unlock();
- 
--	return err;
-+	return PTR_ERR_OR_ZERO(in_dev);
- }
- late_initcall(inet_blackhole_dev_init);
- 
--- 
-2.47.2
+On 01/09/25 8:34 am, James Flowers wrote:
+> strncpy is deprecated for use on NUL-terminated strings, as indicated in
+> Documentation/process/deprecated.rst. strncpy NUL-pads the destination
+> buffer and doesn't guarantee the destination buffer will be NUL
+> terminated.
+> 
+> Signed-off-by: James Flowers <bold.zone2373@fastmail.com>
+> ---
+> V1 -> V2: Replaced with two argument version of strscpy
+> Note: this has only been compile tested.
+> 
+>  net/smc/smc_pnet.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
+> index 76ad29e31d60..b90337f86e83 100644
+> --- a/net/smc/smc_pnet.c
+> +++ b/net/smc/smc_pnet.c
+> @@ -450,7 +450,7 @@ static int smc_pnet_add_ib(struct smc_pnettable *pnettable, char *ib_name,
+>  		return -ENOMEM;
+>  	new_pe->type = SMC_PNET_IB;
+>  	memcpy(new_pe->pnet_name, pnet_name, SMC_MAX_PNETID_LEN);
+> -	strncpy(new_pe->ib_name, ib_name, IB_DEVICE_NAME_MAX);
+> +	strscpy(new_pe->ib_name, ib_name);
+
+I tested your changes by creating a Software PNET ID using *smc_pnet*
+tool & it works fine. Your changes are similar to ae2402b(net/smc:
+replace strncpy with strscpy) commit.
+
+Reviewed-by: Mahanta Jambigi <mjambigi@linux.ibm.com>
+
+>  	new_pe->ib_port = ib_port;
+>  
+>  	new_ibdev = true;
+
 
 
