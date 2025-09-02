@@ -1,123 +1,144 @@
-Return-Path: <netdev+bounces-218991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B93B0B3F3DD
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 06:54:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BBD3B3F42E
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 07:09:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B2977A4F13
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 04:53:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D096200FD7
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 05:09:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68C172676C9;
-	Tue,  2 Sep 2025 04:54:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="ish/7crU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C27B42DF15F;
+	Tue,  2 Sep 2025 05:09:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B542C1DDA0E
-	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 04:54:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB057BA4A;
+	Tue,  2 Sep 2025 05:09:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756788892; cv=none; b=qNxkwyJv3xHXe/CgoDkuAyaLWy0i7Dtqbwg6Bu+vENYdM+GTim1pf2c0y1zPEcEgwKBXhVN6NhbTzWgteud7QdDSaVbMS1BDQrQQvfGaTGo3KQdzqPEx33zgXHJuQ/pEQqTzBslwdqBoeK+w1zhVKPcoeXCb6Bw0JHog27ejPbs=
+	t=1756789772; cv=none; b=UXI595cBPfGHVvmYMYI/7qcSvf4iPU1wgyZUTu5pOhN5CTmMvQvwUns6o/mk1Z9IEuKuqwKbjUfvn/RHhmSjmy1cV6STZsCiHJGjINHz+LRd/rnj52MNASOSnmzn8vvKIluTKpd+VkKNgnSw2f2Ogx1EjhpnvzsAs8cJdOaa+WE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756788892; c=relaxed/simple;
-	bh=72IhmJ6RIfLV7jI/e78WP3nbD5d4w8Qq8fRB98ssrss=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A2eviZutL04wBStTUdENaNHjm4hefJbeUdnKivxs3iKEJknoRXI6lGd9qLOjHJwd/tiEnZd0f7eIdCIphwT2i5jA921VtqvMhJ4I4mDjq9yFoAxlmz9AoHEu5bl32L2dCh89e5KLZhHi3uwcaZpQsPf0QMna0fTo9njooZU+uJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=ish/7crU; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Aj+19BNZQAJQEnx9NIIxJe/jwS+rvqdX2kPfnDEUW5Q=; t=1756788890; x=1757652890; 
-	b=ish/7crU8HPNKkwGzAcnFgpgut4O+FHmFnRlIGu49KcQrPjU9a86OKb/3WFrHdEKmbDzFQMuOhA
-	KuohrktyVWUElgupJ++lBLK+7H3t1R1Bqf31tDGNwPjq5+aPZHx1nzX0CcudrRztqzCHdEsPUX91D
-	gsPFV2UOqeM8kjtqrpc/alDC1lkNmABRh5lld0FpDHx8ihyGuUoDEn8YsRgQR8OYAqKw8Ck08FyhE
-	07IhErPY8FJA+O0rHRP/H7upiTx+ULp3EZG+NUzmnZSK7bPfbZ5jzTwu21+hu/+ULzwh06+ODCYjh
-	xFCZa2aRnVW1wsADU1WbJmizprLdgIQnf3fA==;
-Received: from mail-oo1-f46.google.com ([209.85.161.46]:54406)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1utJ2Y-000409-Qn
-	for netdev@vger.kernel.org; Mon, 01 Sep 2025 21:54:43 -0700
-Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-61bd4ad64c7so1500172eaf.0
-        for <netdev@vger.kernel.org>; Mon, 01 Sep 2025 21:54:42 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVPuKLbqOtiF5IF27+1mWxe0YMLZUWy5hibJFnAapTnfMUpV3CzvQ8kvrZtUMSxGfh2dRPxNKQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YymncEP1Ek0OsatjJ3k4gh/U6HPrnTAztkc3lW21vH4E8uodI1z
-	9UXGfz4M+1FWYHYa7ivpKkcvPxvtyk2bAOceJVpbFjseNfBpFEJhZbfbJex6iwkjx5hSoQ6pzaE
-	CLUvIn1O1wtyBqC5Du47wHHHepKEwAVo=
-X-Google-Smtp-Source: AGHT+IFvD8bgEGiZG0joeKVlTG89zGehV4u9JZkaAIruUUL9UoDL2yFgD4ufE6BSQhVAot3AhKOWYWi8nTrrMX7vpl0=
-X-Received: by 2002:a05:6808:48d6:b0:437:d7b0:878d with SMTP id
- 5614622812f47-437f7ddeecbmr4427628b6e.50.1756788882172; Mon, 01 Sep 2025
- 21:54:42 -0700 (PDT)
+	s=arc-20240116; t=1756789772; c=relaxed/simple;
+	bh=rKCIPKzawr9c9rbkUtSKJObEOaagZquXS9K9Ng9+rgM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fuQnGgEJ04bgdDzOPliWDkdwJrCwNHBQhMTB1emPTXYvUzCHqIm+42VSey8npuxzfcrCLZWIHrcHrH0hGLm+DrLji72XrPxDSjRsdf6RAHAVhUVOlVwRpQ9yGvQvs2iTvar1zex8AdpxkytGV5Z4enkQ+MtiiHgrTmD4EktELO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.2.205] (p5dc55ed2.dip0.t-ipconnect.de [93.197.94.210])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 8008D60213AC3;
+	Tue, 02 Sep 2025 07:08:51 +0200 (CEST)
+Message-ID: <4f746e98-b81b-4632-a2f8-f14d66c71ced@molgen.mpg.de>
+Date: Tue, 2 Sep 2025 07:08:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250818205551.2082-1-ouster@cs.stanford.edu> <20250818205551.2082-15-ouster@cs.stanford.edu>
- <a2dec2d0-84be-4a4f-bfd4-b5f56219ac82@redhat.com> <CAGXJAmztO1SdjyMc6jdHf7Zz=WGnboR5w74kbmy4n-ZjJHNHQw@mail.gmail.com>
- <04716a9e-9dad-47e6-9298-5b5cf6efe7cb@lunn.ch>
-In-Reply-To: <04716a9e-9dad-47e6-9298-5b5cf6efe7cb@lunn.ch>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Mon, 1 Sep 2025 21:54:06 -0700
-X-Gmail-Original-Message-ID: <CAGXJAmwwKu_yUW_vjXhT64+QPyZsHpgqLtih6coQKqgOVC+0EA@mail.gmail.com>
-X-Gm-Features: Ac12FXybycDPAxQAmpiOJOBaWbc4dy5lcMS1e9zJnm0CKeT2ywxMEFPTsaB23ow
-Message-ID: <CAGXJAmwwKu_yUW_vjXhT64+QPyZsHpgqLtih6coQKqgOVC+0EA@mail.gmail.com>
-Subject: Re: [PATCH net-next v15 14/15] net: homa: create homa_plumbing.c
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: 0.8
-X-Scan-Signature: 2d1a4fa5d0150c38835749a59b44c419
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH v2] ixgbe: fix too early devlink_free()
+ in ixgbe_remove()
+To: Koichiro Den <den@valinux.co.jp>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+ przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch,
+ jedrzej.jagielski@intel.com, mateusz.polchlopek@intel.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250902003941.2561389-1-den@valinux.co.jp>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250902003941.2561389-1-den@valinux.co.jp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Sep 1, 2025 at 4:03=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> On Mon, Sep 01, 2025 at 03:53:35PM -0700, John Ousterhout wrote:
-> > On Tue, Aug 26, 2025 at 9:17=E2=80=AFAM Paolo Abeni <pabeni@redhat.com>=
- wrote:
-> >
-> > > > +     status =3D proto_register(&homa_prot, 1);
-> > > > +     if (status !=3D 0) {
-> > > > +             pr_err("proto_register failed for homa_prot: %d\n", s=
-tatus);
-> > > > +             goto error;
-> > > > +     }
-> > > > +     init_proto =3D true;
-> > >
-> > > The standard way of handling the error paths it to avoid local flags =
-and
-> > > use different goto labels.
-> >
-> > I initially implemented this with different goto labels, but there
-> > were so many different labels that the code became unmanageable (very
-> > difficult to figure out what to change when adding or removing
-> > initializers). The current approach is *way* cleaner and more obvious,
-> > so I hope I can keep it. The label approach works best when there is
-> > only one label that collects all errors.
->
-> This _might_ mean you need to split it unto a number of helper
-> function, with each helper using a goto, and the main function calling
-> the helper also using goto when a helper returns an error code.
+Dear Koichiro,
 
-Unfortunately helpers don't help. There are already separate functions
-for the individual initializations. The problem is with handling
-errors in the parent. If a child returns an error, the parent must
-reverse all of the initializations that completed before that child
-was invoked, so error handling is slightly different for every child
-invocation.
 
--John-
+Thank you for your patch.
+
+Am 02.09.25 um 02:39 schrieb Koichiro Den:
+> Since ixgbe_adapter is embedded in devlink, calling devlink_free()
+> prematurely in the ixgbe_remove() path can lead to UAF. Move devlink_free()
+> to the end.
+> 
+> KASAN report:
+> 
+>   BUG: KASAN: use-after-free in ixgbe_reset_interrupt_capability+0x140/0x180 [ixgbe]
+>   Read of size 8 at addr ffff0000adf813e0 by task bash/2095
+>   CPU: 1 UID: 0 PID: 2095 Comm: bash Tainted: G S  6.17.0-rc2-tnguy.net-queue+ #1 PREEMPT(full)
+>   [...]
+>   Call trace:
+>    show_stack+0x30/0x90 (C)
+>    dump_stack_lvl+0x9c/0xd0
+>    print_address_description.constprop.0+0x90/0x310
+>    print_report+0x104/0x1f0
+>    kasan_report+0x88/0x180
+>    __asan_report_load8_noabort+0x20/0x30
+>    ixgbe_reset_interrupt_capability+0x140/0x180 [ixgbe]
+>    ixgbe_clear_interrupt_scheme+0xf8/0x130 [ixgbe]
+>    ixgbe_remove+0x2d0/0x8c0 [ixgbe]
+>    pci_device_remove+0xa0/0x220
+>    device_remove+0xb8/0x170
+>    device_release_driver_internal+0x318/0x490
+>    device_driver_detach+0x40/0x68
+>    unbind_store+0xec/0x118
+>    drv_attr_store+0x64/0xb8
+>    sysfs_kf_write+0xcc/0x138
+>    kernfs_fop_write_iter+0x294/0x440
+>    new_sync_write+0x1fc/0x588
+>    vfs_write+0x480/0x6a0
+>    ksys_write+0xf0/0x1e0
+>    __arm64_sys_write+0x70/0xc0
+>    invoke_syscall.constprop.0+0xcc/0x280
+>    el0_svc_common.constprop.0+0xa8/0x248
+>    do_el0_svc+0x44/0x68
+>    el0_svc+0x54/0x160
+>    el0t_64_sync_handler+0xa0/0xe8
+>    el0t_64_sync+0x1b0/0x1b8
+> 
+> Fixes: a0285236ab93 ("ixgbe: add initial devlink support")
+> Signed-off-by: Koichiro Den <den@valinux.co.jp>
+> ---
+> Changes in v2:
+> - Move only devlink_free()
+> ---
+>   drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> index 80e6a2ef1350..b3822c229300 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> @@ -12092,7 +12092,6 @@ static void ixgbe_remove(struct pci_dev *pdev)
+>   
+>   	devl_port_unregister(&adapter->devlink_port);
+>   	devl_unlock(adapter->devlink);
+> -	devlink_free(adapter->devlink);
+>   
+>   	ixgbe_stop_ipsec_offload(adapter);
+>   	ixgbe_clear_interrupt_scheme(adapter);
+> @@ -12125,6 +12124,8 @@ static void ixgbe_remove(struct pci_dev *pdev)
+>   
+>   	if (disable_dev)
+>   		pci_disable_device(pdev);
+> +
+> +	devlink_free(adapter->devlink);
+>   }
+>   
+>   /**
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+
+Kind regards,
+
+Paul
 
