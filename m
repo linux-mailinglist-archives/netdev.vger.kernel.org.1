@@ -1,254 +1,247 @@
-Return-Path: <netdev+bounces-218963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-218964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FD5BB3F18A
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 02:14:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 127A6B3F199
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 02:36:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB795189F107
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 00:14:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C063A16DB80
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 00:36:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D9952C21CB;
-	Tue,  2 Sep 2025 00:13:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11EDA1F4CBB;
+	Tue,  2 Sep 2025 00:36:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gN0UsaAM"
+	dkim=pass (1024-bit key) header.d=valinux.co.jp header.i=@valinux.co.jp header.b="SuC+2/X6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from OS0P286CU010.outbound.protection.outlook.com (mail-japanwestazon11011066.outbound.protection.outlook.com [40.107.74.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E542C11D2;
-	Tue,  2 Sep 2025 00:13:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756771994; cv=none; b=u4kzRHgd8wCB9HCyga21GZTL0fzVmW9bOE9j4ElkZJA5oNDhj/mX+GogWaQKcDqb+qSGFRMiWLrZWWB5msU03O4LOZtPA9AaQqbG9S/UHsY7B+zPB76IoyK79Jzk6TyjW9B5npT3xxNGC9oV7NZJnyXpwozhQcHUX2dGDB/QJbI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756771994; c=relaxed/simple;
-	bh=rYSJndT6hXCXD8jlYBfbdSRTF0KIs6xPzFEVUOaarJ4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TTorBGgTwVy7q05zK+S1Z22XtWQx0jwDE/kA1AWVi/G4NSDnzUEMqA+SaG3LRi8v3OX46GETojWcSlluQZuYsbTl78Peg+GXuABEUD52Nn/szVGjW2X4yO5MeDORxAsrOXcKoQ+ckH6lPJ8B0rgGhJx0e4Z753ceNulWrzwNoeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gN0UsaAM; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-45b8b7ac427so9532315e9.2;
-        Mon, 01 Sep 2025 17:13:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756771990; x=1757376790; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yYNmQYHvpUW9ygwaADrHIo+U++1cqaaqBXRIk4cWf5E=;
-        b=gN0UsaAMCpIxfXQKYNsvpwI1rHEXHvwd+ej41+DQDW6uMC65H/B+DotWJ5jEGuV907
-         f0tBE08q5BxgNPgkqBTq4iVIrf50/ENYLtFpGL8krHI9uDwqqGIG0ncVwKRFZVIlYMjR
-         BdtoU/YufSkjezVdc46pLiBB0mkezOaf9qTYlXtV8BFThcp0bbQcsHZiQYdDEmGnG0w6
-         HbOPHB5qILYtlv9gOG1Dkl7nXCwD7W+WhfJtAWNPyN0m+ZlKeOrXeye+79mHU4NQ/hDZ
-         jbtQB9sxGF/HHuiX6ipy82DVJvB1qVynBhEOP0RFSFDfxiI0LF1a+kznA0vEcln0Xicj
-         gZVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756771990; x=1757376790;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yYNmQYHvpUW9ygwaADrHIo+U++1cqaaqBXRIk4cWf5E=;
-        b=N5eSZeB9L3hEQwWmcq0S4YUustvciC2Od7e+Jq1+iJzzanlxwdOVNkXgYRcd2BIHH5
-         tqKtBH4vuUfwzClrf+NLMUH7zgFTtZ1eLLIW+j+PEOzh6w56WXZ+R4/hn4hCHvNtilNy
-         aF6vv7iGfcHzQ/E4cdy7wvOPBM9Orbfv4BzXPbN5TcQrLOUernLFUkKfeuT8dthzQZZm
-         mpwR1Z9cLicEkTRZArvb2EFLB1d5okPxvjG28PDcLOOzgWaRVrIQlG0sGzMOEOFcoWG5
-         c8T3UHms1lURVNcNudJVr6F/fEYQsKTRDzH5vpPO+Rwo6QiAFcLLN9MGHiGDQ+f2NtMP
-         jOgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUYAy1yaZb319gsigJuPZjuEoxidBecLG6IhsygFbrkAWMxtOXqeuOl0b3VSrxGsRyK/EamM5Za@vger.kernel.org, AJvYcCUZpfIHO6inERwDpVVvKhHO3MUSmwqpoIUPPTudkwK74TOgf+saf4ZkRR25saLakmzdfW0T5MooWBV08PrN@vger.kernel.org, AJvYcCXjiYXuEHYD7y+0YKpziLoVtPLNYbKc6dIJdZxG2ReKsHJJ985j3Ip6p3z8vZgh6HVrAF1utr/MFCY3@vger.kernel.org
-X-Gm-Message-State: AOJu0YzN9rhw0ZnwBixsA1zlc4D4ebg6Kj59zrOm3hJmpqCC8zW7Lpy1
-	xZwVTvamoR6QGQYCJGgJItyB+rIzgFPOwq9YBKVhm5qM61M7TcyKKLTp
-X-Gm-Gg: ASbGncsg/Ndwp7jJ9waHXi90s78YDMn81lVF86ZP7P3RcDG/gcpIlJu3ULTj5XzueEL
-	5JN2iPpQZi4byk80ACRGk2XwghsDdbTsizbFwwB/izU28iMA8X54cGTH6SalrL7FteSEmtdC65q
-	khBbOJhaVLtYV13yyHznzBpvoBCHZPKiqMUKVOJhDr6LVWqBPavVAJf+nfN3VNbcm6yh7+MjYpx
-	4r8UbE14h1Wm7wjw/HWShlxzBgI7SQs8h9kS+ZDX5P+MJcGlXMCptNA/h6c4UaVWLbwAxOIO+Y8
-	+H1v9aJhw0WrJ+TLoVFyOh7FezIelTGHlKBIlza93DlCu6g17EFIMTuCPJAS+3/hKPvBbrW/ZOy
-	+aS/E1Ylfi5RpZOOLc8274Bx21OWFqXTbuK2HJVhIe5U+9Q==
-X-Google-Smtp-Source: AGHT+IFGGuLbjih6Gj+w7x0wLgIFZo1ltt4HE5wOWmB54nwG1DjvGnz2BT6uviOKTC8YNommrrKJIQ==
-X-Received: by 2002:a05:600c:4fcd:b0:45b:7185:9e5 with SMTP id 5b1f17b1804b1-45b85525cddmr83857055e9.5.1756771990377;
-        Mon, 01 Sep 2025 17:13:10 -0700 (PDT)
-Received: from iku.Home ([2a06:5906:61b:2d00:ca6c:86b2:c8f:84d6])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3d92d51982bsm2138153f8f.21.2025.09.01.17.13.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Sep 2025 17:13:09 -0700 (PDT)
-From: Prabhakar <prabhakar.csengg@gmail.com>
-X-Google-Original-From: Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>
-Cc: linux-renesas-soc@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	Prabhakar <prabhakar.csengg@gmail.com>,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: [PATCH net-next 4/4] net: stmmac: dwmac-renesas-gbeth: Add support for RZ/T2H SoC
-Date: Tue,  2 Sep 2025 01:13:02 +0100
-Message-ID: <20250902001302.3823418-5-prabhakar.mahadev-lad.rj@bp.renesas.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250902001302.3823418-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-References: <20250902001302.3823418-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F0B532F76C;
+	Tue,  2 Sep 2025 00:36:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.74.66
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756773380; cv=fail; b=fyvvA8gZEtMu3dbH84TqrFECfA/VONpPx3hh/LPb9huvhjdEigjyrrEsmj2CVq+h3zKHAwtpGzdIlRRbkI8qsDJwGVYnKkTxH3ElJMVCw2QPrwER+cmnNUIBPiC2FO6jp8k5IkIxBvg5VVHnyOXWLW/T9TG0pNFMM+VpLY3to+U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756773380; c=relaxed/simple;
+	bh=qBcbfomXio8r+MUm6u9TW3p22kGbTWsJ+mHsGx9Ib10=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=qLvQAuNPJLiLjzIe4A9DTCUZ86ex97qfTk0g/rpUqvqDDiL0RC6cENKscaOSYmm4ZaYkPIyC7PBYo2mDv3zwEN2hxGGGMetLJhapjM8r8J+aEugNNhT4h7GhwOhoFh/tMWrD389INN3xgajkZYNf66ieB2xgMNsWhw9U5yK1yHw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valinux.co.jp; spf=pass smtp.mailfrom=valinux.co.jp; dkim=pass (1024-bit key) header.d=valinux.co.jp header.i=@valinux.co.jp header.b=SuC+2/X6; arc=fail smtp.client-ip=40.107.74.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valinux.co.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=valinux.co.jp
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Xioh3+e4PzRXrf4cOD1iuuAz+T6DEazpA8oq/bGCyenv9AjC783ZXi0EAea6Cp2cXALUr+bhsNl2hDRaIjpwIp5AELEhfm29gkmTINs4ciPrevIf9r5yqXnjKVIK8oVy581z2FDslDsSk5jANnO7bMGhWhyM0RCH5ODVJoDwCHi7Eyw6a1/Fdgio8yEAPc/g22wKxiW+WHFZ+WvSXsk6czcFNiIqEPGC1EjBMpWSDtacstVnbFAxeXHWwvDxkX3wQ9qU8iFlT0bRvVDHHFXaj2HNN9rWqzfJtPBjAXMyZhaUiCOjK79dLlqqBdKhCWW9+8DEsrWQoJi2AtKiRfRvqg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QdvDP0gpeOzo3nd863hUszeewihubgv1Wew15yYvVo0=;
+ b=ArRYCBJhhw6Nl+cLOYh9TAGj8B9MrGdYb+/iKR3c0WKgUEC7fNvTSgujlKf1z0N1olMcPelJPWxwJj88JI5Y6Cqk6/aiAh2ISt9bUy/YJQtgUVyYVFPBYBt8uOZ0ANNUxWBQaF2PHkxijka5Zcsl1sokTZT5qOvRTUBHUp9BlHWVUfaw3hiV/FRAgdpSAVrx34YohiS8KZBBZQnf5HjLfOASNIdyPcQ84onindUbKQhJ2sPM0woYYBl8OlR2nKNaSs8E9OIqcSZ4Qq0OwZfmInSty5HkuBlv609HMdoLp5gRTK9QD7FguizS+wUlRdYrPJMKPCa2xhiZ00JydvK3Ng==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=valinux.co.jp; dmarc=pass action=none
+ header.from=valinux.co.jp; dkim=pass header.d=valinux.co.jp; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=valinux.co.jp;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QdvDP0gpeOzo3nd863hUszeewihubgv1Wew15yYvVo0=;
+ b=SuC+2/X6oItzoeK5S4Wsp82ONU2CqEbj6FdLY9HoOzJ1oWPZgZF7gI6qbiBNAaa1813MioZIogFllcRWSlWdpHjhI5hD38qa5MkFsBkDHmEjZcf1I3HV4eOZwlG7+5CmGwaaEAi3d1n9FAxi7Rw/DVbwL+NuMMS9VrShrncEZuw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=valinux.co.jp;
+Received: from OS3P286MB0979.JPNP286.PROD.OUTLOOK.COM (2603:1096:604:10d::7)
+ by TYWP286MB2298.JPNP286.PROD.OUTLOOK.COM (2603:1096:400:13d::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.27; Tue, 2 Sep
+ 2025 00:36:14 +0000
+Received: from OS3P286MB0979.JPNP286.PROD.OUTLOOK.COM
+ ([fe80::80f1:db56:4a11:3f7a]) by OS3P286MB0979.JPNP286.PROD.OUTLOOK.COM
+ ([fe80::80f1:db56:4a11:3f7a%5]) with mapi id 15.20.9073.026; Tue, 2 Sep 2025
+ 00:36:14 +0000
+Date: Tue, 2 Sep 2025 09:36:06 +0900
+From: Koichiro Den <den@valinux.co.jp>
+To: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>
+Cc: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, 
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, 
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "mateusz.polchlopek@intel.com" <mateusz.polchlopek@intel.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [iwl-net] ixgbe: fix too early devlink_free() in ixgbe_remove()
+Message-ID: <bh24mquk7l3ghs7z4ej4dkeqnq25nlxfcc43l6lq5qftc7wmct@kmfake26rj4a>
+References: <20250828020558.1450422-1-den@valinux.co.jp>
+ <PH0PR11MB5902C5678F60DB7F088CB528F007A@PH0PR11MB5902.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <PH0PR11MB5902C5678F60DB7F088CB528F007A@PH0PR11MB5902.namprd11.prod.outlook.com>
+X-ClientProxiedBy: TYCPR01CA0144.jpnprd01.prod.outlook.com
+ (2603:1096:400:2b7::20) To OS3P286MB0979.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:604:10d::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: OS3P286MB0979:EE_|TYWP286MB2298:EE_
+X-MS-Office365-Filtering-Correlation-Id: 74f6ca7f-72bc-43ff-c493-08dde9b8b559
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|10070799003|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?PmPl/XaqH3If2fVdRIdeWlc76o1YXg8Iy887uPc7GLsGxCmGBDcTm10ikWrs?=
+ =?us-ascii?Q?d7Cm1vBelg2kbhaDWZpNa/ULuE+o5xpZeKSfm8P0TDh3Ag4j/6yKdiGNn5Nf?=
+ =?us-ascii?Q?KyjLioO1029csVP5by21HFyb+dugfjmD3QqeTugtldYjDc3YODR5HKDNnvPs?=
+ =?us-ascii?Q?oM4+hkGWN/zjc5UMgVgJcbzUyTDd1xSqbEy9AB+wFGxfbJULURC5YkBGuvw3?=
+ =?us-ascii?Q?nnByEic9mhHWkXv8AiRuINZDj45Eb7DmA1h0XAygU55NXK6gB4Z/EDwcLkht?=
+ =?us-ascii?Q?2xY54figKsubuZ5PounRnhHIweRiKZwIUGWJs5V58mn9PmzPLk/EbuwrUXIO?=
+ =?us-ascii?Q?X4fQfeXkkGDUBuw9X84WRRlSpoooah77MTp0GPmHiq2M6ziVdf01Gg8bKHZ0?=
+ =?us-ascii?Q?d+llo2TQUc4xdYdh+e0IB5p1A67Gs4/d5c3rZi1txhMwvfI9P8aAt1GExKS0?=
+ =?us-ascii?Q?F/7CkPczjvrr+i6OXiIw6fdBWXSBbkzloo857Y1YpvcbDY9U3nzgQMAD8CLF?=
+ =?us-ascii?Q?RVYQXeV40GYuVwJXlFoCjmVs/FSkQkS7H5l4hPRX8Y0Gxm9UI5/2fGL2DB0N?=
+ =?us-ascii?Q?NGGkv5+D+qzxBBRYNYthsd+Y6DhUr8R56pr/uOwSYChhXNRv9vRjNNaZA2Wz?=
+ =?us-ascii?Q?90K7QEO+qMzPJ2qB9bQoZzan5HubU3ZOm3OsguPqJEwO+Y1ljqNRnwYvN4+/?=
+ =?us-ascii?Q?Ryz5KMvS234Nl9fAwe36w3a43Yh0DEt8IkNt3GmJPh81EXSV6iG5dW1CzHxf?=
+ =?us-ascii?Q?assUH9YNiskvDSm+UmtfmLnLt445Vq9ylJdPJrU1oBPb+Hx6gxXfAXrauUjk?=
+ =?us-ascii?Q?8KNpM1ejtWK/d6OUxdTek6X2NZ+hI0vPKmhIGyDWHu5ZLPreMO40ciXUbLPG?=
+ =?us-ascii?Q?P3P2bN3GB+VGcbcXK64XSae5n0cTRmxbf0GH2sHlnHiOpnptBroG5enP60l1?=
+ =?us-ascii?Q?8G75zpIZzjBmzF5wNdbxpMrcHmu8rk05VVSrINDUC2cC8Gqw8HhzjrKwmm5F?=
+ =?us-ascii?Q?CG8zhTsSYLEVH93VAhW1MsfHsQuVdy17SXlHerwvn1kM81b7WrXi+Suu4xEc?=
+ =?us-ascii?Q?L1J/4/bFy3cHziZCVxD4SYiNBuoA06AmkhjDFm0h1E/Z4FV3vAxpnNqGqCCH?=
+ =?us-ascii?Q?oSSzhu4ptyP8p+8PiKULYGQ1JlLY7PD35uO0CgNHq29pVTCL5mPSFGW310nh?=
+ =?us-ascii?Q?PobE2iOAzGMLuO0xdb58awGmIk9D1sGjwzgctfNXNzVV42i37emMoZ+L08Zt?=
+ =?us-ascii?Q?AzP/PNA995de8o6rzHBPTRpQ2cP2zDqLeZ3sB2mk05klk7Th8rwQEsvlrZaM?=
+ =?us-ascii?Q?v4YxQZsD75n6+8reSHvlIIes8SIfJefUPE9AEmHcKVOAHMD7aQHFsPOLolUG?=
+ =?us-ascii?Q?6zs5VtGx6aXT8FsKk5vs2bM6OrgNUYpHL7+nfzZzDKjebLkmAkdvx9aPTRX3?=
+ =?us-ascii?Q?4aFO+Pi7aio=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:OS3P286MB0979.JPNP286.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?UBXcuhPAl3vfSVr2enY5DPuVhCcffZzxHo9QBUJ74GcUkTa0zbH28k8iwOLr?=
+ =?us-ascii?Q?uuV0GNAVgSl3PML+xQ1ong6g8rEqx6HZrlZjdzD2RUBmUU4AX2BVk/0glLw+?=
+ =?us-ascii?Q?B6lyv6ahlcWSZUYhq6vEbAf0mNO6rgZoT3p4UAMt1KIjlKoR59T6lEyYZf4w?=
+ =?us-ascii?Q?1U+b9Jf0lOeYTybKwJtMRNx5nSWhxu+qOJFkmvg4EHccJp1nQYqROi22ieNn?=
+ =?us-ascii?Q?QMTxrvDlfemCGqfDL2QWrnam9jWH1UQdl6yfRbMqcECuwWS+tGrMR53lXFKc?=
+ =?us-ascii?Q?OvjvIKGwqUGHJ8+KvTn06wxwdZYy/yGoTRrUzp9QiefmnORuIdvZcDzTRNXm?=
+ =?us-ascii?Q?94zTmph+HVGYroAFiw74DihDxKwemdUZyZ9SBJ/41pX+cL1cETKofGweWq/s?=
+ =?us-ascii?Q?3QBYnlFrxQJwP0wN1n2mgMgESAwM5UYptateQ00hKDddUmWi9SsWpnFH0M17?=
+ =?us-ascii?Q?ga1Zzp/48nRPEpfGx72ZB2ZfTS2PNOczImcHIgsCtC/f230xOPwq2brapMvN?=
+ =?us-ascii?Q?DptgSvTIJb3+VHeoAhTdkbu6m9nTL5u/oa9pZzv5I+7afv3+K7AzH/sFzhCq?=
+ =?us-ascii?Q?qAWoXkhAQGXXqVhe/fiV3Lwg6Xb+l9rIbUgFuNGpGnJumcgsC78Ur0Utd3Wr?=
+ =?us-ascii?Q?FB7Cjsh0Lc/fATVt897Num/NJqfzEJrQu93ap+Q26DjgloaPkg5h9ooo/S5n?=
+ =?us-ascii?Q?tJTqmfV2875TGvvP3S8g7URyx9tk9S0MYOfp/JqfsfVFQYWmPoMS3msO3k9W?=
+ =?us-ascii?Q?SSYAY3UDcAEDvagMFNt6gFiJp4CyexMTHgzERBz88ZNgCzEF7N8pmCRJ+AVv?=
+ =?us-ascii?Q?9p8m5UO+jXsoxp6qAdLadHn4LkOrwFCnwpbkgdVyMvcUDHjucWzoME2FcPlz?=
+ =?us-ascii?Q?XlE4haLUUrTMs4t9aTDcQ2YGipUet4FKGbdZOu5D9LgSpsC8Kf+8cQNgK+c5?=
+ =?us-ascii?Q?05K1xbO/fAEdcVvN3TJqeYvCUuz/hAUMCgB5hNlxq4iJdYukTvceycQbgVXc?=
+ =?us-ascii?Q?NFiTRNaOzO6HTTkDn+4U9/npPZ3JR7/SSCfUDsDpHNHI9gTJbnqQUH9DqZ+C?=
+ =?us-ascii?Q?a7wGgaeWdHwuSHumccH+3c5PoMv+zhN+5l7QdA2vYmGw93LjDTlc6rKSHV0h?=
+ =?us-ascii?Q?x0m+BVsCBXui0N3Y6MNGPYOqpEu7Bm76FtVV0LPnqoTvHX29TINAHK8Yhpaj?=
+ =?us-ascii?Q?LqhvA6DzVWLAKyr5yDjiaE94D9yJ0gPSpOM7IETcK6g0pE3SjFOn+Gl62ZJL?=
+ =?us-ascii?Q?PlZrGDLMAquRt8TZaxub5iZ/SEaTLQhfwFU63vRTApB65ectegg5Zu2V4+W6?=
+ =?us-ascii?Q?m3HH5SFa33WYGpt4IytR/oGg3w0ciStgyrfWfT/4W3E/dJBfWCT/8RSmrPhv?=
+ =?us-ascii?Q?vcDEiZxQzDdjkfcY05VN4yjJzRimnAodoBCk0Ie5H2wX+27HhtwX4CCVoKtf?=
+ =?us-ascii?Q?HaX3f47kofY9EDQljaULdjLe2tzr7Ci1HoB+2Lp26ERyDKRl1oX83/o+JffB?=
+ =?us-ascii?Q?uYyUXi9v69LK7a1F3ckRZ6YhGC6p+OVi1Gq+tUGWi2/Ogd0ZMGQ6Dv/8TsqI?=
+ =?us-ascii?Q?59NQrw1YPner1KohtZjkhhG+WMMR2WSEfUYgy6YrVErrZJ5RNCW+bNZohY7r?=
+ =?us-ascii?Q?seUeUjzk0RS1tywh2cgpfj0=3D?=
+X-OriginatorOrg: valinux.co.jp
+X-MS-Exchange-CrossTenant-Network-Message-Id: 74f6ca7f-72bc-43ff-c493-08dde9b8b559
+X-MS-Exchange-CrossTenant-AuthSource: OS3P286MB0979.JPNP286.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2025 00:36:14.3647
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 7a57bee8-f73d-4c5f-a4f7-d72c91c8c111
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: m2ZTGdDPSeadMjTUuYLNt2LQnPfzZbw6ruhns2Eeb+/IM+l0RG+9MWVLC19fue3YrlP99SUFsnpCwiHedUrz+Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYWP286MB2298
 
-From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+On Mon, Sep 01, 2025 at 07:53:54AM +0000, Jagielski, Jedrzej wrote:
+> From: Koichiro Den <den@valinux.co.jp> 
+> Sent: Thursday, August 28, 2025 4:06 AM
+> 
+> >Since ixgbe_adapter is embedded in devlink, calling devlink_free()
+> >prematurely in the ixgbe_remove() path can sometimes lead to UAF.
+> >
+> >Move the devlink cleanup steps to the end. KASAN report:
+> >
+> > BUG: KASAN: use-after-free in ixgbe_reset_interrupt_capability+0x140/0x180 [ixgbe]
+> > Read of size 8 at addr ffff0000adf813e0 by task bash/2095
+> > CPU: 1 UID: 0 PID: 2095 Comm: bash Tainted: G S  6.17.0-rc2-tnguy.net-queue+ #1 PREEMPT(full)
+> > [...]
+> > Call trace:
+> >  show_stack+0x30/0x90 (C)
+> >  dump_stack_lvl+0x9c/0xd0
+> >  print_address_description.constprop.0+0x90/0x310
+> >  print_report+0x104/0x1f0
+> >  kasan_report+0x88/0x180
+> >  __asan_report_load8_noabort+0x20/0x30
+> >  ixgbe_reset_interrupt_capability+0x140/0x180 [ixgbe]
+> >  ixgbe_clear_interrupt_scheme+0xf8/0x130 [ixgbe]
+> >  ixgbe_remove+0x2d0/0x8c0 [ixgbe]
+> >  pci_device_remove+0xa0/0x220
+> >  device_remove+0xb8/0x170
+> >  device_release_driver_internal+0x318/0x490
+> >  device_driver_detach+0x40/0x68
+> >  unbind_store+0xec/0x118
+> >  drv_attr_store+0x64/0xb8
+> >  sysfs_kf_write+0xcc/0x138
+> >  kernfs_fop_write_iter+0x294/0x440
+> >  new_sync_write+0x1fc/0x588
+> >  vfs_write+0x480/0x6a0
+> >  ksys_write+0xf0/0x1e0
+> >  __arm64_sys_write+0x70/0xc0
+> >  invoke_syscall.constprop.0+0xcc/0x280
+> >  el0_svc_common.constprop.0+0xa8/0x248
+> >  do_el0_svc+0x44/0x68
+> >  el0_svc+0x54/0x160
+> >  el0t_64_sync_handler+0xa0/0xe8
+> >  el0t_64_sync+0x1b0/0x1b8
+> >
+> >Fixes: a0285236ab93 ("ixgbe: add initial devlink support")
+> >Signed-off-by: Koichiro Den <den@valinux.co.jp>
+> >---
+> > drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 8 ++++----
+> > 1 file changed, 4 insertions(+), 4 deletions(-)
+> >
+> >diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> >index 80e6a2ef1350..2b1f3104164c 100644
+> >--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> >+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> >@@ -12090,10 +12090,6 @@ static void ixgbe_remove(struct pci_dev *pdev)
+> > 	if (netdev->reg_state == NETREG_REGISTERED)
+> > 		unregister_netdev(netdev);
+> > 
+> >-	devl_port_unregister(&adapter->devlink_port);
+> >-	devl_unlock(adapter->devlink);
+> >-	devlink_free(adapter->devlink);
+> >-
+> > 	ixgbe_stop_ipsec_offload(adapter);
+> > 	ixgbe_clear_interrupt_scheme(adapter);
+> > 
+> >@@ -12125,6 +12121,10 @@ static void ixgbe_remove(struct pci_dev *pdev)
+> > 
+> > 	if (disable_dev)
+> > 		pci_disable_device(pdev);
+> >+
+> >+	devl_port_unregister(&adapter->devlink_port);
+> >+	devl_unlock(adapter->devlink);
+> >+	devlink_free(adapter->devlink);
+> 
+> Thanks for finding and fixing!
+> I'm fine with putting devlink_free at the very end of ixgbe_remove,
+> but wouldn't be moving only devlink_free enough?
 
-Extend the Renesas GBETH stmmac glue driver to support the RZ/T2H SoC,
-where the GMAC is connected through a MIIC PCS. Introduce a new
-`has_pcs` flag in `struct renesas_gbeth_of_data` to indicate when PCS
-handling is required.
+Thanks for the review. You're right, let me send v2 shortly.
 
-When enabled, the driver parses the `pcs-handle` phandle, creates a PCS
-instance with `miic_create()`, and wires it into phylink. Proper cleanup
-is done with `miic_destroy()`. New init/exit/select hooks are added to
-`plat_stmmacenet_data` for PCS integration.
+-Koichiro
 
-Update Kconfig to select `PCS_RZN1_MIIC` when building the Renesas GBETH
-driver so the PCS support is always available.
-
-Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
----
- drivers/net/ethernet/stmicro/stmmac/Kconfig   |  1 +
- .../stmicro/stmmac/dwmac-renesas-gbeth.c      | 52 +++++++++++++++++++
- 2 files changed, 53 insertions(+)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-index 67fa879b1e52..a01c83b109f9 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-+++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-@@ -136,6 +136,7 @@ config DWMAC_RENESAS_GBETH
- 	tristate "Renesas RZ/V2H(P) GBETH support"
- 	default ARCH_RENESAS
- 	depends on OF && (ARCH_RENESAS || COMPILE_TEST)
-+	select PCS_RZN1_MIIC
- 	help
- 	  Support for Gigabit Ethernet Interface (GBETH) on Renesas
- 	  RZ/V2H(P) SoCs.
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
-index 022e595a9e1b..ad89f7b8f279 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
-@@ -17,6 +17,7 @@
- #include <linux/device.h>
- #include <linux/module.h>
- #include <linux/of.h>
-+#include <linux/pcs-rzn1-miic.h>
- #include <linux/platform_device.h>
- #include <linux/reset.h>
- #include <linux/types.h>
-@@ -33,6 +34,7 @@
-  *                handled by the glue driver or core driver.
-  * @set_clk_tx_rate: Flag to indicate if Tx clock is fixed or
-  *                   set_clk_tx_rate is needed.
-+ * @has_pcs: Flag to indicate if the MAC has a PCS
-  */
- struct renesas_gbeth_of_data {
- 	const char * const *clks;
-@@ -40,6 +42,7 @@ struct renesas_gbeth_of_data {
- 	u32 stmmac_flags;
- 	bool handle_reset;
- 	bool set_clk_tx_rate;
-+	bool has_pcs;
- };
- 
- struct renesas_gbeth {
-@@ -53,6 +56,41 @@ static const char *const renesas_gbeth_clks[] = {
- 	"tx", "tx-180", "rx", "rx-180",
- };
- 
-+static const char *const renesas_gmac_clks[] = {
-+	"tx",
-+};
-+
-+static int renesas_gmac_pcs_init(struct stmmac_priv *priv)
-+{
-+	struct device_node *np = priv->device->of_node;
-+	struct device_node *pcs_node;
-+	struct phylink_pcs *pcs;
-+
-+	pcs_node = of_parse_phandle(np, "pcs-handle", 0);
-+	if (pcs_node) {
-+		pcs = miic_create(priv->device, pcs_node);
-+		of_node_put(pcs_node);
-+		if (IS_ERR(pcs))
-+			return PTR_ERR(pcs);
-+
-+		priv->hw->phylink_pcs = pcs;
-+	}
-+
-+	return 0;
-+}
-+
-+static void renesas_gmac_pcs_exit(struct stmmac_priv *priv)
-+{
-+	if (priv->hw->phylink_pcs)
-+		miic_destroy(priv->hw->phylink_pcs);
-+}
-+
-+static struct phylink_pcs *renesas_gmac_select_pcs(struct stmmac_priv *priv,
-+						   phy_interface_t interface)
-+{
-+	return priv->hw->phylink_pcs;
-+}
-+
- static int renesas_gbeth_init(struct platform_device *pdev, void *priv)
- {
- 	struct plat_stmmacenet_data *plat_dat;
-@@ -149,6 +187,11 @@ static int renesas_gbeth_probe(struct platform_device *pdev)
- 	plat_dat->init = renesas_gbeth_init;
- 	plat_dat->exit = renesas_gbeth_exit;
- 	plat_dat->flags |= gbeth->of_data->stmmac_flags;
-+	if (of_data->has_pcs) {
-+		plat_dat->pcs_init = renesas_gmac_pcs_init;
-+		plat_dat->pcs_exit = renesas_gmac_pcs_exit;
-+		plat_dat->select_pcs = renesas_gmac_select_pcs;
-+	}
- 
- 	return devm_stmmac_pltfr_probe(pdev, plat_dat, &stmmac_res);
- }
-@@ -163,8 +206,17 @@ static const struct renesas_gbeth_of_data renesas_gbeth_of_data = {
- 			STMMAC_FLAG_SPH_DISABLE,
- };
- 
-+static const struct renesas_gbeth_of_data renesas_gmac_of_data = {
-+	.clks = renesas_gmac_clks,
-+	.num_clks = ARRAY_SIZE(renesas_gmac_clks),
-+	.stmmac_flags = STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY |
-+			STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP,
-+	.has_pcs = true,
-+};
-+
- static const struct of_device_id renesas_gbeth_match[] = {
- 	{ .compatible = "renesas,rzv2h-gbeth", .data = &renesas_gbeth_of_data },
-+	{ .compatible = "renesas,rzt2h-gbeth", .data = &renesas_gmac_of_data },
- 	{ /* Sentinel */ }
- };
- MODULE_DEVICE_TABLE(of, renesas_gbeth_match);
--- 
-2.51.0
-
+> 
+> 
+> > }
+> > 
+> > /**
+> >-- 
+> >2.48.1
+> 
 
