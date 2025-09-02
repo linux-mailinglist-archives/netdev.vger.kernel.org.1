@@ -1,210 +1,215 @@
-Return-Path: <netdev+bounces-219252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 487ECB40BF0
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 19:24:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A3F5B40BF8
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 19:26:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F11D53BC9E6
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 17:24:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2F573A86C6
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 17:26:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29A84343D69;
-	Tue,  2 Sep 2025 17:24:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30EFB3431ED;
+	Tue,  2 Sep 2025 17:26:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NOeH0X/u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF8BD342CB8
-	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 17:24:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BAB9EADC;
+	Tue,  2 Sep 2025 17:26:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756833874; cv=none; b=MOlEJh69A6r0T6fWB1qyXZsRWA0az0DtXTUvcVlRehzfR9hVHk/2F3ceaw27VFqRkdGdZlM/8lQdLF67tfvfY2uWeq9y6IO1p+mFgG/i0pp5URpgf86+z7GyBA9AFVlpJ3/U6TXJhCDXbd2zjhPlG6OMEH2s4ogbWe/P9bUFisw=
+	t=1756833972; cv=none; b=Q6XpoEZET/9+UH3ON/oUiD+xL08X1wODb1WxsafxUZ5h9Z1u6YgO39HCs8xiHou8rpvbKO68Kjv+SvdqscdPQsOvSQyidlETDdz7eZk7BHmjmoo6ZwvHUdBCcCFgomMHpxfiJmb6mDCz5K+7TIWQ2SWMpRKfYpFYCK7ryW3n1F4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756833874; c=relaxed/simple;
-	bh=r9KSlUAqtHp2GW8vv6y/Cz/b8ewlS56gHFEjxdFHR6k=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=jr24RMk47gf+hWDUL/lbCOrRE5gNehZJbIiOROuYqhU16CSR0CeAeLBG8HkhH2+Gi0QDpCFePVDDiY7k/C7E1ZyOLIbgqUWPcRE/HU+dayoeTGCvMht5Nc8PLG1JIZqK6lc53pGPnh9+VyjtR/pkAA1F93husTeH+wJmr+uuf70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3f12be6bc4aso69208785ab.1
-        for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 10:24:31 -0700 (PDT)
+	s=arc-20240116; t=1756833972; c=relaxed/simple;
+	bh=/z/Dz1XaPvrkNw36gI59b8TNtvVJDPJtI5VaXutkiXw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mff9Yy+NNWHDmRjvAFfX3O6EKa2EkRr5ULbZ1QuHzeEjGyWKd1a/qKCTJtMzCs6KOFhd8Vv1geT5Lqd9yt7QI9NFHDcBhxHeCFFLyobEGscnxzD+3TV3mZMm3mVMdmq5jwH3FXe+8iygRfh4EcMcPhcNaKa6N8fHA1Fu+BJ2A3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NOeH0X/u; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-772627dd50aso120462b3a.1;
+        Tue, 02 Sep 2025 10:26:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756833970; x=1757438770; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AI0sibvMCgh5fbMVo8FbbdghaTtrNSnQf+2Uv67Hqb0=;
+        b=NOeH0X/uyave7zSafdBKZ1jA3OB5abauOqB3k3ELpNvZVfNmce7fS0BE5llEUoTFG2
+         09Ta7ToOBrr4pmWAWFBl35xxWvu9fugQJ/FIaLPwgBEDcSXOPjXnRMRX5IGVG9RgFW1K
+         /bGG4Sp7dJ0ariaSkhR4/0F+SWewuhSBeImT2KlY0HNeW1qwFQHwMKK0VEsSJXMoTtkI
+         TRdBPg4L4fYWO60otKro8itfKUcdVZ8YB1Mkvp+Ffpbbv+omePceGtEMhJvMZBKzsAv4
+         eNYDbk18OrooP4CQOpQUHuW0c/Xm89U7ldpf/tfCgVMKLWqiYTZ3DgYT4Qvrj0/dEXZb
+         g8vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756833871; x=1757438671;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=iUma2pL435+m+LJeRZecgruwf95ej2KARn6kielNE/Y=;
-        b=aCKbFhnrQRfwXt7p82FrNoLI6XzvavgD6tnGjurdidz/6tYIRFEjOs/0+rhdyKCmqJ
-         Rvio63zpGtKRO/jPJsR8/HxDnQ/xEj1pgv+22CDATN+sVXTf39eifx5GJNUvhn8jb1+J
-         OipJFsh/UKYkom1OA1/jp8Aje72DroZXbqAkNOIgAQjIWfqy+ULAgqaTf8Nnem7Ve30u
-         RKgJ2WELk01XT6rsuuMefJ0rp3S+GkVtHRrXRSi40EAD//YRIpod9tj948Pn0bvRGHOn
-         qPnzFU+2DZg0rOIdkLqE9lrPICjBkyrGGJ5W8eAJiPV79m2bZQn9t8wtovE998G0967M
-         Knug==
-X-Forwarded-Encrypted: i=1; AJvYcCVrtXoOJoAsvU2hA9ItrXrnVADDW3m6oXe6JasYaNntQ82a3xodObkMjjAZy9JTwRDB7YqfehQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1cJWJdKLxntjhj9iWLXeSUiAFGcP5NPjm4MgYq38KanI+/PNr
-	/izjj/ZLo2YDVdUCMOa6882+T87O6aK1BdeXjShBJzrtX/G8Q78xTlKoQeHegBqrLJ61lgyl7g6
-	o++uwmkG6hHQwfChN1iZQJzxWDshNVEhxHTEARhKmOQV5PcmdR6DnvkRlOfo=
-X-Google-Smtp-Source: AGHT+IGe/LZznh6QHYuzY5n8pRqCjbwP8uuEjnaXH9wZGnRBDb5t26Nc/bad4amg7ZszYO+VLvo6VmdgB0gE0LUNWNg8fzMod4WA
+        d=1e100.net; s=20230601; t=1756833970; x=1757438770;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AI0sibvMCgh5fbMVo8FbbdghaTtrNSnQf+2Uv67Hqb0=;
+        b=D3nvIVYGi8ljuivISsOs0+ZyqYpV6G4gQOw9nj67VVgPkd9iVqzPvP0+GKMxedT6I/
+         VD/kyGg0gWTGytT3HYXUXfsZ0IfwBpzdw1aWqbbOPljwr0LU/pm9mJivUK/+tPdAM4aD
+         fzTvhFK2/xXtxXU2cC/cmbT1rF2YGDnEX1NT+PCyV0WIslbIQ5h4k3mrT9Qb+OVhUipb
+         xWLKPWN5HDr7mjF76l8mSgw/hAa5HJc1UkrqOy4GjCxVWSA6iov13NzfGpgfLgu0yc8p
+         imhRDKhdxvRZgjLsXPoDucOXzoV6jzH/YpOGGgwQTiiLvKah91z2zQLOAxpAWI3+yOrx
+         M7CA==
+X-Forwarded-Encrypted: i=1; AJvYcCWv2FIJHg022eeOPz59PZVMy4/VFqPzSXbiPZpf7eDvy5ZKAuKZre2SL0x3zs9zUghyZQ5wUb8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxg48cya/VDTQaS5zfHdgP4o7Jly0idi5NwgOlCQZaQ/o/3Ucul
+	9U3H/mAvlw36/iCz0kKXDJbrsVHcpoDNgCzNW3RAJsR8coq+43UY608=
+X-Gm-Gg: ASbGnctqPK8pMsEZnGtmLR8b9SJg4lYxbjhasszcayujVaSZb8Dh+2TJJlT94JOitcF
+	7T/9ZCUqBe6d0vSBXlGG9M71D+EN9Nq9+b4mCzwQ+2o+Q+CF+P6d1FXA3hD+xAOtTWZ3/5jvOox
+	yveR/SzJ/hA28QkSrdzuhYeIzxkGMVUgRWHG1OUJVcMLORg/ZhB4/7dEmB+UCzzdMmQTkFAXptN
+	4e7hkKRluW8lCUFu+migFGMi2cHzxkgmpzf+nI8+xHFhCOIEVuM8aEqkG3rqE7rfaiOE+/BxT4T
+	mJDyWoPneSD9YE72e/YClwUQ384sxn7ReUo4WvboiVDv1PuxckeLW33bBaW7AmhcxeUcwdXiKXo
+	z4zmVRDQi7O5lB71FpNTLvT7NqGu7k6DDZ9lQPA99Nng73sqJJik5+6OQenXmCqjCm02ds0Ctdb
+	kI//4J6Uhczh7+AhwxljYV7Qb52O7Wszk3L/Fk35Tgw8Bhz/M6nLxrqGTDsP3xrk9nFC4qsQoFa
+	sZg
+X-Google-Smtp-Source: AGHT+IEUQPE00+kt4cC6c0CTbDY1QOeSG7yzCaxkvyUnPQojU0cKQ/XQPhhE6GNJK8H+7bjn0oI85Q==
+X-Received: by 2002:a05:6a20:244c:b0:23f:ff4e:fcb0 with SMTP id adf61e73a8af0-243d505c677mr19170305637.2.1756833969523;
+        Tue, 02 Sep 2025 10:26:09 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-b4cd3670e5csm12353265a12.53.2025.09.02.10.26.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Sep 2025 10:26:09 -0700 (PDT)
+Date: Tue, 2 Sep 2025 10:26:08 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+	andrii@kernel.org, netdev@vger.kernel.org,
+	magnus.karlsson@intel.com, kerneljasonxing@gmail.com,
+	Eryk Kubanski <e.kubanski@partner.samsung.com>
+Subject: Re: [PATCH v7 bpf] xsk: fix immature cq descriptor production
+Message-ID: <aLcosKaalC8DYR5j@mini-arch>
+References: <20250829180950.2305157-1-maciej.fijalkowski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:4702:b0:3f6:5688:a088 with SMTP id
- e9e14a558f8ab-3f65688a0c7mr60399325ab.10.1756833871128; Tue, 02 Sep 2025
- 10:24:31 -0700 (PDT)
-Date: Tue, 02 Sep 2025 10:24:31 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68b7284f.050a0220.3db4df.01d7.GAE@google.com>
-Subject: [syzbot] [hams?] WARNING: ODEBUG bug in __run_timers (3)
-From: syzbot <syzbot+7287222a6d88bdb559a7@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250829180950.2305157-1-maciej.fijalkowski@intel.com>
 
-Hello,
+On 08/29, Maciej Fijalkowski wrote:
+> Eryk reported an issue that I have put under Closes: tag, related to
+> umem addrs being prematurely produced onto pool's completion queue.
+> Let us make the skb's destructor responsible for producing all addrs
+> that given skb used.
+> 
+> Commit from fixes tag introduced the buggy behavior, it was not broken
+> from day 1, but rather when XSK multi-buffer got introduced.
+> 
+> In order to mitigate performance impact as much as possible, mimic the
+> linear and frag parts within skb by storing the first address from XSK
+> descriptor at sk_buff::destructor_arg. For fragments, store them at ::cb
+> via list. The nodes that will go onto list will be allocated via
+> kmem_cache. xsk_destruct_skb() will consume address stored at
+> ::destructor_arg and optionally go through list from ::cb, if count of
+> descriptors associated with this particular skb is bigger than 1.
+> 
+> Previous approach where whole array for storing UMEM addresses from XSK
+> descriptors was pre-allocated during first fragment processing yielded
+> too big performance regression for 64b traffic. In current approach
+> impact is much reduced on my tests and for jumbo frames I observed
+> traffic being slower by at most 9%.
+> 
+> Magnus suggested to have this way of processing special cased for
+> XDP_SHARED_UMEM, so we would identify this during bind and set different
+> hooks for 'backpressure mechanism' on CQ and for skb destructor, but
+> given that results looked promising on my side I decided to have a
+> single data path for XSK generic Tx. I suppose other auxiliary stuff
+> such as helpers introduced in this patch would have to land as well in
+> order to make it work, so we might have ended up with more noisy diff.
+> 
+> Fixes: b7f72a30e9ac ("xsk: introduce wrappers and helpers for supporting multi-buffer in Tx path")
+> Reported-by: Eryk Kubanski <e.kubanski@partner.samsung.com>
+> Closes: https://lore.kernel.org/netdev/20250530103456.53564-1-e.kubanski@partner.samsung.com/
+> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> ---
+> 
+> Jason, please test this v7 on your setup, I would appreciate if you
+> would report results from your testbed. Thanks!
+> 
+> v1:
+> https://lore.kernel.org/bpf/20250702101648.1942562-1-maciej.fijalkowski@intel.com/
+> v2:
+> https://lore.kernel.org/bpf/20250705135512.1963216-1-maciej.fijalkowski@intel.com/
+> v3:
+> https://lore.kernel.org/bpf/20250806154127.2161434-1-maciej.fijalkowski@intel.com/
+> v4:
+> https://lore.kernel.org/bpf/20250813171210.2205259-1-maciej.fijalkowski@intel.com/
+> v5:
+> https://lore.kernel.org/bpf/aKXBHGPxjpBDKOHq@boxer/T/
+> v6:
+> https://lore.kernel.org/bpf/20250820154416.2248012-1-maciej.fijalkowski@intel.com/
+> 
+> v1->v2:
+> * store addrs in array carried via destructor_arg instead having them
+>   stored in skb headroom; cleaner and less hacky approach;
+> v2->v3:
+> * use kmem_cache for xsk_addrs allocation (Stan/Olek)
+> * set err when xsk_addrs allocation fails (Dan)
+> * change xsk_addrs layout to avoid holes
+> * free xsk_addrs on error path
+> * rebase
+> v3->v4:
+> * have kmem_cache as percpu vars
+> * don't drop unnecessary braces (unrelated) (Stan)
+> * use idx + i in xskq_prod_write_addr (Stan)
+> * alloc kmem_cache on bind (Stan)
+> * keep num_descs as first member in xsk_addrs (Magnus)
+> * add ack from Magnus
+> v4->v5:
+> * have a single kmem_cache per xsk subsystem (Stan)
+> v5->v6:
+> * free skb in xsk_build_skb_zerocopy() when xsk_addrs allocation fails
+>   (Stan)
+> * unregister netdev notifier if creating kmem_cache fails (Stan)
+> v6->v7:
+> * don't include Acks from Magnus/Stan; let them review the new
+>   approach:)
+> * store first desc at sk_buff::destructor_arg and rest of frags in list
+>   stored at sk_buff::cb
 
-syzbot found the following issue on:
+This is a nice way out :-)
 
-HEAD commit:    b320789d6883 Linux 6.17-rc4
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1204ae62580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=da02162f945f3311
-dashboard link: https://syzkaller.appspot.com/bug?extid=7287222a6d88bdb559a7
-compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> * keep the kmem_cache but don't use it for allocation of whole array at
+>   one shot but rather alloc single nodes of list
+> 
+> ---
+>  net/xdp/xsk.c       | 99 ++++++++++++++++++++++++++++++++++++++-------
+>  net/xdp/xsk_queue.h | 12 ++++++
+>  2 files changed, 97 insertions(+), 14 deletions(-)
+> 
+> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> index 9c3acecc14b1..3d12d1fbda41 100644
+> --- a/net/xdp/xsk.c
+> +++ b/net/xdp/xsk.c
+> @@ -36,6 +36,20 @@
+>  #define TX_BATCH_SIZE 32
+>  #define MAX_PER_SOCKET_BUDGET 32
+>  
+> +struct xsk_addr_node {
+> +	u64 addr;
+> +	struct list_head addr_node;
+> +};
+> +
+> +struct xsk_addr_head {
+> +	u32 num_descs;
+> +	struct list_head addrs_list;
+> +};
+> +
+> +static struct kmem_cache *xsk_tx_generic_cache;
+> +
+> +#define XSKCB(skb) ((struct xsk_addr_head *)((skb)->cb))
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Since you're gonna respin, maybe stick a build_bug_on here for
+the sizeof xsk_addr_head vs sizeof skb cb? Who knows, maybe at some
+point we'll stick more info into that struct..
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/7a46ec41bf8b/disk-b320789d.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/876c0ffbc199/vmlinux-b320789d.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/aa352d634f96/bzImage-b320789d.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+7287222a6d88bdb559a7@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-ODEBUG: free active (active state 0) object: ffff88806ac3a490 object type: timer_list hint: rose_t0timer_expiry+0x0/0x150 include/linux/skbuff.h:2880
-WARNING: CPU: 0 PID: 10082 at lib/debugobjects.c:612 debug_print_object+0x1a2/0x2b0 lib/debugobjects.c:612
-Modules linked in:
-CPU: 0 UID: 0 PID: 10082 Comm: syz.1.930 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-RIP: 0010:debug_print_object+0x1a2/0x2b0 lib/debugobjects.c:612
-Code: fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 75 54 41 56 48 8b 14 dd 60 41 16 8c 4c 89 e6 48 c7 c7 e0 35 16 8c e8 cf 43 91 fc 90 <0f> 0b 90 90 58 83 05 46 ce c2 0b 01 48 83 c4 18 5b 5d 41 5c 41 5d
-RSP: 0018:ffffc90000007a28 EFLAGS: 00010286
-RAX: 0000000000000000 RBX: 0000000000000003 RCX: ffffffff817a3358
-RDX: ffff888030b6bc00 RSI: ffffffff817a3365 RDI: 0000000000000001
-RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: ffffffff8c163c80
-R13: ffffffff8bafedc0 R14: ffffffff8a7fa4f0 R15: ffffc90000007b28
-FS:  00007f4947a166c0(0000) GS:ffff8881246b9000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f49479f5d58 CR3: 0000000030c4f000 CR4: 0000000000350ef0
-Call Trace:
- <IRQ>
- __debug_check_no_obj_freed lib/debugobjects.c:1099 [inline]
- debug_check_no_obj_freed+0x4b7/0x600 lib/debugobjects.c:1129
- slab_free_hook mm/slub.c:2348 [inline]
- slab_free mm/slub.c:4680 [inline]
- kfree+0x28f/0x4d0 mm/slub.c:4879
- rose_neigh_put include/net/rose.h:166 [inline]
- rose_timer_expiry+0x53f/0x630 net/rose/rose_timer.c:183
- call_timer_fn+0x19a/0x620 kernel/time/timer.c:1747
- expire_timers kernel/time/timer.c:1798 [inline]
- __run_timers+0x6ef/0x960 kernel/time/timer.c:2372
- __run_timer_base kernel/time/timer.c:2384 [inline]
- __run_timer_base kernel/time/timer.c:2376 [inline]
- run_timer_base+0x114/0x190 kernel/time/timer.c:2393
- run_timer_softirq+0x1a/0x40 kernel/time/timer.c:2403
- handle_softirqs+0x219/0x8e0 kernel/softirq.c:579
- __do_softirq kernel/softirq.c:613 [inline]
- invoke_softirq kernel/softirq.c:453 [inline]
- __irq_exit_rcu+0x109/0x170 kernel/softirq.c:680
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:696
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1050 [inline]
- sysvec_apic_timer_interrupt+0xa4/0xc0 arch/x86/kernel/apic/apic.c:1050
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-RIP: 0010:__raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:152 [inline]
-RIP: 0010:_raw_spin_unlock_irqrestore+0x31/0x80 kernel/locking/spinlock.c:194
-Code: f5 53 48 8b 74 24 10 48 89 fb 48 83 c7 18 e8 76 fe 02 f6 48 89 df e8 5e 52 03 f6 f7 c5 00 02 00 00 75 23 9c 58 f6 c4 02 75 37 <bf> 01 00 00 00 e8 05 4f f3 f5 65 8b 05 0e ac 41 08 85 c0 74 16 5b
-RSP: 0018:ffffc9001fae7770 EFLAGS: 00000246
-RAX: 0000000000000006 RBX: ffff888079171200 RCX: 0000000000000006
-RDX: 0000000000000000 RSI: ffffffff8de4eebc RDI: ffffffff8c163080
-RBP: 0000000000000246 R08: 0000000000000001 R09: 0000000000000001
-R10: ffffffff90ab8a97 R11: 0000000000000000 R12: ffff888033eb78c0
-R13: 0000000000000246 R14: ffff8880791711e8 R15: ffffc9001fae78f8
- spin_unlock_irqrestore include/linux/spinlock.h:406 [inline]
- __skb_try_recv_datagram+0x172/0x4f0 net/core/datagram.c:267
- __unix_dgram_recvmsg+0x1bc/0xc30 net/unix/af_unix.c:2601
- unix_dgram_recvmsg+0xd0/0x110 net/unix/af_unix.c:2700
- sock_recvmsg_nosec net/socket.c:1065 [inline]
- ____sys_recvmsg+0x5f9/0x6b0 net/socket.c:2832
- ___sys_recvmsg+0x114/0x1a0 net/socket.c:2876
- do_recvmmsg+0x2fe/0x750 net/socket.c:2971
- __sys_recvmmsg net/socket.c:3045 [inline]
- __do_sys_recvmmsg net/socket.c:3068 [inline]
- __se_sys_recvmmsg net/socket.c:3061 [inline]
- __x64_sys_recvmmsg+0x22a/0x280 net/socket.c:3061
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0x4c0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f4946b8ebe9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f4947a16038 EFLAGS: 00000246 ORIG_RAX: 000000000000012b
-RAX: ffffffffffffffda RBX: 00007f4946dc6090 RCX: 00007f4946b8ebe9
-RDX: 0000000000010106 RSI: 00002000000000c0 RDI: 0000000000000003
-RBP: 00007f4946c11e19 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000002 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f4946dc6128 R14: 00007f4946dc6090 R15: 00007fff631b3388
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	f5                   	cmc
-   1:	53                   	push   %rbx
-   2:	48 8b 74 24 10       	mov    0x10(%rsp),%rsi
-   7:	48 89 fb             	mov    %rdi,%rbx
-   a:	48 83 c7 18          	add    $0x18,%rdi
-   e:	e8 76 fe 02 f6       	call   0xf602fe89
-  13:	48 89 df             	mov    %rbx,%rdi
-  16:	e8 5e 52 03 f6       	call   0xf6035279
-  1b:	f7 c5 00 02 00 00    	test   $0x200,%ebp
-  21:	75 23                	jne    0x46
-  23:	9c                   	pushf
-  24:	58                   	pop    %rax
-  25:	f6 c4 02             	test   $0x2,%ah
-  28:	75 37                	jne    0x61
-* 2a:	bf 01 00 00 00       	mov    $0x1,%edi <-- trapping instruction
-  2f:	e8 05 4f f3 f5       	call   0xf5f34f39
-  34:	65 8b 05 0e ac 41 08 	mov    %gs:0x841ac0e(%rip),%eax        # 0x841ac49
-  3b:	85 c0                	test   %eax,%eax
-  3d:	74 16                	je     0x55
-  3f:	5b                   	pop    %rbx
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
