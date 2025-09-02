@@ -1,424 +1,240 @@
-Return-Path: <netdev+bounces-219124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 181D1B4004D
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 14:24:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B2A5B3FFED
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 14:19:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94A4F544A9D
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 12:19:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32A911B27DE8
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 12:19:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 128482FD1AB;
-	Tue,  2 Sep 2025 12:17:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA6AB2C11DF;
+	Tue,  2 Sep 2025 12:17:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kSVWNYDv"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="ZR5dFx+i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E71892C11C9;
-	Tue,  2 Sep 2025 12:17:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7E5B2C1590
+	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 12:17:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756815456; cv=none; b=aPz1/97cZd/ZvvbxLJCEOmdWwu4+wg7Ekv9dlR1w/HUZffZmcPH/x/qox6Zw1GiuiPXe0O/JareCtBlxaNwJ6frcMKR41gjTC/nLrUHqEJjevDtBrRoGF0dV6y58YL/OIRjrUsbOAWts8StjMK3QsKWxd8Reiqm5RB+1y0UhKPI=
+	t=1756815444; cv=none; b=i6VZHvMdSG9PF1y6USzqC0333T6opwe7i2mqxJmoncI3kHgsjVyaLQaprpYlJLTC55eWn4XKVm9MwSKyTkCTqh9wEqnVoz511nuuiJvmlTVrLj1ymb0JQW+lQyeq0S4gCaAZOpgZenBtOYVuG44d/mKiWwgZAAz6OwpLTZQTLO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756815456; c=relaxed/simple;
-	bh=3/mypePnJRDUzhOvndfzVAOYSe0h2vW0Tvh9JFz0G0g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WSLvHDJBHHyozkHQobpCVk1z0piPrnQsk6uO+p/shuvrRb9SeYxb6N3p0aaiS4DGegTZzGfMK+uih/dfMMLZkpvZVyMk4Ri7ERBpIQKGfRoZelRNqNlKpizGfW8v0WfoA5q78QJ19Z6ND0gX3DTHJ24LnCJf7DLlzM8vHqAVLAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kSVWNYDv; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-6188b5ae1e8so5559399a12.0;
-        Tue, 02 Sep 2025 05:17:34 -0700 (PDT)
+	s=arc-20240116; t=1756815444; c=relaxed/simple;
+	bh=N3vWDhCOBaZTBUtVme6+yPTAy05u/Y0hc3po6Ylu+DI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pvBRjJ6nSgfkEyRfGi0fLvIZ6dhmsfmK3P5Qd+uLuagaApyRBRmZrbfk9pim+ZyrpxSG2n1o2luXYqanISoBBntxL4ALowBJ1ZzmnpGjUfpcUFxYzUN7XV/r1R+4zF/twrk2CuJvNHkBFLlLEuuDcrbin7hAyu++2L6ZzQUEwRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=ZR5dFx+i; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-560880bb751so34204e87.3
+        for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 05:17:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756815453; x=1757420253; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=42U15/348cdGUsar34UpC/0xXX4VsKca7Fk0wm1luRs=;
-        b=kSVWNYDvOVub/DhWgVqsu0F6bRSJuc8n2aniyhXAAhi3iVdiYMkfvftOFFhreN2taP
-         yjOmt0IAQWOi5GLH3G6oyCy39c+QEuLMH7puAfJ1MnD6EaWqcl0843c+zinsBaRiYmiz
-         zmSWG0t39q6GYBxK1vPE0+P8i7pSgBMe5jpqNw5Q+MElVPeW0sVVob4ZuI4DZFy9qLc6
-         4EQGO5w01ZAKXJBuTlGs59MZODkTMnrmkHQjmdht7tHoTEus5n5+Wj26daBOsYBp/oGh
-         b6ChZK0sj5RSpr/ZmpZXJFRWquhLW1CLhiMLZhBBEohu0m4bbS3Kaosn2n4Du6gG1FS6
-         axKg==
+        d=blackwall.org; s=google; t=1756815439; x=1757420239; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YY5Fq04UKnDR1qGwzFCqLPFzo8fpSNIcl0+8o47nm7s=;
+        b=ZR5dFx+iWvSbP0UBobvVfe8g5pqHVaJC4N7ochYmASAA/31UdgYOwAvQnveVjPHRWI
+         XqBFRQb+3ufBR7AiciACNMDICy9AGFkUlqi0AQEz1EOwLxHAJbciG1sdVhW2wbk5uhCD
+         /v0prjDHm6XPmJCLaJ7wg8B6jIcNsZ1V3vQFT8HtlTS40hDvmlOaLMZLCVv/BLHnm+gy
+         D+ED5pXB131RVpWRNdGAGN/sybGBX0pKQEJz72bqp5L41N5YhTcXbd2CiNb3OaBHAsgU
+         1OHITW59+Mjv/GYEIw9o+z5C1J6o2kFkboqwPLSMPQJ+sX4ZP7stNIyAhX+UreaJA7Ba
+         S5Zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756815453; x=1757420253;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=42U15/348cdGUsar34UpC/0xXX4VsKca7Fk0wm1luRs=;
-        b=gKyZzPV4dC2KLRAIAPx/MbnpTHTPThScxlNDoQIZmcm3yK9oxLlKPtpLoJmNCHZOYP
-         PXDj0yFHJmdrwGXipoOt/JU/HsljanCSeqVFEhmulgnrar7kzycoQtL/Ma/Kz0r3Wt/A
-         R/lqIWD5BSMOXv4kMnuGSspN6uhQhohS+udDCFP9s4z/8ibhCh7e1qM/35ZYLqrNPxtM
-         I24d4aSpXKmQ/LXRtDKMjv4lVHtNBUse2rnr4NiezXI50WvCM2NN4JMjzBKuZcVf/V6G
-         AxL2Z2H88kVcvLf0l6cd+07kyMp8L/oixPlvCkkIpdVuSbEFZbfxZA7nD+1uxYLObMoO
-         eHAg==
-X-Forwarded-Encrypted: i=1; AJvYcCU+nP+t46J5fnam6X3RRbeZepRaBCmgcU6aIJk7rdS4M6AGt3S9X/+8zTduaFQUrv5py04Q/eeUUauwl51e@vger.kernel.org, AJvYcCVKZyiX3ll6n2l41v5+RGWnMA2mkC1oyGE7agcpek2js5LQkFhpqKJBUl7KOEZlwcNI0jzbUgb2/2Wm@vger.kernel.org, AJvYcCVivb2Ibq3AudN7iwVoORswlZ2Ouo7eCUJY6GYLIfr9rx9hKDcnHA2Mv0cyVJ0Dbv+zpA2d5DMHkVOP9+G6bRbWDMQ=@vger.kernel.org, AJvYcCXVW7GskPgP2T4fSBXkbj8JUG++fYENA7Z6ESDUjMWsrDP6X4tVP5zty0B4oD+X9CZLEPBC2YJr@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywmj4bYo5Bkk0XViWXy0ZPrMHBCP1UALkANARsF1qncrdrDglPr
-	VyEE3hv1wlAlQl4C9AX+oglFn9A6OTqFqvkS6pv4GsDvOoJyS0tW4yqgJceIAyGpFGV2PbZ2EkI
-	+j1jIVJXGeOBN4wIR4RJBQWD9C8bTxW8=
-X-Gm-Gg: ASbGncv9K96IA7s12D9qFfcS0BpvBWoJo07iEwJKNuCNz0BKqybLMnWlE+0/cXLPKa9
-	zHkNk2GnZa6QvGQr6cv74cfjLCoQ6HrCRgPv5O22seCEqIJHPSs7Z+B5r3VlK1TssI4BeiGajEp
-	BdKgEpiCw7iMJDTooQbPsirEGwq7oOxhDXCgzuvnNfGSWUXatJ2hvKGFKWBo226F0M6+RJcZvvW
-	cQ3Z3lejUUBUVj17iC5elvJJs0poqqGMIjG45mpqByybVV8jCs=
-X-Google-Smtp-Source: AGHT+IEY6ifRLT0JiWdPcioO0Hkm95EYxod8iArKpPf75fvBrdryW7qlJWrp5KlqLLS4W+5vCXQxFZlsc8+QUu2qk1s=
-X-Received: by 2002:a17:906:2692:b0:b04:1896:1236 with SMTP id
- a640c23a62f3a-b0418961257mr708211166b.22.1756815452790; Tue, 02 Sep 2025
- 05:17:32 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1756815439; x=1757420239;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YY5Fq04UKnDR1qGwzFCqLPFzo8fpSNIcl0+8o47nm7s=;
+        b=NX2oK0Xj+xJJXTN1KGU1whuN/M0tfaGdjGQzm3kuFLbXjTsFoAsEXD3gSa46iDmJ9q
+         44g6eHfVCCuf0DsTlRyV2bf90FQ5OQLZelblwCybD21i6nmWXsHK0DOUU2P1nXDKhUd2
+         1BawI0k1QLrbqmnJWaovdGZRcG9XVDZWCDZBwxRvbvEOHyuUUXnpJKBTvblt0Wjq+bm/
+         R1XyJtkNvQ20nfk92kGcyuDaWa0I4XBKj3jcpX9g4pheTm7UsNZ1dI5jOXZw5CsxtfT6
+         bQmEmXXktjhwlxxrWwDQ1bHh8NPaP5A0aj+RUrQo+afW+N4Ko3N3EgjOrOPJXriq7n0S
+         CRzg==
+X-Forwarded-Encrypted: i=1; AJvYcCXuf5iGlizzOEFyfB3LhwT4/bOa3wjQ3SA1wjilsppFNvN0rOPiANAZbQvjqRG8gw9AIC7Xl4Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxTV8OLLgJeg4OFXu5epOJQS6Fgq/EL43K7CArU38GZYs6029A
+	ocJtOGeEme/6no4rsGBCtWXttAykT9/NASGniJB6FUJ8/K2IKu9mJeWTqNsh7h7kI6E=
+X-Gm-Gg: ASbGnctaQdo/YJj5kW5l3x3w1rwasTYSXMM3+X4SsugKJss4fkiTNqkrEmuwYkilhkv
+	afvqE4isJ39tcrujSu5l+jQYtvaLY9tHz3j/PGcM0mRBp0j5T06ouhkgoNK8jRqOzP8ORKusSGh
+	96Ag6UNgT/D+uBhNegZIH+qNIYcvrw+IxBDy81hvHDn8GyXCtO2X/GtT2n+43u8O5VPsMey7mag
+	PrglbICDYot+TGE/eKMwSdTtdVMRfAiPTKoY6pe+r8gm3ZThZwOlalI+NRAbGJkWNP/IKqcQcKe
+	dI39z6UPcJgC2oiZAfTs3g/2uwSxwkV6ogjhK3sYewUKmZNWgK69vBFiS1GiVzq4y9B6MwtsrIn
+	KMakpNATP/ITlxZMoBPdEJ7m7yutcYI0ZXZ8ZinuQeSX8sbrDuMHZzn792Ca6NGnXFRTLImCK3z
+	IcIw==
+X-Google-Smtp-Source: AGHT+IFQJhNbaxZxWKm4iUzEbs1AJRaxzVHLWSTot3Y47efXhraywUOKZMVrnpAfYs2lrKqwY/QvKw==
+X-Received: by 2002:a05:6512:3e15:b0:55f:6db5:748d with SMTP id 2adb3069b0e04-55f7089c530mr3720256e87.4.1756815438713;
+        Tue, 02 Sep 2025 05:17:18 -0700 (PDT)
+Received: from [100.115.92.205] (176.111.185.210.kyiv.nat.volia.net. [176.111.185.210])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-560826d13edsm674760e87.14.2025.09.02.05.17.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Sep 2025 05:17:17 -0700 (PDT)
+Message-ID: <2e341de1-ec26-4e1f-afdf-4b4854daf38f@blackwall.org>
+Date: Tue, 2 Sep 2025 15:17:15 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250901224327.3429099-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250901224327.3429099-2-prabhakar.mahadev-lad.rj@bp.renesas.com> <20250902-enlightened-hidden-copperhead-4eefdf@kuoka>
-In-Reply-To: <20250902-enlightened-hidden-copperhead-4eefdf@kuoka>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Tue, 2 Sep 2025 13:17:06 +0100
-X-Gm-Features: Ac12FXy9DVpjObuZ3-ixuDeS5Kbpg__4JszfuiG4LvJTm1hlGpANpZzv3qTq1To
-Message-ID: <CA+V-a8sSiNQ6W-ggmL8PP_G1sFq170DS1LJLFJs_WW0RC+XVEw@mail.gmail.com>
-Subject: Re: [PATCH net-next 01/10] dt-bindings: net: pcs: renesas,rzn1-miic:
- Document RZ/T2H and RZ/N2H SoCs
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Philipp Zabel <p.zabel@pengutronix.de>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Magnus Damm <magnus.damm@gmail.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, 
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Biju Das <biju.das.jz@bp.renesas.com>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 2/3] vxlan: Fix NPD in {arp,neigh}_reduce() when using
+ nexthop objects
+To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ petrm@nvidia.com, mcremers@cloudbear.nl
+References: <20250901065035.159644-1-idosch@nvidia.com>
+ <20250901065035.159644-3-idosch@nvidia.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20250901065035.159644-3-idosch@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Krzysztof,
+On 9/1/25 09:50, Ido Schimmel wrote:
+> When the "proxy" option is enabled on a VXLAN device, the device will
+> suppress ARP requests and IPv6 Neighbor Solicitation messages if it is
+> able to reply on behalf of the remote host. That is, if a matching and
+> valid neighbor entry is configured on the VXLAN device whose MAC address
+> is not behind the "any" remote (0.0.0.0 / ::).
+> 
+> The code currently assumes that the FDB entry for the neighbor's MAC
+> address points to a valid remote destination, but this is incorrect if
+> the entry is associated with an FDB nexthop group. This can result in a
+> NPD [1][3] which can be reproduced using [2][4].
+> 
+> Fix by checking that the remote destination exists before dereferencing
+> it.
+> 
+> [1]
+> BUG: kernel NULL pointer dereference, address: 0000000000000000
+> [...]
+> CPU: 4 UID: 0 PID: 365 Comm: arping Not tainted 6.17.0-rc2-virtme-g2a89cb21162c #2 PREEMPT(voluntary)
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-4.fc41 04/01/2014
+> RIP: 0010:vxlan_xmit+0xb58/0x15f0
+> [...]
+> Call Trace:
+>   <TASK>
+>   dev_hard_start_xmit+0x5d/0x1c0
+>   __dev_queue_xmit+0x246/0xfd0
+>   packet_sendmsg+0x113a/0x1850
+>   __sock_sendmsg+0x38/0x70
+>   __sys_sendto+0x126/0x180
+>   __x64_sys_sendto+0x24/0x30
+>   do_syscall_64+0xa4/0x260
+>   entry_SYSCALL_64_after_hwframe+0x4b/0x53
+> 
+> [2]
+>   #!/bin/bash
+> 
+>   ip address add 192.0.2.1/32 dev lo
+> 
+>   ip nexthop add id 1 via 192.0.2.2 fdb
+>   ip nexthop add id 10 group 1 fdb
+> 
+>   ip link add name vx0 up type vxlan id 10010 local 192.0.2.1 dstport 4789 proxy
+> 
+>   ip neigh add 192.0.2.3 lladdr 00:11:22:33:44:55 nud perm dev vx0
+> 
+>   bridge fdb add 00:11:22:33:44:55 dev vx0 self static nhid 10
+> 
+>   arping -b -c 1 -s 192.0.2.1 -I vx0 192.0.2.3
+> 
+> [3]
+> BUG: kernel NULL pointer dereference, address: 0000000000000000
+> [...]
+> CPU: 13 UID: 0 PID: 372 Comm: ndisc6 Not tainted 6.17.0-rc2-virtmne-g6ee90cb26014 #3 PREEMPT(voluntary)
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1v996), BIOS 1.17.0-4.fc41 04/01/2x014
+> RIP: 0010:vxlan_xmit+0x803/0x1600
+> [...]
+> Call Trace:
+>   <TASK>
+>   dev_hard_start_xmit+0x5d/0x1c0
+>   __dev_queue_xmit+0x246/0xfd0
+>   ip6_finish_output2+0x210/0x6c0
+>   ip6_finish_output+0x1af/0x2b0
+>   ip6_mr_output+0x92/0x3e0
+>   ip6_send_skb+0x30/0x90
+>   rawv6_sendmsg+0xe6e/0x12e0
+>   __sock_sendmsg+0x38/0x70
+>   __sys_sendto+0x126/0x180
+>   __x64_sys_sendto+0x24/0x30
+>   do_syscall_64+0xa4/0x260
+>   entry_SYSCALL_64_after_hwframe+0x4b/0x53
+> RIP: 0033:0x7f383422ec77
+> 
+> [4]
+>   #!/bin/bash
+> 
+>   ip address add 2001:db8:1::1/128 dev lo
+> 
+>   ip nexthop add id 1 via 2001:db8:1::1 fdb
+>   ip nexthop add id 10 group 1 fdb
+> 
+>   ip link add name vx0 up type vxlan id 10010 local 2001:db8:1::1 dstport 4789 proxy
+> 
+>   ip neigh add 2001:db8:1::3 lladdr 00:11:22:33:44:55 nud perm dev vx0
+> 
+>   bridge fdb add 00:11:22:33:44:55 dev vx0 self static nhid 10
+> 
+>   ndisc6 -r 1 -s 2001:db8:1::1 -w 1 2001:db8:1::3 vx0
+> 
+> Fixes: 1274e1cc4226 ("vxlan: ecmp support for mac fdb entries")
+> Reviewed-by: Petr Machata <petrm@nvidia.com>
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> ---
+>   drivers/net/vxlan/vxlan_core.c | 10 ++++++++--
+>   1 file changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+> index 0f6a7c89a669..dab864bc733c 100644
+> --- a/drivers/net/vxlan/vxlan_core.c
+> +++ b/drivers/net/vxlan/vxlan_core.c
+> @@ -1877,6 +1877,7 @@ static int arp_reduce(struct net_device *dev, struct sk_buff *skb, __be32 vni)
+>   	n = neigh_lookup(&arp_tbl, &tip, dev);
+>   
+>   	if (n) {
+> +		struct vxlan_rdst *rdst = NULL;
+>   		struct vxlan_fdb *f;
+>   		struct sk_buff	*reply;
+>   
+> @@ -1887,7 +1888,9 @@ static int arp_reduce(struct net_device *dev, struct sk_buff *skb, __be32 vni)
+>   
+>   		rcu_read_lock();
+>   		f = vxlan_find_mac_tx(vxlan, n->ha, vni);
+> -		if (f && vxlan_addr_any(&(first_remote_rcu(f)->remote_ip))) {
+> +		if (f)
+> +			rdst = first_remote_rcu(f);
+> +		if (rdst && vxlan_addr_any(&rdst->remote_ip)) {
+>   			/* bridge-local neighbor */
+>   			neigh_release(n);
+>   			rcu_read_unlock();
+> @@ -2044,6 +2047,7 @@ static int neigh_reduce(struct net_device *dev, struct sk_buff *skb, __be32 vni)
+>   	n = neigh_lookup(ipv6_stub->nd_tbl, &msg->target, dev);
+>   
+>   	if (n) {
+> +		struct vxlan_rdst *rdst = NULL;
+>   		struct vxlan_fdb *f;
+>   		struct sk_buff *reply;
+>   
+> @@ -2053,7 +2057,9 @@ static int neigh_reduce(struct net_device *dev, struct sk_buff *skb, __be32 vni)
+>   		}
+>   
+>   		f = vxlan_find_mac_tx(vxlan, n->ha, vni);
+> -		if (f && vxlan_addr_any(&(first_remote_rcu(f)->remote_ip))) {
+> +		if (f)
+> +			rdst = first_remote_rcu(f);
+> +		if (rdst && vxlan_addr_any(&rdst->remote_ip)) {
+>   			/* bridge-local neighbor */
+>   			neigh_release(n);
+>   			goto out;
 
-Thank you for the review.
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 
-On Tue, Sep 2, 2025 at 9:45=E2=80=AFAM Krzysztof Kozlowski <krzk@kernel.org=
-> wrote:
->
-> On Mon, Sep 01, 2025 at 11:43:14PM +0100, Prabhakar wrote:
-> > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> >
-> > Extend the RZN1 MIIC device-tree binding schema to cover the RZ/T2H
-> > and RZ/N2H SoCs. These SoCs have a MIIC converter similar to RZ/N1, but
-> > with some differences:
-> >
-> > - RZ/T2H has two reset lines; RZ/N1 has none.
-> > - RZ/N1 supports 5 MIIC ports, whereas RZ/T2H supports 4 ports.
-> > - On RZ/N1, MIIC ports can be mapped to various endpoints such as RTOS
-> >   MAC ports, switch ports, EtherCAT ports, SERCOS ports, HSR ports, or
-> >   fixed PHY ports (covering PHY input indices 0-13). On RZ/T2H, ports
-> >   can connect to EtherCAT slave ports, Ethernet switch ports, or GMAC
-> >   ports (mapped to PHY input indices 0-8).
-> > - There are register bit differences between the SoCs, and RZ/N1 has
-> >   additional registers currently unused by the driver.
-> > - On RZ/T2H, the switch is connected to GMAC0 whereas on RZ/N1 the
-> >   switch can be connected to GMAC2/HW-RTOS GMAC.
-> >
-> > To accommodate these differences, a new generic compatible string
-> > `renesas,rzt2h-miic` is introduced for both RZ/T2H and RZ/N2H variants.
-> >
-> > The DT schema is updated to validate these differences and ensure prope=
-r
-> > port and reset configurations per SoC.
-> >
-> > Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> > ---
-> >  .../bindings/net/pcs/renesas,rzn1-miic.yaml   | 171 +++++++++++++-----
-> >  include/dt-bindings/net/pcs-rzt2h-miic.h      |  23 +++
-> >  2 files changed, 148 insertions(+), 46 deletions(-)
-> >  create mode 100644 include/dt-bindings/net/pcs-rzt2h-miic.h
-> >
-> > diff --git a/Documentation/devicetree/bindings/net/pcs/renesas,rzn1-mii=
-c.yaml b/Documentation/devicetree/bindings/net/pcs/renesas,rzn1-miic.yaml
-> > index 2d33bbab7163..832a49877a29 100644
-> > --- a/Documentation/devicetree/bindings/net/pcs/renesas,rzn1-miic.yaml
-> > +++ b/Documentation/devicetree/bindings/net/pcs/renesas,rzn1-miic.yaml
-> > @@ -4,13 +4,14 @@
-> >  $id: http://devicetree.org/schemas/net/pcs/renesas,rzn1-miic.yaml#
-> >  $schema: http://devicetree.org/meta-schemas/core.yaml#
-> >
-> > -title: Renesas RZ/N1 MII converter
-> > +title: Renesas RZ/{N1, N2H, T2H} MII converter
->
-> Don't use regex here. RZ/N1, RZ/N2H and TZ/T2H....
->
-Ok, I will use it as above (s/TZ/T2H/RZ/T2H).
-
-> >
-> >  maintainers:
-> >    - Cl=C3=A9ment L=C3=A9ger <clement.leger@bootlin.com>
-> > +  - Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> >
-> >  description: |
-> > -  This MII converter is present on the Renesas RZ/N1 SoC family. It is
-> > +  This MII converter is present on the Renesas RZ/{N1, N2H, T2H} SoC f=
-amilies. It is
->
-> Just list the soc families, so people can grep for it.
->
-Ok.
-
-> >    responsible to do MII passthrough or convert it to RMII/RGMII.
-> >
-> >  properties:
-> > @@ -21,10 +22,17 @@ properties:
-> >      const: 0
-> >
-> >    compatible:
-> > -    items:
-> > -      - enum:
-> > -          - renesas,r9a06g032-miic
-> > -      - const: renesas,rzn1-miic
-> > +    oneOf:
-> > +      - items:
-> > +          - enum:
-> > +              - renesas,r9a06g032-miic
-> > +          - const: renesas,rzn1-miic
-> > +
-> > +      - items:
-> > +          - enum:
-> > +              - renesas,r9a09g077-miic # RZ/T2H
-> > +              - renesas,r9a09g087-miic # RZ/N2H
-> > +          - const: renesas,rzt2h-miic
-> >
-> >    reg:
-> >      maxItems: 1
-> > @@ -43,11 +51,20 @@ properties:
-> >        - const: rmii_ref
-> >        - const: hclk
-> >
-> > +  resets:
-> > +    items:
-> > +      - description: Converter register reset
-> > +      - description: Converter reset
-> > +
-> > +  reset-names:
-> > +    items:
-> > +      - const: rst
-> > +      - const: crst
-> > +
-> >    renesas,miic-switch-portin:
-> >      description: MII Switch PORTIN configuration. This value should us=
-e one of
-> >        the values defined in dt-bindings/net/pcs-rzn1-miic.h.
-> >      $ref: /schemas/types.yaml#/definitions/uint32
-> > -    enum: [1, 2]
->
-> Why? Widest constraints should be here.
->
-Ok, I will keep this as is and just adjust for RZ/T2H SoC.
-
-> >
-> >    power-domains:
-> >      maxItems: 1
-> > @@ -60,11 +77,11 @@ patternProperties:
-> >      properties:
-> >        reg:
-> >          description: MII Converter port number.
-> > -        enum: [1, 2, 3, 4, 5]
->
-> Why?
->
-If I keep this here and just adjust the below for RZ/T2H case I do get erro=
-rs:
-
-reg:
-  enum: [0, 1, 2, 3]
-
-
-arch/arm64/boot/dts/renesas/r9a09g077m44-rzt2h-evk.dtb: ethss@80110000
-(renesas,r9a09g077-miic): mii-conv@0:reg:0:0: 0 is not one of [1, 2,
-3, 4, 5]
-    from schema $id:
-http://devicetree.org/schemas/net/pcs/renesas,rzn1-miic.yaml#
-
-Any pointers on how to handle this case?
-
-> >
-> >        renesas,miic-input:
-> >          description: Converter input port configuration. This value sh=
-ould use
-> > -          one of the values defined in dt-bindings/net/pcs-rzn1-miic.h=
-.
-> > +          one of the values defined in dt-bindings/net/pcs-rzn1-miic.h=
- for RZ/N1 SoC
-> > +          and include/dt-bindings/net/pcs-rzt2h-miic.h for RZ/{T2H, N2=
-H} SoCs.
-> >          $ref: /schemas/types.yaml#/definitions/uint32
-> >
-> >      required:
-> > @@ -73,47 +90,109 @@ patternProperties:
-> >
-> >      additionalProperties: false
-> >
-> > -    allOf:
-> > -      - if:
-> > -          properties:
-> > -            reg:
-> > -              const: 1
-> > -        then:
-> > -          properties:
-> > -            renesas,miic-input:
-> > -              const: 0
-> > -      - if:
-> > +allOf:
-> > +  - if:
-> > +      properties:
-> > +        compatible:
-> > +          contains:
-> > +            const: renesas,rzn1-miic
-> > +    then:
-> > +      properties:
-> > +        renesas,miic-switch-portin:
-> > +          enum: [1, 2]
-> > +      patternProperties:
-> > +        "^mii-conv@[0-5]$":
-> >            properties:
-> >              reg:
-> > -              const: 2
-> > -        then:
-> > -          properties:
-> > -            renesas,miic-input:
-> > -              enum: [1, 11]
-> > -      - if:
-> > -          properties:
-> > -            reg:
-> > -              const: 3
-> > -        then:
-> > -          properties:
-> > -            renesas,miic-input:
-> > -              enum: [7, 10]
-> > -      - if:
-> > +              enum: [1, 2, 3, 4, 5]
-> > +            resets: false
-> > +            reset-names: false
-> > +          allOf:
-> > +            - if:
-> > +                properties:
-> > +                  reg:
-> > +                    const: 1
-> > +              then:
-> > +                properties:
-> > +                  renesas,miic-input:
-> > +                    const: 0
-> > +            - if:
-> > +                properties:
-> > +                  reg:
-> > +                    const: 2
-> > +              then:
-> > +                properties:
-> > +                  renesas,miic-input:
-> > +                    enum: [1, 11]
-> > +            - if:
-> > +                properties:
-> > +                  reg:
-> > +                    const: 3
-> > +              then:
-> > +                properties:
-> > +                  renesas,miic-input:
-> > +                    enum: [7, 10]
-> > +            - if:
-> > +                properties:
-> > +                  reg:
-> > +                    const: 4
-> > +              then:
-> > +                properties:
-> > +                  renesas,miic-input:
-> > +                    enum: [4, 6, 9, 13]
-> > +            - if:
-> > +                properties:
-> > +                  reg:
-> > +                    const: 5
-> > +              then:
-> > +                properties:
-> > +                  renesas,miic-input:
-> > +                    enum: [3, 5, 8, 12]
-> > +    else:
-> > +      properties:
-> > +        renesas,miic-switch-portin:
-> > +          const: 0
-> > +      required:
-> > +        - resets
-> > +        - reset-names
-> > +      patternProperties:
-> > +        "^mii-conv@[0-5]$":
-> >            properties:
-> >              reg:
-> > -              const: 4
-> > -        then:
-> > -          properties:
-> > -            renesas,miic-input:
-> > -              enum: [4, 6, 9, 13]
-> > -      - if:
-> > -          properties:
-> > -            reg:
-> > -              const: 5
-> > -        then:
-> > -          properties:
-> > -            renesas,miic-input:
-> > -              enum: [3, 5, 8, 12]
-> > +              enum: [0, 1, 2, 3]
-> > +          allOf:
-> > +            - if:
-> > +                properties:
-> > +                  reg:
-> > +                    const: 0
-> > +              then:
-> > +                properties:
-> > +                  renesas,miic-input:
-> > +                    enum: [0, 3, 6]
-> > +            - if:
-> > +                properties:
-> > +                  reg:
-> > +                    const: 1
-> > +              then:
-> > +                properties:
-> > +                  renesas,miic-input:
-> > +                    enum: [1, 4, 7]
-> > +            - if:
-> > +                properties:
-> > +                  reg:
-> > +                    const: 2
-> > +              then:
-> > +                properties:
-> > +                  renesas,miic-input:
-> > +                    enum: [2, 5, 8]
-> > +            - if:
-> > +                properties:
-> > +                  reg:
-> > +                    const: 3
-> > +              then:
-> > +                properties:
-> > +                  renesas,miic-input:
-> > +                    const: 1
-> >
-> >  required:
-> >    - '#address-cells'
-> > diff --git a/include/dt-bindings/net/pcs-rzt2h-miic.h b/include/dt-bind=
-ings/net/pcs-rzt2h-miic.h
-> > new file mode 100644
-> > index 000000000000..c1f35fc0f1cd
-> > --- /dev/null
-> > +++ b/include/dt-bindings/net/pcs-rzt2h-miic.h
->
-> Missing vendor prefix. Filename based on compatible, unless this is not
-> for Renesas?
->
-Agreed, I missed that I will add the vendor prefix and name it to
-`renesas,r9a09g077-pcs-miic.h`.
-
-Cheers,
-Prabhakar
 
