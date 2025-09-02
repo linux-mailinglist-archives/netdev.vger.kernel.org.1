@@ -1,253 +1,163 @@
-Return-Path: <netdev+bounces-219114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE514B3FFD6
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 14:17:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E58A8B3FFFD
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 14:19:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 812E77B8A24
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 12:12:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CCEDD7B78D9
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 12:14:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1363B30649C;
-	Tue,  2 Sep 2025 12:09:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 207242FF157;
+	Tue,  2 Sep 2025 12:11:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B+Z9qz4h"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Wzt2ivyg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7AE830648F;
-	Tue,  2 Sep 2025 12:08:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B5BB2FDC5C
+	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 12:11:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756814940; cv=none; b=A7ksgHQN0K23qipjUFdo6QBqtipkFa8vueJbZBv2UG8/u3F+aQuLK0S37fEF2U3OjtlrwT+yOgzwm/lZun5K76YOvZ48adlvXg4Ui2h7cW8kMX9k9Rzt8bF7fM57fG40Ywloi2BOSgAtnNMNL5Ec9E6+Tp/AT2PuGixqBnIOL9k=
+	t=1756815079; cv=none; b=eAlPGCAbBoaHLlM4+VEH3w8dDgHpOvpKkybiU6c3j47u5DHrMcUWrno9JAmLcj1VOR+x1Qm9xQwrshlwjQKPE83cQj0oqAXID+6DBJ5MIdHoVcoVItBJ3IEozzYmZh4xMVy5Pvpon1t9C2OlSqstrDmitC3MbIB6eSigri1iomI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756814940; c=relaxed/simple;
-	bh=H/sBEqWyTb20zDwKJVg5tvs3nf0zWsZui95oNH6FIeg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nzEYUZHbhRGZ/jntQfn/j4v81yWIJgq9dFTQTkeRe7bk4VMoqkwNSCu6GF1cAvR9KgIqxTJfTRaPQ7APLQ4KWnU47Qf5D9wb+SXFo/Cq4wtt+sn3H/apz6nHzCxrpD7bX9+XXT5dxwAMQYmNr93RJTpYzjuxA57i6kytQqoanwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B+Z9qz4h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F4D3C4CEF7;
-	Tue,  2 Sep 2025 12:08:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756814939;
-	bh=H/sBEqWyTb20zDwKJVg5tvs3nf0zWsZui95oNH6FIeg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=B+Z9qz4hV4GaU4bbE6Wtx6Xpa+dTfkK3kO1U1khdS+/nNgC/GdoTGVdEMKUVM4Zqz
-	 UJ5Z/GGGbYSXWl2gGSKbzXCxKP2/1DRjwnbEc2sa+fMqGMfxGuAazqN1pRcJQO/TsT
-	 sQcgqGLMyX0Kn5UFzO6bUgnM2eKSC6TzcmyOrJs42vWwbbYewH4945QkdhGabTF8Ur
-	 MoDYfiLb6KPLBqy+dwRYTPahxMqPKod0f4E9bD9Vno72PWdABbjbUneOOdwTRzJinJ
-	 OUBMcm19e9cRcxYOCMOE47NPLWyon5NKu/m6v1CaKFRGCAVyKY56UbqY+A1DN+tLoW
-	 p25gIoc3YdSDw==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Junnan Wu <junnan01.wu@samsung.com>,
-	Ying Xu <ying123.xu@samsung.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Sasha Levin <sashal@kernel.org>,
-	jasowang@redhat.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.16] virtio_net: adjust the execution order of function `virtnet_close` during freeze
-Date: Tue,  2 Sep 2025 08:08:28 -0400
-Message-ID: <20250902120833.1342615-17-sashal@kernel.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250902120833.1342615-1-sashal@kernel.org>
-References: <20250902120833.1342615-1-sashal@kernel.org>
+	s=arc-20240116; t=1756815079; c=relaxed/simple;
+	bh=Q9xhz7InacewkR2sL7hxMKTtf5/Apj8ua9YctrXUMkQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fWWYyPldjr6jgowSwS43QBpbZI/TdjJmDrfJjjLnpbVlY5zZ5pJ1RiQh08flXTrK8S8zNAOKyUFCecOjfAReFHWxwn4MdFT+kIcf+MyP2xb358rhkdJK+7diUWvY6hGrgqKOoY+sl498FFKRbi1rP+vNRQveX4NipBjRun9Xqj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Wzt2ivyg; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 582BGFdD010341
+	for <netdev@vger.kernel.org>; Tue, 2 Sep 2025 12:11:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	4vrt0A6ANjc79IaqhSJY8cPh7b4X0YAYPY/tdBRrzog=; b=Wzt2ivygiUPCUSwo
+	BJAREK+B3YS73ADn7xyrkA3+Yid4oH+u/ktvtdOE2h2Aqx7mOQvkPPDlD6icrrBG
+	8S9OW/8/QvXUjbtHgz39CKUw0RxZSjXRqA5DAMW9zUkdmOR4kMSEu4CQVKMcDxQL
+	YNw2ENT48z1OpYcLawqx/abCCZksctaQ/99bSs7lkAqi+RDh7ajNPQ4E/st5RjgD
+	RcKslF1kElgGzipF2lbQaJ5EUcMdEehlpngPrqnctql7iLR2r0oVhQF+QbHBQowl
+	cD12I5MpBTvQbz0xvmgi8fcKmPSvYaqak+HBgFOtdKQwOhENbIiWtavOo1N/T5UT
+	ett0MA==
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com [209.85.160.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48urmjfptm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 12:11:15 +0000 (GMT)
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4b32dfb5c6fso11116501cf.1
+        for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 05:11:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756815074; x=1757419874;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4vrt0A6ANjc79IaqhSJY8cPh7b4X0YAYPY/tdBRrzog=;
+        b=is0HNeSB0iIbEGpfMFgKA2/Bmem9bcMXtV7PoS1gMe7skXcwN4h3MRmcCWCyh4NhGE
+         aXn1d3Zc9e1xFI8deLVGs7bveBTJi0qpCT32MpS6wFq47Ic3Nwqizm6nkV07JcrdjBJZ
+         eHdi+VYuljilcbnauLY1k98AliLJh/9Qyd4sOSSAiCQDPF0d8kR8qUEC1m25jdivGPn1
+         sTOLEFgs0G9st0hvTC4S0db5EFCSJjciWN+IKt7fehE0vB11hkMK0qmMwe10OXBwBG9w
+         deGXkMh3FyEGTOdgTFaMdAYFxYXZCfpIRr9cjMqwZpMfDsv4MYUyTatMp+KcQS8QlZiu
+         WWZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWoqJsd3X5G+TOuk1ZfzWpD7XYKW+c/4RJl2SijvvKv87eK1JExRfP67YzvsdqFJOMB70HSMPg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxw6rRaXUcKJYS4RCAWtCorX6p+3P0ZCoDOtch8tjszr1QHAwpA
+	49k3tO+25iDwHMNzzQVrGxM1/vPWJk84QqY4Si+E9fNV3WT+i9XNrGbHc4sk09kCmRDgST2lVTM
+	RHsWBXff4VakZCSCZ4S4ez59jDyQigLbT9BskIWoX7obfjjLM8SXVGkd0xbE=
+X-Gm-Gg: ASbGncv+DUMnWNQMvTpaY7BRdU81aUnvbR6EHAhZ9tLzj/+U/cuXucyaybDclC/FUxV
+	975ugxdJ6NlfooQWINLUgybcBWFXK7q9Nx/uqUrHLG52YZYxrfzYYSRiYZVDkK9pkol3r9MaBuW
+	iBmiWI6KlQTvF5Z3yGyj/rNw0TWwkNQGlz0VbEn8vv1j0bMmYwKOlFwiPgf00d+VHHdKiBLrgIW
+	6H8IpP3PnvqyPfWT3DQLjsC14F3zFrR6n0xnnInw17gxMfeQfbZKj3Mawf8YMF1zJqrM6BCfNEJ
+	Rcmm7NKq4FRNkiAeuFhG6L1mfiLWVVbFI72g80B8TYbJ3LYB/OGVvo5+iGCO1W0GKHn4MSzenev
+	xq7OngBmA65IeT4cDh4K+Zw==
+X-Received: by 2002:a05:622a:241:b0:4b2:fb6b:38c2 with SMTP id d75a77b69052e-4b313e63155mr114514221cf.5.1756815073703;
+        Tue, 02 Sep 2025 05:11:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE3KfpCYj++Nh+x6sT1ov8IcNZd1mz0M6lJHlQz2dAizYJPZViCf3FEA46K+1XVLTY1Q97W+A==
+X-Received: by 2002:a05:622a:241:b0:4b2:fb6b:38c2 with SMTP id d75a77b69052e-4b313e63155mr114513821cf.5.1756815073082;
+        Tue, 02 Sep 2025 05:11:13 -0700 (PDT)
+Received: from [192.168.149.223] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b040f1cf4b9sm698003666b.29.2025.09.02.05.11.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Sep 2025 05:11:12 -0700 (PDT)
+Message-ID: <b2838f7b-8da9-434b-83aa-fa117bdb715a@oss.qualcomm.com>
+Date: Tue, 2 Sep 2025 14:11:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.16.4
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 03/10] clk: qcom: gcc-ipq5424: Enable NSS NoC clocks to
+ use icc-clk
+To: Luo Jie <quic_luoj@quicinc.com>, Bjorn Andersson <andersson@kernel.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd
+ <sboyd@kernel.org>,
+        Varadarajan Narayanan <quic_varada@quicinc.com>,
+        Georgi Djakov <djakov@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Anusha Rao <quic_anusha@quicinc.com>,
+        Manikanta Mylavarapu <quic_mmanikan@quicinc.com>,
+        Devi Priya <quic_devipriy@quicinc.com>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
+        devicetree@vger.kernel.org,
+        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        quic_kkumarcs@quicinc.com, quic_linchen@quicinc.com,
+        quic_leiwei@quicinc.com, quic_pavir@quicinc.com,
+        quic_suruchia@quicinc.com
+References: <20250828-qcom_ipq5424_nsscc-v4-0-cb913b205bcb@quicinc.com>
+ <20250828-qcom_ipq5424_nsscc-v4-3-cb913b205bcb@quicinc.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <20250828-qcom_ipq5424_nsscc-v4-3-cb913b205bcb@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Authority-Analysis: v=2.4 cv=OemYDgTY c=1 sm=1 tr=0 ts=68b6dee3 cx=c_pps
+ a=JbAStetqSzwMeJznSMzCyw==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=COk6AnOGAAAA:8 a=EUspDBNiAAAA:8
+ a=DdE-_dUAR9VioeaCo_UA:9 a=QEXdDO2ut3YA:10 a=uxP6HrT_eTzRwkO_Te1X:22
+ a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-GUID: dJmI-3D-LSmrmTdh7qIRATOoLrZsR9jf
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODMwMDAyNCBTYWx0ZWRfX/FUbz3n9DTP9
+ ies5/C9ba4l4YWY+0ZddrxboWys314a8moCR4Es74aRvZBq1BUi398VYjeMM6B3IYv3Pe4BgZDX
+ MI/CeyC4JRAt4wQuxQVRWRfZnYVjl3y51OkHrtvfB0M9zeMnnZXIG+x6XWlOJUAJK8o49MUUw4I
+ 2lXCXHgvMZ9EF9/Jd9yvzefaCi5qpb+EAF4ge6kkMvP5DJMFiD1P7Ok32rmfnAf9E6HxGIr2N0h
+ nKVKQown8aZ69vTpX8IaGNnLupPjyEVYeJgfMS/n2mr7+yr3kHuAR2TTIV2WFgf8NTzY3uaxpA/
+ Ug+dZluDlolU7AK3T0KdCQ5r+VuSAOyjTjOI21dOn5kRhphat1dVyoe8bMbbDgdOwYmEsiCRMrm
+ wHAeFpOe
+X-Proofpoint-ORIG-GUID: dJmI-3D-LSmrmTdh7qIRATOoLrZsR9jf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-02_04,2025-08-28_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 suspectscore=0 spamscore=0 bulkscore=0 priorityscore=1501
+ adultscore=0 clxscore=1015 phishscore=0 impostorscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508300024
 
-From: Junnan Wu <junnan01.wu@samsung.com>
+On 8/28/25 12:32 PM, Luo Jie wrote:
+> Add NSS NoC clocks using the icc-clk framework to create interconnect
+> paths. The network subsystem (NSS) can be connected to these NoCs.
+> 
+> Additionally, add the LPASS CNOC and SNOC nodes to establish the complete
+> interconnect path.
+> 
+> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+> ---
 
-[ Upstream commit 45d8ef6322b8a828d3b1e2cfb8893e2ff882cb23 ]
+Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 
-"Use after free" issue appears in suspend once race occurs when
-napi poll scheduls after `netif_device_detach` and before napi disables.
-
-For details, during suspend flow of virtio-net,
-the tx queue state is set to "__QUEUE_STATE_DRV_XOFF" by CPU-A.
-
-And at some coincidental times, if a TCP connection is still working,
-CPU-B does `virtnet_poll` before napi disable.
-In this flow, the state "__QUEUE_STATE_DRV_XOFF"
-of tx queue will be cleared. This is not the normal process it expects.
-
-After that, CPU-A continues to close driver then virtqueue is removed.
-
-Sequence likes below:
---------------------------------------------------------------------------
-              CPU-A                            CPU-B
-              -----                            -----
-         suspend is called                  A TCP based on
-                                        virtio-net still work
- virtnet_freeze
- |- virtnet_freeze_down
- | |- netif_device_detach
- | | |- netif_tx_stop_all_queues
- | |  |- netif_tx_stop_queue
- | |   |- set_bit
- | |     (__QUEUE_STATE_DRV_XOFF,...)
- | |                                     softirq rasied
- | |                                    |- net_rx_action
- | |                                     |- napi_poll
- | |                                      |- virtnet_poll
- | |                                       |- virtnet_poll_cleantx
- | |                                        |- netif_tx_wake_queue
- | |                                         |- test_and_clear_bit
- | |                                          (__QUEUE_STATE_DRV_XOFF,...)
- | |- virtnet_close
- |  |- virtnet_disable_queue_pair
- |   |- virtnet_napi_tx_disable
- |- remove_vq_common
---------------------------------------------------------------------------
-
-When TCP delayack timer is up, a cpu gets softirq and irq handler
-`tcp_delack_timer_handler` will be called, which will finally call
-`start_xmit` in virtio net driver.
-Then the access to tx virtq will cause panic.
-
-The root cause of this issue is that napi tx
-is not disable before `netif_tx_stop_queue`,
-once `virnet_poll` schedules in such coincidental time,
-the tx queue state will be cleared.
-
-To solve this issue, adjusts the order of
-function `virtnet_close` in `virtnet_freeze_down`.
-
-Co-developed-by: Ying Xu <ying123.xu@samsung.com>
-Signed-off-by: Ying Xu <ying123.xu@samsung.com>
-Signed-off-by: Junnan Wu <junnan01.wu@samsung.com>
-Message-Id: <20250812090817.3463403-1-junnan01.wu@samsung.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
-
-LLM Generated explanations, may be completely bogus:
-
-**Backport Status: YES**
-
-This commit should be backported to stable kernel trees. Here's my
-extensive analysis:
-
-## Critical Bug Fix
-This commit fixes a **use-after-free vulnerability** in the virtio_net
-driver that can cause kernel panics during system suspend. The issue is
-a race condition between the suspend process and active network traffic,
-specifically:
-
-1. **Race Condition Details** (from commit message):
-   - CPU-A calls `netif_device_detach()` which sets
-     `__QUEUE_STATE_DRV_XOFF` on TX queues
-   - CPU-B running `virtnet_poll()` can clear this flag via
-     `netif_tx_wake_queue()`
-   - CPU-A then calls `virtnet_close()` which disables NAPI and removes
-     virtqueues
-   - Later, when TCP delayed ACK timer fires, accessing the removed TX
-     virtqueue causes a panic
-
-## Code Analysis
-
-The fix is **minimal and contained** - it simply reorders two operations
-in `virtnet_freeze_down()`:
-
-**Before (buggy order):**
-```c
-netif_tx_lock_bh(vi->dev);
-netif_device_detach(vi->dev);  // Sets __QUEUE_STATE_DRV_XOFF
-netif_tx_unlock_bh(vi->dev);
-if (netif_running(vi->dev)) {
-    virtnet_close(vi->dev);     // Disables NAPI - TOO LATE!
-}
-```
-
-**After (fixed order):**
-```c
-if (netif_running(vi->dev)) {
-    virtnet_close(vi->dev);     // Disables NAPI FIRST
-}
-netif_tx_lock_bh(vi->dev);
-netif_device_detach(vi->dev);  // Then detach device
-netif_tx_unlock_bh(vi->dev);
-```
-
-## Backport Suitability Criteria
-
-1. **Fixes a real bug**: YES - Use-after-free causing kernel panics
-2. **Small and contained**: YES - Only 8 lines moved, no logic changes
-3. **No side effects**: YES - Just reordering existing operations
-4. **No architectural changes**: YES - Simple ordering fix
-5. **Critical subsystem**: YES - Network driver suspend/resume path
-6. **Clear bug fix**: YES - Not a feature addition
-7. **Minimal regression risk**: YES - The new order is logically correct
-   (disable NAPI before marking queues stopped)
-
-## Historical Context
-
-From git blame analysis:
-- The problematic code structure has existed since 2017 (commit
-  9fe7bfce8b3e11)
-- Recent changes in 2025 (commit e7231f49d52682) modified the locking
-  but didn't fix the race
-- This indicates the bug has been latent for **years** and affects many
-  kernel versions
-
-## Impact Assessment
-
-- **Severity**: HIGH - Causes kernel panics during suspend with active
-  network traffic
-- **Likelihood**: MODERATE - Requires specific timing but can happen
-  with normal TCP traffic
-- **Affected systems**: All systems using virtio_net driver (VMs,
-  containers)
-
-The commit already has "[ Upstream commit
-45d8ef6322b8a828d3b1e2cfb8893e2ff882cb23 ]" indicating it's been
-identified for stable backporting, which further confirms its
-importance.
-
- drivers/net/virtio_net.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 82b4a2a2b8c42..c9b18b13cd940 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -5728,14 +5728,15 @@ static void virtnet_freeze_down(struct virtio_device *vdev)
- 	disable_rx_mode_work(vi);
- 	flush_work(&vi->rx_mode_work);
- 
--	netif_tx_lock_bh(vi->dev);
--	netif_device_detach(vi->dev);
--	netif_tx_unlock_bh(vi->dev);
- 	if (netif_running(vi->dev)) {
- 		rtnl_lock();
- 		virtnet_close(vi->dev);
- 		rtnl_unlock();
- 	}
-+
-+	netif_tx_lock_bh(vi->dev);
-+	netif_device_detach(vi->dev);
-+	netif_tx_unlock_bh(vi->dev);
- }
- 
- static int init_vqs(struct virtnet_info *vi);
--- 
-2.50.1
-
+Konrad
 
