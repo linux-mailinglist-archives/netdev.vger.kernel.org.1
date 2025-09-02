@@ -1,103 +1,79 @@
-Return-Path: <netdev+bounces-219367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49F98B410C8
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 01:30:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F565B410CB
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 01:35:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2605F562165
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:30:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD3B6168F7F
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:35:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF5A52820AC;
-	Tue,  2 Sep 2025 23:30:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51B3627F015;
+	Tue,  2 Sep 2025 23:35:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZTeKnxgb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hs7zH0ev"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B53327B500
-	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 23:30:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DE6920E00B;
+	Tue,  2 Sep 2025 23:35:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756855805; cv=none; b=nLCr5rB9Z4K5JjO102nOuPjkHuKZ1ET/IkC9epg46xyL+jx0q6VTpX7baOgvMQ7PGAmxNNsE1+NZEHE3Cnis4LQfSj31w7iyjfEybf8eySgDezlP9ucXTXuwpHgJvEbgmvmIZks8n8+mhZWi6T0RRFUjD/LIbOcQWT6qGInCnqE=
+	t=1756856113; cv=none; b=SP/qGWvAFQw9m8QnJBf2Re+6YM5T/K82epvkRFg7MW4zO1COb+FsBSaPoESByRTSIblDCHlQ8FuxRUa4OpqB8xrRDuY+llJW3NtJV3709PfTQp8FZDDkLMp6dqVzVeApMR+QzPjqG+5K9D5BTgrOh6ZtUHZA5NotBelKpNZja+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756855805; c=relaxed/simple;
-	bh=1iZHQBshwuHRevEymIo6dco6n3zU0Jqlwgkf7PR+1RY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pnQcPG4duKe0eU8u1Y+K3GTt6zcSND2ubxpyxlFoD27GkOWGTRio/fRsebQSmnluJMScg275ar3s5TUSYPufJSoAbiuk4sSSP2rp+1n2TGIOp2CiY0Ga1oDqgkqGWk7RXXQh9dzcWyJZpPxlA99ua9gvmaIvqHkwLFWvouctgGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZTeKnxgb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D53DC4CEED;
-	Tue,  2 Sep 2025 23:30:05 +0000 (UTC)
+	s=arc-20240116; t=1756856113; c=relaxed/simple;
+	bh=Yu0jVEodkPTvVFabct2RrrX/7iqVU1qZiWO7k25ZXzc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PkTu8q5XgsBD07ntyO6n6WaSur88Cmrv7R1rUsmigFM9xAFzub9Dh9IHNBR4Y9E6ZpeCVGkXCyJsjyr6RKwoo8cJeGkXsU90K5bNA4tUONe7uXKAv9DAVhrPYtNerp667HUVGKw7geyMmSGdZ7RwizKKkSpAM86/8ZLVmhcmdtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hs7zH0ev; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B78EC4CEED;
+	Tue,  2 Sep 2025 23:35:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756855805;
-	bh=1iZHQBshwuHRevEymIo6dco6n3zU0Jqlwgkf7PR+1RY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZTeKnxgb/Z/dOgj/1iq8q5bGLdxCO3rZ5Ufdig3FJjcKuZng1USjJ1LgDa6Nnr1oO
-	 1yUXMe25Gw4crK7zRakx2vgTib52m03TpuN/IxiAAMfIoqrXTomJpQ3DRSt3jEjTgk
-	 09rmI7exzcBZYt9zbCcgtM6s9uTHwIeDJPuMPmHc9UFgzrqWDS8QoiICuWnChldRNm
-	 ayiLNjbqUY5BtkQAY0F6bUjPz6NUDyAiyqS16t2fnM0P/VJUcRjSvu/Snitipaz/ew
-	 EQAFxrCLKS5pdYusG1jdp0FQ99C1CoppC/Cwx7DBKwZwbjBDxlpPyKbRmIVZHONuX7
-	 kmpo1NVzJ7Nig==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE053383BF64;
-	Tue,  2 Sep 2025 23:30:11 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1756856112;
+	bh=Yu0jVEodkPTvVFabct2RrrX/7iqVU1qZiWO7k25ZXzc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hs7zH0evhqV4ahtzKH6BZbEYbNGN/VLudXIgIXiJ9Rw0IpEURdoT0Bbpkev9sql0O
+	 XaWIhDU8HjBN7jHHvl9/KDIMG46gC8uSkp6m6oDV0Tq0Vvd0B/7IVgNasF1nLfjjMB
+	 KJilnTsZ0mUmpX1PBdJ43LT7hfmVPAJJyuNw20lSjzdwABzPrnnXlKyqinP5frRMwa
+	 qD7+4lo/pE+MDIZ4Chqz3sVhlqzcUs8HXp7fmCEa8H9Tag01SrHWuEJP093NGLwdUJ
+	 6+OVHbWml+V4vO75unL+LMiXztMq96jyJlAzFe10lLJC8fh93kNIIwFHPZMmYLsMQR
+	 VBnuxdjYRWSXA==
+Date: Tue, 2 Sep 2025 16:35:11 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Oleksij Rempel" <linux@rempel-privat.de>
+Cc: Hubert =?UTF-8?B?V2nFm25pZXdza2k=?= <hubert.wisniewski.25632@gmail.com>,
+ "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Paolo Abeni"
+ <pabeni@redhat.com>, <linux-usb@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <regressions@lists.linux.dev>, <linux-kernel@vger.kernel.org>
+Subject: Re: [REGRESSION] net: usb: asix: deadlock on interface setup
+Message-ID: <20250902163511.181fa76a@kernel.org>
+In-Reply-To: <DCGHG5UJT9G3.2K1GHFZ3H87T0@gmail.com>
+References: <DCGHG5UJT9G3.2K1GHFZ3H87T0@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/3] net: fix optical SFP failures
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175685581051.468066.16262895219684043683.git-patchwork-notify@kernel.org>
-Date: Tue, 02 Sep 2025 23:30:10 +0000
-References: <aLSHmddAqiCISeK3@shell.armlinux.org.uk>
-In-Reply-To: <aLSHmddAqiCISeK3@shell.armlinux.org.uk>
-To: Russell King (Oracle) <linux@armlinux.org.uk>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, matt@traverse.com.au,
- netdev@vger.kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Sun, 31 Aug 2025 10:50:35 +0200 Hubert Wi=C5=9Bniewski wrote:
+> Trying to bring an AX88772B-based USB-Ethernet adapter up results in a
+> deadlock if the adapter was suspended at the time. Most network-related
+> software hangs up indefinitely as a result. This can happen on systems
+> which configure USB power control to 'auto' by default, e.g. laptops
+> running `tlp`.
+=20
+Oleksij, this seems to date back to commit e0bffe3e6894 ("net: asix:
+ax88772: migrate to phylink"). Taking rtnl_lock in runtime resume
+callbacks is known to result in unhappiness :(
 
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sun, 31 Aug 2025 18:34:17 +0100 you wrote:
-> Hi,
-> 
-> A regression was reported back in April concerning pcs-lynx and 10G
-> optical SFPs. This patch series addresses that regression, and likely
-> similar unreported regressions.
-> 
-> These patches:
-> - Add phy_interface_weight() which will be used in the solution.
-> - Split out the code that determines the inband "type" for an
->   interface mode.
-> - Clear the Autoneg bit in the advertising mask, or the Autoneg bit
->   in the support mask and the entire advertising mask if the selected
->   interface mode has no inband capabilties.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,1/3] net: phy: add phy_interface_weight()
-    https://git.kernel.org/netdev/net/c/4beb44a2d62d
-  - [net,2/3] net: phylink: provide phylink_get_inband_type()
-    https://git.kernel.org/netdev/net/c/1bd905dfea98
-  - [net,3/3] net: phylink: disable autoneg for interfaces that have no inband
-    https://git.kernel.org/netdev/net/c/a21202743f9c
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Could you check if commit e110bc825897 ("net: usb:
+lan78xx: Convert to PHYLINK for improved PHY and MAC management")
+isn't similarly flawed?
 
