@@ -1,68 +1,67 @@
-Return-Path: <netdev+bounces-219200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6192B4071F
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 16:39:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF6AAB4072B
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 16:41:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A72F3A1B87
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 14:38:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C3E420374C
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 14:38:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7BBC322C92;
-	Tue,  2 Sep 2025 14:36:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84234324B32;
+	Tue,  2 Sep 2025 14:36:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69573126CF;
-	Tue,  2 Sep 2025 14:36:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F152322C99;
+	Tue,  2 Sep 2025 14:36:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756823808; cv=none; b=IYwkIbZqF9ZbtPsiHlPkRqZsQf+TWlo6w0mzDtpGrxCosgnOsWDnLYZGeL4hP/+HTy1HBnIw5UMAkSAL/W2DxQ9IviClRuySjrLxWSAcnBeYH31mKOSzYuUSYwQZ4YY5IMHzEe1GOjxuCgHazu43DYZtlEcnqEtOW2HdagLIr1c=
+	t=1756823811; cv=none; b=SDkDALkHSUKa8vCyIBX0Acvv3PsVNtcfgX+SLz9GiXHl6yfEEDX/GwUzHrg3NPOsdFP3N+3DgnGiZkKOmP4xgIjRhFkyzgfjJo/CLDIisHJNIpsNfTMFrovqt/FYqRnqQvQQLYO6m0ZJdF4p1XrZ336JjnQFxt74GuDyqx0NUqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756823808; c=relaxed/simple;
-	bh=uv+sRDVE9UdYp/rrXBaRI2PRNEO+AlIgCJajD1luaOc=;
+	s=arc-20240116; t=1756823811; c=relaxed/simple;
+	bh=QH91dZqx9n+fa6UJWQhKmr6KoM9wkO/zEYWaL3iLxbw=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=qxNAvNXSJ1Wow+7zJs9f9PAvqrO11B3CRAYl+Ho6p6MhbbnQ2ui81lPX3Aq/R6B9It0O1e43eY+9k+UQZZuCmqxBhfAab9aBe9Aj/kv+ZbZqVbBX7pBhdq8+7Y8JGza6kcfs+gTzXG7PXp1zNoZzPFMoK9ENkPQ9VkJxX4qIaAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.41
+	 In-Reply-To:To:Cc; b=hhXjarzV1kJscq6szAsYiJcLN/3L/Fhy5McpQCM/agDj2Xk8IA0UPR07LvoIxanwUTlf7PQufk8Ve22iOEXi8vs/CBmAIxh8JMDVM+OyypgD0gjwJodWbOtyswfXRSsXGE9vLeTKa/96FNJA+/1Bt7zNeQLO368k55gYA6kg3mg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-6188b6f501cso6339786a12.2;
-        Tue, 02 Sep 2025 07:36:46 -0700 (PDT)
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b043da5a55fso242486766b.0;
+        Tue, 02 Sep 2025 07:36:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756823805; x=1757428605;
+        d=1e100.net; s=20230601; t=1756823806; x=1757428606;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5ixDvZ/+7M4TDPK7mHzqbLvaRWPSa4oHJo2q4oJdkek=;
-        b=pduvmmtfyhjaHmpzgf/HaBuo6iSVIGemGAVvPd3Gj27igMfkxXDRSjFvG7bQjod2nX
-         ErYlFQUxKIJGc4GrgFNRvMZOfKjSPnFoHBcZyTjrGEpCGdBVsxffhgR9ZdbYbuGmV/u7
-         1LbJjGxg418QPgH7HEXiH9/bU3QatcAfVznuzfvUTkTbD2mvbwjZUyn8NHObIbcaOazk
-         pHqYWvTSorzwVv6103H/QqVy2pqQUfhTjWuRlr0DI8xm0xvWCPow96mogEIb5FjPACmW
-         wfJoJUTX6qZOqUMvKOpUqIDoXM+kQ7Qq8Z9ydszK0wGX0TMqRf+CTNS2brdOEda8YtQ8
-         7cug==
-X-Forwarded-Encrypted: i=1; AJvYcCXYajrw2Wdx03kILRHo2NCMq/lNPUwOR3RWihSz60LgZbN93wP/d+KdzzWzszlMZjpGSsvTgW6kK8CTMVk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yya9ysoeq1NX1yTiHytAp7R2oinBFARmGRMActdub24KduniyOo
-	yqtAraXkI6QvodpD4qOIm/adXcgJtAhMs3HyyeMwISdNn+Tng1feLz8H
-X-Gm-Gg: ASbGncuAEV0L2IpFAqNIQbY6sYoVLtlW11agGN7f7B2PFYF+afwsw6WQI/4Yy6xtvL7
-	fs116uVnRE1jIXs73BBGF2PNlaNSBH/leRPuKfnG7LJNiC9uO5s0o/gqY9GC640dPt7M50BWyzO
-	MtfzGodwpfi0rK2iggQWNrA67TJtRgAkjYygxQ3TpZabPpteAkFe3p7jDYJI0b3nfUPyuQikDIm
-	uP/IkhzjlJqdFmmA7zCcBSjHUxic2+rTpH8e4joMADNQxi4POLhOa0JI5uG8/BnRzMu/WI1h0B2
-	mlnO8hD5fx3P9FgXsB+CHA0vYfRDq1mIHM6vEq2M5JuxguUa48L6w/Ahgcyn7hhazkm/0pbkqD5
-	jWNyknwcAHp4P
-X-Google-Smtp-Source: AGHT+IEJ8WIFf9X4wGSznvxjCKq9+or8baY6JK/xSM4+M8dwgeLla+mziXvq/7bTmdPlq+UE2gO+Pg==
-X-Received: by 2002:a17:907:3f9a:b0:b04:590a:a5b5 with SMTP id a640c23a62f3a-b04590ace5fmr169723166b.24.1756823804683;
-        Tue, 02 Sep 2025 07:36:44 -0700 (PDT)
-Received: from localhost ([2a03:2880:30ff:9::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b0432937d7esm447457966b.17.2025.09.02.07.36.44
+        bh=cSUfMX9h9/cWRq/fgGMN/opuKAJc5EH3ViaOxfsE3gs=;
+        b=uVXYQEn6TqvnQuH/sOGPnme+6NGnSJb0qUnW4TgXb0SR/c+Y/kQCTOLdLZff4zA0q4
+         4K+/dWbRQKrCpi82JsyvZZTOJbU6aRDoYRYtwTGXoE/7WSBsCIKZNprl70eNNJ2zbIQm
+         DIIMxwIwNKApo+06Qus/MyKoTSqmmz47gJarVR641ZK4qonsoKTSpXd/WxtodiIMGrkJ
+         QrVpSc0mvUfI1VydPC6qHf3GzBCxGrA9Ti67n7RnllZhliUbNnS5t+/1r1Yz8mH8ZrCx
+         O9T5ZKHTpc8Njf62NvNd04iDd/UxWeCV0Rw1QZ3Otgghdu/H8hv+qB/P4sl03qxJAMG0
+         On6g==
+X-Forwarded-Encrypted: i=1; AJvYcCVMHiu+TaAmUyNgrzUXvglz00OMmZa/mglx+BE88GHSJt7Cggmev2MrVZTVCymX57J8PrFNAhMVWlqwwN0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy37zmq+Me+5pJLQl1fxGKxvBj8xwaKXpWIg+zMzXbM5Adr8mV6
+	7PMHW7wHWGEYx5x+anT1aYYCexQZz1MPzY6PgDqTmYziFoLJo8q7KiAMRYG/Sg==
+X-Gm-Gg: ASbGncsrpQ67Ak8bo77I/3mkXuOHdPMnm6YznhCy+WAICf/gl1P8ID1/pIAw6LEBGGG
+	mJwumUt8sMYncEHFCl6mUZxKqdPkURM0XVohLT7Q6kozKYGUtma3MnAD0Gyh43Zhsj+PYApt7MS
+	J+m6FDqit2f2UT8/1cFkdLXq7MIwopQGOYuN33q9VeWmj3hrVL6XmwqQBmkhA8b+b89O9XCm40C
+	abkhV05RQ/RfidJrZu1jZHpge2LFr11u/1/VYv+i4El0B6TQzZ7HBnkrn3bwEI7uO3rCiq2a1j0
+	BQkN/zEKB8nJnqK8k7aIK5ltHwP+OWEm5E9LUVqvCEKxl7DC1NhtKYuYbRhMxSdN+mF1yTmBZvn
+	q1UJc6sn/IsbKCTLDF7KC0do=
+X-Google-Smtp-Source: AGHT+IHfacPAJ0eqlJ4ikR5eNCtobwVkC6Qxg+UKHjXDyjYPFMM+X27TbG9HQkfnuOzbL9fqKbVNmQ==
+X-Received: by 2002:a17:907:2da7:b0:afe:7909:f42a with SMTP id a640c23a62f3a-b01d97744a5mr1142142366b.51.1756823806238;
+        Tue, 02 Sep 2025 07:36:46 -0700 (PDT)
+Received: from localhost ([2a03:2880:30ff:1::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b0444252c2dsm295439166b.81.2025.09.02.07.36.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Sep 2025 07:36:44 -0700 (PDT)
+        Tue, 02 Sep 2025 07:36:45 -0700 (PDT)
 From: Breno Leitao <leitao@debian.org>
-Date: Tue, 02 Sep 2025 07:36:23 -0700
-Subject: [PATCH 1/7] netconsole: Split UDP message building and sending
- operations
+Date: Tue, 02 Sep 2025 07:36:24 -0700
+Subject: [PATCH 2/7] netpoll: move prepare skb functions to netconsole
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,7 +70,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250902-netpoll_untangle_v3-v1-1-51a03d6411be@debian.org>
+Message-Id: <20250902-netpoll_untangle_v3-v1-2-51a03d6411be@debian.org>
 References: <20250902-netpoll_untangle_v3-v1-0-51a03d6411be@debian.org>
 In-Reply-To: <20250902-netpoll_untangle_v3-v1-0-51a03d6411be@debian.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -84,135 +83,422 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-rt-devel@lists.linux.dev, kernel-team@meta.com, efault@gmx.de, 
  calvin@wbinvd.org, Breno Leitao <leitao@debian.org>
 X-Mailer: b4 0.15-dev-dd21f
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3991; i=leitao@debian.org;
- h=from:subject:message-id; bh=uv+sRDVE9UdYp/rrXBaRI2PRNEO+AlIgCJajD1luaOc=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBotwD5rHYtgODXvDjBr+4mxuJmvXSRnDOQlekjb
- 8uY3bQrCaSJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaLcA+QAKCRA1o5Of/Hh3
- bQZoEACHZ96Nadl46FRJbWI/4E1Gzzlm+kqKGlfPX+MXLMSXtiA6t/LNDeliZvwvYJiYzN8+7r8
- Awb69iYfvz9djH/hl3znBuNkTrOmRsESsRyS/PXm5zImdPeRKl2p1tyS1sZQ1YMqrTZEYdMAZQR
- kctI5ZkHKBMPlcG04WXstHdTivxfFwHd2tKSxzZURVM37KCL2xbkyWAhQAKwozTjUqLurnZ5t3i
- IlxxhHdfTHJRd2uLPeg+Rw+WiJX0YWDIzb93Vw7JW5rPO62VpeBwLZBsrnc624n0CGt3jBMIGo7
- auEEY6aUqYigyZRb4kFheTVV/5FPxRkBPVUn9+zZ0zku1Ot/LvYW0EvYz9aKTVuXL5fMW98B4A8
- cjMZCBkjXKtZzdUp6JncE/QBh7A3ZT4tGPgqrlCid7oxxkR9aunXzg9JWwREbCR7q9KDtI9Neqv
- Rd6sYGZ8ulftOsHlBt7w7yjmn80r2H/ZEqVdq1+wM34HfGCOnVegXeb27o1syUR4kiRhAAPHRzR
- rLmlSbXSzLNYBBMMmctb8hyS9l/pVQtEHR/ljDRUcvDqHqT6RB4P3YsSQ5Ju4cBF6BvP+VBQ9uC
- 1Cr5a4sDBf2dtiMFUOEFHhclZycDQSQzdPAHCJmFj911hdVSNMlUaeXsTRQhD27uVkLuaPCAvhR
- iOXVNTHBxNMOGCw==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=11674; i=leitao@debian.org;
+ h=from:subject:message-id; bh=QH91dZqx9n+fa6UJWQhKmr6KoM9wkO/zEYWaL3iLxbw=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBotwD5UNbLZUNgiNKJYGRkTDovTVZyqOaKlSyK6
+ TYgooOeZG+JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaLcA+QAKCRA1o5Of/Hh3
+ bSg4D/9JoRLSmgTNXM77atgyT/Q6ZeVcXmI56CiK9qdz5y3XbAYDusi5xwbc+ZWmjhUpquk0IXL
+ XTJxIshkfa/qgv6MNO4R0JqQT5Us1VudXtJacbAnI9LDgsKk+zwlIrx0VdAgGgTSO5a/QyRs5pd
+ NyoINFQwDu760evpMlWAB3Q0xMKT46h9bdh7SonuiJ5WvTLiwlNA8paRYjekubZCYjqzkeGZvDq
+ ppJDm0OLCoYDUV9mDFjojd3Q63jWNwp8D+cR+5ZrqQ5VkcZ5UIQDkm1G1LFiSILlNIwfIJcn6jM
+ 15Lsti3eaTZThyiiLotFxtw2chqlw3mt3HRLXp+5pxUm4NtkD/0a2kD1YcaqWkMpeOMfZDvzzT7
+ 7Ep3aMTivqViwlTxuiVy3YhKWPCYLtVQPUEgRR06/RooT9o17pC6sStucB0gFopF5fmPe0sHwFJ
+ W2z6yyXx39MiprNtlJK8oQl+6cVYiSjH0LhPm1LBiBwiTITwuMlI2owgz75JTpTwbsMk5KVFQb4
+ McQx0uYrUhwqC7fPCXMxlN0gpAAShfygaxit4zYtIWVCjvpl78wuLZscDjraWINVoHmKYFj4X29
+ EcJYIrAmUPwhkMvAxXNNBXDVckswpi3hP1ee5SOplkldDBChICDN0KEJYMKc/sWYDqagcTs3xYZ
+ Tf2uaRd/ktyWCoQ==
 X-Developer-Key: i=leitao@debian.org; a=openpgp;
  fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Split the netpoll_send_udp() function into two separate operations:
-netpoll_prepare_skb() for message preparation and netpoll_send_skb()
-for transmission.
+Move the UDP packet preparation logic from netpoll core to netconsole
+driver, consolidating network console-specific functionality.
 
-This improves separation of concerns. SKB building logic is now isolated
-from the actual network transmission, improving code modularity and
-testability.
+Changes include:
+- Move netpoll_prepare_skb() from net/core/netpoll.c to netconsole.c
+- Move all UDP/IP header construction helpers (push_udp, push_ipv4,
+  push_ipv6, push_eth, netpoll_udp_checksum) to netconsole.c
+- Add necessary network header includes to netconsole.c
+- Export find_skb() from netpoll core to allow netconsole access
+  * This is temporary, given that skb pool management is a netconsole
+    thing. This will be removed in the upcoming change in this patchset.
 
-Why?
-
-The separation of SKB preparation and transmission operations enables
-more granular locking strategies. The netconsole buffer requires lock
-protection during packet construction, but the transmission phase can
-proceed without holding the same lock.
-
-Also, this makes netpoll only reponsible for handling SKB.
-
-netpoll_prepare_skb() is now exported, but, in the upcoming change, it
-will be moved to netconsole, and become static.
+With this in mind, netconsole become another usual netpoll user, by
+calling it with SKBs instead of msgs and len.
 
 Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- drivers/net/netconsole.c | 21 ++++++++++++++-------
- include/linux/netpoll.h  |  2 ++
- net/core/netpoll.c       |  9 +++++----
- 3 files changed, 21 insertions(+), 11 deletions(-)
+ drivers/net/netconsole.c | 147 +++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/netpoll.h  |   3 +-
+ net/core/netpoll.c       | 151 +----------------------------------------------
+ 3 files changed, 150 insertions(+), 151 deletions(-)
 
 diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index 194570443493b..5b8af2de719a2 100644
+index 5b8af2de719a2..30731711571be 100644
 --- a/drivers/net/netconsole.c
 +++ b/drivers/net/netconsole.c
-@@ -1492,18 +1492,25 @@ static struct notifier_block netconsole_netdev_notifier = {
-  */
- static void send_udp(struct netconsole_target *nt, const char *msg, int len)
- {
--	int result = netpoll_send_udp(&nt->np, msg, len);
+@@ -40,6 +40,10 @@
+ #include <linux/utsname.h>
+ #include <linux/rtnetlink.h>
+ 
++#include <net/ip6_checksum.h>
++#include <net/tcp.h>
++#include <net/udp.h>
++
+ MODULE_AUTHOR("Matt Mackall <mpm@selenic.com>");
+ MODULE_DESCRIPTION("Console driver for network interfaces");
+ MODULE_LICENSE("GPL");
+@@ -1480,6 +1484,149 @@ static struct notifier_block netconsole_netdev_notifier = {
+ 	.notifier_call  = netconsole_netdev_event,
+ };
+ 
++static void netpoll_udp_checksum(struct netpoll *np, struct sk_buff *skb,
++				 int len)
++{
++	struct udphdr *udph;
++	int udp_len;
++
++	udp_len = len + sizeof(struct udphdr);
++	udph = udp_hdr(skb);
++
++	/* check needs to be set, since it will be consumed in csum_partial */
++	udph->check = 0;
++	if (np->ipv6)
++		udph->check = csum_ipv6_magic(&np->local_ip.in6,
++					      &np->remote_ip.in6,
++					      udp_len, IPPROTO_UDP,
++					      csum_partial(udph, udp_len, 0));
++	else
++		udph->check = csum_tcpudp_magic(np->local_ip.ip,
++						np->remote_ip.ip,
++						udp_len, IPPROTO_UDP,
++						csum_partial(udph, udp_len, 0));
++	if (udph->check == 0)
++		udph->check = CSUM_MANGLED_0;
++}
++
++static void push_ipv6(struct netpoll *np, struct sk_buff *skb, int len)
++{
++	struct ipv6hdr *ip6h;
++
++	skb_push(skb, sizeof(struct ipv6hdr));
++	skb_reset_network_header(skb);
++	ip6h = ipv6_hdr(skb);
++
++	/* ip6h->version = 6; ip6h->priority = 0; */
++	*(unsigned char *)ip6h = 0x60;
++	ip6h->flow_lbl[0] = 0;
++	ip6h->flow_lbl[1] = 0;
++	ip6h->flow_lbl[2] = 0;
++
++	ip6h->payload_len = htons(sizeof(struct udphdr) + len);
++	ip6h->nexthdr = IPPROTO_UDP;
++	ip6h->hop_limit = 32;
++	ip6h->saddr = np->local_ip.in6;
++	ip6h->daddr = np->remote_ip.in6;
++
++	skb->protocol = htons(ETH_P_IPV6);
++}
++
++static void push_ipv4(struct netpoll *np, struct sk_buff *skb, int len)
++{
++	static atomic_t ip_ident;
++	struct iphdr *iph;
++	int ip_len;
++
++	ip_len = len + sizeof(struct udphdr) + sizeof(struct iphdr);
++
++	skb_push(skb, sizeof(struct iphdr));
++	skb_reset_network_header(skb);
++	iph = ip_hdr(skb);
++
++	/* iph->version = 4; iph->ihl = 5; */
++	*(unsigned char *)iph = 0x45;
++	iph->tos = 0;
++	put_unaligned(htons(ip_len), &iph->tot_len);
++	iph->id = htons(atomic_inc_return(&ip_ident));
++	iph->frag_off = 0;
++	iph->ttl = 64;
++	iph->protocol = IPPROTO_UDP;
++	iph->check = 0;
++	put_unaligned(np->local_ip.ip, &iph->saddr);
++	put_unaligned(np->remote_ip.ip, &iph->daddr);
++	iph->check = ip_fast_csum((unsigned char *)iph, iph->ihl);
++	skb->protocol = htons(ETH_P_IP);
++}
++
++static void push_udp(struct netpoll *np, struct sk_buff *skb, int len)
++{
++	struct udphdr *udph;
++	int udp_len;
++
++	udp_len = len + sizeof(struct udphdr);
++
++	skb_push(skb, sizeof(struct udphdr));
++	skb_reset_transport_header(skb);
++
++	udph = udp_hdr(skb);
++	udph->source = htons(np->local_port);
++	udph->dest = htons(np->remote_port);
++	udph->len = htons(udp_len);
++
++	netpoll_udp_checksum(np, skb, len);
++}
++
++static void push_eth(struct netpoll *np, struct sk_buff *skb)
++{
++	struct ethhdr *eth;
++
++	eth = skb_push(skb, ETH_HLEN);
++	skb_reset_mac_header(skb);
++	ether_addr_copy(eth->h_source, np->dev->dev_addr);
++	ether_addr_copy(eth->h_dest, np->remote_mac);
++	if (np->ipv6)
++		eth->h_proto = htons(ETH_P_IPV6);
++	else
++		eth->h_proto = htons(ETH_P_IP);
++}
++
++static struct sk_buff *netpoll_prepare_skb(struct netpoll *np, const char *msg,
++					   int len)
++{
++	int total_len, ip_len, udp_len;
 +	struct sk_buff *skb;
-+	netdev_tx_t result;
- 
--	if (IS_ENABLED(CONFIG_NETCONSOLE_DYNAMIC)) {
--		if (result == NET_XMIT_DROP) {
--			u64_stats_update_begin(&nt->stats.syncp);
--			u64_stats_inc(&nt->stats.xmit_drop_count);
--			u64_stats_update_end(&nt->stats.syncp);
--		} else if (result == -ENOMEM) {
-+	skb = netpoll_prepare_skb(&nt->np, msg, len);
-+	if (!skb) {
-+		if (IS_ENABLED(CONFIG_NETCONSOLE_DYNAMIC)) {
- 			u64_stats_update_begin(&nt->stats.syncp);
- 			u64_stats_inc(&nt->stats.enomem_count);
- 			u64_stats_update_end(&nt->stats.syncp);
- 		}
-+		return;
-+	}
 +
-+	result = netpoll_send_skb(&nt->np, skb);
++	if (!IS_ENABLED(CONFIG_PREEMPT_RT))
++		WARN_ON_ONCE(!irqs_disabled());
 +
-+	if (IS_ENABLED(CONFIG_NETCONSOLE_DYNAMIC) && result == NET_XMIT_DROP) {
-+		u64_stats_update_begin(&nt->stats.syncp);
-+		u64_stats_inc(&nt->stats.xmit_drop_count);
-+		u64_stats_update_end(&nt->stats.syncp);
- 	}
- }
- 
++	udp_len = len + sizeof(struct udphdr);
++	if (np->ipv6)
++		ip_len = udp_len + sizeof(struct ipv6hdr);
++	else
++		ip_len = udp_len + sizeof(struct iphdr);
++
++	total_len = ip_len + LL_RESERVED_SPACE(np->dev);
++
++	skb = find_skb(np, total_len + np->dev->needed_tailroom,
++		       total_len - len);
++	if (!skb)
++		return NULL;
++
++	skb_copy_to_linear_data(skb, msg, len);
++	skb_put(skb, len);
++
++	push_udp(np, skb, len);
++	if (np->ipv6)
++		push_ipv6(np, skb, len);
++	else
++		push_ipv4(np, skb, len);
++	push_eth(np, skb);
++	skb->dev = np->dev;
++
++	return skb;
++}
++
+ /**
+  * send_udp - Wrapper for netpoll_send_udp that counts errors
+  * @nt: target to send message to
 diff --git a/include/linux/netpoll.h b/include/linux/netpoll.h
-index b5ea9882eda8b..ed74889e126c7 100644
+index ed74889e126c7..481ec474fa6b9 100644
 --- a/include/linux/netpoll.h
 +++ b/include/linux/netpoll.h
-@@ -69,6 +69,8 @@ static inline void netpoll_poll_enable(struct net_device *dev) { return; }
+@@ -69,14 +69,13 @@ static inline void netpoll_poll_enable(struct net_device *dev) { return; }
  #endif
  
  int netpoll_send_udp(struct netpoll *np, const char *msg, int len);
-+struct sk_buff *netpoll_prepare_skb(struct netpoll *np, const char *msg,
-+				    int len);
+-struct sk_buff *netpoll_prepare_skb(struct netpoll *np, const char *msg,
+-				    int len);
  int __netpoll_setup(struct netpoll *np, struct net_device *ndev);
  int netpoll_setup(struct netpoll *np);
  void __netpoll_free(struct netpoll *np);
+ void netpoll_cleanup(struct netpoll *np);
+ void do_netpoll_cleanup(struct netpoll *np);
+ netdev_tx_t netpoll_send_skb(struct netpoll *np, struct sk_buff *skb);
++struct sk_buff *find_skb(struct netpoll *np, int len, int reserve);
+ 
+ #ifdef CONFIG_NETPOLL
+ static inline void *netpoll_poll_lock(struct napi_struct *napi)
 diff --git a/net/core/netpoll.c b/net/core/netpoll.c
-index 5f65b62346d4e..e2098c19987f4 100644
+index e2098c19987f4..b4634e91568e8 100644
 --- a/net/core/netpoll.c
 +++ b/net/core/netpoll.c
-@@ -496,7 +496,8 @@ static void push_eth(struct netpoll *np, struct sk_buff *skb)
- 		eth->h_proto = htons(ETH_P_IP);
+@@ -29,11 +29,8 @@
+ #include <linux/slab.h>
+ #include <linux/export.h>
+ #include <linux/if_vlan.h>
+-#include <net/tcp.h>
+-#include <net/udp.h>
+ #include <net/addrconf.h>
+ #include <net/ndisc.h>
+-#include <net/ip6_checksum.h>
+ #include <linux/unaligned.h>
+ #include <trace/events/napi.h>
+ #include <linux/kconfig.h>
+@@ -271,7 +268,7 @@ static void zap_completion_queue(void)
+ 	put_cpu_var(softnet_data);
  }
  
--int netpoll_send_udp(struct netpoll *np, const char *msg, int len)
-+struct sk_buff *netpoll_prepare_skb(struct netpoll *np, const char *msg,
-+				    int len)
+-static struct sk_buff *find_skb(struct netpoll *np, int len, int reserve)
++struct sk_buff *find_skb(struct netpoll *np, int len, int reserve)
  {
- 	int total_len, ip_len, udp_len;
+ 	int count = 0;
  	struct sk_buff *skb;
-@@ -515,7 +516,7 @@ int netpoll_send_udp(struct netpoll *np, const char *msg, int len)
- 	skb = find_skb(np, total_len + np->dev->needed_tailroom,
- 		       total_len - len);
- 	if (!skb)
--		return -ENOMEM;
-+		return NULL;
- 
- 	skb_copy_to_linear_data(skb, msg, len);
- 	skb_put(skb, len);
-@@ -528,9 +529,9 @@ int netpoll_send_udp(struct netpoll *np, const char *msg, int len)
- 	push_eth(np, skb);
- 	skb->dev = np->dev;
- 
--	return (int)netpoll_send_skb(np, skb);
-+	return skb;
+@@ -297,6 +294,7 @@ static struct sk_buff *find_skb(struct netpoll *np, int len, int reserve)
+ 	skb_reserve(skb, reserve);
+ 	return skb;
  }
--EXPORT_SYMBOL(netpoll_send_udp);
-+EXPORT_SYMBOL(netpoll_prepare_skb);
++EXPORT_SYMBOL_GPL(find_skb);
  
+ static int netpoll_owner_active(struct net_device *dev)
+ {
+@@ -372,31 +370,6 @@ static netdev_tx_t __netpoll_send_skb(struct netpoll *np, struct sk_buff *skb)
+ 	return ret;
+ }
  
+-static void netpoll_udp_checksum(struct netpoll *np, struct sk_buff *skb,
+-				 int len)
+-{
+-	struct udphdr *udph;
+-	int udp_len;
+-
+-	udp_len = len + sizeof(struct udphdr);
+-	udph = udp_hdr(skb);
+-
+-	/* check needs to be set, since it will be consumed in csum_partial */
+-	udph->check = 0;
+-	if (np->ipv6)
+-		udph->check = csum_ipv6_magic(&np->local_ip.in6,
+-					      &np->remote_ip.in6,
+-					      udp_len, IPPROTO_UDP,
+-					      csum_partial(udph, udp_len, 0));
+-	else
+-		udph->check = csum_tcpudp_magic(np->local_ip.ip,
+-						np->remote_ip.ip,
+-						udp_len, IPPROTO_UDP,
+-						csum_partial(udph, udp_len, 0));
+-	if (udph->check == 0)
+-		udph->check = CSUM_MANGLED_0;
+-}
+-
+ netdev_tx_t netpoll_send_skb(struct netpoll *np, struct sk_buff *skb)
+ {
+ 	unsigned long flags;
+@@ -414,126 +387,6 @@ netdev_tx_t netpoll_send_skb(struct netpoll *np, struct sk_buff *skb)
+ }
+ EXPORT_SYMBOL(netpoll_send_skb);
+ 
+-static void push_ipv6(struct netpoll *np, struct sk_buff *skb, int len)
+-{
+-	struct ipv6hdr *ip6h;
+-
+-	skb_push(skb, sizeof(struct ipv6hdr));
+-	skb_reset_network_header(skb);
+-	ip6h = ipv6_hdr(skb);
+-
+-	/* ip6h->version = 6; ip6h->priority = 0; */
+-	*(unsigned char *)ip6h = 0x60;
+-	ip6h->flow_lbl[0] = 0;
+-	ip6h->flow_lbl[1] = 0;
+-	ip6h->flow_lbl[2] = 0;
+-
+-	ip6h->payload_len = htons(sizeof(struct udphdr) + len);
+-	ip6h->nexthdr = IPPROTO_UDP;
+-	ip6h->hop_limit = 32;
+-	ip6h->saddr = np->local_ip.in6;
+-	ip6h->daddr = np->remote_ip.in6;
+-
+-	skb->protocol = htons(ETH_P_IPV6);
+-}
+-
+-static void push_ipv4(struct netpoll *np, struct sk_buff *skb, int len)
+-{
+-	static atomic_t ip_ident;
+-	struct iphdr *iph;
+-	int ip_len;
+-
+-	ip_len = len + sizeof(struct udphdr) + sizeof(struct iphdr);
+-
+-	skb_push(skb, sizeof(struct iphdr));
+-	skb_reset_network_header(skb);
+-	iph = ip_hdr(skb);
+-
+-	/* iph->version = 4; iph->ihl = 5; */
+-	*(unsigned char *)iph = 0x45;
+-	iph->tos = 0;
+-	put_unaligned(htons(ip_len), &iph->tot_len);
+-	iph->id = htons(atomic_inc_return(&ip_ident));
+-	iph->frag_off = 0;
+-	iph->ttl = 64;
+-	iph->protocol = IPPROTO_UDP;
+-	iph->check = 0;
+-	put_unaligned(np->local_ip.ip, &iph->saddr);
+-	put_unaligned(np->remote_ip.ip, &iph->daddr);
+-	iph->check = ip_fast_csum((unsigned char *)iph, iph->ihl);
+-	skb->protocol = htons(ETH_P_IP);
+-}
+-
+-static void push_udp(struct netpoll *np, struct sk_buff *skb, int len)
+-{
+-	struct udphdr *udph;
+-	int udp_len;
+-
+-	udp_len = len + sizeof(struct udphdr);
+-
+-	skb_push(skb, sizeof(struct udphdr));
+-	skb_reset_transport_header(skb);
+-
+-	udph = udp_hdr(skb);
+-	udph->source = htons(np->local_port);
+-	udph->dest = htons(np->remote_port);
+-	udph->len = htons(udp_len);
+-
+-	netpoll_udp_checksum(np, skb, len);
+-}
+-
+-static void push_eth(struct netpoll *np, struct sk_buff *skb)
+-{
+-	struct ethhdr *eth;
+-
+-	eth = skb_push(skb, ETH_HLEN);
+-	skb_reset_mac_header(skb);
+-	ether_addr_copy(eth->h_source, np->dev->dev_addr);
+-	ether_addr_copy(eth->h_dest, np->remote_mac);
+-	if (np->ipv6)
+-		eth->h_proto = htons(ETH_P_IPV6);
+-	else
+-		eth->h_proto = htons(ETH_P_IP);
+-}
+-
+-struct sk_buff *netpoll_prepare_skb(struct netpoll *np, const char *msg,
+-				    int len)
+-{
+-	int total_len, ip_len, udp_len;
+-	struct sk_buff *skb;
+-
+-	if (!IS_ENABLED(CONFIG_PREEMPT_RT))
+-		WARN_ON_ONCE(!irqs_disabled());
+-
+-	udp_len = len + sizeof(struct udphdr);
+-	if (np->ipv6)
+-		ip_len = udp_len + sizeof(struct ipv6hdr);
+-	else
+-		ip_len = udp_len + sizeof(struct iphdr);
+-
+-	total_len = ip_len + LL_RESERVED_SPACE(np->dev);
+-
+-	skb = find_skb(np, total_len + np->dev->needed_tailroom,
+-		       total_len - len);
+-	if (!skb)
+-		return NULL;
+-
+-	skb_copy_to_linear_data(skb, msg, len);
+-	skb_put(skb, len);
+-
+-	push_udp(np, skb, len);
+-	if (np->ipv6)
+-		push_ipv6(np, skb, len);
+-	else
+-		push_ipv4(np, skb, len);
+-	push_eth(np, skb);
+-	skb->dev = np->dev;
+-
+-	return skb;
+-}
+-EXPORT_SYMBOL(netpoll_prepare_skb);
+-
+-
  static void skb_pool_flush(struct netpoll *np)
+ {
+ 	struct sk_buff_head *skb_pool;
 
 -- 
 2.47.3
