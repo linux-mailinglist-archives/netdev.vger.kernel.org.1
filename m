@@ -1,181 +1,230 @@
-Return-Path: <netdev+bounces-219214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDA98B40824
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 16:57:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B25D6B4085F
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 17:03:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AA743B9B79
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 14:55:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65C373A4238
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 15:03:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32D1F321F51;
-	Tue,  2 Sep 2025 14:51:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04F732E0402;
+	Tue,  2 Sep 2025 15:03:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aqNTHpn2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q5t1J8OR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F25E42DFA26;
-	Tue,  2 Sep 2025 14:51:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 258CC1DE2A0;
+	Tue,  2 Sep 2025 15:03:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756824715; cv=none; b=CYduf4cQduJL/R8Cc+zM699jtNGAqkQXzRpGeGyE73jdbwJvD3ZkczsZdJh497bp1aOmbG8C9fD9mKis/JaIeiyernIfUBw7W2A6dR+Hfk6nWJGaZUFiMVx+GyXvgyZaWwXY+xXvK2LHE+vM2jWDVL6wFUaoMB9ejs4xMhhCqbo=
+	t=1756825386; cv=none; b=ZHVt0xFGBEmaUBGiJ+8HKOlqj4KnuQlkHJchsYxWXxD5h3c3Wzbg0OFyjsMW8qjYN3J+jpW0xCBq1lvfooRsQxY6je9iLXAEQGmdfD70RsNZasKPPLcf1xkxxJBCRj0jJuourWRKYyf+qZBQU/G0eqHYJSD0WChkJth5YPeiPcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756824715; c=relaxed/simple;
-	bh=U+dxRjSf6jIW2bglfWLHV6i6zgwzXBdE8U7BUJ6+/nY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HNKx7OJC5fC6NmFFq2mUvPX5uFTNAAhpk5kpKPks/7/KBeMc/6ORWgx4OGz8CI0i5MhKwIX4TcnTuLBaPIGkTL7seMb5fBABlyJC99kyKLXeuRag68a8/1I4hBN/zPe9pJc20ECyJI7yO6uFwGCQpt6GGkAGhKGSwl+VBqzd7AM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aqNTHpn2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4ADD5C4CEF5;
-	Tue,  2 Sep 2025 14:51:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756824714;
-	bh=U+dxRjSf6jIW2bglfWLHV6i6zgwzXBdE8U7BUJ6+/nY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=aqNTHpn2ALOkuwXUyFyXWzRj7T5Z772S3TGgmk88SHljW6MWxiMTRxpj9+K9+ZB4F
-	 7MGSxFm3pb/hzUFcFjxJ7YI7sERVFODsz7TGm7fUaiWQtcgSsXuSxdHwhNQkQXFaDU
-	 cUTJKKiMOZ4/P+i19WcWhpqneZ7c3eIp15vPYm9rk9TMQtTh7JPynHVUIncqwJEGCq
-	 bqcpCFWQ7qS1zRfyxV86Uy2NpcCu6ABpLcsq5v8o0UxTUwH/eMauDRjgFf1Az+j+MD
-	 JW0QmIHSHfsr+s20IL7D6N9CNw8L8iACANdknVTpPpkckpxe3huqi2FCagdc2yfGAZ
-	 A4sIrBPN/MoBA==
-Message-ID: <834238b4-3549-4062-a29b-bf9c5aefa30f@kernel.org>
-Date: Tue, 2 Sep 2025 16:51:47 +0200
+	s=arc-20240116; t=1756825386; c=relaxed/simple;
+	bh=nCJi32g+2XrXf+4mA4uBGNHiEBbBcgVatkU/fgKodc4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=u/XFwX+d69mrHYm5Bgsu6npTYvyhQwmg5g3ZRcC9sxOgKVtLHEwCXnMF5PBnLLP4us/ienyHvI2MKxKxuVxHUUGAoOo2NoBcJadtEpOI+238/zhEwCc0N9XnUSfStgbejNofD05w6BanAFf41WILETU60i9gx50EXibnRjQY92I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q5t1J8OR; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-45b79ec2fbeso37292825e9.3;
+        Tue, 02 Sep 2025 08:03:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756825383; x=1757430183; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+q+6KxQjNGlpDK0FwgWdmK7uwlAylATpqLWZsT8oVn8=;
+        b=Q5t1J8OR+52N94vE+ORBrOOkd5Tgurd+Cy6bHC7koEmNWwzvRE9fJK+LzWZz+hLIqU
+         xgKjcc3mKdKvIkhibxs2e7Nyuhj/SA8ZEBERDSgz3K4A3DXRuXKNoJbjfp7uSl00aTnL
+         Cp0oRBR2bG6Ru3uFVK5ZklQcVr+Lx6igAC++4TgZ1bp5AL9QNJtbwM2m0E3sORkbteVh
+         s7sKfW5NRYVG2FpDUaep4DWnhMKvfWffcnzXmuFYPXTQYhKK6+hwJid/rJKsuPZTFWt/
+         767Tb/yKaW+sJDAfdX0pNJTBWt/Rg7or5XJxecWu82xWB5TxaxIwZDFbYz+2+bKKLxER
+         8SCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756825383; x=1757430183;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+q+6KxQjNGlpDK0FwgWdmK7uwlAylATpqLWZsT8oVn8=;
+        b=d6z7bLrJZyQOQh+NiK8GaagyvgLPYqTtEESx/7YpdlFji/b0qjxqvs90YD8xrS0qKP
+         c2UJJ3Bo8nm/xquEXAWCU3+iQUheYnz5v8pMqNdPhWBNIGs2OcTQSiZZEUPV2LsRHn88
+         1Vxwc6IK+RCSoMzvXGNzGykSu+20wmDtfY/PubkccgCDMVSwZv6NqMHflg4sfiEJmX8N
+         naSDlx9OHivBMTZBsGJD+isGxzz4c8+vnVHOlcfBYhhOiNjRfSXmHSSMcV5+JKgm/eOa
+         tyv7npvBlqik2H4qL0Ct1y+0QratRIUIA1G/GQT/1aWHKDadX04Cz1gJhkkiZLJcjcnp
+         p4Zg==
+X-Forwarded-Encrypted: i=1; AJvYcCXGX4hPCI4E82m1LfUwNT1SysMUbuu6rGEv/sxWzHcx2BkG3j/fDL720FI51xQn5cvkg3VObHs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzk7JEKOm3k+8ZKAe4SDSN1mdTg5I73xn+ZVAM4msxrCbuKQ8/h
+	fSrAyWAJrvv68ri7eEcke8ZkZ7LPSbtjVj1ocwiH6wkWYUcPxo+JEMq9uQRR6/0b
+X-Gm-Gg: ASbGnctMvO3chagpj5DX1ZuVqsgiMT4rtls2Lj6CZtwKF4sop3BDl/0Nz02uh+IYlVI
+	YHfFd+MIWTfs1xM/1PFnJzbb6NoBW2BIkPO3gGdmNEpll1tKA1C7EaohfY7eg0qPNHy0SyIZskw
+	LY4YDaWjycS76I0yHuJe3RgstzRR99b+4wlX2vAhaxMoqIM/EogeiFYXd5LaXI7FZETBtSx5k+Q
+	WG6X7Bpws2Je1udbKgmwnNMuUg/0qEMzhwYK3+zraRsPEf8q+bsEFxHffpIK76W+X9EYGnJq6CD
+	ZtD0wPBtIv14xtCEvj8Zv4PYWa4d0k39kRAd0dRw/CU7DraRrcLhVCFoRJji36rfsdi0QAG9P3h
+	a8l4o7sf+v2eOCFJzSf0LQPsPv3lo2XFvKOE=
+X-Google-Smtp-Source: AGHT+IG6qIR7Mz9ze8kV0dkEjDHFLIMXTiO/mwGxOMslVTSOdM/NzgwnMM7o6oftyrIuL4bODH6MyQ==
+X-Received: by 2002:a05:600c:46c6:b0:45b:84b1:b409 with SMTP id 5b1f17b1804b1-45b855ad0b0mr120431005e9.30.1756825382991;
+        Tue, 02 Sep 2025 08:03:02 -0700 (PDT)
+Received: from oscar-xps.. ([79.127.164.81])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45b7a938e75sm134978505e9.4.2025.09.02.08.02.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Sep 2025 08:03:02 -0700 (PDT)
+From: Oscar Maes <oscmaes92@gmail.com>
+To: netdev@vger.kernel.org,
+	bacs@librecast.net,
+	brett@librecast.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: davem@davemloft.net,
+	dsahern@kernel.org,
+	stable@vger.kernel.org,
+	Oscar Maes <oscmaes92@gmail.com>
+Subject: [PATCH net v5] selftests: net: add test for destination in broadcast packets
+Date: Tue,  2 Sep 2025 17:02:40 +0200
+Message-Id: <20250902150240.4272-1-oscmaes92@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next 0/6] mptcp: misc. features for v6.18
-Content-Language: en-GB, fr-BE
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>,
- Christoph Paasch <cpaasch@openai.com>, Gang Yan <yangang@kylinos.cn>
-References: <20250901-net-next-mptcp-misc-feat-6-18-v1-0-80ae80d2b903@kernel.org>
- <20250902072600.2a9be439@kernel.org>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20250902072600.2a9be439@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Jakub,
+Add test to check the broadcast ethernet destination field is set
+correctly.
 
-On 02/09/2025 16:26, Jakub Kicinski wrote:
-> On Mon, 01 Sep 2025 11:39:09 +0200 Matthieu Baerts (NGI0) wrote:
->> This series contains 4 independent new features:
->>
->> - Patch 1: use HMAC-SHA256 library instead of open-coded HMAC.
->>
->> - Patches 2-3: make ADD_ADDR retransmission timeout adaptive + simplify
->>   selftests.
->>
->> - Patch 4: selftests: check for unexpected fallback counter increments.
->>
->> - Patches 5-6: record subflows in RPS table, for aRFS support.
-> 
-> I don't see why, but kmemleak started to hit this with the join test
-> 2 branches ago :\ Have you seen any kmemleak issues on your side?
-> We also see occasional leaked skb in driver tests which makes no sense.
-> 
-> unreferenced object 0xffff8880029d3340 (size 3016):
->   comm "softirq", pid 0, jiffies 4297316940
->   hex dump (first 32 bytes):
->     0a 00 01 02 0a 00 01 01 00 00 00 00 9e b8 7d 27  ..............}'
->     0a 00 07 41 00 00 00 00 00 00 00 00 00 00 00 00  ...A............
->   backtrace (crc 3653d88c):
->     kmem_cache_alloc_noprof+0x284/0x330
->     sk_prot_alloc.constprop.0+0x4e/0x1b0
->     sk_clone_lock+0x4b/0x10d0
->     mptcp_sk_clone_init+0x2e/0x10d0
->     subflow_syn_recv_sock+0x9d1/0x1680
->     tcp_check_req+0x3a4/0x1910
->     tcp_v4_rcv+0x1004/0x30a0
->     ip_protocol_deliver_rcu+0x82/0x350
->     ip_local_deliver_finish+0x35d/0x620
->     ip_local_deliver+0x19c/0x470
->     ip_rcv+0xc2/0x370
->     __netif_receive_skb_one_core+0x108/0x180
->     process_backlog+0x3c1/0x13e0
->     __napi_poll.constprop.0+0x9f/0x460
->     net_rx_action+0x54f/0xda0
->     handle_softirqs+0x215/0x610
+This test sends a broadcast ping, captures it using tcpdump and
+ensures that all bits of the 6 octet ethernet destination address
+are correctly set by examining the output capture file.
 
-Thank you for this notification!
+Co-developed-by: Brett A C Sheffield <bacs@librecast.net>
+Signed-off-by: Brett A C Sheffield <bacs@librecast.net>
+Signed-off-by: Oscar Maes <oscmaes92@gmail.com>
+---
+v4 -> v5:
+ - Fixed Signed-off-by chain
 
-No, I didn't notice that on our side. For KMemLeak, now I'm waiting 5
-seconds, then I force the scan, and check for issues once. On NIPA, I
-see that there are still 2 scans + cat, and apparently, the issue was
-always visible during the 2nd scan:
+v3 -> v4:
+ - Added Brett as co-author
+ - Wait for tcpdump to bind using slowwait
 
+Links:
+ - Discussion: https://lore.kernel.org/netdev/20250822165231.4353-4-bacs@librecast.net/
+ - Previous version: https://lore.kernel.org/netdev/20250828114242.6433-1-oscmaes92@gmail.com/
 
-https://netdev-3.bots.linux.dev/vmksft-mptcp-dbg/results/279881/1-mptcp-join-sh/stdout
+Thanks to Brett Sheffield for co-developing this selftest!
 
-https://netdev-3.bots.linux.dev/vmksft-mptcp-dbg/results/280062/1-mptcp-join-sh/stdout
+ tools/testing/selftests/net/Makefile          |  1 +
+ .../selftests/net/broadcast_ether_dst.sh      | 83 +++++++++++++++++++
+ 2 files changed, 84 insertions(+)
+ create mode 100755 tools/testing/selftests/net/broadcast_ether_dst.sh
 
-It is unclear why a second scan is needed and only the second one caught
-something. Was it the same with the strange issues you mentioned in
-driver tests? Do you think I should re-add the second scan + cat?
-
-When looking at the modifications of this series, it is unclear what
-could cause that.
-
-Cheers,
-Matt
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index b31a71f2b372..56ad10ea6628 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -115,6 +115,7 @@ TEST_PROGS += skf_net_off.sh
+ TEST_GEN_FILES += skf_net_off
+ TEST_GEN_FILES += tfo
+ TEST_PROGS += tfo_passive.sh
++TEST_PROGS += broadcast_ether_dst.sh
+ TEST_PROGS += broadcast_pmtu.sh
+ TEST_PROGS += ipv6_force_forwarding.sh
+ 
+diff --git a/tools/testing/selftests/net/broadcast_ether_dst.sh b/tools/testing/selftests/net/broadcast_ether_dst.sh
+new file mode 100755
+index 000000000000..334a7eca8a80
+--- /dev/null
++++ b/tools/testing/selftests/net/broadcast_ether_dst.sh
+@@ -0,0 +1,83 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++#
++# Author: Brett A C Sheffield <bacs@librecast.net>
++# Author: Oscar Maes <oscmaes92@gmail.com>
++#
++# Ensure destination ethernet field is correctly set for
++# broadcast packets
++
++source lib.sh
++
++CLIENT_IP4="192.168.0.1"
++GW_IP4="192.168.0.2"
++
++setup() {
++	setup_ns CLIENT_NS SERVER_NS
++
++	ip -net "${SERVER_NS}" link add link1 type veth \
++		peer name link0 netns "${CLIENT_NS}"
++
++	ip -net "${CLIENT_NS}" link set link0 up
++	ip -net "${CLIENT_NS}" addr add "${CLIENT_IP4}"/24 dev link0
++
++	ip -net "${SERVER_NS}" link set link1 up
++
++	ip -net "${CLIENT_NS}" route add default via "${GW_IP4}"
++	ip netns exec "${CLIENT_NS}" arp -s "${GW_IP4}" 00:11:22:33:44:55
++}
++
++cleanup() {
++	rm -f "${CAPFILE}" "${OUTPUT}"
++	ip -net "${SERVER_NS}" link del link1
++	cleanup_ns "${CLIENT_NS}" "${SERVER_NS}"
++}
++
++test_broadcast_ether_dst() {
++	local rc=0
++	CAPFILE=$(mktemp -u cap.XXXXXXXXXX)
++	OUTPUT=$(mktemp -u out.XXXXXXXXXX)
++
++	echo "Testing ethernet broadcast destination"
++
++	# start tcpdump listening for icmp
++	# tcpdump will exit after receiving a single packet
++	# timeout will kill tcpdump if it is still running after 2s
++	timeout 2s ip netns exec "${CLIENT_NS}" \
++		tcpdump -i link0 -c 1 -w "${CAPFILE}" icmp &> "${OUTPUT}" &
++	pid=$!
++	slowwait 1 grep -qs "listening" "${OUTPUT}"
++
++	# send broadcast ping
++	ip netns exec "${CLIENT_NS}" \
++		ping -W0.01 -c1 -b 255.255.255.255 &> /dev/null
++
++	# wait for tcpdump for exit after receiving packet
++	wait "${pid}"
++
++	# compare ethernet destination field to ff:ff:ff:ff:ff:ff
++	ether_dst=$(tcpdump -r "${CAPFILE}" -tnne 2>/dev/null | \
++			awk '{sub(/,/,"",$3); print $3}')
++	if [[ "${ether_dst}" == "ff:ff:ff:ff:ff:ff" ]]; then
++		echo "[ OK ]"
++		rc="${ksft_pass}"
++	else
++		echo "[FAIL] expected dst ether addr to be ff:ff:ff:ff:ff:ff," \
++			"got ${ether_dst}"
++		rc="${ksft_fail}"
++	fi
++
++	return "${rc}"
++}
++
++if [ ! -x "$(command -v tcpdump)" ]; then
++	echo "SKIP: Could not run test without tcpdump tool"
++	exit "${ksft_skip}"
++fi
++
++trap cleanup EXIT
++
++setup
++test_broadcast_ether_dst
++
++exit $?
 -- 
-Sponsored by the NGI0 Core fund.
+2.39.5
 
 
