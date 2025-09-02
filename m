@@ -1,133 +1,121 @@
-Return-Path: <netdev+bounces-219303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85921B40EFB
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:05:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66B8BB40F13
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:12:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29D7F1A84988
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 21:05:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1B3747AAFE7
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 21:10:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78254345757;
-	Tue,  2 Sep 2025 21:05:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D392B35691F;
+	Tue,  2 Sep 2025 21:11:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="nyBeGVuk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vN1aNAiR"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.35.192.45])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00C712E7BDF
-	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 21:05:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.35.192.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FC822E7652;
+	Tue,  2 Sep 2025 21:11:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756847102; cv=none; b=u4B8V36hn+YvQEIOKZ0v4buICIkvGs7UENBzkLKNiw6KLfAMp5qFtY4m4TCDbFOewEtMboWuktv5bVwE6PCcXxclF6M1PGlg0TZLnag02DELtoMBpO1oZl70NgWMlmbf7ZvLtEFAeuuhzHM28S1j6RVSutyDCPqhsh/HqrUCJLQ=
+	t=1756847512; cv=none; b=JfxC7HuH+ONAQ07WNJgofcKcG4rfmAwprRV4weKsFxHmXmJYM/1xat8g7uqRp6ExPX/FNcGuCHl7gJRUjs3QuZkaWAsnbswd8tZ8ndUkDSslud16oeLP9o6xXqbd0+x7WWb4sATH2DUDvb50keikJ51cqQN0WDkT2eT2RQ8x/qc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756847102; c=relaxed/simple;
-	bh=73mGA6MwWSFcRp9ZnTEqPNG8zfkpD63X5c3+H7TkHa0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dtXi1letJ2mpiS/CEcpnDm8PQXTsZWii8XilrlsgfE3CINXArpaGgh2+CfBhzXtCHSB70eXPK6uzrTvF0oFGWXJ82TrEvUY1WyMJC5bUgfI5chnW/0j63pGLQPIn5oylportsLYc9Nci3EEIr8+6tHEZhx8qbfUmnfW1wEP/BlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=nyBeGVuk; arc=none smtp.client-ip=52.35.192.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1756847100; x=1788383100;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=t6gogj4w+fcwjbSwyJUS+/tCtWH+SJm0jaH6FwbZ8xU=;
-  b=nyBeGVukwzK0LnCnsQ9GCSkLbOX20pgq+z5/xtERvEGVL23CfCKiZ/9B
-   cyqRXTWeB4Rwt74bJuhZGKfxwms1mUMDyIht5luFLAymor+YLmN1+V0LC
-   aO8CKLvjE2vfwQU3bVNkLFAF/81JEmYGeMdKHvm0k7UK2q/1d0AkB32Cy
-   Gvjao+SrlFkc0/PihntqY2ZEBcRgFkZLJ5a7eVNDbJA4yQDhgrKa0pKkf
-   DA0QmsaCdeupcf2kfeZBX6xF3o78etmmgg5TTlHVHudLQDhsicjFpQIKY
-   9UWpoeT3eyKWteUk+v4oUJnCSU39HCa4t5tz2PYteyrbQFPXZuiFaNlRD
-   w==;
-X-CSE-ConnectionGUID: SJMIe03nRMqEd+/BuHJhqw==
-X-CSE-MsgGUID: jwh2zAgMRuuLbzyoUfcqqQ==
-X-IronPort-AV: E=Sophos;i="6.18,233,1751241600"; 
-   d="scan'208";a="2134466"
-Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
-  by internal-pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2025 21:04:58 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:48973]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.41.88:2525] with esmtp (Farcaster)
- id 0072c26e-a3f7-4feb-a4b7-8b96bf14c20c; Tue, 2 Sep 2025 21:04:58 +0000 (UTC)
-X-Farcaster-Flow-ID: 0072c26e-a3f7-4feb-a4b7-8b96bf14c20c
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
- Tue, 2 Sep 2025 21:04:58 +0000
-Received: from b0be8375a521.amazon.com (10.37.244.11) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Tue, 2 Sep 2025 21:04:56 +0000
-From: Kohei Enju <enjuk@amazon.com>
-To: <aleksandr.loktionov@intel.com>
-CC: <andrew+netdev@lunn.ch>, <anthony.l.nguyen@intel.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <enjuk@amazon.com>,
-	<intel-wired-lan@lists.osuosl.org>, <kohei.enju@gmail.com>,
-	<kuba@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<przemyslaw.kitszel@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3] ixgbe: preserve RSS indirection table across admin down/up
-Date: Wed, 3 Sep 2025 06:04:43 +0900
-Message-ID: <20250902210447.77961-2-enjuk@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250902210447.77961-1-enjuk@amazon.com>
-References: <IA3PR11MB8986AD639F3395B5BFCC2C38E506A@IA3PR11MB8986.namprd11.prod.outlook.com>
- <20250902210447.77961-1-enjuk@amazon.com>
+	s=arc-20240116; t=1756847512; c=relaxed/simple;
+	bh=J3UyQcqp+XhkbOE7T1z/2dZXwFXfqL8/MpWvYJE0vno=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=UtFJV5p60TjySHb1XzlZUFIPzytu+CYJ1lKF0ZfYJWW0uhoIpj9QwwEVpAuYOBhChQcJZEzUR0ZfBD8IX8E+gir8Ks+5TloHqABLnas68QnvpsJm5QHYzvYr0UaCwOlYjPq3O5XpkZYHdhNae0giwTzj70PhS/c3gLLB3/GDCbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vN1aNAiR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C604C4CEF7;
+	Tue,  2 Sep 2025 21:11:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756847512;
+	bh=J3UyQcqp+XhkbOE7T1z/2dZXwFXfqL8/MpWvYJE0vno=;
+	h=From:Subject:Date:To:Cc:From;
+	b=vN1aNAiRM2wQNjnGjOoGFVoudpKW04Nhz+lWCRm9F5sF1FdgBcz2MqcULMt69NVth
+	 BPZCq0yBRjtdSgAxpgtGtXBDd9QQTbf0q/yh8fURy/d4FT2fvB6GKKNNFQmRxaWbXR
+	 j91UKF2H99h06eMawBK53aiQpmujZpG6Do4nosrmucNhZ4mFMNumSMzoTYb9rC1cQD
+	 8jKS6w4HFlY3Gm9MdjDfjwo9wJUEu37XPhwKG9u9dIwg9C5jzVcYeNVqltL0bQMoD3
+	 ITe+DucgJrWoIXRnHaWUHIzJNn+m3lD93ZQRS/X+CUKuDFI2toUlthigTJz4DZsPeW
+	 nOvviBEXp6djg==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net-next v2 0/4] mptcp: misc. features for v6.18
+Date: Tue, 02 Sep 2025 23:11:32 +0200
+Message-Id: <20250902-net-next-mptcp-misc-feat-6-18-v2-0-fa02bb3188b1@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D040UWB001.ant.amazon.com (10.13.138.82) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAIRdt2gC/4WNwQqDMBBEf0X23C2blGrsqf9RPKS60dCaSBLEI
+ v57Q6DnHubwGGbeDpGD5Qi3aofAq43WuwzyVEE/aTcy2iEzSJJXUrJFxylnSzgvqV9wtrFHwzp
+ hjUJhI6XRqtE1GQH5Ywls7Fb+H/CbQpebycbkw6eIV1H64mhJ/HGsAgkVaVY0yGdLl/uLg+P32
+ YcRuuM4vkLhypbVAAAA
+X-Change-ID: 20250829-net-next-mptcp-misc-feat-6-18-722fa87a60f1
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ Eric Biggers <ebiggers@kernel.org>, Gang Yan <yangang@kylinos.cn>, 
+ Christoph Paasch <cpaasch@openai.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1499; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=J3UyQcqp+XhkbOE7T1z/2dZXwFXfqL8/MpWvYJE0vno=;
+ b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDK2x04sMivWX6b8YdpK8+en1u702CxxKXjRiV3vo9boJ
+ fS1TXpr1VHKwiDGxSArpsgi3RaZP/N5FW+Jl58FzBxWJpAhDFycAjAREW1GhhlrfkVODFuvHXV9
+ +fJYzg2TGwK9MtMLDMsblK/WL2zQ92RkuHXUVWe7yZHq9Y/U78Qn5Ngu+LL7ucoF1WotDevDIfa
+ nWQE=
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-On Tue, 2 Sep 2025 13:25:56 +0000, Loktionov, Aleksandr wrote:
+This series contains 4 independent new features:
 
-> [...]
->> -
->> -	for (i = 0, j = 0; i < reta_entries; i++, j++) {
->> -		if (j == rss_i)
->> -			j = 0;
->> +	/* Update redirection table in memory on first init, queue
->> count change,
->> +	 * or reta entries change, otherwise preserve user
->> configurations. Then
->> +	 * always write to hardware.
->> +	 */
->> +	if (adapter->last_rss_indices != rss_i ||
->> +	    adapter->last_reta_entries != reta_entries) {
->> +		for (i = 0; i < reta_entries; i++)
->> +			adapter->rss_indir_tbl[i] = i % rss_i;
->Are you sure rss_i never ever can be a 0?
->This is the only thing I'm worrying about.
+- Patch 1: use HMAC-SHA256 library instead of open-coded HMAC.
 
-Oops, you're exactly right. Good catch!
+- Patch 2: selftests: check for unexpected fallback counter increments.
 
-I see the original code assigns 0 to rss_indir_tbl[i] when rss_i is 0,
-like:
-  adapter->rss_indir_tbl[i] = 0;
+- Patches 3-4: record subflows in RPS table, for aRFS support.
 
-To handle this with keeping the behavior when rss_i == 0, I'm
-considering
-Option 1:
-  adapter->rss_indir_tbl[i] = rss_i ? i % rss_i : 0;
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Changes in v2:
+- Drop previous patches 2 ("mptcp: make ADD_ADDR retransmission timeout
+  adaptive") + 3 ("selftests: mptcp: remove add_addr_timeout settings"):
+  They were introducing instabilities in the selftests.
+- Rebased. Other patches have not been modified.
+- Link to v1: https://lore.kernel.org/r/20250901-net-next-mptcp-misc-feat-6-18-v1-0-80ae80d2b903@kernel.org
 
-Option 2:
-  if (rss_i)
-      for (i = 0; i < reta_entries; i++)
-          adapter->rss_indir_tbl[i] = i % rss_i;
-  else
-      memset(adapter->rss_indir_tbl, 0, reta_entries);
+---
+Christoph Paasch (2):
+      net: Add rfs_needed() helper
+      mptcp: record subflows in RPS table
 
-Since this is not in the data path, the overhead of checking rss_i in
-each iteration might be acceptable. Therefore I'd like to adopt the
-option 1 for simplicity.
+Eric Biggers (1):
+      mptcp: use HMAC-SHA256 library instead of open-coded HMAC
 
-Do you have any preference or other suggestions?
+Gang Yan (1):
+      selftests: mptcp: add checks for fallback counters
+
+ include/net/rps.h                               |  85 ++++++++++------
+ net/mptcp/crypto.c                              |  35 +------
+ net/mptcp/protocol.c                            |  21 ++++
+ tools/testing/selftests/net/mptcp/mptcp_join.sh | 123 ++++++++++++++++++++++++
+ 4 files changed, 202 insertions(+), 62 deletions(-)
+---
+base-commit: cd8a4cfa6bb43a441901e82f5c222dddc75a18a3
+change-id: 20250829-net-next-mptcp-misc-feat-6-18-722fa87a60f1
+
+Best regards,
+-- 
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
 
