@@ -1,123 +1,103 @@
-Return-Path: <netdev+bounces-219125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4A88B40008
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 14:20:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70251B40015
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 14:21:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2373E1890C05
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 12:20:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 523401B27789
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 12:21:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD812FDC3A;
-	Tue,  2 Sep 2025 12:17:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8EAB3009F8;
+	Tue,  2 Sep 2025 12:18:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="bbGjOoEw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PzLvHWK1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87FA72FDC2D
-	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 12:17:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14DC52FFDFC
+	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 12:18:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756815471; cv=none; b=Qm9cFwER2GM78Z4YJV+a8nlHSoe1u/9uxroDeqamEQNEZMb/pmXmmbwT8qs1oc7L2GnyT+v6jGGb26zfNaY1SOa71jEf1OvrTx7SrCuWzYY8GdcpSUYOGh/BWxvk4dfras5y29t5yaHECjsYJStDldAYHp8d5K1XpYR3TGaqo+o=
+	t=1756815500; cv=none; b=I1/Rzd9kf5355vex4CGhs+3Qwdhs4+HnWte7wJpJOuRjr7DmiQsdwxZ9Glju+T+Oalu7QMg57DvKiMPTYEzK+FmFponowXhDemmd9r437cD/U+B8hbpZOU4kwOTDn0C+egZd41NQVt+xBAKNkB9w3myXZflLb8AOy/+Kf/uSc30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756815471; c=relaxed/simple;
-	bh=ajCHXeRT9qUWoJVcprPMoTB/oi3drEXWgXorP+bs8B0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ws4+GFLB8JFW8XLuKdF+9DCmwlYOhYBGxAZVzCbc+xH0+L2n6yAwTrU7yWT7kdVwGCZDPPa/dVkCkv5Ak0MWNQckli/TFVsNOnBR+2k7yrvSXRjZzya2k6KhNWhb++iFxzHxiHkBsqv+VY09Bf57doyJm6E4FrzoDXspWQr25CA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=bbGjOoEw; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-55f74c6d316so2707904e87.0
-        for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 05:17:48 -0700 (PDT)
+	s=arc-20240116; t=1756815500; c=relaxed/simple;
+	bh=NTUciYP4qkVSP3Ids2cPJKg/b3yW1qYXyRE6W2+YvyM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=a5WYduAFiZs0IhxuBwqYkdj6Dq2mGqobfBT7ptaU8HI9ksfksnPC9r9h5r3wZNgXBQqg6i8No0FaMgzCgUD0bH0+mfe/Gr36T2AAeEl11R4ohgq37ZdzzA1a6fvHilnKr0L9OTpP5uoIDMcOLTNO3L+yIS/gT/JI0p7yeAzdpvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PzLvHWK1; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4b338d7a540so19057271cf.1
+        for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 05:18:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1756815467; x=1757420267; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4iCpQddMLJRrJQifhsXWY+Q2OGrCMHUTkuKYpkEDiO0=;
-        b=bbGjOoEww0e6aMyDANuuK+bXaxqrS6NV705ikP+RXBEGdWP9VQsAChgmtsZzg5sFG/
-         i1whUzNCJ+IW/CCiGF6rvyE2VRscb727yJRpMYrKo3ZzrDOLRkXWuFQLewtHYnL8Qs+x
-         crlOoOz8rt/WoIu3b4Iz2JG8VHO/p2htP+Ez5K4n5Qk4KSE2FhxN6N7t8o2RiEd3OKyP
-         3pjkh3O2sF9Cwi9ZSMQ6r4AG/9mvIXsL2DejasDbvtb5ks79xOGGKCSXbxALfYSg7RIm
-         azXNhhO6fKRzPk4fRvk2Pt8Ym+hhGreb001TjyvFX1Fl19huyGpDvhks9yGm43+f0Q8l
-         BXcw==
+        d=google.com; s=20230601; t=1756815496; x=1757420296; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0BtHVQVngraHXwyztIS7rS2FP0vL/znas/2GvCizYvA=;
+        b=PzLvHWK1Pbj6WlpmabFlATKlg//2jKQcWFwDO4mh/b2dlSdxKBjbpmonyVzeAuJ7rI
+         VQWlfOtS0GKss+npbDB/bsePPacjgaKOmF6ls2gWRa834PXhpzBGVXMhE68Zj9WgQhdM
+         St1lWOqyJKaGhZ93OcLYJvivxqHKuHpFwRGNvBOqTUtmrJqayUOEGitfkU6Z+fOKcs2R
+         3+60MEz6IvqSvXCJSPmVkx5Iu/RYKeAgAKI3/qTAVKQxSCw6Lp8wDVcZ3iasJQMAEC+Y
+         iudGaxk5lAA7bQTYgN8oumhoWT59votstdkrd4PXS2uAjZ4KQVrMlEW08bKqV9A5pdap
+         kEVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756815467; x=1757420267;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4iCpQddMLJRrJQifhsXWY+Q2OGrCMHUTkuKYpkEDiO0=;
-        b=Bq08CZ5PiB9jPvKn82ltB0cMkDGuglZ/9KoDfD6zDz2TTnZCat0PFro0IfZxyQTW8u
-         fmJ50/d18kM5Vd6IzALjP7f/RncFvCOLIUj7qy1mowyE0/w9cjRW3v90Ik5D+8aZc2BU
-         slXisSAPPJdCbyUt0kOk8JKEq/MEhsPIG5Qjtw1ZOSurvyX6DNvNNpd+BcIclbLVjQ+G
-         mOA48V2j3+kb/+hg4TuTl27AmR+B3CcqpDzrxjQ3GP2CUbCyWvGJ/8Ch5N5AUwRQZL7G
-         IPEFauTVuY04DWi5Db03MKkon5fs1uCwSkjNs44ZwvI4+NQpk3gXVNDRQMSrakI5OouF
-         R/5A==
-X-Forwarded-Encrypted: i=1; AJvYcCWnhoVPw/CStw88Won1cuSqvwoey38OkYmMFoLqlYczKRQsr9n2Ng5RcwqjHW8HdN+z/DqxfwI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+EPFacKTQAZ1DTo52v2w0Tid6Bk7GEL/vp/kGyKnaAC8BM7U8
-	7XewL9q6ZeiDHPNKYmCK9YdNwrRcUoo+6LE856SDORfsKQwYJsNXW3cCUmP0HhVLhgA=
-X-Gm-Gg: ASbGncupcNOe/5dOhjENsc4WeOQHzrRFJ5zDwj0XDN5W41K0kU9tGlFK+q31C0lPtJt
-	ZH0gzcUWQ331ar/5c661LVKFsLXpUWkqC7JBe6nk/wGgiq0CUR32XG58dFvgHOSrTUr9gbjLxJP
-	w+LHAbuTDfzbKUHNac0/gkExi55boBEiqVtF17hhh/mMT6wyX420vhiC3/h2POPoCI/LiGDcIua
-	d2POnXr0FKXsYuAsusWC5FOHo5qdbErQGDbG2O59/AbTX+g2mzfz88oO76Nxh595oy5BUj1DmPy
-	cLQGaBRlPkWa9jWCAlMnfbuWd4I1gmpUTdG7y/34+vzYUE8fMBbMgWwrIFVYDsGt4AX8N9HhAL9
-	5/kvnPTiQUD9Awqp+4AT/jlixi0SUmOlmK0EntKEIv6NHAADLmbQK+/h66ziiSva3GtHaoe73NJ
-	24WA==
-X-Google-Smtp-Source: AGHT+IG6Y2S6ttCc1rgioM8V2Bt7Rikb/yiDLeBmqbVMWUGE+lH7RxYzzvo/71Ksboa6WV04ez2Omw==
-X-Received: by 2002:a05:6512:3caa:b0:55f:47a9:7d33 with SMTP id 2adb3069b0e04-55f7094fb14mr3953165e87.44.1756815465201;
-        Tue, 02 Sep 2025 05:17:45 -0700 (PDT)
-Received: from [100.115.92.205] (176.111.185.210.kyiv.nat.volia.net. [176.111.185.210])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-560827af424sm641016e87.139.2025.09.02.05.17.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Sep 2025 05:17:44 -0700 (PDT)
-Message-ID: <d16e3744-96c3-46f6-9da8-e9341dcff1d9@blackwall.org>
-Date: Tue, 2 Sep 2025 15:17:42 +0300
+        d=1e100.net; s=20230601; t=1756815496; x=1757420296;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0BtHVQVngraHXwyztIS7rS2FP0vL/znas/2GvCizYvA=;
+        b=Y8+QmVVRFOqHNhi+ae2VvPeLn/guEfodma6EE3Kgk1zXdRrljy0Xj+pD/quQyOSiOf
+         74XbEU3BczivMr5+Ja6/aMj9dhPuE1Jxb6MN4hlQWfoogKKg7d08/VwWSU1smG21I77B
+         wo3d8tNgJ2LxdnFKgs754Mh4VZF12huElv4MafdY/6it3GSEEsFjbjhdz/Ki7ozVpUi7
+         vPG6CbFsUusux5Lcr9Tt4J0Q5Tq146rCPXcyKEn8VZENyd2bbOVBAJJ7pm7t5EI3LZXu
+         RmiZDN3daDaPFybqgXR4WDZGLY7qRwREsB5qvuZZbti6dAxxCFoPMGDLbimzLsejEHbt
+         92pw==
+X-Forwarded-Encrypted: i=1; AJvYcCUx3vnhPYi7D3yEd6g9O4uCBeDGw/Abb5uVQcp9VWBP5i/G4uqN3XtV/z6HcAccI44so2pBaV0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpbKRh11GLFOnz6PbM/hp85+aqljJ5nnc/EXxvLsCeC5fc9iOZ
+	mSsL6VKt9yG88IComZJmmwmPhzSq2f8oOdhqzphrphMiE9v1QCgLQbOT7hYAXeEdFY+CvbHkGmE
+	qUnyFL7Nyb82y2u+08tZLp8di3VLylroPsL7SxNIl
+X-Gm-Gg: ASbGncsgZVB8vQOlgGo5K5l8tRtSvzkMSS5+Ssm90O6K+3A0tVVbfe/R/BQz59Xm+P7
+	9kMZJAMjx8vw/kNzf663aYAK8MwUlQNyS27FMylLX98jRCyp9rYcQz2Tsf+BOouTL0/oNZonlZq
+	YKm0pBuaY8Dh+nUoe1VKtrmvtZW/155gf5i7vuw5pjBFKuMhZfbzPVBOH7ntwD1QrRFvxD5cF9S
+	qcqJiEZtk2KNA==
+X-Google-Smtp-Source: AGHT+IH5vzEO1QHxkAoblS7kriJ2318EF1KTzHsAZLiCGeoig9qB+yVEkkECgxfzHSgXCz6G9dwSrH92f7veZprPEl4=
+X-Received: by 2002:a05:622a:5b09:b0:4b3:140c:ef9d with SMTP id
+ d75a77b69052e-4b31d844993mr129778201cf.17.1756815495331; Tue, 02 Sep 2025
+ 05:18:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 3/3] selftests: net: Add a selftest for VXLAN with FDB
- nexthop groups
-To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, horms@kernel.org,
- petrm@nvidia.com, mcremers@cloudbear.nl
-References: <20250901065035.159644-1-idosch@nvidia.com>
- <20250901065035.159644-4-idosch@nvidia.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20250901065035.159644-4-idosch@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <aLaQWL9NguWmeM1i@stanley.mountain>
+In-Reply-To: <aLaQWL9NguWmeM1i@stanley.mountain>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 2 Sep 2025 05:18:03 -0700
+X-Gm-Features: Ac12FXwI4CvJS6_vLUukiLiLi6nGCSauJpahGMDDKoEk8R4QGC_U6PfE1GF1EBA
+Message-ID: <CANn89iK9FBmqC78Fn95Aa99+TA128xXSvSsLe408zkk1DG2Ojg@mail.gmail.com>
+Subject: Re: [PATCH net] ipv4: Fix NULL vs error pointer check in inet_blackhole_dev_init()
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Xin Long <lucien.xin@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kernel-janitors@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 9/1/25 09:50, Ido Schimmel wrote:
-> Add test cases for VXLAN with FDB nexthop groups, testing both IPv4 and
-> IPv6. Test basic Tx functionality as well as some corner cases.
-> 
-> Example output:
-> 
->   # ./test_vxlan_nh.sh
->   TEST: VXLAN FDB nexthop: IPv4 basic Tx                              [ OK ]
->   TEST: VXLAN FDB nexthop: IPv6 basic Tx                              [ OK ]
->   TEST: VXLAN FDB nexthop: learning                                   [ OK ]
->   TEST: VXLAN FDB nexthop: IPv4 proxy                                 [ OK ]
->   TEST: VXLAN FDB nexthop: IPv6 proxy                                 [ OK ]
-> 
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> ---
->   tools/testing/selftests/net/Makefile         |   1 +
->   tools/testing/selftests/net/test_vxlan_nh.sh | 223 +++++++++++++++++++
->   2 files changed, 224 insertions(+)
->   create mode 100755 tools/testing/selftests/net/test_vxlan_nh.sh
-> 
+On Mon, Sep 1, 2025 at 11:36=E2=80=AFPM Dan Carpenter <dan.carpenter@linaro=
+.org> wrote:
+>
+> The inetdev_init() function never returns NULL.  Check for error
+> pointers instead.
+>
+> Fixes: 22600596b675 ("ipv4: give an IPv4 dev to blackhole_netdev")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
