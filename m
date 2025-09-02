@@ -1,104 +1,129 @@
-Return-Path: <netdev+bounces-219108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFF87B3FDE4
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 13:37:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4149B3FDF6
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 13:40:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A44C4E229D
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 11:37:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 190BA1898FCE
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 11:41:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C61EF2F548D;
-	Tue,  2 Sep 2025 11:37:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A87F32F6564;
+	Tue,  2 Sep 2025 11:40:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sarinay.com header.i=@sarinay.com header.b="Xz4fiA1q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rUj9IxHj"
 X-Original-To: netdev@vger.kernel.org
-Received: from natrix.sarinay.com (natrix.sarinay.com [159.100.251.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23749634EC;
-	Tue,  2 Sep 2025 11:37:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.100.251.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E3281A08DB;
+	Tue,  2 Sep 2025 11:40:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756813046; cv=none; b=gPBUhSX9hLRuLdLwVvPzD8+V/PCJaKMbDRcsqSq8rtAyeLvz/T64mJD339ugTgsLgtKWe4b5gcbYuGDAOlAXY+bx8k4vZ+GNDWhXVqwxizWSuFmESDleJ80WCRDO60RkHF+atUZfeaVJ4Xgozg6uh/3j5d3cszvE7JaZJI297Zw=
+	t=1756813234; cv=none; b=Y2u7czQhO4/jur2SEYOi7C7q3nkjYBuhuVzz1NxyBsN1XFYr1Y/szdO7+q2kPtFJNjsxxO6b11dH6wllDS5+UTYMrumh2MK2gZMuy4sEPS5H5o0MTpmpLvn2iyEYZeWuXcR/qqfUwSkU0WKlpEEy1Wh807z/TpVDjyXiJmuUv4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756813046; c=relaxed/simple;
-	bh=B95pJxg6nYYJMRoTZpucr9VJiYdNFISyUZJTvxVP1Gw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=m3jlUWbYWNAlji7QetmJNEObCxp6VFYKy4gyh5PiZ6JKRGnDgLDdvIG88evTl6guhhg1gQlsrz+ONaOCW16dOSuhQIll2tiiV8OQeyozyDD0D/ksPM7VigCeQhncMEXUI4tf82GQgQ/GJxqp5TJyNxn1uKccr5k7FXaCqofXntA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sarinay.com; spf=pass smtp.mailfrom=sarinay.com; dkim=pass (2048-bit key) header.d=sarinay.com header.i=@sarinay.com header.b=Xz4fiA1q; arc=none smtp.client-ip=159.100.251.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sarinay.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sarinay.com
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=sarinay.com; s=2023;
-	t=1756813037; bh=B95pJxg6nYYJMRoTZpucr9VJiYdNFISyUZJTvxVP1Gw=;
-	h=From:To:Cc:Subject:Date;
-	b=Xz4fiA1qvUNhXKXKiosCI/x+Und4Cqhoe8eCdOqtWSToNZSN+Q61T2OtjRMpqwYX7
-	 vSXxomRoU3HmR15ZfEYGJBK28tIqt+c4KlMBjHILsdoa03gdM2v/ev4lRhrkzdT5NG
-	 fW1snfg2PScupx7zDywo4jlSwZ2Mf/3lA+VyfMrEjn0pQknB9rrbrZ0P8hxfbTmJnO
-	 i6CqwfMNWySbQrJhqeEfH/3aLs5H93pYlwGg7O4ukH1S2TpWCUW9j5G1Mhd+wfJpYC
-	 xfPCKKtXCu24RMANptSG7ZXZI2/lbci11GhDrcdguEgmqzgA7PXhEFOo1C2sRHmiUP
-	 FbtMX1Qg95Vhg==
-From: =?UTF-8?q?Juraj=20=C5=A0arinay?= <juraj@sarinay.com>
-To: netdev@vger.kernel.org
-Cc: =?UTF-8?q?Juraj=20=C5=A0arinay?= <juraj@sarinay.com>,
-	krzk@kernel.org,
-	linux-kernel@vger.kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	mingo@kernel.org,
-	tglx@linutronix.de
-Subject: [PATCH net-next v3] net: nfc: nci: Increase NCI_DATA_TIMEOUT to 3000 ms
-Date: Tue,  2 Sep 2025 13:36:28 +0200
-Message-ID: <20250902113630.62393-1-juraj@sarinay.com>
-X-Mailer: git-send-email 2.47.2
+	s=arc-20240116; t=1756813234; c=relaxed/simple;
+	bh=wPSaH7cjW+NldJZ1SPTIET9Tf1SoUAdrI/uEh3a0nTo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sBy4FXGTw3HZByEpxSQp7J2VVmBFzByBDjKg+EdzKsDhDbDf0/FShLqcl5slKDevZd1VtfAyY9nTLN7CL4hBrL9eLi5pjR2O5aFq5eaV6b7d7sQKknYnscpl/RGuUDCw33sEYFlTOvKAj3Fi3EpQ/PkQIBCYh6zF1qaEHOOWzfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rUj9IxHj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FE74C4CEED;
+	Tue,  2 Sep 2025 11:40:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756813234;
+	bh=wPSaH7cjW+NldJZ1SPTIET9Tf1SoUAdrI/uEh3a0nTo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rUj9IxHjDKnLpou31B+i5MNND3MCnio/527nPeG6gqRYhVSY1S70j7jhIEhUirTWx
+	 Bg8tZoM3xDUymFY4YaPfj4h3s42nZGqiTKQW1MWv1EE6MHRDb9431jP5D2ilKi9x37
+	 79pN/8k38vHHbOucIkP6Fd9kuLTpLyXHyqgItartg/sJepj7jziVwoc9AZ0dRRbCY0
+	 BERICBhSiZH11LxJ0iSjI07FvdgOT5qROIJkbtsF6BBr+nPMHFpT/1VV0/J0iNFhjv
+	 K9xt2gRxub4Ns1Xq2HVsN8Sx3K5OHv7sGK92pVrQ8ME+capTKxh5CIugZX3eHDP8ZY
+	 NuVLhWU/0m6fg==
+Date: Tue, 2 Sep 2025 12:40:27 +0100
+From: Simon Horman <horms@kernel.org>
+To: Wilfred Mallawa <wilfred.opensource@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Alistair Francis <alistair.francis@wdc.com>,
+	Damien Le'Moal <dlemoal@kernel.org>,
+	Wilfred Mallawa <wilfred.mallawa@wdc.com>
+Subject: Re: [PATCH v2] net/tls: support maximum record size limit
+Message-ID: <20250902114027.GD15473@horms.kernel.org>
+References: <20250902033809.177182-2-wilfred.opensource@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250902033809.177182-2-wilfred.opensource@gmail.com>
 
-An exchange with a NFC target must complete within NCI_DATA_TIMEOUT.
-A delay of 700 ms is not sufficient for cryptographic operations on smart
-cards. CardOS 6.0 may need up to 1.3 seconds to perform 256-bit ECDH
-or 3072-bit RSA. To prevent brute-force attacks, passports and similar
-documents introduce even longer delays into access control protocols
-(BAC/PACE).
+On Tue, Sep 02, 2025 at 01:38:10PM +1000, Wilfred Mallawa wrote:
+> From: Wilfred Mallawa <wilfred.mallawa@wdc.com>
+> 
+> During a handshake, an endpoint may specify a maximum record size limit.
+> Currently, the kernel defaults to TLS_MAX_PAYLOAD_SIZE (16KB) for the
+> maximum record size. Meaning that, the outgoing records from the kernel
+> can exceed a lower size negotiated during the handshake. In such a case,
+> the TLS endpoint must send a fatal "record_overflow" alert [1], and
+> thus the record is discarded.
+> 
+> Upcoming Western Digital NVMe-TCP hardware controllers implement TLS
+> support. For these devices, supporting TLS record size negotiation is
+> necessary because the maximum TLS record size supported by the controller
+> is less than the default 16KB currently used by the kernel.
+> 
+> This patch adds support for retrieving the negotiated record size limit
+> during a handshake, and enforcing it at the TLS layer such that outgoing
+> records are no larger than the size negotiated. This patch depends on
+> the respective userspace support in tlshd and GnuTLS [2].
+> 
+> [1] https://www.rfc-editor.org/rfc/rfc8449
+> [2] https://gitlab.com/gnutls/gnutls/-/merge_requests/2005
+> 
+> Signed-off-by: Wilfred Mallawa <wilfred.mallawa@wdc.com>
 
-The timeout should be higher, but not too much. The expiration allows
-us to detect that a NFC target has disappeared.
+Hi Wilfred,
 
-Signed-off-by: Juraj Šarinay <juraj@sarinay.com>
----
-v3:
-  - introduce no parameter and raise the timeout unconditionally
-v2: https://lore.kernel.org/netdev/20250825234354.855755-1-juraj@sarinay.com/
-  - export nci_data_timeout to survive make allmodconfig
-v1: https://lore.kernel.org/netdev/20250825134644.135448-1-juraj@sarinay.com/
+I'll leave review of this approach to others.
+But in the meantime I wanted to pass on a minor problem I noticed in the code
 
- include/net/nfc/nci_core.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+> index bac65d0d4e3e..9f9359f591d3 100644
+> --- a/net/tls/tls_sw.c
+> +++ b/net/tls/tls_sw.c
+> @@ -1033,6 +1033,7 @@ static int tls_sw_sendmsg_locked(struct sock *sk, struct msghdr *msg,
+>  	unsigned char record_type = TLS_RECORD_TYPE_DATA;
+>  	bool is_kvec = iov_iter_is_kvec(&msg->msg_iter);
+>  	bool eor = !(msg->msg_flags & MSG_MORE);
+> +	u16 record_size_limit;
+>  	size_t try_to_copy;
+>  	ssize_t copied = 0;
+>  	struct sk_msg *msg_pl, *msg_en;
+> @@ -1058,6 +1059,9 @@ static int tls_sw_sendmsg_locked(struct sock *sk, struct msghdr *msg,
+>  		}
+>  	}
+>  
+> +	record_size_limit = tls_ctx->record_size_limit ?
+> +			    tls_ctx->record_size_limit : TLS_MAX_PAYLOAD_SIZE;
+> +
+>  	while (msg_data_left(msg)) {
+>  		if (sk->sk_err) {
+>  			ret = -sk->sk_err;
 
-diff --git a/include/net/nfc/nci_core.h b/include/net/nfc/nci_core.h
-index e180bdf2f82b..664d5058e66e 100644
---- a/include/net/nfc/nci_core.h
-+++ b/include/net/nfc/nci_core.h
-@@ -52,7 +52,7 @@ enum nci_state {
- #define NCI_RF_DISC_SELECT_TIMEOUT		5000
- #define NCI_RF_DEACTIVATE_TIMEOUT		30000
- #define NCI_CMD_TIMEOUT				5000
--#define NCI_DATA_TIMEOUT			700
-+#define NCI_DATA_TIMEOUT			3000
- 
- struct nci_dev;
- 
+record_size_limit is set but otherwise unused.
+Did you forget to add something here?
+
+If not, please remove record_size_limit from this function.
+
 -- 
-2.47.2
-
+pw-bot: changes-requested
 
