@@ -1,103 +1,122 @@
-Return-Path: <netdev+bounces-219127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70251B40015
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 14:21:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37A08B400F1
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 14:43:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 523401B27789
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 12:21:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A56A62C39C9
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 12:41:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8EAB3009F8;
-	Tue,  2 Sep 2025 12:18:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1E0E28DB56;
+	Tue,  2 Sep 2025 12:41:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PzLvHWK1"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="AWfOKPLH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14DC52FFDFC
-	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 12:18:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F5F28CF4A;
+	Tue,  2 Sep 2025 12:41:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756815500; cv=none; b=I1/Rzd9kf5355vex4CGhs+3Qwdhs4+HnWte7wJpJOuRjr7DmiQsdwxZ9Glju+T+Oalu7QMg57DvKiMPTYEzK+FmFponowXhDemmd9r437cD/U+B8hbpZOU4kwOTDn0C+egZd41NQVt+xBAKNkB9w3myXZflLb8AOy/+Kf/uSc30=
+	t=1756816895; cv=none; b=Y+1xBQSNsnTdYVHn0s70xZ1bNwRR+OcMZCxDGux2mcUAj+pcDkdRiAsAfhgDSh3kj8FD4uNPmIHT6s8gDPfLoIV1C/0CPl4/vSHRkm7B+fMim/Dz3F6349LNVdaweFyzCipgFxEaibOOU4z6oFd+gQOzkxDI3dqT+XI39bSmqvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756815500; c=relaxed/simple;
-	bh=NTUciYP4qkVSP3Ids2cPJKg/b3yW1qYXyRE6W2+YvyM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a5WYduAFiZs0IhxuBwqYkdj6Dq2mGqobfBT7ptaU8HI9ksfksnPC9r9h5r3wZNgXBQqg6i8No0FaMgzCgUD0bH0+mfe/Gr36T2AAeEl11R4ohgq37ZdzzA1a6fvHilnKr0L9OTpP5uoIDMcOLTNO3L+yIS/gT/JI0p7yeAzdpvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PzLvHWK1; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4b338d7a540so19057271cf.1
-        for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 05:18:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756815496; x=1757420296; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0BtHVQVngraHXwyztIS7rS2FP0vL/znas/2GvCizYvA=;
-        b=PzLvHWK1Pbj6WlpmabFlATKlg//2jKQcWFwDO4mh/b2dlSdxKBjbpmonyVzeAuJ7rI
-         VQWlfOtS0GKss+npbDB/bsePPacjgaKOmF6ls2gWRa834PXhpzBGVXMhE68Zj9WgQhdM
-         St1lWOqyJKaGhZ93OcLYJvivxqHKuHpFwRGNvBOqTUtmrJqayUOEGitfkU6Z+fOKcs2R
-         3+60MEz6IvqSvXCJSPmVkx5Iu/RYKeAgAKI3/qTAVKQxSCw6Lp8wDVcZ3iasJQMAEC+Y
-         iudGaxk5lAA7bQTYgN8oumhoWT59votstdkrd4PXS2uAjZ4KQVrMlEW08bKqV9A5pdap
-         kEVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756815496; x=1757420296;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0BtHVQVngraHXwyztIS7rS2FP0vL/znas/2GvCizYvA=;
-        b=Y8+QmVVRFOqHNhi+ae2VvPeLn/guEfodma6EE3Kgk1zXdRrljy0Xj+pD/quQyOSiOf
-         74XbEU3BczivMr5+Ja6/aMj9dhPuE1Jxb6MN4hlQWfoogKKg7d08/VwWSU1smG21I77B
-         wo3d8tNgJ2LxdnFKgs754Mh4VZF12huElv4MafdY/6it3GSEEsFjbjhdz/Ki7ozVpUi7
-         vPG6CbFsUusux5Lcr9Tt4J0Q5Tq146rCPXcyKEn8VZENyd2bbOVBAJJ7pm7t5EI3LZXu
-         RmiZDN3daDaPFybqgXR4WDZGLY7qRwREsB5qvuZZbti6dAxxCFoPMGDLbimzLsejEHbt
-         92pw==
-X-Forwarded-Encrypted: i=1; AJvYcCUx3vnhPYi7D3yEd6g9O4uCBeDGw/Abb5uVQcp9VWBP5i/G4uqN3XtV/z6HcAccI44so2pBaV0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpbKRh11GLFOnz6PbM/hp85+aqljJ5nnc/EXxvLsCeC5fc9iOZ
-	mSsL6VKt9yG88IComZJmmwmPhzSq2f8oOdhqzphrphMiE9v1QCgLQbOT7hYAXeEdFY+CvbHkGmE
-	qUnyFL7Nyb82y2u+08tZLp8di3VLylroPsL7SxNIl
-X-Gm-Gg: ASbGncsgZVB8vQOlgGo5K5l8tRtSvzkMSS5+Ssm90O6K+3A0tVVbfe/R/BQz59Xm+P7
-	9kMZJAMjx8vw/kNzf663aYAK8MwUlQNyS27FMylLX98jRCyp9rYcQz2Tsf+BOouTL0/oNZonlZq
-	YKm0pBuaY8Dh+nUoe1VKtrmvtZW/155gf5i7vuw5pjBFKuMhZfbzPVBOH7ntwD1QrRFvxD5cF9S
-	qcqJiEZtk2KNA==
-X-Google-Smtp-Source: AGHT+IH5vzEO1QHxkAoblS7kriJ2318EF1KTzHsAZLiCGeoig9qB+yVEkkECgxfzHSgXCz6G9dwSrH92f7veZprPEl4=
-X-Received: by 2002:a05:622a:5b09:b0:4b3:140c:ef9d with SMTP id
- d75a77b69052e-4b31d844993mr129778201cf.17.1756815495331; Tue, 02 Sep 2025
- 05:18:15 -0700 (PDT)
+	s=arc-20240116; t=1756816895; c=relaxed/simple;
+	bh=M4uI8aFAFfvb6PvO1EZR0WydjlQUd8lvqrrz0abedd4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LB7rM7r3My6bwvJ+d1VLj3E6BnZupuARUyTYiKC5dB8il5ywkOIkLCm5eaZwsXX1evnoxjbcf+fdZaov8ycOGHxy9O2UcKX81Wm9st6nt1t88c+we1fsUwsY8syeopdN6QXWiiyMBSdLZFNMtQTA2c4k6PocA9yzjnr2VhAYzuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=AWfOKPLH; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1756816894; x=1788352894;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=M4uI8aFAFfvb6PvO1EZR0WydjlQUd8lvqrrz0abedd4=;
+  b=AWfOKPLHdzxkjtcjnrgv2kQy1tYMJhVYLaYxsof4QLfgaiEF2Pvx4lL7
+   BnRgr08tJ6Gye+3AsOUAjm3myT5mJEiY7ifof8CbmEI0Y7C7oe/jbxkEN
+   ECxcWpc2hLxhYovPNAn9pF6gnCoFxw19bEbEZfdKo6nbHq3GF5b9KBCuQ
+   yEE+tLhM3kZyHwmk4y283eLAY5A08Tzoda0B39Fbar3N6VcIOpon8Q3dw
+   +vzqLnPJWkQ6IWTE7iZKhH0bafM2BzeuIAVN6U+XWkHmNjkNDshsIqfp3
+   fyu4Vx4Bg38rhB3XHv3VsVRLry97TOdFWf1J4pKhQ8hREbo8FzQrEyX+B
+   Q==;
+X-CSE-ConnectionGUID: uSbTBh14QEunAdjSx76qwQ==
+X-CSE-MsgGUID: M5dpYUY/Sd2bRQfknAEXmw==
+X-IronPort-AV: E=Sophos;i="6.18,230,1751266800"; 
+   d="scan'208";a="213345453"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Sep 2025 05:41:32 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Tue, 2 Sep 2025 05:41:29 -0700
+Received: from DEN-DL-M31836.microchip.com (10.10.85.11) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
+ 15.1.2507.44 via Frontend Transport; Tue, 2 Sep 2025 05:41:27 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <richardcochran@gmail.com>,
+	<Parthiban.Veerasooran@microchip.com>, <kory.maincent@bootlin.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>
+Subject: [PATCH net-next v7 0/2] net: phy: micrel: Add PTP support for lan8842
+Date: Tue, 2 Sep 2025 14:18:30 +0200
+Message-ID: <20250902121832.3258544-1-horatiu.vultur@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aLaQWL9NguWmeM1i@stanley.mountain>
-In-Reply-To: <aLaQWL9NguWmeM1i@stanley.mountain>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 2 Sep 2025 05:18:03 -0700
-X-Gm-Features: Ac12FXwI4CvJS6_vLUukiLiLi6nGCSauJpahGMDDKoEk8R4QGC_U6PfE1GF1EBA
-Message-ID: <CANn89iK9FBmqC78Fn95Aa99+TA128xXSvSsLe408zkk1DG2Ojg@mail.gmail.com>
-Subject: Re: [PATCH net] ipv4: Fix NULL vs error pointer check in inet_blackhole_dev_init()
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Xin Long <lucien.xin@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kernel-janitors@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Mon, Sep 1, 2025 at 11:36=E2=80=AFPM Dan Carpenter <dan.carpenter@linaro=
-.org> wrote:
->
-> The inetdev_init() function never returns NULL.  Check for error
-> pointers instead.
->
-> Fixes: 22600596b675 ("ipv4: give an IPv4 dev to blackhole_netdev")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+The PTP block in lan8842 is the same as lan8814 so reuse all these
+functions.  The first patch of the series just does cosmetic changes such
+that lan8842 can reuse the function lan8814_ptp_probe. There should not be
+any functional changes here. While the second patch adds the PTP support
+to lan8842.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+v6->v7:
+- the v6 was not sent by mistake to mailing lists, so this version just
+  sends also to the mailing list
+
+v5->v6:
+- update commit message of the first commit to say that lan8842 had a
+  different number of GPIOs
+- add define for 0x8832
+- threrefore -> therefore
+
+v4->v5:
+- remove phydev from lan8842_priv as is not used
+- change type for rev to be u16 and fix holes in the struct
+- assign ret to priv->rev only after it is checked
+
+v3->v4:
+- when reading PHY addr first check return value and then mask it
+- change the type of gpios in the declration of __lan8814_ptp_probe_once
+
+v2->v3:
+- check return value of function devm_phy_package_join
+
+v1->v2:
+- use reverse x-mas notation
+- replace hardcoded value with define
+
+Horatiu Vultur (2):
+  net: phy: micrel: Introduce function __lan8814_ptp_probe_once
+  net: phy: micrel: Add PTP support for lan8842
+
+ drivers/net/phy/micrel.c | 116 +++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 111 insertions(+), 5 deletions(-)
+
+-- 
+2.34.1
+
 
