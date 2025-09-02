@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-219170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8527BB402B5
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 15:22:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7DCEB402AA
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 15:21:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DA7B3AD057
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 13:20:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CD5F1B26957
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 13:21:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCF3530BB8E;
-	Tue,  2 Sep 2025 13:18:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 758E730DD1A;
+	Tue,  2 Sep 2025 13:18:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vIG2fMUY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kjdeqm8s"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD03D30ACEB;
-	Tue,  2 Sep 2025 13:18:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C0A9307AE9;
+	Tue,  2 Sep 2025 13:18:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756819106; cv=none; b=ITIS8QfkRJq/nepoZKFRCMldN9RGJ/PF84TnJOMf0AAx2mKUBJt12shFLI+TqtqahbBI2bxrXgg1KVlg/fcQaObVdRC1wAuakgQexWexf7iCmy2QHl5KGNl0iyK16Dis5hH5Ed3VjIAnHdsdEKhcvuvi3du0zCfbmx0br57rARM=
+	t=1756819110; cv=none; b=t4nmc2FwysPF/yN/UE9Guk9WIJrxElY98YW1yGog8VdL42tn7gI7h48X4TqveDPLa69NLuHc6Z7NA9Mplyx8fji2BlukZkm8hwYU19LwWF7lC5ynjucaMa0fiICuA2aJLCfDbzNed1lHsMN/NgWKcm90Fg0CiVZ6gLg1lttW8po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756819106; c=relaxed/simple;
-	bh=FGa7ZgDMj8ZzjbgcMztCURZjWDqJpJhpglo5MQK07Tc=;
+	s=arc-20240116; t=1756819110; c=relaxed/simple;
+	bh=+8yfthSijc95vqMaDpPZVo/AICpcYNlVWfPmxU6cweM=;
 	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=i+ykeIPTcrJWVo3XatnzYFBIrqWJzTN4PmDQ4UFCIQ88IlfMJ8JoAByfdGtwNKJckDOJwlaQhAkqRz6q7Rnq7Rrb7XfDetvLizaGOU8mBp9SAI9MuDHRW05wJUsra5gfFZ4JJsLIcek4tiQeepy1AkouItZtnEHCsntilOzs16M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vIG2fMUY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD50BC4CEED;
-	Tue,  2 Sep 2025 13:18:25 +0000 (UTC)
+	 Message-Id:Subject; b=uCqva2OqNcFnaSAY+GTRlqhTj+fsG5o+r3TNqcWYT9ccwJhy2CbRGjL0305Y9eajBhQbN3hDY+H4bO9B3jK7/zA4HxXwsrJEl0asPa4UrKDoKNJG0c6gl+WjmB9oCSX8ATsbNq4N2lFy1s9y1ZPhck8ol6/VCE5b66jZguu8WJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kjdeqm8s; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70CC6C4CEED;
+	Tue,  2 Sep 2025 13:18:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756819106;
-	bh=FGa7ZgDMj8ZzjbgcMztCURZjWDqJpJhpglo5MQK07Tc=;
+	s=k20201202; t=1756819108;
+	bh=+8yfthSijc95vqMaDpPZVo/AICpcYNlVWfPmxU6cweM=;
 	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=vIG2fMUYOJGTB+1YSHvjxGf5Q3T8tqmuUCNeaKMpRfHsHGBWnBDv2cUL5UIrEPUcc
-	 BwfgQ5m7FwJ4Iz7GfpdQEsdGZmUrzW0oDbMJZNSCtzIcw4gSCv8ep2sCNCwORgj18L
-	 /6dZN6PIRi0gYetVeUI66IXga2yu1KfMV/Zq1HHkmAaXJgjFHqsXU5upbxm4ZM/e9O
-	 /qXAGi1F9/PEYL1uuFbG9ylCRtdtU0oGDxfjydI9f0NGlLGAP1w2g/DnAVwrXCcgJw
-	 XYCTiJJ3bvliyZ2NoizvFArBO/XaKPdXVeAlOW4uvVONWck3Mazzp4lCsJ+1s/taXZ
-	 rE6Gvn5rdaokg==
-Date: Tue, 02 Sep 2025 08:18:23 -0500
+	b=Kjdeqm8sfAcIATBjGpEcCUsXSq477Sd8JSkPuk69/E5nUNFI/xPI7s2Gy150H/Ocp
+	 c2VBYNzKeItKkLcM9EHmiHHBG8rUGkCzyZJkcRm7pNm+p05L+T/Sq9+ZlOgk+Ok0km
+	 mVSOuzm9FRzkFeT7eb+F79CF6p4jJLlsUAFA0/0plHtgok3f5nr3zxk29wBxBMQKGe
+	 f7pIJxwSb/3m2mrtbVev67Y0TuiU9eE3A4GjKsu41NyYd/vR0rHiTPASVMSK3DeItY
+	 3oXYM/L39uRczk7leIDmbwGgqJPPWOML+jXZfI+bEz7IwQJEtxuLTeyaSZz61rqkhP
+	 Wj8FXNUwmbNLg==
+Date: Tue, 02 Sep 2025 08:18:26 -0500
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -51,26 +51,25 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: andrew@lunn.ch, davem@davemloft.net, 
- linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev, 
- kuba@kernel.org, mripard@kernel.org, wens@csie.org, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Cc: kuba@kernel.org, mripard@kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ davem@davemloft.net, linux-sunxi@lists.linux.dev, wens@csie.org
 To: Conley Lee <conleylee@foxmail.com>
-In-Reply-To: <tencent_57056C4B1E98EF5C0517A5685B2E4D060508@qq.com>
-References: <tencent_57056C4B1E98EF5C0517A5685B2E4D060508@qq.com>
-Message-Id: <175678731473.878204.3446095909067556324.robh@kernel.org>
-Subject: Re: [PATCH] arm: dts: add nand device in
- sun7i-a20-haoyu-marsboard.dts
+In-Reply-To: <tencent_64909A540A8CD9063D28DEFD0A684AF9B709@qq.com>
+References: <tencent_64909A540A8CD9063D28DEFD0A684AF9B709@qq.com>
+Message-Id: <175678731491.878219.3817330096416761457.robh@kernel.org>
+Subject: Re: [PATCH] arm: dts: sun4i-emac enable dma rx in sun4i
 
 
-On Mon, 01 Sep 2025 17:05:21 +0800, Conley Lee wrote:
-> The Haoyu MarsBoard-A20 comes with an 8G Hynix NAND flash,
-> and this commit adds this NAND device in the device tree.
+On Mon, 01 Sep 2025 17:04:03 +0800, Conley Lee wrote:
+> The current sun4i-emac driver supports receiving data packets using DMA,
+> but this feature is not enabled in the device tree (dts) configuration.
+> This patch enables the DMA receive option in the dts file.
 > 
 > Signed-off-by: Conley Lee <conleylee@foxmail.com>
 > ---
->  .../allwinner/sun7i-a20-haoyu-marsboard.dts   | 67 +++++++++++++++++++
->  1 file changed, 67 insertions(+)
+>  arch/arm/boot/dts/allwinner/sun4i-a10.dtsi | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
 
 
@@ -95,10 +94,28 @@ This patch series was applied (using b4) to base:
 If this is not the correct base, please add 'base-commit' tag
 (or use b4 which does this automatically)
 
-New warnings running 'make CHECK_DTBS=y for arch/arm/boot/dts/allwinner/' for tencent_57056C4B1E98EF5C0517A5685B2E4D060508@qq.com:
+New warnings running 'make CHECK_DTBS=y for arch/arm/boot/dts/allwinner/' for tencent_64909A540A8CD9063D28DEFD0A684AF9B709@qq.com:
 
-arch/arm/boot/dts/allwinner/sun7i-a20-haoyu-marsboard.dtb: pinctrl@1c20800 (allwinner,sun7i-a20-pinctrl): 'nand_base0@0', 'nand_cs@0', 'nand_cs@1', 'nand_cs@2', 'nand_cs@3', 'nand_rb@0', 'nand_rb@1' do not match any of the regexes: '^([rs]-)?(([a-z0-9]{3,}|[a-oq-z][a-z0-9]*?)?-)+?(p[a-ilm][0-9]*?-)??pins?$', '^pinctrl-[0-9]+$', '^vcc-p[a-ilm]-supply$'
-	from schema $id: http://devicetree.org/schemas/pinctrl/allwinner,sun4i-a10-pinctrl.yaml#
+arch/arm/boot/dts/allwinner/sun4i-a10-jesurun-q5.dtb: ethernet@1c0b000 (allwinner,sun4i-a10-emac): Unevaluated properties are not allowed ('dma-names', 'dmas' were unexpected)
+	from schema $id: http://devicetree.org/schemas/net/allwinner,sun4i-a10-emac.yaml#
+arch/arm/boot/dts/allwinner/sun4i-a10-a1000.dtb: ethernet@1c0b000 (allwinner,sun4i-a10-emac): Unevaluated properties are not allowed ('dma-names', 'dmas' were unexpected)
+	from schema $id: http://devicetree.org/schemas/net/allwinner,sun4i-a10-emac.yaml#
+arch/arm/boot/dts/allwinner/sun4i-a10-cubieboard.dtb: ethernet@1c0b000 (allwinner,sun4i-a10-emac): Unevaluated properties are not allowed ('dma-names', 'dmas' were unexpected)
+	from schema $id: http://devicetree.org/schemas/net/allwinner,sun4i-a10-emac.yaml#
+arch/arm/boot/dts/allwinner/sun4i-a10-olinuxino-lime.dtb: ethernet@1c0b000 (allwinner,sun4i-a10-emac): Unevaluated properties are not allowed ('dma-names', 'dmas' were unexpected)
+	from schema $id: http://devicetree.org/schemas/net/allwinner,sun4i-a10-emac.yaml#
+arch/arm/boot/dts/allwinner/sun4i-a10-itead-iteaduino-plus.dtb: ethernet@1c0b000 (allwinner,sun4i-a10-emac): Unevaluated properties are not allowed ('dma-names', 'dmas' were unexpected)
+	from schema $id: http://devicetree.org/schemas/net/allwinner,sun4i-a10-emac.yaml#
+arch/arm/boot/dts/allwinner/sun4i-a10-pcduino.dtb: ethernet@1c0b000 (allwinner,sun4i-a10-emac): Unevaluated properties are not allowed ('dma-names', 'dmas' were unexpected)
+	from schema $id: http://devicetree.org/schemas/net/allwinner,sun4i-a10-emac.yaml#
+arch/arm/boot/dts/allwinner/sun4i-a10-marsboard.dtb: ethernet@1c0b000 (allwinner,sun4i-a10-emac): Unevaluated properties are not allowed ('dma-names', 'dmas' were unexpected)
+	from schema $id: http://devicetree.org/schemas/net/allwinner,sun4i-a10-emac.yaml#
+arch/arm/boot/dts/allwinner/sun4i-a10-hackberry.dtb: ethernet@1c0b000 (allwinner,sun4i-a10-emac): Unevaluated properties are not allowed ('dma-names', 'dmas' were unexpected)
+	from schema $id: http://devicetree.org/schemas/net/allwinner,sun4i-a10-emac.yaml#
+arch/arm/boot/dts/allwinner/sun4i-a10-ba10-tvbox.dtb: ethernet@1c0b000 (allwinner,sun4i-a10-emac): Unevaluated properties are not allowed ('dma-names', 'dmas' were unexpected)
+	from schema $id: http://devicetree.org/schemas/net/allwinner,sun4i-a10-emac.yaml#
+arch/arm/boot/dts/allwinner/sun4i-a10-pcduino2.dtb: ethernet@1c0b000 (allwinner,sun4i-a10-emac): Unevaluated properties are not allowed ('dma-names', 'dmas' were unexpected)
+	from schema $id: http://devicetree.org/schemas/net/allwinner,sun4i-a10-emac.yaml#
 
 
 
