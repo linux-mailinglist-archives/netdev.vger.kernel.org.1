@@ -1,164 +1,124 @@
-Return-Path: <netdev+bounces-219173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92F28B402BB
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 15:22:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C0DEB402B2
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 15:22:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 276561619E2
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 13:21:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9260216DC5A
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 13:20:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8130630EF64;
-	Tue,  2 Sep 2025 13:18:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C98A30E0D8;
+	Tue,  2 Sep 2025 13:18:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RZ8f6yx+"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145F730E852;
-	Tue,  2 Sep 2025 13:18:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24C4A30DEC4;
+	Tue,  2 Sep 2025 13:18:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756819115; cv=none; b=CMdVhw4AyTTyWsbv7yxBqc+9ZD16G3lkntd9gJvf6rgvhUfXBUdC9RzEMCoMrlA+xf9iI3kBvU4U8SAwWuK9HJ0Yv8UZoq4mqllV+QMCFYb6PzaH5e+CyJAR3pV9FEIuB2DPpmqFwdMRU08bhfxYLZDR0bNJgyadC4dZ2EDdwJs=
+	t=1756819112; cv=none; b=f5nw334ypBoTQ3fD4NRMySTuonceD7gSMzFKWfHDrRVcJGfOXA3v7nT2ZgENKD+t8GXKVWLM/594DpKkgdFMgZ8SwpmjM79UNdaK5SN2ZMAKICh2s2+tuwWLsO78pq/xlJDPOm5zAU/P4WZk1cW1kI6KUQCVigscKzp/4VNLGZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756819115; c=relaxed/simple;
-	bh=wcXHNkBQtrgjmA0wflq1a15s3Jy/DqxokYOrMmypoVM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BNiw4E2+bq/YUwrO+xTpmJ57cKDNokmWFwi9Y4e9b2hv7ZqDiLDw51aXwf0J7ql0NnKAlGxwruBofJXG0+dyftUUSGy/zYkohK23tTiPFiD3o+vYHQAaVVF3c5ceJsFwTmi1MQYbjHr4LkW04GJXxC5n6LWvkANDYsvk64yM2/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 4BC8F606DC; Tue,  2 Sep 2025 15:18:31 +0200 (CEST)
-Date: Tue, 2 Sep 2025 15:18:26 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Eric Woudstra <ericwouds@gmail.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
-	bridge@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: [PATCH v14 nf-next 3/3] netfilter: nft_chain_filter: Add bridge
- double vlan and pppoe
-Message-ID: <aLbuokOe9zcN27sd@strlen.de>
-References: <20250708151209.2006140-1-ericwouds@gmail.com>
- <20250708151209.2006140-4-ericwouds@gmail.com>
- <aG2Vfqd779sIK1eL@strlen.de>
- <6e12178f-e5f8-4202-948b-bdc421d5a361@gmail.com>
- <aHEcYTQ2hK1GWlpG@strlen.de>
- <2d207282-69da-401e-b637-c12f67552d8d@gmail.com>
+	s=arc-20240116; t=1756819112; c=relaxed/simple;
+	bh=nQUVR7QuD0wO5Rmr1nt0LUWraj/tUYvMI5niL2joU/o=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=JNNZPJQn3poSc6iq1D1JdO6hkKA85lr20BnQLVwA/L5JjiwOvCwMe8pH/w0hAvWyeZWHZh3Eu0NrB9kIg5XGl01d33tHJroXndFyrd8d5Kv93lfRmOYXzL7Q8FFAdlAkl3/YBZ/qBKGR6xfQi6QiwwvEyD7Eh7ZWcAcEVI68ASk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RZ8f6yx+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A072BC4CEFA;
+	Tue,  2 Sep 2025 13:18:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756819111;
+	bh=nQUVR7QuD0wO5Rmr1nt0LUWraj/tUYvMI5niL2joU/o=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=RZ8f6yx+IGqsgI9sgMl2O96dV0/sWGFZrJ3FAu8l1KC5NFP5BBaatI7gV6eW1xcoS
+	 4ehJ+GTF+Zf/Qk3uIdPTSch89U2fxk3jsNALl4c7RRfVfnRs4RMxaw5hGRdtBsCetb
+	 8lhU8mOSu9/zcWkML8ioB13IWGyJXeC/Ortl0PfXTRyLNvGtgInNvskYec3lcjUScj
+	 PF+zTIlT9oMSPRcHkp7D9eDEGrEXFpA+x7vpMYNpN45h2qKs6pov2CxlVhqU00yuz6
+	 Ff4UFAe07D7E9l1KfEInQS7/ajpTHyRsL72nPfShxaTw1AeW19i7z+irUNs+NXpO2m
+	 t6Ebn6071UFMw==
+Date: Tue, 02 Sep 2025 08:18:29 -0500
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2d207282-69da-401e-b637-c12f67552d8d@gmail.com>
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ wens@csie.org, kuba@kernel.org, mripard@kernel.org, davem@davemloft.net, 
+ netdev@vger.kernel.org
+To: Conley Lee <conleylee@foxmail.com>
+In-Reply-To: <tencent_C4014DA405A96C2E1E7FEFCC050BA56D5B08@qq.com>
+References: <tencent_C4014DA405A96C2E1E7FEFCC050BA56D5B08@qq.com>
+Message-Id: <175678731505.878234.8586954068434331429.robh@kernel.org>
+Subject: Re: [PATCH 2/2] net: ethernet: sun4i-emac: enable dma rx in sun4i
 
-Eric Woudstra <ericwouds@gmail.com> wrote:
-> > Thats because of implicit dependency insertion on userspace side:
-> > # ip saddr 1.2.3.4 counter ip daddr 3.4.5.6
-> > bridge test-bridge input
-> >   [ meta load protocol => reg 1 ]
-> >   [ cmp eq reg 1 0x00000008 ]
-> >   [ payload load 4b @ network header + 12 => reg 1 ]
-> >   ...
-> > 
-> > So, if userspace would NOT do that it would 'just work'.
-> > 
-> > Pablo, whats your take on this?
-> > We currently don't have a 'nhproto' field in nft_pktinfo
-> > and there is no space to add one.
-> > 
-> > We could say that things work as expected, and that
-> >  ip saddr 1.2.3.4
-> > 
-> > should not magically match packets in e.g. pppoe encap.
 
-FTR, I think 'ip saddr 1.2.3.4' (standalone with no other info),
-should NOT match inside a random l2 tunnel.
-
-> > I suspect it will start to work if you force it to match in pppoe, e.g.
-> > ether type 0x8864 ip saddr ...
-> > 
-> > so nft won't silently add the skb->protocol dependency.
-> > 
-> > Its not a technical issue but about how matching is supposed to work
-> > in a bridge.
-> > 
-> > If its supposed to work automatically we need to either:
-> > 1. munge skb->protocol in kernel, even tough its wrong (we don't strip
-> >    the l2 headers).
-> > 2. record the real l3 protocol somewhere and make it accessible, then
-> >    fix the dependency generation in userspace to use the 'new way' (meta
-> >    l3proto)?
-> > 3. change the dependency generation to something else.
-> >    But what? 'ether type ip' won't work either for 8021ad etc.
-> >    'ip version' can't be used for arp.
-> > 
+On Sat, 30 Aug 2025 15:50:00 +0800, Conley Lee wrote:
+> The current sun4i-emac driver supports receiving data packets using DMA,
+> but this feature is not enabled in the device tree (dts) configuration.
+> This patch enables the DMA receive option in the dts file.
 > 
-> Hi Florian,
+> Signed-off-by: Conley Lee <conleylee@foxmail.com>
+> ---
+>  arch/arm/boot/dts/allwinner/sun4i-a10.dtsi | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> Did you get any information on how to handle this issue?
 
-Did you check if you can get it to match if you add the relevant
-l3 dependency in the rule?
 
-I don't think we should (or can) change how the rules get evaluated by
-making 'ip saddr' match on other l2 tunnel protocols by default.
+My bot found new DTB warnings on the .dts files added or changed in this
+series.
 
-It is even incompatible with any exiting rulesets, consider e.g.
-"ip daddr 1.2.3.4 drop" on a bridge, now this address becomes
-unreachable but it works before your patch (if the address is found in
-e.g. pppoe header).
+Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
+are fixed by another series. Ultimately, it is up to the platform
+maintainer whether these warnings are acceptable or not. No need to reply
+unless the platform maintainer has comments.
 
-'ip/ip6' should work as expected as long as userspace provides
-the correct ether type and dependencies.
+If you already ran DT checks and didn't see these error(s), then
+make sure dt-schema is up to date:
 
-I.e., what this patch adds as C code should work if being provided
-as part of the rule.
+  pip3 install dtschema --upgrade
 
-What might make sense is to add the ppp(oe) header to src/proto.c
-in nftables so users that want to match the header following ppp
-one don't have to use raw payload match syntax.
 
-What might also make sense is to either add a way to force a call
-to nft_set_pktinfo_ipv4_validate() from the ruleset, or take your
-patch but WITHOUT the skb->protocol munging.
+This patch series was applied (using b4) to base:
+ Base: attempting to guess base-commit...
+ Base: tags/next-20250829 (exact match)
 
-However, due to the number of possible l2 header chain combinations
-I'm not sure we should bother with trying to add all of them.
+If this is not the correct base, please add 'base-commit' tag
+(or use b4 which does this automatically)
 
-I worry we would end up turning nft_do_chain_bridge() preamble or
-nft_set_pktinfo() into some kind of l2 packet dissector.
+New warnings running 'make CHECK_DTBS=y for arch/arm/boot/dts/allwinner/' for tencent_C4014DA405A96C2E1E7FEFCC050BA56D5B08@qq.com:
 
-Maybe one way forward is to introduce
+arch/arm/boot/dts/allwinner/sun4i-a10-jesurun-q5.dtb: ethernet@1c0b000 (allwinner,sun4i-a10-emac): Unevaluated properties are not allowed ('dma-names', 'dmas' were unexpected)
+	from schema $id: http://devicetree.org/schemas/net/allwinner,sun4i-a10-emac.yaml#
+arch/arm/boot/dts/allwinner/sun4i-a10-a1000.dtb: ethernet@1c0b000 (allwinner,sun4i-a10-emac): Unevaluated properties are not allowed ('dma-names', 'dmas' were unexpected)
+	from schema $id: http://devicetree.org/schemas/net/allwinner,sun4i-a10-emac.yaml#
+arch/arm/boot/dts/allwinner/sun4i-a10-cubieboard.dtb: ethernet@1c0b000 (allwinner,sun4i-a10-emac): Unevaluated properties are not allowed ('dma-names', 'dmas' were unexpected)
+	from schema $id: http://devicetree.org/schemas/net/allwinner,sun4i-a10-emac.yaml#
+arch/arm/boot/dts/allwinner/sun4i-a10-olinuxino-lime.dtb: ethernet@1c0b000 (allwinner,sun4i-a10-emac): Unevaluated properties are not allowed ('dma-names', 'dmas' were unexpected)
+	from schema $id: http://devicetree.org/schemas/net/allwinner,sun4i-a10-emac.yaml#
+arch/arm/boot/dts/allwinner/sun4i-a10-itead-iteaduino-plus.dtb: ethernet@1c0b000 (allwinner,sun4i-a10-emac): Unevaluated properties are not allowed ('dma-names', 'dmas' were unexpected)
+	from schema $id: http://devicetree.org/schemas/net/allwinner,sun4i-a10-emac.yaml#
+arch/arm/boot/dts/allwinner/sun4i-a10-pcduino.dtb: ethernet@1c0b000 (allwinner,sun4i-a10-emac): Unevaluated properties are not allowed ('dma-names', 'dmas' were unexpected)
+	from schema $id: http://devicetree.org/schemas/net/allwinner,sun4i-a10-emac.yaml#
+arch/arm/boot/dts/allwinner/sun4i-a10-marsboard.dtb: ethernet@1c0b000 (allwinner,sun4i-a10-emac): Unevaluated properties are not allowed ('dma-names', 'dmas' were unexpected)
+	from schema $id: http://devicetree.org/schemas/net/allwinner,sun4i-a10-emac.yaml#
+arch/arm/boot/dts/allwinner/sun4i-a10-hackberry.dtb: ethernet@1c0b000 (allwinner,sun4i-a10-emac): Unevaluated properties are not allowed ('dma-names', 'dmas' were unexpected)
+	from schema $id: http://devicetree.org/schemas/net/allwinner,sun4i-a10-emac.yaml#
+arch/arm/boot/dts/allwinner/sun4i-a10-ba10-tvbox.dtb: ethernet@1c0b000 (allwinner,sun4i-a10-emac): Unevaluated properties are not allowed ('dma-names', 'dmas' were unexpected)
+	from schema $id: http://devicetree.org/schemas/net/allwinner,sun4i-a10-emac.yaml#
+arch/arm/boot/dts/allwinner/sun4i-a10-pcduino2.dtb: ethernet@1c0b000 (allwinner,sun4i-a10-emac): Unevaluated properties are not allowed ('dma-names', 'dmas' were unexpected)
+	from schema $id: http://devicetree.org/schemas/net/allwinner,sun4i-a10-emac.yaml#
 
-	NFT_META_BRI_INET_VALIDATE
 
-nft add rule ... meta inet validate ...
-(just an idea, come up with better names...)
 
-We'd have to add NFT_PKTINFO_L3PROTO flag to
-include/net/netfilter/nf_tables.h.
-(or, alternatively NFT_PKTINFO_UNSPEC).
 
-Then, set this flag in struct nft_pktinfo, from
-nft_set_pktinfo_ipv4|6_validate (or from nft_set_pktinfo_unspec).
 
-NFT_META_BRI_INET_VALIDATE, would call nft_set_pktinfo_ipv4_validate
-or nft_set_pktinfo_ipv6_validate depending on iph->version and set
-NFT_BREAK verdict if the flag is still absent.
-
-**USERSPACE IS RESPONSIBLE** to prevent arp packets from entering
-this expression. If they do, then header validation should fail
-but there would be an off-chance that the garbage is also a valid
-ipv4 or ipv6 packet.
 
