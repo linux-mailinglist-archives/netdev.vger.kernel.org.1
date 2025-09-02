@@ -1,248 +1,156 @@
-Return-Path: <netdev+bounces-219097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1053DB3FCDD
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 12:41:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00877B3FCEE
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 12:44:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 051673A84D9
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 10:40:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD01F205239
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 10:44:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3D8E2F39A4;
-	Tue,  2 Sep 2025 10:39:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E770D2EFD8F;
+	Tue,  2 Sep 2025 10:44:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=maxlinear.com header.i=@maxlinear.com header.b="t2blhYa1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jU3scmdQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2044.outbound.protection.outlook.com [40.107.223.44])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A70932F39D4;
-	Tue,  2 Sep 2025 10:39:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756809585; cv=fail; b=RxLY/4uzo5bQrTB2DReQQUx6Nk5bpcw1CM4Wd6DX0FO3RohLrXwxbXKffPTOc+SFpdoHh4vqKtexd1wp45jb+Azp7xGy9NO75gbTx1uOuv9gf0AMANfnQKHyov7PcuMxEZsOWvnruIIFCkWddCbcyVWlSxMdQ+ELB0FrWieAwEU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756809585; c=relaxed/simple;
-	bh=3lGJc328TTFeO9/vWs6vXGifKrQ7eS8wZjvk4QvXZ2w=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=oL4DtKlv3llLK3YrbndwWBbCRC9DEWHHYDMtWKLcWQS4TV+/94KJzBkXFLZiCOYASR7uTyREDv3mlGo25DPLgo4oFB/330W6HAtjuq7f0qLyWjTiAh4HfBxCJvYWyLjV+mWZZNtw2ei8WXNB8X2BGvflnjR7qy5PgLSKIxilrbk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=maxlinear.com; spf=pass smtp.mailfrom=maxlinear.com; dkim=pass (2048-bit key) header.d=maxlinear.com header.i=@maxlinear.com header.b=t2blhYa1; arc=fail smtp.client-ip=40.107.223.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=maxlinear.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=maxlinear.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rdk2PavlE/C5GPm6VyniZjKV3Yf3xZ0ZFo0s4QwTGn4VpFO7ZmpcFgF95R6WpFnJijNAB9kaE3jy9GZSWdCtONY/wlax8lk5HI6ej5JfHqGbq4o/57XK7YengmJMTzCgngG52pOwBa5mWTxDHOtReYVI0Gnan6YKUbZ3NuStO5IRozVQp+MZ23vVmcvexfYxdxrbT7EkPrST6P1p6RVEQeAh/TiGhyEV8S4gDgNhbbKlXe9qXedi/9iOVmvASxDdmR+UP9UGi5KOuT3fa3btcEQTcWpHCR330xHan+UN2jdmm+wqPtq53glDIEqlt6F3ocpaEnaD1i37cgt3stmASQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CgHp/8tErfDXld4APtcWEQmQ1fpT/tdRRUEmDFp0A0s=;
- b=RT+YtOU3PzIojBV6PDZm9hSRNszi9PzniW8pL3KOvFA0/m0qLhQvE76ok+7C9vD1ZAq2oHLSgpDqMTijG06nYb2YpEb6H+NBv2dkmLaMsR3yU2olmHcfjgYt/C+vW4EzG1oYixdGSj+98ujROs58z4cXBjA77iWo6tkAgEmjmLLH0aV5gncUwrjfPPG+i2WKY/lvnXTDNMltYxnYmOm4B6Tw1QyMofMBW8nPATdZT1xItTT1DkWW8vUUrnHqWD2hES6zqaU5NDQrtu+t79iVP/JHvOnqsbt3vSXEOmZEFGKNSkM/P+2ecBvCbiv+HQ5h+62oUGYYAkg9Z3qMvH4u0w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=maxlinear.com; dmarc=pass action=none
- header.from=maxlinear.com; dkim=pass header.d=maxlinear.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=maxlinear.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CgHp/8tErfDXld4APtcWEQmQ1fpT/tdRRUEmDFp0A0s=;
- b=t2blhYa1g+qqU/5Yugj7QL4fesHA2K/yZCqXNg1P4SaLglghkoZCbvbfuyPIvaIH5TWxkvLP1QXBCF4fVw3/nVni0clWfirXQL7g7MccvAfuoLsO/CrcqD+Ak4pT5iHKHRo3tN5G8ERit0fAgEsgNg1oHxwnAMO87qSh65t4sASqujGyLF3kpK660aL/d6C705OsxkrKmRU8trLA2loDAL5+DW9EUE9CQ9OQUIq8rbWgNWSH8pq+e3Y2JQQKRR21Ifw6FSToGXJcn1kj8olzkjvmBmLJ9Cub0NJsLqQkHkvC6G2nztso2Uoy8p39gdAUXWdhDMJK9V9mKhV9AX2Wew==
-Received: from PH7PR19MB5636.namprd19.prod.outlook.com (2603:10b6:510:13f::17)
- by CO1PR19MB4933.namprd19.prod.outlook.com (2603:10b6:303:da::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.27; Tue, 2 Sep
- 2025 10:39:38 +0000
-Received: from PH7PR19MB5636.namprd19.prod.outlook.com
- ([fe80::1ed6:e61a:e0e1:5d02]) by PH7PR19MB5636.namprd19.prod.outlook.com
- ([fe80::1ed6:e61a:e0e1:5d02%7]) with mapi id 15.20.9073.026; Tue, 2 Sep 2025
- 10:39:38 +0000
-From: Jack Ping Chng <jchng@maxlinear.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org"
-	<krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>, Yi xin Zhu
-	<yzhu@maxlinear.com>, Suresh Nagaraj <sureshnagaraj@maxlinear.com>
-Subject: RE: [PATCH net-next v3 2/2] net: maxlinear: Add support for MxL LGM
- SoC
-Thread-Topic: [PATCH net-next v3 2/2] net: maxlinear: Add support for MxL LGM
- SoC
-Thread-Index: AQHcGONYZdoM3BaqikyKYzM9KF3Q4bR6E/UAgAQAW/CAAD2rAIABUPVQ
-Date: Tue, 2 Sep 2025 10:39:38 +0000
-Message-ID:
- <PH7PR19MB56366632D5609B0B51FE8939B406A@PH7PR19MB5636.namprd19.prod.outlook.com>
-References: <20250829124843.881786-1-jchng@maxlinear.com>
- <20250829124843.881786-3-jchng@maxlinear.com>
- <65771930-d023-49e1-87a7-e8c231e20014@lunn.ch>
- <PH7PR19MB56360AF7B6FCB1AAD0B27120B407A@PH7PR19MB5636.namprd19.prod.outlook.com>
- <398ad4b1-1bd3-4adc-8bda-5cc8f1b99716@lunn.ch>
-In-Reply-To: <398ad4b1-1bd3-4adc-8bda-5cc8f1b99716@lunn.ch>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=maxlinear.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH7PR19MB5636:EE_|CO1PR19MB4933:EE_
-x-ms-office365-filtering-correlation-id: f8b9c08b-9b6b-45fe-4da1-08ddea0d047c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|376014|7416014|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?c3AQYhDrklb5Vfx46NtbG894gc0rmFIuSQNuu5MAKG1lB2YVCf5rIk9ALOrv?=
- =?us-ascii?Q?lu9zCFH3i5rjXtJNzTf+6e/cDB/K9jVCZroGBKYENVSl9kGPJQrwAMLr6aij?=
- =?us-ascii?Q?2lBOU4DR0bsTBZuRT7wSkmSz7q/ViZe+vwDfOHyiVcIIkcVNpbSfPiv5OiRI?=
- =?us-ascii?Q?iY3WyePkZyNn8zaBBExu7eIZXphqQQpsYI4b3xRB+IqgEn4TEgFPJkr8wRg/?=
- =?us-ascii?Q?WfcgMkPMdV/mfZiMWyCJv/Ctr9hHxVGvMh16hZCDqb4+mRcZByT7GnnXRhO6?=
- =?us-ascii?Q?pUdYi/ExJ+J0IZpATbRkR8aNBx3Gcmq4n2087R+37JJh04oNrqyD5Q6+3C4U?=
- =?us-ascii?Q?G+47cavQAyrqcrIClsxPY6sqKJh/8saC6DxNhlqt3fNixWJ2uLNo7TQA1Ucs?=
- =?us-ascii?Q?IWsKBU1I1hJPhHgH51G6fETxh1IMVVsNsY8ntzGyOjekGzQEsHhKW1dj6xVM?=
- =?us-ascii?Q?GRjL8wD9hf762mesoWOSc475CUcwh5P+NWbQUZWXhXNIcuVd4yWOFgWD2yIQ?=
- =?us-ascii?Q?oxViDahbxpHzAfSLoh3El4PLQ8qTBUnkqVgeZ90slQjf1UZNjEUdb7FuDwuO?=
- =?us-ascii?Q?HKjqZCNiA55aoUuR7znzchdkTVqQFq5xMm8DDpI+NNX1ZRbo97JUH/TSmExN?=
- =?us-ascii?Q?hkrLKGDXxYpmvX/5bt9LAg2ME2F6SCJLl90U37NrHj5fg58ly8EINEDgiZTw?=
- =?us-ascii?Q?8/9q3LfgQzoVFBPg96wf+XxDieeI2QqZI2E72l+unLh9W0u8nfsF5zVbrld2?=
- =?us-ascii?Q?SZ8psbx3eW8oPYeAZEj/rdJDfuV3fMiJXh8Y8NlFUA0YOZHOgvnAyy1CRMlj?=
- =?us-ascii?Q?iAGrWazuGfwXWldT5AXsA68IIG8DQzIuXSP384nUuSeXF5xtUetQ8pBfvLX1?=
- =?us-ascii?Q?1UtfHPIMHDwMK9ffNo7OgXWwq3qXxJKEZElFnWFHoXdzInAHLN2M6m1F+xGM?=
- =?us-ascii?Q?OWEsBL86SrEYOA/yaMc0WWpXfIjr096IUWXJA773W8rFbWDlikfsaWsldygO?=
- =?us-ascii?Q?fQpQPcnRJdy9HqKAlnR+onzH9iEBCwF+uR/tOMYjLTnVe0S171sK4grdnUrB?=
- =?us-ascii?Q?Fnah8o/KL0sk4g2qfSq+68sJR3dRflSnO5j2Lm9cxTqWe0bd26MEHXEk9JBc?=
- =?us-ascii?Q?ZrsXuh0TJVtAdx4oK3BMxgy9PodyfU5soGMNSecpLNyekEP8OlPzsXj6DAya?=
- =?us-ascii?Q?oDsx/8oIsCrn8lKDiHGt/CxZ/AkLmNwIXnYKMcWxEofuxBAcRNwofG4zK35j?=
- =?us-ascii?Q?KghTdBFJa6KQ9SrMHxUwibwo0IShvpMWX6vOUlThxO/KBoKjZoD1YpIQL2/X?=
- =?us-ascii?Q?d8so8lvUHC1K9cG7gSgFEGfamMR/BOiGD4NR9xFa8pd1quG8jQ0/MD1s6rzb?=
- =?us-ascii?Q?UlQIr/5duRVGhPQbgmHMtxAeaisGnlRBB/OebdQYcCJ09FNnLtyj9A5SKvud?=
- =?us-ascii?Q?QWQ8Iya9/eR3Q348/7TKFZCXrp8ajoCUhRic4Wy8uUs/5gZCsFXbCg=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR19MB5636.namprd19.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?lebemE9cSBZkL292wMoTH9XDyXbU33bQ0W/4mJGzLwPzyNaMToTKIgU74Fpg?=
- =?us-ascii?Q?zyLTs0n4RhRzSOaE7Oxs64mqbRXWaj9ivgG+1LayUkUzjmQBIMMYQOihGiuE?=
- =?us-ascii?Q?uNzOid4jyZaSTa+niUNN6zX9JSjDppmOrkTAKwMrpIzOY+hXw6vWWtztETp9?=
- =?us-ascii?Q?kbzQKK7Z1M8s8Yq18EDyB3CsUk0stpXI3pLB6pXxo1tyWYG84o93shQEKgiP?=
- =?us-ascii?Q?+zg/FOqOL7squxJwbwn3DzsXZGJUweFjrV2op3NhkOWe2pBW8lU5uYL3ADlk?=
- =?us-ascii?Q?pavXDf84wU0arNF4yuKmS1tKidLWJ5Q1cTptEnnVKOmKj8Ou50THRXwIx1s9?=
- =?us-ascii?Q?nw8CHX6vKHfglvBfh/9aw9eWUhcW9xg73ZiiMKYhG/CGBKjUBefA2t65V6ua?=
- =?us-ascii?Q?2d2/RyeQatN0HZDKyw2D3phmQBKBqptAgN7pnHKm6ilOmhTgxNgcKdnSgUm4?=
- =?us-ascii?Q?+YFX2xERhgEM6JslRzIYHlm6rTjZtSIhzI+8lUVhnQ15tbBdxTjOe9pdXI5L?=
- =?us-ascii?Q?zT/9V+EFW03hOgqBs0/9iuf5Outwo3y6e+lkoJIjDqE+d3SpYEX9vc6F2b4Y?=
- =?us-ascii?Q?VWSKUVjBgpbNIRJvHltHsYPGRjxpA/OyqjNkhQQ7bS7NniMDmFCx67hpLuxr?=
- =?us-ascii?Q?kYeYsJO7GrF3NKpHTPthcD3tmi6CTYfu4RM8Mqdp9bvfOt8Eq44DIgXXMl8Q?=
- =?us-ascii?Q?rmZaDLiUCEk4vdLI2e0WhB1mTarOO4Sr9iQH9e337o/te+vvQFduverQ8N6z?=
- =?us-ascii?Q?VXL01NowXIq2QOF0yRaJHDLkzoPy69WuNO/Fh78b4mN1oRsV6BymhvMCPMaB?=
- =?us-ascii?Q?7GNnXmFRhBRgWcB/LTx6IruTBUjHAwSXqkb7FRMAXHHmTBBFF+Tu5RM450Jf?=
- =?us-ascii?Q?yMC0rk9Hv1BM+DPl1d/wU9+MKwiPerSMpBaha1GMxBB666Bbte2V+uSkIiUZ?=
- =?us-ascii?Q?FjgDjsVDmbliHuUfomcsunlX3BmMdwMFrLXexRxI+WZPMdrPajFr7YNFHID6?=
- =?us-ascii?Q?hRkvVp23mfBigubNHp7hNuD4J3kG4zXIUeRCIKHfk0kHVe1VB/dDWHZfauf4?=
- =?us-ascii?Q?vYNbGNmOlFctGIj5INR6vFV1gYYy8qplBvtV55C6v470wliDxvOr/jFpg3ur?=
- =?us-ascii?Q?DoTy+jkLCyTGI9a7/Xe2jVWKw+b2iW6dn90TyCnF7/TuXcWG9vSpSAjIR6WJ?=
- =?us-ascii?Q?dp4KC0AKH5CL4GJqhz6R39briUDzt8T48WdshzpOOpcDkCo/PRCdnFyrAshZ?=
- =?us-ascii?Q?E3HL7VZUvrGEuLKUK7aqXDN4CxHccoo87Yv5dpIfxs0vbc7gcjiBXOUmlZcj?=
- =?us-ascii?Q?CCCnER5uxq7t7fmV6bChS/2zQbYpErItOupPE/lX3R+h+GHq/R+8e8kMS7PC?=
- =?us-ascii?Q?SBlGHcbefQjd6ofHMkn5hydjQGS8BPEmq/a1oFNmUbdS/xrz72FknfiwYnEX?=
- =?us-ascii?Q?hwVarItQgEtBUGstC+n34KMAQpj0I7J8JJRMQfk918dcZZYJuCYuizK4+CLb?=
- =?us-ascii?Q?sbmc6XhRsdp0q005Hxg8J+cLAJnJ6OvYz3UK9r9tR1jaPnAfxTdhZkPkOUD5?=
- =?us-ascii?Q?Cwk9OmCeWK1ArtFVebZn5grWlEN2elI14QAJPX6n?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48346145355
+	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 10:44:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756809844; cv=none; b=ql7FoOktN1NbmEvacRRPdE/NKek3m5bthY3LvobvlY+AqUfyFbd4LgRMrQn0S1ENhp2p8ojQvp9geUH7tZi7iFrYZvd1F9mUJ2qGVf03YAsFXD4fDcxAx6QdObEMpK1PloFUvbaGJ+YhOU77YmHvlPs3OwvwAo+1AU8oim53HZ0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756809844; c=relaxed/simple;
+	bh=6hesa9TLeYxv3q6e9DhRIDI/mxQpv+JYQO9aNhgs8e0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ejyre74XZquJBcLSBabRuNCmMzp+G3RFDzgYXnagnZ4wzXSiYZTKTBF696Ark3bn2FcoTFWLTcxx/QIx3HGB4ifXLKIHk8LdzrAvNVdnrBdQwcUse9nh9r6YS2x72kUtcoBNbgUvFnVq4h0PB0wgMhpsv0baJnLDyBCEe0oq4oM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jU3scmdQ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756809842;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Jo0/Mj2/+9yOGLss6nLTorYX1OMBEsZpD1lT6UPRfdI=;
+	b=jU3scmdQwmkVH2+vA69840e28zI79uYVRFJn0aohyGZlHwe3yAdQzl+4JVnLFSvJ8Rr5Xm
+	+SUY7c5YZYzGyHArYkSTtB4lJF6Ztg1xTTfZJPEXAxS+8+WJxV6SXrKvqHwPtX+Tj1dR1y
+	lSzvSQVMKKc5qyIcrjGJ6Sw8z0n2PqI=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-558-x1FvC9xEOzCgT9SCBXQUXg-1; Tue, 02 Sep 2025 06:44:01 -0400
+X-MC-Unique: x1FvC9xEOzCgT9SCBXQUXg-1
+X-Mimecast-MFC-AGG-ID: x1FvC9xEOzCgT9SCBXQUXg_1756809840
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45b71eef08eso27115485e9.0
+        for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 03:44:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756809840; x=1757414640;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Jo0/Mj2/+9yOGLss6nLTorYX1OMBEsZpD1lT6UPRfdI=;
+        b=p8Ofbj6a8lmnPfjuN+3ufzG1y6UFJOreKudeTsRoQgAM2RAAAld9yOQMuu9MkRbHBw
+         hc6PehgdpwdKIMKqW/KWb4DLfq9s4Ba8IBpJx0eUbiMcto0t2OIw04/Z7icLJ/vJIdzy
+         kH3UbuwCXoBsQRre7orRVWpXpSV0w7SqhT//mDplpbaSH7lfC0nsjSLPgowifgcPIf0i
+         Lid3DEn81FnM7VHfNl9bedKoCwWuGbQxUhtE4BKvUIm9IG30du09aBy2QbjqKiMpHzu3
+         joPm74MwXe+UtkEjkDHUcQ7DjwqoA6Vjwjs20lvSocLKlB5BkQ7/Df6ARFeQ7lpfPikr
+         U6Aw==
+X-Forwarded-Encrypted: i=1; AJvYcCVRBUYG4o7wQqANRZmjuSxH1g2IXYUveEqhcXW85qC3PbvSF3RI+i/8fLVl/tvEsNDlxk7zehI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9QtlPta9DoDGkT5dM6uN1vYcL5VrndK1XoTL6sEa4XhVHW64o
+	TxOvl9fpgdrIWPypzoFAtWa5SIpZr3VZL1Dcy/vc50nwpl7PKPAadSkMhpgMEOjq8xu1v39pCiq
+	yPgR2dxMwYdRiN4N5ksbiJD4r+ctp3gDaVsk+WLw1iNrYbh3Q83ZmVDjLKw==
+X-Gm-Gg: ASbGncuOUgFtnxR8qezWwArK58bc4gljIhXY7oh24C0y+RUPK55MvnAODQeBk8M1k6R
+	vA/rvOFdyR+F+ct9QBG64VDMrjT60X7kvhFC9/Ol22kHd9bvsWbfINupx/j/YwbXjD4qyBKgWwm
+	UN5yXt9pAd8eJuiWVyqAfSWYuL6Y7AI1eV5AL3U0dpTXYr6Dz0LnYAVsKzwstV2/rCKzG32ZSJs
+	IDNbkUia1Eu7GOHGYcf7EMfxkPQ2Bk9tbJlN8H0G6sLlwuTGbv78dVuspRo0gFxSSCGxhnXUF7k
+	yyA7afC/ZRFSpn0tpeVF9rwr3QIKVZxEzTp5mIw+HzhzzHCeU0i6IiLDWp3RnPLVca/yobbnNIR
+	Gb7tg0vBIFio=
+X-Received: by 2002:a05:600c:524f:b0:45b:8453:d7e with SMTP id 5b1f17b1804b1-45b85526a68mr93034995e9.6.1756809839699;
+        Tue, 02 Sep 2025 03:43:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGD+Nyf/fbAZ/gveofQdn8RFyjdqlaPnTraLhEZlhkMD2OZGug7tcHAInCh6y2cJsJ1vckjFQ==
+X-Received: by 2002:a05:600c:524f:b0:45b:8453:d7e with SMTP id 5b1f17b1804b1-45b85526a68mr93034715e9.6.1756809839302;
+        Tue, 02 Sep 2025 03:43:59 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e00:6083:48d1:630a:25ae? ([2a0d:3344:2712:7e00:6083:48d1:630a:25ae])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3cf276d643dsm19520553f8f.26.2025.09.02.03.43.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Sep 2025 03:43:58 -0700 (PDT)
+Message-ID: <c282cd8e-96c5-41ab-a97b-945cc33141ac@redhat.com>
+Date: Tue, 2 Sep 2025 12:43:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: maxlinear.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR19MB5636.namprd19.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f8b9c08b-9b6b-45fe-4da1-08ddea0d047c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Sep 2025 10:39:38.6611
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: dac28005-13e0-41b8-8280-7663835f2b1d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: cO6lyeEtuWVJQC0g/eM9SRBFswBhMOFZpVNL2fcebb1s+OlbQeWp2MkdWp3bXUj5ywvxhVMXeXQxGIwLCeakNA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR19MB4933
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v10 08/19] net: psp: add socket security
+ association code
+To: Daniel Zahka <daniel.zahka@gmail.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Boris Pismenny <borisp@nvidia.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
+ <willemb@google.com>, David Ahern <dsahern@kernel.org>,
+ Neal Cardwell <ncardwell@google.com>, Patrisious Haddad
+ <phaddad@nvidia.com>, Raed Salem <raeds@nvidia.com>,
+ Jianbo Liu <jianbol@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>,
+ Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+ Stanislav Fomichev <sdf@fomichev.me>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Kiran Kella <kiran.kella@broadcom.com>,
+ Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org
+References: <20250828162953.2707727-1-daniel.zahka@gmail.com>
+ <20250828162953.2707727-9-daniel.zahka@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250828162953.2707727-9-daniel.zahka@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, 1 Sep 2025 15:11:08 +0200
-Andrew Lunn <andrew@lunn.ch> wrote:
+On 8/28/25 6:29 PM, Daniel Zahka wrote:
+> +int psp_assoc_device_get_locked(const struct genl_split_ops *ops,
+> +				struct sk_buff *skb, struct genl_info *info)
+> +{
+> +	struct socket *socket;
+> +	struct psp_dev *psd;
+> +	struct nlattr *id;
+> +	int fd, err;
+> +
+> +	if (GENL_REQ_ATTR_CHECK(info, PSP_A_ASSOC_SOCK_FD))
+> +		return -EINVAL;
+> +
+> +	fd = nla_get_u32(info->attrs[PSP_A_ASSOC_SOCK_FD]);
+> +	socket = sockfd_lookup(fd, &err);
+> +	if (!socket)
+> +		return err;
+> +
+> +	if (!sk_is_tcp(socket->sk)) {
+> +		NL_SET_ERR_MSG_ATTR(info->extack,
+> +				    info->attrs[PSP_A_ASSOC_SOCK_FD],
+> +				    "Unsupported socket family and type");
+> +		err = -EOPNOTSUPP;
+> +		goto err_sock_put;
+> +	}
 
-> On Mon, Sep 01, 2025 at 09:38:44AM +0000, Jack Ping Chng wrote:
-> > Hi Andrew,
-> >
-> > On Fri, 29 Aug 2025 22:24:06 +0200
-> > Andrew Lunn <andrew@lunn.ch> wrote:
-> >
-> > > > +This document describes the Linux driver for the MaxLinear Network=
- Processor
-> > > > +(NP), a high-performance controller supporting multiple MACs and
-> > > > +advanced packet processing capabilities.
-> > > > +
-> > > > +The MaxLinear Network processor integrates programmable hardware a=
-ccelerators
-> > > > +for tasks such as Layer 2, 3, 4 forwarding, flow steering, and tra=
-ffic shaping.
-> > >
-> > > By L2 and L3, do you mean this device can bridge and route frames
-> > > between ports? So it is actually a switch?
-> >
-> > Yes, the SoC does support packet acceleration.
-> > However, this patch series primarily focuses on the host interface to d=
-eliver packets to the CPU,
-> > where bridging and routing are handled within the network stack.
->=20
-> Linux has two ways to support a switch. Pure switchdev, or switchdev +
-> DSA. Which to use depends on the architecture of the device. I would
-> like to check now, before you get too far, what the hardware
-> architecture is.
+It's not clear to me if a family check is required here. AFAICS the RX
+path is contrained to IPv6 only, as per spec, but the TX (NIC) allows
+even IPv4.
 
-Hi Andrew,
+What happens if the psp assoc is bound to an IPv4 socket? What if in
+case of ADDRFORM?
 
-Thank you for your valuable feedback.
+Thanks,
 
-The switch core hardware block is part of the MaxLinear Lightning
-Mountain (LGM) SoC, which integrates Ethernet XGMACs for connectivity
-with external PHY devices via PCS.=20
-At initialization, we configure the switch core ports to enable only
-Layer 2 frame forwarding between the CPU (Host Interface) port and the
-Ethernet ports.
-L2/FDB learning and forwarding will not be enabled for any port.
-The CPU port facilitates packet transfers between the Ethernet ports
-and the CPU within the SoC using DMA. All forwarding and routing
-logic is handled in the Linux network stack.=20
+Paolo
 
-LGM SoC also has a separate HW offload engine for packet routing and
-bridging per flow.  This is not within the scope of this patch series.
-
-> Are there any public available block diagrams of this device?
-
-We will  update the documentation accordingly in the upcoming version.
-Please find the packet flow at a high level below:
-Rx:=20
-PHY -> Switch Core XGMAC -> Host Interface Port -> DMA Rx -> CPU=20
-Tx:
-CPU -> DMA Tx -> Host Interface Port -> Switch Core XGMAC -> PHY
-
-> How does the host direct a frame out a specific port of the switch?
-
-In the TX direction, there is a predefined mapping between the Ethernet
-interface and the corresponding destination switch port.=20
-The Ethernet driver communicates this mapping to the DMA driver,=20
-which then embeds it into the DMA descriptor as sideband information.=20
-This ensures that the data is forwarded correctly through the switch fabric
-
-> How does the host know which port a frame came in on?
-
-On the RX side, the source switch port  is mapped to a specific DMA Rx
-channel. The DMA Rx descriptor also carries the ingress port as
-sideband information.
-Either of these methods can be used to determine the source switch port.
-
-Best regards,
-Jack
 
