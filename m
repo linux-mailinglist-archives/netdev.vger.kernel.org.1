@@ -1,115 +1,148 @@
-Return-Path: <netdev+bounces-219354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D21D4B4109D
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 01:10:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78F59B410A1
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 01:16:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 646DC3B75FA
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:10:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 153F41B63EE8
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:16:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 825281547C9;
-	Tue,  2 Sep 2025 23:10:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C0C61E9905;
+	Tue,  2 Sep 2025 23:15:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kt+r4611"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="apcsHi9K"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D9C232F743
-	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 23:10:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E20923B0
+	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 23:15:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756854606; cv=none; b=Y4Z2QZdh/lyrKEr00ayrialsxbn1DqL7qAV2zL+hKNwJn5MObkTTsv2V1osF8eixwrDezLlG/UA/fcFWxmB2a06Bms4ZQEjn78M77vFdyTxdd1cgQtnonLm6yWrIZhgvZfHGPgDr7eAVtMoJHxXgdNQtkMJvTH4Fg+KCTb79MIA=
+	t=1756854956; cv=none; b=p8BbiZ5pD5K+Pr1fVUpQAropNDRh1u9WRYXAxbpA013f7Mihyq+lG+9Bi5LLRkLnSEh24DrCdOFvJb6UZgzvZtLtOpeyz+ziwL4c1x37RUh3OD801MN9IyVRcL5uItJIO9sBtk20ObDqau7pQ59BXffYJ2GCOnzJQt074ZXGyUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756854606; c=relaxed/simple;
-	bh=pkNDw9d3nn0qkldOJINbDzKAWr5JncPnXMYSrKyzV6k=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=sM8A5S+59Apg8cFuCRZEdAQez3WmItcQdqEkFUUtICvd85E4GK5NjSgJwEE5dRAtFyVVaUtKsgU36p9gsTwfFhDMHEE9+4GtJ2U40mwLxvn/1n2WwUdAh1Y7H02vyjiBxYZKVKnIMsc3mOzSpaDv2fIRxCnfuR/0LxtLFIWaHjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kt+r4611; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFFD5C4CEED;
-	Tue,  2 Sep 2025 23:10:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756854605;
-	bh=pkNDw9d3nn0qkldOJINbDzKAWr5JncPnXMYSrKyzV6k=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kt+r4611FB5QzohQO6F0bXpy5FlTgCX5cAJrT1SunCpJ/QFlR9EgvKRlk9iVlfR6P
-	 DAly21ROmzqh+qgK19IRmzcCR74hqvNAcbpO956EqquO/SKm+jq5jWLuktMJzDUKUy
-	 NMRr+NbY2z5sI5v5a3heSg/IaWWyKNgzPZAX8T+uIgJfJpoz1vWWwDZ1KSznB9ly5m
-	 JrN5PhAAzuU8vcdFJOXya0ERjwGyRNCX4sVUPpwxv1djZdTm8YohePXYuURe+dBy79
-	 SQgnLyhmQTGDiwrkECJMph8sLSUfD7S5rnBQKRT5E5HzoVtab8WWfAyLYNo7KSlVRC
-	 2CEMOnWJntW+Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D43383BF64;
-	Tue,  2 Sep 2025 23:10:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1756854956; c=relaxed/simple;
+	bh=DbQCvqYChsHNKA+kj4v8hsxID/VZEKq3C7g+d7mEY2Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=X3k00hHjuxDp3BZAPNaW9Dt/Mi18g5AetO+neBeJ9PE/eWMLUOaXpmuHCLjHKwY8wggRLKIxMj+Qp1z/rx9UkjLem5paXfYRBa2nZDqdSzzfpTbYoiDFj4bfTmkxxRUlfDpjInkzWKNTgDqHnSHuCKq17Mh/VIbsIK1Wjfb5U2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=apcsHi9K; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=aoJ6mDX6X02ow2aBjJLKBdD9+WaCfDN9/SM8s+5Nlk8=; t=1756854954; x=1757718954; 
+	b=apcsHi9KqdgLksiTd9Bh47fEp3J2tRwVpKI/fj5gwMnyil6HK4/NcsTNAF2Bfk5AxWFu6UzJyn7
+	7AMruRijEtYpgHOtCkKjKUNx/4ARp2vKbs3lgvAxr+s0dSBSwhtmmy81jwnlITcqSW58pLz+T6sFI
+	nxZK51E4SHgIb8Iv1mYp0/qeYouPpuodTXXQ4QR8rNzi+RW13AmurnzO08Ru1gyj4rYRv13Q8tpOI
+	uj3t6GJKolL8/zsYl6B9Cw26eovw9/6SxiHFHtpjqMMUk4GHzIxZ2sUuzz25b3tr8gXGm+6xaEjss
+	+eedi7teuz1aTo/tmusa0hlm6AR9RjIYhqjw==;
+Received: from mail-oo1-f49.google.com ([209.85.161.49]:43173)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1utaED-00021k-8B
+	for netdev@vger.kernel.org; Tue, 02 Sep 2025 16:15:53 -0700
+Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-61bc52fd7a4so296601eaf.0
+        for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 16:15:53 -0700 (PDT)
+X-Gm-Message-State: AOJu0YwFd1ra9NxoXoKAEm/ip8UXxNAyQ7LhRW81ikinX0cWHcpxmxcH
+	toi+RQcro/k/ZJRpI/oJnVCjazc3kgIPqlHcuGDuqNnt44xWn77XGsGaojHPgAsCFTCgg9jM8Qd
+	uki+IgHqd3rLLA5hGu+gAINxIdn9oG+s=
+X-Google-Smtp-Source: AGHT+IFDmUqLrMrDvFQcSAno+peXY3+dIeWyvNeHNxD7xyDuC8Uw6DgCi0fiidAXA4sLsUItN5gq0brlkbOqQtIoGfA=
+X-Received: by 2002:a05:6808:4f23:b0:433:fabb:9b19 with SMTP id
+ 5614622812f47-437f600c0e8mr5900610b6e.3.1756854952645; Tue, 02 Sep 2025
+ 16:15:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net/tcp: Fix socket memory leak in TCP-AO failure
- handling for IPv6
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175685461125.464015.5426802978312843780.git-patchwork-notify@kernel.org>
-Date: Tue, 02 Sep 2025 23:10:11 +0000
-References: <20250830-tcpao_leak-v1-1-e5878c2c3173@openai.com>
-In-Reply-To: <20250830-tcpao_leak-v1-1-e5878c2c3173@openai.com>
-To: Christoph Paasch <cpaasch@openai.com>
-Cc: edumazet@google.com, ncardwell@google.com, kuniyu@google.com,
- davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, 0x7f454c46@gmail.com, noureddine@arista.com,
- fruggeri@arista.com, netdev@vger.kernel.org
+References: <20250818205551.2082-1-ouster@cs.stanford.edu> <20250818205551.2082-15-ouster@cs.stanford.edu>
+ <a2dec2d0-84be-4a4f-bfd4-b5f56219ac82@redhat.com> <CAGXJAmztO1SdjyMc6jdHf7Zz=WGnboR5w74kbmy4n-ZjJHNHQw@mail.gmail.com>
+ <6efc1a99-b5b1-4a22-9655-fb9193e02a7f@redhat.com>
+In-Reply-To: <6efc1a99-b5b1-4a22-9655-fb9193e02a7f@redhat.com>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Tue, 2 Sep 2025 16:15:16 -0700
+X-Gmail-Original-Message-ID: <CAGXJAmzgw3FCgXaKHQr4fFJw-ETsuD_uyZC54AHV76BGH280vA@mail.gmail.com>
+X-Gm-Features: Ac12FXwvrXeVqzLQ4ZkOFBIj-Mmo1OgC1yixS93zsuBbAF8b0LKj9ddcAGrBOLY
+Message-ID: <CAGXJAmzgw3FCgXaKHQr4fFJw-ETsuD_uyZC54AHV76BGH280vA@mail.gmail.com>
+Subject: Re: [PATCH net-next v15 14/15] net: homa: create homa_plumbing.c
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: -1.0
+X-Scan-Signature: 1c1d34d4ae2aac1d1f929c6f17b0cb0c
 
-Hello:
+On Tue, Sep 2, 2025 at 1:12=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
+e:
+>
+> On 9/2/25 12:53 AM, John Ousterhout wrote:
+> > On Tue, Aug 26, 2025 at 9:17=E2=80=AFAM Paolo Abeni <pabeni@redhat.com>=
+ wrote:
+> >>> +             header_offset =3D skb_transport_header(skb) - skb->data=
+;
+> >>> +             if (header_offset)
+> >>> +                     __skb_pull(skb, header_offset);
+> >>> +
+> >>> +             /* Reject packets that are too short or have bogus type=
+s. */
+> >>> +             h =3D (struct homa_common_hdr *)skb->data;
+> >>> +             if (unlikely(skb->len < sizeof(struct homa_common_hdr) =
+||
+> >>> +                          h->type < DATA || h->type > MAX_OP ||
+> >>> +                          skb->len < header_lengths[h->type - DATA])=
+)
+> >>> +                     goto discard;
+> >>> +
+> >>> +             /* Process the packet now if it is a control packet or
+> >>> +              * if it contains an entire short message.
+> >>> +              */
+> >>> +             if (h->type !=3D DATA || ntohl(((struct homa_data_hdr *=
+)h)
+> >>> +                             ->message_length) < 1400) {
+> >>
+> >> I could not fined where `message_length` is validated. AFAICS
+> >> data_hdr->message_length could be > skb->len.
+> >>
+> >> Also I don't see how the condition checked above ensures that the pkt
+> >> contains the whole message.
+> >
+> > Long messages consist of multiple packets, so it is fine if
+> > data_hdr->message_length > skb->len. That said, Homa does not fragment
+> > a message into multiple packets unless necessary, so if the condition
+> > above is met, then the message is contained in a single packet (if for
+> > some reason a sender fragments a short message, that won't cause
+> > problems).
+>
+> Let me rephrase: why 1400? is that MRU dependent, or just an arbitrary
+> threshold? What if the NIC can receive 8K frames (or max 1024 bytes long
+> one)? What if the stack adds a long encapsulation?
+>
+> What if an evil/bugged peer set message_length to a random value (larger
+> than the amount of bytes actually sent or smaller than that)?
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+1400 is an arbitrary threshold. This has no impact on functionality or
+correctness; it is simply used to reorder the packets in a batch so
+that shorter messages get processed first. If the NIC can receive 8K
+frames it won't change this threshold; only frames shorter than 1400
+will get the scheduling boost. If a message shorter than 1400 bytes
+arrives in multiple packets, all of the packets will get the boost.
 
-On Sat, 30 Aug 2025 15:55:38 -0700 you wrote:
-> From: Christoph Paasch <cpaasch@openai.com>
-> 
-> When tcp_ao_copy_all_matching() fails in tcp_v6_syn_recv_sock() it just
-> exits the function. This ends up causing a memory-leak:
-> 
-> unreferenced object 0xffff0000281a8200 (size 2496):
->   comm "softirq", pid 0, jiffies 4295174684
->   hex dump (first 32 bytes):
->     7f 00 00 06 7f 00 00 06 00 00 00 00 cb a8 88 13  ................
->     0a 00 03 61 00 00 00 00 00 00 00 00 00 00 00 00  ...a............
->   backtrace (crc 5ebdbe15):
->     kmemleak_alloc+0x44/0xe0
->     kmem_cache_alloc_noprof+0x248/0x470
->     sk_prot_alloc+0x48/0x120
->     sk_clone_lock+0x38/0x3b0
->     inet_csk_clone_lock+0x34/0x150
->     tcp_create_openreq_child+0x3c/0x4a8
->     tcp_v6_syn_recv_sock+0x1c0/0x620
->     tcp_check_req+0x588/0x790
->     tcp_v6_rcv+0x5d0/0xc18
->     ip6_protocol_deliver_rcu+0x2d8/0x4c0
->     ip6_input_finish+0x74/0x148
->     ip6_input+0x50/0x118
->     ip6_sublist_rcv+0x2fc/0x3b0
->     ipv6_list_rcv+0x114/0x170
->     __netif_receive_skb_list_core+0x16c/0x200
->     netif_receive_skb_list_internal+0x1f0/0x2d0
-> 
-> [...]
+A sender could cheat the mechanism by declaring the message length to
+less than 1400 bytes when the message is really longer than that. This
+would cause the message's packets to get priority for SoftIRQ
+processing, but all of the extra data in the message beyond the stated
+length would be discarded, so I'm not sure how the sender would
+benefit from this.
 
-Here is the summary with links:
-  - [net] net/tcp: Fix socket memory leak in TCP-AO failure handling for IPv6
-    https://git.kernel.org/netdev/net/c/fa390321aba0
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+-John-
 
