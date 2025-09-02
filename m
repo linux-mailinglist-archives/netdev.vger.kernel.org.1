@@ -1,179 +1,256 @@
-Return-Path: <netdev+bounces-219187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D2EEB405F2
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 16:03:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 811D8B4063C
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 16:11:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9FF0188A8D4
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 13:58:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81C0B172B48
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 14:05:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70DDA2DAFCA;
-	Tue,  2 Sep 2025 13:56:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDDCB2DF3CF;
+	Tue,  2 Sep 2025 14:05:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="h2RQdsy1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aTP5ycis"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2047.outbound.protection.outlook.com [40.107.223.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B687B20B1F5;
-	Tue,  2 Sep 2025 13:56:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756821398; cv=fail; b=hyzdzV3tVsCiH3m68N5XjkbL1bWk5f5pcPqrvfms1D7I4Rak3AzehSalK0nVy5JIoQAHdM7lzQkMhIZvMFh0NUtegMGS066eCDE65XZaOfNuf4Eq6DIbH7vQKo7KaDGxES3/dV+XYFs914gRurRfWtTDSwJSGSn/KUHGqt+Jj3I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756821398; c=relaxed/simple;
-	bh=481xXnogg0xI0PAS/zL/3jWgbEyUdLEpcNYBWqP2Zms=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=AwZJXI8l35bMZXWUCYPYcIsu4m4fb2Qap9gx8NHjPwjCMIdq/v7aj8Xc67e2bwd9fjWrXBhIOQQtJp9BnDsoxSp3EHDMdXnYHO5bFTvRjk3OeeLFbywm49e+PkRJMb0IiSOJ8cROjMUaM5IUtnVEnwvNw87qzj1xbzsWvDvS8ws=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=h2RQdsy1; arc=fail smtp.client-ip=40.107.223.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Z9wkQzKNpKNr7YoCp9//JEqULMOJ7odEhgk2Q3DQpgSd2nuzng1aSAqiUBpjnvdHdSnIov3RJfI3FRYCR/YZOLaC2zih3AhJb5OnSiUFBO9CwtnsWk/R4jtQ9BjpNRFYdAGoQWgF3iqHMHY46dul5VAkRHI2Fz6l5k6dskw/xQR5qfCm1pPoVUMPDXgf/z+IOJ9xAUrcaHTvNvSbeypVEuRLAC/USRXG8jrnYUj3YPKp6naaaXT+CZVJ8H1xeHdlDLa1e4oeKwFN414RXPmBwYWA9FJ6+zEu4Z/2vORzdiudC007FOB0mErqEAP5ZkFh9C/ZSQB8D2n9eIZMfsZlJA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5+Qow4qRuSHkcAHpAqvc2yW+215D1SRosVDTop+mBdk=;
- b=qWZBemB2gV3yio0hLJ8w9nO8FxwiIjpcCS8WerE7rtKcZqGk5GfvXwSPl4HKvL1KtgbEaQGVaPWYDGAGO7vZEhsWSBDDskIE7dDju/3dwSB831WMQQcNSIIBA4+QvRj0qsszTF6eQF4v3mKHi6/Ex0o0gz4ycBK62YHnM2zQGtnhHx44MMtoy+FxJnm5tMwAynlftV7GwV4ZU5uPf663/PqbbGNikJu2zhh4b5g1/00SfPiQfAmqc9VjF/Rkven2vNgG21LGrpuVSK1z6l3SndgbnVJTyYMZ0F/2nEMFctEkNm44RIctPlWgKWbY3GD8VVBrTNKPMeOvkcfhxyjizQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5+Qow4qRuSHkcAHpAqvc2yW+215D1SRosVDTop+mBdk=;
- b=h2RQdsy1a/3M8R8fSG9IhMHEpb66qBDbCk1XuW1YTXmV0nG15UDiPtBHwMDBRBRNP1IaqeLY6XPeesMzlxKxrM7ZZDSV0pBG1xX/bCYCoHc8GH8+CKaExn0ARovGZuG6PnohDbSm/aOZihOusSIa2ZDHlw2i9ckV+V6HpjGVaEu9Zoh0r9uyX8mPy4mKA7UrgS3d6gR5EKEZxr/JSRyn13zKBJY2Tg4TgFKByX9c0Cr7CNtQoq+0IPnErW2BQ9RnLG5FoQDbDuBrbYSmYDrenmQe+726XlI9zbp8nNyUXy4zTIHsXMUMoO2oiOMxDkQ3vrwDYQUR8jXIHk9sLb1cZA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by MW4PR12MB5627.namprd12.prod.outlook.com (2603:10b6:303:16a::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.16; Tue, 2 Sep
- 2025 13:56:32 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.9073.026; Tue, 2 Sep 2025
- 13:56:32 +0000
-Date: Tue, 2 Sep 2025 10:56:31 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Abhijit Gangurde <abhijit.gangurde@amd.com>
-Cc: kuba@kernel.org, brett.creeley@amd.com, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, corbet@lwn.net,
-	leon@kernel.org, andrew+netdev@lunn.ch, sln@onemain.com,
-	allen.hubbe@amd.com, nikhil.agarwal@amd.com,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 00/14] Introduce AMD Pensando RDMA driver
-Message-ID: <20250902135631.GO186519@nvidia.com>
-References: <20250814053900.1452408-1-abhijit.gangurde@amd.com>
- <20250826155226.GB2134666@nvidia.com>
- <d829c4ee-f16c-6cfa-afdc-05f4b981ac02@amd.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d829c4ee-f16c-6cfa-afdc-05f4b981ac02@amd.com>
-X-ClientProxiedBy: YT3PR01CA0018.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:86::22) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A5B12DF6EA;
+	Tue,  2 Sep 2025 14:05:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756821934; cv=none; b=kJKiLGShfT0ao7Kn0CXi1LDMUpajoxH7FtTFWTy6p7RDtBUHSnsnuy0UBAbudn/aJsc+hKfEjV8F0HshIWVCLVpwm05tRl7zBI7bNyzsj7TQsVg7ddsMBFL92rR1lnxU4/0MqZMcG5Z0zLYwxSV63ERuvYK7pW225C12IA208uo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756821934; c=relaxed/simple;
+	bh=WqL8QEjjL7r4XmNavrTNC+GBSLmdfzhOFFZTbcF8008=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=V1TI3FiWwj85tDBpG2aSf4H1H/U4Ux/vS/6pi8fAllLiMnUGakkIE4jbaWe3sELngn693eYfhQzn4ZUN0wUl+nwD+q/iCLBpGii1ZArpmWyi6zRwxQUqfif7Cs52OyKrw335UQpjqye7UWayy4xtqbSGh5HWYeUQUjXexD5ezXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aTP5ycis; arc=none smtp.client-ip=209.85.166.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3ea8b3a64c7so23647345ab.0;
+        Tue, 02 Sep 2025 07:05:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756821932; x=1757426732; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IuUbMHTW3Lrm+ILnoYOreD7nrQXIKzGAX3ZRUUd3/Fk=;
+        b=aTP5ycisnFrknjwUzaBt5xp6nqijRBPsGvqNJs21FW/ISB/tURmU0C1/u8Ep4aXdtL
+         jpWQsdGA94JfL3SS/DFCfVkD9lH7OYMDShD2VPxMz1Tn4VYRCucv+49WxFzTJoo0g9gj
+         gJJ+vkiC6Bj/Wj/75tosjWDkJ82+u75jmi/rpM2SnsBo091+JqIaZ5zjqtrDGbJ1qYmz
+         r2xhvMTuh1MGaX6Zyn7t2oofuK1paNstPoI1HjBNpIN+VR/doWXY+6SLMHIPENqz+94J
+         DbszFhlNp3aY5UQpXoVVNUxrxK/ZobkTAF2CyOikjVC+uhR/0ooTVtM6MfkS4QCk7Lco
+         TTlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756821932; x=1757426732;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IuUbMHTW3Lrm+ILnoYOreD7nrQXIKzGAX3ZRUUd3/Fk=;
+        b=Rl2nIXEQ6azH/TnATSqr131PJIlq5ASx0+zNINQu7rjiDq1AAcerzzCpT2Fl1ICD34
+         cDvE5dNyiaMzT9lvX1Hi7UgTki+2psR/26FamfjlQVUqYjHg7DodHliimRm21IT1SsRk
+         4P2r2WhhWPymNZbI+ikuMTvLcEhW5RdaJlPuWtaLFtR/2iiQIYfL9CLBmGxRG1KiHNbA
+         /wB30WvmQ2TJAPf0NY2JtBm9goDuO5JPunesBft5wgWniV8d/ddPzmP/4NalO904T0rR
+         9zKGDnH02GjrvxeCw2FGXi+o/hfniuY4xoeoCnqJggnsjnZq7b9CiBeKmDZ1kq2zIoqo
+         UUDg==
+X-Forwarded-Encrypted: i=1; AJvYcCUsTUUkyJEIBW42e/07UD8GdQ2qPxySv/WBVqQfaq+bKqXWTX2w6RnwE1St9jVWHwryt/AiMlkn@vger.kernel.org, AJvYcCXm6lv3z6Kelt3nusrM2uwbyY+hAz7Nw1dj4KPhoioUobUu832a5+35MTdwQskb2NMJ9w2TKJJ5H6tl7qE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlOZ05DpZ/RWDm0LZ9sthxrFDG3WXQiMGVFc95HhAV+1tGvQ4u
+	fdk1C5uosBcEdjQ9QYuD6GIpE/udy3cF6sirVg7AE+9A845MgXn7P5x65KFlT6JNlXkDs5yX3gb
+	Lg7Hn+tVddE38JqNbEgav5m55trnza8eVioj9os0=
+X-Gm-Gg: ASbGncvdTlB+DmIkBdNtlvYBoVnRdKatNB9daXEWEnatFo3UaOuTRy/9yNDBpdrwb/f
+	QVkMoeg70hmu3rYFBtSmoOe3ujmThBV8KFBFvWHSxb6K9pTINl40mvCdlnScI8efJ06jocDlfKF
+	EsHzAwEdLHv8lffqYEtMeDKrHSXday1Ilvv4vl9wEtG8aIxfy4I0nkrxA4P5PH0WNTlW4q50O5d
+	nBdyQ0=
+X-Google-Smtp-Source: AGHT+IH/faVvJRDetkmio72Ojj/stYKECnbth7d+fvSheZOVTsIDjzFD6JWCYHcExo0xbigEaUjvq3iZ5W8i4VdL6Yw=
+X-Received: by 2002:a05:6e02:3c03:b0:3f0:4a62:cfd0 with SMTP id
+ e9e14a558f8ab-3f4000974ddmr230827905ab.4.1756821931907; Tue, 02 Sep 2025
+ 07:05:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|MW4PR12MB5627:EE_
-X-MS-Office365-Filtering-Correlation-Id: 01a9de13-d6bc-4dfb-b4dd-08ddea2885c9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?eV3hKjKp/Rg30rjUr8mVloj0MYzsc2v+0BegLw3+ff7Uj9r+pYs5rk9Z+6Ph?=
- =?us-ascii?Q?P/AEEsfNThv3f1/SgYHIp0JLgrZ6TAPrldc9LaVSaG+OBHSuArmQz+s39efK?=
- =?us-ascii?Q?gd4oqfBknTE9zkCny0MlRxwAYGSw+zJR+HtCzFJ2EBpCugOXLU49CX7o6ODj?=
- =?us-ascii?Q?JCEUJMB00+ZqSHRaXt6lJTdpbsebg1dy2AdsUR0aP9ZIGdPb9Q9EpfykY9Oj?=
- =?us-ascii?Q?oiXlxGfSxwPC11RH79zv6btig3ainCi8e4CYlbyPqhmBKDxt02W/tcX6c702?=
- =?us-ascii?Q?sFnlCr8hre+nrLUMlAOpIbeIASko0qzpkuNFIFg/cc9JD8fCKfO6tW3ZqPcL?=
- =?us-ascii?Q?QqdohyqakJ7K4WjE7+LKjlp4pIrN4/LWA3+3ATM2dgsyvvrxo5rgBiibqwbo?=
- =?us-ascii?Q?OkI8lVrdlTDMIZhANives4TF1BEt9BxmvhVFf6N/mSP9yr6DbO9b0DPPbk76?=
- =?us-ascii?Q?w5IgIZ0UnbEkeF6HjDfvwNtEm2kcWw8WbpitPPULKfqXNUqY8z7qPZbYdLx4?=
- =?us-ascii?Q?UK2FnAD5PBOYcqPMPZhh/Pb66QwGXQGx2majWkvZ/xBisWcKBxBzBgALw/Jf?=
- =?us-ascii?Q?BnPGA7m7D7kQn3HsyhFiQRucr7wWZi50b4QUj/y3mP2E6s6HzYTmiI/4lB16?=
- =?us-ascii?Q?xD2p94Rmlx7DKJhZrSdsvA2GP05oXH9DPNJw+zI8e9RxL53lA5ZKtCXm7xj+?=
- =?us-ascii?Q?TG/GWw3nRSixnei7F6nqQNkj/jctfiJyz60l/pdei6AlMOb/Urf6K6OLfx/X?=
- =?us-ascii?Q?2jgcovMz58R/SC2JAlqYfqXWGOtOBwncXydQ2grwgLHBmbxnNKA+7zO0P60I?=
- =?us-ascii?Q?dgeAIUnCuKr69B+bR6qGXpuweG1YKx3P6DX2LiVMvsIltkR3TJs1aCvqeGUw?=
- =?us-ascii?Q?tqCLa6rzajYWhWcRsGWV7+QE9FhER06Qt6L/0eYvtspKhGsNA/EBgVNIMlrn?=
- =?us-ascii?Q?uP0gSMtAQGuUTTtVb8wOtuvZjsT32DcbFm8dfvEeStNX31K/t9vTdgzho1iy?=
- =?us-ascii?Q?euCDgW5NqImrwXP7bGfvAtdiPMkgPzGZvELJrc/PzXxviXvzl/alkzMC69He?=
- =?us-ascii?Q?dnlwj0FRP4gYiJxKhNYMtua7EwnJy5WoLX0mp58kzqwPWkJOzFOan3/6L3ga?=
- =?us-ascii?Q?NJ3mFGsVJm9SCu63dW5GUvKNZW6YsiPAtcHOjxN/Bu3rUKPYJE3SUQnDk+nZ?=
- =?us-ascii?Q?jCUa7VE6v/QbjD1jKEojiVzAjbl4uHL6kQ9sQeuY0zG9dopW4LHbT4gTBl9/?=
- =?us-ascii?Q?UIsT2zGDc/rQiouIan+CurghmF/GTaBwYlLQxKHHd3OuQt/S4K7+BBo02TiP?=
- =?us-ascii?Q?dyz/0ChUDK9SxGAFWXNy2f7qH0QsmAtlspTR7UG9gPsjwYBm2YJQ8WGpHXKT?=
- =?us-ascii?Q?3cPjXIYRcRYHT/V1A4RAI24ZjQBmwj3UP4enNXLJDiOrLsa40w=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?peUbMq4RiF06Tr0CiPGxw1qCYAZ4JE4Rip2592JVbXisEQIHVUtsZfYY0O3g?=
- =?us-ascii?Q?Nbi8t1rHXYlFcrzYHAb/+lgqJQdjnz4XSBhfjIcLC7flNvQvJfSGo4LukAUJ?=
- =?us-ascii?Q?WXXZ8BB3T0KNfz0SJHeqN160YptFmDGx05conyakPRAwI8YiiBH+e0S1RtWp?=
- =?us-ascii?Q?0YJLBCWvCGQTzY15gYb/0k8vMdiJgC8Chtu3usWLPahgmdNUfj3r5TsW3S7s?=
- =?us-ascii?Q?TMmi/F9f317qizd6OTNAMLuqXdv4QAr0I1WjrVeVPg8BXuqJLMYSd/k0DKXC?=
- =?us-ascii?Q?wK6sOvTkLQU3z+SO72z9b6BCcMmWjwzYFyUcah0q2NF9GhX0GzMU/qGFX3Qw?=
- =?us-ascii?Q?KXrl7XfOlhlNWyjOCLXQWoeTbnuYw+kTbzc/U4JUZLjvjdGx3OkbVyH0o2gd?=
- =?us-ascii?Q?KeOmY7ioIBkTZIDduU2A4MB8rNCJQsZVZreaXl91w761iUwPiA8bko8ih62F?=
- =?us-ascii?Q?phPKZbQfmanLr82YeAElwKgqM/MFmtDmYBnYtLQ61BiGuafVJtxX3YRaGmiu?=
- =?us-ascii?Q?vKu2zXoYur2FTI3EC+JH9OYbpESDqfAxacam/BtUtNXOgXlqOHG6T2AM0aqk?=
- =?us-ascii?Q?nNwigfR0RVZkQZrLr7wHJ0QBbzhf6BpG0+4XH0rGC5VBVY/vIdGVl8ShtxkZ?=
- =?us-ascii?Q?Xvn+f0wUgItryCPtH++qGb8Kidkm2UDKT/pFGh/cbF5QPyhlX55kQTao+zJQ?=
- =?us-ascii?Q?Q40ICKEOo8kFc+uDJdG1ls2XlKP3RZQYoxr5aykhmsc3e9u/HYPcgIPTPhfd?=
- =?us-ascii?Q?p5v04+9+BIntGqRM5RP+5Ydz4mu6eDP5RV9/tp3+OEgU0/7Bw4vEWW5OgnZ+?=
- =?us-ascii?Q?NwsHxubrozxqtXSntC+GWhVCr3SnG45Ox46shPaw2qknhIxH/H5uN/Y/shJ1?=
- =?us-ascii?Q?5rlQUfSnl/1615HHa+j7PE6S+FeKvofTeb2g+SKlsBmtvGh6AQhDJuAbJYid?=
- =?us-ascii?Q?e1mpDwziwu8gCDtYcuPlF+cFgK0v2WI7j6DK9M4B7f3mRtPjKYkUI/NpPyoP?=
- =?us-ascii?Q?0TcAe6sOjOMlwBPDBB4FjyqmCS4myaXjCSgU8xCOoULvJdOyZTova61xqxzv?=
- =?us-ascii?Q?ONPp/bcW/rJCcm2l0ROiYvmE0PyoDeYH2E+iXqGOvqOQ1KlsIbRUHoDVEXAb?=
- =?us-ascii?Q?25TkUQvcSZ0QzZj4fIUV1npwGCy5ry2+z20M3RbqFxCaBeS3uqFHm4huJ+yR?=
- =?us-ascii?Q?WN5L7dnYXtdca9TF5L+TSTQnb2qy/DgrxRJrH+PozLXsXdzF2YTVLXwNi1Ia?=
- =?us-ascii?Q?T132sY3E5B6GVgt0iRzFiZDC7oobBHM2qM6tGcFu877vwUfmxeAci5MyX79J?=
- =?us-ascii?Q?yrLlpMmtMomskHe59OxzDY+1mDAsKq2l6WLiVLBKMGzLPsZOBTGoBOId7qGO?=
- =?us-ascii?Q?QkZ6c2cC7N6f3jsS1KS0mqLAjQCV34UIiC5TkmuApDfsMjOJZbaEfk3qAcxB?=
- =?us-ascii?Q?TpVYUyKqhc9n/cJ6W3poQYILuXJAKPHBzvnpC/hMfXCALWsZrHLp8IKVYikI?=
- =?us-ascii?Q?jv6jJbNJZ+X2qmm/nZo/vgaltszEMVFtGGYkLWOD74Fm++IHqJ+UMsa1S79A?=
- =?us-ascii?Q?346HZRtvLgV/CGqLcrw=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 01a9de13-d6bc-4dfb-b4dd-08ddea2885c9
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2025 13:56:32.2892
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: klOm1aGan93SlRl9aKgxg5c6OASPI3rGOU5yAH8eIcyafXPbq9a0oo+W6fIHZTL+
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5627
+References: <20250831100822.1238795-1-jackzxcui1989@163.com> <20250831100822.1238795-2-jackzxcui1989@163.com>
+In-Reply-To: <20250831100822.1238795-2-jackzxcui1989@163.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 2 Sep 2025 22:04:54 +0800
+X-Gm-Features: Ac12FXwkd-qgnRRh_CeBqvzvNjDDlu_ORz8tZ4OL8Xi-Iu31XsjOwosLQVhnZD4
+Message-ID: <CAL+tcoBsfxyfGUyKfuiQsqwc8useNefZWxSVJOyivEci9jM6Zw@mail.gmail.com>
+Subject: Re: [PATCH net-next v10 1/2] net: af_packet: remove
+ last_kactive_blk_num field
+To: Xin Zhao <jackzxcui1989@163.com>
+Cc: willemdebruijn.kernel@gmail.com, edumazet@google.com, ferenc@fejes.dev, 
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 01, 2025 at 11:57:21AM +0530, Abhijit Gangurde wrote:
-> 
-> On 8/26/25 21:22, Jason Gunthorpe wrote:
-> > On Thu, Aug 14, 2025 at 11:08:46AM +0530, Abhijit Gangurde wrote:
-> > > This patchset introduces an RDMA driver for the AMD Pensando adapter.
-> > > An AMD Pensando Ethernet device with RDMA capabilities extends its
-> > > functionality through an auxiliary device.
-> > It looks in pretty good enough shape now, what is your plan for
-> > merging this?  Will you do a shared branch or do you just want to have
-> > it all go through rdma? Is the netdev side ack'd?
-> > 
-> > Jason
-> 
-> I'm happy for the patches to go through the RDMA tree.
+On Sun, Aug 31, 2025 at 6:10=E2=80=AFPM Xin Zhao <jackzxcui1989@163.com> wr=
+ote:
+>
+> kactive_blk_num (K) is incremented on block close. last_kactive_blk_num (=
+L)
+> is set to match K on block open and each timer. So the only time that the=
+y
+> differ is if a block is closed in tpacket_rcv and no new block could be
+> opened.
+> So the origin check L=3D=3DK in timer callback only skip the case 'no new=
+ block
+> to open'. If we remove L=3D=3DK check, it will make prb_curr_blk_in_use c=
+heck
+> earlier, which will not cause any side effect.
 
-You will respin it with the little changes then?
+I believe the above commit message needs to be revised:
+1) the above sentence (starting from 'if we remove L....') means
+nothing because your modification doesn't change the behaviour when
+the queue is not frozen.
+2) lack of proofs/reasons on why exposing the prb_open_block() logic doesn'=
+t
+cause side effects. It's the key proof that shows to future readers to
+make sure this patch will not bring trouble.
+
+>
+> Signed-off-by: Xin Zhao <jackzxcui1989@163.com>
+
+It was suggested by Willem, so please add:
+Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+
+So far, it looks good to me as well:
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+
+And I will finish reviewing the other patch by tomorrow :)
 
 Thanks,
 Jason
+
+
+
+> ---
+>  net/packet/af_packet.c | 60 ++++++++++++++++++++----------------------
+>  net/packet/internal.h  |  6 -----
+>  2 files changed, 28 insertions(+), 38 deletions(-)
+>
+> diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+> index a7017d7f0..d4eb4a4fe 100644
+> --- a/net/packet/af_packet.c
+> +++ b/net/packet/af_packet.c
+> @@ -669,7 +669,6 @@ static void init_prb_bdqc(struct packet_sock *po,
+>         p1->knum_blocks =3D req_u->req3.tp_block_nr;
+>         p1->hdrlen =3D po->tp_hdrlen;
+>         p1->version =3D po->tp_version;
+> -       p1->last_kactive_blk_num =3D 0;
+>         po->stats.stats3.tp_freeze_q_cnt =3D 0;
+>         if (req_u->req3.tp_retire_blk_tov)
+>                 p1->retire_blk_tov =3D req_u->req3.tp_retire_blk_tov;
+> @@ -693,7 +692,6 @@ static void _prb_refresh_rx_retire_blk_timer(struct t=
+packet_kbdq_core *pkc)
+>  {
+>         mod_timer(&pkc->retire_blk_timer,
+>                         jiffies + pkc->tov_in_jiffies);
+> -       pkc->last_kactive_blk_num =3D pkc->kactive_blk_num;
+>  }
+>
+>  /*
+> @@ -750,38 +748,36 @@ static void prb_retire_rx_blk_timer_expired(struct =
+timer_list *t)
+>                 write_unlock(&pkc->blk_fill_in_prog_lock);
+>         }
+>
+> -       if (pkc->last_kactive_blk_num =3D=3D pkc->kactive_blk_num) {
+> -               if (!frozen) {
+> -                       if (!BLOCK_NUM_PKTS(pbd)) {
+> -                               /* An empty block. Just refresh the timer=
+. */
+> -                               goto refresh_timer;
+> -                       }
+> -                       prb_retire_current_block(pkc, po, TP_STATUS_BLK_T=
+MO);
+> -                       if (!prb_dispatch_next_block(pkc, po))
+> -                               goto refresh_timer;
+> -                       else
+> -                               goto out;
+> +       if (!frozen) {
+> +               if (!BLOCK_NUM_PKTS(pbd)) {
+> +                       /* An empty block. Just refresh the timer. */
+> +                       goto refresh_timer;
+> +               }
+> +               prb_retire_current_block(pkc, po, TP_STATUS_BLK_TMO);
+> +               if (!prb_dispatch_next_block(pkc, po))
+> +                       goto refresh_timer;
+> +               else
+> +                       goto out;
+> +       } else {
+> +               /* Case 1. Queue was frozen because user-space was
+> +                * lagging behind.
+> +                */
+> +               if (prb_curr_blk_in_use(pbd)) {
+> +                       /*
+> +                        * Ok, user-space is still behind.
+> +                        * So just refresh the timer.
+> +                        */
+> +                       goto refresh_timer;
+>                 } else {
+> -                       /* Case 1. Queue was frozen because user-space wa=
+s
+> -                        *         lagging behind.
+> +                       /* Case 2. queue was frozen,user-space caught up,
+> +                        * now the link went idle && the timer fired.
+> +                        * We don't have a block to close.So we open this
+> +                        * block and restart the timer.
+> +                        * opening a block thaws the queue,restarts timer
+> +                        * Thawing/timer-refresh is a side effect.
+>                          */
+> -                       if (prb_curr_blk_in_use(pbd)) {
+> -                               /*
+> -                                * Ok, user-space is still behind.
+> -                                * So just refresh the timer.
+> -                                */
+> -                               goto refresh_timer;
+> -                       } else {
+> -                              /* Case 2. queue was frozen,user-space cau=
+ght up,
+> -                               * now the link went idle && the timer fir=
+ed.
+> -                               * We don't have a block to close.So we op=
+en this
+> -                               * block and restart the timer.
+> -                               * opening a block thaws the queue,restart=
+s timer
+> -                               * Thawing/timer-refresh is a side effect.
+> -                               */
+> -                               prb_open_block(pkc, pbd);
+> -                               goto out;
+> -                       }
+> +                       prb_open_block(pkc, pbd);
+> +                       goto out;
+>                 }
+>         }
+>
+> diff --git a/net/packet/internal.h b/net/packet/internal.h
+> index 1e743d031..d367b9f93 100644
+> --- a/net/packet/internal.h
+> +++ b/net/packet/internal.h
+> @@ -24,12 +24,6 @@ struct tpacket_kbdq_core {
+>         unsigned short  kactive_blk_num;
+>         unsigned short  blk_sizeof_priv;
+>
+> -       /* last_kactive_blk_num:
+> -        * trick to see if user-space has caught up
+> -        * in order to avoid refreshing timer when every single pkt arriv=
+es.
+> -        */
+> -       unsigned short  last_kactive_blk_num;
+> -
+>         char            *pkblk_start;
+>         char            *pkblk_end;
+>         int             kblk_size;
+> --
+> 2.34.1
+>
+>
 
