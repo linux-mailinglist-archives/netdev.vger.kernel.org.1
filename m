@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-219372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D877AB410D6
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 01:36:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D976B410D8
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 01:36:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8687B5E35E3
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:36:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F214189F357
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 23:37:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0E1E27FB1E;
-	Tue,  2 Sep 2025 23:36:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6762B27FD49;
+	Tue,  2 Sep 2025 23:36:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B45126C05;
-	Tue,  2 Sep 2025 23:36:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7469627FD72;
+	Tue,  2 Sep 2025 23:36:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756856182; cv=none; b=Pvh2A4+NmNnBz0u3BSklsb+nAI0Zyy+SjsKDhHIDOL9ecjMYEqI8MnOHZu4BAtuyZxPuTC2zH/yO8vx+YSlBYA+EJWwHjYql3bpXmaReWrfRSmDgoOPJqvZsMyVQpu+YBkEl4K1WsgFE4YxRczrc8OjEQUed1X3pgMaP53GexMM=
+	t=1756856192; cv=none; b=Ipsot5dY56zCnRDt3XQ0hR4MPTU49rimUUzK7T9LFJcWDPm+e9hEzTXZvnGRNbHe8B5nK0mcOgOHRatBjwcgeDK3oWVSQeVe2zwyxA7r0UmgV06Uf0Hj5qV5F5L5OJcKDA8lS+0hxqJka++lgmchiFySHIDT68FaOsAd1JrH7qI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756856182; c=relaxed/simple;
-	bh=2pIxf0HoF6Z6UiQch8+8jOIMygT02+QakPHOWqDwM94=;
+	s=arc-20240116; t=1756856192; c=relaxed/simple;
+	bh=QyV7zRqGf/Cods92Nyjkn7Q+43zQI1GpE39BoFbYpDc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fv9F0bcbLAVjPfVYbfhqGeiUjvJm8XSaMZKbCKa2hK+qIXQK7jNMxP3WzrO8ZOEZBDc7xWKbGgDoSFuj1P0onTFcpZGv3rKUetf8zYZy1AGhQOMW73f92utV0Z7/2BWTAVabME8MlcN4gCDLYIkDj4yCQKg2RRRmv1w11xaHgb4=
+	 Content-Type:Content-Disposition:In-Reply-To; b=jSeytibImEXqmwxAC9GrUX2V4Dj586uEEsMDlleW7VINPkolxDDMrwWjBjmiQwylXIIhcc/phenNKacS12ZpXKBn7neVF6iO+63FFn+4fX8fhO/1W4CuCqfO46i7qtSlZdD+lzxgd9qRyxUHiLnTgwgHyxB6tOa0U6s25cbxudc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,9 +33,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1utaXw-000000001IK-2JIC;
-	Tue, 02 Sep 2025 23:36:16 +0000
-Date: Wed, 3 Sep 2025 00:36:13 +0100
+	id 1utaY5-000000001Iu-44fF;
+	Tue, 02 Sep 2025 23:36:26 +0000
+Date: Wed, 3 Sep 2025 00:36:22 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -55,9 +55,9 @@ Cc: Andreas Schirm <andreas.schirm@siemens.com>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: [RFC PATCH net-next 3/6] net: dsa: lantiq_gswip: manually convert
- remaining uses of read accessors
-Message-ID: <08a08504d030b8b9f4587097ef81e014acc98846.1756855069.git.daniel@makrotopia.org>
+Subject: [RFC PATCH net-next 4/6] net: dsa: lantiq_gswip: replace *_mask()
+ functions with regmap API
+Message-ID: <09e2fb66a9b4a35057c89160de4beb312f13b688.1756855069.git.daniel@makrotopia.org>
 References: <cover.1756855069.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -69,168 +69,323 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1756855069.git.daniel@makrotopia.org>
 
-Manually convert the remaining uses of the read accessor functions and
-remove them now that they are unused.
+Use coccinelle to replace all uses of *_mask() with an equivalent call
+to regmap_write_bits().
+
+// Replace gswip_switch_mask with regmap_write_bits
+@@
+expression priv, clear, set, offset;
+@@
+- gswip_switch_mask(priv, clear, set, offset)
++ regmap_write_bits(priv->gswip, offset, clear | set, set)
+
+// Replace gswip_mdio_mask with regmap_write_bits
+@@
+expression priv, clear, set, offset;
+@@
+- gswip_mdio_mask(priv, clear, set, offset)
++ regmap_write_bits(priv->mdio, offset, clear | set, set)
+
+// Replace gswip_mii_mask with regmap_write_bits
+@@
+expression priv, clear, set, offset;
+@@
+- gswip_mii_mask(priv, clear, set, offset)
++ regmap_write_bits(priv->mii, offset, clear | set, set)
+
+Remove the new unused *_mask() functions.
+This naive approach will be further optmized manually in the next commit.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
- drivers/net/dsa/lantiq/lantiq_gswip.c | 77 ++++++++++++---------------
- 1 file changed, 34 insertions(+), 43 deletions(-)
+ drivers/net/dsa/lantiq/lantiq_gswip.c | 148 +++++++++++---------------
+ 1 file changed, 63 insertions(+), 85 deletions(-)
 
 diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.c b/drivers/net/dsa/lantiq/lantiq_gswip.c
-index 4c46b8f0ab3d..7ba562f02b57 100644
+index 7ba562f02b57..1fd18b3899b7 100644
 --- a/drivers/net/dsa/lantiq/lantiq_gswip.c
 +++ b/drivers/net/dsa/lantiq/lantiq_gswip.c
-@@ -111,21 +111,6 @@ static const struct gswip_rmon_cnt_desc gswip_rmon_cnt[] = {
+@@ -111,18 +111,6 @@ static const struct gswip_rmon_cnt_desc gswip_rmon_cnt[] = {
  	MIB_DESC(2, 0x0E, "TxGoodBytes"),
  };
  
--static u32 gswip_switch_r(struct gswip_priv *priv, u32 offset)
+-static void gswip_switch_mask(struct gswip_priv *priv, u32 clear, u32 set,
+-			      u32 offset)
 -{
--	unsigned int val;
 -	int ret;
 -
--	ret = regmap_read(priv->gswip, offset, &val);
+-	ret = regmap_write_bits(priv->gswip, offset, clear | set, set);
 -	if (ret) {
 -		WARN_ON_ONCE(1);
--		dev_err(priv->dev, "failed to read switch register\n");
--		return 0;
+-		dev_err(priv->dev, "failed to update switch register\n");
 -	}
--
--	return val;
 -}
 -
- static void gswip_switch_mask(struct gswip_priv *priv, u32 clear, u32 set,
- 			      u32 offset)
+ static u32 gswip_switch_r_timeout(struct gswip_priv *priv, u32 offset,
+ 				  u32 cleared)
  {
-@@ -147,21 +132,6 @@ static u32 gswip_switch_r_timeout(struct gswip_priv *priv, u32 offset,
+@@ -132,30 +120,6 @@ static u32 gswip_switch_r_timeout(struct gswip_priv *priv, u32 offset,
  					!(val & cleared), 20, 50000);
  }
  
--static u32 gswip_mdio_r(struct gswip_priv *priv, u32 offset)
+-static void gswip_mdio_mask(struct gswip_priv *priv, u32 clear, u32 set,
+-			    u32 offset)
 -{
--	u32 val;
 -	int ret;
 -
--	ret = regmap_read(priv->mdio, offset, &val);
+-	ret = regmap_write_bits(priv->mdio, offset, clear | set, set);
 -	if (ret) {
 -		WARN_ON_ONCE(1);
--		dev_err(priv->dev, "failed to read mdio register\n");
--		return 0;
+-		dev_err(priv->dev, "failed to update mdio register\n");
 -	}
--
--	return val;
 -}
 -
- static void gswip_mdio_mask(struct gswip_priv *priv, u32 clear, u32 set,
- 			    u32 offset)
+-static void gswip_mii_mask(struct gswip_priv *priv, u32 clear, u32 set,
+-			   u32 offset)
+-{
+-	int ret;
+-
+-	ret = regmap_write_bits(priv->mii, offset, clear | set, set);
+-	if (ret) {
+-		WARN_ON_ONCE(1);
+-		dev_err(priv->dev, "failed to update mdio register\n");
+-	}
+-}
+-
+ static void gswip_mii_mask_cfg(struct gswip_priv *priv, u32 clear, u32 set,
+ 			       int port)
  {
-@@ -255,6 +225,7 @@ static int gswip_mdio_wr(struct mii_bus *bus, int addr, int reg, u16 val)
- static int gswip_mdio_rd(struct mii_bus *bus, int addr, int reg)
- {
- 	struct gswip_priv *priv = bus->priv;
-+	u32 val;
- 	int err;
+@@ -167,7 +131,8 @@ static void gswip_mii_mask_cfg(struct gswip_priv *priv, u32 clear, u32 set,
  
- 	err = gswip_mdio_poll(priv);
-@@ -274,7 +245,11 @@ static int gswip_mdio_rd(struct mii_bus *bus, int addr, int reg)
- 		return err;
- 	}
+ 	reg_port = port + priv->hw_info->mii_port_reg_offset;
  
--	return gswip_mdio_r(priv, GSWIP_MDIO_READ);
-+	err = regmap_read(priv->mdio, GSWIP_MDIO_READ, &val);
-+	if (err)
-+		return err;
-+
-+	return val;
+-	gswip_mii_mask(priv, clear, set, GSWIP_MII_CFGp(reg_port));
++	regmap_write_bits(priv->mii, GSWIP_MII_CFGp(reg_port), clear | set,
++			  set);
  }
  
- static int gswip_mdio(struct gswip_priv *priv)
-@@ -318,6 +293,7 @@ static int gswip_pce_table_entry_read(struct gswip_priv *priv,
- 	int i;
- 	int err;
- 	u16 crtl;
-+	u32 tmp;
- 	u16 addr_mode = tbl->key_mode ? GSWIP_PCE_TBL_CTRL_OPMOD_KSRD :
- 					GSWIP_PCE_TBL_CTRL_OPMOD_ADRD;
+ static void gswip_mii_mask_pcdu(struct gswip_priv *priv, u32 clear, u32 set,
+@@ -183,13 +148,16 @@ static void gswip_mii_mask_pcdu(struct gswip_priv *priv, u32 clear, u32 set,
  
-@@ -343,16 +319,29 @@ static int gswip_pce_table_entry_read(struct gswip_priv *priv,
- 		return err;
+ 	switch (reg_port) {
+ 	case 0:
+-		gswip_mii_mask(priv, clear, set, GSWIP_MII_PCDU0);
++		regmap_write_bits(priv->mii, GSWIP_MII_PCDU0, clear | set,
++				  set);
+ 		break;
+ 	case 1:
+-		gswip_mii_mask(priv, clear, set, GSWIP_MII_PCDU1);
++		regmap_write_bits(priv->mii, GSWIP_MII_PCDU1, clear | set,
++				  set);
+ 		break;
+ 	case 5:
+-		gswip_mii_mask(priv, clear, set, GSWIP_MII_PCDU5);
++		regmap_write_bits(priv->mii, GSWIP_MII_PCDU5, clear | set,
++				  set);
+ 		break;
+ 	}
+ }
+@@ -307,10 +275,11 @@ static int gswip_pce_table_entry_read(struct gswip_priv *priv,
  	}
  
--	for (i = 0; i < ARRAY_SIZE(tbl->key); i++)
--		tbl->key[i] = gswip_switch_r(priv, GSWIP_PCE_TBL_KEY(i));
--
--	for (i = 0; i < ARRAY_SIZE(tbl->val); i++)
--		tbl->val[i] = gswip_switch_r(priv, GSWIP_PCE_TBL_VAL(i));
-+	for (i = 0; i < ARRAY_SIZE(tbl->key); i++) {
-+		err = regmap_read(priv->gswip, GSWIP_PCE_TBL_KEY(i), &tmp);
-+		if (err)
-+			return err;
-+		tbl->key[i] = tmp;
-+	}
-+	for (i = 0; i < ARRAY_SIZE(tbl->val); i++) {
-+		err = regmap_read(priv->gswip, GSWIP_PCE_TBL_VAL(i), &tmp);
-+		if (err)
-+			return err;
-+		tbl->val[i] = tmp;
-+	}
+ 	regmap_write(priv->gswip, GSWIP_PCE_TBL_ADDR, tbl->index);
+-	gswip_switch_mask(priv, GSWIP_PCE_TBL_CTRL_ADDR_MASK |
+-				GSWIP_PCE_TBL_CTRL_OPMOD_MASK,
++	regmap_write_bits(priv->gswip, GSWIP_PCE_TBL_CTRL,
++			  GSWIP_PCE_TBL_CTRL_ADDR_MASK |
++			  GSWIP_PCE_TBL_CTRL_OPMOD_MASK |
+ 			  tbl->table | addr_mode | GSWIP_PCE_TBL_CTRL_BAS,
+-			  GSWIP_PCE_TBL_CTRL);
++			  tbl->table | addr_mode | GSWIP_PCE_TBL_CTRL_BAS);
  
--	tbl->mask = gswip_switch_r(priv, GSWIP_PCE_TBL_MASK);
-+	err = regmap_read(priv->gswip, GSWIP_PCE_TBL_MASK, &tmp);
-+	if (err)
-+		return err;
+ 	err = gswip_switch_r_timeout(priv, GSWIP_PCE_TBL_CTRL,
+ 				     GSWIP_PCE_TBL_CTRL_BAS);
+@@ -371,10 +340,11 @@ static int gswip_pce_table_entry_write(struct gswip_priv *priv,
+ 	}
  
--	crtl = gswip_switch_r(priv, GSWIP_PCE_TBL_CTRL);
-+	tbl->mask = tmp;
-+	err = regmap_read(priv->gswip, GSWIP_PCE_TBL_CTRL, &tmp);
-+	if (err)
-+		return err;
+ 	regmap_write(priv->gswip, GSWIP_PCE_TBL_ADDR, tbl->index);
+-	gswip_switch_mask(priv, GSWIP_PCE_TBL_CTRL_ADDR_MASK |
+-				GSWIP_PCE_TBL_CTRL_OPMOD_MASK,
++	regmap_write_bits(priv->gswip, GSWIP_PCE_TBL_CTRL,
++			  GSWIP_PCE_TBL_CTRL_ADDR_MASK |
++			  GSWIP_PCE_TBL_CTRL_OPMOD_MASK |
+ 			  tbl->table | addr_mode,
+-			  GSWIP_PCE_TBL_CTRL);
++			  tbl->table | addr_mode);
  
-+	crtl = tmp;
- 	tbl->type = !!(crtl & GSWIP_PCE_TBL_CTRL_TYPE);
- 	tbl->valid = !!(crtl & GSWIP_PCE_TBL_CTRL_VLD);
- 	tbl->gmap = (crtl & GSWIP_PCE_TBL_CTRL_GMAP_MASK) >> 7;
-@@ -368,6 +357,7 @@ static int gswip_pce_table_entry_write(struct gswip_priv *priv,
- 	int i;
- 	int err;
- 	u16 crtl;
-+	u32 tmp;
- 	u16 addr_mode = tbl->key_mode ? GSWIP_PCE_TBL_CTRL_OPMOD_KSWR :
- 					GSWIP_PCE_TBL_CTRL_OPMOD_ADWR;
+ 	for (i = 0; i < ARRAY_SIZE(tbl->key); i++)
+ 		regmap_write(priv->gswip, GSWIP_PCE_TBL_KEY(i), tbl->key[i]);
+@@ -382,10 +352,11 @@ static int gswip_pce_table_entry_write(struct gswip_priv *priv,
+ 	for (i = 0; i < ARRAY_SIZE(tbl->val); i++)
+ 		regmap_write(priv->gswip, GSWIP_PCE_TBL_VAL(i), tbl->val[i]);
  
-@@ -399,9 +389,9 @@ static int gswip_pce_table_entry_write(struct gswip_priv *priv,
+-	gswip_switch_mask(priv, GSWIP_PCE_TBL_CTRL_ADDR_MASK |
+-				GSWIP_PCE_TBL_CTRL_OPMOD_MASK,
++	regmap_write_bits(priv->gswip, GSWIP_PCE_TBL_CTRL,
++			  GSWIP_PCE_TBL_CTRL_ADDR_MASK |
++			  GSWIP_PCE_TBL_CTRL_OPMOD_MASK |
+ 			  tbl->table | addr_mode,
+-			  GSWIP_PCE_TBL_CTRL);
++			  tbl->table | addr_mode);
  
  	regmap_write(priv->gswip, GSWIP_PCE_TBL_MASK, tbl->mask);
  
--	crtl = gswip_switch_r(priv, GSWIP_PCE_TBL_CTRL);
--	crtl &= ~(GSWIP_PCE_TBL_CTRL_TYPE | GSWIP_PCE_TBL_CTRL_VLD |
--		  GSWIP_PCE_TBL_CTRL_GMAP_MASK);
-+	regmap_read(priv->gswip, GSWIP_PCE_TBL_CTRL, &tmp);
-+	crtl = tmp & ~(GSWIP_PCE_TBL_CTRL_TYPE | GSWIP_PCE_TBL_CTRL_VLD |
-+		       GSWIP_PCE_TBL_CTRL_GMAP_MASK);
- 	if (tbl->type)
- 		crtl |= GSWIP_PCE_TBL_CTRL_TYPE;
- 	if (tbl->valid)
-@@ -1563,7 +1553,7 @@ static void gswip_get_strings(struct dsa_switch *ds, int port, u32 stringset,
- static u32 gswip_bcm_ram_entry_read(struct gswip_priv *priv, u32 table,
- 				    u32 index)
- {
--	u32 result;
-+	u32 result, val;
+@@ -463,8 +434,9 @@ static int gswip_port_enable(struct dsa_switch *ds, int port,
+ 		if (phydev)
+ 			mdio_phy = phydev->mdio.addr & GSWIP_MDIO_PHY_ADDR_MASK;
+ 
+-		gswip_mdio_mask(priv, GSWIP_MDIO_PHY_ADDR_MASK, mdio_phy,
+-				GSWIP_MDIO_PHYp(port));
++		regmap_write_bits(priv->mdio, GSWIP_MDIO_PHYp(port),
++				  GSWIP_MDIO_PHY_ADDR_MASK | mdio_phy,
++				  mdio_phy);
+ 	}
+ 
+ 	/* RMON Counter Enable for port */
+@@ -494,9 +466,11 @@ static int gswip_pce_load_microcode(struct gswip_priv *priv)
+ 	int i;
+ 	int err;
+ 
+-	gswip_switch_mask(priv, GSWIP_PCE_TBL_CTRL_ADDR_MASK |
+-				GSWIP_PCE_TBL_CTRL_OPMOD_MASK,
+-			  GSWIP_PCE_TBL_CTRL_OPMOD_ADWR, GSWIP_PCE_TBL_CTRL);
++	regmap_write_bits(priv->gswip, GSWIP_PCE_TBL_CTRL,
++			  GSWIP_PCE_TBL_CTRL_ADDR_MASK |
++			  GSWIP_PCE_TBL_CTRL_OPMOD_MASK |
++			  GSWIP_PCE_TBL_CTRL_OPMOD_ADWR,
++			  GSWIP_PCE_TBL_CTRL_OPMOD_ADWR);
+ 	regmap_write(priv->gswip, GSWIP_PCE_TBL_MASK, 0);
+ 
+ 	for (i = 0; i < priv->hw_info->pce_microcode_size; i++) {
+@@ -542,20 +516,24 @@ static int gswip_port_vlan_filtering(struct dsa_switch *ds, int port,
+ 
+ 	if (vlan_filtering) {
+ 		/* Use tag based VLAN */
+-		gswip_switch_mask(priv,
+-				  GSWIP_PCE_VCTRL_VSR,
+-				  GSWIP_PCE_VCTRL_UVR | GSWIP_PCE_VCTRL_VIMR |
++		regmap_write_bits(priv->gswip, GSWIP_PCE_VCTRL(port),
++				  GSWIP_PCE_VCTRL_VSR |
++				  GSWIP_PCE_VCTRL_UVR |
++				  GSWIP_PCE_VCTRL_VIMR |
+ 				  GSWIP_PCE_VCTRL_VEMR,
+-				  GSWIP_PCE_VCTRL(port));
++				  GSWIP_PCE_VCTRL_UVR |
++				  GSWIP_PCE_VCTRL_VIMR |
++				  GSWIP_PCE_VCTRL_VEMR);
+ 		regmap_clear_bits(priv->gswip, GSWIP_PCE_PCTRL_0p(port),
+ 				  GSWIP_PCE_PCTRL_0_TVM);
+ 	} else {
+ 		/* Use port based VLAN */
+-		gswip_switch_mask(priv,
+-				  GSWIP_PCE_VCTRL_UVR | GSWIP_PCE_VCTRL_VIMR |
+-				  GSWIP_PCE_VCTRL_VEMR,
++		regmap_write_bits(priv->gswip, GSWIP_PCE_VCTRL(port),
++				  GSWIP_PCE_VCTRL_UVR |
++				  GSWIP_PCE_VCTRL_VIMR |
++				  GSWIP_PCE_VCTRL_VEMR |
+ 				  GSWIP_PCE_VCTRL_VSR,
+-				  GSWIP_PCE_VCTRL(port));
++				  GSWIP_PCE_VCTRL_VSR);
+ 		regmap_set_bits(priv->gswip, GSWIP_PCE_PCTRL_0p(port),
+ 				GSWIP_PCE_PCTRL_0_TVM);
+ 	}
+@@ -613,7 +591,7 @@ static int gswip_setup(struct dsa_switch *ds)
+ 	regmap_write(priv->mdio, GSWIP_MDIO_MDC_CFG0, 0x0);
+ 
+ 	/* Configure the MDIO Clock 2.5 MHz */
+-	gswip_mdio_mask(priv, 0xff, 0x09, GSWIP_MDIO_MDC_CFG1);
++	regmap_write_bits(priv->mdio, GSWIP_MDIO_MDC_CFG1, 0xff | 0x09, 0x09);
+ 
+ 	/* bring up the mdio bus */
+ 	err = gswip_mdio(priv);
+@@ -1117,8 +1095,9 @@ static void gswip_port_stp_state_set(struct dsa_switch *ds, int port, u8 state)
+ 
+ 	regmap_set_bits(priv->gswip, GSWIP_SDMA_PCTRLp(port),
+ 			GSWIP_SDMA_PCTRL_EN);
+-	gswip_switch_mask(priv, GSWIP_PCE_PCTRL_0_PSTATE_MASK, stp_state,
+-			  GSWIP_PCE_PCTRL_0p(port));
++	regmap_write_bits(priv->gswip, GSWIP_PCE_PCTRL_0p(port),
++			  GSWIP_PCE_PCTRL_0_PSTATE_MASK | stp_state,
++			  stp_state);
+ }
+ 
+ static int gswip_port_fdb(struct dsa_switch *ds, int port,
+@@ -1344,8 +1323,8 @@ static void gswip_port_set_link(struct gswip_priv *priv, int port, bool link)
+ 	else
+ 		mdio_phy = GSWIP_MDIO_PHY_LINK_DOWN;
+ 
+-	gswip_mdio_mask(priv, GSWIP_MDIO_PHY_LINK_MASK, mdio_phy,
+-			GSWIP_MDIO_PHYp(port));
++	regmap_write_bits(priv->mdio, GSWIP_MDIO_PHYp(port),
++			  GSWIP_MDIO_PHY_LINK_MASK | mdio_phy, mdio_phy);
+ }
+ 
+ static void gswip_port_set_speed(struct gswip_priv *priv, int port, int speed,
+@@ -1385,11 +1364,11 @@ static void gswip_port_set_speed(struct gswip_priv *priv, int port, int speed,
+ 		break;
+ 	}
+ 
+-	gswip_mdio_mask(priv, GSWIP_MDIO_PHY_SPEED_MASK, mdio_phy,
+-			GSWIP_MDIO_PHYp(port));
++	regmap_write_bits(priv->mdio, GSWIP_MDIO_PHYp(port),
++			  GSWIP_MDIO_PHY_SPEED_MASK | mdio_phy, mdio_phy);
+ 	gswip_mii_mask_cfg(priv, GSWIP_MII_CFG_RATE_MASK, mii_cfg, port);
+-	gswip_switch_mask(priv, GSWIP_MAC_CTRL_0_GMII_MASK, mac_ctrl_0,
+-			  GSWIP_MAC_CTRL_0p(port));
++	regmap_write_bits(priv->gswip, GSWIP_MAC_CTRL_0p(port),
++			  GSWIP_MAC_CTRL_0_GMII_MASK | mac_ctrl_0, mac_ctrl_0);
+ }
+ 
+ static void gswip_port_set_duplex(struct gswip_priv *priv, int port, int duplex)
+@@ -1404,10 +1383,10 @@ static void gswip_port_set_duplex(struct gswip_priv *priv, int port, int duplex)
+ 		mdio_phy = GSWIP_MDIO_PHY_FDUP_DIS;
+ 	}
+ 
+-	gswip_switch_mask(priv, GSWIP_MAC_CTRL_0_FDUP_MASK, mac_ctrl_0,
+-			  GSWIP_MAC_CTRL_0p(port));
+-	gswip_mdio_mask(priv, GSWIP_MDIO_PHY_FDUP_MASK, mdio_phy,
+-			GSWIP_MDIO_PHYp(port));
++	regmap_write_bits(priv->gswip, GSWIP_MAC_CTRL_0p(port),
++			  GSWIP_MAC_CTRL_0_FDUP_MASK | mac_ctrl_0, mac_ctrl_0);
++	regmap_write_bits(priv->mdio, GSWIP_MDIO_PHYp(port),
++			  GSWIP_MDIO_PHY_FDUP_MASK | mdio_phy, mdio_phy);
+ }
+ 
+ static void gswip_port_set_pause(struct gswip_priv *priv, int port,
+@@ -1433,12 +1412,11 @@ static void gswip_port_set_pause(struct gswip_priv *priv, int port,
+ 			   GSWIP_MDIO_PHY_FCONRX_DIS;
+ 	}
+ 
+-	gswip_switch_mask(priv, GSWIP_MAC_CTRL_0_FCON_MASK,
+-			  mac_ctrl_0, GSWIP_MAC_CTRL_0p(port));
+-	gswip_mdio_mask(priv,
+-			GSWIP_MDIO_PHY_FCONTX_MASK |
+-			GSWIP_MDIO_PHY_FCONRX_MASK,
+-			mdio_phy, GSWIP_MDIO_PHYp(port));
++	regmap_write_bits(priv->gswip, GSWIP_MAC_CTRL_0p(port),
++			  GSWIP_MAC_CTRL_0_FCON_MASK | mac_ctrl_0, mac_ctrl_0);
++	regmap_write_bits(priv->mdio, GSWIP_MDIO_PHYp(port),
++			  GSWIP_MDIO_PHY_FCONTX_MASK | GSWIP_MDIO_PHY_FCONRX_MASK | mdio_phy,
++			  mdio_phy);
+ }
+ 
+ static void gswip_phylink_mac_config(struct phylink_config *config,
+@@ -1557,10 +1535,10 @@ static u32 gswip_bcm_ram_entry_read(struct gswip_priv *priv, u32 table,
  	int err;
  
  	regmap_write(priv->gswip, GSWIP_BM_RAM_ADDR, index);
-@@ -1581,7 +1571,8 @@ static u32 gswip_bcm_ram_entry_read(struct gswip_priv *priv, u32 table,
- 	}
+-	gswip_switch_mask(priv, GSWIP_BM_RAM_CTRL_ADDR_MASK |
+-				GSWIP_BM_RAM_CTRL_OPMOD,
+-			      table | GSWIP_BM_RAM_CTRL_BAS,
+-			      GSWIP_BM_RAM_CTRL);
++	regmap_write_bits(priv->gswip, GSWIP_BM_RAM_CTRL,
++			  GSWIP_BM_RAM_CTRL_ADDR_MASK | GSWIP_BM_RAM_CTRL_OPMOD |
++			  table | GSWIP_BM_RAM_CTRL_BAS,
++			  table | GSWIP_BM_RAM_CTRL_BAS);
  
- 	regmap_read(priv->gswip, GSWIP_BM_RAM_VAL(0), &result);
--	result |= gswip_switch_r(priv, GSWIP_BM_RAM_VAL(1)) << 16;
-+	regmap_read(priv->gswip, GSWIP_BM_RAM_VAL(1), &val);
-+	result |= val << 16;
- 
- 	return result;
- }
+ 	err = gswip_switch_r_timeout(priv, GSWIP_BM_RAM_CTRL,
+ 				     GSWIP_BM_RAM_CTRL_BAS);
 -- 
 2.51.0
 
