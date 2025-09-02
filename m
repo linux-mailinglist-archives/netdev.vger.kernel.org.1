@@ -1,86 +1,82 @@
-Return-Path: <netdev+bounces-219039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7967B3F7F6
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 10:15:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4469EB3F812
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 10:17:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AF1916D654
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 08:15:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 685817B1E14
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 08:13:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BE672E7F38;
-	Tue,  2 Sep 2025 08:12:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68F062E8DFD;
+	Tue,  2 Sep 2025 08:13:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YwFC0Qf6"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="imRNT2fp"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C98471F237A
-	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 08:12:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA6072E8B86;
+	Tue,  2 Sep 2025 08:13:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756800756; cv=none; b=AAjXxUkYAlmqJbbjvQLlWlq1/uAo5l0BDv4rtP79MeAVBGbJs+qKu6ZevzxeIfziAlNCr9nvlMRLsnY2k4sllL2fnGjWFPNGGFRSK6TO5WAey4qoE/DzB4NORB80LPXWUtokA+Ogbm/ZqhigDa3Wi341TpmAqEgpoz12CqeHkI8=
+	t=1756800807; cv=none; b=MiccgGy+wMr7mEU3T2/LhVqduA5hk/cqavXaHwXLtz7XspqnKHmlEmtlVv9xtetKJ5CmkCtzxmVW8gtYWqFDDpDUXwshv9lFObgAwAhHf7Obu2XKqKp5Qn+pXYkMEDBwobmUneP2n05LwlnK0clna5HxjAu3pbaeXt02tUivNH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756800756; c=relaxed/simple;
-	bh=zJuMtqWN5nf+Dc87lFiX1BeYhPM+TGBGxDmoQ+gslaY=;
+	s=arc-20240116; t=1756800807; c=relaxed/simple;
+	bh=GGtE6q+nP9Ik0rFB89I38FIlhk6EoKwCHJhu0FHTfJE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sDKBubFC5vmu0pWQXUX4xqK+c0yn/wDvuRPtjSaUv3r5386IZc8ILnltpsLBDr2aCzmS2gKZ6Pu+ade+QDpgQdWoi2qdW/Rq9SJTX8GEA9a0uPmDxx4tOeAtviyoLd8JiL/is4uVyLElWVPAE7RCkGDQEQVnOyX1a091twctuGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YwFC0Qf6; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756800753;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=j/S5MChsN4vwFWUggW1BSz4RudX6X7SrO72jBVRdjPg=;
-	b=YwFC0Qf6Om5aGSJxb+mBBwXuOs9wZ0XEHlHkNcZsxlBrX/OH0Eix7cHIlgmE5bdlvIktKO
-	P9vyfG5oLBvnp4cMUacKEMoCdzlTjhWJ9jzT9hdgP0esENtlPWwF9pxB9W3WlRQ0DsLWSW
-	a0d3/UXZSVhoL+naG/n0s4uQwjKukmw=
-Received: from mail-yb1-f200.google.com (mail-yb1-f200.google.com
- [209.85.219.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-83-sFBlA3iUP3qWMBFBQZBEOA-1; Tue, 02 Sep 2025 04:12:32 -0400
-X-MC-Unique: sFBlA3iUP3qWMBFBQZBEOA-1
-X-Mimecast-MFC-AGG-ID: sFBlA3iUP3qWMBFBQZBEOA_1756800752
-Received: by mail-yb1-f200.google.com with SMTP id 3f1490d57ef6-e96dc23e87aso6426644276.2
-        for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 01:12:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756800752; x=1757405552;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j/S5MChsN4vwFWUggW1BSz4RudX6X7SrO72jBVRdjPg=;
-        b=jcLBKDyNZ4T8TSyBujqimrYgid2BkN2KQSyhV9+qV6XRNCtbeP8b1vGWMtuvCfCPA6
-         IBSNRmi2jnMthQNLLnPVphPX/4RdVnxcMncIi2FixRxTbz/0xcscxilCbDMx17qXNUTX
-         uhBjkRilVZW5xXGtLssXoi998DpOYiIJ24dGcu4aaZnpfsExH7v/5rtoMcHGFqyaK+DP
-         Dzv/g7Mf+OAVLe7gU7LbtCajhckzLrgieev3/qdd7HqtiSW2Ru+kahkEmtcI7tG4xHU6
-         L4PPYTLDiaWOv0atc27OZhe0zOYfKxaXffzVmMzSJa9j0uMg/Q+cneAStV2xw9f73FmW
-         XK6w==
-X-Gm-Message-State: AOJu0Yx4mkoPyMEguMIq7Coc7yLAGkJny5nDowFKeUSGX7Yqi15H/GkR
-	EkphO4driQsbYx6Ko3UyYjAwecpMtJTS8IJsos458r4hDw+wOaFj04FhGdzPfRkjwC0gJxBT9xf
-	aqCW+OB2E2NXIgKcNP9tudTKdfN35mgVXwVOpJfCg2M+CTjWd0tpBP+hXpw==
-X-Gm-Gg: ASbGncva8/iBoiJbyIELbTCWJatioGY5oUhfl1RYxILdBgOaHFhXmsSKzLGp+1pvyUE
-	1ia11H9/InmAcd+fF8FwJypoXTZBSL0/lSBhtWRB0wAXRUybtNTudsixeuwJ0sXvqHFtLrQgK1o
-	/8fxfU1bfkaW+Tj7bEAvq5pqQ4YtFB1Gr4f9e8PRi6HGiRsHvo9HxOgm3sVL0UQaRQMHMqLMMK7
-	cfxjBz4ZR0j0iRRlxGfX2VU7wuFOCxNKU6pAfqa91fUp84C9/OaQOwMiqkWwldsRXeDCCZCEQfN
-	g8smimtpxSWzZd69XJVE3VQVfxXQqLZnC1OSL+uhBR/YBN6WtXd1wFOhCJJjPLKA6kWI1Q+ULQV
-	o5Ia+wOYf8cQ=
-X-Received: by 2002:a05:6902:1506:b0:e95:2817:1e5a with SMTP id 3f1490d57ef6-e98a5786655mr12518112276.13.1756800751581;
-        Tue, 02 Sep 2025 01:12:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHnJ64kV3LRZj2otjAvG4Is9EPhI9yBZdrK5BoXJGmEtor+Hu/aL9cy+JTfeDZRsk/ozjuBrQ==
-X-Received: by 2002:a05:6902:1506:b0:e95:2817:1e5a with SMTP id 3f1490d57ef6-e98a5786655mr12518095276.13.1756800751161;
-        Tue, 02 Sep 2025 01:12:31 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e00:6083:48d1:630a:25ae? ([2a0d:3344:2712:7e00:6083:48d1:630a:25ae])
-        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e9bbe05cad6sm386983276.17.2025.09.02.01.12.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Sep 2025 01:12:30 -0700 (PDT)
-Message-ID: <6efc1a99-b5b1-4a22-9655-fb9193e02a7f@redhat.com>
-Date: Tue, 2 Sep 2025 10:12:28 +0200
+	 In-Reply-To:Content-Type; b=IMhMk3besbOBTa4KtGAlffpXzGkzZTOOPgW1pKgWmEIa1O++UbIiZXDliN5V/uF57ag47AYu9WJKyahR+CN/veGphWsRhf+d2+FZ4Pa6mKLZQfOp3l1hwNO+dYzF+VZtVcTBUzFvOT2Cl5U2Sp0ztMwVI4a9AQJ1o3em5eG9hgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=imRNT2fp; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5826kK8p023033;
+	Tue, 2 Sep 2025 08:13:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=OWhkJT
+	GEI1Cz+kXAgoNhGujH4Ol85tWGW+TRw5LjORU=; b=imRNT2fp4R0HUJCdxUdNF+
+	2eGXDvb75FP6OLsU3tOJK4ljfFit+TXKmLrsH/zPi67dTBbqAJgN76++MBzULHPf
+	TnKH3AcuMWZf4Gg9GauMRr3oSY65keVn1qylFmdMI4bkhlLHzuQPzQdE2mXkETJd
+	r8/ZeLxpXqP3YyO8/fyT9itpstMPk812Pf1Ndp8YT1bIqj+3i5tcOYE0IuY9c4+9
+	nxkUNvh/qRRP+MFrqfmc2gIowaoNCT+aFlijhbJaAqB8bxYgrHURjNxRVPz7WbJF
+	v8D8EbUVxmMegio7t8vGfPC4StJTrwKkXbE0nG2tAmak93yVZ8N3W8hXxWX5DB+g
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48usv2w33c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 02 Sep 2025 08:13:11 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 58287osY026169;
+	Tue, 2 Sep 2025 08:13:11 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48usv2w339-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 02 Sep 2025 08:13:11 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5824tsvE019316;
+	Tue, 2 Sep 2025 08:13:09 GMT
+Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 48vd4msg4c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 02 Sep 2025 08:13:09 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5828D8S825494178
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 2 Sep 2025 08:13:08 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3F97558059;
+	Tue,  2 Sep 2025 08:13:08 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2A41C5805D;
+	Tue,  2 Sep 2025 08:13:02 +0000 (GMT)
+Received: from [9.109.249.226] (unknown [9.109.249.226])
+	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  2 Sep 2025 08:13:01 +0000 (GMT)
+Message-ID: <02c901f9-ce69-46cd-9a4c-6fe7ce9c6618@linux.ibm.com>
+Date: Tue, 2 Sep 2025 13:43:00 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,61 +84,63 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v15 14/15] net: homa: create homa_plumbing.c
-To: John Ousterhout <ouster@cs.stanford.edu>
-Cc: netdev@vger.kernel.org, edumazet@google.com, horms@kernel.org,
- kuba@kernel.org
-References: <20250818205551.2082-1-ouster@cs.stanford.edu>
- <20250818205551.2082-15-ouster@cs.stanford.edu>
- <a2dec2d0-84be-4a4f-bfd4-b5f56219ac82@redhat.com>
- <CAGXJAmztO1SdjyMc6jdHf7Zz=WGnboR5w74kbmy4n-ZjJHNHQw@mail.gmail.com>
+Subject: Re: [PATCH net] net/smc: Remove validation of reserved bits in CLC
+ Decline message
+To: Simon Horman <horms@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, alibuda@linux.alibaba.com,
+        dust.li@linux.alibaba.com, sidraya@linux.ibm.com, wenjia@linux.ibm.com,
+        pasic@linux.ibm.com, tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
+        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Alexandra Winter <wintera@linux.ibm.com>
+References: <20250829102626.3271637-1-mjambigi@linux.ibm.com>
+ <20250902070831.GA168966@horms.kernel.org>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CAGXJAmztO1SdjyMc6jdHf7Zz=WGnboR5w74kbmy4n-ZjJHNHQw@mail.gmail.com>
+From: Mahanta Jambigi <mjambigi@linux.ibm.com>
+In-Reply-To: <20250902070831.GA168966@horms.kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ZIZGEzsukigZ0TNhXusGvQzXhi44ccue
+X-Authority-Analysis: v=2.4 cv=FPMbx/os c=1 sm=1 tr=0 ts=68b6a717 cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=yJojWOMRYYMA:10 a=VnNF1IyMAAAA:8 a=KUUty9fwfFscJP1E-eQA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: 1uD8OOH7sFTh0I6IjSvV3lhx1ua1_8I2
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODMwMDAzNCBTYWx0ZWRfX1JxRFvQy5/Cs
+ AILPxgiM7sbesn3lO1Mq7naL9LVLIkEnQx3fEfDTahilFAjjRweKuiPlXrpc9Sz4eRV1h/caLSD
+ PtAXH426vKf4t5oaYbBxDYxofsDSar1cwIld2lvGHs5ZoQZOTTEtQbyRtQNjM1L8VEq3rIj5VN+
+ ivEXJzmX8A8dXqas/w06pHQDUJexZuySmWRXqys+8jfLYAso1MInlDL7EbeWdun2VJ1C/zDAepk
+ Kake3Gl8uapUaP1qYUNqo7HVQByxFyJCXMni/2qEMVeyqYPxcqJgoJTu9YQkobaeMkYxj118HdV
+ 2QksgDPVj/+3IR9L8JVUDnmAVEL7mfTWEmG2yp04biWwvwSStL31l9z4n296WF4I3b5zsU7eIcs
+ 6a0h3L4V
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-09-02_02,2025-08-28_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 impostorscore=0 phishscore=0 clxscore=1015 bulkscore=0
+ spamscore=0 adultscore=0 suspectscore=0 malwarescore=0 classifier=typeunknown
+ authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2507300000 definitions=main-2508300034
 
-On 9/2/25 12:53 AM, John Ousterhout wrote:
-> On Tue, Aug 26, 2025 at 9:17 AM Paolo Abeni <pabeni@redhat.com> wrote:
->>> +             header_offset = skb_transport_header(skb) - skb->data;
->>> +             if (header_offset)
->>> +                     __skb_pull(skb, header_offset);
->>> +
->>> +             /* Reject packets that are too short or have bogus types. */
->>> +             h = (struct homa_common_hdr *)skb->data;
->>> +             if (unlikely(skb->len < sizeof(struct homa_common_hdr) ||
->>> +                          h->type < DATA || h->type > MAX_OP ||
->>> +                          skb->len < header_lengths[h->type - DATA]))
->>> +                     goto discard;
->>> +
->>> +             /* Process the packet now if it is a control packet or
->>> +              * if it contains an entire short message.
->>> +              */
->>> +             if (h->type != DATA || ntohl(((struct homa_data_hdr *)h)
->>> +                             ->message_length) < 1400) {
->>
->> I could not fined where `message_length` is validated. AFAICS
->> data_hdr->message_length could be > skb->len.
->>
->> Also I don't see how the condition checked above ensures that the pkt
->> contains the whole message.
+
+
+On 02/09/25 12:38 pm, Simon Horman wrote:
 > 
-> Long messages consist of multiple packets, so it is fine if
-> data_hdr->message_length > skb->len. That said, Homa does not fragment
-> a message into multiple packets unless necessary, so if the condition
-> above is met, then the message is contained in a single packet (if for
-> some reason a sender fragments a short message, that won't cause
-> problems).
+> Hi Mahanta,
+> 
+> Sorry to nit-pick, but there should not be a blank line here.
+> And the correct format for the Fixes tag, whith at least
+> 12 characters of hash, is:
+> 
+> Fixes: 8ade200c269f ("net/smc: add v2 format of CLC decline message")
 
-Let me rephrase: why 1400? is that MRU dependent, or just an arbitrary
-threshold? What if the NIC can receive 8K frames (or max 1024 bytes long
-one)? What if the stack adds a long encapsulation?
+Sure, will fix this in v2.>> Signed-off-by: Mahanta Jambigi
+<mjambigi@linux.ibm.com>
+>> Reference-ID: LTC214332
+> 
+> Please drop this non-standard tag.
+> And please only include references (by any means) to public information.
 
-What if an evil/bugged peer set message_length to a random value (larger
-than the amount of bytes actually sent or smaller than that)?
-
-Cheers,
-
-Paolo
-
+Yeah, will fix this in v2. Dust Li also mentioned the same.
 
