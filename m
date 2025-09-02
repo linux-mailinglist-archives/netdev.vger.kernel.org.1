@@ -1,132 +1,230 @@
-Return-Path: <netdev+bounces-219339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31961B4105D
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 00:51:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFB61B41062
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 00:56:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C659F1899281
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 22:52:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B699516F86C
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 22:56:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB5FB275B12;
-	Tue,  2 Sep 2025 22:51:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAD52277CB4;
+	Tue,  2 Sep 2025 22:56:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AvpSJBrl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Svp4bnH3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073F3265632
-	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 22:51:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57B452777FC;
+	Tue,  2 Sep 2025 22:56:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756853505; cv=none; b=DVb13W89kovjz+AdJTPRP0XoNR8FrzPcO8VIAYVI9j6FVQX4ZoCc6zPwuysSAe569aCEGGoSPdblSh2TI1wZ7XIKKtfXe46wU2nGIVjexUz6WK5O+OrwpK2th0y00FlmLrMkUK6h5Yh6JzU+l0osFgpO25yBgKcFAY08R/FOC3E=
+	t=1756853777; cv=none; b=FYgLlkzZUDcG1NjM671L90x6pizz56HKMi6ejgObRyC1nzEQ3hbqtAAAyeRqWsvXT7QymxnBOgmPiqejf15FDLVlxUYQtkVjFWWjP7MspFlSw/vxMYq1FVw/ZKki+Mcq9m+wsrzwJVc4i6rWmpO4duvXT3iuxBvpVRec3mfoIG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756853505; c=relaxed/simple;
-	bh=bsmZ5PDPKgBAIOJ5HvCwriActAOC6xFxQ5D5Cn4b5ZI=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pdd85J1Ct58s19yevY2IqyMHqV/pUFZSJqdMieN1zYnFt8C2QYkbn4YeWlJ32mrRyYfYFEtalo3fD1ZJHXJBJbRqEhKfKmxFyx/ZMwNmi86r0p7zfxC2aszplKjwskOpHmZlM+WUDHgDl5xhw7qPG9R77pLYpOsD8NWEabJDUZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AvpSJBrl; arc=none smtp.client-ip=209.85.128.47
+	s=arc-20240116; t=1756853777; c=relaxed/simple;
+	bh=L1aSF83k8T/325D8EFCetHBmvrLfymIgil/+0GT0i+k=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=AQxebH5yxclnASXRe1b35THzEcGkA5hAGKX6Uq5htfvdQjHEmL9VrcKdWk9G1wZ1S3s4nygIgECankhhRm8jZbSlKmz7kfydnlzfQSjsklpLMHDeLHB/4LGin+0sYrKOUkiq3Jk1MemxRBgZrXaViEu9IzcIHO3sBEusitQRaOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Svp4bnH3; arc=none smtp.client-ip=209.85.219.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-45b76a30584so1110745e9.1
-        for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 15:51:43 -0700 (PDT)
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-7240eb21ccaso728696d6.0;
+        Tue, 02 Sep 2025 15:56:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756853502; x=1757458302; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dor+sidR0RjX82QMLQwNVquvBdAo4Ay/OV7OD/TIaNQ=;
-        b=AvpSJBrlvKrlTKaxMlP4ULd2tHAgIzHI+8+HnLS/PT3VuLE5DGk2D1Kl9xkgPzj33Q
-         VaVnPNg6TObE6QL1meMwYJ3Ed9a2LCAbByK2P6WJ/nuSgxpNgtSfkLBCQsCFl9cxCQGn
-         3lW0MQ0O7uFeP9kUxQwVMdSkrMmUFfC7SghGWkLXCw1PJttM4YjZIqScLlfUlrVs5z1V
-         qXTzkghcC4Lz3oPdfeSThlpJTW55qF4SPD7n+n5mByonGgeGEM3hMJTfJD130uydAwOw
-         aAjSD7okxrkyTh8ImZ5uNTjLwSnAWc2ONftz/VakdEYHip9cP2QvOgFaowFWTC37B9/N
-         TJAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756853502; x=1757458302;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1756853774; x=1757458574; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Dor+sidR0RjX82QMLQwNVquvBdAo4Ay/OV7OD/TIaNQ=;
-        b=lV/okjorXAQdYe/gssbXkTDJkMNm+oPS5XsufpKmiTWr8DG2MYQvHbYvzbD1XQ5/wu
-         ocnZhG306n37lg9rDXCNkgqI3x0Bf96b2dFgmrwNZESoKtu2zQtmkSvKWloiRui1+1HC
-         TBWLh4Pt38kxTvO8Cnf36uKDGUBGoXSFc44McI3BwjwWDfiA+r8mqaLImbcKovzmirt+
-         Vdla4MWSLYZ5Hq2MD3h3PNNpc42yGgfeqqujtWnP7QVNIJykqxyENsB1jrDuOs4wf+p5
-         kUMHpf9qwA3ardsgxR4w2nWmC1+jdT8ibT81zmcnmHoDQRtPehktzQ88EugAQ3qha1/H
-         xxzw==
-X-Forwarded-Encrypted: i=1; AJvYcCUhWoXqt5918bw0j/yQQ+YYjUfXeMSF1T34wCHYeWwUXnyO6fzfneUBabQDEB12dohT3SA97uU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeGHOK+rPU4CxUkXnPHfsgTTksYA/YCe4Ef3MtgtralwJ7+CTR
-	aDK/vyAVce3nlnzQEqbNH+lXt4BgSgHOITv+svTGNKLQ4BtaAQ5VpcXS
-X-Gm-Gg: ASbGnctE0bUldZzHw8Kun7upNXO6yzaJ5wIkdb+dOSGkDP5JS59tIhl+dvGMtIltZfe
-	VVEan3h4ZaPAQLXTOdsgTRDZNjt47ZEqgxJPDCtFFF/DdFCSMoia+U1zUiQUiKKtPb7hdIBe3kD
-	cvYsNPbHt1ihooagBAJ9PBt+C0xCW6ZTtggrUBoaZadnAFC+REONCwG1uCUcBlKveqaJZOAfT3M
-	zmNDQGBKZd1DMqu/YjkerIGvwZAxCCzEB8dMiS0JWgCX6LnOj94OEvF4ir7NBeCapt23cDbqyYB
-	rQxgq4JF4ZrtNialHTaCHGN6PpVc7fP2adazzX1hdFyEy72YOZREx/F68gz/tf/JxOWDCkKdlrT
-	SzfFFoYvmlcVF7xHjJHYC9V0=
-X-Google-Smtp-Source: AGHT+IFjP1V+gVIX+eRUe7YF9xD72/E3KPdMwrp5eAxNufIEa3uaF75vzWqWlBb3MGdJ17U4mRpL9w==
-X-Received: by 2002:adf:a1c8:0:b0:3d4:eac4:9d8a with SMTP id ffacd0b85a97d-3d4eac49fdamr2843462f8f.11.1756853502084;
-        Tue, 02 Sep 2025 15:51:42 -0700 (PDT)
-Received: from skbuf ([2a02:2f04:d005:3b00:e6e0:f5a6:e762:89fa])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3d1007c0dc8sm19530121f8f.53.2025.09.02.15.51.39
+        bh=6y60fL7NODA3Mze50fVdidlqngxPgWIM1G9KmQ67B7g=;
+        b=Svp4bnH3wZ8kt3gIU9FYnj4DBbp/Gk+ILbtpM+j//Sy1NsGb9ISFHQX/7b2KgwHTnG
+         O85zQIrSRdGP7kZSskEr0pI7yJxxxbw099GaX3zgqztrpYKKqdg3iFytc+vMa527hQR0
+         pLiDhtgie333E+Mspusmk7A2T3eYaD7iZt6PbbmPpwl0ApbQRtoBt93bliRb8fDfPsW+
+         tO4qoN0LkDJRCUgkhvAhhuK/VuNlRBSLwmVqRubBMSCT7wJfi6haOWusGaYDkT8wRPWn
+         waOi06h6AR0ytGNW18eT6IXLcWbxge9AEajXeQy3AkWHfBMueZSbYUSL1F1toyP9A39W
+         1c0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756853774; x=1757458574;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=6y60fL7NODA3Mze50fVdidlqngxPgWIM1G9KmQ67B7g=;
+        b=vEU9BSWqG6axN9FLwyd7kA19GLEZ99ylPEVid1BRV4LL0vanI055zHdveflpZtr3p7
+         gJ5JE4MFn8tw+VbnMRuHAKKPX3FBu1DBOuKQkN9/RVrr+SdfddKjJUHDwmunLTreT1x8
+         am1db1A4R2UwE6pcR8owkHJhxqW3xwtlX8Efj+r/PdI5XJg8qRlqSbbUnWogdvdueUMK
+         5JS6IkZBqt0uSMK8MRauFiKN+lmJ7ygKFVBtzEMfLy0ky9LLAX0g8JzMb41wxfO+Qj88
+         HlcrWyfQLu4QYLM2cpC93n/ehRJwezK9Vcq07F65LX1lmMmeQ7L0/0Z5QYfqe4JvXmBA
+         bHag==
+X-Forwarded-Encrypted: i=1; AJvYcCWJgyLrUcl7waEfPyAjTKNkwaPcIOyOAvJ/sctIuLi+3Mr6B7gyRcCrcyKk6d0VvQk3h9TeIHqNNg4b/xc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxUaVxnuifzgbsDwSeEf1MKDj/gMOW7S7Wqre5MNNb2Baendti9
+	pjDo/jQu7+ydMGuOiJpcxaSR/a7exIHNkDLmqemaLTPG7pgqGVjvENZU
+X-Gm-Gg: ASbGnctYIq+qTlrObyxhOioOtpDF1sNzbUa2+2nEx3xbGTfYYNFmPVexlqsylcHJEro
+	HYECpF+kr1FhRMECWdfRCkzTS0i8av8ifxyo2cqQUfY0rWiRYBLh2dZRt+jCNikQXU3HdBH5r4S
+	5J7KHT7lmbWlKDs5k3SOeQngXE+GPvWoDJPIRNiSokLaGyu95e2EBvHPfWkXXCcpK5jn1gS4e7I
+	+cZDz7cnBpElTVcdxgcwnEnek7s0NgkMNjwse/AsvCi7Qb9lTJxNCgQEofXlsZ2wImD1aQmNIVp
+	FsWxwfAe3cNDyqG3y5s6fRwGEmkoezPusYFiZiy+mKerp4v2cp5DFJksfotIXqKWn9q7V8ZGNL9
+	wRL+kSLZ/3Mib/4CRtmyO4NuKpEKPwdggDs/AXrnWe6gJWCozrkytSVmG2ccADxe17NWHh1MXCI
+	U56O1H1p8p7h0gPqoiURhD68I=
+X-Google-Smtp-Source: AGHT+IGZcGFPDQK2aRbRHnSfA7r8wxVj7nChgols/TbbtyMaQgQza900R5sHWoInyWm5NemHw4jthw==
+X-Received: by 2002:a05:622a:2d2:b0:4b0:66a3:f13c with SMTP id d75a77b69052e-4b31b8895eemr134350461cf.12.1756853774064;
+        Tue, 02 Sep 2025 15:56:14 -0700 (PDT)
+Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-80aa60dbf87sm22282785a.3.2025.09.02.15.56.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Sep 2025 15:51:40 -0700 (PDT)
-From: Vladimir Oltean <olteanv@gmail.com>
-X-Google-Original-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-Date: Wed, 3 Sep 2025 01:51:37 +0300
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Mathew McBride <matt@traverse.com.au>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net 3/3] net: phylink: disable autoneg for interfaces
- that have no inband
-Message-ID: <20250902225137.6h2ank6itrgeln6w@skbuf>
-References: <aLSHmddAqiCISeK3@shell.armlinux.org.uk>
- <aLSHmddAqiCISeK3@shell.armlinux.org.uk>
- <E1uslwx-00000001SPB-2kiM@rmk-PC.armlinux.org.uk>
- <E1uslwx-00000001SPB-2kiM@rmk-PC.armlinux.org.uk>
+        Tue, 02 Sep 2025 15:56:13 -0700 (PDT)
+Date: Tue, 02 Sep 2025 18:56:13 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Breno Leitao <leitao@debian.org>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+ Clark Williams <clrkwllms@kernel.org>, 
+ Steven Rostedt <rostedt@goodmis.org>
+Cc: netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ linux-rt-devel@lists.linux.dev, 
+ kernel-team@meta.com, 
+ efault@gmx.de, 
+ calvin@wbinvd.org, 
+ Breno Leitao <leitao@debian.org>
+Message-ID: <willemdebruijn.kernel.a0f67bb6112a@gmail.com>
+In-Reply-To: <20250902-netpoll_untangle_v3-v1-5-51a03d6411be@debian.org>
+References: <20250902-netpoll_untangle_v3-v1-0-51a03d6411be@debian.org>
+ <20250902-netpoll_untangle_v3-v1-5-51a03d6411be@debian.org>
+Subject: Re: [PATCH 5/7] netpoll: Move SKBs pool to netconsole side
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1uslwx-00000001SPB-2kiM@rmk-PC.armlinux.org.uk>
- <E1uslwx-00000001SPB-2kiM@rmk-PC.armlinux.org.uk>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Aug 31, 2025 at 06:34:43PM +0100, Russell King (Oracle) wrote:
-> Mathew reports that as a result of commit 6561f0e547be ("net: pcs:
-> pcs-lynx: implement pcs_inband_caps() method"), 10G SFP modules no
-> longer work with the Lynx PCS.
+Breno Leitao wrote:
+> Since netconsole is the sole user of the SKBs pool within netpoll, move
+> the pool management into the netconsole driver.
 > 
-> This problem is not specific to the Lynx PCS, but is caused by commit
-> df874f9e52c3 ("net: phylink: add pcs_inband_caps() method") which added
-> validation of the autoneg state to the optical SFP configuration path.
+> This change prevents other netpoll users from allocating and holding
+> onto skb pool memory unnecessarily, thereby reducing memory usage when
+> the pool is not required (which is all the cases except netconsole).
 > 
-> Fix this by handling interface modes that fundamentally have no
-> inband negotiation more correctly - if we only have a single interface
-> mode, clear the Autoneg support bit and the advertising mask. If the
-> module can operate with several different interface modes, autoneg may
-> be supported for other modes, so leave the support mask alone and just
-> clear the Autoneg bit in the advertising mask.
+> The skb poll struct is still attached to the netpoll, but, eventually
+> this should move to the netconsole target, since it has nothing to do
+> with netpoll.
 > 
-> This restores 10G optical module functionality with PCS that supply
-> their inband support, and makes ethtool output look sane.
-> 
-> Reported-by: Mathew McBride <matt@traverse.com.au>
-> Closes: https://lore.kernel.org/r/025c0ebe-5537-4fa3-b05a-8b835e5ad317@app.fastmail.com
-> Fixes: df874f9e52c3 ("net: phylink: add pcs_inband_caps() method")
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 > ---
+>  drivers/net/netconsole.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++--
+>  net/core/netpoll.c       | 44 ------------------------------------
+>  2 files changed, 56 insertions(+), 46 deletions(-)
+> 
+> diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+> index 90e359b87469a..3fe55db07cfe5 100644
+> --- a/drivers/net/netconsole.c
+> +++ b/drivers/net/netconsole.c
+> @@ -57,6 +57,19 @@ MODULE_LICENSE("GPL");
+>  #define MAX_EXTRADATA_ITEMS		16
+>  #define MAX_PRINT_CHUNK			1000
+>  
+> +/*
+> + * We maintain a small pool of fully-sized skbs, to make sure the
+> + * message gets out even in extreme OOM situations.
+> + */
+> +
+> +#define MAX_SKBS 32
+> +#define MAX_UDP_CHUNK 1460
+> +#define MAX_SKB_SIZE							\
+> +	(sizeof(struct ethhdr) +					\
+> +	 sizeof(struct iphdr) +						\
+> +	 sizeof(struct udphdr) +					\
+> +	 MAX_UDP_CHUNK)
+> +
+>  static char config[MAX_PARAM_LENGTH];
+>  module_param_string(netconsole, config, MAX_PARAM_LENGTH, 0);
+>  MODULE_PARM_DESC(netconsole, " netconsole=[src-port]@[src-ip]/[dev],[tgt-port]@<tgt-ip>/[tgt-macaddr]");
+> @@ -172,6 +185,33 @@ struct netconsole_target {
+>  	char			buf[MAX_PRINT_CHUNK];
+>  };
+>  
+> +static void refill_skbs(struct netpoll *np)
+> +{
+> +	struct sk_buff_head *skb_pool;
+> +	struct sk_buff *skb;
+> +	unsigned long flags;
+> +
+> +	skb_pool = &np->skb_pool;
+> +
+> +	spin_lock_irqsave(&skb_pool->lock, flags);
+> +	while (skb_pool->qlen < MAX_SKBS) {
+> +		skb = alloc_skb(MAX_SKB_SIZE, GFP_ATOMIC);
+> +		if (!skb)
+> +			break;
+> +
+> +		__skb_queue_tail(skb_pool, skb);
+> +	}
+> +	spin_unlock_irqrestore(&skb_pool->lock, flags);
+> +}
+> +
+> +static void refill_skbs_work_handler(struct work_struct *work)
+> +{
+> +	struct netpoll *np =
+> +		container_of(work, struct netpoll, refill_wq);
+> +
+> +	refill_skbs(np);
+> +}
+> +
+>  #ifdef	CONFIG_NETCONSOLE_DYNAMIC
+>  
+>  static struct configfs_subsystem netconsole_subsys;
+> @@ -341,6 +381,20 @@ static int netpoll_parse_ip_addr(const char *str, union inet_addr *addr)
+>  	return -1;
+>  }
+>  
+> +static int setup_netpoll(struct netpoll *np)
 
-Tested-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Having both netpoll_setup and setup_netpoll is a bit confusing.
+Maybe netconsole_setup_netpoll?
 
-I had missed this discussion and was about to report the same problem as
-Mathew again.
+> +{
+> +	int err;
+> +
+> +	err = netpoll_setup(np);
+> +	if (err)
+> +		return err;
+> +
+> +	refill_skbs(np);
+> +	INIT_WORK(&np->refill_wq, refill_skbs_work_handler);
+> +
+> +	return 0;
+> +}
+> +
+>  #ifdef	CONFIG_NETCONSOLE_DYNAMIC
+>  
+>  /*
+> @@ -615,7 +669,7 @@ static ssize_t enabled_store(struct config_item *item,
+>  		 */
+>  		netconsole_print_banner(&nt->np);
+>  
+> -		ret = netpoll_setup(&nt->np);
+> +		ret = setup_netpoll(&nt->np);
+>  		if (ret)
+>  			goto out_unlock;
+>  
+> @@ -2036,7 +2090,7 @@ static struct netconsole_target *alloc_param_target(char *target_config,
+>  	if (err)
+>  		goto fail;
+>  
+> -	err = netpoll_setup(&nt->np);
+> +	err = setup_netpoll(&nt->np);
+>  	if (err) {
+>  		pr_err("Not enabling netconsole for %s%d. Netpoll setup failed\n",
+>  		       NETCONSOLE_PARAM_TARGET_PREFIX, cmdline_count);
 
