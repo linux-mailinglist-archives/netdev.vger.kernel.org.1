@@ -1,98 +1,110 @@
-Return-Path: <netdev+bounces-219267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36341B40D59
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 20:50:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8054DB40D65
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 20:55:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B85D63B101E
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 18:50:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 062003AE26A
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 18:55:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A98D82E54A0;
-	Tue,  2 Sep 2025 18:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31F1232ED25;
+	Tue,  2 Sep 2025 18:55:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W2WUiAWC"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eRJ1/XGc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 690E927EC80;
-	Tue,  2 Sep 2025 18:50:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B364E311C13
+	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 18:55:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756839027; cv=none; b=unp9YTfHBCO90LbSUBcaW/iaxikxV1P2dIPgrC/vBoFGfd8jtihxX+tsF5uWnDBvc8bP5+R9oNpZe9W3Z6nlfWt1fUF8R/wCFcD5oQ9I51BswbFsQL9BAoVPnadVwBKvgefJYYWJsSfghnL9rx5ysE0SsGXAnju1DsdQZsYJPL4=
+	t=1756839315; cv=none; b=ldXMLJ0w+56n57M7sfzLFEHAdoBhZEd222QP7Yma8TFrYA+6OtnAbw7elvJfESptzr0ExVS0Yk8Op7BRS5cSbIn1TamiFa17dq5EIsRpSFNIBUkL9Y0Vc5BXzpwNpT5SrDZX5XPxJovP74B+kt0cKJ6JouUbUG9g7trYInE8HlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756839027; c=relaxed/simple;
-	bh=3f1QlWQggQFlWHsbX6W+fm41fKE8JQ+mTvYxr1R3j/o=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=P8VZ8w4Zr/rVK+MF/RGZ2EFM78jjCJDnoXFUba6hjVlhSi9Xzse5MfN+jx4XUekn6lzl7yfslpVqpdSnUBtcxnCpdCWz8YvPc4IUGOaBX8/I1vpkHM3vnuQZ+2FcIQT45h6jTVDxMxeJjUyi1erLq/0plp51h/LktAeDDQuhI3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W2WUiAWC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22E1AC4CEED;
-	Tue,  2 Sep 2025 18:50:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756839026;
-	bh=3f1QlWQggQFlWHsbX6W+fm41fKE8JQ+mTvYxr1R3j/o=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=W2WUiAWC6ZYJkUKJTOqFW4ab6h/q1xSGEMW8iGGKsXYva7sw0A4o/XNsDiuT7HqDK
-	 XYRoF+LiDkAuaXU3Rs0GImCm6zzlJvRDnUHHtXQtNFHtx4qb6G132fBh5D3V24XdEb
-	 KI6da4hyNmUuo+QqBwBLQcoJcc/T2a8ujPX0dKnXPmJvwMgYmMe7zP7+9+eSP6RWES
-	 2gWESOeZp745gOx4qI+fVA//BIGhqFqnNuNDF1n1Sez3lxruA1GVs96kQQM+tXDnXx
-	 tcylUEw8nAsrKkdRezdS8JJP7ZkxtHQwwzZWoDcFwXLx3wtGTa1ZPUM8eIVXWGk86m
-	 0fkpSXcfTcNwA==
-Date: Tue, 2 Sep 2025 20:50:19 +0200 (GMT+02:00)
-From: Matthieu Baerts <matttbe@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, mptcp@lists.linux.dev,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>,
-	Christoph Paasch <cpaasch@openai.com>, Gang Yan <yangang@kylinos.cn>
-Message-ID: <d4205818-e283-4862-946d-4e51bf180158@kernel.org>
-In-Reply-To: <aLc2hyFAH9kxlNEg@arm.com>
-References: <20250901-net-next-mptcp-misc-feat-6-18-v1-0-80ae80d2b903@kernel.org> <20250902072600.2a9be439@kernel.org> <834238b4-3549-4062-a29b-bf9c5aefa30f@kernel.org> <20250902082759.1e7813b8@kernel.org> <aLc2hyFAH9kxlNEg@arm.com>
-Subject: Re: [PATCH net-next 0/6] mptcp: misc. features for v6.18
+	s=arc-20240116; t=1756839315; c=relaxed/simple;
+	bh=k30iZqFphVmrjXtQ7cb3XHZFtGwVkWt+HAh0/BqYOZU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gzS9e+6dhOI+GccjXe5iOFUeM4NV+zoXc0ZoZNphFEVjQWbuoTgxa8ZCz1SSy7+PfnR3XUlK6yyqBvaPCtpZnZhH8yX1++rc3y8PnJUQHJo6lzV4EAb1w8IacPE30y8trWl4RM/adO5ZDtrdN5Am9mhc7lqbcuNLM1ybMjb5SNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eRJ1/XGc; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <2527aee9-4e19-4e41-9176-7be1eda9aede@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1756839308;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sG8VBcevWdIN+EMwmaHGKO4rbCX49MuPx14U2puOrFA=;
+	b=eRJ1/XGcbshKsl89UradqzBl/8fQHXtLnFMQ0IZOy7s3jAdvHSuXvkwshYLrI+lZZbG0t/
+	IjtOCGZgyWhA/sfA/s38oiPZJVmVgmb2ucc3nIaHHfiaxygFMPt+OTJsDdOfDs8yqBwwuN
+	k9MQG3z2IXRf2d3C+y8cnKFWUAZstIw=
+Date: Tue, 2 Sep 2025 11:55:01 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH v4 bpf-next/net 1/5] tcp: Save lock_sock() for memcg in
+ inet_csk_accept().
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Johannes Weiner <hannes@cmpxchg.org>,
+ Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>,
+ Shakeel Butt <shakeel.butt@linux.dev>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>,
+ Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima
+ <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20250829010026.347440-1-kuniyu@google.com>
+ <20250829010026.347440-2-kuniyu@google.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <20250829010026.347440-2-kuniyu@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Correlation-ID: <d4205818-e283-4862-946d-4e51bf180158@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Catalin,
+On 8/28/25 6:00 PM, Kuniyuki Iwashima wrote:
+> mem_cgroup_sk_alloc() is called for SCTP before __inet_accept(),
+> so I added the protocol check in __inet_accept(), but this can be
+> removed once SCTP uses sk_clone_lock().
 
-2 Sept 2025 20:25:19 Catalin Marinas <catalin.marinas@arm.com>:
+>   void __inet_accept(struct socket *sock, struct socket *newsock, struct sock *newsk)
+>   {
+> +	/* TODO: use sk_clone_lock() in SCTP and remove protocol checks */
+> +	if (mem_cgroup_sockets_enabled &&
+> +	    (!IS_ENABLED(CONFIG_IP_SCTP) ||
+> +	     sk_is_tcp(newsk) || sk_is_mptcp(newsk))) {
 
-> On Tue, Sep 02, 2025 at 08:27:59AM -0700, Jakub Kicinski wrote:
->> On Tue, 2 Sep 2025 16:51:47 +0200 Matthieu Baerts wrote:
->>> It is unclear why a second scan is needed and only the second one caught
->>> something. Was it the same with the strange issues you mentioned in
->>> driver tests? Do you think I should re-add the second scan + cat?
->>
->> Not sure, cc: Catalin, from experience it seems like second scan often
->> surfaces issues the first scan missed.
->
-> It's some of the kmemleak heuristics to reduce false positives. It does
-> a checksum of the object during scanning and only reports a leak if the
-> checksum is the same in two consecutive scans.
+Instead of protocol check, is it the same as checking
+"if (mem_cgroup_sockets_enabled && !mem_cgroup_from_sk(newsk))"
 
-Thank you for the explanation!
-
-Does that mean a scan should be triggered at the end of the tests,
-then wait 5 second for the grace period, then trigger another scan
-and check the results?
-
-Or wait 5 seconds, then trigger two consecutive scans?
-
-Cheers,
-Matt
+> +		gfp_t gfp = GFP_KERNEL | __GFP_NOFAIL;
+> +
+> +		mem_cgroup_sk_alloc(newsk);
+> +
+> +		if (mem_cgroup_from_sk(newsk)) {
+> +			int amt;
+> +
+> +			/* The socket has not been accepted yet, no need
+> +			 * to look at newsk->sk_wmem_queued.
+> +			 */
+> +			amt = sk_mem_pages(newsk->sk_forward_alloc +
+> +					   atomic_read(&newsk->sk_rmem_alloc));
+> +			if (amt)
+> +				mem_cgroup_sk_charge(newsk, amt, gfp);
+> +		}
+> +
+> +		kmem_cache_charge(newsk, gfp);
+> +	}
+> +
 
