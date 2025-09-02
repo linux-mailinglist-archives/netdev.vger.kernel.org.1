@@ -1,110 +1,160 @@
-Return-Path: <netdev+bounces-219268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8054DB40D65
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 20:55:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD3D3B40D6B
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 20:56:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 062003AE26A
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 18:55:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 524DE1892EE2
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 18:56:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31F1232ED25;
-	Tue,  2 Sep 2025 18:55:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7172E32ED25;
+	Tue,  2 Sep 2025 18:56:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eRJ1/XGc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X7F/tT6y"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B364E311C13
-	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 18:55:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F6B719F12A;
+	Tue,  2 Sep 2025 18:56:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756839315; cv=none; b=ldXMLJ0w+56n57M7sfzLFEHAdoBhZEd222QP7Yma8TFrYA+6OtnAbw7elvJfESptzr0ExVS0Yk8Op7BRS5cSbIn1TamiFa17dq5EIsRpSFNIBUkL9Y0Vc5BXzpwNpT5SrDZX5XPxJovP74B+kt0cKJ6JouUbUG9g7trYInE8HlE=
+	t=1756839368; cv=none; b=bpqJR9sOTzugux9TQjczFhoCe+tzO/uWmHNJ4dPRK1aSjAHB6cWjXJKUE/AnXvqePKR4WaaXSsSBGWAQbrXmxnslUDJ2xOe8+6r5eTmr8+u19ynYYPgCjGxe1rme6B9S2j/aE6YWeqbQXX8sbHOGSvda0mxGE4EHYxxcItcSXv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756839315; c=relaxed/simple;
-	bh=k30iZqFphVmrjXtQ7cb3XHZFtGwVkWt+HAh0/BqYOZU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gzS9e+6dhOI+GccjXe5iOFUeM4NV+zoXc0ZoZNphFEVjQWbuoTgxa8ZCz1SSy7+PfnR3XUlK6yyqBvaPCtpZnZhH8yX1++rc3y8PnJUQHJo6lzV4EAb1w8IacPE30y8trWl4RM/adO5ZDtrdN5Am9mhc7lqbcuNLM1ybMjb5SNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eRJ1/XGc; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <2527aee9-4e19-4e41-9176-7be1eda9aede@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1756839308;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sG8VBcevWdIN+EMwmaHGKO4rbCX49MuPx14U2puOrFA=;
-	b=eRJ1/XGcbshKsl89UradqzBl/8fQHXtLnFMQ0IZOy7s3jAdvHSuXvkwshYLrI+lZZbG0t/
-	IjtOCGZgyWhA/sfA/s38oiPZJVmVgmb2ucc3nIaHHfiaxygFMPt+OTJsDdOfDs8yqBwwuN
-	k9MQG3z2IXRf2d3C+y8cnKFWUAZstIw=
-Date: Tue, 2 Sep 2025 11:55:01 -0700
+	s=arc-20240116; t=1756839368; c=relaxed/simple;
+	bh=YTKxsfW0Yr5gDhS1iDA/vpuPyuxHk2F2mqFRLf8Kv8Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nMTZo8rzN0ThaJPmaR12sl61Lr4nZwLkVspu+BQ/wOteN4Lcyysztg3fh22o6p4JKgWDb1ha3Cq0ORe1G8LAsVDd3mFO+uTBmnBEr3CmQSyHx7wFyNnzeuMIcfWoErERL5jH/GrmsZoV46asfmSNQOrft9IRFARpyxPfVhCerlo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X7F/tT6y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CBB7C4CEED;
+	Tue,  2 Sep 2025 18:56:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756839367;
+	bh=YTKxsfW0Yr5gDhS1iDA/vpuPyuxHk2F2mqFRLf8Kv8Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=X7F/tT6y0ljtU46rQx5ypDmPe8ONbxMaaY4gPA3sXQaEamRW7Y33WoOA7vj7Zng8c
+	 IF0chkHTXJyZOh7zXfPYdw+we+1sYvEo5cWqL5Ij/pYCJ5orV7oIBuDItqplp813ze
+	 T8a34hnkTq4K93ZuRuJP9LKp9vQpe2h7zvEMExmS1KzTSdm54ZGoSXYq7qjvvUSp0W
+	 DzN9qyrzH1eYUWplN6Ho3RIaj45JyocR21fPASQUAdjvbQz7QQhFOhALS0R2kBUZO3
+	 Kjz9CyVRcFujsv4szzjzXlKXp/sPK9DnajYLNuH3vxo7hgqUniU+QMOJHDUduecPuV
+	 WWiyXEnlmKhJg==
+Date: Tue, 2 Sep 2025 11:56:06 -0700
+From: Saeed Mahameed <saeed@kernel.org>
+To: Mingrui Cui <mingruic@outlook.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net/mlx5e: Make DEFAULT_FRAG_SIZE relative to page size
+Message-ID: <aLc9xknpad29kSnH@x130>
+References: <MN6PR16MB5450CAF432AE40B2AFA58F61B706A@MN6PR16MB5450.namprd16.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v4 bpf-next/net 1/5] tcp: Save lock_sock() for memcg in
- inet_csk_accept().
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Johannes Weiner <hannes@cmpxchg.org>,
- Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>,
- Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima
- <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20250829010026.347440-1-kuniyu@google.com>
- <20250829010026.347440-2-kuniyu@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <20250829010026.347440-2-kuniyu@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <MN6PR16MB5450CAF432AE40B2AFA58F61B706A@MN6PR16MB5450.namprd16.prod.outlook.com>
 
-On 8/28/25 6:00 PM, Kuniyuki Iwashima wrote:
-> mem_cgroup_sk_alloc() is called for SCTP before __inet_accept(),
-> so I added the protocol check in __inet_accept(), but this can be
-> removed once SCTP uses sk_clone_lock().
+On 02 Sep 21:00, Mingrui Cui wrote:
+>When page size is 4K, DEFAULT_FRAG_SIZE of 2048 ensures that with 3
+>fragments per WQE, odd-indexed WQEs always share the same page with
+>their subsequent WQE. However, this relationship does not hold for page
+>sizes larger than 8K. In this case, wqe_index_mask cannot guarantee that
+>newly allocated WQEs won't share the same page with old WQEs.
+>
+>If the last WQE in a bulk processed by mlx5e_post_rx_wqes() shares a
+>page with its subsequent WQE, allocating a page for that WQE will
+>overwrite mlx5e_frag_page, preventing the original page from being
+>recycled. When the next WQE is processed, the newly allocated page will
+>be immediately recycled.
+>
+>In the next round, if these two WQEs are handled in the same bulk,
+>page_pool_defrag_page() will be called again on the page, causing
+>pp_frag_count to become negative.
+>
+>Fix this by making DEFAULT_FRAG_SIZE always equal to half of the page
+>size.
+>
+>Signed-off-by: Mingrui Cui <mingruic@outlook.com>
+CC:  Dragos Tatulea <dtatulea@nvidia.com>
 
->   void __inet_accept(struct socket *sock, struct socket *newsock, struct sock *newsk)
->   {
-> +	/* TODO: use sk_clone_lock() in SCTP and remove protocol checks */
-> +	if (mem_cgroup_sockets_enabled &&
-> +	    (!IS_ENABLED(CONFIG_IP_SCTP) ||
-> +	     sk_is_tcp(newsk) || sk_is_mptcp(newsk))) {
+Dragos is on a mission to improve page_size support in mlx5.
 
-Instead of protocol check, is it the same as checking
-"if (mem_cgroup_sockets_enabled && !mem_cgroup_from_sk(newsk))"
+Dragos, please look into this, I am not sure making  DEFAULT_FRAG_SIZE
+dependant on PAGE_SIZE is the correct way to go,
+see mlx5e_build_rq_frags_info()
 
-> +		gfp_t gfp = GFP_KERNEL | __GFP_NOFAIL;
-> +
-> +		mem_cgroup_sk_alloc(newsk);
-> +
-> +		if (mem_cgroup_from_sk(newsk)) {
-> +			int amt;
-> +
-> +			/* The socket has not been accepted yet, no need
-> +			 * to look at newsk->sk_wmem_queued.
-> +			 */
-> +			amt = sk_mem_pages(newsk->sk_forward_alloc +
-> +					   atomic_read(&newsk->sk_rmem_alloc));
-> +			if (amt)
-> +				mem_cgroup_sk_charge(newsk, amt, gfp);
-> +		}
-> +
-> +		kmem_cache_charge(newsk, gfp);
-> +	}
-> +
+I believe we don't do page flipping for > 4k pages, but I might be wrong,
+anyway the code also should throw a warn_on: 
+
+/* The last fragment of WQE with index 2*N may share the page with the
+  * first fragment of WQE with index 2*N+1 in certain cases. If WQE
+  * 2*N+1
+  * is not completed yet, WQE 2*N must not be allocated, as it's
+  * responsible for allocating a new page.
+  */
+if (frag_size_max == PAGE_SIZE) {
+	/* No WQE can start in the middle of a page. */
+	info->wqe_index_mask = 0;
+} else {
+	/* PAGE_SIZEs starting from 8192 don't use 2K-sized fragments,
+	 * because there would be more than MLX5E_MAX_RX_FRAGS of
+	 * them.
+	 */
+	WARN_ON(PAGE_SIZE != 2 * DEFAULT_FRAG_SIZE);
+	/* Odd number of fragments allows to pack the last fragment of
+	 * the previous WQE and the first fragment of the next WQE
+	 * into
+	 * the same page.
+	 * As long as DEFAULT_FRAG_SIZE is 2048, and
+	 * MLX5E_MAX_RX_FRAGS
+	 * is 4, the last fragment can be bigger than the rest only
+	 * if
+	 * it's the fourth one, so WQEs consisting of 3 fragments
+	 * will
+	 * always share a page.
+	 * When a page is shared, WQE bulk size is 2, otherwise
+	 * just 1.
+	 */
+	info->wqe_index_mask = info->num_frags % 2;
+}
+
+Looking at the above makes me think that this patch is correct, but a more
+careful look is needed to be taken, a Fixes tag is also required and target
+'net' branch.
+
+Thanks,
+Saeed.
+
+>---
+> drivers/net/ethernet/mellanox/mlx5/core/en/params.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+>
+>diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/params.c b/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
+>index 3cca06a74cf9..d96a3cbea23c 100644
+>--- a/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
+>+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
+>@@ -666,7 +666,7 @@ static void mlx5e_rx_compute_wqe_bulk_params(struct mlx5e_params *params,
+> 	info->refill_unit = DIV_ROUND_UP(info->wqe_bulk, split_factor);
+> }
+>
+>-#define DEFAULT_FRAG_SIZE (2048)
+>+#define DEFAULT_FRAG_SIZE (PAGE_SIZE / 2)
+>
+> static int mlx5e_build_rq_frags_info(struct mlx5_core_dev *mdev,
+> 				     struct mlx5e_params *params,
+>-- 
+>2.43.0
+>
+>
 
