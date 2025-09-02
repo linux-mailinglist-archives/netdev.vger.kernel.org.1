@@ -1,63 +1,76 @@
-Return-Path: <netdev+bounces-219217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B56DDB4088F
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 17:09:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA3EEB408DC
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 17:23:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C4A31B26971
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 15:09:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 748FB3B408E
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 15:23:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B152F31A041;
-	Tue,  2 Sep 2025 15:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eI4ZNklj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48631314B6C;
+	Tue,  2 Sep 2025 15:23:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A64D930FC33;
-	Tue,  2 Sep 2025 15:08:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9552A31353F;
+	Tue,  2 Sep 2025 15:23:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756825731; cv=none; b=rjLy/01xjs7QJ3HZ578PQxfMSz2wqr3W7Mc+MNbxUwN5U/5ca0Kinysh+twxYj3PBJI2KAjQYvDyajY1IQVJkPlhdbRxOkLIP0JSUctz4IFlHkHifeMWnpQb6nBlGAa5OeftNQnH1kZQ25tNbP0eymtJ06rwZN1AtXCtfxvNK6E=
+	t=1756826616; cv=none; b=mB//TJquIvhsx4ko346nvrNaVuRueRPsjPKgMCnintnx7TkOLT5aHm/PG5gStFKRsZOp2qGds0IKFTvuU8523r+znKf7LfRpGVq7aDEQKZqEJzE+TmduUEgd+qMX8I5+lpY/UR5qPuS+RVbXc3kpUFUBsbWfVNZGoOpiK23JNMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756825731; c=relaxed/simple;
-	bh=syzP2MUe5ExWuloTy6E/G8+SoQFwyWf7K7Kj8XNTXeI=;
+	s=arc-20240116; t=1756826616; c=relaxed/simple;
+	bh=djnGVHCYiTjuSia2u0q6T+YLWCnZ+7UiAkbLWyydC5s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VBj1ZiwIzD3bRSDmID602yuZhrPUs6k3irKFyjAXaWSrKmxmNrm6eLiAz+RfZjH9LtBBuIYujxDKHi6L6uFVhxqrboI3JlD7hdfAHB00x8Gaprb58EgqG6RInOsyIcOoyH5z0mdusKwezC96ow3yHUMWvGQfvbdIBwsf7yIHQV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eI4ZNklj; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ZLCJGtUs4SCQmM6ssgLmBMJmoimwe4GV67RpLL10wto=; b=eI4ZNkljF4ruOV7r/5melwfRgq
-	JAqx41wIIYcEsIM5w3WGvpVD/+9czvbnOchkcWsWvagj1w4HpWZJP2K+1QvMXIEVtohrZYvSsRuru
-	Hxu6I1pvlj0UBJAwO29pxeF3BuPOKgQThFEyqc9F4LnXKnkDOUmZOIC5RMGyNGziOzAk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1utSch-006uCE-6U; Tue, 02 Sep 2025 17:08:39 +0200
-Date: Tue, 2 Sep 2025 17:08:39 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "G Thomas, Rohan" <rohan.g.thomas@altera.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Matthew Gerlach <matthew.gerlach@altera.com>
-Subject: Re: [PATCH net-next] net: phy: marvell: Fix 88e1510 downshift
- counter errata
-Message-ID: <4b3e4339-93d5-4d14-b53f-43c5d379d2fa@lunn.ch>
-References: <20250902-marvell_fix-v1-1-9fba7a6147dd@altera.com>
- <aLbyju1nKm5LXDDX@shell.armlinux.org.uk>
- <7b799cb3-ba9f-464e-a0a6-cad151742aab@altera.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FJbvrRdyLELj5XTchsIG2PHIpBnigp/iRJ3fX7BX3vEy0ltb6BNnjTLEsolBWYrnxIF+MtJlgcG3qRyHgE4vQXUOh1sU/ZJwicVTgY5PwBlYWPxUVxVLVGmqFMsYvIF//lallxivsoVPt4MZeZSl5KOxKL+JeEVewIWxjUIT2eM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-61cd6089262so8911167a12.3;
+        Tue, 02 Sep 2025 08:23:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756826613; x=1757431413;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=djnGVHCYiTjuSia2u0q6T+YLWCnZ+7UiAkbLWyydC5s=;
+        b=mljS9MLzDqQNHHOCc1Nc1J/wsfP6GMSxoaoNbxT5jCUpDxfTvIyYKErQykEaVRBYvb
+         LWGgqGfByv0fEaKq4wLUaXloqe3l6eLfYs4MRB3wtmEhJK8g22Mf8igFrhgu35XZLEVh
+         RmfKppELGelka2XZEB/4qkgpYGSMkzh6gJ2AVpCvHBNQrbYYB5S/mt72b7FuPddmQ7G8
+         uC8QW28BsQFvmeCOpZAGEHTa8eX/hU9vZw5JPsphTa20pI0iNoWWLrXKNS6zL1QJOUKi
+         IHJQYEjP87tlciAag+q6IgzWsDGUO4CKYD9Ie4O3oRNuxvCdUjL9DgF1uSYLIVg+nIqv
+         yVyw==
+X-Forwarded-Encrypted: i=1; AJvYcCUS+7tKm363tXPOyMUmjeUOdU82bm357PSbNcDv+tdKc76W7IivS/g0pSfsyRv5BhSF98hD2i+ySZo0tTI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvktiBbVywtqZ8MmZjUKAn8/LhpmZmKzMC/2mPo/rOJ4nOk8v0
+	9iHxMoRV+f2sIWyZ50qMo7nsBqfiupVjKiiwQGEwRu7DoEIFsGqCRhY3
+X-Gm-Gg: ASbGncst4zbRbTMCBkU4nABOXQr/Ro0WO0OSeU0faYS5IjEnG2IxC+pRIZjgrNhE819
+	8PjAajwMphd2f3wQi1PK5m1WOa2gQafrH/Wvq7FxZuu7ONhiSSN522IT3OwOU1O2LFhn+msYMfa
+	R59+PQsmmce5OeLJ9nzgCGHU8FW5UFKZQq+Km1+JhQurW0hPrD0tnulttVW8uf8c/3itpm0ef5Z
+	IGvRc8j43KYyQfjDgCxYsbYZsxRvCBPG1Jo7jDfgxj56QLvJpettJM1WBFEJX5rdbA5DwFYC4JE
+	vVHgjs5KQj/civVTZ88DyLTiTAYgufgG7TpmUjoaYE+IbHa7l8Rh7qORDLGRyoNtjHRn/qL7ixk
+	lWWCXQAgreshM
+X-Google-Smtp-Source: AGHT+IFHMWo3wDGvCkq0RM0mWV3QHrM0M52EgvwyERBSosR5NrkjDWOlCm4CFx8yli0QuWlqhLx/Sg==
+X-Received: by 2002:a17:907:3cd5:b0:afe:23e9:2b4d with SMTP id a640c23a62f3a-b01d976afb7mr1389440266b.43.1756826612615;
+        Tue, 02 Sep 2025 08:23:32 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:8::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b0413782b94sm703116266b.35.2025.09.02.08.23.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Sep 2025 08:23:32 -0700 (PDT)
+Date: Tue, 2 Sep 2025 08:23:29 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Clark Williams <clrkwllms@kernel.org>, 
+	Steven Rostedt <rostedt@goodmis.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-rt-devel@lists.linux.dev, kernel-team@meta.com, efault@gmx.de, calvin@wbinvd.org
+Subject: Re: [PATCH 0/7] netpoll: Untangle netpoll and netconsole
+Message-ID: <7eqeiq2k4kg3j5442pm2zzp6bdflqui6bmwes3f7bybyizbc2r@n6riekklmd7x>
+References: <20250902-netpoll_untangle_v3-v1-0-51a03d6411be@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,26 +79,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7b799cb3-ba9f-464e-a0a6-cad151742aab@altera.com>
+In-Reply-To: <20250902-netpoll_untangle_v3-v1-0-51a03d6411be@debian.org>
 
-> > Also, what is a "link power down/up" ? Are you referring to setting
-> > BMCR_PDOWN and then clearing it? (please update the commit description
-> > and repost after 24 hours, thanks.)
-> > 
-> 
-> Yes, I'm referring to setting and the clearing BMCR_PDOWN. Will update
-> the commit description in the next version.
-
-So it could be the bootloader left the PHY in powered down state, when
-booting.
-
-There is some not so nice logic in phy_attach_direct() which calls
-phy_resume() when the MAC attaches to the PHY. So this case is covered
-by that. But it would be good to comment in the commit message, and
-maybe the resume function, that you are relying on this behaviour.
-
-I do wounder if it should be more explicit, m88e1510_config_init()
-also calls the workaround? You would then not need the comment.
-
-	Andrew
+Needlessly to say that I forgot to tag `net-next`. I will fix it in the
+next revision.
 
