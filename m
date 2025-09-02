@@ -1,136 +1,137 @@
-Return-Path: <netdev+bounces-219032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA6B7B3F720
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 09:55:54 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A49C1B3F743
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 09:59:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B8324801C2
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 07:55:53 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 39BCB4E36AB
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 07:59:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10E862E7BA9;
-	Tue,  2 Sep 2025 07:55:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F5F42E7BC7;
+	Tue,  2 Sep 2025 07:59:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eXPw86tN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mSFsEhZL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 872C62E62C4
-	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 07:55:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5192E7BD9;
+	Tue,  2 Sep 2025 07:59:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756799751; cv=none; b=QgizaY9RParMuPs2OVjcOes25bQSTSf5f3RkTbSq49ikpj7ZogGZqu3jqbHCsi4YtyWpflOw0AXuuMjNzksu+GcmV7XmHFbiUZHNvEKab2PVeG0B4BgyGne+6uCVmrcurksXyabfdjrPpcXKudqh+AvQSRkRJ+XYh3VTUIhl1As=
+	t=1756799973; cv=none; b=XCV8mth5EHb3vuamkAHHYkrll+NGRgJKlvvn/g3Us7M6dWtKT2Ay9Ot2VS4+JKJf2+7VJUsZXizEPGlzeSXk6dHwYnEIqWayle0MyKnb877h4+P1iS8uD/sB44xNL9474u1MTFB+AKftuOtNwp3uMNZEja+UAEcGO/fvXeUzDUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756799751; c=relaxed/simple;
-	bh=R5JjKpinWBFnUUW6V+Dh6HjBmrEj9fHJDeaWWnI8TTo=;
+	s=arc-20240116; t=1756799973; c=relaxed/simple;
+	bh=UetU6Q0k6KRv6T5Ge8HNc+MI7mAoKHwLvsekh+TGmJM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YS46OZTGGGSWfJUWqSyHINmZc3QoYC1wEDgw6vQ5o+qj5UuR8m8L7HqOCh6zQaHxDRX79qvQeK6XNP4aw3X6xzs4Ir1K649RqbKMOsarVSwEQl+nMIitnWMoMO+TysPGaxpqeNRALP9DWUm/5hv403Xg/ZHldQrmdOp0Cx3Z0D8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eXPw86tN; arc=none smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7f722cb35fdso433786185a.3
-        for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 00:55:48 -0700 (PDT)
+	 To:Cc:Content-Type; b=ErKIdLnq3GR7fvMwNBMWz5699bjkfJtiagVAIuBXd+TPozCape0ojJuNhhZRgBOvuZ3iRKAUJxjBwJyeDp8KAT31btusMl8UmSUIUAeQG3IMNoflg+VbL9+w/lRuZGnCxGSy4VfhT9zX6BE1TAjYzc59NVseUcXMKnFb5C5LruU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mSFsEhZL; arc=none smtp.client-ip=209.85.166.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-88432e6700dso40102839f.3;
+        Tue, 02 Sep 2025 00:59:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756799747; x=1757404547; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1756799971; x=1757404771; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=R5JjKpinWBFnUUW6V+Dh6HjBmrEj9fHJDeaWWnI8TTo=;
-        b=eXPw86tNvPqSWpaNgBAANR+N24d9f2YrjVbDKiR3ud31y0lGVaukJllmZ03xW58fcQ
-         3d0FY7imtT/T/qJ34iUIIjw1gLIVs+Uk+bHezJhfdyOEs13ZM2MsrCUp9+1SAK52gDSq
-         7lgpr6bmu3SF5T7a3Cw/HmgnYPokuV349vb9QdNBGlMk2hm1jD2LW9qWruMabRKUBOU7
-         fydSfLxtL1I3HKXZmBDw8WKb0oi9ugBAbOuhVvAwGzdzRN5diMtrYrFXntNRFUQR4zP+
-         Sb5WIdcIi4wAmBrFULv5DPNHfxHFzS32FBMZPPbnCRmvAq1RM3aI3cO8M2z9rJHOmVt3
-         ZSDg==
+        bh=UetU6Q0k6KRv6T5Ge8HNc+MI7mAoKHwLvsekh+TGmJM=;
+        b=mSFsEhZLgMjim3oiFNWw9y0BVx5Ck2VI0vYaJsmN9AwPBmcyKNVDb+Ml8M0IISNzGQ
+         beqjW+nLlkeYE27nhHzLnrrwo6qcG8uPpTOtzRzm/Wf13wKA3S1F1bQqjh3KaG1IPasy
+         bymTwki7hc5bskXczcSDNkdq/R2ir6g3rYA/us2WY0NoDDtb1XEmmpb1dRVidVz9b4aq
+         vzoN/IXbSFn0Acw5tbFKJKgi11/gf5YgXyLBf9YT70+1G49ex9jU6dE62mUi+vsZbYtm
+         hkinDhtqlyZvKbgbtK71EUY0/dztMaIgp3PH4sg/96j0xof4MNvBXZFiBdV3ZPMzlVvE
+         UWug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756799747; x=1757404547;
+        d=1e100.net; s=20230601; t=1756799971; x=1757404771;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=R5JjKpinWBFnUUW6V+Dh6HjBmrEj9fHJDeaWWnI8TTo=;
-        b=r7ZvYORVw0yKl0pJ1qnJI/VZwn7mbl/hp1OrCkR9T1mtBgajZCBxwF/yUJ5+4/mqse
-         i/CPy9L6y3AXirsrf9acFl8yDZMt6nwmmFtRYMf1w0f/AgGb6zwOwsOu+4Lxf6CIACyg
-         RgDR0hwaFQd3VJfZtUwAgA+52ELUDI8m/bgVJnLSpwNXY78qOEeP5+ErabCKHiQRspsj
-         A1AMuvdl1078GW+bCOZYwEUBu/e5a6oidCJjT6OtkoJ4Z452NWfLVamVtcAot+YXG5n5
-         gPeD7uimW48TWEhiPzV+/rQ/zearwQkcgjZEyVNBiOc+mp1ZGjWU/n2zZAJRu408mzGe
-         EvuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV5khW1Xky0sUhDnDwxbtmykTCEQaf30bufAKgPiTRWot+xgofrcFyqFmOcUubaoDNS7At+3b8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyeswdaM73qbma0a3dikw2peLWTW9zV53tBSXNDXGq8FqOcBQX+
-	l4IVyuyqP469m/Pktv1P7AQV/LBadPOCPXSXUjbav/Ppy3yQnApmWA4jU1We3pVbseZUGaZ22cY
-	/+cTAaisef6RP0jpigSYx9xFNAj56BvAlOZVWTeln
-X-Gm-Gg: ASbGnctvGvWnvZP/we9lV3Dg9i0WHrPrYE3tc6UliObZq/ERAHMaH/qVX9/X/80aM8A
-	aiqIApNc8cEfY/Cu/yab8wbKwja3R3U9+na2hXIu38iRtN/pW5fmqEzqvUm2INYENzoO3M6isyu
-	FQRmR7YdYo4xEO1YR5a1avAQkZ9r9ExScaIF0vEAQ+DJPhtZrKigvIZqBea2EGkJI6ueBQ+8VCo
-	yn8+zKAg4YJr8aJw3dljIat
-X-Google-Smtp-Source: AGHT+IGbwtGdrMFQZ6o9HkrZ8v5t2SSqHd4hp6DHCZ4rLDynbaulRNdShi8IFB6n5mcJNPHAyAg0ACU3bKwX6hPljxQ=
-X-Received: by 2002:a05:620a:3950:b0:804:c43:1b68 with SMTP id
- af79cd13be357-8040c431f3emr614482485a.37.1756799746971; Tue, 02 Sep 2025
- 00:55:46 -0700 (PDT)
+        bh=UetU6Q0k6KRv6T5Ge8HNc+MI7mAoKHwLvsekh+TGmJM=;
+        b=cVgZBSSsY2A2d5q0rO+L+Ev8/YQpEiKBQahbVCTEUF0Ima64WFq4ICC/vm+McJ23K2
+         ZLMgR1qRkMPyUzkk+MtR4etwLMkt+g+yqyp73RehzjwkJp4kLDABXLXJsyybd3HHHih8
+         6o3zpOissfWlslvMKCiAOWCtP/p7g596HXRmYa39C+N33a62Je0dxh+zmWa/cmOviUsm
+         GEP8TbtlYtKfyZ8+tyMJ5Wer9Bhz3XMhRTu+lvMlPiCwT82f0QWt3kthAB1Uz/Dmu1Dt
+         WAt2QNMAWdDlvXUjFLIejA96ecfoYYgKW8RVkBZAm7jTxvAPbSVDpBmUQ4SINt/i8zOg
+         HfGg==
+X-Forwarded-Encrypted: i=1; AJvYcCUNu+9Sz6OQjpkjGAZCMMKDF/J05J6lxdSyC/R76qeHBJaBK9+vMi4buHeBbJhiGelZbI2D2mJtfR5f2GM=@vger.kernel.org, AJvYcCWRN4a9Rxt/o98n7P9/OVW+nO2vB+uILswW+p8wAXKHmgUWK31s/XH3gpr3BmMTvTzkudjBImv0@vger.kernel.org
+X-Gm-Message-State: AOJu0YwrqyANeHViI/pFeZcB51HWBlXEWGqt9SgvXXate2sqJ8Rg2GKY
+	6eT3MBDN0vlP4DIebNkgahpy+5KhMBXBUZrPJaY5deQR1W/wxBPeCyqXuB27etyJihv8iR+vl9Q
+	q1lffWB3ueje/Z3J260udOp/QfAZT13Q=
+X-Gm-Gg: ASbGncs/Yh88zbjajxRTswvDMWrt1qXvh6BqFsVx6gY81YmCRSrYDj9rY0+M5XeK6u1
+	/7i1xr92A76/f5ylqri3YGYc7w6buJVg3qfmwmJijeTY/fz5qlmCpEABPnCjJhND+z0HhhxbFbc
+	hPocJ/LGUiSB1T4mB36sWHEx/nLOn3OrvTNkiV2Y/iaWl0wtpmPc9mkjKEIB2UQzHIjxH4x4H4L
+	/aDwUtPUWvd5w0uKQ==
+X-Google-Smtp-Source: AGHT+IGEkf8gg7Ow1PMGLkorRV34nEHMquJJIPNm+rQ3E2LGYOSocGgbgKW015adiEbMvaroPzAP/00jQqW5+KXJsGQ=
+X-Received: by 2002:a05:6e02:2165:b0:3e5:51bb:9cd9 with SMTP id
+ e9e14a558f8ab-3f400674ac2mr211654925ab.8.1756799970758; Tue, 02 Sep 2025
+ 00:59:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <11212ddf-bf32-4b11-afee-e234cdee5938@free.fr> <4e4c9952-e445-41af-8942-e2f1c24a0586@free.fr>
- <90efee88-b9dc-4f87-86f2-6ab60701c39f@free.fr> <6c525868-3e72-4baf-8df4-a1e5982ef783@free.fr>
- <d073ac34a39c02287be6d67622229a1e@vanheusden.com> <6a5cf9cf-9984-4e1b-882f-b9b427d3c096@free.fr>
- <aKxZy7XVRhYiHu7c@stanley.mountain> <0c694353-2904-40c2-bf65-181fe4841ea0@free.fr>
- <CANn89iJ6QYYXhzuF1Z3nUP=7+u_-GhKmCbBb4yr15q-it4rrUA@mail.gmail.com>
- <4542b595-2398-4219-b643-4eda70a487f3@free.fr> <aK9AuSkhr37VnRQS@strlen.de>
- <eb979954-b43c-4e3d-8830-10ac0952e606@free.fr> <1713f383-c538-4918-bc64-13b3288cd542@free.fr>
- <CANn89i+Me3hgy05EK8sSCNkH1Wj5f49rv_UvgFNuFwPf4otu7w@mail.gmail.com>
- <CANn89iLi=ObSPAg69uSPRS+pNwGw9jVSQJfT34ZAp3KtSrx2Gg@mail.gmail.com>
- <cd0461e0-8136-4f90-df7b-64f1e43e78d4@trinnet.net> <80dad7a3-3ca1-4f63-9009-ef5ac9186612@free.fr>
- <CANn89iJGdn2J-UwK9ux+m9r8mRhAND_t2kU6mLCs=RszBhCyRA@mail.gmail.com> <e901a424-fe95-4adc-9777-31d54464d2c5@free.fr>
-In-Reply-To: <e901a424-fe95-4adc-9777-31d54464d2c5@free.fr>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 2 Sep 2025 00:55:36 -0700
-X-Gm-Features: Ac12FXwRiNH6f-m_ly0qAGDfsRps5QoJbfAaPta3A9HiVXiyeBrarvblQGapAEc
-Message-ID: <CANn89iKe3x4yEO940oDLfypDNoejjaX5xf+ksnnpMXpBpApQJA@mail.gmail.com>
-Subject: Re: [ROSE] [AX25] 6.15.10 long term stable kernel oops
-To: F6BVP <f6bvp@free.fr>
-Cc: David Ranch <linux-hams@trinnet.net>, Paolo Abeni <pabeni@redhat.com>, 
-	Dan Carpenter <dan.carpenter@linaro.org>, linux-hams@vger.kernel.org, 
-	netdev <netdev@vger.kernel.org>, Dan Cross <crossd@gmail.com>, 
-	Folkert van Heusden <folkert@vanheusden.com>, Florian Westphal <fw@strlen.de>
+References: <20250902022529.1403405-1-m13940358460@163.com>
+In-Reply-To: <20250902022529.1403405-1-m13940358460@163.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 2 Sep 2025 15:58:53 +0800
+X-Gm-Features: Ac12FXzkrriW9NPsuU0kv6Gzb7sSOm_lvfHS5UbJoKxOsdiMQSxWaqEft8y53B0
+Message-ID: <CAL+tcoDZf2RC7Y+vfmUv73Mi+PJSCgzGAieekpTnz92V4dBfWw@mail.gmail.com>
+Subject: Re: [PATCH v5] net/core: Replace offensive comment in skbuff.c
+To: mysteryli <m13940358460@163.com>
+Cc: willemdebruijn.kernel@gmail.com, aleksander.lobakin@intel.com, 
+	andrew@lunn.ch, kuba@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 2, 2025 at 12:45=E2=80=AFAM F6BVP <f6bvp@free.fr> wrote:
+On Tue, Sep 2, 2025 at 10:26=E2=80=AFAM mysteryli <m13940358460@163.com> wr=
+ote:
 >
-> I tested the fix and validated it on different kernels versions.
+> From: Mystery <m13940358460@163.com>
 >
-> All are doing fine : 6.14.11 , 6.15.11, 6.16.4
+> The original comment contained profanity to express the frustration of
+> dealing with a complex and resource-constrained code path. While the
+> sentiment is understandable, the language is unprofessional and
+> unnecessary.
+> Replace it with a more neutral and descriptive comment that maintains
+> the original technical context and conveys the difficulty of the
+> situation without the use of offensive language.
+> Indeed, I do not believe this will offend any particular individual or gr=
+oup.
+> Nonetheless, it is advisable to revise any commit that appears overly emo=
+tional or rude.
 >
-> Congratulations and many thanks to Eric Dumazet for spending his time on
-> repairing AX25 mkiss serial connexions.
+> v5:
 >
-> Hamradio fans will be able to continue experimenting with AX25 using
-> next Linux developments.
+> - Added this detailed changelog section
 >
+> v4:https://lore.kernel.org/netdev/20250901060635.735038-1-m13940358460@16=
+3.com/
+> - Fixed incorrect Signed-off-by format (removed quotes) as requested by A=
+ndrew Lunn
+> - Consolidated multiple versions (v1/v2) into a single version history
+>
+> v3:Due to some local reasons in my area, this is a lost version. I'm trul=
+y sorry
+>
+> v2:https://lore.kernel.org/netdev/20250901055802.727743-1-m13940358460@16=
+3.com/
+> - Initial version addressing feedback
+>
+> v1:https://lore.kernel.org/netdev/20250828084253.1719646-1-m13940358460@1=
+63.com/
+> - First submission
+>
+> Signed-off-by: Mystery Li <m13940358460@163.com>
 
-Great, many thanks again for your report, bisection, and tests.
+IIUC, you've received an explicit NACK from Jakub at the previous link
+https://lore.kernel.org/netdev/20250901114157.5345a56a@kernel.org/.
 
-I will send the formal patch right away.
-
-
-> Bernard Pidoux
-> F6BVP / AI7BG
-> http://radiotelescope-lavillette.fr
->
->
-> Le 01/09/2025 =C3=A0 18:03, Eric Dumazet a =C3=A9crit :
->
-> > Keep calm, I am just saying that the bisection pointed to a fine commit=
-,
-> > but it took a _lot_ of time to root-cause the issue.
-> >
-> > And the bug is in ax25, not in Paolo patch.
-> >
-> > Please test the fix, and thank me for actually working on a fix, while
-> > I have more urgent work on my plate.
+Thanks,
+Jason
 
