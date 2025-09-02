@@ -1,212 +1,356 @@
-Return-Path: <netdev+bounces-219212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59934B40789
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 16:49:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85834B407DF
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 16:52:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AFA31B651E3
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 14:47:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 124D517DFC3
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 14:49:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6F78313523;
-	Tue,  2 Sep 2025 14:47:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E41A62DFA26;
+	Tue,  2 Sep 2025 14:49:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b="dltZUKRV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fk8RuVoV"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2086.outbound.protection.outlook.com [40.107.244.86])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F1C271443;
-	Tue,  2 Sep 2025 14:47:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.86
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756824434; cv=fail; b=EhrNR1b9ds+hag8NZJ34jRIbTWyCR/HGFvGVq5hrYTfc/fL3Fm0QrWJFk+M6IBCFpjsyOm7gGM5P5YWv0gOTX2jK6gV26382r3OGsvweeevnmDYbB3iN7RudWQZ3fnlWM20u4TtH763kBW5+w4nO3WPXrIiAzrI35TJJnHapCog=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756824434; c=relaxed/simple;
-	bh=RVqXJbQ/5k1/3V6pXemIhgYCldtyPIPlL40pij+nhaA=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=uO+nBmcAKuR1MM12e49ECmXnN9K0pqqY5DEvdaif6t7+QoTWq/9D+r9cEIJaa0nxElNp0IyK/njU4ZEZUTLA3bEotbvlNICOoRYOhEwxb1kvO2AM3aMKzcmrJ51hZJbug+GTigfYVr8wc1Iuub8G2G1XQamyUkElW9sNKT04+Zk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=dltZUKRV; arc=fail smtp.client-ip=40.107.244.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altera.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Z0fxTSHFPuSFgsiJ/jr/691I0ozJr82g1qUI8G89rJFcEu15FPU2tvzsvsDPORR3qxFT7VEtiQj2qq1K/rSonhKr1EpiD6a3t68yjq/Da3n3PmQQFl+aGwGTQwZdLKclW47NT/q9+kuTlBtbK5VEVUPrz0waCuZwrkrY1dfWtyAQGbWIslnzdeZtdb+wlFO6lLjDFDvhXmdc5sHYjwk2nVqa57Nm2EIC4NhjfXw7578mWJUefmyJ91zbeZW8AzloELk/uyg2Hhqp6eEENiJFE0Za3YM55f+c9VdvuaT4A5iBHrKPazfBkraWl5GTMG+bz025nQXcniE6gb2gP2TKQQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YfW5iILLoswE/qBKd5VVJoRji/GgQVikUpYa4xyNzSA=;
- b=UaTh1qG4jDlNiGdnpavPx+EcRzphn07DYcOmhBsoGOTsv3UkwhNHzKaeZzRGxSQrhEoevogVVbYHgG/Dx+EnUfwHM9sItlOZveQQQUV3eT9EZ8GgIcLP9+36M+zwsyOrrQuEHa0BaRbrjAZdCEg97RmP2HywjrC2M+fT6pMAuUQRvsS1Ueq63Xduu+jfGbx+bB5rUo71DMq7bey6oTx7yFbn6XSateCbXhRq/BeDX4k1b1apc4/a9I8B8bkaG4yz0eZh6uHkb46t3NCHveKH/MYA2UqdYIjeo2bsDgOQ6upxptIcFGlQswoI9w42hkPLwD3scyDYVPTwa9+pscPSbw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
- dkim=pass header.d=altera.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YfW5iILLoswE/qBKd5VVJoRji/GgQVikUpYa4xyNzSA=;
- b=dltZUKRVcShiKLkngxUTpNnum+XyMfnqSAP+AKD+/6PILd1KmwUpiEDVxuDpnIYTAEqC/kRPoqSZnDaGDqZHGlm7qCHZE0TpI+tRqaJXjD07YauntYWKXeSd5LV+4iu/P9fQhSEtNtZQQeEmLgl64nqr/uCYCdEVChHs5f9vcSSImWV9eehR/bPl7pUPLHKW3MCdmipAVOTUl4U8+6xYo1PzRdqg+gN7NJwORYJDCUpHy+vR9UWcft8lJR814WY3HeyYvK9tCgmSSnBS7VKoSfBMS0FHNkb117G3EsR9NIx1afWcm6oq9g+HPbZ0HbOSsbv3V+OxRwLR6GnTgQzgvA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=altera.com;
-Received: from DM6PR03MB5371.namprd03.prod.outlook.com (2603:10b6:5:24c::21)
- by SA6PR03MB7638.namprd03.prod.outlook.com (2603:10b6:806:43a::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9094.16; Tue, 2 Sep
- 2025 14:47:11 +0000
-Received: from DM6PR03MB5371.namprd03.prod.outlook.com
- ([fe80::8d3c:c90d:40c:7076]) by DM6PR03MB5371.namprd03.prod.outlook.com
- ([fe80::8d3c:c90d:40c:7076%3]) with mapi id 15.20.9094.016; Tue, 2 Sep 2025
- 14:47:10 +0000
-Message-ID: <7b799cb3-ba9f-464e-a0a6-cad151742aab@altera.com>
-Date: Tue, 2 Sep 2025 20:15:58 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: phy: marvell: Fix 88e1510 downshift counter
- errata
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Matthew Gerlach <matthew.gerlach@altera.com>
-References: <20250902-marvell_fix-v1-1-9fba7a6147dd@altera.com>
- <aLbyju1nKm5LXDDX@shell.armlinux.org.uk>
-Content-Language: en-US
-From: "G Thomas, Rohan" <rohan.g.thomas@altera.com>
-In-Reply-To: <aLbyju1nKm5LXDDX@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MA0PR01CA0093.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a01:ae::20) To DM6PR03MB5371.namprd03.prod.outlook.com
- (2603:10b6:5:24c::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08E1021CC7B;
+	Tue,  2 Sep 2025 14:48:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756824541; cv=none; b=fa/30UgY2cAIsgoSb174zrUNo1Tv1BZkKWHjGiHTRejavSKi8uuLhVRc8gE5AfdAvzRRrIXJjyG2W+WNTOIoXQVCyKXjzddfWxd3CKKVhCc1MuQZdEjkqXGQGbFUhi1qGN9gUeA+4xQDYYvfKjUK4YOdf3/cT5Kc+A7MdeH4Xpo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756824541; c=relaxed/simple;
+	bh=o5QeNlLBhELx7P5EvJQo7RcnvIs+0zKwEAzjErk8gRE=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=RBDU+gBpKYnxqRSHmjqn8vCEw7MUIPGx3KsuLnd69tsmbK9uLi/83RxyKMdDJvnJrqdZDE6z6qBxv2n9T2JXyylDD4onR3kzR43WoXlkXIPuzl8I9DjLhYNOKSuYMSeNQdVudcIsVRjmYpvL3wHgPzHO58GtQzCbTmSNXBGuT9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fk8RuVoV; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-70dfe0ff970so47854656d6.1;
+        Tue, 02 Sep 2025 07:48:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756824539; x=1757429339; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/A11N5YSu22iCZXOsouhk0+bMea3SgOIXSyiPpdYylg=;
+        b=fk8RuVoVQNzkdJCewvC+tZNw1UjFzA26QKpEn7w+4wUQxr31zaXUYvKKPnsyp3cZ81
+         JeZkLxVTIRkUgXTqPhftRJzQLM+w2/CZn7KSi37Ek0lL2rjiWwc96E31eDkUN4k5LzBD
+         QsAVqSGOXe92rcejZFnjTbsVMNLaYL1GWq4eSqUyByCXJa74h9AecaYbbMEUiXNWTIWj
+         gie2tIzhU8MiMD5+TzegTWNzihSfFTOgNw+PVg9USU0R+ot7vUQCrUhq3MwRGEit+Lnf
+         r34xluXnPu/5Ud6LuQw3P6GIqFMX5My911HEsUduFR1dz9dnsH68DZndOP4eHExskvr+
+         TR/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756824539; x=1757429339;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=/A11N5YSu22iCZXOsouhk0+bMea3SgOIXSyiPpdYylg=;
+        b=uVifP7WuvL1WHWpZ2/KcR2hsUIYsYzRJBz1hXI/an7Y3DOe/KzGYK2OHkM+/gtPI4F
+         UIoN7DZqpEAttyAaAdea4UYbY8vzqqO/3dp9EwCu+R2iSISOkR8x7bXiMBTrwv8e+IKZ
+         9i481d4DOx+9hTkmgSfmm4VYkWgN4BF2Fuy0AmO2IvgXYVCibSl9GTZk/Qv7e+a8oF7g
+         LvgmOUeRfKPT6At3w78Pe/PFUX4nr+jdXHKHVWZ9Y9jMpWNoVdw/3vJslwzkStxXLrhz
+         Pn29BYAIMKJxTMDnX7K1fYMQTarkSVxdtEWwRLzXx074q2mrqgZOPNaRP4lo2yqznUDS
+         0yQg==
+X-Forwarded-Encrypted: i=1; AJvYcCVrfhCW7kPWksPGizU0VOEbxoZl2HpJFv57B8frKXEvM3jpV8GNHycZPKCcuxHQUw9VfkY9RZ8M@vger.kernel.org, AJvYcCXLhme/fiildTq/GmugkYv5iYTYuDWZeXlNHZeF7Lt5nlESbHtO9r7+a5OzGzXSnmC63lBHBtFe6xOC7adu1xP/@vger.kernel.org, AJvYcCXkQnZeNiaD63pvhcBF90YB5VBDwpLKtJESOo3uY284D78p93TrTkM5R/X1U0QdKKYTOzecKi/NcRLgW04=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7ub7aBXIyyCndqiZ28JfFueroFOE+FNCCkToDoEshu0Y9plPH
+	YIIrfmePgSpLCm+jr1aBpg7OgSfWHczWJcpXNyvXF1hYioRFgVDUE8fi
+X-Gm-Gg: ASbGncv0z07UNLwVuxD7ZkU9fPjSinJYDbqfhorBBs9YO8DOuenpJKsfD9DKkIfXeer
+	xuDegRLLaIohtwGJl9SXPu7qUhb4Br58M2cWDNSBUEFpdn39Eph3KA/W2+Iqkh1Y3a/YtErFIr7
+	3qh2qVCCvyXAl6s0k0uvkvb7eYbohrXhEuLY9+fvEVBu4Yx19s+7y2gzP50iCdaH3pmqR/nE8Si
+	3eMQBHV6jDbPBEGPtoMMfowiGofxXwvaRKZ8CDl3T6P7ceuMY7BWxGSGcMwcqqpAE+v+HzXSkak
+	TXf7CzXycLsMSrJebnHsGWj91fLaOvAa0VUyP9kABSgZzVY5N3QOeZCmrOamuiFk66QMWiE68EI
+	LEDM4yTUYx0VyP3BxFv1OU9SFUP/sUs0EpJGwfCWCTp/K/bDbBxI7ubCYv/LgTjm9DxMkNowMGV
+	T8Cg==
+X-Google-Smtp-Source: AGHT+IG14VksUsXxMqjD97GVCE+pZda0RfMtsAp4CjwES6XT6Qq59nQ5tR14Aqp1grrmr/Oj4M4V6A==
+X-Received: by 2002:a05:6214:8019:b0:710:9995:ced4 with SMTP id 6a1803df08f44-71099b45be5mr88801766d6.17.1756824538469;
+        Tue, 02 Sep 2025 07:48:58 -0700 (PDT)
+Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-720b475a60esm12707306d6.34.2025.09.02.07.48.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Sep 2025 07:48:57 -0700 (PDT)
+Date: Tue, 02 Sep 2025 10:48:57 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Brett A C Sheffield <bacs@librecast.net>, 
+ willemdebruijn.kernel@gmail.com
+Cc: bacs@librecast.net, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ gregkh@linuxfoundation.org, 
+ horms@kernel.org, 
+ kuba@kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ pabeni@redhat.com, 
+ shuah@kernel.org, 
+ willemb@google.com
+Message-ID: <willemdebruijn.kernel.e019291a1132@gmail.com>
+In-Reply-To: <20250902142502.27278-1-bacs@librecast.net>
+References: <20250902142502.27278-1-bacs@librecast.net>
+Subject: Re: [PATCH net-next v5] selftests: net: add test for ipv6
+ fragmentation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR03MB5371:EE_|SA6PR03MB7638:EE_
-X-MS-Office365-Filtering-Correlation-Id: 24e63a3c-3ca5-4877-a2ab-08ddea2f98d8
-X-MS-Exchange-AtpMessageProperties: SA
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?K1VQNnZLUjhCY2QxSXduQTZCbXRNL1Z4LzBXWWExRHgyeHpodUpXWGljeGVi?=
- =?utf-8?B?S3kyNnpIbitheHpoUXZtTllOV1VRWnhMV1BTWXgzeGhmcGhYVGJ0VTE1UnFV?=
- =?utf-8?B?RFRBNUo4K1l0OGYrMCtvaXJ4T05SVFErVnNpSnJSSDVFcXVQVnpTZjdrWjBB?=
- =?utf-8?B?dU5vRnIyUXhGcUtkYkdOOC93SEZzalNPZ25PYmpTZHZVdEFWL2EyQU9jZTl5?=
- =?utf-8?B?cVdlTktTcmExcTl3RTNldW9RRHhLRGt4d1pHayt5UldoVEpkQzBHN1JJRlJR?=
- =?utf-8?B?TGd4bUt1aFZ4YVJ5QUV5WnpnUVNsU2orUnNwM2hZeVpYaTBiRytuL00rc0lr?=
- =?utf-8?B?dXRLcGxoZWF2Y1pXOFl6d0RldDZRV3NDTkF6UjN6RWx0QkJNMVJ2SXg3bzVT?=
- =?utf-8?B?c3EvdEtWaXR1dnF2VWtJMDFpaTZEOThObHVXeXBsOXdCa1Z4K1dmM2tkM0pB?=
- =?utf-8?B?YmJEaVZKTWZCQjNYVVBqMU1TVFk5ak1VaWJURXRReXNlNnBvSHFRZmt6VkJ2?=
- =?utf-8?B?aXNzU3BMbG9GQXZjMmtFYjcrM3hqQVlHQ2NBcFNjcmxmcHZBMHdJejVhcFM3?=
- =?utf-8?B?NzNXUWdTOStKQVlGNzVlMGhjdzdLWlNhM0craTU1emNFV1NsLzV1N3luUHUr?=
- =?utf-8?B?TzVSWG1EakNJUGVSTmFXb0FTWEc1RjdrWGdiZXFwY1JLVklhMjUvU3Fod2hO?=
- =?utf-8?B?dFhQMVFrQno0Y0V1VnBMdW5LVUl6SEM4WFJuVXhERUJ0UmNYYkM1TlVHUVpk?=
- =?utf-8?B?MUpITlg5ZVFnblBCclJBZGJUTjluN3lOM2sySzVaNTZXRDBpbkVwMi9peEs5?=
- =?utf-8?B?d1BWUHZCKzNVYThxYWd3a2JIMmdWUWFJcGE5Z21BU0I0MGxUaVhiUWw4ckZr?=
- =?utf-8?B?S3BzYkVkUFdXMUhNd0xQSjBua0FFVnhHTUhWOUpZc2VFWGMvNTBhUTBsWEs1?=
- =?utf-8?B?RFgwRzZMQnRhQ3R5T0ZZV3RVbEJLTmtLUmhabDNubVhtd3JxaHJaUnlhK0lw?=
- =?utf-8?B?ZUxYcGtNVityVS9NWUtWVWVpa1BMenFRaEw3aUpvMitYUWZkWGx1RDEvTE9l?=
- =?utf-8?B?dGUxenlVNFI2cjVjaHVuakQ4WFViWnFydmowdGgwd3lITkZHMnl4Q1FlYy81?=
- =?utf-8?B?bmhZN2VIYjlzOUFSVG82aEhEVXcwc1JyeHJURFI3UnllempBOGlwdm8yK2pC?=
- =?utf-8?B?cTVVWkJpS01LbUdybkFEb2Z4YkQxM0Jod0Yrb25tdk1heTdSbHVpMDQ2Sm96?=
- =?utf-8?B?Zm5rSVJyc01rNUtIOGZZUUJiM0xrYkNoOTBEN0lRSXVVcTJPN2N0TXZpaWxk?=
- =?utf-8?B?cVl3SFpOdDFTR251cC95MFg0Mys2Z2V3Ty9veFdzV2xuTFhLQzI5Q1ZMdE9j?=
- =?utf-8?B?NUdoMDloY1lYVXZDNm1mUEVOWXR4c1pPeVpKTkZ2MVBISEdOdDdRRFVaaW1x?=
- =?utf-8?B?cFR5eUVEVWdyaGtqZ3VaeDJaMS9neTNVYzlMMFhGRXdERmFkaTlCcWp0cEpU?=
- =?utf-8?B?QXhibkNCVGQxaWh5RWdGNUJScjNReS8rdDlFZ0F2TFdiSFNmNFpZNGVxZzFV?=
- =?utf-8?B?aE9ib1VoRVpwZG9xODF5cVNqMzNBcEdGTVNiMHdYa2ZKNE5yY1NhRXRiWEZr?=
- =?utf-8?B?cWZ0bHRZYTh0bEN1RThDYXB0byt1TWp3MklPVEdyOHNnZHZydU90a21NNncv?=
- =?utf-8?B?c1F2MktDNEExWHcySnN0endwWWpUaldYUmt6SVdNb0NnVDNDUHMyb1F2K0dw?=
- =?utf-8?B?YlF4RjJZWUxwSDhGbXlLREdyY016aHhYRHo3Qm9XTjNyMU9XSW1pY0ZPSjRs?=
- =?utf-8?B?VVMxR1hDRHVXMGVlcU9HYWJsRHpad2srSVRjRUxJL3pJUHdWOGRwVE9WWHpM?=
- =?utf-8?B?aEpxWkRobTZ6ck1vWUI2UnlONThJcHpwcG9Va29tb21uNDVzTEJIWFRiUDNu?=
- =?utf-8?Q?bjExKP9Ul78=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR03MB5371.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RE9VeWNOSkdoUzRJNTdZaGdsNEl1NXlndlowL2QrMHdqaHlPZTFqN1QrcExp?=
- =?utf-8?B?WmNhUFMxV1FVV3pVUHlpR1JRZi8wdDBCSW9JYkdFTU15ZGlrL0trZzBLbGZi?=
- =?utf-8?B?UXk3WlhjeTdqR0svQVErMGVDRDI1L00xaEdrbmpyRUNXTmQ5WGoyQ2ZUb01j?=
- =?utf-8?B?bHc4ZGpzakdySWUrTmxNRFNtdllMM1lXV1g2QWtzcTVMTDNkdW9Qc1QwOGtT?=
- =?utf-8?B?SHBsUEx3c0UwaEV3aXJ5OVVzV01abWxrTEE4Ylo3R2FYaGZORHhzTDVJQ2FK?=
- =?utf-8?B?VW1pUDRGMkpxYlBtV1o1NTllN3NhR1l6YXRMSllzdXkySnpHQ0tGK284d3FO?=
- =?utf-8?B?NkkydnE0ZGVQYTJTRk0xOHpCR0phVHdvSDZyMUdla1ArT1J5ZkpqQ29abUl6?=
- =?utf-8?B?NDNoNHV4UVFLdHJ2L05TNXN0Tk9CbVRDdlB2Y3o4VlFOSjJoOXVmaGdTWGs4?=
- =?utf-8?B?NFVBdkZKeWNuMW9Hb1pZNE8wUnlheXBkNmxpVG1PUlZGaGJIbFJ6RGFFcHNr?=
- =?utf-8?B?NDhXVG5Ua1dycmxIMC8wOEhtdy9vakFmRE92OEtnL2RST2ZwSUwrem9aLzZF?=
- =?utf-8?B?N3BmSENIamJuK2ZITy9MU0RFQTNGTGVzL2pDSTFJdVBYbEc1Wks3ZVJsb1VB?=
- =?utf-8?B?THQ1T21jeHNBR3dCbmxJMlM4SkE2Rnp4Nm1kZzdjQjVGZDNSN3VsYklOZXIz?=
- =?utf-8?B?WGF6WnJmZFJSM0U0dVN0bEV0VzNidW1jRW1rNEpqYnhhUHlvUTlERVR3NFg5?=
- =?utf-8?B?WGJPUWd0ZUFVWlhxZjVQdXlFZ05QVWxhV0x6NlN4RlRGUVpoRDFhYkRCc3ZS?=
- =?utf-8?B?UDJsYXd2Z21POEYxenduVEl6S3VlaWtrbTVGYVFuZDY2S1dtbWpRSVRwZkFP?=
- =?utf-8?B?YWlBMFNDVU1PQkRvdnBodE5pTFRzYTRJVEc5UEJrM1hQcFVUQ1JueEE2UXpw?=
- =?utf-8?B?aVVCMkNJWTF1QkJCYk5POVI4akNHc2xsc3UyUTZXNTlER3E2UEpBNEJxVzdh?=
- =?utf-8?B?YnFRYUIzNkVlOCtYQUlOcFo5NGFXc2ZNcS83aytTbk82R05Xem5aS3BjWGJy?=
- =?utf-8?B?M3dRWGhqU2pCNG81NUhpNUNkWC9rV21wVEV2YUlJSlBYTkdvY2NveWRrQ3VG?=
- =?utf-8?B?Uzl2WEFzak4vQmxlZTBPbmp4M2JmNDBZcGhacTRBTVNGL1RMRGNTNjB3Ynp3?=
- =?utf-8?B?S1Q1Zm5uajlreW5zaHVHQVdGRWpaOElNbXphdkJiMjQwcEplVVVYMm1Kd1V3?=
- =?utf-8?B?SVFid0o1UlFrczZuUkhQTFprbHdLbUl1RTYybHE3SkVQTDZjYlUrK1ZMVGVn?=
- =?utf-8?B?MUN0b0hhQkM2UVJBc0RFSDNzZU9GUlN2Z1JHVTBjL2QwU0d5a2dDMVpSTXlp?=
- =?utf-8?B?Q28wdGNDWVYvUjJhaVBSYzRwKzM5Vno2ZzhlRWhTTlkxZW13UDdWVm1TUFNx?=
- =?utf-8?B?NXI0YXBKVXowRFB1elFRcWxCKzU0eFRadThWbDdRcTJBWjFyNnJyOGx2Q2Mx?=
- =?utf-8?B?V1BxSGNMc3RiMjhlNXkwVHk2K0tJTUJzaVA5WWtaRFV3bThubnRxREtLYUxj?=
- =?utf-8?B?VUsrbVRIakdEemVYZVJUTm83UU5ReGs2dnYxVVFyUjdEaGh4eGg3NzIvaEdT?=
- =?utf-8?B?STRwK3VONmJmQkliYS93dFFlUlErNmxBUkpBd3ZWSGtmRU5hQ000RE8vZVNE?=
- =?utf-8?B?MUo3OURzK3R3NHlFOEdRaitJQUVoSjg5V1M0QUZ2RU9NMjc5WVNmazNyMHdx?=
- =?utf-8?B?WVVyb2N1RDhGaUlvc094S3UyemwvemsvN1NHK1pJS3RlUlB6QzBwcXRyWXVP?=
- =?utf-8?B?MkFIR1R1UGVyaVNVR1BzZjU2Z0FxM05PdTFublA0M1FERFZwelZ3eHlRUkp6?=
- =?utf-8?B?bWtPeU52ZGNKTWFpcm4vWHkydW16bWMzaWwwcWQ3aExmbitHZnFZMGQ1emk0?=
- =?utf-8?B?cU1UaGM1QzF5b2Y3UFZmUUFCNGk2VS83RDVqS20zTURSbWcyT2lKWkN6elpm?=
- =?utf-8?B?cFpiZklFc25hMFE4Y0JsV2NwOXdzR0o5TmpaY2l2c0ZZaHdmM2d3cVI2K1Mw?=
- =?utf-8?B?ak9LQ0ZSTWgxbTVidndLbXM0M1MvQXlDbDhmKzM3Sis5ZGJ0eUs3dDBteVRD?=
- =?utf-8?B?MjVKdGhncUdOdWdrcUdJakQ3Y1psTlB2QUQvTWhESlVqYXFpdzY3MUJ1M1NU?=
- =?utf-8?B?ZEE9PQ==?=
-X-OriginatorOrg: altera.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 24e63a3c-3ca5-4877-a2ab-08ddea2f98d8
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR03MB5371.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2025 14:47:10.7534
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fbd72e03-d4a5-4110-adce-614d51f2077a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2pAzMX1qCeIf7Fl6IAbz/wn2zPFxkOXCWmTwm0m3DIUKf7Oq/me32BIeOFja/UqQEqSgro4iBLC1J1xsk7rO0Sj4lK/I88KM9aXIxWOzQLI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA6PR03MB7638
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hi Russell King,
-
-Thanks for reviewing the patch.
-
-On 9/2/2025 7:05 PM, Russell King (Oracle) wrote:
-> On Tue, Sep 02, 2025 at 01:59:57PM +0800, Rohan G Thomas via B4 Relay wrote:
->> From: Rohan G Thomas <rohan.g.thomas@altera.com>
->>
->> The 88e1510 PHY has an erratum where the phy downshift counter is not
->> cleared on a link power down/up. This can cause the gigabit link to
->> intermittently downshift to a lower speed.
+Brett A C Sheffield wrote:
+> Add selftest for the IPv6 fragmentation regression which affected
+> several stable kernels.
 > 
-> Does this apply to all 88e1510 PHYs or just some revisions?
+> Commit a18dfa9925b9 ("ipv6: save dontfrag in cork") was backported to
+> stable without some prerequisite commits.  This caused a regression when
+> sending IPv6 UDP packets by preventing fragmentation and instead
+> returning -1 (EMSGSIZE).
+> 
+> Add selftest to check for this issue by attempting to send a packet
+> larger than the interface MTU. The packet will be fragmented on a
+> working kernel, with sendmsg(2) correctly returning the expected number
+> of bytes sent.  When the regression is present, sendmsg returns -1 and
+> sets errno to EMSGSIZE.
+> 
+> Link: https://lore.kernel.org/stable/aElivdUXqd1OqgMY@karahi.gladserv.com
+> Signed-off-by: Brett A C Sheffield <bacs@librecast.net>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> ---
+> Thanks for the reviews Willem and Jakub.
+> 
+> On 2025-09-01 09:45, Willem de Bruijn wrote:
+> 
+> > > +int main(void)
+> > > +{
+> > > +   struct in6_addr addr = {
+> > > +           .s6_addr[15] = 0x01, /* ::1 */
+> > > +   };
+> > > +   struct sockaddr_in6 sa = {
+> > > +           .sin6_family = AF_INET6,
+> > > +           .sin6_addr = addr,
+> > > +           .sin6_port = 9      /* port 9/udp (DISCARD) */
+> >
+> > htons
+> 
+> addr is already initialized in network byte order (BE) here.
 
-I'm not entirely sure on this. But, based on 88E151x A0 "Errata and
-Hardware Release Notes" from Marvell, no revision plans or fixes
-mentioned for this issue but only the workaround is suggested for the
-downshift feature. So, I think it is applicable for all 88e151x PHY
-revisions.
+My point was about port
 
 > 
-> Also, what is a "link power down/up" ? Are you referring to setting
-> BMCR_PDOWN and then clearing it? (please update the commit description
-> and repost after 24 hours, thanks.)
+> Verified with:
+> 
+>         char ip6[INET6_ADDRSTRLEN];
+>         inet_ntop(AF_INET6, &(sa.sin6_addr), ip6, INET6_ADDRSTRLEN);
+>         printf("The address is %s\n", ip6);
+> 
+> which prints "The address is ::1"
+> 
+> All other suggestions adopted in v5.
+> 
+> 
+> v5 changes:
+>  - disable_dad: delete - not needed for lo
+>  - main: simplify failure paths
+>  - main: char -> static char buf
+>  - setup: remove pointless return value
+>  - setup: remove unused variable fd
+>  - setup: merge with interface_up() to simplify
+>  - setup: check all system call return values
+>  - remove no longer used headers
+> 
+> v4 changes:
+>  - fix "else should follow close brace" (checkpatch ERROR)
+> 
+> v3 changes:
+>  - add usleep instead of busy polling on sendmsg
+>  - simplify error handling by using error() and leaving cleanup to O/S
+>  - use loopback interface - don't bother creating TAP
+>  - send to localhost (::1)
+> 
+> v2 changes:
+>  - remove superfluous namespace calls - unshare(2) suffices
+>  - remove usleep(). Don't wait for the interface to be ready, just send, and
+>    handle the (less likely) error case by retrying.
+>  - set destination address only once
+>  - document our use of the IPv6 link-local source address
+>  - send to port 9 (DISCARD) instead of 4242 (DONT PANIC)
+>  - ensure sockets are closed on failure paths
+>  - use KSFT exit codes for clarity
+> 
+> v4: https://lore.kernel.org/netdev/20250901123757.13112-1-bacs@librecast.net
+> v3: https://lore.kernel.org/netdev/20250901112248.5218-1-bacs@librecast.net
+> v2: https://lore.kernel.org/netdev/20250831102908.14655-1-bacs@librecast.net
+> v1: https://lore.kernel.org/netdev/20250825092548.4436-3-bacs@librecast.net
+> 
+>  tools/testing/selftests/net/.gitignore        |   1 +
+>  tools/testing/selftests/net/Makefile          |   1 +
+>  .../selftests/net/ipv6_fragmentation.c        | 115 ++++++++++++++++++
+>  3 files changed, 117 insertions(+)
+>  create mode 100644 tools/testing/selftests/net/ipv6_fragmentation.c
+> 
+> diff --git a/tools/testing/selftests/net/.gitignore b/tools/testing/selftests/net/.gitignore
+> index 47c293c2962f..3d4b4a53dfda 100644
+> --- a/tools/testing/selftests/net/.gitignore
+> +++ b/tools/testing/selftests/net/.gitignore
+> @@ -16,6 +16,7 @@ ip_local_port_range
+>  ipsec
+>  ipv6_flowlabel
+>  ipv6_flowlabel_mgr
+> +ipv6_fragmentation
+>  log.txt
+>  msg_oob
+>  msg_zerocopy
+> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+> index eef0b8f8a7b0..276e0481d996 100644
+> --- a/tools/testing/selftests/net/Makefile
+> +++ b/tools/testing/selftests/net/Makefile
+> @@ -117,6 +117,7 @@ TEST_GEN_FILES += tfo
+>  TEST_PROGS += tfo_passive.sh
+>  TEST_PROGS += broadcast_pmtu.sh
+>  TEST_PROGS += ipv6_force_forwarding.sh
+> +TEST_GEN_PROGS += ipv6_fragmentation
+>  TEST_PROGS += route_hint.sh
+>  
+>  # YNL files, must be before "include ..lib.mk"
+> diff --git a/tools/testing/selftests/net/ipv6_fragmentation.c b/tools/testing/selftests/net/ipv6_fragmentation.c
+> new file mode 100644
+> index 000000000000..b76ce7b713fc
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/ipv6_fragmentation.c
+> @@ -0,0 +1,115 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Author: Brett A C Sheffield <bacs@librecast.net>
+> + *
+> + * Kernel selftest for the IPv6 fragmentation regression which affected stable
+> + * kernels:
+> + *
+> + *   https://lore.kernel.org/stable/aElivdUXqd1OqgMY@karahi.gladserv.com
+> + *
+> + * Commit: a18dfa9925b9 ("ipv6: save dontfrag in cork") was backported to stable
+> + * without some prerequisite commits.
+> + *
+> + * This caused a regression when sending IPv6 UDP packets by preventing
+> + * fragmentation and instead returning -1 (EMSGSIZE).
+> + *
+> + * This selftest demonstrates the issue by sending an IPv6 UDP packet to
+> + * localhost (::1) on the loopback interface from the autoconfigured link-local
+> + * address.
+> + *
+> + * sendmsg(2) returns bytes sent correctly on a working kernel, and returns -1
+> + * (EMSGSIZE) when the regression is present.
+> + *
+> + * The regression was not present in the mainline kernel, but add this test to
+> + * catch similar breakage in future.
+> + */
+> +
+> +#define _GNU_SOURCE
+> +
+> +#include <error.h>
+> +#include <net/if.h>
+> +#include <netinet/in.h>
+> +#include <sched.h>
+> +#include <stdio.h>
+> +#include <sys/ioctl.h>
+> +#include <sys/socket.h>
+> +#include <unistd.h>
+> +#include "../kselftest.h"
+> +
+> +#define MTU 1500
+> +#define LARGER_THAN_MTU 8192
+> +
+> +static void setup(void)
+> +{
+> +	struct ifreq ifr = {
+> +		.ifr_name = "lo"
+> +	};
+> +	int ctl;
+> +
+> +	/* we need to set MTU, so do this in a namespace to play nicely */
+> +	if (unshare(CLONE_NEWNET) == -1)
+> +		error(KSFT_FAIL, errno, "unshare");
+> +
+> +	ctl = socket(AF_LOCAL, SOCK_STREAM, 0);
+> +	if (ctl == -1)
+> +		error(KSFT_FAIL, errno, "socket");
+> +
+> +	/* ensure MTU is smaller than what we plan to send */
+> +	ifr.ifr_mtu = MTU;
+> +	if (ioctl(ctl, SIOCSIFMTU, &ifr) == -1)
+> +		error(KSFT_FAIL, errno, "ioctl: set MTU");
+> +
+> +	/* bring up interface */
+> +	if (ioctl(ctl, SIOCGIFFLAGS, &ifr) == -1)
+> +		error(KSFT_FAIL, errno, "ioctl SIOCGIFFLAGS");
+> +	ifr.ifr_flags = ifr.ifr_flags | IFF_UP;
+> +	if (ioctl(ctl, SIOCSIFFLAGS, &ifr) == -1)
+> +		error(KSFT_FAIL, errno, "ioctl: bring interface up");
+> +
+> +	if (close(ctl) == -1)
+> +		error(KSFT_FAIL, errno, "close");
+> +}
+> +
+> +int main(void)
+> +{
+> +	struct in6_addr addr = {
+> +		.s6_addr[15] = 0x01, /* ::1 */
+> +	};
+> +	struct sockaddr_in6 sa = {
+> +		.sin6_family = AF_INET6,
+> +		.sin6_addr = addr,
+> +		.sin6_port = 9      /* port 9/udp (DISCARD) */
+> +	};
+> +	static char buf[LARGER_THAN_MTU] = {0};
+> +	struct iovec iov = { .iov_base = buf, .iov_len = sizeof(buf) };
+> +	struct msghdr msg = {
+> +		.msg_iov = &iov,
+> +		.msg_iovlen = 1,
+> +		.msg_name = (struct sockaddr *)&sa,
+> +		.msg_namelen = sizeof(sa),
+> +	};
+> +	ssize_t rc;
+> +	int err = KSFT_FAIL;
+> +	int s;
+> +
+> +	printf("Testing IPv6 fragmentation\n");
+> +	setup();
+> +	s = socket(AF_INET6, SOCK_DGRAM, 0);
+> +send_again:
+> +	rc = sendmsg(s, &msg, 0);
+> +	if (rc == -1) {
+> +		/* if interface wasn't ready, try again */
+> +		if (errno == EADDRNOTAVAIL) {
+> +			usleep(1000);
+> +			goto send_again;
+> +		}
+> +		error(KSFT_FAIL, errno, "sendmsg");
+> +	} else if (rc != LARGER_THAN_MTU) {
+> +		error(KSFT_FAIL, errno, "sendmsg returned %zi, expected %i",
+> +				rc, LARGER_THAN_MTU);
+> +	}
+> +	printf("[PASS] sendmsg() returned %zi\n", rc);
+> +	err = KSFT_PASS;
+
+err is no longer needed, just return KSFT_PASS below
+
+> +	close(s);
+
+reminder to check return value of all library and system calls
+> +	return err;
+> +}
+> 
+> base-commit: cd8a4cfa6bb43a441901e82f5c222dddc75a18a3
+> -- 
+> 2.49.1
 > 
 
-Yes, I'm referring to setting and the clearing BMCR_PDOWN. Will update
-the commit description in the next version.
 
-Best Regards,
-Rohan
 
