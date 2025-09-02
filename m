@@ -1,156 +1,99 @@
-Return-Path: <netdev+bounces-219098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00877B3FCEE
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 12:44:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2803CB3FCFC
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 12:47:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD01F205239
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 10:44:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC6A316EA3C
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 10:47:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E770D2EFD8F;
-	Tue,  2 Sep 2025 10:44:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10C2B283FF1;
+	Tue,  2 Sep 2025 10:47:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jU3scmdQ"
+	dkim=pass (2048-bit key) header.d=listout.xyz header.i=@listout.xyz header.b="wXfarb3+"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48346145355
-	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 10:44:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3EAF283680
+	for <netdev@vger.kernel.org>; Tue,  2 Sep 2025 10:47:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756809844; cv=none; b=ql7FoOktN1NbmEvacRRPdE/NKek3m5bthY3LvobvlY+AqUfyFbd4LgRMrQn0S1ENhp2p8ojQvp9geUH7tZi7iFrYZvd1F9mUJ2qGVf03YAsFXD4fDcxAx6QdObEMpK1PloFUvbaGJ+YhOU77YmHvlPs3OwvwAo+1AU8oim53HZ0=
+	t=1756810047; cv=none; b=qB6dQM8Fr1J4yL7uytHZRgwlDCoPDE3+xZOC0VzquGhoIGAv5NYvtUYFoynvLzKPFoXsTtDSyW+l5RJRgSQ0LIp03rYaCEsFmlFHyC7nBMj3iFqJxsBJPmDSKY/PlAoUzWxa8XNu9slzLgiBcHoiUm0f4OTMtEQ5u+iHhdvi540=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756809844; c=relaxed/simple;
-	bh=6hesa9TLeYxv3q6e9DhRIDI/mxQpv+JYQO9aNhgs8e0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ejyre74XZquJBcLSBabRuNCmMzp+G3RFDzgYXnagnZ4wzXSiYZTKTBF696Ark3bn2FcoTFWLTcxx/QIx3HGB4ifXLKIHk8LdzrAvNVdnrBdQwcUse9nh9r6YS2x72kUtcoBNbgUvFnVq4h0PB0wgMhpsv0baJnLDyBCEe0oq4oM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jU3scmdQ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756809842;
+	s=arc-20240116; t=1756810047; c=relaxed/simple;
+	bh=LnJizG7XhZQVsn+enC0vl5CQ2axfJ3gHWyHyB/bX++s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rZhF7A0Mf8MBgGSkNurNlOu7yUAr81z58CYwY5MxI9cu6sA1O5M7fJWtLMk3AM92iiSMF3/VD+iifJjzaV9f0Omjeqn/jLdIjCQO0AxSP4idlNQz5F520Vto+ugOxQzgj3zRTeXoUCS4/IWxaxyOAu0sUBU72K+4Jx4ofVo+I08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=listout.xyz; spf=pass smtp.mailfrom=listout.xyz; dkim=pass (2048-bit key) header.d=listout.xyz header.i=@listout.xyz header.b=wXfarb3+; arc=none smtp.client-ip=80.241.56.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=listout.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=listout.xyz
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4cGMrQ21snz9tQ2;
+	Tue,  2 Sep 2025 12:47:18 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=listout.xyz; s=MBO0001;
+	t=1756810038;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Jo0/Mj2/+9yOGLss6nLTorYX1OMBEsZpD1lT6UPRfdI=;
-	b=jU3scmdQwmkVH2+vA69840e28zI79uYVRFJn0aohyGZlHwe3yAdQzl+4JVnLFSvJ8Rr5Xm
-	+SUY7c5YZYzGyHArYkSTtB4lJF6Ztg1xTTfZJPEXAxS+8+WJxV6SXrKvqHwPtX+Tj1dR1y
-	lSzvSQVMKKc5qyIcrjGJ6Sw8z0n2PqI=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-558-x1FvC9xEOzCgT9SCBXQUXg-1; Tue, 02 Sep 2025 06:44:01 -0400
-X-MC-Unique: x1FvC9xEOzCgT9SCBXQUXg-1
-X-Mimecast-MFC-AGG-ID: x1FvC9xEOzCgT9SCBXQUXg_1756809840
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45b71eef08eso27115485e9.0
-        for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 03:44:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756809840; x=1757414640;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jo0/Mj2/+9yOGLss6nLTorYX1OMBEsZpD1lT6UPRfdI=;
-        b=p8Ofbj6a8lmnPfjuN+3ufzG1y6UFJOreKudeTsRoQgAM2RAAAld9yOQMuu9MkRbHBw
-         hc6PehgdpwdKIMKqW/KWb4DLfq9s4Ba8IBpJx0eUbiMcto0t2OIw04/Z7icLJ/vJIdzy
-         kH3UbuwCXoBsQRre7orRVWpXpSV0w7SqhT//mDplpbaSH7lfC0nsjSLPgowifgcPIf0i
-         Lid3DEn81FnM7VHfNl9bedKoCwWuGbQxUhtE4BKvUIm9IG30du09aBy2QbjqKiMpHzu3
-         joPm74MwXe+UtkEjkDHUcQ7DjwqoA6Vjwjs20lvSocLKlB5BkQ7/Df6ARFeQ7lpfPikr
-         U6Aw==
-X-Forwarded-Encrypted: i=1; AJvYcCVRBUYG4o7wQqANRZmjuSxH1g2IXYUveEqhcXW85qC3PbvSF3RI+i/8fLVl/tvEsNDlxk7zehI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9QtlPta9DoDGkT5dM6uN1vYcL5VrndK1XoTL6sEa4XhVHW64o
-	TxOvl9fpgdrIWPypzoFAtWa5SIpZr3VZL1Dcy/vc50nwpl7PKPAadSkMhpgMEOjq8xu1v39pCiq
-	yPgR2dxMwYdRiN4N5ksbiJD4r+ctp3gDaVsk+WLw1iNrYbh3Q83ZmVDjLKw==
-X-Gm-Gg: ASbGncuOUgFtnxR8qezWwArK58bc4gljIhXY7oh24C0y+RUPK55MvnAODQeBk8M1k6R
-	vA/rvOFdyR+F+ct9QBG64VDMrjT60X7kvhFC9/Ol22kHd9bvsWbfINupx/j/YwbXjD4qyBKgWwm
-	UN5yXt9pAd8eJuiWVyqAfSWYuL6Y7AI1eV5AL3U0dpTXYr6Dz0LnYAVsKzwstV2/rCKzG32ZSJs
-	IDNbkUia1Eu7GOHGYcf7EMfxkPQ2Bk9tbJlN8H0G6sLlwuTGbv78dVuspRo0gFxSSCGxhnXUF7k
-	yyA7afC/ZRFSpn0tpeVF9rwr3QIKVZxEzTp5mIw+HzhzzHCeU0i6IiLDWp3RnPLVca/yobbnNIR
-	Gb7tg0vBIFio=
-X-Received: by 2002:a05:600c:524f:b0:45b:8453:d7e with SMTP id 5b1f17b1804b1-45b85526a68mr93034995e9.6.1756809839699;
-        Tue, 02 Sep 2025 03:43:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGD+Nyf/fbAZ/gveofQdn8RFyjdqlaPnTraLhEZlhkMD2OZGug7tcHAInCh6y2cJsJ1vckjFQ==
-X-Received: by 2002:a05:600c:524f:b0:45b:8453:d7e with SMTP id 5b1f17b1804b1-45b85526a68mr93034715e9.6.1756809839302;
-        Tue, 02 Sep 2025 03:43:59 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e00:6083:48d1:630a:25ae? ([2a0d:3344:2712:7e00:6083:48d1:630a:25ae])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3cf276d643dsm19520553f8f.26.2025.09.02.03.43.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Sep 2025 03:43:58 -0700 (PDT)
-Message-ID: <c282cd8e-96c5-41ab-a97b-945cc33141ac@redhat.com>
-Date: Tue, 2 Sep 2025 12:43:56 +0200
+	bh=lV+l/abgmHpQqmeGSBvsTCuokZnuY1jXVG9xt6N9/rg=;
+	b=wXfarb3+X1eSJg3DUEtiHXAviwGIcCABPRUQHzI9dmwGqo2CStl1aGBJSPFrvUw89ARXUI
+	g/DGvr34anPxAZjGqw62gT/SgdMqSWzJ0sIQq7meyJp36iaS7ReKAjgh90Vq7+sGJcBhs6
+	l4tvIHSCZshf+uCKe6IJAzPyqtGu3wcabMlsAhKum4I+Q/2lBPKBGxNxlQhkC9QgKOk5Yy
+	OBJwXFXFsALybvALsPT1CDtM1Hz/1kM/NVje1g0iM972GY9Rcq1d0VCJB45ZXc9DEc4iHv
+	6+w7g/PvgWmuKoV8tmw57nuoD5NF8w98LptEb6oAVk2xdvLpLSMH2O60MzFHpw==
+Date: Tue, 2 Sep 2025 16:17:11 +0530
+From: Brahmajit Das <listout@listout.xyz>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: andrew+netdev@lunn.ch, anthony.l.nguyen@intel.com, davem@davemloft.net, 
+	intel-wired-lan@lists.osuosl.org, kuba@kernel.org, netdev@vger.kernel.org, 
+	przemyslaw.kitszel@intel.com
+Subject: Re: [PATCH v2] net: intel: fm10k: Fix parameter idx set but not used
+Message-ID: <crnofgnchveaeduom44nzbq26m2zudy4wut3pl7xgf3fwar46n@tzvxk3nwlgmq>
+References: <e13abc99-fb35-4bc4-b110-9ddfa8cdb442@linux.dev>
+ <20250902072422.603237-1-listout@listout.xyz>
+ <c7005c02-63dc-4316-905c-e02283e398c5@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v10 08/19] net: psp: add socket security
- association code
-To: Daniel Zahka <daniel.zahka@gmail.com>,
- Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Boris Pismenny <borisp@nvidia.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
- <willemb@google.com>, David Ahern <dsahern@kernel.org>,
- Neal Cardwell <ncardwell@google.com>, Patrisious Haddad
- <phaddad@nvidia.com>, Raed Salem <raeds@nvidia.com>,
- Jianbo Liu <jianbol@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>,
- Rahul Rameshbabu <rrameshbabu@nvidia.com>,
- Stanislav Fomichev <sdf@fomichev.me>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Kiran Kella <kiran.kella@broadcom.com>,
- Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org
-References: <20250828162953.2707727-1-daniel.zahka@gmail.com>
- <20250828162953.2707727-9-daniel.zahka@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250828162953.2707727-9-daniel.zahka@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <c7005c02-63dc-4316-905c-e02283e398c5@linux.dev>
 
-On 8/28/25 6:29 PM, Daniel Zahka wrote:
-> +int psp_assoc_device_get_locked(const struct genl_split_ops *ops,
-> +				struct sk_buff *skb, struct genl_info *info)
-> +{
-> +	struct socket *socket;
-> +	struct psp_dev *psd;
-> +	struct nlattr *id;
-> +	int fd, err;
-> +
-> +	if (GENL_REQ_ATTR_CHECK(info, PSP_A_ASSOC_SOCK_FD))
-> +		return -EINVAL;
-> +
-> +	fd = nla_get_u32(info->attrs[PSP_A_ASSOC_SOCK_FD]);
-> +	socket = sockfd_lookup(fd, &err);
-> +	if (!socket)
-> +		return err;
-> +
-> +	if (!sk_is_tcp(socket->sk)) {
-> +		NL_SET_ERR_MSG_ATTR(info->extack,
-> +				    info->attrs[PSP_A_ASSOC_SOCK_FD],
-> +				    "Unsupported socket family and type");
-> +		err = -EOPNOTSUPP;
-> +		goto err_sock_put;
-> +	}
+On 02.09.2025 11:34, Vadim Fedorenko wrote:
+> On 02/09/2025 08:24, Brahmajit Das wrote:
+> > Variable idx is set in the loop, but is never used resulting in dead
+> > code. Building with GCC 16, which enables
+> > -Werror=unused-but-set-parameter= by default results in build error.
+> > This patch removes the idx parameter, since all the callers of the
+> > fm10k_unbind_hw_stats_q as 0 as idx anyways.
+> > 
+> > Suggested-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> > Signed-off-by: Brahmajit Das <listout@listout.xyz>
+> > ---
+> > changes in v2:
+> > 	- Removed the idx parameter, since all callers of
+> > 	fm10k_unbind_hw_stats_q passes idx as 0 anyways.
+> Just a reminder that you shouldn't send another version of the patch
+> as a reply to the previous version. And you have to wait for at least
+> 24h before sending next version to let other reviewers look at the code.
+> Current submission looks OK in patchwork, so no action is needed from
+> you right now.
+> 
+> Thanks,
+> Vadim
 
-It's not clear to me if a family check is required here. AFAICS the RX
-path is contrained to IPv6 only, as per spec, but the TX (NIC) allows
-even IPv4.
-
-What happens if the psp assoc is bound to an IPv4 socket? What if in
-case of ADDRFORM?
-
-Thanks,
-
-Paolo
-
+Noted, thank you.
+-- 
+Regards,
+listout
 
