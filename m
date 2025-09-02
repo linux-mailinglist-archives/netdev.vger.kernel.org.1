@@ -1,169 +1,396 @@
-Return-Path: <netdev+bounces-219184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDB4FB4047F
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 15:43:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F852B404EE
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 15:47:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A927754811B
-	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 13:40:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C62EC1B668D1
+	for <lists+netdev@lfdr.de>; Tue,  2 Sep 2025 13:43:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D73AB32ED4D;
-	Tue,  2 Sep 2025 13:36:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E263430EF80;
+	Tue,  2 Sep 2025 13:39:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bbVj+c5V"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B32631354B;
-	Tue,  2 Sep 2025 13:36:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F34261593;
+	Tue,  2 Sep 2025 13:39:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756820187; cv=none; b=kT6edXZv+9lQUyg6TRDzk0HC06Fd5VunHGdIywoCoEW6QtRkQRNg4U8sA0F3fOOA0rfKlXPOf5fRHdJaVn4kw/dJ0K5xEwWKjFQ21KRccTxbwPNe21RuVj5hMuX9gyCfBlpfilsRZ6SurtR/awGOySOtnPTqYHxxuD+E72ZDReM=
+	t=1756820359; cv=none; b=EekG/JVaqMvJNf/RIoUPs1DDo7lPYX6Lo7sTYaRRkMG8B65JFhdnVFTlZK1+XQDvyb6AP7oNrgQQZQSPt5L43Kw16Euo2+C5V6HRwg9ZOjp8ux16/An3tOboI3sccMQIFs3y3iNLodyTEVV8fyC3BfzkR10tlP5287t/U3OM43k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756820187; c=relaxed/simple;
-	bh=eL5bPtEbyYPPnJn5IF5WihPsPiZTJSLjyL6UkYKZl/0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OF7OmT1HxJ6bPxGg+C+ZcwQD6CtBPY/mYT0YvfhasOoZUdFUnQkh+CzUcIuLEvxQJPU6/XYgHzkg+z9VDcw+WigDvCnHGxjF7RVVQuVwgyuxyx0MbaNJal54rIzAM8eu6wNOf+qPIbgsPgdM0jAFt0IVA9dCt2QMolPSSHh7lf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 947B060298; Tue,  2 Sep 2025 15:36:24 +0200 (CEST)
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	<netfilter-devel@vger.kernel.org>,
-	pablo@netfilter.org
-Subject: [PATCH v2 net-next 7/7] netfilter: nft_payload: extend offset to 65535 bytes
-Date: Tue,  2 Sep 2025 15:35:49 +0200
-Message-ID: <20250902133549.15945-8-fw@strlen.de>
-X-Mailer: git-send-email 2.49.1
-In-Reply-To: <20250902133549.15945-1-fw@strlen.de>
-References: <20250902133549.15945-1-fw@strlen.de>
+	s=arc-20240116; t=1756820359; c=relaxed/simple;
+	bh=PQ0Pgo1ptWVhCQFI4t7jgtohrDWSDauWxH8+/TI3uSo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rF3RwCzUmHGCtH85992khXWfa9TtzHnOA8C8tm78Q4J+Ehn+TNg1/fgLO6IsnUYVa3lt/TnFWqW0lOdn6opqCGcTMsEumxPrWaB7gHu9ha5XpZpTHdOPzAaWf9JWemBlkfKZ2cBrPU491RnGfa2XO8H3SxCU8FohA2Rp6g5r7xA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bbVj+c5V; arc=none smtp.client-ip=209.85.166.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-88432e29adcso178037639f.2;
+        Tue, 02 Sep 2025 06:39:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756820356; x=1757425156; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Jm0i6cLmDYL1qv1teKoUVA7Oadkpt2JqAprTnUrssZs=;
+        b=bbVj+c5VYRVrjSsiKlG2aiIL92k94tHjzPw5kwCFV/kCRrdc0yfYRQadLES/y2Rw7r
+         QlDde/eMn40Geqj5dIfnG5WQWFL39mvTy0714J72bphaFCF+h7HR3Ea+pcp/mxfENLkc
+         EM2SvTWU2T+Ha5eKEukYcK74LK6GQ1axq4wtJFzUUs9SGF7tyaeuS+hFXxNhNrQMSAAl
+         gK60TBUIV07oZk8zo4LLk/n/ki7XgGE3iGT1qCl0ZOtRvzGfxEttcwlJAULuSEdcgAmp
+         zMDkvFpVg29iHFwVSxYYBmq8dQXlO0crnq4CrfeVmIeFNp28kfsW0uX3eIWxv13hv6On
+         NYZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756820356; x=1757425156;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Jm0i6cLmDYL1qv1teKoUVA7Oadkpt2JqAprTnUrssZs=;
+        b=QQk0QrR+iTpqkuQCXXm4vNZEVjBpR1j6H4iAqTP9JDP3MZD0JbbHPAf6GB4F3m0tqZ
+         5a+uUT5DVjhYXt0ZsXNSzaF1i/brDSitUNnYIMNEC4YcTZ+Z+Wsd4qatP1Y5VEX564rn
+         Sbxnc4iqYnDvV2aKapFjSerXj++/PSTkOkYaZPSt7FFSAtqJCy/Mt5psYUKdnSACY3XT
+         vNaYIL08URAWOa6rKRvuJPCBIdJegwQl/hdYGuO+WAHF612kz+ccWOapUKzdmmLvXgw0
+         CC6yUil2b3cxXQB0Qts+CGud7n8oG4l2QrMj2Tq8UCof8XNKr4BeK1EEXKRruDMpNC7U
+         QP+A==
+X-Forwarded-Encrypted: i=1; AJvYcCX5SlFwDUyfM8KC39Qq9FWCVzBi2dKJRmwwM14HOymwBp1d1sCFFkog/1/1loyYbKCUbyvRWS0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLg10TEvPr4jje/+0RwCLEMSlBXbJKSIkitsHkI9J7LRHs3Y+P
+	uKDPUvLxVAsccbJy1Yg/PihSKN3F46Eg6VHcPmDfjiIQ3uRKOR4jeXc77/DyKlbmMLxBAAfTyt2
+	uCK28FQDtgEcLeYAOvia/OTdAgtTulkc=
+X-Gm-Gg: ASbGnctEShBjneK002L8lMMNOFMEjWWdkwCA8NCI3tm8W3SLv+7vKbXsc6lPSIxJ1T0
+	Wf8eunJmKYKenEV3dy6NyUUvEccQfxUdlVhIHqTZPyBXXb+NJSQC9fcAVZxdJJr4BB4WYTmgOAr
+	TX8anUXnKVH6KQsk+uNhqC4mA0LZXoK4WzOqEz1OK3KyJJfY/Rc7T5KvlLDSv4uZbcBcmIta0qT
+	rW73ccNZmo/HZNu
+X-Google-Smtp-Source: AGHT+IFM0o4sQxMQ/QhuYwaLuPT+oAMbEic85xvIQ4wg3kxQxPxmd83p+r7ZvU+Z+xmLSocn3gMj+ufSAJyFDARolaU=
+X-Received: by 2002:a05:6e02:440a:10b0:3f6:5675:a17b with SMTP id
+ e9e14a558f8ab-3f65675a3a3mr42249345ab.27.1756820354821; Tue, 02 Sep 2025
+ 06:39:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250829180950.2305157-1-maciej.fijalkowski@intel.com>
+ <CAL+tcoA2MK72wWGXL-RR2Rf+01_tKpSZo7x6VFM+N4DthBK+=w@mail.gmail.com>
+ <aLYD2iq+traoJZ7R@boxer> <CAL+tcoAKVRs9nnAHeOA=2kN3Hf_zSS5z64yUSEVmtiS82zz3-Q@mail.gmail.com>
+ <aLbNNInuSjkC5qbI@boxer>
+In-Reply-To: <aLbNNInuSjkC5qbI@boxer>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 2 Sep 2025 21:38:37 +0800
+X-Gm-Features: Ac12FXxHOVLZO9LmiaYGGN5fscqCdBSIAlH_d0uUhKw3dLjswL1JTbyxmjNoJto
+Message-ID: <CAL+tcoAiY1_OvVAJwWj-YwWY3_9QOWQ_Dwsn5V4vy+wnOQJJog@mail.gmail.com>
+Subject: Re: [PATCH v7 bpf] xsk: fix immature cq descriptor production
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com, 
+	stfomichev@gmail.com, Eryk Kubanski <e.kubanski@partner.samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Fernando Fernandez Mancera <fmancera@suse.de>
+On Tue, Sep 2, 2025 at 6:56=E2=80=AFPM Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
+>
+> On Tue, Sep 02, 2025 at 08:02:30AM +0800, Jason Xing wrote:
+> > On Tue, Sep 2, 2025 at 4:37=E2=80=AFAM Maciej Fijalkowski
+> > <maciej.fijalkowski@intel.com> wrote:
+> > >
+> > > On Tue, Sep 02, 2025 at 12:09:39AM +0800, Jason Xing wrote:
+> > > > On Sat, Aug 30, 2025 at 2:10=E2=80=AFAM Maciej Fijalkowski
+> > > > <maciej.fijalkowski@intel.com> wrote:
+> > > > >
+> > > > > Eryk reported an issue that I have put under Closes: tag, related=
+ to
+> > > > > umem addrs being prematurely produced onto pool's completion queu=
+e.
+> > > > > Let us make the skb's destructor responsible for producing all ad=
+drs
+> > > > > that given skb used.
+> > > > >
+> > > > > Commit from fixes tag introduced the buggy behavior, it was not b=
+roken
+> > > > > from day 1, but rather when XSK multi-buffer got introduced.
+> > > > >
+> > > > > In order to mitigate performance impact as much as possible, mimi=
+c the
+> > > > > linear and frag parts within skb by storing the first address fro=
+m XSK
+> > > > > descriptor at sk_buff::destructor_arg. For fragments, store them =
+at ::cb
+> > > > > via list. The nodes that will go onto list will be allocated via
+> > > > > kmem_cache. xsk_destruct_skb() will consume address stored at
+> > > > > ::destructor_arg and optionally go through list from ::cb, if cou=
+nt of
+> > > > > descriptors associated with this particular skb is bigger than 1.
+> > > > >
+> > > > > Previous approach where whole array for storing UMEM addresses fr=
+om XSK
+> > > > > descriptors was pre-allocated during first fragment processing yi=
+elded
+> > > > > too big performance regression for 64b traffic. In current approa=
+ch
+> > > > > impact is much reduced on my tests and for jumbo frames I observe=
+d
+> > > > > traffic being slower by at most 9%.
+> > > > >
+> > > > > Magnus suggested to have this way of processing special cased for
+> > > > > XDP_SHARED_UMEM, so we would identify this during bind and set di=
+fferent
+> > > > > hooks for 'backpressure mechanism' on CQ and for skb destructor, =
+but
+> > > > > given that results looked promising on my side I decided to have =
+a
+> > > > > single data path for XSK generic Tx. I suppose other auxiliary st=
+uff
+> > > > > such as helpers introduced in this patch would have to land as we=
+ll in
+> > > > > order to make it work, so we might have ended up with more noisy =
+diff.
+> > > > >
+> > > > > Fixes: b7f72a30e9ac ("xsk: introduce wrappers and helpers for sup=
+porting multi-buffer in Tx path")
+> > > > > Reported-by: Eryk Kubanski <e.kubanski@partner.samsung.com>
+> > > > > Closes: https://lore.kernel.org/netdev/20250530103456.53564-1-e.k=
+ubanski@partner.samsung.com/
+> > > > > Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> > > > > ---
+> > > > >
+> > > > > Jason, please test this v7 on your setup, I would appreciate if y=
+ou
+> > > > > would report results from your testbed. Thanks!
+> > > > >
+> > > > > v1:
+> > > > > https://lore.kernel.org/bpf/20250702101648.1942562-1-maciej.fijal=
+kowski@intel.com/
+> > > > > v2:
+> > > > > https://lore.kernel.org/bpf/20250705135512.1963216-1-maciej.fijal=
+kowski@intel.com/
+> > > > > v3:
+> > > > > https://lore.kernel.org/bpf/20250806154127.2161434-1-maciej.fijal=
+kowski@intel.com/
+> > > > > v4:
+> > > > > https://lore.kernel.org/bpf/20250813171210.2205259-1-maciej.fijal=
+kowski@intel.com/
+> > > > > v5:
+> > > > > https://lore.kernel.org/bpf/aKXBHGPxjpBDKOHq@boxer/T/
+> > > > > v6:
+> > > > > https://lore.kernel.org/bpf/20250820154416.2248012-1-maciej.fijal=
+kowski@intel.com/
+> > > > >
+> > > > > v1->v2:
+> > > > > * store addrs in array carried via destructor_arg instead having =
+them
+> > > > >   stored in skb headroom; cleaner and less hacky approach;
+> > > > > v2->v3:
+> > > > > * use kmem_cache for xsk_addrs allocation (Stan/Olek)
+> > > > > * set err when xsk_addrs allocation fails (Dan)
+> > > > > * change xsk_addrs layout to avoid holes
+> > > > > * free xsk_addrs on error path
+> > > > > * rebase
+> > > > > v3->v4:
+> > > > > * have kmem_cache as percpu vars
+> > > > > * don't drop unnecessary braces (unrelated) (Stan)
+> > > > > * use idx + i in xskq_prod_write_addr (Stan)
+> > > > > * alloc kmem_cache on bind (Stan)
+> > > > > * keep num_descs as first member in xsk_addrs (Magnus)
+> > > > > * add ack from Magnus
+> > > > > v4->v5:
+> > > > > * have a single kmem_cache per xsk subsystem (Stan)
+> > > > > v5->v6:
+> > > > > * free skb in xsk_build_skb_zerocopy() when xsk_addrs allocation =
+fails
+> > > > >   (Stan)
+> > > > > * unregister netdev notifier if creating kmem_cache fails (Stan)
+> > > > > v6->v7:
+> > > > > * don't include Acks from Magnus/Stan; let them review the new
+> > > > >   approach:)
+> > > > > * store first desc at sk_buff::destructor_arg and rest of frags i=
+n list
+> > > > >   stored at sk_buff::cb
+> > > > > * keep the kmem_cache but don't use it for allocation of whole ar=
+ray at
+> > > > >   one shot but rather alloc single nodes of list
+> > > > >
+> > > > > ---
+> > > > >  net/xdp/xsk.c       | 99 ++++++++++++++++++++++++++++++++++++++-=
+------
+> > > > >  net/xdp/xsk_queue.h | 12 ++++++
+> > > > >  2 files changed, 97 insertions(+), 14 deletions(-)
+> > > > >
+>
+> (...)
+>
+> > > > >  {
+> > > > > -       long num =3D xsk_get_num_desc(xdp_sk(skb->sk)->skb) + 1;
+> > > > > -
+> > > > > -       skb_shinfo(skb)->destructor_arg =3D (void *)num;
+> > > > > +       INIT_LIST_HEAD(&XSKCB(skb)->addrs_list);
+> > > > > +       XSKCB(skb)->num_descs =3D 0;
+> > > > > +       skb_shinfo(skb)->destructor_arg =3D (void *)addr;
+> > > > >  }
+> > > > >
+> > > > >  static void xsk_consume_skb(struct sk_buff *skb)
+> > > > >  {
+> > > > >         struct xdp_sock *xs =3D xdp_sk(skb->sk);
+> > > > > +       u32 num_descs =3D xsk_get_num_desc(skb);
+> > > > > +       struct xsk_addr_node *pos, *tmp;
+> > > > > +
+> > > > > +       if (unlikely(num_descs > 1)) {
+> > > >
+> > > > I suspect the use of 'unlikely'. For some application turning on th=
+e
+> > > > multi-buffer feature, if it tries to transmit a large chunk of data=
+,
+> > > > it can become 'likely' then. So it depends how people use it.
+> > >
+> > > This pattern is used in major of XDP multi-buffer related code, for
+> > > example:
+> > > $ grep -irn "xdp_buff_has_frags" net/core/xdp.c
+> > > 553:    if (likely(!xdp_buff_has_frags(xdp)))
+> > > 641:    if (unlikely(xdp_buff_has_frags(xdp))) {
+> > > 777:    if (unlikely(xdp_buff_has_frags(xdp)) &&
+> > >
+> > > Drivers however tend to be mixed around this.
+> >
+> > I see. And I have no strong opinion on this.
+> >
+> > >
+> > > >
+> > > > > +               list_for_each_entry_safe(pos, tmp, &XSKCB(skb)->a=
+ddrs_list, addr_node) {
+> > > >
+> > > > It seems no need to use xxx_safe() since the whole process (from
+> > > > allocating skb to freeing skb) makes sure each skb can be processed
+> > > > atomically?
+> > >
+> > > We're deleting nodes from linked list so we need the @tmp for further=
+ list
+> > > traversal, I'm not following your statement about atomicity here?
+> >
+> > I mean this list is chained around each skb. It's not possible for one
+> > skb to do the allocation operation and free operation at the same
+> > time, right? That means it's not possible for one list to do the
+> > delete operation and add operation at the same time. If so, the
+> > xxx_safe() seems unneeded.
+>
+> _safe() variants are meant to allow you to delete nodes while traversing
+> the list.
+> You wouldn't be able to traverse the list when in body of the loop nodes
+> are deleted as the ->next pointer is poisoned by list_del(). _safe()
+> variant utilizes additional 'tmp' parameter to allow you doing this
+> operation.
 
-In some situations 255 bytes offset is not enough to match or manipulate
-the desired packet field. Increase the offset limit to 65535 or U16_MAX.
+Sure, this is exactly how _safe() works. My take is we don't need to
+use _safe() to keep safety because it's not possible for one reader
+traversing the entire addr list while another one is trying to delete
+node. If it can happen, then _safe() does make sense.
 
-In addition, the nla policy maximum value is not set anymore as it is
-limited to s16. Instead, the maximum value is checked during the payload
-expression initialization function.
+>
+> I feel like you misunderstood these macros as they would provide some kin=
+d
+> of serialization mechanism.
+>
+> >
+> > >
+> > > >
+> > > > > +                       list_del(&pos->addr_node);
+> > > > > +                       kmem_cache_free(xsk_tx_generic_cache, pos=
+);
+> > > > > +               }
+> > > > > +       }
+> > > > >
+> > > > >         skb->destructor =3D sock_wfree;
+> > > > > -       xsk_cq_cancel_locked(xs->pool, xsk_get_num_desc(skb));
+> > > > > +       xsk_cq_cancel_locked(xs->pool, num_descs);
+> > > > >         /* Free skb without triggering the perf drop trace */
+> > > > >         consume_skb(skb);
+> > > > >         xs->skb =3D NULL;
+> > > > > @@ -623,6 +668,8 @@ static struct sk_buff *xsk_build_skb_zerocopy=
+(struct xdp_sock *xs,
+> > > > >                         return ERR_PTR(err);
+> > > > >
+> > > > >                 skb_reserve(skb, hr);
+> > > > > +
+> > > > > +               xsk_set_destructor_arg(skb, desc->addr);
+> > > > >         }
+> > > > >
+> > > > >         addr =3D desc->addr;
+> > > > > @@ -694,6 +741,8 @@ static struct sk_buff *xsk_build_skb(struct x=
+dp_sock *xs,
+> > > > >                         err =3D skb_store_bits(skb, 0, buffer, le=
+n);
+> > > > >                         if (unlikely(err))
+> > > > >                                 goto free_err;
+> > > > > +
+> > > > > +                       xsk_set_destructor_arg(skb, desc->addr);
+> > > > >                 } else {
+> > > > >                         int nr_frags =3D skb_shinfo(skb)->nr_frag=
+s;
+> > > > >                         struct page *page;
+> > > > > @@ -759,7 +808,19 @@ static struct sk_buff *xsk_build_skb(struct =
+xdp_sock *xs,
+> > > > >         skb->mark =3D READ_ONCE(xs->sk.sk_mark);
+> > > > >         skb->destructor =3D xsk_destruct_skb;
+> > > > >         xsk_tx_metadata_to_compl(meta, &skb_shinfo(skb)->xsk_meta=
+);
+> > > > > -       xsk_set_destructor_arg(skb);
+> > > > > +
+> > > > > +       xsk_inc_num_desc(skb);
+> > > > > +       if (unlikely(xsk_get_num_desc(skb) > 1)) {
+> > > > > +               struct xsk_addr_node *xsk_addr;
+> > > > > +
+> > > > > +               xsk_addr =3D kmem_cache_zalloc(xsk_tx_generic_cac=
+he, GFP_KERNEL);
+> > > > > +               if (!xsk_addr) {
+> > > >
+> > > > num of descs needs to be decreased by one here? We probably miss th=
+e
+> > > > chance to add this addr node into the list this time. Sorry, I'm no=
+t
+> > > > so sure if this err path handles correctly.
+> > >
+> > > In theory yes, but xsk_consume_skb() will not crash without this by a=
+ny
+> > > means. If we would have a case where we failed on second frag, @num_d=
+escs
+> > > would indeed by 2 but addrs_list would just be empty.
+> >
+> > I wasn't stating very clearly. If the second frag fails on the above
+> > step, next time in xsk_consume_skb() the same skb will try to revisit
+>
+> you meant xsk_build_skb() I assume?
 
-Tested with the nft command line tool.
+Oh, yes.
 
-table ip filter {
-	chain output {
-		@nh,2040,8 set 0xff
-		@nh,524280,8 set 0xff
-		@nh,524280,8 0xff
-		@nh,2040,8 0xff
-	}
-}
+>
+> > the second frag/desc because of xsk_cq_cancel_locked(xs->pool, 1); in
+> > xsk_build_skb(). Then it will try to re-allocate the page for the
+> > second desc by calling alloc_page() in xsk_consume_skb()? IIUC, it
+> > will be messy around this skb. Finally, the descs of this skb will be
+> > increased to 3, which should be 2 actually if the skb only needs to
+> > carry two frags/descs?
+>
+> You're correct here! Even though it would not hurt later successful send
+> case, other paths that use xsk_get_num_desc() would be broken - say that
+> you failed at one point with kmem_cache_zalloc() and then you succeed, yo=
+u
+> have your full skb that is passed to ndo_start_xmit() but it ends with
+> NETDEV_TX_BUSY - then even xskq_cons_cancel_n() is fed with wrong value.
+> And regarding alloc_page - skb would carry doubled frag in
+> skb_shared_info.
+>
+> This is rather unlikely to happen, but needs to be addressed of course.
+> There are two approaches, either we do the allocations upfront or free
+> whole skb when kmem cache allocation fails.
+>
+> I'll send a v8 with this fixed, but overall this path needs a refactor...
 
-Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- include/net/netfilter/nf_tables_core.h |  2 +-
- net/netfilter/nft_payload.c            | 18 +++++++++++-------
- 2 files changed, 12 insertions(+), 8 deletions(-)
+Looking forward to your update version:)
 
-diff --git a/include/net/netfilter/nf_tables_core.h b/include/net/netfilter/nf_tables_core.h
-index 6c2f483d9828..7644cfe9267d 100644
---- a/include/net/netfilter/nf_tables_core.h
-+++ b/include/net/netfilter/nf_tables_core.h
-@@ -73,7 +73,7 @@ struct nft_ct {
- 
- struct nft_payload {
- 	enum nft_payload_bases	base:8;
--	u8			offset;
-+	u16			offset;
- 	u8			len;
- 	u8			dreg;
- };
-diff --git a/net/netfilter/nft_payload.c b/net/netfilter/nft_payload.c
-index 059b28ffad0e..b0214418f75a 100644
---- a/net/netfilter/nft_payload.c
-+++ b/net/netfilter/nft_payload.c
-@@ -40,7 +40,7 @@ static bool nft_payload_rebuild_vlan_hdr(const struct sk_buff *skb, int mac_off,
- 
- /* add vlan header into the user buffer for if tag was removed by offloads */
- static bool
--nft_payload_copy_vlan(u32 *d, const struct sk_buff *skb, u8 offset, u8 len)
-+nft_payload_copy_vlan(u32 *d, const struct sk_buff *skb, u16 offset, u8 len)
- {
- 	int mac_off = skb_mac_header(skb) - skb->data;
- 	u8 *vlanh, *dst_u8 = (u8 *) d;
-@@ -212,7 +212,7 @@ static const struct nla_policy nft_payload_policy[NFTA_PAYLOAD_MAX + 1] = {
- 	[NFTA_PAYLOAD_SREG]		= { .type = NLA_U32 },
- 	[NFTA_PAYLOAD_DREG]		= { .type = NLA_U32 },
- 	[NFTA_PAYLOAD_BASE]		= { .type = NLA_U32 },
--	[NFTA_PAYLOAD_OFFSET]		= NLA_POLICY_MAX(NLA_BE32, 255),
-+	[NFTA_PAYLOAD_OFFSET]		= { .type = NLA_BE32 },
- 	[NFTA_PAYLOAD_LEN]		= NLA_POLICY_MAX(NLA_BE32, 255),
- 	[NFTA_PAYLOAD_CSUM_TYPE]	= { .type = NLA_U32 },
- 	[NFTA_PAYLOAD_CSUM_OFFSET]	= NLA_POLICY_MAX(NLA_BE32, 255),
-@@ -797,7 +797,7 @@ static int nft_payload_csum_inet(struct sk_buff *skb, const u32 *src,
- 
- struct nft_payload_set {
- 	enum nft_payload_bases	base:8;
--	u8			offset;
-+	u16			offset;
- 	u8			len;
- 	u8			sreg;
- 	u8			csum_type;
-@@ -812,7 +812,7 @@ struct nft_payload_vlan_hdr {
- };
- 
- static bool
--nft_payload_set_vlan(const u32 *src, struct sk_buff *skb, u8 offset, u8 len,
-+nft_payload_set_vlan(const u32 *src, struct sk_buff *skb, u16 offset, u8 len,
- 		     int *vlan_hlen)
- {
- 	struct nft_payload_vlan_hdr *vlanh;
-@@ -940,14 +940,18 @@ static int nft_payload_set_init(const struct nft_ctx *ctx,
- 				const struct nft_expr *expr,
- 				const struct nlattr * const tb[])
- {
-+	u32 csum_offset, offset, csum_type = NFT_PAYLOAD_CSUM_NONE;
- 	struct nft_payload_set *priv = nft_expr_priv(expr);
--	u32 csum_offset, csum_type = NFT_PAYLOAD_CSUM_NONE;
- 	int err;
- 
- 	priv->base        = ntohl(nla_get_be32(tb[NFTA_PAYLOAD_BASE]));
--	priv->offset      = ntohl(nla_get_be32(tb[NFTA_PAYLOAD_OFFSET]));
- 	priv->len         = ntohl(nla_get_be32(tb[NFTA_PAYLOAD_LEN]));
- 
-+	err = nft_parse_u32_check(tb[NFTA_PAYLOAD_OFFSET], U16_MAX, &offset);
-+	if (err < 0)
-+		return err;
-+	priv->offset = offset;
-+
- 	if (tb[NFTA_PAYLOAD_CSUM_TYPE])
- 		csum_type = ntohl(nla_get_be32(tb[NFTA_PAYLOAD_CSUM_TYPE]));
- 	if (tb[NFTA_PAYLOAD_CSUM_OFFSET]) {
-@@ -1069,7 +1073,7 @@ nft_payload_select_ops(const struct nft_ctx *ctx,
- 	if (tb[NFTA_PAYLOAD_DREG] == NULL)
- 		return ERR_PTR(-EINVAL);
- 
--	err = nft_parse_u32_check(tb[NFTA_PAYLOAD_OFFSET], U8_MAX, &offset);
-+	err = nft_parse_u32_check(tb[NFTA_PAYLOAD_OFFSET], U16_MAX, &offset);
- 	if (err < 0)
- 		return ERR_PTR(err);
- 
--- 
-2.49.1
-
+Thanks,
+Jason
 
