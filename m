@@ -1,103 +1,73 @@
-Return-Path: <netdev+bounces-219730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24160B42CF9
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 00:50:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80947B42CFF
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 00:51:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D399D189AEBA
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 22:50:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23F292067FF
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 22:51:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 470F32E9EC8;
-	Wed,  3 Sep 2025 22:50:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED9A02EBDFD;
+	Wed,  3 Sep 2025 22:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XHjf7jeF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XK/cN8af"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FC9019C560;
-	Wed,  3 Sep 2025 22:50:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C29602E7BAE;
+	Wed,  3 Sep 2025 22:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756939813; cv=none; b=UE1Prv9qMSBt2yTSKCfulq+/oRA3UU40dmUVNG6w5+lE1gc/D3MxzuP4iX2JGxzusBCqdUHZ6NsL8lWi67KgtuXmH53FCd2Md7O/bFwtoYq873INjz2ccja5yHF3r2yAFXMIHs6UQ8OBDR6MYhrYX66fvX0MO1FdHsyt0Fn8hgg=
+	t=1756939891; cv=none; b=N8hjTt5QJIUKfbSpfcjgULLC8ZbgZd1kS/Nhd0KegVI5+zZL7XC95mZ4RoGg4YyQTc1/woElC7zzmprXUH4uz1mhXmuaMS7/Yb3529kKD31jng6mkVWt2LX87Q16Oj8LxrfvqnQ0fni6COZjFqOPFiX5CCbmL5XfEHj0lL8BBGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756939813; c=relaxed/simple;
-	bh=As5rtX3D5LB2wVeZvRuFo1VLXRYr4qskDKDe3OpTwlI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RIDSsuCQ35wNrSuWiXZ/ueIkzkchc+1mzFmPnKSCb/BoVV0N1uHi+p0mouRZXXby9nwLN3xF0+nNz7+O7GWtjlWeYE1DkViHfqlTjmp2T4ANKmqkeEq+I+Ofr4fYYHWL3x3P5k/hmMUVwyPPUY7EPprOKoMZVpam4owxGgbC63E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XHjf7jeF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D2FCC4CEF4;
-	Wed,  3 Sep 2025 22:50:12 +0000 (UTC)
+	s=arc-20240116; t=1756939891; c=relaxed/simple;
+	bh=nuLAQXUJOzgMOKAOlWlPexVEsUs3b+Bdwfmn9KR08I4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oBy8iGC5Bf3XfgPsEinlfvq0/CN7oU0qdBM4Ck0gOJ6Mzix0N5vzJdsj7U25HUjbL1abceKJVxrxdwPHOGCE51IRNY4yFESzp0LnH2PulymfWK0HE4gg7sQwMA+NHVdf9vGm4AY/wXlcOJdVRBNoWOSKHpMw5MdQf1wSPVbwoQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XK/cN8af; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFB6BC4CEE7;
+	Wed,  3 Sep 2025 22:51:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756939812;
-	bh=As5rtX3D5LB2wVeZvRuFo1VLXRYr4qskDKDe3OpTwlI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XHjf7jeFpYmeaUewcAb7SW4H4UtmZMhox1ss7yeUhnb+Mn4ahh6DumpoJKQtNSfcZ
-	 PM+PVN0buemow0HOFJy7oO9Y0K8uh/48rXBxKTP+P3zAFH7rJtVxyJAUQ5XIvt0VMS
-	 C9qaKLUu4B/zk6QOx+CTKpAkpsHgIjTqQC3takyihWrfTWQh1OvrnaNw4plvLY1o+/
-	 2AXhmJRDALA9bFXunpxJ6832LDbJdBzJbbEOFEzsFfuaIwqt+ak7/ghMhtDxgxipX3
-	 g7CqRMl1vU/26Gs2xtInqgY4wllW1nsZbAUJIVyV4lcA1Phq3oSFykIhHPp3QG91bU
-	 5+/9rjbRD4rBA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB3F2383C259;
-	Wed,  3 Sep 2025 22:50:18 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1756939891;
+	bh=nuLAQXUJOzgMOKAOlWlPexVEsUs3b+Bdwfmn9KR08I4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XK/cN8afZn60GsrJNNrLbXqm96rIPnpewnrYPSr+JwWF8vVRKxchCFbS72dQ2pI8u
+	 mOjcZzxfxwji+jXo5K9ecGZdRc9I4PTgzEJ5uJyY8t4eXmvxEhOlMjcZvabUk5YLfp
+	 rB+tH/7BCXUGe0AsQPCGte2Qxy7+0rjqOpSz0lvNR95hfzdsgVvx2J46C+PC0xUoKu
+	 Uc8BA/cAt6YEUF2PaWNf4APHeWiFrx99MW2ibdvPlyvPApourbzPk86KaIqWUJyUC6
+	 yLArVq4IBex1sThHeRGqOa015IoDD/lnxYTi3CjPwlrMhFCb6EUUKbt8CoEx8bmI4M
+	 l06szAPH3fVWA==
+Date: Wed, 3 Sep 2025 15:51:30 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Wilfred Mallawa <wilfred.opensource@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ horms@kernel.org, corbet@lwn.net, john.fastabend@gmail.com,
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, alistair.francis@wdc.com, dlemoal@kernel.org,
+ sd@queasysnail.net, Wilfred Mallawa <wilfred.mallawa@wdc.com>
+Subject: Re: [PATCH v3] net/tls: support maximum record size limit
+Message-ID: <20250903155130.3ce51167@kernel.org>
+In-Reply-To: <20250903014756.247106-2-wilfred.opensource@gmail.com>
+References: <20250903014756.247106-2-wilfred.opensource@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] tools: ynl-gen: fix nested array counting
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175693981774.1226328.5930762500179486996.git-patchwork-notify@kernel.org>
-Date: Wed, 03 Sep 2025 22:50:17 +0000
-References: <20250902160001.760953-1-ast@fiberby.net>
-In-Reply-To: <20250902160001.760953-1-ast@fiberby.net>
-To: =?utf-8?b?QXNiasO4cm4gU2xvdGggVMO4bm5lc2VuIDxhc3RAZmliZXJieS5uZXQ+?=@codeaurora.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, donald.hunter@gmail.com, horms@kernel.org,
- jacob.e.keller@intel.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Wed,  3 Sep 2025 11:47:57 +1000 Wilfred Mallawa wrote:
+> Upcoming Western Digital NVMe-TCP hardware controllers implement TLS
+> support. For these devices, supporting TLS record size negotiation is
+> necessary because the maximum TLS record size supported by the controller
+> is less than the default 16KB currently used by the kernel.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue,  2 Sep 2025 15:59:59 +0000 you wrote:
-> The blamed commit introduced the concept of split attribute
-> counting, and later allocating an array to hold them, however
-> TypeArrayNest wasn't updated to use the new counting variable.
-> 
-> Abbreviated example from tools/net/ynl/generated/nl80211-user.c:
-> nl80211_if_combination_attributes_parse(...):
->   unsigned int n_limits = 0;
->   [...]
->   ynl_attr_for_each(attr, nlh, yarg->ys->family->hdr_len)
-> 	if (type == NL80211_IFACE_COMB_LIMITS)
-> 		ynl_attr_for_each_nested(attr2, attr)
-> 			dst->_count.limits++;
->   if (n_limits) {
-> 	dst->_count.limits = n_limits;
-> 	/* allocate and parse attributes */
->   }
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,v2] tools: ynl-gen: fix nested array counting
-    https://git.kernel.org/netdev/net/c/b4ada0618eed
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Just to be clear -- the device does not require that the records align
+with TCP segments, right?
 
