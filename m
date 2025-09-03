@@ -1,123 +1,217 @@
-Return-Path: <netdev+bounces-219516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 648A3B41AF3
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 12:02:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A549B41B1C
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 12:06:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DE4918918C9
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 10:02:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 045D6566141
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 10:06:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27115217F2E;
-	Wed,  3 Sep 2025 10:02:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57C65261B75;
+	Wed,  3 Sep 2025 10:05:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iZtT1Kai"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cB7dbrNy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83FA61E0DCB
-	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 10:02:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23C3D2E7BB6
+	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 10:05:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756893729; cv=none; b=KrYQ48rlZeekIxnSgkmVbPcumLkIaJXmGTtkKnEOdwgXrPGxfD5e5HJT46Kr75qW4LvaJiZqv5Mn8KwlJ3nQQU9rRy/KbGqtnsKoIbJWsitAf1fdFZ8oUGUg1qeQYW/x4OX4pyuQ4vv2aLDXZDaLtQoNr/Ddu1YmZPKd/fUfF80=
+	t=1756893957; cv=none; b=Lf0IQ+/yBtB9jYl1u/vi0q/88IaLChp7RLwDo+13jG2tFBlNdTVntrOfV2sZ04vsKFW9QpqqbjDUxTLbjewaeuce0pM5cz3xpVoGO6rpXrhnRsyfEoPE5TBt4gnjGhCDjzTzB3ePT3+gq6/GRjeuT2ydzicu5VVRtJf1nH/dLsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756893729; c=relaxed/simple;
-	bh=uG+IUAFocjY0ferxW0QE1UIG+WKT3oBRbkzbzKGK3hs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GKMUadbXoKr/71R1ERqqj3UTdAnKMG++VDI1CFUePhAAJBjj5oRVINzD1odylylu5ug+FqHF/dFGh8Hj8YD6w8SE1UGkqQEN8p614V8tAbJNrd7G2kY3UzB/uJuwdnT1UO1XOmrsHijwFFrlXFc4hokTz455Asi4LCn8fm90u6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iZtT1Kai; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4b32ce93e30so23152981cf.2
-        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 03:02:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756893726; x=1757498526; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PdZ82/MZBQGEEJuXtN7htuB7hxcJ2bbzGdrPDDwIfc4=;
-        b=iZtT1KaitOM1Jx0RSkEj24gllZS0DSwaOsa2yQwxhwjoZZ089VjQ2whzL1ezlh4770
-         UT6Y7Wfm1N9MF19IR3d75yLm7ogLfN6ANKhswYXLPULFWnF+RSSJ6JWZ3NevUiVnKqWn
-         Ecd+PEpf9J1e7Dz2XtlCdihC6rmS60THDbTf7XYdgDPne5bEuzthxGq6SFwY91zWN2wn
-         0Hy0HYK3qjwJeTNeF/oIxEqrTAPtAJeWSf+86BFAWEPz0gad7jjItGn51eYwZVfPBg8v
-         RI63dWHQ5PwAjQirSFfj5aFWsdrr71fWDknFKw6mVz2clld6cC9szF6xf3LdJFH8Rzz4
-         DgNg==
+	s=arc-20240116; t=1756893957; c=relaxed/simple;
+	bh=kq1Wau0wY9DLA41QIV4x2j+j+ZrFWzY6e0XFo5MjlPE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KGnfdL6CYl8XeWmowiPbqh+N9KFpB2YASqQL6n3QBcT33M61agJ5tSO5v7I3TQPTTAAX78AfrrdXo8VQ5WN+U5Vx+pHp3B11vwcF2REnxJiBjr0vUOQ6UbYIqNOxiau5e3UH+TeBfAwmMj+tntyai85292Gwv+L+l2eX9h+0SH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cB7dbrNy; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756893954;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EA9HHU3PvtBg+lD4L5AqD1cu5f34Hf0u2RaEvtIhKfU=;
+	b=cB7dbrNydeFFH5jSARZJyBP1Yfylcnq5IF708CvXpAOts7A3rJC9/BAtFHqF4QIgL8SLAK
+	+2a+RNOEmTP1suiTHqF+cX7JcldUoc7IjQc+3Ln4U/B4wM0rXg9Rp75f5OP5yhzi8Mcs2d
+	659Mi5+rbEUg6SCsXft9a3mqnGXaCgo=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-661-nEuhNML6P1aDMVIUdrE6_Q-1; Wed, 03 Sep 2025 06:05:53 -0400
+X-MC-Unique: nEuhNML6P1aDMVIUdrE6_Q-1
+X-Mimecast-MFC-AGG-ID: nEuhNML6P1aDMVIUdrE6_Q_1756893952
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3dc3f943e6eso525157f8f.2
+        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 03:05:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756893726; x=1757498526;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PdZ82/MZBQGEEJuXtN7htuB7hxcJ2bbzGdrPDDwIfc4=;
-        b=eIXsHKA4oKzByCSuGWdWVypIRH17mhC7EjKd3U7Sq9dt82kwyrz+hvrXm4s6He+a3Z
-         CEh7oCQYga1Bd/XfNpwCyAj8lXx/HA70u/mhzv746WNK+hgTjx1lG4ANa3b7fOKaAaPJ
-         nuE3z0ycazAlF7+TVeuroEqh35M74jOFjeCAXt2pKeosAoIiCmEsNO7S/FR4XcV7sIA6
-         efJpwTv8EaVKwECkEzL//Erbs8gnNgIMnQDkl9M299yVETizwOiPPaBg09jMLJBQYq2e
-         rcauUyP8mRmbIEVo2jRLvTxGnNjZjVZuTdj+D3/1o5jMetWmi9doS5CLo8wBuZYID++9
-         tZww==
-X-Forwarded-Encrypted: i=1; AJvYcCVYApKQkTFeCDotYRCmXW425l4ykWqHUdgEjR44Hr1Wq4FypFAYW8RgEv/JkI/aVa/z8Udlp0A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRKWIJzSSiVMyE279tRDpKe9ASKW6glqrs9uBoXH2b5py/e8LR
-	lsXImhOpv7e4A+ugIRm3y3hVjR/co67aMuMTyeLl9WloE1jPJS0wURRCqiT3vu54rYBo6CUBa4n
-	f57zGQOzpk9cKlKVz3OLLdTEGo46wJuaIJ8t0LqUQYMHZuWAI8aboCY3mv1c=
-X-Gm-Gg: ASbGncsvCpn9qkSop0Xs3cH77x4qQgXM1FnTc/ux7A3Tc6qvbBPbZXMkXVt/sumR78c
-	Hrt1xuMxUxvTQw+cQzKX/GFeFiMS/eLHft63+IgjWFufnP/4ckmta2hjpbNbas+IPHN3C1W7yKU
-	K7hb9E3VOx3jw9hC03jobUtekxg3Wk2dkTFq93pU7mPpYFBRAxVeC811RiCYy2Pb+A1uxYpjLkL
-	UEgRBcRoJbxXeLxak76Fc/w
-X-Google-Smtp-Source: AGHT+IE96tVDfOMzHb3rTORLqR2kclX9pG/b2GeGdgfjbPLiAuRxi1B/OBPlD8BdlGywrG7cVhIMfiiwU0KYtntSJNY=
-X-Received: by 2002:a05:622a:244a:b0:4b3:4320:e1bf with SMTP id
- d75a77b69052e-4b34320e7edmr87322891cf.33.1756893725981; Wed, 03 Sep 2025
- 03:02:05 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1756893951; x=1757498751;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EA9HHU3PvtBg+lD4L5AqD1cu5f34Hf0u2RaEvtIhKfU=;
+        b=qlUMegRHKxwhgfVAVBhjndqxxMBeS7SzFLGWn+qRywqT0J5UUfQPx2O5t+2I2enDB/
+         yg4epywI5izkltgRcAXj+IgJ+LkQLvGKn5q70w9wFkV4boC6Yy5rNdj8eINZkyJup4LN
+         d71An6yn5kXx2YZbTnSOLB1lAAnzn2o2ZHwxG9bmlwAWpCLXlg06yl/BIK26PZJlhxCv
+         qDoDHOBn1Hs4eWx6+LyZCebMi0Amt3Os9KxgotGH50eUojqh03uUBWeRH8XY7vxVXT4N
+         vPJ4bgy+CclE0Wb1w5ZZRu6/8Gi8OGmzaTF/c1Mv1hc0by6+vcsqULxP2TTUpp1p1Epq
+         Blkw==
+X-Forwarded-Encrypted: i=1; AJvYcCWSsasXHqBwQ1lgG+V3M24BoDciLLfCkBU/td5Y5/9Xpsa/QttRu071dAw6fh5xNUhgjg3ZGJI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2ooncMFtnM8lIRsOx31IIe2GNp0A/5/xC78hJSQHu/2VvxjYu
+	n1gNIQcXr7KKScQvm1cCSQ3pBJdBrLyFZ8t2mMN1ZBpDPLPXmY9cKiUK0EJJ7obE8/tANbPIMLu
+	uKseAXSihjTqtDEy9InJztQXFQ1NsowHkPeD2LZI5IXvakG/e1IQPU0LdyIcmMh5/JS33/3A=
+X-Gm-Gg: ASbGncu35r5Cd4noAQHsHt/Czuc1Ktz1BmQHI1q8AdcX95IWa566ZJtqJqMZ5DvOMkk
+	vNVB0W0MkVfldz99bFb2Ndnz33dcv6KKCTXCvCsFrVbLTbXB/gitQCDchZHAE2HJKjJDjPsqd0V
+	CjYDK6urec9NnGcpIgl8aLHPXQPpaDIkN+rFJF0yYuvT81El4kxFc3l090rOA8YR4H+fCAG18oZ
+	24hImO/AQ9CYhn8DL4uMMZ9hdG2BeKZ8n8iiIxCTqBvE2cayyEfT5vN+o9t+s6ccuWGXdXZeeN/
+	glfSMYnUZzOwzY6lvuXxIp+eXeCEXXfdNePss1BphaM=
+X-Received: by 2002:a05:6000:26c4:b0:3c9:b8b7:ea4e with SMTP id ffacd0b85a97d-3d1dddf0bb6mr11319805f8f.19.1756893951611;
+        Wed, 03 Sep 2025 03:05:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFVOXoPZ7BPX/XFKABihtdsW//N0+PzKwU75BmJnyEGwill00FaomBFArdepVzs0O6QDYnCrA==
+X-Received: by 2002:a05:6000:26c4:b0:3c9:b8b7:ea4e with SMTP id ffacd0b85a97d-3d1dddf0bb6mr11319779f8f.19.1756893951165;
+        Wed, 03 Sep 2025 03:05:51 -0700 (PDT)
+Received: from [192.168.68.125] ([147.235.216.242])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3da13041bcasm6733988f8f.35.2025.09.03.03.05.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Sep 2025 03:05:50 -0700 (PDT)
+Message-ID: <22e2c955-61b7-4a1e-ab91-21cd1906a604@redhat.com>
+Date: Wed, 3 Sep 2025 13:05:48 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <11212ddf-bf32-4b11-afee-e234cdee5938@free.fr> <4e4c9952-e445-41af-8942-e2f1c24a0586@free.fr>
- <90efee88-b9dc-4f87-86f2-6ab60701c39f@free.fr> <6c525868-3e72-4baf-8df4-a1e5982ef783@free.fr>
- <d073ac34a39c02287be6d67622229a1e@vanheusden.com> <6a5cf9cf-9984-4e1b-882f-b9b427d3c096@free.fr>
- <aKxZy7XVRhYiHu7c@stanley.mountain> <0c694353-2904-40c2-bf65-181fe4841ea0@free.fr>
- <CANn89iJ6QYYXhzuF1Z3nUP=7+u_-GhKmCbBb4yr15q-it4rrUA@mail.gmail.com>
- <4542b595-2398-4219-b643-4eda70a487f3@free.fr> <aK9AuSkhr37VnRQS@strlen.de>
- <eb979954-b43c-4e3d-8830-10ac0952e606@free.fr> <1713f383-c538-4918-bc64-13b3288cd542@free.fr>
- <CANn89i+Me3hgy05EK8sSCNkH1Wj5f49rv_UvgFNuFwPf4otu7w@mail.gmail.com>
- <CANn89iLi=ObSPAg69uSPRS+pNwGw9jVSQJfT34ZAp3KtSrx2Gg@mail.gmail.com>
- <cd0461e0-8136-4f90-df7b-64f1e43e78d4@trinnet.net> <80dad7a3-3ca1-4f63-9009-ef5ac9186612@free.fr>
- <CANn89iJGdn2J-UwK9ux+m9r8mRhAND_t2kU6mLCs=RszBhCyRA@mail.gmail.com> <938ad48d-a4a3-4729-a46d-4473e190f1a1@free.fr>
-In-Reply-To: <938ad48d-a4a3-4729-a46d-4473e190f1a1@free.fr>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 3 Sep 2025 03:01:54 -0700
-X-Gm-Features: Ac12FXzLL8m922YFRsZVPobRIu52bY9OqCqqrAh-B95wqQY7JasuKjODHZ9HNec
-Message-ID: <CANn89i+BBuYYk1n=4HvEiZS6YhMwjdntt=psvAEAzXwcU-VKkQ@mail.gmail.com>
-Subject: Re: [BUG] [ROSE] slab-use-after-free in lock_timer_base
-To: Bernard Pidoux <bernard.pidoux@free.fr>, Takamitsu Iwai <takamitz@amazon.co.jp>
-Cc: linux-hams@vger.kernel.org, netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next,2/2] i40e: support generic devlink param
+ "max_mac_per_vf"
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
+ "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+Cc: "przemyslawx.patynowski@intel.com" <przemyslawx.patynowski@intel.com>,
+ "jiri@resnulli.us" <jiri@resnulli.us>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "horms@kernel.org" <horms@kernel.org>,
+ "Keller, Jacob E" <jacob.e.keller@intel.com>,
+ "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+ "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
+References: <20250903075810.17149-1-mheib@redhat.com>
+ <20250903075810.17149-2-mheib@redhat.com>
+ <IA3PR11MB8986F453579349C3518B312CE501A@IA3PR11MB8986.namprd11.prod.outlook.com>
+Content-Language: en-US
+From: mohammad heib <mheib@redhat.com>
+In-Reply-To: <IA3PR11MB8986F453579349C3518B312CE501A@IA3PR11MB8986.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Sep 3, 2025 at 2:51=E2=80=AFAM Bernard Pidoux <bernard.pidoux@free.=
-fr> wrote:
->
-> On 6.16.4 kernel patched with last ROSE commit for refcount use
-> rose_remove_node() is causing refcount_t: underflow; use-after-free
->
-> List:       linux-stable-commits
-> Subject:    Patch "net: rose: split remove and free operations in
-> rose_remove_neigh()" has been added to the 6.1
-> From:       Sasha Levin <sashal () kernel ! org>
-> Date:       2025-08-30 20:20:24
-> Message-ID: 20250830202024.2485006-1-sashal () kernel ! org
->
-> Bernard Pidoux
-> F6BVP / AI7BG
 
-Any particular reason you do not CC the author ?
+Hello Aleksandr,
 
-CC Takamitsu Iwai <takamitz@amazon.co.jp>
+Thank you for your review.
 
-BTW, a syzbot report was already sent to the list.
+On 9/3/25 12:07 PM, Loktionov, Aleksandr wrote:
+> 
+> 
+>> -----Original Message-----
+>> From: mheib@redhat.com <mheib@redhat.com>
+>> Sent: Wednesday, September 3, 2025 9:58 AM
+>> To: intel-wired-lan@lists.osuosl.org
+>> Cc: przemyslawx.patynowski@intel.com; jiri@resnulli.us;
+>> netdev@vger.kernel.org; horms@kernel.org; Keller, Jacob E
+>> <jacob.e.keller@intel.com>; Loktionov, Aleksandr
+>> <aleksandr.loktionov@intel.com>; Nguyen, Anthony L
+>> <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
+>> <przemyslaw.kitszel@intel.com>; Mohammad Heib <mheib@redhat.com>
+>> Subject: [PATCH net-next,2/2] i40e: support generic devlink param
+>> "max_mac_per_vf"
+>>
+>> From: Mohammad Heib <mheib@redhat.com>
+>>
+>> Add support for the new generic devlink runtime parameter
+>> "max_mac_per_vf", which controls the maximum number of MAC addresses a
+>> trusted VF can use.
+> 
+> 
+> Good day Mohammad,
+> 
+> Thanks for working on this and for the clear explanation in the commit message.
+> 
+> I have a couple of questions and thoughts:
+> 
+> 1) Scope of the parameter
+>      The name max_mac_per_vf is a bit ambiguous. From the description,
+>      it seems to apply only to trusted VFs, but the name does not make that obvious.
+>      Would it make sense to either:
+> 	- Make the name reflect that (e.g., max_mac_per_trusted_vf), or
+> 	- Introduce two separate parameters for trusted and untrusted VFs if both cases need to be handled differently?
+I agree that the name could be a bit confusing. Since this is a generic 
+devlink parameter, different devices may handle trusted and untrusted 
+VFs differently.
+For i40e specifically, the device does treat trusted VFs differently 
+from untrusted ones, and this is documented in devlink/i40e.rst.
+However, I chose a more general name to avoid creating a separate 
+devlink parameter for untrusted VFs, which likely wouldn’t be used.
+On reflection, I should update the patch number 1 to remove the 
+**trusted VF** wording from the description to avoid implying that the 
+parameter only applies to trusted VFs.
+> 
+> 2)Problem statement
+>      It would help to better understand the underlying problem this parameter is solving.
+>      Is the goal to enforce a global cap for all VFs, or to provide operators with a way
+>      to fine-tune per-VF limits? From my perspective, the most important part is
+>      clearly stating the problem and the use case.
+> 
+My main goal here is to enforce a global cap for all VFs.
+There was a long discussion [1] about this, and one of the ideas raised 
+was to create fine-tuned per-VF limits using devlink resources instead 
+of a parameter
+However, currently in i40e, we only create a devlink port per PF and no 
+devlink ports per VF.
+Implementing the resource-per-VF approach would therefore require some 
+extra work.
+so i decided to go with this global cap for now.
+[1] - 
+https://patchwork.kernel.org/project/netdevbpf/patch/20250805134042.2604897-2-dhill@redhat.com/
+> 3)Granularity
+>      If the intent is to give operators flexibility, a single global parameter might not be enough.
+>      For example, limiting the number of MAC filters per specific VF (or having different limits for trusted vs. untrusted)
+>      could be a real-world requirement. This patch doesn't seem to address that scenario.
+> 
+> Could you share more details about the use case and whether per-VF granularity was considered?
+> 
+> Thanks again for the work on this. Looking forward to your thoughts.
+> 
+> Best regards,
+> Aleksandr
+> 
+please see - 
+https://patchwork.kernel.org/project/netdevbpf/patch/20250805134042.2604897-2-dhill@redhat.com/
+>>
+>> By default (value 0), the driver enforces its internally calculated
+>> per-VF MAC filter limit. A non-zero value acts as a strict cap,
+>> overriding the internal calculation.
+>>
+>> Please note that the configured value is only a theoretical maximum
+>> and a hardware limits may still apply.
+>>
+>> - Previous discussion about this change:
+>>    https://lore.kernel.org/netdev/20250805134042.2604897-1-
+>> dhill@redhat.com
+>>    https://lore.kernel.org/netdev/20250823094952.182181-1-
+>> mheib@redhat.com
+>>
+>> Signed-off-by: Mohammad Heib <mheib@redhat.com>
+>> ---
+> 
+> ...
+> 
+>> --
+>> 2.50.1
+> 
+  Thank you,
 
-https://syzkaller.appspot.com/bug?extid=3D7287222a6d88bdb559a7
 
