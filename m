@@ -1,118 +1,103 @@
-Return-Path: <netdev+bounces-219729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0399B42CEC
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 00:46:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24160B42CF9
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 00:50:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F4AE3AF986
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 22:46:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D399D189AEBA
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 22:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32C492DCC13;
-	Wed,  3 Sep 2025 22:46:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 470F32E9EC8;
+	Wed,  3 Sep 2025 22:50:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="kgLW9QU8"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XHjf7jeF"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F57A19C560;
-	Wed,  3 Sep 2025 22:46:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FC9019C560;
+	Wed,  3 Sep 2025 22:50:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756939581; cv=none; b=LaCqOOr02sNXdkyv83LT4KKOzOMmoybqdB4MoF+72q+adC4tHnOVJiWL/q1NJ4NdAqrI65TyYV1BI3TN+GN5yvWMyK9TM7tIfb/e69YzOij2VFJ6rXIq6YTal3eKJC3r7qztYIumqmJ13ipReo79EP4mc3vy8sX60DNtJ/9D5yg=
+	t=1756939813; cv=none; b=UE1Prv9qMSBt2yTSKCfulq+/oRA3UU40dmUVNG6w5+lE1gc/D3MxzuP4iX2JGxzusBCqdUHZ6NsL8lWi67KgtuXmH53FCd2Md7O/bFwtoYq873INjz2ccja5yHF3r2yAFXMIHs6UQ8OBDR6MYhrYX66fvX0MO1FdHsyt0Fn8hgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756939581; c=relaxed/simple;
-	bh=E14G7hz4s7ZeraM27XTKxEUx9yqEMxZn0gjMb5mg+Ts=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b+UMLYT4TGcqBa7R/nuzP10PaGv8y3GNnERZJfRj0uwedN7htwjtpGJzRry0llROQbyxL9orkIeHR9Foaea8qv+H1vU+HW2Vd5Okdq8QltfNDS/o6cYfgE57yQCihSwtur0KLYLwq/kMDitwNY2i3Pbxz4f482OUru0GVi8iYUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kgLW9QU8; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=7bTvRnVvVrdfJ0JlVJfNw8ILrW2UjTWiVk6aSWpIF4o=; b=kgLW9QU8Ncl0JCWG9zxLcy6027
-	qExkkYTYK9wyu3uwEhwlhSPDNvDcHvWKlmLqgRL4U8pKuvCnJNqWz80FBbnE5ZELuEpQT5ItwMExS
-	jwHtmSlG2uSv1rDDN9JakBjTQvRVuc92CsF5dCUKVukVdYzchFDMDF5Tl8VNkm7EzBRc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1utwEZ-0076SB-85; Thu, 04 Sep 2025 00:45:43 +0200
-Date: Thu, 4 Sep 2025 00:45:43 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Dong Yibo <dong100@mucse.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
-	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org,
-	gustavoars@kernel.org, rdunlap@infradead.org,
-	vadim.fedorenko@linux.dev, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH net-next v10 4/5] net: rnpgbe: Add basic mbx_fw support
-Message-ID: <19ca3e80-97f7-428a-bf09-f713706fd6ab@lunn.ch>
-References: <20250903025430.864836-1-dong100@mucse.com>
- <20250903025430.864836-5-dong100@mucse.com>
+	s=arc-20240116; t=1756939813; c=relaxed/simple;
+	bh=As5rtX3D5LB2wVeZvRuFo1VLXRYr4qskDKDe3OpTwlI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=RIDSsuCQ35wNrSuWiXZ/ueIkzkchc+1mzFmPnKSCb/BoVV0N1uHi+p0mouRZXXby9nwLN3xF0+nNz7+O7GWtjlWeYE1DkViHfqlTjmp2T4ANKmqkeEq+I+Ofr4fYYHWL3x3P5k/hmMUVwyPPUY7EPprOKoMZVpam4owxGgbC63E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XHjf7jeF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D2FCC4CEF4;
+	Wed,  3 Sep 2025 22:50:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756939812;
+	bh=As5rtX3D5LB2wVeZvRuFo1VLXRYr4qskDKDe3OpTwlI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=XHjf7jeFpYmeaUewcAb7SW4H4UtmZMhox1ss7yeUhnb+Mn4ahh6DumpoJKQtNSfcZ
+	 PM+PVN0buemow0HOFJy7oO9Y0K8uh/48rXBxKTP+P3zAFH7rJtVxyJAUQ5XIvt0VMS
+	 C9qaKLUu4B/zk6QOx+CTKpAkpsHgIjTqQC3takyihWrfTWQh1OvrnaNw4plvLY1o+/
+	 2AXhmJRDALA9bFXunpxJ6832LDbJdBzJbbEOFEzsFfuaIwqt+ak7/ghMhtDxgxipX3
+	 g7CqRMl1vU/26Gs2xtInqgY4wllW1nsZbAUJIVyV4lcA1Phq3oSFykIhHPp3QG91bU
+	 5+/9rjbRD4rBA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB3F2383C259;
+	Wed,  3 Sep 2025 22:50:18 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250903025430.864836-5-dong100@mucse.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] tools: ynl-gen: fix nested array counting
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175693981774.1226328.5930762500179486996.git-patchwork-notify@kernel.org>
+Date: Wed, 03 Sep 2025 22:50:17 +0000
+References: <20250902160001.760953-1-ast@fiberby.net>
+In-Reply-To: <20250902160001.760953-1-ast@fiberby.net>
+To: =?utf-8?b?QXNiasO4cm4gU2xvdGggVMO4bm5lc2VuIDxhc3RAZmliZXJieS5uZXQ+?=@codeaurora.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, donald.hunter@gmail.com, horms@kernel.org,
+ jacob.e.keller@intel.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-> +/**
-> + * mucse_mbx_powerup - Echo fw to powerup
-> + * @hw: pointer to the HW structure
-> + * @is_powerup: true for powerup, false for powerdown
-> + *
-> + * mucse_mbx_powerup echo fw to change working frequency
-> + * to normal after received true, and reduce working frequency
-> + * if false.
-> + *
-> + * Return: 0 on success, negative errno on failure
-> + **/
-> +int mucse_mbx_powerup(struct mucse_hw *hw, bool is_powerup)
-> +{
-> +	struct mbx_fw_cmd_req req = {};
-> +	int len;
-> +	int err;
-> +
-> +	build_powerup(&req, is_powerup);
-> +	len = le16_to_cpu(req.datalen);
-> +	mutex_lock(&hw->mbx.lock);
-> +
-> +	if (is_powerup) {
-> +		err = mucse_write_posted_mbx(hw, (u32 *)&req,
-> +					     len);
-> +	} else {
-> +		err = mucse_write_mbx_pf(hw, (u32 *)&req,
-> +					 len);
-> +	}
+Hello:
 
-It looks odd that this is asymmetric. Why is a different low level
-function used between power up and power down?
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> +int mucse_mbx_reset_hw(struct mucse_hw *hw)
-> +{
-> +	struct mbx_fw_cmd_reply reply = {};
-> +	struct mbx_fw_cmd_req req = {};
-> +
-> +	build_reset_hw_req(&req);
-> +	return mucse_fw_send_cmd_wait(hw, &req, &reply);
-> +}
+On Tue,  2 Sep 2025 15:59:59 +0000 you wrote:
+> The blamed commit introduced the concept of split attribute
+> counting, and later allocating an array to hold them, however
+> TypeArrayNest wasn't updated to use the new counting variable.
+> 
+> Abbreviated example from tools/net/ynl/generated/nl80211-user.c:
+> nl80211_if_combination_attributes_parse(...):
+>   unsigned int n_limits = 0;
+>   [...]
+>   ynl_attr_for_each(attr, nlh, yarg->ys->family->hdr_len)
+> 	if (type == NL80211_IFACE_COMB_LIMITS)
+> 		ynl_attr_for_each_nested(attr2, attr)
+> 			dst->_count.limits++;
+>   if (n_limits) {
+> 	dst->_count.limits = n_limits;
+> 	/* allocate and parse attributes */
+>   }
+> 
+> [...]
 
-And this uses a third low level API different to power up and power
-down?
+Here is the summary with links:
+  - [net,v2] tools: ynl-gen: fix nested array counting
+    https://git.kernel.org/netdev/net/c/b4ada0618eed
 
-	Andrew
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
