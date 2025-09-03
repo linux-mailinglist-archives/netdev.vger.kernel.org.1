@@ -1,246 +1,133 @@
-Return-Path: <netdev+bounces-219682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BD2CB42975
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 21:05:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BC4FB429BF
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 21:21:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD8C316281B
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 19:05:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 257811BC60C0
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 19:22:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 423932D6E6D;
-	Wed,  3 Sep 2025 19:05:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E0C935FC23;
+	Wed,  3 Sep 2025 19:21:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hXOsfBrZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DdA0JHcM"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 869492D47F2
-	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 19:05:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 198DF36996E
+	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 19:21:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756926339; cv=none; b=NYcqwqIPKu57/ewDvTFM6Y72QlzLFUPofQ5gA/vTLdafar8MPAe0mTDqnLzl0ioay6H0N5AENStqNXsKrNH2F2hIDuzvUYfxXzWY3iq7+BQWahcwz7FGufvgqhQmEFWHSEAlfQzn8DZ49RwMLiBnFVKANm8aKCpNUOVlIdRix2o=
+	t=1756927274; cv=none; b=LAivnI0G8Efs2dyx0sI6j0uBAo1ap0rE5WIY//QmyxExm+w+Se04zu9emJIN95fcCj8MQaySCh/8OqQNVT346+e03nAjG0lzO1Bed74fpNIuqitrAtqdsXPaaHmoR5EneOs/iWE9AhKZKcbqFnSBLFgq+S1qp6Z+8thNpxf3I7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756926339; c=relaxed/simple;
-	bh=L0qjocOJiWq3l+u8Q7St5a+0s7x+ymc+4SuFBdkKODg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I6i3m+F5nAw0fOItwyj9ihjiglu8Fnh9f0JfdYiThGD/bW/jhwEUxvshbzMvAX/WIL1Fca9ZyvFMhpIwCOgA/mvT2dAwn1rKsH61xaNILUHiIQP3gFnR9f/WLHzaS/V2UJ6kdDAOJ1A6GNPJUCQYdvnT5phUd/ygaIw4Bp45s+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hXOsfBrZ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756926336;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vjRz5MOW8ct7GDEG18BGj5gmASR3PPkdkMv5XX1JQhU=;
-	b=hXOsfBrZlyEHvqDZmJXJ5ZpJP0DYRcImrcMyKcE5i4L8xbA/oM9dH/pmXF/RkLC9SsvIrZ
-	kQlk2yqBp3e1c07XZP+R8cmyf4HH8SyVAyEb6uKojB0Njf464qXGHSTp8JQVrrAllGN0wm
-	GLR+4QzW/aJhYj7UmjUoehEvvCdoWJM=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-67-7l-9VOICN3WeL0c8VOEQpw-1; Wed, 03 Sep 2025 15:05:31 -0400
-X-MC-Unique: 7l-9VOICN3WeL0c8VOEQpw-1
-X-Mimecast-MFC-AGG-ID: 7l-9VOICN3WeL0c8VOEQpw_1756926330
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-45d6c770066so1571635e9.0
-        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 12:05:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756926330; x=1757531130;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vjRz5MOW8ct7GDEG18BGj5gmASR3PPkdkMv5XX1JQhU=;
-        b=fuMdEk6pVAPQfqt+Ep1D4scA4nGuRurbOpxQUYrecu+KN+PIQ0iSRpQbYNgKuHyiUe
-         HdlymmjOsslbTU2a2Sh9ZwQ62TuVMH+z/bp/E1r8M3xZeZblD7nTAR4PS6pLQgmcYv2i
-         WcytFQ5yD2O/Gmq41yMNwpJ7vROHJ97S3EtqtZoycBSSYHHfPxS01JISBst00r7MMXjv
-         Gs9Ikt/CUIBR4uJkqKVfM9ng4erNLS6Ru+aW6y8hcdlK7WYo0oomQxdVO6WzBX8LWp3x
-         TIcSFZJqBdevbhnZkdAv+Pz9VSE7DKRNZIv7Ya26UnjE3+Fa5vsF7Ejf9Kk1RKMVDhE8
-         gGHA==
-X-Forwarded-Encrypted: i=1; AJvYcCUzFSrnBJtFo+d6v7fNePZR3t0z/xpQwEM9EI+RguzXLmd4B6giLG3kvRSi9CBCOoqRZQpslcw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4to5VWisDA8mzXdTbSeSkUsGh/IVOGuLA3iO6IRaznBrDZygc
-	twOpiyBJ2Q687YDTBf0NbZ2w8aGbJs43jGDvwWAd10NcmqmaaxuT3u5t7FDuOsANBe3b0cyfgR/
-	YL1Rz6yXkcs+vLH9BO+F7hYJi88LbJig2UNWoJoyp70KmSTyDZdBLiK3lYw==
-X-Gm-Gg: ASbGncvOiL2Z+t+U7PC+NBDv/T1FOyDnizh3HM1D3LV8Z80fzvfEUximDVCIQHuXVAV
-	d03sJiy1OeDVlZ0nz4bLEGmTbuz6SuWBEXmvF2BMlGCl3JOc+Hal2Fnozvn4zBsXBJ7+Pnp5OBx
-	mSI/8YfRE9IKi7xJTFVQ98oSk9RPWT72cgVnRqWF9GAnXZiEa2ce8ZYdcIrLm+C9OqQk12J3AvE
-	evBmbZyl+Un4klDOfY9hQy+/4ZCG+KliKdIEZpj7UTfAOd0+cRGPn/tTMF1iHiLJKkrc+BYicCY
-	kuoOYMZkJPcs/6/8omNSF/Q1Zjevy4d9OCwpfp9oK9zOVYkNbEd5jOX8DnnyH/Tihy39aR10MJo
-	u80gtIN1+tg==
-X-Received: by 2002:a05:600c:c491:b0:43c:ec4c:25b4 with SMTP id 5b1f17b1804b1-45cb50381admr39043825e9.10.1756926330112;
-        Wed, 03 Sep 2025 12:05:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEdcMupkCf8a3M3P6r1URmhAbTAW0e0csf3HNKNqZoo69cmt/7+rxjLiAOY5LCXGFAzjSkOTg==
-X-Received: by 2002:a05:600c:c491:b0:43c:ec4c:25b4 with SMTP id 5b1f17b1804b1-45cb50381admr39043605e9.10.1756926329658;
-        Wed, 03 Sep 2025 12:05:29 -0700 (PDT)
-Received: from ?IPV6:2001:4df4:5814:7700:7fb2:f956:4fb9:7689? ([2001:4df4:5814:7700:7fb2:f956:4fb9:7689])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3cf3458a67esm24636831f8f.62.2025.09.03.12.05.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Sep 2025 12:05:29 -0700 (PDT)
-Message-ID: <3280699a-7cd3-407f-8875-8186de967d15@redhat.com>
-Date: Wed, 3 Sep 2025 22:05:26 +0300
+	s=arc-20240116; t=1756927274; c=relaxed/simple;
+	bh=B0C3HqLjJrxPmuqoq9BR1gfOrlkFD/kDcF+bPmMHumI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HccIf/G0e8yoGoayGhk8EY/f8GWkXVj/aUgn2UtOCiay9PgMFioRPUGFklT8V4STX9Ja1U0drGfuwixoC+2Z01MHX7pqPJVVwz4wImgORJsxbjBywY6U+FfY8/UB2qrG+Otvu+zby+7NRO7W//Yg79s1UZlCybqh5LPKF9T4KUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DdA0JHcM; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756927272; x=1788463272;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=B0C3HqLjJrxPmuqoq9BR1gfOrlkFD/kDcF+bPmMHumI=;
+  b=DdA0JHcMW3nFR9NR0KgdXsJ1jYugnfVsaeTCPEjM0BJfZbmRnp4Nr3C8
+   qGAKZ/mxJ1qO3AfAbsQ+L0ykJdJf+Zpi9Q/K7A6VzOCGfl99UBwP6KSKl
+   TB+ntKlflVb5cxGrv8UV1IWcbC2/sUEqJEGXn2uMFLSvVf73eM7F23vIi
+   SEqH7OhKo9DM1SHucOIwh4DdbknLdZ4aR5LwBxzDNEhea8d04qc6z2Ox0
+   eDVt8/FmMcKybhzZvyOiNDlmWrxbEbEXp8puqHq4SzrE7YsllhTfoLW06
+   YIb7mN1ih/sUGMj8kahw/NM/kZWvPdNZouoRl8d0Cmoj8SY+4BrYcPf0i
+   g==;
+X-CSE-ConnectionGUID: aNP/Cl5rTW+Liw4ezj3Dgw==
+X-CSE-MsgGUID: 4HWh42lIRpaRyDaptvtlmg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11542"; a="62898335"
+X-IronPort-AV: E=Sophos;i="6.18,236,1751266800"; 
+   d="scan'208";a="62898335"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2025 12:21:12 -0700
+X-CSE-ConnectionGUID: y4RB/p5LQzazpADN3Ik4ww==
+X-CSE-MsgGUID: B3f1SfsnQGGOL5CGYAX8DA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,236,1751266800"; 
+   d="scan'208";a="172120265"
+Received: from smile.fi.intel.com ([10.237.72.52])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2025 12:21:06 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98.2)
+	(envelope-from <andriy.shevchenko@intel.com>)
+	id 1utt2V-0000000B4Fx-3aJG;
+	Wed, 03 Sep 2025 22:21:03 +0300
+Date: Wed, 3 Sep 2025 22:21:03 +0300
+From: Andy Shevchenko <andriy.shevchenko@intel.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Wei Fang <wei.fang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alex Marginean <alexandru.marginean@nxp.com>, imx@lists.linux.dev,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: enetc: Correct endianness handling in
+ _enetc_rd_reg64
+Message-ID: <aLiVHw4WQW69A5qL@smile.fi.intel.com>
+References: <20250624-etnetc-le-v1-1-a73a95d96e4e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next,2/2] i40e: support generic devlink param
- "max_mac_per_vf"
-To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-Cc: "przemyslawx.patynowski@intel.com" <przemyslawx.patynowski@intel.com>,
- "jiri@resnulli.us" <jiri@resnulli.us>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "horms@kernel.org" <horms@kernel.org>,
- "Keller, Jacob E" <jacob.e.keller@intel.com>,
- "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
- "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
-References: <20250903075810.17149-1-mheib@redhat.com>
- <20250903075810.17149-2-mheib@redhat.com>
- <IA3PR11MB8986F453579349C3518B312CE501A@IA3PR11MB8986.namprd11.prod.outlook.com>
- <3b950579-9ed9-4bcc-9809-441c2141615f@redhat.com>
- <IA3PR11MB89868F663B2835ECCBA899E0E501A@IA3PR11MB8986.namprd11.prod.outlook.com>
-Content-Language: en-US
-From: mohammad heib <mheib@redhat.com>
-In-Reply-To: <IA3PR11MB89868F663B2835ECCBA899E0E501A@IA3PR11MB8986.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250624-etnetc-le-v1-1-a73a95d96e4e@kernel.org>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-Hi Aleksandr,
+On Tue, Jun 24, 2025 at 05:35:12PM +0100, Simon Horman wrote:
+> enetc_hw.h provides two versions of _enetc_rd_reg64.
+> One which simply calls ioread64() when available.
+> And another that composes the 64-bit result from ioread32() calls.
+> 
+> In the second case the code appears to assume that each ioread32() call
+> returns a little-endian value. However both the shift and logical or
+> used to compose the return value would not work correctly on big endian
+> systems if this were the case. Moreover, this is inconsistent with the
+> first case where the return value of ioread64() is assumed to be in host
+> byte order.
+> 
+> It appears that the correct approach is for both versions to treat the
+> return value of ioread*() functions as being in host byte order. And
+> this patch corrects the ioread32()-based version to do so.
+> 
+> This is a bug but would only manifest on big endian systems
+> that make use of the ioread32-based implementation of _enetc_rd_reg64.
+> While all in-tree users of this driver are little endian and
+> make use of the ioread64-based implementation of _enetc_rd_reg64.
+> Thus, no in-tree user of this driver is affected by this bug.
 
-Thanks again for your review.
-I’ve updated the documentation and commit message in v2 to address your 
-feedback.
+...
 
-Appreciate your time!
-On 9/3/25 3:35 PM, Loktionov, Aleksandr wrote:
-> *From:*mohammad heib <mheib@redhat.com>
-> *Sent:* Wednesday, September 3, 2025 12:01 PM
-> *To:* Loktionov, Aleksandr <aleksandr.loktionov@intel.com>; intel-wired- 
-> lan@lists.osuosl.org
-> *Cc:* przemyslawx.patynowski@intel.com; jiri@resnulli.us; 
-> netdev@vger.kernel.org; horms@kernel.org; Keller, Jacob E 
-> <jacob.e.keller@intel.com>; Nguyen, Anthony L 
-> <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw 
-> <przemyslaw.kitszel@intel.com>
-> *Subject:* Re: [PATCH net-next,2/2] i40e: support generic devlink param 
-> "max_mac_per_vf"
-> 
-> Hello Aleksandr,
-> 
-> Thank you for your review.
-> 
-> On 9/3/25 12:07 PM, Loktionov, Aleksandr wrote:
-> 
->         -----Original Message-----
-> 
->         From:mheib@redhat.com <mailto:mheib@redhat.com> <mheib@redhat.com> <mailto:mheib@redhat.com>
-> 
->         Sent: Wednesday, September 3, 2025 9:58 AM
-> 
->         To:intel-wired-lan@lists.osuosl.org <mailto:intel-wired-lan@lists.osuosl.org>
-> 
->         Cc:przemyslawx.patynowski@intel.com <mailto:przemyslawx.patynowski@intel.com>;jiri@resnulli.us <mailto:jiri@resnulli.us>;
-> 
->         netdev@vger.kernel.org <mailto:netdev@vger.kernel.org>;horms@kernel.org <mailto:horms@kernel.org>; Keller, Jacob E
-> 
->         <jacob.e.keller@intel.com> <mailto:jacob.e.keller@intel.com>; Loktionov, Aleksandr
-> 
->         <aleksandr.loktionov@intel.com> <mailto:aleksandr.loktionov@intel.com>; Nguyen, Anthony L
-> 
->         <anthony.l.nguyen@intel.com> <mailto:anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
-> 
->         <przemyslaw.kitszel@intel.com> <mailto:przemyslaw.kitszel@intel.com>; Mohammad Heib<mheib@redhat.com> <mailto:mheib@redhat.com>
-> 
->         Subject: [PATCH net-next,2/2] i40e: support generic devlink param
-> 
->         "max_mac_per_vf"
-> 
->         From: Mohammad Heib<mheib@redhat.com> <mailto:mheib@redhat.com>
-> 
->         Add support for the new generic devlink runtime parameter
-> 
->         "max_mac_per_vf", which controls the maximum number of MAC addresses a
-> 
->         trusted VF can use.
-> 
->     Good day Mohammad,
-> 
->     Thanks for working on this and for the clear explanation in the commit message.
-> 
->     I have a couple of questions and thoughts:
-> 
->     1) Scope of the parameter
-> 
->          The name max_mac_per_vf is a bit ambiguous. From the description,
-> 
->          it seems to apply only to trusted VFs, but the name does not make that obvious.
-> 
->          Would it make sense to either:
-> 
->       - Make the name reflect that (e.g., max_mac_per_trusted_vf), or
-> 
->       - Introduce two separate parameters for trusted and untrusted VFs if both cases need to be handled differently?
-> 
-> I agree that the name could be a bit confusing. Since this is a generic 
-> devlink parameter, different devices may handle trusted and untrusted 
-> VFs differently.
-> For i40e specifically, the device does treat trusted VFs differently 
-> from untrusted ones, and this is documented in devlink/i40e.rst.
-> However, I chose a more general name to avoid creating a separate 
-> devlink parameter for untrusted VFs, which likely wouldn’t be used.
-> On reflection, I should update the patch number 1 to remove the 
-> **trusted VF** wording from the description to avoid implying that the 
-> parameter only applies to trusted VFs.
-> 
->     I believe the community generally aims for solutions that work
->     consistently across different hardware. If this parameter behaves
->     differently on i40e compared to mlx5 (or other drivers), it might be
->     helpful to mention that explicitly in the documentation or commit
->     message.
-> 
->     2)Problem statement
-> 
->          It would help to better understand the underlying problem this parameter is solving.
-> 
->          Is the goal to enforce a global cap for all VFs, or to provide operators with a way
-> 
->          to fine-tune per-VF limits? From my perspective, the most important part is
-> 
->          clearly stating the problem and the use case.
-> 
-> My main goal here is to enforce a global cap for all VFs.
-> There was a long discussion [1] about this, and one of the ideas raised 
-> was to create fine-tuned per-VF limits using devlink resources instead 
-> of a parameter
-> However, currently in i40e, we only create a devlink port per PF and no 
-> devlink ports per VF.
-> Implementing the resource-per-VF approach would therefore require some 
-> extra work.
-> so i decided to go with this global cap for now.
-> [1] - https://patchwork.kernel.org/project/netdevbpf/ 
-> patch/20250805134042.2604897-2-dhill@redhat.com/ <https:// 
-> patchwork.kernel.org/project/netdevbpf/patch/20250805134042.2604897-2- 
-> dhill@redhat.com/>
-> 
-> Thank, you Mohammad
-> 
-> The https://patchwork.kernel.org/project/netdevbpf/ 
-> patch/20250805134042.2604897-2-dhill@redhat.com/ <https:// 
-> patchwork.kernel.org/project/netdevbpf/patch/20250805134042.2604897-2- 
-> dhill@redhat.com/> explains many things.
-> 
-> It might be helpful to include a brief description of the problem being 
-> solved directly in the commit message. This gives reviewers the 
-> necessary context and makes it easier to understand the motivation 
-> behind the change.
-> 
->     …
-> 
+> @@ -507,7 +507,7 @@ static inline u64 _enetc_rd_reg64(void __iomem *reg)
+>  		tmp = ioread32(reg + 4);
+>  	} while (high != tmp);
+>  
+> -	return le64_to_cpu((__le64)high << 32 | low);
+> +	return (u64)high << 32 | low;
+>  }
+
+Description and the visible context rings a bell like this is probably a
+reimplementation of ioread64_lo_hi().
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
 
 
