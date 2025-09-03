@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-219566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7898BB41F62
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 14:41:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D33BB41F5C
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 14:40:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3136E7B5658
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 12:38:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B68816A62E
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 12:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A17A62FE56B;
-	Wed,  3 Sep 2025 12:39:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D1022FE588;
+	Wed,  3 Sep 2025 12:40:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Tx+1w+mh"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="BsLcNUhP"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0207E2FF654
-	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 12:39:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A8512FF678
+	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 12:40:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756903199; cv=none; b=ktuGBbcOKNnn8P3gBofsZ4G5jBDeK+xg98MV3yNHy/TGolvcwi+oKmNDKO03CdmlDZ5C9l0kyJYzZLaIiu2/bzslxiyOgCDLrDx4Q9N0xXB7ZMRFzzXG0f9C58BrL++9UKV1a0udJpuRXrL2yCpC0fq7pFUzY5Ju/QX//oNGNvA=
+	t=1756903204; cv=none; b=hIRFhjoWg3jc11fclfSf/8YcLA9LisqjIIQ5C8BHy1ppAXeqP2FA/IRZfYBiRGaJV590h/lSiVjcMpDG2yNeWgL2+SYdm+7Ws2BIXqlNBbHg4GiGezwWp/b00AyHoTB18kP2gSsEdPmRvgHmhw45Z6FMABN5v48MHnuv43l9FA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756903199; c=relaxed/simple;
-	bh=VbcQ1kjR9rZgh2hXEZmkInsvcqJCW/fhAAocLj/85K0=;
+	s=arc-20240116; t=1756903204; c=relaxed/simple;
+	bh=3KuN0NmS821cZFmkOClhmyL0JZKE8cxFBCU0HrRt39M=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=GBGE3YJ9V+UsB25lKUXD9NMBZ7gbLxyRQ1Onn8T4OS29TNkMHAyEYTff0Z2fAiAiMASjfNOi0MBluPyEwIrXHY3WkFG8xcl+hnGq74SN/QFEAucLIr1PqsKfzcZ3sMKJr1jdf2fOfcE+rh0hNLJy/i+Q7lq4igEa9jC11Ng9y30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Tx+1w+mh; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=pAGhYFNH+OEsrlzzWBUCW7H0VU//FFK/4yoC5mtb/rH0NjB2r7hXVSG14CfBCxW76ZKx0B4XI8Aah8LwQiiNsPlLsLd6cs5YILFIYv+hRAMIi63Q8kmGRcKVpZNghxg+/qrcM0rDNzBNiFY6JDjIN4hNHKRqGGEh5sKsNb/YbPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=BsLcNUhP; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,22 +37,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Lx+cIhNFbytMcZVMSFDTNPjoD4jGqQcNILJcA51HUIY=; b=Tx+1w+mhyZ2tk6KiNHfSWcQ07w
-	mXkqcuUPlUFmE/QjXnraxnee9GKKxI6y0UaW8X8xImXaBy81uJRguU+MskQ22w6qaXwcKTjkXoaXc
-	pmIodrGIIPctHfaW2zYzUZzlQYeFfLuAq+cWR20H8/9iHucbl98qi/HyBdu7nbg+mlabZQzKWH++4
-	4H3laV9nygevZyYuE4mmSS69T/K1DjI9PJ6CNgqYvRaMREwq1s8Z3m8YfC5t3LIJahPu81aBSKqub
-	yD0EYqymzKbhiNs3EAGWOo7DkkD4PKFCis4/zsxY/E/lGkhrIaXzpms065F/dYA1AzrJchAJLtFTk
-	jw4+7WpA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:55354 helo=rmk-PC.armlinux.org.uk)
+	bh=PTfMdoGvvhe+v891wN4zPMEwFCX2uk10dGSQGyWd8/k=; b=BsLcNUhP16FRvIdFtEQx6KQ5Du
+	JgM3Xfj+c1+f/sj1w7PWJZnrmwrXj3qQI4WXQxyOHwaG16R/i6MBJ0KWZOLGp1e6hUwEckVXLgIhH
+	fH09tfjfD5YsWhs00/HQuQmWozmdABS8yFmgd15cc8gBQ0jGv/Fb7rftnDrY2Bth8sFSAT9KiCtT2
+	FIyz11tI7q9T2t1VHRAD77rmqmYq0kEXkegYDX9QQ5S9cgqgvXuV8zUZO0OdkEBJksoWVDxbaQTVL
+	xxzV6QdOB5D6PJ6YDMyUu5MAEZCnFt1XCFEHUWeDON3VT9f+aD3pvmeFKHFZ9vuiWVc2ENmc0zX8/
+	mDre+XVQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:55366 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1utmmF-000000000WQ-0h0c;
-	Wed, 03 Sep 2025 13:39:51 +0100
+	id 1utmmJ-000000000Wg-34Gz;
+	Wed, 03 Sep 2025 13:39:55 +0100
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1utmmD-00000001s0f-2yUs;
-	Wed, 03 Sep 2025 13:39:49 +0100
+	id 1utmmI-00000001s0l-3ly7;
+	Wed, 03 Sep 2025 13:39:54 +0100
 In-Reply-To: <aLg24RZ6hodr711j@shell.armlinux.org.uk>
 References: <aLg24RZ6hodr711j@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -68,8 +68,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 07/11] net: stmmac: mdio: improve mdio register field
- definitions
+Subject: [PATCH net-next 08/11] net: stmmac: mdio: move initialisation of
+ priv->clk_csr to stmmac_mdio
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,78 +79,226 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1utmmD-00000001s0f-2yUs@rmk-PC.armlinux.org.uk>
+Message-Id: <E1utmmI-00000001s0l-3ly7@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 03 Sep 2025 13:39:49 +0100
+Date: Wed, 03 Sep 2025 13:39:54 +0100
 
-Include the register name in the definitions, and use a name which
-more closely resembles that used in documentation, while still being
-descriptive.
+The only user of priv->clk_csr is the MDIO code, so move its
+initialisation to stmmac_mdio.c.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- .../net/ethernet/stmicro/stmmac/stmmac_mdio.c    | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 82 -----------------
+ .../net/ethernet/stmicro/stmmac/stmmac_mdio.c | 88 ++++++++++++++++++-
+ 2 files changed, 86 insertions(+), 84 deletions(-)
 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index f0abd99fd137..419cb49ee5a2 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -314,77 +314,6 @@ static void stmmac_global_err(struct stmmac_priv *priv)
+ 	stmmac_service_event_schedule(priv);
+ }
+ 
+-/**
+- * stmmac_clk_csr_set - dynamically set the MDC clock
+- * @priv: driver private structure
+- * Description: this is to dynamically set the MDC clock according to the csr
+- * clock input.
+- * Note:
+- *	If a specific clk_csr value is passed from the platform
+- *	this means that the CSR Clock Range selection cannot be
+- *	changed at run-time and it is fixed (as reported in the driver
+- *	documentation). Viceversa the driver will try to set the MDC
+- *	clock dynamically according to the actual clock input.
+- */
+-static void stmmac_clk_csr_set(struct stmmac_priv *priv)
+-{
+-	unsigned long clk_rate;
+-
+-	clk_rate = clk_get_rate(priv->plat->stmmac_clk);
+-
+-	/* Platform provided default clk_csr would be assumed valid
+-	 * for all other cases except for the below mentioned ones.
+-	 * For values higher than the IEEE 802.3 specified frequency
+-	 * we can not estimate the proper divider as it is not known
+-	 * the frequency of clk_csr_i. So we do not change the default
+-	 * divider.
+-	 */
+-	if (!(priv->clk_csr & MAC_CSR_H_FRQ_MASK)) {
+-		if (clk_rate < CSR_F_35M)
+-			priv->clk_csr = STMMAC_CSR_20_35M;
+-		else if ((clk_rate >= CSR_F_35M) && (clk_rate < CSR_F_60M))
+-			priv->clk_csr = STMMAC_CSR_35_60M;
+-		else if ((clk_rate >= CSR_F_60M) && (clk_rate < CSR_F_100M))
+-			priv->clk_csr = STMMAC_CSR_60_100M;
+-		else if ((clk_rate >= CSR_F_100M) && (clk_rate < CSR_F_150M))
+-			priv->clk_csr = STMMAC_CSR_100_150M;
+-		else if ((clk_rate >= CSR_F_150M) && (clk_rate < CSR_F_250M))
+-			priv->clk_csr = STMMAC_CSR_150_250M;
+-		else if ((clk_rate >= CSR_F_250M) && (clk_rate <= CSR_F_300M))
+-			priv->clk_csr = STMMAC_CSR_250_300M;
+-		else if ((clk_rate >= CSR_F_300M) && (clk_rate < CSR_F_500M))
+-			priv->clk_csr = STMMAC_CSR_300_500M;
+-		else if ((clk_rate >= CSR_F_500M) && (clk_rate < CSR_F_800M))
+-			priv->clk_csr = STMMAC_CSR_500_800M;
+-	}
+-
+-	if (priv->plat->flags & STMMAC_FLAG_HAS_SUN8I) {
+-		if (clk_rate > 160000000)
+-			priv->clk_csr = 0x03;
+-		else if (clk_rate > 80000000)
+-			priv->clk_csr = 0x02;
+-		else if (clk_rate > 40000000)
+-			priv->clk_csr = 0x01;
+-		else
+-			priv->clk_csr = 0;
+-	}
+-
+-	if (priv->plat->has_xgmac) {
+-		if (clk_rate > 400000000)
+-			priv->clk_csr = 0x5;
+-		else if (clk_rate > 350000000)
+-			priv->clk_csr = 0x4;
+-		else if (clk_rate > 300000000)
+-			priv->clk_csr = 0x3;
+-		else if (clk_rate > 250000000)
+-			priv->clk_csr = 0x2;
+-		else if (clk_rate > 150000000)
+-			priv->clk_csr = 0x1;
+-		else
+-			priv->clk_csr = 0x0;
+-	}
+-}
+-
+ static void print_pkt(unsigned char *buf, int len)
+ {
+ 	pr_debug("len = %d byte, buf addr: 0x%p\n", len, buf);
+@@ -7718,17 +7647,6 @@ int stmmac_dvr_probe(struct device *device,
+ 
+ 	stmmac_fpe_init(priv);
+ 
+-	/* If a specific clk_csr value is passed from the platform
+-	 * this means that the CSR Clock Range selection cannot be
+-	 * changed at run-time and it is fixed. Viceversa the driver'll try to
+-	 * set the MDC clock dynamically according to the csr actual
+-	 * clock input.
+-	 */
+-	if (priv->plat->clk_csr >= 0)
+-		priv->clk_csr = priv->plat->clk_csr;
+-	else
+-		stmmac_clk_csr_set(priv);
+-
+ 	stmmac_check_pcs_mode(priv);
+ 
+ 	pm_runtime_get_noresume(device);
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-index 2d6a5d40e2c1..4d0de3c269a8 100644
+index 4d0de3c269a8..2ba0938ac641 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-@@ -23,9 +23,9 @@
- #include "dwxgmac2.h"
- #include "stmmac.h"
- 
--#define MII_BUSY 0x00000001
--#define MII_WRITE 0x00000002
--#define MII_DATA_MASK GENMASK(15, 0)
-+#define MII_ADDR_GBUSY			BIT(0)
-+#define MII_ADDR_GWRITE			BIT(1)
-+#define MII_DATA_GD_MASK		GENMASK(15, 0)
- 
- /* GMAC4 defines */
- #define MII_GMAC4_GOC_SHIFT		2
-@@ -235,7 +235,7 @@ static u32 stmmac_mdio_format_addr(struct stmmac_priv *priv,
- 	return ((pa << mii_regs->addr_shift) & mii_regs->addr_mask) |
- 	       ((gr << mii_regs->reg_shift) & mii_regs->reg_mask) |
- 	       priv->gmii_address_bus_config |
--	       MII_BUSY;
-+	       MII_ADDR_GBUSY;
+@@ -471,8 +471,92 @@ void stmmac_pcs_clean(struct net_device *ndev)
+ 	priv->hw->xpcs = NULL;
  }
  
- static int stmmac_mdio_access(struct stmmac_priv *priv, unsigned int pa,
-@@ -250,7 +250,7 @@ static int stmmac_mdio_access(struct stmmac_priv *priv, unsigned int pa,
- 	if (ret < 0)
- 		return ret;
+-static void stmmac_mdio_bus_config(struct stmmac_priv *priv, u32 value)
++/**
++ * stmmac_clk_csr_set - dynamically set the MDC clock
++ * @priv: driver private structure
++ * Description: this is to dynamically set the MDC clock according to the csr
++ * clock input.
++ * Note:
++ *	If a specific clk_csr value is passed from the platform
++ *	this means that the CSR Clock Range selection cannot be
++ *	changed at run-time and it is fixed (as reported in the driver
++ *	documentation). Viceversa the driver will try to set the MDC
++ *	clock dynamically according to the actual clock input.
++ */
++static void stmmac_clk_csr_set(struct stmmac_priv *priv)
+ {
++	unsigned long clk_rate;
++
++	clk_rate = clk_get_rate(priv->plat->stmmac_clk);
++
++	/* Platform provided default clk_csr would be assumed valid
++	 * for all other cases except for the below mentioned ones.
++	 * For values higher than the IEEE 802.3 specified frequency
++	 * we can not estimate the proper divider as it is not known
++	 * the frequency of clk_csr_i. So we do not change the default
++	 * divider.
++	 */
++	if (!(priv->clk_csr & MAC_CSR_H_FRQ_MASK)) {
++		if (clk_rate < CSR_F_35M)
++			priv->clk_csr = STMMAC_CSR_20_35M;
++		else if ((clk_rate >= CSR_F_35M) && (clk_rate < CSR_F_60M))
++			priv->clk_csr = STMMAC_CSR_35_60M;
++		else if ((clk_rate >= CSR_F_60M) && (clk_rate < CSR_F_100M))
++			priv->clk_csr = STMMAC_CSR_60_100M;
++		else if ((clk_rate >= CSR_F_100M) && (clk_rate < CSR_F_150M))
++			priv->clk_csr = STMMAC_CSR_100_150M;
++		else if ((clk_rate >= CSR_F_150M) && (clk_rate < CSR_F_250M))
++			priv->clk_csr = STMMAC_CSR_150_250M;
++		else if ((clk_rate >= CSR_F_250M) && (clk_rate <= CSR_F_300M))
++			priv->clk_csr = STMMAC_CSR_250_300M;
++		else if ((clk_rate >= CSR_F_300M) && (clk_rate < CSR_F_500M))
++			priv->clk_csr = STMMAC_CSR_300_500M;
++		else if ((clk_rate >= CSR_F_500M) && (clk_rate < CSR_F_800M))
++			priv->clk_csr = STMMAC_CSR_500_800M;
++	}
++
++	if (priv->plat->flags & STMMAC_FLAG_HAS_SUN8I) {
++		if (clk_rate > 160000000)
++			priv->clk_csr = 0x03;
++		else if (clk_rate > 80000000)
++			priv->clk_csr = 0x02;
++		else if (clk_rate > 40000000)
++			priv->clk_csr = 0x01;
++		else
++			priv->clk_csr = 0;
++	}
++
++	if (priv->plat->has_xgmac) {
++		if (clk_rate > 400000000)
++			priv->clk_csr = 0x5;
++		else if (clk_rate > 350000000)
++			priv->clk_csr = 0x4;
++		else if (clk_rate > 300000000)
++			priv->clk_csr = 0x3;
++		else if (clk_rate > 250000000)
++			priv->clk_csr = 0x2;
++		else if (clk_rate > 150000000)
++			priv->clk_csr = 0x1;
++		else
++			priv->clk_csr = 0x0;
++	}
++}
++
++static void stmmac_mdio_bus_config(struct stmmac_priv *priv)
++{
++	u32 value;
++
++	/* If a specific clk_csr value is passed from the platform, this means
++	 * that the CSR Clock Range value should not be computed from the CSR
++	 * clock.
++	 */
++	if (priv->plat->clk_csr >= 0) {
++		value = priv->plat->clk_csr;
++	} else {
++		stmmac_clk_csr_set(priv);
++		value = priv->clk_csr;
++	}
++
+ 	value <<= priv->hw->mii.clk_csr_shift;
  
--	ret = stmmac_mdio_wait(mii_address, MII_BUSY);
-+	ret = stmmac_mdio_wait(mii_address, MII_ADDR_GBUSY);
- 	if (ret)
- 		goto out;
+ 	if (value & ~priv->hw->mii.clk_csr_mask)
+@@ -503,7 +587,7 @@ int stmmac_mdio_register(struct net_device *ndev)
+ 	if (!mdio_bus_data)
+ 		return 0;
  
-@@ -259,12 +259,12 @@ static int stmmac_mdio_access(struct stmmac_priv *priv, unsigned int pa,
- 	writel(data, mii_data);
- 	writel(addr, mii_address);
+-	stmmac_mdio_bus_config(priv, priv->clk_csr);
++	stmmac_mdio_bus_config(priv);
  
--	ret = stmmac_mdio_wait(mii_address, MII_BUSY);
-+	ret = stmmac_mdio_wait(mii_address, MII_ADDR_GBUSY);
- 	if (ret)
- 		goto out;
- 
- 	/* Read the data from the MII data register if in read mode */
--	ret = read ? readl(mii_data) & MII_DATA_MASK : 0;
-+	ret = read ? readl(mii_data) & MII_DATA_GD_MASK : 0;
- 
- out:
- 	pm_runtime_put(priv->device);
-@@ -345,7 +345,7 @@ static int stmmac_mdio_write_c22(struct mii_bus *bus, int phyaddr, int phyreg,
- 	if (priv->plat->has_gmac4)
- 		cmd = MII_GMAC4_WRITE;
- 	else
--		cmd = MII_WRITE;
-+		cmd = MII_ADDR_GWRITE;
- 
- 	return stmmac_mdio_write(priv, phyaddr, phyreg, cmd, phydata);
- }
+ 	new_bus = mdiobus_alloc();
+ 	if (!new_bus)
 -- 
 2.47.2
 
