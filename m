@@ -1,88 +1,75 @@
-Return-Path: <netdev+bounces-219408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 484BCB4128E
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 04:52:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 105E9B41295
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 04:55:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D48D97005BF
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 02:52:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9513F3AF7D4
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 02:55:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 749B1218EA8;
-	Wed,  3 Sep 2025 02:52:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="xFCRTbyx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 593A7221FB6;
+	Wed,  3 Sep 2025 02:55:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2080.outbound.protection.outlook.com [40.107.92.80])
+Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEC7D75809;
-	Wed,  3 Sep 2025 02:52:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.80
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756867947; cv=fail; b=jn98GILz83hzA9q4huliRKkbSass3qT4zojLY9T7fp8JtnMEeg+qq46mvJd1RPngTM5p3KDy5q8AVPy2/+Am6ThzRmBTyhKVQA8XwIdIMKTd5N9GGY0Ogtw6QL/r7euuxqeKx/PUuepvmH8jymPlddFKyaIgL9WjlqvdgO+9IZM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756867947; c=relaxed/simple;
-	bh=gBj1v7uFTMKELLxb9i1wrGbe94ri2xOul3tsjc0aBdk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jjwI+29uWv1gRVsYd70cdqwntRXL8b0mQgnudhfDelfWKXmee4etE1Vi3i5AWADyICDQUAPrQKo5nSx1WJPbTT52o86d8SxV3PScfxZZULBkK47pVzXQGvVsocUKqkw9dG92qGGZwfTxfpFZjim0d2TWcCFH1W/qdFUPqgWP2tE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=xFCRTbyx; arc=fail smtp.client-ip=40.107.92.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=v+B3dow1bQ8Eyve5H0ESpyTbiVExNcQz+uVJwjMvQYDcBumuYJyAipHzVpls8tLcQqCq/p2Z+F6hKtfUb1+hdx/Wmw6RsFyxiQP1/jR5tJKIssfsYmYHJTblmB2pn8Nb+oDTXZwXz7abbZ3K5dhuZC10m1MlAGRi+UTUxQmfZYHl1UdzcZH8Napz1ufoH2JfqWMNfWTmUdDmSz9WayEjaj+rcr2KmVVFEPLvCxbZnZ5svORFxb1p+QK8W+PrmQZ6WQPWkWPQIVcmJGIrk0wbbDL+FPS2LFFpS74sFNDy43F6F2/m/jayF5OMUxbpwgFTtTYahmjFG6go0zvI3GSGQQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gA95Zq7rl/NCLUdnHujVQox2i1928iT5DrNtfvO7KZQ=;
- b=KINZHoKKKnIanDzmLNE06DFWMzxfqUpWe9UO0Et0a5RWJsguhhjypq8hgjos5kC/PGm7r3IwEeKYH2eRT+8Tp3I/t1WMLHcsisED9L7ve6VgwQ3iXxqsxEbAgotEAnblUJujFX/yte2GmdtqxU8AKduJ8TRjvMwO1QJ0TwvU4ZwSH/7t25uO0u3U8ErXPMNrimqRPYZDnr07YjQtJh7fN1S95z6aIeDEt7AytQH6y9IOi7fmEB8lXD1vAWj7QAAon2TUeE2Oi1VRv5hB3IHFx1Y5XL5MhxMU+4dYeQ0yxT7cwxMDxLju4LxPRAmo27wMwLrTjbhZ1IxC6KVSmi60hA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=lunn.ch smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gA95Zq7rl/NCLUdnHujVQox2i1928iT5DrNtfvO7KZQ=;
- b=xFCRTbyxPT08dSMHGCI91ojMtDT7vDCEbN40BzoqAnrPtv6n11yEoH6kIs124kyk4PWEEBFSNykMv1eF/pdRTLw4WyplKbIBOHO248R2WnO4F2cCUXe3bOHICJMDxTvw89ck/bTf0N0BwtfDf2u75vDYed89pSSJn0QYReCtoPY=
-Received: from BY3PR05CA0021.namprd05.prod.outlook.com (2603:10b6:a03:254::26)
- by MN2PR12MB4111.namprd12.prod.outlook.com (2603:10b6:208:1de::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.27; Wed, 3 Sep
- 2025 02:52:21 +0000
-Received: from SJ1PEPF00002322.namprd03.prod.outlook.com
- (2603:10b6:a03:254:cafe::e6) by BY3PR05CA0021.outlook.office365.com
- (2603:10b6:a03:254::26) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9094.17 via Frontend Transport; Wed,
- 3 Sep 2025 02:52:20 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ1PEPF00002322.mail.protection.outlook.com (10.167.242.84) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.9094.14 via Frontend Transport; Wed, 3 Sep 2025 02:52:19 +0000
-Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 2 Sep
- 2025 21:52:17 -0500
-Received: from xhdradheys41.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
- Transport; Tue, 2 Sep 2025 21:52:14 -0500
-From: Abin Joseph <abin.joseph@amd.com>
-To: <radhey.shyam.pandey@amd.com>, <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <michal.simek@amd.com>
-CC: <git@amd.com>, <abin.joseph@amd.com>, <netdev@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<stable@vger.kernel.org>
-Subject: [PATCH net v3] net: xilinx: axienet: Add error handling for RX metadata pointer retrieval
-Date: Wed, 3 Sep 2025 08:22:13 +0530
-Message-ID: <20250903025213.3120181-1-abin.joseph@amd.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21A831DED53;
+	Wed,  3 Sep 2025 02:54:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756868102; cv=none; b=paMYIxODAs16h/RasP9KOPZPyaMyH/F1Twc0R6lnCexJIPKuR8WFIahUjPreINOWwMRP59uCyqAfhfux4tZTDFnmjaFpnfsxOT6ZXLJ7caMBIf+6CGxO1DPYrnshzlCWC6Th0fzlgePABUsuaMqiPVJiZDq7/klkK+oLFXSTthc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756868102; c=relaxed/simple;
+	bh=7o3W8P2ojYUVJ0fsJWPPz/O+GKIXRReI+kCkt8+HLTg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=e7odnoyRqrGjpwA3Upy8lFSP1FWyZvvv5wg3RDwITas+1cfsXjU9WimDFzlHQrfGraB5MRyQNtWwy3n9zMAFl+E/ouTgWBhNJGo1J+RmtTkIB6xuhagTXmHzCUYy2tUhMy4BkGGLstVfpx2l+TNE050hLFvO1/BRAGbaNvBSSyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.92.39.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: esmtpsz11t1756868078tecfa8ca1
+X-QQ-Originating-IP: bCx5FCFmzv9pp9MzqXj82PbMCHvLGw2luRJIppU3GC4=
+Received: from localhost.localdomain ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 03 Sep 2025 10:54:34 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 5429709690827777819
+EX-QQ-RecipientCnt: 28
+From: Dong Yibo <dong100@mucse.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	corbet@lwn.net,
+	gur.stavi@huawei.com,
+	maddy@linux.ibm.com,
+	mpe@ellerman.id.au,
+	danishanwar@ti.com,
+	lee@trager.us,
+	gongfan1@huawei.com,
+	lorenzo@kernel.org,
+	geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com,
+	lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com,
+	richardcochran@gmail.com,
+	kees@kernel.org,
+	gustavoars@kernel.org,
+	rdunlap@infradead.org,
+	vadim.fedorenko@linux.dev
+Cc: netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org,
+	dong100@mucse.com
+Subject: [PATCH net-next v10 0/5] Add driver for 1Gbe network chips from MUCSE
+Date: Wed,  3 Sep 2025 10:54:25 +0800
+Message-Id: <20250903025430.864836-1-dong100@mucse.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,110 +77,96 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-Received-SPF: None (SATLEXMB04.amd.com: abin.joseph@amd.com does not designate
- permitted sender hosts)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00002322:EE_|MN2PR12MB4111:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4f119b35-ac78-4318-788a-08ddea94e646
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|82310400026|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?0ebRinl5rj4UK2XNxZCmbr2oaPg9Zmd6WUdWgfQ9GXLEfvdC+4/dSGIdwNh4?=
- =?us-ascii?Q?Y1rApgdN+1+vIiJBUgdaPzrk85ZX6X2dNa+r2tpZ7mCggOr8czzblZn/lJgJ?=
- =?us-ascii?Q?+OMpHJki6xK+qmdpzmJpCL74ud6vvSnGvIDX/Qg0DTNXj//56hlT9+vygtv0?=
- =?us-ascii?Q?rXw0HKOc5VD6NOyaw+7aWu5bThv80QqE9e4x8JHKVJqG4ikVpaMis+I7EVjd?=
- =?us-ascii?Q?ginwSvI0jbpJe80/PtKXdrZFjNU7pphI7O+Qynkf03WMoZoFPkpvIIfEAt+r?=
- =?us-ascii?Q?gRKF8pkAL2PGug1fCVx5dKzsUmWM4hBr6fnNXaEblB0DtynqMGGnWi5VGtAu?=
- =?us-ascii?Q?Rjr3HekkgB223WRG4jh+cFIakrc6lu0AM/+KmZqpd9XAN9ELiyV7Bl22fBcV?=
- =?us-ascii?Q?biJDEXf+L3Ft8ewu6zOaDWBScq39KHuKBwbeMfcAJ/4JAenYz5oroX+mQi0M?=
- =?us-ascii?Q?fTM+J+bjH2grVV7C1fXlionykMdl/YSt64Ia6or5LvNgEyNVvJTVljNeUZDe?=
- =?us-ascii?Q?yiJxbhuIM392h/YBHRtfUTJ27tOf9MWMf/h785ulQwyAYff/zQIFentlwzsV?=
- =?us-ascii?Q?nT1hvrBOHSCIgzuOHphhCJfXs2HFJyBo3E9o0zoIEBxfQ5da+a0r3NHZuny/?=
- =?us-ascii?Q?IJ3GmaN7CNVDjxVsBiRl2PLGOSTrJAcmAnVBpxGZTUPUqEjLY2RE4sZpI1q7?=
- =?us-ascii?Q?IetWytScFZ5fye1KDODCmick/pa7ItX+tbwpfYRiIxCJl4FEwOw7IvNm9YKH?=
- =?us-ascii?Q?cWly6ALenWgzcNlP/iu2RNwCCDrX5fOOgQEe6OTPGWw/QYYuiMc9LoA/wg1d?=
- =?us-ascii?Q?nVhDGwI827qlhUD9ztEh2ov4/q6VnLTOHCzPxO8weH+6f1KvlvKz029sAlv6?=
- =?us-ascii?Q?uenpA+5HjsbnY35wrmaPEaV7I9bKjU7xYM7WY4O2qquQIlGgOywQ3Skz4Yoh?=
- =?us-ascii?Q?s3vEfSdUbKDKbmaLQ2c7QIgUSnqy/utrMligxw0e5CgrjwwNhFHHFUrdsrFj?=
- =?us-ascii?Q?oHf10kGocw5uWwS6Do7XaNa1SPUqekFhK/H7dgOeU725loYgybZxy4TY7Ac+?=
- =?us-ascii?Q?lNaxwHXSMTVCKF0A9O23zYGlH1+G9GrTJ2nk8DfSmXobjxRXpSFyFDky7tb1?=
- =?us-ascii?Q?iJWuGuSIdkW510ULZzrs/9k4nBUH8IPibBe96gcuO0rshBO4BJEy/Hh3XdCb?=
- =?us-ascii?Q?36IyeIiL4WPBBMeb3tFulOZgvFMkUYEraugOMmni6oNb+A4od2Ht7TiEtvrC?=
- =?us-ascii?Q?iTjCFAKyPqVCvof+bmjN3uq9KJjqJqCgTEExg2x3jLoF63eSZP5OWtQd2HSJ?=
- =?us-ascii?Q?ImBouq8DGFA0fzvSnTFMbdWatGPjGyMO7u5PaJ+yFYH/hnyxckec8xolLmF3?=
- =?us-ascii?Q?XZmQHaAs0wdXBl2sGmreao9760MdltVqR46d4D770M3VDvF1yjPMX/5eKHqi?=
- =?us-ascii?Q?tweEeEbyuEYaPRY6jN2DgIczbd1kSIx1kyGhndGKE87XRavSROEdlq5wc+Xx?=
- =?us-ascii?Q?GvvAvXqcZkFRHc0b5b9rSpTcnIV2i01TF64j?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(1800799024)(82310400026)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Sep 2025 02:52:19.4555
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4f119b35-ac78-4318-788a-08ddea94e646
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00002322.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4111
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: Mf2c2cXG8XEiQPz1OujGSlUS5cgahaZ3mQMT5guSiQ98wCnKEQwcF5b6
+	cdywTG6AmcwHyZMog6hDUmMZFGDtgTwsSbk2JDBk76HgQILdZ0EUgCFwH/IpqbDd06pf1e4
+	847cyG6FX9yBrspc952A7qBhkPkS1Ou6lx05PguzCIQ3t7yd+QbithUOBjt58Alg4+GWxiJ
+	MISy6IChaUGk1OcvY7/NqTrWFM5biIuTYvOqnuAebcW43IhXECJRxGkTtLYF0YgOvGOD5yi
+	WZXi4yUso5lv62+AsRoKhw+evxhZzga0t4q08jIq7abDk7f0NXycMPFOGw5xN6GEwygrKfx
+	3CLe6IvznFfrJUKdtpkho7r2T0+KX69FvmzlzPA7qxJIkqUiRh8RQFR3p82/JeC5pN4JrBU
+	w9kxH+njiQAIIkFTQ8QFL90D1EY8nJ/FUIwmEqgm9MKh3KjPNALHfFYL4PVcVzaTkmKNPyF
+	0JwsSZbhgVoV1SZx7X/yv5gKitSGGInZsntLUw7DgpttQIGvqOTrNDMY+8gGDH2VGeBXq3d
+	Hu58q3YfvNxR9ZHBPnemMKgwKvHSqqUd7tw2cP9qrtF80KzTan3hGP04BlLnywZ2Eb0C8vQ
+	jSbXF3IG/dO6nTKOsFlwmFTvNg0kt5XzfqpCnF6ngHtQqWKlWM/lCxIe0SP+FZIczCp3lmi
+	zdBJHkhca4Vsd7pBInmdBPEJlapmOpInCFiqw1yu9jt88wnCWnJfV6nS0XQki+gn5tRnyd4
+	nC98u+gmNv2odKNxiG3GSu3fCGK7l5u4a7fx8/0v12C0gXHJmK0m9fCuNQ1APdhrZY7Alkc
+	YMSSAx5+0f56n+kBMQnVC2sELzePxdOGqC2kUcQ1I8DhMyzrFmhDC95yV9wWKV8ltTItKVH
+	CUVj03Ki9+oQBfVdjzoddJBeAI6Lp6O29iml4M2D1+foCn3Uw6sCwToBXXQnUWNSpmIKNev
+	zAuuDx4UBg2NxWsIaNy8aQf8/rJY6M5dfTMuKJd+o2w9NRRZDr88TmuV2dnN2xaqlEXIs95
+	vMRMKqEeMWsiPQp22qmeTFydJ8ooc=
+X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+X-QQ-RECHKSPAM: 0
 
-Add proper error checking for dmaengine_desc_get_metadata_ptr() which
-can return an error pointer and lead to potential crashes or undefined
-behaviour if the pointer retrieval fails.
+Hi maintainers,
 
-Properly handle the error by unmapping DMA buffer, freeing the skb and
-returning early to prevent further processing with invalid data.
+This patch series is v10 to introduce support for MUCSE N500/N210 1Gbps
+Ethernet controllers. I divide codes into multiple series, this is the
+first one which only register netdev without true tx/rx functions.
 
-Fixes: 6a91b846af85 ("net: axienet: Introduce dmaengine support")
-Signed-off-by: Abin Joseph <abin.joseph@amd.com>
-Reviewed-by: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com> 
----
+Changelog:
+v9 -> v10:
+  [patch 4/5]:
+   1. update mucse_mbx_get_capability and rename to mucse_mbx_get_info, along
+      with relative capability struct.
+   2. Separte get_perm from reset_hw_ops.
+   3. Rename ifinmosd to powerup.
+   4. Rename mucse_fw_get_macaddr to mucse_mbx_get_macaddr.
+   5. Rename mucse_mbx_fw_reset_phy to mucse_mbx_reset_hw.
+   6. Add mucse_mbx_sync_fw.
+  [patch 5/5]:
+   1. Use 'mutex_lock', not 'mutex_lock_interruptible'.
+   2. Rename 'driver_status' to 'echo_fw_status'.
 
-Changes in v2:
-Fix the alias to net
+links:
+v9: https://lore.kernel.org/netdev/20250828025547.568563-1-dong100@mucse.com/
+v8: https://lore.kernel.org/netdev/20250827034509.501980-1-dong100@mucse.com/
+v7: https://lore.kernel.org/netdev/20250822023453.1910972-1-dong100@mucse.com
+v6: https://lore.kernel.org/netdev/20250820092154.1643120-1-dong100@mucse.com/
+v5: https://lore.kernel.org/netdev/20250818112856.1446278-1-dong100@mucse.com/
+v4: https://lore.kernel.org/netdev/20250814073855.1060601-1-dong100@mucse.com/
+v3: https://lore.kernel.org/netdev/20250812093937.882045-1-dong100@mucse.com/
+v2: https://lore.kernel.org/netdev/20250721113238.18615-1-dong100@mucse.com/
+v1: https://lore.kernel.org/netdev/20250703014859.210110-1-dong100@mucse.com/
 
-Changes in v3:
-Remove unwanted space 
-Add reviewed by tag
+Dong Yibo (5):
+  net: rnpgbe: Add build support for rnpgbe
+  net: rnpgbe: Add n500/n210 chip support
+  net: rnpgbe: Add basic mbx ops support
+  net: rnpgbe: Add basic mbx_fw support
+  net: rnpgbe: Add register_netdev
 
----
- drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ .../device_drivers/ethernet/index.rst         |   1 +
+ .../device_drivers/ethernet/mucse/rnpgbe.rst  |  21 +
+ MAINTAINERS                                   |   8 +
+ drivers/net/ethernet/Kconfig                  |   1 +
+ drivers/net/ethernet/Makefile                 |   1 +
+ drivers/net/ethernet/mucse/Kconfig            |  34 ++
+ drivers/net/ethernet/mucse/Makefile           |   7 +
+ drivers/net/ethernet/mucse/rnpgbe/Makefile    |  11 +
+ drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |  99 +++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   | 157 +++++++
+ drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |  18 +
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   | 300 +++++++++++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c    | 393 ++++++++++++++++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h    |  25 ++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c | 250 +++++++++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h | 126 ++++++
+ 16 files changed, 1452 insertions(+)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/mucse/rnpgbe.rst
+ create mode 100644 drivers/net/ethernet/mucse/Kconfig
+ create mode 100644 drivers/net/ethernet/mucse/Makefile
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/Makefile
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
 
-diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-index 0d8a05fe541a..ec6d47dc984a 100644
---- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-+++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-@@ -1168,6 +1168,15 @@ static void axienet_dma_rx_cb(void *data, const struct dmaengine_result *result)
- 						       &meta_max_len);
- 	dma_unmap_single(lp->dev, skbuf_dma->dma_address, lp->max_frm_size,
- 			 DMA_FROM_DEVICE);
-+
-+	if (IS_ERR(app_metadata)) {
-+		if (net_ratelimit())
-+			netdev_err(lp->ndev, "Failed to get RX metadata pointer\n");
-+		dev_kfree_skb_any(skb);
-+		lp->ndev->stats.rx_dropped++;
-+		goto rx_submit;
-+	}
-+
- 	/* TODO: Derive app word index programmatically */
- 	rx_len = (app_metadata[LEN_APP] & 0xFFFF);
- 	skb_put(skb, rx_len);
-@@ -1180,6 +1189,7 @@ static void axienet_dma_rx_cb(void *data, const struct dmaengine_result *result)
- 	u64_stats_add(&lp->rx_bytes, rx_len);
- 	u64_stats_update_end(&lp->rx_stat_sync);
- 
-+rx_submit:
- 	for (i = 0; i < CIRC_SPACE(lp->rx_ring_head, lp->rx_ring_tail,
- 				   RX_BUF_NUM_DEFAULT); i++)
- 		axienet_rx_submit_desc(lp->ndev);
 -- 
-2.34.1
+2.25.1
 
 
