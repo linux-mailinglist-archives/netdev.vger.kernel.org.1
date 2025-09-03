@@ -1,153 +1,195 @@
-Return-Path: <netdev+bounces-219421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07552B412F7
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 05:32:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8A68B41308
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 05:42:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6608E1B636EE
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 03:32:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 594E3545632
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 03:42:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 139C12C324D;
-	Wed,  3 Sep 2025 03:32:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F0B82D0600;
+	Wed,  3 Sep 2025 03:42:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c6/aA16+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DXzUqY8a"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95D2932F740;
-	Wed,  3 Sep 2025 03:32:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD062C3272
+	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 03:42:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756870341; cv=none; b=UKNfRQPDhSb7p+4/Wfv3XTdfIs51PaiHxO7AlU7Uco5oz+sqOxjHF438ibH4JKa8AP2YMf+khgEPDyedmjsftH24qI+mIFRJnPUHcYo8z5Qlx+IYXF72k7g1MAh2uhXjB1ImChypZP2VO0mj/WCiIinulK1zPAzhlEwEgx3o4L0=
+	t=1756870938; cv=none; b=dO54zw9xMxD9KyFdPlMqZQ9SgDO/yFU3FCBB1bQAJITeryNhk2zqMe9jkXC49zU002EaB/heDWm0Shw1vlVkYevu4LZkEYETJnmGBt76vc/QOArqgi9hZTOOZlGOs7sC+hBd7esG13WcKqAA6UqoOip3rzBLgEVOwa/iS/Q46YM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756870341; c=relaxed/simple;
-	bh=1armfrQSPhghEXbEgCR40kMT3Mz1KUNVgAlY6GjrTLM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J5t5VZXgL/5Iof6OoWLFo3U1JfXrDUBu3hVZfePtCs16N4B/zwrcpCdWF5EmmR9bz4kftQTc+tOyppvPyFtKM+m5+YtnovbWV3uiDJ8FjlShx5IrpkZg3QttQElhH/1khn+snkJjD9WDehyCIr2qMeogk0BceX0EmBfunuymcOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c6/aA16+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C22F8C4CEF0;
-	Wed,  3 Sep 2025 03:32:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756870340;
-	bh=1armfrQSPhghEXbEgCR40kMT3Mz1KUNVgAlY6GjrTLM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=c6/aA16+bBkQH51tR2bcv5SM6tXtTwJMULf4022Tate2FmzdfUbzGvPiP2fkcVpWI
-	 RriSmrsN2ZlJj0IloB/qX3FQ3Nx9cN4lqbucrjYT4KLxt2DgUbVBqvIKo2olMXLgfB
-	 9N5kKv4v3IBmC1YJev3/3rxoXwXwhR46dCAt8jPxByNLb/XkehQ3Po6KdKfM7VpmMm
-	 1Q1BM8WVxFsEMqVtGOxGMqeKmeEKRty2lb7WMxAWqJ6tmtHvJWE+KovB1IE7Kw9o50
-	 ge8OGusvBxfm+9So2e0mbnLX+HsjFa6ZxAt4PFAo/YR4SAEcoNc0h0IuibbyWbTQJn
-	 FVh2NdAaEjS2A==
-Message-ID: <3242f4a2-9a5f-4165-8d24-5c2387967277@kernel.org>
-Date: Tue, 2 Sep 2025 22:32:05 -0500
+	s=arc-20240116; t=1756870938; c=relaxed/simple;
+	bh=9ESXmPmINNSXqQlz86ZJuKHZQigQluf5ycGSPQZVgNM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fNijzZjZCtvr7pEjmVhji+AJlzZ3Q7czLHN7EadGyJV0bwWhF3mLMxtbL2thW1UOZlfAuP9AYBWLkkNzzyAKik+p36aWF55hy9mOPirMUabWx2w04nCJCYkw0P6qK5SuHObpQWwWNJJdl67c5KsE/xXvZqp/n3sE5WGID5oghzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DXzUqY8a; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756870935;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=21HGKhCy/iaEYJrBJUDnVhz1RoV8QBoCOIAY2Tt+uVI=;
+	b=DXzUqY8alLSdhoFs2wccPZYGcjhKa8AO8R0MW/kFruP192xAQkxXnfWlcXLeyUTdWotay4
+	SHbaZkzMaovIF4BjWE0XGIGaDLo6htNppWVnwIxH5NlaT+mSteQWm/+AbJKib79Qp/pw7U
+	DfD4zj5kNt+ht82lQSIKBCg9v+b6sIQ=
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
+ [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-375-_AiuVMXEPquMMa0cRa9vXQ-1; Tue, 02 Sep 2025 23:42:14 -0400
+X-MC-Unique: _AiuVMXEPquMMa0cRa9vXQ-1
+X-Mimecast-MFC-AGG-ID: _AiuVMXEPquMMa0cRa9vXQ_1756870933
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-7724903b0edso3017613b3a.0
+        for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 20:42:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756870933; x=1757475733;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=21HGKhCy/iaEYJrBJUDnVhz1RoV8QBoCOIAY2Tt+uVI=;
+        b=aKVCJy0YdEO0OwYqnXRc1oExuMo4AYk6H3fR44yyKB6Nr10pORhWK3Z+KpVS3VKKiI
+         TGf4jS8O1Au+FLkbl49Ot3+uGPGN2Bff5GRxS4ISEvx2zCrG1M6y5ChOD1VL6QYFI+NV
+         hIE/mONLnNVBcWVlFxxX1VDovXbDX9de1b4Er2kBXCGaR7VxSt1Xuyn5RMw9Xp1+moBg
+         v+P+UT4txW2Y+pgqcqwtE10yKyyiVPbnvkDDGj7k3eSqPwpqf29ucX+e2Q5dE5x+laOB
+         cO9VTY6WhX282ofGqKNX4kck59WcVCBKK5XqRkxPyN+5g5sdmVcPzrCwDqhHtmx5udlh
+         +7MA==
+X-Forwarded-Encrypted: i=1; AJvYcCXOPqve880S1mA5EBl5jtGPPmhravXlZuOT3/Ec0FKe3zBpUHMak3j1QsttctT4FQnCg381ukc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzrPQy+xhDMpIXTEYW1u0LLLM5QBe1O42CI5DMbe+LgqPOeZnrL
+	Cn2aZbcx1ZpdAS2L6AWGS/93brtwy7naD5DVc6IN9I3L9qCqPgtaPMWgiCeB2qy3ezCMMplGDU1
+	47YeAuhsyMLSEzZtbIatwc3B7UVfh1pG73tOIV7uiFpvX5cD5VI6XW6IuXyoIcOboyzrfcZQLLX
+	B2GACBkhN+fkTDU/id0+qEloROXTpd++JH
+X-Gm-Gg: ASbGnctC9Qz6ZqskTmprXSgmL8pwyQBOkLS9edXYa+Om+Z1zZ99fiINa7xmv5Uq84Bf
+	bnY/89SRxe8CBaU6WKTgH+kwAOvtvgj0Spw1S3l7M08DDUDYEzm/pVOY71ljrf/ORBqGD1n0qKt
+	4zJOAZBW8gPuFa5dWFn2+Xlg==
+X-Received: by 2002:a05:6a21:6d9a:b0:243:af34:8f80 with SMTP id adf61e73a8af0-243d6f0a00emr19321154637.33.1756870933319;
+        Tue, 02 Sep 2025 20:42:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHanPhMKl5ZAvm2Qhwq+QdEgtJZ1BCJ/V8a82/77JVVc+iCktfnjs8inL16NihNJNK30sMh1UDZ/nyoOaphFLk=
+X-Received: by 2002:a05:6a21:6d9a:b0:243:af34:8f80 with SMTP id
+ adf61e73a8af0-243d6f0a00emr19321122637.33.1756870932854; Tue, 02 Sep 2025
+ 20:42:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 04/14] Documentation: amd-pstate: Use internal link to
- kselftest
-To: Bagas Sanjaya <bagasdotme@gmail.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Documentation <linux-doc@vger.kernel.org>,
- Linux DAMON <damon@lists.linux.dev>,
- Linux Memory Management List <linux-mm@kvack.org>,
- Linux Power Management <linux-pm@vger.kernel.org>,
- Linux Block Devices <linux-block@vger.kernel.org>,
- Linux BPF <bpf@vger.kernel.org>,
- Linux Kernel Workflows <workflows@vger.kernel.org>,
- Linux KASAN <kasan-dev@googlegroups.com>,
- Linux Devicetree <devicetree@vger.kernel.org>,
- Linux fsverity <fsverity@lists.linux.dev>,
- Linux MTD <linux-mtd@lists.infradead.org>,
- Linux DRI Development <dri-devel@lists.freedesktop.org>,
- Linux Kernel Build System <linux-lbuild@vger.kernel.org>,
- Linux Networking <netdev@vger.kernel.org>,
- Linux Sound <linux-sound@vger.kernel.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>,
- Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@kernel.org>,
- Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
- Jonathan Corbet <corbet@lwn.net>, SeongJae Park <sj@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>,
- David Hildenbrand <david@redhat.com>,
- Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>, Vlastimil Babka
- <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
- Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
- Huang Rui <ray.huang@amd.com>, "Gautham R. Shenoy" <gautham.shenoy@amd.com>,
- Perry Yuan <perry.yuan@amd.com>, Jens Axboe <axboe@kernel.dk>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Dwaipayan Ray <dwaipayanray1@gmail.com>,
- Lukas Bulwahn <lukas.bulwahn@gmail.com>, Joe Perches <joe@perches.com>,
- Andrey Ryabinin <ryabinin.a.a@gmail.com>,
- Alexander Potapenko <glider@google.com>,
- Andrey Konovalov <andreyknvl@gmail.com>, Dmitry Vyukov <dvyukov@google.com>,
- Vincenzo Frascino <vincenzo.frascino@arm.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
- tytso@mit.edu, Richard Weinberger <richard@nod.at>,
- Zhihao Cheng <chengzhihao1@huawei.com>, David Airlie <airlied@gmail.com>,
- Simona Vetter <simona@ffwll.ch>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- Nathan Chancellor <nathan@kernel.org>,
- Nicolas Schier <nicolas.schier@linux.dev>, Ingo Molnar <mingo@redhat.com>,
- Will Deacon <will@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
- Waiman Long <longman@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Shay Agroskin <shayagr@amazon.com>, Arthur Kiyanovski <akiyano@amazon.com>,
- David Arinzon <darinzon@amazon.com>, Saeed Bishara <saeedb@amazon.com>,
- Andrew Lunn <andrew@lunn.ch>, Liam Girdwood <lgirdwood@gmail.com>,
- Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>, Alexandru Ciobotaru <alcioa@amazon.com>,
- The AWS Nitro Enclaves Team <aws-nitro-enclaves-devel@amazon.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
- Steve French <stfrench@microsoft.com>,
- Meetakshi Setiya <msetiya@microsoft.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Bart Van Assche <bvanassche@acm.org>, =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?=
- <linux@weissschuh.net>, Masahiro Yamada <masahiroy@kernel.org>
-References: <20250829075524.45635-1-bagasdotme@gmail.com>
- <20250829075524.45635-5-bagasdotme@gmail.com>
-Content-Language: en-US
-From: Mario Limonciello <superm1@kernel.org>
-In-Reply-To: <20250829075524.45635-5-bagasdotme@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250902080957.47265-1-simon.schippers@tu-dortmund.de>
+ <20250902080957.47265-5-simon.schippers@tu-dortmund.de> <willemdebruijn.kernel.251eacee11eca@gmail.com>
+In-Reply-To: <willemdebruijn.kernel.251eacee11eca@gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 3 Sep 2025 11:42:01 +0800
+X-Gm-Features: Ac12FXy-ZAK0_-Slu353Uz-vG-bLNLE-4F6AXp-hkWEm5GXoed80DFu99UnucK8
+Message-ID: <CACGkMEshZGJfh+Og_xrPeZYoWkBAcvqW8e93_DCr7ix4oOaP8Q@mail.gmail.com>
+Subject: Re: [PATCH 4/4] netdev queue flow control for vhost_net
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Simon Schippers <simon.schippers@tu-dortmund.de>, mst@redhat.com, eperezma@redhat.com, 
+	stephen@networkplumber.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
+	kvm@vger.kernel.org, Tim Gebauer <tim.gebauer@tu-dortmund.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 8/29/2025 2:55 AM, Bagas Sanjaya wrote:
-> Convert kselftest docs link to internal cross-reference.
-> 
-> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
-> ---
->   Documentation/admin-guide/pm/amd-pstate.rst | 3 +--
->   1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/admin-guide/pm/amd-pstate.rst b/Documentation/admin-guide/pm/amd-pstate.rst
-> index e1771f2225d5f0..37082f2493a7c1 100644
-> --- a/Documentation/admin-guide/pm/amd-pstate.rst
-> +++ b/Documentation/admin-guide/pm/amd-pstate.rst
-> @@ -798,5 +798,4 @@ Reference
->   .. [3] Processor Programming Reference (PPR) for AMD Family 19h Model 51h, Revision A1 Processors
->          https://www.amd.com/system/files/TechDocs/56569-A1-PUB.zip
->   
-> -.. [4] Linux Kernel Selftests,
-> -       https://www.kernel.org/doc/html/latest/dev-tools/kselftest.html
-> +.. [4] Documentation/dev-tools/kselftest.rst
+On Wed, Sep 3, 2025 at 5:31=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Simon Schippers wrote:
+> > Stopping the queue is done in tun_net_xmit.
+> >
+> > Waking the queue is done by calling one of the helpers,
+> > tun_wake_netdev_queue and tap_wake_netdev_queue. For that, in
+> > get_wake_netdev_queue, the correct method is determined and saved in th=
+e
+> > function pointer wake_netdev_queue of the vhost_net_virtqueue. Then, ea=
+ch
+> > time after consuming a batch in vhost_net_buf_produce, wake_netdev_queu=
+e
+> > is called.
+> >
+> > Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> > Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> > Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+> > ---
+> >  drivers/net/tap.c      |  6 ++++++
+> >  drivers/net/tun.c      |  6 ++++++
+> >  drivers/vhost/net.c    | 34 ++++++++++++++++++++++++++++------
+> >  include/linux/if_tap.h |  2 ++
+> >  include/linux/if_tun.h |  3 +++
+> >  5 files changed, 45 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+> > index 4d874672bcd7..0bad9e3d59af 100644
+> > --- a/drivers/net/tap.c
+> > +++ b/drivers/net/tap.c
+> > @@ -1198,6 +1198,12 @@ struct socket *tap_get_socket(struct file *file)
+> >  }
+> >  EXPORT_SYMBOL_GPL(tap_get_socket);
+> >
+> > +void tap_wake_netdev_queue(struct file *file)
+> > +{
+> > +     wake_netdev_queue(file->private_data);
+> > +}
+> > +EXPORT_SYMBOL_GPL(tap_wake_netdev_queue);
+> > +
+> >  struct ptr_ring *tap_get_ptr_ring(struct file *file)
+> >  {
+> >       struct tap_queue *q;
+> > diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> > index 735498e221d8..e85589b596ac 100644
+> > --- a/drivers/net/tun.c
+> > +++ b/drivers/net/tun.c
+> > @@ -3739,6 +3739,12 @@ struct socket *tun_get_socket(struct file *file)
+> >  }
+> >  EXPORT_SYMBOL_GPL(tun_get_socket);
+> >
+> > +void tun_wake_netdev_queue(struct file *file)
+> > +{
+> > +     wake_netdev_queue(file->private_data);
+> > +}
+> > +EXPORT_SYMBOL_GPL(tun_wake_netdev_queue);
+>
+> Having multiple functions with the same name is tad annoying from a
+> cscape PoV, better to call the internal functions
+> __tun_wake_netdev_queue, etc.
+>
+> > +
+> >  struct ptr_ring *tun_get_tx_ring(struct file *file)
+> >  {
+> >       struct tun_file *tfile;
+> > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> > index 6edac0c1ba9b..e837d3a334f1 100644
+> > --- a/drivers/vhost/net.c
+> > +++ b/drivers/vhost/net.c
+> > @@ -130,6 +130,7 @@ struct vhost_net_virtqueue {
+> >       struct vhost_net_buf rxq;
+> >       /* Batched XDP buffs */
+> >       struct xdp_buff *xdp;
+> > +     void (*wake_netdev_queue)(struct file *f);
+>
+> Indirect function calls are expensive post spectre. Probably
+> preferable to just have a branch.
+>
+> A branch in `file->f_op !=3D &tun_fops` would be expensive still as it
+> may touch a cold cacheline.
+>
+> How about adding a bit in struct ptr_ring itself. Pahole shows plenty
+> of holes. Jason, WDYT?
+>
 
-Acked-by: Mario Limonciello (AMD) <superm1@kernel.org>
+I'm not sure I get the idea, did you mean a bit for classifying TUN
+and TAP? If this is, I'm not sure it's a good idea as ptr_ring should
+have no knowledge of its user.
+
+Consider there were still indirect calls to sock->ops, maybe we can
+start from the branch.
+
+Thanks
 
 
