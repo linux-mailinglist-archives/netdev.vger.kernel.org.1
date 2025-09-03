@@ -1,117 +1,87 @@
-Return-Path: <netdev+bounces-219503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C0E1B419C3
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 11:18:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A964B419F9
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 11:28:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 528081BA376D
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 09:19:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14D9B683867
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 09:28:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05BFC2F0C62;
-	Wed,  3 Sep 2025 09:18:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A102F3610;
+	Wed,  3 Sep 2025 09:27:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aaJiHxMm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C16602AE66;
-	Wed,  3 Sep 2025 09:18:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E1952EB5BD;
+	Wed,  3 Sep 2025 09:27:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756891111; cv=none; b=A83EhFosGQ19S1AHNTHygWySJFyHVLlgIF7s4LrMtqbQ0yPk2Wy7nCMa0Tl8OjpM6Kowz5IrnXzCkEaXIy6W0Fktfm+bilxOw1nCuQbZEeBKfAycuoVFVYS8ogT7xL+0nWMgzgrp+XcMbyIFHYgBU1EI0tccJOhDzI1qz4m1IVU=
+	t=1756891678; cv=none; b=e7EzWgq2MNihAEdzbpe7OnWjfNha5VsEwhYRFCDzTyuRTvwPsm2oa4jGgiMHhpLqP6NDdd8sWnZKZo207whlrKGBsLiqNEo8tTNpz9LXNLfX8bUUc2ME/S+KdRn3MPKvJ8XEBUYs0GhzILeBTd0qoyaPV+DLrsRdMgZ8KyV1h48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756891111; c=relaxed/simple;
-	bh=N/LpDLV06ixKhS5RPgvN8UHXyNSWgLwd8Swnz4pmv0M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZU1ijvE2JwgDol3dC36LEdwm0h+SGtGVq/29wQsO1ZqzQ1m8M5uIZphCNKJd6Z9BrIdTFQx1Xe1dBSgieIz6EmkACWVndOgdJ24GuhtJl9nxeeD+08k3jERF7mhFCxUmTEOeR20t7jgqKc/tMw4eQ9Ic1lb0cjuOva1VpbITBF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-8960a00e85bso1893432241.1;
-        Wed, 03 Sep 2025 02:18:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756891108; x=1757495908;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xww/iHCRl4Br2j+u3kaOpXoF0IPDaTQthPF3CkkfnBg=;
-        b=HA6v2NXcNLjE/RG7FiTSjvMReHxDjDYcOfENIhJFF9ILWMoUW7wS71BI6OKnEtz+jK
-         yOK7cmm3PKmtb45arUB8YY+3/9IKbJvfRGoi4a73BpxdzO/326RRGpk/vkaNzz5LzJ0c
-         LfER1hzQfLAMhyqct46ypthhSGGbmqt0ZU3XieFsq4OvNArlRubMncY8OUj0iOE23soZ
-         aCOmnYO5bd4hyXhVQLGYPGpubuZmYL2Kb35S35VHjtYGgvS0cM1lb6FQQOtxlcmBZffy
-         8TlPktlArHNr1asdcT6jWKRnmzkJjac5NXlybH4wEMmohE9CVDgihXjhnQBkzslPtEcF
-         EhUA==
-X-Forwarded-Encrypted: i=1; AJvYcCWAL6BmdE8DiC85GXcrv6S+COAST+/SiRDdPKaw1lUeyJ0o5h/DStwBBRz11YOYh0Ww58+MJUyvmUsZ@vger.kernel.org, AJvYcCWQkzAi5u6qHrFmlw96p1QvOYnxEfXgI42VqDDHcp/faT19VaLWCiK9YOKCj+8jTQkDTbgptowL@vger.kernel.org, AJvYcCWufhjgaXwe2lb22DqCSIhaYrzl7wA/wlrBkovUbClmBkg3bLtrLUjftC+ljfY0LgZEO2zZNjritFso2rCDTkDflzM=@vger.kernel.org, AJvYcCX9rnJcI3PBrfibY5yK57bmkASTs9JXP6c1Ht6ZcirPOMByzbcXuPa/IOiJA8DrQ+vG+vomnkA+bhqkCWtp@vger.kernel.org
-X-Gm-Message-State: AOJu0YxzXyXsbA80G0oUw79Ujz5Nlj6k31cSsX5sEJbbZ1PTekqm5NdS
-	n383fLxPiOvR8fbRsycerWM4wCILRpwA6xpFAkvrGKV/G5hASwTcV0wJrzjQzj/x
-X-Gm-Gg: ASbGncuhENVcyAhRRcqXtfzgjSpOYKKNaiB1pXR588d7XW6qA3XXl8/yUq7gVQETl3P
-	+HRjzAqqRaZUy47+UVxKOfcduId4pWq8TSOhIZl/YDVH6iwqQR/1XtvymwWKxe45FmaEoNWN0jd
-	l99bOQxFwSl0mg2aVYOMSW0KTtu3L4DDQAfPa87d63FygUdhet58TKDOyEPdI5GPmP0+EQXRUm9
-	H3m4Czf9Ge34rNltvBWMjlfQ2oFzeCHaoFNSoZUM6gfyGRpTnbWOhOg3G7rLVjDfHWgqOpzjvvK
-	25/iLAXbJkncwcO+HKUKMJitsds+a3VB8Y863VMNC31sd5VgPBm9P8lHNzhNsKyOv9Xc7fTKwZL
-	geywVzI3ms8jkWvcFoUsWzOR1B13ATdUrc78wcXxWSRo0b713Gza+UiXJoXIBlV1R2q78LDk=
-X-Google-Smtp-Source: AGHT+IHW7UjfczYEUQmrG30HMBstbR7yJ7q6HDx8fJbq8ejTrG03wKVQx2R5ClNWQGDmX8VzG7bUPg==
-X-Received: by 2002:a05:6102:3581:b0:521:412d:94ea with SMTP id ada2fe7eead31-52b1c144e1cmr5494354137.34.1756891108496;
-        Wed, 03 Sep 2025 02:18:28 -0700 (PDT)
-Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com. [209.85.222.53])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-89607330273sm3306462241.18.2025.09.03.02.18.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Sep 2025 02:18:27 -0700 (PDT)
-Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-8943501ba3dso2861504241.3;
-        Wed, 03 Sep 2025 02:18:27 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUXLktEbO1zdshSMyd0AmpkUzrS6G90iM12365+azkrnabzwsB5mNKVgy8x0QwXLMkJKeM32SNG3+lB0oWv@vger.kernel.org, AJvYcCV+mcK62MBcsnCZYo29amGIkBE2tvgFlqVCBLMLtE7J8N9NY6nkphzL3lX42EUycgxNTa3Mnn70@vger.kernel.org, AJvYcCWLq01t9VEba774uWGq4snI0YvzwvE7MyKxAlVcS+wTJTORMsMv4QeFJWV1y5UUKp7VWCcL/CNl6ouT@vger.kernel.org, AJvYcCXMX2aUpVJ4tuqLuU1Z0qawKC/O73gvsYfakN07sR6NH17NQr7IVPRaUd/8dsdZUeQzEJ2zYARJSk5cNF7kC+jksuA=@vger.kernel.org
-X-Received: by 2002:a05:6102:54a4:b0:522:1013:cace with SMTP id
- ada2fe7eead31-52b19a5277emr5076476137.10.1756891107431; Wed, 03 Sep 2025
- 02:18:27 -0700 (PDT)
+	s=arc-20240116; t=1756891678; c=relaxed/simple;
+	bh=zoygvyrvbpRQP0lvFaQr5ZvBPQrrVcLHonREwQLABLU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O1fxwRSilvqOszdpkL1hYBIDVSkQNt+pzpB130KhXKmhpap8ryjjiVrm1WlqssNg2Ki9XN0zo1z3vwlszlgRjzXJykI/kqyqv8Az5FE44PUVlVhCDEpb+0zFv8m6Z+XFd0JNF1BDthpljebKmYhWAln1aKPBjuCKFm8I3O/FdL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aaJiHxMm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 094DEC4CEF0;
+	Wed,  3 Sep 2025 09:27:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756891677;
+	bh=zoygvyrvbpRQP0lvFaQr5ZvBPQrrVcLHonREwQLABLU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aaJiHxMmxm+KDWV54GEw0wFKqHa23MozUT9t1F6E6ykgPQidtVov9eFpwyt2PT/e1
+	 ykvXi8dABrzbhFHZac+ksIqZX5jqvgdo+i/bFDYYqs72VAONSagJP7/hSdvvYCxKz1
+	 eI1/thKT/ROliJ9DvpqJgMsGdmQ2Nm7CxoQr1q03RenOSahf10HJFkPQBnUPtjYevu
+	 7P7PWKjHLGsxIaf3fDgTDHGDy72eJAoJ0j0J3xFjm2UsyWc53a8WTuSfAJkdS7HDlA
+	 Rn/Cqm6KHIE+bQpWm2+d5YOls7aiPXWdMtpkunQRf6ofwIiK55Vv7GdgjI45bB7G7g
+	 0BP6SbigvujPw==
+Date: Wed, 3 Sep 2025 10:27:50 +0100
+From: Lee Jones <lee@kernel.org>
+To: a0282524688@gmail.com
+Cc: tmyu0@nuvoton.com, linus.walleij@linaro.org, brgl@bgdev.pl,
+	andi.shyti@kernel.org, mkl@pengutronix.de,
+	mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net,
+	jdelvare@suse.com, alexandre.belloni@bootlin.com,
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
+	linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH RESEND v14 0/7] Add Nuvoton NCT6694 MFD drivers
+Message-ID: <20250903092750.GG2163762@google.com>
+References: <20250825092403.3301266-1-a0282524688@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250902154051.263156-3-krzysztof.kozlowski@linaro.org> <20250902154051.263156-4-krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20250902154051.263156-4-krzysztof.kozlowski@linaro.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 3 Sep 2025 11:18:16 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdXT35qvPNyjegzhCysA7kRY3fTWSWy4GZ=TZ7FG1JpKQw@mail.gmail.com>
-X-Gm-Features: Ac12FXy7CQvB1AiVQKpvJM9u_WFe4oPUM6ax2MBP4KMifXDrnlzAsDa3ZqgU8bU
-Message-ID: <CAMuHMdXT35qvPNyjegzhCysA7kRY3fTWSWy4GZ=TZ7FG1JpKQw@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] dt-bindings: net: renesas,rzn1-gmac: Constrain interrupts
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Matthew Gerlach <matthew.gerlach@altera.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Romain Gantois <romain.gantois@bootlin.com>, Magnus Damm <magnus.damm@gmail.com>, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250825092403.3301266-1-a0282524688@gmail.com>
 
-On Tue, 2 Sept 2025 at 17:41, Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
-> Renesas RZN1 GMAC uses three interrupts in in-kernel DTS and common
-> snps,dwmac.yaml binding is flexible, so define precise constraint for
-> this device.
->
-> Reviewed-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+On Mon, 25 Aug 2025, a0282524688@gmail.com wrote:
 
-Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> From: Ming Yu <a0282524688@gmail.com>
+> 
+> This patch series introduces support for Nuvoton NCT6694, a peripheral
+> expander based on USB interface. It models the chip as an MFD driver
+> (1/7), GPIO driver(2/7), I2C Adapter driver(3/7), CANfd driver(4/7),
+> WDT driver(5/7), HWMON driver(6/7), and RTC driver(7/7).
 
-Gr{oetje,eeting}s,
+Doesn't apply.
 
-                        Geert
+Please rebase onto v6.17-rc1 and submit a [RESEND].
 
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Lee Jones [李琼斯]
 
