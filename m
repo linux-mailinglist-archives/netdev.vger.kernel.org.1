@@ -1,187 +1,139 @@
-Return-Path: <netdev+bounces-219467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85999B4170E
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 09:44:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55578B4170B
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 09:44:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DCF9188B0E9
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 07:45:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5717B3A7A69
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 07:44:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84C7D2DBF6E;
-	Wed,  3 Sep 2025 07:44:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2E3F2DECDD;
+	Wed,  3 Sep 2025 07:43:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="oOC5tY9q"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="FY5a7YFA"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
+Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2D821C8611;
-	Wed,  3 Sep 2025 07:44:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B85D2DEA6A
+	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 07:43:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756885482; cv=none; b=pbhQbVtrJW9h42km4yTZtf0Iddw2IE83SJwaB1ZhZEYNXLJcaVkqWsB14/KFLp5KUfEUhsL9JKjhv/ZNp16e96PpSDFfh9zn6HPCBkl94dUw27lBw/EZCLpjcZgfUH64Zgv0k2z2zg/k9N6zJq/3rUht2WSMBsTGgtKdLn3UBNw=
+	t=1756885438; cv=none; b=p3tz1I429dWnSmiGpuIbUATKl97FsUP56xf8aps6yZGUIjU4ZfCNhi55mL+ns9ssFVNzcHQ8SHJlJwBKsY1B98saNDIbrhaGqrWnd01qgTUcP4r8UgpkIznCPxG2LBKu4pssMMSwU7294dmmTTTCwiYI2jltgHDCSh7MPh8psvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756885482; c=relaxed/simple;
-	bh=UzjeIvCkXA9dbokj6cXZQ/0m+/oSRETAN7DOXHcComw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=OwELczZGX6dIfaG4Gceh/jBdCkE7h8njVdHC3IYsZUNF5JelEdkzAdxnPtwcQDktGQhvUFsz/kh9gxXRrHFHs19+Dw0Y4Dev2Yge01BPamtCRC7HUbQSfQWtzRMhNMv2B1+9mPa4tTY+Orq7SgPFnOFBZ5z4gK1C2VBDPj4UsJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=oOC5tY9q; arc=none smtp.client-ip=198.47.23.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllvem-sh03.itg.ti.com ([10.64.41.86])
-	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTP id 5837hlMt2779765;
-	Wed, 3 Sep 2025 02:43:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1756885427;
-	bh=La6ncxcZEmWdKtlYiqu4qaaCsos1RqPeSH44Dfbmrsg=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=oOC5tY9q0MixsxO5Xobph2w7N4vEUNiRky93Q69HAAoIx2sePLaFHBWx0X3ND+G1E
-	 3FU6rH9ecK8AXPX9Y4vFv5fmMEZnKD9TkEnHh8cjFxWAnuDv91+beFx84zl5YwhTeZ
-	 rA6bQxoBaqnERooaaKdWbS7tAcH0XNXKIPTNtoXo=
-Received: from DFLE108.ent.ti.com (dfle108.ent.ti.com [10.64.6.29])
-	by fllvem-sh03.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 5837hle13356790
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Wed, 3 Sep 2025 02:43:47 -0500
-Received: from DFLE102.ent.ti.com (10.64.6.23) by DFLE108.ent.ti.com
- (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Wed, 3
- Sep 2025 02:43:46 -0500
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DFLE102.ent.ti.com
- (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
- Frontend Transport; Wed, 3 Sep 2025 02:43:46 -0500
-Received: from [172.24.231.152] (danish-tpc.dhcp.ti.com [172.24.231.152])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 5837hbje1211215;
-	Wed, 3 Sep 2025 02:43:37 -0500
-Message-ID: <ce3b3241-b944-4d2b-95e9-259c71b26026@ti.com>
-Date: Wed, 3 Sep 2025 13:13:36 +0530
+	s=arc-20240116; t=1756885438; c=relaxed/simple;
+	bh=VYRwoTz9kBAzth5kImsoE9LsX10mE0+pUipBJ4Q6LI8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UBb3assom7335Wom/xkBKk9gW0JmRg8L0QtpkQGjbd/jbo15NKVfYmDZTvkPaBVi1X7Hgr7xyjWJBWmF17sXKLWB9dZSzE71NTZOLqXOq3Q3PQUC12w/ecSa0CBxM4ubccnY8icaS/VKfYZdOe/qqcmUL8lLfCR2gQw6tjyrccY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=FY5a7YFA; arc=none smtp.client-ip=103.168.172.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
+	by mailfout.phl.internal (Postfix) with ESMTP id 1ABBAEC0329;
+	Wed,  3 Sep 2025 03:43:56 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-12.internal (MEProxy); Wed, 03 Sep 2025 03:43:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1756885436; x=1756971836; bh=WMFTxUFPCn2PjB5KycEoet1M3JsLe3nCtNa
+	mXu9F+gg=; b=FY5a7YFAbgHbSueY0H2rVSZ6075c0ueTaAJloumZsW9eWdTJs02
+	wDJ6uIf/SJfUoMl+/6GRkrBuAltalEgCZUtZ98Xiq6geCdhdZuz9d1oWDDGnYCvZ
+	14jC/qOSI+G2iCTSYCWmujkIpAY/k5NM/6elIX32Wd2NlTKALcx7ZFIcwXp0NdHb
+	SUUuWoA8PmMmXyFPvsPyMJquLg5lwPr3QD49hQJyT9C6K86w5bEflNLXk/XGE2ON
+	FVDY8yaA4QD6TC3NsgXnsRmcu3HjNUJ050S8ZG5m6RELv2kzOICbRr1ub55XJsKZ
+	POzyYMpw2u60oM1bWgAkG4IKLgZ98I/qszw==
+X-ME-Sender: <xms:u_G3aAH8rLrAWLQ2kc5b8H7u7-ZOaqXi6I3Fys6r-MV5rV7QNssfHw>
+    <xme:u_G3aB92Sgzc1nLxyNwPlQRaoFeECLNP2eoGWaixYg4-PF5OplBvsNY6cC9FE7T7Z
+    1F4f6eC0CL5IGQ>
+X-ME-Received: <xmr:u_G3aBn4TN8nIVb-MS8x8oaZk_e-bbi_8aOFeEmuHo2oyNbI29q4xngQILAF>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvheejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
+    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
+    epfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcuufgthhhi
+    mhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrthhtvghrnh
+    ephefhtdejvdeiffefudduvdffgeetieeigeeugfduffdvffdtfeehieejtdfhjeeknecu
+    ffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtnecurf
+    grrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhnsggp
+    rhgtphhtthhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprhhitggrrh
+    gusegsvghjrghrrghnohdrihhopdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghh
+    pdhrtghpthhtohepmhhikhgrrdifvghsthgvrhgsvghrgheslhhinhhugidrihhnthgvlh
+    drtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdp
+    rhgtphhtthhopehmihgthhgrvghlrdhjrghmvghtsehinhhtvghlrdgtohhmpdhrtghpth
+    htohephigvhhgviihkvghlshhhsgesghhmrghilhdrtghomhdprhgtphhtthhopegrnhgu
+    rhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvh
+    gvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgt
+    ohhm
+X-ME-Proxy: <xmx:u_G3aMAzg2-BmIjcrWjRv7BvaU_7XohnDNYAdZiRPvNILKxWFFlPEA>
+    <xmx:u_G3aKXzjE30Q0OyzhHdVlrS1G08Dw9Yef1djiYBas-zVZdhXq0aLQ>
+    <xmx:u_G3aK80VyKG6Mj4txZdA3DJRoAPaG9PmJo6Z88X1FCL1B87jTFBiQ>
+    <xmx:u_G3aMTleH4tg6zvwKi227_H3UDGSAl4v3iyt33ZtVBloqbxrkQruw>
+    <xmx:vPG3aBZDmtihQCOZOttrS5DNsQSlwo5D5lFq4JrtXEIMm0-W2sMjphYb>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 3 Sep 2025 03:43:54 -0400 (EDT)
+Date: Wed, 3 Sep 2025 10:43:53 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Ricard Bejarano <ricard@bejarano.io>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Mika Westerberg <mika.westerberg@linux.intel.com>,
+	netdev@vger.kernel.org, michael.jamet@intel.com,
+	YehezkelShB@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Subject: Re: Poor thunderbolt-net interface performance when bridged
+Message-ID: <aLfxueDGLngEb7Rw@shredder>
+References: <11d6270e-c4c9-4a3a-8d2b-d273031b9d4f@lunn.ch>
+ <A206060D-C73B-49B9-9969-45BF15A500A1@bejarano.io>
+ <71C2308A-0E9C-4AD3-837A-03CE8EA4CA1D@bejarano.io>
+ <b033e79d-17bc-495d-959c-21ddc7f061e4@app.fastmail.com>
+ <ae3d25c9-f548-44f3-916e-c9a5b4769f36@lunn.ch>
+ <F42DF57F-114A-4250-8008-97933F9EE5D0@bejarano.io>
+ <0925F705-A611-4897-9F62-1F565213FE24@bejarano.io>
+ <75EA103A-A9B8-4924-938B-5F41DD4491CE@bejarano.io>
+ <aLYAKG2Aw5t7GKtu@shredder>
+ <A68375CA-57E1-4F53-877D-480231F07942@bejarano.io>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/8] dt-bindings: net: ti,rpmsg-eth: Add DT
- binding for RPMSG ETH
-To: Krzysztof Kozlowski <krzk@kernel.org>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Mathieu
- Poirier <mathieu.poirier@linaro.org>,
-        Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-        Nishanth Menon <nm@ti.com>, Vignesh
- Raghavendra <vigneshr@ti.com>,
-        Mengyuan Lou <mengyuanlou@net-swift.com>,
-        Xin
- Guo <guoxin09@huawei.com>, Lei Wei <quic_leiwei@quicinc.com>,
-        Lee Trager
-	<lee@trager.us>, Michael Ellerman <mpe@ellerman.id.au>,
-        Fan Gong
-	<gongfan1@huawei.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
-        Geert
- Uytterhoeven <geert+renesas@glider.be>,
-        Lukas Bulwahn
-	<lukas.bulwahn@redhat.com>,
-        Parthiban Veerasooran
-	<Parthiban.Veerasooran@microchip.com>,
-        Suman Anna <s-anna@ti.com>, Tero
- Kristo <kristo@kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-remoteproc@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <srk@ti.com>, Roger Quadros
-	<rogerq@kernel.org>
-References: <20250902090746.3221225-1-danishanwar@ti.com>
- <20250902090746.3221225-2-danishanwar@ti.com>
- <20250903-dark-horse-of-storm-cf68ea@kuoka>
-Content-Language: en-US
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <20250903-dark-horse-of-storm-cf68ea@kuoka>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <A68375CA-57E1-4F53-877D-480231F07942@bejarano.io>
 
-Hi Krzysztof,
+On Tue, Sep 02, 2025 at 12:18:59PM +0200, Ricard Bejarano wrote:
+> I'm afraid we don't just see it with TCP or with bridged traffic.
 
-On 03/09/25 12:48 pm, Krzysztof Kozlowski wrote:
-> On Tue, Sep 02, 2025 at 02:37:39PM +0530, MD Danish Anwar wrote:
->> Add device tree binding documentation for Texas Instruments RPMsg Ethernet
->> channels. This binding describes the shared memory communication interface
->> between host processor and a remote processor for Ethernet packet exchange.
->>
->> The binding defines the required 'memory-region' property that references
->> the dedicated shared memory area used for exchanging Ethernet packets
->> between processors.
->>
->> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
->> ---
->>  .../devicetree/bindings/net/ti,rpmsg-eth.yaml | 38 +++++++++++++++++++
->>  1 file changed, 38 insertions(+)
->>  create mode 100644 Documentation/devicetree/bindings/net/ti,rpmsg-eth.yaml
->>
->> diff --git a/Documentation/devicetree/bindings/net/ti,rpmsg-eth.yaml b/Documentation/devicetree/bindings/net/ti,rpmsg-eth.yaml
->> new file mode 100644
->> index 000000000000..1c86d5c020b0
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/net/ti,rpmsg-eth.yaml
->> @@ -0,0 +1,38 @@
->> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
->> +%YAML 1.2
->> +---
->> +$id: http://devicetree.org/schemas/net/ti,rpmsg-eth.yaml#
->> +$schema: http://devicetree.org/meta-schemas/core.yaml#
->> +
->> +title: Texas Instruments RPMsg channel nodes for Ethernet communication
->> +
->> +description: |
->> +  RPMsg Ethernet subnode represents the communication interface between host
->> +  processor and a remote processor.
->> +
->> +maintainers:
->> +  - MD Danish Anwar <danishanwar@ti.com>
->> +
->> +properties:
->> +  memory-region:
->> +    $ref: /schemas/types.yaml#/definitions/phandle
->> +    description: |
->> +      Phandle to the shared memory region used for communication between the
->> +      host processor and the remote processor.
->> +      This shared memory region is used to exchange Ethernet packets.
->> +
->> +required:
->> +  - memory-region
->> +
->> +additionalProperties: false
+I wrote that it can happen with forwarded traffic, not necessarily
+bridged traffic. Section 6 from here [1] shows that you get 900+ Mb/s
+between blue and purple with UDP, whereas with TCP you only get around
+5Mb/s.
+
+> That was my original observation and so the title of the thread, but
+> it happens at a much lower level, at the data link layer. We observed
+> CRC checksum failures in link stats. You can see those in my May 27th
+> message in the thread.
+
+Assuming you are talking about [2], it shows 16763 errors out of 6360635
+received packets. That's 0.2%.
+
+> The last thing we tried was to force linearization of SKBs with fragments, to
+> see if the problem is with how the driver puts those on the line, which might
+> offset everything out of its place, making CRC checksums fail. I was not able
+> to do it, however, as that would simply hang all my tests.
 > 
-> This cannot be really tested and is pointless binding... Really, one
-> property does not make it a device node.
-> 
-> 
+> Any ideas?
 
-I tried to do something similar to google,cros-ec.yaml and
-qcom,glink-edge.yaml
+I suggest removing the custom patches and re-testing with TSO disabled
+(on both red and blue). If this doesn't help, you can try recording
+packet drops on blue like I suggested in the previous mail.
 
-They are also rpmsg related and used by other vendors. I created similar
-to that as my use case seems similar to them.
-
-The only difference being I only need one property.
-
-
--- 
-Thanks and Regards,
-Danish
-
+[1] https://lore.kernel.org/netdev/29E840A2-D4DB-4A49-88FE-F97303952638@bejarano.io/
+[2] https://lore.kernel.org/netdev/8672A9A1-6B32-4F81-8DFA-4122A057C9BE@bejarano.io/
 
