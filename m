@@ -1,152 +1,118 @@
-Return-Path: <netdev+bounces-219651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88712B427ED
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 19:25:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61689B42820
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 19:42:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60DCC563E34
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 17:25:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CE9818866F1
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 17:42:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D62472F83D4;
-	Wed,  3 Sep 2025 17:24:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A88E4320CB3;
+	Wed,  3 Sep 2025 17:41:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=stgolabs.net header.i=@stgolabs.net header.b="il3HqTk8"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="hWiAJgH6"
 X-Original-To: netdev@vger.kernel.org
-Received: from cornsilk.maple.relay.mailchannels.net (cornsilk.maple.relay.mailchannels.net [23.83.214.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C04081547C9;
-	Wed,  3 Sep 2025 17:24:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.214.40
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756920297; cv=pass; b=U6QAhImvzTCxowKDxjtk9dc1BRAwRbzFn2TSY/OlWKzMarXsrsAVpnsozGOch0ThINvI1kNa5xaAx/Cd5E2JWP6r4qKhocfD5uy9gl5IHVn0JwV7T3Tf7QhxH0UUW4+ttIsCsMPgsFU9CWN+yWaDau7q6fqlCZk0oAiHtJTGdOg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756920297; c=relaxed/simple;
-	bh=LwUSTfALKG1VVys3qBQY4G6QJCtMUSyQC1+vjXnTy3M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WK/lni1lLY/gp6pJSvo/+fx0Z+8ZQME/Z8KnZKazDJ0MsEoJcHD+I3hKFhbnvN1PbNxWGlTcm5p4qRSdA3/LcHkQWCxZkoI2/DVYqBRLKdI2RM9LRs99WZLLDWn9tonFLzcTJsvzpKXn/eEWA4cuz/hD45FMAZi4qCdiTsV/DYM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stgolabs.net; spf=pass smtp.mailfrom=stgolabs.net; dkim=pass (2048-bit key) header.d=stgolabs.net header.i=@stgolabs.net header.b=il3HqTk8; arc=pass smtp.client-ip=23.83.214.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stgolabs.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stgolabs.net
-X-Sender-Id: dreamhost|x-authsender|dave@stgolabs.net
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id 4D740903B21;
-	Wed,  3 Sep 2025 17:24:49 +0000 (UTC)
-Received: from pdx1-sub0-mail-a267.dreamhost.com (trex-blue-0.trex.outbound.svc.cluster.local [100.102.62.95])
-	(Authenticated sender: dreamhost)
-	by relay.mailchannels.net (Postfix) with ESMTPA id D5218904F2D;
-	Wed,  3 Sep 2025 17:24:48 +0000 (UTC)
-ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1756920288; a=rsa-sha256;
-	cv=none;
-	b=yE72xaWcnsnPjyCuTLtc6XTHDseb7aR3Uk2EZBaaO6NUc1sh69EDcow95geLdsQvQjicdi
-	EQxKGj4jU361uWRoZi/0BXQrQidwcX6XAS9CYNTPE9tWvacD6OxnnqGURXGQi7cotXtOTR
-	yLn86sIKkzaQc5LPI5LciTOhdMecz2m1495KLhK/07mYHvgkk1iYLCeNEAmZWMyKswahiN
-	IuBrDm7jMK7GFjjygGx9t5MiHkmtFDkFcKfLug9+jL7TH7RYQfjJ84EWXXacgsfTj9arFd
-	1ui3gY3TKalNet6DltqQ51KWiYM481oQLUghgXt4SYdgBdy1OWIAyKx5xnQf+A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-	s=arc-2022; t=1756920288;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references:dkim-signature;
-	bh=oxVC+Bd/rKhNc7RxcEhIl/qxpsoIJR8Waw8jEId9/b8=;
-	b=356AnktVPnvnRTslEBI6wJCsoEwsvq0yJ42COywn0yjetb4VfSyl5pBXCO3uJqtH/ewXiY
-	6I1L9Z3siA0BZuGVX64+HpGFSPSt6rDGuoh0Bs2iGNIqWNeIR9iDzX6O8BZA6/p3l4uLYk
-	lpmIX6qFVmM0Cb+DDFqOUqaQf//sHZxBaPWa6v3lrVyi1f4DWeHoOm4LSVIPqux6TcOLUK
-	Yhbv20LeU/eCjYWsLZWH+JhTRHc5YmrsB76vbuY56+r1jdg6b3zeeO/5M8MYIgemf5WEQI
-	693sJhG8Vv8wLA9tFHmNODgH4RvZ91bFadLthLe11WKtaxTNC2RygtfQVwtV7g==
-ARC-Authentication-Results: i=1;
-	rspamd-8b9589799-7n25b;
-	auth=pass smtp.auth=dreamhost smtp.mailfrom=dave@stgolabs.net
-X-Sender-Id: dreamhost|x-authsender|dave@stgolabs.net
-X-MC-Relay: Neutral
-X-MailChannels-SenderId: dreamhost|x-authsender|dave@stgolabs.net
-X-MailChannels-Auth-Id: dreamhost
-X-Desert-Celery: 61552a3a02cb5d8b_1756920289170_2804699016
-X-MC-Loop-Signature: 1756920289170:4194458324
-X-MC-Ingress-Time: 1756920289170
-Received: from pdx1-sub0-mail-a267.dreamhost.com (pop.dreamhost.com
- [64.90.62.162])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-	by 100.102.62.95 (trex/7.1.3);
-	Wed, 03 Sep 2025 17:24:49 +0000
-Received: from offworld (syn-076-167-199-067.res.spectrum.com [76.167.199.67])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: dave@stgolabs.net)
-	by pdx1-sub0-mail-a267.dreamhost.com (Postfix) with ESMTPSA id 4cH8cc0SSRz1j;
-	Wed,  3 Sep 2025 10:24:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=stgolabs.net;
-	s=dreamhost; t=1756920288;
-	bh=oxVC+Bd/rKhNc7RxcEhIl/qxpsoIJR8Waw8jEId9/b8=;
-	h=Date:From:To:Cc:Subject:Content-Type;
-	b=il3HqTk8io1vPVMF6IElivCy2/9lfEh2J/TpQM2wE0bHa6ZiXdT9qvsA2RstxPzig
-	 G8R3bCSlA0rfc5Rq+xWpa8FqJe3akn5ny/FbLsRzvEfnrewD8k/ESUTEPRyw57h1cw
-	 ByV7ohUi0jShW/KR+Rjyrt9Vy8ILEUw5cYxbQ3P99B8QRPn6La1etypJBNFmQ/xsUE
-	 qfYdK5RNuJBHXqa8SHWb/wab3UXI/TbESwCGTztAOCzj5aQTgFfwlkf92QX0t3sLVu
-	 JPk1QbUXzpsNiA54dew+OoKWL81J2s07XRh9IygYwaN1f6MLdacMHg5ByPO4gLemhi
-	 HQEPYKX1WBtpg==
-Date: Wed, 3 Sep 2025 10:24:45 -0700
-From: Davidlohr Bueso <dave@stgolabs.net>
-To: alejandro.lucero-palau@amd.com
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
-	dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	dave.jiang@intel.com, Alejandro Lucero <alucerop@amd.com>
-Subject: Re: [PATCH v17 19/22] cxl: Avoid dax creation for accelerators
-Message-ID: <20250903172445.rp6zajnhj6yufrkd@offworld>
-References: <20250624141355.269056-1-alejandro.lucero-palau@amd.com>
- <20250624141355.269056-20-alejandro.lucero-palau@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A5044C92
+	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 17:41:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756921314; cv=none; b=kEQkUzIUc71jYPn0RM1KIYzedp8ANveFgrVr2orwn4k2tI0chgR/rbZgPJbcE1ZfgheleQm8P8uzOILOGj3QFVDJ8fb8x0bArUyuZ+MB0cCCglw1GSQpTy2tOSobbyDtgb5gjn4oyKw8AjjA7iKAYMQujWvyMIo9u2N6VSD2hdA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756921314; c=relaxed/simple;
+	bh=bpoCJi75TuAw42e6A3dn26O70w/74ptLXE3tM4BcXic=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gbkKaBtrUQOhZrVO9Md/+A/G3b8HDdGvfpxIIf6ovW/o3YTtsKk6Vs4X/2ZLFVJbNZiPokH5EgqQWZBGCBwsuD2B4c9iLbi7/NW6XmiIKNvIwjDDbEmjr6rHk6DdhiaxjiqM/EyAmFaWohnABm7akt5mcwfTX25U0Iz01++It+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=hWiAJgH6; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-32b8919e7c7so82916a91.2
+        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 10:41:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google; t=1756921311; x=1757526111; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QWtU1bedA+xl7PsW7lcEl49lqWYG3Q0Mxi9lWkpXK0U=;
+        b=hWiAJgH6OQ1TE0g6Lx+lGuIoJXXLe+WIdUcSoB7hSx6tQezb4cSz7bbG0Rz1XSWHXI
+         fHTP8bclZoxwmVa/84IF6qfd9GdEfg3GEpyURMZa2UCEeDOFF2SQZ1FTcAdlHAS31/+U
+         1rSTkHx8L8G+XcVHb1aLWnXHyBFaWfnPXSY4UAlQMjj6j+HfJCwxkTsXJT4MQJWnxHnm
+         rDwntMEfPE1zku4SViA5n5o9zYMg7ST32DPu/TyCjeD29TxE6t5jasNJJQ+qmmqr1bYx
+         /ahxdvVaUYMpd8NWjed9Sv5p5mwn2Lv9eIp1i61TELO8B1FM8Z0nkxswPOAg7T5rFB5V
+         riEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756921311; x=1757526111;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QWtU1bedA+xl7PsW7lcEl49lqWYG3Q0Mxi9lWkpXK0U=;
+        b=Xp6yh/v1m3qo2nJU+Xy4r8twruf7PLC9IUfE8Pt2TzKUge8KpAyAxYUKDpAhcv+Ty+
+         bZWa0/iy1u824frwD0W+pBdtu7ihtsg2B7qzidIO2pFvlFEbUacaBJUDn4IERwg/v4fz
+         zrpZhgNbVgwG7zyKpSiEbvRn38a4DUQ6tITgVL4Y5xs6DJG+NwZA0HdDeh5TQXlNyW44
+         Tp96BTLpwlbSaPqGuxNZJ7BKknqJ4Hj7cUQ7mwToWCH4KQgsvpFsKicLTqMWG+1LNr4P
+         pq1cYO/A1uMMO8yT9Iwa0+SsC3+cEMt7kmO1KIwwZWgyVuOqxEdk+B/p8/DQxBWZ24w4
+         8jHg==
+X-Forwarded-Encrypted: i=1; AJvYcCVkvX2nl8ka1uK26IFVbk233L6/rry8WsjZ3PB8y0c9E0NE/bCSR1dQ5Fm5Dx2PFqR/8apn+wo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyu8iUtFzf99OE61/PyKZSoWaX/yoD0MFSmpu4qLtpKp9IQUe8Z
+	tiHKd1n67o4mFYIOTd/7gyaQ8i/TFW8LZnKVMeaNJMhgfDQRjPfDNg+UFAKaPyWfuYg0bVQnf05
+	SIelexlzB/a0+2kgEbUzZyXk/rMW1wZ6ywi5OpZyIG6n5pvj/VFkVzVjJ
+X-Gm-Gg: ASbGnctS7/F8CR9wLyXG4HPPjSpTYCn7+C7Px8oGyVqGSZeFz2uK3C7yHeIuUI3w4Y4
+	bhYsiKyA/YhT9v4drENobTn8w3cCHabNY0zwoAxeuLYwV36+ckhc52Nx4w5tZzJenX3mAX+5q3g
+	1qiWJtkyUbGFtM0SY39Ll2CkWNqhVtjoMSLEirHdqk+1Lo5NPiqFi6SRerCj5eRCagsHIfhC5A+
+	EHv9U5X0e5SuxswFKD2rTqotRSKlsEJU2pK4y3qjAAkT7OLsfgVP7fXPKE0P+EE35EyAL7xZhrb
+	6RXsNkTfA0/CfByFJdXliQ==
+X-Google-Smtp-Source: AGHT+IEdLWK2VV7ZxjQos7fBkP7u8BQWyaln03sqyxsZVqDVAVkrTc5Wpas3Svc4Qfy0iKtmL1jDBmsodTgI4M4eHgo=
+X-Received: by 2002:a17:90b:530d:b0:329:ca48:7090 with SMTP id
+ 98e67ed59e1d1-329ca4873c6mr11775847a91.37.1756921311323; Wed, 03 Sep 2025
+ 10:41:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250624141355.269056-20-alejandro.lucero-palau@amd.com>
-User-Agent: NeoMutt/20220429
+References: <20250830-b4-tcp-ao-md5-rst-finwait2-v3-0-9002fec37444@arista.com>
+ <20250830-b4-tcp-ao-md5-rst-finwait2-v3-2-9002fec37444@arista.com> <20250902160858.0b237301@kernel.org>
+In-Reply-To: <20250902160858.0b237301@kernel.org>
+From: Dmitry Safonov <dima@arista.com>
+Date: Wed, 3 Sep 2025 18:41:39 +0100
+X-Gm-Features: Ac12FXyUeZzt3ewl6-0Cy_MpfxEF2HbCkiS16_FH_5RnMTn3QtB_EuyigatOeeI
+Message-ID: <CAGrbwDRHOaiBcMecGrE=bdRG6m0aHyk_VBtpN6-g-B92NF=hTA@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 2/2] tcp: Free TCP-AO/TCP-MD5 info/keys
+ without RCU
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Dmitry Safonov via B4 Relay <devnull+dima.arista.com@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Bob Gilligan <gilligan@arista.com>, 
+	Salam Noureddine <noureddine@arista.com>, Dmitry Safonov <0x7f454c46@gmail.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 24 Jun 2025, alejandro.lucero-palau@amd.com wrote:
+On Wed, Sep 3, 2025 at 12:09=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Sat, 30 Aug 2025 05:31:47 +0100 Dmitry Safonov via B4 Relay wrote:
+> > Now that the destruction of info/keys is delayed until the socket
+> > destructor, it's safe to use kfree() without an RCU callback.
+> > As either socket was yet in TCP_CLOSE state or the socket refcounter is
+> > zero and no one can discover it anymore, it's safe to release memory
+> > straight away.
+> > Similar thing was possible for twsk already.
+>
+> After this patch the rcu members of struct tcp_ao* seem to no longer
+> be used?
 
->From: Alejandro Lucero <alucerop@amd.com>
->
->By definition a type2 cxl device will use the host managed memory for
->specific functionality, therefore it should not be available to other
->uses.
->
->Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+Right. I'll remove tcp_ao_info::rcu in v4.
+For tcp_ao_key it's needed for the regular key rotation, as well as
+for tcp_md5sig_key.
 
-Reviewed-by: Davidlohr Bueso <dave@stgolabs.net>
-
->---
-> drivers/cxl/core/region.c | 7 +++++++
-> 1 file changed, 7 insertions(+)
->
->diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
->index 4ca5ade54ad9..e933e4ebed1c 100644
->--- a/drivers/cxl/core/region.c
->+++ b/drivers/cxl/core/region.c
->@@ -3857,6 +3857,13 @@ static int cxl_region_probe(struct device *dev)
-> 	if (rc)
-> 		return rc;
->
->+	/*
->+	 * HDM-D[B] (device-memory) regions have accelerator specific usage.
->+	 * Skip device-dax registration.
->+	 */
->+	if (cxlr->type == CXL_DECODER_DEVMEM)
->+		return 0;
->+
-> 	switch (cxlr->mode) {
-> 	case CXL_PARTMODE_PMEM:
-> 		return devm_cxl_add_pmem_region(cxlr);
->-- 
->2.34.1
->
+Thanks,
+             Dmitry
 
