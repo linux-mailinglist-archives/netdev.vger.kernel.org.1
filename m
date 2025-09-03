@@ -1,109 +1,187 @@
-Return-Path: <netdev+bounces-219465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AB15B41705
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 09:42:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85999B4170E
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 09:44:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AF4117C78E
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 07:41:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DCF9188B0E9
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 07:45:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A24902D8DDB;
-	Wed,  3 Sep 2025 07:41:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84C7D2DBF6E;
+	Wed,  3 Sep 2025 07:44:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="wEslOGSF";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="/x2LIVrq"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="oOC5tY9q"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF0142797AF
-	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 07:41:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2D821C8611;
+	Wed,  3 Sep 2025 07:44:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756885302; cv=none; b=r4l1QorNCel789eiKB8sH2r5LbgFyjdOqK3HRF4ufFlVqpxvU5hHItNazeYfOKX8N+Y204Pg+LY3HmV1EmU93RRORFbLQpgpDG4TOqnQMotr3FUX23maB3vm1QWiX81jJYpJmB6x78k5MGmcHOGuhfFSR57Q8NdZeuGi9d3/NnA=
+	t=1756885482; cv=none; b=pbhQbVtrJW9h42km4yTZtf0Iddw2IE83SJwaB1ZhZEYNXLJcaVkqWsB14/KFLp5KUfEUhsL9JKjhv/ZNp16e96PpSDFfh9zn6HPCBkl94dUw27lBw/EZCLpjcZgfUH64Zgv0k2z2zg/k9N6zJq/3rUht2WSMBsTGgtKdLn3UBNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756885302; c=relaxed/simple;
-	bh=zdHM8Ax76yr2eLMqhAsCV/ru/BJA5sp18Sj23Ug2RSA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Sl6iEo/uWEjyX7VN5mUxhLlpClNcgwAg3g9mxgIK1LF2yK1oD7+E3xxE3ITp2soSWpjrHalqzXfQS+rsSvTrfD3uhp/i56Bz6OP7Ng1bFmTphvqu3NkuJ2NdR0IIyGCD2d8FXzFK2YDbmz2HrJznFBsEpcrLhXXY0LTaURERwxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=wEslOGSF; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=/x2LIVrq; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Wed, 3 Sep 2025 09:41:31 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1756885293;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=15AzZAl1ag+/3SspXHD2I1iJWGcEJardTJKtJr13veE=;
-	b=wEslOGSFTwuQAoAROzLFnWwu0VdrzzJE5pd1KsBfIbTlmXQxuraBycp5lj4G5B7PwCRUVS
-	GP0TjePKfw3s3cOwNFwRnkN5VvR0o8JqdpFTnV5KgmOAOkm0Ik02NxmG4xkO9FrfvDZv8l
-	wmalNIsEjkkzhFqjTf63DVgCqGnrXJ7JrIyga57H/0sboFk3gPAXojeDtvXadSWFstpLPy
-	FOk8XArJWrRT5UY+0nkOkf/MwCXuPucxBEC9CCp6hpgOj30vhvMkZ6/24uxfJlfcks7nJJ
-	i7F5dhsAD6viDJvUuHMcl884q8le6UW8z6cJBbn04s08n9DGinZ4EqpOtDtbVA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1756885293;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=15AzZAl1ag+/3SspXHD2I1iJWGcEJardTJKtJr13veE=;
-	b=/x2LIVrq/+n/JLhssPxoO79tshIYabp5CNBVi/h7X9Y7KIM/b0Kq5V0325zT/8AFyRpLz1
-	9bUU8ofhusRbcuBg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com,
-	syzbot+50603c05bbdf4dfdaffa@syzkaller.appspotmail.com,
-	Kuniyuki Iwashima <kuniyu@google.com>
-Subject: Re: [PATCH net] net: lockless sock_i_ino()
-Message-ID: <20250903074131.BclfkWQE@linutronix.de>
-References: <20250902183603.740428-1-edumazet@google.com>
+	s=arc-20240116; t=1756885482; c=relaxed/simple;
+	bh=UzjeIvCkXA9dbokj6cXZQ/0m+/oSRETAN7DOXHcComw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=OwELczZGX6dIfaG4Gceh/jBdCkE7h8njVdHC3IYsZUNF5JelEdkzAdxnPtwcQDktGQhvUFsz/kh9gxXRrHFHs19+Dw0Y4Dev2Yge01BPamtCRC7HUbQSfQWtzRMhNMv2B1+9mPa4tTY+Orq7SgPFnOFBZ5z4gK1C2VBDPj4UsJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=oOC5tY9q; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllvem-sh03.itg.ti.com ([10.64.41.86])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTP id 5837hlMt2779765;
+	Wed, 3 Sep 2025 02:43:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1756885427;
+	bh=La6ncxcZEmWdKtlYiqu4qaaCsos1RqPeSH44Dfbmrsg=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=oOC5tY9q0MixsxO5Xobph2w7N4vEUNiRky93Q69HAAoIx2sePLaFHBWx0X3ND+G1E
+	 3FU6rH9ecK8AXPX9Y4vFv5fmMEZnKD9TkEnHh8cjFxWAnuDv91+beFx84zl5YwhTeZ
+	 rA6bQxoBaqnERooaaKdWbS7tAcH0XNXKIPTNtoXo=
+Received: from DFLE108.ent.ti.com (dfle108.ent.ti.com [10.64.6.29])
+	by fllvem-sh03.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 5837hle13356790
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
+	Wed, 3 Sep 2025 02:43:47 -0500
+Received: from DFLE102.ent.ti.com (10.64.6.23) by DFLE108.ent.ti.com
+ (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Wed, 3
+ Sep 2025 02:43:46 -0500
+Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DFLE102.ent.ti.com
+ (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
+ Frontend Transport; Wed, 3 Sep 2025 02:43:46 -0500
+Received: from [172.24.231.152] (danish-tpc.dhcp.ti.com [172.24.231.152])
+	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 5837hbje1211215;
+	Wed, 3 Sep 2025 02:43:37 -0500
+Message-ID: <ce3b3241-b944-4d2b-95e9-259c71b26026@ti.com>
+Date: Wed, 3 Sep 2025 13:13:36 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250902183603.740428-1-edumazet@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/8] dt-bindings: net: ti,rpmsg-eth: Add DT
+ binding for RPMSG ETH
+To: Krzysztof Kozlowski <krzk@kernel.org>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Mathieu
+ Poirier <mathieu.poirier@linaro.org>,
+        Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+        Nishanth Menon <nm@ti.com>, Vignesh
+ Raghavendra <vigneshr@ti.com>,
+        Mengyuan Lou <mengyuanlou@net-swift.com>,
+        Xin
+ Guo <guoxin09@huawei.com>, Lei Wei <quic_leiwei@quicinc.com>,
+        Lee Trager
+	<lee@trager.us>, Michael Ellerman <mpe@ellerman.id.au>,
+        Fan Gong
+	<gongfan1@huawei.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
+        Geert
+ Uytterhoeven <geert+renesas@glider.be>,
+        Lukas Bulwahn
+	<lukas.bulwahn@redhat.com>,
+        Parthiban Veerasooran
+	<Parthiban.Veerasooran@microchip.com>,
+        Suman Anna <s-anna@ti.com>, Tero
+ Kristo <kristo@kernel.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-remoteproc@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <srk@ti.com>, Roger Quadros
+	<rogerq@kernel.org>
+References: <20250902090746.3221225-1-danishanwar@ti.com>
+ <20250902090746.3221225-2-danishanwar@ti.com>
+ <20250903-dark-horse-of-storm-cf68ea@kuoka>
+Content-Language: en-US
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <20250903-dark-horse-of-storm-cf68ea@kuoka>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On 2025-09-02 18:36:03 [+0000], Eric Dumazet wrote:
-> Followup of commit c51da3f7a161 ("net: remove sock_i_uid()")
-> 
-> A recent syzbot report was the trigger for this change.
-> 
-> Over the years, we had many problems caused by the
-> read_lock[_bh](&sk->sk_callback_lock) in sock_i_uid().
-> 
-> We could fix smc_diag_dump_proto() or make a more radical move:
-> 
-> Instead of waiting for new syzbot reports, cache the socket
-> inode number in sk->sk_ino, so that we no longer
-> need to acquire sk->sk_callback_lock in sock_i_ino().
-> 
-> This makes socket dumps faster (one less cache line miss,
-> and two atomic ops avoided).
-> 
-> Prior art:
-> 
-> commit 25a9c8a4431c ("netlink: Add __sock_i_ino() for __netlink_diag_dump().")
-> commit 4f9bf2a2f5aa ("tcp: Don't acquire inet_listen_hashbucket::lock with disabled BH.")
-> commit efc3dbc37412 ("rds: Make rds_sock_lock BH rather than IRQ safe.")
-> 
-> Fixes: d2d6422f8bd1 ("x86: Allow to enable PREEMPT_RT.")
-> Reported-by: syzbot+50603c05bbdf4dfdaffa@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/68b73804.050a0220.3db4df.01d8.GAE@google.com/T/#u
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> Cc: Kuniyuki Iwashima <kuniyu@google.com>
+Hi Krzysztof,
 
-Reviewed-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+On 03/09/25 12:48 pm, Krzysztof Kozlowski wrote:
+> On Tue, Sep 02, 2025 at 02:37:39PM +0530, MD Danish Anwar wrote:
+>> Add device tree binding documentation for Texas Instruments RPMsg Ethernet
+>> channels. This binding describes the shared memory communication interface
+>> between host processor and a remote processor for Ethernet packet exchange.
+>>
+>> The binding defines the required 'memory-region' property that references
+>> the dedicated shared memory area used for exchanging Ethernet packets
+>> between processors.
+>>
+>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>> ---
+>>  .../devicetree/bindings/net/ti,rpmsg-eth.yaml | 38 +++++++++++++++++++
+>>  1 file changed, 38 insertions(+)
+>>  create mode 100644 Documentation/devicetree/bindings/net/ti,rpmsg-eth.yaml
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/ti,rpmsg-eth.yaml b/Documentation/devicetree/bindings/net/ti,rpmsg-eth.yaml
+>> new file mode 100644
+>> index 000000000000..1c86d5c020b0
+>> --- /dev/null
+>> +++ b/Documentation/devicetree/bindings/net/ti,rpmsg-eth.yaml
+>> @@ -0,0 +1,38 @@
+>> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+>> +%YAML 1.2
+>> +---
+>> +$id: http://devicetree.org/schemas/net/ti,rpmsg-eth.yaml#
+>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>> +
+>> +title: Texas Instruments RPMsg channel nodes for Ethernet communication
+>> +
+>> +description: |
+>> +  RPMsg Ethernet subnode represents the communication interface between host
+>> +  processor and a remote processor.
+>> +
+>> +maintainers:
+>> +  - MD Danish Anwar <danishanwar@ti.com>
+>> +
+>> +properties:
+>> +  memory-region:
+>> +    $ref: /schemas/types.yaml#/definitions/phandle
+>> +    description: |
+>> +      Phandle to the shared memory region used for communication between the
+>> +      host processor and the remote processor.
+>> +      This shared memory region is used to exchange Ethernet packets.
+>> +
+>> +required:
+>> +  - memory-region
+>> +
+>> +additionalProperties: false
+> 
+> This cannot be really tested and is pointless binding... Really, one
+> property does not make it a device node.
+> 
+> 
 
-Sebastian
+I tried to do something similar to google,cros-ec.yaml and
+qcom,glink-edge.yaml
+
+They are also rpmsg related and used by other vendors. I created similar
+to that as my use case seems similar to them.
+
+The only difference being I only need one property.
+
+
+-- 
+Thanks and Regards,
+Danish
+
 
