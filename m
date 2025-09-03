@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-219486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4738B41901
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 10:47:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50DB3B41905
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 10:48:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 006663B94A6
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 08:47:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A23001B28004
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 08:48:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2970A2ECD2E;
-	Wed,  3 Sep 2025 08:47:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDD262EC540;
+	Wed,  3 Sep 2025 08:47:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="o2IKOvYJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="izeD1dQW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9157F2EC540
-	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 08:47:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 530092ECD3A
+	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 08:47:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756889248; cv=none; b=uhLpF8qqXyDcCv2zyrrRND7ycwCFoIihPvcWmuKuH5XCjsIflHiqUsBorj/KbFqesSt48AUeyVvRfWeCixI5kWzcJEmQSXU/nRBA8At77aXIBqSygInWebqMiHZzfI7JDL4o3MNVccw8vShwKuFwca6R+iEfrvrTWwNFW8NrIa8=
+	t=1756889249; cv=none; b=YMcNcqNpwHdBEwSEt/Jd3qJgx6wTQnK5X+fOD0nocS9SeUY7K/rUjZSxKUZLCM8mUc1z2SRi0jm88ygwqgInkiHU1ERiRCA8gRt734+orZzI/SCHGRgDs1D8LZMzo/5ynczWPntwrwcR/ckbinbO2tL6M/zAa0yeEc91/OiiJnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756889248; c=relaxed/simple;
-	bh=YEqg/fNE5XF2sUUr9jmVCqU0FDMx9aR2Z1lLUlaPx28=;
+	s=arc-20240116; t=1756889249; c=relaxed/simple;
+	bh=As7t0iWZVog7H+V8rkOKMCRbDFaxsEGw5tACJYmOROI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=O01ZaWzQA9m2fWk0z1pKlikAC0Mxib3nIweDX8MpWy7tKy2fOEeE8UI6hsGUF4MnxTPT8UbT5A8euiuW0jT+30QH5SZi/97jmw5cjncugXsaobrG9Yn5oMLvIIESYjBv1qhpQJjjolJn32W6NlU4TlVwgZ9qIn/euk5t642ktfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=o2IKOvYJ; arc=none smtp.client-ip=209.85.160.201
+	 To:Cc:Content-Type; b=dLNtVKhIMP+PhejPEzypU/eKL4AbDAhM9ezrylIRJvxTHhAM9EwZMPVzFrW16VGtNELazW1737dFYwGrpepNcV88+xqoAk40PTowliymMGeMe3Srf57DACoHNZfAlbqBfvnd4dOqEPGljKY9d1mpebL/+2IG1vqpDhma1DaylUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=izeD1dQW; arc=none smtp.client-ip=209.85.222.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-4b32b721a23so61253811cf.0
-        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 01:47:26 -0700 (PDT)
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-7e8702f4cf9so1352779185a.0
+        for <netdev@vger.kernel.org>; Wed, 03 Sep 2025 01:47:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756889245; x=1757494045; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1756889247; x=1757494047; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VvWW/PKki/9qieVi0Y2AxxKzPQhiiO2QZoxgdHXWaMA=;
-        b=o2IKOvYJHOxxscxxYku268b/33qvQKemgpLq1gDG/VPi8HgvU/sIaUYvlylflKgW6j
-         dr3vfUwKDPfkTvpT2ngd0Wp2s40sJpKReQPIu448D1iNfH03s6GppdxgpzKqsXNIEepf
-         6hiTStCKNwN9jsdRAo71TGtWaQs1QLujk2PdZEEOKxrQluTXtQchWXPSzFi88ubkdy/5
-         jayftVbZQnr8IamSwXT1H3MoxZBE0U0gPow8fhfvWGtDDkYqr+KrAj6n3+uXKqV4LqzI
-         hK5/1oTQXoOXhwvPIaRhA2bRyeIY3CcpZvB4IOMVgOQ1ItXkqcwDUahQUsdnIH7rOUQ2
-         nTFQ==
+        bh=THLjz7foivYiCqZlrrgR5Q0Te1rh/ehKo12NMcCxHmY=;
+        b=izeD1dQWhpfQ2eSIJO2hnlXOe54HxBZ0foiE/XFBJ3RMwv1lGJbRQyJ7qciLDI6uin
+         aL9uDDPTLzwo5Mm8bjxizUfoV0tqdDygS7QA2PJSlQeYH2ZMbb4wz3HVgUfzLwSq4oH2
+         o42h5D953WhhXTTaxg1oqDp4ZbWjA2ZG14ZVk8EvZa98X0lsXIkufqh/LGeoPkzsh3RN
+         lYRtw+wydWDtDKL9f6lN006cxgU6raMNCt5N7FmitHOXZHqQ2eboO/YyFW/9CY415gIn
+         3s90L5ouXMvbq5rL4Sg0W0PUy8x41k2KwaUAE42e/TwUn/QAc8wBbtYB/AwVyVey+eCi
+         UAJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756889245; x=1757494045;
+        d=1e100.net; s=20230601; t=1756889247; x=1757494047;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VvWW/PKki/9qieVi0Y2AxxKzPQhiiO2QZoxgdHXWaMA=;
-        b=v+O/FJBifnCyzGehDEsV0Fv+TQYLCuWYRg0ejPGI7tpTbM/qefs6mF+vhibY2JH4so
-         tcfF0txYcjAueJsGININ/Io+83ur43PT3ysiPtRaMo0CMJEidzwSKBK37W/cs1UCrSmj
-         vIkWSsXn3dwuB3et16/3Jbir/VhHp9b0cctcu51xqShdJUhCqY9h+HS2O6Sw0Gh4r/YE
-         ptCCusaQ6uOsiQOtDD1WF7l/6m6y9q0vJvHRAwsMALtOML7PoQH11u3KlP0YX1iAHfA4
-         MhEi2+EexqluWk+Mh5f6/P6jaq0jvEGUzp3pGZuVCSGB0/GXCsxwaRPq5hf3FMsWCHw+
-         ex8g==
-X-Forwarded-Encrypted: i=1; AJvYcCUze0m/fSRAKZAnw7aZXScRoA8GZJqW/5iN8c+n7H3SBjuHm+6yjHu2F2lF4oIeYIrBnbXloZ0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwhIOXH46ziBqI9q+fqwzx25uCAVKw4o7l0uO9or1joggW7He5K
-	VK8zzBiQMCw3Hw5oUsa++tgiXQJhOI9ZTO5jft97psX0wjiGWQJUYqE98brvF7DL1XFog8o9hWn
-	s3hKZyek3YyK6Bg==
-X-Google-Smtp-Source: AGHT+IFqOrqLfokEKYHVRPlUG7DSHDfPES5EEtEkrcQuODCLciGgfD7YLRxnViEb+1VTl1oorCFbnVLTB1VOYg==
-X-Received: from qtxy13.prod.google.com ([2002:a05:622a:120d:b0:4b3:4718:504c])
+        bh=THLjz7foivYiCqZlrrgR5Q0Te1rh/ehKo12NMcCxHmY=;
+        b=FIvSOZQ8FzLV/CfIAhc75PO6wW/tdvLq/YymND5BqGoRTN8qpkpPrbEU2BVvxoHliT
+         i24d1PHmv9dvcl6vRktyWBie3s3/Lm3/GxyeIslnKu7PcIqaPPwoMGHJHz28jHBhAK4B
+         UXfNPQM5kOSAOtbr1LCuhp/uUvLp1U6jcedo1mPaou0nGZl4npXCCXeBrHa5slcUGW8v
+         7FqXGW35cdZ8/n4B3qP3RtmD3/OnsKPQY2XfV6sEAEZW+RkVaZVKbBN0H6xtSZxSuFcv
+         fz1k2506c+iaDBk3Jw00lLHznE4nd12cLv7/cIRUqORHbbyA591ciz1nurE8KFYCtlAb
+         dWVw==
+X-Forwarded-Encrypted: i=1; AJvYcCXdXB0szNda4Ld+ktroznLjixGDjOZ8lVRGluTD5iLRxAIRBUkepNBnBUST3kvUyHUvUv9/6YQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhNoquAq2IjxjM4ETVf7y7Hg5AimR95qgYY/A5KSms+Es9EFNt
+	nr9IyB0ioD+gwoDI2AT93JC/rDyy+JrzklsFjRr4QDzbt9rPzpdj0BEYg4S782uc9pSDeBEYEad
+	kzJHFkyQzfgKZdg==
+X-Google-Smtp-Source: AGHT+IH/P0IVvaUUQQidgE3CrjW15jQSyGQNTY2y7C7hjtwuIMi83r0s7iZRqZjrT+3+ma6xXzwoRYoraHUbUg==
+X-Received: from qkbdl11.prod.google.com ([2002:a05:620a:1d0b:b0:7ff:27b2:2198])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:5144:b0:4b4:8f9f:7469 with SMTP id d75a77b69052e-4b48f9f8a35mr18808051cf.18.1756889245135;
- Wed, 03 Sep 2025 01:47:25 -0700 (PDT)
-Date: Wed,  3 Sep 2025 08:47:19 +0000
+ 2002:a05:620a:45ab:b0:7f0:d699:244e with SMTP id af79cd13be357-7ff282c772emr1716008785a.31.1756889246999;
+ Wed, 03 Sep 2025 01:47:26 -0700 (PDT)
+Date: Wed,  3 Sep 2025 08:47:20 +0000
 In-Reply-To: <20250903084720.1168904-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250903084720.1168904-1-edumazet@google.com>
 X-Mailer: git-send-email 2.51.0.338.gd7d06c2dae-goog
-Message-ID: <20250903084720.1168904-3-edumazet@google.com>
-Subject: [PATCH net-next 2/3] selftests/net: packetdrill: add tcp_close_no_rst.pkt
+Message-ID: <20250903084720.1168904-4-edumazet@google.com>
+Subject: [PATCH net-next 3/3] tcp: use tcp_eat_recv_skb in __tcp_close()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
@@ -83,53 +83,36 @@ Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netd
 	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This test makes sure we do send a FIN on close()
-if the receive queue contains data that was consumed.
+Small change to use tcp_eat_recv_skb() instead
+of __kfree_skb(). This can help if an application
+under attack has to close many sockets with unread data.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- .../net/packetdrill/tcp_close_no_rst.pkt      | 32 +++++++++++++++++++
- 1 file changed, 32 insertions(+)
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_close_no_rst.pkt
+ net/ipv4/tcp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/net/packetdrill/tcp_close_no_rst.pkt b/tools/testing/selftests/net/packetdrill/tcp_close_no_rst.pkt
-new file mode 100644
-index 000000000000..eef01d5f1118
---- /dev/null
-+++ b/tools/testing/selftests/net/packetdrill/tcp_close_no_rst.pkt
-@@ -0,0 +1,32 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+--mss=1000
-+
-+`./defaults.sh`
-+
-+// Initialize connection
-+    0 socket(..., SOCK_STREAM, IPPROTO_TCP) = 3
-+   +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
-+   +0 bind(3, ..., ...) = 0
-+   +0 listen(3, 1) = 0
-+
-+   +0 < S 0:0(0) win 32792 <mss 1000,sackOK,nop,nop>
-+   +0 > S. 0:0(0) ack 1 <mss 1460,nop,nop,sackOK>
-+  +.1 < . 1:1(0) ack 1 win 32792
-+
-+
-+   +0 accept(3, ..., ...) = 4
-+   +0 < . 1:1001(1000) ack 1 win 32792
-+   +0 > . 1:1(0) ack 1001
-+   +0 read(4, ..., 1000) = 1000
-+
-+// resend the payload + a FIN
-+   +0 < F. 1:1001(1000) ack 1 win 32792
-+// Why do we have a delay and no dsack ?
-+   +0~+.04 > . 1:1(0) ack 1002
-+
-+   +0 close(4) = 0
-+
-+// According to RFC 2525, section 2.17
-+// we should _not_ send an RST here, because there was no data to consume.
-+   +0 > F. 1:1(0) ack 1002
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 39eb03f6d07f..588932c3cf1d 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -3118,14 +3118,14 @@ void __tcp_close(struct sock *sk, long timeout)
+ 	 *  descriptor close, not protocol-sourced closes, because the
+ 	 *  reader process may not have drained the data yet!
+ 	 */
+-	while ((skb = __skb_dequeue(&sk->sk_receive_queue)) != NULL) {
++	while ((skb = skb_peek(&sk->sk_receive_queue)) != NULL) {
+ 		u32 end_seq = TCP_SKB_CB(skb)->end_seq;
+ 
+ 		if (TCP_SKB_CB(skb)->tcp_flags & TCPHDR_FIN)
+ 			end_seq--;
+ 		if (after(end_seq, tcp_sk(sk)->copied_seq))
+ 			data_was_unread = true;
+-		__kfree_skb(skb);
++		tcp_eat_recv_skb(sk, skb);
+ 	}
+ 
+ 	/* If socket has been already reset (e.g. in tcp_reset()) - kill it. */
 -- 
 2.51.0.338.gd7d06c2dae-goog
 
