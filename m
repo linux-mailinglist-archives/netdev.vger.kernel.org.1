@@ -1,74 +1,112 @@
-Return-Path: <netdev+bounces-219732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BC69B42D09
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 00:52:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29C58B42D0B
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 00:54:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CF7F3AE495
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 22:52:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5C311BC1B93
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 22:54:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF3B2ECD07;
-	Wed,  3 Sep 2025 22:52:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE4D72EE263;
+	Wed,  3 Sep 2025 22:54:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XctDD/MJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C21292EAD0B;
-	Wed,  3 Sep 2025 22:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAAD02ECD07;
+	Wed,  3 Sep 2025 22:54:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756939951; cv=none; b=sjF6gYMgOUyTR0OYyKQGXkOBlYYkoFVsuMwB10rnDYZEQyyJygRI23dOS6YX6ZVX/kM5amKgILETa7JLDFClKvSeCdtr13K2BwLRS3kMizpP98qaFcFpOobYrlqiBB0Lx7eeFk0kdl8UcEuWFJA62VMb1Y1GxhU+pFlcF0i0AZE=
+	t=1756940043; cv=none; b=BQbGfKdJisj7e0sOx1DmQ9m0E2OqRCWfn+WbjwS0Sb89XXdsDQUDvFNDuZ951z0poUc4pkODB8SYXoJECXE6kDiuJFOLq/g53NSfeDlQIzwYP+G82ekIdmyJs6AUR0CaEMfLNdyaZuK+Hhn+a0RAetXQSzfObmz5GMAv8W5HgoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756939951; c=relaxed/simple;
-	bh=W/hGK7wH2sOlg9PNlFLnQc3PUa4FpPzF/E6XIXr3xb8=;
+	s=arc-20240116; t=1756940043; c=relaxed/simple;
+	bh=XfTPu2oZ7lfmXdMQ6ihXpC+gQo+ikABjst2FKnf0inU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EfcbNC4e5MsOn/jB/ma0cucCjY4DztqIKmTnKq1JLKKoTP0qQptCEj0o2mASyq04N5m745pr6aq7HKN2CpRXkwjCUxeXOcjYP1XOurC71i8Vi4cXjZrHw0yNNxQVehv3+j0RH0Mt06ngnZkgz0YYYOMbPEczoNxyDHxkfU/UOwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 984996046B; Thu,  4 Sep 2025 00:52:20 +0200 (CEST)
-Date: Thu, 4 Sep 2025 00:52:20 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, netfilter-devel@vger.kernel.org,
-	pablo@netfilter.org
-Subject: Re: [PATCH net 1/2] selftests: netfilter: fix udpclash tool hang
-Message-ID: <aLjFWzreiLM8nWgL@strlen.de>
-References: <20250902185855.25919-1-fw@strlen.de>
- <20250902185855.25919-2-fw@strlen.de>
- <20250903151554.5c72661e@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ukyET23szbgTZWB0HEFp5EcvkmahAtb2R97VEkwNOwXQ6I7q4Sc9Myw7k/MaZYsFxPIo0pg5TcL3KMwM31UUZGRmzMkDhJjOxme49920cM7XNRKgAfPWD8PDNSBIyh8GBhb9hRcIQfNCY1D2Q0DFxVSJUPRNgp7qzfRf7GYoqrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XctDD/MJ; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=H5iWDKFTWxPvKGPHXejnuF9lWu57HYhTyaWxcyUeEPE=; b=XctDD/MJgzIUbVqE0lww2FJ8kZ
+	sA9QSTEXXngpkXfvLS5Fx3CQ93+j/ac+UadPrgplOU7y1udBaZTXJtEyyawYBMtGqwxFndpFK2nN0
+	Nhr1zLbaEUIga6mpFMTc9+pxldwyZPUFBOoab725qdn8aJtuVusrySMqTwgQTUwJUaRI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1utwM3-0076X8-Hm; Thu, 04 Sep 2025 00:53:27 +0200
+Date: Thu, 4 Sep 2025 00:53:27 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Dong Yibo <dong100@mucse.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
+	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
+	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, richardcochran@gmail.com, kees@kernel.org,
+	gustavoars@kernel.org, rdunlap@infradead.org,
+	vadim.fedorenko@linux.dev, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH net-next v10 5/5] net: rnpgbe: Add register_netdev
+Message-ID: <b9a066d0-17b5-4da5-9c5d-8fe848e00896@lunn.ch>
+References: <20250903025430.864836-1-dong100@mucse.com>
+ <20250903025430.864836-6-dong100@mucse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250903151554.5c72661e@kernel.org>
+In-Reply-To: <20250903025430.864836-6-dong100@mucse.com>
 
-Jakub Kicinski <kuba@kernel.org> wrote:
-> On Tue,  2 Sep 2025 20:58:54 +0200 Florian Westphal wrote:
-> > Yi Chen reports that 'udpclash' loops forever depending on compiler
-> > (and optimization level used); while (x == 1) gets optimized into
-> > for (;;).  Switch to stdatomic to prevent this.
-> 
-> gcc version 15.1.1 (F42) w/ whatever flags kselftests use appear to be
-> unaware of this macro:
-> 
-> udpclash.c:33:26: error: implicit declaration of function ‘ATOMIC_VAR_INIT’; did you mean ‘ATOMIC_FLAG_INIT’? [-Wimplicit-function-declaration]
->    33 | static atomic_int wait = ATOMIC_VAR_INIT(1);
->       |                          ^~~~~~~~~~~~~~~
->       |                          ATOMIC_FLAG_INIT
-> udpclash.c:33:26: error: initializer element is not constant
-> Could you perhaps use volatile instead?
+>   * rnpgbe_add_adapter - Add netdev for this pci_dev
+>   * @pdev: PCI device information structure
+> @@ -78,6 +129,38 @@ static int rnpgbe_add_adapter(struct pci_dev *pdev,
+>  
+>  	hw->hw_addr = hw_addr;
+>  	info->init(hw);
+> +	mucse_init_mbx_params_pf(hw);
+> +	err = hw->ops->echo_fw_status(hw, true, mucse_fw_powerup);
+> +	if (err) {
+> +		dev_warn(&pdev->dev, "Send powerup to hw failed %d\n", err);
+> +		dev_warn(&pdev->dev, "Maybe low performance\n");
+> +	}
+> +
+> +	err = mucse_mbx_sync_fw(hw);
+> +	if (err) {
+> +		dev_err(&pdev->dev, "Sync fw failed! %d\n", err);
+> +		goto err_free_net;
+> +	}
 
-That works too.  I'll send a new PR tomorrow, its late here.
+The order here seems odd. Don't you want to synchronise the mbox
+before you power up? If your are out of sync, the power up could fail,
+and you keep in lower power mode? 
+
+> +	netdev->netdev_ops = &rnpgbe_netdev_ops;
+> +	netdev->watchdog_timeo = 5 * HZ;
+> +	err = hw->ops->reset_hw(hw);
+> +	if (err) {
+> +		dev_err(&pdev->dev, "Hw reset failed %d\n", err);
+> +		goto err_free_net;
+> +	}
+> +	err = hw->ops->get_perm_mac(hw);
+> +	if (err == -EINVAL) {
+> +		dev_warn(&pdev->dev, "Try to use random MAC\n");
+> +		eth_random_addr(hw->perm_addr);
+
+eth_random_addr() cannot fail. So you don't try to use a random MAC
+address, you are using a random MAC address/
+
+	Andrew
 
