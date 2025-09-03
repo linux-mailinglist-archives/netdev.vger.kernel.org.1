@@ -1,71 +1,79 @@
-Return-Path: <netdev+bounces-219635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04A80B42725
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 18:43:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D4ECB4272C
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 18:44:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7D3F1BC28D3
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 16:43:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 446205676B2
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 16:44:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 676E13064B4;
-	Wed,  3 Sep 2025 16:43:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bq91ZOLs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DD64307AFC;
+	Wed,  3 Sep 2025 16:44:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B73E2BCF6A;
-	Wed,  3 Sep 2025 16:43:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F9BB304971;
+	Wed,  3 Sep 2025 16:44:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756917807; cv=none; b=E3e1n3ToWfPAE0vqSHEZvhbqmdEaTrIJC1KdJQnD/raqu1b0l9tc/EONm21gplcnU3su7g4/ITyvRnBH3VtycoHs4M5vf0O6Sqny5MevWIwrUakTh1OvsIOA9vZaHFS4+uVGtheWOe6Zo6sxsPitkiqgqC2ZWKF6ZQEb10XGvMs=
+	t=1756917876; cv=none; b=UITIU8MtjdOuzMSxjSRkDsbor64fAmkSrsyleJ5fxYN9Khg0S2oBMvnyOR4XAAs8WqBUPxYSLJHeNJ0AXZnNMR2wkPklGjoLgdFKh7LbkCrZs6AZEo2kGynmXel6IwZ/3ZAATKhPdrk4wo9tScA7lyxAJeUcqriDw/Ign2SPmXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756917807; c=relaxed/simple;
-	bh=AkA4dzUeMeAnqy5b40dZ57UDlURr08Yuge2wOJ7h2Lo=;
+	s=arc-20240116; t=1756917876; c=relaxed/simple;
+	bh=ariY+FcwAGaGYyROXJ//ip+a+qed9bzuJqi587Emzwg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YGg3eLayNxAC+DZqt6N2RVuiqk9kI9ics/a0yxEL89P1NLEsC/Ad3GnR5FCfiQbre8kAcJ3w+2Fh8FSW6xkgFPXhywARSqklsZd1jYhj/zNLIxttP3YbboPvQwMV67rlkNp6AO45awd7RrHl9OpWbF6FTWApQv5tbB96P3DqdTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bq91ZOLs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F85BC4CEE7;
-	Wed,  3 Sep 2025 16:43:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756917806;
-	bh=AkA4dzUeMeAnqy5b40dZ57UDlURr08Yuge2wOJ7h2Lo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Bq91ZOLsPXtnywSL0n01fUFf3HGbluHxTTlrKq4YOWy+oSiYHQUb8lH9kDHubCn3r
-	 y5gNxmYsAiIK3CH9q0yk0xu01AsEU/Z2pZd5Q/1aFa8aeKR+nrpXtcabeqzr+D502y
-	 rByVLKZblyDw7pQOQ7L38CDLNJ++FfwiPvddveK6RIHLPtmnm3Y1Wug2f+9WiW/ryS
-	 jhCmrok2BLBGvhmpUTx4plIHYBrLYWVV8nbwyruYul4jDYoHnYAd/QMJLYv5/anwR1
-	 EctRN/T6egnHSW3kKkCMoImAJ772lynQ1mtEHt+K++Jlv0y7ubSfJw2lX3ZS5RUdY1
-	 OFkdPx/DBKZzA==
-Date: Wed, 3 Sep 2025 11:43:25 -0500
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: linux-stm32@st-md-mailman.stormreply.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Eric Dumazet <edumazet@google.com>, linux-kernel@vger.kernel.org,
-	Matthew Gerlach <matthew.gerlach@altera.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>, devicetree@vger.kernel.org,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: Re: [PATCH v2 2/2] dt-bindings: net: renesas,rzn1-gmac: Constrain
- interrupts
-Message-ID: <175691780521.2465839.12589280217452124752.robh@kernel.org>
-References: <20250902154051.263156-3-krzysztof.kozlowski@linaro.org>
- <20250902154051.263156-4-krzysztof.kozlowski@linaro.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=mWp5Tzmz9TkIBpWrMPmuYdpnnc23M/eahLFgS7WNwspHiOsAP/MPKgXzZpYKFxP7mNrDAPT02enD3hDyuYDtkFJGnHmHZfxRQOHIBBD5j8v/RkWTVibBIUDdRjeI36+4mgvqqNGSTy+KzPZj23mkYt5E/GK8SI2dxR9gYZ+Xv0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-61e8fe26614so61197a12.1;
+        Wed, 03 Sep 2025 09:44:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756917873; x=1757522673;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=t9FL6tV8n13zlBvWYA3e3xfxYg9pjFXyRGdxyyVqxgY=;
+        b=bbXFH0FVl/pQx5GEvDg864XUfVolmy5QOnHAKYX7kHhRYLK1Ple3ppuvf/brX4NRDH
+         5TsAAIk4TcNIoEU/FV7MZqRqlUv9yKJNKQI3q8T6vFjHli8KFGAqddoxLNWLecuqm5il
+         d+VaoeUE8O3fcqLsFdPmZ30Lzk7w35coDLek8Y0gcaHD3YatH3ITENxB5emhhOi0Fh8T
+         z2alWqkqKXL7N0wNI+r9rg4XwwgVSrlWouYLwK3Ymfyc5ZO4un7Algmp1aqRbhEp9d+O
+         ic4rjth0Xxsp6jx6f27omJLkZQjGT1yPtoIj3RrrARAxXKVwH7KJzvMZNvdC/JMlp3tq
+         9b3A==
+X-Forwarded-Encrypted: i=1; AJvYcCUi9CrIR6d8MVFobzqleMksP3bL5AR9IB8m7yQygNTYWkgeZjvLgV4n3uxS73GKLb6h8hijC1FWsybwRGE=@vger.kernel.org, AJvYcCXQWC7SH6uVxkuRMtH8XIsozkxy7RdlvoEJnYl1VaRit81eBpx2nb2p2oVZ/TOegdA6tapVSUV6@vger.kernel.org
+X-Gm-Message-State: AOJu0YzzOqa3Qor8leQ51+RAnQphQrKWkpdZtVIB3WsOJU3NoRArt3io
+	8jw6WoDAps8qsnqkmq7RN8wvptJ6rCgGnTz0WTW0ollgM6tmkrns9iBE
+X-Gm-Gg: ASbGncu5qlUqvgrEr64Y2AptVFqYY5WOyhw5mPyzVKLx9F8FqsRTaIe2ibXAbIaYKsu
+	KMPU1l/LrjzVTuHelZvhYN8ATL+qSmvV++vGhS4DWKFVbRLpUSNqbnEzDJ0FAzxbkoOyKYjAGFB
+	3w1+Q4Agr78x3x6YTkKcgymp6YTcacj6V3X0nNiC9qtcJC4aRmTF8NuvMGivMoGfA+KxPOQO1NS
+	NjVUAsjwN3Q8aw/iDa6q0VVjcNWPszL5NAp50Nv8VXouC4kaEISb6TOJiErbXGPjhBK/iYsfmyN
+	1Z1sOqfNYVu8xEhVjZrUr1KiWI/V0J3kCmHVZB4ldUmXEBoEa91lje9tcfjAyk3uS1U6R1CNCtf
+	rLq1jd79T0eB2
+X-Google-Smtp-Source: AGHT+IHfDVVrl1wHNyJKDwCmpxOKb3QmVNSXv+pI7nurrc1BarqU4QHmNG3rluy6cGrnQiIAHjnrBA==
+X-Received: by 2002:a17:906:5909:b0:b04:1b90:8d7a with SMTP id a640c23a62f3a-b041b908f01mr1209368966b.27.1756917872692;
+        Wed, 03 Sep 2025 09:44:32 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:1::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b01af44a01fsm1099042866b.23.2025.09.03.09.44.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Sep 2025 09:44:32 -0700 (PDT)
+Date: Wed, 3 Sep 2025 09:44:29 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Clark Williams <clrkwllms@kernel.org>, 
+	Steven Rostedt <rostedt@goodmis.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-rt-devel@lists.linux.dev, kernel-team@meta.com, efault@gmx.de, calvin@wbinvd.org
+Subject: Re: [PATCH 3/7] netpoll: Move netpoll_cleanup implementation to
+ netconsole
+Message-ID: <vxad5ijytxk66i2rja2uzmueajzpbccy3xcc4nokfnc6chapqb@j2kxvpyb63rh>
+References: <20250902-netpoll_untangle_v3-v1-0-51a03d6411be@debian.org>
+ <20250902-netpoll_untangle_v3-v1-3-51a03d6411be@debian.org>
+ <willemdebruijn.kernel.2c7a6dc71163b@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,28 +82,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250902154051.263156-4-krzysztof.kozlowski@linaro.org>
+In-Reply-To: <willemdebruijn.kernel.2c7a6dc71163b@gmail.com>
 
+On Tue, Sep 02, 2025 at 06:49:26PM -0400, Willem de Bruijn wrote:
+> Breno Leitao wrote:
+> > Shift the definition of netpoll_cleanup() from netpoll core to the
+> > netconsole driver, updating all relevant file references. This change
+> > centralizes cleanup logic alongside netconsole target management,
+> > 
+> > Given netpoll_cleanup() is only called by netconsole, keep it there.
+> > 
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
+> 
+> What's the rationale for making this a separate patch, as the
+> previous patch also moves the other netconsole specific code from
+> netpoll.c to netconsole.c?
 
-On Tue, 02 Sep 2025 17:40:53 +0200, Krzysztof Kozlowski wrote:
-> Renesas RZN1 GMAC uses three interrupts in in-kernel DTS and common
-> snps,dwmac.yaml binding is flexible, so define precise constraint for
-> this device.
-> 
-> Reviewed-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> 
-> ---
-> 
-> Changes in v2:
-> 1. Minor typo in commit msg.
-> 2. one->three interrupts in commit msg
-> 3. Rb tag
-> ---
->  .../devicetree/bindings/net/renesas,rzn1-gmac.yaml       | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
+I just tried to isolate the changes in small patches as possible.
+previous functions needed to go all together, given it was they were in
+a chain.
 
-Acked-by: Rob Herring (Arm) <robh@kernel.org>
+this one netpoll_cleanup() is more independent, so, I decided to
+separate it, making the patches smaller individually.
 
+> And/or consider updating prefix from netpoll_.. to netconsole_..
+
+Good point, and I agree with the feedback.
+
+In cases like this, should I rename the function while moving, or,
+adding an additional patch to rename them?
+
+Thanks for the review,
+--breno
 
