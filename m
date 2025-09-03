@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-219600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA9F7B4236A
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 16:20:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 839E6B4237A
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 16:24:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 546971A87ADD
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 14:20:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C6F83A76F9
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 14:23:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EC3630AAAD;
-	Wed,  3 Sep 2025 14:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2243230BF78;
+	Wed,  3 Sep 2025 14:23:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rTYnTc4y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uGiphPDg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 174D01F4CB2;
-	Wed,  3 Sep 2025 14:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC4ED1E4AE;
+	Wed,  3 Sep 2025 14:23:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756909200; cv=none; b=VHPAeBmO++ctuquBN6NBgsmYMLe9pa+DS1/T2N+6DSIPKJEPxmT4zftQuqt9jwMTa1hjypaiwdRIjWa5xNNlxbcv+WGW+KfJbirE3NVE4hwbZWm+BpIz3suCKqRMZ3H3Cub2K7JHS+/eZXTkMinAwrtYkWvFrJL+SX45EfLBfBM=
+	t=1756909435; cv=none; b=QAaQ5RgzV0mghDQh1rx+0GHmrMa0EVkr03j2XERq6RrgN2+vSQTEzd/E26kllb+tPHQPfE8K1bExIa+SPeo/Jt4ar+idfY29aJAOH4IS+ty/vGzB4X6fuFoOB/v98Bnm16GxQjn4AswUpGkDmKYyGx9KJOTG3a4Bh/DmQdwVJIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756909200; c=relaxed/simple;
-	bh=82KpDV1PvR2wNvrkgtAIHeyUyj1MQlrsKRL99mRDZBs=;
+	s=arc-20240116; t=1756909435; c=relaxed/simple;
+	bh=RH0JXllZP6MZUtbdIyvnSL6xOTZGtSyzuKbcwgJZhZ8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pguEp815ZRVo2E6uegME22gSfWv+L9E8edWJjSLub2qbt/rifWUHAJgMzs5ZRHgYpN3KigUi+23mjLur9nmJzTXC5Te/ilB/r9UTjntORm6Hu80jzCNWWZ+TjHs7sjwEtlSbmgU51z/Flwm5Zx3tdCPQtLwRdpCUZpRuue02Tpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rTYnTc4y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64960C4CEE7;
-	Wed,  3 Sep 2025 14:19:52 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=JZuBITg9tBDuaXaAvrqeuZLLC6KcT/oGYdwyNyyCoRFZ0kbhFXeACRmrstORFQoRH9x+AGHT2JMy/NwMtAGWyJK8lfz9A1kOI8u1d6fe+/op2MD+rMnyTZHcPT7anzwX/YVJsivIcEj68oe9WWHCxecgudDYtybBjb7f3AWsZJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uGiphPDg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8677FC4CEE7;
+	Wed,  3 Sep 2025 14:23:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756909199;
-	bh=82KpDV1PvR2wNvrkgtAIHeyUyj1MQlrsKRL99mRDZBs=;
+	s=k20201202; t=1756909434;
+	bh=RH0JXllZP6MZUtbdIyvnSL6xOTZGtSyzuKbcwgJZhZ8=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=rTYnTc4yE0MczD5gf388EJftHMhVDIb7K97+qI8yphSe8s6QtmkejjXb+d8GJTmt6
-	 9cVe0Rd0ingn3ucmy/fba5ChlZuxw9VxgICeBrk5+T3byxSscBwtdzB3u5q1POsB2/
-	 S7NhFIhw+aFBixFRCPZO37J1227jFcN2bkuENiD1TUGY5QON21fQiVbReovZ3gdvBw
-	 7JYD7den7jFxsrR8ltXDV74H9mCTmUO0+k3QPTpOatu9YLcWf6Moteg33kohNt9njG
-	 /6YYhB6XJqT+ahKXXzEdAEURKMgct0Kpx9tSUFNwlxcro0ThpySo5hqiIIDmIoNHje
-	 T7aUset+eHlzA==
-Message-ID: <ea75a30b-01f4-4c2d-b3ab-0a9ab0d9de80@kernel.org>
-Date: Wed, 3 Sep 2025 16:19:50 +0200
+	b=uGiphPDg6pqRYghg8mQ3iJf9rZTGTJvVgt56Ntji54toOVqzoEMmxeFzOPC0It7R8
+	 33TOcKwEnNxlz54A8OS7qkEGg/j5U7pOgUnTYAJ6lnjSQGSjv5hb240/CXNXCQCxND
+	 5W9UEdnq33hwParQ+7Ynp9e0qFQPgl1z1gs+Bkrm8B+Kc5kqNQHMJXaOEgp4Tkb34D
+	 lejn1a6pGiHPxyVsO5l6uTwf2ROY+9cfxMLtdZlud4b9vFoLCpGkUP3BuA6FmrHVOk
+	 6HT2/7tKocLDXCApRo3xnxsNBwxsj7IHGMT9FXqqmU80u9FtnyHtjTQ/vY3TU30Bkx
+	 yQjRdEjmbZcFQ==
+Message-ID: <9c2a863c-0c8a-4563-a58d-d59112ac45a8@kernel.org>
+Date: Wed, 3 Sep 2025 16:23:44 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,12 +52,13 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH net-next v2 2/8] dt-bindings: remoteproc: k3-r5f: Add
  rpmsg-eth subnode
-To: "Anwar, Md Danish" <a0501179@ti.com>, MD Danish Anwar <danishanwar@ti.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+To: Andrew Lunn <andrew@lunn.ch>, "Anwar, Md Danish" <a0501179@ti.com>
+Cc: MD Danish Anwar <danishanwar@ti.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
  Mathieu Poirier <mathieu.poirier@linaro.org>, Simon Horman
  <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
  Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
@@ -79,6 +80,7 @@ References: <20250902090746.3221225-1-danishanwar@ti.com>
  <d994594f-7055-47c8-842f-938cf862ffb0@ti.com>
  <f2550076-57b5-46f2-a90a-414e5f2cb8d7@kernel.org>
  <38c054a3-1835-4f91-9f89-fbe90ddba4a9@ti.com>
+ <6e56f36f-70fd-4635-b83f-a221780237ba@lunn.ch>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -124,105 +126,53 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <38c054a3-1835-4f91-9f89-fbe90ddba4a9@ti.com>
+In-Reply-To: <6e56f36f-70fd-4635-b83f-a221780237ba@lunn.ch>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 03/09/2025 15:32, Anwar, Md Danish wrote:
-> 
-> 
-> On 9/3/2025 6:24 PM, Krzysztof Kozlowski wrote:
->> On 03/09/2025 09:57, MD Danish Anwar wrote:
->>>>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
->>>>> ---
->>>>>  .../devicetree/bindings/remoteproc/ti,k3-r5f-rproc.yaml     | 6 ++++++
->>>>>  1 file changed, 6 insertions(+)
->>>>>
->>>>> diff --git a/Documentation/devicetree/bindings/remoteproc/ti,k3-r5f-rproc.yaml b/Documentation/devicetree/bindings/remoteproc/ti,k3-r5f-rproc.yaml
->>>>> index a492f74a8608..4dbd708ec8ee 100644
->>>>> --- a/Documentation/devicetree/bindings/remoteproc/ti,k3-r5f-rproc.yaml
->>>>> +++ b/Documentation/devicetree/bindings/remoteproc/ti,k3-r5f-rproc.yaml
->>>>> @@ -210,6 +210,12 @@ patternProperties:
->>>>>            should be defined as per the generic bindings in,
->>>>>            Documentation/devicetree/bindings/sram/sram.yaml
->>>>>  
->>>>> +      rpmsg-eth:
->>>>> +        $ref: /schemas/net/ti,rpmsg-eth.yaml
->>>>
->>>> No, not a separate device. Please read slides from my DT for beginners
+On 03/09/2025 16:06, Andrew Lunn wrote:
+>>>>  	mboxes = <&mailbox0_cluster2 &mbox_main_r5fss0_core0>;
+>>>>  	memory-region = <&main_r5fss0_core0_dma_memory_region>,
+>>>>  			<&main_r5fss0_core0_memory_region>;
+>>>> +	rpmsg-eth-region = <&main_r5fss0_core0_memory_region_shm>;
 >>>
->>> I had synced with Andrew and we came to the conclusion that including
->>> rpmsg-eth this way will follow the DT guidelines and should be okay.
+>>> You already have here memory-region, so use that one.
+>>>
 >>
->> ... and did you check the guidelines? Instead of repeating something not
->> related to my comment rather bring argument matching the comment.
+>> There is a problem with using memory-region. If I add
+>> `main_r5fss0_core0_memory_region_shm` to memory region, to get this
+>> phandle from driver I would have to use
+>> 	
+>> 	of_parse_phandle(np, "memory-region", 2)
 >>
+>> Where 2 is the index for this region. But the problem is how would the
+>> driver know this index. This index can vary for different vendors and
+>> their rproc device.
 >>
->> ...
->>
->>> @@ -768,6 +774,7 @@ &main_r5fss0_core0 {
->>>  	mboxes = <&mailbox0_cluster2 &mbox_main_r5fss0_core0>;
->>>  	memory-region = <&main_r5fss0_core0_dma_memory_region>,
->>>  			<&main_r5fss0_core0_memory_region>;
->>> +	rpmsg-eth-region = <&main_r5fss0_core0_memory_region_shm>;
->>
->> You already have here memory-region, so use that one.
->>
+>> If some other vendor tries to use this driver but their memory-region
+>> has 3 existing entries. so this this entry will be the 4th one.
 > 
-> There is a problem with using memory-region. If I add
-> `main_r5fss0_core0_memory_region_shm` to memory region, to get this
-> phandle from driver I would have to use
-> 	
-> 	of_parse_phandle(np, "memory-region", 2)
-> 
-> Where 2 is the index for this region. But the problem is how would the
-> driver know this index. This index can vary for different vendors and
-> their rproc device.
+> Just adding to this, there is nothing really TI specific in this
+> system. We want the design so that any vendor can use it, just by
+> adding the needed nodes to their rpmsg node, indicating there is a
+> compatible implementation on the other end, and an indication of where
+> the shared memory is.
 
-Index is fixed, cannot be anything else. Cannot vary.
-
+I don't know your drivers, but I still do not see here a problem with
+'memory-region'. You just need to tell this common code which
+memory-region phandle by index or name is the one for rpmsg.
 
 > 
-> If some other vendor tries to use this driver but their memory-region
-> has 3 existing entries. so this this entry will be the 4th one.
+> Logically, it is a different shared memory. memory-region above is for
+> the rpmsg mechanism itself. A second shared memory is used for the
+> Ethernet drivers where it can place Ethernet frames. The Ethernet
+> frames themselves are not transported over rpmsg. The rpmsg is just
+> used for the control path, not the data path.
 
-None of these are reasons to add completely new node in DT. You use
-arguments of drivers in hardware description. Really, can you read the
-slides I asked for already?
-
-> 
-> But the driver code won't work for this. We need to have a way to know
-
-Driver code can easily work with this. Multiple choices from using names
-up to having driver match data with index.
-
-> which index to look for in existing memory-region which can defer from
-> vendor to vendor.
-> 
-> So to avoid this, I thought of using a new memory region. Which will
-> have only 1 entry specifically for this case, and the driver can always
-> 
-> 	of_parse_phandle(np, "rpmsg-eth-region", 0)
-> 
-> to get the memory region.
-
-Please don't drag the discussion. Look:
-
-Q: I need a child node for my device to instantiate Linux driver"
-A: NO
-
-Q: I need new “vendor,foo-prop” property
-A: Please look at existing common properties from common schemas or
-devices representing similar class
-
-Or actually let's start with most important:
-
-"What Could You Put into DTS?"
-Answers:
-1. "Not the Linux Device Driver model"
-2. "No Linux driver choices"
-
-And that's exactly what you do and how you argue.
+It is still "shared-dma-pool", right? Nothing in the bindings says that
+all memory-region phandles are equal or the same. Just like phandles for
+clocks. Some clocks need to be enabled for entire lifetime of the
+device, some are toggled on-off during runtime PM.
 
 Best regards,
 Krzysztof
