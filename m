@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-219385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FC68B41133
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 02:10:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2BAEB41132
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 02:10:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 796641B615EA
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 00:10:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9769D546BD1
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 00:10:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F66A72639;
-	Wed,  3 Sep 2025 00:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2092C179BD;
+	Wed,  3 Sep 2025 00:10:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hwSgGyya"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lr5Va/Ml"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE904BA45
-	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 00:10:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED0ED1400C;
+	Wed,  3 Sep 2025 00:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756858209; cv=none; b=aTi5kfrZho5Q4f2nI6cBUL/Fzlw6hrkhd7UAsisDYLzYyZtcS7wqdaVEUq/AI1orLHdJAMKz0FBPwUqrMhO6Pus7yiVMG0dU6pQYM0i+6QLWzx1z+mCjd2kAhow4YL2xGgStDYC0ZO3BPJj+JKNQTYKajySYgahZuiAhHwwLvZ4=
+	t=1756858216; cv=none; b=g6reTWvqm97aBMGlUkY6wyrh8byapjcMGkJeFFNiSf5dqQpLfJkfa0l+I7Dqjlhc1TyNYP47euEDZbhV9uhNKao+2PBnJ31/2rPCGGIXoezwYrDWh4pBZtBkXKDPK3s/tZzXQMLkvGc8K5QdYnhpw8uHKciDHrCexBVxCucUhHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756858209; c=relaxed/simple;
-	bh=JifxtBI70mI0Qmk1r0YV94dWMv1pOv8RcMMbvlIHF2Y=;
+	s=arc-20240116; t=1756858216; c=relaxed/simple;
+	bh=kqCBITBvvTPGrJDwgG++T2WdoRqclM08P2bV1oYwrJ8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=uGhpmtEbtvBDEm48gu25RDNqdC+GKV2OjkppBluR26h8033Q5eciIpiVf8nB2nfE6cyyNUjKTovO+Rw037QQLRMcVpjdawxGYsXUWZ3qSDBzU1GTjMJZweHXL/JUH3pz5r0+Uh+3E3FMYjqXZGW/tJTw3jKqgmW0u++Dp2bYJLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hwSgGyya; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65AD6C4CEED;
-	Wed,  3 Sep 2025 00:10:09 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=uqBiuMC3HwaQ5EiSuPNkcfVWmLMLXy8DuIQclc/FHSE0I0/jW5+AUEbS8r0iek6hgRzc76+G9PAr1x3ZRD0OBaOCgIt85q761lHkhaG1hcn/eM5AAs/8nB7phVyCKJEMhaWWOcg07gcOZ0A8E2iEXBLVJAmz8TFzfP1zXxWmfNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lr5Va/Ml; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63BEAC4CEED;
+	Wed,  3 Sep 2025 00:10:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756858209;
-	bh=JifxtBI70mI0Qmk1r0YV94dWMv1pOv8RcMMbvlIHF2Y=;
+	s=k20201202; t=1756858214;
+	bh=kqCBITBvvTPGrJDwgG++T2WdoRqclM08P2bV1oYwrJ8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hwSgGyyapOebUG/ViQbASfSiO44znUaTRz1LmyaWxeupbgZA89w6rIlmkeratVwgm
-	 do6AhG+129fDBSRlpOCdnJTUS+zg9gTLBsaxszk51SFgk9cj8gflwpyHjHdBfXGk6F
-	 CRM8kLAXt14uHQxCk6eS4KdRGvcnW9HD7xx+DPYvaoNqO7FcBow19XJm7V0qGza4ND
-	 sPyxyEKmOoi8uIy88bj4m+ueO4dSDOJ96v7sEZ0n13HzSQ+obsn8xrhr35TN2VptA7
-	 IT7AQjVSr5VrZWESOBBq3oHgaYXV3gSpT0fjn2fwruruMg+xHXj8+eH+MWfaOgaTqn
-	 HYRHjpqrNPnXw==
+	b=Lr5Va/MlszG/kzHdrbfw7ZIore6ay2TLyHokqsZk6WYtvXgTTBOY4tKeyyYHLs3xe
+	 lIJyRkx9duG+GFjkGEsIFynh8FyLkupksunvqWpExXQpPIUaazfP5XF8eslRVGh7WR
+	 mYCsVExLSC3TVheBeaJu7T8nEW5sJYH0NlbUzxraicvFBF+08ZrfgAJ+OX31kUIxro
+	 4dl10Tgytt7hSoT+l5tWDj1fzO9R1QLrhQ3/U1KFCZVH0M5Z9yr/8pQHFIQOWWnckA
+	 aYtrYZFRQiSv2vgj/BYh8Sxig21qy/EDZdp3UBwSOqzU9FDwLBF+4usrrzZpVSWQDv
+	 kX4ULh0wduxAw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF3F383BF64;
-	Wed,  3 Sep 2025 00:10:15 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EACAA383BF64;
+	Wed,  3 Sep 2025 00:10:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,46 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/3] vxlan: Fix NPDs when using nexthop objects
+Subject: Re: [PATCH v3 net-next 0/2] ipv6: improve rpl_seg_enabled sysctl
+ handling
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175685821474.475224.8396576644651360908.git-patchwork-notify@kernel.org>
-Date: Wed, 03 Sep 2025 00:10:14 +0000
-References: <20250901065035.159644-1-idosch@nvidia.com>
-In-Reply-To: <20250901065035.159644-1-idosch@nvidia.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, andrew+netdev@lunn.ch,
- horms@kernel.org, razor@blackwall.org, petrm@nvidia.com,
- mcremers@cloudbear.nl
+ <175685821973.475224.13168377571393825684.git-patchwork-notify@kernel.org>
+Date: Wed, 03 Sep 2025 00:10:19 +0000
+References: <20250901123726.1972881-1-yuehaibing@huawei.com>
+In-Reply-To: <20250901123726.1972881-1-yuehaibing@huawei.com>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, kuniyu@google.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 1 Sep 2025 09:50:32 +0300 you wrote:
-> With FDB nexthop groups, VXLAN FDB entries do not necessarily point to a
-> remote destination but rather to an FDB nexthop group. This means that
-> first_remote_{rcu,rtnl}() can return NULL and a few places in the driver
-> were not ready for that, resulting in NULL pointer dereferences.
-> Patches #1-#2 fix these NPDs.
+On Mon, 1 Sep 2025 20:37:24 +0800 you wrote:
+> First commit annotate data-races around it and second one add sanity check that
+> prevents unintentional misconfiguration.
 > 
-> Note that vxlan_fdb_find_uc() still dereferences the remote returned by
-> first_remote_rcu() without checking that it is not NULL, but this
-> function is only invoked by a single driver which vetoes the creation of
-> FDB nexthop groups. I will patch this in net-next to make the code less
-> fragile.
+> Yue Haibing (2):
+>   ipv6: annotate data-races around devconf->rpl_seg_enabled
+>   ipv6: Add sanity checks on ipv6_devconf.rpl_seg_enabled
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/3] vxlan: Fix NPD when refreshing an FDB entry with a nexthop object
-    https://git.kernel.org/netdev/net/c/6ead38147ebb
-  - [net,2/3] vxlan: Fix NPD in {arp,neigh}_reduce() when using nexthop objects
-    https://git.kernel.org/netdev/net/c/1f5d2fd1ca04
-  - [net,3/3] selftests: net: Add a selftest for VXLAN with FDB nexthop groups
-    https://git.kernel.org/netdev/net/c/2c9fb925c2cc
+  - [v3,net-next,1/2] ipv6: annotate data-races around devconf->rpl_seg_enabled
+    (no matching commit)
+  - [v3,net-next,2/2] ipv6: Add sanity checks on ipv6_devconf.rpl_seg_enabled
+    https://git.kernel.org/netdev/net-next/c/3d95261eeb74
 
 You are awesome, thank you!
 -- 
