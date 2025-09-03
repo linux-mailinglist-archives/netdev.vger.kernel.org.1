@@ -1,78 +1,79 @@
-Return-Path: <netdev+bounces-219639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78DB1B4274B
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 18:52:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 669E6B42753
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 18:55:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9766F7ADE0B
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 16:50:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 137821B24D51
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 16:55:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DE8030C358;
-	Wed,  3 Sep 2025 16:52:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BFC02ED860;
+	Wed,  3 Sep 2025 16:55:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9263E2ED860;
-	Wed,  3 Sep 2025 16:52:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7973A2BF3E2;
+	Wed,  3 Sep 2025 16:55:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756918324; cv=none; b=cpPvaOREnpuEZVFunAuZ4GsapbfbX0iN/sR2gUWMYwDE6C1uzf0soTHkyz6E4T9zX4tS7v8VwVocwvtCZtzK7s8AdvlBrVOLNID2k/kfOPXydruf19VAMnWICRAJtbhGVxlcm4iQiHRP/ZfyEkQbkJtR47lbjvjGOW0Gaf9J+cA=
+	t=1756918512; cv=none; b=ga4RF7kkZz/izJIJsKFHLx/6vodaP6GPFErSG5ATL8GSP+z+hb1yJJojHvKqCQCnHadK6txstdbezOva/RY/Lut65a7hrGSlFPY+aOFCnC0IiZ46Xq5MZ1CvUvfRrekPXvPiMmZGiA7gAWvHZuAFyKo7rJG7/OO1K/eVE9utf6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756918324; c=relaxed/simple;
-	bh=SC4vvCIh6HVYZODXSXSISU1/mNuZk8irrLwPdBkb1LM=;
+	s=arc-20240116; t=1756918512; c=relaxed/simple;
+	bh=30uqmxUWwwZjA2mmV57rJmq7l79ruMZyoiTHZmBLM9Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C9V47A+3H7YqJBhdmEGWrfYrbx0WM0hJtmscx37KZtJn6S1+YthOWhJK0s6pfIPcw7K5hvmZkdRACAwaBMbqL6SpuWXUypFx14Mmm4fb4RzE0/LsB7SBtLKuPcy6Wqqd1UskcpI5dHV6bq/Y9WTEDI8Hu+xDpME6oPKyI8hLDbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.51
+	 Content-Type:Content-Disposition:In-Reply-To; b=c2WsD1/SXqOz14itcRxgmPHCimuPTLLCVqz3Ckow6dHRpvHm/Zf8XNpFhDPOlHeJZcsznwIVGtmLSKIOoZx+tTxOZMYV3tSMetjqpH6PgUzgSsFwLCLjF5qGUI8nqsUNbEiKLfgk8ecW3kwla8oG+Ku3AqdLo1ArrEn1eZDeU3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-afcb7322da8so21298366b.0;
-        Wed, 03 Sep 2025 09:52:02 -0700 (PDT)
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b042ec947e4so15671066b.0;
+        Wed, 03 Sep 2025 09:55:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756918321; x=1757523121;
+        d=1e100.net; s=20230601; t=1756918509; x=1757523309;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TS8yFqssheDT5JhDABA5pXfJxzkDyZX8nmQKjAuFt9o=;
-        b=uWgV48j9dw1mzIMUpKlZrmnC6pmCxNXNMJVhU2bl8VFj64tOFCq1jDW+9bBD7s82m9
-         zrN7q3kSSxVEwNMU+WCZOgneRQAS6M1gEzv/HEGwWriCpy+qeJFIt715o4LXRK1WHxZu
-         KKaPG7exy4ZVd3Och+LSuEmcASNRXtNML/DX2L3Son2QprjzdOv3CwNhYebnNPotvmSs
-         WYzcgcniAsKvyBXPNi5PcaDSkzdjswPZxSW6FyJRMRcquu+gh/AAgmAnZGnLVPs/ziWz
-         a3/TeHIGDmRAFtfzcnQOkEK+oQRbxxUMWuxa1A7fckgDMjOxRslVwaEmGb1IkvuXT5m6
-         p+Mw==
-X-Forwarded-Encrypted: i=1; AJvYcCWEj8kKP3D+ThE1lvT3wtJfpjwbi6Hl3dpAsRbQMdUbOejKwoCdb6gE1N1w0ttFjASHg9EVK/V8ZwWp1z8=@vger.kernel.org, AJvYcCXj7403LWroF7OJ7aoMArr7KGH1JaLxuAlh1hw6lYNs2IZt/Q2MI+tyO9p7fzB+D38vMe6RY0Ae@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzdw6HdRYL4Gl0XgEvXZqPsktk16P09sUz33LFz/KNJr5Ggibcp
-	mKZ9pKPcgt6RzzKDVumOK/HFBMBlXAYQKjRCVAEkinqlmi1+GfnVIjIR
-X-Gm-Gg: ASbGncubR9Aoufc89tohjdFyF/LLN05fr30A/6EWteqWmhnI0ZkURsM7zGAErdAZ7C2
-	JkUs2U6ejT621DpawbTK0NMamizyTQeO9og0dZIG/8ifZwUOC5zwNguu0lAan7V3oFaSzOJcUHN
-	hjsqNkubgXQFlKETLS2tn5FFSBoPHWRjW+b4PjyHIZF9RSoiIyvdW54KcWKxM1IVDpk11xtMk/o
-	VyUNJGbW5A6NXDOFJYBk9gaS+znMVtAwX7zKSOvgrHYo/hhAbJjmpUeX54JwypN2hoLdLSl1iVh
-	Q4hUuW/3y+8UNnwPXRBOVfOx3/NgpVc0kYZTpcOd51I3iuA2O1ESTI11hNtkMRCah//aYYPEf0v
-	2N7V42LZzTUYEFH+WfYTQ1js=
-X-Google-Smtp-Source: AGHT+IGGflStVCuHzCFsc78Vh1Q6ajVQk9iXe7sBDgr5P+ldeTJ4+esXOhqB9adB4iccLVfZDfPKLQ==
-X-Received: by 2002:a17:907:2684:b0:aff:13f5:1f0 with SMTP id a640c23a62f3a-b01d8a26e65mr1488688866b.7.1756918320662;
-        Wed, 03 Sep 2025 09:52:00 -0700 (PDT)
-Received: from gmail.com ([2a03:2880:30ff:1::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b046df9a44dsm153072166b.70.2025.09.03.09.51.58
+        bh=QDdwyuaVc8VSTl6NQmoSrQNloKdIcjoMxK537r629qc=;
+        b=Hm5VRHh8XC/qrU+6rsQP9bnekGF4VjM2ZBzidiPE1b/21Q2wOlL5EEnaGmBPm4+BaY
+         7dlOhatbdvNPGZLhhgbEKfi+atfrv/Xwvlnfs3yhdlXP2z/9AraBW8KPV4Ln+MHEgSsE
+         g94L7/iaGyO4hfSsN0uU6pFrXAuvAhr0iQnJN7yNK85vrz29KxBiicsr1Bmphy8A0ew1
+         bfm1vD6D6jMq7z7EAZuvu2OUSKSEZRX48/ggiy+o20/NIjGGnUAIu9WLBQhNmYByMrFA
+         vZc546GKAlybLQgT65m1C8bDourNVeelzzzIWngdzPzjkS/DfpiF2xxQSE8CSjuR8JV0
+         Rmyg==
+X-Forwarded-Encrypted: i=1; AJvYcCUUbQ07hsOtOIXGbBmZ6etRCeg9SSNy8/k53i+v5FXQHgT0Gu//BEeRPXOLJP7SJU77Fh056CIN@vger.kernel.org, AJvYcCXqMwe1EKIlgH/4VYKNfB6oP04fAAnFPWnSs4E1TFq1xq+k0FgCI1GnJN+syrqE1wqwo/DOzWIw9ndSNkw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEUn3N6lu1s1o/VzhOIqSPGDPO2az8JaL2UJs5+cZQhvcVaHzr
+	WkAefwkEqkCFEaXOF4t9QslWiNvU1eR6l5Y1zB6PZS+87VOzlrtBUiWO
+X-Gm-Gg: ASbGncuT0jSqGVLULzYwzaxmN8fWaqfPU3zdPTi+RcL5VsYapHRh9EV0JNB1Y5nkCx4
+	U7HYmttCD35nW6w0GumJNz8hVjePSBmzplSaFmW8YWeBkuAGS73JnVp1SYF/Zey0P4QI8c3Mbm3
+	9QV0gI7Hs3gQiffaIf2CG8IAa4INKWncwelSGSHiq7ThJKt8qvGA19RhWfoagrYfGuWKvGN1L7w
+	0vMpNXog925MjPmnyM+/PcuCZgdWOdvghnd9HsTSqE06Fxz63UMnQn2QcfitVggPgeQuD/5VusS
+	KZvZyfg6vjAlStzVHF7D9YsZzjJIWcTGoND3RtAEydFTrEzmSfmnoEMIQrfkcGcBpxAcAQoy933
+	kp5RNi/4pG+/hetrEuokZXhI=
+X-Google-Smtp-Source: AGHT+IHj2ea6XeYQe5FG+mFIfrJNdxtnyrHgGC5qizxT1Mt2Lf2mzyFI4yV+cXlZTyes3qLz69Uv4A==
+X-Received: by 2002:a17:907:9444:b0:b04:4d7b:9ad2 with SMTP id a640c23a62f3a-b044d7ba932mr805242366b.39.1756918508646;
+        Wed, 03 Sep 2025 09:55:08 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:6::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b0236d310casm1115557966b.44.2025.09.03.09.55.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Sep 2025 09:51:59 -0700 (PDT)
-Date: Wed, 3 Sep 2025 09:51:57 -0700
+        Wed, 03 Sep 2025 09:55:07 -0700 (PDT)
+Date: Wed, 3 Sep 2025 09:55:05 -0700
 From: Breno Leitao <leitao@debian.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
 	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
 	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Clark Williams <clrkwllms@kernel.org>, 
 	Steven Rostedt <rostedt@goodmis.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-rt-devel@lists.linux.dev, kernel-team@meta.com, efault@gmx.de, calvin@wbinvd.org
-Subject: Re: [PATCH 4/7] netpoll: Export zap_completion_queue
-Message-ID: <v4bz7lyzs6f6mlfhvgy3p34sihu6sojwntbev3hz2sz425j76i@wanin427lov6>
+	linux-rt-devel@lists.linux.dev, kernel-team@meta.com, efault@gmx.de, calvin@wbinvd.org, 
+	willemdebruijn.kernel@gmail.com
+Subject: Re: [PATCH 7/7] netpoll: Flush skb_pool as part of netconsole cleanup
+Message-ID: <sz3tq6rkykm2565stkd4qhj6k6t5wtd2nwboby47goq32hkfor@xwlmwuy7y27x>
 References: <20250902-netpoll_untangle_v3-v1-0-51a03d6411be@debian.org>
- <20250902-netpoll_untangle_v3-v1-4-51a03d6411be@debian.org>
- <willemdebruijn.kernel.9ee65133b4b7@gmail.com>
+ <20250902-netpoll_untangle_v3-v1-7-51a03d6411be@debian.org>
+ <20250902170938.0d671102@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,31 +82,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <willemdebruijn.kernel.9ee65133b4b7@gmail.com>
+In-Reply-To: <20250902170938.0d671102@kernel.org>
 
-On Tue, Sep 02, 2025 at 06:50:25PM -0400, Willem de Bruijn wrote:
-> Breno Leitao wrote:
-> >  include/linux/netpoll.h | 1 +
-> >  net/core/netpoll.c      | 5 ++---
-> >  2 files changed, 3 insertions(+), 3 deletions(-)
-> > 
-....
-> > -static void zap_completion_queue(void)
-> > +void zap_completion_queue(void)
-> >  {
-> >  	unsigned long flags;
-> >  	struct softnet_data *sd = &get_cpu_var(softnet_data);
-> > @@ -267,6 +265,7 @@ static void zap_completion_queue(void)
-> >  
-> >  	put_cpu_var(softnet_data);
+On Tue, Sep 02, 2025 at 05:09:38PM -0700, Jakub Kicinski wrote:
+> On Tue, 02 Sep 2025 07:36:29 -0700 Breno Leitao wrote:
+> > @@ -607,8 +596,6 @@ static void __netpoll_cleanup(struct netpoll *np)
+> >  		call_rcu(&npinfo->rcu, rcu_cleanup_netpoll_info);
+> >  	} else
+> >  		RCU_INIT_POINTER(np->dev->npinfo, NULL);
+> > -
+> > -	skb_pool_flush(np);
 > >  }
-> > +EXPORT_SYMBOL_GPL(zap_completion_queue);
+> >  
 > 
-> consider EXPORT_SYMBOL_NS_GPL(zap_completion_queue, "NETDEV_INTERNAL");
+> Please don't post conflicting patches to net and net-next.
+> Fixes have to go in first, trees converge, and then the net-next patches
+> can be posted.
 
-Thanks for the suggestion. First time I've heard about the export by
-Namespace. I suppose then I need to have
-`MODULE_IMPORT_NS("NETDEV_INTERNAL");` called at the caller side, right?
+Ack. I will wait until the invalid cleanup patch[1] lands in net-next
+before submitting a v2 for this change.
 
---breno
+Link: https://lore.kernel.org/all/20250901-netpoll_memleak-v1-1-34a181977dfc@debian.org/ [1]
 
