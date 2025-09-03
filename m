@@ -1,183 +1,217 @@
-Return-Path: <netdev+bounces-219552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51C7FB41E26
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 14:02:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E733DB41E63
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 14:08:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23B531694D1
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 12:02:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 712851B25D75
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 12:08:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 492682E6CC3;
-	Wed,  3 Sep 2025 12:01:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4232DCF65;
+	Wed,  3 Sep 2025 12:07:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Np+4jTMi"
 X-Original-To: netdev@vger.kernel.org
-Received: from unicom146.biz-email.net (unicom146.biz-email.net [210.51.26.146])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13C282EC555;
-	Wed,  3 Sep 2025 12:01:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.51.26.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6331E2BD597;
+	Wed,  3 Sep 2025 12:07:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756900868; cv=none; b=ndGqkIfpio5lRZuseVU+fZKrKAOiGipeU6qfhdYTxtF7Yk1hFw6XGQQ70TBnKWUwoYcW0cWJerNZ/vi7x/U1MJV3mLBGTPml03bHEA1F7PD5LgOYUoFZP/l27tIFpDQ+xPAwrTAj5poCrxzd5C66+kS1q+tP5Pvn6+Uhi6JZSLw=
+	t=1756901263; cv=none; b=dZyGoyaFRo17o49qJ1LSlQ7cdmLTFrbaF6ZxNBurmGMyg3jmM4Zqfg+cp8OcFg1IvIR/nz05DRYYc+WOskWww6FUPxMw5uV9Zz98gsrX0aaQZIkNlMl3xBaky096tciqnZzQMIswfQVZDgveKNBU3Cy1/NJje6G9eAfbS3qq+qE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756900868; c=relaxed/simple;
-	bh=Fbn6GppGy8yBxgfUd1MDljuMgmJusjReJOu+jY8SeA4=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=erqDWVmNEtl41L4WbhfExT8tzZAjH+YTgMt5hFN/vTGlrpyJ4U41cWTbwWGjwYr4XxS7rgk7J9GxTwaln+IHpwQ3TwWcSuXCGqmYSThEECz2/SvjY03cKkfHQquwlkcjZVkInmo8Fe0BB/AFva9Cum/jfMsXs3TSZdfI/z6iWYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com; spf=pass smtp.mailfrom=inspur.com; arc=none smtp.client-ip=210.51.26.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inspur.com
-Received: from Jtjnmail201614.home.langchao.com
-        by unicom146.biz-email.net ((D)) with ASMTP (SSL) id 202509032000566242;
-        Wed, 03 Sep 2025 20:00:56 +0800
-Received: from Jtjnmail201618.home.langchao.com (10.100.2.18) by
- Jtjnmail201614.home.langchao.com (10.100.2.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.57; Wed, 3 Sep 2025 20:00:57 +0800
-Received: from Jtjnmail201618.home.langchao.com ([fe80::e8a5:9069:4c1e:2304])
- by Jtjnmail201618.home.langchao.com ([fe80::e8a5:9069:4c1e:2304%10]) with
- mapi id 15.01.2507.057; Wed, 3 Sep 2025 20:00:57 +0800
-From: =?utf-8?B?R2FyeSBDaHUo5qWa5YWJ5bqGKQ==?= <chuguangqing@inspur.com>
-To: "Markus.Elfring@web.de" <Markus.Elfring@web.de>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "antonio@openvpn.net"
-	<antonio@openvpn.net>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"sd@queasysnail.net" <sd@queasysnail.net>, "horms@kernel.org"
-	<horms@kernel.org>
-Subject: Re: [PATCH v2 1/1] ovpn: use kmalloc_array() for array space
- allocation
-Thread-Topic: [PATCH v2 1/1] ovpn: use kmalloc_array() for array space
- allocation
-Thread-Index: AdwcyN3LkBtHNNPAvE+aVgfnozl3SA==
-Date: Wed, 3 Sep 2025 12:00:57 +0000
-Message-ID: <154e91e453c44817abbea33a7fb72e32@inspur.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: yes
-X-MS-TNEF-Correlator:
-Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";
-	micalg=SHA1; boundary="----=_NextPart_000_0066_01DC1D0D.7594F930"
+	s=arc-20240116; t=1756901263; c=relaxed/simple;
+	bh=MgBZIiU63PhDZRAMVyVp9++ETTOL9/NSN/2iNcCA55o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QJv5nAVvruzGOUfFYti10S1d3PeNuWP3qYXr8A69Pz6bzyB5ffuk5ASgvNPLdljkKA96CJJWUFtsvpJHaD+929gbSgTcigrQS84RwKLZ0mAkqHlehfj8aRQVBesnxhZVWH+MYymEoJd9xKpq7nN6N/qAJlEvN9myTwZY/e3ga34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Np+4jTMi; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756901262; x=1788437262;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=MgBZIiU63PhDZRAMVyVp9++ETTOL9/NSN/2iNcCA55o=;
+  b=Np+4jTMi6dpF5XN8iFhl8Eck3qhxQPtJETxl4q4sxRMAKCmRWDYcgaKF
+   2ombjZS162fOWNLczCkAH6n6FjSzxTaiEUI5OoQHX0pGmo2cXf1du9Fo9
+   WClPUWbsyGMRMXPNz954icq5hBMfUfHpBZvTKjUXr9Z7ws+JuV8ZC7U5O
+   dnNysvC+DVkyDYmmvU/H6bwaSBLkV17M5JXbReQmH9fndCrzwz2lv8I16
+   0yu+IUg6NJY2U/M81hN+tA3Xc2MSik0ZgTDCq5ojgIw1bQI928MuBCSoP
+   rT770yLs45MDiccYp3RXU4J0/PnoGTtBpAHeD89hNyF2jtEbDdSlGep33
+   A==;
+X-CSE-ConnectionGUID: Pm6nojv3QyuCODBd8i0rcw==
+X-CSE-MsgGUID: ZyXtbbjoRa+mPbGtYNwozQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11541"; a="59355718"
+X-IronPort-AV: E=Sophos;i="6.18,235,1751266800"; 
+   d="scan'208";a="59355718"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2025 05:06:30 -0700
+X-CSE-ConnectionGUID: xnoEev97Q2SK1BNCRg1grQ==
+X-CSE-MsgGUID: eVdKWMdaT4ywl7c+Qn4mMA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,235,1751266800"; 
+   d="scan'208";a="172024814"
+Received: from lkp-server02.sh.intel.com (HELO 06ba48ef64e9) ([10.239.97.151])
+  by fmviesa009.fm.intel.com with ESMTP; 03 Sep 2025 05:06:23 -0700
+Received: from kbuild by 06ba48ef64e9 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1utmEs-0003nj-0s;
+	Wed, 03 Sep 2025 12:05:50 +0000
+Date: Wed, 3 Sep 2025 20:05:03 +0800
+From: kernel test robot <lkp@intel.com>
+To: MD Danish Anwar <danishanwar@ti.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Xin Guo <guoxin09@huawei.com>, Lei Wei <quic_leiwei@quicinc.com>,
+	Lee Trager <lee@trager.us>, Michael Ellerman <mpe@ellerman.id.au>,
+	Fan Gong <gongfan1@huawei.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Lukas Bulwahn <lukas.bulwahn@redhat.com>,
+	Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
+	Suman Anna <s-anna@ti.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Tero Kristo <kristo@kernel.org>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 5/8] net: rpmsg-eth: Register device as netdev
+Message-ID: <202509031942.reUez3UI-lkp@intel.com>
+References: <20250902090746.3221225-6-danishanwar@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-tUid: 20259032000564b70b01accfe526d474de3e659ea2449
-X-Abuse-Reports-To: service@corp-email.com
-Abuse-Reports-To: service@corp-email.com
-X-Complaints-To: service@corp-email.com
-X-Report-Abuse-To: service@corp-email.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250902090746.3221225-6-danishanwar@ti.com>
 
-------=_NextPart_000_0066_01DC1D0D.7594F930
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hi MD,
 
-Hi Markus=EF=BC=8C
-	First of all, thank you for your reminder. According to your =
-suggestion, the format "Chu Guangqing" should be used. However, in line =
-with our company's signature conventions and my previous contributions =
-to the kernel community, I have been using "chuguangqing". Therefore, I =
-have to continue using this signature. The signature should not be =
-changed frequently.
+kernel test robot noticed the following build warnings:
 
->=20
-> > Signed-off-by: chuguangqing <chuguangqing@inspur.com>
->=20
-> Would the personal name usually deviate a bit from the email =
-identifier
-> according to the Developer's Certificate of Origin?
-> =
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/D=
-ocume
-> ntation/process/submitting-patches.rst?h=3Dv6.17-rc4#n436
->=20
-> Regards,
-> Markus
+[auto build test WARNING on 2fd4161d0d2547650d9559d57fc67b4e0a26a9e3]
 
-Best regards,
-Chu Guangqing
-<chuguangqing@inspur.com>
+url:    https://github.com/intel-lab-lkp/linux/commits/MD-Danish-Anwar/dt-bindings-net-ti-rpmsg-eth-Add-DT-binding-for-RPMSG-ETH/20250902-171411
+base:   2fd4161d0d2547650d9559d57fc67b4e0a26a9e3
+patch link:    https://lore.kernel.org/r/20250902090746.3221225-6-danishanwar%40ti.com
+patch subject: [PATCH net-next v2 5/8] net: rpmsg-eth: Register device as netdev
+config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20250903/202509031942.reUez3UI-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 15.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250903/202509031942.reUez3UI-lkp@intel.com/reproduce)
 
-------=_NextPart_000_0066_01DC1D0D.7594F930
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202509031942.reUez3UI-lkp@intel.com/
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIILijCCA8kw
-ggKxoAMCAQICEHiR8OF3G5iSSYrK6OtgewAwDQYJKoZIhvcNAQELBQAwWTETMBEGCgmSJomT8ixk
-ARkWA2NvbTEYMBYGCgmSJomT8ixkARkWCGxhbmdjaGFvMRQwEgYKCZImiZPyLGQBGRYEaG9tZTES
-MBAGA1UEAxMJSU5TUFVSLUNBMB4XDTE3MDEwOTA5MjgzMFoXDTM0MDUxMTEyMjAwNFowWTETMBEG
-CgmSJomT8ixkARkWA2NvbTEYMBYGCgmSJomT8ixkARkWCGxhbmdjaGFvMRQwEgYKCZImiZPyLGQB
-GRYEaG9tZTESMBAGA1UEAxMJSU5TUFVSLUNBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAq+Q17xtjJLyp5hgXDie1r4DeNj76VUvbZNSywWU5zhx+e0Lu0kwcZ0T3KncZdgdWyqYvRJMQ
-/VVqX3gS4VxtLw3zBrg9kGuD0LfpH0cA2b0ZHpxRh5WapP14flcSh/lnawig29z44wfUEg43yTZO
-lOfPKos/Dm6wyrJtaPmD6AF7w4+vFZH0zMYfjQkSN/xGgS3OPBNAB8PTHM2sV+fFmnnlTFpyRg0O
-IIA2foALZvjIjNdUfp8kMGSh/ZVMfHqTH4eo+FcZPZ+t9nTaJQz9cSylw36+Ig6FGZHA/Zq+0fYy
-VCxR1ZLULGS6wsVep8j075zlSinrVpMadguOcArThwIDAQABo4GMMIGJMBMGCSsGAQQBgjcUAgQG
-HgQAQwBBMAsGA1UdDwQEAwIBhjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBReWQOmtExYYJFO
-9h61pTmmMsE1ajAQBgkrBgEEAYI3FQEEAwIBATAjBgkrBgEEAYI3FQIEFgQUJmGwrST2eo+dKLZv
-FQ4PiIOniEswDQYJKoZIhvcNAQELBQADggEBAIhkYRbyElnZftcS7NdO0TO0y2wCULFpAyG//cXy
-rXPdTLpQO0k0aAy42P6hTLbkpkrq4LfVOhcx4EWC1XOuORBV2zo4jk1oFnvEsuy6H4a8o7favPPX
-90Nfvmhvz/rGy4lZTSZV2LONmT85D+rocrfsCGdQX/dtxx0jWdYDcO53MLq5qzCFiyQRcLNqum66
-pa8v1OSs99oKptY1dR7+GFHdA7Zokih5tugQbm7jJR+JRSyf+PomWuIiZEvYs+NpNVac+gyDUDkZ
-sb0vHPENGwf1a9gElQa+c+EHfy9Y8O+7Ha8IpLWUArNP980tBvO/TYYU6LMz07h7RyiXqr7fvEcw
-gge5MIIGoaADAgECAhN+AAJElnbGTStRDxOSAAEAAkSWMA0GCSqGSIb3DQEBCwUAMFkxEzARBgoJ
-kiaJk/IsZAEZFgNjb20xGDAWBgoJkiaJk/IsZAEZFghsYW5nY2hhbzEUMBIGCgmSJomT8ixkARkW
-BGhvbWUxEjAQBgNVBAMTCUlOU1BVUi1DQTAeFw0yNDA5MTIwMjMyMTNaFw0yOTA5MTEwMjMyMTNa
-MIG2MRMwEQYKCZImiZPyLGQBGRYDY29tMRgwFgYKCZImiZPyLGQBGRYIbGFuZ2NoYW8xFDASBgoJ
-kiaJk/IsZAEZFgRob21lMTMwMQYDVQQLDCrmtarmva7nlLXlrZDkv6Hmga/kuqfkuJrogqHku73m
-nInpmZDlhazlj7gxEjAQBgNVBAMMCealmuWFieW6hjEmMCQGCSqGSIb3DQEJARYXY2h1Z3Vhbmdx
-aW5nQGluc3B1ci5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCmAxYJorR2EuWD
-mEqTGNusxuqYJLS16jpUhxl5quVGcbIxKUBz9QWOHnlBO/qYH6jdedfMnwi+pxyJZEJrOqQstgmy
-aRTEC0iJTTbdZQ5z6jnRl8pWFdhf7ZN9wm8DI3C/MvG66vx65w9/JQOfJFDo7hEGld/I59HKCH25
-AvEEnM97gbW7jnSOI0nLfpYj/bYAsiiOuti57fd++qvoiy1728Jq02wnVk4zDTCYy6gVopDGEyiY
-U4mHtkuB8SOMyqqxHnt0sQOkHmHfirvLYWNpFjDMFxE8eQ2K+oxnk0n1Z6ps1RhErpy7mpSRZAH1
-hixBEil4bU/WLtatWPux2zj1AgMBAAGjggQaMIIEFjALBgNVHQ8EBAMCBaAwPQYJKwYBBAGCNxUH
-BDAwLgYmKwYBBAGCNxUIgvKpH4SB13qGqZE9hoD3FYPYj1yBSv2LJoGUp00CAWQCAWEwRAYJKoZI
-hvcNAQkPBDcwNTAOBggqhkiG9w0DAgICAIAwDgYIKoZIhvcNAwQCAgCAMAcGBSsOAwIHMAoGCCqG
-SIb3DQMHMB0GA1UdDgQWBBQRC/IegXfBTn5cZmp9COa0bolxUDAfBgNVHSMEGDAWgBReWQOmtExY
-YJFO9h61pTmmMsE1ajCCAQ8GA1UdHwSCAQYwggECMIH/oIH8oIH5hoG6bGRhcDovLy9DTj1JTlNQ
-VVItQ0EsQ049SlRDQTIwMTIsQ049Q0RQLENOPVB1YmxpYyUyMEtleSUyMFNlcnZpY2VzLENOPVNl
-cnZpY2VzLENOPUNvbmZpZ3VyYXRpb24sREM9aG9tZSxEQz1sYW5nY2hhbyxEQz1jb20/Y2VydGlm
-aWNhdGVSZXZvY2F0aW9uTGlzdD9iYXNlP29iamVjdENsYXNzPWNSTERpc3RyaWJ1dGlvblBvaW50
-hjpodHRwOi8vSlRDQTIwMTIuaG9tZS5sYW5nY2hhby5jb20vQ2VydEVucm9sbC9JTlNQVVItQ0Eu
-Y3JsMIIBLAYIKwYBBQUHAQEEggEeMIIBGjCBsQYIKwYBBQUHMAKGgaRsZGFwOi8vL0NOPUlOU1BV
-Ui1DQSxDTj1BSUEsQ049UHVibGljJTIwS2V5JTIwU2VydmljZXMsQ049U2VydmljZXMsQ049Q29u
-ZmlndXJhdGlvbixEQz1ob21lLERDPWxhbmdjaGFvLERDPWNvbT9jQUNlcnRpZmljYXRlP2Jhc2U/
-b2JqZWN0Q2xhc3M9Y2VydGlmaWNhdGlvbkF1dGhvcml0eTBkBggrBgEFBQcwAoZYaHR0cDovL0pU
-Q0EyMDEyLmhvbWUubGFuZ2NoYW8uY29tL0NlcnRFbnJvbGwvSlRDQTIwMTIuaG9tZS5sYW5nY2hh
-by5jb21fSU5TUFVSLUNBKDEpLmNydDApBgNVHSUEIjAgBggrBgEFBQcDAgYIKwYBBQUHAwQGCisG
-AQQBgjcKAwQwNQYJKwYBBAGCNxUKBCgwJjAKBggrBgEFBQcDAjAKBggrBgEFBQcDBDAMBgorBgEE
-AYI3CgMEMEsGA1UdEQREMEKgJwYKKwYBBAGCNxQCA6AZDBdjaHVndWFuZ3FpbmdAaW5zcHVyLmNv
-bYEXY2h1Z3VhbmdxaW5nQGluc3B1ci5jb20wUAYJKwYBBAGCNxkCBEMwQaA/BgorBgEEAYI3GQIB
-oDEEL1MtMS01LTIxLTE2MDY5ODA4NDgtNzA2Njk5ODI2LTE4MDE2NzQ1MzEtNTYwNDA2MA0GCSqG
-SIb3DQEBCwUAA4IBAQBDRhwc9Cfe5n65yxddOeEDQbNITPIjt/Q+Mf0KqzH+d4IcHt7HNA8ZhrOp
-YQJiFgjJY9eOo4+lABBfQTWVK3MrIiBTzf1MB8MRXnLKR1+FhZkDj+NRQdKDV6L1rcO+RsCJrLM2
-1MGkhqFlpXCHxlyPt+T18YSXSD0ceJ5QpQ3A+/N2p+OTxezHL5GqPSJT051H43ikZC5xCpZMWafu
-B0GyyrLlvvzet4Ko76Y4jWDL61EEakexUR9RgPcPhYFHiNf9f3wi3fc1AW0J1smh+3rm9INI+6Xx
-/g6gEHmIeBWZfODTrhP6FGMlMMJlLQoSAZbPBadhUnssKKTWgy5rT4qUMYIDkzCCA48CAQEwcDBZ
-MRMwEQYKCZImiZPyLGQBGRYDY29tMRgwFgYKCZImiZPyLGQBGRYIbGFuZ2NoYW8xFDASBgoJkiaJ
-k/IsZAEZFgRob21lMRIwEAYDVQQDEwlJTlNQVVItQ0ECE34AAkSWdsZNK1EPE5IAAQACRJYwCQYF
-Kw4DAhoFAKCCAfgwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjUw
-OTAzMTIwMDU1WjAjBgkqhkiG9w0BCQQxFgQUcqQTxZhBRxH0Xkr+ocWsTEVB1GUwfwYJKwYBBAGC
-NxAEMXIwcDBZMRMwEQYKCZImiZPyLGQBGRYDY29tMRgwFgYKCZImiZPyLGQBGRYIbGFuZ2NoYW8x
-FDASBgoJkiaJk/IsZAEZFgRob21lMRIwEAYDVQQDEwlJTlNQVVItQ0ECE34AAkSWdsZNK1EPE5IA
-AQACRJYwgYEGCyqGSIb3DQEJEAILMXKgcDBZMRMwEQYKCZImiZPyLGQBGRYDY29tMRgwFgYKCZIm
-iZPyLGQBGRYIbGFuZ2NoYW8xFDASBgoJkiaJk/IsZAEZFgRob21lMRIwEAYDVQQDEwlJTlNQVVIt
-Q0ECE34AAkSWdsZNK1EPE5IAAQACRJYwgZMGCSqGSIb3DQEJDzGBhTCBgjALBglghkgBZQMEASow
-CwYJYIZIAWUDBAEWMAoGCCqGSIb3DQMHMAsGCWCGSAFlAwQBAjAOBggqhkiG9w0DAgICAIAwDQYI
-KoZIhvcNAwICAUAwBwYFKw4DAhowCwYJYIZIAWUDBAIDMAsGCWCGSAFlAwQCAjALBglghkgBZQME
-AgEwDQYJKoZIhvcNAQEBBQAEggEAM163rdy7QBY4QcH0d+34+Z9/fzNWk+W5FANHajOiJeOBrVaR
-tqlb680R7zzdNNNTeI3mXDl1voygUwBFV376V215LSbLwBBqRfOgt6zCZVn/ucr8iwAq8blxcii/
-0k5czP8ueJj32Oab+aMS2B2EBSxMHdjGhPEOi2Lbjhlu3uutXe65bZiBoP3cExs7vSgP6BbfPEgR
-9xot28ZEtX7lLpJG0hXE1GC6oRJM2ayRTC8E+O7C2wIufPKbkMVLswGwVn7FfvfVFxgfrpDJIbCl
-DLobtdXbQUC2iyJ5D258HNC+/El8xfKcyzcS3+x2GRvQSGLvg4hO7jtvlE4RfW8HWgAAAAAAAA==
+All warnings (new ones prefixed by >>):
 
-------=_NextPart_000_0066_01DC1D0D.7594F930--
+   In file included from include/linux/device.h:15,
+                    from include/linux/of_reserved_mem.h:5,
+                    from drivers/net/ethernet/rpmsg_eth.c:8:
+   drivers/net/ethernet/rpmsg_eth.c: In function 'rpmsg_eth_validate_handshake':
+>> drivers/net/ethernet/rpmsg_eth.c:26:44: warning: format '%lu' expects argument of type 'long unsigned int', but argument 3 has type 'unsigned int' [-Wformat=]
+      26 |                 dev_err(port->common->dev, "Buffer configuration mismatch in handshake: expected_buf_size=%lu, received_buf_size=%d\n",
+         |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/dev_printk.h:110:30: note: in definition of macro 'dev_printk_index_wrap'
+     110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                       \
+         |                              ^~~
+   include/linux/dev_printk.h:154:56: note: in expansion of macro 'dev_fmt'
+     154 |         dev_printk_index_wrap(_dev_err, KERN_ERR, dev, dev_fmt(fmt), ##__VA_ARGS__)
+         |                                                        ^~~~~~~
+   drivers/net/ethernet/rpmsg_eth.c:26:17: note: in expansion of macro 'dev_err'
+      26 |                 dev_err(port->common->dev, "Buffer configuration mismatch in handshake: expected_buf_size=%lu, received_buf_size=%d\n",
+         |                 ^~~~~~~
+   drivers/net/ethernet/rpmsg_eth.c:26:109: note: format string is defined here
+      26 |                 dev_err(port->common->dev, "Buffer configuration mismatch in handshake: expected_buf_size=%lu, received_buf_size=%d\n",
+         |                                                                                                           ~~^
+         |                                                                                                             |
+         |                                                                                                             long unsigned int
+         |                                                                                                           %u
+>> drivers/net/ethernet/rpmsg_eth.c:42:44: warning: format '%llx' expects argument of type 'long long unsigned int', but argument 5 has type 'phys_addr_t' {aka 'unsigned int'} [-Wformat=]
+      42 |                 dev_err(port->common->dev, "TX/RX offset out of range in handshake: tx_offset=0x%x, rx_offset=0x%x, size=0x%llx\n",
+         |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/dev_printk.h:110:30: note: in definition of macro 'dev_printk_index_wrap'
+     110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                       \
+         |                              ^~~
+   include/linux/dev_printk.h:154:56: note: in expansion of macro 'dev_fmt'
+     154 |         dev_printk_index_wrap(_dev_err, KERN_ERR, dev, dev_fmt(fmt), ##__VA_ARGS__)
+         |                                                        ^~~~~~~
+   drivers/net/ethernet/rpmsg_eth.c:42:17: note: in expansion of macro 'dev_err'
+      42 |                 dev_err(port->common->dev, "TX/RX offset out of range in handshake: tx_offset=0x%x, rx_offset=0x%x, size=0x%llx\n",
+         |                 ^~~~~~~
+   drivers/net/ethernet/rpmsg_eth.c:42:127: note: format string is defined here
+      42 |                 dev_err(port->common->dev, "TX/RX offset out of range in handshake: tx_offset=0x%x, rx_offset=0x%x, size=0x%llx\n",
+         |                                                                                                                            ~~~^
+         |                                                                                                                               |
+         |                                                                                                                               long long unsigned int
+         |                                                                                                                            %x
+
+
+vim +26 drivers/net/ethernet/rpmsg_eth.c
+
+   > 8	#include <linux/of_reserved_mem.h>
+     9	#include <linux/remoteproc.h>
+    10	#include "rpmsg_eth.h"
+    11	
+    12	/**
+    13	 * rpmsg_eth_validate_handshake - Validate handshake parameters from remote
+    14	 * @port: Pointer to rpmsg_eth_port structure
+    15	 * @shm_info: Pointer to shared memory info received from remote
+    16	 *
+    17	 * Checks buffer size, magic numbers, and TX/RX offsets in the handshake
+    18	 * response to ensure they match expected values and are within valid ranges.
+    19	 *
+    20	 * Return: 0 on success, -EINVAL on validation failure.
+    21	 */
+    22	static int rpmsg_eth_validate_handshake(struct rpmsg_eth_port *port,
+    23						struct rpmsg_eth_shm *shm_info)
+    24	{
+    25		if (shm_info->buff_slot_size != RPMSG_ETH_BUFFER_SIZE) {
+  > 26			dev_err(port->common->dev, "Buffer configuration mismatch in handshake: expected_buf_size=%lu, received_buf_size=%d\n",
+    27				RPMSG_ETH_BUFFER_SIZE,
+    28				shm_info->buff_slot_size);
+    29			return -EINVAL;
+    30		}
+    31	
+    32		if (readl(port->shm + port->tx_offset + HEAD_MAGIC_NUM_OFFSET) != RPMSG_ETH_SHM_MAGIC_NUM ||
+    33		    readl(port->shm + port->rx_offset + HEAD_MAGIC_NUM_OFFSET) != RPMSG_ETH_SHM_MAGIC_NUM ||
+    34		    readl(port->shm + port->tx_offset + TAIL_MAGIC_NUM_OFFSET(port->tx_max_buffers)) != RPMSG_ETH_SHM_MAGIC_NUM ||
+    35		    readl(port->shm + port->rx_offset + TAIL_MAGIC_NUM_OFFSET(port->rx_max_buffers)) != RPMSG_ETH_SHM_MAGIC_NUM) {
+    36			dev_err(port->common->dev, "Magic number mismatch in handshake at head/tail\n");
+    37			return -EINVAL;
+    38		}
+    39	
+    40		if (shm_info->tx_offset >= port->buf_size ||
+    41		    shm_info->rx_offset >= port->buf_size) {
+  > 42			dev_err(port->common->dev, "TX/RX offset out of range in handshake: tx_offset=0x%x, rx_offset=0x%x, size=0x%llx\n",
+    43				shm_info->tx_offset,
+    44				shm_info->rx_offset,
+    45				port->buf_size);
+    46			return -EINVAL;
+    47		}
+    48	
+    49		return 0;
+    50	}
+    51	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
