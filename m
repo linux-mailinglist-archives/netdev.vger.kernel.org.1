@@ -1,96 +1,103 @@
-Return-Path: <netdev+bounces-219718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B7D0B42CAB
-	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 00:16:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9582CB42CB2
+	for <lists+netdev@lfdr.de>; Thu,  4 Sep 2025 00:20:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7DBC7C573D
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 22:15:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BDF93B144C
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 22:20:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A4E26B764;
-	Wed,  3 Sep 2025 22:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 068F82E2DD8;
+	Wed,  3 Sep 2025 22:20:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f29Eyqlq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BrcT5Sga"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33860BA3F;
-	Wed,  3 Sep 2025 22:15:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9807155333;
+	Wed,  3 Sep 2025 22:20:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756937756; cv=none; b=Dk87y3D4yH9meF9m/QMWPNh61gb+1uA8HiPP15tc7JlrD2ti1OKWXmXmEQ7BJClpMoCXKcYY8Q4qI4T1LB0wX4Ossm86tymRD6cHIJUNsRffad53ZScgLeqeIJiBmBckhyiaBFk7VFEYwryKqDqmhco5Jl1j8iDVfIESBR3W4As=
+	t=1756938011; cv=none; b=fmsm0jJmws+oo9W0qFEpEtvOwWlsM0K0Vggo7+tYEp/XB2vtKiji5PL6988Q7f0usx+eX50avZ6793xHM+s4DE0Bfqvi5sjYtAZ3NRsAz9SrIByjLTVhoBQyaIE734AF9TwLeF6Z5Y5yf1sMzRd0SNSpTDacKZn/0KCB3a5/Ubc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756937756; c=relaxed/simple;
-	bh=FjCxsXTO2y1dcCLjYVy+WtH9zNK8OPmf+oe47T3YX4Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cDdXX4+2eMRq88N5421E1UUjamkTOK0M2GJe7FB3I8aozxX/7dhMzw0VaHWelUPYh8aFUZmIVDy3IJRv974ZQenW1LrM2uM2YNGcDiMIaic3mgIG9bpNV+jCTC1sJn9tATPlxdH6Tk4lTtbGsF3H32JPN55unJvYPkpeerHJYeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f29Eyqlq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 771E0C4CEE7;
-	Wed,  3 Sep 2025 22:15:55 +0000 (UTC)
+	s=arc-20240116; t=1756938011; c=relaxed/simple;
+	bh=kEQv67VDFw8VqkSZh6w4o5ygDSRenhNdCMzd2IORFro=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=PpEsk5hAbEpEwLPVV67lXELOcrKGD5VzWgps8Mgvhp9kPRjc6vzHjXqEm6ezksokqA8HrRTyAgh4yNr868k3glVLsB36pWb0qy+M3KKqgy6ei7kZHYzRRjo3UnZ/fhd8XEjiX4GnrXIsKhn4hJJa3GhggoMWTsXTk1OSVFSP7Gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BrcT5Sga; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 685E9C4CEE7;
+	Wed,  3 Sep 2025 22:20:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756937755;
-	bh=FjCxsXTO2y1dcCLjYVy+WtH9zNK8OPmf+oe47T3YX4Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=f29EyqlqLRMXeIWuZJitiNpeH+sT89UwgxyPvp2eO7nIggZXyOzUvRmFT664V3Y+5
-	 hT4Qe6gNYItnV3OsnFVhk+sKwkV9Xt30TkTk9J7wLXh+dK3V6nvNbzRe6UShvacKq7
-	 1Vdn49ucvrmSBc4RdoT4+sK6MVIQQAsp0ShyTrzXFuPdQ9ZEQhvi4qtX9taKHq0MAG
-	 6Hra8sQuQJGCtKJZRD8Gegr0oR3Bcau9cs9TR49LkWir54tKASsb22+aLo8/3BU/DF
-	 v4zuvzEQ+P7fxHWIAsJZFBrurUDtcdGc7Ts/9tVh7PZIdd+sxhkcDZ+Lf17KY69B22
-	 FaLE2GI9aB4nA==
-Date: Wed, 3 Sep 2025 15:15:54 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: <netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- <netfilter-devel@vger.kernel.org>, pablo@netfilter.org
-Subject: Re: [PATCH net 1/2] selftests: netfilter: fix udpclash tool hang
-Message-ID: <20250903151554.5c72661e@kernel.org>
-In-Reply-To: <20250902185855.25919-2-fw@strlen.de>
-References: <20250902185855.25919-1-fw@strlen.de>
-	<20250902185855.25919-2-fw@strlen.de>
+	s=k20201202; t=1756938011;
+	bh=kEQv67VDFw8VqkSZh6w4o5ygDSRenhNdCMzd2IORFro=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=BrcT5SgaqTJiIXUkMeXSAGAbBMJKM9nLu+dPZJAlg5+BiNDOiM1Yk3VD9/gNQtIGh
+	 mm99RtV+V6oJkP0a8eaFqibCU7JTflrxTiVYWZkWSSweqJQKra7FRdpTRGTXkmF/Ho
+	 SXGFpvaFCzoVNM0OulbJ67VhImSUP/Zs1UHKP6kQloMUZeyirdfmjwi7JG3Ww8ynry
+	 Un6J98/4h6aXaxLK+/ict7h5M1LXulkJwdyI4HOaP8YDYfyvTQDIiTi4wA86cargJn
+	 C9j6xk58tu1Lm4lhDRM32WAKTWNnF7O6ub8dtAWQ8ar2c1mcMqlBTw9HuSw2O8P+uA
+	 eXVgopCLvtUnw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADED8383C259;
+	Wed,  3 Sep 2025 22:20:17 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 0/4] mptcp: misc. features for v6.18
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175693801650.1219827.13681989499903923218.git-patchwork-notify@kernel.org>
+Date: Wed, 03 Sep 2025 22:20:16 +0000
+References: 
+ <20250902-net-next-mptcp-misc-feat-6-18-v2-0-fa02bb3188b1@kernel.org>
+In-Reply-To: 
+ <20250902-net-next-mptcp-misc-feat-6-18-v2-0-fa02bb3188b1@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, shuah@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ ebiggers@kernel.org, yangang@kylinos.cn, cpaasch@openai.com
 
-On Tue,  2 Sep 2025 20:58:54 +0200 Florian Westphal wrote:
-> Yi Chen reports that 'udpclash' loops forever depending on compiler
-> (and optimization level used); while (x =3D=3D 1) gets optimized into
-> for (;;).  Switch to stdatomic to prevent this.
+Hello:
 
-gcc version 15.1.1 (F42) w/ whatever flags kselftests use appear to be
-unaware of this macro:
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-udpclash.c:33:26: error: implicit declaration of function =E2=80=98ATOMIC_V=
-AR_INIT=E2=80=99; did you mean =E2=80=98ATOMIC_FLAG_INIT=E2=80=99? [-Wimpli=
-cit-function-declaration]
-   33 | static atomic_int wait =3D ATOMIC_VAR_INIT(1);
-      |                          ^~~~~~~~~~~~~~~
-      |                          ATOMIC_FLAG_INIT
-udpclash.c:33:26: error: initializer element is not constant
+On Tue, 02 Sep 2025 23:11:32 +0200 you wrote:
+> This series contains 4 independent new features:
+> 
+> - Patch 1: use HMAC-SHA256 library instead of open-coded HMAC.
+> 
+> - Patch 2: selftests: check for unexpected fallback counter increments.
+> 
+> - Patches 3-4: record subflows in RPS table, for aRFS support.
+> 
+> [...]
 
-Could you perhaps use volatile instead?
+Here is the summary with links:
+  - [net-next,v2,1/4] mptcp: use HMAC-SHA256 library instead of open-coded HMAC
+    https://git.kernel.org/netdev/net-next/c/2d5be5629ce7
+  - [net-next,v2,2/4] selftests: mptcp: add checks for fallback counters
+    https://git.kernel.org/netdev/net-next/c/3fff72f827ad
+  - [net-next,v2,3/4] net: Add rfs_needed() helper
+    https://git.kernel.org/netdev/net-next/c/929324913e0c
+  - [net-next,v2,4/4] mptcp: record subflows in RPS table
+    https://git.kernel.org/netdev/net-next/c/3bd4f98a4e2c
 
-> +#include <stdatomic.h>
->  #include <stdio.h>
->  #include <string.h>
->  #include <stdlib.h>
-> @@ -29,7 +30,7 @@ struct thread_args {
->  	int sockfd;
->  };
-> =20
-> -static int wait =3D 1;
-> +static atomic_int wait =3D ATOMIC_VAR_INIT(1);
-> =20
->  static void *thread_main(void *varg)
->  {
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
