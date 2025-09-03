@@ -1,195 +1,230 @@
-Return-Path: <netdev+bounces-219422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8A68B41308
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 05:42:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6BC7B4131D
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 05:50:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 594E3545632
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 03:42:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2942B1B63FCF
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 03:51:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F0B82D0600;
-	Wed,  3 Sep 2025 03:42:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B79D2C375E;
+	Wed,  3 Sep 2025 03:50:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DXzUqY8a"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IFetC7Ft"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD062C3272
-	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 03:42:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756870938; cv=none; b=dO54zw9xMxD9KyFdPlMqZQ9SgDO/yFU3FCBB1bQAJITeryNhk2zqMe9jkXC49zU002EaB/heDWm0Shw1vlVkYevu4LZkEYETJnmGBt76vc/QOArqgi9hZTOOZlGOs7sC+hBd7esG13WcKqAA6UqoOip3rzBLgEVOwa/iS/Q46YM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756870938; c=relaxed/simple;
-	bh=9ESXmPmINNSXqQlz86ZJuKHZQigQluf5ycGSPQZVgNM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fNijzZjZCtvr7pEjmVhji+AJlzZ3Q7czLHN7EadGyJV0bwWhF3mLMxtbL2thW1UOZlfAuP9AYBWLkkNzzyAKik+p36aWF55hy9mOPirMUabWx2w04nCJCYkw0P6qK5SuHObpQWwWNJJdl67c5KsE/xXvZqp/n3sE5WGID5oghzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DXzUqY8a; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756870935;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=21HGKhCy/iaEYJrBJUDnVhz1RoV8QBoCOIAY2Tt+uVI=;
-	b=DXzUqY8alLSdhoFs2wccPZYGcjhKa8AO8R0MW/kFruP192xAQkxXnfWlcXLeyUTdWotay4
-	SHbaZkzMaovIF4BjWE0XGIGaDLo6htNppWVnwIxH5NlaT+mSteQWm/+AbJKib79Qp/pw7U
-	DfD4zj5kNt+ht82lQSIKBCg9v+b6sIQ=
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
- [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-375-_AiuVMXEPquMMa0cRa9vXQ-1; Tue, 02 Sep 2025 23:42:14 -0400
-X-MC-Unique: _AiuVMXEPquMMa0cRa9vXQ-1
-X-Mimecast-MFC-AGG-ID: _AiuVMXEPquMMa0cRa9vXQ_1756870933
-Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-7724903b0edso3017613b3a.0
-        for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 20:42:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756870933; x=1757475733;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=21HGKhCy/iaEYJrBJUDnVhz1RoV8QBoCOIAY2Tt+uVI=;
-        b=aKVCJy0YdEO0OwYqnXRc1oExuMo4AYk6H3fR44yyKB6Nr10pORhWK3Z+KpVS3VKKiI
-         TGf4jS8O1Au+FLkbl49Ot3+uGPGN2Bff5GRxS4ISEvx2zCrG1M6y5ChOD1VL6QYFI+NV
-         hIE/mONLnNVBcWVlFxxX1VDovXbDX9de1b4Er2kBXCGaR7VxSt1Xuyn5RMw9Xp1+moBg
-         v+P+UT4txW2Y+pgqcqwtE10yKyyiVPbnvkDDGj7k3eSqPwpqf29ucX+e2Q5dE5x+laOB
-         cO9VTY6WhX282ofGqKNX4kck59WcVCBKK5XqRkxPyN+5g5sdmVcPzrCwDqhHtmx5udlh
-         +7MA==
-X-Forwarded-Encrypted: i=1; AJvYcCXOPqve880S1mA5EBl5jtGPPmhravXlZuOT3/Ec0FKe3zBpUHMak3j1QsttctT4FQnCg381ukc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrPQy+xhDMpIXTEYW1u0LLLM5QBe1O42CI5DMbe+LgqPOeZnrL
-	Cn2aZbcx1ZpdAS2L6AWGS/93brtwy7naD5DVc6IN9I3L9qCqPgtaPMWgiCeB2qy3ezCMMplGDU1
-	47YeAuhsyMLSEzZtbIatwc3B7UVfh1pG73tOIV7uiFpvX5cD5VI6XW6IuXyoIcOboyzrfcZQLLX
-	B2GACBkhN+fkTDU/id0+qEloROXTpd++JH
-X-Gm-Gg: ASbGnctC9Qz6ZqskTmprXSgmL8pwyQBOkLS9edXYa+Om+Z1zZ99fiINa7xmv5Uq84Bf
-	bnY/89SRxe8CBaU6WKTgH+kwAOvtvgj0Spw1S3l7M08DDUDYEzm/pVOY71ljrf/ORBqGD1n0qKt
-	4zJOAZBW8gPuFa5dWFn2+Xlg==
-X-Received: by 2002:a05:6a21:6d9a:b0:243:af34:8f80 with SMTP id adf61e73a8af0-243d6f0a00emr19321154637.33.1756870933319;
-        Tue, 02 Sep 2025 20:42:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHanPhMKl5ZAvm2Qhwq+QdEgtJZ1BCJ/V8a82/77JVVc+iCktfnjs8inL16NihNJNK30sMh1UDZ/nyoOaphFLk=
-X-Received: by 2002:a05:6a21:6d9a:b0:243:af34:8f80 with SMTP id
- adf61e73a8af0-243d6f0a00emr19321122637.33.1756870932854; Tue, 02 Sep 2025
- 20:42:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC252C21D6;
+	Wed,  3 Sep 2025 03:50:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1756871443; cv=fail; b=IOIf23A4fn+xVvBAuL71adRTwVT9sjvPoUMuZPLhTltEje2x/tbcwtvQFZO5V23++MolCZ8ZKu8BliYeskV2awrPmvRPGrzgM/uhrOrsV5sMuPLL/vmJ1GnE0BZ/i3K3IyOeeDgVYrxwf+o8qTCmRHmDFUCztwdUIc+QKP6yvmQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1756871443; c=relaxed/simple;
+	bh=w+LfILCVVH9Xnfn8T3xwsBodW/eS5lJz4Wgxl6UFYhU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=iE68hjAVRIM5bZuSKuLhCLLAAOGjabJnDB2hsvt77wnstdp72Pm8B5XljhkU746oT3ejFLB1QYkpyOK0NaG5VY+ham5Sx+ou7L/6X1EsXI/GZtO/dT7Kw3lTj0tFHQcMUrOnKDbOhfwIk1Wu3bwNjN2dTOk6A/H5tkrmokCL0gA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IFetC7Ft; arc=fail smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1756871441; x=1788407441;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=w+LfILCVVH9Xnfn8T3xwsBodW/eS5lJz4Wgxl6UFYhU=;
+  b=IFetC7FtQDa34GhGm0Ca36Djq/VOa6mWBMNXSq7u/lo6OyBUujlxPmH5
+   GpSdM9Ca0uB689HNWmN05hehIT6531WTA/gWOoKGky1K1+sMn7eV3MmlW
+   SCMfKLZImvW2JWdhoGwnq443LkgZrrccn7GvRY/bhkxh2R7tO/Xo1uB9s
+   y9vAvh1G6sy14VnMj0H+0hwSMGHGgnJk/3yTgTb6o1eezJRGXJi0T8tqu
+   1KlPNyFUDCNa012uQ8VQt+uIrceHdlKZwSwZQBskofGHCif8pzNw8Lisl
+   swymITm6aV5F6EWecTa1yGSIGZseyjQyv8I3cqU5RQk3/ueGOi1yiz2FP
+   Q==;
+X-CSE-ConnectionGUID: 7cRqDn1YQXevutAfk+1LOw==
+X-CSE-MsgGUID: vfmG7MABScie2gtIlrwCCQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11541"; a="59111347"
+X-IronPort-AV: E=Sophos;i="6.18,233,1751266800"; 
+   d="scan'208";a="59111347"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2025 20:50:40 -0700
+X-CSE-ConnectionGUID: vJBUO0UnRLqdY8IyIEzsDA==
+X-CSE-MsgGUID: YMGGc+VwTn2ZQvnjKKPi+w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.18,233,1751266800"; 
+   d="scan'208";a="195108770"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2025 20:50:40 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Tue, 2 Sep 2025 20:50:39 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Tue, 2 Sep 2025 20:50:39 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (40.107.223.64)
+ by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Tue, 2 Sep 2025 20:50:38 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=WWx8Od6dkhgkO8/iQqj9rxS+yYruOOFInxevok8PTFad7PnlDrWN3TS/YunadUjDffLi9+iBDyumsda9FVXdq2Gm2yJMWe+VjxRbhlwnJglX8JW0gSWUMxIWMoAQ2zAxgIJYgt8K5hwHWi2RIGubs0MacAPb3OCK+V5gaiXaCW3fTfL2gyyPyqOda4xg9cjYWOb1v43O277niAKoTGKQkg9on+G/hTNZKCMBNnymDdEK7OA2SAqqa/FxcNx0xFoovAznIt7uU8f9bOMg6FyH+nF/dLO3QmEHt9HtymBLjCkMQOiSPwa6J+GssYS25UjToEtpHbqfC0Ww0IoWUgUWpg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=w+LfILCVVH9Xnfn8T3xwsBodW/eS5lJz4Wgxl6UFYhU=;
+ b=Z4d2ZGy2Hi/MXJfE1VVx3+P5RaeDu5vTMFtnu9eICISOFMpoHf/nBneCqTRMUseG6H3oKsTKbgXB7w1MfeYLVxT/1dnSrVT4dhJTXuKgn9LknLMN1sdLuYqqDBHbpp7jfWhds7PuDtdIVzmYhrGyBIn++rxnxVmtKcmwrxFHHT+ohm3PxgSrQOCQy5IBRfdT/qgD/aSHtZM8gxjpQm34LUmmE805vHJ51X9dlWyUvwenrmYn7zy2X7dzTV+NbpoR5gHyPvoyTUtbxANMnmfpH91lI+rVhRc2qSW7ZlAbZiM3sDwPV2Hb3VOux1ruPDG4jh9yzCbJmSnabRmsNNCmsA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com (2603:10b6:208:3e9::5)
+ by LV3PR11MB8579.namprd11.prod.outlook.com (2603:10b6:408:1b6::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9073.27; Wed, 3 Sep
+ 2025 03:50:35 +0000
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::7ac8:884c:5d56:9919]) by IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::7ac8:884c:5d56:9919%4]) with mapi id 15.20.9094.016; Wed, 3 Sep 2025
+ 03:50:35 +0000
+From: "Rinitha, SX" <sx.rinitha@intel.com>
+To: Tianyu Xu <xtydtc@gmail.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>
+CC: "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Tianyu Xu <tianyxu@cisco.com>, "Loktionov,
+ Aleksandr" <aleksandr.loktionov@intel.com>, Joe Damato <joe@dama.to>
+Subject: RE: [Intel-wired-lan] [PATCH v2] igb: Fix NULL pointer dereference in
+ ethtool loopback test
+Thread-Topic: [Intel-wired-lan] [PATCH v2] igb: Fix NULL pointer dereference
+ in ethtool loopback test
+Thread-Index: AQHcC4qc8S4LCV3m9kieciGx7WJ1C7SA8zcg
+Date: Wed, 3 Sep 2025 03:50:35 +0000
+Message-ID: <IA1PR11MB62417A30F7E247B971E917958B01A@IA1PR11MB6241.namprd11.prod.outlook.com>
+References: <20250812131056.93963-1-tianyxu@cisco.com>
+In-Reply-To: <20250812131056.93963-1-tianyxu@cisco.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR11MB6241:EE_|LV3PR11MB8579:EE_
+x-ms-office365-filtering-correlation-id: 01599082-9f84-47ce-1716-08ddea9d09f5
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?z+8WI3KTqu4hKdQdQj10wR/kv7lLkS2zQZxZWZTZ5y2oyjB0cEk9Vbl91nu5?=
+ =?us-ascii?Q?oGY0PUe99UDblKRx6tJRbmTHar28G03L7jOCQxUCPZ6zsA7f/zAHHza0/Xl+?=
+ =?us-ascii?Q?WS0UFxdO/rzQWZcwE5Y6wfHdxw8hc16t9+YsAJ5fEUU5zg4wYlKF9JWLg5pY?=
+ =?us-ascii?Q?syrjM5RWUTtiQKP/eCYFm2mc7Hj+989+rcL7TMp4ciNgcp7VMihJLMfjer2R?=
+ =?us-ascii?Q?14phMI58Ydj/pDZG7sFyds8lrvyy4x+5QYJrprUppFayKPuv5XJ90Cv+p34r?=
+ =?us-ascii?Q?nrlVjCIG0V4oNxR4FXxveu26NjrGDO+UNa7Iyenestx12PFc+8XPiWlAhwuU?=
+ =?us-ascii?Q?w20X397+7kjpYpZefvnpo7a+/PG+R2asQiZFGzvz5yoERfXmtD2Un9r8/fKr?=
+ =?us-ascii?Q?g6n8j4fKdIHncxZ7VC5O8ssvBBgmW6maL0R7ec7Zduz/YHnQO5jTkf+u5POp?=
+ =?us-ascii?Q?ZmhZ4dmjXcBeZpJumTxA6R8lcaRk6+hJPwpoRPngH3/wl+kMAu/SJ8iQjys0?=
+ =?us-ascii?Q?vR+PXRq+aTJ7GILZqPknTkT4uYM/lBy8Z1cph/YhaE++znRYWe6IvfCKQjdq?=
+ =?us-ascii?Q?JxjbD/CJGKCwvO6mzffh67z9MN6HsD5EsEVdnpDcV1pbThD6AFLRltwh2wS1?=
+ =?us-ascii?Q?HV9+tyZesm1bkcHS7N4QsKluOka8v/rfDyc/kxW3vGYkTqN4Y2PAwkjJOMkc?=
+ =?us-ascii?Q?h+HtDae/HM6cQzOCS5CIyIOtzHQwa1wOgTqFf9TaCF+MxozQs0YpMQFJRTiP?=
+ =?us-ascii?Q?DRUAHkkgGkjKQRO/bD389yc1h2pi/VlcM/4xw+6nfaGh+rwuEt5JyyhC5mvR?=
+ =?us-ascii?Q?T57zcCtg1bEKtQP6o+aQSPJZA19GIbh6S0KvOogTYE4x3OXX3dwZrAg/nukd?=
+ =?us-ascii?Q?sKnWz3w8Ud5hGmfsqITV0hmUtxS6VQxnKPbVumX/A8jBQBcpC2WmgliLvGEh?=
+ =?us-ascii?Q?gjqlojw1e35Z+6ee6JrhM1mJwjx2yIyc5BrzN4MzSTSiTAT6WVoof2A9NsWH?=
+ =?us-ascii?Q?MLib7lrpTYH2QMlY6hLjwDZLGtpbbNI6qkjXAo/Mi7yGR95ExNh/7ampzj54?=
+ =?us-ascii?Q?CtLtC6VLCbGY5zhB4tAHl0ve4Y1n+RfSx1/GWrAnuiIccZlpRWh9s9nnR/dc?=
+ =?us-ascii?Q?ZQUjIhKudzcKZH8zqGdsueOpGP68JV1SNK+dKicNgJMpq47h1cY54lCwQ+kp?=
+ =?us-ascii?Q?4xtmmLWxyjBeAnXXM/n9M6fmxRBxtvwzoQWPoIngcqNvdaJ4Oo0C/8fFZiSj?=
+ =?us-ascii?Q?WC14PVMLDHSKfxU3rRGiSKS1VOIYmwSVa6ysf7UlBJGr5DM5cr3AOXehvhuA?=
+ =?us-ascii?Q?fJ94ocZfoC3FGVq65U5++XDMbNyZcLyh+CMeoAtyrr2Asx/M0wdBWOw66RGD?=
+ =?us-ascii?Q?EcSziIZ8gUsE83pimrhNCrJCQ+wWlsUU4I5pYnPQ5l5o5XjwmlHKSOMBwPPl?=
+ =?us-ascii?Q?kLgBiaXF45jDgdWfm9UZbEsZtoYF8DRAFvLXO/JAkFPOSqzAeY7FCA=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?xpUAcY80OIbbR6CmB9SHkT5qURng6H+LoExTJQS8UUJJzEOXBnkJh3yLb7L+?=
+ =?us-ascii?Q?LNbhrEjcZhzTIVJEbaLyQiodPYgoPFy9gamh7cGIoxVY3IMZ5FXrYgDbiDBV?=
+ =?us-ascii?Q?1/92aDPAleg4Trxg7qml1ntf0svklAF7fvUgzmoJ90tVQfvpxtvC4RU9Lnli?=
+ =?us-ascii?Q?yZVNn4/C1yB5WsMpjjpewim/23LU3Vi7THlNW4my+a+puqS5tCSYuiHKZbRR?=
+ =?us-ascii?Q?P1PGXu998q/iMmQZqVlLtdZnaT6AfLlbtCK3eyI+EAJpfvgfSIIVLXmHmq8K?=
+ =?us-ascii?Q?zwJ53OFSlBMUb+NNpIwA+v67nBCJ5t/FSYwZ0Fyb8hxZG+I7jGkkLP19Ucsi?=
+ =?us-ascii?Q?irHMSWIYpr4U7oPuFs/HcpYie5YiveOsX473k1s5A0iRe0uZJChP6sbOM09U?=
+ =?us-ascii?Q?18GO0DDv9ODBf1Uvx5oSBFx1EghMQuPUWVeHpmDaGashtrPOzX57naBcSSlX?=
+ =?us-ascii?Q?2DQehaICrC5i2COCmmwhf1BBaCADU6Dx6JDODDrf2Z9WE42ydlwW0uWwxMVx?=
+ =?us-ascii?Q?qgq6kiXLrfpVdbyT1l2wg3+Fpb/j19tptGMicwmiD54WdvMpTELFhltOqBBx?=
+ =?us-ascii?Q?JHM5D2kC+OIUqoDFdKVTBjTIhlqIewpbik8agFg6zg8ZjEEJvQWnSzg+bXAa?=
+ =?us-ascii?Q?uSndxS4w4VA9bXYycG0z0Y4Hdx4Bfa+pH6jhao1TGx6LzuftGCxj+iqzTvBW?=
+ =?us-ascii?Q?17rdpr35a3xd4o6JhpQM45oP7rRSiZwW90zHUARlTzL6cOf54hNpCN8feWVH?=
+ =?us-ascii?Q?RqGKSF4Tg1iv7xKLdcgkqbsw4tCXFJTLoOHS0KYDB8x5I8L9wztUaKiHGquC?=
+ =?us-ascii?Q?1MFtetEpzQe5WDyHc7TaWgbdXAlQBhsLJlCHVe/CPf4x3N7AvqZ/DJRIij4Q?=
+ =?us-ascii?Q?tw1N1bfAFxL2UanyTF17/ZUUjhDZrNQtCG5S1vqZYj/Uh2Mp51iZJYwPD+LS?=
+ =?us-ascii?Q?aB4yUU5+jqTzfVR6YiSCD9OfQfaR5x3g3QJhQPfy8jByLHZxOcBKM7vxF7Yl?=
+ =?us-ascii?Q?KkNidGcotAgwxgFtduWRGad2naiDAjOw8RMeVMU8Uw0xdFVhYTxc8brr9kGY?=
+ =?us-ascii?Q?+GAELY0huhsp01vgb/9OWIhTRl71CcvuAMwr6/9geIm3dd5hpb6TScJ1DNmu?=
+ =?us-ascii?Q?95vlMnL7L1vVoIgiB+0y0V7OQ9X8YtdridRtLbn8zqYF1dbXjTnpdxHp3EKW?=
+ =?us-ascii?Q?uV89XW5UozFvF0Fa9XTeoGQuj+2Hg7GEqfHAf9sIIUkHcXsttbwU0kaSoZiD?=
+ =?us-ascii?Q?gTrJkGWGVxsBOYrzUi2l0iTgmhCq1bmXqqg+y31epYlWctj/y8FZDls71EOt?=
+ =?us-ascii?Q?lwALLuGdY0KCiOvF/KOu2Z5iTcuMWI77LUGm/V8wZGmgKyGHXP/ZEfPT5RgG?=
+ =?us-ascii?Q?H/Ep/KIcRSLXfxavp4soz21DTtdc+L2pXP1muifzqqp7FiZgtF9BnHmTrLgC?=
+ =?us-ascii?Q?dnUoNjp5tK+NT/fpaHl+CR768ikQO9Q2AT8vwCSWg0Z/buYxqUKxi4zuYWxN?=
+ =?us-ascii?Q?GasiX3O775DE2aFq0l1jTGwGHPkvqPDNlUwrciFbhkac43bKOgo7mnpZSFwy?=
+ =?us-ascii?Q?nuuSd+pYb7GcFkoEBH26VOQZ+htLYpx1LuR8XmME?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250902080957.47265-1-simon.schippers@tu-dortmund.de>
- <20250902080957.47265-5-simon.schippers@tu-dortmund.de> <willemdebruijn.kernel.251eacee11eca@gmail.com>
-In-Reply-To: <willemdebruijn.kernel.251eacee11eca@gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 3 Sep 2025 11:42:01 +0800
-X-Gm-Features: Ac12FXy-ZAK0_-Slu353Uz-vG-bLNLE-4F6AXp-hkWEm5GXoed80DFu99UnucK8
-Message-ID: <CACGkMEshZGJfh+Og_xrPeZYoWkBAcvqW8e93_DCr7ix4oOaP8Q@mail.gmail.com>
-Subject: Re: [PATCH 4/4] netdev queue flow control for vhost_net
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Simon Schippers <simon.schippers@tu-dortmund.de>, mst@redhat.com, eperezma@redhat.com, 
-	stephen@networkplumber.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
-	kvm@vger.kernel.org, Tim Gebauer <tim.gebauer@tu-dortmund.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6241.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 01599082-9f84-47ce-1716-08ddea9d09f5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Sep 2025 03:50:35.4163
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: kmP0Dn58XEwr7dIRlck1anLptZeOVVXwfMk7apDyTB3Dbtm2iyfz1UUNNYEngJ834dR5RBe5Oj3VF8UooYMYMA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8579
+X-OriginatorOrg: intel.com
 
-On Wed, Sep 3, 2025 at 5:31=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of T=
+ianyu Xu
+> Sent: 12 August 2025 18:41
+> To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>
+> Cc: Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>; kuba@kernel.org; =
+intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; linux-kernel@vger=
+.kernel.org; Tianyu Xu <tianyxu@cisco.com>; Loktionov, Aleksandr <aleksandr=
+.loktionov@intel.com>; Joe Damato <joe@dama.to>
+> Subject: [Intel-wired-lan] [PATCH v2] igb: Fix NULL pointer dereference i=
+n ethtool loopback test
 >
-> Simon Schippers wrote:
-> > Stopping the queue is done in tun_net_xmit.
-> >
-> > Waking the queue is done by calling one of the helpers,
-> > tun_wake_netdev_queue and tap_wake_netdev_queue. For that, in
-> > get_wake_netdev_queue, the correct method is determined and saved in th=
-e
-> > function pointer wake_netdev_queue of the vhost_net_virtqueue. Then, ea=
-ch
-> > time after consuming a batch in vhost_net_buf_produce, wake_netdev_queu=
-e
-> > is called.
-> >
-> > Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-> > Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-> > Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
-> > ---
-> >  drivers/net/tap.c      |  6 ++++++
-> >  drivers/net/tun.c      |  6 ++++++
-> >  drivers/vhost/net.c    | 34 ++++++++++++++++++++++++++++------
-> >  include/linux/if_tap.h |  2 ++
-> >  include/linux/if_tun.h |  3 +++
-> >  5 files changed, 45 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-> > index 4d874672bcd7..0bad9e3d59af 100644
-> > --- a/drivers/net/tap.c
-> > +++ b/drivers/net/tap.c
-> > @@ -1198,6 +1198,12 @@ struct socket *tap_get_socket(struct file *file)
-> >  }
-> >  EXPORT_SYMBOL_GPL(tap_get_socket);
-> >
-> > +void tap_wake_netdev_queue(struct file *file)
-> > +{
-> > +     wake_netdev_queue(file->private_data);
-> > +}
-> > +EXPORT_SYMBOL_GPL(tap_wake_netdev_queue);
-> > +
-> >  struct ptr_ring *tap_get_ptr_ring(struct file *file)
-> >  {
-> >       struct tap_queue *q;
-> > diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> > index 735498e221d8..e85589b596ac 100644
-> > --- a/drivers/net/tun.c
-> > +++ b/drivers/net/tun.c
-> > @@ -3739,6 +3739,12 @@ struct socket *tun_get_socket(struct file *file)
-> >  }
-> >  EXPORT_SYMBOL_GPL(tun_get_socket);
-> >
-> > +void tun_wake_netdev_queue(struct file *file)
-> > +{
-> > +     wake_netdev_queue(file->private_data);
-> > +}
-> > +EXPORT_SYMBOL_GPL(tun_wake_netdev_queue);
+> The igb driver currently causes a NULL pointer dereference when executing=
+ the ethtool loopback test. This occurs because there is no associated q_ve=
+ctor for the test ring when it is set up, as interrupts are typically not a=
+dded to the test rings.
 >
-> Having multiple functions with the same name is tad annoying from a
-> cscape PoV, better to call the internal functions
-> __tun_wake_netdev_queue, etc.
+> Since commit 5ef44b3cb43b removed the napi_id assignment in __xdp_rxq_inf=
+o_reg(), there is no longer a need to pass a napi_id to it.
+> Therefore, simply use 0 as the last parameter.
 >
-> > +
-> >  struct ptr_ring *tun_get_tx_ring(struct file *file)
-> >  {
-> >       struct tun_file *tfile;
-> > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> > index 6edac0c1ba9b..e837d3a334f1 100644
-> > --- a/drivers/vhost/net.c
-> > +++ b/drivers/vhost/net.c
-> > @@ -130,6 +130,7 @@ struct vhost_net_virtqueue {
-> >       struct vhost_net_buf rxq;
-> >       /* Batched XDP buffs */
-> >       struct xdp_buff *xdp;
-> > +     void (*wake_netdev_queue)(struct file *f);
+> Fixes: 2c6196013f84 ("igb: Add AF_XDP zero-copy Rx support")
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Reviewed-by: Joe Damato <joe@dama.to>
+> Signed-off-by: Tianyu Xu <tianyxu@cisco.com>
+> ---
+> Thanks to Aleksandr and Joe for your feedback. I have added the Fixes tag=
+ and formatted the lines to 75 characters based on your comments.
 >
-> Indirect function calls are expensive post spectre. Probably
-> preferable to just have a branch.
->
-> A branch in `file->f_op !=3D &tun_fops` would be expensive still as it
-> may touch a cold cacheline.
->
-> How about adding a bit in struct ptr_ring itself. Pahole shows plenty
-> of holes. Jason, WDYT?
+> drivers/net/ethernet/intel/igb/igb_main.c | 3 +--
+> 1 file changed, 1 insertion(+), 2 deletions(-)
 >
 
-I'm not sure I get the idea, did you mean a bit for classifying TUN
-and TAP? If this is, I'm not sure it's a good idea as ptr_ring should
-have no knowledge of its user.
-
-Consider there were still indirect calls to sock->ops, maybe we can
-start from the branch.
-
-Thanks
-
+Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 
