@@ -1,121 +1,151 @@
-Return-Path: <netdev+bounces-219454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-219455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CC37B41555
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 08:40:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D45BCB41560
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 08:45:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4AE42164980
-	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 06:40:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 948B83AB7FC
+	for <lists+netdev@lfdr.de>; Wed,  3 Sep 2025 06:45:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3237E2D6E6C;
-	Wed,  3 Sep 2025 06:40:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED51E2D6417;
+	Wed,  3 Sep 2025 06:45:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UdfpPUB/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rb9z5lUU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E8E2D77E9
-	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 06:40:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9698259C9C
+	for <netdev@vger.kernel.org>; Wed,  3 Sep 2025 06:45:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756881625; cv=none; b=h22iUK2bXdmGS4pZx4K49JSu6JuToSf9L/bdrbW08j/ssaYw66+VXl/MnBsmPEX8ynlu7D//1M1BrbPueblclC+07ifueKwuSqsL/DfOq9HWtRtsW+S1Wx1bULwGBDA8Y/w7Xo4Or+v7yM2cK3bxpHBKudRDjIge1yGPu6JCvNI=
+	t=1756881917; cv=none; b=V9FUQRlRoNyeIXnEVwR0KIJtug0KD1SoBIWyqCakiI/W+h1BgRNM51Vi7M3RAyP278F86xTdF3uuwFYL5DefbYcnJV1mPg6bfh3+IxH0JLSEWwoIWTmADAJ7+Gafioj3FnqNsHtQqPLTvPTtf6yji10OTELM+M6P0x0ofK10grU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756881625; c=relaxed/simple;
-	bh=I7dn+ByUDb13NbtwhJa5c65T8gw93qnSbGbhwt6saoU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gUCQjFET1dfjZoIvJe4SSF5pn5cg7fjYqJjukOfuoM7xDzvwUYRyfZhwVPcrO4iaowm+Kt80ihz8Lfvam2mX83iw12HDZ7sLV0E8uK9X/BnVCcKAxUFkFQ1HtabRXlYKr4zjUbL6WSXfQFGwS9guTdoCJMnohtOhFCGPeavevLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UdfpPUB/; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4b2fa418ef3so58778891cf.0
-        for <netdev@vger.kernel.org>; Tue, 02 Sep 2025 23:40:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1756881622; x=1757486422; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LZROVpDLsg/RMaGyQc2L1zm8XIhSAwyyqCJqyKcSBkc=;
-        b=UdfpPUB/XxosTHLYSHkWS+AdGscbknowdpybrk87RX7Uc+uAmo92SOom2MgMqRUlR1
-         MjEkvdCKX7Ds38JwQ7HVmtb30s4zFZ3tA/ddUBKEEYp0ViKq5vXuJHZ4gYhjKHpF5miz
-         7mCBaW+UoEZQDQwPpjGajla6W4T3/isAUq1oqJwKodzT/4e8BCCS/nRcRv3rwIA7ENpq
-         5k3vN/2mzhUGx+M4QmrO5mSsdfqU/gc87258v1QeHz/uQr07A3/gRDIS0kTtArKBrQ62
-         +RwmPJsgSl/S6A/froWFRhqOBx92KK6cRqcqGthCGfUXHxA2J+kYKEeyQ/kadgVo1EsR
-         +RgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756881622; x=1757486422;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LZROVpDLsg/RMaGyQc2L1zm8XIhSAwyyqCJqyKcSBkc=;
-        b=s1G9cEvVzsi8fKPVBtPNPJdBXLNHcaID06z/tQ3uVGnraN4tE75uvBzWfYR3tw2geY
-         KeFrKD2tz8bweFHlfIu7QeYgf+iiqyw1+Fgn/5HYr87pqcaSr8Xp/CTboLrOt/0frUFs
-         jgBvOU2j14wpMi4lGTp2jZMRcDf0KMMIz4uGMqjd5L4lXNBBpMXkQaTChZrAlV7LxiD1
-         gngFz2egWeQNAGBvHo+Qi3xVcOfQQx/WuKufMcJO75WHz1+5UzgEECprs1bLQN3NRMa+
-         e/wp5kxlge8JNiV3ZXzQAyd2igxC55MCOsEMEHYp3+NH/0Hh2O5iQU+qIVxDUPozmBjN
-         1IVg==
-X-Forwarded-Encrypted: i=1; AJvYcCV5xToAQWCH/SDBml21HdMwL9iQWin67YeHcDAmJozG9j6gfbHOe1+jMmmgtrOe38RItVxXlxI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmwUTiD8Nd/Xjx4j7i71BlAc3cb0jg3pvTJk9F/E/chq+HlXkf
-	2CD3Knb1zZpUXeT63In33F4xH6ZRlICvGo9Cu2m1Oa2nmRyk0MDkDtMQKhUG9Pqy47fzxKRUEP3
-	xg85jjKfTkKyKyYUaQ+m+yGh+4Q6odMO53GQMYUl1
-X-Gm-Gg: ASbGncubVCtCtKe/+V7eR8jsDaCIFsQzZCqUhuGQ9rcuwRGMUMvVDNkjuBkcQWz7DyC
-	eZ73CcO9/oV1yBA+o7qM/vTbfJCqb7WSUsSTgJTTEEjaqa9/Hbj5wtyNOkOGmh8wxZManLgWA2g
-	rAGp30MRwB8xxf60MYLfmgrEFQqtpswc3kGGAg3aqQ9xYLETWCK49wogfDt6tXJ0KCshemRKeEB
-	viVDpKt/Rk3XxzHdGo9rXRo
-X-Google-Smtp-Source: AGHT+IHARsXXGrtwJJveuJtqCTwyZ1Wed6t1P5yMrOvhki4ZqUEPp/Dq0VXQZ2cil2KfojtklOQxf1XEcDeYXoxFGEg=
-X-Received: by 2002:a05:622a:1984:b0:4b4:95f9:ada3 with SMTP id
- d75a77b69052e-4b49608f3a5mr2366221cf.60.1756881621977; Tue, 02 Sep 2025
- 23:40:21 -0700 (PDT)
+	s=arc-20240116; t=1756881917; c=relaxed/simple;
+	bh=NzmIpnXATfnIFuqGaF1OnnwxatEPP8/sKse1ZupCRyQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lQ58hpsVeU+nNdr8d//t3LUWgutJWYhzGbCpp94sEzDwyt4h8m/ruB6/JuMo3ER3GOPOWvOTZLj0mGDPgyO3KDQtgZBHjh6o294NvIlJotag0VzKt3Ic12X26BKwHNT9gXZSkH3nyzaUSWj2dczqsZaHCfzqUWujeXXsdlDMFnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rb9z5lUU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48BC4C4CEF0;
+	Wed,  3 Sep 2025 06:45:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756881917;
+	bh=NzmIpnXATfnIFuqGaF1OnnwxatEPP8/sKse1ZupCRyQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rb9z5lUUC6cVHSaTxozTKXudFB+h6cYpAKcZv51I7JsH1YRKmLDLsiVe9GyqD7RsL
+	 w3b4pA58WMFGilKGQ033/EPdBCP2DbNG7zTBQ0XdHraRYAuHVPpYU+tzjBMkWcsTK4
+	 EMKFKTj0lD2aH/kyoYrimBbaVqsZjBnNmh1o1nvJcQgzgKOlHthMZVobOa/j5DIrrn
+	 FRhPXmbFeKEFadAXqoSj4fcj2jfQyY/fc0fRPhxgEU8rnJaNiLR6diQUMKyJj650l8
+	 4dDPMQ0TuSdbM41mDNyIxpbj9qSjj28wAnoNhm0WbN4D1DcS7TJzMnEqdVptLz4m7i
+	 tW28QT9Iv0fbA==
+Date: Tue, 2 Sep 2025 23:45:15 -0700
+From: Saeed Mahameed <saeed@kernel.org>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net-next V6 09/13] devlink: Add 'keep_link_up' generic
+ devlink device param
+Message-ID: <aLfj-9H-GL_amuYc@x130>
+References: <20250709030456.1290841-1-saeed@kernel.org>
+ <20250709030456.1290841-10-saeed@kernel.org>
+ <20250709195801.60b3f4f2@kernel.org>
+ <aG9X13Hrg1_1eBQq@x130>
+ <20250710152421.31901790@kernel.org>
+ <aLC3jlzImChRDeJs@x130>
+ <abdde2b3-8f21-4970-9cf3-d250ca3fb5c6@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250903024406.2418362-1-xuanqiang.luo@linux.dev>
-In-Reply-To: <20250903024406.2418362-1-xuanqiang.luo@linux.dev>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 2 Sep 2025 23:40:10 -0700
-X-Gm-Features: Ac12FXyZI6Czfydvl7ogRcbkHggDSoBwxCpKPzZK1zSshOwTmdUAUCkdFFHVQMc
-Message-ID: <CANn89i+XH95h4UANWpR-39LSRkvM3LL=_pRL0+6fp6dwTZxn_g@mail.gmail.com>
-Subject: Re: [PATCH net] inet: Avoid established lookup missing active sk
-To: Xuanqiang Luo <xuanqiang.luo@linux.dev>
-Cc: kuniyu@google.com, davem@davemloft.net, kuba@kernel.org, 
-	kernelxing@tencent.com, netdev@vger.kernel.org, 
-	Xuanqiang Luo <luoxuanqiang@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <abdde2b3-8f21-4970-9cf3-d250ca3fb5c6@intel.com>
 
-On Tue, Sep 2, 2025 at 7:46=E2=80=AFPM Xuanqiang Luo <xuanqiang.luo@linux.d=
-ev> wrote:
+On 02 Sep 14:57, Jacob Keller wrote:
 >
-> From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
 >
-> Since the lookup of sk in ehash is lockless, when one CPU is performing a
-> lookup while another CPU is executing delete and insert operations
-> (deleting reqsk and inserting sk), the lookup CPU may miss either of
-> them, if sk cannot be found, an RST may be sent.
+>On 8/28/2025 1:09 PM, Saeed Mahameed wrote:
+>> On 10 Jul 15:24, Jakub Kicinski wrote:
+>>> On Wed, 9 Jul 2025 23:04:07 -0700 Saeed Mahameed wrote:
+>>>> On 09 Jul 19:58, Jakub Kicinski wrote:
+>>>>> On Tue,  8 Jul 2025 20:04:51 -0700 Saeed Mahameed wrote:
+>>>>>> Devices that support this in permanent mode will be requested to keep the
+>>>>>> port link up even when driver is not loaded, netdev carrier state won't
+>>>>>> affect the physical port link state.
+>>>>>>
+>>>>>> This is useful for when the link is needed to access onboard management
+>>>>>> such as BMC, even if the host driver isn't loaded.
+>>>>>
+>>>>> Dunno. This deserves a fuller API, and it's squarely and netdev thing.
+>>>>> Let's not add it to devlink.
+>>>>
+>>>> I don't see anything missing in the definition of this parameter
+>>>> 'keep_link_up' it is pretty much self-explanatory, for legacy reasons the
+>>>> netdev controls the underlying physical link state. But this is not
+>>>> true anymore for complex setups (multi-host, DPU, etc..).
+>>>
+>>> The policy can be more complex than "keep_link_up"
+>>> Look around the tree and search the ML archives please.
+>>>
+>>
+>> Sorry for replying late, had to work on other stuff and was waiting
+>> internally for a question I had to ask about this, only recently got the
+>> answer.
+>>
+>> I get your point, but I am not trying to implement any link policy
+>> or eth link specification tunables. For me and maybe other vendors
+>> this knob makes sense, and Important for the usecase I described.
+>>
+>> Perhaps move it to a vendor specific knob ? or rename to
+>> link_{fw/soc}_controlled?
+>>
 >
-> The call trace map is drawn as follows:
->    CPU 0                           CPU 1
->    -----                           -----
->                                 spin_lock()
->                                 sk_nulls_del_node_init_rcu(osk)
-> __inet_lookup_established()
->                                 __sk_nulls_add_node_rcu(sk, list)
->                                 spin_unlock()
+>Intel has also tried something similar sounding with the
+>"link_down_on_close" in ethtool, which appears to be have made it in to
+>ice and i40e.. (I thought I remembered these flags being rejected but I
+>guess not?) I guess the ethtool flag is a bit difference since its
+>relating to driver behavior when you bring the port down
+>administratively, vs something like this which affects firmware control
+>of the link regardless of its state to the kernel.
 >
-> We can try using spin_lock()/spin_unlock() to wait for ehash updates
-> (ensuring all deletions and insertions are completed) after a failed
-> lookup in ehash, then lookup sk again after the update. Since the sk
-> expected to be found is unlikely to encounter the aforementioned scenario
-> multiple times consecutively, we only need one update.
 
-No need for a lock really...
-- add the new node (with a temporary 'wrong' nulls value),
-- delete the old node
-- replace the nulls value by the expected one.
+Interesting, it seems that i40/ice LINK_DOWN_ON_CLOSE and TOTAL_PORT_SHUTDOWN_ENA
+go hand in hand, tried to read the long comment in i40 but it is mostly
+about how these are implemented in both driver and FW/phy but not what they
+mean, what I am trying to understand is "LINK_DOWN_ON_CLOSE_ENA" is an
+'enable' bit, it is off by default and an opt-in, does that mean by default 
+i40e/ice don't actually bring the link down on driver/unload or ndo->close
+?
+
+>>>> This is not different as BMC is sort of multi-host, and physical link
+>>>> control here is delegated to the firmware.
+>>>>
+>>>> Also do we really want netdev to expose API for permanent nic tunables ?
+>>>> I thought this is why we invented devlink to offload raw NIC underlying
+>>>> tunables.
+>>>
+>>> Are you going to add devlink params for link config?
+>>> Its one of the things that's written into the NVMe, usually..
+>>
+>> No, the purpose of this NVM series is to setup FW boot parameters and not spec related
+>> tunables.
+>>
+>
+>This seems quite useful to me w.r.t to BMC access. I think its a stretch
+>to say this implies the desire to add many other knobs.
+
+No sure if you are with or against the devlink knob ? :-)
+But thanks for the i40e/ice pointers at least I know I am not alone on this
+boat..
+
 
